@@ -4,7 +4,7 @@
 
     osdmodule.h
 
-    OSD module manangement
+    OSD module management
 
 *******************************************************************c********/
 
@@ -54,15 +54,14 @@ typedef osd_module *(*module_type)();
 template<class ModuleClass>
 osd_module *module_creator()
 {
-	void *p = osd_malloc(sizeof(ModuleClass));
-	return new(p) ModuleClass;
+	return global_alloc(ModuleClass());
 }
 
 class osd_module_manager
 {
 public:
 
-	static const int MAX_MODULES = 32;
+	static const int MAX_MODULES = 64;
 
 	osd_module_manager();
 	~osd_module_manager();
@@ -102,6 +101,7 @@ private:
 	class mod_class : public osd_module { \
 	public: \
 		mod_class () : osd_module(mod_type, mod_name) { } \
+		virtual ~mod_class() { } \
 		virtual int init(const osd_options &options) override { return -1; } \
 		virtual bool probe() override { return false; } \
 	};

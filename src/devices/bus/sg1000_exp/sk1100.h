@@ -6,13 +6,12 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_SG1000_EXP_SK1100_H
+#define MAME_BUS_SG1000_EXP_SK1100_H
+
 #pragma once
 
-#ifndef __SEGA_SK1100__
-#define __SEGA_SK1100__
 
-
-#include "emu.h"
 #include "sg1000exp.h"
 #include "formats/sc3000_bit.h"
 #include "imagedev/cassette.h"
@@ -34,7 +33,7 @@ class sega_sk1100_device : public device_t,
 {
 public:
 	// construction/destruction
-	sega_sk1100_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sega_sk1100_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;
@@ -51,34 +50,21 @@ protected:
 	// device_sg1000_expansion_slot_interface overrides
 	virtual DECLARE_READ8_MEMBER(peripheral_r) override;
 	virtual DECLARE_WRITE8_MEMBER(peripheral_w) override;
-	virtual bool is_readable(UINT8 offset) override;
+	virtual bool is_readable(uint8_t offset) override;
 
 private:
-	ioport_port* m_key_row[16];
 	required_device<cassette_image_device> m_cassette;
 	required_device<i8255_device> m_ppi;
-	required_ioport m_pa0;
-	required_ioport m_pa1;
-	required_ioport m_pa2;
-	required_ioport m_pa3;
-	required_ioport m_pa4;
-	required_ioport m_pa5;
-	required_ioport m_pa6;
-	required_ioport m_pb0;
-	required_ioport m_pb1;
-	required_ioport m_pb2;
-	required_ioport m_pb3;
-	required_ioport m_pb4;
-	required_ioport m_pb5;
-	required_ioport m_pb6;
+	required_ioport_array<8> m_pa;
+	required_ioport_array<8> m_pb;
 
 	/* keyboard state */
-	UINT8 m_keylatch;
+	uint8_t m_keylatch;
 };
 
 
 // device type definition
-extern const device_type SEGA_SK1100;
+DECLARE_DEVICE_TYPE(SEGA_SK1100, sega_sk1100_device)
 
 
-#endif
+#endif // MAME_BUS_SG1000_EXP_SK1100_H

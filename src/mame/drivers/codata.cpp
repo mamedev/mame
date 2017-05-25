@@ -30,11 +30,12 @@ public:
 
 	DECLARE_READ16_MEMBER(keyin_r);
 	DECLARE_READ16_MEMBER(status_r);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	void kbd_put(u8 data);
+
 private:
-	UINT8 m_term_data;
+	uint8_t m_term_data;
 	virtual void machine_reset() override;
-	required_shared_ptr<UINT16> m_p_base;
+	required_shared_ptr<uint16_t> m_p_base;
 	required_device<generic_terminal_device> m_terminal;
 	required_device<cpu_device> m_maincpu;
 };
@@ -60,7 +61,7 @@ INPUT_PORTS_END
 
 READ16_MEMBER( codata_state::keyin_r )
 {
-	UINT16 ret = m_term_data;
+	uint16_t ret = m_term_data;
 	m_term_data = 0;
 	return ret << 8;
 }
@@ -70,27 +71,27 @@ READ16_MEMBER( codata_state::status_r )
 	return (m_term_data) ? 0x500 : 0x400;
 }
 
-WRITE8_MEMBER( codata_state::kbd_put )
+void codata_state::kbd_put(u8 data)
 {
 	m_term_data = data;
 }
 
 void codata_state::machine_reset()
 {
-	UINT8* RAM = memregion("user1")->base();
+	uint8_t* RAM = memregion("user1")->base();
 	memcpy(m_p_base, RAM, 16);
 	m_term_data = 0;
 	m_maincpu->reset();
 }
 
-static MACHINE_CONFIG_START( codata, codata_state )
+static MACHINE_CONFIG_START( codata )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000, XTAL_16MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(codata_mem)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(codata_state, kbd_put))
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(codata_state, kbd_put))
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -109,5 +110,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 1982, codata,  0,     0,       codata,    codata, driver_device,   0,   "Contel Codata Corporation", "Codata", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   STATE         INIT  COMPANY                      FULLNAME  FLAGS
+COMP( 1982, codata, 0,      0,      codata,  codata, codata_state, 0,    "Contel Codata Corporation", "Codata", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

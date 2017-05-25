@@ -68,6 +68,43 @@
 		</part>
 	</software>
 
+	<software name="hisheet" supported="no">
+		<description>Hi-InterSheet</description>
+		<year>1986</year>
+		<publisher>Computer Concepts</publisher>
+		<info name="compatibility" value="6502 co-processor" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="25600">
+				<rom name="Hi-InterSheet.ssd" size="25600" crc="276aa20f" sha1="46d80cf02a649d3f43d6ef718b4d7ad03cc95646" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hiview" supported="no">
+		<description>Hi-View</description>
+		<year>1984</year>
+		<publisher>Acornsoft</publisher>
+		<info name="release" value="SNB15" />
+		<info name="compatibility" value="6502 co-processor" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102400">
+				<rom name="Hi-View.ssd" size="102400" crc="f9e79e46" sha1="5b5653c890efc74c3d35d1ab82e51ba43d797346" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hiwwplus" supported="no">
+		<description>Hi-Wordwise Plus</description>
+		<year>1985</year>
+		<publisher>Computer Concepts</publisher>
+		<info name="compatibility" value="6502 co-processor" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="33280">
+				<rom name="Hi-WordWisePlus.ssd" size="33280" crc="e0c88da9" sha1="eeb95137ba5b8428795c552f484b07bf12f2e878" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="l2fsutil" supported="no">
 		<description>Econet Level 2 Fileserver Software</description>
 		<year>1985</year>

@@ -36,7 +36,7 @@ if it was a small shared buffer. The order of operations is:
 READ8_MEMBER(docastle_state::docastle_shared0_r)
 {
 	if (offset == 8 && LOG)
-		logerror("CPU #0 shared0r  clock = %d\n", (UINT32)m_maincpu->total_cycles());
+		logerror("CPU #0 shared0r  clock = %d\n", (uint32_t)m_maincpu->total_cycles());
 
 	return m_buffer0[offset];
 }
@@ -45,7 +45,7 @@ READ8_MEMBER(docastle_state::docastle_shared0_r)
 READ8_MEMBER(docastle_state::docastle_shared1_r)
 {
 	if (offset == 8 && LOG)
-		logerror("CPU #1 shared1r  clock = %d\n", (UINT32)m_slave->total_cycles());
+		logerror("CPU #1 shared1r  clock = %d\n", (uint32_t)m_slave->total_cycles());
 
 	return m_buffer1[offset];
 }
@@ -57,7 +57,7 @@ WRITE8_MEMBER(docastle_state::docastle_shared0_w)
 		logerror("CPU #1 shared0w %02x %02x %02x %02x %02x %02x %02x %02x %02x clock = %d\n",
 		m_buffer0[0], m_buffer0[1], m_buffer0[2], m_buffer0[3],
 		m_buffer0[4], m_buffer0[5], m_buffer0[6], m_buffer0[7],
-		data, (UINT32)m_slave->total_cycles());
+		data, (uint32_t)m_slave->total_cycles());
 
 	m_buffer0[offset] = data;
 
@@ -75,7 +75,7 @@ WRITE8_MEMBER(docastle_state::docastle_shared1_w)
 		logerror("CPU #0 shared1w %02x %02x %02x %02x %02x %02x %02x %02x %02x clock = %d\n",
 		m_buffer1[0], m_buffer1[1], m_buffer1[2], m_buffer1[3],
 		m_buffer1[4], m_buffer1[5], m_buffer1[6], m_buffer1[7],
-		data, (UINT32)m_maincpu->total_cycles());
+		data, (uint32_t)m_maincpu->total_cycles());
 
 	/* freeze execution of the master CPU until the slave has used the shared memory */
 	if (offset == 8)

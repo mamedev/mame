@@ -12,22 +12,25 @@
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "screen.h"
 
 
 class unistar_state : public driver_device
 {
 public:
 	unistar_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_maincpu(*this, "maincpu") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_p_chargen(*this, "chargen")
+	{ }
 
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(unistar);
-	UINT32 screen_update_unistar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	const UINT8 *m_p_chargen;
+	uint32_t screen_update_unistar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 private:
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
+	required_region_ptr<u8> m_p_chargen;
 };
 
 
@@ -51,7 +54,6 @@ INPUT_PORTS_END
 
 void unistar_state::machine_reset()
 {
-	m_p_chargen = memregion("chargen")->base();
 }
 
 PALETTE_INIT_MEMBER( unistar_state, unistar )
@@ -61,11 +63,7 @@ PALETTE_INIT_MEMBER( unistar_state, unistar )
 	palette.set_pen_color(2, 0, 128, 0 );   /* Dimmed */
 }
 
-void unistar_state::video_start()
-{
-}
-
-UINT32 unistar_state::screen_update_unistar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t unistar_state::screen_update_unistar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -88,7 +86,7 @@ static GFXDECODE_START( unistar )
 	GFXDECODE_ENTRY( "chargen", 0x0000, unistar_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( unistar, unistar_state )
+static MACHINE_CONFIG_START( unistar )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8085A, XTAL_2MHz)
 	MCFG_CPU_PROGRAM_MAP(unistar_mem)
@@ -121,5 +119,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT    INIT        COMPANY            FULLNAME              FLAGS */
-COMP( 198?, unistar, 0,      0,       unistar,   unistar, driver_device, 0,  "Callan Data Systems", "Unistar 200 Terminal", MACHINE_IS_SKELETON )
+//    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT    STATE          INIT  COMPANY                FULLNAME                FLAGS
+COMP( 198?, unistar, 0,      0,       unistar,   unistar, unistar_state, 0,    "Callan Data Systems", "Unistar 200 Terminal", MACHINE_IS_SKELETON )

@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Philip Bennett
+// thanks-to:Tony Friery
 /***************************************************************************
 
     JPM IMPACT (aka System 6)
@@ -103,13 +104,16 @@ Thanks to Tony Friery and JPeMU for I/O routines and documentation.
 
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
-
 #include "includes/jpmimpct.h"
-#include "machine/nvram.h"
-#include "jpmimpct.lh"
-#include "video/awpvid.h"
+
+#include "cpu/m68000/m68000.h"
 #include "machine/i8255.h"
+#include "machine/nvram.h"
+#include "video/awpvid.h"
+#include "screen.h"
+#include "speaker.h"
+
+#include "jpmimpct.lh"
 
 /*************************************
  *
@@ -207,7 +211,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(jpmimpct_state::duart_1_timer_event)
 READ16_MEMBER(jpmimpct_state::duart_1_r)
 {
 	struct duart_t &duart_1 = m_duart_1;
-	UINT16 val = 0xffff;
+	uint16_t val = 0xffff;
 	switch (offset)
 	{
 		case 0x1:
@@ -381,7 +385,7 @@ READ16_MEMBER(jpmimpct_state::duart_2_r)
 		}
 		case 0xb:
 		{
-			UINT16 val = m_touch_data[m_touch_cnt];
+			uint16_t val = m_touch_data[m_touch_cnt];
 
 			if (m_touch_cnt++ == 3)
 				m_touch_cnt = 0;
@@ -425,7 +429,7 @@ WRITE16_MEMBER(jpmimpct_state::duart_2_w)
 
 READ16_MEMBER(jpmimpct_state::inputs1_r)
 {
-	UINT16 val = 0x00ff;
+	uint16_t val = 0x00ff;
 
 	switch (offset)
 	{
@@ -831,13 +835,13 @@ WRITE_LINE_MEMBER(jpmimpct_state::tms_irq)
  *
  *************************************/
 
-static MACHINE_CONFIG_START( jpmimpct, jpmimpct_state )
+static MACHINE_CONFIG_START( jpmimpct )
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)
 	MCFG_CPU_PROGRAM_MAP(m68k_program_map)
 
 	MCFG_CPU_ADD("dsp", TMS34010, 40000000)
 	MCFG_CPU_PROGRAM_MAP(tms_program_map)
-	MCFG_TMS340X0_HALT_ON_RESET(TRUE) /* halt on reset */
+	MCFG_TMS340X0_HALT_ON_RESET(true) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(40000000/16) /* pixel clock */
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(4) /* pixels per clock */
 	MCFG_TMS340X0_SCANLINE_RGB32_CB(jpmimpct_state, scanline_update)   /* scanline updater (rgb32) */
@@ -999,7 +1003,7 @@ MACHINE_RESET_MEMBER(jpmimpct_state,impctawp)
  */
 READ16_MEMBER(jpmimpct_state::inputs1awp_r)
 {
-	UINT16 val = 0x00;
+	uint16_t val = 0x00;
 
 	{
 		switch (offset)
@@ -1088,18 +1092,18 @@ WRITE16_MEMBER(jpmimpct_state::jpmioawp_w)
 			m_reel1->update((data >> 1)& 0x0F);
 			m_reel2->update((data >> 2)& 0x0F);
 			m_reel3->update((data >> 3)& 0x0F);
-			awp_draw_reel(machine(),"reel1", m_reel0);
-			awp_draw_reel(machine(),"reel2", m_reel1);
-			awp_draw_reel(machine(),"reel3", m_reel2);
-			awp_draw_reel(machine(),"reel4", m_reel3);
+			awp_draw_reel(machine(),"reel1", *m_reel0);
+			awp_draw_reel(machine(),"reel2", *m_reel1);
+			awp_draw_reel(machine(),"reel3", *m_reel2);
+			awp_draw_reel(machine(),"reel4", *m_reel3);
 			break;
 		}
 		case 0x04:
 		{
 			m_reel4->update((data >> 4)& 0x0F);
 			m_reel5->update((data >> 5)& 0x0F);
-			awp_draw_reel(machine(),"reel5", m_reel4);
-			awp_draw_reel(machine(),"reel6", m_reel5);
+			awp_draw_reel(machine(),"reel5", *m_reel4);
+			awp_draw_reel(machine(),"reel6", *m_reel5);
 			break;
 		}
 		case 0x06:
@@ -1303,7 +1307,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START( impctawp, jpmimpct_state )
+MACHINE_CONFIG_START( impctawp )
 	MCFG_CPU_ADD("maincpu",M68000, 8000000)
 	MCFG_CPU_PROGRAM_MAP(awp68k_program_map)
 
@@ -1741,20 +1745,20 @@ ROM_END
 
 /* Video */
 
-GAME( 1995, cluedo,   0,       jpmimpct, cluedo, driver_device,   0, ROT0, "JPM", "Cluedo (prod. 2D)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, cluedod,  cluedo,  jpmimpct, cluedo, driver_device,   0, ROT0, "JPM", "Cluedo (prod. 2D) (Protocol)",MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, cluedo2c, cluedo,  jpmimpct, cluedo, driver_device,   0, ROT0, "JPM", "Cluedo (prod. 2C)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, cluedo2,  cluedo,  jpmimpct, cluedo, driver_device,   0, ROT0, "JPM", "Cluedo (prod. 2)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, trivialp, 0,       jpmimpct, trivialp, driver_device, 0, ROT0, "JPM", "Trivial Pursuit (New Edition) (prod. 1D)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1996, trivialpd,trivialp,jpmimpct, trivialp, driver_device, 0, ROT0, "JPM", "Trivial Pursuit (New Edition) (prod. 1D) (Protocol)",MACHINE_SUPPORTS_SAVE )
-GAME( 1996, trivialpo,trivialp,jpmimpct, trivialp, driver_device, 0, ROT0, "JPM", "Trivial Pursuit",  MACHINE_SUPPORTS_SAVE )
-GAME( 1997, scrabble, 0,       jpmimpct, scrabble, driver_device, 0, ROT0, "JPM", "Scrabble (rev. F)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1997, scrabbled,scrabble,jpmimpct, scrabble, driver_device, 0, ROT0, "JPM", "Scrabble (rev. F) (Protocol)",MACHINE_SUPPORTS_SAVE )
-GAME( 1998, hngmnjpm, 0,       jpmimpct, hngmnjpm, driver_device, 0, ROT0, "JPM", "Hangman (JPM)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1998, hngmnjpmd,hngmnjpm,jpmimpct, hngmnjpm, driver_device, 0, ROT0, "JPM", "Hangman (JPM) (Protocol)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1999, coronatn, 0,       jpmimpct, coronatn, driver_device, 0, ROT0, "JPM", "Coronation Street Quiz Game", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, coronatnd,coronatn,jpmimpct, coronatn, driver_device, 0, ROT0, "JPM", "Coronation Street Quiz Game (Protocol)", MACHINE_SUPPORTS_SAVE )
-GAME( 199?, tqst,     0,       jpmimpct, cluedo  , driver_device, 0, ROT0, "JPM", "Treasure Quest"             , MACHINE_NOT_WORKING) // incomplete (ACE?)
-GAME( 199?, snlad,    0,       jpmimpct, cluedo  , driver_device, 0, ROT0, "JPM", "Snake & Ladders"            , MACHINE_NOT_WORKING) // incomplete
-GAME( 199?, buzzundr, 0,       jpmimpct, cluedo  , driver_device, 0, ROT0, "Ace", "Buzzundrum (Ace)", MACHINE_NOT_WORKING )
-GAME( 199?, monspdr , 0,       jpmimpct, cluedo  , driver_device, 0, ROT0, "Ace", "Money Spider (Ace)", MACHINE_NOT_WORKING )
+GAME( 1995, cluedo,   0,       jpmimpct, cluedo,   jpmimpct_state, 0, ROT0, "JPM", "Cluedo (prod. 2D)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, cluedod,  cluedo,  jpmimpct, cluedo,   jpmimpct_state, 0, ROT0, "JPM", "Cluedo (prod. 2D) (Protocol)",MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, cluedo2c, cluedo,  jpmimpct, cluedo,   jpmimpct_state, 0, ROT0, "JPM", "Cluedo (prod. 2C)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, cluedo2,  cluedo,  jpmimpct, cluedo,   jpmimpct_state, 0, ROT0, "JPM", "Cluedo (prod. 2)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, trivialp, 0,       jpmimpct, trivialp, jpmimpct_state, 0, ROT0, "JPM", "Trivial Pursuit (New Edition) (prod. 1D)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1996, trivialpd,trivialp,jpmimpct, trivialp, jpmimpct_state, 0, ROT0, "JPM", "Trivial Pursuit (New Edition) (prod. 1D) (Protocol)",MACHINE_SUPPORTS_SAVE )
+GAME( 1996, trivialpo,trivialp,jpmimpct, trivialp, jpmimpct_state, 0, ROT0, "JPM", "Trivial Pursuit",  MACHINE_SUPPORTS_SAVE )
+GAME( 1997, scrabble, 0,       jpmimpct, scrabble, jpmimpct_state, 0, ROT0, "JPM", "Scrabble (rev. F)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1997, scrabbled,scrabble,jpmimpct, scrabble, jpmimpct_state, 0, ROT0, "JPM", "Scrabble (rev. F) (Protocol)",MACHINE_SUPPORTS_SAVE )
+GAME( 1998, hngmnjpm, 0,       jpmimpct, hngmnjpm, jpmimpct_state, 0, ROT0, "JPM", "Hangman (JPM)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1998, hngmnjpmd,hngmnjpm,jpmimpct, hngmnjpm, jpmimpct_state, 0, ROT0, "JPM", "Hangman (JPM) (Protocol)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1999, coronatn, 0,       jpmimpct, coronatn, jpmimpct_state, 0, ROT0, "JPM", "Coronation Street Quiz Game", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, coronatnd,coronatn,jpmimpct, coronatn, jpmimpct_state, 0, ROT0, "JPM", "Coronation Street Quiz Game (Protocol)", MACHINE_SUPPORTS_SAVE )
+GAME( 199?, tqst,     0,       jpmimpct, cluedo  , jpmimpct_state, 0, ROT0, "JPM", "Treasure Quest"             , MACHINE_NOT_WORKING) // incomplete (ACE?)
+GAME( 199?, snlad,    0,       jpmimpct, cluedo  , jpmimpct_state, 0, ROT0, "JPM", "Snake & Ladders"            , MACHINE_NOT_WORKING) // incomplete
+GAME( 199?, buzzundr, 0,       jpmimpct, cluedo  , jpmimpct_state, 0, ROT0, "Ace", "Buzzundrum (Ace)", MACHINE_NOT_WORKING )
+GAME( 199?, monspdr , 0,       jpmimpct, cluedo  , jpmimpct_state, 0, ROT0, "Ace", "Money Spider (Ace)", MACHINE_NOT_WORKING )

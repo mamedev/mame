@@ -13,12 +13,16 @@
 // 2 of the sets contain program scrambled roms (where the last 0x2000 bytes match between games) why, badly dumped?
 
 #include "emu.h"
+
 #include "cpu/z180/z180.h"
 #include "machine/i8255.h"
-#include "ecoinf3.lh"
 #include "machine/steppers.h" // stepper motor
-#include "video/awpvid.h" // drawing reels
 #include "sound/sn76496.h"
+#include "video/awpvid.h" // drawing reels
+#include "speaker.h"
+
+#include "ecoinf3.lh"
+
 
 class ecoinf3_state : public driver_device
 {
@@ -42,8 +46,8 @@ public:
 	required_device<stepper_device> m_reel2;
 	required_device<stepper_device> m_reel3;
 
-	UINT16 m_lamps[16];
-	UINT16 m_chars[14];
+	uint16_t m_lamps[16];
+	uint16_t m_chars[14];
 	void update_display();
 
 	int strobe_addr;
@@ -229,8 +233,8 @@ public:
 		m_reel0->update( data    &0x0f);
 		m_reel1->update((data>>4)&0x0f);
 
-		awp_draw_reel(machine(),"reel1", m_reel0);
-		awp_draw_reel(machine(),"reel2", m_reel1);
+		awp_draw_reel(machine(),"reel1", *m_reel0);
+		awp_draw_reel(machine(),"reel2", *m_reel1);
 	}
 
 	DECLARE_WRITE8_MEMBER(ppi8255_intf_d_write_b_reel23)
@@ -240,8 +244,8 @@ public:
 		m_reel2->update( data    &0x0f);
 		m_reel3->update((data>>4)&0x0f);
 
-		awp_draw_reel(machine(),"reel3", m_reel2);
-		awp_draw_reel(machine(),"reel4", m_reel3);
+		awp_draw_reel(machine(),"reel3", *m_reel2);
+		awp_draw_reel(machine(),"reel4", *m_reel3);
 	}
 
 	DECLARE_WRITE8_MEMBER(ppi8255_intf_d_write_c) { logerror("%04x - ppi8255_intf_d_(used)write_c %02x\n", m_maincpu->pcbase(), data);}
@@ -275,7 +279,7 @@ public:
 
 // this is a copy of roc10937charset for now, I don't know what chip we're meant be using here
 // it is some kind of 14 digit, 16 seg display tho
-static const UINT16 ecoin_charset[]=
+static const uint16_t ecoin_charset[]=
 {            // FEDC BA98 7654 3210
 	0x507F, // 0101 0000 0111 1111 @.
 	0x44CF, // 0100 0100 1100 1111 A.
@@ -345,7 +349,7 @@ static const UINT16 ecoin_charset[]=
 	0x1407, // 0001 0100 0000 0111 ?.
 };
 
-static UINT32 set_display(UINT32 segin)
+static uint32_t set_display(uint32_t segin)
 {
 	return BITSWAP32(segin, 31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,11,9,15,13,12,8,10,14,7,6,5,4,3,2,1,0);
 }
@@ -364,7 +368,7 @@ WRITE8_MEMBER(ecoinf3_state::ppi8255_intf_e_write_a_alpha_display)
 	if ((data>=0x20) && (data<0x5b))  logerror("%04x - ppi8255_intf_e_write_a %02x (alpha) '%c'\n", m_maincpu->pcbase(), data, data);
 	else logerror("%04x - ppi8255_intf_e_write_a %02x (alpha)\n", m_maincpu->pcbase(), data);
 
-	static UINT8 send_buffer = 0;
+	static uint8_t send_buffer = 0;
 	static int count = 0;
 	// writes the 'PYRAMID' string from RAM (copied from ROM) here...
 	// along with port 40/41/42 accesses
@@ -656,7 +660,7 @@ static INPUT_PORTS_START( ecoinf3 )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( ecoinf3_pyramid, ecoinf3_state )
+static MACHINE_CONFIG_START( ecoinf3_pyramid )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z180,8000000) // certainly not a plain z80 at least, invalid opcodes for that
 
@@ -821,7 +825,7 @@ DRIVER_INIT_MEMBER(ecoinf3_state,ecoinf3)
 DRIVER_INIT_MEMBER(ecoinf3_state,ecoinf3_swap)
 {
 	// not all sets have this, are they just badly dumped?
-	UINT8 table[] =
+	uint8_t table[] =
 	{
 		0x48, 0x4c, 0x49, 0x4d, 0x40, 0x44, 0x41, 0x45,     0x68, 0x78, 0x60, 0x70, 0x6a, 0x7a, 0x62, 0x72,
 		0x08, 0x0c, 0x09, 0x0d, 0x00, 0x04, 0x01, 0x05,     0x6c, 0x7c, 0x64, 0x74, 0x6e, 0x7e, 0x66, 0x76,
@@ -833,8 +837,8 @@ DRIVER_INIT_MEMBER(ecoinf3_state,ecoinf3_swap)
 		0x06, 0x02, 0x07, 0x03, 0x0e, 0x0a, 0x0f, 0x0b,     0x31, 0x21, 0x39, 0x29, 0x33, 0x23, 0x3b, 0x2b,
 	};
 
-	auto buffer = std::make_unique<UINT8[]>(0x10000);
-	UINT8 *rom = memregion( "maincpu" )->base();
+	auto buffer = std::make_unique<uint8_t[]>(0x10000);
+	uint8_t *rom = memregion( "maincpu" )->base();
 
 
 	for (int i=0;i<0x10000;i++)
@@ -849,15 +853,15 @@ DRIVER_INIT_MEMBER(ecoinf3_state,ecoinf3_swap)
 
 
 // another hw type (similar to stuff in ecoinf2.c) (watchdog on port 58?)
-GAME( 19??, ec_pyram,   0        , ecoinf3_pyramid,   ecoinf3, ecoinf3_state,   ecoinf3_swap,   ROT0,  "Electrocoin", "Pyramid (v1) (Electrocoin)"      , MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
-GAME( 19??, ec_pyrama,  ec_pyram , ecoinf3_pyramid,   ecoinf3, ecoinf3_state,   ecoinf3,        ROT0,  "Electrocoin", "Pyramid (v6) (Electrocoin)"      , MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
-GAME( 19??, ec_sphin,   0        , ecoinf3_pyramid,   ecoinf3, ecoinf3_state,   ecoinf3_swap,   ROT0,  "Electrocoin", "Sphinx (v2) (Electrocoin) (set 1)"       , MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
-GAME( 19??, ec_sphina,  ec_sphin , ecoinf3_pyramid,   ecoinf3, ecoinf3_state,   ecoinf3,        ROT0,  "Electrocoin", "Sphinx (v2) (Electrocoin) (set 2)"       , MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
-GAME( 19??, ec_sphinb,  ec_sphin , ecoinf3_pyramid,   ecoinf3, ecoinf3_state,   ecoinf3,        ROT0,  "Electrocoin", "Sphinx (v1) (Electrocoin)"       , MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
-GAME( 19??, ec_penni,   0        , ecoinf3_pyramid,   ecoinf3, ecoinf3_state,   ecoinf3,        ROT0,  "Electrocoin", "Pennies From Heaven (v1) (Electrocoin)"      , MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
-GAME( 19??, ec_pennia,  ec_penni , ecoinf3_pyramid,   ecoinf3, ecoinf3_state,   ecoinf3,        ROT0,  "Electrocoin", "Pennies From Heaven (v6) (Electrocoin)"      , MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
-GAME( 19??, ec_stair,   0        , ecoinf3_pyramid,   ecoinf3, ecoinf3_state,   ecoinf3,        ROT0,  "Electrocoin", "Stairway To Heaven (v11) (Electrocoin)"      , MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
-GAME( 19??, ec_staira,  ec_stair , ecoinf3_pyramid,   ecoinf3, ecoinf3_state,   ecoinf3,        ROT0,  "Electrocoin", "Stairway To Heaven (v1) (Electrocoin)"       , MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
-GAME( 19??, ec_laby,    0        , ecoinf3_pyramid,   ecoinf3, ecoinf3_state,   ecoinf3,        ROT0,  "Electrocoin", "Labyrinth (v8) (Electrocoin)"        , MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
-GAME( 19??, ec_labya,   ec_laby  , ecoinf3_pyramid,   ecoinf3, ecoinf3_state,   ecoinf3,        ROT0,  "Electrocoin", "Labyrinth (v10) (Electrocoin)"       , MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
-GAME( 19??, ec_secrt,   0        , ecoinf3_pyramid,   ecoinf3, ecoinf3_state,   ecoinf3,        ROT0,  "Electrocoin", "Secret Castle (v1) (Electrocoin)"        , MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
+GAME( 19??, ec_pyram,   0        , ecoinf3_pyramid,   ecoinf3, ecoinf3_state,   ecoinf3_swap,   ROT0,  "Electrocoin", "Pyramid (v1) (Electrocoin)",             MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
+GAME( 19??, ec_pyrama,  ec_pyram , ecoinf3_pyramid,   ecoinf3, ecoinf3_state,   ecoinf3,        ROT0,  "Electrocoin", "Pyramid (v6) (Electrocoin)",             MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
+GAME( 19??, ec_sphin,   0        , ecoinf3_pyramid,   ecoinf3, ecoinf3_state,   ecoinf3_swap,   ROT0,  "Electrocoin", "Sphinx (v2) (Electrocoin) (set 1)",      MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
+GAME( 19??, ec_sphina,  ec_sphin , ecoinf3_pyramid,   ecoinf3, ecoinf3_state,   ecoinf3,        ROT0,  "Electrocoin", "Sphinx (v2) (Electrocoin) (set 2)",      MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
+GAME( 19??, ec_sphinb,  ec_sphin , ecoinf3_pyramid,   ecoinf3, ecoinf3_state,   ecoinf3,        ROT0,  "Electrocoin", "Sphinx (v1) (Electrocoin)",              MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
+GAME( 19??, ec_penni,   0        , ecoinf3_pyramid,   ecoinf3, ecoinf3_state,   ecoinf3,        ROT0,  "Electrocoin", "Pennies From Heaven (v1) (Electrocoin)", MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
+GAME( 19??, ec_pennia,  ec_penni , ecoinf3_pyramid,   ecoinf3, ecoinf3_state,   ecoinf3,        ROT0,  "Electrocoin", "Pennies From Heaven (v6) (Electrocoin)", MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
+GAME( 19??, ec_stair,   0        , ecoinf3_pyramid,   ecoinf3, ecoinf3_state,   ecoinf3,        ROT0,  "Electrocoin", "Stairway To Heaven (v11) (Electrocoin)", MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
+GAME( 19??, ec_staira,  ec_stair , ecoinf3_pyramid,   ecoinf3, ecoinf3_state,   ecoinf3,        ROT0,  "Electrocoin", "Stairway To Heaven (v1) (Electrocoin)",  MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
+GAME( 19??, ec_laby,    0        , ecoinf3_pyramid,   ecoinf3, ecoinf3_state,   ecoinf3,        ROT0,  "Electrocoin", "Labyrinth (v8) (Electrocoin)",           MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
+GAME( 19??, ec_labya,   ec_laby  , ecoinf3_pyramid,   ecoinf3, ecoinf3_state,   ecoinf3,        ROT0,  "Electrocoin", "Labyrinth (v10) (Electrocoin)",          MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
+GAME( 19??, ec_secrt,   0        , ecoinf3_pyramid,   ecoinf3, ecoinf3_state,   ecoinf3,        ROT0,  "Electrocoin", "Secret Castle (v1) (Electrocoin)",       MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)

@@ -11,11 +11,13 @@
 *********************************************************************/
 
 #include "emu.h"
+#include "includes/lisa.h"
 #include "cpu/m6502/m6504.h"
 #include "cpu/cop400/cop400.h"
-#include "includes/lisa.h"
 #include "formats/ap_dsk35.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 /***************************************************************************
     ADDRESS MAP
@@ -31,7 +33,6 @@ static ADDRESS_MAP_START(lisa_fdc_map, AS_PROGRAM, 8, lisa_state )
 	AM_RANGE(0x0400, 0x07ff) AM_READWRITE(lisa_fdc_io_r, lisa_fdc_io_w) /* disk controller (IWM and TTL logic) */
 	AM_RANGE(0x0800, 0x0fff) AM_NOP
 	AM_RANGE(0x1000, 0x1fff) AM_ROM AM_REGION("fdccpu", 0x1000) AM_SHARE("fdc_rom")     /* ROM */
-	AM_RANGE(0x2000, 0xffff) AM_READWRITE(lisa_fdc_r, lisa_fdc_w)       /* handler for wrap-around */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(lisa210_fdc_map, AS_PROGRAM, 8, lisa_state )
@@ -41,7 +42,6 @@ static ADDRESS_MAP_START(lisa210_fdc_map, AS_PROGRAM, 8, lisa_state )
 	AM_RANGE(0x0800, 0x0bff) AM_READWRITE(lisa_fdc_io_r, lisa_fdc_io_w) /* disk controller (IWM and TTL logic) */
 	AM_RANGE(0x0c00, 0x0fff) AM_NOP                                     /* nothing, or IO port wrap-around ??? */
 	AM_RANGE(0x1000, 0x1fff) AM_ROM AM_REGION("fdccpu", 0x1000) AM_SHARE("fdc_rom")         /* ROM */
-	AM_RANGE(0x2000, 0xffff) AM_READWRITE(lisa_fdc_r, lisa_fdc_w)       /* handler for wrap-around */
 ADDRESS_MAP_END
 
 
@@ -95,7 +95,7 @@ static const floppy_interface lisa_floppy_interface =
 ***************************************************************************/
 
 /* Lisa1 and Lisa 2 machine */
-static MACHINE_CONFIG_START( lisa, lisa_state )
+static MACHINE_CONFIG_START( lisa )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 5093760)        /* 20.37504 MHz / 4 */
 	MCFG_CPU_PROGRAM_MAP(lisa_map)
@@ -479,8 +479,8 @@ ROM_END
     Lisa drivers boot MacWorks, but do not boot the Lisa OS, which is why we set
     the MACHINE_NOT_WORKING flag...
 */
-/*     YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT  INIT   COMPANY  FULLNAME */
-COMP( 1983, lisa,     0,    0,  lisa,     lisa, lisa_state,  lisa2,         "Apple Computer",  "Lisa", MACHINE_NOT_WORKING )
-COMP( 1984, lisa2,    0,    0,  lisa,     lisa, lisa_state,  lisa2,         "Apple Computer",  "Lisa2", MACHINE_NOT_WORKING )
-COMP( 1984, lisa210,  lisa2,    0,  lisa210,  lisa, lisa_state,  lisa210,   "Apple Computer",  "Lisa2/10", MACHINE_NOT_WORKING )
-COMP( 1985, macxl,    lisa2,    0,  macxl,    lisa, lisa_state,  mac_xl,    "Apple Computer",  "Macintosh XL", /*MACHINE_NOT_WORKING*/0 )
+/*    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT  STATE        INIT     COMPANY            FULLNAME */
+COMP( 1983, lisa,     0,       0,      lisa,     lisa,  lisa_state,  lisa2,   "Apple Computer",  "Lisa",         MACHINE_NOT_WORKING )
+COMP( 1984, lisa2,    0,       0,      lisa,     lisa,  lisa_state,  lisa2,   "Apple Computer",  "Lisa2",        MACHINE_NOT_WORKING )
+COMP( 1984, lisa210,  lisa2,   0,      lisa210,  lisa,  lisa_state,  lisa210, "Apple Computer",  "Lisa2/10",     MACHINE_NOT_WORKING )
+COMP( 1985, macxl,    lisa2,   0,      macxl,    lisa,  lisa_state,  mac_xl,  "Apple Computer",  "Macintosh XL", /*MACHINE_NOT_WORKING*/0 )

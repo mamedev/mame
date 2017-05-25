@@ -222,12 +222,15 @@ Stephh's notes (based on the games M68000 code and some tests) :
 */
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
-#include "sound/okim6295.h"
 #include "sound/3812intf.h"
+#include "sound/okim6295.h"
 #include "video/decospr.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 class nmg5_state : public driver_device
 {
@@ -248,21 +251,21 @@ public:
 	{ }
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_spriteram;
-	required_shared_ptr<UINT16> m_scroll_ram;
-	required_shared_ptr<UINT16> m_bg_videoram;
-	required_shared_ptr<UINT16> m_fg_videoram;
-	required_shared_ptr<UINT16> m_bitmap;
+	required_shared_ptr<uint16_t> m_spriteram;
+	required_shared_ptr<uint16_t> m_scroll_ram;
+	required_shared_ptr<uint16_t> m_bg_videoram;
+	required_shared_ptr<uint16_t> m_fg_videoram;
+	required_shared_ptr<uint16_t> m_bitmap;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
 	tilemap_t  *m_fg_tilemap;
 
 	/* misc */
-	UINT8 m_prot_val;
-	UINT8 m_input_data;
-	UINT8 m_priority_reg;
-	UINT8 m_gfx_bank;
+	uint8_t m_prot_val;
+	uint8_t m_input_data;
+	uint8_t m_priority_reg;
+	uint8_t m_gfx_bank;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -289,7 +292,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_nmg5(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_nmg5(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_bitmap( bitmap_ind16 &bitmap );
 };
 
@@ -345,7 +348,7 @@ WRITE16_MEMBER(nmg5_state::priority_reg_w)
 
 WRITE8_MEMBER(nmg5_state::oki_banking_w)
 {
-	m_oki->set_bank_base((data & 1) ? 0x40000 : 0);
+	m_oki->set_rom_bank(data & 1);
 }
 
 /*******************************************************************
@@ -832,8 +835,8 @@ TILE_GET_INFO_MEMBER(nmg5_state::bg_get_tile_info){ SET_TILE_INFO_MEMBER(0, m_bg
 
 void nmg5_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(nmg5_state::bg_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(nmg5_state::fg_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nmg5_state::bg_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nmg5_state::fg_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	m_fg_tilemap->set_transparent_pen(0);
 }
 
@@ -843,7 +846,7 @@ void nmg5_state::draw_bitmap( bitmap_ind16 &bitmap )
 {
 	int yyy = 256;
 	int xxx = 512 / 4;
-	UINT16 x, y, count;
+	uint16_t x, y, count;
 	int xoff = -12;
 	int yoff = -9;
 	int pix;
@@ -868,7 +871,7 @@ void nmg5_state::draw_bitmap( bitmap_ind16 &bitmap )
 }
 
 
-UINT32 nmg5_state::screen_update_nmg5(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t nmg5_state::screen_update_nmg5(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->set_scrolly(0, m_scroll_ram[3] + 9);
 	m_bg_tilemap->set_scrollx(0, m_scroll_ram[2] + 3);
@@ -971,7 +974,7 @@ void nmg5_state::machine_reset()
 	m_input_data = 0;
 }
 
-static MACHINE_CONFIG_START( nmg5, nmg5_state )
+static MACHINE_CONFIG_START( nmg5 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
@@ -1013,7 +1016,7 @@ static MACHINE_CONFIG_START( nmg5, nmg5_state )
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", 1000000 , OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", 1000000 , PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1445,7 +1448,7 @@ ROM_START( wondstcka )
 	ROM_LOAD( "3.u80", 0x380000, 0x80000, CRC(553c5781) SHA1(d5f694f6a50f51c80845a15e58d263fa629c3522) )
 
 	ROM_REGION( 0x280000, "gfx2", 0 )   /* 16x16x5 */
-	ROM_LOAD( "8.u83 ",  0x000000, 0x80000, CRC(f51cf9c6) SHA1(6d0fc749bab918ff6a9d7fae8be7c65823349283) )
+	ROM_LOAD( "8.u83",   0x000000, 0x80000, CRC(f51cf9c6) SHA1(6d0fc749bab918ff6a9d7fae8be7c65823349283) )
 //  ROM_LOAD( "9.u82",   0x080000, 0x80000, CRC(8c6cff4d) SHA1(5a217ff60f10bf5c58091c189b3509d1361a16b3) ) // bad dump
 	ROM_LOAD( "9.u82",   0x080000, 0x80000, CRC(ddd3c60c) SHA1(19b68a44c877d0bf630d07b18541ef9636f5adac) )
 	ROM_LOAD( "7.u105",  0x100000, 0x80000, CRC(a7fc624d) SHA1(b336ab6e16555db30f9366bf5b797b5ba3ea767c) )

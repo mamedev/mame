@@ -32,13 +32,13 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
 
-	UINT8 m_outa;
-	UINT8 m_outb;
+	uint8_t m_outa;
+	uint8_t m_outb;
 	int m_power;
-	UINT8 m_reg[0x100];
+	uint8_t m_reg[0x100];
 
 	DECLARE_DRIVER_INIT(pc1251);
-	UINT32 screen_update_pc1251(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_pc1251(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER(pc1251_outa);
 	DECLARE_WRITE8_MEMBER(pc1251_outb);
 	DECLARE_WRITE8_MEMBER(pc1251_outc);

@@ -153,17 +153,32 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/bus/apricot/expansion.h,BUSES["APRICOT_EXPANSION"] = true
+--@src/devices/bus/apricot/expansion/expansion.h,BUSES["APRICOT_EXPANSION"] = true
 ---------------------------------------------------
 
 if (BUSES["APRICOT_EXPANSION"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/bus/apricot/expansion.cpp",
-		MAME_DIR .. "src/devices/bus/apricot/expansion.h",
-		MAME_DIR .. "src/devices/bus/apricot/cards.cpp",
-		MAME_DIR .. "src/devices/bus/apricot/cards.h",
-		MAME_DIR .. "src/devices/bus/apricot/ram.cpp",
-		MAME_DIR .. "src/devices/bus/apricot/ram.h",
+		MAME_DIR .. "src/devices/bus/apricot/expansion/expansion.cpp",
+		MAME_DIR .. "src/devices/bus/apricot/expansion/expansion.h",
+		MAME_DIR .. "src/devices/bus/apricot/expansion/cards.cpp",
+		MAME_DIR .. "src/devices/bus/apricot/expansion/cards.h",
+		MAME_DIR .. "src/devices/bus/apricot/expansion/ram.cpp",
+		MAME_DIR .. "src/devices/bus/apricot/expansion/ram.h",
+	}
+end
+
+
+---------------------------------------------------
+--
+--@src/devices/bus/apricot/keyboard/keyboard.h,BUSES["APRICOT_KEYBOARD"] = true
+---------------------------------------------------
+
+if (BUSES["APRICOT_KEYBOARD"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/apricot/keyboard/keyboard.cpp",
+		MAME_DIR .. "src/devices/bus/apricot/keyboard/keyboard.h",
+		MAME_DIR .. "src/devices/bus/apricot/keyboard/hle.cpp",
+		MAME_DIR .. "src/devices/bus/apricot/keyboard/hle.h",
 	}
 end
 
@@ -198,6 +213,98 @@ if (BUSES["ASTROCADE"]~=null) then
 		MAME_DIR .. "src/devices/bus/astrocde/exp.h",
 		MAME_DIR .. "src/devices/bus/astrocde/ram.cpp",
 		MAME_DIR .. "src/devices/bus/astrocde/ram.h",
+	}
+end
+
+
+---------------------------------------------------
+--
+--@src/devices/bus/bbc/fdc/fdc.h,BUSES["BBC_FDC"] = true
+---------------------------------------------------
+
+if (BUSES["BBC_FDC"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/bbc/fdc/fdc.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/fdc/fdc.h",
+		MAME_DIR .. "src/devices/bus/bbc/fdc/acorn.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/fdc/acorn.h",
+		MAME_DIR .. "src/devices/bus/bbc/fdc/cumana.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/fdc/cumana.h",
+		MAME_DIR .. "src/devices/bus/bbc/fdc/opus.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/fdc/opus.h",
+		MAME_DIR .. "src/devices/bus/bbc/fdc/watford.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/fdc/watford.h",
+	}
+end
+
+
+---------------------------------------------------
+--
+--@src/devices/bus/bbc/analogue/analogue.h,BUSES["BBC_ANALOGUE"] = true
+---------------------------------------------------
+
+if (BUSES["BBC_ANALOGUE"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/bbc/analogue/analogue.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/analogue/analogue.h",
+		MAME_DIR .. "src/devices/bus/bbc/analogue/joystick.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/analogue/joystick.h",
+	}
+end
+
+
+---------------------------------------------------
+--
+--@src/devices/bus/bbc/joyport/joyport.h,BUSES["BBC_JOYPORT"] = true
+---------------------------------------------------
+
+if (BUSES["BBC_JOYPORT"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/bbc/joyport/joyport.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/joyport/joyport.h",
+		MAME_DIR .. "src/devices/bus/bbc/joyport/joystick.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/joyport/joystick.h",
+	}
+end
+
+
+---------------------------------------------------
+--
+--@src/devices/bus/bbc/1mhzbus/1mhzbus.h,BUSES["BBC_1MHZBUS"] = true
+---------------------------------------------------
+
+if (BUSES["BBC_1MHZBUS"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/1mhzbus.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/1mhzbus.h",
+		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/opus3.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/opus3.h",
+	}
+end
+
+
+---------------------------------------------------
+--
+--@src/devices/bus/bbc/tube/tube.h,BUSES["BBC_TUBE"] = true
+---------------------------------------------------
+
+if (BUSES["BBC_TUBE"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/bbc/tube/tube.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/tube/tube.h",
+	}
+end
+
+
+---------------------------------------------------
+--
+--@src/devices/bus/bbc/userport/userport.h,BUSES["BBC_USERPORT"] = true
+---------------------------------------------------
+
+if (BUSES["BBC_USERPORT"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/bbc/userport/userport.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/userport/userport.h",
 	}
 end
 
@@ -321,6 +428,8 @@ if (BUSES["C64"]~=null) then
 		MAME_DIR .. "src/devices/bus/c64/silverrock.h",
 		MAME_DIR .. "src/devices/bus/c64/simons_basic.cpp",
 		MAME_DIR .. "src/devices/bus/c64/simons_basic.h",
+		MAME_DIR .. "src/devices/bus/c64/speakeasy.cpp",
+		MAME_DIR .. "src/devices/bus/c64/speakeasy.h",
 		MAME_DIR .. "src/devices/bus/c64/stardos.cpp",
 		MAME_DIR .. "src/devices/bus/c64/stardos.h",
 		MAME_DIR .. "src/devices/bus/c64/std.cpp",
@@ -583,6 +692,14 @@ if (BUSES["ELECTRON"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/electron/exp.cpp",
 		MAME_DIR .. "src/devices/bus/electron/exp.h",
+		MAME_DIR .. "src/devices/bus/electron/fbjoy.cpp",
+		MAME_DIR .. "src/devices/bus/electron/fbjoy.h",
+		MAME_DIR .. "src/devices/bus/electron/plus3.cpp",
+		MAME_DIR .. "src/devices/bus/electron/plus3.h",
+		MAME_DIR .. "src/devices/bus/electron/pwrjoy.cpp",
+		MAME_DIR .. "src/devices/bus/electron/pwrjoy.h",
+		MAME_DIR .. "src/devices/bus/electron/m2105.cpp",
+		MAME_DIR .. "src/devices/bus/electron/m2105.h",
 	}
 end
 
@@ -598,6 +715,23 @@ if (BUSES["EP64"]~=null) then
 		MAME_DIR .. "src/devices/bus/ep64/exp.h",
 		MAME_DIR .. "src/devices/bus/ep64/exdos.cpp",
 		MAME_DIR .. "src/devices/bus/ep64/exdos.h",
+	}
+end
+
+
+---------------------------------------------------
+--
+--@src/devices/bus/hp_hil/hp_hil.h,BUSES["HPHIL"] = true
+---------------------------------------------------
+
+if (BUSES["HPHIL"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/hp_hil/hp_hil.cpp",
+		MAME_DIR .. "src/devices/bus/hp_hil/hp_hil.h",
+		MAME_DIR .. "src/devices/bus/hp_hil/hil_devices.cpp",
+		MAME_DIR .. "src/devices/bus/hp_hil/hil_devices.h",
+		MAME_DIR .. "src/devices/bus/hp_hil/hlekbd.cpp",
+		MAME_DIR .. "src/devices/bus/hp_hil/hlekbd.h",
 	}
 end
 
@@ -650,6 +784,8 @@ if (BUSES["IEEE488"]~=null) then
 		MAME_DIR .. "src/devices/bus/ieee488/hardbox.h",
 		MAME_DIR .. "src/devices/bus/ieee488/shark.cpp",
 		MAME_DIR .. "src/devices/bus/ieee488/shark.h",
+		MAME_DIR .. "src/devices/bus/ieee488/hp9895.cpp",
+		MAME_DIR .. "src/devices/bus/ieee488/hp9895.h",
 	}
 end
 
@@ -831,6 +967,8 @@ if (BUSES["ISA"]~=null) then
 		MAME_DIR .. "src/devices/bus/isa/p1_hdc.h",
 		MAME_DIR .. "src/devices/bus/isa/p1_rom.cpp",
 		MAME_DIR .. "src/devices/bus/isa/p1_rom.h",
+		MAME_DIR .. "src/devices/bus/isa/p1_sound.cpp",
+		MAME_DIR .. "src/devices/bus/isa/p1_sound.h",
 		MAME_DIR .. "src/devices/bus/isa/mc1502_fdc.cpp",
 		MAME_DIR .. "src/devices/bus/isa/mc1502_fdc.h",
 		MAME_DIR .. "src/devices/bus/isa/mc1502_rom.cpp",
@@ -845,6 +983,8 @@ if (BUSES["ISA"]~=null) then
 		MAME_DIR .. "src/devices/bus/isa/svga_trident.h",
 		MAME_DIR .. "src/devices/bus/isa/num9rev.cpp",
 		MAME_DIR .. "src/devices/bus/isa/num9rev.h",
+		MAME_DIR .. "src/devices/bus/isa/mcd.cpp",
+		MAME_DIR .. "src/devices/bus/isa/mcd.h",
 	}
 end
 
@@ -1103,6 +1243,14 @@ if (BUSES["POFO"]~=null) then
 		MAME_DIR .. "src/devices/bus/pofo/hpc101.h",
 		MAME_DIR .. "src/devices/bus/pofo/hpc102.cpp",
 		MAME_DIR .. "src/devices/bus/pofo/hpc102.h",
+		MAME_DIR .. "src/devices/bus/pofo/hpc104.cpp",
+		MAME_DIR .. "src/devices/bus/pofo/hpc104.h",
+		MAME_DIR .. "src/devices/bus/pofo/ccm.cpp",
+		MAME_DIR .. "src/devices/bus/pofo/ccm.h",
+		MAME_DIR .. "src/devices/bus/pofo/ram.cpp",
+		MAME_DIR .. "src/devices/bus/pofo/ram.h",
+		MAME_DIR .. "src/devices/bus/pofo/rom.cpp",
+		MAME_DIR .. "src/devices/bus/pofo/rom.h",
 	}
 end
 
@@ -1300,6 +1448,10 @@ if (BUSES["VIC20"]~=null) then
 		MAME_DIR .. "src/devices/bus/vic20/vic1112.h",
 		MAME_DIR .. "src/devices/bus/vic20/vic1210.cpp",
 		MAME_DIR .. "src/devices/bus/vic20/vic1210.h",
+		MAME_DIR .. "src/devices/bus/vic20/videopak.cpp",
+		MAME_DIR .. "src/devices/bus/vic20/videopak.h",
+		MAME_DIR .. "src/devices/bus/vic20/speakeasy.cpp",
+		MAME_DIR .. "src/devices/bus/vic20/speakeasy.h",
 		MAME_DIR .. "src/devices/bus/vic20/user.cpp",
 		MAME_DIR .. "src/devices/bus/vic20/user.h",
 		MAME_DIR .. "src/devices/bus/vic20/4cga.cpp",
@@ -1363,6 +1515,29 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/vme/vme.h,BUSES["VME"] = true
+---------------------------------------------------
+
+if (BUSES["VME"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/vme/vme.cpp",
+		MAME_DIR .. "src/devices/bus/vme/vme.h",
+		MAME_DIR .. "src/devices/bus/vme/vme_mzr8300.cpp",
+		MAME_DIR .. "src/devices/bus/vme/vme_mzr8300.h",
+		MAME_DIR .. "src/devices/bus/vme/vme_mvme350.cpp",
+		MAME_DIR .. "src/devices/bus/vme/vme_mvme350.h",
+		MAME_DIR .. "src/devices/bus/vme/vme_fccpu20.cpp",
+		MAME_DIR .. "src/devices/bus/vme/vme_fccpu20.h",
+		MAME_DIR .. "src/devices/bus/vme/vme_fcisio.cpp",
+		MAME_DIR .. "src/devices/bus/vme/vme_fcisio.h",
+		MAME_DIR .. "src/devices/bus/vme/vme_fcscsi.cpp",
+		MAME_DIR .. "src/devices/bus/vme/vme_fcscsi.h",
+	}
+end
+
+
+---------------------------------------------------
+--
 --@src/devices/bus/wangpc/wangpc.h,BUSES["WANGPC"] = true
 ---------------------------------------------------
 
@@ -1417,8 +1592,6 @@ if (BUSES["A2BUS"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/a2bus/a2bus.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/a2bus.h",
-		MAME_DIR .. "src/devices/bus/a2bus/a2lang.cpp",
-		MAME_DIR .. "src/devices/bus/a2bus/a2lang.h",
 		MAME_DIR .. "src/devices/bus/a2bus/a2diskii.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/a2diskii.h",
 		MAME_DIR .. "src/devices/bus/a2bus/a2mockingboard.cpp",
@@ -1497,6 +1670,10 @@ if (BUSES["A2BUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/a2bus/ezcgi.h",
 		MAME_DIR .. "src/devices/bus/a2bus/pc_xporter.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/pc_xporter.h",
+		MAME_DIR .. "src/devices/bus/a2bus/agat7langcard.cpp",
+		MAME_DIR .. "src/devices/bus/a2bus/agat7langcard.h",
+		MAME_DIR .. "src/devices/bus/a2bus/agat7ram.cpp",
+		MAME_DIR .. "src/devices/bus/a2bus/agat7ram.h",
 	}
 end
 
@@ -1606,10 +1783,14 @@ if (BUSES["RS232"]~=null) then
 		MAME_DIR .. "src/devices/bus/rs232/pty.h",
 		MAME_DIR .. "src/devices/bus/rs232/ser_mouse.cpp",
 		MAME_DIR .. "src/devices/bus/rs232/ser_mouse.h",
+		MAME_DIR .. "src/devices/bus/rs232/sun_kbd.cpp",
+		MAME_DIR .. "src/devices/bus/rs232/sun_kbd.h",
 		MAME_DIR .. "src/devices/bus/rs232/terminal.cpp",
 		MAME_DIR .. "src/devices/bus/rs232/terminal.h",
 		MAME_DIR .. "src/devices/bus/rs232/xvd701.cpp",
 		MAME_DIR .. "src/devices/bus/rs232/xvd701.h",
+		MAME_DIR .. "src/devices/bus/rs232/ie15.cpp",
+		MAME_DIR .. "src/devices/bus/rs232/ie15.h",
 	}
 end
 
@@ -1755,6 +1936,8 @@ if (BUSES["NES"]~=null) then
 		MAME_DIR .. "src/devices/bus/nes/sachen.h",
 		MAME_DIR .. "src/devices/bus/nes/somari.cpp",
 		MAME_DIR .. "src/devices/bus/nes/somari.h",
+		MAME_DIR .. "src/devices/bus/nes/subor.cpp",
+		MAME_DIR .. "src/devices/bus/nes/subor.h",
 		MAME_DIR .. "src/devices/bus/nes/sunsoft.cpp",
 		MAME_DIR .. "src/devices/bus/nes/sunsoft.h",
 		MAME_DIR .. "src/devices/bus/nes/sunsoft_dcs.cpp",
@@ -1767,6 +1950,8 @@ if (BUSES["NES"]~=null) then
 		MAME_DIR .. "src/devices/bus/nes/txc.h",
 		MAME_DIR .. "src/devices/bus/nes/waixing.cpp",
 		MAME_DIR .. "src/devices/bus/nes/waixing.h",
+		MAME_DIR .. "src/devices/bus/nes/zemina.cpp",
+		MAME_DIR .. "src/devices/bus/nes/zemina.h",
 	}
 end
 
@@ -2134,11 +2319,29 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/ti8x/ti8x.h,BUSES["TI8X"] = true
+---------------------------------------------------
+
+if (BUSES["TI8X"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/ti8x/bitsocket.cpp",
+		MAME_DIR .. "src/devices/bus/ti8x/bitsocket.h",
+		MAME_DIR .. "src/devices/bus/ti8x/graphlinkhle.cpp",
+		MAME_DIR .. "src/devices/bus/ti8x/graphlinkhle.h",
+		MAME_DIR .. "src/devices/bus/ti8x/teeconn.cpp",
+		MAME_DIR .. "src/devices/bus/ti8x/teeconn.h",
+		MAME_DIR .. "src/devices/bus/ti8x/ti8x.cpp",
+		MAME_DIR .. "src/devices/bus/ti8x/ti8x.h",
+		MAME_DIR .. "src/devices/bus/ti8x/tispeaker.cpp",
+		MAME_DIR .. "src/devices/bus/ti8x/tispeaker.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/bus/ti99x/990_dk.h,BUSES["TI99X"] = true
 --@src/devices/bus/ti99x/990_tap.h,BUSES["TI99X"] = true
 --@src/devices/bus/ti99x/990_hd.h,BUSES["TI99X"] = true
---@src/devices/bus/ti99x/genboard.h,BUSES["TI99X"] = true
---@src/devices/bus/ti99x/joyport.h,BUSES["TI99X"] = true
 ---------------------------------------------------
 
 if (BUSES["TI99X"]~=null) then
@@ -2149,63 +2352,75 @@ if (BUSES["TI99X"]~=null) then
 		MAME_DIR .. "src/devices/bus/ti99x/990_hd.h",
 		MAME_DIR .. "src/devices/bus/ti99x/990_tap.cpp",
 		MAME_DIR .. "src/devices/bus/ti99x/990_tap.h",
-		MAME_DIR .. "src/devices/bus/ti99x/998board.cpp",
-		MAME_DIR .. "src/devices/bus/ti99x/998board.h",
-		MAME_DIR .. "src/devices/bus/ti99x/datamux.cpp",
-		MAME_DIR .. "src/devices/bus/ti99x/datamux.h",
-		MAME_DIR .. "src/devices/bus/ti99x/genboard.cpp",
-		MAME_DIR .. "src/devices/bus/ti99x/genboard.h",
-		MAME_DIR .. "src/devices/bus/ti99x/gromport.cpp",
-		MAME_DIR .. "src/devices/bus/ti99x/gromport.h",
-		MAME_DIR .. "src/devices/bus/ti99x/handset.cpp",
-		MAME_DIR .. "src/devices/bus/ti99x/handset.h",
-		MAME_DIR .. "src/devices/bus/ti99x/joyport.cpp",
-		MAME_DIR .. "src/devices/bus/ti99x/joyport.h",
-		MAME_DIR .. "src/devices/bus/ti99x/mecmouse.cpp",
-		MAME_DIR .. "src/devices/bus/ti99x/mecmouse.h",
-		MAME_DIR .. "src/devices/bus/ti99x/ti99defs.h",
 	}
 end
 
 ---------------------------------------------------
 --
---@src/devices/bus/ti99_peb/peribox.h,BUSES["TI99PEB"] = true
+--@src/devices/bus/ti99/colorbus/colorbus.h,BUSES["TI99"] = true
+--@src/devices/bus/ti99/joyport/joyport.h,BUSES["TI99"] = true
+--@src/devices/bus/ti99/peb/peribox.h,BUSES["TI99"] = true
+--@src/devices/bus/ti99/internal/genboard.h,BUSES["TI99"] = true
+
 ---------------------------------------------------
 
-if (BUSES["TI99PEB"]~=null) then
+if (BUSES["TI99"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/bus/ti99_peb/peribox.cpp",
-		MAME_DIR .. "src/devices/bus/ti99_peb/peribox.h",
-		MAME_DIR .. "src/devices/bus/ti99_peb/bwg.cpp",
-		MAME_DIR .. "src/devices/bus/ti99_peb/bwg.h",
-		MAME_DIR .. "src/devices/bus/ti99_peb/evpc.cpp",
-		MAME_DIR .. "src/devices/bus/ti99_peb/evpc.h",
-		MAME_DIR .. "src/devices/bus/ti99_peb/hfdc.cpp",
-		MAME_DIR .. "src/devices/bus/ti99_peb/hfdc.h",
-		MAME_DIR .. "src/devices/bus/ti99_peb/horizon.cpp",
-		MAME_DIR .. "src/devices/bus/ti99_peb/horizon.h",
-		MAME_DIR .. "src/devices/bus/ti99_peb/hsgpl.cpp",
-		MAME_DIR .. "src/devices/bus/ti99_peb/hsgpl.h",
-		MAME_DIR .. "src/devices/bus/ti99_peb/memex.cpp",
-		MAME_DIR .. "src/devices/bus/ti99_peb/memex.h",
-		MAME_DIR .. "src/devices/bus/ti99_peb/myarcmem.cpp",
-		MAME_DIR .. "src/devices/bus/ti99_peb/myarcmem.h",
-		MAME_DIR .. "src/devices/bus/ti99_peb/pcode.cpp",
-		MAME_DIR .. "src/devices/bus/ti99_peb/pcode.h",
-		MAME_DIR .. "src/devices/bus/ti99_peb/samsmem.cpp",
-		MAME_DIR .. "src/devices/bus/ti99_peb/samsmem.h",
-		MAME_DIR .. "src/devices/bus/ti99_peb/spchsyn.cpp",
-		MAME_DIR .. "src/devices/bus/ti99_peb/spchsyn.h",
-		MAME_DIR .. "src/devices/bus/ti99_peb/ti_32kmem.cpp",
-		MAME_DIR .. "src/devices/bus/ti99_peb/ti_32kmem.h",
-		MAME_DIR .. "src/devices/bus/ti99_peb/ti_fdc.cpp",
-		MAME_DIR .. "src/devices/bus/ti99_peb/ti_fdc.h",
-		MAME_DIR .. "src/devices/bus/ti99_peb/ti_rs232.cpp",
-		MAME_DIR .. "src/devices/bus/ti99_peb/ti_rs232.h",
-		MAME_DIR .. "src/devices/bus/ti99_peb/tn_ide.cpp",
-		MAME_DIR .. "src/devices/bus/ti99_peb/tn_ide.h",
-		MAME_DIR .. "src/devices/bus/ti99_peb/tn_usbsm.cpp",
-		MAME_DIR .. "src/devices/bus/ti99_peb/tn_usbsm.h",
+		MAME_DIR .. "src/devices/bus/ti99/ti99defs.h",
+		MAME_DIR .. "src/devices/bus/ti99/internal/998board.cpp",
+		MAME_DIR .. "src/devices/bus/ti99/internal/998board.h",
+		MAME_DIR .. "src/devices/bus/ti99/internal/datamux.cpp",
+		MAME_DIR .. "src/devices/bus/ti99/internal/datamux.h",
+		MAME_DIR .. "src/devices/bus/ti99/internal/evpcconn.cpp",
+		MAME_DIR .. "src/devices/bus/ti99/internal/evpcconn.h",
+		MAME_DIR .. "src/devices/bus/ti99/internal/genboard.cpp",
+		MAME_DIR .. "src/devices/bus/ti99/internal/genboard.h",
+		MAME_DIR .. "src/devices/bus/ti99/internal/gromport.cpp",
+		MAME_DIR .. "src/devices/bus/ti99/internal/gromport.h",
+		MAME_DIR .. "src/devices/bus/ti99/internal/ioport.cpp",
+		MAME_DIR .. "src/devices/bus/ti99/internal/ioport.h",
+		MAME_DIR .. "src/devices/bus/ti99/colorbus/busmouse.cpp",
+		MAME_DIR .. "src/devices/bus/ti99/colorbus/busmouse.h",
+		MAME_DIR .. "src/devices/bus/ti99/colorbus/colorbus.cpp",
+		MAME_DIR .. "src/devices/bus/ti99/colorbus/colorbus.h",
+		MAME_DIR .. "src/devices/bus/ti99/joyport/handset.cpp",
+		MAME_DIR .. "src/devices/bus/ti99/joyport/handset.h",
+		MAME_DIR .. "src/devices/bus/ti99/joyport/joyport.cpp",
+		MAME_DIR .. "src/devices/bus/ti99/joyport/joyport.h",
+		MAME_DIR .. "src/devices/bus/ti99/joyport/mecmouse.cpp",
+		MAME_DIR .. "src/devices/bus/ti99/joyport/mecmouse.h",
+		MAME_DIR .. "src/devices/bus/ti99/peb/peribox.cpp",
+		MAME_DIR .. "src/devices/bus/ti99/peb/peribox.h",
+		MAME_DIR .. "src/devices/bus/ti99/peb/bwg.cpp",
+		MAME_DIR .. "src/devices/bus/ti99/peb/bwg.h",
+		MAME_DIR .. "src/devices/bus/ti99/peb/evpc.cpp",
+		MAME_DIR .. "src/devices/bus/ti99/peb/evpc.h",
+		MAME_DIR .. "src/devices/bus/ti99/peb/hfdc.cpp",
+		MAME_DIR .. "src/devices/bus/ti99/peb/hfdc.h",
+		MAME_DIR .. "src/devices/bus/ti99/peb/horizon.cpp",
+		MAME_DIR .. "src/devices/bus/ti99/peb/horizon.h",
+		MAME_DIR .. "src/devices/bus/ti99/peb/hsgpl.cpp",
+		MAME_DIR .. "src/devices/bus/ti99/peb/hsgpl.h",
+		MAME_DIR .. "src/devices/bus/ti99/peb/memex.cpp",
+		MAME_DIR .. "src/devices/bus/ti99/peb/memex.h",
+		MAME_DIR .. "src/devices/bus/ti99/peb/myarcmem.cpp",
+		MAME_DIR .. "src/devices/bus/ti99/peb/myarcmem.h",
+		MAME_DIR .. "src/devices/bus/ti99/peb/pcode.cpp",
+		MAME_DIR .. "src/devices/bus/ti99/peb/pcode.h",
+		MAME_DIR .. "src/devices/bus/ti99/peb/samsmem.cpp",
+		MAME_DIR .. "src/devices/bus/ti99/peb/samsmem.h",
+		MAME_DIR .. "src/devices/bus/ti99/peb/spchsyn.cpp",
+		MAME_DIR .. "src/devices/bus/ti99/peb/spchsyn.h",
+		MAME_DIR .. "src/devices/bus/ti99/peb/ti_32kmem.cpp",
+		MAME_DIR .. "src/devices/bus/ti99/peb/ti_32kmem.h",
+		MAME_DIR .. "src/devices/bus/ti99/peb/ti_fdc.cpp",
+		MAME_DIR .. "src/devices/bus/ti99/peb/ti_fdc.h",
+		MAME_DIR .. "src/devices/bus/ti99/peb/ti_rs232.cpp",
+		MAME_DIR .. "src/devices/bus/ti99/peb/ti_rs232.h",
+		MAME_DIR .. "src/devices/bus/ti99/peb/tn_ide.cpp",
+		MAME_DIR .. "src/devices/bus/ti99/peb/tn_ide.h",
+		MAME_DIR .. "src/devices/bus/ti99/peb/tn_usbsm.cpp",
+		MAME_DIR .. "src/devices/bus/ti99/peb/tn_usbsm.h",
 	}
 end
 
@@ -2286,10 +2501,14 @@ if (BUSES["COCO"]~=null) then
 		MAME_DIR .. "src/devices/bus/coco/coco_pak.h",
 		MAME_DIR .. "src/devices/bus/coco/coco_fdc.cpp",
 		MAME_DIR .. "src/devices/bus/coco/coco_fdc.h",
+		MAME_DIR .. "src/devices/bus/coco/coco_gmc.cpp",
+		MAME_DIR .. "src/devices/bus/coco/coco_gmc.h",
 		MAME_DIR .. "src/devices/bus/coco/coco_multi.cpp",
 		MAME_DIR .. "src/devices/bus/coco/coco_multi.h",
 		MAME_DIR .. "src/devices/bus/coco/coco_dwsock.cpp",
 		MAME_DIR .. "src/devices/bus/coco/coco_dwsock.h",
+		MAME_DIR .. "src/devices/bus/coco/dragon_fdc.cpp",
+		MAME_DIR .. "src/devices/bus/coco/coco_t4426.cpp",
 	}
 end
 
@@ -2495,6 +2714,24 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/amiga/keyboard/keyboard.h,BUSES["AMIGA_KEYBOARD"] = true
+---------------------------------------------------
+
+if (BUSES["AMIGA_KEYBOARD"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/amiga/keyboard/keyboard.cpp",
+		MAME_DIR .. "src/devices/bus/amiga/keyboard/keyboard.h",
+		MAME_DIR .. "src/devices/bus/amiga/keyboard/matrix.cpp",
+		MAME_DIR .. "src/devices/bus/amiga/keyboard/matrix.h",
+		MAME_DIR .. "src/devices/bus/amiga/keyboard/a1200.cpp",
+		MAME_DIR .. "src/devices/bus/amiga/keyboard/a1200.h",
+		MAME_DIR .. "src/devices/bus/amiga/keyboard/a500.cpp",
+		MAME_DIR .. "src/devices/bus/amiga/keyboard/a500.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/bus/amiga/zorro/zorro.h,BUSES["ZORRO"] = true
 ---------------------------------------------------
 
@@ -2514,6 +2751,20 @@ if (BUSES["ZORRO"]~=null) then
 		MAME_DIR .. "src/devices/bus/amiga/zorro/action_replay.h",
 		MAME_DIR .. "src/devices/bus/amiga/zorro/buddha.cpp",
 		MAME_DIR .. "src/devices/bus/amiga/zorro/buddha.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/bus/sunkbd/sunkbd.h,BUSES["SUNKBD"] = true
+---------------------------------------------------
+
+if (BUSES["SUNKBD"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/sunkbd/hlekbd.cpp",
+		MAME_DIR .. "src/devices/bus/sunkbd/hlekbd.h",
+		MAME_DIR .. "src/devices/bus/sunkbd/sunkbd.cpp",
+		MAME_DIR .. "src/devices/bus/sunkbd/sunkbd.h",
 	}
 end
 
@@ -2768,5 +3019,44 @@ end
 if (BUSES["HP_OPTROM"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/hp_optroms/hp_optrom.cpp",
-        }
+		}
+end
+
+---------------------------------------------------
+--
+--@src/devices/bus/hp9845_io/hp9845_io.h,BUSES["HP9845_IO"] = true
+---------------------------------------------------
+
+if (BUSES["HP9845_IO"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/hp9845_io/hp9845_io.cpp",
+		MAME_DIR .. "src/devices/bus/hp9845_io/98034.cpp",
+		MAME_DIR .. "src/devices/bus/hp9845_io/98035.cpp",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/bus/compis/graphics.h,BUSES["COMPIS_GRAPHICS"] = true
+---------------------------------------------------
+
+if (BUSES["COMPIS_GRAPHICS"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/compis/graphics.cpp",
+		MAME_DIR .. "src/devices/bus/compis/graphics.h",
+		MAME_DIR .. "src/devices/bus/compis/hrg.cpp",
+		MAME_DIR .. "src/devices/bus/compis/hrg.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/bus/pc1512/mouse.h,BUSES["PC1512"] = true
+---------------------------------------------------
+
+if (BUSES["PC1512"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/pc1512/mouse.cpp",
+		MAME_DIR .. "src/devices/bus/pc1512/mouse.h",
+	}
 end

@@ -21,24 +21,15 @@
     of the magic 64 bit pattern (see read above).
     **************************************************************************************/
 
+#include "emu.h"
 #include "ds1315.h"
 #include "coreutil.h"
 
 
-const device_type DS1315 = &device_creator<ds1315_device>;
+DEFINE_DEVICE_TYPE(DS1315, ds1315_device, "ds1315", "Dallas DS1315 Phantom Time Chip")
 
-ds1315_device::ds1315_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-				: device_t(mconfig, DS1315, "Dallas Semiconductor DS1315", tag, owner, clock, "ds1315", __FILE__), m_mode(), m_count(0)
-			{
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void ds1315_device::device_config_complete()
+ds1315_device::ds1315_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, DS1315, tag, owner, clock), m_mode(), m_count(0)
 {
 }
 
@@ -69,7 +60,7 @@ void ds1315_device::device_reset()
     LOCAL VARIABLES
 ***************************************************************************/
 
-static const UINT8 ds1315_pattern[] =
+static const uint8_t ds1315_pattern[] =
 {
 	1, 0, 1, 0, 0, 0, 1, 1,
 	0, 1, 0, 1, 1, 1, 0, 0,
@@ -135,7 +126,7 @@ READ8_MEMBER( ds1315_device::read_1 )
 
 READ8_MEMBER( ds1315_device::read_data )
 {
-	UINT8 result;
+	uint8_t result;
 
 	if (m_mode == DS_CALENDAR_IO)
 	{
@@ -233,7 +224,7 @@ void ds1315_device::input_raw_data()
 {
 	int raw[8], i, j;
 	raw[0] = raw[1] = raw[2] = raw[3] = raw[4] = raw[5] = raw[6] = raw[7] = 0;
-	UINT8 flag = 1;
+	uint8_t flag = 1;
 
 	for (i = 0; i < 64; i++)
 	{

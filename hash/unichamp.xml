@@ -3,7 +3,7 @@
 
 <softwarelist name="unichamp" description="Unisonic Champion 2711 cartridges">
 
-	<software name="pac-02">
+	<software name="pac_02">
 		<description>Professional Poker Games</description>
 		<year>1977</year>
 		<publisher>Unisonic</publisher>
@@ -15,7 +15,7 @@
 		</part>
 	</software>
 
-	<software name="pac-03">
+	<software name="pac_03">
 		<description>Assorted Family Fun</description>
 		<year>1977</year>
 		<publisher>Unisonic</publisher>
@@ -27,7 +27,7 @@
 		</part>
 	</software>
 
-	<software name="pac-04">
+	<software name="pac_04">
 		<description>Family Card Games</description>
 		<year>1977</year>
 		<publisher>Unisonic</publisher>
@@ -39,7 +39,7 @@
 		</part>
 	</software>
 
-	<software name="pac-05">
+	<software name="pac_05">
 		<description>Math</description>
 		<year>1977</year>
 		<publisher>Unisonic</publisher>

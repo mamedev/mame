@@ -19,10 +19,10 @@
 
 #define ORAO_HEADER_SIZE 360
 
-static INT16    wave_data;
+static int16_t    wave_data;
 static int      len;
 
-static void orao_output_wave( INT16 **buffer, int length ) {
+static void orao_output_wave( int16_t **buffer, int length ) {
 	if ( buffer == nullptr ) {
 		return;
 	}
@@ -32,9 +32,9 @@ static void orao_output_wave( INT16 **buffer, int length ) {
 		*buffer = *buffer + 1;
 	}
 }
-static int orao_cas_to_wav_size( const UINT8 *casdata, int caslen ) {
+static int orao_cas_to_wav_size( const uint8_t *casdata, int caslen ) {
 	int i,j,size;
-	UINT8 b;
+	uint8_t b;
 
 	if (casdata == nullptr) return -1;
 	if (caslen <= ORAO_HEADER_SIZE) {
@@ -55,9 +55,9 @@ static int orao_cas_to_wav_size( const UINT8 *casdata, int caslen ) {
 	return size;
 }
 
-static int orao_cas_fill_wave( INT16 *buffer, int length, UINT8 *bytes ) {
+static int orao_cas_fill_wave( int16_t *buffer, int length, uint8_t *bytes ) {
 	int i,j,size;
-	UINT8 b;
+	uint8_t b;
 	size = 0;
 	if (bytes == nullptr) return -1;
 	for (i=ORAO_HEADER_SIZE;i<len-ORAO_HEADER_SIZE;i++) {
@@ -97,13 +97,13 @@ static const struct CassetteLegacyWaveFiller orao_legacy_fill_wave = {
 
 
 
-static casserr_t orao_cassette_identify( cassette_image *cassette, struct CassetteOptions *opts ) {
+static cassette_image::error orao_cassette_identify( cassette_image *cassette, struct CassetteOptions *opts ) {
 	return cassette_legacy_identify( cassette, opts, &orao_legacy_fill_wave );
 }
 
 
 
-static casserr_t orao_cassette_load( cassette_image *cassette ) {
+static cassette_image::error orao_cassette_load( cassette_image *cassette ) {
 	return cassette_legacy_construct( cassette, &orao_legacy_fill_wave );
 }
 

@@ -18,10 +18,11 @@
 */
 
 #include "emu.h"
-#include "machine/ram.h"
-#include "machine/nvram.h"
-#include "video/msm6222b.h"
 #include "cpu/mcs96/i8x9x.h"
+#include "machine/nvram.h"
+#include "machine/ram.h"
+#include "video/msm6222b.h"
+#include "screen.h"
 
 static INPUT_PORTS_START( d110 )
 	PORT_START("SC0")
@@ -45,116 +46,124 @@ static INPUT_PORTS_START( d110 )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Edit") PORT_CODE(KEYCODE_A)
 INPUT_PORTS_END
 
+
 class d110_state : public driver_device
 {
 public:
-	required_device<i8x9x_device> cpu;
-	required_device<ram_device> ram;
-	required_device<nvram_device> rams;
-	required_device<ram_device> memc;
-	required_device<nvram_device> memcs;
-	required_device<msm6222b_device> lcd;
-	required_device<timer_device> midi_timer;
-
-	d110_state(const machine_config &mconfig, device_type type, const char *tag);
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(d110);
-
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	d110_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_ram(*this, "ram")
+		, m_rams(*this, "rams")
+		, m_memc(*this, "memc")
+		, m_memcs(*this, "memcs")
+		, m_lcd(*this, "lcd")
+		, m_midi_timer(*this, "midi_timer")
+		, m_maincpu(*this, "maincpu") { }
 
 	DECLARE_WRITE8_MEMBER(bank_w);
 	DECLARE_WRITE8_MEMBER(so_w);
 	DECLARE_WRITE16_MEMBER(midi_w);
-
 	DECLARE_READ8_MEMBER(lcd_ctrl_r);
 	DECLARE_WRITE8_MEMBER(lcd_ctrl_w);
 	DECLARE_WRITE8_MEMBER(lcd_data_w);
 	DECLARE_READ16_MEMBER(port0_r);
-
 	TIMER_DEVICE_CALLBACK_MEMBER(midi_timer_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(samples_timer_cb);
+	DECLARE_PALETTE_INIT(d110);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 private:
-	UINT8 lcd_data_buffer[256];
-	int lcd_data_buffer_pos;
-	UINT8 midi;
-	int midi_pos;
-	UINT8 port0;
-	required_device<cpu_device> m_maincpu;
+
+	uint8_t  m_lcd_data_buffer[256];
+	int      m_lcd_data_buffer_pos;
+	uint8_t  m_midi;
+	int      m_midi_pos;
+	uint8_t  m_port0;
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	required_device<ram_device> m_ram;
+	required_device<nvram_device> m_rams;
+	required_device<ram_device> m_memc;
+	required_device<nvram_device> m_memcs;
+	required_device<msm6222b_device> m_lcd;
+	required_device<timer_device> m_midi_timer;
+	required_device<i8x9x_device> m_maincpu;
 };
 
-d110_state::d110_state(const machine_config &mconfig, device_type type, const char *tag) :
-	driver_device(mconfig, type, tag),
-	cpu(*this, "maincpu"),
-	ram(*this, "ram"),
-	rams(*this, "rams"),
-	memc(*this, "memc"),
-	memcs(*this, "memcs"),
-	lcd(*this, "lcd"),
-	midi_timer(*this, "midi_timer")
-,
-		m_maincpu(*this, "maincpu") {
-}
 
-
-UINT32 d110_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t d110_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	uint8_t y,ra,gfx;
+	uint16_t sy=0,x;
+	const uint8_t *data = m_lcd->render();
 	bitmap.fill(0);
-	const UINT8 *data = lcd->render();
-	for(int l=0; l<2; l++)
-		for(int c=0; c<20; c++)
-			for(int y=0; y<8; y++) {
-				UINT8 v = data[c*16 + l*40*16 + y];
-				for(int x=0; x<5; x++)
-					bitmap.pix16(y+9*l, c*6+x) = v & (0x10 >> x) ? 1 : 0;
+
+	for (y = 0; y < 2; y++)
+	{
+		for (ra = 0; ra < 9; ra++)
+		{
+			uint16_t *p = &bitmap.pix16(sy++);
+
+			for (x = 0; x < 16; x++)
+			{
+				gfx = 0;
+				if (ra < 8)
+					gfx = data[x*16 + y*640 + ra];
+
+				*p++ = BIT(gfx, 4);
+				*p++ = BIT(gfx, 3);
+				*p++ = BIT(gfx, 2);
+				*p++ = BIT(gfx, 1);
+				*p++ = BIT(gfx, 0);
+				*p++ = 0;
 			}
+		}
+	}
 	return 0;
 }
 
 void d110_state::machine_start()
 {
-	rams->set_base(ram->pointer(), 32768);
-	memcs->set_base(memc->pointer(), 32768);
+	m_rams->set_base(m_ram->pointer(), 32768);
+	m_memcs->set_base(m_memc->pointer(), 32768);
 
 	membank("bank")->configure_entries(0x00, 4, memregion("maincpu")->base(), 0x4000);
-	membank("bank")->configure_entries(0x10, 2, ram->pointer(), 0x4000);
+	membank("bank")->configure_entries(0x10, 2, m_ram->pointer(), 0x4000);
 	membank("bank")->configure_entries(0x20, 8, memregion("presets")->base(), 0x4000);
-	membank("bank")->configure_entries(0x30, 2, memc->pointer(), 0x4000);
-	membank("fixed")->set_base(ram->pointer());
+	membank("bank")->configure_entries(0x30, 2, m_memc->pointer(), 0x4000);
+	membank("fixed")->set_base(m_ram->pointer());
 
-	lcd_data_buffer_pos = 0;
+	m_lcd_data_buffer_pos = 0;
 }
 
 void d110_state::machine_reset()
 {
 	//  midi_timer->adjust(attotime::from_hz(1));
-	midi_pos = 0;
-	port0 = 0x80; // battery ok
+	m_midi_pos = 0;
+	m_port0 = 0x80; // battery ok
 }
 
 WRITE8_MEMBER(d110_state::lcd_ctrl_w)
 {
-	lcd->control_w(data);
-	for(int i=0; i != lcd_data_buffer_pos; i++)
-		lcd->data_w(lcd_data_buffer[i]);
-	lcd_data_buffer_pos = 0;
+	m_lcd->control_w(data);
+	for(int i=0; i != m_lcd_data_buffer_pos; i++)
+		m_lcd->data_w(m_lcd_data_buffer[i]);
+	m_lcd_data_buffer_pos = 0;
 }
 
 READ8_MEMBER(d110_state::lcd_ctrl_r)
 {
 	// Busy flag in the msm622b is bit 7, while the software expects it in bit 0...
-	return lcd->control_r() >> 7;
+	return m_lcd->control_r() >> 7;
 }
 
 WRITE8_MEMBER(d110_state::lcd_data_w)
 {
-	if(lcd_data_buffer_pos == sizeof(lcd_data_buffer)) {
-		logerror("Warning: lcd data buffer overflow (%04x)\n", cpu->pc());
+	if(m_lcd_data_buffer_pos == sizeof(m_lcd_data_buffer)) {
+		logerror("Warning: lcd data buffer overflow (%04x)\n", m_maincpu->pc());
 		return;
 	}
-	lcd_data_buffer[lcd_data_buffer_pos++] = data;
+	m_lcd_data_buffer[m_lcd_data_buffer_pos++] = data;
 }
 
 WRITE8_MEMBER(d110_state::bank_w)
@@ -165,27 +174,27 @@ WRITE8_MEMBER(d110_state::bank_w)
 WRITE16_MEMBER(d110_state::midi_w)
 {
 	logerror("midi_out %02x\n", data);
-	midi = data;
+	m_midi = data;
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(d110_state::midi_timer_cb)
 {
-	const static UINT8 midi_data[3] = { 0x91, 0x40, 0x7f };
-	midi = midi_data[midi_pos++];
-	logerror("midi_in %02x\n", midi);
-	cpu->serial_w(midi);
-	if(midi_pos < sizeof(midi_data))
-		midi_timer->adjust(attotime::from_hz(1250));
+	const static uint8_t midi_data[3] = { 0x91, 0x40, 0x7f };
+	m_midi = midi_data[m_midi_pos++];
+	logerror("midi_in %02x\n", m_midi);
+	m_maincpu->serial_w(m_midi);
+	if(m_midi_pos < sizeof(midi_data))
+		m_midi_timer->adjust(attotime::from_hz(1250));
 }
 
 READ16_MEMBER(d110_state::port0_r)
 {
-	return port0;
+	return m_port0;
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(d110_state::samples_timer_cb)
 {
-	port0 ^= 0x10;
+	m_port0 ^= 0x10;
 }
 
 WRITE8_MEMBER(d110_state::so_w)
@@ -220,7 +229,7 @@ static ADDRESS_MAP_START( d110_io, AS_IO, 16, d110_state )
 	AM_RANGE(i8x9x_device::P0,     i8x9x_device::P0)     AM_READ(port0_r)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( d110, d110_state )
+static MACHINE_CONFIG_START( d110 )
 	MCFG_CPU_ADD( "maincpu", P8098, XTAL_12MHz )
 	MCFG_CPU_PROGRAM_MAP( d110_map )
 	MCFG_CPU_IO_MAP( d110_io )
@@ -275,4 +284,4 @@ ROM_START( d110 )
 	ROM_LOAD(  "r15179879.ic6.bin",            0,   0x8000, CRC(5d34174e) SHA1(17bd2887711c5c5458aba6d3be5972b2096eb450) )
 ROM_END
 
-CONS( 1988, d110,  0, 0, d110, d110, driver_device, 0, "Roland", "D110",  MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+CONS( 1988, d110,  0, 0, d110, d110, d110_state, 0, "Roland", "D110",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

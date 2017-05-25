@@ -23,14 +23,14 @@ public:
 		m_soundlatch(*this, "soundlatch") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_bgvideoram;
-	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_fgvideoram;
+	required_shared_ptr<uint8_t> m_bgvideoram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_fgvideoram;
 
 	/* video-related */
 	tilemap_t        *m_bg_tilemap;
 	tilemap_t        *m_fg_tilemap;
-	UINT8          m_vreg[4];
+	uint8_t          m_vreg[4];
 
 	/* sound-related */
 	int            m_pulse;
@@ -59,6 +59,6 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(cop01);
-	UINT32 screen_update_cop01(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_cop01(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 };

@@ -8,6 +8,7 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "a590.h"
 #include "bus/scsi/scsi.h"
 #include "bus/scsi/scsihd.h"
@@ -17,8 +18,8 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type A590 = &device_creator<a590_device>;
-const device_type A2091 = &device_creator<a2091_device>;
+DEFINE_DEVICE_TYPE(A590,  a590_device,  "a590",  "CBM A590 HD Controller")
+DEFINE_DEVICE_TYPE(A2091, a2091_device, "a2091", "CBM A2091 HD Controller")
 
 //-------------------------------------------------
 //  input_ports - device-specific input ports
@@ -114,7 +115,7 @@ ioport_constructor a2091_device::device_input_ports() const
 //  machine configurations
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( dmac_hdc )
+static MACHINE_CONFIG_START( dmac_hdc )
 	MCFG_DMAC_ADD("dmac", 0)
 	MCFG_DMAC_SCSI_READ_HANDLER(READ8(dmac_hdc_device, dmac_scsi_r))
 	MCFG_DMAC_SCSI_WRITE_HANDLER(WRITE8(dmac_hdc_device, dmac_scsi_w))
@@ -177,7 +178,7 @@ ROM_START( dmac_hdc )
 	ROM_LOAD("390333-03.u5", 0x000, 0x104, CRC(dc4a8d9b) SHA1(761a1318106e49057f95258699076ec1079967ad))
 ROM_END
 
-const rom_entry *dmac_hdc_device::device_rom_region() const
+const tiny_rom_entry *dmac_hdc_device::device_rom_region() const
 {
 	return ROM_NAME( dmac_hdc );
 }
@@ -191,17 +192,16 @@ const rom_entry *dmac_hdc_device::device_rom_region() const
 //  dmac_hdc_device - constructor
 //-------------------------------------------------
 
-dmac_hdc_device::dmac_hdc_device(const machine_config &mconfig, device_type type, const char *tag,
-	device_t *owner, UINT32 clock, const char *name, const char *shortname) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
+dmac_hdc_device::dmac_hdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	m_int6(false),
 	m_dmac(*this, "dmac"),
 	m_wdc(*this, "wd33c93")
 {
 }
 
-a590_device::a590_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	dmac_hdc_device(mconfig, A590, tag, owner, clock, "CBM A590 HD Controller", "a590"),
+a590_device::a590_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	dmac_hdc_device(mconfig, A590, tag, owner, clock),
 	device_exp_card_interface(mconfig, *this),
 	m_dips(*this, "dips"),
 	m_jp1(*this, "jp1"),
@@ -210,8 +210,8 @@ a590_device::a590_device(const machine_config &mconfig, const char *tag, device_
 {
 }
 
-a2091_device::a2091_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	dmac_hdc_device(mconfig, A2091, tag, owner, clock, "CBM A2091 HD Controller", "a2091"),
+a2091_device::a2091_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	dmac_hdc_device(mconfig, A2091, tag, owner, clock),
 	device_zorro2_card_interface(mconfig, *this),
 	m_jp1(*this, "jp1"),
 	m_jp2(*this, "jp2"),

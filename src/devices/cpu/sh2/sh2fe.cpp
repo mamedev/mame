@@ -18,7 +18,7 @@
     INSTRUCTION PARSERS
 ***************************************************************************/
 
-sh2_frontend::sh2_frontend(sh2_device *device, UINT32 window_start, UINT32 window_end, UINT32 max_sequence)
+sh2_frontend::sh2_frontend(sh2_device *device, uint32_t window_start, uint32_t window_end, uint32_t max_sequence)
 	: drc_frontend(*device, window_start, window_end, max_sequence)
 	, m_sh2(device)
 {
@@ -31,7 +31,7 @@ sh2_frontend::sh2_frontend(sh2_device *device, UINT32 window_start, UINT32 windo
 
 bool sh2_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 {
-	UINT16 opcode;
+	uint16_t opcode;
 
 	/* fetch the opcode */
 	opcode = desc.opptr.w[0] = m_sh2->m_direct->read_word(desc.physpc, SH2_CODE_XOR(0));
@@ -86,7 +86,7 @@ bool sh2_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			// (intentional fallthrough - BSR is BRA with the addition of PR = the return address)
 		case 10:    // BRA
 			{
-				INT32 disp = ((INT32)opcode << 20) >> 20;
+				int32_t disp = ((int32_t)opcode << 20) >> 20;
 
 				desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
 				desc.targetpc = (desc.pc + 2) + disp * 2 + 2;
@@ -114,7 +114,7 @@ bool sh2_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 	return false;
 }
 
-bool sh2_frontend::describe_group_0(opcode_desc &desc, const opcode_desc *prev, UINT16 opcode)
+bool sh2_frontend::describe_group_0(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode)
 {
 	switch (opcode & 0x3F)
 	{
@@ -283,7 +283,7 @@ bool sh2_frontend::describe_group_0(opcode_desc &desc, const opcode_desc *prev, 
 	return false;
 }
 
-bool sh2_frontend::describe_group_2(opcode_desc &desc, const opcode_desc *prev, UINT16 opcode)
+bool sh2_frontend::describe_group_2(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode)
 {
 	switch (opcode & 15)
 	{
@@ -331,7 +331,7 @@ bool sh2_frontend::describe_group_2(opcode_desc &desc, const opcode_desc *prev, 
 	return false;
 }
 
-bool sh2_frontend::describe_group_3(opcode_desc &desc, const opcode_desc *prev, UINT16 opcode)
+bool sh2_frontend::describe_group_3(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode)
 {
 	switch (opcode & 15)
 	{
@@ -380,7 +380,7 @@ bool sh2_frontend::describe_group_3(opcode_desc &desc, const opcode_desc *prev, 
 	return false;
 }
 
-bool sh2_frontend::describe_group_4(opcode_desc &desc, const opcode_desc *prev, UINT16 opcode)
+bool sh2_frontend::describe_group_4(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode)
 {
 	switch (opcode & 0x3F)
 	{
@@ -610,7 +610,7 @@ bool sh2_frontend::describe_group_4(opcode_desc &desc, const opcode_desc *prev, 
 	return false;
 }
 
-bool sh2_frontend::describe_group_6(opcode_desc &desc, const opcode_desc *prev, UINT16 opcode)
+bool sh2_frontend::describe_group_6(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode)
 {
 	switch (opcode & 15)
 	{
@@ -651,9 +651,9 @@ bool sh2_frontend::describe_group_6(opcode_desc &desc, const opcode_desc *prev, 
 	return false;
 }
 
-bool sh2_frontend::describe_group_8(opcode_desc &desc, const opcode_desc *prev, UINT16 opcode)
+bool sh2_frontend::describe_group_8(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode)
 {
-	INT32 disp;
+	int32_t disp;
 
 	switch ( opcode  & (15<<8) )
 	{
@@ -689,7 +689,7 @@ bool sh2_frontend::describe_group_8(opcode_desc &desc, const opcode_desc *prev, 
 	case 11<< 8: // BF(opcode & 0xff);
 		desc.flags |= OPFLAG_IS_CONDITIONAL_BRANCH;
 		desc.cycles = 3;
-		disp = ((INT32)opcode << 24) >> 24;
+		disp = ((int32_t)opcode << 24) >> 24;
 		desc.targetpc = (desc.pc + 2) + disp * 2 + 2;
 		return true;
 
@@ -697,7 +697,7 @@ bool sh2_frontend::describe_group_8(opcode_desc &desc, const opcode_desc *prev, 
 	case 15<< 8: // BFS(opcode & 0xff);
 		desc.flags |= OPFLAG_IS_CONDITIONAL_BRANCH;
 		desc.cycles = 2;
-		disp = ((INT32)opcode << 24) >> 24;
+		disp = ((int32_t)opcode << 24) >> 24;
 		desc.targetpc = (desc.pc + 2) + disp * 2 + 2;
 		desc.delayslots = 1;
 		return true;
@@ -706,7 +706,7 @@ bool sh2_frontend::describe_group_8(opcode_desc &desc, const opcode_desc *prev, 
 	return false;
 }
 
-bool sh2_frontend::describe_group_12(opcode_desc &desc, const opcode_desc *prev, UINT16 opcode)
+bool sh2_frontend::describe_group_12(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode)
 {
 	switch (opcode & (15<<8))
 	{

@@ -31,15 +31,18 @@ ToDo:
 
 *****************************************************************************************/
 
-
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
-#include "machine/nvram.h"
-#include "video/resnet.h"
-#include "sound/tms5220.h"
-#include "sound/dac.h"
 #include "machine/i8255.h"
+#include "machine/nvram.h"
+#include "sound/dac.h"
+#include "sound/tms5220.h"
+#include "sound/volt_reg.h"
+#include "video/resnet.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 class mrgame_state : public driver_device
 {
@@ -75,24 +78,24 @@ public:
 	DECLARE_READ8_MEMBER(portc_r);
 	DECLARE_READ8_MEMBER(rsw_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer);
-	UINT32 screen_update_mrgame(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_mrgame(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	std::unique_ptr<bitmap_ind16> m_tile_bitmap;
 	required_device<palette_device> m_palette;
-	required_shared_ptr<UINT8> m_p_videoram;
-	required_shared_ptr<UINT8> m_p_objectram;
+	required_shared_ptr<uint8_t> m_p_videoram;
+	required_shared_ptr<uint8_t> m_p_objectram;
 	required_device<gfxdecode_device> m_gfxdecode;
 private:
 	bool m_ack1;
 	bool m_ack2;
 	bool m_ackv;
 	bool m_flip;
-	UINT8 m_irq_state;
-	UINT8 m_row_data;
-	UINT8 m_sound_data;
-	UINT8 m_gfx_bank;
-	UINT8 m_video_data;
-	UINT8 m_video_status;
-	UINT8 m_video_ctrl[8];
+	uint8_t m_irq_state;
+	uint8_t m_row_data;
+	uint8_t m_sound_data;
+	uint8_t m_gfx_bank;
+	uint8_t m_video_data;
+	uint8_t m_video_status;
+	uint8_t m_video_ctrl[8];
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_device<m68000_device> m_maincpu;
@@ -135,7 +138,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( audio1_io, AS_IO, 8, mrgame_state )
 	ADDRESS_MAP_GLOBAL_MASK(3)
-	AM_RANGE(0x0000, 0x0000) AM_WRITENOP //AM_DEVWRITE("dac", dac_device, write_unsigned8) //DA1. The DC output might be an electronic volume control of the M114's output.
+	AM_RANGE(0x0000, 0x0000) AM_DEVWRITE("dacvol", dac_byte_interface, write) //DA1
 	AM_RANGE(0x0001, 0x0001) AM_READ(sound_r) //IN1
 	AM_RANGE(0x0002, 0x0002) AM_WRITE(ack1_w) //AKL1
 	AM_RANGE(0x0003, 0x0003) AM_WRITENOP //SGS pass data to M114
@@ -148,11 +151,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( audio2_io, AS_IO, 8, mrgame_state )
 	ADDRESS_MAP_GLOBAL_MASK(7)
-	AM_RANGE(0x0000, 0x0000) AM_DEVWRITE("dacl", dac_device, write_unsigned8) //DA2
+	AM_RANGE(0x0000, 0x0000) AM_DEVWRITE("ldac", dac_byte_interface, write) //DA2
 	AM_RANGE(0x0001, 0x0001) AM_READ(sound_r) //IN2
 	AM_RANGE(0x0002, 0x0002) AM_WRITE(ack2_w) //AKL2
 	AM_RANGE(0x0003, 0x0003) AM_DEVREADWRITE("tms", tms5220_device, status_r, data_w) //Speech
-	AM_RANGE(0x0004, 0x0004) AM_DEVWRITE("dacr", dac_device, write_unsigned8) //DA3
+	AM_RANGE(0x0004, 0x0004) AM_DEVWRITE("rdac", dac_byte_interface, write) //DA3
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( mrgame )
@@ -206,7 +209,7 @@ INPUT_PORTS_END
 
 READ8_MEMBER( mrgame_state::rsw_r )
 {
-	return m_io_dsw0->read() | ((UINT8)m_ack1 << 5) | ((UINT8)m_ack2 << 4);
+	return m_io_dsw0->read() | ((uint8_t)m_ack1 << 5) | ((uint8_t)m_ack2 << 4);
 }
 
 // this is like a keyboard, energise a row and read the column data
@@ -294,7 +297,7 @@ WRITE8_MEMBER( mrgame_state::portb_w )
 
 READ8_MEMBER( mrgame_state::portc_r )
 {
-	return m_io_dsw1->read() | ((UINT8)m_ackv << 4);
+	return m_io_dsw1->read() | ((uint8_t)m_ackv << 4);
 }
 
 void mrgame_state::machine_start()
@@ -371,8 +374,8 @@ PALETTE_INIT_MEMBER( mrgame_state, mrgame)
 {
 	static const int resistances[3] = { 1000, 470, 220 };
 	double rweights[3], gweights[3], bweights[2];
-	UINT8 i, bit0, bit1, bit2, r, g, b;
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	uint8_t i, bit0, bit1, bit2, r, g, b;
+	const uint8_t *color_prom = machine().root_device().memregion("proms")->base();
 
 	/* compute the color output resistor weights */
 	compute_resistor_weights(0, 255, -1.0,
@@ -406,11 +409,11 @@ PALETTE_INIT_MEMBER( mrgame_state, mrgame)
 }
 
 // most of this came from pinmame as the diagram doesn't make a lot of sense
-UINT32 mrgame_state::screen_update_mrgame(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t mrgame_state::screen_update_mrgame(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 x,y,ptr=0,col;
-	INT32 scrolly[32];
-	UINT16 chr;
+	uint8_t x,y,ptr=0,col;
+	int32_t scrolly[32];
+	uint16_t chr;
 	bool flipx,flipy;
 
 	// text
@@ -456,7 +459,7 @@ UINT32 mrgame_state::screen_update_mrgame(screen_device &screen, bitmap_ind16 &b
 	return 0;
 }
 
-static MACHINE_CONFIG_START( mrgame, mrgame_state )
+static MACHINE_CONFIG_START( mrgame )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_6MHz)
 	MCFG_CPU_PROGRAM_MAP(main_map)
@@ -487,10 +490,14 @@ static MACHINE_CONFIG_START( mrgame, mrgame_state )
 
 	/* Sound */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_DAC_ADD("dacl")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MCFG_DAC_ADD("dacr")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	MCFG_SOUND_ADD("ldac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) // unknown DAC
+	MCFG_SOUND_ADD("rdac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25) // unknown DAC
+	MCFG_SOUND_ADD("dacvol", DAC_8BIT_R2R, 0) // unknown DAC
+	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dacvol", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dacvol", -1.0, DAC_VREF_NEG_INPUT)
+
 	MCFG_SOUND_ADD("tms", TMS5220, 672000) // uses a RC combination. 672k copied from jedi.h
 	MCFG_TMS52XX_READYQ_HANDLER(INPUTLINE("audiocpu2", Z80_INPUT_LINE_BOGUSWAIT))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
@@ -657,8 +664,8 @@ ROM_START(wcup90)
 ROM_END
 
 
-GAME(1988,  dakar,     0,         mrgame,  mrgame, mrgame_state,  mrgame,  ROT0,  "Mr Game", "Dakar", MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND )
-GAME(1989,  motrshow,  0,         mrgame,  mrgame, mrgame_state,  mrgame,  ROT0,  "Mr Game", "Motor Show (set 1)", MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND )
-GAME(1989,  motrshowa, motrshow,  mrgame,  mrgame, mrgame_state,  mrgame,  ROT0,  "Mr Game", "Motor Show (set 2)", MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND )
-GAME(1990,  macattck,  0,         mrgame,  mrgame, mrgame_state,  mrgame,  ROT0,  "Mr Game", "Mac Attack", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  wcup90,    0,         mrgame,  mrgame, mrgame_state,  mrgame,  ROT0,  "Mr Game", "World Cup 90", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1988,  dakar,     0,         mrgame,  mrgame, mrgame_state,  mrgame,  ROT0,  "Mr Game", "Dakar",              MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME(1989,  motrshow,  0,         mrgame,  mrgame, mrgame_state,  mrgame,  ROT0,  "Mr Game", "Motor Show (set 1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME(1989,  motrshowa, motrshow,  mrgame,  mrgame, mrgame_state,  mrgame,  ROT0,  "Mr Game", "Motor Show (set 2)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME(1990,  macattck,  0,         mrgame,  mrgame, mrgame_state,  mrgame,  ROT0,  "Mr Game", "Mac Attack",         MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  wcup90,    0,         mrgame,  mrgame, mrgame_state,  mrgame,  ROT0,  "Mr Game", "World Cup 90",       MACHINE_IS_SKELETON_MECHANICAL)

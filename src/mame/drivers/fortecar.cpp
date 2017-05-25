@@ -308,24 +308,26 @@
 
 **************************************************************************************************/
 
+#include "emu.h"
+#include "cpu/z80/z80.h"
+#include "machine/eepromser.h"
+#include "machine/i8255.h"
+#include "machine/nvram.h"
+#include "machine/v3021.h"
+#include "machine/watchdog.h"
+#include "sound/ay8910.h"
+#include "video/mc6845.h"
+#include "video/resnet.h"
+#include "screen.h"
+#include "speaker.h"
+
+#include "fortecrd.lh"
+
 
 #define MASTER_CLOCK    XTAL_12MHz
 #define CPU_CLOCK       (MASTER_CLOCK/4)
 #define CRTC_CLOCK      (MASTER_CLOCK/8)
 #define AY_CLOCK        (MASTER_CLOCK/8)
-
-#include "emu.h"
-#include "cpu/z80/z80.h"
-#include "machine/eepromser.h"
-#include "machine/watchdog.h"
-#include "sound/ay8910.h"
-#include "machine/i8255.h"
-#include "machine/v3021.h"
-#include "video/mc6845.h"
-#include "machine/nvram.h"
-#include "video/resnet.h"
-
-#include "fortecrd.lh"
 
 
 class fortecar_state : public driver_device
@@ -342,7 +344,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<watchdog_timer_device> m_watchdog;
-	required_shared_ptr<UINT8> m_vram;
+	required_shared_ptr<uint8_t> m_vram;
 	DECLARE_WRITE8_MEMBER(ppi0_portc_w);
 	DECLARE_READ8_MEMBER(ppi0_portc_r);
 	DECLARE_WRITE8_MEMBER(ayporta_w);
@@ -351,7 +353,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(fortecar);
-	UINT32 screen_update_fortecar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_fortecar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -366,7 +368,7 @@ void fortecar_state::video_start()
 {
 }
 
-UINT32 fortecar_state::screen_update_fortecar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t fortecar_state::screen_update_fortecar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x, y, count;
 	count = 0;
@@ -395,7 +397,7 @@ UINT32 fortecar_state::screen_update_fortecar(screen_device &screen, bitmap_ind1
 
 PALETTE_INIT_MEMBER(fortecar_state, fortecar)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 /* Video resistors...
 
 O1 (LS374) R1K  RED
@@ -670,7 +672,7 @@ void fortecar_state::machine_reset()
 *         Machine Drivers          *
 ***********************************/
 
-static MACHINE_CONFIG_START( fortecar, fortecar_state )
+static MACHINE_CONFIG_START( fortecar )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)      /* 3 MHz, measured */
 	MCFG_CPU_PROGRAM_MAP(fortecar_map)
@@ -779,6 +781,6 @@ DRIVER_INIT_MEMBER(fortecar_state, fortecar)
 *          Game Drivers            *
 ***********************************/
 
-/*     YEAR  NAME      PARENT    MACHINE   INPUT     STATE           INIT      ROT    COMPANY       FULLNAME                        FLAGS                LAYOUT */
+//     YEAR  NAME      PARENT    MACHINE   INPUT     STATE           INIT      ROT   COMPANY        FULLNAME                        FLAGS                LAYOUT
 GAMEL( 1994, fortecrd, 0,        fortecar, fortecar, fortecar_state, fortecar, ROT0, "Fortex Ltd", "Forte Card (Ver 110, Spanish)", 0,                   layout_fortecrd )
 GAMEL( 1994, fortecar, fortecrd, fortecar, fortecar, fortecar_state, fortecar, ROT0, "Fortex Ltd", "Forte Card (Ver 103, English)", MACHINE_NOT_WORKING, layout_fortecrd )

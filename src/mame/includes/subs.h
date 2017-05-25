@@ -35,8 +35,8 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<discrete_device> m_discrete;
 
-	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_videoram;
 
 	int m_steering_buf1;
 	int m_steering_buf2;
@@ -63,8 +63,8 @@ public:
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(subs);
 
-	UINT32 screen_update_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(interrupt);
 

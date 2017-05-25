@@ -33,13 +33,11 @@ Unable to proceed due to no info available (& in English).
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "cpu/z80/z80.h"
-#include "video/mc6845.h"
-#include "machine/ram.h"
 #include "machine/keyboard.h"
+#include "machine/ram.h"
 #include "machine/terminal.h"
-
-#define TERMINAL_TAG "terminal"
-#define KEYBOARD_TAG "keyboard"
+#include "video/mc6845.h"
+#include "screen.h"
 
 class sapi1_state : public driver_device
 {
@@ -58,7 +56,7 @@ public:
 	{
 	}
 
-	optional_shared_ptr<UINT8> m_p_videoram;
+	optional_shared_ptr<uint8_t> m_p_videoram;
 	DECLARE_READ8_MEMBER(sapi1_keyboard_r);
 	DECLARE_WRITE8_MEMBER(sapi1_keyboard_w);
 	DECLARE_READ8_MEMBER(sapi2_keyboard_status_r);
@@ -67,20 +65,20 @@ public:
 	DECLARE_WRITE8_MEMBER(sapi3_00_w);
 	DECLARE_READ8_MEMBER(sapi3_25_r);
 	DECLARE_WRITE8_MEMBER(sapi3_25_w);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	void kbd_put(u8 data);
 	DECLARE_DRIVER_INIT(sapizps3);
 	DECLARE_DRIVER_INIT(sapizps3a);
 	DECLARE_DRIVER_INIT(sapizps3b);
 	DECLARE_MACHINE_RESET(sapi1);
 	DECLARE_MACHINE_RESET(sapizps3);
 	MC6845_UPDATE_ROW(crtc_update_row);
-	UINT32 screen_update_sapi1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_sapi3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_sapi1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_sapi3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 private:
-	UINT8 m_term_data;
-	UINT8 m_keyboard_mask;
-	UINT8 m_refresh_counter;
-	UINT8 m_zps3_25;
+	uint8_t m_term_data;
+	uint8_t m_keyboard_mask;
+	uint8_t m_refresh_counter;
+	uint8_t m_zps3_25;
 	optional_memory_bank m_bank1;   // Only for sapi3
 	required_ioport m_line0;
 	required_ioport m_line1;
@@ -92,7 +90,7 @@ public:
 	optional_device<palette_device> m_palette;
 };
 
-static const UINT8 MHB2501[] = {
+static const uint8_t MHB2501[] = {
 	0x0c,0x11,0x13,0x15,0x17,0x10,0x0e,0x00, // @
 	0x04,0x0a,0x11,0x11,0x1f,0x11,0x11,0x00, // A
 	0x1e,0x11,0x11,0x1e,0x11,0x11,0x1e,0x00, // B
@@ -226,7 +224,7 @@ static ADDRESS_MAP_START( sapi3a_io, AS_IO, 8, sapi1_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(sapi3_00_w)
-	AM_RANGE(0x12, 0x12) AM_READ(sapi2_keyboard_data_r) AM_DEVWRITE(TERMINAL_TAG, generic_terminal_device, write)
+	AM_RANGE(0x12, 0x12) AM_READ(sapi2_keyboard_data_r) AM_DEVWRITE("terminal", generic_terminal_device, write)
 	AM_RANGE(0x25, 0x25) AM_READWRITE(sapi3_25_r,sapi3_25_w)
 ADDRESS_MAP_END
 
@@ -301,11 +299,11 @@ INPUT_PORTS_END
 
 **************************************/
 
-UINT32 sapi1_state::screen_update_sapi1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t sapi1_state::screen_update_sapi1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bool val;
-	UINT16 addr,xpos;
-	UINT8 chr,attr,ra,x,y,b;
+	uint16_t addr,xpos;
+	uint8_t chr,attr,ra,x,y,b;
 
 	for(y = 0; y < 24; y++ )
 	{
@@ -354,11 +352,11 @@ UINT32 sapi1_state::screen_update_sapi1(screen_device &screen, bitmap_ind16 &bit
 }
 
 // The attributes seem to be different on this one, they need to be understood, so disabled for now
-UINT32 sapi1_state::screen_update_sapi3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t sapi1_state::screen_update_sapi3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bool val;
-	UINT16 addr,xpos;
-	UINT8 chr,attr,ra,x,y,b;
+	uint16_t addr,xpos;
+	uint8_t chr,attr,ra,x,y,b;
 
 	for(y = 0; y < 20; y++ )
 	{
@@ -411,9 +409,9 @@ UINT32 sapi1_state::screen_update_sapi3(screen_device &screen, bitmap_ind16 &bit
 MC6845_UPDATE_ROW( sapi1_state::crtc_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT8 chr,gfx,inv;
-	UINT16 mem,x;
-	UINT32 *p = &bitmap.pix32(y);
+	uint8_t chr,gfx,inv;
+	uint16_t mem,x;
+	uint32_t *p = &bitmap.pix32(y);
 
 	for (x = 0; x < x_count; x++)
 	{
@@ -443,7 +441,7 @@ MC6845_UPDATE_ROW( sapi1_state::crtc_update_row )
 
 READ8_MEMBER( sapi1_state::sapi1_keyboard_r )
 {
-	UINT8 key = 0xff;
+	uint8_t key = 0xff;
 	if (BIT(m_keyboard_mask, 0)) { key &= m_line0->read(); }
 	if (BIT(m_keyboard_mask, 1)) { key &= m_line1->read(); }
 	if (BIT(m_keyboard_mask, 2)) { key &= m_line2->read(); }
@@ -464,12 +462,12 @@ READ8_MEMBER( sapi1_state::sapi2_keyboard_status_r)
 
 READ8_MEMBER( sapi1_state::sapi2_keyboard_data_r)
 {
-	UINT8 ret = ~m_term_data;
+	uint8_t ret = ~m_term_data;
 	m_term_data = 0;
 	return ret;
 }
 
-WRITE8_MEMBER( sapi1_state::kbd_put )
+void sapi1_state::kbd_put(u8 data)
 {
 	m_term_data = data;
 }
@@ -516,25 +514,25 @@ MACHINE_RESET_MEMBER( sapi1_state, sapizps3 )
 
 DRIVER_INIT_MEMBER( sapi1_state, sapizps3 )
 {
-	UINT8 *RAM = memregion("maincpu")->base();
+	uint8_t *RAM = memregion("maincpu")->base();
 	m_bank1->configure_entries(0, 2, &RAM[0x0000], 0x10000);
 }
 
 DRIVER_INIT_MEMBER( sapi1_state, sapizps3a )
 {
-	UINT8 *RAM = memregion("maincpu")->base();
+	uint8_t *RAM = memregion("maincpu")->base();
 	m_bank1->configure_entries(0, 2, &RAM[0x0000], 0xf800);
 }
 
 DRIVER_INIT_MEMBER( sapi1_state, sapizps3b )
 {
-	UINT8 *RAM = memregion("maincpu")->base();
+	uint8_t *RAM = memregion("maincpu")->base();
 	m_bank1->configure_entries(0, 2, &RAM[0x0000], 0x10000);
 }
 
 
 /* Machine driver */
-static MACHINE_CONFIG_START( sapi1, sapi1_state )
+static MACHINE_CONFIG_START( sapi1 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, 2000000)
 	MCFG_CPU_PROGRAM_MAP(sapi1_mem)
@@ -560,8 +558,8 @@ static MACHINE_CONFIG_DERIVED( sapi2, sapi1 )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sapi2_mem)
-	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(WRITE8(sapi1_state, kbd_put))
+	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
+	MCFG_GENERIC_KEYBOARD_CB(PUT(sapi1_state, kbd_put))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( sapi3, sapi2 )
@@ -592,7 +590,7 @@ static MACHINE_CONFIG_DERIVED( sapi3b, sapi3 )
 	MCFG_SCREEN_NO_PALETTE
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sapi3a, sapi1_state )
+static MACHINE_CONFIG_START( sapi3a )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 2000000)
 	MCFG_CPU_PROGRAM_MAP(sapi3a_mem)
@@ -600,8 +598,8 @@ static MACHINE_CONFIG_START( sapi3a, sapi1_state )
 	MCFG_MACHINE_RESET_OVERRIDE(sapi1_state, sapizps3 )
 
 	/* video hardware */
-	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(sapi1_state, kbd_put))
+	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(sapi1_state, kbd_put))
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -663,9 +661,9 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME      PARENT   COMPAT  MACHINE     INPUT  CLASS           INIT      COMPANY    FULLNAME       FLAGS */
-COMP( 1985, sapi1,    0,       0,      sapi1,      sapi1, driver_device,  0,         "Tesla", "SAPI-1 ZPS 1", MACHINE_NO_SOUND_HW)
-COMP( 1985, sapizps2, sapi1,   0,      sapi2,      sapi1, driver_device,  0,         "Tesla", "SAPI-1 ZPS 2", MACHINE_NO_SOUND_HW)
-COMP( 1985, sapizps3, sapi1,   0,      sapi3,      sapi1, sapi1_state,    sapizps3,  "Tesla", "SAPI-1 ZPS 3", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 1985, sapizps3a,sapi1,   0,      sapi3a,     sapi1, sapi1_state,    sapizps3a, "Tesla", "SAPI-1 ZPS 3 (terminal)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 1985, sapizps3b,sapi1,   0,      sapi3b,     sapi1, sapi1_state,    sapizps3b, "Tesla", "SAPI-1 ZPS 3 (6845)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+//    YEAR  NAME       PARENT   COMPAT  MACHINE     INPUT  CLASS        INIT       COMPANY  FULLNAME                   FLAGS
+COMP( 1985, sapi1,     0,       0,      sapi1,      sapi1, sapi1_state, 0,         "Tesla", "SAPI-1 ZPS 1",            MACHINE_NO_SOUND_HW )
+COMP( 1985, sapizps2,  sapi1,   0,      sapi2,      sapi1, sapi1_state, 0,         "Tesla", "SAPI-1 ZPS 2",            MACHINE_NO_SOUND_HW )
+COMP( 1985, sapizps3,  sapi1,   0,      sapi3,      sapi1, sapi1_state, sapizps3,  "Tesla", "SAPI-1 ZPS 3",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1985, sapizps3a, sapi1,   0,      sapi3a,     sapi1, sapi1_state, sapizps3a, "Tesla", "SAPI-1 ZPS 3 (terminal)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1985, sapizps3b, sapi1,   0,      sapi3b,     sapi1, sapi1_state, sapizps3b, "Tesla", "SAPI-1 ZPS 3 (6845)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

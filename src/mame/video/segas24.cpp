@@ -15,7 +15,7 @@
 
 namespace {
 	struct layer_sort {
-		layer_sort(segas24_mixer *_mixer) { mixer = _mixer; }
+		layer_sort(segas24_mixer_device *_mixer) { mixer = _mixer; }
 
 		bool operator()(int l1, int l2) {
 			static const int default_pri[12] = { 0, 1, 2, 3, 4, 5, 6, 7, -4, -3, -2, -1 };
@@ -26,11 +26,11 @@ namespace {
 			return default_pri[l2] - default_pri[l1] < 0;
 		}
 
-		segas24_mixer *mixer;
+		segas24_mixer_device *mixer;
 	};
 }
 
-UINT32 segas24_state::screen_update_system24(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t segas24_state::screen_update_system24(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if(vmixer->get_reg(13) & 1) {
 		bitmap.fill(m_palette->black_pen());

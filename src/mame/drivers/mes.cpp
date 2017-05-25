@@ -10,22 +10,26 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "screen.h"
 
 
 class mes_state : public driver_device
 {
 public:
 	mes_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_p_videoram(*this, "p_videoram"){ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_p_videoram(*this, "videoram")
+		, m_p_chargen(*this, "chargen")
+	{ }
 
-	required_device<cpu_device> m_maincpu;
-	const UINT8 *m_p_chargen;
-	required_shared_ptr<UINT8> m_p_videoram;
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+private:
 	virtual void machine_reset() override;
-	virtual void video_start() override;
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<uint8_t> m_p_videoram;
+	required_region_ptr<u8> m_p_chargen;
 };
 
 
@@ -34,7 +38,7 @@ static ADDRESS_MAP_START(mes_mem, AS_PROGRAM, 8, mes_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1000, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("p_videoram")
+	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mes_io, AS_IO, 8, mes_state)
@@ -49,18 +53,13 @@ void mes_state::machine_reset()
 {
 }
 
-void mes_state::video_start()
-{
-	m_p_chargen = memregion("chargen")->base();
-}
-
 /* This system appears to have 2 screens. Not implemented.
     Also the screen dimensions are a guess. */
-UINT32 mes_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t mes_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	//static UINT8 framecnt=0;
-	UINT8 y,ra,chr,gfx;
-	UINT16 sy=0,ma=0,x,xx;
+	//static uint8_t framecnt=0;
+	uint8_t y,ra,chr,gfx;
+	uint16_t sy=0,ma=0,x,xx;
 
 	//framecnt++;
 
@@ -68,7 +67,7 @@ UINT32 mes_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 	{
 		for (ra = 0; ra < 10; ra++)
 		{
-			UINT16 *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix16(sy++);
 
 			xx = ma;
 			for (x = ma; x < ma + 80; x++)
@@ -103,7 +102,7 @@ UINT32 mes_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 	return 0;
 }
 
-static MACHINE_CONFIG_START( mes, mes_state )
+static MACHINE_CONFIG_START( mes )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(mes_mem)
@@ -137,5 +136,5 @@ ROM_END
 
 /* Driver */
 
-/*   YEAR   NAME    PARENT  COMPAT   MACHINE  INPUT  INIT        COMPANY     FULLNAME       FLAGS */
-COMP( 198?, mes,    0,      0,       mes,     mes, driver_device,   0,       "Schleicher",   "MES", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//   YEAR   NAME    PARENT  COMPAT   MACHINE  INPUT  STATE      INIT  COMPANY       FULLNAME  FLAGS
+COMP( 198?, mes,    0,      0,       mes,     mes,   mes_state, 0,    "Schleicher", "MES",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

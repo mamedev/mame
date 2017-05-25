@@ -9,7 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "osdcore.h"
+#include "dipty.h"
 
 device_pty_interface::device_pty_interface(const machine_config &mconfig, device_t &device)
 	: device_interface(device, "pty")
@@ -51,18 +51,18 @@ bool device_pty_interface::is_open() const
 	return m_opened;
 }
 
-ssize_t device_pty_interface::read(UINT8 *rx_chars , size_t count) const
+ssize_t device_pty_interface::read(u8 *rx_chars , size_t count) const
 {
-	std::uint32_t actual_bytes;
+	u32 actual_bytes;
 	if (m_opened && m_pty_master->read(rx_chars, 0, count, actual_bytes) == osd_file::error::NONE)
 		return actual_bytes;
 	else
 		return -1;
 }
 
-void device_pty_interface::write(UINT8 tx_char) const
+void device_pty_interface::write(u8 tx_char) const
 {
-	std::uint32_t actual_bytes;
+	u32 actual_bytes;
 	if (m_opened)
 		m_pty_master->write(&tx_char, 0, 1, actual_bytes);
 }

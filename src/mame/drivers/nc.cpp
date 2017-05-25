@@ -96,15 +96,16 @@
  ******************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "includes/nc.h"
+
+#include "cpu/z80/z80.h"
 #include "machine/mc146818.h"   /* for NC200 real time clock */
-#include "machine/rp5c01.h" /* for NC100 real time clock */
+#include "machine/rp5c01.h"     /* for NC100 real time clock */
 #include "machine/upd765.h"     /* for NC200 disk drive interface */
 #include "formats/pc_dsk.h"     /* for NC200 disk image */
-#include "sound/beep.h"
-#include "machine/ram.h"
 #include "rendlay.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 #define VERBOSE 0
@@ -298,7 +299,7 @@ static const char *const nc_bankhandler_w[]={
 void nc_state::nc_refresh_memory_bank_config(int bank)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	UINT8 *ptr;
+	uint8_t *ptr;
 	int mem_type;
 	int mem_bank;
 	char bank1[10];
@@ -1204,7 +1205,7 @@ READ8_MEMBER(nc_state::nc200_card_battery_status_r)
 
 READ8_MEMBER(nc_state::nc200_printer_status_r)
 {
-	UINT8 result = 0;
+	uint8_t result = 0;
 
 	result |= m_centronics_busy;
 
@@ -1395,7 +1396,7 @@ INPUT_PORTS_END
 
 /**********************************************************************************************************/
 
-static MACHINE_CONFIG_START( nc100, nc_state )
+static MACHINE_CONFIG_START( nc100 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, /*6000000*/ 4606000)        /* Russell Marks says this is more accurate */
 	MCFG_CPU_PROGRAM_MAP(nc_map)
@@ -1548,7 +1549,7 @@ ROM_START(nc200)
 	ROM_LOAD("nc200.rom", 0x010000, 0x080000, CRC(bb8180e7) SHA1(fb5c93b0a3e199202c6a12548d2617f7a09bae47))
 ROM_END
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY         FULLNAME    FLAGS */
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT  STATE      INIT     COMPANY         FULLNAME    FLAGS */
 COMP( 1992, nc100,  0,      0,      nc100,  nc100, nc_state,  nc,      "Amstrad plc",  "NC100",    0 )
 COMP( 1992, dw225,  nc100,  0,      nc100,  nc100, nc_state,  nc,      "NTS Computer Systems", "DreamWriter 225",    0 )
 COMP( 1992, nc150,  nc100,  0,      nc100,  nc100, nc_state,  nc,      "Amstrad plc",  "NC150",    0 )

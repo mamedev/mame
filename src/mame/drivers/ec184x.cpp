@@ -33,21 +33,22 @@
 	} while (0)
 
 
-
 class ec184x_state : public driver_device
 {
 public:
 	ec184x_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_maincpu(*this, "maincpu") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 
 	DECLARE_MACHINE_RESET(ec1841);
 	DECLARE_DRIVER_INIT(ec1841);
 
-	struct {
-		UINT8 enable[4];
+	struct
+	{
+		uint8_t enable[4];
 		int boards;
 	} m_memory;
 
@@ -76,14 +77,14 @@ public:
 
 READ8_MEMBER(ec184x_state::memboard_r)
 {
-	UINT8 data;
+	uint8_t data;
 
 	data = offset % 4;
 	if (data >= m_memory.boards)
 		data = 0xff;
 	else
 		data = m_memory.enable[data];
-	DBG_LOG(1,"ec1841_memboard",("R (%d of %d) == %02X\n", offset+1, m_memory.boards, data ));
+	DBG_LOG(1, "ec1841_memboard", ("R (%d of %d) == %02X\n", offset + 1, m_memory.boards, data));
 
 	return data;
 }
@@ -92,72 +93,80 @@ WRITE8_MEMBER(ec184x_state::memboard_w)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	ram_device *m_ram = machine().device<ram_device>(RAM_TAG);
-	UINT8 current;
+	uint8_t current;
 
 	current = m_memory.enable[offset];
 
-	DBG_LOG(1,"ec1841_memboard",("W (%d of %d) <- %02X (%02X)\n", offset+1, m_memory.boards, data, current));
+	DBG_LOG(1, "ec1841_memboard", ("W (%d of %d) <- %02X (%02X)\n", offset + 1, m_memory.boards, data, current));
 
-	if (offset >= m_memory.boards) {
+	if (offset >= m_memory.boards)
+	{
 		return;
 	}
 
-	if (BIT(current, 2) && !BIT(data, 2)) {
+	if (BIT(current, 2) && !BIT(data, 2))
+	{
 		// disable read access
-		program.unmap_read(0, EC1841_MEMBOARD_SIZE-1);
-		DBG_LOG(1,"ec1841_memboard_w",("unmap_read(%d)\n", offset));
+		program.unmap_read(0, EC1841_MEMBOARD_SIZE - 1);
+		DBG_LOG(1, "ec1841_memboard_w", ("unmap_read(%d)\n", offset));
 	}
 
-	if (BIT(current, 3) && !BIT(data, 3)) {
+	if (BIT(current, 3) && !BIT(data, 3))
+	{
 		// disable write access
-		program.unmap_write(0, EC1841_MEMBOARD_SIZE-1);
-		DBG_LOG(1,"ec1841_memboard_w",("unmap_write(%d)\n", offset));
+		program.unmap_write(0, EC1841_MEMBOARD_SIZE - 1);
+		DBG_LOG(1, "ec1841_memboard_w", ("unmap_write(%d)\n", offset));
 	}
 
-	if (!BIT(current, 2) && BIT(data, 2)) {
-		for(int i=0; i<4; i++)
+	if (!BIT(current, 2) && BIT(data, 2))
+	{
+		for (int i = 0; i < 4; i++)
 			m_memory.enable[i] &= 0xfb;
 		// enable read access
-		membank("bank10")->set_base(m_ram->pointer() + offset*EC1841_MEMBOARD_SIZE);
-		program.install_read_bank(0, EC1841_MEMBOARD_SIZE-1, "bank10");
-		DBG_LOG(1,"ec1841_memboard_w",("map_read(%d)\n", offset));
+		membank("bank10")->set_base(m_ram->pointer() + offset * EC1841_MEMBOARD_SIZE);
+		program.install_read_bank(0, EC1841_MEMBOARD_SIZE - 1, "bank10");
+		DBG_LOG(1, "ec1841_memboard_w", ("map_read(%d)\n", offset));
 	}
 
-	if (!BIT(current, 3) && BIT(data, 3)) {
-		for(int i=0; i<4; i++)
+	if (!BIT(current, 3) && BIT(data, 3))
+	{
+		for (int i = 0; i < 4; i++)
 			m_memory.enable[i] &= 0xf7;
 		// enable write access
-		membank("bank20")->set_base(m_ram->pointer() + offset*EC1841_MEMBOARD_SIZE);
-		program.install_write_bank(0, EC1841_MEMBOARD_SIZE-1, "bank20");
-		DBG_LOG(1,"ec1841_memboard_w",("map_write(%d)\n", offset));
+		membank("bank20")->set_base(m_ram->pointer() + offset * EC1841_MEMBOARD_SIZE);
+		program.install_write_bank(0, EC1841_MEMBOARD_SIZE - 1, "bank20");
+		DBG_LOG(1, "ec1841_memboard_w", ("map_write(%d)\n", offset));
 	}
 
 	m_memory.enable[offset] = data;
 }
 
-DRIVER_INIT_MEMBER( ec184x_state, ec1841 )
+DRIVER_INIT_MEMBER(ec184x_state, ec1841)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	ram_device *m_ram = machine().device<ram_device>(RAM_TAG);
 
-	m_memory.boards = m_ram->size()/EC1841_MEMBOARD_SIZE;
-	if (m_memory.boards > 4)
-		m_memory.boards = 4;
+	m_memory.boards = m_ram->size() / EC1841_MEMBOARD_SIZE;
+	if (m_memory.boards > 4) m_memory.boards = 4;
+
+	program.install_read_bank(0,  EC1841_MEMBOARD_SIZE-1, "bank10");
+	program.install_write_bank(0, EC1841_MEMBOARD_SIZE-1, "bank20");
+
+	membank("bank10")->set_base(m_ram->pointer());
+	membank("bank20")->set_base(m_ram->pointer());
 
 	// 640K configuration is special -- 512K board mapped at 0 + 128K board mapped at 512K
 	// XXX verify this was actually the case
-	if (m_ram->size() == 640*1024) {
-		program.install_read_bank(0,  m_ram->size()-1, "bank10");
-		program.install_write_bank(0, m_ram->size()-1, "bank20");
-	} else {
-		program.install_read_bank(0,  EC1841_MEMBOARD_SIZE-1, "bank10");
-		program.install_write_bank(0, EC1841_MEMBOARD_SIZE-1, "bank20");
+	if (m_ram->size() == 640 * 1024)
+	{
+		program.install_read_bank(EC1841_MEMBOARD_SIZE, m_ram->size() - 1, "bank11");
+		program.install_write_bank(EC1841_MEMBOARD_SIZE, m_ram->size() - 1, "bank21");
+		membank("bank11")->set_base(m_ram->pointer() + EC1841_MEMBOARD_SIZE);
+		membank("bank21")->set_base(m_ram->pointer() + EC1841_MEMBOARD_SIZE);
 	}
-	membank( "bank10" )->set_base( m_ram->pointer() );
-	membank( "bank20" )->set_base( m_ram->pointer() );
 }
 
-MACHINE_RESET_MEMBER( ec184x_state, ec1841 )
+MACHINE_RESET_MEMBER(ec184x_state, ec1841)
 {
 	memset(m_memory.enable, 0, sizeof(m_memory.enable));
 	// mark 1st board enabled
@@ -199,7 +208,7 @@ ADDRESS_MAP_END
 
 
 // XXX verify everything
-static MACHINE_CONFIG_START( ec1840, ec184x_state )
+static MACHINE_CONFIG_START( ec1840 )
 	MCFG_CPU_ADD("maincpu", I8088, 4096000)
 	MCFG_CPU_PROGRAM_MAP(ec1840_map)
 	MCFG_CPU_IO_MAP(ec1840_io)
@@ -222,7 +231,7 @@ static MACHINE_CONFIG_START( ec1840, ec184x_state )
 	MCFG_RAM_DEFAULT_SIZE("512K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ec1841, ec184x_state )
+static MACHINE_CONFIG_START( ec1841 )
 	MCFG_CPU_ADD("maincpu", I8086, 4096000)
 	MCFG_CPU_PROGRAM_MAP(ec1841_map)
 	MCFG_CPU_IO_MAP(ec1841_io)
@@ -249,7 +258,7 @@ static MACHINE_CONFIG_START( ec1841, ec184x_state )
 MACHINE_CONFIG_END
 
 // XXX verify everything
-static MACHINE_CONFIG_START( ec1847, ec184x_state )
+static MACHINE_CONFIG_START( ec1847 )
 	MCFG_CPU_ADD("maincpu", I8088, 4772720)
 	MCFG_CPU_PROGRAM_MAP(ec1847_map)
 	MCFG_CPU_IO_MAP(ec1847_io)
@@ -346,8 +355,8 @@ ROM_START( ec1847 )
 	ROM_LOAD( "317_d28_2732.bin", 0x00000, 0x1000, CRC(8939599b) SHA1(53d02460cf93596882a96758ef4bac5fa1ce55b2)) // monochrome font
 ROM_END
 
-/*     YEAR     ROM NAME    PARENT      COMPAT  MACHINE     INPUT                       INIT        COMPANY     FULLNAME */
-COMP ( 1987,    ec1840,     ibm5150,    0,      ec1840,     0,        driver_device,    0,          "<unknown>",  "EC-1840", MACHINE_NOT_WORKING)
-COMP ( 1987,    ec1841,     ibm5150,    0,      ec1841,     0,        ec184x_state,     ec1841,     "<unknown>",  "EC-1841", 0)
-COMP ( 1989,    ec1845,     ibm5150,    0,      ec1841,     0,        ec184x_state,     ec1841,     "<unknown>",  "EC-1845", MACHINE_NOT_WORKING)
-COMP ( 1990,    ec1847,     ibm5150,    0,      ec1847,     0,        driver_device,    0,          "<unknown>",  "EC-1847", MACHINE_NOT_WORKING)
+//     YEAR  ROM NAME  PARENT   COMPAT  MACHINE  INPUT  STATE         INIT    COMPANY       FULLNAME   FLAGS
+COMP ( 1987, ec1840,   ibm5150, 0,      ec1840,  0,     ec184x_state, 0,      "<unknown>",  "EC-1840", MACHINE_NOT_WORKING )
+COMP ( 1987, ec1841,   ibm5150, 0,      ec1841,  0,     ec184x_state, ec1841, "<unknown>",  "EC-1841", 0 )
+COMP ( 1989, ec1845,   ibm5150, 0,      ec1841,  0,     ec184x_state, ec1841, "<unknown>",  "EC-1845", MACHINE_NOT_WORKING )
+COMP ( 1990, ec1847,   ibm5150, 0,      ec1847,  0,     ec184x_state, 0,      "<unknown>",  "EC-1847", MACHINE_NOT_WORKING )

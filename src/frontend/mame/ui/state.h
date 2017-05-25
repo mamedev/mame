@@ -23,12 +23,12 @@ class menu_load_save_state_base : public menu
 {
 public:
 	virtual ~menu_load_save_state_base() override;
-	virtual void populate() override;
+	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 
 protected:
-	menu_load_save_state_base(mame_ui_manager &mui, render_container *container, const char *header, bool disable_not_found_items);
+	menu_load_save_state_base(mame_ui_manager &mui, render_container &container, const char *header, bool disable_not_found_items);
 	virtual void process_file(const std::string &file_name) = 0;
 
 private:
@@ -38,7 +38,7 @@ private:
 	const char *m_header;
 	bool m_disable_not_found_items;
 	bool m_was_paused;
-	UINT32 m_enabled_mask;
+	uint32_t m_enabled_mask;
 
 	void slot_selected(int slot);
 	static void *itemref_from_slot_number(unsigned int slot);
@@ -50,7 +50,7 @@ private:
 class menu_load_state : public menu_load_save_state_base
 {
 public:
-	menu_load_state(mame_ui_manager &mui, render_container *container);
+	menu_load_state(mame_ui_manager &mui, render_container &container);
 
 protected:
 	virtual void process_file(const std::string &file_name) override;
@@ -61,7 +61,7 @@ protected:
 class menu_save_state : public menu_load_save_state_base
 {
 public:
-	menu_save_state(mame_ui_manager &mui, render_container *container);
+	menu_save_state(mame_ui_manager &mui, render_container &container);
 
 protected:
 	virtual void process_file(const std::string &file_name) override;

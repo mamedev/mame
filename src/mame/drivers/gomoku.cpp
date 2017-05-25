@@ -24,19 +24,21 @@ todo:
 ******************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "includes/gomoku.h"
+#include "audio/gomoku.h"
+
+#include "cpu/z80/z80.h"
+#include "speaker.h"
 
 
 /* input ports are rotated 90 degrees */
 READ8_MEMBER(gomoku_state::input_port_r)
 {
 	int i, res;
-	static const char *const portnames[] = { "IN0", "IN1", "DSW", "UNUSED0", "UNUSED1", "UNUSED2", "UNUSED3", "UNUSED4" };
 
 	res = 0;
 	for (i = 0; i < 8; i++)
-		res |= ((read_safe(ioport(portnames[i]), 0xff) >> offset) & 1) << i;
+		res |= ((m_inputs[i].read_safe(0xff) >> offset) & 1) << i;
 
 	return res;
 }
@@ -121,7 +123,7 @@ static GFXDECODE_START( gomoku )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( gomoku, gomoku_state )
+static MACHINE_CONFIG_START( gomoku )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/12)      /* 1.536 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(gomoku_map)
@@ -180,5 +182,5 @@ ROM_START( gomoku )
 ROM_END
 
 
-//    YEAR,     NAME,   PARENT,  MACHINE,    INPUT,     INIT,    MONITOR,      COMPANY, FULLNAME
-GAME( 1981,   gomoku,        0,   gomoku,   gomoku, driver_device,        0,      ROT90, "Nichibutsu", "Gomoku Narabe Renju", 0 )
+//    YEAR,   NAME,   PARENT,  MACHINE,  INPUT,  STATE         INIT,   MONITOR, COMPANY,      FULLNAME,              FLAGS
+GAME( 1981,   gomoku, 0,       gomoku,   gomoku, gomoku_state, 0,      ROT90,   "Nichibutsu", "Gomoku Narabe Renju", 0 )

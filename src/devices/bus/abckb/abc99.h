@@ -6,15 +6,15 @@
 
 *********************************************************************/
 
+#ifndef MAME_BUS_ABCKB_ABC99_H
+#define MAME_BUS_ABCKB_ABC99_H
+
 #pragma once
 
-#ifndef __ABC99__
-#define __ABC99__
-
-#include "emu.h"
-#include "cpu/mcs48/mcs48.h"
 #include "abckb.h"
-#include "sound/speaker.h"
+
+#include "cpu/mcs48/mcs48.h"
+#include "sound/spkrdev.h"
 
 
 
@@ -29,10 +29,10 @@ class abc99_device :  public device_t,
 {
 public:
 	// construction/destruction
-	abc99_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	abc99_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual ioport_constructor device_input_ports() const override;
 
@@ -44,8 +44,8 @@ public:
 	DECLARE_WRITE8_MEMBER( z2_led_w );
 	DECLARE_WRITE8_MEMBER( z2_p1_w );
 	DECLARE_READ8_MEMBER( z2_p2_r );
-	DECLARE_READ8_MEMBER( z2_t0_r );
-	DECLARE_READ8_MEMBER( z2_t1_r );
+	DECLARE_READ_LINE_MEMBER( z2_t0_r );
+	DECLARE_READ_LINE_MEMBER( z2_t1_r );
 	DECLARE_READ8_MEMBER( z5_p1_r );
 	DECLARE_WRITE8_MEMBER( z5_p2_w );
 	DECLARE_READ8_MEMBER( z5_t1_r );
@@ -107,8 +107,7 @@ private:
 
 
 // device type definition
-extern const device_type ABC99;
+DECLARE_DEVICE_TYPE(ABC99, abc99_device)
 
 
-
-#endif
+#endif // MAME_BUS_ABCKB_ABC99_H

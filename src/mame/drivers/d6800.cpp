@@ -40,11 +40,13 @@
 
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
-#include "sound/beep.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
-#include "sound/wave.h"
 #include "machine/6821pia.h"
+#include "sound/beep.h"
+#include "sound/wave.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class d6800_state : public driver_device
@@ -72,7 +74,7 @@ public:
 	DECLARE_READ8_MEMBER( d6800_keyboard_r );
 	DECLARE_WRITE8_MEMBER( d6800_keyboard_w );
 	DECLARE_WRITE_LINE_MEMBER( d6800_screen_w );
-	UINT32 screen_update_d6800(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_d6800(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(d6800_c);
 	TIMER_DEVICE_CALLBACK_MEMBER(d6800_p);
 	DECLARE_QUICKLOAD_LOAD_MEMBER( d6800 );
@@ -81,7 +83,7 @@ protected:
 	required_device<cassette_image_device> m_cass;
 	required_device<pia6821_device> m_pia;
 	required_device<beep_device> m_beeper;
-	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<uint8_t> m_videoram;
 	required_ioport m_io_x0;
 	required_ioport m_io_x1;
 	required_ioport m_io_x2;
@@ -92,11 +94,11 @@ protected:
 	required_ioport m_io_y3;
 	required_ioport m_io_shift;
 private:
-	UINT8 m_rtc;
+	uint8_t m_rtc;
 	bool m_cb2;
 	bool m_cassold;
-	UINT8 m_cass_data[4];
-	UINT8 m_portb;
+	uint8_t m_cass_data[4];
+	uint8_t m_portb;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 };
@@ -181,13 +183,13 @@ INPUT_PORTS_END
 
 /* Video */
 
-UINT32 d6800_state::screen_update_d6800(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t d6800_state::screen_update_d6800(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 x,y,gfx=0;
+	uint8_t x,y,gfx=0;
 
 	for (y = 0; y < 32; y++)
 	{
-		UINT16 *p = &bitmap.pix16(y);
+		uint16_t *p = &bitmap.pix16(y);
 
 		for (x = 0; x < 8; x++)
 		{
@@ -233,7 +235,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(d6800_state::d6800_p)
 	if (m_rtc > 159)
 		m_rtc = 0;
 
-	UINT8 data = m_io_x0->read() & m_io_x1->read() & m_io_x2->read() & m_io_x3->read();
+	uint8_t data = m_io_x0->read() & m_io_x1->read() & m_io_x2->read() & m_io_x3->read();
 	int ca1 = (data == 255) ? 0 : 1;
 	int ca2 = m_io_shift->read();
 	int cb1 = (m_rtc) ? 1 : 0;
@@ -244,7 +246,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(d6800_state::d6800_p)
 
 	/* cassette - turn 1200/2400Hz to a bit */
 	m_cass_data[1]++;
-	UINT8 cass_ws = (m_cass->input() > +0.03) ? 1 : 0;
+	uint8_t cass_ws = (m_cass->input() > +0.03) ? 1 : 0;
 
 	if (cass_ws != m_cass_data[0])
 	{
@@ -294,7 +296,7 @@ READ8_MEMBER( d6800_state::d6800_keyboard_r )
 	lines around and reads it another way. This isolates the key that was pressed.
 	*/
 
-	UINT8 data = m_io_x0->read() & m_io_x1->read() & m_io_x2->read() & m_io_x3->read()
+	uint8_t data = m_io_x0->read() & m_io_x1->read() & m_io_x2->read() & m_io_x3->read()
 				& m_io_y0->read() & m_io_y1->read() & m_io_y2->read() & m_io_y3->read();
 
 	return data;
@@ -344,9 +346,9 @@ QUICKLOAD_LOAD_MEMBER( d6800_state, d6800 )
 	int quick_addr = 0x200;
 	int exec_addr = 0xc000;
 	int quick_length;
-	dynamic_buffer quick_data;
+	std::vector<uint8_t> quick_data;
 	int read_;
-	int result = IMAGE_INIT_FAIL;
+	image_init_result result = image_init_result::FAIL;
 
 	quick_length = image.length();
 	quick_data.resize(quick_length);
@@ -366,18 +368,18 @@ QUICKLOAD_LOAD_MEMBER( d6800_state, d6800 )
 		image.message(" Quickload: size=%04X : start=%04X : end=%04X : exec=%04X",quick_length,quick_addr,quick_addr+quick_length,exec_addr);
 
 		// Start the quickload
-		if (strcmp(image.filetype(), "bin") == 0)
+		if (image.is_filetype("bin"))
 			m_maincpu->set_pc(quick_addr);
 		else
 			m_maincpu->set_pc(exec_addr);
 
-		result = IMAGE_INIT_PASS;
+		result = image_init_result::PASS;
 	}
 
 	return result;
 }
 
-static MACHINE_CONFIG_START( d6800, d6800_state )
+static MACHINE_CONFIG_START( d6800 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M6800, XTAL_4MHz/4)
 	MCFG_CPU_PROGRAM_MAP(d6800_map)
@@ -407,8 +409,8 @@ static MACHINE_CONFIG_START( d6800, d6800_state )
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(d6800_state, d6800_keyboard_w))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(d6800_state, d6800_cassette_w))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(d6800_state, d6800_screen_w))
-	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6800_cpu_device, irq_line))
-	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6800_cpu_device, irq_line))
+	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
+	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
@@ -431,5 +433,5 @@ ROM_START( d6800 )
 	ROMX_LOAD( "d6800d.bin", 0xc000, 0x0800, CRC(ded5712f) SHA1(f594f313a74d7135c9fdd0bcb0093fc5771a9b7d), ROM_BIOS(2) )
 ROM_END
 
-/*    YEAR  NAME   PARENT  COMPAT  MACHINE   INPUT  CLASS,          INIT      COMPANY        FULLNAME      FLAGS */
-COMP( 1979, d6800, 0,      0,      d6800,    d6800, driver_device,   0,   "Michael Bauer", "Dream 6800", 0 )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE   INPUT  CLASS        INIT  COMPANY          FULLNAME      FLAGS
+COMP( 1979, d6800, 0,      0,      d6800,    d6800, d6800_state, 0,    "Michael Bauer", "Dream 6800", 0 )

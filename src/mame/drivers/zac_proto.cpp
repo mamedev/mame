@@ -20,6 +20,7 @@ ToDo:
 
 **********************************************************************/
 
+#include "emu.h"
 #include "machine/genpin.h"
 #include "cpu/scmp/scmp.h"
 #include "zac_proto.lh"
@@ -187,7 +188,7 @@ INPUT_PORTS_END
 // solenoids (not knocker)
 WRITE8_MEMBER( zac_proto_state::out0_w )
 {
-	UINT16 t = data | (offset << 8);
+	uint16_t t = data | (offset << 8);
 
 	switch (t)
 	{
@@ -214,8 +215,8 @@ WRITE8_MEMBER( zac_proto_state::out1_w )
 // need to implement blanking of leading zeroes
 WRITE8_MEMBER( zac_proto_state::digit_w )
 {
-	static const UINT8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71 }; // 9368 (outputs 0-9,A-F)
-	static const UINT8 decimals[10] = { 0, 0, 0x80, 0, 0, 0x80, 0, 0, 0, 0 };
+	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71 }; // 9368 (outputs 0-9,A-F)
+	static const uint8_t decimals[10] = { 0, 0, 0x80, 0, 0, 0x80, 0, 0, 0, 0 };
 	offset<<=1;
 	output().set_digit_value(offset, patterns[data&15] | decimals[offset]);
 	offset++;
@@ -232,7 +233,7 @@ void zac_proto_state::machine_reset()
 	output().set_digit_value(10, 0x3f); // units shows zero all the time
 }
 
-static MACHINE_CONFIG_START( zac_proto, zac_proto_state )
+static MACHINE_CONFIG_START( zac_proto )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", INS8060, XTAL_4MHz / 2) // Using SC/MP II chip which has an internal /2 circuit.
 	MCFG_CPU_PROGRAM_MAP(zac_proto_map)
@@ -278,6 +279,6 @@ ROM_START(spacecty)
 	ROM_LOAD("zsc4.dat", 0x1400, 0x0400, CRC(69e0bb95) SHA1(d9a1d0159bf49445b0ece0f9d7806ed80657c2b2))
 ROM_END
 
-GAME(1978,  skijump,   0,  zac_proto,  zac_proto, driver_device,  0,  ROT0, "Zaccaria", "Ski Jump", MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND )
-GAME(1979,  spacecty,  0,  zac_proto,  zac_proto, driver_device,  0,  ROT0, "Zaccaria", "Space City", MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND )
-GAME(1978,  strike,    0,  zac_proto,  zac_proto, driver_device,  0,  ROT0, "Zaccaria", "Strike", MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND )
+GAME(1978,  skijump,   0,  zac_proto,  zac_proto, zac_proto_state,  0,  ROT0, "Zaccaria", "Ski Jump",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME(1979,  spacecty,  0,  zac_proto,  zac_proto, zac_proto_state,  0,  ROT0, "Zaccaria", "Space City", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME(1978,  strike,    0,  zac_proto,  zac_proto, zac_proto_state,  0,  ROT0, "Zaccaria", "Strike",     MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

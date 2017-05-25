@@ -22,7 +22,7 @@
 
 #define OSD_EVENT_WAIT_INFINITE (~(osd_ticks_t)0)
 
-/* osd_event is an opaque type which represents a setable/resetable event */
+/* osd_event is an opaque type which represents a setable/resettable event */
 
 class osd_event
 {
@@ -84,14 +84,14 @@ public:
 		{
 			if (!m_signalled)
 			{
-				UINT64 msec = timeout * 1000 / osd_ticks_per_second();
+				uint64_t msec = timeout * 1000 / osd_ticks_per_second();
 
 				do {
 					if (m_cond.wait_for(lock, std::chrono::milliseconds(msec)) == std::cv_status::timeout)
 					{
 						if (!m_signalled)
 						{
-							return FALSE;
+							return false;
 						}
 						else
 							break;
@@ -122,7 +122,7 @@ public:
 	void reset()
 	{
 		m_mutex.lock();
-		m_signalled = FALSE;
+		m_signalled = false;
 		m_mutex.unlock();
 	}
 
@@ -144,9 +144,9 @@ public:
 	void set()
 	{
 		m_mutex.lock();
-		if (m_signalled == FALSE)
+		if (m_signalled == false)
 		{
-			m_signalled = TRUE;
+			m_signalled = true;
 			if (m_autoreset)
 				m_cond.notify_one();
 			else
@@ -158,8 +158,8 @@ public:
 private:
 	std::mutex               m_mutex;
 	std::condition_variable  m_cond;
-	std::atomic<INT32>       m_autoreset;
-	std::atomic<INT32>       m_signalled;
+	std::atomic<int32_t>       m_autoreset;
+	std::atomic<int32_t>       m_signalled;
 
 };
 

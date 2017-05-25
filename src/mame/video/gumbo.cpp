@@ -34,12 +34,12 @@ TILE_GET_INFO_MEMBER(gumbo_state::get_gumbo_fg_tile_info)
 
 void gumbo_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(gumbo_state::get_gumbo_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(gumbo_state::get_gumbo_fg_tile_info),this), TILEMAP_SCAN_ROWS, 4, 4, 128, 64);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gumbo_state::get_gumbo_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gumbo_state::get_gumbo_fg_tile_info),this), TILEMAP_SCAN_ROWS, 4, 4, 128, 64);
 	m_fg_tilemap->set_transparent_pen(0xff);
 }
 
-UINT32 gumbo_state::screen_update_gumbo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t gumbo_state::screen_update_gumbo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);

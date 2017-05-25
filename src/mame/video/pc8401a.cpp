@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
+#include "emu.h"
 #include "includes/pc8401a.h"
 #include "rendlay.h"
 #include "pc8500.lh"
@@ -22,7 +23,7 @@ void pc8500_state::video_start()
 {
 }
 
-UINT32 pc8500_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t pc8500_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 //  m_lcdc->screen_update(screen, bitmap, cliprect);
 
@@ -55,7 +56,7 @@ ADDRESS_MAP_END
 
 /* Machine Drivers */
 
-MACHINE_CONFIG_FRAGMENT( pc8401a_video )
+MACHINE_CONFIG_START( pc8401a_video )
 //  MCFG_DEFAULT_LAYOUT(layout_pc8401a)
 
 	MCFG_PALETTE_ADD("palette", 2)
@@ -72,7 +73,7 @@ MACHINE_CONFIG_FRAGMENT( pc8401a_video )
 	MCFG_SED1330_ADD(SED1330_TAG, 0, SCREEN_TAG, pc8401a_lcdc)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_FRAGMENT( pc8500_video )
+MACHINE_CONFIG_START( pc8500_video )
 	MCFG_DEFAULT_LAYOUT(layout_pc8500)
 
 	MCFG_PALETTE_ADD("palette", 2+8)

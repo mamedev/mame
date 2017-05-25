@@ -4,7 +4,7 @@
 
     Applix 1616 computer
 
-    See for docs: http;//www.microbee-mspp.org.au
+    See for docs: http://psiphi.server101.com/applix/
 
     First revealed to the world in December 1986 issue of Electronics Today
     International (ETI) an Australian electronics magazine which is now defunct.
@@ -35,17 +35,23 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
-#include "cpu/z80/z80.h"
-#include "cpu/mcs51/mcs51.h"
-#include "video/mc6845.h"
-#include "machine/6522via.h"
-#include "sound/dac.h"
-#include "sound/wave.h"
-#include "machine/wd_fdc.h"
-#include "formats/applix_dsk.h"
-#include "imagedev/cassette.h"
+
 #include "bus/centronics/ctronics.h"
+#include "cpu/m68000/m68000.h"
+#include "cpu/mcs51/mcs51.h"
+#include "cpu/z80/z80.h"
+#include "imagedev/cassette.h"
+#include "machine/6522via.h"
+#include "machine/wd_fdc.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
+#include "sound/wave.h"
+#include "video/mc6845.h"
+
+#include "screen.h"
+#include "speaker.h"
+
+#include "formats/applix_dsk.h"
 
 
 
@@ -63,8 +69,8 @@ public:
 		m_fdc(*this, "fdc"),
 		m_floppy0(*this, "fdc:0"),
 		m_floppy1(*this, "fdc:1"),
-		m_dacl(*this, "dacl"),
-		m_dacr(*this, "dacr"),
+		m_ldac(*this, "ldac"),
+		m_rdac(*this, "rdac"),
 		m_cass(*this, "cassette"),
 		m_io_dsw(*this, "DSW"),
 		m_io_fdc(*this, "FDC"),
@@ -129,42 +135,42 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(cass_timer);
 	DECLARE_DRIVER_INIT(applix);
 	MC6845_UPDATE_ROW(crtc_update_row);
-	UINT8 m_video_latch;
-	UINT8 m_pa;
+	uint8_t m_video_latch;
+	uint8_t m_pa;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(applix);
-	UINT8 m_palette_latch[4];
-	required_shared_ptr<UINT16> m_base;
+	uint8_t m_palette_latch[4];
+	required_shared_ptr<uint16_t> m_base;
 private:
-	UINT8 m_pb;
-	UINT8 m_analog_latch;
-	UINT8 m_dac_latch;
-	UINT8 m_port08;
-	UINT8 m_data_to_fdc;
-	UINT8 m_data_from_fdc;
+	uint8_t m_pb;
+	uint8_t m_analog_latch;
+	uint8_t m_dac_latch;
+	uint8_t m_port08;
+	uint8_t m_data_to_fdc;
+	uint8_t m_data_from_fdc;
 	bool m_data;
 	bool m_data_or_cmd;
 	bool m_buffer_empty;
 	bool m_fdc_cmd;
-	UINT8 m_clock_count;
+	uint8_t m_clock_count;
 	bool m_cp;
-	UINT8   m_p1;
-	UINT8   m_p1_data;
-	UINT8   m_p2;
-	UINT8   m_p3;
-	UINT16  m_last_write_addr;
-	UINT8 m_cass_data[4];
+	uint8_t   m_p1;
+	uint8_t   m_p1_data;
+	uint8_t   m_p2;
+	uint8_t   m_p3;
+	uint16_t  m_last_write_addr;
+	uint8_t m_cass_data[4];
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
 	required_device<via6522_device> m_via;
 	required_device<centronics_device> m_centronics;
 	required_device<output_latch_device> m_cent_data_out;
-	required_device<wd1772_t> m_fdc;
+	required_device<wd1772_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
-	required_device<dac_device> m_dacl;
-	required_device<dac_device> m_dacr;
+	required_device<dac_byte_interface> m_ldac;
+	required_device<dac_byte_interface> m_rdac;
 	required_device<cassette_image_device> m_cass;
 	required_ioport m_io_dsw;
 	required_ioport m_io_fdc;
@@ -190,7 +196,7 @@ private:
 	required_ioport m_io_k3a0;
 	required_ioport m_io_k3b0;
 	required_ioport m_io_k0b;
-	required_shared_ptr<UINT16> m_expansion;
+	required_shared_ptr<uint16_t> m_expansion;
 public:
 	required_device<palette_device> m_palette;
 };
@@ -219,10 +225,10 @@ WRITE16_MEMBER( applix_state::dac_latch_w )
 	m_dac_latch = data;
 
 	if ((m_analog_latch & 0x70) == 0) // right
-		m_dacr->write_unsigned8(m_dac_latch);
+		m_rdac->write(m_dac_latch);
 	else
 	if ((m_analog_latch & 0x70) == 0x10) // left
-		m_dacl->write_unsigned8(m_dac_latch);
+		m_ldac->write(m_dac_latch);
 }
 
 //cent = odd, video = even
@@ -318,7 +324,7 @@ d3 = test switch
 */
 READ8_MEMBER( applix_state::port00_r )
 {
-	return (UINT8)m_data_or_cmd | ((UINT8)m_data << 1) | ((UINT8)m_buffer_empty << 2) | m_io_fdc->read();
+	return (uint8_t)m_data_or_cmd | ((uint8_t)m_data << 1) | ((uint8_t)m_buffer_empty << 2) | m_io_fdc->read();
 }
 
 /*
@@ -401,12 +407,12 @@ WRITE8_MEMBER( applix_state::port60_w )
 
 READ16_MEMBER( applix_state::fdc_stat_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 	switch (offset)
 	{
-	case 0: data = (UINT8)m_buffer_empty^1; break;
-	case 1: data = (UINT8)m_data^1; break;
-	default: data = (UINT8)m_fdc_cmd; // case 2
+	case 0: data = (uint8_t)m_buffer_empty^1; break;
+	case 1: data = (uint8_t)m_data^1; break;
+	default: data = (uint8_t)m_fdc_cmd; // case 2
 	}
 	return data << 7;
 }
@@ -469,7 +475,7 @@ static ADDRESS_MAP_START( subcpu_io, AS_IO, 8, applix_state )
 	AM_RANGE(0x10, 0x17) AM_READWRITE(port10_r,port10_w) //IRQ
 	AM_RANGE(0x18, 0x1f) AM_READWRITE(port18_r,port18_w) //data&command
 	AM_RANGE(0x20, 0x27) AM_MIRROR(0x18) AM_READWRITE(port20_r,port20_w) //SCSI NCR5380
-	AM_RANGE(0x40, 0x43) AM_MIRROR(0x1c) AM_DEVREADWRITE("fdc", wd1772_t, read, write) //FDC
+	AM_RANGE(0x40, 0x43) AM_MIRROR(0x1c) AM_DEVREADWRITE("fdc", wd1772_device, read, write) //FDC
 	AM_RANGE(0x60, 0x63) AM_MIRROR(0x1c) AM_READWRITE(port60_r,port60_w) //anotherZ80SCC
 ADDRESS_MAP_END
 
@@ -716,7 +722,7 @@ INPUT_PORTS_END
 
 void applix_state::machine_reset()
 {
-	UINT8* ROM = memregion("maincpu")->base();
+	uint8_t* ROM = memregion("maincpu")->base();
 	memcpy(m_expansion, ROM, 8);
 	membank("bank1")->set_entry(0);
 	m_p3 = 0xff;
@@ -735,7 +741,7 @@ SLOT_INTERFACE_END
 
 PALETTE_INIT_MEMBER(applix_state, applix)
 { // shades need to be verified - the names on the right are from the manual
-	const UINT8 colors[16*3] = {
+	const uint8_t colors[16*3] = {
 	0x00, 0x00, 0x00,   //  0 Black
 	0x40, 0x40, 0x40,   //  1 Dark Grey
 	0x00, 0x00, 0x80,   //  2 Dark Blue
@@ -753,7 +759,7 @@ PALETTE_INIT_MEMBER(applix_state, applix)
 	0xbf, 0xbf, 0xbf,   // 14 Light Grey
 	0xff, 0xff, 0xff }; // 15 White
 
-	UINT8 r, b, g, i, color_count = 0;
+	uint8_t r, b, g, i, color_count = 0;
 
 	for (i = 0; i < 48; color_count++)
 	{
@@ -773,9 +779,9 @@ MC6845_UPDATE_ROW( applix_state::crtc_update_row )
 // Need to display a border colour.
 // There is a monochrome mode, but no info found as yet.
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT8 i;
-	UINT16 chr,x;
-	UINT32 mem, vidbase = (m_video_latch & 15) << 14, *p = &bitmap.pix32(y);
+	uint8_t i;
+	uint16_t chr,x;
+	uint32_t mem, vidbase = (m_video_latch & 15) << 14, *p = &bitmap.pix32(y);
 
 	for (x = 0; x < x_count; x++)
 	{
@@ -813,7 +819,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(applix_state::cass_timer)
 {
 	/* cassette - turn 2500/5000Hz to a bit */
 	m_cass_data[1]++;
-	UINT8 cass_ws = (m_cass->input() > +0.03) ? 1 : 0;
+	uint8_t cass_ws = (m_cass->input() > +0.03) ? 1 : 0;
 
 	if (cass_ws != m_cass_data[0])
 	{
@@ -826,7 +832,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(applix_state::cass_timer)
 	}
 }
 
-static MACHINE_CONFIG_START( applix, applix_state )
+static MACHINE_CONFIG_START( applix )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 7500000)
 	MCFG_CPU_PROGRAM_MAP(applix_mem)
@@ -849,10 +855,12 @@ static MACHINE_CONFIG_START( applix, applix_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("dacl", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 2.0 )
-	MCFG_SOUND_ADD("dacr", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 2.0 )
+	MCFG_SOUND_ADD("ldac", DAC0800, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0) // 74ls374.u20 + dac0800.u21 + 4052.u23
+	MCFG_SOUND_ADD("rdac", DAC0800, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0) // 74ls374.u20 + dac0800.u21 + 4052.u23
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
+
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 
@@ -870,7 +878,7 @@ static MACHINE_CONFIG_START( applix, applix_state )
 	// in CB2 kdb data
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(applix_state, applix_pa_w))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(applix_state, applix_pb_w))
-	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("maincpu", m68000_device, write_irq2))
+	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M68K_IRQ_2))
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE("via6522", via6522_device, write_ca1))
@@ -925,14 +933,14 @@ ROM_END
 
 DRIVER_INIT_MEMBER(applix_state, applix)
 {
-	UINT8 *RAM = memregion("subcpu")->base();
+	uint8_t *RAM = memregion("subcpu")->base();
 	membank("bank1")->configure_entries(0, 2, &RAM[0x8000], 0x8000);
 }
 
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   CLASS         INIT    COMPANY          FULLNAME       FLAGS */
+//    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   CLASS         INIT    COMPANY           FULLNAME       FLAGS
 COMP( 1986, applix, 0,       0,     applix, applix, applix_state, applix, "Applix Pty Ltd", "Applix 1616", 0 )
 
 
@@ -1081,7 +1089,7 @@ WRITE8_MEMBER( applix_state::p2_write )
 
 READ8_MEMBER( applix_state::p3_read )
 {
-	UINT8 data = m_p3;
+	uint8_t data = m_p3;
 
 	data &= ~0x14;
 

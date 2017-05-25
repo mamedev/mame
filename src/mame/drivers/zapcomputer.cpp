@@ -19,7 +19,7 @@
 
     For more info, please check chapter 6 "Monitor software" in the book
     and/or the assembly listings of the ZAP monitor software
-    avaliable at appendix D.
+    available at appendix D.
 
     Currently missing features in this driver:
       * hookup RS232 support
@@ -43,18 +43,18 @@ public:
 	DECLARE_WRITE8_MEMBER(display_7seg_w);
 
 private:
-	UINT8 decode7seg(UINT8 data);
+	uint8_t decode7seg(uint8_t data);
 	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;
 };
 
-UINT8 zapcomp_state::decode7seg(UINT8 data)
+uint8_t zapcomp_state::decode7seg(uint8_t data)
 {
 	//These are bit patterns representing the conversion of 4bit values
 	//into the status of the segments of the 7 segment displays
 	//controlled by a 82S23 PROM
 
-	UINT8 patterns[16] = {
+	uint8_t patterns[16] = {
 		0x77, 0x41, 0x6e, 0x6b,
 		0x59, 0x3b, 0x3f, 0x61,
 		0x7f, 0x79, 0x7d, 0x1f,
@@ -88,23 +88,23 @@ WRITE8_MEMBER( zapcomp_state::display_7seg_w )
 
 READ8_MEMBER( zapcomp_state::keyboard_r )
 {
-	UINT8 retval = 0x00;
-	UINT8 special = ioport("X1")->read();
-	UINT16 hex_keys = ioport("X0")->read();
+	uint8_t retval = 0x00;
+	uint8_t special = ioport("X1")->read();
+	uint16_t hex_keys = ioport("X0")->read();
 
-	if BIT(special, 2) /* "SHIFT" key is pressed */
+	if (BIT(special, 2)) /* "SHIFT" key is pressed */
 		retval |= 0x40; /* turn on the SHIFT bit but DO NOT turn on the strobe bit */
 
-	if BIT(special, 1) /* "NEXT" key is pressed */
+	if (BIT(special, 1)) /* "NEXT" key is pressed */
 		retval |= 0xA0; /* turn on the strobe & NEXT bits */
 
-	if BIT(special, 0) /* "EXEC" key is pressed */
+	if (BIT(special, 0)) /* "EXEC" key is pressed */
 		retval |= 0x90; /* turn on the strobe & EXEC bit */
 
 	for (int i=0; i<16; i++)
 		if (hex_keys & (1 << i))
 			retval |= (0x80 | i); /* provide the key index in bits 3-0
-                                     as well as turning on the strobe bit */
+			                         as well as turning on the strobe bit */
 
 	return retval;
 }
@@ -156,7 +156,7 @@ void zapcomp_state::machine_start()
 {
 }
 
-static MACHINE_CONFIG_START( zapcomp, zapcomp_state )
+static MACHINE_CONFIG_START( zapcomp )
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_2MHz)
 	MCFG_CPU_PROGRAM_MAP(zapcomp_mem)
@@ -171,5 +171,5 @@ ROM_START( zapcomp )
 	ROM_LOAD("zap.rom", 0x0000, 0x0400, CRC(3f4416e9) SHA1(d6493707bfba1a1e1e551f8144194afa5bda3316) )
 ROM_END
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT    CLASS         INIT    COMPANY                              FULLNAME                              FLAGS
-COMP( 1981, zapcomp,  0,      0,      zapcomp, zapcomp, driver_device,  0,  "Steve Ciarcia / BYTE / McGRAW-HILL",  "ZAP - Z80 Applications Processor", MACHINE_NO_SOUND_HW )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT  COMPANY                               FULLNAME                            FLAGS
+COMP( 1981, zapcomp, 0,      0,      zapcomp, zapcomp, zapcomp_state, 0,    "Steve Ciarcia / BYTE / McGRAW-HILL", "ZAP - Z80 Applications Processor", MACHINE_NO_SOUND_HW )

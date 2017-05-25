@@ -33,7 +33,6 @@ function devicesProject(_target, _subtarget)
 		MAME_DIR .. "src/osd",
 		MAME_DIR .. "src/emu",
 		MAME_DIR .. "src/devices",
-		MAME_DIR .. "src/lib/netlist",
 		MAME_DIR .. "src/mame", -- used for sound amiga
 		MAME_DIR .. "src/lib",
 		MAME_DIR .. "src/lib/util",
@@ -41,8 +40,8 @@ function devicesProject(_target, _subtarget)
 		GEN_DIR  .. "emu",
 		GEN_DIR  .. "emu/layout",
 		ext_includedir("expat"),
-		ext_includedir("lua"),
 		ext_includedir("flac"),
+		MAME_DIR .. "3rdparty/asio/include",
 	}
 
 	dofile(path.join("src", "cpu.lua"))
@@ -70,9 +69,9 @@ if #disasm_files > 0 then
 		MAME_DIR .. "src/lib",
 		MAME_DIR .. "src/lib/util",
 		MAME_DIR .. "3rdparty",
+		MAME_DIR .. "3rdparty/asio/include",
 		GEN_DIR  .. "emu",
 		ext_includedir("expat"),
-		ext_includedir("lua"),
 	}
 
 	files {

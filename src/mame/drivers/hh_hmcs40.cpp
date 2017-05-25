@@ -19,9 +19,9 @@
  @04      HD38800A  1980, Gakken Heiankyo Alien
  @25      HD38800A  1981, Coleco Alien Attack
  @27      HD38800A  1981, Bandai Packri Monster
- *31      HD38800A  1981, Entex Select-a-Game cartridge: Space Invader 2 (have dump)
- *37      HD38800A  1981, Entex Select-a-Game cartridge: Baseball 4 (have dump)
- *38      HD38800A  1981, Entex Select-a-Game cartridge: Pinball (have dump)
+ @31      HD38800A  1981, Entex Select-a-Game cartridge: Space Invader 2
+ @37      HD38800A  1981, Entex Select-a-Game cartridge: Baseball 4
+ @38      HD38800A  1981, Entex Select-a-Game cartridge: Pinball
  *41      HD38800A  1982, Gakken Puck Monster
  *51      HD38800A  1981, Actronics(Hanzawa) Twinvader (larger white version)
  @70      HD38800A  1982, Coleco Galaxian
@@ -64,6 +64,8 @@
   35      HD44801B  1983, Alpha 8302 protection MCU (see 8201)
   42      HD44801B  1984, Alpha 8303 protection MCU (see 8201)
 
+ *89      HD44801C  1985, CXG Advanced Portachess
+
   (* denotes not yet emulated by MAME, @ denotes it's in this driver)
 
 
@@ -73,27 +75,33 @@
   - gckong random lockups (tap the jump button repeatedly): mcu stack overflow,
     works ok if stack levels is increased, 38800 B rev. has more stack levels?
     Or it could be a race condition: irq happening too late/early.
-  - bultrman building explosions are wrong, especially visible on the first one
-  - epacman booting the game in demo mode, pacman should go straight to the
+  - epacman2 booting the game in demo mode, pacman should go straight to the
     upper-left power pill: mcu cycle/interrupt timing related
-  - Though very uncommon when compared to games with LED/lamp display,
-    some games may manipulate VFD plate brightness by strobing it longer,
+  - Though very uncommon when compared to games with LED/lamp display, some
+    games may manipulate VFD plate brightness by strobing it longer/shorter,
     eg. cgalaxn when the player ship explodes.
+  - Related to the above issue: bultrman sometimes strobes D0/D1/D2 for a very
+    short duration, causing (unwanted) dimly lit segments on the real machine.
+    On MAME they will show with full brightness, see eg. building explosions.
+    Currently there's a workaround in place.
   - bzaxxon 3D effect is difficult to simulate
 
 ***************************************************************************/
 
 #include "emu.h"
-#include "rendlay.h"
 #include "cpu/hmcs40/hmcs40.h"
 #include "cpu/cop400/cop400.h"
 #include "machine/gen_latch.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
+#include "rendlay.h"
+#include "screen.h"
+#include "speaker.h"
 
 // internal artwork
 #include "pairmtch.lh"
+#include "sag.lh"
 
-#include "hh_hmcs40_test.lh" // common test-layout - no svg artwork(yet), use external artwork
+//#include "hh_hmcs40_test.lh" // common test-layout - no svg artwork(yet), use external artwork
 
 
 class hh_hmcs40_state : public driver_device
@@ -105,7 +113,7 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_soundlatch(*this, "soundlatch"),
 		m_soundlatch2(*this, "soundlatch2"),
-		m_inp_matrix(*this, "IN"),
+		m_inp_matrix(*this, "IN.%u", 0),
 		m_speaker(*this, "speaker"),
 		m_display_wait(33),
 		m_display_maxy(1),
@@ -121,33 +129,34 @@ public:
 	optional_device<speaker_sound_device> m_speaker;
 
 	// misc common
-	UINT8 m_r[8];                       // MCU R ports write data (optional)
-	UINT16 m_d;                         // MCU D port write data (optional)
-	UINT8 m_int[2];                     // MCU INT0/1 pins state
-	UINT16 m_inp_mux;                   // multiplexed inputs mask
+	u8 m_r[8];                      // MCU R ports write data (optional)
+	u16 m_d;                        // MCU D port write data (optional)
+	u8 m_int[2];                    // MCU INT0/1 pins state
+	u16 m_inp_mux;                  // multiplexed inputs mask
 
-	UINT16 read_inputs(int columns);
+	u16 read_inputs(int columns);
 	void refresh_interrupts(void);
 	void set_interrupt(int line, int state);
 	DECLARE_INPUT_CHANGED_MEMBER(single_interrupt_line);
 
 	// display common
-	int m_display_wait;                 // led/lamp off-delay in microseconds (default 33ms)
-	int m_display_maxy;                 // display matrix number of rows
-	int m_display_maxx;                 // display matrix number of columns (max 47 for now)
+	int m_display_wait;             // led/lamp off-delay in microseconds (default 33ms)
+	int m_display_maxy;             // display matrix number of rows
+	int m_display_maxx;             // display matrix number of columns (max 47 for now)
 
-	UINT32 m_grid;                      // VFD current row data
-	UINT64 m_plate;                     // VFD current column data
+	u32 m_grid;                     // VFD current row data
+	u64 m_plate;                    // VFD current column data
 
-	UINT64 m_display_state[0x20];       // display matrix rows data (last bit is used for always-on)
-	UINT16 m_display_segmask[0x20];     // if not 0, display matrix row is a digit, mask indicates connected segments
-	UINT64 m_display_cache[0x20];       // (internal use)
-	UINT8 m_display_decay[0x20][0x40];  // (internal use)
+	u64 m_display_state[0x20];      // display matrix rows data (last bit is used for always-on)
+	u16 m_display_segmask[0x20];    // if not 0, display matrix row is a digit, mask indicates connected segments
+	u64 m_display_cache[0x20];      // (internal use)
+	u8 m_display_decay[0x20][0x40]; // (internal use)
 
 	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
 	void display_update();
 	void set_display_size(int maxx, int maxy);
-	void display_matrix(int maxx, int maxy, UINT64 setx, UINT32 sety, bool update = true);
+	void set_display_segmask(u32 digits, u32 mask);
+	void display_matrix(int maxx, int maxy, u64 setx, u32 sety, bool update = true);
 
 protected:
 	virtual void machine_start() override;
@@ -208,7 +217,7 @@ void hh_hmcs40_state::machine_reset()
 
 void hh_hmcs40_state::display_update()
 {
-	UINT64 active_state[0x20];
+	u64 active_state[0x20];
 
 	for (int y = 0; y < m_display_maxy; y++)
 	{
@@ -221,7 +230,7 @@ void hh_hmcs40_state::display_update()
 				m_display_decay[y][x] = m_display_wait;
 
 			// determine active state
-			UINT64 ds = (m_display_decay[y][x] != 0) ? 1 : 0;
+			u64 ds = (m_display_decay[y][x] != 0) ? 1 : 0;
 			active_state[y] |= (ds << x);
 		}
 	}
@@ -276,14 +285,25 @@ void hh_hmcs40_state::set_display_size(int maxx, int maxy)
 	m_display_maxy = maxy;
 }
 
-void hh_hmcs40_state::display_matrix(int maxx, int maxy, UINT64 setx, UINT32 sety, bool update)
+void hh_hmcs40_state::set_display_segmask(u32 digits, u32 mask)
+{
+	// set a segment mask per selected digit, but leave unselected ones alone
+	for (int i = 0; i < 0x20; i++)
+	{
+		if (digits & 1)
+			m_display_segmask[i] = mask;
+		digits >>= 1;
+	}
+}
+
+void hh_hmcs40_state::display_matrix(int maxx, int maxy, u64 setx, u32 sety, bool update)
 {
 	set_display_size(maxx, maxy);
 
 	// update current state
-	UINT64 mask = (U64(1) << maxx) - 1;
+	u64 mask = (u64(1) << maxx) - 1;
 	for (int y = 0; y < maxy; y++)
-		m_display_state[y] = (sety >> y & 1) ? ((setx & mask) | (U64(1) << maxx)) : 0;
+		m_display_state[y] = (sety >> y & 1) ? ((setx & mask) | (u64(1) << maxx)) : 0;
 
 	if (update)
 		display_update();
@@ -292,9 +312,9 @@ void hh_hmcs40_state::display_matrix(int maxx, int maxy, UINT64 setx, UINT32 set
 
 // generic input handlers
 
-UINT16 hh_hmcs40_state::read_inputs(int columns)
+u16 hh_hmcs40_state::read_inputs(int columns)
 {
-	UINT16 ret = 0;
+	u16 ret = 0;
 
 	// read selected input rows
 	for (int i = 0; i < columns; i++)
@@ -320,7 +340,7 @@ void hh_hmcs40_state::set_interrupt(int line, int state)
 
 	if (state != m_int[line])
 	{
-		if (machine().phase() >= MACHINE_PHASE_RESET)
+		if (machine().phase() >= machine_phase::RESET)
 			m_maincpu->set_input_line(line, state ? ASSERT_LINE : CLEAR_LINE);
 		m_int[line] = state;
 	}
@@ -328,7 +348,7 @@ void hh_hmcs40_state::set_interrupt(int line, int state)
 
 INPUT_CHANGED_MEMBER(hh_hmcs40_state::single_interrupt_line)
 {
-	set_interrupt((int)(FPTR)param, newval);
+	set_interrupt((int)(uintptr_t)param, newval);
 }
 
 
@@ -365,11 +385,11 @@ public:
 WRITE8_MEMBER(bambball_state::plate_w)
 {
 	// R1x-R3x(,D0-D3): vfd matrix plate
-	int shift = (offset - HMCS40_PORT_R1X) * 4;
+	int shift = (offset - hmcs40_cpu_device::PORT_R1X) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// update display
-	UINT16 plate = BITSWAP16(m_plate,13,8,4,12,9,10,14,1,7,0,15,11,6,3,5,2);
+	u16 plate = BITSWAP16(m_plate,13,8,4,12,9,10,14,1,7,0,15,11,6,3,5,2);
 	display_matrix(16, 9, plate, m_grid);
 }
 
@@ -385,7 +405,7 @@ WRITE16_MEMBER(bambball_state::grid_w)
 	m_grid = data >> 7 & 0x1ff;
 
 	// D0-D3: more plates (update display there)
-	plate_w(space, 3 + HMCS40_PORT_R1X, data & 0xf);
+	plate_w(space, 3 + hmcs40_cpu_device::PORT_R1X, data & 0xf);
 }
 
 READ8_MEMBER(bambball_state::input_r)
@@ -415,16 +435,16 @@ static INPUT_PORTS_START( bambball )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_NAME("Display")
 
 	PORT_START("IN.3") // D10 port R0x
-	PORT_CONFNAME( 0x07, 0x01, "Skill Level")
+	PORT_CONFNAME( 0x07, 0x01, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(    0x01, "1" )
 	PORT_CONFSETTING(    0x02, "2" )
 	PORT_CONFSETTING(    0x04, "3" )
-	PORT_CONFNAME( 0x08, 0x08, "Players" )
+	PORT_CONFNAME( 0x08, 0x08, DEF_STR( Players ) )
 	PORT_CONFSETTING(    0x08, "1" )
 	PORT_CONFSETTING(    0x00, "2" )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( bambball, bambball_state )
+static MACHINE_CONFIG_START( bambball )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38750, 400000) // approximation
@@ -478,15 +498,15 @@ public:
 
 void bmboxing_state::prepare_display()
 {
-	UINT16 grid = BITSWAP16(m_grid,15,14,13,12,11,10,9,0,1,2,3,4,5,6,7,8);
-	UINT32 plate = BITSWAP16(m_plate,15,14,13,12,1,2,0,3,11,4,10,7,5,6,9,8);
+	u16 grid = BITSWAP16(m_grid,15,14,13,12,11,10,9,0,1,2,3,4,5,6,7,8);
+	u32 plate = BITSWAP16(m_plate,15,14,13,12,1,2,0,3,11,4,10,7,5,6,9,8);
 	display_matrix(12, 9, plate, grid);
 }
 
 WRITE8_MEMBER(bmboxing_state::plate_w)
 {
 	// R1x-R3x: vfd matrix plate
-	int shift = (offset - HMCS40_PORT_R1X) * 4;
+	int shift = (offset - hmcs40_cpu_device::PORT_R1X) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 	prepare_display();
 }
@@ -550,17 +570,17 @@ static INPUT_PORTS_START( bmboxing )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.4") // port D
-	PORT_CONFNAME( 0x0001, 0x0000, "Players" )
+	PORT_CONFNAME( 0x0001, 0x0000, DEF_STR( Players ) )
 	PORT_CONFSETTING(      0x0000, "1" )
 	PORT_CONFSETTING(      0x0001, "2" )
-	PORT_CONFNAME( 0x0002, 0x0000, "Skill Level" )
+	PORT_CONFNAME( 0x0002, 0x0000, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(      0x0000, "1" )
 	PORT_CONFSETTING(      0x0002, "2" )
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_START )
 	PORT_BIT( 0xfff8, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( bmboxing, bmboxing_state )
+static MACHINE_CONFIG_START( bmboxing )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38750, 400000) // approximation
@@ -617,8 +637,8 @@ public:
 
 void bfriskyt_state::prepare_display()
 {
-	UINT16 grid = BITSWAP16(m_grid,15,14,13,12,11,10,9,8,0,1,2,3,4,5,6,7);
-	UINT32 plate = BITSWAP24(m_plate,23,22,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21);
+	u16 grid = BITSWAP16(m_grid,15,14,13,12,11,10,9,8,0,1,2,3,4,5,6,7);
+	u32 plate = BITSWAP24(m_plate,23,22,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21);
 	display_matrix(22, 8, plate, grid);
 }
 
@@ -636,7 +656,7 @@ WRITE16_MEMBER(bfriskyt_state::grid_w)
 	m_speaker->level_w(data >> 6 & 1);
 
 	// D11-D15: input mux
-	UINT8 inp_mux = data >> 11 & 0x1f;
+	u8 inp_mux = data >> 11 & 0x1f;
 	if (inp_mux != m_inp_mux)
 	{
 		m_inp_mux = inp_mux;
@@ -685,8 +705,7 @@ INPUT_CHANGED_MEMBER(bfriskyt_state::input_changed)
 	update_int1();
 }
 
-
-static MACHINE_CONFIG_START( bfriskyt, bfriskyt_state )
+static MACHINE_CONFIG_START( bfriskyt )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation
@@ -750,8 +769,8 @@ WRITE8_MEMBER(packmon_state::plate_w)
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// update display
-	UINT16 grid = BITSWAP16(m_grid,15,14,13,12,11,10,0,1,2,3,4,5,6,7,8,9);
-	UINT32 plate = BITSWAP24(m_plate,23,22,21,20,0,1,2,3,4,5,6,19,18,17,16,15,14,13,12,11,10,9,8,7);
+	u16 grid = BITSWAP16(m_grid,15,14,13,12,11,10,0,1,2,3,4,5,6,7,8,9);
+	u32 plate = BITSWAP24(m_plate,23,22,21,20,0,1,2,3,4,5,6,19,18,17,16,15,14,13,12,11,10,9,8,7);
 	display_matrix(20, 10, plate, grid);
 }
 
@@ -796,7 +815,7 @@ static INPUT_PORTS_START( packmon )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( packmon, packmon_state )
+static MACHINE_CONFIG_START( packmon )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation
@@ -860,8 +879,8 @@ public:
 
 void msthawk_state::prepare_display()
 {
-	UINT16 grid = BITSWAP16(m_grid,15,14,13,12,11,10,0,1,2,3,4,5,6,7,8,9);
-	UINT32 plate = BITSWAP24(m_plate,23,22,21,19,20,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0);
+	u16 grid = BITSWAP16(m_grid,15,14,13,12,11,10,0,1,2,3,4,5,6,7,8,9);
+	u32 plate = BITSWAP24(m_plate,23,22,21,19,20,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0);
 	display_matrix(21, 10, plate, grid);
 }
 
@@ -879,7 +898,7 @@ WRITE16_MEMBER(msthawk_state::grid_w)
 	m_speaker->level_w(data >> 5 & 1);
 
 	// D10-D15: input mux
-	UINT8 inp_mux = data >> 10 & 0x3f;
+	u8 inp_mux = data >> 10 & 0x3f;
 	if (inp_mux != m_inp_mux)
 	{
 		m_inp_mux = inp_mux;
@@ -931,8 +950,7 @@ INPUT_CHANGED_MEMBER(msthawk_state::input_changed)
 	update_int0();
 }
 
-
-static MACHINE_CONFIG_START( msthawk, msthawk_state )
+static MACHINE_CONFIG_START( msthawk )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation
@@ -993,8 +1011,8 @@ WRITE8_MEMBER(bzaxxon_state::plate_w)
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// update display
-	UINT16 grid = BITSWAP16(m_grid,15,14,13,12,11,6,7,8,9,10,5,4,3,2,1,0);
-	UINT32 plate = BITSWAP24(m_plate,23,22,21,20,5,7,0,1,2,3,4,6,19,16,17,18,15,14,13,12,10,8,9,11) | 0x800;
+	u16 grid = BITSWAP16(m_grid,15,14,13,12,11,6,7,8,9,10,5,4,3,2,1,0);
+	u32 plate = BITSWAP24(m_plate,23,22,21,20,5,7,0,1,2,3,4,6,19,16,17,18,15,14,13,12,10,8,9,11) | 0x800;
 	display_matrix(20, 11, plate, grid);
 }
 
@@ -1004,7 +1022,7 @@ WRITE16_MEMBER(bzaxxon_state::grid_w)
 	m_speaker->level_w(data >> 4 & 1);
 
 	// D7-D10: input mux
-	UINT8 inp_mux = data >> 7 & 0xf;
+	u8 inp_mux = data >> 7 & 0xf;
 	if (inp_mux != m_inp_mux)
 	{
 		m_inp_mux = inp_mux;
@@ -1053,8 +1071,7 @@ INPUT_CHANGED_MEMBER(bzaxxon_state::input_changed)
 	update_int1();
 }
 
-
-static MACHINE_CONFIG_START( bzaxxon, bzaxxon_state )
+static MACHINE_CONFIG_START( bzaxxon )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38800, 450000) // approximation
@@ -1114,8 +1131,8 @@ WRITE8_MEMBER(zackman_state::plate_w)
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// update display
-	UINT8 grid = BITSWAP8(m_grid,0,1,2,3,4,5,6,7);
-	UINT32 plate = BITSWAP32(m_plate,31,30,27,0,1,2,3,4,5,6,7,8,9,10,11,24,25,26,29,28,23,22,21,20,19,18,17,16,15,14,13,12);
+	u8 grid = BITSWAP8(m_grid,0,1,2,3,4,5,6,7);
+	u32 plate = BITSWAP32(m_plate,31,30,27,0,1,2,3,4,5,6,7,8,9,10,11,24,25,26,29,28,23,22,21,20,19,18,17,16,15,14,13,12);
 	display_matrix(29, 8, plate, grid);
 }
 
@@ -1125,7 +1142,7 @@ WRITE16_MEMBER(zackman_state::grid_w)
 	m_speaker->level_w(data >> 2 & 1);
 
 	// D11-D14: input mux
-	UINT8 inp_mux = data >> 11 & 0xf;
+	u8 inp_mux = data >> 11 & 0xf;
 	if (inp_mux != m_inp_mux)
 	{
 		m_inp_mux = inp_mux;
@@ -1170,8 +1187,7 @@ INPUT_CHANGED_MEMBER(zackman_state::input_changed)
 	update_int0();
 }
 
-
-static MACHINE_CONFIG_START( zackman, zackman_state )
+static MACHINE_CONFIG_START( zackman )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
@@ -1230,8 +1246,8 @@ public:
 
 void bpengo_state::prepare_display()
 {
-	UINT8 grid = BITSWAP8(m_grid,0,1,2,3,4,5,6,7);
-	UINT32 plate = BITSWAP32(m_plate,31,30,29,28,23,22,21,16,17,18,19,20,27,26,25,24,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0);
+	u8 grid = BITSWAP8(m_grid,0,1,2,3,4,5,6,7);
+	u32 plate = BITSWAP32(m_plate,31,30,29,28,23,22,21,16,17,18,19,20,27,26,25,24,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0);
 	display_matrix(25, 8, plate, grid);
 }
 
@@ -1249,7 +1265,7 @@ WRITE16_MEMBER(bpengo_state::grid_w)
 	m_speaker->level_w(data >> 10 & 1);
 
 	// D12-D15: input mux
-	UINT8 inp_mux = data >> 12 & 0xf;
+	u8 inp_mux = data >> 12 & 0xf;
 	if (inp_mux != m_inp_mux)
 	{
 		m_inp_mux = inp_mux;
@@ -1298,8 +1314,7 @@ INPUT_CHANGED_MEMBER(bpengo_state::input_changed)
 	update_int0();
 }
 
-
-static MACHINE_CONFIG_START( bpengo, bpengo_state )
+static MACHINE_CONFIG_START( bpengo )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
@@ -1359,8 +1374,8 @@ public:
 
 void bbtime_state::prepare_display()
 {
-	UINT8 grid = BITSWAP8(m_grid,7,6,0,1,2,3,4,5);
-	UINT32 plate = BITSWAP32(m_plate,31,30,29,28,25,24,26,27,22,23,15,14,12,11,10,8,7,6,4,1,5,9,13,3,2,16,17,18,19,20,0,21) | 0x1;
+	u8 grid = BITSWAP8(m_grid,7,6,0,1,2,3,4,5);
+	u32 plate = BITSWAP32(m_plate,31,30,29,28,25,24,26,27,22,23,15,14,12,11,10,8,7,6,4,1,5,9,13,3,2,16,17,18,19,20,0,21) | 0x1;
 	display_matrix(28, 6, plate, grid);
 }
 
@@ -1378,7 +1393,7 @@ WRITE16_MEMBER(bbtime_state::grid_w)
 	m_speaker->level_w(data >> 3 & 1);
 
 	// D10-D14: input mux
-	UINT8 inp_mux = data >> 10 & 0x1f;
+	u8 inp_mux = data >> 10 & 0x1f;
 	if (inp_mux != m_inp_mux)
 	{
 		m_inp_mux = inp_mux;
@@ -1424,8 +1439,7 @@ INPUT_CHANGED_MEMBER(bbtime_state::input_changed)
 	update_int0();
 }
 
-
-static MACHINE_CONFIG_START( bbtime, bbtime_state )
+static MACHINE_CONFIG_START( bbtime )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
@@ -1485,8 +1499,8 @@ WRITE8_MEMBER(bdoramon_state::plate_w)
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// update display
-	UINT8 grid = BITSWAP8(m_grid,0,1,2,3,4,5,7,6);
-	UINT32 plate = BITSWAP24(m_plate,23,22,21,20,11,19,18,17,16,15,14,13,12,10,9,8,7,6,5,4,3,2,1,0);
+	u8 grid = BITSWAP8(m_grid,0,1,2,3,4,5,7,6);
+	u32 plate = BITSWAP24(m_plate,23,22,21,20,11,19,18,17,16,15,14,13,12,10,9,8,7,6,5,4,3,2,1,0);
 	display_matrix(19, 8, plate, grid);
 }
 
@@ -1525,7 +1539,7 @@ static INPUT_PORTS_START( bdoramon )
 	PORT_CONFSETTING(    0x08, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( bdoramon, bdoramon_state )
+static MACHINE_CONFIG_START( bdoramon )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation
@@ -1584,8 +1598,8 @@ WRITE8_MEMBER(bultrman_state::plate_w)
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// update display
-	UINT8 grid = BITSWAP8(m_grid,0,1,2,3,4,5,6,7);
-	UINT32 plate = BITSWAP24(m_plate,23,22,21,20,19,0,18,17,16,15,14,13,12,3,11,10,9,8,7,6,5,4,1,2);
+	u8 grid = BITSWAP8(m_grid,0,1,2,3,4,5,6,7);
+	u32 plate = BITSWAP24(m_plate,23,22,21,20,19,0,18,17,16,15,14,13,12,3,11,10,9,8,7,6,5,4,1,2);
 	display_matrix(18, 8, plate, grid);
 }
 
@@ -1598,7 +1612,8 @@ WRITE16_MEMBER(bultrman_state::grid_w)
 	m_grid = data >> 8 & 0xff;
 
 	// D0-D2: plate 15-17 (update display there)
-	plate_w(space, 4, data & 7);
+	//plate_w(space, 4, data & 7);
+	plate_w(space, 4, data & (1 << offset) & 7);
 }
 
 
@@ -1617,7 +1632,7 @@ static INPUT_PORTS_START( bultrman )
 	PORT_BIT( 0xff8f, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( bultrman, bultrman_state )
+static MACHINE_CONFIG_START( bultrman )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38800, 350000) // approximation
@@ -1671,14 +1686,14 @@ public:
 
 void machiman_state::prepare_display()
 {
-	UINT32 plate = BITSWAP24(m_plate,23,22,21,20,19,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18);
+	u32 plate = BITSWAP24(m_plate,23,22,21,20,19,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18);
 	display_matrix(19, 5, plate, m_grid);
 }
 
 WRITE8_MEMBER(machiman_state::plate_w)
 {
 	// R0x-R3x,R6012: vfd matrix plate
-	int shift = (offset == HMCS40_PORT_R6X) ? 16 : offset * 4;
+	int shift = (offset == hmcs40_cpu_device::PORT_R6X) ? 16 : offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 	prepare_display();
 }
@@ -1706,7 +1721,7 @@ static INPUT_PORTS_START( machiman )
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( machiman, machiman_state )
+static MACHINE_CONFIG_START( machiman )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
@@ -1773,7 +1788,7 @@ public:
 WRITE8_MEMBER(pairmtch_state::plate_w)
 {
 	// R2x,R3x,R6x: vfd matrix plate
-	int shift = (offset == HMCS40_PORT_R6X) ? 8 : (offset-2) * 4;
+	int shift = (offset == hmcs40_cpu_device::PORT_R6X) ? 8 : (offset-2) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 	display_matrix(12, 6, m_plate, m_grid);
 }
@@ -1845,10 +1860,10 @@ static INPUT_PORTS_START( pairmtch )
 	PORT_CONFSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_CONFSETTING(      0x0040, DEF_STR( On ) )
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_CONFNAME( 0x0800, 0x0800, "Players" )
+	PORT_CONFNAME( 0x0800, 0x0800, DEF_STR( Players ) )
 	PORT_CONFSETTING(      0x0800, "1" )
 	PORT_CONFSETTING(      0x0000, "2" )
-	PORT_CONFNAME( 0x3000, 0x2000, "Skill Level" )
+	PORT_CONFNAME( 0x3000, 0x2000, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(      0x2000, "1" )
 	PORT_CONFSETTING(      0x1000, "2" )
 	PORT_CONFSETTING(      0x0000, "3" )
@@ -1856,7 +1871,7 @@ static INPUT_PORTS_START( pairmtch )
 	PORT_BIT( 0x86bf, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( pairmtch, pairmtch_state )
+static MACHINE_CONFIG_START( pairmtch )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
@@ -1925,7 +1940,7 @@ WRITE8_MEMBER(alnattck_state::plate_w)
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// update display
-	UINT32 plate = BITSWAP24(m_plate,23,22,21,20,19,18,17,16,11,9,8,10,7,2,0,1,3,4,5,6,12,13,14,15);
+	u32 plate = BITSWAP24(m_plate,23,22,21,20,19,18,17,16,11,9,8,10,7,2,0,1,3,4,5,6,12,13,14,15);
 	display_matrix(20, 10, plate, m_grid);
 }
 
@@ -1955,7 +1970,7 @@ READ16_MEMBER(alnattck_state::input_r)
 
 static INPUT_PORTS_START( alnattck )
 	PORT_START("IN.0") // D7 line D5
-	PORT_CONFNAME( 0x20, 0x00, "Skill Level" )
+	PORT_CONFNAME( 0x20, 0x00, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x20, "2" )
 
@@ -1978,7 +1993,7 @@ static INPUT_PORTS_START( alnattck )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Fire")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( alnattck, alnattck_state )
+static MACHINE_CONFIG_START( alnattck )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation
@@ -2012,6 +2027,7 @@ MACHINE_CONFIG_END
   Coleco Donkey Kong (manufactured in Taiwan, licensed from Nintendo)
   * PCB label Coleco Rev C 75790 DK
   * Hitachi QFP HD38820A45 MCU
+  * RC circuit for speaker volume decay
   * cyan/red VFD display Futaba DM-47ZK 2K, with color overlay
 
 ***************************************************************************/
@@ -2027,8 +2043,9 @@ public:
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE16_MEMBER(grid_w);
 
-	int m_speaker_volume;
+	void speaker_decay_reset();
 	TIMER_DEVICE_CALLBACK_MEMBER(speaker_decay_sim);
+	double m_speaker_volume;
 
 protected:
 	virtual void machine_start() override;
@@ -2036,31 +2053,32 @@ protected:
 
 // handlers
 
-// Sound is controlled by two pins: D3 for pitch, and R13 for on/off. When turned
-// off, it does not mute instantly, but volume slowly decays. Until we emulate it
-// with discrete audio, this crude simulation will do.
+void cdkong_state::speaker_decay_reset()
+{
+	if (m_r[1] & 8)
+		m_speaker_volume = 1.0;
 
-#define CDKONG_SPEAKER_MAX 0x10000
-#define CDKONG_SPEAKER_DECAY 50
+	m_speaker->set_output_gain(0, m_speaker_volume);
+}
 
 TIMER_DEVICE_CALLBACK_MEMBER(cdkong_state::speaker_decay_sim)
 {
-	m_speaker->set_output_gain(0, m_speaker_volume / (double)CDKONG_SPEAKER_MAX);
-	m_speaker_volume /= 2;
+	// volume decays when speaker is off (divisor and timer period determine duration)
+	speaker_decay_reset();
+	m_speaker_volume /= 1.015;
 }
-
 
 void cdkong_state::prepare_display()
 {
-	UINT32 plate = BITSWAP32(m_plate,31,30,29,24,0,16,8,1,23,17,9,2,18,10,25,27,26,3,15,27,11,11,14,22,6,13,21,5,19,12,20,4) | 0x800800;
+	u32 plate = BITSWAP32(m_plate,31,30,29,24,0,16,8,1,23,17,9,2,18,10,25,27,26,3,15,27,11,11,14,22,6,13,21,5,19,12,20,4) | 0x800800;
 	display_matrix(29, 11, plate, m_grid);
 }
 
 WRITE8_MEMBER(cdkong_state::plate_w)
 {
 	// R13: speaker on
-	if (offset == HMCS40_PORT_R1X && data & 8)
-		m_speaker_volume = CDKONG_SPEAKER_MAX;
+	m_r[offset] = data;
+	speaker_decay_reset();
 
 	// R0x-R6x: vfd matrix plate
 	int shift = offset * 4;
@@ -2093,7 +2111,6 @@ static INPUT_PORTS_START( cdkong )
 	PORT_BIT( 0x7ff8, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-
 void cdkong_state::machine_start()
 {
 	hh_hmcs40_state::machine_start();
@@ -2103,7 +2120,7 @@ void cdkong_state::machine_start()
 	save_item(NAME(m_speaker_volume));
 }
 
-static MACHINE_CONFIG_START( cdkong, cdkong_state )
+static MACHINE_CONFIG_START( cdkong )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
@@ -2129,7 +2146,7 @@ static MACHINE_CONFIG_START( cdkong, cdkong_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("speaker_decay", cdkong_state, speaker_decay_sim, attotime::from_msec(CDKONG_SPEAKER_DECAY))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("speaker_decay", cdkong_state, speaker_decay_sim, attotime::from_msec(1))
 MACHINE_CONFIG_END
 
 
@@ -2141,6 +2158,7 @@ MACHINE_CONFIG_END
   Coleco Galaxian (manufactured in Taiwan)
   * PCB label Coleco Rev A 75718
   * Hitachi HD38800A70 MCU
+  * discrete sound (when alien attacks)
   * cyan/red VFD display Futaba DM-36Z 2H, with color overlay
 
   Select game mode on start:
@@ -2170,19 +2188,19 @@ public:
 
 void cgalaxn_state::prepare_display()
 {
-	UINT16 grid = BITSWAP16(m_grid,15,14,13,12,1,2,0,11,10,9,8,7,6,5,4,3);
-	UINT16 plate = BITSWAP16(m_plate,15,14,6,5,4,3,2,1,7,8,9,10,11,0,12,13);
+	u16 grid = BITSWAP16(m_grid,15,14,13,12,1,2,0,11,10,9,8,7,6,5,4,3);
+	u16 plate = BITSWAP16(m_plate,15,14,6,5,4,3,2,1,7,8,9,10,11,0,12,13);
 	display_matrix(15, 12, plate, grid);
 }
 
 WRITE8_MEMBER(cgalaxn_state::grid_w)
 {
 	// R10,R11: input mux
-	if (offset == HMCS40_PORT_R1X)
+	if (offset == hmcs40_cpu_device::PORT_R1X)
 		m_inp_mux = data & 3;
 
 	// R1x-R3x: vfd matrix grid
-	int shift = (offset - HMCS40_PORT_R1X) * 4;
+	int shift = (offset - hmcs40_cpu_device::PORT_R1X) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
 	prepare_display();
 }
@@ -2216,7 +2234,7 @@ static INPUT_PORTS_START( cgalaxn )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
 
 	PORT_START("IN.1") // R11 port R0x
-	PORT_CONFNAME( 0x01, 0x01, "Players" ) PORT_CHANGED_MEMBER(DEVICE_SELF, cgalaxn_state, player_switch, nullptr)
+	PORT_CONFNAME( 0x01, 0x01, DEF_STR( Players ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, cgalaxn_state, player_switch, nullptr)
 	PORT_CONFSETTING(    0x01, "1" )
 	PORT_CONFSETTING(    0x00, "2" )
 	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -2235,8 +2253,7 @@ INPUT_CHANGED_MEMBER(cgalaxn_state::player_switch)
 	prepare_display();
 }
 
-
-static MACHINE_CONFIG_START( cgalaxn, cgalaxn_state )
+static MACHINE_CONFIG_START( cgalaxn )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation
@@ -2302,12 +2319,12 @@ public:
 WRITE8_MEMBER(cpacman_state::plate_w)
 {
 	// R1x-R6x(,D1,D2): vfd matrix plate
-	int shift = (offset - HMCS40_PORT_R1X) * 4;
+	int shift = (offset - hmcs40_cpu_device::PORT_R1X) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// update display
-	UINT16 grid = BITSWAP16(m_grid,15,14,13,12,11,0,1,2,3,4,5,6,7,8,9,10);
-	UINT32 plate = BITSWAP32(m_plate,31,30,29,28,27,0,1,2,3,8,9,10,11,16,17,18,19,25,26,23,22,21,20,24,15,14,13,12,4,5,6,7);
+	u16 grid = BITSWAP16(m_grid,15,14,13,12,11,0,1,2,3,4,5,6,7,8,9,10);
+	u32 plate = BITSWAP32(m_plate,31,30,29,28,27,0,1,2,3,8,9,10,11,16,17,18,19,25,26,23,22,21,20,24,15,14,13,12,4,5,6,7);
 	display_matrix(27, 11, plate, grid);
 }
 
@@ -2323,7 +2340,7 @@ WRITE16_MEMBER(cpacman_state::grid_w)
 	m_grid = data >> 5 & 0x7ff;
 
 	// D1,D2: plate 8,14 (update display there)
-	plate_w(space, 6 + HMCS40_PORT_R1X, data >> 1 & 3);
+	plate_w(space, 6 + hmcs40_cpu_device::PORT_R1X, data >> 1 & 3);
 }
 
 READ8_MEMBER(cpacman_state::input_r)
@@ -2337,7 +2354,7 @@ READ8_MEMBER(cpacman_state::input_r)
 
 static INPUT_PORTS_START( cpacman )
 	PORT_START("IN.0") // D13 port R0x
-	PORT_CONFNAME( 0x01, 0x01, "Skill Level" )
+	PORT_CONFNAME( 0x01, 0x01, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x01, "2" )
 	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -2355,7 +2372,7 @@ static INPUT_PORTS_START( cpacman )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( cpacman, cpacman_state )
+static MACHINE_CONFIG_START( cpacman )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
@@ -2419,12 +2436,12 @@ public:
 WRITE8_MEMBER(cmspacmn_state::plate_w)
 {
 	// R1x-R6x(,D0,D1): vfd matrix plate
-	int shift = (offset - HMCS40_PORT_R1X) * 4;
+	int shift = (offset - hmcs40_cpu_device::PORT_R1X) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// update display
-	UINT16 grid = BITSWAP16(m_grid,15,14,13,11,10,9,8,7,6,5,4,3,2,1,0,1);
-	UINT64 plate = BIT(m_plate,15)<<32 | BITSWAP32(m_plate,14,13,12,4,5,6,7,24,23,25,22,21,20,13,24,3,19,14,12,11,24,2,10,8,7,25,0,9,1,18,17,16) | 0x1004080;
+	u16 grid = BITSWAP16(m_grid,15,14,13,11,10,9,8,7,6,5,4,3,2,1,0,1);
+	u64 plate = BIT(m_plate,15)<<32 | BITSWAP32(m_plate,14,13,12,4,5,6,7,24,23,25,22,21,20,13,24,3,19,14,12,11,24,2,10,8,7,25,0,9,1,18,17,16) | 0x1004080;
 	display_matrix(33, 12, plate, grid);
 }
 
@@ -2440,7 +2457,7 @@ WRITE16_MEMBER(cmspacmn_state::grid_w)
 	m_grid = data >> 5 & 0x7ff;
 
 	// D0,D1: more plates (update display there)
-	plate_w(space, 6 + HMCS40_PORT_R1X, data & 3);
+	plate_w(space, 6 + hmcs40_cpu_device::PORT_R1X, data & 3);
 }
 
 READ8_MEMBER(cmspacmn_state::input_r)
@@ -2454,7 +2471,7 @@ READ8_MEMBER(cmspacmn_state::input_r)
 
 static INPUT_PORTS_START( cmspacmn )
 	PORT_START("IN.0") // D13 port R0x
-	PORT_CONFNAME( 0x01, 0x00, "Skill Level" )
+	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x01, "2" )
 	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -2472,7 +2489,7 @@ static INPUT_PORTS_START( cmspacmn )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( cmspacmn, cmspacmn_state )
+static MACHINE_CONFIG_START( cmspacmn )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
@@ -2492,6 +2509,146 @@ static MACHINE_CONFIG_START( cmspacmn, cmspacmn_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 481-1, 0, 1080-1)
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
+  Entex Select-A-Game (HMCS40 MCU cartridges)
+  * see gamelist for cartridge info
+  * cyan/red VFD display Futaba DM-16Z + cyan VFD 9-digit panel Futaba 9-ST-11A 1F
+
+  The console is the peripheral, the heart of the system is the cartridge.
+  Cartridges with a HMCS40 MCU are implemented in this driver.
+
+  MAME external artwork is recommended, needed for per-game VFD overlays.
+
+***************************************************************************/
+
+class sag_state : public hh_hmcs40_state
+{
+public:
+	sag_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_hmcs40_state(mconfig, type, tag)
+	{ }
+
+	void prepare_display();
+	DECLARE_WRITE8_MEMBER(plate_w);
+	DECLARE_WRITE16_MEMBER(grid_w);
+	DECLARE_READ16_MEMBER(input_r);
+};
+
+// handlers
+
+void sag_state::prepare_display()
+{
+	// grid 0-7 are the 'pixels'
+	for (int y = 0; y < 8; y++)
+		m_display_state[y] = (m_grid >> y & 1) ? m_plate : 0;
+
+	// grid 8-11 are 7segs
+	set_display_segmask(0xf00, 0x7f);
+	u8 seg = BITSWAP8(m_plate,3,4,5,6,7,8,9,10);
+	for (int y = 8; y < 12; y++)
+		m_display_state[y] = (m_grid >> y & 1) ? seg : 0;
+
+	set_display_size(14, 12);
+	display_update();
+}
+
+WRITE8_MEMBER(sag_state::plate_w)
+{
+	// R0x-R3x: vfd matrix plate
+	int shift = offset * 4;
+	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
+	prepare_display();
+}
+
+WRITE16_MEMBER(sag_state::grid_w)
+{
+	// D0: speaker out
+	m_speaker->level_w(data & 1);
+
+	// D2-D7: input mux
+	m_inp_mux = data >> 2 & 0x3f;
+
+	// D1-D12: vfd matrix grid
+	m_grid = data >> 1 & 0xfff;
+	prepare_display();
+}
+
+READ16_MEMBER(sag_state::input_r)
+{
+	// D13-D15: multiplexed inputs
+	return read_inputs(6) << 13;
+}
+
+
+// config
+
+static INPUT_PORTS_START( sag )
+	PORT_START("IN.0") // D2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY PORT_NAME("P1 Button 1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL PORT_16WAY PORT_NAME("P2 Button 3")
+	PORT_CONFNAME( 0x04, 0x04, "Game" )
+	PORT_CONFSETTING(    0x04, "1" )
+	PORT_CONFSETTING(    0x00, "2" )
+
+	PORT_START("IN.1") // D3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY PORT_NAME("P1 Button 2")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL PORT_16WAY PORT_NAME("P2 Button 4")
+	PORT_BIT( 0x04, 0x04, IPT_SPECIAL ) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x01) // 1 player
+
+	PORT_START("IN.2") // D4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY PORT_NAME("P1 Button 3")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_COCKTAIL PORT_16WAY PORT_NAME("P2 Button 1")
+	PORT_CONFNAME( 0x04, 0x00, DEF_STR( Difficulty ) )
+	PORT_CONFSETTING(    0x00, "1" )
+	PORT_CONFSETTING(    0x04, "2" )
+
+	PORT_START("IN.3") // D5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY PORT_NAME("P1 Button 4")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL PORT_16WAY PORT_NAME("P2 Button 2")
+	PORT_BIT( 0x04, 0x04, IPT_SPECIAL ) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x00) // demo
+
+	PORT_START("IN.4") // D6
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P1 Button 5")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_COCKTAIL PORT_NAME("P2 Button 5")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Button 7")
+
+	PORT_START("IN.5") // D7
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P1 Button 6")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL PORT_NAME("P2 Button 6")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL PORT_NAME("P2 Button 7")
+
+	PORT_START("FAKE") // shared D3/D5
+	PORT_CONFNAME( 0x03, 0x01, DEF_STR( Players ) )
+	PORT_CONFSETTING(    0x00, "Demo" )
+	PORT_CONFSETTING(    0x01, "1" )
+	PORT_CONFSETTING(    0x02, "2" )
+INPUT_PORTS_END
+
+static MACHINE_CONFIG_START( sag )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", HD38800, 450000) // approximation
+	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(sag_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(sag_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(sag_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(sag_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(sag_state, grid_w))
+	MCFG_HMCS40_READ_D_CB(READ16(sag_state, input_r))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_sag)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2529,8 +2686,8 @@ public:
 
 void egalaxn2_state::prepare_display()
 {
-	UINT16 grid = BITSWAP16(m_grid,15,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14);
-	UINT32 plate = BITSWAP24(m_plate,23,22,21,20,15,14,13,12,7,6,5,4,3,2,1,0,19,18,17,16,11,10,9,8);
+	u16 grid = BITSWAP16(m_grid,15,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14);
+	u32 plate = BITSWAP24(m_plate,23,22,21,20,15,14,13,12,7,6,5,4,3,2,1,0,19,18,17,16,11,10,9,8);
 	display_matrix(24, 15, plate, grid);
 }
 
@@ -2550,7 +2707,7 @@ WRITE16_MEMBER(egalaxn2_state::grid_w)
 WRITE8_MEMBER(egalaxn2_state::plate_w)
 {
 	// R1x-R6x: vfd matrix plate
-	int shift = (offset - HMCS40_PORT_R1X) * 4;
+	int shift = (offset - hmcs40_cpu_device::PORT_R1X) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 	prepare_display();
 }
@@ -2585,16 +2742,16 @@ static INPUT_PORTS_START( egalaxn2 )
 
 	PORT_START("IN.3") // D4 port R0x
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_CONFNAME( 0x02, 0x02, "Skill Level" )
+	PORT_CONFNAME( 0x02, 0x02, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(    0x02, "1" )
 	PORT_CONFSETTING(    0x00, "2" )
-	PORT_CONFNAME( 0x0c, 0x00, "Players" )
+	PORT_CONFNAME( 0x0c, 0x00, DEF_STR( Players ) )
 	PORT_CONFSETTING(    0x08, "0 (Demo)" ) // for Demo mode: need to hold down Fire button at power-on
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x04, "2" )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( egalaxn2, egalaxn2_state )
+static MACHINE_CONFIG_START( egalaxn2 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
@@ -2635,7 +2792,7 @@ MACHINE_CONFIG_END
   2 VFD revisions are known, the difference is Pac-Man's color: cyan or red.
 
 ***************************************************************************/
-#if 0
+
 class epacman2_state : public egalaxn2_state
 {
 public:
@@ -2643,7 +2800,7 @@ public:
 		: egalaxn2_state(mconfig, type, tag)
 	{ }
 };
-#endif
+
 // handlers are identical to Galaxian 2, so we can use those
 
 // config
@@ -2669,10 +2826,10 @@ static INPUT_PORTS_START( epacman2 )
 
 	PORT_START("IN.3") // D4 port R0x
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_CONFNAME( 0x02, 0x02, "Skill Level" )
+	PORT_CONFNAME( 0x02, 0x02, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x02, "2" )
-	PORT_CONFNAME( 0x0c, 0x04, "Players" )
+	PORT_CONFNAME( 0x0c, 0x04, DEF_STR( Players ) )
 	PORT_CONFSETTING(    0x08, "0 (Demo)" )
 	PORT_CONFSETTING(    0x04, "1" )
 	PORT_CONFSETTING(    0x00, "2" )
@@ -2712,7 +2869,7 @@ public:
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE16_MEMBER(grid_w);
 
-	UINT8 m_cop_irq;
+	u8 m_cop_irq;
 	DECLARE_WRITE_LINE_MEMBER(speaker_w);
 	DECLARE_WRITE8_MEMBER(cop_irq_w);
 	DECLARE_READ8_MEMBER(cop_latch_r);
@@ -2729,8 +2886,8 @@ protected:
 
 void eturtles_state::prepare_display()
 {
-	UINT16 grid = BITSWAP16(m_grid,15,1,14,13,12,11,10,9,8,7,6,5,4,3,2,0);
-	UINT32 plate = BITSWAP32(m_plate,31,30,11,12,18,19,16,17,22,15,20,21,27,26,23,25,24,2,3,1,0,6,4,5,10,9,2,8,7,14,1,13);
+	u16 grid = BITSWAP16(m_grid,15,1,14,13,12,11,10,9,8,7,6,5,4,3,2,0);
+	u32 plate = BITSWAP32(m_plate,31,30,11,12,18,19,16,17,22,15,20,21,27,26,23,25,24,2,3,1,0,6,4,5,10,9,2,8,7,14,1,13);
 	display_matrix(30, 15, plate | (grid >> 5 & 8), grid); // grid 8 also forces plate 3 high
 }
 
@@ -2749,7 +2906,7 @@ WRITE16_MEMBER(eturtles_state::grid_w)
 	m_d = data;
 
 	// D1-D6: input mux
-	UINT8 inp_mux = data >> 1 & 0x3f;
+	u8 inp_mux = data >> 1 & 0x3f;
 	if (inp_mux != m_inp_mux)
 	{
 		m_inp_mux = inp_mux;
@@ -2764,7 +2921,7 @@ WRITE16_MEMBER(eturtles_state::grid_w)
 void eturtles_state::update_int()
 {
 	// INT0/1 on multiplexed inputs, and from COP D0
-	UINT8 inp = read_inputs(6);
+	u8 inp = read_inputs(6);
 	set_interrupt(0, (inp & 1) | m_cop_irq);
 	set_interrupt(1, inp & 2);
 }
@@ -2818,13 +2975,13 @@ static INPUT_PORTS_START( eturtles )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, input_changed, nullptr)
 
 	PORT_START("IN.4") // D5 INT0/1
-	PORT_CONFNAME( 0x01, 0x01, "Skill Level" ) PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, input_changed, nullptr)
+	PORT_CONFNAME( 0x01, 0x01, DEF_STR( Difficulty ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, input_changed, nullptr)
 	PORT_CONFSETTING(    0x01, "1" )
 	PORT_CONFSETTING(    0x00, "2" )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, input_changed, nullptr)
 
 	PORT_START("IN.5") // D6 INT0/1
-	PORT_CONFNAME( 0x03, 0x00, "Players" ) PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, input_changed, nullptr)
+	PORT_CONFNAME( 0x03, 0x00, DEF_STR( Players ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, input_changed, nullptr)
 	PORT_CONFSETTING(    0x02, "0 (Demo)" )
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x01, "2" )
@@ -2835,7 +2992,6 @@ INPUT_CHANGED_MEMBER(eturtles_state::input_changed)
 	update_int();
 }
 
-
 void eturtles_state::machine_start()
 {
 	hh_hmcs40_state::machine_start();
@@ -2844,7 +3000,7 @@ void eturtles_state::machine_start()
 	save_item(NAME(m_cop_irq));
 }
 
-static MACHINE_CONFIG_START( eturtles, eturtles_state )
+static MACHINE_CONFIG_START( eturtles )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
@@ -2909,8 +3065,8 @@ public:
 
 void estargte_state::prepare_display()
 {
-	UINT16 grid = BITSWAP16(m_grid,15,0,14,13,12,11,10,9,8,7,6,5,4,3,2,1);
-	UINT32 plate = BITSWAP32(m_plate,31,30,29,15,17,19,21,23,25,27,26,24,3,22,20,18,16,14,12,10,8,6,4,2,0,1,3,5,7,9,11,13);
+	u16 grid = BITSWAP16(m_grid,15,0,14,13,12,11,10,9,8,7,6,5,4,3,2,1);
+	u32 plate = BITSWAP32(m_plate,31,30,29,15,17,19,21,23,25,27,26,24,3,22,20,18,16,14,12,10,8,6,4,2,0,1,3,5,7,9,11,13);
 	display_matrix(29, 14, plate, grid);
 }
 
@@ -2942,11 +3098,11 @@ static INPUT_PORTS_START( estargte )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.4") // D5 INT0/1
-	PORT_CONFNAME( 0x01, 0x00, "Players" ) PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, input_changed, nullptr)
+	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Players ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, input_changed, nullptr)
 	PORT_CONFSETTING(    0x00, "0 (Demo)" ) // yes, same value as 1-player, hold the Inviso button at boot to enter demo mode
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x01, "2" )
-	PORT_CONFNAME( 0x02, 0x02, "Skill Level" ) PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, input_changed, nullptr)
+	PORT_CONFNAME( 0x02, 0x02, DEF_STR( Difficulty ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, input_changed, nullptr)
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x02, "2" )
 
@@ -2954,7 +3110,7 @@ static INPUT_PORTS_START( estargte )
 	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( estargte, estargte_state )
+static MACHINE_CONFIG_START( estargte )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
@@ -3026,8 +3182,8 @@ WRITE8_MEMBER(ghalien_state::plate_w)
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// update display
-	UINT16 grid = BITSWAP16(m_grid,15,14,13,12,11,10,0,1,2,3,4,5,6,7,8,9);
-	UINT32 plate = BITSWAP24(m_plate,23,22,21,20,14,12,10,8,9,13,15,2,0,1,3,11,7,5,4,6,19,17,16,18);
+	u16 grid = BITSWAP16(m_grid,15,14,13,12,11,10,0,1,2,3,4,5,6,7,8,9);
+	u32 plate = BITSWAP24(m_plate,23,22,21,20,14,12,10,8,9,13,15,2,0,1,3,11,7,5,4,6,19,17,16,18);
 	display_matrix(20, 10, plate, grid);
 }
 
@@ -3080,7 +3236,7 @@ static INPUT_PORTS_START( ghalien )
 	PORT_CONFSETTING(      0x8000, "Professional" )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( ghalien, ghalien_state )
+static MACHINE_CONFIG_START( ghalien )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation
@@ -3145,8 +3301,8 @@ WRITE8_MEMBER(gckong_state::plate_w)
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// update display
-	UINT16 grid = BITSWAP16(m_grid,15,14,13,12,11,0,1,2,3,4,5,6,7,8,9,10);
-	UINT32 plate = BITSWAP32(m_plate,31,30,29,28,27,26,25,6,7,8,12,13,14,15,16,17,18,17,16,12,11,10,9,8,7,6,5,4,3,2,1,0) | 0x8000;
+	u16 grid = BITSWAP16(m_grid,15,14,13,12,11,0,1,2,3,4,5,6,7,8,9,10);
+	u32 plate = BITSWAP32(m_plate,31,30,29,28,27,26,25,6,7,8,12,13,14,15,16,17,18,17,16,12,11,10,9,8,7,6,5,4,3,2,1,0) | 0x8000;
 	display_matrix(32, 11, plate, grid);
 }
 
@@ -3156,7 +3312,7 @@ WRITE16_MEMBER(gckong_state::grid_w)
 	m_speaker->level_w(data >> 2 & 1);
 
 	// D5-D8: input mux
-	UINT8 inp_mux = data >> 5 & 0xf;
+	u8 inp_mux = data >> 5 & 0xf;
 	if (inp_mux != m_inp_mux)
 	{
 		m_inp_mux = inp_mux;
@@ -3196,7 +3352,7 @@ static INPUT_PORTS_START( gckong )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)0)
 
 	PORT_START("IN.5") // port D
-	PORT_CONFNAME( 0x0010, 0x0000, "Skill Level" )
+	PORT_CONFNAME( 0x0010, 0x0000, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(      0x0000, "A" )
 	PORT_CONFSETTING(      0x0010, "B" )
 	PORT_BIT( 0xffef, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -3207,8 +3363,7 @@ INPUT_CHANGED_MEMBER(gckong_state::input_changed)
 	update_int1();
 }
 
-
-static MACHINE_CONFIG_START( gckong, gckong_state )
+static MACHINE_CONFIG_START( gckong )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation
@@ -3222,8 +3377,8 @@ static MACHINE_CONFIG_START( gckong, gckong_state )
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
 	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(479, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 479-1, 0, 1080-1)
+	MCFG_SCREEN_SIZE(506, 1080)
+	MCFG_SCREEN_VISIBLE_AREA(0, 506-1, 0, 1080-1)
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 
@@ -3269,7 +3424,7 @@ WRITE8_MEMBER(gdigdug_state::plate_w)
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// update display
-	UINT32 plate = BITSWAP32(m_plate,30,31,0,1,2,3,4,5,6,7,20,21,22,27,26,25,28,29,24,23,15,14,13,12,8,9,10,11,19,18,17,16);
+	u32 plate = BITSWAP32(m_plate,30,31,0,1,2,3,4,5,6,7,20,21,22,27,26,25,28,29,24,23,15,14,13,12,8,9,10,11,19,18,17,16);
 	display_matrix(32, 9, plate, m_grid);
 }
 
@@ -3279,7 +3434,7 @@ WRITE16_MEMBER(gdigdug_state::grid_w)
 	m_speaker->level_w(data >> 6 & 1);
 
 	// D11-D15: input mux
-	UINT8 inp_mux = data >> 11 & 0x1f;
+	u8 inp_mux = data >> 11 & 0x1f;
 	if (inp_mux != m_inp_mux)
 	{
 		m_inp_mux = inp_mux;
@@ -3327,8 +3482,7 @@ INPUT_CHANGED_MEMBER(gdigdug_state::input_changed)
 	update_int1();
 }
 
-
-static MACHINE_CONFIG_START( gdigdug, gdigdug_state )
+static MACHINE_CONFIG_START( gdigdug )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
@@ -3390,14 +3544,14 @@ public:
 
 void mwcbaseb_state::prepare_display()
 {
-	UINT8 grid = BITSWAP8(m_grid,0,1,2,3,4,5,6,7);
+	u8 grid = BITSWAP8(m_grid,0,1,2,3,4,5,6,7);
 	display_matrix(16, 8, m_plate, grid);
 }
 
 WRITE8_MEMBER(mwcbaseb_state::plate_w)
 {
 	// R1x-R3x,R6x: vfd matrix plate
-	int shift = (offset == HMCS40_PORT_R6X) ? 12 : (offset - HMCS40_PORT_R1X) * 4;
+	int shift = (offset == hmcs40_cpu_device::PORT_R6X) ? 12 : (offset - hmcs40_cpu_device::PORT_R1X) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 	prepare_display();
 }
@@ -3488,9 +3642,9 @@ static INPUT_PORTS_START( mwcbaseb )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("P1 1")
 INPUT_PORTS_END
 
-static const INT16 mwcbaseb_speaker_levels[] = { 0, 0x3fff, -0x4000, 0, -0x4000, 0, -0x8000, -0x4000 };
+static const s16 mwcbaseb_speaker_levels[] = { 0, 0x3fff, -0x4000, 0, -0x4000, 0, -0x8000, -0x4000 };
 
-static MACHINE_CONFIG_START( mwcbaseb, mwcbaseb_state )
+static MACHINE_CONFIG_START( mwcbaseb )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
@@ -3550,7 +3704,7 @@ WRITE8_MEMBER(pbqbert_state::plate_w)
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// update display
-	UINT32 plate = BITSWAP32(m_plate,31,30,24,25,26,27,28,15,14,29,13,12,11,10,9,8,7,6,5,4,3,2,1,0,16,17,18,19,20,21,22,23) | 0x400000;
+	u32 plate = BITSWAP32(m_plate,31,30,24,25,26,27,28,15,14,29,13,12,11,10,9,8,7,6,5,4,3,2,1,0,16,17,18,19,20,21,22,23) | 0x400000;
 	display_matrix(30, 8, plate, m_grid);
 }
 
@@ -3578,7 +3732,7 @@ static INPUT_PORTS_START( pbqbert )
 	PORT_BIT( 0xe1ff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( pbqbert, pbqbert_state )
+static MACHINE_CONFIG_START( pbqbert )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
@@ -3638,8 +3792,8 @@ public:
 
 void kingman_state::prepare_display()
 {
-	UINT16 grid = BITSWAP16(m_grid,15,14,13,12,11,10,9,0,1,2,3,4,5,6,7,8);
-	UINT32 plate = BITSWAP24(m_plate,23,6,7,5,4,3,2,1,0,13,12,20,19,18,17,16,10,11,9,8,14,15,13,12);
+	u16 grid = BITSWAP16(m_grid,15,14,13,12,11,10,9,0,1,2,3,4,5,6,7,8);
+	u32 plate = BITSWAP24(m_plate,23,6,7,5,4,3,2,1,0,13,12,20,19,18,17,16,10,11,9,8,14,15,13,12);
 	display_matrix(23, 9, plate, grid);
 }
 
@@ -3657,7 +3811,7 @@ WRITE16_MEMBER(kingman_state::grid_w)
 	m_speaker->level_w(data >> 6 & 1);
 
 	// D12-D15: input mux
-	UINT8 inp_mux = data >> 12 & 0xf;
+	u8 inp_mux = data >> 12 & 0xf;
 	if (inp_mux != m_inp_mux)
 	{
 		m_inp_mux = inp_mux;
@@ -3703,8 +3857,7 @@ INPUT_CHANGED_MEMBER(kingman_state::input_changed)
 	update_int0();
 }
 
-
-static MACHINE_CONFIG_START( kingman, kingman_state )
+static MACHINE_CONFIG_START( kingman )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation
@@ -3760,8 +3913,8 @@ public:
 
 void tmtron_state::prepare_display()
 {
-	UINT16 grid = BITSWAP16(m_grid,15,14,13,12,11,10,1,2,3,4,5,6,7,8,9,0);
-	UINT32 plate = BITSWAP24(m_plate,23,5,2,21,1,6,7,9,10,11,21,0,19,3,4,8,3,18,17,16,12,13,14,15);
+	u16 grid = BITSWAP16(m_grid,15,14,13,12,11,10,1,2,3,4,5,6,7,8,9,0);
+	u32 plate = BITSWAP24(m_plate,23,5,2,21,1,6,7,9,10,11,21,0,19,3,4,8,3,18,17,16,12,13,14,15);
 	display_matrix(23, 10, plate, grid);
 }
 
@@ -3779,7 +3932,7 @@ WRITE16_MEMBER(tmtron_state::grid_w)
 	m_speaker->level_w(data >> 4 & 1);
 
 	// D12-D15: input mux
-	UINT8 inp_mux = data >> 12 & 0xf;
+	u8 inp_mux = data >> 12 & 0xf;
 	if (inp_mux != m_inp_mux)
 	{
 		m_inp_mux = inp_mux;
@@ -3825,8 +3978,7 @@ INPUT_CHANGED_MEMBER(tmtron_state::input_changed)
 	update_int1();
 }
 
-
-static MACHINE_CONFIG_START( tmtron, tmtron_state )
+static MACHINE_CONFIG_START( tmtron )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation
@@ -3883,11 +4035,11 @@ public:
 WRITE8_MEMBER(vinvader_state::plate_w)
 {
 	// R1x-R3x(,D4-D6): vfd matrix plate
-	int shift = (offset - HMCS40_PORT_R1X) * 4;
+	int shift = (offset - hmcs40_cpu_device::PORT_R1X) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// update display
-	UINT16 plate = BITSWAP16(m_plate,15,11,7,3,10,6,14,2,9,5,13,1,8,4,12,0);
+	u16 plate = BITSWAP16(m_plate,15,11,7,3,10,6,14,2,9,5,13,1,8,4,12,0);
 	display_matrix(12, 9, plate, m_grid);
 }
 
@@ -3900,7 +4052,7 @@ WRITE16_MEMBER(vinvader_state::grid_w)
 	m_grid = data >> 7 & 0x1ff;
 
 	// D4-D6: more plates (update display there)
-	plate_w(space, 3 + HMCS40_PORT_R1X, data >> 4 & 7);
+	plate_w(space, 3 + hmcs40_cpu_device::PORT_R1X, data >> 4 & 7);
 }
 
 
@@ -3913,14 +4065,14 @@ static INPUT_PORTS_START( vinvader )
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.1") // port D
-	PORT_CONFNAME( 0x0002, 0x0000, "Skill Level")
+	PORT_CONFNAME( 0x0002, 0x0000, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(      0x0000, "1" )
 	PORT_CONFSETTING(      0x0002, "2" )
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_BIT( 0xfff5, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( vinvader, vinvader_state )
+static MACHINE_CONFIG_START( vinvader )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38750, 400000) // approximation
@@ -4145,6 +4297,27 @@ ROM_START( cmspacmn )
 ROM_END
 
 
+ROM_START( sag_si2 )
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "inv2_hd38800a31", 0x0000, 0x1000, BAD_DUMP CRC(29c8c100) SHA1(41cd413065659c6d7d5b2408de2ca6d51c49629a) )
+	ROM_CONTINUE(                0x1e80, 0x0100 )
+ROM_END
+
+
+ROM_START( sag_bb4 )
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "b-b5_hd38800a37", 0x0000, 0x1000, CRC(64852bd5) SHA1(fb1c24ca43934ceb6fc35ac7c35b71e6e843dbc5) )
+	ROM_CONTINUE(                0x1e80, 0x0100 )
+ROM_END
+
+
+ROM_START( sag_pb )
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "pinb_hd38800a38", 0x0000, 0x1000, CRC(6e53a56b) SHA1(13f057eab2e4cfbb3ef1247a041abff15ae727c9) )
+	ROM_CONTINUE(                0x1e80, 0x0100 )
+ROM_END
+
+
 ROM_START( egalaxn2 )
 	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "hd38820a13", 0x0000, 0x1000, CRC(112b721b) SHA1(4a185bc57ea03fe64f61f7db4da37b16eeb0cb54) )
@@ -4215,8 +4388,8 @@ ROM_START( gckong )
 	ROM_LOAD( "hd38800b01", 0x0000, 0x1000, CRC(d5a2cca3) SHA1(37bb5784383daab672ed1e0e2362c7a40d8d9b3f) )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
-	ROM_REGION( 349591, "svg", 0)
-	ROM_LOAD( "gckong.svg", 0, 349591, BAD_DUMP CRC(94b5fcdf) SHA1(a797feb71d18d0320e846eca72a0df92d111ee1e) ) // by kevtris, ver. 25 apr 2016 - BAD_DUMP: needs overlay
+	ROM_REGION( 356769, "svg", 0)
+	ROM_LOAD( "gckong.svg", 0, 356769, CRC(e2559b53) SHA1(519309c3a88b5d7f4c0ac5ae05dcdc1153377765) ) // by kevtris/hap, ver. 12 may 2017
 ROM_END
 
 
@@ -4281,44 +4454,47 @@ ROM_END
 
 
 
-/*    YEAR  NAME       PARENT COMPAT MACHINE  INPUT     INIT              COMPANY, FULLNAME, FLAGS */
-CONS( 1979, bambball,  0,        0, bambball, bambball, driver_device, 0, "Bambino", "Dribble Away Basketball", MACHINE_SUPPORTS_SAVE )
-CONS( 1979, bmboxing,  0,        0, bmboxing, bmboxing, driver_device, 0, "Bambino", "Knock-Em Out Boxing", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME       PARENT   CMP MACHINE   INPUT     STATE        INIT  COMPANY, FULLNAME, FLAGS
+CONS( 1979, bambball,  0,        0, bambball, bambball, bambball_state, 0, "Bambino", "Dribble Away Basketball", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, bmboxing,  0,        0, bmboxing, bmboxing, bmboxing_state, 0, "Bambino", "Knock-Em Out Boxing", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1982, bfriskyt,  0,        0, bfriskyt, bfriskyt, driver_device, 0, "Bandai", "Frisky Tom (Bandai)", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, packmon,   0,        0, packmon,  packmon,  driver_device, 0, "Bandai", "Packri Monster", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, msthawk,   0,        0, msthawk,  msthawk,  driver_device, 0, "Bandai (Mattel license)", "Star Hawk (Mattel)", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, bzaxxon,   0,        0, bzaxxon,  bzaxxon,  driver_device, 0, "Bandai", "Zaxxon (Bandai)", MACHINE_SUPPORTS_SAVE )
-CONS( 1983, zackman,   0,        0, zackman,  zackman,  driver_device, 0, "Bandai", "Zackman", MACHINE_SUPPORTS_SAVE )
-CONS( 1983, bpengo,    0,        0, bpengo,   bpengo,   driver_device, 0, "Bandai", "Pengo (Bandai)", MACHINE_SUPPORTS_SAVE )
-CONS( 1983, bbtime,    0,        0, bbtime,   bbtime,   driver_device, 0, "Bandai", "Burger Time (Bandai)", MACHINE_SUPPORTS_SAVE )
-CONS( 1983, bdoramon,  0,        0, bdoramon, bdoramon, driver_device, 0, "Bandai", "Dokodemo Dorayaki Doraemon", MACHINE_SUPPORTS_SAVE )
-CONS( 1983, bultrman,  0,        0, bultrman, bultrman, driver_device, 0, "Bandai", "Ultraman Monster Battle", MACHINE_SUPPORTS_SAVE )
-CONS( 1984, machiman,  0,        0, machiman, machiman, driver_device, 0, "Bandai", "Machine Man", MACHINE_SUPPORTS_SAVE )
-CONS( 1984, pairmtch,  0,        0, pairmtch, pairmtch, driver_device, 0, "Bandai", "Pair Match", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, bfriskyt,  0,        0, bfriskyt, bfriskyt, bfriskyt_state, 0, "Bandai", "Frisky Tom (Bandai)", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, packmon,   0,        0, packmon,  packmon,  packmon_state,  0, "Bandai", "Packri Monster", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, msthawk,   0,        0, msthawk,  msthawk,  msthawk_state,  0, "Bandai (Mattel license)", "Star Hawk (Mattel)", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, bzaxxon,   0,        0, bzaxxon,  bzaxxon,  bzaxxon_state,  0, "Bandai", "Zaxxon (Bandai)", MACHINE_SUPPORTS_SAVE )
+CONS( 1983, zackman,   0,        0, zackman,  zackman,  zackman_state,  0, "Bandai", "Zackman", MACHINE_SUPPORTS_SAVE )
+CONS( 1983, bpengo,    0,        0, bpengo,   bpengo,   bpengo_state,   0, "Bandai", "Pengo (Bandai)", MACHINE_SUPPORTS_SAVE )
+CONS( 1983, bbtime,    0,        0, bbtime,   bbtime,   bbtime_state,   0, "Bandai", "Burger Time (Bandai)", MACHINE_SUPPORTS_SAVE )
+CONS( 1983, bdoramon,  0,        0, bdoramon, bdoramon, bdoramon_state, 0, "Bandai", "Dokodemo Dorayaki Doraemon", MACHINE_SUPPORTS_SAVE )
+CONS( 1983, bultrman,  0,        0, bultrman, bultrman, bultrman_state, 0, "Bandai", "Ultraman Monster Battle", MACHINE_SUPPORTS_SAVE )
+CONS( 1984, machiman,  0,        0, machiman, machiman, machiman_state, 0, "Bandai", "Machine Man", MACHINE_SUPPORTS_SAVE )
+CONS( 1984, pairmtch,  0,        0, pairmtch, pairmtch, pairmtch_state, 0, "Bandai", "Pair Match", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1981, alnattck,  0,        0, alnattck, alnattck, driver_device, 0, "Coleco", "Alien Attack", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, cdkong,    0,        0, cdkong,   cdkong,   driver_device, 0, "Coleco", "Donkey Kong (Coleco)", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, cgalaxn,   0,        0, cgalaxn,  cgalaxn,  driver_device, 0, "Coleco", "Galaxian (Coleco)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-CONS( 1981, cpacman,   0,        0, cpacman,  cpacman,  driver_device, 0, "Coleco", "Pac-Man (Coleco, Rev. 29)", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, cpacmanr1, cpacman,  0, cpacman,  cpacman,  driver_device, 0, "Coleco", "Pac-Man (Coleco, Rev. 28)", MACHINE_SUPPORTS_SAVE )
-CONS( 1983, cmspacmn,  0,        0, cmspacmn, cmspacmn, driver_device, 0, "Coleco", "Ms. Pac-Man (Coleco)", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, alnattck,  0,        0, alnattck, alnattck, alnattck_state, 0, "Coleco", "Alien Attack", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, cdkong,    0,        0, cdkong,   cdkong,   cdkong_state,   0, "Coleco", "Donkey Kong (Coleco)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+CONS( 1982, cgalaxn,   0,        0, cgalaxn,  cgalaxn,  cgalaxn_state,  0, "Coleco", "Galaxian (Coleco)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+CONS( 1981, cpacman,   0,        0, cpacman,  cpacman,  cpacman_state,  0, "Coleco", "Pac-Man (Coleco, Rev. 29)", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, cpacmanr1, cpacman,  0, cpacman,  cpacman,  cpacman_state,  0, "Coleco", "Pac-Man (Coleco, Rev. 28)", MACHINE_SUPPORTS_SAVE )
+CONS( 1983, cmspacmn,  0,        0, cmspacmn, cmspacmn, cmspacmn_state, 0, "Coleco", "Ms. Pac-Man (Coleco)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1981, egalaxn2,  0,        0, egalaxn2, egalaxn2, driver_device, 0, "Entex", "Galaxian 2 (Entex)", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, epacman2,  0,        0, epacman2, epacman2, driver_device, 0, "Entex", "Pac Man 2 (Entex, cyan Pacman)", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, epacman2r, epacman2, 0, epacman2, epacman2, driver_device, 0, "Entex", "Pac Man 2 (Entex, red Pacman)", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, estargte,  0,        0, estargte, estargte, driver_device, 0, "Entex", "Stargate (Entex)", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, eturtles,  0,        0, eturtles, eturtles, driver_device, 0, "Entex", "Turtles (Entex)", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, sag_si2,   0,        0, sag,      sag,      sag_state,      0, "Entex", "Select-A-Game: Space Invader 2", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING ) // suspect bad dump
+CONS( 1981, sag_bb4,   0,        0, sag,      sag,      sag_state,      0, "Entex", "Select-A-Game: Baseball 4", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1981, sag_pb,    0,        0, sag,      sag,      sag_state,      0, "Entex", "Select-A-Game: Pinball", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1981, egalaxn2,  0,        0, egalaxn2, egalaxn2, egalaxn2_state, 0, "Entex", "Galaxian 2 (Entex)", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, epacman2,  0,        0, epacman2, epacman2, epacman2_state, 0, "Entex", "Pac Man 2 (Entex, cyan Pacman)", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, epacman2r, epacman2, 0, epacman2, epacman2, epacman2_state, 0, "Entex", "Pac Man 2 (Entex, red Pacman)", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, estargte,  0,        0, estargte, estargte, estargte_state, 0, "Entex", "Stargate (Entex)", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, eturtles,  0,        0, eturtles, eturtles, eturtles_state, 0, "Entex", "Turtles (Entex)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1980, ghalien,   0,        0, ghalien,  ghalien,  driver_device, 0, "Gakken", "Heiankyo Alien (Gakken)", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, gckong,    0,        0, gckong,   gckong,   driver_device, 0, "Gakken", "Crazy Kong (Gakken)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-CONS( 1983, gdigdug,   0,        0, gdigdug,  gdigdug,  driver_device, 0, "Gakken", "Dig Dug (Gakken)", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, ghalien,   0,        0, ghalien,  ghalien,  ghalien_state,  0, "Gakken", "Heiankyo Alien (Gakken)", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, gckong,    0,        0, gckong,   gckong,   gckong_state,   0, "Gakken", "Crazy Kong (Gakken)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1983, gdigdug,   0,        0, gdigdug,  gdigdug,  gdigdug_state,  0, "Gakken", "Dig Dug (Gakken)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1980, mwcbaseb,  0,        0, mwcbaseb, mwcbaseb, driver_device, 0, "Mattel", "World Championship Baseball", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, mwcbaseb,  0,        0, mwcbaseb, mwcbaseb, mwcbaseb_state, 0, "Mattel", "World Championship Baseball", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1983, pbqbert,   0,        0, pbqbert,  pbqbert,  driver_device, 0, "Parker Brothers", "Q*Bert (Parker Brothers)", MACHINE_SUPPORTS_SAVE )
+CONS( 1983, pbqbert,   0,        0, pbqbert,  pbqbert,  pbqbert_state,  0, "Parker Brothers", "Q*Bert (Parker Brothers)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1982, kingman,   0,        0, kingman,  kingman,  driver_device, 0, "Tomy", "Kingman", MACHINE_SUPPORTS_SAVE )
-CONS( 1984, tmtron,    0,        0, tmtron,   tmtron,   driver_device, 0, "Tomy", "Tron (Tomy)", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, kingman,   0,        0, kingman,  kingman,  kingman_state,  0, "Tomy", "Kingman", MACHINE_SUPPORTS_SAVE )
+CONS( 1984, tmtron,    0,        0, tmtron,   tmtron,   tmtron_state,   0, "Tomy", "Tron (Tomy)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1981, vinvader,  0,        0, vinvader, vinvader, driver_device, 0, "VTech", "Invaders (VTech)", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, vinvader,  0,        0, vinvader, vinvader, vinvader_state, 0, "VTech", "Invaders (VTech)", MACHINE_SUPPORTS_SAVE )

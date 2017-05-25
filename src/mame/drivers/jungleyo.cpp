@@ -40,6 +40,8 @@ PCB silkscreened: "MADE IN TAIWAN YONSHI PCB NO-006F"
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class jungleyo_state : public driver_device
@@ -54,7 +56,7 @@ public:
 
 	/* video-related */
 	virtual void video_start() override;
-	UINT32 screen_update_jungleyo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_jungleyo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 };
@@ -63,7 +65,7 @@ void jungleyo_state::video_start()
 {
 }
 
-UINT32 jungleyo_state::screen_update_jungleyo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t jungleyo_state::screen_update_jungleyo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -109,7 +111,7 @@ static GFXDECODE_START( jungleyo )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( jungleyo, jungleyo_state )
+static MACHINE_CONFIG_START( jungleyo )
 
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz)
 	MCFG_CPU_PROGRAM_MAP(jungleyo_map)
@@ -130,7 +132,7 @@ static MACHINE_CONFIG_START( jungleyo, jungleyo_state )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_12MHz/16, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL_12MHz/16, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.47)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)
 MACHINE_CONFIG_END
@@ -155,4 +157,4 @@ ROM_START( jungleyo )
 ROM_END
 
 
-GAME( 1999, jungleyo,    0,        jungleyo,    jungleyo, driver_device,    0, ROT0,  "Yonshi", "Jungle (VI3.02)", MACHINE_NOT_WORKING )
+GAME( 1999, jungleyo,    0,        jungleyo,    jungleyo, jungleyo_state,    0, ROT0,  "Yonshi", "Jungle (VI3.02)", MACHINE_NOT_WORKING )

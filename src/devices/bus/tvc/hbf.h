@@ -1,11 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco
+#ifndef MAME_BUS_TVC_HBF_H
+#define MAME_BUS_TVC_HBF_H
+
 #pragma once
 
-#ifndef __TVC_HBF_H__
-#define __TVC_HBF_H__
-
-#include "emu.h"
 #include "tvc.h"
 #include "machine/wd_fdc.h"
 #include "formats/tvc_dsk.h"
@@ -23,11 +22,11 @@ class tvc_hbf_device :
 {
 public:
 	// construction/destruction
-	tvc_hbf_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tvc_hbf_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
@@ -37,7 +36,7 @@ protected:
 	virtual void device_reset() override;
 
 	// tvcexp_interface overrides
-	virtual UINT8 id_r() override { return 0x02; } // ID_A to GND, ID_B to VCC
+	virtual uint8_t id_r() override { return 0x02; } // ID_A to GND, ID_B to VCC
 	virtual DECLARE_READ8_MEMBER(read) override;
 	virtual DECLARE_WRITE8_MEMBER(write) override;
 	virtual DECLARE_READ8_MEMBER(io_read) override;
@@ -45,15 +44,15 @@ protected:
 
 private:
 	// internal state
-	required_device<fd1793_t>   m_fdc;
+	required_device<fd1793_device>   m_fdc;
 
-	UINT8 *     m_rom;
-	UINT8 *     m_ram;
-	UINT8       m_rom_bank;     // A12 and A13
+	uint8_t *     m_rom;
+	uint8_t *     m_ram;
+	uint8_t       m_rom_bank;     // A12 and A13
 };
 
 
 // device type definition
-extern const device_type TVC_HBF;
+DECLARE_DEVICE_TYPE(TVC_HBF, tvc_hbf_device)
 
-#endif  /* __TVC_HBF_H__ */
+#endif // MAME_BUS_TVC_HBF_H

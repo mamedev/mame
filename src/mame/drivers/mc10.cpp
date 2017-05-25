@@ -8,15 +8,21 @@
 
 
 #include "emu.h"
+
 #include "cpu/m6800/m6800.h"
-#include "sound/dac.h"
-#include "video/mc6847.h"
-#include "video/ef9345.h"
 #include "imagedev/cassette.h"
 #include "imagedev/printer.h"
-#include "formats/coco_cas.h"
 #include "machine/ram.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
+#include "video/ef9345.h"
+#include "video/mc6847.h"
+
 #include "softlist.h"
+#include "speaker.h"
+
+#include "formats/coco_cas.h"
+
 
 //printer state
 enum
@@ -35,33 +41,33 @@ class mc10_state : public driver_device
 {
 public:
 	mc10_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_mc6847(*this, "mc6847"),
-	m_ef9345(*this, "ef9345"),
-	m_dac(*this, "dac"),
-	m_ram(*this, RAM_TAG),
-	m_cassette(*this, "cassette"),
-	m_printer(*this, "printer")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_mc6847(*this, "mc6847")
+		, m_ef9345(*this, "ef9345")
+		, m_dac(*this, "dac")
+		, m_ram(*this, RAM_TAG)
+		, m_cassette(*this, "cassette")
+		, m_printer(*this, "printer")
 	{ }
 
 	required_device<m6803_cpu_device> m_maincpu;
 	optional_device<mc6847_base_device> m_mc6847;
 	optional_device<ef9345_device> m_ef9345;
-	required_device<dac_device> m_dac;
+	required_device<dac_bit_interface> m_dac;
 	required_device<ram_device> m_ram;
 	required_device<cassette_image_device> m_cassette;
 	required_device<printer_image_device> m_printer;
 
-	UINT8 *m_ram_base;
-	UINT32 m_ram_size;
-	UINT8 m_keyboard_strobe;
-	UINT8 m_port2;
+	uint8_t *m_ram_base;
+	uint32_t m_ram_size;
+	uint8_t m_keyboard_strobe;
+	uint8_t m_port2;
 
 	// printer
-	UINT8 m_pr_buffer;
-	UINT8 m_pr_counter;
-	UINT8 m_pr_state;
+	uint8_t m_pr_buffer;
+	uint8_t m_pr_counter;
+	uint8_t m_pr_state;
 
 	DECLARE_READ8_MEMBER( mc10_bfff_r );
 	DECLARE_WRITE8_MEMBER( mc10_bfff_w );
@@ -83,7 +89,7 @@ public:
 
 READ8_MEMBER( mc10_state::mc10_bfff_r )
 {
-	UINT8 result = 0xff;
+	uint8_t result = 0xff;
 
 	if (!BIT(m_keyboard_strobe, 0)) result &= ioport("pb0")->read();
 	if (!BIT(m_keyboard_strobe, 1)) result &= ioport("pb1")->read();
@@ -99,7 +105,7 @@ READ8_MEMBER( mc10_state::mc10_bfff_r )
 
 READ8_MEMBER( mc10_state::alice90_bfff_r )
 {
-	UINT8 result = 0xff;
+	uint8_t result = 0xff;
 
 	if (!BIT(m_keyboard_strobe, 7)) result &= ioport("pb7")->read();
 	else
@@ -131,13 +137,13 @@ WRITE8_MEMBER( mc10_state::mc10_bfff_w )
 	m_mc6847->css_w(BIT(data, 6));
 
 	/* bit 7, dac output */
-	m_dac->write_unsigned8(BIT(data, 7));
+	m_dac->write(BIT(data, 7));
 }
 
 WRITE8_MEMBER( mc10_state::alice32_bfff_w )
 {
 	/* bit 7, dac output */
-	m_dac->write_unsigned8(BIT(data, 7));
+	m_dac->write(BIT(data, 7));
 }
 
 
@@ -159,7 +165,7 @@ WRITE8_MEMBER( mc10_state::mc10_port1_w )
 
 READ8_MEMBER( mc10_state::mc10_port2_r )
 {
-	UINT8 result = 0xeb;
+	uint8_t result = 0xeb;
 
 	/* bit 1, keyboard line pa6 */
 	if (!BIT(m_keyboard_strobe, 0)) result &= ioport("pb0")->read() >> 5;
@@ -224,7 +230,7 @@ READ8_MEMBER( mc10_state::mc6847_videoram_r )
 
 TIMER_DEVICE_CALLBACK_MEMBER(mc10_state::alice32_scanline)
 {
-	m_ef9345->update_scanline((UINT16)param);
+	m_ef9345->update_scanline((uint16_t)param);
 }
 
 /***************************************************************************
@@ -476,7 +482,7 @@ INPUT_PORTS_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( mc10, mc10_state )
+static MACHINE_CONFIG_START( mc10 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6803, XTAL_3_579545MHz)  /* 0,894886 MHz */
@@ -490,9 +496,10 @@ static MACHINE_CONFIG_START( mc10, mc10_state )
 	MCFG_MC6847_INPUT_CALLBACK(READ8(mc10_state, mc6847_videoram_r))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.0625)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_FORMATS(coco_cassette_formats)
@@ -511,7 +518,7 @@ static MACHINE_CONFIG_START( mc10, mc10_state )
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "mc10")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( alice32, mc10_state )
+static MACHINE_CONFIG_START( alice32 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6803, XTAL_3_579545MHz)
@@ -531,9 +538,10 @@ static MACHINE_CONFIG_START( alice32, mc10_state )
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("alice32_sl", mc10_state, alice32_scanline, "screen", 0, 10)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.0625)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_FORMATS(alice32_cassette_formats)
@@ -601,8 +609,8 @@ ROM_END
     GAME DRIVERS
 ***************************************************************************/
 
-/*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  INIT  COMPANY              FULLNAME  FLAGS */
-COMP( 1983, mc10,  0,      0,      mc10,    mc10, mc10_state,  mc10, "Tandy Radio Shack", "MC-10",  MACHINE_SUPPORTS_SAVE )
-COMP( 1983, alice, mc10,   0,      mc10,    alice, mc10_state, mc10, "Matra & Hachette",  "Alice",  MACHINE_SUPPORTS_SAVE )
-COMP( 1984, alice32,       0, 0,   alice32, alice, mc10_state, mc10, "Matra & Hachette",  "Alice 32",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-COMP( 1985, alice90, alice32, 0,   alice90, alice, mc10_state, mc10, "Matra & Hachette",  "Alice 90",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT  STATE       INIT  COMPANY              FULLNAME     FLAGS
+COMP( 1983, mc10,    0,       0,      mc10,    mc10,  mc10_state, mc10, "Tandy Radio Shack", "MC-10",     MACHINE_SUPPORTS_SAVE )
+COMP( 1983, alice,   mc10,    0,      mc10,    alice, mc10_state, mc10, "Matra & Hachette",  "Alice",     MACHINE_SUPPORTS_SAVE )
+COMP( 1984, alice32, 0,       0,      alice32, alice, mc10_state, mc10, "Matra & Hachette",  "Alice 32",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+COMP( 1985, alice90, alice32, 0,      alice90, alice, mc10_state, mc10, "Matra & Hachette",  "Alice 90",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

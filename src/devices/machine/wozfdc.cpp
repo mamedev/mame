@@ -9,9 +9,10 @@
 *********************************************************************/
 
 #include "emu.h"
+#include "wozfdc.h"
+
 #include "imagedev/floppy.h"
 #include "formats/ap2_dsk.h"
-#include "wozfdc.h"
 
 /***************************************************************************
     PARAMETERS
@@ -21,8 +22,8 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type DISKII_FDC = &device_creator<diskii_fdc>;
-const device_type APPLEIII_FDC = &device_creator<appleiii_fdc>;
+DEFINE_DEVICE_TYPE(DISKII_FDC,   diskii_fdc_device,   "d2fdc", "Apple Disk II floppy controller")
+DEFINE_DEVICE_TYPE(APPLEIII_FDC, appleiii_fdc_device, "a3fdc", "Apple III floppy controller")
 
 #define DISKII_P6_REGION  "diskii_rom_p6"
 
@@ -35,7 +36,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *wozfdc_device::device_rom_region() const
+const tiny_rom_entry *wozfdc_device::device_rom_region() const
 {
 	return ROM_NAME( diskiing );
 }
@@ -44,18 +45,18 @@ const rom_entry *wozfdc_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-wozfdc_device::wozfdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+wozfdc_device::wozfdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock)
 {
 }
 
-diskii_fdc::diskii_fdc(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	wozfdc_device(mconfig, DISKII_FDC, "Apple Disk II floppy controller", tag, owner, clock, "d2fdc", __FILE__)
+diskii_fdc_device::diskii_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	wozfdc_device(mconfig, DISKII_FDC, tag, owner, clock)
 {
 }
 
-appleiii_fdc::appleiii_fdc(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	wozfdc_device(mconfig, DISKII_FDC, "Apple III floppy controller", tag, owner, clock, "a3fdc", __FILE__)
+appleiii_fdc_device::appleiii_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	wozfdc_device(mconfig, APPLEIII_FDC, tag, owner, clock)
 {
 }
 
@@ -149,7 +150,7 @@ void wozfdc_device::a3_update_drive_sel()
 	}
 }
 
-void diskii_fdc::device_reset()
+void diskii_fdc_device::device_reset()
 {
 	wozfdc_device::device_reset();
 	external_drive_select = false;
@@ -160,7 +161,7 @@ void diskii_fdc::device_reset()
 	}
 }
 
-void appleiii_fdc::device_reset()
+void appleiii_fdc_device::device_reset()
 {
 	wozfdc_device::device_reset();
 	external_drive_select = true;
@@ -313,17 +314,17 @@ void wozfdc_device::control(int offset)
 		}
 }
 
-UINT64 wozfdc_device::time_to_cycles(const attotime &tm)
+uint64_t wozfdc_device::time_to_cycles(const attotime &tm)
 {
 	// Clock is falling edges of the ~2Mhz clock
 	// The 1021800 must be the controlling 6502's speed
 
-	UINT64 cycles = tm.as_ticks(clock()*2);
+	uint64_t cycles = tm.as_ticks(clock()*2);
 	cycles = (cycles+1) >> 1;
 	return cycles;
 }
 
-attotime wozfdc_device::cycles_to_time(UINT64 cycles)
+attotime wozfdc_device::cycles_to_time(uint64_t cycles)
 {
 	return attotime::from_ticks(cycles*2+1, clock()*2);
 }
@@ -347,9 +348,9 @@ void wozfdc_device::lss_sync()
 
 	attotime next_flux = floppy ? floppy->get_next_transition(cycles_to_time(cycles-1)) : attotime::never;
 
-	UINT64 cycles_limit = time_to_cycles(machine().time());
-	UINT64 cycles_next_flux = next_flux != attotime::never ? time_to_cycles(next_flux) : UINT64(-1);
-	UINT64 cycles_next_flux_down = cycles_next_flux != UINT64(-1) ? cycles_next_flux+1 : UINT64(-1);
+	uint64_t cycles_limit = time_to_cycles(machine().time());
+	uint64_t cycles_next_flux = next_flux != attotime::never ? time_to_cycles(next_flux) : uint64_t(-1);
+	uint64_t cycles_next_flux_down = cycles_next_flux != uint64_t(-1) ? cycles_next_flux+1 : uint64_t(-1);
 
 	if(cycles >= cycles_next_flux && cycles < cycles_next_flux_down)
 		address &= ~0x10;
@@ -357,14 +358,14 @@ void wozfdc_device::lss_sync()
 		address |= 0x10;
 
 	while(cycles < cycles_limit) {
-		UINT64 cycles_next_trans = cycles_limit;
+		uint64_t cycles_next_trans = cycles_limit;
 		if(cycles_next_trans > cycles_next_flux && cycles < cycles_next_flux)
 			cycles_next_trans = cycles_next_flux;
 		if(cycles_next_trans > cycles_next_flux_down && cycles < cycles_next_flux_down)
 			cycles_next_trans = cycles_next_flux_down;
 
 		while(cycles < cycles_next_trans) {
-			UINT8 opcode = m_rom_p6[address];
+			uint8_t opcode = m_rom_p6[address];
 
 			if(mode_write) {
 				if((write_line_active && !(address & 0x80)) ||
@@ -413,14 +414,14 @@ void wozfdc_device::lss_sync()
 		else if(cycles == cycles_next_flux_down) {
 			address |= 0x10;
 			next_flux = floppy ? floppy->get_next_transition(cycles_to_time(cycles)) : attotime::never;
-			cycles_next_flux = next_flux != attotime::never ? time_to_cycles(next_flux) : UINT64(-1);
-			cycles_next_flux_down = cycles_next_flux != UINT64(-1) ? cycles_next_flux+1 : UINT64(-1);
+			cycles_next_flux = next_flux != attotime::never ? time_to_cycles(next_flux) : uint64_t(-1);
+			cycles_next_flux_down = cycles_next_flux != uint64_t(-1) ? cycles_next_flux+1 : uint64_t(-1);
 		}
 	}
 }
 
 // set the two images for the Disk II
-void diskii_fdc::set_floppies(floppy_connector *f0, floppy_connector *f1)
+void diskii_fdc_device::set_floppies(floppy_connector *f0, floppy_connector *f1)
 {
 	floppy0 = f0;
 	floppy1 = f1;
@@ -431,7 +432,7 @@ void diskii_fdc::set_floppies(floppy_connector *f0, floppy_connector *f1)
 	}
 }
 
-void appleiii_fdc::set_floppies_4(floppy_connector *f0, floppy_connector *f1, floppy_connector *f2, floppy_connector *f3)
+void appleiii_fdc_device::set_floppies_4(floppy_connector *f0, floppy_connector *f1, floppy_connector *f2, floppy_connector *f3)
 {
 	floppy0 = f0;
 	floppy1 = f1;
@@ -444,19 +445,19 @@ void appleiii_fdc::set_floppies_4(floppy_connector *f0, floppy_connector *f1, fl
 	}
 }
 
-READ8_MEMBER(appleiii_fdc::read_c0dx)
+READ8_MEMBER(appleiii_fdc_device::read_c0dx)
 {
 	control_dx(offset);
 
 	return 0xff;
 }
 
-WRITE8_MEMBER(appleiii_fdc::write_c0dx)
+WRITE8_MEMBER(appleiii_fdc_device::write_c0dx)
 {
 	control_dx(offset);
 }
 
-void appleiii_fdc::control_dx(int offset)
+void appleiii_fdc_device::control_dx(int offset)
 {
 	switch (offset)
 	{

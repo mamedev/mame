@@ -37,7 +37,7 @@ bgfx_slider::~bgfx_slider()
 {
 }
 
-INT32 bgfx_slider::slider_changed(running_machine& /*machine*/, void *arg, int /*id*/, std::string *str, INT32 newval)
+int32_t bgfx_slider::slider_changed(running_machine& /*machine*/, void *arg, int /*id*/, std::string *str, int32_t newval)
 {
 	if (arg != nullptr)
 	{
@@ -55,7 +55,7 @@ void bgfx_slider::import(float val)
 slider_state* bgfx_slider::create_core_slider(running_machine& machine)
 {
 	int size = sizeof(slider_state) + m_description.length();
-	slider_state *state = reinterpret_cast<slider_state *>(auto_alloc_array_clear(machine, UINT8, size));
+	slider_state *state = reinterpret_cast<slider_state *>(auto_alloc_array_clear(machine, uint8_t, size));
 
 	state->minval = int32_t(floor(m_min / m_step + 0.5f));
 	state->defval = int32_t(floor(m_default / m_step + 0.5f));

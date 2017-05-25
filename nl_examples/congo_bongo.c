@@ -3,9 +3,15 @@
 /* € */ // ABC
 
 #include "netlist/devices/net_lib.h"
-#include "netlist/devices/nld_system.h"
-#include "netlist/analog/nld_bjt.h"
-#include "netlist/analog/nld_twoterm.h"
+
+/* ----------------------------------------------------------------------------
+ *  Define
+ * ---------------------------------------------------------------------------*/
+
+/* set to 1 to use optimizations increasing performance significantly */
+
+#define USE_OPTMIZATIONS	1
+#define USE_FRONTIERS		1
 
 /* ----------------------------------------------------------------------------
  *  Library section header START
@@ -37,29 +43,39 @@ NETLIST_START(dummy)
 // IGNORED O_AUDIO0: O_AUDIO0  64 0
 // .END
 
-	/* €€ */ SOLVER(Solver, 24000)
 	PARAM(Solver.ACCURACY, 1e-8)
-	PARAM(Solver.NR_LOOPS, 9000)
-	PARAM(Solver.SOR_FACTOR, 0.001)
-	PARAM(Solver.GS_LOOPS, 1)
-	//PARAM(Solver.GS_THRESHOLD, 99)
-	PARAM(Solver.ITERATIVE, "SOR")
+	PARAM(Solver.NR_LOOPS, 90)
+	PARAM(Solver.SOR_FACTOR, 1.01)
+	PARAM(Solver.GS_LOOPS, 4)
+	//PARAM(Solver.METHOD, "GMRES")
+	PARAM(Solver.METHOD, "MAT_CR")
+	//PARAM(Solver.METHOD, "SOR")
+
+#if USE_OPTMIZATIONS
+#if USE_FRONTIERS
+	SOLVER(Solver, 24000)
+#else
+	SOLVER(Solver, 48000)
+#endif
+	PARAM(Solver.DYNAMIC_TS, 0	)
+	PARAM(Solver.PARALLEL, 1)
+#else
+	SOLVER(Solver, 24000)
+	PARAM(Solver.DYNAMIC_TS, 1)
+	PARAM(Solver.DYNAMIC_LTE, 1e-4)
+	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 5e-7)
 	PARAM(Solver.PARALLEL, 0)
 	PARAM(Solver.PIVOT, 0)
+#endif
 
 	LOCAL_SOURCE(congob_lib)
 	INCLUDE(congob_lib)
 
 	TTL_INPUT(I_BASS_DRUM0, 0)
-	//CLOCK(I_BASS_DRUM0, 2)
 	TTL_INPUT(I_CONGA_H0, 0)
-	//CLOCK(I_CONGA_H0, 2)
 	TTL_INPUT(I_CONGA_L0, 0)
-	//CLOCK(I_CONGA_L0, 2)
 	TTL_INPUT(I_GORILLA0, 0)
-	//CLOCK(I_GORILLA0, 2)
 	TTL_INPUT(I_RIM0, 0)
-	//CLOCK(I_RIM0, 2)
 
 	ALIAS(I_V0.Q, GND.Q)
 
@@ -80,6 +96,16 @@ NETLIST_START(dummy)
 	NET_MODEL("2SC1941 NPN(IS=46.416f BF=210 NF=1.0022 VAF=600 IKF=500m ISE=60f NE=1.5 BR=2.0122 NR=1.0022 VAR=10G IKR=10G ISC=300p NC=2 RB=13.22 IRB=10G RBM=13.22 RE=100m RC=790m CJE=26.52p VJE=900m MJE=518m TF=1.25n XTF=10 VTF=10 ITF=500m PTF=0 CJC=4.89p VJC=750m MJC=237m XCJC=500m TR=100n CJS=0 VJS=750m MJS=500m XTB=1.5 EG=1.11 XTI=3 KF=0 AF=1 FC=500m)")
 
 	INCLUDE(CongoBongo_schematics)
+
+#if USE_OPTMIZATIONS
+	/* provide resistance feedback loop. This helps convergence for
+	 * Newton-Raphson a lot. This puts a resistor of 1e100 Ohms in parallel
+	 * to the feedback loop consisting of D9 and Q2.
+	 */
+
+	RES(RX1, 1e100)
+	NET_C(RX1.1, Q2.C)
+	NET_C(RX1.2, XU16.7)
 
 	/* The opamp actually has an FPF of about 500k. This doesn't work here and causes oscillations.
 	 * FPF here therefore about half the Solver clock.
@@ -102,7 +128,7 @@ NETLIST_START(dummy)
 	PARAM(XU13.D.MODEL, "MB3614(TYPE=1)")
 #endif
 
-#if 1
+#if USE_FRONTIERS
 	OPTIMIZE_FRONTIER(C51.1, RES_K(20), 50)
 	OPTIMIZE_FRONTIER(R77.2, RES_K(20), 50)
 
@@ -113,6 +139,7 @@ NETLIST_START(dummy)
 
 	OPTIMIZE_FRONTIER(R90.2, RES_K(100), 50)
 	OPTIMIZE_FRONTIER(R92.2, RES_K(15), 50)
+#endif
 #endif
 NETLIST_END()
 
@@ -348,97 +375,13 @@ NETLIST_START(CongoBongo_schematics)
 	NET_C(C61.1, R94.2)
 NETLIST_END()
 
-NETLIST_START(opamp_mod)
-
-	/* Opamp model from
-	 *
-	 * http://www.ecircuitcenter.com/Circuits/opmodel1/opmodel1.htm
-	 *
-	 * MB3614 Unit Gain frequency is about 500 kHz and the first pole frequency
-	 * about 5 Hz. We have to keep the Unity Gain Frequency below our sampling
-	 * frequency of 24 Khz.
-	 *
-	 * Simple Opamp Model Calculation
-	 *
-	 * First Pole Frequency		      5	Hz
-	 * Unity Gain Frequency		 11,000	Hz
-	 * RP						100,000	Ohm
-	 * DC Gain / Aol			   2200
-	 * CP		                  0.318	uF
-	 * KG		                 0.022
-	 *
-	 */
-
-	/* Terminal definitions for calling netlists */
-
-	ALIAS(PLUS, G1.IP) // Positive input
-	ALIAS(MINUS, G1.IN) // Negative input
-	ALIAS(OUT, EBUF.OP) // Opamp output ...
-
-	AFUNC(fUH, 1, "A0 1.2 -")
-	AFUNC(fUL, 1, "A0 1.2 +")
-
-	ALIAS(VCC, fUH.A0) // VCC terminal
-	ALIAS(GND, fUL.A0) // VGND terminal
-
-	AFUNC(fVREF, 2, "A0 A1 + 0.5 *")
-	NET_C(fUH.A0, fVREF.A0)
-	NET_C(fUL.A0, fVREF.A1)
-
-	NET_C(EBUF.ON, fVREF)
-	/* The opamp model */
-
-	LVCCS(G1)
-	PARAM(G1.RI, RES_K(1000))
-#if 0
-	PARAM(G1.G, 0.0022)
-	RES(RP1, 1e6)
-	CAP(CP1, 0.0318e-6)
-#else
-	PARAM(G1.G, 0.002)
-	PARAM(G1.CURLIM, 0.002)
-	RES(RP1, 9.5e6)
-	CAP(CP1, 0.0033e-6)
-#endif
-	VCVS(EBUF)
-	PARAM(EBUF.RO, 50)
-	PARAM(EBUF.G, 1)
-
-	NET_C(G1.ON, fVREF)
-	NET_C(RP1.2, fVREF)
-	NET_C(CP1.2, fVREF)
-	NET_C(EBUF.IN, fVREF)
-
-	NET_C(RP1.1, G1.OP)
-	NET_C(CP1.1, RP1.1)
-
-	DIODE(DP,"D(IS=1e-15 N=1)")
-	DIODE(DN,"D(IS=1e-15 N=1)")
-#if 1
-	NET_C(DP.K, fUH.Q)
-	NET_C(fUL.Q, DN.A)
-	NET_C(DP.A, DN.K, RP1.1)
-#else
-	/*
-	 * This doesn't add any performance by decreasing iteration loops.
-	 * To the contrary, it significantly decreases iterations
-	 */
-	RES(RH1, 0.1)
-	RES(RL1, 0.1)
-	NET_C(DP.K, RH1.1)
-	NET_C(RH1.2, fUH.Q)
-	NET_C(fUL.Q, RL1.1)
-	NET_C(RL1.2, DN.A)
-	NET_C(DP.A, DN.K, RP1.1)
-
-#endif
-	NET_C(EBUF.IP, RP1.1)
-
-NETLIST_END()
 
 
 NETLIST_START(G501534_DIP)
-	AFUNC(f, 2, "A0 A1 0.2 * *")
+	//AFUNC(f, 2, "A0 A1 A1 A1 * * 0.01 * *")
+	//AFUNC(f, 2, "A0")
+	//AFUNC(f, 2, "A0 6 - A1 3 pow * 0.02 * 6 +")
+	AFUNC(f, 2, "A0 * pow(A1,3.0) * 0.02")
 
 	/*
 	 * 12:   VCC

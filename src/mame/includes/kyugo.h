@@ -23,22 +23,22 @@ public:
 		m_palette(*this, "palette")  { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_fgvideoram;
-	required_shared_ptr<UINT8> m_bgvideoram;
-	required_shared_ptr<UINT8> m_bgattribram;
-	required_shared_ptr<UINT8> m_spriteram_1;
-	required_shared_ptr<UINT8> m_spriteram_2;
-	required_shared_ptr<UINT8> m_shared_ram;
+	required_shared_ptr<uint8_t> m_fgvideoram;
+	required_shared_ptr<uint8_t> m_bgvideoram;
+	required_shared_ptr<uint8_t> m_bgattribram;
+	required_shared_ptr<uint8_t> m_spriteram_1;
+	required_shared_ptr<uint8_t> m_spriteram_2;
+	required_shared_ptr<uint8_t> m_shared_ram;
 
 	/* video-related */
 	tilemap_t     *m_bg_tilemap;
 	tilemap_t     *m_fg_tilemap;
-	UINT8       m_scroll_x_lo;
-	UINT8       m_scroll_x_hi;
-	UINT8       m_scroll_y;
+	uint8_t       m_scroll_x_lo;
+	uint8_t       m_scroll_x_hi;
+	uint8_t       m_scroll_y;
 	int         m_bgpalbank;
 	int         m_fgcolor;
-	const UINT8 *m_color_codes;
+	const uint8_t *m_color_codes;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -46,7 +46,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	UINT8       m_nmi_mask;
+	uint8_t       m_nmi_mask;
 	DECLARE_WRITE8_MEMBER(kyugo_nmi_mask_w);
 	DECLARE_WRITE8_MEMBER(kyugo_sub_cpu_control_w);
 	DECLARE_WRITE8_MEMBER(kyugo_coin_counter_w);
@@ -64,7 +64,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_kyugo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_kyugo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 };

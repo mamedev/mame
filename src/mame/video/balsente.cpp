@@ -121,13 +121,13 @@ WRITE8_MEMBER(balsente_state::shrike_sprite_select_w)
  *
  *************************************/
 
-void balsente_state::draw_one_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 *sprite)
+void balsente_state::draw_one_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *sprite)
 {
 	int flags = sprite[0];
 	int image = sprite[1] | ((flags & 7) << 8);
 	int ypos = sprite[2] + 17 + BALSENTE_VBEND;
 	int xpos = sprite[3];
-	UINT8 *src;
+	uint8_t *src;
 	int x, y;
 
 	/* get a pointer to the source image */
@@ -140,7 +140,7 @@ void balsente_state::draw_one_sprite(bitmap_ind16 &bitmap, const rectangle &clip
 		if (ypos >= (16 + BALSENTE_VBEND) && ypos >= cliprect.min_y && ypos <= cliprect.max_y)
 		{
 			const pen_t *pens = &m_palette->pen(m_palettebank_vis * 256);
-			UINT8 *old = &m_expanded_videoram[(ypos - BALSENTE_VBEND) * 256 + xpos];
+			uint8_t *old = &m_expanded_videoram[(ypos - BALSENTE_VBEND) * 256 + xpos];
 			int currx = xpos;
 
 			/* standard case */
@@ -204,7 +204,7 @@ void balsente_state::draw_one_sprite(bitmap_ind16 &bitmap, const rectangle &clip
  *
  *************************************/
 
-UINT32 balsente_state::screen_update_balsente(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t balsente_state::screen_update_balsente(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	const pen_t *pens = &m_palette->pen(m_palettebank_vis * 256);
 	int y, i;

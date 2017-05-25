@@ -1,0 +1,40 @@
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+<exe-name> is a <version> host application.
+Run with -? for options
+
+-------------------------------------------------------------------------------
+# A test name that starts with a #
+-------------------------------------------------------------------------------
+MiscTests.cpp:<line number>
+...............................................................................
+
+MiscTests.cpp:<line number>:
+PASSED:
+with message:
+  yay
+
+-------------------------------------------------------------------------------
+'Not' checks that should fail
+-------------------------------------------------------------------------------
+ConditionTests.cpp:<line number>
+...............................................................................
+
+ConditionTests.cpp:<line number>: FAILED:
+  CHECK( false != false )
+
+ConditionTests.cpp:<line number>: FAILED:
+  CHECK( true != true )
+
+ConditionTests.cpp:<line number>: FAILED:
+  CHECK( !true )
+with expansion:
+  false
+
+ConditionTests.cpp:<line number>: FAILED:
+  CHECK_FALSE( true )
+
+===============================================================================
+test cases: 2 | 1 passed | 1 failed
+assertions: 5 | 1 passed | 4 failed
+

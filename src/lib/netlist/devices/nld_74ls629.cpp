@@ -40,7 +40,7 @@
 
 
 #include "nld_74ls629.h"
-#include "analog/nld_twoterm.h"
+#include "../analog/nlid_twoterm.h"
 
 namespace netlist
 {
@@ -55,12 +55,12 @@ namespace netlist
 		, m_out(*this, "m_out", 0)
 		, m_inc(*this, "m_inc", netlist_time::zero())
 		{
-			connect_late(m_FB, m_Y);
+			connect(m_FB, m_Y);
 		}
 
 		NETLIB_RESETI()
 		{
-			m_enableq = 1;
+			m_enableq = 0;
 			m_out = 0;
 			m_inc = netlist_time::zero();
 		}
@@ -89,9 +89,9 @@ namespace netlist
 		{
 			register_subalias("GND",    m_R_FC.m_N);
 
-			connect_late(m_FC, m_R_FC.m_P);
-			connect_late(m_RNG, m_R_RNG.m_P);
-			connect_late(m_R_FC.m_N, m_R_RNG.m_N);
+			connect(m_FC, m_R_FC.m_P);
+			connect(m_RNG, m_R_RNG.m_P);
+			connect(m_R_FC.m_N, m_R_RNG.m_N);
 
 			register_subalias("Y", m_clock.m_Y);
 		}
@@ -108,8 +108,8 @@ namespace netlist
 
 	public:
 		NETLIB_SUB(SN74LS629clk) m_clock;
-		NETLIB_SUB(R_base) m_R_FC;
-		NETLIB_SUB(R_base) m_R_RNG;
+		analog::NETLIB_SUB(R_base) m_R_FC;
+		analog::NETLIB_SUB(R_base) m_R_RNG;
 
 		logic_input_t m_ENQ;
 		analog_input_t m_RNG;
@@ -133,7 +133,7 @@ namespace netlist
 
 			register_subalias("8",  m_1.m_R_FC.m_N);
 			register_subalias("9",  m_1.m_R_FC.m_N);
-			connect_late(m_1.m_R_FC.m_N, m_2.m_R_FC.m_N);
+			connect(m_1.m_R_FC.m_N, m_2.m_R_FC.m_N);
 
 			register_subalias("10",  m_2.m_clock.m_Y);
 
@@ -160,11 +160,11 @@ namespace netlist
 		if (!m_enableq)
 		{
 			m_out = m_out ^ 1;
-			OUTLOGIC(m_Y, m_out, m_inc);
+			m_Y.push(m_out, m_inc);
 		}
 		else
 		{
-			OUTLOGIC(m_Y, 1, m_inc);
+			m_Y.push(1, m_inc);
 		}
 	}
 
@@ -174,8 +174,8 @@ namespace netlist
 			// recompute
 			nl_double  freq;
 			nl_double  v_freq_2, v_freq_3, v_freq_4;
-			nl_double  v_freq = INPANALOG(m_FC);
-			nl_double  v_rng = INPANALOG(m_RNG);
+			nl_double  v_freq = m_FC();
+			nl_double  v_rng = m_RNG();
 
 			/* coefficients */
 			const nl_double k1 = 1.9904769024796283E+03;
@@ -207,27 +207,27 @@ namespace netlist
 			freq += k9 * v_rng * v_freq_3;
 			freq += k10 * v_rng * v_freq_4;
 
-			freq *= NL_FCONST(0.1e-6) / m_CAP;
+			freq *= NL_FCONST(0.1e-6) / m_CAP();
 
 			// FIXME: we need a possibility to remove entries from queue ...
 			//        or an exact model ...
-			m_clock.m_inc = netlist_time::from_double(0.5 / (double) freq);
+			m_clock.m_inc = netlist_time::from_double(0.5 / freq);
 			//m_clock.update();
 
 			//NL_VERBOSE_OUT(("{1} {2} {3} {4}\n", name(), v_freq, v_rng, freq));
 		}
 
-		if (!m_clock.m_enableq && INPLOGIC(m_ENQ))
+		if (!m_clock.m_enableq && m_ENQ())
 		{
 			m_clock.m_enableq = 1;
 			m_clock.m_out = m_clock.m_out ^ 1;
-			OUTLOGIC(m_clock.m_Y, m_clock.m_out, netlist_time::from_nsec(1));
+			m_clock.m_Y.push(m_clock.m_out, netlist_time::from_nsec(1));
 		}
-		else if (m_clock.m_enableq && !INPLOGIC(m_ENQ))
+		else if (m_clock.m_enableq && !m_ENQ())
 		{
 			m_clock.m_enableq = 0;
 			m_clock.m_out = m_clock.m_out ^ 1;
-			OUTLOGIC(m_clock.m_Y, m_clock.m_out, netlist_time::from_nsec(1));
+			m_clock.m_Y.push(m_clock.m_out, netlist_time::from_nsec(1));
 		}
 	}
 

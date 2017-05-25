@@ -1,11 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:smf
+#include "emu.h"
 #include "legscsi.h"
 
-legacy_scsi_host_adapter::legacy_scsi_host_adapter(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-	m_selected(0),
-	m_scsi_port(*this)
+legacy_scsi_host_adapter::legacy_scsi_host_adapter(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, m_selected(0)
+	, m_scsi_port(*this, finder_base::DUMMY_TAG)
 {
 }
 
@@ -38,7 +39,7 @@ bool legacy_scsi_host_adapter::select(int id)
 	return false;
 }
 
-void legacy_scsi_host_adapter::send_command(UINT8 *data, int bytes)
+void legacy_scsi_host_adapter::send_command(uint8_t *data, int bytes)
 {
 	scsihle_device *scsidev = get_device(m_selected);
 	if (scsidev != nullptr)
@@ -48,7 +49,7 @@ void legacy_scsi_host_adapter::send_command(UINT8 *data, int bytes)
 	}
 	else
 	{
-		logerror("%s: send_command unknown SCSI id %d\n", tag(), m_selected);
+		logerror("send_command unknown SCSI id %d\n", m_selected);
 	}
 }
 
@@ -63,7 +64,7 @@ int legacy_scsi_host_adapter::get_length(void)
 	}
 	else
 	{
-		logerror("%s: get_length unknown SCSI id %d\n", tag(), m_selected);
+		logerror("get_length unknown SCSI id %d\n", m_selected);
 		return 0;
 	}
 }
@@ -79,12 +80,12 @@ int legacy_scsi_host_adapter::get_phase(void)
 	}
 	else
 	{
-		logerror("%s: get_phase unknown SCSI id %d\n", tag(), m_selected);
+		logerror("get_phase unknown SCSI id %d\n", m_selected);
 		return 0;
 	}
 }
 
-void legacy_scsi_host_adapter::read_data(UINT8 *data, int bytes)
+void legacy_scsi_host_adapter::read_data(uint8_t *data, int bytes)
 {
 	scsihle_device *scsidev = get_device(m_selected);
 	if (scsidev != nullptr)
@@ -93,11 +94,11 @@ void legacy_scsi_host_adapter::read_data(UINT8 *data, int bytes)
 	}
 	else
 	{
-		logerror("%s: read_data unknown SCSI id %d\n", tag(), m_selected);
+		logerror("read_data unknown SCSI id %d\n", m_selected);
 	}
 }
 
-void legacy_scsi_host_adapter::write_data(UINT8 *data, int bytes)
+void legacy_scsi_host_adapter::write_data(uint8_t *data, int bytes)
 {
 	scsihle_device *scsidev = get_device(m_selected);
 	if (scsidev != nullptr)
@@ -106,11 +107,11 @@ void legacy_scsi_host_adapter::write_data(UINT8 *data, int bytes)
 	}
 	else
 	{
-		logerror("%s: write_data unknown SCSI id %d\n", tag(), m_selected);
+		logerror("write_data unknown SCSI id %d\n", m_selected);
 	}
 }
 
-UINT8 legacy_scsi_host_adapter::get_status()
+uint8_t legacy_scsi_host_adapter::get_status()
 {
 	scsihle_device *scsidev = get_device(m_selected);
 	if (scsidev != nullptr)
@@ -125,17 +126,17 @@ UINT8 legacy_scsi_host_adapter::get_status()
 	}
 	else
 	{
-		logerror("%s: get_status unknown SCSI id %d\n", tag(), m_selected);
+		logerror("get_status unknown SCSI id %d\n", m_selected);
 		return 0;
 	}
 }
 
 scsihle_device *legacy_scsi_host_adapter::get_device(int id)
 {
-	// steal scsi devices from bus
+	// steal SCSI devices from bus
 	for (device_t &device : m_scsi_port->subdevices())
 	{
-		SCSI_PORT_SLOT_device *slot = dynamic_cast<SCSI_PORT_SLOT_device *>(&device);
+		scsi_port_slot_device *slot = dynamic_cast<scsi_port_slot_device *>(&device);
 		if (slot != nullptr)
 		{
 			scsihle_device *scsidev = dynamic_cast<scsihle_device *>(slot->dev());

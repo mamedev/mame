@@ -26,19 +26,19 @@ public:
 		m_discrete(*this, "discrete"),
 		m_gfxdecode(*this, "gfxdecode") { }
 
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_colorram;
-	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_pc3092_data;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_pc3092_data;
 	required_device<cpu_device> m_maincpu;
 	required_device<sn76477_device> m_sn;
 	required_device<discrete_device> m_discrete;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	UINT16 m_collision_address;
-	UINT8 m_collision_address_clear;
+	uint16_t m_collision_address;
+	uint8_t m_collision_address_clear;
 	tilemap_t *m_bg_tilemap;
-	UINT8 m_irq_mask;
+	uint8_t m_irq_mask;
 	DECLARE_WRITE8_MEMBER(pc3092_w);
 	DECLARE_READ8_MEMBER(pc3259_r);
 	DECLARE_WRITE8_MEMBER(port_sound_w);
@@ -49,12 +49,12 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(crbaloon);
-	UINT32 screen_update_crbaloon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_crbaloon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	DECLARE_WRITE8_MEMBER(crbaloon_audio_set_music_freq);
 	DECLARE_WRITE8_MEMBER(crbaloon_audio_set_music_enable);
 	DECLARE_WRITE8_MEMBER(crbaloon_audio_set_laugh_enable);
-	UINT16 crbaloon_get_collision_address();
+	uint16_t crbaloon_get_collision_address();
 	void crbaloon_set_clear_collision_address(int _crbaloon_collision_address_clear);
 	void draw_sprite_and_check_collision(bitmap_ind16 &bitmap);
 	void pc3092_reset(void);

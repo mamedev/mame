@@ -46,7 +46,7 @@ WRITE8_MEMBER(exprraid_state::exprraid_scrolly_w)
 
 TILE_GET_INFO_MEMBER(exprraid_state::get_bg_tile_info)
 {
-	UINT8 *tilerom = memregion("gfx4")->base();
+	uint8_t *tilerom = memregion("gfx4")->base();
 
 	int data, attr, bank, code, color, flags;
 	int quadrant = 0, offs;
@@ -82,8 +82,8 @@ TILE_GET_INFO_MEMBER(exprraid_state::get_fg_tile_info)
 
 void exprraid_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(exprraid_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(exprraid_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(exprraid_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(exprraid_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_bg_tilemap->set_scroll_rows(2);
 	m_fg_tilemap->set_transparent_pen(0);
@@ -128,7 +128,7 @@ void exprraid_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 	}
 }
 
-UINT32 exprraid_state::screen_update_exprraid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t exprraid_state::screen_update_exprraid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);

@@ -29,15 +29,15 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<UINT16> m_bg_videoram;
-	required_shared_ptr<UINT16> m_mlow_videoram;
-	required_shared_ptr<UINT16> m_mhigh_videoram;
-	required_shared_ptr<UINT16> m_tx_videoram;
-	required_shared_ptr<UINT16> m_bg_scrollram;
-	required_shared_ptr<UINT16> m_mlow_scrollram;
-	required_shared_ptr<UINT16> m_mhigh_scrollram;
-	required_shared_ptr<UINT16> m_vidattrram;
-	required_shared_ptr<UINT16> m_spriteram;
+	required_shared_ptr<uint16_t> m_bg_videoram;
+	required_shared_ptr<uint16_t> m_mlow_videoram;
+	required_shared_ptr<uint16_t> m_mhigh_videoram;
+	required_shared_ptr<uint16_t> m_tx_videoram;
+	required_shared_ptr<uint16_t> m_bg_scrollram;
+	required_shared_ptr<uint16_t> m_mlow_scrollram;
+	required_shared_ptr<uint16_t> m_mhigh_scrollram;
+	required_shared_ptr<uint16_t> m_vidattrram;
+	required_shared_ptr<uint16_t> m_spriteram;
 
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_mlow_tilemap;
@@ -62,6 +62,6 @@ public:
 	TILE_GET_INFO_MEMBER(get_stlforce_tx_tile_info);
 
 	virtual void video_start() override;
-	UINT32 screen_update_stlforce(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_stlforce(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 };

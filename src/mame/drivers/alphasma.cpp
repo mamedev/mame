@@ -18,21 +18,23 @@
 #include "machine/ram.h"
 #include "video/hd44780.h"
 #include "rendlay.h"
+#include "screen.h"
 
 class alphasmart_state : public driver_device
 {
 public:
 	alphasmart_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_lcdc0(*this, "ks0066_0"),
-			m_lcdc1(*this, "ks0066_1"),
-			m_nvram(*this, "nvram"),
-			m_ram(*this, RAM_TAG),
-			m_rambank(*this, "rambank"),
-			m_keyboard(*this, "COL"),
-			m_battery_status(*this, "BATTERY")
-		{ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_lcdc0(*this, "ks0066_0")
+		, m_lcdc1(*this, "ks0066_1")
+		, m_nvram(*this, "nvram")
+		, m_ram(*this, RAM_TAG)
+		, m_rambank(*this, "rambank")
+		, m_keyboard(*this, "COL.%u", 0)
+		, m_battery_status(*this, "BATTERY")
+	{
+	}
 
 	required_device<cpu_device> m_maincpu;
 	required_device<hd44780_device> m_lcdc0;
@@ -46,7 +48,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(alphasmart);
-	virtual UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_INPUT_CHANGED_MEMBER(kb_irq);
 	DECLARE_READ8_MEMBER(kb_r);
@@ -59,9 +61,9 @@ public:
 	void update_lcdc(address_space &space, bool lcdc0, bool lcdc1);
 
 protected:
-	UINT8           m_matrix[2];
-	UINT8           m_port_a;
-	UINT8           m_port_d;
+	uint8_t           m_matrix[2];
+	uint8_t           m_port_a;
+	uint8_t           m_port_d;
 	std::unique_ptr<bitmap_ind16> m_tmp_bitmap;
 };
 
@@ -69,18 +71,19 @@ class asma2k_state : public alphasmart_state
 {
 public:
 	asma2k_state(const machine_config &mconfig, device_type type, const char *tag)
-		: alphasmart_state(mconfig, type, tag),
-			m_intram(*this, "internal_ram")
-		{ }
+		: alphasmart_state(mconfig, type, tag)
+		, m_intram(*this, "internal_ram")
+	{
+	}
 
-	required_shared_ptr<UINT8> m_intram;
+	required_shared_ptr<uint8_t> m_intram;
 
 	DECLARE_READ8_MEMBER(io_r);
 	DECLARE_WRITE8_MEMBER(io_w);
 	virtual DECLARE_WRITE8_MEMBER(port_a_w) override;
 
 private:
-	UINT8 m_lcd_ctrl;
+	uint8_t m_lcd_ctrl;
 };
 
 INPUT_CHANGED_MEMBER(alphasmart_state::kb_irq)
@@ -90,8 +93,8 @@ INPUT_CHANGED_MEMBER(alphasmart_state::kb_irq)
 
 READ8_MEMBER(alphasmart_state::kb_r)
 {
-	UINT16 matrix = (m_matrix[1]<<8) | m_matrix[0];
-	UINT8 data = 0xff;
+	uint16_t matrix = (m_matrix[1]<<8) | m_matrix[0];
+	uint8_t data = 0xff;
 
 	for(int i=0; i<16; i++)
 		if (!(matrix & (1<<i)))
@@ -119,7 +122,7 @@ void alphasmart_state::update_lcdc(address_space &space, bool lcdc0, bool lcdc1)
 {
 	if (m_matrix[1] & 0x04)
 	{
-		UINT8 lcdc_data = 0;
+		uint8_t lcdc_data = 0;
 
 		if (lcdc0)
 			lcdc_data |= m_lcdc0->read(space, BIT(m_matrix[1], 1));
@@ -131,7 +134,7 @@ void alphasmart_state::update_lcdc(address_space &space, bool lcdc0, bool lcdc1)
 	}
 	else
 	{
-		UINT8 lcdc_data = (m_port_d<<2) & 0xf0;
+		uint8_t lcdc_data = (m_port_d<<2) & 0xf0;
 
 		if (lcdc0)
 			m_lcdc0->write(space, BIT(m_matrix[1], 1), lcdc_data);
@@ -143,7 +146,7 @@ void alphasmart_state::update_lcdc(address_space &space, bool lcdc0, bool lcdc1)
 
 WRITE8_MEMBER(alphasmart_state::port_a_w)
 {
-	UINT8 changed = (m_port_a ^ data) & data;
+	uint8_t changed = (m_port_a ^ data) & data;
 	update_lcdc(space, changed & 0x80, changed & 0x20);
 	m_rambank->set_entry(((data>>3) & 0x01) | ((data>>4) & 0x02));
 	m_port_a = data;
@@ -191,7 +194,7 @@ WRITE8_MEMBER(asma2k_state::io_w)
 		kb_matrixh_w(space, offset, data);
 	else if (offset == 0x4000)
 	{
-		UINT8 changed = (m_lcd_ctrl ^ data) & data;
+		uint8_t changed = (m_lcd_ctrl ^ data) & data;
 		update_lcdc(space, changed & 0x01, changed & 0x02);
 		m_lcd_ctrl = data;
 	}
@@ -388,7 +391,7 @@ PALETTE_INIT_MEMBER(alphasmart_state, alphasmart)
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
 }
 
-UINT32 alphasmart_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t alphasmart_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_lcdc0->screen_update(screen, *m_tmp_bitmap, cliprect);
 	copybitmap(bitmap, *m_tmp_bitmap, 0, 0, 0, 0, cliprect);
@@ -399,7 +402,7 @@ UINT32 alphasmart_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 void alphasmart_state::machine_start()
 {
-	UINT8* ram = m_ram->pointer();
+	uint8_t* ram = m_ram->pointer();
 
 	m_rambank->configure_entries(0, 4, ram, 0x8000);
 	m_nvram->set_base(ram, 0x8000*4);
@@ -415,7 +418,7 @@ void alphasmart_state::machine_reset()
 	m_port_d = 0;
 }
 
-static MACHINE_CONFIG_START( alphasmart, alphasmart_state )
+static MACHINE_CONFIG_START( alphasmart )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC68HC11, XTAL_8MHz/2)  // MC68HC11D0, XTAL is 8 Mhz, unknown divider
 	MCFG_CPU_PROGRAM_MAP(alphasmart_mem)
@@ -446,7 +449,7 @@ static MACHINE_CONFIG_START( alphasmart, alphasmart_state )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED_CLASS( asma2k, alphasmart, asma2k_state )
+static MACHINE_CONFIG_DERIVED( asma2k, alphasmart )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(asma2k_mem)
 MACHINE_CONFIG_END
@@ -474,6 +477,6 @@ ROM_START( asma2k )
 ROM_END
 
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 1995, asmapro,  0,       0,  alphasmart, alphasmart, driver_device,   0,   "Intelligent Peripheral Devices",   "AlphaSmart Pro" , MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1997, asma2k ,  0,       0,  asma2k    , alphasmart, driver_device,   0,   "Intelligent Peripheral Devices",   "AlphaSmart 2000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE     INPUT       STATE             INIT  COMPANY                           FULLNAME           FLAGS
+COMP( 1995, asmapro, 0,      0,      alphasmart, alphasmart, alphasmart_state, 0,    "Intelligent Peripheral Devices", "AlphaSmart Pro" , MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1997, asma2k,  0,      0,      asma2k,     alphasmart, asma2k_state,     0,    "Intelligent Peripheral Devices", "AlphaSmart 2000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

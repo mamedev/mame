@@ -35,10 +35,11 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
-#include "sound/dac.h"
 #include "sound/msm5205.h"
 #include "sound/ay8910.h"
 #include "video/resnet.h"
+#include "screen.h"
+#include "speaker.h"
 
 class dacholer_state : public driver_device
 {
@@ -64,23 +65,23 @@ public:
 	required_device<generic_latch_8_device> m_soundlatch;
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_bgvideoram;
-	required_shared_ptr<UINT8> m_fgvideoram;
-	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<uint8_t> m_bgvideoram;
+	required_shared_ptr<uint8_t> m_fgvideoram;
+	required_shared_ptr<uint8_t> m_spriteram;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
 	tilemap_t  *m_fg_tilemap;
 	int      m_bg_bank;
-	UINT8    m_scroll_x;
-	UINT8    m_scroll_y;
+	uint8_t    m_scroll_x;
+	uint8_t    m_scroll_y;
 
 	/* sound-related */
 	int m_msm_data;
 	int m_msm_toggle;
-	UINT8 m_snd_interrupt_enable;
-	UINT8 m_music_interrupt_enable;
-	UINT8 m_snd_ack;
+	uint8_t m_snd_interrupt_enable;
+	uint8_t m_music_interrupt_enable;
+	uint8_t m_snd_ack;
 
 	DECLARE_WRITE8_MEMBER(bg_scroll_x_w);
 	DECLARE_WRITE8_MEMBER(bg_scroll_y_w);
@@ -101,7 +102,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(dacholer);
-	UINT32 screen_update_dacholer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_dacholer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(sound_irq);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
@@ -119,8 +120,8 @@ TILE_GET_INFO_MEMBER(dacholer_state::get_fg_tile_info)
 
 void dacholer_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dacholer_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dacholer_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dacholer_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dacholer_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_fg_tilemap->set_transparent_pen(0);
 }
@@ -166,7 +167,7 @@ void dacholer_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 	}
 }
 
-UINT32 dacholer_state::screen_update_dacholer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t dacholer_state::screen_update_dacholer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (flip_screen())
 	{
@@ -608,7 +609,7 @@ void dacholer_state::machine_reset()
 /* guess: use the same resistor values as Crazy Climber (needs checking on the real HW) */
 PALETTE_INIT_MEMBER(dacholer_state, dacholer)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances_rg[3] = { 1000, 470, 220 };
 	static const int resistances_b [2] = { 470, 220 };
 	double weights_rg[3], weights_b[2];
@@ -647,7 +648,7 @@ PALETTE_INIT_MEMBER(dacholer_state, dacholer)
 }
 
 /* note: clocks are taken from itaten sound reference recording */
-static MACHINE_CONFIG_START( dacholer, dacholer_state )
+static MACHINE_CONFIG_START( dacholer )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz/4)  /* ? */
@@ -691,7 +692,7 @@ static MACHINE_CONFIG_START( dacholer, dacholer_state )
 
 	MCFG_SOUND_ADD("msm", MSM5205, XTAL_384kHz)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(dacholer_state, adpcm_int))          /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S96_4B)  /* 1 / 96 = 3906.25Hz playback  - guess */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)  /* 1 / 96 = 3906.25Hz playback  - guess */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
@@ -846,6 +847,6 @@ ROM_START( itaten )
 ROM_END
 
 
-GAME( 1983, dacholer, 0, dacholer, dacholer, driver_device, 0, ROT0, "Nichibutsu",         "Dacholer",               MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, kickboy,  0, dacholer, kickboy, driver_device,  0, ROT0, "Nichibutsu",         "Kick Boy",               MACHINE_SUPPORTS_SAVE )
-GAME( 1984, itaten,   0, itaten,   itaten, driver_device,   0, ROT0, "Nichibutsu / Alice", "Itazura Tenshi (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, dacholer, 0, dacholer, dacholer, dacholer_state, 0, ROT0, "Nichibutsu",         "Dacholer",               MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, kickboy,  0, dacholer, kickboy,  dacholer_state, 0, ROT0, "Nichibutsu",         "Kick Boy",               MACHINE_SUPPORTS_SAVE )
+GAME( 1984, itaten,   0, itaten,   itaten,   dacholer_state, 0, ROT0, "Nichibutsu / Alice", "Itazura Tenshi (Japan)", MACHINE_SUPPORTS_SAVE )

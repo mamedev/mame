@@ -30,13 +30,13 @@ public:
 	int         m_sprite_colorbase;
 	int         m_layer_colorbase[4];
 	int         m_layerpri[3];
-	UINT16      m_spritebank;
+	uint16_t      m_spritebank;
 	int         m_tilebanks[4];
 	int         m_spritebanks[4];
 
 	/* misc */
-	UINT8       m_cur_control2;
-	UINT16      m_prot[2];
+	uint8_t       m_cur_control2;
+	uint16_t      m_prot[2];
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -52,7 +52,7 @@ public:
 	DECLARE_DRIVER_INIT(asterix);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	UINT32 screen_update_asterix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_asterix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(asterix_interrupt);
 	K05324X_CB_MEMBER(sprite_callback);
 	K056832_CB_MEMBER(tile_callback);

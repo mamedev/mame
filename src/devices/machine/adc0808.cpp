@@ -4,6 +4,10 @@
 
     National Semiconductor ADC0808/ADC0809 8-Bit A/D Converter emulation
 
+    The only difference between ADC0808 and ADC0809 is that the latter
+    chip allows twice as much adjusted error. Mitsubishi parts M58990P
+    and M58990P-1 are equivalent to ADC0808 and ADC0809.
+
 **********************************************************************/
 
 #include "emu.h"
@@ -17,21 +21,22 @@
 //**************************************************************************
 
 // device type definition
-const device_type ADC0808 = &device_creator<adc0808_device>;
+DEFINE_DEVICE_TYPE(ADC0808, adc0808_device, "adc0808", "ADC0808")
 
 //-------------------------------------------------
 //  adc0808_device - constructor
 //-------------------------------------------------
 
-adc0808_device::adc0808_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, ADC0808, "ADC0808", tag, owner, clock, "adc0808", __FILE__),
+adc0808_device::adc0808_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, ADC0808, tag, owner, clock),
 		m_out_eoc_cb(*this),
 		m_address(0),
 		m_start(0),
 		m_eoc(0),
 		m_next_eoc(0), m_sar(0),
 		m_cycle(0),
-		m_bit(0), m_cycle_timer(nullptr)
+		m_bit(0),
+		m_cycle_timer(nullptr)
 {
 }
 

@@ -31,10 +31,12 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/avalnche.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/watchdog.h"
 #include "sound/discrete.h"
-#include "includes/avalnche.h"
+#include "screen.h"
+#include "speaker.h"
 
 #include "avalnche.lh"
 
@@ -47,7 +49,7 @@
  *
  *************************************/
 
-UINT32 avalnche_state::screen_update_avalnche(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t avalnche_state::screen_update_avalnche(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	offs_t offs;
 
@@ -55,18 +57,18 @@ UINT32 avalnche_state::screen_update_avalnche(screen_device &screen, bitmap_rgb3
 	{
 		int i;
 
-		UINT8 x = offs << 3;
+		uint8_t x = offs << 3;
 		int y = offs >> 5;
-		UINT8 data = m_videoram[offs];
+		uint8_t data = m_videoram[offs];
 
 		for (i = 0; i < 8; i++)
 		{
 			pen_t pen;
 
 			if (m_avalance_video_inverted)
-				pen = (data & 0x80) ? rgb_t::white : rgb_t::black;
+				pen = (data & 0x80) ? rgb_t::white() : rgb_t::black();
 			else
-				pen = (data & 0x80) ? rgb_t::black : rgb_t::white;
+				pen = (data & 0x80) ? rgb_t::black() : rgb_t::white();
 
 			bitmap.pix32(y, x) = pen;
 
@@ -244,7 +246,7 @@ void avalnche_state::machine_reset()
 	m_avalance_video_inverted = 0;
 }
 
-static MACHINE_CONFIG_START( avalnche, avalnche_state )
+static MACHINE_CONFIG_START( avalnche )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502,MASTER_CLOCK/16)     /* clock input is the "2H" signal divided by two */
@@ -326,6 +328,6 @@ ROM_END
  *
  *************************************/
 
-GAMEL( 1978, avalnche, 0,        avalnche, avalnche, driver_device, 0, ROT0, "Atari", "Avalanche", MACHINE_SUPPORTS_SAVE, layout_avalnche )
-GAMEL( 1978, cascade,  avalnche, avalnche, cascade, driver_device,  0, ROT0, "bootleg? (Sidam)", "Cascade", MACHINE_SUPPORTS_SAVE, layout_avalnche )
-GAME ( 1977, catchp,   0,        catch,    catch, driver_device,    0, ROT0, "Atari", "Catch (prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND ) // pre-production board, evolved into Avalanche
+GAMEL( 1978, avalnche, 0,        avalnche, avalnche, avalnche_state, 0, ROT0, "Atari",            "Avalanche", MACHINE_SUPPORTS_SAVE, layout_avalnche )
+GAMEL( 1978, cascade,  avalnche, avalnche, cascade,  avalnche_state, 0, ROT0, "bootleg? (Sidam)", "Cascade", MACHINE_SUPPORTS_SAVE, layout_avalnche )
+GAME ( 1977, catchp,   0,        catch,    catch,    avalnche_state, 0, ROT0, "Atari",            "Catch (prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND ) // pre-production board, evolved into Avalanche

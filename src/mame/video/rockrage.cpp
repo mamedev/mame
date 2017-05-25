@@ -5,13 +5,13 @@
 
 PALETTE_INIT_MEMBER(rockrage_state, rockrage)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 
 	for (int i = 0; i < 256*3; i++)
 	{
 		// layer0 uses colors 0x00-0x0f; layer1 uses 0x10-0x1f; sprites use 0x20-0x2f
-		UINT8 colorbase = (i / 256) * 16;
-		UINT8 ctabentry = (color_prom[i] & 0x0f) | colorbase;
+		uint8_t colorbase = (i / 256) * 16;
+		uint8_t ctabentry = (color_prom[i] & 0x0f) | colorbase;
 		palette.set_pen_indirect(i, ctabentry);
 	}
 }
@@ -66,7 +66,7 @@ WRITE8_MEMBER(rockrage_state::rockrage_vreg_w)
 
 ***************************************************************************/
 
-UINT32 rockrage_state::screen_update_rockrage(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t rockrage_state::screen_update_rockrage(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_k007342->tilemap_update();
 

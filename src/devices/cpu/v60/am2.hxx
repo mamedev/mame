@@ -3,21 +3,21 @@
 // AM2 Functions (for ReadAMAddress)
 // *********************************
 
-UINT32 v60_device::am2Register()
+uint32_t v60_device::am2Register()
 {
 	m_amflag = 1;
 	m_amout = m_modval & 0x1F;
 	return 1;
 }
 
-UINT32 v60_device::am2RegisterIndirect()
+uint32_t v60_device::am2RegisterIndirect()
 {
 	m_amflag = 0;
 	m_amout = m_reg[m_modval & 0x1F];
 	return 1;
 }
 
-UINT32 v60_device::bam2RegisterIndirect()
+uint32_t v60_device::bam2RegisterIndirect()
 {
 	m_amflag = 0;
 	m_amout = m_reg[m_modval & 0x1F];
@@ -25,7 +25,7 @@ UINT32 v60_device::bam2RegisterIndirect()
 	return 1;
 }
 
-UINT32 v60_device::am2RegisterIndirectIndexed()
+uint32_t v60_device::am2RegisterIndirectIndexed()
 {
 	m_amflag = 0;
 
@@ -48,7 +48,7 @@ UINT32 v60_device::am2RegisterIndirectIndexed()
 	return 2;
 }
 
-UINT32 v60_device::bam2RegisterIndirectIndexed()
+uint32_t v60_device::bam2RegisterIndirectIndexed()
 {
 	m_amflag = 0;
 	m_amout = m_reg[m_modval2 & 0x1F];
@@ -56,7 +56,7 @@ UINT32 v60_device::bam2RegisterIndirectIndexed()
 	return 2;
 }
 
-UINT32 v60_device::am2Autoincrement()
+uint32_t v60_device::am2Autoincrement()
 {
 	m_amflag = 0;
 	m_amout = m_reg[m_modval & 0x1F];
@@ -80,7 +80,7 @@ UINT32 v60_device::am2Autoincrement()
 	return 1;
 }
 
-UINT32 v60_device::bam2Autoincrement()
+uint32_t v60_device::bam2Autoincrement()
 {
 	m_amflag = 0;
 	m_amout = m_reg[m_modval & 0x1F];
@@ -102,7 +102,7 @@ UINT32 v60_device::bam2Autoincrement()
 	return 1;
 }
 
-UINT32 v60_device::am2Autodecrement()
+uint32_t v60_device::am2Autodecrement()
 {
 	m_amflag = 0;
 
@@ -126,7 +126,7 @@ UINT32 v60_device::am2Autodecrement()
 	return 1;
 }
 
-UINT32 v60_device::bam2Autodecrement()
+uint32_t v60_device::bam2Autodecrement()
 {
 	m_amflag = 0;
 	m_bamoffset = 0;
@@ -149,41 +149,41 @@ UINT32 v60_device::bam2Autodecrement()
 }
 
 
-UINT32 v60_device::am2Displacement8()
+uint32_t v60_device::am2Displacement8()
 {
 	m_amflag = 0;
-	m_amout = m_reg[m_modval & 0x1F] + (INT8)OpRead8(m_modadd + 1);
+	m_amout = m_reg[m_modval & 0x1F] + (int8_t)OpRead8(m_modadd + 1);
 
 	return 2;
 }
 
-UINT32 v60_device::bam2Displacement8()
+uint32_t v60_device::bam2Displacement8()
 {
 	m_amflag = 0;
 	m_amout = m_reg[m_modval & 0x1F];
-	m_bamoffset = (INT8)OpRead8(m_modadd + 1);
+	m_bamoffset = (int8_t)OpRead8(m_modadd + 1);
 
 	return 2;
 }
 
-UINT32 v60_device::am2Displacement16()
+uint32_t v60_device::am2Displacement16()
 {
 	m_amflag = 0;
-	m_amout = m_reg[m_modval & 0x1F] + (INT16)OpRead16(m_modadd + 1);
+	m_amout = m_reg[m_modval & 0x1F] + (int16_t)OpRead16(m_modadd + 1);
 
 	return 3;
 }
 
-UINT32 v60_device::bam2Displacement16()
+uint32_t v60_device::bam2Displacement16()
 {
 	m_amflag = 0;
 	m_amout = m_reg[m_modval & 0x1F];
-	m_bamoffset = (INT16)OpRead16(m_modadd + 1);
+	m_bamoffset = (int16_t)OpRead16(m_modadd + 1);
 
 	return 3;
 }
 
-UINT32 v60_device::am2Displacement32()
+uint32_t v60_device::am2Displacement32()
 {
 	m_amflag = 0;
 	m_amout = m_reg[m_modval & 0x1F] + OpRead32(m_modadd + 1);
@@ -191,7 +191,7 @@ UINT32 v60_device::am2Displacement32()
 	return 5;
 }
 
-UINT32 v60_device::bam2Displacement32()
+uint32_t v60_device::bam2Displacement32()
 {
 	m_amflag = 0;
 	m_amout = m_reg[m_modval & 0x1F];
@@ -200,71 +200,71 @@ UINT32 v60_device::bam2Displacement32()
 	return 5;
 }
 
-UINT32 v60_device::am2DisplacementIndexed8()
+uint32_t v60_device::am2DisplacementIndexed8()
 {
 	m_amflag = 0;
 
 	switch (m_moddim)
 	{
 	case 0:
-		m_amout = m_reg[m_modval2 & 0x1F] + (INT8)OpRead8(m_modadd + 2) + m_reg[m_modval & 0x1F];
+		m_amout = m_reg[m_modval2 & 0x1F] + (int8_t)OpRead8(m_modadd + 2) + m_reg[m_modval & 0x1F];
 		break;
 	case 1:
-		m_amout = m_reg[m_modval2 & 0x1F] + (INT8)OpRead8(m_modadd + 2) + m_reg[m_modval & 0x1F] * 2;
+		m_amout = m_reg[m_modval2 & 0x1F] + (int8_t)OpRead8(m_modadd + 2) + m_reg[m_modval & 0x1F] * 2;
 		break;
 	case 2:
-		m_amout = m_reg[m_modval2 & 0x1F] + (INT8)OpRead8(m_modadd + 2) + m_reg[m_modval & 0x1F] * 4;
+		m_amout = m_reg[m_modval2 & 0x1F] + (int8_t)OpRead8(m_modadd + 2) + m_reg[m_modval & 0x1F] * 4;
 		break;
 	case 3:
-		m_amout = m_reg[m_modval2 & 0x1F] + (INT8)OpRead8(m_modadd + 2) + m_reg[m_modval & 0x1F] * 8;
+		m_amout = m_reg[m_modval2 & 0x1F] + (int8_t)OpRead8(m_modadd + 2) + m_reg[m_modval & 0x1F] * 8;
 		break;
 	}
 
 	return 3;
 }
 
-UINT32 v60_device::bam2DisplacementIndexed8()
+uint32_t v60_device::bam2DisplacementIndexed8()
 {
 	m_amflag = 0;
-	m_amout = m_reg[m_modval2 & 0x1F] + (INT8)OpRead8(m_modadd + 2);
+	m_amout = m_reg[m_modval2 & 0x1F] + (int8_t)OpRead8(m_modadd + 2);
 	m_bamoffset = m_reg[m_modval & 0x1F];
 
 	return 3;
 }
 
-UINT32 v60_device::am2DisplacementIndexed16()
+uint32_t v60_device::am2DisplacementIndexed16()
 {
 	m_amflag = 0;
 
 	switch (m_moddim)
 	{
 	case 0:
-		m_amout = m_reg[m_modval2 & 0x1F] + (INT16)OpRead16(m_modadd + 2) + m_reg[m_modval & 0x1F];
+		m_amout = m_reg[m_modval2 & 0x1F] + (int16_t)OpRead16(m_modadd + 2) + m_reg[m_modval & 0x1F];
 		break;
 	case 1:
-		m_amout = m_reg[m_modval2 & 0x1F] + (INT16)OpRead16(m_modadd + 2) + m_reg[m_modval & 0x1F] * 2;
+		m_amout = m_reg[m_modval2 & 0x1F] + (int16_t)OpRead16(m_modadd + 2) + m_reg[m_modval & 0x1F] * 2;
 		break;
 	case 2:
-		m_amout = m_reg[m_modval2 & 0x1F] + (INT16)OpRead16(m_modadd + 2) + m_reg[m_modval & 0x1F] * 4;
+		m_amout = m_reg[m_modval2 & 0x1F] + (int16_t)OpRead16(m_modadd + 2) + m_reg[m_modval & 0x1F] * 4;
 		break;
 	case 3:
-		m_amout = m_reg[m_modval2 & 0x1F] + (INT16)OpRead16(m_modadd + 2) + m_reg[m_modval & 0x1F] * 8;
+		m_amout = m_reg[m_modval2 & 0x1F] + (int16_t)OpRead16(m_modadd + 2) + m_reg[m_modval & 0x1F] * 8;
 		break;
 	}
 
 	return 4;
 }
 
-UINT32 v60_device::bam2DisplacementIndexed16()
+uint32_t v60_device::bam2DisplacementIndexed16()
 {
 	m_amflag = 0;
-	m_amout = m_reg[m_modval2 & 0x1F] + (INT16)OpRead16(m_modadd + 2);
+	m_amout = m_reg[m_modval2 & 0x1F] + (int16_t)OpRead16(m_modadd + 2);
 	m_bamoffset = m_reg[m_modval & 0x1F];
 
 	return 4;
 }
 
-UINT32 v60_device::am2DisplacementIndexed32()
+uint32_t v60_device::am2DisplacementIndexed32()
 {
 	m_amflag = 0;
 
@@ -287,7 +287,7 @@ UINT32 v60_device::am2DisplacementIndexed32()
 	return 6;
 }
 
-UINT32 v60_device::bam2DisplacementIndexed32()
+uint32_t v60_device::bam2DisplacementIndexed32()
 {
 	m_amflag = 0;
 	m_amout = m_reg[m_modval2 & 0x1F] + OpRead32(m_modadd + 2);
@@ -296,41 +296,41 @@ UINT32 v60_device::bam2DisplacementIndexed32()
 	return 6;
 }
 
-UINT32 v60_device::am2PCDisplacement8()
+uint32_t v60_device::am2PCDisplacement8()
 {
 	m_amflag = 0;
-	m_amout = PC + (INT8)OpRead8(m_modadd + 1);
+	m_amout = PC + (int8_t)OpRead8(m_modadd + 1);
 
 	return 2;
 }
 
-UINT32 v60_device::bam2PCDisplacement8()
+uint32_t v60_device::bam2PCDisplacement8()
 {
 	m_amflag = 0;
 	m_amout = PC;
-	m_bamoffset = (INT8)OpRead8(m_modadd + 1);
+	m_bamoffset = (int8_t)OpRead8(m_modadd + 1);
 
 	return 2;
 }
 
-UINT32 v60_device::am2PCDisplacement16()
+uint32_t v60_device::am2PCDisplacement16()
 {
 	m_amflag = 0;
-	m_amout = PC + (INT16)OpRead16(m_modadd + 1);
+	m_amout = PC + (int16_t)OpRead16(m_modadd + 1);
 
 	return 3;
 }
 
-UINT32 v60_device::bam2PCDisplacement16()
+uint32_t v60_device::bam2PCDisplacement16()
 {
 	m_amflag = 0;
 	m_amout = PC;
-	m_bamoffset = (INT16)OpRead16(m_modadd + 1);
+	m_bamoffset = (int16_t)OpRead16(m_modadd + 1);
 
 	return 3;
 }
 
-UINT32 v60_device::am2PCDisplacement32()
+uint32_t v60_device::am2PCDisplacement32()
 {
 	m_amflag = 0;
 	m_amout = PC + OpRead32(m_modadd + 1);
@@ -338,7 +338,7 @@ UINT32 v60_device::am2PCDisplacement32()
 	return 5;
 }
 
-UINT32 v60_device::bam2PCDisplacement32()
+uint32_t v60_device::bam2PCDisplacement32()
 {
 	m_amflag = 0;
 	m_amout = PC;
@@ -348,71 +348,71 @@ UINT32 v60_device::bam2PCDisplacement32()
 }
 
 
-UINT32 v60_device::am2PCDisplacementIndexed8()
+uint32_t v60_device::am2PCDisplacementIndexed8()
 {
 	m_amflag = 0;
 
 	switch (m_moddim)
 	{
 	case 0:
-		m_amout = PC + (INT8)OpRead8(m_modadd + 2) + m_reg[m_modval & 0x1F];
+		m_amout = PC + (int8_t)OpRead8(m_modadd + 2) + m_reg[m_modval & 0x1F];
 		break;
 	case 1:
-		m_amout = PC + (INT8)OpRead8(m_modadd + 2) + m_reg[m_modval & 0x1F] * 2;
+		m_amout = PC + (int8_t)OpRead8(m_modadd + 2) + m_reg[m_modval & 0x1F] * 2;
 		break;
 	case 2:
-		m_amout = PC + (INT8)OpRead8(m_modadd + 2) + m_reg[m_modval & 0x1F] * 4;
+		m_amout = PC + (int8_t)OpRead8(m_modadd + 2) + m_reg[m_modval & 0x1F] * 4;
 		break;
 	case 3:
-		m_amout = PC + (INT8)OpRead8(m_modadd + 2) + m_reg[m_modval & 0x1F] * 8;
+		m_amout = PC + (int8_t)OpRead8(m_modadd + 2) + m_reg[m_modval & 0x1F] * 8;
 		break;
 	}
 
 	return 3;
 }
 
-UINT32 v60_device::bam2PCDisplacementIndexed8()
+uint32_t v60_device::bam2PCDisplacementIndexed8()
 {
 	m_amflag = 0;
-	m_amout = PC + (INT8)OpRead8(m_modadd + 2);
+	m_amout = PC + (int8_t)OpRead8(m_modadd + 2);
 	m_bamoffset = m_reg[m_modval & 0x1F];
 
 	return 3;
 }
 
-UINT32 v60_device::am2PCDisplacementIndexed16()
+uint32_t v60_device::am2PCDisplacementIndexed16()
 {
 	m_amflag = 0;
 
 	switch (m_moddim)
 	{
 	case 0:
-		m_amout = PC + (INT16)OpRead16(m_modadd + 2) + m_reg[m_modval & 0x1F];
+		m_amout = PC + (int16_t)OpRead16(m_modadd + 2) + m_reg[m_modval & 0x1F];
 		break;
 	case 1:
-		m_amout = PC + (INT16)OpRead16(m_modadd + 2) + m_reg[m_modval & 0x1F] * 2;
+		m_amout = PC + (int16_t)OpRead16(m_modadd + 2) + m_reg[m_modval & 0x1F] * 2;
 		break;
 	case 2:
-		m_amout = PC + (INT16)OpRead16(m_modadd + 2) + m_reg[m_modval & 0x1F] * 4;
+		m_amout = PC + (int16_t)OpRead16(m_modadd + 2) + m_reg[m_modval & 0x1F] * 4;
 		break;
 	case 3:
-		m_amout = PC + (INT16)OpRead16(m_modadd + 2) + m_reg[m_modval & 0x1F] * 8;
+		m_amout = PC + (int16_t)OpRead16(m_modadd + 2) + m_reg[m_modval & 0x1F] * 8;
 		break;
 	}
 
 	return 4;
 }
 
-UINT32 v60_device::bam2PCDisplacementIndexed16()
+uint32_t v60_device::bam2PCDisplacementIndexed16()
 {
 	m_amflag = 0;
-	m_amout = PC + (INT16)OpRead16(m_modadd + 2);
+	m_amout = PC + (int16_t)OpRead16(m_modadd + 2);
 	m_bamoffset = m_reg[m_modval & 0x1F];
 
 	return 4;
 }
 
-UINT32 v60_device::am2PCDisplacementIndexed32()
+uint32_t v60_device::am2PCDisplacementIndexed32()
 {
 	m_amflag = 0;
 
@@ -435,7 +435,7 @@ UINT32 v60_device::am2PCDisplacementIndexed32()
 	return 6;
 }
 
-UINT32 v60_device::bam2PCDisplacementIndexed32()
+uint32_t v60_device::bam2PCDisplacementIndexed32()
 {
 	m_amflag = 0;
 	m_amout = PC + OpRead32(m_modadd + 2);
@@ -444,39 +444,39 @@ UINT32 v60_device::bam2PCDisplacementIndexed32()
 	return 6;
 }
 
-UINT32 v60_device::am2DisplacementIndirect8()
+uint32_t v60_device::am2DisplacementIndirect8()
 {
 	m_amflag = 0;
-	m_amout = m_program->read_dword_unaligned(m_reg[m_modval & 0x1F] + (INT8)OpRead8(m_modadd + 1));
+	m_amout = m_program->read_dword_unaligned(m_reg[m_modval & 0x1F] + (int8_t)OpRead8(m_modadd + 1));
 
 	return 2;
 }
 
-UINT32 v60_device::bam2DisplacementIndirect8()
+uint32_t v60_device::bam2DisplacementIndirect8()
 {
 	m_amflag = 0;
-	m_amout = m_program->read_dword_unaligned(m_reg[m_modval & 0x1F] + (INT8)OpRead8(m_modadd + 1));
+	m_amout = m_program->read_dword_unaligned(m_reg[m_modval & 0x1F] + (int8_t)OpRead8(m_modadd + 1));
 	m_bamoffset = 0;
 	return 2;
 }
 
-UINT32 v60_device::am2DisplacementIndirect16()
+uint32_t v60_device::am2DisplacementIndirect16()
 {
 	m_amflag = 0;
-	m_amout = m_program->read_dword_unaligned(m_reg[m_modval & 0x1F] + (INT16)OpRead16(m_modadd + 1));
+	m_amout = m_program->read_dword_unaligned(m_reg[m_modval & 0x1F] + (int16_t)OpRead16(m_modadd + 1));
 
 	return 3;
 }
 
-UINT32 v60_device::bam2DisplacementIndirect16()
+uint32_t v60_device::bam2DisplacementIndirect16()
 {
 	m_amflag = 0;
-	m_amout = m_program->read_dword_unaligned(m_reg[m_modval & 0x1F] + (INT16)OpRead16(m_modadd + 1));
+	m_amout = m_program->read_dword_unaligned(m_reg[m_modval & 0x1F] + (int16_t)OpRead16(m_modadd + 1));
 	m_bamoffset = 0;
 	return 3;
 }
 
-UINT32 v60_device::am2DisplacementIndirect32()
+uint32_t v60_device::am2DisplacementIndirect32()
 {
 	m_amflag = 0;
 	m_amout = m_program->read_dword_unaligned(m_reg[m_modval & 0x1F] + OpRead32(m_modadd + 1));
@@ -484,7 +484,7 @@ UINT32 v60_device::am2DisplacementIndirect32()
 	return 5;
 }
 
-UINT32 v60_device::bam2DisplacementIndirect32()
+uint32_t v60_device::bam2DisplacementIndirect32()
 {
 	m_amflag = 0;
 	m_amout = m_program->read_dword_unaligned(m_reg[m_modval & 0x1F] + OpRead32(m_modadd + 1));
@@ -493,71 +493,71 @@ UINT32 v60_device::bam2DisplacementIndirect32()
 	return 5;
 }
 
-UINT32 v60_device::am2DisplacementIndirectIndexed8()
+uint32_t v60_device::am2DisplacementIndirectIndexed8()
 {
 	m_amflag = 0;
 
 	switch (m_moddim)
 	{
 	case 0:
-		m_amout = m_program->read_dword_unaligned(m_reg[m_modval2 & 0x1F] + (INT8)OpRead8(m_modadd + 2)) + m_reg[m_modval & 0x1F];
+		m_amout = m_program->read_dword_unaligned(m_reg[m_modval2 & 0x1F] + (int8_t)OpRead8(m_modadd + 2)) + m_reg[m_modval & 0x1F];
 		break;
 	case 1:
-		m_amout = m_program->read_dword_unaligned(m_reg[m_modval2 & 0x1F] + (INT8)OpRead8(m_modadd + 2)) + m_reg[m_modval & 0x1F] * 2;
+		m_amout = m_program->read_dword_unaligned(m_reg[m_modval2 & 0x1F] + (int8_t)OpRead8(m_modadd + 2)) + m_reg[m_modval & 0x1F] * 2;
 		break;
 	case 2:
-		m_amout = m_program->read_dword_unaligned(m_reg[m_modval2 & 0x1F] + (INT8)OpRead8(m_modadd + 2)) + m_reg[m_modval & 0x1F] * 4;
+		m_amout = m_program->read_dword_unaligned(m_reg[m_modval2 & 0x1F] + (int8_t)OpRead8(m_modadd + 2)) + m_reg[m_modval & 0x1F] * 4;
 		break;
 	case 3:
-		m_amout = m_program->read_dword_unaligned(m_reg[m_modval2 & 0x1F] + (INT8)OpRead8(m_modadd + 2)) + m_reg[m_modval & 0x1F] * 8;
+		m_amout = m_program->read_dword_unaligned(m_reg[m_modval2 & 0x1F] + (int8_t)OpRead8(m_modadd + 2)) + m_reg[m_modval & 0x1F] * 8;
 		break;
 	}
 
 	return 3;
 }
 
-UINT32 v60_device::bam2DisplacementIndirectIndexed8()
+uint32_t v60_device::bam2DisplacementIndirectIndexed8()
 {
 	m_amflag = 0;
-	m_amout = m_program->read_dword_unaligned(m_reg[m_modval2 & 0x1F] + (INT8)OpRead8(m_modadd + 2));
+	m_amout = m_program->read_dword_unaligned(m_reg[m_modval2 & 0x1F] + (int8_t)OpRead8(m_modadd + 2));
 	m_bamoffset = m_reg[m_modval & 0x1F];
 
 	return 3;
 }
 
-UINT32 v60_device::am2DisplacementIndirectIndexed16()
+uint32_t v60_device::am2DisplacementIndirectIndexed16()
 {
 	m_amflag = 0;
 
 	switch (m_moddim)
 	{
 	case 0:
-		m_amout = m_program->read_dword_unaligned(m_reg[m_modval2 & 0x1F] + (INT16)OpRead16(m_modadd + 2)) + m_reg[m_modval & 0x1F];
+		m_amout = m_program->read_dword_unaligned(m_reg[m_modval2 & 0x1F] + (int16_t)OpRead16(m_modadd + 2)) + m_reg[m_modval & 0x1F];
 		break;
 	case 1:
-		m_amout = m_program->read_dword_unaligned(m_reg[m_modval2 & 0x1F] + (INT16)OpRead16(m_modadd + 2)) + m_reg[m_modval & 0x1F] * 2;
+		m_amout = m_program->read_dword_unaligned(m_reg[m_modval2 & 0x1F] + (int16_t)OpRead16(m_modadd + 2)) + m_reg[m_modval & 0x1F] * 2;
 		break;
 	case 2:
-		m_amout = m_program->read_dword_unaligned(m_reg[m_modval2 & 0x1F] + (INT16)OpRead16(m_modadd + 2)) + m_reg[m_modval & 0x1F] * 4;
+		m_amout = m_program->read_dword_unaligned(m_reg[m_modval2 & 0x1F] + (int16_t)OpRead16(m_modadd + 2)) + m_reg[m_modval & 0x1F] * 4;
 		break;
 	case 3:
-		m_amout = m_program->read_dword_unaligned(m_reg[m_modval2 & 0x1F] + (INT16)OpRead16(m_modadd + 2)) + m_reg[m_modval & 0x1F] * 8;
+		m_amout = m_program->read_dword_unaligned(m_reg[m_modval2 & 0x1F] + (int16_t)OpRead16(m_modadd + 2)) + m_reg[m_modval & 0x1F] * 8;
 		break;
 	}
 
 	return 4;
 }
 
-UINT32 v60_device::bam2DisplacementIndirectIndexed16()
+uint32_t v60_device::bam2DisplacementIndirectIndexed16()
 {
 	m_amflag = 0;
-	m_amout = m_program->read_dword_unaligned(m_reg[m_modval2 & 0x1F] + (INT16)OpRead16(m_modadd + 2));
+	m_amout = m_program->read_dword_unaligned(m_reg[m_modval2 & 0x1F] + (int16_t)OpRead16(m_modadd + 2));
 	m_bamoffset = m_reg[m_modval & 0x1F];
 
 	return 4;
 }
 
-UINT32 v60_device::am2DisplacementIndirectIndexed32()
+uint32_t v60_device::am2DisplacementIndirectIndexed32()
 {
 	m_amflag = 0;
 
@@ -580,7 +580,7 @@ UINT32 v60_device::am2DisplacementIndirectIndexed32()
 	return 6;
 }
 
-UINT32 v60_device::bam2DisplacementIndirectIndexed32()
+uint32_t v60_device::bam2DisplacementIndirectIndexed32()
 {
 	m_amflag = 0;
 	m_amout = m_program->read_dword_unaligned(m_reg[m_modval2 & 0x1F] + OpRead32(m_modadd + 2));
@@ -589,41 +589,41 @@ UINT32 v60_device::bam2DisplacementIndirectIndexed32()
 	return 6;
 }
 
-UINT32 v60_device::am2PCDisplacementIndirect8()
+uint32_t v60_device::am2PCDisplacementIndirect8()
 {
 	m_amflag = 0;
-	m_amout = m_program->read_dword_unaligned(PC + (INT8)OpRead8(m_modadd + 1));
+	m_amout = m_program->read_dword_unaligned(PC + (int8_t)OpRead8(m_modadd + 1));
 
 	return 2;
 }
 
-UINT32 v60_device::bam2PCDisplacementIndirect8()
+uint32_t v60_device::bam2PCDisplacementIndirect8()
 {
 	m_amflag = 0;
-	m_amout = m_program->read_dword_unaligned(PC + (INT8)OpRead8(m_modadd + 1));
+	m_amout = m_program->read_dword_unaligned(PC + (int8_t)OpRead8(m_modadd + 1));
 	m_bamoffset = 0;
 
 	return 2;
 }
 
-UINT32 v60_device::am2PCDisplacementIndirect16()
+uint32_t v60_device::am2PCDisplacementIndirect16()
 {
 	m_amflag = 0;
-	m_amout = m_program->read_dword_unaligned(PC + (INT16)OpRead16(m_modadd + 1));
+	m_amout = m_program->read_dword_unaligned(PC + (int16_t)OpRead16(m_modadd + 1));
 
 	return 3;
 }
 
-UINT32 v60_device::bam2PCDisplacementIndirect16()
+uint32_t v60_device::bam2PCDisplacementIndirect16()
 {
 	m_amflag = 0;
-	m_amout = m_program->read_dword_unaligned(PC + (INT16)OpRead16(m_modadd + 1));
+	m_amout = m_program->read_dword_unaligned(PC + (int16_t)OpRead16(m_modadd + 1));
 	m_bamoffset = 0;
 
 	return 3;
 }
 
-UINT32 v60_device::am2PCDisplacementIndirect32()
+uint32_t v60_device::am2PCDisplacementIndirect32()
 {
 	m_amflag = 0;
 	m_amout = m_program->read_dword_unaligned(PC + OpRead32(m_modadd + 1));
@@ -631,7 +631,7 @@ UINT32 v60_device::am2PCDisplacementIndirect32()
 	return 5;
 }
 
-UINT32 v60_device::bam2PCDisplacementIndirect32()
+uint32_t v60_device::bam2PCDisplacementIndirect32()
 {
 	m_amflag = 0;
 	m_amout = m_program->read_dword_unaligned(PC + OpRead32(m_modadd + 1));
@@ -640,55 +640,55 @@ UINT32 v60_device::bam2PCDisplacementIndirect32()
 	return 5;
 }
 
-UINT32 v60_device::am2PCDisplacementIndirectIndexed8()
+uint32_t v60_device::am2PCDisplacementIndirectIndexed8()
 {
 	m_amflag = 0;
 
 	switch (m_moddim)
 	{
 	case 0:
-		m_amout = m_program->read_dword_unaligned(PC + (INT8)OpRead8(m_modadd + 2)) + m_reg[m_modval & 0x1F];
+		m_amout = m_program->read_dword_unaligned(PC + (int8_t)OpRead8(m_modadd + 2)) + m_reg[m_modval & 0x1F];
 		break;
 	case 1:
-		m_amout = m_program->read_dword_unaligned(PC + (INT8)OpRead8(m_modadd + 2)) + m_reg[m_modval & 0x1F] * 2;
+		m_amout = m_program->read_dword_unaligned(PC + (int8_t)OpRead8(m_modadd + 2)) + m_reg[m_modval & 0x1F] * 2;
 		break;
 	case 2:
-		m_amout = m_program->read_dword_unaligned(PC + (INT8)OpRead8(m_modadd + 2)) + m_reg[m_modval & 0x1F] * 4;
+		m_amout = m_program->read_dword_unaligned(PC + (int8_t)OpRead8(m_modadd + 2)) + m_reg[m_modval & 0x1F] * 4;
 		break;
 	case 3:
-		m_amout = m_program->read_dword_unaligned(PC + (INT8)OpRead8(m_modadd + 2)) + m_reg[m_modval & 0x1F] * 8;
+		m_amout = m_program->read_dword_unaligned(PC + (int8_t)OpRead8(m_modadd + 2)) + m_reg[m_modval & 0x1F] * 8;
 		break;
 	}
 
 	return 3;
 }
 
-UINT32 v60_device::bam2PCDisplacementIndirectIndexed8()
+uint32_t v60_device::bam2PCDisplacementIndirectIndexed8()
 {
 	m_amflag = 0;
-	m_amout = m_program->read_dword_unaligned(PC + (INT8)OpRead8(m_modadd + 2));
+	m_amout = m_program->read_dword_unaligned(PC + (int8_t)OpRead8(m_modadd + 2));
 	m_bamoffset = m_reg[m_modval & 0x1F];
 
 	return 3;
 }
 
-UINT32 v60_device::am2PCDisplacementIndirectIndexed16()
+uint32_t v60_device::am2PCDisplacementIndirectIndexed16()
 {
 	m_amflag = 0;
 
 	switch (m_moddim)
 	{
 	case 0:
-		m_amout = m_program->read_dword_unaligned(PC + (INT16)OpRead16(m_modadd + 2)) + m_reg[m_modval & 0x1F];
+		m_amout = m_program->read_dword_unaligned(PC + (int16_t)OpRead16(m_modadd + 2)) + m_reg[m_modval & 0x1F];
 		break;
 	case 1:
-		m_amout = m_program->read_dword_unaligned(PC + (INT16)OpRead16(m_modadd + 2)) + m_reg[m_modval & 0x1F] * 2;
+		m_amout = m_program->read_dword_unaligned(PC + (int16_t)OpRead16(m_modadd + 2)) + m_reg[m_modval & 0x1F] * 2;
 		break;
 	case 2:
-		m_amout = m_program->read_dword_unaligned(PC + (INT16)OpRead16(m_modadd + 2)) + m_reg[m_modval & 0x1F] * 4;
+		m_amout = m_program->read_dword_unaligned(PC + (int16_t)OpRead16(m_modadd + 2)) + m_reg[m_modval & 0x1F] * 4;
 		break;
 	case 3:
-		m_amout = m_program->read_dword_unaligned(PC + (INT16)OpRead16(m_modadd + 2)) + m_reg[m_modval & 0x1F] * 8;
+		m_amout = m_program->read_dword_unaligned(PC + (int16_t)OpRead16(m_modadd + 2)) + m_reg[m_modval & 0x1F] * 8;
 		break;
 	}
 
@@ -696,17 +696,17 @@ UINT32 v60_device::am2PCDisplacementIndirectIndexed16()
 }
 
 
-UINT32 v60_device::bam2PCDisplacementIndirectIndexed16()
+uint32_t v60_device::bam2PCDisplacementIndirectIndexed16()
 {
 	m_amflag = 0;
-	m_amout = m_program->read_dword_unaligned(PC + (INT16)OpRead16(m_modadd + 2));
+	m_amout = m_program->read_dword_unaligned(PC + (int16_t)OpRead16(m_modadd + 2));
 	m_bamoffset = m_reg[m_modval & 0x1F];
 
 	return 4;
 }
 
 
-UINT32 v60_device::am2PCDisplacementIndirectIndexed32()
+uint32_t v60_device::am2PCDisplacementIndirectIndexed32()
 {
 	m_amflag = 0;
 
@@ -729,7 +729,7 @@ UINT32 v60_device::am2PCDisplacementIndirectIndexed32()
 	return 6;
 }
 
-UINT32 v60_device::bam2PCDisplacementIndirectIndexed32()
+uint32_t v60_device::bam2PCDisplacementIndirectIndexed32()
 {
 	m_amflag = 0;
 	m_amout = m_program->read_dword_unaligned(PC + OpRead32(m_modadd + 2));
@@ -738,41 +738,41 @@ UINT32 v60_device::bam2PCDisplacementIndirectIndexed32()
 	return 6;
 }
 
-UINT32 v60_device::am2DoubleDisplacement8()
+uint32_t v60_device::am2DoubleDisplacement8()
 {
 	m_amflag = 0;
-	m_amout = m_program->read_dword_unaligned(m_reg[m_modval & 0x1F] + (INT8)OpRead8(m_modadd + 1)) + (INT8)OpRead8(m_modadd + 2);
+	m_amout = m_program->read_dword_unaligned(m_reg[m_modval & 0x1F] + (int8_t)OpRead8(m_modadd + 1)) + (int8_t)OpRead8(m_modadd + 2);
 
 	return 3;
 }
 
-UINT32 v60_device::bam2DoubleDisplacement8()
+uint32_t v60_device::bam2DoubleDisplacement8()
 {
 	m_amflag = 0;
-	m_amout = m_program->read_dword_unaligned(m_reg[m_modval & 0x1F] + (INT8)OpRead8(m_modadd + 1));
-	m_bamoffset = (INT8)OpRead8(m_modadd + 2);
+	m_amout = m_program->read_dword_unaligned(m_reg[m_modval & 0x1F] + (int8_t)OpRead8(m_modadd + 1));
+	m_bamoffset = (int8_t)OpRead8(m_modadd + 2);
 
 	return 3;
 }
 
-UINT32 v60_device::am2DoubleDisplacement16()
+uint32_t v60_device::am2DoubleDisplacement16()
 {
 	m_amflag = 0;
-	m_amout = m_program->read_dword_unaligned(m_reg[m_modval & 0x1F] + (INT16)OpRead16(m_modadd + 1)) + (INT16)OpRead16(m_modadd + 3);
+	m_amout = m_program->read_dword_unaligned(m_reg[m_modval & 0x1F] + (int16_t)OpRead16(m_modadd + 1)) + (int16_t)OpRead16(m_modadd + 3);
 
 	return 5;
 }
 
-UINT32 v60_device::bam2DoubleDisplacement16()
+uint32_t v60_device::bam2DoubleDisplacement16()
 {
 	m_amflag = 0;
-	m_amout = m_program->read_dword_unaligned(m_reg[m_modval & 0x1F] + (INT16)OpRead16(m_modadd + 1));
-	m_bamoffset = (INT8)OpRead8(m_modadd + 3);
+	m_amout = m_program->read_dword_unaligned(m_reg[m_modval & 0x1F] + (int16_t)OpRead16(m_modadd + 1));
+	m_bamoffset = (int8_t)OpRead8(m_modadd + 3);
 
 	return 5;
 }
 
-UINT32 v60_device::am2DoubleDisplacement32()
+uint32_t v60_device::am2DoubleDisplacement32()
 {
 	m_amflag = 0;
 	m_amout = m_program->read_dword_unaligned(m_reg[m_modval & 0x1F] + OpRead32(m_modadd + 1)) + OpRead32(m_modadd + 5);
@@ -780,7 +780,7 @@ UINT32 v60_device::am2DoubleDisplacement32()
 	return 9;
 }
 
-UINT32 v60_device::bam2DoubleDisplacement32()
+uint32_t v60_device::bam2DoubleDisplacement32()
 {
 	m_amflag = 0;
 	m_amout = m_program->read_dword_unaligned(m_reg[m_modval & 0x1F] + OpRead32(m_modadd + 1));
@@ -790,41 +790,41 @@ UINT32 v60_device::bam2DoubleDisplacement32()
 }
 
 
-UINT32 v60_device::am2PCDoubleDisplacement8()
+uint32_t v60_device::am2PCDoubleDisplacement8()
 {
 	m_amflag = 0;
-	m_amout = m_program->read_dword_unaligned(PC + (INT8)OpRead8(m_modadd + 1)) + (INT8)OpRead8(m_modadd + 2);
+	m_amout = m_program->read_dword_unaligned(PC + (int8_t)OpRead8(m_modadd + 1)) + (int8_t)OpRead8(m_modadd + 2);
 
 	return 3;
 }
 
-UINT32 v60_device::bam2PCDoubleDisplacement8()
+uint32_t v60_device::bam2PCDoubleDisplacement8()
 {
 	m_amflag = 0;
-	m_amout = m_program->read_dword_unaligned(PC + (INT8)OpRead8(m_modadd + 1));
-	m_bamoffset = (INT8)OpRead8(m_modadd + 2);
+	m_amout = m_program->read_dword_unaligned(PC + (int8_t)OpRead8(m_modadd + 1));
+	m_bamoffset = (int8_t)OpRead8(m_modadd + 2);
 
 	return 3;
 }
 
-UINT32 v60_device::am2PCDoubleDisplacement16()
+uint32_t v60_device::am2PCDoubleDisplacement16()
 {
 	m_amflag = 0;
-	m_amout = m_program->read_dword_unaligned(PC + (INT16)OpRead16(m_modadd + 1)) + (INT16)OpRead16(m_modadd + 3);
+	m_amout = m_program->read_dword_unaligned(PC + (int16_t)OpRead16(m_modadd + 1)) + (int16_t)OpRead16(m_modadd + 3);
 
 	return 5;
 }
 
-UINT32 v60_device::bam2PCDoubleDisplacement16()
+uint32_t v60_device::bam2PCDoubleDisplacement16()
 {
 	m_amflag = 0;
-	m_amout = m_program->read_dword_unaligned(PC + (INT16)OpRead16(m_modadd + 1));
-	m_bamoffset = (INT8)OpRead8(m_modadd + 3);
+	m_amout = m_program->read_dword_unaligned(PC + (int16_t)OpRead16(m_modadd + 1));
+	m_bamoffset = (int8_t)OpRead8(m_modadd + 3);
 
 	return 5;
 }
 
-UINT32 v60_device::am2PCDoubleDisplacement32()
+uint32_t v60_device::am2PCDoubleDisplacement32()
 {
 	m_amflag = 0;
 	m_amout = m_program->read_dword_unaligned(PC + OpRead32(m_modadd + 1)) + OpRead32(m_modadd + 5);
@@ -832,7 +832,7 @@ UINT32 v60_device::am2PCDoubleDisplacement32()
 	return 9;
 }
 
-UINT32 v60_device::bam2PCDoubleDisplacement32()
+uint32_t v60_device::bam2PCDoubleDisplacement32()
 {
 	m_amflag = 0;
 	m_amout = m_program->read_dword_unaligned(PC + OpRead32(m_modadd + 1));
@@ -841,7 +841,7 @@ UINT32 v60_device::bam2PCDoubleDisplacement32()
 	return 9;
 }
 
-UINT32 v60_device::am2DirectAddress()
+uint32_t v60_device::am2DirectAddress()
 {
 	m_amflag = 0;
 	m_amout = OpRead32(m_modadd + 1);
@@ -849,7 +849,7 @@ UINT32 v60_device::am2DirectAddress()
 	return 5;
 }
 
-UINT32 v60_device::bam2DirectAddress()
+uint32_t v60_device::bam2DirectAddress()
 {
 	m_amflag = 0;
 	m_amout = OpRead32(m_modadd + 1);
@@ -858,7 +858,7 @@ UINT32 v60_device::bam2DirectAddress()
 	return 5;
 }
 
-UINT32 v60_device::am2DirectAddressIndexed()
+uint32_t v60_device::am2DirectAddressIndexed()
 {
 	m_amflag = 0;
 
@@ -881,7 +881,7 @@ UINT32 v60_device::am2DirectAddressIndexed()
 	return 6;
 }
 
-UINT32 v60_device::bam2DirectAddressIndexed()
+uint32_t v60_device::bam2DirectAddressIndexed()
 {
 	m_amflag = 0;
 	m_amout = OpRead32(m_modadd + 2);
@@ -890,7 +890,7 @@ UINT32 v60_device::bam2DirectAddressIndexed()
 	return 6;
 }
 
-UINT32 v60_device::am2DirectAddressDeferred()
+uint32_t v60_device::am2DirectAddressDeferred()
 {
 	m_amflag = 0;
 	m_amout = m_program->read_dword_unaligned(OpRead32(m_modadd + 1));
@@ -898,7 +898,7 @@ UINT32 v60_device::am2DirectAddressDeferred()
 	return 5;
 }
 
-UINT32 v60_device::bam2DirectAddressDeferred()
+uint32_t v60_device::bam2DirectAddressDeferred()
 {
 	m_amflag = 0;
 	m_amout = m_program->read_dword_unaligned(OpRead32(m_modadd + 1));
@@ -907,7 +907,7 @@ UINT32 v60_device::bam2DirectAddressDeferred()
 	return 5;
 }
 
-UINT32 v60_device::am2DirectAddressDeferredIndexed()
+uint32_t v60_device::am2DirectAddressDeferredIndexed()
 {
 	m_amflag = 0;
 
@@ -930,7 +930,7 @@ UINT32 v60_device::am2DirectAddressDeferredIndexed()
 	return 6;
 }
 
-UINT32 v60_device::bam2DirectAddressDeferredIndexed()
+uint32_t v60_device::bam2DirectAddressDeferredIndexed()
 {
 	m_amflag = 0;
 	m_amout = m_program->read_dword_unaligned(OpRead32(m_modadd + 2));
@@ -939,13 +939,13 @@ UINT32 v60_device::bam2DirectAddressDeferredIndexed()
 	return 6;
 }
 
-UINT32 v60_device::am2Immediate()
+uint32_t v60_device::am2Immediate()
 {
 	// ignore LDPR
 	return am1Immediate();
 }
 
-UINT32 v60_device::am2ImmediateQuick()
+uint32_t v60_device::am2ImmediateQuick()
 {
 	// ignore LDPR
 	return am1ImmediateQuick();
@@ -955,72 +955,72 @@ UINT32 v60_device::am2ImmediateQuick()
 // AM2 Tables (for ReadAMAddress)
 // ******************************
 
-UINT32 v60_device::am2Error1()
+uint32_t v60_device::am2Error1()
 {
 	// f1lap trips this, why?
 	logerror("CPU - AM2 - 1 (PC=%06x)", PC);
 	return 0;
 }
 
-UINT32 v60_device::am2Error2()
+uint32_t v60_device::am2Error2()
 {
 	fatalerror("CPU - AM2 - 2 (PC=%06x)\n", PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 
 #ifdef UNUSED_FUNCTION
-UINT32 v60_device::am2Error3()
+uint32_t v60_device::am2Error3()
 {
 	fatalerror("CPU - AM2 - 3 (PC=%06x)\n", PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 #endif
 
-UINT32 v60_device::am2Error4()
+uint32_t v60_device::am2Error4()
 {
 	fatalerror("CPU - AM2 - 4 (PC=%06x)\n", PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 
-UINT32 v60_device::am2Error5()
+uint32_t v60_device::am2Error5()
 {
 	fatalerror("CPU - AM2 - 5 (PC=%06x)\n", PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 
-UINT32 v60_device::bam2Error1()
+uint32_t v60_device::bam2Error1()
 {
 	fatalerror("CPU - BAM2 - 1 (PC=%06x)\n", PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 
-UINT32 v60_device::bam2Error2()
+uint32_t v60_device::bam2Error2()
 {
 	fatalerror("CPU - BAM2 - 2 (PC=%06x)\n", PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 
 #ifdef UNUSED_FUNCTION
-UINT32 v60_device::bam2Error3()
+uint32_t v60_device::bam2Error3()
 {
 	fatalerror("CPU - BAM2 - 3 (PC=%06x)\n", PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 #endif
 
-UINT32 v60_device::bam2Error4()
+uint32_t v60_device::bam2Error4()
 {
 	fatalerror("CPU - BAM2 - 4 (PC=%06x)\n", PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 
-UINT32 v60_device::bam2Error5()
+uint32_t v60_device::bam2Error5()
 {
 	fatalerror("CPU - BAM2 - 5 (PC=%06x)\n", PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 
-UINT32 v60_device::bam2Error6()
+uint32_t v60_device::bam2Error6()
 {
 	fatalerror("CPU - BAM2 - 6 (PC=%06x)\n", PC);
 	return 0; /* never reached, fatalerror won't return */
@@ -1067,7 +1067,7 @@ const v60_device::am_func v60_device::s_BAMTable2_G7a[16] =
 	&v60_device::bam2Error5
 };
 
-UINT32 v60_device::am2Group7a()
+uint32_t v60_device::am2Group7a()
 {
 	if (!(m_modval2 & 0x10))
 		return am2Error4();
@@ -1075,7 +1075,7 @@ UINT32 v60_device::am2Group7a()
 	return (this->*s_AMTable2_G7a[m_modval2 & 0xF])();
 }
 
-UINT32 v60_device::bam2Group7a()
+uint32_t v60_device::bam2Group7a()
 {
 	if (!(m_modval2 & 0x10))
 		return bam2Error4();
@@ -1182,22 +1182,22 @@ const v60_device::am_func v60_device::s_BAMTable2_G6[8] =
 
 
 
-UINT32 v60_device::am2Group6()
+uint32_t v60_device::am2Group6()
 {
 	m_modval2 = OpRead8(m_modadd + 1);
 	return (this->*s_AMTable2_G6[m_modval2 >> 5])();
 }
-UINT32 v60_device::bam2Group6()
+uint32_t v60_device::bam2Group6()
 {
 	m_modval2 = OpRead8(m_modadd + 1);
 	return (this->*s_BAMTable2_G6[m_modval2 >> 5])();
 }
 
-UINT32 v60_device::am2Group7()
+uint32_t v60_device::am2Group7()
 {
 	return (this->*s_AMTable2_G7[m_modval & 0x1F])();
 }
-UINT32 v60_device::bam2Group7()
+uint32_t v60_device::bam2Group7()
 {
 	return (this->*s_BAMTable2_G7[m_modval & 0x1F])();
 }

@@ -73,11 +73,11 @@
   1x Dallas DS1236-10 (micro manager).
   1x Push button.
 
-  1x Unknown 24-pin IC labeled K-666 9330.
-  1x Unknown 8-pin IC labeled K-664 9432 (looks like a DAC).
-  1x LM358P (8-pin).
-  1x MC14538BCL (Dual precision monostable multivibrator).
-  1x TDA2003 Audio Amp.
+  1x Custom DIP24 IC labeled K-666 9330 (equivalent to YM3812).
+  1x Custom DIP8 IC labeled K-664 (equivalent to YM3014).
+  1x LM358P (DIP8, dual operational amplifier).
+  1x MC14538BCL (dual precision monostable multivibrator).
+  1x TDA2003 (10W. audio amplifier).
   1x Pot.
 
   1x KM6264BL-7 (RAM).
@@ -202,9 +202,9 @@
 
   1x Yamaha YM3812.
   1x Yamaha Y3014B (DAC).
-  1x LM358M (8-pin).
-  1x MC14538 (Dual precision monostable multivibrator).
-  1x TDA2003 (Audio Amp, Heatsinked).
+  1x LM358M (DIP8, dual operational amplifier).
+  1x MC14538 (dual precision monostable multivibrator).
+  1x TDA2003 (10W. audio amplifier) heatsinked.
   1x Pot.
 
   1x HY6264A (RAM).
@@ -410,20 +410,22 @@
 ***********************************************************************************/
 
 
+#include "emu.h"
+#include "cpu/z80/z80.h"
+#include "machine/i8255.h"
+#include "sound/3812intf.h"
+#include "video/mc6845.h"
+//#include "sound/dac.h"
+#include "screen.h"
+#include "speaker.h"
+
+#include "suprstar.lh"
+
+
 #define MASTER_CLOCK    XTAL_16MHz
 #define CPU_CLOCK       MASTER_CLOCK/4  /* guess */
 #define SND_CLOCK       MASTER_CLOCK/4  /* guess */
 #define CRTC_CLOCK      MASTER_CLOCK/8  /* guess */
-
-
-#include "emu.h"
-#include "cpu/z80/z80.h"
-#include "video/mc6845.h"
-#include "machine/i8255.h"
-#include "sound/3812intf.h"
-#include "sound/dac.h"
-
-#include "suprstar.lh"
 
 
 class amaticmg_state : public driver_device
@@ -437,14 +439,14 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
 
-	required_shared_ptr<UINT8> m_attr;
-	required_shared_ptr<UINT8> m_vram;
+	required_shared_ptr<uint8_t> m_attr;
+	required_shared_ptr<uint8_t> m_vram;
 
 	DECLARE_WRITE8_MEMBER(rombank_w);
 	DECLARE_WRITE8_MEMBER(nmi_mask_w);
 	DECLARE_WRITE8_MEMBER(unk80_w);
 
-	UINT8 m_nmi_mask;
+	uint8_t m_nmi_mask;
 	DECLARE_WRITE8_MEMBER(out_a_w);
 	DECLARE_WRITE8_MEMBER(out_c_w);
 	DECLARE_DRIVER_INIT(ama8000_3_o);
@@ -456,10 +458,10 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(amaticmg);
 	DECLARE_PALETTE_INIT(amaticmg2);
-	UINT32 screen_update_amaticmg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_amaticmg2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_amaticmg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_amaticmg2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(amaticmg2_irq);
-	void encf(UINT8 ciphertext, int address, UINT8 &plaintext, int &newaddress);
+	void encf(uint8_t ciphertext, int address, uint8_t &plaintext, int &newaddress);
 	void decrypt(int key1, int key2);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -475,7 +477,7 @@ void amaticmg_state::video_start()
 {
 }
 
-UINT32 amaticmg_state::screen_update_amaticmg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t amaticmg_state::screen_update_amaticmg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(0);
 	int y,x;
@@ -485,8 +487,8 @@ UINT32 amaticmg_state::screen_update_amaticmg(screen_device &screen, bitmap_ind1
 	{
 		for (x=0;x<96;x++)
 		{
-			UINT16 tile = m_vram[count];
-			UINT8 color;
+			uint16_t tile = m_vram[count];
+			uint8_t color;
 
 			tile += ((m_attr[count]&0x0f)<<8);
 			/* TODO: this looks so out of place ... */
@@ -500,7 +502,7 @@ UINT32 amaticmg_state::screen_update_amaticmg(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-UINT32 amaticmg_state::screen_update_amaticmg2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t amaticmg_state::screen_update_amaticmg2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(0);
 	int y,x;
@@ -510,8 +512,8 @@ UINT32 amaticmg_state::screen_update_amaticmg2(screen_device &screen, bitmap_ind
 	{
 		for (x=0;x<96;x++)
 		{
-			UINT16 tile = m_vram[count];
-			UINT8 color;
+			uint16_t tile = m_vram[count];
+			uint8_t color;
 
 			tile += ((m_attr[count]&0xff)<<8);
 			color = 0;
@@ -526,7 +528,7 @@ UINT32 amaticmg_state::screen_update_amaticmg2(screen_device &screen, bitmap_ind
 
 PALETTE_INIT_MEMBER(amaticmg_state, amaticmg)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int bit0, bit1, bit2 , r, g, b;
 	int i;
 
@@ -553,7 +555,7 @@ PALETTE_INIT_MEMBER(amaticmg_state, amaticmg)
 
 PALETTE_INIT_MEMBER(amaticmg_state,amaticmg2)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int r, g, b;
 	int i;
 
@@ -627,7 +629,7 @@ WRITE8_MEMBER(amaticmg_state::out_c_w)
 
 WRITE8_MEMBER( amaticmg_state::unk80_w )
 {
-//  m_dac->write_unsigned8(data & 0x01);       /* Sound DAC */
+//  m_dac->write(BIT(data, 0));       /* Sound DAC */
 }
 
 
@@ -656,8 +658,8 @@ static ADDRESS_MAP_START( amaticmg_portmap, AS_IO, 8, amaticmg_state )
 	AM_RANGE(0x80, 0x80) AM_WRITE(unk80_w)
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(rombank_w)
 //  AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("ppi8255_2", ppi8255_device, read, write)
-//  AM_RANGE(0x00, 0x00) AM_DEVWRITE("dac1", dac_device, write_signed8)
-//  AM_RANGE(0x00, 0x00) AM_DEVWRITE("dac2", dac_device, write_signed8)
+//  AM_RANGE(0x00, 0x00) AM_DEVWRITE("dac1", dac_byte_interface, write)
+//  AM_RANGE(0x00, 0x00) AM_DEVWRITE("dac2", dac_byte_interface, write)
 
 ADDRESS_MAP_END
 
@@ -699,11 +701,11 @@ static INPUT_PORTS_START( amaticmg )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE2 )       PORT_NAME("Service B (Dienst B") PORT_CODE(KEYCODE_8) PORT_TOGGLE
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE2 )       PORT_NAME("Service B (Dienst B") PORT_TOGGLE
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )          PORT_NAME("Coin 2 (Muenze 2)")   PORT_IMPULSE(3)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )          PORT_NAME("Hopper Payout pulse") PORT_IMPULSE(3)      PORT_CODE(KEYCODE_Q)  // Hopper paying pulse
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )  PORT_CODE(KEYCODE_W)           // 'Ausgegeben 0 - Hopper Leer' (spent 0 - hopper empty)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )  // 'Ausgegeben 0 - Hopper Leer' (spent 0 - hopper empty)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )    PORT_NAME("Hold 3 (Halten 3)")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )    PORT_NAME("Hold 2 (Halten 2)")
 
@@ -711,10 +713,10 @@ static INPUT_PORTS_START( amaticmg )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )         PORT_NAME("Start")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_CANCEL )   PORT_NAME("Clear / Take (Loeschen)")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )    PORT_NAME("Hold 1 (Halten 1)")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )       PORT_NAME("Service A (Dienst A") PORT_CODE(KEYCODE_7) PORT_TOGGLE
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )       PORT_NAME("Service A (Dienst A") PORT_TOGGLE
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_BET )     PORT_NAME("Bet (Setzen) / Half Take")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE3 )       PORT_NAME("Service C (Dienst C") PORT_CODE(KEYCODE_9) PORT_TOGGLE
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE )        PORT_NAME("Service (Master)")    PORT_CODE(KEYCODE_0)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE3 )       PORT_NAME("Service C (Dienst C") PORT_TOGGLE
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE )        PORT_NAME("Service (Master)")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )    PORT_NAME("Hold 4 (Halten 4)")
 
 	PORT_START("IN3")
@@ -801,7 +803,7 @@ GFXDECODE_END
 
 void amaticmg_state::machine_start()
 {
-	UINT8 *rombank = memregion("maincpu")->base();
+	uint8_t *rombank = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entries(0, 0x10, &rombank[0x8000], 0x4000);
 }
@@ -817,7 +819,7 @@ void amaticmg_state::machine_reset()
 *          Machine Drivers          *
 ************************************/
 
-static MACHINE_CONFIG_START( amaticmg, amaticmg_state )
+static MACHINE_CONFIG_START( amaticmg )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)     /* WRONG! */
 	MCFG_CPU_PROGRAM_MAP(amaticmg_map)
@@ -858,14 +860,10 @@ static MACHINE_CONFIG_START( amaticmg, amaticmg_state )
 	MCFG_PALETTE_INIT_OWNER(amaticmg_state, amaticmg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, SND_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-//  MCFG_DAC_ADD("dac")   /* Y3014B */
-//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
+	MCFG_SOUND_ADD("ymsnd", YM3812, SND_CLOCK) /* Y3014B DAC */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 MACHINE_CONFIG_END
 
 
@@ -927,6 +925,32 @@ ROM_START( am_mg24 )
 	ROM_REGION( 0x20000/*0x0400*/, "proms", 0 )
 	ROM_LOAD( "n82s147a_1.bin", 0x0000, 0x0200, NO_DUMP )
 	ROM_LOAD( "n82s147a_2.bin", 0x0200, 0x0200, NO_DUMP )
+ROM_END
+
+/*
+  1x 40-pin custom CPU labeled:
+
+     Amatic Trading GMBH
+     Lfnd. Nr. 0940
+     Type:     801 L
+     Datum:    11.12.95
+
+  The program needs proper decryption.
+*/
+ROM_START( am_mg24a )
+	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x40000, "mainprg", 0 ) /* encrypted program ROM...*/
+	ROM_LOAD( "multi_stm_27_cl_8202.bin", 0x00000, 0x40000, CRC(e3625367) SHA1(cea3ae4042522c720119ea94c8f05f74cbcdcab0) )
+
+	ROM_REGION( 0x180000, "gfx1", 0 )
+	ROM_LOAD( "multi_2.4_zg1.bin", 0x100000, 0x80000, CRC(29c3a45b) SHA1(97157a4d436a3dc8b81ffd7eb51f96f3bd969f4b) )  // this one doesn't match the parent.
+	ROM_LOAD( "multi_2.4_zg2.bin", 0x080000, 0x80000, CRC(b504e1b8) SHA1(ffa17a2c212eb2fffb89b131868e69430cb41203) )  // identical to the parent.
+	ROM_LOAD( "multi_2.4_zg3.bin", 0x000000, 0x80000, CRC(9b66bb4d) SHA1(64035d2028a9b68164c87475a1ec9754453ad572) )  // identical to the parent.
+
+	ROM_REGION( 0x20000/*0x0400*/, "proms", 0 )
+	ROM_LOAD( "n82s147n_1.bin", 0x0000, 0x0200, CRC(08e304e3) SHA1(e6f7cda9a626bb4b123889446dac9807983fa8c1) )
+	ROM_LOAD( "n82s147n_2.bin", 0x0200, 0x0200, BAD_DUMP CRC(c962a66d) SHA1(d93aa03a9aa5cd93131e830c1221da5366662474) )
 ROM_END
 
 ROM_START( am_mg3 )
@@ -1026,12 +1050,12 @@ ROM_END
 *       Driver Initialization       *
 ************************************/
 
-void amaticmg_state::encf(UINT8 ciphertext, int address, UINT8 &plaintext, int &newaddress)
+void amaticmg_state::encf(uint8_t ciphertext, int address, uint8_t &plaintext, int &newaddress)
 {
 	int aux = address & 0xfff;
 	aux = aux ^ (aux>>6);
 	aux = ((aux<<6) | (aux>>6)) & 0xfff;
-	UINT8 aux2 = BITSWAP8(aux, 9,10,4,1,6,0,7,3);
+	uint8_t aux2 = BITSWAP8(aux, 9,10,4,1,6,0,7,3);
 	aux2 ^= aux2>>4;
 	aux2 = (aux2<<4) | (aux2>>4);
 	ciphertext ^= ciphertext<<4;
@@ -1042,11 +1066,11 @@ void amaticmg_state::encf(UINT8 ciphertext, int address, UINT8 &plaintext, int &
 
 void amaticmg_state::decrypt(int key1, int key2)
 {
-	UINT8 plaintext;
+	uint8_t plaintext;
 	int newaddress;
 
-	UINT8 *src = memregion("mainprg")->base();
-	UINT8 *dest = memregion("maincpu")->base();
+	uint8_t *src = memregion("mainprg")->base();
+	uint8_t *dest = memregion("maincpu")->base();
 	int len = memregion("mainprg")->bytes();
 
 	for (int i = 0; i < len; i++)
@@ -1081,9 +1105,10 @@ DRIVER_INIT_MEMBER(amaticmg_state,ama8000_3_o)
 *           Game Drivers            *
 ************************************/
 
-/*     YEAR  NAME      PARENT    MACHINE    INPUT     STATE           INIT         ROT     COMPANY                FULLNAME                      FLAGS                                                                                                        LAYOUT */
-GAMEL( 1996, suprstar, 0,        amaticmg,  amaticmg, amaticmg_state, ama8000_1_x, ROT90, "Amatic Trading GmbH", "Super Stars",                 MACHINE_IMPERFECT_SOUND,                                                                                        layout_suprstar )
+/*     YEAR  NAME      PARENT    MACHINE    INPUT     STATE           INIT         ROT     COMPANY                FULLNAME                      FLAGS                                                                                                                       LAYOUT */
+GAMEL( 1996, suprstar, 0,        amaticmg,  amaticmg, amaticmg_state, ama8000_1_x, ROT90, "Amatic Trading GmbH", "Super Stars",                 MACHINE_IMPERFECT_SOUND,                                                                                                    layout_suprstar )
 GAME(  2000, am_mg24,  0,        amaticmg2, amaticmg, amaticmg_state, ama8000_2_i, ROT0,  "Amatic Trading GmbH", "Multi Game I (V.Ger 2.4)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME(  2000, am_mg24a, 0,        amaticmg2, amaticmg, amaticmg_state, ama8000_2_i, ROT0,  "Amatic Trading GmbH", "Multi Game I (unknown V2.4)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )  // needs proper decryption.
 GAME(  2000, am_mg3,   0,        amaticmg2, amaticmg, amaticmg_state, ama8000_2_i, ROT0,  "Amatic Trading GmbH", "Multi Game III (V.Ger 3.5)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME(  2000, am_mg3a,  0,        amaticmg2, amaticmg, amaticmg_state, ama8000_2_v, ROT0,  "Amatic Trading GmbH", "Multi Game III (V.Ger 3.64)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME(  2000, am_mg35i, 0,        amaticmg2, amaticmg, amaticmg_state, ama8000_3_o, ROT0,  "Amatic Trading GmbH", "Multi Game III (S.Ita 3.5)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

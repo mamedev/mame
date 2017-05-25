@@ -6,12 +6,11 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_NEWBRAIN_EIM_H
+#define MAME_BUS_NEWBRAIN_EIM_H
+
 #pragma once
 
-#ifndef __NEWBRAIN_EIM__
-#define __NEWBRAIN_EIM__
-
-#include "emu.h"
 #include "exp.h"
 #include "bus/rs232/rs232.h"
 #include "machine/6850acia.h"
@@ -25,17 +24,16 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> newbrain_eim_t
+// ======================> newbrain_eim_device
 
-class newbrain_eim_t :  public device_t,
-						public device_newbrain_expansion_slot_interface
+class newbrain_eim_device :  public device_t, public device_newbrain_expansion_slot_interface
 {
 public:
 	// construction/destruction
-	newbrain_eim_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	newbrain_eim_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	DECLARE_READ8_MEMBER( anout_r );
@@ -58,17 +56,17 @@ protected:
 	virtual void device_reset() override;
 
 	// device_newbrain_expansion_slot_interface overrides
-	virtual UINT8 mreq_r(address_space &space, offs_t offset, UINT8 data, bool &romov, int &exrm, bool &raminh) override;
-	virtual void mreq_w(address_space &space, offs_t offset, UINT8 data, bool &romov, int &exrm, bool &raminh) override;
-	virtual UINT8 iorq_r(address_space &space, offs_t offset, UINT8 data, bool &prtov) override;
-	virtual void iorq_w(address_space &space, offs_t offset, UINT8 data, bool &prtov) override;
+	virtual uint8_t mreq_r(address_space &space, offs_t offset, uint8_t data, bool &romov, int &exrm, bool &raminh) override;
+	virtual void mreq_w(address_space &space, offs_t offset, uint8_t data, bool &romov, int &exrm, bool &raminh) override;
+	virtual uint8_t iorq_r(address_space &space, offs_t offset, uint8_t data, bool &prtov) override;
+	virtual void iorq_w(address_space &space, offs_t offset, uint8_t data, bool &prtov) override;
 
 private:
 	required_device<z80ctc_device> m_ctc;
 	required_device<acia6850_device> m_acia;
-	required_device<newbrain_expansion_slot_t> m_exp;
+	required_device<newbrain_expansion_slot_device> m_exp;
 	required_memory_region m_rom;
-	optional_shared_ptr<UINT8> m_ram;
+	optional_shared_ptr<uint8_t> m_ram;
 
 	int m_aciaint;
 	int m_anint;
@@ -77,7 +75,6 @@ private:
 
 // device type definition
 extern const device_type NEWBRAIN_EIM;
+DECLARE_DEVICE_TYPE(NEWBRAIN_EIM, newbrain_eim_device)
 
-
-
-#endif
+#endif // MAME_BUS_NEWBRAIN_EIM_H

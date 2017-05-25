@@ -104,19 +104,19 @@ public:
 	emu_timer *m_6015_timer;
 
 	// RBV and friends (V8, etc)
-	UINT8 m_rbv_regs[256], m_rbv_ier, m_rbv_ifr, m_rbv_type, m_rbv_montype, m_rbv_vbltime;
-	UINT32 m_rbv_colors[3], m_rbv_count, m_rbv_clutoffs, m_rbv_immed10wr;
-	UINT32 m_rbv_palette[256];
-	UINT8 m_sonora_vctl[8];
+	uint8_t m_rbv_regs[256], m_rbv_ier, m_rbv_ifr, m_rbv_type, m_rbv_montype, m_rbv_vbltime;
+	uint32_t m_rbv_colors[3], m_rbv_count, m_rbv_clutoffs, m_rbv_immed10wr;
+	uint32_t m_rbv_palette[256];
+	uint8_t m_sonora_vctl[8];
 	emu_timer *m_vbl_timer, *m_cursor_timer;
-	UINT16 m_cursor_line;
-	UINT16 m_dafb_int_status;
+	uint16_t m_cursor_line;
+	uint16_t m_dafb_int_status;
 	int m_dafb_scsi1_drq, m_dafb_scsi2_drq;
-	UINT8 m_dafb_mode;
-	UINT32 m_dafb_base, m_dafb_stride;
+	uint8_t m_dafb_mode;
+	uint32_t m_dafb_base, m_dafb_stride;
 
 	// this is shared among all video setups with vram
-	UINT32 *m_vram;
+	uint32_t *m_vram;
 
 	DECLARE_READ16_MEMBER ( mac_via_r );
 	DECLARE_WRITE16_MEMBER ( mac_via_w );
@@ -145,11 +145,11 @@ private:
 	int m_via_cycles;
 
 	// hack
-	UINT16 m_unk1_test;
+	uint16_t m_unk1_test;
 
 public:
 	emu_timer *m_scanline_timer;
-	UINT32 screen_update_pippin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_pippin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(mac_6015_tick);
 	DECLARE_READ8_MEMBER(mac_via_in_a);
 	DECLARE_READ8_MEMBER(mac_via_in_b);

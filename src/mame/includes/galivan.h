@@ -24,21 +24,21 @@ public:
 		m_soundlatch(*this, "soundlatch") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<uint8_t> m_videoram;
 	required_device<buffered_spriteram8_device> m_spriteram;
 
 	/* video-related */
 	tilemap_t     *m_bg_tilemap;
 	tilemap_t     *m_tx_tilemap;
-	UINT16       m_scrollx;
-	UINT16       m_scrolly;
-	UINT8       m_galivan_scrollx[2],m_galivan_scrolly[2];
-	UINT8       m_write_layers;
-	UINT8       m_layers;
-	UINT8       m_ninjemak_dispdisable;
+	uint16_t       m_scrollx;
+	uint16_t       m_scrolly;
+	uint8_t       m_galivan_scrollx[2],m_galivan_scrolly[2];
+	uint8_t       m_write_layers;
+	uint8_t       m_layers;
+	uint8_t       m_ninjemak_dispdisable;
 
-	UINT8       m_shift_scroll; //youmab
-	UINT32      m_shift_val;
+	uint8_t       m_shift_scroll; //youmab
+	uint32_t      m_shift_val;
 	DECLARE_WRITE8_MEMBER(galivan_sound_command_w);
 	DECLARE_READ8_MEMBER(soundlatch_clear_r);
 	DECLARE_READ8_MEMBER(IO_port_c0_r);
@@ -65,8 +65,8 @@ public:
 	DECLARE_MACHINE_START(ninjemak);
 	DECLARE_MACHINE_RESET(ninjemak);
 	DECLARE_VIDEO_START(ninjemak);
-	UINT32 screen_update_galivan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_ninjemak(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_galivan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_ninjemak(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;
 	optional_device<nb1414m4_device> m_nb1414m4;

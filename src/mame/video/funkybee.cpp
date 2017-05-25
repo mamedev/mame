@@ -13,7 +13,7 @@
 
 PALETTE_INIT_MEMBER(funkybee_state, funkybee)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	/* first, the character/sprite palette */
@@ -89,7 +89,7 @@ TILEMAP_MAPPER_MEMBER(funkybee_state::funkybee_tilemap_scan)
 
 void funkybee_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(funkybee_state::get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(funkybee_state::funkybee_tilemap_scan),this), 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(funkybee_state::get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(funkybee_state::funkybee_tilemap_scan),this), 8, 8, 32, 32);
 }
 
 void funkybee_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
@@ -155,7 +155,7 @@ void funkybee_state::draw_columns( bitmap_ind16 &bitmap, const rectangle &clipre
 	}
 }
 
-UINT32 funkybee_state::screen_update_funkybee(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t funkybee_state::screen_update_funkybee(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);

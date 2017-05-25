@@ -6756,19 +6756,6 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
-	<software name="legkagea" cloneof="legkage">
-		<description>Kage no Densetsu - The Legend of Kage (Jpn, Alt)</description>
-		<year>1986</year>
-		<publisher>Taito</publisher>
-		<info name="serial" value="MSX-9" />
-		<info name="alt_title" value="影の伝説" />
-		<part name="cart" interface="msx_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="kage no densetsu - legend of kage, the (japan) (alt 1).rom" size="32768" crc="b581f746" sha1="666e82d8a8e5d2672a9b7159adcdc861a31c8fa1" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="karamaru">
 		<description>Karamaru - Chindou Chuu (Jpn)</description>
 		<year>1985</year>

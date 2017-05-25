@@ -17,15 +17,15 @@ VIDEO_START_MEMBER(orion_state,orion128)
 {
 }
 
-UINT32 orion_state::screen_update_orion128(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t orion_state::screen_update_orion128(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 code1,code2,code3,code4,color,val;
+	uint8_t code1,code2,code3,code4,color,val;
 	int y, x,b;
 	int orionproshift = (m_orion128_video_mode & 0x10) ? 1 : 0;
 	int part1addr = (3-((m_orion128_video_page & 3) | orionproshift)) * 0x4000;
 	int part2addr = part1addr + 0x10000;
 	int video_mode = m_orion128_video_mode & m_video_mode_mask;
-	UINT8 *ram = m_ram->pointer();
+	uint8_t *ram = m_ram->pointer();
 
 	for (x = 0; x < m_orion128_video_width; x++)
 	{

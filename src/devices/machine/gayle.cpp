@@ -8,6 +8,7 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "gayle.h"
 
 
@@ -22,7 +23,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type GAYLE = &device_creator<gayle_device>;
+DEFINE_DEVICE_TYPE(GAYLE, gayle_device, "gayle", "Amiga GAYLE")
 
 
 //**************************************************************************
@@ -33,8 +34,8 @@ const device_type GAYLE = &device_creator<gayle_device>;
 //  gayle_device - constructor
 //-------------------------------------------------
 
-gayle_device::gayle_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, GAYLE, "GAYLE", tag, owner, clock, "gayle", __FILE__),
+gayle_device::gayle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, GAYLE, tag, owner, clock),
 	m_int2_w(*this),
 	m_cs0_read(*this),
 	m_cs0_write(*this),
@@ -49,7 +50,7 @@ gayle_device::gayle_device(const machine_config &mconfig, const char *tag, devic
 //  set_id - set gayle id
 //-------------------------------------------------
 
-void gayle_device::set_id(device_t &device, UINT8 id)
+void gayle_device::set_id(device_t &device, uint8_t id)
 {
 	gayle_device &gayle = downcast<gayle_device &>(device);
 	gayle.m_gayle_id = id;
@@ -88,7 +89,7 @@ void gayle_device::device_reset()
 
 READ16_MEMBER( gayle_device::gayle_r )
 {
-	UINT16 data = 0xffff;
+	uint16_t data = 0xffff;
 	offset <<= 1;
 
 	// swap
@@ -188,7 +189,7 @@ WRITE_LINE_MEMBER( gayle_device::ide_interrupt_w )
 
 READ16_MEMBER( gayle_device::gayle_id_r )
 {
-	UINT16 data;
+	uint16_t data;
 
 	if (ACCESSING_BITS_8_15)
 		data = ((m_gayle_id << m_gayle_id_count++) & 0x80) << 8;

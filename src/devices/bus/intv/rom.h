@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli
-#ifndef __INTV_ROM_H
-#define __INTV_ROM_H
+#ifndef MAME_BUS_INTV_ROM_H
+#define MAME_BUS_INTV_ROM_H
 
 #include "slot.h"
 
@@ -13,8 +13,7 @@ class intv_rom_device : public device_t,
 {
 public:
 	// construction/destruction
-	intv_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	intv_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	intv_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read_rom04) override { return INTV_ROM16_READ(offset + 0x0400); }
@@ -33,6 +32,9 @@ public:
 	virtual DECLARE_READ16_MEMBER(read_rome0) override { return INTV_ROM16_READ(offset + 0xe000); }
 	virtual DECLARE_READ16_MEMBER(read_romf0) override { return INTV_ROM16_READ(offset + 0xf000); }
 
+protected:
+	intv_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override {}
 	virtual void device_reset() override {}
@@ -44,7 +46,7 @@ class intv_ram_device : public intv_rom_device
 {
 public:
 	// construction/destruction
-	intv_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	intv_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read_ram) override { return (int)m_ram[offset & (m_ram.size() - 1)]; }
@@ -57,7 +59,7 @@ class intv_gfact_device : public intv_rom_device
 {
 public:
 	// construction/destruction
-	intv_gfact_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	intv_gfact_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read_ram) override { return (int)m_ram[offset & (m_ram.size() - 1)]; }
@@ -70,15 +72,15 @@ class intv_wsmlb_device : public intv_rom_device
 {
 public:
 	// construction/destruction
-	intv_wsmlb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	intv_wsmlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 
 
 // device type definition
-extern const device_type INTV_ROM_STD;
-extern const device_type INTV_ROM_RAM;
-extern const device_type INTV_ROM_GFACT;
-extern const device_type INTV_ROM_WSMLB;
+DECLARE_DEVICE_TYPE(INTV_ROM_STD,   intv_rom_device)
+DECLARE_DEVICE_TYPE(INTV_ROM_RAM,   intv_ram_device)
+DECLARE_DEVICE_TYPE(INTV_ROM_GFACT, intv_gfact_device)
+DECLARE_DEVICE_TYPE(INTV_ROM_WSMLB, intv_wsmlb_device)
 
-#endif
+#endif // MAME_BUS_INTV_ROM_H

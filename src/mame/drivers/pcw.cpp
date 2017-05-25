@@ -2,7 +2,7 @@
 // copyright-holders:Kevin Thacker
 /******************************************************************************
 
-    pcw.c
+    pcw.cpp
     system driver
 
     Kevin Thacker [MESS driver]
@@ -51,7 +51,7 @@
     The boot-program performs a simple task: Load sector 0, track 0 to &f000 in ram, and execute
     &f010.
 
-    From here CP/M is booted, and the appropiate programs can be run.
+    From here CP/M is booted, and the appropriate programs can be run.
 
     The hardware:
        - Z80 CPU running at 3.4 MHz
@@ -95,25 +95,26 @@
   - emulation of other hardware...?
  ******************************************************************************/
 #include "emu.h"
+// pcw video hardware
+#include "includes/pcw.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/mcs48/mcs48.h"
 #include "machine/i8243.h"
-// upd765 interface
 #include "machine/upd765.h"
-// pcw video hardware
-#include "includes/pcw.h"
 // pcw/pcw16 beeper
 #include "sound/beep.h"
 #include "machine/ram.h"
 #include "softlist.h"
+#include "speaker.h"
 
 #include "pcw.lh"
 
 #define VERBOSE 1
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
-static const UINT8 half_step_table[4] = { 0x01, 0x02, 0x04, 0x08 };
-static const UINT8 full_step_table[4] = { 0x03, 0x06, 0x0c, 0x09 };
+static const uint8_t half_step_table[4] = { 0x01, 0x02, 0x04, 0x08 };
+static const uint8_t full_step_table[4] = { 0x03, 0x06, 0x0c, 0x09 };
 
 void pcw_state::pcw_update_interrupt_counter()
 {
@@ -164,7 +165,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(pcw_state::pcw_timer_interrupt)
 
 	m_timer_irq_flag = 1;
 	pcw_update_irqs();
-	machine().scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(pcw_state::pcw_timer_pulse),this));
+	m_pulse_timer->adjust(attotime::from_usec(100), 0, attotime::from_usec(100));
 }
 
 /* PCW uses UPD765 in NON-DMA mode. FDC Ints are connected to /INT or
@@ -562,7 +563,7 @@ WRITE8_MEMBER(pcw_state::pcw_system_control_w)
 READ8_MEMBER(pcw_state::pcw_system_status_r)
 {
 	/* from Jacob Nevins docs */
-	UINT8 ret = pcw_get_sys_status();
+	uint8_t ret = pcw_get_sys_status();
 
 	return ret;
 }
@@ -612,7 +613,7 @@ READ8_MEMBER(pcw_state::pcw_expansion_r)
 
 	}
 
-	/* result from floating bus/no peripherial at this port */
+	/* result from floating bus/no peripheral at this port */
 	return 0x0ff;
 }
 
@@ -623,16 +624,16 @@ WRITE8_MEMBER(pcw_state::pcw_expansion_w)
 	logerror("pcw expansion w: %04x %02x\n",offset+0x080, data);
 }
 
-void pcw_state::pcw_printer_fire_pins(UINT16 pins)
+void pcw_state::pcw_printer_fire_pins(uint16_t pins)
 {
 	int x,line;
-	INT32 feed = (m_paper_feed / 2);
+	int32_t feed = (m_paper_feed / 2);
 
 	for(x=feed+PCW_PRINTER_HEIGHT-16;x<feed+PCW_PRINTER_HEIGHT-7;x++)
 	{
 		line = x % PCW_PRINTER_HEIGHT;
 		if((pins & 0x01) == 0)
-			m_prn_output->pix16(line, m_printer_headpos) = (UINT16)(pins & 0x01);
+			m_prn_output->pix16(line, m_printer_headpos) = (uint16_t)(pins & 0x01);
 		pins >>= 1;
 	}
 //  if(m_printer_headpos < PCW_PRINTER_WIDTH)
@@ -701,7 +702,7 @@ TIMER_CALLBACK_MEMBER(pcw_state::pcw_stepper_callback)
 	//popmessage("PRN: P2 bits %s %s %s\nSerial: %02x\nHeadpos: %i",m_printer_p2 & 0x40 ? " " : "6",m_printer_p2 & 0x20 ? " " : "5",m_printer_p2 & 0x10 ? " " : "4",m_printer_shift_output,m_printer_headpos);
 	if((m_printer_p2 & 0x10) == 0)  // print head motor active
 	{
-		UINT8 stepper_state = (m_printer_shift_output >> 4) & 0x0f;
+		uint8_t stepper_state = (m_printer_shift_output >> 4) & 0x0f;
 		if(stepper_state == full_step_table[(m_head_motor_state + 1) & 0x03])
 		{
 			m_printer_headpos += 2;
@@ -735,7 +736,7 @@ TIMER_CALLBACK_MEMBER(pcw_state::pcw_stepper_callback)
 	}
 	if((m_printer_p2 & 0x20) == 0)  // line feed motor active
 	{
-		UINT8 stepper_state = m_printer_shift_output & 0x0f;
+		uint8_t stepper_state = m_printer_shift_output & 0x0f;
 		if(stepper_state == full_step_table[(m_linefeed_motor_state + 1) & 0x03])
 		{
 			m_paper_feed++;
@@ -776,7 +777,7 @@ WRITE8_MEMBER(pcw_state::mcu_printer_p1_w)
 
 READ8_MEMBER(pcw_state::mcu_printer_p2_r)
 {
-	UINT8 ret = 0x00;
+	uint8_t ret = 0x00;
 //  logerror("PRN: MCU reading data from P2\n");
 	ret |= 0x80;  // make sure bail bar is in
 	ret |= (m_printer_p2 & 0x70);
@@ -818,13 +819,13 @@ WRITE8_MEMBER(pcw_state::mcu_printer_p2_w)
 }
 
 // Paper sensor
-READ8_MEMBER(pcw_state::mcu_printer_t1_r)
+READ_LINE_MEMBER(pcw_state::mcu_printer_t1_r)
 {
 	return 1;
 }
 
 // Print head location (0 if at left margin, otherwise 1)
-READ8_MEMBER(pcw_state::mcu_printer_t0_r)
+READ_LINE_MEMBER(pcw_state::mcu_printer_t0_r)
 {
 	if(m_printer_headpos == 0)
 		return 0;
@@ -839,7 +840,7 @@ READ8_MEMBER(pcw_state::mcu_printer_t0_r)
  *       bit 1: keyboard serial clock
  *       bit 0: keyboard serial data
  */
-void pcw_state::mcu_transmit_serial(UINT8 bit)
+void pcw_state::mcu_transmit_serial(uint8_t bit)
 {
 	int seq;
 
@@ -906,7 +907,7 @@ WRITE8_MEMBER(pcw_state::mcu_kb_scan_high_w)
 
 READ8_MEMBER(pcw_state::mcu_kb_data_r)
 {
-	UINT16 scan_bits = ((m_kb_scan_row & 0xf000) >> 4) | (m_kb_scan_row & 0xff);
+	uint16_t scan_bits = ((m_kb_scan_row & 0xf000) >> 4) | (m_kb_scan_row & 0xff);
 	int x;
 
 	for(x=0;x<12;x++)
@@ -919,12 +920,12 @@ READ8_MEMBER(pcw_state::mcu_kb_data_r)
 	return 0xff;
 }
 
-READ8_MEMBER(pcw_state::mcu_kb_t1_r)
+READ_LINE_MEMBER(pcw_state::mcu_kb_t1_r)
 {
 	return 1;
 }
 
-READ8_MEMBER(pcw_state::mcu_kb_t0_r)
+READ_LINE_MEMBER(pcw_state::mcu_kb_t0_r)
 {
 	return 0;
 }
@@ -976,22 +977,6 @@ static ADDRESS_MAP_START(pcw9512_io, AS_IO, 8, pcw_state )
 	AM_RANGE(0x0fc, 0x0fd) AM_READWRITE(pcw9512_parallel_r,         pcw9512_parallel_w)
 ADDRESS_MAP_END
 
-/* i8041 MCU */
-static ADDRESS_MAP_START(pcw_printer_io, AS_IO, 8, pcw_state )
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(mcu_printer_p2_r,mcu_printer_p2_w)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(mcu_printer_p1_r, mcu_printer_p1_w)
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(mcu_printer_t1_r)
-	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(mcu_printer_t0_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START(pcw_keyboard_io, AS_IO, 8, pcw_state )
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(mcu_kb_scan_r,mcu_kb_scan_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(mcu_kb_scan_high_r,mcu_kb_scan_high_w)
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(mcu_kb_t1_r)
-	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(mcu_kb_t0_r)
-	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_READ(mcu_kb_data_r)
-ADDRESS_MAP_END
-
 
 TIMER_CALLBACK_MEMBER(pcw_state::setup_beep)
 {
@@ -1006,7 +991,7 @@ void pcw_state::machine_start()
 
 void pcw_state::machine_reset()
 {
-	UINT8* code = memregion("printer_mcu")->base();
+	uint8_t* code = memregion("printer_mcu")->base();
 	int x;
 	/* ram paging is actually undefined at power-on */
 
@@ -1053,10 +1038,12 @@ DRIVER_INIT_MEMBER(pcw_state,pcw)
 	m_roller_ram_offset = 0;
 
 	/* timer interrupt */
-	machine().scheduler().timer_set(attotime::zero, timer_expired_delegate(FUNC(pcw_state::setup_beep),this));
+	m_beep_setup_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pcw_state::setup_beep), this));
+	m_beep_setup_timer->adjust(attotime::zero);
 
-	m_prn_stepper = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pcw_state::pcw_stepper_callback),this));
-	m_prn_pins = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pcw_state::pcw_pins_callback),this));
+	m_prn_stepper = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pcw_state::pcw_stepper_callback), this));
+	m_prn_pins = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pcw_state::pcw_pins_callback), this));
+	m_pulse_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pcw_state::pcw_timer_pulse), this));
 }
 
 
@@ -1255,17 +1242,28 @@ static SLOT_INTERFACE_START( pcw_floppies )
 SLOT_INTERFACE_END
 
 /* PCW8256, PCW8512, PCW9256 */
-static MACHINE_CONFIG_START( pcw, pcw_state )
+static MACHINE_CONFIG_START( pcw )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)       /* clock supplied to chip, but in reality it is 3.4 MHz */
 	MCFG_CPU_PROGRAM_MAP(pcw_map)
 	MCFG_CPU_IO_MAP(pcw_io)
 
 	MCFG_CPU_ADD("printer_mcu", I8041, 11000000)  // 11MHz
-	MCFG_CPU_IO_MAP(pcw_printer_io)
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(pcw_state, mcu_printer_p2_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(pcw_state, mcu_printer_p2_w))
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(pcw_state, mcu_printer_p1_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(pcw_state, mcu_printer_p1_w))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(pcw_state, mcu_printer_t1_r))
+	MCFG_MCS48_PORT_T0_IN_CB(READLINE(pcw_state, mcu_printer_t0_r))
 
 	MCFG_CPU_ADD("keyboard_mcu", I8048, 5000000) // 5MHz
-	MCFG_CPU_IO_MAP(pcw_keyboard_io)
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(pcw_state, mcu_kb_scan_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(pcw_state, mcu_kb_scan_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(pcw_state, mcu_kb_scan_high_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(pcw_state, mcu_kb_scan_high_w))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(pcw_state, mcu_kb_t1_r))
+	MCFG_MCS48_PORT_T0_IN_CB(READLINE(pcw_state, mcu_kb_t0_r))
+	MCFG_MCS48_PORT_BUS_IN_CB(READ8(pcw_state, mcu_kb_data_r))
 
 //  MCFG_QUANTUM_TIME(attotime::from_hz(50))
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
@@ -1395,9 +1393,9 @@ ROM_END
 
 /* these are all variants on the pcw design */
 /* major difference is memory configuration and drive type */
-/*     YEAR NAME        PARENT  COMPAT  MACHINE   INPUT INIT    COMPANY        FULLNAME */
-COMP( 1985, pcw8256,   0,       0,      pcw8256,  pcw, pcw_state,   pcw,    "Amstrad plc", "PCW8256",       MACHINE_NOT_WORKING)
-COMP( 1985, pcw8512,   pcw8256, 0,      pcw8512,  pcw, pcw_state,   pcw,    "Amstrad plc", "PCW8512",       MACHINE_NOT_WORKING)
-COMP( 1987, pcw9256,   pcw8256, 0,      pcw8256,  pcw, pcw_state,   pcw,        "Amstrad plc", "PCW9256",       MACHINE_NOT_WORKING)
-COMP( 1987, pcw9512,   pcw8256, 0,      pcw9512,  pcw, pcw_state,   pcw,        "Amstrad plc", "PCW9512 (+)",   MACHINE_NOT_WORKING)
-COMP( 1993, pcw10,     pcw8256, 0,      pcw8512,  pcw, pcw_state,   pcw,        "Amstrad plc", "PCW10",         MACHINE_NOT_WORKING)
+/*     YEAR NAME       PARENT   COMPAT  MACHINE   INPUT STATE        INIT  COMPANY        FULLNAME */
+COMP( 1985, pcw8256,   0,       0,      pcw8256,  pcw,  pcw_state,   pcw,  "Amstrad plc", "PCW8256",       MACHINE_NOT_WORKING)
+COMP( 1985, pcw8512,   pcw8256, 0,      pcw8512,  pcw,  pcw_state,   pcw,  "Amstrad plc", "PCW8512",       MACHINE_NOT_WORKING)
+COMP( 1987, pcw9256,   pcw8256, 0,      pcw8256,  pcw,  pcw_state,   pcw,  "Amstrad plc", "PCW9256",       MACHINE_NOT_WORKING)
+COMP( 1987, pcw9512,   pcw8256, 0,      pcw9512,  pcw,  pcw_state,   pcw,  "Amstrad plc", "PCW9512 (+)",   MACHINE_NOT_WORKING)
+COMP( 1993, pcw10,     pcw8256, 0,      pcw8512,  pcw,  pcw_state,   pcw,  "Amstrad plc", "PCW10",         MACHINE_NOT_WORKING)

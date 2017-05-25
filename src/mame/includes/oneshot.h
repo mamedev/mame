@@ -18,11 +18,11 @@ public:
 		m_palette(*this, "palette")  { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_sprites;
-	required_shared_ptr<UINT16> m_bg_videoram;
-	required_shared_ptr<UINT16> m_mid_videoram;
-	required_shared_ptr<UINT16> m_fg_videoram;
-	required_shared_ptr<UINT16> m_scroll;
+	required_shared_ptr<uint16_t> m_sprites;
+	required_shared_ptr<uint16_t> m_bg_videoram;
+	required_shared_ptr<uint16_t> m_mid_videoram;
+	required_shared_ptr<uint16_t> m_fg_videoram;
+	required_shared_ptr<uint16_t> m_scroll;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
@@ -55,8 +55,8 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_oneshot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_maddonna(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_oneshot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_maddonna(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_crosshairs( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<okim6295_device> m_oki;

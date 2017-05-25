@@ -95,12 +95,12 @@ bool rx50img_format::supports_save() const
 	return true;
 }
 
-void rx50img_format::find_size(io_generic *io, UINT8 &track_count, UINT8 &head_count, UINT8 &sector_count)
+void rx50img_format::find_size(io_generic *io, uint8_t &track_count, uint8_t &head_count, uint8_t &sector_count)
 {
 	head_count = 1;
 
-	UINT32 expected_size = 0;
-	UINT64 size = io_generic_size(io);
+	uint32_t expected_size = 0;
+	uint64_t size = io_generic_size(io);
 
 	track_count = 80;
 	sector_count = 10;
@@ -124,9 +124,9 @@ void rx50img_format::find_size(io_generic *io, UINT8 &track_count, UINT8 &head_c
 	track_count = head_count = sector_count = 0;
 }
 
-int rx50img_format::identify(io_generic *io, UINT32 form_factor)
+int rx50img_format::identify(io_generic *io, uint32_t form_factor)
 {
-	UINT8 track_count, head_count, sector_count;
+	uint8_t track_count, head_count, sector_count;
 	find_size(io, track_count, head_count, sector_count);
 
 	if(track_count)
@@ -135,14 +135,14 @@ int rx50img_format::identify(io_generic *io, UINT32 form_factor)
 }
 
 	//  /* Sectors are numbered 1 to 10 */
-bool rx50img_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
+bool rx50img_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 {
-	UINT8 track_count, head_count, sector_count;
+	uint8_t track_count, head_count, sector_count;
 	find_size(io, track_count, head_count, sector_count);
 	if(track_count == 0)
 		return false;
 
-	UINT8 sectdata[10*512];
+	uint8_t sectdata[10*512];
 	desc_s sectors[10];
 	for(int i=0; i<sector_count; i++) {
 		sectors[i].data = sectdata + 512*i;
@@ -193,7 +193,7 @@ bool rx50img_format::save(io_generic *io, floppy_image *image)
 	  }
 	}
 */
-	UINT8 sectdata[11*512];
+	uint8_t sectdata[11*512];
 	int track_size = sector_count*512;
 
 	for(int track=0; track < track_count; track++) {

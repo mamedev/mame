@@ -4,7 +4,7 @@
 #
 
 UNAME := $(shell uname)
-ifeq ($(UNAME),$(filter $(UNAME),Linux Darwin SunOS FreeBSD GNU/kFreeBSD NetBSD OpenBSD))
+ifeq ($(UNAME),$(filter $(UNAME),Linux Darwin SunOS FreeBSD GNU/kFreeBSD NetBSD OpenBSD GNU))
 ifeq ($(UNAME),$(filter $(UNAME),Darwin))
 OS=darwin
 else

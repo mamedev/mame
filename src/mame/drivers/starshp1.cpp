@@ -10,8 +10,9 @@ Atari Starship 1 driver
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6502/m6502.h"
 #include "includes/starshp1.h"
+#include "cpu/m6502/m6502.h"
+#include "speaker.h"
 
 
 
@@ -260,7 +261,7 @@ static const gfx_layout spritelayout =
 	0x100   /* step */
 };
 
-static const UINT32 shiplayout_xoffset[64] =
+static const uint32_t shiplayout_xoffset[64] =
 {
 		0x04, 0x05, 0x06, 0x07, 0x0c, 0x0d, 0x0e, 0x0f,
 		0x14, 0x15, 0x16, 0x17, 0x1c, 0x1d, 0x1e, 0x1f,
@@ -293,7 +294,7 @@ static GFXDECODE_START( starshp1 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( starshp1, starshp1_state )
+static MACHINE_CONFIG_START( starshp1 )
 
 	/* basic machine hardware */
 
@@ -307,7 +308,7 @@ static MACHINE_CONFIG_START( starshp1, starshp1_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(STARSHP1_PIXEL_CLOCK, STARSHP1_HTOTAL, STARSHP1_HBEND, STARSHP1_HBSTART, STARSHP1_VTOTAL, STARSHP1_VBEND, STARSHP1_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(starshp1_state, screen_update_starshp1)
-	MCFG_SCREEN_VBLANK_DRIVER(starshp1_state, screen_eof_starshp1)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(starshp1_state, screen_vblank_starshp1))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", starshp1)
@@ -393,5 +394,5 @@ ROM_START( starshpp )
 ROM_END
 
 
-GAME( 1977, starshp1, 0,        starshp1, starshp1, driver_device, 0, ORIENTATION_FLIP_X, "Atari", "Starship 1",              MACHINE_IMPERFECT_SOUND )
-GAME( 1977, starshpp, starshp1, starshp1, starshp1, driver_device, 0, ORIENTATION_FLIP_X, "Atari", "Starship 1 (prototype?)", MACHINE_IMPERFECT_SOUND )
+GAME( 1977, starshp1, 0,        starshp1, starshp1, starshp1_state, 0, ORIENTATION_FLIP_X, "Atari", "Starship 1",              MACHINE_IMPERFECT_SOUND )
+GAME( 1977, starshpp, starshp1, starshp1, starshp1, starshp1_state, 0, ORIENTATION_FLIP_X, "Atari", "Starship 1 (prototype?)", MACHINE_IMPERFECT_SOUND )

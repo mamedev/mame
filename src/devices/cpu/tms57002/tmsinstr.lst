@@ -1,32 +1,32 @@
 abs  1  01 1 n
 	abs
 	aacc = %a;
-	if(((INT32)aacc) < 0) {
+	if(((int32_t)aacc) < 0) {
 	aacc = - aacc;
-	if(((INT32)aacc) < 0)
+	if(((int32_t)aacc) < 0)
 		st1 |= ST1_AOV;
 	}
 
 add  1  03 1 y
 	add %d,a
-	%wa((INT64)(INT32)%d + (INT64)(INT32)%a);
+	%wa((int64_t)(int32_t)%d + (int64_t)(int32_t)%a);
 
 add  1  04 1 y
 	add %c,a
-	%wa((INT64)(INT32)%c + (INT64)(INT32)%a);
+	%wa((int64_t)(int32_t)%c + (int64_t)(int32_t)%a);
 
 add  1  05 1 y
 	add %d,m
 	%sfai(d, %d);
-	%wa((INT64)(INT32)d + (%mo >> 16));
+	%wa((int64_t)(int32_t)d + (%mo >> 16));
 
 add  1  06 1 y
 	add %c,m
-	%wa((INT64)(INT32)%c + (%mo >> 16));
+	%wa((int64_t)(int32_t)%c + (%mo >> 16));
 
 add  1  07 1 y
 	add %d,%c
-	%wa((INT64)(INT32)%d + (INT64)(INT32)%c);
+	%wa((int64_t)(int32_t)%d + (int64_t)(int32_t)%c);
 
 adds 1  08 1 y
 	adds %d
@@ -57,7 +57,7 @@ b    3  48 3 n b
 
 bgz  3  50 3 n cb
 	bgz %i
-	if(((INT32)aacc) > 0) {
+	if(((int32_t)aacc) > 0) {
 	%b(%i);
 	}
 
@@ -66,7 +66,7 @@ bioz 3  70 3 n cb
 
 blz  3  58 3 n cb
 	blz %i
-	if(((INT32)aacc) < 0) {
+	if(((int32_t)aacc) < 0) {
 	%b(%i);
 	}
 
@@ -191,7 +191,7 @@ lcaa 2a 08 1 y
 
 lcac 3  40 1 n
 	lcac %i
-	if(((INT32)aacc) >= 0)
+	if(((int32_t)aacc) >= 0)
 	ca = %i;
 
 lcak 3  18 1 n
@@ -219,11 +219,11 @@ lirk 3  20 1 n
 
 lmhc 1  33 1 n
 	lmhc %c
-	macc = ((INT64)(INT32)%c) << 16;
+	macc = ((int64_t)(int32_t)%c) << 16;
 
 lmhd 1  31 1 n
 	lmhd %d
-	macc = ((INT64)(INT32)%d) << 16;
+	macc = ((int64_t)(int32_t)%d) << 16;
 
 lmld 1  32 1 n
 	lmld %d
@@ -250,7 +250,7 @@ mac  1  24 1 y
 	if(d & 0x00800000)
 	d |= 0xff000000;
 	creg = c = %c;
-	r = (INT64)(INT32)c * (INT64)(INT32)d;
+	r = (int64_t)(int32_t)c * (int64_t)(int32_t)d;
 	macc = %ml + (r >> 7);
 
 mac  1  25 1 y
@@ -259,27 +259,27 @@ mac  1  25 1 y
 mac  1  26 1 y
 	mac %c,a
 	creg = c = %c;
-	r = (INT64)(INT32)c * (INT64)(INT32)%a;
+	r = (int64_t)(int32_t)c * (int64_t)(int32_t)%a;
 	macc = %ml + (r >> 15);
 
 macs 1  2e 1 y
 	macs %c,a
 	creg = c = %c;
-	r = (INT64)(INT32)c * (INT64)(INT32)%a;
+	r = (int64_t)(int32_t)c * (int64_t)(int32_t)%a;
 	macc = %ml + (r >> 14);
 
 macu 1  29 1 y
 	macu %d,%c
 	d = %d24; // d is 24bits unsigned
 	creg = c = %c;
-	r = (INT64)(INT32)c * (INT64)d;
+	r = (int64_t)(int32_t)c * (int64_t)d;
 	macc = %ml + (r >> 7);
 
 macu 1  2a 1 y
 	macu a,%d
 	d = %d24; // d is 24bits unsigned
 	creg = c = %a;
-	r = (INT64)(INT32)c * (INT64)d;
+	r = (int64_t)(int32_t)c * (int64_t)d;
 	macc = %ml + (r >> 7);
 
 mpy  1  21 1 y
@@ -288,13 +288,13 @@ mpy  1  21 1 y
 	if(d & 0x00800000)
 	d |= 0xff000000;
 	creg = c = %c;
-	r = (INT64)(INT32)c * (INT64)(INT32)d;
+	r = (int64_t)(int32_t)c * (int64_t)(int32_t)d;
 	macc = r >> 7;
 
 mpy  1  22 1 y
 	mpy %c,a
 	creg = c = %c;
-	r = (INT64)(INT32)c * (INT64)(INT32)%a;
+	r = (int64_t)(int32_t)c * (int64_t)(int32_t)%a;
 	macc = r >> 15;
 
 mpy  1  23 1 y
@@ -304,7 +304,7 @@ mpyu 1  28 1 y
 	mpyu %d,%c
 	creg = c = %c;
 	d = %d24; // d is 24bits unsigned
-	r = (INT64)(INT32)c * (INT64)d;
+	r = (int64_t)(int32_t)c * (int64_t)d;
 	macc = r >> 7;
 
 neg  1  02 1 n
@@ -495,11 +495,11 @@ std1 2a 0d 1 y
 
 sub  1  09 1 y
 	sub %d,a
-	%wa((INT64)(INT32)%d - (INT64)(INT32)%a);
+	%wa((int64_t)(int32_t)%d - (int64_t)(int32_t)%a);
 
 sub  1  0a 1 y
 	sub %c,a
-	%wa((INT64)(INT32)%c - (INT64)(INT32)%a);
+	%wa((int64_t)(int32_t)%c - (int64_t)(int32_t)%a);
 
 sub  1  0b 1 y
 	sub %d,m
@@ -509,7 +509,7 @@ sub  1  0c 1 y
 
 sub  1  0d 1 y
 	sub %d,%c
-	%wa((INT64)(INT32)%d - (INT64)(INT32)%c);
+	%wa((int64_t)(int32_t)%d - (int64_t)(int32_t)%c);
 
 wre  1  38 1 n
 	wre %d,%c

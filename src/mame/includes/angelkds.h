@@ -21,10 +21,10 @@ public:
 		m_decrypted_opcodes(*this, "decrypted_opcodes") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_bgtopvideoram;
-	required_shared_ptr<UINT8> m_bgbotvideoram;
-	required_shared_ptr<UINT8> m_txvideoram;
-	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<uint8_t> m_bgtopvideoram;
+	required_shared_ptr<uint8_t> m_bgbotvideoram;
+	required_shared_ptr<uint8_t> m_txvideoram;
+	required_shared_ptr<uint8_t> m_spriteram;
 
 	tilemap_t    *m_tx_tilemap;
 	tilemap_t    *m_bgbot_tilemap;
@@ -33,9 +33,9 @@ public:
 	int        m_bgbotbank;
 	int        m_bgtopbank;
 
-	UINT8      m_sound[4];
-	UINT8      m_sound2[4];
-	UINT8      m_layer_ctrl;
+	uint8_t      m_sound[4];
+	uint8_t      m_sound2[4];
+	uint8_t      m_layer_ctrl;
 
 	/* devices */
 	required_device<cpu_device> m_subcpu;
@@ -61,9 +61,9 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_angelkds(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_angelkds(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int enable_n);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
-	optional_shared_ptr<UINT8> m_decrypted_opcodes;
+	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 };

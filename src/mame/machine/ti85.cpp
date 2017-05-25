@@ -2,7 +2,7 @@
 // copyright-holders:Krzysztof Strzecha,Jon Sturm
 /***************************************************************************
   TI-85 driver by Krzysztof Strzecha
-  TI-83 Plus, TI-84 Plus, and Siliver Edition support by Jon Sturm
+  TI-83 Plus, TI-84 Plus, and Silver Edition support by Jon Sturm
 
   Functions to emulate general aspects of the machine (RAM, ROM, interrupts,
   I/O ports)
@@ -134,12 +134,11 @@ void ti85_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 	}
 }
 
-inline void ti8x_update_bank(address_space &space, UINT8 bank, UINT8 *base, UINT8 page, bool is_ram)
+void ti85_state::ti8x_update_bank(address_space &space, uint8_t bank, uint8_t *base, uint8_t page, bool is_ram)
 {
-	ti85_state *state = space.machine().driver_data<ti85_state>();
 	static const char *const tag[] = {"bank1", "bank2", "bank3", "bank4"};
 
-	state->membank(tag[bank&3])->set_base(base + (0x4000 * page));
+	membank(tag[bank&3])->set_base(base + (0x4000 * page));
 
 	if (is_ram)
 		space.install_write_bank(bank * 0x4000, bank * 0x4000 + 0x3fff, tag[bank&3]);
@@ -256,7 +255,8 @@ void ti85_state::machine_start()
 	m_port4_bit0 = 0;
 	m_ti81_port_7_data = 0;
 
-	machine().scheduler().timer_pulse(attotime::from_hz(256), timer_expired_delegate(FUNC(ti85_state::ti85_timer_callback),this));
+	m_ti85_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ti85_state::ti85_timer_callback), this));
+	m_ti85_timer->adjust(attotime::from_hz(256), 0, attotime::from_hz(256));
 
 	space.unmap_write(0x0000, 0x3fff);
 	space.unmap_write(0x4000, 0x7fff);
@@ -266,30 +266,12 @@ void ti85_state::machine_start()
 
 MACHINE_RESET_MEMBER(ti85_state,ti85)
 {
-	m_red_out = 0x00;
-	m_white_out = 0x00;
 	m_PCR = 0xc0;
 }
-
-DIRECT_UPDATE_MEMBER(ti85_state::ti83p_direct_update_handler)
-{
-	if (m_booting)
-	{
-		if (((m_ti83p_port4 & 1) && (address >= 0x4000 && address < 0xc000)) || (address >= 0x4000 && address < 0x8000))
-		{
-			m_booting = false;
-			update_ti83p_memory();
-		}
-	}
-	return address;
-}
-
 
 MACHINE_RESET_MEMBER(ti85_state,ti83p)
 {
-	m_red_out = 0x00;
-	m_white_out = 0x00;
-	m_PCR = 0xc0;
+	m_PCR = 0x00;
 
 
 	m_ti8x_memory_page_1 = 0;
@@ -312,7 +294,6 @@ MACHINE_START_MEMBER(ti85_state,ti83p)
 	m_model = TI83P;
 	//address_space &space = m_maincpu->space(AS_PROGRAM);
 	//m_bios = memregion("flash")->base();
-	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(ti85_state::ti83p_direct_update_handler), this));
 
 	m_timer_interrupt_mask = 0;
 	m_timer_interrupt_status = 0;
@@ -336,10 +317,10 @@ MACHINE_START_MEMBER(ti85_state,ti83p)
 
 	ti85_state::update_ti83p_memory();
 
-
-	machine().scheduler().timer_pulse(attotime::from_hz(256), timer_expired_delegate(FUNC(ti85_state::ti83_timer1_callback),this));
-	machine().scheduler().timer_pulse(attotime::from_hz(512), timer_expired_delegate(FUNC(ti85_state::ti83_timer2_callback),this));
-
+	m_ti83_1st_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ti85_state::ti83_timer1_callback), this));
+	m_ti83_1st_timer->adjust(attotime::from_hz(256), 0, attotime::from_hz(256));
+	m_ti83_2nd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ti85_state::ti83_timer2_callback), this));
+	m_ti83_2nd_timer->adjust(attotime::from_hz(512), 0, attotime::from_hz(512));
 
 	/* save states and debugging */
 	save_item(NAME(m_timer_interrupt_status));
@@ -376,11 +357,11 @@ void ti85_state::ti8xpse_init_common()
 	m_flash_unlocked = 0;
 
 	ti85_state::update_ti83pse_memory();
-	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(ti85_state::ti83p_direct_update_handler), this));
 
-
-	machine().scheduler().timer_pulse(attotime::from_hz(256), timer_expired_delegate(FUNC(ti85_state::ti83_timer1_callback),this));
-	machine().scheduler().timer_pulse(attotime::from_hz(512), timer_expired_delegate(FUNC(ti85_state::ti83_timer2_callback),this));
+	m_ti83_1st_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ti85_state::ti83_timer1_callback), this));
+	m_ti83_1st_timer->adjust(attotime::from_hz(256), 0, attotime::from_hz(256));
+	m_ti83_2nd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ti85_state::ti83_timer2_callback), this));
+	m_ti83_2nd_timer->adjust(attotime::from_hz(512), 0, attotime::from_hz(512));
 
 	m_crystal_timer1 = timer_alloc(CRYSTAL_TIMER1);
 	m_crystal_timer2 = timer_alloc(CRYSTAL_TIMER2);
@@ -438,8 +419,8 @@ MACHINE_START_MEMBER(ti85_state,ti86)
 	m_interrupt_speed = 0;
 	m_port4_bit0 = 0;
 
-	m_ti8x_ram = std::make_unique<UINT8[]>(128*1024);
-	memset(m_ti8x_ram.get(), 0, sizeof(UINT8)*128*1024);
+	m_ti8x_ram = std::make_unique<uint8_t[]>(128*1024);
+	memset(m_ti8x_ram.get(), 0, sizeof(uint8_t)*128*1024);
 
 	space.unmap_write(0x0000, 0x3fff);
 
@@ -447,9 +428,10 @@ MACHINE_START_MEMBER(ti85_state,ti86)
 	membank("bank2")->set_base(m_bios + 0x04000);
 
 	membank("bank4")->set_base(m_ti8x_ram.get());
-	machine().device<nvram_device>("nvram")->set_base(m_ti8x_ram.get(), sizeof(UINT8)*128*1024);
+	machine().device<nvram_device>("nvram")->set_base(m_ti8x_ram.get(), sizeof(uint8_t)*128*1024);
 
-	machine().scheduler().timer_pulse(attotime::from_hz(256), timer_expired_delegate(FUNC(ti85_state::ti85_timer_callback),this));
+	m_ti85_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ti85_state::ti85_timer_callback), this));
+	m_ti85_timer->adjust(attotime::from_hz(256), 0, attotime::from_hz(256));
 }
 
 
@@ -521,13 +503,19 @@ READ8_MEMBER(ti85_state::ti85_port_0006_r)
 
 READ8_MEMBER(ti85_state::ti8x_serial_r)
 {
-	//ti85_update_serial(m_serial);
-	return (m_white_out<<3)
-		| (m_red_out<<2)
-		//| ((ti85serial_white_in(m_serial,0)&(1-m_white_out))<<1)
-		//| (ti85serial_red_in(m_serial,0)&(1-m_red_out))
-		| 0x03  // no link cable
-		| m_PCR;
+	// 7: unknown (ROM always sets to 1)
+	// 6: unknown (ROM always sets to 1)
+	// 5: enable ring output
+	// 4: enable tip output
+	// 3: ring output
+	// 2: tip output
+	// 1: ring input
+	// 0: tip input
+	// If the calculator is driving a line low it will always read low
+
+	uint8_t const tip_in((!m_link_port || m_link_port->tip_r()) ? 0x03 : 0x02);
+	uint8_t const ring_in((!m_link_port || m_link_port->ring_r()) ? 0x03 : 0x01);
+	return (~((m_PCR >> 2) & (m_PCR >> 4)) & tip_in & ring_in) | (m_PCR & 0xfc);
 }
 
 READ8_MEMBER(ti85_state::ti82_port_0002_r )
@@ -576,13 +564,19 @@ READ8_MEMBER(ti85_state::ti83_port_0003_r )
 
 READ8_MEMBER(ti85_state::ti8x_plus_serial_r)
 {
-	//ti85_update_serial(m_serial);
-	return (m_white_out<<3)
-		| (m_red_out<<2)
-		//| ((ti85serial_white_in(m_serial,0)&(1-m_white_out))<<1)
-		//| (ti85serial_red_in(m_serial,0)&(1-m_red_out))
-		| 0x03  // no link cable
-		| m_PCR;
+	// 7: unknown
+	// 6: byte receive in progress (TI-83+ only)
+	// 5: ring output
+	// 4: tip output
+	// 3: received byte ready (cleared by reading port 0x05, TI-83+ only)
+	// 2: enable byte receive (TI-83+ only)
+	// 1: ring input
+	// 0: tip input
+	// Note that tip/ring outputs are inverted by an NPN transistor
+
+	uint8_t const tip_in((!m_link_port || m_link_port->tip_r()) ? 0x03 : 0x02);
+	uint8_t const ring_in((!m_link_port || m_link_port->ring_r()) ? 0x03 : 0x01);
+	return (~(m_PCR >> 4) & tip_in & ring_in) | (m_PCR & 0xfc);
 }
 
 READ8_MEMBER(ti85_state::ti83p_port_0002_r )
@@ -683,13 +677,23 @@ WRITE8_MEMBER(ti85_state::ti85_port_0006_w)
 
 WRITE8_MEMBER(ti85_state::ti8x_serial_w)
 {
-	m_speaker->level_w(BIT(data, 2) | BIT(data, 3));
-	m_red_out = BIT(data, 2);
-	m_white_out = BIT(data, 3);
-	//ti85serial_red_out( m_serial, 0, m_red_out );
-	//ti85serial_white_out( m_serial, 0, m_white_out );
-	//ti85_update_serial(m_serial);
-	m_PCR = data & 0xf0;
+	// 7: unknown (ROM always sets to 1)
+	// 6: unknown (ROM always sets to 1)
+	// 5: enable ring output
+	// 4: enable tip output
+	// 3: ring output
+	// 2: tip output
+	// 1: unused
+	// 0: unused
+	// Note that tip/ring outputs are inverted by an NPN transistor
+	// In practice, the ROM only uses values 0xc0, 0xd4 and 0xe8
+
+	m_PCR = data & 0xfc;
+	if (m_link_port)
+	{
+		m_link_port->tip_w(BIT(~data, 2) | BIT(~data, 4));
+		m_link_port->ring_w(BIT(~data, 3) | BIT(~data, 5));
+	}
 }
 
 WRITE8_MEMBER(ti85_state::ti86_port_0005_w)
@@ -726,22 +730,31 @@ WRITE8_MEMBER(ti85_state::ti83_port_0002_w)
 
 WRITE8_MEMBER(ti85_state::ti83_port_0003_w)
 {
-		if (m_LCD_status && !(data&0x08))   m_timer_interrupt_mask = 0;
-		m_ON_interrupt_mask = data&0x01;
-		//m_timer_interrupt_mask = data&0x04;
-		m_LCD_mask = data&0x02;
-		m_LCD_status = data&0x08;
+	if (m_LCD_status && !(data&0x08))   m_timer_interrupt_mask = 0;
+	m_ON_interrupt_mask = data&0x01;
+	//m_timer_interrupt_mask = data&0x04;
+	m_LCD_mask = data&0x02;
+	m_LCD_status = data&0x08;
 }
 
 WRITE8_MEMBER(ti85_state::ti8x_plus_serial_w)
 {
-	m_speaker->level_w(BIT(data, 0) | BIT(data, 1));
-	m_red_out = BIT(data, 0);
-	m_white_out = BIT(data, 1);
-	//ti85serial_red_out( m_serial, 0, m_red_out );
-	//ti85serial_white_out( m_serial, 0, m_white_out );
-	//ti85_update_serial(m_serial);
-	m_PCR = data & 0xf0;
+	// 7: unknown
+	// 6: unknown
+	// 5: unknown
+	// 4: unknown
+	// 3: unknown
+	// 2: enable byte receive (TI-83+ only)
+	// 1: ring output
+	// 0: tip output
+	// Note that tip/ring outputs are inverted by an NPN transistor
+
+	m_PCR = (m_PCR & 0xc8) | (data & 0x04) | ((data << 4) & 0x30);
+	if (m_link_port)
+	{
+		m_link_port->tip_w(BIT(~data, 2) | BIT(~data, 4));
+		m_link_port->ring_w(BIT(~data, 3) | BIT(~data, 5));
+	}
 }
 
 WRITE8_MEMBER(ti85_state::ti83pse_int_ack_w)
@@ -864,7 +877,7 @@ READ8_MEMBER(ti85_state::ti84pse_port_0056_r)
 
 //timer ports
 
-void ti85_state::ti83pse_count( UINT8 timer, UINT8 data)
+void ti85_state::ti83pse_count( uint8_t timer, uint8_t data)
 {
 	m_ctimer[timer].max = m_ctimer[timer].count = data;
 
@@ -1026,7 +1039,7 @@ WRITE8_MEMBER(ti85_state::ti83pse_ctimer3_count_w)
   TI calculators snapshot files (SAV)
 ***************************************************************************/
 
-void ti85_state::ti8x_snapshot_setup_registers (UINT8 * data)
+void ti85_state::ti8x_snapshot_setup_registers (uint8_t * data)
 {
 	unsigned char lo,hi;
 	unsigned char * reg = data + 0x40;
@@ -1081,7 +1094,7 @@ void ti85_state::ti8x_snapshot_setup_registers (UINT8 * data)
 	m_maincpu->set_input_line(INPUT_LINE_HALT, 0);
 }
 
-void ti85_state::ti85_setup_snapshot (UINT8 * data)
+void ti85_state::ti85_setup_snapshot (uint8_t * data)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	int i;
@@ -1121,7 +1134,7 @@ void ti85_state::ti85_setup_snapshot (UINT8 * data)
 	m_interrupt_speed = 0x03;
 }
 
-void ti85_state::ti86_setup_snapshot (UINT8 * data)
+void ti85_state::ti86_setup_snapshot (uint8_t * data)
 {
 	unsigned char lo,hi;
 	unsigned char * hdw = data + 0x20000 + 0x94;
@@ -1164,7 +1177,7 @@ void ti85_state::ti86_setup_snapshot (UINT8 * data)
 SNAPSHOT_LOAD_MEMBER( ti85_state, ti8x )
 {
 	int expected_snapshot_size = 0;
-	dynamic_buffer ti8x_snapshot_data;
+	std::vector<uint8_t> ti8x_snapshot_data;
 
 	if (!strncmp(machine().system().name, "ti85", 4))
 		expected_snapshot_size = TI85_SNAPSHOT_SIZE;
@@ -1176,7 +1189,7 @@ SNAPSHOT_LOAD_MEMBER( ti85_state, ti8x )
 	if (snapshot_size != expected_snapshot_size)
 	{
 		logerror ("Incomplete snapshot file\n");
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
 	ti8x_snapshot_data.resize(snapshot_size);
@@ -1188,5 +1201,5 @@ SNAPSHOT_LOAD_MEMBER( ti85_state, ti8x )
 	else if (!strncmp(machine().system().name, "ti86", 4))
 		ti86_setup_snapshot(&ti8x_snapshot_data[0]);
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }

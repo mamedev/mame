@@ -10,15 +10,15 @@
 
 #include "emu.h"
 #include "coco_pak.h"
-#include "includes/coco.h"
 
 #define CARTSLOT_TAG            "cart"
+#define CART_AUTOSTART_TAG      "cart_autostart"
 
 /***************************************************************************
     IMPLEMENTATION
 ***************************************************************************/
 
-static MACHINE_CONFIG_FRAGMENT(coco_pak)
+static MACHINE_CONFIG_START(coco_pak)
 MACHINE_CONFIG_END
 
 ROM_START( coco_pak )
@@ -26,11 +26,24 @@ ROM_START( coco_pak )
 	// this region is filled by cococart_slot_device::call_load()
 ROM_END
 
+
+//-------------------------------------------------
+//  INPUT_PORTS( coco_cart_autostart )
+//-------------------------------------------------
+
+static INPUT_PORTS_START( coco_cart_autostart )
+	PORT_START(CART_AUTOSTART_TAG)
+	PORT_CONFNAME( 0x01, 0x01, "Cart Auto-Start" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ))
+	PORT_CONFSETTING(    0x01, DEF_STR( On ))
+INPUT_PORTS_END
+
+
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type COCO_PAK = &device_creator<coco_pak_device>;
+DEFINE_DEVICE_TYPE(COCO_PAK, coco_pak_device, "cocopak", "CoCo Program PAK")
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -39,16 +52,16 @@ const device_type COCO_PAK = &device_creator<coco_pak_device>;
 //-------------------------------------------------
 //  coco_pak_device - constructor
 //-------------------------------------------------
-coco_pak_device::coco_pak_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_cococart_interface( mconfig, *this ), m_cart(nullptr), m_owner(nullptr)
+coco_pak_device::coco_pak_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_cococart_interface(mconfig, *this)
+	, m_cart(nullptr), m_owner(nullptr), m_autostart(*this, CART_AUTOSTART_TAG)
 {
 }
 
-coco_pak_device::coco_pak_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-		: device_t(mconfig, COCO_PAK, "CoCo Program PAK", tag, owner, clock, "cocopak", __FILE__),
-		device_cococart_interface( mconfig, *this ), m_cart(nullptr), m_owner(nullptr)
-	{
+coco_pak_device::coco_pak_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: coco_pak_device(mconfig, COCO_PAK, tag, owner, clock)
+{
 }
 
 //-------------------------------------------------
@@ -72,10 +85,19 @@ machine_config_constructor coco_pak_device::device_mconfig_additions() const
 }
 
 //-------------------------------------------------
+//  input_ports - device-specific input ports
+//-------------------------------------------------
+
+ioport_constructor coco_pak_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( coco_cart_autostart );
+}
+
+//-------------------------------------------------
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *coco_pak_device::device_rom_region() const
+const tiny_rom_entry *coco_pak_device::device_rom_region() const
 {
 	return ROM_NAME( coco_pak );
 }
@@ -86,15 +108,14 @@ const rom_entry *coco_pak_device::device_rom_region() const
 
 void coco_pak_device::device_reset()
 {
-	if (m_cart->exists()) {
-		cococart_line_value cart_line;
+	if (m_cart->exists())
+	{
+		auto cart_line = m_autostart.read_safe(0x01)
+			? cococart_slot_device::line_value::Q
+			: cococart_slot_device::line_value::CLEAR;
 
-		cart_line = read_safe(machine().root_device().ioport(CART_AUTOSTART_TAG), 0x01)
-			? COCOCART_LINE_VALUE_Q
-			: COCOCART_LINE_VALUE_CLEAR;
-
-		/* normal CoCo PAKs tie their CART line to Q - the system clock */
-		m_owner->cart_set_line(COCOCART_LINE_CART,cart_line);
+		// normal CoCo PAKs tie their CART line to Q - the system clock
+		m_owner->set_line_value(cococart_slot_device::line::CART, cart_line);
 	}
 }
 
@@ -102,7 +123,7 @@ void coco_pak_device::device_reset()
     get_cart_base
 -------------------------------------------------*/
 
-UINT8* coco_pak_device::get_cart_base()
+uint8_t* coco_pak_device::get_cart_base()
 {
 	return memregion(CARTSLOT_TAG)->base();
 }
@@ -115,7 +136,7 @@ UINT8* coco_pak_device::get_cart_base()
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type COCO_PAK_BANKED = &device_creator<coco_pak_banked_device>;
+DEFINE_DEVICE_TYPE(COCO_PAK_BANKED, coco_pak_banked_device, "cocopak_banked", "CoCo Program PAK (Banked)")
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -125,8 +146,12 @@ const device_type COCO_PAK_BANKED = &device_creator<coco_pak_banked_device>;
 //  coco_pak_device - constructor
 //-------------------------------------------------
 
-coco_pak_banked_device::coco_pak_banked_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-		: coco_pak_device(mconfig, COCO_PAK_BANKED, "CoCo Program PAK (Banked)", tag, owner, clock, "cocopak_banked", __FILE__)
+coco_pak_banked_device::coco_pak_banked_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: coco_pak_device(mconfig, type, tag, owner, clock)
+{
+}
+coco_pak_banked_device::coco_pak_banked_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: coco_pak_banked_device(mconfig, COCO_PAK_BANKED, tag, owner, clock)
 {
 }
 
@@ -145,12 +170,12 @@ void coco_pak_banked_device::device_reset()
     banked_pak_set_bank - function to set the bank
 -------------------------------------------------*/
 
-void coco_pak_banked_device::banked_pak_set_bank(UINT32 bank)
+void coco_pak_banked_device::banked_pak_set_bank(uint32_t bank)
 {
-	UINT64 pos;
-	UINT32 i;
-	UINT8 *rom = memregion(CARTSLOT_TAG)->base();
-	UINT32 rom_length = memregion(CARTSLOT_TAG)->bytes();
+	uint64_t pos;
+	uint32_t i;
+	uint8_t *rom = memregion(CARTSLOT_TAG)->base();
+	uint32_t rom_length = memregion(CARTSLOT_TAG)->bytes();
 
 	if (m_cart->exists()) {
 		pos = (bank * 0x4000) % m_cart->length();

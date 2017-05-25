@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#ifndef __MAPLE_DC_H__
-#define __MAPLE_DC_H__
+#ifndef MAME_MACHINE_MAPLE_DC_H
+#define MAME_MACHINE_MAPLE_DC_H
+
+#pragma once
 
 #include "cpu/sh4/sh4.h"
 
@@ -15,7 +17,7 @@ class maple_device;
 class maple_dc_device : public device_t
 {
 public:
-	maple_dc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	maple_dc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	static void static_set_maincpu_tag(device_t &device, const char *maincpu_tag);
 	static void static_set_irq_cb(device_t &device, void (*irq_cb)(running_machine &));
 
@@ -60,10 +62,10 @@ private:
 	sh4_device *cpu;
 	emu_timer *timer;
 
-	UINT32 mdstar, mden, mdst, msys;
-	UINT32 mdtsel;
+	uint32_t mdstar, mden, mdst, msys;
+	uint32_t mdtsel;
 
-	UINT32 dma_state, dma_adr, dma_port, dma_dest;
+	uint32_t dma_state, dma_adr, dma_port, dma_dest;
 	bool dma_endflag;
 	void (*irq_cb)(running_machine &);
 
@@ -72,6 +74,6 @@ private:
 	const char *maincpu_tag;
 };
 
-extern const device_type MAPLE_DC;
+DECLARE_DEVICE_TYPE(MAPLE_DC, maple_dc_device)
 
-#endif /* __MAPLE_DC_H__ */
+#endif // MAME_MACHINE_MAPLE_DC_H

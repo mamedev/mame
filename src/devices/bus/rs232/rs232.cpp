@@ -1,28 +1,17 @@
 // license:BSD-3-Clause
 // copyright-holders:smf
+#include "emu.h"
 #include "rs232.h"
 
-const device_type RS232_PORT = &device_creator<rs232_port_device>;
+DEFINE_DEVICE_TYPE(RS232_PORT, rs232_port_device, "rs232", "RS232 Port")
 
-rs232_port_device::rs232_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, RS232_PORT, "RS232 Port", tag, owner, clock, "rs232", __FILE__),
-	device_slot_interface(mconfig, *this),
-	m_rxd(0),
-	m_dcd(0),
-	m_dsr(0),
-	m_ri(0),
-	m_cts(0),
-	m_rxd_handler(*this),
-	m_dcd_handler(*this),
-	m_dsr_handler(*this),
-	m_ri_handler(*this),
-	m_cts_handler(*this),
-	m_dev(nullptr)
+rs232_port_device::rs232_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	rs232_port_device(mconfig, RS232_PORT, tag, owner, clock)
 {
 }
 
-rs232_port_device::rs232_port_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+rs232_port_device::rs232_port_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock),
 	device_slot_interface(mconfig, *this),
 	m_rxd(0),
 	m_dcd(0),
@@ -112,8 +101,10 @@ device_rs232_port_interface::~device_rs232_port_interface()
 #include "loopback.h"
 #include "null_modem.h"
 #include "printer.h"
-#include "terminal.h"
 #include "pty.h"
+#include "sun_kbd.h"
+#include "terminal.h"
+#include "ie15.h"
 
 SLOT_INTERFACE_START( default_rs232_devices )
 	SLOT_INTERFACE("keyboard", SERIAL_KEYBOARD)
@@ -121,5 +112,7 @@ SLOT_INTERFACE_START( default_rs232_devices )
 	SLOT_INTERFACE("null_modem", NULL_MODEM)
 	SLOT_INTERFACE("printer", SERIAL_PRINTER)
 	SLOT_INTERFACE("terminal", SERIAL_TERMINAL)
-		SLOT_INTERFACE("pty", PSEUDO_TERMINAL)
+	SLOT_INTERFACE("pty", PSEUDO_TERMINAL)
+	SLOT_INTERFACE("sunkbd", SUN_KBD_ADAPTOR)
+	SLOT_INTERFACE("ie15", SERIAL_TERMINAL_IE15)
 SLOT_INTERFACE_END

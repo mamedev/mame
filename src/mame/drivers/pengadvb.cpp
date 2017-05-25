@@ -30,6 +30,8 @@ NOTE! switches 1, 3 & 5 must be ON or the game will not boot.
 #include "sound/ay8910.h"
 #include "machine/i8255.h"
 #include "machine/bankdev.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class pengadvb_state : public driver_device
@@ -44,8 +46,8 @@ public:
 
 	address_map_bank_device *m_page[4];
 	memory_bank *m_bank[4];
-	UINT8 m_primary_slot_reg;
-	UINT8 m_kb_matrix_row;
+	uint8_t m_primary_slot_reg;
+	uint8_t m_kb_matrix_row;
 
 	DECLARE_READ8_MEMBER(mem_r);
 	DECLARE_WRITE8_MEMBER(mem_w);
@@ -194,7 +196,7 @@ WRITE8_MEMBER(pengadvb_state::pengadvb_ppi_port_c_w)
 
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( pengadvb, pengadvb_state )
+static MACHINE_CONFIG_START( pengadvb )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_10_738635MHz/3)
@@ -278,8 +280,8 @@ void pengadvb_state::machine_reset()
 
 void pengadvb_state::pengadvb_decrypt(const char* region)
 {
-	UINT8 *mem = memregion(region)->base();
-	int memsize = memregion(region)->bytes();
+	uint8_t *mem = memregion(region)->base();
+	uint32_t memsize = memregion(region)->bytes();
 
 	// data lines swap
 	for (int i = 0; i < memsize; i++)
@@ -288,7 +290,7 @@ void pengadvb_state::pengadvb_decrypt(const char* region)
 	}
 
 	// address line swap
-	dynamic_buffer buf(memsize);
+	std::vector<uint8_t> buf(memsize);
 	memcpy(&buf[0], mem, memsize);
 	for (int i = 0; i < memsize; i++)
 	{

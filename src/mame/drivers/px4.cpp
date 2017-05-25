@@ -9,19 +9,26 @@
 
 ***************************************************************************/
 
+#include "emu.h"
+
+#include "bus/centronics/ctronics.h"
+#include "bus/epson_sio/epson_sio.h"
+#include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
-#include "machine/ram.h"
-#include "bus/epson_sio/epson_sio.h"
-#include "bus/centronics/ctronics.h"
 #include "imagedev/cassette.h"
-#include "machine/ram.h"
 #include "machine/nvram.h"
-#include "sound/speaker.h"
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
-#include "coreutil.h"
+#include "machine/ram.h"
+#include "machine/ram.h"
+#include "sound/spkrdev.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
+#include "coreutil.h"
+
 #include "px4.lh"
 
 
@@ -78,7 +85,7 @@ public:
 	DECLARE_DRIVER_INIT( px4 );
 
 	DECLARE_PALETTE_INIT( px4 );
-	UINT32 screen_update_px4(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_px4(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER( icrlc_r );
 	DECLARE_WRITE8_MEMBER( ctrl1_w );
@@ -195,34 +202,34 @@ private:
 	memory_region *m_caps2_rom;
 
 	// gapnit register
-	UINT8 m_ctrl1;
-	UINT16 m_icrb;
-	UINT8 m_bankr;
-	UINT8 m_isr;
-	UINT8 m_ier;
-	UINT8 m_sior;
+	uint8_t m_ctrl1;
+	uint16_t m_icrb;
+	uint8_t m_bankr;
+	uint8_t m_isr;
+	uint8_t m_ier;
+	uint8_t m_sior;
 
 	// gapnit internal
-	UINT16 m_frc_value;
-	UINT16 m_frc_latch;
+	uint16_t m_frc_value;
+	uint16_t m_frc_latch;
 
 	// gapndi register
-	UINT8 m_vadr;
-	UINT8 m_yoff;
+	uint8_t m_vadr;
+	uint8_t m_yoff;
 
 	// gapnio
-	UINT8 m_artdir;
-	UINT8 m_artdor;
-	UINT8 m_artsr;
-	UINT8 m_artcr;
-	UINT8 m_swr;
+	uint8_t m_artdir;
+	uint8_t m_artdor;
+	uint8_t m_artsr;
+	uint8_t m_artcr;
+	uint8_t m_swr;
 
 	// 7508 internal
 	bool m_one_sec_int_enabled;
 	bool m_key_int_enabled;
 
-	UINT8 m_key_status;
-	UINT8 m_interrupt_status;
+	uint8_t m_key_status;
+	uint8_t m_interrupt_status;
 
 	system_time m_time;
 	int m_clock_state;
@@ -270,7 +277,7 @@ private:
 	required_device<generic_slot_device> m_rdsocket;
 
 	offs_t m_ramdisk_address;
-	std::unique_ptr<UINT8[]> m_ramdisk;
+	std::unique_ptr<uint8_t[]> m_ramdisk;
 };
 
 
@@ -302,7 +309,7 @@ void px4_state::gapnit_interrupt()
 // external cassette or barcode reader input
 TIMER_DEVICE_CALLBACK_MEMBER( px4_state::ext_cassette_read )
 {
-	UINT8 result;
+	uint8_t result;
 	int trigger = 0;
 
 	// sample input state
@@ -474,7 +481,7 @@ WRITE8_MEMBER( px4_state::ier_w )
 // status register
 READ8_MEMBER( px4_state::str_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (0)
 		logerror("%s: str_r\n", machine().describe_context());
@@ -967,7 +974,7 @@ WRITE8_MEMBER( px4_state::artmr_w )
 // io status register
 READ8_MEMBER( px4_state::iostr_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// centronics status
 	data |= m_centronics_busy << 0;
@@ -1066,8 +1073,8 @@ TIMER_DEVICE_CALLBACK_MEMBER( px4_state::upd7508_1sec_callback )
 
 INPUT_CHANGED_MEMBER( px4_state::key_callback )
 {
-	UINT32 oldvalue = oldval * field.mask(), newvalue = newval * field.mask();
-	UINT32 delta = oldvalue ^ newvalue;
+	uint32_t oldvalue = oldval * field.mask(), newvalue = newval * field.mask();
+	uint32_t delta = oldvalue ^ newvalue;
 	int i, scancode = 0xff, down = 0;
 
 	for (i = 0; i < 32; i++)
@@ -1075,7 +1082,7 @@ INPUT_CHANGED_MEMBER( px4_state::key_callback )
 		if (delta & (1 << i))
 		{
 			down = (newvalue & (1 << i)) ? 0x10 : 0x00;
-			scancode = (FPTR)param * 32 + i;
+			scancode = (uintptr_t)param * 32 + i;
 
 			// control keys
 			if ((scancode & 0xa0) == 0xa0)
@@ -1120,7 +1127,7 @@ WRITE8_MEMBER( px4p_state::ramdisk_address_w )
 
 READ8_MEMBER( px4p_state::ramdisk_data_r )
 {
-	UINT8 ret = 0xff;
+	uint8_t ret = 0xff;
 
 	if (m_ramdisk_address < 0x20000)
 	{
@@ -1156,7 +1163,7 @@ READ8_MEMBER( px4p_state::ramdisk_control_r )
 //  VIDEO EMULATION
 //**************************************************************************
 
-UINT32 px4_state::screen_update_px4(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t px4_state::screen_update_px4(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// display enabled?
 	if (BIT(m_yoff, 7))
@@ -1164,12 +1171,12 @@ UINT32 px4_state::screen_update_px4(screen_device &screen, bitmap_ind16 &bitmap,
 		int y, x;
 
 		// get vram start address
-		UINT8 *vram = &m_ram->pointer()[(m_vadr & 0xf8) << 8];
+		uint8_t *vram = &m_ram->pointer()[(m_vadr & 0xf8) << 8];
 
 		for (y = 0; y < 64; y++)
 		{
 			// adjust against y-offset
-			UINT8 row = (y - (m_yoff & 0x3f)) & 0x3f;
+			uint8_t row = (y - (m_yoff & 0x3f)) & 0x3f;
 
 			for (x = 0; x < 240/8; x++)
 			{
@@ -1215,7 +1222,7 @@ DRIVER_INIT_MEMBER( px4p_state, px4p )
 	DRIVER_INIT_CALL(px4);
 
 	// reserve memory for external ram-disk
-	m_ramdisk = std::make_unique<UINT8[]>(0x20000);
+	m_ramdisk = std::make_unique<uint8_t[]>(0x20000);
 }
 
 void px4_state::machine_start()
@@ -1466,7 +1473,7 @@ PALETTE_INIT_MEMBER( px4p_state, px4p )
 //  MACHINE DRIVERS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( px4, px4_state )
+static MACHINE_CONFIG_START( px4 )
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_7_3728MHz / 2)    // uPD70008
 	MCFG_CPU_PROGRAM_MAP(px4_mem)
@@ -1532,7 +1539,7 @@ static MACHINE_CONFIG_START( px4, px4_state )
 	MCFG_SOFTWARE_LIST_ADD("epson_cpm_list", "epson_cpm")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED_CLASS( px4p, px4, px4p_state )
+static MACHINE_CONFIG_DERIVED( px4p, px4 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(px4p_io)
 

@@ -21,10 +21,14 @@ Cart sizes: 1MB, 2MB, 4MB
 ********************************************************************/
 
 #include "emu.h"
+
 #include "cpu/tlcs90/tlcs90.h"
-#include "softlist.h"
+
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+
+#include "screen.h"
+#include "softlist.h"
 
 
 class pockchalv1_state : public driver_device
@@ -34,15 +38,15 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_cart(*this, "cartslot")
-		{ }
+	{ }
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_pockchalv1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_pockchalv1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
-	UINT32  m_rom_size;
+	uint32_t  m_rom_size;
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pockchalv1_cart);
 };
 
@@ -53,13 +57,13 @@ DEVICE_IMAGE_LOAD_MEMBER( pockchalv1_state, pockchalv1_cart )
 	m_cart->rom_alloc(m_rom_size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), m_rom_size, "rom");
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 void pockchalv1_state::video_start()
 {
 }
 
-UINT32 pockchalv1_state::screen_update_pockchalv1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t pockchalv1_state::screen_update_pockchalv1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -87,7 +91,7 @@ void pockchalv1_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( pockchalv1, pockchalv1_state )
+static MACHINE_CONFIG_START( pockchalv1 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMP90845,8000000)         /* ? MHz */
@@ -122,5 +126,5 @@ MACHINE_CONFIG_END
 ROM_START( pockchal )
 ROM_END
 
-/*     YEAR  NAME     PARENT  COMPAT  MACHINE     INPUT       CLASS          INIT        COMPANY               FULLNAME*/
-CONS( 199?, pockchal,  0,     0,      pockchalv1, pockchalv1, driver_device,  0, "Benesse Corporation", "Pocket Challenge W (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT       CLASS             INIT  COMPANY                FULLNAME                      FLAGS
+CONS( 199?, pockchal, 0,      0,      pockchalv1, pockchalv1, pockchalv1_state, 0,    "Benesse Corporation", "Pocket Challenge W (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

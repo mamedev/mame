@@ -1,12 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol, Curt Coder
+#ifndef MAME_INCLUDES_MPF1_H
+#define MAME_INCLUDES_MPF1_H
+
 #pragma once
 
-#ifndef __MPF1__
-#define __MPF1__
 
-
-#include "emu.h"
 #include "machine/spchrom.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
@@ -14,7 +13,7 @@
 #include "machine/i8255.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
 #include "sound/tms5220.h"
 
 #define Z80_TAG         "u1"
@@ -56,23 +55,25 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+	DECLARE_READ8_MEMBER( step_r );
 	DECLARE_READ8_MEMBER( ppi_pa_r );
 	DECLARE_WRITE8_MEMBER( ppi_pb_w );
 	DECLARE_WRITE8_MEMBER( ppi_pc_w );
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_nmi );
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_irq );
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_res );
-	DECLARE_DIRECT_UPDATE_MEMBER(mpf1_direct_update_handler);
 
 	int m_break;
 	int m_m1;
 
-	UINT8 m_lednum;
+	uint8_t m_lednum;
 
 	emu_timer *m_led_refresh_timer;
+	address_space *m_program;
+
 	DECLARE_DRIVER_INIT(mpf1);
 	TIMER_CALLBACK_MEMBER(led_refresh);
 	TIMER_DEVICE_CALLBACK_MEMBER(check_halt_callback);
 };
 
-#endif
+#endif // MAME_INCLUDES_MPF1_H

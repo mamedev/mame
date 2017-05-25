@@ -7,9 +7,10 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6800/m6800.h"
 #include "includes/dragrace.h"
+#include "cpu/m6800/m6800.h"
 #include "sound/discrete.h"
+#include "speaker.h"
 
 #include "dragrace.lh"
 
@@ -97,7 +98,7 @@ void dragrace_state::dragrace_update_misc_flags( address_space &space )
 WRITE8_MEMBER(dragrace_state::dragrace_misc_w)
 {
 	/* Set/clear individual bit */
-	UINT32 mask = 1 << offset;
+	uint32_t mask = 1 << offset;
 	if (data & 0x01)
 		m_misc_flags |= mask;
 	else
@@ -109,7 +110,7 @@ WRITE8_MEMBER(dragrace_state::dragrace_misc_w)
 WRITE8_MEMBER(dragrace_state::dragrace_misc_clear_w)
 {
 	/* Clear 8 bits */
-	UINT32 mask = 0xff << (((offset >> 3) & 0x03) * 8);
+	uint32_t mask = 0xff << (((offset >> 3) & 0x03) * 8);
 	m_misc_flags &= (~mask);
 	logerror("Clear %#6x, Mask=%#10x, Flag=%#10x, Data=%x\n", 0x0920 + offset, mask, m_misc_flags, data & 0x01);
 	dragrace_update_misc_flags(space);
@@ -120,8 +121,8 @@ READ8_MEMBER(dragrace_state::dragrace_input_r)
 	int val = ioport("IN2")->read();
 	static const char *const portnames[] = { "IN0", "IN1" };
 
-	UINT8 maskA = 1 << (offset % 8);
-	UINT8 maskB = 1 << (offset / 8);
+	uint8_t maskA = 1 << (offset % 8);
+	uint8_t maskB = 1 << (offset / 8);
 
 	for (int i = 0; i < 2; i++)
 	{
@@ -324,7 +325,7 @@ void dragrace_state::machine_reset()
 	m_gear[1] = 0;
 }
 
-static MACHINE_CONFIG_START( dragrace, dragrace_state )
+static MACHINE_CONFIG_START( dragrace )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, XTAL_12_096MHz / 12)
@@ -380,4 +381,4 @@ ROM_START( dragrace )
 ROM_END
 
 
-GAMEL(1977, dragrace, 0, dragrace, dragrace, driver_device, 0, 0, "Atari (Kee Games)", "Drag Race", MACHINE_SUPPORTS_SAVE, layout_dragrace )
+GAMEL(1977, dragrace, 0, dragrace, dragrace, dragrace_state, 0, 0, "Atari (Kee Games)", "Drag Race", MACHINE_SUPPORTS_SAVE, layout_dragrace )

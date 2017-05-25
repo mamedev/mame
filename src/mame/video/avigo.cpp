@@ -84,7 +84,7 @@ PALETTE_INIT_MEMBER(avigo_state, avigo)
 	m_palette->set_pen_color(1,rgb_t(0x00,0x00,0x00)); /* black  */
 }
 
-UINT32 avigo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t avigo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int y;
 	int b;
@@ -94,13 +94,13 @@ UINT32 avigo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	for (y=0; y<AVIGO_SCREEN_HEIGHT; y++)
 	{
 		int by;
-		UINT8 *line_ptr = m_video_memory + (y*(AVIGO_SCREEN_WIDTH>>3));
+		uint8_t *line_ptr = m_video_memory + (y*(AVIGO_SCREEN_WIDTH>>3));
 
 		x = 0;
 		for (by=((AVIGO_SCREEN_WIDTH>>3)-1); by>=0; by--)
 		{
 			int px;
-			UINT8 byte = line_ptr[0];
+			uint8_t byte = line_ptr[0];
 
 			px = x;
 			for (b=7; b>=0; b--)

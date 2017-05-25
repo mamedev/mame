@@ -18,7 +18,7 @@
 
 TILE_GET_INFO_MEMBER(mitchell_state::get_tile_info)
 {
-	UINT8 attr = m_colorram[tile_index];
+	uint8_t attr = m_colorram[tile_index];
 	int code = m_videoram[2 * tile_index] + (m_videoram[2 * tile_index + 1] << 8);
 	SET_TILE_INFO_MEMBER(0,
 			code,
@@ -36,7 +36,7 @@ TILE_GET_INFO_MEMBER(mitchell_state::get_tile_info)
 
 VIDEO_START_MEMBER(mitchell_state,pang)
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(mitchell_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mitchell_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_bg_tilemap->set_transparent_pen(15);
 
 	/* OBJ RAM */
@@ -158,7 +158,7 @@ logerror("PC %04x: pang_gfxctrl_w %02x\n",space.device().safe_pc(),data);
 
 	/* bit 4 selects OKI M6295 bank */
 	if (m_oki != nullptr)
-		m_oki->set_bank_base((data & 0x10) ? 0x40000 : 0x00000);
+		m_oki->set_rom_bank((data >> 4) & 1);
 
 	/* bit 5 is palette RAM bank selector (doesn't apply to mgakuen) */
 	m_paletteram_bank = data & 0x20;
@@ -284,7 +284,7 @@ void mitchell_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 	}
 }
 
-UINT32 mitchell_state::screen_update_pang(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t mitchell_state::screen_update_pang(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);

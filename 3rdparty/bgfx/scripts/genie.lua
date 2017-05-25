@@ -1,5 +1,5 @@
 --
--- Copyright 2010-2016 Branimir Karadzic. All rights reserved.
+-- Copyright 2010-2017 Branimir Karadzic. All rights reserved.
 -- License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
 --
 
@@ -43,6 +43,11 @@ newoption {
 	description = "Enable building tools.",
 }
 
+newoption {
+	trigger = "with-examples",
+	description = "Enable building examples.",
+}
+
 solution "bgfx"
 	configurations {
 		"Debug",
@@ -80,10 +85,6 @@ if not os.isdir(BX_DIR) then
 	print("For more info see: https://bkaradzic.github.io/bgfx/build.html")
 	os.exit()
 end
-
-defines {
-	"BX_CONFIG_ENABLE_MSVC_LEVEL4_WARNINGS=1"
-}
 
 dofile (path.join(BX_DIR, "scripts/toolchain.lua"))
 if not toolchain(BGFX_BUILD_DIR, BGFX_THIRD_PARTY_DIR) then
@@ -136,9 +137,14 @@ function exampleProject(_name)
 		path.join(BGFX_DIR, "examples", _name, "**.bin.h"),
 	}
 
+	flags {
+		"FatalWarnings",
+	}
+
 	links {
-		"bgfx",
 		"example-common",
+		"bgfx",
+		"bx",
 	}
 
 	if _OPTIONS["with-sdl"] then
@@ -355,46 +361,55 @@ end
 
 dofile "bgfx.lua"
 
-group "examples"
-dofile "example-common.lua"
-
 group "libs"
 bgfxProject("", "StaticLib", {})
 
-group "examples"
-exampleProject("00-helloworld")
-exampleProject("01-cubes")
-exampleProject("02-metaballs")
-exampleProject("03-raymarch")
-exampleProject("04-mesh")
-exampleProject("05-instancing")
-exampleProject("06-bump")
-exampleProject("07-callback")
-exampleProject("08-update")
-exampleProject("09-hdr")
-exampleProject("10-font")
-exampleProject("11-fontsdf")
-exampleProject("12-lod")
-exampleProject("13-stencil")
-exampleProject("14-shadowvolumes")
-exampleProject("15-shadowmaps-simple")
-exampleProject("16-shadowmaps")
-exampleProject("17-drawstress")
-exampleProject("18-ibl")
-exampleProject("19-oit")
-exampleProject("20-nanovg")
-exampleProject("21-deferred")
-exampleProject("22-windows")
-exampleProject("23-vectordisplay")
-exampleProject("24-nbody")
-exampleProject("26-occlusion")
-exampleProject("27-terrain")
-exampleProject("28-wireframe")
-exampleProject("29-debugdraw")
+dofile(path.join(BX_DIR, "scripts/bx.lua"))
 
--- C99 source doesn't compile under WinRT settings
-if not premake.vstudio.iswinrt() then
-	exampleProject("25-c99")
+if _OPTIONS["with-examples"] or _OPTIONS["with-tools"] then
+	group "examples"
+	dofile "example-common.lua"
+end
+
+if _OPTIONS["with-examples"] then
+	group "examples"
+	exampleProject("00-helloworld")
+	exampleProject("01-cubes")
+	exampleProject("02-metaballs")
+	exampleProject("03-raymarch")
+	exampleProject("04-mesh")
+	exampleProject("05-instancing")
+	exampleProject("06-bump")
+	exampleProject("07-callback")
+	exampleProject("08-update")
+	exampleProject("09-hdr")
+	exampleProject("10-font")
+	exampleProject("11-fontsdf")
+	exampleProject("12-lod")
+	exampleProject("13-stencil")
+	exampleProject("14-shadowvolumes")
+	exampleProject("15-shadowmaps-simple")
+	exampleProject("16-shadowmaps")
+	exampleProject("17-drawstress")
+	exampleProject("18-ibl")
+	exampleProject("19-oit")
+	exampleProject("20-nanovg")
+	exampleProject("21-deferred")
+	exampleProject("22-windows")
+	exampleProject("23-vectordisplay")
+	exampleProject("24-nbody")
+	exampleProject("26-occlusion")
+	exampleProject("27-terrain")
+	exampleProject("28-wireframe")
+	exampleProject("29-debugdraw")
+	exampleProject("30-picking")
+	exampleProject("31-rsm")
+	exampleProject("32-particles")
+
+	-- C99 source doesn't compile under WinRT settings
+	if not premake.vstudio.iswinrt() then
+		exampleProject("25-c99")
+	end
 end
 
 if _OPTIONS["with-shared-lib"] then

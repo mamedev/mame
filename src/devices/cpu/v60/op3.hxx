@@ -1,15 +1,15 @@
 // license:BSD-3-Clause
 // copyright-holders:Farfetch'd, R. Belmont
-UINT32 v60_device::opINCB() /* TRUSTED */
+uint32_t v60_device::opINCB() /* TRUSTED */
 {
-	UINT8 appb;
+	uint8_t appb;
 	m_modadd = PC + 1;
 	m_moddim = 0;
 
 	m_amlength1 = ReadAMAddress();
 
 	if (m_amflag)
-		appb = (UINT8)m_reg[m_amout];
+		appb = (uint8_t)m_reg[m_amout];
 	else
 		appb = m_program->read_byte(m_amout);
 
@@ -23,16 +23,16 @@ UINT32 v60_device::opINCB() /* TRUSTED */
 	return m_amlength1 + 1;
 }
 
-UINT32 v60_device::opINCH() /* TRUSTED */
+uint32_t v60_device::opINCH() /* TRUSTED */
 {
-	UINT16 apph;
+	uint16_t apph;
 	m_modadd = PC + 1;
 	m_moddim = 1;
 
 	m_amlength1 = ReadAMAddress();
 
 	if (m_amflag)
-		apph = (UINT16)m_reg[m_amout];
+		apph = (uint16_t)m_reg[m_amout];
 	else
 		apph = m_program->read_word_unaligned(m_amout);
 
@@ -46,9 +46,9 @@ UINT32 v60_device::opINCH() /* TRUSTED */
 	return m_amlength1 + 1;
 }
 
-UINT32 v60_device::opINCW() /* TRUSTED */
+uint32_t v60_device::opINCW() /* TRUSTED */
 {
-	UINT32 appw;
+	uint32_t appw;
 	m_modadd = PC + 1;
 	m_moddim = 2;
 
@@ -69,16 +69,16 @@ UINT32 v60_device::opINCW() /* TRUSTED */
 	return m_amlength1 + 1;
 }
 
-UINT32 v60_device::opDECB() /* TRUSTED */
+uint32_t v60_device::opDECB() /* TRUSTED */
 {
-	UINT8 appb;
+	uint8_t appb;
 	m_modadd = PC + 1;
 	m_moddim = 0;
 
 	m_amlength1 = ReadAMAddress();
 
 	if (m_amflag)
-		appb = (UINT8)m_reg[m_amout];
+		appb = (uint8_t)m_reg[m_amout];
 	else
 		appb = m_program->read_byte(m_amout);
 
@@ -92,16 +92,16 @@ UINT32 v60_device::opDECB() /* TRUSTED */
 	return m_amlength1 + 1;
 }
 
-UINT32 v60_device::opDECH() /* TRUSTED */
+uint32_t v60_device::opDECH() /* TRUSTED */
 {
-	UINT16 apph;
+	uint16_t apph;
 	m_modadd = PC + 1;
 	m_moddim = 1;
 
 	m_amlength1 = ReadAMAddress();
 
 	if (m_amflag)
-		apph = (UINT16)m_reg[m_amout];
+		apph = (uint16_t)m_reg[m_amout];
 	else
 		apph = m_program->read_word_unaligned(m_amout);
 
@@ -115,9 +115,9 @@ UINT32 v60_device::opDECH() /* TRUSTED */
 	return m_amlength1 + 1;
 }
 
-UINT32 v60_device::opDECW() /* TRUSTED */
+uint32_t v60_device::opDECW() /* TRUSTED */
 {
-	UINT32 appw;
+	uint32_t appw;
 	m_modadd = PC + 1;
 	m_moddim = 2;
 
@@ -138,7 +138,7 @@ UINT32 v60_device::opDECW() /* TRUSTED */
 	return m_amlength1 + 1;
 }
 
-UINT32 v60_device::opJMP() /* TRUSTED */
+uint32_t v60_device::opJMP() /* TRUSTED */
 {
 	m_modadd = PC + 1;
 	m_moddim = 0;
@@ -155,7 +155,7 @@ UINT32 v60_device::opJMP() /* TRUSTED */
 	return 0;
 }
 
-UINT32 v60_device::opJSR() /* TRUSTED */
+uint32_t v60_device::opJSR() /* TRUSTED */
 {
 	m_modadd = PC + 1;
 	m_moddim = 0;
@@ -176,7 +176,7 @@ UINT32 v60_device::opJSR() /* TRUSTED */
 	return 0;
 }
 
-UINT32 v60_device::opPREPARE()    /* somewhat TRUSTED */
+uint32_t v60_device::opPREPARE()    /* somewhat TRUSTED */
 {
 	m_modadd = PC + 1;
 	m_moddim = 2;
@@ -197,7 +197,7 @@ UINT32 v60_device::opPREPARE()    /* somewhat TRUSTED */
 	return m_amlength1 + 1;
 }
 
-UINT32 v60_device::opRET() /* TRUSTED */
+uint32_t v60_device::opRET() /* TRUSTED */
 {
 	m_modadd = PC + 1;
 	m_moddim = 2;
@@ -219,9 +219,9 @@ UINT32 v60_device::opRET() /* TRUSTED */
 	return 0;
 }
 
-UINT32 v60_device::opTRAP()
+uint32_t v60_device::opTRAP()
 {
-	UINT32 oldPSW;
+	uint32_t oldPSW;
 
 	m_modadd = PC + 1;
 	m_moddim = 0;
@@ -299,9 +299,9 @@ UINT32 v60_device::opTRAP()
 	return 0;
 }
 
-UINT32 v60_device::opRETIU() /* TRUSTED */
+uint32_t v60_device::opRETIU() /* TRUSTED */
 {
-	UINT32 newPSW;
+	uint32_t newPSW;
 	m_modadd = PC + 1;
 	m_moddim = 1;
 
@@ -323,9 +323,9 @@ UINT32 v60_device::opRETIU() /* TRUSTED */
 	return 0;
 }
 
-UINT32 v60_device::opRETIS()
+uint32_t v60_device::opRETIS()
 {
-	UINT32 newPSW;
+	uint32_t newPSW;
 
 	m_modadd = PC + 1;
 	m_moddim = 1;
@@ -348,10 +348,10 @@ UINT32 v60_device::opRETIS()
 	return 0;
 }
 
-UINT32 v60_device::opSTTASK()
+uint32_t v60_device::opSTTASK()
 {
 	int i;
-	UINT32 adr;
+	uint32_t adr;
 
 	m_modadd = PC + 1;
 	m_moddim = 2;
@@ -394,7 +394,7 @@ UINT32 v60_device::opSTTASK()
 	return m_amlength1 + 1;
 }
 
-UINT32 v60_device::opGETPSW()
+uint32_t v60_device::opGETPSW()
 {
 	m_modadd = PC + 1;
 	m_moddim = 2;
@@ -406,18 +406,18 @@ UINT32 v60_device::opGETPSW()
 	return m_amlength1 + 1;
 }
 
-UINT32 v60_device::opTASI()
+uint32_t v60_device::opTASI()
 {
-	UINT8 appb;
+	uint8_t appb;
 	m_modadd = PC + 1;
 	m_moddim = 0;
 
 	// Load the address of the operand
 	m_amlength1 = ReadAMAddress();
 
-	// Load UINT8 from the address
+	// Load uint8_t from the address
 	if (m_amflag)
-		appb = (UINT8)m_reg[m_amout & 0x1F];
+		appb = (uint8_t)m_reg[m_amout & 0x1F];
 	else
 		appb = m_program->read_byte(m_amout);
 
@@ -433,7 +433,7 @@ UINT32 v60_device::opTASI()
 	return m_amlength1 + 1;
 }
 
-UINT32 v60_device::opCLRTLB()
+uint32_t v60_device::opCLRTLB()
 {
 	m_modadd = PC + 1;
 	m_moddim = 2;
@@ -446,7 +446,7 @@ UINT32 v60_device::opCLRTLB()
 	return m_amlength1 + 1;
 }
 
-UINT32 v60_device::opPOPM()
+uint32_t v60_device::opPOPM()
 {
 	int i;
 
@@ -472,7 +472,7 @@ UINT32 v60_device::opPOPM()
 	return m_amlength1 + 1;
 }
 
-UINT32 v60_device::opPUSHM()
+uint32_t v60_device::opPUSHM()
 {
 	int i;
 
@@ -499,7 +499,7 @@ UINT32 v60_device::opPUSHM()
 	return m_amlength1 + 1;
 }
 
-UINT32 v60_device::opTESTB() /* TRUSTED */
+uint32_t v60_device::opTESTB() /* TRUSTED */
 {
 	m_modadd = PC + 1;
 	m_moddim = 0;
@@ -515,7 +515,7 @@ UINT32 v60_device::opTESTB() /* TRUSTED */
 	return m_amlength1 + 1;
 }
 
-UINT32 v60_device::opTESTH() /* TRUSTED */
+uint32_t v60_device::opTESTH() /* TRUSTED */
 {
 	m_modadd = PC + 1;
 	m_moddim = 1;
@@ -531,7 +531,7 @@ UINT32 v60_device::opTESTH() /* TRUSTED */
 	return m_amlength1 + 1;
 }
 
-UINT32 v60_device::opTESTW() /* TRUSTED */
+uint32_t v60_device::opTESTW() /* TRUSTED */
 {
 	m_modadd = PC + 1;
 	m_moddim = 2;
@@ -547,7 +547,7 @@ UINT32 v60_device::opTESTW() /* TRUSTED */
 	return m_amlength1 + 1;
 }
 
-UINT32 v60_device::opPUSH()
+uint32_t v60_device::opPUSH()
 {
 	m_modadd = PC + 1;
 	m_moddim = 2;
@@ -560,7 +560,7 @@ UINT32 v60_device::opPUSH()
 	return m_amlength1 + 1;
 }
 
-UINT32 v60_device::opPOP()
+uint32_t v60_device::opPOP()
 {
 	m_modadd = PC + 1;
 	m_moddim = 2;
@@ -572,70 +572,70 @@ UINT32 v60_device::opPOP()
 }
 
 
-UINT32 v60_device::opINCB_0() { m_modm = 0; return opINCB(); }
-UINT32 v60_device::opINCB_1() { m_modm = 1; return opINCB(); }
-UINT32 v60_device::opINCH_0() { m_modm = 0; return opINCH(); }
-UINT32 v60_device::opINCH_1() { m_modm = 1; return opINCH(); }
-UINT32 v60_device::opINCW_0() { m_modm = 0; return opINCW(); }
-UINT32 v60_device::opINCW_1() { m_modm = 1; return opINCW(); }
+uint32_t v60_device::opINCB_0() { m_modm = 0; return opINCB(); }
+uint32_t v60_device::opINCB_1() { m_modm = 1; return opINCB(); }
+uint32_t v60_device::opINCH_0() { m_modm = 0; return opINCH(); }
+uint32_t v60_device::opINCH_1() { m_modm = 1; return opINCH(); }
+uint32_t v60_device::opINCW_0() { m_modm = 0; return opINCW(); }
+uint32_t v60_device::opINCW_1() { m_modm = 1; return opINCW(); }
 
-UINT32 v60_device::opDECB_0() { m_modm = 0; return opDECB(); }
-UINT32 v60_device::opDECB_1() { m_modm = 1; return opDECB(); }
-UINT32 v60_device::opDECH_0() { m_modm = 0; return opDECH(); }
-UINT32 v60_device::opDECH_1() { m_modm = 1; return opDECH(); }
-UINT32 v60_device::opDECW_0() { m_modm = 0; return opDECW(); }
-UINT32 v60_device::opDECW_1() { m_modm = 1; return opDECW(); }
+uint32_t v60_device::opDECB_0() { m_modm = 0; return opDECB(); }
+uint32_t v60_device::opDECB_1() { m_modm = 1; return opDECB(); }
+uint32_t v60_device::opDECH_0() { m_modm = 0; return opDECH(); }
+uint32_t v60_device::opDECH_1() { m_modm = 1; return opDECH(); }
+uint32_t v60_device::opDECW_0() { m_modm = 0; return opDECW(); }
+uint32_t v60_device::opDECW_1() { m_modm = 1; return opDECW(); }
 
-UINT32 v60_device::opJMP_0() { m_modm = 0; return opJMP(); }
-UINT32 v60_device::opJMP_1() { m_modm = 1; return opJMP(); }
+uint32_t v60_device::opJMP_0() { m_modm = 0; return opJMP(); }
+uint32_t v60_device::opJMP_1() { m_modm = 1; return opJMP(); }
 
-UINT32 v60_device::opJSR_0() { m_modm = 0; return opJSR(); }
-UINT32 v60_device::opJSR_1() { m_modm = 1; return opJSR(); }
+uint32_t v60_device::opJSR_0() { m_modm = 0; return opJSR(); }
+uint32_t v60_device::opJSR_1() { m_modm = 1; return opJSR(); }
 
-UINT32 v60_device::opPREPARE_0() { m_modm = 0; return opPREPARE(); }
-UINT32 v60_device::opPREPARE_1() { m_modm = 1; return opPREPARE(); }
+uint32_t v60_device::opPREPARE_0() { m_modm = 0; return opPREPARE(); }
+uint32_t v60_device::opPREPARE_1() { m_modm = 1; return opPREPARE(); }
 
-UINT32 v60_device::opRET_0() { m_modm = 0; return opRET(); }
-UINT32 v60_device::opRET_1() { m_modm = 1; return opRET(); }
+uint32_t v60_device::opRET_0() { m_modm = 0; return opRET(); }
+uint32_t v60_device::opRET_1() { m_modm = 1; return opRET(); }
 
-UINT32 v60_device::opTRAP_0() { m_modm = 0; return opTRAP(); }
-UINT32 v60_device::opTRAP_1() { m_modm = 1; return opTRAP(); }
+uint32_t v60_device::opTRAP_0() { m_modm = 0; return opTRAP(); }
+uint32_t v60_device::opTRAP_1() { m_modm = 1; return opTRAP(); }
 
-UINT32 v60_device::opRETIU_0() { m_modm = 0; return opRETIU(); }
-UINT32 v60_device::opRETIU_1() { m_modm = 1; return opRETIU(); }
+uint32_t v60_device::opRETIU_0() { m_modm = 0; return opRETIU(); }
+uint32_t v60_device::opRETIU_1() { m_modm = 1; return opRETIU(); }
 
-UINT32 v60_device::opRETIS_0() { m_modm = 0; return opRETIS(); }
-UINT32 v60_device::opRETIS_1() { m_modm = 1; return opRETIS(); }
+uint32_t v60_device::opRETIS_0() { m_modm = 0; return opRETIS(); }
+uint32_t v60_device::opRETIS_1() { m_modm = 1; return opRETIS(); }
 
-UINT32 v60_device::opGETPSW_0() { m_modm = 0; return opGETPSW(); }
-UINT32 v60_device::opGETPSW_1() { m_modm = 1; return opGETPSW(); }
+uint32_t v60_device::opGETPSW_0() { m_modm = 0; return opGETPSW(); }
+uint32_t v60_device::opGETPSW_1() { m_modm = 1; return opGETPSW(); }
 
-UINT32 v60_device::opTASI_0() { m_modm = 0; return opTASI(); }
-UINT32 v60_device::opTASI_1() { m_modm = 1; return opTASI(); }
+uint32_t v60_device::opTASI_0() { m_modm = 0; return opTASI(); }
+uint32_t v60_device::opTASI_1() { m_modm = 1; return opTASI(); }
 
-UINT32 v60_device::opCLRTLB_0() { m_modm = 0; return opCLRTLB(); }
-UINT32 v60_device::opCLRTLB_1() { m_modm = 1; return opCLRTLB(); }
+uint32_t v60_device::opCLRTLB_0() { m_modm = 0; return opCLRTLB(); }
+uint32_t v60_device::opCLRTLB_1() { m_modm = 1; return opCLRTLB(); }
 
-UINT32 v60_device::opPOPM_0() { m_modm = 0; return opPOPM(); }
-UINT32 v60_device::opPOPM_1() { m_modm = 1; return opPOPM(); }
+uint32_t v60_device::opPOPM_0() { m_modm = 0; return opPOPM(); }
+uint32_t v60_device::opPOPM_1() { m_modm = 1; return opPOPM(); }
 
-UINT32 v60_device::opPUSHM_0() { m_modm = 0; return opPUSHM(); }
-UINT32 v60_device::opPUSHM_1() { m_modm = 1; return opPUSHM(); }
+uint32_t v60_device::opPUSHM_0() { m_modm = 0; return opPUSHM(); }
+uint32_t v60_device::opPUSHM_1() { m_modm = 1; return opPUSHM(); }
 
-UINT32 v60_device::opTESTB_0() { m_modm = 0; return opTESTB(); }
-UINT32 v60_device::opTESTB_1() { m_modm = 1; return opTESTB(); }
+uint32_t v60_device::opTESTB_0() { m_modm = 0; return opTESTB(); }
+uint32_t v60_device::opTESTB_1() { m_modm = 1; return opTESTB(); }
 
-UINT32 v60_device::opTESTH_0() { m_modm = 0; return opTESTH(); }
-UINT32 v60_device::opTESTH_1() { m_modm = 1; return opTESTH(); }
+uint32_t v60_device::opTESTH_0() { m_modm = 0; return opTESTH(); }
+uint32_t v60_device::opTESTH_1() { m_modm = 1; return opTESTH(); }
 
-UINT32 v60_device::opTESTW_0() { m_modm = 0; return opTESTW(); }
-UINT32 v60_device::opTESTW_1() { m_modm = 1; return opTESTW(); }
+uint32_t v60_device::opTESTW_0() { m_modm = 0; return opTESTW(); }
+uint32_t v60_device::opTESTW_1() { m_modm = 1; return opTESTW(); }
 
-UINT32 v60_device::opPUSH_0() { m_modm = 0; return opPUSH(); }
-UINT32 v60_device::opPUSH_1() { m_modm = 1; return opPUSH(); }
+uint32_t v60_device::opPUSH_0() { m_modm = 0; return opPUSH(); }
+uint32_t v60_device::opPUSH_1() { m_modm = 1; return opPUSH(); }
 
-UINT32 v60_device::opPOP_0() { m_modm = 0; return opPOP(); }
-UINT32 v60_device::opPOP_1() { m_modm = 1; return opPOP(); }
+uint32_t v60_device::opPOP_0() { m_modm = 0; return opPOP(); }
+uint32_t v60_device::opPOP_1() { m_modm = 1; return opPOP(); }
 
-UINT32 v60_device::opSTTASK_0() { m_modm = 0; return opSTTASK(); }
-UINT32 v60_device::opSTTASK_1() { m_modm = 1; return opSTTASK(); }
+uint32_t v60_device::opSTTASK_0() { m_modm = 0; return opSTTASK(); }
+uint32_t v60_device::opSTTASK_1() { m_modm = 1; return opSTTASK(); }

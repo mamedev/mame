@@ -93,10 +93,12 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/cloud9.h"
+
 #include "cpu/m6502/m6502.h"
 #include "machine/watchdog.h"
 #include "sound/pokey.h"
-#include "includes/cloud9.h"
+#include "speaker.h"
 
 
 #define MASTER_CLOCK          (10000000)
@@ -402,7 +404,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( cloud9, cloud9_state )
+static MACHINE_CONFIG_START( cloud9 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK/8)
@@ -496,5 +498,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, cloud9,   0, cloud9, cloud9, driver_device,   0, ROT0, "Atari", "Cloud 9 (prototype)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, firebeas, 0, cloud9, firebeas, driver_device, 0, ROT0, "Atari", "Firebeast (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, cloud9,   0, cloud9, cloud9,   cloud9_state, 0, ROT0, "Atari", "Cloud 9 (prototype)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1983, firebeas, 0, cloud9, firebeas, cloud9_state, 0, ROT0, "Atari", "Firebeast (prototype)", MACHINE_SUPPORTS_SAVE )

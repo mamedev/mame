@@ -939,8 +939,8 @@ INT_PTR CProgressDialog::Create(const UString &title, NWindows::CThread &thread,
       CWaitCursor waitCursor;
       HANDLE h[] = { thread, _createDialogEvent };
       
-      WRes res = WaitForMultipleObjects(ARRAY_SIZE(h), h, FALSE, kCreateDelay);
-      if (res == WAIT_OBJECT_0 && !Sync.ThereIsMessage())
+      WRes res2 = WaitForMultipleObjects(ARRAY_SIZE(h), h, FALSE, kCreateDelay);
+      if (res2 == WAIT_OBJECT_0 && !Sync.ThereIsMessage())
         return 0;
     }
     _title = title;

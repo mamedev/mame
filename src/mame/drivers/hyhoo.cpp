@@ -24,11 +24,14 @@ Memo:
 ******************************************************************************/
 
 #include "emu.h"
+#include "includes/hyhoo.h"
+
 #include "cpu/z80/z80.h"
+#include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "includes/hyhoo.h"
-#include "machine/nvram.h"
+#include "sound/volt_reg.h"
+#include "speaker.h"
 
 
 static ADDRESS_MAP_START( hyhoo_map, AS_PROGRAM, 8, hyhoo_state )
@@ -47,7 +50,7 @@ static ADDRESS_MAP_START( hyhoo_io_map, AS_IO, 8, hyhoo_state )
 	AM_RANGE(0xa0, 0xa0) AM_DEVREADWRITE("nb1413m3", nb1413m3_device, inputport1_r, inputportsel_w)
 	AM_RANGE(0xb0, 0xb0) AM_DEVREADWRITE("nb1413m3", nb1413m3_device, inputport2_r, sndrombank1_w)
 	AM_RANGE(0xc0, 0xcf) AM_WRITEONLY AM_SHARE("clut")
-	AM_RANGE(0xd0, 0xd0) AM_READNOP AM_DEVWRITE("dac", dac_device, write_unsigned8)     // unknown read
+	AM_RANGE(0xd0, 0xd0) AM_READNOP AM_DEVWRITE("dac", dac_byte_interface, write)     // unknown read
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(hyhoo_romsel_w)
 	AM_RANGE(0xe0, 0xe1) AM_DEVREAD("nb1413m3", nb1413m3_device, gfxrom_r)
 	AM_RANGE(0xf0, 0xf0) AM_DEVREAD("nb1413m3", nb1413m3_device, dipsw1_r)
@@ -109,7 +112,7 @@ static INPUT_PORTS_START( hyhoo )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, hyhoo_state, nb1413m3_busyflag_r, nullptr)    // DRAW BUSY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )         // NOT USED
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )       // SERVICE
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Memory Reset")     // MEMORY RESET
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                 // TEST
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )          // COIN1
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )         // NOT USED
@@ -184,7 +187,7 @@ static INPUT_PORTS_START( hyhoo2 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, hyhoo_state, nb1413m3_busyflag_r, nullptr)    // DRAW BUSY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )         // NOT USED
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )       // SERVICE
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Memory Reset")     // MEMORY RESET
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                 // TEST
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )          // COIN1
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )         // NOT USED
@@ -221,7 +224,7 @@ static INPUT_PORTS_START( hyhoo2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( hyhoo, hyhoo_state )
+static MACHINE_CONFIG_START( hyhoo )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 5000000)   /* 5.00 MHz ?? */
@@ -244,14 +247,16 @@ static MACHINE_CONFIG_START( hyhoo, hyhoo_state )
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_SOUND_ADD("aysnd", AY8910, 1250000)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWA"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWB"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.35)
+
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -304,5 +309,5 @@ ROM_START( hyhoo2 )
 ROM_END
 
 
-GAME( 1987, hyhoo,  0, hyhoo,  hyhoo,  driver_device, 0, ROT90, "Nichibutsu", "Hayaoshi Taisen Quiz Hyhoo (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, hyhoo2, 0, hyhoo2, hyhoo2, driver_device, 0, ROT90, "Nichibutsu", "Hayaoshi Taisen Quiz Hyhoo 2 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, hyhoo,  0, hyhoo,  hyhoo,  hyhoo_state, 0, ROT90, "Nichibutsu", "Hayaoshi Taisen Quiz Hyhoo (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, hyhoo2, 0, hyhoo2, hyhoo2, hyhoo_state, 0, ROT90, "Nichibutsu", "Hayaoshi Taisen Quiz Hyhoo 2 (Japan)", MACHINE_SUPPORTS_SAVE )

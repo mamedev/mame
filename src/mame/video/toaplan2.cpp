@@ -58,7 +58,7 @@ TILE_GET_INFO_MEMBER(toaplan2_state::get_text_tile_info)
 
 void toaplan2_state::create_tx_tilemap(int dx, int dx_flipped)
 {
-	m_tx_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(toaplan2_state::get_text_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(toaplan2_state::get_text_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	m_tx_tilemap->set_scroll_rows(8*32); /* line scrolling */
 	m_tx_tilemap->set_scroll_cols(1);
@@ -94,7 +94,7 @@ VIDEO_START_MEMBER(toaplan2_state,truxton2)
 	VIDEO_START_CALL_MEMBER( toaplan2 );
 
 	/* Create the Text tilemap for this game */
-	m_gfxdecode->gfx(0)->set_source(reinterpret_cast<UINT8 *>(m_tx_gfxram16.target()));
+	m_gfxdecode->gfx(0)->set_source(reinterpret_cast<uint8_t *>(m_tx_gfxram16.target()));
 	machine().save().register_postload(save_prepost_delegate(FUNC(toaplan2_state::truxton2_postload), this));
 
 	create_tx_tilemap(0x1d5, 0x16a);
@@ -108,17 +108,10 @@ VIDEO_START_MEMBER(toaplan2_state,fixeightbl)
 	create_tx_tilemap();
 
 	/* This bootleg has additional layer offsets on the VDP */
-	m_vdp0->bg.extra_xoffset.normal  = -0x1d6  -26;
-	m_vdp0->bg.extra_yoffset.normal  = -0x1ef  -15;
-
-	m_vdp0->fg.extra_xoffset.normal  = -0x1d8  -22;
-	m_vdp0->fg.extra_yoffset.normal  = -0x1ef  -15;
-
-	m_vdp0->top.extra_xoffset.normal = -0x1da  -18;
-	m_vdp0->top.extra_yoffset.normal = -0x1ef  -15;
-
-	m_vdp0->sp.extra_xoffset.normal  = 8;//-0x1cc  -64;
-	m_vdp0->sp.extra_yoffset.normal  = 8;//-0x1ef  -128;
+	m_vdp0->set_bg_extra_offsets(  -0x1d6 - 26, -0x1ef - 15, 0, 0 );
+	m_vdp0->set_fg_extra_offsets(  -0x1d8 - 22, -0x1ef - 15, 0, 0 );
+	m_vdp0->set_top_extra_offsets( -0x1da - 18, -0x1ef - 15, 0, 0 );
+	m_vdp0->set_sp_extra_offsets(8/*-0x1cc - 64*/, 8/*-0x1ef - 128*/, 0, 0);
 
 	m_vdp0->init_scroll_regs();
 }
@@ -143,17 +136,17 @@ VIDEO_START_MEMBER(toaplan2_state,batrider)
 {
 	VIDEO_START_CALL_MEMBER( toaplan2 );
 
-	m_vdp0->sp.use_sprite_buffer = 0; // disable buffering on this game
+	m_vdp0->disable_sprite_buffer(); // disable buffering on this game
 
 	/* Create the Text tilemap for this game */
 	m_tx_gfxram16.allocate(RAIZING_TX_GFXRAM_SIZE/2);
-	m_gfxdecode->gfx(0)->set_source(reinterpret_cast<UINT8 *>(m_tx_gfxram16.target()));
+	m_gfxdecode->gfx(0)->set_source(reinterpret_cast<uint8_t *>(m_tx_gfxram16.target()));
 	machine().save().register_postload(save_prepost_delegate(FUNC(toaplan2_state::truxton2_postload), this));
 
 	create_tx_tilemap(0x1d4, 0x16b);
 
 	/* Has special banking */
-	m_vdp0->gp9001_gfxrom_is_banked = 1;
+	m_vdp0->set_gfxrom_banked();
 }
 
 WRITE16_MEMBER(toaplan2_state::toaplan2_tx_videoram_w)
@@ -175,7 +168,7 @@ WRITE16_MEMBER(toaplan2_state::toaplan2_tx_gfxram16_w)
 {
 	/*** Dynamic GFX decoding for Truxton 2 / FixEight ***/
 
-	UINT16 oldword = m_tx_gfxram16[offset];
+	uint16_t oldword = m_tx_gfxram16[offset];
 
 	if (oldword != data)
 	{
@@ -189,7 +182,7 @@ WRITE16_MEMBER(toaplan2_state::batrider_textdata_dma_w)
 	/*** Dynamic Text GFX decoding for Batrider ***/
 	/*** Only done once during start-up ***/
 
-	UINT16 *dest = m_tx_gfxram16;
+	uint16_t *dest = m_tx_gfxram16;
 
 	memcpy(dest, m_tx_videoram, m_tx_videoram.bytes());
 	dest += (m_tx_videoram.bytes()/2);
@@ -214,19 +207,12 @@ WRITE16_MEMBER(toaplan2_state::batrider_unknown_dma_w)
 WRITE16_MEMBER(toaplan2_state::batrider_objectbank_w)
 {
 	if (ACCESSING_BITS_0_7)
-	{
-		data &= 0xf;
-		if (m_vdp0->gp9001_gfxrom_bank[offset] != data)
-		{
-			m_vdp0->gp9001_gfxrom_bank[offset] = data;
-			m_vdp0->gp9001_gfxrom_bank_dirty = 1;
-		}
-	}
+		m_vdp0->set_gfxrom_bank(offset, data & 0x0f);
 }
 
 
 // Dogyuun doesn't appear to require fancy mixing?
-UINT32 toaplan2_state::screen_update_dogyuun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t toaplan2_state::screen_update_dogyuun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (m_vdp1)
 	{
@@ -247,7 +233,7 @@ UINT32 toaplan2_state::screen_update_dogyuun(screen_device &screen, bitmap_ind16
 
 
 // renders to 2 bitmaps, and mixes output
-UINT32 toaplan2_state::screen_update_batsugun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t toaplan2_state::screen_update_batsugun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 //  bitmap.fill(0, cliprect);
 //  gp9001_custom_priority_bitmap->fill(0, cliprect);
@@ -282,8 +268,8 @@ UINT32 toaplan2_state::screen_update_batsugun(screen_device &screen, bitmap_ind1
 		int width = screen.width();
 		int height = screen.height();
 		int y,x;
-		UINT16* src_vdp0; // output buffer of vdp0
-		UINT16* src_vdp1; // output buffer of vdp1
+		uint16_t* src_vdp0; // output buffer of vdp0
+		uint16_t* src_vdp1; // output buffer of vdp1
 
 		for (y=0;y<height;y++)
 		{
@@ -292,8 +278,8 @@ UINT32 toaplan2_state::screen_update_batsugun(screen_device &screen, bitmap_ind1
 
 			for (x=0;x<width;x++)
 			{
-				UINT16 GPU0_LUTaddr = src_vdp0[x];
-				UINT16 GPU1_LUTaddr = src_vdp1[x];
+				uint16_t GPU0_LUTaddr = src_vdp0[x];
+				uint16_t GPU1_LUTaddr = src_vdp1[x];
 
 				// these equations is derived from the PAL, but doesn't seem to work?
 
@@ -346,7 +332,7 @@ UINT32 toaplan2_state::screen_update_batsugun(screen_device &screen, bitmap_ind1
 }
 
 
-UINT32 toaplan2_state::screen_update_toaplan2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t toaplan2_state::screen_update_toaplan2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 	m_custom_priority_bitmap.fill(0, cliprect);
@@ -357,7 +343,7 @@ UINT32 toaplan2_state::screen_update_toaplan2(screen_device &screen, bitmap_ind1
 
 
 /* fixeightbl and bgareggabl do not use the lineselect or linescroll tables */
-UINT32 toaplan2_state::screen_update_bootleg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t toaplan2_state::screen_update_bootleg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	screen_update_toaplan2(screen, bitmap, cliprect);
 	m_tx_tilemap->draw(screen, bitmap, cliprect, 0);
@@ -365,7 +351,7 @@ UINT32 toaplan2_state::screen_update_bootleg(screen_device &screen, bitmap_ind16
 }
 
 
-UINT32 toaplan2_state::screen_update_truxton2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t toaplan2_state::screen_update_truxton2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	screen_update_toaplan2(screen, bitmap, cliprect);
 
@@ -388,7 +374,7 @@ UINT32 toaplan2_state::screen_update_truxton2(screen_device &screen, bitmap_ind1
 
 
 
-void toaplan2_state::screen_eof_toaplan2(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(toaplan2_state::screen_vblank_toaplan2)
 {
 	// rising edge
 	if (state)

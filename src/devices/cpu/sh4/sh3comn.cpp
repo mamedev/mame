@@ -75,7 +75,7 @@ WRITE32_MEMBER( sh3_base_device::sh3_internal_high_w )
 
 READ32_MEMBER( sh3_base_device::sh3_internal_high_r )
 {
-	UINT32 ret = 0;
+	uint32_t ret = 0;
 
 	switch (offset)
 	{
@@ -378,7 +378,7 @@ WRITE32_MEMBER( sh3_base_device::sh3_internal_w )
 {
 	if (offset<0x1000)
 	{
-		//UINT32 old = m_sh3internal_lower[offset];
+		//uint32_t old = m_sh3internal_lower[offset];
 		COMBINE_DATA(&m_sh3internal_lower[offset]);
 
 		switch (offset)

@@ -21,20 +21,20 @@ public:
 		m_decrypted_opcodes(*this, "decrypted_opcodes") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_colorram;
-	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
+	required_shared_ptr<uint8_t> m_spriteram;
 
 	/* misc */
-	UINT8      m_sound_byte;
-	UINT8      m_nmi_enable;
+	uint8_t      m_sound_byte;
+	uint8_t      m_nmi_enable;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	optional_shared_ptr<UINT8> m_decrypted_opcodes;
+	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 
 	DECLARE_WRITE8_MEMBER(mouser_nmi_enable_w);
 	DECLARE_WRITE8_MEMBER(mouser_sound_interrupt_w);
@@ -46,7 +46,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(mouser);
-	UINT32 screen_update_mouser(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_mouser(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(mouser_nmi_interrupt);
 	INTERRUPT_GEN_MEMBER(mouser_sound_nmi_assert);
 };

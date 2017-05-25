@@ -23,12 +23,14 @@
 
 #include "emu.h"
 #include "cpu/tms34010/tms34010.h"
+#include "machine/nvram.h"
 #include "machine/ticket.h"
-#include "video/tlc34076.h"
+#include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "sound/okim6295.h"
-#include "machine/nvram.h"
-#include "machine/watchdog.h"
+#include "video/tlc34076.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class tickee_state : public driver_device
@@ -55,14 +57,14 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<tlc34076_device> m_tlc34076;
 
-	required_shared_ptr<UINT16> m_vram;
-	optional_shared_ptr<UINT16> m_control;
+	required_shared_ptr<uint16_t> m_vram;
+	optional_shared_ptr<uint16_t> m_control;
 
 	emu_timer *m_setup_gun_timer;
 	int m_beamxadd;
 	int m_beamyadd;
 	int m_palette_bank;
-	UINT8 m_gunx[2];
+	uint8_t m_gunx[2];
 	void get_crosshair_xy(int player, int &x, int &y);
 
 	DECLARE_WRITE16_MEMBER(rapidfir_transparent_w);
@@ -133,7 +135,7 @@ void tickee_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 		setup_gun_interrupts(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in tickee_state::device_timer");
+		assert_always(false, "Unknown id in tickee_state::device_timer");
 	}
 }
 
@@ -206,8 +208,8 @@ VIDEO_START_MEMBER(tickee_state,tickee)
 
 TMS340X0_SCANLINE_RGB32_CB_MEMBER(tickee_state::scanline_update)
 {
-	UINT16 *src = &m_vram[(params->rowaddr << 8) & 0x3ff00];
-	UINT32 *dest = &bitmap.pix32(scanline);
+	uint16_t *src = &m_vram[(params->rowaddr << 8) & 0x3ff00];
+	uint32_t *dest = &bitmap.pix32(scanline);
 	const rgb_t *pens = m_tlc34076->get_pens();
 	int coladdr = params->coladdr << 1;
 	int x;
@@ -222,7 +224,7 @@ TMS340X0_SCANLINE_RGB32_CB_MEMBER(tickee_state::scanline_update)
 		/* copy the non-blanked portions of this scanline */
 		for (x = params->heblnk; x < params->hsblnk; x += 2)
 		{
-			UINT16 pixels = src[coladdr++ & 0xff];
+			uint16_t pixels = src[coladdr++ & 0xff];
 			dest[x + 0] = pens[pixels & 0xff];
 			dest[x + 1] = pens[pixels >> 8];
 		}
@@ -231,8 +233,8 @@ TMS340X0_SCANLINE_RGB32_CB_MEMBER(tickee_state::scanline_update)
 
 TMS340X0_SCANLINE_RGB32_CB_MEMBER(tickee_state::rapidfir_scanline_update)
 {
-	UINT16 *src = &m_vram[(params->rowaddr << 8) & 0x3ff00];
-	UINT32 *dest = &bitmap.pix32(scanline);
+	uint16_t *src = &m_vram[(params->rowaddr << 8) & 0x3ff00];
+	uint32_t *dest = &bitmap.pix32(scanline);
 	const rgb_t *pens = m_tlc34076->get_pens();
 	int coladdr = params->coladdr << 1;
 	int x;
@@ -251,7 +253,7 @@ TMS340X0_SCANLINE_RGB32_CB_MEMBER(tickee_state::rapidfir_scanline_update)
 		/* copy the non-blanked portions of this scanline */
 		for (x = params->heblnk; x < params->hsblnk; x += 2)
 		{
-			UINT16 pixels = src[coladdr++ & 0xff];
+			uint16_t pixels = src[coladdr++ & 0xff];
 			dest[x + 0] = pens[pixels & 0xff];
 			dest[x + 1] = pens[pixels >> 8];
 		}
@@ -321,7 +323,7 @@ TMS340X0_FROM_SHIFTREG_CB_MEMBER(tickee_state::rapidfir_from_shiftreg)
 
 WRITE16_MEMBER(tickee_state::tickee_control_w)
 {
-	UINT16 olddata = m_control[offset];
+	uint16_t olddata = m_control[offset];
 
 	/* offsets:
 
@@ -399,19 +401,19 @@ WRITE16_MEMBER(tickee_state::sound_bank_w)
 	switch (data & 0xff)
 	{
 		case 0x2c:
-			m_oki->set_bank_base(0x00000);
+			m_oki->set_rom_bank(0);
 			break;
 
 		case 0x2d:
-			m_oki->set_bank_base(0x40000);
+			m_oki->set_rom_bank(1);
 			break;
 
 		case 0x1c:
-			m_oki->set_bank_base(0x80000);
+			m_oki->set_rom_bank(2);
 			break;
 
 		case 0x1d:
-			m_oki->set_bank_base(0xc0000);
+			m_oki->set_rom_bank(3);
 			break;
 
 		default:
@@ -740,12 +742,12 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( tickee, tickee_state )
+static MACHINE_CONFIG_START( tickee )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS34010, XTAL_40MHz)
 	MCFG_CPU_PROGRAM_MAP(tickee_map)
-	MCFG_TMS340X0_HALT_ON_RESET(FALSE) /* halt on reset */
+	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(VIDEO_CLOCK/2) /* pixel clock */
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */
 	MCFG_TMS340X0_SCANLINE_RGB32_CB(tickee_state, scanline_update) /* scanline callback (rgb32) */
@@ -788,12 +790,12 @@ static MACHINE_CONFIG_DERIVED( ghoshunt, tickee )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( rapidfir, tickee_state )
+static MACHINE_CONFIG_START( rapidfir )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS34010, XTAL_50MHz)
 	MCFG_CPU_PROGRAM_MAP(rapidfir_map)
-	MCFG_TMS340X0_HALT_ON_RESET(FALSE) /* halt on reset */
+	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(VIDEO_CLOCK/2) /* pixel clock */
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */
 	MCFG_TMS340X0_SCANLINE_RGB32_CB(tickee_state, rapidfir_scanline_update)       /* scanline callback (rgb32) */
@@ -817,17 +819,17 @@ static MACHINE_CONFIG_START( rapidfir, tickee_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", OKI_CLOCK, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", OKI_CLOCK, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( mouseatk, tickee_state )
+static MACHINE_CONFIG_START( mouseatk )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS34010, XTAL_40MHz)
 	MCFG_CPU_PROGRAM_MAP(mouseatk_map)
-	MCFG_TMS340X0_HALT_ON_RESET(FALSE) /* halt on reset */
+	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(VIDEO_CLOCK/2) /* pixel clock */
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */
 	MCFG_TMS340X0_SCANLINE_RGB32_CB(tickee_state, scanline_update) /* scanline callback (rgb32) */
@@ -853,7 +855,7 @@ static MACHINE_CONFIG_START( mouseatk, tickee_state )
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN1"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_OKIM6295_ADD("oki", OKI_CLOCK, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", OKI_CLOCK, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
@@ -1149,11 +1151,11 @@ ROM_END
  *
  *************************************/
 
-GAME( 1994, tickee,    0,        tickee,   tickee, driver_device,   0, ROT0, "Raster Elite",  "Tickee Tickats", 0 )
-GAME( 1996, ghoshunt,  0,        ghoshunt, ghoshunt, driver_device, 0, ROT0, "Hanaho Games",  "Ghost Hunter", 0 )
-GAME( 1996, tutstomb,  0,        ghoshunt, ghoshunt, driver_device, 0, ROT0, "Island Design", "Tut's Tomb", 0 )
-GAME( 1996, mouseatk,  0,        mouseatk, mouseatk, driver_device, 0, ROT0, "ICE",           "Mouse Attack", 0 )
-GAME( 1998, rapidfir,  0,        rapidfir, rapidfir, driver_device, 0, ROT0, "Hanaho Games",  "Rapid Fire v1.1 (Build 239)", 0 )
-GAME( 1998, rapidfira, rapidfir, rapidfir, rapidfir, driver_device, 0, ROT0, "Hanaho Games",  "Rapid Fire v1.1 (Build 238)", 0 )
-GAME( 1998, rapidfire, rapidfir, rapidfir, rapidfir, driver_device, 0, ROT0, "Hanaho Games",  "Rapid Fire v1.0 (Build 236)", 0 )
-GAME( 1999, maletmad,  0,        rapidfir, rapidfir, driver_device, 0, ROT0, "Hanaho Games",  "Mallet Madness v2.1", 0 )
+GAME( 1994, tickee,    0,        tickee,   tickee,   tickee_state, 0, ROT0, "Raster Elite",  "Tickee Tickats",              0 )
+GAME( 1996, ghoshunt,  0,        ghoshunt, ghoshunt, tickee_state, 0, ROT0, "Hanaho Games",  "Ghost Hunter",                0 )
+GAME( 1996, tutstomb,  0,        ghoshunt, ghoshunt, tickee_state, 0, ROT0, "Island Design", "Tut's Tomb",                  0 )
+GAME( 1996, mouseatk,  0,        mouseatk, mouseatk, tickee_state, 0, ROT0, "ICE",           "Mouse Attack",                0 )
+GAME( 1998, rapidfir,  0,        rapidfir, rapidfir, tickee_state, 0, ROT0, "Hanaho Games",  "Rapid Fire v1.1 (Build 239)", 0 )
+GAME( 1998, rapidfira, rapidfir, rapidfir, rapidfir, tickee_state, 0, ROT0, "Hanaho Games",  "Rapid Fire v1.1 (Build 238)", 0 )
+GAME( 1998, rapidfire, rapidfir, rapidfir, rapidfir, tickee_state, 0, ROT0, "Hanaho Games",  "Rapid Fire v1.0 (Build 236)", 0 )
+GAME( 1999, maletmad,  0,        rapidfir, rapidfir, tickee_state, 0, ROT0, "Hanaho Games",  "Mallet Madness v2.1",         0 )

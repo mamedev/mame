@@ -25,23 +25,13 @@
 #include "SDL_cocoavideo.h"
 #include "../../events/SDL_clipboardevents_c.h"
 
-static NSString *
-GetTextFormat(_THIS)
-{
-    if (floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_5) {
-        return NSPasteboardTypeString;
-    } else {
-        return NSStringPboardType;
-    }
-}
-
 int
 Cocoa_SetClipboardText(_THIS, const char *text)
 { @autoreleasepool
 {
     SDL_VideoData *data = (SDL_VideoData *) _this->driverdata;
     NSPasteboard *pasteboard;
-    NSString *format = GetTextFormat(_this);
+    NSString *format = NSPasteboardTypeString;
 
     pasteboard = [NSPasteboard generalPasteboard];
     data->clipboard_count = [pasteboard declareTypes:[NSArray arrayWithObject:format] owner:nil];
@@ -55,12 +45,12 @@ Cocoa_GetClipboardText(_THIS)
 { @autoreleasepool
 {
     NSPasteboard *pasteboard;
-    NSString *format = GetTextFormat(_this);
+    NSString *format = NSPasteboardTypeString;
     NSString *available;
     char *text;
 
     pasteboard = [NSPasteboard generalPasteboard];
-    available = [pasteboard availableTypeFromArray: [NSArray arrayWithObject:format]];
+    available = [pasteboard availableTypeFromArray:[NSArray arrayWithObject:format]];
     if ([available isEqualToString:format]) {
         NSString* string;
         const char *utf8;

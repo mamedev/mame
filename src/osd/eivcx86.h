@@ -28,7 +28,7 @@
 
 #ifndef PTR64
 #define mul_32x32 _mul_32x32
-static inline INT64 _mul_32x32(INT32 a, INT32 b)
+static inline int64_t _mul_32x32(int32_t a, int32_t b)
 {
 	// in theory this should work, but it is untested
 	__asm
@@ -49,7 +49,7 @@ static inline INT64 _mul_32x32(INT32 a, INT32 b)
 
 #ifndef PTR64
 #define mulu_32x32 _mulu_32x32
-static inline UINT64 _mulu_32x32(UINT32 a, UINT32 b)
+static inline uint64_t _mulu_32x32(uint32_t a, uint32_t b)
 {
 	// in theory this should work, but it is untested
 	__asm
@@ -70,9 +70,9 @@ static inline UINT64 _mulu_32x32(UINT32 a, UINT32 b)
 
 #ifndef PTR64
 #define mul_32x32_hi _mul_32x32_hi
-static inline INT32 _mul_32x32_hi(INT32 a, INT32 b)
+static inline int32_t _mul_32x32_hi(int32_t a, int32_t b)
 {
-	INT32 result;
+	int32_t result;
 
 	__asm
 	{
@@ -94,9 +94,9 @@ static inline INT32 _mul_32x32_hi(INT32 a, INT32 b)
 
 #ifndef PTR64
 #define mulu_32x32_hi _mulu_32x32_hi
-static inline UINT32 _mulu_32x32_hi(UINT32 a, UINT32 b)
+static inline uint32_t _mulu_32x32_hi(uint32_t a, uint32_t b)
 {
-	INT32 result;
+	int32_t result;
 
 	__asm
 	{
@@ -119,9 +119,9 @@ static inline UINT32 _mulu_32x32_hi(UINT32 a, UINT32 b)
 
 #ifndef PTR64
 #define mul_32x32_shift _mul_32x32_shift
-static inline INT32 _mul_32x32_shift(INT32 a, INT32 b, UINT8 shift)
+static inline int32_t _mul_32x32_shift(int32_t a, int32_t b, uint8_t shift)
 {
-	INT32 result;
+	int32_t result;
 
 	__asm
 	{
@@ -146,9 +146,9 @@ static inline INT32 _mul_32x32_shift(INT32 a, INT32 b, UINT8 shift)
 
 #ifndef PTR64
 #define mulu_32x32_shift _mulu_32x32_shift
-static inline UINT32 _mulu_32x32_shift(UINT32 a, UINT32 b, UINT8 shift)
+static inline uint32_t _mulu_32x32_shift(uint32_t a, uint32_t b, uint8_t shift)
 {
-	INT32 result;
+	int32_t result;
 
 	__asm
 	{
@@ -171,11 +171,11 @@ static inline UINT32 _mulu_32x32_shift(UINT32 a, UINT32 b, UINT8 shift)
 
 #ifndef PTR64
 #define div_64x32 _div_64x32
-static inline INT32 _div_64x32(INT64 a, INT32 b)
+static inline int32_t _div_64x32(int64_t a, int32_t b)
 {
-	INT32 result;
-	INT32 alow = a;
-	INT32 ahigh = a >> 32;
+	int32_t result;
+	int32_t alow = a;
+	int32_t ahigh = a >> 32;
 
 	__asm
 	{
@@ -197,11 +197,11 @@ static inline INT32 _div_64x32(INT64 a, INT32 b)
 
 #ifndef PTR64
 #define divu_64x32 _divu_64x32
-static inline UINT32 _divu_64x32(UINT64 a, UINT32 b)
+static inline uint32_t _divu_64x32(uint64_t a, uint32_t b)
 {
-	UINT32 result;
-	UINT32 alow = a;
-	UINT32 ahigh = a >> 32;
+	uint32_t result;
+	uint32_t alow = a;
+	uint32_t ahigh = a >> 32;
 
 	__asm
 	{
@@ -224,12 +224,12 @@ static inline UINT32 _divu_64x32(UINT64 a, UINT32 b)
 
 #ifndef PTR64
 #define div_64x32_rem _div_64x32_rem
-static inline INT32 _div_64x32_rem(INT64 a, INT32 b, INT32 *remainder)
+static inline int32_t _div_64x32_rem(int64_t a, int32_t b, int32_t *remainder)
 {
-	INT32 result;
-	INT32 alow = a;
-	INT32 ahigh = a >> 32;
-	INT32 rem;
+	int32_t result;
+	int32_t alow = a;
+	int32_t ahigh = a >> 32;
+	int32_t rem;
 
 	__asm
 	{
@@ -254,12 +254,12 @@ static inline INT32 _div_64x32_rem(INT64 a, INT32 b, INT32 *remainder)
 
 #ifndef PTR64
 #define divu_64x32_rem _divu_64x32_rem
-static inline UINT32 _divu_64x32_rem(UINT64 a, UINT32 b, UINT32 *remainder)
+static inline uint32_t _divu_64x32_rem(uint64_t a, uint32_t b, uint32_t *remainder)
 {
-	UINT32 result;
-	UINT32 alow = a;
-	UINT32 ahigh = a >> 32;
-	UINT32 rem;
+	uint32_t result;
+	uint32_t alow = a;
+	uint32_t ahigh = a >> 32;
+	uint32_t rem;
 
 	__asm
 	{
@@ -284,9 +284,9 @@ static inline UINT32 _divu_64x32_rem(UINT64 a, UINT32 b, UINT32 *remainder)
 
 #ifndef PTR64
 #define div_32x32_shift _div_32x32_shift
-static inline INT32 _div_32x32_shift(INT32 a, INT32 b, UINT8 shift)
+static inline int32_t _div_32x32_shift(int32_t a, int32_t b, uint8_t shift)
 {
-	INT32 result;
+	int32_t result;
 
 	__asm
 	{
@@ -312,9 +312,9 @@ static inline INT32 _div_32x32_shift(INT32 a, INT32 b, UINT8 shift)
 
 #ifndef PTR64
 #define divu_32x32_shift _divu_32x32_shift
-static inline UINT32 _divu_32x32_shift(UINT32 a, UINT32 b, UINT8 shift)
+static inline uint32_t _divu_32x32_shift(uint32_t a, uint32_t b, uint8_t shift)
 {
-	UINT32 result;
+	uint32_t result;
 
 	__asm
 	{
@@ -339,11 +339,11 @@ static inline UINT32 _divu_32x32_shift(UINT32 a, UINT32 b, UINT8 shift)
 
 #ifndef PTR64
 #define mod_64x32 _mod_64x32
-static inline INT32 _mod_64x32(INT64 a, INT32 b)
+static inline int32_t _mod_64x32(int64_t a, int32_t b)
 {
-	INT32 result;
-	INT32 alow = a;
-	INT32 ahigh = a >> 32;
+	int32_t result;
+	int32_t alow = a;
+	int32_t ahigh = a >> 32;
 
 	__asm
 	{
@@ -365,11 +365,11 @@ static inline INT32 _mod_64x32(INT64 a, INT32 b)
 
 #ifndef PTR64
 #define modu_64x32 _modu_64x32
-static inline UINT32 _modu_64x32(UINT64 a, UINT32 b)
+static inline uint32_t _modu_64x32(uint64_t a, uint32_t b)
 {
-	UINT32 result;
-	UINT32 alow = a;
-	UINT32 ahigh = a >> 32;
+	uint32_t result;
+	uint32_t alow = a;
+	uint32_t ahigh = a >> 32;
 
 	__asm
 	{
@@ -414,9 +414,9 @@ static inline float _recip_approx(float z)
 
 #ifndef PTR64
 #define count_leading_zeros _count_leading_zeros
-static inline UINT8 _count_leading_zeros(UINT32 value)
+static inline uint8_t _count_leading_zeros(uint32_t value)
 {
-	INT32 result;
+	int32_t result;
 
 	__asm
 	{
@@ -440,9 +440,9 @@ static inline UINT8 _count_leading_zeros(UINT32 value)
 
 #ifndef PTR64
 #define count_leading_ones _count_leading_ones
-static inline UINT8 _count_leading_ones(UINT32 value)
+static inline uint8_t _count_leading_ones(uint32_t value)
 {
-	INT32 result;
+	int32_t result;
 
 	__asm
 	{

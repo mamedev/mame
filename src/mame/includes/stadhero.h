@@ -26,8 +26,8 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	required_shared_ptr<UINT16> m_spriteram;
-	required_shared_ptr<UINT16> m_pf1_data;
+	required_shared_ptr<uint16_t> m_spriteram;
+	required_shared_ptr<uint16_t> m_pf1_data;
 
 	tilemap_t *m_pf1_tilemap;
 
@@ -37,5 +37,5 @@ public:
 	virtual void video_start() override;
 
 	TILE_GET_INFO_MEMBER(get_pf1_tile_info);
-	UINT32 screen_update_stadhero(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_stadhero(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };

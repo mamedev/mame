@@ -1,6 +1,5 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
-#include "emu.h"
 #include "audio/zaccaria.h"
 
 class zaccaria_state : public driver_device
@@ -16,7 +15,7 @@ public:
 		, m_attributesram(*this, "attributesram")
 		, m_spriteram(*this, "spriteram")
 		, m_spriteram2(*this, "spriteram2")
-		, m_dsw_port(*this, "DSW")
+		, m_dsw_port(*this, "DSW.%u", 0)
 	{ }
 
 	DECLARE_READ8_MEMBER(dsw_r);
@@ -35,9 +34,9 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(zaccaria);
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
-	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,UINT8 *spriteram,int color,int section);
+	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,uint8_t *spriteram,int color,int section);
 
 protected:
 	required_device<cpu_device>                 m_maincpu;
@@ -45,14 +44,14 @@ protected:
 	required_device<palette_device>             m_palette;
 	required_device<zac1b11142_audio_device>    m_audiopcb;
 
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_attributesram;
-	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_spriteram2;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_attributesram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_spriteram2;
 
 	required_ioport_array<3> m_dsw_port;
 
 	int m_dsw_sel;
 	tilemap_t *m_bg_tilemap;
-	UINT8 m_nmi_mask;
+	uint8_t m_nmi_mask;
 };

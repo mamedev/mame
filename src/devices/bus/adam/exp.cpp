@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "exp.h"
 
 
@@ -22,7 +23,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ADAM_EXPANSION_SLOT = &device_creator<adam_expansion_slot_device>;
+DEFINE_DEVICE_TYPE(ADAM_EXPANSION_SLOT, adam_expansion_slot_device, "adam_expansion_slot", "ADAM expansion slot")
 
 
 
@@ -51,8 +52,8 @@ device_adam_expansion_slot_card_interface::device_adam_expansion_slot_card_inter
 //  adam_expansion_slot_device - constructor
 //-------------------------------------------------
 
-adam_expansion_slot_device::adam_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, ADAM_EXPANSION_SLOT, "ADAM expansion slot", tag, owner, clock, "adam_expansion_slot", __FILE__),
+adam_expansion_slot_device::adam_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, ADAM_EXPANSION_SLOT, tag, owner, clock),
 	device_slot_interface(mconfig, *this),
 	device_image_interface(mconfig, *this),
 	m_write_irq(*this), m_card(nullptr)
@@ -86,13 +87,13 @@ void adam_expansion_slot_device::device_reset()
 //  call_load -
 //-------------------------------------------------
 
-bool adam_expansion_slot_device::call_load()
+image_init_result adam_expansion_slot_device::call_load()
 {
 	if (m_card)
 	{
 		size_t size;
 
-		if (software_entry() == nullptr)
+		if (!loaded_through_softlist())
 		{
 			size = length();
 
@@ -104,19 +105,7 @@ bool adam_expansion_slot_device::call_load()
 		}
 	}
 
-	return IMAGE_INIT_PASS;
-}
-
-
-//-------------------------------------------------
-//  call_softlist_load -
-//-------------------------------------------------
-
-bool adam_expansion_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
-{
-	machine().rom_load().load_software_part_region(*this, swlist, swname, start_entry);
-
-	return true;
+	return image_init_result::PASS;
 }
 
 
@@ -124,7 +113,7 @@ bool adam_expansion_slot_device::call_softlist_load(software_list_device &swlist
 //  get_default_card_software -
 //-------------------------------------------------
 
-std::string adam_expansion_slot_device::get_default_card_software()
+std::string adam_expansion_slot_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
 	return software_get_default_slot("standard");
 }
@@ -134,7 +123,7 @@ std::string adam_expansion_slot_device::get_default_card_software()
 //  bd_r - buffered data read
 //-------------------------------------------------
 
-UINT8 adam_expansion_slot_device::bd_r(address_space &space, offs_t offset, UINT8 data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2)
+uint8_t adam_expansion_slot_device::bd_r(address_space &space, offs_t offset, uint8_t data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2)
 {
 	if (m_card != nullptr)
 	{
@@ -149,7 +138,7 @@ UINT8 adam_expansion_slot_device::bd_r(address_space &space, offs_t offset, UINT
 //  cd_w - cartridge data write
 //-------------------------------------------------
 
-void adam_expansion_slot_device::bd_w(address_space &space, offs_t offset, UINT8 data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2)
+void adam_expansion_slot_device::bd_w(address_space &space, offs_t offset, uint8_t data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2)
 {
 	if (m_card != nullptr)
 	{

@@ -115,12 +115,17 @@
 **************************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
-#include "cpu/h8/h8s2655.h"
-#include "video/hd44780.h"
-#include "rendlay.h"
+
 #include "bus/midi/midiinport.h"
 #include "bus/midi/midioutport.h"
+#include "cpu/h8/h8s2655.h"
+#include "video/hd44780.h"
+
+#include "debugger.h"
+#include "rendlay.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 static INPUT_PORTS_START( mu100 )
 	PORT_START("P7")
@@ -166,8 +171,8 @@ public:
 	required_ioport m_ioport_p7;
 	required_ioport m_ioport_p8;
 
-	UINT8 cur_p1, cur_p2, cur_p3, cur_p5, cur_p6, cur_pa, cur_pf, cur_pg;
-	UINT8 cur_ic32;
+	uint8_t cur_p1, cur_p2, cur_p3, cur_p5, cur_p6, cur_pa, cur_pf, cur_pg;
+	uint8_t cur_ic32;
 	float contrast;
 
 	DECLARE_READ16_MEMBER(adc0_r);
@@ -191,8 +196,8 @@ public:
 	DECLARE_READ16_MEMBER(snd_r);
 	DECLARE_WRITE16_MEMBER(snd_w);
 
-	float lightlevel(const UINT8 *src, const UINT8 *render);
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	float lightlevel(const uint8_t *src, const uint8_t *render);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual void machine_start() override;
 };
 
@@ -213,9 +218,9 @@ void mu100_state::machine_start()
 	contrast = 1.0;
 }
 
-float mu100_state::lightlevel(const UINT8 *src, const UINT8 *render)
+float mu100_state::lightlevel(const uint8_t *src, const uint8_t *render)
 {
-	UINT8 l = *src;
+	uint8_t l = *src;
 	if(l == 0)
 		return 1.0;
 	int slot = (src[1] << 8) | src[2];
@@ -229,16 +234,16 @@ float mu100_state::lightlevel(const UINT8 *src, const UINT8 *render)
 	return 0.95f;
 }
 
-UINT32 mu100_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t mu100_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	const UINT8 *render = m_lcd->render();
-	const UINT8 *src = ymmu100_bkg + 15;
+	const uint8_t *render = m_lcd->render();
+	const uint8_t *src = ymmu100_bkg + 15;
 
 	for(int y=0; y<241; y++) {
-		UINT32 *pix = reinterpret_cast<UINT32 *>(bitmap.raw_pixptr(y));
+		uint32_t *pix = reinterpret_cast<uint32_t *>(bitmap.raw_pixptr(y));
 		for(int x=0; x<800; x++) {
 			float light = lightlevel(src, render);
-			UINT32 col = (int(0xef*light) << 16) | (int(0xf5*light) << 8);
+			uint32_t col = (int(0xef*light) << 16) | (int(0xf5*light) << 8);
 			*pix++ = col;
 			src += 3;
 		}
@@ -252,7 +257,7 @@ UINT32 mu100_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 			int y = 55 + 65*(i >> 1);
 			for(int yy=-9; yy <= 9; yy++) {
 				int dx = int(sqrt((float)(99-yy*yy)));
-				UINT32 *pix = reinterpret_cast<UINT32 *>(bitmap.raw_pixptr(y+yy)) + (x-dx);
+				uint32_t *pix = reinterpret_cast<uint32_t *>(bitmap.raw_pixptr(y+yy)) + (x-dx);
 				for(int xx=0; xx<2*dx+1; xx++)
 					*pix++ = 0x00ff00;
 			}
@@ -335,7 +340,7 @@ READ16_MEMBER(mu100_state::p1_r)
 	}
 
 	if(!(cur_pf & 0x02)) {
-		UINT8 val = 0xff;
+		uint8_t val = 0xff;
 		if(!(cur_ic32 & 0x20))
 			val &= m_ioport_p7->read();
 		if(!(cur_ic32 & 0x40))
@@ -426,7 +431,7 @@ static ADDRESS_MAP_START( mu100_iomap, AS_IO, 16, mu100_state )
 	AM_RANGE(h8_device::ADC_7,   h8_device::ADC_7)   AM_READ(adc7_r)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( mu100, mu100_state )
+static MACHINE_CONFIG_START( mu100 )
 	MCFG_CPU_ADD( "maincpu", H8S2655, XTAL_16MHz )
 	MCFG_CPU_PROGRAM_MAP( mu100_map )
 	MCFG_CPU_IO_MAP( mu100_iomap )
@@ -450,9 +455,6 @@ static MACHINE_CONFIG_START( mu100, mu100_state )
 	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
 	MCFG_DEVICE_MODIFY("maincpu:sci0")
 	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":mdout", midi_port_device, write_txd))
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_DERIVED_CLASS( mu100r, mu100, mu100r_state )
 MACHINE_CONFIG_END
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
@@ -495,5 +497,5 @@ ROM_START( mu100r )
 	ROM_LOAD( "mu100-font.bin", 0x0000, 0x1000, BAD_DUMP CRC(a7d6c1d6) SHA1(9f0398d678bdf607cb34d83ee535f3b7fcc97c41) )
 ROM_END
 
-CONS( 1997, mu100,  0,     0, mu100,  mu100, driver_device, 0, "Yamaha", "MU100",                  MACHINE_NOT_WORKING )
-CONS( 1997, mu100r, mu100, 0, mu100r, mu100, driver_device, 0, "Yamaha", "MU100 Rackable version", MACHINE_NOT_WORKING )
+CONS( 1997, mu100,  0,     0, mu100, mu100, mu100_state,  0, "Yamaha", "MU100",                  MACHINE_NOT_WORKING )
+CONS( 1997, mu100r, mu100, 0, mu100, mu100, mu100r_state, 0, "Yamaha", "MU100 Rackable version", MACHINE_NOT_WORKING )

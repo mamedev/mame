@@ -5,7 +5,7 @@
 	<software name="advbidng">
 		<description>Advanced Bidding</description>
 		<year>198?</year>
-		<publisher>BBC</publisher>
+		<publisher>Unicard</publisher>
 		<part name="cart" interface="bbcbc_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="masc_03a.bin" size="32768" crc="cbec2471" sha1="770ab06b1fcc35da08ce8453b754b8f62520cdd0" offset="0" />
@@ -16,7 +16,7 @@
 	<software name="advdefnc">
 		<description>Advanced Defence</description>
 		<year>198?</year>
-		<publisher>BBC</publisher>
+		<publisher>Unicard</publisher>
 		<part name="cart" interface="bbcbc_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="advco4a.bin" size="32768" crc="e5ff9113" sha1="262f6f72bd0b63531102e8d4da0345b39ca3ea2f" offset="0" />
@@ -26,8 +26,8 @@
 
 	<software name="bbuilder">
 		<description>Bridge Builder</description>
-		<year>198?</year>
-		<publisher>BBC</publisher>
+		<year>1985</year>
+		<publisher>Unicard</publisher>
 		<part name="cart" interface="bbcbc_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="bbc2_1.bin" size="8192" crc="ee348134" sha1="0528f7c935549f5fe7c033f1f5e58cba8a03736b" offset="0" />
@@ -40,8 +40,8 @@
 
 	<software name="bbuildera" cloneof="bbuilder">
 		<description>Bridge Builder (Alt)</description>
-		<year>198?</year>
-		<publisher>BBC</publisher>
+		<year>1985</year>
+		<publisher>Unicard</publisher>
 		<part name="cart" interface="bbcbc_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="bbc4a.0" size="16384" crc="d1f20bc0" sha1="368fa3ff5affea6ca355b09b4f00917299fa6a8e" offset="0" />
@@ -52,8 +52,8 @@
 
 	<software name="cplay1">
 		<description>Club Play 1</description>
-		<year>198?</year>
-		<publisher>BBC</publisher>
+		<year>1985</year>
+		<publisher>Unicard</publisher>
 		<part name="cart" interface="bbcbc_cart">
 			<dataarea name="rom" size="24576">
 				<rom name="cpc_2_1.bin" size="8192" crc="1efd1481" sha1="d0483da7ae3abff4a1141a89d066e2b5879a52c1" offset="0" />
@@ -66,7 +66,7 @@
 	<software name="cplay2">
 		<description>Club Play 2</description>
 		<year>198?</year>
-		<publisher>BBC</publisher>
+		<publisher>Unicard</publisher>
 		<part name="cart" interface="bbcbc_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="2cp1_1.bin" size="16384" crc="5e18577d" sha1="b22858fb42231453e80fa994a7431e9853b4a2eb" offset="0" />
@@ -78,7 +78,7 @@
 	<software name="cplay2a" cloneof="cplay2">
 		<description>Club Play 2 (Alt)</description>
 		<year>198?</year>
-		<publisher>BBC</publisher>
+		<publisher>Unicard</publisher>
 		<part name="cart" interface="bbcbc_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="club_play_2.bin" size="32768" crc="2867fc62" sha1="ef519def0ad37882da81a9c16371cf2b1d8919ee" offset="0" />
@@ -89,7 +89,7 @@
 	<software name="cplay3">
 		<description>Club Play 3</description>
 		<year>198?</year>
-		<publisher>BBC</publisher>
+		<publisher>Unicard</publisher>
 		<part name="cart" interface="bbcbc_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="cp3.bin" size="32768" crc="a17569d8" sha1="151256d1d0957e3c6c07e2b0150c679384ce195d" offset="0" />
@@ -100,7 +100,7 @@
 	<software name="convent1">
 		<description>Conventions 1</description>
 		<year>198?</year>
-		<publisher>BBC</publisher>
+		<publisher>Unicard</publisher>
 		<part name="cart" interface="bbcbc_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="conc019.bin" size="32768" crc="968179b3" sha1="eb23cd6506a2afea3ff72535be18102036723f94" offset="0" />
@@ -111,7 +111,7 @@
 	<software name="duplict1">
 		<description>Duplicate 1</description>
 		<year>198?</year>
-		<publisher>BBC</publisher>
+		<publisher>Unicard</publisher>
 		<part name="cart" interface="bbcbc_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="dupc04a.bin" size="32768" crc="83d55b90" sha1="61a01c0ccb19f01b3e875db467886969b8284259" offset="0" />
@@ -121,8 +121,8 @@
 
 	<software name="mplay1">
 		<description>Master Play 1</description>
-		<year>198?</year>
-		<publisher>BBC</publisher>
+		<year>1985</year>
+		<publisher>Unicard</publisher>
 		<part name="cart" interface="bbcbc_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="mp_1_1.bin" size="16384" crc="d28d9995" sha1="4288eae32eaabbe489b549a30e4eb35a4e671ae7" offset="0" />

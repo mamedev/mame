@@ -6,6 +6,7 @@
 //
 //============================================================
 
+#include "emu.h"
 #import "disassemblyviewer.h"
 
 #import "debugconsole.h"
@@ -20,10 +21,10 @@
 @implementation MAMEDisassemblyViewer
 
 - (id)initWithMachine:(running_machine &)m console:(MAMEDebugConsole *)c {
-	NSScrollView	*dasmScroll;
-	NSView			*expressionContainer;
-	NSPopUpButton	*actionButton;
-	NSRect			expressionFrame;
+	NSScrollView    *dasmScroll;
+	NSView          *expressionContainer;
+	NSPopUpButton   *actionButton;
+	NSRect          expressionFrame;
 
 	if (!(self = [super initWithMachine:m title:@"Disassembly" console:c]))
 		return nil;
@@ -55,7 +56,7 @@
 
 	// adjust sizes to make it fit nicely
 	expressionFrame = [expressionField frame];
-	expressionFrame.size.height = MAX(expressionFrame.size.height, [subviewButton frame].size.height);
+	expressionFrame.size.height = std::max(expressionFrame.size.height, [subviewButton frame].size.height);
 	expressionFrame.size.width = (contentBounds.size.width - expressionFrame.size.height) / 2;
 	[expressionField setFrame:expressionFrame];
 	expressionFrame.origin.x = expressionFrame.size.width;
@@ -88,6 +89,7 @@
 	[dasmScroll setHasVerticalScroller:YES];
 	[dasmScroll setAutohidesScrollers:YES];
 	[dasmScroll setBorderType:NSNoBorder];
+	[dasmScroll setDrawsBackground:NO];
 	[dasmScroll setDocumentView:dasmView];
 	[dasmView release];
 	[[window contentView] addSubview:dasmScroll];
@@ -177,14 +179,14 @@
 		// if it doesn't exist, add a new one
 		if (bp == nullptr)
 		{
-			UINT32 const bpnum = device.debug()->breakpoint_set(address, nullptr, nullptr);
+			uint32_t const bpnum = device.debug()->breakpoint_set(address, nullptr, nullptr);
 			machine->debugger().console().printf("Breakpoint %X set\n", bpnum);
 		}
 		else
 		{
 			int const bpnum = bp->index();
 			device.debug()->breakpoint_clear(bpnum);
-			machine->debugger().console().printf("Breakpoint %X cleared\n", (UINT32)bpnum);
+			machine->debugger().console().printf("Breakpoint %X cleared\n", (uint32_t)bpnum);
 		}
 
 		// fail to do this and the display doesn't update
@@ -204,8 +206,8 @@
 		{
 			device.debug()->breakpoint_enable(bp->index(), !bp->enabled());
 			machine->debugger().console().printf("Breakpoint %X %s\n",
-								                 (UINT32)bp->index(),
-								                 bp->enabled() ? "enabled" : "disabled");
+												 (uint32_t)bp->index(),
+												 bp->enabled() ? "enabled" : "disabled");
 			machine->debug_view().update_all();
 			machine->debugger().refresh_display();
 		}

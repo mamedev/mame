@@ -96,7 +96,7 @@ PALETTE_INIT_MEMBER(warpwarp_state,warpwarp)
 		bit1 = (i >> 7) & 0x01;
 		b = combine_2_weights(weights_tiles_b, bit0, bit1);
 
-		palette.set_pen_color((i * 2) + 0, rgb_t::black);
+		palette.set_pen_color((i * 2) + 0, rgb_t::black());
 		palette.set_pen_color((i * 2) + 1, rgb_t(r, g, b));
 	}
 
@@ -164,17 +164,17 @@ TILE_GET_INFO_MEMBER(warpwarp_state::warpwarp_get_tile_info)
 
 VIDEO_START_MEMBER(warpwarp_state,geebee)
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(warpwarp_state::geebee_get_tile_info),this),tilemap_mapper_delegate(FUNC(warpwarp_state::tilemap_scan),this),8,8,34,28);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(warpwarp_state::geebee_get_tile_info),this),tilemap_mapper_delegate(FUNC(warpwarp_state::tilemap_scan),this),8,8,34,28);
 }
 
 VIDEO_START_MEMBER(warpwarp_state,navarone)
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(warpwarp_state::navarone_get_tile_info),this),tilemap_mapper_delegate(FUNC(warpwarp_state::tilemap_scan),this),8,8,34,28);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(warpwarp_state::navarone_get_tile_info),this),tilemap_mapper_delegate(FUNC(warpwarp_state::tilemap_scan),this),8,8,34,28);
 }
 
 VIDEO_START_MEMBER(warpwarp_state,warpwarp)
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(warpwarp_state::warpwarp_get_tile_info),this),tilemap_mapper_delegate(FUNC(warpwarp_state::tilemap_scan),this),8,8,34,28);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(warpwarp_state::warpwarp_get_tile_info),this),tilemap_mapper_delegate(FUNC(warpwarp_state::tilemap_scan),this),8,8,34,28);
 }
 
 
@@ -232,7 +232,7 @@ void warpwarp_state::draw_ball(bitmap_ind16 &bitmap, const rectangle &cliprect,p
 	}
 }
 
-UINT32 warpwarp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t warpwarp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0,0);
 

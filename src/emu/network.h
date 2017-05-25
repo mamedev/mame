@@ -7,10 +7,10 @@
     Core network interface functions and definitions.
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_EMU_NETWORK_H
+#define MAME_EMU_NETWORK_H
 
-#ifndef __NETWORK_H__
-#define __NETWORK_H__
+#pragma once
 
 // ======================> network_manager
 
@@ -23,11 +23,11 @@ public:
 	// getters
 	running_machine &machine() const { return m_machine; }
 private:
-	void config_load(config_type cfg_type, xml_data_node *parentnode);
-	void config_save(config_type cfg_type, xml_data_node *parentnode);
+	void config_load(config_type cfg_type, util::xml::data_node const *parentnode);
+	void config_save(config_type cfg_type, util::xml::data_node *parentnode);
 
 	// internal state
 	running_machine &   m_machine;                  // reference to our machine
 };
 
-#endif /* __NETWORK_H__ */
+#endif // MAME_EMU_NETWORK_H

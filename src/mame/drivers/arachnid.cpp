@@ -61,10 +61,11 @@
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
-#include "machine/ram.h"
 #include "machine/6840ptm.h"
+#include "machine/ram.h"
+#include "sound/spkrdev.h"
 #include "video/tms9928a.h"
-#include "sound/speaker.h"
+#include "speaker.h"
 
 #define SCREEN_TAG      "screen"
 #define M6809_TAG       "u3"
@@ -105,9 +106,9 @@ public:
 	DECLARE_WRITE8_MEMBER( pia_u17_pb_w );
 	DECLARE_WRITE_LINE_MEMBER( pia_u17_pcb_w );
 
-	DECLARE_WRITE8_MEMBER(ptm_o1_callback);
+	DECLARE_WRITE_LINE_MEMBER(ptm_o1_callback);
 
-	UINT8 read_keyboard(int pa);
+	uint8_t read_keyboard(int pa);
 };
 
 /***************************************************************************
@@ -248,15 +249,15 @@ INPUT_PORTS_END
     ptm6840_interface ptm_intf
 -------------------------------------------------*/
 
-WRITE8_MEMBER(arachnid_state::ptm_o1_callback)
+WRITE_LINE_MEMBER(arachnid_state::ptm_o1_callback)
 {
-	m_speaker->level_w(data);
+	m_speaker->level_w(state);
 }
 
-UINT8 arachnid_state::read_keyboard(int pa)
+uint8_t arachnid_state::read_keyboard(int pa)
 {
 	int i;
-	UINT8 value;
+	uint8_t value;
 	static const char *const keynames[3][8] =
 			{
 				{ "PA0-0", "PA0-1", "PA0-2", "PA0-3", "PA0-4", "PA0-5", "PA0-6", "PA0-7" },
@@ -292,7 +293,7 @@ READ8_MEMBER( arachnid_state::pia_u4_pa_r )
 	// PA6 - A
 	// PA7 - B
 
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 	data &= read_keyboard(1);
 
 	return data;
@@ -310,7 +311,7 @@ READ8_MEMBER( arachnid_state::pia_u4_pb_r )
 	// PB6 - P
 	// PB7 - O
 
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 	data &= read_keyboard(2);
 
 	return data;
@@ -320,7 +321,7 @@ READ_LINE_MEMBER( arachnid_state::pia_u4_pca_r )
 {
 	// CA1 - SW1 Coin In (Coin Door)
 
-	UINT8 data = 1;
+	uint8_t data = 1;
 	data &= ioport("SW1")->read();
 
 	return data;
@@ -330,7 +331,7 @@ READ_LINE_MEMBER( arachnid_state::pia_u4_pcb_r )
 {
 	// CB1 - SW2 Test Mode (Coin Door)
 
-	UINT8 data = 1;
+	uint8_t data = 1;
 	data &= ioport("SW2")->read();
 
 	return data;
@@ -344,7 +345,7 @@ READ8_MEMBER( arachnid_state::pia_u17_pa_r )
 	// PA3 - Test
 	// PA4 thru PA7 - DIP SW1
 
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 	data &= read_keyboard(0);
 
 	return data;
@@ -354,7 +355,7 @@ READ_LINE_MEMBER( arachnid_state::pia_u17_pca_r )
 {
 	// CA1 - 1000 HZ Input
 
-	UINT8 data = 1;
+	uint8_t data = 1;
 
 	return data;
 }
@@ -413,10 +414,10 @@ void arachnid_state::machine_start()
 ***************************************************************************/
 
 /*-------------------------------------------------
-    MACHINE_CONFIG_START( arachnid, arachnid_state )
+    MACHINE_CONFIG_START( arachnid )
 -------------------------------------------------*/
 
-static MACHINE_CONFIG_START( arachnid, arachnid_state )
+static MACHINE_CONFIG_START( arachnid )
 	// basic machine hardware
 	MCFG_CPU_ADD(M6809_TAG, M6809, XTAL_1MHz)
 	MCFG_CPU_PROGRAM_MAP(arachnid_map)
@@ -450,10 +451,9 @@ static MACHINE_CONFIG_START( arachnid, arachnid_state )
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_DEVICE_ADD(PTM6840_TAG, PTM6840, 0)
-	MCFG_PTM6840_INTERNAL_CLOCK(XTAL_8MHz / 4)
+	MCFG_DEVICE_ADD(PTM6840_TAG, PTM6840, XTAL_8MHz / 4)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
-	MCFG_PTM6840_OUT0_CB(WRITE8(arachnid_state, ptm_o1_callback))
+	MCFG_PTM6840_OUT0_CB(WRITELINE(arachnid_state, ptm_o1_callback))
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -469,5 +469,5 @@ ROM_END
     SYSTEM DRIVERS
 ***************************************************************************/
 
-/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT    COMPANY                   FULLNAME */
-GAME( 1990, arac6000,   0,         arachnid,        arachnid, driver_device,    0,    ROT0,  "Arachnid",         "Super Six Plus II English Mark Darts", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+/*    YEAR  NAME        PARENT     MACHINE   INPUT     STATE              INIT         COMPANY             FULLNAME */
+GAME( 1990, arac6000,   0,         arachnid, arachnid, arachnid_state,    0,    ROT0,  "Arachnid",         "Super Six Plus II English Mark Darts", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )

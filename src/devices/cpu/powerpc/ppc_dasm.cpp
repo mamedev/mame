@@ -107,8 +107,8 @@ enum
 struct IDESCR
 {
 	char    mnem[32];   // mnemonic
-	UINT32  match;      // bit pattern of instruction after it has been masked
-	UINT32  mask;       // mask of variable fields (AND with ~mask to compare w/
+	uint32_t  match;      // bit pattern of instruction after it has been masked
+	uint32_t  mask;       // mask of variable fields (AND with ~mask to compare w/
 						// bit pattern to determine a match)
 	int format;         // operand format
 	int flags;          // flags
@@ -529,13 +529,13 @@ static void DCR(char *dest, int dcr_field)
  * unsigned 16-bit integer.
  */
 
-static void DecodeSigned16(char *outbuf, UINT32 op, int do_unsigned)
+static void DecodeSigned16(char *outbuf, uint32_t op, int do_unsigned)
 {
-	INT16 s;
+	int16_t s;
 
 	s = G_SIMM(op);
 	if (do_unsigned)    // sign extend to unsigned 32-bits
-		sprintf(outbuf, "0x%04X", (UINT32) s);
+		sprintf(outbuf, "0x%04X", (uint32_t) s);
 	else                // print as signed 16 bits
 	{
 		if (s < 0)
@@ -554,9 +554,9 @@ static void DecodeSigned16(char *outbuf, UINT32 op, int do_unsigned)
  * Generate a mask from bit MB through ME (PPC-style backwards bit numbering.)
  */
 
-static UINT32 Mask(int mb, int me)
+static uint32_t Mask(int mb, int me)
 {
-	UINT32  i, mask;
+	uint32_t  i, mask;
 
 	mb &= 31;
 	me &= 31;
@@ -582,7 +582,7 @@ static UINT32 Mask(int mb, int me)
  */
 
 #if 0
-static int Check(UINT32 op, int flags)
+static int Check(uint32_t op, int flags)
 {
 	int nb, rt, ra;
 
@@ -644,9 +644,9 @@ static int Check(UINT32 op, int flags)
  * otherwise 0 to indicate disassembly should carry on as normal.
  */
 
-static int Simplified(UINT32 op, UINT32 vpc, char *signed16, char *mnem, char *oprs)
+static int Simplified(uint32_t op, uint32_t vpc, char *signed16, char *mnem, char *oprs)
 {
-	UINT32  value, disp;
+	uint32_t  value, disp;
 
 	value = G_SIMM(op); // value is fully sign-extended SIMM field
 	if (value & 0x8000)
@@ -835,10 +835,10 @@ static int Simplified(UINT32 op, UINT32 vpc, char *signed16, char *mnem, char *o
 	return 1;
 }
 
-offs_t ppc_dasm_one(char *buffer, UINT32 pc, UINT32 op)
+offs_t ppc_dasm_one(std::ostream &stream, uint32_t pc, uint32_t op)
 {
 	char signed16[12];
-	UINT32 disp;
+	uint32_t disp;
 	int i,j;
 	char mnem[200];
 	char oprs[200];
@@ -858,11 +858,11 @@ offs_t ppc_dasm_one(char *buffer, UINT32 pc, UINT32 op)
 	 */
 
 	if( Simplified(op, pc, signed16, mnem, oprs) ) {
-		buffer += sprintf(buffer, "%s", mnem);
+		util::stream_format(stream, "%s", mnem);
 		for( j = strlen(mnem); j < 10; j++ ) {
-			buffer += sprintf(buffer, " ");
+			util::stream_format(stream, " ");
 		}
-		buffer += sprintf(buffer, "%s", oprs);
+		util::stream_format(stream, "%s", oprs);
 		return 4 | flags;
 	}
 
@@ -1022,7 +1022,7 @@ offs_t ppc_dasm_one(char *buffer, UINT32 pc, UINT32 op)
 				if (G_RA(op))
 					sprintf(oprs, "r%d,%s(r%d)", G_RT(op), signed16, G_RA(op));
 				else
-					sprintf(oprs, "r%d,0x%08X", G_RT(op), (UINT32) ((INT16) G_D(op)));
+					sprintf(oprs, "r%d,0x%08X", G_RT(op), (uint32_t) ((int16_t) G_D(op)));
 				break;
 
 			case F_RT_D_RA:
@@ -1033,7 +1033,7 @@ offs_t ppc_dasm_one(char *buffer, UINT32 pc, UINT32 op)
 				if (G_RA(op))
 					sprintf(oprs, "f%d,%s(r%d)", G_RT(op), signed16, G_RA(op));
 				else
-					sprintf(oprs, "f%d,0x%08X", G_RT(op), (UINT32) ((INT16) G_D(op)));
+					sprintf(oprs, "f%d,0x%08X", G_RT(op), (uint32_t) ((int16_t) G_D(op)));
 				break;
 
 			case F_FRT_D_RA:
@@ -1156,22 +1156,23 @@ offs_t ppc_dasm_one(char *buffer, UINT32 pc, UINT32 op)
 			else if (itab[i].flags & FL_SO)
 				flags |= DASMFLAG_STEP_OUT;
 
-			buffer += sprintf(buffer, "%s", mnem);
+			util::stream_format(stream, "%s", mnem);
 			for( j = strlen(mnem); j < 10; j++ ) {
-				buffer += sprintf(buffer, " ");
+				util::stream_format(stream, " ");
 			}
-			buffer += sprintf(buffer, "%s", oprs);
+			util::stream_format(stream, "%s", oprs);
 			return 4 | flags;
 		}
 	}
 
-	sprintf(buffer, "?");
+	util::stream_format(stream, "?");
 	return 4 | flags;
 }
 
+
 CPU_DISASSEMBLE( powerpc )
 {
-	UINT32 op = *(UINT32 *)oprom;
-	op = BIG_ENDIANIZE_INT32(op);
-	return ppc_dasm_one(buffer, pc, op);
+	uint32_t op = *(uint32_t *)oprom;
+	op = big_endianize_int32(op);
+	return ppc_dasm_one(stream, pc, op);
 }

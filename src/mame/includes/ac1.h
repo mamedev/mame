@@ -16,19 +16,19 @@ class ac1_state : public driver_device
 {
 public:
 	ac1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_cassette(*this, "cassette"),
-		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
-		m_io_line(*this, "LINE")
+		: driver_device(mconfig, type, tag)
+		, m_cassette(*this, "cassette")
+		, m_maincpu(*this, "maincpu")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+		, m_io_line(*this, "LINE.%u", 0)
 	{ }
 
 	DECLARE_DRIVER_INIT(ac1);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_ac1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_ac1_32(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_ac1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_ac1_32(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_READ8_MEMBER(ac1_port_b_r);
 	DECLARE_READ8_MEMBER(ac1_port_a_r);
 	DECLARE_WRITE8_MEMBER(ac1_port_a_w);

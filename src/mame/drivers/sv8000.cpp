@@ -32,7 +32,9 @@ Looking at the code of the cartridges it seems there is:
 #include "video/mc6847.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 class sv8000_state : public driver_device
 {
@@ -72,23 +74,23 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<s68047_device> m_s68047p;
 	required_device<generic_slot_device> m_cart;
-	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<uint8_t> m_videoram;
 	required_ioport m_io_row0;
 	required_ioport m_io_row1;
 	required_ioport m_io_row2;
 	required_ioport m_io_joy;
 
-	UINT8 m_column;
+	uint8_t m_column;
 
 	// graphics signals
-	UINT8 m_ag;
-	UINT8 m_gm2;
-	UINT8 m_gm1;
-	UINT8 m_gm0;
-	UINT8 m_as;
-	UINT8 m_css;
-	UINT8 m_intext;
-	UINT8 m_inv;
+	uint8_t m_ag;
+	uint8_t m_gm2;
+	uint8_t m_gm1;
+	uint8_t m_gm0;
+	uint8_t m_as;
+	uint8_t m_css;
+	uint8_t m_intext;
+	uint8_t m_inv;
 };
 
 
@@ -196,18 +198,18 @@ void sv8000_state::machine_reset()
 
 DEVICE_IMAGE_LOAD_MEMBER( sv8000_state, cart )
 {
-	UINT32 size = m_cart->common_get_size("rom");
+	uint32_t size = m_cart->common_get_size("rom");
 
 	if (size != 0x1000)
 	{
 		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Incorrect or not support cartridge size");
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
 	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 
@@ -226,7 +228,7 @@ WRITE8_MEMBER( sv8000_state::i8255_porta_w )
 
 READ8_MEMBER( sv8000_state::i8255_portb_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	//logerror("i8255_portb_r\n");
 
@@ -268,7 +270,7 @@ WRITE8_MEMBER( sv8000_state::i8255_portc_w )
 
 READ8_MEMBER( sv8000_state::ay_port_a_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	//logerror("ay_port_a_r\n");
 	return data;
@@ -277,7 +279,7 @@ READ8_MEMBER( sv8000_state::ay_port_a_r )
 
 READ8_MEMBER( sv8000_state::ay_port_b_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	//logerror("ay_port_b_r\n");
 	return data;
@@ -358,7 +360,7 @@ READ8_MEMBER( sv8000_state::mc6847_videoram_r )
 	}
 
 	// Standard text
-	UINT8 data = m_videoram[offset % 0xc00];
+	uint8_t data = m_videoram[offset % 0xc00];
 	if (!data) data = 0x20; //bodge
 
 	m_s68047p->inv_w((data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
@@ -366,7 +368,7 @@ READ8_MEMBER( sv8000_state::mc6847_videoram_r )
 	return data;
 }
 
-static MACHINE_CONFIG_START( sv8000, sv8000_state )
+static MACHINE_CONFIG_START( sv8000 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_10_738635MHz/3)  /* Not verified */
 	MCFG_CPU_PROGRAM_MAP(sv8000_mem)
@@ -413,5 +415,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT   INIT                  COMPANY   FULLNAME                            FLAGS */
-CONS( 1979, sv8000, 0,      0,       sv8000,  sv8000, driver_device,   0,   "Bandai", "Super Vision 8000 (TV Jack 8000)", 0 )
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT   STATE          INIT  COMPANY   FULLNAME                            FLAGS */
+CONS( 1979, sv8000, 0,      0,       sv8000,  sv8000, sv8000_state,  0,    "Bandai", "Super Vision 8000 (TV Jack 8000)", 0 )

@@ -31,13 +31,13 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
-	UINT16 m_coin_word;
-	required_shared_ptr<UINT32> m_ram;
-	required_shared_ptr<UINT32> m_spriteram;
-	required_shared_ptr<UINT32> m_shared_ram;
+	uint16_t m_coin_word;
+	required_shared_ptr<uint32_t> m_ram;
+	required_shared_ptr<uint32_t> m_spriteram;
+	required_shared_ptr<uint32_t> m_shared_ram;
 
 	std::unique_ptr<schs_tempsprite[]> m_spritelist;
-	UINT32 m_mem[2];
+	uint32_t m_mem[2];
 
 	DECLARE_READ16_MEMBER(shared_ram_r);
 	DECLARE_WRITE16_MEMBER(shared_ram_w);
@@ -50,7 +50,7 @@ public:
 	DECLARE_READ16_MEMBER(sub_cycle_r);
 	DECLARE_DRIVER_INIT(superchs);
 	virtual void video_start() override;
-	UINT32 screen_update_superchs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_superchs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,const int *primasks,int x_offs,int y_offs);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;

@@ -21,7 +21,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_DISKIING = &device_creator<a2bus_diskiing_device>;
+DEFINE_DEVICE_TYPE(A2BUS_DISKIING, a2bus_diskiing_device, "a2diskiing", "Apple Disk II NG controller")
 
 #define WOZFDC_TAG         "wozfdc"
 #define DISKII_ROM_REGION  "diskii_rom"
@@ -30,7 +30,7 @@ static SLOT_INTERFACE_START( a2_floppies )
 	SLOT_INTERFACE( "525", FLOPPY_525_SD )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_FRAGMENT( diskiing )
+static MACHINE_CONFIG_START( diskiing )
 	MCFG_DEVICE_ADD(WOZFDC_TAG, DISKII_FDC, 1021800*2)
 	MCFG_FLOPPY_DRIVE_ADD("0", a2_floppies, "525", a2bus_diskiing_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("1", a2_floppies, "525", a2bus_diskiing_device::floppy_formats)
@@ -59,7 +59,7 @@ machine_config_constructor a2bus_diskiing_device::device_mconfig_additions() con
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *a2bus_diskiing_device::device_rom_region() const
+const tiny_rom_entry *a2bus_diskiing_device::device_rom_region() const
 {
 	return ROM_NAME( diskiing );
 }
@@ -68,12 +68,13 @@ const rom_entry *a2bus_diskiing_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_diskiing_device::a2bus_diskiing_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, A2BUS_DISKIING, "Apple Disk II NG controller", tag, owner, clock, "a2diskiing", __FILE__),
+a2bus_diskiing_device::a2bus_diskiing_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, A2BUS_DISKIING, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this),
 	m_wozfdc(*this, WOZFDC_TAG),
 	floppy0(*this, "0"),
-	floppy1(*this, "1"), m_rom(nullptr)
+	floppy1(*this, "1"),
+	m_rom(nullptr)
 {
 }
 
@@ -98,7 +99,7 @@ void a2bus_diskiing_device::device_reset()
     read_c0nx - called for reads from this card's c0nx space
 -------------------------------------------------*/
 
-UINT8 a2bus_diskiing_device::read_c0nx(address_space &space, UINT8 offset)
+uint8_t a2bus_diskiing_device::read_c0nx(address_space &space, uint8_t offset)
 {
 	return m_wozfdc->read(space, offset);
 }
@@ -108,7 +109,7 @@ UINT8 a2bus_diskiing_device::read_c0nx(address_space &space, UINT8 offset)
     write_c0nx - called for writes to this card's c0nx space
 -------------------------------------------------*/
 
-void a2bus_diskiing_device::write_c0nx(address_space &space, UINT8 offset, UINT8 data)
+void a2bus_diskiing_device::write_c0nx(address_space &space, uint8_t offset, uint8_t data)
 {
 	m_wozfdc->write(space, offset, data);
 }
@@ -117,7 +118,7 @@ void a2bus_diskiing_device::write_c0nx(address_space &space, UINT8 offset, UINT8
     read_cnxx - called for reads from this card's cnxx space
 -------------------------------------------------*/
 
-UINT8 a2bus_diskiing_device::read_cnxx(address_space &space, UINT8 offset)
+uint8_t a2bus_diskiing_device::read_cnxx(address_space &space, uint8_t offset)
 {
 	return m_rom[offset];
 }

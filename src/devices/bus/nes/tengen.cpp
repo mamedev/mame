@@ -22,7 +22,7 @@
 #include "tengen.h"
 
 #include "cpu/m6502/m6502.h"
-#include "video/ppu2c0x.h"      // this has to be included so that IRQ functions can access PPU_BOTTOM_VISIBLE_SCANLINE
+#include "video/ppu2c0x.h"      // this has to be included so that IRQ functions can access ppu2c0x_device::BOTTOM_VISIBLE_SCANLINE
 
 
 #ifdef NES_PCB_DEBUG
@@ -38,28 +38,28 @@
 //  constructor
 //-------------------------------------------------
 
-const device_type NES_TENGEN_800008 = &device_creator<nes_tengen008_device>;
-const device_type NES_TENGEN_800032 = &device_creator<nes_tengen032_device>;
-const device_type NES_TENGEN_800037 = &device_creator<nes_tengen037_device>;
+DEFINE_DEVICE_TYPE(NES_TENGEN_800008, nes_tengen008_device, "nes_tengen008", "NES Cart Tengen 800008 PCB")
+DEFINE_DEVICE_TYPE(NES_TENGEN_800032, nes_tengen032_device, "nes_tengen032", "NES Cart Tengen 800032 PCB")
+DEFINE_DEVICE_TYPE(NES_TENGEN_800037, nes_tengen037_device, "nes_tengen037", "NES Cart Tengen 800037 PCB")
 
 
-nes_tengen008_device::nes_tengen008_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: nes_nrom_device(mconfig, NES_TENGEN_800008, "NES Cart Tengen 800008 PCB", tag, owner, clock, "nes_tengen008", __FILE__)
+nes_tengen008_device::nes_tengen008_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: nes_nrom_device(mconfig, NES_TENGEN_800008, tag, owner, clock)
 {
 }
 
-nes_tengen032_device::nes_tengen032_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-					: nes_nrom_device(mconfig, type, name, tag, owner, clock, shortname, source), m_irq_count(0), m_irq_count_latch(0), m_irq_mode(0), m_irq_reset(0), m_irq_enable(0), m_latch(0), irq_timer(nullptr)
-				{
-}
-
-nes_tengen032_device::nes_tengen032_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: nes_nrom_device(mconfig, NES_TENGEN_800032, "NES Cart Tengen 800032 PCB", tag, owner, clock, "nes_tengen032", __FILE__), m_irq_count(0), m_irq_count_latch(0), m_irq_mode(0), m_irq_reset(0), m_irq_enable(0), m_latch(0), irq_timer(nullptr)
+nes_tengen032_device::nes_tengen032_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: nes_nrom_device(mconfig, type, tag, owner, clock), m_irq_count(0), m_irq_count_latch(0), m_irq_mode(0), m_irq_reset(0), m_irq_enable(0), m_latch(0), irq_timer(nullptr)
 {
 }
 
-nes_tengen037_device::nes_tengen037_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: nes_tengen032_device(mconfig, NES_TENGEN_800037, "NES Cart Tengen 800037 PCB", tag, owner, clock, "nes_tengen037", __FILE__)
+nes_tengen032_device::nes_tengen032_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: nes_tengen032_device(mconfig, NES_TENGEN_800032, tag, owner, clock)
+{
+}
+
+nes_tengen037_device::nes_tengen037_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: nes_tengen032_device(mconfig, NES_TENGEN_800037, tag, owner, clock)
 {
 }
 
@@ -195,7 +195,7 @@ void nes_tengen032_device::hblank_irq(int scanline, int vblank, int blanked)
 {
 	if (!m_irq_mode) // we are in scanline mode!
 	{
-		if (scanline < PPU_BOTTOM_VISIBLE_SCANLINE)
+		if (scanline < ppu2c0x_device::BOTTOM_VISIBLE_SCANLINE)
 		{
 			irq_clock(blanked);
 		}
@@ -204,7 +204,7 @@ void nes_tengen032_device::hblank_irq(int scanline, int vblank, int blanked)
 
 void nes_tengen032_device::set_prg()
 {
-	UINT8 prg_mode = m_latch & 0x40;
+	uint8_t prg_mode = m_latch & 0x40;
 
 	prg8_89(m_mmc_prg_bank[prg_mode ? 2: 0]);
 	prg8_ab(m_mmc_prg_bank[prg_mode ? 0: 1]);
@@ -218,7 +218,7 @@ void nes_tengen032_device::chr_cb(int start, int bank, int source)
 
 void nes_tengen032_device::set_chr()
 {
-	UINT8 chr_page = (m_latch & 0x80) >> 5;
+	uint8_t chr_page = (m_latch & 0x80) >> 5;
 
 	if (m_latch & 0x20)
 	{
@@ -243,7 +243,7 @@ void nes_tengen032_device::set_chr()
 
 WRITE8_MEMBER(nes_tengen032_device::tengen032_write)
 {
-	UINT8 helper, cmd;
+	uint8_t helper, cmd;
 	LOG_MMC(("tengen032_write, offset: %04x, data: %02x\n", offset, data));
 
 	switch (offset & 0x6001)

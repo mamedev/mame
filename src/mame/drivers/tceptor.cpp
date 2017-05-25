@@ -9,15 +9,21 @@
  */
 
 #include "emu.h"
+#include "includes/tceptor.h"
+
 #include "cpu/m6502/m65c02.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6800/m6800.h"
 #include "cpu/m68000/m68000.h"
-#include "sound/ym2151.h"
-#include "rendlay.h"
-#include "tceptor2.lh"
-#include "includes/tceptor.h"
 #include "machine/nvram.h"
+#include "sound/dac.h"
+#include "sound/ym2151.h"
+#include "sound/volt_reg.h"
+#include "rendlay.h"
+#include "speaker.h"
+
+#include "tceptor2.lh"
+
 
 /*******************************************************************/
 
@@ -85,16 +91,10 @@ WRITE8_MEMBER(tceptor_state::mcu_irq_disable_w)
 }
 
 
-WRITE8_MEMBER(tceptor_state::voice_w)
-{
-	m_dac->write_signed16(data ? (data + 1) * 0x100 : 0x8000);
-}
-
-
 /* fix dsw/input data to memory mapped data */
-UINT8 tceptor_state::fix_input0(UINT8 in1, UINT8 in2)
+uint8_t tceptor_state::fix_input0(uint8_t in1, uint8_t in2)
 {
-	UINT8 r = 0;
+	uint8_t r = 0;
 
 	r |= (in1 & 0x80) >> 7;
 	r |= (in1 & 0x20) >> 4;
@@ -108,9 +108,9 @@ UINT8 tceptor_state::fix_input0(UINT8 in1, UINT8 in2)
 	return r;
 }
 
-UINT8 tceptor_state::fix_input1(UINT8 in1, UINT8 in2)
+uint8_t tceptor_state::fix_input1(uint8_t in1, uint8_t in2)
 {
-	UINT8 r = 0;
+	uint8_t r = 0;
 
 	r |= (in1 & 0x40) >> 6;
 	r |= (in1 & 0x10) >> 3;
@@ -186,7 +186,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( m6502_b_map, AS_PROGRAM, 8, tceptor_state )
 	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0x0100, 0x01ff) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(voice_w)          // voice data
+	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("dac", dac_byte_interface, write)
 	AM_RANGE(0x5000, 0x5000) AM_WRITEONLY           // voice ctrl??
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -344,7 +344,7 @@ void tceptor_state::machine_reset()
 
 /*******************************************************************/
 
-static MACHINE_CONFIG_START( tceptor, tceptor_state )
+static MACHINE_CONFIG_START( tceptor )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 49152000/32)
@@ -404,7 +404,7 @@ static MACHINE_CONFIG_START( tceptor, tceptor_state )
 	MCFG_SCREEN_SIZE(38*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(2*8, 34*8-1 + 2*8, 0*8, 28*8-1 + 0)
 	MCFG_SCREEN_UPDATE_DRIVER(tceptor_state, screen_update_tceptor_3d_right)
-	MCFG_SCREEN_VBLANK_DRIVER(tceptor_state, screen_eof_tceptor)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(tceptor_state, screen_vblank_tceptor))
 	MCFG_SCREEN_PALETTE("palette")
 
 
@@ -422,9 +422,9 @@ static MACHINE_CONFIG_START( tceptor, tceptor_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.40)
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.4) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.4) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -542,6 +542,6 @@ ROM_START( tceptor2 )
 ROM_END
 
 
-/*   ( YEAR  NAME      PARENT    MACHINE   INPUT     INIT      MONITOR   COMPANY FULLNAME ) */
-GAME ( 1986, tceptor,  0,        tceptor,  tceptor, driver_device,  0,        ROT0,     "Namco",  "Thunder Ceptor", 0)
-GAMEL( 1986, tceptor2, tceptor,  tceptor,  tceptor2, driver_device, 0,        ROT0,     "Namco",  "Thunder Ceptor II", 0, layout_tceptor2)
+//   ( YEAR  NAME      PARENT    MACHINE   INPUT     STATE          INIT      MONITOR   COMPANY   FULLNAME             FLAGS )
+GAME ( 1986, tceptor,  0,        tceptor,  tceptor,  tceptor_state, 0,        ROT0,     "Namco",  "Thunder Ceptor",    0)
+GAMEL( 1986, tceptor2, tceptor,  tceptor,  tceptor2, tceptor_state, 0,        ROT0,     "Namco",  "Thunder Ceptor II", 0, layout_tceptor2)

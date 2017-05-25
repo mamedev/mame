@@ -11,27 +11,36 @@
 #include "emu.h"
 #include "crtc_ega.h"
 
+#include "screen.h"
 
-#define LOG     (1)
+#define VERBOSE 1
+#include "logmacro.h"
 
 
-const device_type CRTC_EGA = &device_creator<crtc_ega_device>;
+DEFINE_DEVICE_TYPE(CRTC_EGA, crtc_ega_device, "crtc_ega", "IBM EGA CRT Controller")
 
 
-crtc_ega_device::crtc_ega_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, CRTC_EGA, "crtc_EGA", tag, owner, clock, "crtc_ega", __FILE__),
-		device_video_interface(mconfig, *this, false),
-		m_res_out_de_cb(*this),
-		m_res_out_hsync_cb(*this),
-		m_res_out_vsync_cb(*this),
-		m_res_out_vblank_cb(*this), m_horiz_char_total(0), m_horiz_disp(0), m_horiz_blank_start(0), m_horiz_blank_end(0), m_ena_vert_access(0), m_de_skew(0), m_horiz_retr_start(0), m_horiz_retr_end(0),
-	m_horiz_retr_skew(0), m_vert_total(0), m_preset_row_scan(0), m_byte_panning(0), m_max_ras_addr(0), m_scan_doubling(0), m_cursor_start_ras(0), m_cursor_disable(0), m_cursor_end_ras(0), m_cursor_skew(0),
-	m_disp_start_addr(0), m_cursor_addr(0), m_light_pen_addr(0), m_vert_retr_start(0), m_vert_retr_end(0), m_protect(0), m_bandwidth(0), m_vert_disp_end(0), m_offset(0), m_underline_loc(0), m_vert_blank_start(0),
-	m_vert_blank_end(0), m_mode_control(0), m_line_compare(0), m_register_address_latch(0), m_cursor_state(false), m_cursor_blink_count(0),
-		m_hpixels_per_column(0), m_cur(0), m_hsync(0), m_vsync(0), m_vblank(0), m_de(0), m_character_counter(0), m_hsync_width_counter(0), m_line_counter(0), m_raster_counter(0), m_vsync_width_counter(0),
-	m_line_enable_ff(false), m_vsync_ff(0), m_adjust_active(0), m_line_address(0), m_cursor_x(0), m_line_timer(nullptr), m_de_off_timer(nullptr), m_cur_on_timer(nullptr), m_cur_off_timer(nullptr),
-	m_hsync_on_timer(nullptr), m_hsync_off_timer(nullptr), m_light_pen_latch_timer(nullptr), m_horiz_pix_total(0), m_vert_pix_total(0), m_max_visible_x(0), m_max_visible_y(0), m_hsync_on_pos(0),
-	m_hsync_off_pos(0), m_vsync_on_pos(0), m_vsync_off_pos(0), m_current_disp_addr(0), m_light_pen_latched(0), m_has_valid_parameters(false)
+crtc_ega_device::crtc_ega_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, CRTC_EGA, tag, owner, clock), device_video_interface(mconfig, *this, false)
+	, m_res_out_de_cb(*this), m_res_out_hsync_cb(*this), m_res_out_vsync_cb(*this), m_res_out_vblank_cb(*this)
+	, m_horiz_char_total(0), m_horiz_disp(0), m_horiz_blank_start(0), m_horiz_blank_end(0)
+	, m_ena_vert_access(0), m_de_skew(0)
+	, m_horiz_retr_start(0), m_horiz_retr_end(0), m_horiz_retr_skew(0)
+	, m_vert_total(0), m_preset_row_scan(0), m_byte_panning(0), m_max_ras_addr(0), m_scan_doubling(0)
+	, m_cursor_start_ras(0), m_cursor_disable(0), m_cursor_end_ras(0), m_cursor_skew(0)
+	, m_disp_start_addr(0), m_cursor_addr(0), m_light_pen_addr(0)
+	, m_vert_retr_start(0), m_vert_retr_end(0)
+	, m_protect(0), m_bandwidth(0), m_vert_disp_end(0), m_offset(0), m_underline_loc(0)
+	, m_vert_blank_start(0), m_vert_blank_end(0)
+	, m_mode_control(0), m_line_compare(0), m_register_address_latch(0)
+	, m_cursor_state(false), m_cursor_blink_count(0)
+	, m_hpixels_per_column(0), m_cur(0), m_hsync(0), m_vsync(0), m_vblank(0), m_de(0)
+	, m_character_counter(0), m_hsync_width_counter(0), m_line_counter(0), m_raster_counter(0), m_vsync_width_counter(0)
+	, m_line_enable_ff(false), m_vsync_ff(0), m_adjust_active(0), m_line_address(0), m_cursor_x(0)
+	, m_line_timer(nullptr), m_de_off_timer(nullptr), m_cur_on_timer(nullptr), m_cur_off_timer(nullptr), m_hsync_on_timer(nullptr), m_hsync_off_timer(nullptr), m_light_pen_latch_timer(nullptr)
+	, m_horiz_pix_total(0), m_vert_pix_total(0), m_max_visible_x(0), m_max_visible_y(0)
+	, m_hsync_on_pos(0), m_hsync_off_pos(0), m_vsync_on_pos(0), m_vsync_off_pos(0)
+	, m_current_disp_addr(0), m_light_pen_latched(0), m_has_valid_parameters(false)
 {
 }
 
@@ -50,7 +59,7 @@ WRITE8_MEMBER( crtc_ega_device::address_w )
 
 READ8_MEMBER( crtc_ega_device::register_r )
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 
 	switch (m_register_address_latch)
 	{
@@ -58,8 +67,8 @@ READ8_MEMBER( crtc_ega_device::register_r )
 		case 0x0d:  ret = (m_disp_start_addr >> 0) & 0xff; break;
 		case 0x0e:  ret = (m_cursor_addr    >> 8) & 0xff; break;
 		case 0x0f:  ret = (m_cursor_addr    >> 0) & 0xff; break;
-		case 0x10:  ret = (m_light_pen_addr >> 8) & 0xff; m_light_pen_latched = FALSE; break;
-		case 0x11:  ret = (m_light_pen_addr >> 0) & 0xff; m_light_pen_latched = FALSE; break;
+		case 0x10:  ret = (m_light_pen_addr >> 8) & 0xff; m_light_pen_latched = false; break;
+		case 0x11:  ret = (m_light_pen_addr >> 0) & 0xff; m_light_pen_latched = false; break;
 
 		/* all other registers are write only and return 0 */
 		default: break;
@@ -71,7 +80,7 @@ READ8_MEMBER( crtc_ega_device::register_r )
 
 WRITE8_MEMBER( crtc_ega_device::register_w )
 {
-	if (LOG)  logerror("%s CRTC_EGA: reg 0x%02x = 0x%02x\n", machine().describe_context(), m_register_address_latch, data);
+	LOG("%s CRTC_EGA: reg 0x%02x = 0x%02x\n", machine().describe_context(), m_register_address_latch, data);
 
 	switch (m_register_address_latch)
 	{
@@ -136,15 +145,15 @@ WRITE8_MEMBER( crtc_ega_device::register_w )
 
 void crtc_ega_device::recompute_parameters(bool postload)
 {
-	UINT16 hsync_on_pos, hsync_off_pos, vsync_on_pos, vsync_off_pos;
+	uint16_t hsync_on_pos, hsync_off_pos, vsync_on_pos, vsync_off_pos;
 
 	/* compute the screen sizes */
-	UINT16 horiz_pix_total = (m_horiz_char_total + 2) * m_hpixels_per_column;
-	UINT16 vert_pix_total = m_vert_total + 1;
+	uint16_t horiz_pix_total = (m_horiz_char_total + 2) * m_hpixels_per_column;
+	uint16_t vert_pix_total = m_vert_total + 1;
 
 	/* determine the visible area, avoid division by 0 */
-	UINT16 max_visible_x = ( m_horiz_disp + 1 ) * m_hpixels_per_column - 1;
-	UINT16 max_visible_y = m_vert_disp_end;
+	uint16_t max_visible_x = ( m_horiz_disp + 1 ) * m_hpixels_per_column - 1;
+	uint16_t max_visible_y = m_vert_disp_end;
 
 	/* determine the syncing positions */
 	int horiz_sync_char_width = ( m_horiz_retr_end + 1 ) - ( m_horiz_retr_start & 0x1f );
@@ -189,7 +198,7 @@ void crtc_ega_device::recompute_parameters(bool postload)
 
 			rectangle visarea(0, max_visible_x, 0, max_visible_y);
 
-			if (LOG) logerror("CRTC_EGA config screen: HTOTAL: 0x%x  VTOTAL: 0x%x  MAX_X: 0x%x  MAX_Y: 0x%x  HSYNC: 0x%x-0x%x  VSYNC: 0x%x-0x%x  Freq: %ffps\n",
+			LOG("CRTC_EGA config screen: HTOTAL: 0x%x  VTOTAL: 0x%x  MAX_X: 0x%x  MAX_Y: 0x%x  HSYNC: 0x%x-0x%x  VSYNC: 0x%x-0x%x  Freq: %ffps\n",
 								horiz_pix_total, vert_pix_total, max_visible_x, max_visible_y, hsync_on_pos, hsync_off_pos - 1, vsync_on_pos, vsync_off_pos - 1, 1 / ATTOSECONDS_TO_DOUBLE(refresh));
 
 			if ( m_screen != nullptr )
@@ -200,7 +209,7 @@ void crtc_ega_device::recompute_parameters(bool postload)
 		else
 		{
 			m_has_valid_parameters = false;
-			if (LOG) logerror("CRTC_EGA bad config screen: HTOTAL: 0x%x  VTOTAL: 0x%x  MAX_X: 0x%x  MAX_Y: 0x%x  HSYNC: 0x%x-0x%x  VSYNC: 0x%x-0x%x\n",
+			LOG("CRTC_EGA bad config screen: HTOTAL: 0x%x  VTOTAL: 0x%x  MAX_X: 0x%x  MAX_Y: 0x%x  HSYNC: 0x%x-0x%x  VSYNC: 0x%x-0x%x\n",
 								horiz_pix_total, vert_pix_total, max_visible_x, max_visible_y, hsync_on_pos, hsync_off_pos - 1, vsync_on_pos, vsync_off_pos - 1);
 
 		}
@@ -305,7 +314,7 @@ void crtc_ega_device::handle_line_timer()
 		{
 			m_vsync_ff = 0;
 
-			new_vsync = FALSE;
+			new_vsync = false;
 		}
 	}
 
@@ -333,7 +342,7 @@ void crtc_ega_device::handle_line_timer()
 		m_vsync_width_counter = 0;
 		m_vsync_ff = 1;
 
-		new_vsync = TRUE;
+		new_vsync = true;
 	}
 
 	/* Check if we have reached the end of the vertical area */
@@ -342,7 +351,7 @@ void crtc_ega_device::handle_line_timer()
 		m_line_counter = 0;
 		m_line_address = m_disp_start_addr;
 		m_line_enable_ff = true;
-		set_vblank( FALSE );
+		set_vblank( false );
 		/* also update the cursor state now */
 		update_cursor_state();
 
@@ -375,7 +384,7 @@ void crtc_ega_device::handle_line_timer()
 	/* Set VBlank signal */
 	if ( m_line_counter == m_vert_disp_end + 1 )
 	{
-		set_vblank( TRUE );
+		set_vblank( true );
 	}
 
 	/* Schedule our next callback */
@@ -383,7 +392,7 @@ void crtc_ega_device::handle_line_timer()
 
 	/* Set VSYNC and DE signals */
 	set_vsync( new_vsync );
-	set_de( m_line_enable_ff ? TRUE : FALSE );
+	set_de( m_line_enable_ff ? true : false );
 }
 
 
@@ -396,23 +405,23 @@ void crtc_ega_device::device_timer(emu_timer &timer, device_timer_id id, int par
 		break;
 
 	case TIMER_DE_OFF:
-		set_de( FALSE );
+		set_de( false );
 		break;
 
 	case TIMER_CUR_ON:
-		set_cur( TRUE );
+		set_cur( true );
 
 		/* Schedule CURSOR off signal */
 		m_cur_off_timer->adjust( attotime::from_ticks( 1, m_clock ) );
 		break;
 
 	case TIMER_CUR_OFF:
-		set_cur( FALSE );
+		set_cur( false );
 		break;
 
 	case TIMER_HSYNC_ON:
 		{
-			INT8 hsync_width = ( 0x20 | m_horiz_blank_end ) - ( m_horiz_blank_start & 0x1f );
+			int8_t hsync_width = ( 0x20 | m_horiz_blank_end ) - ( m_horiz_blank_start & 0x1f );
 
 			if ( hsync_width <= 0 )
 			{
@@ -420,7 +429,7 @@ void crtc_ega_device::device_timer(emu_timer &timer, device_timer_id id, int par
 			}
 
 			m_hsync_width_counter = 0;
-			set_hsync( TRUE );
+			set_hsync( true );
 
 			/* Schedule HSYNC off signal */
 			m_hsync_off_timer->adjust( attotime::from_ticks( hsync_width, m_clock ) );
@@ -428,7 +437,7 @@ void crtc_ega_device::device_timer(emu_timer &timer, device_timer_id id, int par
 		break;
 
 	case TIMER_HSYNC_OFF:
-		set_hsync( FALSE );
+		set_hsync( false );
 		break;
 
 	case TIMER_LIGHT_PEN_LATCH:
@@ -439,7 +448,7 @@ void crtc_ega_device::device_timer(emu_timer &timer, device_timer_id id, int par
 }
 
 
-UINT16 crtc_ega_device::get_ma()
+uint16_t crtc_ega_device::get_ma()
 {
 	update_counters();
 
@@ -447,7 +456,7 @@ UINT16 crtc_ega_device::get_ma()
 }
 
 
-UINT8 crtc_ega_device::get_ra()
+uint8_t crtc_ega_device::get_ra()
 {
 	return m_raster_counter;
 }
@@ -490,7 +499,7 @@ void crtc_ega_device::set_hpixels_per_column(int hpixels_per_column)
 void crtc_ega_device::update_cursor_state()
 {
 	/* save and increment cursor counter */
-	UINT8 last_cursor_blink_count = m_cursor_blink_count;
+	uint8_t last_cursor_blink_count = m_cursor_blink_count;
 	m_cursor_blink_count = m_cursor_blink_count + 1;
 
 	/* switch on cursor blinking mode */
@@ -521,13 +530,13 @@ void crtc_ega_device::update_cursor_state()
 }
 
 
-UINT32 crtc_ega_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t crtc_ega_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	assert(bitmap.valid());
 
 	if (m_has_valid_parameters)
 	{
-		UINT16 y;
+		uint16_t y;
 
 		assert(!m_row_update_cb.isnull());
 
@@ -545,7 +554,7 @@ UINT32 crtc_ega_device::screen_update(screen_device &screen, bitmap_ind16 &bitma
 		for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
 			/* compute the current raster line */
-			UINT8 ra = y % (m_max_ras_addr + 1);
+			uint8_t ra = y % (m_max_ras_addr + 1);
 
 			/* check if the cursor is visible and is on this scanline */
 			int cursor_visible = m_cursor_state &&
@@ -555,7 +564,7 @@ UINT32 crtc_ega_device::screen_update(screen_device &screen, bitmap_ind16 &bitma
 								(m_cursor_addr < (m_current_disp_addr + ( m_horiz_disp + 1 )));
 
 			/* compute the cursor X position, or -1 if not visible */
-			INT8 cursor_x = cursor_visible ? (m_cursor_addr - m_current_disp_addr) : -1;
+			int8_t cursor_x = cursor_visible ? (m_cursor_addr - m_current_disp_addr) : -1;
 
 			/* call the external system to draw it */
 			m_row_update_cb(bitmap, cliprect, m_current_disp_addr, ra, y, m_horiz_disp + 1, cursor_x);
@@ -646,7 +655,7 @@ void crtc_ega_device::device_start()
 	m_adjust_active = 0;
 
 	m_current_disp_addr = 0;
-	m_light_pen_latched = FALSE;
+	m_light_pen_latched = false;
 	m_has_valid_parameters = false;
 
 	/* register for state saving */

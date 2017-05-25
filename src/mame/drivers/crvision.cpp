@@ -127,8 +127,12 @@ CN1     - main board connector (17x2 pin header)
 
 */
 
+#include "emu.h"
 #include "includes/crvision.h"
+
 #include "softlist.h"
+#include "speaker.h"
+
 
 /***************************************************************************
     MEMORY MAPS
@@ -496,9 +500,9 @@ WRITE8_MEMBER( crvision_state::pia_pa_w )
 	m_cassette->output( BIT(data, 7) ? +1.0 : -1.0);
 }
 
-UINT8 crvision_state::read_keyboard(int pa)
+uint8_t crvision_state::read_keyboard(int pa)
 {
-	UINT8 value = 0;
+	uint8_t value = 0;
 
 	for (int i = 0; i < 8; i++)
 	{
@@ -535,7 +539,7 @@ READ8_MEMBER( crvision_state::pia_pa_r )
 	    PA7     Cassette data in/out
 	*/
 
-	UINT8 data = 0x7f;
+	uint8_t data = 0x7f;
 
 	if ((m_cassette)->input() > -0.1469) data |= 0x80;
 
@@ -557,7 +561,7 @@ READ8_MEMBER( crvision_state::pia_pb_r )
 	    PB7     Keyboard input
 	*/
 
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	for (int i = 0; i < 4; i++)
 		if (m_keylatch >> i & 1)
@@ -581,7 +585,7 @@ READ8_MEMBER( laser2001_state::pia_pa_r )
 	    PA7     Keyboard column 7
 	*/
 
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	for (int i = 0; i < 8; i++)
 		if (~m_keylatch >> i & 1)
@@ -608,7 +612,7 @@ WRITE8_MEMBER( laser2001_state::pia_pa_w )
 
 READ8_MEMBER( laser2001_state::pia_pb_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	for (int i = 0; i < 4; i++)
 		if (~m_joylatch >> i & 1)
@@ -727,10 +731,10 @@ static SLOT_INTERFACE_START(crvision_cart)
 SLOT_INTERFACE_END
 
 /*-------------------------------------------------
-    MACHINE_CONFIG_START( creativision, crvision_state )
+    MACHINE_CONFIG_START( creativision )
 -------------------------------------------------*/
 
-static MACHINE_CONFIG_START( creativision, crvision_state )
+static MACHINE_CONFIG_START( creativision )
 	// basic machine hardware
 	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_2MHz)
 	MCFG_CPU_PROGRAM_MAP(crvision_map)
@@ -793,7 +797,7 @@ MACHINE_CONFIG_END
     MACHINE_CONFIG_DERIVED( pal, creativision )
 -------------------------------------------------*/
 
-static MACHINE_CONFIG_DERIVED_CLASS( pal, creativision, crvision_pal_state )
+static MACHINE_CONFIG_DERIVED( pal, creativision )
 	// video hardware
 	MCFG_DEVICE_ADD( TMS9929_TAG, TMS9929, XTAL_10_738635MHz / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
@@ -803,10 +807,10 @@ static MACHINE_CONFIG_DERIVED_CLASS( pal, creativision, crvision_pal_state )
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------
-    MACHINE_CONFIG_START( lasr2001, laser2001_state )
+    MACHINE_CONFIG_START( lasr2001 )
 -------------------------------------------------*/
 
-static MACHINE_CONFIG_START( lasr2001, laser2001_state )
+static MACHINE_CONFIG_START( lasr2001 )
 	// basic machine hardware
 	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_17_73447MHz/9)
 	MCFG_CPU_PROGRAM_MAP(lasr2001_map)
@@ -891,14 +895,14 @@ ROM_END
     SYSTEM DRIVERS
 ***************************************************************************/
 
-/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT    COMPANY                   FULLNAME */
-CONS( 1982, crvision,   0,          0,      pal,        crvision, driver_device,    0,      "Video Technology",         "CreatiVision", 0 )
-CONS( 1982, fnvision,   crvision,   0,      pal,        crvision, driver_device,    0,      "Video Technology",         "FunVision", 0 )
-CONS( 1982, crvisioj,   crvision,   0,      ntsc,       crvision, driver_device,    0,      "Cheryco",                  "CreatiVision (Japan)", 0 )
-CONS( 1982, wizzard,    crvision,   0,      pal,        crvision, driver_device,    0,      "Dick Smith Electronics",   "Wizzard (Oceania)", 0 )
-CONS( 1982, rameses,    crvision,   0,      pal,        crvision, driver_device,    0,      "Hanimex",                  "Rameses (Oceania)", 0 )
-CONS( 1983, vz2000,     crvision,   0,      pal,        crvision, driver_device,    0,      "Dick Smith Electronics",   "VZ 2000 (Oceania)", 0 )
-CONS( 1983, crvisio2,   crvision,   0,      pal,        crvision, driver_device,    0,      "Video Technology",         "CreatiVision MK-II (Europe)", 0 )
-//COMP( 1983, lasr2001,   0,          0,      lasr2001,   lasr2001, driver_device,   0,      "Video Technology",         "Laser 2001", MACHINE_NOT_WORKING )
-//COMP( 1983, vz2001,     lasr2001,   0,      lasr2001,   lasr2001, driver_device,   0,      "Dick Smith Electronics",   "VZ 2001 (Oceania)", MACHINE_NOT_WORKING )
-COMP( 1983, manager,    0,          0,      lasr2001,   manager, driver_device, 0,      "Salora",                   "Manager (Finland)", 0 )
+//    YEAR  NAME        PARENT      COMPAT  MACHINE   INPUT     STATE               INIT  COMPANY                   FULLNAME                       FLAGS
+CONS( 1982, crvision,   0,          0,      pal,      crvision, crvision_pal_state, 0,    "Video Technology",       "CreatiVision",                0 )
+CONS( 1982, fnvision,   crvision,   0,      pal,      crvision, crvision_pal_state, 0,    "Video Technology",       "FunVision",                   0 )
+CONS( 1982, crvisioj,   crvision,   0,      ntsc,     crvision, crvision_state,     0,    "Cheryco",                "CreatiVision (Japan)",        0 )
+CONS( 1982, wizzard,    crvision,   0,      pal,      crvision, crvision_pal_state, 0,    "Dick Smith Electronics", "Wizzard (Oceania)",           0 )
+CONS( 1982, rameses,    crvision,   0,      pal,      crvision, crvision_pal_state, 0,    "Hanimex",                "Rameses (Oceania)",           0 )
+CONS( 1983, vz2000,     crvision,   0,      pal,      crvision, crvision_pal_state, 0,    "Dick Smith Electronics", "VZ 2000 (Oceania)",           0 )
+CONS( 1983, crvisio2,   crvision,   0,      pal,      crvision, crvision_pal_state, 0,    "Video Technology",       "CreatiVision MK-II (Europe)", 0 )
+//COMP( 1983, lasr2001,   0,          0,      lasr2001, lasr2001, laser2001_state,    0,    "Video Technology",       "Laser 2001",                  MACHINE_NOT_WORKING )
+//COMP( 1983, vz2001,     lasr2001,   0,      lasr2001, lasr2001, laser2001_state,    0,    "Dick Smith Electronics", "VZ 2001 (Oceania)",           MACHINE_NOT_WORKING )
+COMP( 1983, manager,    0,          0,      lasr2001, manager, laser2001_state,     0,     "Salora",                "Manager (Finland)",           0 )

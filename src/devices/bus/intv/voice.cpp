@@ -13,20 +13,21 @@
 
 #include "emu.h"
 #include "voice.h"
+#include "speaker.h"
 
 
 //-------------------------------------------------
 //  intv_voice_device - constructor
 //-------------------------------------------------
 
-const device_type INTV_ROM_VOICE = &device_creator<intv_voice_device>;
+DEFINE_DEVICE_TYPE(INTV_ROM_VOICE, intv_voice_device, "intv_voice", "Intellivision Intellivoice Expansion")
 
-intv_voice_device::intv_voice_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-				: intv_rom_device(mconfig, INTV_ROM_VOICE, "Intellivision Intellivoice Expansion", tag, owner, clock, "intv_voice", __FILE__),
-				m_speech(*this, "sp0256_speech"),
-				m_subslot(*this, "subslot"),
-				m_ramd0_enabled(false),
-				m_ram88_enabled(false)
+intv_voice_device::intv_voice_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: intv_rom_device(mconfig, INTV_ROM_VOICE, tag, owner, clock),
+	m_speech(*this, "sp0256_speech"),
+	m_subslot(*this, "subslot"),
+	m_ramd0_enabled(false),
+	m_ram88_enabled(false)
 {
 }
 
@@ -65,10 +66,10 @@ void intv_voice_device::late_subslot_setup()
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( intellivoice )
+//  MACHINE_CONFIG_START( intellivoice )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( intellivoice )
+static MACHINE_CONFIG_START( intellivoice )
 	MCFG_SPEAKER_STANDARD_MONO("mono_voice")
 
 	MCFG_SOUND_ADD("sp0256_speech", SP0256, 3120000)
@@ -96,7 +97,7 @@ ROM_START( intellivoice )
 	ROM_LOAD( "sp0256-012.bin",   0x1000, 0x0800, CRC(0de7579d) SHA1(618563e512ff5665183664f52270fa9606c9d289) )
 ROM_END
 
-const rom_entry *intv_voice_device::device_rom_region() const
+const tiny_rom_entry *intv_voice_device::device_rom_region() const
 {
 	return ROM_NAME( intellivoice );
 }
@@ -121,4 +122,21 @@ WRITE16_MEMBER(intv_voice_device::write_speech)
 {
 	if (ACCESSING_BITS_0_7)
 		return m_speech->spb640_w(space, offset, data, mem_mask);
+}
+
+
+READ16_MEMBER(intv_voice_device::read_rom80)
+{
+	if (m_ram88_enabled && offset >= 0x800)
+		return m_subslot->read_ram(space, offset & 0x7ff, mem_mask);
+	else
+		return m_subslot->read_rom80(space, offset, mem_mask);
+}
+
+READ16_MEMBER(intv_voice_device::read_romd0)
+{
+	if (m_ramd0_enabled && offset < 0x800)
+		return m_subslot->read_ram(space, offset, mem_mask);
+	else
+		return m_subslot->read_romd0(space, offset, mem_mask);
 }

@@ -151,15 +151,16 @@ resulting mess can be seen in the F4 viewer display.
 *******************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "includes/spectrum.h"
 #include "includes/spec128.h"
-#include "imagedev/snapquik.h"
-#include "imagedev/cassette.h"
+
+#include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-#include "sound/speaker.h"
+
+#include "screen.h"
+
 #include "formats/tzx_cas.h"
-#include "machine/ram.h"
+
 
 /****************************************************************************************************/
 /* Spectrum 128 specific functions */
@@ -187,7 +188,7 @@ WRITE8_MEMBER(spectrum_state::spectrum_128_port_7ffd_w)
 
 void spectrum_state::spectrum_128_update_memory()
 {
-	UINT8 *messram = m_ram->pointer();
+	uint8_t *messram = m_ram->pointer();
 
 	/* select ram at 0x0c000-0x0ffff */
 	int ram_page = m_port_7ffd_data & 0x07;
@@ -238,7 +239,7 @@ ADDRESS_MAP_END
 
 MACHINE_RESET_MEMBER(spectrum_state,spectrum_128)
 {
-	UINT8 *messram = m_ram->pointer();
+	uint8_t *messram = m_ram->pointer();
 
 	memset(messram,0,128*1024);
 	/* 0x0000-0x3fff always holds ROM */
@@ -358,8 +359,8 @@ ROM_START(hc2000)
 	ROMX_LOAD("hc2000.v2",  0x14000,0x4000, CRC(65d90464) SHA1(5e2096e6460ff2120c8ada97579fdf82c1199c09), ROM_BIOS(2))
 ROM_END
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT       INIT    COMPANY     FULLNAME */
-COMP( 1986, spec128,  0,       0,       spectrum_128,   spec_plus, driver_device,   0,  "Sinclair Research Ltd", "ZX Spectrum 128" , 0 )
-COMP( 1986, specpls2, spec128, 0,       spectrum_128,   spec_plus, driver_device,   0,  "Amstrad plc",           "ZX Spectrum +2" , 0 )
-COMP( 1991, hc128,    spec128, 0,       spectrum_128,   spec_plus, driver_device,   0,  "ICE-Felix",             "HC-128" , 0 )
-COMP( 1992, hc2000,   spec128, 0,       spectrum_128,   spec_plus, driver_device,   0,  "ICE-Felix",             "HC-2000" , MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT   COMPAT  MACHINE       INPUT      STATE           INIT  COMPANY                  FULLNAME           FLAGS
+COMP( 1986, spec128,  0,       0,      spectrum_128, spec_plus, spectrum_state, 0,    "Sinclair Research Ltd", "ZX Spectrum 128", 0 )
+COMP( 1986, specpls2, spec128, 0,      spectrum_128, spec_plus, spectrum_state, 0,    "Amstrad plc",           "ZX Spectrum +2",  0 )
+COMP( 1991, hc128,    spec128, 0,      spectrum_128, spec_plus, spectrum_state, 0,    "ICE-Felix",             "HC-128",          0 )
+COMP( 1992, hc2000,   spec128, 0,      spectrum_128, spec_plus, spectrum_state, 0,    "ICE-Felix",             "HC-2000",         MACHINE_NOT_WORKING )

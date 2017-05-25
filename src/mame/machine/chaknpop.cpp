@@ -12,7 +12,7 @@
 
 /* mcu data that is extracted from the real board! */
 /* updated on 2st Jun 2003 */
-static const UINT8 mcu_data[256] = {
+static const uint8_t mcu_data[256] = {
 	0x3a, 0xe6, 0x80, 0xc6, 0x0e, 0xdd, 0x77, 0xfd,
 	0x7e, 0xfe, 0x10, 0x38, 0x10, 0xdd, 0x7e, 0x03,
 	0xc6, 0x08, 0xdd, 0x77, 0x03, 0xdd, 0x7e, 0xff,
@@ -47,7 +47,7 @@ static const UINT8 mcu_data[256] = {
 	0x10, 0xfc, 0x3e, 0x01, 0x32, 0x5b, 0x81, 0xc9
 };
 
-void chaknpop_state::mcu_update_seed( UINT8 data )
+void chaknpop_state::mcu_update_seed( uint8_t data )
 {
 	if (!(data & 0x80))
 	{
@@ -87,7 +87,7 @@ READ8_MEMBER(chaknpop_state::mcu_port_c_r)
 
 WRITE8_MEMBER(chaknpop_state::mcu_port_a_w)
 {
-	UINT8 mcu_command;
+	uint8_t mcu_command;
 
 	mcu_command = data + m_mcu_seed;
 	m_mcu_result = 0;

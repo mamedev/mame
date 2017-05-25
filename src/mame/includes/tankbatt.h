@@ -18,8 +18,8 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<UINT8> m_bulletsram;
-	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<uint8_t> m_bulletsram;
+	required_shared_ptr<uint8_t> m_videoram;
 
 	int m_nmi_enable;
 	int m_sound_enable;
@@ -49,6 +49,6 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(tankbatt);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprect);
 };

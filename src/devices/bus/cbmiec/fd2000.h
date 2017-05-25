@@ -6,12 +6,11 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_CBMIEC_FD2000_H
+#define MAME_BUS_CBMIEC_FD2000_H
+
 #pragma once
 
-#ifndef __FD2000__
-#define __FD2000__
-
-#include "emu.h"
 #include "cbmiec.h"
 #include "cpu/m6502/m65c02.h"
 #include "formats/d81_dsk.h"
@@ -39,17 +38,10 @@ class fd2000_device :  public device_t,
 {
 public:
 	// construction/destruction
-	fd2000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	fd2000_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source);
-
-	enum
-	{
-		TYPE_FD2000,
-		TYPE_FD4000
-	};
+	fd2000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	DECLARE_READ8_MEMBER( via_pa_r );
@@ -60,6 +52,14 @@ public:
 	//DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 protected:
+	enum
+	{
+		TYPE_FD2000,
+		TYPE_FD4000
+	};
+
+	fd2000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -84,14 +84,13 @@ class fd4000_device :  public fd2000_device
 {
 public:
 	// construction/destruction
-	fd4000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	fd4000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 
 // device type definition
-extern const device_type FD2000;
-extern const device_type FD4000;
+DECLARE_DEVICE_TYPE(FD2000, fd2000_device)
+DECLARE_DEVICE_TYPE(FD4000, fd4000_device)
 
 
-
-#endif
+#endif // MAME_BUS_CBMIEC_FD2000_H

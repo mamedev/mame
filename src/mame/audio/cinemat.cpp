@@ -19,11 +19,12 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/cinemat.h"
+
 #include "cpu/z80/z80.h"
-#include "cpu/ccpu/ccpu.h"
 #include "cpu/z80/z80daisy.h"
 #include "machine/z80ctc.h"
-#include "includes/cinemat.h"
+#include "speaker.h"
 
 
 /*************************************
@@ -53,7 +54,7 @@
 
 WRITE8_MEMBER(cinemat_state::cinemat_sound_control_w)
 {
-	UINT8 oldval = m_sound_control;
+	uint8_t oldval = m_sound_control;
 
 	/* form an 8-bit value with the new bit */
 	m_sound_control = (m_sound_control & ~(1 << offset)) | ((data & 1) << offset);
@@ -129,7 +130,7 @@ static const char *const spacewar_sample_names[] =
 	nullptr
 };
 
-void cinemat_state::spacewar_sound_w(UINT8 sound_val, UINT8 bits_changed)
+void cinemat_state::spacewar_sound_w(uint8_t sound_val, uint8_t bits_changed)
 {
 	/* Explosion - rising edge */
 	if (SOUNDVAL_RISING_EDGE(0x01))
@@ -173,7 +174,7 @@ SOUND_RESET_MEMBER( cinemat_state, spacewar )
 	generic_init(&cinemat_state::spacewar_sound_w);
 }
 
-MACHINE_CONFIG_FRAGMENT( spacewar_sound )
+MACHINE_CONFIG_START( spacewar_sound )
 	MCFG_SOUND_RESET_OVERRIDE(cinemat_state, spacewar)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -201,7 +202,7 @@ static const char *const barrier_sample_names[] =
 	nullptr
 };
 
-void cinemat_state::barrier_sound_w(UINT8 sound_val, UINT8 bits_changed)
+void cinemat_state::barrier_sound_w(uint8_t sound_val, uint8_t bits_changed)
 {
 	/* Player die - rising edge */
 	if (SOUNDVAL_RISING_EDGE(0x01))
@@ -221,7 +222,7 @@ SOUND_RESET_MEMBER( cinemat_state, barrier )
 	generic_init(&cinemat_state::barrier_sound_w);
 }
 
-MACHINE_CONFIG_FRAGMENT( barrier_sound )
+MACHINE_CONFIG_START( barrier_sound )
 	MCFG_SOUND_RESET_OVERRIDE(cinemat_state, barrier)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -247,7 +248,7 @@ static const char *const speedfrk_sample_names[] =
 	nullptr
 };
 
-void cinemat_state::speedfrk_sound_w(UINT8 sound_val, UINT8 bits_changed)
+void cinemat_state::speedfrk_sound_w(uint8_t sound_val, uint8_t bits_changed)
 {
 	/* on the falling edge of bit 0x08, clock the inverse of bit 0x04 into the top of the shiftreg */
 	if (SOUNDVAL_FALLING_EDGE(0x08))
@@ -274,7 +275,7 @@ SOUND_RESET_MEMBER( cinemat_state, speedfrk )
 	generic_init(&cinemat_state::speedfrk_sound_w);
 }
 
-MACHINE_CONFIG_FRAGMENT( speedfrk_sound )
+MACHINE_CONFIG_START( speedfrk_sound )
 	MCFG_SOUND_RESET_OVERRIDE(cinemat_state, speedfrk)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -305,7 +306,7 @@ static const char *const starhawk_sample_names[] =
 	nullptr
 };
 
-void cinemat_state::starhawk_sound_w(UINT8 sound_val, UINT8 bits_changed)
+void cinemat_state::starhawk_sound_w(uint8_t sound_val, uint8_t bits_changed)
 {
 	/* explosion - falling edge */
 	if (SOUNDVAL_FALLING_EDGE(0x01))
@@ -343,7 +344,7 @@ SOUND_RESET_MEMBER( cinemat_state, starhawk )
 	generic_init(&cinemat_state::starhawk_sound_w);
 }
 
-MACHINE_CONFIG_FRAGMENT( starhawk_sound )
+MACHINE_CONFIG_START( starhawk_sound )
 	MCFG_SOUND_RESET_OVERRIDE(cinemat_state, starhawk)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -374,7 +375,7 @@ static const char *const sundance_sample_names[] =
 	nullptr
 };
 
-void cinemat_state::sundance_sound_w(UINT8 sound_val, UINT8 bits_changed)
+void cinemat_state::sundance_sound_w(uint8_t sound_val, uint8_t bits_changed)
 {
 	/* bong - falling edge */
 	if (SOUNDVAL_FALLING_EDGE(0x01))
@@ -406,7 +407,7 @@ SOUND_RESET_MEMBER( cinemat_state, sundance )
 	generic_init(&cinemat_state::sundance_sound_w);
 }
 
-MACHINE_CONFIG_FRAGMENT( sundance_sound )
+MACHINE_CONFIG_START( sundance_sound )
 	MCFG_SOUND_RESET_OVERRIDE(cinemat_state, sundance)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -437,7 +438,7 @@ static const char *const tailg_sample_names[] =
 	nullptr
 };
 
-void cinemat_state::tailg_sound_w(UINT8 sound_val, UINT8 bits_changed)
+void cinemat_state::tailg_sound_w(uint8_t sound_val, uint8_t bits_changed)
 {
 	/* the falling edge of bit 0x10 clocks bit 0x08 into the mux selected by bits 0x07 */
 	if (SOUNDVAL_FALLING_EDGE(0x10))
@@ -488,7 +489,7 @@ SOUND_RESET_MEMBER( cinemat_state, tailg )
 	generic_init(&cinemat_state::tailg_sound_w);
 }
 
-MACHINE_CONFIG_FRAGMENT( tailg_sound )
+MACHINE_CONFIG_START( tailg_sound )
 	MCFG_SOUND_RESET_OVERRIDE(cinemat_state, tailg)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -518,7 +519,7 @@ static const char *const warrior_sample_names[] =
 	nullptr
 };
 
-void cinemat_state::warrior_sound_w(UINT8 sound_val, UINT8 bits_changed)
+void cinemat_state::warrior_sound_w(uint8_t sound_val, uint8_t bits_changed)
 {
 	/* normal level - 0=on, 1=off */
 	if (SOUNDVAL_FALLING_EDGE(0x01))
@@ -550,7 +551,7 @@ SOUND_RESET_MEMBER( cinemat_state, warrior )
 	generic_init(&cinemat_state::warrior_sound_w);
 }
 
-MACHINE_CONFIG_FRAGMENT( warrior_sound )
+MACHINE_CONFIG_START( warrior_sound )
 	MCFG_SOUND_RESET_OVERRIDE(cinemat_state, warrior)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -582,7 +583,7 @@ static const char *const armora_sample_names[] =
 	nullptr
 };
 
-void cinemat_state::armora_sound_w(UINT8 sound_val, UINT8 bits_changed)
+void cinemat_state::armora_sound_w(uint8_t sound_val, uint8_t bits_changed)
 {
 	/* on the rising edge of bit 0x10, clock bit 0x80 into the shift register */
 	if (SOUNDVAL_RISING_EDGE(0x10))
@@ -638,7 +639,7 @@ SOUND_RESET_MEMBER( cinemat_state, armora )
 	generic_init(&cinemat_state::armora_sound_w);
 }
 
-MACHINE_CONFIG_FRAGMENT( armora_sound )
+MACHINE_CONFIG_START( armora_sound )
 	MCFG_SOUND_RESET_OVERRIDE(cinemat_state, armora)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -676,7 +677,7 @@ static const char *const ripoff_sample_names[] =
 	nullptr
 };
 
-void cinemat_state::ripoff_sound_w(UINT8 sound_val, UINT8 bits_changed)
+void cinemat_state::ripoff_sound_w(uint8_t sound_val, uint8_t bits_changed)
 {
 	/* on the rising edge of bit 0x02, clock bit 0x01 into the shift register */
 	if (SOUNDVAL_RISING_EDGE(0x02))
@@ -723,7 +724,7 @@ SOUND_RESET_MEMBER( cinemat_state, ripoff )
 	generic_init(&cinemat_state::ripoff_sound_w);
 }
 
-MACHINE_CONFIG_FRAGMENT( ripoff_sound )
+MACHINE_CONFIG_START( ripoff_sound )
 	MCFG_SOUND_RESET_OVERRIDE(cinemat_state, ripoff)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -756,9 +757,9 @@ static const char *const starcas_sample_names[] =
 	nullptr
 };
 
-void cinemat_state::starcas_sound_w(UINT8 sound_val, UINT8 bits_changed)
+void cinemat_state::starcas_sound_w(uint8_t sound_val, uint8_t bits_changed)
 {
-	UINT32 target_pitch;
+	uint32_t target_pitch;
 
 	/* on the rising edge of bit 0x10, clock bit 0x80 into the shift register */
 	if (SOUNDVAL_RISING_EDGE(0x10))
@@ -830,7 +831,7 @@ SOUND_RESET_MEMBER( cinemat_state, starcas )
 	generic_init(&cinemat_state::starcas_sound_w);
 }
 
-MACHINE_CONFIG_FRAGMENT( starcas_sound )
+MACHINE_CONFIG_START( starcas_sound )
 	MCFG_SOUND_RESET_OVERRIDE(cinemat_state, starcas)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -863,7 +864,7 @@ static const char *const solarq_sample_names[] =
 	nullptr
 };
 
-void cinemat_state::solarq_sound_w(UINT8 sound_val, UINT8 bits_changed)
+void cinemat_state::solarq_sound_w(uint8_t sound_val, uint8_t bits_changed)
 {
 	/* on the rising edge of bit 0x10, clock bit 0x80 into the shift register */
 	if (SOUNDVAL_RISING_EDGE(0x10))
@@ -958,7 +959,7 @@ SOUND_RESET_MEMBER( cinemat_state, solarq )
 	generic_init(&cinemat_state::solarq_sound_w);
 }
 
-MACHINE_CONFIG_FRAGMENT( solarq_sound )
+MACHINE_CONFIG_START( solarq_sound )
 	MCFG_SOUND_RESET_OVERRIDE(cinemat_state, solarq)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -995,7 +996,7 @@ static const char *const boxingb_sample_names[] =
 	nullptr
 };
 
-void cinemat_state::boxingb_sound_w(UINT8 sound_val, UINT8 bits_changed)
+void cinemat_state::boxingb_sound_w(uint8_t sound_val, uint8_t bits_changed)
 {
 	/* on the rising edge of bit 0x10, clock bit 0x80 into the shift register */
 	if (SOUNDVAL_RISING_EDGE(0x10))
@@ -1086,7 +1087,7 @@ SOUND_RESET_MEMBER( cinemat_state, boxingb )
 	generic_init(&cinemat_state::boxingb_sound_w);
 }
 
-MACHINE_CONFIG_FRAGMENT( boxingb_sound )
+MACHINE_CONFIG_START( boxingb_sound )
 	MCFG_SOUND_RESET_OVERRIDE(cinemat_state, boxingb)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1119,9 +1120,9 @@ static const char *const wotw_sample_names[] =
 	nullptr
 };
 
-void cinemat_state::wotw_sound_w(UINT8 sound_val, UINT8 bits_changed)
+void cinemat_state::wotw_sound_w(uint8_t sound_val, uint8_t bits_changed)
 {
-	UINT32 target_pitch;
+	uint32_t target_pitch;
 
 	/* on the rising edge of bit 0x10, clock bit 0x80 into the shift register */
 	if (SOUNDVAL_RISING_EDGE(0x10))
@@ -1193,7 +1194,7 @@ SOUND_RESET_MEMBER( cinemat_state, wotw )
 	generic_init(&cinemat_state::wotw_sound_w);
 }
 
-MACHINE_CONFIG_FRAGMENT( wotw_sound )
+MACHINE_CONFIG_START( wotw_sound )
 	MCFG_SOUND_RESET_OVERRIDE(cinemat_state, wotw)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1219,7 +1220,7 @@ TIMER_CALLBACK_MEMBER( cinemat_state::synced_sound_w )
 }
 
 
-void cinemat_state::demon_sound_w(UINT8 sound_val, UINT8 bits_changed)
+void cinemat_state::demon_sound_w(uint8_t sound_val, uint8_t bits_changed)
 {
 	/* all inputs are inverted */
 	sound_val = ~sound_val;
@@ -1280,7 +1281,7 @@ SOUND_RESET_MEMBER( cinemat_state, demon )
 }
 
 
-static ADDRESS_MAP_START( demon_sound_map, AS_PROGRAM, 8, driver_device )
+static ADDRESS_MAP_START( demon_sound_map, AS_PROGRAM, 8, cinemat_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x3000, 0x33ff) AM_RAM
 	AM_RANGE(0x4000, 0x4001) AM_DEVREAD("ay1", ay8910_device, data_r)
@@ -1293,7 +1294,7 @@ static ADDRESS_MAP_START( demon_sound_map, AS_PROGRAM, 8, driver_device )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( demon_sound_ports, AS_IO, 8, driver_device )
+static ADDRESS_MAP_START( demon_sound_ports, AS_IO, 8, cinemat_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVWRITE("ctc", z80ctc_device, write)
 	AM_RANGE(0x1c, 0x1f) AM_DEVWRITE("ctc", z80ctc_device, write)
@@ -1307,7 +1308,7 @@ static const z80_daisy_config daisy_chain[] =
 };
 
 
-MACHINE_CONFIG_FRAGMENT( demon_sound )
+MACHINE_CONFIG_START( demon_sound )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545)
@@ -1349,7 +1350,7 @@ MACHINE_CONFIG_END
 
 WRITE8_MEMBER(cinemat_state::qb3_sound_w)
 {
-	UINT16 rega = m_maincpu->state_int(CCPU_A);
+	uint16_t rega = m_maincpu->state_int(ccpu_cpu_device::CCPU_A);
 	demon_sound_w(0x00 | (~rega & 0x0f), 0x10);
 }
 

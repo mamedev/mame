@@ -100,8 +100,12 @@
 
 
 
+#include "emu.h"
 #include "includes/tdv2324.h"
+
+#include "screen.h"
 #include "softlist.h"
+
 
 READ8_MEMBER( tdv2324_state::tdv2324_main_io_30 )
 {
@@ -224,7 +228,7 @@ void tdv2324_state::video_start()
 }
 
 
-UINT32 tdv2324_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t tdv2324_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -253,7 +257,7 @@ SLOT_INTERFACE_END
 //  MACHINE_CONFIG( tdv2324 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( tdv2324, tdv2324_state )
+static MACHINE_CONFIG_START( tdv2324 )
 	// basic system hardware
 	MCFG_CPU_ADD(P8085AH_0_TAG, I8085A, 8700000/2) // ???
 	MCFG_CPU_PROGRAM_MAP(tdv2324_mem)
@@ -267,7 +271,7 @@ static MACHINE_CONFIG_START( tdv2324, tdv2324_state )
 	MCFG_CPU_PROGRAM_MAP(tdv2324_fdc_mem)
 
 	// video hardware
-	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green)
+	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_UPDATE_DRIVER(tdv2324_state, screen_update)
 	MCFG_SCREEN_SIZE(800, 400)
@@ -345,5 +349,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     INIT  COMPANY     FULLNAME     FLAGS
-COMP( 1983, tdv2324,        0,      0,      tdv2324,        tdv2324, driver_device,     0,      "Tandberg",     "TDV 2324",     MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT    STATE          INIT  COMPANY     FULLNAME    FLAGS
+COMP( 1983, tdv2324,  0,      0,      tdv2324,  tdv2324, tdv2324_state, 0,    "Tandberg", "TDV 2324", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

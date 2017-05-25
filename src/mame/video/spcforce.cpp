@@ -18,7 +18,7 @@ WRITE8_MEMBER(spcforce_state::flip_screen_w)
 }
 
 
-UINT32 spcforce_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t spcforce_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int offs;
 	int flip = flip_screen();

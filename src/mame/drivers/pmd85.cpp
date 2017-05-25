@@ -172,27 +172,33 @@ I/O ports
 *******************************************************************************/
 
 #include "emu.h"
-#include "cpu/i8085/i8085.h"
-#include "sound/wave.h"
-#include "imagedev/cassette.h"
 #include "includes/pmd85.h"
+
+#include "cpu/i8085/i8085.h"
+#include "imagedev/cassette.h"
+#include "machine/i8251.h"
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
-#include "machine/i8251.h"
-#include "formats/pmd_cas.h"
 #include "machine/ram.h"
+#include "sound/wave.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
+#include "formats/pmd_cas.h"
+
 
 //**************************************************************************
 //  VIDEO EMULATION
 //**************************************************************************
 
-UINT32 pmd85_state::screen_update_pmd85(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t pmd85_state::screen_update_pmd85(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	for (int y = 0; y < 256; y++)
 	{
 		// address of current line in PMD-85 video memory
-		UINT8 *line = m_ram->pointer() + 0xc000 + 0x40 * y;
+		uint8_t *line = m_ram->pointer() + 0xc000 + 0x40 * y;
 
 		for (int x = 0; x < 288/6; x++)
 		{
@@ -566,7 +572,7 @@ static const struct CassetteOptions pmd85_cassette_options =
 };
 
 /* machine definition */
-static MACHINE_CONFIG_START( pmd85, pmd85_state )
+static MACHINE_CONFIG_START( pmd85 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, 2000000)     /* 2.048MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(pmd85_mem)
@@ -600,7 +606,7 @@ static MACHINE_CONFIG_START( pmd85, pmd85_state )
 	MCFG_PIT8253_CLK2(1)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(0)
 	MCFG_SCREEN_SIZE(288, 256)
@@ -801,13 +807,13 @@ ROM_START(c2717pmd)
 ROM_END
 
 
-/*    YEAR  NAME     PARENT  COMPAT MACHINE  INPUT  INIT      COMPANY  FULLNAME */
-COMP( 1985, pmd851,  0,      0,     pmd851,  pmd85, pmd85_state, pmd851,   "Tesla", "PMD-85.1" , 0)
-COMP( 1985, pmd852,  pmd851, 0,     pmd851,  pmd85, pmd85_state, pmd851,   "Tesla", "PMD-85.2" , 0)
-COMP( 1985, pmd852a, pmd851, 0,     pmd852a, pmd85, pmd85_state, pmd852a,  "Tesla", "PMD-85.2A" , 0)
-COMP( 1985, pmd852b, pmd851, 0,     pmd852a, pmd85, pmd85_state, pmd852a,  "Tesla", "PMD-85.2B" , 0)
-COMP( 1988, pmd853,  pmd851, 0,     pmd853,  pmd85, pmd85_state, pmd853,   "Tesla", "PMD-85.3" , 0)
-COMP( 1986, alfa,    pmd851, 0,     alfa,    alfa, pmd85_state,  alfa,     "Didaktik Skalica", "Didaktik Alfa" , 0)
-COMP( 1985, mato,    pmd851, 0,     mato,    mato, pmd85_state,  mato,     "Statny", "Mato" , 0)
-COMP( 1989, c2717,   pmd851, 0,     c2717,   pmd85, pmd85_state, c2717,    "Zbrojovka Brno", "Consul 2717" , 0)
-COMP( 1989, c2717pmd,pmd851, 0,     c2717,   pmd85, pmd85_state, c2717,    "Zbrojovka Brno", "Consul 2717 (with PMD-32)" , MACHINE_NOT_WORKING)
+//    YEAR  NAME     PARENT  COMPAT MACHINE  INPUT  STATE        INIT      COMPANY             FULLNAME                     FLAGS
+COMP( 1985, pmd851,  0,      0,     pmd851,  pmd85, pmd85_state, pmd851,   "Tesla",            "PMD-85.1",                  0 )
+COMP( 1985, pmd852,  pmd851, 0,     pmd851,  pmd85, pmd85_state, pmd851,   "Tesla",            "PMD-85.2",                  0 )
+COMP( 1985, pmd852a, pmd851, 0,     pmd852a, pmd85, pmd85_state, pmd852a,  "Tesla",            "PMD-85.2A",                 0 )
+COMP( 1985, pmd852b, pmd851, 0,     pmd852a, pmd85, pmd85_state, pmd852a,  "Tesla",            "PMD-85.2B",                 0 )
+COMP( 1988, pmd853,  pmd851, 0,     pmd853,  pmd85, pmd85_state, pmd853,   "Tesla",            "PMD-85.3",                  0 )
+COMP( 1986, alfa,    pmd851, 0,     alfa,    alfa,  pmd85_state, alfa,     "Didaktik Skalica", "Didaktik Alfa",             0 )
+COMP( 1985, mato,    pmd851, 0,     mato,    mato,  pmd85_state, mato,     "Statny",           "Mato",                      0 )
+COMP( 1989, c2717,   pmd851, 0,     c2717,   pmd85, pmd85_state, c2717,    "Zbrojovka Brno",   "Consul 2717",               0 )
+COMP( 1989, c2717pmd,pmd851, 0,     c2717,   pmd85, pmd85_state, c2717,    "Zbrojovka Brno",   "Consul 2717 (with PMD-32)", MACHINE_NOT_WORKING )

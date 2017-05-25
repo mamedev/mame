@@ -3,29 +3,36 @@
 /**************************************************************************************
 
     PINBALL
-    Videodens
+    Video Dens S.A., Madrid
 
-    PinMAME used as reference (unable to find any info at all on the net).
+    PinMAME used as reference. The Break '86 manual scan available on the net includes
+    a mostly illegible schematic.
 
     Nothing in this driver is confirmed except where noted.
+
+    Ator runs on different hardware (peyper.cpp).
 
 ***************************************************************************************/
 
 
+#include "emu.h"
 #include "machine/genpin.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
+#include "speaker.h"
+
 #include "vd.lh"
 
 class vd_state : public driver_device
 {
 public:
 	vd_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
 	{ }
 
-	DECLARE_READ8_MEMBER(dsw_r) { return 0; }
+	DECLARE_READ8_MEMBER(ack_r);
 	DECLARE_WRITE8_MEMBER(col_w);
 	DECLARE_WRITE8_MEMBER(disp_w);
 	DECLARE_WRITE8_MEMBER(lamp_w) { };
@@ -39,10 +46,16 @@ protected:
 	// driver_device overrides
 	virtual void machine_reset() override;
 private:
-	UINT8 m_t_c;
-	UINT8 segment[5];
+	uint8_t m_t_c;
+	uint8_t segment[5];
 };
 
+
+READ8_MEMBER(vd_state::ack_r)
+{
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE); // guess
+	return 0; // this value is not used
+}
 
 static ADDRESS_MAP_START( vd_map, AS_PROGRAM, 8, vd_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
@@ -52,49 +65,68 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vd_io, AS_IO, 8, vd_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00,0x00) AM_READ_PORT("X0")
-	AM_RANGE(0x01,0x01) AM_READ_PORT("X1")
-	AM_RANGE(0x02,0x02) AM_READ_PORT("X2")
-	AM_RANGE(0x03,0x03) AM_READ_PORT("X3")
-	AM_RANGE(0x04,0x04) AM_READ_PORT("X4")
-	AM_RANGE(0x05,0x05) AM_READ_PORT("X5")
-	AM_RANGE(0x20,0x27) AM_WRITE(lamp_w)
-	AM_RANGE(0x28,0x28) AM_WRITE(sol_w)
-	AM_RANGE(0x40,0x44) AM_WRITE(disp_w)
-	AM_RANGE(0x60,0x60) AM_DEVWRITE("ay1", ay8910_device, address_w)
-	AM_RANGE(0x61,0x61) AM_READ_PORT("DSW") //AM_READ(dsw_r)
-	AM_RANGE(0x62,0x62) AM_DEVWRITE("ay1", ay8910_device, data_w)
-	AM_RANGE(0x80,0x80) AM_DEVWRITE("ay2", ay8910_device, address_w)
-	AM_RANGE(0x82,0x82) AM_DEVWRITE("ay2", ay8910_device, data_w)
-	AM_RANGE(0xa0,0xa0) AM_DEVREAD("ay2", ay8910_device, data_r)
-	AM_RANGE(0xc0,0xc0) AM_WRITE(col_w)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("X0")
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("X1")
+	AM_RANGE(0x02, 0x02) AM_READ_PORT("X2")
+	AM_RANGE(0x03, 0x03) AM_READ_PORT("X3")
+	AM_RANGE(0x04, 0x04) AM_READ_PORT("X4")
+	AM_RANGE(0x05, 0x05) AM_READ_PORT("X5")
+	AM_RANGE(0x20, 0x27) AM_WRITE(lamp_w)
+	AM_RANGE(0x28, 0x28) AM_WRITE(sol_w)
+	AM_RANGE(0x40, 0x44) AM_WRITE(disp_w)
+	AM_RANGE(0x60, 0x60) AM_DEVWRITE("ay1", ay8910_device, address_w)
+	AM_RANGE(0x61, 0x61) AM_DEVREAD("ay1", ay8910_device, data_r)
+	AM_RANGE(0x62, 0x62) AM_DEVWRITE("ay1", ay8910_device, data_w)
+	AM_RANGE(0x80, 0x80) AM_DEVWRITE("ay2", ay8910_device, address_w)
+	AM_RANGE(0x81, 0x81) AM_DEVREAD("ay2", ay8910_device, data_r) // probably never read
+	AM_RANGE(0x82, 0x82) AM_DEVWRITE("ay2", ay8910_device, data_w)
+	AM_RANGE(0xa0, 0xa0) AM_READ(ack_r)
+	AM_RANGE(0xc0, 0xc0) AM_WRITE(col_w)
 ADDRESS_MAP_END
 
-static INPUT_PORTS_START( vd )
-	PORT_START("DSW")
-	PORT_DIPNAME( 0x0001, 0x0000, "Accounting #1")
-	PORT_DIPSETTING(0x0000, DEF_STR(Off))
-	PORT_DIPSETTING(0x0001, DEF_STR(On))
-	PORT_DIPNAME( 0x0002, 0x0000, "Accounting #2")
-	PORT_DIPSETTING(0x0000, DEF_STR(Off))
-	PORT_DIPSETTING(0x0002, DEF_STR(On))
-	PORT_DIPNAME( 0x0004, 0x0000, "Accounting #3")
-	PORT_DIPSETTING(0x0000, DEF_STR(Off))
-	PORT_DIPSETTING(0x0004, DEF_STR(On))
-	PORT_DIPNAME( 0x0018, 0x0000, "Credits per coin (chute #1/#2)")
-	PORT_DIPSETTING(0x0018, "0.5/3" )
-	PORT_DIPSETTING(0x0000, "1/5" )
-	PORT_DIPSETTING(0x0008, "1/6" )
-	PORT_DIPSETTING(0x0010, "2/8" )
-	PORT_DIPNAME( 0x0020, 0x0000, "S6")
-	PORT_DIPSETTING(0x0000, "0" )
-	PORT_DIPSETTING(0x0020, "1" )
-	PORT_DIPNAME( 0x0040, 0x0000, "Match feature")
-	PORT_DIPSETTING(0x0040, DEF_STR(Off))
-	PORT_DIPSETTING(0x0000, DEF_STR(On))
-	PORT_DIPNAME( 0x0080, 0x0000, "S8")
-	PORT_DIPSETTING(0x0000, "0" )
-	PORT_DIPSETTING(0x0080, "1" )
+static INPUT_PORTS_START( break86 )
+	PORT_START("DSW1") // "Micro Swicher Nº 1"
+	PORT_DIPUNKNOWN(0x01, 0x01) PORT_DIPLOCATION("SW1:8") // used but not described in service manual
+	PORT_DIPUNKNOWN(0x02, 0x02) PORT_DIPLOCATION("SW1:7") // used but not described in service manual
+	PORT_DIPUNKNOWN(0x04, 0x04) PORT_DIPLOCATION("SW1:6") // used but not described in service manual
+	PORT_DIPUNUSED(0x08, 0x08) PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME(0x30, 0x30, "Power Bumpers") PORT_DIPLOCATION("SW1:4,3") // "Potencia Bu????s" (partly illegible)
+	PORT_DIPSETTING(0x00, "4")
+	PORT_DIPSETTING(0x10, "6")
+	PORT_DIPSETTING(0x20, "8")
+	PORT_DIPSETTING(0x30, "10")
+	PORT_DIPNAME(0xc0, 0xc0, "Bonus Balls") PORT_DIPLOCATION("SW1:2,1") // "Bonos Bola Extra" - "Nº de Bonos"
+	PORT_DIPSETTING(0xc0, "6")
+	PORT_DIPSETTING(0x80, "8")
+	PORT_DIPSETTING(0x40, "10")
+	PORT_DIPSETTING(0x00, "12")
+
+	PORT_START("DSW2") // "Micro Swicher Nº 2"
+	PORT_DIPNAME(0x03, 0x03, "Scoring") PORT_DIPLOCATION("SW2:8,7") // "Tanteo"
+	PORT_DIPSETTING(0x03, "800k / 1.4M / 2.0M / 2.6M") // = "Bola Extra," "1ª Partida," "2ª Partida," "High Score"
+	PORT_DIPSETTING(0x02, "1.0M / 1.6M / 2.2M / 2.8M")
+	PORT_DIPSETTING(0x01, "1.2M / 1.8M / 2.4M / 3.0M")
+	PORT_DIPSETTING(0x00, "1.4M / 2.0M / 2.6M / 3.2M")
+	PORT_DIPNAME(0x04, 0x04, "Balls/Game") PORT_DIPLOCATION("SW2:6") // "Bolas-Partida"
+	PORT_DIPSETTING(0x04, "3")
+	PORT_DIPSETTING(0x00, "5")
+	PORT_DIPNAME(0x18, 0x18, DEF_STR(Coinage)) PORT_DIPLOCATION("SW2:5,4") // "Monederos"
+	PORT_DIPSETTING(0x18, "25 Pts. = 1, 100 Pts. = 5")
+	PORT_DIPSETTING(0x10, "25 Pts. = 1, 100 Pts. = 6")
+	PORT_DIPSETTING(0x08, "25 Pts. = 2, 100 Pts. = 8")
+	PORT_DIPSETTING(0x00, "25 Pts. = 1/2, 100 Pts. = 3")
+	PORT_DIPNAME(0x20, 0x20, "Lottery") PORT_DIPLOCATION("SW2:3") // "Loteria"
+	PORT_DIPSETTING(0x00, DEF_STR(No))
+	PORT_DIPSETTING(0x20, DEF_STR(Yes))
+	PORT_DIPNAME(0x40, 0x40, "Musica-Reclamo") PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(0x00, DEF_STR(No))
+	PORT_DIPSETTING(0x40, DEF_STR(Yes))
+	PORT_DIPNAME(0x80, 0x80, "Extra Ball/Score") PORT_DIPLOCATION("SW2:1") // "Bola Extra-Tanteo"
+	PORT_DIPSETTING(0x00, DEF_STR(No))
+	PORT_DIPSETTING(0x80, DEF_STR(Yes))
+
+	PORT_START("DSW3")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED) // SW3 not populated
 
 	PORT_START("X0")
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_START1)
@@ -109,6 +141,10 @@ static INPUT_PORTS_START( vd )
 	PORT_START("X5")
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( papillon )
+	PORT_INCLUDE( break86 ) // differences unknown
+INPUT_PORTS_END
+
 TIMER_DEVICE_CALLBACK_MEMBER( vd_state::irq )
 {
 	if (m_t_c > 40)
@@ -120,8 +156,10 @@ TIMER_DEVICE_CALLBACK_MEMBER( vd_state::irq )
 WRITE8_MEMBER( vd_state::disp_w )
 {
 	segment[offset] = data;
+#if 0 // probably not how this works
 	if (!offset)
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+#endif
 }
 
 WRITE8_MEMBER( vd_state::col_w )
@@ -142,7 +180,7 @@ void vd_state::machine_reset()
 	m_t_c = 0;
 }
 
-static MACHINE_CONFIG_START( vd, vd_state )
+static MACHINE_CONFIG_START( vd )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(vd_map)
@@ -154,8 +192,11 @@ static MACHINE_CONFIG_START( vd, vd_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("ay1", AY8910, 2000000) //?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.33/3)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW2"))
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW1"))
 	MCFG_SOUND_ADD("ay2", AY8910, 2000000) //?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.33/3)
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW3")) //?
 
 	/* Video */
 	MCFG_DEFAULT_LAYOUT(layout_vd)
@@ -163,6 +204,10 @@ MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------
 / Break '86 (1986)
+/
+/ The title of this game is somewhat uncertain. The backglass says
+/ only "Break," the flyer also calls it "Super Break" and "Super
+/ Break '86", and the service manual's title page has "Modbreak."
 /-------------------------------------------------------------------*/
 ROM_START(break86)
 	ROM_REGION(0x10000, "maincpu", 0)
@@ -181,18 +226,6 @@ ROM_START(papillon)
 	ROM_LOAD("u6.dat", 0x4000, 0x2000, CRC(6b2867b3) SHA1(720fe8a65b447e839b0eb9ea21e0b3cb0e50cf7a))
 ROM_END
 
-#if 0
-/*-------------------------------------------------------------------
-/ Ator (19??)
-/-------------------------------------------------------------------*/
-ROM_START(ator)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("ator.u4", 0x0000, 0x2000, NO_DUMP)
-	ROM_LOAD("ator.u5", 0x2000, 0x2000, NO_DUMP)
-	ROM_LOAD("ator.u6", 0x4000, 0x2000, CRC(21aad5c4) SHA1(e78da5d80682710db34cbbfeae5af54241c73371))
-ROM_END
-#endif
 
-//GAME(19??, ator,     0,    vd,  vd, driver_device, 0,  ROT0,  "Videodens", "Ator", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1986, break86,  0,    vd,  vd, driver_device, 0,  ROT0,  "Videodens", "Break '86", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1986, papillon, 0,    vd,  vd, driver_device, 0,  ROT0,  "Videodens", "Papillon", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1986, break86,  0,    vd,  break86,  vd_state, 0,  ROT0,  "Video Dens", "Break '86", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1986, papillon, 0,    vd,  papillon, vd_state, 0,  ROT0,  "Video Dens", "Papillon",  MACHINE_IS_SKELETON_MECHANICAL)

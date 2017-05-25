@@ -51,12 +51,14 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/tutankhm.h"
+#include "includes/konamipt.h"
+#include "audio/timeplt.h"
+
 #include "cpu/m6809/m6809.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
-#include "includes/konamipt.h"
-#include "audio/timeplt.h"
-#include "includes/tutankhm.h"
+#include "screen.h"
 
 
 /*************************************
@@ -221,7 +223,7 @@ MACHINE_RESET_MEMBER(tutankhm_state,tutankhm)
 	m_flip_y = 0;
 }
 
-static MACHINE_CONFIG_START( tutankhm, tutankhm_state )
+static MACHINE_CONFIG_START( tutankhm )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, XTAL_18_432MHz/12)   /* 1.5 MHz ??? */
@@ -326,5 +328,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1982, tutankhm, 0,        tutankhm, tutankhm, driver_device, 0, ROT90, "Konami", "Tutankham", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS)
-GAME( 1982, tutankhms,tutankhm, tutankhm, tutankhm, driver_device, 0, ROT90, "Konami (Stern Electronics license)", "Tutankham (Stern Electronics)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS)
+GAME( 1982, tutankhm, 0,        tutankhm, tutankhm, tutankhm_state, 0, ROT90, "Konami", "Tutankham", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS)
+GAME( 1982, tutankhms,tutankhm, tutankhm, tutankhm, tutankhm_state, 0, ROT90, "Konami (Stern Electronics license)", "Tutankham (Stern Electronics)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS)

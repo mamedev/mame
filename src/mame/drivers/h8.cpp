@@ -47,12 +47,15 @@ TODO:
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/i8085/i8085.h"
 #include "machine/i8251.h"
 #include "machine/clock.h"
 #include "imagedev/cassette.h"
 #include "sound/beep.h"
 #include "sound/wave.h"
+#include "speaker.h"
+
 #include "h8.lh"
 
 
@@ -78,11 +81,11 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(h8_c);
 	TIMER_DEVICE_CALLBACK_MEMBER(h8_p);
 private:
-	UINT8 m_digit;
-	UINT8 m_segment;
-	UINT8 m_irq_ctl;
+	uint8_t m_digit;
+	uint8_t m_segment;
+	uint8_t m_irq_ctl;
 	bool m_ff_b;
-	UINT8 m_cass_data[4];
+	uint8_t m_cass_data[4];
 	bool m_cass_state;
 	bool m_cassold;
 	virtual void machine_reset() override;
@@ -112,7 +115,7 @@ READ8_MEMBER( h8_state::portf0_r )
 	// - if 0 and RTM pressed, causes int10
 	// - if 0 and RST pressed, resets cpu
 
-	UINT8 i,keyin,data = 0xff;
+	uint8_t i,keyin,data = 0xff;
 
 	keyin = ioport("X0")->read();
 	if (keyin != 0xff)
@@ -239,7 +242,7 @@ the data is /INTE while the clock is /M1. If the system is in Single Instruction
 a int20 (output of 2nd flipflop) will occur after 4 M1 steps, to pause the running program.
 But, all of this can only occur if bit 5 of port F0 is low. */
 
-	bool state = (data & I8085_STATUS_M1) ? 0 : 1;
+	bool state = (data & i8080_cpu_device::STATUS_M1) ? 0 : 1;
 	bool c,a = (m_irq_ctl & 0x80) ? 1 : 0;
 
 	if (m_irq_ctl & 2)
@@ -294,7 +297,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(h8_state::h8_p)
 {
 	/* cassette - turn 1200/2400Hz to a bit */
 	m_cass_data[1]++;
-	UINT8 cass_ws = (m_cass->input() > +0.03) ? 1 : 0;
+	uint8_t cass_ws = (m_cass->input() > +0.03) ? 1 : 0;
 
 	if (cass_ws != m_cass_data[0])
 	{
@@ -304,7 +307,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(h8_state::h8_p)
 	}
 }
 
-static MACHINE_CONFIG_START( h8, h8_state )
+static MACHINE_CONFIG_START( h8 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, H8_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(h8_mem)
@@ -363,5 +366,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME PARENT  COMPAT MACHINE INPUT    CLASS,         INIT    COMPANY       FULLNAME       FLAGS */
-COMP( 1977, h8,  0,       0,    h8,     h8,      driver_device,   0, "Heath, Inc.", "Heathkit H8", MACHINE_NOT_WORKING )
+/*    YEAR  NAME PARENT  COMPAT  MACHINE  INPUT    CLASS,      INIT  COMPANY        FULLNAME       FLAGS */
+COMP( 1977, h8,  0,      0,      h8,      h8,      h8_state,   0,    "Heath, Inc.", "Heathkit H8", MACHINE_NOT_WORKING )

@@ -75,7 +75,7 @@ public:
 	required_ioport m_io_row1;
 	required_ioport m_io_row2;
 	required_ioport m_io_row3;
-	required_region_ptr<UINT16> m_charset;
+	required_region_ptr<uint16_t> m_charset;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -87,13 +87,13 @@ public:
 	DECLARE_READ8_MEMBER(unknown_r) { return machine().rand(); }
 
 private:
-	UINT8 m_kb_col;
+	uint8_t m_kb_col;
 };
 
 
 READ8_MEMBER(midcoin24cdjuke_state::kb_row_r)
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (!(m_kb_col & 0x10))
 		data &= m_io_row0->read();
@@ -114,7 +114,7 @@ WRITE8_MEMBER(midcoin24cdjuke_state::kb_col_w)
 
 WRITE8_MEMBER(midcoin24cdjuke_state::digit_w)
 {
-	UINT16 char_data = m_charset[((data & 0x60) << 1) | (data & 0x1f)];
+	uint16_t char_data = m_charset[((data & 0x60) << 1) | (data & 0x1f)];
 
 	char_data = BITSWAP16(char_data, 13,11,9,15,14,10,12,8,7,6,5,4,3,2,1,0);
 
@@ -273,7 +273,7 @@ void midcoin24cdjuke_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( midcoin24cdjuke, midcoin24cdjuke_state )
+static MACHINE_CONFIG_START( midcoin24cdjuke )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,6000000)         /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(midcoin24cdjuke_map)
@@ -293,7 +293,7 @@ static MACHINE_CONFIG_START( midcoin24cdjuke, midcoin24cdjuke_state )
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(midcoin24cdjuke_state, kb_col_w))
 
 	MCFG_DEVICE_ADD("ic31", I8255A, 0)
-	MCFG_I8255_OUT_PORTB_CB(LOGGER("PPI8255 - unmapped write port B", 0))
+	MCFG_I8255_OUT_PORTB_CB(LOGGER("PPI8255 - unmapped write port B"))
 	MCFG_I8255_IN_PORTC_CB(IOPORT("MD4"))
 MACHINE_CONFIG_END
 
@@ -313,4 +313,4 @@ ROM_START( 24cdjuke )
 ROM_END
 
 
-GAME( 1988, 24cdjuke,  0,    midcoin24cdjuke, midcoin24cdjuke, driver_device,  0, ROT0, "Midcoin", "Midcoin Juke Box 24CD", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // what name was it sold under? name is from the PCB text
+GAME( 1988, 24cdjuke,  0,    midcoin24cdjuke, midcoin24cdjuke, midcoin24cdjuke_state,  0, ROT0, "Midcoin", "Midcoin Juke Box 24CD", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // what name was it sold under? name is from the PCB text

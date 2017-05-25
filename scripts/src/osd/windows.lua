@@ -257,7 +257,7 @@ project ("ocore_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/osd/modules/file/winsocket.cpp",
 		MAME_DIR .. "src/osd/modules/lib/osdlib_win32.cpp",
 	}
-	
+
 
 
 --------------------------------------------------

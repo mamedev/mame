@@ -156,16 +156,20 @@ From JP manual
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/topspeed.h"
+#include "includes/taitoipt.h"
+#include "audio/taitosnd.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
-#include "machine/z80ctc.h"
 #include "machine/taitoio.h"
-#include "audio/taitosnd.h"
-#include "sound/ym2151.h"
-#include "sound/msm5205.h"
+#include "machine/z80ctc.h"
 #include "sound/flt_vol.h"
-#include "includes/taitoipt.h"
-#include "includes/topspeed.h"
+#include "sound/msm5205.h"
+#include "sound/ym2151.h"
+#include "screen.h"
+#include "speaker.h"
+
 #include "topspeed.lh"
 
 
@@ -188,8 +192,8 @@ WRITE16_MEMBER(topspeed_state::cpua_ctrl_w)
 READ8_MEMBER(topspeed_state::input_bypass_r)
 {
 	// Read port number
-	UINT8 port = m_tc0220ioc->port_r(space, 0);
-	UINT16 steer = 0xff80 + read_safe(ioport("STEER"), 0);
+	uint8_t port = m_tc0220ioc->port_r(space, 0);
+	uint16_t steer = 0xff80 + m_steer.read_safe(0);
 
 	switch (port)
 	{
@@ -206,9 +210,9 @@ READ8_MEMBER(topspeed_state::input_bypass_r)
 
 CUSTOM_INPUT_MEMBER(topspeed_state::pedal_r)
 {
-	static const UINT8 retval[8] = { 0,1,3,2,6,7,5,4 };
-	const char *tag = (const char *)param;
-	return retval[read_safe(ioport(tag), 0) & 7];
+	static const uint8_t retval[8] = { 0,1,3,2,6,7,5,4 };
+	ioport_port *port = ioport((const char *)param);
+	return retval[port != nullptr ? port->read() & 7 : 0];
 }
 
 READ16_MEMBER(topspeed_state::motor_r)
@@ -260,7 +264,7 @@ void topspeed_state::msm5205_update(int chip)
 	if (m_msm_reset[chip])
 		return;
 
-	UINT8 data = m_msm_rom[chip][m_msm_pos[chip]];
+	uint8_t data = m_msm_rom[chip][m_msm_pos[chip]];
 	msm5205_device *msm = chip ? m_msm2 : m_msm1;
 
 	msm->data_w((m_msm_nibble[chip] ? data : data >> 4) & 0xf);
@@ -339,7 +343,7 @@ WRITE_LINE_MEMBER(topspeed_state::z80ctc_to0)
 		else
 		{
 			// Update on falling edge of /VCK
-			UINT16 oldpos = m_msm_pos[1];
+			uint16_t oldpos = m_msm_pos[1];
 
 			msm5205_update(1);
 
@@ -391,7 +395,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpub_map, AS_PROGRAM, 16, topspeed_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-	AM_RANGE(0x400000, 0X40ffff) AM_RAM AM_SHARE("sharedram")
+	AM_RANGE(0x400000, 0x40ffff) AM_RAM AM_SHARE("sharedram")
 	AM_RANGE(0x880000, 0x880001) AM_READ8(input_bypass_r, 0x00ff) AM_DEVWRITE8("tc0220ioc", tc0220ioc_device, portreg_w, 0x00ff)
 	AM_RANGE(0x880002, 0x880003) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, port_r, port_w, 0x00ff)
 	AM_RANGE(0x900000, 0x9003ff) AM_READWRITE(motor_r, motor_w)
@@ -558,7 +562,7 @@ void topspeed_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( topspeed, topspeed_state )
+static MACHINE_CONFIG_START( topspeed )
 
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz / 2)
@@ -621,11 +625,11 @@ static MACHINE_CONFIG_START( topspeed, topspeed_state )
 
 	MCFG_SOUND_ADD("msm1", MSM5205, XTAL_384kHz)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(topspeed_state, msm5205_1_vck)) // VCK function
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      // 8 kHz, 4-bit
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      // 8 kHz, 4-bit
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter2", 1.0)
 
 	MCFG_SOUND_ADD("msm2", MSM5205, XTAL_384kHz)
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_SEX_4B)      // Slave mode, 4-bit
+	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)      // Slave mode, 4-bit
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter3", 1.0)
 
 	MCFG_FILTER_VOLUME_ADD("filter1l", 0)
@@ -774,6 +778,6 @@ ROM_START( fullthrl )
 ROM_END
 
 
-GAMEL( 1987, topspeed, 0,        topspeed, topspeed, driver_device, 0, ROT0, "Taito Corporation Japan",                     "Top Speed (World)",     MACHINE_SUPPORTS_SAVE, layout_topspeed )
-GAMEL( 1987, topspeedu,topspeed, topspeed, fullthrl, driver_device, 0, ROT0, "Taito America Corporation (Romstar license)", "Top Speed (US)",        MACHINE_SUPPORTS_SAVE, layout_topspeed )
-GAMEL( 1987, fullthrl, topspeed, topspeed, fullthrl, driver_device, 0, ROT0, "Taito Corporation",                           "Full Throttle (Japan)", MACHINE_SUPPORTS_SAVE, layout_topspeed )
+GAMEL( 1987, topspeed, 0,        topspeed, topspeed, topspeed_state, 0, ROT0, "Taito Corporation Japan",                     "Top Speed (World)",     MACHINE_SUPPORTS_SAVE, layout_topspeed )
+GAMEL( 1987, topspeedu,topspeed, topspeed, fullthrl, topspeed_state, 0, ROT0, "Taito America Corporation (Romstar license)", "Top Speed (US)",        MACHINE_SUPPORTS_SAVE, layout_topspeed )
+GAMEL( 1987, fullthrl, topspeed, topspeed, fullthrl, topspeed_state, 0, ROT0, "Taito Corporation",                           "Full Throttle (Japan)", MACHINE_SUPPORTS_SAVE, layout_topspeed )

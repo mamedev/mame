@@ -6,12 +6,11 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_WANGPC_MVC_H
+#define MAME_BUS_WANGPC_MVC_H
+
 #pragma once
 
-#ifndef __WANGPC_MVC__
-#define __WANGPC_MVC__
-
-#include "emu.h"
 #include "wangpc.h"
 #include "video/mc6845.h"
 
@@ -28,7 +27,7 @@ class wangpc_mvc_device : public device_t,
 {
 public:
 	// construction/destruction
-	wangpc_mvc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	wangpc_mvc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -43,26 +42,25 @@ protected:
 	virtual void device_reset() override;
 
 	// device_wangpcbus_card_interface overrides
-	virtual UINT16 wangpcbus_mrdc_r(address_space &space, offs_t offset, UINT16 mem_mask) override;
-	virtual void wangpcbus_amwc_w(address_space &space, offs_t offset, UINT16 mem_mask, UINT16 data) override;
-	virtual UINT16 wangpcbus_iorc_r(address_space &space, offs_t offset, UINT16 mem_mask) override;
-	virtual void wangpcbus_aiowc_w(address_space &space, offs_t offset, UINT16 mem_mask, UINT16 data) override;
+	virtual uint16_t wangpcbus_mrdc_r(address_space &space, offs_t offset, uint16_t mem_mask) override;
+	virtual void wangpcbus_amwc_w(address_space &space, offs_t offset, uint16_t mem_mask, uint16_t data) override;
+	virtual uint16_t wangpcbus_iorc_r(address_space &space, offs_t offset, uint16_t mem_mask) override;
+	virtual void wangpcbus_aiowc_w(address_space &space, offs_t offset, uint16_t mem_mask, uint16_t data) override;
 
 private:
 	inline void set_irq(int state);
 
 	required_device<mc6845_device> m_crtc;
-	optional_shared_ptr<UINT16> m_video_ram;
-	optional_shared_ptr<UINT16> m_char_ram;
-	optional_shared_ptr<UINT16> m_bitmap_ram;
+	optional_shared_ptr<uint16_t> m_video_ram;
+	optional_shared_ptr<uint16_t> m_char_ram;
+	optional_shared_ptr<uint16_t> m_bitmap_ram;
 
-	UINT8 m_option;
+	uint8_t m_option;
 	int m_irq;
 };
 
 
 // device type definition
-extern const device_type WANGPC_MVC;
+DECLARE_DEVICE_TYPE(WANGPC_MVC, wangpc_mvc_device)
 
-
-#endif
+#endif // MAME_BUS_WANGPC_MVC_H

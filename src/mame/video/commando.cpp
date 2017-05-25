@@ -83,15 +83,15 @@ TILE_GET_INFO_MEMBER(commando_state::get_fg_tile_info)
 
 void commando_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(commando_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(commando_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(commando_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(commando_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_fg_tilemap->set_transparent_pen(3);
 }
 
 void commando_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	UINT8 *buffered_spriteram = m_spriteram->buffer();
+	uint8_t *buffered_spriteram = m_spriteram->buffer();
 	int offs;
 
 	for (offs = m_spriteram->bytes() - 4; offs >= 0; offs -= 4)
@@ -119,7 +119,7 @@ void commando_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 	}
 }
 
-UINT32 commando_state::screen_update_commando(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t commando_state::screen_update_commando(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);

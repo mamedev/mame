@@ -40,10 +40,13 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/zaccaria.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "machine/watchdog.h"
-#include "includes/zaccaria.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 void zaccaria_state::machine_start()
@@ -335,7 +338,7 @@ INTERRUPT_GEN_MEMBER(zaccaria_state::vblank_irq)
 }
 
 
-static MACHINE_CONFIG_START( zaccaria, zaccaria_state )
+static MACHINE_CONFIG_START( zaccaria )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,XTAL_18_432MHz/6)   /* verified on pcb */
@@ -366,9 +369,9 @@ static MACHINE_CONFIG_START( zaccaria, zaccaria_state )
 	MCFG_PALETTE_INIT_OWNER(zaccaria_state, zaccaria)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_ZACCARIA_1B11142("audiopcb")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("audiopcb", ZACCARIA_1B11142, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -531,7 +534,7 @@ ROM_END
 
 
 
-GAME( 1983, monymony,  0,        zaccaria, monymony, driver_device, 0, ROT90, "Zaccaria", "Money Money", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, jackrabt,  0,        zaccaria, jackrabt, driver_device, 0, ROT90, "Zaccaria", "Jack Rabbit (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, jackrabt2, jackrabt, zaccaria, jackrabt, driver_device, 0, ROT90, "Zaccaria", "Jack Rabbit (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, jackrabts, jackrabt, zaccaria, jackrabt, driver_device, 0, ROT90, "Zaccaria", "Jack Rabbit (special)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, monymony,  0,        zaccaria, monymony, zaccaria_state, 0, ROT90, "Zaccaria", "Money Money",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, jackrabt,  0,        zaccaria, jackrabt, zaccaria_state, 0, ROT90, "Zaccaria", "Jack Rabbit (set 1)",   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, jackrabt2, jackrabt, zaccaria, jackrabt, zaccaria_state, 0, ROT90, "Zaccaria", "Jack Rabbit (set 2)",   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, jackrabts, jackrabt, zaccaria, jackrabt, zaccaria_state, 0, ROT90, "Zaccaria", "Jack Rabbit (special)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

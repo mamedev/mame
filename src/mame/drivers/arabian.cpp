@@ -45,10 +45,14 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/mb88xx/mb88xx.h"
 #include "includes/arabian.h"
+
+#include "cpu/mb88xx/mb88xx.h"
+#include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 /* constants */
 #define MAIN_OSC        XTAL_12MHz
@@ -100,7 +104,7 @@ WRITE8_MEMBER(arabian_state::ay8910_portb_w)
 
 READ8_MEMBER(arabian_state::mcu_port_r_r)
 {
-	UINT8 val = m_mcu_port_r[offset];
+	uint8_t val = m_mcu_port_r[offset];
 
 	/* RAM mode is enabled */
 	if (offset == 0)
@@ -113,7 +117,7 @@ WRITE8_MEMBER(arabian_state::mcu_port_r_w)
 {
 	if (offset == 0)
 	{
-		UINT32 ram_addr = ((m_mcu_port_p & 7) << 8) | m_mcu_port_o;
+		uint32_t ram_addr = ((m_mcu_port_p & 7) << 8) | m_mcu_port_o;
 
 		if (~data & 2)
 			m_custom_cpu_ram[ram_addr] = 0xf0 | m_mcu_port_r[3];
@@ -126,17 +130,17 @@ WRITE8_MEMBER(arabian_state::mcu_port_r_w)
 
 READ8_MEMBER(arabian_state::mcu_portk_r)
 {
-	UINT8 val = 0xf;
+	uint8_t val = 0xf;
 
 	if (~m_mcu_port_r[0] & 1)
 	{
-		UINT32 ram_addr = ((m_mcu_port_p & 7) << 8) | m_mcu_port_o;
+		uint32_t ram_addr = ((m_mcu_port_p & 7) << 8) | m_mcu_port_o;
 		val = m_custom_cpu_ram[ram_addr];
 	}
 	else
 	{
 		static const char *const comnames[] = { "COM0", "COM1", "COM2", "COM3", "COM4", "COM5" };
-		UINT8 sel = ((m_mcu_port_r[2] << 4) | m_mcu_port_r[1]) & 0x3f;
+		uint8_t sel = ((m_mcu_port_r[2] << 4) | m_mcu_port_r[1]) & 0x3f;
 		int i;
 
 		for (i = 0; i < 6; ++i)
@@ -154,7 +158,7 @@ READ8_MEMBER(arabian_state::mcu_portk_r)
 
 WRITE8_MEMBER(arabian_state::mcu_port_o_w)
 {
-	UINT8 out = data & 0x0f;
+	uint8_t out = data & 0x0f;
 
 	if (data & 0x10)
 		m_mcu_port_o = (m_mcu_port_o & 0x0f) | (out << 4);
@@ -332,7 +336,7 @@ void arabian_state::machine_reset()
 	m_video_control = 0;
 }
 
-static MACHINE_CONFIG_START( arabian, arabian_state )
+static MACHINE_CONFIG_START( arabian )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_OSC/4)
@@ -418,5 +422,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, arabian,  0,       arabian, arabian, driver_device,  0, ROT270, "Sun Electronics",                 "Arabian",         MACHINE_SUPPORTS_SAVE )
-GAME( 1983, arabiana, arabian, arabian, arabiana, driver_device, 0, ROT270, "Sun Electronics (Atari license)", "Arabian (Atari)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, arabian,  0,       arabian, arabian,  arabian_state, 0, ROT270, "Sun Electronics",                 "Arabian",         MACHINE_SUPPORTS_SAVE )
+GAME( 1983, arabiana, arabian, arabian, arabiana, arabian_state, 0, ROT270, "Sun Electronics (Atari license)", "Arabian (Atari)", MACHINE_SUPPORTS_SAVE )

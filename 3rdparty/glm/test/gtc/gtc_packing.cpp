@@ -1,34 +1,3 @@
-///////////////////////////////////////////////////////////////////////////////////
-/// OpenGL Mathematics (glm.g-truc.net)
-///
-/// Copyright (c) 2005 - 2015 G-Truc Creation (www.g-truc.net)
-/// Permission is hereby granted, free of charge, to any person obtaining a copy
-/// of this software and associated documentation files (the "Software"), to deal
-/// in the Software without restriction, including without limitation the rights
-/// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-/// copies of the Software, and to permit persons to whom the Software is
-/// furnished to do so, subject to the following conditions:
-/// 
-/// The above copyright notice and this permission notice shall be included in
-/// all copies or substantial portions of the Software.
-/// 
-/// Restrictions:
-///		By making use of the Software for military purposes, you choose to make
-///		a Bunny unhappy.
-/// 
-/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-/// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-/// THE SOFTWARE.
-///
-/// @file test/gtc/gtc_packing.cpp
-/// @date 2013-08-09 / 2014-11-25
-/// @author Christophe Riccio
-///////////////////////////////////////////////////////////////////////////////////
-
 #include <glm/gtc/packing.hpp>
 #include <glm/gtc/epsilon.hpp>
 #include <cstdio>
@@ -204,7 +173,8 @@ int test_Snorm3x10_1x2()
 		glm::vec4 v0 = glm::unpackSnorm3x10_1x2(p0);
 		glm::uint32 p1 = glm::packSnorm3x10_1x2(v0);
 		glm::vec4 v1 = glm::unpackSnorm3x10_1x2(p1);
-		Error += glm::all(glm::equal(v0, v1)) ? 0 : 1;
+
+		Error += glm::all(glm::epsilonEqual(v0, v1, 0.01f)) ? 0 : 1;
 	}
 
 	return Error;
@@ -228,7 +198,8 @@ int test_Unorm3x10_1x2()
 		glm::vec4 v0 = glm::unpackUnorm3x10_1x2(p0);
 		glm::uint32 p1 = glm::packUnorm3x10_1x2(v0);
 		glm::vec4 v1 = glm::unpackUnorm3x10_1x2(p1);
-		Error += glm::all(glm::equal(v0, v1)) ? 0 : 1;
+
+		Error += glm::all(glm::epsilonEqual(v0, v1, 0.001f)) ? 0 : 1;
 	}
 
 	return Error;
@@ -704,6 +675,7 @@ int main()
 	Error += test_F3x9_E1x5();
 	Error += test_Snorm3x10_1x2();
 	Error += test_Unorm3x10_1x2();
+
 	Error += test_I3x10_1x2();
 	Error += test_U3x10_1x2();
 	Error += test_Half1x16();

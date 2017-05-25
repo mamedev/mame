@@ -27,12 +27,14 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6809/m6809.h"
+#include "includes/esripsys.h"
+
 #include "cpu/esrip/esrip.h"
+#include "cpu/m6809/m6809.h"
 #include "machine/6840ptm.h"
 #include "machine/nvram.h"
-#include "sound/dac.h"
-#include "includes/esripsys.h"
+#include "sound/volt_reg.h"
+#include "speaker.h"
 
 
 /*************************************
@@ -95,7 +97,7 @@ READ8_MEMBER(esripsys_state::g_status_r)
 WRITE8_MEMBER(esripsys_state::g_status_w)
 {
 	int bankaddress;
-	UINT8 *rom = memregion("game_cpu")->base();
+	uint8_t *rom = memregion("game_cpu")->base();
 
 	m_g_status = data;
 
@@ -135,7 +137,7 @@ WRITE8_MEMBER(esripsys_state::g_status_w)
 READ8_MEMBER(esripsys_state::f_status_r)
 {
 	int vblank = m_screen->vblank();
-	UINT8 rip_status = m_videocpu->get_rip_status();
+	uint8_t rip_status = m_videocpu->get_rip_status();
 
 	rip_status = (rip_status & 0x18) | (BIT(rip_status, 6) << 1) |  BIT(rip_status, 7);
 
@@ -229,8 +231,8 @@ WRITE16_MEMBER( esripsys_state::fdt_rip_w )
 READ8_MEMBER(esripsys_state::rip_status_in)
 {
 	int vpos =  m_screen->vpos();
-	UINT8 _vblank = !(vpos >= ESRIPSYS_VBLANK_START);
-//  UINT8 _hblank = !m_screen->hblank();
+	uint8_t _vblank = !(vpos >= ESRIPSYS_VBLANK_START);
+//  uint8_t _hblank = !m_screen->hblank();
 
 	return  _vblank
 			| (m_hblank << 1)
@@ -478,7 +480,7 @@ WRITE8_MEMBER(esripsys_state::s_200e_w)
 
 WRITE8_MEMBER(esripsys_state::s_200f_w)
 {
-	UINT8 *rom = memregion("sound_data")->base();
+	uint8_t *rom = memregion("sound_data")->base();
 	int rombank = data & 0x20 ? 0x2000 : 0;
 
 	/* Bit 6 -> Reset latch U56A */
@@ -510,7 +512,7 @@ READ8_MEMBER(esripsys_state::tms5220_r)
 	if (offset == 0)
 	{
 		/* TMS5220 core returns status bits in D7-D6 */
-		UINT8 status = m_tms->status_r(space, 0);
+		uint8_t status = m_tms->status_r(space, 0);
 
 		status = ((status & 0x80) >> 5) | ((status & 0x40) >> 5) | ((status & 0x20) >> 5);
 		return (m_tms->readyq_r() << 7) | (m_tms->intq_r() << 6) | status;
@@ -551,22 +553,10 @@ WRITE8_MEMBER(esripsys_state::esripsys_dac_w)
 	}
 	else
 	{
-		UINT16 dac_data = (m_dac_msb << 8) | data;
-
-		/*
-		    The 8-bit DAC modulates the 10-bit DAC.
-		    Shift down to prevent clipping.
-		*/
-		m_dac->write_signed16((m_dac_vol * dac_data) >> 1);
+		uint16_t dac_data = (m_dac_msb << 8) | data;
+		m_dac->write(dac_data);
 	}
 }
-
-/* 8-bit MC3408 DAC */
-WRITE8_MEMBER(esripsys_state::volume_dac_w)
-{
-	m_dac_vol = data;
-}
-
 
 /*************************************
  *
@@ -603,7 +593,7 @@ static ADDRESS_MAP_START( sound_cpu_map, AS_PROGRAM, 8, esripsys_state )
 	AM_RANGE(0x0800, 0x0fff) AM_RAM // Not installed on later PCBs
 	AM_RANGE(0x2008, 0x2009) AM_READWRITE(tms5220_r, tms5220_w)
 	AM_RANGE(0x200a, 0x200b) AM_WRITE(esripsys_dac_w)
-	AM_RANGE(0x200c, 0x200c) AM_WRITE(volume_dac_w)
+	AM_RANGE(0x200c, 0x200c) AM_DEVWRITE("dacvol", dac_byte_interface, write)
 	AM_RANGE(0x200d, 0x200d) AM_WRITE(control_w)
 	AM_RANGE(0x200e, 0x200e) AM_READWRITE(s_200e_r, s_200e_w)
 	AM_RANGE(0x200f, 0x200f) AM_READWRITE(s_200f_r, s_200f_w)
@@ -628,11 +618,11 @@ ADDRESS_MAP_END
 
 DRIVER_INIT_MEMBER(esripsys_state,esripsys)
 {
-	UINT8 *rom = memregion("sound_data")->base();
+	uint8_t *rom = memregion("sound_data")->base();
 
-	m_fdt_a = std::make_unique<UINT8[]>(FDT_RAM_SIZE);
-	m_fdt_b = std::make_unique<UINT8[]>(FDT_RAM_SIZE);
-	m_cmos_ram = std::make_unique<UINT8[]>(CMOS_RAM_SIZE);
+	m_fdt_a = std::make_unique<uint8_t[]>(FDT_RAM_SIZE);
+	m_fdt_b = std::make_unique<uint8_t[]>(FDT_RAM_SIZE);
+	m_cmos_ram = std::make_unique<uint8_t[]>(CMOS_RAM_SIZE);
 
 	machine().device<nvram_device>("nvram")->set_base(m_cmos_ram.get(), CMOS_RAM_SIZE);
 
@@ -662,7 +652,6 @@ DRIVER_INIT_MEMBER(esripsys_state,esripsys)
 	save_item(NAME(m_s_to_g_latch1));
 	save_item(NAME(m_s_to_g_latch2));
 	save_item(NAME(m_dac_msb));
-	save_item(NAME(m_dac_vol));
 	save_item(NAME(m_tms_data));
 
 	m_fasel = 0;
@@ -671,7 +660,7 @@ DRIVER_INIT_MEMBER(esripsys_state,esripsys)
 	save_item(NAME(m_fbsel));
 }
 
-static MACHINE_CONFIG_START( esripsys, esripsys_state )
+static MACHINE_CONFIG_START( esripsys )
 	MCFG_CPU_ADD("game_cpu", M6809E, XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(game_cpu_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", esripsys_state,  esripsys_vblank_irq)
@@ -700,17 +689,19 @@ static MACHINE_CONFIG_START( esripsys, esripsys_state )
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 
 	/* Sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("dac", MC3410, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC
+	MCFG_SOUND_ADD("dacvol", MC3408, 0) // unknown DAC
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dacvol", 1.0, DAC_VREF_POS_INPUT)
 
 	MCFG_SOUND_ADD("tms5220nl", TMS5220, 640000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	/* 6840 PTM */
-	MCFG_DEVICE_ADD("6840ptm", PTM6840, 0)
-	MCFG_PTM6840_INTERNAL_CLOCK(XTAL_8MHz / 4)
+	MCFG_DEVICE_ADD("6840ptm", PTM6840, XTAL_8MHz / 4)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
 	MCFG_PTM6840_IRQ_CB(WRITELINE(esripsys_state, ptm_irq))
 MACHINE_CONFIG_END

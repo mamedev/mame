@@ -179,6 +179,7 @@
 
 #include "emu.h"
 #include "machine/68340.h"
+#include "speaker.h"
 
 class pluto5_state : public driver_device
 {
@@ -188,8 +189,8 @@ public:
 			m_maincpu(*this, "maincpu")
 	{ }
 
-	UINT32* m_cpuregion;
-	std::unique_ptr<UINT32[]> m_mainram;
+	uint32_t* m_cpuregion;
+	std::unique_ptr<uint32_t[]> m_mainram;
 
 	DECLARE_READ32_MEMBER(pluto5_mem_r);
 	DECLARE_WRITE32_MEMBER(pluto5_mem_w);
@@ -197,7 +198,7 @@ public:
 protected:
 
 	// devices
-	required_device<m68340cpu_device> m_maincpu;
+	required_device<m68340_cpu_device> m_maincpu;
 public:
 	DECLARE_DRIVER_INIT(hb);
 	virtual void machine_start() override;
@@ -206,7 +207,7 @@ public:
 READ32_MEMBER(pluto5_state::pluto5_mem_r)
 {
 	int pc = space.device().safe_pc();
-	int cs = m68340_get_cs(m_maincpu, offset * 4);
+	int cs = m_maincpu->get_cs(offset * 4);
 
 	switch ( cs )
 	{
@@ -224,7 +225,7 @@ READ32_MEMBER(pluto5_state::pluto5_mem_r)
 WRITE32_MEMBER(pluto5_state::pluto5_mem_w)
 {
 	int pc = space.device().safe_pc();
-	int cs = m68340_get_cs(m_maincpu, offset * 4);
+	int cs = m_maincpu->get_cs(offset * 4);
 
 	switch ( cs )
 	{
@@ -245,12 +246,12 @@ INPUT_PORTS_END
 
 void pluto5_state::machine_start()
 {
-	m_cpuregion = (UINT32*)memregion( "maincpu" )->base();
-	m_mainram = make_unique_clear<UINT32[]>(0x10000);
+	m_cpuregion = (uint32_t*)memregion( "maincpu" )->base();
+	m_mainram = make_unique_clear<uint32_t[]>(0x10000);
 
 }
 
-static MACHINE_CONFIG_START( pluto5, pluto5_state )
+static MACHINE_CONFIG_START( pluto5 )
 	MCFG_CPU_ADD("maincpu", M68340, 16000000)
 	MCFG_CPU_PROGRAM_MAP(pluto5_map)
 
@@ -831,9 +832,9 @@ ROM_END
 
 
 
-static void astra_addresslines( UINT16* src, size_t srcsize, int small )
+static void astra_addresslines( uint16_t* src, size_t srcsize, int small )
 {
-	std::vector<UINT16> dst(srcsize/2);
+	std::vector<uint16_t> dst(srcsize/2);
 
 	int blocksize;
 
@@ -855,11 +856,11 @@ static void astra_addresslines( UINT16* src, size_t srcsize, int small )
 
 DRIVER_INIT_MEMBER(pluto5_state,hb)
 {
-	astra_addresslines( (UINT16*)memregion( "maincpu" )->base(), memregion( "maincpu" )->bytes(), 0 );
+	astra_addresslines( (uint16_t*)memregion( "maincpu" )->base(), memregion( "maincpu" )->bytes(), 0 );
 
 	#if 0
 	{
-		UINT8* ROM = memregion( "maincpu" )->base();
+		uint8_t* ROM = memregion( "maincpu" )->base();
 		FILE *fp;
 		char filename[256];
 		sprintf(filename,"%s", machine().system().name);

@@ -25,15 +25,16 @@ public:
 		m_soundlatch(*this, "soundlatch") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_txvideoram;
-	required_shared_ptr<UINT16> m_spriteram;
-	required_shared_ptr<UINT16> m_zoomram;
+	required_shared_ptr<uint16_t> m_txvideoram;
+	required_shared_ptr<uint16_t> m_spriteram;
+	required_shared_ptr<uint16_t> m_zoomram;
 
 	/* video-related */
 	tilemap_t   *m_tx_tilemap;
 	int         m_txbank;
 	int         m_txpalette;
 	int         m_video_enable;
+	uint8_t     m_pending_command;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -43,16 +44,19 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_WRITE16_MEMBER(sound_command_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(analog_in_r);
 	DECLARE_WRITE16_MEMBER(tail2nos_txvideoram_w);
 	DECLARE_WRITE16_MEMBER(tail2nos_zoomdata_w);
 	DECLARE_WRITE16_MEMBER(tail2nos_gfxbank_w);
+	DECLARE_WRITE8_MEMBER(sound_command_w);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(sound_semaphore_w);
+	DECLARE_READ8_MEMBER(sound_semaphore_r);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_tail2nos(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_tail2nos(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void tail2nos_postload();
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	K051316_CB_MEMBER(zoom_callback);

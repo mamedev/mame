@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "shark.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/i8085/i8085.h"
@@ -26,7 +27,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SHARK = &device_creator<mshark_device>;
+DEFINE_DEVICE_TYPE(MSHARK, mshark_device, "mshark", "Mator SHARK")
 
 
 //-------------------------------------------------
@@ -50,7 +51,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *mshark_device::device_rom_region() const
+const tiny_rom_entry *mshark_device::device_rom_region() const
 {
 	return ROM_NAME( mshark );
 }
@@ -74,10 +75,10 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( mshark )
+//  MACHINE_CONFIG_START( mshark )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( mshark )
+static MACHINE_CONFIG_START( mshark )
 	// basic machine hardware
 	MCFG_CPU_ADD(I8085_TAG, I8085A, 1000000)
 	MCFG_CPU_PROGRAM_MAP(mshark_mem)
@@ -127,10 +128,10 @@ ioport_constructor mshark_device::device_input_ports() const
 //  mshark_device - constructor
 //-------------------------------------------------
 
-mshark_device::mshark_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, SHARK, "Mator SHARK", tag, owner, clock, "mshark", __FILE__),
-		device_ieee488_interface(mconfig, *this),
-		m_maincpu(*this, I8085_TAG)
+mshark_device::mshark_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, MSHARK, tag, owner, clock)
+	, device_ieee488_interface(mconfig, *this)
+	, m_maincpu(*this, I8085_TAG)
 {
 }
 

@@ -44,15 +44,15 @@ public:
 	required_device<tc0480scp_device> m_tc0480scp;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<watchdog_timer_device> m_watchdog;
-	optional_shared_ptr<UINT32> m_ram;
-	optional_shared_ptr<UINT32> m_shared_ram;
-	UINT16 m_coin_word;
-	UINT16 m_port_sel;
+	optional_shared_ptr<uint32_t> m_ram;
+	optional_shared_ptr<uint32_t> m_shared_ram;
+	uint16_t m_coin_word;
+	uint16_t m_port_sel;
 	int m_frame_counter;
 	std::unique_ptr<uf_tempsprite[]> m_spritelist;
-	UINT16 m_rotate_ctrl[8];
-	UINT8 m_dislayer[6];
-	required_shared_ptr<UINT32> m_spriteram;
+	uint16_t m_rotate_ctrl[8];
+	uint8_t m_dislayer[6];
+	required_shared_ptr<uint32_t> m_spriteram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
@@ -72,8 +72,8 @@ public:
 	DECLARE_DRIVER_INIT(undrfire);
 	DECLARE_DRIVER_INIT(cbombers);
 	virtual void video_start() override;
-	UINT32 screen_update_undrfire(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_cbombers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_undrfire(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_cbombers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(undrfire_interrupt);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,const int *primasks,int x_offs,int y_offs);
 	void draw_sprites_cbombers(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,const int *primasks,int x_offs,int y_offs);

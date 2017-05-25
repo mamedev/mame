@@ -120,6 +120,18 @@
 		</part>
 	</software>
 
+	<software name="actionfg0" cloneof="actionfg">
+		<description>Action Fighter (v0, prototype)</description>
+		<year>1986</year>
+		<publisher>Sega</publisher>
+		<info name="alt_title" value="アクションファイター" />
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="action fighter [v0] [proto].bin" size="131072" crc="e2d765ad" sha1="88fe2ee194981c82b5db2a9166dd97a8edb6d852" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="actionfgtw" cloneof="actionfg">
 		<description>Action Fighter / Mo zhan che (Taiwan)</description>
 		<year>1986</year>
@@ -1296,6 +1308,18 @@
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="captain silver (usa).bin" size="131072" crc="b81f6fa5" sha1="7c2b23f4a806c89a533f27e190499243e7311c47" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Notes: FM support -->
+	<software name="captsilvp" cloneof="captsilv">
+		<description>Captain Silver (prototype)</description>
+		<year>1988</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="captain silver [proto].bin" size="131072" crc="2532a7cd" sha1="e128c74fd5f0f1ad2f34d408feedff2bfe1adc71" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5553,6 +5577,19 @@
 		</part>
 	</software>
 
+	<!-- port of an MSX title -->
+	<software name="skyfight">
+		<description>Sky Fighter (Kor)</description>
+		<year>1990</year>
+		<publisher>Clover Soft</publisher>
+		<info name="alt_title" value="보라매 전사"/>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="sky fighter (kr).bin" size="32768" crc="77ba2667" sha1="afdd09097dce40c0af5ec01de0dfdc08482e9e0e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="skyjag">
 		<description>Sky Jaguar (Kor)</description>
 		<year>199?</year>
@@ -6128,7 +6165,18 @@
 		</part>
 	</software>
 
-	<!-- Notes: This has a player 2 input bug: it reads part of player 1 data instead (see sportsjp.cpp) -->
+	<!-- Notes: -->
+	<!-- This Japanese version of Sports Pad Soccer has code to operate the
+	Sports Pad controller in two diffent modes. When it detects a Japanese SMS,
+	the operation is the same used by US Sports Pad games. Otherwise, it uses
+	a mode compatible with the Sega Mark III, that lacks the TH line used by
+	the US Sports Pad mode. This Mark III mode is also used on other non-SMSJ
+	consoles, like the Korean SMS2 version. The two controller modes are
+	significantly different from each other and no information was found about
+	support for both modes on the Japanese Sports Pad model, so that model is
+	currently emulated as a different device: sportspadjp. -->
+	<!-- This ROM has a player 2 input bug when operates in Mark III compatible
+	mode: it reads part of player 1 data instead (see sportsjp.cpp). -->
 	<software name="sportssc" cloneof="worldsoc">
 		<description>Sports Pad Soccer (Jpn)</description>
 		<year>1988</year>
@@ -6136,8 +6184,8 @@
 		<info name="serial" value="G-1365"/>
 		<info name="release" value="19881029"/>
 		<info name="alt_title" value="スポーツパッドサッカー" />
-		<sharedfeat name="ctrl1_default" value="sportspadjp" />
-		<sharedfeat name="ctrl2_default" value="sportspadjp" />
+		<sharedfeat name="ctrl1_default" value="sportspad" />
+		<sharedfeat name="ctrl2_default" value="sportspad" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="sports pad soccer (japan).bin" size="131072" crc="41c948bf" sha1="7634ce39e87049dad1ee4f32a80d728e4bd1f81f" offset="000000" />
@@ -7539,6 +7587,22 @@
 		</part>
 	</software>
 
+  <!-- This MASK rom was actually found on a larger arcade multi-game but appears to have been taken directly from a home cartridge.
+       The menu contained within it, and bank switching system used is ignored by the arcade board which just makes use of the game
+       data from it -->
+	<software name="smssgame">
+		<description>Super Game 11-in-1 (Kor)</description>
+		<year>1990</year>
+		<publisher>Seo Jin</publisher>
+		<part name="cart" interface="sms_cart">
+			<feature name="slot" value="seojin" />
+			<dataarea name="rom" size="0x080000">
+				<rom name="SG11004A 79ST0086END 9045" size="0x080000" crc="cdbfe86e" sha1="83d6f261471dca20f8d2e33b9807d670e9b4eb9c" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="16384">
+			</dataarea>
+		</part>
+	</software>
 
 <!-- The next items have been compiled from original source code written by Jeroen Tel.
   It is unsure if Probe has ever written any game code for these licensed titles -->

@@ -19,44 +19,42 @@
 
 ***************************************************************************************************/
 
+#include "emu.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
-#include "video/mc6845.h"
 #include "machine/6850acia.h"
 #include "machine/clock.h"
 #include "machine/keyboard.h"
+#include "video/mc6845.h"
+#include "screen.h"
 
-#define KEYBOARD_TAG "keyboard"
 
 class mx2178_state : public driver_device
 {
 public:
-	mx2178_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_p_videoram(*this, "videoram"),
-		m_maincpu(*this, "maincpu"),
-		m_acia(*this, "acia"),
-		m_palette(*this, "palette")
+	mx2178_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_palette(*this, "palette")
+		, m_p_videoram(*this, "videoram")
+		, m_maincpu(*this, "maincpu")
+		, m_acia(*this, "acia")
+		, m_p_chargen(*this, "chargen")
 	{
 	}
 
 	DECLARE_READ8_MEMBER(keyin_r);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	void kbd_put(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	const UINT8 *m_p_chargen;
-	required_shared_ptr<UINT8> m_p_videoram;
-
-protected:
-	virtual void machine_reset() override;
-
 private:
-	UINT8 m_term_data;
+	uint8_t m_term_data;
+	virtual void machine_reset() override;
+	required_device<palette_device> m_palette;
+	required_shared_ptr<uint8_t> m_p_videoram;
 	required_device<z80_device> m_maincpu;
 	required_device<acia6850_device> m_acia;
-public:
-	required_device<palette_device> m_palette;
+	required_region_ptr<u8> m_p_chargen;
 };
 
 static ADDRESS_MAP_START(mx2178_mem, AS_PROGRAM, 8, mx2178_state)
@@ -85,7 +83,7 @@ READ8_MEMBER( mx2178_state::keyin_r )
 {
 	if (offset)
 	{
-		UINT8 ret = m_term_data;
+		uint8_t ret = m_term_data;
 		m_term_data = 0;
 		return ret;
 	}
@@ -93,7 +91,7 @@ READ8_MEMBER( mx2178_state::keyin_r )
 		return (m_term_data) ? 0x83 : 0x82;
 }
 
-WRITE8_MEMBER( mx2178_state::kbd_put )
+void mx2178_state::kbd_put(u8 data)
 {
 	m_term_data = data;
 	m_maincpu->set_input_line(0, HOLD_LINE);
@@ -102,9 +100,9 @@ WRITE8_MEMBER( mx2178_state::kbd_put )
 MC6845_UPDATE_ROW( mx2178_state::crtc_update_row )
 {
 	const rgb_t *pens = m_palette->palette()->entry_list_raw();
-	UINT8 chr,gfx;
-	UINT16 mem,x;
-	UINT32 *p = &bitmap.pix32(y);
+	uint8_t chr,gfx;
+	uint16_t mem,x;
+	uint32_t *p = &bitmap.pix32(y);
 
 	for (x = 0; x < x_count; x++)
 	{
@@ -146,7 +144,6 @@ GFXDECODE_END
 
 void mx2178_state::machine_reset()
 {
-	m_p_chargen = memregion("chargen")->base();
 }
 
 WRITE_LINE_MEMBER(mx2178_state::write_acia_clock)
@@ -155,14 +152,14 @@ WRITE_LINE_MEMBER(mx2178_state::write_acia_clock)
 	m_acia->write_rxc(state);
 }
 
-static MACHINE_CONFIG_START( mx2178, mx2178_state )
+static MACHINE_CONFIG_START( mx2178 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 18869600/5) // guess
 	MCFG_CPU_PROGRAM_MAP(mx2178_mem)
 	MCFG_CPU_IO_MAP(mx2178_io)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not correct
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
@@ -181,8 +178,8 @@ static MACHINE_CONFIG_START( mx2178, mx2178_state )
 
 	/// TODO: hook up acia to keyboard and memory map
 
-	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(WRITE8(mx2178_state, kbd_put))
+	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
+	MCFG_GENERIC_KEYBOARD_CB(PUT(mx2178_state, kbd_put))
 
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, 614400)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(mx2178_state, write_acia_clock))
@@ -200,5 +197,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   STATE         INIT    COMPANY    FULLNAME       FLAGS */
-COMP( 1984, mx2178, 0,      0,       mx2178,    mx2178, driver_device,  0,  "Memorex", "Memorex 2178", MACHINE_IS_SKELETON )
+//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   STATE         INIT  COMPANY    FULLNAME        FLAGS
+COMP( 1984, mx2178, 0,      0,       mx2178,    mx2178, mx2178_state, 0,    "Memorex", "Memorex 2178", MACHINE_IS_SKELETON )

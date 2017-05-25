@@ -49,8 +49,10 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "video/mc6845.h"
 #include "machine/mc68681.h"
+#include "video/mc6845.h"
+#include "screen.h"
+#include "speaker.h"
 
 #define MAINCPU_TAG "maincpu"
 #define CRTC_TAG    "crtc"
@@ -66,13 +68,13 @@ public:
 		{ }
 
 	virtual void video_start() override;
-	UINT32 screen_update_hp16500(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_hp16500a(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_hp16500(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_hp16500a(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	required_device<cpu_device> m_maincpu;
-	std::vector<UINT8> m_vram;
+	std::vector<uint8_t> m_vram;
 
-	UINT8 m_mask, m_val;
+	uint8_t m_mask, m_val;
 
 	DECLARE_WRITE32_MEMBER(palette_w);
 
@@ -99,7 +101,7 @@ public:
 	INTERRUPT_GEN_MEMBER(vblank);
 
 private:
-	UINT32 m_palette[256], m_colors[3], m_count, m_clutoffs;
+	uint32_t m_palette[256], m_colors[3], m_count, m_clutoffs;
 };
 
 READ32_MEMBER(hp16500_state::vbl_state_r)
@@ -133,7 +135,7 @@ WRITE_LINE_MEMBER( hp16500_state::vsync_changed )
 
 MC6845_UPDATE_ROW( hp16500_state::crtc_update_row )
 {
-	UINT32 *p = &bitmap.pix32(y);
+	uint32_t *p = &bitmap.pix32(y);
 	int i, pos;
 
 	pos =  y * 144;
@@ -155,7 +157,7 @@ MC6845_UPDATE_ROW( hp16500_state::crtc_update_row )
 
 MC6845_UPDATE_ROW( hp16500_state::crtc_update_row_1650 )
 {
-	UINT32 *p = &bitmap.pix32(y);
+	uint32_t *p = &bitmap.pix32(y);
 	int i, pos;
 
 	pos =  y * 148;
@@ -279,7 +281,7 @@ static ADDRESS_MAP_START(hp16500a_map, AS_PROGRAM, 16, hp16500_state)
 	AM_RANGE(0x980000, 0xa7ffff) AM_RAM
 ADDRESS_MAP_END
 
-UINT32 hp16500_state::screen_update_hp16500a(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t hp16500_state::screen_update_hp16500a(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -375,12 +377,12 @@ WRITE32_MEMBER(hp16500_state::palette_w)
 
 // 4 bpp
 // addr = ((Y * 0xfc0) + 0x360) + (X * 4)
-UINT32 hp16500_state::screen_update_hp16500(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t hp16500_state::screen_update_hp16500(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int pos = 0;
 	for (int y = 0; y < 384; y++)
 	{
-		UINT32 *scanline = &bitmap.pix32(y);
+		uint32_t *scanline = &bitmap.pix32(y);
 
 		for (int x = 0; x < 576; x+=4)
 		{
@@ -395,7 +397,7 @@ UINT32 hp16500_state::screen_update_hp16500(screen_device &screen, bitmap_rgb32 
 	return 0;
 }
 
-static MACHINE_CONFIG_START( hp1650, hp16500_state )
+static MACHINE_CONFIG_START( hp1650 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(MAINCPU_TAG, M68000, 10000000)
 	MCFG_CPU_PROGRAM_MAP(hp1650_map)
@@ -415,7 +417,7 @@ static MACHINE_CONFIG_START( hp1650, hp16500_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( hp1651, hp16500_state )
+static MACHINE_CONFIG_START( hp1651 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(MAINCPU_TAG, M68000, 10000000)
 	MCFG_CPU_PROGRAM_MAP(hp1651_map)
@@ -435,7 +437,7 @@ static MACHINE_CONFIG_START( hp1651, hp16500_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( hp16500a, hp16500_state )
+static MACHINE_CONFIG_START( hp16500a )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(MAINCPU_TAG, M68000, 10000000)
 	MCFG_CPU_PROGRAM_MAP(hp16500a_map)
@@ -455,7 +457,7 @@ static MACHINE_CONFIG_START( hp16500a, hp16500_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( hp16500, hp16500_state )
+static MACHINE_CONFIG_START( hp16500 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(MAINCPU_TAG, M68EC030, 25000000)
 	MCFG_CPU_PROGRAM_MAP(hp16500_map)
@@ -501,7 +503,7 @@ ROM_START( hp16500b )
 	ROM_LOAD32_BYTE( "16500-80017.bin", 0x000003, 0x008000, CRC(e0b1096b) SHA1(426bb9a4756d8087bded4f6b61365d733ffbb09a) )
 ROM_END
 
-COMP( 1989, hp1650b,  0, 0, hp1650,  hp16500, driver_device, 0,  "Hewlett Packard", "HP 1650b", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-COMP( 1989, hp1651b,  0, 0, hp1651,  hp16500, driver_device, 0,  "Hewlett Packard", "HP 1651b", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-COMP( 1991, hp165ka0, 0, 0, hp16500a, hp16500, driver_device, 0, "Hewlett Packard", "HP 16500a", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-COMP( 1991, hp16500b, 0, 0, hp16500, hp16500, driver_device, 0,  "Hewlett Packard", "HP 16500b", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+COMP( 1989, hp1650b,  0, 0, hp1650,   hp16500, hp16500_state, 0, "Hewlett Packard", "HP 1650b",  MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+COMP( 1989, hp1651b,  0, 0, hp1651,   hp16500, hp16500_state, 0, "Hewlett Packard", "HP 1651b",  MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+COMP( 1991, hp165ka0, 0, 0, hp16500a, hp16500, hp16500_state, 0, "Hewlett Packard", "HP 16500a", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+COMP( 1991, hp16500b, 0, 0, hp16500,  hp16500, hp16500_state, 0, "Hewlett Packard", "HP 16500b", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)

@@ -34,8 +34,8 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
-	required_shared_ptr<UINT32> m_ram;
-	required_shared_ptr<UINT32> m_spriteram;
+	required_shared_ptr<uint32_t> m_ram;
+	required_shared_ptr<uint32_t> m_spriteram;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<watchdog_timer_device> m_watchdog;
@@ -44,25 +44,26 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	UINT16 m_coin_word;
-	UINT16 m_frame_counter;
-	UINT16 m_port_sel;
+	uint16_t m_coin_word;
+	uint16_t m_frame_counter;
+	uint16_t m_port_sel;
 	std::unique_ptr<gfx_tempsprite[]> m_spritelist;
-	UINT16 m_rotate_ctrl[8];
+	uint16_t m_rotate_ctrl[8];
 	rectangle m_hack_cliprect;
+	emu_timer *m_interrupt5_timer;
 
-	DECLARE_WRITE32_MEMBER(groundfx_input_w);
-	DECLARE_READ32_MEMBER(groundfx_adc_r);
-	DECLARE_WRITE32_MEMBER(groundfx_adc_w);
+	DECLARE_WRITE32_MEMBER(input_w);
+	DECLARE_READ32_MEMBER(adc_r);
+	DECLARE_WRITE32_MEMBER(adc_w);
 	DECLARE_WRITE32_MEMBER(rotate_control_w);
 	DECLARE_WRITE32_MEMBER(motor_control_w);
-	DECLARE_READ32_MEMBER(irq_speedup_r_groundfx);
+	DECLARE_READ32_MEMBER(irq_speedup_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(frame_counter_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(coin_word_r);
 	DECLARE_DRIVER_INIT(groundfx);
 	virtual void video_start() override;
-	UINT32 screen_update_groundfx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(groundfx_interrupt);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(interrupt);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,int do_hack,int x_offs,int y_offs);
 
 

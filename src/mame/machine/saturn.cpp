@@ -181,7 +181,7 @@ DMA TODO:
 #define WORK_RAM_H(var) (var & 0x07000000) == 0x06000000
 #define SOUND_RAM(_lv_)  ((scu_##_lv_ & 0x07ffffff) >= 0x05a00000) && ((scu_##_lv_ & 0x07ffffff) <= 0x05afffff)
 
-void saturn_state::scu_do_transfer(UINT8 event)
+void saturn_state::scu_do_transfer(uint8_t event)
 {
 	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	int i;
@@ -225,33 +225,33 @@ void saturn_state::scu_test_pending_irq()
 
 READ32_MEMBER(saturn_state::saturn_scu_r)
 {
-	UINT32 res;
+	uint32_t res;
 
 	/*TODO: write only registers must return 0 or open bus */
 	switch(offset)
 	{
 		case 0x5c/4:
 		//  Super Major League and Shin Megami Tensei - Akuma Zensho reads from there (undocumented), DMA status mirror?
-			if(LOG_SCU && !space.debugger_access()) logerror("(PC=%08x) DMA status reg read\n",space.device().safe_pc());
+			if(LOG_SCU && !machine().side_effect_disabled()) logerror("(PC=%08x) DMA status reg read\n",space.device().safe_pc());
 			res = m_scu.status;
 			break;
 		case 0x7c/4:
-			if(LOG_SCU && !space.debugger_access()) logerror("(PC=%08x) DMA status reg read\n",space.device().safe_pc());
+			if(LOG_SCU && !machine().side_effect_disabled()) logerror("(PC=%08x) DMA status reg read\n",space.device().safe_pc());
 			res = m_scu.status;
 			break;
 		case 0x80/4:
 			res = m_scudsp->program_control_r(space, 0, mem_mask);
 			break;
 		case 0x8c/4:
-			if(LOG_SCU && !space.debugger_access()) logerror( "DSP mem read at %08X\n", m_scu_regs[34]);
+			if(LOG_SCU && !machine().side_effect_disabled()) logerror( "DSP mem read at %08X\n", m_scu_regs[34]);
 			res = m_scudsp->ram_address_r(space, 0, mem_mask);
 			break;
 		case 0xa0/4:
-			if(LOG_SCU && !space.debugger_access()) logerror("(PC=%08x) IRQ mask reg read %08x MASK=%08x\n",space.device().safe_pc(),mem_mask,m_scu_regs[0xa0/4]);
+			if(LOG_SCU && !machine().side_effect_disabled()) logerror("(PC=%08x) IRQ mask reg read %08x MASK=%08x\n",space.device().safe_pc(),mem_mask,m_scu_regs[0xa0/4]);
 			res = m_scu.ism;
 			break;
 		case 0xa4/4:
-			if(LOG_SCU && !space.debugger_access()) logerror("(PC=%08x) IRQ status reg read MASK=%08x IST=%08x | ISM=%08x\n",space.device().safe_pc(),mem_mask,m_scu.ist,m_scu.ism);
+			if(LOG_SCU && !machine().side_effect_disabled()) logerror("(PC=%08x) IRQ status reg read MASK=%08x IST=%08x | ISM=%08x\n",space.device().safe_pc(),mem_mask,m_scu.ist,m_scu.ism);
 			/* TODO: Bug! trips an HW fault. Basically, it tries to read the IST bit 1 with that irq enabled.
 			   Densetsu no Ogre Battle doesn't like this, so it needs investigation ...
 			*/
@@ -259,11 +259,11 @@ READ32_MEMBER(saturn_state::saturn_scu_r)
 			res = m_scu.ist;
 			break;
 		case 0xc8/4:
-			if(LOG_SCU && !space.debugger_access()) logerror("(PC=%08x) SCU version reg read\n",space.device().safe_pc());
+			if(LOG_SCU && !machine().side_effect_disabled()) logerror("(PC=%08x) SCU version reg read\n",space.device().safe_pc());
 			res = 0x00000004;/*SCU Version 4, OK? */
 			break;
 		default:
-			if(LOG_SCU && !space.debugger_access()) logerror("(PC=%08x) SCU reg read at %d = %08x\n",space.device().safe_pc(),offset,m_scu_regs[offset]);
+			if(LOG_SCU && !machine().side_effect_disabled()) logerror("(PC=%08x) SCU reg read at %d = %08x\n",space.device().safe_pc(),offset,m_scu_regs[offset]);
 			res = m_scu_regs[offset];
 			break;
 	}
@@ -382,9 +382,9 @@ TIMER_CALLBACK_MEMBER(saturn_state::dma_lv2_ended)
 	DnMV_0(2);
 }
 
-void saturn_state::scu_single_transfer(address_space &space, UINT32 src, UINT32 dst,UINT8 *src_shift)
+void saturn_state::scu_single_transfer(address_space &space, uint32_t src, uint32_t dst,uint8_t *src_shift)
 {
-	UINT32 src_data;
+	uint32_t src_data;
 
 	if(src & 1)
 	{
@@ -401,10 +401,10 @@ void saturn_state::scu_single_transfer(address_space &space, UINT32 src, UINT32 
 	*src_shift ^= 1;
 }
 
-void saturn_state::scu_dma_direct(address_space &space, UINT8 dma_ch)
+void saturn_state::scu_dma_direct(address_space &space, uint8_t dma_ch)
 {
-	UINT32 tmp_src,tmp_dst,total_size;
-	UINT8 cd_transfer_flag;
+	uint32_t tmp_src,tmp_dst,total_size;
+	uint8_t cd_transfer_flag;
 
 	if(m_scu.src_add[dma_ch] == 0 || (m_scu.dst_add[dma_ch] != 2 && m_scu.dst_add[dma_ch] != 4))
 	{
@@ -459,7 +459,7 @@ void saturn_state::scu_dma_direct(address_space &space, UINT8 dma_ch)
 	else
 	{
 		int i;
-		UINT8  src_shift;
+		uint8_t  src_shift;
 
 		src_shift = ((m_scu.src[dma_ch] & 2) >> 1) ^ 1;
 
@@ -491,15 +491,15 @@ void saturn_state::scu_dma_direct(address_space &space, UINT8 dma_ch)
 	}
 }
 
-void saturn_state::scu_dma_indirect(address_space &space,UINT8 dma_ch)
+void saturn_state::scu_dma_indirect(address_space &space,uint8_t dma_ch)
 {
 	/*Helper to get out of the cycle*/
-	UINT8 job_done = 0;
+	uint8_t job_done = 0;
 	/*temporary storage for the transfer data*/
-	UINT32 tmp_src;
-	UINT32 indirect_src,indirect_dst;
-	INT32 indirect_size;
-	UINT32 total_size = 0;
+	uint32_t tmp_src;
+	uint32_t indirect_src,indirect_dst;
+	int32_t indirect_size;
+	uint32_t total_size = 0;
 
 	DnMV_1(dma_ch);
 
@@ -531,7 +531,7 @@ void saturn_state::scu_dma_indirect(address_space &space,UINT8 dma_ch)
 
 		{
 			int i;
-			UINT8  src_shift;
+			uint8_t  src_shift;
 
 			src_shift = ((indirect_src & 2) >> 1) ^ 1;
 
@@ -675,7 +675,7 @@ void saturn_state::scu_reset(void)
 
 TIMER_CALLBACK_MEMBER(saturn_state::stv_rtc_increment)
 {
-	static const UINT8 dpm[12] = { 0x31, 0x28, 0x31, 0x30, 0x31, 0x30, 0x31, 0x31, 0x30, 0x31, 0x30, 0x31 };
+	static const uint8_t dpm[12] = { 0x31, 0x28, 0x31, 0x30, 0x31, 0x30, 0x31, 0x31, 0x30, 0x31, 0x30, 0x31 };
 	static int year_num, year_count;
 
 	/*
@@ -862,6 +862,18 @@ TIMER_DEVICE_CALLBACK_MEMBER(saturn_state::saturn_scanline)
 			m_vdp1.framebuffer_clear_on_next_frame = 1;
 	}
 
+	// TODO: temporary for Batman Forever, presumably anonymous timer not behaving well.
+	//       VDP1 timing needs some HW work anyway so I'm currently firing VDP1 after 8 scanlines for now, will de-anon the timers in a later stage.
+	if(scanline == (vblank_line+8)*y_step)
+	{
+		if(!(m_scu.ism & IRQ_VDP1_END))
+		{
+			m_maincpu->set_input_line_and_vector(0x2, HOLD_LINE, 0x4d);
+			scu_do_transfer(6);
+		}
+		else
+			m_scu.ist |= (IRQ_VDP1_END);
+	}
 
 	if(scanline == (m_scu_regs[36] & 0x3ff)*y_step)
 	{

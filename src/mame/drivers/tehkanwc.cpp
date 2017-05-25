@@ -1,21 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Ernesto Corvi, Roberto Fresca
-/* Notes: DJH 04 Jan 2008
-
-  fixed gridiron079gre (shared access to spriteram was broken)
-
-  The inputs seem to be a hacky mess (although there was reportedly a
-  hardware joystick hack for tehkanwc via plugin logic subboard, is this
-  attempting to simulate it?
-
-  Also there is a hack to reset the sound CPU...
-
-*/
-
 /***************************************************************************
 
 Tehkan World Cup - (c) Tehkan 1985
-
 
 Ernesto Corvi
 ernesto@imagina.com
@@ -89,17 +76,34 @@ TO DO :
   - Confirm "Difficulty" Dip Switch in 'teedoff'
 
 ***************************************************************************/
+/* Notes: DJH 04 Jan 2008
+
+  fixed gridiron079gre (shared access to spriteram was broken)
+
+  The inputs seem to be a hacky mess (although there was reportedly a
+  hardware joystick hack for tehkanwc via plugin logic subboard, is this
+  attempting to simulate it?
+
+  Also there is a hack to reset the sound CPU...
+
+*/
 
 #include "emu.h"
+#include "includes/tehkanwc.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
+
 #include "gridiron.lh"
-#include "includes/tehkanwc.h"
 
 
 void tehkanwc_state::machine_start()
 {
+	m_reset_timer = timer_alloc(TIMER_RESET);
+
 	save_item(NAME(m_track0));
 	save_item(NAME(m_track1));
 	save_item(NAME(m_msm_data_offs));
@@ -163,7 +167,7 @@ void tehkanwc_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		m_audiocpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in tehkanwc_state::device_timer");
+		assert_always(false, "Unknown id in tehkanwc_state::device_timer");
 	}
 }
 
@@ -173,7 +177,7 @@ WRITE8_MEMBER(tehkanwc_state::sound_answer_w)
 
 	/* in Gridiron, the sound CPU goes in a tight loop after the self test, */
 	/* probably waiting to be reset by a watchdog */
-	if (space.device().safe_pc() == 0x08bc) timer_set(attotime::from_seconds(1), TIMER_RESET);
+	if (space.device().safe_pc() == 0x08bc) m_reset_timer->adjust(attotime::from_seconds(1));
 }
 
 
@@ -207,7 +211,7 @@ WRITE8_MEMBER(tehkanwc_state::msm_reset_w)
 
 WRITE_LINE_MEMBER(tehkanwc_state::adpcm_int)
 {
-	UINT8 *SAMPLES = memregion("adpcm")->base();
+	uint8_t *SAMPLES = memregion("adpcm")->base();
 	int msm_data = SAMPLES[m_msm_data_offs & 0x7fff];
 
 	if (m_toggle == 0)
@@ -625,7 +629,7 @@ static GFXDECODE_START( tehkanwc )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( tehkanwc, tehkanwc_state )
+static MACHINE_CONFIG_START( tehkanwc )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 18432000/4)    /* 18.432000 / 4 */
@@ -665,19 +669,19 @@ static MACHINE_CONFIG_START( tehkanwc, tehkanwc_state )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("ay1", AY8910, 1536000)
+	MCFG_SOUND_ADD("ay1", AY8910, 18432000/12)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(tehkanwc_state, portA_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(tehkanwc_state, portB_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 1536000)
+	MCFG_SOUND_ADD("ay2", AY8910, 18432000/12)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(tehkanwc_state, portA_r))
 	MCFG_AY8910_PORT_B_READ_CB(READ8(tehkanwc_state, portB_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(tehkanwc_state, adpcm_int)) /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8KHz               */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8KHz               */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 MACHINE_CONFIG_END
 
@@ -701,7 +705,7 @@ DRIVER_INIT_MEMBER(tehkanwc_state,teedoff)
 	    023A: 00          nop
 	*/
 
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	ROM[0x0238] = 0x00;
 	ROM[0x0239] = 0x00;
@@ -898,8 +902,8 @@ ROM_END
 
 
 
-GAME( 1985, tehkanwc,  0,        tehkanwc, tehkanwc, driver_device, 0,        ROT0,  "Tehkan", "Tehkan World Cup (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, tehkanwcb, tehkanwc, tehkanwc, tehkanwc, driver_device, 0,        ROT0,  "Tehkan", "Tehkan World Cup (set 2, bootleg?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, tehkanwcc, tehkanwc, tehkanwc, tehkanwc, driver_device, 0,        ROT0,  "bootleg", "Tehkan World Cup (set 3, bootleg)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // aka 'World Cup 85', different inputs?
-GAMEL(1985, gridiron,  0,        tehkanwc, gridiron, driver_device, 0,        ROT0,  "Tehkan", "Gridiron Fight", MACHINE_SUPPORTS_SAVE, layout_gridiron )
-GAME( 1986, teedoff,   0,        tehkanwc, teedoff, tehkanwc_state,  teedoff,  ROT90, "Tecmo", "Tee'd Off (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, tehkanwc,  0,        tehkanwc, tehkanwc, tehkanwc_state, 0,        ROT0,  "Tehkan",  "Tehkan World Cup (set 1)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1985, tehkanwcb, tehkanwc, tehkanwc, tehkanwc, tehkanwc_state, 0,        ROT0,  "Tehkan",  "Tehkan World Cup (set 2, bootleg?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, tehkanwcc, tehkanwc, tehkanwc, tehkanwc, tehkanwc_state, 0,        ROT0,  "bootleg", "Tehkan World Cup (set 3, bootleg)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // aka 'World Cup 85', different inputs?
+GAMEL(1985, gridiron,  0,        tehkanwc, gridiron, tehkanwc_state, 0,        ROT0,  "Tehkan",  "Gridiron Fight",                     MACHINE_SUPPORTS_SAVE, layout_gridiron )
+GAME( 1986, teedoff,   0,        tehkanwc, teedoff,  tehkanwc_state, teedoff,  ROT90, "Tecmo",   "Tee'd Off (Japan)",                  MACHINE_SUPPORTS_SAVE )

@@ -51,11 +51,12 @@ ToDo:
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6502/m6510.h"
 #include "cpu/avr8/avr8.h"
+#include "cpu/m6502/m6510.h"
 #include "machine/mos6526.h"
-#include "sound/ay8910.h"
 #include "machine/terminal.h"
+#include "sound/ay8910.h"
+#include "speaker.h"
 
 #define TERMINAL_TAG "terminal"
 
@@ -76,9 +77,9 @@ public:
 	DECLARE_READ8_MEMBER(psg_b_r);
 	DECLARE_WRITE8_MEMBER(key_w);
 	DECLARE_READ8_MEMBER(key_r);
-	UINT8 m_term_data;
-	UINT8 m_key_row;
-	UINT8 m_2;
+	uint8_t m_term_data;
+	uint8_t m_key_row;
+	uint8_t m_2;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -243,7 +244,7 @@ READ8_MEMBER( sbc6510_state::psg_b_r )
 
 READ8_MEMBER( sbc6510_state::key_r )
 {
-	UINT8 data=0;
+	uint8_t data=0;
 
 	for (int i = 0; i < 8; i++)
 	{
@@ -277,7 +278,7 @@ static GFXDECODE_START( sbc6510 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( sbc6510, sbc6510_state )
+static MACHINE_CONFIG_START( sbc6510 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M6510, XTAL_1MHz)
 	MCFG_CPU_PROGRAM_MAP(sbc6510_mem)
@@ -322,5 +323,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    CLASS         INIT    COMPANY          FULLNAME       FLAGS */
-COMP( 2009, sbc6510,  0,      0,       sbc6510,   sbc6510, driver_device, 0,   "Josip Perusanec", "SBC6510", MACHINE_NOT_WORKING )
+/*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    CLASS          INIT  COMPANY            FULLNAME   FLAGS */
+COMP( 2009, sbc6510,  0,      0,       sbc6510,   sbc6510, sbc6510_state, 0,    "Josip Perusanec", "SBC6510", MACHINE_NOT_WORKING )

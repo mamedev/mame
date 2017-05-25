@@ -50,14 +50,14 @@ public:
 	required_device<ram_device> m_ram;
 
 	/* keyboard state */
-	UINT8 m_key_sense;
+	uint8_t m_key_sense;
 
 	/* video state */
-	UINT8 *m_video_ram;
-	UINT8 *m_attr_ram;
+	uint8_t *m_video_ram;
+	uint8_t *m_attr_ram;
 
 	/* sound state */
-	UINT8 m_sound_latch;
+	uint8_t m_sound_latch;
 
 	/* timers */
 	device_t *m_cassette_timer;
@@ -92,7 +92,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_fault);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_select);
-	void bankswitch(UINT8 data);
+	void bankswitch(uint8_t data);
 	DECLARE_SNAPSHOT_LOAD_MEMBER( mtx );
 };
 

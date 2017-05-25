@@ -8,17 +8,16 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_EPSON_SIO_TF20_H
+#define MAME_BUS_EPSON_SIO_TF20_H
+
 #pragma once
 
-#ifndef __TF20_H__
-#define __TF20_H__
-
-#include "emu.h"
+#include "epson_sio.h"
 #include "cpu/z80/z80.h"
 #include "machine/ram.h"
 #include "machine/upd765.h"
 #include "machine/z80dart.h"
-#include "epson_sio.h"
 
 
 //**************************************************************************
@@ -30,10 +29,10 @@ class epson_tf20_device : public device_t,
 {
 public:
 	// construction/destruction
-	epson_tf20_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	epson_tf20_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual ioport_constructor device_input_ports() const override;
 
@@ -85,7 +84,7 @@ private:
 
 
 // device type definition
-extern const device_type EPSON_TF20;
+DECLARE_DEVICE_TYPE(EPSON_TF20, epson_tf20_device)
 
 
-#endif // __TF20_H__
+#endif // MAME_BUS_EPSON_SIO_TF20_H

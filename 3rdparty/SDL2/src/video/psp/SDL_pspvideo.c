@@ -92,6 +92,7 @@ PSP_Create()
     if (gldata == NULL) {
         SDL_OutOfMemory();
         SDL_free(device);
+        SDL_free(phdata);
         return NULL;
     }
     device->gl_data = gldata;
@@ -101,7 +102,7 @@ PSP_Create()
     phdata->egl_initialized = SDL_TRUE;
 
 
-    /* Setup amount of available displays and current display */
+    /* Setup amount of available displays */
     device->num_displays = 0;
 
     /* Set device free function */
@@ -234,7 +235,7 @@ PSP_CreateWindow(_THIS, SDL_Window * window)
 int
 PSP_CreateWindowFrom(_THIS, SDL_Window * window, const void *data)
 {
-    return -1;
+    return SDL_Unsupported();
 }
 
 void

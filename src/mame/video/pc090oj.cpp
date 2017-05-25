@@ -72,10 +72,10 @@ Taito pc090oj
 *****************************************************************************/
 
 
-const device_type PC090OJ = &device_creator<pc090oj_device>;
+DEFINE_DEVICE_TYPE(PC090OJ, pc090oj_device, "pc090oj", "Taito PC090OJ")
 
-pc090oj_device::pc090oj_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, PC090OJ, "Taito PC090OJ", tag, owner, clock, "pc090oj", __FILE__),
+pc090oj_device::pc090oj_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, PC090OJ, tag, owner, clock),
 	m_ctrl(0),
 	m_sprite_ctrl(0),
 	m_ram(nullptr),
@@ -84,8 +84,8 @@ pc090oj_device::pc090oj_device(const machine_config &mconfig, const char *tag, d
 	m_x_offset(0),
 	m_y_offset(0),
 	m_use_buffer(0),
-	m_gfxdecode(*this),
-	m_palette(*this)
+	m_gfxdecode(*this, finder_base::DUMMY_TAG),
+	m_palette(*this, finder_base::DUMMY_TAG)
 {
 }
 
@@ -115,8 +115,8 @@ void pc090oj_device::static_set_palette_tag(device_t &device, const char *tag)
 
 void pc090oj_device::device_start()
 {
-	m_ram = make_unique_clear<UINT16[]>(PC090OJ_RAM_SIZE / 2);
-	m_ram_buffered = make_unique_clear<UINT16[]>(PC090OJ_RAM_SIZE / 2);
+	m_ram = make_unique_clear<uint16_t[]>(PC090OJ_RAM_SIZE / 2);
+	m_ram_buffered = make_unique_clear<uint16_t[]>(PC090OJ_RAM_SIZE / 2);
 
 	save_pointer(NAME(m_ram.get()), PC090OJ_RAM_SIZE / 2);
 	save_pointer(NAME(m_ram_buffered.get()), PC090OJ_RAM_SIZE / 2);
@@ -137,7 +137,7 @@ void pc090oj_device::device_reset()
     DEVICE HANDLERS
 *****************************************************************************/
 
-void pc090oj_device::set_sprite_ctrl( UINT16 sprctrl )
+void pc090oj_device::set_sprite_ctrl( uint16_t sprctrl )
 {
 	m_sprite_ctrl = sprctrl;
 }

@@ -14,9 +14,9 @@
         6809 Microcomputer Programming & Interfacing with Experiments"
             by Andrew C. Staugaard, Jr.; Howard W. Sams & Co., Inc.
 
-    System dependencies:    UINT16 must be 16 bit unsigned int
-                            UINT8 must be 8 bit unsigned int
-                            UINT32 must be more than 16 bits
+    System dependencies:    uint16_t must be 16 bit unsigned int
+                            uint8_t must be 8 bit unsigned int
+                            uint32_t must be more than 16 bits
                             arrays up to 65536 bytes must be supported
                             machine must be twos complement
 
@@ -141,7 +141,7 @@ static void hd63701_trap_pc();
 #define EA      m_ea.w.l
 
 /* point of next timer event */
-static UINT32 timer_next;
+static uint32_t timer_next;
 
 /* memory interface */
 
@@ -284,7 +284,7 @@ enum
 
 /* operate one instruction for */
 #define ONE_MORE_INSN() {       \
-	UINT8 ireg;                             \
+	uint8_t ireg;                             \
 	pPPC = pPC;                             \
 	debugger_instruction_hook(this, PCD);                       \
 	ireg=M_RDOP(PCD);                       \
@@ -306,8 +306,8 @@ enum
 
 /* macros for CC -- CC bits affected should be reset before calling */
 #define SET_Z(a)        if(!(a))SEZ
-#define SET_Z8(a)       SET_Z((UINT8)(a))
-#define SET_Z16(a)      SET_Z((UINT16)(a))
+#define SET_Z8(a)       SET_Z((uint8_t)(a))
+#define SET_Z16(a)      SET_Z((uint16_t)(a))
 #define SET_N8(a)       CC|=(((a)&0x80)>>4)
 #define SET_N16(a)      CC|=(((a)&0x8000)>>12)
 #define SET_H(a,b,r)    CC|=((((a)^(b)^(r))&0x10)<<1)
@@ -316,7 +316,7 @@ enum
 #define SET_V8(a,b,r)   CC|=((((a)^(b)^(r)^((r)>>1))&0x80)>>6)
 #define SET_V16(a,b,r)  CC|=((((a)^(b)^(r)^((r)>>1))&0x8000)>>14)
 
-const UINT8 m6800_cpu_device::flags8i[256]=     /* increment */
+const uint8_t m6800_cpu_device::flags8i[256]=     /* increment */
 {
 0x04,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
@@ -337,7 +337,7 @@ const UINT8 m6800_cpu_device::flags8i[256]=     /* increment */
 };
 
 
-const UINT8 m6800_cpu_device::flags8d[256]= /* decrement */
+const uint8_t m6800_cpu_device::flags8d[256]= /* decrement */
 {
 0x04,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
@@ -366,15 +366,15 @@ const UINT8 m6800_cpu_device::flags8d[256]= /* decrement */
 #define SET_FLAGS8(a,b,r)   {SET_N8(r);SET_Z8(r);SET_V8(a,b,r);SET_C8(r);}
 #define SET_FLAGS16(a,b,r)  {SET_N16(r);SET_Z16(r);SET_V16(a,b,r);SET_C16(r);}
 
-/* for treating an UINT8 as a signed INT16 */
-#define SIGNED(b) ((INT16)(b&0x80?b|0xff00:b))
+/* for treating an uint8_t as a signed int16_t */
+#define SIGNED(b) ((int16_t)(b&0x80?b|0xff00:b))
 
 /* Macros for addressing modes */
 #define DIRECT IMMBYTE(EAD)
 #define IMM8 EA=PC++
 #define IMM16 {EA=PC;PC+=2;}
 #define EXTENDED IMMWORD(m_ea)
-#define INDEXED {EA=X+(UINT8)M_RDOP_ARG(PCD);PC++;}
+#define INDEXED {EA=X+(uint8_t)M_RDOP_ARG(PCD);PC++;}
 
 /* macros to set status flags */
 #if defined(SEC)
@@ -422,7 +422,7 @@ const UINT8 m6800_cpu_device::flags8d[256]= /* decrement */
 /* Note: don't use 0 cycles here for invalid opcodes so that we don't */
 /* hang in an infinite loop if we hit one */
 #define XX 5 // invalid opcode unknown cc
-const UINT8 m6800_cpu_device::cycles_6800[256] =
+const uint8_t m6800_cpu_device::cycles_6800[256] =
 {
 		/* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
 	/*0*/ XX, 2,XX,XX,XX,XX, 2, 2, 4, 4, 2, 2, 2, 2, 2, 2,
@@ -443,7 +443,7 @@ const UINT8 m6800_cpu_device::cycles_6800[256] =
 	/*F*/  4, 4, 4,XX, 4, 4, 4, 5, 4, 4, 4, 4,XX,XX, 5, 6
 };
 
-const UINT8 m6800_cpu_device::cycles_6803[256] =
+const uint8_t m6800_cpu_device::cycles_6803[256] =
 {
 		/* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
 	/*0*/ XX, 2,XX,XX, 3, 3, 2, 2, 3, 3, 2, 2, 2, 2, 2, 2,
@@ -464,7 +464,7 @@ const UINT8 m6800_cpu_device::cycles_6803[256] =
 	/*F*/  4, 4, 4, 6, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5
 };
 
-const UINT8 m6800_cpu_device::cycles_63701[256] =
+const uint8_t m6800_cpu_device::cycles_63701[256] =
 {
 		/* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
 	/*0*/ XX, 1,XX,XX, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
@@ -485,7 +485,7 @@ const UINT8 m6800_cpu_device::cycles_63701[256] =
 	/*F*/  4, 4, 4, 5, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5
 };
 
-const UINT8 m6800_cpu_device::cycles_nsc8105[256] =
+const uint8_t m6800_cpu_device::cycles_nsc8105[256] =
 {
 		/* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
 	/*0*/  5,XX, 2,XX,XX, 2,XX, 2, 4, 2, 4, 2, 2, 2, 2, 2,
@@ -520,34 +520,25 @@ const UINT8 m6800_cpu_device::cycles_nsc8105[256] =
 }
 
 
-const device_type M6800 = &device_creator<m6800_cpu_device>;
-const device_type M6801 = &device_creator<m6801_cpu_device>;
-const device_type M6802 = &device_creator<m6802_cpu_device>;
-const device_type M6803 = &device_creator<m6803_cpu_device>;
-const device_type M6808 = &device_creator<m6808_cpu_device>;
-const device_type HD6301 = &device_creator<hd6301_cpu_device>;
-const device_type HD63701 = &device_creator<hd63701_cpu_device>;
-const device_type NSC8105 = &device_creator<nsc8105_cpu_device>;
-const device_type HD6303R = &device_creator<hd6303r_cpu_device>;
-const device_type HD6303Y = &device_creator<hd6303y_cpu_device>;
+DEFINE_DEVICE_TYPE(M6800, m6800_cpu_device, "m6800", "M6800")
+DEFINE_DEVICE_TYPE(M6801, m6801_cpu_device, "m6801", "M6801")
+DEFINE_DEVICE_TYPE(M6802, m6802_cpu_device, "m6802", "M6802")
+DEFINE_DEVICE_TYPE(M6803, m6803_cpu_device, "m6803", "M6803")
+DEFINE_DEVICE_TYPE(M6808, m6808_cpu_device, "m6808", "M6808")
+DEFINE_DEVICE_TYPE(HD6301, hd6301_cpu_device, "hd6301", "HD6301")
+DEFINE_DEVICE_TYPE(HD63701, hd63701_cpu_device, "hd63701", "HD63701")
+DEFINE_DEVICE_TYPE(NSC8105, nsc8105_cpu_device, "nsc8105", "NSC8105")
+DEFINE_DEVICE_TYPE(HD6303R, hd6303r_cpu_device, "hd6304r", "HD6304R")
+DEFINE_DEVICE_TYPE(HD6303Y, hd6303y_cpu_device, "hd6303y", "HD6303Y")
 
 
-m6800_cpu_device::m6800_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: cpu_device(mconfig, M6800, "M6800", tag, owner, clock, "m6800", __FILE__)
-	, m_program_config("program", ENDIANNESS_BIG, 8, 16, 0)
-	, m_decrypted_opcodes_config("program", ENDIANNESS_BIG, 8, 16, 0)
-	, m_io_config("io", ENDIANNESS_BIG, 8, 9, 0)
-	, m_has_io(false)
-	, m_out_sc2_func(*this)
-	, m_out_sertx_func(*this)
-	, m_insn(m6800_insn)
-	, m_cycles(cycles_6800)
+m6800_cpu_device::m6800_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: m6800_cpu_device(mconfig, M6800, tag, owner, clock, false, 1, m6800_insn, cycles_6800, nullptr)
 {
-	m_clock_divider = 1;
 }
 
-m6800_cpu_device::m6800_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, bool has_io, int clock_divider, const op_func *insn, const UINT8 *cycles, address_map_constructor internal)
-	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
+m6800_cpu_device::m6800_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool has_io, int clock_divider, const op_func *insn, const uint8_t *cycles, address_map_constructor internal)
+	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 8, 16, 0, internal)
 	, m_decrypted_opcodes_config("program", ENDIANNESS_BIG, 8, 16, 0)
 	, m_io_config("io", ENDIANNESS_BIG, 8, 9, 0)
@@ -560,23 +551,23 @@ m6800_cpu_device::m6800_cpu_device(const machine_config &mconfig, device_type ty
 	m_clock_divider = clock_divider;
 }
 
-m6801_cpu_device::m6801_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: m6800_cpu_device(mconfig, M6801, "M6801", tag, owner, clock, "m6801", __FILE__, true, 4, m6803_insn, cycles_6803)
+m6801_cpu_device::m6801_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: m6801_cpu_device(mconfig, M6801, tag, owner, clock, m6803_insn, cycles_6803, nullptr)
 {
 }
 
-m6801_cpu_device::m6801_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, const op_func *insn, const UINT8 *cycles, address_map_constructor internal)
-	: m6800_cpu_device(mconfig, type, name, tag, owner, clock, shortname, source, true, 4, insn, cycles, internal)
+m6801_cpu_device::m6801_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const op_func *insn, const uint8_t *cycles, address_map_constructor internal)
+	: m6800_cpu_device(mconfig, type, tag, owner, clock, true, 4, insn, cycles, internal)
 {
 }
 
-m6802_cpu_device::m6802_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: m6800_cpu_device(mconfig, M6802, "M6802", tag, owner, clock, "m6802", __FILE__, false, 4, m6800_insn, cycles_6800)
+m6802_cpu_device::m6802_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: m6802_cpu_device(mconfig, M6802, tag, owner, clock, m6800_insn, cycles_6800)
 {
 }
 
-m6802_cpu_device::m6802_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, const op_func *insn, const UINT8 *cycles)
-	: m6800_cpu_device(mconfig, type, name, tag, owner, clock, shortname, source, false, 4, insn, cycles)
+m6802_cpu_device::m6802_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const op_func *insn, const uint8_t *cycles)
+	: m6800_cpu_device(mconfig, type, tag, owner, clock, false, 4, insn, cycles, nullptr)
 {
 }
 
@@ -587,43 +578,43 @@ static ADDRESS_MAP_START(m6803_mem, AS_PROGRAM, 8, m6800_cpu_device)
 ADDRESS_MAP_END
 
 
-m6803_cpu_device::m6803_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: m6801_cpu_device(mconfig, M6803, "M6803", tag, owner, clock, "m6803", __FILE__, m6803_insn, cycles_6803, ADDRESS_MAP_NAME(m6803_mem))
+m6803_cpu_device::m6803_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: m6801_cpu_device(mconfig, M6803, tag, owner, clock, m6803_insn, cycles_6803, ADDRESS_MAP_NAME(m6803_mem))
 {
 }
 
-m6808_cpu_device::m6808_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: m6802_cpu_device(mconfig, M6808, "M6808", tag, owner, clock, "m6808", __FILE__, m6800_insn, cycles_6800)
+m6808_cpu_device::m6808_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: m6802_cpu_device(mconfig, M6808, tag, owner, clock, m6800_insn, cycles_6800)
 {
 }
 
-hd6301_cpu_device::hd6301_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: m6801_cpu_device(mconfig, HD6301, "HD6301", tag, owner, clock, "hd6301", __FILE__, hd63701_insn, cycles_63701)
+hd6301_cpu_device::hd6301_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: hd6301_cpu_device(mconfig, HD6301, tag, owner, clock)
 {
 }
 
-hd6301_cpu_device::hd6301_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-	: m6801_cpu_device(mconfig, type, name, tag, owner, clock, shortname, source, hd63701_insn, cycles_63701)
+hd6301_cpu_device::hd6301_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: m6801_cpu_device(mconfig, type, tag, owner, clock, hd63701_insn, cycles_63701)
 {
 }
 
-hd63701_cpu_device::hd63701_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: m6801_cpu_device(mconfig, HD63701, "HD63701", tag, owner, clock, "hd63701", __FILE__, hd63701_insn, cycles_63701)
+hd63701_cpu_device::hd63701_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: m6801_cpu_device(mconfig, HD63701, tag, owner, clock, hd63701_insn, cycles_63701)
 {
 }
 
-nsc8105_cpu_device::nsc8105_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: m6802_cpu_device(mconfig, NSC8105, "NSC8105", tag, owner, clock, "nsc8105", __FILE__, nsc8105_insn, cycles_nsc8105)
+nsc8105_cpu_device::nsc8105_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: m6802_cpu_device(mconfig, NSC8105, tag, owner, clock, nsc8105_insn, cycles_nsc8105)
 {
 }
 
-hd6303r_cpu_device::hd6303r_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: hd6301_cpu_device(mconfig, HD6303R, "HD6303R", tag, owner, clock, "hd6303r", __FILE__)
+hd6303r_cpu_device::hd6303r_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: hd6301_cpu_device(mconfig, HD6303R, tag, owner, clock)
 {
 }
 
-hd6303y_cpu_device::hd6303y_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: hd6301_cpu_device(mconfig, HD6303Y, "HD6303Y", tag, owner, clock, "hd6303y", __FILE__)
+hd6303y_cpu_device::hd6303y_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: hd6301_cpu_device(mconfig, HD6303Y, tag, owner, clock)
 {
 }
 
@@ -639,20 +630,20 @@ const address_space_config *m6800_cpu_device::memory_space_config(address_spacen
 }
 
 
-UINT32 m6800_cpu_device::RM16(UINT32 Addr )
+uint32_t m6800_cpu_device::RM16(uint32_t Addr )
 {
-	UINT32 result = RM(Addr) << 8;
+	uint32_t result = RM(Addr) << 8;
 	return result | RM((Addr+1)&0xffff);
 }
 
-void m6800_cpu_device::WM16(UINT32 Addr, PAIR *p )
+void m6800_cpu_device::WM16(uint32_t Addr, PAIR *p )
 {
 	WM( Addr, p->b.h );
 	WM( (Addr+1)&0xffff, p->b.l );
 }
 
 /* IRQ enter */
-void m6800_cpu_device::enter_interrupt(const char *message,UINT16 irq_vector)
+void m6800_cpu_device::enter_interrupt(const char *message,uint16_t irq_vector)
 {
 	LOG((message, tag()));
 	if( m_wai_state & (M6800_WAI|M6800_SLP) )
@@ -711,7 +702,7 @@ void m6800_cpu_device::CHECK_IRQ_LINES()
 		if(m_wai_state & M6800_SLP)
 			m_wai_state &= ~M6800_SLP;
 
-		m_nmi_pending = FALSE;
+		m_nmi_pending = false;
 		enter_interrupt("M6800 '%s' take NMI\n",0xfffc);
 	}
 	else
@@ -784,7 +775,7 @@ void m6800_cpu_device::increment_counter(int amount)
 		check_timer_event();
 }
 
-void m6800_cpu_device::set_rmcr(UINT8 data)
+void m6800_cpu_device::set_rmcr(uint8_t data)
 {
 	if (m_rmcr == data) return;
 
@@ -819,8 +810,8 @@ void m6800_cpu_device::write_port2()
 {
 	if (!m_port2_written) return;
 
-	UINT8 data = m_port2_data;
-	UINT8 ddr = m_port2_ddr & 0x1f;
+	uint8_t data = m_port2_data;
+	uint8_t ddr = m_port2_ddr & 0x1f;
 
 	if ((ddr != 0x1f) && ddr)
 	{
@@ -1135,6 +1126,7 @@ void m6800_cpu_device::device_start()
 	state_add( M6800_WAI_STATE, "WAI", m_wai_state).formatstr("%01X");
 
 	state_add( STATE_GENPC, "GENPC", m_pc.w.l).noshow();
+	state_add( STATE_GENPCBASE, "CURPC", m_pc.w.l).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_cc).formatstr("%8s").noshow();
 
 	m_icountptr = &m_icount;
@@ -1211,7 +1203,7 @@ void m6800_cpu_device::execute_set_input(int irqline, int state)
 	{
 	case INPUT_LINE_NMI:
 		if (!m_nmi_state && state != CLEAR_LINE)
-			m_nmi_pending = TRUE;
+			m_nmi_pending = true;
 		m_nmi_state = state;
 		break;
 
@@ -1255,7 +1247,7 @@ void m6800_cpu_device::execute_set_input(int irqline, int state)
  ****************************************************************************/
 void m6800_cpu_device::execute_run()
 {
-	UINT8 ireg;
+	uint8_t ireg;
 
 	CHECK_IRQ_LINES(); /* HJB 990417 */
 
@@ -1303,7 +1295,7 @@ void m6800_cpu_device::set_os3(int state)
 
 READ8_MEMBER( m6800_cpu_device::m6801_io_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	switch (offset)
 	{
@@ -1340,7 +1332,7 @@ READ8_MEMBER( m6800_cpu_device::m6801_io_r )
 		break;
 
 	case IO_P3DATA:
-		if (!space.debugger_access())
+		if (!machine().side_effect_disabled())
 		{
 			if (m_p3csr_is3_flag_read)
 			{
@@ -1361,7 +1353,7 @@ READ8_MEMBER( m6800_cpu_device::m6801_io_r )
 			data = (m_io->read_byte(M6801_PORT3) & (m_port3_ddr ^ 0xff))
 				| (m_port3_data & m_port3_ddr);
 
-		if (!space.debugger_access())
+		if (!machine().side_effect_disabled())
 		{
 			m_port3_latched = 0;
 
@@ -1386,7 +1378,7 @@ READ8_MEMBER( m6800_cpu_device::m6801_io_r )
 		break;
 
 	case IO_CH:
-		if(!(m_pending_tcsr&TCSR_TOF) && !space.debugger_access())
+		if(!(m_pending_tcsr&TCSR_TOF) && !machine().side_effect_disabled())
 		{
 			m_tcsr &= ~TCSR_TOF;
 			MODIFIED_tcsr;
@@ -1399,7 +1391,7 @@ READ8_MEMBER( m6800_cpu_device::m6801_io_r )
 		// HACK there should be a break here, but Coleco Adam won't boot with it present, proper fix required to the free-running counter
 
 	case IO_OCRH:
-		if(!(m_pending_tcsr&TCSR_OCF) && !space.debugger_access())
+		if(!(m_pending_tcsr&TCSR_OCF) && !machine().side_effect_disabled())
 		{
 			m_tcsr &= ~TCSR_OCF;
 			MODIFIED_tcsr;
@@ -1408,7 +1400,7 @@ READ8_MEMBER( m6800_cpu_device::m6801_io_r )
 		break;
 
 	case IO_OCRL:
-		if(!(m_pending_tcsr&TCSR_OCF) && !space.debugger_access())
+		if(!(m_pending_tcsr&TCSR_OCF) && !machine().side_effect_disabled())
 		{
 			m_tcsr &= ~TCSR_OCF;
 			MODIFIED_tcsr;
@@ -1417,7 +1409,7 @@ READ8_MEMBER( m6800_cpu_device::m6801_io_r )
 		break;
 
 	case IO_ICRH:
-		if(!(m_pending_tcsr&TCSR_ICF) && !space.debugger_access())
+		if(!(m_pending_tcsr&TCSR_ICF) && !machine().side_effect_disabled())
 		{
 			m_tcsr &= ~TCSR_ICF;
 			MODIFIED_tcsr;
@@ -1430,7 +1422,7 @@ READ8_MEMBER( m6800_cpu_device::m6801_io_r )
 		break;
 
 	case IO_P3CSR:
-		if ((m_p3csr & M6801_P3CSR_IS3_FLAG) && !space.debugger_access())
+		if ((m_p3csr & M6801_P3CSR_IS3_FLAG) && !machine().side_effect_disabled())
 		{
 			m_p3csr_is3_flag_read = 1;
 		}
@@ -1443,7 +1435,7 @@ READ8_MEMBER( m6800_cpu_device::m6801_io_r )
 		break;
 
 	case IO_TRCSR:
-		if (!space.debugger_access())
+		if (!machine().side_effect_disabled())
 		{
 			if (m_trcsr & M6800_TRCSR_TDRE)
 			{
@@ -1465,7 +1457,7 @@ READ8_MEMBER( m6800_cpu_device::m6801_io_r )
 		break;
 
 	case IO_RDR:
-		if (!space.debugger_access())
+		if (!machine().side_effect_disabled())
 		{
 			if (m_trcsr_read_orfe)
 			{
@@ -1751,67 +1743,57 @@ void m6801_cpu_device::m6801_clock_serial()
 	}
 }
 
-offs_t m6800_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t m6800_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( m6800 );
-	return CPU_DISASSEMBLE_NAME(m6800)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(m6800)(this, stream, pc, oprom, opram, options);
 }
 
 
-offs_t m6801_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t m6801_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( m6801 );
-	return CPU_DISASSEMBLE_NAME(m6801)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(m6801)(this, stream, pc, oprom, opram, options);
 }
 
 
-offs_t m6802_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t m6802_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( m6802 );
-	return CPU_DISASSEMBLE_NAME(m6802)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(m6802)(this, stream, pc, oprom, opram, options);
 }
 
 
-offs_t m6803_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t m6803_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( m6803 );
-	return CPU_DISASSEMBLE_NAME(m6803)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(m6803)(this, stream, pc, oprom, opram, options);
 }
 
 
-offs_t m6808_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t m6808_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( m6808 );
-	return CPU_DISASSEMBLE_NAME(m6808)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(m6808)(this, stream, pc, oprom, opram, options);
 }
 
 
-offs_t hd6301_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t hd6301_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( hd6301 );
-	return CPU_DISASSEMBLE_NAME(hd6301)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(hd6301)(this, stream, pc, oprom, opram, options);
 }
 
 
-offs_t hd63701_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t hd63701_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( hd63701 );
-	return CPU_DISASSEMBLE_NAME(hd63701)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(hd63701)(this, stream, pc, oprom, opram, options);
 }
 
 
-offs_t nsc8105_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t nsc8105_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( nsc8105 );
-	return CPU_DISASSEMBLE_NAME(nsc8105)(this, buffer, pc, oprom, opram, options);
-}
-
-WRITE_LINE_MEMBER( m6800_cpu_device::irq_line )
-{
-	set_input_line( M6800_IRQ_LINE, state );
-}
-
-WRITE_LINE_MEMBER( m6800_cpu_device::nmi_line )
-{
-	set_input_line( INPUT_LINE_NMI, state );
+	return CPU_DISASSEMBLE_NAME(nsc8105)(this, stream, pc, oprom, opram, options);
 }

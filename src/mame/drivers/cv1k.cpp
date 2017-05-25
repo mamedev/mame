@@ -172,13 +172,17 @@ Blitter Timing
 */
 
 #include "emu.h"
-#include "cpu/sh4/sh4.h"
+
 #include "cpu/sh4/sh3comn.h"
-#include "profiler.h"
+#include "cpu/sh4/sh4.h"
 #include "machine/rtc9701.h"
+#include "machine/serflash.h"
 #include "sound/ymz770.h"
 #include "video/epic12.h"
-#include "machine/serflash.h"
+
+#include "profiler.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 
@@ -204,8 +208,8 @@ public:
 	required_device<serflash_device> m_serflash;
 	required_device<rtc9701_device> m_eeprom;
 
-	required_shared_ptr<UINT64> m_ram;
-	required_shared_ptr<UINT64> m_rombase;
+	required_shared_ptr<uint64_t> m_ram;
+	required_shared_ptr<uint64_t> m_rombase;
 
 	DECLARE_READ8_MEMBER(flash_io_r);
 	DECLARE_WRITE8_MEMBER(flash_io_w);
@@ -213,7 +217,7 @@ public:
 	DECLARE_WRITE8_MEMBER(serial_rtc_eeprom_w);
 	DECLARE_READ64_MEMBER(flash_port_e_r);
 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	virtual void machine_reset() override;
 
@@ -230,15 +234,15 @@ public:
 	required_ioport m_blitrate;
 	required_ioport m_eepromout;
 
-	UINT32 m_idleramoffs;
-	UINT32 m_idlepc;
-	void install_speedups(UINT32 idleramoff, UINT32 idlepc, bool is_typed);
+	uint32_t m_idleramoffs;
+	uint32_t m_idlepc;
+	void install_speedups(uint32_t idleramoff, uint32_t idlepc, bool is_typed);
 };
 
 
 /**************************************************************************/
 
-UINT32 cv1k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t cv1k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_blitter->set_delay_scale(m_blitrate->read());
 
@@ -336,9 +340,9 @@ WRITE8_MEMBER( cv1k_state::serial_rtc_eeprom_w )
 static ADDRESS_MAP_START( cv1k_map, AS_PROGRAM, 64, cv1k_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_ROM AM_REGION("maincpu", 0) AM_WRITENOP AM_SHARE("rombase") // mmmbanc writes here on startup for some reason..
 	AM_RANGE(0x0c000000, 0x0c7fffff) AM_RAM AM_SHARE("mainram") AM_MIRROR(0x800000) // work RAM
-	AM_RANGE(0x10000000, 0x10000007) AM_READWRITE8(flash_io_r, flash_io_w, U64(0xffffffffffffffff))
-	AM_RANGE(0x10400000, 0x10400007) AM_DEVWRITE8("ymz770", ymz770_device, write, U64(0xffffffffffffffff))
-	AM_RANGE(0x10C00000, 0x10C00007) AM_READWRITE8(serial_rtc_eeprom_r, serial_rtc_eeprom_w, U64(0xffffffffffffffff))
+	AM_RANGE(0x10000000, 0x10000007) AM_READWRITE8(flash_io_r, flash_io_w, 0xffffffffffffffffU)
+	AM_RANGE(0x10400000, 0x10400007) AM_DEVWRITE8("ymz770", ymz770_device, write, 0xffffffffffffffffU)
+	AM_RANGE(0x10C00000, 0x10C00007) AM_READWRITE8(serial_rtc_eeprom_r, serial_rtc_eeprom_w, 0xffffffffffffffffU)
 //  AM_RANGE(0x18000000, 0x18000057) // blitter, installed on reset
 	AM_RANGE(0xf0000000, 0xf0ffffff) AM_RAM // mem mapped cache (sh3 internal?)
 ADDRESS_MAP_END
@@ -346,9 +350,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cv1k_d_map, AS_PROGRAM, 64, cv1k_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_ROM AM_REGION("maincpu", 0) AM_WRITENOP AM_SHARE("rombase") // mmmbanc writes here on startup for some reason..
 	AM_RANGE(0x0c000000, 0x0cffffff) AM_RAM AM_SHARE("mainram") // work RAM
-	AM_RANGE(0x10000000, 0x10000007) AM_READWRITE8(flash_io_r, flash_io_w, U64(0xffffffffffffffff))
-	AM_RANGE(0x10400000, 0x10400007) AM_DEVWRITE8("ymz770", ymz770_device, write, U64(0xffffffffffffffff))
-	AM_RANGE(0x10C00000, 0x10C00007) AM_READWRITE8(serial_rtc_eeprom_r, serial_rtc_eeprom_w, U64(0xffffffffffffffff))
+	AM_RANGE(0x10000000, 0x10000007) AM_READWRITE8(flash_io_r, flash_io_w, 0xffffffffffffffffU)
+	AM_RANGE(0x10400000, 0x10400007) AM_DEVWRITE8("ymz770", ymz770_device, write, 0xffffffffffffffffU)
+	AM_RANGE(0x10C00000, 0x10C00007) AM_READWRITE8(serial_rtc_eeprom_r, serial_rtc_eeprom_w, 0xffffffffffffffffU)
 //  AM_RANGE(0x18000000, 0x18000057) // blitter, installed on reset
 	AM_RANGE(0xf0000000, 0xf0ffffff) AM_RAM // mem mapped cache (sh3 internal?)
 ADDRESS_MAP_END
@@ -421,14 +425,14 @@ INPUT_PORTS_END
 
 void cv1k_state::machine_reset()
 {
-	m_blitter->set_rambase (reinterpret_cast<UINT16 *>(m_ram.target()));
+	m_blitter->set_rambase (reinterpret_cast<uint16_t *>(m_ram.target()));
 	m_blitter->set_cpu_device (m_maincpu);
 	m_blitter->set_is_unsafe(machine().root_device().ioport(":BLITCFG")->read());
 	m_blitter->install_handlers( 0x18000000, 0x18000057 );
 	m_blitter->reset();
 }
 
-static MACHINE_CONFIG_START( cv1k, cv1k_state )
+static MACHINE_CONFIG_START( cv1k )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH3BE, XTAL_12_8MHz*8) // 102.4MHz
@@ -734,7 +738,7 @@ ROM_START( pinkswts )
 	ROM_RELOAD(0x200000,0x200000)
 
 	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
-	ROM_LOAD( "pinkswts_u2", 0x000000, 0x8400000, CRC(92d3243a) SHA1(e9d20c62f642fb2f62ef83ed5caeee6b3f67fef9) ) /* (2006/04/06 MASTER VER....) */
+	ROM_LOAD( "pinkswts_u2", 0x000000, 0x8400000, CRC(a2fa5363) SHA1(5be327534840871592df523ac82ee1927bd79d67) ) /* (2006/04/06 MASTER VER....) */
 
 	ROM_REGION( 0x800000, "ymz770", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP( "u23", 0x000000, 0x400000, CRC(4b82d250) SHA1(ee98dbc3f791efb6d58f3945bcb2044667ae7978) )
@@ -760,7 +764,8 @@ ROM_START( pinkswtsb )
 	ROM_RELOAD(0x200000,0x200000)
 
 	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
-	ROM_LOAD( "pnkswtsb_u2", 0x000000, 0x8400000, CRC(a5666ed9) SHA1(682e06c84990225bc6bb0c9f38b5f46c4e36b430) ) /* (2006/04/06 MASTER VER.) */
+//  ROM_LOAD( "pnkswtsb_u2", 0x000000, 0x8400000, BAD_DUMP CRC(a5666ed9) SHA1(682e06c84990225bc6bb0c9f38b5f46c4e36b430) ) /* (2006/04/06 MASTER VER.) */
+	ROM_LOAD( "pnkswtsx_u2", 0x000000, 0x8400000, CRC(91e4deb2) SHA1(893cb10d6f805df7cb4a1bb709a3ea6de147b7e9) ) // (2006/xx/xx MASTER VER.) and (2006/04/06 MASTER VER.)
 
 	ROM_REGION( 0x800000, "ymz770", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP( "u23", 0x000000, 0x400000, CRC(4b82d250) SHA1(ee98dbc3f791efb6d58f3945bcb2044667ae7978) )
@@ -773,7 +778,7 @@ ROM_START( pinkswtsx )
 	ROM_RELOAD(0x200000,0x200000)
 
 	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
-	ROM_LOAD( "pnkswtsx_u2", 0x000000, 0x8400000, CRC(91e4deb2) SHA1(893cb10d6f805df7cb4a1bb709a3ea6de147b7e9) ) // (2006/xx/xx MASTER VER.)
+	ROM_LOAD( "pnkswtsx_u2", 0x000000, 0x8400000, CRC(91e4deb2) SHA1(893cb10d6f805df7cb4a1bb709a3ea6de147b7e9) ) // (2006/xx/xx MASTER VER.) and (2006/04/06 MASTER VER.)
 
 	ROM_REGION( 0x800000, "ymz770", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP( "u23", 0x000000, 0x400000, CRC(4b82d250) SHA1(ee98dbc3f791efb6d58f3945bcb2044667ae7978) )
@@ -834,17 +839,17 @@ READ64_MEMBER( cv1k_state::speedup_r )
 	return m_ram[m_idleramoffs/8];
 }
 
-void cv1k_state::install_speedups(UINT32 idleramoff, UINT32 idlepc, bool is_typed)
+void cv1k_state::install_speedups(uint32_t idleramoff, uint32_t idlepc, bool is_typed)
 {
 	m_idleramoffs = idleramoff;
 	m_idlepc = idlepc;
 
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000000+m_idleramoffs, 0xc000000+m_idleramoffs+7, read64_delegate(FUNC(cv1k_state::speedup_r),this));
 
-	m_maincpu->add_fastram(0x00000000, 0x003fffff, TRUE,  m_rombase);
+	m_maincpu->add_fastram(0x00000000, 0x003fffff, true,  m_rombase);
 
-	m_maincpu->add_fastram(0x0c000000, 0x0c000000+m_idleramoffs-1, FALSE,  m_ram);
-	m_maincpu->add_fastram(0x0c000000+m_idleramoffs+8, is_typed ? 0x0cffffff : 0x0c7fffff, FALSE,  m_ram + ((m_idleramoffs+8)/8));
+	m_maincpu->add_fastram(0x0c000000, 0x0c000000+m_idleramoffs-1, false,  m_ram);
+	m_maincpu->add_fastram(0x0c000000+m_idleramoffs+8, is_typed ? 0x0cffffff : 0x0c7fffff, false,  m_ram + ((m_idleramoffs+8)/8));
 }
 
 

@@ -129,8 +129,12 @@ ROMs -
 
 ----------------------------------------------------------------*/
 
+#include "emu.h"
 #include "includes/psikyo4.h"
+
 #include "rendlay.h"
+#include "speaker.h"
+
 
 static GFXLAYOUT_RAW( layout_16x16x8, 16, 16, 16*8, 16*16*8 )
 
@@ -171,7 +175,7 @@ INTERRUPT_GEN_MEMBER(psikyo4_state::psikyosh_interrupt)
 
 CUSTOM_INPUT_MEMBER(psikyo4_state::mahjong_ctrl_r)/* used by hotgmck/hgkairak */
 {
-	int player = (FPTR)param;
+	int player = (uintptr_t)param;
 	int ret = 0xff;
 
 	if (m_io_select & 1) ret &= m_keys[player+0]->read();
@@ -294,8 +298,8 @@ WRITE32_MEMBER(psikyo4_state::io_select_w)
 	// YMF banking
 	if (ACCESSING_BITS_16_31)
 	{
-		UINT32 bankdata = data >> 16;
-		UINT32 bankmask = mem_mask >> 16;
+		uint32_t bankdata = data >> 16;
+		uint32_t bankmask = mem_mask >> 16;
 		for (auto & elem : m_ymf_bank)
 		{
 			if (bankmask & 0x0f)
@@ -648,7 +652,7 @@ void psikyo4_state::machine_reset()
 	m_oldbrt2 = -1;
 }
 
-static MACHINE_CONFIG_START( ps4big, psikyo4_state )
+static MACHINE_CONFIG_START( ps4big )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH2, MASTER_CLOCK/2)
@@ -909,12 +913,12 @@ ROM_START( hotdebut )
 ROM_END
 
 
-/*    YEAR  NAME      PARENT    MACHINE    INPUT     INIT              MONITOR COMPANY   FULLNAME     FLAGS */
-GAME( 1997, hotgmck,  0,        ps4big,    hotgmck,  driver_device, 0, ROT0,   "Psikyo", "Taisen Hot Gimmick (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, hgkairak, 0,        ps4big,    hotgmck,  driver_device, 0, ROT0,   "Psikyo", "Taisen Hot Gimmick Kairakuten (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, hotgmck3, 0,        ps4big,    hotgmck,  driver_device, 0, ROT0,   "Psikyo", "Taisen Hot Gimmick 3 Digital Surfing (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 2000, hotgm4ev, 0,        ps4big,    hotgmck,  driver_device, 0, ROT0,   "Psikyo", "Taisen Hot Gimmick 4 Ever (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 2001, hotgmcki, 0,        ps4big,    hotgmck,  driver_device, 0, ROT0,   "Psikyo", "Mahjong Hot Gimmick Integral (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 2000, loderndf, 0,        ps4small,  loderndf, driver_device, 0, ROT0,   "Psikyo", "Lode Runner - The Dig Fight (ver. B)", MACHINE_SUPPORTS_SAVE )
-GAME( 2000, loderndfa,loderndf, ps4small,  loderndf, driver_device, 0, ROT0,   "Psikyo", "Lode Runner - The Dig Fight (ver. A)", MACHINE_SUPPORTS_SAVE )
-GAME( 2000, hotdebut, 0,        ps4small,  hotdebut, driver_device, 0, ROT0,   "MOSS / Psikyo", "Quiz de Idol! Hot Debut (Japan)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT    MACHINE    INPUT     INIT              MONITOR COMPANY          FULLNAME                                        FLAGS
+GAME( 1997, hotgmck,  0,        ps4big,    hotgmck,  psikyo4_state, 0, ROT0,   "Psikyo",        "Taisen Hot Gimmick (Japan)",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1998, hgkairak, 0,        ps4big,    hotgmck,  psikyo4_state, 0, ROT0,   "Psikyo",        "Taisen Hot Gimmick Kairakuten (Japan)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1999, hotgmck3, 0,        ps4big,    hotgmck,  psikyo4_state, 0, ROT0,   "Psikyo",        "Taisen Hot Gimmick 3 Digital Surfing (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, hotgm4ev, 0,        ps4big,    hotgmck,  psikyo4_state, 0, ROT0,   "Psikyo",        "Taisen Hot Gimmick 4 Ever (Japan)",            MACHINE_SUPPORTS_SAVE )
+GAME( 2001, hotgmcki, 0,        ps4big,    hotgmck,  psikyo4_state, 0, ROT0,   "Psikyo",        "Mahjong Hot Gimmick Integral (Japan)",         MACHINE_SUPPORTS_SAVE )
+GAME( 2000, loderndf, 0,        ps4small,  loderndf, psikyo4_state, 0, ROT0,   "Psikyo",        "Lode Runner - The Dig Fight (ver. B)",         MACHINE_SUPPORTS_SAVE )
+GAME( 2000, loderndfa,loderndf, ps4small,  loderndf, psikyo4_state, 0, ROT0,   "Psikyo",        "Lode Runner - The Dig Fight (ver. A)",         MACHINE_SUPPORTS_SAVE )
+GAME( 2000, hotdebut, 0,        ps4small,  hotdebut, psikyo4_state, 0, ROT0,   "MOSS / Psikyo", "Quiz de Idol! Hot Debut (Japan)",              MACHINE_SUPPORTS_SAVE )

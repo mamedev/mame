@@ -25,23 +25,23 @@ public:
 		m_palette(*this, "palette") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_colorram;
-	required_shared_ptr<UINT8> m_videoram;
-	optional_shared_ptr<UINT8> m_spriteram2;
-	required_shared_ptr<UINT8> m_spriteram;
-	optional_shared_ptr<UINT8> m_scrollram;
-	optional_shared_ptr<UINT8> m_soundlatch;
+	required_shared_ptr<uint8_t> m_colorram;
+	required_shared_ptr<uint8_t> m_videoram;
+	optional_shared_ptr<uint8_t> m_spriteram2;
+	required_shared_ptr<uint8_t> m_spriteram;
+	optional_shared_ptr<uint8_t> m_scrollram;
+	optional_shared_ptr<uint8_t> m_soundlatch;
 
 	/* devices */
 	required_device<sn76489a_device> m_sn;
 
 	/* video-related */
 	tilemap_t * m_bg_tilemap;
-	UINT8       m_spritebank;
+	uint8_t       m_spritebank;
 
 	/* misc */
-	UINT8       m_interrupt_mask;
-	UINT8       m_interrupt_ticks;
+	uint8_t       m_interrupt_mask;
+	uint8_t       m_interrupt_ticks;
 	DECLARE_WRITE8_MEMBER(gberet_coin_counter_w);
 	DECLARE_WRITE8_MEMBER(mrgoemon_coin_counter_w);
 	DECLARE_WRITE8_MEMBER(gberet_flipscreen_w);
@@ -60,8 +60,8 @@ public:
 	DECLARE_MACHINE_RESET(gberet);
 	DECLARE_VIDEO_START(gberet);
 	DECLARE_PALETTE_INIT(gberet);
-	UINT32 screen_update_gberet(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_gberetb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_gberet(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_gberetb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(gberet_interrupt_tick);
 	void gberet_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void gberetb_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );

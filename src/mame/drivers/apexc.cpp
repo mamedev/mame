@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "cpu/apexc/apexc.h"
+#include "screen.h"
 
 
 class apexc_state : public driver_device
@@ -22,13 +23,13 @@ public:
 		m_palette(*this, "palette"),
 		m_screen(*this, "screen")  { }
 
-	UINT32 m_panel_data_reg;    /* value of a data register on the control panel which can
-                                be edited - the existence of this register is a personnal
-                                guess */
+	uint32_t m_panel_data_reg;    /* value of a data register on the control panel which can
+	                            be edited - the existence of this register is a personnal
+	                            guess */
 
 	std::unique_ptr<bitmap_ind16> m_bitmap;
 
-	UINT32 m_old_edit_keys;
+	uint32_t m_old_edit_keys;
 	int m_old_control_keys;
 
 	int m_letters;
@@ -37,7 +38,7 @@ public:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(apexc);
-	UINT32 screen_update_apexc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_apexc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(apexc_interrupt);
 	DECLARE_READ8_MEMBER(tape_read);
 	DECLARE_WRITE8_MEMBER(tape_write);
@@ -74,7 +75,7 @@ class apexc_cylinder_image_device : public device_t, public device_image_interfa
 {
 public:
 	// construction/destruction
-	apexc_cylinder_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	apexc_cylinder_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// image-level overrides
 	virtual iodevice_t image_type() const override { return IO_CYLINDER; }
@@ -84,32 +85,29 @@ public:
 	virtual bool is_creatable() const override { return 0; }
 	virtual bool must_be_loaded() const override { return 0; }
 	virtual bool is_reset_on_load() const override { return 1; }
-	virtual const char *image_interface() const override { return nullptr; }
 	virtual const char *file_extensions() const override { return "apc"; }
-	virtual const option_guide *create_option_guide() const override { return nullptr; }
 
-	virtual bool call_load() override;
+	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override { update_names(); }
 	virtual void device_start() override { }
 private:
 	int m_writable;
 };
 
-const device_type APEXC_CYLINDER = &device_creator<apexc_cylinder_image_device>;
+DEFINE_DEVICE_TYPE(APEXC_CYLINDER, apexc_cylinder_image_device, "apexc_cylinder_image", "APEXC Cylinder")
 
-apexc_cylinder_image_device::apexc_cylinder_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, APEXC_CYLINDER, "APEXC Cylinder", tag, owner, clock, "apexc_cylinder_image", __FILE__),
-		device_image_interface(mconfig, *this)
+apexc_cylinder_image_device::apexc_cylinder_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, APEXC_CYLINDER, tag, owner, clock)
+	, device_image_interface(mconfig, *this)
 {
 }
 
 /*
     Open cylinder image and read RAM
 */
-bool apexc_cylinder_image_device::call_load()
+image_init_result apexc_cylinder_image_device::call_load()
 {
 	/* load RAM contents */
 	m_writable = !is_readonly();
@@ -117,14 +115,14 @@ bool apexc_cylinder_image_device::call_load()
 	fread( machine().root_device().memregion("maincpu")->base(), 0x1000);
 #ifdef LSB_FIRST
 	{   /* fix endianness */
-		UINT32 *RAM = (UINT32 *)(machine().root_device().memregion("maincpu")->base());
+		uint32_t *RAM = (uint32_t *)(machine().root_device().memregion("maincpu")->base());
 
 		for (int i=0; i < 0x0400; i++)
-			RAM[i] = BIG_ENDIANIZE_INT32(RAM[i]);
+			RAM[i] = big_endianize_int32(RAM[i]);
 	}
 #endif
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 /*
@@ -138,10 +136,10 @@ void apexc_cylinder_image_device::call_unload()
 		fseek(0, SEEK_SET);
 #ifdef LSB_FIRST
 		{   /* fix endianness */
-			UINT32 *RAM = (UINT32 *)(machine().root_device().memregion("maincpu")->base());
+			uint32_t *RAM = (uint32_t *)(machine().root_device().memregion("maincpu")->base());
 
 			for (int i=0; i < /*0x2000*/0x0400; i++)
-				RAM[i] = BIG_ENDIANIZE_INT32(RAM[i]);
+				RAM[i] = big_endianize_int32(RAM[i]);
 		}
 #endif
 		/* write */
@@ -203,7 +201,7 @@ class apexc_tape_puncher_image_device : public device_t, public device_image_int
 {
 public:
 	// construction/destruction
-	apexc_tape_puncher_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	apexc_tape_puncher_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// image-level overrides
 	virtual iodevice_t image_type() const override { return IO_PUNCHTAPE; }
@@ -213,20 +211,17 @@ public:
 	virtual bool is_creatable() const override { return 1; }
 	virtual bool must_be_loaded() const override { return 0; }
 	virtual bool is_reset_on_load() const override { return 0; }
-	virtual const char *image_interface() const override { return nullptr; }
 	virtual const char *file_extensions() const override { return "tap"; }
-	virtual const option_guide *create_option_guide() const override { return nullptr; }
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override { update_names(); }
 	virtual void device_start() override { }
 };
 
-const device_type APEXC_TAPE_PUNCHER = &device_creator<apexc_tape_puncher_image_device>;
+DEFINE_DEVICE_TYPE(APEXC_TAPE_PUNCHER, apexc_tape_puncher_image_device, "apexc_tape_puncher_image", "APEXC Tape Puncher")
 
-apexc_tape_puncher_image_device::apexc_tape_puncher_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, APEXC_TAPE_PUNCHER, "APEXC Tape Puncher", tag, owner, clock, "apexc_tape_puncher_image", __FILE__),
-		device_image_interface(mconfig, *this)
+apexc_tape_puncher_image_device::apexc_tape_puncher_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, APEXC_TAPE_PUNCHER, tag, owner, clock)
+	, device_image_interface(mconfig, *this)
 {
 }
 
@@ -237,7 +232,7 @@ class apexc_tape_reader_image_device :  public device_t, public device_image_int
 {
 public:
 	// construction/destruction
-	apexc_tape_reader_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	apexc_tape_reader_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// image-level overrides
 	virtual iodevice_t image_type() const override { return IO_PUNCHTAPE; }
@@ -247,20 +242,17 @@ public:
 	virtual bool is_creatable() const override { return 0; }
 	virtual bool must_be_loaded() const override { return 0; }
 	virtual bool is_reset_on_load() const override { return 0; }
-	virtual const char *image_interface() const override { return nullptr; }
 	virtual const char *file_extensions() const override { return "tap"; }
-	virtual const option_guide *create_option_guide() const override { return nullptr; }
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override { update_names(); }
 	virtual void device_start() override { }
 };
 
-const device_type APEXC_TAPE_READER = &device_creator<apexc_tape_reader_image_device>;
+DEFINE_DEVICE_TYPE(APEXC_TAPE_READER, apexc_tape_reader_image_device, "apexc_tape_reader_image", "APEXC Tape Reader")
 
-apexc_tape_reader_image_device::apexc_tape_reader_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, APEXC_TAPE_READER, "APEXC Tape Reader", tag, owner, clock, "apexc_tape_reader_image", __FILE__),
-		device_image_interface(mconfig, *this)
+apexc_tape_reader_image_device::apexc_tape_reader_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, APEXC_TAPE_READER, tag, owner, clock)
+	, device_image_interface(mconfig, *this)
 {
 }
 
@@ -274,7 +266,7 @@ apexc_tape_reader_image_device::apexc_tape_reader_image_device(const machine_con
 READ8_MEMBER(apexc_state::tape_read)
 {
 	device_t *device = machine().device("tape_reader");
-	UINT8 reply;
+	uint8_t reply;
 	device_image_interface *image = dynamic_cast<device_image_interface *>(device);
 
 	if (image->exists() && (image->fread(& reply, 1) == 1))
@@ -286,7 +278,7 @@ READ8_MEMBER(apexc_state::tape_read)
 WRITE8_MEMBER(apexc_state::tape_write)
 {
 	device_t *device = machine().device("tape_puncher");
-	UINT8 data5 = (data & 0x1f);
+	uint8_t data5 = (data & 0x1f);
 	device_image_interface *image = dynamic_cast<device_image_interface *>(device);
 
 	if (image->exists())
@@ -408,7 +400,7 @@ INPUT_PORTS_END
 INTERRUPT_GEN_MEMBER(apexc_state::apexc_interrupt)
 {
 	address_space& space = m_maincpu->space(AS_PROGRAM);
-	UINT32 edit_keys;
+	uint32_t edit_keys;
 	int control_keys;
 
 	int control_transitions;
@@ -434,7 +426,7 @@ INTERRUPT_GEN_MEMBER(apexc_state::apexc_interrupt)
 
 	if (control_transitions & panel_run)
 	{   /* toggle run/stop state */
-		device.state().set_state_int(APEXC_STATE, ! device.state().state_int(APEXC_STATE));
+		m_maincpu->set_state_int(APEXC_STATE, ! m_maincpu->state_int(APEXC_STATE));
 	}
 
 	while (control_transitions & (panel_CR | panel_A | panel_R | panel_ML | panel_HB))
@@ -476,10 +468,10 @@ INTERRUPT_GEN_MEMBER(apexc_state::apexc_interrupt)
 			/* read/write register #reg_id */
 			if (control_keys & panel_write)
 				/* write reg */
-				device.state().set_state_int(reg_id, m_panel_data_reg);
+				m_maincpu->set_state_int(reg_id, m_panel_data_reg);
 			else
 				/* read reg */
-				m_panel_data_reg = device.state().state_int(reg_id);
+				m_panel_data_reg = m_maincpu->state_int(reg_id);
 		}
 	}
 
@@ -488,11 +480,11 @@ INTERRUPT_GEN_MEMBER(apexc_state::apexc_interrupt)
 
 		if (control_keys & panel_write) {
 			/* write memory */
-			space.write_dword(device.state().state_int(APEXC_ML_FULL)<<2, m_panel_data_reg);
+			space.write_dword(m_maincpu->pc(), m_panel_data_reg);
 		}
 		else {
 			/* read memory */
-			m_panel_data_reg = space.read_dword(device.state().state_int(APEXC_ML_FULL)<<2);
+			m_panel_data_reg = space.read_dword(m_maincpu->pc());
 		}
 	}
 
@@ -505,13 +497,13 @@ INTERRUPT_GEN_MEMBER(apexc_state::apexc_interrupt)
 
     Since the APEXC has no video display, we display the control panel.
 
-    Additionnally, We display one page of teletyper output.
+    Additionally, We display one page of teletyper output.
 */
 
 static const rgb_t apexc_palette[] =
 {
-	rgb_t::white,
-	rgb_t::black,
+	rgb_t::white(),
+	rgb_t::black(),
 	rgb_t(255, 0, 0),
 	rgb_t(50, 0, 0)
 };
@@ -602,7 +594,7 @@ void apexc_state::apexc_draw_string(bitmap_ind16 &bitmap, const char *buf, int x
 }
 
 
-UINT32 apexc_state::screen_update_apexc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t apexc_state::screen_update_apexc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i;
 	char the_char;
@@ -635,13 +627,13 @@ UINT32 apexc_state::screen_update_apexc(screen_device &screen, bitmap_ind16 &bit
 
 void apexc_state::apexc_teletyper_init()
 {
-	m_letters = FALSE;
+	m_letters = false;
 	m_pos = 0;
 }
 
 void apexc_state::apexc_teletyper_linefeed()
 {
-	UINT8 buf[teletyper_window_width];
+	uint8_t buf[teletyper_window_width];
 	int y;
 
 	for (y=teletyper_window_offset_y; y<teletyper_window_offset_y+teletyper_window_height-teletyper_scroll_step; y++)
@@ -697,12 +689,12 @@ void apexc_state::apexc_teletyper_putchar(int character)
 
 	case 27:
 		/* Figures */
-		m_letters = FALSE;
+		m_letters = false;
 		break;
 
 	case 31:
 		/* Letters */
-		m_letters = TRUE;
+		m_letters = true;
 		break;
 
 	default:
@@ -735,7 +727,7 @@ enum
 /* apexc driver init : builds a font for use by the teletyper */
 DRIVER_INIT_MEMBER(apexc_state,apexc)
 {
-	UINT8 *dst;
+	uint8_t *dst;
 
 	static const unsigned char fontdata6x8[apexcfontdata_size] =
 	{   /* ASCII characters */
@@ -866,7 +858,7 @@ static ADDRESS_MAP_START(apexc_io_map, AS_IO, 8, apexc_state )
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_START( apexc, apexc_state )
+static MACHINE_CONFIG_START( apexc )
 
 	/* basic machine hardware */
 	/* APEXC CPU @ 2.0 kHz (memory word clock frequency) */
@@ -905,6 +897,6 @@ ROM_START(apexc)
 		/* space filled with our font */
 ROM_END
 
-//     YEAR     NAME        PARENT    COMPAT  MACHINE     INPUT   INIT  COMPANY     FULLNAME */
+//     YEAR     NAME        PARENT    COMPAT  MACHINE     INPUT  STATE         INIT   COMPANY                FULLNAME */
 //COMP(  1951,    apexc53,    0,        0,      apexc53,    apexc, apexc_state,  apexc, "Andrew Donald Booth", "All Purpose Electronic X-ray Computer (as described in 1953)" , MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
 COMP(  1955,    apexc,      0,        0,      apexc,      apexc, apexc_state,  apexc, "Andrew Donald Booth", "All Purpose Electronic X-ray Computer (as described in 1957)" , MACHINE_NO_SOUND_HW)

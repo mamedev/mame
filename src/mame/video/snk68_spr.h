@@ -1,5 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail, Acho A. Tang, Nicola Salmoria
+#ifndef MAME_VIDEO_SNK68_SPR_H
+#define MAME_VIDEO_SNK68_SPR_H
+
+#pragma once
+
+#include "screen.h"
+
 typedef device_delegate<void (int&, int&, int&, int&)> snk68_tile_indirection_delegate;
 
 #define MCFG_SNK68_SPR_GFXDECODE(_gfxtag) \
@@ -13,7 +20,7 @@ typedef device_delegate<void (int&, int&, int&, int&)> snk68_tile_indirection_de
 class snk68_spr_device : public device_t
 {
 public:
-	snk68_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	snk68_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
@@ -36,11 +43,13 @@ protected:
 
 private:
 	required_device<gfxdecode_device> m_gfxdecode;
-	required_shared_ptr<UINT16> m_spriteram;
+	required_shared_ptr<uint16_t> m_spriteram;
 	required_device<screen_device> m_screen;
 	int m_flipscreen;
 	int m_partialupdates; // the original hardware needs this, the cloned hardware does not.
 };
 
 
-extern const device_type SNK68_SPR;
+DECLARE_DEVICE_TYPE(SNK68_SPR, snk68_spr_device)
+
+#endif // MAME_VIDEO_SNK68_SPR_H

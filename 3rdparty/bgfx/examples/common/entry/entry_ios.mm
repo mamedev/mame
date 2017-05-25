@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -17,7 +17,7 @@
 //#   define HAS_METAL_SDK
 #endif
 
-#include <bgfx/bgfxplatform.h>
+#include <bgfx/platform.h>
 
 #include <bx/uint32_t.h>
 #include <bx/thread.h>
@@ -312,7 +312,7 @@ static	void* m_device = NULL;
 
 	[m_window makeKeyAndVisible];
 
-	//float scaleFactor = [[UIScreen mainScreen] scale]; // should use this, but ui is too small on ipad retina
+	//float scaleFactor = [[UIScreen mainScreen] scale]; // should use this, but needs to further pass the value to the `nvgBeginFrame()` call's `devicePixelRatio` parameter in `ExampleNanoVG` class' `update()` method so it can actually work properly.
 	float scaleFactor = 1.0f;
 	[m_view setContentScaleFactor: scaleFactor ];
 

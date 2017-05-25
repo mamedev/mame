@@ -23,7 +23,7 @@
 ***************************************************************************/
 
 PALETTE_INIT_MEMBER(timelimt_state, timelimt){
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	for (i = 0;i < palette.entries();i++)
@@ -68,10 +68,10 @@ TILE_GET_INFO_MEMBER(timelimt_state::get_fg_tile_info)
 
 void timelimt_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(timelimt_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(timelimt_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,
 			8, 8, 64, 32);
 
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(timelimt_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(timelimt_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,
 			8, 8, 32, 32);
 
 	m_fg_tilemap->set_transparent_pen(0);
@@ -135,7 +135,7 @@ void timelimt_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 }
 
 
-UINT32 timelimt_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t timelimt_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->set_scrollx(0, m_scrollx);
 	m_bg_tilemap->set_scrolly(0, m_scrolly);

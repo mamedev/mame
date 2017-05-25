@@ -68,8 +68,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( fr_w );
 	DECLARE_WRITE_LINE_MEMBER( ft_w );
 
-	UINT8 m_memctrl;
-	UINT8 m_cmd;
+	uint8_t m_memctrl;
+	uint8_t m_cmd;
 };
 
 #endif

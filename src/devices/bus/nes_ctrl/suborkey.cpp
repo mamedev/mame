@@ -2,17 +2,18 @@
 // copyright-holders:Fabio Priuli
 /**********************************************************************
 
-    Nintendo Family Computer Subor Keyboard (used by some Famiclones)
+    Xiao Ba Wang/Subor Keyboard (used by most Subor machines and other keyboard Famiclones)
 
 **********************************************************************/
 
+#include "emu.h"
 #include "suborkey.h"
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type NES_SUBORKEYBOARD = &device_creator<nes_suborkey_device>;
+DEFINE_DEVICE_TYPE(NES_SUBORKEYBOARD, nes_suborkey_device, "nes_suborkey", "Subor FC Keyboard")
 
 
 static INPUT_PORTS_START( fc_suborkey )
@@ -39,10 +40,10 @@ static INPUT_PORTS_START( fc_suborkey )
 	PORT_START("SUBOR.2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_INSERT) PORT_CHAR(UCHAR_MAMEKEY(INSERT))
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("NEXT")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("NEXT") PORT_CODE(KEYCODE_PGDN) PORT_CHAR(UCHAR_MAMEKEY(PGDN))
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F8) PORT_CHAR(UCHAR_MAMEKEY(F8))
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("PRIOR")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("PRIOR") PORT_CODE(KEYCODE_PGUP) PORT_CHAR(UCHAR_MAMEKEY(PGUP))
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL) PORT_CHAR(UCHAR_MAMEKEY(DEL))
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_HOME) PORT_CHAR(UCHAR_MAMEKEY(HOME))
 
@@ -160,10 +161,12 @@ ioport_constructor nes_suborkey_device::device_input_ports() const
 //  nes_suborkey_device - constructor
 //-------------------------------------------------
 
-nes_suborkey_device::nes_suborkey_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-					device_t(mconfig, NES_SUBORKEYBOARD, "Subor FC Keyboard", tag, owner, clock, "nes_suborkey", __FILE__),
-					device_nes_control_port_interface(mconfig, *this),
-					m_kbd(*this, "SUBOR"), m_fck_scan(0), m_fck_mode(0)
+nes_suborkey_device::nes_suborkey_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, NES_SUBORKEYBOARD, tag, owner, clock)
+	, device_nes_control_port_interface(mconfig, *this)
+	, m_kbd(*this, "SUBOR.%u", 0)
+	, m_fck_scan(0)
+	, m_fck_mode(0)
 {
 }
 
@@ -194,9 +197,9 @@ void nes_suborkey_device::device_reset()
 //  read
 //-------------------------------------------------
 
-UINT8 nes_suborkey_device::read_exp(offs_t offset)
+uint8_t nes_suborkey_device::read_exp(offs_t offset)
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 	if (offset == 1)    //$4017
 	{
 		// Subor Keyboard: rows of the keyboard matrix are read 4-bits at time and returned as bit1->bit4
@@ -213,11 +216,11 @@ UINT8 nes_suborkey_device::read_exp(offs_t offset)
 //  write
 //-------------------------------------------------
 
-void nes_suborkey_device::write(UINT8 data)
+void nes_suborkey_device::write(uint8_t data)
 {
 	if (BIT(data, 2))   // keyboard active
 	{
-		UINT8 out = BIT(data, 1);   // scan
+		uint8_t out = BIT(data, 1);   // scan
 		if (m_fck_mode && !out && ++m_fck_scan > 12)
 			m_fck_scan = 0;
 

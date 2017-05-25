@@ -21,15 +21,18 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "video/hd61830.h"
-#include "machine/mm58274c.h"
-#include "rendlay.h"
-#include "sound/speaker.h"
-#include "machine/nsc810.h"
 #include "bus/rs232/rs232.h"
-#include "machine/nvram.h"
+#include "cpu/z80/z80.h"
 #include "machine/bankdev.h"
+#include "machine/mm58274c.h"
+#include "machine/nsc810.h"
+#include "machine/nvram.h"
+#include "sound/spkrdev.h"
+#include "video/hd61830.h"
+#include "rendlay.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 class hunter2_state : public driver_device
 {
@@ -67,8 +70,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(rxd_w);
 
 private:
-	UINT8 m_keydata;
-	UINT8 m_irq_mask;
+	uint8_t m_keydata;
+	uint8_t m_irq_mask;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
@@ -189,7 +192,7 @@ INPUT_PORTS_END
 
 READ8_MEMBER( hunter2_state::keyboard_r )
 {
-	UINT8 i,data = 0xff;
+	uint8_t i,data = 0xff;
 	for (i = 0; i < 7; i++)
 	{
 		if (!BIT(m_keydata, i))
@@ -204,7 +207,7 @@ READ8_MEMBER( hunter2_state::keyboard_r )
 
 READ8_MEMBER( hunter2_state::serial_dsr_r )
 {
-	UINT8 res = 0x00;
+	uint8_t res = 0x00;
 
 	if(m_rs232->dsr_r())
 		res |= 0x80;
@@ -220,7 +223,7 @@ WRITE8_MEMBER( hunter2_state::keyboard_w )
 
 READ8_MEMBER( hunter2_state::serial_rx_r )
 {
-	UINT8 res = 0x28;
+	uint8_t res = 0x28;
 
 	if(m_rs232->rxd_r())
 		res |= 0x01;
@@ -305,7 +308,7 @@ WRITE8_MEMBER( hunter2_state::memmap_w )
 	else
 	if (data >= 0x80)
 	{
-		UINT8 bank = data & 0x0f;
+		uint8_t bank = data & 0x0f;
 		m_bank1->set_bank(16 + (bank*3));
 		m_bank2->set_bank(17 + (bank*3));
 		m_bank3->set_bank(18 + (bank*3));
@@ -324,7 +327,7 @@ void hunter2_state::machine_reset()
 // it is presumed that writing to rom will go nowhere
 DRIVER_INIT_MEMBER( hunter2_state, hunter2 )
 {
-	UINT8 *ram = m_ram->base();
+	uint8_t *ram = m_ram->base();
 
 	m_nvram->set_base(ram,m_ram->bytes());
 }
@@ -362,7 +365,7 @@ WRITE_LINE_MEMBER(hunter2_state::rxd_w)
 		m_maincpu->set_input_line(NSC800_RSTB, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( hunter2, hunter2_state )
+static MACHINE_CONFIG_START( hunter2 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NSC800, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(hunter2_mem)
@@ -380,6 +383,7 @@ static MACHINE_CONFIG_START( hunter2, hunter2_state )
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(hunter2_state, hunter2)
 	MCFG_DEVICE_ADD("lcdc", HD61830, XTAL_4_9152MHz/2/2) // unknown clock
+	MCFG_VIDEO_SET_SCREEN("screen")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -438,5 +442,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT    STATE           INIT      COMPANY   FULLNAME       FLAGS */
+//    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT    STATE           INIT      COMPANY   FULLNAME   FLAGS
 COMP( 1981, hunter2, 0,      0,       hunter2,   hunter2, hunter2_state,  hunter2,  "Husky", "Hunter 2", MACHINE_NOT_WORKING )

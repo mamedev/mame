@@ -9,24 +9,28 @@
 #include "machine/serflash.h"
 
 
-ALLOW_SAVE_TYPE(flash_state_t);
+ALLOW_SAVE_TYPE(serflash_device::flash_state_t);
 
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
 
 // device type definition
-const device_type SERFLASH = &device_creator<serflash_device>;
+DEFINE_DEVICE_TYPE(SERFLASH, serflash_device, "serflash", "Serial Flash")
 
 //-------------------------------------------------
 //  serflash_device - constructor
 //-------------------------------------------------
 
-serflash_device::serflash_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, SERFLASH, "Serial Flash", tag, owner, clock, "serflash", __FILE__),
-		device_nvram_interface(mconfig, *this),
-		m_length(0), m_region(nullptr), m_flash_state(), m_flash_enab(0), m_flash_cmd_seq(0), m_flash_cmd_prev(0), m_flash_addr_seq(0), m_flash_read_seq(0), m_flash_row(0),
-	m_flash_col(0), m_flash_page_addr(0), m_flash_page_index(0), m_last_flash_cmd(0), m_flash_addr(0)
+serflash_device::serflash_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, SERFLASH, tag, owner, clock)
+	, device_nvram_interface(mconfig, *this)
+	, m_length(0)
+	, m_region(nullptr)
+	, m_flash_state()
+	, m_flash_enab(0)
+	, m_flash_cmd_seq(0), m_flash_cmd_prev(0), m_flash_addr_seq(0), m_flash_read_seq(0)
+	, m_flash_row(0), m_flash_col(0), m_flash_page_addr(0), m_flash_page_index(0), m_last_flash_cmd(0), m_flash_addr(0)
 {
 }
 
@@ -38,8 +42,8 @@ serflash_device::serflash_device(const machine_config &mconfig, const char *tag,
 
 void serflash_device::device_start()
 {
-	m_length = machine().root_device().memregion( tag() )->bytes();
-	m_region = machine().root_device().memregion( tag() )->base();
+	m_length = machine().root_device().memregion(tag())->bytes();
+	m_region = machine().root_device().memregion(tag())->base();
 
 	m_flashwritemap.resize(m_length / FLASH_PAGE_SIZE);
 	memset(&m_flashwritemap[0], 0, m_length / FLASH_PAGE_SIZE);
@@ -95,7 +99,7 @@ void serflash_device::nvram_read(emu_file &file)
 
 	if (file.is_open())
 	{
-		UINT32 page;
+		uint32_t page;
 		file.read(&page, 4);
 		while (page < size)
 		{
@@ -118,7 +122,7 @@ void serflash_device::nvram_write(emu_file &file)
 	if (m_length % FLASH_PAGE_SIZE) return; // region size must be multiple of flash page size
 	int size = m_length / FLASH_PAGE_SIZE;
 
-	UINT32 page = 0;
+	uint32_t page = 0;
 	while (page < size)
 	{
 		if (m_flashwritemap[page])
@@ -306,8 +310,8 @@ WRITE8_MEMBER( serflash_device::flash_addr_w )
 
 READ8_MEMBER( serflash_device::flash_io_r )
 {
-	UINT8 data = 0x00;
-//  UINT32 old;
+	uint8_t data = 0x00;
+//  uint32_t old;
 
 	if (!m_flash_enab)
 		return 0xff;
@@ -376,7 +380,7 @@ READ8_MEMBER(serflash_device::n3d_flash_r)
 
 	if (m_last_flash_cmd==0x00)
 	{
-		UINT8 retdat = m_flash_page_data[m_flash_page_addr];
+		uint8_t retdat = m_flash_page_data[m_flash_page_addr];
 
 		//logerror("n3d_flash_r %02x %04x\n", offset, m_flash_page_addr);
 

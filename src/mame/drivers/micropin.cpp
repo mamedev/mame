@@ -21,12 +21,17 @@ ToDo:
 
 **************************************************************************************/
 
+#include "emu.h"
 #include "machine/genpin.h"
-#include "cpu/m6800/m6800.h"
+
 #include "cpu/i8085/i8085.h"
+#include "cpu/m6800/m6800.h"
 #include "machine/6821pia.h"
 #include "sound/beep.h"
+#include "speaker.h"
+
 #include "micropin.lh"
+
 
 class micropin_state : public genpin_class
 {
@@ -52,10 +57,10 @@ public:
 	DECLARE_DRIVER_INIT(micropin);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_a);
 private:
-	UINT8 m_row;
-	UINT8 m_counter;
-	UINT8 m_beep_time;
-	UINT8 m_led_time[8];
+	uint8_t m_row;
+	uint8_t m_counter;
+	uint8_t m_beep_time;
+	uint8_t m_led_time[8];
 	virtual void machine_reset() override;
 	optional_device<m6800_cpu_device> m_v1cpu;
 	optional_device<i8085a_cpu_device> m_v2cpu;
@@ -188,7 +193,7 @@ WRITE8_MEMBER( micropin_state::p50a_w )
 	m_counter++;
 	if (m_counter == 1)
 	{
-		static const UINT8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0 }; // 7448
+		static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0 }; // 7448
 		output().set_digit_value(m_row, patterns[data&15]);
 		output().set_digit_value(m_row+20, patterns[data>>4]);
 	}
@@ -199,7 +204,7 @@ WRITE8_MEMBER( micropin_state::p50b_w )
 	m_counter++;
 	if (m_counter == 2)
 	{
-		static const UINT8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0 }; // 7448
+		static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0 }; // 7448
 		output().set_digit_value(m_row+40, patterns[data&15]);
 		output().set_digit_value(m_row+60, patterns[data>>4]);
 	}
@@ -224,7 +229,7 @@ WRITE_LINE_MEMBER( micropin_state::p50ca2_w )
 //   make the tones, and turn it off if no new commands arrive within .1 second.
 WRITE8_MEMBER( micropin_state::p51a_w )
 {
-	static UINT16 frequency[16] = { 387, 435, 488, 517, 581, 652, 691, 775, 870, 977, 1035, 1161, 1304, 1381, 1550, 1740 };
+	static uint16_t frequency[16] = { 387, 435, 488, 517, 581, 652, 691, 775, 870, 977, 1035, 1161, 1304, 1381, 1550, 1740 };
 	m_beep->set_clock(frequency[data & 15]);
 	m_beep_time = 10; // number of 10ms intervals before it is silenced
 	m_beep->set_state(1);
@@ -248,7 +253,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( micropin_state::timer_a )
 
 	// turn off round leds that aren't being refreshed
 
-	UINT8 i;
+	uint8_t i;
 	char wordnum[8];
 
 	for (i = 0; i < 8; i++)
@@ -267,7 +272,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( micropin_state::timer_a )
 
 void micropin_state::machine_reset()
 {
-	UINT8 i;
+	uint8_t i;
 	m_row = 0;
 	m_beep_time = 5;
 	for (i = 0; i < 8; i++)
@@ -278,7 +283,7 @@ DRIVER_INIT_MEMBER( micropin_state, micropin )
 {
 }
 
-static MACHINE_CONFIG_START( micropin, micropin_state )
+static MACHINE_CONFIG_START( micropin )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("v1cpu", M6800, XTAL_2MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(micropin_map)
@@ -315,7 +320,7 @@ static MACHINE_CONFIG_START( micropin, micropin_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_a", micropin_state, timer_a, attotime::from_hz(100))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( pentacup2, micropin_state )
+static MACHINE_CONFIG_START( pentacup2 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("v2cpu", I8085A, 2000000)
 	MCFG_CPU_PROGRAM_MAP(pentacup2_map)

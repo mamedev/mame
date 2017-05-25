@@ -40,14 +40,14 @@ void galspnbl_state::mix_sprite_layer(screen_device &screen, bitmap_ind16 &bitma
 {
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		UINT16 *dd = &bitmap.pix16(y);
-		UINT16 *sd2 = &m_sprite_bitmap.pix16(y);
+		uint16_t *dd = &bitmap.pix16(y);
+		uint16_t *sd2 = &m_sprite_bitmap.pix16(y);
 
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			UINT16 sprpixel = (sd2[x]);
-			//UINT16 sprpri = (sprpixel >> 8) & 3;
-			UINT16 sprpri = (sprpixel >> 9) & 1; // only upper priority bit matters on the bootleg hw?
+			uint16_t sprpixel = (sd2[x]);
+			//uint16_t sprpri = (sprpixel >> 8) & 3;
+			uint16_t sprpri = (sprpixel >> 9) & 1; // only upper priority bit matters on the bootleg hw?
 
 			sprpixel &= 0xff;
 
@@ -57,12 +57,12 @@ void galspnbl_state::mix_sprite_layer(screen_device &screen, bitmap_ind16 &bitma
 					dd[x] = sprpixel;
 			}
 
-			//  UINT16 sprbln = (sprpixel >> 10) & 1; // we handle 'blending' from the original as a simple on/off flicker in the bootleg sprite function, I don't think the bootleg hw can blend
+			//  uint16_t sprbln = (sprpixel >> 10) & 1; // we handle 'blending' from the original as a simple on/off flicker in the bootleg sprite function, I don't think the bootleg hw can blend
 		}
 	}
 }
 
-UINT32 galspnbl_state::screen_update_galspnbl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t galspnbl_state::screen_update_galspnbl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int offs;
 	m_sprite_bitmap.fill(0, cliprect);

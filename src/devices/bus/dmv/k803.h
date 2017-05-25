@@ -1,11 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco
+#ifndef MAME_BUS_DMV_K803_H
+#define MAME_BUS_DMV_K803_H
+
 #pragma once
 
-#ifndef __DMV_K803_H__
-#define __DMV_K803_H__
-
-#include "emu.h"
 #include "dmvbus.h"
 #include "machine/mm58167.h"
 
@@ -21,7 +20,7 @@ class dmv_k803_device :
 {
 public:
 	// construction/destruction
-	dmv_k803_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	dmv_k803_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;
@@ -34,8 +33,8 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual void io_read(address_space &space, int ifsel, offs_t offset, UINT8 &data) override;
-	virtual void io_write(address_space &space, int ifsel, offs_t offset, UINT8 data) override;
+	virtual void io_read(address_space &space, int ifsel, offs_t offset, uint8_t &data) override;
+	virtual void io_write(address_space &space, int ifsel, offs_t offset, uint8_t data) override;
 
 	void update_int();
 
@@ -43,12 +42,12 @@ private:
 	required_device<mm58167_device> m_rtc;
 	required_ioport m_dsw;
 	dmvcart_slot_device * m_bus;
-	UINT8   m_latch;
+	uint8_t   m_latch;
 	int     m_rtc_int;
 };
 
 
 // device type definition
-extern const device_type DMV_K803;
+DECLARE_DEVICE_TYPE(DMV_K803, dmv_k803_device)
 
-#endif  /* __DMV_K803_H__ */
+#endif // MAME_BUS_DMV_K803_H

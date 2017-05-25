@@ -1,3 +1,9 @@
+configurations {
+	Toolset {
+		key: "PlatformToolset";
+		choices: { v140, v120, v110, v100 };
+	}
+}
 nuget {
 	nuspec {
 		id = pugixml;
@@ -24,9 +30,13 @@ nuget {
 	files {
 		include: { "..\src\*.hpp" };
 		
-		[x86,release] { lib: vs2015\Win32_Release\pugixml.lib; }
-		[x86,debug] { lib: vs2015\Win32_Debug\pugixml.lib; }
-		[x64,release] { lib: vs2015\x64_Release\pugixml.lib; }
-		[x64,debug] { lib: vs2015\x64_Debug\pugixml.lib; }
+		[x86,v120,release] { lib: vs2013\x32\pugixmls.lib; }
+		[x86,v120,debug] { lib: vs2013\x32\pugixmlsd.lib; }
+		[x64,v120,release] { lib: vs2013\x64\pugixmls.lib; }
+		[x64,v120,debug] { lib: vs2013\x64\pugixmlsd.lib; }
+		[x86,v140,release] { lib: vs2015\Win32_Release\pugixml.lib; }
+		[x86,v140,debug] { lib: vs2015\Win32_Debug\pugixml.lib; }
+		[x64,v140,release] { lib: vs2015\x64_Release\pugixml.lib; }
+		[x64,v140,debug] { lib: vs2015\x64_Debug\pugixml.lib; }
 	}
 }

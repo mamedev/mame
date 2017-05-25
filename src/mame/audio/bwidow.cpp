@@ -4,10 +4,12 @@
 
 
 #include "emu.h"
+#include "includes/bwidow.h"
+
 #include "sound/pokey.h"
 #include "sound/discrete.h"
 
-#include "includes/bwidow.h"
+#include "speaker.h"
 
 
 /*************************************
@@ -146,7 +148,7 @@ static DISCRETE_SOUND_START(gravitar)
 
 DISCRETE_SOUND_END
 
-MACHINE_CONFIG_FRAGMENT( bwidow_audio )
+MACHINE_CONFIG_START( bwidow_audio )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -169,7 +171,7 @@ MACHINE_CONFIG_FRAGMENT( bwidow_audio )
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_FRAGMENT( gravitar_audio )
+MACHINE_CONFIG_START( gravitar_audio )
 	MCFG_SOUND_MODIFY("pokey1")
 	MCFG_POKEY_OUTPUT_OPAMP_LOW_PASS(BW_R51, GRAV_C34, 5.0) /* BW_C31 ignored */
 

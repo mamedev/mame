@@ -6,12 +6,13 @@
 
 */
 
+#include "emu.h"
 #include "sm500.h"
 #include "debugger.h"
 
 
 // MCU types
-const device_type SM500 = &device_creator<sm500_device>;
+DEFINE_DEVICE_TYPE(SM500, sm500_device, "sm500", "SM500")
 
 
 // internal memory maps
@@ -28,20 +29,22 @@ ADDRESS_MAP_END
 
 
 // device definitions
-sm500_device::sm500_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: sm510_base_device(mconfig, SM500, "SM500", tag, owner, clock, 1 /* stack levels */, 11 /* prg width */, ADDRESS_MAP_NAME(program_1_2k), 6 /* data width */, ADDRESS_MAP_NAME(data_4x10x4), "sm500", __FILE__)
-{ }
+sm500_device::sm500_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: sm500_device(mconfig, SM500, tag, owner, clock, 1 /* stack levels */, 11 /* prg width */, ADDRESS_MAP_NAME(program_1_2k), 6 /* data width */, ADDRESS_MAP_NAME(data_4x10x4))
+{
+}
 
-sm500_device::sm500_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source)
-	: sm510_base_device(mconfig, type, name, tag, owner, clock, stack_levels, prgwidth, program, datawidth, data, shortname, source)
-{ }
+sm500_device::sm500_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data)
+	: sm510_base_device(mconfig, type, tag, owner, clock, stack_levels, prgwidth, program, datawidth, data)
+{
+}
 
 
 // disasm
-offs_t sm500_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t sm500_device::disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options)
 {
 	extern CPU_DISASSEMBLE(sm500);
-	return CPU_DISASSEMBLE_NAME(sm500)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(sm500)(this, stream, pc, oprom, opram, options);
 }
 
 

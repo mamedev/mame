@@ -2,13 +2,13 @@
 // copyright-holders:Juergen Buchmueller
 /*****************************************************************************
  *
- *   Xerox AltoII display block
+ *   Xerox AltoII display emulation
  *
  *****************************************************************************/
 #ifdef  ALTO2_DEFINE_CONSTANTS
 
 /**
- * @brief start value for the horizontal line counter
+ * @brief Start value for the horizontal line counter.
  *
  * This value is loaded into the three 4 bit counters (type 9316)
  * with numbers 65, 67, and 75.
@@ -16,19 +16,21 @@
  * 67: A=1 B=0 C=0 D=1
  * 75: A=0 B=0 C=0 D=0
  *
- * The value is 150
+ * The value is 2+4+16+128 = 150
  */
-#define ALTO2_DISPLAY_HLC_START (2+4+16+128)
+#define A2_DISP_HLC_START (2+4+16+128)
 
 /**
- * @brief end value for the horizontal line counter
+ * @brief End value for the horizontal line counter.
  *
  * This is decoded by H30, an 8 input NAND gate.
  * The value is 1899; horz. line count range 150...1899 = 1750.
+ * So there are 1750 / 2 = 875 total scanlines.
  *
- * There are 1750 / 2 = 875 total scanlines.
+ * Note: The horizontal line counts 150 ... 1023 for the even field,
+ * and 1024 ... 1899 for the odd field.
  */
-#define ALTO2_DISPLAY_HLC_END (1+2+8+32+64+256+512+1024)
+#define A2_DISP_HLC_END (1+2+8+32+64+256+512+1024)
 
 /**
  * @brief display total height, including overscan (vertical blanking and synch)
@@ -37,7 +39,7 @@
  * scanlines to the monitor. The frame rate is 60Hz, which is actually the rate
  * of the half-frames. The rate for full frames is thus 30Hz.
  */
-#define ALTO2_DISPLAY_TOTAL_HEIGHT ((ALTO2_DISPLAY_HLC_END + 1 - ALTO2_DISPLAY_HLC_START) / 2)
+#define A2_DISP_TOTAL_HEIGHT (static_cast<double>(A2_DISP_HLC_END - A2_DISP_HLC_START) / 2)
 
 /**
  * @brief display total width, including horizontal blanking
@@ -66,20 +68,39 @@
  * as its own next address A0-A3!
  *
  */
-#define ALTO2_DISPLAY_TOTAL_WIDTH 768
+#define A2_DISP_TOTAL_WIDTH 768
 
+//! The display fifo has 16 words.
+#define A2_DISP_FIFO 16
 
-#define ALTO2_DISPLAY_FIFO 16                                                       //!< the display fifo has 16 words
-#define ALTO2_DISPLAY_SCANLINE_WORDS (ALTO2_DISPLAY_TOTAL_WIDTH/16)                 //!< words per scanline
-#define ALTO2_DISPLAY_HEIGHT 808                                                    //!< number of visible scanlines per frame; 808 really, but there are some empty lines?
-#define ALTO2_DISPLAY_WIDTH 606                                                     //!< visible width of the display; 38 x 16 bit words - 2 pixels
-#define ALTO2_DISPLAY_VISIBLE_WORDS ((ALTO2_DISPLAY_WIDTH+15)/16)                   //!< visible words per scanline
-#define ALTO2_DISPLAY_BITCLOCK 20160000ll                                           //!< display bit clock in Hertz (20.16MHz)
-#define ALTO2_DISPLAY_BITTIME(n) (U64(1000000000000)*(n)/ALTO2_DISPLAY_BITCLOCK)    //!< display bit time in pico seconds (~= 49.6031ns)
-#define ALTO2_DISPLAY_SCANLINE_TIME ALTO2_DISPLAY_BITTIME(ALTO2_DISPLAY_TOTAL_WIDTH)//!< time for a scanline in pico seconds (768 * 49.6031ns ~= 38095.1808ns)
-#define ALTO2_DISPLAY_VISIBLE_TIME ALTO2_DISPLAY_BITTIME(ALTO2_DISPLAY_WIDTH)       //!< time of the visible part of a scanline in pico seconds (606 * 49.6031ns ~= 30059.4786ns)
-#define ALTO2_DISPLAY_WORD_TIME ALTO2_DISPLAY_BITTIME(16)                           //!< time for a word in pico seconds (16 pixels * 49.6031ns ~= 793.6496ns)
-#define ALTO2_DISPLAY_VBLANK_TIME ((ALTO2_DISPLAY_TOTAL_HEIGHT-ALTO2_DISPLAY_HEIGHT)*HZ_TO_ATTOSECONDS(26250)/2)
+//! Words per scanline.
+#define A2_DISP_SCANLINE_WORDS (A2_DISP_TOTAL_WIDTH/16)
+
+//! Number of visible scanlines per frame
+#define A2_DISP_HEIGHT 808
+
+//! Visible width of the display; 38 x 16 bit words - 2 pixels.
+#define A2_DISP_WIDTH 606
+
+//! Visible words per scanline.
+#define A2_DISP_VISIBLE_WORDS ((A2_DISP_WIDTH+15)/16)
+
+//! Display bit clock in Hertz (20.16MHz).
+#define A2_DISP_BITCLOCK 20160000ll
+
+//! Display bit time in pico seconds (~= 49.6031ns).
+#define A2_DISP_BITTIME(n) DOUBLE_TO_ATTOSECONDS(static_cast<double>(n)/A2_DISP_BITCLOCK)
+
+//! Time for a scanline in pico seconds (768 * 49.6031ns ~= 38095.1808ns).
+#define A2_DISP_SCANLINE_TIME A2_DISP_BITTIME(A2_DISP_TOTAL_WIDTH)
+
+//!< Time of the visible part of a scanline in pico seconds (606 * 49.6031ns ~= 30059.4786ns).
+#define A2_DISP_VISIBLE_TIME A2_DISP_BITTIME(A2_DISP_WIDTH)
+
+//!< Time for a word in pico seconds (16 pixels * 49.6031ns ~= 793.6496ns).
+#define A2_DISP_WORD_TIME A2_DISP_BITTIME(16)
+
+#define A2_DISP_VBLANK_TIME (static_cast<double>(-A2_DISP_HEIGHT)*HZ_TO_ATTOSECONDS(26250))
 
 #else   // ALTO2_DEFINE_CONSTANTS
 /**
@@ -172,30 +193,27 @@
 #ifndef _A2DISP_H_
 #define _A2DISP_H_
 struct {
-	UINT16 state;                       //!< current state of the display_state_machine()
-	UINT16 hlc;                         //!< horizontal line counter
-	UINT16 setmode;                     //!< value written by last SETMODE<-
-	UINT16 inverse;                     //!< set to 0xffff if line is inverse, 0x0000 otherwise
-	bool halfclock;                     //!< set 0 for normal pixel clock, 1 for half pixel clock
-	UINT16 fifo[ALTO2_DISPLAY_FIFO];    //!< display word fifo
-	UINT8 wa;                           //!< fifo input pointer (write address; 4-bit)
-	UINT8 ra;                           //!< fifo output pointer (read address; 4-bit)
-	UINT8 a63;                          //!< most recent value read from the PROM a63
-	UINT8 a66;                          //!< most recent value read from the PROM a66
-	bool dht_blocks;                    //!< set non-zero, if the DHT executed BLOCK
-	bool dwt_blocks;                    //!< set non-zero, if the DWT executed BLOCK
-	bool curt_blocks;                   //!< set non-zero, if the CURT executed BLOCK
-	bool curt_wakeup;                   //!< set non-zero, if CURT wakeups are generated
-	UINT16 vblank;                      //!< most recent HLC with VBLANK still high (11-bit)
-	UINT16 xpreg;                       //!< cursor cursor x position register (10-bit)
-	UINT16 csr;                         //!< cursor shift register (16-bit)
-	UINT32 curxpos;                     //!< helper: first cursor word in scanline
-	UINT16 cursor0;                     //!< helper: shifted cursor data for left word
-	UINT16 cursor1;                     //!< helper: shifted cursor data for right word
-	std::unique_ptr<UINT16[]> raw_bitmap;                 //!< array of words of the raw bitmap that is displayed
-	UINT8 **scanline;                   //!< array of scanlines with 1 byte per pixel
-	std::unique_ptr<bitmap_ind16> bitmap;               //!< MAME bitmap with 16 bit indices
-	bool odd_frame;                     //!< true, if odd frame is drawn
+	uint32_t state;                           //!< current state of the display_state_machine()
+	uint32_t hlc;                             //!< horizontal line counter
+	uint32_t setmode;                         //!< value written by last SETMODE<-
+	uint32_t inverse;                         //!< set to 0xffff if line is inverse, 0x0000 otherwise
+	uint32_t scanline;                        //!< current scanline
+	bool halfclock;                         //!< false for normal pixel clock, true for half pixel clock
+	bool vblank;                            //!< true during vblank, false otherwise
+	uint16_t fifo[A2_DISP_FIFO];              //!< display word fifo
+	uint32_t wa;                              //!< fifo input pointer (write address; 4-bit)
+	uint32_t ra;                              //!< fifo output pointer (read address; 4-bit)
+	uint32_t a63;                             //!< most recent value read from the PROM a63
+	uint32_t a66;                             //!< most recent value read from the PROM a66
+	bool dht_blocks;                        //!< set true, if the DHT executed BLOCK
+	bool dwt_blocks;                        //!< set true, if the DWT executed BLOCK
+	bool curt_blocks;                       //!< set true, if the CURT executed BLOCK
+	bool curt_wakeup;                       //!< set true, if CURT wakeups are generated
+	uint32_t xpreg;                           //!< cursor cursor x position register (10-bit)
+	uint32_t csr;                             //!< cursor shift register (16-bit)
+	std::unique_ptr<uint16_t[]> framebuf;     //!< array of words of the raw bitmap that is displayed
+	uint8_t *patterns;                        //!< array of 65536 patterns (16 bytes) with 1 byte per pixel
+	std::unique_ptr<bitmap_ind16> bitmap;   //!< MAME bitmap with 16 bit indices
 }   m_dsp;
 
 /**
@@ -220,7 +238,7 @@ struct {
  *  O3 (010) = MBEMPTY'
  * </PRE>
  */
-UINT8* m_disp_a38;
+uint8_t* m_disp_a38;
 
 //! output bits of PROM A38
 enum {
@@ -252,10 +270,10 @@ enum {
  * H[1]' -      4
  *
  * The display_state_machine() is called by the CPU at a rate of pixelclock/24,
- * which happens to be very close to every 7th CPU micrcocycle.
+ * which happens to be very close to every 7th CPU microcycle.
  * </PRE>
  */
-UINT8* m_disp_a63;
+uint8_t* m_disp_a63;
 
 enum {
 	disp_a63_HBLANK     = (1 << 0),         //!< PROM a63 B0 is latched as HBLANK signal
@@ -275,7 +293,7 @@ enum {
  * Address lines are driven by H[1] to H[128] of the horz. line counters.
  * The PROM is enabled whenever H[256] and H[512] are both 0.
  */
-UINT8* m_disp_a66;
+uint8_t* m_disp_a66;
 
 enum {
 	disp_a66_VSYNC_ODD      = (1 << 0),     //!< Q1 (001) is VSYNC for the odd field (with H1024=1)
@@ -284,18 +302,15 @@ enum {
 	disp_a66_VBLANK_EVEN    = (1 << 3)      //!< Q4 (010) is VBLANK for the even field (with H1024=0)
 };
 
-void update_bitmap_word(UINT16* bitmap, int x, int y, UINT16 word); //!< update a word in the screen bitmap
+void update_framebuf_word(uint16_t* framebuf, int x, int y, uint16_t word);
 void unload_word();                 //!< unload the next word from the display FIFO and shift it to the screen
-void display_state_machine();       //!< function called by the CPU to enter the next display state
+void display_state_machine();       //!< function called by the CPU execution loop to enter the next display state
 
 void f2_late_evenfield(void);       //!< branch on the evenfield flip-flop
 
 void init_disp();                   //!< initialize the display context
 void exit_disp();                   //!< deinitialize the display context
 void reset_disp();                  //!< reset the display context
-
-void fake_status_putch(int x, UINT8 ch);
-void fake_status_printf(int x, const char* format, ...);
 
 #endif  // _A2DISP_H_
 #endif  // ALTO2_DEFINE_CONSTANTS

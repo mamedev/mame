@@ -10,7 +10,7 @@ import sys
 
 files_included = ['src/emu/emu.h']
 
-include_dirs = ['src/emu/', 'src/devices/', 'src/mame/']
+include_dirs = ['src/emu/', 'src/devices/', 'src/mame/', 'src/lib/']
 
 mappings = dict()
 
@@ -201,6 +201,7 @@ parse_lua_file(root +'scripts/src/cpu.lua')
 parse_lua_file(root +'scripts/src/machine.lua')
 parse_lua_file(root +'scripts/src/sound.lua')
 parse_lua_file(root +'scripts/src/video.lua')
+parse_lua_file(root +'scripts/src/formats.lua')
 
 for filename in sys.argv[2].rsplit(',') :
     deps_files_included.append(filename.replace('\\','/'))

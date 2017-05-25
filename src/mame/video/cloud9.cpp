@@ -22,7 +22,7 @@ void cloud9_state::video_start()
 	static const int resistances[3] = { 22000, 10000, 4700 };
 
 	/* allocate second bank of videoram */
-	m_videoram = std::make_unique<UINT8[]>(0x8000);
+	m_videoram = std::make_unique<uint8_t[]>(0x8000);
 	membank("bank1")->set_base(m_videoram.get());
 
 	/* get pointers to our PROMs */
@@ -107,12 +107,12 @@ WRITE8_MEMBER(cloud9_state::cloud9_paletteram_w)
  *
  *************************************/
 
-inline void cloud9_state::cloud9_write_vram( UINT16 addr, UINT8 data, UINT8 bitmd, UINT8 pixba )
+inline void cloud9_state::cloud9_write_vram( uint16_t addr, uint8_t data, uint8_t bitmd, uint8_t pixba )
 {
-	UINT8 *dest = &m_videoram[0x0000 | (addr & 0x3fff)];
-	UINT8 *dest2 = &m_videoram[0x4000 | (addr & 0x3fff)];
-	UINT8 promaddr = 0;
-	UINT8 wpbits;
+	uint8_t *dest = &m_videoram[0x0000 | (addr & 0x3fff)];
+	uint8_t *dest2 = &m_videoram[0x4000 | (addr & 0x3fff)];
+	uint8_t promaddr = 0;
+	uint8_t wpbits;
 
 	/*
 	    Inputs to the write-protect PROM:
@@ -192,10 +192,10 @@ WRITE8_MEMBER(cloud9_state::cloud9_videoram_w)
 READ8_MEMBER(cloud9_state::cloud9_bitmode_r)
 {
 	/* in bitmode, the address comes from the autoincrement latches */
-	UINT16 addr = (m_bitmode_addr[1] << 6) | (m_bitmode_addr[0] >> 2);
+	uint16_t addr = (m_bitmode_addr[1] << 6) | (m_bitmode_addr[0] >> 2);
 
 	/* the appropriate pixel is selected into the upper 4 bits */
-	UINT8 result = m_videoram[((~m_bitmode_addr[0] & 2) << 13) | addr] << ((m_bitmode_addr[0] & 1) * 4);
+	uint8_t result = m_videoram[((~m_bitmode_addr[0] & 2) << 13) | addr] << ((m_bitmode_addr[0] & 1) * 4);
 
 	/* autoincrement because /BITMD was selected */
 	bitmode_autoinc();
@@ -208,7 +208,7 @@ READ8_MEMBER(cloud9_state::cloud9_bitmode_r)
 WRITE8_MEMBER(cloud9_state::cloud9_bitmode_w)
 {
 	/* in bitmode, the address comes from the autoincrement latches */
-	UINT16 addr = (m_bitmode_addr[1] << 6) | (m_bitmode_addr[0] >> 2);
+	uint16_t addr = (m_bitmode_addr[1] << 6) | (m_bitmode_addr[0] >> 2);
 
 	/* the lower 4 bits of data are replicated to the upper 4 bits */
 	data = (data & 0x0f) | (data << 4);
@@ -236,9 +236,9 @@ WRITE8_MEMBER(cloud9_state::cloud9_bitmode_addr_w)
  *
  *************************************/
 
-UINT32 cloud9_state::screen_update_cloud9(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t cloud9_state::screen_update_cloud9(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *spriteaddr = m_spriteram;
+	uint8_t *spriteaddr = m_spriteram;
 	int flip = m_video_control[5] ? 0xff : 0x00;    /* PLAYER2 */
 	pen_t black = m_palette->black_pen();
 	int x, y, offs;
@@ -263,7 +263,7 @@ UINT32 cloud9_state::screen_update_cloud9(screen_device &screen, bitmap_ind16 &b
 	/* draw the bitmap to the screen, looping over Y */
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		UINT16 *dst = &bitmap.pix16(y);
+		uint16_t *dst = &bitmap.pix16(y);
 
 		/* if we're in the VBLANK region, just fill with black */
 		if (~m_syncprom[y] & 2)
@@ -275,9 +275,9 @@ UINT32 cloud9_state::screen_update_cloud9(screen_device &screen, bitmap_ind16 &b
 		/* non-VBLANK region: merge the sprites and the bitmap */
 		else
 		{
-			UINT16 *mosrc = &m_spritebitmap.pix16(y);
+			uint16_t *mosrc = &m_spritebitmap.pix16(y);
 			int effy = y ^ flip;
-			UINT8 *src[2];
+			uint8_t *src[2];
 
 			/* two videoram arrays */
 			src[0] = &m_videoram[0x4000 | (effy * 64)];
@@ -296,8 +296,8 @@ UINT32 cloud9_state::screen_update_cloud9(screen_device &screen, bitmap_ind16 &b
 					int effx = x ^ flip;
 
 					/* low 4 bits = left pixel, high 4 bits = right pixel */
-					UINT8 pix = (src[(effx >> 1) & 1][effx / 4] >> ((~effx & 1) * 4)) & 0x0f;
-					UINT8 mopix = mosrc[x];
+					uint8_t pix = (src[(effx >> 1) & 1][effx / 4] >> ((~effx & 1) * 4)) & 0x0f;
+					uint8_t mopix = mosrc[x];
 
 					/* sprites have priority if sprite pixel != 0 or some other condition */
 					if (mopix != 0)

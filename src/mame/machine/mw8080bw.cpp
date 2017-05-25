@@ -16,10 +16,10 @@
  *
  *************************************/
 
-UINT8 mw8080bw_state::vpos_to_vysnc_chain_counter( int vpos )
+uint8_t mw8080bw_state::vpos_to_vysnc_chain_counter( int vpos )
 {
 	/* convert from a vertical position to the actual values on the vertical sync counters */
-	UINT8 counter;
+	uint8_t counter;
 	int vblank = (vpos >= MW8080BW_VBSTART);
 
 	if (vblank)
@@ -31,7 +31,7 @@ UINT8 mw8080bw_state::vpos_to_vysnc_chain_counter( int vpos )
 }
 
 
-int mw8080bw_state::vysnc_chain_counter_to_vpos( UINT8 counter, int vblank )
+int mw8080bw_state::vysnc_chain_counter_to_vpos( uint8_t counter, int vblank )
 {
 	/* convert from the vertical sync counters to an actual vertical position */
 	int vpos;
@@ -47,14 +47,14 @@ int mw8080bw_state::vysnc_chain_counter_to_vpos( UINT8 counter, int vblank )
 
 TIMER_CALLBACK_MEMBER(mw8080bw_state::mw8080bw_interrupt_callback)
 {
-	UINT8 next_counter;
+	uint8_t next_counter;
 	int next_vpos;
 	int next_vblank;
 
 	/* compute vector and set the interrupt line */
 	int vpos = m_screen->vpos();
-	UINT8 counter = vpos_to_vysnc_chain_counter(vpos);
-	UINT8 vector = 0xc7 | ((counter & 0x40) >> 2) | ((~counter & 0x40) >> 3);
+	uint8_t counter = vpos_to_vysnc_chain_counter(vpos);
+	uint8_t vector = 0xc7 | ((counter & 0x40) >> 2) | ((~counter & 0x40) >> 3);
 	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, vector);
 
 	/* set up for next interrupt */

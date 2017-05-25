@@ -26,19 +26,19 @@ public:
 		m_soundlatch(*this, "soundlatch") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_bg1videoram;
-	required_shared_ptr<UINT8> m_bg2videoram;
-	required_shared_ptr<UINT8> m_fgvideoram;
-	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<uint8_t> m_bg1videoram;
+	required_shared_ptr<uint8_t> m_bg2videoram;
+	required_shared_ptr<uint8_t> m_fgvideoram;
+	required_shared_ptr<uint8_t> m_spriteram;
 
 	/* video-related */
 	tilemap_t       *m_fg_tilemap;
 	tilemap_t       *m_bg1_tilemap;
 	tilemap_t       *m_bg2_tilemap;
-	UINT8         m_scroll1_x[2];
-	UINT8         m_scroll1_y[2];
-	UINT8         m_scroll2_x[2];
-	UINT8         m_scroll2_y[2];
+	uint8_t         m_scroll1_x[2];
+	uint8_t         m_scroll1_y[2];
+	uint8_t         m_scroll2_x[2];
+	uint8_t         m_scroll2_y[2];
 
 	/* misc */
 	int           m_sound_irq_enable;
@@ -85,9 +85,9 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(firetrap);
-	UINT32 screen_update_firetrap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_firetrap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(firetrap_irq);
-	inline void get_bg_tile_info(tile_data &tileinfo, int tile_index, UINT8 *bgvideoram, int gfx_region);
+	inline void get_bg_tile_info(tile_data &tileinfo, int tile_index, uint8_t *bgvideoram, int gfx_region);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	DECLARE_WRITE_LINE_MEMBER(firetrap_adpcm_int);
 };

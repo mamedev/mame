@@ -6,10 +6,11 @@
 
 ****************************************************************************/
 
-#ifndef swtpc09_H_
-#define swtpc09_H_
+#ifndef MAME_INCLUDES_SWTPC09_H
+#define MAME_INCLUDES_SWTPC09_H
 
-#include "emu.h"
+#pragma once
+
 #include "cpu/m6809/m6809.h"
 #include "video/generic.h"
 #include "machine/wd_fdc.h"
@@ -30,44 +31,30 @@ class swtpc09_state : public driver_device
 {
 public:
 	swtpc09_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_pia(*this, "pia"),
-	m_ptm(*this, "ptm"),
-	m_acia(*this, "acia"),
-	m_fdc(*this, "fdc"),
-	m_floppy0(*this, "fdc:0"),
-	m_floppy1(*this, "fdc:1"),
-	m_floppy2(*this, "fdc:2"),
-	m_floppy3(*this, "fdc:3"),
-	m_via(*this, "via"),
-	m_piaide(*this, "piaide"),
-	m_harddisk(*this, "harddisk"),
-	m_ide(*this, "ide")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_pia(*this, "pia")
+		, m_ptm(*this, "ptm")
+		, m_acia(*this, "acia")
+		, m_fdc(*this, "fdc")
+		, m_floppy0(*this, "fdc:0")
+		, m_floppy1(*this, "fdc:1")
+		, m_floppy2(*this, "fdc:2")
+		, m_floppy3(*this, "fdc:3")
+		, m_via(*this, "via")
+		, m_piaide(*this, "piaide")
+		, m_harddisk(*this, "harddisk")
+		, m_ide(*this, "ide")
 	{ }
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
-
-	required_device<cpu_device> m_maincpu;
-	required_device<pia6821_device> m_pia;
-	required_device<ptm6840_device> m_ptm;
-	required_device<acia6850_device> m_acia;
-	required_device<fd1793_t> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
-	required_device<floppy_connector> m_floppy2;
-	required_device<floppy_connector> m_floppy3;
-	optional_device<via6522_device> m_via;
-	optional_device<pia6821_device> m_piaide;
-	optional_device<device_t> m_harddisk;
-	optional_device<ide_controller_device> m_ide;
 
 	DECLARE_READ8_MEMBER(pia0_a_r);
 	DECLARE_READ8_MEMBER(pia0_ca1_r);
 	DECLARE_WRITE_LINE_MEMBER( pia0_irq_a );
 
-	DECLARE_WRITE8_MEMBER( ptm_o1_callback );
-	DECLARE_WRITE8_MEMBER( ptm_o3_callback );
+	DECLARE_WRITE_LINE_MEMBER( ptm_o1_callback );
+	DECLARE_WRITE_LINE_MEMBER( ptm_o3_callback );
 	DECLARE_WRITE_LINE_MEMBER( ptm_irq );
 
 	DECLARE_WRITE_LINE_MEMBER( acia_interrupt );
@@ -105,43 +92,57 @@ public:
 	DECLARE_DRIVER_INIT( swtpc09u );
 	DECLARE_DRIVER_INIT( swtpc09d3 );
 
+	DECLARE_READ8_MEMBER ( m6844_r );
+	DECLARE_WRITE8_MEMBER ( m6844_w );
+
+protected:
 	void swtpc09_fdc_dma_transfer();
-	void swtpc09_irq_handler(UINT8 peripheral, UINT8 state);
+	void swtpc09_irq_handler(uint8_t peripheral, uint8_t state);
 
-	UINT8 m_term_data;               // terminal keyboard value
-	UINT8 m_pia_counter;             // this is the counter on pia porta
-	UINT8 m_fdc_dma_address_reg;     // dmf2 or dmf3 dma extended address reg
-	UINT8 m_system_type;             // flag to indicate hw and rom combination
-	UINT8 m_fdc_status;              // for floppy controller
-	UINT8 m_via_ca1_input;           // dmf3 fdc interupt is connected here
-	UINT8 m_dmf3_via_porta;
-	UINT8 m_piaide_porta;
-	UINT8 m_piaide_portb;
-	UINT8 m_active_interrupt;
-	UINT8 m_interrupt;
+	required_device<cpu_device> m_maincpu;
+	required_device<pia6821_device> m_pia;
+	required_device<ptm6840_device> m_ptm;
+	required_device<acia6850_device> m_acia;
+	required_device<fd1793_device> m_fdc;
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
+	required_device<floppy_connector> m_floppy2;
+	required_device<floppy_connector> m_floppy3;
+	optional_device<via6522_device> m_via;
+	optional_device<pia6821_device> m_piaide;
+	optional_device<device_t> m_harddisk;
+	optional_device<ide_controller_device> m_ide;
 
+	uint8_t m_term_data;               // terminal keyboard value
+	uint8_t m_pia_counter;             // this is the counter on pia porta
+	uint8_t m_fdc_dma_address_reg;     // dmf2 or dmf3 dma extended address reg
+	uint8_t m_system_type;             // flag to indicate hw and rom combination
+	uint8_t m_fdc_status;              // for floppy controller
+	uint8_t m_via_ca1_input;           // dmf3 fdc interrupt is connected here
+	uint8_t m_dmf3_via_porta;
+	uint8_t m_piaide_porta;
+	uint8_t m_piaide_portb;
+	uint8_t m_active_interrupt;
+	uint8_t m_interrupt;
 
 	// TODO: move this in proper device
 
 	/* channel_data structure holds info about each 6844 DMA channel */
-	typedef struct m6844_channel_data
+	struct m6844_channel_data
 	{
 		int active;
 		int address;
 		int counter;
-		UINT8 control;
+		uint8_t control;
 		int start_address;
 		int start_counter;
-	} m6844_channel_data;
+	};
 
 	/* 6844 description */
 	m6844_channel_data m_m6844_channel[4];
-	UINT8 m_m6844_priority;
-	UINT8 m_m6844_interrupt;
-	UINT8 m_m6844_chain;
-	DECLARE_READ8_MEMBER ( m6844_r );
-	DECLARE_WRITE8_MEMBER ( m6844_w );
-
+	uint8_t m_m6844_priority;
+	uint8_t m_m6844_interrupt;
+	uint8_t m_m6844_chain;
 };
 
-#endif /* swtpc09_H_ */
+#endif // MAME_INCLUDES_SWTPC09_H

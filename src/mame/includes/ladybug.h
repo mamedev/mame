@@ -24,26 +24,26 @@ public:
 		m_decrypted_opcodes(*this, "decrypted_opcodes") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_videoram;
-	optional_shared_ptr<UINT8> m_colorram;
-	required_shared_ptr<UINT8> m_spriteram;
-	optional_shared_ptr<UINT8> m_grid_data;
+	required_shared_ptr<uint8_t> m_videoram;
+	optional_shared_ptr<uint8_t> m_colorram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	optional_shared_ptr<uint8_t> m_grid_data;
 
 	/* video-related */
 	tilemap_t    *m_bg_tilemap;
 	tilemap_t    *m_grid_tilemap;   // ladybug
-	UINT8      m_grid_color;
+	uint8_t      m_grid_color;
 	int        m_star_speed;
-	UINT8      m_stars_enable;
-	UINT8      m_stars_speed;
-	UINT32     m_stars_state;
-	UINT16     m_stars_offset;
-	UINT8      m_stars_count;
+	uint8_t      m_stars_enable;
+	uint8_t      m_stars_speed;
+	uint32_t     m_stars_state;
+	uint16_t     m_stars_offset;
+	uint8_t      m_stars_count;
 
 	/* misc */
-	UINT8      m_sound_low;
-	UINT8      m_sound_high;
-	UINT8      m_weird_value[8];
+	uint8_t      m_sound_low;
+	uint8_t      m_sound_high;
+	uint8_t      m_weird_value[8];
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -52,7 +52,7 @@ public:
 	optional_ioport m_port_dsw0;
 	optional_ioport m_p1_control;
 	optional_ioport m_p2_control;
-	optional_shared_ptr<UINT8> m_decrypted_opcodes;
+	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 
 	DECLARE_WRITE8_MEMBER(ladybug_videoram_w);
 	DECLARE_WRITE8_MEMBER(ladybug_colorram_w);
@@ -67,9 +67,9 @@ public:
 	DECLARE_MACHINE_START(ladybug);
 	DECLARE_VIDEO_START(ladybug);
 	DECLARE_PALETTE_INIT(ladybug);
-	UINT32 screen_update_ladybug(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_ladybug(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void palette_init_common( palette_device &palette, const UINT8 *color_prom,
+	void palette_init_common( palette_device &palette, const uint8_t *color_prom,
 								int r_bit0, int r_bit1, int g_bit0, int g_bit1, int b_bit0, int b_bit1 );
 
 };

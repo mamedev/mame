@@ -6,6 +6,7 @@
 //
 //============================================================
 
+#include "emu.h"
 #include "debug_module.h"
 #include "modules/osdmodule.h"
 
@@ -21,7 +22,6 @@
 #include "win/pointswininfo.h"
 #include "win/uimetrics.h"
 
-#include "emu.h"
 #include "debugger.h"
 #include "debug/debugcpu.h"
 
@@ -30,7 +30,7 @@
 #include "../input/input_windows.h"
 
 
-class debugger_windows : public osd_module, public debug_module, public debugger_windows_interface
+class debugger_windows : public osd_module, public debug_module, protected debugger_windows_interface
 {
 public:
 	debugger_windows() :
@@ -154,7 +154,7 @@ void debugger_windows::wait_for_debugger(device_t &device, bool firststop)
 void debugger_windows::debugger_update()
 {
 	// if we're running live, do some checks
-	if (!winwindow_has_focus() && m_machine && !m_machine->debugger().cpu().is_stopped() && (m_machine->phase() == MACHINE_PHASE_RUNNING))
+	if (!winwindow_has_focus() && m_machine && !m_machine->debugger().cpu().is_stopped() && (m_machine->phase() == machine_phase::RUNNING))
 	{
 		// see if the interrupt key is pressed and break if it is
 		if (seq_pressed())
@@ -241,7 +241,7 @@ void debugger_windows::show_all()
 
 void debugger_windows::hide_all()
 {
-	SetForegroundWindow(osd_common_t::s_window_list.front()->platform_window<HWND>());
+	SetForegroundWindow(std::static_pointer_cast<win_window_info>(osd_common_t::s_window_list.front())->platform_window());
 	for (auto &info : m_window_list)
 		info->hide();
 }
@@ -250,7 +250,7 @@ void debugger_windows::hide_all()
 template <typename T> T *debugger_windows::create_window()
 {
 	// allocate memory
-	std::unique_ptr<T> info = std::make_unique<T>(*this);
+	std::unique_ptr<T> info = std::make_unique<T>(static_cast<debugger_windows_interface &>(*this));
 	if (info->is_valid())
 	{
 		m_window_list.push_back(std::move(info));

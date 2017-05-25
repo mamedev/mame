@@ -42,7 +42,7 @@ public:
 
 	DECLARE_READ8_MEMBER(keyboard_r);
 	DECLARE_WRITE8_MEMBER(hex_display_w);
-	UINT8 convert_key(UINT8 data);
+	uint8_t convert_key(uint8_t data);
 
 protected:
 	required_device<cpu_device> m_maincpu;
@@ -58,9 +58,9 @@ WRITE8_MEMBER(elekscmp_state::hex_display_w)
 	output().set_digit_value(offset, data);
 }
 
-UINT8 elekscmp_state::convert_key(UINT8 data)
+uint8_t elekscmp_state::convert_key(uint8_t data)
 {
-	UINT8 i;
+	uint8_t i;
 	for (i = 0; i < 8; i++)
 		if (BIT(data, i))
 			return i;
@@ -70,7 +70,7 @@ UINT8 elekscmp_state::convert_key(UINT8 data)
 
 READ8_MEMBER(elekscmp_state::keyboard_r)
 {
-	UINT8 data;
+	uint8_t data;
 
 	data = m_x0->read();
 
@@ -141,7 +141,7 @@ static INPUT_PORTS_START( elekscmp )
 	PORT_BIT(0xfe, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( elekscmp, elekscmp_state )
+static MACHINE_CONFIG_START( elekscmp )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",INS8060, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(elekscmp_mem)
@@ -161,5 +161,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1977, elekscmp,  0,   0,       elekscmp,  elekscmp, driver_device,  0,  "Elektor Electronics", "Elektor SC/MP", MACHINE_NO_SOUND_HW)
+/*    YEAR  NAME       PARENT  COMPAT   MACHINE    INPUT     STATE            INIT  COMPANY                FULLNAME         FLAGS */
+COMP( 1977, elekscmp,  0,      0,       elekscmp,  elekscmp, elekscmp_state,  0,    "Elektor Electronics", "Elektor SC/MP", MACHINE_NO_SOUND_HW)

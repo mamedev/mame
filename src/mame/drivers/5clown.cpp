@@ -441,16 +441,18 @@
 
 *******************************************************************************/
 
-
-#define MASTER_CLOCK    XTAL_10MHz
-
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
-#include "video/mc6845.h"
 #include "machine/6821pia.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "sound/okim6295.h"
+#include "video/mc6845.h"
+#include "screen.h"
+#include "speaker.h"
+
+
+#define MASTER_CLOCK    XTAL_10MHz
 
 
 class _5clown_state : public driver_device
@@ -474,13 +476,13 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
 
-	UINT8 m_main_latch_d800;
-	UINT8 m_snd_latch_0800;
-	UINT8 m_snd_latch_0a02;
-	UINT8 m_ay8910_addr;
+	uint8_t m_main_latch_d800;
+	uint8_t m_snd_latch_0800;
+	uint8_t m_snd_latch_0a02;
+	uint8_t m_ay8910_addr;
 	tilemap_t *m_bg_tilemap;
 	int m_mux_data;
 
@@ -503,7 +505,7 @@ public:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(_5clown);
-	UINT32 screen_update_fclown(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_fclown(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 void _5clown_state::machine_start()
@@ -558,11 +560,11 @@ TILE_GET_INFO_MEMBER(_5clown_state::get_fclown_tile_info)
 
 void _5clown_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(_5clown_state::get_fclown_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(_5clown_state::get_fclown_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 
-UINT32 _5clown_state::screen_update_fclown(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t _5clown_state::screen_update_fclown(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -570,7 +572,7 @@ UINT32 _5clown_state::screen_update_fclown(screen_device &screen, bitmap_ind16 &
 
 PALETTE_INIT_MEMBER(_5clown_state, _5clown)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 /*
     7654 3210
     ---- ---x   RED component.
@@ -874,7 +876,7 @@ static INPUT_PORTS_START( fclown )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN0-3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE )    PORT_NAME("Setting") PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE )    PORT_NAME("Setting")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )      PORT_IMPULSE(3) PORT_NAME("Coin In")
@@ -1012,7 +1014,7 @@ GFXDECODE_END
 *    Machine Drivers     *
 *************************/
 
-static MACHINE_CONFIG_START( fclown, _5clown_state )
+static MACHINE_CONFIG_START( fclown )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK/8)  /* guess, seems ok */
@@ -1058,7 +1060,7 @@ static MACHINE_CONFIG_START( fclown, _5clown_state )
 	MCFG_SOUND_ADD("ay8910", AY8910, MASTER_CLOCK/8)        /* guess, seems ok */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_OKIM6295_ADD("oki6295", MASTER_CLOCK/12, OKIM6295_PIN7_LOW)    /* guess, seems ok; pin7 guessed, seems ok */
+	MCFG_OKIM6295_ADD("oki6295", MASTER_CLOCK/12, PIN7_LOW)    /* guess, seems ok; pin7 guessed, seems ok */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.20)
 
 MACHINE_CONFIG_END
@@ -1171,7 +1173,7 @@ DRIVER_INIT_MEMBER(_5clown_state,fclown)
 	/* Decrypting main program */
 
 	int x;
-	UINT8 *src = memregion( "maincpu" )->base();
+	uint8_t *src = memregion( "maincpu" )->base();
 
 	for (x = 0x0000; x < 0x10000; x++)
 	{
@@ -1181,8 +1183,8 @@ DRIVER_INIT_MEMBER(_5clown_state,fclown)
 
 	/* Decrypting GFX by segments */
 
-	UINT8 *gfx1_src = memregion( "gfx1" )->base();
-	UINT8 *gfx2_src = memregion( "gfx2" )->base();
+	uint8_t *gfx1_src = memregion( "gfx1" )->base();
+	uint8_t *gfx2_src = memregion( "gfx2" )->base();
 
 	for (x = 0x2000; x < 0x3000; x++)
 	{
@@ -1202,7 +1204,7 @@ DRIVER_INIT_MEMBER(_5clown_state,fclown)
 
 	/* Decrypting sound samples */
 
-	UINT8 *samples_src = memregion( "oki6295" )->base();
+	uint8_t *samples_src = memregion( "oki6295" )->base();
 
 	for (x = 0x0000; x < 0x10000; x++)
 	{
@@ -1223,7 +1225,7 @@ DRIVER_INIT_MEMBER(_5clown_state,fclown)
 *      Game Drivers      *
 *************************/
 
-/*    YEAR  NAME      PARENT  MACHINE INPUT   INIT    ROT    COMPANY  FULLNAME                      FLAGS... */
+//    YEAR  NAME      PARENT  MACHINE INPUT   STATE          INIT    ROT   COMPANY  FULLNAME                       FLAGS...
 GAME( 1993, 5clown,   0,      fclown, fclown, _5clown_state, fclown, ROT0, "IGS",   "Five Clown (English, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1993, 5clowna,  5clown, fclown, fclown, _5clown_state, fclown, ROT0, "IGS",   "Five Clown (English, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1993, 5clownsp, 5clown, fclown, fclown, _5clown_state, fclown, ROT0, "IGS",   "Five Clown (Spanish hack)",   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

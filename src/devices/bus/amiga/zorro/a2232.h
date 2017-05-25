@@ -10,12 +10,11 @@
 
 ***************************************************************************/
 
+#ifndef MAME_BUS_AMIGA_ZORRO_A2232_H
+#define MAME_BUS_AMIGA_ZORRO_A2232_H
+
 #pragma once
 
-#ifndef __A2232_H__
-#define __A2232_H__
-
-#include "emu.h"
 #include "zorro.h"
 #include "machine/autoconfig.h"
 #include "cpu/m6502/m65ce02.h"
@@ -34,7 +33,7 @@ class a2232_device : public device_t, public device_zorro2_card_interface, publi
 {
 public:
 	// construction/destruction
-	a2232_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	a2232_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// cpu
 	WRITE8_MEMBER( int2_w );
@@ -137,15 +136,15 @@ private:
 	required_device<mos6551_device> m_acia_5;
 	required_device<mos6551_device> m_acia_6;
 	required_device<mos8520_device> m_cia;
-	required_shared_ptr<UINT8> m_shared_ram;
+	required_shared_ptr<uint8_t> m_shared_ram;
 
 	int m_irqs[IRQ_SOURCE_COUNT];
 
-	UINT8 m_cia_port_a;
-	UINT8 m_cia_port_b;
+	uint8_t m_cia_port_a;
+	uint8_t m_cia_port_b;
 };
 
 // device type definition
-extern const device_type A2232;
+DECLARE_DEVICE_TYPE(A2232, a2232_device)
 
-#endif // __A2232_H__
+#endif // MAME_BUS_AMIGA_ZORRO_A2232_H

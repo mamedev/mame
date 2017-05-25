@@ -11,10 +11,12 @@
 // tech manual: http://manx.classiccmp.org/mirror/vt100.net/docs/la120-tm/la120tm1.pdf
 
 #include "emu.h"
-#include "render.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/i8251.h"
 #include "sound/beep.h"
+#include "render.h"
+#include "speaker.h"
+
 
 #define KBD_VERBOSE 1
 #define LED_VERBOSE 1
@@ -38,9 +40,9 @@ public:
 	required_device<beep_device> m_speaker;
 	required_device<i8251_device> m_uart;
 	//required_device<generic_terminal_device> m_terminal;
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	{
-		bitmap.fill(rgb_t::black);
+		bitmap.fill(rgb_t::black(), cliprect);
 		return 0;
 	}
 	DECLARE_READ8_MEMBER(la120_KBD_r);
@@ -53,9 +55,9 @@ private:
 	virtual void machine_start() override;
 	//virtual void machine_reset();
 	ioport_port* m_col_array[16];
-	UINT8 m_led_array;
-	UINT8 m_led_7seg_counter;
-	UINT8 m_led_7seg[4];
+	uint8_t m_led_array;
+	uint8_t m_led_7seg_counter;
+	uint8_t m_led_7seg[4];
 };
 
 READ8_MEMBER( decwriter_state::la120_KBD_r )
@@ -71,7 +73,7 @@ READ8_MEMBER( decwriter_state::la120_KBD_r )
 	 * d7 d6 d5 d4 d3 d2 d1 d0
 	 *  \--\--\--\--\--\--\--\-- read from rows
 	 */
-	UINT8 code = 0;
+	uint8_t code = 0;
 	if (offset&0x8) code |= m_col_array[offset&0x7]->read();
 	if (offset&0x10) code |= m_col_array[(offset&0x7)+8]->read();
 #ifdef KBD_VERBOSE
@@ -160,7 +162,7 @@ WRITE8_MEMBER( decwriter_state::la120_NVR_w )
  */
 READ8_MEMBER( decwriter_state::la120_DC305_r )
 {
-	UINT8 data = 0x00;
+	uint8_t data = 0x00;
 	logerror("DC305 Read from offset %01x, returning %02X\n", offset, data);
 	return data;
 }
@@ -379,7 +381,7 @@ void decwriter_state::machine_reset()
 //  MACHINE DRIVERS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( la120, decwriter_state )
+static MACHINE_CONFIG_START( la120 )
 
 	MCFG_CPU_ADD("maincpu",I8080, XTAL_18MHz / 9) // 18Mhz xtal on schematics, using an i8224 clock divider/reset sanitizer IC
 	MCFG_CPU_PROGRAM_MAP(la120_mem)
@@ -436,5 +438,5 @@ ROM_END
 //**************************************************************************
 //  DRIVERS
 //**************************************************************************
-/*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS          INIT  COMPANY                          FULLNAME       FLAGS */
-COMP( 1978, la120, 0,      0,      la120,   la120, driver_device, 0,    "Digital Equipment Corporation", "DECwriter III (LA120)", MACHINE_NO_SOUND | MACHINE_IS_SKELETON | MACHINE_NOT_WORKING )
+/*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS            INIT  COMPANY                          FULLNAME       FLAGS */
+COMP( 1978, la120, 0,      0,      la120,   la120, decwriter_state, 0,    "Digital Equipment Corporation", "DECwriter III (LA120)", MACHINE_NO_SOUND | MACHINE_IS_SKELETON | MACHINE_NOT_WORKING )

@@ -26,8 +26,8 @@ public:
 		m_soundlatch(*this, "soundlatch") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_videoram1;
-	required_shared_ptr<UINT16> m_videoram2;
+	required_shared_ptr<uint16_t> m_videoram1;
+	required_shared_ptr<uint16_t> m_videoram2;
 
 	required_memory_bank m_z80bank;
 
@@ -47,14 +47,14 @@ public:
 	int       m_roz_bank;
 	int       m_gfxctrl;
 	int       m_flipscreen;
-	UINT32 crshrace_tile_callback( UINT32 code );
+	uint32_t crshrace_tile_callback( uint32_t code );
 
 	/* misc */
 	int m_pending_command;
 
 	/* devices */
 	DECLARE_WRITE8_MEMBER(crshrace_sh_bankswitch_w);
-	DECLARE_WRITE16_MEMBER(sound_command_w);
+	DECLARE_WRITE8_MEMBER(sound_command_w);
 	DECLARE_WRITE8_MEMBER(pending_command_clear_w);
 	DECLARE_WRITE16_MEMBER(crshrace_videoram1_w);
 	DECLARE_WRITE16_MEMBER(crshrace_videoram2_w);
@@ -68,8 +68,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_crshrace(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_crshrace(screen_device &screen, bool state);
+	uint32_t screen_update_crshrace(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_bg( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_fg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };

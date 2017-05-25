@@ -5,9 +5,9 @@
 #include "emu.h"
 #include "includes/snowbros.h"
 
-UINT32 snowbros_state::screen_update_honeydol(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t snowbros_state::screen_update_honeydol(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT16 *spriteram16 = m_bootleg_spriteram16;
+	uint16_t *spriteram16 = m_bootleg_spriteram16;
 	int sx=0, sy=0, x=0, y=0, offs;
 	/* sprites clip on left / right edges when scrolling, but it seems correct,
 	   no extra sprite attribute bits are set during this time, the sprite co-ordinates
@@ -90,9 +90,9 @@ UINT32 snowbros_state::screen_update_honeydol(screen_device &screen, bitmap_ind1
 }
 
 
-UINT32 snowbros_state::screen_update_twinadv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t snowbros_state::screen_update_twinadv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT16 *spriteram16 = m_bootleg_spriteram16;
+	uint16_t *spriteram16 = m_bootleg_spriteram16;
 	int sx=0, sy=0, x=0, y=0, offs;
 	/* sprites clip on left / right edges when scrolling, but it seems correct,
 	   no extra sprite attribute bits are set during this time, the sprite co-ordinates
@@ -145,9 +145,9 @@ UINT32 snowbros_state::screen_update_twinadv(screen_device &screen, bitmap_ind16
 }
 
 
-UINT32 snowbros_state::screen_update_wintbob(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t snowbros_state::screen_update_wintbob(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT16 *spriteram16 = m_bootleg_spriteram16;
+	uint16_t *spriteram16 = m_bootleg_spriteram16;
 	int offs;
 
 	bitmap.fill(m_palette->black_pen(), cliprect);
@@ -188,9 +188,9 @@ UINT32 snowbros_state::screen_update_wintbob(screen_device &screen, bitmap_ind16
 }
 
 
-UINT32 snowbros_state::screen_update_snowbro3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t snowbros_state::screen_update_snowbro3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT16 *spriteram16 = m_bootleg_spriteram16;
+	uint16_t *spriteram16 = m_bootleg_spriteram16;
 	int sx=0, sy=0, x=0, y=0, offs;
 
 	/*

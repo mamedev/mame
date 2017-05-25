@@ -112,8 +112,6 @@ READ16_MEMBER(midyunit_state::midyunit_protection_r)
  *
  *************************************/
 
-IOPORT_ARRAY_MEMBER(midyunit_state::ports) { "IN0", "IN1", "IN2", "DSW", "UNK0", "UNK1" };
-
 READ16_MEMBER(midyunit_state::midyunit_input_r)
 {
 	return m_ports[offset]->read();
@@ -244,8 +242,8 @@ WRITE8_MEMBER(midyunit_state::cvsd_protection_w)
 void midyunit_state::init_generic(int bpp, int sound, int prot_start, int prot_end)
 {
 	offs_t gfx_chunk = m_gfx_rom.bytes() / 4;
-	UINT8 d1, d2, d3, d4, d5, d6;
-	UINT8 *base;
+	uint8_t d1, d2, d3, d4, d5, d6;
+	uint8_t *base;
 	int i;
 
 	/* load graphics ROMs */

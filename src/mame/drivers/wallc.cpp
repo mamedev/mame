@@ -51,8 +51,10 @@ Thanks to HIGHWAYMAN for providing info on how to get to these epoxies
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "video/resnet.h"
 #include "sound/ay8910.h"
+#include "video/resnet.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class wallc_state : public driver_device
@@ -67,7 +69,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<uint8_t> m_videoram;
 
 	tilemap_t *m_bg_tilemap;
 
@@ -79,7 +81,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(wallc);
-	UINT32 screen_update_wallc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_wallc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -110,7 +112,7 @@ public:
 
 PALETTE_INIT_MEMBER(wallc_state, wallc)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	static const int resistances_rg[2] = { 330, 220 };
@@ -159,10 +161,10 @@ TILE_GET_INFO_MEMBER(wallc_state::get_bg_tile_info)
 
 void wallc_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(wallc_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS_FLIP_Y,   8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wallc_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS_FLIP_Y,   8, 8, 32, 32);
 }
 
-UINT32 wallc_state::screen_update_wallc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t wallc_state::screen_update_wallc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -267,10 +269,10 @@ GFXDECODE_END
 
 DRIVER_INIT_MEMBER(wallc_state,wallc)
 {
-	UINT8 c;
-	UINT32 i;
+	uint8_t c;
+	uint32_t i;
 
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	for (i=0; i<0x2000*2; i++)
 	{
@@ -282,10 +284,10 @@ DRIVER_INIT_MEMBER(wallc_state,wallc)
 
 DRIVER_INIT_MEMBER(wallc_state,wallca)
 {
-	UINT8 c;
-	UINT32 i;
+	uint8_t c;
+	uint32_t i;
 
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	for (i=0; i<0x4000; i++)
 	{
@@ -306,7 +308,7 @@ DRIVER_INIT_MEMBER(wallc_state,wallca)
 
 
 
-static MACHINE_CONFIG_START( wallc, wallc_state )
+static MACHINE_CONFIG_START( wallc )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 12288000 / 4)  /* 3.072 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(wallc_map)
@@ -445,10 +447,10 @@ ROM_END
 
 DRIVER_INIT_MEMBER(wallc_state,sidam)
 {
-	UINT8 c;
-	UINT32 i;
+	uint8_t c;
+	uint32_t i;
 
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	int count = 0;
 
 	for (i=0; i<0x2000; i++)
@@ -490,8 +492,8 @@ DRIVER_INIT_MEMBER(wallc_state,sidam)
 
 }
 
-GAME( 1984, wallc,  0,      wallc,  wallc, wallc_state, wallc,  ROT0, "Midcoin", "Wall Crash (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, wallca, wallc,  wallc,  wallc, wallc_state, wallca, ROT0, "Midcoin", "Wall Crash (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, brkblast,wallc, wallc,  wallc, wallc_state, wallca, ROT0, "bootleg (Fadesa)", "Brick Blast (bootleg of Wall Crash)", MACHINE_SUPPORTS_SAVE ) // Spanish bootleg board, Fadesa stickers / text on various components
+GAME( 1984, wallc,    0,     wallc,  wallc, wallc_state, wallc,  ROT0, "Midcoin",          "Wall Crash (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, wallca,   wallc, wallc,  wallc, wallc_state, wallca, ROT0, "Midcoin",          "Wall Crash (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, brkblast, wallc, wallc,  wallc, wallc_state, wallca, ROT0, "bootleg (Fadesa)", "Brick Blast (bootleg of Wall Crash)", MACHINE_SUPPORTS_SAVE ) // Spanish bootleg board, Fadesa stickers / text on various components
 
-GAME( 1984, sidampkr,0,     wallc,  wallc, wallc_state, sidam,  ROT270, "Sidam", "unknown Sidam Poker", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sidampkr, 0,     wallc,  wallc, wallc_state, sidam,  ROT270, "Sidam",          "unknown Sidam Poker", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

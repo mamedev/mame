@@ -2,7 +2,7 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="victor9k_flop" description="Victor 9000 / ACT Sirius 1 diskettes">
 
-	<software name="audiokit" supported="no">
+	<software name="audiokit">
 		<description>Victor Audio Toolkit (v1.2)</description>
 		<year>1983</year>
 		<publisher>Victor Technologies</publisher>
@@ -14,7 +14,7 @@
 		</part>
 	</software>
 
-	<software name="cpm86" supported="no">
+	<software name="cpm86">
 		<description>CP/M 86 v1.1-2.4</description>
 		<year>1982</year>
 		<publisher>&lt;unknown&gt;</publisher>

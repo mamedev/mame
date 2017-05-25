@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina,Pierpaolo Prazzoli
 /********************************************************************
  Eolith 32 bits hardware: Gradation 2D system
@@ -101,11 +101,13 @@
  *********************************************************************/
 
 #include "emu.h"
+#include "includes/eolith.h"
+
 #include "cpu/e132xs/e132xs.h"
 #include "cpu/mcs51/mcs51.h"
-
 #include "machine/eepromser.h"
-#include "includes/eolith.h"
+
+#include "speaker.h"
 
 
 /*************************************
@@ -542,7 +544,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( eolith45, eolith_state )
+static MACHINE_CONFIG_START( eolith45 )
 	MCFG_CPU_ADD("maincpu", E132N, 45000000)         /* 45 MHz */
 	MCFG_CPU_PROGRAM_MAP(eolith_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", eolith_state, eolith_speedup, "screen", 0, 1)
@@ -1516,7 +1518,7 @@ DRIVER_INIT_MEMBER(eolith_state,landbrka)
 	//it fails compares with memories:
 	//$4002d338 -> $4002d348 .... $4002d33f -> $4002d34f
 	//related with bits 0x100 - 0x200 read at startup from input(0) ?
-	UINT32 *rombase = (UINT32*)memregion("maincpu")->base();
+	uint32_t *rombase = (uint32_t*)memregion("maincpu")->base();
 	rombase[0x14f00/4] = (rombase[0x14f00/4] & 0xffff) | 0x03000000; /* Change BR to NOP */
 
 	m_coin_counter_bit = 0x2000;
@@ -1527,7 +1529,7 @@ DRIVER_INIT_MEMBER(eolith_state,landbrka)
 DRIVER_INIT_MEMBER(eolith_state,hidctch2)
 {
 	//it fails compares in memory like in landbrka
-	UINT32 *rombase = (UINT32*)memregion("maincpu")->base();
+	uint32_t *rombase = (uint32_t*)memregion("maincpu")->base();
 	rombase[0xbcc8/4] = (rombase[0xbcc8/4] & 0xffff) | 0x03000000; /* Change BR to NOP */
 
 	DRIVER_INIT_CALL(eolith);
@@ -1536,7 +1538,7 @@ DRIVER_INIT_MEMBER(eolith_state,hidctch2)
 
 DRIVER_INIT_MEMBER(eolith_state,hidnc2k)
 {
-	UINT32 *rombase = (UINT32*)memregion("maincpu")->base();
+	uint32_t *rombase = (uint32_t*)memregion("maincpu")->base();
 	rombase[0x17b2c/4] = (rombase[0x17b2c/4] & 0x0000ffff) | 0x03000000; /* Change BR to NOP */
 	DRIVER_INIT_CALL(eolith);
 }

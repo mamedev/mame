@@ -75,15 +75,6 @@ enum
 
 
 //**************************************************************************
-//  MACROS
-//**************************************************************************
-
-#define ISWAP(var1, var2) do { int temp = var1; var1 = var2; var2 = temp; } while (0)
-#define FSWAP(var1, var2) do { float temp = var1; var1 = var2; var2 = temp; } while (0)
-
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -136,8 +127,8 @@ inline void apply_orientation(render_bounds &bounds, int orientation)
 	// swap first
 	if (orientation & ORIENTATION_SWAP_XY)
 	{
-		FSWAP(bounds.x0, bounds.y0);
-		FSWAP(bounds.x1, bounds.y1);
+		std::swap(bounds.x0, bounds.y0);
+		std::swap(bounds.x1, bounds.y1);
 	}
 
 	// apply X flip
@@ -164,9 +155,9 @@ inline void apply_orientation(render_bounds &bounds, int orientation)
 inline void normalize_bounds(render_bounds &bounds)
 {
 	if (bounds.x0 > bounds.x1)
-		FSWAP(bounds.x0, bounds.x1);
+		std::swap(bounds.x0, bounds.x1);
 	if (bounds.y0 > bounds.y1)
-		FSWAP(bounds.y0, bounds.y1);
+		std::swap(bounds.y0, bounds.y1);
 }
 
 
@@ -214,7 +205,7 @@ inline item_layer get_layer_and_blendmode(const layout_view &view, int index, in
 void render_primitive::reset()
 {
 	// do not clear m_next!
-	memset(&type, 0, FPTR(&texcoords + 1) - FPTR(&type));
+	memset(&type, 0, uintptr_t(&texcoords + 1) - uintptr_t(&type));
 }
 
 
@@ -443,7 +434,7 @@ void render_texture::hq_scale(bitmap_argb32 &dest, bitmap_argb32 &source, const 
 //  get_scaled - get a scaled bitmap (if we can)
 //-------------------------------------------------
 
-void render_texture::get_scaled(UINT32 dwidth, UINT32 dheight, render_texinfo &texinfo, render_primitive_list &primlist, UINT32 flags)
+void render_texture::get_scaled(u32 dwidth, u32 dheight, render_texinfo &texinfo, render_primitive_list &primlist, u32 flags)
 {
 	// source width/height come from the source bounds
 	int swidth = m_sbounds.width();
@@ -458,6 +449,8 @@ void render_texture::get_scaled(UINT32 dwidth, UINT32 dheight, render_texinfo &t
 	// are we scaler-free? if so, just return the source bitmap
 	if (m_scaler == nullptr || (m_bitmap != nullptr && swidth == dwidth && sheight == dheight))
 	{
+		if (m_bitmap == nullptr) return;
+
 		// add a reference and set up the source bitmap
 		primlist.add_reference(m_bitmap);
 		texinfo.base = m_bitmap->raw_pixptr(m_sbounds.min_y, m_sbounds.min_x);
@@ -552,7 +545,7 @@ const rgb_t *render_texture::get_adjusted_palette(render_container &container)
 			return container.bcg_lookup_table(m_format);
 
 		default:
-			assert(FALSE);
+			assert(false);
 	}
 
 	return nullptr;
@@ -643,7 +636,7 @@ void render_container::set_user_settings(const user_settings &settings)
 //  add_line - add a line item to this container
 //-------------------------------------------------
 
-void render_container::add_line(float x0, float y0, float x1, float y1, float width, rgb_t argb, UINT32 flags)
+void render_container::add_line(float x0, float y0, float x1, float y1, float width, rgb_t argb, u32 flags)
 {
 	item &newitem = add_generic(CONTAINER_ITEM_LINE, x0, y0, x1, y1, argb);
 	newitem.m_width = width;
@@ -655,7 +648,7 @@ void render_container::add_line(float x0, float y0, float x1, float y1, float wi
 //  add_quad - add a quad item to this container
 //-------------------------------------------------
 
-void render_container::add_quad(float x0, float y0, float x1, float y1, rgb_t argb, render_texture *texture, UINT32 flags)
+void render_container::add_quad(float x0, float y0, float x1, float y1, rgb_t argb, render_texture *texture, u32 flags)
 {
 	item &newitem = add_generic(CONTAINER_ITEM_QUAD, x0, y0, x1, y1, argb);
 	newitem.m_texture = texture;
@@ -667,7 +660,7 @@ void render_container::add_quad(float x0, float y0, float x1, float y1, rgb_t ar
 //  add_char - add a char item to this container
 //-------------------------------------------------
 
-void render_container::add_char(float x0, float y0, float height, float aspect, rgb_t argb, render_font &font, UINT16 ch)
+void render_container::add_char(float x0, float y0, float height, float aspect, rgb_t argb, render_font &font, u16 ch)
 {
 	// compute the bounds of the character cell and get the texture
 	render_bounds bounds;
@@ -689,7 +682,7 @@ void render_container::add_char(float x0, float y0, float height, float aspect, 
 //  an 8-bit value
 //-------------------------------------------------
 
-UINT8 render_container::apply_brightness_contrast_gamma(UINT8 value)
+u8 render_container::apply_brightness_contrast_gamma(u8 value)
 {
 	return ::apply_brightness_contrast_gamma(value, m_user.m_brightness, m_user.m_contrast, m_user.m_gamma);
 }
@@ -748,8 +741,8 @@ void render_container::overlay_scale(bitmap_argb32 &dest, bitmap_argb32 &source,
 	// simply replicate the source bitmap over the target
 	for (int y = 0; y < dest.height(); y++)
 	{
-		UINT32 *src = &source.pix32(y % source.height());
-		UINT32 *dst = &dest.pix32(y);
+		u32 *src = &source.pix32(y % source.height());
+		u32 *dst = &dest.pix32(y);
 		int sx = 0;
 
 		// loop over columns
@@ -768,7 +761,7 @@ void render_container::overlay_scale(bitmap_argb32 &dest, bitmap_argb32 &source,
 //  container
 //-------------------------------------------------
 
-render_container::item &render_container::add_generic(UINT8 type, float x0, float y0, float x1, float y1, rgb_t argb)
+render_container::item &render_container::add_generic(u8 type, float x0, float y0, float x1, float y1, rgb_t argb)
 {
 	item *newitem = m_item_allocator.alloc();
 
@@ -807,7 +800,7 @@ void render_container::recompute_lookups()
 	// recompute the 256 entry lookup table
 	for (int i = 0; i < 0x100; i++)
 	{
-		UINT8 adjustedval = apply_brightness_contrast_gamma(i);
+		u8 adjustedval = apply_brightness_contrast_gamma(i);
 		m_bcglookup256[i + 0x000] = adjustedval << 0;
 		m_bcglookup256[i + 0x100] = adjustedval << 8;
 		m_bcglookup256[i + 0x200] = adjustedval << 16;
@@ -850,8 +843,8 @@ void render_container::update_palette()
 		return;
 
 	// get the dirty list
-	UINT32 mindirty, maxdirty;
-	const UINT32 *dirty = m_palclient->dirty_list(mindirty, maxdirty);
+	u32 mindirty, maxdirty;
+	const u32 *dirty = m_palclient->dirty_list(mindirty, maxdirty);
 
 	// iterate over dirty items and update them
 	if (dirty != nullptr)
@@ -862,16 +855,16 @@ void render_container::update_palette()
 		if (has_brightness_contrast_gamma_changes())
 		{
 			// loop over chunks of 32 entries, since we can quickly examine 32 at a time
-			for (UINT32 entry32 = mindirty / 32; entry32 <= maxdirty / 32; entry32++)
+			for (u32 entry32 = mindirty / 32; entry32 <= maxdirty / 32; entry32++)
 			{
-				UINT32 dirtybits = dirty[entry32];
+				u32 dirtybits = dirty[entry32];
 				if (dirtybits != 0)
 
 					// this chunk of 32 has dirty entries; fix them up
-					for (UINT32 entry = 0; entry < 32; entry++)
+					for (u32 entry = 0; entry < 32; entry++)
 						if (dirtybits & (1 << entry))
 						{
-							UINT32 finalentry = entry32 * 32 + entry;
+							u32 finalentry = entry32 * 32 + entry;
 							rgb_t newval = adjusted_palette[finalentry];
 							m_bcglookup[finalentry] = (newval & 0xff000000) |
 														m_bcglookup256[0x200 + newval.r()] |
@@ -912,7 +905,7 @@ render_container::user_settings::user_settings()
 //  render_target - constructor
 //-------------------------------------------------
 
-render_target::render_target(render_manager &manager, const internal_layout *layoutfile, UINT32 flags)
+render_target::render_target(render_manager &manager, const internal_layout *layoutfile, u32 flags)
 	: m_next(nullptr),
 		m_manager(manager),
 		m_curview(nullptr),
@@ -942,10 +935,16 @@ render_target::render_target(render_manager &manager, const internal_layout *lay
 	m_int_overscan = manager.machine().options().int_overscan();
 	m_int_scale_x = manager.machine().options().int_scale_x();
 	m_int_scale_y = manager.machine().options().int_scale_y();
-	if (manager.machine().options().uneven_stretch() && !manager.machine().options().uneven_stretch_x())
+	if (m_manager.machine().options().auto_stretch_xy())
+		m_scale_mode = SCALE_FRACTIONAL_AUTO;
+	else if (manager.machine().options().uneven_stretch_x())
+		m_scale_mode = SCALE_FRACTIONAL_X;
+	else if (manager.machine().options().uneven_stretch_y())
+		m_scale_mode = SCALE_FRACTIONAL_Y;
+	else if (manager.machine().options().uneven_stretch())
 		m_scale_mode = SCALE_FRACTIONAL;
 	else
-		m_scale_mode = manager.machine().options().uneven_stretch_x()? SCALE_FRACTIONAL_X : SCALE_INTEGER;
+		m_scale_mode = SCALE_INTEGER;
 
 	// determine the base orientation based on options
 	if (!manager.machine().options().rotate())
@@ -1014,7 +1013,7 @@ int render_target::index() const
 //  of a target
 //-------------------------------------------------
 
-void render_target::set_bounds(INT32 width, INT32 height, float pixel_aspect)
+void render_target::set_bounds(s32 width, s32 height, float pixel_aspect)
 {
 	m_width = width;
 	m_height = height;
@@ -1157,7 +1156,7 @@ const render_screen_list &render_target::view_screens(int viewindex)
 //  layout and proposed new parameters
 //-------------------------------------------------
 
-void render_target::compute_visible_area(INT32 target_width, INT32 target_height, float target_pixel_aspect, int target_orientation, INT32 &visible_width, INT32 &visible_height)
+void render_target::compute_visible_area(s32 target_width, s32 target_height, float target_pixel_aspect, int target_orientation, s32 &visible_width, s32 &visible_height)
 {
 	switch (m_scale_mode)
 	{
@@ -1175,7 +1174,7 @@ void render_target::compute_visible_area(INT32 target_width, INT32 target_height
 
 				// first apply target orientation
 				if (target_orientation & ORIENTATION_SWAP_XY)
-					FSWAP(width, height);
+					std::swap(width, height);
 
 				// apply the target pixel aspect ratio
 				height *= target_pixel_aspect;
@@ -1201,11 +1200,10 @@ void render_target::compute_visible_area(INT32 target_width, INT32 target_height
 			break;
 		}
 
-		case SCALE_FRACTIONAL_X:
-		case SCALE_INTEGER:
+		default:
 		{
 			// get source size and aspect
-			INT32 src_width, src_height;
+			s32 src_width, src_height;
 			compute_minimum_size(src_width, src_height);
 			float src_aspect = m_curview->effective_aspect(m_layerconfig);
 
@@ -1215,26 +1213,37 @@ void render_target::compute_visible_area(INT32 target_width, INT32 target_height
 
 			// get target aspect
 			float target_aspect = (float)target_width / (float)target_height * target_pixel_aspect;
+			bool target_is_portrait = (target_aspect < 1.0f);
+
+			// apply automatic axial stretching if required
+			int scale_mode = m_scale_mode;
+			if (m_scale_mode == SCALE_FRACTIONAL_AUTO)
+			{
+				bool is_rotated = (m_manager.machine().system().flags & ORIENTATION_SWAP_XY) ^ (target_orientation & ORIENTATION_SWAP_XY);
+				scale_mode = is_rotated ^ target_is_portrait ? SCALE_FRACTIONAL_Y : SCALE_FRACTIONAL_X;
+			}
 
 			// determine the scale mode for each axis
-			bool x_is_integer = !(target_aspect >= 1.0f && m_scale_mode == SCALE_FRACTIONAL_X);
-			bool y_is_integer = !(target_aspect < 1.0f && m_scale_mode == SCALE_FRACTIONAL_X);
+			bool x_is_integer = !((!target_is_portrait && scale_mode == SCALE_FRACTIONAL_X) || (target_is_portrait && scale_mode == SCALE_FRACTIONAL_Y));
+			bool y_is_integer = !((target_is_portrait && scale_mode == SCALE_FRACTIONAL_X) || (!target_is_portrait && scale_mode == SCALE_FRACTIONAL_Y));
 
 			// first compute scale factors to fit the screen
 			float xscale = (float)target_width / src_width;
 			float yscale = (float)target_height / src_height;
-			float maxxscale = MAX(1, m_int_overscan? render_round_nearest(xscale) : floor(xscale));
-			float maxyscale = MAX(1, m_int_overscan? render_round_nearest(yscale) : floor(yscale));
+			float maxxscale = std::max(1.0f, float(m_int_overscan ? render_round_nearest(xscale) : floor(xscale)));
+			float maxyscale = std::max(1.0f, float(m_int_overscan ? render_round_nearest(yscale) : floor(yscale)));
 
 			// now apply desired scale mode and aspect correction
 			if (m_keepaspect && target_aspect > src_aspect) xscale *= src_aspect / target_aspect * (maxyscale / yscale);
 			if (m_keepaspect && target_aspect < src_aspect) yscale *= target_aspect / src_aspect * (maxxscale / xscale);
-			if (x_is_integer) xscale = MIN(maxxscale, MAX(1, render_round_nearest(xscale)));
-			if (y_is_integer) yscale = MIN(maxyscale, MAX(1, render_round_nearest(yscale)));
+			if (x_is_integer) xscale = std::min(maxxscale, std::max(1.0f, render_round_nearest(xscale)));
+			if (y_is_integer) yscale = std::min(maxyscale, std::max(1.0f, render_round_nearest(yscale)));
 
 			// check if we have user defined scale factors, if so use them instead
-			xscale = m_int_scale_x? m_int_scale_x : xscale;
-			yscale = m_int_scale_y? m_int_scale_y : yscale;
+			int user_scale_x = target_is_portrait? m_int_scale_y : m_int_scale_x;
+			int user_scale_y = target_is_portrait? m_int_scale_x : m_int_scale_y;
+			xscale = user_scale_x > 0 ? user_scale_x : xscale;
+			yscale = user_scale_y > 0 ? user_scale_y : yscale;
 
 			// set the final width/height
 			visible_width = render_round_nearest(src_width * xscale);
@@ -1252,13 +1261,13 @@ void render_target::compute_visible_area(INT32 target_width, INT32 target_height
 //  source pixel for all included screens
 //-------------------------------------------------
 
-void render_target::compute_minimum_size(INT32 &minwidth, INT32 &minheight)
+void render_target::compute_minimum_size(s32 &minwidth, s32 &minheight)
 {
 	float maxxscale = 1.0f, maxyscale = 1.0f;
 	int screens_considered = 0;
 
 	// early exit in case we are called between device teardown and render teardown
-	if (m_manager.machine().phase() == MACHINE_PHASE_EXIT)
+	if (m_manager.machine().phase() == machine_phase::EXIT)
 	{
 		minwidth = 640;
 		minheight = 480;
@@ -1299,8 +1308,8 @@ void render_target::compute_minimum_size(INT32 &minwidth, INT32 &minheight)
 				}
 
 				// pick the greater
-				maxxscale = MAX(xscale, maxxscale);
-				maxyscale = MAX(yscale, maxyscale);
+				maxxscale = std::max(xscale, maxxscale);
+				maxyscale = std::max(yscale, maxyscale);
 				screens_considered++;
 			}
 
@@ -1337,7 +1346,7 @@ render_primitive_list &render_target::get_primitives()
 	list.release_all();
 
 	// compute the visible width/height
-	INT32 viswidth, visheight;
+	s32 viswidth, visheight;
 	compute_visible_area(m_width, m_height, m_pixel_aspect, m_orientation, viswidth, visheight);
 
 	// create a root transform for the target
@@ -1351,7 +1360,7 @@ render_primitive_list &render_target::get_primitives()
 	root_xform.no_center = false;
 
 	// iterate over layers back-to-front, but only if we're running
-	if (m_manager.machine().phase() >= MACHINE_PHASE_RESET)
+	if (m_manager.machine().phase() >= machine_phase::RESET)
 		for (item_layer layernum = ITEM_LAYER_FIRST; layernum < ITEM_LAYER_MAX; ++layernum)
 		{
 			int blendmode;
@@ -1393,6 +1402,7 @@ render_primitive_list &render_target::get_primitives()
 	{
 		render_primitive *prim = list.alloc(render_primitive::QUAD);
 		set_render_bounds_xy(&prim->bounds, 0.0f, 0.0f, (float)m_width, (float)m_height);
+		prim->full_bounds = prim->bounds;
 		set_render_color(&prim->color, 1.0f, 1.0f, 1.0f, 1.0f);
 		prim->texture.base = nullptr;
 		prim->flags = PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA);
@@ -1402,6 +1412,7 @@ render_primitive_list &render_target::get_primitives()
 		{
 			prim = list.alloc(render_primitive::QUAD);
 			set_render_bounds_xy(&prim->bounds, 1.0f, 1.0f, (float)(m_width - 1), (float)(m_height - 1));
+			prim->full_bounds = prim->bounds;
 			set_render_color(&prim->color, 1.0f, 0.0f, 0.0f, 0.0f);
 			prim->texture.base = nullptr;
 			prim->flags = PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA);
@@ -1456,7 +1467,7 @@ render_primitive_list &render_target::get_primitives()
 //  specified container, if possible
 //-------------------------------------------------
 
-bool render_target::map_point_container(INT32 target_x, INT32 target_y, render_container &container, float &container_x, float &container_y)
+bool render_target::map_point_container(s32 target_x, s32 target_y, render_container &container, float &container_x, float &container_y)
 {
 	ioport_port *input_port;
 	ioport_value input_mask;
@@ -1470,7 +1481,7 @@ bool render_target::map_point_container(INT32 target_x, INT32 target_y, render_c
 //  container, if possible
 //-------------------------------------------------
 
-bool render_target::map_point_input(INT32 target_x, INT32 target_y, ioport_port *&input_port, ioport_value &input_mask, float &input_x, float &input_y)
+bool render_target::map_point_input(s32 target_x, s32 target_y, ioport_port *&input_port, ioport_value &input_mask, float &input_x, float &input_y)
 {
 	return map_point_internal(target_x, target_y, nullptr, input_x, input_y, input_port, input_mask);;
 }
@@ -1642,7 +1653,7 @@ void render_target::load_layout_files(const internal_layout *layoutfile, bool si
 bool render_target::load_layout_file(const char *dirname, const internal_layout *layout_data)
 {
 	// +1 to ensure data is terminated for XML parser
-	auto tempout = make_unique_clear<UINT8[]>(layout_data->decompressed_size+1);
+	auto tempout = make_unique_clear<u8[]>(layout_data->decompressed_size+1);
 
 	z_stream stream;
 	int zerr;
@@ -1690,9 +1701,9 @@ bool render_target::load_layout_file(const char *dirname, const internal_layout 
 bool render_target::load_layout_file(const char *dirname, const char *filename)
 {
 	// if the first character of the "file" is an open brace, assume it is an XML string
-	xml_data_node *rootnode;
+	util::xml::data_node *rootnode;
 	if (filename[0] == '<')
-		rootnode = xml_string_read(filename, nullptr);
+		rootnode = util::xml::data_node::string_read(filename, nullptr);
 
 	// otherwise, assume it is a file
 	else
@@ -1709,7 +1720,7 @@ bool render_target::load_layout_file(const char *dirname, const char *filename)
 			return false;
 
 		// read the file
-		rootnode = xml_file_read(layoutfile, nullptr);
+		rootnode = util::xml::data_node::file_read(layoutfile, nullptr);
 	}
 
 	// if we didn't get a properly-formatted XML file, record a warning and exit
@@ -1740,7 +1751,7 @@ bool render_target::load_layout_file(const char *dirname, const char *filename)
 	emulator_info::layout_file_cb(*rootnode);
 
 	// free the root node
-	xml_file_free(rootnode);
+	rootnode->file_free();
 	return result;
 }
 
@@ -1763,8 +1774,8 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 	cliprect.y1 = xform.yoffs + xform.yscale;
 	sect_render_bounds(&cliprect, &m_bounds);
 
-	float root_xoffs = root_xform.xoffs + abs(root_xform.xscale - xform.xscale) * 0.5f;
-	float root_yoffs = root_xform.yoffs + abs(root_xform.yscale - xform.yscale) * 0.5f;
+	float root_xoffs = root_xform.xoffs + fabsf(root_xform.xscale - xform.xscale) * 0.5f;
+	float root_yoffs = root_xform.yoffs + fabsf(root_xform.yscale - xform.yscale) * 0.5f;
 
 	render_bounds root_cliprect;
 	root_cliprect.x0 = root_xoffs;
@@ -1846,6 +1857,9 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 		prim->color.b = container_xform.color.b * curitem.color().b;
 		prim->color.a = container_xform.color.a * curitem.color().a;
 
+		// copy unclipped bounds
+		prim->full_bounds = prim->bounds;
+
 		// now switch off the type
 		bool clipped = true;
 		switch (curitem.type())
@@ -1862,7 +1876,7 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 				prim->flags |= PRIMFLAG_TYPE_LINE;
 
 				// scale the width by the minimum of X/Y scale factors
-				prim->width = curitem.width() * MIN(container_xform.xscale, container_xform.yscale);
+				prim->width = curitem.width() * std::min(container_xform.xscale, container_xform.yscale);
 				prim->flags |= curitem.flags();
 
 				// clip the primitive
@@ -1893,8 +1907,8 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 					// based on the swap values, get the scaled final texture
 					int width = (finalorient & ORIENTATION_SWAP_XY) ? (prim->bounds.y1 - prim->bounds.y0) : (prim->bounds.x1 - prim->bounds.x0);
 					int height = (finalorient & ORIENTATION_SWAP_XY) ? (prim->bounds.x1 - prim->bounds.x0) : (prim->bounds.y1 - prim->bounds.y0);
-					width = MIN(width, m_maxtexwidth);
-					height = MIN(height, m_maxtexheight);
+					width = std::min(width, m_maxtexwidth);
+					height = std::min(height, m_maxtexheight);
 
 					curitem.texture()->get_scaled(width, height, prim->texture, list, curitem.flags());
 
@@ -1908,7 +1922,7 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 					clipped = render_clip_quad(&prim->bounds, &cliprect, &prim->texcoords);
 
 					// apply the final orientation from the quad flags and then build up the final flags
-					prim->flags = (curitem.flags() & ~(PRIMFLAG_TEXORIENT_MASK | PRIMFLAG_BLENDMODE_MASK | PRIMFLAG_TEXFORMAT_MASK))
+					prim->flags |= (curitem.flags() & ~(PRIMFLAG_TEXORIENT_MASK | PRIMFLAG_BLENDMODE_MASK | PRIMFLAG_TEXFORMAT_MASK))
 						| PRIMFLAG_TEXORIENT(finalorient)
 						| PRIMFLAG_TEXFORMAT(curitem.texture()->format());
 					prim->flags |= blendmode != -1
@@ -1968,7 +1982,7 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 						clipped = render_clip_quad(&prim->bounds, &cliprect, &prim->texcoords);
 
 						// apply the final orientation from the quad flags and then build up the final flags
-						prim->flags = (curitem.flags() & ~(PRIMFLAG_TEXORIENT_MASK | PRIMFLAG_BLENDMODE_MASK | PRIMFLAG_TEXFORMAT_MASK))
+						prim->flags |= (curitem.flags() & ~(PRIMFLAG_TEXORIENT_MASK | PRIMFLAG_BLENDMODE_MASK | PRIMFLAG_TEXFORMAT_MASK))
 							| PRIMFLAG_TEXORIENT(finalorient);
 						prim->flags |= blendmode != -1
 							? PRIMFLAG_BLENDMODE(blendmode)
@@ -1977,7 +1991,7 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 					else
 					{
 						// set the basic flags
-						prim->flags = (curitem.flags() & ~PRIMFLAG_BLENDMODE_MASK)
+						prim->flags |= (curitem.flags() & ~PRIMFLAG_BLENDMODE_MASK)
 							| PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA);
 
 						// apply clipping
@@ -1994,27 +2008,28 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 	// add the overlay if it exists
 	if (container.overlay() != nullptr && m_layerconfig.screen_overlay_enabled())
 	{
-		INT32 width, height;
+		s32 width, height;
 
 		// allocate a primitive
 		render_primitive *prim = list.alloc(render_primitive::QUAD);
 		set_render_bounds_wh(&prim->bounds, xform.xoffs, xform.yoffs, xform.xscale, xform.yscale);
+		prim->full_bounds = prim->bounds;
 		prim->color = container_xform.color;
 		width = render_round_nearest(prim->bounds.x1) - render_round_nearest(prim->bounds.x0);
 		height = render_round_nearest(prim->bounds.y1) - render_round_nearest(prim->bounds.y0);
 
 		container.overlay()->get_scaled(
-				(container_xform.orientation & ORIENTATION_SWAP_XY) ? height : width,
-				(container_xform.orientation & ORIENTATION_SWAP_XY) ? width : height, prim->texture, list);
+			(container_xform.orientation & ORIENTATION_SWAP_XY) ? height : width,
+			(container_xform.orientation & ORIENTATION_SWAP_XY) ? width : height, prim->texture, list);
 
 		// determine UV coordinates
 		prim->texcoords = oriented_texcoords[container_xform.orientation];
 
 		// set the flags and add it to the list
-		prim->flags = PRIMFLAG_TEXORIENT(container_xform.orientation) |
-						PRIMFLAG_BLENDMODE(BLENDMODE_RGB_MULTIPLY) |
-						PRIMFLAG_TEXFORMAT(container.overlay()->format()) |
-						PRIMFLAG_TEXSHADE(1);
+		prim->flags = PRIMFLAG_TEXORIENT(container_xform.orientation)
+			| PRIMFLAG_BLENDMODE(BLENDMODE_RGB_MULTIPLY)
+			| PRIMFLAG_TEXFORMAT(container.overlay()->format())
+			| PRIMFLAG_TEXSHADE(1);
 
 		list.append_or_return(*prim, false);
 	}
@@ -2045,13 +2060,14 @@ void render_target::add_element_primitives(render_primitive_list &list, const ob
 		prim->flags = PRIMFLAG_TEXORIENT(xform.orientation) | PRIMFLAG_BLENDMODE(blendmode) | PRIMFLAG_TEXFORMAT(texture->format());
 
 		// compute the bounds
-		INT32 width = render_round_nearest(xform.xscale);
-		INT32 height = render_round_nearest(xform.yscale);
+		s32 width = render_round_nearest(xform.xscale);
+		s32 height = render_round_nearest(xform.yscale);
 		set_render_bounds_wh(&prim->bounds, render_round_nearest(xform.xoffs), render_round_nearest(xform.yoffs), (float) width, (float) height);
+		prim->full_bounds = prim->bounds;
 		if (xform.orientation & ORIENTATION_SWAP_XY)
-			ISWAP(width, height);
-		width = MIN(width, m_maxtexwidth);
-		height = MIN(height, m_maxtexheight);
+			std::swap(width, height);
+		width = std::min(width, m_maxtexwidth);
+		height = std::min(height, m_maxtexheight);
 
 		// get the scaled texture and append it
 
@@ -2080,10 +2096,10 @@ void render_target::add_element_primitives(render_primitive_list &list, const ob
 //  mapping points
 //-------------------------------------------------
 
-bool render_target::map_point_internal(INT32 target_x, INT32 target_y, render_container *container, float &mapped_x, float &mapped_y, ioport_port *&mapped_input_port, ioport_value &mapped_input_mask)
+bool render_target::map_point_internal(s32 target_x, s32 target_y, render_container *container, float &mapped_x, float &mapped_y, ioport_port *&mapped_input_port, ioport_value &mapped_input_mask)
 {
 	// compute the visible width/height
-	INT32 viswidth, visheight;
+	s32 viswidth, visheight;
 	compute_visible_area(m_width, m_height, m_pixel_aspect, m_orientation, viswidth, visheight);
 
 	// create a root transform for the target
@@ -2199,10 +2215,10 @@ int render_target::view_index(layout_view &targetview) const
 //  config_load - process config information
 //-------------------------------------------------
 
-void render_target::config_load(xml_data_node &targetnode)
+void render_target::config_load(util::xml::data_node const &targetnode)
 {
 	// find the view
-	const char *viewname = xml_get_attribute_string(&targetnode, "view", nullptr);
+	const char *viewname = targetnode.get_attribute_string("view", nullptr);
 	if (viewname != nullptr)
 		for (int viewnum = 0; viewnum < 1000; viewnum++)
 		{
@@ -2217,32 +2233,32 @@ void render_target::config_load(xml_data_node &targetnode)
 		}
 
 	// modify the artwork config
-	int tmpint = xml_get_attribute_int(&targetnode, "backdrops", -1);
+	int tmpint = targetnode.get_attribute_int("backdrops", -1);
 	if (tmpint == 0 || tmpint == 1)
 		set_backdrops_enabled(tmpint);
 
-	tmpint = xml_get_attribute_int(&targetnode, "overlays", -1);
+	tmpint = targetnode.get_attribute_int("overlays", -1);
 	if (tmpint == 0 || tmpint == 1)
 		set_overlays_enabled(tmpint);
 
-	tmpint = xml_get_attribute_int(&targetnode, "bezels", -1);
+	tmpint = targetnode.get_attribute_int("bezels", -1);
 	if (tmpint == 0 || tmpint == 1)
 		set_bezels_enabled(tmpint);
 
-	tmpint = xml_get_attribute_int(&targetnode, "cpanels", -1);
+	tmpint = targetnode.get_attribute_int("cpanels", -1);
 	if (tmpint == 0 || tmpint == 1)
 		set_cpanels_enabled(tmpint);
 
-	tmpint = xml_get_attribute_int(&targetnode, "marquees", -1);
+	tmpint = targetnode.get_attribute_int("marquees", -1);
 	if (tmpint == 0 || tmpint == 1)
 		set_marquees_enabled(tmpint);
 
-	tmpint = xml_get_attribute_int(&targetnode, "zoom", -1);
+	tmpint = targetnode.get_attribute_int("zoom", -1);
 	if (tmpint == 0 || tmpint == 1)
 		set_zoom_to_screen(tmpint);
 
 	// apply orientation
-	tmpint = xml_get_attribute_int(&targetnode, "rotate", -1);
+	tmpint = targetnode.get_attribute_int("rotate", -1);
 	if (tmpint != -1)
 	{
 		if (tmpint == 90)
@@ -2274,29 +2290,29 @@ void render_target::config_load(xml_data_node &targetnode)
 //  return false if we are the same as the default
 //-------------------------------------------------
 
-bool render_target::config_save(xml_data_node &targetnode)
+bool render_target::config_save(util::xml::data_node &targetnode)
 {
 	bool changed = false;
 
 	// output the basics
-	xml_set_attribute_int(&targetnode, "index", index());
+	targetnode.set_attribute_int("index", index());
 
 	// output the view
 	if (m_curview != m_base_view)
 	{
-		xml_set_attribute(&targetnode, "view", m_curview->name());
+		targetnode.set_attribute("view", m_curview->name());
 		changed = true;
 	}
 
 	// output the layer config
 	if (m_layerconfig != m_base_layerconfig)
 	{
-		xml_set_attribute_int(&targetnode, "backdrops", m_layerconfig.backdrops_enabled());
-		xml_set_attribute_int(&targetnode, "overlays", m_layerconfig.overlays_enabled());
-		xml_set_attribute_int(&targetnode, "bezels", m_layerconfig.bezels_enabled());
-		xml_set_attribute_int(&targetnode, "cpanels", m_layerconfig.cpanels_enabled());
-		xml_set_attribute_int(&targetnode, "marquees", m_layerconfig.marquees_enabled());
-		xml_set_attribute_int(&targetnode, "zoom", m_layerconfig.zoom_to_screen());
+		targetnode.set_attribute_int("backdrops", m_layerconfig.backdrops_enabled());
+		targetnode.set_attribute_int("overlays", m_layerconfig.overlays_enabled());
+		targetnode.set_attribute_int("bezels", m_layerconfig.bezels_enabled());
+		targetnode.set_attribute_int("cpanels", m_layerconfig.cpanels_enabled());
+		targetnode.set_attribute_int("marquees", m_layerconfig.marquees_enabled());
+		targetnode.set_attribute_int("zoom", m_layerconfig.zoom_to_screen());
 		changed = true;
 	}
 
@@ -2311,7 +2327,7 @@ bool render_target::config_save(xml_data_node &targetnode)
 		else if (orientation_add(ROT270, m_base_orientation) == m_orientation)
 			rotate = 270;
 		assert(rotate != 0);
-		xml_set_attribute_int(&targetnode, "rotate", rotate);
+		targetnode.set_attribute_int("rotate", rotate);
 		changed = true;
 	}
 
@@ -2340,19 +2356,19 @@ void render_target::init_clear_extents()
 
 bool render_target::remove_clear_extent(const render_bounds &bounds)
 {
-	INT32 *max = &m_clear_extents[MAX_CLEAR_EXTENTS];
-	INT32 *last = &m_clear_extents[m_clear_extent_count];
-	INT32 *ext = &m_clear_extents[0];
-	INT32 boundsx0 = ceil(bounds.x0);
-	INT32 boundsx1 = floor(bounds.x1);
-	INT32 boundsy0 = ceil(bounds.y0);
-	INT32 boundsy1 = floor(bounds.y1);
-	INT32 y0, y1 = 0;
+	s32 *max = &m_clear_extents[MAX_CLEAR_EXTENTS];
+	s32 *last = &m_clear_extents[m_clear_extent_count];
+	s32 *ext = &m_clear_extents[0];
+	s32 boundsx0 = ceil(bounds.x0);
+	s32 boundsx1 = floor(bounds.x1);
+	s32 boundsy0 = ceil(bounds.y0);
+	s32 boundsy1 = floor(bounds.y1);
+	s32 y0, y1 = 0;
 
 	// loop over Y extents
 	while (ext < last)
 	{
-		INT32 *linelast;
+		s32 *linelast;
 
 		// first entry of each line should always be negative
 		assert(ext[0] < 0.0f);
@@ -2362,8 +2378,8 @@ bool render_target::remove_clear_extent(const render_bounds &bounds)
 		// do we intersect this extent?
 		if (boundsy0 < y1 && boundsy1 > y0)
 		{
-			INT32 *xext;
-			INT32 x0, x1 = 0;
+			s32 *xext;
+			s32 x0, x1 = 0;
 
 			// split the top
 			if (y0 < boundsy0)
@@ -2475,16 +2491,16 @@ abort:
 void render_target::add_clear_extents(render_primitive_list &list)
 {
 	simple_list<render_primitive> clearlist;
-	INT32 *last = &m_clear_extents[m_clear_extent_count];
-	INT32 *ext = &m_clear_extents[0];
-	INT32 y0, y1 = 0;
+	s32 *last = &m_clear_extents[m_clear_extent_count];
+	s32 *ext = &m_clear_extents[0];
+	s32 y0, y1 = 0;
 
 	// loop over all extents
 	while (ext < last)
 	{
-		INT32 *linelast = &ext[ext[1] + 2];
-		INT32 *xext = &ext[2];
-		INT32 x0, x1 = 0;
+		s32 *linelast = &ext[ext[1] + 2];
+		s32 *xext = &ext[2];
+		s32 x0, x1 = 0;
 
 		// first entry should always be negative
 		assert(ext[0] < 0);
@@ -2502,6 +2518,7 @@ void render_target::add_clear_extents(render_primitive_list &list)
 			{
 				render_primitive *prim = list.alloc(render_primitive::QUAD);
 				set_render_bounds_xy(&prim->bounds, (float)x0, (float)y0, (float)x1, (float)y1);
+				prim->full_bounds = prim->bounds;
 				set_render_color(&prim->color, 1.0f, 0.0f, 0.0f, 0.0f);
 				prim->texture.base = nullptr;
 				prim->flags = PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA);
@@ -2601,7 +2618,7 @@ render_manager::render_manager(running_machine &machine)
 		m_ui_container(global_alloc(render_container(*this)))
 {
 	// register callbacks
-	machine.configuration().config_register("video", config_saveload_delegate(FUNC(render_manager::config_load), this), config_saveload_delegate(FUNC(render_manager::config_save), this));
+	machine.configuration().config_register("video", config_load_delegate(&render_manager::config_load, this), config_save_delegate(&render_manager::config_save, this));
 
 	// create one container per screen
 	for (screen_device &screen : screen_device_iterator(machine.root_device()))
@@ -2653,7 +2670,7 @@ float render_manager::max_update_rate() const
 			if (minimum == 0)
 				minimum = target.max_update_rate();
 			else
-				minimum = MIN(target.max_update_rate(), minimum);
+				minimum = std::min(target.max_update_rate(), minimum);
 		}
 
 	return minimum;
@@ -2664,7 +2681,7 @@ float render_manager::max_update_rate() const
 //  target_alloc - allocate a new target
 //-------------------------------------------------
 
-render_target *render_manager::target_alloc(const internal_layout *layoutfile, UINT32 flags)
+render_target *render_manager::target_alloc(const internal_layout *layoutfile, u32 flags)
 {
 	return &m_targetlist.append(*global_alloc(render_target(*this, layoutfile, flags)));
 }
@@ -2853,10 +2870,10 @@ void render_manager::container_free(render_container *container)
 //  configuration file
 //-------------------------------------------------
 
-void render_manager::config_load(config_type cfg_type, xml_data_node *parentnode)
+void render_manager::config_load(config_type cfg_type, util::xml::data_node const *parentnode)
 {
 	// we only care about game files
-	if (cfg_type != config_type::CONFIG_TYPE_GAME)
+	if (cfg_type != config_type::GAME)
 		return;
 
 	// might not have any data
@@ -2864,26 +2881,26 @@ void render_manager::config_load(config_type cfg_type, xml_data_node *parentnode
 		return;
 
 	// check the UI target
-	xml_data_node *uinode = xml_get_sibling(parentnode->child, "interface");
+	util::xml::data_node const *const uinode = parentnode->get_child("interface");
 	if (uinode != nullptr)
 	{
-		render_target *target = target_by_index(xml_get_attribute_int(uinode, "target", 0));
+		render_target *target = target_by_index(uinode->get_attribute_int("target", 0));
 		if (target != nullptr)
 			set_ui_target(*target);
 	}
 
 	// iterate over target nodes
-	for (xml_data_node *targetnode = xml_get_sibling(parentnode->child, "target"); targetnode; targetnode = xml_get_sibling(targetnode->next, "target"))
+	for (util::xml::data_node const *targetnode = parentnode->get_child("target"); targetnode; targetnode = targetnode->get_next_sibling("target"))
 	{
-		render_target *target = target_by_index(xml_get_attribute_int(targetnode, "index", -1));
+		render_target *target = target_by_index(targetnode->get_attribute_int("index", -1));
 		if (target != nullptr)
 			target->config_load(*targetnode);
 	}
 
 	// iterate over screen nodes
-	for (xml_data_node *screennode = xml_get_sibling(parentnode->child, "screen"); screennode; screennode = xml_get_sibling(screennode->next, "screen"))
+	for (util::xml::data_node const *screennode = parentnode->get_child("screen"); screennode; screennode = screennode->get_next_sibling("screen"))
 	{
-		int index = xml_get_attribute_int(screennode, "index", -1);
+		int index = screennode->get_attribute_int("index", -1);
 		render_container *container = m_screen_container_list.find(index);
 		render_container::user_settings settings;
 
@@ -2891,15 +2908,15 @@ void render_manager::config_load(config_type cfg_type, xml_data_node *parentnode
 		container->get_user_settings(settings);
 
 		// fetch color controls
-		settings.m_brightness = xml_get_attribute_float(screennode, "brightness", settings.m_brightness);
-		settings.m_contrast = xml_get_attribute_float(screennode, "contrast", settings.m_contrast);
-		settings.m_gamma = xml_get_attribute_float(screennode, "gamma", settings.m_gamma);
+		settings.m_brightness = screennode->get_attribute_float("brightness", settings.m_brightness);
+		settings.m_contrast = screennode->get_attribute_float("contrast", settings.m_contrast);
+		settings.m_gamma = screennode->get_attribute_float("gamma", settings.m_gamma);
 
 		// fetch positioning controls
-		settings.m_xoffset = xml_get_attribute_float(screennode, "hoffset", settings.m_xoffset);
-		settings.m_xscale = xml_get_attribute_float(screennode, "hstretch", settings.m_xscale);
-		settings.m_yoffset = xml_get_attribute_float(screennode, "voffset", settings.m_yoffset);
-		settings.m_yscale = xml_get_attribute_float(screennode, "vstretch", settings.m_yscale);
+		settings.m_xoffset = screennode->get_attribute_float("hoffset", settings.m_xoffset);
+		settings.m_xscale = screennode->get_attribute_float("hstretch", settings.m_xscale);
+		settings.m_yoffset = screennode->get_attribute_float("voffset", settings.m_yoffset);
+		settings.m_yscale = screennode->get_attribute_float("vstretch", settings.m_yscale);
 
 		// set the new values
 		container->set_user_settings(settings);
@@ -2912,19 +2929,19 @@ void render_manager::config_load(config_type cfg_type, xml_data_node *parentnode
 //  file
 //-------------------------------------------------
 
-void render_manager::config_save(config_type cfg_type, xml_data_node *parentnode)
+void render_manager::config_save(config_type cfg_type, util::xml::data_node *parentnode)
 {
 	// we only care about game files
-	if (cfg_type != config_type::CONFIG_TYPE_GAME)
+	if (cfg_type != config_type::GAME)
 		return;
 
 	// write out the interface target
 	if (m_ui_target->index() != 0)
 	{
 		// create a node for it
-		xml_data_node *uinode = xml_add_child(parentnode, "interface", nullptr);
+		util::xml::data_node *const uinode = parentnode->add_child("interface", nullptr);
 		if (uinode != nullptr)
-			xml_set_attribute_int(uinode, "target", m_ui_target->index());
+			uinode->set_attribute_int("target", m_ui_target->index());
 	}
 
 	// iterate over targets
@@ -2936,9 +2953,9 @@ void render_manager::config_save(config_type cfg_type, xml_data_node *parentnode
 			break;
 
 		// create a node
-		xml_data_node *targetnode = xml_add_child(parentnode, "target", nullptr);
+		util::xml::data_node *const targetnode = parentnode->add_child("target", nullptr);
 		if (targetnode != nullptr && !target->config_save(*targetnode))
-			xml_delete_node(targetnode);
+			targetnode->delete_node();
 	}
 
 	// iterate over screen containers
@@ -2946,13 +2963,13 @@ void render_manager::config_save(config_type cfg_type, xml_data_node *parentnode
 	for (render_container *container = m_screen_container_list.first(); container != nullptr; container = container->next(), scrnum++)
 	{
 		// create a node
-		xml_data_node *screennode = xml_add_child(parentnode, "screen", nullptr);
+		util::xml::data_node *const screennode = parentnode->add_child("screen", nullptr);
 		if (screennode != nullptr)
 		{
 			bool changed = false;
 
 			// output the basics
-			xml_set_attribute_int(screennode, "index", scrnum);
+			screennode->set_attribute_int("index", scrnum);
 
 			render_container::user_settings settings;
 			container->get_user_settings(settings);
@@ -2960,50 +2977,50 @@ void render_manager::config_save(config_type cfg_type, xml_data_node *parentnode
 			// output the color controls
 			if (settings.m_brightness != machine().options().brightness())
 			{
-				xml_set_attribute_float(screennode, "brightness", settings.m_brightness);
+				screennode->set_attribute_float("brightness", settings.m_brightness);
 				changed = true;
 			}
 
 			if (settings.m_contrast != machine().options().contrast())
 			{
-				xml_set_attribute_float(screennode, "contrast", settings.m_contrast);
+				screennode->set_attribute_float("contrast", settings.m_contrast);
 				changed = true;
 			}
 
 			if (settings.m_gamma != machine().options().gamma())
 			{
-				xml_set_attribute_float(screennode, "gamma", settings.m_gamma);
+				screennode->set_attribute_float("gamma", settings.m_gamma);
 				changed = true;
 			}
 
 			// output the positioning controls
 			if (settings.m_xoffset != 0.0f)
 			{
-				xml_set_attribute_float(screennode, "hoffset", settings.m_xoffset);
+				screennode->set_attribute_float("hoffset", settings.m_xoffset);
 				changed = true;
 			}
 
 			if (settings.m_xscale != 1.0f)
 			{
-				xml_set_attribute_float(screennode, "hstretch", settings.m_xscale);
+				screennode->set_attribute_float("hstretch", settings.m_xscale);
 				changed = true;
 			}
 
 			if (settings.m_yoffset != 0.0f)
 			{
-				xml_set_attribute_float(screennode, "voffset", settings.m_yoffset);
+				screennode->set_attribute_float("voffset", settings.m_yoffset);
 				changed = true;
 			}
 
 			if (settings.m_yscale != 1.0f)
 			{
-				xml_set_attribute_float(screennode, "vstretch", settings.m_yscale);
+				screennode->set_attribute_float("vstretch", settings.m_yscale);
 				changed = true;
 			}
 
 			// if nothing changed, kill the node
 			if (!changed)
-				xml_delete_node(screennode);
+				screennode->delete_node();
 		}
 	}
 }

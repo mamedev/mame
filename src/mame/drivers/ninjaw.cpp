@@ -316,11 +316,14 @@ rumbling on a subwoofer in the cabinet.)
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/ninjaw.h"
+#include "includes/taitoipt.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/2610intf.h"
-#include "includes/taitoipt.h"
-#include "includes/ninjaw.h"
+#include "screen.h"
+#include "speaker.h"
 
 #include "ninjaw.lh"
 
@@ -632,7 +635,7 @@ class subwoofer_device : public device_t,
 									public device_sound_interface
 {
 public:
-	subwoofer_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	subwoofer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~subwoofer_device() {}
 
 protected:
@@ -649,9 +652,9 @@ private:
 
 extern const device_type SUBWOOFER;
 
-const device_type SUBWOOFER = &device_creator<subwoofer_device>;
+const device_type SUBWOOFER = device_creator<subwoofer_device>;
 
-subwoofer_device::subwoofer_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+subwoofer_device::subwoofer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SUBWOOFER, "Subwoofer", tag, owner, clock),
 		device_sound_interface(mconfig, *this)
 {
@@ -720,7 +723,7 @@ void ninjaw_state::machine_reset()
 	machine().sound().system_enable(true);  /* mixer enabled */
 }
 
-static MACHINE_CONFIG_START( ninjaw, ninjaw_state )
+static MACHINE_CONFIG_START( ninjaw )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,16000000/2)  /* 8 MHz ? */
@@ -840,7 +843,7 @@ static MACHINE_CONFIG_START( ninjaw, ninjaw_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( darius2, ninjaw_state )
+static MACHINE_CONFIG_START( darius2 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,16000000/2)  /* 8 MHz ? */
@@ -1174,8 +1177,8 @@ ROM_END
 
 /* Working Games */
 
-//    YEAR, NAME,    PARENT, MACHINE, INPUT,   INIT,MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1987, ninjaw,  0,      ninjaw,  ninjaw, driver_device,  0,   ROT0,   "Taito Corporation Japan",   "The Ninja Warriors (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ninjawj, ninjaw, ninjaw,  ninjawj, driver_device, 0,   ROT0,   "Taito Corporation",         "The Ninja Warriors (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ninjawu, ninjaw, ninjaw,  ninjawj, driver_device,  0,   ROT0,  "Taito Corporation America (licensed to Romstar)", "The Ninja Warriors (US)", MACHINE_SUPPORTS_SAVE ) /* Uses same coinage as World, see notes */
-GAME( 1989, darius2, 0,      darius2, darius2, driver_device, 0,   ROT0,   "Taito Corporation",         "Darius II (triple screen) (Japan)", MACHINE_SUPPORTS_SAVE )
+//    YEAR, NAME,    PARENT, MACHINE, INPUT,   STATE         INIT,MONITOR,COMPANY,                     FULLNAME,FLAGS
+GAME( 1987, ninjaw,  0,      ninjaw,  ninjaw,  ninjaw_state, 0,   ROT0,   "Taito Corporation Japan",   "The Ninja Warriors (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ninjawj, ninjaw, ninjaw,  ninjawj, ninjaw_state, 0,   ROT0,   "Taito Corporation",         "The Ninja Warriors (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ninjawu, ninjaw, ninjaw,  ninjawj, ninjaw_state, 0,   ROT0,   "Taito Corporation America (licensed to Romstar)", "The Ninja Warriors (US)", MACHINE_SUPPORTS_SAVE ) /* Uses same coinage as World, see notes */
+GAME( 1989, darius2, 0,      darius2, darius2, ninjaw_state, 0,   ROT0,   "Taito Corporation",         "Darius II (triple screen) (Japan)", MACHINE_SUPPORTS_SAVE )

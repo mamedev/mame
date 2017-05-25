@@ -6,12 +6,12 @@
 
 **********************************************************************/
 
+#ifndef MAME_MACHINE_MM58167_H
+#define MAME_MACHINE_MM58167_H
+
 #pragma once
 
-#ifndef __MM58167_H__
-#define __MM58167_H__
-
-#include "emu.h"
+#include "dirtc.h"
 
 
 //**************************************************************************
@@ -33,12 +33,12 @@ class mm58167_device :  public device_t,
 {
 public:
 	// construction/destruction
-	mm58167_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mm58167_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
 
-	template<class _Object> static devcb_base &set_irq_cb(device_t &device, _Object wr) { return downcast<mm58167_device &>(device).m_irq_w.set_callback(wr); }
+	template <class Object> static devcb_base &set_irq_cb(device_t &device, Object &&wr) { return downcast<mm58167_device &>(device).m_irq_w.set_callback(std::forward<Object>(wr)); }
 
 	devcb_write_line m_irq_w;
 
@@ -50,7 +50,7 @@ protected:
 
 	// device_rtc_interface overrides
 	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) override;
-	virtual bool rtc_feature_leap_year() override { return true; }
+	virtual bool rtc_feature_leap_year() const override { return true; }
 
 	void set_irq(int bit);
 	void update_rtc();
@@ -65,6 +65,6 @@ private:
 };
 
 // device type definition
-extern const device_type MM58167;
+DECLARE_DEVICE_TYPE(MM58167, mm58167_device)
 
-#endif
+#endif // MAME_MACHINE_MM58167_H

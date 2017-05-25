@@ -49,17 +49,62 @@ static void ATTR_PRINTF(3,4) verbose_log(running_machine &machine, int level, co
 
 
 //**************************************************************************
+//  REGISTER DEFINES (INCOMPLETE)
+//**************************************************************************
+
+#define SCNTL0_TRG          0x01
+#define SCNTL0_AAP          0x02
+#define SCNTL0_EPG          0x04
+#define SCNTL0_EPC          0x08
+#define SCNTL0_WATN         0x10
+#define SCNTL0_START        0x20
+#define SCNTL0_ARB_MASK     3
+#define SCNTL0_ARB_SHIFT    6
+
+#define SSTAT0_PAR          0x01
+#define SSTAT0_RST          0x02
+#define SSTAT0_UDC          0x04
+#define SSTAT0_SGE          0x08
+#define SSTAT0_SEL          0x10
+#define SSTAT0_STO          0x20
+#define SSTAT0_CMP          0x40
+#define SSTAT0_MA           0x80
+
+#define SSTAT1_SDP          0x01
+#define SSTAT1_RST          0x02
+#define SSTAT1_WOA          0x04
+#define SSTAT1_LOA          0x08
+#define SSTAT1_AIP          0x10
+#define SSTAT1_ORF          0x20
+#define SSTAT1_OLF          0x40
+#define SSTAT1_ILF          0x80
+
+#define ISTAT_DIP           0x01
+#define ISTAT_SIP           0x02
+#define ISTAT_PRE           0x04
+#define ISTAT_CON           0x08
+#define ISTAT_ABRT          0x80
+
+#define DSTAT_OPC           0x01
+#define DSTAT_WTD           0x02
+#define DSTAT_SIR           0x04
+#define DSTAT_SSI           0x08
+#define DSTAT_ABRT          0x10
+#define DSTAT_DFE           0x80
+
+
+//**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
 
-const device_type NCR53C7XX = &device_creator<ncr53c7xx_device>;
+DEFINE_DEVICE_TYPE(NCR53C7XX, ncr53c7xx_device, "ncr537xx", "NCR 53C7xx SCSI")
 
 //-------------------------------------------------
 //  ncr53c7xx_device - constructor/destructor
 //-------------------------------------------------
 
-ncr53c7xx_device::ncr53c7xx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	:   nscsi_device(mconfig, NCR53C7XX, "53C7xx SCSI", tag, owner, clock, "ncr537xx", __FILE__),
+ncr53c7xx_device::ncr53c7xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	:   nscsi_device(mconfig, NCR53C7XX, tag, owner, clock),
 		device_execute_interface(mconfig, *this),
 		m_icount(0),
 		m_irq_handler(*this),
@@ -187,7 +232,7 @@ READ32_MEMBER( ncr53c7xx_device::read )
 {
 	VERBOSE_LOG(machine(), 1, "REG R: [%x] (%08X)\n", offset, mem_mask);
 
-	UINT32 ret = 0;
+	uint32_t ret = 0;
 
 	switch (offset)
 	{
@@ -700,7 +745,7 @@ void ncr53c7xx_device::send_byte()
 
 	set_scsi_state( (m_scsi_state & STATE_MASK) | (SEND_WAIT_SETTLE << SUB_SHIFT) );
 
-	UINT32 data = m_host_read(m_dnad & ~3, 0xffffffff);
+	uint32_t data = m_host_read(m_dnad & ~3, 0xffffffff);
 	data = data >> ((m_dnad & 3) * 8) & 0xff;
 
 	++m_dnad;
@@ -742,8 +787,8 @@ void ncr53c7xx_device::device_timer(emu_timer &timer, device_timer_id id, int pa
 
 void ncr53c7xx_device::step(bool timeout)
 {
-	UINT32 ctrl = scsi_bus->ctrl_r();
-	UINT32 data = scsi_bus->data_r();
+	uint32_t ctrl = scsi_bus->ctrl_r();
+	uint32_t data = scsi_bus->data_r();
 
 	VERBOSE_LOG(machine(), 2, "Step: CTRL:%x DATA:%x (%d.%d) Timeout:%d\n", ctrl, data, m_scsi_state & STATE_MASK, m_scsi_state >> SUB_SHIFT, timeout);
 
@@ -1058,8 +1103,8 @@ void ncr53c7xx_device::step(bool timeout)
 			{
 				m_last_data = scsi_bus->data_r();
 
-				UINT32 shift = (8 * (m_dnad & 3));
-				UINT32 mem_mask = 0xff << shift;
+				uint32_t shift = (8 * (m_dnad & 3));
+				uint32_t mem_mask = 0xff << shift;
 				m_host_write(m_dnad & ~3, data << shift, mem_mask);
 
 				++m_dnad;
@@ -1138,7 +1183,7 @@ void ncr53c7xx_device::execute_run()
 				m_finished = false;
 
 				// Fetch the instruction
-				UINT32 inst = m_host_read(m_dsp, 0xffffffff);
+				uint32_t inst = m_host_read(m_dsp, 0xffffffff);
 
 				m_dcmd = inst >> 24;
 				m_dbc = inst & 0xffffff;
@@ -1534,7 +1579,7 @@ void ncr53c7xx_device::io_i_waitreselect()
 
 void ncr53c7xx_device::io_i_set()
 {
-	UINT32 mask = 0;
+	uint32_t mask = 0;
 
 	if (m_dbc & (1 << 3))
 		mask |= S_ATN;
@@ -1554,7 +1599,7 @@ void ncr53c7xx_device::io_i_set()
 
 void ncr53c7xx_device::io_i_clear()
 {
-	UINT32 mask = 0;
+	uint32_t mask = 0;
 
 	if (m_dbc & (1 << 3))
 		mask |= S_ATN;

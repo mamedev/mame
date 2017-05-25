@@ -131,11 +131,13 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/mips/mips3.h"
+#include "audio/dcs.h"
+
 #include "cpu/adsp2100/adsp2100.h"
+#include "cpu/mips/mips3.h"
 #include "machine/ataintf.h"
 #include "machine/idehd.h"
-#include "audio/dcs.h"
+#include "screen.h"
 
 
 class kinst_state : public driver_device
@@ -158,12 +160,13 @@ public:
 	{
 	}
 
-	required_shared_ptr<UINT32> m_rambase;
-	required_shared_ptr<UINT32> m_rambase2;
-	required_shared_ptr<UINT32> m_control;
-	required_shared_ptr<UINT32> m_rombase;
-	UINT32 *m_video_base;
-	const UINT8 *m_control_map;
+	required_shared_ptr<uint32_t> m_rambase;
+	required_shared_ptr<uint32_t> m_rambase2;
+	required_shared_ptr<uint32_t> m_control;
+	required_shared_ptr<uint32_t> m_rombase;
+	uint32_t *m_video_base;
+	const uint8_t *m_control_map;
+	emu_timer *m_irq0_stop_timer;
 	DECLARE_READ32_MEMBER(kinst_control_r);
 	DECLARE_WRITE32_MEMBER(kinst_control_w);
 	DECLARE_READ32_MEMBER(kinst_ide_r);
@@ -174,7 +177,7 @@ public:
 	DECLARE_DRIVER_INIT(kinst2);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	UINT32 screen_update_kinst(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_kinst(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(irq0_start);
 	required_device<mips3_device> m_maincpu;
 	required_device<ata_interface_device> m_ata;
@@ -203,9 +206,11 @@ void kinst_state::machine_start()
 	m_maincpu->mips3drc_set_options(MIPS3DRC_FASTEST_OPTIONS);
 
 	/* configure fast RAM regions */
-	m_maincpu->add_fastram(0x08000000, 0x087fffff, FALSE, m_rambase2);
-	m_maincpu->add_fastram(0x00000000, 0x0007ffff, FALSE, m_rambase);
-	m_maincpu->add_fastram(0x1fc00000, 0x1fc7ffff, TRUE,  m_rombase);
+	m_maincpu->add_fastram(0x08000000, 0x087fffff, false, m_rambase2);
+	m_maincpu->add_fastram(0x00000000, 0x0007ffff, false, m_rambase);
+	m_maincpu->add_fastram(0x1fc00000, 0x1fc7ffff, true,  m_rombase);
+
+	m_irq0_stop_timer = timer_alloc(TIMER_IRQ0_STOP);
 }
 
 
@@ -219,7 +224,7 @@ void kinst_state::machine_start()
 void kinst_state::machine_reset()
 {
 	ide_hdd_device *hdd = m_ata->subdevice<ata_slot_device>("0")->subdevice<ide_hdd_device>("hdd");
-	UINT16 *identify_device = hdd->identify_device_buffer();
+	uint16_t *identify_device = hdd->identify_device_buffer();
 
 	if (strncmp(machine().system().name, "kinst2", 6) != 0)
 	{
@@ -252,21 +257,21 @@ void kinst_state::machine_reset()
  *
  *************************************/
 
-UINT32 kinst_state::screen_update_kinst(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t kinst_state::screen_update_kinst(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int y;
 
 	/* loop over rows and copy to the destination */
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		UINT32 *src = &m_video_base[640/4 * y];
-		UINT16 *dest = &bitmap.pix16(y, cliprect.min_x);
+		uint32_t *src = &m_video_base[640/4 * y];
+		uint16_t *dest = &bitmap.pix16(y, cliprect.min_x);
 		int x;
 
 		/* loop over columns */
 		for (x = cliprect.min_x; x < cliprect.max_x; x += 2)
 		{
-			UINT32 data = *src++;
+			uint32_t data = *src++;
 
 			/* store two pixels */
 			*dest++ = (data >>  0) & 0x7fff;
@@ -292,7 +297,7 @@ void kinst_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in kinst_state::device_timer");
+		assert_always(false, "Unknown id in kinst_state::device_timer");
 	}
 }
 
@@ -300,7 +305,7 @@ void kinst_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 INTERRUPT_GEN_MEMBER(kinst_state::irq0_start)
 {
 	device.execute().set_input_line(0, ASSERT_LINE);
-	timer_set(attotime::from_usec(50), TIMER_IRQ0_STOP);
+	m_irq0_stop_timer->adjust(attotime::from_usec(50));
 }
 
 
@@ -343,7 +348,7 @@ WRITE32_MEMBER(kinst_state::kinst_ide_extra_w)
 
 READ32_MEMBER(kinst_state::kinst_control_r)
 {
-	UINT32 result;
+	uint32_t result;
 	static const char *const portnames[] = { "P1", "P2", "VOLUME", "UNUSED", "DSW" };
 
 	/* apply shuffling */
@@ -378,7 +383,7 @@ READ32_MEMBER(kinst_state::kinst_control_r)
 
 WRITE32_MEMBER(kinst_state::kinst_control_w)
 {
-	UINT32 olddata;
+	uint32_t olddata;
 
 	/* apply shuffling */
 	offset = m_control_map[offset / 2];
@@ -661,7 +666,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( kinst, kinst_state )
+static MACHINE_CONFIG_START( kinst )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", R4600LE, MASTER_CLOCK*2)
@@ -897,7 +902,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(kinst_state,kinst)
 {
-	static const UINT8 kinst_control_map[8] = { 0,1,2,3,4,5,6,7 };
+	static const uint8_t kinst_control_map[8] = { 0,1,2,3,4,5,6,7 };
 
 	/* set up the control register mapping */
 	m_control_map = kinst_control_map;
@@ -906,7 +911,7 @@ DRIVER_INIT_MEMBER(kinst_state,kinst)
 
 DRIVER_INIT_MEMBER(kinst_state,kinst2)
 {
-	static const UINT8 kinst2_control_map[8] = { 2,4,1,0,3,5,6,7 };
+	static const uint8_t kinst2_control_map[8] = { 2,4,1,0,3,5,6,7 };
 
 	// read: $80 on ki2 = $90 on ki
 	// read: $88 on ki2 = $a0 on ki
@@ -927,7 +932,7 @@ DRIVER_INIT_MEMBER(kinst_state,kinst2)
  *
  *************************************/
 
-GAME( 1994, kinst,    0,      kinst, kinst, kinst_state,  kinst,   ROT0, "Rare", "Killer Instinct (v1.5d)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, kinst,    0,      kinst, kinst,  kinst_state, kinst,   ROT0, "Rare", "Killer Instinct (v1.5d)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, kinst14,  kinst,  kinst, kinst2, kinst_state, kinst,   ROT0, "Rare", "Killer Instinct (v1.4)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, kinst13,  kinst,  kinst, kinst2, kinst_state, kinst,   ROT0, "Rare", "Killer Instinct (v1.3)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, kinstp,   kinst,  kinst, kinst2, kinst_state, kinst,   ROT0, "Rare", "Killer Instinct (proto v4.7)", MACHINE_SUPPORTS_SAVE )

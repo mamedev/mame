@@ -6,12 +6,11 @@
 
 ***************************************************************************/
 
+#ifndef MAME_BUS_SVI3X8_SLOT_SV802_H
+#define MAME_BUS_SVI3X8_SLOT_SV802_H
+
 #pragma once
 
-#ifndef __SVI3X8_SLOT_SV802_H__
-#define __SVI3X8_SLOT_SV802_H__
-
-#include "emu.h"
 #include "slot.h"
 #include "machine/buffer.h"
 #include "bus/centronics/ctronics.h"
@@ -27,7 +26,7 @@ class sv802_device : public device_t, public device_svi_slot_interface
 {
 public:
 	// construction/destruction
-	sv802_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sv802_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual DECLARE_READ8_MEMBER( iorq_r ) override;
 	virtual DECLARE_WRITE8_MEMBER( iorq_w ) override;
@@ -46,6 +45,6 @@ private:
 };
 
 // device type definition
-extern const device_type SV802;
+DECLARE_DEVICE_TYPE(SV802, sv802_device)
 
-#endif // __SVI3X8_SLOT_SV802_H__
+#endif // MAME_BUS_SVI3X8_SLOT_SV802_H

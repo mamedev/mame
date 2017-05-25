@@ -2,10 +2,10 @@
 <mamelayout version="2">
 
 <!--
-	Front panel of the Patinho Feio mini-computer
-	with clickable buttons, switches and lamps.
+    Front panel of the Patinho Feio mini-computer
+    with clickable buttons, switches and lamps.
 
-	Written by Felipe Sanches.
+    Written by Felipe Sanches.
 -->
 
 	<element name="bit_lamp" defstate="0">

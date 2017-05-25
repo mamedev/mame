@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "ddp.h"
 
 
@@ -22,7 +23,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ADAM_DDP = &device_creator<adam_digital_data_pack_device>;
+DEFINE_DEVICE_TYPE(ADAM_DDP, adam_digital_data_pack_device, "adam_ddp", "Adam Digital Data Pack")
 
 
 //-------------------------------------------------
@@ -39,7 +40,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *adam_digital_data_pack_device::device_rom_region() const
+const tiny_rom_entry *adam_digital_data_pack_device::device_rom_region() const
 {
 	return ROM_NAME( adam_ddp );
 }
@@ -79,7 +80,7 @@ static const struct CassetteOptions adam_cassette_options =
 //  MACHINE_DRIVER( adam_ddp )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( adam_ddp )
+static MACHINE_CONFIG_START( adam_ddp )
 	MCFG_CPU_ADD(M6801_TAG, M6801, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(adam_ddp_mem)
 	MCFG_CPU_IO_MAP(adam_ddp_io)
@@ -118,8 +119,8 @@ machine_config_constructor adam_digital_data_pack_device::device_mconfig_additio
 //  adam_digital_data_pack_device - constructor
 //-------------------------------------------------
 
-adam_digital_data_pack_device::adam_digital_data_pack_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, ADAM_DDP, "Adam DDP", tag, owner, clock, "adam_ddp", __FILE__),
+adam_digital_data_pack_device::adam_digital_data_pack_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, ADAM_DDP, tag, owner, clock),
 		device_adamnet_card_interface(mconfig, *this),
 		m_maincpu(*this, M6801_TAG),
 		m_ddp0(*this, "cassette"),
@@ -214,7 +215,7 @@ READ8_MEMBER( adam_digital_data_pack_device::p2_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (m_bus->reset_r())
 		data |= M6801_MODE_6;
@@ -284,7 +285,7 @@ READ8_MEMBER( adam_digital_data_pack_device::p4_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// drive 0
 	if (m_ddp0->exists())

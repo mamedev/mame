@@ -40,12 +40,12 @@ inline ATTR_FORCE_INLINE T m6809_base_device::rotate_right(T value)
 //-------------------------------------------------
 
 template<class T>
-inline ATTR_FORCE_INLINE UINT32 m6809_base_device::rotate_left(T value)
+inline ATTR_FORCE_INLINE uint32_t m6809_base_device::rotate_left(T value)
 {
 	T high_bit = ((T) 1) << (sizeof(T) * 8 - 1);
 	bool new_carry = (value & high_bit) ? true : false;
 
-	UINT32 new_value = value;
+	uint32_t new_value = value;
 	new_value <<= 1;
 
 	if (m_cc & CC_C)
@@ -65,14 +65,14 @@ inline ATTR_FORCE_INLINE UINT32 m6809_base_device::rotate_left(T value)
 //  read_operand
 //-------------------------------------------------
 
-inline ATTR_FORCE_INLINE UINT8 m6809_base_device::read_operand()
+inline ATTR_FORCE_INLINE uint8_t m6809_base_device::read_operand()
 {
 	switch(m_addressing_mode)
 	{
 		case ADDRESSING_MODE_EA:            return read_memory(m_ea.w);
 		case ADDRESSING_MODE_IMMEDIATE:     return read_opcode_arg();
-		case ADDRESSING_MODE_REGISTER_A:    return m_d.b.h;
-		case ADDRESSING_MODE_REGISTER_B:    return m_d.b.l;
+		case ADDRESSING_MODE_REGISTER_A:    return m_q.r.a;
+		case ADDRESSING_MODE_REGISTER_B:    return m_q.r.b;
 		default:                            fatalerror("Unexpected");   return 0x00;
 	}
 }
@@ -82,7 +82,7 @@ inline ATTR_FORCE_INLINE UINT8 m6809_base_device::read_operand()
 //  read_operand
 //-------------------------------------------------
 
-inline ATTR_FORCE_INLINE UINT8 m6809_base_device::read_operand(int ordinal)
+inline ATTR_FORCE_INLINE uint8_t m6809_base_device::read_operand(int ordinal)
 {
 	switch(m_addressing_mode)
 	{
@@ -97,14 +97,14 @@ inline ATTR_FORCE_INLINE UINT8 m6809_base_device::read_operand(int ordinal)
 //  write_operand
 //-------------------------------------------------
 
-inline ATTR_FORCE_INLINE void m6809_base_device::write_operand(UINT8 data)
+inline ATTR_FORCE_INLINE void m6809_base_device::write_operand(uint8_t data)
 {
 	switch(m_addressing_mode)
 	{
 		case ADDRESSING_MODE_IMMEDIATE:     /* do nothing */                break;
 		case ADDRESSING_MODE_EA:            write_memory(m_ea.w, data);     break;
-		case ADDRESSING_MODE_REGISTER_A:    m_d.b.h = data;                 break;
-		case ADDRESSING_MODE_REGISTER_B:    m_d.b.l = data;                 break;
+		case ADDRESSING_MODE_REGISTER_A:    m_q.r.a = data;                 break;
+		case ADDRESSING_MODE_REGISTER_B:    m_q.r.b = data;                 break;
 		default:                            fatalerror("Unexpected");       break;
 	}
 }
@@ -114,7 +114,7 @@ inline ATTR_FORCE_INLINE void m6809_base_device::write_operand(UINT8 data)
 //  write_operand
 //-------------------------------------------------
 
-inline ATTR_FORCE_INLINE void m6809_base_device::write_operand(int ordinal, UINT8 data)
+inline ATTR_FORCE_INLINE void m6809_base_device::write_operand(int ordinal, uint8_t data)
 {
 	switch(m_addressing_mode)
 	{
@@ -131,9 +131,9 @@ inline ATTR_FORCE_INLINE void m6809_base_device::write_operand(int ordinal, UINT
 
 inline ATTR_FORCE_INLINE void m6809_base_device::daa()
 {
-	UINT16 t, cf = 0;
-	UINT8 msn = m_d.b.h & 0xF0;
-	UINT8 lsn = m_d.b.h & 0x0F;
+	uint16_t t, cf = 0;
+	uint8_t msn = m_q.r.a & 0xF0;
+	uint8_t lsn = m_q.r.a & 0x0F;
 
 	// compute the carry
 	if (lsn > 0x09 || m_cc & CC_H)  cf |= 0x06;
@@ -141,14 +141,14 @@ inline ATTR_FORCE_INLINE void m6809_base_device::daa()
 	if (msn > 0x90 || m_cc & CC_C)  cf |= 0x60;
 
 	// calculate the result
-	t = m_d.b.h + cf;
+	t = m_q.r.a + cf;
 
 	m_cc &= ~CC_V;
 	if (t & 0x0100)     // keep carry from previous operation
 		m_cc |= CC_C;
 
 	// and put it back into A
-	m_d.b.h = set_flags(CC_NZ, (UINT8) t);
+	m_q.r.a = set_flags(CC_NZ, (uint8_t) t);
 }
 
 
@@ -159,13 +159,13 @@ inline ATTR_FORCE_INLINE void m6809_base_device::daa()
 inline ATTR_FORCE_INLINE void m6809_base_device::mul()
 {
 	// perform multiply
-	UINT16 result = ((UINT16) m_d.b.h) * ((UINT16) m_d.b.l);
+	uint16_t result = ((uint16_t) m_q.r.a) * ((uint16_t) m_q.r.b);
 
 	// set result and Z flag
-	m_d.w = set_flags(CC_Z, result);
+	m_q.r.d = set_flags(CC_Z, result);
 
 	// set C flag
-	if (m_d.w & 0x0080)
+	if (m_q.r.d & 0x0080)
 		m_cc |= CC_C;
 	else
 		m_cc &= ~CC_C;
@@ -176,7 +176,7 @@ inline ATTR_FORCE_INLINE void m6809_base_device::mul()
 //  ireg
 //-------------------------------------------------
 
-inline ATTR_FORCE_INLINE UINT16 &m6809_base_device::ireg()
+inline ATTR_FORCE_INLINE uint16_t &m6809_base_device::ireg()
 {
 	switch(m_opcode & 0x60)
 	{
@@ -196,7 +196,7 @@ inline ATTR_FORCE_INLINE UINT16 &m6809_base_device::ireg()
 //-------------------------------------------------
 
 template<class T>
-inline T m6809_base_device::set_flags(UINT8 mask, T a, T b, UINT32 r)
+inline T m6809_base_device::set_flags(uint8_t mask, T a, T b, uint32_t r)
 {
 	T hi_bit = (T) (1 << (sizeof(T) * 8 - 1));
 
@@ -220,7 +220,7 @@ inline T m6809_base_device::set_flags(UINT8 mask, T a, T b, UINT32 r)
 //-------------------------------------------------
 
 template<class T>
-inline T m6809_base_device::set_flags(UINT8 mask, T r)
+inline T m6809_base_device::set_flags(uint8_t mask, T r)
 {
 	return set_flags(mask, (T)0, r, r);
 }
@@ -233,7 +233,7 @@ inline T m6809_base_device::set_flags(UINT8 mask, T r)
 inline void m6809_base_device::eat_remaining()
 {
 	// we do this in order to be nice to people debugging
-	UINT16 real_pc = m_pc.w;
+	uint16_t real_pc = m_pc.w;
 
 	eat(m_icount);
 
@@ -260,7 +260,7 @@ inline bool m6809_base_device::is_register_addressing_mode()
 //  get_pending_interrupt
 //-------------------------------------------------
 
-inline UINT16 m6809_base_device::get_pending_interrupt()
+inline uint16_t m6809_base_device::get_pending_interrupt()
 {
 	if (m_nmi_asserted)
 		return VECTOR_NMI;

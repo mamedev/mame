@@ -167,16 +167,16 @@
 			<bounds x="2.767" y="3.067" width="0.02" height="0.02" />
 		</bezel>
 
-		<bezel name="lamp0" element="start">
+		<bezel name="lamp0" element="start" inputtag="SYSTEM" inputmask="0x04">
 			<bounds x="3.5" y="3.3" width="0.4" height="0.1" />
 		</bezel>
-		<bezel name="lamp1" element="view1">
+		<bezel name="lamp1" element="view1" inputtag="IN1" inputmask="0x10">
 			<bounds x="0.1" y="3.1" width="0.4" height="0.1" />
 		</bezel>
-		<bezel name="lamp2" element="view2">
+		<bezel name="lamp2" element="view2" inputtag="IN1" inputmask="0x20">
 			<bounds x="0.1" y="3.2" width="0.4" height="0.1" />
 		</bezel>
-		<bezel name="lamp3" element="view3">
+		<bezel name="lamp3" element="view3" inputtag="IN1" inputmask="0x40">
 			<bounds x="0.1" y="3.3" width="0.4" height="0.1" />
 		</bezel>
 	</view>

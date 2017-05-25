@@ -403,9 +403,9 @@ HRESULT CMethodProps::ParseParamsFromPROPVARIANT(const UString &realName, const 
   if (value.vt == VT_EMPTY)
   {
     // {realName}=[empty]
-    UString name, value;
-    SplitParam(realName, name, value);
-    return SetParam(name, value);
+    UString name, valueStr;
+    SplitParam(realName, name, valueStr);
+    return SetParam(name, valueStr);
   }
   
   // {realName}=value

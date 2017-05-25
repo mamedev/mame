@@ -3,7 +3,7 @@
 /*
  * nl_dice_compat.h
  *
- * The follwoing script will convert a circuit using dice syntax into netlist
+ * The following script will convert a circuit using dice syntax into netlist
  * syntax. It's not fail proof, but eases the manual work involved significantly.
 
 sed -e 's/#define \(.*\)"\(.*\)"[ \t]*,[ \t]*\(.*\)/NET_ALIAS(\1,\2.\3)/' src/mame/drivers/nl_breakout.c   \
@@ -27,7 +27,10 @@ sed -e 's/#define \(.*\)"\(.*\)"[ \t]*,[ \t]*\(.*\)/NET_ALIAS(\1,\2.\3)/' src/ma
 #ifndef NL_CONVERT_CPP
 #include "devices/net_lib.h"
 #include "analog/nld_twoterm.h"
+
+#include <cmath>
 #endif
+
 
 /* --------------------------------------------------------------------
  * Compatibility macros for DICE netlists ...
@@ -230,7 +233,7 @@ inline int CAPACITOR_tc_lh(const double c, const double r)
 	NET_C(GND, name ## _C.2)
 #else
 // fast, might work
-#define	CHIP_CAPACITOR(name, pdesc) \
+#define CHIP_CAPACITOR(name, pdesc) \
 	RES(name ## _C, RES_K(1000)) \
 	ALIAS(name.1, name ## _C.1 ) \
 	ALIAS(name.2, name ## _C.1) \

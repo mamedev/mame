@@ -7,7 +7,7 @@ void raiden2cop_device::dma_tilemap_buffer()
 
 	for (int i = 0; i < 0x2800 / 2; i++)
 	{
-		UINT16 tileval = m_host_space->read_word(src);
+		uint16_t tileval = m_host_space->read_word(src);
 		src += 2;
 		m_videoramout_cb(i, tileval, 0xffff);
 	}
@@ -20,7 +20,7 @@ void raiden2cop_device::dma_palette_buffer()
 
 	for (int i = 0; i < 0x1000 / 2; i++) // todo, use length register
 	{
-		UINT16 palval = m_host_space->read_word(src);
+		uint16_t palval = m_host_space->read_word(src);
 		src += 2;
 		m_palette->set_pen_color(i, pal5bit(palval >> 0), pal5bit(palval >> 5), pal5bit(palval >> 10));
 	}
@@ -29,7 +29,7 @@ void raiden2cop_device::dma_palette_buffer()
 // these are typically used to transfer palette data from one RAM buffer to another, applying fade values to it prior to the 0x15 transfer
 void raiden2cop_device::dma_palette_brightness()
 {
-	UINT32 src, dst, size, i;
+	uint32_t src, dst, size, i;
 
 	/*
 	Apparently all of those are just different DMA channels, brightness effects are done through a RAM table and the pal_brightness_val / mode
@@ -41,8 +41,6 @@ void raiden2cop_device::dma_palette_brightness()
 
 	TODO:
 	- Denjin Makai mode 4 is totally guessworked.
-	- SD Gundam doesn't fade colors correctly, it should have the text layer / sprites with normal gradient and the rest dimmed in most cases,
-	presumably bad RAM table or bad algorithm
 	*/
 
 	//if(dma_trigger != 0x87)
@@ -54,34 +52,41 @@ void raiden2cop_device::dma_palette_brightness()
 
 	for (i = 0; i < size; i++)
 	{
-		UINT16 pal_val;
+		uint16_t pal_val;
 		int r, g, b;
 		int rt, gt, bt;
 
 		if (pal_brightness_mode == 5)
 		{
-			bt = ((m_host_space->read_word(src + (cop_dma_adr_rel * 0x400))) & 0x7c00) >> 5;
-			bt = fade_table(bt | (pal_brightness_val ^ 0));
-			b = ((m_host_space->read_word(src)) & 0x7c00) >> 5;
-			b = fade_table(b | (pal_brightness_val ^ 0x1f));
-			pal_val = ((b + bt) & 0x1f) << 10;
-			gt = ((m_host_space->read_word(src + (cop_dma_adr_rel * 0x400))) & 0x03e0);
-			gt = fade_table(gt | (pal_brightness_val ^ 0));
-			g = ((m_host_space->read_word(src)) & 0x03e0);
-			g = fade_table(g | (pal_brightness_val ^ 0x1f));
-			pal_val |= ((g + gt) & 0x1f) << 5;
-			rt = ((m_host_space->read_word(src + (cop_dma_adr_rel * 0x400))) & 0x001f) << 5;
-			rt = fade_table(rt | (pal_brightness_val ^ 0));
-			r = ((m_host_space->read_word(src)) & 0x001f) << 5;
-			r = fade_table(r | (pal_brightness_val ^ 0x1f));
-			pal_val |= ((r + rt) & 0x1f);
+			u16 paldata = m_host_space->read_word(src);
+			if (BIT(paldata, 15))
+				pal_val = paldata; // fade me not
+			else
+			{
+				u16 targetpaldata = m_host_space->read_word(src + (cop_dma_adr_rel * 0x400));
+				bt = (targetpaldata & 0x7c00) >> 5;
+				bt = fade_table(bt | (pal_brightness_val ^ 0));
+				b = (paldata & 0x7c00) >> 5;
+				b = fade_table(b | (pal_brightness_val ^ 0x1f));
+				pal_val = ((b + bt) & 0x1f) << 10;
+				gt = (targetpaldata & 0x03e0);
+				gt = fade_table(gt | (pal_brightness_val ^ 0));
+				g = (paldata & 0x03e0);
+				g = fade_table(g | (pal_brightness_val ^ 0x1f));
+				pal_val |= ((g + gt) & 0x1f) << 5;
+				rt = (targetpaldata & 0x001f) << 5;
+				rt = fade_table(rt | (pal_brightness_val ^ 0));
+				r = (paldata & 0x001f) << 5;
+				r = fade_table(r | (pal_brightness_val ^ 0x1f));
+				pal_val |= ((r + rt) & 0x1f);
+			}
 		}
 		else if (pal_brightness_mode == 4) //Denjin Makai
 		{
 			// mode 4 swaps endianness between two words, likely that DMA works in dword steps and bit 0.
 			// TODO: check on V30 flavour
-			UINT16 targetpaldata = m_host_space->read_word((src + (cop_dma_adr_rel * 0x400)) ^ 2);
-			UINT16 paldata = m_host_space->read_word(src ^ 2);
+			uint16_t targetpaldata = m_host_space->read_word((src + (cop_dma_adr_rel * 0x400)) ^ 2);
+			uint16_t paldata = m_host_space->read_word(src ^ 2);
 
 			bt = (targetpaldata & 0x7c00) >> 10;
 			b = (paldata & 0x7c00) >> 10;
@@ -121,7 +126,7 @@ void raiden2cop_device::dma_palette_brightness()
 
 void raiden2cop_device::dma_fill()
 {
-	UINT32 length, address;
+	uint32_t length, address;
 	int i;
 	if (cop_dma_dst[cop_dma_mode] != 0x0000) // Invalid?
 		return;
@@ -135,7 +140,7 @@ void raiden2cop_device::dma_fill()
 		m_host_space->write_dword(i, (cop_dma_v1) | (cop_dma_v2 << 16));
 
 	/*
-	UINT32 length, address;
+	uint32_t length, address;
 	int i;
 	if(cop_dma_dst[cop_dma_mode] != 0x0000) // Invalid?
 	return;
@@ -152,24 +157,24 @@ void raiden2cop_device::dma_fill()
 	*/
 }
 
-void raiden2cop_device::dma_zsorting(UINT16 data)
+void raiden2cop_device::dma_zsorting(uint16_t data)
 {
 	struct sort_entry {
-		INT16 sorting_key;
-		UINT16 val;
+		int32_t sorting_key;
+		uint16_t val;
 	};
 
 	std::vector<sort_entry> entries(data);
 	for(int i=0; i<data; i++) {
 		sort_entry &e = entries[i];
 		e.val = m_host_space->read_word(cop_sort_lookup + 2*i);
-		e.sorting_key = m_host_space->read_word(cop_sort_ram_addr + e.val);
+		e.sorting_key = m_host_space->read_dword(cop_sort_ram_addr + e.val);
 	}
 	switch(cop_sort_param) {
-	case 1:
+	case 2:
 		std::sort(entries.begin(), entries.end(), [](const auto &a, const auto &b){ return a.sorting_key > b.sorting_key; });
 		break;
-	case 2:
+	case 1:
 		std::sort(entries.begin(), entries.end(), [](const auto &a, const auto &b){ return a.sorting_key < b.sorting_key; });
 		break;
 	}

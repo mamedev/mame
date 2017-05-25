@@ -109,18 +109,18 @@ public:
 	required_device<generic_terminal_device> m_terminal;
 	DECLARE_READ16_MEMBER( teletype_ctrl_r );
 	DECLARE_WRITE16_MEMBER( teletype_ctrl_w );
-	DECLARE_WRITE8_MEMBER( kbd_put );
-	UINT8 m_teletype_data;
-	UINT16 m_teletype_status;
+	void kbd_put(u8 data);
+	uint8_t m_teletype_data;
+	uint16_t m_teletype_status;
 	virtual void machine_reset() override;
 	DECLARE_MACHINE_RESET(pdp11ub2);
 	DECLARE_MACHINE_RESET(pdp11qb);
-	void load9312prom(UINT8 *desc, UINT8 *src, int size);
+	void load9312prom(uint8_t *desc, uint8_t *src, int size);
 };
 
 READ16_MEMBER(pdp11_state::teletype_ctrl_r)
 {
-	UINT16 res = 0;
+	uint16_t res = 0;
 
 	switch(offset)
 	{
@@ -262,41 +262,41 @@ INPUT_PORTS_END
 void pdp11_state::machine_reset()
 {
 	// Load M9301-YA
-	UINT8* user1 = memregion("user1")->base();
-	UINT8* maincpu = memregion("maincpu")->base();
+	uint8_t* user1 = memregion("user1")->base();
+	uint8_t* maincpu = memregion("maincpu")->base();
 	int i;
 
 	for(i=0;i<0x100;i++) {
-		UINT8 nib1 = user1[i+0x000] ^ 0x00;
-		UINT8 nib2 = user1[i+0x200] ^ 0x01;
-		UINT8 nib3 = user1[i+0x400] ^ 0x0f;
-		UINT8 nib4 = user1[i+0x600] ^ 0x0e;
+		uint8_t nib1 = user1[i+0x000] ^ 0x00;
+		uint8_t nib2 = user1[i+0x200] ^ 0x01;
+		uint8_t nib3 = user1[i+0x400] ^ 0x0f;
+		uint8_t nib4 = user1[i+0x600] ^ 0x0e;
 
 		maincpu[0xea00 + i*2 + 1] = (nib1 << 4) + nib2;
 		maincpu[0xea00 + i*2 + 0] = (nib3 << 4) + nib4;
 	}
 	for(i=0x100;i<0x200;i++) {
-		UINT8 nib1 = user1[i+0x000] ^ 0x00;
-		UINT8 nib2 = user1[i+0x200] ^ 0x01;
-		UINT8 nib3 = user1[i+0x400] ^ 0x0f;
-		UINT8 nib4 = user1[i+0x600] ^ 0x0e;
+		uint8_t nib1 = user1[i+0x000] ^ 0x00;
+		uint8_t nib2 = user1[i+0x200] ^ 0x01;
+		uint8_t nib3 = user1[i+0x400] ^ 0x0f;
+		uint8_t nib4 = user1[i+0x600] ^ 0x0e;
 
 		maincpu[0xf600 + (i-0x100)*2 + 1] = (nib1 << 4) + nib2;
 		maincpu[0xf600 + (i-0x100)*2 + 0] = (nib3 << 4) + nib4;
 	}
 }
 
-void pdp11_state::load9312prom(UINT8 *desc, UINT8 *src, int size)
+void pdp11_state::load9312prom(uint8_t *desc, uint8_t *src, int size)
 {
 	//   3   2   1   8
 	//   7   6   5   4
 	// ~11 ~10   9   0
 	//  15  14  13 ~12
 	for(int i=0;i<size;i++) {
-		UINT8 nib1 = src[i*4+0];
-		UINT8 nib2 = src[i*4+1];
-		UINT8 nib3 = src[i*4+2];
-		UINT8 nib4 = src[i*4+3];
+		uint8_t nib1 = src[i*4+0];
+		uint8_t nib2 = src[i*4+1];
+		uint8_t nib3 = src[i*4+2];
+		uint8_t nib4 = src[i*4+3];
 
 		desc[i*2 + 0] = (nib2 << 4) + ((nib1 & 0x0e) | (nib3 & 1));
 		desc[i*2 + 1] = ((nib4 ^ 0x01)<<4) + ((nib1 & 0x01) | ((nib3 ^ 0x0c) & 0x0e));
@@ -306,16 +306,16 @@ void pdp11_state::load9312prom(UINT8 *desc, UINT8 *src, int size)
 MACHINE_RESET_MEMBER(pdp11_state,pdp11ub2)
 {
 	// Load M9312
-	UINT8* user1 = memregion("consproms")->base() + ioport("CONSPROM")->read() * 0x0400;
-	UINT8* maincpu = memregion("maincpu")->base();
+	uint8_t* user1 = memregion("consproms")->base() + ioport("CONSPROM")->read() * 0x0400;
+	uint8_t* maincpu = memregion("maincpu")->base();
 
 	//0165000
 	load9312prom(maincpu + 0165000,user1,0x100);
 
-	UINT8 s1 = ioport("S1")->read();
+	uint8_t s1 = ioport("S1")->read();
 
 	if (s1 & 0x02) { // if boot enabled
-		UINT16 addr = 0173000;
+		uint16_t addr = 0173000;
 		if (s1 & 1) {
 			addr = 0165000;
 		}
@@ -340,13 +340,13 @@ MACHINE_RESET_MEMBER(pdp11_state,pdp11qb)
 }
 
 
-WRITE8_MEMBER( pdp11_state::kbd_put )
+void pdp11_state::kbd_put(u8 data)
 {
 	m_teletype_data = data;
 	m_teletype_status |= 0x80;
 }
 
-static MACHINE_CONFIG_START( pdp11, pdp11_state )
+static MACHINE_CONFIG_START( pdp11 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",T11, XTAL_4MHz) // Need proper CPU here
 	MCFG_T11_INITIAL_MODE(6 << 13)
@@ -355,7 +355,7 @@ static MACHINE_CONFIG_START( pdp11, pdp11_state )
 
 	/* video hardware */
 	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(pdp11_state, kbd_put))
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(pdp11_state, kbd_put))
 
 	MCFG_RX01_ADD("rx01")
 MACHINE_CONFIG_END
@@ -463,8 +463,8 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( ????, pdp11ub,  0,       0,   pdp11,    pdp11, driver_device,  0,   "Digital Equipment Corporation",   "PDP-11 [Unibus](M9301-YA)",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( ????, pdp11ub2, pdp11ub, 0,   pdp11ub2, pdp11, driver_device,  0,   "Digital Equipment Corporation",   "PDP-11 [Unibus](M9312)",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( ????, pdp11qb,  pdp11ub, 0,   pdp11qb,  pdp11, driver_device,  0,   "Digital Equipment Corporation",   "PDP-11 [Q-BUS] (M7195 - MXV11)",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1987, sms1000,  pdp11ub, 0,   pdp11qb,  pdp11, driver_device,  0,   "Scientific Micro Systems",   "SMS-1000",      MACHINE_IS_SKELETON )
+/*    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT  STATE         INIT  COMPANY                          FULLNAME                          FLAGS */
+COMP( ????, pdp11ub,  0,       0,      pdp11,    pdp11, pdp11_state,  0,    "Digital Equipment Corporation", "PDP-11 [Unibus](M9301-YA)",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( ????, pdp11ub2, pdp11ub, 0,      pdp11ub2, pdp11, pdp11_state,  0,    "Digital Equipment Corporation", "PDP-11 [Unibus](M9312)",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( ????, pdp11qb,  pdp11ub, 0,      pdp11qb,  pdp11, pdp11_state,  0,    "Digital Equipment Corporation", "PDP-11 [Q-BUS] (M7195 - MXV11)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1987, sms1000,  pdp11ub, 0,      pdp11qb,  pdp11, pdp11_state,  0,    "Scientific Micro Systems",      "SMS-1000",                       MACHINE_IS_SKELETON )

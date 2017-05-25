@@ -15,9 +15,11 @@ TODO:
 *****************************************************************************/
 
 #include "emu.h"
+#include "includes/ikki.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
-#include "includes/ikki.h"
+#include "speaker.h"
 
 
 /*************************************
@@ -236,7 +238,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(ikki_state::ikki_irq)
 
 
 
-static MACHINE_CONFIG_START( ikki, ikki_state )
+static MACHINE_CONFIG_START( ikki )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,8000000/2) /* 4.000MHz */
@@ -354,5 +356,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1985, ikki,   0,    ikki, ikki, driver_device, 0, ROT0, "Sun Electronics", "Ikki (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, farmer, ikki, ikki, ikki, driver_device, 0, ROT0, "Sun Electronics", "Farmers Rebellion", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, ikki,   0,    ikki, ikki, ikki_state, 0, ROT0, "Sun Electronics", "Ikki (Japan)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1985, farmer, ikki, ikki, ikki, ikki_state, 0, ROT0, "Sun Electronics", "Farmers Rebellion", MACHINE_SUPPORTS_SAVE )

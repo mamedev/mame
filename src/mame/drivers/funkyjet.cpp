@@ -90,13 +90,16 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/funkyjet.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/h6280/h6280.h"
 #include "machine/decocrpt.h"
 #include "machine/gen_latch.h"
-#include "includes/funkyjet.h"
 #include "sound/ym2151.h"
 #include "sound/okim6295.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /******************************************************************************/
@@ -104,12 +107,12 @@ Notes:
 
 READ16_MEMBER( funkyjet_state::funkyjet_protection_region_0_146_r )
 {
-//  UINT16 realdat = deco16_146_funkyjet_prot_r(space,offset&0x3ff,mem_mask);
+//  uint16_t realdat = deco16_146_funkyjet_prot_r(space,offset&0x3ff,mem_mask);
 
 	int real_address = 0 + (offset *2);
 	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,  /* note, same bitswap as fghthist */      10,  9,  8,  7,  6,   5,  4,  3,  2,  1,    0) & 0x7fff;
-	UINT8 cs = 0;
-	UINT16 data = m_deco146->read_data( deco146_addr, mem_mask, cs );
+	uint8_t cs = 0;
+	uint16_t data = m_deco146->read_data( deco146_addr, mem_mask, cs );
 
 //  if ((realdat & mem_mask) != (data & mem_mask))
 //      printf("returned %04x instead of %04x (real address %08x swapped addr %08x)\n", data, realdat, real_address, deco146_addr);
@@ -123,7 +126,7 @@ WRITE16_MEMBER( funkyjet_state::funkyjet_protection_region_0_146_w )
 
 	int real_address = 0 + (offset *2);
 	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14, /* note, same bitswap as fghthist */       10,  9,  8,  7,  6,   5,  4,  3,  2,  1,    0) & 0x7fff;
-	UINT8 cs = 0;
+	uint8_t cs = 0;
 	m_deco146->write_data( space, deco146_addr, data, mem_mask, cs );
 }
 
@@ -307,7 +310,7 @@ void funkyjet_state::machine_start()
 {
 }
 
-static MACHINE_CONFIG_START( funkyjet, funkyjet_state )
+static MACHINE_CONFIG_START( funkyjet )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_28MHz/2) /* 28 MHz crystal */
@@ -362,7 +365,7 @@ static MACHINE_CONFIG_START( funkyjet, funkyjet_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_28MHz/28, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL_28MHz/28, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END

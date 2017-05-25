@@ -19,7 +19,7 @@
 
 const options_entry ui_options::s_option_entries[] =
 {
-	// seach path options
+	// search path options
 	{ nullptr,                              nullptr,                       OPTION_HEADER,  "UI SEARCH PATH OPTIONS" },
 	{ OPTION_HISTORY_PATH,                  "history;dats;.",              OPTION_STRING,  "path to history files" },
 	{ OPTION_EXTRAINI_PATH,                 "folders",                     OPTION_STRING,  "path to extra ini files" },
@@ -44,7 +44,6 @@ const options_entry ui_options::s_option_entries[] =
 
 	// misc options
 	{ nullptr,                              nullptr,    OPTION_HEADER,      "UI MISC OPTIONS" },
-	{ OPTION_DATS_ENABLED,                  "1",        OPTION_BOOLEAN,     "enable DATs support" },
 	{ OPTION_REMEMBER_LAST,                 "1",        OPTION_BOOLEAN,     "reselect in main menu last played game" },
 	{ OPTION_ENLARGE_SNAPS,                 "1",        OPTION_BOOLEAN,     "enlarge arts (snapshot, title, etc...) in right panel (keeping aspect ratio)" },
 	{ OPTION_FORCED4X3,                     "1",        OPTION_BOOLEAN,     "force the appearance of the snapshot in the list software to 4:3" },
@@ -54,6 +53,7 @@ const options_entry ui_options::s_option_entries[] =
 	{ OPTION_LAST_USED_FILTER,              "",         OPTION_STRING,      "latest used filter" },
 	{ OPTION_LAST_USED_MACHINE,             "",         OPTION_STRING,      "latest used machine" },
 	{ OPTION_INFO_AUTO_AUDIT,               "0",        OPTION_BOOLEAN,     "enable auto audit in the general info panel" },
+	{ OPTION_HIDE_ROMLESS,                  "1",        OPTION_BOOLEAN,     "hide romless machine from available list" },
 
 	// UI options
 	{ nullptr,                              nullptr,        OPTION_HEADER,      "UI OPTIONS" },

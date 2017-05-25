@@ -18,7 +18,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type TVCEXP_SLOT  = &device_creator<tvcexp_slot_device>;
+DEFINE_DEVICE_TYPE(TVCEXP_SLOT, tvcexp_slot_device, "tvcexp_slot", "TVC64 Expansion Slot")
 
 
 //**************************************************************************
@@ -51,11 +51,12 @@ device_tvcexp_interface::~device_tvcexp_interface()
 //-------------------------------------------------
 //  tvcexp_slot_device - constructor
 //-------------------------------------------------
-tvcexp_slot_device::tvcexp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, TVCEXP_SLOT, "TVC64 Expansion Slot", tag, owner, clock, "tvcexp_slot", __FILE__),
-		device_slot_interface(mconfig, *this),
-		m_out_irq_cb(*this),
-		m_out_nmi_cb(*this), m_cart(nullptr)
+tvcexp_slot_device::tvcexp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, TVCEXP_SLOT, tag, owner, clock),
+	device_slot_interface(mconfig, *this),
+	m_out_irq_cb(*this),
+	m_out_nmi_cb(*this),
+	m_cart(nullptr)
 {
 }
 
@@ -84,9 +85,9 @@ void tvcexp_slot_device::device_start()
     module id read
 -------------------------------------------------*/
 
-UINT8 tvcexp_slot_device::id_r()
+uint8_t tvcexp_slot_device::id_r()
 {
-	UINT8 result = 0x00;
+	uint8_t result = 0x00;
 
 	if (m_cart)
 		result = m_cart->id_r() & 0x03;
@@ -108,9 +109,9 @@ void tvcexp_slot_device::int_ack()
     module int read
 -------------------------------------------------*/
 
-UINT8 tvcexp_slot_device::int_r()
+uint8_t tvcexp_slot_device::int_r()
 {
-	UINT8 result = 1;
+	uint8_t result = 1;
 
 	if (m_cart)
 		result = m_cart->int_r() & 0x01;

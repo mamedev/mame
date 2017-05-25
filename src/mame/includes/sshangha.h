@@ -29,19 +29,19 @@ public:
 
 	optional_device<deco146_device> m_deco146;
 	required_device<deco16ic_device> m_deco_tilegen1;
-	required_shared_ptr<UINT16> m_spriteram;
-	optional_shared_ptr<UINT16> m_spriteram2;
+	required_shared_ptr<uint16_t> m_spriteram;
+	optional_shared_ptr<uint16_t> m_spriteram2;
 
-	required_shared_ptr<UINT16> m_sound_shared_ram;
-	required_shared_ptr<UINT16> m_pf1_rowscroll;
-	required_shared_ptr<UINT16> m_pf2_rowscroll;
+	required_shared_ptr<uint16_t> m_sound_shared_ram;
+	required_shared_ptr<uint16_t> m_pf1_rowscroll;
+	required_shared_ptr<uint16_t> m_pf2_rowscroll;
 
-	required_shared_ptr<UINT16> m_sprite_paletteram;
-	required_shared_ptr<UINT16> m_tile_paletteram2;
-	required_shared_ptr<UINT16> m_sprite_paletteram2;
-	required_shared_ptr<UINT16> m_tile_paletteram1;
+	required_shared_ptr<uint16_t> m_sprite_paletteram;
+	required_shared_ptr<uint16_t> m_tile_paletteram2;
+	required_shared_ptr<uint16_t> m_sprite_paletteram2;
+	required_shared_ptr<uint16_t> m_tile_paletteram1;
 
-	optional_shared_ptr<UINT16> m_prot_data;
+	optional_shared_ptr<uint16_t> m_prot_data;
 
 	optional_device<decospr_device> m_sprgen1;
 	optional_device<decospr_device> m_sprgen2;
@@ -67,8 +67,8 @@ public:
 	DECLARE_DRIVER_INIT(sshangha);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_sshangha(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	inline void sshangha_set_color_888(pen_t color, int rshift, int gshift, int bshift, UINT32 data);
+	uint32_t screen_update_sshangha(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	inline void sshangha_set_color_888(pen_t color, int rshift, int gshift, int bshift, uint32_t data);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<palette_device> m_palette;

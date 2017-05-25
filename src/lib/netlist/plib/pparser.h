@@ -8,25 +8,20 @@
 #ifndef PPARSER_H_
 #define PPARSER_H_
 
+#include "pstring.h"
+#include "plists.h"
+#include "pstream.h"
+
 #include <unordered_map>
 #include <cstdint>
 
-#include "pconfig.h"
-#include "pstring.h"
-#include "plists.h"
-#include "putil.h"
-#include "pstream.h"
-
 namespace plib {
-class ptokenizer
+class ptokenizer : nocopyassignmove
 {
-	P_PREVENT_COPYING(ptokenizer)
 public:
-	virtual ~ptokenizer() {}
+	explicit ptokenizer(plib::putf8_reader &strm);
 
-	explicit ptokenizer(pistream &strm)
-	: m_strm(strm), m_lineno(1), m_px(0), m_string('"')
-	{}
+	virtual ~ptokenizer();
 
 	enum token_type
 	{
@@ -42,32 +37,29 @@ public:
 	struct token_id_t
 	{
 	public:
-		token_id_t() : m_id(-2) {}
-		token_id_t(const int id) : m_id(id) {}
-		int id() const { return m_id; }
+
+		static constexpr std::size_t npos = static_cast<std::size_t>(-1);
+
+		token_id_t() : m_id(npos) {}
+		explicit token_id_t(const std::size_t id) : m_id(id) {}
+		std::size_t id() const { return m_id; }
 	private:
-		int m_id;
+		std::size_t m_id;
 	};
 
 	struct token_t
 	{
-		token_t(token_type type)
+		explicit token_t(token_type type)
+		: m_type(type), m_id(), m_token("")
 		{
-			m_type = type;
-			m_id = token_id_t(-1);
-			m_token ="";
 		}
 		token_t(token_type type, const pstring &str)
+		: m_type(type), m_id(), m_token(str)
 		{
-			m_type = type;
-			m_id = token_id_t(-1);
-			m_token = str;
 		}
-		token_t(const token_id_t id, const pstring &str)
+		token_t(const token_id_t &id, const pstring &str)
+		: m_type(TOKEN), m_id(id), m_token(str)
 		{
-			m_type = TOKEN;
-			m_id = id;
-			m_token = str;
 		}
 
 		bool is(const token_id_t &tok_id) const { return m_id.id() == tok_id.id(); }
@@ -97,17 +89,18 @@ public:
 	long get_number_long();
 
 	void require_token(const token_id_t &token_num);
-	void require_token(const token_t tok, const token_id_t &token_num);
+	void require_token(const token_t &tok, const token_id_t &token_num);
 
 	token_id_t register_token(pstring token)
 	{
-		m_tokens.push_back(token);
-		return token_id_t(m_tokens.size() - 1);
+		token_id_t ret(m_tokens.size());
+		m_tokens.emplace(token, ret);
+		return ret;
 	}
 
 	void set_identifier_chars(pstring s) { m_identifier_chars = s; }
 	void set_number_chars(pstring st, pstring rem) { m_number_chars_start = st; m_number_chars = rem; }
-	void set_string_char(char c) { m_string = c; }
+	void set_string_char(pstring::code_t c) { m_string = c; }
 	void set_whitespace(pstring s) { m_whitespace = s; }
 	void set_comment(pstring start, pstring end, pstring line)
 	{
@@ -126,22 +119,23 @@ private:
 	void skipeol();
 
 	pstring::code_t getc();
-	void ungetc();
+	void ungetc(pstring::code_t c);
 
 	bool eof() { return m_strm.eof(); }
 
-	pistream &m_strm;
+	putf8_reader &m_strm;
 
 	int m_lineno;
 	pstring m_cur_line;
-	unsigned m_px;
+	pstring::const_iterator m_px;
+	pstring::code_t m_unget;
 
 	/* tokenizer stuff follows ... */
 
 	pstring m_identifier_chars;
 	pstring m_number_chars;
 	pstring m_number_chars_start;
-	std::vector<pstring> m_tokens;
+	std::unordered_map<pstring, token_id_t> m_tokens;
 	pstring m_whitespace;
 	pstring::code_t  m_string;
 
@@ -151,9 +145,8 @@ private:
 };
 
 
-class ppreprocessor
+class ppreprocessor : plib::nocopyassignmove
 {
-	P_PREVENT_COPYING(ppreprocessor)
 public:
 
 	struct define_t
@@ -165,25 +158,15 @@ public:
 		pstring m_replace;
 	};
 
-	ppreprocessor(std::vector<define_t> *defines = nullptr);
+	explicit ppreprocessor(std::vector<define_t> *defines = nullptr);
 	virtual ~ppreprocessor() {}
 
-	template<class ISTR, class OSTR>
-	OSTR &process(ISTR &istrm, OSTR &ostrm)
-	{
-		return dynamic_cast<OSTR &>(process_i(istrm, ostrm));
-	}
+	void process(putf8_reader &istrm, putf8_writer &ostrm);
 
 protected:
-
-	postream &process_i(pistream &istrm, postream &ostrm);
-
-	double expr(const plib::pstring_vector_t &sexpr, std::size_t &start, int prio);
-
+	double expr(const std::vector<pstring> &sexpr, std::size_t &start, int prio);
 	define_t *get_define(const pstring &name);
-
 	pstring replace_macros(const pstring &line);
-
 	virtual void error(const pstring &err);
 
 private:
@@ -191,9 +174,9 @@ private:
 	pstring process_line(const pstring &line);
 
 	std::unordered_map<pstring, define_t> m_defines;
-	plib::pstring_vector_t m_expr_sep;
+	std::vector<pstring> m_expr_sep;
 
-	std::uint_least32_t m_ifflag; // 31 if levels
+	std::uint_least64_t m_ifflag; // 31 if levels
 	int m_level;
 	int m_lineno;
 };

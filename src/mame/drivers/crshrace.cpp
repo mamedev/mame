@@ -129,10 +129,12 @@ Dip locations verified with Service Mode.
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/crshrace.h"
+
 #include "cpu/m68000/m68000.h"
 #include "sound/2610intf.h"
-
-#include "includes/crshrace.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 #define CRSHRACE_3P_HACK    0
@@ -143,14 +145,11 @@ WRITE8_MEMBER(crshrace_state::crshrace_sh_bankswitch_w)
 	m_z80bank->set_entry(data & 0x03);
 }
 
-WRITE16_MEMBER(crshrace_state::sound_command_w)
+WRITE8_MEMBER(crshrace_state::sound_command_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		m_pending_command = 1;
-		m_soundlatch->write(space, offset, data & 0xff);
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-	}
+	m_pending_command = 1;
+	m_soundlatch->write(space, offset, data & 0xff);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 CUSTOM_INPUT_MEMBER(crshrace_state::country_sndpending_r)
@@ -162,7 +161,6 @@ WRITE8_MEMBER(crshrace_state::pending_command_clear_w)
 {
 	m_pending_command = 0;
 }
-
 
 
 static ADDRESS_MAP_START( crshrace_map, AS_PROGRAM, 16, crshrace_state )
@@ -180,7 +178,7 @@ static ADDRESS_MAP_START( crshrace_map, AS_PROGRAM, 16, crshrace_state )
 	AM_RANGE(0xfff002, 0xfff003) AM_READ_PORT("P2")
 	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("DSW0")
 	AM_RANGE(0xfff006, 0xfff007) AM_READ_PORT("DSW2")
-	AM_RANGE(0xfff008, 0xfff009) AM_WRITE(sound_command_w)
+	AM_RANGE(0xfff008, 0xfff009) AM_WRITE8(sound_command_w, 0x00ff)
 	AM_RANGE(0xfff00a, 0xfff00b) AM_READ_PORT("DSW1")
 	AM_RANGE(0xfff00e, 0xfff00f) AM_READ_PORT("P3")
 	AM_RANGE(0xfff020, 0xfff03f) AM_DEVWRITE("k053936", k053936_device, ctrl_w)
@@ -420,7 +418,7 @@ void crshrace_state::machine_reset()
 	m_pending_command = 0;
 }
 
-static MACHINE_CONFIG_START( crshrace, crshrace_state )
+static MACHINE_CONFIG_START( crshrace )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,16000000)    /* 16 MHz ??? */
@@ -438,7 +436,8 @@ static MACHINE_CONFIG_START( crshrace, crshrace_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(crshrace_state, screen_update_crshrace)
-	MCFG_SCREEN_VBLANK_DRIVER(crshrace_state, screen_eof_crshrace)
+	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("spriteram2", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", crshrace)
@@ -541,10 +540,10 @@ ROM_END
 
 
 #ifdef UNUSED_FUNCTION
-void crshrace_state::crshrace_patch_code( UINT16 offset )
+void crshrace_state::crshrace_patch_code( uint16_t offset )
 {
 	/* A hack which shows 3 player mode in code which is disabled */
-	UINT16 *RAM = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *RAM = (uint16_t *)memregion("maincpu")->base();
 	RAM[(offset + 0)/2] = 0x4e71;
 	RAM[(offset + 2)/2] = 0x4e71;
 	RAM[(offset + 4)/2] = 0x4e71;
@@ -567,5 +566,5 @@ DRIVER_INIT_MEMBER(crshrace_state,crshrace2)
 }
 
 
-GAME( 1993, crshrace,  0,        crshrace, crshrace, crshrace_state,  crshrace,  ROT270, "Video System Co.", "Lethal Crash Race (set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, crshrace,  0,        crshrace, crshrace,  crshrace_state, crshrace,  ROT270, "Video System Co.", "Lethal Crash Race (set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1993, crshrace2, crshrace, crshrace, crshrace2, crshrace_state, crshrace2, ROT270, "Video System Co.", "Lethal Crash Race (set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

@@ -49,7 +49,7 @@ PALETTE_INIT_MEMBER(ssystem3_state, ssystem3)
 void ssystem3_state::video_start()
 {
 	// artwork seams to need this
-	m_videoram = std::make_unique<UINT8[]>(6 * 2 + 24);
+	m_videoram = std::make_unique<uint8_t[]>(6 * 2 + 24);
 }
 
 
@@ -161,7 +161,7 @@ static const char single_led[]=
 " 55555555   55555555          000000   000000   00   00   00  00         000000      00     00  00    00   0000000"
 ;
 
-void ssystem3_state::ssystem3_draw_led(bitmap_ind16 &bitmap,INT16 color, int x, int y, int ch)
+void ssystem3_state::ssystem3_draw_led(bitmap_ind16 &bitmap,int16_t color, int x, int y, int ch)
 {
 	int j, xi=0;
 	for (j=0; single_led[j]; j++) {
@@ -183,7 +183,7 @@ void ssystem3_state::ssystem3_draw_led(bitmap_ind16 &bitmap,INT16 color, int x, 
 	}
 }
 
-UINT32 ssystem3_state::screen_update_ssystem3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t ssystem3_state::screen_update_ssystem3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i;
 

@@ -57,6 +57,7 @@ Notes added 2014-09-10:
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "screen.h"
 
 
 class rcorsair_state : public driver_device
@@ -67,7 +68,7 @@ public:
 	m_maincpu(*this, "maincpu")
 	{ }
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
 
@@ -130,12 +131,12 @@ void rcorsair_state::video_start()
 {
 }
 
-UINT32 rcorsair_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t rcorsair_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
 
-static MACHINE_CONFIG_START( rcorsair, rcorsair_state )
+static MACHINE_CONFIG_START( rcorsair )
 
 	/* Main CPU is probably inside Custom Block with
 	   program code, unknown type */
@@ -177,4 +178,4 @@ ROM_START( rcorsair )
 ROM_END
 
 
-GAME( 1984, rcorsair,  0,    rcorsair, inports, driver_device, 0, ROT90, "Nakasawa", "Red Corsair", MACHINE_IS_SKELETON )
+GAME( 1984, rcorsair,  0,    rcorsair, inports, rcorsair_state, 0, ROT90, "Nakasawa", "Red Corsair", MACHINE_IS_SKELETON )

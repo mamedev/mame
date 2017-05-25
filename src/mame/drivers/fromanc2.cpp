@@ -19,11 +19,14 @@
 ******************************************************************************/
 
 #include "emu.h"
+#include "includes/fromanc2.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "sound/2610intf.h"
-#include "includes/fromanc2.h"
 #include "rendlay.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /*************************************
@@ -54,7 +57,7 @@ WRITE16_MEMBER(fromanc2_state::fromanc2_portselect_w)
 
 READ16_MEMBER(fromanc2_state::fromanc2_keymatrix_r)
 {
-	UINT16 ret;
+	uint16_t ret;
 
 	switch (m_portselect)
 	{
@@ -477,7 +480,7 @@ MACHINE_START_MEMBER(fromanc2_state,fromanc4)
 
 MACHINE_START_MEMBER(fromanc2_state,fromanc2)
 {
-	m_bankedram = std::make_unique<UINT8[]>(0x4000 * 3);
+	m_bankedram = std::make_unique<uint8_t[]>(0x4000 * 3);
 
 	membank("bank1")->configure_entries(0, 4, memregion("sub")->base(), 0x4000);
 	membank("bank2")->configure_entry(0, memregion("sub")->base() + 0x08000);
@@ -498,7 +501,7 @@ void fromanc2_state::machine_reset()
 	m_datalatch_2l = 0;
 }
 
-static MACHINE_CONFIG_START( fromanc2, fromanc2_state )
+static MACHINE_CONFIG_START( fromanc2 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,32000000/2)      /* 16.00 MHz */
@@ -558,7 +561,7 @@ static MACHINE_CONFIG_START( fromanc2, fromanc2_state )
 	MCFG_SOUND_ROUTE(2, "mono", 0.75)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( fromancr, fromanc2_state )
+static MACHINE_CONFIG_START( fromancr )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,32000000/2)      /* 16.00 MHz */
@@ -618,7 +621,7 @@ static MACHINE_CONFIG_START( fromancr, fromanc2_state )
 	MCFG_SOUND_ROUTE(2, "mono", 0.75)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( fromanc4, fromanc2_state )
+static MACHINE_CONFIG_START( fromanc4 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,32000000/2)      /* 16.00 MHz */
@@ -808,5 +811,5 @@ DRIVER_INIT_MEMBER(fromanc2_state,fromanc4)
  *************************************/
 
 GAME( 1995, fromanc2, 0, fromanc2, fromanc2, fromanc2_state, fromanc2, ROT0, "Video System Co.", "Taisen Idol-Mahjong Final Romance 2 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, fromancr, 0, fromancr, fromanc2, fromanc2_state, fromanc2, ROT0, "Video System Co.", "Taisen Mahjong Final Romance R (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, fromanc4, 0, fromanc4, fromanc4, fromanc2_state, fromanc4, ROT0, "Video System Co.", "Taisen Mahjong Final Romance 4 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, fromancr, 0, fromancr, fromanc2, fromanc2_state, fromanc2, ROT0, "Video System Co.", "Taisen Mahjong Final Romance R (Japan)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1998, fromanc4, 0, fromanc4, fromanc4, fromanc2_state, fromanc4, ROT0, "Video System Co.", "Taisen Mahjong Final Romance 4 (Japan)",      MACHINE_SUPPORTS_SAVE )

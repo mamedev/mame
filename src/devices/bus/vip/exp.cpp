@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "exp.h"
 
 
@@ -22,7 +23,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type VIP_EXPANSION_SLOT = &device_creator<vip_expansion_slot_device>;
+DEFINE_DEVICE_TYPE(VIP_EXPANSION_SLOT, vip_expansion_slot_device, "vip_expansion_slot", "VIP expansion port")
 
 
 
@@ -50,8 +51,8 @@ device_vip_expansion_card_interface::device_vip_expansion_card_interface(const m
 //  vip_expansion_slot_device - constructor
 //-------------------------------------------------
 
-vip_expansion_slot_device::vip_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, VIP_EXPANSION_SLOT, "VIP expansion port", tag, owner, clock, "vip_expansion_slot", __FILE__),
+vip_expansion_slot_device::vip_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, VIP_EXPANSION_SLOT, tag, owner, clock),
 	device_slot_interface(mconfig, *this),
 	m_write_int(*this),
 	m_write_dma_out(*this),
@@ -79,9 +80,9 @@ void vip_expansion_slot_device::device_start()
 //  program_r - program read
 //-------------------------------------------------
 
-UINT8 vip_expansion_slot_device::program_r(address_space &space, offs_t offset, int cs, int cdef, int *minh)
+uint8_t vip_expansion_slot_device::program_r(address_space &space, offs_t offset, int cs, int cdef, int *minh)
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (m_card != nullptr)
 	{
@@ -96,7 +97,7 @@ UINT8 vip_expansion_slot_device::program_r(address_space &space, offs_t offset, 
 //  program_w - program write
 //-------------------------------------------------
 
-void vip_expansion_slot_device::program_w(address_space &space, offs_t offset, UINT8 data, int cdef, int *minh)
+void vip_expansion_slot_device::program_w(address_space &space, offs_t offset, uint8_t data, int cdef, int *minh)
 {
 	if (m_card != nullptr)
 	{
@@ -109,9 +110,9 @@ void vip_expansion_slot_device::program_w(address_space &space, offs_t offset, U
 //  io_r - io read
 //-------------------------------------------------
 
-UINT8 vip_expansion_slot_device::io_r(address_space &space, offs_t offset)
+uint8_t vip_expansion_slot_device::io_r(address_space &space, offs_t offset)
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (m_card != nullptr)
 	{
@@ -126,7 +127,7 @@ UINT8 vip_expansion_slot_device::io_r(address_space &space, offs_t offset)
 //  io_w - io write
 //-------------------------------------------------
 
-void vip_expansion_slot_device::io_w(address_space &space, offs_t offset, UINT8 data)
+void vip_expansion_slot_device::io_w(address_space &space, offs_t offset, uint8_t data)
 {
 	if (m_card != nullptr)
 	{
@@ -139,9 +140,9 @@ void vip_expansion_slot_device::io_w(address_space &space, offs_t offset, UINT8 
 //  dma_r - dma read
 //-------------------------------------------------
 
-UINT8 vip_expansion_slot_device::dma_r(address_space &space, offs_t offset)
+uint8_t vip_expansion_slot_device::dma_r(address_space &space, offs_t offset)
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (m_card != nullptr)
 	{
@@ -156,7 +157,7 @@ UINT8 vip_expansion_slot_device::dma_r(address_space &space, offs_t offset)
 //  dma_w - dma write
 //-------------------------------------------------
 
-void vip_expansion_slot_device::dma_w(address_space &space, offs_t offset, UINT8 data)
+void vip_expansion_slot_device::dma_w(address_space &space, offs_t offset, uint8_t data)
 {
 	if (m_card != nullptr)
 	{
@@ -169,7 +170,7 @@ void vip_expansion_slot_device::dma_w(address_space &space, offs_t offset, UINT8
 //  screen_update -
 //-------------------------------------------------
 
-UINT32 vip_expansion_slot_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t vip_expansion_slot_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bool value = false;
 

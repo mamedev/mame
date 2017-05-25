@@ -6,7 +6,7 @@
 
 PALETTE_INIT_MEMBER(mainsnk_state, mainsnk)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 	int num_colors = 0x400;
 
@@ -70,8 +70,8 @@ TILE_GET_INFO_MEMBER(mainsnk_state::get_bg_tile_info)
 
 void mainsnk_state::video_start()
 {
-	m_tx_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(mainsnk_state::get_tx_tile_info),this), tilemap_mapper_delegate(FUNC(mainsnk_state::marvins_tx_scan_cols),this), 8, 8, 36, 28);
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(mainsnk_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS,    8, 8, 32, 32);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mainsnk_state::get_tx_tile_info),this), tilemap_mapper_delegate(FUNC(mainsnk_state::marvins_tx_scan_cols),this), 8, 8, 36, 28);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mainsnk_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS,    8, 8, 32, 32);
 
 	m_tx_tilemap->set_transparent_pen(15);
 	m_tx_tilemap->set_scrolldy(8, 8);
@@ -123,7 +123,7 @@ WRITE8_MEMBER(mainsnk_state::bgram_w)
 void mainsnk_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int scrollx, int scrolly )
 {
 	gfx_element *gfx = m_gfxdecode->gfx(1);
-	const UINT8 *source, *finish;
+	const uint8_t *source, *finish;
 	source =  m_spriteram;
 	finish =  source + 25*4;
 
@@ -146,7 +146,7 @@ void mainsnk_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 		if (flip_screen())
 		{
 			sx = 288-16 - sx;
-			sy = 224-16 - sy;
+			sy = 224+8-16 - sy;
 			flipx = !flipx;
 			flipy = !flipy;
 		}
@@ -162,7 +162,7 @@ void mainsnk_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 }
 
 
-UINT32 mainsnk_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t mainsnk_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect, 0, 0);

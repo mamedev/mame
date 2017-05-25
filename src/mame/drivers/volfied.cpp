@@ -20,7 +20,8 @@ Volfied (c) 1989 Taito Corporation
 
     OSC: 32MHz, 26.686MHz & 20MHz
 
-TC0030CMD is a custom Z80 with embedded 8K ram + 8k rom (20MHz OSC is next to chip, 20MHz/4 = 5MHz(?))
+TC0030CMD is a hybrid package ASIC containing NEC D78C11
+(with 4k internal ROM) + 8k EPROM + 8k DRAM + logic.
 
 Stephh's notes (based on the game M68000 code and some tests) :
 
@@ -34,7 +35,7 @@ Stephh's notes (based on the game M68000 code and some tests) :
   - These 3 games are 100% the same, only region differs !
   - Coinage relies on the region (code at 0x00666a) :
       * 0x0001 (Japan) uses TAITO_COINAGE_JAPAN_OLD
-      * 0x0002 (US) uses slighlty different TAITO_COINAGE_US :
+      * 0x0002 (US) uses slightly different TAITO_COINAGE_US :
         in fact, as there is no possibility to continue a game,
         what are used to be "Continue Price" Dip Switches are unused
       * 0x0003 (World) uses TAITO_COINAGE_WORLD
@@ -44,18 +45,21 @@ Stephh's notes (based on the game M68000 code and some tests) :
 
 ********************************************************************/
 
+#include "emu.h"
+#include "includes/volfied.h"
+#include "includes/taitoipt.h"
+#include "audio/taitosnd.h"
+
+#include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
+#include "sound/2203intf.h"
+#include "speaker.h"
+
+
 /* Define clocks based on actual OSC on the PCB */
 
 #define CPU_CLOCK           (XTAL_32MHz / 4)        /* 8 MHz clock for 68000 */
 #define SOUND_CPU_CLOCK     (XTAL_32MHz / 8)        /* 4 MHz clock for Z80 sound CPU */
-
-#include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/m68000/m68000.h"
-#include "includes/taitoipt.h"
-#include "audio/taitosnd.h"
-#include "sound/2203intf.h"
-#include "includes/volfied.h"
 
 
 /***********************************************************
@@ -67,16 +71,16 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, volfied_state )
 	AM_RANGE(0x080000, 0x0fffff) AM_ROM     /* tiles   */
 	AM_RANGE(0x100000, 0x103fff) AM_RAM     /* main    */
 	AM_RANGE(0x200000, 0x203fff) AM_DEVREADWRITE("pc090oj", pc090oj_device, word_r, word_w)
-	AM_RANGE(0x400000, 0x47ffff) AM_READWRITE(volfied_video_ram_r, volfied_video_ram_w)
+	AM_RANGE(0x400000, 0x47ffff) AM_READWRITE(video_ram_r, video_ram_w)
 	AM_RANGE(0x500000, 0x503fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x600000, 0x600001) AM_WRITE(volfied_video_mask_w)
-	AM_RANGE(0x700000, 0x700001) AM_WRITE(volfied_sprite_ctrl_w)
-	AM_RANGE(0xd00000, 0xd00001) AM_READWRITE(volfied_video_ctrl_r, volfied_video_ctrl_w)
+	AM_RANGE(0x600000, 0x600001) AM_WRITE(video_mask_w)
+	AM_RANGE(0x700000, 0x700001) AM_WRITE(sprite_ctrl_w)
+	AM_RANGE(0xd00000, 0xd00001) AM_READWRITE(video_ctrl_r, video_ctrl_w)
 	AM_RANGE(0xe00000, 0xe00001) AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0x00ff)
 	AM_RANGE(0xe00002, 0xe00003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0x00ff)
-	AM_RANGE(0xf00000, 0xf007ff) AM_READWRITE(volfied_cchip_ram_r, volfied_cchip_ram_w)
-	AM_RANGE(0xf00802, 0xf00803) AM_READWRITE(volfied_cchip_ctrl_r, volfied_cchip_ctrl_w)
-	AM_RANGE(0xf00c00, 0xf00c01) AM_WRITE(volfied_cchip_bank_w)
+	AM_RANGE(0xf00000, 0xf007ff) AM_READWRITE(cchip_ram_r, cchip_ram_w)
+	AM_RANGE(0xf00802, 0xf00803) AM_READWRITE(cchip_ctrl_r, cchip_ctrl_w)
+	AM_RANGE(0xf00c00, 0xf00c01) AM_WRITE(cchip_bank_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( z80_map, AS_PROGRAM, 8, volfied_state )
@@ -207,15 +211,15 @@ GFXDECODE_END
 
 void volfied_state::machine_start()
 {
-	volfied_cchip_init();
+	cchip_init();
 }
 
 void volfied_state::machine_reset()
 {
-	volfied_cchip_reset();
+	cchip_reset();
 }
 
-static MACHINE_CONFIG_START( volfied, volfied_state )
+static MACHINE_CONFIG_START( volfied )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, CPU_CLOCK)   /* 8MHz */
@@ -234,7 +238,7 @@ static MACHINE_CONFIG_START( volfied, volfied_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(320, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 8, 247)
-	MCFG_SCREEN_UPDATE_DRIVER(volfied_state, screen_update_volfied)
+	MCFG_SCREEN_UPDATE_DRIVER(volfied_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", volfied)
@@ -442,9 +446,9 @@ ROM_START( volfiedjo )
 ROM_END
 
 
-GAME( 1989, volfied,   0,       volfied, volfied, driver_device,  0, ROT270, "Taito Corporation Japan",   "Volfied (World, revision 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, volfiedu,  volfied, volfied, volfiedu, driver_device, 0, ROT270, "Taito America Corporation", "Volfied (US, revision 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, volfiedj,  volfied, volfied, volfiedj, driver_device, 0, ROT270, "Taito Corporation",         "Volfied (Japan, revision 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, volfiedo,  volfied, volfied, volfiedj, driver_device, 0, ROT270, "Taito Corporation Japan",   "Volfied (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, volfieduo, volfied, volfied, volfiedj, driver_device, 0, ROT270, "Taito America Corporation", "Volfied (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, volfiedjo, volfied, volfied, volfiedj, driver_device, 0, ROT270, "Taito Corporation",         "Volfied (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, volfied,   0,       volfied, volfied,  volfied_state, 0, ROT270, "Taito Corporation Japan",   "Volfied (World, revision 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, volfiedu,  volfied, volfied, volfiedu, volfied_state, 0, ROT270, "Taito America Corporation", "Volfied (US, revision 1)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1989, volfiedj,  volfied, volfied, volfiedj, volfied_state, 0, ROT270, "Taito Corporation",         "Volfied (Japan, revision 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, volfiedo,  volfied, volfied, volfiedj, volfied_state, 0, ROT270, "Taito Corporation Japan",   "Volfied (World)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1989, volfieduo, volfied, volfied, volfiedj, volfied_state, 0, ROT270, "Taito America Corporation", "Volfied (US)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1989, volfiedjo, volfied, volfied, volfiedj, volfied_state, 0, ROT270, "Taito Corporation",         "Volfied (Japan)",             MACHINE_SUPPORTS_SAVE )

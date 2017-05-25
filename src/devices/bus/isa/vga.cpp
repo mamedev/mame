@@ -19,7 +19,7 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ISA8_VGA = &device_creator<isa8_vga_device>;
+DEFINE_DEVICE_TYPE(ISA8_VGA, isa8_vga_device, "ibm_vga", "IBM VGA Graphics Card")
 
 
 //-------------------------------------------------
@@ -36,7 +36,7 @@ machine_config_constructor isa8_vga_device::device_mconfig_additions() const
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *isa8_vga_device::device_rom_region() const
+const tiny_rom_entry *isa8_vga_device::device_rom_region() const
 {
 	return ROM_NAME( ibm_vga );
 }
@@ -49,9 +49,9 @@ const rom_entry *isa8_vga_device::device_rom_region() const
 //  isa8_vga_device - constructor
 //-------------------------------------------------
 
-isa8_vga_device::isa8_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, ISA8_VGA, "IBM VGA Graphics Card", tag, owner, clock, "ibm_vga", __FILE__),
-		device_isa8_card_interface(mconfig, *this), m_vga(nullptr)
+isa8_vga_device::isa8_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, ISA8_VGA, tag, owner, clock),
+	device_isa8_card_interface(mconfig, *this), m_vga(nullptr)
 {
 }
 

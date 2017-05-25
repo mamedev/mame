@@ -157,9 +157,9 @@ Speak & Math:
     - VSM(2/2): 16KB CD2393
     - VFD: Futaba 9SY -02Z 7E
     - notes: As with the Speak & Spell, the voice actor was a radio announcer.
-      However, the phrase "is greater than or less than" had to be added in a
-      hurry by one of the TI employees in a hurry, the day before a demo.
-      Apparently QA never found out and it ended up in the final product.
+      However, the phrase "is greater than or less than" had to be added by one
+      of the TI employees in a hurry, the day before a demo. Apparently QA
+      never found out and it ended up in the final product.
 
     Speak & Math (US), 1986
     - MCU: CD2708, label CD2708N2L (die label TMC0270F 2708A)
@@ -398,12 +398,16 @@ K28 modules:
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "includes/hh_tms1k.h"
-#include "sound/tms5110.h"
-#include "machine/tms6100.h"
-#include "bus/generic/slot.h"
+
 #include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
+#include "machine/tms6100.h"
+#include "sound/tms5110.h"
+
 #include "softlist.h"
+#include "speaker.h"
 
 // internal artwork
 #include "k28m2.lh"
@@ -452,21 +456,21 @@ public:
 	DECLARE_WRITE16_MEMBER(snspellc_write_r);
 	DECLARE_READ8_MEMBER(tntell_read_k);
 
-	void k28_prepare_display(UINT8 old, UINT8 data);
+	void k28_prepare_display(u8 old, u8 data);
 	DECLARE_READ8_MEMBER(k28_read_k);
 	DECLARE_WRITE16_MEMBER(k28_write_o);
 	DECLARE_WRITE16_MEMBER(k28_write_r);
 
 	// cartridge
-	UINT32 m_cart_max_size;
-	UINT8* m_cart_base;
+	u32 m_cart_max_size;
+	u8* m_cart_base;
 	void init_cartridge();
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(tispeak_cartridge);
 	DECLARE_DRIVER_INIT(snspell);
 	DECLARE_DRIVER_INIT(tntell);
 	DECLARE_DRIVER_INIT(lantutor);
 
-	UINT8 m_overlay;
+	u8 m_overlay;
 	TIMER_DEVICE_CALLBACK_MEMBER(tntell_get_overlay);
 
 protected:
@@ -504,18 +508,18 @@ void tispeak_state::init_cartridge()
 
 DEVICE_IMAGE_LOAD_MEMBER(tispeak_state, tispeak_cartridge)
 {
-	UINT32 size = m_cart->common_get_size("rom");
+	u32 size = m_cart->common_get_size("rom");
 
 	if (size > m_cart_max_size)
 	{
 		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid file size");
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
 	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 
@@ -549,7 +553,7 @@ DRIVER_INIT_MEMBER(tispeak_state, lantutor)
 
 void tispeak_state::prepare_display()
 {
-	UINT16 gridmask = vfd_filament_on() ? 0xffff : 0x8000;
+	u16 gridmask = vfd_filament_on() ? 0xffff : 0x8000;
 	set_display_segmask(0x21ff, 0x3fff);
 	display_matrix(16+1, 16, m_plate | 1<<16, m_grid & gridmask);
 }
@@ -640,7 +644,7 @@ WRITE16_MEMBER(tispeak_state::snspellc_write_o)
 READ8_MEMBER(tispeak_state::snspellc_read_k)
 {
 	// K4: TMS5100 CTL1
-	UINT8 k4 = m_tms5100->ctl_r(space, 0) << 2 & 4;
+	u8 k4 = m_tms5100->ctl_r(space, 0) << 2 & 4;
 
 	// K: multiplexed inputs (note: the Vss row is always on)
 	return k4 | m_inp_matrix[9]->read() | read_inputs(9);
@@ -652,7 +656,7 @@ READ8_MEMBER(tispeak_state::snspellc_read_k)
 READ8_MEMBER(tispeak_state::tntell_read_k)
 {
 	// K8: overlay code from R5,O4-O7
-	UINT8 k8 = (((m_r >> 1 & 0x10) | (m_o >> 4 & 0xf)) & m_overlay) ? 8 : 0;
+	u8 k8 = (((m_r >> 1 & 0x10) | (m_o >> 4 & 0xf)) & m_overlay) ? 8 : 0;
 
 	// rest is same as snpellc
 	return k8 | snspellc_read_k(space, offset);
@@ -678,7 +682,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(tispeak_state::tntell_get_overlay)
 
 // k28 specific
 
-void tispeak_state::k28_prepare_display(UINT8 old, UINT8 data)
+void tispeak_state::k28_prepare_display(u8 old, u8 data)
 {
 	// ?
 }
@@ -725,7 +729,7 @@ READ8_MEMBER(tispeak_state::k28_read_k)
 
 INPUT_CHANGED_MEMBER(tispeak_state::power_button)
 {
-	int on = (int)(FPTR)param;
+	int on = (int)(uintptr_t)param;
 
 	if (on && !m_power_on)
 	{
@@ -1180,7 +1184,7 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static MACHINE_CONFIG_FRAGMENT( tms5110_route )
+static MACHINE_CONFIG_START( tms5110_route )
 
 	/* sound hardware */
 	MCFG_TMS5110_M0_CB(DEVWRITELINE("tms6100", tms6100_device, m0_w))
@@ -1191,7 +1195,7 @@ static MACHINE_CONFIG_FRAGMENT( tms5110_route )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( snmath, tispeak_state )
+static MACHINE_CONFIG_START( snmath )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS0270, MASTER_CLOCK/2)
@@ -1288,7 +1292,7 @@ static MACHINE_CONFIG_DERIVED( lantutor, snmath )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( snspellc, tispeak_state )
+static MACHINE_CONFIG_START( snspellc )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS1100, MASTER_CLOCK/2)
@@ -1321,7 +1325,7 @@ static MACHINE_CONFIG_DERIVED( snspellcuk, snspellc )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( vocaid, tispeak_state )
+static MACHINE_CONFIG_START( vocaid )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS1100, MASTER_CLOCK/2)
@@ -1352,7 +1356,7 @@ static MACHINE_CONFIG_DERIVED( tntell, vocaid )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( k28m2, tispeak_state )
+static MACHINE_CONFIG_START( k28m2 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS1400, MASTER_CLOCK/2)
@@ -1735,7 +1739,7 @@ ROM_END
 
 
 
-/*    YEAR  NAME        PARENT COMPAT MACHINE      INPUT       INIT                     COMPANY, FULLNAME, FLAGS */
+//    YEAR  NAME        PARENT   CMP MACHINE       INPUT       STATE          INIT      COMPANY, FULLNAME, FLAGS
 COMP( 1979, snspell,    0,        0, sns_tmc0281,  snspell,    tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (US, 1979 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 COMP( 1978, snspellp,   snspell,  0, sns_tmc0281,  snspell,    tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (US, patent)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 COMP( 1980, snspellub,  snspell,  0, sns_tmc0281d, snspell,    tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (US, 1980 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
@@ -1750,9 +1754,9 @@ COMP( 1981, snspellc,   0,        0, snspellc,     snspellc,   tispeak_state, sn
 COMP( 1982, snspellca,  snspellc, 0, snspellc,     snspellc,   tispeak_state, snspell,  "Texas Instruments", "Speak & Spell Compact (US, 1982 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 COMP( 1982, snspellcuk, snspellc, 0, snspellcuk,   snspellcuk, tispeak_state, snspell,  "Texas Instruments", "Speak & Write (UK)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
-COMP( 1980, snmath,     0,        0, snmath,       snmath,     driver_device, 0,        "Texas Instruments", "Speak & Math (US, 1980 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-COMP( 1986, snmatha,    snmath,   0, snmath,       snmath,     driver_device, 0,        "Texas Instruments", "Speak & Math (US, 1986 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-COMP( 1980, snmathp,    snmath,   0, snmath,       snmath,     driver_device, 0,        "Texas Instruments", "Speak & Math (US, patent)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_IS_INCOMPLETE )
+COMP( 1980, snmath,     0,        0, snmath,       snmath,     tispeak_state, 0,        "Texas Instruments", "Speak & Math (US, 1980 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+COMP( 1986, snmatha,    snmath,   0, snmath,       snmath,     tispeak_state, 0,        "Texas Instruments", "Speak & Math (US, 1986 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+COMP( 1980, snmathp,    snmath,   0, snmath,       snmath,     tispeak_state, 0,        "Texas Instruments", "Speak & Math (US, patent)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_IS_INCOMPLETE )
 
 COMP( 1980, snread,     0,        0, snread,       snread,     tispeak_state, snspell,  "Texas Instruments", "Speak & Read (US)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
@@ -1763,6 +1767,6 @@ COMP( 1980, tntellp,    tntell,   0, tntell,       tntell,     tispeak_state, tn
 COMP( 1981, tntelluk,   tntell,   0, tntell,       tntell,     tispeak_state, tntell,   "Texas Instruments", "Touch & Tell (UK)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_CLICKABLE_ARTWORK | MACHINE_REQUIRES_ARTWORK )
 COMP( 1981, tntellfr,   tntell,   0, tntell,       tntell,     tispeak_state, tntell,   "Texas Instruments", "Le Livre Magique (France)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_CLICKABLE_ARTWORK | MACHINE_REQUIRES_ARTWORK )
 
-COMP( 1982, vocaid,     0,        0, vocaid,       tntell,     driver_device, 0,        "Texas Instruments", "Vocaid", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_REQUIRES_ARTWORK )
+COMP( 1982, vocaid,     0,        0, vocaid,       tntell,     tispeak_state, 0,        "Texas Instruments", "Vocaid", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_REQUIRES_ARTWORK )
 
 COMP( 1985, k28m2,      0,        0, k28m2,        k28m2,      tispeak_state, snspell,  "Tiger Electronics", "K28: Talking Learning Computer (model 7-232)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )

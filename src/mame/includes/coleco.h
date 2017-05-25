@@ -6,7 +6,6 @@
 #define __COLECO__
 
 
-#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
 #include "video/tms9928a.h"
@@ -56,13 +55,13 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(coleco_vdp_interrupt);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(czz50_cart);
 
-	UINT8 coleco_paddle_read(int port, int joy_mode, UINT8 joy_status);
-	UINT8 coleco_scan_paddles(UINT8 *joy_status0, UINT8 *joy_status1);
+	uint8_t coleco_paddle_read(int port, int joy_mode, uint8_t joy_status);
+	uint8_t coleco_scan_paddles(uint8_t *joy_status0, uint8_t *joy_status1);
 
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<colecovision_cartridge_slot_device> m_cart;
-	required_shared_ptr<UINT8> m_ram;
+	required_shared_ptr<uint8_t> m_ram;
 
 	int m_joy_mode;
 	int m_last_nmi_state;
@@ -74,8 +73,8 @@ private:
 	emu_timer *m_joy_d7_timer[2];
 	int m_joy_irq_state[2];
 	int m_joy_d7_state[2];
-	UINT8 m_joy_analog_state[2];
-	UINT8 m_joy_analog_reload[2];
+	uint8_t m_joy_analog_state[2];
+	uint8_t m_joy_analog_reload[2];
 
 	optional_ioport m_ctrlsel;
 	required_ioport m_std_keypad1;

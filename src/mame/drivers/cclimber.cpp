@@ -238,12 +238,15 @@ Dip location verified from manual for: cclimber, guzzler, swimmer
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/cclimber.h"
+#include "audio/cclimber.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/segacrpt_device.h"
 #include "sound/ay8910.h"
 #include "sound/samples.h"
-#include "audio/cclimber.h"
-#include "includes/cclimber.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 #define MASTER_CLOCK            XTAL_18_432MHz
@@ -305,6 +308,13 @@ MACHINE_RESET_MEMBER(cclimber_state,cclimber)
 WRITE8_MEMBER(cclimber_state::nmi_mask_w)
 {
 	m_nmi_mask = data & 1;
+}
+
+
+READ8_MEMBER(cclimber_state::bagmanf_a000_r)
+{
+	// Should this actually use the same PAL16R6 as the parent set?
+	return 0x3f;
 }
 
 
@@ -431,6 +441,28 @@ static ADDRESS_MAP_START( toprollr_map, AS_PROGRAM, 8, cclimber_state )
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW") AM_DEVWRITE("cclimber_audio", cclimber_audio_device, sample_volume_w)
 	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xc000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( bagmanf_map, AS_PROGRAM, 8, cclimber_state )
+	AM_RANGE(0x0000, 0x5fff) AM_ROM
+	AM_RANGE(0x6000, 0x6bff) AM_RAM             /* Crazy Kong only */
+	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("P1")
+	AM_RANGE(0x8800, 0x8800) AM_READ_PORT("P2")
+	AM_RANGE(0x8800, 0x88ff) AM_RAM AM_SHARE("bigspriteram") // wrong
+	AM_RANGE(0x8900, 0x8bff) AM_RAM             /* not used, but initialized */
+	AM_RANGE(0x9000, 0x93ff) AM_RAM AM_SHARE("videoram")
+	AM_RANGE(0xffe0, 0xffff) AM_RAM AM_SHARE("column_scroll") // wrong, is this area even connected?
+	AM_RANGE(0x9800, 0x9800) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0x9800, 0x981f) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x98dc, 0x98df) AM_RAM AM_SHARE("bigspritectrl") // wrong
+	AM_RANGE(0x9800, 0x9bff) AM_RAM AM_SHARE("colorram")
+	AM_RANGE(0x9c00, 0x9fff) AM_RAM  /* not used, but initialized */
+	AM_RANGE(0xa000, 0xa000) AM_READ(bagmanf_a000_r) AM_WRITE(nmi_mask_w)
+	AM_RANGE(0xa001, 0xa002) AM_WRITEONLY AM_SHARE("flip_screen")
+	AM_RANGE(0xa004, 0xa004) AM_DEVWRITE("cclimber_audio", cclimber_audio_device, sample_trigger_w)
+	AM_RANGE(0xa800, 0xa800) AM_READNOP AM_DEVWRITE("cclimber_audio", cclimber_audio_device, sample_rate_w)
+	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW") AM_DEVWRITE("cclimber_audio", cclimber_audio_device, sample_volume_w)
+	AM_RANGE(0xb800, 0xb800) AM_READNOP
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( toprollr_decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, cclimber_state )
@@ -589,6 +621,34 @@ static INPUT_PORTS_START( ckong )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( bagmanf )
+	PORT_INCLUDE( ckong )
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )            PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPSETTING(    0x03, "2" )
+	PORT_DIPSETTING(    0x02, "3" )
+	PORT_DIPSETTING(    0x01, "4" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Coinage ) )          PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x00, "2C/1C 1C/1C 1C/3C 1C/7C" )
+	PORT_DIPSETTING(    0x04, "1C/1C 1C/2C 1C/6C 1C/14C" )
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("SW1:4,5")
+	PORT_DIPSETTING(    0x18, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Medium ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Language ) )         PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( English ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( French ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Bonus_Life ) )       PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x40, "30000" )
+	PORT_DIPSETTING(    0x00, "40000" )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ) ) /* Cabinet type set through edge connector, not dip switch (verified on real pcb) */
+	PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 INPUT_PORTS_END
 
 /* Similar to normal Crazy Kong except for the lives per game */
@@ -1035,7 +1095,13 @@ INTERRUPT_GEN_MEMBER(cclimber_state::vblank_irq)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( root, cclimber_state )
+INTERRUPT_GEN_MEMBER(cclimber_state::bagmanf_vblank_irq)
+{
+	if(m_nmi_mask)
+		device.execute().set_input_line(0, HOLD_LINE);
+}
+
+static MACHINE_CONFIG_START( root )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/3/2)  /* 3.072 MHz */
@@ -1065,7 +1131,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( cclimber, root )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_CCLIMBER_AUDIO_ADD("cclimber_audio")
 MACHINE_CONFIG_END
@@ -1084,6 +1150,14 @@ static MACHINE_CONFIG_DERIVED( cannonb, cclimber )
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", cannonb)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( bagmanf, cclimber )
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(bagmanf_map)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", cclimber_state, bagmanf_vblank_irq)
 MACHINE_CONFIG_END
 
 
@@ -1109,13 +1183,13 @@ static MACHINE_CONFIG_DERIVED( yamato, root )
 	MCFG_SCREEN_UPDATE_DRIVER(cclimber_state, screen_update_yamato)
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_SOUND_ADD("ay1", AY8910, 1536000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
 	MCFG_SOUND_ADD("ay2", AY8910, 1536000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 MACHINE_CONFIG_END
 
 
@@ -1143,7 +1217,7 @@ static MACHINE_CONFIG_DERIVED( toprollr, cclimber )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( swimmer, cclimber_state )
+static MACHINE_CONFIG_START( swimmer )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)    /* verified on pcb */
@@ -1171,15 +1245,15 @@ static MACHINE_CONFIG_START( swimmer, cclimber_state )
 	MCFG_VIDEO_START_OVERRIDE(cclimber_state,swimmer)
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ay1", AY8910, XTAL_4MHz/2)  /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
 	MCFG_SOUND_ADD("ay2", AY8910, XTAL_4MHz/2)  /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( guzzler, swimmer )
@@ -2194,6 +2268,7 @@ ROM_END
    this set also explains why the cannonball set above contained a number of bagman roms, it was clearly
    a half-converted board.
 
+   A bootleg of "Le Bagnard" with a KCK-series motherboard has also been observed.
 */
 ROM_START( bagmanf )
 	ROM_REGION( 0x6000, "maincpu", 0 )
@@ -2204,23 +2279,18 @@ ROM_START( bagmanf )
 	ROM_LOAD( "05.l5.bin",  0x4000, 0x1000, CRC(4f0088ab) SHA1(a8009f5b8517ba4d84fbc483b199f2514f24eae8) )
 	ROM_LOAD( "2732 05 pos dboard.bin",  0x5000, 0x1000, CRC(91570033) SHA1(7cd7fe9541da36c3919324bc65e6db1d1ca635e0) )
 
+	// not 100% trusted, but close (unless bad tiles are supposed to be masked by color)
 	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "09.l11.bin", 0x0000, 0x0800, CRC(060b044c) SHA1(3121f07adb661663a2303085eea1b662968f8f98) )
-	/* 0x0800-0x0fff - empty */
-	ROM_CONTINUE(           0x1000, 0x0800 )
-	/* 0x1800-0x0fff - empty */
-	ROM_LOAD( "11.h11.bin", 0x2000, 0x0800, CRC(8043bc1a) SHA1(bd2f3dfe26cf8d987d9ecaa41eac4bdc4e16a692) )
-	/* 0x2800-0x0fff - empty */
-	ROM_CONTINUE(           0x3000, 0x0800 )
-	/* 0x3800-0x0fff - empty */
+	ROM_LOAD( "10.n11.bin",   0x2000, 0x1000, CRC(c680ef04) SHA1(79406bc786374abfcd9f548268c445b5c8d8858d) )
+	ROM_LOAD( "09.l11.bin",   0x3000, 0x1000, CRC(060b044c) SHA1(3121f07adb661663a2303085eea1b662968f8f98) )
+	ROM_LOAD( "12.k11.bin",   0x0000, 0x1000, CRC(4a0a6b55) SHA1(955f8bd4bd9b0fc3c6c359c25ba543ba26c04cbd) )
+	ROM_LOAD( "11.h11.bin",   0x1000, 0x1000, CRC(8043bc1a) SHA1(bd2f3dfe26cf8d987d9ecaa41eac4bdc4e16a692) )
 
-	ROM_REGION( 0x2000, "gfx2", 0 )
-	ROM_LOAD( "10.n11.bin",   0x0000, 0x1000, CRC(c680ef04) SHA1(79406bc786374abfcd9f548268c445b5c8d8858d) )
-	ROM_LOAD( "12.k11.bin",   0x1000, 0x1000, CRC(4a0a6b55) SHA1(955f8bd4bd9b0fc3c6c359c25ba543ba26c04cbd) )
+	ROM_REGION( 0x2000, "gfx2", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x0060, "proms", 0 )
-	ROM_LOAD( "v6",      0x0000, 0x0020, CRC(b3fc1505) SHA1(5b94adde0428a26b815c7eb9b3f3716470d349c7) )
-	ROM_LOAD( "u6",      0x0020, 0x0020, CRC(26aada9e) SHA1(f59645e606ea4f0dd0fc4ea47dd03f526c534941) )
+	ROM_LOAD( "v6",      0x0020, 0x0020, CRC(b3fc1505) SHA1(5b94adde0428a26b815c7eb9b3f3716470d349c7) )
+	ROM_LOAD( "u6",      0x0000, 0x0020, CRC(26aada9e) SHA1(f59645e606ea4f0dd0fc4ea47dd03f526c534941) )
 	ROM_LOAD( "t6",      0x0040, 0x0020, CRC(676b3166) SHA1(29b9434cd34d43ea5664e436e2a24b54f8d88aac) )
 
 	/* as well as one of the program roms, the daughterboard contains the speech hardware + roms */
@@ -2506,7 +2576,7 @@ DRIVER_INIT_MEMBER(cclimber_state,yamato)
 
 DRIVER_INIT_MEMBER(cclimber_state,toprollr)
 {
-	m_opcodes = std::make_unique<UINT8[]>(0x6000*3);
+	m_opcodes = std::make_unique<uint8_t[]>(0x6000*3);
 
 	segacrpt_z80_device* cpu = (segacrpt_z80_device*)machine().device(":maincpu");
 
@@ -2532,7 +2602,7 @@ DRIVER_INIT_MEMBER(cclimber_state,toprollr)
 
 DRIVER_INIT_MEMBER(cclimber_state,dking)
 {
-	UINT8 *rom = memregion( "maincpu" )->base();
+	uint8_t *rom = memregion( "maincpu" )->base();
 	int i;
 	int j;
 
@@ -2544,59 +2614,72 @@ DRIVER_INIT_MEMBER(cclimber_state,dking)
 
 }
 
+DRIVER_INIT_MEMBER(cclimber_state,rpatrol)
+{
+	uint8_t *rom = memregion( "maincpu" )->base();
+
+	/* Bits are inverted */
+	for (int i = 0x0000; i < 0x5000; i++)
+	{
+		rom[i] = rom[i] ^ 0x79;
+		i++;
+		rom[i] = rom[i] ^ 0x5b;
+	}
+}
+
 
 GAME( 1980, cclimber,    0,        cclimberx, cclimber, cclimber_state, cclimber, ROT0,   "Nichibutsu", "Crazy Climber (US)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, cclimberj,   cclimber, cclimberx, cclimberj, cclimber_state,cclimberj,ROT0,   "Nichibutsu", "Crazy Climber (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, ccboot,      cclimber, cclimberx, cclimber, cclimber_state, cclimberj,ROT0,   "bootleg", "Crazy Climber (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, ccboot2,     cclimber, cclimberx, cclimber, cclimber_state, cclimberj,ROT0,   "bootleg", "Crazy Climber (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, ccbootmr,    cclimber, cclimberx, cclimber, cclimber_state, cclimberj,ROT0,   "bootleg (Model Racing)", "Crazy Climber (Model Racing bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, cclimbroper, cclimber, cclimber,  cclimber, driver_device,  0,        ROT0,   "bootleg (Operamatic)", "Crazy Climber (Spanish, Operamatic bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, cclimbrrod,  cclimber, cclimber,  cclimber, driver_device,  0,        ROT0,   "bootleg (Rodmar)", "Crazy Climber (Spanish, Rodmar bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, cclimbroper, cclimber, cclimber,  cclimber, cclimber_state, 0,        ROT0,   "bootleg (Operamatic)", "Crazy Climber (Spanish, Operamatic bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, cclimbrrod,  cclimber, cclimber,  cclimber, cclimber_state, 0,        ROT0,   "bootleg (Rodmar)", "Crazy Climber (Spanish, Rodmar bootleg)", MACHINE_SUPPORTS_SAVE )
 
 /* these sets have ugly colours, no extra attract screen, and no graphics for the extra attract screen in the BG roms
   - there is a Falcon logo in the text roms which is unused
   - does the code to display the extra screen still exist in the roms?  */
-GAME( 1981, ckong,       0,        cclimber, ckong, driver_device,    0,        ROT270, "Kyoei / Falcon", "Crazy Kong", MACHINE_SUPPORTS_SAVE ) // on a Falcon FCK-01 PCB, but doesn't display any Falcon copyright
-GAME( 1981, ckongalc,    ckong,    cclimber, ckong, driver_device,    0,        ROT270, "bootleg (Alca)", "Crazy Kong (Alca bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, monkeyd,     ckong,    cclimber, ckong, driver_device,    0,        ROT270, "bootleg", "Monkey Donkey", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, dking,       ckong,    cclimber, ckong, cclimber_state,   dking,    ROT270, "bootleg", "Donkey King", MACHINE_SUPPORTS_SAVE ) // supposedly, possibly by Hafasonic?
-GAME( 1981, ckongdks,    ckong,    cclimber, ckong, cclimber_state,   dking,    ROT270, "bootleg", "Donkey Kong (Spanish Crazy Kong bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, ckong,       0,        cclimber, ckong,  cclimber_state,   0,        ROT270, "Kyoei / Falcon", "Crazy Kong", MACHINE_SUPPORTS_SAVE ) // on a Falcon FCK-01 PCB, but doesn't display any Falcon copyright
+GAME( 1981, ckongalc,    ckong,    cclimber, ckong,  cclimber_state,   0,        ROT270, "bootleg (Alca)", "Crazy Kong (Alca bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, monkeyd,     ckong,    cclimber, ckong,  cclimber_state,   0,        ROT270, "bootleg", "Monkey Donkey", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, dking,       ckong,    cclimber, ckong,  cclimber_state,   dking,    ROT270, "bootleg", "Donkey King", MACHINE_SUPPORTS_SAVE ) // supposedly, possibly by Hafasonic?
+GAME( 1981, ckongdks,    ckong,    cclimber, ckong,  cclimber_state,   dking,    ROT270, "bootleg", "Donkey Kong (Spanish Crazy Kong bootleg)", MACHINE_SUPPORTS_SAVE )
 
 /* these sets have correct colours, and also contain the graphics used for the extra attract screen in the BG roms, but it is unused
  - the Falcon logo in the text roms is still unused
  - does the code to display the extra screen still exist in the roms?  */
-GAME( 1981, ckongo,      ckong,    cclimber, ckong, driver_device,    0,        ROT270, "bootleg (Orca)", "Crazy Kong (Orca bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, bigkong,     ckong,    cclimber, ckong, driver_device,    0,        ROT270, "bootleg", "Big Kong", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, ckongo,      ckong,    cclimber, ckong,  cclimber_state,   0,        ROT270, "bootleg (Orca)", "Crazy Kong (Orca bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, bigkong,     ckong,    cclimber, ckong,  cclimber_state,   0,        ROT270, "bootleg", "Big Kong", MACHINE_SUPPORTS_SAVE )
 
 /* these sets have correct colours, and the extra attract screen, they also make use of the Falcon logo, some sets hack out the Falcon
    text on the extra screen */
-GAME( 1981, ckongpt2,    0,        cclimber, ckong, driver_device,    0,        ROT270, "Falcon", "Crazy Kong Part II (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, ckongpt2a,   ckongpt2, cclimber, ckong, driver_device,    0,        ROT270, "Falcon", "Crazy Kong Part II (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, ckongpt2j,   ckongpt2, cclimber, ckong, driver_device,    0,        ROT270, "Falcon", "Crazy Kong Part II (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, ckongpt2jeu, ckongpt2, cclimber, ckong, driver_device,    0,        ROT270, "bootleg (Jeutel)", "Crazy Kong Part II (Jeutel bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, ckongpt2,    0,        cclimber, ckong,  cclimber_state,   0,        ROT270, "Falcon", "Crazy Kong Part II (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, ckongpt2a,   ckongpt2, cclimber, ckong,  cclimber_state,   0,        ROT270, "Falcon", "Crazy Kong Part II (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, ckongpt2j,   ckongpt2, cclimber, ckong,  cclimber_state,   0,        ROT270, "Falcon", "Crazy Kong Part II (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, ckongpt2jeu, ckongpt2, cclimber, ckong,  cclimber_state,   0,        ROT270, "bootleg (Jeutel)", "Crazy Kong Part II (Jeutel bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, ckongpt2b,   ckongpt2, cclimber, ckongb, cclimber_state,   ckongb,   ROT270, "bootleg", "Crazy Kong Part II (alternative levels)", MACHINE_SUPPORTS_SAVE )
 
-// see bagman.c for parent
-GAME( 1981, bagmanf,     bagman,   cclimber, ckong, driver_device,    0,        ROT270, "bootleg", "Bagman (bootleg on Crazy Kong hardware)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+// see bagman.cpp for parent
+GAME( 1982, bagmanf,     bagman,   bagmanf,  bagmanf, cclimber_state,  0,        ROT270, "bootleg", "Le Bagnard (bootleg on Crazy Kong hardware)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1981, rpatrol,     0,        cclimber, rpatrol, driver_device,  0,        ROT0,   "Orca", "River Patrol (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // TODO: encrypted, suicide battery on PCB
-GAME( 1981, rpatrola,    rpatrol,  cclimber, rpatrol, driver_device,  0,        ROT0,   "bootleg", "River Patrol (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, rpatrolb,    rpatrol,  cclimber, rpatrol, driver_device,  0,        ROT0,   "bootleg", "River Patrol (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, silvland,    rpatrol,  cclimber, rpatrol, driver_device,  0,        ROT0,   "Falcon", "Silver Land", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, rpatrol,     0,        cclimber, rpatrol, cclimber_state,  rpatrol,  ROT0,   "Orca", "River Patrol (Japan)", MACHINE_SUPPORTS_SAVE)
+GAME( 1981, rpatrola,    rpatrol,  cclimber, rpatrol, cclimber_state,  0,        ROT0,   "bootleg", "River Patrol (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, rpatrolb,    rpatrol,  cclimber, rpatrol, cclimber_state,  0,        ROT0,   "bootleg", "River Patrol (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, silvland,    rpatrol,  cclimber, rpatrol, cclimber_state,  0,        ROT0,   "Falcon", "Silver Land", MACHINE_SUPPORTS_SAVE )
 
-// see pacman.c for parent
+// see pacman.cpp for parent
 GAME( 1985, cannonb,     cannonbp, cannonb,  cannonb, cclimber_state,  cannonb,  ROT90,  "bootleg (Soft)", "Cannon Ball (bootleg on Crazy Kong hardware) (set 1, buggy)" , MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // bootleggers missed protection after bonus game
 GAME( 1985, cannonb2,    cannonbp, cannonb,  cannonb, cclimber_state,  cannonb2, ROT90,  "bootleg (TV Game Gruenberg)", "Cannon Ball (bootleg on Crazy Kong hardware) (set 2, buggy)", MACHINE_SUPPORTS_SAVE ) // bootleggers missed protection after bonus game
 GAME( 1985, cannonb3,    cannonbp, cannonb,  cannonb, cclimber_state,  cannonb2, ROT90,  "bootleg (Soft)", "Cannon Ball (bootleg on Crazy Kong hardware) (set 3, no bonus game)", MACHINE_SUPPORTS_SAVE ) // the bonus game is patched out, thus avoiding the protection issue
 
-GAME( 1982, swimmer,     0,        swimmer,  swimmer, driver_device,  0,        ROT0,   "Tehkan", "Swimmer (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, swimmera,    swimmer,  swimmer,  swimmer, driver_device,  0,        ROT0,   "Tehkan", "Swimmer (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, swimmerb,    swimmer,  swimmer,  swimmerb, driver_device, 0,        ROT0,   "Tehkan", "Swimmer (set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, swimmer,     0,        swimmer,  swimmer, cclimber_state,  0,        ROT0,   "Tehkan", "Swimmer (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, swimmera,    swimmer,  swimmer,  swimmer, cclimber_state,  0,        ROT0,   "Tehkan", "Swimmer (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, swimmerb,    swimmer,  swimmer,  swimmerb, cclimber_state, 0,        ROT0,   "Tehkan", "Swimmer (set 3)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, guzzler,     0,        guzzler,  guzzler, driver_device,  0,        ROT90,  "Tehkan", "Guzzler", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, guzzlers,    guzzler,  guzzler,  guzzler, driver_device,  0,        ROT90,  "Tehkan", "Guzzler (Swimmer Conversion)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, guzzler,     0,        guzzler,  guzzler, cclimber_state,  0,        ROT90,  "Tehkan", "Guzzler", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, guzzlers,    guzzler,  guzzler,  guzzler, cclimber_state,  0,        ROT90,  "Tehkan", "Guzzler (Swimmer Conversion)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, yamato,      0,        yamato,   yamato, cclimber_state,   yamato,   ROT90,  "Sega", "Yamato (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, yamato2,     yamato,   yamato,   yamato, cclimber_state,   yamato,   ROT90,  "Sega", "Yamato (World?)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, yamato,      0,        yamato,   yamato,  cclimber_state,  yamato,   ROT90,  "Sega", "Yamato (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, yamato2,     yamato,   yamato,   yamato,  cclimber_state,  yamato,   ROT90,  "Sega", "Yamato (World?)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1983, toprollr,    0,        toprollr, toprollr, cclimber_state, toprollr, ROT90,  "Jaleco", "Top Roller", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )

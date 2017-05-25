@@ -8,11 +8,12 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "ser_mouse.h"
 
 
-serial_mouse_device::serial_mouse_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+serial_mouse_device::serial_mouse_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock),
 	device_rs232_port_interface(mconfig, *this),
 	device_serial_interface(mconfig, *this),
 	m_dtr(1),
@@ -28,17 +29,17 @@ serial_mouse_device::serial_mouse_device(const machine_config &mconfig, device_t
 {
 }
 
-const device_type MSFT_SERIAL_MOUSE = &device_creator<microsoft_mouse_device>;
+DEFINE_DEVICE_TYPE(MSFT_SERIAL_MOUSE, microsoft_mouse_device, "microsoft_mouse", "Microsoft Serial Mouse")
 
-microsoft_mouse_device::microsoft_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: serial_mouse_device(mconfig, MSFT_SERIAL_MOUSE, "Microsoft Serial Mouse", tag, owner, clock, "microsoft_mouse", __FILE__)
+microsoft_mouse_device::microsoft_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: serial_mouse_device(mconfig, MSFT_SERIAL_MOUSE, tag, owner, clock)
 {
 }
 
-const device_type MSYSTEM_SERIAL_MOUSE = &device_creator<mouse_systems_mouse_device>;
+DEFINE_DEVICE_TYPE(MSYSTEM_SERIAL_MOUSE, mouse_systems_mouse_device, "mouse_systems_mouse", "Mouse Systems Serial Mouse")
 
-mouse_systems_mouse_device::mouse_systems_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: serial_mouse_device(mconfig, MSYSTEM_SERIAL_MOUSE, "Mouse Systems Serial Mouse", tag, owner, clock, "mouse_systems_mouse", __FILE__)
+mouse_systems_mouse_device::mouse_systems_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: serial_mouse_device(mconfig, MSYSTEM_SERIAL_MOUSE, tag, owner, clock)
 {
 }
 
@@ -132,7 +133,7 @@ void microsoft_mouse_device::mouse_trans(int dx, int dy, int nb, int mbc)
 	/* split deltas into packets of -128..+127 max */
 	do
 	{
-		UINT8 m0, m1, m2;
+		uint8_t m0, m1, m2;
 		int ddx = (dx < -128) ? -128 : (dx > 127) ? 127 : dx;
 		int ddy = (dy < -128) ? -128 : (dy > 127) ? 127 : dy;
 		m0 = 0x40 | ((nb << 4) & 0x30) | ((ddx >> 6) & 0x03) | ((ddy >> 4) & 0x0c);

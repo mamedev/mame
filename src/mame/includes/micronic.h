@@ -74,12 +74,12 @@ public:
 	DECLARE_WRITE8_MEMBER( rtc_data_w );
 	DECLARE_WRITE_LINE_MEMBER( mc146818_irq );
 
-	required_shared_ptr<UINT8> m_ram_base;
-	UINT8 m_banks_num;
-	UINT8 m_kp_matrix;
-	UINT8 m_lcd_contrast;
+	required_shared_ptr<uint8_t> m_ram_base;
+	uint8_t m_banks_num;
+	uint8_t m_kp_matrix;
+	uint8_t m_lcd_contrast;
 	int m_lcd_backlight;
-	UINT8 m_status_flag;
+	uint8_t m_status_flag;
 	DECLARE_PALETTE_INIT(micronic);
 
 protected:

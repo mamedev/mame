@@ -1,17 +1,18 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
+#include "emu.h"
 #include "machine/nscsi_hd.h"
 #include "imagedev/harddriv.h"
 
-const device_type NSCSI_HARDDISK = &device_creator<nscsi_harddisk_device>;
+DEFINE_DEVICE_TYPE(NSCSI_HARDDISK, nscsi_harddisk_device, "scsi_harddisk", "SCSI Hard Disk")
 
-nscsi_harddisk_device::nscsi_harddisk_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	nscsi_full_device(mconfig, NSCSI_HARDDISK, "SCSI HARDDISK", tag, owner, clock, "scsi_harddisk", __FILE__), harddisk(nullptr), lba(0), cur_lba(0), blocks(0), bytes_per_sector(0)
+nscsi_harddisk_device::nscsi_harddisk_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	nscsi_harddisk_device(mconfig, NSCSI_HARDDISK, tag, owner, clock)
 {
 }
 
-nscsi_harddisk_device::nscsi_harddisk_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
-	nscsi_full_device(mconfig, type, name, tag, owner, clock, shortname, source), harddisk(nullptr), lba(0), cur_lba(0), blocks(0), bytes_per_sector(0)
+nscsi_harddisk_device::nscsi_harddisk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	nscsi_full_device(mconfig, type, tag, owner, clock), harddisk(nullptr), lba(0), cur_lba(0), blocks(0), bytes_per_sector(0)
 {
 }
 
@@ -40,7 +41,7 @@ void nscsi_harddisk_device::device_reset()
 	cur_lba = -1;
 }
 
-static MACHINE_CONFIG_FRAGMENT(scsi_harddisk)
+static MACHINE_CONFIG_START(scsi_harddisk)
 	MCFG_HARDDISK_ADD("image")
 	MCFG_HARDDISK_INTERFACE("scsi_hdd")
 MACHINE_CONFIG_END
@@ -50,7 +51,7 @@ machine_config_constructor nscsi_harddisk_device::device_mconfig_additions() con
 	return MACHINE_CONFIG_NAME(scsi_harddisk);
 }
 
-UINT8 nscsi_harddisk_device::scsi_get_data(int id, int pos)
+uint8_t nscsi_harddisk_device::scsi_get_data(int id, int pos)
 {
 	if(id != 2)
 		return nscsi_full_device::scsi_get_data(id, pos);
@@ -65,7 +66,7 @@ UINT8 nscsi_harddisk_device::scsi_get_data(int id, int pos)
 	return block[pos % bytes_per_sector];
 }
 
-void nscsi_harddisk_device::scsi_put_data(int id, int pos, UINT8 data)
+void nscsi_harddisk_device::scsi_put_data(int id, int pos, uint8_t data)
 {
 	if(id != 2) {
 		nscsi_full_device::scsi_put_data(id, pos, data);
@@ -194,7 +195,7 @@ void nscsi_harddisk_device::scsi_command()
 		scsi_cmdbuf[pos++] = 0x00; // WP, cache
 
 		hard_disk_info *info = hard_disk_get_info(harddisk);
-		UINT32 dsize = info->cylinders * info->heads * info->sectors - 1;
+		uint32_t dsize = info->cylinders * info->heads * info->sectors - 1;
 		scsi_cmdbuf[pos++] = 0x08; // Block descriptor length
 		scsi_cmdbuf[pos++] = 0x00;
 		scsi_cmdbuf[pos++] = (dsize>>16) & 0xff;
@@ -265,8 +266,8 @@ void nscsi_harddisk_device::scsi_command()
 				scsi_cmdbuf[pos++] = 0x00;                  // RPL
 				scsi_cmdbuf[pos++] = 0x00;                  // Rotational offset
 				scsi_cmdbuf[pos++] = 0x00;                  // Reserved
-				scsi_cmdbuf[pos++] = UINT8(10000 >> 8);     // Medium rotation rate
-				scsi_cmdbuf[pos++] = UINT8(10000);          // Medium rotation rate
+				scsi_cmdbuf[pos++] = uint8_t(10000 >> 8);     // Medium rotation rate
+				scsi_cmdbuf[pos++] = uint8_t(10000);          // Medium rotation rate
 				scsi_cmdbuf[pos++] = 0x00;                  // Reserved
 				scsi_cmdbuf[pos++] = 0x00;                  // Reserved
 				break;
@@ -323,7 +324,7 @@ void nscsi_harddisk_device::scsi_command()
 		logerror("%s: command READ CAPACITY\n", tag());
 
 		hard_disk_info *info = hard_disk_get_info(harddisk);
-		UINT32 size = info->cylinders * info->heads * info->sectors - 1;
+		uint32_t size = info->cylinders * info->heads * info->sectors - 1;
 
 		scsi_cmdbuf[0] = (size>>24) & 0xff;
 		scsi_cmdbuf[1] = (size>>16) & 0xff;

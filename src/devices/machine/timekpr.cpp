@@ -10,19 +10,21 @@
         - M48T37
         - M48T58
         - MK48T08
+        - MK48T12
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "machine/timekpr.h"
-
+#include "machine/timehelp.h"
 
 // device type definition
-const device_type M48T02 = &device_creator<m48t02_device>;
-const device_type M48T35 = &device_creator<m48t35_device>;
-const device_type M48T37 = &device_creator<m48t37_device>;
-const device_type M48T58 = &device_creator<m48t58_device>;
-const device_type MK48T08 = &device_creator<mk48t08_device>;
+DEFINE_DEVICE_TYPE(M48T02,  m48t02_device,  "m48t02",  "M48T02 Timekeeper")
+DEFINE_DEVICE_TYPE(M48T35,  m48t35_device,  "m48t35",  "M48T35 Timekeeper")
+DEFINE_DEVICE_TYPE(M48T37,  m48t37_device,  "m48t37",  "M48T37 Timekeeper")
+DEFINE_DEVICE_TYPE(M48T58,  m48t58_device,  "m48t58",  "M48T58 Timekeeper")
+DEFINE_DEVICE_TYPE(MK48T08, mk48t08_device, "mk48t08", "MK48T08 Timekeeper")
+DEFINE_DEVICE_TYPE(MK48T12, mk48t12_device, "mk48t12", "MK48T12 Timekeeper")
 
 
 /***************************************************************************
@@ -61,40 +63,7 @@ const device_type MK48T08 = &device_creator<mk48t08_device>;
     INLINE FUNCTIONS
 ***************************************************************************/
 
-static inline UINT8 make_bcd(UINT8 data)
-{
-	return ( ( ( data / 10 ) % 10 ) << 4 ) + ( data % 10 );
-}
-
-static inline UINT8 from_bcd( UINT8 data )
-{
-	return ( ( ( data >> 4 ) & 15 ) * 10 ) + ( data & 15 );
-}
-
-static int inc_bcd( UINT8 *data, int mask, int min, int max )
-{
-	int bcd;
-	int carry;
-
-	bcd = ( *( data ) + 1 ) & mask;
-	carry = 0;
-
-	if( ( bcd & 0x0f ) > 9 )
-	{
-		bcd &= 0xf0;
-		bcd += 0x10;
-		if( bcd > max )
-		{
-			bcd = min;
-			carry = 1;
-		}
-	}
-
-	*( data ) = ( *( data ) & ~mask ) | ( bcd & mask );
-	return carry;
-}
-
-static void counter_to_ram( UINT8 *data, int offset, int counter )
+static void counter_to_ram( uint8_t *data, int offset, int counter )
 {
 	if( offset >= 0 )
 	{
@@ -102,7 +71,7 @@ static void counter_to_ram( UINT8 *data, int offset, int counter )
 	}
 }
 
-static int counter_from_ram( UINT8 *data, int offset )
+static int counter_from_ram( uint8_t *data, int offset )
 {
 	if( offset >= 0 )
 	{
@@ -119,16 +88,16 @@ static int counter_from_ram( UINT8 *data, int offset )
 //  timekeeper_device_config - constructor
 //-------------------------------------------------
 
-timekeeper_device::timekeeper_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int size)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+timekeeper_device::timekeeper_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int size)
+	: device_t(mconfig, type, tag, owner, clock)
 	, device_nvram_interface(mconfig, *this)
 	, m_default_data(*this, DEVICE_SELF, size)
 	, m_size(size)
 {
 }
 
-m48t02_device::m48t02_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: timekeeper_device(mconfig, M48T02, "M48T02 Timekeeper", tag, owner, clock, "m48t02", __FILE__, 0x800)
+m48t02_device::m48t02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: timekeeper_device(mconfig, M48T02, tag, owner, clock, 0x800)
 {
 	m_offset_control = 0x7f8;
 	m_offset_seconds = 0x7f9;
@@ -142,8 +111,8 @@ m48t02_device::m48t02_device(const machine_config &mconfig, const char *tag, dev
 	m_offset_flags = -1;
 }
 
-m48t35_device::m48t35_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: timekeeper_device(mconfig, M48T35, "M48T35 Timekeeper", tag, owner, clock, "m48t35", __FILE__, 0x8000)
+m48t35_device::m48t35_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: timekeeper_device(mconfig, M48T35, tag, owner, clock, 0x8000)
 {
 	m_offset_control = 0x7ff8;
 	m_offset_seconds = 0x7ff9;
@@ -157,8 +126,8 @@ m48t35_device::m48t35_device(const machine_config &mconfig, const char *tag, dev
 	m_offset_flags = -1;
 }
 
-m48t37_device::m48t37_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: timekeeper_device(mconfig, M48T37, "M48T37 Timekeeper", tag, owner, clock, "m48t37", __FILE__, 0x8000)
+m48t37_device::m48t37_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: timekeeper_device(mconfig, M48T37, tag, owner, clock, 0x8000)
 {
 	m_offset_control = 0x7ff8;
 	m_offset_seconds = 0x7ff9;
@@ -172,8 +141,8 @@ m48t37_device::m48t37_device(const machine_config &mconfig, const char *tag, dev
 	m_offset_flags = 0x7ff0;
 }
 
-m48t58_device::m48t58_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: timekeeper_device(mconfig, M48T58, "M48T58 Timekeeper", tag, owner, clock, "m48t58", __FILE__, 0x2000)
+m48t58_device::m48t58_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: timekeeper_device(mconfig, M48T58, tag, owner, clock, 0x2000)
 {
 	m_offset_control = 0x1ff8;
 	m_offset_seconds = 0x1ff9;
@@ -187,8 +156,8 @@ m48t58_device::m48t58_device(const machine_config &mconfig, const char *tag, dev
 	m_offset_flags = -1;
 }
 
-mk48t08_device::mk48t08_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: timekeeper_device(mconfig, MK48T08, "MK48T08 Timekeeper", tag, owner, clock, "m48t08", __FILE__, 0x2000)
+mk48t08_device::mk48t08_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: timekeeper_device(mconfig, MK48T08, tag, owner, clock, 0x2000)
 {
 	m_offset_control = 0x1ff8;
 	m_offset_seconds = 0x1ff9;
@@ -200,6 +169,20 @@ mk48t08_device::mk48t08_device(const machine_config &mconfig, const char *tag, d
 	m_offset_year = 0x1fff;
 	m_offset_century = 0x1ff1;
 	m_offset_flags = 0x1ff0;
+}
+
+mk48t12_device::mk48t12_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: timekeeper_device(mconfig, MK48T12, tag, owner, clock, 0x2000)
+{
+	m_offset_control = 0x7f8;
+	m_offset_seconds = 0x7f9;
+	m_offset_minutes = 0x7fa;
+	m_offset_hours = 0x7fb;
+	m_offset_day = 0x7fc;
+	m_offset_date = 0x7fd;
+	m_offset_month = 0x7fe;
+	m_offset_year = 0x7ff;
+	m_offset_century = -1;
 }
 
 
@@ -217,14 +200,14 @@ void timekeeper_device::device_start()
 	machine().base_datetime(systime);
 
 	m_control = 0;
-	m_seconds = make_bcd( systime.local_time.second );
-	m_minutes = make_bcd( systime.local_time.minute );
-	m_hours = make_bcd( systime.local_time.hour );
-	m_day = make_bcd( systime.local_time.weekday + 1 );
-	m_date = make_bcd( systime.local_time.mday );
-	m_month = make_bcd( systime.local_time.month + 1 );
-	m_year = make_bcd( systime.local_time.year % 100 );
-	m_century = make_bcd( systime.local_time.year / 100 );
+	m_seconds = time_helper::make_bcd( systime.local_time.second );
+	m_minutes = time_helper::make_bcd( systime.local_time.minute );
+	m_hours = time_helper::make_bcd( systime.local_time.hour );
+	m_day = time_helper::make_bcd( systime.local_time.weekday + 1 );
+	m_date = time_helper::make_bcd( systime.local_time.mday );
+	m_month = time_helper::make_bcd( systime.local_time.month + 1 );
+	m_year = time_helper::make_bcd( systime.local_time.year % 100 );
+	m_century = time_helper::make_bcd( systime.local_time.year / 100 );
 	m_data.resize( m_size );
 
 	save_item( NAME(m_control) );
@@ -282,25 +265,25 @@ void timekeeper_device::device_timer(emu_timer &timer, device_timer_id id, int p
 		return;
 	}
 
-	int carry = inc_bcd( &m_seconds, MASK_SECONDS, 0x00, 0x59 );
+	int carry = time_helper::inc_bcd( &m_seconds, MASK_SECONDS, 0x00, 0x59 );
 	if( carry )
 	{
-		carry = inc_bcd( &m_minutes, MASK_MINUTES, 0x00, 0x59 );
+		carry = time_helper::inc_bcd( &m_minutes, MASK_MINUTES, 0x00, 0x59 );
 	}
 	if( carry )
 	{
-		carry = inc_bcd( &m_hours, MASK_HOURS, 0x00, 0x23 );
+		carry = time_helper::inc_bcd( &m_hours, MASK_HOURS, 0x00, 0x23 );
 	}
 
 	if( carry )
 	{
-		UINT8 maxdays;
-		static const UINT8 daysinmonth[] = { 0x31, 0x28, 0x31, 0x30, 0x31, 0x30, 0x31, 0x31, 0x30, 0x31, 0x30, 0x31 };
+		uint8_t maxdays;
+		static const uint8_t daysinmonth[] = { 0x31, 0x28, 0x31, 0x30, 0x31, 0x30, 0x31, 0x31, 0x30, 0x31, 0x30, 0x31 };
 
-		inc_bcd( &m_day, MASK_DAY, 0x01, 0x07 );
+		time_helper::inc_bcd( &m_day, MASK_DAY, 0x01, 0x07 );
 
-		UINT8 month = from_bcd( m_month );
-		UINT8 year = from_bcd( m_year );
+		uint8_t month = time_helper::from_bcd( m_month );
+		uint8_t year = time_helper::from_bcd( m_year );
 
 		if( month == 2 && ( year % 4 ) == 0 )
 		{
@@ -315,19 +298,19 @@ void timekeeper_device::device_timer(emu_timer &timer, device_timer_id id, int p
 			maxdays = 0x31;
 		}
 
-		carry = inc_bcd( &m_date, MASK_DATE, 0x01, maxdays );
+		carry = time_helper::inc_bcd( &m_date, MASK_DATE, 0x01, maxdays );
 	}
 	if( carry )
 	{
-		carry = inc_bcd( &m_month, MASK_MONTH, 0x01, 0x12 );
+		carry = time_helper::inc_bcd( &m_month, MASK_MONTH, 0x01, 0x12 );
 	}
 	if( carry )
 	{
-		carry = inc_bcd( &m_year, MASK_YEAR, 0x00, 0x99 );
+		carry = time_helper::inc_bcd( &m_year, MASK_YEAR, 0x00, 0x99 );
 	}
 	if( carry )
 	{
-		carry = inc_bcd( &m_century, MASK_CENTURY, 0x00, 0x99 );
+		carry = time_helper::inc_bcd( &m_century, MASK_CENTURY, 0x00, 0x99 );
 
 		if( type() == M48T35 ||
 			type() == M48T58 )
@@ -370,7 +353,7 @@ WRITE8_MEMBER( timekeeper_device::write )
 
 READ8_MEMBER( timekeeper_device::read )
 {
-	UINT8 result = m_data[ offset ];
+	uint8_t result = m_data[ offset ];
 	if( offset == m_offset_date && type() == M48T58 )
 	{
 		result &= ~DATE_BL;

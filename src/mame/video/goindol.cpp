@@ -47,8 +47,8 @@ TILE_GET_INFO_MEMBER(goindol_state::get_bg_tile_info)
 
 void goindol_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(goindol_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(goindol_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(goindol_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(goindol_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_fg_tilemap->set_transparent_pen(0);
 }
@@ -80,7 +80,7 @@ WRITE8_MEMBER(goindol_state::goindol_bg_videoram_w)
 
 ***************************************************************************/
 
-void goindol_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int gfxbank, UINT8 *sprite_ram )
+void goindol_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int gfxbank, uint8_t *sprite_ram )
 {
 	int offs, sx, sy, tile, palette;
 
@@ -117,7 +117,7 @@ void goindol_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 	}
 }
 
-UINT32 goindol_state::screen_update_goindol(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t goindol_state::screen_update_goindol(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_fg_tilemap->set_scrollx(0, *m_fg_scrollx);
 	m_fg_tilemap->set_scrolly(0, *m_fg_scrolly);

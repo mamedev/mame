@@ -1,28 +1,30 @@
 // license:BSD-3-Clause
 // copyright-holders:Nathan Woods
+#ifndef MAME_INCLUDES_ATOM_H
+#define MAME_INCLUDES_ATOM_H
+
 #pragma once
 
-#ifndef __ATOM__
-#define __ATOM__
 
-
-#include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "imagedev/cassette.h"
 #include "imagedev/flopdrv.h"
-#include "machine/ram.h"
 #include "imagedev/snapquik.h"
-#include "formats/atom_tap.h"
-#include "formats/atom_dsk.h"
-#include "formats/uef_cas.h"
-#include "bus/centronics/ctronics.h"
 #include "machine/6522via.h"
 #include "machine/i8255.h"
 #include "machine/i8271.h"
-#include "sound/speaker.h"
+#include "machine/ram.h"
+#include "sound/spkrdev.h"
 #include "video/mc6847.h"
-#include "bus/generic/slot.h"
+
+#include "bus/centronics/ctronics.h"
 #include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
+
+#include "formats/atom_dsk.h"
+#include "formats/atom_tap.h"
+#include "formats/uef_cas.h"
+
 
 #define SY6502_TAG      "ic22"
 #define INS8255_TAG     "ic25"
@@ -97,7 +99,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( motor_w );
 
 	/* video state */
-	required_shared_ptr<UINT8> m_video_ram;
+	required_shared_ptr<uint8_t> m_video_ram;
 
 	/* keyboard state */
 	int m_keylatch;
@@ -112,7 +114,7 @@ public:
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 	TIMER_DEVICE_CALLBACK_MEMBER(cassette_output_tick);
 
-	int load_cart(device_image_interface &image, generic_slot_device *slot);
+	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load) { return load_cart(image, m_cart); }
 	DECLARE_QUICKLOAD_LOAD_MEMBER(atom_atm);
 };
@@ -163,4 +165,4 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(e1_load) { return load_cart(image, m_e1); }
 };
 
-#endif
+#endif // MAME_INCLUDES_ATOM_H

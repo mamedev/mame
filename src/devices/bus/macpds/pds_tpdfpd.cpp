@@ -31,14 +31,17 @@
 
 #include "emu.h"
 #include "pds_tpdfpd.h"
+
 #include "cpu/m68000/m68000.h"
+#include "screen.h"
+
 
 #define SEDISPLAY_SCREEN_NAME "fpd_screen"
 #define SEDISPLAY_ROM_REGION  "fpd_rom"
 
 #define VRAM_SIZE   (256*1024)  // PCB has a jumper for 1MByte; may require different EPROMs
 
-MACHINE_CONFIG_FRAGMENT( sedisplay )
+MACHINE_CONFIG_START( sedisplay )
 	MCFG_SCREEN_ADD( SEDISPLAY_SCREEN_NAME, RASTER)
 	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, macpds_sedisplay_device, screen_update)
 	MCFG_SCREEN_SIZE(1280, 960)
@@ -56,7 +59,7 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type PDS_SEDISPLAY = &device_creator<macpds_sedisplay_device>;
+DEFINE_DEVICE_TYPE(PDS_SEDISPLAY, macpds_sedisplay_device, "pds_sefp", "Radius SE Full Page Display")
 
 
 //-------------------------------------------------
@@ -73,7 +76,7 @@ machine_config_constructor macpds_sedisplay_device::device_mconfig_additions() c
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *macpds_sedisplay_device::device_rom_region() const
+const tiny_rom_entry *macpds_sedisplay_device::device_rom_region() const
 {
 	return ROM_NAME( sedisplay );
 }
@@ -86,21 +89,18 @@ const rom_entry *macpds_sedisplay_device::device_rom_region() const
 //  macpds_sedisplay_device - constructor
 //-------------------------------------------------
 
-macpds_sedisplay_device::macpds_sedisplay_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, PDS_SEDISPLAY, "Radius SE Full Page Display", tag, owner, clock, "pds_sefp", __FILE__),
-		device_video_interface(mconfig, *this),
-		device_macpds_card_interface(mconfig, *this), m_vram(nullptr), m_vbl_disable(0), m_count(0), m_clutoffs(0), m_timer(nullptr)
+macpds_sedisplay_device::macpds_sedisplay_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	macpds_sedisplay_device(mconfig, PDS_SEDISPLAY, tag, owner, clock)
 {
-	m_assembled_tag = std::string(tag).append(":").append(SEDISPLAY_SCREEN_NAME);
-	m_screen_tag = m_assembled_tag.c_str();
 }
 
-macpds_sedisplay_device::macpds_sedisplay_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
-		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_video_interface(mconfig, *this),
-		device_macpds_card_interface(mconfig, *this), m_vram(nullptr), m_vbl_disable(0), m_count(0), m_clutoffs(0), m_timer(nullptr)
+macpds_sedisplay_device::macpds_sedisplay_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	device_video_interface(mconfig, *this),
+	device_macpds_card_interface(mconfig, *this),
+	m_vram(nullptr), m_vbl_disable(0), m_count(0), m_clutoffs(0), m_timer(nullptr),
+	m_assembled_tag(util::string_format("%s:%s", tag, SEDISPLAY_SCREEN_NAME))
 {
-	m_assembled_tag = std::string(tag).append(":").append(SEDISPLAY_SCREEN_NAME);
 	m_screen_tag = m_assembled_tag.c_str();
 }
 
@@ -115,7 +115,7 @@ void macpds_sedisplay_device::device_start()
 	install_rom(this, SEDISPLAY_ROM_REGION, 0xc00000);
 	install_rom(this, SEDISPLAY_ROM_REGION, 0xf80000);
 
-	m_vram = std::make_unique<UINT8[]>(VRAM_SIZE);
+	m_vram = std::make_unique<uint8_t[]>(VRAM_SIZE);
 
 	static const char bankname[] = { "radpds_ram" };
 	m_macpds->install_bank(0xc40000, 0xc40000+VRAM_SIZE-1, bankname, m_vram.get());
@@ -160,11 +160,11 @@ void macpds_sedisplay_device::device_timer(emu_timer &timer, device_timer_id tid
 
 ***************************************************************************/
 
-UINT32 macpds_sedisplay_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t macpds_sedisplay_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UINT32 *scanline;
+	uint32_t *scanline;
 	int x, y;
-	UINT8 pixels, *vram;
+	uint8_t pixels, *vram;
 
 	vram = m_vram.get();
 

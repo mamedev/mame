@@ -16,57 +16,57 @@
  *
  *****************************************************************************/
 
-UINT8 sc61860_device::READ_OP()
+uint8_t sc61860_device::READ_OP()
 {
 	return m_direct->read_byte(m_pc++);
 }
 
-UINT8 sc61860_device::READ_OP_ARG()
+uint8_t sc61860_device::READ_OP_ARG()
 {
 	return m_direct->read_byte(m_pc++);
 }
 
-UINT16 sc61860_device::READ_OP_ARG_WORD()
+uint16_t sc61860_device::READ_OP_ARG_WORD()
 {
-	UINT16 t=m_direct->read_byte(m_pc++)<<8;
+	uint16_t t=m_direct->read_byte(m_pc++)<<8;
 	t|=m_direct->read_byte(m_pc++);
 	return t;
 }
 
-UINT8 sc61860_device::READ_BYTE(UINT16 adr)
+uint8_t sc61860_device::READ_BYTE(uint16_t adr)
 {
 	return m_program->read_byte(adr);
 }
 
-void sc61860_device::WRITE_BYTE(UINT16 a, UINT8 v)
+void sc61860_device::WRITE_BYTE(uint16_t a, uint8_t v)
 {
 	m_program->write_byte(a, v);
 }
 
-UINT8 sc61860_device::READ_RAM(int r)
+uint8_t sc61860_device::READ_RAM(int r)
 {
 	return m_ram[r];
 }
 
-void sc61860_device::WRITE_RAM(int r, UINT8 v)
+void sc61860_device::WRITE_RAM(int r, uint8_t v)
 {
 	m_ram[r] = v;
 }
 
-void sc61860_device::PUSH(UINT8 v)
+void sc61860_device::PUSH(uint8_t v)
 {
 	m_r--;
 	WRITE_RAM(m_r, v);
 }
 
-UINT8 sc61860_device::POP()
+uint8_t sc61860_device::POP()
 {
-	UINT8 t = READ_RAM(m_r);
+	uint8_t t = READ_RAM(m_r);
 	m_r++;
 	return t;
 }
 
-void sc61860_device::sc61860_load_imm(int r, UINT8 v)
+void sc61860_device::sc61860_load_imm(int r, uint8_t v)
 {
 	WRITE_RAM(r, v);
 }
@@ -76,12 +76,12 @@ void sc61860_device::sc61860_load()
 	WRITE_RAM(A, READ_RAM(m_p));
 }
 
-void sc61860_device::sc61860_load_imm_p(UINT8 v)
+void sc61860_device::sc61860_load_imm_p(uint8_t v)
 {
 	m_p=v&0x7f;
 }
 
-void sc61860_device::sc61860_load_imm_q(UINT8 v)
+void sc61860_device::sc61860_load_imm_q(uint8_t v)
 {
 	m_q=v&0x7f;
 }
@@ -128,12 +128,12 @@ void sc61860_device::sc61860_store_ext(int r)
 
 void sc61860_device::sc61860_exam(int a, int b)
 {
-	UINT8 t = READ_RAM(a);
+	uint8_t t = READ_RAM(a);
 	WRITE_RAM(a, READ_RAM(b));
 	WRITE_RAM(b, t);
 }
 
-void sc61860_device::sc61860_test(int reg, UINT8 value)
+void sc61860_device::sc61860_test(int reg, uint8_t value)
 {
 	m_zero=(READ_RAM(reg) & value)==0;
 }
@@ -143,30 +143,30 @@ void sc61860_device::sc61860_test_ext()
 	m_zero=(READ_BYTE(m_dp)&READ_OP_ARG())==0;
 }
 
-void sc61860_device::sc61860_and(int reg, UINT8 value)
+void sc61860_device::sc61860_and(int reg, uint8_t value)
 {
-	UINT8 t = READ_RAM(reg) & value;
+	uint8_t t = READ_RAM(reg) & value;
 	WRITE_RAM(reg,  t);
 	m_zero=t==0;
 }
 
 void sc61860_device::sc61860_and_ext()
 {
-	UINT8 t = READ_BYTE(m_dp) & READ_OP_ARG();
+	uint8_t t = READ_BYTE(m_dp) & READ_OP_ARG();
 	m_zero=t==0;
 	WRITE_BYTE(m_dp, t);
 }
 
-void sc61860_device::sc61860_or(int reg, UINT8 value)
+void sc61860_device::sc61860_or(int reg, uint8_t value)
 {
-	UINT8 t = READ_RAM(reg) | value;
+	uint8_t t = READ_RAM(reg) | value;
 	WRITE_RAM(reg, t);
 	m_zero=t==0;
 }
 
 void sc61860_device::sc61860_or_ext()
 {
-	UINT8 t=READ_BYTE(m_dp)|READ_OP_ARG();
+	uint8_t t=READ_BYTE(m_dp)|READ_OP_ARG();
 	m_zero=t==0;
 	WRITE_BYTE(m_dp, t);
 }
@@ -196,7 +196,7 @@ void sc61860_device::sc61860_swap()
 // q=reg sideeffect
 void sc61860_device::sc61860_inc(int reg)
 {
-	UINT8 t = READ_RAM(reg) + 1;
+	uint8_t t = READ_RAM(reg) + 1;
 	m_q=reg;
 	WRITE_RAM(reg, t);
 	m_zero=t==0;
@@ -211,7 +211,7 @@ void sc61860_device::sc61860_inc_p()
 // q=reg sideeffect
 void sc61860_device::sc61860_dec(int reg)
 {
-	UINT8 t = READ_RAM(reg) - 1;
+	uint8_t t = READ_RAM(reg) - 1;
 	m_q=reg;
 	WRITE_RAM(reg, t);
 	m_zero=t==0;
@@ -223,7 +223,7 @@ void sc61860_device::sc61860_dec_p()
 	m_p--;
 }
 
-void sc61860_device::sc61860_add(int reg, UINT8 value)
+void sc61860_device::sc61860_add(int reg, uint8_t value)
 {
 	int t = READ_RAM(reg) + value;
 	WRITE_RAM(reg, t);
@@ -254,7 +254,7 @@ void sc61860_device::sc61860_add_word()
 }
 
 
-void sc61860_device::sc61860_sub(int reg, UINT8 value)
+void sc61860_device::sc61860_sub(int reg, uint8_t value)
 {
 	int t = READ_RAM(reg) - value;
 	WRITE_RAM(reg, t);
@@ -285,7 +285,7 @@ void sc61860_device::sc61860_sub_word()
 	m_carry=t2<0;
 }
 
-void sc61860_device::sc61860_cmp(int reg, UINT8 value)
+void sc61860_device::sc61860_cmp(int reg, uint8_t value)
 {
 	int t = READ_RAM(reg) - value;
 	m_zero=t==0;
@@ -327,7 +327,7 @@ void sc61860_device::sc61860_execute_table_call()
 }
 
 
-void sc61860_device::sc61860_call(UINT16 adr)
+void sc61860_device::sc61860_call(uint16_t adr)
 {
 	PUSH(m_pc>>8);
 	PUSH(m_pc&0xff);
@@ -336,14 +336,14 @@ void sc61860_device::sc61860_call(UINT16 adr)
 
 void sc61860_device::sc61860_return()
 {
-	UINT16 t=POP();
+	uint16_t t=POP();
 	t|=POP()<<8;
 	m_pc=t;
 }
 
 void sc61860_device::sc61860_jump(int yes)
 {
-	UINT16 adr = READ_OP_ARG_WORD();
+	uint16_t adr = READ_OP_ARG_WORD();
 	if (yes) {
 		m_pc=adr;
 	}
@@ -351,7 +351,7 @@ void sc61860_device::sc61860_jump(int yes)
 
 void sc61860_device::sc61860_jump_rel_plus(int yes)
 {
-	UINT16 adr = m_pc + READ_OP_ARG();
+	uint16_t adr = m_pc + READ_OP_ARG();
 	if (yes) {
 		m_pc=adr;
 		m_icount-=3;
@@ -360,7 +360,7 @@ void sc61860_device::sc61860_jump_rel_plus(int yes)
 
 void sc61860_device::sc61860_jump_rel_minus(int yes)
 {
-	UINT16 adr = m_pc - READ_OP_ARG();
+	uint16_t adr = m_pc - READ_OP_ARG();
 	if (yes) {
 		m_pc=adr;
 		m_icount-=3;
@@ -369,8 +369,8 @@ void sc61860_device::sc61860_jump_rel_minus(int yes)
 
 void sc61860_device::sc61860_loop()
 {
-	UINT16 adr = m_pc - READ_OP_ARG();
-	UINT8 t = READ_RAM(m_r) - 1;
+	uint16_t adr = m_pc - READ_OP_ARG();
+	uint8_t t = READ_RAM(m_r) - 1;
 	WRITE_RAM(m_r, t);
 	m_zero=t==0;
 	m_carry=t==0xff;
@@ -482,7 +482,7 @@ void sc61860_device::sc61860_test_special()
 // p-=I+1 sideeffect
 void sc61860_device::sc61860_add_bcd_a()
 {
-	UINT8 help = READ_RAM(A);
+	uint8_t help = READ_RAM(A);
 	int i, hlp, hlp1 = 0;
 	m_zero=1;
 	for (i=0; i <= READ_RAM(I); i++) {
@@ -529,7 +529,7 @@ void sc61860_device::sc61860_add_bcd()
 // p-=I+1 sideeffect
 void sc61860_device::sc61860_sub_bcd_a()
 {
-	UINT8 help = READ_RAM(A);
+	uint8_t help = READ_RAM(A);
 	int i, hlp, hlp1 = 0;
 	m_zero=1;
 	for (i=0; i <= READ_RAM(I); i++) {
@@ -601,8 +601,8 @@ void sc61860_device::sc61860_shift_right_nibble()
 // q=reg+1 sideeffect
 void sc61860_device::sc61860_inc_load_dp(int reg)
 {
-	UINT8 t = READ_RAM(reg) + 1;
-	UINT8 t2 = READ_RAM(reg + 1);
+	uint8_t t = READ_RAM(reg) + 1;
+	uint8_t t2 = READ_RAM(reg + 1);
 	WRITE_RAM(reg, t);
 	if (t == 0) { t2++; WRITE_RAM(reg + 1, t2); }
 	m_dp=t|(t2<<8);
@@ -612,8 +612,8 @@ void sc61860_device::sc61860_inc_load_dp(int reg)
 // q=reg+1 sideeffect
 void sc61860_device::sc61860_dec_load_dp(int reg)
 {
-	UINT8 t = READ_RAM(reg) - 1;
-	UINT8 t2 = READ_RAM(reg + 1);
+	uint8_t t = READ_RAM(reg) - 1;
+	uint8_t t2 = READ_RAM(reg + 1);
 	WRITE_RAM(reg, t);
 	if (t == 0xff) { t2--; WRITE_RAM(reg + 1, t2); }
 	m_dp=t|(t2<<8);
@@ -697,7 +697,7 @@ void sc61860_device::sc61860_copy_int(int count)
 {
 	int i;
 	for (i=0; i<=count; i++) {
-		UINT8 t = READ_BYTE((READ_RAM(A)|(READ_RAM(B)<<8))); /* internal rom! */
+		uint8_t t = READ_BYTE((READ_RAM(A)|(READ_RAM(B)<<8))); /* internal rom! */
 		WRITE_RAM(m_p, t);
 		m_p++;
 		if (i!=count) {
@@ -715,7 +715,7 @@ void sc61860_device::sc61860_copy_int(int count)
 void sc61860_device::sc61860_exchange(int count)
 {
 	int i;
-	UINT8 t;
+	uint8_t t;
 	for (i=0; i<=count; i++) {
 		t = READ_RAM(m_p);
 		WRITE_RAM(m_p, READ_RAM(m_q));
@@ -729,7 +729,7 @@ void sc61860_device::sc61860_exchange(int count)
 void sc61860_device::sc61860_exchange_ext(int count)
 {
 	int i;
-	UINT8 t;
+	uint8_t t;
 	for (i=0; i<=count; i++) {
 		t = READ_RAM(m_p);
 		WRITE_RAM(m_p, READ_BYTE(m_dp));
@@ -750,7 +750,7 @@ void sc61860_device::sc61860_wait_x(int level)
 
 	if (!m_x.isnull()) {
 		for (c=READ_RAM(I); c>=0; c--) {
-			UINT8 t = (READ_RAM(m_p)+1)&0x7f;
+			uint8_t t = (READ_RAM(m_p)+1)&0x7f;
 			WRITE_RAM(m_p, t);
 			m_zero=m_x();
 			m_icount-=4;

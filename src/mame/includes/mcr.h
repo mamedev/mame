@@ -13,6 +13,7 @@
 #include "machine/z80dart.h"
 #include "machine/watchdog.h"
 #include "audio/midway.h"
+#include "audio/csd.h"
 #include "sound/samples.h"
 
 /* constants */
@@ -32,9 +33,9 @@ public:
 		m_paletteram(*this, "paletteram"),
 		m_sio(*this, "ipu_sio"),
 		m_ssio(*this, "ssio"),
-		m_chip_squeak_deluxe(*this, "csd"),
+		m_cheap_squeak_deluxe(*this, "csd"),
 		m_sounds_good(*this, "sg"),
-		m_turbo_chip_squeak(*this, "tcs"),
+		m_turbo_cheap_squeak(*this, "tcs"),
 		m_squawk_n_talk(*this, "snt"),
 		m_dpoker_coin_in_timer(*this, "dp_coinin"),
 		m_dpoker_hopper_timer(*this, "dp_hopper"),
@@ -46,15 +47,15 @@ public:
 	required_device<z80_device> m_maincpu;
 	optional_device<cpu_device> m_ipu;
 	required_device<watchdog_timer_device> m_watchdog;
-	optional_shared_ptr<UINT8> m_spriteram;
-	optional_shared_ptr<UINT8> m_videoram;
-	optional_shared_ptr<UINT8> m_paletteram;
+	optional_shared_ptr<uint8_t> m_spriteram;
+	optional_shared_ptr<uint8_t> m_videoram;
+	optional_shared_ptr<uint8_t> m_paletteram;
 
 	optional_device<z80dart_device> m_sio;
 	optional_device<midway_ssio_device> m_ssio;
-	optional_device<midway_chip_squeak_deluxe_device> m_chip_squeak_deluxe;
+	optional_device<midway_cheap_squeak_deluxe_device> m_cheap_squeak_deluxe;
 	optional_device<midway_sounds_good_device> m_sounds_good;
-	optional_device<midway_turbo_chip_squeak_device> m_turbo_chip_squeak;
+	optional_device<midway_turbo_cheap_squeak_device> m_turbo_cheap_squeak;
 	optional_device<midway_squawk_n_talk_device> m_squawk_n_talk;
 	optional_device<timer_device> m_dpoker_coin_in_timer;
 	optional_device<timer_device> m_dpoker_hopper_timer;
@@ -119,7 +120,7 @@ public:
 	DECLARE_MACHINE_RESET(mcr);
 	DECLARE_VIDEO_START(mcr);
 	DECLARE_MACHINE_START(nflfoot);
-	UINT32 screen_update_mcr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_mcr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(ipu_watchdog_reset);
 	TIMER_DEVICE_CALLBACK_MEMBER(dpoker_hopper_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(dpoker_coin_in_callback);
@@ -138,15 +139,15 @@ public:
 
 extern const z80_daisy_config mcr_daisy_chain[];
 extern const z80_daisy_config mcr_ipu_daisy_chain[];
-extern UINT8 mcr_cocktail_flip;
+extern uint8_t mcr_cocktail_flip;
 
 extern const gfx_layout mcr_bg_layout;
 extern const gfx_layout mcr_sprite_layout;
 
-extern UINT32 mcr_cpu_board;
-extern UINT32 mcr_sprite_board;
+extern uint32_t mcr_cpu_board;
+extern uint32_t mcr_sprite_board;
 
 /*----------- defined in video/mcr.c -----------*/
 
-extern INT8 mcr12_sprite_xoffs;
-extern INT8 mcr12_sprite_xoffs_flip;
+extern int8_t mcr12_sprite_xoffs;
+extern int8_t mcr12_sprite_xoffs_flip;

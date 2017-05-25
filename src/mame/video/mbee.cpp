@@ -43,6 +43,7 @@
 ****************************************************************************/
 
 
+#include "emu.h"
 #include "includes/mbee.h"
 
 WRITE_LINE_MEMBER( mbee_state::crtc_vs )
@@ -63,7 +64,7 @@ WRITE_LINE_MEMBER( mbee_state::crtc_vs )
 
 void mbee_state::sy6545_cursor_configure()
 {
-	UINT8 i,curs_type=0,r9,r10,r11;
+	uint8_t i,curs_type=0,r9,r10,r11;
 
 	/* curs_type holds the general cursor shape to be created
 	    0 = no cursor
@@ -116,7 +117,7 @@ READ8_MEMBER( mbee_state::video_low_r )
 
 WRITE8_MEMBER( mbee_state::video_low_w )
 {
-	if BIT(m_1c, 4)
+	if (BIT(m_1c, 4))
 	{
 		// non-premium attribute writes are discarded
 		if (m_is_premium && BIT(m_1c, 7))
@@ -128,7 +129,7 @@ WRITE8_MEMBER( mbee_state::video_low_w )
 
 READ8_MEMBER( mbee_state::video_high_r )
 {
-	if BIT(m_08, 6)
+	if (BIT(m_08, 6))
 		return m_p_colorram[offset];
 	else
 		return m_p_gfxram[(((m_1c & 15) + 1) << 11) | offset];
@@ -186,14 +187,14 @@ WRITE8_MEMBER( mbee_state::port1c_w )
 ************************************************************/
 
 
-void mbee_state::oldkb_matrix_r(UINT16 offs)
+void mbee_state::oldkb_matrix_r(uint16_t offs)
 {
 	if (m_has_oldkb)
 	{
-		UINT8 port = (offs >> 7) & 7;
-		UINT8 bit = (offs >> 4) & 7;
-		UINT8 extra = 0;
-		UINT8 data = m_io_oldkb[port]->read();
+		uint8_t port = (offs >> 7) & 7;
+		uint8_t bit = (offs >> 4) & 7;
+		uint8_t extra = 0;
+		uint8_t data = m_io_oldkb[port]->read();
 		bool keydown  = BIT(data, bit);
 
 		// This adds premium-style cursor keys to the old keyboard.
@@ -203,31 +204,27 @@ void mbee_state::oldkb_matrix_r(UINT16 offs)
 		{
 			if ((port == 0) || (port == 2) || (port == 3))
 				extra = m_io_x7->read();
-			else
-			if (port == 7)
+			else if (port == 7)
 				extra = data;
 
 			if (extra)
 			{
-				if BIT(extra, 0) // cursor up
+				if (BIT(extra, 0)) // cursor up
 				{
 					if( port == 7 && bit == 1 ) keydown = 1;
 					if( port == 0 && bit == 5 ) keydown = 1; // control E
 				}
-				else
-				if BIT(extra, 2) // cursor down
+				else if (BIT(extra, 2)) // cursor down
 				{
 					if( port == 7 && bit == 1 ) keydown = 1;
 					if( port == 3 && bit == 0 ) keydown = 1; // control X
 				}
-				else
-				if BIT(extra, 3) // cursor left
+				else if (BIT(extra, 3)) // cursor left
 				{
 					if( port == 7 && bit == 1 ) keydown = 1;
 					if( port == 2 && bit == 3 ) keydown = 1; // control S
 				}
-				else
-				if BIT(extra, 6) // cursor right
+				else if (BIT(extra, 6)) // cursor right
 				{
 					if( port == 7 && bit == 1 ) keydown = 1;
 					if( port == 0 && bit == 4 ) keydown = 1; // control D
@@ -241,7 +238,7 @@ void mbee_state::oldkb_matrix_r(UINT16 offs)
 }
 
 
-void mbee_state::oldkb_scan( UINT16 param )
+void mbee_state::oldkb_scan( uint16_t param )
 {
 	if (m_0b) return; // IC5 (pins 11,12,13)
 	if (param & 15) return; // only scan once per row instead of 16 times
@@ -264,7 +261,7 @@ WRITE8_MEMBER ( mbee_state::m6545_index_w )
 
 WRITE8_MEMBER ( mbee_state::m6545_data_w )
 {
-	static const UINT8 sy6545_mask[32]={0xff,0xff,0xff,0x0f,0x7f,0x1f,0x7f,0x7f,3,0x1f,0x7f,0x1f,0x3f,0xff,0x3f,0xff,0,0,0x3f,0xff};
+	static const uint8_t sy6545_mask[32]={0xff,0xff,0xff,0x0f,0x7f,0x1f,0x7f,0x7f,3,0x1f,0x7f,0x1f,0x3f,0xff,0x3f,0xff,0,0,0x3f,0xff};
 
 	switch( m_sy6545_ind )
 	{
@@ -315,7 +312,7 @@ VIDEO_START_MEMBER( mbee_state, premium )
 	m_is_premium = 1;
 }
 
-UINT32 mbee_state::screen_update_mbee(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t mbee_state::screen_update_mbee(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_framecnt++;
 	m_crtc->screen_update(screen, bitmap, cliprect);
@@ -337,15 +334,15 @@ MC6845_UPDATE_ROW( mbee_state::crtc_update_row )
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 
 	// colours
-	UINT8 colourm = (m_08 & 0x0e) >> 1;
-	UINT8 monopal = (m_io_config->read() & 0x30) >> 4;
+	uint8_t colourm = (m_08 & 0x0e) >> 1;
+	uint8_t monopal = (m_io_config->read() & 0x30) >> 4;
 	// if colour chosen on mono bee, default to amber
 	if (!monopal && !m_p_colorram)
 		monopal = 2;
 
-	UINT32 *p = &bitmap.pix32(y);
-	UINT8 inv, attr=0, gfx, fg=96+monopal, bg=96, col=0;
-	UINT16 mem, x, chr;
+	uint32_t *p = &bitmap.pix32(y);
+	uint8_t inv, attr=0, gfx, fg=96+monopal, bg=96, col=0;
+	uint16_t mem, x, chr;
 
 	for (x = 0; x < x_count; x++)           // for each character
 	{
@@ -353,14 +350,14 @@ MC6845_UPDATE_ROW( mbee_state::crtc_update_row )
 		mem = (ma + x) & 0x7ff;
 		chr = m_p_videoram[mem];
 
-		if BIT(m_1c, 7) // premium graphics enabled?
+		if (BIT(m_1c, 7)) // premium graphics enabled?
 		{
 			attr = m_p_attribram[mem];
 
-			if BIT(chr, 7)
+			if (BIT(chr, 7))
 				chr += ((attr & 15) << 7);          // bump chr to its particular pcg definition
 
-			if BIT(attr, 6)
+			if (BIT(attr, 6))
 				inv ^= 0xff;                    // inverse attribute
 
 			if (BIT(attr, 7) & BIT(m_framecnt, 4))            // flashing attribute
@@ -422,10 +419,10 @@ MC6845_UPDATE_ROW( mbee_state::crtc_update_row )
 
 PALETTE_INIT_MEMBER( mbee_state, standard )
 {
-	const UINT8 *color_prom = memregion("proms")->base();
-	UINT8 i=0, r, b, g, k, r1, g1, b1;
-	UINT8 bglevel[] = { 0, 0x54, 0xa0, 0xff };
-	UINT8 fglevel[] = { 0, 0xa0, 0xff, 0xff };
+	const uint8_t *color_prom = memregion("proms")->base();
+	uint8_t i=0, r, b, g, k, r1, g1, b1;
+	uint8_t bglevel[] = { 0, 0x54, 0xa0, 0xff };
+	uint8_t fglevel[] = { 0, 0xa0, 0xff, 0xff };
 
 	// set up background colours (00-63)
 	for (b1 = 0; b1 < 4; b1++)
@@ -464,7 +461,7 @@ PALETTE_INIT_MEMBER( mbee_state, standard )
 
 PALETTE_INIT_MEMBER( mbee_state, premium )
 {
-	UINT8 i, r, b, g;
+	uint8_t i, r, b, g;
 
 	/* set up 8 low intensity colours */
 	for (i = 0; i < 7; i++)

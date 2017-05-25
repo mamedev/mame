@@ -11,7 +11,9 @@ $input v_color0, v_texcoord0
 // Autos
 uniform vec4 u_swap_xy;
 uniform vec4 u_screen_dims;
+uniform vec4 u_screen_count;
 uniform vec4 u_target_dims;
+uniform vec4 u_target_scale;
 uniform vec4 u_quad_dims;
 
 // User-supplied
@@ -97,7 +99,7 @@ float GetSpotAddend(vec2 coord, float amount)
 	return saturate(SigmoidSpot);
 }
 
-float GetRoundCornerFactor(vec2 coord, vec2 bounds, float radiusAmount, float smoothAmount)
+float GetBoundsFactor(vec2 coord, vec2 bounds, float radiusAmount, float smoothAmount)
 {
 	// reduce smooth amount down to radius amount
 	smoothAmount = min(smoothAmount, radiusAmount);
@@ -141,7 +143,7 @@ vec2 GetDistortedCoords(vec2 centerCoord, float amount, float amountCube)
 	return centerCoord;
 }
 
-vec2 GetCoords(vec2 coord, float distortionAmount, float cubicDistortionAmount)
+vec2 GetTextureCoords(vec2 coord, float distortionAmount, float cubicDistortionAmount)
 {
 	// center coordinates
 	coord -= 0.5;
@@ -155,6 +157,20 @@ vec2 GetCoords(vec2 coord, float distortionAmount, float cubicDistortionAmount)
 	return coord;
 }
 
+vec2 GetQuadCoords(vec2 coord, vec2 scale, float distortionAmount, float cubicDistortionAmount)
+{
+	// center coordinates
+	coord -= 0.5;
+
+	// apply scale
+	coord *= scale;
+
+	// distort coordinates
+	coord = GetDistortedCoords(coord, distortionAmount, cubicDistortionAmount);
+
+	return coord;
+}
+
 // Shader
 
 void main()
@@ -164,18 +180,30 @@ void main()
 		? u_cubic_distortion.x * 1.1  // cubic distortion need to be a little higher to compensate the quartic distortion
 		: u_cubic_distortion.x * 1.2; // negativ values even more
 
+	// corner distortion at least by the amount of the image distorition
+	float distortCornerAmount = max(u_distort_corner.x, u_distortion.x + u_cubic_distortion.x);
+
+	float roundCornerAmount = u_round_corner.x * 0.5; 
+	float smoothBorderAmount = u_smooth_border.x * 0.5;
+
 	vec2 TexelDims = vec2(1.0 / u_target_dims.x, 1.0 / u_target_dims.y);
 
-	// Screen Curvature
-	vec2 BaseCoord = GetCoords(v_texcoord0, distortionAmount, cubicDistortionAmount);
+	// base-target dimensions (without oversampling)
+	vec2 BaseTargetDims = u_target_dims.xy / u_target_scale.xy;
+	BaseTargetDims = (u_swap_xy.x > 0.0)
+		? BaseTargetDims.yx
+		: BaseTargetDims.xy;
 
-	// Corner Curvature
-	vec2 CornerCoord = GetCoords(v_texcoord0, u_distort_corner.x, 0.0);
+	// base-target/quad difference scale
+	vec2 BaseTargetQuadScale = (u_screen_count.x > 0.0 && u_screen_count.x < 2.0)
+		? BaseTargetDims / u_quad_dims.xy // keeps the coords inside of the quad bounds of a single screen
+		: vec2(1.0, 1.0);
 
-	vec2 BaseCoordCentered = BaseCoord;
-	BaseCoordCentered -= 0.5;
-	vec2 CornerCoordCentered = CornerCoord;
-	CornerCoordCentered -= 0.5;
+	// Screen Texture Curvature
+	vec2 BaseCoord = GetTextureCoords(v_texcoord0, distortionAmount, cubicDistortionAmount);
+
+	// Screen Quad Curvature
+	vec2 QuadCoord = GetQuadCoords(v_texcoord0, BaseTargetQuadScale, distortCornerAmount, 0.0);
 
 	// Color
 	vec4 BaseColor = texture2D(s_tex, BaseCoord);
@@ -188,7 +216,7 @@ void main()
 	else
 	{
 		// Vignetting Simulation
-		vec2 VignetteCoord = CornerCoordCentered;
+		vec2 VignetteCoord = QuadCoord;
 
 		float VignetteFactor = GetVignetteFactor(VignetteCoord, u_vignetting.x);
 		BaseColor.rgb *= VignetteFactor;
@@ -196,20 +224,23 @@ void main()
 		// Light Reflection Simulation
 		vec4 LightColor = vec4(1.0, 0.90, 0.80, 1.0); // color temperature 5.000 Kelvin
 
-		vec2 SpotCoord = CornerCoordCentered;
-		vec2 NoiseCoord = CornerCoordCentered;
+		vec2 SpotCoord = QuadCoord;
+		vec2 NoiseCoord = QuadCoord;
 
 		float SpotAddend = GetSpotAddend(SpotCoord, u_reflection.x);
 		float NoiseFactor = GetNoiseFactor(SpotAddend, rand(NoiseCoord));
 		BaseColor += SpotAddend * NoiseFactor * LightColor;
 
 		// Round Corners Simulation
-		vec2 RoundCornerCoord = CornerCoordCentered;
-		vec2 RoundCornerBounds = (u_swap_xy.x > 0.0)
-			? u_quad_dims.yx
-			: u_quad_dims.xy;
+		vec2 RoundCornerCoord = QuadCoord;
+		vec2 RoundCornerBounds = (u_screen_count.x > 0.0 && u_screen_count.x < 2.0)
+			? u_quad_dims.xy // align corners to screen quad bounds
+			: BaseTargetDims; // align corners to target texture bounds
+		RoundCornerBounds = (u_swap_xy.x > 0.0)
+			? RoundCornerBounds.yx
+			: RoundCornerBounds.xy;
 
-		float roundCornerFactor = GetRoundCornerFactor(RoundCornerCoord, RoundCornerBounds, u_round_corner.x * 0.5f, u_smooth_border.x * 0.5f);
+		float roundCornerFactor = GetBoundsFactor(RoundCornerCoord, RoundCornerBounds, roundCornerAmount, smoothBorderAmount);
 		BaseColor.rgb *= roundCornerFactor;
 
 		gl_FragColor = BaseColor;

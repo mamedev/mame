@@ -29,7 +29,7 @@
                 => add device MX80c and bank switching for the ROM
         03/01/2010 Update and clean prog  by yo_fr       (jj.stac@aliceadsl.fr)
                 => add the port mapping for keyboard
-        20/11/2010 : synchronization between uPD765 and Z80 are now OK, CP/M runnig! JJStacino
+        20/11/2010 : synchronization between uPD765 and Z80 are now OK, CP/M running! JJStacino
         11/11/2011 : add the minidisque support -3 pouces 1/2 driver-  JJStacino  (jj.stac @ aliceadsl.fr)
 
             don't forget to keep some information about these machine see DChector project : http://dchector.free.fr/ made by DanielCoulom
@@ -38,6 +38,10 @@
     TODO :  Add the cartridge function,
             Adjust the one shot and A/D timing (sn76477)
 */
+#ifndef MAME_INCLUDES_HEC2HRP_H
+#define MAME_INCLUDES_HEC2HRP_H
+
+#pragma once
 
 #include "machine/upd765.h"
 #include "machine/wd_fdc.h"
@@ -83,7 +87,7 @@ public:
 		m_palette(*this, "palette"),
 		m_videoram(*this,"videoram"),
 		m_hector_videoram(*this,"hector_videoram") ,
-		m_keyboard(*this, "KEY"),
+		m_keyboard(*this, "KEY.%u", 0),
 		m_minidisc_fdc(*this, "wd179x"),
 		m_floppy0(*this, "wd179x:0")
 	{}
@@ -95,42 +99,42 @@ public:
 	required_device<cassette_image_device> m_cassette;
 	required_device<sn76477_device> m_sn;
 	required_device<palette_device> m_palette;
-	optional_shared_ptr<UINT8> m_videoram;
-	optional_shared_ptr<UINT8> m_hector_videoram;
+	optional_shared_ptr<uint8_t> m_videoram;
+	optional_shared_ptr<uint8_t> m_hector_videoram;
 	required_ioport_array<9> m_keyboard;
 
-	optional_device<fd1793_t> m_minidisc_fdc;
+	optional_device<fd1793_device> m_minidisc_fdc;
 	optional_device<floppy_connector> m_floppy0;
 
-	UINT8 m_hector_flag_hr;
-	UINT8 m_hector_flag_80c;
-	UINT8 m_hector_color[4];
-	UINT8 m_hector_disc2_data_r_ready;
-	UINT8 m_hector_disc2_data_w_ready;
-	UINT8 m_hector_disc2_data_read;
-	UINT8 m_hector_disc2_data_write;
-	UINT8 m_hector_disc2_RNMI;
-	UINT8 m_state3000;
-	UINT8 m_write_cassette;
+	uint8_t m_hector_flag_hr;
+	uint8_t m_hector_flag_80c;
+	uint8_t m_hector_color[4];
+	uint8_t m_hector_disc2_data_r_ready;
+	uint8_t m_hector_disc2_data_w_ready;
+	uint8_t m_hector_disc2_data_read;
+	uint8_t m_hector_disc2_data_write;
+	uint8_t m_hector_disc2_RNMI;
+	uint8_t m_state3000;
+	uint8_t m_write_cassette;
 	emu_timer *m_Cassette_timer;
-	UINT8 m_CK_signal ;
-	UINT8 m_flag_clk;
+	uint8_t m_CK_signal ;
+	uint8_t m_flag_clk;
 	double m_Pin_Value[29][2];
 	int m_AU[17];
 	int m_ValMixer;
 	int m_oldstate3000;
 	int m_oldstate1000;
-	UINT8 m_pot0;
-	UINT8 m_pot1;
-	UINT8 m_actions;
-	UINT8 m_hector_port_a;
-	UINT8 m_hector_port_b;
-	UINT8 m_hector_port_c_h;
-	UINT8 m_hector_port_c_l;
-	UINT8 m_hector_port_cmd;
-	UINT8 m_cassette_bit;
-	UINT8 m_cassette_bit_mem;
-	UINT8 m_Data_K7;
+	uint8_t m_pot0;
+	uint8_t m_pot1;
+	uint8_t m_actions;
+	uint8_t m_hector_port_a;
+	uint8_t m_hector_port_b;
+	uint8_t m_hector_port_c_h;
+	uint8_t m_hector_port_c_l;
+	uint8_t m_hector_port_cmd;
+	uint8_t m_cassette_bit;
+	uint8_t m_cassette_bit_mem;
+	uint8_t m_Data_K7;
 	int m_counter_write;
 	int m_IRQ_current_state;
 	int m_NMI_current_state;
@@ -138,7 +142,7 @@ public:
 	int m_hector_nb_cde;
 	int m_hector_flag_result;
 	int m_print;
-	UINT8 m_hector_videoram_hrx[0x04000];
+	uint8_t m_hector_videoram_hrx[0x04000];
 
 	DECLARE_WRITE8_MEMBER(minidisc_control_w);
 
@@ -162,7 +166,7 @@ public:
 	DECLARE_MACHINE_RESET(hec2hrx);
 	DECLARE_MACHINE_START(hec2mdhrx);
 	DECLARE_MACHINE_RESET(hec2mdhrx);
-	UINT32 screen_update_hec2hrp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_hec2hrp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(Callback_CK);
 
 	DECLARE_WRITE_LINE_MEMBER( disc2_fdc_interrupt );
@@ -173,12 +177,12 @@ public:
 	int isHectoreXtend();
 	void Mise_A_Jour_Etat(int Adresse, int Value );
 	void Init_Value_SN76477_Hector();
-	void Update_Sound(address_space &space, UINT8 data);
+	void Update_Sound(address_space &space, uint8_t data);
 	void hector_reset(int hr, int with_D2 );
 	void hector_init();
 	void Init_Hector_Palette();
-	void hector_80c(bitmap_ind16 &bitmap, UINT8 *page, int ymax, int yram) ;
-	void hector_hr(bitmap_ind16 &bitmap, UINT8 *page, int ymax, int yram) ;
+	void hector_80c(bitmap_ind16 &bitmap, uint8_t *page, int ymax, int yram) ;
+	void hector_hr(bitmap_ind16 &bitmap, uint8_t *page, int ymax, int yram) ;
 	/*----------- defined in machine/hecdisk2.c -----------*/
 
 	// disc2 handling
@@ -197,3 +201,5 @@ public:
 };
 
 MACHINE_CONFIG_EXTERN( hector_audio );
+
+#endif // MAME_INCLUDES_HEC2HRP_H

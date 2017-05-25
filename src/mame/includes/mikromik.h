@@ -81,12 +81,12 @@ public:
 	required_memory_region m_rom;
 	required_memory_region m_mmu_rom;
 	required_memory_region m_char_rom;
-	required_shared_ptr<UINT16> m_video_ram;
+	required_shared_ptr<uint16_t> m_video_ram;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );

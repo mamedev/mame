@@ -63,7 +63,7 @@ public:
 	DECLARE_WRITE8_MEMBER(k007232_extvolume_w);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	UINT32 screen_update_chqflag(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_chqflag(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER(volume_callback0);
 	DECLARE_WRITE8_MEMBER(volume_callback1);
 	K051316_CB_MEMBER(zoom_callback_1);

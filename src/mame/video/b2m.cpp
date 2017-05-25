@@ -17,13 +17,13 @@ void b2m_state::video_start()
 {
 }
 
-UINT32 b2m_state::screen_update_b2m(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t b2m_state::screen_update_b2m(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 code1;
-	UINT8 code2;
-	UINT8 col;
+	uint8_t code1;
+	uint8_t code2;
+	uint8_t col;
 	int y, x, b;
-	UINT8 *ram = m_ram->pointer();
+	uint8_t *ram = m_ram->pointer();
 
 	for (x = 0; x < 48; x++)
 	{

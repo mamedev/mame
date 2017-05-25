@@ -173,18 +173,18 @@ void real_profiler_state::update_text(running_machine &machine)
 	};
 
 	// compute the total time for all bits, not including profiler or idle
-	UINT64 computed = 0;
+	u64 computed = 0;
 	profile_type curtype;
 	for (curtype = PROFILER_DEVICE_FIRST; curtype < PROFILER_PROFILER; ++curtype)
 		computed += m_data[curtype];
 
 	// save that result in normalize, and continue adding the rest
-	UINT64 normalize = computed;
+	u64 normalize = computed;
 	for ( ; curtype < PROFILER_TOTAL; ++curtype)
 		computed += m_data[curtype];
 
 	// this becomes the total; if we end up with 0 for anything, we were just started, so return empty
-	UINT64 total = computed;
+	u64 total = computed;
 	m_text.clear();
 	if (total == 0 || normalize == 0)
 	{

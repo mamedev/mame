@@ -23,8 +23,10 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "emuopts.h"
 #include "samples.h"
+
+#include "emuopts.h"
+
 #include "flac.h"
 
 
@@ -33,7 +35,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type SAMPLES = &device_creator<samples_device>;
+DEFINE_DEVICE_TYPE(SAMPLES, samples_device, "samples", "Samples")
 
 
 
@@ -45,19 +47,16 @@ const device_type SAMPLES = &device_creator<samples_device>;
 //  samples_device - constructors
 //-------------------------------------------------
 
-samples_device::samples_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, SAMPLES, "Samples", tag, owner, clock, "samples", __FILE__),
-		device_sound_interface(mconfig, *this),
-		m_channels(0),
-		m_names(nullptr)
+samples_device::samples_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: samples_device(mconfig, SAMPLES, tag, owner, clock)
 {
 }
 
-samples_device::samples_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_sound_interface(mconfig, *this),
-		m_channels(0),
-		m_names(nullptr)
+samples_device::samples_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_sound_interface(mconfig, *this)
+	, m_channels(0)
+	, m_names(nullptr)
 {
 }
 
@@ -70,7 +69,7 @@ samples_device::samples_device(const machine_config &mconfig, device_type type, 
 //  start - start playing a loaded sample
 //-------------------------------------------------
 
-void samples_device::start(UINT8 channel, UINT32 samplenum, bool loop)
+void samples_device::start(uint8_t channel, uint32_t samplenum, bool loop)
 {
 	// if samples are disabled, just return quietly
 	if (m_sample.empty())
@@ -91,7 +90,7 @@ void samples_device::start(UINT8 channel, UINT32 samplenum, bool loop)
 	chan.pos = 0;
 	chan.frac = 0;
 	chan.basefreq = sample.frequency;
-	chan.step = (INT64(chan.basefreq) << FRAC_BITS) / machine().sample_rate();
+	chan.step = (int64_t(chan.basefreq) << FRAC_BITS) / machine().sample_rate();
 	chan.loop = loop;
 }
 
@@ -101,7 +100,7 @@ void samples_device::start(UINT8 channel, UINT32 samplenum, bool loop)
 //  provided sample
 //-------------------------------------------------
 
-void samples_device::start_raw(UINT8 channel, const INT16 *sampledata, UINT32 samples, UINT32 frequency, bool loop)
+void samples_device::start_raw(uint8_t channel, const int16_t *sampledata, uint32_t samples, uint32_t frequency, bool loop)
 {
 	assert(channel < m_channels);
 
@@ -116,7 +115,7 @@ void samples_device::start_raw(UINT8 channel, const INT16 *sampledata, UINT32 sa
 	chan.pos = 0;
 	chan.frac = 0;
 	chan.basefreq = frequency;
-	chan.step = (INT64(chan.basefreq) << FRAC_BITS) / machine().sample_rate();
+	chan.step = (int64_t(chan.basefreq) << FRAC_BITS) / machine().sample_rate();
 	chan.loop = loop;
 }
 
@@ -126,14 +125,14 @@ void samples_device::start_raw(UINT8 channel, const INT16 *sampledata, UINT32 sa
 //  a sample
 //-------------------------------------------------
 
-void samples_device::set_frequency(UINT8 channel, UINT32 freq)
+void samples_device::set_frequency(uint8_t channel, uint32_t freq)
 {
 	assert(channel < m_channels);
 
 	// force an update before we start
 	channel_t &chan = m_channel[channel];
 	chan.stream->update();
-	chan.step = (INT64(freq) << FRAC_BITS) / machine().sample_rate();
+	chan.step = (int64_t(freq) << FRAC_BITS) / machine().sample_rate();
 }
 
 
@@ -142,7 +141,7 @@ void samples_device::set_frequency(UINT8 channel, UINT32 freq)
 //  sample
 //-------------------------------------------------
 
-void samples_device::set_volume(UINT8 channel, float volume)
+void samples_device::set_volume(uint8_t channel, float volume)
 {
 	assert(channel < m_channels);
 
@@ -156,7 +155,7 @@ void samples_device::set_volume(UINT8 channel, float volume)
 //  pause - pause playback on a channel
 //-------------------------------------------------
 
-void samples_device::pause(UINT8 channel, bool pause)
+void samples_device::pause(uint8_t channel, bool pause)
 {
 	assert(channel < m_channels);
 
@@ -170,7 +169,7 @@ void samples_device::pause(UINT8 channel, bool pause)
 //  stop - stop playback on a channel
 //-------------------------------------------------
 
-void samples_device::stop(UINT8 channel)
+void samples_device::stop(uint8_t channel)
 {
 	assert(channel < m_channels);
 
@@ -188,7 +187,7 @@ void samples_device::stop(UINT8 channel)
 void samples_device::stop_all()
 {
 	// just iterate over channels and stop them
-	for (UINT8 channel = 0; channel < m_channels; channel++)
+	for (uint8_t channel = 0; channel < m_channels; channel++)
 		stop(channel);
 }
 
@@ -198,7 +197,7 @@ void samples_device::stop_all()
 //  a channel being played
 //-------------------------------------------------
 
-UINT32 samples_device::base_frequency(UINT8 channel) const
+uint32_t samples_device::base_frequency(uint8_t channel) const
 {
 	assert(channel < m_channels);
 
@@ -214,7 +213,7 @@ UINT32 samples_device::base_frequency(UINT8 channel) const
 //  playing on the given channel
 //-------------------------------------------------
 
-bool samples_device::playing(UINT8 channel) const
+bool samples_device::playing(uint8_t channel) const
 {
 	assert(channel < m_channels);
 
@@ -333,18 +332,18 @@ void samples_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 			if (chan.source != nullptr && !chan.paused)
 			{
 				// load some info locally
-				UINT32 pos = chan.pos;
-				UINT32 frac = chan.frac;
-				UINT32 step = chan.step;
-				const INT16 *sample = chan.source;
-				UINT32 sample_length = chan.source_length;
+				uint32_t pos = chan.pos;
+				uint32_t frac = chan.frac;
+				uint32_t step = chan.step;
+				const int16_t *sample = chan.source;
+				uint32_t sample_length = chan.source_length;
 
 				while (samples--)
 				{
 					// do a linear interp on the sample
-					INT32 sample1 = sample[pos];
-					INT32 sample2 = sample[(pos + 1) % sample_length];
-					INT32 fracmult = frac >> (FRAC_BITS - 14);
+					int32_t sample1 = sample[pos];
+					int32_t sample2 = sample[(pos + 1) % sample_length];
+					int32_t fracmult = frac >> (FRAC_BITS - 14);
 					*buffer++ = ((0x4000 - fracmult) * sample1 + fracmult * sample2) >> 14;
 
 					// advance
@@ -392,8 +391,8 @@ void samples_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 bool samples_device::read_sample(emu_file &file, sample_t &sample)
 {
 	// read the core header and make sure it's a proper file
-	UINT8 buf[4];
-	UINT32 offset = file.read(buf, 4);
+	uint8_t buf[4];
+	uint32_t offset = file.read(buf, 4);
 	if (offset < 4)
 	{
 		osd_printf_warning("Unable to read %s, 0-byte file?\n", file.filename());
@@ -419,17 +418,17 @@ bool samples_device::read_sample(emu_file &file, sample_t &sample)
 bool samples_device::read_wav_sample(emu_file &file, sample_t &sample)
 {
 	// we already read the opening 'RIFF' tag
-	UINT32 offset = 4;
+	uint32_t offset = 4;
 
 	// get the total size
-	UINT32 filesize;
+	uint32_t filesize;
 	offset += file.read(&filesize, 4);
 	if (offset < 8)
 	{
 		osd_printf_warning("Unexpected size offset %u (%s)\n", offset, file.filename());
 		return false;
 	}
-	filesize = LITTLE_ENDIANIZE_INT32(filesize);
+	filesize = little_endianize_int32(filesize);
 
 	// read the RIFF file type and make sure it's a WAVE file
 	char buf[32];
@@ -446,12 +445,12 @@ bool samples_device::read_wav_sample(emu_file &file, sample_t &sample)
 	}
 
 	// seek until we find a format tag
-	UINT32 length;
+	uint32_t length;
 	while (1)
 	{
 		offset += file.read(buf, 4);
 		offset += file.read(&length, 4);
-		length = LITTLE_ENDIANIZE_INT32(length);
+		length = little_endianize_int32(length);
 		if (memcmp(&buf[0], "fmt ", 4) == 0)
 			break;
 
@@ -466,9 +465,9 @@ bool samples_device::read_wav_sample(emu_file &file, sample_t &sample)
 	}
 
 	// read the format -- make sure it is PCM
-	UINT16 temp16;
+	uint16_t temp16;
 	offset += file.read(&temp16, 2);
-	temp16 = LITTLE_ENDIANIZE_INT16(temp16);
+	temp16 = little_endianize_int16(temp16);
 	if (temp16 != 1)
 	{
 		osd_printf_warning("unsupported format %u - only PCM is supported (%s)\n", temp16, file.filename());
@@ -477,7 +476,7 @@ bool samples_device::read_wav_sample(emu_file &file, sample_t &sample)
 
 	// number of channels -- only mono is supported
 	offset += file.read(&temp16, 2);
-	temp16 = LITTLE_ENDIANIZE_INT16(temp16);
+	temp16 = little_endianize_int16(temp16);
 	if (temp16 != 1)
 	{
 		osd_printf_warning("unsupported number of channels %u - only mono is supported (%s)\n", temp16, file.filename());
@@ -485,17 +484,17 @@ bool samples_device::read_wav_sample(emu_file &file, sample_t &sample)
 	}
 
 	// sample rate
-	UINT32 rate;
+	uint32_t rate;
 	offset += file.read(&rate, 4);
-	rate = LITTLE_ENDIANIZE_INT32(rate);
+	rate = little_endianize_int32(rate);
 
 	// bytes/second and block alignment are ignored
 	offset += file.read(buf, 6);
 
 	// bits/sample
-	UINT16 bits;
+	uint16_t bits;
 	offset += file.read(&bits, 2);
-	bits = LITTLE_ENDIANIZE_INT16(bits);
+	bits = little_endianize_int16(bits);
 	if (bits != 8 && bits != 16)
 	{
 		osd_printf_warning("unsupported bits/sample %u - only 8 and 16 are supported (%s)\n", bits, file.filename());
@@ -511,7 +510,7 @@ bool samples_device::read_wav_sample(emu_file &file, sample_t &sample)
 	{
 		offset += file.read(buf, 4);
 		offset += file.read(&length, 4);
-		length = LITTLE_ENDIANIZE_INT32(length);
+		length = little_endianize_int32(length);
 		if (memcmp(&buf[0], "data", 4) == 0)
 			break;
 
@@ -542,9 +541,9 @@ bool samples_device::read_wav_sample(emu_file &file, sample_t &sample)
 		file.read(&sample.data[0], length);
 
 		// convert 8-bit data to signed samples
-		UINT8 *tempptr = reinterpret_cast<UINT8 *>(&sample.data[0]);
-		for (INT32 sindex = length - 1; sindex >= 0; sindex--)
-			sample.data[sindex] = INT8(tempptr[sindex] ^ 0x80) * 256;
+		uint8_t *tempptr = reinterpret_cast<uint8_t *>(&sample.data[0]);
+		for (int32_t sindex = length - 1; sindex >= 0; sindex--)
+			sample.data[sindex] = int8_t(tempptr[sindex] ^ 0x80) * 256;
 	}
 	else
 	{
@@ -554,8 +553,8 @@ bool samples_device::read_wav_sample(emu_file &file, sample_t &sample)
 
 		// swap high/low on big-endian systems
 		if (ENDIANNESS_NATIVE != ENDIANNESS_LITTLE)
-			for (UINT32 sindex = 0; sindex < length / 2; sindex++)
-				sample.data[sindex] = LITTLE_ENDIANIZE_INT16(sample.data[sindex]);
+			for (uint32_t sindex = 0; sindex < length / 2; sindex++)
+				sample.data[sindex] = little_endianize_int16(sample.data[sindex]);
 	}
 	return true;
 }

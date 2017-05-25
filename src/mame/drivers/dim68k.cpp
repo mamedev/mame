@@ -35,22 +35,26 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "sound/speaker.h"
-#include "video/mc6845.h"
 #include "machine/keyboard.h"
 #include "machine/upd765.h"
+#include "sound/spkrdev.h"
+#include "video/mc6845.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 class dim68k_state : public driver_device
 {
 public:
 	dim68k_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_crtc(*this, "crtc"),
-		m_speaker(*this, "speaker"),
-		m_ram(*this, "ram"),
-		m_palette(*this, "palette") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_crtc(*this, "crtc")
+		, m_speaker(*this, "speaker")
+		, m_ram(*this, "ram")
+		, m_palette(*this, "palette")
+		, m_p_chargen(*this, "chargen")
+	{ }
 
 	DECLARE_READ16_MEMBER( dim68k_duart_r );
 	DECLARE_READ16_MEMBER( dim68k_fdc_r );
@@ -65,19 +69,20 @@ public:
 	DECLARE_WRITE16_MEMBER( dim68k_video_control_w );
 	DECLARE_WRITE16_MEMBER( dim68k_video_high_w );
 	DECLARE_WRITE16_MEMBER( dim68k_video_reset_w );
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	void kbd_put(u8 data);
 	MC6845_UPDATE_ROW(crtc_update_row);
-	const UINT8 *m_p_chargen;
+
+private:
 	bool m_speaker_bit;
-	UINT8 m_video_control;
-	UINT8 m_term_data;
+	u8 m_video_control;
+	u8 m_term_data;
 	virtual void machine_reset() override;
-	virtual void video_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
 	required_device<speaker_sound_device> m_speaker;
-	required_shared_ptr<UINT16> m_ram;
+	required_shared_ptr<uint16_t> m_ram;
 	required_device<palette_device> m_palette;
+	required_region_ptr<u8> m_p_chargen;
 };
 
 READ16_MEMBER( dim68k_state::dim68k_duart_r )
@@ -212,27 +217,22 @@ INPUT_PORTS_END
 
 void dim68k_state::machine_reset()
 {
-	UINT8* ROM = memregion("bootrom")->base();
+	u8* ROM = memregion("bootrom")->base();
 
-	memcpy((UINT8*)m_ram.target(), ROM, 0x2000);
+	memcpy((u8*)m_ram.target(), ROM, 0x2000);
 
 	m_maincpu->reset();
-}
-
-void dim68k_state::video_start()
-{
-	m_p_chargen = memregion("chargen")->base();
 }
 
 // Text-only; graphics isn't emulated yet. Need to find out if hardware cursor is used.
 MC6845_UPDATE_ROW( dim68k_state::crtc_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT8 chr,gfx,x,xx,inv;
-	UINT16 chr16=0x2020; // set to spaces if screen is off
-	UINT32 *p = &bitmap.pix32(y);
-	UINT8 screen_on = ~m_video_control & 4;
-	UINT8 dot8 = ~m_video_control & 40;
+	u8 chr,gfx,x,xx,inv;
+	uint16_t chr16=0x2020; // set to spaces if screen is off
+	uint32_t *p = &bitmap.pix32(y);
+	u8 screen_on = ~m_video_control & 4;
+	u8 dot8 = ~m_video_control & 40;
 
 	// need to divide everything in half to cater for 16-bit reads
 	x_count /= 2;
@@ -298,12 +298,12 @@ static SLOT_INTERFACE_START( dim68k_floppies )
 	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
 SLOT_INTERFACE_END
 
-WRITE8_MEMBER( dim68k_state::kbd_put )
+void dim68k_state::kbd_put(u8 data)
 {
 	m_term_data = data;
 }
 
-static MACHINE_CONFIG_START( dim68k, dim68k_state )
+static MACHINE_CONFIG_START( dim68k )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
 	MCFG_CPU_PROGRAM_MAP(dim68k_mem)
@@ -334,7 +334,7 @@ static MACHINE_CONFIG_START( dim68k, dim68k_state )
 	MCFG_MC6845_UPDATE_ROW_CB(dim68k_state, crtc_update_row)
 
 	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(WRITE8(dim68k_state, kbd_put))
+	MCFG_GENERIC_KEYBOARD_CB(PUT(dim68k_state, kbd_put))
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "dim68k")
@@ -397,5 +397,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1984, dim68k,  0,       0,     dim68k,   dim68k, driver_device,   0,     "Micro Craft", "Dimension 68000", MACHINE_NOT_WORKING)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE   INPUT   STATE         INIT  COMPANY        FULLNAME           FLAGS
+COMP( 1984, dim68k, 0,      0,      dim68k,   dim68k, dim68k_state, 0,    "Micro Craft", "Dimension 68000", MACHINE_NOT_WORKING)

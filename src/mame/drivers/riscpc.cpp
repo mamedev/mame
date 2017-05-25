@@ -19,6 +19,8 @@
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class riscpc_state : public driver_device
@@ -36,32 +38,32 @@ public:
 	DECLARE_WRITE32_MEMBER(a7000_iomd_w);
 	DECLARE_WRITE32_MEMBER(a7000_vidc20_w);
 
-	UINT8 m_vidc20_pal_index;
-	UINT16 m_vidc20_horz_reg[0x10];
-	UINT16 m_vidc20_vert_reg[0x10];
-	UINT8 m_vidc20_bpp_mode;
+	uint8_t m_vidc20_pal_index;
+	uint16_t m_vidc20_horz_reg[0x10];
+	uint16_t m_vidc20_vert_reg[0x10];
+	uint8_t m_vidc20_bpp_mode;
 	emu_timer *m_flyback_timer;
-	UINT16 m_timer_in[2];
-	UINT16 m_timer_out[2];
+	uint16_t m_timer_in[2];
+	uint16_t m_timer_out[2];
 	int m_timer_counter[2];
 	emu_timer *m_IOMD_timer[2];
-	UINT8 m_IRQ_status_A;
-	UINT8 m_IRQ_mask_A;
-	UINT8 m_IOMD_IO_ctrl;
-	UINT8 m_IOMD_keyb_ctrl;
-	UINT16 m_io_id;
-	UINT8 m_viddma_status;
-	UINT32 m_viddma_addr_start;
-	UINT32 m_viddma_addr_end;
-	UINT8 m_t0readinc;
-	UINT8 m_t1readinc;
+	uint8_t m_IRQ_status_A;
+	uint8_t m_IRQ_mask_A;
+	uint8_t m_IOMD_IO_ctrl;
+	uint8_t m_IOMD_keyb_ctrl;
+	uint16_t m_io_id;
+	uint8_t m_viddma_status;
+	uint32_t m_viddma_addr_start;
+	uint32_t m_viddma_addr_end;
+	uint8_t m_t0readinc;
+	uint8_t m_t1readinc;
 	void fire_iomd_timer(int timer);
 	void viddma_transfer_start();
 	void vidc20_dynamic_screen_change();
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(IOMD_timer0_callback);
 	TIMER_CALLBACK_MEMBER(IOMD_timer1_callback);
 	TIMER_CALLBACK_MEMBER(flyback_timer_callback);
@@ -272,12 +274,12 @@ WRITE32_MEMBER( riscpc_state::a7000_vidc20_w )
 	}
 }
 
-UINT32 riscpc_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t riscpc_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int x_size,y_size,x_start,y_start;
 	int x,y,xi;
-	UINT32 count;
-	UINT8 *vram = memregion("vram")->base();
+	uint32_t count;
+	uint8_t *vram = memregion("vram")->base();
 
 	bitmap.fill(m_palette->pen(0x100), cliprect);
 
@@ -587,7 +589,7 @@ TIMER_CALLBACK_MEMBER(riscpc_state::IOMD_timer0_callback)
 	m_IRQ_status_A|=0x20;
 	if(m_IRQ_mask_A&0x20)
 	{
-		generic_pulse_irq_line(m_maincpu, ARM7_IRQ_LINE,1);
+		generic_pulse_irq_line(*m_maincpu, ARM7_IRQ_LINE,1);
 	}
 }
 
@@ -596,7 +598,7 @@ TIMER_CALLBACK_MEMBER(riscpc_state::IOMD_timer1_callback)
 	m_IRQ_status_A|=0x40;
 	if(m_IRQ_mask_A&0x40)
 	{
-		generic_pulse_irq_line(m_maincpu, ARM7_IRQ_LINE,1);
+		generic_pulse_irq_line(*m_maincpu, ARM7_IRQ_LINE,1);
 	}
 }
 
@@ -605,7 +607,7 @@ TIMER_CALLBACK_MEMBER(riscpc_state::flyback_timer_callback)
 	m_IRQ_status_A|=0x08;
 	if(m_IRQ_mask_A&0x08)
 	{
-		generic_pulse_irq_line(m_maincpu, ARM7_IRQ_LINE,1);
+		generic_pulse_irq_line(*m_maincpu, ARM7_IRQ_LINE,1);
 	}
 
 	m_flyback_timer->adjust(machine().first_screen()->time_until_pos(m_vidc20_vert_reg[VDER]));
@@ -614,11 +616,11 @@ TIMER_CALLBACK_MEMBER(riscpc_state::flyback_timer_callback)
 void riscpc_state::viddma_transfer_start()
 {
 	address_space &mem = m_maincpu->space(AS_PROGRAM);
-	UINT32 src = m_viddma_addr_start;
-	UINT32 dst = 0;
-	UINT32 size = m_viddma_addr_end;
-	UINT32 dma_index;
-	UINT8 *vram = memregion("vram")->base();
+	uint32_t src = m_viddma_addr_start;
+	uint32_t dst = 0;
+	uint32_t size = m_viddma_addr_end;
+	uint32_t dma_index;
+	uint8_t *vram = memregion("vram")->base();
 
 	/* TODO: this should actually be a qword transfer */
 	for(dma_index = 0;dma_index < size;dma_index++)
@@ -640,7 +642,7 @@ READ32_MEMBER( riscpc_state::a7000_iomd_r )
 	{
 		case IOMD_IOCR:
 		{
-			UINT8 flyback;
+			uint8_t flyback;
 			int vert_pos;
 
 			vert_pos = machine().first_screen()->vpos();
@@ -797,7 +799,7 @@ void riscpc_state::machine_reset()
 	m_flyback_timer->adjust( attotime::never);
 }
 
-static MACHINE_CONFIG_START( rpc600, riscpc_state )
+static MACHINE_CONFIG_START( rpc600 )
 	/* Basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", ARM7, XTAL_30MHz ) // ARM610
 	MCFG_CPU_PROGRAM_MAP(a7000_mem)
@@ -812,7 +814,7 @@ static MACHINE_CONFIG_START( rpc600, riscpc_state )
 	MCFG_PALETTE_ADD("palette", 0x200)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( rpc700, riscpc_state )
+static MACHINE_CONFIG_START( rpc700 )
 	/* Basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", ARM7, XTAL_40MHz ) // ARM710
 	MCFG_CPU_PROGRAM_MAP(a7000_mem)
@@ -827,7 +829,7 @@ static MACHINE_CONFIG_START( rpc700, riscpc_state )
 	MCFG_PALETTE_ADD("palette", 0x200)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( a7000, riscpc_state )
+static MACHINE_CONFIG_START( a7000 )
 	/* Basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", ARM7, XTAL_32MHz ) // ARM7500
 	MCFG_CPU_PROGRAM_MAP(a7000_mem)
@@ -847,7 +849,7 @@ static MACHINE_CONFIG_DERIVED( a7000p, a7000 )
 	MCFG_CPU_CLOCK(XTAL_48MHz)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sarpc, riscpc_state )
+static MACHINE_CONFIG_START( sarpc )
 	/* Basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", ARM7, 202000000 ) // StrongARM
 	MCFG_CPU_PROGRAM_MAP(a7000_mem)
@@ -862,7 +864,7 @@ static MACHINE_CONFIG_START( sarpc, riscpc_state )
 	MCFG_PALETTE_ADD("palette", 0x200)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sarpc_j233, riscpc_state )
+static MACHINE_CONFIG_START( sarpc_j233 )
 	/* Basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", ARM7, 233000000 ) // StrongARM
 	MCFG_CPU_PROGRAM_MAP(a7000_mem)
@@ -945,10 +947,10 @@ ROM_END
 
 ***************************************************************************/
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT   INIT    COMPANY FULLNAME        FLAGS */
-COMP( 1994, rpc600,     0,      0,      rpc600,     a7000, driver_device,   0,      "Acorn",  "Risc PC 600",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1994, rpc700,     rpc600, 0,      rpc700,     a7000, driver_device,   0,      "Acorn",  "Risc PC 700",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1995, a7000,      rpc600, 0,      a7000,      a7000, driver_device,   0,      "Acorn",  "Archimedes A7000",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1997, a7000p,     rpc600, 0,      a7000p,     a7000, driver_device,   0,      "Acorn",  "Archimedes A7000+",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1997, sarpc,      rpc600, 0,      sarpc,      a7000, driver_device,   0,      "Acorn",  "StrongARM Risc PC",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1997, sarpc_j233, rpc600, 0,      sarpc_j233, a7000, driver_device,   0,      "Acorn",  "J233 StrongARM Risc PC",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT  STATE         INIT  COMPANY   FULLNAME                  FLAGS */
+COMP( 1994, rpc600,     0,      0,      rpc600,     a7000, riscpc_state, 0,    "Acorn",  "Risc PC 600",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1994, rpc700,     rpc600, 0,      rpc700,     a7000, riscpc_state, 0,    "Acorn",  "Risc PC 700",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1995, a7000,      rpc600, 0,      a7000,      a7000, riscpc_state, 0,    "Acorn",  "Archimedes A7000",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1997, a7000p,     rpc600, 0,      a7000p,     a7000, riscpc_state, 0,    "Acorn",  "Archimedes A7000+",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1997, sarpc,      rpc600, 0,      sarpc,      a7000, riscpc_state, 0,    "Acorn",  "StrongARM Risc PC",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1997, sarpc_j233, rpc600, 0,      sarpc_j233, a7000, riscpc_state, 0,    "Acorn",  "J233 StrongARM Risc PC", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

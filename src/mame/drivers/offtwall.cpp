@@ -20,9 +20,11 @@
 
 
 #include "emu.h"
+#include "includes/offtwall.h"
+
 #include "cpu/m68000/m68000.h"
 #include "machine/watchdog.h"
-#include "includes/offtwall.h"
+#include "speaker.h"
 
 
 
@@ -130,8 +132,8 @@ READ16_MEMBER(offtwall_state::bankrom_r)
 	    ROM bank area, we need to return the correct value to give the proper checksum */
 	if ((offset == 0x3000 || offset == 0x3001) && space.device().safe_pcbase() > 0x37000)
 	{
-		UINT32 checksum = (space.read_word(0x3fd210) << 16) | space.read_word(0x3fd212);
-		UINT32 us = 0xaaaa5555 - checksum;
+		uint32_t checksum = (space.read_word(0x3fd210) << 16) | space.read_word(0x3fd212);
+		uint32_t us = 0xaaaa5555 - checksum;
 		if (offset == 0x3001)
 			return us & 0xffff;
 		else
@@ -168,7 +170,7 @@ READ16_MEMBER(offtwall_state::spritecache_count_r)
 	/* if this read is coming from $99f8 or $9992, it's in the sprite copy loop */
 	if (prevpc == 0x99f8 || prevpc == 0x9992)
 	{
-		UINT16 *data = &m_spritecache_count[-0x100];
+		uint16_t *data = &m_spritecache_count[-0x100];
 		int oldword = m_spritecache_count[0];
 		int count = oldword >> 8;
 		int i, width = 0;
@@ -358,7 +360,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( offtwall, offtwall_state )
+static MACHINE_CONFIG_START( offtwall )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
@@ -474,7 +476,7 @@ DRIVER_INIT_MEMBER(offtwall_state,offtwall)
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x037ec2, 0x037f39, read16_delegate(FUNC(offtwall_state::bankswitch_r),this));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x3fdf1e, 0x3fdf1f, read16_delegate(FUNC(offtwall_state::unknown_verify_r),this));
 	m_spritecache_count = m_mainram + (0x3fde42 - 0x3fd800)/2;
-	m_bankswitch_base = (UINT16 *)(memregion("maincpu")->base() + 0x37ec2);
+	m_bankswitch_base = (uint16_t *)(memregion("maincpu")->base() + 0x37ec2);
 	m_unknown_verify_base = m_mainram + (0x3fdf1e - 0x3fd800)/2;
 }
 
@@ -486,7 +488,7 @@ DRIVER_INIT_MEMBER(offtwall_state,offtwalc)
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x037eca, 0x037f43, read16_delegate(FUNC(offtwall_state::bankswitch_r),this));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x3fdf24, 0x3fdf25, read16_delegate(FUNC(offtwall_state::unknown_verify_r),this));
 	m_spritecache_count = m_mainram + (0x3fde42 - 0x3fd800)/2;
-	m_bankswitch_base = (UINT16 *)(memregion("maincpu")->base() + 0x37eca);
+	m_bankswitch_base = (uint16_t *)(memregion("maincpu")->base() + 0x37eca);
 	m_unknown_verify_base = m_mainram + (0x3fdf24 - 0x3fd800)/2;
 }
 

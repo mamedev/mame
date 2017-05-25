@@ -18,12 +18,16 @@ TODO:
 *******************************************************************************************/
 
 #include "emu.h"
-#include "sound/ay8910.h"
-#include "sound/2203intf.h"
-#include "cpu/z80/z80.h"
+
 #include "cpu/m6800/m6800.h"
+#include "cpu/z80/z80.h"
+#include "sound/2203intf.h"
+#include "sound/ay8910.h"
 #include "video/jangou_blitter.h"
 #include "video/resnet.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 #define MASTER_CLOCK    XTAL_19_968MHz
 
@@ -50,7 +54,6 @@ public:
 		m_io_pl2_5(*this, "PL2_5"),
 		m_io_pl2_6(*this, "PL2_6"),
 		m_io_system(*this, "SYSTEM"),
-		m_io_sysa(*this, "SYSA"),
 		m_io_dswa(*this, "DSWA"),
 		m_io_dswb(*this, "DSWB"),
 		m_io_dswc(*this, "DSWC"),
@@ -58,14 +61,15 @@ public:
 		m_blitter(*this, "blitter") { }
 
 	/* video-related */
-	UINT8 m_blit_raw_data[3];
+	uint8_t m_blit_raw_data[3];
 
 	/* misc */
-	UINT8 m_nsc_latch;
-	UINT8 m_z80_latch;
-	UINT8 m_mux_data;
+	uint8_t m_nsc_latch;
+	uint8_t m_z80_latch;
+	uint8_t m_mux_data;
+	emu_timer *m_z80_wait_ack_timer;
 
-	required_shared_ptr<UINT8> m_comms_ram;
+	required_shared_ptr<uint8_t> m_comms_ram;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -90,7 +94,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(nightgal);
-	UINT32 screen_update_nightgal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_nightgal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
 	required_ioport m_io_cr_clear;
@@ -108,7 +112,6 @@ protected:
 	required_ioport m_io_pl2_5;
 	required_ioport m_io_pl2_6;
 	required_ioport m_io_system;
-	required_ioport m_io_sysa;
 	required_ioport m_io_dswa;
 	required_ioport m_io_dswb;
 	required_ioport m_io_dswc;
@@ -125,18 +128,18 @@ void nightgal_state::video_start()
 	m_tmp_bitmap = std::make_unique<bitmap_ind16>(256, 256);
 }
 
-UINT32 nightgal_state::screen_update_nightgal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t nightgal_state::screen_update_nightgal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x, y;
 
 	for (y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
-		UINT8 *src = &m_blitter->m_blit_buffer[y * 256 + cliprect.min_x];
-		UINT16 *dst = &m_tmp_bitmap->pix16(y, cliprect.min_x);
+		const uint8_t *src = &m_blitter->blit_buffer(y, cliprect.min_x);
+		uint16_t *dst = &m_tmp_bitmap->pix16(y, cliprect.min_x);
 
 		for (x = cliprect.min_x; x <= cliprect.max_x; x += 2)
 		{
-			UINT32 srcpix = *src++;
+			uint32_t srcpix = *src++;
 			*dst++ = m_palette->pen(srcpix & 0xf);
 			*dst++ = m_palette->pen((srcpix >> 4) & 0xf);
 		}
@@ -150,7 +153,7 @@ UINT32 nightgal_state::screen_update_nightgal(screen_device &screen, bitmap_ind1
 /* guess: use the same resistor values as Crazy Climber (needs checking on the real HW) */
 PALETTE_INIT_MEMBER(nightgal_state, nightgal)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances_rg[3] = { 1000, 470, 220 };
 	static const int resistances_b [2] = { 470, 220 };
 	double weights_rg[3], weights_b[2];
@@ -233,7 +236,7 @@ void nightgal_state::z80_wait_assert_cb()
 
 	// Note: cycles_to_attotime requires z80 context to work, calling for example m_subcpu as context gives a x4 cycle boost in z80 terms (reads execute_cycles_to_clocks() from NCS?) even if they runs at same speed basically.
 	// TODO: needs a getter that tells a given CPU how many cycles requires an executing opcode for the r/w operation, which stacks with wait state penalty for accessing this specific area.
-	machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(4), timer_expired_delegate(FUNC(nightgal_state::z80_wait_ack_cb),this));
+	m_z80_wait_ack_timer->adjust(m_maincpu->cycles_to_attotime(4));
 }
 
 READ8_MEMBER(nightgal_state::royalqn_comm_r)
@@ -263,7 +266,7 @@ WRITE8_MEMBER(nightgal_state::mux_w)
 
 READ8_MEMBER(nightgal_state::input_1p_r)
 {
-	UINT8 cr_clear = m_io_cr_clear->read();
+	uint8_t cr_clear = m_io_cr_clear->read();
 
 	switch (m_mux_data)
 	{
@@ -282,7 +285,7 @@ READ8_MEMBER(nightgal_state::input_1p_r)
 
 READ8_MEMBER(nightgal_state::input_2p_r)
 {
-	UINT8 coin_port = m_io_coins->read();
+	uint8_t coin_port = m_io_coins->read();
 
 	switch (m_mux_data)
 	{
@@ -331,10 +334,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sexygal_io, AS_IO, 8, nightgal_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00,0x01) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-	AM_RANGE(0x10,0x10) AM_READ_PORT("DSWC") AM_WRITE(output_w)
-	AM_RANGE(0x11,0x11) AM_READ_PORT("SYSA") AM_WRITE(mux_w)
-	AM_RANGE(0x12,0x12) AM_MIRROR(0xe8) AM_READ_PORT("DSWA") AM_WRITE(royalqn_blitter_0_w)
-	AM_RANGE(0x13,0x13) AM_MIRROR(0xe8) AM_READ_PORT("DSWB") AM_WRITE(royalqn_blitter_1_w)
+	AM_RANGE(0x10,0x10) AM_READ_PORT("DSWA") AM_WRITE(output_w)
+	AM_RANGE(0x11,0x11) AM_READ_PORT("SYSTEM") AM_WRITE(mux_w)
+	AM_RANGE(0x12,0x12) AM_MIRROR(0xe8) AM_READ_PORT("DSWB") AM_WRITE(royalqn_blitter_0_w)
+	AM_RANGE(0x13,0x13) AM_MIRROR(0xe8) AM_READ_PORT("DSWC") AM_WRITE(royalqn_blitter_1_w)
 	AM_RANGE(0x14,0x14) AM_MIRROR(0xe8) AM_READNOP AM_WRITE(royalqn_blitter_2_w)
 ADDRESS_MAP_END
 
@@ -366,10 +369,10 @@ static ADDRESS_MAP_START( royalqn_io, AS_IO, 8, nightgal_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01,0x01) AM_MIRROR(0xec) AM_DEVREAD("aysnd", ay8910_device, data_r)
 	AM_RANGE(0x02,0x03) AM_MIRROR(0xec) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-	AM_RANGE(0x10,0x10) AM_MIRROR(0xe8) AM_READ_PORT("DSWC") AM_WRITE(output_w)
-	AM_RANGE(0x11,0x11) AM_MIRROR(0xe8) AM_READ_PORT("SYSA") AM_WRITE(mux_w)
-	AM_RANGE(0x12,0x12) AM_MIRROR(0xe8) AM_READ_PORT("DSWA") AM_WRITE(royalqn_blitter_0_w)
-	AM_RANGE(0x13,0x13) AM_MIRROR(0xe8) AM_READ_PORT("DSWB") AM_WRITE(royalqn_blitter_1_w)
+	AM_RANGE(0x10,0x10) AM_MIRROR(0xe8) AM_READ_PORT("DSWA") AM_WRITE(output_w)
+	AM_RANGE(0x11,0x11) AM_MIRROR(0xe8) AM_READ_PORT("SYSTEM") AM_WRITE(mux_w)
+	AM_RANGE(0x12,0x12) AM_MIRROR(0xe8) AM_READ_PORT("DSWB") AM_WRITE(royalqn_blitter_0_w)
+	AM_RANGE(0x13,0x13) AM_MIRROR(0xe8) AM_READ_PORT("DSWC") AM_WRITE(royalqn_blitter_1_w)
 	AM_RANGE(0x14,0x14) AM_MIRROR(0xe8) AM_READNOP AM_WRITE(royalqn_blitter_2_w)
 	AM_RANGE(0x15,0x15) AM_MIRROR(0xe8) AM_NOP
 	AM_RANGE(0x16,0x16) AM_MIRROR(0xe8) AM_NOP
@@ -498,45 +501,11 @@ static INPUT_PORTS_START( sexygal )
 	PORT_BIT( 0x3c, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SYSTEM")
-	PORT_DIPNAME( 0x01, 0x01, "SYSTEM" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("SYSA")
-	PORT_DIPNAME( 0x01, 0x00, "SYSA" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_GAMBLE_PAYOUT ) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("Option 0 - Payout")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_MEMORY_RESET ) PORT_TOGGLE  PORT_CODE(KEYCODE_9)                         /* Memory Reset */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_TOGGLE  PORT_CODE(KEYCODE_0) PORT_NAME("Analyzer")       /* Analyzer */
+	PORT_SERVICE( 0x08, IP_ACTIVE_HIGH )
+	PORT_DIPNAME( 0x10, 0x00, "SYSTEM" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
 	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
@@ -549,31 +518,42 @@ static INPUT_PORTS_START( sexygal )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
+	// TODO: ok for ngtbunny, not for the others
 	PORT_START("DSWA")
-	PORT_DIPNAME( 0x01, 0x01, "DSWA" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0f, 0x0f, "Game Out Rate" ) PORT_DIPLOCATION("SWA:1,2,3,4")
+	PORT_DIPSETTING(    0x00, "50" )
+	PORT_DIPSETTING(    0x01, "53" )
+	PORT_DIPSETTING(    0x02, "56" )
+	PORT_DIPSETTING(    0x03, "59" )
+	PORT_DIPSETTING(    0x04, "62" )
+	PORT_DIPSETTING(    0x05, "65" )
+	PORT_DIPSETTING(    0x06, "68" )
+	PORT_DIPSETTING(    0x07, "71" )
+	PORT_DIPSETTING(    0x08, "75" )
+	PORT_DIPSETTING(    0x09, "78" )
+	PORT_DIPSETTING(    0x0a, "81" )
+	PORT_DIPSETTING(    0x0b, "84" )
+	PORT_DIPSETTING(    0x0c, "87" )
+	PORT_DIPSETTING(    0x0d, "90" )
+	PORT_DIPSETTING(    0x0e, "93" )
+	PORT_DIPSETTING(    0x0f, "96" )
+	PORT_DIPNAME( 0xf0, 0xf0, "Rate Max" ) PORT_DIPLOCATION("SWA:5,6,7,8")
+//  PORT_DIPSETTING(    0x20, "10" )
+//  PORT_DIPSETTING(    0x30, "20" )
+//  PORT_DIPSETTING(    0x40, "5" )
+//  PORT_DIPSETTING(    0x50, "10" )
+//  PORT_DIPSETTING(    0x60, "20" )
+	PORT_DIPSETTING(    0x80, "1" )
+	PORT_DIPSETTING(    0x90, "2" )
+	PORT_DIPSETTING(    0xc0, "3" )
+	PORT_DIPSETTING(    0xa0, "4" )
+	PORT_DIPSETTING(    0xd0, "5" )
+	PORT_DIPSETTING(    0xb0, "6" )
+	PORT_DIPSETTING(    0x00, "7" )
+	PORT_DIPSETTING(    0x10, "8" )
+	PORT_DIPSETTING(    0xe0, "10" )
+	PORT_DIPSETTING(    0xf0, "20" )
+	PORT_DIPSETTING(    0x70, "30" )
 
 	PORT_START("DSWB")
 	PORT_DIPNAME( 0x01, 0x01, "DSWB" )
@@ -655,6 +635,8 @@ INPUT_PORTS_END
 
 void nightgal_state::machine_start()
 {
+	m_z80_wait_ack_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nightgal_state::z80_wait_ack_cb), this));
+
 	save_item(NAME(m_nsc_latch));
 	save_item(NAME(m_z80_latch));
 	save_item(NAME(m_mux_data));
@@ -671,7 +653,7 @@ void nightgal_state::machine_reset()
 	memset(m_blit_raw_data, 0, ARRAY_LENGTH(m_blit_raw_data));
 }
 
-static MACHINE_CONFIG_START( royalqn, nightgal_state )
+static MACHINE_CONFIG_START( royalqn )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,MASTER_CLOCK / 8)        /* ? MHz */
@@ -1034,7 +1016,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(nightgal_state,royalqn)
 {
-	UINT8 *ROM = memregion("subrom")->base();
+	uint8_t *ROM = memregion("subrom")->base();
 
 	/* patch open bus / protection */
 	ROM[0x027e] = 0x02;
@@ -1053,12 +1035,12 @@ DRIVER_INIT_MEMBER(nightgal_state,ngalsumr)
 }
 
 /* Type 1 HW */
-GAME( 1984, nightgal, 0,        royalqn, sexygal, driver_device,  0,       ROT0, "Nichibutsu",   "Night Gal (Japan 840920 AG 1-00)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, ngtbunny, 0,        royalqn, sexygal, driver_device,  0,       ROT0, "Nichibutsu",   "Night Bunny (Japan 840601 MRN 2-10)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, royalngt, ngtbunny, royalqn, sexygal, driver_device,  0,       ROT0, "Royal Denshi", "Royal Night [BET] (Japan 840220 RN 2-00)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, royalqn,  0,        royalqn, sexygal, nightgal_state, royalqn, ROT0, "Royal Denshi", "Royal Queen [BET] (Japan 841010 RQ 0-07)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, nightgal, 0,        royalqn, sexygal, nightgal_state, 0,        ROT0, "Nichibutsu",   "Night Gal (Japan 840920 AG 1-00)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, ngtbunny, 0,        royalqn, sexygal, nightgal_state, 0,        ROT0, "Nichibutsu",   "Night Bunny (Japan 840601 MRN 2-10)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, royalngt, ngtbunny, royalqn, sexygal, nightgal_state, 0,        ROT0, "Royal Denshi", "Royal Night [BET] (Japan 840220 RN 2-00)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, royalqn,  0,        royalqn, sexygal, nightgal_state, royalqn,  ROT0, "Royal Denshi", "Royal Queen [BET] (Japan 841010 RQ 0-07)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 /* Type 2 HW */
-GAME( 1985, sexygal,  0,        sexygal, sexygal, driver_device,  0,       ROT0, "Nichibutsu",   "Sexy Gal (Japan 850501 SXG 1-00)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, sweetgal, sexygal,  sexygal, sexygal, driver_device,  0,       ROT0, "Nichibutsu",   "Sweet Gal (Japan 850510 SWG 1-02)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, sexygal,  0,        sexygal, sexygal, nightgal_state, 0,        ROT0, "Nichibutsu",   "Sexy Gal (Japan 850501 SXG 1-00)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, sweetgal, sexygal,  sexygal, sexygal, nightgal_state, 0,        ROT0, "Nichibutsu",   "Sweet Gal (Japan 850510 SWG 1-02)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 /* Type 3 HW */
-GAME( 1985, ngalsumr, 0,        ngalsumr,sexygal, nightgal_state,  ngalsumr,ROT0, "Nichibutsu",   "Night Gal Summer (Japan 850702 NGS 0-01)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, ngalsumr, 0,        ngalsumr,sexygal, nightgal_state, ngalsumr, ROT0, "Nichibutsu",   "Night Gal Summer (Japan 850702 NGS 0-01)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

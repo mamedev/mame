@@ -48,7 +48,9 @@
 #include "machine/ram.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 class rx78_state : public driver_device
 {
@@ -73,14 +75,14 @@ public:
 	DECLARE_WRITE8_MEMBER( vdp_reg_w );
 	DECLARE_WRITE8_MEMBER( vdp_bg_reg_w );
 	DECLARE_WRITE8_MEMBER( vdp_pri_mask_w );
-	UINT8 m_vram_read_bank;
-	UINT8 m_vram_write_bank;
-	UINT8 m_pal_reg[7];
-	UINT8 m_pri_mask;
-	UINT8 m_key_mux;
+	uint8_t m_vram_read_bank;
+	uint8_t m_vram_write_bank;
+	uint8_t m_pal_reg[7];
+	uint8_t m_pri_mask;
+	uint8_t m_key_mux;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_DRIVER_INIT(rx78);
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
@@ -109,9 +111,9 @@ void rx78_state::video_start()
 {
 }
 
-UINT32 rx78_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t rx78_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *vram = memregion("vram")->base();
+	uint8_t *vram = memregion("vram")->base();
 	int x,y,count;
 
 	bitmap.fill(16, cliprect);
@@ -189,7 +191,7 @@ WRITE8_MEMBER( rx78_state::key_w )
 
 READ8_MEMBER( rx78_state::rx78_vram_r )
 {
-	UINT8 *vram = memregion("vram")->base();
+	uint8_t *vram = memregion("vram")->base();
 
 	if(m_vram_read_bank == 0 || m_vram_read_bank > 6)
 		return 0xff;
@@ -199,7 +201,7 @@ READ8_MEMBER( rx78_state::rx78_vram_r )
 
 WRITE8_MEMBER( rx78_state::rx78_vram_w )
 {
-	UINT8 *vram = memregion("vram")->base();
+	uint8_t *vram = memregion("vram")->base();
 
 	if(m_vram_write_bank & 0x01) { vram[offset + 0 * 0x2000] = data; }
 	if(m_vram_write_bank & 0x02) { vram[offset + 1 * 0x2000] = data; }
@@ -221,7 +223,7 @@ WRITE8_MEMBER( rx78_state::vram_write_bank_w )
 
 WRITE8_MEMBER( rx78_state::vdp_reg_w )
 {
-	UINT8 r,g,b,res,i;
+	uint8_t r,g,b,res,i;
 
 	m_pal_reg[offset] = data;
 
@@ -416,18 +418,18 @@ void rx78_state::machine_reset()
 
 DEVICE_IMAGE_LOAD_MEMBER( rx78_state, rx78_cart )
 {
-	UINT32 size = m_cart->common_get_size("rom");
+	uint32_t size = m_cart->common_get_size("rom");
 
 	if (size != 0x2000 && size != 0x4000)
 	{
 		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
 	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 /* F4 Character Displayer */
@@ -449,7 +451,7 @@ static GFXDECODE_START( rx78 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( rx78, rx78_state )
+static MACHINE_CONFIG_START( rx78 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, MASTER_CLOCK/7) // unknown divider
 	MCFG_CPU_PROGRAM_MAP(rx78_mem)
@@ -500,7 +502,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(rx78_state,rx78)
 {
-	UINT32 ram_size = m_ram->size();
+	uint32_t ram_size = m_ram->size();
 	address_space &prg = m_maincpu->space(AS_PROGRAM);
 
 	if (ram_size == 0x4000)

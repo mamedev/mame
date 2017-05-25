@@ -26,8 +26,11 @@
 
 */
 
+#include "emu.h"
 #include "includes/hx20.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 
 //**************************************************************************
@@ -42,7 +45,7 @@ void hx20_state::update_interrupt()
 {
 	int irq = m_rtc_irq || m_kbrequest;
 
-	m_maincpu->set_input_line(M6800_IRQ_LINE, irq);
+	m_maincpu->set_input_line(HD6301_IRQ_LINE, irq);
 }
 
 
@@ -64,7 +67,7 @@ WRITE8_MEMBER( hx20_state::ksc_w )
 
 READ8_MEMBER( hx20_state::krtn07_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (!BIT(m_ksc, 0)) data &= m_ksc0->read();
 	if (!BIT(m_ksc, 1)) data &= m_ksc1->read();
@@ -100,7 +103,7 @@ READ8_MEMBER( hx20_state::krtn89_r )
 
 	*/
 
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (!BIT(m_ksc, 0)) data &= m_ksc0->read() >> 8;
 	if (!BIT(m_ksc, 1)) data &= m_ksc1->read() >> 8;
@@ -203,7 +206,7 @@ READ8_MEMBER( hx20_state::main_p1_r )
 
 	*/
 
-	UINT8 data = 0x98;
+	uint8_t data = 0x98;
 
 	// RS-232
 	data |= m_rs232->dsr_r();
@@ -263,7 +266,7 @@ READ8_MEMBER( hx20_state::main_p2_r )
 
 	*/
 
-	UINT8 data = M6801_MODE_4;
+	uint8_t data = M6801_MODE_4;
 
 	// serial
 	data &= ~(!m_slave_flag << 2);
@@ -332,7 +335,7 @@ READ8_MEMBER( hx20_state::slave_p1_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	return data;
 }
@@ -385,7 +388,7 @@ READ8_MEMBER( hx20_state::slave_p2_r )
 
 	*/
 
-	UINT8 data = M6801_MODE_7;
+	uint8_t data = M6801_MODE_7;
 
 	// serial
 	data |= m_slave_tx << 3;
@@ -441,7 +444,7 @@ READ8_MEMBER( hx20_state::slave_p3_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	return data;
 }
@@ -497,7 +500,7 @@ READ8_MEMBER( hx20_state::slave_p4_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// RS-232
 	data |= m_rs232->dcd_r() << 7;
@@ -771,7 +774,7 @@ PALETTE_INIT_MEMBER(hx20_state, hx20)
 //  SCREEN_UPDATE( hx20 )
 //-------------------------------------------------
 
-UINT32 hx20_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t hx20_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_lcdc0->screen_update(screen, bitmap, cliprect);
 	m_lcdc1->screen_update(screen, bitmap, cliprect);
@@ -814,7 +817,7 @@ void hx20_state::machine_start()
 //  MACHINE_CONFIG( hx20 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( hx20, hx20_state )
+static MACHINE_CONFIG_START( hx20 )
 	// basic machine hardware
 	MCFG_CPU_ADD(HD6301V1_MAIN_TAG, HD63701, XTAL_2_4576MHz)
 	MCFG_CPU_PROGRAM_MAP(hx20_mem)
@@ -917,6 +920,6 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT                     COMPANY   FULLNAME           FLAGS
-COMP( 1983, ehx20,  0,      0,       hx20,      hx20,    driver_device,    0,     "Epson",  "Epson HX-20",           MACHINE_NOT_WORKING )
-COMP( 1983, ehx20e, ehx20,  0,       hx20,      hx20e,   driver_device,    0,     "Epson",  "Epson HX-20 (Europe)",  MACHINE_NOT_WORKING )
+//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    STATE          INIT   COMPANY   FULLNAME                 FLAGS
+COMP( 1983, ehx20,  0,      0,       hx20,      hx20,    hx20_state,    0,     "Epson",  "Epson HX-20",           MACHINE_NOT_WORKING )
+COMP( 1983, ehx20e, ehx20,  0,       hx20,      hx20e,   hx20_state,    0,     "Epson",  "Epson HX-20 (Europe)",  MACHINE_NOT_WORKING )

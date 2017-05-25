@@ -153,7 +153,7 @@ Demonstration Tape (included with the VZ300)
 	<software name="hamsam">
 		<description>Hamburger Sam</description>
 		<year>????</year>
-		<publisher></publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="vtech1_cass">
 			<dataarea name="cass" size="5109472">
 				<rom name="hamsam.wav" size="5109472" crc="7aed86a7" sha1="b5061edb1401cea4aee97d8cd92c582c9c14e66b" offset="0" />
@@ -201,7 +201,7 @@ Demonstration Tape (included with the VZ300)
 	<software name="missile">
 		<description>Missile</description>
 		<year>????</year>
-		<publisher></publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="vtech1_cass">
 			<dataarea name="cass" size="5109776">
 				<rom name="missile.wav" size="5109776" crc="55a1fda4" sha1="1de495534447cee16d3db22b043d53b6d15f05fe" offset="0" />

@@ -46,14 +46,15 @@
 
 *************************************************************************/
 
-
-#define MASTER_CLOCK    XTAL_12MHz
-
 #include "emu.h"
 #include "cpu/tms9900/tms9980a.h"
 //#include "cpu/tms9900/tms9900.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
+#include "screen.h"
+
+
+#define MASTER_CLOCK    XTAL_12MHz
 
 
 class nibble_state : public driver_device
@@ -65,7 +66,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode") { }
 
-	required_shared_ptr<UINT16> m_videoram;
+	required_shared_ptr<uint16_t> m_videoram;
 	tilemap_t *m_bg_tilemap;
 	DECLARE_WRITE16_MEMBER(nibble_videoram_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -74,7 +75,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(nibble);
-	UINT32 screen_update_nibble(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_nibble(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(nibble_interrupt);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -101,17 +102,17 @@ TILE_GET_INFO_MEMBER(nibble_state::get_bg_tile_info)
     ---- ----   color code.
     ---- ----   seems unused.
 */
-	UINT8 code = m_videoram[tile_index/2] >> (tile_index & 1 ? 0 : 8);
+	uint8_t code = m_videoram[tile_index/2] >> (tile_index & 1 ? 0 : 8);
 
 	SET_TILE_INFO_MEMBER(0 /* bank */, code, 0 /* color */, 0);
 }
 
 void nibble_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(nibble_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nibble_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
-UINT32 nibble_state::screen_update_nibble(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t nibble_state::screen_update_nibble(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -300,7 +301,7 @@ GFXDECODE_END
 *    Machine Drivers     *
 *************************/
 
-static MACHINE_CONFIG_START( nibble, nibble_state )
+static MACHINE_CONFIG_START( nibble )
 
 	MCFG_TMS99xx_ADD("maincpu", TMS9900, MASTER_CLOCK/4, nibble_map, nibble_cru_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", nibble_state,  nibble_interrupt)
@@ -358,5 +359,5 @@ ROM_END
 *      Game Drivers      *
 *************************/
 
-/*    YEAR  NAME      PARENT  MACHINE  INPUT   STATE          INIT  ROT    COMPANY   FULLNAME   FLAGS... */
-GAME( 19??, l9nibble, 0,      nibble,  nibble, driver_device, 0,    ROT0, "Nibble", "Lucky 9",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT  MACHINE  INPUT   STATE         INIT  ROT   COMPANY   FULLNAME    FLAGS
+GAME( 19??, l9nibble, 0,      nibble,  nibble, nibble_state, 0,    ROT0, "Nibble", "Lucky 9",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

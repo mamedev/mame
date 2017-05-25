@@ -1046,8 +1046,7 @@ if (askExtractMode == NArchive::NExtract::NAskMode::kExtract && !_testMode)
     
     if (_item.IsAltStream && _item.ParentIndex != (UInt32)(Int32)-1)
     {
-      CIndexToPathPair pair(_item.ParentIndex);
-      int renIndex = _renamedFiles.FindInSorted(pair);
+      int renIndex = _renamedFiles.FindInSorted(CIndexToPathPair(_item.ParentIndex));
       if (renIndex >= 0)
       {
         const CIndexToPathPair &pair = _renamedFiles[renIndex];
@@ -1319,7 +1318,7 @@ if (askExtractMode == NArchive::NExtract::NAskMode::kExtract && !_testMode)
         if (needWriteFile)
         {
           _outFileStreamSpec = new COutFileStream;
-          CMyComPtr<ISequentialOutStream> outStreamLoc(_outFileStreamSpec);
+          CMyComPtr<ISequentialOutStream> outStreamLoc2(_outFileStreamSpec);
           if (!_outFileStreamSpec->Open(fullProcessedPath, _isSplit ? OPEN_ALWAYS: CREATE_ALWAYS))
           {
             // if (::GetLastError() != ERROR_FILE_EXISTS || !isSplit)
@@ -1346,7 +1345,7 @@ if (askExtractMode == NArchive::NExtract::NAskMode::kExtract && !_testMode)
             RINOK(_outFileStreamSpec->Seek(_position, STREAM_SEEK_SET, NULL));
           }
          
-          _outFileStream = outStreamLoc;
+          _outFileStream = outStreamLoc2;
         }
       }
     }

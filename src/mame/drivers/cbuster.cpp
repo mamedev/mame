@@ -32,12 +32,16 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/cbuster.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/h6280/h6280.h"
-#include "includes/cbuster.h"
 #include "sound/2203intf.h"
 #include "sound/ym2151.h"
 #include "sound/okim6295.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 WRITE16_MEMBER(cbuster_state::twocrude_control_w)
 {
@@ -59,21 +63,21 @@ WRITE16_MEMBER(cbuster_state::twocrude_control_w)
 
 	case 4: /* Protection, maybe this is a PAL on the board?
 
-            80046 is level number
-            stop at stage and enter.
-            see also 8216..
+	        80046 is level number
+	        stop at stage and enter.
+	        see also 8216..
 
-                9a 00 = pf4 over pf3 (normal) (level 0)
-                9a f1 =  (level 1 - water), pf3 over ALL sprites + pf4
-                9a 80 = pf3 over pf4 (Level 2 - copter)
-                9a 40 = pf3 over ALL sprites + pf4 (snow) level 3
-                9a c0 = doesn't matter?
-                9a ff = pf 3 over pf4
+	            9a 00 = pf4 over pf3 (normal) (level 0)
+	            9a f1 =  (level 1 - water), pf3 over ALL sprites + pf4
+	            9a 80 = pf3 over pf4 (Level 2 - copter)
+	            9a 40 = pf3 over ALL sprites + pf4 (snow) level 3
+	            9a c0 = doesn't matter?
+	            9a ff = pf 3 over pf4
 
-            I can't find a priority register, I assume it's tied to the
-            protection?!
+	        I can't find a priority register, I assume it's tied to the
+	        protection?!
 
-        */
+	    */
 		if ((data & 0xffff) == 0x9a00) m_prot = 0;
 		if ((data & 0xffff) == 0xaa)   m_prot = 0x74;
 		if ((data & 0xffff) == 0x0200) m_prot = 0x63 << 8;
@@ -294,7 +298,7 @@ void cbuster_state::machine_reset()
 	m_pri = 0;
 }
 
-static MACHINE_CONFIG_START( twocrude, cbuster_state )
+static MACHINE_CONFIG_START( twocrude )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2) /* Custom chip 59 @ 12MHz Verified */
@@ -364,10 +368,10 @@ static MACHINE_CONFIG_START( twocrude, cbuster_state )
 	MCFG_SOUND_ROUTE(0, "mono", 0.45)
 	MCFG_SOUND_ROUTE(1, "mono", 0.45)
 
-	MCFG_OKIM6295_ADD("oki1", XTAL_32_22MHz/32, OKIM6295_PIN7_HIGH) /* 1.0068MHz Verified */
+	MCFG_OKIM6295_ADD("oki1", XTAL_32_22MHz/32, PIN7_HIGH) /* 1.0068MHz Verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL_32_22MHz/16, OKIM6295_PIN7_HIGH) /* 2.01375MHz Verified */
+	MCFG_OKIM6295_ADD("oki2", XTAL_32_22MHz/16, PIN7_HIGH) /* 2.01375MHz Verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
@@ -575,8 +579,8 @@ ROM_END
 
 DRIVER_INIT_MEMBER(cbuster_state,twocrude)
 {
-	UINT8 *RAM = memregion("maincpu")->base();
-	UINT8 *PTR;
+	uint8_t *RAM = memregion("maincpu")->base();
+	uint8_t *PTR;
 	int i, j;
 
 	/* Main cpu decrypt */

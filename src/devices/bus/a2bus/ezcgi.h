@@ -10,10 +10,11 @@
 
 *********************************************************************/
 
-#ifndef __A2BUS_EZCGI__
-#define __A2BUS_EZCGI__
+#ifndef MAME_BUS_A2BUS_A2EZCGI_H
+#define MAME_BUS_A2BUS_A2EZCGI_H
 
-#include "emu.h"
+#pragma once
+
 #include "a2bus.h"
 #include "video/tms9928a.h"
 #include "video/v9938.h"
@@ -28,8 +29,7 @@ class a2bus_ezcgi_device:
 {
 public:
 	// construction/destruction
-	a2bus_ezcgi_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	a2bus_ezcgi_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	a2bus_ezcgi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -37,12 +37,14 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( tms_irq_w );
 
 protected:
+	a2bus_ezcgi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 	// overrides of standard a2bus slot functions
-	virtual UINT8 read_c0nx(address_space &space, UINT8 offset) override;
-	virtual void write_c0nx(address_space &space, UINT8 offset, UINT8 data) override;
+	virtual uint8_t read_c0nx(address_space &space, uint8_t offset) override;
+	virtual void write_c0nx(address_space &space, uint8_t offset, uint8_t data) override;
 
 	required_device<tms9918a_device> m_tms;
 };
@@ -53,8 +55,7 @@ class a2bus_ezcgi_9938_device:
 {
 public:
 	// construction/destruction
-	a2bus_ezcgi_9938_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	a2bus_ezcgi_9938_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	a2bus_ezcgi_9938_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -62,12 +63,14 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( tms_irq_w );
 
 protected:
+	a2bus_ezcgi_9938_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 	// overrides of standard a2bus slot functions
-	virtual UINT8 read_c0nx(address_space &space, UINT8 offset) override;
-	virtual void write_c0nx(address_space &space, UINT8 offset, UINT8 data) override;
+	virtual uint8_t read_c0nx(address_space &space, uint8_t offset) override;
+	virtual void write_c0nx(address_space &space, uint8_t offset, uint8_t data) override;
 
 	required_device<v9938_device> m_tms;
 };
@@ -78,8 +81,7 @@ class a2bus_ezcgi_9958_device:
 {
 public:
 	// construction/destruction
-	a2bus_ezcgi_9958_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	a2bus_ezcgi_9958_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	a2bus_ezcgi_9958_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -87,19 +89,21 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( tms_irq_w );
 
 protected:
+	a2bus_ezcgi_9958_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 	// overrides of standard a2bus slot functions
-	virtual UINT8 read_c0nx(address_space &space, UINT8 offset) override;
-	virtual void write_c0nx(address_space &space, UINT8 offset, UINT8 data) override;
+	virtual uint8_t read_c0nx(address_space &space, uint8_t offset) override;
+	virtual void write_c0nx(address_space &space, uint8_t offset, uint8_t data) override;
 
 	required_device<v9958_device> m_tms;
 };
 
 // device type definition
-extern const device_type A2BUS_EZCGI;
-extern const device_type A2BUS_EZCGI_9938;
-extern const device_type A2BUS_EZCGI_9958;
+DECLARE_DEVICE_TYPE(A2BUS_EZCGI,      a2bus_ezcgi_device)
+DECLARE_DEVICE_TYPE(A2BUS_EZCGI_9938, a2bus_ezcgi_9938_device)
+DECLARE_DEVICE_TYPE(A2BUS_EZCGI_9958, a2bus_ezcgi_9958_device)
 
-#endif  /* __A2BUS_EZCGI__ */
+#endif  // MAME_BUS_A2BUS_A2EZCGI_H

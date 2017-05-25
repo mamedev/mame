@@ -11,8 +11,9 @@
 **********************************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "taitosnd.h"
+
+#include "cpu/z80/z80.h"
 
 
 /**********************************************************************************************
@@ -29,7 +30,7 @@
 
 
 // device type definition
-const device_type TC0140SYT = &device_creator<tc0140syt_device>;
+DEFINE_DEVICE_TYPE(TC0140SYT, tc0140syt_device, "tc0140syt", "Taito TC0140SYT")
 
 
 //**************************************************************************
@@ -40,17 +41,17 @@ const device_type TC0140SYT = &device_creator<tc0140syt_device>;
 //  tc0140syt_device - constructor
 //-------------------------------------------------
 
-tc0140syt_device::tc0140syt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, TC0140SYT, "Taito TC0140SYT", tag, owner, clock, "tc0140syt", __FILE__),
-		m_mainmode(0),
-		m_submode(0),
-		m_status(0),
-		m_nmi_enabled(0),
-		m_mastercpu(*this),
-		m_slavecpu(*this)
+tc0140syt_device::tc0140syt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, TC0140SYT, tag, owner, clock)
+	, m_mainmode(0)
+	, m_submode(0)
+	, m_status(0)
+	, m_nmi_enabled(0)
+	, m_mastercpu(*this, finder_base::DUMMY_TAG)
+	, m_slavecpu(*this, finder_base::DUMMY_TAG)
 {
-	memset(m_slavedata, 0, sizeof(UINT8)*4);
-	memset(m_masterdata, 0, sizeof(UINT8)*4);
+	memset(m_slavedata, 0, sizeof(uint8_t)*4);
+	memset(m_masterdata, 0, sizeof(uint8_t)*4);
 }
 
 
@@ -80,7 +81,7 @@ void tc0140syt_device::device_reset()
 	m_status = 0;
 	m_nmi_enabled = 0;
 
-	for (UINT32 i = 0; i < 4; i++)
+	for (uint32_t i = 0; i < 4; i++)
 	{
 		m_slavedata[i] = 0;
 		m_masterdata[i] = 0;
@@ -94,8 +95,8 @@ void tc0140syt_device::device_reset()
 
 void tc0140syt_device::update_nmi()
 {
-	UINT32 nmi_pending = m_status & (TC0140SYT_PORT23_FULL | TC0140SYT_PORT01_FULL);
-	UINT32 state = (nmi_pending && m_nmi_enabled) ? ASSERT_LINE : CLEAR_LINE;
+	uint32_t nmi_pending = m_status & (TC0140SYT_PORT23_FULL | TC0140SYT_PORT01_FULL);
+	uint32_t state = (nmi_pending && m_nmi_enabled) ? ASSERT_LINE : CLEAR_LINE;
 
 	m_slavecpu->set_input_line(INPUT_LINE_NMI, state);
 }
@@ -118,7 +119,7 @@ WRITE8_MEMBER( tc0140syt_device::master_port_w )
 
 WRITE8_MEMBER( tc0140syt_device::master_comm_w )
 {
-	machine().scheduler().synchronize(); // let slavecpu catch up before changing anything
+	machine().scheduler().synchronize(); // let slavecpu catch up (after we return and the main cpu finishes what it's doing)
 	data &= 0x0f; /* this is important, otherwise ballbros won't work */
 
 	switch (m_mainmode)
@@ -155,8 +156,8 @@ WRITE8_MEMBER( tc0140syt_device::master_comm_w )
 
 READ8_MEMBER( tc0140syt_device::master_comm_r )
 {
-	machine().scheduler().synchronize(); // let slavecpu catch up before changing anything
-	UINT8 res = 0;
+	machine().scheduler().synchronize(); // let slavecpu catch up (after we return and the main cpu finishes what it's doing)
+	uint8_t res = 0;
 
 	switch (m_mainmode)
 	{
@@ -250,7 +251,7 @@ WRITE8_MEMBER( tc0140syt_device::slave_comm_w )
 
 READ8_MEMBER( tc0140syt_device::slave_comm_r )
 {
-	UINT8 res = 0;
+	uint8_t res = 0;
 
 	switch (m_submode)
 	{

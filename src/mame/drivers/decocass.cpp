@@ -14,33 +14,42 @@
     The Dumping Union
     Team Japump!!!
     Hau
+    Jean-Francois Del Nero
+    Omar Cornut
+    Game Preservation Society
+    Joseph Redon
 
     The DECO cassette system consists of three PCBS in a card cage:
     Early boardset: (1980-1983) (proms unknown for this boardset, no schematics for this boardset)
     One DE-0069C-0 RMS-3 pcb with a 6502 processor, D8041C MCU (DECO Cassette control), two ay-3-8910s, and one 2708 eprom holding the audio bios. (audio, needs external amp and volume control)
-    One DE-0068B-0 DSP-3 pcb with a 'DECO CPU-3' custom, two 2716 eproms (main processor and bios, graphics, dipswitches?)
-    One DE-0070C-0 BIO-3 pcb with an analog ADC0908 8-bit adc
+    One DE-0068B-0 DSP-3 pcb with a 'DECO CPU-3' custom, two 2716 eproms. (main processor and bios, graphics, dipswitches?)
+    One DE-0070C-0 BIO-3 pcb with an analog ADC0908 8-bit adc.
     One DE-0066B-0 card rack board that the other three boards plug into.
-    TODO: get more info about this older boardset: D. Widel has some info about it on his page at http://www.widel.com/stuff/decopin.htm
+    This boardset has two versions : MD, known as "shokase" in Japan, and MT, known as "daikase" which is using bigger data tapes. (MT was only sold in Japan, not emulated yet)
 
-    Later boardset: (1984 onward, schematic is dated 10/83)
+    Later boardset: (1984 onward, schematic is dated October 1983)
     One DE-0097C-0 RMS-8 pcb with a 6502 processor, two ay-3-8910s, two eproms (2716 and 2732) plus one prom, and 48k worth of 4116 16kx1 DRAMs; the 6502 processor has its own 4K of SRAM. (audio processor and RAM, Main processor's dram, dipswitches)
-    One DE-0096C-0 DSP-8 board with a 'DECO 222' custom on it (labeled '8049 // C10707-2') which appears to really be a 'cleverly' disguised 6502, and two proms, plus 4K of sram, and three hm2511-1 1kx1 srams. (main processor and graphics)
-    One DE-0098C-0 B10-8 (BIO-8 on schematics) board with an 8041, an analog devices ADC0908 8-bit adc, and 4K of SRAM on it (DECO Cassette control, inputs)
-    One DE-0109C-0 card rack board that the other three boards plug into.
+    One DE-0096C-0 DSP-8 board with a 'DECO 222' custom on it (labeled '8049 // C10707-2') which appears to really be a 'cleverly' disguised 6502, and two proms, plus 4K of sram, and three hm2511-1 1kx1 srams. (main processor, sprites, missiles, palette)
+    One DE-0098C-0 B10-8 (BIO-8 on schematics) board with an 8041, an analog devices ADC0908 8-bit adc, and 4K of SRAM on it. (DECO Cassette control, inputs, tilemaps, headlights)
+    One DE-0109C-0 card rack board that the other three boards plug into. (fourth connector for DE-109C-0 is shorter than in earlier versions)
 
     The actual cassettes use a custom player hooked to the BIO board, and are roughly microcassette form factor, but are larger and will not fit in a conventional microcassette player.
-    Each cassette has two tracks on it: a clock track and a data track, for a form of synchronous serial. The data is stored in blocks with headers and checksums.
+    Each cassette has one track on it and is separated into clock and data by two Magtek IC in the player, for a form of synchronous serial.
+    The data is stored in blocks with headers and CRC16 checksums.
+    The first block contains information such as the region (A:Japan, B:USA, C:UK, D:Europe) and the total number of blocks left to read.
+    The last physical block on the cassette is a dummy block not used by the system. (only used to mark the end of last block)
 
  ***********************************************************************/
 
 #include "emu.h"
+#include "includes/decocass.h"
+
 #include "cpu/m6502/m6502.h"
 #include "cpu/mcs48/mcs48.h"
-#include "includes/decocass.h"
+#include "machine/deco222.h"
 #include "machine/decocass_tape.h"
 #include "sound/ay8910.h"
-#include "machine/deco222.h"
+#include "speaker.h"
 
 #define MASTER_CLOCK    XTAL_12MHz
 #define HCLK            (MASTER_CLOCK/2)
@@ -125,11 +134,6 @@ static ADDRESS_MAP_START( decocass_sound_map, AS_PROGRAM, 8, decocass_state )
 	AM_RANGE(0xf800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-
-static ADDRESS_MAP_START( decocass_mcu_portmap, AS_IO, 8, decocass_state )
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(i8041_p1_r, i8041_p1_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(i8041_p2_r, i8041_p2_w)
-ADDRESS_MAP_END
 
 static INPUT_PORTS_START( decocass )
 	PORT_START("IN0")
@@ -247,6 +251,42 @@ static INPUT_PORTS_START( csuperas )
 	PORT_DIPSETTING(    0x08, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Difficult ) )
 	/* Switches 6, 7 & 8 are listed as "Country Code" A through F and "Don't Change" */
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( cocean1a ) /* 10 */
+	PORT_INCLUDE( decocass )
+
+	PORT_MODIFY("DSW1") /* Switches 5 and 6 defined as blank/2100/2100/2100 and "Don't change" */
+	PORT_DIPNAME( 0x07, 0x07, "Number of 1 Coin Credit")                PORT_DIPLOCATION("SW1:1,2,3") /* Credits for 1 coin */
+	PORT_DIPSETTING(    0x07, "1")
+	PORT_DIPSETTING(    0x06, "2")
+	PORT_DIPSETTING(    0x05, "5")
+	PORT_DIPSETTING(    0x04, "10")
+	PORT_DIPSETTING(    0x03, "20")
+	PORT_DIPSETTING(    0x02, "30")
+	PORT_DIPSETTING(    0x01, "40")
+	PORT_DIPSETTING(    0x00, "50")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( None ) )                         PORT_DIPLOCATION("SW1:4")     /* Default is "Off" and shown as "Don't change" */
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x03, 0x03, "Key Switch Credit" )                     PORT_DIPLOCATION("SW2:1,2")   /* Unknown */
+	PORT_DIPSETTING(    0x03, "1 Coin 10 Credits" )
+	PORT_DIPSETTING(    0x02, "1 Coin 20 Credits" )
+	PORT_DIPSETTING(    0x01, "1 Coin 50 Credits" )
+	PORT_DIPSETTING(    0x00, "1 Coin 100 Credits" )
+	PORT_DIPNAME( 0x04, 0x04, "Game Select" )                           PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(    0x04, "1 to 8 Lines" )
+	PORT_DIPSETTING(    0x00, "Center Line" )
+	PORT_DIPNAME( 0x08, 0x08, "Background Music" )                      PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "Pay Out %" )                             PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(    0x10, "Payout 75%")
+	PORT_DIPSETTING(    0x00, "Payout 85%")
+	/* Switches 6 to 8 are shown as completly blank and "Don't change" */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( clocknch )
@@ -620,6 +660,26 @@ static INPUT_PORTS_START( cfishing )
 	/* Switches 5, 6, 7 & 8 are listed as "Not Used" and "Don't Change" */
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( cfboy0a1 ) /* 12 */
+	PORT_INCLUDE( decocass )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, "Number of The Deco Kids" )                PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x01, "3" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPNAME( 0x06, 0x06, "Bonus Points" )                           PORT_DIPLOCATION("SW2:2,3")
+	PORT_DIPSETTING(    0x06, "5000" )
+	PORT_DIPSETTING(    0x04, "10000" )
+	PORT_DIPSETTING(    0x02, "15000" )
+	PORT_DIPSETTING(    0x00, DEF_STR( None )  )
+	PORT_DIPNAME( 0x08, 0x08, "Number of Alien Missiles" )               PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Difficult ) )
+	PORT_DIPNAME( 0x10, 0x10, "Alien Craft Movement" )                   PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Difficult ) )
+	/* Switches 6 to 8 are shown as "Country Code" (A to F) and "Don't Change" */
+INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
@@ -654,13 +714,13 @@ static const gfx_layout tilelayout =
 	2*16*16
 };
 
-static const UINT32 objlayout_xoffset[64] =
+static const uint32_t objlayout_xoffset[64] =
 {
 	STEP8(7*8,1), STEP8(6*8,1), STEP8(5*8,1), STEP8(4*8,1),
 	STEP8(3*8,1), STEP8(2*8,1), STEP8(1*8,1), STEP8(0*8,1)
 };
 
-static const UINT32 objlayout_yoffset[64] =
+static const uint32_t objlayout_yoffset[64] =
 {
 	STEP32(63*2*64, -1*2*64),
 	STEP32(31*2*64, -1*2*64)
@@ -713,7 +773,7 @@ PALETTE_INIT_MEMBER(decocass_state, decocass)
 }
 
 
-static MACHINE_CONFIG_START( decocass, decocass_state )
+static MACHINE_CONFIG_START( decocass )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", DECO_222, HCLK4) /* the earlier revision board doesn't have the 222 but must have the same thing implemented in logic for the M6502 */
@@ -724,7 +784,10 @@ static MACHINE_CONFIG_START( decocass, decocass_state )
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("audionmi", decocass_state, decocass_audio_nmi_gen, "screen", 0, 8)
 
 	MCFG_CPU_ADD("mcu", I8041, HCLK)
-	MCFG_CPU_IO_MAP(decocass_mcu_portmap)
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(decocass_state, i8041_p1_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(decocass_state, i8041_p1_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(decocass_state, i8041_p2_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(decocass_state, i8041_p2_w))
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(4200))              /* interleave CPUs */
 
@@ -816,10 +879,24 @@ static MACHINE_CONFIG_DERIVED( csuperas, decocass )
 MACHINE_CONFIG_END
 
 
+static MACHINE_CONFIG_DERIVED( cocean1a, decocass ) /* 10 */
+
+	/* basic machine hardware */
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_state,cocean1a)
+MACHINE_CONFIG_END
+
+
 static MACHINE_CONFIG_DERIVED( clocknch, decocass )
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_state,clocknch)
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( cfboy0a1, decocass ) /* 12 */
+
+	/* basic machine hardware */
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_state,cfboy0a1)
 MACHINE_CONFIG_END
 
 
@@ -991,46 +1068,106 @@ static MACHINE_CONFIG_DERIVED( cflyball, decocass )
 MACHINE_CONFIG_END
 
 
-#define DECOCASS_COMMON_ROMS    \
-	ROM_REGION( 0x10000, "audiocpu", 0 )      \
-	ROM_LOAD( "v1-.5a",     0xf800, 0x0800, CRC(b66b2c2a) SHA1(0097f38beb4872e735e560148052e258a26b08fd) ) /* from RMS-8 board: 2716 eprom @5A w/V1- label,  contains audio cpu code */ \
-\
+#define ROM_LOAD_BIOS(bios,name,offset,length,hash) \
+	ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios+1)) /* Note '+1' */
+
+
+/************ Version A bios roms *************/
+
+/* v0a.7e, New boardset bios, revision A */
+#define DECOCASS_BIOS_A_MAINCPU \
+	ROM_SYSTEM_BIOS( 0, "a",   "Bios A (Japan)" ) \
+	ROM_LOAD_BIOS( 0, "v0a-.7e",    0xf000, 0x1000, CRC(3d33ac34) SHA1(909d59e7a993affd10224402b4370e82a5f5545c) ) /* from RMS-8 board: 2732 EPROM @7E w/'V0A-' label (has HDRA01HDR string inside it), bios code */
+#define DECOCASS_BIOS_A_AUDIOCPU \
+	ROM_LOAD_BIOS( 0, "v1-.5a",     0xf800, 0x0800, CRC(b66b2c2a) SHA1(0097f38beb4872e735e560148052e258a26b08fd) ) /* from RMS-8 board: 2716 eprom @5A w/V1- label,  contains audio cpu code */
+#define DECOCASS_BIOS_A_PROMS \
+	ROM_LOAD_BIOS( 0, "v2.3m",      0x0000, 0x0020, CRC(238fdb40) SHA1(b88e8fabb82092105c3828154608ea067acbf2e5) ) /* from DSP-8 board: M3-7603-5 (82s123 equiv, 32x8 TS) PROM @3M w/'V2' stamp, unknown purpose (gfx related: row/interrupt/vblank related? vertical counter related) */ \
+	ROM_LOAD_BIOS( 0, "v4.10d",     0x0020, 0x0020, CRC(3b5836b4) SHA1(b630bb277d9ec09d46ef26b944014dd6165b35d8) ) /* from DSP-8 board: M3-7603-5 (82s123 equiv, 32x8 TS) PROM @10D w/'V4' stamp, unknown purpose (gfx related: tile banking? horizontal counter related) */ \
+	ROM_LOAD_BIOS( 0, "v3.3j",      0x0040, 0x0020, CRC(51eef657) SHA1(eaedce5caf55624ad6ae706aedf82c5717c60f1f) ) /* from RMS-8 board: M3-7603-5 (82s123 equiv, 32x8 TS) PROM @3J w/'V3' stamp, handles DRAM banking and timing */
+
+/* Old boardset bios, version A for Japan, 2x 2716 EPROM, MD labbeled as RMS-3D and MT as RMS-3T, region code (letter) is (not always) inserted after "-" */ \
+#define DECOCASS_BIOS_A0_MAINCPU \
+	ROM_SYSTEM_BIOS( 1, "a0",   "Bios A (Japan, older)" ) \
+	ROM_LOAD_BIOS( 1, "dsp-3_p0-a.m9",      0xf000, 0x0800, CRC(2541e34b) SHA1(4f983513dbae1350c83a433dea77a4465748b9c6) ) \
+	ROM_LOAD_BIOS( 1, "dsp-3_p1-.l9",       0xf800, 0x0800, CRC(3bfff5f3) SHA1(4e9437cb1b76d64da6b37f01bd6e879fb399e8ce) )
+#define DECOCASS_BIOS_A0_AUDIOCPU \
+	ROM_LOAD_BIOS( 1, "rms-3_p2-.c9",       0xfc00, 0x0400, CRC(6c4a891f) SHA1(5c00cf8b1accfdbb1d61e9b3f6db1594dfbc608b) ) /* 2708 EPROM, contains audio cpu code */
+#define DECOCASS_BIOS_A0_PROMS \
+	ROM_LOAD_BIOS( 1, "dsp-3_p3-.e5",       0x0000, 0x0020, CRC(539a5a64) SHA1(7b7d3cc58ac6f95242240c97046e770d2fd20c96) ) /* M3-7603-5 (82s123 equiv, 32x8 TS) PROM, unknown purpose (gfx related: row/interrupt/vblank related? vertical counter related) */ \
+	ROM_LOAD_BIOS( 1, "rms-3_p4-.f6",       0x0020, 0x0020, CRC(9014c0fd) SHA1(7405d39a5f4fcad821448ddaf6bd4e27c0c9e145) ) /* M3-7603-5 (82s123 equiv, 32x8 TS) PROM, unknown purpose (gfx related: tile banking? horizontal counter related) */ \
+	ROM_LOAD_BIOS( 1, "dsp-3_p5-.m4",       0x0040, 0x0020, CRC(e52089a0) SHA1(d85c17809b089c6977ee9571f976af6f107fd4d3) ) /* M3-7603-5 (82s123 equiv, 32x8 TS) PROM, handles DRAM banking and timing */ \
+
+/************ Version B bios roms *************/
+
+/* rms8.7e, New boardset bios, revision B */ \
+#define DECOCASS_BIOS_B_MAINCPU \
+	ROM_SYSTEM_BIOS( 2, "b",   "Bios B (USA)" ) \
+	ROM_LOAD_BIOS( 2, "v0b-.7e",    0xf000, 0x1000, CRC(23d929b7) SHA1(063f83020ba3d6f43ab8471f95ca919767b93aa4) ) /* from RMS-8 board: 2732 EPROM @7E w/'V0B-' label (has HDRB01HDR string inside it), bios code */
+#define DECOCASS_BIOS_B_AUDIOCPU \
+	ROM_LOAD_BIOS( 2, "v1-.5a",     0xf800, 0x0800, CRC(b66b2c2a) SHA1(0097f38beb4872e735e560148052e258a26b08fd) ) /* from RMS-8 board: 2716 eprom @5A w/V1- label,  contains audio cpu code */
+#define DECOCASS_BIOS_B_PROMS \
+	ROM_LOAD_BIOS( 2, "v2.3m",      0x0000, 0x0020, CRC(238fdb40) SHA1(b88e8fabb82092105c3828154608ea067acbf2e5) ) /* from DSP-8 board: M3-7603-5 (82s123 equiv, 32x8 TS) PROM @3M w/'V2' stamp, unknown purpose (gfx related: row/interrupt/vblank related? vertical counter related) */ \
+	ROM_LOAD_BIOS( 2, "v4.10d",     0x0020, 0x0020, CRC(3b5836b4) SHA1(b630bb277d9ec09d46ef26b944014dd6165b35d8) ) /* from DSP-8 board: M3-7603-5 (82s123 equiv, 32x8 TS) PROM @10D w/'V4' stamp, unknown purpose (gfx related: tile banking? horizontal counter related) */ \
+	ROM_LOAD_BIOS( 2, "v3.3j",      0x0040, 0x0020, CRC(51eef657) SHA1(eaedce5caf55624ad6ae706aedf82c5717c60f1f) ) /* from RMS-8 board: M3-7603-5 (82s123 equiv, 32x8 TS) PROM @3J w/'V3' stamp, handles DRAM banking and timing */
+
+/* Old boardset bios, version B for USA, 2x 2716 EPROM, MD labbeled as RMS-3D and MT as RMS-3T, region code (letter) is (not always) inserted after "-" */ \
+/* dsp3.p0b/p1b, Old boardset bios, revision B?; from DSP-3 board? has HDRB01x string in it, 2x 2716 EPROM? */ \
+#define DECOCASS_BIOS_B0_MAINCPU \
+	ROM_SYSTEM_BIOS( 3, "b0",   "Bios B (USA, older)" ) \
+	ROM_LOAD_BIOS( 3, "dsp-3_p0-b.m9",      0xf000, 0x0800, CRC(b67a91d9) SHA1(681c040be0f0ed1ba0a50161b36d0ad8e1c8c5cb) ) \
+	ROM_LOAD_BIOS( 3, "dsp-3_p1-.l9",       0xf800, 0x0800, CRC(3bfff5f3) SHA1(4e9437cb1b76d64da6b37f01bd6e879fb399e8ce) )
+#define DECOCASS_BIOS_B0_AUDIOCPU \
+	ROM_LOAD_BIOS( 3, "rms-3_p2-.c9",       0xfc00, 0x0400, CRC(6c4a891f) SHA1(5c00cf8b1accfdbb1d61e9b3f6db1594dfbc608b) ) /* 2708 EPROM, contains audio cpu code */
+#define DECOCASS_BIOS_B0_PROMS \
+	ROM_LOAD_BIOS( 3, "dsp-3_p3-.e5",       0x0000, 0x0020, CRC(539a5a64) SHA1(7b7d3cc58ac6f95242240c97046e770d2fd20c96) ) /* M3-7603-5 (82s123 equiv, 32x8 TS) PROM, unknown purpose (gfx related: row/interrupt/vblank related? vertical counter related) */ \
+	ROM_LOAD_BIOS( 3, "rms-3_p4-.f6",       0x0020, 0x0020, CRC(9014c0fd) SHA1(7405d39a5f4fcad821448ddaf6bd4e27c0c9e145) ) /* M3-7603-5 (82s123 equiv, 32x8 TS) PROM, unknown purpose (gfx related: tile banking? horizontal counter related) */ \
+	ROM_LOAD_BIOS( 3, "dsp-3_p5-.m4",       0x0040, 0x0020, CRC(e52089a0) SHA1(d85c17809b089c6977ee9571f976af6f107fd4d3) ) /* M3-7603-5 (82s123 equiv, 32x8 TS) PROM, handles DRAM banking and timing */ \
+
+/************ Common MCU bios rom *************/
+
+#define DECOCASS_BIOS_MCU \
+	ROM_LOAD( "cassmcu.1c", 0x0000, 0x0400, CRC(a6df18fd) SHA1(1f9ea47e372d31767c936c15852b43df2b0ee8ff) ) /* from B10-B board: "NEC // JAPAN // X1202D-108 // D8041C 535" 8041 MCU @1C, handles cassette and other stuff; This info needs additional verification, as the d8041-535 mcu has not been dumped yet to prove code is the same. */
+
+
+
+#define DECOCASS_BIOS_MAIN \
+	ROM_REGION( 0x10000, "maincpu", 0 ) \
+	DECOCASS_BIOS_A_MAINCPU \
+	DECOCASS_BIOS_A0_MAINCPU \
+	DECOCASS_BIOS_B_MAINCPU \
+	DECOCASS_BIOS_B0_MAINCPU \
+	ROM_REGION( 0x10000, "audiocpu", 0 ) \
+	DECOCASS_BIOS_A_AUDIOCPU \
+	DECOCASS_BIOS_A0_AUDIOCPU \
+	DECOCASS_BIOS_B_AUDIOCPU \
+	DECOCASS_BIOS_B0_AUDIOCPU \
+	ROM_REGION( 0x00060, "proms", 0 ) \
+	DECOCASS_BIOS_A_PROMS \
+	DECOCASS_BIOS_A0_PROMS \
+	DECOCASS_BIOS_B_PROMS \
+	DECOCASS_BIOS_B0_PROMS \
 	ROM_REGION( 0x10000, "mcu", 0 )   /* 4k for the 8041 MCU (actually 1K ROM + 64 bytes RAM @ 0x800) */ \
-	ROM_LOAD( "cassmcu.1c", 0x0000, 0x0400, CRC(a6df18fd) SHA1(1f9ea47e372d31767c936c15852b43df2b0ee8ff) ) /* from B10-B board: "NEC // JAPAN // X1202D-108 // D8041C 535" 8041 MCU @1C, handles cassette and other stuff; This info needs additional verification, as the d8041-535 mcu has not been dumped yet to prove code is the same. */ \
-\
-	ROM_REGION( 0x00060, "proms", 0 )     /* PROMS */ \
-	ROM_LOAD( "v2.3m",      0x0000, 0x0020, CRC(238fdb40) SHA1(b88e8fabb82092105c3828154608ea067acbf2e5) ) /* from DSP-8 board: M3-7603-5 (82s123 equiv, 32x8 TS) PROM @3M w/'V2' stamp, unknown purpose (gfx related: row/interrupt/vblank related? vertical counter related) */ \
-	ROM_LOAD( "v4.10d",     0x0020, 0x0020, CRC(3b5836b4) SHA1(b630bb277d9ec09d46ef26b944014dd6165b35d8) ) /* from DSP-8 board: M3-7603-5 (82s123 equiv, 32x8 TS) PROM @10D w/'V4' stamp, unknown purpose (gfx related: tile banking? horizontal counter related) */ \
-	ROM_LOAD( "v3.3j",      0x0040, 0x0020, CRC(51eef657) SHA1(eaedce5caf55624ad6ae706aedf82c5717c60f1f) ) /* from RMS-8 board: M3-7603-5 (82s123 equiv, 32x8 TS) PROM @3J w/'V3' stamp, handles DRAM banking and timing */
+	DECOCASS_BIOS_MCU
 
-#define DECOCASS_BIOS_A_ROMS    \
-	/* v0a.7e, New boardset bios, revision A */ \
-\
-	ROM_REGION( 0x10000, "maincpu", 0 ) \
-	ROM_LOAD( "v0a-.7e",    0xf000, 0x1000, CRC(3d33ac34) SHA1(909d59e7a993affd10224402b4370e82a5f5545c) ) /* from RMS-8 board: 2732 EPROM @7E w/'V0A-' label (has HDRA01HDR string inside it), bios code */ \
-\
-	DECOCASS_COMMON_ROMS
 
-#define DECOCASS_BIOS_B_ROMS    \
-	/* rms8.7e, New boardset bios, revision B */ \
-\
-	ROM_REGION( 0x10000, "maincpu", 0 ) \
-	ROM_LOAD( "v0b-.7e",    0xf000, 0x1000, CRC(23d929b7) SHA1(063f83020ba3d6f43ab8471f95ca919767b93aa4) ) /* from RMS-8 board: 2732 EPROM @7E w/'V0B-' label (has HDRB01HDR string inside it), bios code */ \
-\
-	DECOCASS_COMMON_ROMS
+#define DECOCASS_BIOS_B_ROMS \
+	DECOCASS_BIOS_MAIN \
+	ROM_DEFAULT_BIOS( "b" )
 
-#define DECOCASS_BIOS_B2_ROMS   \
-	/* dsp3.p0b/p1b, Old boardset bios, revision B?; from DSP-3 board? has HDRB01x string in it, 2x 2716 EPROM? */ \
-\
-	ROM_REGION( 0x10000, "maincpu", 0 ) \
-	ROM_LOAD( "dsp3.p0b",   0xf000, 0x0800, CRC(b67a91d9) SHA1(681c040be0f0ed1ba0a50161b36d0ad8e1c8c5cb) ) \
-	ROM_LOAD( "dsp3.p1b",   0xf800, 0x0800, CRC(3bfff5f3) SHA1(4e9437cb1b76d64da6b37f01bd6e879fb399e8ce) ) \
-\
-	DECOCASS_COMMON_ROMS
+#define DECOCASS_BIOS_BO_ROMS   \
+	DECOCASS_BIOS_MAIN \
+	ROM_DEFAULT_BIOS( "b0" )
+
+#define DECOCASS_BIOS_A_ROMS \
+	DECOCASS_BIOS_MAIN \
+	ROM_DEFAULT_BIOS( "a" )
+
+#define DECOCASS_BIOS_AO_ROMS   \
+	DECOCASS_BIOS_MAIN \
+	ROM_DEFAULT_BIOS( "a0" )
 
 ROM_START( decocass )
-	DECOCASS_BIOS_B_ROMS
-
+	DECOCASS_BIOS_MAIN
 ROM_END
 
 /* The Following use Dongle Type 1 (DE-0061)
@@ -1102,6 +1239,27 @@ ROM_START( csuperas )
 	ROM_LOAD( "csuperas.cas", 0x0000, 0x8000, CRC(fabcd07f) SHA1(4070c668ad6725f0710cf7fe6df0d5f80272a449) )
 ROM_END
 
+/* 10 Ocean to Ocean (World) */
+ROM_START( cocean1a ) // version MD 1-A-0 verified, 061 blocks, decrypted main data CRC(b97ab3cb)
+	DECOCASS_BIOS_AO_ROMS
+
+	ROM_REGION( 0x10000, "cassette", 0 )  /* (max) 64k for cassette image */
+	ROM_LOAD( "dt-1101-a-0.cas", 0x0000, 0x3e00, CRC(db8ab848) SHA1(2b2acb249bf66e6c5e15d89b7ebd294ed2eee066) )
+
+	ROM_REGION( 0x00020, "dongle", 0 )    /* dongle data */
+	ROM_LOAD( "dp-1100-a.rom",   0x0000, 0x0020, CRC(1bc9fccb) SHA1(ffc59c7660d5c87a8deca294f80260b6bc7c3027) )
+ROM_END
+
+ROM_START( cocean6b ) // version MD 10-B-0 not verified, 068 blocks, decrypted main data CRC(410d1f19)
+	DECOCASS_BIOS_BO_ROMS
+
+	ROM_REGION( 0x10000, "cassette", 0 )  /* (max) 64k for cassette image */
+	ROM_LOAD( "dt-1106-b-0.cas", 0x0000, 0x4500, CRC(fa6ffc95) SHA1(95f881503aa8cd97d04b327abeb68891d053563f) )
+
+	ROM_REGION( 0x00020, "dongle", 0 )    /* dongle data */
+	ROM_LOAD( "dp-1100-b.rom",   0x0000, 0x0020, CRC(e09ae5de) SHA1(7dec067d0739a6dad2607132641b66880a5b7751) )
+ROM_END
+
 /* 11 Lock'n'Chase */
 ROM_START( clocknch )
 	DECOCASS_BIOS_B_ROMS
@@ -1111,6 +1269,17 @@ ROM_START( clocknch )
 
 	ROM_REGION( 0x10000, "cassette", 0 )      /* (max) 64k for cassette image */
 	ROM_LOAD( "clocknch.cas",  0x0000, 0x8000, CRC(c9d163a4) SHA1(3ef55a8d8f603059e263776c08eb81f2cf18b75c) )
+ROM_END
+
+/* 12 Flash Boy (early vertical Japan version, then horizontal version), The Deco Kid (early vertical World version, then vertical version) */
+ROM_START( cfboy0a1 ) // version MD 0-A-1 verified, 105 blocks, decrypted main data CRC(7ca358f0)
+	DECOCASS_BIOS_AO_ROMS
+
+	ROM_REGION( 0x10000, "cassette", 0 )  /* (max) 64k for cassette image */
+	ROM_LOAD( "dt-1120-a-1.cas", 0x0000, 0x6a00, CRC(c6746dc0) SHA1(816ccb61dfa2745a9ef918d9a50d1cd91493c9ed) )
+
+	ROM_REGION( 0x00020, "dongle", 0 )    /* dongle data */
+	ROM_LOAD( "dp-1120-a.rom",   0x0000, 0x0020, CRC(1bc9fccb) SHA1(ffc59c7660d5c87a8deca294f80260b6bc7c3027) )
 ROM_END
 
 /* 13 */
@@ -1618,7 +1787,7 @@ DRIVER_INIT_MEMBER(decocass_state,decocrom)
 
 READ8_MEMBER(decocass_state::cdsteljn_input_r )
 {
-	UINT8 res;
+	uint8_t res;
 	static const char *const portnames[2][4] = {
 		{"P1_MP0", "P1_MP1", "P1_MP2", "P1_MP3"},
 		{"P2_MP0", "P2_MP1", "P2_MP2", "P2_MP3"}         };
@@ -1651,65 +1820,66 @@ DRIVER_INIT_MEMBER(decocass_state,cdsteljn)
 }
 
 /* -- */ GAME( 1981, decocass,  0,        decocass, decocass, decocass_state, decocass, ROT270, "Data East Corporation", "DECO Cassette System", MACHINE_IS_BIOS_ROOT )
-/* -- */ GAME( 1981, ctsttape,  decocass, ctsttape, decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Test Tape (DECO Cassette)", 0 )
-/* 01 */ GAME( 1980, chwy,      decocass, chwy,     decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Highway Chase (DECO Cassette)", 0 )
+/* -- */ GAME( 1981, ctsttape,  decocass, ctsttape, decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Test Tape (DECO Cassette) (US)", 0 )
+/* 01 */ GAME( 1980, chwy,      decocass, chwy,     decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Highway Chase (DECO Cassette) (US)", 0 )
 /* 02 */ // 1980.12 Sengoku Ninjatai
-/* 03 */ GAME( 1981, cmanhat,   decocass, cmanhat,  decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Manhattan (DECO Cassette)", MACHINE_IMPERFECT_GRAPHICS )
-/* 04 */ GAME( 1981, cterrani,  decocass, cterrani, cterrani, decocass_state, decocass, ROT270, "Data East Corporation", "Terranean (DECO Cassette)", 0 )
+/* 03 */ GAME( 1981, cmanhat,   decocass, cmanhat,  decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Manhattan (DECO Cassette) (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+/* 04 */ GAME( 1981, cterrani,  decocass, cterrani, cterrani, decocass_state, decocass, ROT270, "Data East Corporation", "Terranean (DECO Cassette) (US)", 0 )
 /* 05 */ // 1981.?? Missile Sprinter
 /* 06 */ // 1980.12 Nebula
-/* 07 */ GAME( 1981, castfant,  decocass, castfant, decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Astro Fantasia (DECO Cassette)", 0 )
+/* 07 */ GAME( 1981, castfant,  decocass, castfant, decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Astro Fantasia (DECO Cassette) (US)", 0 )
 /* 08 */ // 1981.03 The Tower
-/* 09 */ GAME( 1981, csuperas,  decocass, csuperas, csuperas, decocass_state, decocass, ROT270, "Data East Corporation", "Super Astro Fighter (DECO Cassette)", 0 )
-/* 10 */ // 1981.?? Ocean to Ocean (medal)
-/* 11 */ GAME( 1981, clocknch,  decocass, clocknch, clocknch, decocass_state, decocass, ROT270, "Data East Corporation", "Lock'n'Chase (DECO Cassette)", 0 )
-/* 12 */ // 1981.08 Flash Boy/DECO Kid
-/* 13 */ GAME( 1981, cprogolf,  decocass, cprogolf, cprogolf, decocass_state, decocass, ROT270, "Data East Corporation", "Tournament Pro Golf (DECO Cassette)", 0 )
-/*    */ GAME( 1981, cprogolfj, cprogolf, cprogolfj,cprogolf, decocass_state, decocass, ROT270, "Data East Corporation", "Tournament Pro Golf (DECO Cassette, Japan)", 0 )
-/* 14 */ GAME( 1981, cdsteljn,  decocass, cdsteljn, cdsteljn, decocass_state, cdsteljn, ROT270, "Data East Corporation", "DS Telejan (DECO Cassette, Japan)", 0 )
-/* 15 */ GAME( 1981, cluckypo,  decocass, cluckypo, decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Lucky Poker (DECO Cassette)", 0 )
-/* 16 */ GAME( 1981, ctisland,  decocass, ctisland, decocass, decocass_state, decocrom, ROT270, "Data East Corporation", "Treasure Island (DECO Cassette, set 1)", 0 )
-/*    */ GAME( 1981, ctisland2, ctisland, ctisland, decocass, decocass_state, decocrom, ROT270, "Data East Corporation", "Treasure Island (DECO Cassette, set 2)", 0 )
-/*    */ GAME( 1981, ctisland3, ctisland, ctisland, decocass, decocass_state, decocrom, ROT270, "Data East Corporation", "Treasure Island (DECO Cassette, set 3)", MACHINE_NOT_WORKING ) /* Different Bitswap? */
+/* 09 */ GAME( 1981, csuperas,  decocass, csuperas, csuperas, decocass_state, decocass, ROT270, "Data East Corporation", "Super Astro Fighter (DECO Cassette) (US)", 0 )
+/* 10 */ GAME( 1981, cocean1a,  decocass, cocean1a, cocean1a, decocass_state, decocass, ROT270, "Data East Corporation", "Ocean to Ocean (Medal) (DECO Cassette MD) (No.10/Ver.1,Japan)", 0 ) /* no lever, 1P/2P buttons used to switch player, cocktail mode not emulated */
+/*    */ GAME( 1981, cocean6b,  cocean1a, cocean1a, cocean1a, decocass_state, decocass, ROT270, "Data East Corporation", "Ocean to Ocean (Medal) (DECO Cassette MD) (No.10/Ver.6,US)", 0 ) /* lever, 1P/2P buttons used to switch player, cocktail mode not emulated */
+/* 11 */ GAME( 1981, clocknch,  decocass, clocknch, clocknch, decocass_state, decocass, ROT270, "Data East Corporation", "Lock'n'Chase (DECO Cassette) (US)", 0 )
+/* 12 */ GAME( 1981, cfboy0a1,  decocass, cfboy0a1, cfboy0a1, decocass_state, decocass, ROT270, "Data East Corporation", "Flash Boy (vertical) [DECO Cassette MD] (No.12/Ver.0/Set.1,Japan)", 0 )
+/* 13 */ GAME( 1981, cprogolf,  decocass, cprogolf, cprogolf, decocass_state, decocass, ROT270, "Data East Corporation", "Tournament Pro Golf (DECO Cassette) (US)", 0 )
+/*    */ GAME( 1981, cprogolfj, cprogolf, cprogolfj,cprogolf, decocass_state, decocass, ROT270, "Data East Corporation", "Tournament Pro Golf (DECO Cassette) (Japan)", 0 )
+/* 14 */ GAME( 1981, cdsteljn,  decocass, cdsteljn, cdsteljn, decocass_state, cdsteljn, ROT270, "Data East Corporation", "DS Telejan (DECO Cassette) (Japan)", 0 )
+/* 15 */ GAME( 1981, cluckypo,  decocass, cluckypo, decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Lucky Poker (DECO Cassette) (US)", 0 )
+/* 16 */ GAME( 1981, ctisland,  decocass, ctisland, decocass, decocass_state, decocrom, ROT270, "Data East Corporation", "Treasure Island (DECO Cassette) (US) (set 1)", 0 )
+/*    */ GAME( 1981, ctisland2, ctisland, ctisland, decocass, decocass_state, decocrom, ROT270, "Data East Corporation", "Treasure Island (DECO Cassette) (US) (set 2)", 0 )
+/*    */ GAME( 1981, ctisland3, ctisland, ctisland, decocass, decocass_state, decocrom, ROT270, "Data East Corporation", "Treasure Island (DECO Cassette) (unk)", MACHINE_NOT_WORKING ) /* Different Bitswap, region not verified */
 /* 17 */ // 1981.10 Bobbitto
-/* 18 */ GAME( 1982, cexplore,  decocass, cexplore, cexplore, decocass_state, decocass, ROT270, "Data East Corporation", "Explorer (DECO Cassette)", MACHINE_NOT_WORKING )
-/* 19 */ GAME( 1982, cdiscon1,  decocass, cdiscon1, decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Disco No.1 (DECO Cassette)", 0 )
-/*    */ GAME( 1982, csweetht,  cdiscon1, cdiscon1, decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Sweet Heart (DECO Cassette)", 0 )
-/* 20 */ GAME( 1982, ctornado,  decocass, ctornado, ctornado, decocass_state, decocass, ROT270, "Data East Corporation", "Tornado (DECO Cassette)", 0 )
-/* 21 */ GAME( 1982, cmissnx,   decocass, cmissnx,  cmissnx,  decocass_state, decocass, ROT270, "Data East Corporation", "Mission-X (DECO Cassette)", 0 )
-/* 22 */ GAME( 1982, cptennis,  decocass, cptennis, decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Pro Tennis (DECO Cassette)", 0 )
-/* 23 */ GAME( 1982, cprogolf18,cprogolf, cprogolfj,cprogolf, decocass_state, decocass, ROT270, "Data East Corporation", "18 Challenge Pro Golf (DECO Cassette, Japan)", 0 ) // 1982.?? 18 Hole Pro Golf
+/* 18 */ GAME( 1982, cexplore,  decocass, cexplore, cexplore, decocass_state, decocass, ROT270, "Data East Corporation", "Explorer (DECO Cassette) (US)", MACHINE_NOT_WORKING )
+/* 19 */ GAME( 1982, cdiscon1,  decocass, cdiscon1, decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Disco No.1 (DECO Cassette) (US)", 0 )
+/*    */ GAME( 1982, csweetht,  cdiscon1, cdiscon1, decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Sweet Heart (DECO Cassette) (US)", 0 )
+/* 20 */ GAME( 1982, ctornado,  decocass, ctornado, ctornado, decocass_state, decocass, ROT270, "Data East Corporation", "Tornado (DECO Cassette) (US)", 0 )
+/* 21 */ GAME( 1982, cmissnx,   decocass, cmissnx,  cmissnx,  decocass_state, decocass, ROT270, "Data East Corporation", "Mission-X (DECO Cassette) (US)", 0 )
+/* 22 */ GAME( 1982, cptennis,  decocass, cptennis, decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Pro Tennis (DECO Cassette) (US)", 0 )
+/* 23 */ GAME( 1982, cprogolf18,cprogolf, cprogolfj,cprogolf, decocass_state, decocass, ROT270, "Data East Corporation", "18 Challenge Pro Golf (DECO Cassette) (Japan)", 0 ) // 1982.?? 18 Hole Pro Golf
 /* 24 */ // 1982.07 Tsumego Kaisyou
-/* 25 */ GAME( 1982, cadanglr,  decocass, cfishing, cfishing, decocass_state, decocass, ROT270, "Data East Corporation", "Angler Dangler (DECO Cassette)", 0 )
-/* 25 */ GAME( 1982, cfishing,  cadanglr, cfishing, cfishing, decocass_state, decocass, ROT270, "Data East Corporation", "Fishing (DECO Cassette, Japan)", 0 )
-/* 26 */ GAME( 1983, cbtime,    decocass, cbtime,   cbtime,   decocass_state, decocass, ROT270, "Data East Corporation", "Burger Time (DECO Cassette)", 0 )
-/*    */ GAME( 1982, chamburger,cbtime,   cbtime,   cbtime,   decocass_state, decocass, ROT270, "Data East Corporation", "Hamburger (DECO Cassette, Japan)", 0 )
-/* 27 */ GAME( 1982, cburnrub,  decocass, cburnrub, decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Burnin' Rubber (DECO Cassette, set 1)", 0 )
-/*    */ GAME( 1982, cburnrub2, cburnrub, cburnrub, decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Burnin' Rubber (DECO Cassette, set 2)", 0 )
-/*    */ GAME( 1982, cbnj,      cburnrub, cburnrub, decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Bump 'n' Jump (DECO Cassette, Japan)", 0 )
-/* 28 */ GAME( 1983, cgraplop,  decocass, cgraplop, cgraplop, decocass_state, decocass, ROT270, "Data East Corporation", "Cluster Buster (DECO Cassette)", 0 )
-/*    */ GAME( 1983, cgraplop2, cgraplop, cgraplop2,cgraplop, decocass_state, decocass, ROT270, "Data East Corporation", "Graplop (no title screen) (DECO Cassette)", 0 ) // a version with title screen exists, see reference videos
-/* 29 */ GAME( 1983, clapapa,   decocass, clapapa,  decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Rootin' Tootin' / La-Pa-Pa (DECO Cassette)" , 0) /* Displays 'La-Pa-Pa during attract */
-/*    */ GAME( 1983, clapapa2,  clapapa,  clapapa,  decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Rootin' Tootin' (DECO Cassette)" , 0) /* Displays 'Rootin' Tootin' during attract */
-/* 30 */ GAME( 1983, cskater,   decocass, cskater,  cskater,  decocass_state, decocass, ROT270, "Data East Corporation", "Skater (DECO Cassette, Japan)", 0 )
-/* 31 */ GAME( 1983, cprobowl,  decocass, cprobowl, decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Pro Bowling (DECO Cassette)", 0 )
-/* 32 */ GAME( 1983, cnightst,  decocass, cnightst, cnightst, decocass_state, decocass, ROT270, "Data East Corporation", "Night Star (DECO Cassette, set 1)", 0 )
-/*    */ GAME( 1983, cnightst2, cnightst, cnightst, cnightst, decocass_state, decocass, ROT270, "Data East Corporation", "Night Star (DECO Cassette, set 2)", 0 )
-/* 33 */ GAME( 1983, cpsoccer,  decocass, cpsoccer, cpsoccer, decocass_state, decocass, ROT270, "Data East Corporation", "Pro Soccer (DECO Cassette)", 0 )
-/*    */ GAME( 1983, cpsoccerj, cpsoccer, cpsoccer, cpsoccer, decocass_state, decocass, ROT270, "Data East Corporation", "Pro Soccer (DECO Cassette, Japan)", 0 )
-/* 34 */ GAME( 1983, csdtenis,  decocass, csdtenis, csdtenis, decocass_state, decocass, ROT270, "Data East Corporation", "Super Doubles Tennis (DECO Cassette, Japan)", MACHINE_WRONG_COLORS )
-/* 35 */ GAME( 1985, cflyball,  decocass, cflyball, decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Flying Ball (DECO Cassette)", 0 )
+/* 25 */ GAME( 1982, cadanglr,  decocass, cfishing, cfishing, decocass_state, decocass, ROT270, "Data East Corporation", "Angler Dangler (DECO Cassette) (US)", 0 )
+/* 25 */ GAME( 1982, cfishing,  cadanglr, cfishing, cfishing, decocass_state, decocass, ROT270, "Data East Corporation", "Fishing (DECO Cassette) (Japan)", 0 )
+/* 26 */ GAME( 1983, cbtime,    decocass, cbtime,   cbtime,   decocass_state, decocass, ROT270, "Data East Corporation", "Burger Time (DECO Cassette) (US)", 0 )
+/*    */ GAME( 1982, chamburger,cbtime,   cbtime,   cbtime,   decocass_state, decocass, ROT270, "Data East Corporation", "Hamburger (DECO Cassette) (Japan)", 0 )
+/* 27 */ GAME( 1982, cburnrub,  decocass, cburnrub, decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Burnin' Rubber (DECO Cassette) (US) (set 1)", 0 )
+/*    */ GAME( 1982, cburnrub2, cburnrub, cburnrub, decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Burnin' Rubber (DECO Cassette) (US) (set 2)", 0 )
+/*    */ GAME( 1982, cbnj,      cburnrub, cburnrub, decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Bump 'n' Jump (DECO Cassette) (US)", 0 ) // was marked 'Japan' but uses the type B (US) bios
+/* 28 */ GAME( 1983, cgraplop,  decocass, cgraplop, cgraplop, decocass_state, decocass, ROT270, "Data East Corporation", "Cluster Buster (DECO Cassette) (US)", 0 )
+/*    */ GAME( 1983, cgraplop2, cgraplop, cgraplop2,cgraplop, decocass_state, decocass, ROT270, "Data East Corporation", "Graplop (no title screen) (DECO Cassette) (US)", 0 ) // a version with title screen exists, see reference videos
+/* 29 */ GAME( 1983, clapapa,   decocass, clapapa,  decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Rootin' Tootin' / La-Pa-Pa (DECO Cassette) (US)" , 0) /* Displays 'La-Pa-Pa during attract */
+/*    */ GAME( 1983, clapapa2,  clapapa,  clapapa,  decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Rootin' Tootin' (DECO Cassette) (US)" , 0) /* Displays 'Rootin' Tootin' during attract */
+/* 30 */ GAME( 1983, cskater,   decocass, cskater,  cskater,  decocass_state, decocass, ROT270, "Data East Corporation", "Skater (DECO Cassette) (Japan)", 0 )
+/* 31 */ GAME( 1983, cprobowl,  decocass, cprobowl, decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Pro Bowling (DECO Cassette) (US)", 0 )
+/* 32 */ GAME( 1983, cnightst,  decocass, cnightst, cnightst, decocass_state, decocass, ROT270, "Data East Corporation", "Night Star (DECO Cassette) (US) (set 1)", 0 )
+/*    */ GAME( 1983, cnightst2, cnightst, cnightst, cnightst, decocass_state, decocass, ROT270, "Data East Corporation", "Night Star (DECO Cassette) (US) (set 2)", 0 )
+/* 33 */ GAME( 1983, cpsoccer,  decocass, cpsoccer, cpsoccer, decocass_state, decocass, ROT270, "Data East Corporation", "Pro Soccer (DECO Cassette) (US)", 0 )
+/*    */ GAME( 1983, cpsoccerj, cpsoccer, cpsoccer, cpsoccer, decocass_state, decocass, ROT270, "Data East Corporation", "Pro Soccer (DECO Cassette) (Japan)", 0 )
+/* 34 */ GAME( 1983, csdtenis,  decocass, csdtenis, csdtenis, decocass_state, decocass, ROT270, "Data East Corporation", "Super Doubles Tennis (DECO Cassette) (Japan)", MACHINE_WRONG_COLORS )
+/* 35 */ GAME( 1985, cflyball,  decocass, cflyball, decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Flying Ball (DECO Cassette) (US)", 0 )
 /* 36 */ // 1984.04 Genesis/Boomer Rang'r
-/* 37 */ GAME( 1983, czeroize,  decocass, czeroize, decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Zeroize (DECO Cassette)", 0 )
-/* 38 */ GAME( 1984, cscrtry,   decocass, type4,    cscrtry,  decocass_state, decocass, ROT270, "Data East Corporation", "Scrum Try (DECO Cassette, set 1)", 0 )
-/*    */ GAME( 1984, cscrtry2,  cscrtry,  type4,    cscrtry,  decocass_state, decocass, ROT270, "Data East Corporation", "Scrum Try (DECO Cassette, set 2)", 0 )
-/* 39 */ GAME( 1984, cppicf,    decocass, cppicf,   decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Peter Pepper's Ice Cream Factory (DECO Cassette, set 1)", 0 )
-/*    */ GAME( 1984, cppicf2,   cppicf,   cppicf,   decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Peter Pepper's Ice Cream Factory (DECO Cassette, set 2)", 0 )
-/* 40 */ GAME( 1984, cfghtice,  decocass, cfghtice, cfghtice, decocass_state, decocass, ROT270, "Data East Corporation", "Fighting Ice Hockey (DECO Cassette)", 0 )
-/* 41 */ GAME( 1984, coozumou,  decocass, type4,    cscrtry,  decocass_state, decocass, ROT270, "Data East Corporation", "Oozumou - The Grand Sumo (DECO Cassette, Japan)", 0 )
+/* 37 */ GAME( 1983, czeroize,  decocass, czeroize, decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Zeroize (DECO Cassette) (US)", 0 )
+/* 38 */ GAME( 1984, cscrtry,   decocass, type4,    cscrtry,  decocass_state, decocass, ROT270, "Data East Corporation", "Scrum Try (DECO Cassette) (US) (set 1)", 0 )
+/*    */ GAME( 1984, cscrtry2,  cscrtry,  type4,    cscrtry,  decocass_state, decocass, ROT270, "Data East Corporation", "Scrum Try (DECO Cassette) (US) (set 2)", 0 )
+/* 39 */ GAME( 1984, cppicf,    decocass, cppicf,   decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Peter Pepper's Ice Cream Factory (DECO Cassette) (US) (set 1)", 0 )
+/*    */ GAME( 1984, cppicf2,   cppicf,   cppicf,   decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Peter Pepper's Ice Cream Factory (DECO Cassette) (US) (set 2)", 0 )
+/* 40 */ GAME( 1984, cfghtice,  decocass, cfghtice, cfghtice, decocass_state, decocass, ROT270, "Data East Corporation", "Fighting Ice Hockey (DECO Cassette) (US)", 0 )
+/* 41 */ GAME( 1984, coozumou,  decocass, type4,    cscrtry,  decocass_state, decocass, ROT270, "Data East Corporation", "Oozumou - The Grand Sumo (DECO Cassette) (Japan)", 0 )
 /* 42 */ // 1984.08 Hellow Gateball // not a typo, this is official spelling
 /* 43 */ // 1984.08 Yellow Cab
-/* 44 */ GAME( 1985, cbdash,    decocass, cbdash,   cbdash,   decocass_state, decocass, ROT270, "Data East Corporation", "Boulder Dash (DECO Cassette)", 0 )
+/* 44 */ GAME( 1985, cbdash,    decocass, cbdash,   cbdash,   decocass_state, decocass, ROT270, "Data East Corporation", "Boulder Dash (DECO Cassette) (US)", 0 )
 
 /* UX7 */ // 1984.12 Tokyo MIE Clinic/Tokyo MIE Shinryoujo
 /* UX8 */ // 1985.01 Tokyo MIE Clinic/Tokyo MIE Shinryoujo Part 2

@@ -1,8 +1,8 @@
 7-Zip method IDs for 7z and xz archives
 ---------------------------------------
 
-Version: 15.06
-Date: 2015-06-23
+Version: 16.03
+Date: 2016-09-27
 
 Each compression or crypto method in 7z is associated with unique binary value (ID).
 The length of ID in bytes is arbitrary but it can not exceed 63 bits (8 bytes).
@@ -122,7 +122,8 @@ List of defined IDs
    F7 - External codecs (that are not included to 7-Zip)
 
       0x xx - reserved
-      10 xx - reserved
+      10 xx - reserved (LZHAM)
+      11 xx - reserved (Zstd)
 
 
 06.. - Crypto 

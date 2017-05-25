@@ -8,10 +8,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_FRONTEND_UI_INIFILE_H
+#define MAME_FRONTEND_UI_INIFILE_H
 
-#ifndef __UI_INIFILE_H__
-#define __UI_INIFILE_H__
+#pragma once
 
 #include "../frontend/mame/ui/utils.h"
 
@@ -35,8 +35,8 @@ public:
 	std::string get_category() { return ini_index[c_file].second[c_cat].first; }
 	size_t total() { return ini_index.size(); }
 	size_t cat_total() { return ini_index[c_file].second.size(); }
-	UINT16 &cur_file() { return c_file; }
-	UINT16 &cur_cat() { return c_cat; }
+	uint16_t &cur_file() { return c_file; }
+	uint16_t &cur_cat() { return c_cat; }
 
 	// load games from category
 	void load_ini_category(std::vector<int> &temp_filter);
@@ -44,8 +44,8 @@ public:
 	// setters
 	void move_file(int d) { c_file += d; c_cat = 0; }
 	void move_cat(int d) { c_cat += d; }
-	void set_cat(int i) { c_cat = i; }
-	void set_file(int i) { c_file = i; }
+	void set_cat(uint16_t i) { c_cat = i; }
+	void set_file(uint16_t i) { c_file = i; }
 
 private:
 
@@ -53,7 +53,7 @@ private:
 	using categoryindex = std::vector<std::pair<std::string, long>>;
 
 	// files indices
-	static UINT16 c_file, c_cat;
+	static uint16_t c_file, c_cat;
 	std::vector<std::pair<std::string, categoryindex>> ini_index;
 
 	// init category index
@@ -83,8 +83,17 @@ public:
 	// construction/destruction
 	favorite_manager(running_machine &machine, ui_options &moptions);
 
+	// favorites comparator
+	struct ci_less
+	{
+		bool operator() (const std::string &s1, const std::string &s2) const
+		{
+			return (core_stricmp(s1.c_str(), s2.c_str()) < 0);
+		}
+	};
+
 	// favorite indices
-	std::vector<ui_software_info> m_list;
+	std::multimap<std::string, ui_software_info, ci_less> m_list;
 
 	// getters
 	running_machine &machine() const { return m_machine; }
@@ -97,7 +106,7 @@ public:
 	// check
 	bool isgame_favorite();
 	bool isgame_favorite(const game_driver *driver);
-	bool isgame_favorite(ui_software_info &swinfo);
+	bool isgame_favorite(ui_software_info const &swinfo);
 
 	// save
 	void save_favorite_games();
@@ -110,7 +119,7 @@ private:
 	const char *favorite_filename = "favorites.ini";
 
 	// current
-	int m_current;
+	std::multimap<std::string, ui_software_info>::iterator m_current;
 
 	// parse file ui_favorite
 	void parse_favorite();
@@ -120,4 +129,4 @@ private:
 	ui_options &m_options;
 };
 
-#endif  /* __UI_INIFILE_H__ */
+#endif  // MAME_FRONTEND_UI_INIFILE_H

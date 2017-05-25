@@ -5,16 +5,18 @@
 //#define USE_HD64x180          /* Define if CPU support is available */
 //#define TRUXTON2_STEREO       /* Uncomment to hear truxton2 music in stereo */
 
-// We encode priority with colour in the tilemaps, so need a larger palette
-#define T2PALETTE_LENGTH 0x10000
-
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"
 #include "machine/gen_latch.h"
 #include "machine/nmk112.h"
+#include "machine/ticket.h"
 #include "machine/upd4992.h"
 #include "video/gp9001.h"
 #include "sound/okim6295.h"
+#include "screen.h"
+
+// We encode priority with colour in the tilemaps, so need a larger palette
+#define T2PALETTE_LENGTH 0x10000
 
 class toaplan2_state : public driver_device
 {
@@ -47,16 +49,17 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
-		m_soundlatch2(*this, "soundlatch2") { }
+		m_soundlatch2(*this, "soundlatch2"),
+		m_hopper(*this, "hopper") { }
 
-	optional_shared_ptr<UINT8> m_shared_ram; // 8 bit RAM shared between 68K and sound CPU
-	optional_shared_ptr<UINT16> m_shared_ram16;     // Really 8 bit RAM connected to Z180
-	optional_shared_ptr<UINT16> m_paletteram;
-	optional_shared_ptr<UINT16> m_tx_videoram;
-	optional_shared_ptr<UINT16> m_tx_lineselect;
-	optional_shared_ptr<UINT16> m_tx_linescroll;
-	optional_shared_ptr<UINT16> m_tx_gfxram16;
-	optional_shared_ptr<UINT16> m_mainram16;
+	optional_shared_ptr<uint8_t> m_shared_ram; // 8 bit RAM shared between 68K and sound CPU
+	optional_shared_ptr<uint16_t> m_shared_ram16;     // Really 8 bit RAM connected to Z180
+	optional_shared_ptr<uint16_t> m_paletteram;
+	optional_shared_ptr<uint16_t> m_tx_videoram;
+	optional_shared_ptr<uint16_t> m_tx_lineselect;
+	optional_shared_ptr<uint16_t> m_tx_linescroll;
+	optional_shared_ptr<uint16_t> m_tx_gfxram16;
+	optional_shared_ptr<uint16_t> m_mainram16;
 
 	required_device<m68000_base_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
@@ -72,16 +75,19 @@ public:
 	required_device<palette_device> m_palette;
 	optional_device<generic_latch_8_device> m_soundlatch; // batrider and bgaregga and batsugun
 	optional_device<generic_latch_8_device> m_soundlatch2;
+	optional_device<ticket_dispenser_device> m_hopper;
 
-	UINT16 m_mcu_data;
-	INT8 m_old_p1_paddle_h; /* For Ghox */
-	INT8 m_old_p2_paddle_h;
-	UINT8 m_v25_reset_line; /* 0x20 for dogyuun/batsugun, 0x10 for vfive, 0x08 for fixeight */
-	UINT8 m_sndirq_line;        /* IRQ4 for batrider, IRQ2 for bbakraid */
-	UINT8 m_z80_busreq;
+	uint16_t m_mcu_data;
+	int8_t m_old_p1_paddle_h; /* For Ghox */
+	int8_t m_old_p2_paddle_h;
+	uint8_t m_v25_reset_line; /* 0x20 for dogyuun/batsugun, 0x10 for vfive, 0x08 for fixeight */
+	uint8_t m_sndirq_line;        /* IRQ4 for batrider, IRQ2 for bbakraid */
+	uint8_t m_z80_busreq;
 
 	bitmap_ind8 m_custom_priority_bitmap;
 	bitmap_ind16 m_secondary_render_bitmap;
+
+	emu_timer * m_raise_irq_timer;
 
 	tilemap_t *m_tx_tilemap;    /* Tilemap for extra-text-layer */
 	DECLARE_READ16_MEMBER(video_count_r);
@@ -126,6 +132,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(c2map_r);
 	DECLARE_WRITE16_MEMBER(oki_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(oki1_bankswitch_w);
+	DECLARE_WRITE16_MEMBER(enmadaio_oki_bank_w);
 	DECLARE_DRIVER_INIT(bbakraid);
 	DECLARE_DRIVER_INIT(pipibibsbl);
 	DECLARE_DRIVER_INIT(dogyuun);
@@ -134,8 +141,9 @@ public:
 	DECLARE_DRIVER_INIT(fixeightbl);
 	DECLARE_DRIVER_INIT(vfive);
 	DECLARE_DRIVER_INIT(batrider);
+	DECLARE_DRIVER_INIT(enmadaio);
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
-	DECLARE_MACHINE_START(toaplan2);
+	virtual void machine_start() override;
 	DECLARE_MACHINE_RESET(toaplan2);
 	DECLARE_VIDEO_START(toaplan2);
 	DECLARE_MACHINE_RESET(ghox);
@@ -144,12 +152,20 @@ public:
 	DECLARE_VIDEO_START(bgaregga);
 	DECLARE_VIDEO_START(bgareggabl);
 	DECLARE_VIDEO_START(batrider);
-	UINT32 screen_update_toaplan2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_dogyuun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_batsugun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_truxton2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_bootleg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_toaplan2(screen_device &screen, bool state);
+
+	// Teki Paki sound
+	uint8_t m_cmdavailable;
+
+	DECLARE_WRITE16_MEMBER(tekipaki_mcu_w);
+	DECLARE_READ8_MEMBER(tekipaki_soundlatch_r);
+	DECLARE_READ8_MEMBER(tekipaki_cmdavailable_r);
+
+	uint32_t screen_update_toaplan2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_dogyuun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_batsugun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_truxton2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_bootleg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_toaplan2);
 	INTERRUPT_GEN_MEMBER(toaplan2_vblank_irq1);
 	INTERRUPT_GEN_MEMBER(toaplan2_vblank_irq2);
 	INTERRUPT_GEN_MEMBER(toaplan2_vblank_irq4);
@@ -158,9 +174,8 @@ public:
 	void create_tx_tilemap(int dx = 0, int dx_flipped = 0);
 	void toaplan2_vblank_irq(int irq_line);
 
-	UINT8 m_pwrkick_hopper;
-	DECLARE_CUSTOM_INPUT_MEMBER(pwrkick_hopper_status_r);
 	DECLARE_WRITE8_MEMBER(pwrkick_coin_w);
+	DECLARE_WRITE8_MEMBER(pwrkick_coin_lockout_w);
 
 	DECLARE_WRITE_LINE_MEMBER(toaplan2_reset);
 protected:

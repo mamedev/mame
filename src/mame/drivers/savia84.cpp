@@ -49,10 +49,10 @@ public:
 	DECLARE_WRITE8_MEMBER(savia84_8255_porta_w);
 	DECLARE_WRITE8_MEMBER(savia84_8255_portb_w);
 	DECLARE_WRITE8_MEMBER(savia84_8255_portc_w);
-	UINT8 m_kbd;
-	UINT8 m_segment;
-	UINT8 m_digit;
-	UINT8 m_digit_last;
+	uint8_t m_kbd;
+	uint8_t m_segment;
+	uint8_t m_digit;
+	uint8_t m_digit_last;
 	virtual void machine_reset() override;
 };
 
@@ -168,7 +168,7 @@ READ8_MEMBER( savia84_state::savia84_8255_portc_r ) // IN FA - read keyboard
 		return 0xff;
 }
 
-static MACHINE_CONFIG_START( savia84, savia84_state )
+static MACHINE_CONFIG_START( savia84 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(savia84_mem)
@@ -197,5 +197,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY     FULLNAME       FLAGS */
-COMP( 1984, savia84,  0,       0,    savia84,   savia84, driver_device, 0,     "JT Hyan", "Savia 84", MACHINE_NO_SOUND_HW)
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    STATE          INIT  COMPANY    FULLNAME    FLAGS
+COMP( 1984, savia84, 0,      0,      savia84, savia84, savia84_state, 0,    "JT Hyan", "Savia 84", MACHINE_NO_SOUND_HW)

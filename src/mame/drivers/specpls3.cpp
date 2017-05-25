@@ -150,15 +150,13 @@ http://www.z88forever.org.uk/zxplus3e/
 #include "includes/spectrum.h"
 #include "includes/spec128.h"
 #include "includes/specpls3.h"
-#include "imagedev/snapquik.h"
-#include "imagedev/cassette.h"
-#include "sound/ay8910.h"
-#include "sound/speaker.h"
-#include "formats/tzx_cas.h"
 
-/* +3 hardware */
-#include "machine/ram.h"
+#include "sound/ay8910.h"
+
+#include "screen.h"
 #include "softlist.h"
+
+#include "formats/tzx_cas.h"
 
 /****************************************************************************************************/
 /* Spectrum + 3 specific functions */
@@ -201,7 +199,7 @@ READ8_MEMBER( spectrum_state::spectrum_plus3_port_2ffd_r )
 void spectrum_state::spectrum_plus3_update_memory()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	UINT8 *messram = m_ram->pointer();
+	uint8_t *messram = m_ram->pointer();
 
 	if (m_port_7ffd_data & 8)
 	{
@@ -324,7 +322,7 @@ ADDRESS_MAP_END
 
 MACHINE_RESET_MEMBER(spectrum_state,spectrum_plus3)
 {
-	UINT8 *messram = m_ram->pointer();
+	uint8_t *messram = m_ram->pointer();
 	memset(messram,0,128*1024);
 
 	MACHINE_RESET_CALL_MEMBER(spectrum);

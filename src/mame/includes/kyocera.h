@@ -1,29 +1,31 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
+#ifndef MAME_INCLUDES_KYOCERA_H
+#define MAME_INCLUDES_KYOCERA_H
+
 #pragma once
 
-#ifndef __KYOCERA__
-#define __KYOCERA__
 
-
-#include "bus/rs232/rs232.h"
 #include "cpu/i8085/i8085.h"
 #include "imagedev/cassette.h"
 #include "machine/buffer.h"
-#include "bus/centronics/ctronics.h"
 #include "machine/i8155.h"
 #include "machine/i8251.h"
 #include "machine/im6402.h"
 #include "machine/ram.h"
 #include "machine/rp5c01.h"
 #include "machine/upd1990a.h"
+#include "sound/spkrdev.h"
 #include "video/hd44102.h"
 #include "video/hd61830.h"
-#include "sound/speaker.h"
-#include "rendlay.h"
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "bus/centronics/ctronics.h"
+#include "bus/rs232/rs232.h"
+
+#include "rendlay.h"
+
 
 #define SCREEN_TAG      "screen"
 #define I8085_TAG       "m19"
@@ -55,38 +57,30 @@
 class kc85_state : public driver_device
 {
 public:
-	kc85_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, I8085_TAG),
-			m_rtc(*this, UPD1990A_TAG),
-			m_uart(*this, IM6402_TAG),
-			m_lcdc0(*this, HD44102_0_TAG),
-			m_lcdc1(*this, HD44102_1_TAG),
-			m_lcdc2(*this, HD44102_2_TAG),
-			m_lcdc3(*this, HD44102_3_TAG),
-			m_lcdc4(*this, HD44102_4_TAG),
-			m_lcdc5(*this, HD44102_5_TAG),
-			m_lcdc6(*this, HD44102_6_TAG),
-			m_lcdc7(*this, HD44102_7_TAG),
-			m_lcdc8(*this, HD44102_8_TAG),
-			m_lcdc9(*this, HD44102_9_TAG),
-			m_centronics(*this, CENTRONICS_TAG),
-			m_speaker(*this, "speaker"),
-			m_cassette(*this, "cassette"),
-			m_opt_cart(*this, "opt_cartslot"),
-			m_ram(*this, RAM_TAG),
-			m_rs232(*this, RS232_TAG),
-			m_rom(*this, I8085_TAG),
-			m_y0(*this, "Y0"),
-			m_y1(*this, "Y1"),
-			m_y2(*this, "Y2"),
-			m_y3(*this, "Y3"),
-			m_y4(*this, "Y4"),
-			m_y5(*this, "Y5"),
-			m_y6(*this, "Y6"),
-			m_y7(*this, "Y7"),
-			m_y8(*this, "Y8"),
-			m_battery(*this, "BATTERY")
+	kc85_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, I8085_TAG),
+		m_rtc(*this, UPD1990A_TAG),
+		m_uart(*this, IM6402_TAG),
+		m_lcdc0(*this, HD44102_0_TAG),
+		m_lcdc1(*this, HD44102_1_TAG),
+		m_lcdc2(*this, HD44102_2_TAG),
+		m_lcdc3(*this, HD44102_3_TAG),
+		m_lcdc4(*this, HD44102_4_TAG),
+		m_lcdc5(*this, HD44102_5_TAG),
+		m_lcdc6(*this, HD44102_6_TAG),
+		m_lcdc7(*this, HD44102_7_TAG),
+		m_lcdc8(*this, HD44102_8_TAG),
+		m_lcdc9(*this, HD44102_9_TAG),
+		m_centronics(*this, CENTRONICS_TAG),
+		m_speaker(*this, "speaker"),
+		m_cassette(*this, "cassette"),
+		m_opt_cart(*this, "opt_cartslot"),
+		m_ram(*this, RAM_TAG),
+		m_rs232(*this, RS232_TAG),
+		m_rom(*this, I8085_TAG),
+		m_y(*this, "Y%u", 0),
+		m_battery(*this, "BATTERY")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -109,21 +103,13 @@ public:
 	required_device<ram_device> m_ram;
 	required_device<rs232_port_device> m_rs232;
 	required_memory_region m_rom;
-	required_ioport m_y0;
-	required_ioport m_y1;
-	required_ioport m_y2;
-	required_ioport m_y3;
-	required_ioport m_y4;
-	required_ioport m_y5;
-	required_ioport m_y6;
-	required_ioport m_y7;
-	required_ioport m_y8;
+	required_ioport_array<9> m_y;
 	required_ioport m_battery;
 
 	virtual void machine_start() override;
 	memory_region *m_opt_region;
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER( uart_status_r );
 	DECLARE_WRITE8_MEMBER( uart_ctrl_w );
@@ -140,10 +126,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( write_centronics_select );
 
 	/* memory state */
-	UINT8 m_bank;           /* memory bank selection */
+	uint8_t m_bank;           /* memory bank selection */
 
 	/* keyboard state */
-	UINT16 m_keylatch;      /* keyboard latch */
+	uint16_t m_keylatch;      /* keyboard latch */
 
 	/* sound state */
 	int m_buzzer;               /* buzzer select */
@@ -186,11 +172,11 @@ public:
 	DECLARE_WRITE8_MEMBER( romam_w );
 	DECLARE_READ8_MEMBER( romrd_r );
 
-	void bankswitch(UINT8 data);
+	void bankswitch(uint8_t data);
 
 	// ROM cassette
 	int m_rom_sel;
-	UINT32 m_rom_addr;
+	uint32_t m_rom_addr;
 
 	/* peripheral state */
 	int m_iosel;                /* serial interface select */
@@ -199,28 +185,20 @@ public:
 class tandy200_state : public driver_device
 {
 public:
-	tandy200_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, I8085_TAG),
-			m_rtc(*this, RP5C01A_TAG),
-			m_lcdc(*this, HD61830_TAG),
-			m_centronics(*this, CENTRONICS_TAG),
-			m_cent_data_out(*this, "cent_data_out"),
-			m_speaker(*this, "speaker"),
-			m_cassette(*this, "cassette"),
-			m_opt_cart(*this, "opt_cartslot"),
-			m_ram(*this, RAM_TAG),
-			m_rs232(*this, RS232_TAG),
-			m_rom(*this, I8085_TAG),
-			m_y0(*this, "Y0"),
-			m_y1(*this, "Y1"),
-			m_y2(*this, "Y2"),
-			m_y3(*this, "Y3"),
-			m_y4(*this, "Y4"),
-			m_y5(*this, "Y5"),
-			m_y6(*this, "Y6"),
-			m_y7(*this, "Y7"),
-			m_y8(*this, "Y8")
+	tandy200_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, I8085_TAG),
+		m_rtc(*this, RP5C01A_TAG),
+		m_lcdc(*this, HD61830_TAG),
+		m_centronics(*this, CENTRONICS_TAG),
+		m_cent_data_out(*this, "cent_data_out"),
+		m_speaker(*this, "speaker"),
+		m_cassette(*this, "cassette"),
+		m_opt_cart(*this, "opt_cartslot"),
+		m_ram(*this, RAM_TAG),
+		m_rs232(*this, RS232_TAG),
+		m_rom(*this, I8085_TAG),
+		m_y(*this, "Y%u", 0)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -234,20 +212,12 @@ public:
 	required_device<ram_device> m_ram;
 	required_device<rs232_port_device> m_rs232;
 	required_memory_region m_rom;
-	required_ioport m_y0;
-	required_ioport m_y1;
-	required_ioport m_y2;
-	required_ioport m_y3;
-	required_ioport m_y4;
-	required_ioport m_y5;
-	required_ioport m_y6;
-	required_ioport m_y7;
-	required_ioport m_y8;
+	required_ioport_array<9> m_y;
 
 	virtual void machine_start() override;
 	memory_region *m_opt_region;
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER( bank_r );
 	DECLARE_WRITE8_MEMBER( bank_w );
@@ -266,13 +236,13 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(tandy200_tp_tick);
 
-	void bankswitch(UINT8 data);
+	void bankswitch(uint8_t data);
 
 	/* memory state */
-	UINT8 m_bank;           /* memory bank selection */
+	uint8_t m_bank;           /* memory bank selection */
 
 	/* keyboard state */
-	UINT16 m_keylatch;      /* keyboard latch */
+	uint16_t m_keylatch;      /* keyboard latch */
 	int m_tp;               /* timing pulse */
 
 	/* sound state */
@@ -288,4 +258,4 @@ public:
 MACHINE_CONFIG_EXTERN( kc85_video );
 MACHINE_CONFIG_EXTERN( tandy200_video );
 
-#endif
+#endif // MAME_INCLUDES_KYOCERA_H

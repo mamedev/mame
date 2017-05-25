@@ -23,6 +23,8 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
+#include "screen.h"
+#include "speaker.h"
 
 #define MAIN_CLOCK XTAL_24MHz
 
@@ -38,14 +40,14 @@ public:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<UINT8> m_ram;
+	required_shared_ptr<uint8_t> m_ram;
 	required_device<palette_device> m_palette;
 
 	// screen updates
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	// driver state
-	UINT8 m_control;
+	uint8_t m_control;
 
 	// member functions
 	DECLARE_WRITE8_MEMBER(control_w);
@@ -70,7 +72,7 @@ public:
 
 PALETTE_INIT_MEMBER(kontest_state, kontest)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int bit0, bit1, bit2 , r, g, b;
 	int i;
 
@@ -97,12 +99,12 @@ void kontest_state::video_start()
 {
 }
 
-UINT32 kontest_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
+uint32_t kontest_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
 {
 	int x,y;
 	int xi,yi;
-	UINT16 tile;
-	UINT8 attr;
+	uint16_t tile;
+	uint8_t attr;
 
 	for(y=0;y<32;y++)
 	{
@@ -117,8 +119,8 @@ UINT32 kontest_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap
 			{
 				for(xi=0;xi<8;xi++)
 				{
-					UINT8 color,pen[2];
-					UINT8 x_step;
+					uint8_t color,pen[2];
+					uint8_t x_step;
 					int res_x,res_y;
 
 					x_step = xi >> 2;
@@ -245,7 +247,7 @@ void kontest_state::machine_reset()
 	m_control = 0;
 }
 
-static MACHINE_CONFIG_START( kontest, kontest_state )
+static MACHINE_CONFIG_START( kontest )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,MAIN_CLOCK/8)
@@ -289,4 +291,4 @@ ROM_START( kontest )
 	ROM_LOAD( "800a02.4f",    0x000000, 0x000020, CRC(6d604171) SHA1(6b1366fb53cecbde6fb651142a77917dd16daf69) )
 ROM_END
 
-GAME( 1987?, kontest,  0,   kontest,  kontest, driver_device,  0,       ROT0, "Konami",      "Konami Test Board (GX800, Japan)", MACHINE_SUPPORTS_SAVE ) // late 1987 or early 1988
+GAME( 1987?, kontest,  0,   kontest,  kontest, kontest_state,  0,       ROT0, "Konami",      "Konami Test Board (GX800, Japan)", MACHINE_SUPPORTS_SAVE ) // late 1987 or early 1988

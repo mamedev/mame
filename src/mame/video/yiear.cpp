@@ -33,7 +33,7 @@
 
 PALETTE_INIT_MEMBER(yiear_state, yiear)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < palette.entries(); i++)
@@ -102,13 +102,13 @@ TILE_GET_INFO_MEMBER(yiear_state::get_bg_tile_info)
 
 void yiear_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(yiear_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(yiear_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 void yiear_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	UINT8 *spriteram = m_spriteram;
-	UINT8 *spriteram_2 = m_spriteram2;
+	uint8_t *spriteram = m_spriteram;
+	uint8_t *spriteram_2 = m_spriteram2;
 	int offs;
 
 	for (offs = m_spriteram.bytes() - 2; offs >= 0; offs -= 2)
@@ -140,7 +140,7 @@ void yiear_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect 
 	}
 }
 
-UINT32 yiear_state::screen_update_yiear(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t yiear_state::screen_update_yiear(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);

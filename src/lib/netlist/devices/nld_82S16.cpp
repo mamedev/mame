@@ -6,6 +6,7 @@
  */
 
 #include "nld_82S16.h"
+#include "../nl_base.h"
 
 namespace netlist
 {
@@ -37,7 +38,7 @@ namespace netlist
 		logic_input_t m_DIN;
 		logic_output_t m_DOUTQ;
 
-		state_var<uint_fast64_t[4]> m_ram; // 256 bits
+		state_var<uint64_t[4]> m_ram; // 256 bits
 	};
 
 	NETLIB_OBJECT_DERIVED(82S16_dip, 82S16)
@@ -68,33 +69,35 @@ namespace netlist
 	// FIXME: optimize device (separate address decoder!)
 	NETLIB_UPDATE(82S16)
 	{
-		if (INPLOGIC(m_CE1Q) || INPLOGIC(m_CE2Q) || INPLOGIC(m_CE3Q))
+		if (m_CE1Q() || m_CE2Q() || m_CE3Q())
 		{
 			// FIXME: Outputs are tristate. This needs to be properly implemented
-			OUTLOGIC(m_DOUTQ, 1, NLTIME_FROM_NS(20));
+			m_DOUTQ.push(1, NLTIME_FROM_NS(20));
 			//for (int i=0; i<8; i++)
 				//m_A[i].inactivate();
 		}
 		else
 		{
 			unsigned int adr = 0;
-			for (int i=0; i<8; i++)
+			for (std::size_t i=0; i<8; i++)
 			{
 				//m_A[i].activate();
-				adr |= (INPLOGIC(m_A[i]) << i);
+				adr |= (m_A[i]() << i);
 			}
 
-			if (!INPLOGIC(m_WEQ))
+			if (!m_WEQ())
 			{
-				m_ram[adr >> 6] = (m_ram[adr >> 6] & ~((uint_fast64_t) 1 << (adr & 0x3f))) | ((uint_fast64_t) INPLOGIC(m_DIN) << (adr & 0x3f));
+				m_ram[adr >> 6] = (m_ram[adr >> 6]
+						& ~(static_cast<uint64_t>(1) << (adr & 0x3f)))
+						| (static_cast<uint64_t>(m_DIN()) << (adr & 0x3f));
 			}
-			OUTLOGIC(m_DOUTQ, ((m_ram[adr >> 6] >> (adr & 0x3f)) & 1) ^ 1, NLTIME_FROM_NS(20));
+			m_DOUTQ.push(((m_ram[adr >> 6] >> (adr & 0x3f)) & 1) ^ 1, NLTIME_FROM_NS(20));
 		}
 	}
 
 	NETLIB_RESET(82S16)
 	{
-		for (int i=0; i<4; i++)
+		for (std::size_t i=0; i<4; i++)
 		{
 			m_ram[i] = 0;
 		}

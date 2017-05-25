@@ -12,10 +12,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_SOUND_OKIM9810_H
+#define MAME_SOUND_OKIM9810_H
 
-#ifndef __OKIM9810_H__
-#define __OKIM9810_H__
+#pragma once
 
 #include "okiadpcm.h"
 
@@ -23,29 +23,6 @@
 //**************************************************************************
 //  CONSTANTS
 //**************************************************************************
-
-enum
-{
-	OKIM9810_ADPCM_PLAYBACK = 0,
-	OKIM9810_ADPCM2_PLAYBACK = 1,
-	OKIM9810_STRAIGHT8_PLAYBACK = 2,
-	OKIM9810_NONLINEAR8_PLAYBACK = 3
-};
-
-enum
-{
-	OKIM9810_SECONDARY_FILTER = 0,
-	OKIM9810_PRIMARY_FILTER = 1,
-	OKIM9810_NO_FILTER = 2,
-	OKIM9810_NO_FILTER2 = 3
-};
-
-enum
-{
-	OKIM9810_OUTPUT_TO_DIRECT_DAC = 0,
-	OKIM9810_OUTPUT_TO_VOLTAGE_FOLLOWER = 1
-};
-
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
@@ -68,96 +45,114 @@ enum
 
 class okim9810_device : public device_t,
 						public device_sound_interface,
-						public device_memory_interface
+						public device_rom_interface
 {
 public:
 	// construction/destruction
-	okim9810_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	okim9810_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	UINT8 read_status();
-	void write_TMP_register(UINT8 command);
-	void write_command(UINT8 command);
+	uint8_t read_status();
+	void write_tmp_register(uint8_t command);
+	void write_command(uint8_t command);
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_WRITE8_MEMBER( write_TMP_register );
+	DECLARE_WRITE8_MEMBER( write_tmp_register );
 
 protected:
+	enum
+	{
+		ADPCM_PLAYBACK = 0,
+		ADPCM2_PLAYBACK = 1,
+		STRAIGHT8_PLAYBACK = 2,
+		NONLINEAR8_PLAYBACK = 3
+	};
+
+	enum
+	{
+		SECONDARY_FILTER = 0,
+		PRIMARY_FILTER = 1,
+		NO_FILTER = 2,
+		NO_FILTER2 = 3
+	};
+
+	enum
+	{
+		OUTPUT_TO_DIRECT_DAC = 0,
+		OUTPUT_TO_VOLTAGE_FOLLOWER = 1
+	};
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_post_load() override;
 	virtual void device_clock_changed() override;
 
-	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
-
 	// device_sound_interface overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+
+	// device_rom_interface overrides
+	virtual void rom_bank_updated() override;
 
 	// a single voice
 	class okim_voice
 	{
 	public:
 		okim_voice();
-		void generate_audio(direct_read_data &direct,
+		void generate_audio(device_rom_interface &rom,
 							stream_sample_t **buffers,
 							int samples,
-							const UINT8 global_volume,
-							const UINT32 clock,
-							const UINT8 filter_type);
+							const uint8_t global_volume,
+							const uint32_t clock,
+							const uint8_t filter_type);
 
 		// computes volume scale from 3 volume numbers
-		UINT8 volume_scale(const UINT8 global_volume,
-							const UINT8 channel_volume,
-							const UINT8 pan_volume) const;
+		uint8_t volume_scale(const uint8_t global_volume,
+							const uint8_t channel_volume,
+							const uint8_t pan_volume) const;
 
 		oki_adpcm_state m_adpcm;    // current ADPCM state
 		oki_adpcm2_state m_adpcm2;  // current ADPCM2 state
-		UINT8   m_playbackAlgo;     // current playback method
+		uint8_t   m_playbackAlgo;     // current playback method
 		bool    m_looping;
-		UINT8   m_startFlags;
-		UINT8   m_endFlags;
+		uint8_t   m_startFlags;
+		uint8_t   m_endFlags;
 		offs_t  m_base_offset;      // pointer to the base memory location
-		UINT32  m_count;            // total samples to play
-		UINT32  m_samplingFreq;     // voice sampling frequency
+		uint32_t  m_count;            // total samples to play
+		uint32_t  m_samplingFreq;     // voice sampling frequency
 
 		bool    m_playing;          // playback state
-		UINT32  m_sample;           // current sample number
+		uint32_t  m_sample;           // current sample number
 
-		UINT8   m_channel_volume;   // volume index set with the CVOL command
-		UINT8   m_pan_volume_left;  // volume index set with the PAN command
-		UINT8   m_pan_volume_right; // volume index set with the PAN command
+		uint8_t   m_channel_volume;   // volume index set with the CVOL command
+		uint8_t   m_pan_volume_left;  // volume index set with the PAN command
+		uint8_t   m_pan_volume_right; // volume index set with the PAN command
 
-		INT32   m_startSample;      // interpolation state - sample to interpolate from
-		INT32   m_endSample;        // interpolation state - sample to interpolate to
-		UINT32  m_interpSampleNum;  // interpolation state - fraction between start & end
+		int32_t   m_startSample;      // interpolation state - sample to interpolate from
+		int32_t   m_endSample;        // interpolation state - sample to interpolate to
+		uint32_t  m_interpSampleNum;  // interpolation state - fraction between start & end
 
-		static const UINT8 s_volume_table[16];
+		static const uint8_t s_volume_table[16];
 	};
 
 	// internal state
-	const address_space_config  m_space_config;
 
 	sound_stream* m_stream;
-	direct_read_data* m_direct;
 
-	UINT8 m_TMP_register;
+	uint8_t m_TMP_register;
 
-	UINT8 m_global_volume;      // volume index set with the OPT command
-	UINT8 m_filter_type;        // interpolation filter type set with the OPT command
-	UINT8 m_output_level;       // flag stating if a voltage follower is connected
+	uint8_t m_global_volume;      // volume index set with the OPT command
+	uint8_t m_filter_type;        // interpolation filter type set with the OPT command
+	uint8_t m_output_level;       // flag stating if a voltage follower is connected
 
-	static const int OKIM9810_VOICES = 8;
+	static constexpr int OKIM9810_VOICES = 8;
 	okim_voice m_voice[OKIM9810_VOICES];
 
-	static const UINT32 s_sampling_freq_table[16];
+	static const uint32_t s_sampling_freq_table[16];
 };
 
 
 // device type definition
-extern const device_type OKIM9810;
+DECLARE_DEVICE_TYPE(OKIM9810, okim9810_device)
 
-
-
-#endif // __OKIM9810_H__
+#endif // MAME_SOUND_OKIM9810_H

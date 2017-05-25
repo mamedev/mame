@@ -22,15 +22,18 @@
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m6800/m6800.h"
 #include "machine/6522via.h"
+#include "machine/6850acia.h"
 #include "machine/i8279.h"
+#include "machine/wd_fdc.h"
 #include "video/ef9364.h"
 #include "video/mc6845.h"
-#include "machine/6850acia.h"
-#include "machine/wd_fdc.h"
 
+#include "screen.h"
 #include "softlist.h"
+
 
 #define MAIN_CLOCK           XTAL_4MHz
 #define VIDEO_CLOCK          MAIN_CLOCK / 8     /* 1.75 Mhz */
@@ -72,12 +75,12 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	UINT8 m_row_kbd1;
-	UINT8 m_row_kbd2;
+	uint8_t m_row_kbd1;
+	uint8_t m_row_kbd2;
 	int old_state_ca2;
-	UINT8 via_video_pbb_data;
-	UINT8 cnttim;
-	UINT8 valkeyb;
+	uint8_t via_video_pbb_data;
+	uint8_t cnttim;
+	uint8_t valkeyb;
 	TIMER_DEVICE_CALLBACK_MEMBER(goupil_scanline);
 
 private:
@@ -87,7 +90,7 @@ private:
 	required_device<via6522_device> m_via_video;
 	required_device<via6522_device> m_via_keyb;
 	required_device<via6522_device> m_via_modem;
-	required_device<fd1791_t> m_fdc;
+	required_device<fd1791_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	floppy_image_device *m_floppy;
@@ -104,7 +107,7 @@ private:
 
 TIMER_DEVICE_CALLBACK_MEMBER( goupil_g1_state::goupil_scanline )
 {
-	m_ef9364->update_scanline((UINT16)param);
+	m_ef9364->update_scanline((uint16_t)param);
 }
 
 static ADDRESS_MAP_START(goupil_mem, AS_PROGRAM, 8, goupil_g1_state)
@@ -117,17 +120,14 @@ static ADDRESS_MAP_START(goupil_mem, AS_PROGRAM, 8, goupil_g1_state)
 	AM_RANGE(0xE800,0xE80F) AM_DEVREADWRITE("ef6850", acia6850_device, data_r, data_w)
 	AM_RANGE(0xE810,0xE81F) AM_DEVREADWRITE("m_via_video", via6522_device, read, write)
 
-	AM_RANGE(0xE820,0xE820) AM_DEVREADWRITE("i8279_kb1", i8279_device, data_r, data_w )
-	AM_RANGE(0xE821,0xE821) AM_DEVREADWRITE("i8279_kb1", i8279_device, status_r, cmd_w )
-
-	AM_RANGE(0xE830,0xE830) AM_DEVREADWRITE("i8279_kb2", i8279_device, data_r, data_w )
-	AM_RANGE(0xE831,0xE831) AM_DEVREADWRITE("i8279_kb2", i8279_device, status_r, cmd_w )
+	AM_RANGE(0xe820, 0xe821) AM_DEVREADWRITE("i8279_kb1", i8279_device, read, write)
+	AM_RANGE(0xe830, 0xe831) AM_DEVREADWRITE("i8279_kb2", i8279_device, read, write)
 
 	AM_RANGE(0xE840,0xE84F) AM_DEVREADWRITE("m_via_keyb", via6522_device, read, write)
 
 	AM_RANGE(0xE860,0xE86F) AM_DEVREADWRITE("m_via_modem", via6522_device, read, write)
 
-	AM_RANGE(0xe8f0,0xe8ff) AM_DEVREADWRITE("fd1791", fd1791_t, read, write)
+	AM_RANGE(0xe8f0,0xe8ff) AM_DEVREADWRITE("fd1791", fd1791_device, read, write)
 	//AM_RANGE(0xf08a,0xf08a) AM_READWRITE( fdc_sel0_r, fdc_sel0_w )
 	//AM_RANGE(0xf08b,0xf08b) AM_READWRITE( fdc_sel1_r, fdc_sel1_w )
 
@@ -193,7 +193,7 @@ READ8_MEMBER( goupil_g1_state::shift_kb2_r )
 READ8_MEMBER( goupil_g1_state::kbd1_r )
 {
 	char kbdrow[6];
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	kbdrow[0] = 'A';
 	kbdrow[1] = 'X';
@@ -218,7 +218,7 @@ READ_LINE_MEMBER( goupil_g1_state::via_keyb_ca2_r )
 READ8_MEMBER( goupil_g1_state::kbd2_r )
 {
 	char kbdrow[6];
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	kbdrow[0] = 'B';
 	kbdrow[1] = 'X';
@@ -424,7 +424,7 @@ WRITE_LINE_MEMBER( goupil_g1_state::via_video_ca2_w )
 	old_state_ca2 = state;
 }
 
-static MACHINE_CONFIG_START( goupil_g1, goupil_g1_state )
+static MACHINE_CONFIG_START( goupil_g1 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M6808, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(goupil_mem)
@@ -455,10 +455,10 @@ static MACHINE_CONFIG_START( goupil_g1, goupil_g1_state )
 	MCFG_VIA6522_CA2_HANDLER(WRITELINE(goupil_g1_state, via_video_ca2_w))
 
 	MCFG_DEVICE_ADD("m_via_keyb", VIA6522, 0)
-	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("maincpu", m6808_cpu_device, irq_line))
+	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M6808_IRQ_LINE))
 
 	MCFG_DEVICE_ADD("m_via_modem", VIA6522, 0)
-	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("maincpu", m6808_cpu_device, irq_line))
+	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M6808_IRQ_LINE))
 
 	/* Floppy */
 	MCFG_FD1791_ADD("fd1791", XTAL_8MHz )
@@ -507,5 +507,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR   NAME   PARENT  COMPAT   MACHINE    INPUT  CLASS           INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1979, goupilg1,   0,   0,      goupil_g1,  goupil_g1,driver_device,   0,     "SMT", "Goupil G1",    MACHINE_IS_SKELETON )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE    INPUT      CLASS            INIT  COMPANY  FULLNAME       FLAGS
+COMP( 1979, goupilg1, 0,      0,      goupil_g1, goupil_g1, goupil_g1_state, 0,    "SMT",   "Goupil G1",   MACHINE_IS_SKELETON )

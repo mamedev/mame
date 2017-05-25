@@ -33,7 +33,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
-	required_device<dac_device> m_dac;
+	required_device<dac_byte_interface> m_dac;
 	required_device<generic_slot_device> m_cart;
 	required_memory_bank m_bank1;
 	required_ioport m_joy;
@@ -43,7 +43,7 @@ public:
 	virtual void machine_reset() override;
 
 	virtual void video_start() override;
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void update_dac();
 	void vh_write(int data);
@@ -55,7 +55,7 @@ public:
 	DECLARE_READ8_MEMBER( controller_r );
 	DECLARE_WRITE8_MEMBER( bankswitch_w );
 	DECLARE_WRITE8_MEMBER( av_control_w );
-	DECLARE_READ8_MEMBER( vsync_r );
+	DECLARE_READ_LINE_MEMBER( vsync_r );
 	DECLARE_READ8_MEMBER( sound_cmd_r );
 	DECLARE_WRITE8_MEMBER( sound_g_w );
 	DECLARE_WRITE8_MEMBER( sound_d_w );
@@ -65,7 +65,7 @@ public:
 	int m_ea_bank;
 
 	/* external RAM state */
-	dynamic_buffer m_ext_ram;
+	std::vector<uint8_t> m_ext_ram;
 	int m_rambank;
 
 	/* video state */
@@ -74,8 +74,8 @@ public:
 	int m_video_enable;
 	int m_video_bank;
 	int m_video_hpos;
-	UINT8 m_led_latch[8];
-	dynamic_buffer m_display;
+	uint8_t m_led_latch[8];
+	std::vector<uint8_t> m_display;
 
 	/* sound state */
 	int m_sound_cmd;

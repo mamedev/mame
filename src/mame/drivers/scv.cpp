@@ -11,7 +11,9 @@
 #include "sound/upd1771.h"
 #include "bus/scv/slot.h"
 #include "bus/scv/rom.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 
 class scv_state : public driver_device
@@ -23,7 +25,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_upd1771c(*this, "upd1771c"),
 		m_cart(*this, "cartslot"),
-		m_pa(*this, "PA"),
+		m_pa(*this, "PA.%u", 0),
 		m_pc0(*this, "PC0"),
 		m_charrom(*this, "charrom") { }
 
@@ -32,14 +34,14 @@ public:
 	DECLARE_READ8_MEMBER(portc_r);
 	DECLARE_WRITE8_MEMBER(portc_w);
 	DECLARE_WRITE_LINE_MEMBER(upd1771_ack_w);
-	required_shared_ptr<UINT8> m_videoram;
-	UINT8 m_porta;
-	UINT8 m_portc;
+	required_shared_ptr<uint8_t> m_videoram;
+	uint8_t m_porta;
+	uint8_t m_portc;
 	emu_timer *m_vb_timer;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(scv);
-	UINT32 screen_update_scv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_scv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
 	enum
@@ -57,11 +59,11 @@ protected:
 	ioport_port *m_key[8];
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	inline void plot_sprite_part( bitmap_ind16 &bitmap, UINT8 x, UINT8 y, UINT8 pat, UINT8 col, UINT8 screen_sprite_start_line );
-	inline void draw_sprite( bitmap_ind16 &bitmap, UINT8 x, UINT8 y, UINT8 tile_idx, UINT8 col, UINT8 left, UINT8 right, UINT8 top, UINT8 bottom, UINT8 clip_y, UINT8 screen_sprite_start_line );
-	inline void draw_text( bitmap_ind16 &bitmap, UINT8 x, UINT8 y, UINT8 *char_data, UINT8 fg, UINT8 bg );
-	inline void draw_semi_graph( bitmap_ind16 &bitmap, UINT8 x, UINT8 y, UINT8 data, UINT8 fg );
-	inline void draw_block_graph( bitmap_ind16 &bitmap, UINT8 x, UINT8 y, UINT8 col );
+	inline void plot_sprite_part( bitmap_ind16 &bitmap, uint8_t x, uint8_t y, uint8_t pat, uint8_t col, uint8_t screen_sprite_start_line );
+	inline void draw_sprite( bitmap_ind16 &bitmap, uint8_t x, uint8_t y, uint8_t tile_idx, uint8_t col, uint8_t left, uint8_t right, uint8_t top, uint8_t bottom, uint8_t clip_y, uint8_t screen_sprite_start_line );
+	inline void draw_text( bitmap_ind16 &bitmap, uint8_t x, uint8_t y, uint8_t *char_data, uint8_t fg, uint8_t bg );
+	inline void draw_semi_graph( bitmap_ind16 &bitmap, uint8_t x, uint8_t y, uint8_t data, uint8_t fg );
+	inline void draw_block_graph( bitmap_ind16 &bitmap, uint8_t x, uint8_t y, uint8_t col );
 };
 
 
@@ -73,13 +75,6 @@ static ADDRESS_MAP_START( scv_mem, AS_PROGRAM, 8, scv_state )
 
 	AM_RANGE( 0x8000, 0xff7f ) AM_DEVREADWRITE("cartslot", scv_cart_slot_device, read_cart, write_cart) // cartridge
 	AM_RANGE( 0xff80, 0xffff ) AM_RAM   // upd7801 internal RAM
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( scv_io, AS_IO, 8, scv_state )
-	AM_RANGE( 0x00, 0x00 ) AM_WRITE(porta_w)
-	AM_RANGE( 0x01, 0x01 ) AM_READ(portb_r)
-	AM_RANGE( 0x02, 0x02 ) AM_READWRITE(portc_r, portc_w)
 ADDRESS_MAP_END
 
 
@@ -177,7 +172,7 @@ WRITE8_MEMBER( scv_state::porta_w )
 
 READ8_MEMBER( scv_state::portb_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	for (int i = 0; i < 8; i++)
 	{
@@ -191,7 +186,7 @@ READ8_MEMBER( scv_state::portb_r )
 
 READ8_MEMBER( scv_state::portc_r )
 {
-	UINT8 data = m_portc;
+	uint8_t data = m_portc;
 
 	data = (data & 0xfe) | (m_pc0->read() & 0x01);
 
@@ -283,12 +278,12 @@ void scv_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 			break;
 
 		default:
-			assert_always(FALSE, "Unknown id in scv_state::device_timer");
+			assert_always(false, "Unknown id in scv_state::device_timer");
 	}
 }
 
 
-inline void scv_state::plot_sprite_part( bitmap_ind16 &bitmap, UINT8 x, UINT8 y, UINT8 pat, UINT8 col, UINT8 screen_sprite_start_line )
+inline void scv_state::plot_sprite_part( bitmap_ind16 &bitmap, uint8_t x, uint8_t y, uint8_t pat, uint8_t col, uint8_t screen_sprite_start_line )
 {
 	if ( x < 4 )
 	{
@@ -319,17 +314,17 @@ inline void scv_state::plot_sprite_part( bitmap_ind16 &bitmap, UINT8 x, UINT8 y,
 }
 
 
-inline void scv_state::draw_sprite( bitmap_ind16 &bitmap, UINT8 x, UINT8 y, UINT8 tile_idx, UINT8 col, UINT8 left, UINT8 right, UINT8 top, UINT8 bottom, UINT8 clip_y, UINT8 screen_sprite_start_line )
+inline void scv_state::draw_sprite( bitmap_ind16 &bitmap, uint8_t x, uint8_t y, uint8_t tile_idx, uint8_t col, uint8_t left, uint8_t right, uint8_t top, uint8_t bottom, uint8_t clip_y, uint8_t screen_sprite_start_line )
 {
 	int j;
 
 	y += clip_y * 2;
 	for ( j = clip_y * 4; j < 32; j += 4 )
 	{
-		UINT8 pat0 = m_videoram[ tile_idx * 32 + j + 0 ];
-		UINT8 pat1 = m_videoram[ tile_idx * 32 + j + 1 ];
-		UINT8 pat2 = m_videoram[ tile_idx * 32 + j + 2 ];
-		UINT8 pat3 = m_videoram[ tile_idx * 32 + j + 3 ];
+		uint8_t pat0 = m_videoram[ tile_idx * 32 + j + 0 ];
+		uint8_t pat1 = m_videoram[ tile_idx * 32 + j + 1 ];
+		uint8_t pat2 = m_videoram[ tile_idx * 32 + j + 2 ];
+		uint8_t pat3 = m_videoram[ tile_idx * 32 + j + 3 ];
 
 		if ( ( top && j < 16 ) || ( bottom && j >= 16 ) )
 		{
@@ -361,13 +356,13 @@ inline void scv_state::draw_sprite( bitmap_ind16 &bitmap, UINT8 x, UINT8 y, UINT
 }
 
 
-inline void scv_state::draw_text( bitmap_ind16 &bitmap, UINT8 x, UINT8 y, UINT8 *char_data, UINT8 fg, UINT8 bg )
+inline void scv_state::draw_text( bitmap_ind16 &bitmap, uint8_t x, uint8_t y, uint8_t *char_data, uint8_t fg, uint8_t bg )
 {
 	int i;
 
 	for ( i = 0; i < 8; i++ )
 	{
-		UINT8 d = char_data[i];
+		uint8_t d = char_data[i];
 
 		bitmap.pix16(y + i, x + 0 ) = ( d & 0x80 ) ? fg : bg;
 		bitmap.pix16(y + i, x + 1 ) = ( d & 0x40 ) ? fg : bg;
@@ -394,7 +389,7 @@ inline void scv_state::draw_text( bitmap_ind16 &bitmap, UINT8 x, UINT8 y, UINT8 
 }
 
 
-inline void scv_state::draw_semi_graph( bitmap_ind16 &bitmap, UINT8 x, UINT8 y, UINT8 data, UINT8 fg )
+inline void scv_state::draw_semi_graph( bitmap_ind16 &bitmap, uint8_t x, uint8_t y, uint8_t data, uint8_t fg )
 {
 	int i;
 
@@ -411,7 +406,7 @@ inline void scv_state::draw_semi_graph( bitmap_ind16 &bitmap, UINT8 x, UINT8 y, 
 }
 
 
-inline void scv_state::draw_block_graph( bitmap_ind16 &bitmap, UINT8 x, UINT8 y, UINT8 col )
+inline void scv_state::draw_block_graph( bitmap_ind16 &bitmap, uint8_t x, uint8_t y, uint8_t col )
 {
 	int i;
 
@@ -429,13 +424,13 @@ inline void scv_state::draw_block_graph( bitmap_ind16 &bitmap, UINT8 x, UINT8 y,
 }
 
 
-UINT32 scv_state::screen_update_scv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t scv_state::screen_update_scv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x, y;
-	UINT8 fg = m_videoram[0x1403] >> 4;
-	UINT8 bg = m_videoram[0x1403] & 0x0f;
-	UINT8 gr_fg = m_videoram[0x1401] >> 4;
-	UINT8 gr_bg = m_videoram[0x1401] & 0x0f;
+	uint8_t fg = m_videoram[0x1403] >> 4;
+	uint8_t bg = m_videoram[0x1403] & 0x0f;
+	uint8_t gr_fg = m_videoram[0x1401] >> 4;
+	uint8_t gr_bg = m_videoram[0x1401] & 0x0f;
 	int clip_x = ( m_videoram[0x1402] & 0x0f ) * 2;
 	int clip_y = m_videoram[0x1402] >> 4;
 
@@ -459,7 +454,7 @@ UINT32 scv_state::screen_update_scv(screen_device &screen, bitmap_ind16 &bitmap,
 		for ( x = 0; x < 32; x++ )
 		{
 			int text_x = 0;
-			UINT8 d = m_videoram[ 0x1000 + y * 32 + x ];
+			uint8_t d = m_videoram[ 0x1000 + y * 32 + x ];
 
 			if ( x < clip_x )
 			{
@@ -473,7 +468,7 @@ UINT32 scv_state::screen_update_scv(screen_device &screen, bitmap_ind16 &bitmap,
 			if ( text_x && text_y )
 			{
 				/* Text mode */
-				UINT8 *char_data = m_charrom->base() + ( d & 0x7f ) * 8;
+				uint8_t *char_data = m_charrom->base() + ( d & 0x7f ) * 8;
 				draw_text( bitmap, x * 8, y * 16, char_data, fg, bg );
 			}
 			else
@@ -506,23 +501,23 @@ UINT32 scv_state::screen_update_scv(screen_device &screen, bitmap_ind16 &bitmap,
 	/* Draw sprites if enabled */
 	if ( m_videoram[0x1400] & 0x10 )
 	{
-		UINT8 screen_start_sprite_line = ( ( ( m_videoram[0x1400] & 0xf7 ) == 0x17 ) && ( ( m_videoram[0x1402] & 0xef ) == 0x4f ) ) ? 21 + 32 : 0 ;
+		uint8_t screen_start_sprite_line = ( ( ( m_videoram[0x1400] & 0xf7 ) == 0x17 ) && ( ( m_videoram[0x1402] & 0xef ) == 0x4f ) ) ? 21 + 32 : 0 ;
 		int i;
 
 		for ( i = 0; i < 128; i++ )
 		{
-			UINT8 spr_y = m_videoram[ 0x1200 + i * 4 ] & 0xfe;
-			UINT8 y_32 = m_videoram[ 0x1200 + i * 4 ] & 0x01;       /* Xx32 sprite */
-			UINT8 clip = m_videoram[ 0x1201 + i * 4 ] >> 4;
-			UINT8 col = m_videoram[ 0x1201 + i * 4 ] & 0x0f;
-			UINT8 spr_x = m_videoram[ 0x1202 + i * 4 ] & 0xfe;
-			UINT8 x_32 = m_videoram[ 0x1202 + i * 4 ] & 0x01;       /* 32xX sprite */
-			UINT8 tile_idx = m_videoram[ 0x1203 + i * 4 ] & 0x7f;
-			UINT8 half = m_videoram[ 0x1203 + i * 4] & 0x80;
-			UINT8 left = 1;
-			UINT8 right = 1;
-			UINT8 top = 1;
-			UINT8 bottom = 1;
+			uint8_t spr_y = m_videoram[ 0x1200 + i * 4 ] & 0xfe;
+			uint8_t y_32 = m_videoram[ 0x1200 + i * 4 ] & 0x01;       /* Xx32 sprite */
+			uint8_t clip = m_videoram[ 0x1201 + i * 4 ] >> 4;
+			uint8_t col = m_videoram[ 0x1201 + i * 4 ] & 0x0f;
+			uint8_t spr_x = m_videoram[ 0x1202 + i * 4 ] & 0xfe;
+			uint8_t x_32 = m_videoram[ 0x1202 + i * 4 ] & 0x01;       /* 32xX sprite */
+			uint8_t tile_idx = m_videoram[ 0x1203 + i * 4 ] & 0x7f;
+			uint8_t half = m_videoram[ 0x1203 + i * 4] & 0x80;
+			uint8_t left = 1;
+			uint8_t right = 1;
+			uint8_t top = 1;
+			uint8_t bottom = 1;
 
 			if ( !col )
 			{
@@ -572,8 +567,8 @@ UINT32 scv_state::screen_update_scv(screen_device &screen, bitmap_ind16 &bitmap,
 				draw_sprite( bitmap, spr_x, spr_y, tile_idx, col, left, right, top, bottom, clip, screen_start_sprite_line );
 				if ( x_32 || y_32 )
 				{
-					static const UINT8 spr_2col_lut0[16] = { 0, 15, 12, 13, 10, 11,  8, 9, 6, 7,  4,  5, 2, 3,  1,  1 };
-					static const UINT8 spr_2col_lut1[16] = { 0,  1,  8, 11,  2,  3, 10, 9, 4, 5, 12, 13, 6, 7, 14, 15 };
+					static const uint8_t spr_2col_lut0[16] = { 0, 15, 12, 13, 10, 11,  8, 9, 6, 7,  4,  5, 2, 3,  1,  1 };
+					static const uint8_t spr_2col_lut1[16] = { 0,  1,  8, 11,  2,  3, 10, 9, 4, 5, 12, 13, 6, 7, 14, 15 };
 
 					draw_sprite( bitmap, spr_x, spr_y, tile_idx ^ ( 8 * x_32 + y_32 ), ( i & 0x40 ) ? spr_2col_lut1[col] : spr_2col_lut0[col], left, right, top, bottom, clip, screen_start_sprite_line );
 				}
@@ -656,11 +651,14 @@ static SLOT_INTERFACE_START(scv_cart)
 	SLOT_INTERFACE_INTERNAL("rom128k_ram", SCV_ROM128K_RAM4K)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( scv, scv_state )
+static MACHINE_CONFIG_START( scv )
 
 	MCFG_CPU_ADD( "maincpu", UPD7801, XTAL_4MHz )
 	MCFG_CPU_PROGRAM_MAP( scv_mem )
-	MCFG_CPU_IO_MAP( scv_io )
+	MCFG_UPD7810_PORTA_WRITE_CB(WRITE8(scv_state, porta_w))
+	MCFG_UPD7810_PORTB_READ_CB(READ8(scv_state, portb_r))
+	MCFG_UPD7810_PORTC_READ_CB(READ8(scv_state, portc_r))
+	MCFG_UPD7810_PORTC_WRITE_CB(WRITE8(scv_state, portc_w))
 
 	/* Video chip is EPOCH TV-1 */
 	MCFG_SCREEN_ADD( "screen", RASTER )
@@ -714,6 +712,6 @@ ROM_START( scv_pal )
 ROM_END
 
 
-/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  INIT    COMPANY  FULLNAME                 FLAGS */
-CONS( 1984, scv,     0,      0,      scv,     scv, driver_device,   0,      "Epoch", "Super Cassette Vision", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-CONS( 198?, scv_pal, scv,    0,      scv_pal, scv, driver_device,   0,      "Yeno",  "Super Cassette Vision (PAL)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  STATE      INIT    COMPANY  FULLNAME                       FLAGS */
+CONS( 1984, scv,     0,      0,      scv,     scv,   scv_state, 0,      "Epoch", "Super Cassette Vision",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+CONS( 198?, scv_pal, scv,    0,      scv_pal, scv,   scv_state, 0,      "Yeno",  "Super Cassette Vision (PAL)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

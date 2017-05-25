@@ -36,7 +36,7 @@
 
     Todo:
 
-        FLIPX support in taitoic.c is not quite correct - the Taito logo is wrong,
+        FLIPX support in the video chips is not quite correct - the Taito logo is wrong,
         and the floor in the Doom levels has horizontal scrolling where it shouldn't.
 
         No networked machine support
@@ -44,11 +44,13 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "audio/taito_en.h"
+#include "includes/gunbustr.h"
+
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"
 #include "sound/es5506.h"
-#include "audio/taito_en.h"
-#include "includes/gunbustr.h"
+#include "screen.h"
 
 
 /*********************************************************************/
@@ -61,13 +63,13 @@ void gunbustr_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		m_maincpu->set_input_line(5, HOLD_LINE);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in gunbustr_state::device_timer");
+		assert_always(false, "Unknown id in gunbustr_state::device_timer");
 	}
 }
 
 INTERRUPT_GEN_MEMBER(gunbustr_state::gunbustr_interrupt)
 {
-	timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(200000-500), TIMER_GUNBUSTR_INTERRUPT5);
+	m_interrupt5_timer->adjust(m_maincpu->cycles_to_attotime(200000-500));
 	device.execute().set_input_line(4, HOLD_LINE);
 }
 
@@ -138,7 +140,7 @@ READ32_MEMBER(gunbustr_state::gunbustr_gun_r)
 WRITE32_MEMBER(gunbustr_state::gunbustr_gun_w)
 {
 	/* 10000 cycle delay is arbitrary */
-	timer_set(downcast<cpu_device *>(&space.device())->cycles_to_attotime(10000), TIMER_GUNBUSTR_INTERRUPT5);
+	m_interrupt5_timer->adjust(m_maincpu->cycles_to_attotime(10000));
 }
 
 
@@ -274,7 +276,7 @@ GFXDECODE_END
                  MACHINE DRIVERS
 ***********************************************************/
 
-static MACHINE_CONFIG_START( gunbustr, gunbustr_state )
+static MACHINE_CONFIG_START( gunbustr )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, XTAL_16MHz)
@@ -426,6 +428,8 @@ DRIVER_INIT_MEMBER(gunbustr_state,gunbustr)
 {
 	/* Speedup handler */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x203acc, 0x203acf, read32_delegate(FUNC(gunbustr_state::main_cycle_r),this));
+
+	m_interrupt5_timer = timer_alloc(TIMER_GUNBUSTR_INTERRUPT5);
 }
 
 DRIVER_INIT_MEMBER(gunbustr_state,gunbustrj)
@@ -436,6 +440,6 @@ DRIVER_INIT_MEMBER(gunbustr_state,gunbustrj)
 	m_coin_lockout = false;
 }
 
-GAME( 1992, gunbustr,  0,        gunbustr, gunbustr, gunbustr_state, gunbustr, ORIENTATION_FLIP_X, "Taito Corporation Japan", "Gunbuster (World)", 0 )
-GAME( 1992, gunbustru, gunbustr, gunbustr, gunbustr, gunbustr_state, gunbustr, ORIENTATION_FLIP_X, "Taito America Corporation", "Gunbuster (US)", 0 )
-GAME( 1992, gunbustrj, gunbustr, gunbustr, gunbustr, gunbustr_state, gunbustrj,ORIENTATION_FLIP_X, "Taito Corporation", "Gunbuster (Japan)", 0 )
+GAME( 1992, gunbustr,  0,        gunbustr, gunbustr, gunbustr_state, gunbustr, ORIENTATION_FLIP_X, "Taito Corporation Japan",   "Gunbuster (World)", 0 )
+GAME( 1992, gunbustru, gunbustr, gunbustr, gunbustr, gunbustr_state, gunbustr, ORIENTATION_FLIP_X, "Taito America Corporation", "Gunbuster (US)",    0 )
+GAME( 1992, gunbustrj, gunbustr, gunbustr, gunbustr, gunbustr_state, gunbustrj,ORIENTATION_FLIP_X, "Taito Corporation",         "Gunbuster (Japan)", 0 )

@@ -8,7 +8,8 @@
 #ifndef NLID_CMOS_H_
 #define NLID_CMOS_H_
 
-#include "nl_base.h"
+#include "../nl_setup.h"
+#include "../nl_base.h"
 
 namespace netlist
 {
@@ -26,8 +27,8 @@ namespace netlist
 		NETLIB_RESETI() {}
 
 	public:
-		inline nl_double vdd() { return INPANALOG(m_vdd); }
-		inline nl_double vss() { return INPANALOG(m_vss); }
+		nl_double vdd() { return m_vdd(); }
+		nl_double vss() { return m_vss(); }
 
 		analog_input_t m_vdd;
 		analog_input_t m_vss;

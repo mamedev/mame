@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "ramcard.h"
 
 
@@ -14,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type BW2_RAMCARD = &device_creator<bw2_ramcard_device>;
+DEFINE_DEVICE_TYPE(BW2_RAMCARD, bw2_ramcard_device, "bw2_ramcard", "Bondwell 2 RAMCARD")
 
 
 //-------------------------------------------------
@@ -31,7 +32,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *bw2_ramcard_device::device_rom_region() const
+const tiny_rom_entry *bw2_ramcard_device::device_rom_region() const
 {
 	return ROM_NAME( bw2_ramcard );
 }
@@ -46,8 +47,8 @@ const rom_entry *bw2_ramcard_device::device_rom_region() const
 //  bw2_ramcard_device - constructor
 //-------------------------------------------------
 
-bw2_ramcard_device::bw2_ramcard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, BW2_RAMCARD, "RAMCARD", tag, owner, clock, "bw2_ramcard", __FILE__),
+bw2_ramcard_device::bw2_ramcard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, BW2_RAMCARD, tag, owner, clock),
 		device_bw2_expansion_slot_interface(mconfig, *this),
 		m_rom(*this, "ramcard"),
 		m_ram(*this, "ram"),
@@ -87,7 +88,7 @@ void bw2_ramcard_device::device_reset()
 //  bw2_cd_r - cartridge data read
 //-------------------------------------------------
 
-UINT8 bw2_ramcard_device::bw2_cd_r(address_space &space, offs_t offset, UINT8 data, int ram2, int ram3, int ram4, int ram5, int ram6)
+uint8_t bw2_ramcard_device::bw2_cd_r(address_space &space, offs_t offset, uint8_t data, int ram2, int ram3, int ram4, int ram5, int ram6)
 {
 	if (!ram2)
 	{
@@ -106,7 +107,7 @@ UINT8 bw2_ramcard_device::bw2_cd_r(address_space &space, offs_t offset, UINT8 da
 //  bw2_cd_r - cartridge data write
 //-------------------------------------------------
 
-void bw2_ramcard_device::bw2_cd_w(address_space &space, offs_t offset, UINT8 data, int ram2, int ram3, int ram4, int ram5, int ram6)
+void bw2_ramcard_device::bw2_cd_w(address_space &space, offs_t offset, uint8_t data, int ram2, int ram3, int ram4, int ram5, int ram6)
 {
 	if (m_en && !ram5)
 	{
@@ -119,7 +120,7 @@ void bw2_ramcard_device::bw2_cd_w(address_space &space, offs_t offset, UINT8 dat
 //  bw2_slot_w - slot write
 //-------------------------------------------------
 
-void bw2_ramcard_device::bw2_slot_w(address_space &space, offs_t offset, UINT8 data)
+void bw2_ramcard_device::bw2_slot_w(address_space &space, offs_t offset, uint8_t data)
 {
 	m_en = 1;
 	m_bank = data & 0x0f;

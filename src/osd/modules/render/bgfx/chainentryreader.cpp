@@ -50,7 +50,7 @@ bgfx_chain_entry* chain_entry_reader::read_from_value(const Value& value, std::s
 	if (value.HasMember("input"))
 	{
 		const Value& input_array = value["input"];
-		for (UINT32 i = 0; i < input_array.Size(); i++)
+		for (uint32_t i = 0; i < input_array.Size(); i++)
 		{
 			const Value& input = input_array[i];
 			if (!READER_CHECK(input.HasMember("sampler"), (prefix + "input[" + std::to_string(i) + ": Must have string value 'sampler' (what sampler are we binding to?)\n").c_str())) return nullptr;
@@ -182,7 +182,7 @@ bgfx_chain_entry* chain_entry_reader::read_from_value(const Value& value, std::s
 	if (value.HasMember("uniforms"))
 	{
 		const Value& uniform_array = value["uniforms"];
-		for (UINT32 i = 0; i < uniform_array.Size(); i++)
+		for (uint32_t i = 0; i < uniform_array.Size(); i++)
 		{
 			bgfx_entry_uniform* uniform = entry_uniform_reader::read_from_value(uniform_array[i], prefix + "uniforms[" + std::to_string(i) + "]: ", effect, sliders, params);
 			if (uniform == nullptr)
@@ -198,7 +198,7 @@ bgfx_chain_entry* chain_entry_reader::read_from_value(const Value& value, std::s
 	if (value.HasMember("disablewhen"))
 	{
 		const Value& suppressor_array = value["disablewhen"];
-		for (UINT32 i = 0; i < suppressor_array.Size(); i++)
+		for (uint32_t i = 0; i < suppressor_array.Size(); i++)
 		{
 			bgfx_suppressor* suppressor = suppressor_reader::read_from_value(suppressor_array[i], prefix, sliders);
 			if (suppressor == nullptr)

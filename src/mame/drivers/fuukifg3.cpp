@@ -157,10 +157,12 @@ FG-3J ROM-J 507KA0301P04       Rev:1.3
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/fuukifg3.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/ymf278b.h"
-#include "includes/fuukifg3.h"
+#include "speaker.h"
 
 
 /***************************************************************************
@@ -175,7 +177,7 @@ FG-3J ROM-J 507KA0301P04       Rev:1.3
 READ32_MEMBER(fuuki32_state::snd_020_r)
 {
 	machine().scheduler().synchronize();
-	UINT32 retdata = m_shared_ram[offset * 2] << 16 | m_shared_ram[(offset * 2) + 1];
+	uint32_t retdata = m_shared_ram[offset * 2] << 16 | m_shared_ram[(offset * 2) + 1];
 	return retdata;
 }
 
@@ -243,7 +245,7 @@ WRITE8_MEMBER(fuuki32_state::sound_bw_w)
 
 READ8_MEMBER(fuuki32_state::snd_z80_r)
 {
-	UINT8 retdata = m_shared_ram[offset];
+	uint8_t retdata = m_shared_ram[offset];
 	return retdata;
 }
 
@@ -514,14 +516,14 @@ void fuuki32_state::device_timer(emu_timer &timer, device_timer_id id, int param
 		m_raster_interrupt_timer->adjust(m_screen->frame_period());
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in fuuki32_state::device_timer");
+		assert_always(false, "Unknown id in fuuki32_state::device_timer");
 	}
 }
 
 
 void fuuki32_state::machine_start()
 {
-	UINT8 *ROM = memregion("soundcpu")->base();
+	uint8_t *ROM = memregion("soundcpu")->base();
 
 	membank("bank1")->configure_entries(0, 0x10, &ROM[0x10000], 0x8000);
 
@@ -544,7 +546,7 @@ void fuuki32_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START(fuuki32, fuuki32_state)
+static MACHINE_CONFIG_START(fuuki32)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, CPU_CLOCK) /* 20MHz verified */
@@ -560,7 +562,7 @@ static MACHINE_CONFIG_START(fuuki32, fuuki32_state)
 	MCFG_SCREEN_SIZE(64 * 8, 32 * 8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40 * 8 - 1, 0, 30 * 8 - 1)
 	MCFG_SCREEN_UPDATE_DRIVER(fuuki32_state, screen_update)
-	MCFG_SCREEN_VBLANK_DRIVER(fuuki32_state, screen_eof)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(fuuki32_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fuuki32)
@@ -723,7 +725,7 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1998, asurabld,   0, fuuki32, asurabld, driver_device, 0, ROT0, "Fuuki", "Asura Blade - Sword of Dynasty (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, asurabld,   0,        fuuki32, asurabld, fuuki32_state, 0, ROT0, "Fuuki", "Asura Blade - Sword of Dynasty (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 2000, asurabus,   0,        fuuki32, asurabus, driver_device, 0, ROT0, "Fuuki", "Asura Buster - Eternal Warriors (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2000, asurabusa,  asurabus, fuuki32, asurabusa,driver_device, 0, ROT0, "Fuuki", "Asura Buster - Eternal Warriors (Japan) (ARCADIA review build)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // has pause function on P1 button 4
+GAME( 2000, asurabus,   0,        fuuki32, asurabus, fuuki32_state, 0, ROT0, "Fuuki", "Asura Buster - Eternal Warriors (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2000, asurabusa,  asurabus, fuuki32, asurabusa,fuuki32_state, 0, ROT0, "Fuuki", "Asura Buster - Eternal Warriors (Japan) (ARCADIA review build)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // has pause function on P1 button 4

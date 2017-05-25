@@ -8,8 +8,10 @@
 
 *********************************************************************/
 
-#ifndef __A2BUS_MIDI__
-#define __A2BUS_MIDI__
+#ifndef MAME_BUS_A2BUS_A2MIDI_H
+#define MAME_BUS_A2BUS_A2MIDI_H
+
+#pragma once
 
 #include "a2bus.h"
 #include "machine/6840ptm.h"
@@ -25,8 +27,7 @@ class a2bus_midi_device:
 {
 public:
 	// construction/destruction
-	a2bus_midi_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	a2bus_midi_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	a2bus_midi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -36,11 +37,13 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( write_acia_clock );
 
 protected:
+	a2bus_midi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual UINT8 read_c0nx(address_space &space, UINT8 offset) override;
-	virtual void write_c0nx(address_space &space, UINT8 offset, UINT8 data) override;
+	virtual uint8_t read_c0nx(address_space &space, uint8_t offset) override;
+	virtual void write_c0nx(address_space &space, uint8_t offset, uint8_t data) override;
 
 	required_device<ptm6840_device> m_ptm;
 	required_device<acia6850_device> m_acia;
@@ -50,6 +53,6 @@ private:
 };
 
 // device type definition
-extern const device_type A2BUS_MIDI;
+DECLARE_DEVICE_TYPE(A2BUS_MIDI, a2bus_midi_device)
 
-#endif  /* __A2BUS_MIDI__ */
+#endif // MAME_BUS_A2BUS_A2MIDI_H

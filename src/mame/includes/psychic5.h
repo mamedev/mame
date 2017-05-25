@@ -31,22 +31,22 @@ public:
 	optional_device<address_map_bank_device> m_vrambank;
 	optional_device<jaleco_blend_device> m_blend;
 
-	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_fg_videoram;
-	required_shared_ptr<UINT8> m_bg_videoram;
-	required_shared_ptr<UINT8> m_bg_control;
-	required_shared_ptr<UINT8> m_ps5_palette_ram_bg;
-	required_shared_ptr<UINT8> m_ps5_palette_ram_sp;
-	required_shared_ptr<UINT8> m_ps5_palette_ram_tx;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_fg_videoram;
+	required_shared_ptr<uint8_t> m_bg_videoram;
+	required_shared_ptr<uint8_t> m_bg_control;
+	required_shared_ptr<uint8_t> m_ps5_palette_ram_bg;
+	required_shared_ptr<uint8_t> m_ps5_palette_ram_sp;
+	required_shared_ptr<uint8_t> m_ps5_palette_ram_tx;
 
-	UINT8 m_bank_latch;
-	UINT8 m_ps5_vram_page;
-	UINT8 m_bg_clip_mode;
-	UINT8 m_title_screen;
+	uint8_t m_bank_latch;
+	uint8_t m_ps5_vram_page;
+	uint8_t m_bg_clip_mode;
+	uint8_t m_title_screen;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
-	UINT16 m_palette_intensity;
-	UINT8 m_bombsa_unknown;
+	uint16_t m_palette_intensity;
+	uint8_t m_bombsa_unknown;
 	int m_sx1;
 	int m_sy1;
 	int m_sy2;
@@ -83,9 +83,9 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 
-	UINT32 screen_update_psychic5(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_bombsa(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void change_palette(int offset, UINT8* palram, int palbase);
+	uint32_t screen_update_psychic5(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_bombsa(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void change_palette(int offset, uint8_t* palram, int palbase);
 	void change_bg_palette(int color, int lo_offs, int hi_offs);
 	void set_background_palette_intensity();
 	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);

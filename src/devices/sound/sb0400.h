@@ -2,8 +2,8 @@
 // copyright-holders:Olivier Galibert
 // Creative labs SB0400 Audigy2 Value
 
-#ifndef SB0400_H
-#define SB0400_H
+#ifndef MAME_SOUND_SB0400_H
+#define MAME_SOUND_SB0400_H
 
 #include "machine/pci.h"
 
@@ -12,7 +12,7 @@
 
 class sb0400_device : public pci_device {
 public:
-	sb0400_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sb0400_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual void device_start() override;
@@ -22,6 +22,6 @@ private:
 	DECLARE_ADDRESS_MAP(map, 32);
 };
 
-extern const device_type SB0400;
+DECLARE_DEVICE_TYPE(SB0400, sb0400_device)
 
-#endif
+#endif // MAME_SOUND_SB0400_H

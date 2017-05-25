@@ -31,7 +31,7 @@ namespace ui {
 //  ctor
 //-------------------------------------------------
 
-menu_file_manager::menu_file_manager(mame_ui_manager &mui, render_container *container, const char *warnings) : menu(mui, container), selected_device(nullptr)
+menu_file_manager::menu_file_manager(mame_ui_manager &mui, render_container &container, const char *warnings) : menu(mui, container), selected_device(nullptr)
 {
 	// This warning string is used when accessing from the force_file_manager call, i.e.
 	// when the file manager is loaded top front in the case of mandatory image devices
@@ -40,7 +40,7 @@ menu_file_manager::menu_file_manager(mame_ui_manager &mui, render_container *con
 	else
 		m_warnings.clear();
 
-	m_curr_selected = FALSE;
+	m_curr_selected = false;
 }
 
 
@@ -78,10 +78,10 @@ void menu_file_manager::fill_image_line(device_image_interface *img, std::string
 		filename.assign(img->basename());
 
 		// if the image has been loaded through softlist, also show the loaded part
-		if (img->part_entry() != nullptr)
+		if (img->loaded_through_softlist())
 		{
 			const software_part *tmp = img->part_entry();
-			if (tmp->name() != nullptr)
+			if (!tmp->name().empty())
 			{
 				filename.append(" (");
 				filename.append(tmp->name());
@@ -103,7 +103,7 @@ void menu_file_manager::fill_image_line(device_image_interface *img, std::string
 //  populate
 //-------------------------------------------------
 
-void menu_file_manager::populate()
+void menu_file_manager::populate(float &customtop, float &custombottom)
 {
 	std::string tmp_inst, tmp_name;
 	bool first_entry = true;
@@ -170,7 +170,7 @@ void menu_file_manager::handle()
 	const event *event = process(0);
 	if (event != nullptr && event->itemref != nullptr && event->iptkey == IPT_UI_SELECT)
 	{
-		if ((FPTR)event->itemref == 1)
+		if ((uintptr_t)event->itemref == 1)
 		{
 			if (m_curr_selected)
 				machine().schedule_hard_reset();
@@ -180,15 +180,15 @@ void menu_file_manager::handle()
 			selected_device = (device_image_interface *) event->itemref;
 			if (selected_device != nullptr)
 			{
-				m_curr_selected = TRUE;
+				m_curr_selected = true;
 				floppy_image_device *floppy_device = dynamic_cast<floppy_image_device *>(selected_device);
 				if (floppy_device != nullptr)
 				{
-					menu::stack_push<menu_control_floppy_image>(ui(), container, floppy_device);
+					menu::stack_push<menu_control_floppy_image>(ui(), container(), *floppy_device);
 				}
 				else
 				{
-					menu::stack_push<menu_control_device_image>(ui(), container, selected_device);
+					menu::stack_push<menu_control_device_image>(ui(), container(), *selected_device);
 				}
 				// reset the existing menu
 				reset(reset_options::REMEMBER_POSITION);
@@ -198,7 +198,7 @@ void menu_file_manager::handle()
 }
 
 // force file manager menu
-void menu_file_manager::force_file_manager(mame_ui_manager &mui, render_container *container, const char *warnings)
+void menu_file_manager::force_file_manager(mame_ui_manager &mui, render_container &container, const char *warnings)
 {
 	// reset the menu stack
 	menu::stack_reset(mui.machine());

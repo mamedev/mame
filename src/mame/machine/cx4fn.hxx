@@ -11,7 +11,7 @@
 ***************************************************************************/
 
 #include <math.h>
-#define CX4_Tan(a) (CX4_CosTable[a] ? ((((INT32)CX4_SinTable[a]) << 16) / CX4_CosTable[a]) : 0x80000000)
+#define CX4_Tan(a) (CX4_CosTable[a] ? ((((int32_t)CX4_SinTable[a]) << 16) / CX4_CosTable[a]) : 0x80000000)
 #define CX4_sar(b, n) ((b) >> (n))
 #ifdef PI
 #undef PI
@@ -41,8 +41,8 @@ static void CX4_C4TransfWireFrame(void)
 	cx4.c4y    = cx4.c4x2 * sin(cx4.tanval) + cx4.c4y2 * cos(cx4.tanval);
 
 	//Scale
-	cx4.C4WFXVal = (INT16)(cx4.c4x * cx4.C4WFScale / (0x90 * (cx4.c4z + 0x95)) * 0x95);
-	cx4.C4WFYVal = (INT16)(cx4.c4y * cx4.C4WFScale / (0x90 * (cx4.c4z + 0x95)) * 0x95);
+	cx4.C4WFXVal = (int16_t)(cx4.c4x * cx4.C4WFScale / (0x90 * (cx4.c4z + 0x95)) * 0x95);
+	cx4.C4WFYVal = (int16_t)(cx4.c4y * cx4.C4WFScale / (0x90 * (cx4.c4z + 0x95)) * 0x95);
 }
 
 static void CX4_C4CalcWireFrame(void)
@@ -90,18 +90,18 @@ static void CX4_C4TransfWireFrame2(void)
 	cx4.c4y    = cx4.c4x2 * sin(cx4.tanval) + cx4.c4y2 * cos(cx4.tanval);
 
 	//Scale
-	cx4.C4WFXVal = (INT16)(cx4.c4x * cx4.C4WFScale / 0x100);
-	cx4.C4WFYVal = (INT16)(cx4.c4y * cx4.C4WFScale / 0x100);
+	cx4.C4WFXVal = (int16_t)(cx4.c4x * cx4.C4WFScale / 0x100);
+	cx4.C4WFYVal = (int16_t)(cx4.c4y * cx4.C4WFScale / 0x100);
 }
 
 static void CX4_C4DrawWireFrame(running_machine &machine)
 {
-	UINT32 line = CX4_readl(0x1f80);
-	UINT32 point1, point2;
-	INT16 X1, Y1, Z1;
-	INT16 X2, Y2, Z2;
-	UINT8 Color;
-	INT32 i;
+	uint32_t line = CX4_readl(0x1f80);
+	uint32_t point1, point2;
+	int16_t X1, Y1, Z1;
+	int16_t X2, Y2, Z2;
+	uint8_t Color;
+	int32_t i;
 
 	address_space &space = machine.device<cpu_device>("maincpu")->space(AS_PROGRAM);
 	for(i = cx4.ram[0x0295]; i > 0; i--, line += 5)
@@ -109,7 +109,7 @@ static void CX4_C4DrawWireFrame(running_machine &machine)
 		if(space.read_byte(line) == 0xff &&
 			space.read_byte(line + 1) == 0xff)
 		{
-			INT32 tmp = line - 5;
+			int32_t tmp = line - 5;
 			while(space.read_byte(tmp + 2) == 0xff &&
 					space.read_byte(tmp + 3) == 0xff &&
 					(tmp + 2) >= 0)
@@ -147,13 +147,13 @@ static void CX4_C4DrawWireFrame(running_machine &machine)
 	}
 }
 
-static void CX4_C4DrawLine(INT32 X1, INT32 Y1, INT16 Z1, INT32 X2, INT32 Y2, INT16 Z2, UINT8 Color)
+static void CX4_C4DrawLine(int32_t X1, int32_t Y1, int16_t Z1, int32_t X2, int32_t Y2, int16_t Z2, uint8_t Color)
 {
-	INT32 i;
+	int32_t i;
 
 	//Transform coordinates
-	cx4.C4WFXVal  = (INT16)X1;
-	cx4.C4WFYVal  = (INT16)Y1;
+	cx4.C4WFXVal  = (int16_t)X1;
+	cx4.C4WFYVal  = (int16_t)Y1;
 	cx4.C4WFZVal  = Z1;
 	cx4.C4WFScale = CX4_read(0x1f90);
 	cx4.C4WFX2Val = CX4_read(0x1f86);
@@ -163,29 +163,29 @@ static void CX4_C4DrawLine(INT32 X1, INT32 Y1, INT16 Z1, INT32 X2, INT32 Y2, INT
 	X1 = (cx4.C4WFXVal + 48) << 8;
 	Y1 = (cx4.C4WFYVal + 48) << 8;
 
-	cx4.C4WFXVal = (INT16)X2;
-	cx4.C4WFYVal = (INT16)Y2;
+	cx4.C4WFXVal = (int16_t)X2;
+	cx4.C4WFYVal = (int16_t)Y2;
 	cx4.C4WFZVal = Z2;
 	CX4_C4TransfWireFrame2();
 	X2 = (cx4.C4WFXVal + 48) << 8;
 	Y2 = (cx4.C4WFYVal + 48) << 8;
 
 	//Get line info
-	cx4.C4WFXVal  = (INT16)(X1 >> 8);
-	cx4.C4WFYVal  = (INT16)(Y1 >> 8);
-	cx4.C4WFX2Val = (INT16)(X2 >> 8);
-	cx4.C4WFY2Val = (INT16)(Y2 >> 8);
+	cx4.C4WFXVal  = (int16_t)(X1 >> 8);
+	cx4.C4WFYVal  = (int16_t)(Y1 >> 8);
+	cx4.C4WFX2Val = (int16_t)(X2 >> 8);
+	cx4.C4WFY2Val = (int16_t)(Y2 >> 8);
 	CX4_C4CalcWireFrame();
-	X2 = (INT16)cx4.C4WFXVal;
-	Y2 = (INT16)cx4.C4WFYVal;
+	X2 = (int16_t)cx4.C4WFXVal;
+	Y2 = (int16_t)cx4.C4WFYVal;
 
 	//Render line
 	for(i = cx4.C4WFDist ? cx4.C4WFDist : 1; i > 0; i--)
 	{
 		if(X1 > 0xff && Y1 > 0xff && X1 < 0x6000 && Y1 < 0x6000)
 		{
-			UINT16 addr = (((Y1 >> 8) >> 3) << 8) - (((Y1 >> 8) >> 3) << 6) + (((X1 >> 8) >> 3) << 4) + ((Y1 >> 8) & 7) * 2;
-			UINT8 bit = 0x80 >> ((X1 >> 8) & 7);
+			uint16_t addr = (((Y1 >> 8) >> 3) << 8) - (((Y1 >> 8) >> 3) << 6) + (((X1 >> 8) >> 3) << 4) + ((Y1 >> 8) & 7) * 2;
+			uint8_t bit = 0x80 >> ((X1 >> 8) & 7);
 			cx4.ram[addr + 0x300] &= ~bit;
 			cx4.ram[addr + 0x301] &= ~bit;
 			if(Color & 1)
@@ -204,25 +204,25 @@ static void CX4_C4DrawLine(INT32 X1, INT32 Y1, INT16 Z1, INT32 X2, INT32 Y2, INT
 
 static void CX4_C4DoScaleRotate(int row_padding)
 {
-	INT16 A, B, C, D;
-	INT32 x, y;
+	int16_t A, B, C, D;
+	int32_t x, y;
 
 	//Calculate Pixel Resolution
-	UINT8 w = CX4_read(0x1f89) & ~7;
-	UINT8 h = CX4_read(0x1f8c) & ~7;
+	uint8_t w = CX4_read(0x1f89) & ~7;
+	uint8_t h = CX4_read(0x1f8c) & ~7;
 
-	INT32 Cx = (INT16)CX4_readw(0x1f83);
-	INT32 Cy = (INT16)CX4_readw(0x1f86);
+	int32_t Cx = (int16_t)CX4_readw(0x1f83);
+	int32_t Cy = (int16_t)CX4_readw(0x1f86);
 
-	INT32 LineX, LineY;
-	UINT32 X, Y;
-	UINT8 byte;
-	INT32 outidx = 0;
-	UINT8 bit    = 0x80;
+	int32_t LineX, LineY;
+	uint32_t X, Y;
+	uint8_t byte;
+	int32_t outidx = 0;
+	uint8_t bit    = 0x80;
 
 	//Calculate matrix
-	INT32 XScale = CX4_readw(0x1f8f);
-	INT32 YScale = CX4_readw(0x1f92);
+	int32_t XScale = CX4_readw(0x1f8f);
+	int32_t YScale = CX4_readw(0x1f92);
 
 	if(XScale & 0x8000)
 	{
@@ -235,38 +235,38 @@ static void CX4_C4DoScaleRotate(int row_padding)
 
 	if(CX4_readw(0x1f80) == 0)
 	{ //no rotation
-		A = (INT16)XScale;
+		A = (int16_t)XScale;
 		B = 0;
 		C = 0;
-		D = (INT16)YScale;
+		D = (int16_t)YScale;
 	}
 	else if(CX4_readw(0x1f80) == 128)
 	{ //90 degree rotation
 		A = 0;
-		B = (INT16)(-YScale);
-		C = (INT16)XScale;
+		B = (int16_t)(-YScale);
+		C = (int16_t)XScale;
 		D = 0;
 	}
 	else if(CX4_readw(0x1f80) == 256)
 	{ //180 degree rotation
-		A = (INT16)(-XScale);
+		A = (int16_t)(-XScale);
 		B = 0;
 		C = 0;
-		D = (INT16)(-YScale);
+		D = (int16_t)(-YScale);
 	}
 	else if(CX4_readw(0x1f80) == 384)
 	{ //270 degree rotation
 		A = 0;
-		B = (INT16)YScale;
-		C = (INT16)(-XScale);
+		B = (int16_t)YScale;
+		C = (int16_t)(-XScale);
 		D = 0;
 	}
 	else
 	{
-		A = (INT16)  CX4_sar(CX4_CosTable[CX4_readw(0x1f80) & 0x1ff] * XScale, 15);
-		B = (INT16)(-CX4_sar(CX4_SinTable[CX4_readw(0x1f80) & 0x1ff] * YScale, 15));
-		C = (INT16)  CX4_sar(CX4_SinTable[CX4_readw(0x1f80) & 0x1ff] * XScale, 15);
-		D = (INT16)  CX4_sar(CX4_CosTable[CX4_readw(0x1f80) & 0x1ff] * YScale, 15);
+		A = (int16_t)  CX4_sar(CX4_CosTable[CX4_readw(0x1f80) & 0x1ff] * XScale, 15);
+		B = (int16_t)(-CX4_sar(CX4_SinTable[CX4_readw(0x1f80) & 0x1ff] * YScale, 15));
+		C = (int16_t)  CX4_sar(CX4_SinTable[CX4_readw(0x1f80) & 0x1ff] * XScale, 15);
+		D = (int16_t)  CX4_sar(CX4_CosTable[CX4_readw(0x1f80) & 0x1ff] * YScale, 15);
 	}
 
 	//Clear the output RAM
@@ -292,7 +292,7 @@ static void CX4_C4DoScaleRotate(int row_padding)
 			}
 			else
 			{
-				UINT32 addr = (Y >> 12) * w + (X >> 12);
+				uint32_t addr = (Y >> 12) * w + (X >> 12);
 				byte = CX4_read(0x600 + (addr >> 1));
 				if(addr & 1)
 				{

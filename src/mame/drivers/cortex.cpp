@@ -38,7 +38,7 @@ public:
 
 	virtual void machine_reset() override;
 	required_device<tms9995_device> m_maincpu;
-	required_shared_ptr<UINT8> m_p_ram;
+	required_shared_ptr<uint8_t> m_p_ram;
 };
 
 static ADDRESS_MAP_START( cortex_mem, AS_PROGRAM, 8, cortex_state )
@@ -69,12 +69,12 @@ INPUT_PORTS_END
 
 void cortex_state::machine_reset()
 {
-	UINT8* ROM = memregion("maincpu")->base();
+	uint8_t* ROM = memregion("maincpu")->base();
 	memcpy(m_p_ram, ROM, 0x6000);
 	m_maincpu->ready_line(ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( cortex, cortex_state )
+static MACHINE_CONFIG_START( cortex )
 	/* basic machine hardware */
 	/* TMS9995 CPU @ 12.0 MHz */
 	// Standard variant, no overflow int
@@ -102,5 +102,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY                  FULLNAME       FLAGS */
-COMP( 1982, cortex, 0,      0,       cortex,    cortex, driver_device,  0,    "Powertran Cybernetics",   "Cortex", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   STATE         INIT  COMPANY                  FULLNAME  FLAGS
+COMP( 1982, cortex, 0,      0,       cortex,    cortex, cortex_state, 0,    "Powertran Cybernetics", "Cortex", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

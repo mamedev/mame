@@ -74,12 +74,14 @@ TODO
 
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
+#include "imagedev/cassette.h"
+#include "imagedev/snapquik.h"
 #include "machine/6821pia.h"
 #include "machine/6850acia.h"
 #include "machine/clock.h"
-#include "imagedev/cassette.h"
-#include "imagedev/snapquik.h"
 #include "sound/wave.h"
+#include "speaker.h"
+
 #include "mekd2.lh"
 
 #define XTAL_MEKD2 1228800
@@ -115,10 +117,10 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
-	UINT8 m_cass_data[4];
-	UINT8 m_segment;
-	UINT8 m_digit;
-	UINT8 m_keydata;
+	uint8_t m_cass_data[4];
+	uint8_t m_segment;
+	uint8_t m_digit;
+	uint8_t m_keydata;
 	bool m_cass_state;
 	bool m_cassold;
 	required_device<cpu_device> m_maincpu;
@@ -205,7 +207,7 @@ void mekd2_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in mekd2_state::device_timer");
+		assert_always(false, "Unknown id in mekd2_state::device_timer");
 	}
 }
 
@@ -234,7 +236,7 @@ READ_LINE_MEMBER( mekd2_state::mekd2_key40_r )
 READ8_MEMBER( mekd2_state::mekd2_key_r )
 {
 	char kbdrow[4];
-	UINT8 i;
+	uint8_t i;
 	m_keydata = 0xff;
 
 	for (i = 0; i < 6; i++)
@@ -276,7 +278,7 @@ WRITE8_MEMBER( mekd2_state::mekd2_segment_w )
 
 WRITE8_MEMBER( mekd2_state::mekd2_digit_w )
 {
-	UINT8 i;
+	uint8_t i;
 	if (data < 0x3f)
 	{
 		for (i = 0; i < 6; i++)
@@ -305,25 +307,25 @@ QUICKLOAD_LOAD_MEMBER( mekd2_state, mekd2_quik )
 {
 	static const char magic[] = "MEK6800D2";
 	char buff[9];
-	UINT16 addr, size;
-	UINT8 ident, *RAM = memregion("maincpu")->base();
+	uint16_t addr, size;
+	uint8_t ident, *RAM = memregion("maincpu")->base();
 
 	image.fread(buff, sizeof (buff));
 	if (memcmp(buff, magic, sizeof (buff)))
 	{
 		logerror("mekd2 rom load: magic '%s' not found\n", magic);
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 	image.fread(&addr, 2);
-	addr = LITTLE_ENDIANIZE_INT16(addr);
+	addr = little_endianize_int16(addr);
 	image.fread(&size, 2);
-	size = LITTLE_ENDIANIZE_INT16(size);
+	size = little_endianize_int16(size);
 	image.fread(&ident, 1);
 	logerror("mekd2 rom load: $%04X $%04X $%02X\n", addr, size, ident);
 	while (size-- > 0)
 		image.fread(&RAM[addr++], 1);
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(mekd2_state::mekd2_c)
@@ -346,7 +348,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mekd2_state::mekd2_p)
 {
 	/* cassette - turn 1200/2400Hz to a bit */
 	m_cass_data[1]++;
-	UINT8 cass_ws = (m_cass->input() > +0.03) ? 1 : 0;
+	uint8_t cass_ws = (m_cass->input() > +0.03) ? 1 : 0;
 
 	if (cass_ws != m_cass_data[0])
 	{
@@ -362,7 +364,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mekd2_state::mekd2_p)
 
 ************************************************************/
 
-static MACHINE_CONFIG_START( mekd2, mekd2_state )
+static MACHINE_CONFIG_START( mekd2 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, XTAL_MEKD2 / 2)        /* 614.4 kHz */
 	MCFG_CPU_PROGRAM_MAP(mekd2_mem)
@@ -383,12 +385,12 @@ static MACHINE_CONFIG_START( mekd2, mekd2_state )
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(mekd2_state, mekd2_segment_w))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(mekd2_state, mekd2_digit_w))
 	MCFG_PIA_CA2_HANDLER(WRITELINE(mekd2_state, mekd2_nmi_w))
-	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6800_cpu_device, nmi_line))
-	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6800_cpu_device, nmi_line))
+	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	MCFG_DEVICE_ADD("pia_u", PIA6821, 0)
-	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6800_cpu_device, irq_line))
-	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6800_cpu_device, irq_line))
+	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
+	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
 
 	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
 	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(mekd2_state, cass_w))
@@ -422,5 +424,5 @@ ROM_END
 
 ***************************************************************************/
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE   INPUT  CLASS        INIT    COMPANY     FULLNAME   FLAGS */
-COMP( 1977, mekd2,  0,      0,      mekd2,    mekd2, driver_device, 0,  "Motorola", "MEK6800D2" , 0 )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE   INPUT  CLASS        INIT  COMPANY     FULLNAME      FLAGS
+COMP( 1977, mekd2,  0,      0,      mekd2,    mekd2, mekd2_state, 0,    "Motorola", "MEK6800D2" , 0 )

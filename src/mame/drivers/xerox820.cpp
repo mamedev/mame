@@ -47,14 +47,20 @@
 */
 
 
+#include "emu.h"
 #include "includes/xerox820.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
+
 /* Read/Write Handlers */
 
 void xerox820_state::bankswitch(int bank)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
-	UINT8 *ram = m_ram->pointer();
+	uint8_t *ram = m_ram->pointer();
 
 	if (bank)
 	{
@@ -73,7 +79,7 @@ void xerox820_state::bankswitch(int bank)
 void xerox820ii_state::bankswitch(int bank)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
-	UINT8 *ram = m_ram->pointer();
+	uint8_t *ram = m_ram->pointer();
 
 	if (bank)
 	{
@@ -234,7 +240,7 @@ READ8_MEMBER( xerox820_state::kbpio_pa_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// keyboard
 	data |= m_kbpio->rdy_b() << 3;
@@ -415,10 +421,10 @@ WRITE_LINE_MEMBER( xerox820_state::fr_w )
 
 /* Video */
 
-UINT32 xerox820_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t xerox820_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UINT8 y,ra,chr,gfx;
-	UINT16 sy=0,ma=(m_scroll + 1) * 0x80,x;
+	uint8_t y,ra,chr,gfx;
+	uint16_t sy=0,ma=(m_scroll + 1) * 0x80,x;
 	const pen_t *pen=m_palette->pens();
 
 	m_framecnt++;
@@ -429,7 +435,7 @@ UINT32 xerox820_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 
 		for (ra = 0; ra < 10; ra++)
 		{
-			UINT32 *p = &bitmap.pix32(sy++);
+			uint32_t *p = &bitmap.pix32(sy++);
 
 			for (x = ma; x < ma + 80; x++)
 			{
@@ -539,7 +545,7 @@ GFXDECODE_END
 
 /* Machine Drivers */
 
-static MACHINE_CONFIG_START( xerox820, xerox820_state )
+static MACHINE_CONFIG_START( xerox820 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_20MHz/8)
 	MCFG_CPU_PROGRAM_MAP(xerox820_mem)
@@ -606,14 +612,14 @@ static MACHINE_CONFIG_START( xerox820, xerox820_state )
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "xerox820")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED_CLASS( bigboard, xerox820, bigboard_state )
+static MACHINE_CONFIG_DERIVED( bigboard, xerox820 )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("beeper", BEEP, 950)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00) /* bigboard only */
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( xerox820ii, xerox820ii_state )
+static MACHINE_CONFIG_START( xerox820ii )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/4)
 	MCFG_CPU_PROGRAM_MAP(xerox820ii_mem)
@@ -823,10 +829,10 @@ ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT    COMPANY                         FULLNAME        FLAGS */
-COMP( 1980, bigboard,   0,          0,      bigboard,   xerox820, driver_device,   0,      "Digital Research Computers",   "Big Board",     0 )
-COMP( 1981, x820,       bigboard,   0,      xerox820,   xerox820, driver_device,   0,      "Xerox",                        "Xerox 820",     MACHINE_NO_SOUND_HW )
-COMP( 1982, mk82,       bigboard,   0,      bigboard,   xerox820, driver_device,   0,      "Scomar",                       "MK-82",         0 )
-COMP( 1983, x820ii,     0,          0,      xerox820ii, xerox820, driver_device,   0,      "Xerox",                        "Xerox 820-II",  MACHINE_NOT_WORKING )
-COMP( 1983, x168,       x820ii,     0,      xerox168,   xerox820, driver_device,   0,      "Xerox",                        "Xerox 16/8",    MACHINE_NOT_WORKING )
-COMP( 1983, mk83,       x820ii,     0,      mk83,       xerox820, driver_device,   0,      "Scomar",                       "MK-83",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT     STATE             INIT  COMPANY                       FULLNAME        FLAGS
+COMP( 1980, bigboard, 0,        0,      bigboard,   xerox820, bigboard_state,   0,    "Digital Research Computers", "Big Board",    0 )
+COMP( 1981, x820,     bigboard, 0,      xerox820,   xerox820, xerox820_state,   0,    "Xerox",                      "Xerox 820",    MACHINE_NO_SOUND_HW )
+COMP( 1982, mk82,     bigboard, 0,      bigboard,   xerox820, bigboard_state,   0,    "Scomar",                     "MK-82",        0 )
+COMP( 1983, x820ii,   0,        0,      xerox820ii, xerox820, xerox820ii_state, 0,    "Xerox",                      "Xerox 820-II", MACHINE_NOT_WORKING )
+COMP( 1983, x168,     x820ii,   0,      xerox168,   xerox820, xerox820ii_state, 0,    "Xerox",                      "Xerox 16/8",   MACHINE_NOT_WORKING )
+COMP( 1983, mk83,     x820ii,   0,      mk83,       xerox820, xerox820_state,   0,    "Scomar",                     "MK-83",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

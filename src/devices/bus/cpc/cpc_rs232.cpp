@@ -6,18 +6,20 @@
  *  Created on: 22/04/2014
  */
 
+#include "emu.h"
 #include "cpc_rs232.h"
-#include "includes/amstrad.h"
+
+SLOT_INTERFACE_EXTERN(cpc_exp_cards);
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CPC_RS232 = &device_creator<cpc_rs232_device>;
-const device_type CPC_RS232_AMS = &device_creator<cpc_ams_rs232_device>;
+DEFINE_DEVICE_TYPE(CPC_RS232,     cpc_rs232_device,     "cpc_ser",    "Pace RS232C interface")
+DEFINE_DEVICE_TYPE(CPC_RS232_AMS, cpc_ams_rs232_device, "cpc_serams", "Amstrad RS232C interface")
 
 // device machine config
-static MACHINE_CONFIG_FRAGMENT( cpc_rs232 )
+static MACHINE_CONFIG_START( cpc_rs232 )
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
 	MCFG_PIT8253_CLK0(2000000)
 	MCFG_PIT8253_CLK1(2000000)
@@ -65,12 +67,12 @@ machine_config_constructor cpc_rs232_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME( cpc_rs232 );
 }
 
-const rom_entry *cpc_rs232_device::device_rom_region() const
+const tiny_rom_entry *cpc_rs232_device::device_rom_region() const
 {
 	return ROM_NAME( cpc_rs232 );
 }
 
-const rom_entry *cpc_ams_rs232_device::device_rom_region() const
+const tiny_rom_entry *cpc_ams_rs232_device::device_rom_region() const
 {
 	return ROM_NAME( cpc_rs232_ams );
 }
@@ -80,26 +82,23 @@ const rom_entry *cpc_ams_rs232_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-cpc_rs232_device::cpc_rs232_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, CPC_RS232, "Pace RS232C interface", tag, owner, clock, "cpc_ser", __FILE__),
-	device_cpc_expansion_card_interface(mconfig, *this),
-	m_pit(*this,"pit"),
-	m_dart(*this,"dart"),
-	m_rs232(*this,"rs232"), m_slot(nullptr)
+cpc_rs232_device::cpc_rs232_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	cpc_rs232_device(mconfig, CPC_RS232, tag, owner, clock)
 {
 }
 
-cpc_rs232_device::cpc_rs232_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+cpc_rs232_device::cpc_rs232_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_cpc_expansion_card_interface(mconfig, *this),
 	m_pit(*this,"pit"),
 	m_dart(*this,"dart"),
-	m_rs232(*this,"rs232"), m_slot(nullptr)
+	m_rs232(*this,"rs232"),
+	m_slot(nullptr)
 {
 }
 
-cpc_ams_rs232_device::cpc_ams_rs232_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	cpc_rs232_device(mconfig, CPC_RS232_AMS, "Amstrad RS232C interface", tag, owner, clock, "cpc_serams", __FILE__)
+cpc_ams_rs232_device::cpc_ams_rs232_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	cpc_rs232_device(mconfig, CPC_RS232_AMS, tag, owner, clock)
 {
 }
 

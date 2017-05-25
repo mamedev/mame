@@ -25,10 +25,11 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/nvram.h"
+#include "machine/ticket.h"
 #include "sound/ay8910.h"
 #include "video/v9938.h"
-#include "machine/ticket.h"
-#include "machine/nvram.h"
+#include "speaker.h"
 
 class tonton_state : public driver_device
 {
@@ -209,7 +210,7 @@ WRITE8_MEMBER(tonton_state::ay_bout_w)
 *                 Machine Driver                 *
 *************************************************/
 
-static MACHINE_CONFIG_START( tonton, tonton_state )
+static MACHINE_CONFIG_START( tonton )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, CPU_CLOCK)  /* Guess. According to other MSX2 based gambling games */
@@ -255,5 +256,5 @@ ROM_START( tonton )
 ROM_END
 
 
-/*    YEAR  NAME     PARENT  MACHINE  INPUT   STATE          INIT  ROT    COMPANY                   FULLNAME                                 FLAGS  */
-GAME( 199?, tonton,  0,      tonton,  tonton, driver_device, 0,    ROT0, "Success / Taiyo Jidoki", "Waku Waku Doubutsu Land TonTon (Japan)", 0 )
+//    YEAR  NAME     PARENT  MACHINE  INPUT   STATE         INIT  ROT   COMPANY                   FULLNAME                                  FLAGS
+GAME( 199?, tonton,  0,      tonton,  tonton, tonton_state, 0,    ROT0, "Success / Taiyo Jidoki", "Waku Waku Doubutsu Land TonTon (Japan)", 0 )

@@ -35,6 +35,7 @@
 		sln.blocks         = { }
 		sln.configurations = { }
 		sln.groups         = { }
+		sln.importedprojects = { }
 		return sln
 	end
 

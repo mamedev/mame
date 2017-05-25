@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_IEEE488_SOFTBOX_H
+#define MAME_BUS_IEEE488_SOFTBOX_H
 
-#ifndef __PET_SOFTBOX__
-#define __PET_SOFTBOX__
+#pragma once
 
 #include "ieee488.h"
 #include "bus/rs232/rs232.h"
@@ -33,10 +33,10 @@ class softbox_device :  public device_t,
 {
 public:
 	// construction/destruction
-	softbox_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	softbox_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual ioport_constructor device_input_ports() const override;
 
@@ -68,15 +68,14 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<com8116_device> m_dbrg;
-	required_device<corvus_hdc_t> m_hdc;
+	required_device<corvus_hdc_device> m_hdc;
 
 	int m_ifc;  // Tracks previous state of IEEE-488 IFC line
 };
 
 
 // device type definition
-extern const device_type SOFTBOX;
+DECLARE_DEVICE_TYPE(SOFTBOX, softbox_device)
 
 
-
-#endif
+#endif // MAME_BUS_IEEE488_SOFTBOX_H

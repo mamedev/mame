@@ -7,12 +7,16 @@
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m6502/m6502.h"
-#include "machine/ram.h"
-#include "sound/speaker.h"
-#include "machine/mos6530n.h"
 #include "machine/6522via.h"
 #include "machine/74145.h"
+#include "machine/mos6530n.h"
+#include "machine/ram.h"
+#include "sound/spkrdev.h"
+
+#include "speaker.h"
+
 #include "sym1.lh"
 
 
@@ -49,13 +53,13 @@ public:
 		m_row3(*this, "ROW-3"),
 		m_wp(*this, "WP") { }
 
-	required_shared_ptr<UINT8> m_ram_1k;
-	required_shared_ptr<UINT8> m_ram_2k;
-	required_shared_ptr<UINT8> m_ram_3k;
-	required_shared_ptr<UINT8> m_monitor;
-	required_shared_ptr<UINT8> m_riot_ram;
-	UINT8 m_riot_port_a;
-	UINT8 m_riot_port_b;
+	required_shared_ptr<uint8_t> m_ram_1k;
+	required_shared_ptr<uint8_t> m_ram_2k;
+	required_shared_ptr<uint8_t> m_ram_3k;
+	required_shared_ptr<uint8_t> m_monitor;
+	required_shared_ptr<uint8_t> m_riot_ram;
+	uint8_t m_riot_port_a;
+	uint8_t m_riot_port_b;
 	emu_timer *m_led_update;
 	DECLARE_DRIVER_INIT(sym1);
 	virtual void machine_reset() override;
@@ -289,7 +293,7 @@ static ADDRESS_MAP_START( sym1_map, AS_PROGRAM, 8, sym1_state )
 	AM_RANGE(0x0c00, 0x0fff) AM_RAMBANK("bank4") AM_SHARE("ram_3k")
 	AM_RANGE(0x8000, 0x8fff) AM_ROM AM_SHARE("monitor") // U20 Monitor ROM
 	AM_RANGE(0xa000, 0xa00f) AM_DEVREADWRITE("via6522_0", via6522_device, read, write)  // U25 VIA #1
-	AM_RANGE(0xa400, 0xa41f) AM_DEVICE("riot", mos6532_t, io_map)  // U27 RIOT
+	AM_RANGE(0xa400, 0xa41f) AM_DEVICE("riot", mos6532_new_device, io_map)  // U27 RIOT
 	AM_RANGE(0xa600, 0xa67f) AM_RAMBANK("bank5") AM_SHARE("riot_ram")   // U27 RIOT RAM
 	AM_RANGE(0xa800, 0xa80f) AM_DEVREADWRITE("via6522_1", via6522_device, read, write)  // U28 VIA #2
 	AM_RANGE(0xac00, 0xac0f) AM_DEVREADWRITE("via6522_2", via6522_device, read, write)  // U29 VIA #3
@@ -301,7 +305,7 @@ ADDRESS_MAP_END
 //  MACHINE DRIVERS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( sym1, sym1_state )
+static MACHINE_CONFIG_START( sym1 )
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M6502, SYM1_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(sym1_map)
@@ -314,7 +318,7 @@ static MACHINE_CONFIG_START( sym1, sym1_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	// devices
-	MCFG_DEVICE_ADD("riot", MOS6532n, SYM1_CLOCK)
+	MCFG_DEVICE_ADD("riot", MOS6532_NEW, SYM1_CLOCK)
 	MCFG_MOS6530n_IN_PA_CB(READ8(sym1_state, sym1_riot_a_r))
 	MCFG_MOS6530n_OUT_PA_CB(WRITE8(sym1_state, sym1_riot_a_w))
 	MCFG_MOS6530n_IN_PB_CB(READ8(sym1_state, sym1_riot_b_r))
@@ -331,14 +335,14 @@ static MACHINE_CONFIG_START( sym1, sym1_state )
 	// lines 7-9 not connected
 
 	MCFG_DEVICE_ADD("via6522_0", VIA6522, 0)
-	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("maincpu", m6502_device, irq_line))
+	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M6502_IRQ_LINE))
 
 	MCFG_DEVICE_ADD("via6522_1", VIA6522, 0)
-	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("maincpu", m6502_device, irq_line))
+	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M6502_IRQ_LINE))
 
 	MCFG_DEVICE_ADD("via6522_2", VIA6522, 0)
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(sym1_state, sym1_via2_a_w))
-	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("maincpu", m6502_device, irq_line))
+	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M6502_IRQ_LINE))
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)

@@ -184,6 +184,7 @@ Notes:
 */
 
 #include "emu.h"
+
 #include "cpu/cosmac/cosmac.h"
 #include "sound/beep.h"
 #include "sound/cdp1864.h"
@@ -192,7 +193,10 @@ Notes:
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+
 #include "softlist.h"
+#include "speaker.h"
+
 
 #define CDP1802_TAG     "ic1"
 #define CDP1861_TAG     "ic2"
@@ -241,7 +245,7 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( studio2_cart_load );
 
 	/* keyboard state */
-	UINT8 m_keylatch;
+	uint8_t m_keylatch;
 };
 
 class visicom_state : public studio2_state
@@ -253,10 +257,10 @@ public:
 			m_color1_ram(*this, "color1_ram")
 	{ }
 
-	virtual UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	required_shared_ptr<UINT8> m_color0_ram;
-	required_shared_ptr<UINT8> m_color1_ram;
+	required_shared_ptr<uint8_t> m_color0_ram;
+	required_shared_ptr<uint8_t> m_color1_ram;
 
 	DECLARE_WRITE8_MEMBER( dma_w );
 };
@@ -282,8 +286,8 @@ public:
 	DECLARE_READ_LINE_MEMBER( gdata_r );
 
 	/* video state */
-	required_shared_ptr<UINT8> m_color_ram;
-	UINT8 m_color;
+	required_shared_ptr<uint8_t> m_color_ram;
+	uint8_t m_color;
 };
 
 
@@ -407,7 +411,7 @@ static const rgb_t VISICOM_PALETTE[] =
 	rgb_t(0xef, 0x45, 0x4a)
 };
 
-UINT32 visicom_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t visicom_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_vdc->screen_update(screen, bitmap, cliprect);
 
@@ -458,9 +462,9 @@ WRITE8_MEMBER( visicom_state::dma_w )
 	int sx = m_screen->hpos() + 4;
 	int y = m_screen->vpos();
 
-	UINT8 addr = offset & 0xff;
-	UINT8 color0 = m_color0_ram[addr];
-	UINT8 color1 = m_color1_ram[addr];
+	uint8_t addr = offset & 0xff;
+	uint8_t color0 = m_color0_ram[addr];
+	uint8_t color1 = m_color1_ram[addr];
 
 	for (int x = 0; x < 8; x++)
 	{
@@ -473,7 +477,7 @@ WRITE8_MEMBER( visicom_state::dma_w )
 
 WRITE8_MEMBER( mpt02_state::dma_w )
 {
-	UINT8 addr = ((offset & 0xe0) >> 2) | (offset & 0x07);
+	uint8_t addr = ((offset & 0xe0) >> 2) | (offset & 0x07);
 
 	m_color = m_color_ram[addr];
 
@@ -528,23 +532,23 @@ void mpt02_state::machine_reset()
 
 DEVICE_IMAGE_LOAD_MEMBER( studio2_state, studio2_cart_load )
 {
-	UINT32 size;
+	uint32_t size;
 
 	// always alloc 3K, even if range $400-$600 is not read by the system (RAM is present there)
 	m_cart->rom_alloc(0xc00, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 
-	if (image.software_entry() == nullptr)
+	if (!image.loaded_through_softlist())
 	{
-		if (!strcmp(image.filetype(), "st2"))
+		if (image.is_filetype("st2"))
 		{
-			UINT8 header[0x100];
-			UINT8 catalogue[10], title[32], pages[64];
-			UINT8 blocks;
+			uint8_t header[0x100];
+			uint8_t catalogue[10], title[32], pages[64];
+			uint8_t blocks;
 
 			if (image.length() <= 0x100)
 			{
 				image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid ROM file");
-				return IMAGE_INIT_FAIL;
+				return image_init_result::FAIL;
 			}
 
 			image.fread(&header, 0x100);
@@ -553,7 +557,7 @@ DEVICE_IMAGE_LOAD_MEMBER( studio2_state, studio2_cart_load )
 			if (strncmp((const char *)header, "RCA2", 4))
 			{
 				image.seterror(IMAGE_ERROR_UNSPECIFIED, "Not an .ST2 file");
-				return IMAGE_INIT_FAIL;
+				return image_init_result::FAIL;
 			}
 
 			blocks = header[4];
@@ -568,7 +572,7 @@ DEVICE_IMAGE_LOAD_MEMBER( studio2_state, studio2_cart_load )
 					logerror("ST2 invalid block %u to %04x\n", block, pages[block] << 8);
 				else
 				{
-					UINT16 offset = (pages[block] << 8) - 0x400;
+					uint16_t offset = (pages[block] << 8) - 0x400;
 					logerror("ST2 Reading block %u to %04x\n", block, offset);
 					image.fread(m_cart->get_rom_base() + offset, 0x100);
 				}
@@ -583,7 +587,7 @@ DEVICE_IMAGE_LOAD_MEMBER( studio2_state, studio2_cart_load )
 			if (size > 0x400)
 			{
 				image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
-				return IMAGE_INIT_FAIL;
+				return image_init_result::FAIL;
 			}
 			else
 				image.fread(m_cart->get_rom_base(), size);
@@ -603,13 +607,13 @@ DEVICE_IMAGE_LOAD_MEMBER( studio2_state, studio2_cart_load )
 			memcpy(m_cart->get_rom_base() + 0xa00, image.get_software_region("rom_e00"), image.get_software_region_length("rom_e00"));
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 
 /* Machine Drivers */
 
-static MACHINE_CONFIG_FRAGMENT( studio2_cartslot )
+static MACHINE_CONFIG_START( studio2_cartslot )
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "studio2_cart")
 	MCFG_GENERIC_EXTENSIONS("st2,bin,rom")
 	MCFG_GENERIC_LOAD(studio2_state, studio2_cart_load)
@@ -618,7 +622,7 @@ static MACHINE_CONFIG_FRAGMENT( studio2_cartslot )
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "studio2")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( studio2, studio2_state )
+static MACHINE_CONFIG_START( studio2 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, 1760000) /* the real clock is derived from an oscillator circuit */
 	MCFG_CPU_PROGRAM_MAP(studio2_map)
@@ -645,7 +649,7 @@ static MACHINE_CONFIG_START( studio2, studio2_state )
 	MCFG_FRAGMENT_ADD( studio2_cartslot )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( visicom, visicom_state )
+static MACHINE_CONFIG_START( visicom )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_3_579545MHz/2)
 	MCFG_CPU_PROGRAM_MAP(visicom_map)
@@ -677,7 +681,7 @@ static MACHINE_CONFIG_START( visicom, visicom_state )
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "visicom")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( mpt02, mpt02_state )
+static MACHINE_CONFIG_START( mpt02 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, CDP1864_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(mpt02_map)
@@ -741,12 +745,12 @@ ROM_END
 
 /* Game Drivers */
 
-//    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT    INIT                 COMPANY    FULLNAME                                         FLAGS
-CONS( 1977, studio2,    0,      0,      studio2,    studio2, driver_device, 0,    "RCA",      "Studio II",                                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-CONS( 1978, visicom,    studio2,0,      visicom,    studio2, driver_device, 0,    "Toshiba",  "Visicom COM-100 (Japan)",                      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-CONS( 1978, mpt02,      studio2,0,      mpt02,      studio2, driver_device, 0,    "Soundic",  "Victory MPT-02 Home TV Programmer (Austria)",  MACHINE_SUPPORTS_SAVE )
-CONS( 1978, mpt02h,     studio2,0,      mpt02,      studio2, driver_device, 0,    "Hanimex",  "MPT-02 Jeu TV Programmable (France)",          MACHINE_SUPPORTS_SAVE )
-CONS( 1978, mtc9016,    studio2,0,      mpt02,      studio2, driver_device, 0,    "Mustang",  "9016 Telespiel Computer (Germany)",            MACHINE_SUPPORTS_SAVE )
-CONS( 1978, shmc1200,   studio2,0,      mpt02,      studio2, driver_device, 0,    "Sheen",    "M1200 Micro Computer (Australia)",             MACHINE_SUPPORTS_SAVE )
-CONS( 1978, cm1200,     studio2,0,      mpt02,      studio2, driver_device, 0,    "Conic",    "M-1200 (?)",                                   MACHINE_SUPPORTS_SAVE )
-CONS( 1978, apollo80,   studio2,0,      mpt02,      studio2, driver_device, 0,    "Academy",  "Apollo 80 (Germany)",                          MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT    STATE          INIT  COMPANY     FULLNAME                                        FLAGS
+CONS( 1977, studio2,    0,      0,      studio2,    studio2, studio2_state, 0,    "RCA",      "Studio II",                                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+CONS( 1978, visicom,    studio2,0,      visicom,    studio2, visicom_state, 0,    "Toshiba",  "Visicom COM-100 (Japan)",                      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+CONS( 1978, mpt02,      studio2,0,      mpt02,      studio2, mpt02_state, 0,      "Soundic",  "Victory MPT-02 Home TV Programmer (Austria)",  MACHINE_SUPPORTS_SAVE )
+CONS( 1978, mpt02h,     studio2,0,      mpt02,      studio2, mpt02_state, 0,      "Hanimex",  "MPT-02 Jeu TV Programmable (France)",          MACHINE_SUPPORTS_SAVE )
+CONS( 1978, mtc9016,    studio2,0,      mpt02,      studio2, mpt02_state, 0,      "Mustang",  "9016 Telespiel Computer (Germany)",            MACHINE_SUPPORTS_SAVE )
+CONS( 1978, shmc1200,   studio2,0,      mpt02,      studio2, mpt02_state, 0,      "Sheen",    "M1200 Micro Computer (Australia)",             MACHINE_SUPPORTS_SAVE )
+CONS( 1978, cm1200,     studio2,0,      mpt02,      studio2, mpt02_state, 0,      "Conic",    "M-1200 (?)",                                   MACHINE_SUPPORTS_SAVE )
+CONS( 1978, apollo80,   studio2,0,      mpt02,      studio2, mpt02_state, 0,      "Academy",  "Apollo 80 (Germany)",                          MACHINE_SUPPORTS_SAVE )

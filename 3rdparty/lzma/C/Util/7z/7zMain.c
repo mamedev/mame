@@ -1,5 +1,5 @@
 /* 7zMain.c - Test application for 7z Decoder
-2015-08-02 : Igor Pavlov : Public domain */
+2016-05-16 : Igor Pavlov : Public domain */
 
 #include "Precomp.h"
 
@@ -310,10 +310,10 @@ static void ConvertFileTimeToString(const CNtfsFileTime *nt, char *s)
     ms[1] = 29;
   for (mon = 0;; mon++)
   {
-    unsigned s = ms[mon];
-    if (v < s)
+    unsigned d = ms[mon];
+    if (v < d)
       break;
-    v -= s;
+    v -= d;
   }
   s = UIntToStr(s, year, 4); *s++ = '-';
   UIntToStr_2(s, mon + 1); s[2] = '-'; s += 3;

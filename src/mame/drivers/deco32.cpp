@@ -363,6 +363,8 @@ NOTE: There are several unpopulated locations (denoted by *) for additional rom 
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/deco32.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/arm/arm.h"
 #include "cpu/h6280/h6280.h"
@@ -370,8 +372,7 @@ NOTE: There are several unpopulated locations (denoted by *) for additional rom 
 #include "cpu/z80/z80.h"
 #include "machine/decocrpt.h"
 #include "machine/deco156.h"
-#include "includes/deco32.h"
-#include "sound/ym2151.h"
+#include "speaker.h"
 
 /**********************************************************************************/
 
@@ -393,15 +394,15 @@ READ32_MEMBER(deco32_state::irq_controller_r)
 
 	case 3: /* Irq controller
 
-        Bit 0:  1 = Vblank active
-        Bit 1:  ? (Hblank active?  Captain America raster IRQ waits for this to go low)
-        Bit 2:
-        Bit 3:
-        Bit 4:  VBL Irq
-        Bit 5:  Raster IRQ
-        Bit 6:  Lightgun IRQ (on Lock N Load only)
-        Bit 7:
-        */
+	    Bit 0:  1 = Vblank active
+	    Bit 1:  ? (Hblank active?  Captain America raster IRQ waits for this to go low)
+	    Bit 2:
+	    Bit 3:
+	    Bit 4:  VBL Irq
+	    Bit 5:  Raster IRQ
+	    Bit 6:  Lightgun IRQ (on Lock N Load only)
+	    Bit 7:
+	    */
 
 		/* ZV03082007 - video_screen_get_vblank() doesn't work for Captain America, as it expects
 		   that this bit is NOT set in rows 0-7. */
@@ -447,10 +448,23 @@ WRITE32_MEMBER(deco32_state::sound_w)
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
-void deco32_state::deco32_sound_cb( address_space &space, UINT16 data, UINT16 mem_mask )
+void deco32_state::deco32_sound_cb( address_space &space, uint16_t data, uint16_t mem_mask )
 {
 	m_soundlatch->write(space, 0, data & 0xff);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
+}
+
+void deco32_state::deco32_set_audio_output(uint8_t raw_data)
+{
+	// TODO: assume linear with a 0.0-1.0 dB scale for now
+	uint8_t raw_vol = 0xff - raw_data;
+	float vol_output = ((float)raw_vol) / 255.0f;
+
+	m_ym2151->set_output_gain(ALL_OUTPUTS, vol_output);
+	m_oki1->set_output_gain(ALL_OUTPUTS, vol_output);
+	m_oki2->set_output_gain(ALL_OUTPUTS, vol_output);
+
+	//popmessage("%02x %02x %f",raw_data,raw_vol,vol_output);
 }
 
 READ32_MEMBER(deco32_state::_71_r)
@@ -478,6 +492,7 @@ READ32_MEMBER(deco32_state::fghthist_control_r)
 	return 0xffffffff;
 }
 
+
 WRITE32_MEMBER(deco32_state::fghthist_eeprom_w)
 {
 	if (ACCESSING_BITS_0_7) {
@@ -487,9 +502,11 @@ WRITE32_MEMBER(deco32_state::fghthist_eeprom_w)
 
 		pri_w(space,0,data&0x1,0xffffffff); /* Bit 0 - layer priority toggle */
 	}
-	else if (!ACCESSING_BITS_8_15)
+
+	if (ACCESSING_BITS_8_15)
 	{
 		// Volume port
+		deco32_set_audio_output((data >> 8) & 0xff);
 	}
 }
 
@@ -555,7 +572,7 @@ WRITE32_MEMBER(dragngun_state::eeprom_w)
 WRITE32_MEMBER(deco32_state::tattass_control_w)
 {
 	/* Eprom in low byte */
-	if (mem_mask==0x000000ff) { /* Byte write to low byte only (different from word writing including low byte) */
+	if (ACCESSING_BITS_0_7) { /* Byte write to low byte only (different from word writing including low byte) */
 		/*
 		    The Tattoo Assassins eprom seems strange...  It's 1024 bytes in size, and 8 bit
 		    in width, but offers a 'multiple read' mode where a bit stream can be read
@@ -656,13 +673,12 @@ WRITE32_MEMBER(deco32_state::tattass_control_w)
 		}
 
 		m_lastClock=data&0x20;
-		return;
 	}
 
 	/* Volume in high byte */
-	if (mem_mask==0x0000ff00) {
+	if (ACCESSING_BITS_8_15) {
 		//TODO:  volume attenuation == ((data>>8)&0xff);
-		return;
+		// TODO: is it really there?
 	}
 
 	/* Playfield control - Only written in full word memory accesses */
@@ -684,12 +700,12 @@ WRITE32_MEMBER(deco32_state::tattass_control_w)
 /**********************************************************************************/
 
 
-UINT16 deco32_state::port_b_nslasher(int unused)
+uint16_t deco32_state::port_b_nslasher(int unused)
 {
 	return (m_eeprom->do_read());
 }
 
-void deco32_state::nslasher_sound_cb( address_space &space, UINT16 data, UINT16 mem_mask )
+void deco32_state::nslasher_sound_cb( address_space &space, uint16_t data, uint16_t mem_mask )
 {
 	/* bit 1 of nslasher_sound_irq specifies IRQ command writes */
 	m_soundlatch->write(space,0,(data)&0xff);
@@ -697,12 +713,12 @@ void deco32_state::nslasher_sound_cb( address_space &space, UINT16 data, UINT16 
 	m_audiocpu->set_input_line(0, (m_nslasher_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-UINT16 deco32_state::port_b_tattass(int unused)
+uint16_t deco32_state::port_b_tattass(int unused)
 {
 	return m_tattass_eprom_bit;
 }
 
-void deco32_state::tattass_sound_cb( address_space &space, UINT16 data, UINT16 mem_mask )
+void deco32_state::tattass_sound_cb( address_space &space, uint16_t data, uint16_t mem_mask )
 {
 	/* 'Swap bits 0 and 3 to correct for design error from BSMT schematic' */
 	int soundcommand = (data)&0xff;
@@ -720,6 +736,10 @@ WRITE32_MEMBER(deco32_state::nslasher_eeprom_w)
 
 		pri_w(space,0,data&0x3,0xffffffff); /* Bit 0 - layer priority toggle, Bit 1 - BG2/3 Joint mode (8bpp) */
 	}
+
+//  popmessage("%08x",data);
+	if (ACCESSING_BITS_8_15)
+		deco32_set_audio_output((data >> 8) & 0xff);
 }
 
 
@@ -806,16 +826,16 @@ ADDRESS_MAP_END
 
 READ32_MEMBER( deco32_state::fghthist_protection_region_0_146_r )
 {
-	UINT32 retdata = 0x0000ffff;
+	uint32_t retdata = 0x0000ffff;
 
-	if (mem_mask & 0xffff0000)
+	if (ACCESSING_BITS_16_31)
 	{
 		mem_mask >>=16;
 
 		int real_address = 0 + (offset *2);
 		int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,   10,9,8,7,6,5,4,3,2,1,   0) & 0x7fff;
-		UINT8 cs = 0;
-		UINT16 data = m_deco146->read_data( deco146_addr, mem_mask, cs );
+		uint8_t cs = 0;
+		uint16_t data = m_deco146->read_data( deco146_addr, mem_mask, cs );
 
 
 
@@ -826,14 +846,14 @@ READ32_MEMBER( deco32_state::fghthist_protection_region_0_146_r )
 
 WRITE32_MEMBER( deco32_state::fghthist_protection_region_0_146_w )
 {
-	if (mem_mask & 0xffff0000)
+	if (ACCESSING_BITS_16_31)
 	{
 		data >>=16;
 		mem_mask >>=16;
 
 		int real_address = 0 + (offset *2);
 		int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8,7,6,5,4,3,2,1,   0) & 0x7fff;
-		UINT8 cs = 0;
+		uint8_t cs = 0;
 		m_deco146->write_data( space, deco146_addr, data, mem_mask, cs );
 	}
 }
@@ -908,8 +928,8 @@ READ16_MEMBER( deco32_state::dg_protection_region_0_146_r )
 {
 	int real_address = 0 + (offset *2);
 	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
-	UINT8 cs = 0;
-	UINT16 data = m_deco146->read_data( deco146_addr, mem_mask, cs );
+	uint8_t cs = 0;
+	uint16_t data = m_deco146->read_data( deco146_addr, mem_mask, cs );
 	return data;
 }
 
@@ -917,7 +937,7 @@ WRITE16_MEMBER( deco32_state::dg_protection_region_0_146_w )
 {
 	int real_address = 0 + (offset *2);
 	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
-	UINT8 cs = 0;
+	uint8_t cs = 0;
 	m_deco146->write_data( space, deco146_addr, data, mem_mask, cs );
 }
 
@@ -1031,6 +1051,7 @@ static ADDRESS_MAP_START( lockload_map, AS_PROGRAM, 32, dragngun_state )
 	AM_RANGE(0x300000, 0x3fffff) AM_ROM
 
 //  AM_RANGE(0x400000, 0x400003) AM_DEVREADWRITE8("oki3", okim6295_device, read, write, 0x000000ff)
+	AM_RANGE(0x410000, 0x410003) AM_WRITENOP /* Some kind of serial bit-stream - digital volume control? */
 	AM_RANGE(0x420000, 0x420003) AM_READWRITE(eeprom_r, eeprom_w)
 //  AM_RANGE(0x430000, 0x43001f) AM_WRITE(lightgun_w)
 //  AM_RANGE(0x438000, 0x438003) AM_READ(lightgun_r)
@@ -1088,8 +1109,8 @@ READ16_MEMBER( deco32_state::nslasher_protection_region_0_104_r )
 {
 	int real_address = 0 + (offset *2);
 	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
-	UINT8 cs = 0;
-	UINT16 data = m_deco104->read_data( deco146_addr, mem_mask, cs );
+	uint8_t cs = 0;
+	uint16_t data = m_deco104->read_data( deco146_addr, mem_mask, cs );
 	return data;
 }
 
@@ -1097,7 +1118,7 @@ WRITE16_MEMBER( deco32_state::nslasher_protection_region_0_104_w )
 {
 	int real_address = 0 + (offset *2);
 	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
-	UINT8 cs = 0;
+	uint8_t cs = 0;
 	m_deco104->write_data( space, deco146_addr, data, mem_mask, cs );
 }
 
@@ -1759,8 +1780,8 @@ WRITE_LINE_MEMBER(deco32_state::sound_irq_nslasher)
 
 WRITE8_MEMBER(deco32_state::sound_bankswitch_w)
 {
-	m_oki1->set_bank_base(((data >> 0)& 1) * 0x40000);
-	m_oki2->set_bank_base(((data >> 1)& 1) * 0x40000);
+	m_oki1->set_rom_bank((data >> 0) & 1);
+	m_oki2->set_rom_bank((data >> 1) & 1);
 }
 
 /**********************************************************************************/
@@ -1803,7 +1824,7 @@ DECO16IC_BANK_CB_MEMBER(deco32_state::captaven_bank_callback)
 	return bank * 0x4000;
 }
 
-static MACHINE_CONFIG_START( captaven, deco32_state )
+static MACHINE_CONFIG_START( captaven )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM, XTAL_28MHz/4) /* verified on pcb (Data East 101 custom)*/
@@ -1876,27 +1897,27 @@ static MACHINE_CONFIG_START( captaven, deco32_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.42)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.42)
 
-	MCFG_OKIM6295_ADD("oki1", XTAL_32_22MHz/32, OKIM6295_PIN7_HIGH)  /* verified on pcb; pin 7 is floating to 2.5V (left unconnected), so I presume High */
+	MCFG_OKIM6295_ADD("oki1", XTAL_32_22MHz/32, PIN7_HIGH)  /* verified on pcb; pin 7 is floating to 2.5V (left unconnected), so I presume High */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL_32_22MHz/16, OKIM6295_PIN7_HIGH) /* verified on pcb; pin 7 is floating to 2.5V (left unconnected), so I presume High */
+	MCFG_OKIM6295_ADD("oki2", XTAL_32_22MHz/16, PIN7_HIGH) /* verified on pcb; pin 7 is floating to 2.5V (left unconnected), so I presume High */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.35)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.35)
 MACHINE_CONFIG_END
 
 
-UINT16 deco32_state::port_a_fghthist(int unused)
+uint16_t deco32_state::port_a_fghthist(int unused)
 {
 	return machine().root_device().ioport(":IN0")->read();
 }
 
-UINT16 deco32_state::port_b_fghthist(int unused)
+uint16_t deco32_state::port_b_fghthist(int unused)
 {
 	return machine().device<eeprom_serial_93cxx_device>(":eeprom")->do_read();
 }
 
-UINT16 deco32_state::port_c_fghthist(int unused)
+uint16_t deco32_state::port_c_fghthist(int unused)
 {
 	return machine().root_device().ioport(":IN1")->read();
 }
@@ -1909,7 +1930,7 @@ DECO16IC_BANK_CB_MEMBER(deco32_state::fghthist_bank_callback)
 	return bank * 0x1000;
 }
 
-static MACHINE_CONFIG_START( fghthist, deco32_state ) /* DE-0380-2 PCB */
+static MACHINE_CONFIG_START( fghthist ) /* DE-0380-2 PCB */
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM, 28000000/4)
@@ -1985,16 +2006,16 @@ static MACHINE_CONFIG_START( fghthist, deco32_state ) /* DE-0380-2 PCB */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.42)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.42)
 
-	MCFG_OKIM6295_ADD("oki1", 32220000/32, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki1", 32220000/32, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki2", 32220000/16, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki2", 32220000/16, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.35)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.35)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( fghthsta, deco32_state ) /* DE-0395-1 PCB */
+static MACHINE_CONFIG_START( fghthsta ) /* DE-0395-1 PCB */
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM, 28000000/4)
@@ -2069,11 +2090,11 @@ static MACHINE_CONFIG_START( fghthsta, deco32_state ) /* DE-0395-1 PCB */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.42)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.42)
 
-	MCFG_OKIM6295_ADD("oki1", 32220000/32, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki1", 32220000/32, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki2", 32220000/16, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki2", 32220000/16, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.35)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.35)
 MACHINE_CONFIG_END
@@ -2117,7 +2138,7 @@ DECO16IC_BANK_CB_MEMBER(dragngun_state::bank_2_callback)
 	return bank * 0x1000;
 }
 
-static MACHINE_CONFIG_START( dragngun, dragngun_state )
+static MACHINE_CONFIG_START( dragngun )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM, 28000000/4)
@@ -2195,15 +2216,15 @@ static MACHINE_CONFIG_START( dragngun, dragngun_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.42)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.42)
 
-	MCFG_OKIM6295_ADD("oki1", 32220000/32, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki1", 32220000/32, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki2", 32220000/16, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki2", 32220000/16, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.35)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.35)
 
-	MCFG_OKIM6295_ADD("oki3", 32220000/32, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki3", 32220000/32, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -2227,7 +2248,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(dragngun_state::lockload_vbl_irq)
 }
 
 
-static MACHINE_CONFIG_START( lockload, dragngun_state )
+static MACHINE_CONFIG_START( lockload )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM, 28000000/4)
@@ -2307,11 +2328,11 @@ static MACHINE_CONFIG_START( lockload, dragngun_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.42)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.42)
 
-	MCFG_OKIM6295_ADD("oki1", 32220000/32, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki1", 32220000/32, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki2", 32220000/32, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki2", 32220000/32, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.35)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.35)
 MACHINE_CONFIG_END
@@ -2332,7 +2353,7 @@ DECO16IC_BANK_CB_MEMBER(deco32_state::tattass_bank_callback)
 	return bank * 0x1000;
 }
 
-static MACHINE_CONFIG_START( tattass, deco32_state )
+static MACHINE_CONFIG_START( tattass )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM, 28000000/4) // unconfirmed
@@ -2399,7 +2420,7 @@ static MACHINE_CONFIG_START( tattass, deco32_state )
 	MCFG_DECOBSMT_ADD(DECOBSMT_TAG)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( nslasher, deco32_state )
+static MACHINE_CONFIG_START( nslasher )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM, 28322000/4)
@@ -2479,11 +2500,11 @@ static MACHINE_CONFIG_START( nslasher, deco32_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.40)
 
-	MCFG_OKIM6295_ADD("oki1", 32220000/32, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki1", 32220000/32, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
 
-	MCFG_OKIM6295_ADD("oki2", 32220000/16, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki2", 32220000/16, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
 MACHINE_CONFIG_END
@@ -3954,12 +3975,12 @@ DRIVER_INIT_MEMBER(deco32_state,captaven)
 	save_item(NAME(m_irq_source));
 }
 
-extern void process_dvi_data(device_t *device,UINT8* dvi_data, int offset, int regionsize);
+extern void process_dvi_data(device_t *device,uint8_t* dvi_data, int offset, int regionsize);
 
 void dragngun_state::dragngun_init_common()
 {
-	const UINT8 *SRC_RAM = memregion("gfx1")->base();
-	UINT8 *DST_RAM = memregion("gfx2")->base();
+	const uint8_t *SRC_RAM = memregion("gfx1")->base();
+	uint8_t *DST_RAM = memregion("gfx2")->base();
 
 	deco74_decrypt_gfx(machine(), "gfx1");
 	deco74_decrypt_gfx(machine(), "gfx2");
@@ -3970,7 +3991,7 @@ void dragngun_state::dragngun_init_common()
 
 #if 0
 	{
-		UINT8 *ROM = memregion("dvi")->base();
+		uint8_t *ROM = memregion("dvi")->base();
 
 		FILE *fp;
 		char filename[256];
@@ -4000,7 +4021,7 @@ DRIVER_INIT_MEMBER(dragngun_state,dragngun)
 {
 	dragngun_init_common();
 
-	UINT32 *ROM = (UINT32 *)memregion("maincpu")->base();
+	uint32_t *ROM = (uint32_t *)memregion("maincpu")->base();
 	ROM[0x1b32c/4]=0xe1a00000; // bl $ee000: NOP test switch lock
 }
 
@@ -4008,7 +4029,7 @@ DRIVER_INIT_MEMBER(dragngun_state,dragngunj)
 {
 	dragngun_init_common();
 
-	UINT32 *ROM = (UINT32 *)memregion("maincpu")->base();
+	uint32_t *ROM = (uint32_t *)memregion("maincpu")->base();
 	ROM[0x1a1b4/4]=0xe1a00000; // bl $ee000: NOP test switch lock
 }
 
@@ -4020,8 +4041,8 @@ DRIVER_INIT_MEMBER(deco32_state,fghthist)
 
 DRIVER_INIT_MEMBER(dragngun_state,lockload)
 {
-	UINT8 *RAM = memregion("maincpu")->base();
-//  UINT32 *ROM = (UINT32 *)memregion("maincpu")->base();
+	uint8_t *RAM = memregion("maincpu")->base();
+//  uint32_t *ROM = (uint32_t *)memregion("maincpu")->base();
 
 	deco74_decrypt_gfx(machine(), "gfx1");
 	deco74_decrypt_gfx(machine(), "gfx2");
@@ -4041,8 +4062,8 @@ DRIVER_INIT_MEMBER(dragngun_state,lockload)
 
 DRIVER_INIT_MEMBER(deco32_state,tattass)
 {
-	UINT8 *RAM = memregion("gfx1")->base();
-	dynamic_buffer tmp(0x80000);
+	uint8_t *RAM = memregion("gfx1")->base();
+	std::vector<uint8_t> tmp(0x80000);
 
 	/* Reorder bitplanes to make decoding easier */
 	memcpy(&tmp[0],RAM+0x80000,0x80000);
@@ -4068,8 +4089,8 @@ DRIVER_INIT_MEMBER(deco32_state,tattass)
 
 DRIVER_INIT_MEMBER(deco32_state,nslasher)
 {
-	UINT8 *RAM = memregion("gfx1")->base();
-	dynamic_buffer tmp(0x80000);
+	uint8_t *RAM = memregion("gfx1")->base();
+	std::vector<uint8_t> tmp(0x80000);
 
 	/* Reorder bitplanes to make decoding easier */
 	memcpy(&tmp[0],RAM+0x80000,0x80000);

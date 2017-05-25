@@ -38,6 +38,8 @@ It means we probably would have to emulate a modem device for it to treat commun
 #include "cpu/mcs51/mcs51.h"
 #include "video/hd44780.h"
 #include "rendlay.h"
+#include "screen.h"
+
 
 class ti630_state : public driver_device
 {
@@ -92,7 +94,7 @@ READ8_MEMBER(ti630_state::ti630_io_r)
 	{
 		case 0x01:
 		{
-			UINT8 value = 0;
+			uint8_t value = 0;
 #if LOG_IO_PORTS
 			printf("P1 read value:%02X\n", value);
 #endif
@@ -108,7 +110,7 @@ READ8_MEMBER(ti630_state::ti630_io_r)
 
 WRITE8_MEMBER(ti630_state::ti630_io_w)
 {
-	static UINT8 p0=0, p1=0, p2=0, p3=0;
+	static uint8_t p0=0, p1=0, p2=0, p3=0;
 	switch (offset)
 	{
 		case 0x00:
@@ -179,7 +181,7 @@ static GFXDECODE_START( ti630 )
 	GFXDECODE_ENTRY( "hd44780:cgrom", 0x0000, ti630_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( ti630, ti630_state )
+static MACHINE_CONFIG_START( ti630 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I80C31, XTAL_10MHz)
 	MCFG_CPU_PROGRAM_MAP(i80c31_prg)
@@ -208,5 +210,5 @@ ROM_START( ti630 )
 	ROM_LOAD( "ti630.ci11",  0x00000, 0x10000, CRC(2602cbdc) SHA1(98266bea52a5893e0af0b5872eca0a0a1e0c5f9c) )
 ROM_END
 
-/*    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT     CLASS         INIT    COMPANY  FULLNAME                       FLAGS */
-COMP( 1999, ti630,   0,      0,      ti630,     0,   ti630_state, ti630, "Intelbras", "TI630 telephone",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
+//    YEAR  NAME     PARENT  COMPAT  MACHINE   INPUT  CLASS        INIT   COMPANY      FULLNAME           FLAGS
+COMP( 1999, ti630,   0,      0,      ti630,    0,     ti630_state, ti630, "Intelbras", "TI630 telephone", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )

@@ -74,8 +74,8 @@ private:
 	required_device<rs232_port_device> m_rs232;
 	required_ioport m_usart_baud_rate;
 
-	UINT8 m_usart_divide_counter;
-	UINT8 m_usart_clock_state;
+	uint8_t m_usart_divide_counter;
+	uint8_t m_usart_clock_state;
 };
 
 static ADDRESS_MAP_START(isbc8030_mem, AS_PROGRAM, 8, isbc8030_state)
@@ -108,10 +108,10 @@ INPUT_PORTS_END
 
 WRITE_LINE_MEMBER( isbc8030_state::usart_clock_tick )
 {
-	UINT8 old_counter = m_usart_divide_counter;
+	uint8_t old_counter = m_usart_divide_counter;
 	m_usart_divide_counter++;
 
-	UINT8 transition = (old_counter ^ m_usart_divide_counter) & m_usart_baud_rate->read();
+	uint8_t transition = (old_counter ^ m_usart_divide_counter) & m_usart_baud_rate->read();
 	if (transition)
 	{
 		m_usart->write_txc(m_usart_clock_state);
@@ -135,7 +135,7 @@ static DEVICE_INPUT_DEFAULTS_START( terminal ) // set up terminal to default to 
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
 DEVICE_INPUT_DEFAULTS_END
 
-static MACHINE_CONFIG_START( isbc8030, isbc8030_state )
+static MACHINE_CONFIG_START( isbc8030 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8085A, XTAL_22_1184MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(isbc8030_mem)
@@ -173,5 +173,5 @@ ROM_START( isbc8030 )
 	ROM_LOAD( "mon830.bin", 0x0000, 0x0800, CRC(cda15115) SHA1(242dad14a919568178b363c3e27f22ec0a5849b3))
 ROM_END
 
-/*    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT      CLASS           INIT   COMPANY   FULLNAME       FLAGS */
-COMP( 1978, isbc8030,  0,        0,      isbc8030,  isbc8030,  driver_device,  0,     "Intel",  "iSBC 80/30",  MACHINE_NO_SOUND_HW )
+/*    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT      CLASS            INIT   COMPANY   FULLNAME       FLAGS */
+COMP( 1978, isbc8030,  0,        0,      isbc8030,  isbc8030,  isbc8030_state,  0,     "Intel",  "iSBC 80/30",  MACHINE_NO_SOUND_HW )

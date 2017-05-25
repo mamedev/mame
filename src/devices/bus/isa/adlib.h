@@ -1,11 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Miodrag Milanovic
+#ifndef MAME_BUS_ISA_ADLIB_H
+#define MAME_BUS_ISA_ADLIB_H
+
 #pragma once
 
-#ifndef __ISA_ADLIB_H__
-#define __ISA_ADLIB_H__
-
-#include "emu.h"
 #include "isa.h"
 #include "sound/3812intf.h"
 
@@ -21,7 +20,7 @@ class isa8_adlib_device :
 {
 public:
 		// construction/destruction
-		isa8_adlib_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+		isa8_adlib_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 		// optional information overrides
 		virtual machine_config_constructor device_mconfig_additions() const override;
@@ -39,6 +38,6 @@ private:
 
 
 // device type definition
-extern const device_type ISA8_ADLIB;
+DECLARE_DEVICE_TYPE(ISA8_ADLIB, isa8_adlib_device)
 
-#endif  /* __ISA_ADLIB_H__ */
+#endif // MAME_BUS_ISA_ADLIB_H

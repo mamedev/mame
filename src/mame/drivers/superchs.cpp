@@ -41,13 +41,15 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/superchs.h"
+#include "audio/taito_en.h"
+
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"
 #include "sound/es5506.h"
-#include "audio/taito_en.h"
+#include "screen.h"
 
 #include "superchs.lh"
-#include "includes/superchs.h"
 
 
 /*********************************************************************/
@@ -159,10 +161,10 @@ WRITE32_MEMBER(superchs_state::superchs_input_w)
 
 READ32_MEMBER(superchs_state::superchs_stick_r)
 {
-	UINT8 b0 = ioport("UNKNOWN")->read();
-	UINT8 b1 = ((ioport("SOUND")->read() * 255) / 100) ^ 0xff; // 00 = full, ff = silent
-	UINT8 b2 = ioport("ACCEL")->read() ^ 0xff;
-	UINT8 b3 = ioport("WHEEL")->read();
+	uint8_t b0 = ioport("UNKNOWN")->read();
+	uint8_t b1 = ((ioport("SOUND")->read() * 255) / 100) ^ 0xff; // 00 = full, ff = silent
+	uint8_t b2 = ioport("ACCEL")->read() ^ 0xff;
+	uint8_t b3 = ioport("WHEEL")->read();
 
 	return b3 << 24 | b2 << 16 | b1 << 8 | b0;
 }
@@ -302,7 +304,7 @@ GFXDECODE_END
                  MACHINE DRIVERS
 ***********************************************************/
 
-static MACHINE_CONFIG_START( superchs, superchs_state )
+static MACHINE_CONFIG_START( superchs )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, XTAL_40MHz/2) /* 20MHz - verified */
@@ -587,4 +589,4 @@ DRIVER_INIT_MEMBER(superchs_state,superchs)
 GAMEL( 1992, superchs,         0, superchs, superchs, superchs_state, superchs, ROT0,               "Taito Corporation Japan",   "Super Chase - Criminal Termination (World)", 0, layout_superchs )
 GAMEL( 1992, superchsu, superchs, superchs, superchs, superchs_state, superchs, ROT0,               "Taito America Corporation", "Super Chase - Criminal Termination (US)",    0, layout_superchs )
 GAMEL( 1992, superchsj, superchs, superchs, superchs, superchs_state, superchs, ROT0,               "Taito Corporation",         "Super Chase - Criminal Termination (Japan)", 0, layout_superchs )
-GAMEL( 1992, superchsp, superchs, chase3,   superchs, driver_device,  0,        ORIENTATION_FLIP_X, "Taito Corporation",         "Super Chase - Criminal Termination (1992/10/26 20:24:29 CHASE 3 VER 1.1, prototype)", 0, layout_superchs ) // has CHASE 3 as the internal description
+GAMEL( 1992, superchsp, superchs, chase3,   superchs, superchs_state, 0,        ORIENTATION_FLIP_X, "Taito Corporation",         "Super Chase - Criminal Termination (1992/10/26 20:24:29 CHASE 3 VER 1.1, prototype)", 0, layout_superchs ) // has CHASE 3 as the internal description

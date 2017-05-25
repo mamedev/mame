@@ -44,10 +44,13 @@ All Clocks and Vsync verified by Corrado Tomaselli (August 2012)
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/vulgus.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "sound/ay8910.h"
-#include "includes/vulgus.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 INTERRUPT_GEN_MEMBER(vulgus_state::vblank_irq)
@@ -211,7 +214,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_CONFIG_START( vulgus, vulgus_state )
+static MACHINE_CONFIG_START( vulgus )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/4)  /* 3 MHz */
@@ -376,6 +379,6 @@ ROM_END
 
 
 
-GAME( 1984, vulgus,  0,      vulgus, vulgus, driver_device, 0, ROT270, "Capcom", "Vulgus (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, vulgusa, vulgus, vulgus, vulgus, driver_device, 0, ROT90,  "Capcom", "Vulgus (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, vulgusj, vulgus, vulgus, vulgus, driver_device, 0, ROT270, "Capcom", "Vulgus (Japan?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, vulgus,  0,      vulgus, vulgus, vulgus_state, 0, ROT270, "Capcom", "Vulgus (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, vulgusa, vulgus, vulgus, vulgus, vulgus_state, 0, ROT90,  "Capcom", "Vulgus (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, vulgusj, vulgus, vulgus, vulgus, vulgus_state, 0, ROT270, "Capcom", "Vulgus (Japan?)", MACHINE_SUPPORTS_SAVE )

@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "comal80.h"
 
 
@@ -14,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_COMAL80 = &device_creator<c64_comal80_cartridge_device>;
+DEFINE_DEVICE_TYPE(C64_COMAL80, c64_comal80_cartridge_device, "c64_comal80", "C64 COMAL 80 cartridge")
 
 
 
@@ -26,8 +27,8 @@ const device_type C64_COMAL80 = &device_creator<c64_comal80_cartridge_device>;
 //  c64_comal80_cartridge_device - constructor
 //-------------------------------------------------
 
-c64_comal80_cartridge_device::c64_comal80_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, C64_COMAL80, "C64 COMAL 80 cartridge", tag, owner, clock, "c64_comal80", __FILE__),
+c64_comal80_cartridge_device::c64_comal80_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, C64_COMAL80, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_bank(0)
 {
@@ -59,7 +60,7 @@ void c64_comal80_cartridge_device::device_reset()
 //  c64_cd_r - cartridge data read
 //-------------------------------------------------
 
-UINT8 c64_comal80_cartridge_device::c64_cd_r(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+uint8_t c64_comal80_cartridge_device::c64_cd_r(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!roml || !romh)
 	{
@@ -75,7 +76,7 @@ UINT8 c64_comal80_cartridge_device::c64_cd_r(address_space &space, offs_t offset
 //  c64_cd_w - cartridge data write
 //-------------------------------------------------
 
-void c64_comal80_cartridge_device::c64_cd_w(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+void c64_comal80_cartridge_device::c64_cd_w(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!io1)
 	{

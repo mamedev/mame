@@ -281,7 +281,7 @@ DRIVER_INIT_MEMBER(ti990_4_state, ti990_4)
 	m_nmi_timer = timer_alloc(NMI_TIMER_ID);
 }
 
-static MACHINE_CONFIG_START( ti990_4, ti990_4_state )
+static MACHINE_CONFIG_START( ti990_4 )
 	/* basic machine hardware */
 	/* TMS9900 CPU @ 3.0(???) MHz */
 	MCFG_TMS99xx_ADD("maincpu", TMS9900, 3000000, memmap, cru_map)
@@ -296,13 +296,13 @@ static MACHINE_CONFIG_START( ti990_4, ti990_4_state )
 	MCFG_ASR733_LINEINT_HANDLER(WRITELINE(ti990_4_state, line_interrupt))
 
 	// Floppy controller
-	MCFG_DEVICE_ADD("fd800", FD800, 0)
+	MCFG_DEVICE_ADD("fd800", TI99X_FD800, 0)
 	MCFG_FD800_INT_HANDLER(WRITELINE(ti990_4_state, fd_interrupt))
 
 //  MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(ti990_4_floppy_interface)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ti990_4v, ti990_4_state )
+static MACHINE_CONFIG_START( ti990_4v )
 	/* basic machine hardware */
 	/* TMS9900 CPU @ 3.0(???) MHz */
 	MCFG_TMS99xx_ADD("maincpu", TMS9900, 3000000, memmap, cru_map_v)
@@ -316,7 +316,7 @@ static MACHINE_CONFIG_START( ti990_4v, ti990_4_state )
 	MCFG_VDT911_LINEINT_HANDLER(WRITELINE(ti990_4_state, line_interrupt))
 
 	// Floppy controller
-	MCFG_DEVICE_ADD("fd800", FD800, 0)
+	MCFG_DEVICE_ADD("fd800", TI99X_FD800, 0)
 	MCFG_FD800_INT_HANDLER(WRITELINE(ti990_4_state, fd_interrupt))
 
 //  MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(ti990_4_floppy_interface)
@@ -350,7 +350,7 @@ ROM_START(ti990_4)
 	ROM_LOAD16_WORD("ti9904.rom", 0xFC00, 0x400, CRC(691e7d19) SHA1(58d9bed80490fdf71c743bfd3077c70840b7df8c))
 #endif
 
-	ROM_REGION(asr733_chr_region_len, asr733_chr_region, ROMREGION_ERASEFF)
+	ROM_REGION(asr733_device::chr_region_len, asr733_chr_region, ROMREGION_ERASEFF)
 ROM_END
 
 ROM_START(ti990_4v)
@@ -359,9 +359,9 @@ ROM_START(ti990_4v)
 	ROM_LOAD16_WORD("ti9904.rom", 0xFC00, 0x400, CRC(691e7d19) SHA1(58d9bed80490fdf71c743bfd3077c70840b7df8c))
 
 	/* VDT911 character definitions */
-	ROM_REGION(vdt911_chr_region_len, vdt911_chr_region, ROMREGION_ERASEFF)
+	ROM_REGION(vdt911_device::chr_region_len, vdt911_chr_region, ROMREGION_ERASEFF)
 ROM_END
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        COMPANY                 FULLNAME */
-COMP( 1976, ti990_4,  0,      0,      ti990_4,    0, ti990_4_state, ti990_4,    "Texas Instruments",    "TI Model 990/4 Microcomputer System" , MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1976, ti990_4v, ti990_4,      0,      ti990_4v,   0, ti990_4_state, ti990_4,    "Texas Instruments",    "TI Model 990/4 Microcomputer System with Video Display Terminal" , MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT  STATE          INIT     COMPANY              FULLNAME                                                           FLAGS
+COMP( 1976, ti990_4,  0,       0,      ti990_4,  0,     ti990_4_state, ti990_4, "Texas Instruments", "TI Model 990/4 Microcomputer System",                             MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1976, ti990_4v, ti990_4, 0,      ti990_4v, 0,     ti990_4_state, ti990_4, "Texas Instruments", "TI Model 990/4 Microcomputer System with Video Display Terminal", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

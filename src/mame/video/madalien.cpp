@@ -9,8 +9,9 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "video/mc6845.h"
 #include "includes/madalien.h"
+#include "video/mc6845.h"
+#include "screen.h"
 
 
 #define PIXEL_CLOCK (MADALIEN_MAIN_CLOCK / 2)
@@ -18,7 +19,7 @@
 
 PALETTE_INIT_MEMBER(madalien_state,madalien)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < 0x20; i++)
@@ -48,7 +49,7 @@ PALETTE_INIT_MEMBER(madalien_state,madalien)
 
 	for (i = 0x10; i < 0x20; i++)
 	{
-		UINT8 ctabentry = i - 0x10;
+		uint8_t ctabentry = i - 0x10;
 
 		if (BIT((i - 0x10), 1))
 			ctabentry = ctabentry ^ 0x06;
@@ -90,7 +91,7 @@ TILEMAP_MAPPER_MEMBER(madalien_state::scan_mode3)
 
 TILE_GET_INFO_MEMBER(madalien_state::get_tile_info_BG_1)
 {
-	UINT8 *map = memregion("user1")->base() + ((*m_video_flags & 0x08) << 6);
+	uint8_t *map = memregion("user1")->base() + ((*m_video_flags & 0x08) << 6);
 
 	SET_TILE_INFO_MEMBER(1, map[tile_index], BIT(*m_video_flags, 2) ? 2 : 0, 0);
 }
@@ -98,7 +99,7 @@ TILE_GET_INFO_MEMBER(madalien_state::get_tile_info_BG_1)
 
 TILE_GET_INFO_MEMBER(madalien_state::get_tile_info_BG_2)
 {
-	UINT8 *map = memregion("user1")->base() + ((*m_video_flags & 0x08) << 6) + 0x80;
+	uint8_t *map = memregion("user1")->base() + ((*m_video_flags & 0x08) << 6) + 0x80;
 
 	SET_TILE_INFO_MEMBER(1, map[tile_index], BIT(*m_video_flags, 2) ? 2 : 0, 0);
 }
@@ -133,14 +134,14 @@ VIDEO_START_MEMBER(madalien_state,madalien)
 		16, 16, 32, 32
 	};
 
-	m_tilemap_fg = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(madalien_state::get_tile_info_FG),this), TILEMAP_SCAN_COLS_FLIP_X, 8, 8, 32, 32);
+	m_tilemap_fg = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(madalien_state::get_tile_info_FG),this), TILEMAP_SCAN_COLS_FLIP_X, 8, 8, 32, 32);
 	m_tilemap_fg->set_transparent_pen(0);
 
 	for (i = 0; i < 4; i++)
 	{
-		m_tilemap_edge1[i] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(madalien_state::get_tile_info_BG_1),this), scan_functions[i], 16, 16, tilemap_cols[i], 8);
+		m_tilemap_edge1[i] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(madalien_state::get_tile_info_BG_1),this), scan_functions[i], 16, 16, tilemap_cols[i], 8);
 
-		m_tilemap_edge2[i] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(madalien_state::get_tile_info_BG_2),this), scan_functions[i], 16, 16, tilemap_cols[i], 8);
+		m_tilemap_edge2[i] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(madalien_state::get_tile_info_BG_2),this), scan_functions[i], 16, 16, tilemap_cols[i], 8);
 	}
 
 	m_headlight_bitmap = std::make_unique<bitmap_ind16>(128, 128);
@@ -194,12 +195,12 @@ void madalien_state::draw_headlight(bitmap_ind16 &bitmap, const rectangle &clipr
 {
 	if (BIT(*m_video_flags, 0))
 	{
-		UINT8 y;
+		uint8_t y;
 
 		for (y = 0; y < 0x80; y++)
 		{
-			UINT8 x;
-			UINT8 hy = y - *m_headlight_pos;
+			uint8_t x;
+			uint8_t hy = y - *m_headlight_pos;
 
 			if (flip)
 				hy = ~hy;
@@ -209,7 +210,7 @@ void madalien_state::draw_headlight(bitmap_ind16 &bitmap, const rectangle &clipr
 
 			for (x = 0; x < 0x80; x++)
 			{
-				UINT8 hx = x;
+				uint8_t hx = x;
 
 				if (flip)
 					hx = ~hx;
@@ -239,7 +240,7 @@ WRITE8_MEMBER(madalien_state::madalien_charram_w)
 }
 
 
-UINT32 madalien_state::screen_update_madalien(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t madalien_state::screen_update_madalien(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int flip = BIT(ioport("DSW")->read(), 6) && BIT(*m_video_control, 0);
 
@@ -294,7 +295,7 @@ UINT32 madalien_state::screen_update_madalien(screen_device &screen, bitmap_ind1
 }
 
 
-static const UINT32 headlight_xoffset[] =
+static const uint32_t headlight_xoffset[] =
 {
 	STEP8(0x78, 1),
 	STEP8(0x70, 1),
@@ -314,7 +315,7 @@ static const UINT32 headlight_xoffset[] =
 	STEP8(0x00, 1),
 };
 
-static const UINT32 headlight_yoffset[] =
+static const uint32_t headlight_yoffset[] =
 {
 	STEP32(0x0000, 0x80), STEP32(0x1000, 0x80)
 };
@@ -367,7 +368,7 @@ static GFXDECODE_START( madalien )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_FRAGMENT( madalien_video )
+MACHINE_CONFIG_START( madalien_video )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 336, 0, 256, 288, 0, 256)
 	MCFG_SCREEN_UPDATE_DRIVER(madalien_state, screen_update_madalien)

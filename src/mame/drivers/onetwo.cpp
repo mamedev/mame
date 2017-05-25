@@ -45,8 +45,10 @@ Note: this is quite clearly a 'Korean bootleg' of Shisensho - Joshiryo-Hen / Mat
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
-#include "sound/okim6295.h"
 #include "sound/3812intf.h"
+#include "sound/okim6295.h"
+#include "screen.h"
+#include "speaker.h"
 
 #define MASTER_CLOCK        XTAL_4MHz
 
@@ -66,9 +68,9 @@ public:
 		m_soundlatch(*this, "soundlatch") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_paletteram;
-	required_shared_ptr<UINT8> m_paletteram2;
-	required_shared_ptr<UINT8> m_fgram;
+	required_shared_ptr<uint8_t> m_paletteram;
+	required_shared_ptr<uint8_t> m_paletteram2;
+	required_shared_ptr<uint8_t> m_fgram;
 
 	/* video-related */
 	tilemap_t *m_fg_tilemap;
@@ -90,7 +92,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	UINT32 screen_update_onetwo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_onetwo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void set_color(int offset);
 };
 
@@ -114,10 +116,10 @@ TILE_GET_INFO_MEMBER(onetwo_state::get_fg_tile_info)
 
 void onetwo_state::video_start()
 {
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(onetwo_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(onetwo_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 }
 
-UINT32 onetwo_state::screen_update_onetwo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t onetwo_state::screen_update_onetwo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -347,13 +349,13 @@ GFXDECODE_END
 
 void onetwo_state::machine_start()
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 
 }
 
-static MACHINE_CONFIG_START( onetwo, onetwo_state )
+static MACHINE_CONFIG_START( onetwo )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,MASTER_CLOCK)   /* 4 MHz */
@@ -389,7 +391,7 @@ static MACHINE_CONFIG_START( onetwo, onetwo_state )
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", 1056000*2, OKIM6295_PIN7_LOW) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 1056000*2, PIN7_LOW) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -437,5 +439,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1997, onetwo,       0, onetwo, onetwo, driver_device, 0, ROT0, "Barko", "One + Two", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, onetwoe, onetwo, onetwo, onetwo, driver_device, 0, ROT0, "Barko", "One + Two (earlier)", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, onetwo,       0, onetwo, onetwo, onetwo_state, 0, ROT0, "Barko", "One + Two", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, onetwoe, onetwo, onetwo, onetwo, onetwo_state, 0, ROT0, "Barko", "One + Two (earlier)", MACHINE_SUPPORTS_SAVE )

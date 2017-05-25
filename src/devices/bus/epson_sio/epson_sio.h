@@ -6,12 +6,11 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_EPSON_SIO_EPSON_SIO_H
+#define MAME_BUS_EPSON_SIO_EPSON_SIO_H
+
 #pragma once
 
-#ifndef __EPSON_SIO_H__
-#define __EPSON_SIO_H__
-
-#include "emu.h"
 
 
 //**************************************************************************
@@ -23,10 +22,10 @@
 	MCFG_DEVICE_SLOT_INTERFACE(epson_sio_devices, _def_slot, false)
 
 #define MCFG_EPSON_SIO_RX(_rx) \
-	downcast<epson_sio_device *>(device)->set_rx_callback(DEVCB_##_rx);
+	devcb = &downcast<epson_sio_device *>(device)->set_rx_callback(DEVCB_##_rx);
 
 #define MCFG_EPSON_SIO_PIN(_pin) \
-	downcast<epson_sio_device *>(device)->set_pin_callback(DEVCB_##_pin);
+	devcb = &downcast<epson_sio_device *>(device)->set_pin_callback(DEVCB_##_pin);
 
 
 //**************************************************************************
@@ -41,12 +40,12 @@ class epson_sio_device : public device_t,
 {
 public:
 	// construction/destruction
-	epson_sio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	epson_sio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~epson_sio_device();
 
 	// callbacks
-	template<class _rx> void set_rx_callback(_rx rx) { m_write_rx.set_callback(rx); }
-	template<class _pin> void set_pin_callback(_pin pin) { m_write_pin.set_callback(pin); }
+	template<class _rx> devcb_base &set_rx_callback(_rx rx) { return m_write_rx.set_callback(rx); }
+	template<class _pin> devcb_base &set_pin_callback(_pin pin) { return m_write_pin.set_callback(pin); }
 
 	// called from owner
 	DECLARE_WRITE_LINE_MEMBER( tx_w );
@@ -74,23 +73,24 @@ class device_epson_sio_interface : public device_slot_card_interface
 {
 public:
 	// construction/destruction
-	device_epson_sio_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_epson_sio_interface();
 
 	virtual void tx_w(int state) { };
 	virtual void pout_w(int state) { };
 
 protected:
+	device_epson_sio_interface(const machine_config &mconfig, device_t &device);
+
 	epson_sio_device *m_slot;
 };
 
 
 // device type definition
-extern const device_type EPSON_SIO;
+DECLARE_DEVICE_TYPE(EPSON_SIO, epson_sio_device)
 
 
 // supported devices
 SLOT_INTERFACE_EXTERN( epson_sio_devices );
 
 
-#endif // __EPSON_SIO_H__
+#endif // MAME_BUS_EPSON_SIO_EPSON_SIO_H

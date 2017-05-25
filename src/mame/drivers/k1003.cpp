@@ -58,9 +58,9 @@ public:
 	DECLARE_WRITE8_MEMBER(disp_1_w);
 	DECLARE_WRITE8_MEMBER(disp_2_w);
 	DECLARE_WRITE8_MEMBER(disp_w);
-	UINT8 m_disp_1;
-	UINT8 m_disp_2;
-	UINT8 bit_to_dec(UINT8 val);
+	uint8_t m_disp_1;
+	uint8_t m_disp_2;
+	uint8_t bit_to_dec(uint8_t val);
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 };
@@ -96,7 +96,7 @@ WRITE8_MEMBER( k1003_state::disp_2_w )
 	m_disp_2 = data;
 }
 
-UINT8 k1003_state::bit_to_dec(UINT8 val)
+uint8_t k1003_state::bit_to_dec(uint8_t val)
 {
 	if (BIT(val,0)) return 0;
 	if (BIT(val,1)) return 1;
@@ -134,7 +134,7 @@ void k1003_state::machine_reset()
 {
 }
 
-static MACHINE_CONFIG_START( k1003, k1003_state )
+static MACHINE_CONFIG_START( k1003 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8008, 800000)
 	MCFG_CPU_PROGRAM_MAP(k1003_mem)
@@ -193,5 +193,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1978, k1003,  0,      0,       k1003,     k1003, driver_device,   0,    "Robotron", "K1003", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE        INIT  COMPANY     FULLNAME  FLAGS
+COMP( 1978, k1003,  0,      0,       k1003,     k1003, k1003_state, 0,    "Robotron", "K1003",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

@@ -129,21 +129,17 @@ static const char keyboard[8][9][8] = {
 	},
 };
 
-UINT8 microtan_state::read_dsw()
+uint8_t microtan_state::read_dsw()
 {
-	UINT8 result;
 	switch(machine().phase())
 	{
-		case MACHINE_PHASE_RESET:
-		case MACHINE_PHASE_RUNNING:
-			result = ioport("DSW")->read();
-			break;
+	case machine_phase::RESET:
+	case machine_phase::RUNNING:
+		return ioport("DSW")->read();
 
-		default:
-			result = 0x00;
-			break;
+	default:
+		return 0x00;
 	}
-	return result;
 }
 
 void microtan_state::microtan_set_irq_line()
@@ -235,7 +231,7 @@ void microtan_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		microtan_pulse_nmi(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in microtan_state::device_timer");
+		assert_always(false, "Unknown id in microtan_state::device_timer");
 	}
 }
 
@@ -417,7 +413,7 @@ INTERRUPT_GEN_MEMBER(microtan_state::microtan_interrupt)
 
 DRIVER_INIT_MEMBER(microtan_state,microtan)
 {
-	UINT8 *dst = memregion("gfx2")->base();
+	uint8_t *dst = memregion("gfx2")->base();
 	int i;
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -522,26 +518,26 @@ void microtan_state::machine_reset()
 	output().set_led_value(1, (m_keyrows[3] & 0x80) ? 0 : 1);
 }
 
-int microtan_state::microtan_verify_snapshot(UINT8 *data, int size)
+image_verify_result microtan_state::microtan_verify_snapshot(uint8_t *data, int size)
 {
 	if (size == 8263)
 	{
 		logerror("microtan_snapshot_id: magic size %d found\n", size);
-		return IMAGE_VERIFY_PASS;
+		return image_verify_result::PASS;
 	}
 	else
 	{
 		if (4 + data[2] + 256 * data[3] + 1 + 16 + 16 + 16 + 1 + 1 + 16 + 16 + 64 + 7 == size)
 		{
 			logerror("microtan_snapshot_id: header RAM size + structures matches filesize %d\n", size);
-			return IMAGE_VERIFY_PASS;
+			return image_verify_result::PASS;
 		}
 	}
 
-	return IMAGE_VERIFY_FAIL;
+	return image_verify_result::FAIL;
 }
 
-int microtan_state::parse_intel_hex(UINT8 *snapshot_buff, char *src)
+image_init_result microtan_state::parse_intel_hex(uint8_t *snapshot_buff, char *src)
 {
 	char line[128];
 	int /*row = 0,*/ column = 0, last_addr = 0, last_size = 0;
@@ -619,10 +615,10 @@ int microtan_state::parse_intel_hex(UINT8 *snapshot_buff, char *src)
 		logerror("parse_intel_hex: registers (?) at %04X\n", last_addr);
 		memcpy(&snapshot_buff[8192+64], &snapshot_buff[last_addr], last_size);
 	}
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
-int microtan_state::parse_zillion_hex(UINT8 *snapshot_buff, char *src)
+image_init_result microtan_state::parse_zillion_hex(uint8_t *snapshot_buff, char *src)
 {
 	char line[128];
 	int parsing = 0, /*row = 0,*/ column = 0;
@@ -702,10 +698,10 @@ int microtan_state::parse_zillion_hex(UINT8 *snapshot_buff, char *src)
 		}
 		src++;
 	}
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
-void microtan_state::microtan_set_cpu_regs(const UINT8 *snapshot_buff, int base)
+void microtan_state::microtan_set_cpu_regs(const uint8_t *snapshot_buff, int base)
 {
 	logerror("microtan_snapshot_copy: PC:%02X%02X P:%02X A:%02X X:%02X Y:%02X SP:1%02X",
 		snapshot_buff[base+1], snapshot_buff[base+0], snapshot_buff[base+2], snapshot_buff[base+3],
@@ -718,9 +714,9 @@ void microtan_state::microtan_set_cpu_regs(const UINT8 *snapshot_buff, int base)
 	m_maincpu->set_state_int(M6502_S, snapshot_buff[base+6]);
 }
 
-void microtan_state::microtan_snapshot_copy(UINT8 *snapshot_buff, int snapshot_size)
+void microtan_state::microtan_snapshot_copy(uint8_t *snapshot_buff, int snapshot_size)
 {
-	UINT8 *RAM = memregion("maincpu")->base();
+	uint8_t *RAM = memregion("maincpu")->base();
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	ay8910_device *ay8910 = machine().device<ay8910_device>("ay8910.1");
 
@@ -821,25 +817,25 @@ void microtan_state::microtan_snapshot_copy(UINT8 *snapshot_buff, int snapshot_s
 
 SNAPSHOT_LOAD_MEMBER( microtan_state, microtan )
 {
-	UINT8 *snapshot_buff;
+	uint8_t *snapshot_buff;
 
-	snapshot_buff = (UINT8*)image.ptr();
+	snapshot_buff = (uint8_t*)image.ptr();
 	if (!snapshot_buff)
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 
-	if (microtan_verify_snapshot(snapshot_buff, snapshot_size)==IMAGE_VERIFY_FAIL)
-		return IMAGE_INIT_FAIL;
+	if (microtan_verify_snapshot(snapshot_buff, snapshot_size) != image_verify_result::PASS)
+		return image_init_result::FAIL;
 
 	microtan_snapshot_copy(snapshot_buff, snapshot_size);
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 QUICKLOAD_LOAD_MEMBER( microtan_state, microtan )
 {
 	int snapshot_size = 8263;   /* magic size */
-	dynamic_buffer snapshot_buff(snapshot_size, 0);
+	std::vector<uint8_t> snapshot_buff(snapshot_size, 0);
 	std::vector<char> buff(quickload_size + 1);
-	int rc;
+	image_init_result rc;
 
 	image.fread(&buff[0], quickload_size);
 
@@ -849,7 +845,7 @@ QUICKLOAD_LOAD_MEMBER( microtan_state, microtan )
 		rc = parse_intel_hex(&snapshot_buff[0], &buff[0]);
 	else
 		rc = parse_zillion_hex(&snapshot_buff[0], &buff[0]);
-	if (rc == IMAGE_INIT_PASS)
+	if (rc == image_init_result::PASS)
 		microtan_snapshot_copy(&snapshot_buff[0], snapshot_size);
 	return rc;
 }

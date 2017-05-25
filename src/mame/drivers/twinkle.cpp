@@ -238,12 +238,14 @@ Notes:
 #include "machine/ataintf.h"
 #include "machine/fdc37c665gt.h"
 #include "machine/i2cmem.h"
+#include "machine/ram.h"
 #include "machine/rtc65271.h"
 #include "machine/watchdog.h"
 #include "machine/x76f041.h"
 #include "sound/spu.h"
 #include "sound/cdda.h"
 #include "sound/rf5c400.h"
+#include "speaker.h"
 
 class twinkle_state : public driver_device
 {
@@ -261,17 +263,17 @@ public:
 
 	required_device<am53cf96_device> m_am53cf96;
 	required_device<ata_interface_device> m_ata;
-	required_region_ptr<UINT16> m_waveram;
+	required_region_ptr<uint16_t> m_waveram;
 
-	UINT16 m_spu_ctrl;      // SPU board control register
-	UINT8 m_spu_shared[0x400];  // SPU/PSX shared dual-ported RAM
-	UINT32 m_spu_ata_dma;
+	uint16_t m_spu_ctrl;      // SPU board control register
+	uint8_t m_spu_shared[0x400];  // SPU/PSX shared dual-ported RAM
+	uint32_t m_spu_ata_dma;
 	int m_spu_ata_dmarq;
 
 	int m_io_offset;
 	int m_output_last[ 0x100 ];
 	int m_last_io_offset;
-	UINT8 m_sector_buffer[ 4096 ];
+	uint8_t m_sector_buffer[ 4096 ];
 	DECLARE_WRITE8_MEMBER(twinkle_io_w);
 	DECLARE_READ8_MEMBER(twinkle_io_r);
 	DECLARE_WRITE16_MEMBER(twinkle_output_w);
@@ -328,7 +330,7 @@ public:
 //   D2  D1
 
 
-static const UINT16 asciicharset[]=
+static const uint16_t asciicharset[]=
 {
 	LED_A1 | LED_A2 | LED_B | LED_C | LED_D1 | LED_D2 | LED_E | LED_F | LED_J | LED_M, // 0
 	LED_B | LED_C, // 1
@@ -534,7 +536,7 @@ WRITE8_MEMBER(twinkle_state::twinkle_io_w)
 
 READ8_MEMBER(twinkle_state::twinkle_io_r)
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	switch( offset )
 	{
@@ -686,7 +688,7 @@ WRITE8_MEMBER(twinkle_state::shared_psx_w)
 
 READ8_MEMBER(twinkle_state::shared_psx_r)
 {
-	UINT32 result = m_spu_shared[offset];
+	uint32_t result = m_spu_shared[offset];
 
 	//printf("shared_psx_r: %04x, %04x, %04x\n", offset, result, mem_mask);
 
@@ -777,7 +779,7 @@ WRITE_LINE_MEMBER(twinkle_state::spu_ata_dmarq)
 
 			while (m_spu_ata_dmarq)
 			{
-				UINT16 data = m_ata->read_dma();
+				uint16_t data = m_ata->read_dma();
 				//printf("spu_ata_dmarq %08x %04x\n", m_spu_ata_dma * 2, data);
 				//waveram[m_spu_ata_dma++] = (data >> 8) | (data << 8);
 				// bp 4a0e ;bmiidx4 checksum
@@ -809,7 +811,7 @@ WRITE16_MEMBER(twinkle_state::twinkle_waveram_w)
 
 READ16_MEMBER(twinkle_state::shared_68k_r)
 {
-	UINT16 result = m_spu_shared[offset];
+	uint16_t result = m_spu_shared[offset];
 
 //  printf("shared_68k_r: %04x, %04x, %04x\n", offset, result, mem_mask);
 
@@ -848,7 +850,7 @@ ADDRESS_MAP_END
 
 /* SCSI */
 
-static void scsi_dma_read( twinkle_state *state, UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size )
+static void scsi_dma_read( twinkle_state *state, uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size )
 {
 	int i;
 	int n_this;
@@ -891,7 +893,7 @@ static void scsi_dma_read( twinkle_state *state, UINT32 *p_n_psxram, UINT32 n_ad
 	}
 }
 
-static void scsi_dma_write( twinkle_state *state, UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size )
+static void scsi_dma_write( twinkle_state *state, uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size )
 {
 	int i;
 	int n_this;
@@ -925,13 +927,13 @@ static void scsi_dma_write( twinkle_state *state, UINT32 *p_n_psxram, UINT32 n_a
 }
 
 
-static MACHINE_CONFIG_FRAGMENT( cdrom_config )
+static MACHINE_CONFIG_START( cdrom_config )
 	MCFG_DEVICE_MODIFY( "cdda" )
 	MCFG_SOUND_ROUTE( 0, "^^^^speakerleft", 1.0 )
 	MCFG_SOUND_ROUTE( 1, "^^^^speakerright", 1.0 )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( twinkle, twinkle_state )
+static MACHINE_CONFIG_START( twinkle )
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", CXD8530CQ, XTAL_67_7376MHz )
 	MCFG_CPU_PROGRAM_MAP( main_map )
@@ -939,8 +941,8 @@ static MACHINE_CONFIG_START( twinkle, twinkle_state )
 	MCFG_RAM_MODIFY("maincpu:ram")
 	MCFG_RAM_DEFAULT_SIZE("4M")
 
-	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psx_dma_read_delegate( FUNC( scsi_dma_read ), (twinkle_state *) owner ) )
-	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 5, psx_dma_write_delegate( FUNC( scsi_dma_write ), (twinkle_state *) owner ) )
+	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psxdma_device::read_delegate(&scsi_dma_read, (twinkle_state *) owner ) )
+	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 5, psxdma_device::write_delegate(&scsi_dma_write, (twinkle_state *) owner ) )
 
 	MCFG_CPU_ADD("audiocpu", M68000, 32000000/2)    /* 16.000 MHz */
 	MCFG_CPU_PROGRAM_MAP( sound_map )
@@ -1331,20 +1333,20 @@ ROM_START( bmiidxc2 )
 	DISK_IMAGE_READONLY( "983hdda01", 0, SHA1(bcbbf55acf8bebc5773ffc5769420a0129f4da57) )
 ROM_END
 
-GAME( 1999, gq863,    0,       twinkle,  twinkle,  driver_device, 0,        ROT0, "Konami", "Twinkle System", MACHINE_IS_BIOS_ROOT )
+GAME( 1999, gq863,    0,       twinkle,  twinkle,  twinkle_state, 0,        ROT0, "Konami", "Twinkle System", MACHINE_IS_BIOS_ROOT )
 
-GAME( 1999, bmiidx,   gq863,   twinklex, twinklex, driver_device, 0,        ROT0, "Konami", "beatmania IIDX (863 JAB)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1999, bmiidxa,  bmiidx,  twinklex, twinklex, driver_device, 0,        ROT0, "Konami", "beatmania IIDX (863 JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1999, bmiidxc,  gq863,   twinklex, twinklex, driver_device, 0,        ROT0, "Konami", "beatmania IIDX with DDR 2nd Club Version (896 JAB)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1999, bmiidxca, bmiidxc, twinklex, twinklex, driver_device, 0,        ROT0, "Konami", "beatmania IIDX with DDR 2nd Club Version (896 JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1999, bmiidxs,  gq863,   twinklex, twinklex, driver_device, 0,        ROT0, "Konami", "beatmania IIDX Substream (983 JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1999, bmiidxc2, gq863,   twinklex, twinklex, driver_device, 0,        ROT0, "Konami", "beatmania IIDX Substream with DDR 2nd Club Version 2 (984 A01 BM)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1999, bmiidx2,  gq863,   twinklei, twinklei, driver_device, 0,        ROT0, "Konami", "beatmania IIDX 2nd style (GC985 JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 2000, bmiidx3,  gq863,   twinklei, twinklei, driver_device, 0,        ROT0, "Konami", "beatmania IIDX 3rd style (GC992 JAC)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 2000, bmiidx3a, bmiidx3, twinklei, twinklei, driver_device, 0,        ROT0, "Konami", "beatmania IIDX 3rd style (GC992 JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 2000, bmiidx4,  gq863,   twinklei, twinklei, driver_device, 0,        ROT0, "Konami", "beatmania IIDX 4th style (GCA03 JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 2001, bmiidx5,  gq863,   twinklei, twinklei, driver_device, 0,        ROT0, "Konami", "beatmania IIDX 5th style (GCA17 JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 2001, bmiidx6,  gq863,   twinklei, twinklei, driver_device, 0,        ROT0, "Konami", "beatmania IIDX 6th style (GCB4U JAB)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 2001, bmiidx6a, bmiidx6, twinklei, twinklei, driver_device, 0,        ROT0, "Konami", "beatmania IIDX 6th style (GCB4U JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 2002, bmiidx7,  gq863,   twinklei, twinklei, driver_device, 0,        ROT0, "Konami", "beatmania IIDX 7th style (GCB44 JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 2002, bmiidx8,  gq863,   twinklei, twinklei, driver_device, 0,        ROT0, "Konami", "beatmania IIDX 8th style (GCC44 JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1999, bmiidx,   gq863,   twinklex, twinklex, twinkle_state, 0,        ROT0, "Konami", "beatmania IIDX (863 JAB)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1999, bmiidxa,  bmiidx,  twinklex, twinklex, twinkle_state, 0,        ROT0, "Konami", "beatmania IIDX (863 JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1999, bmiidxc,  gq863,   twinklex, twinklex, twinkle_state, 0,        ROT0, "Konami", "beatmania IIDX with DDR 2nd Club Version (896 JAB)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1999, bmiidxca, bmiidxc, twinklex, twinklex, twinkle_state, 0,        ROT0, "Konami", "beatmania IIDX with DDR 2nd Club Version (896 JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1999, bmiidxs,  gq863,   twinklex, twinklex, twinkle_state, 0,        ROT0, "Konami", "beatmania IIDX Substream (983 JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1999, bmiidxc2, gq863,   twinklex, twinklex, twinkle_state, 0,        ROT0, "Konami", "beatmania IIDX Substream with DDR 2nd Club Version 2 (984 A01 BM)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1999, bmiidx2,  gq863,   twinklei, twinklei, twinkle_state, 0,        ROT0, "Konami", "beatmania IIDX 2nd style (GC985 JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 2000, bmiidx3,  gq863,   twinklei, twinklei, twinkle_state, 0,        ROT0, "Konami", "beatmania IIDX 3rd style (GC992 JAC)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 2000, bmiidx3a, bmiidx3, twinklei, twinklei, twinkle_state, 0,        ROT0, "Konami", "beatmania IIDX 3rd style (GC992 JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 2000, bmiidx4,  gq863,   twinklei, twinklei, twinkle_state, 0,        ROT0, "Konami", "beatmania IIDX 4th style (GCA03 JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 2001, bmiidx5,  gq863,   twinklei, twinklei, twinkle_state, 0,        ROT0, "Konami", "beatmania IIDX 5th style (GCA17 JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 2001, bmiidx6,  gq863,   twinklei, twinklei, twinkle_state, 0,        ROT0, "Konami", "beatmania IIDX 6th style (GCB4U JAB)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 2001, bmiidx6a, bmiidx6, twinklei, twinklei, twinkle_state, 0,        ROT0, "Konami", "beatmania IIDX 6th style (GCB4U JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 2002, bmiidx7,  gq863,   twinklei, twinklei, twinkle_state, 0,        ROT0, "Konami", "beatmania IIDX 7th style (GCB44 JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 2002, bmiidx8,  gq863,   twinklei, twinklei, twinkle_state, 0,        ROT0, "Konami", "beatmania IIDX 8th style (GCC44 JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )

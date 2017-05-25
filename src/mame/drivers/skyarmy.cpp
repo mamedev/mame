@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina,Ryan Holtz
 /*
  2010.04.05. stephh
@@ -7,10 +7,8 @@
     - Updated memory map to partially handle screen flipping
 
  05/01/2003  Ryan Holtz
-    - Corrected second AY (shouldn't have been there)
     - Added first AY's status read
     - Added coinage DIP
-    - What are those unmapped port writes!? Not AY...
 
  2003.01.01. Tomasz Slanina
 
@@ -26,10 +24,12 @@
     - cpu clock .. now 4 mhz
 */
 
-
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 class skyarmy_state : public driver_device
 {
@@ -48,10 +48,10 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_colorram;
-	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_scrollram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_scrollram;
 
 	tilemap_t* m_tilemap;
 	int m_nmi;
@@ -60,6 +60,7 @@ public:
 	DECLARE_WRITE8_MEMBER(flip_screen_y_w);
 	DECLARE_WRITE8_MEMBER(videoram_w);
 	DECLARE_WRITE8_MEMBER(colorram_w);
+	DECLARE_WRITE8_MEMBER(coin_counter_w);
 	DECLARE_WRITE8_MEMBER(nmi_enable_w);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
@@ -68,7 +69,7 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(skyarmy);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(nmi_source);
 };
@@ -110,7 +111,7 @@ WRITE8_MEMBER(skyarmy_state::colorram_w)
 
 PALETTE_INIT_MEMBER(skyarmy_state, skyarmy)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	for (i = 0;i < 32;i++)
@@ -139,12 +140,12 @@ PALETTE_INIT_MEMBER(skyarmy_state, skyarmy)
 
 void skyarmy_state::video_start()
 {
-	m_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(skyarmy_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(skyarmy_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_tilemap->set_scroll_cols(32);
 }
 
 
-UINT32 skyarmy_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t skyarmy_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int sx, sy, flipx, flipy, offs,pal;
 	int i;
@@ -163,6 +164,17 @@ UINT32 skyarmy_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 		flipy = (m_spriteram[offs+1]&0x80)>>7;
 		flipx = (m_spriteram[offs+1]&0x40)>>6;
 
+		if (flip_screen_x())
+		{
+			sx = 240 - sx;
+			flipx = !flipx;
+		}
+		if (flip_screen_y())
+		{
+			sy = 240 - sy;
+			flipy = !flipy;
+		}
+
 		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 			m_spriteram[offs+1]&0x3f,
 			pal,
@@ -175,13 +187,22 @@ UINT32 skyarmy_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 INTERRUPT_GEN_MEMBER(skyarmy_state::nmi_source)
 {
-	if(m_nmi) device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (m_nmi)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+}
+
+
+WRITE8_MEMBER(skyarmy_state::coin_counter_w)
+{
+	machine().bookkeeping().coin_counter_w(0, data & 1);
 }
 
 
 WRITE8_MEMBER(skyarmy_state::nmi_enable_w)
 {
 	m_nmi=data & 1;
+	if (!m_nmi)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
@@ -192,20 +213,22 @@ static ADDRESS_MAP_START( skyarmy_map, AS_PROGRAM, 8, skyarmy_state )
 	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram") /* Color RAM */
 	AM_RANGE(0x9800, 0x983f) AM_RAM AM_SHARE("spriteram") /* Sprites */
 	AM_RANGE(0x9840, 0x985f) AM_RAM AM_SHARE("scrollram")  /* Scroll RAM */
-	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("DSW")
+	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("DSW") AM_WRITE(coin_counter_w)
 	AM_RANGE(0xa001, 0xa001) AM_READ_PORT("P1")
 	AM_RANGE(0xa002, 0xa002) AM_READ_PORT("P2")
 	AM_RANGE(0xa003, 0xa003) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xa004, 0xa004) AM_WRITE(nmi_enable_w) // ???
 	AM_RANGE(0xa005, 0xa005) AM_WRITE(flip_screen_x_w)
 	AM_RANGE(0xa006, 0xa006) AM_WRITE(flip_screen_y_w)
-	AM_RANGE(0xa007, 0xa007) AM_WRITENOP
+	AM_RANGE(0xa007, 0xa007) AM_WRITENOP // video RAM buffering?
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( skyarmy_io_map, AS_IO, 8, skyarmy_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x04, 0x05) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0x06, 0x06) AM_DEVREAD("aysnd", ay8910_device, data_r)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay0", ay8910_device, address_data_w)
+	AM_RANGE(0x02, 0x02) AM_DEVREAD("ay0", ay8910_device, data_r)
+	AM_RANGE(0x04, 0x05) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
+	AM_RANGE(0x06, 0x06) AM_DEVREAD("ay1", ay8910_device, data_r)
 ADDRESS_MAP_END
 
 
@@ -294,7 +317,7 @@ static GFXDECODE_START( skyarmy )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0, 8 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( skyarmy, skyarmy_state )
+static MACHINE_CONFIG_START( skyarmy )
 
 	MCFG_CPU_ADD("maincpu", Z80,4000000)
 	MCFG_CPU_PROGRAM_MAP(skyarmy_map)
@@ -317,7 +340,9 @@ static MACHINE_CONFIG_START( skyarmy, skyarmy_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, 2500000)
+	MCFG_SOUND_ADD("ay0", AY8910, 2500000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	MCFG_SOUND_ADD("ay1", AY8910, 2500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 MACHINE_CONFIG_END
 
@@ -341,4 +366,4 @@ ROM_START( skyarmy )
 	ROM_LOAD( "a6.bin",  0x0000, 0x0020, CRC(c721220b) SHA1(61b3320fb616c0600d56840cb6438616c7e0c6eb) )
 ROM_END
 
-GAME( 1982, skyarmy, 0, skyarmy, skyarmy, driver_device, 0, ROT90, "Shoei", "Sky Army", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, skyarmy, 0, skyarmy, skyarmy, skyarmy_state, 0, ROT90, "Shoei", "Sky Army", MACHINE_SUPPORTS_SAVE )

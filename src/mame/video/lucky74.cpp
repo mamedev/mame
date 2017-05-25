@@ -131,7 +131,7 @@ PALETTE_INIT_MEMBER(lucky74_state, lucky74)
    We're constructing a double-sized palette with one half for each state.
 */
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 	static const int resistances_rgb[4] = { 2000, 1000, 470, 220 };
 	double weights_r[4], weights_g[4], weights_b[4];
@@ -231,13 +231,13 @@ TILE_GET_INFO_MEMBER(lucky74_state::get_bg_tile_info)
 
 void lucky74_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(lucky74_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(lucky74_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(lucky74_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(lucky74_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	m_fg_tilemap->set_transparent_pen(0);
 }
 
-UINT32 lucky74_state::screen_update_lucky74(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t lucky74_state::screen_update_lucky74(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);

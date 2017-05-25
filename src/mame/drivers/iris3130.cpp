@@ -40,7 +40,6 @@
 
 #include "emu.h"
 #include "bus/rs232/rs232.h"
-#include "sound/dac.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/mc146818.h" /* TOD clock */
 #include "machine/mc68681.h" /* DUART0, DUART1 */
@@ -95,21 +94,21 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(duartb_irq_handler);
 	required_device<cpu_device> m_maincpu;
 protected:
-	required_shared_ptr<UINT32> m_mainram;
+	required_shared_ptr<uint32_t> m_mainram;
 	required_device<mc68681_device> m_duarta;
 	required_device<mc68681_device> m_duartb;
-	required_shared_ptr<UINT32> m_bss;
-	required_shared_ptr<UINT32> m_ptmap;
+	required_shared_ptr<uint32_t> m_bss;
+	required_shared_ptr<uint32_t> m_ptmap;
 	required_device<mc146818_device> m_rtc;
 private:
-	UINT8 m_mbut;
-	UINT16 m_mquad;
-	UINT16 m_tdbase;
-	UINT16 m_tdlmt;
-	UINT16 m_stkbase;
-	UINT16 m_stklmt;
-	UINT8 m_parctl;
-	UINT8 m_mbp;
+	uint8_t m_mbut;
+	uint16_t m_mquad;
+	uint16_t m_tdbase;
+	uint16_t m_tdlmt;
+	uint16_t m_stkbase;
+	uint16_t m_stklmt;
+	uint8_t m_parctl;
+	uint8_t m_mbp;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ... );
@@ -184,7 +183,7 @@ READ16_MEMBER(sgi_ip2_state::sgi_ip2_swtch_r)
 
 READ8_MEMBER(sgi_ip2_state::sgi_ip2_clock_ctl_r)
 {
-	UINT8 ret = m_rtc->read(space, 1);
+	uint8_t ret = m_rtc->read(space, 1);
 	verboselog(1, "sgi_ip2_clock_ctl_r: %02x\n", ret);
 	return ret;
 }
@@ -197,7 +196,7 @@ WRITE8_MEMBER(sgi_ip2_state::sgi_ip2_clock_ctl_w)
 
 READ8_MEMBER(sgi_ip2_state::sgi_ip2_clock_data_r)
 {
-	UINT8 ret = m_rtc->read(space, 0);
+	uint8_t ret = m_rtc->read(space, 0);
 	verboselog(1, "sgi_ip2_clock_data_r: %02x\n", ret);
 	return ret;
 }
@@ -419,7 +418,7 @@ static DEVICE_INPUT_DEFAULTS_START( ip2_terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
 DEVICE_INPUT_DEFAULTS_END
 
-static MACHINE_CONFIG_START( sgi_ip2, sgi_ip2_state )
+static MACHINE_CONFIG_START( sgi_ip2 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68020, 16000000)
 	MCFG_CPU_PROGRAM_MAP(sgi_ip2_map)
@@ -436,11 +435,6 @@ static MACHINE_CONFIG_START( sgi_ip2, sgi_ip2_state )
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("duart68681a", mc68681_device, rx_b_w))
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", ip2_terminal)
-
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD( "dac", DAC, 0 )
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( sgi_ip2 )
@@ -493,8 +487,8 @@ INPUT_PORTS_END
 
 DRIVER_INIT_MEMBER(sgi_ip2_state,sgi_ip2)
 {
-	UINT32 *src = (UINT32*)(memregion("maincpu")->base());
-	UINT32 *dst = m_mainram;
+	uint32_t *src = (uint32_t*)(memregion("maincpu")->base());
+	uint32_t *dst = m_mainram;
 	memcpy(dst, src, 8);
 
 	m_maincpu->reset();
@@ -513,5 +507,5 @@ ROM_START( sgi_ip2 )
 	ROM_LOAD( "sgi-ip2-u93.ip2.2-008.od",  0x10000, 0x8000, CRC(bf967590) SHA1(1aac48e4f5531a25c5482f64de5cd3c7a9931f11) )
 ROM_END
 
-/*    YEAR  NAME      PARENT    COMPAT    MACHINE  INPUT     INIT     COMPANY                   FULLNAME */
+//    YEAR  NAME      PARENT    COMPAT    MACHINE  INPUT    STATE           INIT     COMPANY                 FULLNAME           FLAGS
 COMP( 1985, sgi_ip2,  0,        0,        sgi_ip2, sgi_ip2, sgi_ip2_state,  sgi_ip2, "Silicon Graphics Inc", "IRIS 3130 (IP2)", MACHINE_NOT_WORKING )

@@ -26,10 +26,10 @@ public:
 	required_device<palette_device> m_palette;
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_videoram;
-	required_shared_ptr<UINT16> m_vregs;
-	required_shared_ptr<UINT16> m_spriteram;
-	required_shared_ptr<UINT16> m_mainram;
+	required_shared_ptr<uint16_t> m_videoram;
+	required_shared_ptr<uint16_t> m_vregs;
+	required_shared_ptr<uint16_t> m_spriteram;
+	required_shared_ptr<uint16_t> m_mainram;
 
 	/* video-related */
 	tilemap_t     *m_pant[2];
@@ -57,7 +57,7 @@ public:
 
 	TILE_GET_INFO_MEMBER(get_tile_info_screen0);
 	TILE_GET_INFO_MEMBER(get_tile_info_screen1);
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(interrupt);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void ROM16_split_gfx( const char *src_reg, const char *dst_reg, int start, int length, int dest1, int dest2 );

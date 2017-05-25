@@ -34,16 +34,16 @@ public:
 
 	/* memory pointers */
 	required_device<buffered_spriteram16_device> m_spriteram;
-	required_shared_ptr<UINT16> m_vram;
-	required_shared_ptr<UINT16> m_scroll1;
-	required_shared_ptr<UINT16> m_scroll2;
-	required_shared_ptr<UINT16> m_paletteram;
+	required_shared_ptr<uint16_t> m_vram;
+	required_shared_ptr<uint16_t> m_scroll1;
+	required_shared_ptr<uint16_t> m_scroll2;
+	required_shared_ptr<uint16_t> m_paletteram;
 
 	/* video-related */
 	tilemap_t     *m_bg_tilemap;
 	tilemap_t     *m_fg_tilemap;
 	tilemap_t     *m_tx_tilemap;
-	UINT16      m_scroll[8];
+	uint16_t      m_scroll[8];
 	int         m_sprite_flipy_mask;
 	int         m_sprite_pri_mask;
 	int         m_tilemap_priority;
@@ -68,8 +68,8 @@ public:
 	DECLARE_VIDEO_START(lastduel);
 	DECLARE_MACHINE_START(madgear);
 	DECLARE_VIDEO_START(madgear);
-	UINT32 screen_update_lastduel(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_madgear(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_lastduel(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_madgear(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(lastduel_timer_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(madgear_timer_cb);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int pri );

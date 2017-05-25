@@ -97,12 +97,15 @@ Sound: VLM5030 at 7B
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/yiear.h"
+#include "includes/konamipt.h"
+#include "audio/trackfld.h"
+
 #include "cpu/m6809/m6809.h"
 #include "machine/watchdog.h"
 #include "sound/sn76496.h"
-#include "includes/konamipt.h"
-#include "audio/trackfld.h"
-#include "includes/yiear.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 
@@ -275,7 +278,7 @@ void yiear_state::machine_reset()
 	m_yiear_nmi_enable = 0;
 }
 
-static MACHINE_CONFIG_START( yiear, yiear_state )
+static MACHINE_CONFIG_START( yiear )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809,XTAL_18_432MHz/12)   /* verified on pcb */
@@ -364,5 +367,5 @@ ROM_END
 
 
 
-GAME( 1985, yiear,  0,     yiear, yiear, driver_device, 0, ROT0, "Konami", "Yie Ar Kung-Fu (program code I)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, yiear2, yiear, yiear, yiear, driver_device, 0, ROT0, "Konami", "Yie Ar Kung-Fu (program code G)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, yiear,  0,     yiear, yiear, yiear_state, 0, ROT0, "Konami", "Yie Ar Kung-Fu (program code I)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, yiear2, yiear, yiear, yiear, yiear_state, 0, ROT0, "Konami", "Yie Ar Kung-Fu (program code G)", MACHINE_SUPPORTS_SAVE )

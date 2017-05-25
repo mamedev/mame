@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Miodrag Milanovic
+// copyright-holders:Miodrag Milanovic, MetalliC
 /***************************************************************************
 
         Vector06c driver by Miodrag Milanovic
@@ -9,12 +9,14 @@
 ****************************************************************************/
 
 
+#include "emu.h"
 #include "includes/vector06.h"
+#include "screen.h"
 
 
 READ8_MEMBER( vector06_state::vector06_8255_portb_r )
 {
-	UINT8 key = 0xff;
+	uint8_t key = 0xff;
 	if (BIT(m_keyboard_mask, 0)) key &= m_line[0]->read();
 	if (BIT(m_keyboard_mask, 1)) key &= m_line[1]->read();
 	if (BIT(m_keyboard_mask, 2)) key &= m_line[2]->read();
@@ -28,7 +30,7 @@ READ8_MEMBER( vector06_state::vector06_8255_portb_r )
 
 READ8_MEMBER( vector06_state::vector06_8255_portc_r )
 {
-	UINT8 ret = m_line[8]->read();
+	uint8_t ret = m_line[8]->read();
 
 	if (m_cassette->input() > 0)
 		ret |= 0x10;
@@ -59,20 +61,25 @@ WRITE8_MEMBER( vector06_state::vector06_8255_portb_w )
 
 WRITE8_MEMBER( vector06_state::vector06_color_set )
 {
-	UINT8 r = (data & 7) << 5;
-	UINT8 g = ((data >> 3) & 7) << 5;
-	UINT8 b = ((data >>6) & 3) << 6;
+	uint8_t r = (data & 7) << 5;
+	uint8_t g = ((data >> 3) & 7) << 5;
+	uint8_t b = ((data >>6) & 3) << 6;
 	m_palette->set_pen_color( m_color_index, rgb_t(r,g,b) );
 }
 
 
 READ8_MEMBER( vector06_state::vector06_romdisk_portb_r )
 {
-	UINT16 addr = (m_romdisk_msb << 8) | m_romdisk_lsb;
-	if (m_cart->exists() && addr < m_cart->get_rom_size())
+	uint16_t addr = ((m_romdisk_msb & 0x7f) << 8) | m_romdisk_lsb;
+	if ((m_romdisk_msb & 0x80) && m_cart->exists() && addr < m_cart->get_rom_size())
 		return m_cart->read_rom(space, addr);
 	else
-		return 0xff;
+		return m_ay->ay8910_read_ym();
+}
+
+WRITE8_MEMBER(vector06_state::vector06_romdisk_portb_w)
+{
+	m_aylatch = data;
 }
 
 WRITE8_MEMBER( vector06_state::vector06_romdisk_porta_w )
@@ -82,6 +89,8 @@ WRITE8_MEMBER( vector06_state::vector06_romdisk_porta_w )
 
 WRITE8_MEMBER( vector06_state::vector06_romdisk_portc_w )
 {
+	if (data & 4)
+		m_ay->ay8910_write_ym((data >> 1) & 1, m_aylatch);
 	m_romdisk_msb = data;
 }
 
@@ -107,31 +116,30 @@ WRITE8_MEMBER( vector06_state::vector06_8255_2_w )
 
 INTERRUPT_GEN_MEMBER(vector06_state::vector06_interrupt)
 {
-	m_vblank_state++;
-	if (m_vblank_state>1) m_vblank_state=0;
-	device.execute().set_input_line(0,m_vblank_state ? HOLD_LINE : CLEAR_LINE);
-
+	device.execute().set_input_line(0, HOLD_LINE);
 }
 
 IRQ_CALLBACK_MEMBER(vector06_state::vector06_irq_callback)
 {
-	// Interupt is RST 7
+	// Interrupt is RST 7
 	return 0xff;
 }
 
 TIMER_CALLBACK_MEMBER(vector06_state::reset_check_callback)
 {
-	UINT8 val = m_reset->read();
+	uint8_t val = m_reset->read();
 
 	if (BIT(val, 0))
 	{
-		m_bank1->set_base(m_region_maincpu->base() + 0x10000);
+		m_romen = true;
+		update_mem();
 		m_maincpu->reset();
 	}
 
 	if (BIT(val, 1))
 	{
-		m_bank1->set_base(m_ram->pointer() + 0x0000);
+		m_romen = false;
+		update_mem();
 		m_maincpu->reset();
 	}
 }
@@ -156,24 +164,75 @@ WRITE8_MEMBER( vector06_state::vector06_disc_w )
 	}
 }
 
+void vector06_state::update_mem()
+{
+	if ((m_rambank & 0x10) && m_stack_state) {
+		int sentry = ((m_rambank >> 2) & 3) + 1;
+		m_bank1->set_entry(sentry);
+		m_bank3->set_entry(sentry);
+		m_bank2->set_base(m_ram->pointer() + sentry * 0x10000);
+	}
+	else {
+		m_bank1->set_entry(0);
+		int ventry = 0;
+		if (m_rambank & 0x20)
+			ventry = (m_rambank & 3) + 1;
+		m_bank3->set_entry(ventry);
+		if (m_romen)
+			m_bank2->set_base(m_region_maincpu->base() + 0x10000);
+		else
+			m_bank2->set_base(m_ram->pointer());
+	}
+}
+
+WRITE8_MEMBER(vector06_state::vector06_ramdisk_w)
+{
+	const uint8_t oldbank = m_rambank;
+	m_rambank = data;
+	if (oldbank != m_rambank)
+		update_mem();
+}
+
+WRITE8_MEMBER(vector06_state::vector06_status_callback)
+{
+	const bool oldstate = m_stack_state;
+	m_stack_state = bool(data & i8080_cpu_device::STATUS_STACK);
+	if (oldstate != m_stack_state && (m_rambank & 0x10))
+		update_mem();
+}
+
+WRITE_LINE_MEMBER(vector06_state::speaker_w)
+{
+	m_speaker->level_w(state);
+}
+
+WRITE8_MEMBER(vector06_state::pit8253_w)
+{
+	m_pit8253->write(space, offset ^ 3, data);
+}
+
+READ8_MEMBER(vector06_state::pit8253_r)
+{
+	return m_pit8253->read(space,  offset ^ 3);
+}
+
 void vector06_state::machine_start()
 {
-	machine().scheduler().timer_pulse(attotime::from_hz(50), timer_expired_delegate(FUNC(vector06_state::reset_check_callback),this));
+	m_reset_check_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vector06_state::reset_check_callback), this));
+	m_reset_check_timer->adjust(attotime::from_hz(50), 0, attotime::from_hz(50));
 }
 
 void vector06_state::machine_reset()
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
+	m_stack_state = false;
+	m_rambank = 0;
+	m_romen = true;
 
-	space.install_read_bank (0x0000, 0x7fff, m_bank1);
-	space.install_write_bank(0x0000, 0x7fff, m_bank2);
-	space.install_read_bank (0x8000, 0xffff, m_bank3);
-	space.install_write_bank(0x8000, 0xffff, m_bank4);
+	m_bank1->configure_entries(0, 5, m_ram->pointer(), 0x10000);
+	for (int i = 0; i < 5; i++)
+		m_bank3->configure_entry(i, m_ram->pointer() + 0x10000 * i + 0xa000);
 
-	m_bank1->set_base(m_region_maincpu->base() + 0x10000);
-	m_bank2->set_base(m_ram->pointer() + 0x0000);
-	m_bank3->set_base(m_ram->pointer() + 0x8000);
-	m_bank4->set_base(m_ram->pointer() + 0x8000);
+	update_mem();
 
 	m_keyboard_mask = 0;
 	m_color_index = 0;

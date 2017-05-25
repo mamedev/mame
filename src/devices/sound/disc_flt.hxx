@@ -1187,14 +1187,14 @@ DISCRETE_STEP( dst_rcintegrate)
 	else
 		iQc = EM_IC(u - vE);
 
-	m_vCE = MIN(vP - 0.1, vP - RG * iQc);
+	m_vCE = std::min(vP - 0.1, vP - RG * iQc);
 
 	/* Avoid oscillations
 	 * The method tends to largely overshoot - no wonder without
 	 * iterative solution approximation
 	 */
 
-	m_vCE = MAX(m_vCE, 0.1 );
+	m_vCE = std::max(m_vCE, 0.1 );
 	m_vCE = 0.1 * m_vCE + 0.9 * (vP - vE - iQ * DST_RCINTEGRATE__R3);
 
 	switch (m_type)
@@ -1206,7 +1206,7 @@ DISCRETE_STEP( dst_rcintegrate)
 			set_output(0,  vE);
 			break;
 		case DISC_RC_INTEGRATE_TYPE3:
-			set_output(0,  MAX(0, vP - iQ * DST_RCINTEGRATE__R3));
+			set_output(0, std::max(0.0, vP - iQ * DST_RCINTEGRATE__R3));
 			break;
 	}
 }

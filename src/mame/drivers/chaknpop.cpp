@@ -110,9 +110,13 @@ Notes:
 */
 
 #include "emu.h"
+#include "includes/chaknpop.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-#include "includes/chaknpop.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 /***************************************************************************
 
@@ -326,7 +330,7 @@ GFXDECODE_END
 
 void chaknpop_state::machine_start()
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x4000);
 
@@ -350,7 +354,7 @@ void chaknpop_state::machine_reset()
 	m_mcu_select = 0;
 }
 
-static MACHINE_CONFIG_START( chaknpop, chaknpop_state )
+static MACHINE_CONFIG_START( chaknpop )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18MHz / 6)    /* Verified on PCB */
@@ -417,5 +421,5 @@ ROM_START( chaknpop )
 ROM_END
 
 
-/*  ( YEAR  NAME      PARENT    MACHINE   INPUT     INIT      MONITOR  COMPANY              FULLNAME ) */
-GAME( 1983, chaknpop, 0,        chaknpop, chaknpop, driver_device, 0,        ROT0,    "Taito Corporation", "Chack'n Pop", MACHINE_SUPPORTS_SAVE )
+/*  ( YEAR  NAME      PARENT    MACHINE   INPUT     STATE           INIT      MONITOR  COMPANY              FULLNAME       FLAGS ) */
+GAME( 1983, chaknpop, 0,        chaknpop, chaknpop, chaknpop_state, 0,        ROT0,    "Taito Corporation", "Chack'n Pop", MACHINE_SUPPORTS_SAVE )

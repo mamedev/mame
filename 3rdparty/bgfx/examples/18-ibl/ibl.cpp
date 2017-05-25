@@ -89,7 +89,7 @@ bgfx::VertexDecl PosColorTexCoord0Vertex::ms_decl;
 
 void screenSpaceQuad(float _textureWidth, float _textureHeight, bool _originBottomLeft = false, float _width = 1.0f, float _height = 1.0f)
 {
-	if (bgfx::checkAvailTransientVertexBuffer(3, PosColorTexCoord0Vertex::ms_decl) )
+	if (3 == bgfx::getAvailTransientVertexBuffer(3, PosColorTexCoord0Vertex::ms_decl) )
 	{
 		bgfx::TransientVertexBuffer vb;
 		bgfx::allocTransientVertexBuffer(&vb, 3, PosColorTexCoord0Vertex::ms_decl);
@@ -365,8 +365,8 @@ struct Camera
 
 	static inline void latLongFromVec(float& _u, float& _v, const float _vec[3])
 	{
-		const float phi = atan2f(_vec[0], _vec[2]);
-		const float theta = acosf(_vec[1]);
+		const float phi = bx::fatan2(_vec[0], _vec[2]);
+		const float theta = bx::facos(_vec[1]);
 
 		_u = (bx::pi + phi)*bx::invPi*0.5f;
 		_v = theta*bx::invPi;
@@ -553,8 +553,8 @@ int _main_(int _argc, char** _argv)
 			| (mouseState.m_buttons[entry::MouseButton::Right ] ? IMGUI_MBUT_RIGHT  : 0)
 			| (mouseState.m_buttons[entry::MouseButton::Middle] ? IMGUI_MBUT_MIDDLE : 0)
 			, mouseState.m_mz
-			, width
-			, height
+			, uint16_t(width)
+			, uint16_t(height)
 			);
 
 		static int32_t rightScrollArea = 0;
@@ -564,10 +564,16 @@ int _main_(int _argc, char** _argv)
 		imguiIndent();
 		imguiBool("IBL Diffuse",  settings.m_doDiffuseIbl);
 		imguiBool("IBL Specular", settings.m_doSpecularIbl);
-		currentLightProbe = LightProbe::Enum(imguiTabs(currentLightProbe, true, ImguiAlign::LeftIndented, 16, 2, 2
-													   , "Bolonga"
-													   , "Kyoto"
-													   ) );
+		currentLightProbe = LightProbe::Enum(imguiTabs(
+								  uint8_t(currentLightProbe)
+								, true
+								, ImguiAlign::LeftIndented
+								, 16
+								, 2
+								, 2
+								, "Bolonga"
+								, "Kyoto"
+								) );
 		if (imguiCube(lightProbes[currentLightProbe].m_tex, settings.m_lod, settings.m_crossCubemapPreview, true) )
 		{
 			settings.m_crossCubemapPreview = ImguiCubemap::Enum( (settings.m_crossCubemapPreview+1) % ImguiCubemap::Count);
@@ -592,14 +598,21 @@ int _main_(int _argc, char** _argv)
 		imguiIndent();
 		{
 			int32_t selection;
-			if      (0.0f == settings.m_bgType) { selection = 0; }
-			else if (7.0f == settings.m_bgType) { selection = 2; }
-			else                                { selection = 1; }
-			selection = imguiTabs(selection, true, ImguiAlign::LeftIndented, 16, 2, 3
-								 , "Skybox"
-								 , "Radiance"
-								 , "Irradiance"
-								 );
+			if      (0.0f == settings.m_bgType) { selection = UINT8_C(0); }
+			else if (7.0f == settings.m_bgType) { selection = UINT8_C(2); }
+			else                                { selection = UINT8_C(1); }
+
+			selection = imguiTabs(
+							  uint8_t(selection)
+							, true
+							, ImguiAlign::LeftIndented
+							, 16
+							, 2
+							, 3
+							, "Skybox"
+							, "Radiance"
+							, "Irradiance"
+							);
 			if      (0 == selection) { settings.m_bgType = 0.0f; }
 			else if (2 == selection) { settings.m_bgType = 7.0f; }
 			else                     { settings.m_bgType = settings.m_radianceSlider; }
@@ -622,7 +635,7 @@ int _main_(int _argc, char** _argv)
 
 		imguiLabel("Mesh:");
 		imguiIndent();
-		settings.m_meshSelection = imguiChoose(settings.m_meshSelection, "Bunny", "Orbs");
+		settings.m_meshSelection = uint8_t(imguiChoose(settings.m_meshSelection, "Bunny", "Orbs") );
 		imguiUnindent();
 
 		const bool isBunny = (0 == settings.m_meshSelection);
@@ -662,10 +675,10 @@ int _main_(int _argc, char** _argv)
 		uniforms.m_doSpecular    = float(settings.m_doSpecular);
 		uniforms.m_doDiffuseIbl  = float(settings.m_doDiffuseIbl);
 		uniforms.m_doSpecularIbl = float(settings.m_doSpecularIbl);
-		memcpy(uniforms.m_rgbDiff,  settings.m_rgbDiff,  3*sizeof(float) );
-		memcpy(uniforms.m_rgbSpec,  settings.m_rgbSpec,  3*sizeof(float) );
-		memcpy(uniforms.m_lightDir, settings.m_lightDir, 3*sizeof(float) );
-		memcpy(uniforms.m_lightCol, settings.m_lightCol, 3*sizeof(float) );
+		bx::memCopy(uniforms.m_rgbDiff,  settings.m_rgbDiff,  3*sizeof(float) );
+		bx::memCopy(uniforms.m_rgbSpec,  settings.m_rgbSpec,  3*sizeof(float) );
+		bx::memCopy(uniforms.m_lightDir, settings.m_lightDir, 3*sizeof(float) );
+		bx::memCopy(uniforms.m_lightCol, settings.m_lightCol, 3*sizeof(float) );
 
 		int64_t now = bx::getHPCounter();
 		static int64_t last = now;
@@ -704,7 +717,7 @@ int _main_(int _argc, char** _argv)
 			}
 		}
 		camera.update(deltaTimeSec);
-		memcpy(uniforms.m_cameraPos, camera.m_pos.curr, 3*sizeof(float) );
+		bx::memCopy(uniforms.m_cameraPos, camera.m_pos.curr, 3*sizeof(float) );
 
 		// View Transform 0.
 		float view[16];
@@ -715,12 +728,12 @@ int _main_(int _argc, char** _argv)
 
 		// View Transform 1.
 		camera.mtxLookAt(view);
-		bx::mtxProj(proj, 45.0f, float(width)/float(height), 0.1f, 100.0f);
+		bx::mtxProj(proj, 45.0f, float(width)/float(height), 0.1f, 100.0f, bgfx::getCaps()->homogeneousDepth);
 		bgfx::setViewTransform(1, view, proj);
 
 		// View rect.
-		bgfx::setViewRect(0, 0, 0, width, height);
-		bgfx::setViewRect(1, 0, 0, width, height);
+		bgfx::setViewRect(0, 0, 0, uint16_t(width), uint16_t(height) );
+		bgfx::setViewRect(1, 0, 0, uint16_t(width), uint16_t(height) );
 
 		// Env rotation.
 		const float amount = bx::fmin(deltaTimeSec/0.12f, 1.0f);
@@ -731,7 +744,7 @@ int _main_(int _argc, char** _argv)
 		camera.envViewMtx(mtxEnvView);
 		float mtxEnvRot[16];
 		bx::mtxRotateY(mtxEnvRot, settings.m_envRotCurr);
-		bx::mtxMul(uniforms.m_mtx, mtxEnvView, mtxEnvRot);
+		bx::mtxMul(uniforms.m_mtx, mtxEnvView, mtxEnvRot); // Used for Skybox.
 
 		// Submit view 0.
 		bgfx::setTexture(0, s_texCube, lightProbes[currentLightProbe].m_tex);
@@ -742,6 +755,7 @@ int _main_(int _argc, char** _argv)
 		bgfx::submit(0, programSky);
 
 		// Submit view 1.
+		bx::memCopy(uniforms.m_mtx, mtxEnvRot, 16*sizeof(float)); // Used for IBL.
 		if (0 == settings.m_meshSelection)
 		{
 			// Submit bunny.
@@ -749,6 +763,7 @@ int _main_(int _argc, char** _argv)
 			bx::mtxSRT(mtx, 1.0f, 1.0f, 1.0f, 0.0f, bx::pi, 0.0f, 0.0f, -0.80f, 0.0f);
 			bgfx::setTexture(0, s_texCube,    lightProbes[currentLightProbe].m_tex);
 			bgfx::setTexture(1, s_texCubeIrr, lightProbes[currentLightProbe].m_texIrr);
+			uniforms.submit();
 			meshSubmit(meshBunny, 1, programMesh, mtx);
 		}
 		else

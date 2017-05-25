@@ -9,10 +9,13 @@
 ******************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6502/m65sc02.h"
-#include "audio/lynx.h"
 #include "includes/lynx.h"
+#include "audio/lynx.h"
+
+#include "cpu/m6502/m65sc02.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 #include "lynx.lh"
 
@@ -60,7 +63,7 @@ void lynx_state::video_start()
 	machine().first_screen()->register_screen_bitmap(m_bitmap);
 }
 
-UINT32 lynx_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t lynx_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
@@ -72,7 +75,7 @@ void lynx_state::sound_cb()
 	lynx_timer_count_down(1);
 }
 
-static MACHINE_CONFIG_START( lynx, lynx_state )
+static MACHINE_CONFIG_START( lynx )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M65SC02, 4000000)        /* vti core, integrated in vlsi, stz, but not bbr bbs */
 	MCFG_CPU_PROGRAM_MAP(lynx_mem)
@@ -152,18 +155,18 @@ ROM_END
 QUICKLOAD_LOAD_MEMBER( lynx_state, lynx )
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	dynamic_buffer data;
-	UINT8 *rom = memregion("maincpu")->base();
-	UINT8 header[10]; // 80 08 dw Start dw Len B S 9 3
-	UINT16 start, length;
+	std::vector<uint8_t> data;
+	uint8_t *rom = memregion("maincpu")->base();
+	uint8_t header[10]; // 80 08 dw Start dw Len B S 9 3
+	uint16_t start, length;
 	int i;
 
 	if (image.fread( header, sizeof(header)) != sizeof(header))
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 
 	/* Check the image */
-	if (lynx_verify_cart((char*)header, LYNX_QUICKLOAD) == IMAGE_VERIFY_FAIL)
-		return IMAGE_INIT_FAIL;
+	if (lynx_verify_cart((char*)header, LYNX_QUICKLOAD) != image_verify_result::PASS)
+		return image_init_result::FAIL;
 
 	start = header[3] | (header[2]<<8); //! big endian format in file format for little endian cpu
 	length = header[5] | (header[4]<<8);
@@ -173,7 +176,7 @@ QUICKLOAD_LOAD_MEMBER( lynx_state, lynx )
 
 	if (image.fread( &data[0], length) != length)
 	{
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
 	for (i = 0; i < length; i++)
@@ -186,7 +189,7 @@ QUICKLOAD_LOAD_MEMBER( lynx_state, lynx )
 
 	m_maincpu->set_pc(start);
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 /***************************************************************************
@@ -195,6 +198,6 @@ QUICKLOAD_LOAD_MEMBER( lynx_state, lynx )
 
 ***************************************************************************/
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY   FULLNAME      FLAGS */
-CONS( 1989, lynx,   0,      0,      lynx,   lynx, driver_device,   0,       "Atari",  "Lynx", MACHINE_SUPPORTS_SAVE )
-// CONS( 1991, lynx2,  lynx,   0,      lynx2,  lynx, driver_device,   0,       "Atari",  "Lynx II",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT STATE         INIT    COMPANY   FULLNAME      FLAGS */
+CONS( 1989, lynx,   0,      0,      lynx,   lynx, lynx_state,   0,      "Atari",  "Lynx",       MACHINE_SUPPORTS_SAVE )
+// CONS( 1991, lynx2,  lynx,  0,      lynx2,  lynx, lynx_state,   0,      "Atari",  "Lynx II",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

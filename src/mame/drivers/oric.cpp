@@ -20,18 +20,24 @@
 *********************************************************************/
 
 #include "emu.h"
+
+#include "bus/centronics/ctronics.h"
 #include "bus/oricext/oricext.h"
 #include "cpu/m6502/m6502.h"
-#include "sound/ay8910.h"
-#include "sound/wave.h"
+#include "imagedev/cassette.h"
+#include "imagedev/floppy.h"
 #include "machine/6522via.h"
 #include "machine/mos6551.h"
-#include "bus/centronics/ctronics.h"
-#include "imagedev/floppy.h"
-#include "imagedev/cassette.h"
 #include "machine/wd_fdc.h"
+#include "sound/ay8910.h"
+#include "sound/wave.h"
+
+#include "screen.h"
+#include "speaker.h"
+
 #include "formats/oric_dsk.h"
 #include "formats/oric_tap.h"
+
 
 class oric_state : public driver_device
 {
@@ -77,8 +83,8 @@ public:
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	UINT32 screen_update_oric(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void vblank_w(screen_device &screen, bool state);
+	uint32_t screen_update_oric(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(vblank_w);
 
 protected:
 	required_device<cpu_device> m_maincpu;
@@ -88,7 +94,7 @@ protected:
 	required_device<output_latch_device> m_cent_data_out;
 	required_device<cassette_image_device> m_cassette;
 	required_device<via6522_device> m_via;
-	required_shared_ptr<UINT8> m_ram;
+	required_shared_ptr<uint8_t> m_ram;
 	optional_memory_region m_rom;
 	required_memory_bank m_bank_c000_r;
 	optional_memory_bank m_bank_e000_r;
@@ -100,8 +106,8 @@ protected:
 	ioport_port *m_kbd_row[8];
 
 	int m_blink_counter;
-	UINT8 m_pattr;
-	UINT8 m_via_a, m_via_b, m_psg_a;
+	uint8_t m_pattr;
+	uint8_t m_via_a, m_via_b, m_psg_a;
 	bool m_via_ca2, m_via_cb2, m_via_irq;
 	bool m_ext_irq;
 
@@ -156,7 +162,7 @@ protected:
 	};
 
 	required_device<via6522_device> m_via2;
-	required_device<fd1793_t> m_fdc;
+	required_device<fd1793_device> m_fdc;
 	required_memory_region m_telmatic;
 	required_memory_region m_teleass;
 	required_memory_region m_hyperbas;
@@ -165,13 +171,13 @@ protected:
 	required_ioport m_joy2;
 
 	floppy_image_device *m_floppies[4];
-	UINT8 m_port_314;
-	UINT8 m_via2_a, m_via2_b;
+	uint8_t m_port_314;
+	uint8_t m_via2_a, m_via2_b;
 	bool m_via2_ca2, m_via2_cb2, m_via2_irq;
 	bool m_acia_irq;
 	bool m_fdc_irq, m_fdc_drq, m_fdc_hld;
 
-	UINT8 m_junk_read[0x4000], m_junk_write[0x4000];
+	uint8_t m_junk_read[0x4000], m_junk_write[0x4000];
 
 	virtual void update_irq() override;
 	void remap();
@@ -191,7 +197,7 @@ The telestrat has the memory regions split into 16k blocks.
 Memory region &c000-&ffff can be ram or rom. */
 static ADDRESS_MAP_START(telestrat_mem, AS_PROGRAM, 8, telestrat_state )
 	AM_RANGE( 0x0300, 0x030f) AM_DEVREADWRITE("via6522", via6522_device, read, write)
-	AM_RANGE( 0x0310, 0x0313) AM_DEVREADWRITE("fdc", fd1793_t, read, write)
+	AM_RANGE( 0x0310, 0x0313) AM_DEVREADWRITE("fdc", fd1793_device, read, write)
 	AM_RANGE( 0x0314, 0x0314) AM_READWRITE(port_314_r, port_314_w)
 	AM_RANGE( 0x0318, 0x0318) AM_READ(port_318_r)
 	AM_RANGE( 0x031c, 0x031f) AM_DEVREADWRITE("acia", mos6551_device, read, write)
@@ -200,31 +206,31 @@ static ADDRESS_MAP_START(telestrat_mem, AS_PROGRAM, 8, telestrat_state )
 	AM_RANGE( 0x0000, 0xffff) AM_RAM AM_SHARE("ram")
 ADDRESS_MAP_END
 
-UINT32 oric_state::screen_update_oric(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t oric_state::screen_update_oric(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bool blink_state = m_blink_counter & 0x20;
 	m_blink_counter = (m_blink_counter + 1) & 0x3f;
 
-	UINT8 pattr = m_pattr;
+	uint8_t pattr = m_pattr;
 
 	for(int y=0; y<224; y++) {
 		// Line attributes and current colors
-		UINT8 lattr = 0;
-		UINT32 fgcol = m_palette->pen_color(7);
-		UINT32 bgcol = m_palette->pen_color(0);
+		uint8_t lattr = 0;
+		uint32_t fgcol = m_palette->pen_color(7);
+		uint32_t bgcol = m_palette->pen_color(0);
 
-		UINT32 *p = &bitmap.pix32(y);
+		uint32_t *p = &bitmap.pix32(y);
 
 		for(int x=0; x<40; x++) {
 			// Lookup the byte and, if needed, the pattern data
-			UINT8 ch, pat;
+			uint8_t ch, pat;
 			if((pattr & PATTR_HIRES) && y < 200)
 				ch = pat = m_ram[0xa000 + y*40 + x];
 
 			else {
 				ch = m_ram[0xbb80 + (y>>3)*40 + x];
 				int off = (lattr & LATTR_DSIZE ? y >> 1 : y ) & 7;
-				const UINT8 *base;
+				const uint8_t *base;
 				if(pattr & PATTR_HIRES)
 					if(lattr & LATTR_ALT)
 						base = m_ram + 0x9c00;
@@ -250,8 +256,8 @@ UINT32 oric_state::screen_update_oric(screen_device &screen, bitmap_rgb32 &bitma
 			}
 
 			// Pick up the colors for the pattern
-			UINT32 c_fgcol = fgcol;
-			UINT32 c_bgcol = bgcol;
+			uint32_t c_fgcol = fgcol;
+			uint32_t c_bgcol = bgcol;
 
 			//    inverse video
 			if(ch & 0x80) {
@@ -356,7 +362,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(oric_state::update_tape)
 		m_via->write_cb1(m_cassette->input() > 0.0038);
 }
 
-void oric_state::vblank_w(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(oric_state::vblank_w)
 {
 	if(m_config->read())
 		m_via->write_cb1(state);
@@ -435,7 +441,7 @@ WRITE8_MEMBER(telestrat_state::via2_a_w)
 WRITE8_MEMBER(telestrat_state::via2_b_w)
 {
 	m_via2_b = data;
-	UINT8 port = 0xff;
+	uint8_t port = 0xff;
 	if(!(m_via2_b & 0x40))
 		port &= m_joy1->read();
 	if(!(m_via2_b & 0x80))
@@ -760,7 +766,7 @@ static INPUT_PORTS_START(telstrat)
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( oric, oric_state )
+static MACHINE_CONFIG_START( oric )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_12MHz/12)
 	MCFG_CPU_PROGRAM_MAP(oric_mem)
@@ -773,7 +779,7 @@ static MACHINE_CONFIG_START( oric, oric_state )
 	MCFG_SCREEN_SIZE(40*6, 28*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40*6-1, 0, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(oric_state, screen_update_oric)
-	MCFG_SCREEN_VBLANK_DRIVER(oric_state, vblank_w)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(oric_state, vblank_w))
 
 	MCFG_PALETTE_ADD_3BIT_RGB("palette")
 
@@ -822,7 +828,7 @@ static SLOT_INTERFACE_START( telestrat_floppies )
 	SLOT_INTERFACE( "3dsdd", FLOPPY_3_DSDD )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_DERIVED_CLASS( telstrat, oric, telestrat_state )
+static MACHINE_CONFIG_DERIVED( telstrat, oric )
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(telestrat_mem)
 
@@ -850,6 +856,10 @@ static MACHINE_CONFIG_DERIVED_CLASS( telstrat, oric, telestrat_state )
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", telestrat_floppies, nullptr,    telestrat_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:2", telestrat_floppies, nullptr,    telestrat_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:3", telestrat_floppies, nullptr,    telestrat_state::floppy_formats)
+
+	// [RH] 30 August 2016: Based on the French Wikipedia page for the Oric, it does not appear
+	// that the Telestrat supported the same expansions as the Oric-1 and Atmos.
+	MCFG_DEVICE_REMOVE("ext")
 MACHINE_CONFIG_END
 
 
@@ -943,9 +953,9 @@ ROM_START(prav8dd)
 ROM_END
 
 
-/*    YEAR   NAME       PARENT  COMPAT  MACHINE     INPUT       INIT    COMPANY         FULLNAME */
-COMP( 1983, oric1,      0,      0,      oric,       oric, driver_device,       0,    "Tangerine",    "Oric 1" , 0)
-COMP( 1984, orica,      oric1,  0,      oric,       orica, driver_device,      0,    "Tangerine",    "Oric Atmos" , 0)
-COMP( 1985, prav8d,     oric1,  0,      prav8d,     prav8d, driver_device,     0,    "Pravetz",      "Pravetz 8D", 0)
-COMP( 1989, prav8dd,    oric1,  0,      prav8d,     prav8d, driver_device,     0,    "Pravetz",      "Pravetz 8D (Disk ROM)", MACHINE_UNOFFICIAL)
-COMP( 1986, telstrat,   oric1,  0,      telstrat,   telstrat, driver_device,   0,    "Tangerine",    "Oric Telestrat", 0 )
+//    YEAR  NAME       PARENT  COMPAT  MACHINE     INPUT     STATE            INIT  COMPANY      FULLNAME                 FLAGS
+COMP( 1983, oric1,     0,      0,      oric,       oric,     oric_state,      0,    "Tangerine", "Oric 1" ,               0 )
+COMP( 1984, orica,     oric1,  0,      oric,       orica,    oric_state,      0,    "Tangerine", "Oric Atmos" ,           0 )
+COMP( 1985, prav8d,    oric1,  0,      prav8d,     prav8d,   oric_state,      0,    "Pravetz",   "Pravetz 8D",            0 )
+COMP( 1989, prav8dd,   oric1,  0,      prav8d,     prav8d,   oric_state,      0,    "Pravetz",   "Pravetz 8D (Disk ROM)", MACHINE_UNOFFICIAL )
+COMP( 1986, telstrat,  oric1,  0,      telstrat,   telstrat, telestrat_state, 0,    "Tangerine", "Oric Telestrat",        0 )

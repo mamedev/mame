@@ -127,8 +127,11 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/i8085/i8085.h"
 #include "includes/warpwarp.h"
+
+#include "cpu/i8085/i8085.h"
+#include "screen.h"
+#include "speaker.h"
 
 #include "geebee.lh"
 #include "navarone.lh"
@@ -150,15 +153,13 @@ INTERRUPT_GEN_MEMBER(warpwarp_state::vblank_irq)
 		device.execute().set_input_line(0, ASSERT_LINE);
 }
 
-IOPORT_ARRAY_MEMBER(warpwarp_state::portnames) { "SW0", "SW1", "DSW2", "PLACEHOLDER" }; // "IN1" & "IN2" are read separately when offset==3
-
 /* B&W Games I/O */
 READ8_MEMBER(warpwarp_state::geebee_in_r)
 {
 	int res;
 
 	offset &= 3;
-	res = m_ports[offset] ? m_ports[offset]->read() : 0;
+	res = m_ports[offset].read_safe(0);
 	if (offset == 3)
 	{
 		res = (flip_screen() & 1) ? m_in2->read() : m_in1->read();  // read player 2 input in cocktail mode
@@ -729,7 +730,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_CONFIG_START( geebee, warpwarp_state )
+static MACHINE_CONFIG_START( geebee )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, MASTER_CLOCK/9) /* verified on pcb */
@@ -767,7 +768,7 @@ static MACHINE_CONFIG_DERIVED( navarone, geebee )
 	MCFG_VIDEO_START_OVERRIDE(warpwarp_state,navarone)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( bombbee, warpwarp_state )
+static MACHINE_CONFIG_START( bombbee )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, MASTER_CLOCK/9)

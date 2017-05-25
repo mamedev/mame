@@ -5,8 +5,8 @@
 *
 */
 
-#ifndef _FDC37C665GT_H_
-#define _FDC37C665GT_H_
+#ifndef MAME_MACHINE_FDC37C665GT_H
+#define MAME_MACHINE_FDC37C665GT_H
 
 #pragma once
 
@@ -16,7 +16,7 @@ class fdc37c665gt_device : public device_t
 {
 public:
 	// construction/destruction
-	fdc37c665gt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	fdc37c665gt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
@@ -32,6 +32,6 @@ private:
 };
 
 // device type definition
-extern const device_type FDC37C665GT;
+DECLARE_DEVICE_TYPE(FDC37C665GT, fdc37c665gt_device)
 
-#endif
+#endif // MAME_MACHINE_FDC37C665GT_H

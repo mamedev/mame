@@ -35,7 +35,7 @@
 *************************************************************************/
 
 #include "emu.h"
-#include "render.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
 #include "machine/ldv1000.h"
@@ -44,7 +44,10 @@
 #include "machine/z80ctc.h"
 #include "machine/z80dart.h"
 #include "sound/ay8910.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
+#include "render.h"
+#include "speaker.h"
+
 #include "dlair.lh"
 
 
@@ -71,22 +74,22 @@ public:
 	optional_device<pioneer_ldv1000_device> m_ldv1000;
 	optional_device<pioneer_pr7820_device> m_pr7820;
 	optional_device<phillips_22vp932_device> m_22vp932;
-	optional_shared_ptr<UINT8> m_videoram;
+	optional_shared_ptr<uint8_t> m_videoram;
 
-	void laserdisc_data_w(UINT8 data)
+	void laserdisc_data_w(uint8_t data)
 	{
 		if (m_ldv1000 != nullptr) m_ldv1000->data_w(data);
 		if (m_pr7820 != nullptr) m_pr7820->data_w(data);
 		if (m_22vp932 != nullptr) m_22vp932->data_w(data);
 	}
 
-	void laserdisc_enter_w(UINT8 data)
+	void laserdisc_enter_w(uint8_t data)
 	{
 		if (m_pr7820 != nullptr) m_pr7820->enter_w(data);
 		if (m_22vp932 != nullptr) m_22vp932->enter_w(data);
 	}
 
-	UINT8 laserdisc_data_r()
+	uint8_t laserdisc_data_r()
 	{
 		if (m_ldv1000 != nullptr) return m_ldv1000->status_r();
 		if (m_pr7820 != nullptr) return m_pr7820->data_r();
@@ -94,26 +97,26 @@ public:
 		return 0;
 	}
 
-	UINT8 laserdisc_data_available_r()
+	uint8_t laserdisc_data_available_r()
 	{
 		return CLEAR_LINE;
 	}
 
-	UINT8 laserdisc_status_r()
+	uint8_t laserdisc_status_r()
 	{
 		if (m_ldv1000 != nullptr) return m_ldv1000->status_strobe_r();
 		return CLEAR_LINE;
 	}
 
-	UINT8 laserdisc_ready_r()
+	uint8_t laserdisc_ready_r()
 	{
 		if (m_ldv1000 != nullptr) return m_ldv1000->command_strobe_r();
 		if (m_pr7820 != nullptr) return m_pr7820->ready_r();
 		return CLEAR_LINE;
 	}
 
-	UINT8 m_last_misc;
-	UINT8 m_laserdisc_data;
+	uint8_t m_last_misc;
+	uint8_t m_laserdisc_data;
 	DECLARE_WRITE8_MEMBER(misc_w);
 	DECLARE_WRITE8_MEMBER(dleuro_misc_w);
 	DECLARE_WRITE8_MEMBER(led_den1_w);
@@ -127,7 +130,7 @@ public:
 	DECLARE_MACHINE_START(dlair);
 	DECLARE_MACHINE_RESET(dlair);
 	DECLARE_PALETTE_INIT(dleuro);
-	UINT32 screen_update_dleuro(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_dleuro(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(write_speaker);
 };
 
@@ -153,7 +156,7 @@ public:
 
 
 
-static const UINT8 led_map[16] =
+static const uint8_t led_map[16] =
 	{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x77,0x7c,0x39,0x5e,0x79,0x00 };
 
 
@@ -204,16 +207,16 @@ PALETTE_INIT_MEMBER(dlair_state,dleuro)
  *
  *************************************/
 
-UINT32 dlair_state::screen_update_dleuro(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t dlair_state::screen_update_dleuro(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 	int x, y;
 
 	/* redraw the overlay */
 	for (y = 0; y < 32; y++)
 		for (x = 0; x < 32; x++)
 		{
-			UINT8 *base = &videoram[y * 64 + x * 2 + 1];
+			uint8_t *base = &videoram[y * 64 + x * 2 + 1];
 			// TODO: opaque?
 			m_gfxdecode->gfx(0)->opaque(bitmap,cliprect, base[0], base[1], 0, 0, 10 * x, 16 * y);
 		}
@@ -264,7 +267,7 @@ WRITE8_MEMBER(dlair_state::misc_w)
 	       D6 = ENTER
 	       D7 = INT/EXT
 	*/
-	UINT8 diff = data ^ m_last_misc;
+	uint8_t diff = data ^ m_last_misc;
 	m_last_misc = data;
 
 	machine().bookkeeping().coin_counter_w(0, (~data >> 4) & 1);
@@ -290,7 +293,7 @@ WRITE8_MEMBER(dlair_state::dleuro_misc_w)
 	       D6 = ENTER
 	       D7 = INT/EXT
 	*/
-	UINT8 diff = data ^ m_last_misc;
+	uint8_t diff = data ^ m_last_misc;
 	m_last_misc = data;
 
 	machine().bookkeeping().coin_counter_w(1, (~data >> 3) & 1);
@@ -338,7 +341,7 @@ CUSTOM_INPUT_MEMBER(dlair_state::laserdisc_command_r)
 
 READ8_MEMBER(dlair_state::laserdisc_r)
 {
-	UINT8 result = laserdisc_data_r();
+	uint8_t result = laserdisc_data_r();
 	osd_printf_debug("laserdisc_r = %02X\n", result);
 	return result;
 }
@@ -704,7 +707,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( dlair_base, dlair_state )
+static MACHINE_CONFIG_START( dlair_base )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK_US/4)
@@ -740,7 +743,7 @@ static MACHINE_CONFIG_DERIVED( dlair_ldv1000, dlair_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( dleuro, dlair_state )
+static MACHINE_CONFIG_START( dleuro )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK_EURO/4)

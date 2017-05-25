@@ -68,7 +68,7 @@ WRITE16_MEMBER(tecmosys_state::fg_tilemap_w)
 }
 
 
-inline void tecmosys_state::set_color_555(pen_t color, int rshift, int gshift, int bshift, UINT16 data)
+inline void tecmosys_state::set_color_555(pen_t color, int rshift, int gshift, int bshift, uint16_t data)
 {
 	m_palette->set_pen_color(color, pal5bit(data >> rshift), pal5bit(data >> gshift), pal5bit(data >> bshift));
 }
@@ -99,9 +99,9 @@ WRITE16_MEMBER(tecmosys_state::bg2_tilemap_lineram_w)
 
 
 
-void tecmosys_state::render_sprites_to_bitmap(bitmap_rgb32 &bitmap, UINT16 extrax, UINT16 extray )
+void tecmosys_state::render_sprites_to_bitmap(bitmap_rgb32 &bitmap, uint16_t extrax, uint16_t extray )
 {
-	UINT8 *gfxsrc    = memregion       ( "gfx1" )->base();
+	uint8_t *gfxsrc    = memregion       ( "gfx1" )->base();
 	int i;
 
 	/* render sprites (with priority information) to temp bitmap */
@@ -111,7 +111,7 @@ void tecmosys_state::render_sprites_to_bitmap(bitmap_rgb32 &bitmap, UINT16 extra
 	{
 		int xcnt,ycnt;
 		int drawx, drawy;
-		UINT16* dstptr;
+		uint16_t* dstptr;
 
 		int x, y;
 		int address;
@@ -173,7 +173,7 @@ void tecmosys_state::render_sprites_to_bitmap(bitmap_rgb32 &bitmap, UINT16 extra
 
 				if ((drawx>=0 && drawx<320) && (drawy>=0 && drawy<240))
 				{
-					UINT8 data;
+					uint8_t data;
 
 					dstptr = &m_sprite_bitmap.pix16(drawy, drawx);
 
@@ -190,11 +190,11 @@ void tecmosys_state::render_sprites_to_bitmap(bitmap_rgb32 &bitmap, UINT16 extra
 	}
 }
 
-void tecmosys_state::tilemap_copy_to_compose(UINT16 pri)
+void tecmosys_state::tilemap_copy_to_compose(uint16_t pri)
 {
 	int y,x;
-	UINT16 *srcptr;
-	UINT16 *dstptr;
+	uint16_t *srcptr;
+	uint16_t *dstptr;
 	for (y=0;y<240;y++)
 	{
 		srcptr = &m_tmp_tilemap_renderbitmap.pix16(y);
@@ -211,9 +211,9 @@ void tecmosys_state::do_final_mix(bitmap_rgb32 &bitmap)
 {
 	const pen_t *paldata = m_palette->pens();
 	int y,x;
-	UINT16 *srcptr;
-	UINT16 *srcptr2;
-	UINT32 *dstptr;
+	uint16_t *srcptr;
+	uint16_t *srcptr2;
+	uint32_t *dstptr;
 
 	for (y=0;y<240;y++)
 	{
@@ -223,11 +223,11 @@ void tecmosys_state::do_final_mix(bitmap_rgb32 &bitmap)
 		dstptr = &bitmap.pix32(y);
 		for (x=0;x<320;x++)
 		{
-			UINT16 pri, pri2;
-			UINT16 penvalue;
-			UINT16 penvalue2;
-			UINT32 colour;
-			UINT32 colour2;
+			uint16_t pri, pri2;
+			uint16_t penvalue;
+			uint16_t penvalue2;
+			uint32_t colour;
+			uint32_t colour2;
 
 			pri = srcptr[x] & 0xc000;
 			pri2 = srcptr2[x] & 0xc000;
@@ -277,7 +277,7 @@ void tecmosys_state::do_final_mix(bitmap_rgb32 &bitmap)
 }
 
 
-UINT32 tecmosys_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t tecmosys_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->pen(0x4000), cliprect);
 
@@ -330,16 +330,16 @@ void tecmosys_state::video_start()
 	m_tmp_tilemap_renderbitmap.fill(0x0000);
 
 
-	m_txt_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tecmosys_state::get_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32*2,32*2);
+	m_txt_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tecmosys_state::get_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32*2,32*2);
 	m_txt_tilemap->set_transparent_pen(0);
 
-	m_bg0tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tecmosys_state::get_bg0tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
+	m_bg0tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tecmosys_state::get_bg0tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
 	m_bg0tilemap->set_transparent_pen(0);
 
-	m_bg1tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tecmosys_state::get_bg1tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
+	m_bg1tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tecmosys_state::get_bg1tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
 	m_bg1tilemap->set_transparent_pen(0);
 
-	m_bg2tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tecmosys_state::get_bg2tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
+	m_bg2tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tecmosys_state::get_bg2tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
 	m_bg2tilemap->set_transparent_pen(0);
 
 	save_item(NAME(m_spritelist));

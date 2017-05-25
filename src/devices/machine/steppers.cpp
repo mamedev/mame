@@ -41,14 +41,14 @@
 #include "emu.h"
 #include "steppers.h"
 
-const device_type STEPPER = &device_creator<stepper_device>;
+DEFINE_DEVICE_TYPE(STEPPER, stepper_device, "stepper", "Stepper Motor")
 
-stepper_device::stepper_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-		: device_t(mconfig, STEPPER, "Stepper Motor", tag, owner, clock, "stepper", __FILE__),
-		m_optic_cb(*this)
-	{
-		m_max_steps=(48*2);
-	}
+stepper_device::stepper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, STEPPER, tag, owner, clock)
+	, m_optic_cb(*this)
+{
+	m_max_steps=(48*2);
+}
 ///////////////////////////////////////////////////////////////////////////
 
 void stepper_device::update_optic()
@@ -121,7 +121,7 @@ void stepper_device::device_reset()
 
 ///////////////////////////////////////////////////////////////////////////
 
-int stepper_device::update(UINT8 pattern)
+int stepper_device::update(uint8_t pattern)
 {
 	int changed = 0;
 

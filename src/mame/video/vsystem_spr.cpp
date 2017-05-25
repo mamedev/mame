@@ -59,33 +59,26 @@ Abstracts the VS9210
 
 */
 
-
-
 #include "emu.h"
 #include "vsystem_spr.h"
+#include "screen.h"
 
 
+DEFINE_DEVICE_TYPE(VSYSTEM_SPR, vsystem_spr_device, "vsystem_spr", "Video System Sprites")
 
-
-
-
-const device_type VSYSTEM_SPR = &device_creator<vsystem_spr_device>;
-
-vsystem_spr_device::vsystem_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, VSYSTEM_SPR, "Video System Sprites", tag, owner, clock, "vsystem_spr", __FILE__),
-		m_gfxdecode(*this)
+vsystem_spr_device::vsystem_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, VSYSTEM_SPR, tag, owner, clock)
+	, m_newtilecb(FUNC(vsystem_spr_device::tile_callback_noindirect), this)
+	, m_xoffs(0)
+	, m_yoffs(0)
+	, m_pdraw(false)
+	, m_pal_mask(0x3f)
+	, m_gfx_region(-1)
+	, m_transpen(15)
+	, m_pal_base(0)
+	, m_curr_sprite()
+	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
 {
-	m_transpen = 15;
-	m_pal_base = 0;
-	m_xoffs = 0;
-	m_yoffs = 0;
-	m_pdraw = false;
-	m_gfx_region = -1;
-	m_pal_mask = 0x3f;
-
-	m_newtilecb =  vsystem_tile_indirection_delegate(FUNC(vsystem_spr_device::tile_callback_noindirect), this);
-
-	memset(&m_curr_sprite, 0, sizeof(m_curr_sprite));
 }
 
 //-------------------------------------------------
@@ -98,7 +91,7 @@ void vsystem_spr_device::static_set_gfxdecode_tag(device_t &device, const char *
 	downcast<vsystem_spr_device &>(device).m_gfxdecode.set_tag(tag);
 }
 
-UINT32 vsystem_spr_device::tile_callback_noindirect(UINT32 tile)
+uint32_t vsystem_spr_device::tile_callback_noindirect(uint32_t tile)
 {
 	return tile;
 }
@@ -142,11 +135,6 @@ void vsystem_spr_device::CG10103_set_pal_base(device_t &device, int pal_base)
 }
 
 
-void vsystem_spr_device::set_pal_base(int pal_base)
-{
-	m_pal_base = pal_base;
-}
-
 // static
 void vsystem_spr_device::set_pal_mask(device_t &device, int pal_mask)
 {
@@ -186,7 +174,7 @@ void vsystem_spr_device::device_reset()
 {
 }
 
-void vsystem_spr_device::get_sprite_attributes(UINT16* ram)
+void vsystem_spr_device::sprite_attributes::get(uint16_t const *ram)
 {
 	/*
 	    attr_start + 0x0000
@@ -210,21 +198,21 @@ void vsystem_spr_device::get_sprite_attributes(UINT16* ram)
 	    xxxx xxxx xxxx xxxx map start (lsb)
 	*/
 
-	m_curr_sprite.oy =    (ram[0] & 0x01ff);
-	m_curr_sprite.ysize = (ram[0] & 0x0e00) >> 9;
-	m_curr_sprite.zoomy = (ram[0] & 0xf000) >> 12;
+	oy =    (ram[0] & 0x01ff);
+	ysize = (ram[0] & 0x0e00) >> 9;
+	zoomy = (ram[0] & 0xf000) >> 12;
 
-	m_curr_sprite.ox =    (ram[1] & 0x01ff);
-	m_curr_sprite.xsize = (ram[1] & 0x0e00) >> 9;
-	m_curr_sprite.zoomx = (ram[1] & 0xf000) >> 12;
+	ox =    (ram[1] & 0x01ff);
+	xsize = (ram[1] & 0x0e00) >> 9;
+	zoomx = (ram[1] & 0xf000) >> 12;
 
-	m_curr_sprite.flipx = (ram[2] & 0x4000);
-	m_curr_sprite.flipy = (ram[2] & 0x8000);
-	m_curr_sprite.color = (ram[2] & 0x3f00) >> 8;
-	m_curr_sprite.pri   = (ram[2] & 0x3000) >> 12;
-	m_curr_sprite.map   = (ram[2] & 0x0001) << 16;
+	flipx = (ram[2] & 0x4000);
+	flipy = (ram[2] & 0x8000);
+	color = (ram[2] & 0x3f00) >> 8;
+	pri   = (ram[2] & 0x3000) >> 12;
+	map   = (ram[2] & 0x0001) << 16;
 
-	m_curr_sprite.map  |= (ram[3] & 0xffff);
+	map  |= (ram[3] & 0xffff);
 }
 
 
@@ -291,7 +279,7 @@ void vsystem_spr_device::common_sprite_drawgfx(bitmap_ind16 &bitmap, const recta
 
 
 
-void vsystem_spr_device::draw_sprites( UINT16* spriteram, int spriteram_bytes, screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int prihack_mask, int prihack_val )
+void vsystem_spr_device::draw_sprites(uint16_t const *spriteram, int spriteram_bytes, screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int prihack_mask, int prihack_val )
 {
 	int offs;
 	int end = 0;
@@ -328,7 +316,7 @@ void vsystem_spr_device::draw_sprites( UINT16* spriteram, int spriteram_bytes, s
 
 			attr_start = 4 * (spriteram[offs] & 0x03ff);
 
-			get_sprite_attributes(&spriteram[attr_start]);
+			m_curr_sprite.get(&spriteram[attr_start]);
 
 			m_curr_sprite.color &= m_pal_mask;
 

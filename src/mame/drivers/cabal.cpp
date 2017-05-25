@@ -44,17 +44,17 @@ Dip locations verified with Fabtek manual for the trackball version
 ******************************************************************/
 
 #include "emu.h"
+#include "includes/cabal.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
+#include "machine/upd4701.h"
 #include "sound/ym2151.h"
 #include "sound/msm5205.h"
-#include "includes/cabal.h"
+#include "screen.h"
+#include "speaker.h"
 
-MACHINE_START_MEMBER(cabal_state,cabal)
-{
-	save_item(NAME(m_last));
-}
 
 MACHINE_START_MEMBER(cabal_state,cabalbl)
 {
@@ -86,28 +86,6 @@ WRITE16_MEMBER(cabal_state::cabalbl_sndcmd_w)
 
 
 
-WRITE16_MEMBER(cabal_state::track_reset_w)
-{
-	int i;
-	static const char *const track_names[] = { "IN0", "IN1", "IN2", "IN3" };
-
-	for (i = 0; i < 4; i++)
-		m_last[i] = ioport(track_names[i])->read();
-}
-
-READ16_MEMBER(cabal_state::track_r)
-{
-	switch (offset)
-	{
-		default:
-		case 0: return (( ioport("IN0")->read() - m_last[0]) & 0x00ff)           | (((ioport("IN2")->read() - m_last[2]) & 0x00ff) << 8);       /* X lo */
-		case 1: return (((ioport("IN0")->read() - m_last[0]) & 0xff00) >> 8) | (( ioport("IN2")->read() - m_last[2]) & 0xff00);                 /* X hi */
-		case 2: return (( ioport("IN1")->read() - m_last[1]) & 0x00ff)           | (((ioport("IN3")->read() - m_last[3]) & 0x00ff) << 8);       /* Y lo */
-		case 3: return (((ioport("IN1")->read() - m_last[1]) & 0xff00) >> 8) | (( ioport("IN3")->read() - m_last[3]) & 0xff00);                 /* Y hi */
-	}
-}
-
-
 WRITE16_MEMBER(cabal_state::sound_irq_trigger_word_w)
 {
 	m_seibu_sound->main_word_w(space,4,data,mem_mask);
@@ -132,15 +110,26 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, cabal_state )
 	AM_RANGE(0x80000, 0x801ff) AM_RAM_WRITE(background_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x80200, 0x803ff) AM_RAM
 	AM_RANGE(0xa0000, 0xa0001) AM_READ_PORT("DSW")
-	AM_RANGE(0xa0008, 0xa000f) AM_READ(track_r)
+	AM_RANGE(0xa0008, 0xa0009) AM_READ_PORT("IN2")
 	AM_RANGE(0xa0010, 0xa0011) AM_READ_PORT("INPUTS")
-	AM_RANGE(0xc0000, 0xc0001) AM_WRITE(track_reset_w)
 	AM_RANGE(0xc0040, 0xc0041) AM_WRITENOP /* ??? */
 	AM_RANGE(0xc0080, 0xc0081) AM_WRITE(flipscreen_w)
 	AM_RANGE(0xe0000, 0xe07ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xe8008, 0xe8009) AM_WRITE(sound_irq_trigger_word_w) // fix coin insertion
 	AM_RANGE(0xe8000, 0xe800d) AM_DEVREADWRITE("seibu_sound", seibu_sound_device, main_word_r, main_word_w)
 ADDRESS_MAP_END
+
+
+
+static ADDRESS_MAP_START( trackball_main_map, AS_PROGRAM, 16, cabal_state )
+	AM_RANGE(0xa0008, 0xa000f) AM_DEVREAD8("upd4701l", upd4701_device, read_xy, 0x00ff)
+	AM_RANGE(0xa0008, 0xa000f) AM_DEVREAD8("upd4701h", upd4701_device, read_xy, 0xff00)
+	AM_RANGE(0xc0000, 0xc0001) AM_DEVWRITE8("upd4701l", upd4701_device, reset_xy, 0x00ff)
+	AM_RANGE(0xc0000, 0xc0001) AM_DEVWRITE8("upd4701h", upd4701_device, reset_xy, 0xff00)
+	AM_IMPORT_FROM(main_map)
+ADDRESS_MAP_END
+
+
 
 static ADDRESS_MAP_START( cabalbl_main_map, AS_PROGRAM, 16, cabal_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_ROM
@@ -183,13 +172,13 @@ WRITE8_MEMBER(cabal_state::cabalbl_coin_w)
 }
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, cabal_state )
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x0000, 0x1fff) AM_DEVREAD("sei80bu", sei80bu_device, data_r)
 	AM_RANGE(0x2000, 0x27ff) AM_RAM
 	AM_RANGE(0x4001, 0x4001) AM_DEVWRITE("seibu_sound", seibu_sound_device, irq_clear_w)
 	AM_RANGE(0x4002, 0x4002) AM_DEVWRITE("seibu_sound", seibu_sound_device, rst10_ack_w)
 	AM_RANGE(0x4003, 0x4003) AM_DEVWRITE("seibu_sound", seibu_sound_device, rst18_ack_w)
 	AM_RANGE(0x4005, 0x4006) AM_DEVWRITE("adpcm1", seibu_adpcm_device, adr_w)
-	AM_RANGE(0x4008, 0x4009) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
+	AM_RANGE(0x4008, 0x4009) AM_DEVREADWRITE("seibu_sound", seibu_sound_device, ym_r, ym_w)
 	AM_RANGE(0x4010, 0x4011) AM_DEVREAD("seibu_sound", seibu_sound_device, soundlatch_r)
 	AM_RANGE(0x4012, 0x4012) AM_DEVREAD("seibu_sound", seibu_sound_device, main_data_pending_r)
 	AM_RANGE(0x4013, 0x4013) AM_READ_PORT("COIN")
@@ -198,7 +187,12 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, cabal_state )
 	AM_RANGE(0x401b, 0x401b) AM_DEVWRITE("seibu_sound", seibu_sound_device, coin_w)
 	AM_RANGE(0x6005, 0x6006) AM_DEVWRITE("adpcm2", seibu_adpcm_device, adr_w)
 	AM_RANGE(0x601a, 0x601a) AM_DEVWRITE("adpcm2", seibu_adpcm_device, ctl_w)
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("seibu_bank1")
+	AM_RANGE(0x8000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( sound_decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, cabal_state )
+	AM_RANGE(0x0000, 0x1fff) AM_DEVREAD("sei80bu", sei80bu_device, opcode_r)
+	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("audiocpu", 0x8000)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cabalbl_sound_map, AS_PROGRAM, 8, cabal_state )
@@ -214,6 +208,30 @@ static ADDRESS_MAP_START( cabalbl_sound_map, AS_PROGRAM, 8, cabal_state )
 	AM_RANGE(0x400e, 0x400f) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x6000, 0x6000) AM_WRITENOP  /* ??? */
 	AM_RANGE(0x8000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( cabalbl2_sound_map, AS_PROGRAM, 8, cabal_state )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x2000, 0x27ff) AM_RAM
+	AM_RANGE(0x4001, 0x4001) AM_DEVWRITE("seibu_sound", seibu_sound_device, irq_clear_w)
+	AM_RANGE(0x4002, 0x4002) AM_DEVWRITE("seibu_sound", seibu_sound_device, rst10_ack_w)
+	AM_RANGE(0x4003, 0x4003) AM_DEVWRITE("seibu_sound", seibu_sound_device, rst18_ack_w)
+	AM_RANGE(0x4005, 0x4006) AM_DEVWRITE("adpcm1", seibu_adpcm_device, adr_w)
+	AM_RANGE(0x4008, 0x4009) AM_DEVREADWRITE("seibu_sound", seibu_sound_device, ym_r, ym_w)
+	AM_RANGE(0x4010, 0x4011) AM_DEVREAD("seibu_sound", seibu_sound_device, soundlatch_r)
+	AM_RANGE(0x4012, 0x4012) AM_DEVREAD("seibu_sound", seibu_sound_device, main_data_pending_r)
+	AM_RANGE(0x4013, 0x4013) AM_READ_PORT("COIN")
+	AM_RANGE(0x4018, 0x4019) AM_DEVWRITE("seibu_sound", seibu_sound_device, main_data_w)
+	AM_RANGE(0x401a, 0x401a) AM_DEVWRITE("adpcm1", seibu_adpcm_device, ctl_w)
+	AM_RANGE(0x401b, 0x401b) AM_DEVWRITE("seibu_sound", seibu_sound_device, coin_w)
+	AM_RANGE(0x6005, 0x6006) AM_DEVWRITE("adpcm2", seibu_adpcm_device, adr_w)
+	AM_RANGE(0x601a, 0x601a) AM_DEVWRITE("adpcm2", seibu_adpcm_device, ctl_w)
+	AM_RANGE(0x8000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( cabalbl2_predecrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, cabal_state )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("audiocpu", 0x2000)
+	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("audiocpu", 0x8000)
 ADDRESS_MAP_END
 
 /* the bootleg has 2x z80 sample players */
@@ -337,16 +355,16 @@ static INPUT_PORTS_START( cabalt )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START1 )
 
 	PORT_START("IN0")
-	PORT_BIT( 0x0fff, 0x0000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_PLAYER(1)
+	PORT_BIT( 0x0fff, 0x0000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_RESET PORT_PLAYER(1)
 
 	PORT_START("IN1")
-	PORT_BIT( 0x0fff, 0x0000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_REVERSE PORT_PLAYER(1)
+	PORT_BIT( 0x0fff, 0x0000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_REVERSE PORT_RESET PORT_PLAYER(1)
 
 	PORT_START("IN2")
-	PORT_BIT( 0x0fff, 0x0000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_PLAYER(2)
+	PORT_BIT( 0x0fff, 0x0000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_RESET PORT_PLAYER(2)
 
 	PORT_START("IN3")
-	PORT_BIT( 0x0fff, 0x0000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_PLAYER(2)
+	PORT_BIT( 0x0fff, 0x0000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_RESET PORT_PLAYER(2)
 INPUT_PORTS_END
 
 
@@ -383,14 +401,15 @@ static INPUT_PORTS_START( cabalj )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 
 	PORT_START("IN3")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -469,7 +488,7 @@ static GFXDECODE_START( cabal )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( cabal_base, cabal_state )
+static MACHINE_CONFIG_START( cabal )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz/2) /* verified on pcb */
@@ -478,8 +497,10 @@ static MACHINE_CONFIG_START( cabal_base, cabal_state )
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(sound_decrypted_opcodes_map)
 
-	MCFG_MACHINE_START_OVERRIDE(cabal_state,cabal)
+	MCFG_DEVICE_ADD("sei80bu", SEI80BU, 0)
+	MCFG_DEVICE_ROM("audiocpu")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -496,31 +517,47 @@ static MACHINE_CONFIG_START( cabal_base, cabal_state )
 
 	/* sound hardware */
 	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
+	MCFG_SEIBU_SOUND_CPU("audiocpu")
+	MCFG_SEIBU_SOUND_YM_READ_CB(DEVREAD8("ymsnd", ym2151_device, read))
+	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym2151_device, write))
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz) /* verified on pcb */
 	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono", 0.80)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MCFG_SOUND_ADD("adpcm1", SEIBU_ADPCM, 8000) /* it should use the msm5205 */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono", 0.40)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_SOUND_ADD("adpcm2", SEIBU_ADPCM, 8000) /* it should use the msm5205 */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono", 0.40)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( cabal, cabal_base )
-	SEIBU_SOUND_SYSTEM_ENCRYPTED_LOW()
+static MACHINE_CONFIG_DERIVED( cabalt, cabal )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(trackball_main_map)
+
+	MCFG_DEVICE_ADD("upd4701l", UPD4701A, 0)
+	MCFG_UPD4701_PORTX("IN0")
+	MCFG_UPD4701_PORTY("IN1")
+
+	MCFG_DEVICE_ADD("upd4701h", UPD4701A, 0)
+	MCFG_UPD4701_PORTX("IN2")
+	MCFG_UPD4701_PORTY("IN3")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( cabalbl2, cabal_base )
-	SEIBU_SOUND_SYSTEM_ENCRYPTED_CUSTOM()
+static MACHINE_CONFIG_DERIVED( cabalbl2, cabal )
+	MCFG_DEVICE_REMOVE("sei80bu")
+
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_CPU_PROGRAM_MAP(cabalbl2_sound_map)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(cabalbl2_predecrypted_opcodes_map)
 MACHINE_CONFIG_END
 
 
 /* the bootleg has different sound hardware (2 extra Z80s for ADPCM playback) */
-static MACHINE_CONFIG_START( cabalbl, cabal_state )
+static MACHINE_CONFIG_START( cabalbl )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz/2) /* verified on pcb */
@@ -571,11 +608,11 @@ static MACHINE_CONFIG_START( cabalbl, cabal_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono", 0.80)
 
 	MCFG_SOUND_ADD("msm1", MSM5205, XTAL_12MHz/32) /* verified on pcb (no resonator) */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_SEX_4B)
+	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
 	MCFG_SOUND_ADD("msm2", MSM5205, XTAL_12MHz/32) /* verified on pcb (no resonator)*/
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_SEX_4B)
+	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
@@ -880,21 +917,12 @@ DRIVER_INIT_MEMBER(cabal_state,cabal)
 	m_adpcm2->decrypt();
 }
 
-DRIVER_INIT_MEMBER(cabal_state,cabalbl2)
-{
-	UINT8 *decrypt = m_seibu_sound->get_custom_decrypt();
-	memcpy(decrypt,        memregion("audiocpu")->base()+0x2000, 0x2000);
-	memcpy(decrypt+0x8000, memregion("audiocpu")->base()+0x8000, 0x8000);
-	m_adpcm1->decrypt();
-	m_adpcm2->decrypt();
-}
 
+GAME( 1988, cabal,   0,     cabal,   cabalj,  cabal_state,  cabal,  ROT0, "TAD Corporation",                         "Cabal (World, Joystick)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, cabala,  cabal, cabal,   cabalj,  cabal_state,  cabal,  ROT0, "TAD Corporation (Alpha Trading license)", "Cabal (Korea?, Joystick)", MACHINE_SUPPORTS_SAVE ) // korea?
+GAME( 1988, cabalbl, cabal, cabalbl, cabalbl, cabal_state,  0,      ROT0, "bootleg (Red Corporation)",               "Cabal (bootleg of Joystick version, set 1, alternate sound hardware)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cabalbl2,cabal, cabalbl2,cabalj,  cabal_state,  cabal,  ROT0, "bootleg",                                 "Cabal (bootleg of Joystick version, set 2)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, cabal,   0,     cabal,   cabalj, cabal_state,   cabal,   ROT0, "TAD Corporation",                         "Cabal (World, Joystick)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, cabala,  cabal, cabal,   cabalj, cabal_state,   cabal,   ROT0, "TAD Corporation (Alpha Trading license)", "Cabal (Korea?, Joystick)", MACHINE_SUPPORTS_SAVE ) // korea?
-GAME( 1988, cabalbl, cabal, cabalbl, cabalbl,driver_device, 0,       ROT0, "bootleg (Red Corporation)",               "Cabal (bootleg of Joystick version, set 1, alternate sound hardware)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, cabalbl2,cabal, cabalbl2,cabalj, cabal_state,   cabalbl2,ROT0, "bootleg",                                 "Cabal (bootleg of Joystick version, set 2)", MACHINE_SUPPORTS_SAVE )
-
-GAME( 1988, cabalus, cabal, cabal,   cabalt, cabal_state,   cabal,  ROT0, "TAD Corporation (Fabtek license)",         "Cabal (US set 1, Trackball)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, cabalus2,cabal, cabal,   cabalt, cabal_state,   cabal,  ROT0, "TAD Corporation (Fabtek license)",         "Cabal (US set 2, Trackball)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, cabaluk, cabal, cabal,   cabalt, cabal_state,   cabal,  ROT0, "TAD Corporation (Electrocoin license)",    "Cabal (UK, Trackball)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cabalus, cabal, cabalt,  cabalt,  cabal_state,  cabal,  ROT0, "TAD Corporation (Fabtek license)",        "Cabal (US set 1, Trackball)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cabalus2,cabal, cabalt,  cabalt,  cabal_state,  cabal,  ROT0, "TAD Corporation (Fabtek license)",        "Cabal (US set 2, Trackball)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, cabaluk, cabal, cabalt,  cabalt,  cabal_state,  cabal,  ROT0, "TAD Corporation (Electrocoin license)",   "Cabal (UK, Trackball)", MACHINE_SUPPORTS_SAVE )

@@ -8,15 +8,14 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_EPSON_SIO_PF10_H
+#define MAME_BUS_EPSON_SIO_PF10_H
+
 #pragma once
 
-#ifndef __PF10_H__
-#define __PF10_H__
-
-#include "emu.h"
+#include "epson_sio.h"
 #include "cpu/m6800/m6800.h"
 #include "machine/upd765.h"
-#include "epson_sio.h"
 
 
 //**************************************************************************
@@ -28,10 +27,10 @@ class epson_pf10_device : public device_t,
 {
 public:
 	// construction/destruction
-	epson_pf10_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	epson_pf10_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// floppy disk controller
@@ -72,8 +71,8 @@ private:
 
 	emu_timer *m_timer;
 
-	UINT8 m_port1;
-	UINT8 m_port2;
+	uint8_t m_port1;
+	uint8_t m_port2;
 
 	int m_rxc;
 	int m_hd6303_tx;
@@ -95,7 +94,7 @@ private:
 
 
 // device type definition
-extern const device_type EPSON_PF10;
+DECLARE_DEVICE_TYPE(EPSON_PF10, epson_pf10_device)
 
 
-#endif // __PF10_H__
+#endif // MAME_BUS_EPSON_SIO_PF10_H

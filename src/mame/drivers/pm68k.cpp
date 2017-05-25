@@ -27,20 +27,20 @@ public:
 	{
 	}
 
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	void kbd_put(u8 data);
 	DECLARE_READ16_MEMBER(keyin_r);
 	DECLARE_READ16_MEMBER(status_r);
 private:
-	UINT8 m_term_data;
+	uint8_t m_term_data;
 	virtual void machine_reset() override;
-	required_shared_ptr<UINT16> m_p_base;
+	required_shared_ptr<uint16_t> m_p_base;
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 };
 
 READ16_MEMBER( pm68k_state::keyin_r )
 {
-	UINT16 ret = m_term_data;
+	uint16_t ret = m_term_data;
 	m_term_data = 0;
 	return ret << 8;
 }
@@ -68,24 +68,24 @@ INPUT_PORTS_END
 
 void pm68k_state::machine_reset()
 {
-	UINT8* ROM = memregion("maincpu")->base();
+	uint8_t* ROM = memregion("maincpu")->base();
 	memcpy(m_p_base, ROM, 8);
 	m_maincpu->reset();
 }
 
-WRITE8_MEMBER( pm68k_state::kbd_put )
+void pm68k_state::kbd_put(u8 data)
 {
 	m_term_data = data;
 }
 
-static MACHINE_CONFIG_START( pm68k, pm68k_state )
+static MACHINE_CONFIG_START( pm68k )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)
 	MCFG_CPU_PROGRAM_MAP(pm68k_mem)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(pm68k_state, kbd_put))
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(pm68k_state, kbd_put))
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -100,5 +100,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME   PARENT  COMPAT  MACHINE INPUT   CLASS         INIT    COMPANY           FULLNAME       FLAGS */
-COMP( 198?, pm68k, 0,      0,      pm68k,  pm68k,  driver_device, 0, "Callan Data Systems", "PM68K", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE INPUT   CLASS        INIT  COMPANY                FULLNAME  FLAGS
+COMP( 198?, pm68k, 0,      0,      pm68k,  pm68k,  pm68k_state, 0,    "Callan Data Systems", "PM68K",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

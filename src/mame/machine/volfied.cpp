@@ -5,9 +5,8 @@
   Volfied C-Chip Protection
   =========================
 
-  The C-Chip (Taito TC0030CMD) is an unidentified mask programmed
-  microcontroller of some sort with 64 pins.  It probably has
-  about 2k of ROM and 8k of RAM.
+  The C-Chip (Taito TC0030CMD) contains a NEC D78C11 (with 4k internal ROM) +
+  8k EPROM + 8k DRAM + logic.
 
   Cheat:
     volfied:0:100191:00:001:Complete level with 99.9% Now!
@@ -19,7 +18,7 @@
 #include "emu.h"
 #include "includes/volfied.h"
 
-static const UINT16 palette_data_01[0x50] =
+static const uint16_t palette_data_01[0x50] =
 {
 	0x0000, 0xde7b, 0xde03, 0x5e01, 0x5e02, 0xc07b, 0x0000, 0xde7b,
 	0x0058, 0x4079, 0x407a, 0x407b, 0xd47b, 0x0000, 0x0000, 0x0000,
@@ -33,7 +32,7 @@ static const UINT16 palette_data_01[0x50] =
 	0x1e00, 0x1000, 0x9e01, 0x1e02, 0xde02, 0x0038, 0x0e38, 0x0000
 };
 
-static const UINT16 palette_data_02[0x50] =
+static const uint16_t palette_data_02[0x50] =
 {
 	0x0000, 0xde7b, 0xde03, 0x5e01, 0x5e02, 0xc07b, 0x0000, 0xde7b,
 	0x0058, 0x4079, 0x407a, 0x407b, 0xd47b, 0x0000, 0x0000, 0x0000,
@@ -47,7 +46,7 @@ static const UINT16 palette_data_02[0x50] =
 	0x187b, 0x947a, 0x0821, 0x9e79, 0x1040, 0x8079, 0xc07a, 0x0000
 };
 
-static const UINT16 palette_data_03[0x50] =
+static const uint16_t palette_data_03[0x50] =
 {
 	0x0000, 0xde7b, 0xde03, 0x5e01, 0x5e02, 0xc07b, 0x0000, 0xde7b,
 	0x0058, 0x4079, 0x407a, 0x407b, 0xd47b, 0x0000, 0x0000, 0x0000,
@@ -61,7 +60,7 @@ static const UINT16 palette_data_03[0x50] =
 	0x9201, 0xc002, 0xc003, 0x0003, 0x8002, 0x4001, 0xc002, 0x4003
 };
 
-static const UINT16 palette_data_04[0x50] =
+static const uint16_t palette_data_04[0x50] =
 {
 	0x0000, 0xde7b, 0xde03, 0x5e01, 0x5e02, 0xc07b, 0x0000, 0xde7b,
 	0x0058, 0x4079, 0x407a, 0x407b, 0xd47b, 0x0000, 0x0000, 0x0000,
@@ -75,7 +74,7 @@ static const UINT16 palette_data_04[0x50] =
 	0x1e00, 0x1000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000
 };
 
-static const UINT16 palette_data_05[0x50] =
+static const uint16_t palette_data_05[0x50] =
 {
 	0x0000, 0xde7b, 0xde03, 0x5e01, 0x5e02, 0xc07b, 0x0000, 0xde7b,
 	0x0058, 0x4079, 0x407a, 0x407b, 0xd47b, 0x0000, 0x0000, 0x0000,
@@ -89,7 +88,7 @@ static const UINT16 palette_data_05[0x50] =
 	0x803a, 0x4208, 0x0821, 0x1042, 0xd65a, 0x9c73, 0xde03, 0x5c02
 };
 
-static const UINT16 palette_data_06[0x50] =
+static const uint16_t palette_data_06[0x50] =
 {
 	0x0000, 0xde7b, 0xde03, 0x5e01, 0x5e02, 0xc07b, 0x0000, 0xde7b,
 	0x0058, 0x4079, 0x407a, 0x407b, 0xd47b, 0x0000, 0x0000, 0x0000,
@@ -103,7 +102,7 @@ static const UINT16 palette_data_06[0x50] =
 	0xde01, 0x1e01, 0xc03a, 0x0063, 0x586b, 0x9252, 0x8a31, 0x527a
 };
 
-static const UINT16 palette_data_07[0x50] =
+static const uint16_t palette_data_07[0x50] =
 {
 	0x0000, 0xde7b, 0xde03, 0x5e01, 0x5e02, 0xc07b, 0x0000, 0xde7b,
 	0x0058, 0x4079, 0x407a, 0x407b, 0xd47b, 0x0000, 0x0000, 0x0000,
@@ -117,7 +116,7 @@ static const UINT16 palette_data_07[0x50] =
 	0x8c31, 0x1042, 0x9c73, 0x1e00, 0x5c02, 0x0c00, 0x1860, 0x1e78
 };
 
-static const UINT16 palette_data_08[0x50] =
+static const uint16_t palette_data_08[0x50] =
 {
 	0x0000, 0xde7b, 0xde03, 0x5e01, 0x5e02, 0xc07b, 0x0000, 0xde7b,
 	0x0058, 0x4079, 0x407a, 0x407b, 0xd47b, 0x0000, 0x0000, 0x0000,
@@ -131,7 +130,7 @@ static const UINT16 palette_data_08[0x50] =
 	0x1e00, 0x1000, 0x9e01, 0x5e02, 0x5e03, 0x0038, 0x0e38, 0x0000
 };
 
-static const UINT16 palette_data_09[0x50] =
+static const uint16_t palette_data_09[0x50] =
 {
 	0x0000, 0xde7b, 0xde03, 0x5e01, 0x5e02, 0xc07b, 0x0000, 0xde7b,
 	0x0058, 0x4079, 0x407a, 0x407b, 0xd47b, 0x0000, 0x0000, 0x0000,
@@ -145,7 +144,7 @@ static const UINT16 palette_data_09[0x50] =
 	0x4208, 0x4a29, 0x8c31, 0x1042, 0x1e42, 0x186b, 0x9210, 0x9e31
 };
 
-static const UINT16 palette_data_0a[0x50] =
+static const uint16_t palette_data_0a[0x50] =
 {
 	0x0000, 0xde7b, 0xde03, 0x5e01, 0x5e02, 0xc07b, 0x0000, 0xde7b,
 	0x0058, 0x4079, 0x407a, 0x407b, 0xd47b, 0x0000, 0x0000, 0x0000,
@@ -159,7 +158,7 @@ static const UINT16 palette_data_0a[0x50] =
 	0x0003, 0xc003, 0x5e02, 0xde01, 0x5201, 0xd200, 0x0668, 0x4672
 };
 
-static const UINT16 palette_data_0b[0x50] =
+static const uint16_t palette_data_0b[0x50] =
 {
 	0x0000, 0xde7b, 0xde03, 0x5e01, 0x5e02, 0xc07b, 0x0000, 0xde7b,
 	0x0058, 0x4079, 0x407a, 0x407b, 0xd47b, 0x0000, 0x0000, 0x0000,
@@ -173,7 +172,7 @@ static const UINT16 palette_data_0b[0x50] =
 	0xce01, 0x8c01, 0x4208, 0xde03, 0x9c02, 0x1e60, 0x1a00, 0x1000
 };
 
-static const UINT16 palette_data_0c[0x50] =
+static const uint16_t palette_data_0c[0x50] =
 {
 	0x0000, 0xde7b, 0xde03, 0x5e01, 0x5e02, 0xc07b, 0x0000, 0xde7b,
 	0x0058, 0x4079, 0x407a, 0x407b, 0xd47b, 0x0000, 0x0000, 0x0000,
@@ -187,7 +186,7 @@ static const UINT16 palette_data_0c[0x50] =
 	0xc001, 0xc003, 0xde03, 0x1403, 0xcc01, 0x4a01, 0x0668, 0x4672
 };
 
-static const UINT16 palette_data_0d[0x50] =
+static const uint16_t palette_data_0d[0x50] =
 {
 	0x0000, 0xde7b, 0xde03, 0x5e01, 0x5e02, 0xc07b, 0x0000, 0xde7b,
 	0x0058, 0x4079, 0x407a, 0x407b, 0xd47b, 0x0000, 0x0000, 0x0000,
@@ -201,7 +200,7 @@ static const UINT16 palette_data_0d[0x50] =
 	0xde4b, 0x8e39, 0x0821, 0x1600, 0x1000, 0xd201, 0x1e00, 0x0a42
 };
 
-static const UINT16 palette_data_0e[0x50] =
+static const uint16_t palette_data_0e[0x50] =
 {
 	0x0000, 0xde7b, 0xde03, 0x5e01, 0x5e02, 0xc07b, 0x0000, 0xde7b,
 	0x0058, 0x4079, 0x407a, 0x407b, 0xd47b, 0x0000, 0x0000, 0x0000,
@@ -215,7 +214,7 @@ static const UINT16 palette_data_0e[0x50] =
 	0x4208, 0x0821, 0x8c31, 0x1042, 0x5a6b, 0x8001, 0x0002, 0x545b
 };
 
-static const UINT16 palette_data_0f[0x50] =
+static const uint16_t palette_data_0f[0x50] =
 {
 	0x0000, 0xde7b, 0xde03, 0x5e01, 0x5e02, 0xc07b, 0x0000, 0xde7b,
 	0x0058, 0x4079, 0x407a, 0x407b, 0xd47b, 0x0000, 0x0000, 0x0000,
@@ -229,7 +228,7 @@ static const UINT16 palette_data_0f[0x50] =
 	0x8c31, 0x1042, 0x9c73, 0x1e03, 0x1a02, 0x0c00, 0x9e01, 0x0e00
 };
 
-static const UINT16 palette_data_10[0x50] =
+static const uint16_t palette_data_10[0x50] =
 {
 	0x0000, 0xde7b, 0xde03, 0x5e01, 0x5e02, 0xc07b, 0x0000, 0xde7b,
 	0x0058, 0x4079, 0x407a, 0x407b, 0xd47b, 0x0000, 0x0000, 0x0000,
@@ -243,7 +242,7 @@ static const UINT16 palette_data_10[0x50] =
 	0x524a, 0xce39, 0x0821, 0x1600, 0x1000, 0xd201, 0xde03, 0x0a42
 };
 
-static const UINT16 palette_data_11[0x50] =
+static const uint16_t palette_data_11[0x50] =
 {
 	0x0000, 0x4a29, 0x8c31, 0xce39, 0x1042, 0x524a, 0x9452, 0xd65a,
 	0x1863, 0x0000, 0xde39, 0xde7b, 0xc001, 0x8002, 0x1800, 0x1e00,
@@ -257,7 +256,7 @@ static const UINT16 palette_data_11[0x50] =
 	0xce39, 0x1c02, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000
 };
 
-static const UINT16 *const palette_data_lookup[] =
+static const uint16_t *const palette_data_lookup[] =
 {
 	nullptr,
 	palette_data_01,
@@ -284,19 +283,19 @@ void volfied_state::device_timer(emu_timer &timer, device_timer_id id, int param
 	switch (id)
 	{
 	case TIMER_VOLFIED:
-		volfied_timer_callback(ptr, param);
+		timer_callback(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in volfied_state::device_timer");
+		assert_always(false, "Unknown id in volfied_state::device_timer");
 	}
 }
 
-TIMER_CALLBACK_MEMBER(volfied_state::volfied_timer_callback)
+TIMER_CALLBACK_MEMBER(volfied_state::timer_callback)
 {
 	// Palette commands - palette data written to bank 0: $10 - $af
 	if (m_current_cmd >= 0x1 && m_current_cmd < 0x12)
 	{
-		const UINT16* palette_data = palette_data_lookup[m_current_cmd];
+		const uint16_t* palette_data = palette_data_lookup[m_current_cmd];
 		int i;
 		for (i = 0; i < 0x50; i++)
 		{
@@ -339,17 +338,17 @@ TIMER_CALLBACK_MEMBER(volfied_state::volfied_timer_callback)
  *
  *************************************/
 
-WRITE16_MEMBER(volfied_state::volfied_cchip_ctrl_w)
+WRITE16_MEMBER(volfied_state::cchip_ctrl_w)
 {
 	/* value 2 is written here */
 }
 
-WRITE16_MEMBER(volfied_state::volfied_cchip_bank_w)
+WRITE16_MEMBER(volfied_state::cchip_bank_w)
 {
 	m_current_bank = data & 7;
 }
 
-WRITE16_MEMBER(volfied_state::volfied_cchip_ram_w)
+WRITE16_MEMBER(volfied_state::cchip_ram_w)
 {
 	m_cchip_ram[(m_current_bank * 0x400) + offset] = data;
 
@@ -400,12 +399,12 @@ WRITE16_MEMBER(volfied_state::volfied_cchip_ram_w)
 			// Palette request cmd - verified to take around 122242 68000 cycles to complete
 			if (m_current_cmd >= 0x1 && m_current_cmd < 0x12)
 			{
-				timer_set(downcast<cpu_device *>(&space.device())->cycles_to_attotime(122242), TIMER_VOLFIED);
+				m_cchip_timer->adjust(m_maincpu->cycles_to_attotime(122242));
 			}
 			// Unknown cmd - verified to take around 105500 68000 cycles to complete
 			else if (m_current_cmd >= 0x81 && m_current_cmd < 0x92)
 			{
-				timer_set(downcast<cpu_device *>(&space.device())->cycles_to_attotime(105500), TIMER_VOLFIED);
+				m_cchip_timer->adjust(m_maincpu->cycles_to_attotime(105500));
 			}
 			else
 			{
@@ -429,7 +428,7 @@ WRITE16_MEMBER(volfied_state::volfied_cchip_ram_w)
  *
  *************************************/
 
-READ16_MEMBER(volfied_state::volfied_cchip_ctrl_r)
+READ16_MEMBER(volfied_state::cchip_ctrl_r)
 {
 	/*
 	    Bit 2 = Error signal
@@ -438,7 +437,7 @@ READ16_MEMBER(volfied_state::volfied_cchip_ctrl_r)
 	return 0x01; /* Return 0x05 for C-Chip error */
 }
 
-READ16_MEMBER(volfied_state::volfied_cchip_ram_r)
+READ16_MEMBER(volfied_state::cchip_ram_r)
 {
 	/* Check for input ports */
 	if (m_current_bank == 0)
@@ -491,9 +490,11 @@ READ16_MEMBER(volfied_state::volfied_cchip_ram_r)
  *
  *************************************/
 
-void volfied_state::volfied_cchip_init(  )
+void volfied_state::cchip_init()
 {
-	m_cchip_ram = make_unique_clear<UINT8[]>(0x400 * 8);
+	m_cchip_timer = timer_alloc(TIMER_VOLFIED);
+
+	m_cchip_ram = make_unique_clear<uint8_t[]>(0x400 * 8);
 
 	save_item(NAME(m_current_bank));
 	save_item(NAME(m_current_cmd));
@@ -502,7 +503,7 @@ void volfied_state::volfied_cchip_init(  )
 	save_pointer(NAME(m_cchip_ram.get()), 0x400 * 8);
 }
 
-void volfied_state::volfied_cchip_reset(  )
+void volfied_state::cchip_reset()
 {
 	m_current_bank = 0;
 	m_current_flag = 0;

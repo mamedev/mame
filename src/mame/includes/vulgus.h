@@ -27,11 +27,11 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<UINT8> m_scroll_low;
-	required_shared_ptr<UINT8> m_scroll_high;
-	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_fgvideoram;
-	required_shared_ptr<UINT8> m_bgvideoram;
+	required_shared_ptr<uint8_t> m_scroll_low;
+	required_shared_ptr<uint8_t> m_scroll_high;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_fgvideoram;
+	required_shared_ptr<uint8_t> m_bgvideoram;
 
 	int m_palette_bank;
 	tilemap_t *m_fg_tilemap;
@@ -48,7 +48,7 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(vulgus);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(vblank_irq);

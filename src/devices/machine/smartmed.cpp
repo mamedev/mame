@@ -22,21 +22,21 @@
 #include "smartmed.h"
 
 
-#define MAX_SMARTMEDIA  1
+namespace {
 
 /* machine-independent big-endian 32-bit integer */
 struct UINT32BE
 {
-	UINT8 bytes[4];
+	uint8_t bytes[4];
 };
 
-static inline UINT32 get_UINT32BE(UINT32BE word)
+inline uint32_t get_UINT32BE(UINT32BE word)
 {
 	return (word.bytes[0] << 24) | (word.bytes[1] << 16) | (word.bytes[2] << 8) | word.bytes[3];
 }
 
 #ifdef UNUSED_FUNCTION
-static inline void set_UINT32BE(UINT32BE *word, UINT32 data)
+inline void set_UINT32BE(UINT32BE *word, uint32_t data)
 {
 	word->bytes[0] = (data >> 24) & 0xff;
 	word->bytes[1] = (data >> 16) & 0xff;
@@ -48,7 +48,7 @@ static inline void set_UINT32BE(UINT32BE *word, UINT32 data)
 /* SmartMedia image header */
 struct SM_disk_image_header
 {
-	UINT8 version;
+	uint8_t version;
 	UINT32BE page_data_size;
 	UINT32BE page_total_size;
 	UINT32BE num_pages;
@@ -57,11 +57,11 @@ struct SM_disk_image_header
 
 struct disk_image_format_2_header
 {
-	UINT8 data1[3];
-	UINT8 padding1[256-3];
-	UINT8 data2[16];
-	UINT8 data3[16];
-	UINT8 padding2[768-32];
+	uint8_t data1[3];
+	uint8_t padding1[256-3];
+	uint8_t data2[16];
+	uint8_t data3[16];
+	uint8_t padding2[768-32];
 };
 
 enum
@@ -69,37 +69,28 @@ enum
 	header_len = sizeof(SM_disk_image_header)
 };
 
+} // anonymous namespace
 
-const device_type NAND = &device_creator<nand_device>;
 
-nand_device::nand_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, NAND, "NAND Flash Memory", tag, owner, clock, "nand", __FILE__),
-		m_page_data_size(0),
-		m_page_total_size(0),
-		m_num_pages(0),
-		m_log2_pages_per_block(0),
-		m_pagereg(nullptr),
-		m_id_len(0),
-		m_col_address_cycles(0),
-		m_row_address_cycles(0),
-		m_sequential_row_read(0),
-		m_write_rnb(*this)
+DEFINE_DEVICE_TYPE(NAND, nand_device, "nand", "NAND Flash Memory")
+
+nand_device::nand_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: nand_device(mconfig, NAND, tag, owner, clock)
 {
-	memset(m_id, 0, sizeof(m_id));
 }
 
-nand_device::nand_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		m_page_data_size(0),
-		m_page_total_size(0),
-		m_num_pages(0),
-		m_log2_pages_per_block(0),
-		m_pagereg(nullptr),
-		m_id_len(0),
-		m_col_address_cycles(0),
-		m_row_address_cycles(0),
-		m_sequential_row_read(0),
-		m_write_rnb(*this)
+nand_device::nand_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, m_page_data_size(0)
+	, m_page_total_size(0)
+	, m_num_pages(0)
+	, m_log2_pages_per_block(0)
+	, m_pagereg(nullptr)
+	, m_id_len(0)
+	, m_col_address_cycles(0)
+	, m_row_address_cycles(0)
+	, m_sequential_row_read(0)
+	, m_write_rnb(*this)
 {
 	memset(m_id, 0, sizeof(m_id));
 }
@@ -119,18 +110,18 @@ void nand_device::device_start()
 	m_accumulated_status = 0;
 	m_mp_opcode = 0;
 	m_mode_3065 = 0;
-	m_pagereg = std::make_unique<UINT8[]>(m_page_total_size);
+	m_pagereg = std::make_unique<uint8_t[]>(m_page_total_size);
 
-	#ifdef SMARTMEDIA_IMAGE_SAVE
+#ifdef SMARTMEDIA_IMAGE_SAVE
 	m_image_format = 0;
-	#endif
+#endif
 	m_write_rnb.resolve_safe();
 }
 
 /*
     Load a SmartMedia image
 */
-bool smartmedia_image_device::smartmedia_format_1()
+image_init_result smartmedia_image_device::smartmedia_format_1()
 {
 	SM_disk_image_header custom_header;
 	int bytes_read;
@@ -138,20 +129,20 @@ bool smartmedia_image_device::smartmedia_format_1()
 	bytes_read = fread(&custom_header, sizeof(custom_header));
 	if (bytes_read != sizeof(custom_header))
 	{
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
 	if (custom_header.version > 1)
 	{
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
 	m_page_data_size = get_UINT32BE(custom_header.page_data_size);
 	m_page_total_size = get_UINT32BE(custom_header.page_total_size);
 	m_num_pages = get_UINT32BE(custom_header.num_pages);
 	m_log2_pages_per_block = get_UINT32BE(custom_header.log2_pages_per_block);
-	m_data_ptr = auto_alloc_array(machine(), UINT8, m_page_total_size*m_num_pages);
-	m_data_uid_ptr = std::make_unique<UINT8[]>(256 + 16);
+	m_data_ptr = auto_alloc_array(machine(), uint8_t, m_page_total_size*m_num_pages);
+	m_data_uid_ptr = std::make_unique<uint8_t[]>(256 + 16);
 	m_mode = SM_M_INIT;
 	m_pointer_mode = SM_PM_A;
 	m_page_addr = 0;
@@ -160,7 +151,7 @@ bool smartmedia_image_device::smartmedia_format_1()
 	if (!is_readonly())
 		m_status |= 0x80;
 	m_accumulated_status = 0;
-	m_pagereg = std::make_unique<UINT8[]>(m_page_total_size);
+	m_pagereg = std::make_unique<uint8_t[]>(m_page_total_size);
 	memset( m_id, 0, sizeof( m_id));
 	m_id_len = 0;
 	m_col_address_cycles = 1;
@@ -182,16 +173,16 @@ bool smartmedia_image_device::smartmedia_format_1()
 	}
 	fread(m_data_ptr, m_page_total_size*m_num_pages);
 
-	#ifdef SMARTMEDIA_IMAGE_SAVE
+#ifdef SMARTMEDIA_IMAGE_SAVE
 	m_image_format = 1;
-	#endif
+#endif
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
-int smartmedia_image_device::detect_geometry( UINT8 id1, UINT8 id2)
+int smartmedia_image_device::detect_geometry( uint8_t id1, uint8_t id2)
 {
-	int result = FALSE;
+	int result = false;
 
 	switch (id1)
 	{
@@ -199,15 +190,15 @@ int smartmedia_image_device::detect_geometry( UINT8 id1, UINT8 id2)
 		{
 			switch (id2)
 			{
-				case 0xA4 : m_page_data_size = 0x0100; m_num_pages = 0x00800; m_page_total_size = 0x0108; m_log2_pages_per_block = 0; result = TRUE; break;
-				case 0x6E : m_page_data_size = 0x0100; m_num_pages = 0x01000; m_page_total_size = 0x0108; m_log2_pages_per_block = 0; result = TRUE; break;
-				case 0xEA : m_page_data_size = 0x0100; m_num_pages = 0x02000; m_page_total_size = 0x0108; m_log2_pages_per_block = 4; result = TRUE; break;
-				case 0xE3 : m_page_data_size = 0x0200; m_num_pages = 0x02000; m_page_total_size = 0x0210; m_log2_pages_per_block = 4; result = TRUE; break;
-				case 0xE6 : m_page_data_size = 0x0200; m_num_pages = 0x04000; m_page_total_size = 0x0210; m_log2_pages_per_block = 4; result = TRUE; break;
-				case 0x73 : m_page_data_size = 0x0200; m_num_pages = 0x08000; m_page_total_size = 0x0210; m_log2_pages_per_block = 5; result = TRUE; break;
-				case 0x75 : m_page_data_size = 0x0200; m_num_pages = 0x10000; m_page_total_size = 0x0210; m_log2_pages_per_block = 5; result = TRUE; break;
-				case 0x76 : m_page_data_size = 0x0200; m_num_pages = 0x20000; m_page_total_size = 0x0210; m_log2_pages_per_block = 5; result = TRUE; break;
-				case 0x79 : m_page_data_size = 0x0200; m_num_pages = 0x40000; m_page_total_size = 0x0210; m_log2_pages_per_block = 5; result = TRUE; break;
+				case 0xA4 : m_page_data_size = 0x0100; m_num_pages = 0x00800; m_page_total_size = 0x0108; m_log2_pages_per_block = 0; result = true; break;
+				case 0x6E : m_page_data_size = 0x0100; m_num_pages = 0x01000; m_page_total_size = 0x0108; m_log2_pages_per_block = 0; result = true; break;
+				case 0xEA : m_page_data_size = 0x0100; m_num_pages = 0x02000; m_page_total_size = 0x0108; m_log2_pages_per_block = 4; result = true; break;
+				case 0xE3 : m_page_data_size = 0x0200; m_num_pages = 0x02000; m_page_total_size = 0x0210; m_log2_pages_per_block = 4; result = true; break;
+				case 0xE6 : m_page_data_size = 0x0200; m_num_pages = 0x04000; m_page_total_size = 0x0210; m_log2_pages_per_block = 4; result = true; break;
+				case 0x73 : m_page_data_size = 0x0200; m_num_pages = 0x08000; m_page_total_size = 0x0210; m_log2_pages_per_block = 5; result = true; break;
+				case 0x75 : m_page_data_size = 0x0200; m_num_pages = 0x10000; m_page_total_size = 0x0210; m_log2_pages_per_block = 5; result = true; break;
+				case 0x76 : m_page_data_size = 0x0200; m_num_pages = 0x20000; m_page_total_size = 0x0210; m_log2_pages_per_block = 5; result = true; break;
+				case 0x79 : m_page_data_size = 0x0200; m_num_pages = 0x40000; m_page_total_size = 0x0210; m_log2_pages_per_block = 5; result = true; break;
 			}
 		}
 		break;
@@ -215,7 +206,7 @@ int smartmedia_image_device::detect_geometry( UINT8 id1, UINT8 id2)
 		{
 			switch (id2)
 			{
-				case 0x75 : m_page_data_size = 0x0200; m_num_pages = 0x10000; m_page_total_size = 0x0210; m_log2_pages_per_block = 5; result = TRUE; break;
+				case 0x75 : m_page_data_size = 0x0200; m_num_pages = 0x10000; m_page_total_size = 0x0210; m_log2_pages_per_block = 5; result = true; break;
 			}
 		}
 		break;
@@ -224,7 +215,7 @@ int smartmedia_image_device::detect_geometry( UINT8 id1, UINT8 id2)
 	return result;
 }
 
-bool smartmedia_image_device::smartmedia_format_2()
+image_init_result smartmedia_image_device::smartmedia_format_2()
 {
 	disk_image_format_2_header custom_header;
 	int bytes_read, i, j;
@@ -232,21 +223,21 @@ bool smartmedia_image_device::smartmedia_format_2()
 	bytes_read = fread(&custom_header, sizeof(custom_header));
 	if (bytes_read != sizeof(custom_header))
 	{
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
 	if ((custom_header.data1[0] != 0xEC) && (custom_header.data1[0] != 0x98))
 	{
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
 	if (!detect_geometry(custom_header.data1[0], custom_header.data1[1]))
 	{
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
-	m_data_ptr = auto_alloc_array(machine(), UINT8, m_page_total_size*m_num_pages);
-	m_data_uid_ptr = std::make_unique<UINT8[]>(256 + 16);
+	m_data_ptr = auto_alloc_array(machine(), uint8_t, m_page_total_size*m_num_pages);
+	m_data_uid_ptr = std::make_unique<uint8_t[]>(256 + 16);
 	m_mode = SM_M_INIT;
 	m_pointer_mode = SM_PM_A;
 	m_page_addr = 0;
@@ -255,7 +246,7 @@ bool smartmedia_image_device::smartmedia_format_2()
 	if (!is_readonly())
 		m_status |= 0x80;
 	m_accumulated_status = 0;
-	m_pagereg = std::make_unique<UINT8[]>(m_page_total_size);
+	m_pagereg = std::make_unique<uint8_t[]>(m_page_total_size);
 	m_id_len = 3;
 	memcpy( m_id, custom_header.data1, m_id_len);
 	m_mp_opcode = 0;
@@ -272,21 +263,21 @@ bool smartmedia_image_device::smartmedia_format_2()
 
 	fread(m_data_ptr, m_page_total_size*m_num_pages);
 
-	#ifdef SMARTMEDIA_IMAGE_SAVE
+#ifdef SMARTMEDIA_IMAGE_SAVE
 	m_image_format = 2;
-	#endif
+#endif
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
-bool smartmedia_image_device::call_load()
+image_init_result smartmedia_image_device::call_load()
 {
-	int result;
-	UINT64 position;
+	image_init_result result;
+	uint64_t position;
 	// try format 1
 	position = ftell();
 	result = smartmedia_format_1();
-	if (result != IMAGE_INIT_PASS)
+	if (result != image_init_result::PASS)
 	{
 			// try format 2
 			fseek( position, SEEK_SET);
@@ -300,7 +291,7 @@ bool smartmedia_image_device::call_load()
 */
 void smartmedia_image_device::call_unload()
 {
-	#ifdef SMARTMEDIA_IMAGE_SAVE
+#ifdef SMARTMEDIA_IMAGE_SAVE
 	if (!is_readonly())
 	{
 		if (m_image_format == 1)
@@ -329,7 +320,7 @@ void smartmedia_image_device::call_unload()
 			fwrite( m_data_ptr, m_page_total_size * m_num_pages);
 		}
 	}
-	#endif
+#endif
 
 	m_page_data_size = 0;
 	m_page_total_size = 0;
@@ -343,7 +334,7 @@ void smartmedia_image_device::call_unload()
 	m_byte_addr = 0;
 	m_status = 0xC0;
 	m_accumulated_status = 0;
-	m_pagereg = std::make_unique<UINT8[]>(m_page_total_size);
+	m_pagereg = std::make_unique<uint8_t[]>(m_page_total_size);
 	memset( m_id, 0, sizeof( m_id));
 	m_id_len = 0;
 	m_mp_opcode = 0;
@@ -352,9 +343,9 @@ void smartmedia_image_device::call_unload()
 	m_row_address_cycles = 0;
 	m_sequential_row_read = 0;
 
-	#ifdef SMARTMEDIA_IMAGE_SAVE
+#ifdef SMARTMEDIA_IMAGE_SAVE
 	m_image_format = 0;
-	#endif
+#endif
 
 	return;
 }
@@ -376,13 +367,13 @@ int nand_device::is_busy()
 
 void nand_device::set_data_ptr(void *ptr)
 {
-	m_data_ptr = (UINT8 *)ptr;
+	m_data_ptr = (uint8_t *)ptr;
 }
 
 /*
     write a byte to SmartMedia command port
 */
-void nand_device::command_w(UINT8 data)
+void nand_device::command_w(uint8_t data)
 {
 	if (!is_present())
 		return;
@@ -593,7 +584,7 @@ void nand_device::command_w(UINT8 data)
 /*
     write a byte to SmartMedia address port
 */
-void nand_device::address_w(UINT8 data)
+void nand_device::address_w(uint8_t data)
 {
 	if (!is_present())
 		return;
@@ -671,9 +662,9 @@ void nand_device::address_w(UINT8 data)
 /*
     read a byte from SmartMedia data port
 */
-UINT8 nand_device::data_r()
+uint8_t nand_device::data_r()
 {
-	UINT8 reply = 0;
+	uint8_t reply = 0;
 	if (!is_present())
 		return 0;
 
@@ -732,7 +723,7 @@ UINT8 nand_device::data_r()
 /*
     write a byte to SmartMedia data port
 */
-void nand_device::data_w(UINT8 data)
+void nand_device::data_w(uint8_t data)
 {
 	if (!is_present())
 		return;
@@ -777,15 +768,10 @@ void nand_device::device_reset()
 }
 
 
-const device_type SMARTMEDIA = &device_creator<smartmedia_image_device>;
+DEFINE_DEVICE_TYPE(SMARTMEDIA, smartmedia_image_device, "smartmedia", "SmartMedia Flash card")
 
-smartmedia_image_device::smartmedia_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: nand_device(mconfig, SMARTMEDIA, "SmartMedia Flash ROM", tag, owner, clock, "smartmedia", __FILE__),
-		device_image_interface(mconfig, *this)
+smartmedia_image_device::smartmedia_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: nand_device(mconfig, SMARTMEDIA, tag, owner, clock)
+	, device_image_interface(mconfig, *this)
 {
-}
-
-void smartmedia_image_device::device_config_complete()
-{
-	update_names();
 }

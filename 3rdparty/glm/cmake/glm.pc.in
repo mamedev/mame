@@ -1,0 +1,7 @@
+prefix=@CMAKE_INSTALL_PREFIX@
+includedir=${prefix}/include
+
+Name: GLM
+Description: OpenGL Mathematics
+Version: @GLM_VERSION@
+Cflags: -I${includedir}

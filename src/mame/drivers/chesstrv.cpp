@@ -34,9 +34,9 @@ public:
 	DECLARE_WRITE8_MEMBER( diplomat_display_w );
 	DECLARE_READ8_MEMBER( diplomat_keypad_r );
 
-	UINT8 m_ram_addr;
-	UINT8 *m_ram;
-	UINT8 m_matrix;
+	uint8_t m_ram_addr;
+	uint8_t *m_ram;
+	uint8_t m_matrix;
 	//TIMER_DEVICE_CALLBACK_MEMBER(borisdpl_timer_interrupt);
 	required_device<cpu_device> m_maincpu;
 };
@@ -63,7 +63,7 @@ WRITE8_MEMBER( chesstrv_state::ram_w )
 
 WRITE8_MEMBER( chesstrv_state::display_w )
 {
-	UINT8 seg_data = BITSWAP8(data,0,1,2,3,4,5,6,7);
+	uint8_t seg_data = BITSWAP8(data,0,1,2,3,4,5,6,7);
 
 	if(!(m_matrix & 0x01))
 		output().set_digit_value( 3, seg_data );
@@ -82,7 +82,7 @@ WRITE8_MEMBER( chesstrv_state::matrix_w )
 
 READ8_MEMBER( chesstrv_state::keypad_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	data |= ioport("LINE1")->read();
 	data |= ioport("LINE2")->read();
@@ -103,7 +103,7 @@ WRITE8_MEMBER( chesstrv_state::diplomat_display_w )
 
 READ8_MEMBER( chesstrv_state::diplomat_keypad_r )
 {
-	UINT8 data = m_matrix & 0x07;
+	uint8_t data = m_matrix & 0x07;
 
 	switch (m_matrix & 7)
 	{
@@ -213,7 +213,7 @@ void chesstrv_state::machine_start()
 	save_item(NAME(m_matrix));
 }
 
-static MACHINE_CONFIG_START( chesstrv, chesstrv_state )
+static MACHINE_CONFIG_START( chesstrv )
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", F8, 3000000 )      // Fairchild 3870
 	MCFG_CPU_PROGRAM_MAP( chesstrv_mem )
@@ -223,7 +223,7 @@ static MACHINE_CONFIG_START( chesstrv, chesstrv_state )
 	MCFG_DEFAULT_LAYOUT( layout_chesstrv )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( borisdpl, chesstrv_state )
+static MACHINE_CONFIG_START( borisdpl )
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", F8, 30000000 )     // Motorola SC80265P
 	MCFG_CPU_PROGRAM_MAP( chesstrv_mem )
@@ -251,6 +251,6 @@ ROM_START( borisdpl )
 ROM_END
 
 
-/*    YEAR   NAME  PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY                 FULLNAME */
-CONS( 1980,  chesstrv,  0,      0,      chesstrv,    chesstrv, driver_device,    0,   "Acetronic", "Chess Traveller", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
-CONS( 1979,  borisdpl,  0,      0,      borisdpl,    borisdpl, driver_device,    0,   "Applied Concepts",  "Boris Diplomat",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+//    YEAR   NAME       PARENT  COMPAT  MACHINE   INPUT     STATE           INIT  COMPANY             FULLNAME           FLAGS
+CONS( 1980,  chesstrv,  0,      0,      chesstrv, chesstrv, chesstrv_state, 0,    "Acetronic",        "Chess Traveller", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+CONS( 1979,  borisdpl,  0,      0,      borisdpl, borisdpl, chesstrv_state, 0,    "Applied Concepts", "Boris Diplomat",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

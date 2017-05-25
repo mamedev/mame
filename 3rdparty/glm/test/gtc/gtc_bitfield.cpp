@@ -1,34 +1,3 @@
-///////////////////////////////////////////////////////////////////////////////////
-/// OpenGL Mathematics (glm.g-truc.net)
-///
-/// Copyright (c) 2005 - 2015 G-Truc Creation (www.g-truc.net)
-/// Permission is hereby granted, free of charge, to any person obtaining a copy
-/// of this software and associated documentation files (the "Software"), to deal
-/// in the Software without restriction, including without limitation the rights
-/// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-/// copies of the Software, and to permit persons to whom the Software is
-/// furnished to do so, subject to the following conditions:
-/// 
-/// The above copyright notice and this permission notice shall be included in
-/// all copies or substantial portions of the Software.
-/// 
-/// Restrictions:
-///		By making use of the Software for military purposes, you choose to make
-///		a Bunny unhappy.
-/// 
-/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-/// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-/// THE SOFTWARE.
-///
-/// @file test/gtc/gtc_bitfield.cpp
-/// @date 2014-10-25 / 2014-11-25
-/// @author Christophe Riccio
-///////////////////////////////////////////////////////////////////////////////////
-
 #include <glm/gtc/bitfield.hpp>
 #include <glm/gtc/type_precision.hpp>
 #include <glm/vector_relational.hpp>
@@ -349,7 +318,7 @@ namespace bitfieldInterleave
 
 		return REG1 | (REG2 << 1);
 	}
-
+/*
 	inline glm::uint64 loopBitfieldInterleave(glm::uint32 x, glm::uint32 y)
 	{
 		static glm::uint64 const Mask[5] = 
@@ -371,8 +340,8 @@ namespace bitfieldInterleave
 
 		return REG1 | (REG2 << 1);
 	}
-
-#if(GLM_ARCH != GLM_ARCH_PURE)
+*/
+#if GLM_ARCH & GLM_ARCH_SSE2_BIT
 	inline glm::uint64 sseBitfieldInterleave(glm::uint32 x, glm::uint32 y)
 	{
 		GLM_ALIGN(16) glm::uint32 const Array[4] = {x, 0, y, 0};
@@ -488,7 +457,7 @@ namespace bitfieldInterleave
 
 		return Result[0];
 	}
-#endif//(GLM_ARCH != GLM_ARCH_PURE)
+#endif//GLM_ARCH & GLM_ARCH_SSE2_BIT
 
 	int test()
 	{
@@ -498,24 +467,24 @@ namespace bitfieldInterleave
 			{
 				glm::uint64 A = glm::bitfieldInterleave(x, y);
 				glm::uint64 B = fastBitfieldInterleave(x, y);
-				glm::uint64 C = loopBitfieldInterleave(x, y);
+				//glm::uint64 C = loopBitfieldInterleave(x, y);
 				glm::uint64 D = interleaveBitfieldInterleave(x, y);
 
 				assert(A == B);
-				assert(A == C);
+				//assert(A == C);
 				assert(A == D);
 
-#				if(GLM_ARCH != GLM_ARCH_PURE)
+#				if GLM_ARCH & GLM_ARCH_SSE2_BIT
 					glm::uint64 E = sseBitfieldInterleave(x, y);
 					glm::uint64 F = sseUnalignedBitfieldInterleave(x, y);
 					assert(A == E);
 					assert(A == F);
 
-					__m128i G = glm::detail::_mm_bit_interleave_si128(_mm_set_epi32(0, y, 0, x));
+					__m128i G = glm_i128_interleave(_mm_set_epi32(0, y, 0, x));
 					glm::uint64 Result[2];
 					_mm_storeu_si128((__m128i*)Result, G);
 					assert(A == Result[0]);
-#				endif//(GLM_ARCH != GLM_ARCH_PURE)
+#				endif//GLM_ARCH & GLM_ARCH_SSE2_BIT
 			}
 		}
 
@@ -571,7 +540,7 @@ namespace bitfieldInterleave
 
 			std::printf("fastBitfieldInterleave Time %d clocks\n", static_cast<unsigned int>(Time));
 		}
-
+/*
 		{
 			std::clock_t LastTime = std::clock();
 
@@ -582,7 +551,7 @@ namespace bitfieldInterleave
 
 			std::printf("loopBitfieldInterleave Time %d clocks\n", static_cast<unsigned int>(Time));
 		}
-
+*/
 		{
 			std::clock_t LastTime = std::clock();
 
@@ -594,7 +563,7 @@ namespace bitfieldInterleave
 			std::printf("interleaveBitfieldInterleave Time %d clocks\n", static_cast<unsigned int>(Time));
 		}
 
-#		if(GLM_ARCH != GLM_ARCH_PURE)
+#		if GLM_ARCH & GLM_ARCH_SSE2_BIT
 		{
 			std::clock_t LastTime = std::clock();
 
@@ -616,7 +585,7 @@ namespace bitfieldInterleave
 
 			std::printf("sseUnalignedBitfieldInterleave Time %d clocks\n", static_cast<unsigned int>(Time));
 		}
-#		endif//(GLM_ARCH != GLM_ARCH_PURE)
+#		endif//GLM_ARCH & GLM_ARCH_SSE2_BIT
 
 		{
 			std::clock_t LastTime = std::clock();
@@ -629,7 +598,7 @@ namespace bitfieldInterleave
 			std::printf("glm::detail::bitfieldInterleave Time %d clocks\n", static_cast<unsigned int>(Time));
 		}
 
-#		if(GLM_ARCH != GLM_ARCH_PURE && !(GLM_COMPILER & GLM_COMPILER_GCC))
+#		if(GLM_ARCH & GLM_ARCH_SSE2_BIT && !(GLM_COMPILER & GLM_COMPILER_GCC))
 		{
 			// SIMD
 			std::vector<__m128i> SimdData;
@@ -642,13 +611,13 @@ namespace bitfieldInterleave
 			std::clock_t LastTime = std::clock();
 
 			for(std::size_t i = 0; i < SimdData.size(); ++i)
-				SimdData[i] = glm::detail::_mm_bit_interleave_si128(SimdParam[i]);
+				SimdData[i] = glm_i128_interleave(SimdParam[i]);
 
 			std::clock_t Time = std::clock() - LastTime;
 
 			std::printf("_mm_bit_interleave_si128 Time %d clocks\n", static_cast<unsigned int>(Time));
 		}
-#		endif//(GLM_ARCH != GLM_ARCH_PURE)
+#		endif//GLM_ARCH & GLM_ARCH_SSE2_BIT
 
 		return 0;
 	}

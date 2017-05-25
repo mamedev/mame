@@ -68,7 +68,7 @@ VIDEO_START_MEMBER(arcadecl_state,arcadecl)
  *
  *************************************/
 
-UINT32 arcadecl_state::screen_update_arcadecl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t arcadecl_state::screen_update_arcadecl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// start drawing
 	if (m_mob != nullptr)
@@ -84,8 +84,8 @@ UINT32 arcadecl_state::screen_update_arcadecl(screen_device &screen, bitmap_ind1
 		for (const sparse_dirty_rect *rect = m_mob->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
 			for (int y = rect->min_y; y <= rect->max_y; y++)
 			{
-				UINT16 *mo = &mobitmap.pix16(y);
-				UINT16 *pf = &bitmap.pix16(y);
+				uint16_t *mo = &mobitmap.pix16(y);
+				uint16_t *pf = &bitmap.pix16(y);
 				for (int x = rect->min_x; x <= rect->max_x; x++)
 					if (mo[x] != 0xffff)
 					{
@@ -112,8 +112,8 @@ void arcadecl_state::arcadecl_bitmap_render(bitmap_ind16 &bitmap, const rectangl
 	/* update any dirty scanlines */
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		const UINT16 *src = &m_bitmap[256 * y];
-		UINT16 *dst = &bitmap.pix16(y);
+		const uint16_t *src = &m_bitmap[256 * y];
+		uint16_t *dst = &bitmap.pix16(y);
 
 		/* regenerate the line */
 		for (x = cliprect.min_x & ~1; x <= cliprect.max_x; x += 2)

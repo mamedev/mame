@@ -24,8 +24,12 @@ Bugs
 
 ******************************************************************************/
 
+#include "emu.h"
 #include "includes/aim65.h"
+
 #include "softlist.h"
+#include "speaker.h"
+
 #include "aim65.lh"
 
 
@@ -35,10 +39,12 @@ Bugs
 
 /* Note: RAM is mapped dynamically in machine/aim65.c */
 static ADDRESS_MAP_START( aim65_mem, AS_PROGRAM, 8, aim65_state )
-	AM_RANGE( 0x1000, 0x9fff ) AM_NOP /* User available expansions */
+	AM_RANGE( 0x1000, 0x3fff ) AM_NOP /* User available expansions */
+	AM_RANGE( 0x4000, 0x7fff ) AM_ROM /* 4 ROM sockets in 16K PROM/ROM module */
+	AM_RANGE( 0x8000, 0x9fff ) AM_NOP /* User available expansions */
 	AM_RANGE( 0xa000, 0xa00f ) AM_MIRROR(0x3f0) AM_DEVREADWRITE("via6522_1", via6522_device, read, write) // user via
-	AM_RANGE( 0xa400, 0xa47f ) AM_DEVICE("riot", mos6532_t, ram_map)
-	AM_RANGE( 0xa480, 0xa497 ) AM_DEVICE("riot", mos6532_t, io_map)
+	AM_RANGE( 0xa400, 0xa47f ) AM_DEVICE("riot", mos6532_new_device, ram_map)
+	AM_RANGE( 0xa480, 0xa497 ) AM_DEVICE("riot", mos6532_new_device, io_map)
 	AM_RANGE( 0xa498, 0xa7ff ) AM_NOP /* Not available */
 	AM_RANGE( 0xa800, 0xa80f ) AM_MIRROR(0x3f0) AM_DEVREADWRITE("via6522_0", via6522_device, read, write) // system via
 	AM_RANGE( 0xac00, 0xac03 ) AM_DEVREADWRITE("pia6821", pia6821_device, read, write)
@@ -115,7 +121,7 @@ static INPUT_PORTS_START( aim65 )
 
 	PORT_START("keyboard_6")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Right Shift") PORT_CODE(KEYCODE_RSHIFT)     PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Del")         PORT_CODE(KEYCODE_BACKSPACE)  PORT_CHAR(8)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Del")         PORT_CODE(KEYCODE_TILDE)      PORT_CHAR(8)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(";  +")        PORT_CODE(KEYCODE_COLON)      PORT_CHAR(';') PORT_CHAR('+')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("K")           PORT_CODE(KEYCODE_K)          PORT_CHAR('k')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("H")           PORT_CODE(KEYCODE_H)          PORT_CHAR('h')
@@ -134,10 +140,9 @@ static INPUT_PORTS_START( aim65 )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F1")          PORT_CODE(KEYCODE_BACKSLASH)  PORT_CHAR(UCHAR_MAMEKEY(F1))
 
 	PORT_START("switches")
-	PORT_DIPNAME(0x08, 0x08, "KB/TTY")
-	PORT_DIPLOCATION("S3:1")
-	PORT_DIPSETTING( 0x00, "TTY")
-	PORT_DIPSETTING( 0x08, "KB")
+	PORT_DIPNAME(0x08, 0x08, "KB/TTY") PORT_DIPLOCATION("S3:1")
+	PORT_DIPSETTING(0x00, "TTY")
+	PORT_DIPSETTING(0x08, "KB")
 INPUT_PORTS_END
 
 
@@ -145,51 +150,50 @@ INPUT_PORTS_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-int aim65_state::load_cart(device_image_interface &image, generic_slot_device *slot, const char *slot_tag)
+image_init_result aim65_state::load_cart(device_image_interface &image, generic_slot_device *slot, const char *slot_tag)
 {
-	UINT32 size = slot->common_get_size(slot_tag);
+	uint32_t size = slot->common_get_size(slot_tag);
 
 	if (size > 0x1000)
 	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
-		return IMAGE_INIT_FAIL;
+		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported ROM size");
+		return image_init_result::FAIL;
 	}
 
-	if (image.software_entry() != nullptr && image.get_software_region(slot_tag) == nullptr)
+	if (image.loaded_through_softlist() && image.get_software_region(slot_tag) == nullptr)
 	{
 		std::string errmsg = string_format(
 				"Attempted to load file with wrong extension\nSocket '%s' only accepts files with '.%s' extension",
 				slot_tag, slot_tag);
 		image.seterror(IMAGE_ERROR_UNSPECIFIED, errmsg.c_str());
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
 	slot->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	slot->common_load_rom(slot->get_rom_base(), size, slot_tag);
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 
-static MACHINE_CONFIG_START( aim65, aim65_state )
+static MACHINE_CONFIG_START( aim65 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, AIM65_CLOCK) /* 1 MHz */
 	MCFG_CPU_PROGRAM_MAP(aim65_mem)
-
 
 	MCFG_DEFAULT_LAYOUT(layout_aim65)
 
 	/* alpha-numeric display */
 	MCFG_DEVICE_ADD("ds1", DL1416T, 0)
-	MCFG_DL1416_UPDATE_HANDLER(WRITE16(aim65_state, aim65_update_ds1))
+	MCFG_DL1416_UPDATE_HANDLER(WRITE16(aim65_state, aim65_update_ds<1>))
 	MCFG_DEVICE_ADD("ds2", DL1416T, 0)
-	MCFG_DL1416_UPDATE_HANDLER(WRITE16(aim65_state, aim65_update_ds2))
+	MCFG_DL1416_UPDATE_HANDLER(WRITE16(aim65_state, aim65_update_ds<2>))
 	MCFG_DEVICE_ADD("ds3", DL1416T, 0)
-	MCFG_DL1416_UPDATE_HANDLER(WRITE16(aim65_state, aim65_update_ds3))
+	MCFG_DL1416_UPDATE_HANDLER(WRITE16(aim65_state, aim65_update_ds<3>))
 	MCFG_DEVICE_ADD("ds4", DL1416T, 0)
-	MCFG_DL1416_UPDATE_HANDLER(WRITE16(aim65_state, aim65_update_ds4))
+	MCFG_DL1416_UPDATE_HANDLER(WRITE16(aim65_state, aim65_update_ds<4>))
 	MCFG_DEVICE_ADD("ds5", DL1416T, 0)
-	MCFG_DL1416_UPDATE_HANDLER(WRITE16(aim65_state, aim65_update_ds5))
+	MCFG_DL1416_UPDATE_HANDLER(WRITE16(aim65_state, aim65_update_ds<5>))
 
 	/* Sound - wave sound only */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -197,7 +201,7 @@ static MACHINE_CONFIG_START( aim65, aim65_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* other devices */
-	MCFG_DEVICE_ADD("riot", MOS6532n, AIM65_CLOCK)
+	MCFG_DEVICE_ADD("riot", MOS6532_NEW, AIM65_CLOCK)
 	MCFG_MOS6530n_OUT_PA_CB(WRITE8(aim65_state, aim65_riot_a_w))
 	MCFG_MOS6530n_IN_PB_CB(READ8(aim65_state, aim65_riot_b_r))
 	MCFG_MOS6530n_IRQ_CB(INPUTLINE("maincpu", M6502_IRQ_LINE))
@@ -209,10 +213,10 @@ static MACHINE_CONFIG_START( aim65, aim65_state )
 	// out CB1 printer start
 	// out CA2 cass control (H=in)
 	// out CB2 turn printer on
-	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("maincpu", m6502_device, irq_line))
+	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M6502_IRQ_LINE))
 
 	MCFG_DEVICE_ADD("via6522_1", VIA6522, 0)
-	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("maincpu", m6502_device, irq_line))
+	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M6502_IRQ_LINE))
 
 	MCFG_DEVICE_ADD("pia6821", PIA6821, 0)
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(aim65_state, aim65_pia_a_w))
@@ -226,17 +230,34 @@ static MACHINE_CONFIG_START( aim65, aim65_state )
 	MCFG_CASSETTE_ADD( "cassette2" )
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_RECORD | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED)
 
-	MCFG_GENERIC_SOCKET_ADD("z26", generic_plain_slot, "aim65_cart")
+	MCFG_GENERIC_SOCKET_ADD("z26", generic_plain_slot, "aim65_z26_cart")
 	MCFG_GENERIC_EXTENSIONS("z26")
 	MCFG_GENERIC_LOAD(aim65_state, z26_load)
 
-	MCFG_GENERIC_SOCKET_ADD("z25", generic_plain_slot, "aim65_cart")
+	MCFG_GENERIC_SOCKET_ADD("z25", generic_plain_slot, "aim65_z25_cart")
 	MCFG_GENERIC_EXTENSIONS("z25")
 	MCFG_GENERIC_LOAD(aim65_state, z25_load)
 
-	MCFG_GENERIC_SOCKET_ADD("z24", generic_plain_slot, "aim65_cart")
+	MCFG_GENERIC_SOCKET_ADD("z24", generic_plain_slot, "aim65_z24_cart")
 	MCFG_GENERIC_EXTENSIONS("z24")
 	MCFG_GENERIC_LOAD(aim65_state, z24_load)
+
+	/* PROM/ROM module sockets */
+	MCFG_GENERIC_SOCKET_ADD("z12", generic_plain_slot, "rm65_z12_cart")
+	MCFG_GENERIC_EXTENSIONS("z12")
+	MCFG_GENERIC_LOAD(aim65_state, z12_load)
+
+	MCFG_GENERIC_SOCKET_ADD("z13", generic_plain_slot, "rm65_z13_cart")
+	MCFG_GENERIC_EXTENSIONS("z13")
+	MCFG_GENERIC_LOAD(aim65_state, z13_load)
+
+	MCFG_GENERIC_SOCKET_ADD("z14", generic_plain_slot, "rm65_z14_cart")
+	MCFG_GENERIC_EXTENSIONS("z14")
+	MCFG_GENERIC_LOAD(aim65_state, z14_load)
+
+	MCFG_GENERIC_SOCKET_ADD("z15", generic_plain_slot, "rm65_z15_cart")
+	MCFG_GENERIC_EXTENSIONS("z15")
+	MCFG_GENERIC_LOAD(aim65_state, z15_load)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -285,5 +306,5 @@ ROM_END
     GAME DRIVERS
 ***************************************************************************/
 
-/*   YEAR  NAME         PARENT  COMPAT  MACHINE  INPUT   INIT    COMPANY    FULLNAME    FLAGS */
-COMP(1977, aim65,       0,      0,      aim65,   aim65, driver_device,  0,     "Rockwell", "AIM 65", MACHINE_NO_SOUND_HW )
+//   YEAR  NAME         PARENT  COMPAT  MACHINE  INPUT  CLASS         INIT    COMPANY    FULLNAME  FLAGS
+COMP(1977, aim65,       0,      0,      aim65,   aim65, aim65_state,  0,     "Rockwell", "AIM 65", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW)

@@ -17,11 +17,15 @@
 *******************************************************************************/
 
 #include "emu.h"
+#include "includes/liberate.h"
+
 #include "cpu/m6502/deco16.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/ay8910.h"
-#include "includes/liberate.h"
 #include "machine/deco222.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 /*************************************
  *
@@ -31,7 +35,7 @@
 
 READ8_MEMBER(liberate_state::deco16_bank_r)
 {
-	const UINT8 *ROM = memregion("user1")->base();
+	const uint8_t *ROM = memregion("user1")->base();
 
 	/* The tilemap bank can be swapped into main memory */
 	if (m_bank)
@@ -80,7 +84,7 @@ WRITE8_MEMBER(liberate_state::deco16_bank_w)
 
 READ8_MEMBER(liberate_state::prosoccr_bank_r)
 {
-	const UINT8 *ROM = memregion("user1")->base();
+	const uint8_t *ROM = memregion("user1")->base();
 
 	/* The tilemap bank can be swapped into main memory */
 	if (m_bank)
@@ -109,7 +113,7 @@ READ8_MEMBER(liberate_state::prosoccr_bank_r)
 
 READ8_MEMBER(liberate_state::prosoccr_charram_r)
 {
-	UINT8 *SRC_GFX = memregion("shared_gfx")->base();
+	uint8_t *SRC_GFX = memregion("shared_gfx")->base();
 
 	if (m_gfx_rom_readback)
 	{
@@ -184,7 +188,7 @@ WRITE8_MEMBER(liberate_state::prosoccr_io_bank_w)
 
 READ8_MEMBER(liberate_state::prosport_charram_r)
 {
-	UINT8 *FG_GFX = memregion("progolf_fg_gfx")->base();
+	uint8_t *FG_GFX = memregion("progolf_fg_gfx")->base();
 
 	switch (offset & 0x1800)
 	{
@@ -204,7 +208,7 @@ READ8_MEMBER(liberate_state::prosport_charram_r)
 
 WRITE8_MEMBER(liberate_state::prosport_charram_w)
 {
-	UINT8 *FG_GFX = memregion("progolf_fg_gfx")->base();
+	uint8_t *FG_GFX = memregion("progolf_fg_gfx")->base();
 
 	switch (offset & 0x1800)
 	{
@@ -724,7 +728,7 @@ MACHINE_RESET_MEMBER(liberate_state,liberate)
 	m_bank = 0;
 }
 
-static MACHINE_CONFIG_START( liberate_base, liberate_state )
+static MACHINE_CONFIG_START( liberate_base )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",DECO16, 2000000)
@@ -811,7 +815,7 @@ static MACHINE_CONFIG_DERIVED( prosoccr, liberate_base )
 	MCFG_VIDEO_START_OVERRIDE(liberate_state,prosoccr)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( prosport, liberate_state )
+static MACHINE_CONFIG_START( prosport )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", DECO16, 2000000)
@@ -1265,7 +1269,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(liberate_state,prosport)
 {
-	UINT8 *RAM = memregion("maincpu")->base();
+	uint8_t *RAM = memregion("maincpu")->base();
 	int i;
 
 	/* Main cpu has the nibbles swapped */
@@ -1283,7 +1287,7 @@ DRIVER_INIT_MEMBER(liberate_state,yellowcb)
 
 DRIVER_INIT_MEMBER(liberate_state,liberate)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	/* Swap bits for opcodes only, not data */
 	for (int A = 0; A < 0x8000; A++) {

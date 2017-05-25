@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#ifndef GF7600GS_H
-#define GF7600GS_H
+#ifndef MAME_VIDEO_GF7600GS_H
+#define MAME_VIDEO_GF7600GS_H
+
+#pragma once
 
 #include "machine/pci.h"
 
@@ -10,7 +12,7 @@
 
 class geforce_7600gs_device : public pci_device {
 public:
-	geforce_7600gs_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	geforce_7600gs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual void device_start() override;
@@ -22,6 +24,6 @@ private:
 	DECLARE_ADDRESS_MAP(map3, 32);
 };
 
-extern const device_type GEFORCE_7600GS;
+DECLARE_DEVICE_TYPE(GEFORCE_7600GS, geforce_7600gs_device)
 
-#endif
+#endif // MAME_VIDEO_GF7600GS_H

@@ -28,7 +28,12 @@ MZ80B
 
 ****************************************************************************/
 
+#include "emu.h"
 #include "includes/mz80.h"
+
+#include "screen.h"
+#include "speaker.h"
+
 #include "formats/mz_cas.h"
 
 
@@ -137,17 +142,17 @@ static INPUT_PORTS_START( mz80k )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("G25") PORT_CODE(KEYCODE_TILDE)
 INPUT_PORTS_END
 
-// One of the keys labeled as 'Unused' in Line0 should be the Graph key; another one is the Spacebar. Also, PORT_NAMEs need to be verified
+// PORT_NAMEs need to be verified
 static INPUT_PORTS_START( mz80a )
 	PORT_START("LINE0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Unused?")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Grph") PORT_CODE(KEYCODE_TAB)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Unused?")
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Unused?")
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Unused?")
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Unused?")
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Unused?")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Unused?")
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Ctrl  Break") PORT_CODE(KEYCODE_ESC)
 
 	PORT_START("LINE1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z) PORT_CHAR('Z')
@@ -221,7 +226,7 @@ static INPUT_PORTS_START( mz80a )
 
 	PORT_START("LINE8")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_0_PAD) PORT_CHAR(UCHAR_MAMEKEY(0_PAD))
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("00")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_00_PAD) PORT_CHAR(UCHAR_MAMEKEY(00_PAD))
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_1_PAD) PORT_CHAR(UCHAR_MAMEKEY(1_PAD))
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_2_PAD) PORT_CHAR(UCHAR_MAMEKEY(2_PAD))
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_4_PAD) PORT_CHAR(UCHAR_MAMEKEY(4_PAD))
@@ -244,7 +249,7 @@ static ADDRESS_MAP_START( mz80k_mem, AS_PROGRAM, 8, mz80_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1000, 0xcfff) AM_RAM AM_SHARE("p_ram") // 48 KB of RAM
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("p_videoram") // Video RAM
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("videoram") // Video RAM
 	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("ppi8255", i8255_device, read, write) /* PPIA 8255 */
 	AM_RANGE(0xe004, 0xe007) AM_DEVREADWRITE("pit8253", pit8253_device, read, write)  /* PIT 8253  */
 	AM_RANGE(0xe008, 0xe00b) AM_READWRITE( mz80k_strobe_r, mz80k_strobe_w)
@@ -269,7 +274,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mz80_state::ne555_tempo_callback)
 	m_mz80k_tempo_strobe ^= 1;
 }
 
-static MACHINE_CONFIG_START( mz80k, mz80_state )
+static MACHINE_CONFIG_START( mz80k )
 	/* basic machine hardware */
 
 	/* main CPU */
@@ -366,18 +371,7 @@ ROM_START( mz80a )
 	ROM_LOAD( "mz80acg.rom", 0x0000, 0x0800, CRC(a87c2e2b) SHA1(e8aefbdb48a63e5f96692af868c353ca7e1bfcd2) )
 ROM_END
 
-ROM_START( mz80b )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "ipl.rom",  0x0000, 0x0800, CRC(80beeec0) SHA1(d2b8167cc77ad023a807198993cb5e7a94c9e19e) )
-
-	ROM_REGION( 0x1000, "chargen", 0 )
-	ROM_LOAD( "mzfont.rom", 0x0000, 0x0800, CRC(0631efc3) SHA1(99b206af5c9845995733d877e9e93e9681b982a8) )
-ROM_END
-
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE  INPUT   INIT   COMPANY    FULLNAME */
+//    YEAR  NAME      PARENT    COMPAT  MACHINE  INPUT  STATE        INIT   COMPANY    FULLNAME             FLAGS
 COMP( 1979, mz80kj,   0,        0,      mz80kj,  mz80k, mz80_state,  mz80k, "Sharp",   "MZ-80K (Japanese)", 0 )
-COMP( 1979, mz80k,    mz80kj,   0,      mz80k,   mz80k, mz80_state,  mz80k, "Sharp",   "MZ-80K", 0 )
-
-// These may need a separate driver!
-COMP( 1982, mz80a,    0,        0,      mz80a,   mz80a, mz80_state,  mz80k, "Sharp",   "MZ-80A", 0 )
-COMP( 1981, mz80b,    0,        0,      mz80k,   mz80k, mz80_state,  mz80k, "Sharp",   "MZ-80B", MACHINE_NOT_WORKING )
+COMP( 1979, mz80k,    mz80kj,   0,      mz80k,   mz80k, mz80_state,  mz80k, "Sharp",   "MZ-80K",            0 )
+COMP( 1982, mz80a,    0,        0,      mz80a,   mz80a, mz80_state,  mz80k, "Sharp",   "MZ-80A",            0 )

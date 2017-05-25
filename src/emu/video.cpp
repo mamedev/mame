@@ -35,20 +35,20 @@
 //**************************************************************************
 
 // frameskipping tables
-const UINT8 video_manager::s_skiptable[FRAMESKIP_LEVELS][FRAMESKIP_LEVELS] =
+const bool video_manager::s_skiptable[FRAMESKIP_LEVELS][FRAMESKIP_LEVELS] =
 {
-	{ 0,0,0,0,0,0,0,0,0,0,0,0 },
-	{ 0,0,0,0,0,0,0,0,0,0,0,1 },
-	{ 0,0,0,0,0,1,0,0,0,0,0,1 },
-	{ 0,0,0,1,0,0,0,1,0,0,0,1 },
-	{ 0,0,1,0,0,1,0,0,1,0,0,1 },
-	{ 0,1,0,0,1,0,1,0,0,1,0,1 },
-	{ 0,1,0,1,0,1,0,1,0,1,0,1 },
-	{ 0,1,0,1,1,0,1,0,1,1,0,1 },
-	{ 0,1,1,0,1,1,0,1,1,0,1,1 },
-	{ 0,1,1,1,0,1,1,1,0,1,1,1 },
-	{ 0,1,1,1,1,1,0,1,1,1,1,1 },
-	{ 0,1,1,1,1,1,1,1,1,1,1,1 }
+	{ false, false, false, false, false, false, false, false, false, false, false, false },
+	{ false, false, false, false, false, false, false, false, false, false, false, true  },
+	{ false, false, false, false, false, true , false, false, false, false, false, true  },
+	{ false, false, false, true , false, false, false, true , false, false, false, true  },
+	{ false, false, true , false, false, true , false, false, true , false, false, true  },
+	{ false, true , false, false, true , false, true , false, false, true , false, true  },
+	{ false, true , false, true , false, true , false, true , false, true , false, true  },
+	{ false, true , false, true , true , false, true , false, true , true , false, true  },
+	{ false, true , true , false, true , true , false, true , true , false, true , true  },
+	{ false, true , true , true , false, true , true , true , false, true , true , true  },
+	{ false, true , true , true , true , true , false, true , true , true , true , true  },
+	{ false, true , true , true , true , true , true , true , true , true , true , true  }
 };
 
 
@@ -57,7 +57,7 @@ const UINT8 video_manager::s_skiptable[FRAMESKIP_LEVELS][FRAMESKIP_LEVELS] =
 //  VIDEO MANAGER
 //**************************************************************************
 
-static void video_notifier_callback(const char *outname, INT32 value, void *param)
+static void video_notifier_callback(const char *outname, s32 value, void *param)
 {
 	video_manager *vm = (video_manager *)param;
 
@@ -107,7 +107,6 @@ video_manager::video_manager(running_machine &machine)
 		m_avi_frame_period(attotime::zero),
 		m_avi_next_frame_time(attotime::zero),
 		m_avi_frame(0),
-		m_dummy_recording(false),
 		m_timecode_enabled(false),
 		m_timecode_write(false),
 		m_timecode_text(""),
@@ -116,7 +115,7 @@ video_manager::video_manager(running_machine &machine)
 
 {
 	// request a callback upon exiting
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(video_manager::exit), this));
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&video_manager::exit, this));
 	machine.save().register_postload(save_prepost_delegate(FUNC(video_manager::postload), this));
 
 	// extract initial execution state from global configuration settings
@@ -160,10 +159,6 @@ video_manager::video_manager(running_machine &machine)
 	if (filename[0] != 0)
 		begin_recording(filename, MF_AVI);
 
-#ifdef MAME_DEBUG
-	m_dummy_recording = machine.options().dummy_write();
-#endif
-
 	// if no screens, create a periodic timer to drive updates
 	if (machine.first_screen() == nullptr)
 	{
@@ -206,9 +201,9 @@ void video_manager::set_frameskip(int frameskip)
 void video_manager::frame_update(bool from_debugger)
 {
 	// only render sound and video if we're in the running phase
-	int phase = machine().phase();
+	machine_phase const phase = machine().phase();
 	bool skipped_it = m_skipping_this_frame;
-	if (phase == MACHINE_PHASE_RUNNING && (!machine().paused() || machine().options().update_in_pause()))
+	if (phase == machine_phase::RUNNING && (!machine().paused() || machine().options().update_in_pause()))
 	{
 		bool anything_changed = finish_screen_updates();
 
@@ -249,7 +244,7 @@ void video_manager::frame_update(bool from_debugger)
 		recompute_speed(current_time);
 
 	// call the end-of-frame callback
-	if (phase == MACHINE_PHASE_RUNNING)
+	if (phase == machine_phase::RUNNING)
 	{
 		// reset partial updates if we're paused or if the debugger is active
 		screen_device *const screen = machine().first_screen();
@@ -317,7 +312,7 @@ void video_manager::save_snapshot(screen_device *screen, emu_file &file)
 
 	// add two text entries describing the image
 	std::string text1 = std::string(emulator_info::get_appname()).append(" ").append(emulator_info::get_build_version());
-	std::string text2 = std::string(machine().system().manufacturer).append(" ").append(machine().system().description);
+	std::string text2 = std::string(machine().system().manufacturer).append(" ").append(machine().system().type.fullname());
 	png_info pnginfo = { nullptr };
 	png_add_text(&pnginfo, "Software", text1.c_str());
 	png_add_text(&pnginfo, "System", text2.c_str());
@@ -553,7 +548,7 @@ void video_manager::end_recording(movie_format format)
 //  recording
 //-------------------------------------------------
 
-void video_manager::add_sound_to_recording(const INT16 *sound, int numsamples)
+void video_manager::add_sound_to_recording(const s16 *sound, int numsamples)
 {
 	// only record if we have a file
 	if (m_avi_file != nullptr)
@@ -770,7 +765,7 @@ void video_manager::update_throttle(attotime emutime)
            restoring from a saved state
 
 */
-	static const UINT8 popcount[256] =
+	static const u8 popcount[256] =
 	{
 		0,1,1,2,1,2,2,3, 1,2,2,3,2,3,3,4, 1,2,2,3,2,3,3,4, 2,3,3,4,3,4,4,5,
 		1,2,2,3,2,3,3,4, 2,3,3,4,3,4,4,5, 2,3,3,4,3,4,4,5, 3,4,4,5,4,5,5,6,
@@ -897,16 +892,17 @@ osd_ticks_t video_manager::throttle_until_ticks(osd_ticks_t target_ticks)
 
 	// loop until we reach our target
 	g_profiler.start(PROFILER_IDLE);
-	osd_ticks_t minimum_sleep = osd_ticks_per_second() / 1000;
 	osd_ticks_t current_ticks = osd_ticks();
 	while (current_ticks < target_ticks)
 	{
 		// compute how much time to sleep for, taking into account the average oversleep
 		osd_ticks_t delta = (target_ticks - current_ticks) * 1000 / (1000 + m_average_oversleep);
+		if (!delta)
+			delta = 1;
 
 		// see if we can sleep
 		bool slept = false;
-		if (allowed_to_sleep && delta >= minimum_sleep)
+		if (allowed_to_sleep)
 		{
 			osd_sleep(delta);
 			slept = true;
@@ -1011,15 +1007,15 @@ void video_manager::update_refresh_speed()
 			{
 				attoseconds_t period = screen.frame_period().attoseconds();
 				if (period != 0)
-					min_frame_period = MIN(min_frame_period, period);
+					min_frame_period = std::min(min_frame_period, period);
 			}
 
 			// compute a target speed as an integral percentage
 			// note that we lop 0.25Hz off of the minrefresh when doing the computation to allow for
 			// the fact that most refresh rates are not accurate to 10 digits...
-			UINT32 target_speed = floor((minrefresh - 0.25) * 1000.0 / ATTOSECONDS_TO_HZ(min_frame_period));
-			UINT32 original_speed = original_speed_setting();
-			target_speed = MIN(target_speed, original_speed);
+			u32 target_speed = floor((minrefresh - 0.25) * 1000.0 / ATTOSECONDS_TO_HZ(min_frame_period));
+			u32 original_speed = original_speed_setting();
+			target_speed = std::min(target_speed, original_speed);
 
 			// if we changed, log that verbosely
 			if (target_speed != m_speed)
@@ -1102,8 +1098,8 @@ void video_manager::recompute_speed(const attotime &emutime)
 //  given screen
 //-------------------------------------------------
 
-typedef software_renderer<UINT32, 0,0,0, 16,8,0, false, true> snap_renderer_bilinear;
-typedef software_renderer<UINT32, 0,0,0, 16,8,0, false, false> snap_renderer;
+typedef software_renderer<u32, 0,0,0, 16,8,0, false, true> snap_renderer_bilinear;
+typedef software_renderer<u32, 0,0,0, 16,8,0, false, false> snap_renderer;
 
 void video_manager::create_snapshot_bitmap(screen_device *screen)
 {
@@ -1117,8 +1113,8 @@ void video_manager::create_snapshot_bitmap(screen_device *screen)
 	}
 
 	// get the minimum width/height and set it on the target
-	INT32 width = m_snap_width;
-	INT32 height = m_snap_height;
+	s32 width = m_snap_width;
+	s32 height = m_snap_height;
 	if (width == 0 || height == 0)
 		m_snap_target->compute_minimum_size(width, height);
 	m_snap_target->set_bounds(width, height);
@@ -1146,7 +1142,7 @@ void video_manager::create_snapshot_bitmap(screen_device *screen)
 
 osd_file::error video_manager::open_next(emu_file &file, const char *extension)
 {
-	UINT32 origflags = file.openflags();
+	u32 origflags = file.openflags();
 
 	// handle defaults
 	const char *snapname = machine().options().snap_name();
@@ -1180,7 +1176,7 @@ osd_file::error video_manager::open_next(emu_file &file, const char *extension)
 			int end;
 
 			if ((end1 != -1) && (end2 != -1))
-				end = MIN(end1, end2);
+				end = std::min(end1, end2);
 			else if (end1 != -1)
 				end = end1;
 			else if (end2 != -1)
@@ -1272,7 +1268,7 @@ osd_file::error video_manager::open_next(emu_file &file, const char *extension)
 void video_manager::record_frame()
 {
 	// ignore if nothing to do
-	if (m_mng_file == nullptr && m_avi_file == nullptr && !m_dummy_recording)
+	if (m_mng_file == nullptr && m_avi_file == nullptr)
 		return;
 
 	// start the profiler and get the current time
@@ -1314,7 +1310,7 @@ void video_manager::record_frame()
 			if (m_mng_frame == 0)
 			{
 				std::string text1 = std::string(emulator_info::get_appname()).append(" ").append(emulator_info::get_build_version());
-				std::string text2 = std::string(machine().system().manufacturer).append(" ").append(machine().system().description);
+				std::string text2 = std::string(machine().system().manufacturer).append(" ").append(machine().system().type.fullname());
 				png_add_text(&pnginfo, "Software", text1.c_str());
 				png_add_text(&pnginfo, "System", text2.c_str());
 			}

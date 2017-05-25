@@ -15,9 +15,9 @@ TILEMAP_MAPPER_MEMBER(gotcha_state::gotcha_tilemap_scan)
 	return (col & 0x1f) | (row << 5) | ((col & 0x20) << 5);
 }
 
-inline void gotcha_state::get_tile_info( tile_data &tileinfo, int tile_index ,UINT16 *vram, int color_offs)
+inline void gotcha_state::get_tile_info( tile_data &tileinfo, int tile_index ,uint16_t *vram, int color_offs)
 {
-	UINT16 data = vram[tile_index];
+	uint16_t data = vram[tile_index];
 	int code = (data & 0x3ff) | (m_gfxbank[(data & 0x0c00) >> 10] << 10);
 
 	SET_TILE_INFO_MEMBER(0, code, (data >> 12) + color_offs, 0);
@@ -43,8 +43,8 @@ TILE_GET_INFO_MEMBER(gotcha_state::bg_get_tile_info)
 
 void gotcha_state::video_start()
 {
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(gotcha_state::fg_get_tile_info),this), tilemap_mapper_delegate(FUNC(gotcha_state::gotcha_tilemap_scan),this), 16, 16, 64, 32);
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(gotcha_state::bg_get_tile_info),this), tilemap_mapper_delegate(FUNC(gotcha_state::gotcha_tilemap_scan),this), 16, 16, 64, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gotcha_state::fg_get_tile_info),this), tilemap_mapper_delegate(FUNC(gotcha_state::gotcha_tilemap_scan),this), 16, 16, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gotcha_state::bg_get_tile_info),this), tilemap_mapper_delegate(FUNC(gotcha_state::gotcha_tilemap_scan),this), 16, 16, 64, 32);
 
 	m_fg_tilemap->set_transparent_pen(0);
 
@@ -100,7 +100,7 @@ WRITE16_MEMBER(gotcha_state::gotcha_scroll_w)
 
 
 
-UINT32 gotcha_state::screen_update_gotcha(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t gotcha_state::screen_update_gotcha(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);

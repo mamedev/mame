@@ -92,6 +92,8 @@ To verify against original HW:
 
 #include "emu.h"
 #include "includes/divebomb.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 
@@ -162,7 +164,7 @@ WRITE8_MEMBER(divebomb_state::fgcpu_roz_comm_w)
 
 READ8_MEMBER(divebomb_state::fgcpu_comm_flags_r)
 {
-	UINT8 result = 0;
+	uint8_t result = 0;
 
 	if (has_fromroz)
 		result |= 1;
@@ -249,7 +251,7 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(divebomb_state::rozcpu_bank_w)
 {
-	UINT32 bank = BITSWAP8(data, 4, 5, 6, 7, 3, 2, 1, 0) >> 4;
+	uint32_t bank = BITSWAP8(data, 4, 5, 6, 7, 3, 2, 1, 0) >> 4;
 	m_bank1->set_entry(bank);
 
 	if (data & 0x0f)
@@ -443,7 +445,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( divebomb, divebomb_state )
+static MACHINE_CONFIG_START( divebomb )
 
 	MCFG_CPU_ADD("fgcpu", Z80,XTAL1/4) // ?
 	MCFG_CPU_PROGRAM_MAP(divebomb_fgcpu_map)
@@ -628,4 +630,4 @@ MACHINE_RESET_MEMBER(divebomb_state, divebomb)
  *************************************/
 
 // According to a flyer, the world release was to be called 'Gaia'. The Gaia title graphics are present in the ROMs.
-GAME( 1989, divebomb, 0, divebomb, divebomb, driver_device, 0, ROT270, "Konami", "Kyuukoukabakugekitai - Dive Bomber Squad (Japan, prototype)", MACHINE_IS_INCOMPLETE | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, divebomb, 0, divebomb, divebomb, divebomb_state, 0, ROT270, "Konami", "Kyuukoukabakugekitai - Dive Bomber Squad (Japan, prototype)", MACHINE_IS_INCOMPLETE | MACHINE_SUPPORTS_SAVE )

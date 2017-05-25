@@ -35,6 +35,9 @@
 #include "machine/gen_latch.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
+#include "sound/volt_reg.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class cntsteer_state : public driver_device
@@ -54,10 +57,10 @@ public:
 		m_soundlatch(*this, "soundlatch") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_colorram;
-	required_shared_ptr<UINT8> m_videoram2;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
+	required_shared_ptr<uint8_t> m_videoram2;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
@@ -110,8 +113,8 @@ public:
 	DECLARE_MACHINE_RESET(zerotrgt);
 	DECLARE_VIDEO_START(zerotrgt);
 	DECLARE_PALETTE_INIT(zerotrgt);
-	UINT32 screen_update_cntsteer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_zerotrgt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_cntsteer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_zerotrgt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(subcpu_vblank_irq);
 	INTERRUPT_GEN_MEMBER(sound_interrupt);
 	void zerotrgt_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
@@ -122,7 +125,7 @@ public:
 
 PALETTE_INIT_MEMBER(cntsteer_state,zerotrgt)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 	for (i = 0; i < palette.entries(); i++)
 	{
@@ -167,8 +170,8 @@ TILE_GET_INFO_MEMBER(cntsteer_state::get_fg_tile_info)
 
 VIDEO_START_MEMBER(cntsteer_state,cntsteer)
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(cntsteer_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 64, 64);
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(cntsteer_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS_FLIP_X, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cntsteer_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 64, 64);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cntsteer_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS_FLIP_X, 8, 8, 32, 32);
 
 	m_fg_tilemap->set_transparent_pen(0);
 
@@ -177,8 +180,8 @@ VIDEO_START_MEMBER(cntsteer_state,cntsteer)
 
 VIDEO_START_MEMBER(cntsteer_state,zerotrgt)
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(cntsteer_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(cntsteer_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS_FLIP_X, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cntsteer_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cntsteer_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS_FLIP_X, 8, 8, 32, 32);
 
 	m_fg_tilemap->set_transparent_pen(0);
 
@@ -303,7 +306,7 @@ void cntsteer_state::cntsteer_draw_sprites( bitmap_ind16 &bitmap, const rectangl
 	}
 }
 
-UINT32 cntsteer_state::screen_update_zerotrgt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t cntsteer_state::screen_update_zerotrgt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (m_disable_roz)
 		bitmap.fill(m_palette->pen(8 * m_bg_color_bank), cliprect);
@@ -352,7 +355,7 @@ UINT32 cntsteer_state::screen_update_zerotrgt(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-UINT32 cntsteer_state::screen_update_cntsteer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t cntsteer_state::screen_update_cntsteer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (m_disable_roz)
 		bitmap.fill(m_palette->pen(8 * m_bg_color_bank), cliprect);
@@ -413,7 +416,7 @@ UINT32 cntsteer_state::screen_update_cntsteer(screen_device &screen, bitmap_ind1
 */
 WRITE8_MEMBER(cntsteer_state::zerotrgt_vregs_w)
 {
-//  static UINT8 test[5];
+//  static uint8_t test[5];
 
 //  test[offset] = data;
 //    popmessage("%02x %02x %02x %02x %02x",test[0],test[1],test[2],test[3],test[4]);
@@ -438,7 +441,7 @@ WRITE8_MEMBER(cntsteer_state::zerotrgt_vregs_w)
 
 WRITE8_MEMBER(cntsteer_state::cntsteer_vregs_w)
 {
-//  static UINT8 test[5];
+//  static uint8_t test[5];
 
 //  test[offset] = data;
 //   popmessage("%02x %02x %02x %02x %02x",test[0],test[1],test[2],test[3],test[4]);
@@ -524,24 +527,19 @@ WRITE8_MEMBER(cntsteer_state::cntsteer_sub_irq_w)
 
 WRITE8_MEMBER(cntsteer_state::cntsteer_sub_nmi_w)
 {
-//  if (data)
-	machine().scheduler().synchronize(); // force resync
-
-	//m_subcpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 	m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 //  popmessage("%02x", data);
 }
 
 WRITE8_MEMBER(cntsteer_state::cntsteer_main_irq_w)
 {
-	machine().scheduler().synchronize(); // force resync
 	m_maincpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 }
 
 /* Convert weird input handling with MAME standards.*/
 READ8_MEMBER(cntsteer_state::cntsteer_adx_r)
 {
-	UINT8 res = 0, adx_val;
+	uint8_t res = 0, adx_val;
 	adx_val = ioport("AN_STEERING")->read();
 
 	if (adx_val >= 0x70 && adx_val <= 0x90)
@@ -636,7 +634,7 @@ INTERRUPT_GEN_MEMBER(cntsteer_state::subcpu_vblank_irq)
 	//       That's my best guess so far about how Slave is supposed to stop execution on Master CPU, the lack of any realistic write
 	//       between these operations brings us to this.
 	//       Game currently returns error on MIX CPU RAM because halt-ing BACK CPU doesn't happen when it should of course ...
-//  UINT8 dp_r = (UINT8)device.state().state_int(M6809_DP);
+//  uint8_t dp_r = (uint8_t)device.state().state_int(M6809_DP);
 //  m_maincpu->set_input_line(INPUT_LINE_HALT, dp_r ? ASSERT_LINE : CLEAR_LINE);
 	m_subcpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 }
@@ -906,7 +904,7 @@ MACHINE_RESET_MEMBER(cntsteer_state,cntsteer)
 	MACHINE_RESET_CALL_MEMBER(zerotrgt);
 }
 
-static MACHINE_CONFIG_START( cntsteer, cntsteer_state )
+static MACHINE_CONFIG_START( cntsteer )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 2000000)      /* ? */
@@ -944,22 +942,23 @@ static MACHINE_CONFIG_START( cntsteer, cntsteer_state )
 	MCFG_VIDEO_START_OVERRIDE(cntsteer_state,cntsteer)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ay1", AY8910, 1500000)
-	MCFG_AY8910_PORT_A_WRITE_CB(DEVWRITE8("dac", dac_device, write_unsigned8))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_AY8910_PORT_A_WRITE_CB(DEVWRITE8("dac", dac_byte_interface, write))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
 	MCFG_SOUND_ADD("ay2", AY8910, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( zerotrgt, cntsteer_state )
+static MACHINE_CONFIG_START( zerotrgt )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 2000000)      /* ? */
@@ -995,15 +994,15 @@ static MACHINE_CONFIG_START( zerotrgt, cntsteer_state )
 	MCFG_VIDEO_START_OVERRIDE(cntsteer_state,zerotrgt)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ay1", AY8910, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
 	MCFG_SOUND_ADD("ay2", AY8910, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 MACHINE_CONFIG_END
 
 /***************************************************************************/
@@ -1183,8 +1182,8 @@ ROM_END
 
 void cntsteer_state::zerotrgt_rearrange_gfx( int romsize, int romarea )
 {
-	UINT8 *src = memregion("gfx4")->base();
-	UINT8 *dst = memregion("gfx3")->base();
+	uint8_t *src = memregion("gfx4")->base();
+	uint8_t *dst = memregion("gfx3")->base();
 	int rm;
 	int cnt1;
 
@@ -1203,7 +1202,7 @@ void cntsteer_state::zerotrgt_rearrange_gfx( int romsize, int romarea )
 #if 0
 DRIVER_INIT_MEMBER(cntsteer_state,cntsteer)
 {
-	UINT8 *RAM = memregion("subcpu")->base();
+	uint8_t *RAM = memregion("subcpu")->base();
 
 	RAM[0xc2cf] = 0x43; /* Patch out Cpu 1 ram test - it never ends..?! */
 	RAM[0xc2d0] = 0x43;
@@ -1222,7 +1221,7 @@ DRIVER_INIT_MEMBER(cntsteer_state,zerotrgt)
 
 /***************************************************************************/
 
-GAME( 1985, zerotrgt,  0,        zerotrgt,  zerotrgt, cntsteer_state,  zerotrgt, ROT0,   "Data East Corporation", "Zero Target (World, CW)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND|MACHINE_NO_COCKTAIL|MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE )
+GAME( 1985, zerotrgt,  0,        zerotrgt,  zerotrgt,  cntsteer_state, zerotrgt, ROT0,   "Data East Corporation", "Zero Target (World, CW)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND|MACHINE_NO_COCKTAIL|MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE )
 GAME( 1985, zerotrgta, zerotrgt, zerotrgt,  zerotrgta, cntsteer_state, zerotrgt, ROT0,   "Data East Corporation", "Zero Target (World, CT)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND|MACHINE_NO_COCKTAIL|MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE )
-GAME( 1985, gekitsui,  zerotrgt, zerotrgt,  zerotrgta, cntsteer_state, zerotrgt, ROT0,   "Data East Corporation", "Gekitsui Oh (Japan)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND|MACHINE_NO_COCKTAIL|MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE )
-GAME( 1985, cntsteer,  0,        cntsteer,  cntsteer, cntsteer_state,  zerotrgt, ROT270, "Data East Corporation", "Counter Steer (Japan)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND|MACHINE_WRONG_COLORS|MACHINE_NO_COCKTAIL|MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE )
+GAME( 1985, gekitsui,  zerotrgt, zerotrgt,  zerotrgta, cntsteer_state, zerotrgt, ROT0,   "Data East Corporation", "Gekitsui Oh (Japan)",     MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND|MACHINE_NO_COCKTAIL|MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE )
+GAME( 1985, cntsteer,  0,        cntsteer,  cntsteer,  cntsteer_state, zerotrgt, ROT270, "Data East Corporation", "Counter Steer (Japan)",   MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND|MACHINE_WRONG_COLORS|MACHINE_NO_COCKTAIL|MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE )

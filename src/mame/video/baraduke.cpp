@@ -19,7 +19,7 @@
 
 PALETTE_INIT_MEMBER(baraduke_state, baraduke)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 	int bit0,bit1,bit2,bit3,r,g,b;
 
@@ -114,9 +114,9 @@ TILE_GET_INFO_MEMBER(baraduke_state::get_tile_info1)
 
 void baraduke_state::video_start()
 {
-	m_tx_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(baraduke_state::tx_get_tile_info),this),tilemap_mapper_delegate(FUNC(baraduke_state::tx_tilemap_scan),this),8,8,36,28);
-	m_bg_tilemap[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(baraduke_state::get_tile_info0),this),TILEMAP_SCAN_ROWS,8,8,64,32);
-	m_bg_tilemap[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(baraduke_state::get_tile_info1),this),TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(baraduke_state::tx_get_tile_info),this),tilemap_mapper_delegate(FUNC(baraduke_state::tx_tilemap_scan),this),8,8,36,28);
+	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(baraduke_state::get_tile_info0),this),TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(baraduke_state::get_tile_info1),this),TILEMAP_SCAN_ROWS,8,8,64,32);
 
 	m_tx_tilemap->set_transparent_pen(3);
 	m_bg_tilemap[0]->set_transparent_pen(7);
@@ -211,9 +211,9 @@ WRITE8_MEMBER(baraduke_state::baraduke_spriteram_w)
 
 void baraduke_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int sprite_priority)
 {
-	UINT8 *spriteram = m_spriteram + 0x1800;
-	const UINT8 *source = &spriteram[0x0000];
-	const UINT8 *finish = &spriteram[0x0800-16];    /* the last is NOT a sprite */
+	uint8_t *spriteram = m_spriteram + 0x1800;
+	const uint8_t *source = &spriteram[0x0000];
+	const uint8_t *finish = &spriteram[0x0800-16];    /* the last is NOT a sprite */
 
 	int sprite_xoffs = spriteram[0x07f5] - 256 * (spriteram[0x07f4] & 1);
 	int sprite_yoffs = spriteram[0x07f7];
@@ -300,9 +300,9 @@ void baraduke_state::set_scroll(int layer)
 }
 
 
-UINT32 baraduke_state::screen_update_baraduke(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t baraduke_state::screen_update_baraduke(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *spriteram = m_spriteram + 0x1800;
+	uint8_t *spriteram = m_spriteram + 0x1800;
 	int back;
 
 	/* flip screen is embedded in the sprite control registers */
@@ -325,14 +325,14 @@ UINT32 baraduke_state::screen_update_baraduke(screen_device &screen, bitmap_ind1
 }
 
 
-void baraduke_state::screen_eof_baraduke(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(baraduke_state::screen_vblank_baraduke)
 {
 	// rising edge
 	if (state)
 	{
 		if (m_copy_sprites)
 		{
-			UINT8 *spriteram = m_spriteram + 0x1800;
+			uint8_t *spriteram = m_spriteram + 0x1800;
 			int i,j;
 
 			for (i = 0;i < 0x800;i += 16)

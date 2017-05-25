@@ -35,6 +35,8 @@ voice.rom - VOICE ROM
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class good_state : public driver_device
@@ -45,12 +47,14 @@ public:
 		m_fg_tilemapram(*this, "fg_tilemapram"),
 		m_bg_tilemapram(*this, "bg_tilemapram"),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode")
+	{
+	}
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_fg_tilemapram;
-	required_shared_ptr<UINT16> m_bg_tilemapram;
-	UINT16 *  m_sprites;
+	required_shared_ptr<uint16_t> m_fg_tilemapram;
+	required_shared_ptr<uint16_t> m_bg_tilemapram;
+	uint16_t *  m_sprites;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
@@ -60,7 +64,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start() override;
-	UINT32 screen_update_good(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_good(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 };
@@ -96,12 +100,12 @@ TILE_GET_INFO_MEMBER(good_state::get_bg_tile_info)
 
 void good_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(good_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(good_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(good_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(good_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 	m_fg_tilemap->set_transparent_pen(0xf);
 }
 
-UINT32 good_state::screen_update_good(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t good_state::screen_update_good(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -280,7 +284,7 @@ static GFXDECODE_START( good )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( good, good_state )
+static MACHINE_CONFIG_START( good )
 
 	MCFG_CPU_ADD("maincpu", M68000, 16000000 /2)
 	MCFG_CPU_PROGRAM_MAP(good_map)
@@ -302,7 +306,7 @@ static MACHINE_CONFIG_START( good, good_state )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.47)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)
 MACHINE_CONFIG_END
@@ -323,4 +327,4 @@ ROM_START( good )
 	ROM_LOAD16_BYTE( "grp-04", 0x40001, 0x20000, CRC(83dbbb52) SHA1(e597f3cbb54b5cdf2230ea6318f970319061e31b) )
 ROM_END
 
-GAME( 1998, good,   0,   good,   good, driver_device,   0,  ROT0,  "<unknown>", "Good (Korea)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, good,   0,   good,   good, good_state,   0,  ROT0,  "<unknown>", "Good (Korea)", MACHINE_SUPPORTS_SAVE )

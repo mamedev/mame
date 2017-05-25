@@ -6553,7 +6553,7 @@
 		</part>
 	</software>
 
-	<software name="valis3j" cloneof="valis2">
+	<software name="valis3j" cloneof="valis3">
 		<description>Valis III - The Fantasm Soldier (CD)(Jpn)</description>
 		<year>1990</year>
 		<publisher>Nihon Telenet</publisher>

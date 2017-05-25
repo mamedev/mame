@@ -147,6 +147,18 @@
 	end
 
 
+	function T.clean.CppBundleFiles()
+		prj = project "MyProject"
+		language "C++"
+		kind "Bundle"
+		prepare()
+		test.contains(removed, "MyProject.dll")
+		test.contains(removed, "libMyProject.so")
+		test.contains(removed, "MyProject.lib")
+		test.contains(removed, "MyProject.bundle")
+	end
+
+
 	function T.clean.CppStaticLibFiles()
 		prj = project "MyProject"
 		language "C++"

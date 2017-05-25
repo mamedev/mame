@@ -122,6 +122,8 @@ video z80
 #include "sound/ay8910.h"
 #include "video/resnet.h"
 #include "video/mb_vcu.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 #define MAZERBLA 0x01
@@ -151,39 +153,39 @@ public:
 	/* video-related */
 	bitmap_ind16 m_tmpbitmaps[4];
 
-	UINT8 m_vcu_video_reg[4];
-	UINT32 m_vcu_gfx_addr;
-	UINT32 m_vcu_gfx_param_addr;
+	uint8_t m_vcu_video_reg[4];
+	uint32_t m_vcu_gfx_addr;
+	uint32_t m_vcu_gfx_param_addr;
 
-	UINT8 m_bknd_col;
-	UINT8 m_port02_status;
-	UINT8 m_vbank;      /* video page select signal, likely for double buffering ?*/
-	UINT32 m_xpos;
-	UINT32 m_ypos;
-	UINT32 m_pix_xsize;
-	UINT32 m_pix_ysize;
-	UINT8 m_color1;
-	UINT8 m_color2;
-	UINT8 m_mode;
-	UINT8 m_plane;
-	UINT8 m_lookup_ram[0x100*4];
-	UINT32 m_gfx_rom_bank;  /* graphics ROMs are banked */
+	uint8_t m_bknd_col;
+	uint8_t m_port02_status;
+	uint8_t m_vbank;      /* video page select signal, likely for double buffering ?*/
+	uint32_t m_xpos;
+	uint32_t m_ypos;
+	uint32_t m_pix_xsize;
+	uint32_t m_pix_ysize;
+	uint8_t m_color1;
+	uint8_t m_color2;
+	uint8_t m_mode;
+	uint8_t m_plane;
+	uint8_t m_lookup_ram[0x100*4];
+	uint32_t m_gfx_rom_bank;  /* graphics ROMs are banked */
 
 	double m_weights_r[2];
 	double m_weights_g[3];
 	double m_weights_b[3];
 
 	/* misc */
-	UINT8 m_game_id; /* hacks per game */
-	UINT8 m_ls670_0[4];
-	UINT8 m_ls670_1[4];
+	uint8_t m_game_id; /* hacks per game */
+	uint8_t m_ls670_0[4];
+	uint8_t m_ls670_1[4];
 
-	UINT8 m_zpu_int_vector;
+	uint8_t m_zpu_int_vector;
 
-	UINT8 m_bcd_7445;
+	uint8_t m_bcd_7445;
 
-	UINT8 m_vsb_ls273;
-	UINT8 m_soundlatch;
+	uint8_t m_vsb_ls273;
+	uint8_t m_soundlatch;
 
 #if 0
 	int m_dbg_info;
@@ -219,8 +221,8 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(mazerbla);
-	UINT32 screen_update_mazerbla(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void screen_eof(screen_device &screen, bool state);
+	uint32_t screen_update_mazerbla(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	INTERRUPT_GEN_MEMBER(sound_interrupt);
 	TIMER_CALLBACK_MEMBER(deferred_ls670_0_w);
 	TIMER_CALLBACK_MEMBER(deferred_ls670_1_w);
@@ -283,13 +285,13 @@ void mazerbla_state::video_start()
 }
 
 
-UINT32 mazerbla_state::screen_update_mazerbla(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t mazerbla_state::screen_update_mazerbla(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_vcu->screen_update(screen,bitmap,cliprect);
 	return 0;
 }
 
-void mazerbla_state::screen_eof(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(mazerbla_state::screen_vblank)
 {
 	if (state)
 	{
@@ -379,11 +381,11 @@ READ8_MEMBER(mazerbla_state::vcu_set_cmd_param_r)
 
 READ8_MEMBER(mazerbla_state::vcu_set_gfx_addr_r)
 {
-	UINT8 * rom = memregion("sub2")->base() + (m_gfx_rom_bank * 0x2000) + 0x10000;
+	uint8_t * rom = memregion("sub2")->base() + (m_gfx_rom_bank * 0x2000) + 0x10000;
 	int offs;
 	int x, y;
 	int bits = 0;
-	UINT8 color_base = 0;
+	uint8_t color_base = 0;
 
 	color_base = m_vcu_video_reg[1] << 4;
 
@@ -448,9 +450,9 @@ READ8_MEMBER(mazerbla_state::vcu_set_gfx_addr_r)
 			{
 				for (x = 0; x <= m_pix_xsize; x++)
 				{
-					UINT8 pixeldata = rom[(offs + (bits >> 3)) % 0x2000];
-					UINT8 data = (pixeldata >> (6 - (bits & 7))) & 3;
-					UINT8 col = 0;
+					uint8_t pixeldata = rom[(offs + (bits >> 3)) % 0x2000];
+					uint8_t data = (pixeldata >> (6 - (bits & 7))) & 3;
+					uint8_t col = 0;
 
 					switch(data)
 					{
@@ -491,8 +493,8 @@ READ8_MEMBER(mazerbla_state::vcu_set_gfx_addr_r)
 			{
 				for (x = 0; x <= m_pix_xsize; x++)
 				{
-					UINT8 pixeldata = rom[(offs + (bits >> 3)) % 0x2000];
-					UINT8 data = (pixeldata >> (7 - (bits & 7))) & 1;
+					uint8_t pixeldata = rom[(offs + (bits >> 3)) % 0x2000];
+					uint8_t data = (pixeldata >> (7 - (bits & 7))) & 1;
 
 					/* color = 4 MSB = front PEN, 4 LSB = background PEN */
 
@@ -518,9 +520,9 @@ READ8_MEMBER(mazerbla_state::vcu_set_gfx_addr_r)
 			{
 				for (x = 0; x <= m_pix_xsize; x++)
 				{
-					UINT8 pixeldata = rom[(offs + (bits >> 3)) % 0x2000];
-					UINT8 data = (pixeldata >> (4 - (bits & 7))) & 15;
-					UINT8 col = 0;
+					uint8_t pixeldata = rom[(offs + (bits >> 3)) % 0x2000];
+					uint8_t data = (pixeldata >> (4 - (bits & 7))) & 15;
+					uint8_t col = 0;
 
 					col = color_base | data;
 
@@ -543,12 +545,12 @@ READ8_MEMBER(mazerbla_state::vcu_set_gfx_addr_r)
 
 READ8_MEMBER(mazerbla_state::vcu_set_clr_addr_r)
 {
-	UINT8 * rom = memregion("sub2")->base() + (m_gfx_rom_bank * 0x2000) + 0x10000;
+	uint8_t * rom = memregion("sub2")->base() + (m_gfx_rom_bank * 0x2000) + 0x10000;
 	int offs;
 	int x, y;
 	int bits = 0;
 
-	UINT8 color_base = 0;
+	uint8_t color_base = 0;
 
 
 /*
@@ -604,9 +606,9 @@ READ8_MEMBER(mazerbla_state::vcu_set_clr_addr_r)
 			{
 				for (x = 0; x <= m_pix_xsize; x++)
 				{
-					UINT8 pixeldata = rom[(offs + (bits >> 3)) % 0x2000];
-					UINT8 data = (pixeldata >> (6 - (bits & 7))) & 3;
-					UINT8 col = 0;
+					uint8_t pixeldata = rom[(offs + (bits >> 3)) % 0x2000];
+					uint8_t data = (pixeldata >> (6 - (bits & 7))) & 3;
+					uint8_t col = 0;
 
 					switch(data)
 					{
@@ -650,7 +652,7 @@ READ8_MEMBER(mazerbla_state::vcu_set_clr_addr_r)
 				{
 					for (x = 0; x < 16; x++)
 					{
-						UINT8 colour = m_cfb_ram[offs + x + y * 16];
+						uint8_t colour = m_cfb_ram[offs + x + y * 16];
 
 						/* red component */
 						bit1 = (colour >> 7) & 0x01;
@@ -685,7 +687,7 @@ READ8_MEMBER(mazerbla_state::vcu_set_clr_addr_r)
 				{
 					for (x = 0; x < 16; x++)
 					{
-						UINT8 dat = m_cfb_ram[offs + x + y * 16];
+						uint8_t dat = m_cfb_ram[offs + x + y * 16];
 						m_lookup_ram[lookup_offs + x + y * 16] = dat;
 					}
 				}
@@ -699,7 +701,7 @@ READ8_MEMBER(mazerbla_state::vcu_set_clr_addr_r)
 				{
 					for (x = 0; x < 16; x++)
 					{
-						UINT8 dat = m_cfb_ram[offs + x + y * 16];
+						uint8_t dat = m_cfb_ram[offs + x + y * 16];
 						m_lookup_ram[lookup_offs + x + y * 16] = dat;
 					}
 				}
@@ -713,7 +715,7 @@ READ8_MEMBER(mazerbla_state::vcu_set_clr_addr_r)
 				{
 					for (x = 0; x < 16; x++)
 					{
-						UINT8 dat = m_cfb_ram[offs + x + y * 16];
+						uint8_t dat = m_cfb_ram[offs + x + y * 16];
 						m_lookup_ram[lookup_offs + x + y * 16] = dat;
 					}
 				}
@@ -865,7 +867,7 @@ READ8_MEMBER(mazerbla_state::zpu_inputs_r)
 	static const char *const strobenames[] = { "ZPU", "DSW0", "DSW1", "DSW2", "DSW3", "BUTTONS", "STICK0_X", "STICK0_Y",
 												"STICK1_X", "STICK1_Y", "UNUSED", "UNUSED", "UNUSED", "UNUSED", "UNUSED", "UNUSED" };
 
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 
 	ret = ioport(strobenames[m_bcd_7445])->read();
 
@@ -1439,7 +1441,7 @@ void mazerbla_state::machine_reset()
 	memset(m_lookup_ram, 0, ARRAY_LENGTH(m_lookup_ram));
 }
 
-static MACHINE_CONFIG_START( mazerbla, mazerbla_state )
+static MACHINE_CONFIG_START( mazerbla )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK)  /* 4 MHz, no NMI, IM2 - vectors at 0xf8, 0xfa, 0xfc */
@@ -1481,7 +1483,7 @@ static MACHINE_CONFIG_START( mazerbla, mazerbla_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( greatgun, mazerbla_state )
+static MACHINE_CONFIG_START( greatgun )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK)  /* 4 MHz, no NMI, IM2 - vectors at 0xf8, 0xfa, 0xfc */
@@ -1513,7 +1515,7 @@ static MACHINE_CONFIG_START( greatgun, mazerbla_state )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mazerbla_state, screen_update_mazerbla)
-	MCFG_SCREEN_VBLANK_DRIVER(mazerbla_state, screen_eof)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(mazerbla_state, screen_vblank))
 
 	MCFG_PALETTE_ADD("palette", 256+1)
 	MCFG_PALETTE_INIT_OWNER(mazerbla_state, mazerbla)
@@ -1613,33 +1615,33 @@ ROM_START( greatgun )
 	ROM_LOAD( "zpu3.4h",0x6000, 0x2000, CRC(c142ebdf) SHA1(0b87740d26b19a05f65b811225ee0053ddb27d22) )
 
 	ROM_REGION( 0x10000, "sub", 0 )     /* 64k for sound CPU (PSB board) */
-	ROM_LOAD( "psb.4a",0x0000, 0x2000, CRC(172a793e) SHA1(3618a778af1f4a6267bf7e0786529be731ac9b76) )
+	ROM_LOAD( "psb.prom0.4a",0x0000, 0x2000, CRC(172a793e) SHA1(3618a778af1f4a6267bf7e0786529be731ac9b76) )/*ROM number is silkscreened on the PCB & PCB location is also given */
 
 	ROM_REGION( 0x60000, "sub2", 0 )     /* 64k for video CPU (CFB board) */
 	ROM_LOAD( "cfb0.7f",0x00000, 0x2000, CRC(ee372b1f) SHA1(b630fd659d59eb8c2540f18d91ae0d72e859fc4f) )
 	ROM_LOAD( "cfb1.8f",0x02000, 0x2000, CRC(b76d9527) SHA1(8f16b850bd67d553aaaf7e176754e36aba581445) )
 
-	ROM_LOAD( "psb00.5g",0x10000,0x2000, CRC(b4956100) SHA1(98baf5c27c76dc5c4eafc44f42705239504637fe) )/*banked at 0x4000*/
-	ROM_LOAD( "psb01.5f",0x14000,0x2000, CRC(acdce2ee) SHA1(96b8961afbd0006b10cfdc825aefe27ec18121ff) )
-	ROM_LOAD( "psb02.5d",0x18000,0x2000, CRC(cb840fc6) SHA1(c30c72d355e1957f3715e9fab701f65b9d7d632a) )
-	ROM_LOAD( "psb03.5c",0x1c000,0x2000, CRC(86ea6f99) SHA1(ce5d42557d0a62eebe3d0cee28587d60707573e4) )
-	ROM_LOAD( "psb04.6g",0x20000,0x2000, CRC(65379893) SHA1(84bb755e23d5ce13b1c82e59f24f3890c50697cc) )
-	ROM_LOAD( "psb05.6f",0x24000,0x2000, CRC(f82245cb) SHA1(fa1cab94a03ce7b8e45ea6eec572b21f268f7547) )
-	ROM_LOAD( "psb06.6d",0x28000,0x2000, CRC(6b86794f) SHA1(72cf67ecf5a9198ecb44dd846de968e6cdd6458d) )
-	ROM_LOAD( "psb07.6c",0x2c000,0x2000, CRC(60a7abf3) SHA1(44b932d8af29ec706c29d6b71a8bac6318d92315) )
-	ROM_LOAD( "psb08.7g",0x30000,0x2000, CRC(854be14e) SHA1(ae9b1fe2443c87bb4334bc776f7bc7e5fa874f38) )
-	ROM_LOAD( "psb09.7f",0x34000,0x2000, CRC(b2e8afa3) SHA1(30a3d83bf1ec7885549b47f9569e9ae0d05b948d) )
-	ROM_LOAD( "psb10.7d",0x38000,0x2000, CRC(fbfb0aab) SHA1(2eb666a5eff31019b4ffdfc82e242ff47cd59527) )
-	ROM_LOAD( "psb11.7c",0x3c000,0x2000, CRC(ddcd3cec) SHA1(7d0c3b4160b11ebe9b097664190d8ae605413baa) )
-	ROM_LOAD( "psb12.8g",0x40000,0x2000, CRC(c6617377) SHA1(29a6fc52e06c41f06ee333aad707c3a1952dff4d) )
-	ROM_LOAD( "psb13.8f",0x44000,0x2000, CRC(aeab8555) SHA1(c398cac5210022e3c9e25a9f2ef1017b27c21e62) )
-	ROM_LOAD( "psb14.8d",0x48000,0x2000, CRC(ef35e314) SHA1(2e20517ff89b153fd888cf4eb0404a802e16b1b7) )
-	ROM_LOAD( "psb15.8c",0x4c000,0x2000, CRC(1fafe83d) SHA1(d1d406275f50d87547aabe1295795099f341433d) )
-	ROM_LOAD( "psb16.9g",0x50000,0x2000, CRC(ec49864f) SHA1(7a3b295972b52682406f75c4fe12c29632452491) )
-	ROM_LOAD( "psb17.9f",0x54000,0x2000, CRC(d9778e85) SHA1(2998f0a08cdba8a75e687a54cb9a03edeb4b22cd) )
-	ROM_LOAD( "psb18.9d",0x58000,0x2000, CRC(ef61b6c0) SHA1(7e8a82beefb9fd8e219fc4d7d25a3a43ab8aadf7) )
-	ROM_LOAD( "psb19.9c",0x5c000,0x2000, CRC(68752e0d) SHA1(58a4921e4f774af5e1ef7af67f06e9b43643ffab) )
-//  10g missing?
+	ROM_LOAD( "great_guns_psb0_ra1.rom0.5g",0x10000,0x2000,   CRC(b4956100) SHA1(98baf5c27c76dc5c4eafc44f42705239504637fe) )/*banked at 0x4000*/
+	ROM_LOAD( "great_guns_psb1_ra1.rom1.5f",0x14000,0x2000,   CRC(acdce2ee) SHA1(96b8961afbd0006b10cfdc825aefe27ec18121ff) )/*ROM number is silkscreened on the PCB & PCB locations are also given */
+	ROM_LOAD( "great_guns_psb2_ra1.rom2.5d",0x18000,0x2000,   CRC(cb840fc6) SHA1(c30c72d355e1957f3715e9fab701f65b9d7d632a) )
+	ROM_LOAD( "great_guns_psb3_ra1.rom3.5c",0x1c000,0x2000,   CRC(86ea6f99) SHA1(ce5d42557d0a62eebe3d0cee28587d60707573e4) )
+	ROM_LOAD( "great_guns_psb4_ra1.rom4.6g",0x20000,0x2000,   CRC(65379893) SHA1(84bb755e23d5ce13b1c82e59f24f3890c50697cc) )
+	ROM_LOAD( "great_guns_psb5_ra1.rom5.6f",0x24000,0x2000,   CRC(f82245cb) SHA1(fa1cab94a03ce7b8e45ea6eec572b21f268f7547) )
+	ROM_LOAD( "great_guns_psb6_ra1.rom6.6d",0x28000,0x2000,   CRC(6b86794f) SHA1(72cf67ecf5a9198ecb44dd846de968e6cdd6458d) )
+	ROM_LOAD( "great_guns_psb7_ra1.rom7.6c",0x2c000,0x2000,   CRC(60a7abf3) SHA1(44b932d8af29ec706c29d6b71a8bac6318d92315) )
+	ROM_LOAD( "great_guns_psb8_ra1.rom8.7g",0x30000,0x2000,   CRC(854be14e) SHA1(ae9b1fe2443c87bb4334bc776f7bc7e5fa874f38) )
+	ROM_LOAD( "great_guns_psb9_ra1.rom9.7f",0x34000,0x2000,   CRC(b2e8afa3) SHA1(30a3d83bf1ec7885549b47f9569e9ae0d05b948d) )
+	ROM_LOAD( "great_guns_psb10_ra1.rom10.7d",0x38000,0x2000, CRC(fbfb0aab) SHA1(2eb666a5eff31019b4ffdfc82e242ff47cd59527) )
+	ROM_LOAD( "great_guns_psb11_ra1.rom11.7c",0x3c000,0x2000, CRC(ddcd3cec) SHA1(7d0c3b4160b11ebe9b097664190d8ae605413baa) )
+	ROM_LOAD( "great_guns_psb12_ra1.rom12.8g",0x40000,0x2000, CRC(c6617377) SHA1(29a6fc52e06c41f06ee333aad707c3a1952dff4d) )
+	ROM_LOAD( "great_guns_psb13_ra1.rom13.8f",0x44000,0x2000, CRC(aeab8555) SHA1(c398cac5210022e3c9e25a9f2ef1017b27c21e62) )
+	ROM_LOAD( "great_guns_psb14_ra1.rom14.8d",0x48000,0x2000, CRC(ef35e314) SHA1(2e20517ff89b153fd888cf4eb0404a802e16b1b7) )
+	ROM_LOAD( "great_guns_psb15_ra1.rom15.8c",0x4c000,0x2000, CRC(1fafe83d) SHA1(d1d406275f50d87547aabe1295795099f341433d) )
+	ROM_LOAD( "great_guns_psb16_ra1.rom16.9g",0x50000,0x2000, CRC(ec49864f) SHA1(7a3b295972b52682406f75c4fe12c29632452491) )
+	ROM_LOAD( "great_guns_psb17_ra1.rom17.9f",0x54000,0x2000, CRC(d9778e85) SHA1(2998f0a08cdba8a75e687a54cb9a03edeb4b22cd) )
+	ROM_LOAD( "great_guns_psb18_ra1.rom18.9d",0x58000,0x2000, CRC(ef61b6c0) SHA1(7e8a82beefb9fd8e219fc4d7d25a3a43ab8aadf7) )
+	ROM_LOAD( "great_guns_psb19_ra1.rom19.9c",0x5c000,0x2000, CRC(68752e0d) SHA1(58a4921e4f774af5e1ef7af67f06e9b43643ffab) )
+//  ROM20.10g, ROM21.10f, ROM22.10d and ROM23.10c are unpopulated.
 ROM_END
 
 DRIVER_INIT_MEMBER(mazerbla_state,mazerbla)
@@ -1649,7 +1651,7 @@ DRIVER_INIT_MEMBER(mazerbla_state,mazerbla)
 
 DRIVER_INIT_MEMBER(mazerbla_state,greatgun)
 {
-	UINT8 *rom = memregion("sub2")->base();
+	uint8_t *rom = memregion("sub2")->base();
 
 	m_game_id = GREATGUN;
 
@@ -1664,4 +1666,4 @@ DRIVER_INIT_MEMBER(mazerbla_state,greatgun)
 
 GAME( 1983, mazerbla,  0,        mazerbla,  mazerbla, mazerbla_state, mazerbla, ROT0, "Stern Electronics", "Mazer Blazer (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1983, mazerblaa, mazerbla, mazerbla,  mazerbla, mazerbla_state, mazerbla, ROT0, "Stern Electronics", "Mazer Blazer (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, greatgun,  0,        greatgun,  greatgun, mazerbla_state, greatgun, ROT0, "Stern Electronics", "Great Guns", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, greatgun,  0,        greatgun,  greatgun, mazerbla_state, greatgun, ROT0, "Stern Electronics", "Great Guns",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

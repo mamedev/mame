@@ -230,13 +230,15 @@
 
 *******************************************************************************/
 
-
-#define MASTER_CLOCK    XTAL_8MHz   /* from CPU Board */
-#define SECONDARY_CLOCK XTAL_6MHz   /* from GFX Board */
-
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
+
+
+#define MASTER_CLOCK    XTAL_8MHz   /* from CPU Board */
+#define SECONDARY_CLOCK XTAL_6MHz   /* from GFX Board */
 
 
 class goldngam_state : public driver_device
@@ -247,11 +249,11 @@ public:
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu") { }
 
-	required_shared_ptr<UINT16> m_videoram;
+	required_shared_ptr<uint16_t> m_videoram;
 	DECLARE_READ16_MEMBER(unk_r);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(goldngam);
-	UINT32 screen_update_goldngam(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_goldngam(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -264,7 +266,7 @@ void goldngam_state::video_start()
 {
 }
 
-UINT32 goldngam_state::screen_update_goldngam(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t goldngam_state::screen_update_goldngam(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int index = 0;
 
@@ -272,7 +274,7 @@ UINT32 goldngam_state::screen_update_goldngam(screen_device &screen, bitmap_ind1
 	{
 		for(int x = 0; x < 384; x += 2)
 		{
-			UINT16 word = m_videoram[index];
+			uint16_t word = m_videoram[index];
 			bitmap.pix16(y, x) = word >> 8;
 			bitmap.pix16(y, x+1) = word & 0xff;
 			++index;
@@ -544,7 +546,7 @@ GFXDECODE_END
 *************************/
 
 
-static MACHINE_CONFIG_START( swisspkr, goldngam_state )
+static MACHINE_CONFIG_START( swisspkr )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK)
@@ -612,6 +614,6 @@ ROM_END
 *      Game Drivers      *
 *************************/
 
-/*    YEAR  NAME      PARENT    MACHINE    INPUT      INIT  ROT    COMPANY                           FULLNAME                          FLAGS */
-GAME( 1990, swisspkr, 0,        swisspkr,  goldngam, driver_device,  0,    ROT0, "Golden Games / C+M Technics AG", "Swiss Poker ('50 SG-.10', V2.5)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1998, moviecrd, 0,        moviecrd,  goldngam, driver_device,  0,    ROT0, "Golden Games / C+M Technics AG", "Movie Card",                      MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT    MACHINE    INPUT     STATE            INIT  ROT   COMPANY                           FULLNAME                           FLAGS
+GAME( 1990, swisspkr, 0,        swisspkr,  goldngam, goldngam_state,  0,    ROT0, "Golden Games / C+M Technics AG", "Swiss Poker ('50 SG-.10', V2.5)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1998, moviecrd, 0,        moviecrd,  goldngam, goldngam_state,  0,    ROT0, "Golden Games / C+M Technics AG", "Movie Card",                      MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

@@ -6,12 +6,11 @@
 
 **********************************************************************/
 
+#ifndef MAME_MACHINE_I80130_H
+#define MAME_MACHINE_I80130_H
+
 #pragma once
 
-#ifndef __I80130__
-#define __I80130__
-
-#include "emu.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 
@@ -51,23 +50,23 @@ class i80130_device :  public device_t
 {
 public:
 	// construction/destruction
-	i80130_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i80130_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<i80130_device &>(device).m_write_irq.set_callback(object); }
-	template<class _Object> static devcb_base &set_ack_wr_callback(device_t &device, _Object object) { return downcast<i80130_device &>(device).m_write_ack.set_callback(object); }
-	template<class _Object> static devcb_base &set_lir_wr_callback(device_t &device, _Object object) { return downcast<i80130_device &>(device).m_write_lir.set_callback(object); }
-	template<class _Object> static devcb_base &set_systick_wr_callback(device_t &device, _Object object) { return downcast<i80130_device &>(device).m_write_systick.set_callback(object); }
-	template<class _Object> static devcb_base &set_delay_wr_callback(device_t &device, _Object object) { return downcast<i80130_device &>(device).m_write_delay.set_callback(object); }
-	template<class _Object> static devcb_base &set_baud_wr_callback(device_t &device, _Object object) { return downcast<i80130_device &>(device).m_write_baud.set_callback(object); }
+	template <class Object> static devcb_base &set_irq_wr_callback(device_t &device, Object &&cb) { return downcast<i80130_device &>(device).m_write_irq.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_ack_wr_callback(device_t &device, Object &&cb) { return downcast<i80130_device &>(device).m_write_ack.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_lir_wr_callback(device_t &device, Object &&cb) { return downcast<i80130_device &>(device).m_write_lir.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_systick_wr_callback(device_t &device, Object &&cb) { return downcast<i80130_device &>(device).m_write_systick.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_delay_wr_callback(device_t &device, Object &&cb) { return downcast<i80130_device &>(device).m_write_delay.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_baud_wr_callback(device_t &device, Object &&cb) { return downcast<i80130_device &>(device).m_write_baud.set_callback(std::forward<Object>(cb)); }
 
 	virtual DECLARE_ADDRESS_MAP(rom_map, 16);
 	virtual DECLARE_ADDRESS_MAP(io_map, 16);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	UINT8 inta_r() { return m_pic->acknowledge(); }
+	uint8_t inta_r() { return m_pic->acknowledge(); }
 
 	DECLARE_WRITE_LINE_MEMBER( ir0_w ) { m_pic->ir0_w(state); }
 	DECLARE_WRITE_LINE_MEMBER( ir1_w ) { m_pic->ir1_w(state); }
@@ -104,8 +103,6 @@ protected:
 
 
 // device type definition
-extern const device_type I80130;
+DECLARE_DEVICE_TYPE(I80130, i80130_device)
 
-
-
-#endif
+#endif // MAME_MACHINE_I80130_H

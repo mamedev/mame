@@ -27,7 +27,9 @@ TODO:
 #include "bus/vcs/scharger.h"
 #include "bus/vcs/compumat.h"
 #include "bus/vcs_ctrl/ctrl.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 
 #if USE_NEW_RIOT
@@ -58,8 +60,8 @@ public:
 		m_riot(*this,"riot")
 	{ }
 
-	required_shared_ptr<UINT8> m_riot_ram;
-	UINT16 m_current_screen_height;
+	required_shared_ptr<uint8_t> m_riot_ram;
+	uint16_t m_current_screen_height;
 
 	DECLARE_MACHINE_START(a2600);
 	DECLARE_WRITE8_MEMBER(switch_A_w);
@@ -101,7 +103,7 @@ protected:
 #define MASTER_CLOCK_PAL    3546894
 #define CATEGORY_SELECT     16
 
-static const UINT16 supported_screen_heights[4] = { 262, 312, 328, 342 };
+static const uint16_t supported_screen_heights[4] = { 262, 312, 328, 342 };
 
 
 static ADDRESS_MAP_START(a2600_mem, AS_PROGRAM, 8, a2600_state ) // 6507 has 13-bit address space, 0x0000 - 0x1fff
@@ -118,11 +120,11 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(a2600_state::cart_over_all_r)
 {
-	if (!space.debugger_access())
+	if (!machine().side_effect_disabled())
 		m_cart->write_bank(space, offset, 0);
 
 	int masked_offset = offset &~ 0x0d00;
-	UINT8 ret = 0x00;
+	uint8_t ret = 0x00;
 
 	if (masked_offset < 0x80)
 	{
@@ -206,7 +208,7 @@ WRITE8_MEMBER(a2600_state::switch_A_w)
 
 READ8_MEMBER(a2600_state::switch_A_r)
 {
-	UINT8 val = 0;
+	uint8_t val = 0;
 
 	/* Left controller port PINs 1-4 ( 4321 ) */
 	val |= ( m_joy1->joy_r() & 0x0F ) << 4;
@@ -267,8 +269,8 @@ READ16_MEMBER(a2600_state::a2600_read_input_port)
 */
 READ8_MEMBER(a2600_state::a2600_get_databus_contents)
 {
-	UINT16  last_address, prev_address;
-	UINT8   last_byte, prev_byte;
+	uint16_t  last_address, prev_address;
+	uint8_t   last_byte, prev_byte;
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 
 	last_address = m_maincpu->pc() + 1;
@@ -340,7 +342,7 @@ WRITE16_MEMBER(a2600_state::a2600_tia_vsync_callback_pal)
 // TODO: is this the correct behavior for the real hardware?!?
 READ8_MEMBER(a2600_state::cart_over_riot_r)
 {
-	if (!space.debugger_access())
+	if (!machine().side_effect_disabled())
 		m_cart->write_bank(space, offset, 0);
 	return m_riot_ram[0x20 + offset];
 }
@@ -383,7 +385,6 @@ MACHINE_START_MEMBER(a2600_state,a2600)
 		case A26_F6:
 		case A26_DPC:
 			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1000, 0x1fff, read8_delegate(FUNC(vcs_cart_slot_device::read_rom),(vcs_cart_slot_device*)m_cart), write8_delegate(FUNC(vcs_cart_slot_device::write_bank),(vcs_cart_slot_device*)m_cart));
-			m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(vcs_cart_slot_device::cart_opbase),(vcs_cart_slot_device*)m_cart));
 			break;
 		case A26_FE:
 			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1000, 0x1fff, read8_delegate(FUNC(vcs_cart_slot_device::read_rom),(vcs_cart_slot_device*)m_cart), write8_delegate(FUNC(vcs_cart_slot_device::write_ram),(vcs_cart_slot_device*)m_cart));
@@ -452,7 +453,7 @@ unsigned a2600_state::long detect_2600controllers()
 
 	unsigned int left,right;
 	int i,j,foundkeypad = 0;
-	UINT8 *cart;
+	uint8_t *cart;
 	static const unsigned char signatures[][5] =  {
 		{ 0x55, 0xa5, 0x3c, 0x29, 0}, // star raiders
 		{ 0xf9, 0xff, 0xa5, 0x80, 1}, // sentinel
@@ -561,7 +562,7 @@ static SLOT_INTERFACE_START(a2600_cart)
 	SLOT_INTERFACE_INTERNAL("a26_harmony",   A26_ROM_HARMONY)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_FRAGMENT(a2600_cartslot)
+static MACHINE_CONFIG_START(a2600_cartslot)
 	MCFG_VCS_CARTRIDGE_ADD("cartslot", a2600_cart, nullptr)
 
 	/* software lists */
@@ -569,7 +570,7 @@ static MACHINE_CONFIG_FRAGMENT(a2600_cartslot)
 	MCFG_SOFTWARE_LIST_ADD("cass_list","a2600_cass")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( a2600, a2600_state )
+static MACHINE_CONFIG_START( a2600 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6507, MASTER_CLOCK_NTSC / 3)
 	MCFG_M6502_DISABLE_DIRECT()
@@ -618,7 +619,7 @@ static MACHINE_CONFIG_START( a2600, a2600_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( a2600p, a2600_state )
+static MACHINE_CONFIG_START( a2600p )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6507, MASTER_CLOCK_PAL / 3)
 	MCFG_CPU_PROGRAM_MAP(a2600_mem)
@@ -674,6 +675,6 @@ ROM_END
 
 #define rom_a2600p rom_a2600
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY     FULLNAME */
-CONS( 1977, a2600,  0,      0,      a2600,  a2600, driver_device,   0,      "Atari",    "Atari 2600 (NTSC)" , MACHINE_SUPPORTS_SAVE )
-CONS( 1978, a2600p, a2600,  0,      a2600p, a2600, driver_device,   0,      "Atari",    "Atari 2600 (PAL)",   MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT  STATE        INIT    COMPANY     FULLNAME */
+CONS( 1977, a2600,  0,      0,      a2600,  a2600, a2600_state, 0,      "Atari",    "Atari 2600 (NTSC)" , MACHINE_SUPPORTS_SAVE )
+CONS( 1978, a2600p, a2600,  0,      a2600p, a2600, a2600_state, 0,      "Atari",    "Atari 2600 (PAL)",   MACHINE_SUPPORTS_SAVE )

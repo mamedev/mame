@@ -25,13 +25,12 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_COLECO_EXP_H
+#define MAME_BUS_COLECO_EXP_H
+
 #pragma once
 
-#ifndef __COLECOVISION_CARTRIDGE_SLOT__
-#define __COLECOVISION_CARTRIDGE_SLOT__
-
-#include "emu.h"
-
+#include "softlist_dev.h"
 
 
 //**************************************************************************
@@ -66,20 +65,18 @@ class colecovision_cartridge_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	colecovision_cartridge_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual ~colecovision_cartridge_slot_device() { }
+	colecovision_cartridge_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// computer interface
-	UINT8 bd_r(address_space &space, offs_t offset, UINT8 data, int _8000, int _a000, int _c000, int _e000);
+	uint8_t bd_r(address_space &space, offs_t offset, uint8_t data, int _8000, int _a000, int _c000, int _e000);
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override { update_names(); }
 	virtual void device_start() override;
 
 	// image-level overrides
-	virtual bool call_load() override;
-	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry) override;
+	virtual image_init_result call_load() override;
+	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
 	virtual iodevice_t image_type() const override { return IO_CARTSLOT; }
 
@@ -88,12 +85,11 @@ protected:
 	virtual bool is_creatable() const override { return 0; }
 	virtual bool must_be_loaded() const override { return 0; }
 	virtual bool is_reset_on_load() const override { return 1; }
-	virtual const char *image_interface() const override { return ":coleco_cart"; }
+	virtual const char *image_interface() const override { return "coleco_cart"; }
 	virtual const char *file_extensions() const override { return "rom,col,bin"; }
-	virtual const option_guide *create_option_guide() const override { return nullptr; }
 
 	// slot interface overrides
-	virtual std::string get_default_card_software() override;
+	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	device_colecovision_cartridge_interface *m_card;
 };
@@ -106,16 +102,15 @@ class device_colecovision_cartridge_interface : public device_slot_card_interfac
 	friend class colecovision_cartridge_slot_device;
 
 public:
-	// construction/destruction
-	device_colecovision_cartridge_interface(const machine_config &mconfig, device_t &device);
-	virtual ~device_colecovision_cartridge_interface() { }
-
-	virtual UINT8 bd_r(address_space &space, offs_t offset, UINT8 data, int _8000, int _a000, int _c000, int _e000) { return 0xff; }
+	virtual uint8_t bd_r(address_space &space, offs_t offset, uint8_t data, int _8000, int _a000, int _c000, int _e000) { return 0xff; }
 
 	void rom_alloc(size_t size);
 
 protected:
-	UINT8 *m_rom;
+	// construction/destruction
+	device_colecovision_cartridge_interface(const machine_config &mconfig, device_t &device);
+
+	uint8_t *m_rom;
 	size_t m_rom_size;
 
 	colecovision_cartridge_slot_device *m_slot;
@@ -123,10 +118,9 @@ protected:
 
 
 // device type definition
-extern const device_type COLECOVISION_CARTRIDGE_SLOT;
+DECLARE_DEVICE_TYPE(COLECOVISION_CARTRIDGE_SLOT, colecovision_cartridge_slot_device)
 
 SLOT_INTERFACE_EXTERN( colecovision_cartridges );
 
 
-
-#endif
+#endif // MAME_BUS_COLECO_EXP_H

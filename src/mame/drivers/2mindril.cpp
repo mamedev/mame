@@ -35,9 +35,11 @@ DAC               -26.6860Mhz
 */
 
 #include "emu.h"
+#include "includes/taito_f3.h"
+
 #include "cpu/m68000/m68000.h"
 #include "sound/2610intf.h"
-#include "includes/taito_f3.h"
+#include "speaker.h"
 
 
 class _2mindril_state : public taito_f3_state
@@ -48,12 +50,12 @@ public:
 		m_iodata(*this, "iodata") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_iodata;
+	required_shared_ptr<uint16_t> m_iodata;
 
 	/* input-related */
-	UINT16        m_defender_sensor;
-	UINT16        m_shutter_sensor;
-	UINT16        m_irq_reg;
+	uint16_t        m_defender_sensor;
+	uint16_t        m_shutter_sensor;
+	uint16_t        m_irq_reg;
 
 	/* devices */
 	DECLARE_READ16_MEMBER(drill_io_r);
@@ -153,7 +155,7 @@ void _2mindril_state::device_timer(emu_timer &timer, device_timer_id id, int par
 			m_defender_sensor = param;
 			break;
 	default:
-			assert_always(FALSE, "Unknown id in _2mindril_state::device_timer");
+			assert_always(false, "Unknown id in _2mindril_state::device_timer");
 	}
 }
 #endif
@@ -443,7 +445,7 @@ MACHINE_RESET_MEMBER(_2mindril_state,drill)
 	m_irq_reg = 0;
 }
 
-static MACHINE_CONFIG_START( drill, _2mindril_state )
+static MACHINE_CONFIG_START( drill )
 
 	MCFG_CPU_ADD("maincpu", M68000, 16000000 )
 	MCFG_CPU_PROGRAM_MAP(drill_map)
@@ -460,7 +462,7 @@ static MACHINE_CONFIG_START( drill, _2mindril_state )
 	MCFG_SCREEN_SIZE(40*8+48*2, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(46, 40*8-1 + 46, 24, 24+224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(_2mindril_state, screen_update_f3)
-	MCFG_SCREEN_VBLANK_DRIVER(_2mindril_state, screen_eof_f3)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(_2mindril_state, screen_vblank_f3))
 
 	MCFG_PALETTE_ADD("palette", 0x2000)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
@@ -497,9 +499,9 @@ ROM_END
 
 void _2mindril_state::tile_decode()
 {
-	UINT8 lsb,msb;
-	UINT32 offset,i;
-	UINT8 *gfx = memregion("gfx2")->base();
+	uint8_t lsb,msb;
+	uint32_t offset,i;
+	uint8_t *gfx = memregion("gfx2")->base();
 	int size=memregion("gfx2")->bytes();
 	int data;
 

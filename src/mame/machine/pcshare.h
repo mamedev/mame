@@ -44,8 +44,8 @@ public:
 	DECLARE_READ8_MEMBER( get_slave_ack );
 	DECLARE_WRITE_LINE_MEMBER( at_pit8254_out2_changed );
 	int m_dma_channel;
-	UINT8 m_dma_offset[2][4];
-	UINT8 m_at_pages[0x10];
+	uint8_t m_dma_offset[2][4];
+	uint8_t m_at_pages[0x10];
 	int m_pit_out2;
 };
 

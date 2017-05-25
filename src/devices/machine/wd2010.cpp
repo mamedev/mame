@@ -33,6 +33,17 @@ Implements WD2010 / WD1010 controller basics.
  MCFG_WD2010_IN_SC_CB(VCC)    // SEEK COMPLETE = VCC
  **********************************************************************/
 
+#include "emu.h"
+#include "machine/wd2010.h"
+
+#define VERBOSE 1
+#include "logmacro.h"
+
+
+//**************************************************************************
+//  MACROS / CONSTANTS
+//**************************************************************************
+
 // WD 2010 CONFIGURATION (2048 cylinder limit)
 #define STEP_LIMIT 2048
 #define CYLINDER_HIGH_MASK 0x07
@@ -47,14 +58,6 @@ Implements WD2010 / WD1010 controller basics.
 #define MAX_MFM_SECTORS 17      // STANDARD MFM SECTORS/TRACK
 // --------------------------------------------------------
 
-
-#include "machine/wd2010.h"
-
-//**************************************************************************
-//  MACROS / CONSTANTS
-//**************************************************************************
-
-#define LOG 1
 
 // task file
 enum
@@ -88,7 +91,7 @@ enum
 #define DRIVE \
 	((m_task_file[TASK_FILE_SDH_REGISTER] >> 3) & 0x03)
 
-static const int SECTOR_SIZES[4] = { 256, 512, 1024, 128 };
+static constexpr int SECTOR_SIZES[4] = { 256, 512, 1024, 128 };
 
 #define SECTOR_SIZE \
 	SECTOR_SIZES[(m_task_file[TASK_FILE_SDH_REGISTER] >> 5) & 0x03]
@@ -131,7 +134,7 @@ static const int SECTOR_SIZES[4] = { 256, 512, 1024, 128 };
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type WD2010 = &device_creator<wd2010_device>;
+DEFINE_DEVICE_TYPE(WD2010, wd2010_device, "wd2010", "Western Digital WD2010 Winchester Disk Controller")
 
 
 //**************************************************************************
@@ -142,25 +145,25 @@ const device_type WD2010 = &device_creator<wd2010_device>;
 //  wd2010_device - constructor
 //-------------------------------------------------
 
-wd2010_device::wd2010_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: device_t(mconfig, WD2010, "Western Digital WD2010", tag, owner, clock, "wd2010", __FILE__),
-m_out_intrq_cb(*this),
-m_out_bdrq_cb(*this),
-m_out_bcr_cb(*this),
-m_in_bcs_cb(*this),
-m_in_brdy_cb(*this),
-m_out_bcs_cb(*this),
-m_out_dirin_cb(*this),
-m_out_step_cb(*this),
-m_out_rwc_cb(*this),
-m_out_wg_cb(*this),
-m_in_drdy_cb(*this),
-m_in_index_cb(*this),
-m_in_wf_cb(*this),
-m_in_tk000_cb(*this),
-m_in_sc_cb(*this),
-m_status(0),
-m_error(0)
+wd2010_device::wd2010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, WD2010, tag, owner, clock)
+	, m_out_intrq_cb(*this)
+	, m_out_bdrq_cb(*this)
+	, m_out_bcr_cb(*this)
+	, m_in_bcs_cb(*this)
+	, m_in_brdy_cb(*this)
+	, m_out_bcs_cb(*this)
+	, m_out_dirin_cb(*this)
+	, m_out_step_cb(*this)
+	, m_out_rwc_cb(*this)
+	, m_out_wg_cb(*this)
+	, m_in_drdy_cb(*this)
+	, m_in_index_cb(*this)
+	, m_in_wf_cb(*this)
+	, m_in_tk000_cb(*this)
+	, m_in_sc_cb(*this)
+	, m_status(0)
+	, m_error(0)
 {
 }
 
@@ -224,7 +227,7 @@ void wd2010_device::device_reset()
 
 READ8_MEMBER(wd2010_device::read)
 {
-	UINT8 data;
+	uint8_t data;
 
 	switch (offset)
 	{
@@ -245,10 +248,10 @@ READ8_MEMBER(wd2010_device::read)
 
 		if (offset == TASK_FILE_SDH_REGISTER)
 		{
-			logerror("(READ) %s WD2010 '%s' SDH: %u\n", machine().describe_context(), tag(), data);
-			logerror("(READ) %s WD2010 '%s' Head: %u\n", machine().describe_context(), tag(), HEAD);
-			logerror("(READ) %s WD2010 '%s' Drive: %u\n", machine().describe_context(), tag(), DRIVE);
-			logerror("(READ) %s WD2010 '%s' Sector Size: %u\n", machine().describe_context(), tag(), SECTOR_SIZE);
+			logerror("(READ) %s WD2010 SDH: %u\n", machine().describe_context(), data);
+			logerror("(READ) %s WD2010 Head: %u\n", machine().describe_context(), HEAD);
+			logerror("(READ) %s WD2010 Drive: %u\n", machine().describe_context(), DRIVE);
+			logerror("(READ) %s WD2010 Sector Size: %u\n", machine().describe_context(), SECTOR_SIZE);
 		}
 
 		break;
@@ -269,33 +272,30 @@ WRITE8_MEMBER(wd2010_device::write)
 	switch (offset)
 	{
 	case TASK_FILE_WRITE_PRECOMP_CYLINDER:
-		if (LOG) logerror("%s WD2010 '%s' Write Precomp Cylinder: %u\n", machine().describe_context(), tag(), WRITE_PRECOMP_CYLINDER);
+		LOG("%s WD2010 Write Precomp Cylinder: %u\n", machine().describe_context(), WRITE_PRECOMP_CYLINDER);
 		break;
 
 	case TASK_FILE_SECTOR_COUNT:
-		if (LOG) logerror("%s WD2010 '%s' Sector Count: %u\n", machine().describe_context(), tag(), SECTOR_COUNT);
+		LOG("%s WD2010 Sector Count: %u\n", machine().describe_context(), SECTOR_COUNT);
 		break;
 
 	case TASK_FILE_SECTOR_NUMBER:
-		if (LOG) logerror("%s WD2010 '%s' Sector Number: %u\n", machine().describe_context(), tag(), SECTOR_NUMBER);
+		LOG("%s WD2010 Sector Number: %u\n", machine().describe_context(), SECTOR_NUMBER);
 		break;
 
 	case TASK_FILE_CYLINDER_LOW:
-		if (LOG) logerror("%s WD2010 '%s' Cylinder (lower bits set): %u\n", machine().describe_context(), tag(), CYLINDER);
+		LOG("%s WD2010 Cylinder (lower bits set): %u\n", machine().describe_context(), CYLINDER);
 		break;
 
 	case TASK_FILE_CYLINDER_HIGH:
-		if (LOG) logerror("%s WD2010 '%s' Cylinder (MSB bits set): %u\n", machine().describe_context(), tag(), CYLINDER);
+		LOG("%s WD2010 Cylinder (MSB bits set): %u\n", machine().describe_context(), CYLINDER);
 		break;
 
 	case TASK_FILE_SDH_REGISTER:
-		if (LOG)
-		{
-			logerror("(WRITE) %s WD2010 '%s' SDH: %u\n", machine().describe_context(), tag(), data);
-			logerror("(WRITE) %s WD2010 '%s' Head: %u\n", machine().describe_context(), tag(), HEAD);
-			logerror("(WRITE) %s WD2010 '%s' Drive: %u\n", machine().describe_context(), tag(), DRIVE);
-			logerror("(WRITE) %s WD2010 '%s' Sector Size: %u\n", machine().describe_context(), tag(), SECTOR_SIZE);
-		}
+		LOG("(WRITE) %s WD2010 SDH: %u\n", machine().describe_context(), data);
+		LOG("(WRITE) %s WD2010 Head: %u\n", machine().describe_context(), HEAD);
+		LOG("(WRITE) %s WD2010 Drive: %u\n", machine().describe_context(), DRIVE);
+		LOG("(WRITE) %s WD2010 Sector Size: %u\n", machine().describe_context(), SECTOR_SIZE);
 		break;
 
 	case TASK_FILE_COMMAND:
@@ -305,12 +305,12 @@ WRITE8_MEMBER(wd2010_device::write)
 
 		if (data == COMMAND_COMPUTE_CORRECTION)
 		{
-			if (LOG) logerror("%s WD2010 '%s' COMPUTE CORRECTION\n", machine().describe_context(), tag());
+			LOG("%s WD2010 COMPUTE CORRECTION\n", machine().describe_context());
 			compute_correction(data);
 		}
 		else if ((data & COMMAND_SET_PARAMETER_MASK) == COMMAND_SET_PARAMETER)
 		{
-			if (LOG) logerror("%s WD2010 '%s' SET PARAMETER\n", machine().describe_context(), tag());
+			LOG("%s WD2010 SET PARAMETER\n", machine().describe_context());
 			set_parameter(data);
 		}
 		else
@@ -318,32 +318,32 @@ WRITE8_MEMBER(wd2010_device::write)
 			switch (data & COMMAND_MASK)
 			{
 			case COMMAND_RESTORE:
-				if (LOG) logerror("%s WD2010 '%s' RESTORE\n", machine().describe_context(), tag());
+				LOG("%s WD2010 RESTORE\n", machine().describe_context());
 				restore(data);
 				break;
 
 			case COMMAND_SEEK:
-				if (LOG) logerror("%s WD2010 '%s' SEEK\n", machine().describe_context(), tag());
+				LOG("%s WD2010 SEEK\n", machine().describe_context());
 				seek(data);
 				break;
 
 			case COMMAND_READ_SECTOR:
-				if (LOG) logerror("%s WD2010 '%s' READ SECTOR (I = %u) (M = %u)\n", machine().describe_context(), tag(), ((data & 8)>0), ((data & 4)>0));
+				LOG("%s WD2010 READ SECTOR (I = %u) (M = %u)\n", machine().describe_context(), ((data & 8)>0), ((data & 4)>0));
 				read_sector(data);
 				break;
 
 			case COMMAND_WRITE_SECTOR:
-				if (LOG) logerror("%s WD2010 '%s' WRITE SECTOR (M = %u)\n", machine().describe_context(), tag(), ((data & 4) > 0));
+				LOG("%s WD2010 WRITE SECTOR (M = %u)\n", machine().describe_context(), ((data & 4) > 0));
 				write_sector(data);
 				break;
 
 			case COMMAND_SCAN_ID:
-				if (LOG) logerror("%s WD2010 '%s' SCAN ID\n", machine().describe_context(), tag());
+				LOG("%s WD2010 SCAN ID\n", machine().describe_context());
 				scan_id(data);
 				break;
 
 			case COMMAND_WRITE_FORMAT:
-				if (LOG) logerror("%s WD2010 '%s' WRITE FORMAT\n", machine().describe_context(), tag());
+				LOG("%s WD2010 WRITE FORMAT\n", machine().describe_context());
 				format(data);
 				break;
 			}
@@ -358,9 +358,9 @@ WRITE8_MEMBER(wd2010_device::write)
 //-------------------------------------------------
 //  compute_correction -
 //-------------------------------------------------
-void wd2010_device::compute_correction(UINT8 data)
+void wd2010_device::compute_correction(uint8_t data)
 {
-	UINT8 newstatus = STATUS_RDY | STATUS_SC;
+	uint8_t newstatus = STATUS_RDY | STATUS_SC;
 	complete_cmd(newstatus);
 }
 
@@ -368,9 +368,9 @@ void wd2010_device::compute_correction(UINT8 data)
 //-------------------------------------------------
 //  set_parameter -
 //-------------------------------------------------
-void wd2010_device::set_parameter(UINT8 data)
+void wd2010_device::set_parameter(uint8_t data)
 {
-	UINT8 newstatus = STATUS_RDY | STATUS_SC;
+	uint8_t newstatus = STATUS_RDY | STATUS_SC;
 	complete_cmd(newstatus);
 }
 
@@ -378,9 +378,9 @@ void wd2010_device::set_parameter(UINT8 data)
 //-------------------------------------------------
 //  restore -
 //-------------------------------------------------
-void wd2010_device::restore(UINT8 data)
+void wd2010_device::restore(uint8_t data)
 {
-	UINT8 newstatus = STATUS_RDY | STATUS_SC;
+	uint8_t newstatus = STATUS_RDY | STATUS_SC;
 
 	m_out_intrq_cb(CLEAR_LINE); // reset INTRQ, errors, set BUSY, CIP
 	m_error = 0;
@@ -450,9 +450,9 @@ void wd2010_device::restore(UINT8 data)
 // FIXME : step rate, drive change (!)
 
 // NOT IMPLEMENTED: IMPLIED SEEK ("wait until rising edge of SC signal")
-void wd2010_device::seek(UINT8 data)
+void wd2010_device::seek(uint8_t data)
 {
-	UINT8 newstatus = STATUS_RDY | STATUS_SC;
+	uint8_t newstatus = STATUS_RDY | STATUS_SC;
 
 	m_out_intrq_cb(CLEAR_LINE); // reset INTRQ, errors, set BUSY, CIP
 	m_error = 0;
@@ -467,7 +467,7 @@ void wd2010_device::seek(UINT8 data)
 
 	// Calculate number of steps by comparing the cylinder registers
 	//           HI/LO with the internally stored position.
-	UINT32 cylinder_registers = CYLINDER;
+	uint32_t cylinder_registers = CYLINDER;
 	if (m_present_cylinder > cylinder_registers)
 	{
 		step_pulses = m_present_cylinder - cylinder_registers;
@@ -535,9 +535,9 @@ void wd2010_device::seek(UINT8 data)
 //-------------------------------------------------
 // FIXME: multiple sector transfers, ID / CYL / HEAD / SIZE match
 //        + ERROR HANDLING (...)
-void wd2010_device::read_sector(UINT8 data)
+void wd2010_device::read_sector(uint8_t data)
 {
-	UINT8 newstatus = STATUS_RDY | STATUS_SC;
+	uint8_t newstatus = STATUS_RDY | STATUS_SC;
 	int intrq_at_end = 0; // (default) : (I = 1  INTRQ occurs when the command
 
 	m_out_intrq_cb(CLEAR_LINE); // reset INTRQ, errors, set BUSY, CIP
@@ -647,7 +647,7 @@ void wd2010_device::read_sector(UINT8 data)
 //-------------------------------------------------
 // FIXME: SEEK, SEEK_COMPLETE, Drive # change (!)
 // as well as CYL.register + internal CYL.register comparisons
-void wd2010_device::write_sector(UINT8 data)
+void wd2010_device::write_sector(uint8_t data)
 {
 	m_error = 0; // De-assert ERROR + DRQ
 	m_status &= ~(STATUS_DRQ);
@@ -665,9 +665,9 @@ void wd2010_device::write_sector(UINT8 data)
 //-------------------------------------------------
 //  write_sector (stage II)
 //-------------------------------------------------
-void wd2010_device::complete_write_sector(UINT8 data)
+void wd2010_device::complete_write_sector(uint8_t data)
 {
-	UINT8 newstatus = STATUS_RDY | STATUS_SC;
+	uint8_t newstatus = STATUS_RDY | STATUS_SC;
 
 	m_out_bdrq_cb(0); // DE-Assert BDRQ (...and DRQ !)
 	m_status &= ~(STATUS_DRQ);
@@ -729,7 +729,7 @@ void wd2010_device::complete_write_sector(UINT8 data)
 
 	// * does nothing right now *
 // ******************************************************
-void wd2010_device::auto_scan_id(UINT8 data)
+void wd2010_device::auto_scan_id(uint8_t data)
 {
 	static int last_drive;
 
@@ -747,7 +747,7 @@ void wd2010_device::auto_scan_id(UINT8 data)
 // ******************************************************
 
 // What to do here (just update present_cylinder with CYLINDER)...?
-void wd2010_device::update_sdh(UINT8 new_sector_size, UINT8 new_head, UINT16 new_cylinder, UINT8 new_sectornr)
+void wd2010_device::update_sdh(uint8_t new_sector_size, uint8_t new_head, uint16_t new_cylinder, uint8_t new_sectornr)
 {
 	// "Update SDH"
 	/*
@@ -774,9 +774,9 @@ void wd2010_device::update_sdh(UINT8 new_sector_size, UINT8 new_head, UINT16 new
 //  and writes this into the Present Cylinder Position Register.
 
 //  FIXME: NO ID HANDLING (ID FOUND / NOT FOUND), NO BAD BLOCK; NO CRC
-void wd2010_device::scan_id(UINT8 data)
+void wd2010_device::scan_id(uint8_t data)
 {
-	UINT8 newstatus = STATUS_RDY;
+	uint8_t newstatus = STATUS_RDY;
 
 	m_out_intrq_cb(CLEAR_LINE);
 	m_error = 0;
@@ -811,9 +811,9 @@ void wd2010_device::scan_id(UINT8 data)
 // SECTOR NUMBER REG.= number of bytes - 3 (for GAP 1 + 3)
 // = 40 decimal on DEC RD51 with WUTIL 3.2
 //--------------------------------------------------------
-void wd2010_device::format(UINT8 data)
+void wd2010_device::format(uint8_t data)
 {
-	UINT8 newstatus = STATUS_RDY;
+	uint8_t newstatus = STATUS_RDY;
 
 	m_out_intrq_cb(CLEAR_LINE);
 	m_error = 0;
@@ -859,7 +859,7 @@ void wd2010_device::format(UINT8 data)
 		return;
 	}
 
-	//  UINT8 format_sector_count = m_task_file[TASK_FILE_SECTOR_COUNT];
+	//  uint8_t format_sector_count = m_task_file[TASK_FILE_SECTOR_COUNT];
 	//  do
 	//  {
 	//      < WRITE GAP 1 or GAP 3 >
@@ -955,7 +955,7 @@ void wd2010_device::device_timer(emu_timer &timer, device_timer_id tid, int para
 }
 
 // Called by 'device_timer' -
-void wd2010_device::complete_immediate(UINT8 status)
+void wd2010_device::complete_immediate(uint8_t status)
 {
 	// re-evaluate external signals at end of command
 	status &= ~(STATUS_RDY | STATUS_WF | STATUS_SC); // RDY  0x40  / WF 0x20 /  SC 0x10
@@ -983,7 +983,7 @@ void wd2010_device::complete_immediate(UINT8 status)
 	m_out_bcr_cb(1);
 }
 
-void wd2010_device::complete_cmd(UINT8 status)
+void wd2010_device::complete_cmd(uint8_t status)
 {
 	cmd_timer->adjust(attotime::from_msec(1), status);
 }

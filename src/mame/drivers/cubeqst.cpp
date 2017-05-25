@@ -20,12 +20,13 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
 #include "cpu/cubeqcpu/cubeqcpu.h"
-#include "sound/dac.h"
+#include "cpu/m68000/m68000.h"
 #include "machine/ldpr8210.h"
 #include "machine/nvram.h"
-
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
+#include "speaker.h"
 
 class cubeqst_state : public driver_device
 {
@@ -37,18 +38,31 @@ public:
 			m_linecpu(*this, "line_cpu"),
 			m_soundcpu(*this, "sound_cpu"),
 			m_screen(*this, "screen"),
-			m_generic_paletteram_16(*this, "paletteram") { }
+			m_dacs(*this, {
+				"rdac0", "ldac0",
+				"rdac1", "ldac1",
+				"rdac2", "ldac2",
+				"rdac3", "ldac3",
+				"rdac4", "ldac4",
+				"rdac5", "ldac5",
+				"rdac6", "ldac6",
+				"rdac7", "ldac7"
+			}),
+			m_generic_paletteram_16(*this, "paletteram")
+	{
+	}
 
-	std::unique_ptr<UINT8[]> m_depth_buffer;
+	std::unique_ptr<uint8_t[]> m_depth_buffer;
 	int m_video_field;
-	UINT8 m_io_latch;
-	UINT8 m_reset_latch;
+	uint8_t m_io_latch;
+	uint8_t m_reset_latch;
 	required_device<simutrek_special_device> m_laserdisc;
 	required_device<cquestrot_cpu_device> m_rotatecpu;
 	required_device<cquestlin_cpu_device> m_linecpu;
 	required_device<cquestsnd_cpu_device> m_soundcpu;
 	required_device<screen_device> m_screen;
-	required_shared_ptr<UINT16> m_generic_paletteram_16;
+	required_device_array<dac_word_interface, 16> m_dacs;
+	required_shared_ptr<uint16_t> m_generic_paletteram_16;
 	std::unique_ptr<rgb_t[]> m_colormap;
 	DECLARE_WRITE16_MEMBER(palette_w);
 	DECLARE_READ16_MEMBER(line_r);
@@ -68,7 +82,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_cubeqst(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_cubeqst(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank);
 	TIMER_CALLBACK_MEMBER(delayed_bank_swap);
 	void swap_linecpu_banks();
@@ -96,7 +110,7 @@ public:
 void cubeqst_state::video_start()
 {
 	m_video_field = 0;
-	m_depth_buffer = std::make_unique<UINT8[]>(512);
+	m_depth_buffer = std::make_unique<uint8_t[]>(512);
 }
 
 WRITE16_MEMBER(cubeqst_state::palette_w)
@@ -108,7 +122,7 @@ WRITE16_MEMBER(cubeqst_state::palette_w)
 }
 
 /* TODO: This is a simplified version of what actually happens */
-UINT32 cubeqst_state::screen_update_cubeqst(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t cubeqst_state::screen_update_cubeqst(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int y;
 
@@ -125,9 +139,9 @@ UINT32 cubeqst_state::screen_update_cubeqst(screen_device &screen, bitmap_rgb32 
 	{
 		int i;
 		int num_entries = m_linecpu->cubeqcpu_get_ptr_ram_val(y);
-		UINT32 *stk_ram = m_linecpu->cubeqcpu_get_stack_ram();
-		UINT32 *dest = &bitmap.pix32(y);
-		UINT32 pen;
+		uint32_t *stk_ram = m_linecpu->cubeqcpu_get_stack_ram();
+		uint32_t *dest = &bitmap.pix32(y);
+		uint32_t pen;
 
 		/* Zap the depth buffer */
 		memset(m_depth_buffer.get(), 0xff, 512);
@@ -327,7 +341,7 @@ WRITE16_MEMBER(cubeqst_state::io_w)
 
 READ16_MEMBER(cubeqst_state::io_r)
 {
-	UINT16 port_data = ioport("IO")->read();
+	uint16_t port_data = ioport("IO")->read();
 
 	/*
 	     Certain bits depend on Q7 of the IO latch:
@@ -447,7 +461,7 @@ void cubeqst_state::machine_start()
 	m_colormap = std::make_unique<rgb_t[]>(65536);
 	for (i = 0; i < 65536; ++i)
 	{
-		UINT8 a, r, g, b, y;
+		uint8_t a, r, g, b, y;
 
 		a = (i >> 3) & 1;
 		b = (i >> 0) & 7;
@@ -485,18 +499,10 @@ void cubeqst_state::machine_reset()
 /* Called by the sound CPU emulation */
 WRITE16_MEMBER( cubeqst_state::sound_dac_w )
 {
-	static const char *const dacs[] =
-	{
-		"rdac0", "ldac0",
-		"rdac1", "ldac1",
-		"rdac2", "ldac2",
-		"rdac3", "ldac3",
-		"rdac4", "ldac4",
-		"rdac5", "ldac5",
-		"rdac6", "ldac6",
-		"rdac7", "ldac7"
-	};
-	machine().device<dac_device>(dacs[data & 15])->write_signed16((data & 0xfff0) ^ 0x8000);
+	/// d0 selects between 4051.1d (right, d0=1) and 4051.3d (left, d0=0)
+	/// d1-d3 select the channel
+	/// d4-d11 are sent to the 7521 dac, d11 is inverted
+	m_dacs[data & 15]->write((data >> 4) ^ 0x800);
 }
 
 
@@ -506,7 +512,7 @@ WRITE16_MEMBER( cubeqst_state::sound_dac_w )
  *
  *************************************/
 
-static MACHINE_CONFIG_START( cubeqst, cubeqst_state )
+static MACHINE_CONFIG_START( cubeqst )
 	MCFG_CPU_ADD("main_cpu", M68000, XTAL_16MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(m68k_program_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cubeqst_state,  vblank)
@@ -542,38 +548,39 @@ static MACHINE_CONFIG_START( cubeqst, cubeqst_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_DAC_ADD("rdac0")
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.125)
-	MCFG_DAC_ADD("ldac0")
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.125)
-	MCFG_DAC_ADD("rdac1")
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.125)
-	MCFG_DAC_ADD("ldac1")
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.125)
-	MCFG_DAC_ADD("rdac2")
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.125)
-	MCFG_DAC_ADD("ldac2")
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.125)
-	MCFG_DAC_ADD("rdac3")
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.125)
-	MCFG_DAC_ADD("ldac3")
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.125)
-	MCFG_DAC_ADD("rdac4")
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.125)
-	MCFG_DAC_ADD("ldac4")
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.125)
-	MCFG_DAC_ADD("rdac5")
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.125)
-	MCFG_DAC_ADD("ldac5")
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.125)
-	MCFG_DAC_ADD("rdac6")
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.125)
-	MCFG_DAC_ADD("ldac6")
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.125)
-	MCFG_DAC_ADD("rdac7")
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.125)
-	MCFG_DAC_ADD("ldac7")
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.125)
+	MCFG_SOUND_ADD("rdac0", AD7521, 0) MCFG_SOUND_ROUTE(0, "rspeaker", 0.125) // ad7521jn.2d (59) + cd4051be.1d (24) + 1500pf.c22 (34) + tl074cn.1b (53) + r10k.rn1 (30)
+	MCFG_SOUND_ADD("ldac0", AD7521, 0) MCFG_SOUND_ROUTE(0, "lspeaker", 0.125) // ad7521jn.2d (59) + cd4051be.3d (24) + 1500pf.c13 (34) + tl074cn.3b (53) + r10k.rn3 (30)
+	MCFG_SOUND_ADD("rdac1", AD7521, 0) MCFG_SOUND_ROUTE(0, "rspeaker", 0.125) // ad7521jn.2d (59) + cd4051be.1d (24) + 1500pf.c21 (34) + tl074cn.1c (53) + r10k.rn2 (30)
+	MCFG_SOUND_ADD("ldac1", AD7521, 0) MCFG_SOUND_ROUTE(0, "lspeaker", 0.125) // ad7521jn.2d (59) + cd4051be.3d (24) + 1500pf.c12 (34) + tl074cn.3c (53) + r10k.rn4 (30)
+	MCFG_SOUND_ADD("rdac2", AD7521, 0) MCFG_SOUND_ROUTE(0, "rspeaker", 0.125) // ad7521jn.2d (59) + cd4051be.1d (24) + 1500pf.c20 (34) + tl074cn.1c (53) + r10k.rn2 (30)
+	MCFG_SOUND_ADD("ldac2", AD7521, 0) MCFG_SOUND_ROUTE(0, "lspeaker", 0.125) // ad7521jn.2d (59) + cd4051be.3d (24) + 1500pf.c11 (34) + tl074cn.3c (53) + r10k.rn4 (30)
+	MCFG_SOUND_ADD("rdac3", AD7521, 0) MCFG_SOUND_ROUTE(0, "rspeaker", 0.125) // ad7521jn.2d (59) + cd4051be.1d (24) + 1500pf.c19 (34) + tl074cn.1b (53) + r10k.rn1 (30)
+	MCFG_SOUND_ADD("ldac3", AD7521, 0) MCFG_SOUND_ROUTE(0, "lspeaker", 0.125) // ad7521jn.2d (59) + cd4051be.3d (24) + 1500pf.c10 (34) + tl074cn.3b (53) + r10k.rn3 (30)
+	MCFG_SOUND_ADD("rdac4", AD7521, 0) MCFG_SOUND_ROUTE(0, "rspeaker", 0.125) // ad7521jn.2d (59) + cd4051be.1d (24) + 1500pf.c18 (34) + tl074cn.1c (53) + r10k.rn2 (30)
+	MCFG_SOUND_ADD("ldac4", AD7521, 0) MCFG_SOUND_ROUTE(0, "lspeaker", 0.125) // ad7521jn.2d (59) + cd4051be.3d (24) + 1500pf.c9  (34) + tl074cn.3c (53) + r10k.rn4 (30)
+	MCFG_SOUND_ADD("rdac5", AD7521, 0) MCFG_SOUND_ROUTE(0, "rspeaker", 0.125) // ad7521jn.2d (59) + cd4051be.1d (24) + 1500pf.c17 (34) + tl074cn.1b (53) + r10k.rn1 (30)
+	MCFG_SOUND_ADD("ldac5", AD7521, 0) MCFG_SOUND_ROUTE(0, "lspeaker", 0.125) // ad7521jn.2d (59) + cd4051be.3d (24) + 1500pf.c8  (34) + tl074cn.3b (53) + r10k.rn3 (30)
+	MCFG_SOUND_ADD("rdac6", AD7521, 0) MCFG_SOUND_ROUTE(0, "rspeaker", 0.125) // ad7521jn.2d (59) + cd4051be.1d (24) + 1500pf.c16 (34) + tl074cn.1c (53) + r10k.rn2 (30)
+	MCFG_SOUND_ADD("ldac6", AD7521, 0) MCFG_SOUND_ROUTE(0, "lspeaker", 0.125) // ad7521jn.2d (59) + cd4051be.3d (24) + 1500pf.c7  (34) + tl074cn.3c (53) + r10k.rn4 (30)
+	MCFG_SOUND_ADD("rdac7", AD7521, 0) MCFG_SOUND_ROUTE(0, "rspeaker", 0.125) // ad7521jn.2d (59) + cd4051be.1d (24) + 1500pf.c15 (34) + tl074cn.1b (53) + r10k.rn1 (30)
+	MCFG_SOUND_ADD("ldac7", AD7521, 0) MCFG_SOUND_ROUTE(0, "lspeaker", 0.125) // ad7521jn.2d (59) + cd4051be.3d (24) + 1500pf.c6  (34) + tl074cn.3b (53) + r10k.rn3 (30)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "rdac0", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac0", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "ldac0", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac0", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "rdac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac1", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "ldac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac1", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "rdac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac2", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "ldac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac2", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "rdac3", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac3", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "ldac3", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac3", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "rdac4", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac4", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "ldac4", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac4", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "rdac5", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac5", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "ldac5", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac5", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "rdac6", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac6", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "ldac6", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac6", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "rdac7", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac7", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "ldac7", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac7", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -762,5 +769,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, cubeqst,  0,       cubeqst, cubeqst, driver_device, 0, ROT0, "Simutrek", "Cube Quest (01/04/84)", 0 )
-GAME( 1983, cubeqsta, cubeqst, cubeqst, cubeqst, driver_device, 0, ROT0, "Simutrek", "Cube Quest (12/30/83)", 0 )
+GAME( 1983, cubeqst,  0,       cubeqst, cubeqst, cubeqst_state, 0, ROT0, "Simutrek", "Cube Quest (01/04/84)", 0 )
+GAME( 1983, cubeqsta, cubeqst, cubeqst, cubeqst, cubeqst_state, 0, ROT0, "Simutrek", "Cube Quest (12/30/83)", 0 )

@@ -21,6 +21,7 @@
 #include <list>
 #include <vector>
 #include <memory>
+#include <map>
 #include <unordered_map>
 #include <unordered_set>
 
@@ -28,6 +29,9 @@
 #include "emucore.h"
 #include "eminline.h"
 #include "profiler.h"
+
+// http interface helpers
+#include "http.h"
 
 // commonly-referenced utilities imported from lib/util
 #include "palette.h"
@@ -53,8 +57,7 @@
 
 // define machine_config_constructor here due to circular dependency
 // between devices and the machine config
-class machine_config;
-typedef device_t * (*machine_config_constructor)(machine_config &config, device_t *owner, device_t *device);
+typedef void (*machine_config_constructor)(machine_config &config, device_t *owner, device_t *device);
 
 // I/O
 #include "input.h"
@@ -66,22 +69,21 @@ typedef device_t * (*machine_config_constructor)(machine_config &config, device_
 #include "devfind.h"
 #include "distate.h"
 #include "dimemory.h"
+#include "dirom.h"
 #include "diexec.h"
 #include "opresolv.h"
+#include "dipalette.h"
 #include "digfx.h"
 #include "diimage.h"
-#include "dioutput.h"
 #include "diserial.h"
 #include "dislot.h"
 #include "disound.h"
 #include "divideo.h"
 #include "dinvram.h"
-#include "dirtc.h"
 #include "didisasm.h"
 #include "schedule.h"
 #include "timer.h"
 #include "dinetwork.h"
-#include "dipty.h"
 
 // machine and driver configuration
 #include "mconfig.h"
@@ -98,23 +100,23 @@ typedef device_t * (*machine_config_constructor)(machine_config &config, device_
 
 // video-related
 #include "drawgfx.h"
-#include "tilemap.h"
 #include "emupal.h"
-#include "screen.h"
+#include "tilemap.h"
 #include "video.h"
 
 // sound-related
 #include "sound.h"
-#include "speaker.h"
 
 // generic helpers
 #include "devcb.h"
-#include "dispatch.h"
 #include "drivers/xtal.h"
 #include "bookkeeping.h"
 #include "video/generic.h"
 
 // member templates that don't like incomplete types
 #include "device.ipp"
+
+template <class DriverClass> void game_driver::driver_init_helper_impl<DriverClass>::invoke(driver_init_helper const &helper, running_machine &machine)
+{ (machine.driver_data<DriverClass>()->*static_cast<driver_init_helper_impl<DriverClass> const &>(helper).m_method)(); }
 
 #endif  /* __EMU_H__ */

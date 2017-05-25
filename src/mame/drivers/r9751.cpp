@@ -81,6 +81,8 @@ public:
 	{
 	}
 
+	void kbd_put(u8 data);
+
 	DECLARE_READ32_MEMBER(r9751_mmio_5ff_r);
 	DECLARE_WRITE32_MEMBER(r9751_mmio_5ff_w);
 	DECLARE_READ32_MEMBER(r9751_mmio_ff01_r);
@@ -100,50 +102,55 @@ private:
 	required_device<pdc_device> m_pdc;
 	required_device<wd33c93_device> m_wd33c93;
 	required_device<generic_terminal_device> m_terminal;
-	required_shared_ptr<UINT32> m_main_ram;
+	required_shared_ptr<uint32_t> m_main_ram;
 
 	m68000_base_device* ptr_m68000;
 
 	// Begin registers
-	UINT32 reg_ff050004;
-	UINT32 reg_fff80040;
-	UINT32 fdd_dest_address; // 5FF080B0
-	UINT32 fdd_cmd_complete;
-	UINT32 smioc_out_addr;
-	UINT32 smioc_dma_bank;
-	UINT32 fdd_dma_bank;
+	uint32_t reg_ff050004;
+	uint32_t reg_fff80040;
+	uint32_t fdd_dest_address; // 5FF080B0
+	uint32_t fdd_cmd_complete;
+	uint32_t smioc_out_addr;
+	uint32_t smioc_dma_bank;
+	uint32_t fdd_dma_bank;
 	attotime timer_32khz_last;
+	uint8_t m_term_data;
 	// End registers
 
 	address_space *m_mem;
 
 	// functions
-	UINT32 swap_uint32( UINT32 val );
-	UINT32 debug_a6();
-	UINT32 debug_a5();
-	UINT32 debug_a5_20();
+	uint32_t swap_uint32( uint32_t val );
+	uint32_t debug_a6();
+	uint32_t debug_a5();
+	uint32_t debug_a5_20();
 
 	virtual void machine_reset() override;
 };
 
+void r9751_state::kbd_put(u8 data)
+{
+	m_term_data = data;
+}
 
-UINT32 r9751_state::swap_uint32( UINT32 val )
+uint32_t r9751_state::swap_uint32( uint32_t val )
 {
 	val = ((val << 8) & 0xFF00FF00 ) | ((val >> 8) & 0xFF00FF );
 	return (val << 16) | (val >> 16);
 }
 
-UINT32 r9751_state::debug_a6()
+uint32_t r9751_state::debug_a6()
 {
 	return m_maincpu->space(AS_PROGRAM).read_dword(ptr_m68000->dar[14] + 4);
 }
 
-UINT32 r9751_state::debug_a5()
+uint32_t r9751_state::debug_a5()
 {
 	return m_maincpu->space(AS_PROGRAM).read_dword(ptr_m68000->dar[13]);
 }
 
-UINT32 r9751_state::debug_a5_20()
+uint32_t r9751_state::debug_a5_20()
 {
 	return m_maincpu->space(AS_PROGRAM).read_dword(ptr_m68000->dar[13] + 0x20);
 }
@@ -151,7 +158,7 @@ UINT32 r9751_state::debug_a5_20()
 READ8_MEMBER(r9751_state::pdc_dma_r)
 {
 	/* This callback function takes the value written to 0xFF01000C as the bank offset */
-	UINT32 address = (fdd_dma_bank & 0x7FFFF800) + (offset&0x3FFFF);
+	uint32_t address = (fdd_dma_bank & 0x7FFFF800) + (offset&0x3FFFF);
 	if(TRACE_DMA) logerror("DMA READ: %08X DATA: %08X\n", address, m_maincpu->space(AS_PROGRAM).read_byte(address));
 	return m_maincpu->space(AS_PROGRAM).read_byte(address);
 }
@@ -159,7 +166,7 @@ READ8_MEMBER(r9751_state::pdc_dma_r)
 WRITE8_MEMBER(r9751_state::pdc_dma_w)
 {
 	/* This callback function takes the value written to 0xFF01000C as the bank offset */
-	UINT32 address = (fdd_dma_bank & 0x7FFFF800) + (m_pdc->fdd_68k_dma_address&0x3FFFF);
+	uint32_t address = (fdd_dma_bank & 0x7FFFF800) + (m_pdc->fdd_68k_dma_address&0x3FFFF);
 	m_maincpu->space(AS_PROGRAM).write_byte(address,data);
 	if(TRACE_DMA) logerror("DMA WRITE: %08X DATA: %08X\n", address,data);
 }
@@ -191,8 +198,8 @@ DRIVER_INIT_MEMBER(r9751_state,r9751)
 
 void r9751_state::machine_reset()
 {
-	UINT8 *rom = memregion("prom")->base();
-	UINT32 *ram = m_main_ram;
+	uint8_t *rom = memregion("prom")->base();
+	uint32_t *ram = m_main_ram;
 
 	memcpy(ram, rom, 8);
 
@@ -205,7 +212,7 @@ void r9751_state::machine_reset()
 ******************************************************************************/
 READ32_MEMBER( r9751_state::r9751_mmio_5ff_r )
 {
-	UINT32 data;
+	uint32_t data;
 
 	switch(offset << 2)
 	{
@@ -237,7 +244,7 @@ READ32_MEMBER( r9751_state::r9751_mmio_5ff_r )
 
 WRITE32_MEMBER( r9751_state::r9751_mmio_5ff_w )
 {
-	UINT8 data_b0, data_b1;
+	uint8_t data_b0, data_b1;
 	/* Unknown mask */
 	if (mem_mask != 0xFFFFFFFF)
 		logerror("Mask found: %08X Register: %08X PC: %08X\n", mem_mask, offset << 2 | 0x5FF00000, space.machine().firstcpu->pc());
@@ -311,8 +318,8 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_5ff_w )
 			if(TRACE_FDC)logerror("--- FDD SET PDC Port 38: %X\n",m_pdc->reg_p38);
 			break;
 		case 0x80B0: /* FDD command address register */
-			UINT32 fdd_scsi_command;
-			UINT32 fdd_scsi_command2;
+			uint32_t fdd_scsi_command;
+			uint32_t fdd_scsi_command2;
 			unsigned char c_fdd_scsi_command[8]; // Array for SCSI command
 			int scsi_lba; // FDD LBA location here, extracted from command
 
@@ -356,7 +363,7 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_5ff_w )
 ******************************************************************************/
 READ32_MEMBER( r9751_state::r9751_mmio_ff01_r )
 {
-	//UINT32 data;
+	//uint32_t data;
 
 	switch(offset << 2)
 	{
@@ -390,7 +397,7 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_ff01_w )
 
 READ32_MEMBER( r9751_state::r9751_mmio_ff05_r )
 {
-	UINT32 data;
+	uint32_t data;
 
 	switch(offset << 2)
 	{
@@ -438,7 +445,7 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_ff05_w )
 
 READ32_MEMBER( r9751_state::r9751_mmio_fff8_r )
 {
-	UINT32 data;
+	uint32_t data;
 
 	switch(offset << 2)
 	{
@@ -492,7 +499,7 @@ INPUT_PORTS_END
  Machine Drivers
 ******************************************************************************/
 
-static MACHINE_CONFIG_START( r9751, r9751_state )
+static MACHINE_CONFIG_START( r9751 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68030, 20000000)
 	MCFG_CPU_PROGRAM_MAP(r9751_mem)
@@ -500,6 +507,7 @@ static MACHINE_CONFIG_START( r9751, r9751_state )
 
 	/* video hardware */
 	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(r9751_state, kbd_put))
 
 	/* disk hardware */
 	MCFG_DEVICE_ADD("pdc", PDC, 0)
@@ -524,7 +532,10 @@ MACHINE_CONFIG_END
 ROM_START(r9751)
 	ROM_REGION32_BE(0x00010000, "prom", 0)
 	ROM_SYSTEM_BIOS(0, "prom34",  "PROM Version 3.4")
-	ROMX_LOAD( "p-n_98d4643__abaco_v3.4__(49fe7a)__j221.27512.bin", 0x0000, 0x10000, CRC(9fb19a85) SHA1(c861e15a2fc9a4ef689c2034c53fbb36f17f7da6), ROM_GROUPWORD | ROM_BIOS(1) ) // Label: "P/N 98D4643 // ABACO V3.4 // (49FE7A) // J221" 27128 @Unknown
+	ROMX_LOAD( "p-n_98d4643__abaco_v3.4__(49fe7a)__j221.27512.bin", 0x0000, 0x10000, CRC(9fb19a85) SHA1(c861e15a2fc9a4ef689c2034c53fbb36f17f7da6), ROM_GROUPWORD | ROM_BIOS(1) ) // Label: "P/N 98D4643 // ABACO V3.4 // (49FE7A) // J221" 27512 @Unknown
+
+	ROM_SYSTEM_BIOS(1, "prom42", "PROM Version 4.2")
+	ROMX_LOAD( "98d5731__zebra_v4.2__4cd79d.u5", 0x0000, 0x10000, CRC(e640f8df) SHA1(a9e4fa271d7f2f3a134e2120932ec088d5b8b007), ROM_GROUPWORD | ROM_BIOS(2) ) // Label: 98D5731 // ZEBRA V4.2 // 4CD79D 27512 @Unknown
 ROM_END
 
 
@@ -533,5 +544,5 @@ ROM_END
  Drivers
 ******************************************************************************/
 
-/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT      COMPANY                     FULLNAME                                                    FLAGS */
-COMP( 1988, r9751,   0,          0,      r9751,   r9751, r9751_state, r9751,      "ROLM Systems, Inc.",   "ROLM 9751 Model 10", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+//    YEAR  NAME     PARENT      COMPAT  MACHINE  INPUT  STATE        INIT      COMPANY                 FULLNAME              FLAGS
+COMP( 1988, r9751,   0,          0,      r9751,   r9751, r9751_state, r9751,    "ROLM Systems, Inc.",   "ROLM 9751 Model 10", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

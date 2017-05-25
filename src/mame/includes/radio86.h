@@ -56,14 +56,14 @@ public:
 
 	virtual void video_start() override;
 
-	UINT8 m_tape_value;
-	UINT8 m_mikrosha_font_page;
+	uint8_t m_tape_value;
+	uint8_t m_mikrosha_font_page;
 	int m_keyboard_mask;
-	std::unique_ptr<UINT8[]> m_radio_ram_disk;
-	UINT8 m_romdisk_lsb;
-	UINT8 m_romdisk_msb;
-	UINT8 m_disk_sel;
-	const UINT8 *m_charmap;
+	std::unique_ptr<uint8_t[]> m_radio_ram_disk;
+	uint8_t m_romdisk_lsb;
+	uint8_t m_romdisk_msb;
+	uint8_t m_disk_sel;
+	const uint8_t *m_charmap;
 	DECLARE_READ8_MEMBER(radio_cpu_state_r);
 	DECLARE_READ8_MEMBER(radio_io_r);
 	DECLARE_WRITE8_MEMBER(radio_io_w);

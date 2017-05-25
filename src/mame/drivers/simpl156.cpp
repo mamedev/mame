@@ -91,12 +91,16 @@ Are the OKI M6295 clocks from Heavy Smash are correct at least for the Mitchell 
 */
 
 #include "emu.h"
+#include "includes/simpl156.h"
+
 #include "machine/decocrpt.h"
 #include "machine/deco156.h"
 #include "cpu/arm/arm.h"
-#include "includes/simpl156.h"
 #include "machine/eepromser.h"
 #include "sound/okim6295.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 static INPUT_PORTS_START( simpl156 )
 	PORT_START("IN0")
@@ -135,7 +139,7 @@ WRITE32_MEMBER(simpl156_state::simpl156_eeprom_w)
 
 	//okibank = data & 0x07;
 
-	m_okimusic->set_bank_base(0x40000 * (data & 0x7));
+	m_okimusic->set_rom_bank(data & 0x7);
 
 	m_eeprom->clk_write(BIT(data, 5) ? ASSERT_LINE : CLEAR_LINE);
 	m_eeprom->di_write(BIT(data, 4));
@@ -376,7 +380,7 @@ DECOSPR_PRIORITY_CB_MEMBER(simpl156_state::pri_callback)
 }
 
 
-static MACHINE_CONFIG_START( chainrec, simpl156_state )
+static MACHINE_CONFIG_START( chainrec )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM, 28000000 /* /4 */) /*DE156*/ /* 7.000 MHz */ /* measured at 7.. seems to need 28? */
@@ -422,11 +426,11 @@ static MACHINE_CONFIG_START( chainrec, simpl156_state )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("okisfx", 32220000/32, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("okisfx", 32220000/32, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.6)
 
-	MCFG_OKIM6295_ADD("okimusic", 32220000/16, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("okimusic", 32220000/16, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.2)
 MACHINE_CONFIG_END
@@ -458,7 +462,7 @@ static MACHINE_CONFIG_DERIVED( mitchell156, chainrec )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(mitchell156_map)
 
-	MCFG_OKIM6295_REPLACE("okimusic", 32220000/32, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_REPLACE("okimusic", 32220000/32, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.2)
 MACHINE_CONFIG_END
@@ -1017,16 +1021,16 @@ ROM_END
 
 DRIVER_INIT_MEMBER(simpl156_state,simpl156)
 {
-	UINT8 *rom = memregion("okimusic")->base();
+	uint8_t *rom = memregion("okimusic")->base();
 	int length = memregion("okimusic")->bytes();
-	dynamic_buffer buf1(length);
+	std::vector<uint8_t> buf1(length);
 
-	UINT32 x;
+	uint32_t x;
 
 	/* hmm low address line goes to banking chip instead? */
 	for (x = 0; x < length; x++)
 	{
-		UINT32 addr;
+		uint32_t addr;
 
 		addr = BITSWAP24 (x,23,22,21,0, 20,
 							19,18,17,16,

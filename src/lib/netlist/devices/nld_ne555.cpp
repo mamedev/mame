@@ -1,13 +1,53 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * nld_NE555.c
+/*!
+ *  \file nld_NE555.cpp
  *
+ *  \page NE555 NE555: PRECISION TIMERS
+ *
+ *  The Swiss army knife for timing purposes
+ *
+ *  \section ne555_1 Synopsis
+ *
+ *  \snippet devsyn.dox.h NE555 synopsis
+ *  \snippet devsyn.dox.h NE555_DIP synopsis
+
+ *  \section ne555_11 "C" Synopsis
+ *
+ *  \snippet devsyn.dox.h NE555 csynopsis
+ *  \snippet devsyn.dox.h NE555_DIP csynopsis
+ *
+ *  For the \c NE555 use verbose pin assignments like \c name.TRIG or \c name.OUT.
+ *  For the \c NE555_DIP use pin numbers like \c name.1.
+ *
+ *  \section ne555_2 Connection Diagram
+ *
+ *  <pre>
+ *          +--------+
+ *      GND |1  ++  8| VCC
+ *     TRIG |2      7| DISCH
+ *      OUT |3      6| THRES
+ *    RESET |4      5| CONT
+ *          +--------+
+ *  </pre>
+ *
+ *  Naming conventions follow Texas Instruments datasheet
+ *
+ *  \section ne555_3 Function Table
+ *
+ *  Please refer to the datasheet.
+ *
+ *  \section ne555_4 Limitations
+ *
+ *  Internal resistor network currently fixed to 5k.
+ *
+ *  \section ne555_5 Example
+ *  \snippet ne555_astable.c ne555 example
  */
 
 #include "nld_ne555.h"
-#include "analog/nld_twoterm.h"
-#include <solver/nld_solver.h>
+#include "../analog/nlid_twoterm.h"
+#include "../solver/nld_solver.h"
 
 #define R_OFF (1E20)
 #define R_ON (25)   // Datasheet states a maximum discharge of 200mA, R = 5V / 0.2
@@ -35,19 +75,19 @@ namespace netlist
 			register_subalias("DISCH", m_RDIS.m_P); // Pin 7
 			register_subalias("VCC",  m_R1.m_P);    // Pin 8
 
-			connect_late(m_R1.m_N, m_R2.m_P);
-			connect_late(m_R2.m_N, m_R3.m_P);
-			connect_late(m_RDIS.m_N, m_R3.m_N);
+			connect(m_R1.m_N, m_R2.m_P);
+			connect(m_R2.m_N, m_R3.m_P);
+			connect(m_RDIS.m_N, m_R3.m_N);
 		}
 
 		NETLIB_UPDATEI();
 		NETLIB_RESETI();
 
 	protected:
-		NETLIB_SUB(R) m_R1;
-		NETLIB_SUB(R) m_R2;
-		NETLIB_SUB(R) m_R3;
-		NETLIB_SUB(R) m_RDIS;
+		analog::NETLIB_SUB(R_base) m_R1;
+		analog::NETLIB_SUB(R_base) m_R2;
+		analog::NETLIB_SUB(R_base) m_R3;
+		analog::NETLIB_SUB(R_base) m_RDIS;
 
 		logic_input_t m_RESET;
 		analog_input_t m_THRES;
@@ -80,7 +120,7 @@ namespace netlist
 	inline nl_double NETLIB_NAME(NE555)::clamp(const nl_double v, const nl_double a, const nl_double b)
 	{
 		nl_double ret = v;
-		nl_double vcc = TERMANALOG(m_R1.m_P);
+		nl_double vcc = m_R1.m_P();
 
 		if (ret >  vcc - a)
 			ret = vcc - a;
@@ -96,6 +136,7 @@ namespace netlist
 		m_R3.do_reset();
 		m_RDIS.do_reset();
 
+		/* FIXME make resistance a parameter, properly model other variants */
 		m_R1.set_R(5000);
 		m_R2.set_R(5000);
 		m_R3.set_R(5000);
@@ -108,9 +149,9 @@ namespace netlist
 	{
 		// FIXME: assumes GND is connected to 0V.
 
-		nl_double vt = clamp(TERMANALOG(m_R2.m_P), 0.7, 1.4);
-		bool bthresh = (INPANALOG(m_THRES) > vt);
-		bool btrig = (INPANALOG(m_TRIG) > clamp(TERMANALOG(m_R2.m_N), 0.7, 1.4));
+		nl_double vt = clamp(m_R2.m_P(), 0.7, 1.4);
+		bool bthresh = (m_THRES() > vt);
+		bool btrig = (m_TRIG() > clamp(m_R2.m_N(), 0.7, 1.4));
 
 		if (!btrig)
 		{
@@ -121,19 +162,19 @@ namespace netlist
 			m_ff = false;
 		}
 
-		bool out = (!INPLOGIC(m_RESET) ? false : m_ff);
+		bool out = (!m_RESET() ? false : m_ff);
 
 		if (m_last_out && !out)
 		{
 			m_RDIS.update_dev();
-			OUTANALOG(m_OUT, TERMANALOG(m_R3.m_N));
+			m_OUT.push(m_R3.m_N());
 			m_RDIS.set_R(R_ON);
 		}
 		else if (!m_last_out && out)
 		{
 			m_RDIS.update_dev();
 			// FIXME: Should be delayed by 100ns
-			OUTANALOG(m_OUT, TERMANALOG(m_R1.m_P));
+			m_OUT.push(m_R1.m_P());
 			m_RDIS.set_R(R_OFF);
 		}
 		m_last_out = out;

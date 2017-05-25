@@ -7,13 +7,13 @@
 //============================================================
 
 // standard windows headers
-#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <shlwapi.h>
 #include <tchar.h>
 
 // MAME headers
 #include "osdcore.h"
+#include "strformat.h"
 
 // MAMEOS headers
 #include "strconv.h"
@@ -47,6 +47,7 @@ private:
 	bool                m_is_first;               // true if this is the first entry
 	entry               m_entry;                  // current entry's data
 	WIN32_FIND_DATA     m_data;                   // current raw data
+	std::string         m_name;                   // converted name of directory
 };
 
 //============================================================
@@ -69,8 +70,6 @@ win_directory::win_directory()
 win_directory::~win_directory()
 {
 	// free any data associated
-	if (m_entry.name != nullptr)
-		osd_free((void *)m_entry.name);
 	if (m_find != INVALID_HANDLE_VALUE)
 		FindClose(m_find);
 }
@@ -82,13 +81,6 @@ win_directory::~win_directory()
 
 const directory::entry *win_directory::read()
 {
-	// if we've previously allocated a name, free it now
-	if (m_entry.name != nullptr)
-	{
-		osd_free((void *)m_entry.name);
-		m_entry.name = nullptr;
-	}
-
 	// if this isn't the first file, do a find next
 	if (!m_is_first)
 	{
@@ -98,7 +90,8 @@ const directory::entry *win_directory::read()
 	m_is_first = false;
 
 	// extract the data
-	m_entry.name = utf8_from_tstring(m_data.cFileName);
+	osd::text::from_tstring(m_name, m_data.cFileName);
+	m_entry.name = m_name.c_str();
 	m_entry.type = win_attributes_to_entry_type(m_data.dwFileAttributes);
 	m_entry.size = m_data.nFileSizeLow | (std::uint64_t(m_data.nFileSizeHigh) << 32);
 	m_entry.last_modified = win_time_point_from_filetime(&m_data.ftLastWriteTime);
@@ -114,20 +107,14 @@ bool win_directory::open_impl(std::string const &dirname)
 {
 	assert(m_find == INVALID_HANDLE_VALUE);
 
-	// convert the path to TCHARs
-	std::unique_ptr<TCHAR, void (*)(void *)> const t_dirname(tstring_from_utf8(dirname.c_str()), &osd_free);
-	if (!t_dirname)
-		return false;
-
 	// append \*.* to the directory name
-	auto const dirfilter_size = _tcslen(t_dirname.get()) + 5;
-	std::unique_ptr<TCHAR []> dirfilter;
-	try { dirfilter.reset(new TCHAR[dirfilter_size]); }
-	catch (...) { return false; }
-	_sntprintf(dirfilter.get(), dirfilter_size, TEXT("%s\\*.*"), t_dirname.get());
+	std::string dirfilter = string_format("%s\\*.*", dirname);
+
+	// convert the path to TCHARs
+	osd::text::tstring t_dirfilter = osd::text::to_tstring(dirfilter);
 
 	// attempt to find the first file
-	m_find = FindFirstFileEx(dirfilter.get(), FindExInfoStandard, &m_data, FindExSearchNameMatch, nullptr, 0);
+	m_find = FindFirstFileEx(t_dirfilter.c_str(), FindExInfoStandard, &m_data, FindExSearchNameMatch, nullptr, 0);
 	return m_find != INVALID_HANDLE_VALUE;
 }
 
@@ -151,4 +138,4 @@ directory::ptr directory::open(std::string const &dirname)
 	return ptr(std::move(dir));
 }
 
-} // namesapce osd
+} // namespace osd

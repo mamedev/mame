@@ -45,12 +45,15 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/sidearms.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/2203intf.h"
 #include "sound/ym2151.h"
-#include "includes/sidearms.h"
+#include "screen.h"
+#include "speaker.h"
 
 void sidearms_state::machine_start()
 {
@@ -63,14 +66,12 @@ WRITE8_MEMBER(sidearms_state::bankswitch_w)
 }
 
 
-/* Turtle Ship input ports are rotated 90 degrees */
-IOPORT_ARRAY_MEMBER(sidearms_state::ports) { "SYSTEM", "P1", "P2", "DSW0", "DSW1" };
-
+// Turtle Ship input ports are rotated 90 degrees
 READ8_MEMBER(sidearms_state::turtship_ports_r)
 {
 	int res = 0;
 	for (int i = 0; i < 5;i++)
-		res |= ((read_safe(m_ports[i], 0) >> offset) & 1) << i;
+		res |= ((m_ports[i].read_safe(0) >> offset) & 1) << i;
 
 	return res;
 }
@@ -592,7 +593,7 @@ static GFXDECODE_START( turtship )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( sidearms, sidearms_state )
+static MACHINE_CONFIG_START( sidearms )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000) /* 4 MHz (?) */
@@ -613,7 +614,7 @@ static MACHINE_CONFIG_START( sidearms, sidearms_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 2*8, 30*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(sidearms_state, screen_update)
-	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
+	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sidearms)
@@ -641,7 +642,7 @@ static MACHINE_CONFIG_START( sidearms, sidearms_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( turtship, sidearms_state )
+static MACHINE_CONFIG_START( turtship )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000) /* 4 MHz (?) */
@@ -661,7 +662,7 @@ static MACHINE_CONFIG_START( turtship, sidearms_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 2*8, 30*8-1 )
-	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
+	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_UPDATE_DRIVER(sidearms_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -689,7 +690,7 @@ static MACHINE_CONFIG_START( turtship, sidearms_state )
 	MCFG_SOUND_ROUTE(3, "mono", 0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( whizz, sidearms_state )
+static MACHINE_CONFIG_START( whizz )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)        /* 4 MHz (?) */
@@ -714,7 +715,7 @@ static MACHINE_CONFIG_START( whizz, sidearms_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 2*8, 30*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(sidearms_state, screen_update)
-	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
+	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", turtship)

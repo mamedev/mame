@@ -32,7 +32,7 @@
 struct objtype_entry
 {
 	objtype_entry *     next;
-	UINT32              type;
+	uint32_t              type;
 	const char *        friendly;
 	void                (*destructor)(void *, size_t);
 };
@@ -367,11 +367,11 @@ void *pool_object_remove(object_pool *pool, void *object, int destruct)
 
 
 /*-------------------------------------------------
-    pool_object_exists - return TRUE if an
+    pool_object_exists - return true if an
     object exists in the pool
 -------------------------------------------------*/
 
-int pool_object_exists(object_pool *pool, object_type type, void *object)
+bool pool_object_exists(object_pool *pool, object_type type, void *object)
 {
 	int hashnum = hash_object(object);
 	object_entry *entry;
@@ -379,9 +379,9 @@ int pool_object_exists(object_pool *pool, object_type type, void *object)
 	/* find the object in question */
 	for (entry = pool->hashtable[hashnum]; entry != nullptr; entry = entry->next)
 		if (entry->object == object && (type == OBJTYPE_WILDCARD || entry->type->type == type))
-			return TRUE;
+			return true;
 
-	return FALSE;
+	return false;
 }
 
 
@@ -418,7 +418,7 @@ object_pool_iterator *pool_iterate_begin(object_pool *pool, object_type type)
     object pool
 -------------------------------------------------*/
 
-int pool_iterate_next(object_pool_iterator *iter, void **objectptr, size_t *sizeptr, object_type *typeptr)
+bool pool_iterate_next(object_pool_iterator *iter, void **objectptr, size_t *sizeptr, object_type *typeptr)
 {
 	/* if no previous entry, find the first */
 	if (iter->last == nullptr)
@@ -435,11 +435,11 @@ int pool_iterate_next(object_pool_iterator *iter, void **objectptr, size_t *size
 			*sizeptr = iter->last->size;
 		if (typeptr != nullptr)
 			*typeptr = iter->last->type->type;
-		return TRUE;
+		return true;
 	}
 
 	/* nothing left */
-	return FALSE;
+	return false;
 }
 
 
@@ -479,7 +479,7 @@ void *pool_malloc_file_line(object_pool *pool, size_t size, const char *file, in
 void *pool_realloc_file_line(object_pool *pool, void *ptr, size_t size, const char *file, int line)
 {
 	if (ptr != nullptr)
-		pool_object_remove(pool, ptr, FALSE);
+		pool_object_remove(pool, ptr, false);
 	ptr = realloc(ptr, size);
 	if (size != 0)
 		pool_object_add_file_line(pool, OBJTYPE_MEMORY, ptr, size, file, line);
@@ -551,7 +551,7 @@ static void report_failure(object_pool *pool, const char *format, ...)
     TESTING FUNCTIONS
 ***************************************************************************/
 
-static int has_memory_error;
+static bool has_memory_error;
 
 
 /*-------------------------------------------------
@@ -561,7 +561,7 @@ static int has_memory_error;
 static void memory_error(const char *message)
 {
 	printf("memory test failure: %s\n", message);
-	has_memory_error = TRUE;
+	has_memory_error = true;
 }
 
 
@@ -578,13 +578,13 @@ static void memory_error(const char *message)
  * @return  An int.
  */
 
-int test_memory_pools(void)
+bool test_memory_pools(void)
 {
 	object_pool *pool;
 	void *ptrs[16];
 	int i;
 
-	has_memory_error = FALSE;
+	has_memory_error = false;
 	pool = pool_alloc_lib(memory_error);
 	memset(ptrs, 0, sizeof(ptrs));
 

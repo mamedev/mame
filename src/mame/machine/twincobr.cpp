@@ -53,7 +53,7 @@ READ16_MEMBER(twincobr_state::twincobr_dsp_r)
 {
 	/* DSP can read data from main CPU RAM via DSP IO port 1 */
 
-	UINT16 input_data = 0;
+	uint16_t input_data = 0;
 	switch (m_main_ram_seg) {
 		case 0x30000:
 		case 0x40000:
@@ -100,7 +100,7 @@ READ16_MEMBER(twincobr_state::wardner_dsp_r)
 {
 	/* DSP can read data from main CPU RAM via DSP IO port 1 */
 
-	UINT16 input_data = 0;
+	uint16_t input_data = 0;
 	switch (m_main_ram_seg) {
 		case 0x7000:
 		case 0x8000:

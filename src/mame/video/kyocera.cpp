@@ -1,7 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
+#include "emu.h"
 #include "includes/kyocera.h"
+
 #include "rendlay.h"
+#include "screen.h"
+
 
 PALETTE_INIT_MEMBER(kc85_state,kc85)
 {
@@ -15,7 +19,7 @@ PALETTE_INIT_MEMBER(tandy200_state,tandy200)
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
 }
 
-UINT32 kc85_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t kc85_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_lcdc0->screen_update(screen, bitmap, cliprect);
 	m_lcdc1->screen_update(screen, bitmap, cliprect);
@@ -31,7 +35,7 @@ UINT32 kc85_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 	return 0;
 }
 
-UINT32 tandy200_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t tandy200_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_lcdc->screen_update(screen, bitmap, cliprect);
 
@@ -43,7 +47,7 @@ static ADDRESS_MAP_START( tandy200_lcdc, AS_0, 8, tandy200_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_FRAGMENT( kc85_video )
+MACHINE_CONFIG_START( kc85_video )
 	MCFG_SCREEN_ADD(SCREEN_TAG, LCD)
 	MCFG_SCREEN_REFRESH_RATE(44)
 	MCFG_SCREEN_UPDATE_DRIVER(kc85_state, screen_update)
@@ -71,7 +75,7 @@ MACHINE_CONFIG_FRAGMENT( kc85_video )
 //  MCFG_HD44103_SLAVE_ADD( "m12", "m11", SCREEN_TAG, HD44103_FS_HIGH, HD44103_DUTY_1_32)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_FRAGMENT( tandy200_video )
+MACHINE_CONFIG_START( tandy200_video )
 	MCFG_SCREEN_ADD(SCREEN_TAG, LCD)
 	MCFG_SCREEN_REFRESH_RATE(80)
 	MCFG_SCREEN_UPDATE_DRIVER(tandy200_state, screen_update)

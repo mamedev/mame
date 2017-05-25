@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "i80130.h"
 
 
@@ -15,7 +16,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type I80130 = &device_creator<i80130_device>;
+DEFINE_DEVICE_TYPE(I80130, i80130_device, "i80130", "I80130")
 
 
 DEVICE_ADDRESS_MAP_START( rom_map, 16, i80130_device )
@@ -30,7 +31,7 @@ ADDRESS_MAP_END
 
 READ16_MEMBER( i80130_device::io_r )
 {
-	UINT16 data = 0;
+	uint16_t data = 0;
 
 	switch (offset)
 	{
@@ -87,17 +88,17 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *i80130_device::device_rom_region() const
+const tiny_rom_entry *i80130_device::device_rom_region() const
 {
 	return ROM_NAME( i80130 );
 }
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( i80130 )
+//  MACHINE_CONFIG_START( i80130 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( i80130 )
+static MACHINE_CONFIG_START( i80130 )
 	MCFG_PIC8259_ADD("pic", DEVWRITELINE(DEVICE_SELF, i80130_device, irq_w), VCC, NOOP)
 
 	MCFG_DEVICE_ADD("pit", PIT8254, 0)
@@ -130,8 +131,8 @@ machine_config_constructor i80130_device::device_mconfig_additions() const
 //  i80130_device - constructor
 //-------------------------------------------------
 
-i80130_device::i80130_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, I80130, "I80130", tag, owner, clock, "i80130", __FILE__),
+i80130_device::i80130_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, I80130, tag, owner, clock),
 		m_pic(*this, "pic"),
 		m_pit(*this, "pit"),
 		m_write_irq(*this),

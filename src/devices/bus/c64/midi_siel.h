@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_C64_MIDI_SIEL_H
+#define MAME_BUS_C64_MIDI_SIEL_H
 
-#ifndef __C64_MIDI_SIEL__
-#define __C64_MIDI_SIEL__
+#pragma once
 
 #include "exp.h"
 #include "machine/6850acia.h"
@@ -27,7 +27,7 @@ class c64_siel_midi_cartridge_device : public device_t,
 {
 public:
 	// construction/destruction
-	c64_siel_midi_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	c64_siel_midi_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -41,8 +41,8 @@ protected:
 	virtual void device_reset() override;
 
 	// device_c64_expansion_card_interface overrides
-	virtual UINT8 c64_cd_r(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2) override;
-	virtual void c64_cd_w(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2) override;
+	virtual uint8_t c64_cd_r(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2) override;
+	virtual void c64_cd_w(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2) override;
 
 private:
 	required_device<acia6850_device> m_acia;
@@ -50,7 +50,7 @@ private:
 
 
 // device type definition
-extern const device_type C64_MIDI_SIEL;
+DECLARE_DEVICE_TYPE(C64_MIDI_SIEL, c64_siel_midi_cartridge_device)
 
 
-#endif
+#endif // MAME_BUS_C64_MIDI_SIEL_H

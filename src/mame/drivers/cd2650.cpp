@@ -30,41 +30,41 @@ TODO
 
 #include "emu.h"
 #include "cpu/s2650/s2650.h"
-#include "machine/keyboard.h"
-#include "imagedev/snapquik.h"
 #include "imagedev/cassette.h"
-#include "sound/wave.h"
+#include "imagedev/snapquik.h"
+#include "machine/keyboard.h"
 #include "sound/beep.h"
-
-#define KEYBOARD_TAG "keyboard"
+#include "sound/wave.h"
+#include "screen.h"
+#include "speaker.h"
 
 class cd2650_state : public driver_device
 {
 public:
 	cd2650_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_p_videoram(*this, "videoram"),
-		m_maincpu(*this, "maincpu"),
-		m_beep(*this, "beeper"),
-		m_cass(*this, "cassette")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_p_videoram(*this, "videoram")
+		, m_p_chargen(*this, "chargen")
+		, m_beep(*this, "beeper")
+		, m_cass(*this, "cassette")
 	{
 	}
 
 	DECLARE_READ8_MEMBER(keyin_r);
 	DECLARE_WRITE8_MEMBER(beep_w);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	void kbd_put(u8 data);
 	DECLARE_READ8_MEMBER(cass_r);
 	DECLARE_WRITE_LINE_MEMBER(cass_w);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(cd2650);
-	const UINT8 *m_p_chargen;
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_shared_ptr<UINT8> m_p_videoram;
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 private:
-	UINT8 m_term_data;
+	uint8_t m_term_data;
 	virtual void machine_reset() override;
-	virtual void video_start() override;
 	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<uint8_t> m_p_videoram;
+	required_region_ptr<u8> m_p_chargen;
 	required_device<beep_device> m_beep;
 	required_device<cassette_image_device> m_cass;
 };
@@ -88,7 +88,7 @@ READ8_MEMBER( cd2650_state::cass_r )
 
 READ8_MEMBER( cd2650_state::keyin_r )
 {
-	UINT8 ret = m_term_data;
+	uint8_t ret = m_term_data;
 	m_term_data = ret | 0x80;
 	return ret;
 }
@@ -117,27 +117,22 @@ void cd2650_state::machine_reset()
 	m_beep->set_state(0);
 }
 
-void cd2650_state::video_start()
-{
-	m_p_chargen = memregion("chargen")->base();
-}
-
-UINT32 cd2650_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t cd2650_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 /* The video is unusual in that the characters in each line are spaced at 16 bytes in memory,
     thus line 1 starts at 1000, line 2 at 1001, etc. There are 16 lines of 80 characters.
     Further, the letters have bit 6 set low, thus the range is 01 to 1A.
     When the bottom of the screen is reached, it does not scroll, it just wraps around. */
 
-	UINT16 offset = 0;
-	UINT8 y,ra,chr,gfx;
-	UINT16 sy=0,x,mem;
+	uint16_t offset = 0;
+	uint8_t y,ra,chr,gfx;
+	uint16_t sy=0,x,mem;
 
 	for (y = 0; y < 16; y++)
 	{
 		for (ra = 0; ra < 10; ra++)
 		{
-			UINT16 *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix16(sy++);
 
 			for (x = 0; x < 80; x++)
 			{
@@ -187,7 +182,7 @@ static GFXDECODE_START( cd2650 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, cd2650_charlayout, 0, 1 )
 GFXDECODE_END
 
-WRITE8_MEMBER( cd2650_state::kbd_put )
+void cd2650_state::kbd_put(u8 data)
 {
 	if (data)
 		m_term_data = data;
@@ -195,7 +190,8 @@ WRITE8_MEMBER( cd2650_state::kbd_put )
 
 QUICKLOAD_LOAD_MEMBER( cd2650_state, cd2650 )
 {
-	int i, result = IMAGE_INIT_FAIL;
+	int i;
+	image_init_result result = image_init_result::FAIL;
 
 	int quick_length = image.length();
 	if (quick_length < 0x1500)
@@ -211,7 +207,7 @@ QUICKLOAD_LOAD_MEMBER( cd2650_state, cd2650 )
 	}
 	else
 	{
-		dynamic_buffer quick_data(quick_length);
+		std::vector<uint8_t> quick_data(quick_length);
 		int read_ = image.fread( &quick_data[0], quick_length);
 		if (read_ != quick_length)
 		{
@@ -253,7 +249,7 @@ QUICKLOAD_LOAD_MEMBER( cd2650_state, cd2650 )
 				// Start the quickload
 				m_maincpu->set_state_int(S2650_PC, exec_addr);
 
-				result = IMAGE_INIT_PASS;
+				result = image_init_result::PASS;
 			}
 		}
 	}
@@ -261,7 +257,7 @@ QUICKLOAD_LOAD_MEMBER( cd2650_state, cd2650 )
 	return result;
 }
 
-static MACHINE_CONFIG_START( cd2650, cd2650_state )
+static MACHINE_CONFIG_START( cd2650 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",S2650, XTAL_1MHz)
 	MCFG_CPU_PROGRAM_MAP(cd2650_mem)
@@ -290,8 +286,8 @@ static MACHINE_CONFIG_START( cd2650, cd2650_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
-	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(WRITE8(cd2650_state, kbd_put))
+	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
+	MCFG_GENERIC_KEYBOARD_CB(PUT(cd2650_state, kbd_put))
 	MCFG_CASSETTE_ADD( "cassette" )
 MACHINE_CONFIG_END
 
@@ -318,5 +314,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   CLASS          INIT     COMPANY        FULLNAME       FLAGS */
-COMP( 1977, cd2650, 0,      0,       cd2650,    cd2650, driver_device,  0,   "Central Data",   "CD 2650", 0 )
+//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   CLASS          INIT  COMPANY         FULLNAME   FLAGS
+COMP( 1977, cd2650, 0,      0,       cd2650,    cd2650, cd2650_state,  0,    "Central Data", "CD 2650", 0 )

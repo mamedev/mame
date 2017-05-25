@@ -28,26 +28,44 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/hanaawas.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-#include "includes/hanaawas.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 READ8_MEMBER(hanaawas_state::hanaawas_input_port_0_r)
 {
 	int i, ordinal = 0;
-	UINT16 buttons = 0;
+	uint16_t buttons = 0;
+
+	// TODO: key matrix seems identical to speedatk.cpp, needs merging
+	if(m_coin_impulse > 0)
+	{
+		m_coin_impulse--;
+		return 0x80;
+	}
+
+	if((ioport("COINS")->read() & 1) || (ioport("COINS")->read() & 2))
+	{
+		m_coin_impulse = m_coin_settings*2;
+		m_coin_impulse--;
+		return 0x80;
+	}
 
 	switch (m_mux)
 	{
-	case 1: /* start buttons */
-		buttons = ioport("START")->read();
-		break;
-	case 2: /* player 1 buttons */
-		buttons = ioport("P1")->read();
-		break;
-	case 4: /* player 2 buttons */
-		buttons = ioport("P2")->read();
-		break;
+		case 1: /* start buttons */
+			buttons = ioport("START")->read();
+			break;
+		case 2: /* player 1 buttons */
+			buttons = ioport("P1")->read();
+			break;
+		case 4: /* player 2 buttons */
+			buttons = ioport("P2")->read();
+			break;
 	}
 
 
@@ -62,12 +80,23 @@ READ8_MEMBER(hanaawas_state::hanaawas_input_port_0_r)
 		}
 	}
 
-	return (ioport("IN0")->read() & 0xf0) | ordinal;
+	return ordinal;
 }
 
 WRITE8_MEMBER(hanaawas_state::hanaawas_inputs_mux_w)
 {
 	m_mux = data;
+}
+
+WRITE8_MEMBER(hanaawas_state::irq_ack_w)
+{
+	m_maincpu->set_input_line(0,CLEAR_LINE);
+}
+
+WRITE8_MEMBER(hanaawas_state::key_matrix_status_w)
+{
+	if((data & 0xf0) == 0x40) //coinage setting command
+		m_coin_settings = data & 0xf;
 }
 
 static ADDRESS_MAP_START( hanaawas_map, AS_PROGRAM, 8, hanaawas_state )
@@ -77,24 +106,23 @@ static ADDRESS_MAP_START( hanaawas_map, AS_PROGRAM, 8, hanaawas_state )
 	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(hanaawas_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(hanaawas_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x8800, 0x8bff) AM_RAM
+	AM_RANGE(0xb000, 0xb000) AM_WRITE(irq_ack_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( io_map, AS_IO, 8, hanaawas_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(hanaawas_input_port_0_r, hanaawas_inputs_mux_w)
-	AM_RANGE(0x01, 0x01) AM_READNOP /* it must return 0 */
+	AM_RANGE(0x01, 0x01) AM_READNOP AM_WRITE(key_matrix_status_w) /* r bit 1: status ready, presumably of the input mux device / w = configure device? */
 	AM_RANGE(0x10, 0x10) AM_DEVREAD("aysnd", ay8910_device, data_r)
 	AM_RANGE(0x10, 0x11) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
+	AM_RANGE(0xc0, 0xc0) AM_WRITENOP // watchdog
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( hanaawas )
-	PORT_START("IN0")
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
+	PORT_START("COINS")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1)
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )
@@ -176,6 +204,8 @@ GFXDECODE_END
 void hanaawas_state::machine_start()
 {
 	save_item(NAME(m_mux));
+	save_item(NAME(m_coin_settings));
+	save_item(NAME(m_coin_impulse));
 }
 
 void hanaawas_state::machine_reset()
@@ -183,13 +213,13 @@ void hanaawas_state::machine_reset()
 	m_mux = 0;
 }
 
-static MACHINE_CONFIG_START( hanaawas, hanaawas_state )
+static MACHINE_CONFIG_START( hanaawas )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,18432000/6) /* 3.072 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(hanaawas_map)
 	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", hanaawas_state,  irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", hanaawas_state,  irq0_line_assert)
 
 
 	/* video hardware */
@@ -242,4 +272,4 @@ ROM_START( hanaawas )
 ROM_END
 
 
-GAME( 1982, hanaawas, 0, hanaawas, hanaawas, driver_device, 0, ROT0, "Seta Kikaku, Ltd.", "Hana Awase", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, hanaawas, 0, hanaawas, hanaawas, hanaawas_state, 0, ROT0, "Seta Kikaku, Ltd.", "Hana Awase", MACHINE_SUPPORTS_SAVE )

@@ -44,10 +44,160 @@
 
 #include "emu.h"
 
+#include "machine/68340.h"
 #include "machine/sec.h"
+#include "speaker.h"
+
 #include "mpu5.lh"
 
-#include "machine/68340.h"
+// MFME2MAME layouts:
+#include "m5addams.lh"
+#include "m5all41d.lh"
+#include "m5arab.lh"
+#include "m5austin11.lh"
+#include "m5barkng.lh"
+#include "m5barmy.lh"
+#include "m5baxe04.lh"
+#include "m5bbro.lh"
+#include "m5bbrocl.lh"
+#include "m5beansa.lh"
+#include "m5bigchs.lh"
+#include "m5biggam.lh"
+#include "m5bling.lh"
+#include "m5blkwht11.lh"
+#include "m5bnzclb.lh"
+#include "m5btlbnk.lh"
+#include "m5bttf.lh"
+#include "m5bwaves.lh"
+#include "m5carou.lh"
+#include "m5cashat.lh"
+#include "m5cashrn.lh"
+#include "m5cbw.lh"
+#include "m5centcl.lh"
+#include "m5circlb33.lh"
+#include "m5circus0a.lh"
+#include "m5clifhn.lh"
+#include "m5clown11.lh"
+#include "m5codft.lh"
+#include "m5cosclb.lh"
+#include "m5crzkni.lh"
+#include "m5cshkcb.lh"
+#include "m5cshstx.lh"
+#include "m5dblqtsb.lh"
+#include "m5devil.lh"
+#include "m5dick10.lh"
+#include "m5doshpk05.lh"
+#include "m5egr.lh"
+#include "m5elband.lh"
+#include "m5elim.lh"
+#include "m5evgrhr.lh"
+#include "m5ewn.lh"
+#include "m5extrm.lh"
+#include "m5fiddle.lh"
+#include "m5fire.lh"
+#include "m5firebl.lh"
+#include "m5flipcr.lh"
+#include "m5fortby.lh"
+#include "m5frnzy.lh"
+#include "m5funsun.lh"
+#include "m5gdrag.lh"
+#include "m5ggems20.lh"
+#include "m5gimmie.lh"
+#include "m5grush.lh"
+#include "m5grush5.lh"
+#include "m5gsstrk07.lh"
+#include "m5gstrik.lh"
+#include "m5hellrz.lh"
+#include "m5hgl14.lh"
+#include "m5hiclau.lh"
+#include "m5hifly.lh"
+#include "m5hilok.lh"
+#include "m5hisprt.lh"
+#include "m5hlsumo.lh"
+#include "m5holy.lh"
+#include "m5hopidl.lh"
+#include "m5hotslt.lh"
+#include "m5hotstf.lh"
+#include "m5hypvip.lh"
+#include "m5jackbx.lh"
+#include "m5jackp2.lh"
+#include "m5jackpt.lh"
+#include "m5jlyjwl.lh"
+#include "m5jmpgem01.lh"
+#include "m5kingqc06.lh"
+#include "m5kkebab.lh"
+#include "m5korma.lh"
+#include "m5loony.lh"
+#include "m5loot.lh"
+#include "m5lotta.lh"
+#include "m5martns07.lh"
+#include "m5mega.lh"
+#include "m5mmak06.lh"
+#include "m5monmst.lh"
+#include "m5mpfc.lh"
+#include "m5mprio.lh"
+#include "m5neptun.lh"
+#include "m5nnww.lh"
+#include "m5oohaah.lh"
+#include "m5oohrio.lh"
+#include "m5openbx05.lh"
+#include "m5overld.lh"
+#include "m5peepsh.lh"
+#include "m5piefac.lh"
+#include "m5piefcr.lh"
+#include "m5ppussy.lh"
+#include "m5psyccl01.lh"
+#include "m5psycho.lh"
+#include "m5ptyani.lh"
+#include "m5qdrawb.lh"
+#include "m5qshot04.lh"
+#include "m5ratpka.lh"
+#include "m5razdz10.lh"
+#include "m5redbal.lh"
+#include "m5redrcka.lh"
+#include "m5resfrg.lh"
+#include "m5revo13.lh"
+#include "m5rfymc.lh"
+#include "m5rgclb12.lh"
+#include "m5rhrgt02.lh"
+#include "m5ritj.lh"
+#include "m5rollup.lh"
+#include "m5rollx.lh"
+#include "m5rthh.lh"
+#include "m5rub.lh"
+#include "m5rwb.lh"
+#include "m5scharg.lh"
+#include "m5seven.lh"
+#include "m5shark.lh"
+#include "m5sheik.lh"
+#include "m5skulcl20.lh"
+#include "m5sondra.lh"
+#include "m5speccl.lh"
+#include "m5spiker.lh"
+#include "m5spins.lh"
+#include "m5squids06.lh"
+#include "m5sstrk.lh"
+#include "m5starcl.lh"
+#include "m5stars26.lh"
+#include "m5stax.lh"
+#include "m5supnov.lh"
+#include "m5supro.lh"
+#include "m5tbird.lh"
+#include "m5tempcl.lh"
+#include "m5tempp.lh"
+#include "m5tempt2.lh"
+#include "m5tictacbwb.lh"
+#include "m5trail.lh"
+#include "m5ultimo04.lh"
+#include "m5upover.lh"
+#include "m5vampup.lh"
+#include "m5vertgo.lh"
+#include "m5wking05.lh"
+#include "m5wonga.lh"
+#include "m5wthing20.lh"
+#include "m5xchn.lh"
+#include "m5xfact11.lh"
+
 
 class mpu5_state : public driver_device
 {
@@ -56,20 +206,20 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu")
 	{ }
-	UINT32* m_cpuregion;
-	std::unique_ptr<UINT32[]> m_mainram;
+	uint32_t* m_cpuregion;
+	std::unique_ptr<uint32_t[]> m_mainram;
 	SEC sec;
 
-	UINT8 m_led_strobe_temp;
-	UINT8 m_led_strobe;
-	UINT8 m_pic_clk;
+	uint8_t m_led_strobe_temp;
+	uint8_t m_led_strobe;
+	uint8_t m_pic_clk;
 	bool  m_pic_transfer_in_progress;
-	UINT8 m_pic_bit1;
-	UINT8 m_pic_data;
-	UINT8 m_pic_clocked_bits;
-	UINT8 m_pic_stored_input;
-	UINT8 m_pic_output_bit;
-	UINT8 m_input_strobe;
+	uint8_t m_pic_bit1;
+	uint8_t m_pic_data;
+	uint8_t m_pic_clocked_bits;
+	uint8_t m_pic_stored_input;
+	uint8_t m_pic_output_bit;
+	uint8_t m_input_strobe;
 
 	DECLARE_READ32_MEMBER(mpu5_mem_r);
 	DECLARE_WRITE32_MEMBER(mpu5_mem_w);
@@ -85,7 +235,7 @@ public:
 protected:
 
 	// devices
-	required_device<m68340cpu_device> m_maincpu;
+	required_device<m68340_cpu_device> m_maincpu;
 	virtual void machine_start() override;
 };
 
@@ -120,11 +270,11 @@ READ8_MEMBER(mpu5_state::asic_r8)
 
 READ32_MEMBER(mpu5_state::asic_r32)
 {
-	UINT32 retdata = 0;
-	if (mem_mask&0xff000000) retdata |= asic_r8(space,(offset*4)+0) <<24;
-	if (mem_mask&0x00ff0000) retdata |= asic_r8(space,(offset*4)+1) <<16;
-	if (mem_mask&0x0000ff00) retdata |= asic_r8(space,(offset*4)+2) <<8;
-	if (mem_mask&0x000000ff) retdata |= asic_r8(space,(offset*4)+3) <<0;
+	uint32_t retdata = 0;
+	if (ACCESSING_BITS_24_31) retdata |= asic_r8(space,(offset*4)+0) <<24;
+	if (ACCESSING_BITS_16_23) retdata |= asic_r8(space,(offset*4)+1) <<16;
+	if (ACCESSING_BITS_8_15) retdata |= asic_r8(space,(offset*4)+2) <<8;
+	if (ACCESSING_BITS_0_7) retdata |= asic_r8(space,(offset*4)+3) <<0;
 	return retdata;
 }
 
@@ -132,7 +282,7 @@ READ32_MEMBER(mpu5_state::mpu5_mem_r)
 {
 	int pc = space.device().safe_pc();
 	int addr = offset *4;
-	int cs = m68340_get_cs(m_maincpu, addr);
+	int cs = m_maincpu->get_cs(addr);
 
 	switch ( cs )
 	{
@@ -255,10 +405,10 @@ WRITE8_MEMBER(mpu5_state::asic_w8)
 
 WRITE32_MEMBER(mpu5_state::asic_w32)
 {
-	if (mem_mask&0xff000000) asic_w8(space,(offset*4)+0, (data>>24)&0xff);
-	if (mem_mask&0x00ff0000) asic_w8(space,(offset*4)+1, (data>>16)&0xff);
-	if (mem_mask&0x0000ff00) asic_w8(space,(offset*4)+2, (data>>8) &0xff);
-	if (mem_mask&0x000000ff) asic_w8(space,(offset*4)+3, (data>>0) &0xff);
+	if (ACCESSING_BITS_24_31) asic_w8(space,(offset*4)+0, (data>>24)&0xff);
+	if (ACCESSING_BITS_16_23) asic_w8(space,(offset*4)+1, (data>>16)&0xff);
+	if (ACCESSING_BITS_8_15) asic_w8(space,(offset*4)+2, (data>>8) &0xff);
+	if (ACCESSING_BITS_0_7) asic_w8(space,(offset*4)+3, (data>>0) &0xff);
 }
 
 
@@ -328,7 +478,7 @@ WRITE32_MEMBER(mpu5_state::mpu5_mem_w)
 {
 	int pc = space.device().safe_pc();
 	int addr = offset *4;
-	int cs = m68340_get_cs(m_maincpu, addr);
+	int cs = m_maincpu->get_cs(addr);
 
 	switch ( cs )
 	{
@@ -385,13 +535,13 @@ INPUT_PORTS_END
 
 void mpu5_state::machine_start()
 {
-	m_cpuregion = (UINT32*)memregion( "maincpu" )->base();
-	m_mainram = make_unique_clear<UINT32[]>(0x10000);
+	m_cpuregion = (uint32_t*)memregion( "maincpu" )->base();
+	m_mainram = make_unique_clear<uint32_t[]>(0x10000);
 	m_pic_output_bit =0;
 }
 
 
-MACHINE_CONFIG_START( mpu5, mpu5_state )
+MACHINE_CONFIG_START( mpu5 )
 	MCFG_CPU_ADD("maincpu", M68340, 16000000)    // ?
 	MCFG_CPU_PROGRAM_MAP(mpu5_map)
 

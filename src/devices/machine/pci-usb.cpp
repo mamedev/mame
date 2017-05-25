@@ -1,15 +1,36 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
+#include "emu.h"
 #include "pci-usb.h"
 
-const device_type USB_UHCI = &device_creator<usb_uhci_device>;
-const device_type USB_EHCI = &device_creator<usb_ehci_device>;
+DEFINE_DEVICE_TYPE(USB_OHCI, usb_ohci_device, "usb_ohci", "USB 1.1 OHCI interface")
+DEFINE_DEVICE_TYPE(USB_UHCI, usb_uhci_device, "usb_uhci", "USB 1.1 UHCI interface")
+DEFINE_DEVICE_TYPE(USB_EHCI, usb_ehci_device, "usb_ehci", "USB 2.0 EHCI interface")
+
+DEVICE_ADDRESS_MAP_START(map, 32, usb_ohci_device)
+ADDRESS_MAP_END
+
+usb_ohci_device::usb_ohci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: pci_device(mconfig, USB_OHCI, tag, owner, clock)
+{
+}
+
+void usb_ohci_device::device_start()
+{
+	pci_device::device_start();
+	add_map(4096, M_MEM, FUNC(usb_ohci_device::map));
+}
+
+void usb_ohci_device::device_reset()
+{
+	pci_device::device_reset();
+}
 
 DEVICE_ADDRESS_MAP_START(map, 32, usb_uhci_device)
 ADDRESS_MAP_END
 
-usb_uhci_device::usb_uhci_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: pci_device(mconfig, USB_UHCI, "USB 1.1 UHCI interface", tag, owner, clock, "usb_uhci", __FILE__)
+usb_uhci_device::usb_uhci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: pci_device(mconfig, USB_UHCI, tag, owner, clock)
 {
 }
 
@@ -27,8 +48,8 @@ void usb_uhci_device::device_reset()
 DEVICE_ADDRESS_MAP_START(map, 32, usb_ehci_device)
 ADDRESS_MAP_END
 
-usb_ehci_device::usb_ehci_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: pci_device(mconfig, USB_EHCI, "USB 2.0 EHCI interface", tag, owner, clock, "usb_ehci", __FILE__)
+usb_ehci_device::usb_ehci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: pci_device(mconfig, USB_EHCI, tag, owner, clock)
 {
 }
 

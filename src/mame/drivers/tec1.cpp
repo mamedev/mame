@@ -73,9 +73,11 @@ JMON ToDo:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "sound/speaker.h"
-#include "sound/wave.h"
 #include "imagedev/cassette.h"
+#include "sound/spkrdev.h"
+#include "sound/wave.h"
+#include "speaker.h"
+
 #include "tec1.lh"
 
 
@@ -112,12 +114,12 @@ public:
 	DECLARE_WRITE8_MEMBER( tec1_digit_w );
 	DECLARE_WRITE8_MEMBER( tecjmon_digit_w );
 	DECLARE_WRITE8_MEMBER( tec1_segment_w );
-	UINT8 m_kbd;
-	UINT8 m_segment;
-	UINT8 m_digit;
-	UINT8 m_kbd_row;
-	UINT8 m_refresh[6];
-	UINT8 tec1_convert_col_to_bin( UINT8 col, UINT8 row );
+	uint8_t m_kbd;
+	uint8_t m_segment;
+	uint8_t m_digit;
+	uint8_t m_kbd_row;
+	uint8_t m_refresh[6];
+	uint8_t tec1_convert_col_to_bin( uint8_t col, uint8_t row );
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	TIMER_CALLBACK_MEMBER(tec1_kbd_callback);
@@ -188,7 +190,7 @@ WRITE8_MEMBER( tec1_state::tecjmon_digit_w )
 READ8_MEMBER( tec1_state::latch_r )
 {
 // bit 7 - cass in ; bit 6 low = key pressed
-	UINT8 data = (m_key_pressed) ? 0 : 0x40;
+	uint8_t data = (m_key_pressed) ? 0 : 0x40;
 
 	if (m_cass->input() > 0.03)
 		data |= 0x80;
@@ -203,9 +205,9 @@ READ8_MEMBER( tec1_state::tec1_kbd_r )
 	return m_kbd | m_io_shift->read();
 }
 
-UINT8 tec1_state::tec1_convert_col_to_bin( UINT8 col, UINT8 row )
+uint8_t tec1_state::tec1_convert_col_to_bin( uint8_t col, uint8_t row )
 {
-	UINT8 data = row;
+	uint8_t data = row;
 
 	if (BIT(col, 1))
 		data |= 4;
@@ -224,7 +226,7 @@ UINT8 tec1_state::tec1_convert_col_to_bin( UINT8 col, UINT8 row )
 
 TIMER_CALLBACK_MEMBER(tec1_state::tec1_kbd_callback)
 {
-	UINT8 i;
+	uint8_t i;
 
 	// Display the digits. Blank any digits that haven't been refreshed for a while.
 	// This will fix the problem reported by a user.
@@ -287,10 +289,10 @@ TIMER_CALLBACK_MEMBER(tec1_state::tec1_kbd_callback)
 	{
 		m_kbd = tec1_convert_col_to_bin(i, m_kbd_row);
 		m_maincpu->set_input_line(INPUT_LINE_NMI, HOLD_LINE);
-		m_key_pressed = TRUE;
+		m_key_pressed = true;
 	}
 	else
-		m_key_pressed = FALSE;
+		m_key_pressed = false;
 }
 
 
@@ -400,7 +402,7 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( tec1, tec1_state )
+static MACHINE_CONFIG_START( tec1 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 1000000)   /* speed can be varied between 250kHz and 2MHz */
 	MCFG_CPU_PROGRAM_MAP(tec1_map)
@@ -415,7 +417,7 @@ static MACHINE_CONFIG_START( tec1, tec1_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( tecjmon, tec1_state )
+static MACHINE_CONFIG_START( tecjmon )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_579545MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(tecjmon_map)
@@ -458,6 +460,6 @@ ROM_START(tecjmon)
 	ROM_LOAD("util.rom",    0x3800, 0x0800, CRC(7c19700d) SHA1(dc5b3ade66bb11c54430056966ed99cdd299d82b) )
 ROM_END
 
-/*    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT    INIT       COMPANY                     FULLNAME */
-COMP( 1984, tec1,     0,      0,      tec1,       tec1, driver_device,    0,    "Talking Electronics magazine",  "TEC-1" , 0 )
-COMP( 1984, tecjmon,  tec1,   0,      tecjmon,    tec1, driver_device,    0,    "Talking Electronics magazine",  "TEC-1A with JMON" , 0 )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT STATE       INIT  COMPANY                         FULLNAME            FLAGS
+COMP( 1984, tec1,     0,      0,      tec1,       tec1, tec1_state, 0,    "Talking Electronics magazine", "TEC-1",            0 )
+COMP( 1984, tecjmon,  tec1,   0,      tecjmon,    tec1, tec1_state, 0,    "Talking Electronics magazine", "TEC-1A with JMON", 0 )

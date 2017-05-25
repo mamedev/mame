@@ -33,14 +33,17 @@
 
 ***************************************************************************/
 
-#define CPU_CLOCK       (XTAL_10MHz)
-#define SND_CLOCK       (XTAL_16MHz)/16
-
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
 #include "machine/nvram.h"
+#include "screen.h"
+#include "speaker.h"
+
 #include "galaxi.lh"
+
+#define CPU_CLOCK       (XTAL_10MHz)
+#define SND_CLOCK       (XTAL_16MHz)/16
 
 class galaxi_state : public driver_device
 {
@@ -61,12 +64,12 @@ public:
 		{ }
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_bg1_ram;
-	required_shared_ptr<UINT16> m_bg2_ram;
-	required_shared_ptr<UINT16> m_bg3_ram;
-	required_shared_ptr<UINT16> m_bg4_ram;
-	required_shared_ptr<UINT16> m_fg_ram;
-//  UINT16 *  m_nvram;        // currently this uses generic nvram handling
+	required_shared_ptr<uint16_t> m_bg1_ram;
+	required_shared_ptr<uint16_t> m_bg2_ram;
+	required_shared_ptr<uint16_t> m_bg3_ram;
+	required_shared_ptr<uint16_t> m_bg4_ram;
+	required_shared_ptr<uint16_t> m_fg_ram;
+//  uint16_t *  m_nvram;        // currently this uses generic nvram handling
 
 	/* video-related */
 	tilemap_t   *m_bg1_tmap;
@@ -75,13 +78,13 @@ public:
 	tilemap_t   *m_bg4_tmap;
 	tilemap_t   *m_fg_tmap;
 
-	UINT16 m_bg3_xscroll;
-	UINT16 m_bg3_yscroll;
+	uint16_t m_bg3_xscroll;
+	uint16_t m_bg3_yscroll;
 
 	/* misc */
 	int       m_hopper;
 	int       m_ticket;
-	UINT16    m_out;
+	uint16_t    m_out;
 
 	DECLARE_WRITE16_MEMBER(galaxi_bg1_w);
 	DECLARE_WRITE16_MEMBER(galaxi_bg2_w);
@@ -101,7 +104,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_galaxi(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_galaxi(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void show_out(  );
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -116,31 +119,31 @@ public:
 
 TILE_GET_INFO_MEMBER(galaxi_state::get_bg1_tile_info)
 {
-	UINT16 code = m_bg1_ram[tile_index];
+	uint16_t code = m_bg1_ram[tile_index];
 	SET_TILE_INFO_MEMBER(0, code, 0x10 + (code >> 12), 0);
 }
 
 TILE_GET_INFO_MEMBER(galaxi_state::get_bg2_tile_info)
 {
-	UINT16 code = m_bg2_ram[tile_index];
+	uint16_t code = m_bg2_ram[tile_index];
 	SET_TILE_INFO_MEMBER(0, code, 0x10 + (code >> 12), 0);
 }
 
 TILE_GET_INFO_MEMBER(galaxi_state::get_bg3_tile_info)
 {
-	UINT16 code = m_bg3_ram[tile_index];
+	uint16_t code = m_bg3_ram[tile_index];
 	SET_TILE_INFO_MEMBER(0, code, (code >> 12), 0);
 }
 
 TILE_GET_INFO_MEMBER(galaxi_state::get_bg4_tile_info)
 {
-	UINT16 code = m_bg4_ram[tile_index];
+	uint16_t code = m_bg4_ram[tile_index];
 	SET_TILE_INFO_MEMBER(0, code, (code >> 12), 0);
 }
 
 TILE_GET_INFO_MEMBER(galaxi_state::get_fg_tile_info)
 {
-	UINT16 code = m_fg_ram[tile_index];
+	uint16_t code = m_fg_ram[tile_index];
 	SET_TILE_INFO_MEMBER(1, code, 0x20 + (code >> 12), 0);
 }
 
@@ -176,12 +179,12 @@ WRITE16_MEMBER(galaxi_state::galaxi_fg_w)
 
 void galaxi_state::video_start()
 {
-	m_bg1_tmap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(galaxi_state::get_bg1_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 0x20, 0x10);
-	m_bg2_tmap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(galaxi_state::get_bg2_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 0x20, 0x10);
-	m_bg3_tmap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(galaxi_state::get_bg3_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 0x20, 0x10);
-	m_bg4_tmap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(galaxi_state::get_bg4_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 0x20, 0x10);
+	m_bg1_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(galaxi_state::get_bg1_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 0x20, 0x10);
+	m_bg2_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(galaxi_state::get_bg2_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 0x20, 0x10);
+	m_bg3_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(galaxi_state::get_bg3_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 0x20, 0x10);
+	m_bg4_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(galaxi_state::get_bg4_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 0x20, 0x10);
 
-	m_fg_tmap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(galaxi_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 0x40, 0x20);
+	m_fg_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(galaxi_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 0x40, 0x20);
 
 	m_bg1_tmap->set_transparent_pen(0);
 	m_bg2_tmap->set_transparent_pen(0);
@@ -191,7 +194,7 @@ void galaxi_state::video_start()
 	m_fg_tmap->set_transparent_pen(0);
 }
 
-UINT32 galaxi_state::screen_update_galaxi(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t galaxi_state::screen_update_galaxi(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg3_tmap->set_scrollx(m_bg3_xscroll);
 	m_bg3_tmap->set_scrolly(m_bg3_yscroll);
@@ -442,7 +445,7 @@ void galaxi_state::machine_reset()
                               Machine Drivers
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( galaxi, galaxi_state )
+static MACHINE_CONFIG_START( galaxi )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, CPU_CLOCK)
@@ -467,7 +470,7 @@ static MACHINE_CONFIG_START( galaxi, galaxi_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", SND_CLOCK, OKIM6295_PIN7_LOW)  // ?
+	MCFG_OKIM6295_ADD("oki", SND_CLOCK, PIN7_LOW)  // ?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -573,7 +576,7 @@ ROM_END
                                Game Drivers
 ***************************************************************************/
 
-/*     YEAR  NAME      PARENT  MACHINE   INPUT     STATE          INIT  ROT    COMPANY   FULLNAME                       FLAGS                   LAYOUT  */
-GAMEL( 2000, galaxi,   0,      galaxi,   galaxi,   driver_device, 0,    ROT0, "B.R.L.", "Galaxi (v2.0)",                MACHINE_SUPPORTS_SAVE,  layout_galaxi )
-GAMEL( 2000, magjoker, 0,      magjoker, magjoker, driver_device, 0,    ROT0, "B.R.L.", "Magic Joker (v1.25.10.2000)",  MACHINE_SUPPORTS_SAVE,  layout_galaxi )
-GAMEL( 2001, lastfour, 0,      lastfour, magjoker, driver_device, 0,    ROT0, "B.R.L.", "Last Four (09:12 16/01/2001)", MACHINE_SUPPORTS_SAVE,  layout_galaxi )
+//     YEAR  NAME      PARENT  MACHINE   INPUT     STATE         INIT  ROT   COMPANY   FULLNAME                        FLAGS                   LAYOUT
+GAMEL( 2000, galaxi,   0,      galaxi,   galaxi,   galaxi_state, 0,    ROT0, "B.R.L.", "Galaxi (v2.0)",                MACHINE_SUPPORTS_SAVE,  layout_galaxi )
+GAMEL( 2000, magjoker, 0,      magjoker, magjoker, galaxi_state, 0,    ROT0, "B.R.L.", "Magic Joker (v1.25.10.2000)",  MACHINE_SUPPORTS_SAVE,  layout_galaxi )
+GAMEL( 2001, lastfour, 0,      lastfour, magjoker, galaxi_state, 0,    ROT0, "B.R.L.", "Last Four (09:12 16/01/2001)", MACHINE_SUPPORTS_SAVE,  layout_galaxi )

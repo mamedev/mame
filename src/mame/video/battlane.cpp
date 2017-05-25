@@ -137,7 +137,7 @@ TILEMAP_MAPPER_MEMBER(battlane_state::battlane_tilemap_scan_rows_2x2)
 
 void battlane_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(battlane_state::get_tile_info_bg),this), tilemap_mapper_delegate(FUNC(battlane_state::battlane_tilemap_scan_rows_2x2),this), 16, 16, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(battlane_state::get_tile_info_bg),this), tilemap_mapper_delegate(FUNC(battlane_state::battlane_tilemap_scan_rows_2x2),this), 16, 16, 32, 32);
 	m_screen_bitmap.allocate(32 * 8, 32 * 8);
 	save_item(NAME(m_screen_bitmap));
 }
@@ -226,7 +226,7 @@ void battlane_state::draw_fg_bitmap( bitmap_ind16 &bitmap )
 	}
 }
 
-UINT32 battlane_state::screen_update_battlane(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t battlane_state::screen_update_battlane(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->mark_all_dirty(); // HACK
 

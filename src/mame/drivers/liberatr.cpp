@@ -138,6 +138,7 @@
 
 #include "emu.h"
 #include "includes/liberatr.h"
+#include "speaker.h"
 
 #define MASTER_CLOCK 20000000 /* 20Mhz Main Clock Xtal */
 
@@ -192,8 +193,8 @@ WRITE8_MEMBER( liberatr_state::trackball_reset_w )
 	/* input becomes the starting point for the trackball counters */
 	if (((data ^ m_ctrld) & 0x10) && (data & 0x10))
 	{
-		UINT8 trackball = ioport("FAKE")->read();
-		UINT8 switches = ioport("IN0")->read();
+		uint8_t trackball = ioport("FAKE")->read();
+		uint8_t switches = ioport("IN0")->read();
 		m_trackball_offset = ((trackball & 0xf0) - (switches & 0xf0)) | ((trackball - switches) & 0x0f);
 	}
 	m_ctrld = data & 0x10;
@@ -205,7 +206,7 @@ READ8_MEMBER( liberatr_state::port0_r )
 	/* if ctrld is high, the /ld signal on the LS191 is NOT set, meaning that the trackball is counting */
 	if (m_ctrld)
 	{
-		UINT8 trackball = ioport("FAKE")->read();
+		uint8_t trackball = ioport("FAKE")->read();
 		return ((trackball & 0xf0) - (m_trackball_offset & 0xf0)) | ((trackball - m_trackball_offset) & 0x0f);
 	}
 
@@ -414,7 +415,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( liberatr, liberatr_state )
+static MACHINE_CONFIG_START( liberatr )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK/16) /* 1.25Mhz divided from 20Mhz master clock */
@@ -531,5 +532,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1982, liberatr, 0,        liberatr, liberatr, driver_device, 0, ROT0, "Atari", "Liberator (set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, liberatr2,liberatr, liberat2, liberatr, driver_device, 0, ROT0, "Atari", "Liberator (set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, liberatr, 0,        liberatr, liberatr, liberatr_state, 0, ROT0, "Atari", "Liberator (set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, liberatr2,liberatr, liberat2, liberatr, liberatr_state, 0, ROT0, "Atari", "Liberator (set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

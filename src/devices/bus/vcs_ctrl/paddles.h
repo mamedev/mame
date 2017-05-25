@@ -6,12 +6,11 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_VCS_CTRL_PADDLES_H
+#define MAME_BUS_VCS_CTRL_PADDLES_H
+
 #pragma once
 
-#ifndef __VCS_PADDLES__
-#define __VCS_PADDLES__
-
-#include "emu.h"
 #include "ctrl.h"
 
 
@@ -27,7 +26,7 @@ class vcs_paddles_device : public device_t,
 {
 public:
 	// construction/destruction
-	vcs_paddles_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	vcs_paddles_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;
@@ -37,9 +36,9 @@ protected:
 	virtual void device_start() override;
 
 	// device_vcs_control_port_interface overrides
-	virtual UINT8 vcs_joy_r() override;
-	virtual UINT8 vcs_pot_x_r() override;
-	virtual UINT8 vcs_pot_y_r() override;
+	virtual uint8_t vcs_joy_r() override;
+	virtual uint8_t vcs_pot_x_r() override;
+	virtual uint8_t vcs_pot_y_r() override;
 
 	virtual bool has_pot_x() override { return true; }
 	virtual bool has_pot_y() override { return true; }
@@ -52,7 +51,6 @@ private:
 
 
 // device type definition
-extern const device_type VCS_PADDLES;
+DECLARE_DEVICE_TYPE(VCS_PADDLES, vcs_paddles_device)
 
-
-#endif
+#endif // MAME_BUS_VCS_CTRL_PADDLES_H

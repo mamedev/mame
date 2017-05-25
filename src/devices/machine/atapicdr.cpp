@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:smf
+#include "emu.h"
 #include "atapicdr.h"
 
 #define SCSI_SENSE_ASC_MEDIUM_NOT_PRESENT 0x3a
@@ -7,19 +8,25 @@
 #define T10MMC_GET_EVENT_STATUS_NOTIFICATION 0x4a
 
 // device type definition
-const device_type ATAPI_CDROM = &device_creator<atapi_cdrom_device>;
+DEFINE_DEVICE_TYPE(ATAPI_CDROM,       atapi_cdrom_device,       "cdrom",       "ATAPI CD-ROM")
+DEFINE_DEVICE_TYPE(ATAPI_FIXED_CDROM, atapi_fixed_cdrom_device, "cdrom_fixed", "ATAPI fixed CD-ROM")
 
-atapi_cdrom_device::atapi_cdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	atapi_hle_device(mconfig, ATAPI_CDROM, "ATAPI CDROM", tag, owner, clock, "cdrom", __FILE__)
+atapi_cdrom_device::atapi_cdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	atapi_cdrom_device(mconfig, ATAPI_CDROM, tag, owner, clock)
 {
 }
 
-atapi_cdrom_device::atapi_cdrom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
-	atapi_hle_device(mconfig, type, name, tag, owner, clock, shortname, source)
+atapi_cdrom_device::atapi_cdrom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	atapi_hle_device(mconfig, type, tag, owner, clock)
 {
 }
 
-static MACHINE_CONFIG_FRAGMENT( atapicdr )
+atapi_fixed_cdrom_device::atapi_fixed_cdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	atapi_cdrom_device(mconfig, ATAPI_FIXED_CDROM, tag, owner, clock)
+{
+}
+
+static MACHINE_CONFIG_START( atapicdr )
 	MCFG_CDROM_ADD("image")
 	MCFG_CDROM_INTERFACE("cdrom")
 	MCFG_SOUND_ADD("cdda", CDDA, 0)
@@ -79,6 +86,13 @@ void atapi_cdrom_device::device_reset()
 {
 	atapi_hle_device::device_reset();
 	m_media_change = true;
+}
+
+void atapi_fixed_cdrom_device::device_reset()
+{
+	atapi_hle_device::device_reset();
+	m_cdrom = m_image->get_cdrom_file();
+	m_media_change = false;
 }
 
 void atapi_cdrom_device::process_buffer()

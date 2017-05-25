@@ -344,7 +344,7 @@ static void UpdateChangeCountCallback(void                      *userData,
 	NSString *errDesc = nil;
 	id const desc = [NSPropertyListSerialization propertyListFromData:data
 													 mutabilityOption:0
-													 		   format:NULL
+															   format:NULL
 													 errorDescription:&errDesc];
 	if ((nil == desc) || ![desc isKindOfClass:[NSDictionary class]] || (nil != errDesc))
 	{
@@ -771,7 +771,7 @@ static void UpdateChangeCountCallback(void                      *userData,
 	[NSApp setServicesMenu:submenu];
 
 	[menu addItem:[NSMenuItem separatorItem]];
-	
+
 	item = [menu addItemWithTitle:[NSString stringWithFormat:@"Hide %@", appName] action:@selector(hide:) keyEquivalent:@"h"];
 	item = [menu addItemWithTitle:@"Hide Others" action:@selector(hideOtherApplications:) keyEquivalent:@"h"];
 	[item setKeyEquivalentModifierMask:NSCommandKeyMask | NSAlternateKeyMask];
@@ -796,9 +796,9 @@ static void UpdateChangeCountCallback(void                      *userData,
 	[menu setSubmenu:newEffectMenu forItem:item];
 	[newEffectMenu release];
 	item = [menu addItemWithTitle:[NSString stringWithFormat:@"Open%C", (unichar)0x2026] action:@selector(openDocument:) keyEquivalent:@"o"];
-	
+
 	[menu addItem:[NSMenuItem separatorItem]];
-	
+
 	item = [menu addItemWithTitle:@"Close" action:@selector(performClose:) keyEquivalent:@"w"];
 	item = [menu addItemWithTitle:@"Save" action:@selector(saveDocument:) keyEquivalent:@"s"];
 	item = [menu addItemWithTitle:[NSString stringWithFormat:@"Save As%C", (unichar)0x2026] action:@selector(saveDocumentAs:) keyEquivalent:@"S"];

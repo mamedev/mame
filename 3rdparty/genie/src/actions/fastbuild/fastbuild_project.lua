@@ -15,6 +15,9 @@
 --		Unicode = 1,
 --		Unsafe = 1,
 --		WinMain = 1,
+-- API todo:
+--		custombuildtask
+--		dependency
 
 local function add_trailing_backslash(dir)
 	if dir:len() > 0 and dir:sub(-1) ~= "\\" then
@@ -27,7 +30,7 @@ local function compile(indentlevel, prj, cfg, commonbasepath)
 
 	local firstflag = true
 	for _, cfgexclude in ipairs(cfg.excludes) do
-		if path.isSourceFile(cfgexclude) then
+		if path.issourcefile(cfgexclude) then
 			if firstflag then
 				_p(indentlevel, '// Excluded files:')
 				firstflag = false
@@ -107,6 +110,10 @@ local function compile(indentlevel, prj, cfg, commonbasepath)
 		'/errorReport:prompt',
 		'/FS',
 		}
+
+	if cfg.options.ForceCPP then
+		table.insert(compileroptions, '/TP')
+	end
 
 	if cfg.flags.ExtraWarnings then
 		table.insert(compileroptions, '/W4')
@@ -411,7 +418,7 @@ function premake.fastbuild.project(prj)
 
 	local cppfiles = {}
 	for file in premake.project.eachfile(prj) do
-		if path.isSourceFile(file.name) then
+		if path.issourcefile(file.name) then
 			table.insert(cppfiles, file.name)
 		end
 	end
@@ -420,10 +427,8 @@ function premake.fastbuild.project(prj)
 	for _, file in ipairs(cppfiles) do
 		commonbasepath = path.getcommonbasedir(commonbasepath..'/', file)
 	end
-	-- These lines will allow fastbuild to keep the object files in the right folder hierarchy
-	-- without including everything underneath.
-	_p(1, ".CompilerInputPath = '%s/'", commonbasepath)
-	_p(1, ".CompilerInputPattern = 'ignoreall'")
+
+	_p(1, ".CompilerInputFilesRoot = '%s/'", commonbasepath)
 	_p(1, '.CompilerInputFiles = {')
 	for _, file in ipairs(cppfiles) do
 		_p(2, "'%s',", file)

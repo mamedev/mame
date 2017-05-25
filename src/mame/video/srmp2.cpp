@@ -12,7 +12,7 @@ Functions to emulate the video hardware of the machine.
 
 PALETTE_INIT_MEMBER(srmp2_state,srmp2)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < palette.entries(); i++)
@@ -27,7 +27,7 @@ PALETTE_INIT_MEMBER(srmp2_state,srmp2)
 
 PALETTE_INIT_MEMBER(srmp2_state,srmp3)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < palette.entries(); i++)
@@ -51,7 +51,7 @@ SETA001_SPRITE_GFXBANK_CB_MEMBER(srmp2_state::srmp3_gfxbank_callback)
 }
 
 
-UINT32 srmp2_state::screen_update_srmp2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t srmp2_state::screen_update_srmp2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0x1ff, cliprect);
 
@@ -68,7 +68,7 @@ UINT32 srmp2_state::screen_update_srmp2(screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
-UINT32 srmp2_state::screen_update_srmp3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t srmp2_state::screen_update_srmp3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0x1f0, cliprect);
 
@@ -81,7 +81,7 @@ UINT32 srmp2_state::screen_update_srmp3(screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
-UINT32 srmp2_state::screen_update_mjyuugi(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t srmp2_state::screen_update_mjyuugi(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0x1f0, cliprect);
 

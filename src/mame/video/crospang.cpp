@@ -113,13 +113,13 @@ TILE_GET_INFO_MEMBER(crospang_state::get_fg_tile_info)
 
 void crospang_state::video_start()
 {
-	m_bg_layer = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(crospang_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	m_fg_layer = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(crospang_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_bg_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(crospang_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_fg_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(crospang_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	m_fg_layer->set_transparent_pen(0);
 }
 
-UINT32 crospang_state::screen_update_crospang(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t crospang_state::screen_update_crospang(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_layer->draw(screen, bitmap, cliprect, 0, 0);
 	m_fg_layer->draw(screen, bitmap, cliprect, 0, 0);

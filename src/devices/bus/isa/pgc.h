@@ -1,12 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Sergey Svishchev
 
+#ifndef MAME_BUS_ISA_PGC_H
+#define MAME_BUS_ISA_PGC_H
+
 #pragma once
 
-#ifndef __ISA_PGC_H__
-#define __ISA_PGC_H__
-
-#include "emu.h"
 
 #include "cpu/i86/i86.h"
 #include "isa.h"
@@ -23,15 +22,14 @@ class isa8_pgc_device :
 {
 public:
 	// construction/destruction
-	isa8_pgc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	isa8_pgc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	isa8_pgc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual ioport_constructor device_input_ports() const override;
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER( scanline_callback );
 	INTERRUPT_GEN_MEMBER(vblank_irq);
@@ -45,6 +43,8 @@ public:
 	void reset_common();
 
 protected:
+	isa8_pgc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -54,16 +54,16 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	UINT8 *m_commarea;
-	std::unique_ptr<UINT8[]> m_vram;
-	std::unique_ptr<UINT8[]> m_eram;
-	UINT8 m_stateparam[16];
-	UINT8 m_lut[256*3];
+	uint8_t *m_commarea;
+	std::unique_ptr<uint8_t[]> m_vram;
+	std::unique_ptr<uint8_t[]> m_eram;
+	uint8_t m_stateparam[16];
+	uint8_t m_lut[256*3];
 	std::unique_ptr<bitmap_ind16> m_bitmap;
 };
 
 
 // device type definition
-extern const device_type ISA8_PGC;
+DECLARE_DEVICE_TYPE(ISA8_PGC, isa8_pgc_device)
 
-#endif  /* __ISA_PGC_H__ */
+#endif // MAME_BUS_ISA_PGC_H

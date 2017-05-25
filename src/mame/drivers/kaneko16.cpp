@@ -97,12 +97,15 @@ Non-Bugs (happen on real PCB)
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/kaneko16.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
-#include "includes/kaneko16.h"
 #include "machine/watchdog.h"
 #include "sound/ym2151.h"
 #include "machine/kaneko_hit.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /***************************************************************************
@@ -249,7 +252,7 @@ WRITE8_MEMBER(kaneko16_state::eeprom_w)
 
 READ16_MEMBER(kaneko16_berlwall_state::berlwall_oki_r)
 {
-	UINT16 ret;
+	uint16_t ret;
 
 	if (mem_mask == 0xff00) // reads / writes to the upper byte only appear to act as a mirror to the lower byte, 16-bit reads/writes only access the lower byte.
 	{
@@ -338,7 +341,7 @@ ADDRESS_MAP_END
 WRITE16_MEMBER(kaneko16_state::bakubrkr_oki_bank_w)
 {
 	if (ACCESSING_BITS_0_7) {
-		m_oki->set_bank_base(0x40000 * (data & 0x7) );
+		m_oki->set_rom_bank(data & 0x7);
 		logerror("%s:Selecting OKI bank %02X\n",machine().describe_context(),data&0xff);
 	}
 }
@@ -400,7 +403,7 @@ WRITE16_MEMBER(kaneko16_gtmr_state::bloodwar_oki_0_bank_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_oki1->set_bank_base(0x40000 * (data & 0xf) );
+		m_oki1->set_rom_bank(data & 0xf);
 //      logerror("CPU #0 PC %06X : OKI0  bank %08X\n",space.device().safe_pc(),data);
 	}
 }
@@ -409,7 +412,7 @@ WRITE16_MEMBER(kaneko16_gtmr_state::bloodwar_oki_1_bank_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_oki2->set_bank_base(0x40000 * data );
+		m_oki2->set_rom_bank(data);
 //      logerror("CPU #0 PC %06X : OKI1  bank %08X\n",space.device().safe_pc(),data);
 	}
 }
@@ -464,7 +467,7 @@ WRITE16_MEMBER(kaneko16_gtmr_state::bonkadv_oki_0_bank_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_oki1->set_bank_base(0x40000 * (data & 0xF));
+		m_oki1->set_rom_bank(data & 0xf);
 		logerror("%s: OKI0  bank %08X\n",machine().describe_context(),data);
 	}
 }
@@ -473,7 +476,7 @@ WRITE16_MEMBER(kaneko16_gtmr_state::bonkadv_oki_1_bank_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_oki2->set_bank_base(0x40000 * data );
+		m_oki2->set_rom_bank(data);
 		logerror("%s: OKI1  bank %08X\n",machine().describe_context(),data);
 	}
 }
@@ -533,7 +536,7 @@ WRITE16_MEMBER(kaneko16_gtmr_state::gtmr_oki_0_bank_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_oki1->set_bank_base( 0x40000 * (data & 0xF) );
+		m_oki1->set_rom_bank(data & 0xf);
 //      logerror("CPU #0 PC %06X : OKI0 bank %08X\n",space.device().safe_pc(),data);
 	}
 }
@@ -542,7 +545,7 @@ WRITE16_MEMBER(kaneko16_gtmr_state::gtmr_oki_1_bank_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_oki2->set_bank_base( 0x40000 * (data & 0x1) );
+		m_oki2->set_rom_bank(data & 0x1);
 //      logerror("CPU #0 PC %06X : OKI1 bank %08X\n",space.device().safe_pc(),data);
 	}
 }
@@ -690,8 +693,8 @@ ADDRESS_MAP_END
 
 void kaneko16_state::kaneko16_common_oki_bank_w(  const char *bankname, const char* tag, int bank, size_t fixedsize, size_t bankedsize )
 {
-	UINT32 bankaddr;
-	UINT8* samples = memregion(tag)->base();
+	uint32_t bankaddr;
+	uint8_t* samples = memregion(tag)->base();
 	size_t length = memregion(tag)->bytes();
 
 	bankaddr = fixedsize + (bankedsize * bank);
@@ -778,7 +781,7 @@ ADDRESS_MAP_END
 WRITE8_MEMBER(kaneko16_state::wingforc_oki_bank_w)
 {
 	if (data <= 2)
-		m_oki->set_bank_base(0x40000 * data);
+		m_oki->set_rom_bank(data);
 	else
 		logerror("%s: unknown OKI bank %02X\n", machine().describe_context(), data);
 }
@@ -1299,8 +1302,8 @@ static INPUT_PORTS_START( gtmr )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) // swapped for consistency:
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) // button1 is usually accel.
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -1309,8 +1312,8 @@ static INPUT_PORTS_START( gtmr )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) // swapped for consistency:
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) // button1 is usually accel.
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -1377,8 +1380,8 @@ static INPUT_PORTS_START( gtmr2 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) // swapped for consistency:
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) // button1 is usually accel.
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -1387,8 +1390,8 @@ static INPUT_PORTS_START( gtmr2 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) // swapped for consistency:
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) // button1 is usually accel.
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -1859,7 +1862,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(kaneko16_state::kaneko16_interrupt)
     6-7]    rte
 */
 
-static MACHINE_CONFIG_START( berlwall, kaneko16_berlwall_state )
+static MACHINE_CONFIG_START( berlwall )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* MC68000P12 */
@@ -1908,7 +1911,7 @@ static MACHINE_CONFIG_START( berlwall, kaneko16_berlwall_state )
 	MCFG_SOUND_ADD("ym2149_2", YM2149, 1000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", 12000000/6, OKIM6295_PIN7_LOW)
+	MCFG_OKIM6295_ADD("oki", 12000000/6, PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -1918,7 +1921,7 @@ MACHINE_CONFIG_END
                             Bakuretsu Breaker
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( bakubrkr, kaneko16_state )
+static MACHINE_CONFIG_START( bakubrkr )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz) /* verified on pcb */
@@ -1974,7 +1977,7 @@ static MACHINE_CONFIG_START( bakubrkr, kaneko16_state )
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(kaneko16_state, eeprom_w)) /* outputs B:  0,EEPROM reset */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_12MHz/6, OKIM6295_PIN7_HIGH) /* verified on pcb */
+	MCFG_OKIM6295_ADD("oki", XTAL_12MHz/6, PIN7_HIGH) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1993,7 +1996,7 @@ MACHINE_CONFIG_END
         6-7]    busy loop
 */
 
-static MACHINE_CONFIG_START( blazeon, kaneko16_state )
+static MACHINE_CONFIG_START( blazeon )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,12000000)    /* TMP68HC000-12 */
@@ -2047,7 +2050,7 @@ MACHINE_CONFIG_END
                                  Wing Force
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( wingforc, kaneko16_state )
+static MACHINE_CONFIG_START( wingforc )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)    /* TMP68HC000N-16 */
@@ -2094,7 +2097,7 @@ static MACHINE_CONFIG_START( wingforc, kaneko16_state )
 	MCFG_YM2151_ADD("ymsnd", XTAL_16MHz/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.4)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/16, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/16, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -2113,7 +2116,7 @@ MACHINE_CONFIG_END
     VIDEO_UPDATE_AFTER_VBLANK fixes the mangled/wrong colored sprites
 */
 
-static MACHINE_CONFIG_START( gtmr, kaneko16_gtmr_state )
+static MACHINE_CONFIG_START( gtmr )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz) /* verified on pcb */
@@ -2164,16 +2167,16 @@ static MACHINE_CONFIG_START( gtmr, kaneko16_gtmr_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki1", XTAL_16MHz/8, OKIM6295_PIN7_LOW)  /* verified on pcb */
+	MCFG_OKIM6295_ADD("oki1", XTAL_16MHz/8, PIN7_LOW)  /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL_16MHz/8, OKIM6295_PIN7_LOW)  /* verified on pcb */
+	MCFG_OKIM6295_ADD("oki2", XTAL_16MHz/8, PIN7_LOW)  /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( gtmre, gtmr )
 	MCFG_DEVICE_MODIFY("toybox")
-	MCFG_TOYBOX_TABLE_TYPE(TABLE_ALT)
+	MCFG_TOYBOX_TABLE_TYPE(ALT)
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -2225,7 +2228,7 @@ static MACHINE_CONFIG_DERIVED( bonkadv, gtmr )
 
 
 	MCFG_DEVICE_MODIFY("toybox")
-	MCFG_TOYBOX_GAME_TYPE(GAME_BONK)
+	MCFG_TOYBOX_GAME_TYPE(BONK)
 	MCFG_DEVICE_MODIFY("kan_hit")
 	kaneko_hit_device::set_type(*device, 0);
 
@@ -2236,7 +2239,7 @@ MACHINE_CONFIG_END
                                 Magical Crystal
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( mgcrystl, kaneko16_state )
+static MACHINE_CONFIG_START( mgcrystl )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz) /* verified on pcb, TMP68HC000N-12 @U31 and X2 is 12MHz */
@@ -2291,7 +2294,7 @@ static MACHINE_CONFIG_START( mgcrystl, kaneko16_state )
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(kaneko16_state, eeprom_w)) /* outputs B:  0,EEPROM reset */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_12MHz/6, OKIM6295_PIN7_HIGH) /* verified on pcb */
+	MCFG_OKIM6295_ADD("oki", XTAL_12MHz/6, PIN7_HIGH) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -2332,7 +2335,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(kaneko16_state::shogwarr_interrupt)
 }
 
 /*
-static const UINT16 shogwarr_default_eeprom[64] = {
+static const uint16_t shogwarr_default_eeprom[64] = {
     0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
     0x4B41, 0x4E45, 0x4B4F, 0x2F41, 0x544F, 0x5020, 0x3139, 0x3932,
     0x4655, 0x4A49, 0xFFFF, 0x4D41, 0x2042, 0x5553, 0x5445, 0x5220,
@@ -2345,7 +2348,7 @@ static const UINT16 shogwarr_default_eeprom[64] = {
 */
 // the above eeprom looks corrupt, some of the text is wrong, the game never writes this text tho.. maybe it should be as below
 // leaving both here incase they relate to which tables get 'locked out' by the MCU somehow
-static const UINT16 shogwarr_default_eeprom[64] = {
+static const uint16_t shogwarr_default_eeprom[64] = {
 	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
 	0x4B41, 0x4E45, 0x4B4F, 0x2F41, 0x544F, 0x5020, 0x3139, 0x3932,
 	0x4655, 0x4A49, 0x5941, 0x4D41, 0x2042, 0x5553, 0x5445, 0x5220,
@@ -2365,7 +2368,7 @@ static ADDRESS_MAP_START( shogwarr_oki2_map, AS_0, 8, kaneko16_shogwarr_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_ROMBANK("bank11")
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( shogwarr, kaneko16_shogwarr_state )
+static MACHINE_CONFIG_START( shogwarr )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz)
@@ -2415,17 +2418,17 @@ static MACHINE_CONFIG_START( shogwarr, kaneko16_shogwarr_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki1", XTAL_16MHz/8, OKIM6295_PIN7_LOW)
+	MCFG_OKIM6295_ADD("oki1", XTAL_16MHz/8, PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, shogwarr_oki1_map)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL_16MHz/8, OKIM6295_PIN7_LOW)
+	MCFG_OKIM6295_ADD("oki2", XTAL_16MHz/8, PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, shogwarr_oki2_map)
 MACHINE_CONFIG_END
 
 
-static const UINT16 brapboys_default_eeprom[64] = {
+static const uint16_t brapboys_default_eeprom[64] = {
 	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
 	0x0000, 0x0005, 0x0006, 0x2030, 0x0003, 0x6818, 0x0101, 0x0101,
 	0x0101, 0x0001, 0x0004, 0x0008, 0x4B41, 0x4E45, 0x4B4F, 0x2020,
@@ -2474,7 +2477,7 @@ void kaneko16_state::kaneko16_unscramble_tiles(const char *region)
 		return;
 	}
 
-	UINT8 *ram = tile_region->base();
+	uint8_t *ram = tile_region->base();
 	int size = tile_region->bytes();
 
 	for (int i = 0; i < size; i ++)
@@ -2495,7 +2498,7 @@ void kaneko16_state::kaneko16_expand_sample_banks(const char *region)
 	   possible combinations of these and swap between them.
 	*/
 	int bank;
-	UINT8 *src0;
+	uint8_t *src0;
 
 	if (memregion(region)->bytes() < 0x40000 * 16)
 		fatalerror("gtmr SOUND1 region too small\n");
@@ -2504,8 +2507,8 @@ void kaneko16_state::kaneko16_expand_sample_banks(const char *region)
 	src0 = memregion(region)->base();
 	for (bank = 15; bank > 0; bank--)
 	{
-		UINT8 *srcn = src0 + 0x10000 * (bank < 3 ? 3 : bank);
-		UINT8 *dst = src0 + 0x40000 * bank;
+		uint8_t *srcn = src0 + 0x10000 * (bank < 3 ? 3 : bank);
+		uint8_t *dst = src0 + 0x40000 * bank;
 
 		memcpy(dst + 0x30000, srcn + 0x00000, 0x10000);
 		memcpy(dst + 0x00000, src0 + 0x00000, 0x30000);
@@ -2518,9 +2521,81 @@ DRIVER_INIT_MEMBER( kaneko16_state, kaneko16 )
 	kaneko16_unscramble_tiles("gfx3");
 }
 
-DRIVER_INIT_MEMBER( kaneko16_berlwall_state, berlwall )
+/*
+
+berlwallt original bug ?
+
+info from SebV:
+
+After about level 5 or so, if you insert a coin when the continue screen
+pops up, an error message "Copy Board" pops up.
+----------------------------------------
+Happened to me when player dies, at level 4.
+The message is not written in ROM, its sprite ram address is (always?)
+$30fd40
+Routine $337d2 writes it (and routine $5c8c erases it)
+The 'COPY BOARD!' message in stored in ROM directly as sprite number
+($1cfa8)
+
+$20288a : seems to contain the level number (initialized to 2 (?) when a
+game is started, and is incremented by 1 once a level is finished)
+
+01CF3E: move.b  $20288a.l, D0
+01CF44: cmpi.b  #$d, D0
+01CF48: bcs     1cf76                   ; branch not taken -=> 'COPY BOARD!'
+01CF4A: movem.l D0/A0-A2, -(A7)
+01CF4E: movea.l A0, A1
+01CF50: lea     ($4c,PC), A0; ($1cf9e)
+01CF54: nop
+01CF56: lea     ($a,A0), A0             ; A0 = $1cfa8 = 'COPY BOARD!'
+01CF5A: lea     $30e064.l, A1
+01CF60: lea     (-$64,A1), A1
+01CF64: lea     ($1d40,A1), A1
+01CF68: move.b  #$80, D1
+01CF6C: jsr     $33776.l                ; display routine
+01CF72: movem.l (A7)+, D0/A0-A2
+01CF76:
+
+berlwall  levels: 1-1,2,3(anim),...
+berlwallt levels: 1-1(anim)2-1/2/3/4/5(anim)3-1/2/3/4/5(anim)4-1(*)
+
+note: berlwall may be genuine while berlwallt may be bootleg! because
+stage 1-1 of berlwallt is stage 1-3 of berlwall, and berlwall has
+explanation ingame.
+(TAFA flyers exist for both berlwall and berlwallt player graphics)
+--------------------------------------------------------------------------------
+*/
+// TODO: this is certainly a protection issue, the level number variable can go up to 0x2f, which is way bigger than 0xd.
+// Sprite DMA decryption? @see berlwall_spriteram_r
+void kaneko16_berlwall_state::patch_protection(uint32_t bra_offset,uint16_t bra_value,uint16_t checksum)
+{
+	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
+
+	ROM[bra_offset/2] = bra_value;
+	ROM[0x3fffe/2] = checksum;
+}
+
+DRIVER_INIT_MEMBER(kaneko16_berlwall_state, berlwall_common)
 {
 	kaneko16_unscramble_tiles("gfx2");
+}
+
+DRIVER_INIT_MEMBER( kaneko16_berlwall_state, berlwall )
+{
+	DRIVER_INIT_CALL(berlwall_common);
+	patch_protection(0x1a3ea,0x602c,0xc40d);
+}
+
+DRIVER_INIT_MEMBER( kaneko16_berlwall_state, berlwallt )
+{
+	DRIVER_INIT_CALL(berlwall_common);
+	patch_protection(0x1cf48,0x602c,0xaed4);
+}
+
+DRIVER_INIT_MEMBER( kaneko16_berlwall_state, berlwallk )
+{
+	DRIVER_INIT_CALL(berlwall_common);
+	patch_protection(0x1ceb0,0x602c,0x8364);
 }
 
 DRIVER_INIT_MEMBER( kaneko16_state, samplebank )
@@ -2737,51 +2812,6 @@ ROM_START( berlwall )
 	ROM_LOAD( "bw_u48.u48", 0x200, 0x0117, NO_DUMP)
 	ROM_LOAD( "bw_u54.u54", 0x400, 0x0117, NO_DUMP)
 ROM_END
-
-
-/*
-berlwallt original bug ?
-
-info from SebV:
-
-After about level 5 or so, if you insert a coin when the continue screen
-pops up, an error message "Copy Board" pops up.
-----------------------------------------
-Happened to me when player dies, at level 4.
-The message is not written in ROM, its sprite ram address is (always?)
-$30fd40
-Routine $337d2 writes it (and routine $5c8c erases it)
-The 'COPY BOARD!' message in stored in ROM directly as sprite number
-($1cfa8)
-
-$20288a : seems to contain the level number (initialized to 2 (?) when a
-game is started, and is incremented by 1 once a level is finished)
-
-01CF3E: move.b  $20288a.l, D0
-01CF44: cmpi.b  #$d, D0
-01CF48: bcs     1cf76                   ; branch not taken -=> 'COPY BOARD!'
-01CF4A: movem.l D0/A0-A2, -(A7)
-01CF4E: movea.l A0, A1
-01CF50: lea     ($4c,PC), A0; ($1cf9e)
-01CF54: nop
-01CF56: lea     ($a,A0), A0             ; A0 = $1cfa8 = 'COPY BOARD!'
-01CF5A: lea     $30e064.l, A1
-01CF60: lea     (-$64,A1), A1
-01CF64: lea     ($1d40,A1), A1
-01CF68: move.b  #$80, D1
-01CF6C: jsr     $33776.l                ; display routine
-01CF72: movem.l (A7)+, D0/A0-A2
-01CF76:
-
-berlwall  levels: 1-1,2,3(anim),...
-berlwallt levels: 1-1(anim)2-1/2/3/4/5(anim)3-1/2/3/4/5(anim)4-1(*)
-
-note: berlwall may be genuine while berlwallt may be bootleg! because
-stage 1-1 of berlwallt is stage 1-3 of berlwall, and berlwall has
-explanation ingame.
-(TAFA flyers exist for both berlwall and berlwallt player graphics)
---------------------------------------------------------------------------------
-*/
 
 ROM_START( berlwallt )
 	ROM_REGION( 0x040000, "maincpu", 0 )            /* 68000 Code */
@@ -4441,9 +4471,9 @@ DRIVER_INIT_MEMBER( kaneko16_shogwarr_state, brapboys )
 ***************************************************************************/
 
 GAME( 1991, berlwall, 0,        berlwall, berlwall, kaneko16_berlwall_state, berlwall, ROT0,  "Kaneko", "The Berlin Wall", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, berlwallt,berlwall, berlwall, berlwallt,kaneko16_berlwall_state, berlwall, ROT0,  "Kaneko", "The Berlin Wall (bootleg?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, berlwallk,berlwall, berlwall, berlwallk,kaneko16_berlwall_state, berlwall, ROT0,  "Kaneko (Inter license)", "The Berlin Wall (Korea)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, packbang, 0,        berlwall, packbang, kaneko16_berlwall_state, berlwall, ROT90, "Kaneko", "Pack'n Bang Bang (prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // priorities between stages?
+GAME( 1991, berlwallt,berlwall, berlwall, berlwallt,kaneko16_berlwall_state, berlwallt, ROT0,  "Kaneko", "The Berlin Wall (bootleg?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, berlwallk,berlwall, berlwall, berlwallk,kaneko16_berlwall_state, berlwallk, ROT0,  "Kaneko (Inter license)", "The Berlin Wall (Korea)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, packbang, 0,        berlwall, packbang, kaneko16_berlwall_state, berlwall_common, ROT90, "Kaneko", "Pack'n Bang Bang (prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // priorities between stages?
 
 GAME( 1991, mgcrystl, 0,        mgcrystl, mgcrystl, kaneko16_state,          kaneko16, ROT0,  "Kaneko", "Magical Crystals (World, 92/01/10)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, mgcrystlo,mgcrystl, mgcrystl, mgcrystl, kaneko16_state,          kaneko16, ROT0,  "Kaneko", "Magical Crystals (World, 91/12/10)", MACHINE_SUPPORTS_SAVE )
@@ -4453,7 +4483,7 @@ GAME( 1992, explbrkr, 0,        bakubrkr, bakubrkr, kaneko16_state,          kan
 GAME( 1992, bakubrkr, explbrkr, bakubrkr, bakubrkr, kaneko16_state,          kaneko16, ROT90, "Kaneko", "Bakuretsu Breaker", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, wingforc, 0,        wingforc, wingforc, kaneko16_state,          kaneko16, ROT270,"A.I (Atlus license)",  "Wing Force (Japan, prototype)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1994, bonkadv,  0,        bonkadv , bonkadv,  kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "B.C. Kid / Bonk's Adventure / Kyukyoku!! PC Genjin", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, bonkadv,  0,        bonkadv,  bonkadv,  kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "B.C. Kid / Bonk's Adventure / Kyukyoku!! PC Genjin", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, bloodwar, 0,        bloodwar, bloodwar, kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "Blood Warrior", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, oedfight, bloodwar, bloodwar, bloodwar, kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "Oedo Fight (Japan Bloodshed Ver.)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, gtmr,     0,        gtmr,     gtmr,     kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "1000 Miglia: Great 1000 Miles Rally (94/07/18)", MACHINE_SUPPORTS_SAVE ) // this set shows 'PCB by Jinwei Co Ltd. ROC'

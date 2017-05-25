@@ -108,7 +108,7 @@ void menu_cheat::handle()
 		/* handle autofire menu */
 		if (menu_event->itemref == ITEMREF_CHEATS_AUTOFIRE_SETTINGS && menu_event->iptkey == IPT_UI_SELECT)
 		{
-			menu::stack_push<menu_autofire>(ui(), container);
+			menu::stack_push<menu_autofire>(ui(), container());
 		}
 
 		/* if things changed, update */
@@ -122,11 +122,11 @@ void menu_cheat::handle()
     menu_cheat_populate - populate the cheat menu
 -------------------------------------------------*/
 
-menu_cheat::menu_cheat(mame_ui_manager &mui, render_container *container) : menu(mui, container)
+menu_cheat::menu_cheat(mame_ui_manager &mui, render_container &container) : menu(mui, container)
 {
 }
 
-void menu_cheat::populate()
+void menu_cheat::populate(float &customtop, float &custombottom)
 {
 	/* iterate over cheats */
 	std::string text;
@@ -142,10 +142,10 @@ void menu_cheat::populate()
 	if (!mame_machine_manager::instance()->cheat().entries().empty()) {
 		for (auto &curcheat : mame_machine_manager::instance()->cheat().entries())
 		{
-			UINT32 flags;
+			uint32_t flags;
 			curcheat->menu_text(text, subtext, flags);
 			if (text == MENU_SEPARATOR_ITEM)
-				item_append(menu_item_type::SEPARATOR);
+				item_append(menu_item_type::SEPARATOR, flags);
 			else
 				item_append(text, subtext, flags, curcheat.get());
 		}
@@ -174,7 +174,7 @@ menu_cheat::~menu_cheat()
     menu
 -------------------------------------------------*/
 
-menu_autofire::menu_autofire(mame_ui_manager &mui, render_container *container) : menu(mui, container), last_toggle(false)
+menu_autofire::menu_autofire(mame_ui_manager &mui, render_container &container) : menu(mui, container), last_toggle(false)
 {
 	const screen_device *screen = mui.machine().first_screen();
 
@@ -264,7 +264,7 @@ void menu_autofire::handle()
     menu
 -------------------------------------------------*/
 
-void menu_autofire::populate()
+void menu_autofire::populate(float &customtop, float &custombottom)
 {
 	char temp_text[64];
 

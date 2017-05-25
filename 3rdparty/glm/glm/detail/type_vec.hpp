@@ -1,42 +1,106 @@
-///////////////////////////////////////////////////////////////////////////////////
-/// OpenGL Mathematics (glm.g-truc.net)
-///
-/// Copyright (c) 2005 - 2015 G-Truc Creation (www.g-truc.net)
-/// Permission is hereby granted, free of charge, to any person obtaining a copy
-/// of this software and associated documentation files (the "Software"), to deal
-/// in the Software without restriction, including without limitation the rights
-/// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-/// copies of the Software, and to permit persons to whom the Software is
-/// furnished to do so, subject to the following conditions:
-/// 
-/// The above copyright notice and this permission notice shall be included in
-/// all copies or substantial portions of the Software.
-/// 
-/// Restrictions:
-///		By making use of the Software for military purposes, you choose to make
-///		a Bunny unhappy.
-/// 
-/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-/// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-/// THE SOFTWARE.
-///
 /// @ref core
 /// @file glm/detail/type_vec.hpp
-/// @date 2010-01-26 / 2014-10-05
-/// @author Christophe Riccio
-///////////////////////////////////////////////////////////////////////////////////
 
 #pragma once
 
 #include "precision.hpp"
 #include "type_int.hpp"
 
-namespace glm
+namespace glm{
+namespace detail
 {
+	template <typename T, std::size_t size, bool aligned>
+	struct storage
+	{
+		typedef struct type {
+			uint8 data[size];
+		} type;
+	};
+
+	#define GLM_ALIGNED_STORAGE_TYPE_STRUCT(x) \
+		template <typename T> \
+		struct storage<T, x, true> { \
+			GLM_ALIGNED_STRUCT(x) type { \
+				uint8 data[x]; \
+			}; \
+		};
+
+	GLM_ALIGNED_STORAGE_TYPE_STRUCT(1)
+	GLM_ALIGNED_STORAGE_TYPE_STRUCT(2)
+	GLM_ALIGNED_STORAGE_TYPE_STRUCT(4)
+	GLM_ALIGNED_STORAGE_TYPE_STRUCT(8)
+	GLM_ALIGNED_STORAGE_TYPE_STRUCT(16)
+	GLM_ALIGNED_STORAGE_TYPE_STRUCT(32)
+	GLM_ALIGNED_STORAGE_TYPE_STRUCT(64)
+		
+#	if GLM_ARCH & GLM_ARCH_SSE2_BIT
+		template <>
+		struct storage<float, 16, true>
+		{
+			typedef glm_vec4 type;
+		};
+
+		template <>
+		struct storage<int, 16, true>
+		{
+			typedef glm_ivec4 type;
+		};
+
+		template <>
+		struct storage<unsigned int, 16, true>
+		{
+			typedef glm_uvec4 type;
+		};
+/*
+#	else
+		typedef union __declspec(align(16)) glm_128
+		{
+			unsigned __int8 data[16];
+		} glm_128;
+
+		template <>
+		struct storage<float, 16, true>
+		{
+			typedef glm_128 type;
+		};
+
+		template <>
+		struct storage<int, 16, true>
+		{
+			typedef glm_128 type;
+		};
+
+		template <>
+		struct storage<unsigned int, 16, true>
+		{
+			typedef glm_128 type;
+		};
+*/
+#	endif
+
+#	if (GLM_ARCH & GLM_ARCH_AVX_BIT)
+		template <>
+		struct storage<double, 32, true>
+		{
+			typedef glm_dvec4 type;
+		};
+#	endif
+
+#	if (GLM_ARCH & GLM_ARCH_AVX2_BIT)
+		template <>
+		struct storage<int64, 32, true>
+		{
+			typedef glm_i64vec4 type;
+		};
+
+		template <>
+		struct storage<uint64, 32, true>
+		{
+			typedef glm_u64vec4 type;
+		};
+#	endif
+}//namespace detail
+
 	template <typename T, precision P> struct tvec1;
 	template <typename T, precision P> struct tvec2;
 	template <typename T, precision P> struct tvec3;

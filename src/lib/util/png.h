@@ -89,24 +89,24 @@ struct png_text
 
 struct png_info
 {
-	UINT8 *         image;
-	UINT32          width, height;
-	UINT32          xres, yres;
+	uint8_t *         image;
+	uint32_t          width, height;
+	uint32_t          xres, yres;
 	rectangle       screen;
 	double          xscale, yscale;
 	double          source_gamma;
-	UINT32          resolution_unit;
-	UINT8           bit_depth;
-	UINT8           color_type;
-	UINT8           compression_method;
-	UINT8           filter_method;
-	UINT8           interlace_method;
+	uint32_t          resolution_unit;
+	uint8_t           bit_depth;
+	uint8_t           color_type;
+	uint8_t           compression_method;
+	uint8_t           filter_method;
+	uint8_t           interlace_method;
 
-	UINT8 *         palette;
-	UINT32          num_palette;
+	uint8_t *         palette;
+	uint32_t          num_palette;
 
-	UINT8 *         trans;
-	UINT32          num_trans;
+	uint8_t *         trans;
+	uint32_t          num_trans;
 
 	png_text *      textlist;
 };

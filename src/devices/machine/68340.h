@@ -1,13 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 /* 68340 */
-
+#ifndef MAME_MACHINE_68340_H
+#define MAME_MACHINE_68340_H
 
 #pragma once
-#ifndef __M68340_H__
-#define __M68340_H__
 
-#include "emu.h"
+
 #include "cpu/m68000/m68000.h"
 
 #include "68340sim.h"
@@ -16,27 +15,12 @@
 #include "68340tmu.h"
 
 
-
-
-
-class m68340cpu_device : public fscpu32_device {
+class m68340_cpu_device : public fscpu32_device
+{
 public:
-	m68340cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	m68340_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-
-	int m68340_currentcs;
-
-	/* 68340 peripheral modules */
-	m68340_sim*    m68340SIM;
-	m68340_dma*    m68340DMA;
-	m68340_serial* m68340SERIAL;
-	m68340_timer*  m68340TIMER;
-
-	UINT32 m68340_base;
-
-	UINT16 m_avr;
-	UINT16 m_picr;
-	UINT16 m_pitr;
+	uint16_t get_cs(offs_t address);
 
 	READ32_MEMBER( m68340_internal_base_r );
 	WRITE32_MEMBER( m68340_internal_base_w );
@@ -53,23 +37,33 @@ public:
 	READ32_MEMBER( m68340_internal_timer_r );
 	WRITE32_MEMBER( m68340_internal_timer_w );
 
-	emu_timer *m_irq_timer;
-	TIMER_CALLBACK_MEMBER(periodic_interrupt_timer_callback);
-	void start_68340_sim(void);
-	void do_timer_irq(void);
 protected:
-
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	TIMER_CALLBACK_MEMBER(periodic_interrupt_timer_callback);
+	void start_68340_sim();
+	void do_timer_irq();
+
+	int calc_cs(offs_t address) const;
+
+	int m_currentcs;
+
+	/* 68340 peripheral modules */
+	m68340_sim*    m68340SIM;
+	m68340_dma*    m68340DMA;
+	m68340_serial* m68340SERIAL;
+	m68340_timer*  m68340TIMER;
+
+	uint32_t m68340_base;
+
+	uint16_t m_avr;
+	uint16_t m_picr;
+	uint16_t m_pitr;
+
+	emu_timer *m_irq_timer;
 };
 
-static const device_type M68340 = &device_creator<m68340cpu_device>;
+DECLARE_DEVICE_TYPE(M68340, m68340_cpu_device)
 
-extern UINT16 m68340_get_cs(m68340cpu_device *device, offs_t address);
-
-
-
-
-
-#endif
+#endif // MAME_MACHINE_68340_H

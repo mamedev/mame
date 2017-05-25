@@ -16,135 +16,135 @@
 
 struct DVI_Header
 {
-	UINT32 dv1;     // header ID (VDVI)
-	UINT16 dv2;     // header size (sometimes just 1)
-	UINT16 dv3;     // header version
-	UINT32 dv4;     // offset of annotation data
+	uint32_t dv1;     // header ID (VDVI)
+	uint16_t dv2;     // header size (sometimes just 1)
+	uint16_t dv3;     // header version
+	uint32_t dv4;     // offset of annotation data
 };
 
 
 struct AVSS_Header
 {
-	UINT32 av1;       // header ID (AVSS)
-	UINT16 av2;     // header size
-	UINT16 av3;     // header version
-	UINT16 av4;       // number of stream groups
-	UINT16 av5;       // size of each stream group
-	UINT32 av6;       // offset to first stream group
-	UINT16 av7;       // format of stream groups
-	UINT16 av8;       // size of stream header
-	UINT16 av9;       // format of stream header
-	UINT16 av10;      // number of stream headers
-	UINT32 av11;      // offset to stream structures array
-	UINT32 av12;      // offset to substream headers array
-	UINT32 av13;      // number of labels
-	UINT32 av14;      // offset to first label
-	UINT16 av15;      // label size
-	UINT16 av16;      // label format
-	UINT32 av17;      // offset to video sequence header
-	UINT16 av18;      // size of video sequence header
-	UINT16 av19;      // version of frame headers
-	UINT32 av20;      // number of frame headers
-	UINT32 av21;      // size of frame headers
-	UINT32 av22;      // offset to first frame
-	UINT32 av23;      // offset of last frame
-	UINT16 av24;      // size of frame header
-	UINT16 av25;      // size of frame dictionary
-	UINT32 av26;      // offset of frame dictionary
-	UINT16 av27;      // format of frame dictionary
-	UINT16 av28;      // framerate
-	UINT32 av29;      // streaming data?
-	UINT32 av30;      // unused
-	UINT8  av31[32];  // unused
+	uint32_t av1;       // header ID (AVSS)
+	uint16_t av2;     // header size
+	uint16_t av3;     // header version
+	uint16_t av4;       // number of stream groups
+	uint16_t av5;       // size of each stream group
+	uint32_t av6;       // offset to first stream group
+	uint16_t av7;       // format of stream groups
+	uint16_t av8;       // size of stream header
+	uint16_t av9;       // format of stream header
+	uint16_t av10;      // number of stream headers
+	uint32_t av11;      // offset to stream structures array
+	uint32_t av12;      // offset to substream headers array
+	uint32_t av13;      // number of labels
+	uint32_t av14;      // offset to first label
+	uint16_t av15;      // label size
+	uint16_t av16;      // label format
+	uint32_t av17;      // offset to video sequence header
+	uint16_t av18;      // size of video sequence header
+	uint16_t av19;      // version of frame headers
+	uint32_t av20;      // number of frame headers
+	uint32_t av21;      // size of frame headers
+	uint32_t av22;      // offset to first frame
+	uint32_t av23;      // offset of last frame
+	uint16_t av24;      // size of frame header
+	uint16_t av25;      // size of frame dictionary
+	uint32_t av26;      // offset of frame dictionary
+	uint16_t av27;      // format of frame dictionary
+	uint16_t av28;      // framerate
+	uint32_t av29;      // streaming data?
+	uint32_t av30;      // unused
+	uint8_t  av31[32];  // unused
 };
 
 struct STRM_Header
 {
-	UINT32 st1;       // header ID (STRM)
-	UINT16 st2;       // header size
-	UINT16 st3;       // stream type
-	UINT16 st4;       // stream subtype
-	UINT16 st5;       // number of substream headers
-	UINT16 st6;       // next stream ID
-	UINT16 st7;       // group IP
-	UINT16 st8;       // unused (Pad)
-	UINT16 st9;       // frame size flag..
-	UINT32 st10;      // max data per frame
-	UINT32 st11;      // offset to first substream header
-	UINT8  st12[16];  // name
+	uint32_t st1;       // header ID (STRM)
+	uint16_t st2;       // header size
+	uint16_t st3;       // stream type
+	uint16_t st4;       // stream subtype
+	uint16_t st5;       // number of substream headers
+	uint16_t st6;       // next stream ID
+	uint16_t st7;       // group IP
+	uint16_t st8;       // unused (Pad)
+	uint16_t st9;       // frame size flag..
+	uint32_t st10;      // max data per frame
+	uint32_t st11;      // offset to first substream header
+	uint8_t  st12[16];  // name
 };
 
 #if 0
 struct AUDI_Header
 {
-	UINT32 au1;      // header iID (AUDI)
-	UINT16 au2;      // header size
-	UINT16 au3;      // header format
-	UINT8  au4[80];  // original media filename
-	UINT32 au5;      // original media frame ID
-	UINT16 au6;    // original media frame ID
-	UINT16 au7;      // unused (Pad)
-	UINT32 au8;      // number of frames
-	UINT32 au9;      // offset of next header
-	UINT8  au10[16]; // library stream name
-	UINT8  au11[16]; // compression algorithm name
-	UINT32 au12;     // sample freq
-	UINT16 au13;     // filter cutoff
-	UINT16 au14;     // unused
-	UINT16 au15;     // left volume
-	UINT16 au16;     // right volume
-	UINT32 au17;     // unused
-	UINT32 au18;     // first frame ID
-	UINT32 au19;     // mono / stereo
-	UINT16 au20;     // playback rate
-	UINT16 au21;     // unused (Pad)
-	UINT32 au22;     // Digital Compression ID
+	uint32_t au1;      // header iID (AUDI)
+	uint16_t au2;      // header size
+	uint16_t au3;      // header format
+	uint8_t  au4[80];  // original media filename
+	uint32_t au5;      // original media frame ID
+	uint16_t au6;    // original media frame ID
+	uint16_t au7;      // unused (Pad)
+	uint32_t au8;      // number of frames
+	uint32_t au9;      // offset of next header
+	uint8_t  au10[16]; // library stream name
+	uint8_t  au11[16]; // compression algorithm name
+	uint32_t au12;     // sample freq
+	uint16_t au13;     // filter cutoff
+	uint16_t au14;     // unused
+	uint16_t au15;     // left volume
+	uint16_t au16;     // right volume
+	uint32_t au17;     // unused
+	uint32_t au18;     // first frame ID
+	uint32_t au19;     // mono / stereo
+	uint16_t au20;     // playback rate
+	uint16_t au21;     // unused (Pad)
+	uint32_t au22;     // Digital Compression ID
 };
 #endif
 
 struct CIMG_Header
 {
-	UINT32 ci1;     // header ID (CIMG)
-	UINT16 ci2;     // header size
-	UINT16 ci3;     // header format
-	UINT8  ci4[80]; // source media filename
-	UINT32 ci5;     // source media frame ID
-	UINT16 ci6;     // source media stream ID
-	UINT16 ci7;     // Unused (Pad value)
-	UINT32 ci8;     // Frames before next header
-	UINT32 ci9;     // Next Header Pos
-	UINT16 ci10;    // X Pos
-	UINT16 ci11;    // Y Pos
-	UINT16 ci12;    // Width
-	UINT16 ci13;    // Height
-	UINT16 ci14;    // X Crop
-	UINT16 ci15;    // Y Crop
-	UINT16 ci16;    // Unused
-	UINT16 ci17;    // Unused
-	UINT32 ci18;    // Interframe Frequency
-	UINT16 ci19;    // Min Buffer Size
-	UINT16 ci20;    // Max Buffer Size
-	UINT16 ci21;    // Decompression ID
-	UINT16 ci22;    // Unused (Pad Value)
-	UINT32 ci23;    // Digitial Compression ID
+	uint32_t ci1;     // header ID (CIMG)
+	uint16_t ci2;     // header size
+	uint16_t ci3;     // header format
+	uint8_t  ci4[80]; // source media filename
+	uint32_t ci5;     // source media frame ID
+	uint16_t ci6;     // source media stream ID
+	uint16_t ci7;     // Unused (Pad value)
+	uint32_t ci8;     // Frames before next header
+	uint32_t ci9;     // Next Header Pos
+	uint16_t ci10;    // X Pos
+	uint16_t ci11;    // Y Pos
+	uint16_t ci12;    // Width
+	uint16_t ci13;    // Height
+	uint16_t ci14;    // X Crop
+	uint16_t ci15;    // Y Crop
+	uint16_t ci16;    // Unused
+	uint16_t ci17;    // Unused
+	uint32_t ci18;    // Interframe Frequency
+	uint16_t ci19;    // Min Buffer Size
+	uint16_t ci20;    // Max Buffer Size
+	uint16_t ci21;    // Decompression ID
+	uint16_t ci22;    // Unused (Pad Value)
+	uint32_t ci23;    // Digitial Compression ID
 };
 
 struct FHEAD_Header
 {
-	UINT32 fh1;              // frame number
-	UINT32 fh2;              // offset of previous frame
-	UINT32 fh3;              // checksum
-	//UINT32 framesizearray? // just the frame data?
+	uint32_t fh1;              // frame number
+	uint32_t fh2;              // offset of previous frame
+	uint32_t fh3;              // checksum
+	//uint32_t framesizearray? // just the frame data?
 };
 
 struct FDICT_Header
 {
-	UINT32 fd1; // offset of frame header
+	uint32_t fd1; // offset of frame header
 };
 
-static UINT32 R32(UINT8 **currptr)
+static uint32_t R32(uint8_t **currptr)
 {
-	UINT32 ret = 0;
+	uint32_t ret = 0;
 	ret |= *(*currptr)++; ret <<=8;
 	ret |= *(*currptr)++; ret <<=8;
 	ret |= *(*currptr)++; ret <<=8;
@@ -153,27 +153,27 @@ static UINT32 R32(UINT8 **currptr)
 	return ret;
 }
 
-static UINT16 R16(UINT8 **currptr)
+static uint16_t R16(uint8_t **currptr)
 {
-	UINT16 ret = 0;
+	uint16_t ret = 0;
 	ret |= *(*currptr)++; ret <<=8;
 	ret |= *(*currptr)++;
 
 	return ret;
 }
 
-static UINT8 R8(UINT8 **currptr)
+static uint8_t R8(uint8_t **currptr)
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 	ret |= *(*currptr)++;
 	return ret;
 }
 
-void process_dvi_data(device_t *device,UINT8* dvi_data, int baseoffset, int regionsize)
+void process_dvi_data(device_t *device,uint8_t* dvi_data, int baseoffset, int regionsize)
 {
 	DVI_Header DVI;
 
-	UINT8* currptr = dvi_data + baseoffset;
+	uint8_t* currptr = dvi_data + baseoffset;
 
 	DVI.dv1 = R32(&currptr);
 	DVI.dv2 = R16(&currptr);
@@ -288,7 +288,7 @@ void process_dvi_data(device_t *device,UINT8* dvi_data, int baseoffset, int regi
 		dviprintf("     Name               ");  for (int i=0;i<16;i++) { dviprintf("%02x", STRM.st12[i]); }; dviprintf("\n");
 		dviprintf("\n");
 
-		UINT8* subptr = dvi_data+STRM.st11+baseoffset;
+		uint8_t* subptr = dvi_data+STRM.st11+baseoffset;
 
 		for (int h=0;h<STRM.st5;h++)
 		{
@@ -356,8 +356,8 @@ void process_dvi_data(device_t *device,UINT8* dvi_data, int baseoffset, int regi
 	/* some entries also seem to point to the wrong places?? I'm guessing this isn't used when playing back the data ... it seems like the upper and lower words are out of sync... */
 	dviprintf("Frame Dictionaries\n\n");
 
-	UINT8* frameptr = dvi_data + AVSS.av26 + 2 + baseoffset; // +2 ??
-//  UINT8* frameptr = dvi_data + AVSS.av26 + baseoffset;
+	uint8_t* frameptr = dvi_data + AVSS.av26 + 2 + baseoffset; // +2 ??
+//  uint8_t* frameptr = dvi_data + AVSS.av26 + baseoffset;
 
 	for (int f=0;f<AVSS.av20;f++)
 	{
@@ -368,7 +368,7 @@ void process_dvi_data(device_t *device,UINT8* dvi_data, int baseoffset, int regi
 
 		dviprintf(" %04d Frame Offset %08x\n", f, FDICT.fd1);
 
-			UINT8* frameptr2 = dvi_data + ((FDICT.fd1 + baseoffset)&(regionsize-1)) ;
+			uint8_t* frameptr2 = dvi_data + ((FDICT.fd1 + baseoffset)&(regionsize-1)) ;
 		FHEAD_Header FHEAD;
 		FHEAD.fh1 = R32(&frameptr2);
 		FHEAD.fh2 = R32(&frameptr2);

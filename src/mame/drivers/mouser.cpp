@@ -15,9 +15,13 @@
 *******************************************************************************/
 
 #include "emu.h"
+#include "includes/mouser.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-#include "includes/mouser.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 /* Mouser has external masking circuitry around
  * the NMI input on the main CPU */
@@ -197,7 +201,7 @@ void mouser_state::machine_reset()
 	m_nmi_enable = 0;
 }
 
-static MACHINE_CONFIG_START( mouser, mouser_state )
+static MACHINE_CONFIG_START( mouser )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)   /* 4 MHz ? */
@@ -288,8 +292,8 @@ DRIVER_INIT_MEMBER(mouser_state,mouser)
 	/* Decode the opcodes */
 
 	offs_t i;
-	UINT8 *rom = memregion("maincpu")->base();
-	UINT8 *table = memregion("user1")->base();
+	uint8_t *rom = memregion("maincpu")->base();
+	uint8_t *table = memregion("user1")->base();
 
 	for (i = 0; i < 0x6000; i++)
 	{
@@ -298,5 +302,5 @@ DRIVER_INIT_MEMBER(mouser_state,mouser)
 }
 
 
-GAME( 1983, mouser,   0,      mouser, mouser, mouser_state, mouser, ROT90, "UPL", "Mouser", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mouser,   0,      mouser, mouser, mouser_state, mouser, ROT90, "UPL",                  "Mouser",          MACHINE_SUPPORTS_SAVE )
 GAME( 1983, mouserc,  mouser, mouser, mouser, mouser_state, mouser, ROT90, "UPL (Cosmos license)", "Mouser (Cosmos)", MACHINE_SUPPORTS_SAVE )

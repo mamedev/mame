@@ -44,8 +44,10 @@ this seems more like 8-bit hardware, maybe it should be v25, not v35...
 
 #include "emu.h"
 #include "cpu/nec/v25.h"
-#include "sound/ay8910.h"
 #include "machine/i8255.h"
+#include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class cb2001_state : public driver_device
@@ -59,8 +61,8 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
 
-	required_shared_ptr<UINT16> m_vram_fg;
-	required_shared_ptr<UINT16> m_vram_bg;
+	required_shared_ptr<uint16_t> m_vram_fg;
+	required_shared_ptr<uint16_t> m_vram_bg;
 	int m_videobank;
 	int m_videomode;
 	tilemap_t *m_reel1_tilemap;
@@ -76,7 +78,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_cb2001_reel3_tile_info);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(cb2001);
-	UINT32 screen_update_cb2001(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_cb2001(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -86,7 +88,7 @@ public:
 
 #define xxxx 0x90 /* Unknown */
 
-static const UINT8 cb2001_decryption_table[256] = {
+static const uint8_t cb2001_decryption_table[256] = {
 	0xe8,xxxx,xxxx,xxxx,0x80,0xe4,0x12,0x2f, 0x3c,xxxx,xxxx,0x23,xxxx,xxxx,xxxx,0x5f, /* 00 */
 //    ssss                ---- **** pppp pppp  ssss           pppp                pppp
 	0x86,xxxx,xxxx,0x27,0x1c,xxxx,xxxx,xxxx, 0x32,0x40,0xa0,0xd3,0x3a,0x14,0x89,0x1f, /* 10 */
@@ -341,7 +343,7 @@ e3 -> c6
 */
 
 
-UINT32 cb2001_state::screen_update_cb2001(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t cb2001_state::screen_update_cb2001(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int count,x,y;
 	bitmap.fill(m_palette->black_pen(), cliprect);
@@ -377,7 +379,7 @@ UINT32 cb2001_state::screen_update_cb2001(screen_device &screen, bitmap_rgb32 &b
 
 			for (i= 0;i < 64;i++)
 			{
-				UINT16 scroll;
+				uint16_t scroll;
 
 				scroll = m_vram_bg[0xa00/2 + i/2];
 				if (i&1)
@@ -447,7 +449,7 @@ UINT32 cb2001_state::screen_update_cb2001(screen_device &screen, bitmap_rgb32 &b
    is being executed incorrectly */
 WRITE16_MEMBER(cb2001_state::cb2001_vidctrl_w)
 {
-	if (mem_mask&0xff00) // video control?
+	if (ACCESSING_BITS_8_15) // video control?
 	{
 		printf("cb2001_vidctrl_w %04x %04x\n", data, mem_mask);
 		m_videobank = (data & 0x0800)>>11;
@@ -458,7 +460,7 @@ WRITE16_MEMBER(cb2001_state::cb2001_vidctrl_w)
 
 WRITE16_MEMBER(cb2001_state::cb2001_vidctrl2_w)
 {
-	if (mem_mask&0xff00) // video control?
+	if (ACCESSING_BITS_8_15) // video control?
 	{
 		printf("cb2001_vidctrl2_w %04x %04x\n", data, mem_mask); // i think this switches to 'reels' mode
 		m_videomode = (data>>8) & 0x03; // which bit??
@@ -524,9 +526,9 @@ TILE_GET_INFO_MEMBER(cb2001_state::get_cb2001_reel3_tile_info)
 
 void cb2001_state::video_start()
 {
-	m_reel1_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(cb2001_state::get_cb2001_reel1_tile_info),this),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
-	m_reel2_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(cb2001_state::get_cb2001_reel2_tile_info),this),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
-	m_reel3_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(cb2001_state::get_cb2001_reel3_tile_info),this),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cb2001_state::get_cb2001_reel1_tile_info),this),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cb2001_state::get_cb2001_reel2_tile_info),this),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel3_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cb2001_state::get_cb2001_reel3_tile_info),this),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
 
 	m_reel1_tilemap->set_scroll_cols(64);
 	m_reel2_tilemap->set_scroll_cols(64);
@@ -783,9 +785,9 @@ PALETTE_INIT_MEMBER(cb2001_state, cb2001)
 	{
 		int r,g,b;
 
-		UINT8*proms = memregion("proms")->base();
+		uint8_t*proms = memregion("proms")->base();
 		int length = memregion("proms")->bytes();
-		UINT16 dat;
+		uint16_t dat;
 
 		dat = (proms[0x000+i] << 8) | proms[0x200+i];
 
@@ -805,7 +807,7 @@ PALETTE_INIT_MEMBER(cb2001_state, cb2001)
 	}
 }
 
-static MACHINE_CONFIG_START( cb2001, cb2001_state )
+static MACHINE_CONFIG_START( cb2001 )
 	MCFG_CPU_ADD("maincpu", V35, 20000000) // CPU91A-011-0016JK004; encrypted cpu like nec v25/35 used in some irem game
 	MCFG_V25_CONFIG(cb2001_decryption_table)
 	MCFG_CPU_PROGRAM_MAP(cb2001_map)
@@ -867,5 +869,5 @@ ROM_START( scherrym )
 	ROM_LOAD( "n82s135-2.bin", 0x200, 0x100, CRC(a19821db) SHA1(62dda90dd67dfbc0b96f161f1f2b7a46a5805eae) )
 ROM_END
 
-GAME( 2001, cb2001,    0,      cb2001,      cb2001, driver_device,   0, ROT0,  "Dyna", "Cherry Bonus 2001", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
-GAME( 2001, scherrym,  0,      cb2001,      cb2001, driver_device,   0, ROT0,  "Dyna", "Super Cherry Master", MACHINE_NOT_WORKING|MACHINE_NO_SOUND ) // 2001 version? (we have bootlegs running on z80 hw of a 1996 version)
+GAME( 2001, cb2001,    0,      cb2001,      cb2001, cb2001_state,   0, ROT0,  "Dyna", "Cherry Bonus 2001",   MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+GAME( 2001, scherrym,  0,      cb2001,      cb2001, cb2001_state,   0, ROT0,  "Dyna", "Super Cherry Master", MACHINE_NOT_WORKING|MACHINE_NO_SOUND ) // 2001 version? (we have bootlegs running on z80 hw of a 1996 version)

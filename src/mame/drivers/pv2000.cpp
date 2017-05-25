@@ -37,7 +37,9 @@ For BIOS CRC confirmation
 #include "imagedev/cassette.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 class pv2000_state : public driver_device
 {
@@ -62,9 +64,9 @@ public:
 	DECLARE_READ8_MEMBER(cass_in);
 	DECLARE_WRITE8_MEMBER(cass_out);
 	bool m_last_state;
-	UINT8 m_key_pressed;
-	UINT8 m_keyb_column;
-	UINT8 m_cass_conf;
+	uint8_t m_key_pressed;
+	uint8_t m_keyb_column;
+	uint8_t m_cass_conf;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pv2000_cart);
@@ -96,7 +98,7 @@ WRITE8_MEMBER( pv2000_state::keys_w )
 
 READ8_MEMBER( pv2000_state::keys_hi_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 	char kbdrow[6];
 
 	switch ( m_keyb_column )
@@ -120,7 +122,7 @@ READ8_MEMBER( pv2000_state::keys_hi_r )
 
 READ8_MEMBER( pv2000_state::keys_lo_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 	char kbdrow[6];
 
 	logerror("%s: pv2000_keys_r\n", machine().describe_context() );
@@ -321,7 +323,7 @@ WRITE_LINE_MEMBER( pv2000_state::pv2000_vdp_interrupt )
 	if ( m_keyb_column == 0x0f )
 	{
 		/* Check if a key is pressed */
-		UINT8 key_pressed;
+		uint8_t key_pressed;
 
 		key_pressed = ioport( "IN0" )->read()
 			| ioport( "IN1" )->read()
@@ -362,22 +364,22 @@ void pv2000_state::machine_reset()
 
 DEVICE_IMAGE_LOAD_MEMBER( pv2000_state, pv2000_cart )
 {
-	UINT32 size = m_cart->common_get_size("rom");
+	uint32_t size = m_cart->common_get_size("rom");
 
 	if (size != 0x2000 && size != 0x4000)
 	{
 		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
 	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 /* Machine Drivers */
-static MACHINE_CONFIG_START( pv2000, pv2000_state )
+static MACHINE_CONFIG_START( pv2000 )
 
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_7_15909MHz/2) // 3.579545 MHz
@@ -424,5 +426,5 @@ ROM_END
 
 /* System Drivers */
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT     INIT COMPANY   FULLNAME    FLAGS
-CONS( 1983, pv2000,  0,      0,      pv2000,  pv2000, driver_device,   0,   "Casio",  "PV-2000",  MACHINE_NOT_WORKING )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   STATE           INIT COMPANY   FULLNAME    FLAGS
+CONS( 1983, pv2000,  0,      0,      pv2000,  pv2000, pv2000_state,   0,   "Casio",  "PV-2000",  MACHINE_NOT_WORKING )

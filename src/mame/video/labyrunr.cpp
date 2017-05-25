@@ -6,7 +6,7 @@
 
 PALETTE_INIT_MEMBER(labyrunr_state, labyrunr)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int pal;
 
 	for (pal = 0; pal < 8; pal++)
@@ -26,7 +26,7 @@ PALETTE_INIT_MEMBER(labyrunr_state, labyrunr)
 
 			for (i = 0; i < 0x100; i++)
 			{
-				UINT8 ctabentry;
+				uint8_t ctabentry;
 
 				if (color_prom[i] == 0)
 					ctabentry = 0;
@@ -49,10 +49,10 @@ PALETTE_INIT_MEMBER(labyrunr_state, labyrunr)
 
 TILE_GET_INFO_MEMBER(labyrunr_state::get_tile_info0)
 {
-	UINT8 ctrl_3 = m_k007121->ctrlram_r(generic_space(), 3);
-	UINT8 ctrl_4 = m_k007121->ctrlram_r(generic_space(), 4);
-	UINT8 ctrl_5 = m_k007121->ctrlram_r(generic_space(), 5);
-	UINT8 ctrl_6 = m_k007121->ctrlram_r(generic_space(), 6);
+	uint8_t ctrl_3 = m_k007121->ctrlram_r(generic_space(), 3);
+	uint8_t ctrl_4 = m_k007121->ctrlram_r(generic_space(), 4);
+	uint8_t ctrl_5 = m_k007121->ctrlram_r(generic_space(), 5);
+	uint8_t ctrl_6 = m_k007121->ctrlram_r(generic_space(), 6);
 	int attr = m_videoram1[tile_index];
 	int code = m_videoram1[tile_index + 0x400];
 	int bit0 = (ctrl_5 >> 0) & 0x03;
@@ -77,10 +77,10 @@ TILE_GET_INFO_MEMBER(labyrunr_state::get_tile_info0)
 
 TILE_GET_INFO_MEMBER(labyrunr_state::get_tile_info1)
 {
-	UINT8 ctrl_3 = m_k007121->ctrlram_r(generic_space(), 3);
-	UINT8 ctrl_4 = m_k007121->ctrlram_r(generic_space(), 4);
-	UINT8 ctrl_5 = m_k007121->ctrlram_r(generic_space(), 5);
-	UINT8 ctrl_6 = m_k007121->ctrlram_r(generic_space(), 6);
+	uint8_t ctrl_3 = m_k007121->ctrlram_r(generic_space(), 3);
+	uint8_t ctrl_4 = m_k007121->ctrlram_r(generic_space(), 4);
+	uint8_t ctrl_5 = m_k007121->ctrlram_r(generic_space(), 5);
+	uint8_t ctrl_6 = m_k007121->ctrlram_r(generic_space(), 6);
 	int attr = m_videoram2[tile_index];
 	int code = m_videoram2[tile_index + 0x400];
 	int bit0 = (ctrl_5 >> 0) & 0x03;
@@ -112,8 +112,8 @@ TILE_GET_INFO_MEMBER(labyrunr_state::get_tile_info1)
 
 void labyrunr_state::video_start()
 {
-	m_layer0 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(labyrunr_state::get_tile_info0),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_layer1 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(labyrunr_state::get_tile_info1),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_layer0 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(labyrunr_state::get_tile_info0),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_layer1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(labyrunr_state::get_tile_info1),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_layer0->set_transparent_pen(0);
 	m_layer1->set_transparent_pen(0);
@@ -156,10 +156,10 @@ WRITE8_MEMBER(labyrunr_state::labyrunr_vram2_w)
 
 ***************************************************************************/
 
-UINT32 labyrunr_state::screen_update_labyrunr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t labyrunr_state::screen_update_labyrunr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	address_space &space = machine().driver_data()->generic_space();
-	UINT8 ctrl_0 = m_k007121->ctrlram_r(space, 0);
+	address_space &space = machine().dummy_space();
+	uint8_t ctrl_0 = m_k007121->ctrlram_r(space, 0);
 	rectangle finalclip0, finalclip1;
 
 	screen.priority().fill(0, cliprect);
@@ -188,7 +188,7 @@ UINT32 labyrunr_state::screen_update_labyrunr(screen_device &screen, bitmap_ind1
 		}
 
 		m_layer0->draw(screen, bitmap, finalclip0, TILEMAP_DRAW_OPAQUE, 0);
-		m_k007121->sprites_draw(bitmap, cliprect, m_gfxdecode->gfx(0), m_palette, m_spriteram,(m_k007121->ctrlram_r(space, 6) & 0x30) * 2, 40,0,screen.priority(),(m_k007121->ctrlram_r(space, 3) & 0x40) >> 5);
+		m_k007121->sprites_draw(bitmap, cliprect, m_gfxdecode->gfx(0), *m_palette, m_spriteram,(m_k007121->ctrlram_r(space, 6) & 0x30) * 2, 40,0,screen.priority(),(m_k007121->ctrlram_r(space, 3) & 0x40) >> 5);
 		/* we ignore the transparency because layer1 is drawn only at the top of the screen also covering sprites */
 		m_layer1->draw(screen, bitmap, finalclip1, TILEMAP_DRAW_OPAQUE, 0);
 	}
@@ -258,7 +258,7 @@ UINT32 labyrunr_state::screen_update_labyrunr(screen_device &screen, bitmap_ind1
 		if(use_clip3[1])
 			m_layer1->draw(screen, bitmap, finalclip3, 0, 1);
 
-		m_k007121->sprites_draw(bitmap, cliprect, m_gfxdecode->gfx(0), m_palette, m_spriteram, (m_k007121->ctrlram_r(space, 6) & 0x30) * 2,40,0,screen.priority(),(m_k007121->ctrlram_r(space, 3) & 0x40) >> 5);
+		m_k007121->sprites_draw(bitmap, cliprect, m_gfxdecode->gfx(0), *m_palette, m_spriteram, (m_k007121->ctrlram_r(space, 6) & 0x30) * 2,40,0,screen.priority(),(m_k007121->ctrlram_r(space, 3) & 0x40) >> 5);
 	}
 	return 0;
 }

@@ -18,10 +18,14 @@ ToDo:
 
 *****************************************************************************************************/
 
+#include "emu.h"
 #include "machine/genpin.h"
+
 #include "cpu/m6502/m65c02.h"
 #include "machine/6522via.h"
 #include "video/mc6845.h"
+#include "screen.h"
+
 
 class gts3a_state : public driver_device
 {
@@ -33,7 +37,7 @@ public:
 		, m_dmdcpu(*this, "dmdcpu")
 		, m_u4(*this, "u4")
 		, m_u5(*this, "u5")
-		, m_switches(*this, "X")
+		, m_switches(*this, "X.%u", 0)
 	{ }
 
 	DECLARE_DRIVER_INIT(gts3a);
@@ -51,11 +55,11 @@ public:
 private:
 	bool m_dispclk;
 	bool m_lampclk;
-	UINT8 m_digit;
-	UINT8 m_row; // for lamps and switches
-	UINT8 m_segment[4];
-	UINT8 m_u4b;
-	UINT8 m_dmd;
+	uint8_t m_digit;
+	uint8_t m_row; // for lamps and switches
+	uint8_t m_segment[4];
+	uint8_t m_u4b;
+	uint8_t m_dmd;
 	virtual void machine_reset() override;
 	required_device<m65c02_device> m_maincpu;
 	required_device<m65c02_device> m_dmdcpu;
@@ -225,7 +229,7 @@ WRITE_LINE_MEMBER( gts3a_state::nmi_w )
 
 WRITE8_MEMBER( gts3a_state::segbank_w )
 { // this is all wrong
-	UINT32 seg1,seg2;
+	uint32_t seg1,seg2;
 	m_segment[offset] = data;
 	seg1 = m_segment[offset&2] | (m_segment[offset|1] << 8);
 	seg2 = BITSWAP32(seg1,16,16,16,16,16,16,16,16,16,16,16,16,16,16,15,14,9,7,13,11,10,6,8,12,5,4,3,3,2,1,0,0);
@@ -238,7 +242,7 @@ WRITE8_MEMBER( gts3a_state::u4b_w )
 	bool clk_bit = BIT(data, 6);
 	if ((!m_dispclk) && clk_bit) // 0->1 is valid
 	{
-		if BIT(data, 5)
+		if (BIT(data, 5))
 			m_digit = 0;
 		else
 			m_digit++;
@@ -248,7 +252,7 @@ WRITE8_MEMBER( gts3a_state::u4b_w )
 	clk_bit = BIT(data, 1);
 	if ((!m_lampclk) && clk_bit) // 0->1 is valid
 	{
-		if BIT(data, 0)
+		if (BIT(data, 0))
 			m_row = 0;
 		else
 			m_row++;
@@ -280,7 +284,7 @@ void gts3a_state::machine_reset()
 
 DRIVER_INIT_MEMBER( gts3a_state, gts3a )
 {
-	UINT8 *dmd = memregion("dmdcpu")->base();
+	uint8_t *dmd = memregion("dmdcpu")->base();
 
 	membank("bank1")->configure_entries(0, 32, &dmd[0x0000], 0x4000);
 }
@@ -305,9 +309,9 @@ PALETTE_INIT_MEMBER( gts3a_state, gts3a )
 MC6845_UPDATE_ROW( gts3a_state::crtc_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT8 gfx=0;
-	UINT16 mem,x;
-	UINT32 *p = &bitmap.pix32(y);
+	uint8_t gfx=0;
+	uint16_t mem,x;
+	uint32_t *p = &bitmap.pix32(y);
 
 	for (x = 0; x < x_count; x++)
 	{
@@ -326,7 +330,7 @@ MC6845_UPDATE_ROW( gts3a_state::crtc_update_row )
 	}
 }
 
-static MACHINE_CONFIG_START( gts3a, gts3a_state )
+static MACHINE_CONFIG_START( gts3a )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M65C02, XTAL_4MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(gts3a_map)
@@ -354,7 +358,7 @@ static MACHINE_CONFIG_START( gts3a, gts3a_state )
 	MCFG_FRAGMENT_ADD( genpin_audio )
 
 	MCFG_DEVICE_ADD("u4", VIA6522, 0)
-	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("maincpu", m65c02_device, irq_line))
+	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M65C02_IRQ_LINE))
 	MCFG_VIA6522_READPA_HANDLER(READ8(gts3a_state, u4a_r))
 	MCFG_VIA6522_READPB_HANDLER(READ8(gts3a_state, u4b_r))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(gts3a_state, u4b_w))
@@ -362,7 +366,7 @@ static MACHINE_CONFIG_START( gts3a, gts3a_state )
 	MCFG_VIA6522_CB2_HANDLER(WRITELINE(gts3a_state, nmi_w))
 
 	MCFG_DEVICE_ADD("u5", VIA6522, 0)
-	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("maincpu", m65c02_device, irq_line))
+	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M65C02_IRQ_LINE))
 	//MCFG_VIA6522_READPA_HANDLER(READ8(gts3a_state, u5a_r))
 	//MCFG_VIA6522_READPB_HANDLER(READ8(gts3a_state, u5b_r))
 	//MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(gts3a_state, u5b_w))
@@ -434,6 +438,52 @@ ROM_START(cueball)
 
 	ROM_REGION(0x80000, "dmdcpu", 0)
 	ROM_LOAD("dsprom.bin", 0x00000, 0x40000, CRC(3cc7f470) SHA1(6adf8ac2ff93eb19c7b1dbbcf8fff6cd926dc563))
+	ROM_RELOAD( 0x40000, 0x40000)
+
+	ROM_REGION(0x10000, "cpu4", 0)
+	ROM_LOAD("drom1.bin", 0x8000, 0x8000, CRC(9fd04109) SHA1(27864fe4e9c248dce6221c9e56861967d089b216))
+
+	ROM_REGION(0x100000, "sound1", 0)
+	ROM_LOAD("arom1.bin", 0x00000, 0x40000, CRC(476bb11c) SHA1(ce546df59933cc230a6671dec493bbbe71146dee))
+	ROM_RELOAD(0x00000+0x40000, 0x40000)
+	ROM_LOAD("arom2.bin", 0x80000, 0x40000, CRC(23708ad9) SHA1(156fcb19403f9845404af1a4ac4edfd3fcde601d))
+	ROM_RELOAD(0x80000+0x40000, 0x40000)
+
+	ROM_REGION(0x10000, "cpu3", 0)
+	ROM_LOAD("yrom1.bin", 0x8000, 0x8000, CRC(c22f5cc5) SHA1(a5bfbc1824bc483eecc961851bd411cb0dbcdc4a))
+ROM_END
+
+ROM_START(cueball2)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("gprom.r2", 0x0000, 0x10000, CRC(171c0a0e) SHA1(e53d32e7cddf47feacf3f5c00651c2216da39b7a))
+
+	ROM_REGION(0x10000, "cpu2", ROMREGION_ERASEFF)
+
+	ROM_REGION(0x80000, "dmdcpu", 0)
+	ROM_LOAD("dsprom.r2", 0x00000, 0x40000, CRC(70345a0b) SHA1(38ccea4f367d6ac777119201156b2f35c4d2d379))
+	ROM_RELOAD( 0x40000, 0x40000)
+
+	ROM_REGION(0x10000, "cpu4", 0)
+	ROM_LOAD("drom1.bin", 0x8000, 0x8000, CRC(9fd04109) SHA1(27864fe4e9c248dce6221c9e56861967d089b216))
+
+	ROM_REGION(0x100000, "sound1", 0)
+	ROM_LOAD("arom1.bin", 0x00000, 0x40000, CRC(476bb11c) SHA1(ce546df59933cc230a6671dec493bbbe71146dee))
+	ROM_RELOAD(0x00000+0x40000, 0x40000)
+	ROM_LOAD("arom2.bin", 0x80000, 0x40000, CRC(23708ad9) SHA1(156fcb19403f9845404af1a4ac4edfd3fcde601d))
+	ROM_RELOAD(0x80000+0x40000, 0x40000)
+
+	ROM_REGION(0x10000, "cpu3", 0)
+	ROM_LOAD("yrom1.bin", 0x8000, 0x8000, CRC(c22f5cc5) SHA1(a5bfbc1824bc483eecc961851bd411cb0dbcdc4a))
+ROM_END
+
+ROM_START(cueball3)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("gprom.r3", 0x0000, 0x10000, CRC(f2d6e9d8) SHA1(bac7d498876454092607116fd7d46034438c9bfa))
+
+	ROM_REGION(0x10000, "cpu2", ROMREGION_ERASEFF)
+
+	ROM_REGION(0x80000, "dmdcpu", 0)
+	ROM_LOAD("dsprom.r2", 0x00000, 0x40000, CRC(70345a0b) SHA1(38ccea4f367d6ac777119201156b2f35c4d2d379))
 	ROM_RELOAD( 0x40000, 0x40000)
 
 	ROM_REGION(0x10000, "cpu4", 0)
@@ -759,6 +809,26 @@ ROM_START(stargatp4)
 	ROM_LOAD("yrom1.bin", 0x8000, 0x8000, CRC(53123fd4) SHA1(77fd183a10eea2e04a07edf9da14ef7aadb65f91))
 ROM_END
 
+ROM_START(stargatp5)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("stgtcpu5.512", 0x0000, 0x10000, CRC(c0579d86) SHA1(ba7ea85ccf407ec72d19e15b34b96a7ca95bf893))
+
+	ROM_REGION(0x10000, "cpu2", ROMREGION_ERASEFF)
+
+	ROM_REGION(0x80000, "dmdcpu", 0)
+	ROM_LOAD("dsprom3.bin", 0x00000, 0x80000, CRC(db483524) SHA1(ea14e8b04c32fc403ce2ff060caed5562104a862))
+
+	ROM_REGION(0x10000, "cpu4", 0)
+	ROM_LOAD("drom1.bin", 0x8000, 0x8000, CRC(781b2b27) SHA1(06decd22b9064ee4859618a043055e0b3e3b9e04))
+
+	ROM_REGION(0x100000, "sound1", 0)
+	ROM_LOAD("arom1.bin", 0x00000, 0x80000, CRC(a0f62605) SHA1(8c39452367150f66271371ab02be2f5a812cb954))
+	ROM_RELOAD(0x80000, 0x80000)
+
+	ROM_REGION(0x10000, "cpu3", 0)
+	ROM_LOAD("yrom1.bin", 0x8000, 0x8000, CRC(53123fd4) SHA1(77fd183a10eea2e04a07edf9da14ef7aadb65f91))
+ROM_END
+
 /*-------------------------------------------------------------------
 / Street Fighter II (#735)
 /-------------------------------------------------------------------*/
@@ -850,9 +920,30 @@ ROM_START(snspares)
 	ROM_REGION(0x100000, "user3", 0)
 	ROM_LOAD("arom1.bin", 0x00000, 0x80000, CRC(e248574a) SHA1(d2bdc2b9a330bb81556d25d464f617e0934995eb))
 ROM_END
+
 ROM_START(snspares1)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("gprom1.bin", 0x0000, 0x10000, CRC(590393f4) SHA1(f52400c620e510253abd1c0719050b9bb09be942))
+
+	ROM_REGION(0x10000, "cpu2", ROMREGION_ERASEFF)
+
+	ROM_REGION(0x80000, "dmdcpu", 0)
+	ROM_LOAD("dsprom.bin", 0x00000, 0x40000, CRC(5c901899) SHA1(d106561b2e382afdb16e938072c9c8f1d1ccdae6))
+	ROM_RELOAD( 0x40000, 0x40000)
+
+	ROM_REGION(0x10000, "cpu3", ROMREGION_ERASEFF)
+
+	ROM_REGION(0x80000, "user2", 0)
+	ROM_LOAD("dsprom.bin", 0x00000, 0x40000, CRC(5c901899) SHA1(d106561b2e382afdb16e938072c9c8f1d1ccdae6))
+	ROM_RELOAD( 0x40000, 0x40000)
+
+	ROM_REGION(0x100000, "user3", 0)
+	ROM_LOAD("arom1.bin", 0x00000, 0x80000, CRC(e248574a) SHA1(d2bdc2b9a330bb81556d25d464f617e0934995eb))
+ROM_END
+
+ROM_START(snspares2)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("gprom2.bin", 0x0000, 0x10000, CRC(79906dfc) SHA1(1efb68dd391f79e6f8ad5a588145d6ad7b36743c))
 
 	ROM_REGION(0x10000, "cpu2", ROMREGION_ERASEFF)
 
@@ -1175,38 +1266,42 @@ ROM_START(wcsoccerd2)
 	ROM_LOAD("yrom1.bin", 0x8000, 0x8000, CRC(8b2795b0) SHA1(b838d4e410c815421099c65b0d3b22227dae17c6))
 ROM_END
 
-GAME(1992,  smb,        0,          gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Super Mario Brothers",             MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1992,  smb1,       smb,        gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Super Mario Brothers (rev.1)",             MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1992,  smb2,       smb,        gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Super Mario Brothers (rev.2)",             MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1992,  smb3,       smb,        gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Super Mario Brothers (rev.3)",             MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1992,  smbmush,    0,          gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Super Mario Brothers Mushroom World",              MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1992,  cueball,    0,          gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Cue Ball Wizard",              MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1993,  sfight2,    0,          gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Street Fighter II",                MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1993,  sfight2a,   sfight2,    gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Street Fighter II (rev.1)",                MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1993,  sfight2b,   sfight2,    gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Street Fighter II (rev.2)",                MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1993,  teedoffp,   0,          gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Tee'd Off",                MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1993,  teedoffp1,  teedoffp,   gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Tee'd Off (rev.1)",                MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1993,  teedoffp3,  teedoffp,   gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Tee'd Off (rev.3)",                MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1993,  gladiatp,   0,          gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Gladiators",               MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1993,  wipeout,    0,          gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Wipeout (rev.2)",              MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1994,  rescu911,   0,          gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Rescue 911 (rev.1)",               MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1994,  wcsoccer,   0,          gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "World Challenge Soccer (rev.1)",               MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1994,  wcsoccerd2, wcsoccer,   gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "World Challenge Soccer (disp.rev.2)",              MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  stargatp,   0,          gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Stargate (Pinball)",               MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  stargatp1,  stargatp,   gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Stargate (rev.1)",             MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  stargatp2,  stargatp,   gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Stargate (rev.2)",             MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  stargatp3,  stargatp,   gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Stargate (rev.3)",             MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  stargatp4,  stargatp,   gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Stargate (rev.4)",             MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  shaqattq,   0,          gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Shaq Attaq (rev.5)",               MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  shaqattq2,  shaqattq,   gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Shaq Attaq (rev.2)",               MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1994,  freddy,     0,          gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Freddy: A Nightmare on Elm Street (rev.3)",                MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1994,  freddy4,    freddy,     gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Freddy: A Nightmare on Elm Street (rev.4)",                MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  bighurt,    0,          gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Frank Thomas' Big Hurt (rev.3)",               MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  waterwld,   0,          gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Waterworld (rev.3)",               MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  waterwld2,  waterwld,   gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Waterworld (rev.2)",               MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  snspares,   0,          gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Strikes n' Spares (rev.6)",                MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  snspares1,  snspares,   gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Strikes n' Spares (rev.1)",                MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  andretti,   0,          gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Mario Andretti",               MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  andretti4,  andretti,   gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Mario Andretti (rev.T4)",              MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1996,  barbwire,   0,          gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Barb Wire",                MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1996,  brooks,     0,          gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Brooks & Dunn (rev.T1)",               MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1992,  smb,        0,          gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Super Mario Brothers",                      MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1992,  smb1,       smb,        gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Super Mario Brothers (rev.1)",              MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1992,  smb2,       smb,        gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Super Mario Brothers (rev.2)",              MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1992,  smb3,       smb,        gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Super Mario Brothers (rev.3)",              MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1992,  smbmush,    0,          gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Super Mario Brothers Mushroom World",       MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1992,  cueball,    0,          gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Cue Ball Wizard",                           MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1992,  cueball2,   cueball,    gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Cue Ball Wizard (rev.2)",                   MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1992,  cueball3,   cueball,    gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Cue Ball Wizard (rev.3)",                   MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1993,  sfight2,    0,          gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Street Fighter II",                         MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1993,  sfight2a,   sfight2,    gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Street Fighter II (rev.1)",                 MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1993,  sfight2b,   sfight2,    gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Street Fighter II (rev.2)",                 MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1993,  teedoffp,   0,          gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Tee'd Off",                                 MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1993,  teedoffp1,  teedoffp,   gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Tee'd Off (rev.1)",                         MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1993,  teedoffp3,  teedoffp,   gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Tee'd Off (rev.3)",                         MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1993,  gladiatp,   0,          gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Gladiators",                                MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1993,  wipeout,    0,          gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Wipeout (rev.2)",                           MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1994,  rescu911,   0,          gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Rescue 911 (rev.1)",                        MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1994,  wcsoccer,   0,          gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "World Challenge Soccer (rev.1)",            MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1994,  wcsoccerd2, wcsoccer,   gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "World Challenge Soccer (disp.rev.2)",       MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995,  stargatp,   0,          gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Stargate (Pinball)",                        MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995,  stargatp1,  stargatp,   gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Stargate (rev.1)",                          MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995,  stargatp2,  stargatp,   gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Stargate (rev.2)",                          MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995,  stargatp3,  stargatp,   gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Stargate (rev.3)",                          MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995,  stargatp4,  stargatp,   gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Stargate (rev.4)",                          MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995,  stargatp5,  stargatp,   gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Stargate (rev.5)",                          MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995,  shaqattq,   0,          gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Shaq Attaq (rev.5)",                        MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995,  shaqattq2,  shaqattq,   gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Shaq Attaq (rev.2)",                        MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1994,  freddy,     0,          gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Freddy: A Nightmare on Elm Street (rev.3)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1994,  freddy4,    freddy,     gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Freddy: A Nightmare on Elm Street (rev.4)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995,  bighurt,    0,          gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Frank Thomas' Big Hurt (rev.3)",            MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995,  waterwld,   0,          gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Waterworld (rev.3)",                        MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995,  waterwld2,  waterwld,   gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Waterworld (rev.2)",                        MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995,  snspares,   0,          gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Strikes n' Spares (rev.6)",                 MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995,  snspares2,  snspares,   gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Strikes n' Spares (rev.2)",                 MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995,  snspares1,  snspares,   gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Strikes n' Spares (rev.1)",                 MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995,  andretti,   0,          gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Mario Andretti",                            MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995,  andretti4,  andretti,   gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Mario Andretti (rev.T4)",                   MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1996,  barbwire,   0,          gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Barb Wire",                                 MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1996,  brooks,     0,          gts3a,   gts3a, gts3a_state,   gts3a,   ROT0,   "Gottlieb", "Brooks & Dunn (rev.T1)",                    MACHINE_IS_SKELETON_MECHANICAL)

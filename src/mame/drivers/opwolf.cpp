@@ -234,7 +234,7 @@ Stephh's notes (based on the game M68000 code and some tests) :
   - Sets :
       * 'opwolfa' : region = 0x0003
   - There is only ONE byte of difference at 0x03fff5.b with 'opwolf'
-    but its effect is unknown as this address doesn't seem to be read !
+    it changes behaviour in the 'continue game' screen
 
 3) 'opwolfb'
 
@@ -246,7 +246,7 @@ Stephh's notes (based on the game M68000 code and some tests) :
       * all reference to TAITO and "Operation Wolf" have been changed or "blanked"
       * "(c) 1988 BEAR CORPORATION KOREA" / "ALL RIGHTS RESERVED"
       * ROM check test "noped" (code at 0x00bb72)
-  - Notes on bootleg c-chip (similar to what is in machine/opwolf.c) :
+  - Notes on bootleg c-chip (similar to what is in machine/opwolf.cpp) :
       * always Engish language (thus the Dip Switch change to "Unused")
       * round 4 in "demo mode" instead of round 5
       * "service" button doesn't add credits (it works in the "test mode" though)
@@ -255,10 +255,6 @@ Stephh's notes (based on the game M68000 code and some tests) :
 
 TODO
 ====
-
-Need to verify Opwolf against original board: various reports
-claim there are discrepancies (perhaps limitations of the fake
-Z80 c-chip substitute to blame?).
 
 There are a few unmapped writes for the sound Z80 in the log.
 
@@ -278,13 +274,17 @@ register. So what is controlling priority.
 #define SOUND_CPU_CLOCK     (XTAL_8MHz / 2)     /* clock for Z80 sound CPU */
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/m68000/m68000.h"
-#include "includes/taitoipt.h"
-#include "audio/taitosnd.h"
-#include "sound/ym2151.h"
-#include "sound/msm5205.h"
 #include "includes/opwolf.h"
+#include "audio/taitosnd.h"
+
+#include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
+#include "includes/taitoipt.h"
+#include "sound/msm5205.h"
+#include "sound/ym2151.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 READ16_MEMBER(opwolf_state::cchip_r)
 {
@@ -427,7 +427,7 @@ ADDRESS_MAP_END
 /***************************************************************************/
 
 
-//static UINT8 adpcm_d[0x08];
+//static uint8_t adpcm_d[0x08];
 //0 - start ROM offset LSB
 //1 - start ROM offset MSB
 //2 - end ROM offset LSB
@@ -439,6 +439,8 @@ ADDRESS_MAP_END
 
 void opwolf_state::machine_start()
 {
+	m_opwolf_timer = timer_alloc(TIMER_OPWOLF);
+
 	save_item(NAME(m_sprite_ctrl));
 	save_item(NAME(m_sprites_flipscreen));
 
@@ -470,7 +472,10 @@ void opwolf_state::opwolf_msm5205_vck(msm5205_device *device,int chip)
 		device->data_w(m_adpcm_data[chip] & 0x0f);
 		m_adpcm_data[chip] = -1;
 		if (m_adpcm_pos[chip] == m_adpcm_end[chip])
+		{
 			device->reset_w(1);
+			//logerror("reset device %d\n", chip);
+		}
 	}
 	else
 	{
@@ -504,6 +509,7 @@ WRITE8_MEMBER(opwolf_state::opwolf_adpcm_b_w)
 		m_adpcm_pos[0] = start;
 		m_adpcm_end[0] = end;
 		m_msm1->reset_w(0);
+		//logerror("TRIGGER MSM1\n");
 	}
 
 //  logerror("CPU #1     b00%i-data=%2x   pc=%4x\n",offset,data,space.device().safe_pc() );
@@ -526,6 +532,8 @@ WRITE8_MEMBER(opwolf_state::opwolf_adpcm_c_w)
 		m_adpcm_pos[1] = start;
 		m_adpcm_end[1] = end;
 		m_msm2->reset_w(0);
+
+		//logerror("TRIGGER MSM2\n");
 	}
 
 //  logerror("CPU #1     c00%i-data=%2x   pc=%4x\n",offset,data,space.device().safe_pc() );
@@ -766,7 +774,7 @@ GFXDECODE_END
                  MACHINE DRIVERS
 ***********************************************************/
 
-static MACHINE_CONFIG_START( opwolf, opwolf_state )
+static MACHINE_CONFIG_START( opwolf )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, CPU_CLOCK ) /* 8 MHz */
@@ -812,13 +820,13 @@ static MACHINE_CONFIG_START( opwolf, opwolf_state )
 
 	MCFG_SOUND_ADD("msm1", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(opwolf_state, opwolf_msm5205_vck_1)) /* VCK function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8 kHz */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
 
 	MCFG_SOUND_ADD("msm2", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(opwolf_state, opwolf_msm5205_vck_2)) /* VCK function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8 kHz */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
 
@@ -837,7 +845,7 @@ MACHINE_CONFIG_END
 
 
 
-static MACHINE_CONFIG_START( opwolfb, opwolf_state ) /* OSC clocks unknown for the bootleg, but changed to match original sets */
+static MACHINE_CONFIG_START( opwolfb ) /* OSC clocks unknown for the bootleg, but changed to match original sets */
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, CPU_CLOCK ) /* 8 MHz ??? */
@@ -886,13 +894,13 @@ static MACHINE_CONFIG_START( opwolfb, opwolf_state ) /* OSC clocks unknown for t
 
 	MCFG_SOUND_ADD("msm1", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(opwolf_state, opwolf_msm5205_vck_1)) /* VCK function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8 kHz */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
 
 	MCFG_SOUND_ADD("msm2", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(opwolf_state, opwolf_msm5205_vck_2)) /* VCK function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8 kHz */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
 
@@ -1065,7 +1073,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(opwolf_state,opwolf)
 {
-	UINT16* rom = (UINT16*)memregion("maincpu")->base();
+	uint16_t* rom = (uint16_t*)memregion("maincpu")->base();
 
 	m_opwolf_region = rom[0x03fffe / 2] & 0xff;
 
@@ -1081,7 +1089,7 @@ DRIVER_INIT_MEMBER(opwolf_state,opwolf)
 
 DRIVER_INIT_MEMBER(opwolf_state,opwolfb)
 {
-	UINT16* rom = (UINT16*)memregion("maincpu")->base();
+	uint16_t* rom = (uint16_t*)memregion("maincpu")->base();
 
 	m_opwolf_region = rom[0x03fffe / 2] & 0xff;
 
@@ -1094,7 +1102,7 @@ DRIVER_INIT_MEMBER(opwolf_state,opwolfb)
 
 DRIVER_INIT_MEMBER(opwolf_state,opwolfp)
 {
-	UINT16* rom = (UINT16*)memregion("maincpu")->base();
+	uint16_t* rom = (uint16_t*)memregion("maincpu")->base();
 
 	m_opwolf_region = rom[0x03fffe / 2] & 0xff;
 
@@ -1104,12 +1112,15 @@ DRIVER_INIT_MEMBER(opwolf_state,opwolfp)
 	membank("z80bank")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
 }
 
+// Prototype rom set includes the string - 'T KATO 10/6/87'
+// Regular rom set includes the string '11 Sep 1987'
 
+// MACHINE_IMPERFECT_SOUND is present because the credit sound appears to double trigger.  All other sounds seem correct.
 
-/*    year  rom       parent    machine   inp       init */
-GAME( 1987, opwolf,   0,        opwolf,   opwolf,  opwolf_state,  opwolf,   ROT0, "Taito Corporation Japan", "Operation Wolf (World, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, opwolfa,  opwolf,   opwolf,   opwolf,  opwolf_state,  opwolf,   ROT0, "Taito Corporation Japan", "Operation Wolf (World, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, opwolfj,  opwolf,   opwolf,   opwolfu, opwolf_state,  opwolf,   ROT0, "Taito Corporation", "Operation Wolf (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, opwolfu,  opwolf,   opwolf,   opwolfu, opwolf_state,  opwolf,   ROT0, "Taito America Corporation", "Operation Wolf (US)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+//    year  rom       parent    machine   inp      state          init
+GAME( 1987, opwolf,   0,        opwolf,   opwolf,  opwolf_state,  opwolf,   ROT0, "Taito Corporation Japan",          "Operation Wolf (World, set 1)",              MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, opwolfa,  opwolf,   opwolf,   opwolf,  opwolf_state,  opwolf,   ROT0, "Taito Corporation Japan",          "Operation Wolf (World, set 2)",              MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, opwolfj,  opwolf,   opwolf,   opwolfu, opwolf_state,  opwolf,   ROT0, "Taito Corporation",                "Operation Wolf (Japan)",                     MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, opwolfu,  opwolf,   opwolf,   opwolfu, opwolf_state,  opwolf,   ROT0, "Taito America Corporation",        "Operation Wolf (US)",                        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1987, opwolfb,  opwolf,   opwolfb,  opwolfb, opwolf_state,  opwolfb,  ROT0, "bootleg (Bear Corporation Korea)", "Operation Bear (bootleg of Operation Wolf)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, opwolfp,  opwolf,   opwolfp,  opwolfp, opwolf_state,  opwolfp,  ROT0, "Taito Corporation", "Operation Wolf (Japan, prototype)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // unprotected
+GAME( 1987, opwolfp,  opwolf,   opwolfp,  opwolfp, opwolf_state,  opwolfp,  ROT0, "Taito Corporation",                "Operation Wolf (Japan, prototype)",          MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // unprotected

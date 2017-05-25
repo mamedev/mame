@@ -1,10 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli
-#ifndef __A800_CARTS_H
-#define __A800_CARTS_H
+#ifndef MAME_BUS_A800_A800_CARTS_H
+#define MAME_BUS_A800_A800_CARTS_H
 
+#pragma once
 
-#include "emu.h"
 
 #include "rom.h"
 #include "oss.h"
@@ -47,4 +47,4 @@ static SLOT_INTERFACE_START(a5200_carts)
 	SLOT_INTERFACE_INTERNAL("a5200_bbsb",    A5200_ROM_BBSB)
 SLOT_INTERFACE_END
 
-#endif
+#endif // MAME_BUS_A800_A800_CARTS_H

@@ -33,15 +33,17 @@ RAM = 4116 (x11)
 ********************************************************************/
 
 #include "emu.h"
-#include "machine/rescap.h"
-#include "machine/6821pia.h"
-#include "machine/74123.h"
-#include "video/mc6845.h"
 #include "cpu/m6800/m6800.h"
 #include "cpu/m6809/m6809.h"
-#include "sound/ay8910.h"
+#include "machine/6821pia.h"
+#include "machine/74123.h"
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
+#include "machine/rescap.h"
+#include "sound/ay8910.h"
+#include "video/mc6845.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 #define LOG_AUDIO_COMM  (0)
@@ -63,11 +65,11 @@ public:
 		m_soundlatch(*this, "soundlatch"),
 		m_soundlatch2(*this, "soundlatch2") { }
 
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_colorram;
-	UINT8 m_flipscreen;
-	UINT32 m_ttl74123_output;
-	UINT8 m_AY8910_selected;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
+	uint8_t m_flipscreen;
+	uint32_t m_ttl74123_output;
+	uint8_t m_AY8910_selected;
 
 	DECLARE_READ8_MEMBER(audio_command_r);
 	DECLARE_WRITE8_MEMBER(audio_command_w);
@@ -131,7 +133,7 @@ WRITE_LINE_MEMBER(r2dtank_state::main_cpu_irq)
 
 READ8_MEMBER(r2dtank_state::audio_command_r)
 {
-	UINT8 ret = m_soundlatch->read(space, 0);
+	uint8_t ret = m_soundlatch->read(space, 0);
 
 if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  Audio Command Read: %x\n", space.device().safe_pc(), ret);
 
@@ -142,7 +144,7 @@ if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  Audio Command Read: %x\n", space.devi
 WRITE8_MEMBER(r2dtank_state::audio_command_w)
 {
 	m_soundlatch->write(space, 0, ~data);
-	m_audiocpu->set_input_line(M6800_IRQ_LINE, HOLD_LINE);
+	m_audiocpu->set_input_line(M6802_IRQ_LINE, HOLD_LINE);
 
 if (LOG_AUDIO_COMM) logerror("%08X   CPU#0  Audio Command Write: %x\n", space.device().safe_pc(), data^0xff);
 }
@@ -150,7 +152,7 @@ if (LOG_AUDIO_COMM) logerror("%08X   CPU#0  Audio Command Write: %x\n", space.de
 
 READ8_MEMBER(r2dtank_state::audio_answer_r)
 {
-	UINT8 ret = m_soundlatch2->read(space, 0);
+	uint8_t ret = m_soundlatch2->read(space, 0);
 if (LOG_AUDIO_COMM) logerror("%08X  CPU#0  Audio Answer Read: %x\n", space.device().safe_pc(), ret);
 
 	return ret;
@@ -187,7 +189,7 @@ if (LOG_AUDIO_COMM) logerror("%s:  CPU#1  AY8910_select_w: %x\n", machine().desc
 
 READ8_MEMBER(r2dtank_state::AY8910_port_r)
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 
 	if (m_AY8910_selected & 0x08)
 		ret = machine().device<ay8910_device>("ay1")->data_r(space, 0);
@@ -265,11 +267,11 @@ WRITE_LINE_MEMBER(r2dtank_state::flipscreen_w)
 
 MC6845_UPDATE_ROW( r2dtank_state::crtc_update_row )
 {
-	UINT8 x = 0;
+	uint8_t x = 0;
 
-	for (UINT8 cx = 0; cx < x_count; cx++)
+	for (uint8_t cx = 0; cx < x_count; cx++)
 	{
-		UINT8 data, fore_color;
+		uint8_t data, fore_color;
 
 		/* the memory is hooked up to the MA, RA lines this way */
 		offs_t offs = ((ma << 3) & 0x1f00) |
@@ -284,7 +286,7 @@ MC6845_UPDATE_ROW( r2dtank_state::crtc_update_row )
 
 		for (int i = 0; i < 8; i++)
 		{
-			UINT8 bit, color;
+			uint8_t bit, color;
 
 			if (m_flipscreen)
 			{
@@ -323,7 +325,7 @@ WRITE_LINE_MEMBER(r2dtank_state::display_enable_changed)
 WRITE8_MEMBER(r2dtank_state::pia_comp_w)
 {
 	device_t *device = machine().device("pia_main");
-	downcast<pia6821_device *>(device)->write(machine().driver_data()->generic_space(), offset, ~data);
+	downcast<pia6821_device *>(device)->write(machine().dummy_space(), offset, ~data);
 }
 
 
@@ -439,7 +441,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( r2dtank, r2dtank_state )
+static MACHINE_CONFIG_START( r2dtank )
 	MCFG_CPU_ADD("maincpu", M6809,3000000)       /* ?? too fast ? */
 	MCFG_CPU_PROGRAM_MAP(r2dtank_main_map)
 
@@ -530,4 +532,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1980, r2dtank, 0, r2dtank, r2dtank, driver_device, 0, ROT270, "Sigma Enterprises Inc.", "R2D Tank", MACHINE_SUPPORTS_SAVE)
+GAME( 1980, r2dtank, 0, r2dtank, r2dtank, r2dtank_state, 0, ROT270, "Sigma Enterprises Inc.", "R2D Tank", MACHINE_SUPPORTS_SAVE)

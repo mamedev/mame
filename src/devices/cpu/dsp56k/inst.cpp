@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Andrew Gardner
+#include "emu.h"
 #include "inst.h"
 #include "emu.h"
 
@@ -7,12 +8,12 @@ namespace DSP56K
 {
 // Factory
 std::unique_ptr<Instruction> Instruction::decodeInstruction(const Opcode* opc,
-											const UINT16 word0,
-											const UINT16 word1,
+											const uint16_t word0,
+											const uint16_t word1,
 											bool shifted)
 {
-	UINT16 w0 = word0;
-	UINT16 w1 = word1;
+	uint16_t w0 = word0;
+	uint16_t w1 = word1;
 
 	if (shifted)
 	{

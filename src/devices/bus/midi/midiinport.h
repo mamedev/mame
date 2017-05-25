@@ -8,8 +8,10 @@
 
 *********************************************************************/
 
-#ifndef _MIDIINPORT_H_
-#define _MIDIINPORT_H_
+#ifndef MAME_BUS_MIDI_MIDIINPORT_H
+#define MAME_BUS_MIDI_MIDIINPORT_H
+
+#pragma once
 
 #include "midi.h"
 #include "imagedev/midiin.h"
@@ -18,7 +20,7 @@ class midiin_port_device : public device_t,
 	public device_midi_port_interface
 {
 public:
-	midiin_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	midiin_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_WRITE_LINE_MEMBER( read ) { output_rxd(state); }
 
@@ -31,6 +33,6 @@ private:
 	required_device<midiin_device> m_midiin;
 };
 
-extern const device_type MIDIIN_PORT;
+DECLARE_DEVICE_TYPE(MIDIIN_PORT, midiin_port_device)
 
-#endif
+#endif // MAME_BUS_MIDI_MIDIINPORT_H

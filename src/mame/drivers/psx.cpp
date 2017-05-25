@@ -10,16 +10,21 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/psx/psx.h"
-#include "cpu/m6805/m6805.h"
-#include "video/psx.h"
-#include "imagedev/snapquik.h"
-#include "imagedev/chd_cd.h"
-#include "sound/spu.h"
-#include "debugger.h"
-#include "machine/psxcd.h"
+
 #include "bus/psx/ctlrport.h"
+#include "cpu/m6805/m6805.h"
+#include "cpu/psx/psx.h"
+#include "imagedev/chd_cd.h"
+#include "imagedev/snapquik.h"
+#include "machine/psxcd.h"
+#include "machine/ram.h"
+#include "sound/spu.h"
+#include "video/psx.h"
+
+#include "debugger.h"
 #include "softlist.h"
+#include "speaker.h"
+
 
 #define PSXCD_TAG   "psxcd"
 
@@ -33,21 +38,21 @@ public:
 	{
 	}
 
-	UINT8 *m_exe_buffer;
+	uint8_t *m_exe_buffer;
 	int m_exe_size;
 	int m_cd_param_p;
 	int m_cd_result_p;
 	int m_cd_result_c;
 	int m_cd_result_ready;
 	int m_cd_reset;
-	UINT8 m_cd_stat;
-	UINT8 m_cd_io_status;
-	UINT8 m_cd_param[8];
-	UINT8 m_cd_result[8];
+	uint8_t m_cd_stat;
+	uint8_t m_cd_io_status;
+	uint8_t m_cd_param[8];
+	uint8_t m_cd_result[8];
 	DECLARE_MACHINE_RESET(psx);
 	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ... );
-	void cd_dma_read( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size );
-	void cd_dma_write( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size );
+	void cd_dma_read( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
+	void cd_dma_write( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
 	required_device<psxcpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 };
@@ -69,14 +74,14 @@ inline void ATTR_PRINTF(3,4)  psx1_state::verboselog( int n_level, const char *s
 }
 
 
-void psx1_state::cd_dma_read( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size )
+void psx1_state::cd_dma_read( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size )
 {
-	UINT8 *psxram = (UINT8 *) p_n_psxram;
+	uint8_t *psxram = (uint8_t *) p_n_psxram;
 	psxcd_device *psxcd = machine().device<psxcd_device>(PSXCD_TAG);
 	psxcd->start_dma(psxram + n_address, n_size*4);
 }
 
-void psx1_state::cd_dma_write( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size )
+void psx1_state::cd_dma_write( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size )
 {
 	printf("cd_dma_write?!: addr %x, size %x\n", n_address, n_size);
 }
@@ -88,7 +93,7 @@ static ADDRESS_MAP_START( subcpu_map, AS_PROGRAM, 8, psx1_state )
 	AM_RANGE(0x0000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( psj, psx1_state )
+static MACHINE_CONFIG_START( psj )
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", CXD8530CQ, XTAL_67_7376MHz )
 	MCFG_CPU_PROGRAM_MAP( psx_map )
@@ -124,8 +129,8 @@ static MACHINE_CONFIG_START( psj, psx1_state )
 
 	MCFG_PSXCD_ADD(PSXCD_TAG, "cdrom")
 	MCFG_PSXCD_IRQ_HANDLER(DEVWRITELINE("maincpu:irq", psxirq_device, intin2))
-	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 3, psx_dma_read_delegate( FUNC( psx1_state::cd_dma_read ), (psx1_state *) owner ) )
-	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 3, psx_dma_write_delegate( FUNC( psx1_state::cd_dma_write ), (psx1_state *) owner ) )
+	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 3, psxdma_device::read_delegate(&psx1_state::cd_dma_read, (psx1_state *) owner ) )
+	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 3, psxdma_device::write_delegate(&psx1_state::cd_dma_write, (psx1_state *) owner ) )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( psu, psj )
@@ -133,7 +138,7 @@ static MACHINE_CONFIG_DERIVED( psu, psj )
 	MCFG_CPU_PROGRAM_MAP( subcpu_map )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( pse, psx1_state )
+static MACHINE_CONFIG_START( pse )
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", CXD8530AQ, XTAL_67_7376MHz )
 	MCFG_CPU_PROGRAM_MAP( psx_map)
@@ -170,8 +175,8 @@ static MACHINE_CONFIG_START( pse, psx1_state )
 
 	MCFG_PSXCD_ADD(PSXCD_TAG, "cdrom")
 	MCFG_PSXCD_IRQ_HANDLER(DEVWRITELINE("maincpu:irq", psxirq_device, intin2))
-	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 3, psx_dma_read_delegate( FUNC( psx1_state::cd_dma_read ), (psx1_state *) owner ) )
-	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 3, psx_dma_write_delegate( FUNC( psx1_state::cd_dma_write ), (psx1_state *) owner ) )
+	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 3, psxdma_device::read_delegate(&psx1_state::cd_dma_read, (psx1_state *) owner ) )
+	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 3, psxdma_device::write_delegate(&psx1_state::cd_dma_write, (psx1_state *) owner ) )
 MACHINE_CONFIG_END
 
 ROM_START( psj )
@@ -301,8 +306,8 @@ Version 4.3 E
 
 */
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   INIT    COMPANY                             FULLNAME                            FLAGS */
-CONS( 1994, psj,    0,      0,      psj,        0, driver_device,    0,    "Sony Computer Entertainment Inc", "Sony PlayStation (Japan)",         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 1995, pse,    psj,    0,      pse,        0, driver_device,    0,    "Sony Computer Entertainment Inc", "Sony PlayStation (Europe)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 1995, psu,    psj,    0,      psu,        0, driver_device,    0,    "Sony Computer Entertainment Inc", "Sony PlayStation (USA)",           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 1995, psa,    psj,    0,      psj,        0, driver_device,    0,    "Sony Computer Entertainment Inc", "Sony PlayStation (Asia-Pacific)",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT  STATE       INIT  COMPANY                            FULLNAME                            FLAGS
+CONS( 1994, psj,    0,      0,      psj,        0,     psx1_state, 0,    "Sony Computer Entertainment Inc", "Sony PlayStation (Japan)",         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 1995, pse,    psj,    0,      pse,        0,     psx1_state, 0,    "Sony Computer Entertainment Inc", "Sony PlayStation (Europe)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 1995, psu,    psj,    0,      psu,        0,     psx1_state, 0,    "Sony Computer Entertainment Inc", "Sony PlayStation (USA)",           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 1995, psa,    psj,    0,      psj,        0,     psx1_state, 0,    "Sony Computer Entertainment Inc", "Sony PlayStation (Asia-Pacific)",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

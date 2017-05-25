@@ -11,7 +11,7 @@
 --     "item" [{
 --       "value": "itemval(index*stepval+minval)",
 --       "text": "text"
---     }, 
+--     },
 --     ... ]
 --   },
 --   "space": {
@@ -71,7 +71,6 @@ function cheat.startplugin()
 
 	local function load_cheats()
 		local filename = emu.romname()
-		local json = require("json")
 		local newcheats = {}
 		local file = emu.file(manager:machine():options().entries.cheatpath:value():gsub("([^;]+)", "%1;%1/cheat") , 1)
 		if emu.softname() ~= "" then
@@ -81,7 +80,7 @@ function cheat.startplugin()
 				end
 			end
 		end
-		function add(addcheats)
+		local function add(addcheats)
 			if not next(newcheats) then
 				newcheats = addcheats
 			else
@@ -90,6 +89,7 @@ function cheat.startplugin()
 				end
 			end
 		end
+		local json = require("json")
 		local ret = file:open(filename .. ".json")
 		while not ret do
 			add(json.parse(file:read(file:size())))
@@ -99,6 +99,12 @@ function cheat.startplugin()
 		ret = file:open(filename .. ".xml")
 		while not ret do
 			add(xml.conv_cheat(file:read(file:size())))
+			ret = file:open_next()
+		end
+		local simp = require("cheat/simple_conv")
+		ret = file:open("cheat.simple")
+		while not ret do
+			add(simp.conv_cheat(filename, file:read(file:size())))
 			ret = file:open_next()
 		end
 		return newcheats
@@ -165,17 +171,17 @@ function cheat.startplugin()
 
 	local function parse_cheat(cheat)
 		cheat.cheat_env = { draw_text = draw_text,
-				    draw_line = draw_line,
-				    draw_box = draw_box,
-				    tobcd = tobcd,
-				    frombcd = frombcd,
-				    pairs = pairs,
-				    ipairs = ipairs,
-				    outputs = manager:machine():outputs(),
-				    time = time,
-			    	    table = 
-				    { insert = table.insert,
-			    	      remove = table.remove } }
+					draw_line = draw_line,
+					draw_box = draw_box,
+					tobcd = tobcd,
+					frombcd = frombcd,
+					pairs = pairs,
+					ipairs = ipairs,
+					outputs = manager:machine():outputs(),
+					time = time,
+						table =
+					{ insert = table.insert,
+						  remove = table.remove } }
 		cheat.enabled = false
 		-- verify scripts are valid first
 		if not cheat.script then
@@ -185,7 +191,8 @@ function cheat.startplugin()
 			script, err = load(script, cheat.desc .. name, "t", cheat.cheat_env)
 			if not script then
 				emu.print_verbose("error loading cheat script: " .. cheat.desc .. " " .. err)
-				cheat = { desc = cheat.desc .. " error" }
+				cheat.desc = cheat.desc .. " error"
+				cheat.script = nil
 				return
 			end
 			cheat.script[name] = script
@@ -199,18 +206,21 @@ function cheat.startplugin()
 				local cpu, mem
 				cpu = manager:machine().devices[space.tag]
 				if not cpu then
-					emu.print_verbose("error loading cheat script: " .. cheat.desc)
-					cheat = { desc = cheat.desc .. " error" }
+					emu.print_verbose("error loading cheat script: " .. cheat.desc .. " missing device " .. space.tag)
+					cheat.desc = cheat.desc .. " error"
+					cheat.script = nil
 					return
 				end
 				if space.type then
 					mem = cpu.spaces[space.type]
 				else
+					space.type = "program"
 					mem = cpu.spaces["program"]
 				end
 				if not mem then
-					emu.print_verbose("error loading cheat script: " .. cheat.desc)
-					cheat = { desc = cheat.desc .. " error" }
+					emu.print_verbose("error loading cheat script: " .. cheat.desc .. " missing space " .. space.type)
+					cheat.desc = cheat.desc .. " error"
+					cheat.script = nil
 					return
 				end
 				cheat.cheat_env[name] = mem
@@ -230,8 +240,9 @@ function cheat.startplugin()
 			for name, region in pairs(cheat.region) do
 				local mem = manager:machine():memory().regions[region]
 				if not mem then
-					emu.print_verbose("error loading cheat script: " .. cheat.desc)
-					cheat = { desc = cheat.desc .. " error" }
+					emu.print_verbose("error loading cheat script: " .. cheat.desc .. " missing region " .. region)
+					cheat.desc = cheat.desc .. " error"
+					cheat.script = nil
 					return
 				end
 				cheat.cheat_env[name] = mem
@@ -241,8 +252,9 @@ function cheat.startplugin()
 			for name, tag in pairs(cheat.ram) do
 				local ram = manager:machine().devices[tag]
 				if not ram then
-					emu.print_verbose("error loading cheat script: " .. cheat.desc)
-					cheat = { desc = cheat.desc .. " error" }
+					emu.print_verbose("error loading cheat script: " .. cheat.desc .. " missing ram device " .. ram)
+					cheat.desc = cheat.desc .. " error"
+					cheat.script = nil
 					return
 				end
 				cheat.cheat_env[name] = emu.item(ram.items["0/m_pointer"])
@@ -339,7 +351,7 @@ function cheat.startplugin()
 					end
 				end
 			elseif index == 3 then
-				for num, cheat in pairs(cheats) do 
+				for num, cheat in pairs(cheats) do
 					if cheat.enabled and cheat.script.off then
 						cheat.script.off()
 					end

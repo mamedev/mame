@@ -29,7 +29,6 @@ void taitosj_state::machine_start()
 	save_item(NAME(m_zready));
 	save_item(NAME(m_busreq));
 
-	save_item(NAME(m_portA_in));
 	save_item(NAME(m_portA_out));
 	save_item(NAME(m_address));
 	save_item(NAME(m_spacecr_prot_value));
@@ -47,8 +46,8 @@ void taitosj_state::machine_reset()
 	m_zaccept = 1;
 	m_zready = 0;
 	m_busreq = 0;
-	if (m_mcu != nullptr)
-		m_mcu->set_input_line(0, CLEAR_LINE);
+	if (m_mcu)
+		m_mcu->set_input_line(M68705_IRQ_LINE, CLEAR_LINE);
 
 	m_spacecr_prot_value = 0;
 }
@@ -57,6 +56,19 @@ void taitosj_state::machine_reset()
 WRITE8_MEMBER(taitosj_state::taitosj_bankswitch_w)
 {
 	machine().bookkeeping().coin_lockout_global_w(~data & 1);
+
+	/* this is a bit of a hack, but works.
+	    Eventually the mixing of the ay1 outs and
+	    amplitude-overdrive-mute stuff done by
+	    bit 1 here should be done on a netlist.
+	*/
+	m_ay1->set_output_gain(0, (data & 0x2) ? 1.0 : 0.0); // 3 outputs for Ay1 since it doesn't use tied together outs
+	m_ay1->set_output_gain(1, (data & 0x2) ? 1.0 : 0.0);
+	m_ay1->set_output_gain(2, (data & 0x2) ? 1.0 : 0.0);
+	m_ay2->set_output_gain(0, (data & 0x2) ? 1.0 : 0.0);
+	m_ay3->set_output_gain(0, (data & 0x2) ? 1.0 : 0.0);
+	m_ay4->set_output_gain(0, (data & 0x2) ? 1.0 : 0.0);
+	m_dac->set_output_gain(0, (data & 0x2) ? 1.0 : 0.0);
 
 	if(data & 0x80) membank("bank1")->set_entry(1);
 	else membank("bank1")->set_entry(0);
@@ -107,7 +119,7 @@ READ8_MEMBER(taitosj_state::taitosj_mcu_data_r)
 TIMER_CALLBACK_MEMBER(taitosj_state::taitosj_mcu_real_data_w)
 {
 	m_zready = 1;
-	m_mcu->set_input_line(0, ASSERT_LINE);
+	m_mcu->set_input_line(M68705_IRQ_LINE, ASSERT_LINE);
 	m_fromz80 = param;
 }
 
@@ -127,12 +139,6 @@ READ8_MEMBER(taitosj_state::taitosj_mcu_status_r)
 	/* bit 0 = the 68705 has read data from the Z80 */
 	/* bit 1 = the 68705 has written data for the Z80 */
 	return ~((m_zready << 0) | (m_zaccept << 1));
-}
-
-READ8_MEMBER(taitosj_state::taitosj_68705_portA_r)
-{
-	LOG(("%04x: 68705 port A read %02x\n",space.device().safe_pc(),m_portA_in));
-	return m_portA_in;
 }
 
 WRITE8_MEMBER(taitosj_state::taitosj_68705_portA_w)
@@ -163,11 +169,6 @@ WRITE8_MEMBER(taitosj_state::taitosj_68705_portA_w)
  *               the main Z80 memory location to access)
  */
 
-READ8_MEMBER(taitosj_state::taitosj_68705_portB_r)
-{
-	return 0xff;
-}
-
 /* timer callback : 68705 is going to read data from the Z80 */
 TIMER_CALLBACK_MEMBER(taitosj_state::taitosj_mcu_data_real_r)
 {
@@ -192,10 +193,10 @@ WRITE8_MEMBER(taitosj_state::taitosj_68705_portB_w)
 	if (~data & 0x02)
 	{
 		/* 68705 is going to read data from the Z80 */
-		machine().scheduler().synchronize(timer_expired_delegate(FUNC(taitosj_state::taitosj_mcu_data_real_r),this));
-		m_mcu->set_input_line(0, CLEAR_LINE);
-		m_portA_in = m_fromz80;
-		LOG(("%04x: 68705 <- Z80 %02x\n", space.device().safe_pc(), m_portA_in));
+		machine().scheduler().synchronize(timer_expired_delegate(FUNC(taitosj_state::taitosj_mcu_data_real_r), this));
+		m_mcu->pa_w(space, 0, m_fromz80);
+		m_mcu->set_input_line(M68705_IRQ_LINE, CLEAR_LINE);
+		LOG(("%04x: 68705 <- Z80 %02x\n", space.device().safe_pc(), m_fromz80));
 	}
 	if (~data & 0x08)
 		m_busreq = 1;
@@ -220,9 +221,9 @@ WRITE8_MEMBER(taitosj_state::taitosj_68705_portB_w)
 	}
 	if (~data & 0x20)
 	{
-		address_space &cpu0space = m_maincpu->space(AS_PROGRAM);
-		m_portA_in = cpu0space.read_byte(m_address);
-		LOG(("%04x: 68705 read %02x from address %04x\n", space.device().safe_pc(), m_portA_in, m_address));
+		u8 const value = m_maincpu->space(AS_PROGRAM).read_byte(m_address);
+		m_mcu->pa_w(space, 0, value);
+		LOG(("%04x: 68705 read %02x from address %04x\n", space.device().safe_pc(), value, m_address));
 	}
 	if (~data & 0x40)
 	{

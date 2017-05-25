@@ -14,36 +14,36 @@
 
 #include <algorithm>
 
-#include "solver/nld_ms_direct.h"
-#include "solver/nld_matrix_solver.h"
-#include "solver/nld_solver.h"
+#include "nld_ms_direct.h"
+#include "nld_matrix_solver.h"
+#include "nld_solver.h"
 
 namespace netlist
 {
 	namespace devices
 	{
-template <unsigned m_N, unsigned storage_N>
+template <std::size_t m_N, std::size_t storage_N>
 class matrix_solver_SOR_mat_t: public matrix_solver_direct_t<m_N, storage_N>
 {
 	friend class matrix_solver_t;
 
 public:
 
-	matrix_solver_SOR_mat_t(netlist_t &anetlist, const pstring &name, const solver_parameters_t *params, int size)
+	matrix_solver_SOR_mat_t(netlist_t &anetlist, const pstring &name, const solver_parameters_t *params, std::size_t size)
 		: matrix_solver_direct_t<m_N, storage_N>(anetlist, name, matrix_solver_t::DESCENDING, params, size)
 		, m_Vdelta(*this, "m_Vdelta", 0.0)
-		, m_omega(*this, "m_omega", params->m_sor)
+		, m_omega(*this, "m_omega", params->m_gs_sor)
 		, m_lp_fact(*this, "m_lp_fact", 0)
 		, m_gs_fail(*this, "m_gs_fail", 0)
 		, m_gs_total(*this, "m_gs_total", 0)
 		{
 		}
 
-	virtual ~matrix_solver_SOR_mat_t() {}
+	virtual ~matrix_solver_SOR_mat_t() override {}
 
 	virtual void vsetup(analog_net_t::list_t &nets) override;
 
-	virtual int vsolve_non_dynamic(const bool newton_raphson) override;
+	virtual unsigned vsolve_non_dynamic(const bool newton_raphson) override;
 
 private:
 	state_var<nl_double[storage_N]> m_Vdelta;
@@ -58,7 +58,7 @@ private:
 // matrix_solver - Gauss - Seidel
 // ----------------------------------------------------------------------------------------
 
-template <unsigned m_N, unsigned storage_N>
+template <std::size_t m_N, std::size_t storage_N>
 void matrix_solver_SOR_mat_t<m_N, storage_N>::vsetup(analog_net_t::list_t &nets)
 {
 	matrix_solver_direct_t<m_N, storage_N>::vsetup(nets);
@@ -113,8 +113,8 @@ nl_double matrix_solver_SOR_mat_t<m_N, storage_N>::vsolve()
 }
 #endif
 
-template <unsigned m_N, unsigned storage_N>
-int matrix_solver_SOR_mat_t<m_N, storage_N>::vsolve_non_dynamic(const bool newton_raphson)
+template <std::size_t m_N, std::size_t storage_N>
+unsigned matrix_solver_SOR_mat_t<m_N, storage_N>::vsolve_non_dynamic(const bool newton_raphson)
 {
 	/* The matrix based code looks a lot nicer but actually is 30% slower than
 	 * the optimized code which works directly on the data structures.
@@ -123,14 +123,14 @@ int matrix_solver_SOR_mat_t<m_N, storage_N>::vsolve_non_dynamic(const bool newto
 
 
 	nl_double new_v[storage_N] = { 0.0 };
-	const unsigned iN = this->N();
+	const std::size_t iN = this->N();
 
 	matrix_solver_t::build_LE_A<matrix_solver_SOR_mat_t>();
 	matrix_solver_t::build_LE_RHS<matrix_solver_SOR_mat_t>();
 
 	bool resched = false;
 
-	int  resched_cnt = 0;
+	unsigned resched_cnt = 0;
 
 
 #if 0
@@ -169,21 +169,21 @@ int matrix_solver_SOR_mat_t<m_N, storage_N>::vsolve_non_dynamic(const bool newto
 	}
 #endif
 
-	for (unsigned k = 0; k < iN; k++)
-		new_v[k] = this->m_nets[k]->m_cur_Analog;
+	for (std::size_t k = 0; k < iN; k++)
+		new_v[k] = this->m_nets[k]->Q_Analog();
 
 	do {
 		resched = false;
 		nl_double cerr = 0.0;
 
-		for (unsigned k = 0; k < iN; k++)
+		for (std::size_t k = 0; k < iN; k++)
 		{
 			nl_double Idrive = 0;
 
 			const auto *p = this->m_terms[k]->m_nz.data();
-			const unsigned e = this->m_terms[k]->m_nz.size();
+			const std::size_t e = this->m_terms[k]->m_nz.size();
 
-			for (unsigned i = 0; i < e; i++)
+			for (std::size_t i = 0; i < e; i++)
 				Idrive = Idrive + this->A(k,p[i]) * new_v[p[i]];
 
 			const nl_double delta = m_omega * (this->RHS(k) - Idrive) / this->A(k,k);
@@ -199,10 +199,12 @@ int matrix_solver_SOR_mat_t<m_N, storage_N>::vsolve_non_dynamic(const bool newto
 	} while (resched && (resched_cnt < this->m_params.m_gs_loops));
 
 	this->m_stat_calculations++;
+	this->m_iterative_total += resched_cnt;
 	this->m_gs_total += resched_cnt;
 
 	if (resched)
 	{
+		this->m_iterative_fail++;
 		//this->netlist().warning("Falling back to direct solver .. Consider increasing RESCHED_LOOPS");
 		this->m_gs_fail++;
 

@@ -27,11 +27,11 @@ public:
 		m_palette(*this, "palette") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_colorram;
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_scroll_x;
-	required_shared_ptr<UINT8> m_scroll_dir;
+	required_shared_ptr<uint8_t> m_colorram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_scroll_x;
+	required_shared_ptr<uint8_t> m_scroll_dir;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -43,8 +43,8 @@ public:
 	tilemap_t      *m_bg_tilemap;
 
 	/* misc */
-	UINT8        m_irq_enable;
-	UINT8        m_nmi_enable;
+	uint8_t        m_irq_enable;
+	uint8_t        m_nmi_enable;
 	DECLARE_WRITE8_MEMBER(ctrl_w);
 	DECLARE_WRITE8_MEMBER(coin_w);
 	DECLARE_WRITE8_MEMBER(videoram_w);
@@ -56,7 +56,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(jailbrek);
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(interrupt);
 	INTERRUPT_GEN_MEMBER(interrupt_nmi);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );

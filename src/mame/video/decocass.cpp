@@ -11,8 +11,10 @@
     with semi-independent scrolling, and the ability to transition
     between scrolling different sections.
 
-    Additionally it supports the headlight effect also needed for
-    a Highway Chase style game.
+    Additionally it supports the headlight and tunnel effects also
+    needed for a Highway Chase style game. These both produce a pen
+    modification effect which is not emulated properly now. The lack
+    of tunnel .
 
     ---
 
@@ -32,18 +34,15 @@
         - different game revision to emulated version, main
           boss enemy shown at the top of the scoreboard differs
           so notes below could be invalid
-
-        - bullets should be white, not black
-        - BG layer changes to orange colours for first level
-          (this would require a palette bitplane re-order we
-           don't currently support)
+        - bullets should be white, not black (OK)
+        - BG layer changes to orange colours for first level, but
+          reverts to red when player explodes
 
     mamedev.emulab.it/haze/reference/sm18975592-HWY_CHASE.mp4
         - road / bg colour should be darkish blue outside of tunnels
         - road / bg colour should be black in tunnels
         - headlight should be the same darkish blue as the road
           at all times, so only visible in tunnels
-        - our headlight is misplaced (should be simple fix)
         - center line of road does not exist on hw!
         - enemies are hidden in tunnels (like madalien)
         - road / bg flashs regular blue when enemy is hit revealing
@@ -53,7 +52,7 @@
         - colours of BG tilemap are glitchy even on hardware eg.
           Pink desert after first tunnel, Green water after 2nd
           tunnel even when the right palettes exist!
-        - enemy bullets are red
+        - player bullets are yellow, enemy bullets are red (OK)
 
     mamedev.emulab.it/haze/reference/sm17433759-PRO_BOWLING.mp4
         - no notes
@@ -81,8 +80,7 @@
           blue, they appear green in our emulation
 
     mamedev.emulab.it/haze/reference/sm17202201-SKATER.mp4
-        - shadow handling (headlight sprite) positioning is wrong, the
-          game also turns on the 'cross' bit, why?
+        - the game turns on the 'cross' bit, why?
 
     mamedev.emulab.it/haze/reference/sm17201813-ZEROIZE.mp4
         - no notes
@@ -129,7 +127,7 @@
 #include "includes/decocass.h"
 
 
-static const UINT32 tile_offset[32*32] = {
+static const uint32_t tile_offset[32*32] = {
 	0x078,0x079,0x07a,0x07b,0x07c,0x07d,0x07e,0x07f,0x0ff,0x0fe,0x0fd,0x0fc,0x0fb,0x0fa,0x0f9,0x0f8,0x278,0x279,0x27a,0x27b,0x27c,0x27d,0x27e,0x27f,0x2ff,0x2fe,0x2fd,0x2fc,0x2fb,0x2fa,0x2f9,0x2f8,
 	0x070,0x071,0x072,0x073,0x074,0x075,0x076,0x077,0x0f7,0x0f6,0x0f5,0x0f4,0x0f3,0x0f2,0x0f1,0x0f0,0x270,0x271,0x272,0x273,0x274,0x275,0x276,0x277,0x2f7,0x2f6,0x2f5,0x2f4,0x2f3,0x2f2,0x2f1,0x2f0,
 	0x068,0x069,0x06a,0x06b,0x06c,0x06d,0x06e,0x06f,0x0ef,0x0ee,0x0ed,0x0ec,0x0eb,0x0ea,0x0e9,0x0e8,0x268,0x269,0x26a,0x26b,0x26c,0x26d,0x26e,0x26f,0x2ef,0x2ee,0x2ed,0x2ec,0x2eb,0x2ea,0x2e9,0x2e8,
@@ -223,8 +221,8 @@ TILE_GET_INFO_MEMBER(decocass_state::get_bg_r_tile_info )
 
 TILE_GET_INFO_MEMBER(decocass_state::get_fg_tile_info )
 {
-	UINT8 code = m_fgvideoram[tile_index];
-	UINT8 attr = m_colorram[tile_index];
+	uint8_t code = m_fgvideoram[tile_index];
+	uint8_t attr = m_colorram[tile_index];
 	SET_TILE_INFO_MEMBER(0,
 			256 * (attr & 3) + code,
 			m_color_center_bot & 1,
@@ -487,7 +485,7 @@ WRITE8_MEMBER(decocass_state::decocass_center_v_shift_w )
 
 void decocass_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int color,
 						int sprite_y_adjust, int sprite_y_adjust_flip_screen,
-						UINT8 *sprite_ram, int interleave)
+						uint8_t *sprite_ram, int interleave)
 {
 	int i,offs;
 
@@ -536,7 +534,7 @@ void decocass_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 void decocass_state::draw_missiles(bitmap_ind16 &bitmap, const rectangle &cliprect,
 						int missile_y_adjust, int missile_y_adjust_flip_screen,
-						UINT8 *missile_ram, int interleave)
+						uint8_t *missile_ram, int interleave)
 {
 	int i, offs, x;
 
@@ -558,7 +556,7 @@ void decocass_state::draw_missiles(bitmap_ind16 &bitmap, const rectangle &clipre
 			for (x = 0; x < 4; x++)
 			{
 				if (sx >= cliprect.min_x && sx <= cliprect.max_x)
-					bitmap.pix16(sy, sx) = (m_color_missiles >> 4) & 7;
+					bitmap.pix16(sy, sx) = (m_color_missiles & 7) | 8;
 				sx++;
 			}
 
@@ -574,7 +572,7 @@ void decocass_state::draw_missiles(bitmap_ind16 &bitmap, const rectangle &clipre
 			for (x = 0; x < 4; x++)
 			{
 				if (sx >= cliprect.min_x && sx <= cliprect.max_x)
-					bitmap.pix16(sy, sx) = m_color_missiles & 7;
+					bitmap.pix16(sy, sx) = ((m_color_missiles >> 4) & 7) | 8;
 				sx++;
 			}
 	}
@@ -626,8 +624,8 @@ void decocass_state::draw_edge(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 	for (y=clip.min_y; y<=clip.max_y;y++)
 	{
 		int srcline = (y + scrolly) & 0x1ff;
-		UINT16* src = &srcbitmap->pix16(srcline);
-		UINT16* dst = &bitmap.pix16(y);
+		uint16_t* src = &srcbitmap->pix16(srcline);
+		uint16_t* dst = &bitmap.pix16(y);
 
 		for (x=clip.min_x; x<=clip.max_x;x++)
 		{
@@ -643,7 +641,7 @@ void decocass_state::draw_edge(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 				case 0x03: srccol = (x + scrollx) & 0x1ff; break; // hwy, burnrub etc.
 			}
 
-			UINT16 pix = src[srccol];
+			uint16_t pix = src[srccol];
 
 			if ((pix & 0x3) || opaque)
 			{
@@ -657,9 +655,9 @@ void decocass_state::draw_edge(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 
 void decocass_state::video_start()
 {
-	m_bg_tilemap_l = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(decocass_state::get_bg_l_tile_info),this), tilemap_mapper_delegate(FUNC(decocass_state::bgvideoram_scan_cols),this), 16, 16, 32, 32);
-	m_bg_tilemap_r = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(decocass_state::get_bg_r_tile_info),this), tilemap_mapper_delegate(FUNC(decocass_state::bgvideoram_scan_cols),this), 16, 16, 32, 32);
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(decocass_state::get_fg_tile_info),this), tilemap_mapper_delegate(FUNC(decocass_state::fgvideoram_scan_cols),this), 8, 8, 32, 32);
+	m_bg_tilemap_l = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(decocass_state::get_bg_l_tile_info),this), tilemap_mapper_delegate(FUNC(decocass_state::bgvideoram_scan_cols),this), 16, 16, 32, 32);
+	m_bg_tilemap_r = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(decocass_state::get_bg_r_tile_info),this), tilemap_mapper_delegate(FUNC(decocass_state::bgvideoram_scan_cols),this), 16, 16, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(decocass_state::get_fg_tile_info),this), tilemap_mapper_delegate(FUNC(decocass_state::fgvideoram_scan_cols),this), 8, 8, 32, 32);
 
 	m_bg_tilemap_l->set_transparent_pen(0);
 	m_bg_tilemap_r->set_transparent_pen(0);
@@ -684,7 +682,7 @@ void decocass_state::video_start()
 	memset(m_empty_tile, 0, sizeof(m_empty_tile));
 }
 
-UINT32 decocass_state::screen_update_decocass(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t decocass_state::screen_update_decocass(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* THIS CODE SHOULD NOT BE IN SCREEN UPDATE !! */
 
@@ -741,8 +739,17 @@ UINT32 decocass_state::screen_update_decocass(screen_device &screen, bitmap_ind1
 			draw_edge(bitmap,cliprect,1,false);
 		}
 	}
-	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
+	// LS148 @ 2B (DSP-8 board) sets pen priority
+
+	// priority 1: sprites
 	draw_sprites(bitmap, cliprect, (m_color_center_bot >> 1) & 1, 0, 0, m_fgvideoram, 0x20);
+
+	// priority 2 & 3: missiles
 	draw_missiles(bitmap, cliprect, 1, 0, m_colorram, 0x20);
+
+	// priority 4: foreground
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
 	return 0;
 }

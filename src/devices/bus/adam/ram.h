@@ -6,12 +6,11 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_ADAM_RAM_H
+#define MAME_BUS_ADAM_RAM_H
+
 #pragma once
 
-#ifndef __ADAM_RAM__
-#define __ADAM_RAM__
-
-#include "emu.h"
 #include "exp.h"
 
 
@@ -27,24 +26,22 @@ class adam_ram_expansion_device :  public device_t,
 {
 public:
 	// construction/destruction
-	adam_ram_expansion_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	adam_ram_expansion_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 
 	// device_adam_expansion_slot_card_interface overrides
-	virtual UINT8 adam_bd_r(address_space &space, offs_t offset, UINT8 data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2) override;
-	virtual void adam_bd_w(address_space &space, offs_t offset, UINT8 data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2) override;
+	virtual uint8_t adam_bd_r(address_space &space, offs_t offset, uint8_t data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2) override;
+	virtual void adam_bd_w(address_space &space, offs_t offset, uint8_t data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2) override;
 
 private:
-	optional_shared_ptr<UINT8> m_ram;
+	optional_shared_ptr<uint8_t> m_ram;
 };
 
 
 // device type definition
-extern const device_type ADAM_RAM;
+DECLARE_DEVICE_TYPE(ADAM_RAM, adam_ram_expansion_device)
 
-
-
-#endif
+#endif // MAME_BUS_ADAM_RAM_H

@@ -52,6 +52,8 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class carrera_state : public driver_device
@@ -64,10 +66,10 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
 
-	required_shared_ptr<UINT8> m_tileram;
+	required_shared_ptr<uint8_t> m_tileram;
 	DECLARE_READ8_MEMBER(unknown_r);
 	DECLARE_PALETTE_INIT(carrera);
-	UINT32 screen_update_carrera(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_carrera(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -256,7 +258,7 @@ static GFXDECODE_START( carrera )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 1 )
 GFXDECODE_END
 
-UINT32 carrera_state::screen_update_carrera(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t carrera_state::screen_update_carrera(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x,y;
 	int count = 0;
@@ -281,7 +283,7 @@ READ8_MEMBER(carrera_state::unknown_r)
 
 PALETTE_INIT_MEMBER(carrera_state, carrera)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int br_bit0, br_bit1, bit0, bit1, r, g, b;
 	int i;
 
@@ -306,7 +308,7 @@ PALETTE_INIT_MEMBER(carrera_state, carrera)
 }
 
 
-static MACHINE_CONFIG_START( carrera, carrera_state )
+static MACHINE_CONFIG_START( carrera )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK / 6)
 	MCFG_CPU_PROGRAM_MAP(carrera_map)
@@ -357,4 +359,4 @@ ROM_START( carrera )
 ROM_END
 
 
-GAME( 19??, carrera, 0, carrera, carrera, driver_device,0, ROT0, "BS Electronics", "Carrera (Version 6.7)", 0 )
+GAME( 19??, carrera, 0, carrera, carrera, carrera_state, 0, ROT0, "BS Electronics", "Carrera (Version 6.7)", 0 )

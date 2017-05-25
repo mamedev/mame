@@ -6,10 +6,10 @@
 
 #define MAX_AMPLITUDE  0x7fff
 
-const device_type CHANNELF_SOUND = &device_creator<channelf_sound_device>;
+DEFINE_DEVICE_TYPE(CHANNELF_SOUND, channelf_sound_device, "channelf_sound", "Channel F Sound")
 
-channelf_sound_device::channelf_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, CHANNELF_SOUND, "Channel F Sound", tag, owner, clock, "channelf_sound", __FILE__),
+channelf_sound_device::channelf_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, CHANNELF_SOUND, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		m_channel(nullptr),
 		m_sound_mode(0),
@@ -19,16 +19,6 @@ channelf_sound_device::channelf_sound_device(const machine_config &mconfig, cons
 		m_sample_counter(0),
 		m_forced_ontime(0),
 		m_min_ontime(0)
-{
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void channelf_sound_device::device_config_complete()
 {
 }
 
@@ -82,7 +72,7 @@ void channelf_sound_device::device_start()
 
 void channelf_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	UINT32 mask = 0, target = 0;
+	uint32_t mask = 0, target = 0;
 	stream_sample_t *buffer = outputs[0];
 	stream_sample_t *sample = buffer;
 

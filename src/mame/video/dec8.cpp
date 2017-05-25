@@ -76,7 +76,7 @@ sprites.
 
 PALETTE_INIT_MEMBER(dec8_state,ghostb)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < palette.entries(); i++)
@@ -210,7 +210,7 @@ WRITE8_MEMBER(dec8_state::gondo_scroll_w)
 
 void dec8_state::srdarwin_draw_sprites(  bitmap_ind16 &bitmap, const rectangle &cliprect, int pri )
 {
-	UINT8 *buffered_spriteram = m_spriteram->buffer();
+	uint8_t *buffered_spriteram = m_spriteram->buffer();
 	int offs;
 
 	/* Sprites */
@@ -258,7 +258,7 @@ void dec8_state::srdarwin_draw_sprites(  bitmap_ind16 &bitmap, const rectangle &
 
 /******************************************************************************/
 
-UINT32 dec8_state::screen_update_cobracom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t dec8_state::screen_update_cobracom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	flip_screen_set(m_tilegen1->get_flip_state());
 
@@ -287,7 +287,7 @@ TILE_GET_INFO_MEMBER(dec8_state::get_cobracom_fix_tile_info)
 
 VIDEO_START_MEMBER(dec8_state,cobracom)
 {
-	m_fix_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dec8_state::get_cobracom_fix_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dec8_state::get_cobracom_fix_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_fix_tilemap->set_transparent_pen(0);
 
@@ -298,7 +298,7 @@ VIDEO_START_MEMBER(dec8_state,cobracom)
 
 /******************************************************************************/
 
-UINT32 dec8_state::screen_update_ghostb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t dec8_state::screen_update_ghostb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_tilegen1->deco_bac06_pf_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
 	m_spritegen_krn->draw_sprites(bitmap, cliprect, m_buffered_spriteram16, 0x400, 0);
@@ -320,7 +320,7 @@ TILE_GET_INFO_MEMBER(dec8_state::get_ghostb_fix_tile_info)
 
 VIDEO_START_MEMBER(dec8_state,ghostb)
 {
-	m_fix_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dec8_state::get_ghostb_fix_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dec8_state::get_ghostb_fix_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_fix_tilemap->set_transparent_pen(0);
 
 	m_game_uses_priority = 0;
@@ -329,7 +329,7 @@ VIDEO_START_MEMBER(dec8_state,ghostb)
 
 /******************************************************************************/
 
-UINT32 dec8_state::screen_update_oscar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t dec8_state::screen_update_oscar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	flip_screen_set(m_tilegen1->get_flip_state());
 
@@ -355,7 +355,7 @@ TILE_GET_INFO_MEMBER(dec8_state::get_oscar_fix_tile_info)
 
 VIDEO_START_MEMBER(dec8_state,oscar)
 {
-	m_fix_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dec8_state::get_oscar_fix_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dec8_state::get_oscar_fix_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_fix_tilemap->set_transparent_pen(0);
 
@@ -365,7 +365,7 @@ VIDEO_START_MEMBER(dec8_state,oscar)
 
 /******************************************************************************/
 
-UINT32 dec8_state::screen_update_lastmisn(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t dec8_state::screen_update_lastmisn(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->set_scrollx(0, ((m_scroll2[0] << 8)+ m_scroll2[1]));
 	m_bg_tilemap->set_scrolly(0, ((m_scroll2[2] << 8)+ m_scroll2[3]));
@@ -376,7 +376,7 @@ UINT32 dec8_state::screen_update_lastmisn(screen_device &screen, bitmap_ind16 &b
 	return 0;
 }
 
-UINT32 dec8_state::screen_update_shackled(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t dec8_state::screen_update_shackled(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->set_scrollx(0, ((m_scroll2[0] << 8) + m_scroll2[1]));
 	m_bg_tilemap->set_scrolly(0, ((m_scroll2[2] << 8) + m_scroll2[3]));
@@ -427,8 +427,8 @@ TILE_GET_INFO_MEMBER(dec8_state::get_lastmisn_fix_tile_info)
 
 VIDEO_START_MEMBER(dec8_state,lastmisn)
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dec8_state::get_lastmisn_tile_info),this), tilemap_mapper_delegate(FUNC(dec8_state::lastmisn_scan_rows),this), 16, 16, 32, 32);
-	m_fix_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dec8_state::get_lastmisn_fix_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dec8_state::get_lastmisn_tile_info),this), tilemap_mapper_delegate(FUNC(dec8_state::lastmisn_scan_rows),this), 16, 16, 32, 32);
+	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dec8_state::get_lastmisn_fix_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_fix_tilemap->set_transparent_pen(0);
 	m_game_uses_priority = 0;
@@ -436,8 +436,8 @@ VIDEO_START_MEMBER(dec8_state,lastmisn)
 
 VIDEO_START_MEMBER(dec8_state,shackled)
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dec8_state::get_lastmisn_tile_info),this), tilemap_mapper_delegate(FUNC(dec8_state::lastmisn_scan_rows),this), 16, 16, 32, 32);
-	m_fix_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dec8_state::get_lastmisn_fix_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dec8_state::get_lastmisn_tile_info),this), tilemap_mapper_delegate(FUNC(dec8_state::lastmisn_scan_rows),this), 16, 16, 32, 32);
+	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dec8_state::get_lastmisn_fix_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_fix_tilemap->set_transparent_pen(0);
 	m_bg_tilemap->set_transmask(0, 0x000f, 0xfff0); /* Bottom 12 pens */
@@ -446,7 +446,7 @@ VIDEO_START_MEMBER(dec8_state,shackled)
 
 /******************************************************************************/
 
-UINT32 dec8_state::screen_update_srdarwin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t dec8_state::screen_update_srdarwin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->set_scrollx(0, (m_scroll2[0] << 8) + m_scroll2[1]);
 
@@ -489,8 +489,8 @@ TILE_GET_INFO_MEMBER(dec8_state::get_srdarwin_tile_info)
 
 VIDEO_START_MEMBER(dec8_state,srdarwin)
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dec8_state::get_srdarwin_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 16);
-	m_fix_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dec8_state::get_srdarwin_fix_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dec8_state::get_srdarwin_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 16);
+	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dec8_state::get_srdarwin_fix_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_fix_tilemap->set_transparent_pen(0);
 	m_bg_tilemap->set_transmask(0, 0xffff, 0x0000); //* draw as background only
@@ -501,7 +501,7 @@ VIDEO_START_MEMBER(dec8_state,srdarwin)
 
 /******************************************************************************/
 
-UINT32 dec8_state::screen_update_gondo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t dec8_state::screen_update_gondo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->set_scrollx(0, ((m_scroll2[0] << 8) + m_scroll2[1]));
 	m_bg_tilemap->set_scrolly(0, ((m_scroll2[2] << 8) + m_scroll2[3]));
@@ -514,7 +514,7 @@ UINT32 dec8_state::screen_update_gondo(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-UINT32 dec8_state::screen_update_garyoret(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t dec8_state::screen_update_garyoret(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->set_scrollx(0, ((m_scroll2[0] << 8) + m_scroll2[1]));
 	m_bg_tilemap->set_scrolly(0, ((m_scroll2[2] << 8) + m_scroll2[3]));
@@ -557,8 +557,8 @@ TILE_GET_INFO_MEMBER(dec8_state::get_gondo_tile_info)
 
 VIDEO_START_MEMBER(dec8_state,gondo)
 {
-	m_fix_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dec8_state::get_gondo_fix_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dec8_state::get_gondo_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dec8_state::get_gondo_fix_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dec8_state::get_gondo_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	m_fix_tilemap->set_transparent_pen(0);
 	m_bg_tilemap->set_transmask(0, 0x00ff, 0xff00); /* Bottom 8 pens */
@@ -567,8 +567,8 @@ VIDEO_START_MEMBER(dec8_state,gondo)
 
 VIDEO_START_MEMBER(dec8_state,garyoret)
 {
-	m_fix_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dec8_state::get_gondo_fix_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dec8_state::get_gondo_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dec8_state::get_gondo_fix_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dec8_state::get_gondo_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	m_fix_tilemap->set_transparent_pen(0);
 	m_game_uses_priority = 1;

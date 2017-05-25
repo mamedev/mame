@@ -6,6 +6,7 @@
  */
 
 #include "nld_7490.h"
+#include "../nl_base.h"
 
 namespace netlist
 {
@@ -41,8 +42,8 @@ namespace netlist
 		logic_input_t m_R92;
 
 		state_var_u8 m_cnt;
-		state_var_u8 m_last_A;
-		state_var_u8 m_last_B;
+		state_var<netlist_sig_t> m_last_A;
+		state_var<netlist_sig_t> m_last_B;
 
 		object_array_t<logic_output_t, 4> m_Q;
 	};
@@ -77,7 +78,7 @@ namespace netlist
 		m_last_B = 0;
 	}
 
-	static const netlist_time delay[4] =
+	static C14CONSTEXPR const netlist_time delay[4] =
 	{
 			NLTIME_FROM_NS(18),
 			NLTIME_FROM_NS(36) - NLTIME_FROM_NS(18),
@@ -86,15 +87,15 @@ namespace netlist
 
 	NETLIB_UPDATE(7490)
 	{
-		const netlist_sig_t new_A = INPLOGIC(m_A);
-		const netlist_sig_t new_B = INPLOGIC(m_B);
+		const netlist_sig_t new_A = m_A();
+		const netlist_sig_t new_B = m_B();
 
-		if (INPLOGIC(m_R91) & INPLOGIC(m_R92))
+		if (m_R91() & m_R92())
 		{
 			m_cnt = 9;
 			update_outputs();
 		}
-		else if (INPLOGIC(m_R1) & INPLOGIC(m_R2))
+		else if (m_R1() & m_R2())
 		{
 			m_cnt = 0;
 			update_outputs();
@@ -104,7 +105,7 @@ namespace netlist
 			if (m_last_A && !new_A)  // High - Low
 			{
 				m_cnt ^= 1;
-				OUTLOGIC(m_Q[0], m_cnt & 1, delay[0]);
+				m_Q[0].push(m_cnt & 1, delay[0]);
 			}
 			if (m_last_B && !new_B)  // High - Low
 			{
@@ -120,8 +121,8 @@ namespace netlist
 
 	NETLIB_FUNC_VOID(7490, update_outputs, (void))
 	{
-		for (int i=0; i<4; i++)
-			OUTLOGIC(m_Q[i], (m_cnt >> i) & 1, delay[i]);
+		for (std::size_t i=0; i<4; i++)
+			m_Q[i].push((m_cnt >> i) & 1, delay[i]);
 	}
 
 	NETLIB_DEVICE_IMPL(7490)

@@ -4,7 +4,6 @@
 <!--
 Undumped carts, based on Wikipedia list
 C1010 - Bump N' Run (Unreleased?)
-C1016 - Volcano Panic
 C1020 - Bad Bud Chou Chu's Adventure (Unreleased?)
 C1025 - Jackpot (Unreleased?)
 C1030 - Beach Volleyball (Unreleased?)
@@ -13,15 +12,11 @@ C1039 - Column #5 (Unreleased?)
 C1040 - ??
 C1041 - Mighty Boxer
 C1046 - Kiki Island
-C1047 - Fortune 'n Luck
-C1048 - Baseball (or Super Baseball)
 C1050 - Fortress of Fierceness
 C1051 - Incantational Couple
 C1055 - ??
-C1056 - GP Race
 C1059 - ??
 C1062 - ??
-C1065 - Hot Hero
 C1066 - ??
 -->
 
@@ -191,6 +186,18 @@ C1066 - ??
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="c1015_kill_shot.bin" size="32768" crc="69bc6a30" sha1="a4310f285f68c1837b4e92a2e127e22e7f0fd4f2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="volpanic" supported="no">
+		<description>Volcano Panic</description>
+		<year>1991</year>
+		<publisher>Bit Corporation</publisher>
+		<info name="serial" value="C1016" />
+		<part name="cart" interface="gamate_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="c1-016.bin" size="131072" crc="1c2921df" sha1="958f4936f3aa8db5e76d315ee6acc6aee0e010b4" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -472,13 +479,37 @@ C1066 - ??
 		</part>
 	</software>
 
+	<software name="ftnnluck" supported="no">
+		<description>Fortune 'n Luck</description>
+		<year>1992</year>
+		<publisher>Bit Corporation</publisher>
+		<info name="serial" value="C1047" />
+		<part name="cart" interface="gamate_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="c1-047.bin" size="131072" crc="39660803" sha1="8719418a6b30c2cc9d013d35d1baacde86016da3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="baseball" supported="no">
+		<description>Baseball</description>
+		<year>1991</year>
+		<publisher>Bit Corporation</publisher>
+		<info name="serial" value="C1048" />
+		<part name="cart" interface="gamate_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="c1-048.bin" size="65536" crc="daf715c5" sha1="f10e180c4aac41e9c710ce38ca9a93ca6f331f57" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="punkboy" supported="no">
 		<description>Punk Boy</description>
 		<year>1992</year>
 		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1049" />
 		<part name="cart" interface="gamate_cart">
-			<dataarea name="rom" size="131072">
+			<dataarea name="rom" size="65536">
 				<rom name="c1-049.bin" size="65536" crc="aa2e0d32" sha1="1b3082be0698c12c8fc978db6a0c63c8958c33f8" offset="0" />
 			</dataarea>
 		</part>
@@ -586,7 +617,7 @@ C1066 - ??
 		<publisher>Unknown</publisher>
 		<info name="serial" value="C1063" />
 		<part name="cart" interface="gamate_cart">
-			<dataarea name="rom" size="524288">
+			<dataarea name="rom" size="262144">
 				<rom name="c1-063.bin" size="262144" crc="93d5f365" sha1="91b9b9060b76d2012d5cbc6523839f67caa37aaf" offset="0" />
 			</dataarea>
 		</part>
@@ -600,6 +631,18 @@ C1066 - ??
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="c1-064.bin" size="524288" crc="8574f0eb" sha1="ba42622b9ff4b2fa0cb70f322ee24b1d8c387222" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hothero" supported="no">
+		<description>Hot Hero</description>
+		<year>199?</year>
+		<publisher>Unknown</publisher>
+		<info name="serial" value="C1065" />
+		<part name="cart" interface="gamate_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="c1-065.bin" size="524288" crc="1ed9d0a3" sha1="568f87864c0ed6117fe34e3f79e56c01e911e482" offset="0" />
 			</dataarea>
 		</part>
 	</software>

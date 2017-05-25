@@ -6,23 +6,29 @@
  *
  ****************************************************************************/
 
-#ifndef MBEE_H_
-#define MBEE_H_
+#ifndef MAME_INCLUDES_MBEE_H
+#define MAME_INCLUDES_MBEE_H
 
-#include "emu.h"
-#include "imagedev/snapquik.h"
-#include "machine/z80pio.h"
-#include "machine/8530scc.h"
-#include "imagedev/cassette.h"
-#include "machine/buffer.h"
 #include "bus/centronics/ctronics.h"
-#include "machine/mc146818.h"
-#include "video/mc6845.h"
-#include "sound/speaker.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
-#include "sound/wave.h"
+
+#include "imagedev/cassette.h"
+#include "imagedev/snapquik.h"
+
+#include "machine/8530scc.h"
+#include "machine/buffer.h"
+#include "machine/mc146818.h"
 #include "machine/wd_fdc.h"
+#include "machine/z80pio.h"
+
+#include "sound/spkrdev.h"
+#include "sound/wave.h"
+
+#include "video/mc6845.h"
+
+#include "screen.h"
 
 
 class mbee_state : public driver_device
@@ -52,8 +58,8 @@ public:
 		, m_telcom(*this, "telcom")
 		, m_basic(*this, "basic")
 		, m_io_x7(*this, "X.7")
-		, m_io_oldkb(*this, "X")
-		, m_io_newkb(*this, "Y")
+		, m_io_oldkb(*this, "X.%u", 0)
+		, m_io_newkb(*this, "Y.%u", 0)
 		, m_io_config(*this, "CONFIG")
 		, m_screen(*this, "screen")
 	{ }
@@ -105,7 +111,7 @@ public:
 	DECLARE_MACHINE_RESET(mbee128);
 	DECLARE_MACHINE_RESET(mbee256);
 	DECLARE_MACHINE_RESET(mbeett);
-	UINT32 screen_update_mbee(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_mbee(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(timer_newkb);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(mbee);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(mbee_z80bin);
@@ -117,33 +123,33 @@ public:
 
 	required_device<palette_device> m_palette;
 private:
-	UINT8 *m_p_videoram;
-	UINT8 *m_p_gfxram;
-	UINT8 *m_p_colorram;
-	UINT8 *m_p_attribram;
+	uint8_t *m_p_videoram;
+	uint8_t *m_p_gfxram;
+	uint8_t *m_p_colorram;
+	uint8_t *m_p_attribram;
 	bool m_is_premium;
 	bool m_has_oldkb;
 	size_t m_size;
 	bool m_b7_rtc;
 	bool m_b7_vs;
 	bool m_b2;
-	UINT8 m_framecnt;
-	UINT8 m_08;
-	UINT8 m_0a;
-	UINT8 m_0b;
-	UINT8 m_1c;
-	UINT8 m_sy6545_cursor[16];
-	UINT8 m_mbee256_was_pressed[15];
-	UINT8 m_mbee256_q[20];
-	UINT8 m_mbee256_q_pos;
-	UINT8 m_sy6545_reg[32];
-	UINT8 m_sy6545_ind;
-	UINT8 m_fdc_rq;
-	UINT8 m_bank_array[33];
-	void setup_banks(UINT8 data, bool first_time, UINT8 b_mask);
+	uint8_t m_framecnt;
+	uint8_t m_08;
+	uint8_t m_0a;
+	uint8_t m_0b;
+	uint8_t m_1c;
+	uint8_t m_sy6545_cursor[16];
+	uint8_t m_mbee256_was_pressed[15];
+	uint8_t m_mbee256_q[20];
+	uint8_t m_mbee256_q_pos;
+	uint8_t m_sy6545_reg[32];
+	uint8_t m_sy6545_ind;
+	uint8_t m_fdc_rq;
+	uint8_t m_bank_array[33];
+	void setup_banks(uint8_t data, bool first_time, uint8_t b_mask);
 	void sy6545_cursor_configure();
-	void oldkb_scan(UINT16 param);
-	void oldkb_matrix_r(UINT16 offs);
+	void oldkb_scan(uint16_t param);
+	void oldkb_matrix_r(uint16_t offs);
 	void machine_reset_common();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	required_device<cpu_device> m_maincpu;
@@ -154,7 +160,7 @@ private:
 	required_device<centronics_device> m_centronics;
 	required_device<output_latch_device> m_cent_data_out;
 	required_device<mc6845_device> m_crtc;
-	optional_device<wd2793_t> m_fdc;
+	optional_device<wd2793_device> m_fdc;
 	optional_device<floppy_connector> m_floppy0;
 	optional_device<floppy_connector> m_floppy1;
 	optional_device<mc146818_device> m_rtc;
@@ -168,4 +174,4 @@ private:
 	required_device<screen_device> m_screen;
 };
 
-#endif /* MBEE_H_ */
+#endif // MAME_INCLUDES_MBEE_H

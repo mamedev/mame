@@ -10,15 +10,15 @@
         - M48T37
         - M48T58
         - MK48T08
+        - MK48T12
 
 ***************************************************************************/
 
+#ifndef MAME_MACHINE_TIMEKPR_H
+#define MAME_MACHINE_TIMEKPR_H
+
 #pragma once
 
-#ifndef __TIMEKPR_H__
-#define __TIMEKPR_H__
-
-#include "emu.h"
 
 
 
@@ -41,6 +41,9 @@
 #define MCFG_MK48T08_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, MK48T08, 0)
 
+#define MCFG_MK48T12_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, MK48T12, 0)
+
 
 
 //**************************************************************************
@@ -50,18 +53,16 @@
 
 // ======================> timekeeper_device
 
-class timekeeper_device :   public device_t,
-							public device_nvram_interface
+class timekeeper_device : public device_t, public device_nvram_interface
 {
-protected:
-	// construction/destruction
-	timekeeper_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int size);
-
 public:
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_READ8_MEMBER( read );
 
 protected:
+	// construction/destruction
+	timekeeper_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int size);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -77,21 +78,21 @@ private:
 	void counters_from_ram();
 
 	// internal state
-	UINT8 m_control;
-	UINT8 m_seconds;
-	UINT8 m_minutes;
-	UINT8 m_hours;
-	UINT8 m_day;
-	UINT8 m_date;
-	UINT8 m_month;
-	UINT8 m_year;
-	UINT8 m_century;
+	uint8_t m_control;
+	uint8_t m_seconds;
+	uint8_t m_minutes;
+	uint8_t m_hours;
+	uint8_t m_day;
+	uint8_t m_date;
+	uint8_t m_month;
+	uint8_t m_year;
+	uint8_t m_century;
 
-	dynamic_buffer m_data;
-	optional_region_ptr<UINT8> m_default_data;
+	std::vector<uint8_t> m_data;
+	optional_region_ptr<uint8_t> m_default_data;
 
 protected:
-	int m_size;
+	int const m_size;
 	int m_offset_control;
 	int m_offset_seconds;
 	int m_offset_minutes;
@@ -107,38 +108,45 @@ protected:
 class m48t02_device : public timekeeper_device
 {
 public:
-	m48t02_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	m48t02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class m48t35_device : public timekeeper_device
 {
 public:
-	m48t35_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	m48t35_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class m48t37_device : public timekeeper_device
 {
 public:
-	m48t37_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	m48t37_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class m48t58_device : public timekeeper_device
 {
 public:
-	m48t58_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	m48t58_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class mk48t08_device : public timekeeper_device
 {
 public:
-	mk48t08_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mk48t08_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+class mk48t12_device : public timekeeper_device
+{
+public:
+	mk48t12_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 // device type definition
-extern const device_type M48T02;
-extern const device_type M48T35;
-extern const device_type M48T37;
-extern const device_type M48T58;
-extern const device_type MK48T08;
+DECLARE_DEVICE_TYPE(M48T02,  m48t02_device)
+DECLARE_DEVICE_TYPE(M48T35,  m48t35_device)
+DECLARE_DEVICE_TYPE(M48T37,  m48t37_device)
+DECLARE_DEVICE_TYPE(M48T58,  m48t58_device)
+DECLARE_DEVICE_TYPE(MK48T08, mk48t08_device)
+DECLARE_DEVICE_TYPE(MK48T12, mk48t12_device)
 
-#endif // __TIMEKPR_H__
+#endif // MAME_MACHINE_TIMEKPR_H

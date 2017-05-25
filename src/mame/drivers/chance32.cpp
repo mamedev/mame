@@ -22,6 +22,8 @@
 #include "cpu/z80/z80.h"
 #include "sound/okim6295.h"
 #include "video/mc6845.h"
+#include "screen.h"
+#include "speaker.h"
 
 #include "chance32.lh"
 
@@ -55,16 +57,16 @@ public:
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_bg_tilemap;
 
-	required_shared_ptr<UINT8> m_fgram;
-	required_shared_ptr<UINT8> m_bgram;
+	required_shared_ptr<uint8_t> m_fgram;
+	required_shared_ptr<uint8_t> m_bgram;
 
-	UINT8 mux_data;
+	uint8_t mux_data;
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_chance32(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_chance32(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 };
@@ -93,17 +95,17 @@ TILE_GET_INFO_MEMBER(chance32_state::get_bg_tile_info)
 
 void chance32_state::video_start()
 {
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(chance32_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 8, 35, 29);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(chance32_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 8, 35, 29);
 	m_fg_tilemap->set_transparent_pen(0);
 
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(chance32_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 8, 35, 29);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(chance32_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 8, 35, 29);
 
 	m_fg_tilemap->set_flip(TILE_FLIPX|TILE_FLIPY);
 	m_bg_tilemap->set_flip(TILE_FLIPX|TILE_FLIPY);
 }
 
 
-UINT32 chance32_state::screen_update_chance32(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t chance32_state::screen_update_chance32(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -119,7 +121,7 @@ WRITE8_MEMBER(chance32_state::mux_w)
 
 READ8_MEMBER(chance32_state::mux_r)
 {
-	UINT8 res,i;
+	uint8_t res,i;
 	const char *const muxnames[4] = { "IN0", "IN1", "IN2", "IN3" };
 	res = 0;
 
@@ -442,7 +444,7 @@ void chance32_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( chance32, chance32_state )
+static MACHINE_CONFIG_START( chance32 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,12000000/2)
@@ -472,7 +474,7 @@ static MACHINE_CONFIG_START( chance32, chance32_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	/* clock at 1050 kHz match the 8000 Hz samples stored inside the ROM */
-	MCFG_OKIM6295_ADD("oki", XTAL_1_056MHz, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL_1_056MHz, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -515,5 +517,5 @@ ROM_END
 *      Game Drivers      *
 *************************/
 
-/*     YEAR  NAME      PARENT  MACHINE   INPUT     STATE          INIT  ROT    COMPANY                FULLNAME            FLAGS  LAYOUT */
-GAMEL( 19??, chance32, 0,      chance32, chance32, driver_device, 0,    ROT0, "PAL System Co, Ltd.", "Chance Thirty Two", 0,     layout_chance32 )
+/*     YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT  ROT   COMPANY                FULLNAME             FLAGS  LAYOUT */
+GAMEL( 19??, chance32, 0,      chance32, chance32, chance32_state, 0,    ROT0, "PAL System Co, Ltd.", "Chance Thirty Two", 0,     layout_chance32 )

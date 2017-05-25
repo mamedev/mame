@@ -68,13 +68,8 @@
 
 #define TEST_ICC_NZ(x)      do { m_psr &= ~PSR_ICC_MASK; m_psr |= (x & 0x80000000) ? PSR_N_MASK : 0; m_psr |= (x == 0) ? PSR_Z_MASK : 0; } while (0)
 
-#define MAKE_PSR            do { m_psr = (m_impl << PSR_IMPL_SHIFT) | (m_ver << PSR_VER_SHIFT) | (m_icc << PSR_ICC_SHIFT) | (m_ec ? PSR_EC_MASK : 0) | (m_ef ? PSR_EF_MASK : 0) | (m_pil << PSR_PIL_SHIFT) | (m_s ? PSR_S_MASK : 0) | (m_ps ? PSR_PS_MASK : 0) | (m_et ? PSR_ET_MASK : 0) | m_cwp; } while(0)
 #define BREAK_PSR           do { m_icc = (m_psr & PSR_ICC_MASK) >> PSR_ICC_SHIFT; m_ec = m_psr & PSR_EC_MASK; m_ef = m_psr & PSR_EF_MASK; m_pil = (m_psr & PSR_PIL_MASK) >> PSR_PIL_SHIFT; m_s = m_psr & PSR_S_MASK; m_ps = m_psr & PSR_PS_MASK; m_et = m_psr & PSR_ET_MASK; m_cwp = m_psr & PSR_CWP_MASK; } while(0)
 #define MAKE_ICC            do { m_icc = (m_psr & PSR_ICC_MASK) >> PSR_ICC_SHIFT; } while(0)
-
-#define CWP                 m_cwp
-#define S                   m_s
-#define PS                  m_ps
 
 #define IS_SUPERVISOR       (m_psr & PSR_S_MASK)
 #define IS_USER             (!IS_SUPERVISOR)
@@ -93,18 +88,18 @@
 #define OPC     ((op >> 5) & 0x1ff)
 #define OPFLOW  ((op >> 5) & 0x3f)
 
-#define DISP30  (INT32(op << 2))
-#define DISP22  (INT32(op << 10) >> 8)
-#define DISP19  (INT32(op << 13) >> 11)
-#define DISP16  (INT32(((op << 10) & 0xc0000000) | ((op << 16) & 0x3fff0000)) >> 14)
+#define DISP30  (int32_t(op << 2))
+#define DISP22  (int32_t(op << 10) >> 8)
+#define DISP19  (int32_t(op << 13) >> 11)
+#define DISP16  (int32_t(((op << 10) & 0xc0000000) | ((op << 16) & 0x3fff0000)) >> 14)
 #define IMM22   (op << 10)
 #define CONST22 (op & 0x3fffff)
-#define SIMM13  (INT32(op << 19) >> 19)
-#define SIMM11  (INT32(op << 21) >> 21)
-#define SIMM10  (INT32(op << 22) >> 22)
-#define SIMM8   (INT32(op << 24) >> 24)
+#define SIMM13  (int32_t(op << 19) >> 19)
+#define SIMM11  (int32_t(op << 21) >> 21)
+#define SIMM10  (int32_t(op << 22) >> 22)
+#define SIMM8   (int32_t(op << 24) >> 24)
 #define IMM7    (op & 0x7f)
-#define SIMM7   (INT32(op << 25) >> 25)
+#define SIMM7   (int32_t(op << 25) >> 25)
 #define SHCNT32 (op & 31)
 #define SHCNT64 (op & 63)
 #define IAMODE  (op & 0x7)
@@ -144,11 +139,6 @@
 #define nPC     m_npc
 
 #define Y       m_y
-
-#define ET      m_et
-#define EF      m_ef
-#define EC      m_ec
-#define PIL     m_pil
 
 #define MAE         m_mae
 #define HOLD_BUS    m_hold_bus

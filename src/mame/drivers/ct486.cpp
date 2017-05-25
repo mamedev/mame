@@ -7,16 +7,22 @@
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/i386/i386.h"
-#include "machine/ram.h"
-#include "machine/cs4031.h"
 #include "machine/at_keybc.h"
-#include "bus/pc_kbd/pc_kbdc.h"
-#include "bus/pc_kbd/keyboards.h"
+#include "machine/cs4031.h"
+#include "machine/ram.h"
+#include "sound/spkrdev.h"
+
 #include "bus/isa/isa.h"
 #include "bus/isa/isa_cards.h"
-#include "sound/speaker.h"
+#include "bus/pc_kbd/keyboards.h"
+#include "bus/pc_kbd/pc_kbdc.h"
+
 #include "softlist.h"
+#include "softlist_dev.h"
+#include "speaker.h"
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -26,11 +32,11 @@ class ct486_state : public driver_device
 {
 public:
 	ct486_state(const machine_config &mconfig, device_type type, const char *tag) :
-	driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_cs4031(*this, "cs4031"),
-	m_isabus(*this, "isabus"),
-	m_speaker(*this, "speaker")
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_cs4031(*this, "cs4031"),
+		m_isabus(*this, "isabus"),
+		m_speaker(*this, "speaker")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -98,7 +104,7 @@ ADDRESS_MAP_END
 //  MACHINE DRIVERS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( ct486, ct486_state )
+static MACHINE_CONFIG_START( ct486 )
 	MCFG_CPU_ADD("maincpu", I486, XTAL_25MHz)
 	MCFG_CPU_PROGRAM_MAP(ct486_map)
 	MCFG_CPU_IO_MAP(ct486_io)
@@ -174,7 +180,6 @@ static MACHINE_CONFIG_START( ct486, ct486_state )
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("pc_disk_list","ibm5150")
-	MCFG_SOFTWARE_LIST_ADD("xt_disk_list","ibm5160_flop")
 	MCFG_SOFTWARE_LIST_ADD("at_disk_list","ibm5170")
 	MCFG_SOFTWARE_LIST_ADD("at_cdrom_list","ibm5170_cdrom")
 MACHINE_CONFIG_END
@@ -195,4 +200,4 @@ ROM_END
 //  GAME DRIVERS
 //**************************************************************************
 
-COMP( 1993, ct486, 0, 0, ct486, 0, driver_device, 0, "<unknown>", "PC/AT 486 with CS4031 chipset", 0 )
+COMP( 1993, ct486, 0, 0, ct486, 0, ct486_state, 0, "<unknown>", "PC/AT 486 with CS4031 chipset", 0 )

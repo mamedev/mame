@@ -66,6 +66,8 @@ There are some unmapped writes past the end of text ram too
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
 #include "video/snk68_spr.h"
+#include "speaker.h"
+
 
 class blackt96_state : public driver_device
 {
@@ -79,10 +81,9 @@ public:
 		m_sprites(*this, "sprites")
 		{ }
 
-	required_shared_ptr<UINT16> m_tilemapram;
+	required_shared_ptr<uint16_t> m_tilemapram;
 	DECLARE_WRITE16_MEMBER(blackt96_c0000_w);
 	DECLARE_WRITE16_MEMBER(blackt96_80000_w);
-	DECLARE_READ_LINE_MEMBER(PIC16C5X_T0_clk_r);
 	DECLARE_WRITE8_MEMBER(blackt96_soundio_port00_w);
 	DECLARE_READ8_MEMBER(blackt96_soundio_port01_r);
 	DECLARE_WRITE8_MEMBER(blackt96_soundio_port01_w);
@@ -96,10 +97,10 @@ public:
 		return machine().rand();
 	}
 
-	UINT8 m_txt_bank;
+	uint8_t m_txt_bank;
 
 	virtual void video_start() override;
-	UINT32 screen_update_blackt96(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_blackt96(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -112,7 +113,7 @@ void blackt96_state::video_start()
 }
 
 
-UINT32 blackt96_state::screen_update_blackt96(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t blackt96_state::screen_update_blackt96(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
@@ -127,7 +128,7 @@ UINT32 blackt96_state::screen_update_blackt96(screen_device &screen, bitmap_ind1
 	{
 		for (y=0;y<32;y++)
 		{
-			UINT16 tile = (m_tilemapram[count*2]&0xff);
+			uint16_t tile = (m_tilemapram[count*2]&0xff);
 			tile += m_txt_bank * 0x100;
 			gfx->transpen(bitmap,cliprect,tile,0,0,0,x*8,y*8,0);
 			count++;
@@ -300,11 +301,6 @@ static GFXDECODE_START( blackt96 )
 GFXDECODE_END
 
 
-READ_LINE_MEMBER(blackt96_state::PIC16C5X_T0_clk_r)
-{
-	return 0;
-}
-
 WRITE8_MEMBER(blackt96_state::blackt96_soundio_port00_w)
 {
 }
@@ -344,7 +340,7 @@ void blackt96_state::tile_callback(int &tile, int& fx, int& fy, int& region)
 }
 
 
-static MACHINE_CONFIG_START( blackt96, blackt96_state )
+static MACHINE_CONFIG_START( blackt96 )
 	MCFG_CPU_ADD("maincpu", M68000, 18000000 /2)
 	MCFG_CPU_PROGRAM_MAP(blackt96_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", blackt96_state,  irq1_line_hold)
@@ -355,7 +351,6 @@ static MACHINE_CONFIG_START( blackt96, blackt96_state )
 	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(blackt96_state, blackt96_soundio_port01_w))
 	MCFG_PIC16C5x_READ_C_CB(READ8(blackt96_state, blackt96_soundio_port02_r))
 	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(blackt96_state, blackt96_soundio_port02_w))
-	MCFG_PIC16C5x_T0_CB(READLINE(blackt96_state, PIC16C5X_T0_clk_r))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", blackt96)
 
@@ -378,11 +373,11 @@ static MACHINE_CONFIG_START( blackt96, blackt96_state )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki1", 8000000/8, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki1", 8000000/8, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.47)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)
 
-	MCFG_OKIM6295_ADD("oki2", 8000000/8, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki2", 8000000/8, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.47)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)
 MACHINE_CONFIG_END
@@ -421,4 +416,4 @@ ROM_START( blackt96 )
 	ROM_CONTINUE(          0x00001, 0x08000 ) // first half is empty
 ROM_END
 
-GAME( 1996, blackt96,    0,        blackt96,    blackt96, driver_device,    0, ROT0,  "D.G.R.M.", "Black Touch '96", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1996, blackt96,    0,        blackt96,    blackt96, blackt96_state,    0, ROT0,  "D.G.R.M.", "Black Touch '96", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

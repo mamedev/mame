@@ -41,7 +41,7 @@ public:
 	DECLARE_MACHINE_START(skullxbo);
 	DECLARE_MACHINE_RESET(skullxbo);
 	DECLARE_VIDEO_START(skullxbo);
-	UINT32 screen_update_skullxbo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_skullxbo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_timer);
 	void skullxbo_scanline_update(int scanline);
 	DECLARE_WRITE16_MEMBER( skullxbo_xscroll_w );

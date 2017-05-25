@@ -6,10 +6,11 @@
  *  Created on: 5/05/2014
  */
 
-#ifndef WD7600_H_
-#define WD7600_H_
+#ifndef MAME_MACHINE_WD7600_H
+#define MAME_MACHINE_WD7600_H
 
-#include "emu.h"
+#pragma once
+
 #include "machine/am9517a.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
@@ -26,31 +27,31 @@
 	wd7600_device::static_set_keybctag(*device, _keybctag);
 
 #define MCFG_WD7600_IOR(_ior) \
-	downcast<wd7600_device *>(device)->set_ior_callback(DEVCB_##_ior);
+	devcb = &downcast<wd7600_device *>(device)->set_ior_callback(DEVCB_##_ior);
 
 #define MCFG_WD7600_IOW(_iow) \
-	downcast<wd7600_device *>(device)->set_iow_callback(DEVCB_##_iow);
+	devcb = &downcast<wd7600_device *>(device)->set_iow_callback(DEVCB_##_iow);
 
 #define MCFG_WD7600_TC(_tc) \
-	downcast<wd7600_device *>(device)->set_tc_callback(DEVCB_##_tc);
+	devcb = &downcast<wd7600_device *>(device)->set_tc_callback(DEVCB_##_tc);
 
 #define MCFG_WD7600_HOLD(_hold) \
-	downcast<wd7600_device *>(device)->set_hold_callback(DEVCB_##_hold);
+	devcb = &downcast<wd7600_device *>(device)->set_hold_callback(DEVCB_##_hold);
 
 #define MCFG_WD7600_NMI(_nmi) \
-	downcast<wd7600_device *>(device)->set_nmi_callback(DEVCB_##_nmi);
+	devcb = &downcast<wd7600_device *>(device)->set_nmi_callback(DEVCB_##_nmi);
 
 #define MCFG_WD7600_INTR(_intr) \
-	downcast<wd7600_device *>(device)->set_intr_callback(DEVCB_##_intr);
+	devcb = &downcast<wd7600_device *>(device)->set_intr_callback(DEVCB_##_intr);
 
 #define MCFG_WD7600_CPURESET(_cpureset) \
-	downcast<wd7600_device *>(device)->set_cpureset_callback(DEVCB_##_cpureset);
+	devcb = &downcast<wd7600_device *>(device)->set_cpureset_callback(DEVCB_##_cpureset);
 
 #define MCFG_WD7600_A20M(_a20m) \
-	downcast<wd7600_device *>(device)->set_a20m_callback(DEVCB_##_a20m);
+	devcb = &downcast<wd7600_device *>(device)->set_a20m_callback(DEVCB_##_a20m);
 
 #define MCFG_WD7600_SPKR(_spkr) \
-	downcast<wd7600_device *>(device)->set_spkr_callback(DEVCB_##_spkr);
+	devcb = &downcast<wd7600_device *>(device)->set_spkr_callback(DEVCB_##_spkr);
 
 
 //**************************************************************************
@@ -63,21 +64,21 @@ class wd7600_device : public device_t
 {
 public:
 	// construction/destruction
-	wd7600_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	wd7600_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// callbacks
-	template<class _ior> void set_ior_callback(_ior ior) { m_read_ior.set_callback(ior); }
-	template<class _iow> void set_iow_callback(_iow iow) { m_write_iow.set_callback(iow); }
-	template<class _tc> void set_tc_callback(_tc tc) { m_write_tc.set_callback(tc); }
-	template<class _hold> void set_hold_callback(_hold hold) { m_write_hold.set_callback(hold); }
-	template<class _cpureset> void set_cpureset_callback(_cpureset cpureset) { m_write_cpureset.set_callback(cpureset); }
-	template<class _nmi> void set_nmi_callback(_nmi nmi) { m_write_nmi.set_callback(nmi); }
-	template<class _intr> void set_intr_callback(_intr intr) { m_write_intr.set_callback(intr); }
-	template<class _a20m> void set_a20m_callback(_a20m a20m) { m_write_a20m.set_callback(a20m); }
-	template<class _spkr> void set_spkr_callback(_spkr spkr) { m_write_spkr.set_callback(spkr); }
+	template <class Object> devcb_base &set_ior_callback(Object &&ior) { return m_read_ior.set_callback(std::forward<Object>(ior)); }
+	template <class Object> devcb_base &set_iow_callback(Object &&iow) { return m_write_iow.set_callback(std::forward<Object>(iow)); }
+	template <class Object> devcb_base &set_tc_callback(Object &&tc) { return m_write_tc.set_callback(std::forward<Object>(tc)); }
+	template <class Object> devcb_base &set_hold_callback(Object &&hold) { return m_write_hold.set_callback(std::forward<Object>(hold)); }
+	template <class Object> devcb_base &set_cpureset_callback(Object &&cpureset) { return m_write_cpureset.set_callback(std::forward<Object>(cpureset)); }
+	template <class Object> devcb_base &set_nmi_callback(Object &&nmi) { return m_write_nmi.set_callback(std::forward<Object>(nmi)); }
+	template <class Object> devcb_base &set_intr_callback(Object &&intr) { return m_write_intr.set_callback(std::forward<Object>(intr)); }
+	template <class Object> devcb_base &set_a20m_callback(Object &&a20m) { return m_write_a20m.set_callback(std::forward<Object>(a20m)); }
+	template <class Object> devcb_base &set_spkr_callback(Object &&spkr) { return m_write_spkr.set_callback(std::forward<Object>(spkr)); }
 
 	// inline configuration
 	static void static_set_cputag(device_t &device, const char *tag);
@@ -110,9 +111,9 @@ public:
 	DECLARE_READ8_MEMBER( dma1_ior1_r ) { return m_read_ior(1); }
 	DECLARE_READ8_MEMBER( dma1_ior2_r ) { return m_read_ior(2); }
 	DECLARE_READ8_MEMBER( dma1_ior3_r ) { return m_read_ior(3); }
-	DECLARE_READ8_MEMBER( dma2_ior1_r ) { UINT16 result = m_read_ior(5); m_dma_high_byte = result >> 8; return result; }
-	DECLARE_READ8_MEMBER( dma2_ior2_r ) { UINT16 result = m_read_ior(6); m_dma_high_byte = result >> 8; return result; }
-	DECLARE_READ8_MEMBER( dma2_ior3_r ) { UINT16 result = m_read_ior(7); m_dma_high_byte = result >> 8; return result; }
+	DECLARE_READ8_MEMBER( dma2_ior1_r ) { uint16_t result = m_read_ior(5); m_dma_high_byte = result >> 8; return result; }
+	DECLARE_READ8_MEMBER( dma2_ior2_r ) { uint16_t result = m_read_ior(6); m_dma_high_byte = result >> 8; return result; }
+	DECLARE_READ8_MEMBER( dma2_ior3_r ) { uint16_t result = m_read_ior(7); m_dma_high_byte = result >> 8; return result; }
 	DECLARE_WRITE8_MEMBER( dma1_iow0_w ) { m_write_iow(0, data, 0xffff); }
 	DECLARE_WRITE8_MEMBER( dma1_iow1_w ) { m_write_iow(1, data, 0xffff); }
 	DECLARE_WRITE8_MEMBER( dma1_iow2_w ) { m_write_iow(2, data, 0xffff); }
@@ -207,34 +208,34 @@ private:
 	const char *m_isatag;
 	const char *m_biostag;
 	const char *m_keybctag;
-	UINT8 m_portb;
+	uint8_t m_portb;
 	int m_iochck;
 	int m_nmi_mask;
 	int m_alt_a20;
 	int m_ext_gatea20;
 	int m_kbrst;
 	int m_refresh_toggle;
-	UINT16 m_refresh_ctrl;
-	UINT16 m_memory_ctrl;
-	UINT16 m_chip_sel;
-	UINT16 m_split_start;
-	UINT8 m_bank_start[4];
-	UINT16 m_diagnostic;
+	uint16_t m_refresh_ctrl;
+	uint16_t m_memory_ctrl;
+	uint16_t m_chip_sel;
+	uint16_t m_split_start;
+	uint8_t m_bank_start[4];
+	uint16_t m_diagnostic;
 
 	int m_dma_eop;
-	UINT8 m_dma_page[0x10];
-	UINT8 m_dma_high_byte;
+	uint8_t m_dma_page[0x10];
+	uint8_t m_dma_high_byte;
 	int m_dma_channel;
 
 	address_space *m_space;
 	address_space *m_space_io;
-	UINT8 *m_isa;
-	UINT8 *m_bios;
-	UINT8 *m_ram;
+	uint8_t *m_isa;
+	uint8_t *m_bios;
+	uint8_t *m_ram;
 	at_keyboard_controller_device *m_keybc;
 };
 
 // device type definition
-extern const device_type WD7600;
+DECLARE_DEVICE_TYPE(WD7600, wd7600_device)
 
-#endif /* WD7600_H_ */
+#endif // MAME_MACHINE_WD7600_H

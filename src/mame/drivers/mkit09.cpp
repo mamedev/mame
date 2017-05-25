@@ -33,9 +33,11 @@ Test Paste:
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
-#include "machine/6821pia.h"
 #include "imagedev/cassette.h"
+#include "machine/6821pia.h"
 #include "sound/wave.h"
+#include "speaker.h"
+
 #include "mkit09.lh"
 
 
@@ -56,7 +58,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(trigger_reset);
 	DECLARE_INPUT_CHANGED_MEMBER(trigger_nmi);
 private:
-	UINT8 m_keydata;
+	uint8_t m_keydata;
 	virtual void machine_reset() override;
 	required_device<pia6821_device> m_pia;
 	required_device<cassette_image_device> m_cass;
@@ -187,7 +189,7 @@ WRITE8_MEMBER( mkit09_state::pb_w )
 }
 
 
-static MACHINE_CONFIG_START( mkit09, mkit09_state )
+static MACHINE_CONFIG_START( mkit09 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M6809E, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(mkit09_mem)
@@ -207,13 +209,13 @@ static MACHINE_CONFIG_START( mkit09, mkit09_state )
 	MCFG_PIA_READPB_HANDLER(READ8(mkit09_state, pb_r))
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(mkit09_state, pa_w))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(mkit09_state, pb_w))
-	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6809e_device, irq_line))
-	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6809e_device, irq_line))
+	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
+	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
 
 	MCFG_CASSETTE_ADD( "cassette" )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( mkit09a, mkit09_state )
+static MACHINE_CONFIG_START( mkit09a )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M6809E, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(mkit09a_mem)
@@ -233,8 +235,8 @@ static MACHINE_CONFIG_START( mkit09a, mkit09_state )
 	MCFG_PIA_READPB_HANDLER(READ8(mkit09_state, pb_r))
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(mkit09_state, pa_w))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(mkit09_state, pb_w))
-	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6809e_device, irq_line))
-	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6809e_device, irq_line))
+	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
+	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
 
 	MCFG_CASSETTE_ADD( "cassette" )
 MACHINE_CONFIG_END
@@ -252,6 +254,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME     PARENT  COMPAT   MACHINE     INPUT   CLASS          INIT    COMPANY         FULLNAME   FLAGS */
-COMP( 1983, mkit09,  0,      0,       mkit09,     mkit09, driver_device,   0,   "Multitech",  "Microkit09", MACHINE_NO_SOUND_HW )
-COMP( 1983, mkit09a, mkit09, 0,       mkit09a,    mkit09, driver_device,   0,   "Multitech",  "Microkit09 (Alt version)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME     PARENT  COMPAT   MACHINE     INPUT   CLASS          INIT  COMPANY       FULLNAME                    FLAGS
+COMP( 1983, mkit09,  0,      0,       mkit09,     mkit09, mkit09_state,  0,    "Multitech",  "Microkit09",               MACHINE_NO_SOUND_HW )
+COMP( 1983, mkit09a, mkit09, 0,       mkit09a,    mkit09, mkit09_state,  0,    "Multitech",  "Microkit09 (Alt version)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

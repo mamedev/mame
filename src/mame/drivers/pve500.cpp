@@ -45,13 +45,15 @@
 #define DEBUGGING_INDUCE_SELFDIAGNOSE 0
 
 #include "emu.h"
-#include "cpu/z80/tmpz84c015.h"
-#include "cpu/mb88xx/mb88xx.h"
-#include "sound/beep.h"
 #include "bus/rs232/rs232.h" /* actually meant to be RS422 ports */
-#include "pve500.lh"
-#include "machine/mb8421.h"
+#include "cpu/mb88xx/mb88xx.h"
+#include "cpu/z80/tmpz84c015.h"
 #include "machine/eepromser.h"
+#include "machine/mb8421.h"
+#include "sound/beep.h"
+#include "speaker.h"
+
+#include "pve500.lh"
 
 #define IO_EXPANDER_PORTA 0
 #define IO_EXPANDER_PORTB 1
@@ -87,7 +89,7 @@ private:
 	required_device<tmpz84c015_device> m_subcpu;
 	required_device<eeprom_serial_er5911_device> m_eeprom;
 	required_device<beep_device> m_buzzer;
-	UINT8 io_SEL, io_LD, io_LE, io_SC, io_KY;
+	uint8_t io_SEL, io_LD, io_LE, io_SC, io_KY;
 };
 
 WRITE_LINE_MEMBER( pve500_state::GPI_w )
@@ -343,7 +345,7 @@ printf("io_expander_w: PORTA (io_SC=%02X)\n", data);
 	}
 }
 
-static MACHINE_CONFIG_START( pve500, pve500_state )
+static MACHINE_CONFIG_START( pve500 )
 	/* Main CPU */
 	MCFG_CPU_ADD("maincpu", TMPZ84C015, XTAL_12MHz / 2) /* TMPZ84C015BF-6 */
 	MCFG_CPU_PROGRAM_MAP(maincpu_prg)
@@ -433,5 +435,5 @@ ROM_START( pve500 )
 	ROM_LOAD( "pve500.ice3", 0x0000, 0x080, NO_DUMP )
 ROM_END
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   CLASS           INIT   COMPANY    FULLNAME                    FLAGS */
-COMP( 1995, pve500, 0,      0,      pve500,     pve500, pve500_state, pve500, "SONY", "PVE-500", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   CLASS         INIT    COMPANY  FULLNAME   FLAGS
+COMP( 1995, pve500, 0,      0,      pve500,     pve500, pve500_state, pve500, "SONY",  "PVE-500", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)

@@ -18,14 +18,14 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_colorram;
-	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
+	required_shared_ptr<uint8_t> m_spriteram;
 
 	int m_flipscreen;
-	UINT8 *m_soundregs;  // if 0-ed
-	UINT8 m_main_irq_mask;
-	UINT8 m_sound_irq_mask;
+	uint8_t *m_soundregs;  // if 0-ed
+	uint8_t m_main_irq_mask;
+	uint8_t m_sound_irq_mask;
 
 	DECLARE_READ8_MEMBER(ports_r);
 	DECLARE_WRITE8_MEMBER(subcpu_reset_w);
@@ -36,7 +36,7 @@ public:
 	DECLARE_PALETTE_INIT(wiping);
 	virtual void machine_start() override;
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	INTERRUPT_GEN_MEMBER(sound_timer_irq);

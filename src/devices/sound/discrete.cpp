@@ -36,16 +36,19 @@
  ************************************************************************/
 
 #include "emu.h"
-#include "wavwrite.h"
 #include "discrete.h"
+
+#include "wavwrite.h"
+
 #include <atomic>
 #include <iostream>
+
 
 /* for_each collides with c++ standard libraries - include it here */
 #define for_each(_T, _e, _l) for (_T _e = (_l)->begin_ptr() ;  _e <= (_l)->end_ptr(); _e++)
 
 // device type definition
-const device_type DISCRETE = &device_creator<discrete_sound_device>;
+DEFINE_DEVICE_TYPE(DISCRETE, discrete_sound_device, "discrete", "Discrete Sound")
 
 /*************************************
  *
@@ -110,7 +113,7 @@ public:
 	virtual ~discrete_task(void) { }
 
 	inline void step_nodes(void);
-	inline bool lock_threadid(INT32 threadid)
+	inline bool lock_threadid(int32_t threadid)
 	{
 		int expected = -1;
 		return m_threadid.compare_exchange_weak(expected, threadid, std::memory_order_release,std::memory_order_relaxed);
@@ -145,7 +148,7 @@ protected:
 	discrete_device &                   m_device;
 
 private:
-	std::atomic<INT32>      m_threadid;
+	std::atomic<int32_t>      m_threadid;
 	volatile int            m_samples;
 
 };
@@ -235,7 +238,7 @@ void *discrete_task::task_callback(void *param, int threadid)
 
 bool discrete_task::process(void)
 {
-	int samples = MIN(m_samples, MAX_SAMPLES_PER_TASK_SLICE);
+	int samples = std::min(int(m_samples), MAX_SAMPLES_PER_TASK_SLICE);
 
 	/* check dependencies */
 	for_each(input_buffer *, sn, &source_list)
@@ -613,9 +616,9 @@ void discrete_device::discrete_sanity_check(const sound_block_list_t &block_list
  *
  *************************************/
 
-static UINT64 list_run_time(const node_list_t &list)
+static uint64_t list_run_time(const node_list_t &list)
 {
-	UINT64 total = 0;
+	uint64_t total = 0;
 
 	for_each(discrete_base_node **, node, &list)
 	{
@@ -626,9 +629,9 @@ static UINT64 list_run_time(const node_list_t &list)
 	return total;
 }
 
-static UINT64 step_list_run_time(const node_step_list_t &list)
+static uint64_t step_list_run_time(const node_step_list_t &list)
 {
-	UINT64 total = 0;
+	uint64_t total = 0;
 
 	for_each(discrete_step_interface **, node, &list)
 	{
@@ -640,8 +643,8 @@ static UINT64 step_list_run_time(const node_step_list_t &list)
 void discrete_device::display_profiling(void)
 {
 	int count;
-	UINT64 total;
-	UINT64 tresh;
+	uint64_t total;
+	uint64_t tresh;
 	double tt;
 
 	/* calculate total time */
@@ -835,8 +838,8 @@ void discrete_device::static_set_intf(device_t &device, const discrete_block *in
 //  discrete_device - constructor
 //-------------------------------------------------
 
-discrete_device::discrete_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, type, name, tag, owner, clock, "discrete", __FILE__),
+discrete_device::discrete_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock),
 		m_intf(nullptr),
 		m_sample_rate(0),
 		m_sample_time(0),
@@ -850,8 +853,8 @@ discrete_device::discrete_device(const machine_config &mconfig, device_type type
 {
 }
 
-discrete_sound_device::discrete_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: discrete_device(mconfig, DISCRETE, "DISCRETE", tag, owner, clock),
+discrete_sound_device::discrete_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: discrete_device(mconfig, DISCRETE, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		m_stream(nullptr)
 {
@@ -889,8 +892,8 @@ void discrete_device::device_start()
 
 	/* enable profiling */
 	m_profiling = 0;
-	if (getenv("DISCRETE_PROFILING"))
-		m_profiling = atoi(getenv("DISCRETE_PROFILING"));
+	if (osd_getenv("DISCRETE_PROFILING"))
+		m_profiling = atoi(osd_getenv("DISCRETE_PROFILING"));
 
 	/* Build the final block list */
 	sound_block_list_t block_list;
@@ -1102,7 +1105,7 @@ READ8_MEMBER( discrete_device::read )
 {
 	const discrete_base_node *node = discrete_find_node(offset);
 
-	UINT8 data;
+	uint8_t data;
 
 	/* Read the node input value if allowed */
 	if (node)
@@ -1110,7 +1113,7 @@ READ8_MEMBER( discrete_device::read )
 		/* Bring the system up to now */
 		update_to_current_time();
 
-		data = (UINT8) node->m_output[NODE_CHILD_NODE_NUM(offset)];
+		data = (uint8_t) node->m_output[NODE_CHILD_NODE_NUM(offset)];
 	}
 	else
 		fatalerror("discrete_sound_r read from non-existent NODE_%02d\n", offset-NODE_00);

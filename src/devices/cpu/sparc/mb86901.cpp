@@ -18,20 +18,30 @@
 //================================================================
 
 #include "emu.h"
-#include "debugger.h"
 #include "sparc.h"
 #include "sparcdefs.h"
 
-const device_type MB86901 = &device_creator<mb86901_device>;
+#include "debugger.h"
+
+
+DEFINE_DEVICE_TYPE(MB86901, mb86901_device, "mb86901", "Fujitsu MB86901")
 
 const int mb86901_device::NWINDOWS = 7;
+
+#if LOG_FCODES
+#include "ss1fcode.ipp"
+#endif
+
+#if SPARCV8
+#include "sparcv8ops.ipp"
+#endif
 
 //-------------------------------------------------
 //  mb86901_device - constructor
 //-------------------------------------------------
 
-mb86901_device::mb86901_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: cpu_device(mconfig, MB86901, "Fujitsu MB86901", tag, owner, clock, "mb86901", __FILE__)
+mb86901_device::mb86901_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: cpu_device(mconfig, MB86901, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 32, 32)
 	, m_dasm(this, 7)
 {
@@ -40,15 +50,98 @@ mb86901_device::mb86901_device(const machine_config &mconfig, const char *tag, d
 
 void mb86901_device::device_start()
 {
+#if LOG_FCODES
+	m_ss1_fcode_table.clear();
+	FILE* input = fopen("names.txt", "rb");
+
+	if (input != NULL)
+	{
+		fseek(input, 0, SEEK_END);
+		size_t filesize = ftell(input);
+		fseek(input, 0, SEEK_SET);
+
+		uint8_t *buf = new uint8_t[filesize];
+		fread(buf, 1, filesize, input);
+		fclose(input);
+
+		size_t pos = 0;
+		while (pos < filesize)
+		{
+			// eat newlines
+			while (pos < filesize && (buf[pos] == 0x0d || buf[pos] == 0x0a))
+				pos++;
+
+			if (pos >= filesize)
+				break;
+
+			// get opcode
+			uint16_t opcode = 0;
+			for (int shift = 12; shift >= 0 && pos < filesize; shift -= 4)
+			{
+				uint8_t digit = buf[pos];
+				if (digit >= 'a' && digit <= 'z')
+				{
+					digit &= ~0x20;
+				}
+
+				if (digit >= '0' && digit <= '9')
+				{
+					opcode |= (digit - 0x30) << shift;
+				}
+				else if (digit >= 'A' && digit <= 'F')
+				{
+					opcode |= ((digit - 0x41) + 10) << shift;
+				}
+				pos++;
+			}
+
+			if (pos >= filesize)
+				break;
+
+			// skip " : "
+			pos += 3;
+
+			if (pos >= filesize)
+				break;
+
+			// read description up to the first space
+			std::string description;
+			while (buf[pos] != ' ' && pos < filesize)
+			{
+				description += char(buf[pos]);
+				pos++;
+			}
+
+			if (pos >= filesize)
+				break;
+
+			// skip everything else up to the trailing semicolon
+			while (buf[pos] != ';' && pos < filesize)
+				pos++;
+
+			if (pos >= filesize)
+				break;
+
+			if (buf[pos] == ';')
+				pos++;
+
+			m_ss1_fcode_table[opcode] = description;
+		}
+		delete [] buf;
+	}
+	m_log_fcodes = false;
+#endif
+
 	m_bp_reset_in = false;
-	m_bp_irl = 0;
 	m_bp_fpu_present = false;
 	m_bp_cp_present = false;
 	m_pb_error = false;
 	m_pb_block_ldst_byte = false;
 	m_pb_block_ldst_word = false;
+	m_bp_irl = 0;
+	m_irq_state = 0;
 
-	memset(m_dbgregs, 0, 24 * sizeof(UINT32));
+	memset(m_dbgregs, 0, 24 * sizeof(uint32_t));
 
 	memset(m_illegal_instruction_asr, 0, 32 * sizeof(bool));
 	memset(m_privileged_asr, 1, 32 * sizeof(bool));
@@ -156,6 +249,7 @@ void mb86901_device::device_start()
 
 	// register our state for the debugger
 	state_add(STATE_GENPC,      "GENPC",    m_pc).noshow();
+	state_add(STATE_GENPCBASE,  "CURPC",    m_pc).noshow();
 	state_add(STATE_GENFLAGS,   "GENFLAGS", m_psr).callimport().callexport().formatstr("%6s").noshow();
 	state_add(SPARC_PC,         "PC",       m_pc).formatstr("%08X");
 	state_add(SPARC_NPC,        "nPC",      m_npc).formatstr("%08X");
@@ -298,6 +392,9 @@ void mb86901_device::device_reset()
 	m_fpu_sequence_err = 0;
 	m_cp_sequence_err = 0;
 
+	m_bp_irl = 0;
+	m_irq_state = 0;
+
 	m_asi = 0;
 	MAE = false;
 	HOLD_BUS = false;
@@ -305,30 +402,28 @@ void mb86901_device::device_reset()
 
 	PC = 0;
 	nPC = 4;
-	memset(m_r, 0, sizeof(UINT32) * 120);
-	memset(m_fpr, 0, sizeof(UINT32) * 32);
+	memset(m_r, 0, sizeof(uint32_t) * 120);
+	memset(m_fpr, 0, sizeof(uint32_t) * 32);
 
 	WIM = 0;
 	TBR = 0;
 	Y = 0;
 
-	m_impl = 0;
-	m_ver = 0;
-	m_icc = 0;
-	m_ec = false;
-	m_ef = false;
-	m_pil = 0;
-	m_s = true;
-	m_ps = true;
-	m_et = false;
-	m_cwp = 0;
+	PSR = PSR_S_MASK | PSR_PS_MASK;
 
-	MAKE_PSR;
 	for (int i = 0; i < 8; i++)
 	{
 		m_regs[i] = m_r + i;
 	}
 	update_gpr_pointers();
+
+#if LOG_FCODES
+	m_ss1_next_pc = ~0;
+	m_ss1_next_opcode = ~0;
+	m_ss1_next_handler_base = ~0;
+	m_ss1_next_entry_point = ~0;
+	m_ss1_next_stack = ~0;
+#endif
 }
 
 
@@ -357,7 +452,7 @@ const address_space_config *mb86901_device::memory_space_config(address_spacenum
 //  a 32-bit word in a big-endian system.
 //-------------------------------------------------
 
-UINT32 mb86901_device::read_sized_word(UINT8 asi, UINT32 address, int size)
+uint32_t mb86901_device::read_sized_word(uint8_t asi, uint32_t address, int size)
 {
 	m_asi = asi;
 	if (size == 1)
@@ -384,7 +479,7 @@ UINT32 mb86901_device::read_sized_word(UINT8 asi, UINT32 address, int size)
 //  size handlers
 //-------------------------------------------------
 
-void mb86901_device::write_sized_word(UINT8 asi, UINT32 address, UINT32 data, int size)
+void mb86901_device::write_sized_word(uint8_t asi, uint32_t address, uint32_t data, int size)
 {
 	m_asi = asi;
 	if (size == 1)
@@ -433,7 +528,7 @@ void mb86901_device::state_string_export(const device_state_entry &entry, std::s
 //  of the shortest instruction, in bytes
 //-------------------------------------------------
 
-UINT32 mb86901_device::disasm_min_opcode_bytes() const
+uint32_t mb86901_device::disasm_min_opcode_bytes() const
 {
 	return 4;
 }
@@ -444,7 +539,7 @@ UINT32 mb86901_device::disasm_min_opcode_bytes() const
 //  of the longest instruction, in bytes
 //-------------------------------------------------
 
-UINT32 mb86901_device::disasm_max_opcode_bytes() const
+uint32_t mb86901_device::disasm_max_opcode_bytes() const
 {
 	return 4;
 }
@@ -455,10 +550,10 @@ UINT32 mb86901_device::disasm_max_opcode_bytes() const
 //  helper function
 //-------------------------------------------------
 
-offs_t mb86901_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t mb86901_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
-	UINT32 op = *reinterpret_cast<const UINT32 *>(oprom);
-	return m_dasm.dasm(buffer, pc, BIG_ENDIANIZE_INT32(op));
+	uint32_t op = *reinterpret_cast<const uint32_t *>(oprom);
+	return m_dasm.dasm(stream, pc, big_endianize_int32(op));
 }
 
 
@@ -471,7 +566,7 @@ offs_t mb86901_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-UINT32 mb86901_device::execute_min_cycles() const
+uint32_t mb86901_device::execute_min_cycles() const
 {
 	return 1;
 }
@@ -482,7 +577,7 @@ UINT32 mb86901_device::execute_min_cycles() const
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-UINT32 mb86901_device::execute_max_cycles() const
+uint32_t mb86901_device::execute_max_cycles() const
 {
 	return 4;
 }
@@ -493,9 +588,9 @@ UINT32 mb86901_device::execute_max_cycles() const
 //  input/interrupt lines
 //-------------------------------------------------
 
-UINT32 mb86901_device::execute_input_lines() const
+uint32_t mb86901_device::execute_input_lines() const
 {
-	return 0;
+	return 16;
 }
 
 
@@ -506,18 +601,62 @@ UINT32 mb86901_device::execute_input_lines() const
 
 void mb86901_device::execute_set_input(int inputnum, int state)
 {
+	switch (inputnum)
+	{
+		case SPARC_IRQ1:
+		case SPARC_IRQ2:
+		case SPARC_IRQ3:
+		case SPARC_IRQ4:
+		case SPARC_IRQ5:
+		case SPARC_IRQ6:
+		case SPARC_IRQ7:
+		case SPARC_IRQ8:
+		case SPARC_IRQ9:
+		case SPARC_IRQ10:
+		case SPARC_IRQ11:
+		case SPARC_IRQ12:
+		case SPARC_IRQ13:
+		case SPARC_IRQ14:
+		case SPARC_NMI:
+		{
+			int index = (inputnum - SPARC_IRQ1) + 1;
+			if (state)
+			{
+				m_irq_state |= 1 << index;
+			}
+			else
+			{
+				m_irq_state &= ~(1 << index);
+			}
+
+			for(index = 15; index > 0; index--)
+			{
+				if (m_irq_state & (1 << index))
+				{
+					break;
+				}
+			}
+
+			m_bp_irl = index;
+			break;
+		}
+
+		case SPARC_MAE:
+			m_mae = (state != 0) ? 1 : 0;
+			break;
+
+		case SPARC_RESET:
+			m_bp_reset_in = (state != 0) ? 1 : 0;
+			break;
+	}
 }
 
-
-#if SPARCV8
-#include "sparcv8ops.ipp"
-#endif
 
 //-------------------------------------------------
 //  execute_add - execute an add-type opcode
 //-------------------------------------------------
 
-void mb86901_device::execute_add(UINT32 op)
+void mb86901_device::execute_add(uint32_t op)
 {
 	/* The SPARC Instruction Manual: Version 8, page 173, "Appendix C - ISP Descriptions - Add Instructions" (SPARCv8.pdf, pg. 170)
 
@@ -541,14 +680,14 @@ void mb86901_device::execute_add(UINT32 op)
 	        ((not result<31>) and (r[rs1]<31> or operand2<31>))
 	);
 	*/
-	UINT32 operand2 = USEIMM ? SIMM13 : RS2REG;
+	uint32_t rs1 = RS1REG;
+	uint32_t operand2 = USEIMM ? SIMM13 : RS2REG;
 
-	UINT32 result = 0;
+	uint32_t result = 0;
 	if (ADD || ADDCC)
-		result = RS1REG + operand2;
+		result = rs1 + operand2;
 	else if (ADDX || ADDXCC)
-		result = RS1REG + operand2 + ICC_C;
-
+		result = rs1 + operand2 + ICC_C;
 
 	if (RD != 0)
 		RDREG = result;
@@ -558,10 +697,10 @@ void mb86901_device::execute_add(UINT32 op)
 		CLEAR_ICC;
 		PSR |= (BIT31(result)) ? PSR_N_MASK : 0;
 		PSR |= (result == 0) ? PSR_Z_MASK : 0;
-		PSR |= ((BIT31(RS1REG) && BIT31(operand2) && !BIT31(result)) ||
-				(!BIT31(RS1REG) && !BIT31(operand2) && BIT31(result))) ? PSR_V_MASK : 0;
-		PSR |= ((BIT31(RS1REG) && BIT31(operand2)) ||
-				(!BIT31(result) && (BIT31(RS1REG) || BIT31(operand2)))) ? PSR_C_MASK : 0;
+		PSR |= ((BIT31(rs1) && BIT31(operand2) && !BIT31(result)) ||
+				(!BIT31(rs1) && !BIT31(operand2) && BIT31(result))) ? PSR_V_MASK : 0;
+		PSR |= ((BIT31(rs1) && BIT31(operand2)) ||
+				(!BIT31(result) && (BIT31(rs1) || BIT31(operand2)))) ? PSR_C_MASK : 0;
 	}
 }
 
@@ -571,7 +710,7 @@ void mb86901_device::execute_add(UINT32 op)
 //  opcode
 //-------------------------------------------------
 
-void mb86901_device::execute_taddcc(UINT32 op)
+void mb86901_device::execute_taddcc(uint32_t op)
 {
 	/* The SPARC Instruction Manual: Version 8, page 173, "Appendix C - ISP Descriptions - Tagged Add Instructions" (SPARCv8.pdf, pg. 170)
 
@@ -598,13 +737,14 @@ void mb86901_device::execute_taddcc(UINT32 op)
 	        r[rd] <- result;
 	);
 	*/
-	UINT32 operand2 = USEIMM ? SIMM13 : RS2REG;
+	uint32_t rs1 = RS1REG;
+	uint32_t operand2 = USEIMM ? SIMM13 : RS2REG;
 
-	UINT32 result = RS1REG + operand2;
+	uint32_t result = rs1 + operand2;
 
-	bool temp_v = (BIT31(RS1REG) && BIT31(operand2) && !BIT31(result)) ||
-					(!BIT31(RS1REG) && !BIT31(operand2) && BIT31(result)) ||
-					((RS1REG & 3) != 0 || (RS1REG & 3) != 0) ? true : false;
+	bool temp_v = (BIT31(rs1) && BIT31(operand2) && !BIT31(result)) ||
+					(!BIT31(rs1) && !BIT31(operand2) && BIT31(result)) ||
+					((rs1 & 3) != 0 || (operand2 & 3) != 0) ? true : false;
 
 	if (TADDCCTV && temp_v)
 	{
@@ -617,8 +757,8 @@ void mb86901_device::execute_taddcc(UINT32 op)
 		PSR |= (BIT31(result)) ? PSR_N_MASK : 0;
 		PSR |= (result == 0) ? PSR_Z_MASK : 0;
 		PSR |= temp_v ? PSR_V_MASK : 0;
-		PSR |= ((BIT31(RS1REG) && BIT31(operand2)) ||
-				(!BIT31(result) && (BIT31(RS1REG) || BIT31(operand2)))) ? PSR_C_MASK : 0;
+		PSR |= ((BIT31(rs1) && BIT31(operand2)) ||
+				(!BIT31(result) && (BIT31(rs1) || BIT31(operand2)))) ? PSR_C_MASK : 0;
 
 		if (RD != 0)
 			RDREG = result;
@@ -631,7 +771,7 @@ void mb86901_device::execute_taddcc(UINT32 op)
 //  opcode
 //-------------------------------------------------
 
-void mb86901_device::execute_sub(UINT32 op)
+void mb86901_device::execute_sub(uint32_t op)
 {
 	/* The SPARC Instruction Manual: Version 8, page 174, "Appendix C - ISP Descriptions - Subtract Instructions" (SPARCv8.pdf, pg. 171)
 
@@ -655,13 +795,14 @@ void mb86901_device::execute_sub(UINT32 op)
 	         (result<31> and ((not r[rs1]<31>) or operand2<31>))
 	);
 	*/
-	UINT32 operand2 = USEIMM ? SIMM13 : RS2REG;
+	uint32_t rs1 = RS1REG;
+	uint32_t operand2 = USEIMM ? SIMM13 : RS2REG;
 
-	UINT32 result = 0;
+	uint32_t result = 0;
 	if (SUB || SUBCC)
-		result = RS1REG - operand2;
+		result = rs1 - operand2;
 	else if (SUBX || SUBXCC)
-		result = RS1REG - operand2 - ICC_C;
+		result = rs1 - operand2 - ICC_C;
 
 	if (RD != 0)
 		RDREG = result;
@@ -671,10 +812,10 @@ void mb86901_device::execute_sub(UINT32 op)
 		CLEAR_ICC;
 		PSR |= (BIT31(result)) ? PSR_N_MASK : 0;
 		PSR |= (result == 0) ? PSR_Z_MASK : 0;
-		PSR |= ((BIT31(RS1REG) && !BIT31(operand2) && !BIT31(result)) ||
-				(!BIT31(RS1REG) && BIT31(operand2) && BIT31(result))) ? PSR_V_MASK : 0;
-		PSR |= ((!BIT31(RS1REG) && BIT31(operand2)) ||
-				(BIT31(result) && (!BIT31(RS1REG) || BIT31(operand2)))) ? PSR_C_MASK : 0;
+		PSR |= ((BIT31(rs1) && !BIT31(operand2) && !BIT31(result)) ||
+				(!BIT31(rs1) && BIT31(operand2) && BIT31(result))) ? PSR_V_MASK : 0;
+		PSR |= ((!BIT31(rs1) && BIT31(operand2)) ||
+				(BIT31(result) && (!BIT31(rs1) || BIT31(operand2)))) ? PSR_C_MASK : 0;
 	}
 }
 
@@ -684,7 +825,7 @@ void mb86901_device::execute_sub(UINT32 op)
 //  opcode
 //--------------------------------------------------
 
-void mb86901_device::execute_tsubcc(UINT32 op)
+void mb86901_device::execute_tsubcc(uint32_t op)
 {
 	/* The SPARC Instruction Manual: Version 8, page 174, "Appendix C - ISP Descriptions - Tagged Subtract Instructions" (SPARCv8.pdf, pg. 171)
 
@@ -712,13 +853,14 @@ void mb86901_device::execute_tsubcc(UINT32 op)
 	);
 	*/
 
-	UINT32 operand2 = USEIMM ? SIMM13 : RS2REG;
+	uint32_t rs1 = RS1REG;
+	uint32_t operand2 = USEIMM ? SIMM13 : RS2REG;
 
-	UINT32 result = RS1REG - operand2;
+	uint32_t result = rs1 - operand2;
 
-	bool temp_v = (BIT31(RS1REG) && !BIT31(operand2) && !BIT31(result)) ||
-					(!BIT31(RS1REG) && BIT31(operand2) && BIT31(result)) ||
-					((RS1REG & 3) != 0 || (RS1REG & 3) != 0) ? true : false;
+	bool temp_v = (BIT31(rs1) && !BIT31(operand2) && !BIT31(result)) ||
+					(!BIT31(rs1) && BIT31(operand2) && BIT31(result)) ||
+					((rs1 & 3) != 0 || (operand2 & 3) != 0) ? true : false;
 
 	if (TSUBCCTV && temp_v)
 	{
@@ -731,8 +873,8 @@ void mb86901_device::execute_tsubcc(UINT32 op)
 		PSR |= (BIT31(result)) ? PSR_N_MASK : 0;
 		PSR |= (result == 0) ? PSR_Z_MASK : 0;
 		PSR |= temp_v ? PSR_V_MASK : 0;
-		PSR |= ((!BIT31(RS1REG) && BIT31(operand2)) ||
-				(BIT31(result) && (!BIT31(RS1REG) || BIT31(operand2)))) ? PSR_C_MASK : 0;
+		PSR |= ((!BIT31(rs1) && BIT31(operand2)) ||
+				(BIT31(result) && (!BIT31(rs1) || BIT31(operand2)))) ? PSR_C_MASK : 0;
 
 		if (RD != 0)
 			RDREG = result;
@@ -745,7 +887,7 @@ void mb86901_device::execute_tsubcc(UINT32 op)
 //  opcode, and/or/xor/andn/orn/xnor
 //-------------------------------------------------
 
-void mb86901_device::execute_logical(UINT32 op)
+void mb86901_device::execute_logical(uint32_t op)
 {
 	/* The SPARC Instruction Manual: Version 8, page 172, "Appendix C - ISP Descriptions - Logical Instructions" (SPARCv8.pdf, pg. 169)
 
@@ -769,9 +911,9 @@ void mb86901_device::execute_logical(UINT32 op)
 	);
 	*/
 
-	UINT32 operand2 = USEIMM ? SIMM13 : RS2REG;
+	uint32_t operand2 = USEIMM ? SIMM13 : RS2REG;
 
-	UINT32 result = 0;
+	uint32_t result = 0;
 	switch (OP3)
 	{
 		case OP3_AND:
@@ -817,7 +959,7 @@ void mb86901_device::execute_logical(UINT32 op)
 //  sll/srl/sra
 //-------------------------------------------------
 
-void mb86901_device::execute_shift(UINT32 op)
+void mb86901_device::execute_shift(uint32_t op)
 {
 	/* The SPARC Instruction Manual: Version 8, page 172, "Appendix C - ISP Descriptions - Shift Instructions" (SPARCv8.pdf, pg. 169)
 
@@ -830,14 +972,14 @@ void mb86901_device::execute_shift(UINT32 op)
 	else if (SRA and (rd != 0) ) then
 	    r[rd] <- shift_right_arithmetic(r[rs1], shift_count)
 	*/
-	UINT32 shift_count = USEIMM ? (SIMM13 & 31) : (RS2REG & 31);
+	uint32_t shift_count = USEIMM ? (SIMM13 & 31) : (RS2REG & 31);
 
 	if (SLL && RD != 0)
 		RDREG = RS1REG << shift_count;
 	else if (SRL && RD != 0)
-		RDREG = UINT32(RS1REG) >> shift_count;
+		RDREG = uint32_t(RS1REG) >> shift_count;
 	else if (SRA && RD != 0)
-		RDREG = INT32(RS1REG) >> shift_count;
+		RDREG = int32_t(RS1REG) >> shift_count;
 }
 
 
@@ -845,7 +987,7 @@ void mb86901_device::execute_shift(UINT32 op)
 //  execute_mulscc - execute a multiply step opcode
 //--------------------------------------------------
 
-void mb86901_device::execute_mulscc(UINT32 op)
+void mb86901_device::execute_mulscc(uint32_t op)
 {
 	/* The SPARC Instruction Manual: Version 8, page 175, "Appendix C - ISP Descriptions - Multiply Step Instruction" (SPARCv8.pdf, pg. 172)
 
@@ -870,11 +1012,11 @@ void mb86901_device::execute_mulscc(UINT32 op)
 	C <- (operand1<31> and operand2<31>) or
 	     ((not result<31>) and (operand1<31> or operand2<31>))
 	*/
-	UINT32 operand1 = (ICC_N != ICC_V ? 0x80000000 : 0) | (RS1REG >> 1);
+	uint32_t operand1 = ((ICC_N != ICC_V) ? 0x80000000 : 0) | (RS1REG >> 1);
 
-	UINT32 operand2 = (Y & 1) ? 0 : (USEIMM ? SIMM13 : RS2REG);
+	uint32_t operand2 = (Y & 1) ? (USEIMM ? SIMM13 : RS2REG) : 0;
 
-	UINT32 result = operand1 + operand2;
+	uint32_t result = operand1 + operand2;
 	Y = ((RS1REG & 1) ? 0x80000000 : 0) | (Y >> 1);
 
 	if (RD != 0)
@@ -895,7 +1037,7 @@ void mb86901_device::execute_mulscc(UINT32 op)
 //  opcode
 //-------------------------------------------------
 
-void mb86901_device::execute_rdsr(UINT32 op)
+void mb86901_device::execute_rdsr(uint32_t op)
 {
 	/* The SPARC Instruction Manual: Version 8, page 182, "Appendix C - ISP Descriptions - Read State Register Instructions" (SPARCv8.pdf, pg. 179)
 
@@ -935,7 +1077,9 @@ void mb86901_device::execute_rdsr(UINT32 op)
 			}
 		}
 		else if (RDPSR)
+		{
 			RDREG = PSR;
+		}
 		else if (RDWIM)
 			RDREG = WIM;
 		else if (RDTBR)
@@ -949,7 +1093,7 @@ void mb86901_device::execute_rdsr(UINT32 op)
 //  opcode
 //-------------------------------------------------
 
-void mb86901_device::execute_wrsr(UINT32 op)
+void mb86901_device::execute_wrsr(uint32_t op)
 {
 	/* The SPARC Instruction Manual: Version 8, page 183, "Appendix C - ISP Descriptions - Write State Register Instructions" (SPARCv8.pdf, pg. 180)
 
@@ -994,9 +1138,9 @@ void mb86901_device::execute_wrsr(UINT32 op)
 	    )
 	);
 	*/
-	UINT32 operand2 = USEIMM ? SIMM13 : RS2REG;
+	uint32_t operand2 = USEIMM ? SIMM13 : RS2REG;
 
-	UINT32 result = RS1REG ^ operand2;
+	uint32_t result = RS1REG ^ operand2;
 
 	if (WRASR && RD == 0)
 	{
@@ -1034,6 +1178,7 @@ void mb86901_device::execute_wrsr(UINT32 op)
 		else
 		{
 			PSR = result &~ PSR_ZERO_MASK;
+			update_gpr_pointers();
 		}
 	}
 	else if (WRWIM)
@@ -1068,7 +1213,7 @@ void mb86901_device::execute_wrsr(UINT32 op)
 //  opcode
 //-------------------------------------------------
 
-void mb86901_device::execute_rett(UINT32 op)
+void mb86901_device::execute_rett(uint32_t op)
 {
 	/* The SPARC Instruction Manual: Version 8, page 181, "Appendix C - ISP Descriptions - Return from Trap Instructions" (SPARCv8.pdf, pg. 178)
 
@@ -1106,13 +1251,19 @@ void mb86901_device::execute_rett(UINT32 op)
 	)
 	*/
 
-	UINT8 new_cwp = (CWP + 1) % NWINDOWS;
-	UINT32 address = RS1REG + (USEIMM ? SIMM13 : RS2REG);
-	if (ET)
+	uint8_t new_cwp = ((PSR & PSR_CWP_MASK) + 1) % NWINDOWS;
+	uint32_t address = RS1REG + (USEIMM ? SIMM13 : RS2REG);
+	if (PSR & PSR_ET_MASK)
 	{
 		m_trap = 1;
-		if (IS_USER) m_privileged_instruction = 1;
-		else m_illegal_instruction = 1;
+		if (IS_USER)
+		{
+			m_privileged_instruction = 1;
+		}
+		else
+		{
+			m_illegal_instruction = 1;
+		}
 	}
 	else if (IS_USER)
 	{
@@ -1129,7 +1280,6 @@ void mb86901_device::execute_rett(UINT32 op)
 		m_tt = 6;
 		m_execute_mode = 0;
 		m_error_mode = 1;
-
 	}
 	else if (address & 3)
 	{
@@ -1141,14 +1291,19 @@ void mb86901_device::execute_rett(UINT32 op)
 	}
 	else
 	{
-		ET = 1;
+		PSR |= PSR_ET_MASK;
 		PC = nPC;
 		nPC = address;
-		CWP = new_cwp;
-		S = PS;
+
+		PSR &= ~PSR_CWP_MASK;
+		PSR |= new_cwp;
+
+		if (PSR & PSR_PS_MASK)
+			PSR |= PSR_S_MASK;
+		else
+			PSR &= ~PSR_S_MASK;
 	}
 
-	MAKE_PSR;
 	update_gpr_pointers();
 }
 
@@ -1159,7 +1314,7 @@ void mb86901_device::execute_rett(UINT32 op)
 // opcode
 //-------------------------------------------------
 
-void mb86901_device::execute_saverestore(UINT32 op)
+void mb86901_device::execute_saverestore(uint32_t op)
 {
 	/* The SPARC Instruction Manual: Version 8, page 177, "Appendix C - ISP Descriptions - SAVE and RESTORE Instructions" (SPARCv8.pdf, pg. 174)
 
@@ -1191,13 +1346,13 @@ void mb86901_device::execute_saverestore(UINT32 op)
 	    r[rd] <- result { destination in new window }
 	*/
 
-	UINT32 rs1 = RS1REG;
-	UINT32 operand2 = USEIMM ? SIMM13 : RS2REG;
+	uint32_t rs1 = RS1REG;
+	uint32_t operand2 = USEIMM ? SIMM13 : RS2REG;
 
-	UINT32 result = 0;
+	uint32_t result = 0;
 	if (SAVE)
 	{
-		UINT8 new_cwp = ((CWP + NWINDOWS) - 1) % NWINDOWS;
+		uint8_t new_cwp = (((PSR & PSR_CWP_MASK) + NWINDOWS) - 1) % NWINDOWS;
 		if ((WIM & (1 << new_cwp)) != 0)
 		{
 			m_trap = 1;
@@ -1206,12 +1361,13 @@ void mb86901_device::execute_saverestore(UINT32 op)
 		else
 		{
 			result = rs1 + operand2;
-			CWP = new_cwp;
+			PSR &= ~PSR_CWP_MASK;
+			PSR |= new_cwp;
 		}
 	}
 	else if (RESTORE)
 	{
-		UINT8 new_cwp = (CWP + 1) % NWINDOWS;
+		uint8_t new_cwp = ((PSR & PSR_CWP_MASK) + 1) % NWINDOWS;
 		if ((WIM & (1 << new_cwp)) != 0)
 		{
 			m_trap = 1;
@@ -1220,11 +1376,11 @@ void mb86901_device::execute_saverestore(UINT32 op)
 		else
 		{
 			result = rs1 + operand2;
-			CWP = new_cwp;
+			PSR &= ~PSR_CWP_MASK;
+			PSR |= new_cwp;
 		}
 	}
 
-	MAKE_PSR;
 	update_gpr_pointers();
 
 	if (m_trap == 0 && RD != 0)
@@ -1236,7 +1392,7 @@ void mb86901_device::execute_saverestore(UINT32 op)
 //  execute_jmpl - execute a jump and link opcode
 //-------------------------------------------------
 
-void mb86901_device::execute_jmpl(UINT32 op)
+void mb86901_device::execute_jmpl(uint32_t op)
 {
 	/* The SPARC Instruction Manual: Version 8, page 180, "Appendix C - ISP Descriptions - SAVE and RESTORE Instructions" (SPARCv8.pdf, pg. 177)
 
@@ -1252,7 +1408,7 @@ void mb86901_device::execute_jmpl(UINT32 op)
 	)
 	*/
 
-	UINT32 jump_address = RS1REG + (USEIMM ? SIMM13 : RS2REG);
+	uint32_t jump_address = RS1REG + (USEIMM ? SIMM13 : RS2REG);
 
 	if (jump_address & 3)
 	{
@@ -1274,7 +1430,7 @@ void mb86901_device::execute_jmpl(UINT32 op)
 //  mostly ALU ops
 //-------------------------------------------------
 
-void mb86901_device::execute_group2(UINT32 op)
+void mb86901_device::execute_group2(uint32_t op)
 {
 	switch (OP3)
 	{
@@ -1384,9 +1540,11 @@ void mb86901_device::execute_group2(UINT32 op)
 #endif
 
 		default:
+		{
 			m_trap = 1;
 			m_illegal_instruction = 1;
 			break;
+		}
 	}
 }
 
@@ -1399,11 +1557,12 @@ void mb86901_device::execute_group2(UINT32 op)
 
 void mb86901_device::update_gpr_pointers()
 {
+	int cwp = PSR & PSR_CWP_MASK;
 	for (int i = 0; i < 8; i++)
 	{
-		m_regs[ 8 + i] = &m_r[8 + (( 0 + m_cwp * 16 + i) % (NWINDOWS * 16))];
-		m_regs[16 + i] = &m_r[8 + (( 8 + m_cwp * 16 + i) % (NWINDOWS * 16))];
-		m_regs[24 + i] = &m_r[8 + ((16 + m_cwp * 16 + i) % (NWINDOWS * 16))];
+		m_regs[ 8 + i] = &m_r[8 + (( 0 + cwp * 16 + i) % (NWINDOWS * 16))];
+		m_regs[16 + i] = &m_r[8 + (( 8 + cwp * 16 + i) % (NWINDOWS * 16))];
+		m_regs[24 + i] = &m_r[8 + ((16 + cwp * 16 + i) % (NWINDOWS * 16))];
 	}
 }
 
@@ -1412,7 +1571,7 @@ void mb86901_device::update_gpr_pointers()
 //  execute_store - execute a store-type opcode
 //-------------------------------------------------
 
-void mb86901_device::execute_store(UINT32 op)
+void mb86901_device::execute_store(uint32_t op)
 {
 	/* The SPARC Instruction Manual: Version 8, page 165, "Appendix C - ISP Descriptions - Store Instructions" (SPARCv8.pdf, pg. 162)
 
@@ -1544,8 +1703,8 @@ void mb86901_device::execute_store(UINT32 op)
 		m_illegal_instruction = 1;
 	}
 
-	UINT32 address = 0;
-	UINT8 addr_space = 0;
+	uint32_t address = 0;
+	uint8_t addr_space = 0;
 	if (!m_trap)
 	{
 		if (STD || ST || STH || STB || STF || STDF || STFSR || STDFQ || STCSR || STC || STDC || STDCQ)
@@ -1558,12 +1717,12 @@ void mb86901_device::execute_store(UINT32 op)
 			address = RS1REG + RS2REG;
 			addr_space = ASI;
 		}
-		if ((STF || STDF || STFSR || STDFQ) && (!EF || !m_bp_fpu_present))
+		if ((STF || STDF || STFSR || STDFQ) && (!(PSR & PSR_EF_MASK) || !m_bp_fpu_present))
 		{
 			m_trap = 1;
 			m_fp_disabled = 1;
 		}
-		if ((STC || STDC || STCSR || STDCQ) && (!EC || !m_bp_cp_present))
+		if ((STC || STDC || STCSR || STDCQ) && (!(PSR & PSR_EC_MASK) || !m_bp_cp_present))
 		{
 			m_trap = 1;
 			m_cp_disabled = 1;
@@ -1612,10 +1771,10 @@ void mb86901_device::execute_store(UINT32 op)
 		}
 	}
 
-	UINT32 data0 = 0;
+	uint32_t data0 = 0;
 	if (!m_trap)
 	{
-		//UINT8 byte_mask;
+		//uint8_t byte_mask;
 		if (STF)
 		{
 			//byte_mask = 15;
@@ -1720,7 +1879,7 @@ void mb86901_device::execute_store(UINT32 op)
 	}
 	if (!m_trap && (STD || STDA || STDF || STDC || STDFQ || STDCQ))
 	{
-		UINT32 data1 = 0;
+		uint32_t data1 = 0;
 		if (STD || STDA)
 		{
 			data1 = REG(RD | 1);
@@ -1755,7 +1914,7 @@ void mb86901_device::execute_store(UINT32 op)
 //  execute_load - execute a load-type opcode
 //-------------------------------------------------
 
-void mb86901_device::execute_load(UINT32 op)
+void mb86901_device::execute_load(uint32_t op)
 {
 	/* The SPARC Instruction Manual: Version 8, page 163, "Appendix C - ISP Descriptions - C.9. Instruction Defintions - Load Instructions" (SPARCv8.pdf, pg. 160)
 
@@ -1857,8 +2016,8 @@ void mb86901_device::execute_load(UINT32 op)
 	);
 	*/
 
-	UINT32 address = 0;
-	UINT8 addr_space = 0;
+	uint32_t address = 0;
+	uint8_t addr_space = 0;
 	if (LDD || LD || LDSH || LDUH || LDSB || LDUB || LDDF || LDF || LDFSR || LDDC || LDC || LDCSR)
 	{
 		address = RS1REG + (USEIMM ? SIMM13 : RS2REG);
@@ -1885,12 +2044,12 @@ void mb86901_device::execute_load(UINT32 op)
 
 	if (!m_trap)
 	{
-		if ((LDF || LDDF || LDFSR) && (EF == 0 || m_bp_fpu_present == 0))
+		if ((LDF || LDDF || LDFSR) && (!(PSR & PSR_EF_MASK) || m_bp_fpu_present == 0))
 		{
 			m_trap = 1;
 			m_fp_disabled = 1;
 		}
-		else if ((LDC || LDDC || LDCSR) && (EC == 0 || m_bp_cp_present == 0))
+		else if ((LDC || LDDC || LDCSR) && (!(PSR & PSR_EC_MASK) || m_bp_cp_present == 0))
 		{
 			m_trap = 1;
 			m_cp_disabled = 1;
@@ -1922,10 +2081,10 @@ void mb86901_device::execute_load(UINT32 op)
 		}
 	}
 
-	UINT32 word0(0);
+	uint32_t word0(0);
 	if (!m_trap)
 	{
-		UINT32 data = read_sized_word(addr_space, address, (LD || LDD || LDA || LDDA) ? 4 : ((LDUH || LDSH || LDUHA || LDSHA) ? 2 : 1));
+		uint32_t data = read_sized_word(addr_space, address, (LD || LDD || LDA || LDDA) ? 4 : ((LDUH || LDSH || LDUHA || LDSHA) ? 2 : 1));
 
 		if (m_mae)
 		{
@@ -1936,26 +2095,26 @@ void mb86901_device::execute_load(UINT32 op)
 		{
 			if (LDSB || LDSBA || LDUB || LDUBA)
 			{
-				UINT8 byte = 0;
+				uint8_t byte = 0;
 				if ((address & 3) == 0) byte = (data >> 24) & 0xff;
 				else if ((address & 3) == 1) byte = (data >> 16) & 0xff;
 				else if ((address & 3) == 2) byte = (data >> 8) & 0xff;
 				else if ((address & 3) == 3) byte = data & 0xff;
 
 				if (LDSB || LDSBA)
-					word0 = (((INT32)byte) << 24) >> 24;
+					word0 = (((int32_t)byte) << 24) >> 24;
 				else
 					word0 = byte;
 			}
 			else if (LDSH || LDSHA || LDUH || LDUHA)
 			{
-				UINT16 halfword = 0;
+				uint16_t halfword = 0;
 				if ((address & 3) == 0) halfword = (data >> 16) & 0xffff;
 				else if ((address & 3) == 2) halfword = data & 0xffff;
 
 				if (LDSH || LDSHA)
 				{
-					word0 = (((INT32)halfword) << 16) >> 16;
+					word0 = (((int32_t)halfword) << 16) >> 16;
 				}
 				else
 				{
@@ -1971,10 +2130,8 @@ void mb86901_device::execute_load(UINT32 op)
 
 	if (!m_trap)
 	{
-		if ((RD != 0) && (LD || LDA || LDSH || LDSHA || LDUHA || LDUH || LDSB || LDSBA || LDUB || LDUBA))
-		{
-			RDREG = word0;
-		}
+		if (RD == 0) { }
+		else if (LD || LDA || LDSH || LDSHA || LDUHA || LDUH || LDSB || LDSBA || LDUB || LDUBA) RDREG = word0;
 		else if (LDF) FDREG = word0;
 		else if (LDC) { } // implementation-dependent actions
 		else if (LDFSR) FSR = word0;
@@ -1985,7 +2142,7 @@ void mb86901_device::execute_load(UINT32 op)
 
 	if (!m_trap && (LDD || LDDA || LDDF || LDDC))
 	{
-		UINT32 word1 = read_sized_word(addr_space, address + 4, 4);
+		uint32_t word1 = read_sized_word(addr_space, address + 4, 4);
 		if (MAE)
 		{
 			m_trap = 1;
@@ -2003,7 +2160,7 @@ void mb86901_device::execute_load(UINT32 op)
 //  instruction
 //-------------------------------------------------
 
-void mb86901_device::execute_ldstub(UINT32 op)
+void mb86901_device::execute_ldstub(uint32_t op)
 {
 	/* The SPARC Instruction Manual: Version 8, page 169, "Appendix C - ISP Descriptions - Atomic Load-Store Unsigned Byte Instructions" (SPARCv8.pdf, pg. 166)
 
@@ -2064,8 +2221,8 @@ void mb86901_device::execute_ldstub(UINT32 op)
 	);
 	*/
 
-	UINT32 address = 0;
-	UINT8 addr_space = 0;
+	uint32_t address = 0;
+	uint8_t addr_space = 0;
 	if (LDSTUB)
 	{
 		address = RS1REG + (USEIMM ? SIMM13 : RS2REG);
@@ -2090,7 +2247,7 @@ void mb86901_device::execute_ldstub(UINT32 op)
 		}
 	}
 
-	UINT32 data(0);
+	uint32_t data(0);
 	if (!m_trap)
 	{
 		while (m_pb_block_ldst_byte || m_pb_block_ldst_word)
@@ -2113,7 +2270,7 @@ void mb86901_device::execute_ldstub(UINT32 op)
 
 	if (!m_trap)
 	{
-		//UINT8 byte_mask;
+		//uint8_t byte_mask;
 		if ((address & 3) == 0)
 		{
 			//byte_mask = 8;
@@ -2141,7 +2298,7 @@ void mb86901_device::execute_ldstub(UINT32 op)
 		}
 		else
 		{
-			UINT32 word;
+			uint32_t word;
 			if ((address & 3) == 0)
 			{
 				word = (data >> 24) & 0xff;
@@ -2170,7 +2327,7 @@ void mb86901_device::execute_ldstub(UINT32 op)
 //  (load/store)
 //-------------------------------------------------
 
-void mb86901_device::execute_group3(UINT32 op)
+void mb86901_device::execute_group3(uint32_t op)
 {
 	static const int ldst_cycles[64] = {
 		1, 1, 1, 2, 2, 2, 2, 3,
@@ -2250,7 +2407,7 @@ void mb86901_device::execute_group3(UINT32 op)
 //  condition code
 //-------------------------------------------------
 
-bool mb86901_device::evaluate_condition(UINT32 op)
+bool mb86901_device::evaluate_condition(uint32_t op)
 {
 	bool take = false;
 	bool n = ICC_N_SET;
@@ -2281,7 +2438,7 @@ bool mb86901_device::evaluate_condition(UINT32 op)
 //  execute_bicc - execute a branch opcode
 //-------------------------------------------------
 
-void mb86901_device::execute_bicc(UINT32 op)
+void mb86901_device::execute_bicc(uint32_t op)
 {
 	/* The SPARC Instruction Manual: Version 8, page 178, "Appendix C - ISP Descriptions - Branch on Integer Condition Instructions" (SPARCv8.pdf, pg. 175)
 
@@ -2316,7 +2473,7 @@ void mb86901_device::execute_bicc(UINT32 op)
 	*/
 
 	bool branch_taken = evaluate_condition(op);
-	UINT32 pc = PC;
+	uint32_t pc = PC;
 	PC = nPC;
 	if (branch_taken)
 	{
@@ -2337,7 +2494,7 @@ void mb86901_device::execute_bicc(UINT32 op)
 //  execute_ticc - execute a conditional trap
 //-------------------------------------------------
 
-void mb86901_device::execute_ticc(UINT32 op)
+void mb86901_device::execute_ticc(uint32_t op)
 {
 	/* The SPARC Instruction Manual: Version 8, page 182, "Appendix C - ISP Descriptions - Trap on Integer Condition Instructions" (SPARCv8.pdf, pg. 179)
 
@@ -2376,7 +2533,7 @@ void mb86901_device::execute_ticc(UINT32 op)
 
 	bool trap_eval_icc = evaluate_condition(op);
 
-	UINT8 trap_number = RS1REG + (USEIMM ? SIMM7 : RS2REG);
+	uint8_t trap_number = RS1REG + (USEIMM ? SIMM7 : RS2REG);
 
 	if (COND)
 	{
@@ -2411,7 +2568,7 @@ void mb86901_device::select_trap()
 		m_trap = 0;
 		return;
 	}
-	else if (!ET)
+	else if (!(PSR & PSR_ET_MASK))
 	{
 		m_execute_mode = 0;
 		m_error_mode = 1;
@@ -2457,6 +2614,8 @@ void mb86901_device::select_trap()
 	else if (m_interrupt_level > 0)
 		m_tt = 0x10 | m_interrupt_level;
 
+	TBR |= m_tt << 4;
+	m_trap = 0;
 	m_instruction_access_exception = 0;
 	m_illegal_instruction = 0;
 	m_privileged_instruction = 0;
@@ -2472,6 +2631,7 @@ void mb86901_device::select_trap()
 	m_division_by_zero = 0;
 	m_trap_instruction = 0;
 	m_interrupt_level = 0;
+	m_mae = 0;
 }
 
 
@@ -2563,15 +2723,30 @@ void mb86901_device::execute_trap()
 	*/
 
 	if (!m_trap)
+	{
 		return;
+	}
 
 	select_trap();
 
 	if (!m_error_mode)
 	{
-		ET = 0;
-		PS = S;
-		CWP = ((CWP + NWINDOWS) - 1) % NWINDOWS;
+		PSR &= ~PSR_ET_MASK;
+
+		if (IS_USER)
+			PSR &= ~PSR_PS_MASK;
+		else
+			PSR |= PSR_PS_MASK;
+
+		PSR |= PSR_S_MASK;
+
+		int cwp = PSR & PSR_CWP_MASK;
+		int new_cwp = ((cwp + NWINDOWS) - 1) % NWINDOWS;
+
+		PSR &= ~PSR_CWP_MASK;
+		PSR |= new_cwp;
+
+		update_gpr_pointers();
 
 		if (m_annul == 0)
 		{
@@ -2585,7 +2760,6 @@ void mb86901_device::execute_trap()
 			m_annul = 0;
 		}
 
-		S = 1;
 		if (!m_reset_trap)
 		{
 			PC = TBR;
@@ -2598,9 +2772,6 @@ void mb86901_device::execute_trap()
 			m_reset_trap = 0;
 		}
 	}
-
-	MAKE_PSR;
-	update_gpr_pointers();
 }
 
 
@@ -2611,7 +2782,7 @@ void mb86901_device::execute_trap()
 //  validity.
 //-------------------------------------------------
 
-void mb86901_device::complete_instruction_execution(UINT32 op)
+void mb86901_device::complete_instruction_execution(uint32_t op)
 {
 	switch (OP)
 	{
@@ -2642,8 +2813,8 @@ void mb86901_device::complete_instruction_execution(UINT32 op)
 
 	case OP_CALL: // call
 	{
-		UINT32 pc = PC;
-		UINT32 callpc = PC + DISP30;
+		uint32_t pc = PC;
+		uint32_t callpc = PC + DISP30;
 		PC = nPC;
 		nPC = callpc;
 
@@ -2669,7 +2840,7 @@ void mb86901_device::complete_instruction_execution(UINT32 op)
 //  fetched instruction
 //-------------------------------------------------
 
-void mb86901_device::dispatch_instruction(UINT32 op)
+void mb86901_device::dispatch_instruction(uint32_t op)
 {
 	/* The SPARC Instruction Manual: Version 8, page 159, "Appendix C - ISP Descriptions - C.6. Instruction Dispatch" (SPARCv8.pdf, pg. 156)
 
@@ -2700,16 +2871,16 @@ void mb86901_device::dispatch_instruction(UINT32 op)
 
 	if (illegal_IU_instr)
 	{
+		printf("illegal instruction at %08x\n", PC);
 		m_trap = 1;
 		m_illegal_instruction = 1;
-
 	}
-	if (((OP == OP_ALU && (FPOP1 || FPOP2)) || (OP == OP_TYPE0 && OP2 == OP2_FBFCC)) && (!EF || !m_bp_fpu_present))
+	if (((OP == OP_ALU && (FPOP1 || FPOP2)) || (OP == OP_TYPE0 && OP2 == OP2_FBFCC)) && (!(PSR & PSR_EF_MASK) || !m_bp_fpu_present))
 	{
 		m_trap = 1;
 		m_fp_disabled = 1;
 	}
-	if (((OP == OP_ALU && (CPOP1 || CPOP2)) || (OP == OP_TYPE0 && OP2 == OP2_CBCCC)) && (!EC || !m_bp_cp_present))
+	if (((OP == OP_ALU && (CPOP1 || CPOP2)) || (OP == OP_TYPE0 && OP2 == OP2_CBCCC)) && (!(PSR & PSR_EC_MASK) || !m_bp_cp_present))
 	{
 		m_trap = 1;
 		m_cp_disabled = 1;
@@ -2727,10 +2898,9 @@ void mb86901_device::dispatch_instruction(UINT32 op)
 //  of a floating-point operation
 //-------------------------------------------------
 
-void mb86901_device::complete_fp_execution(UINT32 /*op*/)
+void mb86901_device::complete_fp_execution(uint32_t /*op*/)
 {
 }
-
 
 //-------------------------------------------------
 //  execute_step - perform one step in execute
@@ -2794,278 +2964,35 @@ void mb86901_device::execute_step()
 	if (m_bp_reset_in)
 	{
 		m_execute_mode = 0;
+		m_error_mode = 0;
 		m_reset_mode = 1;
+		printf("Entering reset mode\n");
 		return;
 	}
-	else if (ET && (m_bp_irl == 15 || m_bp_irl > PIL))
+	else if ((PSR & PSR_ET_MASK) && (m_bp_irl == 15 || m_bp_irl > ((PSR & PSR_PIL_MASK) >> PSR_PIL_SHIFT)))
 	{
 		m_trap = 1;
 		m_interrupt_level = m_bp_irl;
 	}
 
-	if (m_trap) execute_trap();
+	if (m_trap)
+	{
+		execute_trap();
+		BREAK_PSR;
+		debugger_instruction_hook(this, PC);
+	}
 
 	if (m_execute_mode)
 	{
 		// write-state-register delay not yet implemented
 
-		UINT32 addr_space = (IS_USER ? 8 : 9);
-		UINT32 op = read_sized_word(addr_space, PC, 4);
+		uint32_t addr_space = (IS_USER ? 8 : 9);
+		uint32_t op = read_sized_word(addr_space, PC, 4);
 
-#if 0
-		if (PC == 0xffef0000)
+#if LOG_FCODES
+		//if (m_log_fcodes)
 		{
-			UINT32 opcode = read_sized_word(11, REG(5), 2);
-			if (!(REG(5) & 2))
-			{
-				opcode >>= 16;
-			}
-			UINT32 l1 = opcode << 2;
-			l1 += REG(2);
-			UINT32 handler_offset = read_sized_word(11, l1, 2);
-			if (!(l1 & 2))
-			{
-				handler_offset >>= 16;
-			}
-			handler_offset <<= 2;
-			handler_offset += REG(2);
-			if (handler_offset == 0xffe87964)
-			{
-				printf("Opcode at %08x: %04x, handler is at %08x // call %08x\n", REG(5), opcode, handler_offset, l1 + 2);
-			}
-			else if (handler_offset == 0xffe8799c)
-			{
-				UINT32 address = REG(5) + 2;
-				UINT32 half = read_sized_word(11, address, 2);
-				if (!(address & 2)) half >>= 16;
-
-				printf("Opcode at %08x: %04x, handler is at %08x // push_data current result (%08x) + load address %08x\n", REG(5), opcode, handler_offset, REG(4), REG(3) + half);
-			}
-			else if (handler_offset == 0xffe879e4)
-			{
-				UINT32 address = l1 + 2;
-				UINT32 half0 = read_sized_word(11, address, 2);
-				if (address & 2) half0 <<= 16;
-
-				address = l1 + 4;
-				UINT32 half1 = read_sized_word(11, address, 2);
-				if (!(address & 2)) half1 >>= 16;
-
-				UINT32 value = half0 | half1;
-
-				printf("Opcode at %08x: %04x, handler is at %08x // push_data current result (%08x) + load immediate word from handler table (%08x)\n", REG(5), opcode, handler_offset, REG(4), value);
-			}
-			else if (handler_offset == 0xffe879c4)
-			{
-				UINT32 address = l1 + 2;
-				UINT32 l0 = read_sized_word(11, address, 2);
-				if (!(address & 2)) l0 >>= 16;
-
-				address = REG(3) + l0;
-				UINT32 l1_2 = read_sized_word(11, address, 2);
-				if (!(address & 2)) l1_2 >>= 16;
-
-				address = REG(2) + (l1_2 << 2);
-				UINT32 l0_2 = read_sized_word(11, address, 2);
-				if (!(address & 2)) l0_2 >>= 16;
-
-				UINT32 dest = REG(2) + (l0_2 << 2);
-
-				printf("Opcode at %08x: %04x, handler is at %08x // SPARC branch to %08x, calcs: g2(%08x) + halfword[g2(%04x) + (halfword[g3(%08x) + halfword[entry_point(%04x) + 2](%04x)](%04x) << 2)](%08x)\n", REG(5), opcode, handler_offset, dest, REG(2), REG(2), REG(3), l1, l0, l1_2, l0_2);
-				printf("                                                 // Target func: %08x\n", l0_2 << 2);
-				switch (l0_2 << 2)
-				{
-					case 0x10: // call
-						printf("                                                 // call %08x\n", (REG(2) + (l1_2 << 2)) + 2);
-						break;
-					default:
-						printf("                                                 // unknown handler address: %08x\n", REG(2) + (l0_2 << 2));
-						break;
-				}
-			}
-			else if (handler_offset == 0xffe8c838)
-			{
-				UINT32 address = l1 + 2;
-				UINT32 half0 = read_sized_word(11, address, 2);
-				if (address & 2) half0 <<= 16;
-
-				address = l1 + 4;
-				UINT32 half1 = read_sized_word(11, address, 2);
-				if (!(address & 2)) half1 >>= 16;
-
-				UINT32 value = half0 | half1;
-
-				printf("Opcode at %08x: %04x, handler is at %08x // add 32-bit word (%08x) from handler table to result (%08x + %08x = %08x)\n", REG(5), opcode, handler_offset, value, REG(4), value, REG(4) + value);
-			}
-			else if (opcode == 0x003f || opcode == 0x0066 || opcode == 0x0099 || opcode == 0x0121 || opcode == 0x0136 || opcode == 0x014f || opcode == 0x0155 || opcode == 0x01c7 || opcode == 0x01cd ||
-						opcode == 0x0217 || opcode == 0x0289 || opcode == 0x0296 || opcode == 0x029d || opcode == 0x02f2 || opcode == 0x0334 || opcode == 0x0381 || opcode == 0x3d38)
-			{
-				switch(opcode)
-				{
-					case 0x003f:
-					{
-						UINT32 address = REG(5) + 2;
-						UINT32 half0 = read_sized_word(11, address, 2);
-						if (address & 2) half0 <<= 16;
-
-						address = REG(5) + 4;
-						UINT32 half1 = read_sized_word(11, address, 2);
-						if (!(address & 2)) half1 >>= 16;
-
-						UINT32 value = half0 | half1;
-
-						printf("Opcode at %08x: %04x, handler is at %08x // push_data current result (%08x) + load immediate word from instructions (%08x)\n", REG(5), opcode, handler_offset, REG(4), value);
-						break;
-					}
-
-					case 0x0066:
-					{
-						UINT32 address = REG(5) + 2;
-						UINT32 offset = read_sized_word(11, address, 2);
-						if (!(address & 2)) offset >>= 16;
-
-						UINT32 target = REG(5) + 2 + offset;
-
-						printf("Opcode at %08x: %04x, handler is at %08x // if result (%08x) is zero, jump to %08x\n", REG(5), opcode, handler_offset, REG(4), target);
-						break;
-					}
-
-					case 0x0099:
-					{
-						UINT32 l1_2 = REG(4);
-
-						UINT32 address = REG(7);
-						UINT32 l0_2 = read_sized_word(11, address, 4);
-
-						address = REG(7) + 4;
-						UINT32 popped_g4 = read_sized_word(11, address, 4);
-
-						address = REG(5) + 2;
-						UINT32 offset = read_sized_word(11, address, 2);
-						if (!(address & 2)) offset >>= 16;
-
-						UINT32 target = REG(5) + 2 + offset;
-
-						printf("Opcode at %08x: %04x, handler is at %08x // branch relative to %08x if data stack pop/top (%08x) == result (%08x), pop_data result (%08x)\n", REG(5), opcode, handler_offset, target, l0_2, l1_2, popped_g4);
-						if (l1_2 == l0_2)
-						{
-							printf("                                                 // branch will be taken\n");
-						}
-						else
-						{
-							printf("                                                 // branch will not be taken\n");
-							printf("                                                 // push pc (%08x) onto program stack\n", REG(5) + 2);
-							printf("                                                 // push previous data stack top + 0x80000000 (%08x) onto program stack\n", l0_2 + 0x8000000);
-							printf("                                                 // push diff of (result - stack top) (%08x - %08x = %08x)\n", popped_g4, l0_2 + 0x8000000, popped_g4 - (l0_2 + 0x80000000));
-						}
-
-						break;
-					}
-
-					case 0x0121:
-					{
-						UINT32 address = REG(7);
-						UINT32 word = read_sized_word(11, address, 4);
-						printf("Opcode at %08x: %04x, handler is at %08x // logical-AND result with data stack pop, store in result: %08x = %08x & %08x\n", REG(5), opcode, handler_offset, word & REG(4), word, REG(4));
-						break;
-					}
-
-					case 0x0136:
-						printf("Opcode at %08x: %04x, handler is at %08x // invert result (%08x -> %08x)\n", REG(5), opcode, handler_offset, REG(4), REG(4) ^ 0xffffffff);
-						break;
-
-					case 0x014f:
-					{
-						UINT32 address = REG(7);
-						UINT32 word = read_sized_word(11, address, 4);
-						printf("Opcode at %08x: %04x, handler is at %08x // add result to data stack pop, store in result: %08x = %08x + %08x\n", REG(5), opcode, handler_offset, word + REG(4), word, REG(4));
-						break;
-					}
-
-					case 0x0155:
-					{
-						UINT32 address = REG(7);
-						UINT32 word = read_sized_word(11, address, 4);
-						printf("Opcode at %08x: %04x, handler is at %08x // subtract result from data stack pop, store in result: %08x = %08x - %08x\n", REG(5), opcode, handler_offset, word - REG(4), word, REG(4));
-						break;
-					}
-
-					case 0x01c7:
-					{
-						UINT32 address = REG(6);
-						UINT32 half0 = read_sized_word(11, address, 2);
-						if (address & 2) half0 <<= 16;
-
-						address = REG(6) + 2;
-						UINT32 half1 = read_sized_word(11, address, 2);
-						if (!(address & 2)) half1 >>= 16;
-
-						UINT32 value = half0 | half1;
-
-						printf("Opcode at %08x: %04x, handler is at %08x // return (%08x) (pops off program stack)\n", REG(5), opcode, handler_offset, value);
-						break;
-					}
-
-					case 0x01cd:
-						printf("Opcode at %08x: %04x, handler is at %08x // insert result (%08x) between data stack top (%08x) and next data stack entry\n", REG(5), opcode, handler_offset, REG(4), read_sized_word(11, REG(7), 4));
-						break;
-
-					case 0x0217:
-					{
-						UINT32 value = read_sized_word(11, REG(7), 4);
-						printf("Opcode at %08x: %04x, handler is at %08x // if pop_data (%08x) >= result (%08x), set result to 0, otherwise -1 (%08x)\n", REG(5), opcode, handler_offset, value, REG(4), (value >= REG(4)) ? 0 : ~0);
-						break;
-					}
-
-					case 0x0289:
-						printf("Opcode at %08x: %04x, handler is at %08x // push_data(g4 (%08x))\n", REG(5), opcode, handler_offset, REG(4));
-						break;
-
-					case 0x0296:
-						printf("Opcode at %08x: %04x, handler is at %08x // swap result (%08x) with top of data stack (%08x)\n", REG(5), opcode, handler_offset, REG(4), read_sized_word(11, REG(7), 4));
-						break;
-
-					case 0x029d:
-					{
-						UINT32 top = read_sized_word(11, REG(7), 4);
-						UINT32 next = read_sized_word(11, REG(7) + 4, 4);
-						printf("Opcode at %08x: %04x, handler is at %08x // swap the top two values of the data stack (%08x <-> %08x), exchange second value with result (%08x <-> %08x)\n", REG(5), opcode, handler_offset, top, next, REG(4), next);
-						break;
-					}
-
-					case 0x02f2:
-						printf("Opcode at %08x: %04x, handler is at %08x // decrement g4 (%08x -> %08x)\n", REG(5), opcode, handler_offset, REG(4), REG(4) - 1);
-						break;
-
-					case 0x0334:
-					{
-						UINT32 address = REG(4);
-						UINT32 half0 = read_sized_word(11, address, 2);
-						if (address & 2) half0 <<= 16;
-
-						address = REG(4) + 2;
-						UINT32 half1 = read_sized_word(11, address, 2);
-						if (!(address & 2)) half1 >>= 16;
-
-						UINT32 value = half0 | half1;
-
-						printf("Opcode at %08x: %04x, handler is at %08x // load result with 32-bit word at result address (g4 = [%08x] (%08x)\n", REG(5), opcode, handler_offset, REG(4), value);
-						break;
-					}
-
-					case 0x0381:
-						printf("Opcode at %08x: %04x, handler is at %08x // word[g4 (%08x)] = pop_data(g7), result = pop_data(g7), g7 = %08x\n", REG(5), opcode, handler_offset, REG(4), REG(7));
-						break;
-
-					case 0x3d38:
-						printf("Opcode at %08x: %04x, handler is at %08x // call ffe8fe90\n", REG(5), opcode, handler_offset);
-						break;
-				}
-			}
-			else
-			{
-				printf("Opcode at %08x: %04x, handler is at %08x\n", REG(5), opcode, handler_offset);
-			}
+			log_fcodes();
 		}
 #endif
 
@@ -3126,6 +3053,7 @@ void mb86901_device::reset_step()
 		m_execute_mode = 1;
 		m_trap = 1;
 		m_reset_trap = 1;
+		printf("m_bp_reset_in is false, resetting\n");
 	}
 }
 
@@ -3173,7 +3101,8 @@ void mb86901_device::execute_run()
 			continue;
 		}
 
-		debugger_instruction_hook(this, m_pc);
+		BREAK_PSR;
+		debugger_instruction_hook(this, PC);
 
 		if (m_reset_mode)
 		{
@@ -3207,7 +3136,7 @@ void mb86901_device::execute_run()
 //  disassembler
 //-------------------------------------------------
 
-UINT64 mb86901_device::get_reg_r(unsigned index) const
+uint64_t mb86901_device::get_reg_r(unsigned index) const
 {
 	return REG(index & 31);
 }
@@ -3218,7 +3147,7 @@ UINT64 mb86901_device::get_reg_r(unsigned index) const
 //  disassembler
 //-------------------------------------------------
 
-UINT64 mb86901_device::get_translated_pc() const
+uint64_t mb86901_device::get_translated_pc() const
 {
 	// FIXME: how do we apply translation to the address so it's in the same space the disassembler sees?
 	return m_pc;
@@ -3230,7 +3159,7 @@ UINT64 mb86901_device::get_translated_pc() const
 //  disassembler
 //-------------------------------------------------
 
-UINT8 mb86901_device::get_icc() const
+uint8_t mb86901_device::get_icc() const
 {
 	return (m_psr & PSR_ICC_MASK) >> PSR_ICC_SHIFT;
 }
@@ -3241,7 +3170,7 @@ UINT8 mb86901_device::get_icc() const
 //  for disassembler
 //-------------------------------------------------
 
-UINT8 mb86901_device::get_xcc() const
+uint8_t mb86901_device::get_xcc() const
 {
 	// not present before SPARCv9
 	return 0;
@@ -3253,7 +3182,7 @@ UINT8 mb86901_device::get_xcc() const
 //  for disassembler
 //-------------------------------------------------
 
-UINT8 mb86901_device::get_fcc(unsigned index) const
+uint8_t mb86901_device::get_fcc(unsigned index) const
 {
 	// only one fcc instance before SPARCv9
 	return (m_fsr >> 10) & 3;

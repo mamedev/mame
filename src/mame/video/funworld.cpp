@@ -52,7 +52,7 @@
 
 PALETTE_INIT_MEMBER(funworld_state,funworld)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 	static const int resistances_rb[3] = { 1000, 470, 220 };
 	static const int resistances_g [2] = { 470, 220 };
@@ -127,21 +127,21 @@ TILE_GET_INFO_MEMBER(funworld_state::get_bg_tile_info)
 
 VIDEO_START_MEMBER(funworld_state, funworld)
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(funworld_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 4, 8, 96, 29);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(funworld_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 4, 8, 96, 29);
 }
 
 VIDEO_START_MEMBER(funworld_state, magicrd2)
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(funworld_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 4, 8, 112, 34);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(funworld_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 4, 8, 112, 34);
 }
 
 VIDEO_START_MEMBER(funworld_state, chinatow)
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(funworld_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 4, 8, 96, 31);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(funworld_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 4, 8, 96, 31);
 }
 
 
-UINT32 funworld_state::screen_update_funworld(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t funworld_state::screen_update_funworld(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;

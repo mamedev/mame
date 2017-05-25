@@ -7,15 +7,15 @@
     driver by Christopher Kirmse, Aaron Giles
 
     Games supported:
-        * Demolition Derby (Monoboard version) (Turbo Chip Squeak)
-        * Sarge (Turbo Chip Squeak)
-        * Max RPM (Turbo Chip Squeak)
+        * Demolition Derby (Monoboard version) (Turbo Cheap Squeak)
+        * Sarge (Turbo Cheap Squeak)
+        * Max RPM (Turbo Cheap Squeak)
         * Rampage (Sounds Good)
         * Power Drive (Sounds Good)
         * Star Guards (Sounds Good)
-        * Spy Hunter (Chip Squeak Deluxe)
+        * Spy Hunter (Cheap Squeak Deluxe)
         * Crater Raider
-        * Turbo Tag (prototype) (Chip Squeak Deluxe)
+        * Turbo Tag (prototype) (Cheap Squeak Deluxe)
 
     Known bugs:
         * Spy Hunter crashes at the end of the boat level
@@ -104,12 +104,16 @@
 
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "machine/z80ctc.h"
-#include "audio/midway.h"
-#include "machine/nvram.h"
 #include "includes/mcr.h"
 #include "includes/mcr3.h"
+#include "audio/midway.h"
+#include "audio/csd.h"
+
+#include "cpu/z80/z80.h"
+#include "machine/nvram.h"
+#include "machine/z80ctc.h"
+
+#include "speaker.h"
 
 #include "spyhunt.lh"
 #include "turbotag.lh"
@@ -165,7 +169,7 @@ WRITE8_MEMBER(mcr3_state::demoderm_op6_w)
 	if (data & 0x40) m_input_mux = 1;
 
 	/* low 5 bits control the turbo CS */
-	m_turbo_chip_squeak->write(space, offset, data);
+	m_turbo_cheap_squeak->write(space, offset, data);
 }
 
 
@@ -185,9 +189,9 @@ READ8_MEMBER(mcr3_state::maxrpm_ip1_r)
 READ8_MEMBER(mcr3_state::maxrpm_ip2_r)
 {
 	/* this is a blatant hack, should really do a better implementation */
-	static const UINT8 shift_bits[5] = { 0x00, 0x05, 0x06, 0x01, 0x02 };
-	UINT8 start = ioport("MONO.IP0")->read();
-	UINT8 shift = ioport("SHIFT")->read();
+	static const uint8_t shift_bits[5] = { 0x00, 0x05, 0x06, 0x01, 0x02 };
+	uint8_t start = ioport("MONO.IP0")->read();
+	uint8_t shift = ioport("SHIFT")->read();
 
 	/* reset on a start */
 	if (!(start & 0x08))
@@ -269,7 +273,7 @@ WRITE8_MEMBER(mcr3_state::maxrpm_op6_w)
 		m_maxrpm_adc_select = (m_maxrpm_adc_control >> 1) & 3;
 
 	/* low 5 bits control the turbo CS */
-	m_turbo_chip_squeak->write(space, offset, data);
+	m_turbo_cheap_squeak->write(space, offset, data);
 }
 
 
@@ -349,7 +353,7 @@ WRITE8_MEMBER(mcr3_state::powerdrv_op6_w)
 
 READ8_MEMBER(mcr3_state::stargrds_ip0_r)
 {
-	UINT8 result = ioport("MONO.IP0")->read();
+	uint8_t result = ioport("MONO.IP0")->read();
 	if (m_input_mux)
 		result = (result & ~0x0a) | (ioport("MONO.IP0.ALT")->read() & 0x0a);
 	return (result & ~0x10) | ((m_sounds_good->read(space, 0) << 4) & 0x10);
@@ -392,7 +396,7 @@ WRITE8_MEMBER(mcr3_state::stargrds_op6_w)
 
 READ8_MEMBER(mcr3_state::spyhunt_ip1_r)
 {
-	return ioport("ssio:IP1")->read() | (m_chip_squeak_deluxe->read(space, 0) << 5);
+	return ioport("ssio:IP1")->read() | (m_cheap_squeak_deluxe->stat_r(space, 0) << 5);
 }
 
 
@@ -405,7 +409,7 @@ READ8_MEMBER(mcr3_state::spyhunt_ip2_r)
 
 WRITE8_MEMBER(mcr3_state::spyhunt_op4_w)
 {
-	/* Spy Hunter uses port 4 for talking to the Chip Squeak Deluxe */
+	/* Spy Hunter uses port 4 for talking to the Cheap Squeak Deluxe */
 	/* (and for toggling the lamps and muxing the analog inputs) */
 
 	/* mux select is in bit 7 */
@@ -435,8 +439,9 @@ WRITE8_MEMBER(mcr3_state::spyhunt_op4_w)
 	}
 	m_last_op4 = data;
 
-	/* low 5 bits go to control the Chip Squeak Deluxe */
-	m_chip_squeak_deluxe->write(space, offset, data);
+	/* low 5 bits go to control the Cheap Squeak Deluxe */
+	m_cheap_squeak_deluxe->sr_w(space, offset, data & 0x0f);
+	m_cheap_squeak_deluxe->sirq_w(BIT(data, 4));
 }
 
 
@@ -1020,7 +1025,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const UINT32 spyhunt_charlayout_xoffset[64] =
+static const uint32_t spyhunt_charlayout_xoffset[64] =
 {
 		0,  0,  2,  2,  4,  4,  6,  6,  8,  8, 10, 10, 12, 12, 14, 14,
 		16, 16, 18, 18, 20, 20, 22, 22, 24, 24, 26, 26, 28, 28, 30, 30,
@@ -1079,7 +1084,7 @@ GFXDECODE_END
  *************************************/
 
 /* Core MCR monoboard system with no sound */
-static MACHINE_CONFIG_START( mcrmono, mcr3_state )
+static MACHINE_CONFIG_START( mcrmono )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)
@@ -1122,11 +1127,11 @@ MACHINE_CONFIG_END
 /*************************************/
 
 
-/* Sarge/Demolition Derby Mono/Max RPM = MCR monoboard with Turbo Chip Squeak */
+/* Sarge/Demolition Derby Mono/Max RPM = MCR monoboard with Turbo Cheap Squeak */
 static MACHINE_CONFIG_DERIVED( mono_tcs, mcrmono )
 
 	/* basic machine hardware */
-	MCFG_MIDWAY_TURBO_CHIP_SQUEAK_ADD("tcs")
+	MCFG_SOUND_ADD("tcs", MIDWAY_TURBO_CHEAP_SQUEAK, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -1136,7 +1141,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( mono_sg, mcrmono )
 
 	/* basic machine hardware */
-	MCFG_MIDWAY_SOUNDS_GOOD_ADD("sg")
+	MCFG_SOUND_ADD("sg", MIDWAY_SOUNDS_GOOD, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -1149,7 +1154,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( mcrscroll, mcrmono )
 
 	/* basic machine hardware */
-	MCFG_MIDWAY_SSIO_ADD("ssio")
+	MCFG_SOUND_ADD("ssio", MIDWAY_SSIO, 0)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -1171,11 +1176,11 @@ static MACHINE_CONFIG_DERIVED( mcrscroll, mcrmono )
 MACHINE_CONFIG_END
 
 
-/* Spy Hunter = scrolling system with an SSIO and a chip squeak deluxe */
+/* Spy Hunter = scrolling system with an SSIO and a cheap squeak deluxe */
 static MACHINE_CONFIG_DERIVED( mcrsc_csd, mcrscroll )
 
 	/* basic machine hardware */
-	MCFG_MIDWAY_CHIP_SQUEAK_DELUXE_ADD("csd")
+	MCFG_SOUND_ADD("csd", MIDWAY_CHEAP_SQUEAK_DELUXE, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -1392,7 +1397,7 @@ ROM_START( spyhunt )
 	ROM_LOAD( "spy-hunter_snd_0_sd_11-18-83.a7",   0x0000, 0x1000, CRC(c95cf31e) SHA1(d1b0e299a27e306ddbc0654fd3a9d981c92afe8c) )
 	ROM_LOAD( "spy-hunter_snd_1_sd_11-18-83.a8",   0x1000, 0x1000, CRC(12aaa48e) SHA1(c6b835fc45e4484a4d52b682ce015caa242c8b4f) )
 
-	ROM_REGION( 0x8000, "csd:cpu", 0 )  /* 32k for the Chip Squeak Deluxe */ // all dated 11-18-83
+	ROM_REGION( 0x8000, "csd:cpu", 0 )  /* 32k for the Cheap Squeak Deluxe */ // all dated 11-18-83
 	ROM_LOAD16_BYTE( "spy-hunter_cs_deluxe_u7_a_11-18-83.u7",   0x00000, 0x2000, CRC(6e689fe7) SHA1(38ad2e9f12b9d389fb2568ebcb32c8bd1ac6879e) )
 	ROM_LOAD16_BYTE( "spy-hunter_cs_deluxe_u17_b_11-18-83.u17", 0x00001, 0x2000, CRC(0d9ddce6) SHA1(d955c0e67fc78b517cc229601ab4023cc5a644c2) )
 	ROM_LOAD16_BYTE( "spy-hunter_cs_deluxe_u8_c_11-18-83.u8",   0x04000, 0x2000, CRC(35563cd0) SHA1(5708d374dd56758194c95118f096ea51bf12bf64) )
@@ -1433,7 +1438,7 @@ ROM_START( spyhuntp )
 	ROM_LOAD( "spy-hunter_snd_0_sd_11-18-83.a7",   0x0000, 0x1000, CRC(c95cf31e) SHA1(d1b0e299a27e306ddbc0654fd3a9d981c92afe8c) )
 	ROM_LOAD( "spy-hunter_snd_1_sd_11-18-83.a8",   0x1000, 0x1000, CRC(12aaa48e) SHA1(c6b835fc45e4484a4d52b682ce015caa242c8b4f) )
 
-	ROM_REGION( 0x8000, "csd:cpu", 0 )  /* 32k for the Chip Squeak Deluxe */
+	ROM_REGION( 0x8000, "csd:cpu", 0 )  /* 32k for the Cheap Squeak Deluxe */
 	ROM_LOAD16_BYTE( "spy-hunter_cs_deluxe_u7_a_11-18-83.u7",   0x00000, 0x2000, CRC(6e689fe7) SHA1(38ad2e9f12b9d389fb2568ebcb32c8bd1ac6879e) )
 	ROM_LOAD16_BYTE( "spy-hunter_cs_deluxe_u17_b_11-18-83.u17", 0x00001, 0x2000, CRC(0d9ddce6) SHA1(d955c0e67fc78b517cc229601ab4023cc5a644c2) )
 	ROM_LOAD16_BYTE( "spy-hunter_cs_deluxe_u8_c_11-18-83.u8",   0x04000, 0x2000, CRC(35563cd0) SHA1(5708d374dd56758194c95118f096ea51bf12bf64) )
@@ -1509,7 +1514,7 @@ ROM_START( turbotag )
 
 	ROM_REGION( 0x10000, "ssio:cpu", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x8000, "csd:cpu", 0 )  /* 32k for the Chip Squeak Deluxe */
+	ROM_REGION( 0x8000, "csd:cpu", 0 )  /* 32k for the Cheap Squeak Deluxe */
 	ROM_LOAD16_BYTE( "ttu7.bin",  0x00000, 0x2000, CRC(8ebb3302) SHA1(c516abdae6eea524a6d2a039ed9bd7dff72ab986) )
 	ROM_LOAD16_BYTE( "ttu17.bin", 0x00001, 0x2000, CRC(605d6c74) SHA1(a6c2bc95cca372fa823ab256c9dd1f92b6ba45fd) )
 	ROM_LOAD16_BYTE( "ttu8.bin",  0x04000, 0x2000, CRC(6bfcb22a) SHA1(7b895e3ae1e99f195bb32b052f801b58c63a401c) )
@@ -1563,7 +1568,7 @@ DRIVER_INIT_MEMBER(mcr3_state,demoderm)
 DRIVER_INIT_MEMBER(mcr3_state,sarge)
 {
 	mcr_common_init();
-	m_maincpu->space(AS_IO).install_write_handler(0x06, 0x06, write8_delegate(FUNC(midway_turbo_chip_squeak_device::write),m_turbo_chip_squeak.target()));
+	m_maincpu->space(AS_IO).install_write_handler(0x06, 0x06, write8_delegate(FUNC(midway_turbo_cheap_squeak_device::write),m_turbo_cheap_squeak.target()));
 }
 
 

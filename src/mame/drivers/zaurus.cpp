@@ -1403,11 +1403,13 @@ Note:
 
 *****************************************************************************************************************************************/
 
-
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
 #include "machine/pxa255.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 #define MAIN_CLOCK XTAL_8MHz
 
@@ -1415,16 +1417,16 @@ class zaurus_state : public driver_device
 {
 public:
 	zaurus_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_ram(*this, "ram")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_ram(*this, "ram")
 	{ }
 
 	// devices
 	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<UINT32> m_ram;
+	required_shared_ptr<uint32_t> m_ram;
 
-	UINT8 m_rtc_tick;
+	uint8_t m_rtc_tick;
 	DECLARE_READ32_MEMBER(pxa255_ostimer_r);
 	DECLARE_WRITE32_MEMBER(pxa255_ostimer_w);
 	DECLARE_READ32_MEMBER(pxa255_rtc_r);
@@ -1436,11 +1438,11 @@ public:
 
 	void pxa255_ostimer_irq_check();
 	void pxa255_update_interrupts();
-	void pxa255_set_irq_line(UINT32 line, int irq_state);
+	void pxa255_set_irq_line(uint32_t line, int irq_state);
 	TIMER_DEVICE_CALLBACK_MEMBER(rtc_irq_callback);
 
 	// screen updates
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
 	// driver_device overrides
@@ -1471,7 +1473,7 @@ void zaurus_state::video_start()
 {
 }
 
-UINT32 zaurus_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
+uint32_t zaurus_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
 {
 	return 0;
 }
@@ -1486,7 +1488,7 @@ void zaurus_state::pxa255_update_interrupts()
 	m_maincpu->set_input_line(ARM7_IRQ_LINE,  intc_regs->icip ? ASSERT_LINE : CLEAR_LINE);
 }
 
-void zaurus_state::pxa255_set_irq_line(UINT32 line, int irq_state)
+void zaurus_state::pxa255_set_irq_line(uint32_t line, int irq_state)
 {
 	PXA255_INTC_Regs *intc_regs = &m_intc_regs;
 
@@ -1745,7 +1747,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(zaurus_state::rtc_irq_callback)
 }
 
 // TODO: main CPU differs greatly between versions!
-static MACHINE_CONFIG_START( zaurus, zaurus_state )
+static MACHINE_CONFIG_START( zaurus )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",PXA255,MAIN_CLOCK)
@@ -1807,9 +1809,9 @@ ROM_START( zslc1000 )
 	ROM_LOAD( "openzaurus 3.5.3 - zimage-sharp sl-c1000-20050427214434.bin", 0x000000, 0x128980, BAD_DUMP  CRC(1e1a9279) SHA1(909ac3f00385eced55822d6a155b79d9d25f43b3) )
 ROM_END
 
-COMP( 2002, zsl5500,  0,   0, zaurus,  zaurus, driver_device,  0,  "Sharp",      "Zaurus SL-5500 \"Collie\"", MACHINE_IS_SKELETON )
-COMP( 2002, zsl5600,  0,   0, zaurus,  zaurus, driver_device,  0,  "Sharp",      "Zaurus SL-5600 / SL-B500 \"Poodle\"", MACHINE_IS_SKELETON )
-COMP( 2003, zslc750,  0,   0, zaurus,  zaurus, driver_device,  0,  "Sharp",      "Zaurus SL-C750 \"Shepherd\" (Japan)", MACHINE_IS_SKELETON )
-COMP( 2004, zslc760,  0,   0, zaurus,  zaurus, driver_device,  0,  "Sharp",      "Zaurus SL-C760 \"Husky\" (Japan)", MACHINE_IS_SKELETON )
-COMP( 200?, zslc3000, 0,   0, zaurus,  zaurus, driver_device,  0,  "Sharp",      "Zaurus SL-C3000 \"Spitz\" (Japan)", MACHINE_IS_SKELETON )
-COMP( 200?, zslc1000, 0,   0, zaurus,  zaurus, driver_device,  0,  "Sharp",      "Zaurus SL-C3000 \"Akita\" (Japan)", MACHINE_IS_SKELETON )
+COMP( 2002, zsl5500,  0,   0, zaurus,  zaurus, zaurus_state,  0,  "Sharp",      "Zaurus SL-5500 \"Collie\"",           MACHINE_IS_SKELETON )
+COMP( 2002, zsl5600,  0,   0, zaurus,  zaurus, zaurus_state,  0,  "Sharp",      "Zaurus SL-5600 / SL-B500 \"Poodle\"", MACHINE_IS_SKELETON )
+COMP( 2003, zslc750,  0,   0, zaurus,  zaurus, zaurus_state,  0,  "Sharp",      "Zaurus SL-C750 \"Shepherd\" (Japan)", MACHINE_IS_SKELETON )
+COMP( 2004, zslc760,  0,   0, zaurus,  zaurus, zaurus_state,  0,  "Sharp",      "Zaurus SL-C760 \"Husky\" (Japan)",    MACHINE_IS_SKELETON )
+COMP( 200?, zslc3000, 0,   0, zaurus,  zaurus, zaurus_state,  0,  "Sharp",      "Zaurus SL-C3000 \"Spitz\" (Japan)",   MACHINE_IS_SKELETON )
+COMP( 200?, zslc1000, 0,   0, zaurus,  zaurus, zaurus_state,  0,  "Sharp",      "Zaurus SL-C3000 \"Akita\" (Japan)",   MACHINE_IS_SKELETON )

@@ -20,7 +20,7 @@
         * Shuffleshot (3 sets)
         * Golden Tee 3D Golf (12 sets)
         * Golden Tee Golf '97 (7 sets)
-        * Golden Tee Golf '98 (5 sets)
+        * Golden Tee Golf '98 (6 sets)
         * Golden Tee Golf '99 (4 Sets)
         * Golden Tee Golf 2K (5 Sets)
         * Golden Tee Classic (3 Sets)
@@ -351,17 +351,20 @@ Notes:
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/tms32031/tms32031.h"
+#include "includes/itech32.h"
+
 #include "cpu/m6800/m6800.h"
-#include "cpu/m6809/m6809.h"
 #include "cpu/m68000/m68000.h"
+#include "cpu/m6809/m6809.h"
+#include "cpu/tms32031/tms32031.h"
 #include "machine/6522via.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
-#include "machine/watchdog.h"
-#include "includes/itech32.h"
-#include "sound/es5506.h"
 #include "machine/timekpr.h"
+#include "machine/watchdog.h"
+#include "sound/es5506.h"
+
+#include "speaker.h"
 
 
 #define FULL_LOGGING                0
@@ -443,7 +446,7 @@ WRITE16_MEMBER(itech32_state::int1_ack_w)
 void itech32_state::machine_start()
 {
 	membank("soundbank")->configure_entries(0, 256, memregion("soundcpu")->base() + 0x10000, 0x4000);
-	
+
 	save_item(NAME(m_vint_state));
 	save_item(NAME(m_xint_state));
 	save_item(NAME(m_qint_state));
@@ -633,7 +636,7 @@ READ16_MEMBER(itech32_state::wcbowl_prot_result_r)
 
 READ32_MEMBER(itech32_state::itech020_prot_result_r)
 {
-	UINT32 result = ((UINT32 *)m_main_ram.target())[m_itech020_prot_address >> 2];
+	uint32_t result = ((uint32_t *)m_main_ram.target())[m_itech020_prot_address >> 2];
 	result >>= (~m_itech020_prot_address & 3) * 8;
 	return (result & 0xff) << 8;
 }
@@ -739,7 +742,7 @@ WRITE8_MEMBER(itech32_state::drivedge_portb_out)
 	output().set_led_value(1, data & 0x01);
 	output().set_led_value(2, data & 0x02);
 	output().set_led_value(3, data & 0x04);
-	machine().device<ticket_dispenser_device>("ticket")->write(machine().driver_data()->generic_space(), 0, (data & 0x10) << 3);
+	machine().device<ticket_dispenser_device>("ticket")->write(machine().dummy_space(), 0, (data & 0x10) << 3);
 	machine().bookkeeping().coin_counter_w(0, (data & 0x20) >> 5);
 }
 
@@ -757,7 +760,7 @@ WRITE8_MEMBER(itech32_state::pia_portb_out)
 	/* bit 4 controls the ticket dispenser */
 	/* bit 5 controls the coin counter */
 	/* bit 6 controls the diagnostic sound LED */
-	machine().device<ticket_dispenser_device>("ticket")->write(machine().driver_data()->generic_space(), 0, (data & 0x10) << 3);
+	machine().device<ticket_dispenser_device>("ticket")->write(machine().dummy_space(), 0, (data & 0x10) << 3);
 	machine().bookkeeping().coin_counter_w(0, (data & 0x20) >> 5);
 }
 
@@ -877,11 +880,11 @@ void itech32_state::nvram_init(nvram_device &nvram, void *base, size_t length)
 	// if nvram is the main RAM, don't overwrite exception vectors
 	int start = (base == m_main_ram) ? 0x80 : 0x00;
 	for (int i = start; i < length; i++)
-		((UINT8 *)base)[i] = machine().rand();
+		((uint8_t *)base)[i] = machine().rand();
 
 	// due to accessing uninitialized RAM, we need this hack
 	if (m_is_drivedge)
-		((UINT32 *)m_main_ram.target())[0x2ce4/4] = 0x0000001e;
+		((uint32_t *)m_main_ram.target())[0x2ce4/4] = 0x0000001e;
 }
 
 
@@ -939,7 +942,7 @@ READ32_MEMBER(itech32_state::test1_r)
 	if (ACCESSING_BITS_16_23 && !m_written[0x100 + offset*4+1]) logerror("%06X:read from uninitialized memory %04X\n", space.device().safe_pc(), 0x100 + offset*4+1);
 	if (ACCESSING_BITS_8_15 && !m_written[0x100 + offset*4+2]) logerror("%06X:read from uninitialized memory %04X\n", space.device().safe_pc(), 0x100 + offset*4+2);
 	if (ACCESSING_BITS_0_7 && !m_written[0x100 + offset*4+3]) logerror("%06X:read from uninitialized memory %04X\n", space.device().safe_pc(), 0x100 + offset*4+3);
-	return ((UINT32 *)m_main_ram)[0x100/4 + offset];
+	return ((uint32_t *)m_main_ram)[0x100/4 + offset];
 }
 
 WRITE32_MEMBER(itech32_state::test1_w)
@@ -948,7 +951,7 @@ WRITE32_MEMBER(itech32_state::test1_w)
 	if (ACCESSING_BITS_16_23) m_written[0x100 + offset*4+1] = 1;
 	if (ACCESSING_BITS_8_15) m_written[0x100 + offset*4+2] = 1;
 	if (ACCESSING_BITS_0_7) m_written[0x100 + offset*4+3] = 1;
-	COMBINE_DATA(&((UINT32 *)m_main_ram)[0x100/4 + offset]);
+	COMBINE_DATA(&((uint32_t *)m_main_ram)[0x100/4 + offset]);
 }
 
 READ32_MEMBER(itech32_state::test2_r)
@@ -957,7 +960,7 @@ READ32_MEMBER(itech32_state::test2_r)
 	if (ACCESSING_BITS_16_23 && !m_written[0xc00 + offset*4+1]) logerror("%06X:read from uninitialized memory %04X\n", space.device().safe_pc(), 0xc00 + offset*4+1);
 	if (ACCESSING_BITS_8_15 && !m_written[0xc00 + offset*4+2]) logerror("%06X:read from uninitialized memory %04X\n", space.device().safe_pc(), 0xc00 + offset*4+2);
 	if (ACCESSING_BITS_0_7 && !m_written[0xc00 + offset*4+3]) logerror("%06X:read from uninitialized memory %04X\n", space.device().safe_pc(), 0xc00 + offset*4+3);
-	return ((UINT32 *)m_main_ram)[0xc00/4 + offset];
+	return ((uint32_t *)m_main_ram)[0xc00/4 + offset];
 }
 
 WRITE32_MEMBER(itech32_state::test2_w)
@@ -966,7 +969,7 @@ WRITE32_MEMBER(itech32_state::test2_w)
 	if (ACCESSING_BITS_16_23) m_written[0xc00 + offset*4+1] = 1;
 	if (ACCESSING_BITS_8_15) m_written[0xc00 + offset*4+2] = 1;
 	if (ACCESSING_BITS_0_7) m_written[0xc00 + offset*4+3] = 1;
-	COMBINE_DATA(&((UINT32 *)m_main_ram)[0xc00/4 + offset]);
+	COMBINE_DATA(&((uint32_t *)m_main_ram)[0xc00/4 + offset]);
 }
 #endif
 
@@ -1669,7 +1672,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( timekill, itech32_state )
+static MACHINE_CONFIG_START( timekill )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, CPU_CLOCK)
@@ -1711,7 +1714,7 @@ static MACHINE_CONFIG_START( timekill, itech32_state )
 	/* via */
 	MCFG_DEVICE_ADD("via6522_0", VIA6522, SOUND_CLOCK/8)
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(itech32_state,pia_portb_out))
-	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("soundcpu", m6809_device, firq_line))
+	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("soundcpu", M6809_FIRQ_LINE))
 MACHINE_CONFIG_END
 
 
@@ -2139,55 +2142,55 @@ ROM_END
 
 ROM_START( pairs )  /* Version 1.2 (3-tier board set: P/N 1059 Rev 3, P/N 1061 Rev 1 &  P/N 1060 Rev 0) */
 	ROM_REGION16_BE( 0x80000, "user1", 0 )
-	ROM_LOAD16_BYTE( "pair0_v1.2.u83", 0x00000, 0x20000, CRC(a9c761d8) SHA1(2618c9c3f336cf30f760fd88f12c09985cfd4ee7) )
-	ROM_LOAD16_BYTE( "pair1_v1.2.u88", 0x00001, 0x20000, CRC(5141eb86) SHA1(3bb10d588e6334a33e5c2c468651699e84f46cdc) )
+	ROM_LOAD16_BYTE( "pair0_u83_x_v1.2.u83", 0x00000, 0x20000, CRC(a9c761d8) SHA1(2618c9c3f336cf30f760fd88f12c09985cfd4ee7) )
+	ROM_LOAD16_BYTE( "pair1_u88_x_v1.2.u88", 0x00001, 0x20000, CRC(5141eb86) SHA1(3bb10d588e6334a33e5c2c468651699e84f46cdc) )
 
 	ROM_REGION( 0x28000, "soundcpu", 0 )
-	ROM_LOAD( "snd.u17", 0x10000, 0x18000, CRC(7a514cfd) SHA1(ef5bc74c9560d2c058298051070fa748e58f07e1) )
-	ROM_CONTINUE(        0x08000, 0x08000 )
+	ROM_LOAD( "pairsnd_u17_v1.u17", 0x10000, 0x18000, CRC(7a514cfd) SHA1(ef5bc74c9560d2c058298051070fa748e58f07e1) )
+	ROM_CONTINUE(                   0x08000, 0x08000 )
 
 	ROM_REGION( 0x880000, "gfx1", 0 )
-	ROM_LOAD32_BYTE( "grom0",  0x000000, 0x80000, CRC(baf1c2dd) SHA1(4de50001bce294ea5eea581cee9ca5a966701176) )
-	ROM_LOAD32_BYTE( "grom5",  0x000001, 0x80000, CRC(30e993f3) SHA1(fe32aabacbe9d6d9419410faafe048c01988ac78) )
-	ROM_LOAD32_BYTE( "grom10", 0x000002, 0x80000, CRC(3f52f50d) SHA1(abb7ec8fa1af0876dacfe04d76fbc8fc18a2b610) )
-	ROM_LOAD32_BYTE( "grom15", 0x000003, 0x80000, CRC(fd38aa36) SHA1(7c65b2a42bb45b81b841792c475ea391c03a4eb2) )
-	ROM_LOAD32_BYTE( "grom1",  0x200000, 0x40000, CRC(b0bd7008) SHA1(29cb334e9af73f7aef4bf55eae79d8cc05412164) )
-	ROM_LOAD32_BYTE( "grom6",  0x200001, 0x40000, CRC(f7b20a47) SHA1(5a68add24b0f9cfb56b3e7aedc28382c8ead81a1) )
-	ROM_LOAD32_BYTE( "grom11", 0x200002, 0x40000, CRC(1e5f2523) SHA1(c6c362bc0bb303e271176ce8c2a49990be1834cd) )
-	ROM_LOAD32_BYTE( "grom16", 0x200003, 0x40000, CRC(b2975259) SHA1(aa82f8e855f2ebf1d7178a46f2b515d7c9a26299) )
+	ROM_LOAD32_BYTE( "pairx_grom0_v1.grom0",   0x000000, 0x80000, CRC(baf1c2dd) SHA1(4de50001bce294ea5eea581cee9ca5a966701176) )
+	ROM_LOAD32_BYTE( "pairx_grom5_v1.grom5",   0x000001, 0x80000, CRC(30e993f3) SHA1(fe32aabacbe9d6d9419410faafe048c01988ac78) )
+	ROM_LOAD32_BYTE( "pairx_grom10_v1.grom10", 0x000002, 0x80000, CRC(3f52f50d) SHA1(abb7ec8fa1af0876dacfe04d76fbc8fc18a2b610) )
+	ROM_LOAD32_BYTE( "pairx_grom15_v1.grom15", 0x000003, 0x80000, CRC(fd38aa36) SHA1(7c65b2a42bb45b81b841792c475ea391c03a4eb2) )
+	ROM_LOAD32_BYTE( "pairx_grom1_v1.grom1",   0x200000, 0x40000, CRC(b0bd7008) SHA1(29cb334e9af73f7aef4bf55eae79d8cc05412164) )
+	ROM_LOAD32_BYTE( "pairx_grom6_v1.grom6",   0x200001, 0x40000, CRC(f7b20a47) SHA1(5a68add24b0f9cfb56b3e7aedc28382c8ead81a1) )
+	ROM_LOAD32_BYTE( "pairx_grom11_v1.grom11", 0x200002, 0x40000, CRC(1e5f2523) SHA1(c6c362bc0bb303e271176ce8c2a49990be1834cd) )
+	ROM_LOAD32_BYTE( "pairx_grom16_v1.grom16", 0x200003, 0x40000, CRC(b2975259) SHA1(aa82f8e855f2ebf1d7178a46f2b515d7c9a26299) )
 
 	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE( "ensoniq.2m", 0x000000, 0x200000, CRC(9fdc4825) SHA1(71e5255c66d9010be7e6f27916b605441fc53839) ) /* Ensoniq 2m 1350901601 */
 
 	ROM_REGION16_BE( 0x400000, "ensoniq.2", ROMREGION_ERASE00 )
-	ROM_LOAD16_BYTE( "srom0.bin", 0x000000, 0x80000, CRC(19a857f9) SHA1(2515b4c127191d52d3b5a72477384847d8cabad3) )
+	ROM_LOAD16_BYTE( "srom0.bin", 0x000000, 0x80000, CRC(19a857f9) SHA1(2515b4c127191d52d3b5a72477384847d8cabad3) ) /* Unknown label and / or revision */
 ROM_END
 
 
-ROM_START( pairsa ) /* Version ?? (3-tier board set: P/N 1059 Rev 3, P/N 1061 Rev 1 &  P/N 1060 Rev 0) */
+ROM_START( pairsa ) /* Version 1 (3-tier board set: P/N 1059 Rev 3, P/N 1061 Rev 1 &  P/N 1060 Rev 0) */
 	ROM_REGION16_BE( 0x80000, "user1", 0 )
-	ROM_LOAD16_BYTE( "pair0.u83", 0x00000, 0x20000, CRC(774995a3) SHA1(93df91378b56802d14c105f7f48ed8a4f7bafffd) )
-	ROM_LOAD16_BYTE( "pair1.u88", 0x00001, 0x20000, CRC(85d0b73a) SHA1(48a6ac6de94be13e407da13e3e2440d858714b4b) )
+	ROM_LOAD16_BYTE( "pair0_u83_x_v1.u83", 0x00000, 0x20000, CRC(774995a3) SHA1(93df91378b56802d14c105f7f48ed8a4f7bafffd) )
+	ROM_LOAD16_BYTE( "pair1_u83_x_v1.u88", 0x00001, 0x20000, CRC(85d0b73a) SHA1(48a6ac6de94be13e407da13e3e2440d858714b4b) )
 
 	ROM_REGION( 0x28000, "soundcpu", 0 )
-	ROM_LOAD( "snd.u17", 0x10000, 0x18000, CRC(7a514cfd) SHA1(ef5bc74c9560d2c058298051070fa748e58f07e1) )
-	ROM_CONTINUE(        0x08000, 0x08000 )
+	ROM_LOAD( "pairsnd_u17_v1.u17", 0x10000, 0x18000, CRC(7a514cfd) SHA1(ef5bc74c9560d2c058298051070fa748e58f07e1) )
+	ROM_CONTINUE(                   0x08000, 0x08000 )
 
 	ROM_REGION( 0x880000, "gfx1", 0 )
-	ROM_LOAD32_BYTE( "grom0",  0x000000, 0x80000, CRC(baf1c2dd) SHA1(4de50001bce294ea5eea581cee9ca5a966701176) )
-	ROM_LOAD32_BYTE( "grom5",  0x000001, 0x80000, CRC(30e993f3) SHA1(fe32aabacbe9d6d9419410faafe048c01988ac78) )
-	ROM_LOAD32_BYTE( "grom10", 0x000002, 0x80000, CRC(3f52f50d) SHA1(abb7ec8fa1af0876dacfe04d76fbc8fc18a2b610) )
-	ROM_LOAD32_BYTE( "grom15", 0x000003, 0x80000, CRC(fd38aa36) SHA1(7c65b2a42bb45b81b841792c475ea391c03a4eb2) )
-	ROM_LOAD32_BYTE( "grom1",  0x200000, 0x40000, CRC(b0bd7008) SHA1(29cb334e9af73f7aef4bf55eae79d8cc05412164) )
-	ROM_LOAD32_BYTE( "grom6",  0x200001, 0x40000, CRC(f7b20a47) SHA1(5a68add24b0f9cfb56b3e7aedc28382c8ead81a1) )
-	ROM_LOAD32_BYTE( "grom11", 0x200002, 0x40000, CRC(1e5f2523) SHA1(c6c362bc0bb303e271176ce8c2a49990be1834cd) )
-	ROM_LOAD32_BYTE( "grom16", 0x200003, 0x40000, CRC(b2975259) SHA1(aa82f8e855f2ebf1d7178a46f2b515d7c9a26299) )
+	ROM_LOAD32_BYTE( "pairx_grom0_v1.grom0",   0x000000, 0x80000, CRC(baf1c2dd) SHA1(4de50001bce294ea5eea581cee9ca5a966701176) )
+	ROM_LOAD32_BYTE( "pairx_grom5_v1.grom5",   0x000001, 0x80000, CRC(30e993f3) SHA1(fe32aabacbe9d6d9419410faafe048c01988ac78) )
+	ROM_LOAD32_BYTE( "pairx_grom10_v1.grom10", 0x000002, 0x80000, CRC(3f52f50d) SHA1(abb7ec8fa1af0876dacfe04d76fbc8fc18a2b610) )
+	ROM_LOAD32_BYTE( "pairx_grom15_v1.grom15", 0x000003, 0x80000, CRC(fd38aa36) SHA1(7c65b2a42bb45b81b841792c475ea391c03a4eb2) )
+	ROM_LOAD32_BYTE( "pairx_grom1_v1.grom1",   0x200000, 0x40000, CRC(b0bd7008) SHA1(29cb334e9af73f7aef4bf55eae79d8cc05412164) )
+	ROM_LOAD32_BYTE( "pairx_grom6_v1.grom6",   0x200001, 0x40000, CRC(f7b20a47) SHA1(5a68add24b0f9cfb56b3e7aedc28382c8ead81a1) )
+	ROM_LOAD32_BYTE( "pairx_grom11_v1.grom11", 0x200002, 0x40000, CRC(1e5f2523) SHA1(c6c362bc0bb303e271176ce8c2a49990be1834cd) )
+	ROM_LOAD32_BYTE( "pairx_grom16_v1.grom16", 0x200003, 0x40000, CRC(b2975259) SHA1(aa82f8e855f2ebf1d7178a46f2b515d7c9a26299) )
 
 	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE( "ensoniq.2m", 0x000000, 0x200000, CRC(9fdc4825) SHA1(71e5255c66d9010be7e6f27916b605441fc53839) ) /* Ensoniq 2m 1350901601 */
 
 	ROM_REGION16_BE( 0x400000, "ensoniq.2", ROMREGION_ERASE00 )
-	ROM_LOAD16_BYTE( "srom0", 0x000000, 0x80000, CRC(1d96c581) SHA1(3b7c84b7db3b098ec28c7058c16f97e9cf0e4733) )
+	ROM_LOAD16_BYTE( "srom0_pairs_v1.srom0", 0x000000, 0x80000, CRC(1d96c581) SHA1(3b7c84b7db3b098ec28c7058c16f97e9cf0e4733) )
 ROM_END
 
 
@@ -3734,6 +3737,37 @@ ROM_START( gt98t303 )   /* Version 3.03 Tournament Edition (PCB P/N 1083 Rev 2) 
 ROM_END
 
 
+ROM_START( gt98t302 )   /* Version 3.02 Tournament Edition (PCB P/N 1083 Rev 2) */
+	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
+	ROM_LOAD32_BYTE( "gt98_prom0_v3.02t.prom0", 0x00000, 0x100000, CRC(744e0d9b) SHA1(affb05390485d3523478199493e15f32359511f1) )
+	ROM_LOAD32_BYTE( "gt98_prom1_v3.02t.prom1", 0x00001, 0x100000, CRC(b25508a1) SHA1(a744a212cb95852e1b7eb3051bb12a448e161ca7) )
+	ROM_LOAD32_BYTE( "gt98_prom2_v3.02t.prom2", 0x00002, 0x100000, CRC(98a3466e) SHA1(a0f8a897cb7b4752c63079c04725e7800e71ae13) )
+	ROM_LOAD32_BYTE( "gt98_prom3_v3.02t.prom3", 0x00003, 0x100000, CRC(17c3152a) SHA1(68ffa7470049424a7456c4954b6da11b69048264) )
+
+	ROM_REGION( 0x28000, "soundcpu", 0 )
+	ROM_LOAD( "gt98nr_u88_v1.0.u88", 0x10000, 0x18000, CRC(2cee9e98) SHA1(02edac7abab2335c1cd824d1d9b26aa32238a2de) )
+	ROM_CONTINUE(                    0x08000, 0x08000 )
+
+	ROM_REGION( 0x600000, "gfx1", 0 )
+	ROM_LOAD32_BYTE( "gt98_grom0_0.grm0_0", 0x000000, 0x80000, CRC(2d79492b) SHA1(16d66d937c34ddf616f31cba0d285326a31cad85) )
+	ROM_LOAD32_BYTE( "gt98_grom0_1.grm0_1", 0x000001, 0x80000, CRC(79afda1a) SHA1(77a9883f14b58ceece9c76ce88bb900bc4accf25) )
+	ROM_LOAD32_BYTE( "gt98_grom0_2.grm0_2", 0x000002, 0x80000, CRC(8c381f56) SHA1(41a5b70f9e524a1cade031f864350ec75c08c956) )
+	ROM_LOAD32_BYTE( "gt98_grom0_3.grm0_3", 0x000003, 0x80000, CRC(46c35ba6) SHA1(a1976dd8710442cdb92c47f778acacba4380731b) )
+	ROM_LOAD32_BYTE( "gt98_grom1_0.grm1_0", 0x200000, 0x80000, CRC(b07bc634) SHA1(48a9aeafaf844374d129d209884ec3a23abe249f) )
+	ROM_LOAD32_BYTE( "gt98_grom1_1.grm1_1", 0x200001, 0x80000, CRC(b23d59a7) SHA1(be68da263691e297b266e81485f5f28a5a5ad2f2) )
+	ROM_LOAD32_BYTE( "gt98_grom1_2.grm1_2", 0x200002, 0x80000, CRC(9c113abc) SHA1(8cb23da237dce73bbd283662c6344876d1c352f3) )
+	ROM_LOAD32_BYTE( "gt98_grom1_3.grm1_3", 0x200003, 0x80000, CRC(231bbe58) SHA1(b662a2ffd881a22ec0503810dca8bd61a4994463) )
+	ROM_LOAD32_BYTE( "gt98_grom2_0.grm2_0", 0x400000, 0x80000, CRC(db5cec87) SHA1(831cebd0c90c118d007b737b2eb5fb374a86cf4b) )
+	ROM_LOAD32_BYTE( "gt98_grom2_1.grm2_1", 0x400001, 0x80000, CRC(c74fc7d3) SHA1(38581876d4557f79acbc2c639bd4188a49d3b7cc) )
+	ROM_LOAD32_BYTE( "gt98_grom2_2.grm2_2", 0x400002, 0x80000, CRC(1227609d) SHA1(5a586d2383c9090ff3847abd2c645354dacd400f) )
+	ROM_LOAD32_BYTE( "gt98_grom2_3.grm2_3", 0x400003, 0x80000, CRC(78745131) SHA1(c430be4cb650f1f6265406ca8fcad8df809282f5) )
+
+	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE00 )
+	ROM_LOAD16_BYTE( "gt98_srom0_nr.srom0", 0x000000, 0x100000, CRC(44983bd7) SHA1(a6ac966ec113b079434d7f871e4ce7266206d234) )
+	ROM_LOAD16_BYTE( "gt98_srom1_nr.srom1", 0x200000, 0x080000, CRC(1b3f18b6) SHA1(3b65de6a90c5ede183b5f8ca1875736bc1425772) )
+ROM_END
+
+
 ROM_START( gtdiamond )  /* Version 3.05TL Tournament Edition (PCB P/N 1083 Rev 2) */
 	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
 	ROM_LOAD32_BYTE( "gt98_golf_elc_prom0_v3.05tl.prom0", 0x00000, 0x100000, CRC(b6b0e3b8) SHA1(e2ff88f205ad902d78b8c52ed554eb612c300d3c) )
@@ -4484,7 +4518,7 @@ GAME( 1994, bloodstm11,  bloodstm, bloodstm, bloodstm, itech32_state, bloodstm, 
 GAME( 1994, bloodstm10,  bloodstm, bloodstm, bloodstm, itech32_state, bloodstm, ROT0, "Strata/Incredible Technologies",   "Blood Storm (v1.04)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, pairsred,    0,        bloodstm, pairs,    itech32_state, bloodstm, ROT0, "Strata/Incredible Technologies",   "Pairs Redemption (V1.0, 10/25/94)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, pairs,       0,        bloodstm, pairs,    itech32_state, bloodstm, ROT0, "Strata/Incredible Technologies",   "Pairs (V1.2, 09/30/94)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, pairsa,      pairs,    bloodstm, pairs,    itech32_state, bloodstm, ROT0, "Strata/Incredible Technologies",   "Pairs (09/07/94)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, pairsa,      pairs,    bloodstm, pairs,    itech32_state, bloodstm, ROT0, "Strata/Incredible Technologies",   "Pairs (V1, 09/07/94)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, hotmemry,    pairs,    bloodstm, pairs,    itech32_state, bloodstm, ROT0, "Incredible Technologies (Tuning license)", "Hot Memory (V1.2, Germany, 12/28/94)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, hotmemry11,  pairs,    bloodstm, pairs,    itech32_state, bloodstm, ROT0, "Incredible Technologies (Tuning license)", "Hot Memory (V1.1, Germany, 11/30/94)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, drivedge,    0,        drivedge, drivedge, itech32_state, drivedge, ROT0, "Strata/Incredible Technologies",   "Driver's Edge", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
@@ -4574,6 +4608,7 @@ GAME( 1998, gt98,      0,        sftm,    aama,  itech32_state, aama,     ROT0, 
 GAME( 1998, gt98v100,  gt98,     sftm,    gt98,  itech32_state, aama,     ROT0, "Incredible Technologies", "Golden Tee '98 (v1.00)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITGF98 */
 GAME( 1998, gt98s100,  gt98,     sftm,    gt98s, itech32_state, s_ver,    ROT0, "Incredible Technologies", "Golden Tee '98 (v1.00S)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITGF98-M */
 GAME( 1998, gt98t303,  gt98,     tourny,  gt98s, itech32_state, aamat,    ROT0, "Incredible Technologies", "Golden Tee '98 Tournament (v3.03)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITGF98 */
+GAME( 1998, gt98t302,  gt98,     tourny,  gt98s, itech32_state, aamat,    ROT0, "Incredible Technologies", "Golden Tee '98 Tournament (v3.02)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITGF98 */
 GAME( 1998, gtdiamond, gt98,     tourny,  gt98s, itech32_state, aamat,    ROT0, "Incredible Technologies", "Golden Tee Diamond Edition Tournament (v3.05T ELC)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITGF98 */
 
 GAME( 1999, gt99,      0,        sftm,    aama,  itech32_state, aama,     ROT0, "Incredible Technologies", "Golden Tee '99 (v1.00)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITGF99 */

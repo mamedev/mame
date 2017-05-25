@@ -10,15 +10,21 @@
 
 
 #include "emu.h"
+#include "includes/radio86.h"
+
 #include "cpu/i8085/i8085.h"
-#include "sound/wave.h"
-#include "sound/speaker.h"
+#include "imagedev/cassette.h"
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
-#include "imagedev/cassette.h"
-#include "formats/rk_cas.h"
-#include "includes/radio86.h"
+#include "sound/spkrdev.h"
+#include "sound/wave.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
+#include "formats/rk_cas.h"
+
 
 class apogee_state : public radio86_state
 {
@@ -27,9 +33,9 @@ public:
 		: radio86_state(mconfig, type, tag),
 		m_speaker(*this, "speaker") { }
 
-	UINT8 m_out0;
-	UINT8 m_out1;
-	UINT8 m_out2;
+	uint8_t m_out0;
+	uint8_t m_out1;
+	uint8_t m_out2;
 	DECLARE_WRITE_LINE_MEMBER(pit8253_out0_changed);
 	DECLARE_WRITE_LINE_MEMBER(pit8253_out1_changed);
 	DECLARE_WRITE_LINE_MEMBER(pit8253_out2_changed);
@@ -144,7 +150,7 @@ static INPUT_PORTS_START( apogee )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Rus/Lat") PORT_CODE(KEYCODE_LALT) PORT_CODE(KEYCODE_RALT)
 INPUT_PORTS_END
 
-static const INT16 speaker_levels[] = {-32767, -10922, 10922, 32767};
+static const int16_t speaker_levels[] = {-32767, -10922, 10922, 32767};
 
 WRITE_LINE_MEMBER(apogee_state::pit8253_out0_changed)
 {
@@ -168,8 +174,8 @@ I8275_DRAW_CHARACTER_MEMBER(apogee_state::display_pixels)
 {
 	int i;
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	const UINT8 *charmap = m_charmap + (gpa & 1) * 0x400;
-	UINT8 pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
+	const uint8_t *charmap = m_charmap + (gpa & 1) * 0x400;
+	uint8_t pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
 	if(linecount == 8)
 		pixels = 0;
 	if (vsp) {
@@ -206,7 +212,7 @@ GFXDECODE_END
 
 
 /* Machine driver */
-static MACHINE_CONFIG_START( apogee, apogee_state )
+static MACHINE_CONFIG_START( apogee )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, XTAL_16MHz / 9)
 	MCFG_CPU_PROGRAM_MAP(apogee_mem)
@@ -276,5 +282,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1989, apogee, radio86,0,       apogee,    apogee, radio86_state,radio86, "Zavod BRA", "Apogee BK-01", 0)
+//    YEAR  NAME    PARENT   COMPAT  MACHINE    INPUT   STATE         INIT     COMPANY      FULLNAME        FLAGS
+COMP( 1989, apogee, radio86, 0,      apogee,    apogee, apogee_state, radio86, "Zavod BRA", "Apogee BK-01", 0 )

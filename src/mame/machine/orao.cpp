@@ -10,7 +10,6 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "sound/dac.h"
 #include "imagedev/cassette.h"
 #include "includes/orao.h"
 

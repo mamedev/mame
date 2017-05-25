@@ -9,6 +9,9 @@
 //
 //============================================================
 
+#include <bx/readerwriter.h>
+#include <bx/crtimpl.h>
+
 #include "emu.h"
 #include "../frontend/mame/ui/slider.h"
 
@@ -17,9 +20,6 @@
 
 #include <rapidjson/document.h>
 #include <rapidjson/error/en.h>
-
-#include <bx/readerwriter.h>
-#include <bx/crtimpl.h>
 
 #include "bgfxutil.h"
 
@@ -61,7 +61,9 @@ void chain_manager::refresh_available_chains()
 	m_available_chains.clear();
 	m_available_chains.push_back(chain_desc("none", ""));
 
-	find_available_chains(std::string(m_options.bgfx_path()) + "/chains", "");
+	std::string chains_path;
+	osd_subst_env(chains_path, util::string_format("%s" PATH_SEPARATOR "chains", m_options.bgfx_path()));
+	find_available_chains(chains_path, "");
 
 	destroy_unloaded_chains();
 }
@@ -133,11 +135,13 @@ void chain_manager::find_available_chains(std::string root, std::string path)
 
 bgfx_chain* chain_manager::load_chain(std::string name, uint32_t screen_index)
 {
-	if (name.length() < 5 || (name.compare(name.length() - 5, 5, ".json")!= 0))
+	if (name.length() < 5 || (name.compare(name.length() - 5, 5, ".json") != 0))
 	{
 		name = name + ".json";
 	}
-	std::string path = std::string(m_options.bgfx_path()) + "/chains/" + name;
+	std::string path;
+	osd_subst_env(path, util::string_format("%s" PATH_SEPARATOR "chains" PATH_SEPARATOR, m_options.bgfx_path()));
+	path += name;
 
 	bx::CrtFileReader reader;
 	if (!bx::open(&reader, path.c_str()))
@@ -362,7 +366,7 @@ void chain_manager::update_screen_count(uint32_t screen_count)
 	}
 }
 
-INT32 chain_manager::slider_changed(running_machine &machine, void *arg, int id, std::string *str, INT32 newval)
+int32_t chain_manager::slider_changed(running_machine &machine, void *arg, int id, std::string *str, int32_t newval)
 {
 	if (newval != SLIDER_NOCHANGE)
 	{
@@ -392,7 +396,7 @@ void chain_manager::create_selection_slider(uint32_t screen_index)
 
 	std::string description = "Window " + std::to_string(m_window_index) + ", Screen " + std::to_string(screen_index) + " Effect:";
 	size_t size = sizeof(slider_state) + description.length();
-	slider_state *state = reinterpret_cast<slider_state *>(auto_alloc_array_clear(m_machine, UINT8, size));
+	slider_state *state = reinterpret_cast<slider_state *>(auto_alloc_array_clear(m_machine, uint8_t, size));
 
 	state->minval = 0;
 	state->defval = m_current_chain[screen_index];
@@ -434,8 +438,8 @@ uint32_t chain_manager::handle_screen_chains(uint32_t view, render_primitive *st
 			continue;
 		}
 
-		uint16_t screen_width(floor((prim->bounds.x1 - prim->bounds.x0) + 0.5f));
-		uint16_t screen_height(floor((prim->bounds.y1 - prim->bounds.y0) + 0.5f));
+		uint16_t screen_width(floorf(prim->get_full_quad_width() + 0.5f));
+		uint16_t screen_height(floorf(prim->get_full_quad_height() + 0.5f));
 		if (window.swap_xy())
 		{
 			std::swap(screen_width, screen_height);

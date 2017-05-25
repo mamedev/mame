@@ -11,10 +11,8 @@
 #ifndef INPUT_SDLCOMMON_H_
 #define INPUT_SDLCOMMON_H_
 
-#include <vector>
 #include <unordered_map>
 #include <algorithm>
-#include <queue>
 
 #define MAX_DEVMAP_ENTRIES  16
 #define SDL_MODULE_EVENT_BUFFER_SIZE 5
@@ -22,16 +20,16 @@
 // state information for a keyboard
 struct keyboard_state
 {
-	INT32   state[0x3ff];                                   // must be INT32!
-	INT8    oldkey[MAX_KEYS];
-	INT8    currkey[MAX_KEYS];
+	int32_t   state[0x3ff];                                   // must be int32_t!
+	int8_t    oldkey[MAX_KEYS];
+	int8_t    currkey[MAX_KEYS];
 };
 
 // state information for a mouse
 struct mouse_state
 {
-	INT32 lX, lY;
-	INT32 buttons[MAX_BUTTONS];
+	int32_t lX, lY;
+	int32_t buttons[MAX_BUTTONS];
 };
 
 
@@ -39,10 +37,10 @@ struct mouse_state
 struct joystick_state
 {
 	SDL_Joystick *device;
-	INT32 axes[MAX_AXES];
-	INT32 buttons[MAX_BUTTONS];
-	INT32 hatsU[MAX_HATS], hatsD[MAX_HATS], hatsL[MAX_HATS], hatsR[MAX_HATS];
-	INT32 balls[MAX_AXES];
+	int32_t axes[MAX_AXES];
+	int32_t buttons[MAX_BUTTONS];
+	int32_t hatsU[MAX_HATS], hatsD[MAX_HATS], hatsL[MAX_HATS], hatsR[MAX_HATS];
+	int32_t balls[MAX_AXES];
 };
 
 struct device_map_t
@@ -96,17 +94,18 @@ public:
 	{
 		std::lock_guard<std::mutex> scope_lock(m_lock);
 
-		// Loop over the entries and find ones that match our subscriber
-		std::vector<typename std::unordered_multimap<int, TSubscriber*>::iterator> remove;
-		for (auto iter = m_subscription_index.begin(); iter != m_subscription_index.end(); ++iter)
+		// Remove the events that match the subscriber
+		for (auto it = begin(m_subscription_index); it != end(m_subscription_index);)
 		{
-			if (iter->second == subscriber)
-				remove.push_back(iter);
+			if (it->second == subscriber)
+			{
+				it = m_subscription_index.erase(it);
+			}
+			else
+			{
+				++it;
+			}
 		}
-
-		// remove those that matched
-		for (int i = 0; i < remove.size(); i++)
-			m_subscription_index.erase(remove[i]);
 	}
 
 	virtual void process_events(running_machine &machine) = 0;
@@ -117,14 +116,14 @@ class sdl_window_info;
 class sdl_event_manager : public event_manager_t<sdl_event_subscriber>
 {
 private:
-	bool                  m_mouse_over_window;
-	bool                  m_has_focus;
+	bool                                 m_mouse_over_window;
+	bool                                 m_has_focus;
 	std::shared_ptr<sdl_window_info>     m_focus_window;
 
 	sdl_event_manager()
 		: m_mouse_over_window(true),
-			m_has_focus(true),
-			m_focus_window(nullptr)
+		  m_has_focus(true),
+		  m_focus_window(nullptr)
 	{
 	}
 
@@ -148,17 +147,6 @@ private:
 //============================================================
 //  INLINE FUNCTIONS
 //============================================================
-
-static inline int devmap_leastfree(device_map_t *devmap)
-{
-	int i;
-	for (i = 0; i < MAX_DEVMAP_ENTRIES; i++)
-	{
-		if (devmap->map[i].name.length() == 0)
-			return i;
-	}
-	return -1;
-}
 
 static inline std::string remove_spaces(const char *s)
 {
@@ -185,6 +173,7 @@ static inline void devmap_init(running_machine &machine, device_map_t *devmap, c
 	// Initialize the map to default uninitialized values
 	for (dev = 0; dev < MAX_DEVMAP_ENTRIES; dev++)
 	{
+		devmap->map[dev].name.clear();
 		devmap->map[dev].physical = -1;
 		devmap->logical[dev] = -1;
 	}

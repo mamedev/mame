@@ -497,7 +497,7 @@ static HRESULT Archive_GetArcProp_UInt(IInArchive *arc, PROPID propid, UInt64 &r
   switch (prop.vt)
   {
     case VT_UI4: result = prop.ulVal; defined = true; break;
-    case VT_I4: result = prop.lVal; defined = true; break;
+    case VT_I4: result = (Int64)prop.lVal; defined = true; break;
     case VT_UI8: result = (UInt64)prop.uhVal.QuadPart; defined = true; break;
     case VT_I8: result = (UInt64)prop.hVal.QuadPart; defined = true; break;
     case VT_EMPTY: break;
@@ -582,9 +582,9 @@ HRESULT CArc::GetItemPathToParent(UInt32 index, UInt32 parent, UStringVector &pa
     if (prevWasAltStream)
     {
       {
-        UString &s = parts[parts.Size() - 2];
-        s += L':';
-        s += parts.Back();
+        UString &s2 = parts[parts.Size() - 2];
+        s2 += L':';
+        s2 += parts.Back();
       }
       parts.DeleteBack();
     }
@@ -864,7 +864,7 @@ HRESULT CArc::GetItem(UInt32 index, CReadArcItem &item) const
     {
       item.MainPath.DeleteFrom(colon);
       item.AltStreamName = item.Path.Ptr(colon + 1);
-      item.MainIsDir = (colon == 0 || IsPathSepar(item.Path[colon - 1]));
+      item.MainIsDir = (colon == 0 || IsPathSepar(item.Path[(unsigned)colon - 1]));
       item.IsAltStream = true;
     }
   }
@@ -2015,7 +2015,6 @@ HRESULT CArc::OpenStream2(const COpenOptions &op)
       const CArcInfoEx &ai = op.codecs->Formats[formatIndex];
       if (ai.FindExtension(extension) >= 0)
       {
-        const CArcInfoEx &ai = op.codecs->Formats[formatIndex];
         if (ai.Flags_FindSignature() && searchMarkerInHandler)
           return S_FALSE;
       }
@@ -3467,6 +3466,8 @@ static bool ParseTypeParams(const UString &s, COpenType &type)
 bool ParseType(CCodecs &codecs, const UString &s, COpenType &type)
 {
   int pos2 = s.Find(L':');
+
+  {
   UString name;
   if (pos2 < 0)
   {
@@ -3501,13 +3502,15 @@ bool ParseType(CCodecs &codecs, const UString &s, COpenType &type)
   }
   
   type.FormatIndex = index;
+
+  }
  
   for (unsigned i = pos2; i < s.Len();)
   {
     int next = s.Find(L':', i);
     if (next < 0)
       next = s.Len();
-    UString name = s.Mid(i, next - i);
+    const UString name = s.Mid(i, next - i);
     if (name.IsEmpty())
       return false;
     if (!ParseTypeParams(name, type))

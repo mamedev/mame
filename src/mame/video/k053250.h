@@ -1,13 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#ifndef __K053250_H__
-#define __K053250_H__
+#ifndef MAME_VIDEO_K053250_H
+#define MAME_VIDEO_K053250_H
+
+#pragma once
 
 //
 //  Konami 053250 road generator
 //
 
-#include "emu.h"
 
 #define MCFG_K053250_ADD(_tag, _palette_tag, _screen_tag, offx, offy)  \
 	MCFG_DEVICE_ADD(_tag, K053250, 0) \
@@ -20,7 +21,7 @@ class k053250_device :  public device_t,
 						public device_video_interface
 {
 public:
-	k053250_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	k053250_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	static void static_set_offsets(device_t &device, int offx, int offy);
 
@@ -42,22 +43,22 @@ private:
 	int m_offx, m_offy;
 
 	// internal state
-	required_region_ptr<UINT8> m_rom;
-	dynamic_buffer m_unpacked_rom;
-	std::vector<UINT16> m_ram;
-	UINT16 *m_buffer[2];
-	UINT8 m_regs[8];
-	UINT8 m_page;
-	INT32 m_frame;
+	required_region_ptr<uint8_t> m_rom;
+	std::vector<uint8_t> m_unpacked_rom;
+	std::vector<uint16_t> m_ram;
+	uint16_t *m_buffer[2];
+	uint8_t m_regs[8];
+	uint8_t m_page;
+	int32_t m_frame;
 
 	// internal helpers
 	void unpack_nibbles();
 	void dma(int limiter);
-	static void pdraw_scanline32(bitmap_rgb32 &bitmap, const pen_t *pal_base, UINT8 *source,
+	static void pdraw_scanline32(bitmap_rgb32 &bitmap, const pen_t *pal_base, uint8_t *source,
 									const rectangle &cliprect, int linepos, int scroll, int zoom,
-									UINT32 clipmask, UINT32 wrapmask, UINT32 orientation, bitmap_ind8 &priority, UINT8 pri);
+									uint32_t clipmask, uint32_t wrapmask, uint32_t orientation, bitmap_ind8 &priority, uint8_t pri);
 };
 
-extern const device_type K053250;
+DECLARE_DEVICE_TYPE(K053250, k053250_device)
 
-#endif
+#endif // MAME_VIDEO_K053250_H

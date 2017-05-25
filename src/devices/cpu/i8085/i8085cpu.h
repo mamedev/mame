@@ -66,11 +66,11 @@
 /* logical */
 #define M_ORA(R) m_AF.b.h|=R; m_AF.b.l=ZSP[m_AF.b.h]
 #define M_XRA(R) m_AF.b.h^=R; m_AF.b.l=ZSP[m_AF.b.h]
-#define M_ANA(R) {UINT8 hc = ((m_AF.b.h | R)<<1) & HF; m_AF.b.h&=R; m_AF.b.l=ZSP[m_AF.b.h]; if(IS_8085()) { m_AF.b.l |= HF; } else {m_AF.b.l |= hc; } }
+#define M_ANA(R) {uint8_t hc = ((m_AF.b.h | R)<<1) & HF; m_AF.b.h&=R; m_AF.b.l=ZSP[m_AF.b.h]; if(IS_8085()) { m_AF.b.l |= HF; } else {m_AF.b.l |= hc; } }
 
 /* increase / decrease */
-#define M_INR(R) {UINT8 hc = ((R & 0x0f) == 0x0f) ? HF : 0; ++R; m_AF.b.l= (m_AF.b.l & CF ) | ZSP[R] | hc; }
-#define M_DCR(R) {UINT8 hc = ((R & 0x0f) != 0x00) ? HF : 0; --R; m_AF.b.l= (m_AF.b.l & CF ) | ZSP[R] | hc | VF; }
+#define M_INR(R) {uint8_t hc = ((R & 0x0f) == 0x0f) ? HF : 0; ++R; m_AF.b.l= (m_AF.b.l & CF ) | ZSP[R] | hc; }
+#define M_DCR(R) {uint8_t hc = ((R & 0x0f) != 0x00) ? HF : 0; --R; m_AF.b.l= (m_AF.b.l & CF ) | ZSP[R] | hc | VF; }
 
 /* arithmetic */
 #define M_ADD(R) { \
@@ -124,24 +124,24 @@
 
 /* i/o */
 #define M_IN \
-	m_STATUS = 0x42; \
+	set_status(0x42); \
 	m_WZ.d=ARG(); \
 	m_AF.b.h=m_io->read_byte(m_WZ.d);
 
 #define M_OUT \
-	m_STATUS = 0x10; \
+	set_status(0x10); \
 	m_WZ.d=ARG(); \
 	m_io->write_byte(m_WZ.d,m_AF.b.h)
 
 /* stack */
 #define M_PUSH(R) { \
-	m_STATUS = 0x04; \
+	set_status(0x04); \
 	m_program->write_byte(--m_SP.w.l, m_##R.b.h); \
 	m_program->write_byte(--m_SP.w.l, m_##R.b.l); \
 }
 
 #define M_POP(R) { \
-	m_STATUS = 0x86; \
+	set_status(0x86); \
 	m_##R.b.l = m_program->read_byte(m_SP.w.l++); \
 	m_##R.b.h = m_program->read_byte(m_SP.w.l++); \
 }
@@ -162,7 +162,7 @@
 { \
 	if (cc) \
 	{ \
-		UINT16 a = ARG16(); \
+		uint16_t a = ARG16(); \
 		m_icount -= (IS_8085()) ? 7 : 6 ; \
 		M_PUSH(PC); \
 		m_PC.d = a; \

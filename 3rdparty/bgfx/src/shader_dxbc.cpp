@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -730,21 +730,21 @@ namespace bgfx
 		}
 
 		uint32_t last[16];
-		memset(last, 0, sizeof(last) );
+		bx::memSet(last, 0, sizeof(last) );
 
 		const uint32_t remaining = _size & 0x3f;
 
 		if (remaining >= 56)
 		{
-			memcpy(&last[0], data, remaining);
+			bx::memCopy(&last[0], data, remaining);
 			last[remaining/4] = 0x80;
 			dxbcHashBlock(last, hash);
 
-			memset(&last[1], 0, 56);
+			bx::memSet(&last[1], 0, 56);
 		}
 		else
 		{
-			memcpy(&last[1], data, remaining);
+			bx::memCopy(&last[1], data, remaining);
 			last[1 + remaining/4] = 0x80;
 		}
 
@@ -752,7 +752,7 @@ namespace bgfx
 		last[15] = _size * 2 + 1;
 		dxbcHashBlock(last, hash);
 
-		memcpy(_digest, hash, 16);
+		bx::memCopy(_digest, hash, 16);
 	}
 
 	int32_t read(bx::ReaderI* _reader, DxbcSubOperand& _subOperand, bx::Error* _err)
@@ -1000,7 +1000,7 @@ namespace bgfx
 			break;
 		}
 
-		for (uint32_t ii = 0; ii < _operand.numAddrModes; ++ii)
+		for (uint32_t ii = 0, num = bx::uint32_min(_operand.numAddrModes, BX_COUNTOF(_operand.addrMode) ); ii < num; ++ii)
 		{
 			switch (_operand.addrMode[ii])
 			{
@@ -1526,7 +1526,7 @@ namespace bgfx
 									);
 			}
 
-			for (uint32_t jj = first; jj < operand.numAddrModes; ++jj)
+			for (uint32_t jj = first, num = bx::uint32_min(operand.numAddrModes, BX_COUNTOF(operand.addrMode) ); jj < num; ++jj)
 			{
 				switch (operand.addrMode[jj])
 				{
@@ -1928,7 +1928,7 @@ namespace bgfx
 		uint8_t* data = (uint8_t*)mb.more();
 		uint32_t size = uint32_t(bx::getSize(&writer) );
 		_dst.byteCode.reserve(size);
-		memcpy(_dst.byteCode.data(), data, size);
+		bx::memCopy(_dst.byteCode.data(), data, size);
 	}
 
 } // namespace bgfx

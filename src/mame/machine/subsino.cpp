@@ -11,14 +11,14 @@ by David Haywood
 
 // XORs:
 
-extern const UINT8 crsbingo_xors[8] = { 0xbb, 0xcc, 0xcc, 0xdd, 0xaa, 0x11, 0x44, 0xee };
-extern const UINT8 sharkpy_xors [8] = { 0xcc, 0xaa, 0x66, 0xaa, 0xee, 0x33, 0xff, 0xff };
-extern const UINT8 victor5_xors [8] = { 0x99, 0x99, 0x33, 0x44, 0xbb, 0x88, 0x88, 0xbb };
-extern const UINT8 victor21_xors[8] = { 0x44, 0xbb, 0x66, 0x44, 0xaa, 0x55, 0x88, 0x22 };
+extern const uint8_t crsbingo_xors[8] = { 0xbb, 0xcc, 0xcc, 0xdd, 0xaa, 0x11, 0x44, 0xee };
+extern const uint8_t sharkpy_xors [8] = { 0xcc, 0xaa, 0x66, 0xaa, 0xee, 0x33, 0xff, 0xff };
+extern const uint8_t victor5_xors [8] = { 0x99, 0x99, 0x33, 0x44, 0xbb, 0x88, 0x88, 0xbb };
+extern const uint8_t victor21_xors[8] = { 0x44, 0xbb, 0x66, 0x44, 0xaa, 0x55, 0x88, 0x22 };
 
 // Bitswaps:
 
-void crsbingo_bitswaps(UINT8 *decrypt, int i)
+void crsbingo_bitswaps(uint8_t *decrypt, int i)
 {
 	if ((i&7) == 0) decrypt[i] = BITSWAP8(decrypt[i], 7,2,5,4,3,6,1,0 );
 	if ((i&7) == 1) decrypt[i] = BITSWAP8(decrypt[i], 7,2,1,0,3,6,5,4 );
@@ -30,7 +30,7 @@ void crsbingo_bitswaps(UINT8 *decrypt, int i)
 	if ((i&7) == 7) decrypt[i] = BITSWAP8(decrypt[i], 3,2,1,0,7,6,5,4 );
 }
 
-void sharkpy_bitswaps(UINT8 *decrypt, int i)
+void sharkpy_bitswaps(uint8_t *decrypt, int i)
 {
 	if ((i&7) == 0) decrypt[i] = BITSWAP8(decrypt[i], 3,2,1,0,7,6,5,4 );
 	if ((i&7) == 1) decrypt[i] = BITSWAP8(decrypt[i], 7,2,5,4,3,6,1,0 );
@@ -42,7 +42,7 @@ void sharkpy_bitswaps(UINT8 *decrypt, int i)
 	if ((i&7) == 7) decrypt[i] = BITSWAP8(decrypt[i], 3,6,1,4,7,2,5,0 );
 }
 
-void victor5_bitswaps(UINT8 *decrypt, int i)
+void victor5_bitswaps(uint8_t *decrypt, int i)
 {
 	if ((i&7) == 0) decrypt[i] = BITSWAP8(decrypt[i], 7,2,5,4,3,6,1,0 );
 	if ((i&7) == 1) decrypt[i] = BITSWAP8(decrypt[i], 7,6,5,0,3,2,1,4 );
@@ -54,7 +54,7 @@ void victor5_bitswaps(UINT8 *decrypt, int i)
 	if ((i&7) == 7) decrypt[i] = BITSWAP8(decrypt[i], 7,2,1,4,3,6,5,0 );
 }
 
-void victor21_bitswaps(UINT8 *decrypt, int i)
+void victor21_bitswaps(uint8_t *decrypt, int i)
 {
 	if ((i&7) == 0) decrypt[i] = BITSWAP8(decrypt[i], 7,2,1,0,3,6,5,4 );
 	if ((i&7) == 1) decrypt[i] = BITSWAP8(decrypt[i], 3,6,1,4,7,2,5,0 );
@@ -69,7 +69,7 @@ void victor21_bitswaps(UINT8 *decrypt, int i)
 // Decrypt:
 
 #if 0
-void dump_decrypted(running_machine& machine, UINT8* decrypt)
+void dump_decrypted(running_machine& machine, uint8_t* decrypt)
 {
 	FILE *fp;
 	char filename[256];
@@ -83,11 +83,11 @@ void dump_decrypted(running_machine& machine, UINT8* decrypt)
 }
 #endif
 
-void subsino_decrypt(running_machine& machine, void (*bitswaps)(UINT8 *decrypt, int i), const UINT8 *xors, int size)
+void subsino_decrypt(running_machine& machine, void (*bitswaps)(uint8_t *decrypt, int i), const uint8_t *xors, int size)
 {
 	int i;
-	std::unique_ptr<UINT8[]> decrypt = std::make_unique<UINT8[]>(0x10000);
-	UINT8* region = machine.root_device().memregion("maincpu")->base();
+	std::unique_ptr<uint8_t[]> decrypt = std::make_unique<uint8_t[]>(0x10000);
+	uint8_t* region = machine.root_device().memregion("maincpu")->base();
 
 	for (i=0;i<0x10000;i++)
 	{

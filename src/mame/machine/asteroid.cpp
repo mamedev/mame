@@ -122,8 +122,8 @@ void asteroid_state::machine_start()
 	/* configure RAM banks if present (not on llander) */
 	if (m_ram1.target() != nullptr)
 	{
-		UINT8 *ram1 = reinterpret_cast<UINT8 *>(memshare("ram1")->ptr());
-		UINT8 *ram2 = reinterpret_cast<UINT8 *>(memshare("ram2")->ptr());
+		uint8_t *ram1 = reinterpret_cast<uint8_t *>(memshare("ram1")->ptr());
+		uint8_t *ram2 = reinterpret_cast<uint8_t *>(memshare("ram2")->ptr());
 
 		/* swapped */
 		m_ram1->configure_entry(1, ram2);

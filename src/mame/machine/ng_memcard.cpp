@@ -10,32 +10,21 @@
 
 #include "emu.h"
 #include "emuopts.h"
+
 #include "ng_memcard.h"
 
+
 // device type definition
-const device_type NG_MEMCARD = &device_creator<ng_memcard_device>;
+DEFINE_DEVICE_TYPE(NG_MEMCARD, ng_memcard_device, "ng_memcard", "NeoGeo Memory Card")
 
 //-------------------------------------------------
 //  ng_memcard_device - constructor
 //-------------------------------------------------
 
-ng_memcard_device::ng_memcard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, NG_MEMCARD, "NeoGeo Memory Card", tag, owner, clock, "ng_memcard", __FILE__),
-		device_image_interface(mconfig, *this)
+ng_memcard_device::ng_memcard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, NG_MEMCARD, tag, owner, clock)
+	, device_image_interface(mconfig, *this)
 {
-}
-
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void ng_memcard_device::device_config_complete()
-{
-	// set brief and instance name
-	update_names();
 }
 
 
@@ -53,17 +42,17 @@ void ng_memcard_device::device_start()
     with the given index
 -------------------------------------------------*/
 
-bool ng_memcard_device::call_load()
+image_init_result ng_memcard_device::call_load()
 {
 	if(length() != 0x800)
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 
 	fseek(0, SEEK_SET);
 	size_t ret = fread(m_memcard_data, 0x800);
 	if(ret != 0x800)
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 void ng_memcard_device::call_unload()
@@ -72,15 +61,15 @@ void ng_memcard_device::call_unload()
 	fwrite(m_memcard_data, 0x800);
 }
 
-bool ng_memcard_device::call_create(int format_type, option_resolution *format_options)
+image_init_result ng_memcard_device::call_create(int format_type, util::option_resolution *format_options)
 {
 	memset(m_memcard_data, 0, 0x800);
 
 	size_t ret = fwrite(m_memcard_data, 0x800);
 	if(ret != 0x800)
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 

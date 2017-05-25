@@ -51,7 +51,7 @@ public:
 	DECLARE_WRITE8_MEMBER( ppi_pb_w );
 
 	int m_ls145_p;
-	UINT8 m_segment;
+	uint8_t m_segment;
 
 	// timers
 	emu_timer *m_led_refresh_timer;
@@ -206,7 +206,7 @@ void amico2k_state::machine_start()
 	save_item(NAME(m_segment));
 }
 
-static MACHINE_CONFIG_START( amico2k, amico2k_state )
+static MACHINE_CONFIG_START( amico2k )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 1000000) /* 1MHz */
 	MCFG_CPU_PROGRAM_MAP(amico2k_mem)
@@ -237,5 +237,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME      PARENT  COMPAT MACHINE     INPUT       INIT     COMPANY   FULLNAME         FLAGS */
-COMP( 1978, amico2k,  0,      0,     amico2k,    amico2k, driver_device,    0,     "A.S.E.L.", "Amico 2000", MACHINE_NO_SOUND_HW)
+//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT    STATE          INIT   COMPANY     FULLNAME      FLAGS
+COMP( 1978, amico2k,  0,      0,      amico2k, amico2k, amico2k_state, 0,     "A.S.E.L.", "Amico 2000", MACHINE_NO_SOUND_HW)

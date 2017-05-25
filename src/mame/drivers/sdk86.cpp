@@ -26,6 +26,7 @@ ToDo:
 
 ****************************************************************************/
 
+#include "emu.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/i86/i86.h"
 #include "machine/clock.h"
@@ -56,7 +57,7 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( write_usart_clock );
 
-	UINT8 m_digit;
+	uint8_t m_digit;
 };
 
 static ADDRESS_MAP_START(sdk86_mem, AS_PROGRAM, 16, sdk86_state)
@@ -68,8 +69,7 @@ static ADDRESS_MAP_START(sdk86_io, AS_IO, 16, sdk86_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0xfff0, 0xfff1) AM_MIRROR(4) AM_DEVREADWRITE8(I8251_TAG, i8251_device, data_r, data_w, 0xff)
 	AM_RANGE(0xfff2, 0xfff3) AM_MIRROR(4) AM_DEVREADWRITE8(I8251_TAG, i8251_device, status_r, control_w, 0xff)
-	AM_RANGE(0xffe8, 0xffe9) AM_MIRROR(4) AM_DEVREADWRITE8("i8279", i8279_device, data_r, data_w, 0xff)
-	AM_RANGE(0xffea, 0xffeb) AM_MIRROR(4) AM_DEVREADWRITE8("i8279", i8279_device, status_r, cmd_w, 0xff)
+	AM_RANGE(0xffe8, 0xffeb) AM_MIRROR(4) AM_DEVREADWRITE8("i8279", i8279_device, read, write, 0xff)
 	// FFF8-FFFF = 2 x 8255A i/o chips. chip 1 uses the odd addresses, chip 2 uses the even addresses.
 	//             ports are A,B,C,control in that order.
 ADDRESS_MAP_END
@@ -120,7 +120,7 @@ WRITE8_MEMBER( sdk86_state::digit_w )
 
 READ8_MEMBER( sdk86_state::kbd_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (m_digit < 3)
 	{
@@ -146,7 +146,7 @@ static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_2 )
 DEVICE_INPUT_DEFAULTS_END
 
-static MACHINE_CONFIG_START( sdk86, sdk86_state )
+static MACHINE_CONFIG_START( sdk86 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8086, XTAL_14_7456MHz/3) /* divided down by i8284 clock generator; jumper selection allows it to be slowed to 2.5MHz, hence changing divider from 3 to 6 */
 	MCFG_CPU_PROGRAM_MAP(sdk86_mem)
@@ -181,15 +181,25 @@ MACHINE_CONFIG_END
 /* ROM definition */
 ROM_START( sdk86 )
 	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF ) // all are Intel D2616 ?eproms with the windows painted over? (factory programmed eproms? this would match the 'i8642' marking on the factory programmed eprom version of the AT keyboard mcu...)
-	// Note that the rom pairs at FE000-FEFFF and FF000-FFFFF are interchangeable; the ones at FF000-FFFFF are the ones which start on bootup, and the other ones live at FE000-FEFFF and can be switched in by the user. One pair is the Serial RS232 Monitor and the other is the Keypad/front panel monitor. On the SDK-86 I (LN) dumped, the Keypad monitor was primary, but the other SDK-86 I know of has the roms in the opposite arrangement (Serial primary).
+	/* Note that the rom pairs at FE000-FEFFF and FF000-FFFFF are
+	   interchangeable; the ones at FF000-FFFFF are the ones which start on
+	   bootup, and the other ones live at FE000-FEFFF and can be switched in by
+	   the user. One pair is the Serial RS232 Monitor and the other is the
+	   Keypad/front panel monitor. On the SDK-86 I (LN) dumped, the Keypad
+	   monitor was primary, but the other SDK-86 I know of has the roms in
+	   the opposite arrangement (Serial primary). */
 	// Keypad Monitor Version 1.1 (says "- 86   1.1" on LED display at startup)
 	ROM_SYSTEM_BIOS( 0, "keypad", "Keypad Monitor" )
+	ROMX_LOAD( "0456_104531-001.a36", 0xfe000, 0x0800, CRC(f9c4a809) SHA1(aea324c3f52dd393f1eed2b856ba11f050a35b93), ROM_SKIP(1) | ROM_BIOS(1) ) /* Label: "iD2616 // T142099WS // (C)INTEL '77 // 0456 // 104531-001" */
+	ROMX_LOAD( "0457_104532-001.a37", 0xfe001, 0x0800, CRC(a245ba5c) SHA1(7f67277f866fca5377cb123e9cc405b5fdfe61d3), ROM_SKIP(1) | ROM_BIOS(1) ) /* Label: "iD2616 // T145054WS // (C)INTEL '77 // 0457 // 104532-001" */
 	ROMX_LOAD( "0169_102042-001.a27", 0xff000, 0x0800, CRC(3f46311a) SHA1(a97e6861b736f26230b9adbf5cd2576a9f60d626), ROM_SKIP(1) | ROM_BIOS(1) ) /* Label: "iD2616 // T142094WS // (C)INTEL '77 // 0169 // 102042-001" */
 	ROMX_LOAD( "0170_102043-001.a30", 0xff001, 0x0800, CRC(65924471) SHA1(5d258695bf585f89179dfa0a113a0eeeabd5ee2b), ROM_SKIP(1) | ROM_BIOS(1) ) /* Label: "iD2616 // T145056WS // (C)INTEL '77 // 0170 // 102043-001" */
 	// Serial Monitor Version 1.2 (says "  86   1.2" on LED display at startup, and sends a data prompt over serial)
 	ROM_SYSTEM_BIOS( 1, "serial", "Serial Monitor" )
-	ROMX_LOAD( "0456_104531-001.a36", 0xff000, 0x0800, CRC(f9c4a809) SHA1(aea324c3f52dd393f1eed2b856ba11f050a35b93), ROM_SKIP(1) | ROM_BIOS(2) ) /* Label: "iD2616 // T142099WS // (C)INTEL '77 // 0456 // 104531-001" */
-	ROMX_LOAD( "0457_104532-001.a37", 0xff001, 0x0800, CRC(a245ba5c) SHA1(7f67277f866fca5377cb123e9cc405b5fdfe61d3), ROM_SKIP(1) | ROM_BIOS(2) ) /* Label: "iD2616 // T145054WS // (C)INTEL '77 // 0457 // 104532-001" */
+	ROMX_LOAD( "0169_102042-001.a36", 0xfe000, 0x0800, CRC(3f46311a) SHA1(a97e6861b736f26230b9adbf5cd2576a9f60d626), ROM_SKIP(1) | ROM_BIOS(2) ) /* Label: "iD2616 // T142094WS // (C)INTEL '77 // 0169 // 102042-001" */
+	ROMX_LOAD( "0170_102043-001.a37", 0xfe001, 0x0800, CRC(65924471) SHA1(5d258695bf585f89179dfa0a113a0eeeabd5ee2b), ROM_SKIP(1) | ROM_BIOS(2) ) /* Label: "iD2616 // T145056WS // (C)INTEL '77 // 0170 // 102043-001" */
+	ROMX_LOAD( "0456_104531-001.a27", 0xff000, 0x0800, CRC(f9c4a809) SHA1(aea324c3f52dd393f1eed2b856ba11f050a35b93), ROM_SKIP(1) | ROM_BIOS(2) ) /* Label: "iD2616 // T142099WS // (C)INTEL '77 // 0456 // 104531-001" */
+	ROMX_LOAD( "0457_104532-001.a30", 0xff001, 0x0800, CRC(a245ba5c) SHA1(7f67277f866fca5377cb123e9cc405b5fdfe61d3), ROM_SKIP(1) | ROM_BIOS(2) ) /* Label: "iD2616 // T145054WS // (C)INTEL '77 // 0457 // 104532-001" */
 
 	/* proms:
 	 * dumped 11/21/09 through 11/29/09 by LN
@@ -208,5 +218,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR   NAME  PARENT  COMPAT   MACHINE    INPUT          STATE  INIT     COMPANY   FULLNAME                FLAGS */
-COMP( 1979, sdk86,      0,      0,    sdk86,   sdk86, driver_device,    0,    "Intel",  "SDK-86", MACHINE_NO_SOUND_HW)
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE        INIT  COMPANY   FULLNAME  FLAGS */
+COMP( 1979, sdk86,  0,      0,      sdk86,   sdk86, sdk86_state, 0,    "Intel",  "SDK-86", MACHINE_NO_SOUND_HW)

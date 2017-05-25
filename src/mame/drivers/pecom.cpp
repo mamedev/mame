@@ -9,12 +9,12 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/cosmac/cosmac.h"
-#include "sound/cdp1869.h"
-#include "sound/wave.h"
-#include "machine/ram.h"
 #include "includes/pecom.h"
+
+#include "sound/wave.h"
 #include "softlist.h"
+#include "speaker.h"
+
 
 /* Address maps */
 static ADDRESS_MAP_START(pecom64_mem, AS_PROGRAM, 8, pecom_state )
@@ -52,7 +52,7 @@ mappings, this is another situation where natural keyboard comes very handy!    
 
 INPUT_CHANGED_MEMBER(pecom_state::ef_w)
 {
-	m_cdp1802->set_input_line((int)(FPTR)param, newval);
+	m_cdp1802->set_input_line((int)(uintptr_t)param, newval);
 }
 
 static INPUT_PORTS_START( pecom )
@@ -168,9 +168,9 @@ static INPUT_PORTS_START( pecom )
 INPUT_PORTS_END
 
 /* Machine driver */
-static MACHINE_CONFIG_START( pecom64, pecom_state )
+static MACHINE_CONFIG_START( pecom64 )
 	/* basic machine hardware */
-	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, CDP1869_DOT_CLK_PAL/3)
+	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, cdp1869_device::DOT_CLK_PAL/3)
 	MCFG_CPU_PROGRAM_MAP(pecom64_mem)
 	MCFG_CPU_IO_MAP(pecom64_io)
 	MCFG_COSMAC_WAIT_CALLBACK(VCC)
@@ -213,6 +213,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME   PARENT  COMPAT       MACHINE     INPUT   INIT   COMPANY  FULLNAME      FLAGS */
-COMP( 1986, pecom32,       0,      0,     pecom64,    pecom, driver_device,   0,     "Ei Nis", "Pecom 32",    0)
-COMP( 1987, pecom64, pecom32,      0,     pecom64,    pecom, driver_device,   0,     "Ei Nis", "Pecom 64",    0)
+/*    YEAR  NAME     PARENT   COMPAT  MACHINE     INPUT  STATE         INIT   COMPANY   FULLNAME     FLAGS */
+COMP( 1986, pecom32, 0,       0,      pecom64,    pecom, pecom_state,  0,     "Ei Nis", "Pecom 32",  0)
+COMP( 1987, pecom64, pecom32, 0,      pecom64,    pecom, pecom_state,  0,     "Ei Nis", "Pecom 64",  0)

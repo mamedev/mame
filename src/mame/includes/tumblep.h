@@ -26,9 +26,9 @@ public:
 	{ }
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_spriteram;
-	required_shared_ptr<UINT16> m_pf1_rowscroll;
-	required_shared_ptr<UINT16> m_pf2_rowscroll;
+	required_shared_ptr<uint16_t> m_spriteram;
+	required_shared_ptr<uint16_t> m_pf1_rowscroll;
+	required_shared_ptr<uint16_t> m_pf2_rowscroll;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -41,5 +41,5 @@ public:
 	DECLARE_READ16_MEMBER(tumblepop_controls_r);
 	DECLARE_DRIVER_INIT(tumblep);
 	virtual void machine_start() override;
-	UINT32 screen_update_tumblep(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_tumblep(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };

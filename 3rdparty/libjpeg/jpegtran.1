@@ -1,4 +1,4 @@
-.TH JPEGTRAN 1 "28 December 2009"
+.TH JPEGTRAN 1 "20 September 2015"
 .SH NAME
 jpegtran \- lossless transformation of JPEG files
 .SH SYNOPSIS
@@ -19,6 +19,10 @@ for example from baseline JPEG to progressive JPEG or vice versa.  It can also
 perform some rearrangements of the image data, for example turning an image
 from landscape to portrait format by rotation.
 .PP
+For EXIF files and JPEG files containing Exif data, you may prefer to use
+.B exiftran
+instead.
+.PP
 .B jpegtran
 works by rearranging the compressed data (DCT coefficients), without
 ever fully decoding the image.  Therefore, its transformations are lossless:
@@ -28,7 +32,11 @@ followed by
 .B cjpeg
 to accomplish the same conversion.  But by the same token,
 .B jpegtran
-cannot perform lossy operations such as changing the image quality.
+cannot perform lossy operations such as changing the image quality.  However,
+while the image data is losslessly transformed, metadata can be removed.  See
+the
+.B \-copy
+option for specifics.
 .PP
 .B jpegtran
 reads the named JPEG/JFIF file, or the standard input if no file is
@@ -156,14 +164,23 @@ image region but losslessly preserves what is inside.  Like the rotate and
 flip transforms, lossless crop is restricted by the current JPEG format: the
 upper left corner of the selected region must fall on an iMCU boundary.  If
 this does not hold for the given crop parameters, we silently move the upper
-left corner up and/or left to make it so, simultaneously increasing the region
-dimensions to keep the lower right crop corner unchanged.  (Thus, the output
-image covers at least the requested region, but may cover more.)
+left corner up and/or left to make it so, simultaneously increasing the
+region dimensions to keep the lower right crop corner unchanged.  (Thus, the
+output image covers at least the requested region, but may cover more.)
+The adjustment of the region dimensions may be optionally disabled by
+attaching an 'f' character ("force") to the width or height number.
 
 The image can be losslessly cropped by giving the switch:
 .TP
 .B \-crop WxH+X+Y
 Crop to a rectangular subarea of width W, height H starting at point X,Y.
+.PP
+A complementary lossless-wipe option is provided to discard (gray out) data
+inside a given image region while losslessly preserving what is outside:
+.TP
+.B \-wipe WxH+X+Y
+Wipe (gray out) a rectangular subarea of width W, height H starting at point
+X,Y.
 .PP
 Other not-strictly-lossless transformation switches are:
 .TP
@@ -198,16 +215,17 @@ such as comment blocks:
 .TP
 .B \-copy none
 Copy no extra markers from source file.  This setting suppresses all
-comments and other excess baggage present in the source file.
+comments and other metadata in the source file.
 .TP
 .B \-copy comments
 Copy only comment markers.  This setting copies comments from the source file,
-but discards any other inessential (for image display) data.
+but discards any other metadata.
 .TP
 .B \-copy all
-Copy all extra markers.  This setting preserves miscellaneous markers
+Copy all extra markers.  This setting preserves metadata
 found in the source file, such as JFIF thumbnails, Exif data, and Photoshop
-settings.  In some files these extra markers can be sizable.
+settings.  In some files these extra markers can be sizable.  Note that this
+option will copy thumbnails as-is; they will not be transformed.
 .IP
 The default behavior is
 .BR "\-copy comments" .

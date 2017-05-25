@@ -17,11 +17,14 @@
     Known games (followed by game ID, some are duplicate):
 
     1943 Kai (65)
+    Adventure Island (64)
     Aero Blaster (32)
     After Burner II (46)
+    Alice in Wonderland (61)
   * Ankoku Densetu (Legendary Axe II)
     Armed-F (?)
     Ballistix (186)
+    Barunba (39)
   * Batman
     Be Ball (93)
   * Blodia
@@ -41,11 +44,13 @@
     Doraemon Meikyuu Daisakusen (20)
   * Doraemon II
     Down Load (43)
-  * Dragon Egg!
+    Dragon Egg! (137)
     Dragon Saber (65)
     Dragon Spirit (?)
+    Drop Rock Hora Hora (12)
     Dungeon Explorer (?)
   * F1 Triple Battle
+    Fighting Run (195)
     Final Blaster (29)
     Final Lap Twin (79)
     Final Match Tennis (62)
@@ -54,15 +59,19 @@
     Gunhed (148)
     Hana Taka Daka (Super Long Nose Goblin) (6)
   * Hatris
+    Image Fight (99)
     Jackie Chan (54)
     Jinmu Densho (19)
+    Kato & Ken (42)
     Kiki Kaikai (120)
     Legend Of Hero Tomna (56)
-    Makyo Densetsu - The Legenary Axe (?)
+    Makyo Densetsu - The Legenary Axe (40)
+    Mesopotamia (197)
     Mizubaku Daibouken Liquid Kids (10) (marketed as "Parasol Stars II")
     Mr. Heli (23)
     Ninja Ryukenden (10)
     Operation Wolf (26)
+    Ordyne (94)
     Out Run (38)
     Override (53)
     Pac-Land (16)
@@ -74,11 +83,12 @@
     Power Eleven (83)
   * Power Golf
     Power League IV (?)
-  * Power Sports
+    Power Sports (199)
+    Power Tennis (183)
     Pro Yakyuu World Stadium '91 (192)
     Psycho Chaser (14)
     Puzzle Boy (57)
-  * Puzznic
+    Puzznic (69)
     R-Type II (61)
   * Rabio Lepus Special
     Raiden (111)
@@ -88,18 +98,21 @@
     Shinobi (5)
     Side Arms (2)
     Skweek (89)
-  * Soldier Blade
+    Sokoban World (66)
+    Soldier Blade (23)
     Son Son II (80)
     Special Criminal Investigation (58)
+    Spin Pair (50)
     Super Star Soldier (42)
-    Super Volley ball (?)
+    Super Volley ball (9)
     Tatsujin (31)
     Terra Cresta II (27)
-    Thunder Blade (?)
+    The NewZealand Story (11)
+    Thunder Blade (34)
   * Tiger Road
   * Titan
     Toy Shop Boys (51)
-  * Tricky
+    Tricky (42)
   * TV Sports
     USA Pro Basketball (?)
     Veigues (40)
@@ -270,25 +283,31 @@ http://blog.system11.org/?p=1943
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/i8085/i8085.h"
 #include "machine/pcecommn.h"
+
+#include "cpu/h6280/h6280.h"
+#include "cpu/i8085/i8085.h"
 #include "video/huc6260.h"
 #include "video/huc6270.h"
-#include "cpu/h6280/h6280.h"
 #include "sound/c6280.h"
 #include "machine/i8155.h"
-#include "softlist.h"
+
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+
+#include "screen.h"
+#include "softlist.h"
+#include "speaker.h"
+
 
 class tourvision_state : public pce_common_state
 {
 public:
 	tourvision_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pce_common_state(mconfig, type, tag),
-		m_subcpu(*this, "subcpu"),
-		m_cart(*this, "cartslot")
-		{ }
+		: pce_common_state(mconfig, type, tag)
+		, m_subcpu(*this, "subcpu")
+		, m_cart(*this, "cartslot")
+	{ }
 
 	DECLARE_WRITE8_MEMBER(tourvision_8085_d000_w);
 	DECLARE_WRITE8_MEMBER(tourvision_i8155_a_w);
@@ -297,7 +316,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(tourvision_timer_out);
 	required_device<cpu_device> m_subcpu;
 	required_device<generic_slot_device> m_cart;
-	UINT32  m_rom_size;
+	uint32_t  m_rom_size;
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(tourvision_cart);
 };
@@ -308,8 +327,8 @@ DEVICE_IMAGE_LOAD_MEMBER( tourvision_state, tourvision_cart )
 	m_cart->rom_alloc(m_rom_size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), m_rom_size, "rom");
 
-	UINT8* rgn = memregion("maincpu")->base();
-	UINT8* base = m_cart->get_rom_base();
+	uint8_t* rgn = memregion("maincpu")->base();
+	uint8_t* base = m_cart->get_rom_base();
 
 	if (m_rom_size == 0x0c0000)
 	{
@@ -344,7 +363,7 @@ DEVICE_IMAGE_LOAD_MEMBER( tourvision_state, tourvision_cart )
 	}
 #endif
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 /* note from system11 - this system actually supports 2 players */
@@ -479,7 +498,7 @@ WRITE_LINE_MEMBER(tourvision_state::tourvision_timer_out)
 }
 
 
-static MACHINE_CONFIG_START( tourvision, tourvision_state )
+static MACHINE_CONFIG_START( tourvision )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", H6280, PCE_MAIN_CLOCK/3)
 	MCFG_CPU_PROGRAM_MAP(pce_mem)
@@ -491,7 +510,7 @@ static MACHINE_CONFIG_START( tourvision, tourvision_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PCE_MAIN_CLOCK, HUC6260_WPF, 64, 64 + 1024 + 64, HUC6260_LPF, 18, 18 + 242)
+	MCFG_SCREEN_RAW_PARAMS(PCE_MAIN_CLOCK, huc6260_device::WPF, 64, 64 + 1024 + 64, huc6260_device::LPF, 18, 18 + 242)
 	MCFG_SCREEN_UPDATE_DRIVER( pce_common_state, screen_update )
 	MCFG_SCREEN_PALETTE("huc6260:palette")
 
@@ -549,4 +568,4 @@ ROM_START(tourvis)
 ROM_END
 
 
-GAME( 19??, tourvis,  0,       tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision)",                                      "Tourvision PCE bootleg", MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING )
+GAME( 19??, tourvis,  0,       tourvision, tourvision, tourvision_state, pce_common, ROT0, "bootleg (Tourvision)",                                      "Tourvision PCE bootleg", MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING )

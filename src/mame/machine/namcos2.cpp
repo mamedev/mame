@@ -23,9 +23,9 @@ void (*namcos2_kickstart)(running_machine &machine, int internal);
 
 READ16_MEMBER( namcos2_state::namcos2_finallap_prot_r )
 {
-	static const UINT16 table0[8] = { 0x0000,0x0040,0x0440,0x2440,0x2480,0xa080,0x8081,0x8041 };
-	static const UINT16 table1[8] = { 0x0040,0x0060,0x0060,0x0860,0x0864,0x08e4,0x08e5,0x08a5 };
-	UINT16 data;
+	static const uint16_t table0[8] = { 0x0000,0x0040,0x0440,0x2440,0x2480,0xa080,0x8081,0x8041 };
+	static const uint16_t table1[8] = { 0x0040,0x0060,0x0060,0x0860,0x0864,0x08e4,0x08e5,0x08a5 };
+	uint16_t data;
 
 	switch( offset )
 	{
@@ -71,6 +71,44 @@ READ16_MEMBER( namcos2_state::namcos2_finallap_prot_r )
 
 #define m_eeprom_size 0x2000
 
+WRITE8_MEMBER(namcos2_shared_state::sound_reset_w)
+{
+	address_space &masterspace = m_maincpu->space(AS_PROGRAM);
+
+	if (data & 0x01)
+	{
+		/* Resume execution */
+		m_audiocpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+		masterspace.device().execute().yield();
+	}
+	else
+	{
+		/* Suspend execution */
+		m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	}
+
+	if (namcos2_kickstart != nullptr)
+	{
+		//printf( "dspkick=0x%x\n", data );
+		if (data & 0x04)
+		{
+			(*namcos2_kickstart)(space.machine(), 1);
+		}
+	}
+}
+
+// TODO:
+WRITE8_MEMBER(namcos2_shared_state::system_reset_w)
+{
+	reset_all_subcpus(data & 1 ? CLEAR_LINE : ASSERT_LINE);
+
+	if (data & 0x01)
+	{
+		address_space &masterspace = m_maincpu->space(AS_PROGRAM);
+		masterspace.device().execute().yield();
+	}
+}
+
 void namcos2_shared_state::reset_all_subcpus(int state)
 {
 	m_slave->set_input_line(INPUT_LINE_RESET, state);
@@ -102,9 +140,8 @@ void namcos2_shared_state::reset_all_subcpus(int state)
 MACHINE_START_MEMBER(namcos2_shared_state,namcos2)
 {
 	namcos2_kickstart = nullptr;
-	m_eeprom = std::make_unique<UINT8[]>(m_eeprom_size);
+	m_eeprom = std::make_unique<uint8_t[]>(m_eeprom_size);
 	machine().device<nvram_device>("nvram")->set_base(m_eeprom.get(), m_eeprom_size);
-	m_posirq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(namcos2_shared_state::namcos2_posirq_tick),this));
 }
 
 MACHINE_RESET_MEMBER(namcos2_shared_state, namcos2)
@@ -124,12 +161,6 @@ MACHINE_RESET_MEMBER(namcos2_shared_state, namcos2)
 	/* Place CPU2 & CPU3 into the reset condition */
 	reset_all_subcpus(ASSERT_LINE);
 
-	/* Initialise interrupt handlers */
-	init_c148();
-
-	/* reset POSIRQ timer */
-	m_posirq_timer->adjust(attotime::never);
-
 	m_player_mux = 0;
 }
 
@@ -145,40 +176,6 @@ WRITE8_MEMBER( namcos2_shared_state::namcos2_68k_eeprom_w )
 READ8_MEMBER( namcos2_shared_state::namcos2_68k_eeprom_r )
 {
 	return m_eeprom[offset];
-}
-
-
-
-/**************************************************************/
-/* 68000 Shared serial communications processor (CPU5?)       */
-/**************************************************************/
-
-READ16_MEMBER( namcos2_state::serial_comms_ram_r ){
-	return m_serial_comms_ram[offset];
-}
-
-WRITE16_MEMBER( namcos2_state::serial_comms_ram_w ){
-	COMBINE_DATA( &m_serial_comms_ram[offset] );
-}
-
-READ16_MEMBER( namcos2_state::serial_comms_ctrl_r )
-{
-	UINT16 retval = m_serial_comms_ctrl[offset];
-
-	switch(offset){
-	case 0x00:
-		retval |= 0x0004;   /* Set READY? status bit */
-		break;
-
-	default:
-		break;
-	}
-	return retval;
-}
-
-WRITE16_MEMBER( namcos2_state::serial_comms_ctrl_w )
-{
-	COMBINE_DATA( &m_serial_comms_ctrl[offset] );
 }
 
 /*************************************************************/
@@ -435,252 +432,6 @@ bool namcos2_shared_state::is_system21()
 	}
 }
 
-void namcos2_shared_state::init_c148()
-{
-	for(int loop = 0; loop < 0x20; loop++)
-	{
-		m_68k_master_C148[loop] = 0;
-		m_68k_slave_C148[loop] = 0;
-		m_68k_gpu_C148[loop] = 0;
-	}
-}
-
-UINT16 namcos2_shared_state::readwrite_c148( address_space &space, offs_t offset, UINT16 data, int bWrite )
-{
-	offs_t addr = ((offset * 2) + 0x1c0000) & 0x1fe000;
-	device_t *altcpu = nullptr;
-	UINT16 *pC148Reg = nullptr;
-	UINT16 *pC148RegAlt = nullptr;
-	UINT16 result = 0;
-
-	if (&space.device() == m_maincpu)
-	{
-		pC148Reg = m_68k_master_C148;
-		altcpu = m_slave;
-		pC148RegAlt = m_68k_slave_C148;
-	}
-	else if (&space.device() == m_slave)
-	{
-		pC148Reg = m_68k_slave_C148;
-		altcpu = m_maincpu;
-		pC148RegAlt = m_68k_master_C148;
-	}
-	else if (&space.device() == m_gpu)
-	{
-		pC148Reg = m_68k_gpu_C148;
-		altcpu = m_maincpu;
-		pC148RegAlt = m_68k_master_C148;
-	}
-
-	if( bWrite )
-	{
-		int reg = (addr >> 13) & 0x1f;
-
-		// If writing an IRQ priority register, clear any pending IRQs.
-		// Dirt Fox and Winning Run require this behaviour
-		if (reg < 8)
-			space.device().execute().set_input_line(pC148Reg[reg], CLEAR_LINE);
-
-		pC148Reg[reg] = data & 0x0007;
-	}
-
-	switch(addr)
-	{
-	case 0x1c0000: break; /* ? NAMCOS2_C148_0 */
-	case 0x1c2000: break; /* ? NAMCOS2_C148_1 */
-	case 0x1c4000: break; /* ? NAMCOS2_C148_2 */
-
-	/* IRQ level */
-	case 0x1c6000: break; /* NAMCOS2_C148_CPUIRQ */
-	case 0x1c8000: break; /* NAMCOS2_C148_EXIRQ */
-	case 0x1ca000: break; /* NAMCOS2_C148_POSIRQ */
-	case 0x1cc000: break; /* NAMCOS2_C148_SERIRQ */
-	case 0x1ce000: break; /* NAMCOS2_C148_VBLANKIRQ */
-
-	case 0x1d0000: /* ? NAMCOS2_C148_0 */
-		if( bWrite )
-		{
-			// osd_printf_debug( "cpu(%d) RAM[0x%06x] = 0x%x\n", cpu, addr, data );
-			/* Dubious to assert IRQ for other CPU here, but Starblade seems to rely on it.
-			   It fails to show large polygons otherwise. */
-			altcpu->execute().set_input_line(pC148RegAlt[NAMCOS2_C148_CPUIRQ], ASSERT_LINE);
-		}
-		break;
-
-	case 0x1d2000: break; /* ? NAMCOS2_C148_1 */
-
-	case 0x1d4000: /* ? NAMCOS2_C148_2 */
-		if( bWrite )
-		{
-			// osd_printf_debug( "cpu(%d) RAM[0x%06x] = 0x%x\n", cpu, addr, data );
-			/* Dubious to assert IRQ for other CPU here: Rolling Thunder 2 and Fine Hour break. */
-			// altcpu->execute().set_input_line(pC148RegAlt[NAMCOS2_C148_CPUIRQ], ASSERT_LINE);
-		}
-		break;
-
-
-	/* IRQ ack */
-	case 0x1d6000: /* NAMCOS2_C148_CPUIRQ */
-		// if( bWrite ) osd_printf_debug( "cpu(%d) RAM[0x%06x] = 0x%x\n", cpu, addr, data );
-		space.device().execute().set_input_line(pC148Reg[NAMCOS2_C148_CPUIRQ], CLEAR_LINE);
-		break;
-
-	case 0x1d8000: /* NAMCOS2_C148_EXIRQ */
-		// if( bWrite ) osd_printf_debug( "cpu(%d) RAM[0x%06x] = 0x%x\n", cpu, addr, data );
-		space.device().execute().set_input_line(pC148Reg[NAMCOS2_C148_EXIRQ], CLEAR_LINE);
-		break;
-
-	case 0x1da000: /* NAMCOS2_C148_POSIRQ */
-		// if( bWrite ) osd_printf_debug( "cpu(%d) RAM[0x%06x] = 0x%x\n", cpu, addr, data );
-		space.device().execute().set_input_line(pC148Reg[NAMCOS2_C148_POSIRQ], CLEAR_LINE);
-		break;
-
-	case 0x1dc000: /* NAMCOS2_C148_SERIRQ */
-		// if( bWrite ) osd_printf_debug( "cpu(%d) RAM[0x%06x] = 0x%x\n", cpu, addr, data );
-		space.device().execute().set_input_line(pC148Reg[NAMCOS2_C148_SERIRQ], CLEAR_LINE);
-		break;
-
-	case 0x1de000: /* NAMCOS2_C148_VBLANKIRQ */
-		space.device().execute().set_input_line(pC148Reg[NAMCOS2_C148_VBLANKIRQ], CLEAR_LINE);
-		break;
-
-
-	case 0x1e0000: /* EEPROM Status Register */
-		result = ~0; /* Only BIT0 used: 1=EEPROM READY 0=EEPROM BUSY */
-		break;
-
-	case 0x1e2000: /* Sound CPU Reset control */
-		if (&space.device() == m_maincpu) /* ? */
-		{
-			if (data & 0x01)
-			{
-				/* Resume execution */
-				m_audiocpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-				space.device().execute().yield();
-			}
-			else
-			{
-				/* Suspend execution */
-				m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-			}
-			if (namcos2_kickstart != nullptr)
-			{
-				//printf( "dspkick=0x%x\n", data );
-				if (data & 0x04)
-				{
-					(*namcos2_kickstart)(space.machine(), 1);
-				}
-			}
-		}
-		break;
-
-	case 0x1e4000: /* Alt 68000 & IO CPU Reset */
-		if (&space.device() == m_maincpu) /* ? */
-		{
-			if (data & 0x01)
-			{ /* Resume execution */
-				reset_all_subcpus(CLEAR_LINE);
-				/* Give the new CPU an immediate slice of the action */
-				space.device().execute().yield();
-			}
-			else
-			{ /* Suspend execution */
-				reset_all_subcpus(ASSERT_LINE);
-			}
-		}
-		break;
-
-	case 0x1e6000: /* Watchdog reset kicker */
-		/* watchdog_reset_w(0,0); */
-		break;
-
-	default:
-		break;
-	}
-	return result;
-}
-
-WRITE16_MEMBER( namcos2_shared_state::namcos2_68k_master_C148_w )
-{
-	(void)readwrite_c148(space, offset, data, 1);
-}
-
-READ16_MEMBER( namcos2_shared_state::namcos2_68k_master_C148_r )
-{
-	return readwrite_c148(space, offset, 0, 0);
-}
-
-WRITE16_MEMBER( namcos2_shared_state::namcos2_68k_slave_C148_w )
-{
-	(void)readwrite_c148(space, offset, data, 1);
-}
-
-READ16_MEMBER( namcos2_shared_state::namcos2_68k_slave_C148_r )
-{
-	return readwrite_c148(space, offset, 0, 0);
-}
-
-WRITE16_MEMBER( namcos2_shared_state::namcos21_68k_gpu_C148_w )
-{
-	(void)readwrite_c148(space, offset, data, 1);
-}
-
-READ16_MEMBER( namcos2_shared_state::namcos21_68k_gpu_C148_r )
-{
-	return readwrite_c148(space, offset, 0, 0);
-}
-
-
-int namcos2_shared_state::get_posirq_scanline()
-{
-	if (is_system21()) return 0;
-	return downcast<namcos2_state *>(this)->get_pos_irq_scanline();
-}
-
-TIMER_CALLBACK_MEMBER(namcos2_shared_state::namcos2_posirq_tick)
-{
-	if (is_system21()) {
-		if (m_68k_gpu_C148[NAMCOS2_C148_POSIRQ]) {
-			m_screen->update_partial(param);
-			m_gpu->set_input_line(m_68k_gpu_C148[NAMCOS2_C148_POSIRQ] , ASSERT_LINE);
-		}
-		return;
-	}
-
-	if (m_68k_master_C148[NAMCOS2_C148_POSIRQ]|m_68k_slave_C148[NAMCOS2_C148_POSIRQ]) {
-		m_screen->update_partial(param);
-		if (m_68k_master_C148[NAMCOS2_C148_POSIRQ]) m_maincpu->set_input_line(m_68k_master_C148[NAMCOS2_C148_POSIRQ] , ASSERT_LINE);
-		if (m_68k_slave_C148[NAMCOS2_C148_POSIRQ]) m_slave->set_input_line(m_68k_slave_C148[NAMCOS2_C148_POSIRQ] , ASSERT_LINE);
-	}
-}
-
-void namcos2_shared_state::adjust_posirq_timer( int scanline )
-{
-	m_posirq_timer->adjust(m_screen->time_until_pos(scanline, 80), scanline);
-}
-
-INTERRUPT_GEN_MEMBER(namcos2_shared_state::namcos2_68k_master_vblank)
-{
-	if (!is_system21()) adjust_posirq_timer(get_posirq_scanline());
-	device.execute().set_input_line(m_68k_master_C148[NAMCOS2_C148_VBLANKIRQ], HOLD_LINE);
-}
-
-INTERRUPT_GEN_MEMBER(namcos2_shared_state::namcos2_68k_slave_vblank)
-{
-	if (!is_system21()) adjust_posirq_timer(get_posirq_scanline());
-	device.execute().set_input_line(m_68k_slave_C148[NAMCOS2_C148_VBLANKIRQ], HOLD_LINE);
-}
-
-INTERRUPT_GEN_MEMBER(namcos2_shared_state::namcos2_68k_gpu_vblank)
-{
-	/* only used by namcos21 */
-	//int scanline = get_posirq_scanline();
-	INT32 scanline = 0x50+0x89; /* HACK for Winning Run */
-
-	//printf( "namcos2_68k_gpu_vblank(%d)\n",m_68k_gpu_C148[NAMCOS2_C148_POSIRQ] );
-	adjust_posirq_timer(scanline);
-	device.execute().set_input_line(m_68k_gpu_C148[NAMCOS2_C148_VBLANKIRQ], HOLD_LINE);
-}
 
 /**************************************************************/
 /*  Sound sub-system                                          */
@@ -688,8 +439,8 @@ INTERRUPT_GEN_MEMBER(namcos2_shared_state::namcos2_68k_gpu_vblank)
 
 WRITE8_MEMBER( namcos2_shared_state::namcos2_sound_bankselect_w )
 {
-	UINT8 *RAM= memregion("audiocpu")->base();
-	UINT32 max = (memregion("audiocpu")->bytes() - 0x10000) / 0x4000;
+	uint8_t *RAM= memregion("audiocpu")->base();
+	uint32_t max = (memregion("audiocpu")->bytes() - 0x10000) / 0x4000;
 	int bank = ( data >> 4 ) % max; /* 991104.CAB */
 	membank(BANKED_SOUND_ROM)->set_base(&RAM[ 0x10000 + ( 0x4000 * bank ) ] );
 }
@@ -753,7 +504,7 @@ WRITE8_MEMBER( namcos2_shared_state::namcos2_mcu_analog_ctrl_w )
 		/* If the interrupt enable bit is set trigger an A/D IRQ */
 		if(data & 0x20)
 		{
-			generic_pulse_irq_line(m_mcu, HD63705_INT_ADCONV, 1);
+			generic_pulse_irq_line(*m_mcu, HD63705_INT_ADCONV, 1);
 		}
 	}
 }

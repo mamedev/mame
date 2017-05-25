@@ -8,7 +8,7 @@
 --
 -- Returns an array of strings, each of which is a substring of s
 -- formed by splitting on boundaries formed by `pattern`.
--- 
+--
 
 	function string.explode(s, pattern, plain)
 		if (pattern == '') then return false end
@@ -21,7 +21,7 @@
 		table.insert(arr, s:sub(pos))
 		return arr
 	end
-	
+
 
 
 --
@@ -30,13 +30,17 @@
 
 	function string.findlast(s, pattern, plain)
 		local curr = 0
+		local term = nil
 		repeat
-			local next = s:find(pattern, curr + 1, plain)
-			if (next) then curr = next end
+			local next, nextterm = s:find(pattern, curr + 1, plain)
+			if (next) then
+				curr = next
+				term = nextterm
+			end
 		until (not next)
 		if (curr > 0) then
-			return curr
-		end	
+			return curr, term
+		end
 	end
 
 
@@ -47,4 +51,12 @@
 
 	function string.startswith(haystack, needle)
 		return (haystack:find(needle, 1, true) == 1)
+	end
+
+	--
+	-- remove leading and trailing whitespace from string.
+	--
+
+	function string.trim(s)
+		return (s:gsub("^%s*(.-)%s*$", "%1"))
 	end

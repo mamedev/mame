@@ -10,9 +10,12 @@
 
 #include "emu.h"
 #include "ataintf.h"
-#include "debugger.h"
-#include "idehd.h"
+
 #include "atapicdr.h"
+#include "idehd.h"
+
+#include "debugger.h"
+
 
 void ata_interface_device::set_irq(int state)
 {
@@ -71,7 +74,7 @@ WRITE_LINE_MEMBER( ata_interface_device::dasp1_write_line )
 	{
 		m_dasp[1] = state;
 
-		ata_device_interface *dev = m_slot[0]->dev();
+		device_ata_interface *dev = m_slot[0]->dev();
 		if (dev != nullptr)
 			dev->write_dasp(state);
 
@@ -110,7 +113,7 @@ WRITE_LINE_MEMBER( ata_interface_device::pdiag1_write_line )
 	{
 		m_pdiag[1] = state;
 
-		ata_device_interface *dev = m_slot[0]->dev();
+		device_ata_interface *dev = m_slot[0]->dev();
 		if (dev != nullptr)
 			dev->write_pdiag(state);
 	}
@@ -122,9 +125,9 @@ WRITE_LINE_MEMBER( ata_interface_device::pdiag1_write_line )
  *
  *************************************/
 
-UINT16 ata_interface_device::read_dma()
+uint16_t ata_interface_device::read_dma()
 {
-	UINT16 result = 0xffff;
+	uint16_t result = 0xffff;
 	for (auto & elem : m_slot)
 		if (elem->dev() != nullptr)
 			result &= elem->dev()->read_dma();
@@ -135,7 +138,7 @@ UINT16 ata_interface_device::read_dma()
 
 READ16_MEMBER( ata_interface_device::read_cs0 )
 {
-	UINT16 result = mem_mask;
+	uint16_t result = mem_mask;
 	for (auto & elem : m_slot)
 		if (elem->dev() != nullptr)
 			result &= elem->dev()->read_cs0(space, offset, mem_mask);
@@ -149,7 +152,7 @@ READ16_MEMBER( ata_interface_device::read_cs0 )
 
 READ16_MEMBER( ata_interface_device::read_cs1 )
 {
-	UINT16 result = mem_mask;
+	uint16_t result = mem_mask;
 	for (auto & elem : m_slot)
 		if (elem->dev() != nullptr)
 			result &= elem->dev()->read_cs1(space, offset, mem_mask);
@@ -166,7 +169,7 @@ READ16_MEMBER( ata_interface_device::read_cs1 )
  *
  *************************************/
 
-void ata_interface_device::write_dma( UINT16 data )
+void ata_interface_device::write_dma( uint16_t data )
 {
 //  printf( "%s: write_dma %04x\n", machine().describe_context(), data );
 
@@ -207,21 +210,18 @@ SLOT_INTERFACE_START(ata_devices)
 	SLOT_INTERFACE("cdrom", ATAPI_CDROM)
 SLOT_INTERFACE_END
 
-ata_interface_device::ata_interface_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+ata_interface_device::ata_interface_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	m_irq_handler(*this),
 	m_dmarq_handler(*this),
 	m_dasp_handler(*this){
 }
 
 
-const device_type ATA_INTERFACE = &device_creator<ata_interface_device>;
+DEFINE_DEVICE_TYPE(ATA_INTERFACE, ata_interface_device, "ata_interface", "ATA Interface")
 
-ata_interface_device::ata_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, ATA_INTERFACE, "ATA Interface", tag, owner, clock, "ata_interface", __FILE__),
-	m_irq_handler(*this),
-	m_dmarq_handler(*this),
-	m_dasp_handler(*this)
+ata_interface_device::ata_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	ata_interface_device(mconfig, ATA_INTERFACE, tag, owner, clock)
 {
 }
 
@@ -246,7 +246,7 @@ void ata_interface_device::device_start()
 		m_dasp[i] = 0;
 		m_pdiag[i] = 0;
 
-		ata_device_interface *dev = m_slot[i]->dev();
+		device_ata_interface *dev = m_slot[i]->dev();
 		if (dev != nullptr)
 		{
 			if (i == 0)
@@ -269,7 +269,7 @@ void ata_interface_device::device_start()
 	}
 }
 
-static MACHINE_CONFIG_FRAGMENT( ata_interface )
+static MACHINE_CONFIG_START( ata_interface )
 	MCFG_DEVICE_ADD( "0", ATA_SLOT, 0 )
 	MCFG_DEVICE_ADD( "1", ATA_SLOT, 0 )
 MACHINE_CONFIG_END
@@ -290,14 +290,14 @@ machine_config_constructor ata_interface_device::device_mconfig_additions() cons
 //**************************************************************************
 
 // device type definition
-const device_type ATA_SLOT = &device_creator<ata_slot_device>;
+DEFINE_DEVICE_TYPE(ATA_SLOT, ata_slot_device, "ata_slot", "ATA Connector")
 
 //-------------------------------------------------
 //  ata_slot_device - constructor
 //-------------------------------------------------
 
-ata_slot_device::ata_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, ATA_SLOT, "ATA Connector", tag, owner, clock, "ata_slot", __FILE__),
+ata_slot_device::ata_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, ATA_SLOT, tag, owner, clock),
 		device_slot_interface(mconfig, *this),
 		m_dev(nullptr)
 {
@@ -311,7 +311,7 @@ ata_slot_device::ata_slot_device(const machine_config &mconfig, const char *tag,
 
 void ata_slot_device::device_config_complete()
 {
-	m_dev = dynamic_cast<ata_device_interface *>(get_card_device());
+	m_dev = dynamic_cast<device_ata_interface *>(get_card_device());
 }
 
 //-------------------------------------------------

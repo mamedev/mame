@@ -79,6 +79,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/cesblit.h,VIDEOS["CESBLIT"] = true
+--------------------------------------------------
+
+if (VIDEOS["CESBLIT"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/cesblit.cpp",
+		MAME_DIR .. "src/devices/video/cesblit.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/crt9007.h,VIDEOS["CRT9007"] = true
 --------------------------------------------------
 
@@ -246,6 +258,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/mga2064w.h,VIDEOS["MGA2064W"] = true
+--------------------------------------------------
+
+if (VIDEOS["MGA2064W"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/mga2064w.cpp",
+		MAME_DIR .. "src/devices/video/mga2064w.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/hd44102.h,VIDEOS["HD44102"] = true
 --------------------------------------------------
 
@@ -318,6 +342,42 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/hlcd0515.h,VIDEOS["HLCD0515"] = true
+--------------------------------------------------
+
+if (VIDEOS["HLCD0515"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/hlcd0515.cpp",
+		MAME_DIR .. "src/devices/video/hlcd0515.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/hlcd0538.h,VIDEOS["HLCD0538"] = true
+--------------------------------------------------
+
+if (VIDEOS["HLCD0538"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/hlcd0538.cpp",
+		MAME_DIR .. "src/devices/video/hlcd0538.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/hp1ll3.h,VIDEOS["HP1LL3"] = true
+--------------------------------------------------
+
+if (VIDEOS["HP1LL3"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/hp1ll3.cpp",
+		MAME_DIR .. "src/devices/video/hp1ll3.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/huc6202.h,VIDEOS["HUC6202"] = true
 --------------------------------------------------
 
@@ -361,6 +421,18 @@ if (VIDEOS["HUC6270"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/video/huc6270.cpp",
 		MAME_DIR .. "src/devices/video/huc6270.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/huc6271.h,VIDEOS["HUC6271"] = true
+--------------------------------------------------
+
+if (VIDEOS["HUC6271"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/huc6271.cpp",
+		MAME_DIR .. "src/devices/video/huc6271.h",
 	}
 end
 
@@ -876,3 +948,42 @@ if (VIDEOS["GB_LCD"]~=null) then
 		MAME_DIR .. "src/devices/video/gb_lcd.h",
 	}
 end
+
+--------------------------------------------------
+--
+--@src/devices/video/gba_lcd.h,VIDEOS["GBA_LCD"] = true
+--------------------------------------------------
+
+if (VIDEOS["GBA_LCD"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/gba_lcd.cpp",
+		MAME_DIR .. "src/devices/video/gba_lcd.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/ef9369.h,VIDEOS["EF9369"] = true
+--------------------------------------------------
+
+if (VIDEOS["EF9369"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/ef9369.cpp",
+		MAME_DIR .. "src/devices/video/ef9369.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/ppu2c0x.h,VIDEOS["PPU2C0X"] = true
+--------------------------------------------------
+
+if (VIDEOS["PPU2C0X"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/ppu2c0x.cpp",
+		MAME_DIR .. "src/devices/video/ppu2c0x.h",
+		MAME_DIR .. "src/devices/video/ppu2c0x_vt.cpp",
+		MAME_DIR .. "src/devices/video/ppu2c0x_vt.h",
+	}
+end
+

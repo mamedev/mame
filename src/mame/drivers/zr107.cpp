@@ -181,6 +181,7 @@ Check gticlub.c for details on the bottom board.
 #include "video/k001006.h"
 #include "video/k054156_k054157_k056832.h"
 #include "video/konami_helper.h"
+#include "speaker.h"
 
 
 class zr107_state : public driver_device
@@ -221,22 +222,22 @@ public:
 	optional_device<k001604_device> m_k001604;
 	required_device<k056800_device> m_k056800;
 	optional_device<k056832_device> m_k056832;
-	optional_shared_ptr<UINT32> m_workram;
+	optional_shared_ptr<uint32_t> m_workram;
 	required_ioport m_in0, m_in1, m_in2, m_in3, m_in4, m_out4, m_eepromout, m_analog1, m_analog2, m_analog3;
 	required_device<palette_device> m_palette;
 	optional_device<k001005_device> m_k001005;
 	optional_device<k001006_device> m_k001006_1;
 	optional_device<k001006_device> m_k001006_2;
-	required_shared_ptr<UINT32> m_generic_paletteram_32;
+	required_shared_ptr<uint32_t> m_generic_paletteram_32;
 	required_device<konppc_device> m_konppc;
 
-	std::unique_ptr<UINT32[]> m_sharc_dataram;
-	UINT8 m_led_reg0;
-	UINT8 m_led_reg1;
+	std::unique_ptr<uint32_t[]> m_sharc_dataram;
+	uint8_t m_led_reg0;
+	uint8_t m_led_reg1;
 	int m_ccu_vcth;
 	int m_ccu_vctl;
-	UINT8 m_sound_ctrl;
-	UINT8 m_sound_intck;
+	uint8_t m_sound_ctrl;
+	uint8_t m_sound_intck;
 
 	DECLARE_WRITE32_MEMBER(paletteram32_w);
 	DECLARE_READ8_MEMBER(sysreg_r);
@@ -253,8 +254,8 @@ public:
 	DECLARE_DRIVER_INIT(jetwave);
 	DECLARE_VIDEO_START(zr107);
 	DECLARE_VIDEO_START(jetwave);
-	UINT32 screen_update_zr107(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_jetwave(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_zr107(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_jetwave(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(zr107_vblank);
 	WRITE_LINE_MEMBER(k054539_irq_gen);
 	ADC083X_INPUT_CB(adc0838_callback);
@@ -274,7 +275,7 @@ VIDEO_START_MEMBER(zr107_state,jetwave)
 }
 
 
-UINT32 zr107_state::screen_update_jetwave(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t zr107_state::screen_update_jetwave(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->pen(0), cliprect);
 
@@ -321,7 +322,7 @@ VIDEO_START_MEMBER(zr107_state,zr107)
 	m_k056832->set_layer_offs(7, -29, -27);
 }
 
-UINT32 zr107_state::screen_update_zr107(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t zr107_state::screen_update_zr107(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->pen(0), cliprect);
 
@@ -340,7 +341,7 @@ UINT32 zr107_state::screen_update_zr107(screen_device &screen, bitmap_rgb32 &bit
 
 READ8_MEMBER(zr107_state::sysreg_r)
 {
-	UINT32 r = 0;
+	uint32_t r = 0;
 
 	switch (offset)
 	{
@@ -430,7 +431,7 @@ WRITE8_MEMBER(zr107_state::sysreg_w)
 
 READ32_MEMBER(zr107_state::ccu_r)
 {
-	UINT32 r = 0;
+	uint32_t r = 0;
 	switch (offset)
 	{
 		case 0x1c/4:
@@ -465,7 +466,7 @@ void zr107_state::machine_start()
 	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	m_maincpu->ppcdrc_add_fastram(0x00000000, 0x000fffff, FALSE, m_workram);
+	m_maincpu->ppcdrc_add_fastram(0x00000000, 0x000fffff, false, m_workram);
 }
 
 static ADDRESS_MAP_START( zr107_map, AS_PROGRAM, 32, zr107_state )
@@ -755,7 +756,7 @@ void zr107_state::machine_reset()
 	m_dsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( zr107, zr107_state )
+static MACHINE_CONFIG_START( zr107 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PPC403GA, XTAL_64MHz/2)   /* PowerPC 403GA 32MHz */
@@ -822,11 +823,11 @@ static MACHINE_CONFIG_START( zr107, zr107_state )
 
 	MCFG_DEVICE_ADD("konppc", KONPPC, 0)
 	MCFG_KONPPC_CGBOARD_NUMBER(1)
-	MCFG_KONPPC_CGBOARD_TYPE(CGBOARD_TYPE_ZR107)
+	MCFG_KONPPC_CGBOARD_TYPE(ZR107)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( jetwave, zr107_state )
+static MACHINE_CONFIG_START( jetwave )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PPC403GA, XTAL_64MHz/2)   /* PowerPC 403GA 32MHz */
@@ -901,14 +902,14 @@ static MACHINE_CONFIG_START( jetwave, zr107_state )
 
 	MCFG_DEVICE_ADD("konppc", KONPPC, 0)
 	MCFG_KONPPC_CGBOARD_NUMBER(1)
-	MCFG_KONPPC_CGBOARD_TYPE(CGBOARD_TYPE_GTICLUB)
+	MCFG_KONPPC_CGBOARD_TYPE(GTICLUB)
 MACHINE_CONFIG_END
 
 /*****************************************************************************/
 
 DRIVER_INIT_MEMBER(zr107_state,common)
 {
-	m_sharc_dataram = std::make_unique<UINT32[]>(0x100000/4);
+	m_sharc_dataram = std::make_unique<uint32_t[]>(0x100000/4);
 	m_led_reg0 = m_led_reg1 = 0x7f;
 	m_ccu_vcth = m_ccu_vctl = 0;
 

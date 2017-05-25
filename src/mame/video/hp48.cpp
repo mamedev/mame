@@ -125,11 +125,11 @@ PALETTE_INIT_MEMBER(hp48_state, hp48)
 	data >>= 1
 
 #define draw_quart                  \
-	UINT8 data = space.read_byte( addr );   \
+	uint8_t data = space.read_byte( addr );   \
 	draw_pixel; draw_pixel; draw_pixel; draw_pixel;
 
 
-UINT32 hp48_state::screen_update_hp48(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t hp48_state::screen_update_hp48(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	int x, y, xp, i, addr;

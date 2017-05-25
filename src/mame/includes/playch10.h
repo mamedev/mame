@@ -6,7 +6,7 @@
 struct chr_bank
 {
 	int writable;   // 1 for RAM, 0 for ROM
-	UINT8* chr;     // direct access to the memory
+	uint8_t* chr;     // direct access to the memory
 };
 
 class playch10_state : public driver_device
@@ -30,10 +30,10 @@ public:
 	required_device<ppu2c0x_device> m_ppu;
 	optional_device<rp5h01_device> m_rp5h01;
 
-	required_shared_ptr<UINT8> m_ram_8w;
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_timedata;
-	required_shared_ptr<UINT8> m_work_ram;
+	required_shared_ptr<uint8_t> m_ram_8w;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_timedata;
+	required_shared_ptr<uint8_t> m_work_ram;
 	required_device<gfxdecode_device> m_gfxdecode;
 
 	optional_memory_region m_vrom_region;
@@ -53,10 +53,10 @@ public:
 	int m_mirroring;
 	int m_MMC2_bank[4];
 	int m_MMC2_bank_latch[2];
-	UINT8* m_vrom;
-	std::unique_ptr<UINT8[]> m_vram;
-	UINT8* m_nametable[4];
-	std::unique_ptr<UINT8[]> m_nt_ram;
+	uint8_t* m_vrom;
+	std::unique_ptr<uint8_t[]> m_vram;
+	uint8_t* m_nametable[4];
+	std::unique_ptr<uint8_t[]> m_nt_ram;
 	chr_bank m_chr_page[8];
 	int m_mmc1_shiftreg;
 	int m_mmc1_shiftcount;
@@ -68,7 +68,7 @@ public:
 	int m_gboard_last_bank;
 	int m_gboard_command;
 	int m_IRQ_count;
-	UINT8 m_IRQ_count_latch;
+	uint8_t m_IRQ_count_latch;
 	int m_IRQ_enable;
 	int m_pc10_bios;
 	tilemap_t *m_bg_tilemap;
@@ -133,9 +133,9 @@ public:
 	DECLARE_PALETTE_INIT(playch10);
 	DECLARE_MACHINE_START(playch10_hboard);
 	DECLARE_VIDEO_START(playch10_hboard);
-	UINT32 screen_update_playch10_top(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_playch10_bottom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_playch10_single(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_playch10_top(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_playch10_bottom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_playch10_single(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(playch10_interrupt);
 	void pc10_set_videorom_bank( int first, int count, int bank, int size );
 	void set_videoram_bank( int first, int count, int bank, int size );

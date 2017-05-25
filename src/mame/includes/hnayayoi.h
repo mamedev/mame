@@ -16,12 +16,12 @@ public:
 		m_msm(*this, "msm") { }
 
 	/* video-related */
-	UINT8      *m_pixmap[8];
+	uint8_t      *m_pixmap[8];
 	int        m_palbank;
 	int        m_total_pixmaps;
-	UINT8      m_blit_layer;
-	UINT16     m_blit_dest;
-	UINT32     m_blit_src;
+	uint8_t      m_blit_layer;
+	uint16_t     m_blit_dest;
+	uint32_t     m_blit_src;
 
 	/* misc */
 	int        m_keyb;
@@ -41,7 +41,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_VIDEO_START(untoucha);
-	UINT32 screen_update_hnayayoi(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_hnayayoi(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void common_vh_start( int num_pixmaps );
 	void copy_pixel( int x, int y, int pen );
 	void draw_layer_interleaved( bitmap_ind16 &bitmap, const rectangle &cliprect, int left_pixmap, int right_pixmap, int palbase, int transp );

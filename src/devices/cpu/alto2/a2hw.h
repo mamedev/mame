@@ -12,10 +12,10 @@
 #define _A2HW_H_
 //! miscellaneous hardware registers in the memory mapped I/O range
 struct {
-	UINT16 eia;             //!< the EIA port at 0177001
-	UINT16 utilout;         //!< the UTILOUT port at 0177016 (active-low outputs)
-	UINT16 xbus[4];         //!< the XBUS port at 0177020 to 0177023
-	UINT16 utilin;          //!< the UTILIN port at 0177030 to 0177033 (same value on all addresses)
+	uint16_t eia;             //!< the EIA port at 0177001
+	uint16_t utilout;         //!< the UTILOUT port at 0177016 (active-low outputs)
+	uint16_t xbus[4];         //!< the XBUS port at 0177020 to 0177023
+	uint16_t utilin;          //!< the UTILIN port at 0177030 to 0177033 (same value on all addresses)
 }   m_hw;
 
 DECLARE_READ16_MEMBER ( pprdy_r );          //!< read UTILIN[0] printer paper ready bit

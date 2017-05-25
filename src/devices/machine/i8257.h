@@ -29,12 +29,11 @@
 
 ***************************************************************************/
 
+#ifndef MAME_MACHINE_I8257_H
+#define MAME_MACHINE_I8257_H
+
 #pragma once
 
-#ifndef __I8257__
-#define __I8257__
-
-#include "emu.h"
 
 
 
@@ -101,7 +100,7 @@ class i8257_device :  public device_t,
 {
 public:
 	// construction/destruction
-	i8257_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i8257_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -114,28 +113,29 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( dreq2_w );
 	DECLARE_WRITE_LINE_MEMBER( dreq3_w );
 
-	template<class _Object> static devcb_base &set_out_hrq_callback(device_t &device, _Object object) { return downcast<i8257_device &>(device).m_out_hrq_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_tc_callback(device_t &device, _Object object) { return downcast<i8257_device &>(device).m_out_tc_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_out_hrq_callback(device_t &device, Object &&cb) { return downcast<i8257_device &>(device).m_out_hrq_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_tc_callback(device_t &device, Object &&cb) { return downcast<i8257_device &>(device).m_out_tc_cb.set_callback(std::forward<Object>(cb)); }
 
-	template<class _Object> static devcb_base &set_in_memr_callback(device_t &device, _Object object) { return downcast<i8257_device &>(device).m_in_memr_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_memw_callback(device_t &device, _Object object) { return downcast<i8257_device &>(device).m_out_memw_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_in_memr_callback(device_t &device, Object &&cb) { return downcast<i8257_device &>(device).m_in_memr_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_memw_callback(device_t &device, Object &&cb) { return downcast<i8257_device &>(device).m_out_memw_cb.set_callback(std::forward<Object>(cb)); }
 
-	template<class _Object> static devcb_base &set_in_ior_0_callback(device_t &device, _Object object) { return downcast<i8257_device &>(device).m_in_ior_0_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_in_ior_1_callback(device_t &device, _Object object) { return downcast<i8257_device &>(device).m_in_ior_1_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_in_ior_2_callback(device_t &device, _Object object) { return downcast<i8257_device &>(device).m_in_ior_2_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_in_ior_3_callback(device_t &device, _Object object) { return downcast<i8257_device &>(device).m_in_ior_3_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_in_ior_0_callback(device_t &device, Object &&cb) { return downcast<i8257_device &>(device).m_in_ior_0_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_in_ior_1_callback(device_t &device, Object &&cb) { return downcast<i8257_device &>(device).m_in_ior_1_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_in_ior_2_callback(device_t &device, Object &&cb) { return downcast<i8257_device &>(device).m_in_ior_2_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_in_ior_3_callback(device_t &device, Object &&cb) { return downcast<i8257_device &>(device).m_in_ior_3_cb.set_callback(std::forward<Object>(cb)); }
 
-	template<class _Object> static devcb_base &set_out_iow_0_callback(device_t &device, _Object object) { return downcast<i8257_device &>(device).m_out_iow_0_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_iow_1_callback(device_t &device, _Object object) { return downcast<i8257_device &>(device).m_out_iow_1_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_iow_2_callback(device_t &device, _Object object) { return downcast<i8257_device &>(device).m_out_iow_2_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_iow_3_callback(device_t &device, _Object object) { return downcast<i8257_device &>(device).m_out_iow_3_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_out_iow_0_callback(device_t &device, Object &&cb) { return downcast<i8257_device &>(device).m_out_iow_0_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_iow_1_callback(device_t &device, Object &&cb) { return downcast<i8257_device &>(device).m_out_iow_1_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_iow_2_callback(device_t &device, Object &&cb) { return downcast<i8257_device &>(device).m_out_iow_2_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_iow_3_callback(device_t &device, Object &&cb) { return downcast<i8257_device &>(device).m_out_iow_3_cb.set_callback(std::forward<Object>(cb)); }
 
-	template<class _Object> static devcb_base &set_out_dack_0_callback(device_t &device, _Object object) { return downcast<i8257_device &>(device).m_out_dack_0_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_dack_1_callback(device_t &device, _Object object) { return downcast<i8257_device &>(device).m_out_dack_1_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_dack_2_callback(device_t &device, _Object object) { return downcast<i8257_device &>(device).m_out_dack_2_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_dack_3_callback(device_t &device, _Object object) { return downcast<i8257_device &>(device).m_out_dack_3_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_out_dack_0_callback(device_t &device, Object &&cb) { return downcast<i8257_device &>(device).m_out_dack_0_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_dack_1_callback(device_t &device, Object &&cb) { return downcast<i8257_device &>(device).m_out_dack_1_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_dack_2_callback(device_t &device, Object &&cb) { return downcast<i8257_device &>(device).m_out_dack_2_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_dack_3_callback(device_t &device, Object &&cb) { return downcast<i8257_device &>(device).m_out_dack_3_cb.set_callback(std::forward<Object>(cb)); }
 
 	static void static_set_reverse_rw_mode(device_t &device, bool flag) { downcast<i8257_device &>(device).m_reverse_rw = flag; }
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -146,7 +146,7 @@ protected:
 
 private:
 	inline void dma_request(int channel, int state);
-	inline bool is_request_active(int channel);
+	inline bool is_request_active(int channel) const;
 	inline void set_hreq(int state);
 	inline void set_dack();
 	inline void dma_read();
@@ -164,10 +164,10 @@ private:
 	int m_state;
 	int m_current_channel;
 	int m_last_channel;
-	UINT8 m_transfer_mode;
-	UINT8 m_status;
-	UINT8 m_request;
-	UINT8 m_temp;
+	uint8_t m_transfer_mode;
+	uint8_t m_status;
+	uint8_t m_request;
+	uint8_t m_temp;
 
 	devcb_write_line   m_out_hrq_cb;
 	devcb_write_line   m_out_tc_cb;
@@ -192,16 +192,14 @@ private:
 
 	struct
 	{
-		UINT16 m_address;
-		UINT16 m_count;
-		UINT8 m_mode;
+		uint16_t m_address;
+		uint16_t m_count;
+		uint8_t m_mode;
 	} m_channel[4];
 };
 
 
 // device type definition
-extern const device_type I8257;
+DECLARE_DEVICE_TYPE(I8257, i8257_device)
 
-
-
-#endif
+#endif // MAME_MACHINE_I8257_H

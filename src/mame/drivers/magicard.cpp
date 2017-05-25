@@ -160,15 +160,17 @@
 
 *******************************************************************************/
 
-
-#define CLOCK_A XTAL_30MHz
-#define CLOCK_B XTAL_8MHz
-#define CLOCK_C XTAL_19_6608MHz
-
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/ym2413.h"
 #include "video/ramdac.h"
+#include "screen.h"
+#include "speaker.h"
+
+
+#define CLOCK_A XTAL_30MHz
+#define CLOCK_B XTAL_8MHz
+#define CLOCK_C XTAL_19_6608MHz
 
 
 class magicard_state : public driver_device
@@ -191,17 +193,17 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette")  { }
 
-	required_shared_ptr<UINT16> m_magicram;
-	required_shared_ptr<UINT16> m_magicramb;
-	required_shared_ptr<UINT16> m_pcab_vregs;
-	required_shared_ptr<UINT16> m_scc68070_ext_irqc_regs;
-	required_shared_ptr<UINT16> m_scc68070_iic_regs;
-	required_shared_ptr<UINT16> m_scc68070_uart_regs;
-	required_shared_ptr<UINT16> m_scc68070_timer_regs;
-	required_shared_ptr<UINT16> m_scc68070_int_irqc_regs;
-	required_shared_ptr<UINT16> m_scc68070_dma_ch1_regs;
-	required_shared_ptr<UINT16> m_scc68070_dma_ch2_regs;
-	required_shared_ptr<UINT16> m_scc68070_mmu_regs;
+	required_shared_ptr<uint16_t> m_magicram;
+	required_shared_ptr<uint16_t> m_magicramb;
+	required_shared_ptr<uint16_t> m_pcab_vregs;
+	required_shared_ptr<uint16_t> m_scc68070_ext_irqc_regs;
+	required_shared_ptr<uint16_t> m_scc68070_iic_regs;
+	required_shared_ptr<uint16_t> m_scc68070_uart_regs;
+	required_shared_ptr<uint16_t> m_scc68070_timer_regs;
+	required_shared_ptr<uint16_t> m_scc68070_int_irqc_regs;
+	required_shared_ptr<uint16_t> m_scc68070_dma_ch1_regs;
+	required_shared_ptr<uint16_t> m_scc68070_dma_ch2_regs;
+	required_shared_ptr<uint16_t> m_scc68070_mmu_regs;
 	DECLARE_READ16_MEMBER(test_r);
 	DECLARE_READ16_MEMBER(philips_66470_r);
 	DECLARE_WRITE16_MEMBER(philips_66470_w);
@@ -224,7 +226,7 @@ public:
 	DECLARE_DRIVER_INIT(magicard);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_magicard(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_magicard(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(magicard_irq);
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -423,10 +425,10 @@ void magicard_state::video_start()
 {
 }
 
-UINT32 magicard_state::screen_update_magicard(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t magicard_state::screen_update_magicard(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int x, y;
-	UINT32 count;
+	uint32_t count;
 
 	bitmap.fill(m_palette->black_pen(), cliprect); //TODO
 
@@ -441,7 +443,7 @@ UINT32 magicard_state::screen_update_magicard(screen_device &screen, bitmap_rgb3
 		{
 			for(x = 0; x < 84; x++)
 			{
-				UINT32 color;
+				uint32_t color;
 
 				color = ((m_magicram[count]) & 0x000f) >> 0;
 
@@ -473,7 +475,7 @@ UINT32 magicard_state::screen_update_magicard(screen_device &screen, bitmap_rgb3
 		{
 			for(x = 0; x < 168; x++)
 			{
-				UINT32 color;
+				uint32_t color;
 
 				color = ((m_magicram[count]) & 0x00ff) >> 0;
 
@@ -509,7 +511,7 @@ READ16_MEMBER(magicard_state::philips_66470_r)
 	{
 		case 0/2:
 		{
-			UINT8 vdisp;
+			uint8_t vdisp;
 			vdisp = m_screen->vpos() < 256;
 
 			return (m_pcab_vregs[offset] & 0xff7f) | vdisp << 7; //TODO
@@ -716,8 +718,8 @@ INPUT_PORTS_END
 
 void magicard_state::machine_reset()
 {
-	UINT16 *src    = (UINT16*)memregion("maincpu" )->base();
-	UINT16 *dst    = m_magicram;
+	uint16_t *src    = (uint16_t*)memregion("maincpu" )->base();
+	uint16_t *dst    = m_magicram;
 	memcpy (dst, src, 0x80000);
 	memcpy (dst + 0x40000 * 1, src, 0x80000);
 	memcpy (dst + 0x40000 * 2, src, 0x80000);
@@ -749,7 +751,7 @@ static ADDRESS_MAP_START( ramdac_map, AS_0, 8, magicard_state )
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_START( magicard, magicard_state )
+static MACHINE_CONFIG_START( magicard )
 	MCFG_CPU_ADD("maincpu", SCC68070, CLOCK_A / 2)    /* SCC-68070 CCA84 datasheet */
 	MCFG_CPU_PROGRAM_MAP(magicard_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", magicard_state, magicard_irq) /* no interrupts? (it erases the vectors..) */
@@ -900,7 +902,7 @@ DRIVER_INIT_MEMBER(magicard_state, magicard)
 *      Game Drivers      *
 *************************/
 
-/*    YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT      ROT    COMPANY   FULLNAME                    FLAGS... */
+//    YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT      ROT   COMPANY   FULLNAME                     FLAGS
 
 GAME( 199?, magicard,  0,        magicard, magicard, magicard_state, magicard, ROT0, "Impera", "Magic Card (set 1)",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 199?, magicarda, magicard, magicard, magicard, magicard_state, magicard, ROT0, "Impera", "Magic Card (set 2)",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

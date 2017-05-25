@@ -87,7 +87,10 @@
 // prompt should appear. A command that could be tried is "DIR" that lists
 // the content of floppy disk.
 
+#include "emu.h"
 #include "includes/imds2.h"
+#include "screen.h"
+#include "speaker.h"
 
 // CPU oscillator of IPC board: 8 MHz
 #define IPC_XTAL_Y2     XTAL_8MHz
@@ -152,18 +155,6 @@ static ADDRESS_MAP_START(ioc_io_map , AS_IO , 8 , imds2_state)
 	AM_RANGE(0xf0 , 0xf8) AM_DEVREADWRITE("iocdma" , i8257_device , read , write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(pio_io_map , AS_IO , 8 , imds2_state)
-	AM_RANGE(MCS48_PORT_P1 , MCS48_PORT_P1) AM_READWRITE(imds2_pio_port_p1_r , imds2_pio_port_p1_w)
-	AM_RANGE(MCS48_PORT_P2 , MCS48_PORT_P2) AM_READWRITE(imds2_pio_port_p2_r , imds2_pio_port_p2_w)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START(kb_io_map , AS_IO , 8 , imds2_state)
-	AM_RANGE(MCS48_PORT_P1 , MCS48_PORT_P1) AM_WRITE(imds2_kb_port_p1_w)
-	AM_RANGE(MCS48_PORT_P2 , MCS48_PORT_P2) AM_READ(imds2_kb_port_p2_r)
-	AM_RANGE(MCS48_PORT_T0 , MCS48_PORT_T0) AM_READ(imds2_kb_port_t0_r)
-	AM_RANGE(MCS48_PORT_T1 , MCS48_PORT_T1) AM_READ(imds2_kb_port_t1_r)
-ADDRESS_MAP_END
-
 imds2_state::imds2_state(const machine_config &mconfig, device_type type, const char *tag)
 	: driver_device(mconfig , type , tag),
 	m_ipccpu(*this , "ipccpu"),
@@ -220,7 +211,7 @@ WRITE8_MEMBER(imds2_state::imds2_ipc_control_w)
 	// See A84, pg 28 of [1]
 	// b3 is ~(bit to be written)
 	// b2-b0 is ~(no. of bit to be written)
-	UINT8 mask = (1U << (~data & 0x07));
+	uint8_t mask = (1U << (~data & 0x07));
 
 	if (BIT(data , 3)) {
 		m_ipc_control &= ~mask;
@@ -276,7 +267,7 @@ WRITE8_MEMBER(imds2_state::imds2_miscout_w)
 
 READ8_MEMBER(imds2_state::imds2_miscin_r)
 {
-	UINT8 res = m_ioc_options->read();
+	uint8_t res = m_ioc_options->read();
 	return res | ((m_beeper_timer == 0) << 2);
 }
 
@@ -363,14 +354,14 @@ WRITE8_MEMBER(imds2_state::imds2_kb_port_p1_w)
 	m_kb_p1 = data;
 }
 
-READ8_MEMBER(imds2_state::imds2_kb_port_t0_r)
+READ_LINE_MEMBER(imds2_state::imds2_kb_port_t0_r)
 {
 	// T0 tied low
 	// It appears to be some kind of strapping option on kb hw
 	return 0;
 }
 
-READ8_MEMBER(imds2_state::imds2_kb_port_t1_r)
+READ_LINE_MEMBER(imds2_state::imds2_kb_port_t1_r)
 {
 	// T1 tied low
 	// It appears to be some kind of strapping option on kb hw
@@ -524,8 +515,8 @@ I8275_DRAW_CHARACTER_MEMBER(imds2_state::crtc_display_pixels)
 {
 	unsigned i;
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT8 chargen_byte = m_chargen[ (linecount & 7) | ((unsigned)charcode << 3) ];
-	UINT16 pixels;
+	uint8_t chargen_byte = m_chargen[ (linecount & 7) | ((unsigned)charcode << 3) ];
+	uint16_t pixels;
 
 	if (lten) {
 		pixels = ~0;
@@ -534,10 +525,10 @@ I8275_DRAW_CHARACTER_MEMBER(imds2_state::crtc_display_pixels)
 	} else {
 		// See [2], pg 58 for the very peculiar way of generating character images
 		// Here each half-pixel is translated into a full pixel
-		UINT16 exp_pix_l;
-		UINT16 exp_pix_r;
+		uint16_t exp_pix_l;
+		uint16_t exp_pix_r;
 
-		exp_pix_l = (UINT16)chargen_byte;
+		exp_pix_l = (uint16_t)chargen_byte;
 		exp_pix_l = ((exp_pix_l & 0x80) << 5) |
 			((exp_pix_l & 0x40) << 4) |
 			((exp_pix_l & 0x20) << 3) |
@@ -633,7 +624,7 @@ void imds2_state::imds2_update_beeper(void)
 void imds2_state::imds2_update_printer(void)
 {
 	// Data to printer is ~P1 when STATUS ENABLE/==1, else 0xff (assuming pull-ups on printer)
-	UINT8 printer_data;
+	uint8_t printer_data;
 	if ((m_pio_port2 & 0x7f) == 0x6c) {
 		printer_data = 0xff;
 	} else {
@@ -762,7 +753,7 @@ static SLOT_INTERFACE_START( imds2_floppies )
 	SLOT_INTERFACE( "8sssd", FLOPPY_8_SSSD )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START(imds2 , imds2_state)
+static MACHINE_CONFIG_START(imds2)
 		MCFG_CPU_ADD("ipccpu" , I8085A , IPC_XTAL_Y2 / 2)  // 4 MHz
 		MCFG_CPU_PROGRAM_MAP(ipc_mem_map)
 		MCFG_CPU_IO_MAP(ipc_io_map)
@@ -835,6 +826,7 @@ static MACHINE_CONFIG_START(imds2 , imds2_state)
 		MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(imds2_state , crtc_display_pixels)
 		MCFG_I8275_DRQ_CALLBACK(DEVWRITELINE("iocdma" , i8257_device , dreq2_w))
 		MCFG_I8275_IRQ_CALLBACK(INPUTLINE("ioccpu" , I8085_INTR_LINE))
+		MCFG_VIDEO_SET_SCREEN("screen")
 
 		MCFG_SCREEN_ADD("screen" , RASTER)
 		MCFG_SCREEN_UPDATE_DEVICE("ioccrtc" , i8275_device , screen_update)
@@ -865,11 +857,17 @@ static MACHINE_CONFIG_START(imds2 , imds2_state)
 		MCFG_SLOT_FIXED(true)
 
 		MCFG_CPU_ADD("iocpio" , I8041 , IOC_XTAL_Y3)
-		MCFG_CPU_IO_MAP(pio_io_map)
+		MCFG_MCS48_PORT_P1_IN_CB(READ8(imds2_state, imds2_pio_port_p1_r))
+		MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(imds2_state, imds2_pio_port_p1_w))
+		MCFG_MCS48_PORT_P2_IN_CB(READ8(imds2_state, imds2_pio_port_p2_r))
+		MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(imds2_state, imds2_pio_port_p2_w))
 		MCFG_QUANTUM_TIME(attotime::from_hz(100))
 
 		MCFG_CPU_ADD("kbcpu", I8741, XTAL_3_579545MHz)         /* 3.579545 MHz */
-		MCFG_CPU_IO_MAP(kb_io_map)
+		MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(imds2_state, imds2_kb_port_p1_w))
+		MCFG_MCS48_PORT_P2_IN_CB(READ8(imds2_state, imds2_kb_port_p2_r))
+		MCFG_MCS48_PORT_T0_IN_CB(READLINE(imds2_state, imds2_kb_port_t0_r))
+		MCFG_MCS48_PORT_T1_IN_CB(READLINE(imds2_state, imds2_kb_port_t1_r))
 		MCFG_QUANTUM_TIME(attotime::from_hz(100))
 
 		MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
@@ -915,5 +913,5 @@ ROM_START(imds2)
 		ROM_LOAD ("ioc_a19.bin" , 0x0000 , 0x0400 , CRC(47487d0f) SHA1(0ed98f9f06622949ee3cc2ffc572fb9702db0f81))
 ROM_END
 
-/*    YEAR  NAME       PARENT    COMPAT MACHINE INPUT     INIT              COMPANY       FULLNAME */
-COMP( 1979, imds2,     0,        0,     imds2,  imds2,    driver_device, 0, "Intel",      "Intellec MDS-II" , 0)
+/*    YEAR  NAME       PARENT    COMPAT MACHINE INPUT   STATE        INIT  COMPANY       FULLNAME */
+COMP( 1979, imds2,     0,        0,     imds2,  imds2,  imds2_state, 0,    "Intel",      "Intellec MDS-II" , 0)

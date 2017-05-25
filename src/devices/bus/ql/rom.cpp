@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "rom.h"
 
 
@@ -14,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type QL_ROM_CARTRIDGE_SLOT = &device_creator<ql_rom_cartridge_slot_t>;
+DEFINE_DEVICE_TYPE(QL_ROM_CARTRIDGE_SLOT, ql_rom_cartridge_slot_device, "ql_rom_cartridge_slot", "QL ROM cartridge slot")
 
 
 
@@ -31,7 +32,7 @@ device_ql_rom_cartridge_card_interface::device_ql_rom_cartridge_card_interface(c
 	m_rom(*this, "rom"),
 	m_romoeh(0)
 {
-	m_slot = dynamic_cast<ql_rom_cartridge_slot_t *>(device.owner());
+	m_slot = dynamic_cast<ql_rom_cartridge_slot_device *>(device.owner());
 }
 
 
@@ -50,11 +51,11 @@ device_ql_rom_cartridge_card_interface::~device_ql_rom_cartridge_card_interface(
 //**************************************************************************
 
 //-------------------------------------------------
-//  ql_rom_cartridge_slot_t - constructor
+//  ql_rom_cartridge_slot_device - constructor
 //-------------------------------------------------
 
-ql_rom_cartridge_slot_t::ql_rom_cartridge_slot_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, QL_ROM_CARTRIDGE_SLOT, "QL ROM cartridge slot", tag, owner, clock, "ql_rom_cartridge_slot", __FILE__),
+ql_rom_cartridge_slot_device::ql_rom_cartridge_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, QL_ROM_CARTRIDGE_SLOT, tag, owner, clock),
 	device_slot_interface(mconfig, *this),
 	device_image_interface(mconfig, *this), m_card(nullptr)
 {
@@ -65,7 +66,7 @@ ql_rom_cartridge_slot_t::ql_rom_cartridge_slot_t(const machine_config &mconfig, 
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void ql_rom_cartridge_slot_t::device_start()
+void ql_rom_cartridge_slot_device::device_start()
 {
 	m_card = dynamic_cast<device_ql_rom_cartridge_card_interface *>(get_card_device());
 }
@@ -75,13 +76,13 @@ void ql_rom_cartridge_slot_t::device_start()
 //  call_load -
 //-------------------------------------------------
 
-bool ql_rom_cartridge_slot_t::call_load()
+image_init_result ql_rom_cartridge_slot_device::call_load()
 {
 	if (m_card)
 	{
 		size_t size;
 
-		if (software_entry() == nullptr)
+		if (!loaded_through_softlist())
 		{
 			size = length();
 
@@ -94,19 +95,7 @@ bool ql_rom_cartridge_slot_t::call_load()
 		}
 	}
 
-	return IMAGE_INIT_PASS;
-}
-
-
-//-------------------------------------------------
-//  call_softlist_load -
-//-------------------------------------------------
-
-bool ql_rom_cartridge_slot_t::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
-{
-	machine().rom_load().load_software_part_region(*this, swlist, swname, start_entry);
-
-	return true;
+	return image_init_result::PASS;
 }
 
 
@@ -114,7 +103,7 @@ bool ql_rom_cartridge_slot_t::call_softlist_load(software_list_device &swlist, c
 //  get_default_card_software -
 //-------------------------------------------------
 
-std::string ql_rom_cartridge_slot_t::get_default_card_software()
+std::string ql_rom_cartridge_slot_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
 	return software_get_default_slot("standard");
 }

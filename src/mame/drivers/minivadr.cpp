@@ -36,6 +36,7 @@ Notes: (all ICs shown)
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "screen.h"
 
 
 class minivadr_state : public driver_device
@@ -47,8 +48,8 @@ public:
 		m_maincpu(*this, "maincpu") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_videoram;
-	UINT32 screen_update_minivadr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	required_shared_ptr<uint8_t> m_videoram;
+	uint32_t screen_update_minivadr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -58,7 +59,7 @@ public:
  *
  *************************************/
 
-UINT32 minivadr_state::screen_update_minivadr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t minivadr_state::screen_update_minivadr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	offs_t offs;
 
@@ -66,13 +67,13 @@ UINT32 minivadr_state::screen_update_minivadr(screen_device &screen, bitmap_rgb3
 	{
 		int i;
 
-		UINT8 x = offs << 3;
+		uint8_t x = offs << 3;
 		int y = offs >> 5;
-		UINT8 data = m_videoram[offs];
+		uint8_t data = m_videoram[offs];
 
 		for (i = 0; i < 8; i++)
 		{
-			pen_t pen = (data & 0x80) ? rgb_t::white : rgb_t::black;
+			pen_t pen = (data & 0x80) ? rgb_t::white() : rgb_t::black();
 			bitmap.pix32(y, x) = pen;
 
 			data = data << 1;
@@ -104,7 +105,7 @@ static INPUT_PORTS_START( minivadr )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( minivadr, minivadr_state )
+static MACHINE_CONFIG_START( minivadr )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,24000000 / 6)        /* 4 MHz ? */
@@ -135,4 +136,4 @@ ROM_START( minivadr )
 ROM_END
 
 
-GAME( 1990, minivadr, 0, minivadr, minivadr, driver_device, 0, ROT0, "Taito Corporation", "Mini Vaders", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+GAME( 1990, minivadr, 0, minivadr, minivadr, minivadr_state, 0, ROT0, "Taito Corporation", "Mini Vaders", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

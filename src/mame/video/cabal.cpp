@@ -40,8 +40,8 @@ TILE_GET_INFO_MEMBER(cabal_state::get_text_tile_info)
 
 void cabal_state::video_start()
 {
-	m_background_layer = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(cabal_state::get_back_tile_info),this),TILEMAP_SCAN_ROWS,16,16,16,16);
-	m_text_layer       = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(cabal_state::get_text_tile_info),this),TILEMAP_SCAN_ROWS,  8,8,32,32);
+	m_background_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cabal_state::get_back_tile_info),this),TILEMAP_SCAN_ROWS,16,16,16,16);
+	m_text_layer       = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cabal_state::get_text_tile_info),this),TILEMAP_SCAN_ROWS,  8,8,32,32);
 
 	m_text_layer->set_transparent_pen(3);
 	m_background_layer->set_transparent_pen(15);
@@ -134,7 +134,7 @@ void cabal_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 }
 
 
-UINT32 cabal_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t cabal_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_background_layer->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
 	draw_sprites(bitmap,cliprect);

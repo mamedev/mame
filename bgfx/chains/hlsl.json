@@ -84,7 +84,7 @@
 		{ "type": "vec2", "name": "radial_converge_green", "text": "Green Radial Convergence, ", "default": [ 0.0, 0.0 ], "max": [ 10.0, 10.0 ], "min": [ -10.0, -10.0 ], "step": 0.1, "format": "%2.1f", "screen": "raster" },
 		{ "type": "vec2", "name": "radial_converge_blue",  "text": "Blue Radial Convergence, ",  "default": [ 0.0, 0.0 ], "max": [ 10.0, 10.0 ], "min": [ -10.0, -10.0 ], "step": 0.1, "format": "%2.1f", "screen": "raster" },
 
-		{ "type": "vec2", "name": "defocus", "text": "Defocus, ", "default": [ 0.5, 0.5 ], "max": [ 10.0, 10.0 ], "min": [ 0.0, 0.0 ], "step": 0.1, "format": "%2.1f", "screen": "crt" },
+		{ "type": "vec2", "name": "defocus", "text": "Defocus, ", "default": [ 0.5, 0.5 ], "max": [ 2.0, 2.0 ], "min": [ 0.0, 0.0 ], "step": 0.1, "format": "%1.1f", "screen": "crt" },
 
 		{ "type": "color", "name": "phosphor", "text": "Phosphor Persistence, ",  "default": [ 0.45, 0.45, 0.45 ], "max": [ 1.00, 1.00, 1.00 ], "min": [ 0.00, 0.00, 0.00 ], "step": 0.01, "format": "%1.2f", "screen": "crt" },
 
@@ -391,21 +391,7 @@
 			"output": "internal"
 		},
 		{	"effect": "hlsl/defocus",
-			"name": "Defocus Pass 1",
-			"disablewhen": [
-				{ "type": "slider", "condition": "equal", "combine": "or", "name": "adjustments", "value": 0 },
-				{ "type": "slider", "condition": "equal", "combine": "or", "name": "defocus",     "value": [ 0, 0 ] }
-			],
-			"uniforms": [
-				{ "uniform": "u_defocus", "slider": "defocus" }
-			],
-			"input": [
-				{ "sampler": "s_tex", "target": "internal" }
-			],
-			"output": "internal"
-		},
-		{	"effect": "hlsl/defocus",
-			"name": "Defocus Pass 2",
+			"name": "Defocus Pass",
 			"disablewhen": [
 				{ "type": "slider", "condition": "equal", "combine": "or", "name": "adjustments", "value": 0 },
 				{ "type": "slider", "condition": "equal", "combine": "or", "name": "defocus",     "value": [ 0, 0 ] }

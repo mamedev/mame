@@ -39,6 +39,7 @@ plugin_options::plugin_options()
 void plugin_options::parse_json(std::string path)
 {
 	// first try to open as a directory
+	osd_subst_env(path, path);
 	osd::directory::ptr directory = osd::directory::open(path);
 	if (directory)
 	{

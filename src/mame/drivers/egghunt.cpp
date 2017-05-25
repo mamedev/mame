@@ -47,6 +47,8 @@ I dumped it with this configuration. In case I'll redump it desoldering pin 16 f
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "sound/okim6295.h"
+#include "screen.h"
+#include "speaker.h"
 
 class egghunt_state : public driver_device
 {
@@ -63,19 +65,19 @@ public:
 
 	/* video-related */
 	tilemap_t   *m_bg_tilemap;
-	UINT8     m_vidram_bank;
+	uint8_t     m_vidram_bank;
 
 	/* misc */
-	UINT8     m_okibanking;
-	UINT8     m_gfx_banking;
+	uint8_t     m_okibanking;
+	uint8_t     m_gfx_banking;
 
 	/* devices */
 	required_device<cpu_device> m_audiocpu;
 
 	/* memory */
-	required_shared_ptr<UINT8> m_atram;
-	UINT8     m_bgram[0x1000];
-	UINT8     m_spram[0x1000];
+	required_shared_ptr<uint8_t> m_atram;
+	uint8_t     m_bgram[0x1000];
+	uint8_t     m_spram[0x1000];
 	DECLARE_READ8_MEMBER(egghunt_bgram_r);
 	DECLARE_WRITE8_MEMBER(egghunt_bgram_w);
 	DECLARE_WRITE8_MEMBER(egghunt_atram_w);
@@ -88,7 +90,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_egghunt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_egghunt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
@@ -188,13 +190,13 @@ WRITE8_MEMBER(egghunt_state::egghunt_atram_w)
 
 void egghunt_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(egghunt_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(egghunt_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	save_item(NAME(m_bgram));
 	save_item(NAME(m_spram));
 }
 
-UINT32 egghunt_state::screen_update_egghunt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t egghunt_state::screen_update_egghunt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);
@@ -229,7 +231,7 @@ READ8_MEMBER(egghunt_state::egghunt_okibanking_r)
 WRITE8_MEMBER(egghunt_state::egghunt_okibanking_w)
 {
 	m_okibanking = data;
-	m_oki->set_bank_base((data & 0x10) ? 0x40000 : 0);
+	m_oki->set_rom_bank((data >> 4) & 1);
 }
 
 static ADDRESS_MAP_START( egghunt_map, AS_PROGRAM, 8, egghunt_state )
@@ -415,7 +417,7 @@ void egghunt_state::machine_reset()
 	m_vidram_bank = 0;
 }
 
-static MACHINE_CONFIG_START( egghunt, egghunt_state )
+static MACHINE_CONFIG_START( egghunt )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,12000000/2)      /* 6 MHz ?*/
@@ -446,7 +448,7 @@ static MACHINE_CONFIG_START( egghunt, egghunt_state )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -473,4 +475,4 @@ ROM_START( egghunt )
 	ROM_LOAD( "rom1.bin", 0x00000, 0x80000, CRC(f03589bc) SHA1(4d9c8422ac3c4c3ecba3bcf0ed47b8c7d5903f8c) )
 ROM_END
 
-GAME( 1995, egghunt, 0, egghunt, egghunt, driver_device, 0, ROT0, "Invi Image", "Egg Hunt", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, egghunt, 0, egghunt, egghunt, egghunt_state, 0, ROT0, "Invi Image", "Egg Hunt", MACHINE_SUPPORTS_SAVE )

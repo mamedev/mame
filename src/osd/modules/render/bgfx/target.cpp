@@ -37,7 +37,7 @@ bgfx_target::bgfx_target(std::string name, bgfx::TextureFormat::Enum format, uin
 		m_targets = new bgfx::FrameBufferHandle[m_page_count];
 		for (int page = 0; page < m_page_count; page++)
 		{
-			m_textures[page] = bgfx::createTexture2D(m_width, m_height, 1, format, wrap_mode | filter_mode | BGFX_TEXTURE_RT);
+			m_textures[page] = bgfx::createTexture2D(m_width, m_height, false, 1, format, wrap_mode | filter_mode | BGFX_TEXTURE_RT);
 			assert(m_textures[page].idx != 0xffff);
 			m_targets[page] = bgfx::createFrameBuffer(1, &m_textures[page], false);
 			assert(m_targets[page].idx != 0xffff);

@@ -1,10 +1,15 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol
 #include "emu.h"
-#include "coreutil.h"
+
+#include "cpu/i86/i86.h"
+#include "bus/isa/aga.h"
 #include "machine/genpc.h"
 #include "machine/nvram.h"
 #include "machine/pckeybrd.h"
+
+#include "coreutil.h"
+
 
 class europc_pc_state : public driver_device
 {
@@ -37,11 +42,11 @@ public:
 
 	void europc_rtc_set_time();
 
-	UINT8 m_jim_data[16];
-	UINT8 m_jim_state;
+	uint8_t m_jim_data[16];
+	uint8_t m_jim_state;
 	AGA_MODE m_jim_mode;
 	int m_port61; // bit 0,1 must be 0 for startup; reset?
-	UINT8 m_rtc_data[0x10];
+	uint8_t m_rtc_data[0x10];
 	int m_rtc_reg;
 	int m_rtc_state;
 
@@ -323,7 +328,7 @@ WRITE8_MEMBER( europc_pc_state::europc_rtc_w )
 
 DRIVER_INIT_MEMBER(europc_pc_state,europc)
 {
-	UINT8 *rom = &memregion("bios")->base()[0];
+	uint8_t *rom = &memregion("bios")->base()[0];
 
 	int i;
 	/*
@@ -331,7 +336,7 @@ DRIVER_INIT_MEMBER(europc_pc_state,europc)
 	  if year <79 month (and not CENTURY) is loaded with 0x20
 	*/
 	if (rom[0xf93e]==0xb6){ // mov dh,
-		UINT8 a;
+		uint8_t a;
 		rom[0xf93e]=0xb5; // mov ch,
 		for (i=0x8000, a=0; i<0xffff; i++ ) a+=rom[i];
 		rom[0xffff]=256-a;
@@ -471,7 +476,7 @@ static ADDRESS_MAP_START(europc_io, AS_IO, 8, europc_pc_state )
 	AM_RANGE(0x02e0, 0x02e0) AM_READ(europc_jim2_r)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( europc, europc_pc_state )
+static MACHINE_CONFIG_START( europc )
 	MCFG_CPU_ADD("maincpu", I8088, 4772720*2)
 	MCFG_CPU_PROGRAM_MAP(europc_map)
 	MCFG_CPU_IO_MAP(europc_io)

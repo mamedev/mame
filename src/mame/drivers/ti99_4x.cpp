@@ -46,13 +46,17 @@
 #include "machine/tms9901.h"
 #include "imagedev/cassette.h"
 
-#include "bus/ti99x/ti99defs.h"
-#include "bus/ti99x/datamux.h"
-#include "bus/ti99x/gromport.h"
-#include "bus/ti99x/joyport.h"
+#include "bus/ti99/ti99defs.h"
+#include "bus/ti99/internal/datamux.h"
+#include "bus/ti99/internal/gromport.h"
+#include "bus/ti99/internal/evpcconn.h"
 
-#include "bus/ti99_peb/peribox.h"
+#include "bus/ti99/joyport/joyport.h"
+#include "bus/ti99/internal/ioport.h"
+#include "machine/ram.h"
+
 #include "softlist.h"
+#include "speaker.h"
 
 // Debugging
 #define TRACE_READY 0
@@ -67,16 +71,24 @@ class ti99_4x_state : public driver_device
 public:
 	ti99_4x_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_keyboard_column(0),
+		m_check_alphalock(false),
+		m_nready_combined(0),
+		m_nready_prev(0),
+		m_model(0),
+		m_int1(0),
+		m_int2(0),
+		m_int12(0),
 		m_cpu(*this, "maincpu"),
 		m_tms9901(*this, TMS9901_TAG),
 		m_gromport(*this, GROMPORT_TAG),
-		m_peribox(*this, PERIBOX_TAG),
+		m_ioport(*this, TI99_IOPORT_TAG),
 		m_joyport(*this, JOYPORT_TAG),
 		m_datamux(*this, DATAMUX_TAG),
 		m_video(*this, VDP_TAG),
 		m_cassette1(*this, "cassette"),
 		m_cassette2(*this, "cassette2")
-		{ }
+	{ }
 
 	// Machine management
 	DECLARE_MACHINE_START(ti99_4);
@@ -147,23 +159,26 @@ private:
 	int     m_model;
 
 	// Latch for 9901 INT1, INT2, and INT12 lines
-	line_state  m_int1;
-	line_state  m_int2;
-	line_state  m_int12;
+	int  m_int1;
+	int  m_int2;
+	int  m_int12;
 
 	// Connected devices
 	required_device<tms9900_device>     m_cpu;
 	required_device<tms9901_device>     m_tms9901;
-	required_device<gromport_device>    m_gromport;
-	required_device<peribox_device>     m_peribox;
-	required_device<joyport_device>     m_joyport;
-	required_device<ti99_datamux_device> m_datamux;
+	required_device<bus::ti99::internal::gromport_device>   m_gromport;
+	required_device<bus::ti99::internal::ioport_device>     m_ioport;
+	required_device<bus::ti99::joyport::joyport_device>     m_joyport;
+	required_device<bus::ti99::internal::datamux_device>    m_datamux;
 	optional_device<tms9928a_device>    m_video;
 	required_device<cassette_image_device> m_cassette1;
 	required_device<cassette_image_device> m_cassette2;
 
 	// Timer for EVPC (provided by the TMS9929A, but EVPC replaces that VDP)
 	emu_timer   *m_gromclk_timer;
+
+	// Registering save state
+	void    register_save_state();
 };
 
 /*
@@ -193,7 +208,7 @@ enum
 */
 static ADDRESS_MAP_START(memmap, AS_PROGRAM, 16, ti99_4x_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xffff)
-	AM_RANGE(0x0000, 0xffff) AM_DEVREADWRITE(DATAMUX_TAG, ti99_datamux_device, read, write) AM_DEVSETOFFSET(DATAMUX_TAG, ti99_datamux_device, setoffset)
+	AM_RANGE(0x0000, 0xffff) AM_DEVREADWRITE(DATAMUX_TAG, bus::ti99::internal::datamux_device, read, write) AM_DEVSETOFFSET(DATAMUX_TAG, bus::ti99::internal::datamux_device, setoffset)
 ADDRESS_MAP_END
 
 /*
@@ -290,7 +305,7 @@ static INPUT_PORTS_START(ti99_4a)
 		PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 		PORT_CONFSETTING(    0x01, DEF_STR( On ) )
 
-	PORT_START( "LOADINT ")
+	PORT_START( "LOADINT")
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Load interrupt") PORT_CODE(KEYCODE_PRTSCR) PORT_CHANGED_MEMBER(DEVICE_SELF, ti99_4x_state, load_interrupt, 1)
 
 	PORT_START("COL0")  // col 0
@@ -374,7 +389,7 @@ INPUT_PORTS_END
 READ8_MEMBER( ti99_4x_state::cruread )
 {
 //  if (TRACE_CRU) logerror("read access to CRU address %04x\n", offset << 4);
-	UINT8 value = 0;
+	uint8_t value = 0;
 
 	// Similar to the bus8z_devices, just let the gromport and the p-box
 	// decide whether they want to change the value at the CRU address
@@ -382,7 +397,7 @@ READ8_MEMBER( ti99_4x_state::cruread )
 
 	// The QI version does not propagate the CRU signals to the cartridge slot
 	if (m_model != MODEL_4QI) m_gromport->crureadz(space, offset<<4, &value);
-	m_peribox->crureadz(space, offset<<4, &value);
+	m_ioport->crureadz(space, offset<<4, &value);
 
 	return value;
 }
@@ -392,7 +407,7 @@ WRITE8_MEMBER( ti99_4x_state::cruwrite )
 	if (TRACE_CRU) logerror("ti99_4x: write access to CRU address %04x\n", offset << 1);
 	// The QI version does not propagate the CRU signals to the cartridge slot
 	if (m_model != MODEL_4QI) m_gromport->cruwrite(space, offset<<1, data);
-	m_peribox->cruwrite(space, offset<<1, data);
+	m_ioport->cruwrite(space, offset<<1, data);
 }
 
 WRITE8_MEMBER( ti99_4x_state::external_operation )
@@ -440,7 +455,7 @@ READ8_MEMBER( ti99_4x_state::read_by_9901 )
 
 	switch (offset & 0x03)
 	{
-	case TMS9901_CB_INT7:
+	case tms9901_device::CB_INT7:
 		//
 		// Read pins INT3*-INT7* of TI99's 9901.
 		// bit 1: INT1 status
@@ -476,7 +491,7 @@ READ8_MEMBER( ti99_4x_state::read_by_9901 )
 
 		break;
 
-	case TMS9901_INT8_INT15:
+	case tms9901_device::INT8_INT15:
 		// |1|1|1|INT12|0|K|K|K|
 		if (m_keyboard_column >= (m_model==MODEL_4? 5:6)) answer = 0x07;
 		else answer = ((ioport(column[m_keyboard_column])->read())>>5) & 0x07;
@@ -484,12 +499,12 @@ READ8_MEMBER( ti99_4x_state::read_by_9901 )
 		if (m_model != MODEL_4 || m_int12==CLEAR_LINE) answer |= 0x10;
 		break;
 
-	case TMS9901_P0_P7:
+	case tms9901_device::P0_P7:
 		// Required for the handset (only on TI-99/4)
 		if ((m_joyport->read_port() & 0x20)!=0) answer |= 2;
 		break;
 
-	case TMS9901_P8_P15:
+	case tms9901_device::P8_P15:
 		// Preset to 1
 		answer = 4;
 
@@ -622,7 +637,7 @@ READ8_MEMBER( ti99_4x_state::interrupt_level )
 WRITE_LINE_MEMBER( ti99_4x_state::clock_out )
 {
 	m_datamux->clock_in(state);
-	m_peribox->clock_in(state);
+	m_ioport->clock_in(state);
 }
 
 /*
@@ -758,7 +773,7 @@ WRITE_LINE_MEMBER( ti99_4x_state::console_ready_cart )
 */
 WRITE_LINE_MEMBER( ti99_4x_state::console_reset )
 {
-	if (machine().phase() != MACHINE_PHASE_INIT)
+	if (machine().phase() != machine_phase::INIT)
 	{
 		logerror("ti99_4x: Console reset line = %d\n", state);
 		m_cpu->set_input_line(INT_9900_RESET, state);
@@ -778,36 +793,17 @@ WRITE_LINE_MEMBER( ti99_4x_state::notconnected )
 	if (TRACE_INTERRUPTS) logerror("ti99_4x: Setting a not connected line ... ignored\n");
 }
 
-#if 0
-/*
-    External clock connector. This is actually a separate cable lead going from
-    the EPVC in the PEB to a pin inside the console. This cable sends the
-    video interrupt from the v9938 on the EVPC into the console.
-    This workaround must be done on the real system because the peripheral
-    box and its connector were not designed to deliver a video interrupt signal.
-    This was fixed with the EVPC2 which uses the external interrupt EXTINT
-    with a special firmware (DSR).
-
-    Emulation detail: We are using a separate device class in order to avoid
-    exposing the console class to the external class.
-*/
-evpc_clock_connector::evpc_clock_connector(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: device_t(mconfig, EVPC_CONN, "EVPC clock connector", tag, owner, clock, "ti99_evpc_clock", __FILE__)
+void ti99_4x_state::register_save_state()
 {
+	save_item(NAME(m_keyboard_column));
+	save_item(NAME(m_check_alphalock));
+	save_item(NAME(m_nready_combined));
+	save_item(NAME(m_nready_prev));
+	save_item(NAME(m_model));
+	save_item(NAME(m_int1));
+	save_item(NAME(m_int2));
+	save_item(NAME(m_int12));
 }
-
-void evpc_clock_connector::device_start()
-{
-	m_console = downcast<ti99_4x_state*>(owner());
-}
-
-WRITE_LINE_MEMBER( evpc_clock_connector::vclock_line )
-{
-	m_console->video_interrupt_in(state);
-};
-
-const device_type EVPC_CONN = &device_creator<evpc_clock_connector>;
-#endif
 
 /******************************************************************************
     Machine definitions
@@ -815,10 +811,9 @@ const device_type EVPC_CONN = &device_creator<evpc_clock_connector>;
 
 MACHINE_START_MEMBER(ti99_4x_state,ti99_4)
 {
-	m_peribox->senila(CLEAR_LINE);
-	m_peribox->senilb(CLEAR_LINE);
 	m_nready_combined = 0;
 	m_model = MODEL_4;
+	register_save_state();
 }
 
 MACHINE_RESET_MEMBER(ti99_4x_state,ti99_4)
@@ -834,7 +829,7 @@ MACHINE_RESET_MEMBER(ti99_4x_state,ti99_4)
     TI-99/4 - predecessor of the more popular TI-99/4A
 ***********************************************************************/
 
-static MACHINE_CONFIG_START( ti99_4, ti99_4x_state )
+static MACHINE_CONFIG_START( ti99_4 )
 	// CPU
 	MCFG_TMS99xx_ADD("maincpu", TMS9900, 3000000, memmap, cru_map)
 	MCFG_TMS99xx_EXTOP_HANDLER( WRITE8(ti99_4x_state, external_operation) )
@@ -845,7 +840,7 @@ static MACHINE_CONFIG_START( ti99_4, ti99_4x_state )
 	MCFG_MACHINE_START_OVERRIDE(ti99_4x_state, ti99_4 )
 	MCFG_MACHINE_RESET_OVERRIDE(ti99_4x_state, ti99_4 )
 
-	/* Main board */
+	// Main board
 	MCFG_DEVICE_ADD(TMS9901_TAG, TMS9901, 3000000)
 	MCFG_TMS9901_READBLOCK_HANDLER( READ8(ti99_4x_state, read_by_9901) )
 	MCFG_TMS9901_P0_HANDLER( WRITELINE( ti99_4x_state, handset_ack) )
@@ -858,21 +853,30 @@ static MACHINE_CONFIG_START( ti99_4, ti99_4x_state )
 	MCFG_TMS9901_P9_HANDLER( WRITELINE( ti99_4x_state, cassette_output) )
 	MCFG_TMS9901_INTLEVEL_HANDLER( WRITE8( ti99_4x_state, tms9901_interrupt) )
 
-	MCFG_DEVICE_ADD( DATAMUX_TAG, DATAMUX, 0)
+	MCFG_DEVICE_ADD( DATAMUX_TAG, TI99_DATAMUX, 0)
 	MCFG_DMUX_READY_HANDLER( WRITELINE(ti99_4x_state, console_ready_dmux) )
 
 	MCFG_GROMPORT4_ADD( GROMPORT_TAG )
 	MCFG_GROMPORT_READY_HANDLER( WRITELINE(ti99_4x_state, console_ready_cart) )
 	MCFG_GROMPORT_RESET_HANDLER( WRITELINE(ti99_4x_state, console_reset) )
 
-	/* Software list */
+	// Scratch pad RAM 256 bytes
+	MCFG_RAM_ADD(PADRAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("256")
+	MCFG_RAM_DEFAULT_VALUE(0)
+
+	// Optional RAM expansion
+	MCFG_RAM_ADD(EXPRAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("32K")
+	MCFG_RAM_DEFAULT_VALUE(0)
+
+	// Software list
 	MCFG_SOFTWARE_LIST_ADD("cart_list_ti99", "ti99_cart")
 
-	/* Peripheral expansion box */
-	MCFG_DEVICE_ADD( PERIBOX_TAG, PERIBOX, 0)
-	MCFG_PERIBOX_INTA_HANDLER( WRITELINE(ti99_4x_state, extint) )
-	MCFG_PERIBOX_INTB_HANDLER( WRITELINE(ti99_4x_state, notconnected) )
-	MCFG_PERIBOX_READY_HANDLER( DEVWRITELINE(DATAMUX_TAG, ti99_datamux_device, ready_line) )
+	// Input/output port
+	MCFG_IOPORT_ADD( TI99_IOPORT_TAG )
+	MCFG_IOPORT_EXTINT_HANDLER( WRITELINE(ti99_4x_state, extint) )
+	MCFG_IOPORT_READY_HANDLER( DEVWRITELINE(DATAMUX_TAG, bus::ti99::internal::datamux_device, ready_line) )
 
 	// Sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("sound_out")
@@ -880,7 +884,7 @@ static MACHINE_CONFIG_START( ti99_4, ti99_4x_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "sound_out", 0.75)
 	MCFG_SN76496_READY_HANDLER( WRITELINE(ti99_4x_state, console_ready_sound) )
 
-	/* Cassette drives */
+	// Cassette drives
 	MCFG_SPEAKER_STANDARD_MONO("cass_out")
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_ADD( "cassette2" )
@@ -928,10 +932,9 @@ MACHINE_CONFIG_END
 
 MACHINE_START_MEMBER(ti99_4x_state,ti99_4a)
 {
-	m_peribox->senila(CLEAR_LINE);
-	m_peribox->senilb(CLEAR_LINE);
 	m_nready_combined = 0;
 	m_model = MODEL_4A;
+	register_save_state();
 }
 
 MACHINE_RESET_MEMBER(ti99_4x_state,ti99_4a)
@@ -943,8 +946,8 @@ MACHINE_RESET_MEMBER(ti99_4x_state,ti99_4a)
 	m_int12 = CLEAR_LINE;
 }
 
-static MACHINE_CONFIG_START( ti99_4a, ti99_4x_state )
-	/* CPU */
+static MACHINE_CONFIG_START( ti99_4a )
+	// CPU
 	MCFG_TMS99xx_ADD("maincpu", TMS9900, 3000000, memmap, cru_map)
 	MCFG_TMS99xx_EXTOP_HANDLER( WRITE8(ti99_4x_state, external_operation) )
 	MCFG_TMS99xx_INTLEVEL_HANDLER( READ8(ti99_4x_state, interrupt_level) )
@@ -954,7 +957,7 @@ static MACHINE_CONFIG_START( ti99_4a, ti99_4x_state )
 	MCFG_MACHINE_START_OVERRIDE(ti99_4x_state, ti99_4a )
 	MCFG_MACHINE_RESET_OVERRIDE(ti99_4x_state, ti99_4a )
 
-	/* Main board */
+	// Main board
 	MCFG_DEVICE_ADD(TMS9901_TAG, TMS9901, 3000000)
 	MCFG_TMS9901_READBLOCK_HANDLER( READ8(ti99_4x_state, read_by_9901) )
 	MCFG_TMS9901_P2_HANDLER( WRITELINE( ti99_4x_state, keyC0) )
@@ -967,21 +970,30 @@ static MACHINE_CONFIG_START( ti99_4a, ti99_4x_state )
 	MCFG_TMS9901_P9_HANDLER( WRITELINE( ti99_4x_state, cassette_output) )
 	MCFG_TMS9901_INTLEVEL_HANDLER( WRITE8( ti99_4x_state, tms9901_interrupt) )
 
-	MCFG_DEVICE_ADD( DATAMUX_TAG, DATAMUX, 0)
+	MCFG_DEVICE_ADD( DATAMUX_TAG, TI99_DATAMUX, 0)
 	MCFG_DMUX_READY_HANDLER( WRITELINE(ti99_4x_state, console_ready_dmux) )
 
 	MCFG_GROMPORT4_ADD( GROMPORT_TAG )
 	MCFG_GROMPORT_READY_HANDLER( WRITELINE(ti99_4x_state, console_ready_cart) )
 	MCFG_GROMPORT_RESET_HANDLER( WRITELINE(ti99_4x_state, console_reset) )
 
-	/* Software list */
+	// Scratch pad RAM 256 bytes
+	MCFG_RAM_ADD(PADRAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("256")
+	MCFG_RAM_DEFAULT_VALUE(0)
+
+	// Optional RAM expansion
+	MCFG_RAM_ADD(EXPRAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("32K")
+	MCFG_RAM_DEFAULT_VALUE(0)
+
+	// Software list
 	MCFG_SOFTWARE_LIST_ADD("cart_list_ti99", "ti99_cart")
 
-	/* Peripheral expansion box */
-	MCFG_DEVICE_ADD( PERIBOX_TAG, PERIBOX, 0)
-	MCFG_PERIBOX_INTA_HANDLER( WRITELINE(ti99_4x_state, extint) )
-	MCFG_PERIBOX_INTB_HANDLER( WRITELINE(ti99_4x_state, notconnected) )
-	MCFG_PERIBOX_READY_HANDLER( DEVWRITELINE(DATAMUX_TAG, ti99_datamux_device, ready_line) )
+	// Input/output port
+	MCFG_IOPORT_ADD( TI99_IOPORT_TAG )
+	MCFG_IOPORT_EXTINT_HANDLER( WRITELINE(ti99_4x_state, extint) )
+	MCFG_IOPORT_READY_HANDLER( DEVWRITELINE(DATAMUX_TAG, bus::ti99::internal::datamux_device, ready_line) )
 
 	// Sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("sound_out")
@@ -989,7 +1001,7 @@ static MACHINE_CONFIG_START( ti99_4a, ti99_4x_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "sound_out", 0.75)
 	MCFG_SN76496_READY_HANDLER( WRITELINE(ti99_4x_state, console_ready_sound) )
 
-	/* Cassette drives */
+	// Cassette drives
 	MCFG_SPEAKER_STANDARD_MONO("cass_out")
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_ADD( "cassette2" )
@@ -1041,10 +1053,9 @@ MACHINE_CONFIG_END
 
 MACHINE_START_MEMBER(ti99_4x_state, ti99_4qi)
 {
-	m_peribox->senila(CLEAR_LINE);
-	m_peribox->senilb(CLEAR_LINE);
 	m_model = MODEL_4QI;
 	m_nready_combined = 0;
+	register_save_state();
 }
 
 static MACHINE_CONFIG_DERIVED( ti99_4qi, ti99_4a )
@@ -1074,13 +1085,12 @@ MACHINE_CONFIG_END
 
 MACHINE_START_MEMBER(ti99_4x_state, ti99_4ev)
 {
-	m_peribox->senila(CLEAR_LINE);
-	m_peribox->senilb(CLEAR_LINE);
 	m_nready_combined = 0;
 	m_model = MODEL_4A;
 	// Removing the TMS9928a requires to add a replacement for the GROMCLK.
 	// In the real hardware this is a circuit (REPL99x) that fits into the VDP socket
 	m_gromclk_timer = timer_alloc(0);
+	register_save_state();
 }
 
 MACHINE_RESET_MEMBER(ti99_4x_state, ti99_4ev)
@@ -1093,8 +1103,8 @@ MACHINE_RESET_MEMBER(ti99_4x_state, ti99_4ev)
 	m_gromclk_timer->adjust(attotime::zero, 0, attotime::from_hz(XTAL_10_738635MHz/24));
 }
 
-static MACHINE_CONFIG_START( ti99_4ev_60hz, ti99_4x_state )
-	/* CPU */
+static MACHINE_CONFIG_START( ti99_4ev_60hz )
+	// CPU
 	MCFG_TMS99xx_ADD("maincpu", TMS9900, 3000000, memmap, cru_map)
 	MCFG_TMS99xx_EXTOP_HANDLER( WRITE8(ti99_4x_state, external_operation) )
 	MCFG_TMS99xx_INTLEVEL_HANDLER( READ8(ti99_4x_state, interrupt_level) )
@@ -1104,7 +1114,7 @@ static MACHINE_CONFIG_START( ti99_4ev_60hz, ti99_4x_state )
 	MCFG_MACHINE_START_OVERRIDE(ti99_4x_state, ti99_4ev )
 	MCFG_MACHINE_RESET_OVERRIDE(ti99_4x_state, ti99_4ev )
 
-	/* Main board */
+	// Main board
 	MCFG_DEVICE_ADD(TMS9901_TAG, TMS9901, 3000000)
 	MCFG_TMS9901_READBLOCK_HANDLER( READ8(ti99_4x_state, read_by_9901) )
 	MCFG_TMS9901_P2_HANDLER( WRITELINE( ti99_4x_state, keyC0) )
@@ -1117,25 +1127,34 @@ static MACHINE_CONFIG_START( ti99_4ev_60hz, ti99_4x_state )
 	MCFG_TMS9901_P9_HANDLER( WRITELINE( ti99_4x_state, cassette_output) )
 	MCFG_TMS9901_INTLEVEL_HANDLER( WRITE8( ti99_4x_state, tms9901_interrupt) )
 
-	MCFG_DEVICE_ADD( DATAMUX_TAG, DATAMUX, 0)
+	MCFG_DEVICE_ADD( DATAMUX_TAG, TI99_DATAMUX, 0)
 	MCFG_DMUX_READY_HANDLER( WRITELINE(ti99_4x_state, console_ready_dmux) )
 	MCFG_GROMPORT4_ADD( GROMPORT_TAG )
 	MCFG_GROMPORT_READY_HANDLER( WRITELINE(ti99_4x_state, console_ready_cart) )
 	MCFG_GROMPORT_RESET_HANDLER( WRITELINE(ti99_4x_state, console_reset) )
 
+	// Scratch pad RAM 256 bytes
+	MCFG_RAM_ADD(PADRAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("256")
+	MCFG_RAM_DEFAULT_VALUE(0)
+
+	// Optional RAM expansion
+	MCFG_RAM_ADD(EXPRAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("32K")
+	MCFG_RAM_DEFAULT_VALUE(0)
+
 	// EVPC connector
 	MCFG_ADD_EVPC_CONNECTOR( EVPC_CONN_TAG, WRITELINE( ti99_4x_state, video_interrupt_evpc_in ) )
 
-	/* Software list */
+	// Software list
 	MCFG_SOFTWARE_LIST_ADD("cart_list_ti99", "ti99_cart")
 
-	/* Peripheral expansion box */
-	MCFG_DEVICE_ADD( PERIBOX_TAG, PERIBOX_EV, 0)
-	MCFG_PERIBOX_INTA_HANDLER( WRITELINE(ti99_4x_state, extint) )
-	MCFG_PERIBOX_INTB_HANDLER( WRITELINE(ti99_4x_state, notconnected) )
-	MCFG_PERIBOX_READY_HANDLER( DEVWRITELINE(DATAMUX_TAG, ti99_datamux_device, ready_line) )
+	// Input/output port
+	MCFG_IOPORT_ADD( TI99_IOPORT_TAG )
+	MCFG_IOPORT_EXTINT_HANDLER( WRITELINE(ti99_4x_state, extint) )
+	MCFG_IOPORT_READY_HANDLER( DEVWRITELINE(DATAMUX_TAG, bus::ti99::internal::datamux_device, ready_line) )
 
-	/* Cassette drives */
+	// Cassette drives
 	MCFG_SPEAKER_STANDARD_MONO("cass_out")
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_ADD( "cassette2" )
@@ -1224,10 +1243,10 @@ ROM_START(ti99_4ev)
 	ROM_LOAD("994a_grom2.u502", 0x4000, 0x1800, CRC(e0bb5341) SHA1(e255f0d65d69b927cecb8fcfac7a4c17d585ea96)) /* system GROM 2 */
 ROM_END
 
-//    YEAR  NAME      PARENT  COMPAT   MACHINE        INPUT    CLASS          INIT  COMPANY             FULLNAME                          FLAGS
-COMP( 1979, ti99_4,   0,        0,     ti99_4_60hz,   ti99_4,  driver_device, 0,   "Texas Instruments", "TI-99/4 Home Computer (US)",       0)
-COMP( 1980, ti99_4e,  ti99_4,   0,     ti99_4_50hz,   ti99_4,  driver_device, 0,   "Texas Instruments", "TI-99/4 Home Computer (Europe)",   0)
-COMP( 1981, ti99_4a,  0,        0,     ti99_4a_60hz,  ti99_4a, driver_device, 0,   "Texas Instruments", "TI-99/4A Home Computer (US)",      0)
-COMP( 1981, ti99_4ae, ti99_4a,  0,     ti99_4a_50hz,  ti99_4a, driver_device, 0,   "Texas Instruments", "TI-99/4A Home Computer (Europe)",  0)
-COMP( 1983, ti99_4qi, ti99_4a,  0,     ti99_4qi_60hz, ti99_4a, driver_device, 0,   "Texas Instruments", "TI-99/4QI Home Computer (US)",     0)
-COMP( 1994, ti99_4ev, ti99_4a,  0,     ti99_4ev_60hz, ti99_4a, driver_device, 0,   "Texas Instruments", "TI-99/4A Home Computer with EVPC", 0)
+//    YEAR  NAME      PARENT  COMPAT   MACHINE        INPUT    CLASS          INIT  COMPANY             FULLNAME                            FLAGS
+COMP( 1979, ti99_4,   0,        0,     ti99_4_60hz,   ti99_4,  ti99_4x_state, 0,   "Texas Instruments", "TI-99/4 Home Computer (US)",       MACHINE_SUPPORTS_SAVE)
+COMP( 1980, ti99_4e,  ti99_4,   0,     ti99_4_50hz,   ti99_4,  ti99_4x_state, 0,   "Texas Instruments", "TI-99/4 Home Computer (Europe)",   MACHINE_SUPPORTS_SAVE)
+COMP( 1981, ti99_4a,  0,        0,     ti99_4a_60hz,  ti99_4a, ti99_4x_state, 0,   "Texas Instruments", "TI-99/4A Home Computer (US)",      MACHINE_SUPPORTS_SAVE)
+COMP( 1981, ti99_4ae, ti99_4a,  0,     ti99_4a_50hz,  ti99_4a, ti99_4x_state, 0,   "Texas Instruments", "TI-99/4A Home Computer (Europe)",  MACHINE_SUPPORTS_SAVE)
+COMP( 1983, ti99_4qi, ti99_4a,  0,     ti99_4qi_60hz, ti99_4a, ti99_4x_state, 0,   "Texas Instruments", "TI-99/4QI Home Computer (US)",     MACHINE_SUPPORTS_SAVE)
+COMP( 1994, ti99_4ev, ti99_4a,  0,     ti99_4ev_60hz, ti99_4a, ti99_4x_state, 0,   "Texas Instruments", "TI-99/4A Home Computer with EVPC", MACHINE_SUPPORTS_SAVE)

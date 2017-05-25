@@ -76,11 +76,12 @@
 
 
 #include "emu.h"
+#include "includes/foodf.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/atarigen.h"
 #include "machine/watchdog.h"
 #include "sound/pokey.h"
-#include "includes/foodf.h"
+#include "speaker.h"
 
 
 #define MASTER_CLOCK        12096000
@@ -125,7 +126,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(foodf_state::scanline_update_timer)
 	   mystery yet */
 
 	/* INT 1 is on 32V */
-	scanline_int_gen(m_maincpu);
+	scanline_int_gen(*m_maincpu);
 
 	/* advance to the next interrupt */
 	scanline += 64;
@@ -334,7 +335,7 @@ READ8_MEMBER(foodf_state::pot_r)
  *
  *************************************/
 
-static MACHINE_CONFIG_START( foodf, foodf_state )
+static MACHINE_CONFIG_START( foodf )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK/2)
@@ -504,7 +505,7 @@ ROM_END
  *
  *************************************/
 
-GAME( 1982, foodf,  0,     foodf, foodf, driver_device, 0, ROT0, "General Computer Corporation (Atari license)", "Food Fight (rev 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, foodf2, foodf, foodf, foodf, driver_device, 0, ROT0, "General Computer Corporation (Atari license)", "Food Fight (rev 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, foodf1, foodf, foodf, foodf, driver_device, 0, ROT0, "General Computer Corporation (Atari license)", "Food Fight (rev 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, foodfc, foodf, foodf, foodf, driver_device, 0, ROT0, "General Computer Corporation (Atari license)", "Food Fight (cocktail)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, foodf,  0,     foodf, foodf, foodf_state, 0, ROT0, "General Computer Corporation (Atari license)", "Food Fight (rev 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, foodf2, foodf, foodf, foodf, foodf_state, 0, ROT0, "General Computer Corporation (Atari license)", "Food Fight (rev 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, foodf1, foodf, foodf, foodf, foodf_state, 0, ROT0, "General Computer Corporation (Atari license)", "Food Fight (rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, foodfc, foodf, foodf, foodf, foodf_state, 0, ROT0, "General Computer Corporation (Atari license)", "Food Fight (cocktail)", MACHINE_SUPPORTS_SAVE )

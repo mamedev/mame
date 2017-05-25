@@ -89,7 +89,7 @@ WRITE_LINE_MEMBER(carpolo_state::carpolo_7474_2u_2_q_cb)
 }
 
 
-void carpolo_state::carpolo_generate_ball_screen_interrupt(UINT8 cause)
+void carpolo_state::carpolo_generate_ball_screen_interrupt(uint8_t cause)
 {
 	m_ball_screen_collision_cause = cause;
 
@@ -198,7 +198,7 @@ READ8_MEMBER(carpolo_state::carpolo_interrupt_cause_r)
 
 INTERRUPT_GEN_MEMBER(carpolo_state::carpolo_timer_interrupt)
 {
-	UINT8 port_value;
+	uint8_t port_value;
 	int player;
 
 
@@ -253,30 +253,16 @@ INTERRUPT_GEN_MEMBER(carpolo_state::carpolo_timer_interrupt)
 	/* finally read the accelerator pedals */
 	port_value = ioport("PEDALS")->read();
 
-	for (player = 0; player < 4; player++)
-	{
-		/* one line indicates if the pedal is pressed and the other
-		   how much, resulting in only two different possible levels */
-		if (port_value & 0x01)
-		{
-			m_ttl74153_1k->input_line_w(0, player, 1);
-			m_ttl74153_1k->input_line_w(1, player, 0);
-		}
-		else if (port_value & 0x02)
-		{
-			m_ttl74153_1k->input_line_w(0, player, 1);
-			m_ttl74153_1k->input_line_w(1, player, 1);
-		}
-		else
-		{
-			m_ttl74153_1k->input_line_w(0, player, 0);
-			/* the other line is irrelevant */
-		}
-
-		port_value >>= 2;
-	}
-
-	m_ttl74153_1k->update();
+	// one line indicates if the pedal is pressed and the other
+	// how much, resulting in only two different possible levels
+	m_ttl74153_1k->i0a_w(BIT(port_value, 0) | BIT(port_value, 1));
+	m_ttl74153_1k->i1a_w(BIT(port_value, 2) | BIT(port_value, 3));
+	m_ttl74153_1k->i2a_w(BIT(port_value, 4) | BIT(port_value, 5));
+	m_ttl74153_1k->i3a_w(BIT(port_value, 6) | BIT(port_value, 7));
+	m_ttl74153_1k->i0b_w(BIT(port_value, 1));
+	m_ttl74153_1k->i1b_w(BIT(port_value, 3));
+	m_ttl74153_1k->i2b_w(BIT(port_value, 5));
+	m_ttl74153_1k->i3b_w(BIT(port_value, 7));
 }
 
 // FIXME: Remove trampolines
@@ -344,6 +330,16 @@ WRITE8_MEMBER(carpolo_state::carpolo_timer_interrupt_clear_w)
  *
  *************************************/
 
+WRITE_LINE_MEMBER( carpolo_state::ls153_za_w )
+{
+	m_ls153_za = state;
+}
+
+WRITE_LINE_MEMBER( carpolo_state::ls153_zb_w )
+{
+	m_ls153_zb = state;
+}
+
 WRITE8_MEMBER(carpolo_state::pia_0_port_a_w)
 {
 	/* bit 0 - Coin counter
@@ -374,10 +370,8 @@ WRITE8_MEMBER(carpolo_state::pia_0_port_b_w)
 	   bit 6 - Select pedal 0
 	   bit 7 - Select pdeal 1 */
 
-	m_ttl74153_1k->a_w(data & 0x40);
-	m_ttl74153_1k->b_w(data & 0x80);
-
-	m_ttl74153_1k->update();
+	m_ttl74153_1k->s0_w(BIT(data, 6));
+	m_ttl74153_1k->s1_w(BIT(data, 7));
 }
 
 READ8_MEMBER(carpolo_state::pia_0_port_b_r)
@@ -385,14 +379,13 @@ READ8_MEMBER(carpolo_state::pia_0_port_b_r)
 	/* bit 4 - Pedal bit 0
 	   bit 5 - Pedal bit 1 */
 
-	return (m_ttl74153_1k->output_r(0) << 5) |
-			(m_ttl74153_1k->output_r(1) << 4);
+	return (m_ls153_za << 5) | (m_ls153_zb << 4);
 }
 
 
 READ8_MEMBER(carpolo_state::pia_1_port_a_r)
 {
-	UINT8 ret;
+	uint8_t ret;
 
 	/* bit 0 - Player 4 steering input (left or right)
 	   bit 1 - Player 3 steering input (left or right)
@@ -415,7 +408,7 @@ READ8_MEMBER(carpolo_state::pia_1_port_a_r)
 
 READ8_MEMBER(carpolo_state::pia_1_port_b_r)
 {
-	UINT8 ret;
+	uint8_t ret;
 
 	/* bit 4 - Player 4 steering input (wheel moving or stopped)
 	   bit 5 - Player 3 steering input (wheel moving or stopped)
@@ -486,9 +479,4 @@ void carpolo_state::machine_reset()
 
 	m_ttl7474_1a_2->clear_w (1);
 	m_ttl7474_1a_2->preset_w(1);
-
-
-	/* set up the pedal handling chips */
-	m_ttl74153_1k->enable_w(0, 0);
-	m_ttl74153_1k->enable_w(1, 0);
 }

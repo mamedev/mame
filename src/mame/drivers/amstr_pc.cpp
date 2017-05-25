@@ -34,6 +34,7 @@ More information can be found at http://www.seasip.info/AmstradXT/1640tech/index
 #include "machine/genpc.h"
 #include "bus/isa/isa.h"
 #include "bus/isa/isa_cards.h"
+#include "bus/pc_joy/pc_joy.h"
 
 #include "machine/pckeybrd.h"
 #include "machine/pc_lpt.h"
@@ -47,8 +48,10 @@ public:
 		m_mb(*this, "mb"),
 		m_keyboard(*this, "pc_keyboard"),
 		m_lpt1(*this, "lpt_1"),
-		m_lpt2(*this, "lpt_2")
-			{ m_mouse.x =0; m_mouse.y=0;}
+		m_lpt2(*this, "lpt_2"),
+		m_mouse{ 0, 0 }
+	{
+	}
 
 	required_device<cpu_device> m_maincpu;
 	required_device<pc_noppi_mb_device> m_mb;
@@ -72,14 +75,14 @@ public:
 	DECLARE_READ8_MEMBER( pc1640_port278_r );
 
 	struct {
-		UINT8 x,y; //byte clipping needed
+		uint8_t x,y; //byte clipping needed
 	} m_mouse;
 
 	// 64 system status register?
-	UINT8 m_port60;
-	UINT8 m_port61;
-	UINT8 m_port62;
-	UINT8 m_port65;
+	uint8_t m_port60;
+	uint8_t m_port61;
+	uint8_t m_port62;
+	uint8_t m_port65;
 
 	int m_dipstate;
 };
@@ -290,7 +293,7 @@ READ8_MEMBER( amstrad_pc_state::pc1640_port60_r )
 
 READ8_MEMBER( amstrad_pc_state::pc200_port378_r )
 {
-	UINT8 data = m_lpt1->read(space, offset);
+	uint8_t data = m_lpt1->read(space, offset);
 
 	if (offset == 1)
 		data = (data & ~7) | (ioport("DSW0")->read() & 7);
@@ -302,7 +305,7 @@ READ8_MEMBER( amstrad_pc_state::pc200_port378_r )
 
 READ8_MEMBER( amstrad_pc_state::pc200_port278_r )
 {
-	UINT8 data = m_lpt2->read(space, offset);
+	uint8_t data = m_lpt2->read(space, offset);
 
 	if (offset == 1)
 		data = (data & ~7) | (ioport("DSW0")->read() & 7);
@@ -315,7 +318,7 @@ READ8_MEMBER( amstrad_pc_state::pc200_port278_r )
 
 READ8_MEMBER( amstrad_pc_state::pc1640_port378_r )
 {
-	UINT8 data = m_lpt1->read(space, offset);
+	uint8_t data = m_lpt1->read(space, offset);
 
 	if (offset == 1)
 		data=(data & ~7) | (ioport("DSW0")->read() & 7);
@@ -461,12 +464,12 @@ INPUT_PORTS_END
 // GFXDECODE_END
 
 // has it's own mouse
-static MACHINE_CONFIG_FRAGMENT( cfg_com )
+static MACHINE_CONFIG_START( cfg_com )
 	MCFG_DEVICE_MODIFY("serport0")
 	MCFG_SLOT_DEFAULT_OPTION(nullptr)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( pc200, amstrad_pc_state )
+static MACHINE_CONFIG_START( pc200 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8086, 8000000)
 	MCFG_CPU_PROGRAM_MAP(ppc640_map)
@@ -629,10 +632,10 @@ ROM_END
 
 ***************************************************************************/
 
-/*     YEAR     NAME        PARENT      COMPAT      MACHINE     INPUT       INIT        COMPANY     FULLNAME */
-COMP(  1987,    ppc512,     ibm5150,    0,  ppc512,     pc200, driver_device,    0,  "Amstrad plc",  "Amstrad PPC512", MACHINE_NOT_WORKING)
-COMP(  1987,    ppc640,     ibm5150,    0,  ppc640,     pc200, driver_device,    0,  "Amstrad plc",  "Amstrad PPC640", MACHINE_NOT_WORKING)
-COMP(  1988,    pc20,       ibm5150,    0,  pc200,      pc200, driver_device,    0,  "Amstrad plc",  "Amstrad PC20" , MACHINE_NOT_WORKING)
-COMP(  1988,    pc200,      ibm5150,    0,  pc200,      pc200, driver_device,    0,  "Sinclair Research Ltd",  "PC200 Professional Series", MACHINE_NOT_WORKING)
-COMP(  1988,    pc2086,     ibm5150,    0,  pc2086,     pc200, driver_device,    0,  "Amstrad plc",  "Amstrad PC2086", MACHINE_NOT_WORKING )
-COMP(  1990,    pc3086,     ibm5150,    0,  pc2086,     pc200, driver_device,    0,  "Amstrad plc",  "Amstrad PC3086", MACHINE_NOT_WORKING )
+/*     YEAR   NAME     PARENT    COMPAT  MACHINE  INPUT  STATE              INIT  COMPANY     FULLNAME */
+COMP(  1987,  ppc512,  ibm5150,  0,      ppc512,  pc200, amstrad_pc_state,  0,    "Amstrad plc",  "Amstrad PPC512", MACHINE_NOT_WORKING)
+COMP(  1987,  ppc640,  ibm5150,  0,      ppc640,  pc200, amstrad_pc_state,  0,    "Amstrad plc",  "Amstrad PPC640", MACHINE_NOT_WORKING)
+COMP(  1988,  pc20,    ibm5150,  0,      pc200,   pc200, amstrad_pc_state,  0,    "Amstrad plc",  "Amstrad PC20" , MACHINE_NOT_WORKING)
+COMP(  1988,  pc200,   ibm5150,  0,      pc200,   pc200, amstrad_pc_state,  0,    "Sinclair Research Ltd",  "PC200 Professional Series", MACHINE_NOT_WORKING)
+COMP(  1988,  pc2086,  ibm5150,  0,      pc2086,  pc200, amstrad_pc_state,  0,    "Amstrad plc",  "Amstrad PC2086", MACHINE_NOT_WORKING )
+COMP(  1990,  pc3086,  ibm5150,  0,      pc2086,  pc200, amstrad_pc_state,  0,    "Amstrad plc",  "Amstrad PC3086", MACHINE_NOT_WORKING )

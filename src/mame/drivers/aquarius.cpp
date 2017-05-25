@@ -21,8 +21,12 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "includes/aquarius.h"
+
 #include "softlist.h"
+#include "speaker.h"
+
 
 /***************************************************************************
     CONSTANTS
@@ -134,7 +138,7 @@ WRITE8_MEMBER(aquarius_state::printer_w)
 */
 READ8_MEMBER(aquarius_state::keyboard_r)
 {
-	UINT8 result = 0xff;
+	uint8_t result = 0xff;
 
 	if (!BIT(offset,  8)) result &= m_y0->read();
 	if (!BIT(offset,  9)) result &= m_y1->read();
@@ -174,7 +178,7 @@ WRITE8_MEMBER(aquarius_state::scrambler_w)
 
 READ8_MEMBER(aquarius_state::cartridge_r)
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 	if (m_cart->exists())
 		data = m_cart->read_rom(space, offset);
 
@@ -343,7 +347,7 @@ GFXDECODE_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( aquarius, aquarius_state )
+static MACHINE_CONFIG_START( aquarius )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_579545MHz) // ???
 	MCFG_CPU_PROGRAM_MAP(aquarius_mem)
@@ -416,6 +420,6 @@ ROM_END
     GAME DRIVERS
 ***************************************************************************/
 
-/*    YEAR  NAME         PARENT    COMPAT  MACHINE      INPUT     INIT      COMPANY   FULLNAME                         FLAGS */
-COMP( 1983, aquarius,    0,        0,      aquarius,    aquarius, aquarius_state, aquarius, "Mattel", "Aquarius (NTSC)",               0 )
-//COMP( 1984,   aquariu2,   aquarius,   0,      aquarius,   aquarius, driver_device,   0,  "Mattel",   "Aquarius II",  MACHINE_NOT_WORKING )
+//    YEAR  NAME         PARENT    COMPAT  MACHINE      INPUT     STATE           INIT      COMPANY   FULLNAME               FLAGS
+COMP( 1983, aquarius,    0,        0,      aquarius,    aquarius, aquarius_state, aquarius, "Mattel", "Aquarius (NTSC)",     0 )
+//COMP( 1984, aquariu2,    aquarius, 0,      aquarius,    aquarius, aquarius_state, 0,        "Mattel", "Aquarius II",         MACHINE_NOT_WORKING )

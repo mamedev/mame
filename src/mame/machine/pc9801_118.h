@@ -6,11 +6,11 @@
 
 ***************************************************************************/
 
+#ifndef MAME_MACHINE_PC9801_118_H
+#define MAME_MACHINE_PC9801_118_H
 
 #pragma once
 
-#ifndef __PC9801_118DEV_H__
-#define __PC9801_118DEV_H__
 
 #include "machine/pic8259.h"
 #include "sound/2608intf.h"
@@ -26,7 +26,7 @@ class pc9801_118_device : public device_t
 {
 public:
 	// construction/destruction
-	pc9801_118_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pc9801_118_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -40,9 +40,8 @@ public:
 	DECLARE_WRITE8_MEMBER(pc9801_118_ext_w);
 	DECLARE_WRITE_LINE_MEMBER(pc9801_sound_irq);
 
-//  required_device<cpu_device>  m_maincpu;
-	required_device<ym2608_device>  m_opn3;
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+
 protected:
 	// device-level overrides
 	virtual void device_validity_check(validity_checker &valid) const override;
@@ -51,13 +50,16 @@ protected:
 	void install_device(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler);
 
 private:
-	UINT8 m_joy_sel;
-	UINT8 m_ext_reg;
+//  required_device<cpu_device>  m_maincpu;
+	required_device<ym2608_device>  m_opn3;
+
+	uint8_t m_joy_sel;
+	uint8_t m_ext_reg;
 };
 
 
 // device type definition
-extern const device_type PC9801_118;
+DECLARE_DEVICE_TYPE(PC9801_118, pc9801_118_device)
 
 
 
@@ -67,4 +69,4 @@ extern const device_type PC9801_118;
 
 
 
-#endif
+#endif // MAME_MACHINE_PC9801_118_H

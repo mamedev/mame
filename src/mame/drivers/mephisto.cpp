@@ -65,6 +65,7 @@ Mephisto 4 Turbo Kit 18mhz - (mm4tk)
 #include "emu.h"
 #include "cpu/m6502/m65c02.h"
 #include "sound/beep.h"
+#include "speaker.h"
 //#include "mephisto.lh"
 
 class mephisto_state : public driver_device
@@ -99,11 +100,11 @@ public:
 	DECLARE_READ8_MEMBER(read_keys);
 	DECLARE_WRITE8_MEMBER(write_led);
 	DECLARE_WRITE8_MEMBER(write_led_mm2);
-	UINT8 m_lcd_shift_counter;
-	UINT8 m_led_status;
-	//UINT8 *m_p_ram;
-	UINT8 m_led7;
-	UINT8 m_allowNMI;
+	uint8_t m_lcd_shift_counter;
+	uint8_t m_led_status;
+	//uint8_t *m_p_ram;
+	uint8_t m_led7;
+	uint8_t m_allowNMI;
 	DECLARE_DRIVER_INIT(mephisto);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -148,7 +149,7 @@ WRITE8_MEMBER( mephisto_state::mephisto_NMI )
 
 READ8_MEMBER( mephisto_state::read_keys )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (((m_led_status & 0x80) == 0x00))
 	{
@@ -185,7 +186,7 @@ READ8_MEMBER( mephisto_state::read_keys )
 
 WRITE8_MEMBER( mephisto_state::write_led )
 {
-	UINT8 LED_offset=100;
+	uint8_t LED_offset=100;
 	data &= 0x80;
 
 	if (data==0)m_led_status &= 255-(1<<offset) ; else m_led_status|=1<<offset;
@@ -196,7 +197,7 @@ WRITE8_MEMBER( mephisto_state::write_led )
 
 WRITE8_MEMBER( mephisto_state::write_led_mm2 )
 {
-	UINT8 LED_offset=100;
+	uint8_t LED_offset=100;
 	data &= 0x80;
 
 	if (data==0)
@@ -353,7 +354,7 @@ void mephisto_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( mephisto, mephisto_state )
+static MACHINE_CONFIG_START( mephisto )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M65C02,4915200)  /* 65C02 */
 	MCFG_CPU_PROGRAM_MAP(mephisto_mem)
@@ -455,7 +456,7 @@ DRIVER_INIT_MEMBER(mephisto_state,mephisto)
 
 ***************************************************************************/
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        COMPANY             FULLNAME                            FLAGS */
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT     CLASS             INIT        COMPANY             FULLNAME                            FLAGS */
 
 CONS( 1984, mm2,        mm4,    0,      mm2,        mephisto, mephisto_state,   mephisto,   "Hegener & Glaser", "Mephisto MM2 Schachcomputer",     MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1986, rebel5,     mm4,    0,      rebel5,     mephisto, mephisto_state,   mephisto,   "Hegener & Glaser", "Mephisto Rebell 5,0 Schachcomputer", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )

@@ -23,9 +23,16 @@ Game Status:
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "includes/gamecom.h"
+
+#include "sound/volt_reg.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 #include "gamecom.lh"
+
 
 static ADDRESS_MAP_START(gamecom_mem_map, AS_PROGRAM, 8, gamecom_state)
 	AM_RANGE( 0x0000, 0x0013 )  AM_RAM AM_REGION("maincpu", 0x00)
@@ -229,7 +236,7 @@ PALETTE_INIT_MEMBER(gamecom_state, gamecom)
 	palette.set_pen_color(4, 0xDF, 0xFF, 0x8F ); // White
 }
 
-UINT32 gamecom_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t gamecom_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
@@ -240,7 +247,7 @@ INTERRUPT_GEN_MEMBER(gamecom_state::gamecom_interrupt)
 	m_maincpu->set_input_line(sm8500_cpu_device::LCDC_INT, ASSERT_LINE );
 }
 
-static MACHINE_CONFIG_START( gamecom, gamecom_state )
+static MACHINE_CONFIG_START( gamecom )
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", SM8500, XTAL_11_0592MHz/2 )   /* actually it's an sm8521 microcontroller containing an sm8500 cpu */
 	MCFG_CPU_PROGRAM_MAP( gamecom_mem_map)
@@ -266,17 +273,15 @@ static MACHINE_CONFIG_START( gamecom, gamecom_state )
 	MCFG_PALETTE_INIT_OWNER(gamecom_state, gamecom)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO( "lspeaker", "rspeaker" )
+	MCFG_SPEAKER_STANDARD_MONO( "speaker" )
 	/* TODO: much more complex than this */
-	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
-	MCFG_SOUND_ADD("dac0", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
-	MCFG_SOUND_ADD("dac1", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC (Digital audio)
+	MCFG_SOUND_ADD("dac0", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.05) // unknown DAC (Frequency modulation)
+	MCFG_SOUND_ADD("dac1", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.05) // unknown DAC (Frequency modulation)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "dac0", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac0", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot1", generic_linear_slot, "gamecom_cart")
@@ -298,5 +303,5 @@ ROM_START( gamecom )
 	ROM_LOAD( "external.bin", 0x00000, 0x40000, CRC(e235a589) SHA1(97f782e72d738f4d7b861363266bf46b438d9b50) )
 ROM_END
 
-/*    YEAR  NAME     PARENT COMPAT MACHINE  INPUT    CLASS            INIT    COMPANY  FULLNAME */
-CONS( 1997, gamecom, 0,     0,     gamecom, gamecom, gamecom_state, gamecom, "Tiger", "Game.com", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT     COMPANY  FULLNAME    FLAGS
+CONS( 1997, gamecom, 0,      0,      gamecom, gamecom, gamecom_state, gamecom, "Tiger", "Game.com", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)

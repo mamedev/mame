@@ -6,6 +6,7 @@
 //
 //============================================================
 
+#include "emu.h"
 #import "pointsviewer.h"
 
 #import "breakpointsview.h"
@@ -15,11 +16,11 @@
 @implementation MAMEPointsViewer
 
 - (id)initWithMachine:(running_machine &)m console:(MAMEDebugConsole *)c {
-	MAMEDebugView	*breakView, *watchView;
-	NSScrollView	*breakScroll, *watchScroll;
-	NSTabViewItem	*breakTab, *watchTab;
-	NSPopUpButton	*actionButton, *subviewButton;
-	NSRect			subviewFrame;
+	MAMEDebugView   *breakView, *watchView;
+	NSScrollView    *breakScroll, *watchScroll;
+	NSTabViewItem   *breakTab, *watchTab;
+	NSPopUpButton   *actionButton, *subviewButton;
+	NSRect          subviewFrame;
 
 	if (!(self = [super initWithMachine:m title:@"(Break|Watch)points" console:c]))
 		return nil;
@@ -72,6 +73,7 @@
 	[breakScroll setHasVerticalScroller:YES];
 	[breakScroll setAutohidesScrollers:YES];
 	[breakScroll setBorderType:NSNoBorder];
+	[breakScroll setDrawsBackground:NO];
 	[breakScroll setDocumentView:breakView];
 	[breakView release];
 	breakTab = [[NSTabViewItem alloc] initWithIdentifier:@""];
@@ -87,6 +89,7 @@
 	[watchScroll setHasVerticalScroller:YES];
 	[watchScroll setAutohidesScrollers:YES];
 	[watchScroll setBorderType:NSNoBorder];
+	[watchScroll setDrawsBackground:NO];
 	[watchScroll setDocumentView:watchView];
 	[watchView release];
 	watchTab = [[NSTabViewItem alloc] initWithIdentifier:@""];
@@ -119,8 +122,8 @@
 												hasHorizontalScroller:YES
 												  hasVerticalScroller:YES
 														   borderType:[watchScroll borderType]];
-	NSSize const desired = NSMakeSize(MAX(breakDesired.width, watchDesired.width),
-									  MAX(breakDesired.height, watchDesired.height));
+	NSSize const desired = NSMakeSize(std::max(breakDesired.width, watchDesired.width),
+									  std::max(breakDesired.height, watchDesired.height));
 	[self cascadeWindowWithDesiredSize:desired forView:tabs];
 
 	// don't forget the result

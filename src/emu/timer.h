@@ -14,8 +14,8 @@
 #error Dont include this file directly; include emu.h instead.
 #endif
 
-#ifndef __TIMER_H__
-#define __TIMER_H__
+#ifndef MAME_EMU_TIMER_H
+#define MAME_EMU_TIMER_H
 
 
 
@@ -24,7 +24,7 @@
 //**************************************************************************
 
 // macros for a timer callback functions
-#define TIMER_DEVICE_CALLBACK_MEMBER(name)  void name(timer_device &timer, void *ptr, INT32 param)
+#define TIMER_DEVICE_CALLBACK_MEMBER(name)  void name(timer_device &timer, void *ptr, s32 param)
 
 //**************************************************************************
 //  TIMER DEVICE CONFIGURATION MACROS
@@ -32,30 +32,30 @@
 
 #define MCFG_TIMER_ADD_NONE(_tag) \
 	MCFG_DEVICE_ADD(_tag, TIMER, 0) \
-	timer_device::static_configure_generic(*device, timer_device_expired_delegate());
+	timer_device::static_configure_generic(*device, timer_device::expired_delegate());
 #define MCFG_TIMER_DRIVER_ADD(_tag, _class, _callback) \
 	MCFG_DEVICE_ADD(_tag, TIMER, 0) \
-	timer_device::static_configure_generic(*device, timer_device_expired_delegate(&_class::_callback, #_class "::" #_callback, nullptr, (_class *)nullptr));
+	timer_device::static_configure_generic(*device, timer_device::expired_delegate(&_class::_callback, #_class "::" #_callback, nullptr, (_class *)nullptr));
 #define MCFG_TIMER_DEVICE_ADD(_tag, _devtag, _class, _callback) \
 	MCFG_DEVICE_ADD(_tag, TIMER, 0) \
-	timer_device::static_configure_generic(*device, timer_device_expired_delegate(&_class::_callback, #_class "::" #_callback, _devtag, (_class *)nullptr));
+	timer_device::static_configure_generic(*device, timer_device::expired_delegate(&_class::_callback, #_class "::" #_callback, _devtag, (_class *)nullptr));
 #define MCFG_TIMER_DRIVER_ADD_PERIODIC(_tag, _class, _callback, _period) \
 	MCFG_DEVICE_ADD(_tag, TIMER, 0) \
-	timer_device::static_configure_periodic(*device, timer_device_expired_delegate(&_class::_callback, #_class "::" #_callback, nullptr, (_class *)nullptr), _period);
+	timer_device::static_configure_periodic(*device, timer_device::expired_delegate(&_class::_callback, #_class "::" #_callback, nullptr, (_class *)nullptr), _period);
 #define MCFG_TIMER_DEVICE_ADD_PERIODIC(_tag, _devtag, _class, _callback, _period) \
 	MCFG_DEVICE_ADD(_tag, TIMER, 0) \
-	timer_device::static_configure_periodic(*device, timer_device_expired_delegate(&_class::_callback, #_class "::" #_callback, _devtag, (_class *)nullptr), _period);
+	timer_device::static_configure_periodic(*device, timer_device::expired_delegate(&_class::_callback, #_class "::" #_callback, _devtag, (_class *)nullptr), _period);
 #define MCFG_TIMER_DRIVER_ADD_SCANLINE(_tag, _class, _callback, _screen, _first_vpos, _increment) \
 	MCFG_DEVICE_ADD(_tag, TIMER, 0) \
-	timer_device::static_configure_scanline(*device, timer_device_expired_delegate(&_class::_callback, #_class "::" #_callback, nullptr, (_class *)nullptr), _screen, _first_vpos, _increment);
+	timer_device::static_configure_scanline(*device, timer_device::expired_delegate(&_class::_callback, #_class "::" #_callback, nullptr, (_class *)nullptr), _screen, _first_vpos, _increment);
 #define MCFG_TIMER_DEVICE_ADD_SCANLINE(_tag, _devtag, _class, _callback, _screen, _first_vpos, _increment) \
 	MCFG_DEVICE_ADD(_tag, TIMER, 0) \
-	timer_device::static_configure_scanline(*device, timer_device_expired_delegate(&_class::_callback, #_class "::" #_callback, _devtag, (_class *)nullptr), _screen, _first_vpos, _increment);
+	timer_device::static_configure_scanline(*device, timer_device::expired_delegate(&_class::_callback, #_class "::" #_callback, _devtag, (_class *)nullptr), _screen, _first_vpos, _increment);
 #define MCFG_TIMER_MODIFY(_tag) \
 	MCFG_DEVICE_MODIFY(_tag)
 
 #define MCFG_TIMER_DRIVER_CALLBACK(_class, _callback) \
-	timer_device::static_set_callback(*device, timer_device_expired_delegate(&_class::_callback, #_class "::" #_callback, nullptr, (_class *)nullptr));
+	timer_device::static_set_callback(*device, timer_device::expired_delegate(&_class::_callback, #_class "::" #_callback, nullptr, (_class *)nullptr));
 #define MCFG_TIMER_START_DELAY(_start_delay) \
 	timer_device::static_set_start_delay(*device, _start_delay);
 #define MCFG_TIMER_PARAM(_param) \
@@ -68,26 +68,22 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// forward declarations
-class emu_timer;
-class timer_device;
-
-// a timer callbacks look like this
-typedef device_delegate<void (timer_device &, void *, INT32)> timer_device_expired_delegate;
-
 // ======================> timer_device
 
 class timer_device : public device_t
 {
 public:
+	// a timer callbacks look like this
+	typedef device_delegate<void (timer_device &, void *, s32)> expired_delegate;
+
 	// construction/destruction
-	timer_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	timer_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// inline configuration helpers
-	static void static_configure_generic(device_t &device, timer_device_expired_delegate callback);
-	static void static_configure_periodic(device_t &device, timer_device_expired_delegate callback, const attotime &period);
-	static void static_configure_scanline(device_t &device, timer_device_expired_delegate callback, const char *screen, int first_vpos, int increment);
-	static void static_set_callback(device_t &device, timer_device_expired_delegate callback);
+	static void static_configure_generic(device_t &device, expired_delegate callback);
+	static void static_configure_periodic(device_t &device, expired_delegate callback, const attotime &period);
+	static void static_configure_scanline(device_t &device, expired_delegate callback, const char *screen, int first_vpos, int increment);
+	static void static_set_callback(device_t &device, expired_delegate callback);
 	static void static_set_start_delay(device_t &device, const attotime &delay);
 	static void static_set_param(device_t &device, int param);
 	static void static_set_ptr(device_t &device, void *ptr);
@@ -104,7 +100,7 @@ public:
 
 	// adjustments
 	void reset() { adjust(attotime::never, 0, attotime::never); }
-	void adjust(const attotime &duration, INT32 param = 0, const attotime &period = attotime::never) const { assert(m_type == TIMER_TYPE_GENERIC); m_timer->adjust(duration, param, period); }
+	void adjust(const attotime &duration, s32 param = 0, const attotime &period = attotime::never) const { assert(m_type == TIMER_TYPE_GENERIC); m_timer->adjust(duration, param, period); }
 
 	// timing information
 	attotime time_elapsed() const { return m_timer->elapsed(); }
@@ -129,19 +125,19 @@ private:
 
 	// configuration data
 	timer_type              m_type;             // type of timer
-	timer_device_expired_delegate   m_callback;         // the timer's callback function
+	expired_delegate   m_callback;         // the timer's callback function
 	void *                  m_ptr;              // the pointer parameter passed to the timer callback
 
 	// periodic timers only
 	attotime                m_start_delay;      // delay before the timer fires for the first time
 	attotime                m_period;           // period of repeated timer firings
-	INT32                   m_param;            // the integer parameter passed to the timer callback
+	s32                     m_param;            // the integer parameter passed to the timer callback
 
 	// scanline timers only
 	const char *            m_screen_tag;       // the tag of the screen this timer tracks
 	screen_device *         m_screen;           // pointer to the screen device
-	UINT32                  m_first_vpos;       // the first vertical scanline position the timer fires on
-	UINT32                  m_increment;        // the number of scanlines between firings
+	u32                     m_first_vpos;       // the first vertical scanline position the timer fires on
+	u32                     m_increment;        // the number of scanlines between firings
 
 	// internal state
 	emu_timer *             m_timer;            // the backing timer
@@ -154,7 +150,7 @@ private:
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-extern const device_type TIMER;
+DECLARE_DEVICE_TYPE(TIMER, timer_device)
 
 
-#endif  /* __TIMER_H__ */
+#endif // MAME_EMU_TIMER_H

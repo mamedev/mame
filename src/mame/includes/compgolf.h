@@ -19,9 +19,9 @@ public:
 		m_palette(*this, "palette") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_bg_ram;
-	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_bg_ram;
+	required_shared_ptr<uint8_t> m_spriteram;
 
 	/* video-related */
 	tilemap_t        *m_text_tilemap;
@@ -46,7 +46,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(compgolf);
-	UINT32 screen_update_compgolf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_compgolf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void compgolf_expand_bg();
 	required_device<cpu_device> m_maincpu;

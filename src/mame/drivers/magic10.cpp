@@ -89,18 +89,22 @@
 ****************************************************************************/
 
 
+#include "emu.h"
+
+#include "cpu/m68000/m68000.h"
+#include "machine/nvram.h"
+#include "sound/okim6295.h"
+#include "screen.h"
+#include "speaker.h"
+
+#include "sgsafari.lh"
+#include "musicsrt.lh"
+
+
 #define MAIN_CLOCK    XTAL_20MHz
 #define AUX_CLOCK     XTAL_30MHz
 
 #define CPU_CLOCK    MAIN_CLOCK/2
-
-
-#include "emu.h"
-#include "cpu/m68000/m68000.h"
-#include "sound/okim6295.h"
-#include "machine/nvram.h"
-#include "sgsafari.lh"
-#include "musicsrt.lh"
 
 
 class magic10_state : public driver_device
@@ -119,12 +123,12 @@ public:
 	tilemap_t *m_layer0_tilemap;
 	tilemap_t *m_layer1_tilemap;
 	tilemap_t *m_layer2_tilemap;
-	required_shared_ptr<UINT16> m_layer0_videoram;
-	required_shared_ptr<UINT16> m_layer1_videoram;
-	required_shared_ptr<UINT16> m_layer2_videoram;
+	required_shared_ptr<uint16_t> m_layer0_videoram;
+	required_shared_ptr<uint16_t> m_layer1_videoram;
+	required_shared_ptr<uint16_t> m_layer2_videoram;
 	int m_layer2_offset[2];
-	required_shared_ptr<UINT16> m_vregs;
-	UINT16 m_magic102_ret;
+	required_shared_ptr<uint16_t> m_vregs;
+	uint16_t m_magic102_ret;
 	DECLARE_WRITE16_MEMBER(layer0_videoram_w);
 	DECLARE_WRITE16_MEMBER(layer1_videoram_w);
 	DECLARE_WRITE16_MEMBER(layer2_videoram_w);
@@ -142,7 +146,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_layer1_tile_info);
 	TILE_GET_INFO_MEMBER(get_layer2_tile_info);
 	virtual void video_start() override;
-	UINT32 screen_update_magic10(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_magic10(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -197,15 +201,15 @@ TILE_GET_INFO_MEMBER(magic10_state::get_layer2_tile_info)
 
 void magic10_state::video_start()
 {
-	m_layer0_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(magic10_state::get_layer0_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	m_layer1_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(magic10_state::get_layer1_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	m_layer2_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(magic10_state::get_layer2_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_layer0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(magic10_state::get_layer0_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_layer1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(magic10_state::get_layer1_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_layer2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(magic10_state::get_layer2_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 
 	m_layer1_tilemap->set_transparent_pen(0);
 	m_layer2_tilemap->set_transparent_pen(0);
 }
 
-UINT32 magic10_state::screen_update_magic10(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t magic10_state::screen_update_magic10(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/*TODO: understand where this comes from. */
 	m_layer2_tilemap->set_scrollx(0, m_layer2_offset[0]);
@@ -733,7 +737,7 @@ GFXDECODE_END
 *      Machine Drivers      *
 ****************************/
 
-static MACHINE_CONFIG_START( magic10, magic10_state )
+static MACHINE_CONFIG_START( magic10 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, CPU_CLOCK)  // 10 MHz.
 	MCFG_CPU_PROGRAM_MAP(magic10_map)
@@ -756,7 +760,7 @@ static MACHINE_CONFIG_START( magic10, magic10_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH)   /* clock frequency & pin 7 not verified */
+	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH)   /* clock frequency & pin 7 not verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1477,7 +1481,7 @@ DRIVER_INIT_MEMBER(magic10_state, altaten)
 	m_layer2_offset[1] = 16;
 
 	// patching the boot protection...
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 		rom[0x7668] = 0x71;
 		rom[0x7669] = 0x4e;
@@ -1488,7 +1492,7 @@ DRIVER_INIT_MEMBER(magic10_state, altaten)
 *        Game Drivers         *
 ******************************/
 
-/*     YEAR  NAME      PARENT    MACHINE   INPUT     STATE          INIT      ROT    COMPANY                 FULLNAME                         FLAGS            LAYOUT  */
+//     YEAR  NAME      PARENT    MACHINE   INPUT     STATE          INIT      ROT   COMPANY                 FULLNAME                          FLAGS            LAYOUT
 GAMEL( 1995, magic10,  0,        magic10,  magic10,  magic10_state, magic10,  ROT0, "A.W.P. Games",         "Magic's 10 (ver. 16.55)",        0,               layout_sgsafari )
 GAMEL( 1995, magic10a, magic10,  magic10,  magic10,  magic10_state, magic10,  ROT0, "A.W.P. Games",         "Magic's 10 (ver. 16.54)",        0,               layout_sgsafari )
 GAMEL( 1995, magic10b, magic10,  magic10a, magic10,  magic10_state, magic10,  ROT0, "A.W.P. Games",         "Magic's 10 (ver. 16.45)",        0,               layout_sgsafari )

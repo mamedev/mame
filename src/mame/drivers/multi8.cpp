@@ -16,27 +16,26 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "sound/2203intf.h"
-#include "video/mc6845.h"
 #include "machine/i8255.h"
+#include "sound/2203intf.h"
 #include "sound/beep.h"
+#include "video/mc6845.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class multi8_state : public driver_device
 {
 public:
 	multi8_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_ppi(*this, "ppi8255_0"),
-	m_crtc(*this, "crtc"),
-	m_beeper(*this, "beeper")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_p_chargen(*this, "chargen")
+		, m_ppi(*this, "ppi8255_0")
+		, m_crtc(*this, "crtc")
+		, m_beeper(*this, "beeper")
 	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<i8255_device> m_ppi;
-	required_device<mc6845_device> m_crtc;
-	required_device<beep_device> m_beeper;
 	DECLARE_WRITE8_MEMBER(multi8_6845_w);
 	DECLARE_READ8_MEMBER(key_input_r);
 	DECLARE_READ8_MEMBER(key_status_r);
@@ -50,28 +49,34 @@ public:
 	DECLARE_WRITE8_MEMBER(portb_w);
 	DECLARE_WRITE8_MEMBER(portc_w);
 	DECLARE_WRITE8_MEMBER(ym2203_porta_w);
-	UINT8 *m_p_vram;
-	UINT8 *m_p_wram;
-	UINT8 *m_p_kanji;
-	UINT8 *m_p_chargen;
-	UINT8 m_mcu_init;
-	UINT8 m_keyb_press;
-	UINT8 m_keyb_press_flag;
-	UINT8 m_shift_press_flag;
-	UINT8 m_display_reg;
-	UINT8 m_crtc_vreg[0x100],m_crtc_index;
-	UINT8 m_vram_bank;
-	UINT8 m_pen_clut[8];
-	UINT8 m_bw_mode;
-	UINT16 m_knj_addr;
 	DECLARE_READ8_MEMBER(ay8912_0_r);
 	DECLARE_READ8_MEMBER(ay8912_1_r);
+	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
+	uint32_t screen_update_multi8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+private:
+	uint8_t *m_p_vram;
+	uint8_t *m_p_wram;
+	uint8_t *m_p_kanji;
+	uint8_t m_mcu_init;
+	uint8_t m_keyb_press;
+	uint8_t m_keyb_press_flag;
+	uint8_t m_shift_press_flag;
+	uint8_t m_display_reg;
+	uint8_t m_crtc_vreg[0x100],m_crtc_index;
+	uint8_t m_vram_bank;
+	uint8_t m_pen_clut[8];
+	uint8_t m_bw_mode;
+	uint16_t m_knj_addr;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_multi8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
-	void multi8_draw_pixel(bitmap_ind16 &bitmap,int y,int x,UINT8 pen,UINT8 width);
+	void multi8_draw_pixel(bitmap_ind16 &bitmap,int y,int x,uint8_t pen,uint8_t width);
+	required_device<cpu_device> m_maincpu;
+	required_region_ptr<u8> m_p_chargen;
+	required_device<i8255_device> m_ppi;
+	required_device<mc6845_device> m_crtc;
+	required_device<beep_device> m_beeper;
 };
 
 #define mc6845_h_char_total     (m_crtc_vreg[0])
@@ -100,10 +105,9 @@ void multi8_state::video_start()
 
 	m_vram_bank = 8;
 	m_bw_mode = 0;
-	m_p_chargen = memregion("chargen")->base();
 }
 
-void multi8_state::multi8_draw_pixel(bitmap_ind16 &bitmap,int y,int x,UINT8 pen,UINT8 width)
+void multi8_state::multi8_draw_pixel(bitmap_ind16 &bitmap,int y,int x,uint8_t pen,uint8_t width)
 {
 	if(!machine().first_screen()->visible_area().contains(x, y))
 		return;
@@ -117,11 +121,11 @@ void multi8_state::multi8_draw_pixel(bitmap_ind16 &bitmap,int y,int x,UINT8 pen,
 		bitmap.pix16(y, x) = pen;
 }
 
-UINT32 multi8_state::screen_update_multi8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t multi8_state::screen_update_multi8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x,y,count;
-	UINT8 x_width;
-	UINT8 xi,yi;
+	uint8_t x_width;
+	uint8_t xi,yi;
 
 	count = 0x0000;
 
@@ -264,7 +268,7 @@ READ8_MEMBER( multi8_state::key_status_r )
 
 READ8_MEMBER( multi8_state::multi8_vram_r )
 {
-	UINT8 res;
+	uint8_t res;
 
 	if (!BIT(m_vram_bank, 4)) //select plain work ram
 		return m_p_wram[offset];
@@ -316,7 +320,7 @@ WRITE8_MEMBER( multi8_state::pal_w )
 {
 	m_pen_clut[offset] = data;
 
-	UINT8 i;
+	uint8_t i;
 	for(i=0;i<8;i++)
 	{
 		if (m_pen_clut[i])
@@ -488,7 +492,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(multi8_state::keyboard_callback)
 {
 	static const char *const portnames[3] = { "key1","key2","key3" };
 	int i,port_i,scancode;
-	UINT8 keymod = ioport("key_modifiers")->read() & 0x1f;
+	uint8_t keymod = ioport("key_modifiers")->read() & 0x1f;
 	scancode = 0;
 
 	m_shift_press_flag = ((keymod & 0x02) >> 1);
@@ -613,7 +617,7 @@ void multi8_state::machine_reset()
 	m_mcu_init = 0;
 }
 
-static MACHINE_CONFIG_START( multi8, multi8_state )
+static MACHINE_CONFIG_START( multi8 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(multi8_mem)
@@ -676,5 +680,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY      FULLNAME       FLAGS */
-COMP( 1983, multi8, 0,      0,       multi8,    multi8, driver_device,  0,     "Mitsubishi", "Multi 8", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   STATE          INIT   COMPANY       FULLNAME                FLAGS
+COMP( 1983, multi8, 0,      0,       multi8,    multi8, multi8_state,  0,     "Mitsubishi", "Multi 8 (Mitsubishi)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

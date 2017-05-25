@@ -5,7 +5,7 @@
 #include "tiasound.h"
 
 // device type definition
-const device_type TIA = &device_creator<tia_device>;
+DEFINE_DEVICE_TYPE(TIA, tia_device, "tia_sound", "Atari TIA (Sound)")
 
 
 //**************************************************************************
@@ -16,8 +16,8 @@ const device_type TIA = &device_creator<tia_device>;
 //  tia_device - constructor
 //-------------------------------------------------
 
-tia_device::tia_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, TIA, "TIA", tag, owner, clock, "tia_sound", __FILE__),
+tia_device::tia_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, TIA, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		m_channel(nullptr),
 		m_chip(nullptr)

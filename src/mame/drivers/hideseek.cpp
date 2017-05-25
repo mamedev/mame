@@ -28,24 +28,26 @@ Other stuff: NEC D4992 (RTC?) and xtal possibly 32.768kHz, 3V coin battery, 93L4
 
 #include "emu.h"
 #include "cpu/sh2/sh2.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class hideseek_state : public driver_device
 {
 public:
 	hideseek_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
-		{ }
-
-	required_device<cpu_device> m_maincpu;
-
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+	{
+	}
 
 	DECLARE_DRIVER_INIT(hideseek);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(hideseek);
-	UINT32 screen_update_hideseek(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_hideseek(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+protected:
+	required_device<cpu_device> m_maincpu;
 };
 
 
@@ -54,7 +56,7 @@ void hideseek_state::video_start()
 }
 
 
-UINT32 hideseek_state::screen_update_hideseek(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t hideseek_state::screen_update_hideseek(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -94,7 +96,7 @@ PALETTE_INIT_MEMBER(hideseek_state, hideseek)
 
 
 
-static MACHINE_CONFIG_START( hideseek, hideseek_state )
+static MACHINE_CONFIG_START( hideseek )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH2, 7372800 * 4 )

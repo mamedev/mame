@@ -61,12 +61,12 @@ SOFTWARE.
 
 -- global dependencies:
 local pairs, type, tostring, tonumber, getmetatable, setmetatable =
-      pairs, type, tostring, tonumber, getmetatable, setmetatable
+	  pairs, type, tostring, tonumber, getmetatable, setmetatable
 local error, require, pcall, select = error, require, pcall, select
 local floor, huge = math.floor, math.huge
 local strrep, gsub, strsub, strbyte, strchar, strfind, strlen, strformat =
-      string.rep, string.gsub, string.sub, string.byte, string.char,
-      string.find, string.len, string.format
+	  string.rep, string.gsub, string.sub, string.byte, string.char,
+	  string.find, string.len, string.format
 local strmatch = string.match
 local concat = table.concat
 
@@ -93,23 +93,23 @@ json.null = setmetatable ({}, {
 local function isarray (tbl)
   local max, n, arraylen = 0, 0, 0
   for k,v in pairs (tbl) do
-    if k == 'n' and type(v) == 'number' then
-      arraylen = v
-      if v > max then
-        max = v
-      end
-    else
-      if type(k) ~= 'number' or k < 1 or floor(k) ~= k then
-        return false
-      end
-      if k > max then
-        max = k
-      end
-      n = n + 1
-    end
+	if k == 'n' and type(v) == 'number' then
+	  arraylen = v
+	  if v > max then
+		max = v
+	  end
+	else
+	  if type(k) ~= 'number' or k < 1 or floor(k) ~= k then
+		return false
+	  end
+	  if k > max then
+		max = k
+	  end
+	  n = n + 1
+	end
   end
   if max > 10 and max > arraylen and max > n * 2 then
-    return false -- don't create an array with too many holes
+	return false -- don't create an array with too many holes
   end
   return true, max
 end
@@ -122,30 +122,30 @@ local escapecodes = {
 local function escapeutf8 (uchar)
   local value = escapecodes[uchar]
   if value then
-    return value
+	return value
   end
   local a, b, c, d = strbyte (uchar, 1, 4)
   a, b, c, d = a or 0, b or 0, c or 0, d or 0
   if a <= 0x7f then
-    value = a
+	value = a
   elseif 0xc0 <= a and a <= 0xdf and b >= 0x80 then
-    value = (a - 0xc0) * 0x40 + b - 0x80
+	value = (a - 0xc0) * 0x40 + b - 0x80
   elseif 0xe0 <= a and a <= 0xef and b >= 0x80 and c >= 0x80 then
-    value = ((a - 0xe0) * 0x40 + b - 0x80) * 0x40 + c - 0x80
+	value = ((a - 0xe0) * 0x40 + b - 0x80) * 0x40 + c - 0x80
   elseif 0xf0 <= a and a <= 0xf7 and b >= 0x80 and c >= 0x80 and d >= 0x80 then
-    value = (((a - 0xf0) * 0x40 + b - 0x80) * 0x40 + c - 0x80) * 0x40 + d - 0x80
+	value = (((a - 0xf0) * 0x40 + b - 0x80) * 0x40 + c - 0x80) * 0x40 + d - 0x80
   else
-    return ""
+	return ""
   end
   if value <= 0xffff then
-    return strformat ("\\u%.4x", value)
+	return strformat ("\\u%.4x", value)
   elseif value <= 0x10ffff then
-    -- encode as UTF-16 surrogate pair
-    value = value - 0x10000
-    local highsur, lowsur = 0xD800 + floor (value/0x400), 0xDC00 + (value % 0x400)
-    return strformat ("\\u%.4x\\u%.4x", highsur, lowsur)
+	-- encode as UTF-16 surrogate pair
+	value = value - 0x10000
+	local highsur, lowsur = 0xD800 + floor (value/0x400), 0xDC00 + (value % 0x400)
+	return strformat ("\\u%.4x\\u%.4x", highsur, lowsur)
   else
-    return ""
+	return ""
   end
 end
 
@@ -154,9 +154,9 @@ local function fsub (str, pattern, repl)
   -- exists. First using find should be more efficient when most strings
   -- don't contain the pattern.
   if strfind (str, pattern) then
-    return gsub (str, pattern, repl)
+	return gsub (str, pattern, repl)
   else
-    return str
+	return str
   end
 end
 
@@ -164,14 +164,14 @@ local function quotestring (value)
   -- based on the regexp "escapable" in https://github.com/douglascrockford/JSON-js
   value = fsub (value, "[%z\1-\31\"\\\127]", escapeutf8)
   if strfind (value, "[\194\216\220\225\226\239]") then
-    value = fsub (value, "\194[\128-\159\173]", escapeutf8)
-    value = fsub (value, "\216[\128-\132]", escapeutf8)
-    value = fsub (value, "\220\143", escapeutf8)
-    value = fsub (value, "\225\158[\180\181]", escapeutf8)
-    value = fsub (value, "\226\128[\140-\143\168-\175]", escapeutf8)
-    value = fsub (value, "\226\129[\160-\175]", escapeutf8)
-    value = fsub (value, "\239\187\191", escapeutf8)
-    value = fsub (value, "\239\191[\176-\191]", escapeutf8)
+	value = fsub (value, "\194[\128-\159\173]", escapeutf8)
+	value = fsub (value, "\216[\128-\132]", escapeutf8)
+	value = fsub (value, "\220\143", escapeutf8)
+	value = fsub (value, "\225\158[\180\181]", escapeutf8)
+	value = fsub (value, "\226\128[\140-\143\168-\175]", escapeutf8)
+	value = fsub (value, "\226\129[\160-\175]", escapeutf8)
+	value = fsub (value, "\239\187\191", escapeutf8)
+	value = fsub (value, "\239\191[\176-\191]", escapeutf8)
   end
   return "\"" .. value .. "\""
 end
@@ -180,9 +180,9 @@ json.quotestring = quotestring
 local function replace(str, o, n)
   local i, j = strfind (str, o, 1, true)
   if i then
-    return strsub(str, 1, i-1) .. n .. strsub(str, j+1, -1)
+	return strsub(str, 1, i-1) .. n .. strsub(str, j+1, -1)
   else
-    return str
+	return str
   end
 end
 
@@ -204,8 +204,8 @@ end
 local function str2num (str)
   local num = tonumber(replace(str, ".", decpoint))
   if not num then
-    updatedecpoint()
-    num = tonumber(replace(str, ".", decpoint))
+	updatedecpoint()
+	num = tonumber(replace(str, ".", decpoint))
   end
   return num
 end
@@ -219,8 +219,8 @@ end
 
 function json.addnewline (state)
   if state.indent then
-    state.bufferlen = addnewline2 (state.level or 0,
-                           state.buffer, state.bufferlen or #(state.buffer))
+	state.bufferlen = addnewline2 (state.level or 0,
+						   state.buffer, state.bufferlen or #(state.buffer))
   end
 end
 
@@ -229,14 +229,14 @@ local encode2 -- forward declaration
 local function addpair (key, value, prev, indent, level, buffer, buflen, tables, globalorder, state)
   local kt = type (key)
   if kt ~= 'string' and kt ~= 'number' then
-    return nil, "type '" .. kt .. "' is not supported as a key by JSON."
+	return nil, "type '" .. kt .. "' is not supported as a key by JSON."
   end
   if prev then
-    buflen = buflen + 1
-    buffer[buflen] = ","
+	buflen = buflen + 1
+	buffer[buflen] = ","
   end
   if indent then
-    buflen = addnewline2 (level, buffer, buflen)
+	buflen = addnewline2 (level, buffer, buflen)
   end
   buffer[buflen+1] = quotestring (key)
   buffer[buflen+2] = ":"
@@ -246,8 +246,8 @@ end
 local function appendcustom(res, buffer, state)
   local buflen = state.bufferlen
   if type (res) == 'string' then
-    buflen = buflen + 1
-    buffer[buflen] = res
+	buflen = buflen + 1
+	buffer[buflen] = res
   end
   return buflen
 end
@@ -256,12 +256,12 @@ local function exception(reason, value, state, buffer, buflen, defaultmessage)
   defaultmessage = defaultmessage or reason
   local handler = state.exception
   if not handler then
-    return nil, defaultmessage
+	return nil, defaultmessage
   else
-    state.bufferlen = buflen
-    local ret, msg = handler (reason, value, state, defaultmessage)
-    if not ret then return nil, msg or defaultmessage end
-    return appendcustom(ret, buffer, state)
+	state.bufferlen = buflen
+	local ret, msg = handler (reason, value, state, defaultmessage)
+	if not ret then return nil, msg or defaultmessage end
+	return appendcustom(ret, buffer, state)
   end
 end
 
@@ -275,100 +275,100 @@ encode2 = function (value, indent, level, buffer, buflen, tables, globalorder, s
   valmeta = type (valmeta) == 'table' and valmeta -- only tables
   local valtojson = valmeta and valmeta.__tojson
   if valtojson then
-    if tables[value] then
-      return exception('reference cycle', value, state, buffer, buflen)
-    end
-    tables[value] = true
-    state.bufferlen = buflen
-    local ret, msg = valtojson (value, state)
-    if not ret then return exception('custom encoder failed', value, state, buffer, buflen, msg) end
-    tables[value] = nil
-    buflen = appendcustom(ret, buffer, state)
+	if tables[value] then
+	  return exception('reference cycle', value, state, buffer, buflen)
+	end
+	tables[value] = true
+	state.bufferlen = buflen
+	local ret, msg = valtojson (value, state)
+	if not ret then return exception('custom encoder failed', value, state, buffer, buflen, msg) end
+	tables[value] = nil
+	buflen = appendcustom(ret, buffer, state)
   elseif value == nil then
-    buflen = buflen + 1
-    buffer[buflen] = "null"
+	buflen = buflen + 1
+	buffer[buflen] = "null"
   elseif valtype == 'number' then
-    local s
-    if value ~= value or value >= huge or -value >= huge then
-      -- This is the behaviour of the original JSON implementation.
-      s = "null"
-    else
-      s = num2str (value)
-    end
-    buflen = buflen + 1
-    buffer[buflen] = s
+	local s
+	if value ~= value or value >= huge or -value >= huge then
+	  -- This is the behaviour of the original JSON implementation.
+	  s = "null"
+	else
+	  s = num2str (value)
+	end
+	buflen = buflen + 1
+	buffer[buflen] = s
   elseif valtype == 'boolean' then
-    buflen = buflen + 1
-    buffer[buflen] = value and "true" or "false"
+	buflen = buflen + 1
+	buffer[buflen] = value and "true" or "false"
   elseif valtype == 'string' then
-    buflen = buflen + 1
-    buffer[buflen] = quotestring (value)
+	buflen = buflen + 1
+	buffer[buflen] = quotestring (value)
   elseif valtype == 'table' then
-    if tables[value] then
-      return exception('reference cycle', value, state, buffer, buflen)
-    end
-    tables[value] = true
-    level = level + 1
-    local isa, n = isarray (value)
-    if n == 0 and valmeta and valmeta.__jsontype == 'object' then
-      isa = false
-    end
-    local msg
-    if isa then -- JSON array
-      buflen = buflen + 1
-      buffer[buflen] = "["
-      for i = 1, n do
-        buflen, msg = encode2 (value[i], indent, level, buffer, buflen, tables, globalorder, state)
-        if not buflen then return nil, msg end
-        if i < n then
-          buflen = buflen + 1
-          buffer[buflen] = ","
-        end
-      end
-      buflen = buflen + 1
-      buffer[buflen] = "]"
-    else -- JSON object
-      local prev = false
-      buflen = buflen + 1
-      buffer[buflen] = "{"
-      local order = valmeta and valmeta.__jsonorder or globalorder
-      if order then
-        local used = {}
-        n = #order
-        for i = 1, n do
-          local k = order[i]
-          local v = value[k]
-          local _
-          if v then
-            used[k] = true
-            buflen, _ = addpair (k, v, prev, indent, level, buffer, buflen, tables, globalorder, state)
-            prev = true -- add a seperator before the next element
-          end
-        end
-        for k,v in pairs (value) do
-          if not used[k] then
-            buflen, msg = addpair (k, v, prev, indent, level, buffer, buflen, tables, globalorder, state)
-            if not buflen then return nil, msg end
-            prev = true -- add a seperator before the next element
-          end
-        end
-      else -- unordered
-        for k,v in pairs (value) do
-          buflen, msg = addpair (k, v, prev, indent, level, buffer, buflen, tables, globalorder, state)
-          if not buflen then return nil, msg end
-          prev = true -- add a seperator before the next element
-        end
-      end
-      if indent then
-        buflen = addnewline2 (level - 1, buffer, buflen)
-      end
-      buflen = buflen + 1
-      buffer[buflen] = "}"
-    end
-    tables[value] = nil
+	if tables[value] then
+	  return exception('reference cycle', value, state, buffer, buflen)
+	end
+	tables[value] = true
+	level = level + 1
+	local isa, n = isarray (value)
+	if n == 0 and valmeta and valmeta.__jsontype == 'object' then
+	  isa = false
+	end
+	local msg
+	if isa then -- JSON array
+	  buflen = buflen + 1
+	  buffer[buflen] = "["
+	  for i = 1, n do
+		buflen, msg = encode2 (value[i], indent, level, buffer, buflen, tables, globalorder, state)
+		if not buflen then return nil, msg end
+		if i < n then
+		  buflen = buflen + 1
+		  buffer[buflen] = ","
+		end
+	  end
+	  buflen = buflen + 1
+	  buffer[buflen] = "]"
+	else -- JSON object
+	  local prev = false
+	  buflen = buflen + 1
+	  buffer[buflen] = "{"
+	  local order = valmeta and valmeta.__jsonorder or globalorder
+	  if order then
+		local used = {}
+		n = #order
+		for i = 1, n do
+		  local k = order[i]
+		  local v = value[k]
+		  local _
+		  if v then
+			used[k] = true
+			buflen, _ = addpair (k, v, prev, indent, level, buffer, buflen, tables, globalorder, state)
+			prev = true -- add a seperator before the next element
+		  end
+		end
+		for k,v in pairs (value) do
+		  if not used[k] then
+			buflen, msg = addpair (k, v, prev, indent, level, buffer, buflen, tables, globalorder, state)
+			if not buflen then return nil, msg end
+			prev = true -- add a seperator before the next element
+		  end
+		end
+	  else -- unordered
+		for k,v in pairs (value) do
+		  buflen, msg = addpair (k, v, prev, indent, level, buffer, buflen, tables, globalorder, state)
+		  if not buflen then return nil, msg end
+		  prev = true -- add a seperator before the next element
+		end
+	  end
+	  if indent then
+		buflen = addnewline2 (level - 1, buffer, buflen)
+	  end
+	  buflen = buflen + 1
+	  buffer[buflen] = "}"
+	end
+	tables[value] = nil
   else
-    return exception ('unsupported type', value, state, buffer, buflen,
-      "type '" .. valtype .. "' is not supported by JSON.")
+	return exception ('unsupported type', value, state, buffer, buflen,
+	  "type '" .. valtype .. "' is not supported by JSON.")
   end
   return buflen
 end
@@ -380,30 +380,30 @@ function json.encode (value, state)
   state.buffer = buffer
   updatedecpoint()
   local ret, msg = encode2 (value, state.indent, state.level or 0,
-                   buffer, state.bufferlen or 0, state.tables or {}, state.keyorder, state)
+				   buffer, state.bufferlen or 0, state.tables or {}, state.keyorder, state)
   if not ret then
-    error (msg, 2)
+	error (msg, 2)
   elseif oldbuffer == buffer then
-    state.bufferlen = ret
-    return true
+	state.bufferlen = ret
+	return true
   else
-    state.bufferlen = nil
-    state.buffer = nil
-    return concat (buffer)
+	state.bufferlen = nil
+	state.buffer = nil
+	return concat (buffer)
   end
 end
 
 local function loc (str, where)
   local line, pos, linepos = 1, 1, 0
   while true do
-    pos = strfind (str, "\n", pos, true)
-    if pos and pos < where then
-      line = line + 1
-      linepos = pos
-      pos = pos + 1
-    else
-      break
-    end
+	pos = strfind (str, "\n", pos, true)
+	if pos and pos < where then
+	  line = line + 1
+	  linepos = pos
+	  pos = pos + 1
+	else
+	  break
+	end
   end
   return "line " .. line .. ", column " .. (where - linepos)
 end
@@ -414,22 +414,22 @@ end
 
 local function scanwhite (str, pos)
   while true do
-    pos = strfind (str, "%S", pos)
-    if not pos then return nil end
-    local sub2 = strsub (str, pos, pos + 1)
-    if sub2 == "\239\187" and strsub (str, pos + 2, pos + 2) == "\191" then
-      -- UTF-8 Byte Order Mark
-      pos = pos + 3
-    elseif sub2 == "//" then
-      pos = strfind (str, "[\n\r]", pos + 2)
-      if not pos then return nil end
-    elseif sub2 == "/*" then
-      pos = strfind (str, "*/", pos + 2)
-      if not pos then return nil end
-      pos = pos + 2
-    else
-      return pos
-    end
+	pos = strfind (str, "%S", pos)
+	if not pos then return nil end
+	local sub2 = strsub (str, pos, pos + 1)
+	if sub2 == "\239\187" and strsub (str, pos + 2, pos + 2) == "\191" then
+	  -- UTF-8 Byte Order Mark
+	  pos = pos + 3
+	elseif sub2 == "//" then
+	  pos = strfind (str, "[\n\r]", pos + 2)
+	  if not pos then return nil end
+	elseif sub2 == "/*" then
+	  pos = strfind (str, "*/", pos + 2)
+	  if not pos then return nil end
+	  pos = pos + 2
+	else
+	  return pos
+	end
   end
 end
 
@@ -440,23 +440,23 @@ local escapechars = {
 
 local function unichar (value)
   if value < 0 then
-    return nil
+	return nil
   elseif value <= 0x007f then
-    return strchar (value)
+	return strchar (value)
   elseif value <= 0x07ff then
-    return strchar (0xc0 + floor(value/0x40),
-                    0x80 + (floor(value) % 0x40))
+	return strchar (0xc0 + floor(value/0x40),
+					0x80 + (floor(value) % 0x40))
   elseif value <= 0xffff then
-    return strchar (0xe0 + floor(value/0x1000),
-                    0x80 + (floor(value/0x40) % 0x40),
-                    0x80 + (floor(value) % 0x40))
+	return strchar (0xe0 + floor(value/0x1000),
+					0x80 + (floor(value/0x40) % 0x40),
+					0x80 + (floor(value) % 0x40))
   elseif value <= 0x10ffff then
-    return strchar (0xf0 + floor(value/0x40000),
-                    0x80 + (floor(value/0x1000) % 0x40),
-                    0x80 + (floor(value/0x40) % 0x40),
-                    0x80 + (floor(value) % 0x40))
+	return strchar (0xf0 + floor(value/0x40000),
+					0x80 + (floor(value/0x1000) % 0x40),
+					0x80 + (floor(value/0x40) % 0x40),
+					0x80 + (floor(value) % 0x40))
   else
-    return nil
+	return nil
   end
 end
 
@@ -464,60 +464,60 @@ local function scanstring (str, pos)
   local lastpos = pos + 1
   local buffer, n = {}, 0
   while true do
-    local nextpos = strfind (str, "[\"\\]", lastpos)
-    if not nextpos then
-      return unterminated (str, "string", pos)
-    end
-    if nextpos > lastpos then
-      n = n + 1
-      buffer[n] = strsub (str, lastpos, nextpos - 1)
-    end
-    if strsub (str, nextpos, nextpos) == "\"" then
-      lastpos = nextpos + 1
-      break
-    else
-      local escchar = strsub (str, nextpos + 1, nextpos + 1)
-      local value
-      if escchar == "u" then
-        value = tonumber (strsub (str, nextpos + 2, nextpos + 5), 16)
-        if value then
-          local value2
-          if 0xD800 <= value and value <= 0xDBff then
-            -- we have the high surrogate of UTF-16. Check if there is a
-            -- low surrogate escaped nearby to combine them.
-            if strsub (str, nextpos + 6, nextpos + 7) == "\\u" then
-              value2 = tonumber (strsub (str, nextpos + 8, nextpos + 11), 16)
-              if value2 and 0xDC00 <= value2 and value2 <= 0xDFFF then
-                value = (value - 0xD800)  * 0x400 + (value2 - 0xDC00) + 0x10000
-              else
-                value2 = nil -- in case it was out of range for a low surrogate
-              end
-            end
-          end
-          value = value and unichar (value)
-          if value then
-            if value2 then
-              lastpos = nextpos + 12
-            else
-              lastpos = nextpos + 6
-            end
-          end
-        end
-      end
-      if not value then
-        value = escapechars[escchar] or escchar
-        lastpos = nextpos + 2
-      end
-      n = n + 1
-      buffer[n] = value
-    end
+	local nextpos = strfind (str, "[\"\\]", lastpos)
+	if not nextpos then
+	  return unterminated (str, "string", pos)
+	end
+	if nextpos > lastpos then
+	  n = n + 1
+	  buffer[n] = strsub (str, lastpos, nextpos - 1)
+	end
+	if strsub (str, nextpos, nextpos) == "\"" then
+	  lastpos = nextpos + 1
+	  break
+	else
+	  local escchar = strsub (str, nextpos + 1, nextpos + 1)
+	  local value
+	  if escchar == "u" then
+		value = tonumber (strsub (str, nextpos + 2, nextpos + 5), 16)
+		if value then
+		  local value2
+		  if 0xD800 <= value and value <= 0xDBff then
+			-- we have the high surrogate of UTF-16. Check if there is a
+			-- low surrogate escaped nearby to combine them.
+			if strsub (str, nextpos + 6, nextpos + 7) == "\\u" then
+			  value2 = tonumber (strsub (str, nextpos + 8, nextpos + 11), 16)
+			  if value2 and 0xDC00 <= value2 and value2 <= 0xDFFF then
+				value = (value - 0xD800)  * 0x400 + (value2 - 0xDC00) + 0x10000
+			  else
+				value2 = nil -- in case it was out of range for a low surrogate
+			  end
+			end
+		  end
+		  value = value and unichar (value)
+		  if value then
+			if value2 then
+			  lastpos = nextpos + 12
+			else
+			  lastpos = nextpos + 6
+			end
+		  end
+		end
+	  end
+	  if not value then
+		value = escapechars[escchar] or escchar
+		lastpos = nextpos + 2
+	  end
+	  n = n + 1
+	  buffer[n] = value
+	end
   end
   if n == 1 then
-    return buffer[1], lastpos
+	return buffer[1], lastpos
   elseif n > 1 then
-    return concat (buffer), lastpos
+	return concat (buffer), lastpos
   else
-    return "", lastpos
+	return "", lastpos
   end
 end
 
@@ -527,43 +527,43 @@ local function scantable (what, closechar, str, startpos, nullval, objectmeta, a
   local tbl, n = {}, 0
   local pos = startpos + 1
   if what == 'object' then
-    setmetatable (tbl, objectmeta)
+	setmetatable (tbl, objectmeta)
   else
-    setmetatable (tbl, arraymeta)
+	setmetatable (tbl, arraymeta)
   end
   while true do
-    pos = scanwhite (str, pos)
-    if not pos then return unterminated (str, what, startpos) end
-    local char = strsub (str, pos, pos)
-    if char == closechar then
-      return tbl, pos + 1
-    end
-    local val1, err
-    val1, pos, err = scanvalue (str, pos, nullval, objectmeta, arraymeta)
-    if err then return nil, pos, err end
-    pos = scanwhite (str, pos)
-    if not pos then return unterminated (str, what, startpos) end
-    char = strsub (str, pos, pos)
-    if char == ":" then
-      if val1 == nil then
-        return nil, pos, "cannot use nil as table index (at " .. loc (str, pos) .. ")"
-      end
-      pos = scanwhite (str, pos + 1)
-      if not pos then return unterminated (str, what, startpos) end
-      local val2
-      val2, pos, err = scanvalue (str, pos, nullval, objectmeta, arraymeta)
-      if err then return nil, pos, err end
-      tbl[val1] = val2
-      pos = scanwhite (str, pos)
-      if not pos then return unterminated (str, what, startpos) end
-      char = strsub (str, pos, pos)
-    else
-      n = n + 1
-      tbl[n] = val1
-    end
-    if char == "," then
-      pos = pos + 1
-    end
+	pos = scanwhite (str, pos)
+	if not pos then return unterminated (str, what, startpos) end
+	local char = strsub (str, pos, pos)
+	if char == closechar then
+	  return tbl, pos + 1
+	end
+	local val1, err
+	val1, pos, err = scanvalue (str, pos, nullval, objectmeta, arraymeta)
+	if err then return nil, pos, err end
+	pos = scanwhite (str, pos)
+	if not pos then return unterminated (str, what, startpos) end
+	char = strsub (str, pos, pos)
+	if char == ":" then
+	  if val1 == nil then
+		return nil, pos, "cannot use nil as table index (at " .. loc (str, pos) .. ")"
+	  end
+	  pos = scanwhite (str, pos + 1)
+	  if not pos then return unterminated (str, what, startpos) end
+	  local val2
+	  val2, pos, err = scanvalue (str, pos, nullval, objectmeta, arraymeta)
+	  if err then return nil, pos, err end
+	  tbl[val1] = val2
+	  pos = scanwhite (str, pos)
+	  if not pos then return unterminated (str, what, startpos) end
+	  char = strsub (str, pos, pos)
+	else
+	  n = n + 1
+	  tbl[n] = val1
+	end
+	if char == "," then
+	  pos = pos + 1
+	end
   end
 end
 
@@ -571,43 +571,43 @@ scanvalue = function (str, pos, nullval, objectmeta, arraymeta)
   pos = pos or 1
   pos = scanwhite (str, pos)
   if not pos then
-    return nil, strlen (str) + 1, "no valid JSON value (reached the end)"
+	return nil, strlen (str) + 1, "no valid JSON value (reached the end)"
   end
   local char = strsub (str, pos, pos)
   if char == "{" then
-    return scantable ('object', "}", str, pos, nullval, objectmeta, arraymeta)
+	return scantable ('object', "}", str, pos, nullval, objectmeta, arraymeta)
   elseif char == "[" then
-    return scantable ('array', "]", str, pos, nullval, objectmeta, arraymeta)
+	return scantable ('array', "]", str, pos, nullval, objectmeta, arraymeta)
   elseif char == "\"" then
-    return scanstring (str, pos)
+	return scanstring (str, pos)
   else
-    local pstart, pend = strfind (str, "^%-?[%d%.]+[eE]?[%+%-]?%d*", pos)
-    if pstart then
-      local number = str2num (strsub (str, pstart, pend))
-      if number then
-        return number, pend + 1
-      end
-    end
-    pstart, pend = strfind (str, "^%a%w*", pos)
-    if pstart then
-      local name = strsub (str, pstart, pend)
-      if name == "true" then
-        return true, pend + 1
-      elseif name == "false" then
-        return false, pend + 1
-      elseif name == "null" then
-        return nullval, pend + 1
-      end
-    end
-    return nil, pos, "no valid JSON value at " .. loc (str, pos)
+	local pstart, pend = strfind (str, "^%-?[%d%.]+[eE]?[%+%-]?%d*", pos)
+	if pstart then
+	  local number = str2num (strsub (str, pstart, pend))
+	  if number then
+		return number, pend + 1
+	  end
+	end
+	pstart, pend = strfind (str, "^%a%w*", pos)
+	if pstart then
+	  local name = strsub (str, pstart, pend)
+	  if name == "true" then
+		return true, pend + 1
+	  elseif name == "false" then
+		return false, pend + 1
+	  elseif name == "null" then
+		return nullval, pend + 1
+	  end
+	end
+	return nil, pos, "no valid JSON value at " .. loc (str, pos)
   end
 end
 
 local function optionalmetatables(...)
   if select("#", ...) > 0 then
-    return ...
+	return ...
   else
-    return {__jsontype = 'object'}, {__jsontype = 'array'}
+	return {__jsontype = 'object'}, {__jsontype = 'array'}
   end
 end
 
@@ -620,22 +620,22 @@ function json.use_lpeg ()
   local g = require ("lpeg")
 
   if g.version() == "0.11" then
-    error "due to a bug in LPeg 0.11, it cannot be used for JSON matching"
+	error "due to a bug in LPeg 0.11, it cannot be used for JSON matching"
   end
 
   local pegmatch = g.match
   local P, S, R = g.P, g.S, g.R
 
   local function ErrorCall (str, pos, msg, state)
-    if not state.msg then
-      state.msg = msg .. " at " .. loc (str, pos)
-      state.pos = pos
-    end
-    return false
+	if not state.msg then
+	  state.msg = msg .. " at " .. loc (str, pos)
+	  state.pos = pos
+	end
+	return false
   end
 
   local function Err (msg)
-    return g.Cmt (g.Cc (msg) * g.Carg (2), ErrorCall)
+	return g.Cmt (g.Cc (msg) * g.Carg (2), ErrorCall)
   end
 
   local SingleLineComment = P"//" * (1 - S"\n\r")^0
@@ -646,15 +646,15 @@ function json.use_lpeg ()
   local EscapeSequence = (P"\\" * g.C (S"\"\\/bfnrt" + Err "unsupported escape sequence")) / escapechars
   local HexDigit = R("09", "af", "AF")
   local function UTF16Surrogate (match, pos, high, low)
-    high, low = tonumber (high, 16), tonumber (low, 16)
-    if 0xD800 <= high and high <= 0xDBff and 0xDC00 <= low and low <= 0xDFFF then
-      return true, unichar ((high - 0xD800)  * 0x400 + (low - 0xDC00) + 0x10000)
-    else
-      return false
-    end
+	high, low = tonumber (high, 16), tonumber (low, 16)
+	if 0xD800 <= high and high <= 0xDBff and 0xDC00 <= low and low <= 0xDFFF then
+	  return true, unichar ((high - 0xD800)  * 0x400 + (low - 0xDC00) + 0x10000)
+	else
+	  return false
+	end
   end
   local function UTF16BMP (hex)
-    return unichar (tonumber (hex, 16))
+	return unichar (tonumber (hex, 16))
   end
   local U16Sequence = (P"\\u" * g.C (HexDigit * HexDigit * HexDigit * HexDigit))
   local UnicodeEscape = g.Cmt (U16Sequence * U16Sequence, UTF16Surrogate) + U16Sequence/UTF16BMP
@@ -671,30 +671,30 @@ function json.use_lpeg ()
   -- The functions parsearray and parseobject parse only a single value/pair
   -- at a time and store them directly to avoid hitting the LPeg limits.
   local function parsearray (str, pos, nullval, state)
-    local obj, cont
-    local npos
-    local t, nt = {}, 0
-    repeat
-      obj, cont, npos = pegmatch (ArrayContent, str, pos, nullval, state)
-      if not npos then break end
-      pos = npos
-      nt = nt + 1
-      t[nt] = obj
-    until cont == 'last'
-    return pos, setmetatable (t, state.arraymeta)
+	local obj, cont
+	local npos
+	local t, nt = {}, 0
+	repeat
+	  obj, cont, npos = pegmatch (ArrayContent, str, pos, nullval, state)
+	  if not npos then break end
+	  pos = npos
+	  nt = nt + 1
+	  t[nt] = obj
+	until cont == 'last'
+	return pos, setmetatable (t, state.arraymeta)
   end
 
   local function parseobject (str, pos, nullval, state)
-    local obj, key, cont
-    local npos
-    local t = {}
-    repeat
-      key, obj, cont, npos = pegmatch (ObjectContent, str, pos, nullval, state)
-      if not npos then break end
-      pos = npos
-      t[key] = obj
-    until cont == 'last'
-    return pos, setmetatable (t, state.objectmeta)
+	local obj, key, cont
+	local npos
+	local t = {}
+	repeat
+	  key, obj, cont, npos = pegmatch (ObjectContent, str, pos, nullval, state)
+	  if not npos then break end
+	  pos = npos
+	  t[key] = obj
+	until cont == 'last'
+	return pos, setmetatable (t, state.objectmeta)
   end
 
   local Array = P"[" * g.Cmt (g.Carg(1) * g.Carg(2), parsearray) * Space * (P"]" + Err "']' expected")
@@ -707,14 +707,14 @@ function json.use_lpeg ()
   local DecodeValue = ExpectedValue * g.Cp ()
 
   function json.decode (str, pos, nullval, ...)
-    local state = {}
-    state.objectmeta, state.arraymeta = optionalmetatables(...)
-    local obj, retpos = pegmatch (DecodeValue, str, pos, nullval, state)
-    if state.msg then
-      return nil, state.pos, state.msg
-    else
-      return obj, retpos
-    end
+	local state = {}
+	state.objectmeta, state.arraymeta = optionalmetatables(...)
+	local obj, retpos = pegmatch (DecodeValue, str, pos, nullval, state)
+	if state.msg then
+	  return nil, state.pos, state.msg
+	else
+	  return obj, retpos
+	end
   end
 
   -- use this function only once:

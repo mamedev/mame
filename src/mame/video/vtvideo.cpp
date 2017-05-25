@@ -59,6 +59,7 @@ FIXME: work out the differences and identify common code between VT and Rainbow.
 
 #include "emu.h"
 #include "video/vtvideo.h"
+#include "screen.h"
 
 /***************************************************************************
 PARAMETERS
@@ -69,34 +70,29 @@ PARAMETERS
 #define LOG(x)      do { if (VERBOSE) logerror x; } while (0)
 
 
-const device_type VT100_VIDEO = &device_creator<vt100_video_device>;
-const device_type RAINBOW_VIDEO = &device_creator<rainbow_video_device>;
+DEFINE_DEVICE_TYPE(VT100_VIDEO, vt100_video_device, "vt100_video", "VT100 Video")
+DEFINE_DEVICE_TYPE(RAINBOW_VIDEO, rainbow_video_device, "rainbow_video", "Rainbow Video")
 
 
-vt100_video_device::vt100_video_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-device_video_interface(mconfig, *this),
-m_read_ram(*this),
-m_write_clear_video_interrupt(*this),
-m_char_rom(*this),
-m_palette(*this, "palette")
+vt100_video_device::vt100_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_video_interface(mconfig, *this)
+	, m_read_ram(*this)
+	, m_write_clear_video_interrupt(*this)
+	, m_char_rom(*this, finder_base::DUMMY_TAG)
+	, m_palette(*this, "palette")
 {
 }
 
 
-vt100_video_device::vt100_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: device_t(mconfig, VT100_VIDEO, "VT100 Video", tag, owner, clock, "vt100_video", __FILE__),
-device_video_interface(mconfig, *this),
-m_read_ram(*this),
-m_write_clear_video_interrupt(*this),
-m_char_rom(*this),
-m_palette(*this, "palette")
+vt100_video_device::vt100_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: vt100_video_device(mconfig, VT100_VIDEO, tag, owner, clock)
 {
 }
 
 
-rainbow_video_device::rainbow_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: vt100_video_device(mconfig, RAINBOW_VIDEO, "Rainbow Video", tag, owner, clock, "rainbow_video", __FILE__)
+rainbow_video_device::rainbow_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: vt100_video_device(mconfig, RAINBOW_VIDEO, tag, owner, clock)
 {
 }
 
@@ -112,7 +108,8 @@ void vt100_video_device::device_start()
 	m_write_clear_video_interrupt.resolve_safe();
 
 	// LBA7 is scan line frequency update
-	machine().scheduler().timer_pulse(attotime::from_nsec(31778), timer_expired_delegate(FUNC(vt100_video_device::lba7_change), this));
+	m_lba7_change_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vt100_video_device::lba7_change), this));
+	m_lba7_change_timer->adjust(attotime::from_nsec(31778), 0, attotime::from_nsec(31778));
 
 	save_item(NAME(m_lba7));
 	save_item(NAME(m_scroll_latch));
@@ -236,18 +233,16 @@ WRITE8_MEMBER(vt100_video_device::dc012_w)
 {
 	// Writes to [10C] and [0C] are treated differently
 	// - see 3.1.3.9.5 DC012 Programming Information (PC-100 spec)
-	if ((offset & 0x100) && (data == 0) ) // MHFU is disabled by writing 00 to port 010C.
+	if ((offset & 0x100) ) // MHFU is disabled by writing a value to port 010C.
 	{
-		if (MHFU_FLAG == true)
-						printf("MHFU  *** DISABLED *** \n");
+//      if (MHFU_FLAG == true)
+//                      printf("MHFU  *** DISABLED *** \n");
 		MHFU_FLAG = false;
-		MHFU_counter = 0; // ?
 	}
 	else
 	{
-		if (MHFU_FLAG == false)
-			printf("MHFU  ___ENABLED___ %05x \n", space.device().safe_pc());
-
+//      if (MHFU_FLAG == false)
+//          printf("MHFU  ___ENABLED___ %05x \n", space.device().safe_pc());
 		MHFU_FLAG = true;
 		MHFU_counter = 0;
 	}
@@ -278,12 +273,13 @@ WRITE8_MEMBER(vt100_video_device::dc012_w)
 			m_write_clear_video_interrupt(0);
 			break;
 		case 0x0a:
-			// set reverse field on
-			m_reverse_field = 1;
+			// PDF: reverse field ON
+			m_reverse_field = 0;
 			break;
 		case 0x0b:
-			// set reverse field off
-			m_reverse_field = 0;
+			// PDF: reverse field OFF
+			// SETUP: dark screen selected
+			m_reverse_field = 1;
 			break;
 
 			//  Writing a 11XX bit combination clears the blink-flip flop (valid for 0x0C - 0x0F):
@@ -362,9 +358,9 @@ WRITE8_MEMBER(vt100_video_device::brightness_w)
 
 
 
-void vt100_video_device::display_char(bitmap_ind16 &bitmap, UINT8 code, int x, int y, UINT8 scroll_region, UINT8 display_type)
+void vt100_video_device::display_char(bitmap_ind16 &bitmap, uint8_t code, int x, int y, uint8_t scroll_region, uint8_t display_type)
 {
-	UINT8 line = 0;
+	uint8_t line = 0;
 	int bit = 0, prevbit, invert = 0, j;
 	int double_width = (display_type == 2) ? 1 : 0;
 
@@ -427,15 +423,15 @@ void vt100_video_device::display_char(bitmap_ind16 &bitmap, UINT8 code, int x, i
 
 void vt100_video_device::video_update(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT16 addr = 0;
+	uint16_t addr = 0;
 	int line = 0;
 	int xpos = 0;
 	int ypos = 0;
-	UINT8 code;
+	uint8_t code;
 	int x = 0;
-	UINT8 scroll_region = 1; // binary 1
-	UINT8 display_type = 3;  // binary 11
-	UINT16 temp = 0;
+	uint8_t scroll_region = 1; // binary 1
+	uint8_t display_type = 3;  // binary 11
+	uint16_t temp = 0;
 
 	if (m_read_ram(0) != 0x7f)
 		return;
@@ -508,23 +504,23 @@ void vt100_video_device::video_update(bitmap_ind16 &bitmap, const rectangle &cli
 // 0 = display char. in BOLD      (encoded as 16 in display_type) LOW ACTIVE
 // 0 = display char. w. BLINK     (encoded as 32 in display_type) LOW ACTIVE
 // 0 = display char. w. UNDERLINE (encoded as 64 in display_type) LOW ACTIVE
-void rainbow_video_device::display_char(bitmap_ind16 &bitmap, UINT8 code, int x, int y, UINT8 scroll_region, UINT8 display_type)
+void rainbow_video_device::display_char(bitmap_ind16 &bitmap, uint8_t code, int x, int y, uint8_t scroll_region, uint8_t display_type)
 {
-	UINT16 x_preset = x << 3; // x_preset = x * 9 (= 132 column mode)
+	uint16_t x_preset = x << 3; // x_preset = x * 9 (= 132 column mode)
 	x_preset += x;
 
 	if (m_columns == 80)
 		x_preset += x; //        x_preset = x * 10 (80 column mode)
 
-	UINT16 y_preset;
+	uint16_t y_preset;
 
-	UINT16 CHARPOS_y_preset = y << 3; // CHARPOS_y_preset = y * 10;
+	uint16_t CHARPOS_y_preset = y << 3; // CHARPOS_y_preset = y * 10;
 	CHARPOS_y_preset += y;
 	CHARPOS_y_preset += y;
 
-	UINT16 DOUBLE_x_preset = x_preset << 1; // 18 for 132 column mode, else 20 (x_preset * 2)
+	uint16_t DOUBLE_x_preset = x_preset << 1; // 18 for 132 column mode, else 20 (x_preset * 2)
 
-	UINT8 line = 0;
+	uint8_t line = 0;
 	int bit = 0, j = 0;
 	int fg_intensity;
 	int back_intensity, back_default_intensity;
@@ -697,16 +693,16 @@ void rainbow_video_device::display_char(bitmap_ind16 &bitmap, UINT8 code, int x,
 // ****** RAINBOW ******
 void rainbow_video_device::video_update(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT16 addr = 0;
-	UINT16 attr_addr = 0;
+	uint16_t addr = 0;
+	uint16_t attr_addr = 0;
 	int line = 0;
 	int xpos = 0;
 	int ypos = 0;
-	UINT8 code;
+	uint8_t code;
 	int x = 0;
-	UINT8 scroll_region = 0;  // DEFAULT TO 0 = NOT PART OF scroll_region
-	UINT8 display_type = 3;  // NORMAL DISPLAY - binary 11
-	UINT16 temp = 0;
+	uint8_t scroll_region = 0;  // DEFAULT TO 0 = NOT PART OF scroll_region
+	uint8_t display_type = 3;  // NORMAL DISPLAY - binary 11
+	uint16_t temp = 0;
 
 	if (m_read_ram(0) != 0xff) // video uninitialized?
 		return;
@@ -835,49 +831,40 @@ void rainbow_video_device::video_blanking(bitmap_ind16 &bitmap, const rectangle 
 	bitmap.fill(((m_reverse_field ^ m_basic_attribute) ? 1 : 0), cliprect);
 }
 
-
+#define MHFU_IS_ENABLED 1
+#define MHFU_COUNT -1
+#define MHFU_VALUE -2
+#define MHFU_RESET_and_ENABLE   -100
+#define MHFU_RESET_and_DISABLE  -200
+#define MHFU_RESET              -250
 
 int rainbow_video_device::MHFU(int ASK)
 {
 	switch (ASK)
 	{
-	case 1:         // "true": RETURN BOOLEAN (MHFU disabled or enabled?)
+	case MHFU_IS_ENABLED:       // "true": RETURN BOOLEAN (MHFU disabled or enabled?)
 		return MHFU_FLAG;
 
-	case -1:        // -1: increment IF ENABLED, return counter value (=> Rainbow.c)
-		//if (MHFU_FLAG == true)
-			if (MHFU_counter < 255)
+	case MHFU_COUNT:        // -1: increment IF ENABLED, return counter value (=> Rainbow.c)
+		if (MHFU_FLAG == true)
+			if (MHFU_counter < 254)
 				MHFU_counter++;
 
-	case -2:
+	case MHFU_VALUE:
 		return MHFU_counter;
 
-	case -250:          // -250 : RESET counter (NOTHING ELSE!)
+	case MHFU_RESET:        // -250 : RESET counter (NOTHING ELSE!)
 		MHFU_counter = 0;
 		return MHFU_FLAG;
 
-	case -100:          // -100 : RESET and ENABLE MHFU counter
+	case MHFU_RESET_and_ENABLE: // -100 : RESET and ENABLE MHFU counter
 		MHFU_counter = 0;
-		if(0) //if (VERBOSE)
-			printf("-100 MHFU  * reset and ENABLE * \n");
-
-		if(0) // if (VERBOSE)
-		{
-			if (MHFU_FLAG == false)
-				printf("-100 MHFU  ___ENABLED___\n");
-		}
 		MHFU_FLAG = true;
 
 		return -100;
 
-	case -200:          // -200 : RESET and DISABLE MHFU
+	case MHFU_RESET_and_DISABLE:    // -200 : RESET and DISABLE MHFU
 		MHFU_counter = 0;
-
-		if(0) //if (VERBOSE)
-		{
-			if (MHFU_FLAG == true)
-				printf("MHFU  *** DISABLED ***xxx \n");
-		}
 		MHFU_FLAG = false;
 
 		return -200;
@@ -893,30 +880,15 @@ TIMER_CALLBACK_MEMBER(vt100_video_device::lba7_change)
 	m_lba7 = (m_lba7) ? 0 : 1;
 }
 
-static MACHINE_CONFIG_FRAGMENT(vt100_video)
+
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER(vt100_video_device::device_add_mconfig)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 MACHINE_CONFIG_END
 
-//-------------------------------------------------
-//  machine_config_additions - return a pointer to
-//  the device's machine fragment
-//-------------------------------------------------
-
-machine_config_constructor vt100_video_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME(vt100_video);
-}
-
-static MACHINE_CONFIG_FRAGMENT(rainbow_video)
+MACHINE_CONFIG_MEMBER(rainbow_video_device::device_add_mconfig)
 	MCFG_PALETTE_ADD("palette", 4)
 MACHINE_CONFIG_END
-
-//-------------------------------------------------
-//  machine_config_additions - return a pointer to
-//  the device's machine fragment
-//-------------------------------------------------
-
-machine_config_constructor rainbow_video_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME(rainbow_video);
-}

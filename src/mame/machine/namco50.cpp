@@ -163,7 +163,7 @@ READ8_MEMBER( namco_50xx_device::R2_r )
 
 WRITE8_MEMBER( namco_50xx_device::O_w )
 {
-	UINT8 out = (data & 0x0f);
+	uint8_t out = (data & 0x0f);
 	if (data & 0x10)
 		m_portO = (m_portO & 0x0f) | (out << 4);
 	else
@@ -205,7 +205,7 @@ WRITE_LINE_MEMBER(namco_50xx_device::read_request)
 
 READ8_MEMBER( namco_50xx_device::read )
 {
-	UINT8 res = m_portO;
+	uint8_t res = m_portO;
 
 	read_request(0);
 
@@ -225,7 +225,7 @@ static ADDRESS_MAP_START( namco_50xx_map_io, AS_IO, 8, namco_50xx_device )
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_FRAGMENT( namco_50xx )
+static MACHINE_CONFIG_START( namco_50xx )
 	MCFG_CPU_ADD("mcu", MB8842, DERIVED_CLOCK(1,1))     /* parent clock, internally divided by 6 */
 	MCFG_CPU_IO_MAP(namco_50xx_map_io)
 MACHINE_CONFIG_END
@@ -237,10 +237,10 @@ ROM_START( namco_50xx )
 ROM_END
 
 
-const device_type NAMCO_50XX = &device_creator<namco_50xx_device>;
+DEFINE_DEVICE_TYPE(NAMCO_50XX, namco_50xx_device, "namco50", "Namco 50xx")
 
-namco_50xx_device::namco_50xx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, NAMCO_50XX, "Namco 50xx", tag, owner, clock, "namco50", __FILE__),
+namco_50xx_device::namco_50xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, NAMCO_50XX, tag, owner, clock),
 	m_cpu(*this, "mcu"),
 	m_latched_cmd(0),
 	m_latched_rw(0),
@@ -275,7 +275,7 @@ machine_config_constructor namco_50xx_device::device_mconfig_additions() const
 //  the device's ROM definitions
 //-------------------------------------------------
 
-const rom_entry *namco_50xx_device::device_rom_region() const
+const tiny_rom_entry *namco_50xx_device::device_rom_region() const
 {
 	return ROM_NAME(namco_50xx );
 }

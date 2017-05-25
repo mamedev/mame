@@ -38,7 +38,7 @@
                     (thank's Daniel)
         03/01/2010 Update and clean prog  by yo_fr       (jj.stac@aliceadsl.fr)
                 => add the port mapping for keyboard
-        20/11/2010 : synchronization between uPD765 and Z80 are now OK, CP/M runnig! JJStacino
+        20/11/2010 : synchronization between uPD765 and Z80 are now OK, CP/M running! JJStacino
         11/11/2011 : add the minidisque support -3 pouces 1/2 driver-  JJStacino
 
         don't forget to keep some information about these machine see DChector project : http://dchector.free.fr/ made by DanielCoulom
@@ -72,17 +72,22 @@
 */
 
 #include "emu.h"
-
-#include "imagedev/cassette.h"
-#include "formats/hect_tap.h"
-#include "imagedev/printer.h"
-#include "sound/wave.h"      /* for K7 sound*/
-#include "sound/discrete.h"  /* for 1 Bit sound*/
-#include "machine/upd765.h" /* for floppy disc controller */
-#include "cpu/z80/z80.h"
-#include "formats/hect_dsk.h"
-#include "formats/hector_minidisc.h"
 #include "includes/hec2hrp.h"
+
+#include "cpu/z80/z80.h"
+#include "imagedev/cassette.h"
+#include "imagedev/printer.h"
+#include "machine/upd765.h" /* for floppy disc controller */
+#include "sound/discrete.h"  /* for 1 Bit sound*/
+#include "sound/wave.h"      /* for K7 sound*/
+
+#include "screen.h"
+#include "speaker.h"
+
+#include "formats/hect_dsk.h"
+#include "formats/hect_tap.h"
+#include "formats/hector_minidisc.h"
+
 
 /*****************************************************************************/
 static ADDRESS_MAP_START(hecdisc2_mem, AS_PROGRAM, 8, hec2hrp_state )
@@ -177,7 +182,7 @@ static ADDRESS_MAP_START( hec2mdhrx_io , AS_IO, 8, hec2hrp_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
 	// Minidisc commands and changing the rom page !*/
-	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("wd179x", fd1793_t, read, write)
+	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("wd179x", fd1793_device, read, write)
 	AM_RANGE(0x08, 0x08) AM_WRITE(minidisc_control_w)
 	AM_RANGE(0x0f0,0x0ff) AM_READWRITE(hector_io_8255_r, hector_io_8255_w )
 ADDRESS_MAP_END
@@ -305,7 +310,7 @@ MACHINE_RESET_MEMBER(hec2hrp_state,hec2hrp)
 MACHINE_START_MEMBER(hec2hrp_state,hec2hrx)
 /*****************************************************************************/
 {
-	UINT8 *RAM   = memregion("maincpu"  )->base();  // pointer to mess ram
+	uint8_t *RAM   = memregion("maincpu"  )->base();  // pointer to mess ram
 	//Patch rom possible !
 	//RAMD2[0xff6b] = 0x0ff; // force verbose mode hector !
 
@@ -339,7 +344,7 @@ MACHINE_START_MEMBER(hec2hrp_state,hec2mdhrx)
 /*****************************************************************************/
 //minidisc
 {
-	UINT8 *RAM   = memregion("maincpu"  )->base();  // pointer to mess ram
+	uint8_t *RAM   = memregion("maincpu"  )->base();  // pointer to mess ram
 
 	// Memory install for bank switching
 	membank("bank1")->configure_entry(HECTOR_BANK_PROG , &RAM[0xc000]   ); // Mess ram
@@ -396,7 +401,7 @@ SLOT_INTERFACE_END
 
 
 /******************************************************************************/
-static MACHINE_CONFIG_START( hec2hr, hec2hrp_state )
+static MACHINE_CONFIG_START( hec2hr )
 /******************************************************************************/
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_5MHz)
@@ -431,7 +436,7 @@ static MACHINE_CONFIG_START( hec2hr, hec2hrp_state )
 MACHINE_CONFIG_END
 
 /*****************************************************************************/
-static MACHINE_CONFIG_START( hec2hrp, hec2hrp_state )
+static MACHINE_CONFIG_START( hec2hrp )
 /*****************************************************************************/
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_5MHz)
@@ -470,7 +475,7 @@ static SLOT_INTERFACE_START( hector_floppies )
 SLOT_INTERFACE_END
 
 /*****************************************************************************/
-static MACHINE_CONFIG_START( hec2mx40, hec2hrp_state )
+static MACHINE_CONFIG_START( hec2mx40 )
 /*****************************************************************************/
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_5MHz)
@@ -514,7 +519,7 @@ static MACHINE_CONFIG_START( hec2mx40, hec2hrp_state )
 
 MACHINE_CONFIG_END
 /*****************************************************************************/
-static MACHINE_CONFIG_START( hec2hrx, hec2hrp_state )
+static MACHINE_CONFIG_START( hec2hrx )
 /*****************************************************************************/
 /* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_5MHz)
@@ -558,7 +563,7 @@ static MACHINE_CONFIG_START( hec2hrx, hec2hrp_state )
 
 MACHINE_CONFIG_END
 /*****************************************************************************/
-static MACHINE_CONFIG_START( hec2mdhrx, hec2hrp_state )
+static MACHINE_CONFIG_START( hec2mdhrx )
 /*****************************************************************************/
 // minidisc
 /* basic machine hardware */
@@ -600,7 +605,7 @@ static MACHINE_CONFIG_START( hec2mdhrx, hec2hrp_state )
 MACHINE_CONFIG_END
 
 /*****************************************************************************/
-static MACHINE_CONFIG_START( hec2mx80, hec2hrp_state )
+static MACHINE_CONFIG_START( hec2mx80 )
 /*****************************************************************************/
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_5MHz)
@@ -721,11 +726,11 @@ ROM_END
 
 /* Driver */
 
-/*  YEAR    NAME    PARENT      COMPAT      MACHINE     INPUT   INIT    COMPANY         FULLNAME            FLAGS */
-COMP(1983,  hec2hrp,    0,      interact,   hec2hrp,    hec2hrp, driver_device,0,       "Micronique",   "Hector 2HR+",      MACHINE_IMPERFECT_SOUND)
-COMP(1980,  victor,     hec2hrp, 0,         hec2hrp,    hec2hrp, driver_device,0,       "Micronique",   "Victor",           MACHINE_IMPERFECT_SOUND)
-COMP(1983,  hec2hr,     hec2hrp, 0,         hec2hr,     hec2hrp, driver_device,0,        "Micronique",  "Hector 2HR",       MACHINE_IMPERFECT_SOUND)
-COMP(1984,  hec2hrx,    hec2hrp, 0,         hec2hrx,    hec2hrp, driver_device,0,        "Micronique",  "Hector HRX + Disc2",       MACHINE_IMPERFECT_SOUND)
-COMP(1985,  hec2mdhrx,  hec2hrp, 0,         hec2mdhrx,  hec2hrp, driver_device,0,        "Micronique",  "Hector HRX + mini Disc" ,  MACHINE_IMPERFECT_SOUND)
-COMP(1985,  hec2mx80,   hec2hrp, 0,         hec2mx80,   hec2hrp, driver_device,0,        "Micronique",  "Hector MX 80c + Disc2" ,   MACHINE_IMPERFECT_SOUND)
-COMP(1985,  hec2mx40,   hec2hrp, 0,         hec2mx40,   hec2hrp, driver_device,0,        "Micronique",  "Hector MX 40c + Disc2" ,   MACHINE_IMPERFECT_SOUND)
+/*  YEAR    NAME    PARENT      COMPAT      MACHINE     INPUT    STATE          INIT  COMPANY        FULLNAME                  FLAGS */
+COMP(1983,  hec2hrp,    0,      interact,   hec2hrp,    hec2hrp, hec2hrp_state, 0,    "Micronique",  "Hector 2HR+",            MACHINE_IMPERFECT_SOUND)
+COMP(1980,  victor,     hec2hrp, 0,         hec2hrp,    hec2hrp, hec2hrp_state, 0,    "Micronique",  "Victor",                 MACHINE_IMPERFECT_SOUND)
+COMP(1983,  hec2hr,     hec2hrp, 0,         hec2hr,     hec2hrp, hec2hrp_state, 0,    "Micronique",  "Hector 2HR",             MACHINE_IMPERFECT_SOUND)
+COMP(1984,  hec2hrx,    hec2hrp, 0,         hec2hrx,    hec2hrp, hec2hrp_state, 0,    "Micronique",  "Hector HRX + Disc2",     MACHINE_IMPERFECT_SOUND)
+COMP(1985,  hec2mdhrx,  hec2hrp, 0,         hec2mdhrx,  hec2hrp, hec2hrp_state, 0,    "Micronique",  "Hector HRX + mini Disc", MACHINE_IMPERFECT_SOUND)
+COMP(1985,  hec2mx80,   hec2hrp, 0,         hec2mx80,   hec2hrp, hec2hrp_state, 0,    "Micronique",  "Hector MX 80c + Disc2",  MACHINE_IMPERFECT_SOUND)
+COMP(1985,  hec2mx40,   hec2hrp, 0,         hec2mx40,   hec2hrp, hec2hrp_state, 0,    "Micronique",  "Hector MX 40c + Disc2",  MACHINE_IMPERFECT_SOUND)

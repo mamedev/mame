@@ -1,7 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles, Vas Crabb
 
-#define WIN32_LEAN_AND_MEAN
 
 #include "winfile.h"
 
@@ -87,12 +86,9 @@ bool win_check_ptty_path(std::string const &path)
 
 osd_file::error win_open_ptty(std::string const &path, std::uint32_t openflags, osd_file::ptr &file, std::uint64_t &filesize)
 {
-	TCHAR *t_name = tstring_from_utf8(path.c_str());
-	if (!t_name)
-		return osd_file::error::OUT_OF_MEMORY;
+	osd::text::tstring t_name = osd::text::to_tstring(path);
 
-	HANDLE pipe = CreateNamedPipe(t_name, PIPE_ACCESS_DUPLEX, PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_NOWAIT, 1, 32, 32, 0, nullptr);
-	osd_free(t_name);
+	HANDLE pipe = CreateNamedPipe(t_name.c_str(), PIPE_ACCESS_DUPLEX, PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_NOWAIT, 1, 32, 32, 0, nullptr);
 
 	if (INVALID_HANDLE_VALUE == pipe)
 		return osd_file::error::ACCESS_DENIED;

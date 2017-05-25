@@ -16,6 +16,8 @@
 #include "sound/sn76477.h"
 #include "sound/tms3615.h"
 
+#include "screen.h"
+
 
 class laserbat_state_base : public driver_device
 {
@@ -23,11 +25,9 @@ public:
 
 	laserbat_state_base(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_row0(*this, "ROW0")
+		, m_mux_ports(*this, {"ROW0", "ROW1", "SW1", "SW2"})
 		, m_row1(*this, "ROW1")
 		, m_row2(*this, "ROW2")
-		, m_sw1(*this, "SW1")
-		, m_sw2(*this, "SW2")
 		, m_maincpu(*this, "maincpu")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
@@ -82,7 +82,7 @@ public:
 
 	// running the video
 	virtual void video_start() override;
-	UINT32 screen_update_laserbat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_laserbat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
 	enum { TIMER_SCANLINE };
@@ -93,11 +93,9 @@ protected:
 	TIMER_CALLBACK_MEMBER(video_line);
 
 	// input lines
-	required_ioport m_row0;
+	required_ioport_array<4> m_mux_ports;
 	required_ioport m_row1;
 	required_ioport m_row2;
-	required_ioport m_sw1;
-	required_ioport m_sw2;
 
 	// main CPU device
 	required_device<cpu_device> m_maincpu;
@@ -114,16 +112,16 @@ protected:
 	// stuff for rendering video
 	emu_timer       *m_scanline_timer;
 	bitmap_ind16    m_bitmap;
-	UINT8 const     *m_gfx1;
-	UINT8 const     *m_gfx2;
+	uint8_t const     *m_gfx1;
+	uint8_t const     *m_gfx2;
 
 	// control lines
 	unsigned        m_input_mux;
 	bool            m_mpx_p_1_2;
 
 	// RAM used by TTL video hardware, writable by CPU
-	UINT8           m_bg_ram[0x400];    // background tilemap
-	UINT8           m_eff_ram[0x400];   // per-scanline effects (A8 not wired meaning only half is usable)
+	uint8_t           m_bg_ram[0x400];    // background tilemap
+	uint8_t           m_eff_ram[0x400];   // per-scanline effects (A8 not wired meaning only half is usable)
 	bool            m_mpx_bkeff;        // select between writing background and effects memory
 
 	// signals affecting the TTL-generated 32x32 sprite

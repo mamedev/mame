@@ -71,13 +71,14 @@
 
 *******************************************************************************/
 
-#define MASTER_CLOCK    XTAL_8MHz   /* guess */
-
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "video/mc6845.h"
 #include "machine/6821pia.h"
 #include "machine/nvram.h"
+#include "screen.h"
+
+#define MASTER_CLOCK    XTAL_8MHz   /* guess */
 
 
 class jokrwild_state : public driver_device
@@ -90,8 +91,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode") { }
 
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
 	tilemap_t *m_bg_tilemap;
 	DECLARE_WRITE8_MEMBER(jokrwild_videoram_w);
 	DECLARE_WRITE8_MEMBER(jokrwild_colorram_w);
@@ -102,7 +103,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(jokrwild);
-	UINT32 screen_update_jokrwild(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_jokrwild(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 };
@@ -140,10 +141,10 @@ TILE_GET_INFO_MEMBER(jokrwild_state::get_bg_tile_info)
 
 void jokrwild_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(jokrwild_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 24, 26);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(jokrwild_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 24, 26);
 }
 
-UINT32 jokrwild_state::screen_update_jokrwild(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t jokrwild_state::screen_update_jokrwild(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -401,7 +402,7 @@ WRITE8_MEMBER(jokrwild_state::testb_w)
 *    Machine Drivers     *
 *************************/
 
-static MACHINE_CONFIG_START( jokrwild, jokrwild_state )
+static MACHINE_CONFIG_START( jokrwild )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/2)  /* guess */
@@ -490,7 +491,7 @@ DRIVER_INIT_MEMBER(jokrwild_state,jokrwild)
 *****************************************************************************/
 {
 	int i, offs;
-	UINT8 *srcp = memregion( "maincpu" )->base();
+	uint8_t *srcp = memregion( "maincpu" )->base();
 
 	for (i = 0x8000; i < 0x10000; i++)
 	{
@@ -504,5 +505,5 @@ DRIVER_INIT_MEMBER(jokrwild_state,jokrwild)
 *      Game Drivers      *
 *************************/
 
-/*    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT      ROT    COMPANY  FULLNAME                   FLAGS */
+//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT      ROT   COMPANY  FULLNAME                    FLAGS
 GAME( 1988, jokrwild, 0,      jokrwild, jokrwild, jokrwild_state, jokrwild, ROT0, "Sigma", "Joker's Wild (encrypted)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

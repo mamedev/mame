@@ -8,8 +8,10 @@
 
 ***************************************************************************/
 
-#ifndef __DVTEXT_H__
-#define __DVTEXT_H__
+#ifndef MAME_EMU_DEBUG_DVTEXT_H
+#define MAME_EMU_DEBUG_DVTEXT_H
+
+#pragma once
 
 #include "debugvw.h"
 #include "textbuf.h"
@@ -37,8 +39,8 @@ protected:
 private:
 	// internal state
 	text_buffer &       m_textbuf;              /* pointer to the text buffer */
-	bool                m_at_bottom;                /* are we tracking new stuff being added? */
-	UINT32              m_topseq;                   /* sequence number of the top line */
+	bool                m_at_bottom;            /* are we tracking new stuff being added? */
+	u32                 m_topseq;               /* sequence number of the top line */
 };
 
 
@@ -57,5 +59,4 @@ class debug_view_log : public debug_view_textbuf
 	debug_view_log(running_machine &machine, debug_view_osd_update_func osdupdate, void *osdprivate);
 };
 
-
-#endif
+#endif // MAME_EMU_DEBUG_DVTEXT_H

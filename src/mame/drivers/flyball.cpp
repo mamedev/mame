@@ -20,6 +20,7 @@ TODO:
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
+#include "screen.h"
 
 #define MASTER_CLOCK    XTAL_12_096MHz
 #define PIXEL_CLOCK     (MASTER_CLOCK / 2)
@@ -50,20 +51,21 @@ public:
 	required_device<palette_device> m_palette;
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_playfield_ram;
+	required_shared_ptr<uint8_t> m_playfield_ram;
 
 	/* video-related */
 	tilemap_t  *m_tmap;
-	UINT8    m_pitcher_vert;
-	UINT8    m_pitcher_horz;
-	UINT8    m_pitcher_pic;
-	UINT8    m_ball_vert;
-	UINT8    m_ball_horz;
+	uint8_t    m_pitcher_vert;
+	uint8_t    m_pitcher_horz;
+	uint8_t    m_pitcher_pic;
+	uint8_t    m_ball_vert;
+	uint8_t    m_ball_horz;
 
 	/* misc */
-	UINT8    m_potmask;
-	UINT8    m_potsense;
+	uint8_t    m_potmask;
+	uint8_t    m_potsense;
 
+	emu_timer *m_pot_assert_timer[64];
 	emu_timer *m_pot_clear_timer;
 	emu_timer *m_quarter_timer;
 
@@ -86,7 +88,7 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(flyball);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TIMER_CALLBACK_MEMBER(joystick_callback);
 	TIMER_CALLBACK_MEMBER(quarter_callback);
@@ -113,7 +115,7 @@ TILEMAP_MAPPER_MEMBER(flyball_state::get_memory_offset)
 
 TILE_GET_INFO_MEMBER(flyball_state::get_tile_info)
 {
-	UINT8 data = m_playfield_ram[tile_index];
+	uint8_t data = m_playfield_ram[tile_index];
 	int flags = ((data & 0x40) ? TILE_FLIPX : 0) | ((data & 0x80) ? TILE_FLIPY : 0);
 	int code = data & 63;
 
@@ -126,11 +128,11 @@ TILE_GET_INFO_MEMBER(flyball_state::get_tile_info)
 
 void flyball_state::video_start()
 {
-	m_tmap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(flyball_state::get_tile_info),this), tilemap_mapper_delegate(FUNC(flyball_state::get_memory_offset),this), 8, 16, 32, 16);
+	m_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(flyball_state::get_tile_info),this), tilemap_mapper_delegate(FUNC(flyball_state::get_memory_offset),this), 8, 16, 32, 16);
 }
 
 
-UINT32 flyball_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t flyball_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int pitcherx = m_pitcher_horz;
 	int pitchery = m_pitcher_vert - 31;
@@ -171,7 +173,7 @@ void flyball_state::device_timer(emu_timer &timer, device_timer_id id, int param
 		break;
 
 	default:
-		assert_always(FALSE, "Unknown id in flyball_state::device_timer");
+		assert_always(false, "Unknown id in flyball_state::device_timer");
 	}
 }
 
@@ -205,7 +207,7 @@ TIMER_CALLBACK_MEMBER(flyball_state::quarter_callback)
 
 	for (i = 0; i < 64; i++)
 		if (potsense[i] != 0)
-			timer_set(m_screen->time_until_pos(scanline + i), TIMER_POT_ASSERT, potsense[i]);
+			m_pot_assert_timer[potsense[i]]->adjust(m_screen->time_until_pos(scanline + i), potsense[i]);
 
 	scanline += 0x40;
 	scanline &= 0xff;
@@ -424,13 +426,15 @@ PALETTE_INIT_MEMBER(flyball_state, flyball)
 void flyball_state::machine_start()
 {
 	/* address bits 0 through 8 are inverted */
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	int len = memregion("maincpu")->bytes();
-	dynamic_buffer buf(len);
+	std::vector<uint8_t> buf(len);
 	for (int i = 0; i < len; i++)
 		buf[i ^ 0x1ff] = ROM[i];
 	memcpy(ROM, &buf[0], len);
 
+	for (int i = 0; i < 64; i++)
+		m_pot_assert_timer[i] = timer_alloc(TIMER_POT_ASSERT);
 	m_pot_clear_timer = timer_alloc(TIMER_POT_CLEAR);
 	m_quarter_timer = timer_alloc(TIMER_QUARTER);
 
@@ -457,7 +461,7 @@ void flyball_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( flyball, flyball_state )
+static MACHINE_CONFIG_START( flyball )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK/16)
@@ -537,5 +541,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1976, flyball,  0,       flyball, flyball, driver_device, 0, 0, "Atari", "Flyball (rev 2)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1976, flyball1, flyball, flyball, flyball, driver_device, 0, 0, "Atari", "Flyball (rev 1)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1976, flyball,  0,       flyball, flyball, flyball_state, 0, 0, "Atari", "Flyball (rev 2)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1976, flyball1, flyball, flyball, flyball, flyball_state, 0, 0, "Atari", "Flyball (rev 1)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

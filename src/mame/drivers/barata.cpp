@@ -11,7 +11,7 @@
 
     Manufactured by Matic: http://maticplay.com.br/
     This driver still only emulates an early prototype of the game.
-    Propper dumps of the actual released game is still lacking.
+    Proper dumps of the actual released game is still lacking.
     Photos on the web make us believe that there are at least 2 official
     releases of this game.
 
@@ -34,21 +34,21 @@
 
 **************************************************************************/
 
-#define CPU_CLOCK       (XTAL_6MHz)         /* main cpu clock */
-
 #include "emu.h"
 #include "cpu/mcs51/mcs51.h"
-#include "sound/dac.h"
-#include "barata.lh"
 #include "rendlay.h"
+#include "speaker.h"
+
+#include "barata.lh"
+
+#define CPU_CLOCK       (XTAL_6MHz)         /* main cpu clock */
 
 class barata_state : public driver_device
 {
 public:
 	barata_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_dac(*this, "dac") { }
+		m_maincpu(*this, "maincpu") { }
 	DECLARE_WRITE8_MEMBER(fpga_w);
 	DECLARE_WRITE8_MEMBER(port0_w);
 	DECLARE_WRITE8_MEMBER(port2_w);
@@ -56,7 +56,6 @@ public:
 	void fpga_send(unsigned char cmd);
 
 	required_device<cpu_device> m_maincpu;
-	required_device<dac_device> m_dac;
 private:
 	unsigned char row_selection;
 };
@@ -119,9 +118,9 @@ static INPUT_PORTS_START( barata )
 INPUT_PORTS_END
 
 /* BCD to Seven Segment Decoder */
-static UINT8 dec_7seg(int data)
+static uint8_t dec_7seg(int data)
 {
-	UINT8 segment;
+	uint8_t segment;
 	switch (data)
 	{
 		case 0: segment = 0x3f; break;
@@ -305,7 +304,7 @@ ADDRESS_MAP_END
 *    Machine Drivers    *
 ************************/
 
-static MACHINE_CONFIG_START( barata, barata_state )
+static MACHINE_CONFIG_START( barata )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8051, CPU_CLOCK)
 	MCFG_CPU_IO_MAP(i8051_io_port)
@@ -313,9 +312,7 @@ static MACHINE_CONFIG_START( barata, barata_state )
 	MCFG_DEFAULT_LAYOUT( layout_barata )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.55)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	/* TODO: add sound samples */
 MACHINE_CONFIG_END
@@ -332,4 +329,4 @@ ROM_END
 /*************************
 *      Game Drivers      *
 *************************/
-GAME( 2002, barata,     0,        barata,   barata,    driver_device, 0,        ROT0,  "Eletro Matic Equipamentos Eletromec??nicos", "Dona Barata (early prototype)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2002, barata,     0,        barata,   barata,    barata_state, 0,        ROT0,  "Eletro Matic Equipamentos Eletromec??nicos", "Dona Barata (early prototype)", MACHINE_IMPERFECT_GRAPHICS )

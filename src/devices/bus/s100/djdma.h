@@ -6,12 +6,11 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_S100_DJDMA_H
+#define MAME_BUS_S100_DJDMA_H
+
 #pragma once
 
-#ifndef __S100_DJDMA__
-#define __S100_DJDMA__
-
-#include "emu.h"
 #include "s100.h"
 #include "cpu/z80/z80.h"
 
@@ -28,11 +27,11 @@ class s100_djdma_device : public device_t,
 {
 public:
 	// construction/destruction
-	s100_djdma_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	s100_djdma_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 
 protected:
 	// device-level overrides
@@ -42,7 +41,6 @@ protected:
 
 
 // device type definition
-extern const device_type S100_DJDMA;
+DECLARE_DEVICE_TYPE(S100_DJDMA, s100_djdma_device)
 
-
-#endif
+#endif // MAME_BUS_S100_DJDMA_H

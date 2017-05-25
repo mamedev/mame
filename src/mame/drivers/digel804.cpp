@@ -27,6 +27,20 @@
 *
 ******************************************************************************/
 
+/* Core includes */
+#include "emu.h"
+#include "bus/rs232/rs232.h"
+#include "cpu/z80/z80.h"
+#include "machine/mm74c922.h"
+#include "machine/mos6551.h"
+#include "machine/ram.h"
+#include "machine/roc10937.h"
+#include "sound/spkrdev.h"
+#include "speaker.h"
+
+#include "digel804.lh"
+
+
 // port 40 read reads eprom socket pins 11-13, 15-19 (i.e. eprom pin D0 to pin D7)
 
 // port 40 write writes eprom socket pins 11-13, 15-19 (i.e. eprom pin D0 to pin D7)
@@ -53,18 +67,6 @@
 // port 47 write is tim0-tim7
 
 
-/* Core includes */
-#include "emu.h"
-#include "cpu/z80/z80.h"
-#include "sound/speaker.h"
-#include "machine/roc10937.h"
-#include "machine/mos6551.h"
-#include "machine/mm74c922.h"
-#include "machine/ram.h"
-#include "bus/rs232/rs232.h"
-#include "digel804.lh"
-
-
 class digel804_state : public driver_device
 {
 public:
@@ -83,7 +85,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<mos6551_device> m_acia;
-	required_device<roc10937_t> m_vfd;
+	required_device<roc10937_device> m_vfd;
 	required_device<mm74c922_device> m_kb;
 	required_device<ram_device> m_ram;
 	required_memory_bank m_rambank;
@@ -116,20 +118,20 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( da_w );
 	DECLARE_INPUT_CHANGED_MEMBER(mode_change);
 	// current speaker state for port 45
-	UINT8 m_speaker_state;
+	uint8_t m_speaker_state;
 	// ram stuff for banking
-	UINT8 m_ram_bank;
+	uint8_t m_ram_bank;
 	// states
-	UINT8 m_acia_intq;
-	UINT8 m_overload_state;
-	UINT8 m_key_intq;
-	UINT8 m_remote_mode;
-	UINT8 m_key_mode;
-	UINT8 m_sim_mode;
-	UINT8 m_powerfail_state;
-	UINT8 m_chipinsert_state;
-	UINT8 m_keyen_state;
-	UINT8 m_op41;
+	uint8_t m_acia_intq;
+	uint8_t m_overload_state;
+	uint8_t m_key_intq;
+	uint8_t m_remote_mode;
+	uint8_t m_key_mode;
+	uint8_t m_sim_mode;
+	uint8_t m_powerfail_state;
+	uint8_t m_chipinsert_state;
+	uint8_t m_keyen_state;
+	uint8_t m_op41;
 };
 
 
@@ -308,7 +310,7 @@ READ8_MEMBER( digel804_state::ip46 ) // keypad read
 	 * this value auto-latches on a key press and remains through multiple reads
 	 * this is done by a 74C923 integrated circuit
 	*/
-	UINT8 kbd = m_kb->read();
+	uint8_t kbd = m_kb->read();
 #ifdef PORT46_R_VERBOSE
 	logerror("Digel804: returning %02X for port 46 keypad read\n", kbd);
 #endif
@@ -350,7 +352,7 @@ INPUT_CHANGED_MEMBER( digel804_state::mode_change )
 {
 	if (!newval && !m_keyen_state)
 	{
-		switch ((int)(FPTR)param)
+		switch ((int)(uintptr_t)param)
 		{
 			case MODE_OFF:
 				m_key_mode = m_remote_mode = m_sim_mode = 1;
@@ -582,7 +584,7 @@ WRITE_LINE_MEMBER( digel804_state::ep804_acia_irq_w )
 {
 }
 
-static MACHINE_CONFIG_START( digel804, digel804_state )
+static MACHINE_CONFIG_START( digel804 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_6864MHz/2) /* Z80A, X1(aka E0 on schematics): 3.6864Mhz */
 	MCFG_CPU_PROGRAM_MAP(z80_mem_804_1_4)
@@ -721,6 +723,6 @@ ROM_END
  Drivers
 ******************************************************************************/
 
-/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT      COMPANY                     FULLNAME                                                    FLAGS */
-COMP( 1985, digel804,   0,          0,      digel804,   digel804, digel804_state, digel804,      "Digelec, Inc",   "Digelec 804 EPROM Programmer", MACHINE_NOT_WORKING )
-COMP( 1982, ep804,   digel804,          0,      ep804,   digel804, digel804_state, digel804,      "Wavetek/Digelec, Inc",   "EP804 EPROM Programmer", MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     STATE           INIT      COMPANY                 FULLNAME                        FLAGS
+COMP( 1985, digel804, 0,        0,      digel804, digel804, digel804_state, digel804, "Digelec, Inc",         "Digelec 804 EPROM Programmer", MACHINE_NOT_WORKING )
+COMP( 1982, ep804,    digel804, 0,      ep804,    digel804, digel804_state, digel804, "Wavetek/Digelec, Inc", "EP804 EPROM Programmer",       MACHINE_NOT_WORKING )

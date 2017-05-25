@@ -244,14 +244,14 @@ DC00      - Selection buttons #2, 9-16 (R)
  ******************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "sound/sn76496.h"
-#include "sound/ym2413.h"
-#include "video/315_5124.h"
 #include "includes/sms.h"
+
+#include "cpu/z80/z80.h"
 #include "softlist.h"
+#include "speaker.h"
 
 #include "sms1.lh"
+
 
 #define MASTER_CLOCK_GG     32215905
 #define MASTER_CLOCK_PALN   10746168
@@ -300,7 +300,7 @@ static ADDRESS_MAP_START( sg1000m3_io, AS_IO, 8, sms_state )
 	AM_RANGE(0x40, 0x7f)                 AM_READWRITE(sms_count_r, sms_psg_w)
 	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3e) AM_DEVREADWRITE("sms_vdp", sega315_5124_device, vram_read, vram_write)
 	AM_RANGE(0x81, 0x81) AM_MIRROR(0x3e) AM_DEVREADWRITE("sms_vdp", sega315_5124_device, register_read, register_write)
-	AM_RANGE(0xc0, 0xc7) AM_MIRROR(0x38) AM_READWRITE(sg1000m3_peripheral_r,sg1000m3_peripheral_w)
+	AM_RANGE(0xc0, 0xc7) AM_MIRROR(0x38) AM_READWRITE(sg1000m3_peripheral_r, sg1000m3_peripheral_w)
 ADDRESS_MAP_END
 
 
@@ -486,7 +486,7 @@ static INPUT_PORTS_START( gg )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( sms_base, sms_state )
+static MACHINE_CONFIG_START( sms_base )
 	MCFG_MACHINE_START_OVERRIDE(sms_state,sms)
 	MCFG_MACHINE_RESET_OVERRIDE(sms_state,sms)
 
@@ -537,33 +537,33 @@ MACHINE_CONFIG_END
 
 #define MCFG_SCREEN_SMS_PAL_RAW_PARAMS(_pixelclock) \
 	MCFG_SCREEN_RAW_PARAMS(_pixelclock, \
-		SEGA315_5124_WIDTH, \
-		SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH - 2, \
-		SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH + 256 + 10, \
-		SEGA315_5124_HEIGHT_PAL, \
-		SEGA315_5124_TBORDER_START + SEGA315_5124_PAL_240_TBORDER_HEIGHT, \
-		SEGA315_5124_TBORDER_START + SEGA315_5124_PAL_240_TBORDER_HEIGHT + 240) \
-	MCFG_SCREEN_REFRESH_RATE((double) _pixelclock / (SEGA315_5124_WIDTH * SEGA315_5124_HEIGHT_PAL))
+		sega315_5124_device::WIDTH, \
+		sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH - 2, \
+		sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 256 + 10, \
+		sega315_5124_device::HEIGHT_PAL, \
+		sega315_5124_device::TBORDER_START + sega315_5124_device::PAL_240_TBORDER_HEIGHT, \
+		sega315_5124_device::TBORDER_START + sega315_5124_device::PAL_240_TBORDER_HEIGHT + 240) \
+	MCFG_SCREEN_REFRESH_RATE((double) _pixelclock / (sega315_5124_device::WIDTH * sega315_5124_device::HEIGHT_PAL))
 
 #define MCFG_SCREEN_SMS_NTSC_RAW_PARAMS(_pixelclock) \
 	MCFG_SCREEN_RAW_PARAMS(_pixelclock, \
-		SEGA315_5124_WIDTH, \
-		SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH - 2, \
-		SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH + 256 + 10, \
-		SEGA315_5124_HEIGHT_NTSC, \
-		SEGA315_5124_TBORDER_START + SEGA315_5124_NTSC_224_TBORDER_HEIGHT, \
-		SEGA315_5124_TBORDER_START + SEGA315_5124_NTSC_224_TBORDER_HEIGHT + 224) \
-	MCFG_SCREEN_REFRESH_RATE((double) _pixelclock / (SEGA315_5124_WIDTH * SEGA315_5124_HEIGHT_NTSC))
+		sega315_5124_device::WIDTH, \
+		sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH - 2, \
+		sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 256 + 10, \
+		sega315_5124_device::HEIGHT_NTSC, \
+		sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT, \
+		sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT + 224) \
+	MCFG_SCREEN_REFRESH_RATE((double) _pixelclock / (sega315_5124_device::WIDTH * sega315_5124_device::HEIGHT_NTSC))
 
 #define MCFG_SCREEN_GG_RAW_PARAMS(_pixelclock) \
 	MCFG_SCREEN_RAW_PARAMS(_pixelclock, \
-		SEGA315_5124_WIDTH, \
-		SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH + 6*8, \
-		SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH + 26*8, \
-		SEGA315_5124_HEIGHT_NTSC, \
-		SEGA315_5124_TBORDER_START + SEGA315_5124_NTSC_192_TBORDER_HEIGHT + 3*8, \
-		SEGA315_5124_TBORDER_START + SEGA315_5124_NTSC_192_TBORDER_HEIGHT + 21*8 ) \
-	MCFG_SCREEN_REFRESH_RATE((double) _pixelclock / (SEGA315_5124_WIDTH * SEGA315_5124_HEIGHT_NTSC))
+		sega315_5124_device::WIDTH, \
+		sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 6*8, \
+		sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 26*8, \
+		sega315_5124_device::HEIGHT_NTSC, \
+		sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_192_TBORDER_HEIGHT + 3*8, \
+		sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_192_TBORDER_HEIGHT + 21*8 ) \
+	MCFG_SCREEN_REFRESH_RATE((double) _pixelclock / (sega315_5124_device::WIDTH * sega315_5124_device::HEIGHT_NTSC))
 
 
 static MACHINE_CONFIG_DERIVED( sms2_ntsc, sms_ntsc_base )
@@ -598,7 +598,7 @@ static MACHINE_CONFIG_DERIVED( sms1_ntsc, sms_ntsc_base )
 	MCFG_SCREEN_SMS_NTSC_RAW_PARAMS(XTAL_10_738635MHz/2)
 	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms1)
 
-	MCFG_SCREEN_VBLANK_DRIVER(sms_state, screen_vblank_sms1)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(sms_state, screen_vblank_sms1))
 
 	MCFG_DEFAULT_LAYOUT(layout_sms1)
 
@@ -616,7 +616,7 @@ static MACHINE_CONFIG_DERIVED( sms1_ntsc, sms_ntsc_base )
 	MCFG_SMS_EXPANSION_ADD("smsexp", sms_expansion_devices, nullptr)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED_CLASS( sms_sdisp, sms1_ntsc, smssdisp_state )
+static MACHINE_CONFIG_DERIVED( sms_sdisp, sms1_ntsc )
 
 	MCFG_DEVICE_MODIFY("sms_vdp")
 	MCFG_SEGA315_5124_INT_CB(WRITELINE(smssdisp_state, sms_store_int_callback))
@@ -708,7 +708,7 @@ static MACHINE_CONFIG_DERIVED( sms1_pal, sms_pal_base )
 	MCFG_SCREEN_SMS_PAL_RAW_PARAMS(MASTER_CLOCK_PAL/10)
 	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms1)
 
-	MCFG_SCREEN_VBLANK_DRIVER(sms_state, screen_vblank_sms1)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(sms_state, screen_vblank_sms1))
 
 	MCFG_DEFAULT_LAYOUT(layout_sms1)
 
@@ -772,7 +772,7 @@ static MACHINE_CONFIG_DERIVED( sms1_paln, sms_paln_base )
 	MCFG_SCREEN_SMS_PAL_RAW_PARAMS(MASTER_CLOCK_PALN/2)
 	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms1)
 
-	MCFG_SCREEN_VBLANK_DRIVER(sms_state, screen_vblank_sms1)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(sms_state, screen_vblank_sms1))
 
 	MCFG_DEFAULT_LAYOUT(layout_sms1)
 
@@ -838,7 +838,7 @@ static MACHINE_CONFIG_DERIVED( sms1_br, sms_br_base )
 	MCFG_SCREEN_SMS_NTSC_RAW_PARAMS(MASTER_CLOCK_PALM/2)
 	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms1)
 
-	MCFG_SCREEN_VBLANK_DRIVER(sms_state, screen_vblank_sms1)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(sms_state, screen_vblank_sms1))
 
 	MCFG_DEFAULT_LAYOUT(layout_sms1)
 
@@ -870,8 +870,15 @@ static MACHINE_CONFIG_DERIVED( sms1_kr, sms1_ntsc )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(smskr_io)
 
+	// need to replace the cartridge slot with the Japanese version, so to
+	// keep the usual media order, remove and reinsert all of them.
 	MCFG_DEVICE_REMOVE("slot")
+	MCFG_DEVICE_REMOVE("mycard")
+	MCFG_DEVICE_REMOVE("smsexp")
 	MCFG_SG1000MK3_CARTRIDGE_ADD("slot", sg1000mk3_cart, nullptr)
+	MCFG_SMS_CARD_ADD("mycard", sms_cart, nullptr)
+	MCFG_SMS_EXPANSION_ADD("smsexp", sms_expansion_devices, nullptr)
+
 	MCFG_SOFTWARE_LIST_ADD("cart_list2","sg1000")
 
 	MCFG_DEVICE_MODIFY("sms_vdp")
@@ -883,6 +890,8 @@ static MACHINE_CONFIG_DERIVED( smsj, sms1_kr )
 	MCFG_CPU_IO_MAP(smsj_io)
 
 	MCFG_SOUND_ADD("ym2413", YM2413, XTAL_10_738635MHz/3)
+	// if this output gain is changed, the gain set when unmute the output need
+	// to be changed too, probably along the gain set for the Mark III FM Unit.
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
@@ -890,12 +899,16 @@ static MACHINE_CONFIG_DERIVED( sg1000m3, sms1_ntsc )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(sg1000m3_io)
 
+	// Remove and reinsert all media slots, as done with the sms1_kr config,
+	// and also replace the expansion slot with the SG-1000 version.
 	MCFG_DEVICE_REMOVE("slot")
-	MCFG_SG1000MK3_CARTRIDGE_ADD("slot", sg1000mk3_cart, nullptr)
-	MCFG_SOFTWARE_LIST_ADD("cart_list2","sg1000")
-
+	MCFG_DEVICE_REMOVE("mycard")
 	MCFG_DEVICE_REMOVE("smsexp")
+	MCFG_SG1000MK3_CARTRIDGE_ADD("slot", sg1000mk3_cart, nullptr)
+	MCFG_SMS_CARD_ADD("mycard", sms_cart, nullptr)
 	MCFG_SG1000_EXPANSION_ADD("sgexp", sg1000_expansion_devices, nullptr, false)
+
+	MCFG_SOFTWARE_LIST_ADD("cart_list2","sg1000")
 
 	// Mark III does not have TH connected.
 	MCFG_SMS_CONTROL_PORT_MODIFY(CONTROL1_TAG)
@@ -904,7 +917,7 @@ static MACHINE_CONFIG_DERIVED( sg1000m3, sms1_ntsc )
 	MCFG_SMS_CONTROL_PORT_TH_INPUT_HANDLER(NOOP)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( gamegear, sms_state )
+static MACHINE_CONFIG_START( gamegear )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK_GG/9)
 	MCFG_CPU_PROGRAM_MAP(sms_mem)
@@ -932,6 +945,7 @@ static MACHINE_CONFIG_START( gamegear, sms_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
 
+	/* actually, PSG is embedded in the VDP chip */
 	MCFG_SOUND_ADD("gamegear", GAMEGEAR, MASTER_CLOCK_GG/9)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)

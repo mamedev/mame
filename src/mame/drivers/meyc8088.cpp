@@ -30,7 +30,10 @@
 #include "machine/i8155.h"
 #include "machine/nvram.h"
 #include "sound/dac.h"
+#include "sound/volt_reg.h"
 #include "video/resnet.h"
+#include "screen.h"
+#include "speaker.h"
 
 #include "gldarrow.lh"
 
@@ -43,16 +46,17 @@ public:
 		m_maincpu(*this,"maincpu"),
 		m_vram(*this, "vram"),
 		m_heartbeat(*this, "heartbeat"),
-		m_dac(*this, "dac")
+		m_switches(*this, {"C0", "C1", "C2", "C3"})
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<UINT8> m_vram;
+	required_shared_ptr<uint8_t> m_vram;
 	required_device<timer_device> m_heartbeat;
-	required_device<dac_device> m_dac;
 
-	UINT8 m_status;
-	UINT8 m_common;
+	optional_ioport_array<4> m_switches;
+
+	uint8_t m_status;
+	uint8_t m_common;
 
 	DECLARE_WRITE8_MEMBER(drive_w);
 	DECLARE_WRITE8_MEMBER(video5_flip_w);
@@ -65,10 +69,9 @@ public:
 	DECLARE_WRITE8_MEMBER(meyc8088_lights2_w);
 	DECLARE_WRITE8_MEMBER(meyc8088_common_w);
 
-	DECLARE_WRITE_LINE_MEMBER(meyc8088_sound_out);
 	DECLARE_PALETTE_INIT(meyc8088);
-	UINT32 screen_update_meyc8088(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_meyc8088(screen_device &screen, bool state);
+	uint32_t screen_update_meyc8088(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_meyc8088);
 	TIMER_DEVICE_CALLBACK_MEMBER(heartbeat_callback);
 };
 
@@ -121,16 +124,16 @@ static const res_net_info meyc8088_net_info =
 
 PALETTE_INIT_MEMBER(meyc8088_state, meyc8088)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	std::vector<rgb_t> rgb;
 
 	compute_res_net_all(rgb, color_prom, meyc8088_decode_info, meyc8088_net_info);
 	palette.set_pen_colors(0, rgb);
 }
 
-UINT32 meyc8088_state::screen_update_meyc8088(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t meyc8088_state::screen_update_meyc8088(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 v[5];
+	uint8_t v[5];
 	v[4] = m_status << 2 & 0x10; // video5: color prom d4
 
 	if (~m_status & 2)
@@ -142,8 +145,8 @@ UINT32 meyc8088_state::screen_update_meyc8088(screen_device &screen, bitmap_ind1
 
 	for (offs_t offs = 0x800; offs < 0x4000; offs+=2)
 	{
-		UINT8 y = (offs-0x800) >> 6;
-		UINT8 x = (offs-0x800) << 2;
+		uint8_t y = (offs-0x800) >> 6;
+		uint8_t x = (offs-0x800) << 2;
 
 		v[0] = m_vram[offs|0x0000]; // video1: color prom d0
 		v[1] = m_vram[offs|0x0001]; // video2: color prom d1
@@ -157,10 +160,10 @@ UINT32 meyc8088_state::screen_update_meyc8088(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-void meyc8088_state::screen_eof_meyc8088(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(meyc8088_state::screen_vblank_meyc8088)
 {
 	// INTR on LC255 (pulses at start and end of vblank), INTA hardwired to $20
-	generic_pulse_irq_line_and_vector(m_maincpu, 0, 0x20, 1);
+	generic_pulse_irq_line_and_vector(*m_maincpu, 0, 0x20, 1);
 }
 
 
@@ -228,13 +231,13 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(meyc8088_state::meyc8088_input_r)
 {
-	UINT8 ret = 0xff;
+	uint8_t ret = 0xff;
 
 	// multiplexed switch inputs
-	if (~m_common & 1) ret &= read_safe(ioport("C0"), 0); // bit switches
-	if (~m_common & 2) ret &= read_safe(ioport("C1"), 0); // control switches
-	if (~m_common & 4) ret &= read_safe(ioport("C2"), 0); // light switches
-	if (~m_common & 8) ret &= read_safe(ioport("C3"), 0); // light switches
+	if (~m_common & 1) ret &= m_switches[0].read_safe(0); // bit switches
+	if (~m_common & 2) ret &= m_switches[1].read_safe(0); // control switches
+	if (~m_common & 4) ret &= m_switches[2].read_safe(0); // light switches
+	if (~m_common & 8) ret &= m_switches[3].read_safe(0); // light switches
 
 	return ret;
 }
@@ -275,11 +278,6 @@ WRITE8_MEMBER(meyc8088_state::meyc8088_common_w)
 
 	// d2-d5: /common
 	m_common = data >> 2 & 0xf;
-}
-
-WRITE_LINE_MEMBER(meyc8088_state::meyc8088_sound_out)
-{
-	m_dac->write_signed8(state ? 0x7f : 0);
 }
 
 
@@ -347,7 +345,7 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( meyc8088, meyc8088_state )
+static MACHINE_CONFIG_START( meyc8088 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8088, (XTAL_15MHz / 3) * 0.95) // NOTE: underclocked to prevent errors on diagnostics, MAME i8088 cycle timing is probably inaccurate
@@ -365,7 +363,7 @@ static MACHINE_CONFIG_START( meyc8088, meyc8088_state )
 	MCFG_I8155_OUT_PORTA_CB(WRITE8(meyc8088_state, meyc8088_lights2_w))
 	MCFG_I8155_OUT_PORTB_CB(WRITE8(meyc8088_state, meyc8088_lights1_w))
 	MCFG_I8155_OUT_PORTC_CB(WRITE8(meyc8088_state, meyc8088_common_w))
-	MCFG_I8155_OUT_TIMEROUT_CB(WRITELINE(meyc8088_state, meyc8088_sound_out))
+	MCFG_I8155_OUT_TIMEROUT_CB(DEVWRITELINE("dac", dac_bit_interface, write))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -375,17 +373,18 @@ static MACHINE_CONFIG_START( meyc8088, meyc8088_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_15MHz/3, 320, 0, 256, 261, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(meyc8088_state, screen_update_meyc8088)
-	MCFG_SCREEN_VBLANK_DRIVER(meyc8088_state, screen_eof_meyc8088)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(meyc8088_state, screen_vblank_meyc8088))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(meyc8088_state, meyc8088)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -400,4 +399,4 @@ ROM_START( gldarrow )
 ROM_END
 
 
-GAMEL(1984, gldarrow, 0,        meyc8088, gldarrow, driver_device, 0, ROT0,  "Meyco Games, Inc.", "Golden Arrow (Standard G8-03)", 0, layout_gldarrow )
+GAMEL(1984, gldarrow, 0,        meyc8088, gldarrow, meyc8088_state, 0, ROT0,  "Meyco Games, Inc.", "Golden Arrow (Standard G8-03)", 0, layout_gldarrow )

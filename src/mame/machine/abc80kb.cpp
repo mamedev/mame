@@ -71,7 +71,10 @@ Notes:
 
 */
 
+#include "emu.h"
 #include "abc80kb.h"
+
+#include "cpu/mcs48/mcs48.h"
 
 
 
@@ -87,7 +90,7 @@ Notes:
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ABC80_KEYBOARD = &device_creator<abc80_keyboard_device>;
+DEFINE_DEVICE_TYPE(ABC80_KEYBOARD, abc80_keyboard_device, "abc80kb", "ABC-80 Keyboard")
 
 
 //-------------------------------------------------
@@ -104,7 +107,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *abc80_keyboard_device::device_rom_region() const
+const tiny_rom_entry *abc80_keyboard_device::device_rom_region() const
 {
 	return ROM_NAME( abc80_keyboard );
 }
@@ -122,7 +125,7 @@ ADDRESS_MAP_END
 //  MACHINE_DRIVER( abc80_keyboard )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( abc80_keyboard )
+static MACHINE_CONFIG_START( abc80_keyboard )
 	MCFG_CPU_ADD(I8048_TAG, I8048, 4000000)
 	MCFG_CPU_IO_MAP(abc80_keyboard_io)
 	MCFG_DEVICE_DISABLE()
@@ -167,10 +170,10 @@ ioport_constructor abc80_keyboard_device::device_input_ports() const
 //  abc80_keyboard_device - constructor
 //-------------------------------------------------
 
-abc80_keyboard_device::abc80_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, ABC80_KEYBOARD, "ABC-80 Keyboard", tag, owner, clock, "abc80kb", __FILE__),
-		m_write_keydown(*this),
-		m_maincpu(*this, I8048_TAG)
+abc80_keyboard_device::abc80_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, ABC80_KEYBOARD, tag, owner, clock)
+	, m_write_keydown(*this)
+	, m_maincpu(*this, I8048_TAG)
 {
 }
 
@@ -199,7 +202,7 @@ void abc80_keyboard_device::device_reset()
 //  data_r - keyboard data read
 //-------------------------------------------------
 
-UINT8 abc80_keyboard_device::data_r()
+uint8_t abc80_keyboard_device::data_r()
 {
 	return 0;
 }

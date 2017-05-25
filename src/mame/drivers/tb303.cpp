@@ -14,6 +14,7 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "includes/hh_ucom4.h"
 
 #include "tb303.lh"
@@ -26,8 +27,8 @@ public:
 		: hh_ucom4_state(mconfig, type, tag)
 	{ }
 
-	UINT8 m_ram[0xc00];
-	UINT16 m_ram_address;
+	u8 m_ram[0xc00];
+	u16 m_ram_address;
 	bool m_ram_ce;
 	bool m_ram_we;
 
@@ -67,7 +68,7 @@ void tb303_state::refresh_ram()
 	// MCU E2,E3 goes through a 4556 IC(pin 14,13) to one of uPD444 _CE:
 	// _Q0: N/C, _Q1: IC-5, _Q2: IC-3, _Q3: IC-4
 	m_ram_ce = true;
-	UINT8 hi = 0;
+	u8 hi = 0;
 	switch (m_port[NEC_UCOM4_PORTE] >> 2 & 3)
 	{
 		case 0: m_ram_ce = false; break;
@@ -245,7 +246,7 @@ void tb303_state::machine_start()
 	save_item(NAME(m_ram_we));
 }
 
-static MACHINE_CONFIG_START( tb303, tb303_state )
+static MACHINE_CONFIG_START( tb303 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NEC_D650, TP2_HZ)
@@ -285,4 +286,4 @@ ROM_START( tb303 )
 ROM_END
 
 
-CONS( 1982, tb303, 0, 0, tb303, tb303, driver_device, 0, "Roland", "TB-303 Bass Line", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+CONS( 1982, tb303, 0, 0, tb303, tb303, tb303_state, 0, "Roland", "TB-303 Bass Line", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

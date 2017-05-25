@@ -609,7 +609,7 @@ SDL_SYS_HapticQuit(void)
         /* Opened and not closed haptics are leaked, this is on purpose.
          * Close your haptic devices after usage. */
         SDL_free(item->fname);
-        item->fname = NULL;
+        SDL_free(item);
     }
 
 #if SDL_USE_LIBUDEV
@@ -690,7 +690,7 @@ SDL_SYS_ToDirection(Uint16 *dest, SDL_HapticDirection * src)
         else if (!src->dir[0])
             *dest = (src->dir[1] >= 0 ? 0x8000 : 0);
         else {
-            float f = atan2(src->dir[1], src->dir[0]);    /* Ideally we'd use fixed point math instead of floats... */
+            float f = SDL_atan2(src->dir[1], src->dir[0]);    /* Ideally we'd use fixed point math instead of floats... */
                     /*
                       atan2 takes the parameters: Y-axis-value and X-axis-value (in that order)
                        - Y-axis-value is the second coordinate (from center to SOUTH)

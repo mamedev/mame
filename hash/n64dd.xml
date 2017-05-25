@@ -6,8 +6,8 @@
 		<description>Dezaemon DD (Prototype Rev 199802xx)</description>
 		<year>1998</year>
 		<publisher>Athena</publisher>
-		<info name="usage" value="Requires Dezaemon 3D cart" />
 		<info name="serial" value="NUD-DPGJ-JPN" />
+		<sharedfeat name="requirement" value="n64:dezaemon"/>
 		<part name="disk" interface="n64dd_disk">
 			<dataarea name="rom" size="70627520">
 				<rom name="dezaemon.bin" size="70627520" crc="8648a5e0" sha1="195426bc24501edfdfd36e3f75658b641738b8e3" offset="0" />
@@ -19,10 +19,10 @@
 		<description>F-Zero X Expansion Kit</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
-		<info name="usage" value="Requires F-Zero X cart" />
 		<info name="serial" value="NUD-EFZJ-JPN" />
 		<info name="release" value="20000421" />
 		<info name="alt_title" value="エフ　ゼロ　エックス　エクスパンションキット" />
+		<sharedfeat name="requirement" value="n64:fzeroxj"/>
 		<part name="disk" interface="n64dd_disk">
 			<dataarea name="rom" size="70627520">
 				<rom name="f-zero x expansion kit [nud-efzj-jpn].bin" size="70627520" crc="9ab91e71" sha1="7b39677dad61b2fb91eb2ede756fbd3b49f15afe" offset="0" />

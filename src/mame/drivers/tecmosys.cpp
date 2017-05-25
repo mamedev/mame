@@ -183,12 +183,14 @@ ae500w07.ad1 - M6295 Samples (23c4001)
 */
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "includes/tecmosys.h"
+
 #include "cpu/m68000/m68000.h"
-#include "sound/okim6295.h"
+#include "cpu/z80/z80.h"
 #include "sound/262intf.h"
+#include "sound/okim6295.h"
 #include "sound/ymz280b.h"
+#include "speaker.h"
 
 
 // It looks like this needs a synch between z80 and 68k ??? See z80:006A-0091
@@ -251,7 +253,7 @@ WRITE16_MEMBER(tecmosys_state::unk880000_w)
 
 READ16_MEMBER(tecmosys_state::unk880000_r)
 {
-	//UINT16 ret = m_880000regs[offset];
+	//uint16_t ret = m_880000regs[offset];
 
 	logerror( "unk880000_r( %06x ) @ %06x = %04x\n", (offset * 2 ) +0x880000, space.device().safe_pc(), m_880000regs[offset] );
 
@@ -330,9 +332,9 @@ WRITE8_MEMBER(tecmosys_state::z80_bank_w)
 
 WRITE8_MEMBER(tecmosys_state::oki_bank_w)
 {
-	UINT8 upperbank = (data & 0x30) >> 4;
-	UINT8 lowerbank = (data & 0x03) >> 0;
-	UINT8* region = memregion("oki")->base();
+	uint8_t upperbank = (data & 0x30) >> 4;
+	uint8_t lowerbank = (data & 0x03) >> 0;
+	uint8_t* region = memregion("oki")->base();
 
 	memcpy( region+0x00000, region+0x80000 + lowerbank * 0x20000, 0x20000  );
 	memcpy( region+0x20000, region+0x80000 + upperbank * 0x20000, 0x20000  );
@@ -441,7 +443,7 @@ void tecmosys_state::machine_start()
 	save_item(NAME(m_device_value));
 }
 
-static MACHINE_CONFIG_START( deroon, tecmosys_state )
+static MACHINE_CONFIG_START( deroon )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", tecmosys_state,  irq1_line_hold)
@@ -484,7 +486,7 @@ static MACHINE_CONFIG_START( deroon, tecmosys_state )
 	MCFG_SOUND_ROUTE(2, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(3, "rspeaker", 1.00)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/8, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/8, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
@@ -625,13 +627,13 @@ ROM_END
 
 void tecmosys_state::descramble()
 {
-	UINT8 *gfxsrc  = memregion( "gfx1" )->base();
+	uint8_t *gfxsrc  = memregion( "gfx1" )->base();
 	size_t srcsize = memregion( "gfx1" )->bytes();
 	int i;
 
 	for (i=0; i < srcsize; i+=4)
 	{
-		UINT8 tmp[4];
+		uint8_t tmp[4];
 
 		tmp[2] = ((gfxsrc[i+0]&0xf0)>>0) | ((gfxsrc[i+1]&0xf0)>>4); //  0, 1, 2, 3   8, 9,10,11
 		tmp[3] = ((gfxsrc[i+0]&0x0f)<<4) | ((gfxsrc[i+1]&0x0f)<<0); //  4, 5, 6, 7, 12,13,14,15
@@ -663,6 +665,6 @@ DRIVER_INIT_MEMBER(tecmosys_state,tkdensha)
 	prot_init(2);
 }
 
-GAME( 1995, deroon,           0, deroon, deroon, tecmosys_state, deroon,     ROT0, "Tecmo", "Deroon DeroDero", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, deroon,           0, deroon, deroon, tecmosys_state, deroon,     ROT0, "Tecmo", "Deroon DeroDero",                         MACHINE_SUPPORTS_SAVE )
 GAME( 1996, tkdensho,         0, deroon, deroon, tecmosys_state, tkdensho,   ROT0, "Tecmo", "Toukidenshou - Angel Eyes (VER. 960614)", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, tkdenshoa, tkdensho, deroon, deroon, tecmosys_state, tkdensha,   ROT0, "Tecmo", "Toukidenshou - Angel Eyes (VER. 960427)", MACHINE_SUPPORTS_SAVE )

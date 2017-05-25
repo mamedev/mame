@@ -12,6 +12,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "tf20.h"
 
 #define XTAL_CR1    XTAL_8MHz
@@ -22,7 +23,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type EPSON_TF20 = &device_creator<epson_tf20_device>;
+DEFINE_DEVICE_TYPE(EPSON_TF20, epson_tf20_device, "epson_tf20", "EPSON TF-20 Dual Floppy Disk Drive")
 
 //-------------------------------------------------
 //  address maps
@@ -52,7 +53,7 @@ ROM_START( tf20 )
 	ROM_LOAD("tfx.15e", 0x0000, 0x0800, CRC(af34f084) SHA1(c9bdf393f757ba5d8f838108ceb2b079be1d616e))
 ROM_END
 
-const rom_entry *epson_tf20_device::device_rom_region() const
+const tiny_rom_entry *epson_tf20_device::device_rom_region() const
 {
 	return ROM_NAME( tf20 );
 }
@@ -83,7 +84,7 @@ static SLOT_INTERFACE_START( tf20_floppies )
 	SLOT_INTERFACE( "sd320", EPSON_SD_320 )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_FRAGMENT( tf20 )
+static MACHINE_CONFIG_START( tf20 )
 	MCFG_CPU_ADD("19b", Z80, XTAL_CR1 / 2) /* uPD780C */
 	MCFG_CPU_PROGRAM_MAP(cpu_mem)
 	MCFG_CPU_IO_MAP(cpu_io)
@@ -126,8 +127,8 @@ machine_config_constructor epson_tf20_device::device_mconfig_additions() const
 //  epson_tf20_device - constructor
 //-------------------------------------------------
 
-epson_tf20_device::epson_tf20_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, EPSON_TF20, "EPSON TF-20 Dual Floppy Disk Drive", tag, owner, clock, "epson_tf20", __FILE__),
+epson_tf20_device::epson_tf20_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, EPSON_TF20, tag, owner, clock),
 	device_epson_sio_interface(mconfig, *this),
 	m_cpu(*this, "19b"),
 	m_ram(*this, "ram"),

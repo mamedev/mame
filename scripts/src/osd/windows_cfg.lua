@@ -3,6 +3,8 @@
 
 defines {
 	"OSD_WINDOWS",
+	"WIN32_LEAN_AND_MEAN",
+	"NOMINMAX",
 }
 
 configuration { "mingw* or vs*" }
@@ -10,11 +12,6 @@ configuration { "mingw* or vs*" }
 		"UNICODE",
 		"_UNICODE",
 		"main=utf8_main",
-	}
-
-configuration { "Debug" }
-	defines {
-		"MALLOC_DEBUG",
 	}
 
 configuration { "vs*" }

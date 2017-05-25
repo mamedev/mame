@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "kempston_di.h"
 
 
@@ -14,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type KEMPSTON_DISK_INTERFACE = &device_creator<kempston_disk_interface_t>;
+DEFINE_DEVICE_TYPE(KEMPSTON_DISK_INTERFACE, kempston_disk_interface_device, "ql_kdi", "Kempston Disk Interface")
 
 
 //-------------------------------------------------
@@ -33,7 +34,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *kempston_disk_interface_t::device_rom_region() const
+const tiny_rom_entry *kempston_disk_interface_device::device_rom_region() const
 {
 	return ROM_NAME( kempston_disk_system );
 }
@@ -45,11 +46,11 @@ const rom_entry *kempston_disk_interface_t::device_rom_region() const
 //**************************************************************************
 
 //-------------------------------------------------
-//  kempston_disk_interface_t - constructor
+//  kempston_disk_interface_device - constructor
 //-------------------------------------------------
 
-kempston_disk_interface_t::kempston_disk_interface_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, KEMPSTON_DISK_INTERFACE, "Kempston Disk Interface", tag, owner, clock, "ql_kdi", __FILE__),
+kempston_disk_interface_device::kempston_disk_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, KEMPSTON_DISK_INTERFACE, tag, owner, clock),
 	device_ql_expansion_card_interface(mconfig, *this)
 {
 }
@@ -59,7 +60,7 @@ kempston_disk_interface_t::kempston_disk_interface_t(const machine_config &mconf
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void kempston_disk_interface_t::device_start()
+void kempston_disk_interface_device::device_start()
 {
 }
 
@@ -68,7 +69,7 @@ void kempston_disk_interface_t::device_start()
 //  read -
 //-------------------------------------------------
 
-UINT8 kempston_disk_interface_t::read(address_space &space, offs_t offset, UINT8 data)
+uint8_t kempston_disk_interface_device::read(address_space &space, offs_t offset, uint8_t data)
 {
 	return data;
 }
@@ -78,6 +79,6 @@ UINT8 kempston_disk_interface_t::read(address_space &space, offs_t offset, UINT8
 //  write -
 //-------------------------------------------------
 
-void kempston_disk_interface_t::write(address_space &space, offs_t offset, UINT8 data)
+void kempston_disk_interface_device::write(address_space &space, offs_t offset, uint8_t data)
 {
 }

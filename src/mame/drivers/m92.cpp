@@ -201,13 +201,15 @@ psoldier dip locations still need verification.
 *****************************************************************************/
 
 #include "emu.h"
-#include "cpu/nec/nec.h"
-#include "cpu/nec/v25.h"
 #include "includes/m92.h"
 #include "includes/iremipt.h"
+
+#include "cpu/nec/nec.h"
+#include "cpu/nec/v25.h"
 #include "machine/irem_cpu.h"
 #include "sound/ym2151.h"
 #include "sound/iremga20.h"
+#include "speaker.h"
 
 
 // I haven't managed to find a way to keep nbbatman happy when using the proper upd71059c device
@@ -290,14 +292,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(m92_state::m92_scanline_interrupt)
 
 READ16_MEMBER(m92_state::m92_eeprom_r)
 {
-	UINT8 *RAM = memregion("eeprom")->base();
+	uint8_t *RAM = memregion("eeprom")->base();
 //  logerror("%05x: EEPROM RE %04x\n",space.device().safe_pc(),offset);
 	return RAM[offset] | 0xff00;
 }
 
 WRITE16_MEMBER(m92_state::m92_eeprom_w)
 {
-	UINT8 *RAM = memregion("eeprom")->base();
+	uint8_t *RAM = memregion("eeprom")->base();
 //  logerror("%05x: EEPROM WR %04x\n",space.device().safe_pc(),offset);
 	if (ACCESSING_BITS_0_7)
 		RAM[offset] = data;
@@ -418,7 +420,7 @@ ADDRESS_MAP_END
 
 WRITE16_MEMBER(m92_state::oki_bank_w)
 {
-	m_oki->set_bank_base(0x40000 * ((data+1) & 0x3)); // +1?
+	m_oki->set_rom_bank((data+1) & 0x3); // +1?
 }
 
 static ADDRESS_MAP_START( ppan_portmap, AS_IO, 16, m92_state )
@@ -963,7 +965,7 @@ void m92_state::m92_sprite_interrupt()
 }
 
 
-static MACHINE_CONFIG_START( m92, m92_state )
+static MACHINE_CONFIG_START( m92 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",V33,XTAL_18MHz/2)
@@ -1066,7 +1068,7 @@ static MACHINE_CONFIG_DERIVED( ppan, m92 )
 
 	MCFG_VIDEO_START_OVERRIDE(m92_state,ppan)
 
-	MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -2240,7 +2242,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(m92_state,m92)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->set_base(&ROM[0xa0000]);
 
@@ -2256,7 +2258,7 @@ DRIVER_INIT_MEMBER(m92_state,lethalth)
 /* has bankswitching */
 DRIVER_INIT_MEMBER(m92_state,m92_bank)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entries(0, 4, &ROM[0x80000], 0x20000);
 	m_maincpu->space(AS_IO).install_write_handler(0x20, 0x21, write16_delegate(FUNC(m92_state::m92_bankswitch_w),this));
@@ -2267,7 +2269,7 @@ DRIVER_INIT_MEMBER(m92_state,m92_bank)
 /* has bankswitching, has eeprom, needs sprite kludge */
 DRIVER_INIT_MEMBER(m92_state,majtitl2)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entries(0, 4, &ROM[0x80000], 0x20000);
 	m_maincpu->space(AS_IO).install_write_handler(0x20, 0x21, write16_delegate(FUNC(m92_state::m92_bankswitch_w),this));
@@ -2281,7 +2283,7 @@ DRIVER_INIT_MEMBER(m92_state,majtitl2)
 /* TODO: figure out actual address map and other differences from real Irem h/w */
 DRIVER_INIT_MEMBER(m92_state,ppan)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->set_base(&ROM[0xa0000]);
 
 	m_game_kludge = 0;

@@ -49,15 +49,17 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z8000/z8000.h"
 #include "cpu/z80/z80daisy.h"
+#include "cpu/z8000/z8000.h"
+#include "machine/terminal.h"
 #include "machine/upd765.h"
 #include "machine/z80ctc.h"
-#include "machine/z80pio.h"
 #include "machine/z80dart.h"
 #include "machine/z80dma.h"
+#include "machine/z80pio.h"
 #include "sound/beep.h"
-#include "machine/terminal.h"
+#include "speaker.h"
+
 
 #define TERMINAL_TAG "terminal"
 
@@ -77,9 +79,9 @@ public:
 	DECLARE_WRITE8_MEMBER(p8k_port24_w);
 	DECLARE_READ16_MEMBER(portff82_r);
 	DECLARE_WRITE16_MEMBER(portff82_w);
-	DECLARE_WRITE8_MEMBER(kbd_put);
-	DECLARE_WRITE8_MEMBER(kbd_put_16);
-	UINT8 m_term_data;
+	void kbd_put(u8 data);
+	void kbd_put_16(u8 data);
+	uint8_t m_term_data;
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 	DECLARE_DRIVER_INIT(p8k);
@@ -149,7 +151,7 @@ READ8_MEMBER( p8k_state::p8k_port0_r )
 // see memory explanation above
 WRITE8_MEMBER( p8k_state::p8k_port0_w )
 {
-	UINT8 breg = m_maincpu->state_int(Z80_B) >> 4;
+	uint8_t breg = m_maincpu->state_int(Z80_B) >> 4;
 	if ((data==1) || (data==2) || (data==4))
 	{
 		char banknum[8];
@@ -187,15 +189,15 @@ WRITE8_MEMBER( p8k_state::p8k_port24_w )
 		m_terminal->write(space, 0, data);
 }
 
-WRITE8_MEMBER( p8k_state::kbd_put )
+void p8k_state::kbd_put(u8 data)
 {
 	address_space &mem = m_maincpu->space(AS_PROGRAM);
 	m_term_data = data;
 	// This is a dreadful hack..
 	// simulate interrupt by saving current pc on
 	// the stack and jumping to interrupt handler.
-	UINT16 spreg = m_maincpu->state_int(Z80_SP);
-	UINT16 pcreg = m_maincpu->state_int(Z80_PC);
+	uint16_t spreg = m_maincpu->state_int(Z80_SP);
+	uint16_t pcreg = m_maincpu->state_int(Z80_PC);
 	spreg--;
 	mem.write_byte(spreg, pcreg >> 8);
 	spreg--;
@@ -314,7 +316,7 @@ MACHINE_RESET_MEMBER(p8k_state,p8k)
 
 DRIVER_INIT_MEMBER(p8k_state,p8k)
 {
-	UINT8 *RAM = memregion("maincpu")->base();
+	uint8_t *RAM = memregion("maincpu")->base();
 	membank("bank0")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
 	membank("bank1")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
 	membank("bank2")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
@@ -340,14 +342,14 @@ DRIVER_INIT_MEMBER(p8k_state,p8k)
 
 ****************************************************************************/
 
-WRITE8_MEMBER( p8k_state::kbd_put_16 )
+void p8k_state::kbd_put_16(u8 data)
 {
 	address_space &mem = m_maincpu->space(AS_DATA);
 	// keyboard int handler is at 0x0700
 	m_term_data = data;
 	// This is another dire hack..
-	UINT8 offs = mem.read_byte(0x43a5);
-	UINT16 addr = 0x41b0 + (UINT16) offs;
+	uint8_t offs = mem.read_byte(0x43a5);
+	uint16_t addr = 0x41b0 + (uint16_t) offs;
 	mem.write_byte(addr, data);
 	mem.write_byte(0x43a0, 1);
 }
@@ -463,7 +465,7 @@ GFXDECODE_END
 
 ****************************************************************************/
 
-static MACHINE_CONFIG_START( p8k, p8k_state )
+static MACHINE_CONFIG_START( p8k )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz )
 	MCFG_Z80_DAISY_CHAIN(p8k_daisy_chain)
@@ -520,10 +522,10 @@ static MACHINE_CONFIG_START( p8k, p8k_state )
 
 	/* video hardware */
 	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(p8k_state, kbd_put))
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(p8k_state, kbd_put))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( p8k_16, p8k_state )
+static MACHINE_CONFIG_START( p8k_16 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z8001, XTAL_4MHz )
 	MCFG_Z80_DAISY_CHAIN(p8k_16_daisy_chain)
@@ -560,7 +562,7 @@ static MACHINE_CONFIG_START( p8k_16, p8k_state )
 
 	/* video hardware */
 	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(p8k_state, kbd_put_16))
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(p8k_state, kbd_put_16))
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -590,6 +592,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME        PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY                   FULLNAME       FLAGS */
-COMP( 1989, p8000,      0,      0,       p8k,       p8k, p8k_state,     p8k,    "EAW electronic Treptow", "P8000 (8bit Board)",  MACHINE_NOT_WORKING)
-COMP( 1989, p8000_16,   p8000,  0,       p8k_16,    p8k, driver_device,     0,      "EAW electronic Treptow", "P8000 (16bit Board)",  MACHINE_NOT_WORKING)
+//    YEAR  NAME        PARENT  COMPAT   MACHINE    INPUT  STATE      INIT    COMPANY                   FULLNAME               FLAGS
+COMP( 1989, p8000,      0,      0,       p8k,       p8k,   p8k_state, p8k,    "EAW electronic Treptow", "P8000 (8bit Board)",  MACHINE_NOT_WORKING)
+COMP( 1989, p8000_16,   p8000,  0,       p8k_16,    p8k,   p8k_state, 0,      "EAW electronic Treptow", "P8000 (16bit Board)", MACHINE_NOT_WORKING)

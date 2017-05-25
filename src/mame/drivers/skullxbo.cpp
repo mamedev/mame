@@ -20,9 +20,11 @@
 
 
 #include "emu.h"
+#include "includes/skullxbo.h"
+
 #include "cpu/m68000/m68000.h"
 #include "machine/watchdog.h"
-#include "includes/skullxbo.h"
+#include "speaker.h"
 
 
 
@@ -42,7 +44,7 @@ void skullxbo_state::update_interrupts()
 
 TIMER_DEVICE_CALLBACK_MEMBER(skullxbo_state::scanline_timer)
 {
-	scanline_int_gen(m_maincpu);
+	scanline_int_gen(*m_maincpu);
 }
 
 
@@ -222,7 +224,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( skullxbo, skullxbo_state )
+static MACHINE_CONFIG_START( skullxbo )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)

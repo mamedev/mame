@@ -97,14 +97,17 @@
  */
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
-#include "cpu/z80/z80.h"
-#include "cpu/tms57002/tms57002.h"
-#include "machine/eepromser.h"
-#include "sound/k056800.h"
-#include "sound/k054539.h"
 #include "includes/konamigx.h"
+
+#include "cpu/m68000/m68000.h"
+#include "cpu/tms57002/tms57002.h"
+#include "cpu/z80/z80.h"
+#include "machine/eepromser.h"
+#include "sound/k054539.h"
+#include "sound/k056800.h"
 #include "rendlay.h"
+#include "speaker.h"
+
 
 // TODO: check on PCB
 #define MASTER_CLOCK XTAL_24MHz
@@ -182,16 +185,16 @@
 
 static struct sprite_entry {
 	int pri;
-	UINT32 adr;
+	uint32_t adr;
 } sprites[0x100];
 
-void konamigx_state::generate_sprites(address_space &space, UINT32 src, UINT32 spr, int count)
+void konamigx_state::generate_sprites(address_space &space, uint32_t src, uint32_t spr, int count)
 {
 	int scount = 0;
 	int ecount = 0;
 
 	for(int i=0; i<count; i++) {
-		UINT32 adr = src + 0x100*i;
+		uint32_t adr = src + 0x100*i;
 		int pri;
 		if(!space.read_word(adr+2))
 			continue;
@@ -206,21 +209,21 @@ void konamigx_state::generate_sprites(address_space &space, UINT32 src, UINT32 s
 	//qsort(sprites, ecount, sizeof(struct sprite_entry), pri_comp);
 
 	for(int i=0; i<ecount; i++) {
-		UINT32 adr = sprites[i].adr;
+		uint32_t adr = sprites[i].adr;
 		if(adr) {
-			UINT32 set =(space.read_word(adr) << 16)|space.read_word(adr+2);
-			UINT16 glob_x = space.read_word(adr+4);
-			UINT16 glob_y = space.read_word(adr+8);
-			UINT16 flip_x = space.read_word(adr+12) ? 0x1000 : 0x0000;
-			UINT16 flip_y = space.read_word(adr+14) ? 0x2000 : 0x0000;
-			UINT16 glob_f = flip_x | (flip_y ^ 0x2000);
-			UINT16 zoom_x = space.read_word(adr+20);
-			UINT16 zoom_y = space.read_word(adr+22);
-			UINT16 color_val    = 0x0000;
-			UINT16 color_mask   = 0xffff;
-			UINT16 color_set    = 0x0000;
-			UINT16 color_rotate = 0x0000;
-			UINT16 v;
+			uint32_t set =(space.read_word(adr) << 16)|space.read_word(adr+2);
+			uint16_t glob_x = space.read_word(adr+4);
+			uint16_t glob_y = space.read_word(adr+8);
+			uint16_t flip_x = space.read_word(adr+12) ? 0x1000 : 0x0000;
+			uint16_t flip_y = space.read_word(adr+14) ? 0x2000 : 0x0000;
+			uint16_t glob_f = flip_x | (flip_y ^ 0x2000);
+			uint16_t zoom_x = space.read_word(adr+20);
+			uint16_t zoom_y = space.read_word(adr+22);
+			uint16_t color_val    = 0x0000;
+			uint16_t color_mask   = 0xffff;
+			uint16_t color_set    = 0x0000;
+			uint16_t color_rotate = 0x0000;
+			uint16_t v;
 
 			v = space.read_word(adr+24);
 			if(v & 0x8000) {
@@ -253,13 +256,13 @@ void konamigx_state::generate_sprites(address_space &space, UINT32 src, UINT32 s
 
 			if(set >= 0x200000 && set < 0xd00000)
 			{
-				UINT16 count2 = space.read_word(set);
+				uint16_t count2 = space.read_word(set);
 
 				set += 2;
 				while(count2) {
-					UINT16 idx  = space.read_word(set);
-					UINT16 flip = space.read_word(set+2);
-					UINT16 col  = space.read_word(set+4);
+					uint16_t idx  = space.read_word(set);
+					uint16_t flip = space.read_word(set+2);
+					uint16_t col  = space.read_word(set+4);
 					short y = space.read_word(set+6);
 					short x = space.read_word(set+8);
 
@@ -321,22 +324,22 @@ void konamigx_state::generate_sprites(address_space &space, UINT32 src, UINT32 s
 	}
 }
 
-void konamigx_state::tkmmpzdm_esc(address_space &space, UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4)
+void konamigx_state::tkmmpzdm_esc(address_space &space, uint32_t p1, uint32_t p2, uint32_t p3, uint32_t p4)
 {
 	konamigx_esc_alert(m_workram, 0x0142, 0x100, 0);
 }
 
-void konamigx_state::dragoonj_esc(address_space &space, UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4)
+void konamigx_state::dragoonj_esc(address_space &space, uint32_t p1, uint32_t p2, uint32_t p3, uint32_t p4)
 {
 	konamigx_esc_alert(m_workram, 0x5c00, 0x100, 0);
 }
 
-void konamigx_state::sal2_esc(address_space &space, UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4)
+void konamigx_state::sal2_esc(address_space &space, uint32_t p1, uint32_t p2, uint32_t p3, uint32_t p4)
 {
 	konamigx_esc_alert(m_workram, 0x1c8c, 0x172, 1);
 }
 
-void konamigx_state::sexyparo_esc(address_space &space, UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4)
+void konamigx_state::sexyparo_esc(address_space &space, uint32_t p1, uint32_t p2, uint32_t p3, uint32_t p4)
 {
 	// The d20000 should probably be p3
 	// TODO: debugging bootcamp, remove once finished
@@ -355,20 +358,20 @@ void konamigx_state::sexyparo_esc(address_space &space, UINT32 p1, UINT32 p2, UI
 	generate_sprites(space, 0xc00604, 0xd20000, 0xfc);
 }
 
-void konamigx_state::tbyahhoo_esc(address_space &space, UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4)
+void konamigx_state::tbyahhoo_esc(address_space &space, uint32_t p1, uint32_t p2, uint32_t p3, uint32_t p4)
 {
 	generate_sprites(space, 0xc00000, 0xd20000, 0x100);
 }
 
-void konamigx_state::daiskiss_esc(address_space &space, UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4)
+void konamigx_state::daiskiss_esc(address_space &space, uint32_t p1, uint32_t p2, uint32_t p3, uint32_t p4)
 {
 	generate_sprites(space, 0xc00000, 0xd20000, 0x100);
 }
 
 WRITE32_MEMBER(konamigx_state::esc_w)
 {
-	UINT32 opcode;
-	UINT32 params;
+	uint32_t opcode;
+	uint32_t params;
 
 	/* ignore nullptr writes to the ESC (these appear to be "keepalives" on the real hardware) */
 	if (!data)
@@ -414,10 +417,10 @@ WRITE32_MEMBER(konamigx_state::esc_w)
 			break;
 		case 1: // Run program
 			if(m_esc_cb) {
-				UINT32 p1 = (space.read_word(params+0)<<16) | space.read_word(params+2);
-				UINT32 p2 = (space.read_word(params+4)<<16) | space.read_word(params+6);
-				UINT32 p3 = (space.read_word(params+8)<<16) | space.read_word(params+10);
-				UINT32 p4 = (space.read_word(params+12)<<16) | space.read_word(params+14);
+				uint32_t p1 = (space.read_word(params+0)<<16) | space.read_word(params+2);
+				uint32_t p2 = (space.read_word(params+4)<<16) | space.read_word(params+6);
+				uint32_t p3 = (space.read_word(params+8)<<16) | space.read_word(params+10);
+				uint32_t p4 = (space.read_word(params+12)<<16) | space.read_word(params+14);
 				(this->*m_esc_cb)(space, p1, p2, p3, p4);
 			}
 			break;
@@ -457,7 +460,7 @@ CUSTOM_INPUT_MEMBER(konamigx_state::gx_rdport1_3_r)
 
 WRITE32_MEMBER(konamigx_state::eeprom_w)
 {
-	UINT32 odata;
+	uint32_t odata;
 
 	if (ACCESSING_BITS_24_31)
 	{
@@ -506,7 +509,7 @@ WRITE32_MEMBER(konamigx_state::eeprom_w)
 WRITE32_MEMBER(konamigx_state::control_w)
 {
 	// TODO: derive from reported PCB XTALs
-	const UINT32 pixclock[4] = { XTAL_6MHz, XTAL_8MHz, XTAL_12MHz, XTAL_16MHz};
+	const uint32_t pixclock[4] = { XTAL_6MHz, XTAL_8MHz, XTAL_12MHz, XTAL_16MHz};
 	//logerror("write %x to control register (mask=%x)\n", data, mem_mask);
 
 	// known controls:
@@ -762,14 +765,14 @@ READ32_MEMBER(konamigx_state::le2_gun_V_r)
 
 READ32_MEMBER(konamigx_state::type1_roz_r1)
 {
-	UINT32 *ROM = (UINT32 *)memregion("gfx3")->base();
+	uint32_t *ROM = (uint32_t *)memregion("gfx3")->base();
 
 	return ROM[offset];
 }
 
 READ32_MEMBER(konamigx_state::type1_roz_r2)
 {
-	UINT32 *ROM = (UINT32 *)memregion("gfx3")->base();
+	uint32_t *ROM = (uint32_t *)memregion("gfx3")->base();
 
 	ROM += (0x600000/2);
 
@@ -961,7 +964,7 @@ WRITE32_MEMBER(konamigx_state::type4_prot_w)
 				}
 				else
 				{
-					printf("GXT4: unknown protection command %x (PC=%x)\n", m_last_prot_op, space.device().safe_pc());
+					//printf("GXT4: unknown protection command %x (PC=%x)\n", m_last_prot_op, space.device().safe_pc());
 				}
 
 				if (m_gx_wrport1_1 & 0x10)
@@ -1473,7 +1476,10 @@ static INPUT_PORTS_START( type3 )
 	PORT_INCLUDE( common )
 
 	PORT_MODIFY("SYSTEM_DSW")
-	PORT_BIT( 0x00008000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_COIN4 )
+	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_SERVICE3 )
+	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_SERVICE4 )
 	PORT_DIPNAME( 0x01000000, 0x00000000, DEF_STR( Stereo ))
 	PORT_DIPSETTING(          0x00000000, DEF_STR( Stereo ))
 	PORT_DIPSETTING(          0x01000000, DEF_STR( Mono ))
@@ -1603,7 +1609,7 @@ WRITE_LINE_MEMBER(konamigx_state::hblank_irq_ack_w)
 	m_gx_syncen |= 0x40;
 }
 
-static MACHINE_CONFIG_START( konamigx, konamigx_state )
+static MACHINE_CONFIG_START( konamigx )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, MASTER_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(gx_type2_map)
@@ -2266,8 +2272,8 @@ ROM_START( rungun2 )
 	/* main program */
 	ROM_REGION( 0x800000, "maincpu", 0 )
 	GX_BIOS
-	ROM_LOAD32_WORD_SWAP( "505uaa03.27b", 0x200000, 512*1024, CRC(ad7f9ded) SHA1(824448daeb6109b822667e54baa1c73484642ac9))
-	ROM_LOAD32_WORD_SWAP( "505uaa02.31b", 0x200002, 512*1024, CRC(cfca23f7) SHA1(dfea871f0aaf6b2db6d924ddfd4174e7a14333e8))
+	ROM_LOAD32_WORD_SWAP( "505uaa03.27b", 0x200000, 512*1024, CRC(ad7f9ded) SHA1(824448daeb6109b822667e54baa1c73484642ac9) )
+	ROM_LOAD32_WORD_SWAP( "505uaa02.31b", 0x200002, 512*1024, CRC(cfca23f7) SHA1(dfea871f0aaf6b2db6d924ddfd4174e7a14333e8) )
 
 	/* data roms */
 	ROM_LOAD32_WORD_SWAP( "505a05.29r", 0x400000, 1024*1024, CRC(5da5d695) SHA1(02bfbfa4ba0213a23819828a9be02923740dccd6) )
@@ -2365,18 +2371,18 @@ ROM_START( rushhero )
 	ROM_LOAD32_WORD_SWAP( "605uab02.31m", 0x200002, 512*1024, CRC(94c3d835) SHA1(f48d34987fa6575a2c41d3ca3359e9e2cbc817e0) )
 
 	/* data roms */
-	ROM_LOAD32_WORD_SWAP( "605a05.29r", 0x400000, 1024*1024, CRC(9bca4297) SHA1(c20be1ffcee8bd56f69d4fcc19d0035b3f74b8f2))
-	ROM_LOAD32_WORD_SWAP( "605a04.31r", 0x400002, 1024*1024, CRC(f6788154) SHA1(093c145d5348b4f10193acc258f5539bd59138a1))
+	ROM_LOAD32_WORD_SWAP( "605a05.29r", 0x400000, 1024*1024, CRC(9bca4297) SHA1(c20be1ffcee8bd56f69d4fcc19d0035b3f74b8f2) )
+	ROM_LOAD32_WORD_SWAP( "605a04.31r", 0x400002, 1024*1024, CRC(f6788154) SHA1(093c145d5348b4f10193acc258f5539bd59138a1) )
 
 	/* sound program */
 	ROM_REGION( 0x40000, "soundcpu", 0 )
-	ROM_LOAD16_BYTE("605a06.9m", 0x000000, 128*1024, CRC(9ca03dce) SHA1(008106e864d8390d7ae8645a2fe06d0eaaa746e0))
-	ROM_LOAD16_BYTE("605a07.7m", 0x000001, 128*1024, CRC(3116a8b0) SHA1(f0899d7027464d9aad45ffa6a464288a51a80dc1))
+	ROM_LOAD16_BYTE("605a06.9m", 0x000000, 128*1024, CRC(9ca03dce) SHA1(008106e864d8390d7ae8645a2fe06d0eaaa746e0) )
+	ROM_LOAD16_BYTE("605a07.7m", 0x000001, 128*1024, CRC(3116a8b0) SHA1(f0899d7027464d9aad45ffa6a464288a51a80dc1) )
 
 	/* tiles */
 	ROM_REGION( 0x600000, "gfx1", ROMREGION_ERASE00 )
-	ROM_LOAD16_BYTE( "605a21.11r", 0x000000, 1024*1024, CRC(0e5add29) SHA1(f80d81ff8110825ba19ebc3cf50480b8cf275571))
-	ROM_LOAD16_BYTE( "605a20.11m", 0x000001, 1024*1024, CRC(a8fb4288) SHA1(b0ee6c2add5a8063f771ac8bbdfd78c0382a5036))
+	ROM_LOAD16_BYTE( "605a21.11r", 0x000000, 1024*1024, CRC(0e5add29) SHA1(f80d81ff8110825ba19ebc3cf50480b8cf275571) )
+	ROM_LOAD16_BYTE( "605a20.11m", 0x000001, 1024*1024, CRC(a8fb4288) SHA1(b0ee6c2add5a8063f771ac8bbdfd78c0382a5036) )
 
 	/* sprites */
 	ROM_REGION( 0x3000000, "gfx2", ROMREGION_ERASE00 )
@@ -2386,8 +2392,8 @@ ROM_START( rushhero )
 	_48_WORD_ROM_LOAD( "605a17.16r", 0x0c00000, 4*1024*1024, CRC(7a8f1cf9) SHA1(4c07f846915bded61c40876a10f5457e8895ad58) )
 	_48_WORD_ROM_LOAD( "605a13.21r", 0x0c00002, 4*1024*1024, CRC(9a6dff6d) SHA1(cbc200bde5933098e768db8d3021f77bdfe454b8) )
 	_48_WORD_ROM_LOAD( "605a09.25r", 0x0c00004, 4*1024*1024, CRC(624fd486) SHA1(edd81d5487f8239ffa89b931430cf41f06a17cf6) )
-	_48_WORD_ROM_LOAD( "605a14.14m", 0x1800000, 4*1024*1024, CRC(4d4dbecb) SHA1(7c3cb2739d6b729d855d652b1991c7af6cd79d1c) )
-	_48_WORD_ROM_LOAD( "605a18.18m", 0x1800002, 4*1024*1024, CRC(b5115d76) SHA1(48c3119afb649c58d4df36806fe5530ddd379782) )
+	_48_WORD_ROM_LOAD( "605a18.14m", 0x1800000, 4*1024*1024, CRC(4d4dbecb) SHA1(7c3cb2739d6b729d855d652b1991c7af6cd79d1c) )
+	_48_WORD_ROM_LOAD( "605a14.18m", 0x1800002, 4*1024*1024, CRC(b5115d76) SHA1(48c3119afb649c58d4df36806fe5530ddd379782) )
 	_48_WORD_ROM_LOAD( "605a10.23m", 0x1800004, 4*1024*1024, CRC(4f47d434) SHA1(c4503993c738e1b8df6f045f5a82504363682db7) )
 	_48_WORD_ROM_LOAD( "605a16.16m", 0x2400000, 4*1024*1024, CRC(aab542ca) SHA1(9728b028f48768236f47a7a9bddb27944297b583) )
 	_48_WORD_ROM_LOAD( "605a12.21m", 0x2400002, 4*1024*1024, CRC(194ffad0) SHA1(1c56f4e89bfe72b435793b907e7ca3e62ecddf4b) )
@@ -2395,11 +2401,11 @@ ROM_START( rushhero )
 
 	/* PSAC2 tiles */
 	ROM_REGION( 0x200000, "gfx3", 0 )
-	ROM_LOAD("605a24.22h", 0x000000, 2*1024*1024, CRC(73f06065) SHA1(8ca6747204a4c2cf59f19bcc9fce280e796e4a6e))
+	ROM_LOAD("605a24.22h", 0x000000, 2*1024*1024, CRC(73f06065) SHA1(8ca6747204a4c2cf59f19bcc9fce280e796e4a6e) )
 
 	/* sound data */
 	ROM_REGION( 0x400000, "shared", 0 )
-	ROM_LOAD( "605a23.7r", 0x000000, 4*1024*1024, BAD_DUMP CRC(992c4751) SHA1(18ecfc21138f9dc62f0658750808bbef649510f7)) //speaker samples are distorted
+	ROM_LOAD( "605a23.7r", 0x000000, 4*1024*1024, CRC(458ecee1) SHA1(4adcbbff312597716c6db1cd5df6cdf7022d4961) )
 ROM_END
 
 /* Taisen Tokkae-dama */
@@ -3704,7 +3710,17 @@ ROM_END
 
 MACHINE_START_MEMBER(konamigx_state,konamigx)
 {
+	save_item(NAME(m_sound_ctrl));
+	save_item(NAME(m_sound_intck));
+
+	save_item(NAME(m_gx_wrport1_0));
 	save_item(NAME(m_gx_wrport1_1));
+	save_item(NAME(m_gx_wrport2));
+
+	save_item(NAME(m_gx_rdport1_3));
+	save_item(NAME(m_gx_syncen));
+	save_item(NAME(m_suspension_active));
+	save_item(NAME(m_prev_pixel_clock));
 }
 
 MACHINE_RESET_MEMBER(konamigx_state,konamigx)
@@ -3769,9 +3785,9 @@ MACHINE_RESET_MEMBER(konamigx_state,konamigx)
 struct GXGameInfoT
 {
 	const char *romname;
-	UINT32 cfgport;
-	UINT32 special;
-	UINT32 readback;
+	uint32_t cfgport;
+	uint32_t special;
+	uint32_t readback;
 };
 
 #define BPP4  0
@@ -3858,7 +3874,7 @@ DRIVER_INIT_MEMBER(konamigx_state,konamigx)
 					break;
 				case 2: // tkmmpzdm hack
 				{
-					UINT32 *rom = (UINT32*)memregion("maincpu")->base();
+					uint32_t *rom = (uint32_t*)memregion("maincpu")->base();
 
 					// The display is initialized after POST but the copyright screen disabled
 					// planes B,C,D and didn't bother restoring them. I've spent a good

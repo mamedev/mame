@@ -1,12 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl,Olivier Galibert
 
+#include "emu.h"
 #include "i8271.h"
 
-const device_type I8271 = &device_creator<i8271_device>;
+DEFINE_DEVICE_TYPE(I8271, i8271_device, "i8271", "Intel 8271 FDC")
 
-i8271_device::i8271_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, I8271, "Intel 8271", tag, owner, clock, "i8271", __FILE__), ready_connected(false), mode(0), main_phase(0),
+i8271_device::i8271_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, I8271, tag, owner, clock), ready_connected(false), mode(0), main_phase(0),
 	intrq_cb(*this),
 	drq_cb(*this),
 	hdl_cb(*this),
@@ -51,7 +52,7 @@ void i8271_device::device_start()
 			if(con) {
 				flopi[i].dev = con->get_device();
 				if (flopi[i].dev != nullptr)
-					flopi[i].dev->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(FUNC(i8271_device::index_callback), this));
+					flopi[i].dev->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(&i8271_device::index_callback, this));
 			} else
 				flopi[i].dev = nullptr;
 		} else
@@ -126,12 +127,12 @@ void i8271_device::set_floppy(floppy_image_device *flop)
 		elem.dev = flop;
 	}
 	if(flop)
-		flop->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(FUNC(i8271_device::index_callback), this));
+		flop->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(&i8271_device::index_callback, this));
 }
 
 READ8_MEMBER(i8271_device::sr_r)
 {
-	UINT32 ret = (irq ? SR_IRQ : 0);
+	uint32_t ret = (irq ? SR_IRQ : 0);
 	switch(main_phase) {
 	case PHASE_CMD:
 		ret |= SR_CF;
@@ -200,7 +201,7 @@ WRITE8_MEMBER(i8271_device::param_w)
 	}
 }
 
-bool i8271_device::set_output(UINT8 data)
+bool i8271_device::set_output(uint8_t data)
 {
 	if(main_phase == PHASE_EXEC) {
 		if(drq) {
@@ -213,7 +214,7 @@ bool i8271_device::set_output(UINT8 data)
 	return true;
 }
 
-bool i8271_device::get_input(UINT8 *data)
+bool i8271_device::get_input(uint8_t *data)
 {
 	if(main_phase == PHASE_EXEC) {
 		if(drq) {
@@ -470,7 +471,7 @@ void i8271_device::live_run(attotime limit)
 		case SCAN_SECTOR_DATA_BYTE:
 			if(!scan_done)
 			{
-				UINT8 data = 0;
+				uint8_t data = 0;
 				if(!get_input(&data)) {
 					live_delay(IDLE);
 					return;
@@ -545,7 +546,7 @@ void i8271_device::live_run(attotime limit)
 				cur_live.crc = 0xffff;
 				live_write_raw(BIT(command[0], 2) ? 0xf56a : 0xf56f);
 			} else if(cur_live.byte_counter < 7+sector_size) {
-				UINT8 data = 0;
+				uint8_t data = 0;
 				if(!get_input(&data)) {
 					live_delay(IDLE);
 					return;
@@ -602,7 +603,7 @@ void i8271_device::live_run(attotime limit)
 				cur_live.crc = 0xffff;
 				live_write_raw(0xf57e);
 			} else if(cur_live.byte_counter < 11) {
-				UINT8 data = 0;
+				uint8_t data = 0;
 				if(!get_input(&data)) {
 					live_delay(IDLE);
 					return;
@@ -1312,7 +1313,7 @@ void i8271_device::write_data_continue(floppy_info &fi)
 	}
 }
 
-int i8271_device::calc_sector_size(UINT8 size)
+int i8271_device::calc_sector_size(uint8_t size)
 {
 	return size > 7 ? 16384 : 128 << size;
 }
@@ -1686,16 +1687,16 @@ bool i8271_device::write_one_bit(const attotime &limit)
 	return false;
 }
 
-void i8271_device::live_write_raw(UINT16 raw)
+void i8271_device::live_write_raw(uint16_t raw)
 {
 	//  logerror("write %04x %04x\n", raw, cur_live.crc);
 	cur_live.shift_reg = raw;
 	cur_live.data_bit_context = raw & 1;
 }
 
-void i8271_device::live_write_fm(UINT8 fm)
+void i8271_device::live_write_fm(uint8_t fm)
 {
-	UINT16 raw = 0xaaaa;
+	uint16_t raw = 0xaaaa;
 	for(int i=0; i<8; i++)
 		if(fm & (0x80 >> i))
 			raw |= 0x4000 >> (2*i);

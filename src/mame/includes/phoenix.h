@@ -1,32 +1,25 @@
 // license:BSD-3-Clause
 // copyright-holders:Richard Davies
+#ifndef MAME_INCLUDES_PHOENIX_H
+#define MAME_INCLUDES_PHOENIX_H
+
+#pragma once
+
 #include "audio/pleiads.h"
-#include "sound/discrete.h"
-#include "sound/tms36xx.h"
 
 class phoenix_state : public driver_device
 {
 public:
 	phoenix_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_maincpu(*this, "maincpu"),
-		m_pleiads_custom(*this, "pleiads_custom"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_pleiads_custom(*this, "pleiads_custom")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_fg_tilemap(nullptr)
+		, m_bg_tilemap(nullptr)
+	{
+	}
 
-	required_device<cpu_device> m_maincpu;
-	optional_device<pleiads_sound_device> m_pleiads_custom;
-	required_device<gfxdecode_device> m_gfxdecode;
-	std::unique_ptr<UINT8[]> m_videoram_pg[2];
-	UINT8 m_videoram_pg_index;
-	UINT8 m_palette_bank;
-	UINT8 m_cocktail_mode;
-	UINT8 m_pleiads_protection_question;
-	UINT8 m_survival_protection_value;
-	int m_survival_sid_value;
-	tilemap_t *m_fg_tilemap;
-	tilemap_t *m_bg_tilemap;
-	UINT8 m_survival_input_latches[2];
-	UINT8 m_survival_input_readc;
 	DECLARE_WRITE8_MEMBER(phoenix_videoram_w);
 	DECLARE_WRITE8_MEMBER(phoenix_videoreg_w);
 	DECLARE_WRITE8_MEMBER(pleiads_videoreg_w);
@@ -34,8 +27,9 @@ public:
 	DECLARE_READ8_MEMBER(survival_input_port_0_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(player_input_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(pleiads_protection_r);
-	DECLARE_DRIVER_INIT(condor);
-	DECLARE_DRIVER_INIT(vautourza);
+	DECLARE_DRIVER_INIT(oneprom);
+	DECLARE_DRIVER_INIT(coindsw);
+	DECLARE_DRIVER_INIT(oneprom_coindsw);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	DECLARE_MACHINE_RESET(phoenix);
@@ -43,9 +37,27 @@ public:
 	DECLARE_PALETTE_INIT(phoenix);
 	DECLARE_PALETTE_INIT(survival);
 	DECLARE_PALETTE_INIT(pleiads);
-	UINT32 screen_update_phoenix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_phoenix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_READ8_MEMBER(survival_protection_r);
 	DECLARE_READ_LINE_MEMBER(survival_sid_callback);
+
+protected:
+	required_device<cpu_device>             m_maincpu;
+	optional_device<pleiads_sound_device>   m_pleiads_custom;
+	required_device<gfxdecode_device>       m_gfxdecode;
+
+	tilemap_t *m_fg_tilemap;
+	tilemap_t *m_bg_tilemap;
+
+	std::unique_ptr<uint8_t[]> m_videoram_pg[2];
+	uint8_t m_videoram_pg_index;
+	uint8_t m_palette_bank;
+	uint8_t m_cocktail_mode;
+	uint8_t m_pleiads_protection_question;
+	uint8_t m_survival_protection_value;
+	int m_survival_sid_value;
+	uint8_t m_survival_input_latches[2];
+	uint8_t m_survival_input_readc;
 };
 
 
@@ -62,56 +74,4 @@ public:
 #define VBSTART                 (208)
 #define VBEND                   (0)
 
-/*----------- defined in audio/phoenix.c -----------*/
-
-struct c_state
-{
-	INT32 counter;
-	INT32 level;
-};
-
-struct n_state
-{
-	INT32 counter;
-	INT32 polyoffs;
-	INT32 polybit;
-	INT32 lowpass_counter;
-	INT32 lowpass_polybit;
-};
-
-class phoenix_sound_device : public device_t,
-									public device_sound_interface
-{
-public:
-	phoenix_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~phoenix_sound_device() {}
-
-	DECLARE_WRITE8_MEMBER( control_a_w );
-	DECLARE_WRITE8_MEMBER( control_b_w );
-
-protected:
-	// device-level overrides
-	virtual void device_config_complete() override;
-	virtual void device_start() override;
-
-	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
-private:
-	// internal state
-	struct c_state      m_c24_state;
-	struct c_state      m_c25_state;
-	struct n_state      m_noise_state;
-	UINT8               m_sound_latch_a;
-	sound_stream *      m_channel;
-	std::unique_ptr<UINT32[]>                m_poly18;
-	discrete_device *m_discrete;
-	tms36xx_device *m_tms;
-
-	int update_c24(int samplerate);
-	int update_c25(int samplerate);
-	int noise(int samplerate);
-};
-
-extern const device_type PHOENIX;
-
-DISCRETE_SOUND_EXTERN( phoenix );
+#endif // MAME_INCLUDES_PHOENIX_H

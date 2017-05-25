@@ -11,7 +11,7 @@
 
 mpeg_audio::mpeg_audio(const void *_base, unsigned int _accepted, bool lsb_first, int _position_align)
 {
-	base = (const UINT8 *)_base;
+	base = (const uint8_t *)_base;
 	accepted = _accepted;
 	do_gb = lsb_first ? do_gb_lsb : do_gb_msb;
 	position_align = _position_align ? _position_align - 1 : 0;

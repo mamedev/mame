@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#pragma once
+#ifndef MAME_INCLUDES_VIXEN_H
+#define MAME_INCLUDES_VIXEN_H
 
-#ifndef __VIXEN__
-#define __VIXEN__
+#pragma once
 
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
@@ -43,7 +43,7 @@ public:
 			m_sync_rom(*this, "video"),
 			m_char_rom(*this, "chargen"),
 			m_video_ram(*this, "video_ram"),
-			m_key(*this, "KEY"),
+			m_key(*this, "KEY.%u", 0),
 			m_cmd_d1(0),
 			m_fdint(0),
 			m_vsync(0),
@@ -73,11 +73,11 @@ public:
 	IRQ_CALLBACK_MEMBER(vixen_int_ack);
 	DECLARE_READ8_MEMBER(opram_r);
 	DECLARE_READ8_MEMBER(oprom_r);
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 private:
 	required_device<cpu_device> m_maincpu;
-	required_device<fd1797_t> m_fdc;
+	required_device<fd1797_device> m_fdc;
 	required_device<i8155_device> m_io_i8155;
 	required_device<i8251_device> m_usart;
 	required_device<discrete_sound_device> m_discrete;
@@ -87,10 +87,10 @@ private:
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	required_device<rs232_port_device> m_rs232;
-	required_region_ptr<UINT8> m_rom;
-	required_region_ptr<UINT8> m_sync_rom;
-	required_region_ptr<UINT8> m_char_rom;
-	required_shared_ptr<UINT8> m_video_ram;
+	required_region_ptr<uint8_t> m_rom;
+	required_region_ptr<uint8_t> m_sync_rom;
+	required_region_ptr<uint8_t> m_char_rom;
+	required_shared_ptr<uint8_t> m_video_ram;
 	required_ioport_array<8> m_key;
 
 	address_space *m_program;
@@ -103,7 +103,7 @@ private:
 	void update_interrupt();
 
 	// keyboard state
-	UINT8 m_col;
+	uint8_t m_col;
 
 	// interrupt state
 	int m_cmd_d0;
@@ -129,4 +129,4 @@ private:
 	bool m_256;
 };
 
-#endif
+#endif // MAME_INCLUDES_VIXEN_H

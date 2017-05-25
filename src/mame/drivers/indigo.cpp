@@ -19,14 +19,16 @@
 \*********************************************************************/
 
 #include "emu.h"
+#include "bus/scsi/scsi.h"
+#include "bus/scsi/scsicd.h"
 #include "cpu/mips/mips3.h"
 #include "cpu/mips/r3000.h"
 #include "machine/8530scc.h"
-#include "machine/sgi.h"
 #include "machine/eepromser.h"
-#include "bus/scsi/scsi.h"
-#include "bus/scsi/scsicd.h"
+#include "machine/sgi.h"
 #include "machine/wd33c93.h"
+#include "screen.h"
+#include "speaker.h"
 
 class indigo_state : public driver_device
 {
@@ -54,24 +56,24 @@ public:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 private:
 	struct hpc_t
 	{
-		UINT8 m_misc_status;
-		UINT32 m_parbuf_ptr;
-		UINT32 m_local_ioreg0_mask;
-		UINT32 m_local_ioreg1_mask;
-		UINT32 m_vme_intmask0;
-		UINT32 m_vme_intmask1;
-		UINT32 m_scsi0_descriptor;
-		UINT32 m_scsi0_dma_ctrl;
+		uint8_t m_misc_status;
+		uint32_t m_parbuf_ptr;
+		uint32_t m_local_ioreg0_mask;
+		uint32_t m_local_ioreg1_mask;
+		uint32_t m_vme_intmask0;
+		uint32_t m_vme_intmask1;
+		uint32_t m_scsi0_descriptor;
+		uint32_t m_scsi0_dma_ctrl;
 	};
 
 	struct rtc_t
 	{
-		UINT8 nRAM[32];
+		uint8_t nRAM[32];
 	};
 
 	required_device<cpu_device> m_maincpu;
@@ -110,7 +112,7 @@ void indigo_state::video_start()
 {
 }
 
-UINT32 indigo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t indigo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -276,7 +278,7 @@ WRITE32_MEMBER(indigo_state::hpc_w)
 		#if 0
 		if (data & 0x80)
 		{
-			UINT32 next;
+			uint32_t next;
 
 			osd_printf_info("DMA activated for SCSI0\n");
 			osd_printf_info("Descriptor block:\n");
@@ -493,7 +495,7 @@ void indigo_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 		indigo_timer_rtc();
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in indigo_state::device_timer");
+		assert_always(false, "Unknown id in indigo_state::device_timer");
 	}
 }
 
@@ -566,12 +568,12 @@ static INPUT_PORTS_START( indigo )
 	PORT_BIT ( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_FRAGMENT( cdrom_config )
+static MACHINE_CONFIG_START( cdrom_config )
 	MCFG_DEVICE_MODIFY( "cdda" )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "^^^^mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( indigo3k, indigo_state )
+static MACHINE_CONFIG_START( indigo3k )
 	MCFG_CPU_ADD("maincpu", R3041, 33000000)
 	MCFG_R3000_ENDIANNESS(ENDIANNESS_BIG)
 	MCFG_CPU_PROGRAM_MAP(indigo3k_map)
@@ -624,6 +626,6 @@ ROM_START( indigo4k )
 	ROM_LOAD( "ip20prom.070-8116-004.bin", 0x000000, 0x080000, CRC(940d960e) SHA1(596aba530b53a147985ff3f6f853471ce48c866c) )
 ROM_END
 
-/*    YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     CLASS         INIT    COMPANY   FULLNAME */
-COMP( 1991, indigo3k, 0,        0,        indigo3k, indigo,   driver_device, 0,     "Silicon Graphics Inc", "IRIS Indigo (R3000, 33MHz)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1993, indigo4k, 0,        0,        indigo4k, indigo,   driver_device, 0,         "Silicon Graphics Inc", "IRIS Indigo (R4400, 150MHz, Ver. 4.0.5D Rev A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     CLASS         INIT   COMPANY                 FULLNAME                                          FLAGS
+COMP( 1991, indigo3k, 0,        0,        indigo3k, indigo,   indigo_state, 0,     "Silicon Graphics Inc", "IRIS Indigo (R3000, 33MHz)",                     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1993, indigo4k, 0,        0,        indigo4k, indigo,   indigo_state, 0,     "Silicon Graphics Inc", "IRIS Indigo (R4400, 150MHz, Ver. 4.0.5D Rev A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

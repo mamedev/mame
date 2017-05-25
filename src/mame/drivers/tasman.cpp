@@ -28,6 +28,8 @@
 #include "video/k054156_k054157_k056832.h"
 #include "video/k055555.h"
 #include "machine/eepromser.h"
+#include "speaker.h"
+
 
 #define CUSTOM_DRAW 1
 
@@ -60,7 +62,7 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	optional_shared_ptr<UINT32> m_vram;
+	optional_shared_ptr<uint32_t> m_vram;
 	DECLARE_READ32_MEMBER(eeprom_r);
 	DECLARE_WRITE8_MEMBER(eeprom_w);
 	DECLARE_WRITE8_MEMBER(kongambl_ff_w);
@@ -68,10 +70,10 @@ public:
 	// DECLARE_READ32_MEMBER(rng_r);
 	DECLARE_DRIVER_INIT(kingtut);
 	DECLARE_VIDEO_START(kongambl);
-	UINT8 m_irq_mask;
+	uint8_t m_irq_mask;
 
 	virtual void machine_reset() override { m_irq_mask = 0; };
-	UINT32 screen_update_kongambl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_kongambl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	WRITE_LINE_MEMBER(vblank_irq_ack_w);
 	WRITE_LINE_MEMBER(hblank_irq_ack_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(kongambl_vblank);
@@ -93,11 +95,11 @@ VIDEO_START_MEMBER(kongambl_state,kongambl)
 	#endif
 }
 
-UINT32 kongambl_state::screen_update_kongambl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t kongambl_state::screen_update_kongambl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	#if CUSTOM_DRAW
 	gfx_element *gfx = m_gfxdecode->gfx(0);
-	UINT32 count;
+	uint32_t count;
 
 	count = 0;
 
@@ -105,7 +107,7 @@ UINT32 kongambl_state::screen_update_kongambl(screen_device &screen, bitmap_ind1
 	{
 		for (int x=0;x<128;x++)
 		{
-			UINT32 tile = m_vram[count] & 0xffff;
+			uint32_t tile = m_vram[count] & 0xffff;
 
 			if(m_screen->visible_area().contains(x*8, y*8))
 				gfx->opaque(bitmap,cliprect,tile,0,0,0,x*8,y*8);
@@ -120,7 +122,7 @@ UINT32 kongambl_state::screen_update_kongambl(screen_device &screen, bitmap_ind1
 	{
 		for (int x=0;x<128;x++)
 		{
-			UINT32 tile = m_vram[count] & 0xffff;
+			uint32_t tile = m_vram[count] & 0xffff;
 
 			if(m_screen->visible_area().contains(x*8, y*8))
 				gfx->transpen(bitmap,cliprect,tile,0,0,0,x*8,y*8,0);
@@ -145,7 +147,7 @@ UINT32 kongambl_state::screen_update_kongambl(screen_device &screen, bitmap_ind1
 READ32_MEMBER(kongambl_state::eeprom_r)
 {
 	//return machine().rand();
-	UINT32 retval = 0;
+	uint32_t retval = 0;
 
 	if (ACCESSING_BITS_24_31)
 		retval |= ioport("IN0")->read() << 24; // bit 0 freezes the system if 1
@@ -631,7 +633,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(kongambl_state::kongambl_vblank)
 
 }
 
-static MACHINE_CONFIG_START( kongambl, kongambl_state )
+static MACHINE_CONFIG_START( kongambl )
 	MCFG_CPU_ADD("maincpu", M68EC020, 25000000)
 	MCFG_CPU_PROGRAM_MAP(kongambl_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", kongambl_state, kongambl_vblank, "screen", 0, 1)
@@ -806,7 +808,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(kongambl_state,kingtut)
 {
-	//UINT32 *rom = (UINT32*)memregion("maincpu")->base();
+	//uint32_t *rom = (uint32_t*)memregion("maincpu")->base();
 
 	//rom[0x3986c/4] = (rom[0x3986c/4] & 0xffff0000) | 0x600e; // patch ROM check
 	//rom[0x2bfc8/4] = (rom[0x2bfc8/4] & 0xffff0000) | 0x6612; // patch VRAM ROM checks
@@ -814,8 +816,8 @@ DRIVER_INIT_MEMBER(kongambl_state,kingtut)
 	//rom[0x55e40/4] = (rom[0x55e40/4] & 0xffff0000) | 0x4e71; // goes away from the POST
 }
 
-GAME( 199?, kingtut,    0,        kongambl,    kongambl, kongambl_state,    kingtut, ROT0,  "Konami", "King Tut (NSW, Australia)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 199?, moneybnk,   0,        kongambl,    kongambl, driver_device,    0, ROT0,  "Konami", "Money In The Bank (NSW, Australia)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 199?, dragsphr,   0,        kongambl,    kongambl, driver_device,    0, ROT0,  "Konami", "Dragon Sphere", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 199?, ivorytsk,   0,        kongambl,    kongambl, driver_device,    0, ROT0,  "Konami", "Ivory Tusk", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 199?, vikingt,    0,        kongambl,    kongambl, driver_device,    0, ROT0,  "Konami", "Viking Treasure", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 199?, kingtut,    0,        kongambl,    kongambl, kongambl_state,  kingtut, ROT0,  "Konami", "King Tut (NSW, Australia)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 199?, moneybnk,   0,        kongambl,    kongambl, kongambl_state,  0,       ROT0,  "Konami", "Money In The Bank (NSW, Australia)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 199?, dragsphr,   0,        kongambl,    kongambl, kongambl_state,  0,       ROT0,  "Konami", "Dragon Sphere", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 199?, ivorytsk,   0,        kongambl,    kongambl, kongambl_state,  0,       ROT0,  "Konami", "Ivory Tusk", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 199?, vikingt,    0,        kongambl,    kongambl, kongambl_state,  0,       ROT0,  "Konami", "Viking Treasure", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

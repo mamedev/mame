@@ -26,20 +26,20 @@ two 6809s and as the reset generator for the entire system.
 #include "machine/c117.h"
 
 
-static MACHINE_CONFIG_FRAGMENT( namco_c117 )
+static MACHINE_CONFIG_START( namco_c117 )
 	MCFG_WATCHDOG_ADD("watchdog")
 MACHINE_CONFIG_END
 
 
-const device_type NAMCO_C117 = &device_creator<namco_c117_device>;
+DEFINE_DEVICE_TYPE(NAMCO_C117, namco_c117_device, "namco_c117", "Namco C117 MMU")
 
 
 //-------------------------------------------------
 //  namco_c117_device - constructor
 //-------------------------------------------------
 
-namco_c117_device::namco_c117_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, NAMCO_C117, "Namco C117 MMU", tag, owner, clock, "namco_c117", __FILE__),
+namco_c117_device::namco_c117_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, NAMCO_C117, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	m_subres_cb(*this),
 	m_program_config("program", ENDIANNESS_BIG, 8, 23),
@@ -160,7 +160,7 @@ WRITE8_MEMBER(namco_c117_device::sound_watchdog_w)
 }
 
 
-void namco_c117_device::register_w(int whichcpu, offs_t offset, UINT8 data)
+void namco_c117_device::register_w(int whichcpu, offs_t offset, uint8_t data)
 {
 	int reg = (offset >> 9) & 0xf;
 	bool unknown_reg = false;
@@ -219,9 +219,9 @@ void namco_c117_device::register_w(int whichcpu, offs_t offset, UINT8 data)
 		logerror("'%s' writing to unknown CUS117 register %04X = %02X\n", (whichcpu ? m_subcpu_tag : m_maincpu_tag), offset, data);
 }
 
-void namco_c117_device::bankswitch(int whichcpu, int whichbank, int a0, UINT8 data)
+void namco_c117_device::bankswitch(int whichcpu, int whichbank, int a0, uint8_t data)
 {
-	UINT32 &bank = m_offsets[whichcpu][whichbank];
+	uint32_t &bank = m_offsets[whichcpu][whichbank];
 
 	// even writes set a22-a21; odd writes set a20-a13
 	if (a0 == 0)

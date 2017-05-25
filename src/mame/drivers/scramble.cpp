@@ -29,15 +29,15 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/s2650/s2650.h"
-#include "sound/ay8910.h"
-#include "sound/dac.h"
-#include "machine/i8255.h"
-#include "machine/gen_latch.h"
-#include "machine/watchdog.h"
 #include "includes/scramble.h"
 
+#include "cpu/s2650/s2650.h"
+#include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
+#include "machine/i8255.h"
+#include "machine/watchdog.h"
+#include "sound/ay8910.h"
+#include "speaker.h"
 
 
 static ADDRESS_MAP_START( scramble_map, AS_PROGRAM, 8, scramble_state )
@@ -540,7 +540,7 @@ INPUT_PORTS_END
 /* ckongs coinage DIPs are spread across two input ports */
 CUSTOM_INPUT_MEMBER(scramble_state::ckongs_coinage_r)
 {
-	int bit_mask = (FPTR)param;
+	int bit_mask = (uintptr_t)param;
 	return (ioport("FAKE")->read() & bit_mask) ? 0x01 : 0x00;
 }
 
@@ -1291,7 +1291,7 @@ GFXDECODE_END
 
 /**************************************************************************/
 
-static MACHINE_CONFIG_START( scramble, scramble_state )
+static MACHINE_CONFIG_START( scramble )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 18432000/6)    /* 3.072 MHz */
@@ -1569,7 +1569,7 @@ static MACHINE_CONFIG_DERIVED( hncholms, hunchbks )
 	MCFG_VIDEO_START_OVERRIDE(scramble_state,scorpion)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ad2083, scramble_state )
+static MACHINE_CONFIG_START( ad2083 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 18432000/6)    /* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(ad2083_map)
@@ -2257,7 +2257,7 @@ GAME( 1983, mrkougb2, mrkougar, mrkougb,  mrkougar, scramble_state, mrkougb,    
 GAME( 1982, hotshock, 0,        hotshock, hotshock, scramble_state, hotshock,     ROT90, "E.G. Felaco (Domino license)", "Hot Shocker",           MACHINE_SUPPORTS_SAVE )
 GAME( 1982, hotshockb,hotshock, hotshock, hotshock, scramble_state, hotshock,     ROT90, "E.G. Felaco",         "Hot Shocker (early revision?)",  MACHINE_SUPPORTS_SAVE ) // has "Dudley presents" (protagonist of the game), instead of Domino
 
-GAME( 198?, conquer,  0,        hotshock, hotshock, driver_device,  0,            ROT90, "<unknown>",           "Conqueror",                      MACHINE_NOT_WORKING   )
+GAME( 198?, conquer,  0,        hotshock, hotshock, scramble_state, 0,            ROT90, "<unknown>",           "Conqueror",                      MACHINE_NOT_WORKING   )
 
 GAME( 1983, hunchbks, hunchbak, hunchbks, hunchbks, scramble_state, scramble_ppi, ROT90, "Century Electronics", "Hunchback (Scramble hardware)",  MACHINE_SUPPORTS_SAVE )
 GAME( 1983, hunchbks2,hunchbak, hunchbks, hunchbks, scramble_state, scramble_ppi, ROT90, "bootleg (Sig)",       "Hunchback (Scramble hardware, bootleg)",  MACHINE_SUPPORTS_SAVE )

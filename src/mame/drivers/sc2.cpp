@@ -13,8 +13,10 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/z80pio.h"
 #include "sound/beep.h"
+#include "machine/z80pio.h"
+#include "speaker.h"
+
 #include "sc2.lh"
 
 class sc2_state : public driver_device
@@ -32,11 +34,11 @@ public:
 	DECLARE_WRITE8_MEMBER(pio_port_a_w);
 	DECLARE_WRITE8_MEMBER(pio_port_b_w);
 	DECLARE_READ8_MEMBER(sc2_beep);
-	UINT8 m_kp_matrix;
-	UINT8 m_led_7seg_data[4];
-	UINT8 m_led_selected;
-	UINT8 m_digit_data;
-	UINT8 m_beep_state;
+	uint8_t m_kp_matrix;
+	uint8_t m_led_7seg_data[4];
+	uint8_t m_led_selected;
+	uint8_t m_digit_data;
+	uint8_t m_beep_state;
 	void sc2_update_display();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -45,7 +47,7 @@ public:
 
 READ8_MEMBER( sc2_state::sc2_beep )
 {
-	//if (!space.debugger_access())
+	//if (!machine().side_effect_disabled())
 	{
 		m_beep_state = ~m_beep_state;
 
@@ -116,7 +118,7 @@ void sc2_state::machine_reset()
 
 void sc2_state::sc2_update_display()
 {
-	UINT8 digit_data = BITSWAP8( m_digit_data,7,0,1,2,3,4,5,6 ) & 0x7f;
+	uint8_t digit_data = BITSWAP8( m_digit_data,7,0,1,2,3,4,5,6 ) & 0x7f;
 
 	if (!BIT(m_led_selected, 0))
 	{
@@ -154,7 +156,7 @@ READ8_MEMBER( sc2_state::pio_port_a_r )
 
 READ8_MEMBER( sc2_state::pio_port_b_r )
 {
-	UINT8 data = m_led_selected & 0x0f;
+	uint8_t data = m_led_selected & 0x0f;
 
 	if (BIT(m_kp_matrix, 0))
 	{
@@ -195,7 +197,7 @@ WRITE8_MEMBER( sc2_state::pio_port_b_w )
 		m_kp_matrix = data;
 }
 
-static MACHINE_CONFIG_START( sc2, sc2_state )
+static MACHINE_CONFIG_START( sc2 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(sc2_mem)
@@ -234,5 +236,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY                        FULLNAME       FLAGS */
-COMP( 1981, sc2,    0,      0,       sc2,       sc2, driver_device,     0,  "VEB Mikroelektronik Erfurt", "Schachcomputer SC2", MACHINE_SUPPORTS_SAVE)
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  STATE      INIT  COMPANY                       FULLNAME              FLAGS
+COMP( 1981, sc2,  0,      0,      sc2,     sc2,   sc2_state, 0,    "VEB Mikroelektronik Erfurt", "Schachcomputer SC2", MACHINE_SUPPORTS_SAVE )

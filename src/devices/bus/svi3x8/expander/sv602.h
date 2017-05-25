@@ -6,12 +6,11 @@
 
 ***************************************************************************/
 
+#ifndef MAME_BUS_SVI3X8_EXPANDER_SV602_H
+#define MAME_BUS_SVI3X8_EXPANDER_SV602_H
+
 #pragma once
 
-#ifndef __SVI3X8_EXPANDER_SV602_H__
-#define __SVI3X8_EXPANDER_SV602_H__
-
-#include "emu.h"
 #include "expander.h"
 #include "bus/svi3x8/slot/slot.h"
 
@@ -26,7 +25,7 @@ class sv602_device : public device_t, public device_svi_expander_interface
 {
 public:
 	// construction/destruction
-	sv602_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sv602_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// from slots
 	WRITE_LINE_MEMBER( int_w );
@@ -53,6 +52,6 @@ private:
 };
 
 // device type definition
-extern const device_type SV602;
+DECLARE_DEVICE_TYPE(SV602, sv602_device)
 
-#endif // __SVI3X8_EXPANDER_SV602_H__
+#endif // MAME_BUS_SVI3X8_EXPANDER_SV602_H

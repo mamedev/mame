@@ -664,7 +664,7 @@
 		</part>
 	</software>
 
-	<software name="scarrya" cloneof="scarry">
+	<software name="scarrya" cloneof="scarry" supported="no">
 		<description>Richard Scarry's Best Electronic Wordbook Ever (320K Disk)</description>
 		<year>1984</year>
 		<publisher>Coleco</publisher>
@@ -3688,7 +3688,7 @@
 		</part>
 	</software>
 
-	<software name="wackywrda" cloneof="wackywrd">
+	<software name="wackywrda" cloneof="wackywrd" supported="no">
 		<description>Wacky Word Games (Alt)</description>
 		<year>1984</year>
 		<publisher>Coleco</publisher>
@@ -5950,7 +5950,7 @@
 		</part>
 	</software>
 
-	<software name="celestnv a" cloneof="celestnv">
+	<software name="celestnva" cloneof="celestnv">
 		<description>Celestial and Great Circle Navigation (No Code, Hacked?)</description>
 		<year>1987</year>
 		<publisher>Gore Aviation</publisher>
@@ -8355,12 +8355,12 @@
 		</part>
 	</software>
 
-	<software name="adamforma" cloneof="adamform">
+	<software name="adamforma" cloneof="adamform" supported="no">
 		<description>ADAM Format Utility (AJM Software, v2.1, Alt)</description>
 		<year>1990</year>
 		<publisher>AJM Software</publisher>
 
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="adam format utility v2.1 (1990) (ajm software) [a1].dsk" size="1474560" crc="231c9729" sha1="3ab9cc170251067f1f3a4930d32049f42b8686be" offset="0" />
 			</dataarea>
@@ -17629,7 +17629,7 @@
 		</part>
 	</software>
 
-	<software name="ann1004">
+	<software name="ann1004" supported="no">
 		<description>ANN Disk - 2010-04 - E.O.S. Files (CORRUPT)</description>
 		<year>2010</year>
 		<publisher>ADAM News Network</publisher>

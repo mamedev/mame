@@ -145,16 +145,17 @@ REF. 970429
 **************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
 #include "includes/gaelco3d.h"
-#include "cpu/tms32031/tms32031.h"
+
 #include "cpu/adsp2100/adsp2100.h"
+#include "cpu/m68000/m68000.h"
+#include "cpu/tms32031/tms32031.h"
 #include "machine/eepromser.h"
 
+#include "speaker.h"
+
+
 #define LOG             0
-
-
-
 
 
 WRITE_LINE_MEMBER(gaelco3d_state::ser_irq)
@@ -188,16 +189,16 @@ void gaelco3d_state::machine_start()
 
 MACHINE_RESET_MEMBER(gaelco3d_state,common)
 {
-	UINT16 *src;
+	uint16_t *src;
 	int i;
 
 	m_framenum = 0;
 
 	/* boot the ADSP chip */
-	src = (UINT16 *)memregion("user1")->base();
+	src = (uint16_t *)memregion("user1")->base();
 	for (i = 0; i < (src[3] & 0xff) * 8; i++)
 	{
-		UINT32 opcode = ((src[i*4+0] & 0xff) << 16) | ((src[i*4+1] & 0xff) << 8) | (src[i*4+2] & 0xff);
+		uint32_t opcode = ((src[i*4+0] & 0xff) << 16) | ((src[i*4+1] & 0xff) << 8) | (src[i*4+2] & 0xff);
 		m_adsp_ram_base[i] = opcode;
 	}
 
@@ -272,13 +273,13 @@ WRITE32_MEMBER(gaelco3d_state::irq_ack32_w)
 
 READ16_MEMBER(gaelco3d_state::eeprom_data_r)
 {
-	UINT32 result = 0xffff;
+	uint32_t result = 0xffff;
 
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0 is clock */
 		/* bit 1 active */
-		result &= ~GAELCOSER_EXT_STATUS_MASK;
+		result &= ~uint32_t(gaelco_serial_device::EXT_STATUS_MASK);
 		result |= m_serial->status_r(space, 0);
 	}
 
@@ -295,7 +296,7 @@ READ32_MEMBER(gaelco3d_state::eeprom_data32_r)
 		return (eeprom_data_r(space, 0, mem_mask >> 16) << 16) | 0xffff;
 	else if (ACCESSING_BITS_0_7)
 	{
-		UINT8 data = m_serial->data_r(space,0);
+		uint8_t data = m_serial->data_r(space,0);
 		if (LOG)
 			logerror("%06X:read(%02X) = %08X & %08X\n", m_maincpu->pc(), offset, data, mem_mask);
 		return  data | 0xffffff00;
@@ -397,7 +398,7 @@ WRITE16_MEMBER(gaelco3d_state::sound_status_w)
 
 CUSTOM_INPUT_MEMBER(gaelco3d_state::analog_bit_r)
 {
-	int which = (FPTR)param;
+	int which = (uintptr_t)param;
 	return (m_analog_ports[which] >> 7) & 0x01;
 }
 
@@ -430,10 +431,10 @@ WRITE16_MEMBER(gaelco3d_state::analog_port_latch_w)
 	{
 		if (!(data & 0xff))
 		{
-			m_analog_ports[0] = read_safe(ioport("ANALOG0"), 0);
-			m_analog_ports[1] = read_safe(ioport("ANALOG1"), 0);
-			m_analog_ports[2] = read_safe(ioport("ANALOG2"), 0);
-			m_analog_ports[3] = read_safe(ioport("ANALOG3"), 0);
+			m_analog_ports[0] = m_analog[0].read_safe(0);
+			m_analog_ports[1] = m_analog[1].read_safe(0);
+			m_analog_ports[2] = m_analog[2].read_safe(0);
+			m_analog_ports[3] = m_analog[3].read_safe(0);
 		}
 	}
 	else
@@ -454,8 +455,8 @@ WRITE16_MEMBER(gaelco3d_state::analog_port_latch_w)
 
 READ32_MEMBER(gaelco3d_state::tms_m68k_ram_r)
 {
-//  logerror("%06X:tms_m68k_ram_r(%04X) = %08X\n", space.device().safe_pc(), offset, !(offset & 1) ? ((INT32)m_m68k_ram_base[offset/2] >> 16) : (int)(INT16)m_m68k_ram_base[offset/2]);
-	return (INT32)(INT16)m_m68k_ram_base[offset ^ m_tms_offset_xor];
+//  logerror("%06X:tms_m68k_ram_r(%04X) = %08X\n", space.device().safe_pc(), offset, !(offset & 1) ? ((int32_t)m_m68k_ram_base[offset/2] >> 16) : (int)(int16_t)m_m68k_ram_base[offset/2]);
+	return (int32_t)(int16_t)m_m68k_ram_base[offset ^ m_tms_offset_xor];
 }
 
 
@@ -613,7 +614,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(gaelco3d_state::adsp_autobuffer_irq)
 	/* copy the current data into the buffer */
 // logerror("ADSP buffer: I%d=%04X incs=%04X size=%04X\n", m_adsp_ireg, reg, m_adsp_incs, m_adsp_size);
 	if (m_adsp_incs)
-		dmadac_transfer(&m_dmadac[0], SOUND_CHANNELS, m_adsp_incs, SOUND_CHANNELS * m_adsp_incs, m_adsp_size / (SOUND_CHANNELS * m_adsp_incs), (INT16 *)&m_adsp_fastram_base[reg - 0x3800]);
+		dmadac_transfer(&m_dmadac[0], SOUND_CHANNELS, m_adsp_incs, SOUND_CHANNELS * m_adsp_incs, m_adsp_size / (SOUND_CHANNELS * m_adsp_incs), (int16_t *)&m_adsp_fastram_base[reg - 0x3800]);
 
 	/* increment it */
 	reg += m_adsp_size;
@@ -625,7 +626,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(gaelco3d_state::adsp_autobuffer_irq)
 		reg = m_adsp_ireg_base;
 
 		/* generate the (internal, thats why the pulse) irq */
-		generic_pulse_irq_line(m_adsp, ADSP2105_IRQ1, 1);
+		generic_pulse_irq_line(*m_adsp, ADSP2105_IRQ1, 1);
 	}
 
 	/* store it */
@@ -646,7 +647,7 @@ WRITE32_MEMBER(gaelco3d_state::adsp_tx_callback)
 		{
 			/* get the autobuffer registers */
 			int     mreg, lreg;
-			UINT16  source;
+			uint16_t  source;
 			attotime sample_period;
 
 			m_adsp_ireg = (m_adsp_control_regs[S1_AUTOBUF_REG] >> 9) & 7;
@@ -949,7 +950,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( gaelco3d, gaelco3d_state )
+static MACHINE_CONFIG_START( gaelco3d )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 15000000)
@@ -1221,6 +1222,38 @@ ROM_START( radikalba )
 //  ROM_LOAD( "rab.35", 0x0060000, 0x020000, CRC(bbcf6977) SHA1(0282c8ba79c35ed1240711d5812bfb590d151738) )
 ROM_END
 
+ROM_START( footbpow )
+	ROM_REGION( 0x200000, "maincpu", 0 )    /* 68020 code */
+	ROM_LOAD32_BYTE( "fop_7.ic7",   0x000000, 0x80000, CRC(a2d7ec69) SHA1(27e4f3d27882152244c0f9d5a984e0f1bd7b7d3f) )
+	ROM_LOAD32_BYTE( "fop_12.ic12", 0x000001, 0x80000, CRC(443caf77) SHA1(2b0c6dccee28fb3caa0b2493f59ddbd29897aed9) )
+	ROM_LOAD32_BYTE( "fop_13.ic13", 0x000002, 0x80000, CRC(57723eda) SHA1(09972b09444b6704dcc966033bfab61ea57d0cd0) )
+	ROM_LOAD32_BYTE( "fop_19.ic19", 0x000003, 0x80000, CRC(aa59cd2d) SHA1(7cc6edfd0896e4d2c881b16d5ad07361bdeff11d) )
+
+	ROM_REGION16_LE( 0x400000, "user1", 0 ) /* ADSP-2115 code & data */
+	ROM_LOAD( "fop_ic23.ic23", 0x0000000, 0x400000, CRC(3c02f7c6) SHA1(2325f2a1b260ac60929c82640ced481ad67bb2e0) )
+
+	ROM_REGION32_LE( 0x800000, "user2", 0 )
+	ROM_LOAD32_WORD( "fop_ic48.ic48", 0x000000, 0x400000, CRC(09ae0cde) SHA1(30dc06e8f36674986f2271054a9708f7dfdaf485) ) // redumped
+	ROM_LOAD32_WORD( "fop_ic42.ic42", 0x000002, 0x400000, CRC(da1f9461) SHA1(8b69ceb4221f6231c6eff0645359d6c2ae6d9d96) ) // redumped
+
+	ROM_REGION( 0x2000000, "gfx1", 0 )
+	ROM_LOAD( "fop_ic8.ic8",   0x0000000, 0x400000, CRC(eaff30ec) SHA1(63f5d33b98194a206c558f9e02c432e7e05aa0e6) )
+	ROM_LOAD( "fop_ic10.ic10", 0x0800000, 0x400000, CRC(536c822b) SHA1(235e96af470785f6cca010782560a4071f285901) )
+	ROM_LOAD( "fop_ic15.ic15", 0x1000000, 0x400000, CRC(c8903051) SHA1(b5927a0bbba017d42b98e7850df966cfa9eeb64a) )
+	ROM_LOAD( "fop_ic17.ic17", 0x1c00000, 0x400000, CRC(559a38ae) SHA1(e36d596ad90d0f3657d677e3afa984be30c1fa3b) ) // redumped
+
+	ROM_REGION( 0x0080000, "gfx2", 0 )
+	ROM_LOAD( "fop_24.ic24", 0x0000000, 0x020000, CRC(3214ae1b) SHA1(3ae2fa28ef603b34b3c72313c513f200e2750b85) )
+	ROM_LOAD( "fop_25.ic25", 0x0020000, 0x020000, CRC(69a8734c) SHA1(835db85371d8fbf0c1a2bc0c6109286f12c95794) )
+	ROM_LOAD( "fop_26.ic26", 0x0040000, 0x020000, CRC(b5877b68) SHA1(6f6f00da84d6d84895691266c2022fd4cd92f228) )
+	ROM_LOAD( "fop_27.ic27", 0x0060000, 0x020000, CRC(58309912) SHA1(eb62ccfd75fc168338d30bc30214e6f9f62e5e70) )
+	/* these 4 are copies of the previous 4 */
+//	ROM_LOAD( "fop_34.ic34", 0x0000000, 0x020000, CRC(3214ae1b) SHA1(3ae2fa28ef603b34b3c72313c513f200e2750b85) )
+//	ROM_LOAD( "fop_35.ic35", 0x0020000, 0x020000, CRC(69a8734c) SHA1(835db85371d8fbf0c1a2bc0c6109286f12c95794) )
+//	ROM_LOAD( "fop_36.ic36", 0x0040000, 0x020000, CRC(b5877b68) SHA1(6f6f00da84d6d84895691266c2022fd4cd92f228) )
+//	ROM_LOAD( "fop_37.ic37", 0x0060000, 0x020000, CRC(58309912) SHA1(eb62ccfd75fc168338d30bc30214e6f9f62e5e70) )
+ROM_END
+
 
 /*************************************
  *
@@ -1248,3 +1281,5 @@ GAME( 1997, surfplnt40, surfplnt, gaelco3d,  surfplnt, gaelco3d_state, gaelco3d,
 
 GAME( 1998, radikalb,   0,        gaelco3d2, radikalb, gaelco3d_state, gaelco3d, ROT0, "Gaelco",                 "Radikal Bikers (Version 2.02)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
 GAME( 1998, radikalba,  radikalb, gaelco3d2, radikalb, gaelco3d_state, gaelco3d, ROT0, "Gaelco (Atari license)", "Radikal Bikers (Version 2.02, Atari license)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
+
+GAME( 2000, footbpow,   0,        gaelco3d2, radikalb, gaelco3d_state, gaelco3d, ROT0, "Gaelco",                 "Football Power",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING)

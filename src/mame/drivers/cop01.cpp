@@ -54,10 +54,13 @@ Mighty Guy board layout:
 
 ***************************************************************************/
 #include "emu.h"
+#include "includes/cop01.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "sound/3526intf.h"
-#include "includes/cop01.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 #define MIGHTGUY_HACK    0
@@ -99,7 +102,7 @@ READ8_MEMBER(cop01_state::cop01_sound_command_r)
 
 CUSTOM_INPUT_MEMBER(cop01_state::mightguy_area_r)
 {
-	int bit_mask = (FPTR)param;
+	int bit_mask = (uintptr_t)param;
 	return (ioport("FAKE")->read() & bit_mask) ? 0x01 : 0x00;
 }
 
@@ -443,7 +446,7 @@ void cop01_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( cop01, cop01_state )
+static MACHINE_CONFIG_START( cop01 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAINCPU_CLOCK/2)   /* unknown clock / divider */
@@ -485,7 +488,7 @@ static MACHINE_CONFIG_START( cop01, cop01_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( mightguy, cop01_state )
+static MACHINE_CONFIG_START( mightguy )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAINCPU_CLOCK/2)   /* unknown divider */
@@ -647,7 +650,7 @@ DRIVER_INIT_MEMBER(cop01_state,mightguy)
 #if MIGHTGUY_HACK
 	/* This is a hack to fix the game code to get a fully working
 	   "Starting Area" fake Dip Switch */
-	UINT8 *RAM = (UINT8 *)memregion("maincpu")->base();
+	uint8_t *RAM = (uint8_t *)memregion("maincpu")->base();
 	RAM[0x00e4] = 0x07; // rlca
 	RAM[0x00e5] = 0x07; // rlca
 	RAM[0x00e6] = 0x07; // rlca
@@ -664,6 +667,6 @@ DRIVER_INIT_MEMBER(cop01_state,mightguy)
  *
  *************************************/
 
-GAME( 1985, cop01,    0,     cop01,    cop01, driver_device,    0,        ROT0,   "Nichibutsu", "Cop 01 (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, cop01a,   cop01, cop01,    cop01, driver_device,    0,        ROT0,   "Nichibutsu", "Cop 01 (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, mightguy, 0,     mightguy, mightguy, cop01_state, mightguy, ROT270, "Nichibutsu", "Mighty Guy", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, cop01,    0,     cop01,    cop01,    cop01_state, 0,        ROT0,   "Nichibutsu", "Cop 01 (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, cop01a,   cop01, cop01,    cop01,    cop01_state, 0,        ROT0,   "Nichibutsu", "Cop 01 (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, mightguy, 0,     mightguy, mightguy, cop01_state, mightguy, ROT270, "Nichibutsu", "Mighty Guy",     MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

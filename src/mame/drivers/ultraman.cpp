@@ -12,12 +12,15 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/ultraman.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/watchdog.h"
 #include "sound/ym2151.h"
 #include "sound/okim6295.h"
-#include "includes/ultraman.h"
+#include "speaker.h"
+
 
 WRITE16_MEMBER(ultraman_state::sound_cmd_w)
 {
@@ -173,7 +176,7 @@ void ultraman_state::machine_reset()
 	m_bank2 = -1;
 }
 
-static MACHINE_CONFIG_START( ultraman, ultraman_state )
+static MACHINE_CONFIG_START( ultraman )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,24000000/2)      /* 12 MHz? */
@@ -230,7 +233,7 @@ static MACHINE_CONFIG_START( ultraman, ultraman_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END
@@ -275,4 +278,4 @@ ROM_START( ultraman )
 ROM_END
 
 
-GAME( 1991, ultraman, 0, ultraman, ultraman, driver_device, 0, ROT0, "Banpresto / Bandai", "Ultraman (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ultraman, 0, ultraman, ultraman, ultraman_state, 0, ROT0, "Banpresto / Bandai", "Ultraman (Japan)", MACHINE_SUPPORTS_SAVE )

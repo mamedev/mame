@@ -23,7 +23,7 @@
 ***************************************************************************/
 
 // tracks are padded to a multiple of this many frames
-const UINT32 CD_TRACK_PADDING = 4;
+const uint32_t CD_TRACK_PADDING = 4;
 
 #define CD_MAX_TRACKS           (99)    /* AFAIK the theoretical limit */
 #define CD_MAX_SECTOR_DATA      (2352)
@@ -67,33 +67,33 @@ struct cdrom_file;
 struct cdrom_track_info
 {
 	/* fields used by CHDMAN and in MAME */
-	UINT32 trktype;     /* track type */
-	UINT32 subtype;     /* subcode data type */
-	UINT32 datasize;    /* size of data in each sector of this track */
-	UINT32 subsize;     /* size of subchannel data in each sector of this track */
-	UINT32 frames;      /* number of frames in this track */
-	UINT32 extraframes; /* number of "spillage" frames in this track */
-	UINT32 pregap;      /* number of pregap frames */
-	UINT32 postgap;     /* number of postgap frames */
-	UINT32 pgtype;      /* type of sectors in pregap */
-	UINT32 pgsub;       /* type of subchannel data in pregap */
-	UINT32 pgdatasize;  /* size of data in each sector of the pregap */
-	UINT32 pgsubsize;   /* size of subchannel data in each sector of the pregap */
+	uint32_t trktype;     /* track type */
+	uint32_t subtype;     /* subcode data type */
+	uint32_t datasize;    /* size of data in each sector of this track */
+	uint32_t subsize;     /* size of subchannel data in each sector of this track */
+	uint32_t frames;      /* number of frames in this track */
+	uint32_t extraframes; /* number of "spillage" frames in this track */
+	uint32_t pregap;      /* number of pregap frames */
+	uint32_t postgap;     /* number of postgap frames */
+	uint32_t pgtype;      /* type of sectors in pregap */
+	uint32_t pgsub;       /* type of subchannel data in pregap */
+	uint32_t pgdatasize;  /* size of data in each sector of the pregap */
+	uint32_t pgsubsize;   /* size of subchannel data in each sector of the pregap */
 
 	/* fields used in CHDMAN only */
-	UINT32 padframes;   /* number of frames of padding to add to the end of the track; needed for GDI */
+	uint32_t padframes;   /* number of frames of padding to add to the end of the track; needed for GDI */
 
 	/* fields used in MAME/MESS only */
-	UINT32 logframeofs; /* logical frame of actual track data - offset by pregap size if pregap not physically present */
-	UINT32 physframeofs; /* physical frame of actual track data in CHD data */
-	UINT32 chdframeofs; /* frame number this track starts at on the CHD */
+	uint32_t logframeofs; /* logical frame of actual track data - offset by pregap size if pregap not physically present */
+	uint32_t physframeofs; /* physical frame of actual track data in CHD data */
+	uint32_t chdframeofs; /* frame number this track starts at on the CHD */
 };
 
 
 struct cdrom_toc
 {
-	UINT32 numtrks;     /* number of tracks */
-	UINT32 flags;       /* see FLAG_ above */
+	uint32_t numtrks;     /* number of tracks */
+	uint32_t flags;       /* see FLAG_ above */
 	cdrom_track_info tracks[CD_MAX_TRACKS];
 };
 
@@ -110,13 +110,13 @@ void cdrom_close(cdrom_file *file);
 cdrom_file *cdrom_open(const char *inputfile);
 
 /* core read access */
-UINT32 cdrom_read_data(cdrom_file *file, UINT32 lbasector, void *buffer, UINT32 datatype, bool phys=false);
-UINT32 cdrom_read_subcode(cdrom_file *file, UINT32 lbasector, void *buffer, bool phys=false);
+uint32_t cdrom_read_data(cdrom_file *file, uint32_t lbasector, void *buffer, uint32_t datatype, bool phys=false);
+uint32_t cdrom_read_subcode(cdrom_file *file, uint32_t lbasector, void *buffer, bool phys=false);
 
 /* handy utilities */
-UINT32 cdrom_get_track(cdrom_file *file, UINT32 frame);
-UINT32 cdrom_get_track_start(cdrom_file *file, UINT32 track);
-UINT32 cdrom_get_track_start_phys(cdrom_file *file, UINT32 track);
+uint32_t cdrom_get_track(cdrom_file *file, uint32_t frame);
+uint32_t cdrom_get_track_start(cdrom_file *file, uint32_t track);
+uint32_t cdrom_get_track_start_phys(cdrom_file *file, uint32_t track);
 
 /* TOC utilities */
 int cdrom_get_last_track(cdrom_file *file);
@@ -129,15 +129,15 @@ void cdrom_convert_type_string_to_track_info(const char *typestring, cdrom_track
 void cdrom_convert_type_string_to_pregap_info(const char *typestring, cdrom_track_info *info);
 void cdrom_convert_subtype_string_to_track_info(const char *typestring, cdrom_track_info *info);
 void cdrom_convert_subtype_string_to_pregap_info(const char *typestring, cdrom_track_info *info);
-const char *cdrom_get_type_string(UINT32 trktype);
-const char *cdrom_get_subtype_string(UINT32 subtype);
+const char *cdrom_get_type_string(uint32_t trktype);
+const char *cdrom_get_subtype_string(uint32_t subtype);
 chd_error cdrom_parse_metadata(chd_file *chd, cdrom_toc *toc);
 chd_error cdrom_write_metadata(chd_file *chd, const cdrom_toc *toc);
 
 // ECC utilities
-bool ecc_verify(const UINT8 *sector);
-void ecc_generate(UINT8 *sector);
-void ecc_clear(UINT8 *sector);
+bool ecc_verify(const uint8_t *sector);
+void ecc_generate(uint8_t *sector);
+void ecc_clear(uint8_t *sector);
 
 
 
@@ -145,14 +145,14 @@ void ecc_clear(UINT8 *sector);
     INLINE FUNCTIONS
 ***************************************************************************/
 
-static inline UINT32 msf_to_lba(UINT32 msf)
+static inline uint32_t msf_to_lba(uint32_t msf)
 {
 	return ( ((msf&0x00ff0000)>>16) * 60 * 75) + (((msf&0x0000ff00)>>8) * 75) + ((msf&0x000000ff)>>0);
 }
 
-static inline UINT32 lba_to_msf(UINT32 lba)
+static inline uint32_t lba_to_msf(uint32_t lba)
 {
-	UINT8 m, s, f;
+	uint8_t m, s, f;
 
 	m = lba / (60 * 75);
 	lba -= m * (60 * 75);
@@ -167,9 +167,9 @@ static inline UINT32 lba_to_msf(UINT32 lba)
 // segacd needs it like this.. investigate
 // Angelo also says PCE tracks often start playing at the
 // wrong address.. related?
-static inline UINT32 lba_to_msf_alt(int lba)
+static inline uint32_t lba_to_msf_alt(int lba)
 {
-	UINT32 ret = 0;
+	uint32_t ret = 0;
 
 	ret |= ((lba / (60 * 75))&0xff)<<16;
 	ret |= (((lba / 75) % 60)&0xff)<<8;

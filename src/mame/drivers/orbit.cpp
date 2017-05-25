@@ -20,10 +20,12 @@ Atari Orbit Driver
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6800/m6800.h"
 #include "includes/orbit.h"
+
+#include "cpu/m6800/m6800.h"
 #include "machine/watchdog.h"
 #include "sound/discrete.h"
+#include "speaker.h"
 
 
 #define MASTER_CLOCK        XTAL_12_096MHz
@@ -62,7 +64,7 @@ INTERRUPT_GEN_MEMBER(orbit_state::orbit_interrupt)
  *
  *************************************/
 
-void orbit_state::update_misc_flags(address_space &space, UINT8 val)
+void orbit_state::update_misc_flags(address_space &space, uint8_t val)
 {
 	m_misc_flags = val;
 
@@ -87,7 +89,7 @@ void orbit_state::update_misc_flags(address_space &space, UINT8 val)
 
 WRITE8_MEMBER(orbit_state::orbit_misc_w)
 {
-	UINT8 bit = offset >> 1;
+	uint8_t bit = offset >> 1;
 
 	if (offset & 1)
 		update_misc_flags(space, m_misc_flags | (1 << bit));
@@ -289,7 +291,7 @@ void orbit_state::machine_reset()
  *
  *************************************/
 
-static MACHINE_CONFIG_START( orbit, orbit_state )
+static MACHINE_CONFIG_START( orbit )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, MASTER_CLOCK / 16)
@@ -363,4 +365,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1978, orbit, 0, orbit, orbit, driver_device, 0, 0, "Atari", "Orbit", MACHINE_SUPPORTS_SAVE )
+GAME( 1978, orbit, 0, orbit, orbit, orbit_state, 0, 0, "Atari", "Orbit", MACHINE_SUPPORTS_SAVE )

@@ -83,6 +83,8 @@ PROM  : Type MB7051
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "video/resnet.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class shougi_state : public driver_device
@@ -101,10 +103,10 @@ public:
 	required_device<cpu_device> m_subcpu;
 	required_device<alpha_8201_device> m_alpha_8201;
 
-	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<uint8_t> m_videoram;
 
-	UINT8 m_control[8];
-	UINT8 m_nmi_enabled;
+	uint8_t m_control[8];
+	uint8_t m_nmi_enabled;
 	int m_r;
 
 	DECLARE_WRITE8_MEMBER(control_w);
@@ -112,7 +114,7 @@ public:
 
 	DECLARE_PALETTE_INIT(shougi);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_nmi);
 
 	virtual void machine_start() override;
@@ -165,7 +167,7 @@ void shougi_state::machine_reset()
 
 PALETTE_INIT_MEMBER(shougi_state, shougi)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances_b[2]  = { 470, 220 };
 	static const int resistances_rg[3] = { 1000, 470, 220 };
 	double weights_r[3], weights_g[3], weights_b[2];
@@ -201,7 +203,7 @@ PALETTE_INIT_MEMBER(shougi_state, shougi)
 }
 
 
-UINT32 shougi_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t shougi_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	for (int offs = 0; offs < 0x4000; offs++)
 	{
@@ -396,7 +398,7 @@ INTERRUPT_GEN_MEMBER(shougi_state::vblank_nmi)
 }
 
 
-static MACHINE_CONFIG_START( shougi, shougi_state )
+static MACHINE_CONFIG_START( shougi )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_10MHz/4)
@@ -487,6 +489,6 @@ ROM_START( shougi2 )
 ROM_END
 
 
-/*    YEAR  NAME     PARENT  MACHINE  INPUT    INIT              MONITOR, COMPANY, FULLNAME, FLAGS */
-GAME( 1982, shougi,  0,      shougi,  shougi,  driver_device, 0, ROT0, "Alpha Denshi Co. (Tehkan license)", "Shougi", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, shougi2, 0,      shougi,  shougi2, driver_device, 0, ROT0, "Alpha Denshi Co. (Tehkan license)", "Shougi Part II", MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME     PARENT  MACHINE  INPUT    STATE         INIT  MONITOR  COMPANY                              FULLNAME          FLAGS */
+GAME( 1982, shougi,  0,      shougi,  shougi,  shougi_state, 0,    ROT0,    "Alpha Denshi Co. (Tehkan license)", "Shougi",         MACHINE_SUPPORTS_SAVE )
+GAME( 1982, shougi2, 0,      shougi,  shougi2, shougi_state, 0,    ROT0,    "Alpha Denshi Co. (Tehkan license)", "Shougi Part II", MACHINE_SUPPORTS_SAVE )

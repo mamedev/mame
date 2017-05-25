@@ -82,9 +82,11 @@
 
 #include "emu.h"
 #include "cpu/s2650/s2650.h"
-#include "sound/speaker.h"
 #include "imagedev/cassette.h"
+#include "sound/spkrdev.h"
 #include "sound/wave.h"
+#include "speaker.h"
+
 #include "dolphunk.lh"
 
 
@@ -105,8 +107,8 @@ public:
 	DECLARE_WRITE8_MEMBER(port06_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(dauphin_c);
 private:
-	UINT8 m_cass_data;
-	UINT8 m_last_key;
+	uint8_t m_cass_data;
+	uint8_t m_last_key;
 	bool m_cass_state;
 	bool m_cassold;
 	bool m_speaker_state;
@@ -138,18 +140,18 @@ WRITE8_MEMBER( dauphin_state::port06_w )
 
 READ8_MEMBER( dauphin_state::port07_r )
 {
-	UINT8 keyin, i, data = 0x40;
+	uint8_t keyin, i, data = 0x40;
 
 	keyin = ioport("X0")->read();
 	if (keyin != 0xff)
 		for (i = 0; i < 8; i++)
-			if BIT(~keyin, i)
+			if (BIT(~keyin, i))
 				data = i | 0xc0;
 
 	keyin = ioport("X1")->read();
 	if (keyin != 0xff)
 		for (i = 0; i < 8; i++)
-			if BIT(~keyin, i)
+			if (BIT(~keyin, i))
 				data = i | 0xc8;
 
 	if (data == m_last_key)
@@ -222,7 +224,7 @@ static INPUT_PORTS_START( dauphin )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( dauphin, dauphin_state )
+static MACHINE_CONFIG_START( dauphin )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",S2650, XTAL_1MHz)
 	MCFG_CPU_PROGRAM_MAP(dauphin_mem)
@@ -262,5 +264,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME       PARENT   COMPAT   MACHINE    INPUT     CLASS         INIT     COMPANY             FULLNAME   FLAGS */
-COMP( 1979, dauphin,   0,       0,       dauphin,  dauphin, driver_device, 0,     "LCD EPFL Stoppani", "Dauphin", 0 )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT    CLASS          INIT  COMPANY              FULLNAME   FLAGS
+COMP( 1979, dauphin,  0,      0,      dauphin,  dauphin, dauphin_state, 0,    "LCD EPFL Stoppani", "Dauphin", 0 )

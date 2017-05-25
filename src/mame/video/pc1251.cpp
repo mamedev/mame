@@ -99,7 +99,7 @@ static const POCKETC_FIGURE /*busy={
 
 READ8_MEMBER(pc1251_state::pc1251_lcd_read)
 {
-	UINT8 data = m_reg[offset&0xff];
+	uint8_t data = m_reg[offset&0xff];
 	logerror("pc1251 read %.3x %.2x\n",offset,data);
 	return data;
 }
@@ -113,7 +113,7 @@ WRITE8_MEMBER(pc1251_state::pc1251_lcd_write)
 #define DOWN 62
 #define RIGHT 68
 
-UINT32 pc1251_state::screen_update_pc1251(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t pc1251_state::screen_update_pc1251(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x, y, i, j;
 	int color[2];

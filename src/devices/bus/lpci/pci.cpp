@@ -80,7 +80,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type PCI_BUS = &device_creator<pci_bus_device>;
+DEFINE_DEVICE_TYPE(PCI_BUS, pci_bus_device, "pci_bus", "PCI Bus")
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -89,9 +89,9 @@ const device_type PCI_BUS = &device_creator<pci_bus_device>;
 //-------------------------------------------------
 //  pci_bus_device - constructor
 //-------------------------------------------------
-pci_bus_device::pci_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, PCI_BUS, "PCI Bus", tag, owner, clock, "pci_bus", __FILE__), m_busnum(0),
-		m_father(nullptr), m_address(0), m_devicenum(0), m_busnumber(0), m_busnumaddr(nullptr)
+pci_bus_device::pci_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, PCI_BUS, tag, owner, clock), m_busnum(0),
+	m_father(nullptr), m_address(0), m_devicenum(0), m_busnumber(0), m_busnumaddr(nullptr)
 {
 	for (auto & elem : m_devtag) {
 		elem= nullptr;
@@ -105,7 +105,7 @@ pci_bus_device::pci_bus_device(const machine_config &mconfig, const char *tag, d
 
 READ32_MEMBER( pci_bus_device::read )
 {
-	UINT32 result = 0xffffffff;
+	uint32_t result = 0xffffffff;
 	int function, reg;
 
 	offset %= 2;
@@ -207,19 +207,19 @@ WRITE32_MEMBER( pci_bus_device::write )
 
 READ64_MEMBER(pci_bus_device::read_64be)
 {
-	UINT64 result = 0;
-	mem_mask = FLIPENDIAN_INT64(mem_mask);
+	uint64_t result = 0;
+	mem_mask = flipendian_int64(mem_mask);
 	if (ACCESSING_BITS_0_31)
-		result |= (UINT64)read(space, offset * 2 + 0, mem_mask >> 0) << 0;
+		result |= (uint64_t)read(space, offset * 2 + 0, mem_mask >> 0) << 0;
 	if (ACCESSING_BITS_32_63)
-		result |= (UINT64)read(space, offset * 2 + 1, mem_mask >> 32) << 32;
-	return FLIPENDIAN_INT64(result);
+		result |= (uint64_t)read(space, offset * 2 + 1, mem_mask >> 32) << 32;
+	return flipendian_int64(result);
 }
 
 WRITE64_MEMBER(pci_bus_device::write_64be)
 {
-	data = FLIPENDIAN_INT64(data);
-	mem_mask = FLIPENDIAN_INT64(mem_mask);
+	data = flipendian_int64(data);
+	mem_mask = flipendian_int64(mem_mask);
 	if (ACCESSING_BITS_0_31)
 		write(space, offset * 2 + 0, data >> 0, mem_mask >> 0);
 	if (ACCESSING_BITS_32_63)
@@ -262,7 +262,7 @@ void pci_bus_device::device_start()
 	for (int i = 0; i < ARRAY_LENGTH(m_devtag); i++)
 	{
 		sprintf(id, "%d", i);
-		pci_connector *conn = downcast<pci_connector *>(subdevice(id));
+		pci_connector_device *conn = downcast<pci_connector_device *>(subdevice(id));
 		if (conn!=nullptr)
 			m_device[i] = conn->get_device();
 		else
@@ -311,24 +311,24 @@ pci_device_interface::~pci_device_interface()
 }
 
 
-const device_type PCI_CONNECTOR = &device_creator<pci_connector>;
+DEFINE_DEVICE_TYPE(PCI_CONNECTOR, pci_connector_device, "pci_connector", "PCI device connector abstraction")
 
 
-pci_connector::pci_connector(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, PCI_CONNECTOR, "PCI device connector abstraction", tag, owner, clock, "pci_connector", __FILE__),
+pci_connector_device::pci_connector_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, PCI_CONNECTOR, tag, owner, clock),
 	device_slot_interface(mconfig, *this)
 {
 }
 
-pci_connector::~pci_connector()
+pci_connector_device::~pci_connector_device()
 {
 }
 
-void pci_connector::device_start()
+void pci_connector_device::device_start()
 {
 }
 
-pci_device_interface *pci_connector::get_device()
+pci_device_interface *pci_connector_device::get_device()
 {
 	return dynamic_cast<pci_device_interface *>(get_card_device());
 }

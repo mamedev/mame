@@ -1,5 +1,5 @@
 /* Aes.c -- AES encryption / decryption
-2015-02-23 : Igor Pavlov : Public domain */
+2016-05-21 : Igor Pavlov : Public domain */
 
 #include "Precomp.h"
 
@@ -167,10 +167,10 @@ void MY_FAST_CALL Aes_SetKey_Dec(UInt32 *w, const Byte *key, unsigned keySize)
   {
     UInt32 r = w[i];
     w[i] =
-      D[        Sbox[gb0(r)]] ^
-      D[0x100 + Sbox[gb1(r)]] ^
-      D[0x200 + Sbox[gb2(r)]] ^
-      D[0x300 + Sbox[gb3(r)]];
+      D[        (unsigned)Sbox[gb0(r)]] ^
+      D[0x100 + (unsigned)Sbox[gb1(r)]] ^
+      D[0x200 + (unsigned)Sbox[gb2(r)]] ^
+      D[0x300 + (unsigned)Sbox[gb3(r)]];
   }
 }
 

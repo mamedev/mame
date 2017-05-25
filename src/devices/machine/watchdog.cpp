@@ -9,25 +9,27 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "emuopts.h"
 #include "watchdog.h"
+
+#include "emuopts.h"
+#include "screen.h"
 
 
 //**************************************************************************
 //  WATCHDOG TIMER DEVICE
 //**************************************************************************
 
-const device_type WATCHDOG_TIMER = &device_creator<watchdog_timer_device>;
+DEFINE_DEVICE_TYPE(WATCHDOG_TIMER, watchdog_timer_device, "watchdog", "Watchdog Timer")
 
 //-------------------------------------------------
 //  watchdog_timer_device - constructor
 //-------------------------------------------------
 
-watchdog_timer_device::watchdog_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, WATCHDOG_TIMER, "Watchdog timer", tag, owner, clock, "watchdog", __FILE__),
-		m_vblank_count(0),
-		m_time(attotime::zero),
-		m_screen_tag(nullptr)
+watchdog_timer_device::watchdog_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, WATCHDOG_TIMER, tag, owner, clock)
+	, m_vblank_count(0)
+	, m_time(attotime::zero)
+	, m_screen_tag(nullptr)
 {
 }
 
@@ -37,7 +39,7 @@ watchdog_timer_device::watchdog_timer_device(const machine_config &mconfig, cons
 //  to set the number of VBLANKs
 //-------------------------------------------------
 
-void watchdog_timer_device::static_set_vblank_count(device_t &device, const char *screen_tag, INT32 count)
+void watchdog_timer_device::static_set_vblank_count(device_t &device, const char *screen_tag, int32_t count)
 {
 	watchdog_timer_device &watchdog = downcast<watchdog_timer_device &>(device);
 	watchdog.m_screen_tag = screen_tag;
@@ -89,7 +91,7 @@ void watchdog_timer_device::device_start()
 		// fetch the screen
 		screen_device *screen = siblingdevice<screen_device>(m_screen_tag);
 		if (screen != nullptr)
-			screen->register_vblank_callback(vblank_state_delegate(FUNC(watchdog_timer_device::watchdog_vblank), this));
+			screen->register_vblank_callback(vblank_state_delegate(&watchdog_timer_device::watchdog_vblank, this));
 	}
 	save_item(NAME(m_enabled));
 	save_item(NAME(m_counter));

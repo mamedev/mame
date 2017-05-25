@@ -7,14 +7,13 @@
 TODO:
 - Ugly text flickering in various places, namely the text when you finish level 1.
   This is due of completely busted sprite limit hook-up. (check k007121.cpp and MT #00185)
+- understand how the trackball really works for clone sets.
 - it seems that to get correct target colors in firing range III we have to
   use the WRONG lookup table (the one for tiles instead of the one for
   sprites).
 - in combatscb, wrong sprite/char priority (see cpu head at beginning of arm
   wrestling, and heads in intermission after firing range III)
-- hook up sound in bootleg (the current sound is a hack, making use of the
-  Konami ROMset)
-- understand how the trackball really works
+- improve sound hook up in bootleg.
 - YM2203 pitch is wrong. Fixing it screws up the tempo.
 
   Update: 3MHz(24MHz/8) is the more appropriate clock speed for the 2203.
@@ -122,11 +121,13 @@ Dip location and recommended settings verified with the US manual
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/combatsc.h"
+
 #include "cpu/m6809/hd6309.h"
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
 #include "sound/2203intf.h"
-#include "includes/combatsc.h"
+#include "speaker.h"
 
 
 /*************************************
@@ -268,13 +269,12 @@ READ8_MEMBER(combatsc_state::trackball_r)
 	if (offset == 0)
 	{
 		int i, dir[4];
-		static const char *const tracknames[] = { "TRACK0_Y", "TRACK0_X", "TRACK1_Y", "TRACK1_X" };
 
 		for (i = 0; i < 4; i++)
 		{
-			UINT8 curr;
+			uint8_t curr;
 
-			curr = read_safe(ioport(tracknames[i]), 0xff);
+			curr = m_track_ports[i].read_safe(0xff);
 
 			dir[i] = curr - m_pos[i];
 			m_sign[i] = dir[i] & 0x80;
@@ -340,6 +340,11 @@ WRITE8_MEMBER(combatsc_state::combatsc_portA_w)
 	/* unknown. always write 0 */
 }
 
+// causes scores to disappear during fire ranges, either sprite busy flag or screen frame number related
+READ8_MEMBER(combatsc_state::unk_r)
+{
+	return 0; //m_screen->frame_number() & 1;
+}
 
 /*************************************
  *
@@ -349,6 +354,7 @@ WRITE8_MEMBER(combatsc_state::combatsc_portA_w)
 
 static ADDRESS_MAP_START( combatsc_map, AS_PROGRAM, 8, combatsc_state )
 	AM_RANGE(0x0000, 0x0007) AM_WRITE(combatsc_pf_control_w)
+	AM_RANGE(0x001f, 0x001f) AM_READ(unk_r)
 	AM_RANGE(0x0020, 0x005f) AM_READWRITE(combatsc_scrollram_r, combatsc_scrollram_w)
 //  AM_RANGE(0x0060, 0x00ff) AM_WRITEONLY                 /* RAM */
 
@@ -362,7 +368,7 @@ static ADDRESS_MAP_START( combatsc_map, AS_PROGRAM, 8, combatsc_state )
 	AM_RANGE(0x0404, 0x0407) AM_READ(trackball_r)           /* 1P & 2P controls / trackball */
 	AM_RANGE(0x0408, 0x0408) AM_WRITE(combatsc_coin_counter_w)  /* coin counters */
 	AM_RANGE(0x040c, 0x040c) AM_WRITE(combatsc_vreg_w)
-	AM_RANGE(0x0410, 0x0410) AM_WRITE(combatsc_bankselect_w)
+	AM_RANGE(0x0410, 0x0410) AM_READNOP AM_WRITE(combatsc_bankselect_w) // read is clr a (discarded)
 	AM_RANGE(0x0414, 0x0414) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x0418, 0x0418) AM_WRITE(combatsc_sh_irqtrigger_w)
 	AM_RANGE(0x041c, 0x041c) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w) /* watchdog reset? */
@@ -640,7 +646,7 @@ GFXDECODE_END
 
 MACHINE_START_MEMBER(combatsc_state,combatsc)
 {
-	UINT8 *MEM = memregion("maincpu")->base() + 0x38000;
+	uint8_t *MEM = memregion("maincpu")->base() + 0x38000;
 
 	m_io_ram  = MEM + 0x0000;
 	m_page[0] = MEM + 0x4000;
@@ -691,7 +697,7 @@ void combatsc_state::machine_reset()
 }
 
 /* combat school (original) */
-static MACHINE_CONFIG_START( combatsc, combatsc_state )
+static MACHINE_CONFIG_START( combatsc )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309, 3000000*4)  /* 3 MHz? */
@@ -709,10 +715,11 @@ static MACHINE_CONFIG_START( combatsc, combatsc_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+//  MCFG_SCREEN_REFRESH_RATE(60)
+//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+//  MCFG_SCREEN_SIZE(32*8, 32*8)
+//  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_24MHz/3, 528, 0, 256, 256, 16, 240) // not accurate, assuming same to other Konami games (59.17)
 	MCFG_SCREEN_UPDATE_DRIVER(combatsc_state, screen_update_combatsc)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -744,7 +751,7 @@ MACHINE_CONFIG_END
 
 
 /* combat school (bootleg on different hardware) */
-static MACHINE_CONFIG_START( combatscb, combatsc_state )
+static MACHINE_CONFIG_START( combatscb )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309, 3000000*4)  /* 3 MHz? */
@@ -784,7 +791,7 @@ static MACHINE_CONFIG_START( combatscb, combatsc_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	MCFG_SOUND_ADD("msm5205", MSM5205, 384000)
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_SEX_4B)  /* 8KHz playback ?    */
+	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)  /* 8KHz playback ?    */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
@@ -997,9 +1004,9 @@ DRIVER_INIT_MEMBER(combatsc_state,combatsc)
  *
  *************************************/
 
-GAME( 1988, combatsc,  0,        combatsc,  combatsc, combatsc_state,  combatsc,  ROT0, "Konami",  "Combat School (joystick)", 0 )
-GAME( 1987, combatsct, combatsc, combatsc,  combatsct, driver_device, 0,         ROT0, "Konami",  "Combat School (trackball)", 0 )
-GAME( 1987, combatscj, combatsc, combatsc,  combatsct, driver_device, 0,         ROT0, "Konami",  "Combat School (Japan trackball)", 0 )
-GAME( 1987, bootcamp,  combatsc, combatsc,  combatsct, driver_device, 0,         ROT0, "Konami",  "Boot Camp (set 1)", 0 )
-GAME( 1987, bootcampa, combatsc, combatsc,  combatsct, driver_device, 0,         ROT0, "Konami",  "Boot Camp (set 2)", 0 )
-GAME( 1988, combatscb, combatsc, combatscb, combatscb, driver_device, 0,         ROT0, "bootleg", "Combat School (bootleg)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND )
+GAME( 1988, combatsc,  0,        combatsc,  combatsc,  combatsc_state, combatsc,  ROT0, "Konami",  "Combat School (joystick)",        0 )
+GAME( 1987, combatsct, combatsc, combatsc,  combatsct, combatsc_state, 0,         ROT0, "Konami",  "Combat School (trackball)",       MACHINE_NOT_WORKING )
+GAME( 1987, combatscj, combatsc, combatsc,  combatsct, combatsc_state, 0,         ROT0, "Konami",  "Combat School (Japan trackball)", MACHINE_NOT_WORKING )
+GAME( 1987, bootcamp,  combatsc, combatsc,  combatsct, combatsc_state, 0,         ROT0, "Konami",  "Boot Camp (set 1)",               MACHINE_NOT_WORKING )
+GAME( 1987, bootcampa, combatsc, combatsc,  combatsct, combatsc_state, 0,         ROT0, "Konami",  "Boot Camp (set 2)",               MACHINE_NOT_WORKING )
+GAME( 1988, combatscb, combatsc, combatscb, combatscb, combatsc_state, 0,         ROT0, "bootleg", "Combat School (bootleg)",         MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND )

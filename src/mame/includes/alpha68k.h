@@ -23,9 +23,9 @@ public:
 		m_soundlatch(*this, "soundlatch") { }
 
 	/* memory pointers */
-	optional_shared_ptr<UINT16> m_shared_ram;
-	required_shared_ptr<UINT16> m_spriteram;
-	optional_shared_ptr<UINT16> m_videoram;
+	optional_shared_ptr<uint16_t> m_shared_ram;
+	required_shared_ptr<uint16_t> m_spriteram;
+	optional_shared_ptr<uint16_t> m_videoram;
 
 	/* video-related */
 	tilemap_t     *m_fix_tilemap;
@@ -51,8 +51,8 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_audiocpu;
-	UINT8       m_sound_nmi_mask;
-	UINT8       m_sound_pa_latch;
+	uint8_t       m_sound_nmi_mask;
+	uint8_t       m_sound_pa_latch;
 	DECLARE_WRITE16_MEMBER(tnextspc_coin_counters_w);
 	DECLARE_WRITE16_MEMBER(tnextspc_unknown_w);
 	DECLARE_WRITE16_MEMBER(alpha_microcontroller_w);
@@ -105,12 +105,12 @@ public:
 	DECLARE_VIDEO_START(alpha68k);
 	DECLARE_MACHINE_START(alpha68k_V);
 	DECLARE_MACHINE_RESET(alpha68k_V);
-	UINT32 screen_update_sstingry(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_kyros(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_alpha68k_I(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_alpha68k_II(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_alpha68k_V(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_alpha68k_V_sb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_sstingry(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_kyros(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_alpha68k_I(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_alpha68k_II(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_alpha68k_V(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_alpha68k_V_sb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(alpha68k_sound_nmi);
 	void alpha68k_flipscreen_w( int flip );
 	void alpha68k_V_video_bank_w( int bank );

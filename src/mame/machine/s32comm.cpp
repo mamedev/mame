@@ -70,16 +70,17 @@ Sega System Multi32 Comm PCB 837-8792-91
 #include "emuopts.h"
 #include "machine/s32comm.h"
 
-//#define __S32COMM_VERBOSE__
+#define VERBOSE 0
+#include "logmacro.h"
 
-MACHINE_CONFIG_FRAGMENT( s32comm )
+MACHINE_CONFIG_START( s32comm )
 MACHINE_CONFIG_END
 
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type S32COMM = &device_creator<s32comm_device>;
+DEFINE_DEVICE_TYPE(S32COMM, s32comm_device, "s32comm", "System 32 Communication Board")
 
 //-------------------------------------------------
 //  machine_config_additions - device-specific
@@ -99,8 +100,8 @@ machine_config_constructor s32comm_device::device_mconfig_additions() const
 //  s32comm_device - constructor
 //-------------------------------------------------
 
-s32comm_device::s32comm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, S32COMM, "SYSTEM32 COMMUNICATION BD", tag, owner, clock, "s32comm", __FILE__),
+s32comm_device::s32comm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, S32COMM, tag, owner, clock),
 	m_line_rx(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE ),
 	m_line_tx(OPEN_FLAG_READ)
 {
@@ -140,35 +141,27 @@ void s32comm_device::device_reset()
 
 READ8_MEMBER(s32comm_device::zfg_r)
 {
-	UINT8 result = m_zfg | 0xFE;
-#ifdef __S32COMM_VERBOSE__
-	osd_printf_verbose("s32comm-zfg_r: read register %02x for value %02x\n", offset, result);
-#endif
+	uint8_t result = m_zfg | 0xFE;
+	LOG("s32comm-zfg_r: read register %02x for value %02x\n", offset, result);
 	return result;
 }
 
 WRITE8_MEMBER(s32comm_device::zfg_w)
 {
-#ifdef __S32COMM_VERBOSE__
-	osd_printf_verbose("s32comm-zfg_w: %02x\n", data);
-#endif
+	LOG("s32comm-zfg_w: %02x\n", data);
 	m_zfg = data & 0x01;
 }
 
 READ8_MEMBER(s32comm_device::share_r)
 {
-	UINT8 result = m_shared[offset];
-#ifdef __S32COMM_VERBOSE__
-	osd_printf_verbose("s32comm-share_r: read shared memory %02x for value %02x\n", offset, result);
-#endif
+	uint8_t result = m_shared[offset];
+	LOG("s32comm-share_r: read shared memory %02x for value %02x\n", offset, result);
 	return result;
 }
 
 WRITE8_MEMBER(s32comm_device::share_w)
 {
-#ifdef __S32COMM_VERBOSE__
-	osd_printf_verbose("s32comm-share_w: %02x %02x\n", offset, data);
-#endif
+	LOG("s32comm-share_w: %02x %02x\n", offset, data);
 	m_shared[offset] = data;
 }
 
@@ -181,7 +174,7 @@ WRITE8_MEMBER(s32comm_device::cn_w)
 {
 	m_cn = data & 0x01;
 
-#ifndef __S32COMM_SIMULATION__
+#ifndef S32COMM_SIMULATION
 	if (!m_cn)
 		device_reset();
 #else
@@ -221,14 +214,14 @@ WRITE8_MEMBER(s32comm_device::fg_w)
 
 void s32comm_device::check_vint_irq()
 {
-#ifndef __S32COMM_SIMULATION__
+#ifndef S32COMM_SIMULATION
 #else
 	comm_tick();
 #endif
 }
 
-#ifdef __S32COMM_SIMULATION__
-void s32comm_device::set_linktype(UINT16 linktype)
+#ifdef S32COMM_SIMULATION
+void s32comm_device::set_linktype(uint16_t linktype)
 {
 	m_linktype = linktype;
 
@@ -371,7 +364,7 @@ void s32comm_device::comm_tick_14084()
 							recv = m_line_rx.read(m_buffer, togo);
 							togo -= recv;
 						}
-						osd_printf_verbose("S32COMM: droped a message...\n");
+						osd_printf_verbose("S32COMM: dropped a message...\n");
 					}
 
 					if (m_linkalive == 0x00)
@@ -468,7 +461,7 @@ void s32comm_device::comm_tick_14084()
 						recv = m_line_rx.read(m_buffer, togo);
 						togo -= recv;
 					}
-					osd_printf_verbose("S32COMM: droped a message...\n");
+					osd_printf_verbose("S32COMM: dropped a message...\n");
 				}
 				recv = m_line_rx.read(m_buffer, dataSize);
 			}
@@ -624,7 +617,7 @@ void s32comm_device::comm_tick_15033()
 							recv = m_line_rx.read(m_buffer, togo);
 							togo -= recv;
 						}
-						osd_printf_verbose("S32COMM: droped a message...\n");
+						osd_printf_verbose("S32COMM: dropped a message...\n");
 					}
 
 					if (m_linkalive == 0x00)
@@ -721,7 +714,7 @@ void s32comm_device::comm_tick_15033()
 						recv = m_line_rx.read(m_buffer, togo);
 						togo -= recv;
 					}
-					osd_printf_verbose("S32COMM: droped a message...\n");
+					osd_printf_verbose("S32COMM: dropped a message...\n");
 				}
 				recv = m_line_rx.read(m_buffer, dataSize);
 			}
@@ -865,7 +858,7 @@ void s32comm_device::comm_tick_15612()
 							recv = m_line_rx.read(m_buffer, togo);
 							togo -= recv;
 						}
-						osd_printf_verbose("S32COMM: droped a message...\n");
+						osd_printf_verbose("S32COMM: dropped a message...\n");
 					}
 
 					if (m_linkalive == 0x00)
@@ -962,7 +955,7 @@ void s32comm_device::comm_tick_15612()
 						recv = m_line_rx.read(m_buffer, togo);
 						togo -= recv;
 					}
-					osd_printf_verbose("S32COMM: droped a message...\n");
+					osd_printf_verbose("S32COMM: dropped a message...\n");
 				}
 				recv = m_line_rx.read(m_buffer, dataSize);
 			}

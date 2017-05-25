@@ -41,6 +41,7 @@
 
 #include "emu.h"
 #include "includes/lkage.h"
+#include "screen.h"
 
 
 WRITE8_MEMBER(lkage_state::lkage_videoram_w)
@@ -86,9 +87,9 @@ TILE_GET_INFO_MEMBER(lkage_state::get_tx_tile_info)
 
 void lkage_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(lkage_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(lkage_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_tx_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(lkage_state::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(lkage_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(lkage_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(lkage_state::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_fg_tilemap->set_transparent_pen(0);
 	m_tx_tilemap->set_transparent_pen(0);
@@ -101,8 +102,8 @@ void lkage_state::video_start()
 
 void lkage_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	const UINT8 *source = m_spriteram;
-	const UINT8 *finish = source + 0x60;
+	const uint8_t *source = m_spriteram;
+	const uint8_t *finish = source + 0x60;
 
 	while (source < finish)
 	{
@@ -165,7 +166,7 @@ void lkage_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, con
 	}
 }
 
-UINT32 lkage_state::screen_update_lkage(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t lkage_state::screen_update_lkage(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int bank;
 

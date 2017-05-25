@@ -41,7 +41,9 @@
 #include "cpu/powerpc/ppc.h"
 #include "imagedev/chd_cd.h"
 #include "sound/cdda.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 READ64_MEMBER( macpci_state::unk1_r )
 {
@@ -53,7 +55,7 @@ READ64_MEMBER( macpci_state::unk1_r )
 READ64_MEMBER( macpci_state::unk2_r )
 {
 	if (ACCESSING_BITS_32_47)
-		return (UINT64)0xe1 << 32; //PC=fff04810
+		return (uint64_t)0xe1 << 32; //PC=fff04810
 
 	return 0;
 }
@@ -72,7 +74,7 @@ static ADDRESS_MAP_START(pippin_mem, AS_PROGRAM, 64, macpci_state)
 	AM_RANGE(0xf00dfff8, 0xf00dffff) AM_READ(unk2_r)
 	AM_RANGE(0xf3008800, 0xf3008807) AM_READ(unk1_r)
 
-	AM_RANGE(0xf3016000, 0xf3017fff) AM_READWRITE16(mac_via_r, mac_via_w, U64(0xffffffffffffffff))
+	AM_RANGE(0xf3016000, 0xf3017fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffffffffffffU)
 
 	AM_RANGE(0xffc00000, 0xffffffff) AM_ROM AM_REGION("bootrom",0)
 ADDRESS_MAP_END
@@ -82,12 +84,12 @@ static INPUT_PORTS_START( pippin )
 INPUT_PORTS_END
 
 
-UINT32 macpci_state::screen_update_pippin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t macpci_state::screen_update_pippin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
 
-static MACHINE_CONFIG_START( pippin, macpci_state )
+static MACHINE_CONFIG_START( pippin )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PPC603, 66000000)
 	MCFG_CPU_PROGRAM_MAP(pippin_mem)
@@ -165,5 +167,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY            FULLNAME       FLAGS */
-COMP( 1996, pippin,  0,       0,     pippin,    pippin, driver_device,  0,  "Apple / Bandai",   "Pippin @mark", MACHINE_NOT_WORKING)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   STATE          INIT  COMPANY            FULLNAME        FLAGS */
+COMP( 1996, pippin,  0,       0,     pippin,    pippin, macpci_state,  0,    "Apple / Bandai",  "Pippin @mark", MACHINE_NOT_WORKING)

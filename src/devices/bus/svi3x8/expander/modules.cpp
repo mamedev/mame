@@ -6,7 +6,12 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "modules.h"
+
+#include "sv601.h"
+#include "sv602.h"
+#include "sv603.h"
 
 SLOT_INTERFACE_START( svi_expander_modules )
 	SLOT_INTERFACE("sv601", SV601)

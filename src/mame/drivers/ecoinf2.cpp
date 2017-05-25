@@ -47,9 +47,9 @@ public:
 	required_ioport m_key;
 	required_ioport m_panel;
 
-	UINT16 m_lamps[16];
-	UINT16 m_leds[16];
-	//UINT16 m_chars[14];
+	uint16_t m_lamps[16];
+	uint16_t m_leds[16];
+	//uint16_t m_chars[14];
 //  void update_display();
 	int m_optic_pattern;
 	DECLARE_WRITE_LINE_MEMBER(reel0_optic_cb) { if (state) m_optic_pattern |= 0x01; else m_optic_pattern &= ~0x01; }
@@ -62,7 +62,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ox_port5c_out_w);
 	DECLARE_DRIVER_INIT(ecoinf2);
 
-		void update_lamps(void)
+	void update_lamps()
 	{
 		for (int i=0; i<16; i++)
 		{
@@ -204,8 +204,8 @@ public:
 		m_reel0->update( data    &0x0f);
 		m_reel1->update((data>>4)&0x0f);
 
-		awp_draw_reel(machine(),"reel1", m_reel0);
-		awp_draw_reel(machine(),"reel2", m_reel1);
+		awp_draw_reel(machine(),"reel1", *m_reel0);
+		awp_draw_reel(machine(),"reel2", *m_reel1);
 	}
 
 	DECLARE_WRITE8_MEMBER(ppi8255_ic23_write_b_reel23)
@@ -213,8 +213,8 @@ public:
 		m_reel2->update( data    &0x0f);
 		m_reel3->update((data>>4)&0x0f);
 
-		awp_draw_reel(machine(),"reel3", m_reel2);
-		awp_draw_reel(machine(),"reel4", m_reel3);
+		awp_draw_reel(machine(),"reel3", *m_reel2);
+		awp_draw_reel(machine(),"reel4", *m_reel3);
 	}
 
 	DECLARE_READ8_MEMBER(ppi8255_ic23_read_c_key)
@@ -500,7 +500,7 @@ static INPUT_PORTS_START( ecoinf2 )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( ecoinf2_oxo, ecoinf2_state )
+static MACHINE_CONFIG_START( ecoinf2_oxo )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z180,4000000) // some of these hit invalid opcodes with a plain z80, some don't?
 	MCFG_CPU_PROGRAM_MAP(oxo_memmap)
@@ -790,13 +790,13 @@ DRIVER_INIT_MEMBER(ecoinf2_state,ecoinf2)
 }
 
 // OXO wh type (Phoenix?) (watchdog on port 5c?)
-GAME( 19??, ec_oxocg,   0        , ecoinf2_oxo,   ecoinf2, ecoinf2_state,   ecoinf2,    ROT0,  "Electrocoin", "Oxo Classic Gold (Electrocoin) (?)"      , MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
-GAME( 19??, ec_oxocl,   0        , ecoinf2_oxo,   ecoinf2, ecoinf2_state,   ecoinf2,    ROT0,  "Electrocoin", "Oxo Club (Electrocoin) (?)"     , MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
-GAME( 19??, ec_oxogb,   0        , ecoinf2_oxo,   ecoinf2, ecoinf2_state,   ecoinf2,    ROT0,  "Electrocoin", "Oxo Golden Bars (Electrocoin) (?)"       , MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
-GAME( 19??, ec_oxorl,   0        , ecoinf2_oxo,   ecoinf2, ecoinf2_state,   ecoinf2,    ROT0,  "Electrocoin", "Oxo Reels (Electrocoin) (?)"     , MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
-GAME( 19??, ec_oxorv,   0        , ecoinf2_oxo,   ecoinf2, ecoinf2_state,   ecoinf2,    ROT0,  "Electrocoin", "Oxo Revolution (Electrocoin) (?)"        , MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
-GAME( 19??, ec_suprl,   0        , ecoinf2_oxo,   ecoinf2, ecoinf2_state,   ecoinf2,    ROT0,  "Electrocoin", "Super Reels (Electrocoin) (?)"       , MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
-GAME( 19??, ec_rcc,     0        , ecoinf2_oxo,   ecoinf2, ecoinf2_state,   ecoinf2,    ROT0,  "Electrocoin", "Royal Casino Club (Electrocoin) (?)"     , MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
+GAME( 19??, ec_oxocg,   0        , ecoinf2_oxo,   ecoinf2, ecoinf2_state,   ecoinf2,    ROT0,  "Electrocoin", "Oxo Classic Gold (Electrocoin) (?)",                              MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
+GAME( 19??, ec_oxocl,   0        , ecoinf2_oxo,   ecoinf2, ecoinf2_state,   ecoinf2,    ROT0,  "Electrocoin", "Oxo Club (Electrocoin) (?)",                                      MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
+GAME( 19??, ec_oxogb,   0        , ecoinf2_oxo,   ecoinf2, ecoinf2_state,   ecoinf2,    ROT0,  "Electrocoin", "Oxo Golden Bars (Electrocoin) (?)",                               MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
+GAME( 19??, ec_oxorl,   0        , ecoinf2_oxo,   ecoinf2, ecoinf2_state,   ecoinf2,    ROT0,  "Electrocoin", "Oxo Reels (Electrocoin) (?)",                                     MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
+GAME( 19??, ec_oxorv,   0        , ecoinf2_oxo,   ecoinf2, ecoinf2_state,   ecoinf2,    ROT0,  "Electrocoin", "Oxo Revolution (Electrocoin) (?)",                                MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
+GAME( 19??, ec_suprl,   0        , ecoinf2_oxo,   ecoinf2, ecoinf2_state,   ecoinf2,    ROT0,  "Electrocoin", "Super Reels (Electrocoin) (?)",                                   MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
+GAME( 19??, ec_rcc,     0        , ecoinf2_oxo,   ecoinf2, ecoinf2_state,   ecoinf2,    ROT0,  "Electrocoin", "Royal Casino Club (Electrocoin) (?)",                             MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
 
-GAME( 19??, ec_sumnd,   0        , ecoinf2_oxo,   ecoinf2, ecoinf2_state,   ecoinf2,    ROT0,  "Concept Games Ltd", "Super Multi Nudger (Concept / Electrocoin Oxo) (?)"        , MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
-GAME( 19??, ec_sumnc,   0        , ecoinf2_oxo,   ecoinf2, ecoinf2_state,   ecoinf2,    ROT0,  "Concept Games Ltd", "Casino Super Multi Nudger (Concept / Electrocoin Oxo) (?)"     , MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
+GAME( 19??, ec_sumnd,   0        , ecoinf2_oxo,   ecoinf2, ecoinf2_state,   ecoinf2,    ROT0,  "Concept Games Ltd", "Super Multi Nudger (Concept / Electrocoin Oxo) (?)",        MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)
+GAME( 19??, ec_sumnc,   0        , ecoinf2_oxo,   ecoinf2, ecoinf2_state,   ecoinf2,    ROT0,  "Concept Games Ltd", "Casino Super Multi Nudger (Concept / Electrocoin Oxo) (?)", MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING|MACHINE_MECHANICAL)

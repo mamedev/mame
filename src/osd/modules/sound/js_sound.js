@@ -129,7 +129,7 @@ function update_audio_stream (
 		i++
 	) {
 		var offset =
-			// divide by sizeof(INT16) since pBuffer is offset
+			// divide by sizeof(int16_t) since pBuffer is offset
 			//  in bytes
 			((pBuffer / 2) | 0) +
 			((i * 2) | 0);

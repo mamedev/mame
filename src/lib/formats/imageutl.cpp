@@ -97,7 +97,7 @@ static int is_delim(char c)
     an extension list
 -------------------------------------------------*/
 
-static int image_internal_find_extension(const char *extension_list, const char *target_extension)
+static bool image_internal_find_extension(const char *extension_list, const char *target_extension)
 {
 	/* this version allows target_extension to be delimited with a comma */
 	int pos = 0;
@@ -116,7 +116,7 @@ static int image_internal_find_extension(const char *extension_list, const char 
 
 		/* check to see if it was found */
 		if (is_delim(extension_list[pos + i]) && is_delim(target_extension[i]))
-			return TRUE;
+			return true;
 
 		/* move to next position in the buffer */
 		pos += i;
@@ -127,7 +127,7 @@ static int image_internal_find_extension(const char *extension_list, const char 
 	}
 
 	/* not found */
-	return FALSE;
+	return false;
 }
 
 
@@ -137,11 +137,11 @@ static int image_internal_find_extension(const char *extension_list, const char 
     list
 -------------------------------------------------*/
 
-int image_find_extension(const char *extension_list, const char *target_extension)
+bool image_find_extension(const char *extension_list, const char *target_extension)
 {
 	/* the internal function allows something that we do not */
 	if (strchr(target_extension, ','))
-		return FALSE;
+		return false;
 
 	/* special case to allow ext to be in the form '.EXT' */
 	if (*target_extension == '.')

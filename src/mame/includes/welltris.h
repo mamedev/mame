@@ -25,16 +25,16 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	required_shared_ptr<UINT16> m_spriteram;
-	required_shared_ptr<UINT16> m_pixelram;
-	required_shared_ptr<UINT16> m_charvideoram;
+	required_shared_ptr<uint16_t> m_spriteram;
+	required_shared_ptr<uint16_t> m_pixelram;
+	required_shared_ptr<uint16_t> m_charvideoram;
 
 	tilemap_t *m_char_tilemap;
 	int m_pending_command;
-	UINT8 m_gfxbank[2];
-	UINT16 m_charpalettebank;
-	UINT16 m_spritepalettebank;
-	UINT16 m_pixelpalettebank;
+	uint8_t m_gfxbank[2];
+	uint16_t m_charpalettebank;
+	uint16_t m_spritepalettebank;
+	uint16_t m_pixelpalettebank;
 	int m_scrollx;
 	int m_scrolly;
 
@@ -54,7 +54,7 @@ public:
 	virtual void video_start() override;
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void setbank(int num, int bank);
 };

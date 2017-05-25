@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina
 /*
  Moero!! Pro Yakyuu Homerun Kyousou - (c) 1988 Jaleco
@@ -51,11 +51,13 @@ Notes:
 */
 
 #include "emu.h"
+#include "includes/homerun.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "sound/2203intf.h"
 #include "sound/samples.h"
-#include "includes/homerun.h"
+#include "speaker.h"
 
 
 /***************************************************************************
@@ -83,7 +85,7 @@ WRITE8_MEMBER(homerun_state::homerun_control_w)
 
 		if (~data & 0x10 & m_control && !m_samples->playing(0))
 		{
-			samples_iterator iter(m_samples);
+			samples_iterator iter(*m_samples);
 			if (m_sample < iter.count())
 				m_samples->start(0, m_sample);
 		}
@@ -322,7 +324,7 @@ GFXDECODE_END
 
 void homerun_state::machine_start()
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entry(0, &ROM[0x00000]);
 	membank("bank1")->configure_entries(1, 7, &ROM[0x10000], 0x4000);
@@ -345,7 +347,7 @@ void homerun_state::machine_reset()
 
 /**************************************************************************/
 
-static MACHINE_CONFIG_START( dynashot, homerun_state )
+static MACHINE_CONFIG_START( dynashot )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_20MHz/4)
@@ -450,6 +452,6 @@ ROM_START( ganjaja )
 ROM_END
 
 
-GAME( 1988, homerun,  0, homerun,  homerun,  driver_device, 0, ROT0, "Jaleco", "Moero!! Pro Yakyuu Homerun Kyousou", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, dynashot, 0, dynashot, dynashot, driver_device, 0, ROT0, "Jaleco", "Dynamic Shoot Kyousou", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ganjaja,  0, ganjaja,  ganjaja,  driver_device, 0, ROT0, "Jaleco", "Ganbare Jajamaru Saisho wa Goo / Ganbare Jajamaru Hop Step & Jump", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, homerun,  0, homerun,  homerun,  homerun_state, 0, ROT0, "Jaleco", "Moero!! Pro Yakyuu Homerun Kyousou", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, dynashot, 0, dynashot, dynashot, homerun_state, 0, ROT0, "Jaleco", "Dynamic Shoot Kyousou", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ganjaja,  0, ganjaja,  ganjaja,  homerun_state, 0, ROT0, "Jaleco", "Ganbare Jajamaru Saisho wa Goo / Ganbare Jajamaru Hop Step & Jump", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

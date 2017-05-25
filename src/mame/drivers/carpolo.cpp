@@ -19,10 +19,12 @@
 ****************************************************************************/
 
 #include "emu.h"
+#include "includes/carpolo.h"
+
 #include "cpu/m6502/m6502.h"
 #include "machine/74153.h"
 #include "machine/6821pia.h"
-#include "includes/carpolo.h"
+#include "screen.h"
 
 
 
@@ -229,14 +231,14 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( carpolo, carpolo_state )
+static MACHINE_CONFIG_START( carpolo )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_11_289MHz/12)       /* 940.75 kHz */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", carpolo_state,  carpolo_timer_interrupt)   /* this not strictly VBLANK,
-                                                       but it's supposed to happen 60
-                                                       times a sec, so it's a good place */
+	                                                   but it's supposed to happen 60
+	                                                   times a sec, so it's a good place */
 
 	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
 	MCFG_PIA_READPB_HANDLER(READ8(carpolo_state, pia_0_port_b_r))
@@ -275,7 +277,9 @@ static MACHINE_CONFIG_START( carpolo, carpolo_state )
 	MCFG_DEVICE_ADD("74148_3s", TTL74148, 0)
 	MCFG_74148_OUTPUT_CB(carpolo_state, ttl74148_3s_cb)
 
-	MCFG_DEVICE_ADD("74153_1k", TTL74153, 0)
+	MCFG_TTL153_ADD("74153_1k")
+	MCFG_TTL153_ZA_CB(WRITELINE(carpolo_state, ls153_za_w)) // pia1 pb5
+	MCFG_TTL153_ZB_CB(WRITELINE(carpolo_state, ls153_zb_w)) // pia1 pb4
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -284,7 +288,7 @@ static MACHINE_CONFIG_START( carpolo, carpolo_state )
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 239, 0, 255)
 	MCFG_SCREEN_UPDATE_DRIVER(carpolo_state, screen_update_carpolo)
-	MCFG_SCREEN_VBLANK_DRIVER(carpolo_state, screen_eof_carpolo)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(carpolo_state, screen_vblank_carpolo))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", carpolo)
@@ -344,7 +348,7 @@ ROM_END
 DRIVER_INIT_MEMBER(carpolo_state,carpolo)
 {
 	size_t i, len;
-	UINT8 *ROM;
+	uint8_t *ROM;
 
 
 	/* invert gfx PROM since the bits are active LO */

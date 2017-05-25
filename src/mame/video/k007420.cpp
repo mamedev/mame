@@ -16,15 +16,15 @@ and a variable amount of ROM. Nothing is known about its external interface.
 
 #define K007420_SPRITERAM_SIZE 0x200
 
-const device_type K007420 = &device_creator<k007420_device>;
+DEFINE_DEVICE_TYPE(K007420, k007420_device, "k007420", "K007420 Sprite Generator")
 
-k007420_device::k007420_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, K007420, "K007420 Sprite Generator", tag, owner, clock, "k007420", __FILE__),
-	m_ram(nullptr),
-	m_flipscreen(0),
-	m_palette(*this),
-	m_banklimit(0)
-	//m_regs[8],
+k007420_device::k007420_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, K007420, tag, owner, clock)
+	, m_ram(nullptr)
+	, m_flipscreen(0)
+	, m_palette(*this, finder_base::DUMMY_TAG)
+	, m_banklimit(0)
+	//, m_regs[8]
 {
 }
 
@@ -37,7 +37,7 @@ void k007420_device::device_start()
 	// bind the init function
 	m_callback.bind_relative_to(*owner());
 
-	m_ram = make_unique_clear<UINT8[]>(0x200);
+	m_ram = make_unique_clear<uint8_t[]>(0x200);
 
 	save_pointer(NAME(m_ram.get()), 0x200);
 	save_item(NAME(m_flipscreen));   // current one uses 7342 one

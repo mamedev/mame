@@ -26,17 +26,19 @@ TODO:
 ******************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "sound/dac.h"
-#include "sound/ay8910.h"
-#include "sound/3812intf.h"
 #include "includes/nbmj8900.h"
+
+#include "cpu/z80/z80.h"
+#include "sound/3812intf.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
+#include "speaker.h"
 
 
 DRIVER_INIT_MEMBER(nbmj8900_state,ohpaipee)
 {
 #if 0
-	UINT8 *prot = memregion("protdata")->base();
+	uint8_t *prot = memregion("protdata")->base();
 	int i;
 
 	/* this is one possible way to rearrange the protection ROM data to get the
@@ -65,7 +67,7 @@ DRIVER_INIT_MEMBER(nbmj8900_state,ohpaipee)
 DRIVER_INIT_MEMBER(nbmj8900_state,togenkyo)
 {
 #if 0
-	UINT8 *prot = memregion("protdata")->base();
+	uint8_t *prot = memregion("protdata")->base();
 	int i;
 
 	/* this is one possible way to rearrange the protection ROM data to get the
@@ -122,7 +124,7 @@ static ADDRESS_MAP_START( ohpaipee_io_map, AS_IO, 8, nbmj8900_state )
 	AM_RANGE(0xa0, 0xa0) AM_DEVREADWRITE("nb1413m3", nb1413m3_device, inputport1_r, inputportsel_w)
 	AM_RANGE(0xb0, 0xb0) AM_DEVREADWRITE("nb1413m3", nb1413m3_device, inputport2_r, sndrombank1_w)
 	AM_RANGE(0xc0, 0xc0) AM_DEVREAD("nb1413m3", nb1413m3_device, inputport3_r)
-	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE("dac", dac_device, write_unsigned8)
+	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE("dac", dac_byte_interface, write)
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(vramsel_w)
 	AM_RANGE(0xf0, 0xf0) AM_DEVREAD("nb1413m3", nb1413m3_device, dipsw1_r)
 	AM_RANGE(0xf1, 0xf1) AM_DEVREADWRITE("nb1413m3", nb1413m3_device, dipsw2_r, outcoin_w)
@@ -299,7 +301,7 @@ INPUT_PORTS_END
 
 
 
-static MACHINE_CONFIG_START( ohpaipee, nbmj8900_state )
+static MACHINE_CONFIG_START( ohpaipee )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 20000000/4)    /* 5.00 MHz ? */
@@ -323,13 +325,14 @@ static MACHINE_CONFIG_START( ohpaipee, nbmj8900_state )
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, 2500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.7)
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.85)
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.42) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( togenkyo, ohpaipee )

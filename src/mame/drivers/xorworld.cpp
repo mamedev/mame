@@ -30,10 +30,14 @@ EEPROM chip: 93C46
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/eepromser.h"
-#include "cpu/m68000/m68000.h"
-#include "sound/saa1099.h"
 #include "includes/xorworld.h"
+
+#include "cpu/m68000/m68000.h"
+#include "machine/eepromser.h"
+#include "sound/saa1099.h"
+
+#include "screen.h"
+#include "speaker.h"
 
 
 /****************************************************************
@@ -167,7 +171,7 @@ static GFXDECODE_START( xorworld )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( xorworld, xorworld_state )
+static MACHINE_CONFIG_START( xorworld )
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)   // 10 MHz
 	MCFG_CPU_PROGRAM_MAP(xorworld_map)
@@ -225,7 +229,7 @@ DRIVER_INIT_MEMBER(xorworld_state,xorworld)
 	/*  patch some strange protection (without this, strange characters appear
 	    after level 5 and some pieces don't rotate properly some times) */
 
-	UINT16 *rom = (UINT16 *)(memregion("maincpu")->base() + 0x1390);
+	uint16_t *rom = (uint16_t *)(memregion("maincpu")->base() + 0x1390);
 
 	PATCH(0x4239); PATCH(0x00ff); PATCH(0xe196);    /* clr.b $ffe196 */
 	PATCH(0x4239); PATCH(0x00ff); PATCH(0xe197);    /* clr.b $ffe197 */

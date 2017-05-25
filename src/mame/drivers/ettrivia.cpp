@@ -28,20 +28,24 @@ Notes:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "sound/ay8910.h"
 #include "machine/nvram.h"
+#include "sound/ay8910.h"
 #include "video/resnet.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class ettrivia_state : public driver_device
 {
 public:
 	ettrivia_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_fg_videoram(*this, "fg_videoram"),
-		m_bg_videoram(*this, "bg_videoram"),
-		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		: driver_device(mconfig, type, tag)
+		, m_fg_videoram(*this, "fg_videoram")
+		, m_bg_videoram(*this, "bg_videoram")
+		, m_maincpu(*this, "maincpu")
+		, m_gfxdecode(*this, "gfxdecode")
+	{
+	}
 
 	int m_palreg;
 	int m_gfx_bank;
@@ -49,8 +53,8 @@ public:
 	int m_b000_val;
 	int m_b000_ret;
 	int m_b800_prev;
-	required_shared_ptr<UINT8> m_fg_videoram;
-	required_shared_ptr<UINT8> m_bg_videoram;
+	required_shared_ptr<uint8_t> m_fg_videoram;
+	required_shared_ptr<uint8_t> m_bg_videoram;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
 	DECLARE_WRITE8_MEMBER(ettrivia_fg_w);
@@ -64,9 +68,9 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info_fg);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(ettrivia);
-	UINT32 screen_update_ettrivia(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_ettrivia(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(ettrivia_interrupt);
-	inline void get_tile_info(tile_data &tileinfo, int tile_index, UINT8 *vidram, int gfx_code);
+	inline void get_tile_info(tile_data &tileinfo, int tile_index, uint8_t *vidram, int gfx_code);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 };
@@ -100,7 +104,7 @@ WRITE8_MEMBER(ettrivia_state::ettrivia_control_w)
 
 READ8_MEMBER(ettrivia_state::ettrivia_question_r)
 {
-	UINT8 *QUESTIONS = memregion("user1")->base();
+	uint8_t *QUESTIONS = memregion("user1")->base();
 	return QUESTIONS[offset + 0x10000 * m_question_bank];
 }
 
@@ -203,7 +207,7 @@ static GFXDECODE_START( ettrivia )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout, 32*4, 32 )
 GFXDECODE_END
 
-void ettrivia_state::get_tile_info(tile_data &tileinfo, int tile_index, UINT8 *vidram, int gfx_code)
+void ettrivia_state::get_tile_info(tile_data &tileinfo, int tile_index, uint8_t *vidram, int gfx_code)
 {
 	int code = vidram[tile_index];
 	int color = (code >> 5) + 8 * m_palreg;
@@ -225,7 +229,7 @@ TILE_GET_INFO_MEMBER(ettrivia_state::get_tile_info_fg)
 
 PALETTE_INIT_MEMBER(ettrivia_state, ettrivia)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances[2] = { 270, 130 };
 	double weights[2];
 	int i;
@@ -262,13 +266,13 @@ PALETTE_INIT_MEMBER(ettrivia_state, ettrivia)
 
 void ettrivia_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(ettrivia_state::get_tile_info_bg),this),TILEMAP_SCAN_ROWS,8,8,64,32 );
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(ettrivia_state::get_tile_info_fg),this),TILEMAP_SCAN_ROWS,8,8,64,32 );
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ettrivia_state::get_tile_info_bg),this),TILEMAP_SCAN_ROWS,8,8,64,32 );
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ettrivia_state::get_tile_info_fg),this),TILEMAP_SCAN_ROWS,8,8,64,32 );
 
 	m_fg_tilemap->set_transparent_pen(0);
 }
 
-UINT32 ettrivia_state::screen_update_ettrivia(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t ettrivia_state::screen_update_ettrivia(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0,0);
@@ -283,7 +287,7 @@ INTERRUPT_GEN_MEMBER(ettrivia_state::ettrivia_interrupt)
 		device.execute().set_input_line(0, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( ettrivia, ettrivia_state )
+static MACHINE_CONFIG_START( ettrivia )
 	MCFG_CPU_ADD("maincpu", Z80,12000000/4-48000) //should be ok, it gives the 300 interrupts expected
 	MCFG_CPU_PROGRAM_MAP(cpu_map)
 	MCFG_CPU_IO_MAP(io_map)
@@ -462,8 +466,8 @@ ROM_START( strvmstr )
 	ROM_LOAD( "entrtn.hi3",   0x38000, 0x8000, CRC(a8cf603b) SHA1(6efa5753d8d252452b3f5be8635a28364e4d8de1) )
 ROM_END
 
-GAME( 1985, promutrv, 0,        ettrivia, ettrivia, driver_device, 0, ROT270, "Enerdyne Technologies Inc.", "Progressive Music Trivia (Question set 1)", 0 )
-GAME( 1985, promutrva,promutrv, ettrivia, ettrivia, driver_device, 0, ROT270, "Enerdyne Technologies Inc.", "Progressive Music Trivia (Question set 2)", 0 )
-GAME( 1985, promutrvb,promutrv, ettrivia, ettrivia, driver_device, 0, ROT270, "Enerdyne Technologies Inc.", "Progressive Music Trivia (Question set 3)", 0 )
-GAME( 1985, promutrvc,promutrv, ettrivia, ettrivia, driver_device, 0, ROT270, "Enerdyne Technologies Inc.", "Progressive Music Trivia (Question set 4)", 0 )
-GAME( 1986, strvmstr, 0,        ettrivia, ettrivia, driver_device, 0, ROT270, "Enerdyne Technologies Inc.", "Super Trivia Master", MACHINE_WRONG_COLORS )
+GAME( 1985, promutrv,  0,        ettrivia, ettrivia, ettrivia_state, 0, ROT270, "Enerdyne Technologies Inc.", "Progressive Music Trivia (Question set 1)", 0 )
+GAME( 1985, promutrva, promutrv, ettrivia, ettrivia, ettrivia_state, 0, ROT270, "Enerdyne Technologies Inc.", "Progressive Music Trivia (Question set 2)", 0 )
+GAME( 1985, promutrvb, promutrv, ettrivia, ettrivia, ettrivia_state, 0, ROT270, "Enerdyne Technologies Inc.", "Progressive Music Trivia (Question set 3)", 0 )
+GAME( 1985, promutrvc, promutrv, ettrivia, ettrivia, ettrivia_state, 0, ROT270, "Enerdyne Technologies Inc.", "Progressive Music Trivia (Question set 4)", 0 )
+GAME( 1986, strvmstr,  0,        ettrivia, ettrivia, ettrivia_state, 0, ROT270, "Enerdyne Technologies Inc.", "Super Trivia Master",                       MACHINE_WRONG_COLORS )

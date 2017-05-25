@@ -14,7 +14,7 @@ local function xml_parse(data)
 		local arr = {}
 		while str ~= "" do
 			local tag, attr, stop
-			tag, attr, stop, str = str:match("<([%w!-]+) ?(.-)(/?)[ -]->(.*)")
+			tag, attr, stop, str = str:match("<([%w!%-]+) ?(.-)(/?)[ %-]->(.*)")
 
 			if not tag then
 				return arr
@@ -26,7 +26,7 @@ local function xml_parse(data)
 					nest, str = str:match("(.-)</ *" .. tag .. " *>(.*)")
 					local children = get_tags(nest)
 					if not next(children) then
-						nest = nest:gsub("<!--.--->", "")
+						nest = nest:gsub("<!--.-%-%->", "")
 						nest = nest:gsub("^%s*(.-)%s*$", "%1")
 						block["text"] = nest
 					else
@@ -55,9 +55,9 @@ function xml.conv_cheat(data)
 	data = xml_parse(data)
 	local function convert_expr(data)
 		local write = false
-	
-		local function convert_memref(cpu, space, width, addr, rw)
-			local direct = ""
+
+		local function convert_memref(cpu, phys, space, width, addr, rw)
+			local mod = ""
 			local count
 			if space == "p" then
 				fullspace = "program"
@@ -67,7 +67,7 @@ function xml.conv_cheat(data)
 				fullspace = "io"
 			elseif space == "r" or space == "o" then
 				fullspace = "program"
-				direct = "direct_"
+				mod = "direct_"
 				space = "p"
 			end
 			if width == "b" then
@@ -84,12 +84,15 @@ function xml.conv_cheat(data)
 				regions[cpuname .. space] = ":" .. cpu
 			else
 				spaces[cpuname .. space] = { tag = ":" .. cpu, type = fullspace }
+				if phys ~= "p" and mod == "" then
+					mod = "log_"
+				end
 			end
 			if rw == "=" then
 				write = true
-				ret = cpuname .. space .. ":" .. "write_" .. direct .. width .. "(" .. addr .. ","
+				ret = cpuname .. space .. ":" .. "write_" .. mod .. width .. "(" .. addr .. ","
 			else
-				ret = cpuname .. space .. ":" .. "read_" .. direct .. width .. "(" .. addr .. ")"
+				ret = cpuname .. space .. ":" .. "read_" .. mod .. width .. "(" .. addr .. ")"
 			end
 			if rw == "==" then
 				ret = ret .. "=="
@@ -119,9 +122,9 @@ function xml.conv_cheat(data)
 		data = data:gsub("%f[%w]lshift%f[%W]", "<<")
 		data = data:gsub("(%w-)%+%+", "%1 = %1 + 1")
 		data = data:gsub("%f[%w](%x+)%f[%W]", "0x%1")
-		data = data:gsub("([%w_:]-)%.([pmrodi3]-)([bwdq])@(%w+) *(=*)", convert_memref)
+		data = data:gsub("([%w_:]-)%.(p?)([pmrodi3])([bwdq])@(%w+) *(=*)", convert_memref)
 		repeat
-			data, count = data:gsub("([%w_:]-)%.([pmrodi3]-)([bwdq])@(%b()) *(=*)", convert_memref)
+			data, count = data:gsub("([%w_:]-)%.(p?)([pmrodi3])([bwdq])@(%b()) *(=*)", convert_memref)
 		until count == 0
 		if write then
 			data = data .. ")"
@@ -220,16 +223,16 @@ function xml.conv_cheat(data)
 			end
 		end
 		if next(spaces) then
-			data["cheat"][count]["space"] = {} 
+			data["cheat"][count]["space"] = {}
 			for name, space in pairs(spaces) do
-				data["cheat"][count]["space"] = {} 
+				data["cheat"][count]["space"] = {}
 				data["cheat"][count]["space"][name] = { type = space["type"], tag = space["tag"] }
 			end
 		end
 		if next(regions) then
-			data["cheat"][count]["region"] = {} 
+			data["cheat"][count]["region"] = {}
 			for name, region in pairs(regions) do
-				data["cheat"][count]["region"] = {} 
+				data["cheat"][count]["region"] = {}
 				data["cheat"][count]["region"][name] = region
 			end
 		end

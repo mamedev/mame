@@ -57,7 +57,7 @@ READ64_MEMBER(naomi_state::naomi2_biose_idle_skip_r )
 	return dc_ram[0x2b0600/8];
 }
 
-UINT8 naomi_state::asciihex_to_dec(UINT8 in)
+uint8_t naomi_state::asciihex_to_dec(uint8_t in)
 {
 	if (in>=0x30 && in<=0x39)
 	{
@@ -94,8 +94,8 @@ void naomi_state::create_pic_from_retdat()
 
 		if (rgn_hexregion && rgn_newregion)
 		{
-			UINT8* hexregion = rgn_hexregion->base();
-			UINT8* newregion = rgn_newregion->base();
+			uint8_t* hexregion = rgn_hexregion->base();
+			uint8_t* newregion = rgn_newregion->base();
 
 
 			int hexoffs = 0;
@@ -112,11 +112,11 @@ void naomi_state::create_pic_from_retdat()
 
 				for (offs2=0;offs2<0x20;offs2++)
 				{
-					UINT8 ascii1 = hexregion[hexoffs+0];
-					UINT8 ascii2 = hexregion[hexoffs+1];
-					UINT8 dec1 = asciihex_to_dec(ascii1);
-					UINT8 dec2 = asciihex_to_dec(ascii2);
-					UINT8 val = dec1 << 4 | dec2;
+					uint8_t ascii1 = hexregion[hexoffs+0];
+					uint8_t ascii2 = hexregion[hexoffs+1];
+					uint8_t dec1 = asciihex_to_dec(ascii1);
+					uint8_t dec2 = asciihex_to_dec(ascii2);
+					uint8_t val = dec1 << 4 | dec2;
 
 					//printf("%02x%02x", ascii1, ascii2);
 
@@ -137,8 +137,8 @@ void naomi_state::create_pic_from_retdat()
 
 			if (rgn_retregion && rgn_newregion)
 			{
-				UINT8* retregion = rgn_retregion->base();
-				UINT8* newregion = rgn_newregion->base();
+				uint8_t* retregion = rgn_retregion->base();
+				uint8_t* newregion = rgn_newregion->base();
 
 
 				int i;
@@ -177,7 +177,7 @@ void naomi_state::create_pic_from_retdat()
 
 			if (rgn_newregion)
 			{
-				UINT8* newregion = rgn_newregion->base();
+				uint8_t* newregion = rgn_newregion->base();
 
 				FILE *fp;
 				char filename[256];
@@ -205,15 +205,13 @@ DRIVER_INIT_MEMBER(naomi_state,naomi)
 {
 	//m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2ad238, 0xc2ad23f, read64_delegate(FUNC(naomi_state::naomi_biose_idle_skip_r),this); // rev e bios
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2b0600, 0xc2b0607, read64_delegate(FUNC(naomi_state::naomi_biosh_idle_skip_r),this)); // rev h bios
-	actel_id = 0xffff;
 
 	create_pic_from_retdat();
 }
 
-DRIVER_INIT_MEMBER(naomi_state,naomi2)
+DRIVER_INIT_MEMBER(naomi2_state,naomi2)
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2b0600, 0xc2b0607, read64_delegate(FUNC(naomi_state::naomi2_biose_idle_skip_r),this)); // rev e bios
-	actel_id = 0xffff;
 
 	create_pic_from_retdat();
 }
@@ -225,12 +223,16 @@ INPUT_CHANGED_MEMBER(naomi_state::naomi_mp_w)
 CUSTOM_INPUT_MEMBER(naomi_state::naomi_mp_r)
 {
 	const char *tagptr = (const char *)param;
-	UINT8 retval = 0;
+	uint8_t retval = 0;
 
 	for (int i = 0x80; i >= 0x08; i >>= 1)
 	{
 		if (m_mp_mux & i)
-			retval |= read_safe(ioport(tagptr), 0);
+		{
+			ioport_port *port = ioport(tagptr);
+			if (port != nullptr)
+				retval |= port->read();
+		}
 		tagptr += strlen(tagptr) + 1;
 	}
 	return retval;
@@ -240,7 +242,6 @@ DRIVER_INIT_MEMBER(naomi_state,naomi_mp)
 {
 	//m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2ad238, 0xc2ad23f, read64_delegate(FUNC(naomi_state::naomi_biose_idle_skip_r),this); // rev e bios
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2b0600, 0xc2b0607, read64_delegate(FUNC(naomi_state::naomi_biosh_idle_skip_r),this)); // rev h bios
-	actel_id = 0xffff;
 	m_mp_mux = 0;
 
 	create_pic_from_retdat();
@@ -250,7 +251,6 @@ DRIVER_INIT_MEMBER(naomi_state,naomigd)
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2ad238, 0xc2ad23f, read64_delegate(FUNC(naomi_state::naomi_biose_idle_skip_r),this)); // rev e bios
 	//m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2b0600, 0xc2b0607, read64_delegate(FUNC(naomi_state::naomi_biosh_idle_skip_r),this)); // rev h bios
-	actel_id = 0xffff;
 
 	create_pic_from_retdat();
 }
@@ -259,7 +259,6 @@ DRIVER_INIT_MEMBER(naomi_state,naomigd_mp)
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2ad238, 0xc2ad23f, read64_delegate(FUNC(naomi_state::naomi_biose_idle_skip_r),this)); // rev e bios
 	//m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2b0600, 0xc2b0607, read64_delegate(FUNC(naomi_state::naomi_biosh_idle_skip_r),this)); // rev h bios
-	actel_id = 0xffff;
 	m_mp_mux = 0;
 
 	create_pic_from_retdat();
@@ -326,36 +325,6 @@ DRIVER_INIT_MEMBER(naomi_state,sfz3ugd)
 	DRIVER_INIT_CALL(naomigd);
 }
 
-
-DRIVER_INIT_MEMBER(naomi_state,qmegamis)
-{
-	DRIVER_INIT_CALL(naomi);
-	actel_id = 0; //FIXME: correct value
-}
-
-DRIVER_INIT_MEMBER(naomi_state,mvsc2)
-{
-	DRIVER_INIT_CALL(naomi);
-	actel_id = 0; //FIXME: correct value
-}
-
-DRIVER_INIT_MEMBER(naomi_state,gram2000)
-{
-	DRIVER_INIT_CALL(naomi);
-	actel_id = 0; //FIXME: correct value
-}
-
-DRIVER_INIT_MEMBER(naomi_state,vf4evoct)
-{
-	DRIVER_INIT_CALL(naomi2);
-	actel_id = 0; //FIXME: correct value
-}
-
-DRIVER_INIT_MEMBER(naomi_state,kick4csh)
-{
-	DRIVER_INIT_CALL(naomi);
-	actel_id = 0; //FIXME: correct value
-}
 
 READ64_MEMBER(naomi_state::hotd2_idle_skip_r )
 {

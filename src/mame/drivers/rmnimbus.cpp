@@ -9,17 +9,24 @@
 
 */
 
+#include "emu.h"
 #include "includes/rmnimbus.h"
+#include "machine/rmnkbd.h"
+
 #include "cpu/mcs51/mcs51.h"
 #include "imagedev/flopdrv.h"
-#include "formats/pc_dsk.h"
-#include "bus/scsi/scsihd.h"
-#include "bus/scsi/s1410.h"
-#include "bus/scsi/acb4070.h"
+
 #include "bus/isa/fdc.h"
 #include "bus/rs232/rs232.h"
-#include "machine/rmnkbd.h"
+#include "bus/scsi/acb4070.h"
+#include "bus/scsi/s1410.h"
+#include "bus/scsi/scsihd.h"
+
 #include "softlist.h"
+#include "speaker.h"
+
+#include "formats/pc_dsk.h"
+
 
 static SLOT_INTERFACE_START(rmnimbus_floppies)
 	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
@@ -46,11 +53,11 @@ static ADDRESS_MAP_START(nimbus_io, AS_IO, 16, rmnimbus_state )
 	AM_RANGE( 0x0080, 0x0081) AM_READWRITE8(nimbus_mcu_r, nimbus_mcu_w, 0x00FF)
 	AM_RANGE( 0x0092, 0x0093) AM_READWRITE8(nimbus_iou_r, nimbus_iou_w, 0x00FF)
 	AM_RANGE( 0x00A4, 0x00A5) AM_READWRITE8(nimbus_mouse_js_r, nimbus_mouse_js_w, 0x00FF)
-	AM_RANGE( 0X00c0, 0X00cf) AM_READWRITE8(nimbus_pc8031_r, nimbus_pc8031_w, 0x00FF)
-	AM_RANGE( 0X00e0, 0X00ef) AM_DEVREADWRITE8(AY8910_TAG, ay8910_device, data_r, address_data_w, 0x00FF)
+	AM_RANGE( 0x00c0, 0x00cf) AM_READWRITE8(nimbus_pc8031_r, nimbus_pc8031_w, 0x00FF)
+	AM_RANGE( 0x00e0, 0x00ef) AM_DEVREADWRITE8(AY8910_TAG, ay8910_device, data_r, address_data_w, 0x00FF)
 	AM_RANGE( 0x00f0, 0x00f7) AM_DEVREADWRITE8(Z80SIO_TAG, z80sio2_device, cd_ba_r, cd_ba_w, 0x00ff)
 	AM_RANGE( 0x0400, 0x0401) AM_WRITE8(fdc_ctl_w, 0x00ff)
-	AM_RANGE( 0x0408, 0x040f) AM_DEVREADWRITE8(FDC_TAG, wd2793_t, read, write, 0x00ff)
+	AM_RANGE( 0x0408, 0x040f) AM_DEVREADWRITE8(FDC_TAG, wd2793_device, read, write, 0x00ff)
 	AM_RANGE( 0x0410, 0x041f) AM_READWRITE8(scsi_r, scsi_w, 0x00ff)
 	AM_RANGE( 0x0480, 0x049f) AM_DEVREADWRITE8(VIA_TAG, via6522_device, read, write, 0x00FF)
 ADDRESS_MAP_END
@@ -93,7 +100,7 @@ static ADDRESS_MAP_START( nimbus_iocpu_io , AS_IO, 8, rmnimbus_state )
 	AM_RANGE(0x20000, 0x20004) AM_READWRITE(nimbus_pc8031_port_r, nimbus_pc8031_port_w)
 ADDRESS_MAP_END
 
-static const UINT16 def_config[16] =
+static const uint16_t def_config[16] =
 {
 	0x0280, 0x017F, 0xE824, 0x8129,
 	0x0329, 0x0000, 0x0000, 0x0000,
@@ -101,7 +108,7 @@ static const UINT16 def_config[16] =
 	0x0000, 0x8893, 0x2025, 0xB9E6
 };
 
-static MACHINE_CONFIG_START( nimbus, rmnimbus_state )
+static MACHINE_CONFIG_START( nimbus )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(MAINCPU_TAG, I80186, 16000000) // the cpu is a 10Mhz part but the serial clocks are wrong unless it runs at 8Mhz
 	MCFG_CPU_PROGRAM_MAP(nimbus_mem)
@@ -148,8 +155,8 @@ static MACHINE_CONFIG_START( nimbus, rmnimbus_state )
 	MCFG_DEVICE_ADD("scsi_data_in", INPUT_BUFFER, 0)
 
 	MCFG_DEVICE_ADD("scsi_ctrl_out", OUTPUT_LATCH, 0)
-	MCFG_OUTPUT_LATCH_BIT0_HANDLER(DEVWRITELINE(SCSIBUS_TAG, SCSI_PORT_DEVICE, write_rst))
-	MCFG_OUTPUT_LATCH_BIT1_HANDLER(DEVWRITELINE(SCSIBUS_TAG, SCSI_PORT_DEVICE, write_sel))
+	MCFG_OUTPUT_LATCH_BIT0_HANDLER(DEVWRITELINE(SCSIBUS_TAG, scsi_port_device, write_rst))
+	MCFG_OUTPUT_LATCH_BIT1_HANDLER(DEVWRITELINE(SCSIBUS_TAG, scsi_port_device, write_sel))
 	MCFG_OUTPUT_LATCH_BIT2_HANDLER(WRITELINE(rmnimbus_state, write_scsi_iena))
 
 	MCFG_RAM_ADD(RAM_TAG)
@@ -195,7 +202,7 @@ static MACHINE_CONFIG_START( nimbus, rmnimbus_state )
 
 	MCFG_SOUND_ADD(MSM5205_TAG, MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(rmnimbus_state, nimbus_msm5205_vck)) /* VCK function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8 kHz */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, MONO_TAG, 0.75)
 
 	/* Software list */
@@ -222,5 +229,5 @@ ROM_START( nimbus )
 	ROM_LOAD("hexec-v1.02u-13488-1985-10-29.rom", 0x0000, 0x1000, CRC(75c6adfd) SHA1(0f11e0b7386c6368d20e1fc7a6196d670f924825))
 ROM_END
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE INPUT   INIT  COMPANY  FULLNAME   FLAGS */
-COMP( 1986, nimbus,     0,      0,      nimbus, nimbus, driver_device, 0,   "Research Machines", "Nimbus", 0)
+//    YEAR  NAME        PARENT  COMPAT  MACHINE  INPUT   STATE           INIT  COMPANY              FULLNAME  FLAGS
+COMP( 1986, nimbus,     0,      0,      nimbus,  nimbus, rmnimbus_state, 0,    "Research Machines", "Nimbus", 0)

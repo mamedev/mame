@@ -5,7 +5,7 @@
 
 a sound-only Pico type system (one of the boards even says S-PICO)
 
-CPU is unknown (I can't see one?!) cartridge dumps should be good, but not confirmed, might be data only for an MCU?
+CPU is unknown (I can't see one?! MCU with internal ROM?) cartridge dumps have been tested as working using a flash cart.
 driver does nothing except allow the softlist to be connected to the -romident commands etc.
 
 
@@ -25,7 +25,7 @@ http://mamedev.emulab.it/haze/reference/sawatte/cartridge_example.jpg
 */
 
 #include "emu.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 
 
 class sawatte_state : public driver_device
@@ -43,7 +43,7 @@ static INPUT_PORTS_START( sawatte )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( sawatte, sawatte_state )
+static MACHINE_CONFIG_START( sawatte )
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "sawatte")
 MACHINE_CONFIG_END
 
@@ -51,4 +51,4 @@ ROM_START( sawatte )
 ROM_END
 
 
-CONS( 1996?, sawatte, 0, 0, sawatte,  sawatte, driver_device,  0, "Sega", "Sawatte", MACHINE_IS_SKELETON )
+CONS( 1996?, sawatte, 0, 0, sawatte,  sawatte, sawatte_state,  0, "Sega", "Sawatte", MACHINE_IS_SKELETON )

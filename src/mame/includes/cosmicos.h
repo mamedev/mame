@@ -1,18 +1,17 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
+#ifndef MAME_INCLUDES_COSMICOS_H
+#define MAME_INCLUDES_COSMICOS_H
+
 #pragma once
 
-#ifndef __COSMICOS__
-#define __COSMICOS__
-
-#include "emu.h"
 #include "cpu/cosmac/cosmac.h"
 #include "imagedev/cassette.h"
-#include "machine/ram.h"
 #include "imagedev/snapquik.h"
+#include "machine/ram.h"
 #include "machine/rescap.h"
 #include "sound/cdp1864.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
 #include "video/dm9368.h"
 
 #define CDP1802_TAG     "ic19"
@@ -50,10 +49,7 @@ public:
 			m_speaker(*this, "speaker"),
 			m_ram(*this, RAM_TAG),
 			m_rom(*this, CDP1802_TAG),
-			m_y1(*this, "Y1"),
-			m_y2(*this, "Y2"),
-			m_y3(*this, "Y3"),
-			m_y4(*this, "Y4"),
+			m_key_row(*this, {"Y1", "Y2", "Y3", "Y4"}),
 			m_io_data(*this, "DATA"),
 			m_special(*this, "SPECIAL"),
 			m_buttons(*this, "BUTTONS")
@@ -66,10 +62,7 @@ public:
 	required_device<speaker_sound_device> m_speaker;
 	required_device<ram_device> m_ram;
 	required_memory_region m_rom;
-	required_ioport m_y1;
-	required_ioport m_y2;
-	required_ioport m_y3;
-	required_ioport m_y4;
+	required_ioport_array<4> m_key_row;
 	required_ioport m_io_data;
 	required_ioport m_special;
 	required_ioport m_buttons;
@@ -121,17 +114,16 @@ public:
 	int m_sc1;
 
 	/* memory state */
-	UINT8 m_data;
+	uint8_t m_data;
 	int m_boot;
 	int m_ram_protect;
 	int m_ram_disable;
 
 	/* keyboard state */
-	ioport_port* m_key_row[4];
-	UINT8 m_keylatch;
+	uint8_t m_keylatch;
 
 	/* display state */
-	UINT8 m_segment;
+	uint8_t m_segment;
 	int m_digit;
 	int m_counter;
 	int m_q;
@@ -144,4 +136,4 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(int_tick);
 };
 
-#endif
+#endif // MAME_INCLUDES_COSMICOS_H

@@ -73,12 +73,14 @@ TODO:
 ******************************************************************************/
 
 #include "emu.h"
+#include "includes/inufuku.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
 #include "sound/2610intf.h"
-#include "video/vsystem_spr.h"
-#include "includes/inufuku.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /******************************************************************************
@@ -119,7 +121,7 @@ WRITE8_MEMBER(inufuku_state::inufuku_soundrombank_w)
 
 CUSTOM_INPUT_MEMBER(inufuku_state::soundflag_r)
 {
-	UINT16 soundflag = m_pending_command ? 0 : 1;
+	uint16_t soundflag = m_pending_command ? 0 : 1;
 
 	return soundflag;
 }
@@ -324,7 +326,7 @@ GFXDECODE_END
 
 void inufuku_state::machine_start()
 {
-	UINT8 *ROM = memregion("audiocpu")->base();
+	uint8_t *ROM = memregion("audiocpu")->base();
 
 	membank("bank1")->configure_entries(0, 4, &ROM[0x00000], 0x8000);
 	membank("bank1")->set_entry(0);
@@ -352,7 +354,7 @@ void inufuku_state::machine_reset()
 	m_tx_palettebank = 0;
 }
 
-static MACHINE_CONFIG_START( inufuku, inufuku_state )
+static MACHINE_CONFIG_START( inufuku )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 32000000/2) /* 16.00 MHz */
@@ -374,7 +376,7 @@ static MACHINE_CONFIG_START( inufuku, inufuku_state )
 	MCFG_SCREEN_SIZE(2048, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 223)
 	MCFG_SCREEN_UPDATE_DRIVER(inufuku_state, screen_update_inufuku)
-	MCFG_SCREEN_VBLANK_DRIVER(inufuku_state, screen_eof_inufuku)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(inufuku_state, screen_vblank_inufuku))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("vsystem_spr", VSYSTEM_SPR, 0)
@@ -477,5 +479,5 @@ ROM_END
 
 ******************************************************************************/
 
-GAME( 1998, inufuku, 0, inufuku, inufuku, driver_device, 0, ROT0, "Video System Co.", "Quiz & Variety Sukusuku Inufuku (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, 3on3dunk, 0, _3on3dunk, inufuku, driver_device, 0, ROT0, "Video System Co.", "3 On 3 Dunk Madness (US, prototype? 1997/02/04)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // tilemap priority is wrong in places (basketball before explosion in attract, highscores)
+GAME( 1998, inufuku,  0, inufuku,   inufuku, inufuku_state, 0, ROT0, "Video System Co.", "Quiz & Variety Sukusuku Inufuku (Japan)",         MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, 3on3dunk, 0, _3on3dunk, inufuku, inufuku_state, 0, ROT0, "Video System Co.", "3 On 3 Dunk Madness (US, prototype? 1997/02/04)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // tilemap priority is wrong in places (basketball before explosion in attract, highscores)

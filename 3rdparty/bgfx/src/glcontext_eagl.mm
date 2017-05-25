@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -27,7 +27,7 @@ namespace bgfx { namespace gl
 		{
 			_layer.contentsScale = [UIScreen mainScreen].scale;
 
-			_layer.opaque = true;
+			_layer.opaque = [_layer.style valueForKey:@"opaque"] == nil ? true : [[_layer.style valueForKey:@"opaque"] boolValue];
 
 			_layer.drawableProperties = [NSDictionary dictionaryWithObjectsAndKeys
 											: [NSNumber numberWithBool:false]
@@ -122,7 +122,8 @@ namespace bgfx { namespace gl
 
 		void resize(GLint _width, GLint _height)
 		{
-			if(m_width == _width && m_height == _height)
+			if (m_width  == _width
+			&&  m_height == _height)
 			{
 				return;
 			}
@@ -158,7 +159,7 @@ namespace bgfx { namespace gl
 
 		BX_UNUSED(_width, _height);
 		CAEAGLLayer* layer = (CAEAGLLayer*)g_platformData.nwh;
-		layer.opaque = true;
+		layer.opaque = [layer.style valueForKey:@"opaque"] == nil ? true : [[layer.style valueForKey:@"opaque"] boolValue];
 
 		layer.drawableProperties = [NSDictionary dictionaryWithObjectsAndKeys
 										: [NSNumber numberWithBool:false]

@@ -6,12 +6,11 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_IEEE488_C2031_H
+#define MAME_BUS_IEEE488_C2031_H
+
 #pragma once
 
-#ifndef __C2031__
-#define __C2031__
-
-#include "emu.h"
 #include "ieee488.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/64h156.h"
@@ -30,10 +29,10 @@ class c2031_device :  public device_t,
 {
 public:
 	// construction/destruction
-	c2031_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	c2031_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual ioport_constructor device_input_ports() const override;
 
@@ -80,8 +79,7 @@ protected:
 
 
 // device type definition
-extern const device_type C2031;
+DECLARE_DEVICE_TYPE(C2031, c2031_device)
 
 
-
-#endif
+#endif // MAME_BUS_IEEE488_C2031_H

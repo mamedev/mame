@@ -39,10 +39,14 @@ the "America" release.
 ****************************************************************************/
 
 #include "emu.h"
+#include "includes/tsamurai.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "includes/tsamurai.h"
+#include "sound/volt_reg.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 void tsamurai_state::machine_start()
@@ -238,7 +242,7 @@ static ADDRESS_MAP_START( sound1_map, AS_PROGRAM, 8, tsamurai_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x6000, 0x6000) AM_READ(sound_command1_r)
 	AM_RANGE(0x6001, 0x6001) AM_WRITENOP /* ? - probably clear IRQ */
-	AM_RANGE(0x6002, 0x6002) AM_DEVWRITE("dac1", dac_device, write_unsigned8)
+	AM_RANGE(0x6002, 0x6002) AM_DEVWRITE("dac1", dac_byte_interface, write)
 	AM_RANGE(0x7f00, 0x7fff) AM_RAM
 ADDRESS_MAP_END
 
@@ -248,7 +252,7 @@ static ADDRESS_MAP_START( sound2_map, AS_PROGRAM, 8, tsamurai_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x6000, 0x6000) AM_READ(sound_command2_r)
 	AM_RANGE(0x6001, 0x6001) AM_WRITENOP /* ? - probably clear IRQ */
-	AM_RANGE(0x6002, 0x6002) AM_DEVWRITE("dac2", dac_device, write_unsigned8)
+	AM_RANGE(0x6002, 0x6002) AM_DEVWRITE("dac2", dac_byte_interface, write)
 	AM_RANGE(0x7f00, 0x7fff) AM_RAM
 ADDRESS_MAP_END
 
@@ -258,7 +262,7 @@ static ADDRESS_MAP_START( sound1_m660_map, AS_PROGRAM, 8, tsamurai_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0xc000, 0xc000) AM_READ(sound_command1_r)
 	AM_RANGE(0xc001, 0xc001) AM_WRITENOP /* ? - probably clear IRQ */
-	AM_RANGE(0xc002, 0xc002) AM_DEVWRITE("dac1", dac_device, write_unsigned8)
+	AM_RANGE(0xc002, 0xc002) AM_DEVWRITE("dac1", dac_byte_interface, write)
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 ADDRESS_MAP_END
 
@@ -268,7 +272,7 @@ static ADDRESS_MAP_START( sound2_m660_map, AS_PROGRAM, 8, tsamurai_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0xc000, 0xc000) AM_READ(sound_command2_r)
 	AM_RANGE(0xc001, 0xc001) AM_WRITENOP /* ? - probably clear IRQ */
-	AM_RANGE(0xc002, 0xc002) AM_DEVWRITE("dac2", dac_device, write_unsigned8)
+	AM_RANGE(0xc002, 0xc002) AM_DEVWRITE("dac2", dac_byte_interface, write)
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 ADDRESS_MAP_END
 
@@ -360,7 +364,7 @@ static ADDRESS_MAP_START( sound_vsgongf_map, AS_PROGRAM, 8, tsamurai_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x6000, 0x63ff) AM_RAM /* work RAM */
 	AM_RANGE(0x8000, 0x8000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(vsgongf_sound_nmi_enable_w) /* NMI enable */
-	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("dac", dac_device, write_unsigned8)
+	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("dac", dac_byte_interface, write)
 ADDRESS_MAP_END
 
 /*******************************************************************************/
@@ -702,7 +706,7 @@ GFXDECODE_END
 
 /*******************************************************************************/
 
-static MACHINE_CONFIG_START( tsamurai, tsamurai_state )
+static MACHINE_CONFIG_START( tsamurai )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz/8)
@@ -728,24 +732,24 @@ static MACHINE_CONFIG_START( tsamurai, tsamurai_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tsamurai)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 256)
+	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 	MCFG_VIDEO_START_OVERRIDE(tsamurai_state,tsamurai)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_24MHz/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1)
 
-	MCFG_DAC_ADD("dac1")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
-
-	MCFG_DAC_ADD("dac2")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MCFG_SOUND_ADD("dac1", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1) // unknown DAC
+	MCFG_SOUND_ADD("dac2", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( vsgongf, tsamurai_state )
+static MACHINE_CONFIG_START( vsgongf )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz/8)
@@ -769,23 +773,24 @@ static MACHINE_CONFIG_START( vsgongf, tsamurai_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tsamurai)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 256)
+	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 	MCFG_VIDEO_START_OVERRIDE(tsamurai_state,vsgongf)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_24MHz/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1)
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( m660, tsamurai_state )
+static MACHINE_CONFIG_START( m660 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz/8)
@@ -816,20 +821,20 @@ static MACHINE_CONFIG_START( m660, tsamurai_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tsamurai)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 256)
+	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 	MCFG_VIDEO_START_OVERRIDE(tsamurai_state,m660)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_24MHz/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1)
 
-	MCFG_DAC_ADD("dac1")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
-
-	MCFG_DAC_ADD("dac2")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MCFG_SOUND_ADD("dac1", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1) // unknown DAC
+	MCFG_SOUND_ADD("dac2", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 /*******************************************************************************/
@@ -1268,20 +1273,20 @@ ROM_START( ringfgt2 )
 	ROM_LOAD( "clr.6p",  0x200, 0x0100, CRC(0e4fd17a) SHA1(d4e32bd9dd903177af61f77976a25c5db1467bba) )
 ROM_END
 
-GAME( 1984, vsgongf,  0,        vsgongf,  vsgongf, driver_device,  0, ROT90, "Kaneko", "VS Gong Fight", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1984, ringfgt,  vsgongf,  vsgongf,  vsgongf, driver_device,  0, ROT90, "Kaneko (Taito license)", "Ring Fighter (set 1)", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, ringfgt2, vsgongf,  vsgongf,  vsgongf, driver_device,  0, ROT90, "Kaneko (Taito license)", "Ring Fighter (set 2)", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, vsgongf,   0,        vsgongf,  vsgongf,  tsamurai_state, 0, ROT90, "Kaneko", "VS Gong Fight", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1984, ringfgt,   vsgongf,  vsgongf,  vsgongf,  tsamurai_state, 0, ROT90, "Kaneko (Taito license)", "Ring Fighter (set 1)", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, ringfgt2,  vsgongf,  vsgongf,  vsgongf,  tsamurai_state, 0, ROT90, "Kaneko (Taito license)", "Ring Fighter (set 2)", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1985, tsamurai, 0,        tsamurai, tsamurai, driver_device, 0, ROT90, "Kaneko / Taito", "Samurai Nihon-Ichi (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, tsamurai2,tsamurai, tsamurai, tsamurai, driver_device, 0, ROT90, "Kaneko / Taito", "Samurai Nihon-Ichi (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, tsamuraih,tsamurai, tsamurai, tsamurai, driver_device, 0, ROT90, "bootleg", "Samurai Nihon-Ichi (bootleg, harder)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, tsamurai,  0,        tsamurai, tsamurai, tsamurai_state, 0, ROT90, "Kaneko / Taito", "Samurai Nihon-Ichi (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, tsamurai2, tsamurai, tsamurai, tsamurai, tsamurai_state, 0, ROT90, "Kaneko / Taito", "Samurai Nihon-Ichi (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, tsamuraih, tsamurai, tsamurai, tsamurai, tsamurai_state, 0, ROT90, "bootleg", "Samurai Nihon-Ichi (bootleg, harder)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1985, ladymstr, 0,        tsamurai, ladymstr, driver_device, 0, ROT90, "Kaneko / Taito", "Lady Master of Kung Fu", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, nunchaku, ladymstr, tsamurai, nunchaku, driver_device, 0, ROT90, "Kaneko / Taito", "Nunchackun", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, ladymstr,  0,        tsamurai, ladymstr, tsamurai_state, 0, ROT90, "Kaneko / Taito", "Lady Master of Kung Fu", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, nunchaku,  ladymstr, tsamurai, nunchaku, tsamurai_state, 0, ROT90, "Kaneko / Taito", "Nunchackun", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1985, yamagchi, 0,        tsamurai, yamagchi, driver_device, 0, ROT90, "Kaneko / Taito", "Go Go Mr. Yamaguchi / Yuke Yuke Yamaguchi-kun", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, yamagchi,  0,        tsamurai, yamagchi, tsamurai_state, 0, ROT90, "Kaneko / Taito", "Go Go Mr. Yamaguchi / Yuke Yuke Yamaguchi-kun", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1986, m660,     0,        m660,     m660, driver_device,     0, ROT90, "Wood Place Inc. (Taito America Corporation license)", "Mission 660 (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, m660j,    m660,     m660,     m660, driver_device,     0, ROT90, "Wood Place Inc. (Taito Corporation license)", "Mission 660 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, m660b,    m660,     m660,     m660, driver_device,     0, ROT90, "bootleg", "Mission 660 (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, alphaxz,  m660,     m660,     m660, driver_device,     0, ROT90, "Ed Co. Ltd. (Wood Place Inc. license)", "The Alphax Z (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, m660,      0,        m660,     m660,     tsamurai_state, 0, ROT90, "Wood Place Inc. (Taito America Corporation license)", "Mission 660 (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, m660j,     m660,     m660,     m660,     tsamurai_state, 0, ROT90, "Wood Place Inc. (Taito Corporation license)", "Mission 660 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, m660b,     m660,     m660,     m660,     tsamurai_state, 0, ROT90, "bootleg", "Mission 660 (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, alphaxz,   m660,     m660,     m660,     tsamurai_state, 0, ROT90, "Ed Co. Ltd. (Wood Place Inc. license)", "The Alphax Z (Japan)", MACHINE_SUPPORTS_SAVE )

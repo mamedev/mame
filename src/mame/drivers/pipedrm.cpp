@@ -163,10 +163,12 @@ Added Multiple Coin Feature:
 
 
 #include "emu.h"
+#include "includes/fromance.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/2608intf.h"
 #include "sound/2610intf.h"
-#include "includes/fromance.h"
+#include "speaker.h"
 
 
 class pipedrm_state : public fromance_state
@@ -294,8 +296,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_portmap, AS_IO, 8, pipedrm_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x10) AM_WRITE(fromance_crtc_data_w)
-	AM_RANGE(0x11, 0x11) AM_WRITE(fromance_crtc_register_w)
+	AM_RANGE(0x10, 0x11) AM_DEVWRITE("gga", vsystem_gga_device, write)
 	AM_RANGE(0x20, 0x20) AM_READ_PORT("P1") AM_WRITE(sound_command_w)
 	AM_RANGE(0x21, 0x21) AM_READ_PORT("P2") AM_WRITE(pipedrm_bankswitch_w)
 	AM_RANGE(0x22, 0x25) AM_WRITE(fromance_scroll_w)
@@ -594,8 +595,6 @@ MACHINE_START_MEMBER(pipedrm_state,pipedrm)
 
 MACHINE_RESET_MEMBER(pipedrm_state,pipedrm)
 {
-	int i;
-
 	m_pending_command = 0;
 	m_sound_command = 0;
 
@@ -610,13 +609,9 @@ MACHINE_RESET_MEMBER(pipedrm_state,pipedrm)
 	m_scrolly[1] = 0;
 	m_gfxreg = 0;
 	m_flipscreen = 0;
-	m_crtc_register = 0;
-
-	for (i = 0; i < 0x10; i++)
-		m_crtc_data[i] = 0;
 }
 
-static MACHINE_CONFIG_START( pipedrm, pipedrm_state )
+static MACHINE_CONFIG_START( pipedrm )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,12000000/2)
@@ -644,6 +639,9 @@ static MACHINE_CONFIG_START( pipedrm, pipedrm_state )
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
+	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, 0)
+	MCFG_VSYSTEM_GGA_REGISTER_WRITE_CB(WRITE8(fromance_state, fromance_gga_data_w))
+
 	MCFG_DEVICE_ADD("vsystem_spr_old", VSYSTEM_SPR2, 0)
 	MCFG_VSYSTEM_SPR2_SET_GFXREGION(2)
 	MCFG_VSYSTEM_SPR2_SET_OFFSETS(-13, -6)
@@ -663,7 +661,7 @@ static MACHINE_CONFIG_START( pipedrm, pipedrm_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( hatris, pipedrm_state )
+static MACHINE_CONFIG_START( hatris )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,12000000/2)
@@ -690,6 +688,9 @@ static MACHINE_CONFIG_START( hatris, pipedrm_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hatris)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+
+	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, 0)
+	MCFG_VSYSTEM_GGA_REGISTER_WRITE_CB(WRITE8(fromance_state, fromance_gga_data_w))
 
 	MCFG_VIDEO_START_OVERRIDE(pipedrm_state,hatris)
 
@@ -905,7 +906,7 @@ DRIVER_INIT_MEMBER(pipedrm_state,pipedrm)
 {
 	const memory_share *share = memshare("palette");
 	/* sprite RAM lives at the end of palette RAM */
-	m_spriteram.set_target((UINT8*)share->ptr() + 0xc00, 0x400);
+	m_spriteram.set_target((uint8_t*)share->ptr() + 0xc00, 0x400);
 	m_maincpu->space(AS_PROGRAM).install_ram(0xcc00, 0xcfff, m_spriteram);
 }
 
@@ -924,9 +925,9 @@ DRIVER_INIT_MEMBER(pipedrm_state,hatris)
  *
  *************************************/
 
-GAME( 1990, pipedrm,  0,       pipedrm, pipedrm, pipedrm_state, pipedrm, ROT0, "Video System Co.", "Pipe Dream (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, pipedrmu, pipedrm, pipedrm, pipedrm, pipedrm_state, pipedrm, ROT0, "Video System Co.", "Pipe Dream (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, pipedrmj, pipedrm, pipedrm, pipedrm, pipedrm_state, pipedrm, ROT0, "Video System Co.", "Pipe Dream (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pipedrm,  0,       pipedrm, pipedrm, pipedrm_state, pipedrm, ROT0, "Video System Co.", "Pipe Dream (World)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pipedrmu, pipedrm, pipedrm, pipedrm, pipedrm_state, pipedrm, ROT0, "Video System Co.", "Pipe Dream (US)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pipedrmj, pipedrm, pipedrm, pipedrm, pipedrm_state, pipedrm, ROT0, "Video System Co.", "Pipe Dream (Japan)",  MACHINE_SUPPORTS_SAVE )
 GAME( 1990, pipedrmt, pipedrm, pipedrm, pipedrm, pipedrm_state, pipedrm, ROT0, "Video System Co.", "Pipe Dream (Taiwan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, hatris,   0,       hatris,  hatris, pipedrm_state,  hatris,  ROT0, "Video System Co.", "Hatris (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, hatrisj,  hatris,  hatris,  hatris, pipedrm_state,  hatris,  ROT0, "Video System Co.", "Hatris (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hatris,   0,       hatris,  hatris,  pipedrm_state, hatris,  ROT0, "Video System Co.", "Hatris (US)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hatrisj,  hatris,  hatris,  hatris,  pipedrm_state, hatris,  ROT0, "Video System Co.", "Hatris (Japan)",      MACHINE_SUPPORTS_SAVE )

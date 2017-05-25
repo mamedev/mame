@@ -2,7 +2,7 @@
 // copyright-holders:Robbbert
 /***************************************************************************
 
-    microbee.c
+    microbee.cpp
 
     machine driver
     Originally written by Juergen Buchmueller, Jan 2000
@@ -11,6 +11,7 @@
 
 ****************************************************************************/
 
+#include "emu.h"
 #include "includes/mbee.h"
 #include "machine/z80bin.h"
 
@@ -23,7 +24,7 @@ void mbee_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 		timer_newkb(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in mbee_state::device_timer");
+		assert_always(false, "Unknown id in mbee_state::device_timer");
 	}
 }
 
@@ -57,7 +58,7 @@ WRITE8_MEMBER( mbee_state::pio_port_b_w )
 
 READ8_MEMBER( mbee_state::pio_port_b_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (m_cassette->input() > 0.03)
 		data |= 1;
@@ -67,16 +68,16 @@ READ8_MEMBER( mbee_state::pio_port_b_r )
 	switch (m_io_config->read() & 0xc0)
 	{
 		case 0x00:
-			data |= (UINT8)m_b7_vs << 7;
+			data |= (uint8_t)m_b7_vs << 7;
 			break;
 		case 0x40:
-			data |= (UINT8)m_b7_rtc << 7;
+			data |= (uint8_t)m_b7_rtc << 7;
 			break;
 		case 0x80:
 			data |= 0x80;
 			break;
 	}
-	data |= (UINT8)m_b2 << 1; // key pressed on new keyboard
+	data |= (uint8_t)m_b2 << 1; // key pressed on new keyboard
 
 	return data;
 }
@@ -156,7 +157,7 @@ TIMER_CALLBACK_MEMBER( mbee_state::timer_newkb )
 	It includes up to 4 KB of mask-programmable ROM, 64 bytes of scratchpad RAM and up to 64 bytes
 	of executable RAM. The MCU also integrates 32-bit I/O and a programmable timer. */
 
-	UINT8 i, j, pressed;
+	uint8_t i, j, pressed;
 
 	// find what has changed
 	for (i = 0; i < 15; i++)
@@ -170,7 +171,7 @@ TIMER_CALLBACK_MEMBER( mbee_state::timer_newkb )
 				if (BIT(pressed^m_mbee256_was_pressed[i], j))
 				{
 					// put it in the queue
-					UINT8 code = (i << 3) | j | (BIT(pressed, j) ? 0x80 : 0);
+					uint8_t code = (i << 3) | j | (BIT(pressed, j) ? 0x80 : 0);
 					m_mbee256_q[m_mbee256_q_pos] = code;
 					if (m_mbee256_q_pos < 19) m_mbee256_q_pos++;
 				}
@@ -191,7 +192,7 @@ TIMER_CALLBACK_MEMBER( mbee_state::timer_newkb )
 
 READ8_MEMBER( mbee_state::port18_r )
 {
-	UINT8 i, data = m_mbee256_q[0]; // get oldest key
+	uint8_t i, data = m_mbee256_q[0]; // get oldest key
 
 	if (m_mbee256_q_pos)
 	{
@@ -273,14 +274,14 @@ WRITE_LINE_MEMBER( mbee_state::rtc_irq_w )
 
 ************************************************************/
 
-void mbee_state::setup_banks(UINT8 data, bool first_time, UINT8 b_mask)
+void mbee_state::setup_banks(uint8_t data, bool first_time, uint8_t b_mask)
 {
 	data &= 0x3f; // (bits 0-5 are referred to as S0-S5)
 	address_space &mem = m_maincpu->space(AS_PROGRAM);
-	UINT8 *prom = memregion("pals")->base();
-	UINT8 b_data = BITSWAP8(data, 7,5,3,2,4,6,1,0) & 0x3b; // arrange data bits to S0,S1,-,S4,S2,S3
-	UINT8 b_bank, b_byte, b_byte_t, b_addr, p_bank = 1;
-	UINT16 b_vid;
+	uint8_t *prom = memregion("pals")->base();
+	uint8_t b_data = BITSWAP8(data, 7,5,3,2,4,6,1,0) & 0x3b; // arrange data bits to S0,S1,-,S4,S2,S3
+	uint8_t b_bank, b_byte, b_byte_t, b_addr, p_bank = 1;
+	uint16_t b_vid;
 	char banktag[10];
 
 	if (first_time || (b_data != m_bank_array[0])) // if same data as last time, leave now
@@ -494,7 +495,7 @@ DRIVER_INIT_MEMBER( mbee_state, mbee )
 
 DRIVER_INIT_MEMBER( mbee_state, mbeeic )
 {
-	UINT8 *RAM = memregion("pakrom")->base();
+	uint8_t *RAM = memregion("pakrom")->base();
 	m_pak->configure_entries(0, 16, &RAM[0x0000], 0x2000);
 	m_pak->set_entry(0);
 
@@ -504,7 +505,7 @@ DRIVER_INIT_MEMBER( mbee_state, mbeeic )
 
 DRIVER_INIT_MEMBER( mbee_state, mbeepc )
 {
-	UINT8 *RAM = memregion("telcomrom")->base();
+	uint8_t *RAM = memregion("telcomrom")->base();
 	m_telcom->configure_entries(0, 2, &RAM[0x0000], 0x1000);
 
 	RAM = memregion("pakrom")->base();
@@ -517,7 +518,7 @@ DRIVER_INIT_MEMBER( mbee_state, mbeepc )
 
 DRIVER_INIT_MEMBER( mbee_state, mbeepc85 )
 {
-	UINT8 *RAM = memregion("telcomrom")->base();
+	uint8_t *RAM = memregion("telcomrom")->base();
 	m_telcom->configure_entries(0, 2, &RAM[0x0000], 0x1000);
 
 	RAM = memregion("pakrom")->base();
@@ -530,7 +531,7 @@ DRIVER_INIT_MEMBER( mbee_state, mbeepc85 )
 
 DRIVER_INIT_MEMBER( mbee_state, mbeeppc )
 {
-	UINT8 *RAM = memregion("basicrom")->base();
+	uint8_t *RAM = memregion("basicrom")->base();
 	m_basic->configure_entries(0, 2, &RAM[0x0000], 0x2000);
 
 	RAM = memregion("telcomrom")->base();
@@ -554,11 +555,11 @@ DRIVER_INIT_MEMBER( mbee_state, mbee56 )
 // PP has 1024k which is 256 banks, but having 64 banks stops it crashing during the self-test. Need a schematic before we can fix it.
 DRIVER_INIT_MEMBER( mbee_state, mbee128 )
 {
-	UINT8 *RAM = memregion("rams")->base();
-	UINT8 *ROM = memregion("roms")->base();
+	uint8_t *RAM = memregion("rams")->base();
+	uint8_t *ROM = memregion("roms")->base();
 	char banktag[10];
 
-	for (UINT8 b_bank = 0; b_bank < 16; b_bank++)
+	for (uint8_t b_bank = 0; b_bank < 16; b_bank++)
 	{
 		sprintf(banktag, "bankr%d", b_bank);
 		membank(banktag)->configure_entries(0, 64, &RAM[0x0000], 0x1000); // RAM banks
@@ -575,11 +576,11 @@ DRIVER_INIT_MEMBER( mbee_state, mbee128 )
 
 DRIVER_INIT_MEMBER( mbee_state, mbee256 )
 {
-	UINT8 *RAM = memregion("rams")->base();
-	UINT8 *ROM = memregion("roms")->base();
+	uint8_t *RAM = memregion("rams")->base();
+	uint8_t *ROM = memregion("roms")->base();
 	char banktag[10];
 
-	for (UINT8 b_bank = 0; b_bank < 16; b_bank++)
+	for (uint8_t b_bank = 0; b_bank < 16; b_bank++)
 	{
 		sprintf(banktag, "bankr%d", b_bank);
 		membank(banktag)->configure_entries(0, 64, &RAM[0x0000], 0x1000); // RAM banks
@@ -598,7 +599,7 @@ DRIVER_INIT_MEMBER( mbee_state, mbee256 )
 
 DRIVER_INIT_MEMBER( mbee_state, mbeett )
 {
-	UINT8 *RAM = memregion("telcomrom")->base();
+	uint8_t *RAM = memregion("telcomrom")->base();
 	m_telcom->configure_entries(0, 2, &RAM[0x0000], 0x1000);
 
 	RAM = memregion("pakrom")->base();
@@ -624,10 +625,10 @@ DRIVER_INIT_MEMBER( mbee_state, mbeett )
 QUICKLOAD_LOAD_MEMBER( mbee_state, mbee )
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	UINT16 i, j;
-	UINT8 data, sw = m_io_config->read() & 1;   /* reading the config switch: 1 = autorun */
+	uint16_t i, j;
+	uint8_t data, sw = m_io_config->read() & 1;   /* reading the config switch: 1 = autorun */
 
-	if (!core_stricmp(image.filetype(), "mwb"))
+	if (image.is_filetype("mwb"))
 	{
 		/* mwb files - standard basic files */
 		for (i = 0; i < quickload_size; i++)
@@ -637,7 +638,7 @@ QUICKLOAD_LOAD_MEMBER( mbee_state, mbee )
 			if (image.fread(&data, 1) != 1)
 			{
 				image.message("Unexpected EOF");
-				return IMAGE_INIT_FAIL;
+				return image_init_result::FAIL;
 			}
 
 			if ((j < m_size) || (j > 0xefff))
@@ -645,7 +646,7 @@ QUICKLOAD_LOAD_MEMBER( mbee_state, mbee )
 			else
 			{
 				image.message("Not enough memory in this microbee");
-				return IMAGE_INIT_FAIL;
+				return image_init_result::FAIL;
 			}
 		}
 
@@ -657,7 +658,7 @@ QUICKLOAD_LOAD_MEMBER( mbee_state, mbee )
 		else
 			space.write_word(0xa2,0x8517);
 	}
-	else if (!core_stricmp(image.filetype(), "com"))
+	else if (image.is_filetype("com"))
 	{
 		/* com files - most com files are just machine-language games with a wrapper and don't need cp/m to be present */
 		for (i = 0; i < quickload_size; i++)
@@ -667,7 +668,7 @@ QUICKLOAD_LOAD_MEMBER( mbee_state, mbee )
 			if (image.fread(&data, 1) != 1)
 			{
 				image.message("Unexpected EOF");
-				return IMAGE_INIT_FAIL;
+				return image_init_result::FAIL;
 			}
 
 			if ((j < m_size) || (j > 0xefff))
@@ -675,13 +676,13 @@ QUICKLOAD_LOAD_MEMBER( mbee_state, mbee )
 			else
 			{
 				image.message("Not enough memory in this microbee");
-				return IMAGE_INIT_FAIL;
+				return image_init_result::FAIL;
 			}
 		}
 
 		if (sw) m_maincpu->set_pc(0x100);
 	}
-	else if (!core_stricmp(image.filetype(), "bee"))
+	else if (image.is_filetype("bee"))
 	{
 		/* bee files - machine-language games that start at 0900 */
 		for (i = 0; i < quickload_size; i++)
@@ -691,7 +692,7 @@ QUICKLOAD_LOAD_MEMBER( mbee_state, mbee )
 			if (image.fread(&data, 1) != 1)
 			{
 				image.message("Unexpected EOF");
-				return IMAGE_INIT_FAIL;
+				return image_init_result::FAIL;
 			}
 
 			if ((j < m_size) || (j > 0xefff))
@@ -699,14 +700,14 @@ QUICKLOAD_LOAD_MEMBER( mbee_state, mbee )
 			else
 			{
 				image.message("Not enough memory in this microbee");
-				return IMAGE_INIT_FAIL;
+				return image_init_result::FAIL;
 			}
 		}
 
 		if (sw) m_maincpu->set_pc(0x900);
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 
@@ -716,13 +717,13 @@ QUICKLOAD_LOAD_MEMBER( mbee_state, mbee )
 
 QUICKLOAD_LOAD_MEMBER( mbee_state, mbee_z80bin )
 {
-	UINT16 execute_address, start_addr, end_addr;
+	uint16_t execute_address, start_addr, end_addr;
 	int autorun;
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	/* load the binary into memory */
-	if (z80bin_load_file(&image, space, file_type, &execute_address, &start_addr, &end_addr) == IMAGE_INIT_FAIL)
-		return IMAGE_INIT_FAIL;
+	if (z80bin_load_file(&image, space, file_type, &execute_address, &start_addr, &end_addr) != image_init_result::PASS)
+		return image_init_result::FAIL;
 
 	/* is this file executable? */
 	if (execute_address != 0xffff)
@@ -743,5 +744,5 @@ QUICKLOAD_LOAD_MEMBER( mbee_state, mbee_z80bin )
 		}
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }

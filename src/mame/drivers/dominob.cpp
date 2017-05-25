@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina, David Haywood
 /***************************************************************************
 
@@ -65,6 +65,8 @@ Notes:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
 
 class dominob_state : public driver_device
 {
@@ -79,17 +81,17 @@ public:
 		m_palette(*this, "palette")  { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_bgram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_bgram;
 
 	/* input-related */
-	//UINT8 m_paddle_select;
-	//UINT8 m_paddle_value;
+	//uint8_t m_paddle_select;
+	//uint8_t m_paddle_value;
 	DECLARE_WRITE8_MEMBER(dominob_d008_w);
 	DECLARE_READ8_MEMBER(dominob_unk_port02_r);
 	virtual void video_start() override;
-	UINT32 screen_update_dominob(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_dominob(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -130,7 +132,7 @@ void dominob_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 }
 
 
-UINT32 dominob_state::screen_update_dominob(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t dominob_state::screen_update_dominob(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x,y;
 	int index = 0;
@@ -287,7 +289,7 @@ static GFXDECODE_START( dominob )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( dominob, dominob_state )
+static MACHINE_CONFIG_START( dominob )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,XTAL_12MHz/2)
@@ -359,5 +361,5 @@ ROM_START( dominobv2 )
 	ROM_LOAD( "u114v2",   0xc0000, 0x40000, CRC(df17ee65) SHA1(1cb434719a8c406726d2c966392be03a2dc1d758) )
 ROM_END
 
-GAME( 1996, dominob,  0,       dominob,  dominob, driver_device,  0, ROT0, "Wonwoo Systems", "Domino Block", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, dominobv2,dominob, dominob,  dominob, driver_device,  0, ROT0, "Wonwoo Systems", "Domino Block ver.2", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, dominob,  0,       dominob,  dominob, dominob_state,  0, ROT0, "Wonwoo Systems", "Domino Block",       MACHINE_SUPPORTS_SAVE )
+GAME( 1996, dominobv2,dominob, dominob,  dominob, dominob_state,  0, ROT0, "Wonwoo Systems", "Domino Block ver.2", MACHINE_SUPPORTS_SAVE )

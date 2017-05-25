@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina, Roberto Fresca
 /***************************************************************************
 
@@ -119,9 +119,12 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/4enraya.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
-#include "includes/4enraya.h"
+#include "screen.h"
+#include "speaker.h"
 
 #define MAIN_CLOCK XTAL_8MHz
 
@@ -161,8 +164,8 @@ WRITE8_MEMBER(_4enraya_state::sound_control_w)
 
 READ8_MEMBER(_4enraya_state::fenraya_custom_map_r)
 {
-	UINT8 prom_routing = (m_prom[offset >> 12] & 0xf) ^ 0xf;
-	UINT8 res = 0;
+	uint8_t prom_routing = (m_prom[offset >> 12] & 0xf) ^ 0xf;
+	uint8_t res = 0;
 
 	if (prom_routing & 1) // ROM5
 	{
@@ -189,7 +192,7 @@ READ8_MEMBER(_4enraya_state::fenraya_custom_map_r)
 
 WRITE8_MEMBER(_4enraya_state::fenraya_custom_map_w)
 {
-	UINT8 prom_routing = (m_prom[offset >> 12] & 0xf) ^ 0xf;
+	uint8_t prom_routing = (m_prom[offset >> 12] & 0xf) ^ 0xf;
 
 	if (prom_routing & 1) // ROM5
 	{
@@ -420,7 +423,7 @@ void _4enraya_state::machine_reset()
 *         Machine Drivers          *
 ***********************************/
 
-static MACHINE_CONFIG_START( 4enraya, _4enraya_state )
+static MACHINE_CONFIG_START( 4enraya )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK/2)
@@ -516,7 +519,7 @@ ROM_END
 DRIVER_INIT_MEMBER(_4enraya_state, unkpacg)
 {
 	// descramble rom
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 	for (int i = 0x8000; i < 0xa000; i++)
 		rom[i] = BITSWAP8(rom[i], 7,6,5,4,3,2,0,1);
 }
@@ -527,6 +530,6 @@ DRIVER_INIT_MEMBER(_4enraya_state, unkpacg)
 ***********************************/
 
 /*    YEAR  NAME      PARENT   MACHINE   INPUT    STATE           INIT     ROT    COMPANY      FULLNAME                        FLAGS  */
-GAME( 1990, 4enraya,  0,       4enraya,  4enraya, driver_device,  0,       ROT0, "IDSA",      "4 En Raya (set 1)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1990, 4enrayaa, 4enraya, 4enraya,  4enraya, driver_device,  0,       ROT0, "IDSA",      "4 En Raya (set 2)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1990, 4enraya,  0,       4enraya,  4enraya, _4enraya_state, 0,       ROT0, "IDSA",      "4 En Raya (set 1)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1990, 4enrayaa, 4enraya, 4enraya,  4enraya, _4enraya_state, 0,       ROT0, "IDSA",      "4 En Raya (set 2)",             MACHINE_SUPPORTS_SAVE )
 GAME( 199?, unkpacg,  0,       unkpacg,  unkpacg, _4enraya_state, unkpacg, ROT0, "<unknown>", "unknown Pac-Man gambling game", MACHINE_SUPPORTS_SAVE )

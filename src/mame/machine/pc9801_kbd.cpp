@@ -9,6 +9,7 @@
 
     - Verify untested keys:
       STOP, COPY, and vf-1 through vf-5
+      STOP is correct, verified with branmar2
 
     - Problems with natural keyboard (most nonprinting keys don't work)
 
@@ -23,7 +24,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type PC9801_KBD = &device_creator<pc9801_kbd_device>;
+DEFINE_DEVICE_TYPE(PC9801_KBD, pc9801_kbd_device, "pc9801_kbd", "PC-9801 Keyboard")
 
 
 //**************************************************************************
@@ -34,8 +35,8 @@ const device_type PC9801_KBD = &device_creator<pc9801_kbd_device>;
 //  pc9801_kbd_device - constructor
 //-------------------------------------------------
 
-pc9801_kbd_device::pc9801_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, PC9801_KBD, "pc9801_kbd", tag, owner, clock, "pc9801_kbd_", __FILE__),
+pc9801_kbd_device::pc9801_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, PC9801_KBD, tag, owner, clock),
 	m_write_irq(*this)
 {
 }
@@ -47,10 +48,10 @@ pc9801_kbd_device::pc9801_kbd_device(const machine_config &mconfig, const char *
 INPUT_CHANGED_MEMBER(pc9801_kbd_device::key_stroke)
 {
 	if(newval && !oldval)
-		m_rx_buf[(UINT8)(FPTR)(param) & 0x7f] = 1;
+		m_rx_buf[(uint8_t)(uintptr_t)(param) & 0x7f] = 1;
 
 	if(oldval && !newval)
-		m_rx_buf[(UINT8)(FPTR)(param) & 0x7f] = 2;
+		m_rx_buf[(uint8_t)(uintptr_t)(param) & 0x7f] = 2;
 }
 
 static INPUT_PORTS_START( pc9801_kbd )
@@ -176,7 +177,7 @@ static INPUT_PORTS_START( pc9801_kbd )
 	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME(" un 3-8")  PORT_CHANGED_MEMBER(DEVICE_SELF, pc9801_kbd_device, key_stroke, 0x5f)
 
 	PORT_START("KEYC") // 0x60 - 0x67
-	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("STOP?")  PORT_CHANGED_MEMBER(DEVICE_SELF, pc9801_kbd_device, key_stroke, 0x60)
+	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("STOP")  PORT_CHANGED_MEMBER(DEVICE_SELF, pc9801_kbd_device, key_stroke, 0x60)
 	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("COPY?")  PORT_CHANGED_MEMBER(DEVICE_SELF, pc9801_kbd_device, key_stroke, 0x61)
 	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("F1") PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(F1))  PORT_CHANGED_MEMBER(DEVICE_SELF, pc9801_kbd_device, key_stroke, 0x62)
 	PORT_BIT(0x08,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("F2") PORT_CODE(KEYCODE_F2) PORT_CHAR(UCHAR_MAMEKEY(F2))  PORT_CHANGED_MEMBER(DEVICE_SELF, pc9801_kbd_device, key_stroke, 0x63)

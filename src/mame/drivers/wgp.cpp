@@ -397,12 +397,16 @@ Stephh's notes (based on the game M68000 code and some tests) :
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "includes/taitoipt.h"
-#include "cpu/m68000/m68000.h"
-#include "audio/taitosnd.h"
-#include "sound/2610intf.h"
 #include "includes/wgp.h"
+#include "includes/taitoipt.h"
+#include "audio/taitosnd.h"
+
+#include "cpu/z80/z80.h"
+#include "cpu/m68000/m68000.h"
+#include "sound/2610intf.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 void wgp_state::parse_control()
 {
@@ -446,7 +450,7 @@ void wgp_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 		m_subcpu->set_input_line(6, HOLD_LINE); /* assumes Z80 sandwiched between the 68Ks */
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in wgp_state::device_timer");
+		assert_always(false, "Unknown id in wgp_state::device_timer");
 	}
 }
 
@@ -517,12 +521,12 @@ WRITE16_MEMBER(wgp_state::rotate_port_w)
 READ16_MEMBER(wgp_state::wgp_adinput_r)
 {
 	int steer = 0x40;
-	int fake = m_fake ? m_fake->read() : 0;
+	int fake = m_fake.read_safe(0);
 
 	if (!(fake & 0x10)) /* Analogue steer (the real control method) */
 	{
 		/* Reduce span to 0x80 */
-		steer = ((m_steer ? m_steer->read() : 0) * 0x80) / 0x100;
+		steer = (m_steer.read_safe(0) * 0x80) / 0x100;
 	}
 	else    /* Digital steer */
 	{
@@ -567,7 +571,7 @@ READ16_MEMBER(wgp_state::wgp_adinput_r)
 		}
 
 		case 0x05:
-			return m_unknown ? m_unknown->read() : 0;   /* unknown */
+			return m_unknown.read_safe(0);   /* unknown */
 	}
 
 logerror("CPU #0 PC %06x: warning - read unmapped a/d input offset %06x\n",space.device().safe_pc(),offset);
@@ -894,7 +898,7 @@ void wgp_state::machine_reset()
 		m_piv_scrolly[i] = 0;
 	}
 
-	memset(m_rotate_ctrl, 0, 8 * sizeof(UINT16));
+	memset(m_rotate_ctrl, 0, 8 * sizeof(uint16_t));
 }
 
 void wgp_state::machine_start()
@@ -906,7 +910,7 @@ void wgp_state::machine_start()
 	machine().save().register_postload(save_prepost_delegate(FUNC(wgp_state::wgp_postload), this));
 }
 
-static MACHINE_CONFIG_START( wgp, wgp_state )
+static MACHINE_CONFIG_START( wgp )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz ??? */
@@ -1183,7 +1187,7 @@ DRIVER_INIT_MEMBER(wgp_state,wgp)
 #if 0
 	/* Patch for coding error that causes corrupt data in
 	   sprite tilemapping area from $4083c0-847f */
-	UINT16 *ROM = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 	ROM[0x25dc / 2] = 0x0602;   // faulty value is 0x0206
 #endif
 }
@@ -1191,15 +1195,15 @@ DRIVER_INIT_MEMBER(wgp_state,wgp)
 DRIVER_INIT_MEMBER(wgp_state,wgp2)
 {
 	/* Code patches to prevent failure in memory checks */
-	UINT16 *ROM = (UINT16 *)memregion("sub")->base();
+	uint16_t *ROM = (uint16_t *)memregion("sub")->base();
 	ROM[0x8008 / 2] = 0x0;
 	ROM[0x8010 / 2] = 0x0;
 }
 
 /* Working Games with some graphics problems - e.g. missing rotation */
 
-GAME( 1989, wgp,      0,      wgp,    wgp, wgp_state,    wgp,    ROT0, "Taito America Corporation", "World Grand Prix (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1989, wgpj,     wgp,    wgp,    wgpj, wgp_state,   wgp,    ROT0, "Taito Corporation", "World Grand Prix (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1989, wgpjoy,   wgp,    wgp,    wgpjoy, wgp_state, wgp,    ROT0, "Taito Corporation", "World Grand Prix (joystick version) (Japan, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1989, wgpjoya,  wgp,    wgp,    wgpjoy, wgp_state, wgp,    ROT0, "Taito Corporation", "World Grand Prix (joystick version) (Japan, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1990, wgp2,     wgp,    wgp2,   wgp2, wgp_state,   wgp2,   ROT0, "Taito Corporation", "World Grand Prix 2 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1989, wgp,      0,      wgp,    wgp,    wgp_state, wgp,    ROT0, "Taito America Corporation", "World Grand Prix (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1989, wgpj,     wgp,    wgp,    wgpj,   wgp_state, wgp,    ROT0, "Taito Corporation",         "World Grand Prix (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1989, wgpjoy,   wgp,    wgp,    wgpjoy, wgp_state, wgp,    ROT0, "Taito Corporation",         "World Grand Prix (joystick version) (Japan, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1989, wgpjoya,  wgp,    wgp,    wgpjoy, wgp_state, wgp,    ROT0, "Taito Corporation",         "World Grand Prix (joystick version) (Japan, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1990, wgp2,     wgp,    wgp2,   wgp2,   wgp_state, wgp2,   ROT0, "Taito Corporation",         "World Grand Prix 2 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )

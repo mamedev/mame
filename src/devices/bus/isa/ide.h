@@ -1,11 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Miodrag Milanovic
+#ifndef MAME_BUS_ISA_IDE_H
+#define MAME_BUS_ISA_IDE_H
+
 #pragma once
 
-#ifndef __ISA_IDE_H__
-#define __ISA_IDE_H__
-
-#include "emu.h"
 #include "isa.h"
 #include "machine/idectrl.h"
 
@@ -20,7 +19,7 @@ class isa16_ide_device : public device_t,
 {
 public:
 	// construction/destruction
-	isa16_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	isa16_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -45,6 +44,6 @@ private:
 
 
 // device type definition
-extern const device_type ISA16_IDE;
+DECLARE_DEVICE_TYPE(ISA16_IDE, isa16_ide_device)
 
-#endif  /* __ISA_IDE_H__ */
+#endif // MAME_BUS_ISA_IDE_H

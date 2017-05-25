@@ -254,15 +254,17 @@
 
 ***************************************************************************************************/
 
-#define MASTER_CLOCK    XTAL_10MHz
-#define CPU_CLOCK       (MASTER_CLOCK/16)
-
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 //#include "cpu/m6805/m6805.h"
-#include "video/mc6845.h"
 #include "machine/6821pia.h"
 #include "sound/discrete.h"
+#include "video/mc6845.h"
+#include "screen.h"
+
+
+#define MASTER_CLOCK    XTAL_10MHz
+#define CPU_CLOCK       (MASTER_CLOCK/16)
 
 
 class blitz_state : public driver_device
@@ -273,10 +275,11 @@ public:
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode")
+	{ }
 
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
 	tilemap_t *m_bg_tilemap;
 	int m_mux_data;
 	DECLARE_WRITE8_MEMBER(megadpkr_videoram_w);
@@ -288,7 +291,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(blitz);
-	UINT32 screen_update_megadpkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_megadpkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 };
@@ -331,10 +334,10 @@ TILE_GET_INFO_MEMBER(blitz_state::get_bg_tile_info)
 
 void blitz_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(blitz_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(blitz_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
-UINT32 blitz_state::screen_update_megadpkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t blitz_state::screen_update_megadpkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -343,7 +346,7 @@ UINT32 blitz_state::screen_update_megadpkr(screen_device &screen, bitmap_ind16 &
 
 PALETTE_INIT_MEMBER(blitz_state, blitz)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 /*
     This hardware has a feature called BLUE KILLER.
     Using the original intensity line, the PCB has a bridge
@@ -699,7 +702,7 @@ GFXDECODE_END
 *              Machine Drivers               *
 *********************************************/
 
-static MACHINE_CONFIG_START( megadpkr, blitz_state )
+static MACHINE_CONFIG_START( megadpkr )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, CPU_CLOCK)
@@ -830,6 +833,6 @@ ROM_END
 *                Game Drivers                *
 *********************************************/
 
-/*    YEAR  NAME       PARENT    MACHINE   INPUT     STATE          INIT  ROT     COMPANY              FULLNAME                                    FLAGS */
-GAME( 1990, megadpkr,  0,        megadpkr, megadpkr, driver_device, 0,    ROT0,  "Blitz System Inc.", "Mega Double Poker (conversion kit, set 1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1990, megadpkrb, megadpkr, megadpkr, megadpkr, driver_device, 0,    ROT0,  "Blitz System Inc.", "Mega Double Poker (conversion kit, set 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+/*    YEAR  NAME       PARENT    MACHINE   INPUT     STATE        INIT  ROT    COMPANY              FULLNAME                                     FLAGS */
+GAME( 1990, megadpkr,  0,        megadpkr, megadpkr, blitz_state, 0,    ROT0,  "Blitz System Inc.", "Mega Double Poker (conversion kit, set 1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1990, megadpkrb, megadpkr, megadpkr, megadpkr, blitz_state, 0,    ROT0,  "Blitz System Inc.", "Mega Double Poker (conversion kit, set 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

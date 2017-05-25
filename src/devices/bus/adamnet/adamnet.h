@@ -6,12 +6,11 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_ADAMNET_ADAMNET_H
+#define MAME_BUS_ADAMNET_ADAMNET_H
+
 #pragma once
 
-#ifndef __ADAMNET__
-#define __ADAMNET__
-
-#include "emu.h"
 
 
 
@@ -48,7 +47,7 @@ class adamnet_device : public device_t
 {
 public:
 	// construction/destruction
-	adamnet_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	adamnet_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void add_device(device_t *target);
 
@@ -93,7 +92,7 @@ class adamnet_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	adamnet_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	adamnet_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -108,24 +107,28 @@ protected:
 
 class device_adamnet_card_interface : public device_slot_card_interface
 {
+	friend class adamnet_device;
+
 public:
 	// construction/destruction
-	device_adamnet_card_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_adamnet_card_interface();
 
 	virtual void adamnet_reset_w(int state) = 0;
+
+protected:
+	device_adamnet_card_interface(const machine_config &mconfig, device_t &device);
 
 	adamnet_device  *m_bus;
 };
 
 
 // device type definitions
-extern const device_type ADAMNET;
-extern const device_type ADAMNET_SLOT;
+DECLARE_DEVICE_TYPE(ADAMNET,      adamnet_device)
+DECLARE_DEVICE_TYPE(ADAMNET_SLOT, adamnet_slot_device)
 
 
 SLOT_INTERFACE_EXTERN( adamnet_devices );
 
 
 
-#endif
+#endif // MAME_BUS_ADAMNET_ADAMNET_H

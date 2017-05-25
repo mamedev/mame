@@ -20,24 +20,33 @@ namespace ui {
 class menu_software_parts : public menu
 {
 public:
-	enum { T_EMPTY, T_FMGR, T_SWLIST, T_ENTRY };
-	menu_software_parts(mame_ui_manager &mui, render_container *container, const software_info *info, const char *interface, const software_part **part, bool other_opt, int *result);
+	enum class result
+	{
+		INVALID = -1,
+		EMPTY = 0x2000,
+		FMGR,
+		SWLIST,
+		ENTRY
+	};
+
+	menu_software_parts(mame_ui_manager &mui, render_container &container, const software_info *info, const char *interface, const software_part **part, bool other_opt, result &result);
 	virtual ~menu_software_parts() override;
-	virtual void populate() override;
-	virtual void handle() override;
 
 private:
 	struct software_part_menu_entry {
-		int type;
+		result type;
 		const software_part *part;
 	};
+
+	virtual void populate(float &customtop, float &custombottom) override;
+	virtual void handle() override;
 
 	// variables
 	const software_info *   m_info;
 	const char *            m_interface;
 	const software_part **  m_selected_part;
 	bool                    m_other_opt;
-	int *                   m_result;
+	result &                m_result;
 };
 
 
@@ -46,9 +55,9 @@ private:
 class menu_software_list : public menu
 {
 public:
-	menu_software_list(mame_ui_manager &mui, render_container *container, software_list_device *swlist, const char *interface, std::string &result);
+	menu_software_list(mame_ui_manager &mui, render_container &container, software_list_device *swlist, const char *interface, std::string &result);
 	virtual ~menu_software_list() override;
-	virtual void populate() override;
+	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 
 private:
@@ -68,8 +77,8 @@ private:
 	software_list_device *          m_swlist; // currently selected list
 	const char *                    m_interface;
 	std::string &                   m_result;
-	std::vector<entry_info>			m_entrylist;
-	char                            m_filename_buffer[1024];
+	std::list<entry_info>           m_entrylist;
+	std::string                     m_filename_buffer;
 	bool                            m_ordered_by_shortname;
 
 	// functions
@@ -83,9 +92,9 @@ private:
 class menu_software : public menu
 {
 public:
-	menu_software(mame_ui_manager &mui, render_container *container, const char *interface, software_list_device **result);
+	menu_software(mame_ui_manager &mui, render_container &container, const char *interface, software_list_device **result);
 	virtual ~menu_software() override;
-	virtual void populate() override;
+	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 
 private:

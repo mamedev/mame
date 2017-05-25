@@ -15,14 +15,20 @@
 ************************************************************************/
 
 #include "emu.h"
+#include "video/apple2.h"
+
+#include "cpu/m6502/m6502.h"
+#include "imagedev/cassette.h"
+#include "imagedev/flopdrv.h"
 #include "machine/bankdev.h"
 #include "machine/ram.h"
-#include "sound/speaker.h"
-#include "imagedev/flopdrv.h"
-#include "imagedev/cassette.h"
+#include "sound/spkrdev.h"
+
+#include "screen.h"
+#include "speaker.h"
+
 #include "formats/ap2_dsk.h"
-#include "cpu/m6502/m6502.h"
-#include "video/apple2.h"
+
 
 #define A2_CPU_TAG "maincpu"
 #define A2_BUS_TAG "a2bus"
@@ -70,7 +76,7 @@ public:
 	virtual void machine_reset() override;
 
 	DECLARE_PALETTE_INIT(tk2000);
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER(ram_r);
 	DECLARE_WRITE8_MEMBER(ram_w);
@@ -85,15 +91,15 @@ private:
 	int m_speaker_state;
 	int m_cassette_state;
 
-	UINT8 m_strobe;
+	uint8_t m_strobe;
 
 	bool m_page2;
 
-	UINT8 *m_ram_ptr;
+	uint8_t *m_ram_ptr;
 	int m_ram_size;
 
 	void do_io(address_space &space, int offset);
-	UINT8 read_floatingbus();
+	uint8_t read_floatingbus();
 };
 
 /***************************************************************************
@@ -152,7 +158,7 @@ PALETTE_INIT_MEMBER(tk2000_state, tk2000)
 	m_video->palette_init_apple2(palette);
 }
 
-UINT32 tk2000_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t tk2000_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_video->hgr_update(screen, bitmap, cliprect, 0, 191);
 	return 0;
@@ -164,7 +170,7 @@ UINT32 tk2000_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 // most softswitches don't care about read vs write, so handle them here
 void tk2000_state::do_io(address_space &space, int offset)
 {
-	if(space.debugger_access())
+	if(machine().side_effect_disabled())
 	{
 		return;
 	}
@@ -287,7 +293,7 @@ WRITE8_MEMBER(tk2000_state::c100_w)
 }
 
 // floating bus code from old machine/apple2: needs to be reworked based on real beam position to enable e.g. Bob Bishop's screen splitter
-UINT8 tk2000_state::read_floatingbus()
+uint8_t tk2000_state::read_floatingbus()
 {
 	enum
 	{
@@ -555,7 +561,7 @@ static INPUT_PORTS_START( tk2000 )
 	PORT_CONFSETTING(0x03, "Amber")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( tk2000, tk2000_state )
+static MACHINE_CONFIG_START( tk2000 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(A2_CPU_TAG, M6502, 1021800)     /* close to actual CPU frequency of 1.020484 MHz */
 	MCFG_CPU_PROGRAM_MAP(apple2_map)
@@ -604,5 +610,5 @@ ROM_START(tk2000)
 	ROM_LOAD( "tk2000.rom",   0x000000, 0x004000, CRC(dfdbacc3) SHA1(bb37844c31616046630868a4399ee3d55d6df277) )
 ROM_END
 
-/*    YEAR  NAME      PARENT    COMPAT    MACHINE      INPUT     INIT      COMPANY            FULLNAME */
-COMP( 1984, tk2000,   0,        0,        tk2000,      tk2000,  driver_device,   0,        "Microdigital",    "TK2000", MACHINE_NOT_WORKING )
+/*    YEAR  NAME      PARENT    COMPAT    MACHINE      INPUT    STATE INIT      INIT  COMPANY            FULLNAME */
+COMP( 1984, tk2000,   0,        0,        tk2000,      tk2000,  tk2000_state,   0,    "Microdigital",    "TK2000", MACHINE_NOT_WORKING )

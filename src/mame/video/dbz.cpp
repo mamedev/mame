@@ -73,8 +73,8 @@ TILE_GET_INFO_MEMBER(dbz_state::get_dbz_bg1_tile_info)
 
 void dbz_state::video_start()
 {
-	m_bg1_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dbz_state::get_dbz_bg1_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
-	m_bg2_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dbz_state::get_dbz_bg2_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+	m_bg1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dbz_state::get_dbz_bg1_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+	m_bg2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dbz_state::get_dbz_bg2_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
 
 	m_bg1_tilemap->set_transparent_pen(0);
 	m_bg2_tilemap->set_transparent_pen(0);
@@ -88,12 +88,12 @@ void dbz_state::video_start()
 	m_k056832->set_layer_offs(3, -31, -16); //?
 }
 
-UINT32 dbz_state::screen_update_dbz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t dbz_state::screen_update_dbz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	static const int K053251_CI[6] = { K053251_CI3, K053251_CI4, K053251_CI4, K053251_CI4, K053251_CI2, K053251_CI1 };
+	static const int K053251_CI[6] = { k053251_device::CI3, k053251_device::CI4, k053251_device::CI4, k053251_device::CI4, k053251_device::CI2, k053251_device::CI1 };
 	int layer[5], plane, new_colorbase;
 
-	m_sprite_colorbase = m_k053251->get_palette_index(K053251_CI0);
+	m_sprite_colorbase = m_k053251->get_palette_index(k053251_device::CI0);
 
 	for (plane = 0; plane < 6; plane++)
 	{
@@ -113,15 +113,15 @@ UINT32 dbz_state::screen_update_dbz(screen_device &screen, bitmap_ind16 &bitmap,
 	//layers priority
 
 	layer[0] = 0;
-	m_layerpri[0] = m_k053251->get_priority(K053251_CI3);
+	m_layerpri[0] = m_k053251->get_priority(k053251_device::CI3);
 	layer[1] = 1;
-	m_layerpri[1] = m_k053251->get_priority(K053251_CI4);
+	m_layerpri[1] = m_k053251->get_priority(k053251_device::CI4);
 	layer[2] = 3;
-	m_layerpri[2] = m_k053251->get_priority(K053251_CI0);
+	m_layerpri[2] = m_k053251->get_priority(k053251_device::CI0);
 	layer[3] = 4;
-	m_layerpri[3] = m_k053251->get_priority(K053251_CI2);
+	m_layerpri[3] = m_k053251->get_priority(k053251_device::CI2);
 	layer[4] = 5;
-	m_layerpri[4] = m_k053251->get_priority(K053251_CI1);
+	m_layerpri[4] = m_k053251->get_priority(k053251_device::CI1);
 
 	konami_sortlayers5(layer, m_layerpri);
 

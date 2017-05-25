@@ -1,11 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
+#ifndef MAME_INCLUDES_BULLET_H
+#define MAME_INCLUDES_BULLET_H
+
 #pragma once
 
-#ifndef __BULLET__
-#define __BULLET__
-
-#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "bus/centronics/ctronics.h"
 #include "machine/ram.h"
@@ -56,28 +55,6 @@ public:
 	{
 	}
 
-	required_device<cpu_device> m_maincpu;
-	required_device<z80ctc_device> m_ctc;
-	required_device<z80dart_device> m_dart;
-	required_device<z80dma_device> m_dmac;
-	required_device<mb8877_t> m_fdc;
-	required_device<ram_device> m_ram;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
-	required_device<floppy_connector> m_floppy2;
-	required_device<floppy_connector> m_floppy3;
-	required_device<floppy_connector> m_floppy4;
-	required_device<floppy_connector> m_floppy5;
-	required_device<floppy_connector> m_floppy6;
-	required_device<floppy_connector> m_floppy7;
-	floppy_image_device *m_floppy;
-	required_device<centronics_device> m_centronics;
-	required_memory_region m_rom;
-	required_ioport m_sw1;
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
 	DECLARE_READ8_MEMBER( mreq_r );
 	DECLARE_WRITE8_MEMBER( mreq_w );
 	DECLARE_READ8_MEMBER( info_r );
@@ -100,13 +77,42 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( write_centronics_fault );
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
 
+	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
+	DECLARE_WRITE_LINE_MEMBER(dart_rxtxca_w);
+	DECLARE_READ8_MEMBER(io_read_byte);
+	DECLARE_WRITE8_MEMBER(io_write_byte);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 	void update_dma_rdy();
+
+	required_device<cpu_device> m_maincpu;
+	required_device<z80ctc_device> m_ctc;
+	required_device<z80dart_device> m_dart;
+	required_device<z80dma_device> m_dmac;
+	required_device<mb8877_device> m_fdc;
+	required_device<ram_device> m_ram;
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
+	required_device<floppy_connector> m_floppy2;
+	required_device<floppy_connector> m_floppy3;
+	required_device<floppy_connector> m_floppy4;
+	required_device<floppy_connector> m_floppy5;
+	required_device<floppy_connector> m_floppy6;
+	required_device<floppy_connector> m_floppy7;
+	floppy_image_device *m_floppy;
+	required_device<centronics_device> m_centronics;
+	required_memory_region m_rom;
+	required_ioport m_sw1;
+
 	// memory state
 	int m_segst;
 	int m_brom;
 
 	// DMA state
-	UINT8 m_exdma;
+	uint8_t m_exdma;
 	int m_buf;
 	bool m_fdrdy;
 	int m_dartardy;
@@ -121,11 +127,6 @@ public:
 	int m_centronics_perror;
 	int m_centronics_select;
 	int m_centronics_fault;
-
-	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
-	DECLARE_WRITE_LINE_MEMBER(dart_rxtxca_w);
-	DECLARE_READ8_MEMBER(io_read_byte);
-	DECLARE_WRITE8_MEMBER(io_write_byte);
 };
 
 class bulletf_state : public bullet_state
@@ -142,16 +143,6 @@ public:
 	{
 	}
 
-	required_device<floppy_connector> m_floppy8;
-	required_device<floppy_connector> m_floppy9;
-	required_device<SCSI_PORT_DEVICE> m_scsibus;
-	required_device<input_buffer_device> m_scsi_data_in;
-	required_device<output_latch_device> m_scsi_data_out;
-	required_device<input_buffer_device> m_scsi_ctrl_in;
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
 	DECLARE_READ8_MEMBER( mreq_r );
 	DECLARE_WRITE8_MEMBER( mreq_w );
 	DECLARE_WRITE8_MEMBER( xdma0_w );
@@ -167,13 +158,24 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( cstrb_w );
 	DECLARE_WRITE_LINE_MEMBER( req_w );
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 	void update_dma_rdy();
 
+	required_device<floppy_connector> m_floppy8;
+	required_device<floppy_connector> m_floppy9;
+	required_device<scsi_port_device> m_scsibus;
+	required_device<input_buffer_device> m_scsi_data_in;
+	required_device<output_latch_device> m_scsi_data_out;
+	required_device<input_buffer_device> m_scsi_ctrl_in;
+
 	int m_rome;
-	UINT8 m_xdma0;
-	UINT8 m_mbank;
+	uint8_t m_xdma0;
+	uint8_t m_mbank;
 	int m_wack;
 	int m_wrdy;
 };
 
-#endif
+#endif // MAME_INCLUDES_BULLET_H

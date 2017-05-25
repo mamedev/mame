@@ -73,8 +73,129 @@
 
 */
 
-#include "includes/ql.h"
+#include "emu.h"
+
+#include "bus/ql/exp.h"
+#include "bus/ql/rom.h"
+#include "bus/rs232/rs232.h"
+#include "cpu/m68000/m68000.h"
+#include "cpu/mcs48/mcs48.h"
+#include "machine/microdrv.h"
+#include "machine/qimi.h"
+#include "machine/ram.h"
+#include "machine/zx8302.h"
+#include "sound/spkrdev.h"
+#include "video/zx8301.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
+
+#define SCREEN_TAG  "screen"
+
+#define M68008_TAG  "ic18"
+#define I8749_TAG   "ic24"
+#define I8051_TAG   "i8051"
+#define ZX8301_TAG  "ic22"
+#define ZX8302_TAG  "ic23"
+#define RS232_A_TAG "ser1"
+#define RS232_B_TAG "ser2"
+#define QIMI_TAG    "qimi"
+
+#define X1 XTAL_15MHz
+#define X2 XTAL_32_768kHz
+#define X3 XTAL_4_436MHz
+#define X4 XTAL_11MHz
+
+class ql_state : public driver_device
+{
+public:
+	ql_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, M68008_TAG),
+		m_ipc(*this, I8749_TAG),
+		m_zx8301(*this, ZX8301_TAG),
+		m_zx8302(*this, ZX8302_TAG),
+		m_speaker(*this, "speaker"),
+		m_mdv1(*this, MDV_1),
+		m_mdv2(*this, MDV_2),
+		m_ser1(*this, RS232_A_TAG),
+		m_ser2(*this, RS232_A_TAG),
+		m_ram(*this, RAM_TAG),
+		m_exp(*this, "exp"),
+		m_cart(*this, "rom"),
+		m_qimi(*this, QIMI_TAG),
+		m_rom(*this, M68008_TAG),
+		m_y(*this, "Y%u", 0),
+		m_joy(*this, "JOY%u", 0),
+		m_config(*this, "config"),
+		m_extintl(CLEAR_LINE),
+		m_keylatch(0),
+		m_ipl(0),
+		m_comdata_to_ipc(0),
+		m_baudx4(0),
+		m_qimi_enabled(false),
+		m_qimi_extint(CLEAR_LINE)
+	{ }
+
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_ipc;
+	required_device<zx8301_device> m_zx8301;
+	required_device<zx8302_device> m_zx8302;
+	required_device<speaker_sound_device> m_speaker;
+	required_device<microdrive_image_device> m_mdv1;
+	required_device<microdrive_image_device> m_mdv2;
+	required_device<rs232_port_device> m_ser1;
+	required_device<rs232_port_device> m_ser2;
+	required_device<ram_device> m_ram;
+	required_device<ql_expansion_slot_device> m_exp;
+	required_device<ql_rom_cartridge_slot_device> m_cart;
+	optional_device<qimi_device> m_qimi;
+	required_memory_region m_rom;
+	required_ioport_array<8> m_y;
+	required_ioport_array<2> m_joy;
+	required_ioport m_config;
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
+
+	DECLARE_WRITE8_MEMBER( ipc_w );
+	DECLARE_WRITE8_MEMBER( ipc_port1_w );
+	DECLARE_WRITE8_MEMBER( ipc_port2_w );
+	DECLARE_READ8_MEMBER( ipc_port2_r );
+	DECLARE_READ_LINE_MEMBER( ipc_t1_r );
+	DECLARE_READ8_MEMBER( ipc_bus_r );
+	DECLARE_WRITE_LINE_MEMBER( ql_baudx4_w );
+	DECLARE_WRITE_LINE_MEMBER( ql_comdata_w );
+	DECLARE_WRITE_LINE_MEMBER( zx8302_mdselck_w );
+	DECLARE_WRITE_LINE_MEMBER( zx8302_mdrdw_w );
+	DECLARE_WRITE_LINE_MEMBER( zx8302_erase_w );
+	DECLARE_WRITE_LINE_MEMBER( zx8302_raw1_w );
+	DECLARE_READ_LINE_MEMBER( zx8302_raw1_r );
+	DECLARE_WRITE_LINE_MEMBER( zx8302_raw2_w );
+	DECLARE_READ_LINE_MEMBER( zx8302_raw2_r );
+	DECLARE_WRITE_LINE_MEMBER( exp_extintl_w );
+	DECLARE_WRITE_LINE_MEMBER( qimi_extintl_w );
+
+	void update_interrupt();
+
+	int m_extintl;
+
+	// IPC
+	uint8_t m_keylatch;
+	int m_ipl;
+	int m_comdata_to_ipc;
+	int m_baudx4;
+
+	// QIMI
+	bool m_qimi_enabled;
+	int m_qimi_extint;
+};
+
 
 
 //**************************************************************************
@@ -87,7 +208,7 @@
 
 READ8_MEMBER( ql_state::read )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 	int cart_romoeh = 0;
 	int exp_romoeh = 0;
 
@@ -253,7 +374,7 @@ READ8_MEMBER( ql_state::ipc_port2_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// SER2 serial data input
 	data |= m_ser2->rxd_r();
@@ -319,7 +440,7 @@ WRITE8_MEMBER( ql_state::ipc_port2_w )
 //  ipc_t1_r -
 //-------------------------------------------------
 
-READ8_MEMBER( ql_state::ipc_t1_r )
+READ_LINE_MEMBER( ql_state::ipc_t1_r )
 {
 	return m_baudx4;
 }
@@ -346,20 +467,19 @@ READ8_MEMBER( ql_state::ipc_bus_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
-	if (BIT(m_keylatch, 0)) data |= m_y0->read() | m_joy0->read();
-	if (BIT(m_keylatch, 1)) data |= m_y1->read() | m_joy1->read();
-	if (BIT(m_keylatch, 2)) data |= m_y2->read();
-	if (BIT(m_keylatch, 3)) data |= m_y3->read();
-	if (BIT(m_keylatch, 4)) data |= m_y4->read();
-	if (BIT(m_keylatch, 5)) data |= m_y5->read();
-	if (BIT(m_keylatch, 6)) data |= m_y6->read();
-	if (BIT(m_keylatch, 7)) data |= m_y7->read();
+	if (BIT(m_keylatch, 0)) data |= m_y[0]->read() | m_joy[0]->read();
+	if (BIT(m_keylatch, 1)) data |= m_y[1]->read() | m_joy[1]->read();
+	if (BIT(m_keylatch, 2)) data |= m_y[2]->read();
+	if (BIT(m_keylatch, 3)) data |= m_y[3]->read();
+	if (BIT(m_keylatch, 4)) data |= m_y[4]->read();
+	if (BIT(m_keylatch, 5)) data |= m_y[5]->read();
+	if (BIT(m_keylatch, 6)) data |= m_y[6]->read();
+	if (BIT(m_keylatch, 7)) data |= m_y[7]->read();
 
 	return data;
 }
-
 
 
 
@@ -383,10 +503,6 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( ipc_io, AS_IO, 8, ql_state )
 	AM_RANGE(0x00, 0x7f) AM_WRITE(ipc_w)
 	AM_RANGE(0x27, 0x28) AM_READNOP // IPC reads these to set P0 (bus) to Hi-Z mode
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(ipc_port1_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(ipc_port2_r, ipc_port2_w)
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(ipc_t1_r)
-	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_READ(ipc_bus_r) AM_WRITENOP
 ADDRESS_MAP_END
 
 
@@ -772,13 +888,18 @@ void ql_state::machine_reset()
 //  MACHINE_CONFIG( ql )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( ql, ql_state )
+static MACHINE_CONFIG_START( ql )
 	// basic machine hardware
 	MCFG_CPU_ADD(M68008_TAG, M68008, X1/2)
 	MCFG_CPU_PROGRAM_MAP(ql_mem)
 
 	MCFG_CPU_ADD(I8749_TAG, I8749, X4)
 	MCFG_CPU_IO_MAP(ipc_io)
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(ql_state, ipc_port1_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(ql_state, ipc_port2_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(ql_state, ipc_port2_w))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(ql_state, ipc_t1_r))
+	MCFG_MCS48_PORT_BUS_IN_CB(READ8(ql_state, ipc_bus_r))
 
 	// video hardware
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
@@ -1138,15 +1259,15 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   INIT    COMPANY                     FULLNAME        FLAGS
-COMP( 1984, ql,     0,      0,      ql,         ql, driver_device,     0,      "Sinclair Research Ltd",    "QL (UK)",      MACHINE_SUPPORTS_SAVE )
-COMP( 1985, ql_us,  ql,     0,      ql_ntsc,    ql, driver_device,     0,      "Sinclair Research Ltd",    "QL (USA)",     MACHINE_SUPPORTS_SAVE )
-COMP( 1985, ql_es,  ql,     0,      ql,         ql_es, driver_device,  0,      "Sinclair Research Ltd",    "QL (Spain)",   MACHINE_SUPPORTS_SAVE )
-COMP( 1985, ql_fr,  ql,     0,      ql,         ql_fr, driver_device,  0,      "Sinclair Research Ltd",    "QL (France)",  MACHINE_NOT_WORKING )
-COMP( 1985, ql_de,  ql,     0,      ql,         ql_de, driver_device,  0,      "Sinclair Research Ltd",    "QL (Germany)", MACHINE_SUPPORTS_SAVE )
-COMP( 1985, ql_it,  ql,     0,      ql,         ql_it, driver_device,  0,      "Sinclair Research Ltd",    "QL (Italy)",   MACHINE_SUPPORTS_SAVE )
-COMP( 1985, ql_se,  ql,     0,      ql,         ql_se, driver_device,  0,      "Sinclair Research Ltd",    "QL (Sweden)",  MACHINE_NOT_WORKING )
-COMP( 1985, ql_dk,  ql,     0,      ql,         ql_dk, driver_device,  0,      "Sinclair Research Ltd",    "QL (Denmark)", MACHINE_NOT_WORKING )
-COMP( 1985, ql_gr,  ql,     0,      ql,         ql, driver_device,     0,      "Sinclair Research Ltd",    "QL (Greece)",  MACHINE_SUPPORTS_SAVE )
-COMP( 1984, tonto,  0,      0,      opd,        ql, driver_device,     0,      "British Telecom Business Systems", "Merlin M1800 Tonto", MACHINE_NOT_WORKING )
-//COMP( 1986, megaopd,tonto,    0,      megaopd,    ql, driver_device,     0,      "International Computer Limited", "MegaOPD (USA)", MACHINE_NOT_WORKING )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   STATE      INIT    COMPANY                             FULLNAME              FLAGS
+COMP( 1984, ql,     0,      0,      ql,         ql,     ql_state,  0,      "Sinclair Research Ltd",            "QL (UK)",            MACHINE_SUPPORTS_SAVE )
+COMP( 1985, ql_us,  ql,     0,      ql_ntsc,    ql,     ql_state,  0,      "Sinclair Research Ltd",            "QL (USA)",           MACHINE_SUPPORTS_SAVE )
+COMP( 1985, ql_es,  ql,     0,      ql,         ql_es,  ql_state,  0,      "Sinclair Research Ltd",            "QL (Spain)",         MACHINE_SUPPORTS_SAVE )
+COMP( 1985, ql_fr,  ql,     0,      ql,         ql_fr,  ql_state,  0,      "Sinclair Research Ltd",            "QL (France)",        MACHINE_NOT_WORKING )
+COMP( 1985, ql_de,  ql,     0,      ql,         ql_de,  ql_state,  0,      "Sinclair Research Ltd",            "QL (Germany)",       MACHINE_SUPPORTS_SAVE )
+COMP( 1985, ql_it,  ql,     0,      ql,         ql_it,  ql_state,  0,      "Sinclair Research Ltd",            "QL (Italy)",         MACHINE_SUPPORTS_SAVE )
+COMP( 1985, ql_se,  ql,     0,      ql,         ql_se,  ql_state,  0,      "Sinclair Research Ltd",            "QL (Sweden)",        MACHINE_NOT_WORKING )
+COMP( 1985, ql_dk,  ql,     0,      ql,         ql_dk,  ql_state,  0,      "Sinclair Research Ltd",            "QL (Denmark)",       MACHINE_NOT_WORKING )
+COMP( 1985, ql_gr,  ql,     0,      ql,         ql,     ql_state,  0,      "Sinclair Research Ltd",            "QL (Greece)",        MACHINE_SUPPORTS_SAVE )
+COMP( 1984, tonto,  0,      0,      opd,        ql,     ql_state,  0,      "British Telecom Business Systems", "Merlin M1800 Tonto", MACHINE_NOT_WORKING )
+//COMP( 1986, megaopd,tonto,    0,      megaopd,    ql, ql_state,  0,      "International Computer Limited", "MegaOPD (USA)", MACHINE_NOT_WORKING )

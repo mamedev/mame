@@ -1,15 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco
+#ifndef MAME_BUS_KC_D002_H
+#define MAME_BUS_KC_D002_H
+
 #pragma once
 
-#ifndef __KC_D002_H__
-#define __KC_D002_H__
-
-#include "emu.h"
 #include "kc.h"
-#include "ram.h"
-#include "rom.h"
-#include "d004.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -23,7 +19,7 @@ class kc_d002_device :
 {
 public:
 	// construction/destruction
-	kc_d002_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	kc_d002_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -40,21 +36,21 @@ protected:
 	virtual void device_reset() override;
 
 	// kcexp_interface overrides
-	virtual void read(offs_t offset, UINT8 &data) override;
-	virtual void write(offs_t offset, UINT8 data) override;
-	virtual void io_read(offs_t offset, UINT8 &data) override;
-	virtual void io_write(offs_t offset, UINT8 data) override;
+	virtual void read(offs_t offset, uint8_t &data) override;
+	virtual void write(offs_t offset, uint8_t data) override;
+	virtual void io_read(offs_t offset, uint8_t &data) override;
+	virtual void io_write(offs_t offset, uint8_t data) override;
 	virtual DECLARE_WRITE_LINE_MEMBER( mei_w ) override;
 
 private:
 	kcexp_slot_device *m_slot;
 
 	// internal state
-	kcexp_slot_device *m_expansions[5];
+	required_device_array<kcexp_slot_device, 5> m_expansions;
 };
 
 
 // device type definition
-extern const device_type KC_D002;
+DECLARE_DEVICE_TYPE(KC_D002, kc_d002_device)
 
-#endif  /* __KC_D002_H__ */
+#endif // MAME_BUS_KC_D002_H

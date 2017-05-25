@@ -8,13 +8,14 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "sscope.h"
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SNES_SUPERSCOPE = &device_creator<snes_sscope_device>;
+DEFINE_DEVICE_TYPE(SNES_SUPERSCOPE, snes_sscope_device, "snes_sscope", "Nintendo SNES / SFC SuperScope")
 
 
 static INPUT_PORTS_START( snes_sscope )
@@ -53,12 +54,13 @@ ioport_constructor snes_sscope_device::device_input_ports() const
 //  snes_sscope_device - constructor
 //-------------------------------------------------
 
-snes_sscope_device::snes_sscope_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-					device_t(mconfig, SNES_SUPERSCOPE, "Nintendo SNES / SFC SuperScope", tag, owner, clock, "snes_sscope", __FILE__),
-					device_snes_control_port_interface(mconfig, *this),
-					m_buttons(*this, "BUTTONS"),
-					m_xaxis(*this, "SSX"),
-					m_yaxis(*this, "SSY"), m_strobe(0), m_idx(0), m_latch(0), m_x(0), m_y(0), m_turbo_lock(0), m_pause_lock(0), m_fire_lock(0)
+snes_sscope_device::snes_sscope_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, SNES_SUPERSCOPE, tag, owner, clock),
+	device_snes_control_port_interface(mconfig, *this),
+	m_buttons(*this, "BUTTONS"),
+	m_xaxis(*this, "SSX"),
+	m_yaxis(*this, "SSY"),
+	m_strobe(0), m_idx(0), m_latch(0), m_x(0), m_y(0), m_turbo_lock(0), m_pause_lock(0), m_fire_lock(0)
 {
 }
 
@@ -103,7 +105,7 @@ void snes_sscope_device::device_reset()
 void snes_sscope_device::port_poll()
 {
 	// first read input bits
-	UINT8 input = m_buttons->read();
+	uint8_t input = m_buttons->read();
 	m_x = m_xaxis->read();
 	m_y = m_yaxis->read();
 	m_idx = 0;
@@ -113,8 +115,7 @@ void snes_sscope_device::port_poll()
 	m_latch &= 0x04;
 
 	// 2. set onscreen/offscreen
-	if (!m_port->m_onscreen_cb.isnull())
-		m_latch |= (m_port->m_onscreen_cb(m_x, m_y) ? 0x00 : 0x40);
+	m_latch |= m_port->onscreen_cb(m_x, m_y) ? 0x00 : 0x40;
 
 	// 3. pause is a button that is always edge sensitive
 	if (BIT(input, 3) && !m_pause_lock)
@@ -151,17 +152,17 @@ void snes_sscope_device::port_poll()
 	// Notice that this only works in Port2 because its IOBit pin is connected to bit7 of the IO Port, while Port1
 	// has IOBit pin connected to bit6 of the IO Port, and the latter is not detected by the H/V Counters. In other
 	// words, you can connect SuperScope to Port1, but there is no way SNES could detect its on-screen position
-	if ((m_latch & 0x03) && !(m_latch & 0x40) && !m_port->m_gunlatch_cb.isnull())
-		m_port->m_gunlatch_cb(m_x, m_y);
+	if ((m_latch & 0x03) && !(m_latch & 0x40))
+		m_port->gunlatch_cb(m_x, m_y);
 }
 
 //-------------------------------------------------
 //  read
 //-------------------------------------------------
 
-UINT8 snes_sscope_device::read_pin4()
+uint8_t snes_sscope_device::read_pin4()
 {
-	UINT8 res = 0;
+	uint8_t res = 0;
 
 	if (m_idx >= 8) // bits 8-15 = ID = all 1s; bits >= 16 all 1s
 		res |= 0x01;
@@ -175,7 +176,7 @@ UINT8 snes_sscope_device::read_pin4()
 //  write
 //-------------------------------------------------
 
-void snes_sscope_device::write_strobe(UINT8 data)
+void snes_sscope_device::write_strobe(uint8_t data)
 {
 	int old = m_strobe;
 	m_strobe = data & 0x01;

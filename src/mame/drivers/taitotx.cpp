@@ -118,6 +118,7 @@
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
+#include "screen.h"
 
 class taito_type_x_state : public driver_device
 {
@@ -132,7 +133,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_taito_type_x(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_taito_type_x(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -143,7 +144,7 @@ void taito_type_x_state::video_start()
 }
 
 
-UINT32 taito_type_x_state::screen_update_taito_type_x(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t taito_type_x_state::screen_update_taito_type_x(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -165,7 +166,7 @@ void taito_type_x_state::machine_reset()
 }
 
 // todo: different configs for the different machine types.
-static MACHINE_CONFIG_START( taito_type_x, taito_type_x_state )
+static MACHINE_CONFIG_START( taito_type_x )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PENTIUM3, 733333333) /* Wrong, much newer processors, much faster. */
@@ -247,6 +248,18 @@ ROM_START( kof98um )
 	DISK_IMAGE( "kof98um_v1_00", 0, SHA1(cf21747ddcdf802d766a2bd6a3d75a965e89b2cf) )
 ROM_END
 
+ROM_START( kofskyst)
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD("taito_type_x_bios.bin", 0x00, 0x10000, NO_DUMP ) // size unknown.
+	/* bios, video bios etc. not dumped */
+
+	DISK_REGION( "ide:0:hdd:image" )
+	// Single 40GB drive(KOF SKY STAGE - M9008134A - Ver.1.00J - 40.0 GB WD - WD400BB-22JHCO)
+	// d1337c5ee363a6a95a9d1caf45857993 kof_sky_stage_ver.1.00j.img
+	// 0x3b61ddf8 kof_sky_stage_ver.1.00j_ata_id.bin
+	DISK_IMAGE( "kof_sky_stage_v1.00j", 0, SHA1(86bdd4c7cd6f198c07c125a65b5361afe1bdd199) )
+ROM_END
+
 ROM_START( raiden3 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD("taito_type_x_bios.bin", 0x00, 0x10000, NO_DUMP ) // size unknown.
@@ -319,6 +332,7 @@ GAME( 2007, raiden4,   0,    taito_type_x, taito_type_x, driver_device,  0, ROT0
 GAME( 2008, kof98um,   0,    taito_type_x, taito_type_x, driver_device,  0, ROT0, "SNK", "The King of Fighters '98: Ultimate Match (v1.00)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2008, trbwtchs,  0,    taito_type_x, taito_type_x, driver_device,  0, ROT0, "Adventure Planning Service/Studio SiestA", "Trouble Witches AC (v1.00J)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2009, goketsuj,  0,    taito_type_x, taito_type_x, driver_device,  0, ROT0, "Atlus", "Goketsuji Ichizoku: Matsuri Senzo Kuyou (v200906230)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2010, kofskyst,  0,    taito_type_x, taito_type_x, driver_device,  0, ROT0, "Moss / SNK Playmore", "KOF Sky Stage (v1.00J)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 
 // Type X+
@@ -364,6 +378,17 @@ ROM_START( samspsen )
 	DISK_IMAGE( "samurai spirits sen.v1.00", 0, SHA1(5c687604066301a5b7c60f7fc778f0961efce0b6) )
 ROM_END
 
+ROM_START( kofxii )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD("taito_type_x2_bios.bin", 0x00, 0x10000, NO_DUMP ) // size unknown.
+	/* bios, video bios etc. not dumped */
 
-GAME( 2006, chasehq2,  0,    taito_type_x, taito_type_x, driver_device,  0, ROT0, "Taito Corporation", "Chase H.Q. 2 (v2.0.6.JP)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2008, samspsen,  0,    taito_type_x, taito_type_x, driver_device,  0, ROT0, "SNK Playmore", "Samurai Spirits Sen (v1.00)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+	DISK_REGION( "ide:0:hdd:image" ) // Single 80GB drive
+	//2ff6b2d33ab7e915733a4328c73695de xii_ver.1.img
+	DISK_IMAGE( "kof xii.v1.00", 0, SHA1(9caaca4cf4d3bacd218932004f0c761337ee8a6f) )
+ROM_END
+
+
+GAME( 2006, chasehq2,  0,    taito_type_x, taito_type_x, taito_type_x_state,  0, ROT0, "Taito Corporation", "Chase H.Q. 2 (v2.0.6.JP)",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2008, samspsen,  0,    taito_type_x, taito_type_x, taito_type_x_state,  0, ROT0, "SNK Playmore",      "Samurai Spirits Sen (v1.00)",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2009, kofxii,    0,    taito_type_x, taito_type_x, taito_type_x_state,  0, ROT0, "SNK Playmore",      "The King of Fighters XII (v1.00)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

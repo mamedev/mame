@@ -48,14 +48,14 @@ public:
 	{
 	}
 
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	void kbd_put(u8 data);
 	DECLARE_READ8_MEMBER(keyin_r);
 	DECLARE_READ8_MEMBER(status_r);
 	DECLARE_MACHINE_RESET(mcb216);
 	DECLARE_MACHINE_RESET(cb308);
 
 private:
-	UINT8 m_term_data;
+	uint8_t m_term_data;
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 };
@@ -87,7 +87,7 @@ INPUT_PORTS_END
 
 READ8_MEMBER( mcb216_state::keyin_r )
 {
-	UINT8 ret = m_term_data;
+	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
@@ -99,7 +99,7 @@ READ8_MEMBER( mcb216_state::status_r )
 	return (m_term_data) ? 0xc0 : 0x80;
 }
 
-WRITE8_MEMBER( mcb216_state::kbd_put )
+void mcb216_state::kbd_put(u8 data)
 {
 	m_term_data = data;
 }
@@ -115,7 +115,7 @@ MACHINE_RESET_MEMBER( mcb216_state, cb308 )
 	m_maincpu->set_state_int(Z80_PC, 0xe000);
 }
 
-static MACHINE_CONFIG_START( mcb216, mcb216_state )
+static MACHINE_CONFIG_START( mcb216 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(mcb216_mem)
@@ -124,10 +124,10 @@ static MACHINE_CONFIG_START( mcb216, mcb216_state )
 
 	/* video hardware */
 	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(mcb216_state, kbd_put))
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(mcb216_state, kbd_put))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( cb308, mcb216_state )
+static MACHINE_CONFIG_START( cb308 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(cb308_mem)
@@ -136,7 +136,7 @@ static MACHINE_CONFIG_START( cb308, mcb216_state )
 
 	/* video hardware */
 	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(mcb216_state, kbd_put))
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(mcb216_state, kbd_put))
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -156,6 +156,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   CLASS         INIT    COMPANY    FULLNAME       FLAGS */
-COMP( 1979, mcb216, 0,      0,       mcb216,    mcb216, driver_device,  0,  "Cromemco", "MCB-216", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1977, cb308,  mcb216, 0,       cb308,     mcb216, driver_device,  0,  "Cromemco", "CB-308",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   CLASS          INIT  COMPANY      FULLNAME  FLAGS */
+COMP( 1979, mcb216, 0,      0,       mcb216,    mcb216, mcb216_state,  0,    "Cromemco", "MCB-216", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1977, cb308,  mcb216, 0,       cb308,     mcb216, mcb216_state,  0,    "Cromemco", "CB-308",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

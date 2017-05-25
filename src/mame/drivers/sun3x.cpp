@@ -7,7 +7,6 @@
   status: 3/80 POSTs, 3/460 needs its unique RTC chip (also used by non-3x Sun 3s).
 
   TODO:
-    - Z8530 SCC needs to actually speak serial so we can hook up the mouse and keyboard.
     - Improve interrupt controller emulation.
     - Figure out how the IOMMU works.
     - Intersil 7170 device for 3/460 and 3/480 (they use the same PROMs).
@@ -129,17 +128,23 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
-#include "machine/timekpr.h"
-#include "machine/z80scc.h"
+
 #include "bus/scsi/scsi.h"
-#include "bus/scsi/scsihd.h"
 #include "bus/scsi/scsicd.h"
-#include "machine/ncr539x.h"
-#include "machine/upd765.h"
-#include "formats/pc_dsk.h"
+#include "bus/scsi/scsihd.h"
+#include "cpu/m68000/m68000.h"
 #include "formats/mfi_dsk.h"
+#include "formats/pc_dsk.h"
+#include "machine/ncr539x.h"
+#include "machine/timekpr.h"
+#include "machine/upd765.h"
+#include "machine/z80scc.h"
+
 #include "bus/rs232/rs232.h"
+#include "bus/sunkbd/sunkbd.h"
+
+#include "screen.h"
+
 
 #define TIMEKEEPER_TAG  "timekpr"
 #define SCC1_TAG        "scc1"
@@ -148,6 +153,7 @@
 #define FDC_TAG         "fdc"
 #define RS232A_TAG      "rs232a"
 #define RS232B_TAG      "rs232b"
+#define KEYBOARD_TAG    "keyboard"
 
 class sun3x_state : public driver_device
 {
@@ -160,7 +166,7 @@ public:
 		m_fdc(*this, FDC_TAG),
 		m_p_ram(*this, "p_ram"),
 		m_bw2_vram(*this, "bw2_vram")
-		{ }
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<z80scc_device> m_scc1;
@@ -168,8 +174,8 @@ public:
 	optional_device<n82077aa_device> m_fdc;
 	virtual void machine_reset() override;
 
-	required_shared_ptr<UINT32> m_p_ram;
-	optional_shared_ptr<UINT32> m_bw2_vram;
+	required_shared_ptr<uint32_t> m_p_ram;
+	optional_shared_ptr<uint32_t> m_bw2_vram;
 
 	DECLARE_READ32_MEMBER(enable_r);
 	DECLARE_WRITE32_MEMBER(enable_w);
@@ -199,11 +205,11 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(sun380_timer);
 
-	UINT32 bw2_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t bw2_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 private:
-	UINT32 m_enable, m_buserr, m_diag, m_printer, m_irqctrl, m_memreg, m_memerraddr;
-	UINT32 m_iommu[0x800];
+	uint32_t m_enable, m_buserr, m_diag, m_printer, m_irqctrl, m_memreg, m_memerraddr;
+	uint32_t m_iommu[0x800];
 	bool m_bInBusErr;
 };
 
@@ -272,7 +278,7 @@ READ32_MEMBER( sun3x_state::fdc_control_r )
 	if(m_fdc) {
 		floppy_image_device *fdev = machine().device<floppy_connector>(":fdc:0")->get_device();
 		if(fdev->exists()) {
-			UINT32 variant = fdev->get_variant();
+			uint32_t variant = fdev->get_variant();
 			switch(variant) {
 			case floppy_image::SSSD:
 			case floppy_image::SSDD:
@@ -293,7 +299,7 @@ READ32_MEMBER( sun3x_state::fdc_control_r )
 
 WRITE32_MEMBER(sun3x_state::ramwrite_w)
 {
-	UINT32 *pRAM = (UINT32 *)m_p_ram.target();
+	uint32_t *pRAM = (uint32_t *)m_p_ram.target();
 
 	if (((m_memreg & 0xf0000000) == 0x70000000) &&
 		(m_irqctrl & 0x01000000) &&
@@ -357,7 +363,7 @@ WRITE32_MEMBER(sun3x_state::enable_w)
 
 READ32_MEMBER(sun3x_state::buserr_r)
 {
-	UINT32 rv = m_buserr;
+	uint32_t rv = m_buserr;
 	m_buserr = 0;
 	return rv;
 }
@@ -506,13 +512,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(sun3x_state::sun380_timer)
 	}
 }
 
-UINT32 sun3x_state::bw2_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t sun3x_state::bw2_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UINT32 *scanline;
+	uint32_t *scanline;
 	int x, y;
-	UINT8 pixels;
-	static const UINT32 palette[2] = { 0, 0xffffff };
-	UINT8 *m_vram = (UINT8 *)m_bw2_vram.target();
+	uint8_t pixels;
+	static const uint32_t palette[2] = { 0, 0xffffff };
+	uint8_t *m_vram = (uint8_t *)m_bw2_vram.target();
 
 	for (y = 0; y < 900; y++)
 	{
@@ -542,9 +548,9 @@ INPUT_PORTS_END
 
 void sun3x_state::machine_reset()
 {
-	UINT8* user1 = memregion("user1")->base();
+	uint8_t* user1 = memregion("user1")->base();
 
-	memcpy((UINT8*)m_p_ram.target(),user1,0x10000);
+	memcpy((uint8_t*)m_p_ram.target(),user1,0x10000);
 
 	m_maincpu->reset();
 
@@ -568,7 +574,7 @@ static SLOT_INTERFACE_START( sun_floppies )
 	SLOT_INTERFACE( "35hd", FLOPPY_35_HD )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( sun3_80, sun3x_state )
+static MACHINE_CONFIG_START( sun3_80 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68030, 20000000)
 	MCFG_CPU_PROGRAM_MAP(sun3_80_mem)
@@ -576,6 +582,11 @@ static MACHINE_CONFIG_START( sun3_80, sun3x_state )
 	MCFG_M48T02_ADD(TIMEKEEPER_TAG)
 
 	MCFG_SCC8530_ADD(SCC1_TAG, XTAL_4_9152MHz, 0, 0, 0, 0)
+	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE(KEYBOARD_TAG, sun_keyboard_port_device, write_txd))
+
+	MCFG_SUNKBD_PORT_ADD(KEYBOARD_TAG, default_sun_keyboard_devices, "type3hle")
+	MCFG_SUNKBD_RXD_HANDLER(DEVWRITELINE(SCC1_TAG, z80scc_device, rxa_w))
+
 	MCFG_SCC8530_ADD(SCC2_TAG, XTAL_4_9152MHz, 0, 0, 0, 0)
 	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE(RS232A_TAG, rs232_port_device, write_txd))
 	MCFG_Z80SCC_OUT_TXDB_CB(DEVWRITELINE(RS232B_TAG, rs232_port_device, write_txd))
@@ -610,7 +621,7 @@ static MACHINE_CONFIG_START( sun3_80, sun3x_state )
 	MCFG_SCREEN_REFRESH_RATE(72)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sun3_460, sun3x_state )
+static MACHINE_CONFIG_START( sun3_460 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68030, 33000000)
 	MCFG_CPU_PROGRAM_MAP(sun3_460_mem)
@@ -679,6 +690,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY         FULLNAME       FLAGS */
-COMP( 198?, sun3_80,   0,       0,   sun3_80,   sun3x, driver_device,     0,  "Sun Microsystems", "Sun 3/80", MACHINE_NOT_WORKING | MACHINE_NO_SOUND) // Hydra
-COMP( 198?, sun3_460,  0,       0,   sun3_460,  sun3x, driver_device,     0,  "Sun Microsystems", "Sun 3/460/470/480", MACHINE_NOT_WORKING | MACHINE_NO_SOUND) // Pegasus
+//    YEAR  NAME      PARENT  COMPAT  MACHINE    INPUT  STATE        INIT  COMPANY             FULLNAME             FLAGS
+COMP( 198?, sun3_80,  0,      0,      sun3_80,   sun3x, sun3x_state, 0,    "Sun Microsystems", "Sun 3/80",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Hydra
+COMP( 198?, sun3_460, 0,      0,      sun3_460,  sun3x, sun3x_state, 0,    "Sun Microsystems", "Sun 3/460/470/480", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Pegasus

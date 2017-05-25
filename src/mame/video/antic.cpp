@@ -8,7 +8,9 @@
     Juergen Buchmueller, June 1998
 ******************************************************************************/
 
+#include "emu.h"
 #include "antic.h"
+#include "screen.h"
 
 #ifdef MAME_DEBUG
 #define VERBOSE 1
@@ -18,40 +20,321 @@
 
 #define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
 
+#define CYCLES_PER_LINE 114     /* total number of cpu cycles per scanline (incl. hblank) */
+#define CYCLES_REFRESH  9       /* number of cycles lost for ANTICs RAM refresh using DMA */
+#define CYCLES_HSTART   32      /* where does the ANTIC DMA fetch start */
+#define CYCLES_DLI_NMI  7       /* number of cycles until the CPU recognizes a DLI */
+#define CYCLES_HSYNC    104     /* where does the HSYNC position of a scanline start */
+
+#define PMOFFSET        32      /* # of pixels to adjust p/m hpos */
+
+#define VPAGE           0xf000  /* 4K page mask for video data src */
+#define VOFFS           0x0fff  /* 4K offset mask for video data src */
+#define DPAGE           0xfc00  /* 1K page mask for display list */
+#define DOFFS           0x03ff  /* 1K offset mask for display list */
+
+#define DLI_NMI         0x80    /* 10000000b bit mask for display list interrupt */
+#define VBL_NMI         0x40    /* 01000000b bit mask for vertical blank interrupt */
+
+#define ANTIC_DLI       0x80    /* 10000000b cmds with display list intr    */
+#define ANTIC_LMS       0x40    /* 01000000b cmds with load memory scan     */
+#define ANTIC_VSCR      0x20    /* 00100000b cmds with vertical scroll      */
+#define ANTIC_HSCR      0x10    /* 00010000b cmds with horizontal scroll    */
+#define ANTIC_MODE      0x0f    /* 00001111b cmd mode mask                  */
+
+#define DMA_ANTIC       0x20    /* 00100000b ANTIC DMA enable               */
+#define DMA_PM_DBLLINE  0x10    /* 00010000b double line player/missile     */
+#define DMA_PLAYER      0x08    /* 00001000b player DMA enable              */
+#define DMA_MISSILE     0x04    /* 00000100b missile DMA enable             */
+
+#define OFS_MIS_SINGLE  3*256   /* offset missiles single line DMA          */
+#define OFS_PL0_SINGLE  4*256   /* offset player 0 single line DMA          */
+#define OFS_PL1_SINGLE  5*256   /* offset player 1 single line DMA          */
+#define OFS_PL2_SINGLE  6*256   /* offset player 2 single line DMA          */
+#define OFS_PL3_SINGLE  7*256   /* offset player 3 single line DMA          */
+
+#define OFS_MIS_DOUBLE  3*128   /* offset missiles double line DMA          */
+#define OFS_PL0_DOUBLE  4*128   /* offset player 0 double line DMA          */
+#define OFS_PL1_DOUBLE  5*128   /* offset player 1 double line DMA          */
+#define OFS_PL2_DOUBLE  6*128   /* offset player 2 double line DMA          */
+#define OFS_PL3_DOUBLE  7*128   /* offset player 3 double line DMA          */
+
+#define PFD     0x00    /* 00000000b playfield default color */
+
+#define PBK     0x00    /* 00000000b playfield background */
+#define PF0     0x01    /* 00000001b playfield color #0   */
+#define PF1     0x02    /* 00000010b playfield color #1   */
+#define PF2     0x04    /* 00000100b playfield color #2   */
+#define PF3     0x08    /* 00001000b playfield color #3   */
+#define PL0     0x11    /* 00010001b player #0            */
+#define PL1     0x12    /* 00010010b player #1            */
+#define PL2     0x14    /* 00010100b player #2            */
+#define PL3     0x18    /* 00011000b player #3            */
+#define MI0     0x21    /* 00100001b missile #0           */
+#define MI1     0x22    /* 00100010b missile #1           */
+#define MI2     0x24    /* 00100100b missile #2           */
+#define MI3     0x28    /* 00101000b missile #3           */
+#define T00     0x40    /* 01000000b text mode pixels 00  */
+#define P000    0x48    /* 01001000b player #0 pixels 00  */
+#define P100    0x4a    /* 01001010b player #1 pixels 00  */
+#define P200    0x4c    /* 01001100b player #2 pixels 00  */
+#define P300    0x4e    /* 01001110b player #3 pixels 00  */
+#define P400    0x4f    /* 01001111b missiles  pixels 00  */
+#define T01     0x50    /* 01010000b text mode pixels 01  */
+#define P001    0x58    /* 01011000b player #0 pixels 01  */
+#define P101    0x5a    /* 01011010b player #1 pixels 01  */
+#define P201    0x5c    /* 01011100b player #2 pixels 01  */
+#define P301    0x5e    /* 01011110b player #3 pixels 01  */
+#define P401    0x5f    /* 01011111b missiles  pixels 01  */
+#define T10     0x60    /* 01100000b text mode pixels 10  */
+#define P010    0x68    /* 01101000b player #0 pixels 10  */
+#define P110    0x6a    /* 01101010b player #1 pixels 10  */
+#define P210    0x6c    /* 01101100b player #2 pixels 10  */
+#define P310    0x6e    /* 01101110b player #3 pixels 10  */
+#define P410    0x6f    /* 01101111b missiles  pixels 10  */
+#define T11     0x70    /* 01110000b text mode pixels 11  */
+#define P011    0x78    /* 01111000b player #0 pixels 11  */
+#define P111    0x7a    /* 01111010b player #1 pixels 11  */
+#define P211    0x7c    /* 01111100b player #2 pixels 11  */
+#define P311    0x7e    /* 01111110b player #3 pixels 11  */
+#define P411    0x7f    /* 01111111b missiles  pixels 11  */
+#define G00     0x80    /* 10000000b hires gfx pixels 00  */
+#define G01     0x90    /* 10010000b hires gfx pixels 01  */
+#define G10     0xa0    /* 10100000b hires gfx pixels 10  */
+#define G11     0xb0    /* 10110000b hires gfx pixels 11  */
+#define GT1     0xc0    /* 11000000b gtia mode 1          */
+#define GT2     0xd0    /* 11010000b gtia mode 2          */
+#define GT3     0xe0    /* 11100000b gtia mode 3          */
+#define ILL     0xfe    /* 11111110b illegal priority     */
+#define EOR     0xff    /* 11111111b EOR mode color       */
+
+#define LUM     0x0f    /* 00001111b luminance bits       */
+#define HUE     0xf0    /* 11110000b hue bits             */
+
+#define TRIGGER_VBLANK  64715
+#define TRIGGER_STEAL   64716
+#define TRIGGER_HSYNC   64717
+
+
+/*****************************************************************************
+ * If your memcpy does not expand too well if you use it with constant
+ * size_t field, you might want to define these macros somehow different.
+ * NOTE: dst is not necessarily uint32_t aligned (because of horz scrolling)!
+ *****************************************************************************/
+#define COPY4(dst,s1) *dst++ = s1
+#define COPY8(dst,s1,s2) *dst++ = s1; *dst++ = s2
+#define COPY16(dst,s1,s2,s3,s4) *dst++ = s1; *dst++ = s2; *dst++ = s3; *dst++ = s4
+
+#define RDANTIC(space)      space.read_byte(m_dpage+m_doffs)
+#define RDVIDEO(space,o)    space.read_byte(m_vpage+((m_voffs+(o))&VOFFS))
+#define RDCHGEN(space,o)    space.read_byte(m_chbase+(o))
+#define RDPMGFXS(space,o)   space.read_byte(m_pmbase_s+(o)+(m_scanline>>1))
+#define RDPMGFXD(space,o)   space.read_byte(m_pmbase_d+(o)+m_scanline)
+
+#define PREPARE()                                               \
+	uint32_t *dst = (uint32_t *)&m_cclock[PMOFFSET]
+
+#define PREPARE_TXT2(space,width)                               \
+	uint32_t *dst = (uint32_t *)&m_cclock[PMOFFSET];            \
+	for (int i = 0; i < width; i++)                             \
+	{                                                           \
+		uint16_t ch = RDVIDEO(space,i) << 3;                      \
+		if (ch & 0x400)                                         \
+		{                                                       \
+			ch = RDCHGEN(space,(ch & 0x3f8) + m_w.chbasl);  \
+			ch = (ch ^ m_chxor) & m_chand;              \
+		}                                                       \
+		else                                                    \
+		{                                                       \
+			ch = RDCHGEN(space,ch + m_w.chbasl);            \
+		}                                                       \
+		video->data[i] = ch;                                    \
+	}
+
+#define PREPARE_TXT3(space,width)                               \
+	uint32_t *dst = (uint32_t *)&m_cclock[PMOFFSET];            \
+	for (int i = 0; i < width; i++)                             \
+	{                                                           \
+		uint16_t ch = RDVIDEO(space,i) << 3;                      \
+		if (ch & 0x400)                                         \
+		{                                                       \
+			ch &= 0x3f8;                                        \
+			if ((ch & 0x300) == 0x300)                          \
+			{                                                   \
+				if (m_w.chbasl < 2) /* first two lines empty */ \
+					ch = 0x00;                                  \
+				else /* lines 2..7 are standard, 8&9 are 0&1 */ \
+					ch = RDCHGEN(space,ch + (m_w.chbasl & 7));\
+			}                                                   \
+			else                                                \
+			{                                                   \
+				if (m_w.chbasl > 7) /* last two lines empty */  \
+					ch = 0x00;                                  \
+				else /* lines 0..7 are standard */              \
+					ch = RDCHGEN(space,ch + m_w.chbasl);    \
+			}                                                   \
+			ch = (ch ^ m_chxor) & m_chand;              \
+		}                                                       \
+		else                                                    \
+		{                                                       \
+			if ((ch & 0x300) == 0x300)                          \
+			{                                                   \
+				if (m_w.chbasl < 2) /* first two lines empty */ \
+					ch = 0x00;                                  \
+				else /* lines 2..7 are standard, 8&9 are 0&1 */ \
+					ch = RDCHGEN(space,ch + (m_w.chbasl & 7));\
+			}                                                   \
+			else                                                \
+			{                                                   \
+				if (m_w.chbasl > 7) /* last two lines empty */  \
+					ch = 0x00;                                  \
+				else /* lines 0..7 are standard */              \
+					ch = RDCHGEN(space,ch + m_w.chbasl);    \
+			}                                                   \
+		}                                                       \
+		video->data[i] = ch;                                    \
+	}
+
+#define PREPARE_TXT45(space,width,shift)                        \
+	uint32_t *dst = (uint32_t *)&m_cclock[PMOFFSET];            \
+	for (int i = 0; i < width; i++)                             \
+	{                                                           \
+		uint16_t ch = RDVIDEO(space,i) << 3;                      \
+		ch = ((ch>>2)&0x100)|RDCHGEN(space,(ch&0x3f8)+(m_w.chbasl>>shift)); \
+		video->data[i] = ch;                                    \
+	}
+
+
+#define PREPARE_TXT67(space,width,shift)                        \
+	uint32_t *dst = (uint32_t *)&m_cclock[PMOFFSET];            \
+	for (int i = 0; i < width; i++)                             \
+	{                                                           \
+		uint16_t ch = RDVIDEO(space,i) << 3;                      \
+		ch = (ch&0x600)|(RDCHGEN(space,(ch&0x1f8)+(m_w.chbasl>>shift))<<1); \
+		video->data[i] = ch;                                    \
+	}
+
+#define PREPARE_GFX8(space,width)                               \
+	uint32_t *dst = (uint32_t *)&m_cclock[PMOFFSET];            \
+	for (int i = 0; i < width; i++)                             \
+		video->data[i] = RDVIDEO(space,i) << 2
+
+#define PREPARE_GFX9BC(space,width)                             \
+	uint32_t *dst = (uint32_t *)&m_cclock[PMOFFSET];            \
+	for (int i = 0; i < width; i++)                             \
+		video->data[i] = RDVIDEO(space,i) << 1
+
+#define PREPARE_GFXA(space,width)                               \
+	uint32_t *dst = (uint32_t *)&m_cclock[PMOFFSET];            \
+	for (int i = 0; i < width; i++)                             \
+		video->data[i] = RDVIDEO(space,i) << 1
+
+#define PREPARE_GFXDE(space,width)                              \
+	uint32_t *dst = (uint32_t *)&m_cclock[PMOFFSET];            \
+	for (int i = 0; i < width; i++)                             \
+		video->data[i] = RDVIDEO(space,i)
+
+#define PREPARE_GFXF(space,width)                               \
+	uint32_t *dst = (uint32_t *)&m_cclock[PMOFFSET];            \
+	for (int i = 0; i < width; i++)                             \
+		video->data[i] = RDVIDEO(space,i)
+
+#define PREPARE_GFXG1(space,width)                              \
+	uint32_t *dst = (uint32_t *)&m_cclock[PMOFFSET];            \
+	for (int i = 0; i < width; i++)                             \
+		video->data[i] = RDVIDEO(space,i)
+
+#define PREPARE_GFXG2(space,width)                              \
+	uint32_t *dst = (uint32_t *)&m_cclock[PMOFFSET];            \
+	for (int i = 0; i < width; i++)                             \
+		video->data[i] = RDVIDEO(space,i)
+
+#define PREPARE_GFXG3(space,width)                              \
+	uint32_t *dst = (uint32_t *)&m_cclock[PMOFFSET];            \
+	for (int i = 0; i < width; i++)                             \
+		video->data[i] = RDVIDEO(space,i)
+
+/******************************************************************
+ * common end of a single antic/gtia mode emulation function
+ ******************************************************************/
+#define POST()                                                  \
+	--m_modelines
+
+#define POST_GFX(width)                                         \
+	m_steal_cycles += width;                                \
+	if (--m_modelines == 0)                                 \
+		m_voffs = (m_voffs + width) & VOFFS
+
+#define POST_TXT(width)                                         \
+	m_steal_cycles += width;                                \
+	if (--m_modelines == 0)                                 \
+		m_voffs = (m_voffs + width) & VOFFS;            \
+	else if (m_w.chactl & 4)                                \
+		m_w.chbasl--;                                       \
+	else                                                        \
+		m_w.chbasl++
+
+/* erase a number of color clocks to background color PBK */
+#define ERASE(size)                         \
+	for (int i = 0; i < size; i++)          \
+	{                                       \
+		*dst++ = (PBK << 24) | (PBK << 16) | (PBK << 8) | PBK;  \
+	}
+#define ZAP48()                                                 \
+	dst = (uint32_t *)&antic.cclock[PMOFFSET];                    \
+	dst[ 0] = (PBK << 24) | (PBK << 16) | (PBK << 8) | PBK;     \
+	dst[ 1] = (PBK << 24) | (PBK << 16) | (PBK << 8) | PBK;     \
+	dst[ 2] = (PBK << 24) | (PBK << 16) | (PBK << 8) | PBK;     \
+	dst[45] = (PBK << 24) | (PBK << 16) | (PBK << 8) | PBK;     \
+	dst[46] = (PBK << 24) | (PBK << 16) | (PBK << 8) | PBK;     \
+	dst[47] = (PBK << 24) | (PBK << 16) | (PBK << 8) | PBK
+
+#define REP(FUNC, size)                     \
+	for (int i = 0; i < size; i++)          \
+	{                                       \
+		FUNC(i);                            \
+	}
+
+
+constexpr unsigned antic_device::TOTAL_LINES_60HZ;
+constexpr unsigned antic_device::TOTAL_LINES_50HZ;
+constexpr double antic_device::FRAME_RATE_50HZ;
+constexpr double antic_device::FRAME_RATE_60HZ;
+
 // devices
-const device_type ATARI_ANTIC = &device_creator<antic_device>;
+DEFINE_DEVICE_TYPE(ATARI_ANTIC, antic_device, "antic", "Atari ANTIC")
 
 //-------------------------------------------------
 //  antic_device - constructor
 //-------------------------------------------------
 
-antic_device::antic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-				device_t(mconfig, ATARI_ANTIC, "Atari ANTIC", tag, owner, clock, "antic", __FILE__),
-				device_video_interface(mconfig, *this),
-				m_gtia_tag(nullptr),
-				m_maincpu(*this, ":maincpu"),
-				m_djoy_b(*this, ":djoy_b"),
-				m_artifacts(*this, ":artifacts"),
-				m_tv_artifacts(0),
-				m_render1(0),
-				m_render2(0),
-				m_render3(0),
-				m_cmd(0),
-				m_steal_cycles(0),
-				m_vscrol_old(0),
-				m_hscrol_old(0),
-				m_modelines(0),
-				m_chbase(0),
-				m_chand(0),
-				m_chxor(0),
-				m_scanline(0),
-				m_pfwidth(0),
-				m_dpage(0),
-				m_doffs(0),
-				m_vpage(0),
-				m_voffs(0),
-				m_pmbase_s(0),
-				m_pmbase_d(0)
+antic_device::antic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, ATARI_ANTIC, tag, owner, clock),
+	device_video_interface(mconfig, *this),
+	m_gtia_tag(nullptr),
+	m_maincpu(*this, ":maincpu"),
+	m_djoy_b(*this, ":djoy_b"),
+	m_artifacts(*this, ":artifacts"),
+	m_tv_artifacts(0),
+	m_render1(0),
+	m_render2(0),
+	m_render3(0),
+	m_cmd(0),
+	m_steal_cycles(0),
+	m_vscrol_old(0),
+	m_hscrol_old(0),
+	m_modelines(0),
+	m_chbase(0),
+	m_chand(0),
+	m_chxor(0),
+	m_scanline(0),
+	m_pfwidth(0),
+	m_dpage(0),
+	m_doffs(0),
+	m_vpage(0),
+	m_voffs(0),
+	m_pmbase_s(0),
+	m_pmbase_d(0)
 {
 }
 
@@ -67,7 +350,7 @@ void antic_device::device_start()
 
 	m_bitmap = std::make_unique<bitmap_ind16>(m_screen->width(), m_screen->height());
 
-	m_cclk_expand = make_unique_clear<UINT32[]>(21 * 256);
+	m_cclk_expand = make_unique_clear<uint32_t[]>(21 * 256);
 
 	m_pf_21       = &m_cclk_expand[ 0 * 256];
 	m_pf_x10b     = &m_cclk_expand[ 1 * 256];
@@ -79,9 +362,9 @@ void antic_device::device_start()
 	m_pf_gtia2    = &m_cclk_expand[19 * 256];
 	m_pf_gtia3    = &m_cclk_expand[20 * 256];
 
-	m_used_colors = std::make_unique<UINT8[]>(21 * 256);
+	m_used_colors = std::make_unique<uint8_t[]>(21 * 256);
 
-	memset(m_used_colors.get(), 0, 21 * 256 * sizeof(UINT8));
+	memset(m_used_colors.get(), 0, 21 * 256 * sizeof(uint8_t));
 
 	m_uc_21       = &m_used_colors[ 0 * 256];
 	m_uc_x10b     = &m_used_colors[ 1 * 256];
@@ -97,7 +380,7 @@ void antic_device::device_start()
 	cclk_init();
 
 	for (auto & elem : m_prio_table)
-		elem = make_unique_clear<UINT8[]>(8*256);
+		elem = make_unique_clear<uint8_t[]>(8*256);
 
 	LOG(("atari prio_init\n"));
 	prio_init();
@@ -106,8 +389,8 @@ void antic_device::device_start()
 		m_video[i] = auto_alloc_clear(machine(), <VIDEO>());
 
 	/* save states */
-	save_pointer(NAME((UINT8 *) &m_r), sizeof(m_r));
-	save_pointer(NAME((UINT8 *) &m_w), sizeof(m_w));
+	save_pointer(NAME((uint8_t *) &m_r), sizeof(m_r));
+	save_pointer(NAME((uint8_t *) &m_w), sizeof(m_w));
 	// TODO: save VIDEO items
 
 	save_item(NAME(m_tv_artifacts));
@@ -231,7 +514,7 @@ void antic_device::device_reset()
  * player/missile colors calculated for the first part (00-1F).
  * The priorities of combining priority bits (which games use!) are:
  ************************************************************************/
-static const UINT8 _pm_colors[32][8*2*8] = {
+static const uint8_t _pm_colors[32][8*2*8] = {
 	{
 		M0, PL0,P0, PL0,M1, PL1,P1, PL1,M2, PL2,P2, PL2,M3, PL3,P3, PL3,  // 00
 		M0, PL0,P0, PL0,M1, PL1,P1, PL1,M2, PL2,P2, PL2,M3, PL3,P3, PL3,
@@ -561,7 +844,7 @@ static const UINT8 _pm_colors[32][8*2*8] = {
 void antic_device::prio_init()
 {
 	int i, j, pm, p, c;
-	const UINT8 * prio;
+	const uint8_t * prio;
 
 	/* 32 priority bit combinations */
 	for( i = 0; i < 32; i++ )
@@ -598,37 +881,37 @@ void antic_device::prio_init()
  ************************************************************************/
 void antic_device::cclk_init()
 {
-	static const UINT8 _pf_21[4] =   {T00,T01,T10,T11};
-	static const UINT8 _pf_1b[4] =   {G00,G01,G10,G11};
-	static const UINT8 _pf_210b[4] = {PBK,PF0,PF1,PF2};
-	static const UINT8 _pf_310b[4] = {PBK,PF0,PF1,PF3};
+	static const uint8_t _pf_21[4] =   {T00,T01,T10,T11};
+	static const uint8_t _pf_1b[4] =   {G00,G01,G10,G11};
+	static const uint8_t _pf_210b[4] = {PBK,PF0,PF1,PF2};
+	static const uint8_t _pf_310b[4] = {PBK,PF0,PF1,PF3};
 	int i;
-	UINT8 * dst;
+	uint8_t * dst;
 
 	/* setup color translation for the ANTIC modes */
 	for( i = 0; i < 256; i++ )
 	{
 		/****** text mode (2,3) **********/
-		dst = (UINT8 *)&m_pf_21[0x000+i];
+		dst = (uint8_t *)&m_pf_21[0x000+i];
 		*dst++ = _pf_21[(i>>6)&3];
 		*dst++ = _pf_21[(i>>4)&3];
 		*dst++ = _pf_21[(i>>2)&3];
 		*dst++ = _pf_21[(i>>0)&3];
 
 		/****** 4 color text (4,5) with pf2, D, E **********/
-		dst = (UINT8 *)&m_pf_x10b[0x000+i];
+		dst = (uint8_t *)&m_pf_x10b[0x000+i];
 		*dst++ = _pf_210b[(i>>6)&3];
 		*dst++ = _pf_210b[(i>>4)&3];
 		*dst++ = _pf_210b[(i>>2)&3];
 		*dst++ = _pf_210b[(i>>0)&3];
-		dst = (UINT8 *)&m_pf_x10b[0x100+i];
+		dst = (uint8_t *)&m_pf_x10b[0x100+i];
 		*dst++ = _pf_310b[(i>>6)&3];
 		*dst++ = _pf_310b[(i>>4)&3];
 		*dst++ = _pf_310b[(i>>2)&3];
 		*dst++ = _pf_310b[(i>>0)&3];
 
 		/****** pf0 color text (6,7), 9, B, C **********/
-		dst = (UINT8 *)&m_pf_3210b2[0x000+i*2];
+		dst = (uint8_t *)&m_pf_3210b2[0x000+i*2];
 		*dst++ = (i&0x80)?PF0:PBK;
 		*dst++ = (i&0x40)?PF0:PBK;
 		*dst++ = (i&0x20)?PF0:PBK;
@@ -639,7 +922,7 @@ void antic_device::cclk_init()
 		*dst++ = (i&0x01)?PF0:PBK;
 
 		/****** pf1 color text (6,7), 9, B, C **********/
-		dst = (UINT8 *)&m_pf_3210b2[0x200+i*2];
+		dst = (uint8_t *)&m_pf_3210b2[0x200+i*2];
 		*dst++ = (i&0x80)?PF1:PBK;
 		*dst++ = (i&0x40)?PF1:PBK;
 		*dst++ = (i&0x20)?PF1:PBK;
@@ -650,7 +933,7 @@ void antic_device::cclk_init()
 		*dst++ = (i&0x01)?PF1:PBK;
 
 		/****** pf2 color text (6,7), 9, B, C **********/
-		dst = (UINT8 *)&m_pf_3210b2[0x400+i*2];
+		dst = (uint8_t *)&m_pf_3210b2[0x400+i*2];
 		*dst++ = (i&0x80)?PF2:PBK;
 		*dst++ = (i&0x40)?PF2:PBK;
 		*dst++ = (i&0x20)?PF2:PBK;
@@ -661,7 +944,7 @@ void antic_device::cclk_init()
 		*dst++ = (i&0x01)?PF2:PBK;
 
 		/****** pf3 color text (6,7), 9, B, C **********/
-		dst = (UINT8 *)&m_pf_3210b2[0x600+i*2];
+		dst = (uint8_t *)&m_pf_3210b2[0x600+i*2];
 		*dst++ = (i&0x80)?PF3:PBK;
 		*dst++ = (i&0x40)?PF3:PBK;
 		*dst++ = (i&0x20)?PF3:PBK;
@@ -672,7 +955,7 @@ void antic_device::cclk_init()
 		*dst++ = (i&0x01)?PF3:PBK;
 
 		/****** 4 color graphics 4 cclks (8) **********/
-		dst = (UINT8 *)&m_pf_210b4[i*4];
+		dst = (uint8_t *)&m_pf_210b4[i*4];
 		*dst++ = _pf_210b[(i>>6)&3];
 		*dst++ = _pf_210b[(i>>6)&3];
 		*dst++ = _pf_210b[(i>>6)&3];
@@ -691,7 +974,7 @@ void antic_device::cclk_init()
 		*dst++ = _pf_210b[(i>>0)&3];
 
 		/****** 4 color graphics 2 cclks (A) **********/
-		dst = (UINT8 *)&m_pf_210b2[i*2];
+		dst = (uint8_t *)&m_pf_210b2[i*2];
 		*dst++ = _pf_210b[(i>>6)&3];
 		*dst++ = _pf_210b[(i>>6)&3];
 		*dst++ = _pf_210b[(i>>4)&3];
@@ -702,28 +985,28 @@ void antic_device::cclk_init()
 		*dst++ = _pf_210b[(i>>0)&3];
 
 		/****** high resolution graphics (F) **********/
-		dst = (UINT8 *)&m_pf_1b[i];
+		dst = (uint8_t *)&m_pf_1b[i];
 		*dst++ = _pf_1b[(i>>6)&3];
 		*dst++ = _pf_1b[(i>>4)&3];
 		*dst++ = _pf_1b[(i>>2)&3];
 		*dst++ = _pf_1b[(i>>0)&3];
 
 		/****** gtia mode 1 **********/
-		dst = (UINT8 *)&m_pf_gtia1[i];
+		dst = (uint8_t *)&m_pf_gtia1[i];
 		*dst++ = GT1+((i>>4)&15);
 		*dst++ = GT1+((i>>4)&15);
 		*dst++ = GT1+(i&15);
 		*dst++ = GT1+(i&15);
 
 		/****** gtia mode 2 **********/
-		dst = (UINT8 *)&m_pf_gtia2[i];
+		dst = (uint8_t *)&m_pf_gtia2[i];
 		*dst++ = GT2+((i>>4)&15);
 		*dst++ = GT2+((i>>4)&15);
 		*dst++ = GT2+(i&15);
 		*dst++ = GT2+(i&15);
 
 		/****** gtia mode 3 **********/
-		dst = (UINT8 *)&m_pf_gtia3[i];
+		dst = (uint8_t *)&m_pf_gtia3[i];
 		*dst++ = GT3+((i>>4)&15);
 		*dst++ = GT3+((i>>4)&15);
 		*dst++ = GT3+(i&15);
@@ -859,7 +1142,7 @@ void antic_device::cclk_init()
  **************************************************************/
 READ8_MEMBER ( antic_device::read )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	switch (offset & 15)
 	{
@@ -1389,9 +1672,9 @@ void antic_device::render(address_space &space, int param1, int param2, int para
  * Refresh screen bitmap.
  * Note: Actual drawing is done scanline wise during atari_interrupt
  ************************************************************************/
-UINT32 antic_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t antic_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT32 new_tv_artifacts = m_artifacts ? m_artifacts->read() : 0;
+	uint32_t new_tv_artifacts = m_artifacts.read_safe(0);
 	copybitmap(bitmap, *m_bitmap, 0, 0, 0, 0, cliprect);
 
 	if (m_tv_artifacts != new_tv_artifacts)
@@ -1400,16 +1683,16 @@ UINT32 antic_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 	return 0;
 }
 
-void antic_device::artifacts_gfx(UINT8 *src, UINT8 *dst, int width)
+void antic_device::artifacts_gfx(uint8_t *src, uint8_t *dst, int width)
 {
-	UINT8 n, bits = 0;
-	UINT8 b = m_gtia->get_w_colbk() & 0xf0;
-	UINT8 c = m_gtia->get_w_colpf1() & 0x0f;
-	UINT8 atari_A = ((b + 0x30) & 0xf0) + c;
-	UINT8 atari_B = ((b + 0x70) & 0xf0) + c;
-	UINT8 atari_C = b + c;
-	UINT8 atari_D = m_gtia->get_w_colbk();
-	UINT16 *color_lookup = m_gtia->get_color_lookup();
+	uint8_t n, bits = 0;
+	uint8_t b = m_gtia->get_w_colbk() & 0xf0;
+	uint8_t c = m_gtia->get_w_colpf1() & 0x0f;
+	uint8_t atari_A = ((b + 0x30) & 0xf0) + c;
+	uint8_t atari_B = ((b + 0x70) & 0xf0) + c;
+	uint8_t atari_C = b + c;
+	uint8_t atari_D = m_gtia->get_w_colbk();
+	uint16_t *color_lookup = m_gtia->get_color_lookup();
 
 	for (int x = 0; x < width * 4; x++)
 	{
@@ -1474,16 +1757,16 @@ void antic_device::artifacts_gfx(UINT8 *src, UINT8 *dst, int width)
 	}
 }
 
-void antic_device::artifacts_txt(UINT8 * src, UINT8 * dst, int width)
+void antic_device::artifacts_txt(uint8_t * src, uint8_t * dst, int width)
 {
-	UINT8 n, bits = 0;
-	UINT8 b = m_gtia->get_w_colpf2() & 0xf0;
-	UINT8 c = m_gtia->get_w_colpf1() & 0x0f;
-	UINT8 atari_A = ((b+0x30)&0xf0)+c;
-	UINT8 atari_B = ((b+0x70)&0xf0)+c;
-	UINT8 atari_C = b+c;
-	UINT8 atari_D = m_gtia->get_w_colpf2();
-	UINT16 *color_lookup = m_gtia->get_color_lookup();
+	uint8_t n, bits = 0;
+	uint8_t b = m_gtia->get_w_colpf2() & 0xf0;
+	uint8_t c = m_gtia->get_w_colpf1() & 0x0f;
+	uint8_t atari_A = ((b+0x30)&0xf0)+c;
+	uint8_t atari_B = ((b+0x70)&0xf0)+c;
+	uint8_t atari_C = b+c;
+	uint8_t atari_D = m_gtia->get_w_colpf2();
+	uint16_t *color_lookup = m_gtia->get_color_lookup();
 
 	for (int x = 0; x < width * 4; x++)
 	{
@@ -1552,10 +1835,10 @@ void antic_device::artifacts_txt(UINT8 * src, UINT8 * dst, int width)
 void antic_device::linerefresh()
 {
 	int x, y;
-	UINT8 *src;
-	UINT32 *dst;
-	UINT32 scanline[4 + (HCHARS * 2) + 4];
-	UINT16 *color_lookup = m_gtia->get_color_lookup();
+	uint8_t *src;
+	uint32_t *dst;
+	uint32_t scanline[4 + (HCHARS * 2) + 4];
+	uint16_t *color_lookup = m_gtia->get_color_lookup();
 
 	/* increment the scanline */
 	if( ++m_scanline == m_screen->height() )
@@ -1578,13 +1861,13 @@ void antic_device::linerefresh()
 	{
 		if( (m_cmd & 0x0f) == 2 || (m_cmd & 0x0f) == 3 )
 		{
-			artifacts_txt(src, (UINT8*)(dst + 3), HCHARS);
+			artifacts_txt(src, (uint8_t*)(dst + 3), HCHARS);
 			return;
 		}
 		else
 			if( (m_cmd & 0x0f) == 15 )
 			{
-				artifacts_gfx(src, (UINT8*)(dst + 3), HCHARS);
+				artifacts_gfx(src, (uint8_t*)(dst + 3), HCHARS);
 				return;
 			}
 	}
@@ -1655,7 +1938,7 @@ void antic_device::linerefresh()
 	dst[2] = color_lookup[PBK] | color_lookup[PBK] << 16;
 	dst[3] = color_lookup[PBK] | color_lookup[PBK] << 16;
 
-	draw_scanline8(*m_bitmap, 12, y, MIN(m_bitmap->width() - 12, sizeof(scanline)), (const UINT8 *) scanline, nullptr);
+	draw_scanline8(*m_bitmap, 12, y, std::min(size_t(m_bitmap->width() - 12), sizeof(scanline)), (const uint8_t *) scanline, nullptr);
 }
 
 
@@ -1804,7 +2087,7 @@ TIMER_CALLBACK_MEMBER( antic_device::scanline_render )
 	}
 
 	if (m_scanline >= VBL_END && m_scanline < 256)
-		m_gtia->render((UINT8 *)m_pmbits + PMOFFSET, (UINT8 *)m_cclock + PMOFFSET - m_hscrol_old, m_prio_table[m_gtia->get_w_prior() & 0x3f].get(), (UINT8 *)&m_pmbits);
+		m_gtia->render((uint8_t *)m_pmbits + PMOFFSET, (uint8_t *)m_cclock + PMOFFSET - m_hscrol_old, m_prio_table[m_gtia->get_w_prior() & 0x3f].get(), (uint8_t *)&m_pmbits);
 
 	m_steal_cycles += CYCLES_REFRESH;
 	LOG(("           run CPU for %d cycles\n", CYCLES_HSYNC - CYCLES_HSTART - m_steal_cycles));
@@ -1860,8 +2143,8 @@ void antic_device::scanline_dma(int param)
 			{
 				m_render1 = 0;
 				m_render3 = m_w.dmactl & 3;
-				UINT8 vscrol_subtract = 0;
-				UINT8 new_cmd;
+				uint8_t vscrol_subtract = 0;
+				uint8_t new_cmd;
 
 				new_cmd = RDANTIC(space);
 				m_doffs = (m_doffs + 1) & DOFFS;
@@ -2084,7 +2367,7 @@ void antic_device::generic_interrupt(int button_count)
 	if( m_scanline == VBL_START )
 	{
 		/* specify buttons relevant to this Atari variant */
-		m_gtia->button_interrupt(button_count, m_djoy_b ? m_djoy_b->read() : 0);
+		m_gtia->button_interrupt(button_count, m_djoy_b.read_safe(0));
 
 		/* do nothing new for the rest of the frame */
 		m_modelines = m_screen->height() - VBL_START;

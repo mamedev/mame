@@ -30,21 +30,24 @@ public:
 	{
 	}
 
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	void kbd_put(u8 data);
 	DECLARE_READ16_MEMBER(keyin_r);
 	DECLARE_READ16_MEMBER(status_r);
 	DECLARE_READ16_MEMBER(switches_r);
+
 private:
-	UINT8 m_term_data;
+	uint8_t m_term_data;
 	virtual void machine_reset() override;
-	required_shared_ptr<UINT16> m_p_base;
+
+	required_shared_ptr<uint16_t> m_p_base;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 };
 
 READ16_MEMBER( ft68m_state::keyin_r )
 {
-	UINT16 ret = m_term_data;
+	uint16_t ret = m_term_data;
 	m_term_data = 0;
 	return ret << 8;
 }
@@ -83,17 +86,17 @@ INPUT_PORTS_END
 
 void ft68m_state::machine_reset()
 {
-	UINT8* ROM = memregion("roms")->base();
+	uint8_t* ROM = memregion("roms")->base();
 	memcpy(m_p_base, ROM, 8);
 	m_maincpu->reset();
 }
 
-WRITE8_MEMBER( ft68m_state::kbd_put )
+void ft68m_state::kbd_put(u8 data)
 {
 	m_term_data = data;
 }
 
-static MACHINE_CONFIG_START( ft68m, ft68m_state )
+static MACHINE_CONFIG_START( ft68m )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_19_6608MHz / 2)
@@ -101,7 +104,7 @@ static MACHINE_CONFIG_START( ft68m, ft68m_state )
 
 	/* video hardware */
 	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(ft68m_state, kbd_put))
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(ft68m_state, kbd_put))
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -124,5 +127,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME   PARENT  COMPAT  MACHINE INPUT   CLASS          INIT COMPANY               FULLNAME  FLAGS */
-COMP( 198?, ft68m, 0,      0,      ft68m,  ft68m,  driver_device, 0,   "Forward Technology", "FT-68M", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE INPUT   CLASS        INIT  COMPANY               FULLNAME  FLAGS
+COMP( 198?, ft68m, 0,      0,      ft68m,  ft68m,  ft68m_state, 0,    "Forward Technology", "FT-68M", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

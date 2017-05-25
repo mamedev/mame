@@ -20,18 +20,22 @@ ToDo:
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
-#include "video/upd7220.h"
-#include "machine/ram.h"
-#include "machine/upd765.h"
-#include "formats/a5105_dsk.h"
-#include "machine/z80ctc.h"
-#include "machine/z80pio.h"
 #include "imagedev/cassette.h"
 #include "imagedev/flopdrv.h"
-#include "sound/wave.h"
+#include "machine/ram.h"
+#include "machine/upd765.h"
+#include "machine/z80ctc.h"
+#include "machine/z80pio.h"
 #include "sound/beep.h"
+#include "sound/wave.h"
+#include "video/upd7220.h"
 
+#include "screen.h"
+#include "speaker.h"
+
+#include "formats/a5105_dsk.h"
 
 
 class a5105_state : public driver_device
@@ -73,14 +77,14 @@ public:
 	DECLARE_WRITE8_MEMBER( a5105_upd765_w );
 	DECLARE_WRITE8_MEMBER(pcg_addr_w);
 	DECLARE_WRITE8_MEMBER(pcg_val_w);
-	required_shared_ptr<UINT16> m_video_ram;
-	UINT8 *m_ram_base;
-	UINT8 *m_rom_base;
-	UINT8 *m_char_ram;
-	UINT16 m_pcg_addr;
-	UINT16 m_pcg_internal_addr;
-	UINT8 m_key_mux;
-	UINT8 m_memsel[4];
+	required_shared_ptr<uint16_t> m_video_ram;
+	uint8_t *m_ram_base;
+	uint8_t *m_rom_base;
+	uint8_t *m_char_ram;
+	uint16_t m_pcg_addr;
+	uint16_t m_pcg_internal_addr;
+	uint8_t m_key_mux;
+	uint8_t m_memsel[4];
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(a5105);
@@ -98,7 +102,7 @@ UPD7220_DISPLAY_PIXELS_MEMBER( a5105_state::hgdc_display_pixels )
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 
 	int xi,gfx;
-	UINT8 pen;
+	uint8_t pen;
 
 	gfx = m_video_ram[(address & 0x1ffff) >> 1];
 
@@ -116,7 +120,7 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( a5105_state::hgdc_draw_text )
 	int x;
 	int xi,yi;
 	int tile,color;
-	UINT8 tile_data;
+	uint8_t tile_data;
 
 	for( x = 0; x < pitch; x++ )
 	{
@@ -231,7 +235,7 @@ WRITE8_MEMBER( a5105_state::a5105_ab_w )
 
 READ8_MEMBER( a5105_state::a5105_memsel_r )
 {
-	UINT8 res;
+	uint8_t res;
 
 	res = (m_memsel[0] & 3) << 0;
 	res|= (m_memsel[1] & 3) << 2;
@@ -485,8 +489,8 @@ void a5105_state::machine_reset()
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	a5105_ab_w(space, 0, 9); // turn motor off
 
-	m_ram_base = (UINT8*)m_ram->pointer();
-	m_rom_base = (UINT8*)memregion("maincpu")->base();
+	m_ram_base = (uint8_t*)m_ram->pointer();
+	m_rom_base = (uint8_t*)memregion("maincpu")->base();
 
 	membank("bank1")->set_base(m_rom_base);
 	membank("bank2")->set_base(m_rom_base + 0x4000);
@@ -552,7 +556,7 @@ static const z80_daisy_config a5105_daisy_chain[] =
 	{ nullptr }
 };
 
-static MACHINE_CONFIG_START( a5105, a5105_state )
+static MACHINE_CONFIG_START( a5105 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_15MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(a5105_mem)
@@ -619,5 +623,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY           FULLNAME           FLAGS */
-COMP( 1989, a5105,  0,      0,       a5105,     a5105, driver_device,   0,      "VEB Robotron",   "BIC A5105", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE        INIT    COMPANY           FULLNAME     FLAGS
+COMP( 1989, a5105,  0,      0,       a5105,     a5105, a5105_state, 0,      "VEB Robotron",   "BIC A5105", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

@@ -84,7 +84,7 @@ private:
 
 	void update_screen_count(uint32_t screen_count);
 
-	virtual INT32 slider_changed(running_machine &machine, void *arg, int id, std::string *str, INT32 newval) override;
+	virtual int32_t slider_changed(running_machine &machine, void *arg, int id, std::string *str, int32_t newval) override;
 	void create_selection_slider(uint32_t screen_index);
 	bool needs_sliders();
 

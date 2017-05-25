@@ -161,9 +161,10 @@ Notes: (All IC's listed for completeness)
 */
 
 #include "emu.h"
+#include "cpu/mcs96/i8x9x.h"
 #include "machine/ram.h"
 #include "video/sed1200.h"
-#include "cpu/mcs96/i8x9x.h"
+#include "screen.h"
 
 static INPUT_PORTS_START( mt32 )
 	PORT_START("SC0")
@@ -200,7 +201,7 @@ public:
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(mt32);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE8_MEMBER(bank_w);
 	DECLARE_WRITE8_MEMBER(so_w);
@@ -215,11 +216,11 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(samples_timer_cb);
 
 private:
-	UINT8 lcd_data_buffer[256];
+	uint8_t lcd_data_buffer[256];
 	int lcd_data_buffer_pos;
-	UINT8 midi;
+	uint8_t midi;
 	int midi_pos;
-	UINT8 port0;
+	uint8_t port0;
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -234,13 +235,13 @@ mt32_state::mt32_state(const machine_config &mconfig, device_type type, const ch
 }
 
 
-UINT32 mt32_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t mt32_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0);
-	const UINT8 *data = lcd->render();
+	const uint8_t *data = lcd->render();
 	for(int c=0; c<20; c++)
 		for(int y=0; y<8; y++) {
-			UINT8 v = data[c*8+y];
+			uint8_t v = data[c*8+y];
 			for(int x=0; x<5; x++)
 				bitmap.pix16(y == 7 ? 8 : y, c*6+x) = v & (0x10 >> x) ? 1 : 0;
 		}
@@ -294,7 +295,7 @@ WRITE16_MEMBER(mt32_state::midi_w)
 
 TIMER_DEVICE_CALLBACK_MEMBER(mt32_state::midi_timer_cb)
 {
-	const static UINT8 midi_data[3] = { 0x91, 0x40, 0x7f };
+	const static uint8_t midi_data[3] = { 0x91, 0x40, 0x7f };
 	midi = midi_data[midi_pos++];
 	logerror("midi_in %02x\n", midi);
 	cpu->serial_w(midi);
@@ -347,7 +348,7 @@ static ADDRESS_MAP_START( mt32_io, AS_IO, 16, mt32_state )
 	AM_RANGE(i8x9x_device::P0,     i8x9x_device::P0)     AM_READ(port0_r)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( mt32, mt32_state )
+static MACHINE_CONFIG_START( mt32 )
 	MCFG_CPU_ADD( "maincpu", P8098, XTAL_12MHz )
 	MCFG_CPU_PROGRAM_MAP( mt32_map )
 	MCFG_CPU_IO_MAP( mt32_io )
@@ -434,5 +435,5 @@ ROM_START( cm32l )
 	ROM_LOAD(        "r15179917.ic19.bin",           0,   0x8000, CRC(236c87a6) SHA1(e1c03905c46e962d1deb15eeed92eb61b42bba4a) )
 ROM_END
 
-CONS( 1987, mt32,  0, 0, mt32, mt32, driver_device, 0, "Roland", "MT32",  MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
-CONS( 1989, cm32l, 0, 0, mt32, mt32, driver_device, 0, "Roland", "CM32L", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+CONS( 1987, mt32,  0, 0, mt32, mt32, mt32_state, 0, "Roland", "MT32",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 1989, cm32l, 0, 0, mt32, mt32, mt32_state, 0, "Roland", "CM32L", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

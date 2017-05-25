@@ -28,9 +28,9 @@
 
 union _x86_union
 {
-	UINT64 u64;
+	uint64_t u64;
 	struct {
-		UINT32 l, h;
+		uint32_t l, h;
 	} u32;
 };
 
@@ -41,10 +41,10 @@ union _x86_union
 
 #ifndef __x86_64__
 #define mul_32x32 _mul_32x32
-static inline INT64 ATTR_CONST ATTR_FORCE_INLINE
-_mul_32x32(INT32 a, INT32 b)
+static inline int64_t ATTR_CONST ATTR_FORCE_INLINE
+_mul_32x32(int32_t a, int32_t b)
 {
-	INT64 result;
+	int64_t result;
 
 	__asm__ (
 		" imull  %[b] ;"
@@ -67,10 +67,10 @@ _mul_32x32(INT32 a, INT32 b)
 
 #ifndef __x86_64__
 #define mulu_32x32 _mulu_32x32
-static inline UINT64 ATTR_CONST ATTR_FORCE_INLINE
-_mulu_32x32(UINT32 a, UINT32 b)
+static inline uint64_t ATTR_CONST ATTR_FORCE_INLINE
+_mulu_32x32(uint32_t a, uint32_t b)
 {
-	UINT64 result;
+	uint64_t result;
 
 	__asm__ (
 		" mull  %[b] ;"
@@ -92,10 +92,10 @@ _mulu_32x32(UINT32 a, UINT32 b)
 -------------------------------------------------*/
 
 #define mul_32x32_hi _mul_32x32_hi
-static inline INT32 ATTR_CONST ATTR_FORCE_INLINE
-_mul_32x32_hi(INT32 a, INT32 b)
+static inline int32_t ATTR_CONST ATTR_FORCE_INLINE
+_mul_32x32_hi(int32_t a, int32_t b)
 {
-	INT32 result, temp;
+	int32_t result, temp;
 
 	__asm__ (
 		" imull  %[b] ;"
@@ -117,10 +117,10 @@ _mul_32x32_hi(INT32 a, INT32 b)
 -------------------------------------------------*/
 
 #define mulu_32x32_hi _mulu_32x32_hi
-static inline UINT32 ATTR_CONST ATTR_FORCE_INLINE
-_mulu_32x32_hi(UINT32 a, UINT32 b)
+static inline uint32_t ATTR_CONST ATTR_FORCE_INLINE
+_mulu_32x32_hi(uint32_t a, uint32_t b)
 {
-	UINT32 result, temp;
+	uint32_t result, temp;
 
 	__asm__ (
 		" mull  %[b] ;"
@@ -144,10 +144,10 @@ _mulu_32x32_hi(UINT32 a, UINT32 b)
 
 #ifndef __x86_64__
 #define mul_32x32_shift _mul_32x32_shift
-static inline INT32 ATTR_CONST ATTR_FORCE_INLINE
-_mul_32x32_shift(INT32 a, INT32 b, UINT8 shift)
+static inline int32_t ATTR_CONST ATTR_FORCE_INLINE
+_mul_32x32_shift(int32_t a, int32_t b, uint8_t shift)
 {
-	INT32 result;
+	int32_t result;
 
 	/* Valid for (0 <= shift <= 31) */
 	__asm__ (
@@ -174,10 +174,10 @@ _mul_32x32_shift(INT32 a, INT32 b, UINT8 shift)
 
 #ifndef __x86_64__
 #define mulu_32x32_shift _mulu_32x32_shift
-static inline UINT32 ATTR_CONST ATTR_FORCE_INLINE
-_mulu_32x32_shift(UINT32 a, UINT32 b, UINT8 shift)
+static inline uint32_t ATTR_CONST ATTR_FORCE_INLINE
+_mulu_32x32_shift(uint32_t a, uint32_t b, uint8_t shift)
 {
-	UINT32 result;
+	uint32_t result;
 
 	/* Valid for (0 <= shift <= 31) */
 	__asm__ (
@@ -202,10 +202,10 @@ _mulu_32x32_shift(UINT32 a, UINT32 b, UINT8 shift)
 
 #ifndef __x86_64__
 #define div_64x32 _div_64x32
-static inline INT32 ATTR_CONST ATTR_FORCE_INLINE
-_div_64x32(INT64 a, INT32 b)
+static inline int32_t ATTR_CONST ATTR_FORCE_INLINE
+_div_64x32(int64_t a, int32_t b)
 {
-	INT32 result, temp;
+	int32_t result, temp;
 
 	/* Throws arithmetic exception if result doesn't fit in 32 bits */
 	__asm__ (
@@ -229,10 +229,10 @@ _div_64x32(INT64 a, INT32 b)
 
 #ifndef __x86_64__
 #define divu_64x32 _divu_64x32
-static inline UINT32 ATTR_CONST ATTR_FORCE_INLINE
-_divu_64x32(UINT64 a, UINT32 b)
+static inline uint32_t ATTR_CONST ATTR_FORCE_INLINE
+_divu_64x32(uint64_t a, uint32_t b)
 {
-	UINT32 result, temp;
+	uint32_t result, temp;
 
 	/* Throws arithmetic exception if result doesn't fit in 32 bits */
 	__asm__ (
@@ -257,10 +257,10 @@ _divu_64x32(UINT64 a, UINT32 b)
 
 #ifndef __x86_64__
 #define div_64x32_rem _div_64x32_rem
-static inline INT32 ATTR_FORCE_INLINE
-_div_64x32_rem(INT64 dividend, INT32 divisor, INT32 *remainder)
+static inline int32_t ATTR_FORCE_INLINE
+_div_64x32_rem(int64_t dividend, int32_t divisor, int32_t *remainder)
 {
-	INT32 quotient;
+	int32_t quotient;
 
 	/* Throws arithmetic exception if result doesn't fit in 32 bits */
 	__asm__ (
@@ -285,10 +285,10 @@ _div_64x32_rem(INT64 dividend, INT32 divisor, INT32 *remainder)
 
 #ifndef __x86_64__
 #define divu_64x32_rem _divu_64x32_rem
-static inline UINT32 ATTR_FORCE_INLINE
-_divu_64x32_rem(UINT64 dividend, UINT32 divisor, UINT32 *remainder)
+static inline uint32_t ATTR_FORCE_INLINE
+_divu_64x32_rem(uint64_t dividend, uint32_t divisor, uint32_t *remainder)
 {
-	UINT32 quotient;
+	uint32_t quotient;
 
 	/* Throws arithmetic exception if result doesn't fit in 32 bits */
 	__asm__ (
@@ -304,10 +304,10 @@ _divu_64x32_rem(UINT64 dividend, UINT32 divisor, UINT32 *remainder)
 }
 #else
 #define divu_64x32_rem _divu_64x32_rem
-static inline UINT32 ATTR_FORCE_INLINE
-_divu_64x32_rem(UINT64 dividend, UINT32 divisor, UINT32 *remainder)
+static inline uint32_t ATTR_FORCE_INLINE
+_divu_64x32_rem(uint64_t dividend, uint32_t divisor, uint32_t *remainder)
 {
-	UINT32 quotient;
+	uint32_t quotient;
 	_x86_union r;
 
 	r.u64 = dividend;
@@ -336,10 +336,10 @@ _divu_64x32_rem(UINT64 dividend, UINT32 divisor, UINT32 *remainder)
 
 #ifndef __x86_64__
 #define div_32x32_shift _div_32x32_shift
-static inline INT32 ATTR_CONST ATTR_FORCE_INLINE
-_div_32x32_shift(INT32 a, INT32 b, UINT8 shift)
+static inline int32_t ATTR_CONST ATTR_FORCE_INLINE
+_div_32x32_shift(int32_t a, int32_t b, uint8_t shift)
 {
-	INT32 result;
+	int32_t result;
 
 	/* Valid for (0 <= shift <= 31) */
 	/* Throws arithmetic exception if result doesn't fit in 32 bits */
@@ -368,10 +368,10 @@ _div_32x32_shift(INT32 a, INT32 b, UINT8 shift)
 
 #ifndef __x86_64__
 #define divu_32x32_shift _divu_32x32_shift
-static inline UINT32 ATTR_CONST ATTR_FORCE_INLINE
-_divu_32x32_shift(UINT32 a, UINT32 b, UINT8 shift)
+static inline uint32_t ATTR_CONST ATTR_FORCE_INLINE
+_divu_32x32_shift(uint32_t a, uint32_t b, uint8_t shift)
 {
-	INT32 result;
+	int32_t result;
 
 	/* Valid for (0 <= shift <= 31) */
 	/* Throws arithmetic exception if result doesn't fit in 32 bits */
@@ -399,10 +399,10 @@ _divu_32x32_shift(UINT32 a, UINT32 b, UINT8 shift)
 
 #ifndef __x86_64__
 #define mod_64x32 _mod_64x32
-static inline INT32 ATTR_CONST ATTR_FORCE_INLINE
-_mod_64x32(INT64 a, INT32 b)
+static inline int32_t ATTR_CONST ATTR_FORCE_INLINE
+_mod_64x32(int64_t a, int32_t b)
 {
-	INT32 result, temp;
+	int32_t result, temp;
 
 	/* Throws arithmetic exception if quotient doesn't fit in 32 bits */
 	__asm__ (
@@ -426,10 +426,10 @@ _mod_64x32(INT64 a, INT32 b)
 
 #ifndef __x86_64__
 #define modu_64x32 _modu_64x32
-static inline UINT32 ATTR_CONST ATTR_FORCE_INLINE
-_modu_64x32(UINT64 a, UINT32 b)
+static inline uint32_t ATTR_CONST ATTR_FORCE_INLINE
+_modu_64x32(uint64_t a, uint32_t b)
 {
-	UINT32 result, temp;
+	uint32_t result, temp;
 
 	/* Throws arithmetic exception if quotient doesn't fit in 32 bits */
 	__asm__ (
@@ -476,10 +476,10 @@ _recip_approx(float value)
 -------------------------------------------------*/
 
 #define count_leading_zeros _count_leading_zeros
-static inline UINT8 ATTR_CONST ATTR_FORCE_INLINE
-_count_leading_zeros(UINT32 value)
+static inline uint8_t ATTR_CONST ATTR_FORCE_INLINE
+_count_leading_zeros(uint32_t value)
 {
-	UINT32 result;
+	uint32_t result;
 
 	__asm__ (
 		"   bsrl  %[value], %[result] ;"
@@ -501,10 +501,10 @@ _count_leading_zeros(UINT32 value)
 -------------------------------------------------*/
 
 #define count_leading_ones _count_leading_ones
-static inline UINT8 ATTR_CONST ATTR_FORCE_INLINE
-_count_leading_ones(UINT32 value)
+static inline uint8_t ATTR_CONST ATTR_FORCE_INLINE
+_count_leading_ones(uint32_t value)
 {
-	UINT32 result;
+	uint32_t result;
 
 	__asm__ (
 		"   movl  %[value], %[result]  ;"

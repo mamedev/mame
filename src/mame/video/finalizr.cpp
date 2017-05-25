@@ -9,8 +9,9 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "video/resnet.h"
 #include "includes/finalizr.h"
+#include "video/resnet.h"
+#include "screen.h"
 
 
 /***************************************************************************
@@ -36,7 +37,7 @@
 
 PALETTE_INIT_MEMBER(finalizr_state, finalizr)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances[4] = { 2200, 1000, 470, 220 };
 	double rweights[4], gweights[4], bweights[4];
 	int i;
@@ -82,13 +83,13 @@ PALETTE_INIT_MEMBER(finalizr_state, finalizr)
 
 	for (i = 0; i < 0x100; i++)
 	{
-		UINT8 ctabentry = (color_prom[i] & 0x0f) | 0x10;
+		uint8_t ctabentry = (color_prom[i] & 0x0f) | 0x10;
 		palette.set_pen_indirect(i, ctabentry);
 	}
 
 	for (i = 0x100; i < 0x200; i++)
 	{
-		UINT8 ctabentry = color_prom[i] & 0x0f;
+		uint8_t ctabentry = color_prom[i] & 0x0f;
 		palette.set_pen_indirect(i, ctabentry);
 	}
 }
@@ -115,8 +116,8 @@ TILE_GET_INFO_MEMBER(finalizr_state::get_fg_tile_info)
 
 void finalizr_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(finalizr_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(finalizr_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(finalizr_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(finalizr_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 
@@ -128,7 +129,7 @@ void finalizr_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 	gfx_element *gfx1 = m_gfxdecode->gfx(1);
 	gfx_element *gfx2 = m_gfxdecode->gfx(2);
 
-	UINT8 *sr = m_spriterambank ? m_spriteram_2 : m_spriteram;
+	uint8_t *sr = m_spriterambank ? m_spriteram_2 : m_spriteram;
 
 	for (int offs = 0; offs <= m_spriteram.bytes() - 5; offs += 5)
 	{
@@ -203,7 +204,7 @@ void finalizr_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 }
 
 
-UINT32 finalizr_state::screen_update_finalizr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t finalizr_state::screen_update_finalizr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->mark_all_dirty();
 	m_fg_tilemap->mark_all_dirty();
@@ -217,9 +218,17 @@ UINT32 finalizr_state::screen_update_finalizr(screen_device &screen, bitmap_ind1
 	const rectangle &visarea = screen.visible_area();
 	rectangle clip = cliprect;
 
-	clip.min_x = visarea.min_x;
-	clip.max_x = visarea.min_x + 31;
-	m_fg_tilemap->set_scrolldx(0,-32);
+	if (flip_screen())
+	{
+		clip.min_x = visarea.max_x - 31;
+		clip.max_x = visarea.max_x;
+	}
+	else
+	{
+		clip.min_x = visarea.min_x;
+		clip.max_x = visarea.min_x + 31;
+	}
+
 	m_fg_tilemap->draw(screen, bitmap, clip, 0, 0);
 
 	return 0;

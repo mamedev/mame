@@ -16,9 +16,13 @@
 #include "cpu/lc8670/lc8670.h"
 #include "imagedev/snapquik.h"
 #include "machine/intelfsh.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 #include "svmu.lh"
+
 
 #define     PIXEL_SIZE          7
 #define     PIXEL_DISTANCE      1
@@ -37,7 +41,7 @@ public:
 	required_device<lc8670_cpu_device> m_maincpu;
 	required_device<intelfsh8_device> m_flash;
 	required_device<speaker_sound_device> m_speaker;
-	required_region_ptr<UINT8> m_bios;
+	required_region_ptr<uint8_t> m_bios;
 
 	DECLARE_PALETTE_INIT(svmu);
 	virtual void machine_reset() override;
@@ -51,7 +55,7 @@ public:
 	DECLARE_QUICKLOAD_LOAD_MEMBER( svmu );
 
 private:
-	UINT8       m_page;
+	uint8_t       m_page;
 };
 
 
@@ -183,12 +187,12 @@ static LC8670_LCD_UPDATE( svmu_lcd_update )
 }
 
 
-inline void vmufat_write_byte(UINT8* flash, UINT8 block, offs_t offset, UINT8 data)
+inline void vmufat_write_byte(uint8_t* flash, uint8_t block, offs_t offset, uint8_t data)
 {
 	flash[(block * 512) + offset] = data;
 }
 
-inline void vmufat_write_word(UINT8* flash, UINT8 block, offs_t offset, UINT16 data)
+inline void vmufat_write_word(uint8_t* flash, uint8_t block, offs_t offset, uint16_t data)
 {
 	// 16-bit data are stored in little endian
 	flash[(block * 512) + offset + 0] = data & 0xff;
@@ -197,8 +201,8 @@ inline void vmufat_write_word(UINT8* flash, UINT8 block, offs_t offset, UINT16 d
 
 QUICKLOAD_LOAD_MEMBER( svmu_state, svmu )
 {
-	UINT32 size = image.length();
-	UINT8 *flash = m_flash->base();
+	uint32_t size = image.length();
+	uint8_t *flash = m_flash->base();
 
 	image.fread(flash, size);
 
@@ -292,11 +296,11 @@ QUICKLOAD_LOAD_MEMBER( svmu_state, svmu )
 		vmufat_write_word(flash, 253, 0x1a, 0x0001);        // offset of header (in blocks) from file start
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 
-static MACHINE_CONFIG_START( svmu, svmu_state )
+static MACHINE_CONFIG_START( svmu )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", LC8670, XTAL_32_768kHz)
 	MCFG_CPU_PROGRAM_MAP(svmu_mem)
@@ -355,5 +359,5 @@ ROM_END
 
 /* Driver */
 
-/*  YEAR  NAME  PARENT  COMPAT   MACHINE    INPUT   INIT    COMPANY   FULLNAME     FLAGS */
-COMP( 1998, svmu,   0,  0,  svmu ,  svmu , driver_device,   0, "Sega",   "Visual Memory Unit",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  STATE       INIT  COMPANY   FULLNAME               FLAGS */
+COMP( 1998, svmu, 0,      0,      svmu,    svmu,  svmu_state, 0,    "Sega",   "Visual Memory Unit",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

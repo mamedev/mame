@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Miodrag Milanovic, Robbbert
-/***************************************************************************
+/**************************************************************************************************************************************
 
         Intel SDK-85
 
@@ -20,7 +20,19 @@ then press NEXT to increment the address.
 ToDo:
 - Artwork
 
-****************************************************************************/
+
+Notes on Mastermind bios.
+Original author: Paolo Forlani
+Ported to SDK85 by: Stefano Bodrato
+
+Game instructions (from Stefano):
+Start up, press 0 to begin. Game shows ----. You need to guess a number between 0000 and 9999.
+Enter your guess, "computer" will answer showing on left with the number of found digits.
+On the right you'll get a "clue", slightly different than on the standard game (making it a bit more tricky and more intriguing).
+Once you find the number, you'll see it flashing.   Press the 2 key and you'll get your score (number of attempts before guessing).
+Press 0 to restart.
+
+*************************************************************************************************************************************/
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
@@ -32,14 +44,19 @@ class sdk85_state : public driver_device
 {
 public:
 	sdk85_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_maincpu(*this, "maincpu") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_keyboard(*this, "X%u", 0)
+		{ }
 
 	DECLARE_WRITE8_MEMBER(scanlines_w);
 	DECLARE_WRITE8_MEMBER(digit_w);
 	DECLARE_READ8_MEMBER(kbd_r);
-	UINT8 m_digit;
+
+private:
+	u8 m_digit;
 	required_device<cpu_device> m_maincpu;
+	required_ioport_array<3> m_keyboard;
 };
 
 static ADDRESS_MAP_START(sdk85_mem, AS_PROGRAM, 8, sdk85_state)
@@ -80,12 +97,12 @@ static INPUT_PORTS_START( sdk85 )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F") PORT_CODE(KEYCODE_F) PORT_CHAR('F')
 
 	PORT_START("X2")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("EXEC") PORT_CODE(KEYCODE_Q)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("NEXT") PORT_CODE(KEYCODE_UP)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("GO") PORT_CODE(KEYCODE_R)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SUBST") PORT_CODE(KEYCODE_T)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("EXAM") PORT_CODE(KEYCODE_Y)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SINGLE") PORT_CODE(KEYCODE_U)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("EXEC")   PORT_CODE(KEYCODE_Q)  PORT_CHAR('Q')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("NEXT")   PORT_CODE(KEYCODE_UP) PORT_CHAR('^')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("GO")     PORT_CODE(KEYCODE_R)  PORT_CHAR('R')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SUBST")  PORT_CODE(KEYCODE_T)  PORT_CHAR('T')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("EXAM")   PORT_CODE(KEYCODE_Y)  PORT_CHAR('Y')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SINGLE") PORT_CODE(KEYCODE_U)  PORT_CHAR('U')
 	PORT_BIT(0xC0, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
@@ -103,18 +120,11 @@ WRITE8_MEMBER( sdk85_state::digit_w )
 
 READ8_MEMBER( sdk85_state::kbd_r )
 {
-	UINT8 data = 0xff;
-
-	if (m_digit < 3)
-	{
-		char kbdrow[6];
-		sprintf(kbdrow,"X%X",m_digit);
-		data = ioport(kbdrow)->read();
-	}
+	u8 data = (m_digit < 3) ? m_keyboard[m_digit]->read() : 0xff;
 	return data;
 }
 
-static MACHINE_CONFIG_START( sdk85, sdk85_state )
+static MACHINE_CONFIG_START( sdk85 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8085A, XTAL_2MHz)
 	MCFG_CPU_PROGRAM_MAP(sdk85_mem)
@@ -136,10 +146,13 @@ MACHINE_CONFIG_END
 /* ROM definition */
 ROM_START( sdk85 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "sdk85.a14", 0x0000, 0x0800, CRC(9d5a983f) SHA1(54e218560fbec009ac3de5cfb64b920241ef2eeb))
+	ROM_SYSTEM_BIOS(0, "default", "Default")
+	ROMX_LOAD( "sdk85.a14", 0x0000, 0x0800, CRC(9d5a983f) SHA1(54e218560fbec009ac3de5cfb64b920241ef2eeb), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS(1, "mastermind", "Mastermind")
+	ROMX_LOAD( "mastermind.a14", 0x0000, 0x0800, CRC(36b694ae) SHA1(4d8a5ae5d10e8f72a6e349c7eeaf1aa00c4e45e1), ROM_BIOS(2) )
 ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT   COMPANY   FULLNAME       FLAGS */
-COMP( 1977, sdk85,  0,       0,      sdk85,     sdk85, driver_device,     0,  "Intel",   "SDK-85", MACHINE_NO_SOUND_HW)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE         INIT  COMPANY    FULLNAME  FLAGS */
+COMP( 1977, sdk85,  0,       0,      sdk85,     sdk85, sdk85_state,  0,    "Intel",   "SDK-85", MACHINE_NO_SOUND_HW)

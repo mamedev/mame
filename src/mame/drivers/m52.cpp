@@ -81,6 +81,7 @@ static ADDRESS_MAP_START( alpha1v_map, AS_PROGRAM, 8, m52_state )
 	AM_RANGE(0x0000, 0x6fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(m52_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(m52_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0x8800, 0x8800) AM_MIRROR(0x07ff) AM_READ(m52_protection_r) // result is ignored
 	AM_RANGE(0xc800, 0xc9ff) AM_WRITEONLY AM_SHARE("spriteram") // bigger or mirrored?
 	AM_RANGE(0xd000, 0xd000) AM_READ_PORT("IN0") AM_DEVWRITE("irem_audio", irem_audio_device, cmd_w)
 	AM_RANGE(0xd001, 0xd001) AM_READ_PORT("IN1") AM_WRITE(alpha1v_flipscreen_w)
@@ -327,7 +328,7 @@ static const gfx_layout spritelayout =
 	32*8
 };
 
-static const UINT32 bgcharlayout_xoffset[256] =
+static const uint32_t bgcharlayout_xoffset[256] =
 {
 	STEP4(0x000,1), STEP4(0x008,1), STEP4(0x010,1), STEP4(0x018,1),
 	STEP4(0x020,1), STEP4(0x028,1), STEP4(0x030,1), STEP4(0x038,1),
@@ -347,7 +348,7 @@ static const UINT32 bgcharlayout_xoffset[256] =
 	STEP4(0x1e0,1), STEP4(0x1e8,1), STEP4(0x1f0,1), STEP4(0x1f8,1)
 };
 
-static const UINT32 bgcharlayout_yoffset[64] =
+static const uint32_t bgcharlayout_yoffset[64] =
 {
 	STEP32(0x0000,0x200), STEP32(0x4000,0x200)
 };
@@ -391,7 +392,7 @@ void m52_state::machine_reset()
 	m_bgcontrol = 0;
 }
 
-static MACHINE_CONFIG_START( m52, m52_state )
+static MACHINE_CONFIG_START( m52 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)
@@ -422,6 +423,8 @@ static MACHINE_CONFIG_DERIVED( alpha1v, m52 )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(alpha1v_map)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 384, 136, 376, 282, 16, 272)
 MACHINE_CONFIG_END
 
 
@@ -583,7 +586,7 @@ ROM_END
  *
  *************************************/
 
-GAME( 1982, mpatrol,  0,        m52,      mpatrol,  driver_device,  0, ROT0, "Irem", "Moon Patrol", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, mpatrolw, mpatrol,  m52,      mpatrolw, driver_device,  0, ROT0, "Irem (Williams license)", "Moon Patrol (Williams)", MACHINE_SUPPORTS_SAVE ) // USA
-GAME( 1982, mranger,  mpatrol,  m52,      mpatrol,  driver_device,  0, ROT0, "bootleg", "Moon Ranger (bootleg of Moon Patrol)", MACHINE_SUPPORTS_SAVE ) // Italy
-GAME( 1988, alpha1v,  0,        alpha1v,  alpha1v,  driver_device,  0, ROT0, "Vision Electronics", "Alpha One (Vision Electronics)", MACHINE_NOT_WORKING| MACHINE_NO_SOUND| MACHINE_SUPPORTS_SAVE )
+GAME( 1982, mpatrol,  0,        m52,      mpatrol,  m52_state,  0, ROT0, "Irem", "Moon Patrol",                                  MACHINE_SUPPORTS_SAVE )
+GAME( 1982, mpatrolw, mpatrol,  m52,      mpatrolw, m52_state,  0, ROT0, "Irem (Williams license)", "Moon Patrol (Williams)",    MACHINE_SUPPORTS_SAVE ) // USA
+GAME( 1982, mranger,  mpatrol,  m52,      mpatrol,  m52_state,  0, ROT0, "bootleg", "Moon Ranger (bootleg of Moon Patrol)",      MACHINE_SUPPORTS_SAVE ) // Italy
+GAME( 1988, alpha1v,  0,        alpha1v,  alpha1v,  m52_state,  0, ROT0, "Vision Electronics", "Alpha One (Vision Electronics)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

@@ -6,13 +6,11 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_SNES_CTRL_CTRL_H
+#define MAME_BUS_SNES_CTRL_CTRL_H
 
 #pragma once
 
-#ifndef __SNES_CONTROL_PORT__
-#define __SNES_CONTROL_PORT__
-
-#include "emu.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -29,54 +27,56 @@ public:
 	device_snes_control_port_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_snes_control_port_interface();
 
-	virtual UINT8 read_pin4() { return 0; };
-	virtual UINT8 read_pin5() { return 0; };
-	virtual void write_pin6(UINT8 data) { };
-	virtual void write_strobe(UINT8 data) { };
-	virtual void port_poll() { };
+	virtual uint8_t read_pin4() { return 0; }
+	virtual uint8_t read_pin5() { return 0; }
+	virtual void write_pin6(uint8_t data) { }
+	virtual void write_strobe(uint8_t data) { }
+	virtual void port_poll() { }
 
 protected:
 	snes_control_port_device *m_port;
 };
 
-typedef device_delegate<bool (INT16 x, INT16 y)> snesctrl_onscreen_delegate;
-#define SNESCTRL_ONSCREEN_CB(name)  bool name(INT16 x, INT16 y)
+typedef device_delegate<bool (int16_t x, int16_t y)> snesctrl_onscreen_delegate;
+#define SNESCTRL_ONSCREEN_CB(name)  bool name(int16_t x, int16_t y)
 
-typedef device_delegate<void (INT16 x, INT16 y)> snesctrl_gunlatch_delegate;
-#define SNESCTRL_GUNLATCH_CB(name)  void name(INT16 x, INT16 y)
+typedef device_delegate<void (int16_t x, int16_t y)> snesctrl_gunlatch_delegate;
+#define SNESCTRL_GUNLATCH_CB(name)  void name(int16_t x, int16_t y)
 
 // ======================> snes_control_port_device
 
-class snes_control_port_device : public device_t,
-								public device_slot_interface
+class snes_control_port_device : public device_t, public device_slot_interface
 {
 public:
 	// construction/destruction
-	snes_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	snes_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~snes_control_port_device();
 
 	static void set_onscreen_callback(device_t &device, snesctrl_onscreen_delegate callback) { downcast<snes_control_port_device &>(device).m_onscreen_cb = callback; }
 	static void set_gunlatch_callback(device_t &device, snesctrl_gunlatch_delegate callback) { downcast<snes_control_port_device &>(device).m_gunlatch_cb = callback; }
 
-	UINT8 read_pin4();
-	UINT8 read_pin5();
-	void write_pin6(UINT8 data);
-	void write_strobe(UINT8 data);
+	uint8_t read_pin4();
+	uint8_t read_pin5();
+	void write_pin6(uint8_t data);
+	void write_strobe(uint8_t data);
 	void port_poll();
 
-	snesctrl_onscreen_delegate m_onscreen_cb;
-	snesctrl_gunlatch_delegate m_gunlatch_cb;
+	bool onscreen_cb(int16_t x, int16_t y) { return m_onscreen_cb.isnull() ? true : m_onscreen_cb(x, y); }
+	void gunlatch_cb(int16_t x, int16_t y) { if (!m_gunlatch_cb.isnull()) m_gunlatch_cb(x, y); }
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+
+	snesctrl_onscreen_delegate m_onscreen_cb;
+	snesctrl_gunlatch_delegate m_gunlatch_cb;
 
 	device_snes_control_port_interface *m_device;
 };
 
 
 // device type definition
-extern const device_type SNES_CONTROL_PORT;
+DECLARE_DEVICE_TYPE(SNES_CONTROL_PORT, snes_control_port_device)
 
 
 //**************************************************************************
@@ -97,4 +97,4 @@ extern const device_type SNES_CONTROL_PORT;
 SLOT_INTERFACE_EXTERN( snes_control_port_devices );
 
 
-#endif
+#endif // MAME_BUS_SNES_CTRL_CTRL_H

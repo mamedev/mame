@@ -37,21 +37,26 @@ E I1     Vectored interrupt error
 
 
 #include "emu.h"
-#include "cpu/z8000/z8000.h"
+#include "machine/m20_8086.h"
+#include "machine/m20_kbd.h"
+
+#include "bus/rs232/rs232.h"
 #include "cpu/i86/i86.h"
-#include "video/mc6845.h"
-#include "machine/ram.h"
-#include "machine/wd_fdc.h"
+#include "cpu/z8000/z8000.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
-#include "machine/pit8253.h"
 #include "machine/pic8259.h"
+#include "machine/pit8253.h"
+#include "machine/ram.h"
+#include "machine/wd_fdc.h"
+#include "video/mc6845.h"
+
+#include "screen.h"
+#include "softlist.h"
+
 #include "formats/m20_dsk.h"
 #include "formats/pc_dsk.h"
-#include "machine/m20_kbd.h"
-#include "bus/rs232/rs232.h"
-#include "machine/m20_8086.h"
-#include "softlist.h"
+
 
 class m20_state : public driver_device
 {
@@ -68,7 +73,7 @@ public:
 		m_floppy0(*this, "fd1797:0:5dd"),
 		m_floppy1(*this, "fd1797:1:5dd"),
 		m_apb(*this, "apb"),
-		m_p_videoram(*this, "p_videoram"),
+		m_p_videoram(*this, "videoram"),
 		m_palette(*this, "palette")
 	{
 	}
@@ -79,12 +84,12 @@ public:
 	required_device<i8251_device> m_ttyi8251;
 	required_device<i8255_device> m_i8255;
 	required_device<pic8259_device> m_i8259;
-	required_device<fd1797_t> m_fd1797;
+	required_device<fd1797_device> m_fd1797;
 	required_device<floppy_image_device> m_floppy0;
 	required_device<floppy_image_device> m_floppy1;
 	optional_device<m20_8086_device> m_apb;
 
-	required_shared_ptr<UINT16> m_p_videoram;
+	required_shared_ptr<uint16_t> m_p_videoram;
 	required_device<palette_device> m_palette;
 
 	virtual void machine_start() override;
@@ -102,7 +107,7 @@ public:
 
 private:
 	offs_t m_memsize;
-	UINT8 m_port21;
+	uint8_t m_port21;
 	void install_memory();
 
 public:
@@ -117,14 +122,14 @@ public:
 
 MC6845_UPDATE_ROW( m20_state::update_row )
 {
-	UINT32  *p = &bitmap.pix32(y);
+	uint32_t  *p = &bitmap.pix32(y);
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	int i, j;
 
 	for ( i = 0; i < x_count; i++ )
 	{
-		UINT16 offset = ((ma | (ra << 1)) << 4) + i;
-		UINT16 data = m_p_videoram[ offset ];
+		uint16_t offset = ((ma | (ra << 1)) << 4) + i;
+		uint16_t data = m_p_videoram[ offset ];
 
 		for ( j = 15; j >= 0; j-- )
 		{
@@ -312,13 +317,13 @@ B/W, 128K cards, 3 cards => 512K of memory:
 
 static ADDRESS_MAP_START(m20_program_mem, AS_PROGRAM, 16, m20_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x30000, 0x33fff ) AM_RAM AM_SHARE("p_videoram")
+	AM_RANGE( 0x30000, 0x33fff ) AM_RAM AM_SHARE("videoram")
 	AM_RANGE( 0x40000, 0x41fff ) AM_ROM AM_REGION("maincpu", 0x00000)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(m20_data_mem, AS_DATA, 16, m20_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x30000, 0x33fff ) AM_RAM AM_SHARE("p_videoram")
+	AM_RANGE( 0x30000, 0x33fff ) AM_RAM AM_SHARE("videoram")
 	AM_RANGE( 0x40000, 0x41fff ) AM_ROM AM_REGION("maincpu", 0x00000)
 ADDRESS_MAP_END
 
@@ -326,7 +331,7 @@ ADDRESS_MAP_END
 void m20_state::install_memory()
 {
 	m_memsize = m_ram->size();
-	UINT8 *memptr = m_ram->pointer();
+	uint8_t *memptr = m_ram->pointer();
 	address_space& pspace = m_maincpu->space(AS_PROGRAM);
 	address_space& dspace = m_maincpu->space(AS_DATA);
 
@@ -693,7 +698,7 @@ void m20_state::install_memory()
 static ADDRESS_MAP_START(m20_io, AS_IO, 16, m20_state)
 	ADDRESS_MAP_UNMAP_HIGH
 
-	AM_RANGE(0x00, 0x07) AM_DEVREADWRITE8("fd1797", fd1797_t, read, write, 0x00ff)
+	AM_RANGE(0x00, 0x07) AM_DEVREADWRITE8("fd1797", fd1797_device, read, write, 0x00ff)
 
 	AM_RANGE(0x20, 0x21) AM_READWRITE(port21_r, port21_w);
 
@@ -739,8 +744,8 @@ void m20_state::machine_start()
 
 void m20_state::machine_reset()
 {
-	UINT8 *ROM = memregion("maincpu")->base();
-	UINT8 *RAM = (UINT8 *)(m_ram->pointer() + 0x4000);
+	uint8_t *ROM = memregion("maincpu")->base();
+	uint8_t *RAM = (uint8_t *)(m_ram->pointer() + 0x4000);
 
 	if (m_memsize >= 256 * 1024)
 		m_port21 = 0xdf;
@@ -754,8 +759,9 @@ void m20_state::machine_reset()
 
 	memcpy(RAM, ROM, 8);  // we need only the reset vector
 	m_maincpu->reset();     // reset the CPU to ensure it picks up the new vector
-	if(m_apb)
-		m_apb->m_8086->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	m_kbdi8251->write_cts(0);
+	if (m_apb)
+		m_apb->halt();
 }
 
 
@@ -772,7 +778,7 @@ static SLOT_INTERFACE_START(keyboard)
 	SLOT_INTERFACE("m20", M20_KEYBOARD)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( m20, m20_state )
+static MACHINE_CONFIG_START( m20 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z8001, MAIN_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(m20_program_mem)
@@ -861,6 +867,6 @@ ROM_START(m40)
 	ROM_REGION(0x4000, "apb_bios", ROMREGION_ERASEFF) // Processor board with 8086
 ROM_END
 
-/*    YEAR  NAME   PARENT  COMPAT  MACHINE INPUT   INIT COMPANY     FULLNAME        FLAGS */
-COMP( 1981, m20,   0,      0,      m20,    0,   driver_device,    0, "Olivetti", "Olivetti L1 M20", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1981, m40,   m20,    0,      m20,    0,   driver_device,    0, "Olivetti", "Olivetti L1 M40", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME   PARENT  COMPAT  MACHINE INPUT STATE      INIT COMPANY     FULLNAME           FLAGS
+COMP( 1981, m20,   0,      0,      m20,    0,    m20_state, 0,   "Olivetti", "Olivetti L1 M20", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1981, m40,   m20,    0,      m20,    0,    m20_state, 0,   "Olivetti", "Olivetti L1 M40", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

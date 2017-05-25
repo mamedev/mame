@@ -6,17 +6,17 @@
  *
  */
 
+#include "emu.h"
 #include "doubler.h"
-#include "includes/amstrad.h"
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CPC_DOUBLER = &device_creator<cpc_doubler_device>;
+DEFINE_DEVICE_TYPE(CPC_DOUBLER, cpc_doubler_device, "cpc_doubler", "Draysoft Doubler")
 
 
-static MACHINE_CONFIG_FRAGMENT( cpc_doubler )
+static MACHINE_CONFIG_START( cpc_doubler )
 	MCFG_CASSETTE_ADD( "doubler_tape" )
 	MCFG_CASSETTE_FORMATS(cdt_cassette_formats)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED)
@@ -36,8 +36,8 @@ machine_config_constructor cpc_doubler_device::device_mconfig_additions() const
 //  LIVE DEVICE
 //**************************************************************************
 
-cpc_doubler_device::cpc_doubler_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, CPC_DOUBLER, "Draysoft Doubler", tag, owner, clock, "cpc_doubler", __FILE__),
+cpc_doubler_device::cpc_doubler_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, CPC_DOUBLER, tag, owner, clock),
 	device_cpc_expansion_card_interface(mconfig, *this), m_slot(nullptr),
 	m_tape(*this,"doubler_tape")
 {
@@ -67,7 +67,7 @@ void cpc_doubler_device::device_reset()
 
 READ8_MEMBER(cpc_doubler_device::ext_tape_r)
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 	if(m_tape->input() > 0.03)
 		data |= 0x20;
 	return data;

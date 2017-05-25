@@ -43,6 +43,7 @@ SOUNDS["HC55516"] = true
 SOUNDS["YM3812"] = true
 SOUNDS["CEM3394"] = true
 SOUNDS["VOTRAX"] = true
+SOUNDS["VOLT_REG"] = true
 
 --------------------------------------------------
 -- specify available video cores
@@ -138,8 +139,6 @@ files{
 	MAME_DIR .. "src/mame/audio/williams.cpp",
 	MAME_DIR .. "src/mame/audio/williams.h",
 	MAME_DIR .. "src/mame/video/williams.cpp",
-	MAME_DIR .. "src/mame/audio/gorf.cpp",
-	MAME_DIR .. "src/mame/audio/wow.cpp",
 	MAME_DIR .. "src/mame/drivers/gaelco.cpp",
 	MAME_DIR .. "src/mame/includes/gaelco.h",
 	MAME_DIR .. "src/mame/video/gaelco.cpp",

@@ -1,13 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Nathan Woods
+#ifndef MAME_BUS_COCO_COCO_ORCH90_H
+#define MAME_BUS_COCO_COCO_ORCH90_H
+
 #pragma once
 
-#ifndef __COCO_ORCH90_H__
-#define __COCO_ORCH90_H__
-
-#include "emu.h"
-#include "sound/dac.h"
 #include "cococart.h"
+#include "sound/dac.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -21,7 +20,7 @@ class coco_orch90_device :
 {
 public:
 		// construction/destruction
-		coco_orch90_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+		coco_orch90_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 		// optional information overrides
 		virtual machine_config_constructor device_mconfig_additions() const override;
@@ -31,12 +30,12 @@ protected:
 		virtual DECLARE_WRITE8_MEMBER(write) override;
 private:
 		// internal state
-		dac_device *m_left_dac;
-		dac_device *m_right_dac;
+		required_device<dac_byte_interface> m_ldac;
+		required_device<dac_byte_interface> m_rdac;
 };
 
 
 // device type definition
-extern const device_type COCO_ORCH90;
+DECLARE_DEVICE_TYPE(COCO_ORCH90, coco_orch90_device)
 
-#endif  /* __COCO_ORCH90_H__ */
+#endif // MAME_BUS_COCO_COCO_ORCH90_H

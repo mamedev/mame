@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef __CENTRONICS_DSJOY_H__
-#define __CENTRONICS_DSJOY_H__
+#ifndef MAME_BUS_CENTRONICS_DSJOY_H
+#define MAME_BUS_CENTRONICS_DSJOY_H
 
 #pragma once
 
@@ -18,7 +18,7 @@ class dempa_shinbunsha_joystick_device : public device_t,
 {
 public:
 	// construction/destruction
-	dempa_shinbunsha_joystick_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	dempa_shinbunsha_joystick_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides
@@ -37,11 +37,11 @@ private:
 
 	void update_perror();
 
-	UINT8 m_data;
+	uint8_t m_data;
 	int m_perror;
 };
 
 // device type definition
-extern const device_type DEMPA_SHINBUNSHA_JOYSTICK;
+DECLARE_DEVICE_TYPE(DEMPA_SHINBUNSHA_JOYSTICK, dempa_shinbunsha_joystick_device)
 
-#endif
+#endif // MAME_BUS_CENTRONICS_DSJOY_H

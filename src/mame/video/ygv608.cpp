@@ -33,12 +33,194 @@
 
 #include "emu.h"
 #include "video/ygv608.h"
+#include "screen.h"
+
+
+// Fundamental constants
+enum {
+	p5_rwai     = 0x80,     // increment register select on reads
+	p5_rrai     = 0x40,     // increment register select on writes
+	p5_rn       = 0x3f,     // register select
+
+//  p6_res6     = 0xe0,
+	p6_fp       = 0x10,     // position detection flag
+	p6_fv       = 0x08,     // vertical border interval flag
+	p6_fc       = 0x04,
+	p6_hb       = 0x02,     // horizontal blanking flag?
+	p6_vb       = 0x01,     // vertical blanking flag?
+
+//  p7_res7     = 0xc0,
+	p7_tr       = 0x20,
+	p7_tc       = 0x10,
+	p7_tl       = 0x08,
+	p7_ts       = 0x04,
+	p7_tn       = 0x02,
+	p7_sr       = 0x01,
+
+	r0_pnya     = 0x80,     // if set, increment name table address after reads
+	r0_b_a      = 0x40,     // if set, we're reading from the second plane of tile data
+	r0_pny      = 0x3f,     // y-coordinate of current name table address
+
+	r1_pnxa     = 0x80,     // if set, increment name table address after read
+	r1_res1     = 0x40,
+	r1_pnx      = 0x3f,     // x-coordinate of current name table address
+
+	r2_cpaw     = 0x80,     // if set, increment color palette address after writes
+	r2_cpar     = 0x40,     // if set, increment color palette address after reads
+//  r2_res2     = 0x20,
+	r2_b_a      = 0x10,
+	r2_scaw     = 0x08,     // if set, increment scroll address after writes
+	r2_scar     = 0x04,     // if set, increment scroll address after reads
+	r2_saaw     = 0x02,     // if set, increment sprite address after writes
+	r2_saar     = 0x01,     // if set, increment sprite address after reads
+
+	r7_dckm     = 0x80,
+	r7_flip     = 0x40,
+//  r7_res7     = 0x30,
+	r7_zron     = 0x08,     // if set, roz plane is active
+	r7_md       = 0x06,     // determines 1 of 4 possible video modes
+	r7_dspe     = 0x01,     // if set, display is enabled
+
+	r8_hds      = 0xc0,
+	r8_vds      = 0x30,
+	r8_rlrt     = 0x08,
+	r8_rlsc     = 0x04,
+//  r8_res8     = 0x02,
+	r8_pgs      = 0x01,
+
+	r9_pts      = 0xc0,
+	r9_slh      = 0x38,
+	r9_slv      = 0x07,
+
+	r10_spa     = 0xc0,     // misc global sprite attributes (x/y flip or sprite size)
+	r10_spas    = 0x20,     // if set, spa controls sprite flip, if clear, controls sprite size
+	r10_sprd    = 0x10,     // if set, sprites are disabled
+	r10_mcb     = 0x0c,
+	r10_mca     = 0x03,
+
+	r11_scm     = 0xc0,
+	r11_yse     = 0x20,
+	r11_cbdr    = 0x10,
+	r11_prm     = 0x0c,     // determines one of 4 priority settings
+	r11_ctpb    = 0x02,
+	r11_ctpa    = 0x01,
+
+	r12_spf     = 0xc0,
+	r12_bpf     = 0x38,
+	r12_apf     = 0x07,
+
+//  r14_res14   = 0xfc,
+	r14_iep     = 0x02,     // if set, generate IRQ on position detection (?)
+	r14_iev     = 0x01,     // if set, generate IRQ on vertical border interval draw
+
+	// these 4 are currently unimplemented by us
+	r16_fpm     = 0x80,
+	r16_il8     = 0x40,
+	r16_res16   = 0x20,
+	r16_ih      = 0x1f,
+
+	r17_ba1     = 0x70,
+	r17_ba0     = 0x07,
+	r18_ba3     = 0x70,
+	r18_ba2     = 0x07,
+	r19_ba5     = 0x70,
+	r19_ba4     = 0x07,
+	r20_ba7     = 0x70,
+	r20_ba6     = 0x07,
+	r21_bb1     = 0x70,
+	r21_bb0     = 0x07,
+	r22_bb3     = 0x70,
+	r22_bb2     = 0x07,
+	r23_bb5     = 0x70,
+	r23_bb4     = 0x07,
+	r24_bb7     = 0x70,
+	r24_bb6     = 0x07,
+
+	r39_hsw     = 0xe0,
+	r39_hbw     = 0x1f,
+
+	r40_htl89   = 0xc0,
+	r40_hdw     = 0x3f,
+
+	r43_vsw     = 0xe0,
+	r43_vbw     = 0x1f,
+
+	r44_vsls    = 0x40,
+	r44_vdw     = 0x1f,
+
+	r45_vtl8    = 0x80,
+	r45_tres    = 0x40,
+	r45_vdp     = 0x1f
+};
+
+
+// R#7(md)
+#define MD_2PLANE_8BIT      0x00
+#define MD_2PLANE_16BIT     0x02
+#define MD_1PLANE_16COLOUR  0x04
+#define MD_1PLANE_256COLOUR 0x06
+#define MD_1PLANE           (MD_1PLANE_16COLOUR & MD_1PLANE_256COLOUR)
+#define MD_SHIFT            0
+#define MD_MASK             0x06
+
+// R#8
+#define PGS_64X32         0x0
+#define PGS_32X64         0x1
+#define PGS_SHIFT         0
+#define PGS_MASK          0x01
+
+// R#9
+#define SLV_SCREEN        0x00
+#define SLV_8             0x04
+#define SLV_16            0x05
+#define SLV_32            0x06
+#define SLV_64            0x07
+#define SLH_SCREEN        0x00
+#define SLH_8             0x04
+#define SLH_16            0x05
+#define SLH_32            0x06
+#define SLH_64            0x07
+#define PTS_8X8           0x00
+#define PTS_16X16         0x40
+#define PTS_32X32         0x80
+#define PTS_64X64         0xc0
+#define PTS_SHIFT         0
+#define PTS_MASK          0xc0
+
+// R#10
+#define SPAS_SPRITESIZE    0
+#define SPAS_SPRITEREVERSE 1
+
+// R#10(spas)=1
+#define SZ_8X8            0x00
+#define SZ_16X16          0x01
+#define SZ_32X32          0x02
+#define SZ_64X64          0x03
+
+// R#10(spas)=0
+#define SZ_NOREVERSE      0x00
+#define SZ_VERTREVERSE    0x01
+#define SZ_HORIZREVERSE   0x02
+#define SZ_BOTHREVERSE    0x03
+
+// R#11(prm)
+#define PRM_SABDEX        0x00
+#define PRM_ASBDEX        0x04
+#define PRM_SEABDX        0x08
+#define PRM_ASEBDX        0x0c
+
+// R#40
+#define HDW_SHIFT         0
+#define HDW_MASK          0x3f
+
+// R#44
+#define VDW_SHIFT         0
+#define VDW_MASK          0x3f
 
 #define _ENABLE_SPRITES
 #define _ENABLE_SCROLLX
 #define _ENABLE_SCROLLY
 //#define _ENABLE_SCREEN_RESIZE
-//#define _ENABLE_ROTATE_ZOOM
 //#define _SHOW_VIDEO_DEBUG
 
 #define GFX_8X8_4BIT    0
@@ -51,13 +233,13 @@
 
 /* text-layer characters */
 
-static const UINT32 pts_4bits_layout_xoffset[64] =
+static const uint32_t pts_4bits_layout_xoffset[64] =
 {
 	STEP8( 0*256, 4 ), STEP8( 1*256, 4 ), STEP8( 4*256, 4 ), STEP8( 5*256, 4 ),
 	STEP8( 16*256, 4 ), STEP8( 17*256, 4 ), STEP8( 20*256, 4 ), STEP8( 21*256, 4 )
 };
 
-static const UINT32 pts_4bits_layout_yoffset[64] =
+static const uint32_t pts_4bits_layout_yoffset[64] =
 {
 	STEP8( 0*256, 8*4 ), STEP8( 2*256, 8*4 ), STEP8( 8*256, 8*4 ), STEP8( 10*256, 8*4 ),
 	STEP8( 32*256, 8*4 ), STEP8( 34*256, 8*4 ), STEP8( 40*256, 8*4 ), STEP8( 42*256, 8*4 )
@@ -148,15 +330,15 @@ static GFXDECODE_START( ygv608 )
 GFXDECODE_END
 
 
-const device_type YGV608 = &device_creator<ygv608_device>;
+DEFINE_DEVICE_TYPE(YGV608, ygv608_device, "ygv608", "YGV608 VDP")
 
-ygv608_device::ygv608_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock )
-	: device_t(mconfig, YGV608, "YGV608 VDP", tag, owner, clock, "ygv608", __FILE__),
-	device_gfx_interface(mconfig, *this, GFXDECODE_NAME(ygv608))
+ygv608_device::ygv608_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock )
+	: device_t(mconfig, YGV608, tag, owner, clock)
+	, device_gfx_interface(mconfig, *this, GFXDECODE_NAME(ygv608))
 {
 }
 
-void ygv608_device::set_gfxbank(UINT8 gfxbank)
+void ygv608_device::set_gfxbank(uint8_t gfxbank)
 {
 	m_namcond1_gfxbank = gfxbank;
 }
@@ -197,7 +379,7 @@ TILEMAP_MAPPER_MEMBER( ygv608_device::get_tile_offset )
 {
 	// this optimisation is not much good to us,
 	// since we really need row,col in the get_tile_info() routines
-	// - so just pack them into a UINT32
+	// - so just pack them into a uint32_t
 
 	return( ( col << 6 ) | row );
 }
@@ -211,7 +393,7 @@ TILE_GET_INFO_MEMBER( ygv608_device::get_tile_info_A_8 )
 	int             col = tile_index >> 6;
 	int             row = tile_index & 0x3f;
 
-	UINT8   attr = 0;
+	uint8_t   attr = 0;
 	int             pattern_name_base = 0;
 	int             set = ((m_regs.s.r7 & r7_md) == MD_1PLANE_256COLOUR
 						? GFX_8X8_8BIT : GFX_8X8_4BIT );
@@ -304,7 +486,7 @@ TILE_GET_INFO_MEMBER( ygv608_device::get_tile_info_B_8 )
 	int             col = tile_index >> 6;
 	int             row = tile_index & 0x3f;
 
-	UINT8   attr = 0;
+	uint8_t   attr = 0;
 	int             pattern_name_base = ( ( m_page_y << m_pny_shift )
 						<< m_bits16 );
 	int             set = GFX_8X8_4BIT;
@@ -375,7 +557,7 @@ TILE_GET_INFO_MEMBER( ygv608_device::get_tile_info_B_8 )
 		}
 		if ((m_regs.s.r12 & r12_bpf) != 0)
 		{
-			UINT8 color = (m_regs.s.r12 & r12_bpf) >> 3;
+			uint8_t color = (m_regs.s.r12 & r12_bpf) >> 3;
 
 			/* assume 16 colour mode for now... */
 			attr = ( j >> ( (color - 1 ) * 2 ) ) & 0x0f;
@@ -401,7 +583,7 @@ TILE_GET_INFO_MEMBER( ygv608_device::get_tile_info_A_16 )
 	int             col = tile_index >> 6;
 	int             row = tile_index & 0x3f;
 
-	UINT8   attr = 0;
+	uint8_t   attr = 0;
 	int             pattern_name_base = 0;
 	int             set = ((m_regs.s.r7 & r7_md) == MD_1PLANE_256COLOUR
 						? GFX_16X16_8BIT : GFX_16X16_4BIT );
@@ -490,7 +672,7 @@ TILE_GET_INFO_MEMBER( ygv608_device::get_tile_info_B_16 )
 	int             col = tile_index >> 6;
 	int             row = tile_index & 0x3f;
 
-	UINT8   attr = 0;
+	uint8_t   attr = 0;
 	int             pattern_name_base = ( ( m_page_y << m_pny_shift )
 					<< m_bits16 );
 	int             set = GFX_16X16_4BIT;
@@ -554,7 +736,7 @@ TILE_GET_INFO_MEMBER( ygv608_device::get_tile_info_B_16 )
 
 	if ((m_regs.s.r12 & r12_bpf) != 0)
 	{
-		UINT8 color = (m_regs.s.r12 & r12_bpf) >> 3;
+		uint8_t color = (m_regs.s.r12 & r12_bpf) >> 3;
 
 		/* assume 16 colour mode for now... */
 		attr = ( j >> (color * 2)) & 0x0f;
@@ -666,8 +848,8 @@ void ygv608_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 
 	/* draw sprites */
 	spriteClip &= cliprect;
-	sa = &m_sprite_attribute_table.s[YGV608_MAX_SPRITES-1];
-	for( i=0; i<YGV608_MAX_SPRITES; i++, sa-- )
+	sa = &m_sprite_attribute_table.s[MAX_SPRITES-1];
+	for( i=0; i<MAX_SPRITES; i++, sa-- )
 	{
 	int code, color, sx, sy, size, attr, g_attr, spf;
 
@@ -831,7 +1013,32 @@ static const char *const mode[] = {
 static const char *const psize[] = { "8x8", "16x16", "32x32", "64x64" };
 #endif
 
-UINT32 ygv608_device::update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+inline void ygv608_device::draw_layer_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *source_tilemap)
+{
+	//int xc, yc;
+	//double r, alpha, sin_theta, cos_theta;
+	//const rectangle &visarea = screen.visible_area();
+
+	if( m_regs.s.r7 & r7_zron )
+	{
+		// old code, for reference.
+		//xc = m_ax >> 16;
+		//yc = m_ay >> 16;
+		//r = sqrt( (double)( xc * xc + yc * yc ) );
+		//alpha = atan( (double)xc / (double)yc );
+		//sin_theta = (double)m_dyx / (double)0x10000;
+		//cos_theta = (double)m_dx / (double)0x10000;
+
+		source_tilemap->draw_roz(screen, bitmap, cliprect,
+				m_ax, m_ay,
+				m_dx, m_dxy, m_dyx, m_dy, true, 0, 0 );
+	}
+	else
+		source_tilemap->draw(screen, bitmap, cliprect, 0, 0 );
+}
+
+
+uint32_t ygv608_device::update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 #ifdef _SHOW_VIDEO_DEBUG
 	char buffer[64];
@@ -839,21 +1046,17 @@ UINT32 ygv608_device::update_screen(screen_device &screen, bitmap_ind16 &bitmap,
 #ifdef _ENABLE_SCROLLY
 	int col;
 #endif
-#ifdef _ENABLE_ROTATE_ZOOM
-	int xc, yc;
-	double r, alpha, sin_theta, cos_theta;
-#endif
 	rectangle finalclip;
 	const rectangle &visarea = screen.visible_area();
 
 	// clip to the current bitmap
 	finalclip.set(0, screen.width() - 1, 0, screen.height() - 1);
 	finalclip &= cliprect;
+	bitmap.fill(0, visarea );
 
 	// punt if not initialized
 	if (m_page_x == 0 || m_page_y == 0)
 	{
-		bitmap.fill(0, finalclip);
 		return 0;
 	}
 
@@ -951,7 +1154,6 @@ UINT32 ygv608_device::update_screen(screen_device &screen, bitmap_ind16 &bitmap,
 	 *    now we can render the screen
 	 */
 
-#if 1
 	// LBO - need to implement proper pen marking for sprites as well as set aside a non-transparent
 	// pen to be used for background fills when plane B is disabled.
 	if ((m_regs.s.r7 & r7_md) & MD_1PLANE)
@@ -961,34 +1163,11 @@ UINT32 ygv608_device::update_screen(screen_device &screen, bitmap_ind16 &bitmap,
 //      m_work_bitmap.fill(1, *visarea);
 	}
 	else
-#endif
-		m_tilemap_B->draw(screen, m_work_bitmap, finalclip, 0, 0 );
+	{
+		draw_layer_roz(screen, m_work_bitmap, finalclip, m_tilemap_B);
 
-#ifdef _ENABLE_ROTATE_ZOOM
-
-	/*
-	*    fudge - translate ax,ay to startx, starty each time
-	*/
-
-	xc = m_ax >> 16;
-	yc = m_ay >> 16;
-	r = sqrt( (double)( xc * xc + yc * yc ) );
-	alpha = atan( (double)xc / (double)yc );
-	sin_theta = (double)m_dyx / (double)0x10000;
-	cos_theta = (double)m_dx / (double)0x10000;
-
-	if( m_regs.s.zron )
-	copyrozbitmap( bitmap, finalclip, &m_work_bitmap,
-					( visarea.min_x << 16 ) +
-					m_ax + 0x10000 * r *
-					( -sin( alpha ) * cos_theta + cos( alpha ) * sin_theta ),
-					( visarea.min_y << 16 ) +
-					m_ay + 0x10000 * r *
-					( cos( alpha ) * cos_theta + sin( alpha ) * sin_theta ),
-					m_dx, m_dxy, m_dyx, m_dy, 0);
-	else
-#endif
-	copybitmap( bitmap, m_work_bitmap, 0, 0, 0, 0, finalclip);
+		copybitmap( bitmap, m_work_bitmap, 0, 0, 0, 0, finalclip);
+	}
 
 	// for some reason we can't use an opaque m_tilemap_A
 	// so use a transparent but clear the work bitmap first
@@ -999,18 +1178,8 @@ UINT32 ygv608_device::update_screen(screen_device &screen, bitmap_ind16 &bitmap,
 		(m_regs.s.r11 & r11_prm) == PRM_ASEBDX )
 		draw_sprites(bitmap, finalclip);
 
-	m_tilemap_A->draw(screen, m_work_bitmap, finalclip, 0, 0 );
-
-#ifdef _ENABLE_ROTATE_ZOOM
-	if( m_regs.s.zron )
-	copyrozbitmap_trans( bitmap, finalclip, &m_work_bitmap,
-					m_ax, // + ( visarea.min_x << 16 ),
-					m_ay, // + ( visarea.min_y << 16 ),
-					m_dx, m_dxy, m_dyx, m_dy, 0,
-					0 );
-	else
-#endif
-	copybitmap_trans( bitmap, m_work_bitmap, 0, 0, 0, 0, finalclip, 0 );
+	draw_layer_roz(screen, m_work_bitmap, finalclip, m_tilemap_A);
+	copybitmap_trans( bitmap, m_work_bitmap, 0, 0, 0, 0, finalclip, 0);
 
 	if ((m_regs.s.r11 & r11_prm) == PRM_SABDEX ||
 		(m_regs.s.r11 & r11_prm) == PRM_SEABDX)
@@ -1045,14 +1214,14 @@ READ16_MEMBER( ygv608_device::read )
 	static int p3_state = 0;
 	static int pattern_name_base = 0;  /* pattern name table base address */
 	int pn=0;
-	UINT16  data = 0;
+	uint16_t  data = 0;
 
 	switch (offset)
 	{
 		case 0x00: /* P#0 - pattern name table data port */
 		{
-			UINT8 xTile = m_regs.s.r1 & r1_pnx;
-			UINT8 yTile = m_regs.s.r0 & r0_pny;
+			uint8_t xTile = m_regs.s.r1 & r1_pnx;
+			uint8_t yTile = m_regs.s.r0 & r0_pny;
 
 			switch (p0_state)
 			{
@@ -1162,7 +1331,7 @@ READ16_MEMBER( ygv608_device::read )
 
 		case 0x04: /* P#4 - register data port */
 		{
-			UINT8 regNum = (m_ports.s.p5) & p5_rn;
+			uint8_t regNum = (m_ports.s.p5) & p5_rn;
 			data = m_regs.b[regNum];
 			if (m_ports.s.p5 & p5_rrai)
 			{
@@ -1183,7 +1352,7 @@ READ16_MEMBER( ygv608_device::read )
 
 		case 0x06:
 		case 0x07:
-			return( (UINT16)(m_ports.b[offset]) << 8 );
+			return( (uint16_t)(m_ports.b[offset]) << 8 );
 
 		default :
 			logerror( "unknown ygv608 register (%d)\n", offset );
@@ -1206,8 +1375,8 @@ WRITE16_MEMBER( ygv608_device::write )
 	{
 		case 0x00: /* P#0 - pattern name table data port */
 		{
-			UINT8 xTile = m_regs.s.r1 & r1_pnx;
-			UINT8 yTile = m_regs.s.r0 & r0_pny;
+			uint8_t xTile = m_regs.s.r1 & r1_pnx;
+			uint8_t yTile = m_regs.s.r0 & r0_pny;
 
 			switch (p0_state)
 			{
@@ -1319,7 +1488,7 @@ WRITE16_MEMBER( ygv608_device::write )
 
 		case 0x04: /* P#4 - register data port */
 		{
-			UINT8 regNum = (m_ports.s.p5) & p5_rn;
+			uint8_t regNum = (m_ports.s.p5) & p5_rn;
 #if 0
 			logerror( "R#%d = $%02X\n", regNum, data );
 #endif
@@ -1377,7 +1546,7 @@ void ygv608_device::HandleYGV608Reset()
 	/* Clear internal ram */
 	memset( m_pattern_name_table, 0, 4096 );
 	memset( m_sprite_attribute_table.b, 0,
-			YGV608_SPRITE_ATTR_TABLE_SIZE );
+			SPRITE_ATTR_TABLE_SIZE );
 	memset( m_scroll_data_table, 0, 2*256 );
 	memset( m_colour_palette, 0, 256*3 );
 
@@ -1398,11 +1567,11 @@ void ygv608_device::HandleYGV608Reset()
 void ygv608_device::HandleRomTransfers()
 {
 #if 0
-	static UINT8 *sdt = (UINT8 *)m_scroll_data_table;
-	static UINT8 *sat = (UINT8 *)m_sprite_attribute_table.b;
+	static uint8_t *sdt = (uint8_t *)m_scroll_data_table;
+	static uint8_t *sat = (uint8_t *)m_sprite_attribute_table.b;
 
 	/* fudge copy from sprite data for now... */
-	UINT8 *RAM = machine.memory_region[0];
+	uint8_t *RAM = machine.memory_region[0];
 	int i;
 
 	int src = ( ( (int)m_regs.s.tb13 << 8 ) +
@@ -1448,7 +1617,7 @@ void ygv608_device::HandleRomTransfers()
 }
 
 #if 0
-void nvsram( offs_t offset, UINT16 data )
+void nvsram( offs_t offset, uint16_t data )
 {
 	static int i = 0;
 
@@ -1512,7 +1681,7 @@ void ygv608_device::SetPostShortcuts(int reg )
 	{
 	case 0:
 	{
-		UINT8 yTile = m_regs.s.r0 & r0_pny;
+		uint8_t yTile = m_regs.s.r0 & r0_pny;
 
 		if (yTile >= m_page_y)
 		logerror ("%s:setting pny(%d) >= page_y(%d)\n", machine().describe_context(),
@@ -1525,7 +1694,7 @@ void ygv608_device::SetPostShortcuts(int reg )
 
 	case 1:
 	{
-		UINT8 xTile = m_regs.s.r1 & r1_pnx;
+		uint8_t xTile = m_regs.s.r1 & r1_pnx;
 
 		if (xTile >= m_page_x)
 		logerror ("%s:setting pnx(%d) >= page_x(%d)\n", machine().describe_context(),
@@ -1663,11 +1832,11 @@ void ygv608_device::SetPostShortcuts(int reg )
 //#define SHOW_SOURCE_MODE
 
 #if 0
-void dump_block( char *name, UINT8 *block, int len )
+void dump_block( char *name, uint8_t *block, int len )
 {
 	int i;
 
-	logerror( "UINT8 %s[] = {\n", name );
+	logerror( "uint8_t %s[] = {\n", name );
 	for( i=0; i<len; i++ ) {
 	if( i%8 == 0 )
 		logerror( " " );
@@ -1696,19 +1865,19 @@ READ16_MEMBER( ygv608_device::debug_trigger_r )
 #ifdef SHOW_SOURCE_MODE
 #if 0
 	dump_block( "ygv608_regs",
-			(UINT8 *)m_regs.b,
+			(uint8_t *)m_regs.b,
 			64 );
 	dump_block( "ygv608_pnt",
-			(UINT8 *)m_pattern_name_table,
+			(uint8_t *)m_pattern_name_table,
 			4096 );
 	dump_block( "ygv608_sat",
-			(UINT8 *)m_sprite_attribute_table.b,
+			(uint8_t *)m_sprite_attribute_table.b,
 			256 );
 	dump_block( "ygv608_sdt",
-			(UINT8 *)m_scroll_data_table,
+			(uint8_t *)m_scroll_data_table,
 			512 );
 	dump_block( "ygv608_cp",
-			(UINT8 *)m_colour_palette,
+			(uint8_t *)m_colour_palette,
 			768 );
 #endif
 

@@ -50,7 +50,9 @@ Pasting doesn't work, but if it did...
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
+#include "speaker.h"
+
 #include "slc1.lh"
 
 
@@ -67,7 +69,7 @@ public:
 	required_device<speaker_sound_device> m_speaker;
 	DECLARE_READ8_MEMBER( io_r );
 	DECLARE_WRITE8_MEMBER( io_w );
-	UINT8 m_digit;
+	uint8_t m_digit;
 	bool m_kbd_type;
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
@@ -100,9 +102,9 @@ WRITE8_MEMBER( slc1_state::io_w )
 	if (offset == 0x2f07)
 		return;
 
-	UINT8 segdata = output().get_digit_value(m_digit);
-	UINT8 segnum  = offset & 7;
-	UINT8 segmask = 1 << segnum;
+	uint8_t segdata = output().get_digit_value(m_digit);
+	uint8_t segnum  = offset & 7;
+	uint8_t segmask = 1 << segnum;
 
 	if (segonoff)
 		segdata |= segmask;
@@ -126,7 +128,7 @@ WRITE8_MEMBER( slc1_state::io_w )
 
 READ8_MEMBER( slc1_state::io_r )
 {
-	UINT8 data = 0xff, upper = (offset >> 8) & 7;
+	uint8_t data = 0xff, upper = (offset >> 8) & 7;
 
 	if (m_kbd_type)
 	{ // Trainer
@@ -182,7 +184,7 @@ static ADDRESS_MAP_START( slc1_map, AS_PROGRAM, 8, slc1_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x4fff)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_MIRROR(0xc00)
+	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_MIRROR(0xc00)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slc1_io, AS_IO, 8, slc1_state )
@@ -250,7 +252,7 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( slc1, slc1_state )
+static MACHINE_CONFIG_START( slc1 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 2500000)
 	MCFG_CPU_PROGRAM_MAP(slc1_map)
@@ -281,5 +283,5 @@ ROM_START(slc1)
 ROM_END
 
 
-/*    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT    INIT      COMPANY    FULLNAME */
-COMP( 1989, slc1,     0,      0,      slc1,       slc1, driver_device,    0,      "Dr. Dieter Scheuschner",  "SLC-1" , 0 )
+/*    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT  STATE          INIT  COMPANY                   FULLNAME */
+COMP( 1989, slc1,     0,      0,      slc1,       slc1,  slc1_state,    0,    "Dr. Dieter Scheuschner", "SLC-1" , 0 )

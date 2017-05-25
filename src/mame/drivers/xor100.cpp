@@ -35,6 +35,7 @@
 */
 
 
+#include "emu.h"
 #include "includes/xor100.h"
 #include "bus/rs232/rs232.h"
 
@@ -184,7 +185,7 @@ READ8_MEMBER( xor100_state::fdc_wait_r )
 
 	*/
 
-	if (!space.debugger_access())
+	if (!machine().side_effect_disabled())
 	{
 		if (!m_fdc_irq && !m_fdc_drq)
 		{
@@ -403,7 +404,7 @@ READ8_MEMBER(xor100_state::i8255_pc_r)
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	/* on line */
 	data |= m_centronics_select << 4;
@@ -475,8 +476,8 @@ SLOT_INTERFACE_END
 void xor100_state::machine_start()
 {
 	int banks = m_ram->size() / 0x10000;
-	UINT8 *ram = m_ram->pointer();
-	UINT8 *rom = m_rom->base();
+	uint8_t *ram = m_ram->pointer();
+	uint8_t *rom = m_rom->base();
 
 	/* setup memory banking */
 	membank("bank1")->configure_entries(1, banks, ram, 0x10000);
@@ -511,7 +512,7 @@ void xor100_state::post_load()
 
 /* Machine Driver */
 
-static MACHINE_CONFIG_START( xor100, xor100_state )
+static MACHINE_CONFIG_START( xor100 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/2)
 	MCFG_CPU_PROGRAM_MAP(xor100_mem)
@@ -596,5 +597,5 @@ ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT       INIT    COMPANY                 FULLNAME        FLAGS */
-COMP( 1980, xor100, 0,      0,      xor100,     xor100, driver_device,     0,   "Xor Data Science",     "XOR S-100-12", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   STATE         INIT  COMPANY             FULLNAME        FLAGS
+COMP( 1980, xor100, 0,      0,      xor100,  xor100, xor100_state, 0,    "Xor Data Science", "XOR S-100-12", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

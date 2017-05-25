@@ -6,8 +6,10 @@
 
 ***************************************************************************/
 
-#ifndef __MPEG_AUDIO_H__
-#define __MPEG_AUDIO_H__
+#ifndef MAME_SOUND_MPEG_AUDIO_H
+#define MAME_SOUND_MPEG_AUDIO_H
+
+#pragma once
 
 class mpeg_audio {
 public:
@@ -74,7 +76,7 @@ private:
 	static const band_info band_infos[18];
 	static const double synthesis_filter[512];
 
-	const UINT8 *base;
+	const uint8_t *base;
 	int accepted, position_align;
 
 	int sampling_rate, last_frame_number;
@@ -125,4 +127,4 @@ private:
 	}
 };
 
-#endif
+#endif // MAME_SOUND_MPEG_AUDIO_H

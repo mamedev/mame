@@ -19,38 +19,42 @@
 
 #if defined(WIN32)
 
-#ifndef WIN32_LEAN_AND_MEAN
-#define WIN32_LEAN_AND_MEAN
-#endif
-
 #include <windows.h>
 
-// the result of these functions has to be released with osd_free()
-
-CHAR *astring_from_utf8(const char *s);
-char *utf8_from_astring(const CHAR *s);
-
-WCHAR *wstring_from_utf8(const char *s);
-char *utf8_from_wstring(const WCHAR *s);
-
-struct osd_wstr_deleter
+namespace osd
 {
-	void operator () (wchar_t* wstr) const
+	namespace text
 	{
-		if (wstr != nullptr)
-			osd_free(wstr);
-	}
-};
+		std::string to_astring(const std::string &s);
+		std::string to_astring(const char *s);
+		std::string &to_astring(std::string &dst, const std::string &s);
+		std::string &to_astring(std::string &dst, const char *s);
+		std::string from_astring(const std::string &s);
+		std::string from_astring(const CHAR *s);
+		std::string &from_astring(std::string &dst, const std::string &s);
+		std::string &from_astring(std::string &dst, const CHAR *s);
 
-typedef std::unique_ptr<wchar_t, osd_wstr_deleter> osd_unique_wstr;
+		std::wstring to_wstring(const std::string &s);
+		std::wstring to_wstring(const char *s);
+		std::wstring &to_wstring(std::wstring &dst, const std::string &s);
+		std::wstring &to_wstring(std::wstring &dst, const char *s);
+		std::string from_wstring(const std::wstring &s);
+		std::string from_wstring(const WCHAR *s);
+		std::string &from_wstring(std::string &dst, const std::wstring &s);
+		std::string &from_wstring(std::string &dst, const WCHAR *s);
 
 #ifdef UNICODE
-#define tstring_from_utf8   wstring_from_utf8
-#define utf8_from_tstring   utf8_from_wstring
+typedef std::wstring tstring;
+#define to_tstring   to_wstring
+#define from_tstring   from_wstring
 #else // !UNICODE
-#define tstring_from_utf8   astring_from_utf8
-#define utf8_from_tstring   utf8_from_astring
+typedef std::string tstring;
+#define to_tstring   to_astring
+#define from_tstring   from_astring
 #endif // UNICODE
+
+	}
+}
 
 #endif // defined(WIN32)
 

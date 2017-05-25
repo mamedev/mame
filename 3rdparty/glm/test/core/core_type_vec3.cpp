@@ -1,35 +1,4 @@
-///////////////////////////////////////////////////////////////////////////////////
-/// OpenGL Mathematics (glm.g-truc.net)
-///
-/// Copyright (c) 2005 - 2015 G-Truc Creation (www.g-truc.net)
-/// Permission is hereby granted, free of charge, to any person obtaining a copy
-/// of this software and associated documentation files (the "Software"), to deal
-/// in the Software without restriction, including without limitation the rights
-/// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-/// copies of the Software, and to permit persons to whom the Software is
-/// furnished to do so, subject to the following conditions:
-/// 
-/// The above copyright notice and this permission notice shall be included in
-/// all copies or substantial portions of the Software.
-/// 
-/// Restrictions:
-///		By making use of the Software for military purposes, you choose to make
-///		a Bunny unhappy.
-/// 
-/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-/// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-/// THE SOFTWARE.
-///
-/// @file test/core/core_type_vec3.cpp
-/// @date 2008-08-31 / 2014-11-25
-/// @author Christophe Riccio
-///////////////////////////////////////////////////////////////////////////////////
-
-#define GLM_SWIZZLE
+#define GLM_FORCE_SWIZZLE
 #include <glm/vector_relational.hpp>
 #include <glm/geometric.hpp>
 #include <glm/vec2.hpp>
@@ -37,6 +6,10 @@
 #include <glm/vec4.hpp>
 #include <cstdio>
 #include <vector>
+
+static glm::vec3 v1;
+static glm::vec3 v2(1);
+static glm::vec3 v3(1, 1, 1);
 
 int test_vec3_ctor()
 {
@@ -71,7 +44,7 @@ int test_vec3_ctor()
 	}
 #endif
 
-#if(GLM_HAS_UNRESTRICTED_UNIONS && defined(GLM_SWIZZLE))
+#if(GLM_HAS_UNRESTRICTED_UNIONS && defined(GLM_FORCE_SWIZZLE))
 	{
 		glm::vec3 A = glm::vec3(1.0f, 2.0f, 3.0f);
 		glm::vec3 B = A.xyz;
@@ -90,7 +63,7 @@ int test_vec3_ctor()
 		Error += glm::all(glm::equal(A, G)) ? 0 : 1;
 		Error += glm::all(glm::equal(A, H)) ? 0 : 1;
 	}
-#endif//(GLM_HAS_UNRESTRICTED_UNIONS && defined(GLM_SWIZZLE))
+#endif//(GLM_HAS_UNRESTRICTED_UNIONS && defined(GLM_FORCE_SWIZZLE))
 
 	{
 		glm::vec3 A(1);
@@ -270,6 +243,9 @@ int test_vec3_size()
 	Error += 24 == sizeof(glm::highp_dvec3) ? 0 : 1;
 	Error += glm::vec3().length() == 3 ? 0 : 1;
 	Error += glm::dvec3().length() == 3 ? 0 : 1;
+	Error += glm::vec3::length() == 3 ? 0 : 1;
+	Error += glm::dvec3::length() == 3 ? 0 : 1;
+
 	return Error;
 }
 
@@ -362,6 +338,7 @@ int test_vec3_swizzle3_3()
 	return Error;
 }
 
+#if !GLM_HAS_ONLY_XYZW
 int test_vec3_swizzle_operators()
 {
 	int Error = 0;
@@ -468,6 +445,7 @@ int test_vec3_swizzle_partial()
 
 	return Error;
 }
+#endif//!GLM_HAS_ONLY_XYZW
 
 int test_operator_increment()
 {
@@ -508,10 +486,13 @@ int main()
 	Error += test_vec3_size();
 	Error += test_vec3_swizzle3_2();
 	Error += test_vec3_swizzle3_3();
-	Error += test_vec3_swizzle_partial();
-	Error += test_vec3_swizzle_operators();
-	Error += test_vec3_swizzle_functions();
 	Error += test_operator_increment();
+
+#	if !GLM_HAS_ONLY_XYZW
+		Error += test_vec3_swizzle_partial();
+		Error += test_vec3_swizzle_operators();
+		Error += test_vec3_swizzle_functions();
+#	endif//!GLM_HAS_ONLY_XYZW
 
 	return Error;
 }

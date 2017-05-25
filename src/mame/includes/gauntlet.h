@@ -36,10 +36,10 @@ public:
 	required_device<tilemap_device> m_alpha_tilemap;
 	required_device<atari_motion_objects_device> m_mob;
 
-	UINT16          m_sound_reset_val;
-	UINT8           m_vindctr2_screen_refresh;
-	UINT8           m_playfield_tile_bank;
-	UINT8           m_playfield_color_bank;
+	uint16_t          m_sound_reset_val;
+	uint8_t           m_vindctr2_screen_refresh;
+	uint8_t           m_playfield_tile_bank;
+	uint8_t           m_playfield_color_bank;
 	virtual void update_interrupts() override;
 	virtual void scanline_update(screen_device &screen, int scanline) override;
 	DECLARE_WRITE16_MEMBER(sound_reset_w);
@@ -55,7 +55,7 @@ public:
 	DECLARE_MACHINE_START(gauntlet);
 	DECLARE_MACHINE_RESET(gauntlet);
 	DECLARE_VIDEO_START(gauntlet);
-	UINT32 screen_update_gauntlet(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_gauntlet(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE16_MEMBER( gauntlet_xscroll_w );
 	DECLARE_WRITE16_MEMBER( gauntlet_yscroll_w );
 

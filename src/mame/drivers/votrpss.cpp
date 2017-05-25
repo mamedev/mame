@@ -68,20 +68,24 @@ Things to be looked at:
 ******************************************************************************/
 
 /* Core includes */
+#include "emu.h"
+
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
 //#include "votrpss.lh"
 
 /* Components */
-#include "sound/ay8910.h"
-#include "sound/votrax.h"
 #include "machine/clock.h"
+#include "machine/i8251.h"
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
-#include "machine/i8251.h"
+#include "sound/ay8910.h"
+#include "sound/votrax.h"
 
 /* For testing */
 #include "machine/terminal.h"
+
+#include "speaker.h"
 
 #define TERMINAL_TAG "terminal"
 
@@ -97,7 +101,7 @@ public:
 	{
 	}
 
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	void kbd_put(u8 data);
 	DECLARE_READ8_MEMBER(ppi_pa_r);
 	DECLARE_READ8_MEMBER(ppi_pb_r);
 	DECLARE_READ8_MEMBER(ppi_pc_r);
@@ -107,11 +111,12 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer);
 	DECLARE_WRITE_LINE_MEMBER(write_uart_clock);
 	IRQ_CALLBACK_MEMBER(irq_ack);
+
 private:
-	UINT8 m_term_data;
-	UINT8 m_porta;
-	UINT8 m_portb;
-	UINT8 m_portc;
+	uint8_t m_term_data;
+	uint8_t m_porta;
+	uint8_t m_portb;
+	uint8_t m_portc;
 	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
@@ -194,7 +199,7 @@ IRQ_CALLBACK_MEMBER( votrpss_state::irq_ack )
 
 READ8_MEMBER( votrpss_state::ppi_pa_r )
 {
-	UINT8 ret = m_term_data;
+	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
@@ -207,7 +212,7 @@ READ8_MEMBER( votrpss_state::ppi_pb_r )
 // Bit 0 controls what happens at interrupt time. See code around 518.
 READ8_MEMBER( votrpss_state::ppi_pc_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (m_term_data)
 	{
@@ -235,7 +240,7 @@ WRITE8_MEMBER( votrpss_state::ppi_pc_w )
 	m_portc = data;
 }
 
-WRITE8_MEMBER( votrpss_state::kbd_put )
+void votrpss_state::kbd_put(u8 data)
 {
 	m_term_data = data;
 }
@@ -250,7 +255,7 @@ DECLARE_WRITE_LINE_MEMBER( votrpss_state::write_uart_clock )
  Machine Drivers
 ******************************************************************************/
 
-static MACHINE_CONFIG_START( votrpss, votrpss_state )
+static MACHINE_CONFIG_START( votrpss )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz/2)  /* 4.000 MHz, verified */
 	MCFG_CPU_PROGRAM_MAP(votrpss_mem)
@@ -271,7 +276,7 @@ static MACHINE_CONFIG_START( votrpss, votrpss_state )
 
 	/* Devices */
 	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(votrpss_state, kbd_put))
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(votrpss_state, kbd_put))
 
 	MCFG_DEVICE_ADD("uart", I8251, 0)
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
@@ -330,5 +335,5 @@ ROM_END
  Drivers
 ******************************************************************************/
 
-/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT      COMPANY                     FULLNAME                            FLAGS */
-COMP( 1982, votrpss,   0,          0,      votrpss,   votrpss, driver_device, 0,      "Votrax",        "Personal Speech System", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME     PARENT  COMPAT  MACHINE    INPUT    STATE          INIT  COMPANY   FULLNAME                  FLAGS
+COMP( 1982, votrpss, 0,      0,      votrpss,   votrpss, votrpss_state, 0,    "Votrax", "Personal Speech System", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

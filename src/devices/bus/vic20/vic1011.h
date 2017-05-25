@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_VIC20_VIC1011_H
+#define MAME_BUS_VIC20_VIC1011_H
 
-#ifndef __VIC1011__
-#define __VIC1011__
+#pragma once
 
 #include "user.h"
 #include "bus/rs232/rs232.h"
@@ -27,7 +27,7 @@ class vic1011_device : public device_t,
 {
 public:
 	// construction/destruction
-	vic1011_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	vic1011_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -54,4 +54,4 @@ extern const device_type VIC1011;
 
 
 
-#endif
+#endif // MAME_BUS_VIC20_VIC1011_H

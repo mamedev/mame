@@ -64,9 +64,11 @@ Notes:
 */
 
 
+#include "emu.h"
 #include "includes/sg1000.h"
 #include "bus/rs232/rs232.h"
 #include "softlist.h"
+#include "speaker.h"
 
 
 /***************************************************************************
@@ -268,7 +270,7 @@ INPUT_PORTS_END
     INPUT_PORTS( omv )
 -------------------------------------------------*/
 
-static INPUT_PORTS_START( omv )
+static INPUT_PORTS_START( omv1000 )
 	PORT_START("C0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CHAR('1')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2')
@@ -309,7 +311,16 @@ static INPUT_PORTS_START( omv )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
 
+	// The OMV FG-1000 has no 2nd joystick
+	// http://www.famitsu.com/image/29819/pEllnbNQfCJ58skZ25uB511N6eSFfAu6.jpg
 	PORT_START("C5")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( omv2000 )
+	PORT_INCLUDE( omv1000 )
+
+	PORT_MODIFY("C5")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
@@ -375,7 +386,7 @@ READ8_MEMBER( sf7000_state::ppi_pa_r )
 	    PA7
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	data |= m_fdc->get_irq() ? 0x01 : 0x00;
 	data |= m_centronics_busy << 1;
@@ -503,10 +514,10 @@ void sf7000_state::machine_reset()
 ***************************************************************************/
 
 /*-------------------------------------------------
-    MACHINE_CONFIG_START( sg1000, sg1000_state )
+    MACHINE_CONFIG_START( sg1000 )
 -------------------------------------------------*/
 
-static MACHINE_CONFIG_START( sg1000, sg1000_state )
+static MACHINE_CONFIG_START( sg1000 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_10_738635MHz/3)
 	MCFG_CPU_PROGRAM_MAP(sg1000_map)
@@ -556,10 +567,10 @@ static MACHINE_CONFIG_DERIVED( omv, sg1000 )
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------
-    MACHINE_CONFIG_START( sc3000, sc3000_state )
+    MACHINE_CONFIG_START( sc3000 )
 -------------------------------------------------*/
 
-static MACHINE_CONFIG_START( sc3000, sc3000_state )
+static MACHINE_CONFIG_START( sc3000 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_10_738635MHz/3) // LH0080A
 	MCFG_CPU_PROGRAM_MAP(sc3000_map)
@@ -594,10 +605,10 @@ static MACHINE_CONFIG_START( sc3000, sc3000_state )
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------
-    MACHINE_CONFIG_START( sf7000, sf7000_state )
+    MACHINE_CONFIG_START( sf7000 )
 -------------------------------------------------*/
 
-static MACHINE_CONFIG_START( sf7000, sf7000_state )
+static MACHINE_CONFIG_START( sf7000 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_10_738635MHz/3)
 	MCFG_CPU_PROGRAM_MAP(sf7000_map)
@@ -682,11 +693,11 @@ ROM_END
     SYSTEM DRIVERS
 ***************************************************************************/
 
-/*    YEAR  NAME        PARENT      COMPAT      MACHINE     INPUT       INIT    COMPANY             FULLNAME                                    FLAGS */
-CONS( 1983, sg1000,     0,          0,          sg1000,     sg1000, driver_device,     0,      "Sega",             "SG-1000",                                  MACHINE_SUPPORTS_SAVE )
-CONS( 1984, sg1000m2,   sg1000,     0,          sc3000,     sc3000, driver_device,     0,      "Sega",             "SG-1000 II",                               MACHINE_SUPPORTS_SAVE )
-COMP( 1983, sc3000,     0,          sg1000,     sc3000,     sc3000, driver_device,     0,      "Sega",             "SC-3000",                                  MACHINE_SUPPORTS_SAVE )
-COMP( 1983, sc3000h,    sc3000,     0,          sc3000,     sc3000, driver_device,     0,      "Sega",             "SC-3000H",                                 MACHINE_SUPPORTS_SAVE )
-COMP( 1983, sf7000,     sc3000,     0,          sf7000,     sf7000, driver_device,     0,      "Sega",             "SC-3000/Super Control Station SF-7000",    MACHINE_SUPPORTS_SAVE )
-CONS( 1984, omv1000,    sg1000,     0,          omv,        omv,    driver_device,     0,      "Tsukuda Original", "Othello Multivision FG-1000",              MACHINE_SUPPORTS_SAVE )
-CONS( 1984, omv2000,    sg1000,     0,          omv,        omv,    driver_device,     0,      "Tsukuda Original", "Othello Multivision FG-2000",              MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME        PARENT      COMPAT      MACHINE     INPUT    STATE            INIT    COMPANY             FULLNAME                                    FLAGS */
+CONS( 1983, sg1000,     0,          0,          sg1000,     sg1000,  sg1000_state,    0,      "Sega",             "SG-1000",                                  MACHINE_SUPPORTS_SAVE )
+CONS( 1984, sg1000m2,   sg1000,     0,          sc3000,     sc3000,  sc3000_state,    0,      "Sega",             "SG-1000 II",                               MACHINE_SUPPORTS_SAVE )
+COMP( 1983, sc3000,     0,          sg1000,     sc3000,     sc3000,  sc3000_state,    0,      "Sega",             "SC-3000",                                  MACHINE_SUPPORTS_SAVE )
+COMP( 1983, sc3000h,    sc3000,     0,          sc3000,     sc3000,  sc3000_state,    0,      "Sega",             "SC-3000H",                                 MACHINE_SUPPORTS_SAVE )
+COMP( 1983, sf7000,     sc3000,     0,          sf7000,     sf7000,  sf7000_state,    0,      "Sega",             "SC-3000/Super Control Station SF-7000",    MACHINE_SUPPORTS_SAVE )
+CONS( 1984, omv1000,    sg1000,     0,          omv,        omv1000, sg1000_state,    0,      "Tsukuda Original", "Othello Multivision FG-1000",              MACHINE_SUPPORTS_SAVE )
+CONS( 1984, omv2000,    sg1000,     0,          omv,        omv2000, sg1000_state,    0,      "Tsukuda Original", "Othello Multivision FG-2000",              MACHINE_SUPPORTS_SAVE )

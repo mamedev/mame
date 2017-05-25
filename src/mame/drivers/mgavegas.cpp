@@ -19,12 +19,15 @@ Ver. 2.2 should exist
 #include "emu.h"
 
 #include "cpu/z80/z80.h"
-#include "sound/ay8910.h"
-#include "sound/msm5205.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
+#include "sound/ay8910.h"
 #include "sound/flt_rc.h"
+#include "sound/msm5205.h"
+#include "speaker.h"
+
 #include "mgavegas.lh"
+
 
 /****************************
 *    LOG defines            *
@@ -56,69 +59,69 @@ public:
 		m_ticket(*this, "hopper"),
 		m_filter1(*this, "filter1"),
 		m_filter2(*this, "filter2")
-
-
 	{ }
-	UINT8 m_int;
+
+
+	uint8_t m_int;
 
 	//OUT1
-	UINT8 m_ckmod;
-	UINT8 m_dmod;
-	UINT8 m_emod;
-	UINT8 m_inh;
-	UINT8 m_hop;
-	UINT8 m_seg;
-	UINT8 m_printer;
-	UINT8 m_auxp;
+	uint8_t m_ckmod;
+	uint8_t m_dmod;
+	uint8_t m_emod;
+	uint8_t m_inh;
+	uint8_t m_hop;
+	uint8_t m_seg;
+	uint8_t m_printer;
+	uint8_t m_auxp;
 
 	//helper...
-	UINT8 m_old_ckmod;
-	UINT8 m_old_emod;
+	uint8_t m_old_ckmod;
+	uint8_t m_old_emod;
 
 	//OUT2
-	UINT8 m_bobina_ctrl;
-	UINT8 m_timbre;
-	UINT8 m_coil_1;
-	UINT8 m_coil_2;
-	UINT8 m_coil_3;
-	UINT8 m_cont_ent;
-	UINT8 m_cont_sal;
-	UINT8 m_cont_caj;
+	uint8_t m_bobina_ctrl;
+	uint8_t m_timbre;
+	uint8_t m_coil_1;
+	uint8_t m_coil_2;
+	uint8_t m_coil_3;
+	uint8_t m_cont_ent;
+	uint8_t m_cont_sal;
+	uint8_t m_cont_caj;
 
 	//lamps out
-	UINT64 m_custom_data;
-	UINT8 m_auxs;
-	UINT8 m_anal;
-	UINT8 m_anacl;
-	UINT8 m_anacr;
-	UINT8 m_anar;
-	UINT8 m_pl;
-	UINT8 m_pc;
-	UINT8 m_pr;
-	UINT8 m_luz_250_rul;
-	UINT8 m_luz_100_rul;
-	UINT8 m_luz_50_rlul;
-	UINT8 m_luz_25_lrul;
-	UINT8 m_luz_25_rrul;
-	UINT8 m_fl;
-	UINT8 m_fc;
-	UINT8 m_fr;
-	UINT8 m_insert_coin;
-	UINT8 m_no_cambio;
-	UINT8 m_fuse;
-	UINT8 m_falta;
-	UINT8 m_anag;
-	UINT8 m_cl;
-	UINT8 m_cc;
-	UINT8 m_cr;
-	UINT8 m_premio_s;
-	UINT8 m_100;
-	UINT8 m_200;
-	UINT8 m_300;
-	UINT8 m_500;
-	UINT8 m_ml;
-	UINT8 m_mc;
-	UINT8 m_mr;
+	uint64_t m_custom_data;
+	uint8_t m_auxs;
+	uint8_t m_anal;
+	uint8_t m_anacl;
+	uint8_t m_anacr;
+	uint8_t m_anar;
+	uint8_t m_pl;
+	uint8_t m_pc;
+	uint8_t m_pr;
+	uint8_t m_luz_250_rul;
+	uint8_t m_luz_100_rul;
+	uint8_t m_luz_50_rlul;
+	uint8_t m_luz_25_lrul;
+	uint8_t m_luz_25_rrul;
+	uint8_t m_fl;
+	uint8_t m_fc;
+	uint8_t m_fr;
+	uint8_t m_insert_coin;
+	uint8_t m_no_cambio;
+	uint8_t m_fuse;
+	uint8_t m_falta;
+	uint8_t m_anag;
+	uint8_t m_cl;
+	uint8_t m_cc;
+	uint8_t m_cr;
+	uint8_t m_premio_s;
+	uint8_t m_100;
+	uint8_t m_200;
+	uint8_t m_300;
+	uint8_t m_500;
+	uint8_t m_ml;
+	uint8_t m_mc;
+	uint8_t m_mr;
 
 	DECLARE_READ8_MEMBER(start_read);
 
@@ -210,7 +213,7 @@ void mgavegas_state::update_lamp(){
 
 
 void mgavegas_state::update_custom(){
-UINT64 tmp;
+uint64_t tmp;
 
 	if( (m_ckmod==1) & (m_old_ckmod==0) ){
 		//vadid clock, sample the data
@@ -284,7 +287,7 @@ READ8_MEMBER( mgavegas_state::start_read )
 ****************************/
 READ8_MEMBER(mgavegas_state::r_a0)
 {
-UINT8 ret=0;
+uint8_t ret=0;
 
 
 	switch (offset&0x03)
@@ -335,7 +338,7 @@ WRITE8_MEMBER(mgavegas_state::w_a0)
 
 READ8_MEMBER(mgavegas_state::csoki_r)
 {
-UINT8 ret=0;
+uint8_t ret=0;
 
 	if (LOG_MSM5205)
 		logerror("read from %04X return %02X\n",offset+0xc800,ret);
@@ -369,7 +372,7 @@ WRITE8_MEMBER(mgavegas_state::cso1_w)
 	update_custom();
 
 	hopper_data=(m_hop&0x01)<<7;
-	m_ticket->write(machine().driver_data()->generic_space(), 0, hopper_data);
+	m_ticket->write(machine().dummy_space(), 0, hopper_data);
 }
 
 WRITE8_MEMBER(mgavegas_state::cso2_w)
@@ -392,7 +395,7 @@ WRITE8_MEMBER(mgavegas_state::cso2_w)
 
 READ8_MEMBER(mgavegas_state::ay8910_a_r)
 {
-	UINT8 ret=0xff;
+	uint8_t ret=0xff;
 
 	ret=ioport("INA")->read();
 
@@ -404,7 +407,7 @@ READ8_MEMBER(mgavegas_state::ay8910_a_r)
 
 READ8_MEMBER(mgavegas_state::ay8910_b_r)
 {
-	UINT8 ret=0xff;
+	uint8_t ret=0xff;
 
 	ret=ioport("DSW1")->read();
 
@@ -486,7 +489,7 @@ INPUT_PORTS_END
 void mgavegas_state::machine_reset()
 {
 	m_int=1;
-	m_custom_data=U64(0xffffffffffffffff);
+	m_custom_data=0xffffffffffffffffU;
 
 	m_old_ckmod=1;
 	m_old_emod=0;
@@ -543,8 +546,8 @@ void mgavegas_state::machine_reset()
 	m_mc=0;
 	m_mr=0;
 
-	m_filter1->filter_rc_set_RC(FLT_RC_LOWPASS, 1000, 0, 0, CAP_N(1) );     /* RC out of MSM5205 R=1K C=1nF */
-	m_filter2->filter_rc_set_RC(FLT_RC_HIGHPASS, 3846, 0, 0, CAP_N(100 ));  /*ALP3B active-hybrid filter fc=2.6Khz 2poles???*/
+	m_filter1->filter_rc_set_RC(filter_rc_device::LOWPASS, 1000, 0, 0, CAP_N(1) );     /* RC out of MSM5205 R=1K C=1nF */
+	m_filter2->filter_rc_set_RC(filter_rc_device::HIGHPASS, 3846, 0, 0, CAP_N(100 ));  /*ALP3B active-hybrid filter fc=2.6Khz 2poles???*/
 }
 
 
@@ -584,7 +587,7 @@ DRIVER_INIT_MEMBER(mgavegas_state,mgavegas133)
 *************************/
 
 
-static MACHINE_CONFIG_START( mgavegas, mgavegas_state )
+static MACHINE_CONFIG_START( mgavegas )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLK)
 	MCFG_CPU_PROGRAM_MAP(mgavegas_map)
@@ -604,7 +607,7 @@ static MACHINE_CONFIG_START( mgavegas, mgavegas_state )
 	MCFG_AY8910_PORT_B_READ_CB(READ8(mgavegas_state, ay8910_b_r))
 
 	MCFG_SOUND_ADD("5205", MSM5205, MSM_CLK)
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S64_4B)
+	MCFG_MSM5205_PRESCALER_SELECTOR(S64_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter1", 2.0)
 
 
@@ -653,7 +656,7 @@ ROM_END
 /*************************
 *      Game Drivers      *
 *************************/
-/*    YEAR  NAME            PARENT      MACHINE   INPUT     STATE          INIT         ROT     COMPANY     FULLNAME    FLAGS*/
+//    YEAR  NAME            PARENT      MACHINE   INPUT     STATE           INIT        ROT     COMPANY   FULLNAME                                      FLAGS
 GAME( 1985, mgavegas,       0,          mgavegas, mgavegas, mgavegas_state, mgavegas,   ROT0,   "MGA",    "Vegas 1 (Ver 2.3 dual coin pulse, shorter)", MACHINE_MECHANICAL )
-GAME( 1985, mgavegas21,     mgavegas,   mgavegas, mgavegas, mgavegas_state, mgavegas21, ROT0,   "MGA",    "Vegas 1 (Ver 2.1 dual coin pulse, longer)", MACHINE_MECHANICAL )
-GAME( 1985, mgavegas133,    mgavegas,   mgavegas, mgavegas, mgavegas_state, mgavegas133,ROT0,   "MGA",    "Vegas 1 (Ver 1.33 single coin pulse)", MACHINE_MECHANICAL )
+GAME( 1985, mgavegas21,     mgavegas,   mgavegas, mgavegas, mgavegas_state, mgavegas21, ROT0,   "MGA",    "Vegas 1 (Ver 2.1 dual coin pulse, longer)",  MACHINE_MECHANICAL )
+GAME( 1985, mgavegas133,    mgavegas,   mgavegas, mgavegas, mgavegas_state, mgavegas133,ROT0,   "MGA",    "Vegas 1 (Ver 1.33 single coin pulse)",       MACHINE_MECHANICAL )

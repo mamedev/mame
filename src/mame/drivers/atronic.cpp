@@ -16,6 +16,7 @@
 
 #include "emu.h"
 #include "cpu/z180/z180.h"
+#include "screen.h"
 
 
 class atronic_state : public driver_device
@@ -26,7 +27,7 @@ public:
 			m_maincpu(*this, "maincpu")
 	{ }
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
 
@@ -34,7 +35,7 @@ protected:
 	required_device<cpu_device> m_maincpu;
 };
 
-UINT32 atronic_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
+uint32_t atronic_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	return 0;
 }
@@ -57,7 +58,7 @@ static INPUT_PORTS_START( atronic )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( atronic, atronic_state )
+static MACHINE_CONFIG_START( atronic )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z180, 6000000)
 	MCFG_CPU_PROGRAM_MAP(atronic_map)
@@ -814,33 +815,33 @@ ROM_END
 
 
 
-GAME( 1999, atronic,    0,        atronic, atronic, driver_device,  0,             ROT0,  "Atronic", "Atronic SetUp/Clear Chips (Russia, set 1)", MACHINE_IS_SKELETON)
-GAME( 1999, atronica,   atronic,  atronic, atronic, driver_device,  0,             ROT0,  "Atronic", "Atronic SetUp/Clear Chips (Russia, set 2)", MACHINE_IS_SKELETON)
+GAME( 1999, atronic,    0,        atronic, atronic, atronic_state,  0,             ROT0,  "Atronic", "Atronic SetUp/Clear Chips (Russia, set 1)", MACHINE_IS_SKELETON)
+GAME( 1999, atronica,   atronic,  atronic, atronic, atronic_state,  0,             ROT0,  "Atronic", "Atronic SetUp/Clear Chips (Russia, set 2)", MACHINE_IS_SKELETON)
 
-GAME( 2002, atlantca,   0,        atronic, atronic, driver_device,  0,             ROT0,  "Atronic", "Atlantica (Russia) (Atronic) (set 1)", MACHINE_IS_SKELETON)
-GAME( 2002, atlantcaa,  atlantca, atronic, atronic, driver_device,  0,             ROT0,  "Atronic", "Atlantica (Russia) (Atronic) (set 2)", MACHINE_IS_SKELETON)
-GAME( 2002, baboshka,   0,        atronic, atronic, driver_device,  0,             ROT0,  "Atronic", "Baboshka (Russia) (Atronic)", MACHINE_IS_SKELETON)
-GAME( 2002, cfblue,     0,        atronic, atronic, driver_device,  0,             ROT0,  "Atronic", "Crazy Fruits Blue (Russia) (Atronic) (set 1)", MACHINE_IS_SKELETON)
-GAME( 2002, cfbluea,    cfblue,   atronic, atronic, driver_device,  0,             ROT0,  "Atronic", "Crazy Fruits Blue (Russia) (Atronic) (set 2)", MACHINE_IS_SKELETON)
-GAME( 2002, cfgreen,    0,        atronic, atronic, driver_device,  0,             ROT0,  "Atronic", "Crazy Fruits Green (Russia) (Atronic)", MACHINE_IS_SKELETON)
-GAME( 2002, chicken,    0,        atronic, atronic, driver_device,  0,             ROT0,  "Atronic", "Chicken (Russia) (Atronic)", MACHINE_IS_SKELETON)
-GAME( 2002, aclown,     0,        atronic, atronic, driver_device,  0,             ROT0,  "Atronic", "Clown (Russia) (Atronic)", MACHINE_IS_SKELETON)
-GAME( 2002, goldglen,   0,        atronic, atronic, driver_device,  0,             ROT0,  "Atronic", "Golden Glenn (Russia) (Atronic)", MACHINE_IS_SKELETON)
-GAME( 2002, iccash,     0,        atronic, atronic, driver_device,  0,             ROT0,  "Atronic", "I C Cash (Russia) (Atronic)", MACHINE_IS_SKELETON)
-GAME( 2002, shpinxii,   0,        atronic, atronic, driver_device,  0,             ROT0,  "Atronic", "Sphinx II (Russia) (Atronic)", MACHINE_IS_SKELETON)
-GAME( 2002, bearnec,    0,        atronic, atronic, driver_device,  0,             ROT0,  "Atronic", "Bear Necessities (Russia) (Atronic)", MACHINE_IS_SKELETON)
-GAME( 2002, beachpt,    0,        atronic, atronic, driver_device,  0,             ROT0,  "Atronic", "Beach Patrol (Russia) (Atronic)", MACHINE_IS_SKELETON)
-GAME( 2002, beetleup,   0,        atronic, atronic, driver_device,  0,             ROT0,  "Atronic", "Beetles Unplugged (Russia) (Atronic)", MACHINE_IS_SKELETON)
-GAME( 2002, abigchs,    0,        atronic, atronic, driver_device,  0,             ROT0,  "Atronic", "Big Cheese (Russia) (Atronic)", MACHINE_IS_SKELETON)
-GAME( 2002, bigblue,    0,        atronic, atronic, driver_device,  0,             ROT0,  "Atronic", "Big Blue (Russia) (Atronic)", MACHINE_IS_SKELETON)
-GAME( 2002, castaway,   0,        atronic, atronic, driver_device,  0,             ROT0,  "Atronic", "Castaway (Russia) (Atronic) (set 1)", MACHINE_IS_SKELETON)
-GAME( 2002, castawaya,  castaway, atronic, atronic, driver_device,  0,             ROT0,  "Atronic", "Castaway (Russia) (Atronic) (set 2)", MACHINE_IS_SKELETON)
-GAME( 2002, dncsprt,    0,        atronic, atronic, driver_device,  0,             ROT0,  "Atronic", "Dancing Spirit (Russia) (Atronic)", MACHINE_IS_SKELETON)
-GAME( 2002, drmmake,    0,        atronic, atronic, driver_device,  0,             ROT0,  "Atronic", "Dream Maker (Russia) (Atronic)", MACHINE_IS_SKELETON)
-GAME( 2002, goldcity,   0,        atronic, atronic, driver_device,  0,             ROT0,  "Atronic", "Gold City (Russia) (Atronic)", MACHINE_IS_SKELETON)
-GAME( 2002, jumpjkpt,   0,        atronic, atronic, driver_device,  0,             ROT0,  "Atronic", "Jumping Jackpots (Russia) (Atronic)", MACHINE_IS_SKELETON)
-GAME( 2002, mushmagi,   0,        atronic, atronic, driver_device,  0,             ROT0,  "Atronic", "Mushroom Magic (Russia) (Atronic)", MACHINE_IS_SKELETON)
-GAME( 2002, santam,     0,        atronic, atronic, driver_device,  0,             ROT0,  "Atronic", "Santa Maria (Russia) (Atronic)", MACHINE_IS_SKELETON)
-GAME( 2002, splmastr,   0,        atronic, atronic, driver_device,  0,             ROT0,  "Atronic", "Spell Master (Russia) (Atronic)", MACHINE_IS_SKELETON)
-GAME( 2002, tajmah,     0,        atronic, atronic, driver_device,  0,             ROT0,  "Atronic", "Tajmahal (Russia) (Atronic)", MACHINE_IS_SKELETON)
-GAME( 2002, 3wishrd,    0,        atronic, atronic, driver_device,  0,             ROT0,  "Atronic", "Three Wishes Red (Russia) (Atronic)", MACHINE_IS_SKELETON)
+GAME( 2002, atlantca,   0,        atronic, atronic, atronic_state,  0,             ROT0,  "Atronic", "Atlantica (Russia) (Atronic) (set 1)", MACHINE_IS_SKELETON)
+GAME( 2002, atlantcaa,  atlantca, atronic, atronic, atronic_state,  0,             ROT0,  "Atronic", "Atlantica (Russia) (Atronic) (set 2)", MACHINE_IS_SKELETON)
+GAME( 2002, baboshka,   0,        atronic, atronic, atronic_state,  0,             ROT0,  "Atronic", "Baboshka (Russia) (Atronic)", MACHINE_IS_SKELETON)
+GAME( 2002, cfblue,     0,        atronic, atronic, atronic_state,  0,             ROT0,  "Atronic", "Crazy Fruits Blue (Russia) (Atronic) (set 1)", MACHINE_IS_SKELETON)
+GAME( 2002, cfbluea,    cfblue,   atronic, atronic, atronic_state,  0,             ROT0,  "Atronic", "Crazy Fruits Blue (Russia) (Atronic) (set 2)", MACHINE_IS_SKELETON)
+GAME( 2002, cfgreen,    0,        atronic, atronic, atronic_state,  0,             ROT0,  "Atronic", "Crazy Fruits Green (Russia) (Atronic)", MACHINE_IS_SKELETON)
+GAME( 2002, chicken,    0,        atronic, atronic, atronic_state,  0,             ROT0,  "Atronic", "Chicken (Russia) (Atronic)", MACHINE_IS_SKELETON)
+GAME( 2002, aclown,     0,        atronic, atronic, atronic_state,  0,             ROT0,  "Atronic", "Clown (Russia) (Atronic)", MACHINE_IS_SKELETON)
+GAME( 2002, goldglen,   0,        atronic, atronic, atronic_state,  0,             ROT0,  "Atronic", "Golden Glenn (Russia) (Atronic)", MACHINE_IS_SKELETON)
+GAME( 2002, iccash,     0,        atronic, atronic, atronic_state,  0,             ROT0,  "Atronic", "I C Cash (Russia) (Atronic)", MACHINE_IS_SKELETON)
+GAME( 2002, shpinxii,   0,        atronic, atronic, atronic_state,  0,             ROT0,  "Atronic", "Sphinx II (Russia) (Atronic)", MACHINE_IS_SKELETON)
+GAME( 2002, bearnec,    0,        atronic, atronic, atronic_state,  0,             ROT0,  "Atronic", "Bear Necessities (Russia) (Atronic)", MACHINE_IS_SKELETON)
+GAME( 2002, beachpt,    0,        atronic, atronic, atronic_state,  0,             ROT0,  "Atronic", "Beach Patrol (Russia) (Atronic)", MACHINE_IS_SKELETON)
+GAME( 2002, beetleup,   0,        atronic, atronic, atronic_state,  0,             ROT0,  "Atronic", "Beetles Unplugged (Russia) (Atronic)", MACHINE_IS_SKELETON)
+GAME( 2002, abigchs,    0,        atronic, atronic, atronic_state,  0,             ROT0,  "Atronic", "Big Cheese (Russia) (Atronic)", MACHINE_IS_SKELETON)
+GAME( 2002, bigblue,    0,        atronic, atronic, atronic_state,  0,             ROT0,  "Atronic", "Big Blue (Russia) (Atronic)", MACHINE_IS_SKELETON)
+GAME( 2002, castaway,   0,        atronic, atronic, atronic_state,  0,             ROT0,  "Atronic", "Castaway (Russia) (Atronic) (set 1)", MACHINE_IS_SKELETON)
+GAME( 2002, castawaya,  castaway, atronic, atronic, atronic_state,  0,             ROT0,  "Atronic", "Castaway (Russia) (Atronic) (set 2)", MACHINE_IS_SKELETON)
+GAME( 2002, dncsprt,    0,        atronic, atronic, atronic_state,  0,             ROT0,  "Atronic", "Dancing Spirit (Russia) (Atronic)", MACHINE_IS_SKELETON)
+GAME( 2002, drmmake,    0,        atronic, atronic, atronic_state,  0,             ROT0,  "Atronic", "Dream Maker (Russia) (Atronic)", MACHINE_IS_SKELETON)
+GAME( 2002, goldcity,   0,        atronic, atronic, atronic_state,  0,             ROT0,  "Atronic", "Gold City (Russia) (Atronic)", MACHINE_IS_SKELETON)
+GAME( 2002, jumpjkpt,   0,        atronic, atronic, atronic_state,  0,             ROT0,  "Atronic", "Jumping Jackpots (Russia) (Atronic)", MACHINE_IS_SKELETON)
+GAME( 2002, mushmagi,   0,        atronic, atronic, atronic_state,  0,             ROT0,  "Atronic", "Mushroom Magic (Russia) (Atronic)", MACHINE_IS_SKELETON)
+GAME( 2002, santam,     0,        atronic, atronic, atronic_state,  0,             ROT0,  "Atronic", "Santa Maria (Russia) (Atronic)", MACHINE_IS_SKELETON)
+GAME( 2002, splmastr,   0,        atronic, atronic, atronic_state,  0,             ROT0,  "Atronic", "Spell Master (Russia) (Atronic)", MACHINE_IS_SKELETON)
+GAME( 2002, tajmah,     0,        atronic, atronic, atronic_state,  0,             ROT0,  "Atronic", "Tajmahal (Russia) (Atronic)", MACHINE_IS_SKELETON)
+GAME( 2002, 3wishrd,    0,        atronic, atronic, atronic_state,  0,             ROT0,  "Atronic", "Three Wishes Red (Russia) (Atronic)", MACHINE_IS_SKELETON)

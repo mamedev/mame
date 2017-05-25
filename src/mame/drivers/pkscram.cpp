@@ -15,8 +15,10 @@ driver by David Haywood and few bits by Pierpaolo Prazzoli
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "sound/2203intf.h"
 #include "machine/nvram.h"
+#include "sound/2203intf.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class pkscram_state : public driver_device
@@ -31,11 +33,11 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen") { }
 
-	UINT16 m_out;
-	UINT8 m_interrupt_line_active;
-	required_shared_ptr<UINT16> m_pkscramble_fgtilemap_ram;
-	required_shared_ptr<UINT16> m_pkscramble_mdtilemap_ram;
-	required_shared_ptr<UINT16> m_pkscramble_bgtilemap_ram;
+	uint16_t m_out;
+	uint8_t m_interrupt_line_active;
+	required_shared_ptr<uint16_t> m_pkscramble_fgtilemap_ram;
+	required_shared_ptr<uint16_t> m_pkscramble_mdtilemap_ram;
+	required_shared_ptr<uint16_t> m_pkscramble_bgtilemap_ram;
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_md_tilemap;
 	tilemap_t *m_bg_tilemap;
@@ -49,7 +51,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_pkscramble(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_pkscramble(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_callback);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	required_device<cpu_device> m_maincpu;
@@ -245,15 +247,15 @@ TIMER_DEVICE_CALLBACK_MEMBER(pkscram_state::scanline_callback)
 
 void pkscram_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(pkscram_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8,32,32);
-	m_md_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(pkscram_state::get_md_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8,32,32);
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(pkscram_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8,32,32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(pkscram_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8,32,32);
+	m_md_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(pkscram_state::get_md_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8,32,32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(pkscram_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8,32,32);
 
 	m_md_tilemap->set_transparent_pen(15);
 	m_fg_tilemap->set_transparent_pen(15);
 }
 
-UINT32 pkscram_state::screen_update_pkscramble(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t pkscram_state::screen_update_pkscramble(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	m_md_tilemap->draw(screen, bitmap, cliprect, 0,0);
@@ -297,7 +299,7 @@ void pkscram_state::machine_reset()
 	scanline_timer->adjust(m_screen->time_until_pos(interrupt_scanline), interrupt_scanline);
 }
 
-static MACHINE_CONFIG_START( pkscramble, pkscram_state )
+static MACHINE_CONFIG_START( pkscramble )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000 )
 	MCFG_CPU_PROGRAM_MAP(pkscramble_map)
@@ -342,4 +344,4 @@ ROM_START( pkscram )
 ROM_END
 
 
-GAME( 1993, pkscram, 0, pkscramble, pkscramble, driver_device, 0, ROT0, "Cosmo Electronics Corporation", "PK Scramble", MACHINE_SUPPORTS_SAVE)
+GAME( 1993, pkscram, 0, pkscramble, pkscramble, pkscram_state, 0, ROT0, "Cosmo Electronics Corporation", "PK Scramble", MACHINE_SUPPORTS_SAVE )

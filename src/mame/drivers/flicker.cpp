@@ -19,6 +19,7 @@
 
 ************************************************************************************/
 
+#include "emu.h"
 #include "machine/genpin.h"
 #include "cpu/i4004/i4004.h"
 #include "flicker.lh"
@@ -31,7 +32,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_testport(*this, "TEST")
 		, m_coinport(*this, "COIN")
-		, m_switch(*this, "SWITCH")
+		, m_switch(*this, "SWITCH.%u", 0)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(port00_w);
@@ -39,7 +40,7 @@ public:
 	DECLARE_WRITE8_MEMBER(port10_w);
 	DECLARE_READ8_MEMBER(port02_r);
 private:
-	UINT8 m_out_data;
+	uint8_t m_out_data;
 	required_device<i4004_cpu_device> m_maincpu;
 	required_ioport m_testport;
 	required_ioport m_coinport;
@@ -125,7 +126,7 @@ READ8_MEMBER( flicker_state::port02_r )
 
 WRITE8_MEMBER( flicker_state::port00_w )
 {
-	static const UINT8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0, 0, 0, 0, 0, 0 };
+	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0, 0, 0, 0, 0, 0 };
 	offset = m_maincpu->state_int(I4004_RAM); // we need the full address
 	output().set_digit_value(offset, patterns[data]);
 }
@@ -135,8 +136,8 @@ WRITE8_MEMBER( flicker_state::port01_w )
 // The output lines operate the various lamps (44 of them)
 	offset = m_maincpu->state_int(I4004_RAM) & 0x0f; // we need the full address
 
-	UINT16 test_port = m_testport->read() & 0xf81e;
-	UINT16 coin_port = m_coinport->read() & 0x07e0;
+	uint16_t test_port = m_testport->read() & 0xf81e;
+	uint16_t coin_port = m_coinport->read() & 0x07e0;
 
 	if (BIT(m_coinport->read(), 0) )
 		test_port |= coin_port;
@@ -206,7 +207,7 @@ sound to produce. We need to change this to just one pulse per actual sound. */
 }
 
 
-static MACHINE_CONFIG_START( flicker, flicker_state )
+static MACHINE_CONFIG_START( flicker )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I4004, XTAL_5MHz / 8)
 	MCFG_CPU_PROGRAM_MAP(flicker_rom)
@@ -227,5 +228,5 @@ ROM_START(flicker)
 	ROM_LOAD("flicker.rom", 0x0000, 0x0400, CRC(c692e586) SHA1(5cabb28a074d18b589b5b8f700c57e1610071c68))
 ROM_END
 
-//   YEAR    GAME     PARENT  MACHINE   INPUT    CLASS           INIT      ORIENTATION   COMPANY                            DESCRIPTION           FLAGS
-GAME(1974,  flicker,  0,      flicker,  flicker, driver_device,  0,        ROT0,        "Dave Nutting Associates / Bally", "Flicker (prototype)", MACHINE_MECHANICAL )
+//   YEAR    GAME     PARENT  MACHINE   INPUT    CLASS           INIT      ORIENTATION  COMPANY                            DESCRIPTION            FLAGS
+GAME(1974,  flicker,  0,      flicker,  flicker, flicker_state,  0,        ROT0,        "Dave Nutting Associates / Bally", "Flicker (prototype)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )

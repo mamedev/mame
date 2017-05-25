@@ -13,8 +13,11 @@
 
 #include "emu.h"
 #include "machine/pc9801_26.h"
+
 #include "machine/pic8259.h"
 #include "sound/2203intf.h"
+#include "speaker.h"
+
 
 #define MAIN_CLOCK_X1 XTAL_1_9968MHz
 
@@ -23,7 +26,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type PC9801_26 = &device_creator<pc9801_26_device>;
+DEFINE_DEVICE_TYPE(PC9801_26, pc9801_26_device, "pc9801_26", "pc9801_26")
 
 
 
@@ -43,7 +46,7 @@ WRITE_LINE_MEMBER(pc9801_26_device::pc9801_sound_irq)
 	machine().device<pic8259_device>(":pic8259_slave")->ir4_w(state);
 }
 
-static MACHINE_CONFIG_FRAGMENT( pc9801_26_config )
+static MACHINE_CONFIG_START( pc9801_26_config )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("opn", YM2203, MAIN_CLOCK_X1*2) // unknown clock / divider
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(pc9801_26_device, pc9801_sound_irq))
@@ -109,8 +112,8 @@ ioport_constructor pc9801_26_device::device_input_ports() const
 //  pc9801_26_device - constructor
 //-------------------------------------------------
 
-pc9801_26_device::pc9801_26_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, PC9801_26, "pc9801_26", tag, owner, clock, "pc9801_26", __FILE__),
+pc9801_26_device::pc9801_26_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, PC9801_26, tag, owner, clock),
 //      m_maincpu(*this, "^maincpu"),
 		m_opn(*this, "opn")
 {
@@ -161,7 +164,7 @@ void pc9801_26_device::device_start()
 
 void pc9801_26_device::device_reset()
 {
-	UINT16 port_base = (ioport("OPN_DSW")->read() & 1) << 8;
+	uint16_t port_base = (ioport("OPN_DSW")->read() & 1) << 8;
 	install_device(port_base + 0x0088, port_base + 0x008b, read8_delegate(FUNC(pc9801_26_device::pc9801_26_r), this), write8_delegate(FUNC(pc9801_26_device::pc9801_26_w), this) );
 }
 

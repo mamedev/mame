@@ -21,6 +21,8 @@ PAL16R6A 11H
 */
 
 #include "emu.h"
+#include "includes/dietgo.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/h6280/h6280.h"
 #include "sound/ym2151.h"
@@ -28,15 +30,16 @@ PAL16R6A 11H
 #include "machine/decocrpt.h"
 #include "machine/deco102.h"
 #include "machine/gen_latch.h"
-#include "includes/dietgo.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 READ16_MEMBER( dietgo_state::dietgo_protection_region_0_104_r )
 {
 	int real_address = 0 + (offset *2);
 	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
-	UINT8 cs = 0;
-	UINT16 data = m_deco104->read_data( deco146_addr, mem_mask, cs );
+	uint8_t cs = 0;
+	uint16_t data = m_deco104->read_data( deco146_addr, mem_mask, cs );
 	return data;
 }
 
@@ -44,7 +47,7 @@ WRITE16_MEMBER( dietgo_state::dietgo_protection_region_0_104_w )
 {
 	int real_address = 0 + (offset *2);
 	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
-	UINT8 cs = 0;
+	uint8_t cs = 0;
 	m_deco104->write_data( space, deco146_addr, data, mem_mask, cs );
 }
 
@@ -206,7 +209,7 @@ void dietgo_state::machine_start()
 {
 }
 
-static MACHINE_CONFIG_START( dietgo, dietgo_state )
+static MACHINE_CONFIG_START( dietgo )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_28MHz/2) /* DE102 (verified on pcb) */
@@ -265,7 +268,7 @@ static MACHINE_CONFIG_START( dietgo, dietgo_state )
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1)) /* IRQ 2 */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_32_22MHz/32, OKIM6295_PIN7_HIGH) /* verified on pcb */
+	MCFG_OKIM6295_ADD("oki", XTAL_32_22MHz/32, PIN7_HIGH) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
@@ -372,7 +375,7 @@ ROM_END
 DRIVER_INIT_MEMBER(dietgo_state,dietgo)
 {
 	deco56_decrypt_gfx(machine(), "gfx1");
-	deco102_decrypt_cpu((UINT16 *)memregion("maincpu")->base(), m_decrypted_opcodes, 0x80000, 0xe9ba, 0x01, 0x19);
+	deco102_decrypt_cpu((uint16_t *)memregion("maincpu")->base(), m_decrypted_opcodes, 0x80000, 0xe9ba, 0x01, 0x19);
 }
 
 GAME( 1992, dietgo,   0,      dietgo, dietgo, dietgo_state,  dietgo,    ROT0, "Data East Corporation", "Diet Go Go (Euro v1.1 1992.09.26)", MACHINE_SUPPORTS_SAVE )

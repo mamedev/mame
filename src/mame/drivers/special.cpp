@@ -9,15 +9,20 @@
 
 ****************************************************************************/
 
-
+#include "emu.h"
 #include "includes/special.h"
+
+#include "sound/volt_reg.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 
 /* Address maps */
 static ADDRESS_MAP_START(specialist_mem, AS_PROGRAM, 8, special_state )
 	AM_RANGE( 0x0000, 0x2fff ) AM_RAMBANK("bank1") // First bank
 	AM_RANGE( 0x3000, 0x8fff ) AM_RAM  // RAM
-	AM_RANGE( 0x9000, 0xbfff ) AM_RAM  AM_SHARE("p_videoram") // Video RAM
+	AM_RANGE( 0x9000, 0xbfff ) AM_RAM  AM_SHARE("videoram") // Video RAM
 	AM_RANGE( 0xc000, 0xefff ) AM_ROM  // System ROM
 	AM_RANGE( 0xf800, 0xf803 ) AM_MIRROR(0x7fc) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 ADDRESS_MAP_END
@@ -25,7 +30,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(specialp_mem, AS_PROGRAM, 8, special_state )
 	AM_RANGE( 0x0000, 0x2fff ) AM_RAMBANK("bank1") // First bank
 	AM_RANGE( 0x3000, 0x7fff ) AM_RAM  // RAM
-	AM_RANGE( 0x8000, 0xbfff ) AM_RAM  AM_SHARE("p_videoram") // Video RAM
+	AM_RANGE( 0x8000, 0xbfff ) AM_RAM  AM_SHARE("videoram") // Video RAM
 	AM_RANGE( 0xc000, 0xefff ) AM_ROM  // System ROM
 	AM_RANGE( 0xf800, 0xf803 ) AM_MIRROR(0x7fc) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 ADDRESS_MAP_END
@@ -44,7 +49,7 @@ static ADDRESS_MAP_START( erik_io_map, AS_IO, 8, special_state )
 	AM_RANGE(0xf1, 0xf1) AM_READWRITE(erik_rr_reg_r, erik_rr_reg_w)
 	AM_RANGE(0xf2, 0xf2) AM_READWRITE(erik_rc_reg_r, erik_rc_reg_w)
 	AM_RANGE(0xf3, 0xf3) AM_READWRITE(erik_disk_reg_r, erik_disk_reg_w)
-	AM_RANGE(0xf4, 0xf7) AM_DEVREADWRITE("fd1793", fd1793_t, read, write)
+	AM_RANGE(0xf4, 0xf7) AM_DEVREADWRITE("fd1793", fd1793_device, read, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(specimx_mem, AS_PROGRAM, 8, special_state )
@@ -55,7 +60,7 @@ static ADDRESS_MAP_START(specimx_mem, AS_PROGRAM, 8, special_state )
 	AM_RANGE( 0xffc0, 0xffdf ) AM_RAMBANK("bank4")
 	AM_RANGE( 0xffe0, 0xffe3 ) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 	AM_RANGE( 0xffe4, 0xffe7 ) AM_RAM //external 8255
-	AM_RANGE( 0xffe8, 0xffeb ) AM_DEVREADWRITE("fd1793", fd1793_t, read, write)
+	AM_RANGE( 0xffe8, 0xffeb ) AM_DEVREADWRITE("fd1793", fd1793_device, read, write)
 	AM_RANGE( 0xffec, 0xffef ) AM_DEVREADWRITE("pit8253", pit8253_device, read, write)
 	AM_RANGE( 0xfff0, 0xfff3 ) AM_READWRITE(specimx_disk_ctrl_r, specimx_disk_ctrl_w)
 	AM_RANGE( 0xfff8, 0xfffb ) AM_READWRITE(specimx_video_color_r,specimx_video_color_w)
@@ -353,7 +358,7 @@ static SLOT_INTERFACE_START( specimx_floppies )
 SLOT_INTERFACE_END
 
 /* Machine driver */
-static MACHINE_CONFIG_START( special, special_state )
+static MACHINE_CONFIG_START( special )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, 2000000)
 	MCFG_CPU_PROGRAM_MAP(specialist_mem)
@@ -372,11 +377,13 @@ static MACHINE_CONFIG_START( special, special_state )
 	MCFG_PALETTE_ADD("palette", 2)
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.0625)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
 	/* Devices */
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
@@ -436,7 +443,7 @@ static MACHINE_CONFIG_DERIVED( specimx, special )
 
 	/* audio hardware */
 	MCFG_SOUND_ADD("custom", SPECIMX_SND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	/* Devices */
 	MCFG_DEVICE_ADD( "pit8253", PIT8253, 0)
@@ -468,7 +475,7 @@ static MACHINE_CONFIG_DERIVED( specimx, special )
 	MCFG_RAM_DEFAULT_VALUE(0x00)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( erik, special_state )
+static MACHINE_CONFIG_START( erik )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(erik_mem)
@@ -489,11 +496,13 @@ static MACHINE_CONFIG_START( erik, special_state )
 	MCFG_PALETTE_INIT_OWNER(special_state,erik)
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.0625)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
 	/* Devices */
 	MCFG_CASSETTE_ADD( "cassette" )
@@ -589,11 +598,11 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME        PARENT    COMPAT   MACHINE    INPUT     CLASS              INIT        COMPANY      FULLNAME       FLAGS */
-COMP( 1985, special,    0,        0,       special,   special,  special_state,    special,   "<unknown>", "Specialist", 0 )
-COMP( 1985, specialm,   special,  0,       specialm,  special,  special_state,    special,   "<unknown>", "Specialist M", 0 )
-COMP( 1985, pioner,     special,  0,       special,   special,  special_state,    special,   "<unknown>", "Pioner", MACHINE_NOT_WORKING )
+//    YEAR  NAME        PARENT    COMPAT   MACHINE    INPUT     CLASS             INIT       COMPANY      FULLNAME                    FLAGS
+COMP( 1985, special,    0,        0,       special,   special,  special_state,    special,   "<unknown>", "Specialist",               0 )
+COMP( 1985, specialm,   special,  0,       specialm,  special,  special_state,    special,   "<unknown>", "Specialist M",             0 )
+COMP( 1985, pioner,     special,  0,       special,   special,  special_state,    special,   "<unknown>", "Pioner",                   MACHINE_NOT_WORKING )
 COMP( 1985, specialp,   special,  0,       specialp,  specialp, special_state,    special,   "<unknown>", "Specialist + hires graph", MACHINE_NOT_WORKING )
-COMP( 1985, lik,        special,  0,       special,   lik,      special_state,    special,   "<unknown>", "Lik", 0 )
-COMP( 1985, specimx,    special,  0,       specimx,   specimx,  driver_device,    0,         "<unknown>", "Specialist MX", 0)
-COMP( 1994, erik,       special,  0,       erik,      special,  special_state,    erik,      "<unknown>", "Erik", 0 )
+COMP( 1985, lik,        special,  0,       special,   lik,      special_state,    special,   "<unknown>", "Lik",                      0 )
+COMP( 1985, specimx,    special,  0,       specimx,   specimx,  special_state,    0,         "<unknown>", "Specialist MX",            0 )
+COMP( 1994, erik,       special,  0,       erik,      special,  special_state,    erik,      "<unknown>", "Erik",                     0 )

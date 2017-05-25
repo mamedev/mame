@@ -55,14 +55,14 @@ private:
 	void yuv_lookup_set(unsigned int pen, unsigned char red,
 				unsigned char green, unsigned char blue);
 
-	INT32               m_blittimer;
+	int32_t               m_blittimer;
 
 	SDL_Renderer        *m_sdl_renderer;
 	SDL_Texture         *m_texture_id;
 
 	// YUV overlay
-	UINT32              *m_yuv_lookup;
-	UINT16              *m_yuv_bitmap;
+	uint32_t              *m_yuv_lookup;
+	uint16_t              *m_yuv_bitmap;
 
 	// if we leave scaling to SDL and the underlying driver, this
 	// is the render_target_width/height to use
@@ -82,7 +82,7 @@ struct sdl_scale_mode
 	int             mult_h;             /* Height multiplier     */
 	const char      *sdl_scale_mode_hint;        /* what to use as a hint ? */
 	int             pixel_format;       /* Pixel/Overlay format  */
-	void            (*yuv_blit)(const UINT16 *bitmap, UINT8 *ptr, const int pitch, const UINT32 *lookup, const int width, const int height);
+	void            (*yuv_blit)(const uint16_t *bitmap, uint8_t *ptr, const int pitch, const uint32_t *lookup, const int width, const int height);
 };
 
 #endif // __DRAWSDL1__

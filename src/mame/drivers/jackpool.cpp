@@ -19,8 +19,10 @@ TODO:
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "sound/okim6295.h"
 #include "machine/eepromser.h"
+#include "sound/okim6295.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class jackpool_state : public driver_device
@@ -35,15 +37,15 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
 
-	required_shared_ptr<UINT16> m_vram;
-	UINT8 m_map_vreg;
-	required_shared_ptr<UINT16> m_io;
+	required_shared_ptr<uint16_t> m_vram;
+	uint8_t m_map_vreg;
+	required_shared_ptr<uint16_t> m_io;
 	DECLARE_READ16_MEMBER(jackpool_ff_r);
 	DECLARE_READ16_MEMBER(jackpool_io_r);
 	DECLARE_WRITE16_MEMBER(jackpool_io_w);
 	DECLARE_DRIVER_INIT(jackpool);
 	virtual void video_start() override;
-	UINT32 screen_update_jackpool(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_jackpool(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(jackpool_interrupt);
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
@@ -56,7 +58,7 @@ void jackpool_state::video_start()
 {
 }
 
-UINT32 jackpool_state::screen_update_jackpool(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t jackpool_state::screen_update_jackpool(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(0);
 	int count;// = 0x00000/2;
@@ -265,7 +267,7 @@ INTERRUPT_GEN_MEMBER(jackpool_state::jackpool_interrupt)
 }
 
 
-static MACHINE_CONFIG_START( jackpool, jackpool_state )
+static MACHINE_CONFIG_START( jackpool )
 	MCFG_CPU_ADD("maincpu", M68000, 12000000) // ?
 	MCFG_CPU_PROGRAM_MAP(jackpool_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", jackpool_state, jackpool_interrupt)  // ?
@@ -287,7 +289,7 @@ static MACHINE_CONFIG_START( jackpool, jackpool_state )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -309,7 +311,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(jackpool_state,jackpool)
 {
-	UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
 	/* patch NVRAM routine */
 	rom[0x9040/2] = 0x6602;

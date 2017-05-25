@@ -190,6 +190,17 @@ ToDo:
 
 ****************************************************************************/
 
+#include "emu.h"
+#include "cpu/m68000/m68000.h"
+#include "machine/clock.h"
+#include "machine/mc68681.h"
+#include "machine/nvram.h"
+#include "sound/spkrdev.h"
+#include "bus/centronics/ctronics.h"
+#include "screen.h"
+#include "speaker.h"
+
+
 // Defines
 
 #undef DEBUG_GA2OPR_W
@@ -220,15 +231,6 @@ ToDo:
 #define DEBUG_SWYFT_VIA0 1
 #define DEBUG_SWYFT_VIA1 1
 
-
-// Includes
-#include "emu.h"
-#include "cpu/m68000/m68000.h"
-#include "machine/clock.h"
-#include "machine/mc68681.h"
-#include "machine/nvram.h"
-#include "sound/speaker.h"
-#include "bus/centronics/ctronics.h"
 
 class cat_state : public driver_device
 {
@@ -266,8 +268,8 @@ public:
 	required_device<centronics_device> m_ctx;
 	required_device<output_latch_device> m_ctx_data_out;
 	required_device<speaker_sound_device> m_speaker;
-	required_shared_ptr<UINT16> m_svram;
-	required_shared_ptr<UINT16> m_p_cat_videoram;
+	required_shared_ptr<uint16_t> m_svram;
+	required_shared_ptr<uint16_t> m_p_cat_videoram;
 	required_ioport m_y0;
 	required_ioport m_y1;
 	required_ioport m_y2;
@@ -285,7 +287,7 @@ public:
 	DECLARE_VIDEO_START(cat);
 	DECLARE_DRIVER_INIT(cat);
 
-	UINT32 screen_update_cat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_cat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE_LINE_MEMBER(cat_duart_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(cat_duart_txa);
@@ -324,14 +326,14 @@ public:
 	   The watchdog counter and the 6ms counter are both incremented
 	   every time the KTOBF pulses.
 	 */
-	UINT16 m_6ms_counter;
-	UINT8 m_wdt_counter;
-	UINT8 m_duart_ktobf_ff;
+	uint16_t m_6ms_counter;
+	uint8_t m_wdt_counter;
+	uint8_t m_duart_ktobf_ff;
 	/* the /ACK line from the centronics printer port goes through a similar
 	   flipflop to the ktobf line as well, so duart IP4 inverts on /ACK rising edge
 	 */
-	UINT8 m_duart_prn_ack_prev_state;
-	UINT8 m_duart_prn_ack_ff;
+	uint8_t m_duart_prn_ack_prev_state;
+	uint8_t m_duart_prn_ack_ff;
 	/* Gate array 2 is in charge of serializing the video for display to the screen;
 	   Gate array 1 is in charge of vblank/hblank timing, and in charge of refreshing
 	   dram and indicating to GA2, using the /LDPS signal, what times the address it is
@@ -340,11 +342,11 @@ public:
 	   GA2 then takes: ((output_bit XNOR video_invert) AND video enable), and serially
 	   bangs the result to the analog display circuitry.
 	 */
-	UINT8 m_video_enable;
-	UINT8 m_video_invert;
-	UINT16 m_pr_cont;
-	UINT8 m_keyboard_line;
-	UINT8 m_floppy_control;
+	uint8_t m_video_enable;
+	uint8_t m_video_invert;
+	uint16_t m_pr_cont;
+	uint8_t m_keyboard_line;
+	uint8_t m_floppy_control;
 
 	//TIMER_CALLBACK_MEMBER(keyboard_callback);
 	TIMER_CALLBACK_MEMBER(counter_6ms_callback);
@@ -358,7 +360,7 @@ protected:
 /*
 DRIVER_INIT_MEMBER( cat_state,cat )
 {
-    UINT8 *svrom = memregion("svrom")->base();
+    uint8_t *svrom = memregion("svrom")->base();
     int i;
     // fill svrom with the correct 2e80 pattern except where svrom1 sits
     // first half
@@ -429,7 +431,10 @@ WRITE16_MEMBER( cat_state::cat_video_control_w )
 	 *     Suffice to say, whatever bit combination 0b00011100000x does, it enables both horiz and vert sync and both are positive
 	 */
 #ifdef DEBUG_VIDEO_CONTROL_W
-	static const char *const regDest[16] = { "VSE (End of frame)", "VST (End of VSync)", "VSS (Start of VSync)", "VDE (Active Lines)", "unknown 620xxx", "unknown 628xxx", "unknown 630xxx", "unknown 638xxx", "HSE (end of horizontal line)", "HST (end of HSync)", "HSS (HSync Start)", "VOC (Video Control)", "unknown 660xxx", "unknown 668xxx", "unknown 670xxx", "unknown 678xxx" };
+	static const char *const regDest[16] = { "VSE (End of frame)", "VST (End of VSync)", "VSS (Start of VSync)", "VDE (Active Lines)",
+	"unknown 620xxx", "unknown 628xxx", "unknown 630xxx", "unknown 638xxx",
+	"HSE (end of horizontal line)", "HST (end of HSync)", "HSS (HSync Start)", "VOC (Video Control)",
+	"unknown 660xxx", "unknown 668xxx", "unknown 670xxx", "unknown 678xxx" };
 	fprintf(stderr,"Write to video chip address %06X; %02X -> register %s with data %04X\n", 0x600000+(offset<<1), offset&0xFF, regDest[(offset&0x3C000)>>14], data);
 #endif
 }
@@ -525,7 +530,7 @@ READ16_MEMBER( cat_state::cat_floppy_status_r )
 // 0x80000a-0x80000b
 READ16_MEMBER( cat_state::cat_keyboard_r )
 {
-	UINT16 retVal = 0;
+	uint16_t retVal = 0;
 	// Read country code
 	if ((m_pr_cont&0xFF00) == 0x0900)
 		retVal = m_dipsw->read();
@@ -713,7 +718,9 @@ a23 a22 a21 a20 a19 a18 a17 a16 a15 a14 a13 a12 a11 a10 a9  a8  a7  a6  a5  a4  
 0   0   1   x   x   0   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   1       R   SVROM 0 ic6 (MASK ROM tc531000) [controlled via GA2 /SVCS0]
 0   0   1   x   x   1   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   0       O   OPEN BUS (reads as 0x2e) [controlled via GA2 /SVCS1] *SEE BELOW*
 0   0   1   x   x   1   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   1       R   SVROM 1 ic8 (not present on cat as sold, open bus reads as 0x80) [controlled via GA2 /SVCS1] *SEE BELOW*
-                                                                                                    *NOTE: on Dwight E's user-made developer unit, two 128K SRAMS are mapped in place of the two entries immediately above!* (this involves some creative wiring+sockets); the official IAI 'shadow ram board' maps the ram to the A00000-A3FFFF area instead)
+                                                                                                    *NOTE: on Dwight E's user-made developer unit, two 128K SRAMS are mapped in place of the
+                                                                                                    two entries immediately above!* (this involves some creative wiring+sockets); the official
+                                                                                                    IAI 'shadow ram board' maps the ram to the A00000-A3FFFF area instead)
 0   1   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *       *BOTH GATE ARRAYS 1 and 2 DECODE THIS AREA; 2 DEALS WITH ADDR AND 1 WITH DATA/CAS/RAS*
 0   1   0   x   x   a   b   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *       RW  VIDEO/SYSTEM DRAM (ab: 00=row 0, ic26-29; 01=row 1, ic22-25; 10=row 2; ic18-21; 11=row 3; ic14-17)
                                                                                                     *NOTE: DRAM rows 2 and 3 above are only usually populated in cat developer units!*
@@ -887,7 +894,7 @@ void cat_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 		counter_6ms_callback(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in cat_state::device_timer");
+		assert_always(false, "Unknown id in cat_state::device_timer");
 	}
 }
 
@@ -932,9 +939,9 @@ VIDEO_START_MEMBER(cat_state,cat)
 {
 }
 
-UINT32 cat_state::screen_update_cat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t cat_state::screen_update_cat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT16 code;
+	uint16_t code;
 	int y, x, b;
 
 	int addr = 0;
@@ -993,8 +1000,17 @@ WRITE_LINE_MEMBER(cat_state::cat_duart_txb) // memit sends stuff here; connects 
 
 /* mc68681 DUART Input pins:
  * IP0: CTS [using the DUART builtin hardware-CTS feature?]
- * IP1: Centronics /ACK (pin 10) positive edge detect (IP1 changes state 0->1 or 1->0 on the rising edge of /ACK using a 74ls74a d-flipflop)
- * IP2: KTOBF (IP2 changes state 0->1 or 1->0 on the rising edge of KTOBF using a 74ls74a d-flipflop; KTOBF is a 6.5536ms-period squarewave generated by one of the gate arrays, I need to check with a scope to see whether it is a single spike/pulse every 6.5536ms or if from the gate array it inverts every 6.5536ms, documentation isn't 100% clear but I suspect the former) [uses the Delta IP2 state change detection feature to generate an interrupt; I'm not sure if IP2 is used as a counter clock source but given the beep frequency of the real unit I very much doubt it, 6.5536ms is too slow]
+ * IP1: Centronics /ACK (pin 10) positive edge detect (IP1 changes state 0->1
+        or 1->0 on the rising edge of /ACK using a 74ls74a d-flipflop)
+ * IP2: KTOBF (IP2 changes state 0->1 or 1->0 on the rising edge of KTOBF
+        using a 74ls74a d-flipflop; KTOBF is a 6.5536ms-period squarewave
+        generated by one of the gate arrays, I need to check with a scope to
+        see whether it is a single spike/pulse every 6.5536ms or if from the
+        gate array it inverts every 6.5536ms, documentation isn't 100% clear
+        but I suspect the former) [uses the Delta IP2 state change detection
+        feature to generate an interrupt; I'm not sure if IP2 is used as a
+        counter clock source but given the beep frequency of the real unit I
+        very much doubt it, 6.5536ms is too slow]
  * IP3: RG ("ring" input)
  * IP4: Centronics BUSY (pin 11), inverted
  * IP5: DSR
@@ -1031,7 +1047,7 @@ WRITE_LINE_MEMBER(cat_state::prn_ack_ff) // switch the flipflop state on the ris
 #endif
 }
 
-static MACHINE_CONFIG_START( cat, cat_state )
+static MACHINE_CONFIG_START( cat )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000, XTAL_19_968MHz/4)
@@ -1155,4 +1171,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME  PARENT  COMPAT   MACHINE    INPUT    DEVICE         INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 1987, cat,  0,  0,       cat,       cat,     driver_device, 0,       "Canon",  "Cat", MACHINE_NOT_WORKING)
+COMP( 1987, cat,  0,      0,       cat,       cat,     cat_state,     0,       "Canon",  "Cat",         MACHINE_NOT_WORKING)

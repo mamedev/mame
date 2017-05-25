@@ -204,10 +204,10 @@ struct _command_entry
 typedef struct _pin_fuse_rows pin_fuse_rows;
 struct _pin_fuse_rows
 {
-	UINT16 pin;                 /* Pin number */
-	UINT16 fuserowoutputenable; /* Fuse row for the output enable */
-	UINT16 fuserowtermstart;    /* Fuse row for the first term */
-	UINT16 fuserowtermend;      /* Fuse row for the last term */
+	uint16_t pin;                 /* Pin number */
+	uint16_t fuserowoutputenable; /* Fuse row for the output enable */
+	uint16_t fuserowtermstart;    /* Fuse row for the first term */
+	uint16_t fuserowtermend;      /* Fuse row for the last term */
 };
 
 
@@ -216,9 +216,9 @@ struct _pin_fuse_rows
 typedef struct _pin_fuse_columns pin_fuse_columns;
 struct _pin_fuse_columns
 {
-	UINT16 pin;            /* Pin number */
-	UINT16 lowfusecolumn;  /* Column number for low output */
-	UINT16 highfusecolumn; /* Column number for high output */
+	uint16_t pin;            /* Pin number */
+	uint16_t lowfusecolumn;  /* Column number for low output */
+	uint16_t highfusecolumn; /* Column number for high output */
 };
 
 
@@ -226,17 +226,17 @@ typedef struct _pal_data pal_data;
 
 typedef void (*print_product_terms_func)(const pal_data* pal, const jed_data* jed);
 typedef void (*config_pins_func)(const pal_data* pal, const jed_data* jed);
-typedef int (*is_product_term_enabled_func)(const pal_data* pal, const jed_data* jed, UINT16 fuserow);
-typedef UINT16 (*get_pin_fuse_state_func)(const pal_data* pal, const jed_data* jed, UINT16 pin, UINT16 fuserow);
+typedef int (*is_product_term_enabled_func)(const pal_data* pal, const jed_data* jed, uint16_t fuserow);
+typedef uint16_t (*get_pin_fuse_state_func)(const pal_data* pal, const jed_data* jed, uint16_t pin, uint16_t fuserow);
 
 struct _pal_data
 {
 	const char *name;
-	UINT32 numfuses;
+	uint32_t numfuses;
 	const pin_fuse_rows *pinfuserows;
-	UINT16 pinfuserowscount;
+	uint16_t pinfuserowscount;
 	const pin_fuse_columns *pinfusecolumns;
-	UINT16 pinfusecolumnscount;
+	uint16_t pinfusecolumnscount;
 	print_product_terms_func print_product_terms;
 	config_pins_func config_pins;
 	is_product_term_enabled_func is_product_term_enabled;
@@ -249,8 +249,8 @@ struct _pal_data
 typedef struct _pin_output_config pin_output_config;
 struct _pin_output_config
 {
-	UINT16 pin;
-	UINT16 flags;
+	uint16_t pin;
+	uint16_t flags;
 };
 
 
@@ -380,11 +380,11 @@ static void config_pal20l2_pins(const pal_data* pal, const jed_data* jed);
 
 
 
-static int is_gal16v8_product_term_enabled(const pal_data* pal, const jed_data* jed, UINT16 fuserow);
+static int is_gal16v8_product_term_enabled(const pal_data* pal, const jed_data* jed, uint16_t fuserow);
 
 
 
-static UINT16 get_peel18cv8_pin_fuse_state(const pal_data* pal, const jed_data* jed, UINT16 pin, UINT16 fuserow);
+static uint16_t get_peel18cv8_pin_fuse_state(const pal_data* pal, const jed_data* jed, uint16_t pin, uint16_t fuserow);
 
 
 
@@ -392,17 +392,17 @@ static UINT16 get_peel18cv8_pin_fuse_state(const pal_data* pal, const jed_data* 
     GLOBAL VARIABLES
 ***************************************************************************/
 
-static UINT8 *srcbuf;
+static uint8_t *srcbuf;
 static size_t srcbuflen;
 
-static UINT8 *dstbuf;
+static uint8_t *dstbuf;
 static size_t dstbuflen;
 
-static UINT16 inputpins[26];
-static UINT16 inputpinscount;
+static uint16_t inputpins[26];
+static uint16_t inputpinscount;
 
 static pin_output_config outputpins[26];
-static UINT16 outputpinscount;
+static uint16_t outputpinscount;
 
 static pin_fuse_rows pal10l8pinfuserows[] = {
 	{12, NO_OUTPUT_ENABLE_FUSE_ROW, 280, 300},
@@ -2330,9 +2330,9 @@ static int is_jed_file(const char *file)
 	len = strlen(file);
 
 	return (file[len - 4] == '.' &&
-			tolower((UINT8)file[len - 3]) == 'j' &&
-			tolower((UINT8)file[len - 2]) == 'e' &&
-			tolower((UINT8)file[len - 1]) == 'd');
+			tolower((uint8_t)file[len - 3]) == 'j' &&
+			tolower((uint8_t)file[len - 2]) == 'e' &&
+			tolower((uint8_t)file[len - 1]) == 'd');
 }
 
 
@@ -2350,9 +2350,9 @@ static int is_pla_file(const char *file)
 	len = strlen(file);
 
 	return (file[len - 4] == '.' &&
-			tolower((UINT8)file[len - 3]) == 'p' &&
-			tolower((UINT8)file[len - 2]) == 'l' &&
-			tolower((UINT8)file[len - 1]) == 'a');
+			tolower((uint8_t)file[len - 3]) == 'p' &&
+			tolower((uint8_t)file[len - 2]) == 'l' &&
+			tolower((uint8_t)file[len - 1]) == 'a');
 }
 
 
@@ -2384,9 +2384,9 @@ static const pal_data* find_pal_data(const char *name)
     an output pin.
 -------------------------------------------------*/
 
-static const pin_fuse_rows* find_fuse_rows(const pal_data* pal, UINT16 pin)
+static const pin_fuse_rows* find_fuse_rows(const pal_data* pal, uint16_t pin)
 {
-	UINT16 index;
+	uint16_t index;
 
 	for (index = 0; index < pal->pinfuserowscount; ++index)
 	{
@@ -2406,9 +2406,9 @@ static const pin_fuse_rows* find_fuse_rows(const pal_data* pal, UINT16 pin)
     data for an input pin.
 -------------------------------------------------*/
 
-static const pin_fuse_columns* find_fuse_columns(const pal_data* pal, UINT16 pin)
+static const pin_fuse_columns* find_fuse_columns(const pal_data* pal, uint16_t pin)
 {
-	UINT16 index;
+	uint16_t index;
 
 	for (index = 0; index < pal->pinfusecolumnscount; ++index)
 	{
@@ -2428,7 +2428,7 @@ static const pin_fuse_columns* find_fuse_columns(const pal_data* pal, UINT16 pin
     associated with a fuse row
 -------------------------------------------------*/
 
-static UINT16 find_pin_from_fuse_row(const pal_data* pal, UINT16 fuserow)
+static uint16_t find_pin_from_fuse_row(const pal_data* pal, uint16_t fuserow)
 {
 	int index;
 
@@ -2459,7 +2459,7 @@ static UINT16 find_pin_from_fuse_row(const pal_data* pal, UINT16 fuserow)
     columns of a pal
 -------------------------------------------------*/
 
-static UINT16 calc_fuse_column_count(const pal_data* pal)
+static uint16_t calc_fuse_column_count(const pal_data* pal)
 {
 	return pal->pinfusecolumnscount * 2;
 }
@@ -2471,10 +2471,10 @@ static UINT16 calc_fuse_column_count(const pal_data* pal)
     is all blown
 -------------------------------------------------*/
 
-static int all_fuses_in_row_blown(const pal_data* pal, const jed_data* jed, UINT16 fuserow)
+static int all_fuses_in_row_blown(const pal_data* pal, const jed_data* jed, uint16_t fuserow)
 {
-	UINT16 columncount = calc_fuse_column_count(pal);
-	UINT16 column;
+	uint16_t columncount = calc_fuse_column_count(pal);
+	uint16_t column;
 
 	for (column = 0; column < columncount; ++column)
 	{
@@ -2495,10 +2495,10 @@ static int all_fuses_in_row_blown(const pal_data* pal, const jed_data* jed, UINT
     term that enables the output.
 -------------------------------------------------*/
 
-static int does_output_enable_fuse_row_allow_output(const pal_data* pal, const jed_data* jed, UINT16 fuserow)
+static int does_output_enable_fuse_row_allow_output(const pal_data* pal, const jed_data* jed, uint16_t fuserow)
 {
 	int lowfusestate, highfusestate;
-	UINT16 index;
+	uint16_t index;
 
 	for (index = 0; index < pal->pinfusecolumnscount; ++index)
 	{
@@ -2521,9 +2521,9 @@ static int does_output_enable_fuse_row_allow_output(const pal_data* pal, const j
     used by a product term
 -------------------------------------------------*/
 
-static void set_input_pins(const UINT16* pins, UINT16 pin_count)
+static void set_input_pins(const uint16_t* pins, uint16_t pin_count)
 {
-	UINT16 index;
+	uint16_t index;
 
 	for (index = 0; index < pin_count; ++index)
 	{
@@ -2539,9 +2539,9 @@ static void set_input_pins(const UINT16* pins, UINT16 pin_count)
     set_output_pins - saves the output pins
 -------------------------------------------------*/
 
-static void set_output_pins(const pin_output_config* pin_output_configs, UINT16 pin_count)
+static void set_output_pins(const pin_output_config* pin_output_configs, uint16_t pin_count)
 {
-	UINT16 index;
+	uint16_t index;
 
 	for (index = 0; index < pin_count; ++index)
 	{
@@ -2559,9 +2559,9 @@ static void set_output_pins(const pin_output_config* pin_output_configs, UINT16 
     output pin
 -------------------------------------------------*/
 
-static int is_output_pin(UINT16 pin)
+static int is_output_pin(uint16_t pin)
 {
-	UINT16 index;
+	uint16_t index;
 
 	for (index = 0; index < outputpinscount; ++index)
 	{
@@ -2581,9 +2581,9 @@ static int is_output_pin(UINT16 pin)
     of an output pin
 -------------------------------------------------*/
 
-static UINT16 get_pin_output_flags(UINT16 pin)
+static uint16_t get_pin_output_flags(uint16_t pin)
 {
-	UINT16 index;
+	uint16_t index;
 
 	for (index = 0; index < outputpinscount; ++index)
 	{
@@ -2603,7 +2603,7 @@ static UINT16 get_pin_output_flags(UINT16 pin)
     an input pin
 -------------------------------------------------*/
 
-static UINT16 get_pin_fuse_state(const pal_data* pal, const jed_data* jed, UINT16 pin, UINT16 fuserow)
+static uint16_t get_pin_fuse_state(const pal_data* pal, const jed_data* jed, uint16_t pin, uint16_t fuserow)
 {
 	const pin_fuse_columns* fuse_columns = find_fuse_columns(pal, pin);
 	int lowfusestate, highfusestate;
@@ -2641,9 +2641,9 @@ static UINT16 get_pin_fuse_state(const pal_data* pal, const jed_data* jed, UINT1
     terms for a fuse row
 -------------------------------------------------*/
 
-static void generate_product_terms(const pal_data* pal, const jed_data* jed, UINT16 fuserow, char* buffer)
+static void generate_product_terms(const pal_data* pal, const jed_data* jed, uint16_t fuserow, char* buffer)
 {
-	UINT16 index, pin, fuse_state, haveterm, flags;
+	uint16_t index, pin, fuse_state, haveterm, flags;
 	char tmpbuffer[20];
 
 	*buffer = 0;
@@ -2785,7 +2785,7 @@ static void generate_product_terms(const pal_data* pal, const jed_data* jed, UIN
 
 static void print_input_pins()
 {
-	UINT16 index;
+	uint16_t index;
 
 	printf("Inputs:\n\n");
 
@@ -2810,7 +2810,7 @@ static void print_input_pins()
 
 static void print_output_pins()
 {
-	UINT16 index, flags;
+	uint16_t index, flags;
 
 	printf("Outputs:\n\n");
 
@@ -2882,7 +2882,7 @@ static void print_output_pins()
 
 static void print_product_terms(const pal_data* pal, const jed_data* jed)
 {
-	UINT16 index, columncount, flags, row, haveterms;
+	uint16_t index, columncount, flags, row, haveterms;
 	char buffer[200];
 	int indent, indentindex;
 	const pin_fuse_rows* fuse_rows;
@@ -3013,7 +3013,7 @@ static void print_product_terms(const pal_data* pal, const jed_data* jed)
     product terms and one output enable product term.
 -------------------------------------------------*/
 
-static void config_palce16v8_pin_as_7_product_terms_and_oe_term(UINT16 pin)
+static void config_palce16v8_pin_as_7_product_terms_and_oe_term(uint16_t pin)
 {
 	static pin_fuse_rows pinfuserows[] = {
 		{12, 1792, 1824, 2016},
@@ -3024,7 +3024,7 @@ static void config_palce16v8_pin_as_7_product_terms_and_oe_term(UINT16 pin)
 		{17, 512, 544, 736},
 		{18, 256, 288, 480},
 		{19, 0, 32, 224}};
-	UINT16 index;
+	uint16_t index;
 
 	for (index = 0; index < ARRAY_LENGTH(pinfuserows); ++index)
 	{
@@ -3047,7 +3047,7 @@ static void config_palce16v8_pin_as_7_product_terms_and_oe_term(UINT16 pin)
     product terms and no output enable product term.
 -------------------------------------------------*/
 
-static void config_palce16v8_pin_as_8_product_terms(UINT16 pin)
+static void config_palce16v8_pin_as_8_product_terms(uint16_t pin)
 {
 	static pin_fuse_rows pinfuserows[] = {
 		{12, NO_OUTPUT_ENABLE_FUSE_ROW, 1792, 2016},
@@ -3058,7 +3058,7 @@ static void config_palce16v8_pin_as_8_product_terms(UINT16 pin)
 		{17, NO_OUTPUT_ENABLE_FUSE_ROW, 512, 736},
 		{18, NO_OUTPUT_ENABLE_FUSE_ROW, 256, 480},
 		{19, NO_OUTPUT_ENABLE_FUSE_ROW, 0, 224}};
-	UINT16 index;
+	uint16_t index;
 
 	for (index = 0; index < ARRAY_LENGTH(pinfuserows); ++index)
 	{
@@ -3082,7 +3082,7 @@ static void config_palce16v8_pin_as_8_product_terms(UINT16 pin)
 
 static void print_pal20xxx_product_terms(const pal_data* pal, const jed_data* jed)
 {
-	UINT16 index, columncount, flags, row, haveterms, tmpindex;
+	uint16_t index, columncount, flags, row, haveterms, tmpindex;
 	char buffer[200];
 	int indent, indentindex, rowhasterms[4];
 	const pin_fuse_rows* fuse_rows;
@@ -3599,7 +3599,7 @@ static void print_pal20x10_product_terms(const pal_data* pal, const jed_data* je
 
 static void print_82s153_pls153_product_terms(const pal_data* pal, const jed_data* jed)
 {
-	UINT16 index, columncount, flags, row, haveterms, or_column, fuserow;
+	uint16_t index, columncount, flags, row, haveterms, or_column, fuserow;
 	char buffer[200];
 	int indent, indentindex;
 	const pin_fuse_rows* fuse_rows;
@@ -3702,7 +3702,7 @@ static void print_82s153_pls153_product_terms(const pal_data* pal, const jed_dat
 
 static void print_ck2605_product_terms(const pal_data* pal, const jed_data* jed)
 {
-	UINT16 index, columncount, flags, row, haveterms, or_column, fuserow;
+	uint16_t index, columncount, flags, row, haveterms, or_column, fuserow;
 	char buffer[200];
 	int indent, indentindex;
 	const pin_fuse_rows* fuse_rows;
@@ -3809,9 +3809,9 @@ static void print_epl10p8_product_terms(const pal_data* pal, const jed_data* jed
 	typedef struct _memory_cell memory_cell;
 	struct _memory_cell
 	{
-		UINT16 pin;
-		UINT16 or_fuse; /* 0 - intact? */
-		UINT16 xor_fuse; /* 0 - intact? */
+		uint16_t pin;
+		uint16_t or_fuse; /* 0 - intact? */
+		uint16_t xor_fuse; /* 0 - intact? */
 	};
 
 	static memory_cell memory_cells[] = {
@@ -3823,7 +3823,7 @@ static void print_epl10p8_product_terms(const pal_data* pal, const jed_data* jed
 		{17, 646, 647},
 		{18, 643, 644},
 		{19, 640, 641}};
-	UINT16 index, columncount, flags, haveterms, fuserow;
+	uint16_t index, columncount, flags, haveterms, fuserow;
 	char buffer[200];
 	int indent, row, indentindex;
 	const pin_fuse_rows* fuse_rows;
@@ -4285,7 +4285,7 @@ static void print_pal20l2_product_terms(const pal_data* pal, const jed_data* jed
 
 static void config_pal10l8_pins(const pal_data* pal, const jed_data* jed)
 {
-	static UINT16 input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11};
+	static uint16_t input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11};
 	static pin_output_config output_pins[] = {
 		{12, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
 		{13, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
@@ -4309,7 +4309,7 @@ static void config_pal10l8_pins(const pal_data* pal, const jed_data* jed)
 
 static void config_pal10h8_pins(const pal_data* pal, const jed_data* jed)
 {
-	static UINT16 input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11};
+	static uint16_t input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11};
 	static pin_output_config output_pins[] = {
 		{12, OUTPUT_ACTIVEHIGH | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
 		{13, OUTPUT_ACTIVEHIGH | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
@@ -4333,7 +4333,7 @@ static void config_pal10h8_pins(const pal_data* pal, const jed_data* jed)
 
 static void config_pal12l6_pins(const pal_data* pal, const jed_data* jed)
 {
-	static UINT16 input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 19};
+	static uint16_t input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 19};
 	static pin_output_config output_pins[] = {
 		{13, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
 		{14, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
@@ -4355,7 +4355,7 @@ static void config_pal12l6_pins(const pal_data* pal, const jed_data* jed)
 
 static void config_pal12h6_pins(const pal_data* pal, const jed_data* jed)
 {
-	static UINT16 input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 19};
+	static uint16_t input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 19};
 	static pin_output_config output_pins[] = {
 		{13, OUTPUT_ACTIVEHIGH | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
 		{14, OUTPUT_ACTIVEHIGH | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
@@ -4377,7 +4377,7 @@ static void config_pal12h6_pins(const pal_data* pal, const jed_data* jed)
 
 static void config_pal14l4_pins(const pal_data* pal, const jed_data* jed)
 {
-	static UINT16 input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 18, 19};
+	static uint16_t input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 18, 19};
 	static pin_output_config output_pins[] = {
 		{14, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
 		{15, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
@@ -4397,7 +4397,7 @@ static void config_pal14l4_pins(const pal_data* pal, const jed_data* jed)
 
 static void config_pal14h4_pins(const pal_data* pal, const jed_data* jed)
 {
-	static UINT16 input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 18, 19};
+	static uint16_t input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 18, 19};
 	static pin_output_config output_pins[] = {
 		{14, OUTPUT_ACTIVEHIGH | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
 		{15, OUTPUT_ACTIVEHIGH | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
@@ -4417,7 +4417,7 @@ static void config_pal14h4_pins(const pal_data* pal, const jed_data* jed)
 
 static void config_pal16l2_pins(const pal_data* pal, const jed_data* jed)
 {
-	static UINT16 input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 17, 18, 19};
+	static uint16_t input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 17, 18, 19};
 	static pin_output_config output_pins[] = {
 		{15, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
 		{16, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE}};
@@ -4435,7 +4435,7 @@ static void config_pal16l2_pins(const pal_data* pal, const jed_data* jed)
 
 static void config_pal16h2_pins(const pal_data* pal, const jed_data* jed)
 {
-	static UINT16 input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 17, 18, 19};
+	static uint16_t input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 17, 18, 19};
 	static pin_output_config output_pins[] = {
 		{15, OUTPUT_ACTIVEHIGH | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
 		{16, OUTPUT_ACTIVEHIGH | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE}};
@@ -4453,7 +4453,7 @@ static void config_pal16h2_pins(const pal_data* pal, const jed_data* jed)
 
 static void config_pal16c1_pins(const pal_data* pal, const jed_data* jed)
 {
-	static UINT16 input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 17, 18, 19};
+	static uint16_t input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 17, 18, 19};
 	static pin_output_config output_pins[] = {
 		{15, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
 		{16, OUTPUT_ACTIVEHIGH | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE}};
@@ -4471,9 +4471,9 @@ static void config_pal16c1_pins(const pal_data* pal, const jed_data* jed)
 
 static void config_pal16l8_pins(const pal_data* pal, const jed_data* jed)
 {
-	static UINT16 input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 13, 14, 15, 16, 17, 18};
+	static uint16_t input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 13, 14, 15, 16, 17, 18};
 	pin_output_config output_pins[8];
-	UINT16 output_pin_count, index;
+	uint16_t output_pin_count, index;
 
 	output_pin_count = 0;
 
@@ -4501,10 +4501,10 @@ static void config_pal16l8_pins(const pal_data* pal, const jed_data* jed)
 
 static void config_pal16r4_pins(const pal_data* pal, const jed_data* jed)
 {
-	static UINT16 input_pins[] = {2, 3, 4, 5, 6, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19};
-	static UINT16 registered_pins[] = {14, 15, 16, 17};
+	static uint16_t input_pins[] = {2, 3, 4, 5, 6, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19};
+	static uint16_t registered_pins[] = {14, 15, 16, 17};
 	pin_output_config output_pins[8];
-	UINT16 output_pin_count, index;
+	uint16_t output_pin_count, index;
 
 	output_pin_count = 0;
 
@@ -4561,10 +4561,10 @@ static void config_pal16r4_pins(const pal_data* pal, const jed_data* jed)
 
 static void config_pal16r6_pins(const pal_data* pal, const jed_data* jed)
 {
-	static UINT16 input_pins[] = {2, 3, 4, 5, 6, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19};
-	static UINT16 registered_pins[] = {13, 14, 15, 16, 17, 18};
+	static uint16_t input_pins[] = {2, 3, 4, 5, 6, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19};
+	static uint16_t registered_pins[] = {13, 14, 15, 16, 17, 18};
 	pin_output_config output_pins[8];
-	UINT16 output_pin_count, index;
+	uint16_t output_pin_count, index;
 
 	output_pin_count = 0;
 
@@ -4605,7 +4605,7 @@ static void config_pal16r6_pins(const pal_data* pal, const jed_data* jed)
 
 static void config_pal16r8_pins(const pal_data* pal, const jed_data* jed)
 {
-	static UINT16 input_pins[] = {2, 3, 4, 5, 6, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19};
+	static uint16_t input_pins[] = {2, 3, 4, 5, 6, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19};
 	static pin_output_config output_pins[] = {
 		{12, OUTPUT_ACTIVELOW | OUTPUT_REGISTERED | OUTPUT_FEEDBACK_REGISTERED},
 		{13, OUTPUT_ACTIVELOW | OUTPUT_REGISTERED | OUTPUT_FEEDBACK_REGISTERED},
@@ -4632,10 +4632,10 @@ static void config_palce16v8_pins(const pal_data* pal, const jed_data* jed)
 	typedef struct _output_logic_macrocell output_logic_macrocell;
 	struct _output_logic_macrocell
 	{
-		UINT16 pin;
-		UINT16 sl0_fuse; /* registers allowed (0 - registered, 1 - not registered) */
-		UINT16 sl1_fuse; /* output polarity (0 - low, 1 - high) */
-		UINT16 fuserowoutputenable;
+		uint16_t pin;
+		uint16_t sl0_fuse; /* registers allowed (0 - registered, 1 - not registered) */
+		uint16_t sl1_fuse; /* output polarity (0 - low, 1 - high) */
+		uint16_t fuserowoutputenable;
 	};
 
 	static output_logic_macrocell macrocells[] = {
@@ -4698,14 +4698,14 @@ static void config_palce16v8_pins(const pal_data* pal, const jed_data* jed)
 		{17, 11, 10},
 		{18, 7, 6},
 		{19, 3, 2}};
-	static UINT16 input_pins_i_or_o[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11};
-	static UINT16 input_pins_io[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11};
-	static UINT16 input_pins_regs[] = {2, 3, 4, 5, 6, 7, 8, 9};
-	static UINT16 sg0 = 2192;
-	static UINT16 sg1 = 2193;
-	UINT16 input_pins[18];
+	static uint16_t input_pins_i_or_o[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11};
+	static uint16_t input_pins_io[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11};
+	static uint16_t input_pins_regs[] = {2, 3, 4, 5, 6, 7, 8, 9};
+	static uint16_t sg0 = 2192;
+	static uint16_t sg1 = 2193;
+	uint16_t input_pins[18];
 	pin_output_config output_pins[ARRAY_LENGTH(macrocells)];
-	UINT16 index, input_pin_count, output_pin_count;
+	uint16_t index, input_pin_count, output_pin_count;
 
 	input_pin_count = 0;
 	output_pin_count = 0;
@@ -4898,9 +4898,9 @@ static void config_gal16v8_pins(const pal_data* pal, const jed_data* jed)
 	typedef struct _output_logic_macrocell output_logic_macrocell;
 	struct _output_logic_macrocell
 	{
-		UINT16 pin;
-		UINT16 xor_fuse;
-		UINT16 ac1_fuse;
+		uint16_t pin;
+		uint16_t xor_fuse;
+		uint16_t ac1_fuse;
 	};
 
 	static output_logic_macrocell macrocells[] = {
@@ -4981,11 +4981,11 @@ static void config_gal16v8_pins(const pal_data* pal, const jed_data* jed)
 		{17, 15, 14},
 		{18, 11, 10},
 		{19, 7,  6}};
-	static UINT16 input_pins_registered[] = {2, 3, 4, 5, 6, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19};
-	static UINT16 input_pins_combinatorialcomplex[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 13, 14, 15, 16, 17, 18};
-	static UINT16 input_pins_combinatorialsimple[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 17, 18, 19};
+	static uint16_t input_pins_registered[] = {2, 3, 4, 5, 6, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19};
+	static uint16_t input_pins_combinatorialcomplex[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 13, 14, 15, 16, 17, 18};
+	static uint16_t input_pins_combinatorialsimple[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 17, 18, 19};
 	pin_output_config output_pins[ARRAY_LENGTH(macrocells)];
-	UINT16 index, output_pin_count;
+	uint16_t index, output_pin_count;
 
 	output_pin_count = 0;
 
@@ -5162,11 +5162,11 @@ static void config_peel18cv8_pins(const pal_data* pal, const jed_data* jed)
 	typedef struct _output_logic_macrocell output_logic_macrocell;
 	struct _output_logic_macrocell
 	{
-		UINT16 pin;
-		UINT16 polarity_fuse; /* 0 = active high or 1 = active low */
-		UINT16 type_fuse; /* 1 = registered or 0 = combinatorial */
-		UINT16 feedback1_fuse;
-		UINT16 feedback2_fuse;
+		uint16_t pin;
+		uint16_t polarity_fuse; /* 0 = active high or 1 = active low */
+		uint16_t type_fuse; /* 1 = registered or 0 = combinatorial */
+		uint16_t feedback1_fuse;
+		uint16_t feedback2_fuse;
 	};
 
 	static output_logic_macrocell macrocells[] = {
@@ -5178,9 +5178,9 @@ static void config_peel18cv8_pins(const pal_data* pal, const jed_data* jed)
 		{17, 2672, 2673, 2674, 2675},
 		{18, 2668, 2669, 2670, 2671},
 		{19, 2664, 2665, 2666, 2667}};
-	static UINT16 input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16, 17, 18, 19};
+	static uint16_t input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16, 17, 18, 19};
 	pin_output_config output_pins[ARRAY_LENGTH(macrocells)];
-	UINT16 index, output_pin_count;
+	uint16_t index, output_pin_count;
 
 	set_input_pins(input_pins, ARRAY_LENGTH(input_pins));
 
@@ -5297,9 +5297,9 @@ static void config_peel18cv8_pins(const pal_data* pal, const jed_data* jed)
 
 static void config_ampal18p8_pins(const pal_data* pal, const jed_data* jed)
 {
-	static UINT16 input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16, 17, 18, 19};
+	static uint16_t input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16, 17, 18, 19};
 	pin_output_config output_pins[8];
-	UINT16 index, output_pin_count;
+	uint16_t index, output_pin_count;
 
 	set_input_pins(input_pins, ARRAY_LENGTH(input_pins));
 
@@ -5340,9 +5340,9 @@ static void config_gal18v10_pins(const pal_data* pal, const jed_data* jed)
 	typedef struct _output_logic_macrocell output_logic_macrocell;
 	struct _output_logic_macrocell
 	{
-		UINT16 pin;
-		UINT16 s0_fuse; /* 0 - active low, 1 - active high */
-		UINT16 s1_fuse; /* 0 - registered, 1 - combinatorial */
+		uint16_t pin;
+		uint16_t s0_fuse; /* 0 - active low, 1 - active high */
+		uint16_t s1_fuse; /* 0 - registered, 1 - combinatorial */
 	};
 
 	static output_logic_macrocell macrocells[] = {
@@ -5356,9 +5356,9 @@ static void config_gal18v10_pins(const pal_data* pal, const jed_data* jed)
 		{17, 3460, 3461},
 		{18, 3458, 3459},
 		{19, 3456, 3457}};
-	static UINT16 input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16, 17, 18, 19};
+	static uint16_t input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16, 17, 18, 19};
 	pin_output_config output_pins[ARRAY_LENGTH(macrocells)];
-	UINT16 index, output_pin_count;
+	uint16_t index, output_pin_count;
 
 	output_pin_count = 0;
 
@@ -5418,9 +5418,9 @@ static void config_gal18v10_pins(const pal_data* pal, const jed_data* jed)
 
 static void config_pal20l8_pins(const pal_data* pal, const jed_data* jed)
 {
-	static UINT16 input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 16, 17, 18, 19, 20, 21, 23};
+	static uint16_t input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 16, 17, 18, 19, 20, 21, 23};
 	pin_output_config output_pins[8];
-	UINT16 output_pin_count, index;
+	uint16_t output_pin_count, index;
 
 	output_pin_count = 0;
 
@@ -5458,9 +5458,9 @@ static void config_pal20l8_pins(const pal_data* pal, const jed_data* jed)
 
 static void config_pal20l10_pins(const pal_data* pal, const jed_data* jed)
 {
-	static UINT16 input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 15, 16, 17, 18, 19, 20, 21, 22};
+	static uint16_t input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 15, 16, 17, 18, 19, 20, 21, 22};
 	pin_output_config output_pins[10];
-	UINT16 output_pin_count, index;
+	uint16_t output_pin_count, index;
 
 	output_pin_count = 0;
 
@@ -5498,10 +5498,10 @@ static void config_pal20l10_pins(const pal_data* pal, const jed_data* jed)
 
 static void config_pal20r4_pins(const pal_data* pal, const jed_data* jed)
 {
-	static UINT16 input_pins[] = {2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23};
-	static UINT16 registered_pins[] = {17, 18, 19, 20};
+	static uint16_t input_pins[] = {2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23};
+	static uint16_t registered_pins[] = {17, 18, 19, 20};
 	pin_output_config output_pins[8];
-	UINT16 output_pin_count, index;
+	uint16_t output_pin_count, index;
 
 	output_pin_count = 0;
 
@@ -5558,10 +5558,10 @@ static void config_pal20r4_pins(const pal_data* pal, const jed_data* jed)
 
 static void config_pal20r6_pins(const pal_data* pal, const jed_data* jed)
 {
-	static UINT16 input_pins[] = {2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23};
-	static UINT16 registered_pins[] = {16, 17, 18, 19, 20, 21};
+	static uint16_t input_pins[] = {2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23};
+	static uint16_t registered_pins[] = {16, 17, 18, 19, 20, 21};
 	pin_output_config output_pins[8];
-	UINT16 output_pin_count, index;
+	uint16_t output_pin_count, index;
 
 	output_pin_count = 0;
 
@@ -5602,7 +5602,7 @@ static void config_pal20r6_pins(const pal_data* pal, const jed_data* jed)
 
 static void config_pal20r8_pins(const pal_data* pal, const jed_data* jed)
 {
-	static UINT16 input_pins[] = {2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23};
+	static uint16_t input_pins[] = {2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23};
 	static pin_output_config output_pins[] = {
 		{15, OUTPUT_ACTIVELOW | OUTPUT_REGISTERED | OUTPUT_FEEDBACK_REGISTERED},
 		{16, OUTPUT_ACTIVELOW | OUTPUT_REGISTERED | OUTPUT_FEEDBACK_REGISTERED},
@@ -5626,7 +5626,7 @@ static void config_pal20r8_pins(const pal_data* pal, const jed_data* jed)
 
 static void config_pal20x4_pins(const pal_data* pal, const jed_data* jed)
 {
-	static UINT16 input_pins[] = {2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23};
+	static uint16_t input_pins[] = {2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23};
 	static pin_output_config output_pins[] = {
 		{14, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_OUTPUT},
 		{15, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_OUTPUT},
@@ -5650,7 +5650,7 @@ static void config_pal20x4_pins(const pal_data* pal, const jed_data* jed)
 
 static void config_pal20x8_pins(const pal_data* pal, const jed_data* jed)
 {
-	static UINT16 input_pins[] = {2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23};
+	static uint16_t input_pins[] = {2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23};
 	static pin_output_config output_pins[] = {
 		{14, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_OUTPUT},
 		{15, OUTPUT_ACTIVELOW | OUTPUT_REGISTERED | OUTPUT_FEEDBACK_REGISTERED},
@@ -5676,7 +5676,7 @@ static void config_pal20x8_pins(const pal_data* pal, const jed_data* jed)
 
 static void config_pal20x10_pins(const pal_data* pal, const jed_data* jed)
 {
-	static UINT16 input_pins[] = {2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23};
+	static uint16_t input_pins[] = {2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23};
 	static pin_output_config output_pins[] = {
 		{14, OUTPUT_ACTIVELOW | OUTPUT_REGISTERED | OUTPUT_FEEDBACK_REGISTERED},
 		{15, OUTPUT_ACTIVELOW | OUTPUT_REGISTERED | OUTPUT_FEEDBACK_REGISTERED},
@@ -5702,9 +5702,9 @@ static void config_pal20x10_pins(const pal_data* pal, const jed_data* jed)
 
 static void config_82s153_pls153_pins(const pal_data* pal, const jed_data* jed)
 {
-	static UINT16 input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16, 17, 18, 19};
+	static uint16_t input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16, 17, 18, 19};
 	pin_output_config output_pins[10];
-	UINT16 output_pin_count, index;
+	uint16_t output_pin_count, index;
 
 	output_pin_count = 0;
 
@@ -5741,9 +5741,9 @@ static void config_82s153_pls153_pins(const pal_data* pal, const jed_data* jed)
 
 static void config_ck2605_pins(const pal_data* pal, const jed_data* jed)
 {
-	static UINT16 input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16, 17, 18, 19};
+	static uint16_t input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16, 17, 18, 19};
 	pin_output_config output_pins[10];
-	UINT16 output_pin_count, index;
+	uint16_t output_pin_count, index;
 
 	output_pin_count = 0;
 
@@ -5784,8 +5784,8 @@ static void config_epl10p8_pins(const pal_data* pal, const jed_data* jed)
 	typedef struct _memory_cell memory_cell;
 	struct _memory_cell
 	{
-		UINT16 pin;
-		UINT16 polarity_fuse; /* 0 - active low?, 1 - active high? */
+		uint16_t pin;
+		uint16_t polarity_fuse; /* 0 - active low?, 1 - active high? */
 	};
 
 	static memory_cell memory_cells[] = {
@@ -5797,9 +5797,9 @@ static void config_epl10p8_pins(const pal_data* pal, const jed_data* jed)
 		{17, 648},
 		{18, 645},
 		{19, 642}};
-	static UINT16 input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11};
+	static uint16_t input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11};
 	pin_output_config output_pins[8];
-	UINT16 index;
+	uint16_t index;
 
 	for (index = 0; index < ARRAY_LENGTH(memory_cells); ++index)
 	{
@@ -5832,10 +5832,10 @@ static void config_epl12p6_pins(const pal_data* pal, const jed_data* jed)
 	typedef struct _memory_cell memory_cell;
 	struct _memory_cell
 	{
-		UINT16 pin;
-		UINT16 polarity_fuse; /* 0 - active low?, 1 - active high? */
-		UINT16 or_fuse; /* 0 - intact? */
-		UINT16 xor_fuse; /* 0 - intact? */
+		uint16_t pin;
+		uint16_t polarity_fuse; /* 0 - active low?, 1 - active high? */
+		uint16_t or_fuse; /* 0 - intact? */
+		uint16_t xor_fuse; /* 0 - intact? */
 	};
 
 	static memory_cell memory_cells[] = {
@@ -5845,9 +5845,9 @@ static void config_epl12p6_pins(const pal_data* pal, const jed_data* jed)
 		{16, 776, 774, 775},
 		{17, 773, 771, 772},
 		{18, 770, 768, 769}};
-	static UINT16 input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 19};
+	static uint16_t input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 19};
 	pin_output_config output_pins[8];
-	UINT16 index;
+	uint16_t index;
 
 	for (index = 0; index < ARRAY_LENGTH(memory_cells); ++index)
 	{
@@ -5880,10 +5880,10 @@ static void config_epl14p4_pins(const pal_data* pal, const jed_data* jed)
 	typedef struct _memory_cell memory_cell;
 	struct _memory_cell
 	{
-		UINT16 pin;
-		UINT16 polarity_fuse; /* 0 - active low?, 1 - active high? */
-		UINT16 or_fuse; /* 0 - intact? */
-		UINT16 xor_fuse; /* 0 - intact? */
+		uint16_t pin;
+		uint16_t polarity_fuse; /* 0 - active low?, 1 - active high? */
+		uint16_t or_fuse; /* 0 - intact? */
+		uint16_t xor_fuse; /* 0 - intact? */
 	};
 
 	static memory_cell memory_cells[] = {
@@ -5891,9 +5891,9 @@ static void config_epl14p4_pins(const pal_data* pal, const jed_data* jed)
 		{15, 904, 902, 903},
 		{16, 901, 899, 900},
 		{17, 898, 896, 897}};
-	static UINT16 input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 18, 19};
+	static uint16_t input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 18, 19};
 	pin_output_config output_pins[8];
-	UINT16 index;
+	uint16_t index;
 
 	for (index = 0; index < ARRAY_LENGTH(memory_cells); ++index)
 	{
@@ -5926,18 +5926,18 @@ static void config_epl16p2_pins(const pal_data* pal, const jed_data* jed)
 	typedef struct _memory_cell memory_cell;
 	struct _memory_cell
 	{
-		UINT16 pin;
-		UINT16 polarity_fuse; /* 0 - active low?, 1 - active high? */
-		UINT16 or_fuse; /* 0 - intact? */
-		UINT16 xor_fuse; /* 0 - intact? */
+		uint16_t pin;
+		uint16_t polarity_fuse; /* 0 - active low?, 1 - active high? */
+		uint16_t or_fuse; /* 0 - intact? */
+		uint16_t xor_fuse; /* 0 - intact? */
 	};
 
 	static memory_cell memory_cells[] = {
 		{15, 1029, 1027, 1028},
 		{16, 1026, 1024, 1025}};
-	static UINT16 input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 17, 18, 19};
+	static uint16_t input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 17, 18, 19};
 	pin_output_config output_pins[8];
-	UINT16 index;
+	uint16_t index;
 
 	for (index = 0; index < ARRAY_LENGTH(memory_cells); ++index)
 	{
@@ -5970,10 +5970,10 @@ static void config_epl16p8_pins(const pal_data* pal, const jed_data* jed)
 	typedef struct _memory_cell memory_cell;
 	struct _memory_cell
 	{
-		UINT16 pin;
-		UINT16 polarity_fuse; /* 0 - active low?, 1 - active high? */
-		UINT16 or_fuse; /* 0 - intact? */
-		UINT16 xor_fuse; /* 0 - intact? */
+		uint16_t pin;
+		uint16_t polarity_fuse; /* 0 - active low?, 1 - active high? */
+		uint16_t or_fuse; /* 0 - intact? */
+		uint16_t xor_fuse; /* 0 - intact? */
 	};
 
 	static memory_cell memory_cells[] = {
@@ -5985,9 +5985,9 @@ static void config_epl16p8_pins(const pal_data* pal, const jed_data* jed)
 		{17, 2056, 2054, 2055},
 		{18, 2053, 2051, 2052},
 		{19, 2050, 2048, 2049}};
-	static UINT16 input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11};
+	static uint16_t input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11};
 	pin_output_config output_pins[8];
-	UINT16 index;
+	uint16_t index;
 
 	for (index = 0; index < ARRAY_LENGTH(memory_cells); ++index)
 	{
@@ -6020,10 +6020,10 @@ static void config_epl16rp8_pins(const pal_data* pal, const jed_data* jed)
 	typedef struct _memory_cell memory_cell;
 	struct _memory_cell
 	{
-		UINT16 pin;
-		UINT16 polarity_fuse; /* 0 - active low?, 1 - active high? */
-		UINT16 or_fuse; /* 0 - intact? */
-		UINT16 xor_fuse; /* 0 - intact? */
+		uint16_t pin;
+		uint16_t polarity_fuse; /* 0 - active low?, 1 - active high? */
+		uint16_t or_fuse; /* 0 - intact? */
+		uint16_t xor_fuse; /* 0 - intact? */
 	};
 
 	static memory_cell memory_cells[] = {
@@ -6035,9 +6035,9 @@ static void config_epl16rp8_pins(const pal_data* pal, const jed_data* jed)
 		{17, 2056, 2054, 2055},
 		{18, 2053, 2051, 2052},
 		{19, 2050, 2048, 2049}};
-	static UINT16 input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11};
+	static uint16_t input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11};
 	pin_output_config output_pins[8];
-	UINT16 index;
+	uint16_t index;
 
 	for (index = 0; index < ARRAY_LENGTH(memory_cells); ++index)
 	{
@@ -6070,10 +6070,10 @@ static void config_epl16rp6_pins(const pal_data* pal, const jed_data* jed)
 	typedef struct _memory_cell memory_cell;
 	struct _memory_cell
 	{
-		UINT16 pin;
-		UINT16 polarity_fuse; /* 0 - active low?, 1 - active high? */
-		UINT16 or_fuse; /* 0 - intact? */
-		UINT16 xor_fuse; /* 0 - intact? */
+		uint16_t pin;
+		uint16_t polarity_fuse; /* 0 - active low?, 1 - active high? */
+		uint16_t or_fuse; /* 0 - intact? */
+		uint16_t xor_fuse; /* 0 - intact? */
 	};
 
 	static memory_cell memory_cells[] = {
@@ -6085,9 +6085,9 @@ static void config_epl16rp6_pins(const pal_data* pal, const jed_data* jed)
 		{17, 2056, 2054, 2055},
 		{18, 2053, 2051, 2052},
 		{19, 2050, 2048, 2049}};
-	static UINT16 input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11};
+	static uint16_t input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11};
 	pin_output_config output_pins[8];
-	UINT16 index;
+	uint16_t index;
 
 	for (index = 0; index < ARRAY_LENGTH(memory_cells); ++index)
 	{
@@ -6130,10 +6130,10 @@ static void config_epl16rp4_pins(const pal_data* pal, const jed_data* jed)
 	typedef struct _memory_cell memory_cell;
 	struct _memory_cell
 	{
-		UINT16 pin;
-		UINT16 polarity_fuse; /* 0 - active low?, 1 - active high? */
-		UINT16 or_fuse; /* 0 - intact? */
-		UINT16 xor_fuse; /* 0 - intact? */
+		uint16_t pin;
+		uint16_t polarity_fuse; /* 0 - active low?, 1 - active high? */
+		uint16_t or_fuse; /* 0 - intact? */
+		uint16_t xor_fuse; /* 0 - intact? */
 	};
 
 	static memory_cell memory_cells[] = {
@@ -6145,9 +6145,9 @@ static void config_epl16rp4_pins(const pal_data* pal, const jed_data* jed)
 		{17, 2056, 2054, 2055},
 		{18, 2053, 2051, 2052},
 		{19, 2050, 2048, 2049}};
-	static UINT16 input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11};
+	static uint16_t input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11};
 	pin_output_config output_pins[8];
-	UINT16 index;
+	uint16_t index;
 
 	for (index = 0; index < ARRAY_LENGTH(memory_cells); ++index)
 	{
@@ -6187,9 +6187,9 @@ static void config_epl16rp4_pins(const pal_data* pal, const jed_data* jed)
 
 static void config_pal10p8_pins(const pal_data* pal, const jed_data* jed)
 {
-	static UINT16 input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11};
+	static uint16_t input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11};
 	pin_output_config output_pins[8];
-	UINT16 index;
+	uint16_t index;
 
 	for (index = 0; index < ARRAY_LENGTH(output_pins); ++index)
 	{
@@ -6219,9 +6219,9 @@ static void config_pal10p8_pins(const pal_data* pal, const jed_data* jed)
 
 static void config_pal12p6_pins(const pal_data* pal, const jed_data* jed)
 {
-	static UINT16 input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 19};
+	static uint16_t input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 19};
 	pin_output_config output_pins[6];
-	UINT16 index;
+	uint16_t index;
 
 	for (index = 0; index < ARRAY_LENGTH(output_pins); ++index)
 	{
@@ -6251,9 +6251,9 @@ static void config_pal12p6_pins(const pal_data* pal, const jed_data* jed)
 
 static void config_pal14p4_pins(const pal_data* pal, const jed_data* jed)
 {
-	static UINT16 input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 18, 19};
+	static uint16_t input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 18, 19};
 	pin_output_config output_pins[4];
-	UINT16 index;
+	uint16_t index;
 
 	for (index = 0; index < ARRAY_LENGTH(output_pins); ++index)
 	{
@@ -6283,9 +6283,9 @@ static void config_pal14p4_pins(const pal_data* pal, const jed_data* jed)
 
 static void config_pal16p2_pins(const pal_data* pal, const jed_data* jed)
 {
-	static UINT16 input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 17, 18, 19};
+	static uint16_t input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 17, 18, 19};
 	pin_output_config output_pins[2];
-	UINT16 index;
+	uint16_t index;
 
 	for (index = 0; index < ARRAY_LENGTH(output_pins); ++index)
 	{
@@ -6315,9 +6315,9 @@ static void config_pal16p2_pins(const pal_data* pal, const jed_data* jed)
 
 static void config_pal16p8_pins(const pal_data* pal, const jed_data* jed)
 {
-	static UINT16 input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 13, 14, 15, 16, 17, 18};
+	static uint16_t input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 13, 14, 15, 16, 17, 18};
 	pin_output_config output_pins[8];
-	UINT16 output_pin_count, index;
+	uint16_t output_pin_count, index;
 
 	output_pin_count = 0;
 
@@ -6354,10 +6354,10 @@ static void config_pal16p8_pins(const pal_data* pal, const jed_data* jed)
 
 static void config_pal16rp4_pins(const pal_data* pal, const jed_data* jed)
 {
-	static UINT16 input_pins[] = {2, 3, 4, 5, 6, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19};
-	static UINT16 registered_pins[] = {14, 15, 16, 17};
+	static uint16_t input_pins[] = {2, 3, 4, 5, 6, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19};
+	static uint16_t registered_pins[] = {14, 15, 16, 17};
 	pin_output_config output_pins[8];
-	UINT16 output_pin_count, index;
+	uint16_t output_pin_count, index;
 
 	output_pin_count = 0;
 
@@ -6459,10 +6459,10 @@ static void config_pal16rp4_pins(const pal_data* pal, const jed_data* jed)
 
 static void config_pal16rp6_pins(const pal_data* pal, const jed_data* jed)
 {
-	static UINT16 input_pins[] = {2, 3, 4, 5, 6, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19};
-	static UINT16 registered_pins[] = {13, 14, 15, 16, 17, 18};
+	static uint16_t input_pins[] = {2, 3, 4, 5, 6, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19};
+	static uint16_t registered_pins[] = {13, 14, 15, 16, 17, 18};
 	pin_output_config output_pins[8];
-	UINT16 output_pin_count, index;
+	uint16_t output_pin_count, index;
 
 	output_pin_count = 0;
 
@@ -6530,7 +6530,7 @@ static void config_pal16rp6_pins(const pal_data* pal, const jed_data* jed)
 
 static void config_pal16rp8_pins(const pal_data* pal, const jed_data* jed)
 {
-	static UINT16 input_pins[] = {2, 3, 4, 5, 6, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19};
+	static uint16_t input_pins[] = {2, 3, 4, 5, 6, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19};
 	pin_output_config output_pins[] = {
 		{12, OUTPUT_REGISTERED | OUTPUT_FEEDBACK_REGISTERED},
 		{13, OUTPUT_REGISTERED | OUTPUT_FEEDBACK_REGISTERED},
@@ -6540,7 +6540,7 @@ static void config_pal16rp8_pins(const pal_data* pal, const jed_data* jed)
 		{17, OUTPUT_REGISTERED | OUTPUT_FEEDBACK_REGISTERED},
 		{18, OUTPUT_REGISTERED | OUTPUT_FEEDBACK_REGISTERED},
 		{19, OUTPUT_REGISTERED | OUTPUT_FEEDBACK_REGISTERED}};
-	UINT16 index;
+	uint16_t index;
 
 	for (index = 0; index < ARRAY_LENGTH(output_pins); ++index)
 	{
@@ -6567,7 +6567,7 @@ static void config_pal16rp8_pins(const pal_data* pal, const jed_data* jed)
 
 static void config_pal6l16_pins(const pal_data* pal, const jed_data* jed)
 {
-	static UINT16 input_pins[] = {4, 5, 6, 7, 8, 9};
+	static uint16_t input_pins[] = {4, 5, 6, 7, 8, 9};
 	static pin_output_config output_pins[] = {
 		{1, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
 		{2, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
@@ -6599,7 +6599,7 @@ static void config_pal6l16_pins(const pal_data* pal, const jed_data* jed)
 
 static void config_pal8l14_pins(const pal_data* pal, const jed_data* jed)
 {
-	static UINT16 input_pins[] = {3, 4, 5, 6, 7, 8, 9, 10};
+	static uint16_t input_pins[] = {3, 4, 5, 6, 7, 8, 9, 10};
 	static pin_output_config output_pins[] = {
 		{1, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
 		{2, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
@@ -6629,7 +6629,7 @@ static void config_pal8l14_pins(const pal_data* pal, const jed_data* jed)
 
 static void config_pal12h10_pins(const pal_data* pal, const jed_data* jed)
 {
-	static UINT16 input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13};
+	static uint16_t input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13};
 	static pin_output_config output_pins[] = {
 		{14, OUTPUT_ACTIVEHIGH | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
 		{15, OUTPUT_ACTIVEHIGH | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
@@ -6655,7 +6655,7 @@ static void config_pal12h10_pins(const pal_data* pal, const jed_data* jed)
 
 static void config_pal12l10_pins(const pal_data* pal, const jed_data* jed)
 {
-	static UINT16 input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13};
+	static uint16_t input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13};
 	static pin_output_config output_pins[] = {
 		{14, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
 		{15, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
@@ -6681,7 +6681,7 @@ static void config_pal12l10_pins(const pal_data* pal, const jed_data* jed)
 
 static void config_pal14h8_pins(const pal_data* pal, const jed_data* jed)
 {
-	static UINT16 input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 23};
+	static uint16_t input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 23};
 	static pin_output_config output_pins[] = {
 		{15, OUTPUT_ACTIVEHIGH | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
 		{16, OUTPUT_ACTIVEHIGH | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
@@ -6705,7 +6705,7 @@ static void config_pal14h8_pins(const pal_data* pal, const jed_data* jed)
 
 static void config_pal14l8_pins(const pal_data* pal, const jed_data* jed)
 {
-	static UINT16 input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 23};
+	static uint16_t input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 23};
 	static pin_output_config output_pins[] = {
 		{15, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
 		{16, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
@@ -6729,7 +6729,7 @@ static void config_pal14l8_pins(const pal_data* pal, const jed_data* jed)
 
 static void config_pal16h6_pins(const pal_data* pal, const jed_data* jed)
 {
-	static UINT16 input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 22, 23};
+	static uint16_t input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 22, 23};
 	static pin_output_config output_pins[] = {
 		{16, OUTPUT_ACTIVEHIGH | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
 		{17, OUTPUT_ACTIVEHIGH | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
@@ -6751,7 +6751,7 @@ static void config_pal16h6_pins(const pal_data* pal, const jed_data* jed)
 
 static void config_pal16l6_pins(const pal_data* pal, const jed_data* jed)
 {
-	static UINT16 input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 22, 23};
+	static uint16_t input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 22, 23};
 	static pin_output_config output_pins[] = {
 		{16, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
 		{17, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
@@ -6773,7 +6773,7 @@ static void config_pal16l6_pins(const pal_data* pal, const jed_data* jed)
 
 static void config_pal18h4_pins(const pal_data* pal, const jed_data* jed)
 {
-	static UINT16 input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 21, 22, 23};
+	static uint16_t input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 21, 22, 23};
 	static pin_output_config output_pins[] = {
 		{17, OUTPUT_ACTIVEHIGH | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
 		{18, OUTPUT_ACTIVEHIGH | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
@@ -6793,7 +6793,7 @@ static void config_pal18h4_pins(const pal_data* pal, const jed_data* jed)
 
 static void config_pal18l4_pins(const pal_data* pal, const jed_data* jed)
 {
-	static UINT16 input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 21, 22, 23};
+	static uint16_t input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 21, 22, 23};
 	static pin_output_config output_pins[] = {
 		{17, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
 		{18, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
@@ -6813,7 +6813,7 @@ static void config_pal18l4_pins(const pal_data* pal, const jed_data* jed)
 
 static void config_pal20c1_pins(const pal_data* pal, const jed_data* jed)
 {
-	static UINT16 input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 20, 21, 22, 23};
+	static uint16_t input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 20, 21, 22, 23};
 	static pin_output_config output_pins[] = {
 		{18, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
 		{19, OUTPUT_ACTIVEHIGH | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE}};
@@ -6831,7 +6831,7 @@ static void config_pal20c1_pins(const pal_data* pal, const jed_data* jed)
 
 static void config_pal20l2_pins(const pal_data* pal, const jed_data* jed)
 {
-	static UINT16 input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 20, 21, 22, 23};
+	static uint16_t input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 20, 21, 22, 23};
 	static pin_output_config output_pins[] = {
 		{18, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
 		{19, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE}};
@@ -6847,9 +6847,9 @@ static void config_pal20l2_pins(const pal_data* pal, const jed_data* jed)
     a fuse row in a GAL16V8 is enabled
 -------------------------------------------------*/
 
-static int is_gal16v8_product_term_enabled(const pal_data* pal, const jed_data* jed, UINT16 fuserow)
+static int is_gal16v8_product_term_enabled(const pal_data* pal, const jed_data* jed, uint16_t fuserow)
 {
-	UINT16 fuse_ptd;
+	uint16_t fuse_ptd;
 
 	fuse_ptd = (fuserow / calc_fuse_column_count(pal)) + 2128;
 
@@ -6870,11 +6870,11 @@ static int is_gal16v8_product_term_enabled(const pal_data* pal, const jed_data* 
     fuse state of an input pin in a fuse row
 -------------------------------------------------*/
 
-static UINT16 get_peel18cv8_pin_fuse_state(const pal_data* pal, const jed_data* jed, UINT16 pin, UINT16 fuserow)
+static uint16_t get_peel18cv8_pin_fuse_state(const pal_data* pal, const jed_data* jed, uint16_t pin, uint16_t fuserow)
 {
 	const pin_fuse_columns* fuse_columns;
 	int lowfusestate, highfusestate, tmpfusestate, swapfusestates;
-	UINT16 cfgpin;
+	uint16_t cfgpin;
 
 	/* Synchronous Preset or Asynchronous Clear fuse row? */
 
@@ -6984,7 +6984,7 @@ static int read_source_file(const char *srcfile)
 	fseek(file, 0, SEEK_END);
 	srcbuflen = ftell(file);
 	fseek(file, 0, SEEK_SET);
-	srcbuf = (UINT8 *)malloc(srcbuflen);
+	srcbuf = (uint8_t *)malloc(srcbuflen);
 	if (!srcbuf)
 	{
 		fprintf(stderr, "Unable to allocate %d bytes for the source!\n", (int)srcbuflen);
@@ -7147,7 +7147,7 @@ static int command_convert(int argc, char *argv[])
 
 		/* generate the output */
 		dstbuflen = jedbin_output(&jed, nullptr, 0);
-		dstbuf = (UINT8 *)malloc(dstbuflen);
+		dstbuf = (uint8_t *)malloc(dstbuflen);
 		if (!dstbuf)
 		{
 			fprintf(stderr, "Unable to allocate %d bytes for the target buffer!\n", (int)dstbuflen);
@@ -7175,7 +7175,7 @@ static int command_convert(int argc, char *argv[])
 
 		/* generate the output */
 		dstbuflen = jed_output(&jed, nullptr, 0);
-		dstbuf = (UINT8 *)malloc(dstbuflen);
+		dstbuf = (uint8_t *)malloc(dstbuflen);
 		if (!dstbuf)
 		{
 			fprintf(stderr, "Unable to allocate %d bytes for the target buffer!\n", (int)dstbuflen);

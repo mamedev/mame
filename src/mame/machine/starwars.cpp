@@ -153,12 +153,12 @@ WRITE8_MEMBER(starwars_state::starwars_adc_select_w)
 
 void starwars_state::starwars_mproc_init()
 {
-	UINT8 *src = memregion("user2")->base();
+	uint8_t *src = memregion("user2")->base();
 	int cnt, val;
 
-	m_PROM_STR = std::make_unique<UINT8[]>(1024);
-	m_PROM_MAS = std::make_unique<UINT8[]>(1024);
-	m_PROM_AM = std::make_unique<UINT8[]>(1024);
+	m_PROM_STR = std::make_unique<uint8_t[]>(1024);
+	m_PROM_MAS = std::make_unique<uint8_t[]>(1024);
+	m_PROM_AM = std::make_unique<uint8_t[]>(1024);
 
 	for (cnt = 0; cnt < 1024; cnt++)
 	{
@@ -318,7 +318,7 @@ void starwars_state::run_mproc()
 			 * takes 33 clock pulses to do a full rotation.
 			 */
 
-			m_ACC += (((INT32)(m_A - m_B) << 1) * m_C) << 1;
+			m_ACC += (((int32_t)(m_A - m_B) << 1) * m_C) << 1;
 
 			/* A and B are sign extended (requred by the ls384). After
 			 * multiplication they just contain the sign.
@@ -445,7 +445,7 @@ WRITE8_MEMBER(starwars_state::starwars_math_w)
 			for (i = 1; i < 16; i++)
 			{
 				m_quotient_shift <<= 1;
-				if (((INT32)m_dvd_shift + (m_divisor ^ 0xffff) + 1) & 0x10000)
+				if (((int32_t)m_dvd_shift + (m_divisor ^ 0xffff) + 1) & 0x10000)
 				{
 					m_quotient_shift |= 1;
 					m_dvd_shift = (m_dvd_shift + (m_divisor ^ 0xffff) + 1) << 1;

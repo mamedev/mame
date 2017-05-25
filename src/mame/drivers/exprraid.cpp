@@ -206,12 +206,15 @@ Stephh's notes (based on the games M6502 code and some tests) :
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/exprraid.h"
+
 #include "cpu/m6502/deco16.h"
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/2203intf.h"
 #include "sound/3526intf.h"
-#include "includes/exprraid.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /*****************************************************************************************/
@@ -496,7 +499,7 @@ void exprraid_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( exprraid, exprraid_state )
+static MACHINE_CONFIG_START( exprraid )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", DECO16, XTAL_12MHz / 8)
@@ -520,7 +523,7 @@ static MACHINE_CONFIG_START( exprraid, exprraid_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", exprraid)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 256)
+	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -818,7 +821,7 @@ void exprraid_state::exprraid_gfx_expand()
 {
 	/* Expand the background rom so we can use regular decode routines */
 
-	UINT8   *gfx = memregion("gfx3")->base();
+	uint8_t   *gfx = memregion("gfx3")->base();
 	int offs = 0x10000 - 0x1000;
 	int i;
 
@@ -837,7 +840,7 @@ void exprraid_state::exprraid_gfx_expand()
 
 DRIVER_INIT_MEMBER(exprraid_state,wexpressb)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	/* HACK: this set uses M6502 irq vectors but DECO CPU-16 opcodes??? */
 	rom[0xfff7] = rom[0xfffa];

@@ -16,10 +16,10 @@
 #include "emu.h"
 #include "machine/pc_fdc.h"
 
-const device_type PC_FDC_XT = &device_creator<pc_fdc_xt_device>;
-const device_type PC_FDC_AT = &device_creator<pc_fdc_at_device>;
+DEFINE_DEVICE_TYPE(PC_FDC_XT, pc_fdc_xt_device, "pc_fdc_xt", "PC FDC (XT)")
+DEFINE_DEVICE_TYPE(PC_FDC_AT, pc_fdc_at_device, "pc_fdc_at", "PC FDC (AT)")
 
-static MACHINE_CONFIG_FRAGMENT( cfg )
+static MACHINE_CONFIG_START( cfg )
 	MCFG_UPD765A_ADD("upd765", false, false)
 	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(pc_fdc_family_device, irq_w))
 	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(pc_fdc_family_device, drq_w))
@@ -45,8 +45,8 @@ DEVICE_ADDRESS_MAP_START(map, 8, pc_fdc_at_device)
 	AM_RANGE(0x7, 0x7) AM_READWRITE(dir_r, ccr_w)
 ADDRESS_MAP_END
 
-pc_fdc_family_device::pc_fdc_family_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
-	pc_fdc_interface(mconfig, type, name, tag, owner, clock, shortname, source), fdc(*this, "upd765"),
+pc_fdc_family_device::pc_fdc_family_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	pc_fdc_interface(mconfig, type, tag, owner, clock), fdc(*this, "upd765"),
 	intrq_cb(*this),
 	drq_cb(*this)
 {
@@ -57,12 +57,12 @@ void pc_fdc_family_device::tc_w(bool state)
 	fdc->tc_w(state);
 }
 
-UINT8 pc_fdc_family_device::dma_r()
+uint8_t pc_fdc_family_device::dma_r()
 {
 	return fdc->dma_r();
 }
 
-void pc_fdc_family_device::dma_w(UINT8 data)
+void pc_fdc_family_device::dma_w(uint8_t data)
 {
 	fdc->dma_w(data);
 }
@@ -104,7 +104,7 @@ void pc_fdc_family_device::device_reset()
 WRITE8_MEMBER( pc_fdc_family_device::dor_w )
 {
 	logerror("%s: dor = %02x\n", tag(), data);
-	UINT8 pdor = dor;
+	uint8_t pdor = dor;
 	dor = data;
 
 	for(int i=0; i<4; i++)
@@ -140,7 +140,7 @@ WRITE8_MEMBER( pc_fdc_family_device::ccr_w )
 	fdc->set_rate(rates[data & 3]);
 }
 
-UINT8 pc_fdc_family_device::do_dir_r()
+uint8_t pc_fdc_family_device::do_dir_r()
 {
 	if(floppy[dor & 3])
 		return floppy[dor & 3]->dskchg_r() ? 0x00 : 0x80;
@@ -183,10 +183,10 @@ void pc_fdc_family_device::check_drq()
 		drq_cb(drq);
 }
 
-pc_fdc_xt_device::pc_fdc_xt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : pc_fdc_family_device(mconfig, PC_FDC_XT, "PC FDC XT", tag, owner, clock, "pc_fdc_xt", __FILE__)
+pc_fdc_xt_device::pc_fdc_xt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : pc_fdc_family_device(mconfig, PC_FDC_XT, tag, owner, clock)
 {
 }
 
-pc_fdc_at_device::pc_fdc_at_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : pc_fdc_family_device(mconfig, PC_FDC_AT, "PC FDC AT", tag, owner, clock, "pc_fdc_at", __FILE__)
+pc_fdc_at_device::pc_fdc_at_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : pc_fdc_family_device(mconfig, PC_FDC_AT, tag, owner, clock)
 {
 }

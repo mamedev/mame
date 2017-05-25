@@ -184,14 +184,18 @@ other supported games as well.
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
+#include "includes/m72.h"
+#include "includes/iremipt.h"
+
+#include "cpu/mcs51/mcs51.h"
 #include "cpu/nec/nec.h"
 #include "cpu/nec/v25.h"
+#include "cpu/z80/z80.h"
 #include "machine/irem_cpu.h"
 #include "sound/ym2151.h"
-#include "includes/iremipt.h"
-#include "includes/m72.h"
-#include "cpu/mcs51/mcs51.h"
+#include "sound/volt_reg.h"
+#include "speaker.h"
+
 
 #define MASTER_CLOCK        XTAL_32MHz
 #define SOUND_CLOCK         XTAL_3_579545MHz
@@ -334,9 +338,9 @@ The protection device does
 
 TIMER_CALLBACK_MEMBER(m72_state::delayed_ram16_w)
 {
-	UINT16 val = ((UINT32) param) & 0xffff;
-	UINT16 offset = (((UINT32) param) >> 16) & 0xffff;
-	UINT16 *ram = (UINT16 *)ptr;
+	uint16_t val = ((uint32_t) param) & 0xffff;
+	uint16_t offset = (((uint32_t) param) >> 16) & 0xffff;
+	uint16_t *ram = (uint16_t *)ptr;
 
 	ram[offset] = val;
 }
@@ -356,7 +360,7 @@ WRITE16_MEMBER(m72_state::main_mcu_sound_w)
 
 WRITE16_MEMBER(m72_state::main_mcu_w)
 {
-	UINT16 val = m_protection_ram[offset];
+	uint16_t val = m_protection_ram[offset];
 
 	COMBINE_DATA(&val);
 
@@ -378,7 +382,7 @@ WRITE16_MEMBER(m72_state::main_mcu_w)
 
 WRITE8_MEMBER(m72_state::mcu_data_w)
 {
-	UINT16 val;
+	uint16_t val;
 	if (offset&1) val = (m_protection_ram[offset/2] & 0x00ff) | (data << 8);
 	else val = (m_protection_ram[offset/2] & 0xff00) | (data&0xff);
 
@@ -387,7 +391,7 @@ WRITE8_MEMBER(m72_state::mcu_data_w)
 
 READ8_MEMBER(m72_state::mcu_data_r)
 {
-	UINT8 ret;
+	uint8_t ret;
 
 	if (offset == 0x0fff || offset == 0x0ffe)
 	{
@@ -403,13 +407,13 @@ READ8_MEMBER(m72_state::mcu_data_r)
 INTERRUPT_GEN_MEMBER(m72_state::mcu_int)
 {
 	//m_mcu_snd_cmd_latch |= 0x11; /* 0x10 is special as well - FIXME */
-	m_mcu_snd_cmd_latch = 0x11;// | (machine.rand() & 1); /* 0x10 is special as well - FIXME */
+	m_mcu_snd_cmd_latch = 0x11;// | (machine().rand() & 1); /* 0x10 is special as well - FIXME */
 	device.execute().set_input_line(1, ASSERT_LINE);
 }
 
 READ8_MEMBER(m72_state::mcu_sample_r)
 {
-	UINT8 sample;
+	uint8_t sample;
 	sample = memregion("samples")->base()[m_mcu_sample_addr++];
 	return sample;
 }
@@ -466,7 +470,7 @@ DRIVER_INIT_MEMBER(m72_state,m72_8751)
 	address_space &io = m_maincpu->space(AS_IO);
 	address_space &sndio = m_soundcpu->space(AS_IO);
 
-	m_protection_ram = std::make_unique<UINT16[]>(0x10000/2);
+	m_protection_ram = std::make_unique<uint16_t[]>(0x10000/2);
 	program.install_read_bank(0xb0000, 0xbffff, "bank1");
 	program.install_write_handler(0xb0000, 0xb0fff, write16_delegate(FUNC(m72_state::main_mcu_w),this));
 	membank("bank1")->configure_entry(0, m_protection_ram.get());
@@ -480,7 +484,7 @@ DRIVER_INIT_MEMBER(m72_state,m72_8751)
 	io.install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::main_mcu_sound_w),this));
 
 	/* sound cpu */
-	sndio.install_write_handler(0x82, 0x82, write8_delegate(FUNC(dac_device::write_unsigned8),(dac_device*)m_dac));
+	sndio.install_write_handler(0x82, 0x82, write8_delegate(FUNC(dac_byte_interface::write),(dac_byte_interface *)m_dac));
 	sndio.install_read_handler (0x84, 0x84, read8_delegate(FUNC(m72_state::snd_cpu_sample_r),this));
 
 	/* lohtb2 */
@@ -491,7 +495,7 @@ DRIVER_INIT_MEMBER(m72_state,m72_8751)
 	 * prefetching on the V30.
 	 */
 	{
-		UINT8 *rom=memregion("mcu")->base();
+		uint8_t *rom=memregion("mcu")->base();
 
 		rom[0x12d+5] += 1; printf(" 5: %d\n", rom[0x12d+5]);
 		rom[0x12d+8] += 5;  printf(" 8: %d\n", rom[0x12d+8]);
@@ -531,7 +535,7 @@ the NMI handler in the other games.
 #if 0
 int m72_state::find_sample(int num)
 {
-	UINT8 *rom = memregion("samples")->base();
+	uint8_t *rom = memregion("samples")->base();
 	int len = memregion("samples")->bytes();
 	int addr = 0;
 
@@ -654,7 +658,7 @@ running, but they have not been derived from the real 8751 code.
 #define CRC_LEN 18
 
 /* Battle Chopper / Mr. Heli */
-static const UINT8 bchopper_code[CODE_LEN] =
+static const uint8_t bchopper_code[CODE_LEN] =
 {
 	0x68,0x00,0xa0,             // push 0a000h
 	0x1f,                       // pop ds
@@ -674,11 +678,11 @@ static const UINT8 bchopper_code[CODE_LEN] =
 	0x1f,                       // pop ds
 	0xea,0x68,0x01,0x40,0x00    // jmp  0040:$0168
 };
-static const UINT8 bchopper_crc[CRC_LEN] =  {   0x1a,0x12,0x5c,0x08, 0x84,0xb6,0x73,0xd1,
+static const uint8_t bchopper_crc[CRC_LEN] =  {   0x1a,0x12,0x5c,0x08, 0x84,0xb6,0x73,0xd1,
 												0x54,0x91,0x94,0xeb, 0x00,0x00 };
 
 /* Ninja Spirit */
-static const UINT8 nspirit_code[CODE_LEN] =
+static const uint8_t nspirit_code[CODE_LEN] =
 {
 	0x68,0x00,0xa0,             // push 0a000h
 	0x1f,                       // pop ds
@@ -697,10 +701,10 @@ static const UINT8 nspirit_code[CODE_LEN] =
 	0x1f,                       // pop ds
 	0xea,0x00,0x00,0x40,0x00    // jmp  0040:$0000
 };
-static const UINT8 nspirit_crc[CRC_LEN] =   {   0xfe,0x94,0x6e,0x4e, 0xc8,0x33,0xa7,0x2d,
+static const uint8_t nspirit_crc[CRC_LEN] =   {   0xfe,0x94,0x6e,0x4e, 0xc8,0x33,0xa7,0x2d,
 												0xf2,0xa3,0xf9,0xe1, 0xa9,0x6c,0x02,0x95, 0x00,0x00 };
 /* Image Fight */
-static const UINT8 imgfight_code[CODE_LEN] =
+static const uint8_t imgfight_code[CODE_LEN] =
 {
 	0x68,0x00,0xa0,             // push 0a000h
 	0x1f,                       // pop ds
@@ -725,11 +729,11 @@ static const UINT8 imgfight_code[CODE_LEN] =
 };
 
 // these are for the japan set where we have the mcu anyway...
-static const UINT8 imgfightj_crc[CRC_LEN] =  {  0x7e,0xcc,0xec,0x03, 0x04,0x33,0xb6,0xc5,
+static const uint8_t imgfightj_crc[CRC_LEN] =  {  0x7e,0xcc,0xec,0x03, 0x04,0x33,0xb6,0xc5,
 												0xbf,0x37,0x92,0x94, 0x00,0x00 };
 
 /* Legend of Hero Tonma */
-static const UINT8 loht_code[CODE_LEN] =
+static const uint8_t loht_code[CODE_LEN] =
 {
 	0x68,0x00,0xa0,             // push 0a000h
 	0x1f,                       // pop ds
@@ -747,21 +751,21 @@ static const UINT8 loht_code[CODE_LEN] =
 	0xea,0x5d,0x01,0x40,0x00    // jmp  0040:$015d
 
 };
-static const UINT8 loht_crc[CRC_LEN] =    { 0x39,0x00,0x82,0xae, 0x2c,0x9d,0x4b,0x73,
+static const uint8_t loht_crc[CRC_LEN] =    { 0x39,0x00,0x82,0xae, 0x2c,0x9d,0x4b,0x73,
 												0xfb,0xac,0xd4,0x6d, 0x6d,0x5b,0x77,0xc0, 0x00,0x00 };
 
 
 
 /* Dragon Breed */
-static const UINT8 dbreedm72_code[CODE_LEN] =
+static const uint8_t dbreedm72_code[CODE_LEN] =
 {
 	0xea,0x6c,0x00,0x00,0x00    // jmp  0000:$006c
 };
-static const UINT8 dbreedm72_crc[CRC_LEN] =   { 0xa4,0x96,0x5f,0xc0, 0xab,0x49,0x9f,0x19,
+static const uint8_t dbreedm72_crc[CRC_LEN] =   { 0xa4,0x96,0x5f,0xc0, 0xab,0x49,0x9f,0x19,
 												0x84,0xe6,0xd6,0xca, 0x00,0x00 };
 
 /* Air Duel */
-static const UINT8 airduelm72_code[CODE_LEN] =
+static const uint8_t airduelm72_code[CODE_LEN] =
 {
 	0x68,0x00,0xd0,             // push 0d000h
 	0x1f,                       // pop ds
@@ -771,20 +775,20 @@ static const UINT8 airduelm72_code[CODE_LEN] =
 	0xc6,0x06,0xc0,0x1c,0x57,   // mov [1cc0h], byte 057h
 	0xea,0x69,0x0b,0x00,0x00    // jmp  0000:$0b69
 };
-static const UINT8 airduelm72_crc[CRC_LEN] =     { 0x72,0x9c,0xca,0x85, 0xc9,0x12,0xcc,0xea,
+static const uint8_t airduelm72_crc[CRC_LEN] =     { 0x72,0x9c,0xca,0x85, 0xc9,0x12,0xcc,0xea,
 												0x00,0x00 };
 
 /* Daiku no Gensan */
-static const UINT8 dkgenm72_code[CODE_LEN] =
+static const uint8_t dkgenm72_code[CODE_LEN] =
 {
 	0xea,0x3d,0x00,0x00,0x10    // jmp  1000:$003d
 };
-static const UINT8 dkgenm72_crc[CRC_LEN] =  {   0xc8,0xb4,0xdc,0xf8, 0xd3,0xba,0x48,0xed,
+static const uint8_t dkgenm72_crc[CRC_LEN] =  {   0xc8,0xb4,0xdc,0xf8, 0xd3,0xba,0x48,0xed,
 												0x79,0x08,0x1c,0xb3, 0x00,0x00 };
 
 
 
-void m72_state::copy_le(UINT16 *dest, const UINT8 *src, UINT8 bytes)
+void m72_state::copy_le(uint16_t *dest, const uint8_t *src, uint8_t bytes)
 {
 	int i;
 
@@ -809,9 +813,9 @@ WRITE16_MEMBER(m72_state::protection_w)
 		copy_le(&m_protection_ram[0x0fe0],m_protection_crc,CRC_LEN);
 }
 
-void m72_state::install_protection_handler(const UINT8 *code,const UINT8 *crc)
+void m72_state::install_protection_handler(const uint8_t *code,const uint8_t *crc)
 {
-	m_protection_ram = std::make_unique<UINT16[]>(0x1000/2);
+	m_protection_ram = std::make_unique<uint16_t[]>(0x1000/2);
 	m_protection_code = code;
 	m_protection_crc =  crc;
 	m_maincpu->space(AS_PROGRAM).install_read_bank(0xb0000, 0xb0fff, "bank1");
@@ -891,37 +895,6 @@ WRITE16_MEMBER(m72_state::soundram_w)
 		m_soundram[offset * 2 + 0] = data;
 	if (ACCESSING_BITS_8_15)
 		m_soundram[offset * 2 + 1] = data >> 8;
-}
-
-
-READ16_MEMBER(m72_state::poundfor_trackball_r)
-{
-	static const char *const axisnames[] = { "TRACK0_X", "TRACK0_Y", "TRACK1_X", "TRACK1_Y" };
-
-	if (offset == 0)
-	{
-		int i,curr;
-
-		for (i = 0;i < 4;i++)
-		{
-			curr = ioport(axisnames[i])->read();
-			m_diff[i] = (curr - m_prev[i]);
-			m_prev[i] = curr;
-		}
-	}
-
-	switch (offset)
-	{
-		default:
-		case 0:
-			return (m_diff[0] & 0xff) | ((m_diff[2] & 0xff) << 8);
-		case 1:
-			return ((m_diff[0] >> 8) & 0x1f) | (m_diff[2] & 0x1f00) | (ioport("IN0")->read() & 0xe0e0);
-		case 2:
-			return (m_diff[1] & 0xff) | ((m_diff[3] & 0xff) << 8);
-		case 3:
-			return ((m_diff[1] >> 8) & 0x1f) | (m_diff[3] & 0x1f00);
-	}
 }
 
 
@@ -1009,7 +982,7 @@ static ADDRESS_MAP_START( m72_portmap, AS_IO, 16, m72_state )
 	AM_RANGE(0x02, 0x03) AM_READ_PORT("IN1")
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("m72", m72_audio_device, sound_command_w)
-	AM_RANGE(0x02, 0x03) AM_WRITE(port02_w) /* coin counters, reset sound cpu, other stuff? */
+	AM_RANGE(0x02, 0x03) AM_WRITE8(port02_w, 0x00ff) /* coin counters, reset sound cpu, other stuff? */
 	AM_RANGE(0x04, 0x05) AM_WRITE(dmaon_w)
 	AM_RANGE(0x06, 0x07) AM_WRITE(irq_line_w)
 	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE8("upd71059c", pic8259_device, read, write, 0x00ff)
@@ -1025,7 +998,7 @@ static ADDRESS_MAP_START( m84_portmap, AS_IO, 16, m72_state )
 	AM_RANGE(0x02, 0x03) AM_READ_PORT("IN1")
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("m72", m72_audio_device, sound_command_w)
-	AM_RANGE(0x02, 0x03) AM_WRITE(rtype2_port02_w)
+	AM_RANGE(0x02, 0x03) AM_WRITE8(rtype2_port02_w, 0x00ff)
 	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE8("upd71059c", pic8259_device, read, write, 0x00ff)
 	AM_RANGE(0x80, 0x81) AM_WRITE(scrolly1_w)
 	AM_RANGE(0x82, 0x83) AM_WRITE(scrollx1_w)
@@ -1038,7 +1011,7 @@ static ADDRESS_MAP_START( m84_v33_portmap, AS_IO, 16, m72_state )
 	AM_RANGE(0x02, 0x03) AM_READ_PORT("IN1")
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("m72", m72_audio_device, sound_command_w)
-	AM_RANGE(0x02, 0x03) AM_WRITE(rtype2_port02_w)
+	AM_RANGE(0x02, 0x03) AM_WRITE8(rtype2_port02_w, 0x00ff)
 	AM_RANGE(0x80, 0x81) AM_WRITE(scrolly1_w)
 	AM_RANGE(0x82, 0x83) AM_WRITE(scrollx1_w)
 	AM_RANGE(0x84, 0x85) AM_WRITE(scrolly2_w)
@@ -1050,9 +1023,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( poundfor_portmap, AS_IO, 16, m72_state )
 	AM_RANGE(0x02, 0x03) AM_READ_PORT("IN1")
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
-	AM_RANGE(0x08, 0x0f) AM_READ(poundfor_trackball_r)
+	AM_RANGE(0x08, 0x0f) AM_DEVREAD8("upd4701l", upd4701_device, read_xy, 0x00ff)
+	AM_RANGE(0x08, 0x0f) AM_DEVREAD8("upd4701h", upd4701_device, read_xy, 0xff00)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("m72", m72_audio_device, sound_command_w)
-	AM_RANGE(0x02, 0x03) AM_WRITE(rtype2_port02_w)
+	AM_RANGE(0x02, 0x03) AM_WRITE8(poundfor_port02_w, 0x00ff)
 	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE8("upd71059c", pic8259_device, read, write, 0x00ff)
 	AM_RANGE(0x80, 0x81) AM_WRITE(scrolly1_w)
 	AM_RANGE(0x82, 0x83) AM_WRITE(scrollx1_w)
@@ -1065,7 +1039,7 @@ static ADDRESS_MAP_START( m82_portmap, AS_IO, 16, m72_state )
 	AM_RANGE(0x02, 0x03) AM_READ_PORT("IN1")
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("m72", m72_audio_device, sound_command_w)
-	AM_RANGE(0x02, 0x03) AM_WRITE(rtype2_port02_w)
+	AM_RANGE(0x02, 0x03) AM_WRITE8(rtype2_port02_w, 0x00ff)
 	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE8("upd71059c", pic8259_device, read, write, 0x00ff)
 	AM_RANGE(0x80, 0x81) AM_WRITE(scrolly1_w)
 	AM_RANGE(0x82, 0x83) AM_WRITE(scrollx1_w)
@@ -1082,7 +1056,7 @@ static ADDRESS_MAP_START( m81_portmap, AS_IO, 16, m72_state )
 	AM_RANGE(0x02, 0x03) AM_READ_PORT("IN1")
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("m72", m72_audio_device, sound_command_w)
-	AM_RANGE(0x02, 0x03) AM_WRITE(rtype2_port02_w)  /* coin counters, reset sound cpu, other stuff? */
+	AM_RANGE(0x02, 0x03) AM_WRITE8(rtype2_port02_w, 0x00ff)  /* coin counters, reset sound cpu, other stuff? */
 	AM_RANGE(0x04, 0x05) AM_WRITE(dmaon_w)
 	AM_RANGE(0x06, 0x07) AM_WRITE(irq_line_w)
 	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE8("upd71059c", pic8259_device, read, write, 0x00ff)
@@ -1612,15 +1586,12 @@ static INPUT_PORTS_START( m81_hharry )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( poundfor )
-	PORT_START("IN0")
-	PORT_BIT( 0x001f, IP_ACTIVE_HIGH, IPT_SPECIAL ) /* high bits of trackball X */
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x1f00, IP_ACTIVE_HIGH, IPT_SPECIAL ) /* high bits of trackball X */
-	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_START("IN0") // not read directly
+	PORT_BIT( 0x9f9f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_WRITE_LINE_DEVICE_MEMBER("upd4701l", upd4701_device, right_w)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_WRITE_LINE_DEVICE_MEMBER("upd4701l", upd4701_device, left_w)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_WRITE_LINE_DEVICE_MEMBER("upd4701h", upd4701_device, right_w)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_WRITE_LINE_DEVICE_MEMBER("upd4701h", upd4701_device, left_w)
 
 	PORT_START("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1 )
@@ -1687,16 +1658,16 @@ static INPUT_PORTS_START( poundfor )
 	IREM_COIN_MODE_2_HIGH
 
 	PORT_START("TRACK0_X")
-	PORT_BIT( 0xffff, 0x0000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(30) PORT_PLAYER(1)
+	PORT_BIT( 0x0fff, 0x0000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(30) PORT_RESET PORT_PLAYER(1)
 
 	PORT_START("TRACK0_Y")
-	PORT_BIT( 0xffff, 0x0000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(30) PORT_REVERSE PORT_PLAYER(1)
+	PORT_BIT( 0x0fff, 0x0000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(30) PORT_REVERSE PORT_RESET PORT_PLAYER(1)
 
 	PORT_START("TRACK1_X")
-	PORT_BIT( 0xffff, 0x0000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(30) PORT_REVERSE PORT_PLAYER(2)
+	PORT_BIT( 0x0fff, 0x0000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(30) PORT_REVERSE PORT_RESET PORT_PLAYER(2)
 
 	PORT_START("TRACK1_Y")
-	PORT_BIT( 0xffff, 0x0000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(30) PORT_PLAYER(2)
+	PORT_BIT( 0x0fff, 0x0000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(30) PORT_RESET PORT_PLAYER(2)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( airduel )
@@ -1867,23 +1838,24 @@ static GFXDECODE_START( majtitle )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_FRAGMENT( m72_audio_chips )
+static MACHINE_CONFIG_START( m72_audio_chips )
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("m72", M72, 0);
+	MCFG_SOUND_ADD("m72", IREM_M72_AUDIO, 0)
 
 	MCFG_YM2151_ADD("ymsnd", SOUND_CLOCK)
 	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("m72", m72_audio_device, ym2151_irq_handler))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( m72_base, m72_state )
+static MACHINE_CONFIG_START( m72_base )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",V30,MASTER_CLOCK/2/2)    /* 16 MHz external freq (8MHz internal) */
@@ -1923,7 +1895,6 @@ static MACHINE_CONFIG_DERIVED( m72_8751, m72_base )
 	MCFG_CPU_ADD("mcu",I8751, XTAL_8MHz) /* Uses its own XTAL */
 	MCFG_CPU_IO_MAP(mcu_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", m72_state,  mcu_int)
-
 MACHINE_CONFIG_END
 
 
@@ -1935,6 +1906,7 @@ static MACHINE_CONFIG_DERIVED( rtype, m72_base )
 	MCFG_CPU_IO_MAP(rtype_sound_portmap)
 
 	MCFG_DEVICE_REMOVE("dac")
+	MCFG_DEVICE_REMOVE("vref")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( m72_xmultipl, m72_8751 )
@@ -1995,7 +1967,7 @@ MACHINE_CONFIG_END
 /****************************************** M84 ***********************************************/
 
 // M84
-static MACHINE_CONFIG_START( rtype2, m72_state )
+static MACHINE_CONFIG_START( rtype2 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V30,MASTER_CLOCK/2/2)   /* 16 MHz external freq (8MHz internal) */
@@ -2040,7 +2012,7 @@ MACHINE_CONFIG_END
 // M84
 
 // is the upd71059c present and unused, or has it been removed from the PCB? it isn't needed beacuse the V35 has it's own IRQ controller.
-static MACHINE_CONFIG_START( cosmccop, m72_state )
+static MACHINE_CONFIG_START( cosmccop )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V35,MASTER_CLOCK/2)
@@ -2089,7 +2061,7 @@ M82-A-A as the top board
 M82-B-A and as the bottom board
 
 */
-static MACHINE_CONFIG_START( m82, m72_state )
+static MACHINE_CONFIG_START( m82 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V30,MASTER_CLOCK/2/2)   /* 16 MHz external freq (8MHz internal) */
@@ -2125,7 +2097,7 @@ MACHINE_CONFIG_END
   M85-A-B / M85-B
 */
 
-static MACHINE_CONFIG_START( poundfor, m72_state )
+static MACHINE_CONFIG_START( poundfor )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V30,MASTER_CLOCK/2/2)   /* 16 MHz external freq (8MHz internal) */
@@ -2141,6 +2113,14 @@ static MACHINE_CONFIG_START( poundfor, m72_state )
 								/* IRQs are generated by main Z80 and YM2151 */
 
 	MCFG_PIC8259_ADD( "upd71059c", INPUTLINE("maincpu", 0), VCC, NOOP)
+
+	MCFG_DEVICE_ADD("upd4701l", UPD4701A, 0)
+	MCFG_UPD4701_PORTX("TRACK0_X")
+	MCFG_UPD4701_PORTY("TRACK0_Y")
+
+	MCFG_DEVICE_ADD("upd4701h", UPD4701A, 0)
+	MCFG_UPD4701_PORTX("TRACK1_X")
+	MCFG_UPD4701_PORTY("TRACK1_Y")
 
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rtype2)
@@ -3774,11 +3754,11 @@ ROM_END
 
 /* M72 */
 
-GAME( 1987, rtype,       0,        rtype,       rtype,    driver_device, 0,           ROT0,   "Irem", "R-Type (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, rtypej,      rtype,    rtype,       rtype,    driver_device, 0,           ROT0,   "Irem", "R-Type (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, rtypejp,     rtype,    rtype,       rtypep,   driver_device, 0,           ROT0,   "Irem", "R-Type (Japan prototype)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, rtypeu,      rtype,    rtype,       rtype,    driver_device, 0,           ROT0,   "Irem (Nintendo of America license)", "R-Type (US)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, rtypeb,      rtype,    rtype,       rtype,    driver_device, 0,           ROT0,   "bootleg", "R-Type (World bootleg)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, rtype,       0,        rtype,       rtype,    m72_state,     0,           ROT0,   "Irem", "R-Type (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, rtypej,      rtype,    rtype,       rtype,    m72_state,     0,           ROT0,   "Irem", "R-Type (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, rtypejp,     rtype,    rtype,       rtypep,   m72_state,     0,           ROT0,   "Irem", "R-Type (Japan prototype)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, rtypeu,      rtype,    rtype,       rtype,    m72_state,     0,           ROT0,   "Irem (Nintendo of America license)", "R-Type (US)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, rtypeb,      rtype,    rtype,       rtype,    m72_state,     0,           ROT0,   "bootleg", "R-Type (World bootleg)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1987, bchopper,    0,        m72,         bchopper, m72_state,     bchopper,    ROT0,   "Irem", "Battle Chopper", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1987, mrheli,      bchopper, m72_8751,    bchopper, m72_state,     m72_8751,    ROT0,   "Irem", "Mr. HELI no Daibouken (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
@@ -3795,7 +3775,7 @@ GAME( 1989, lohtb2,      loht,     m72_8751,    loht,     m72_state,     m72_875
 
 GAME( 1989, xmultiplm72, xmultipl, m72_xmultipl,xmultipl, m72_state,     m72_8751,    ROT0,   "Irem", "X Multiply (Japan, M72)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, dbreedm72,   dbreed,   m72_dbreed,   dbreed,   m72_state,     dbreedm72,   ROT0,   "Irem", "Dragon Breed (M72 PCB version)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // probably Japan version
+GAME( 1989, dbreedm72,   dbreed,   m72_dbreed,  dbreed,   m72_state,     dbreedm72,   ROT0,   "Irem", "Dragon Breed (M72 PCB version)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // probably Japan version
 
 GAME( 1991, gallop,      cosmccop, m72,         gallop,   m72_state,     gallop,      ROT0,   "Irem", "Gallop - Armed Police Unit (Japan, M72)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
@@ -3804,40 +3784,40 @@ GAME( 1990, airduelm72,  airduel,  m72,         airduel,  m72_state,     airduel
 GAME( 1990, dkgensanm72, hharry,   m72,         hharry,   m72_state,     dkgenm72,    ROT0,   "Irem", "Daiku no Gensan (Japan, M72)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
 /* M81 */
-GAME( 1989, xmultipl,    0,        m81_xmultipl,m81_xmultipl,driver_device,0,         ROT0,   "Irem", "X Multiply (World, M81)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, dbreed,      0,        m81_dbreed,   m81_dbreed,driver_device,0,           ROT0,   "Irem", "Dragon Breed (M81 PCB version)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, hharry,      0,        m81_hharry,  m81_hharry,driver_device,0,           ROT0,   "Irem", "Hammerin' Harry (World, M81)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, xmultipl,    0,        m81_xmultipl,m81_xmultipl,m72_state,0,         ROT0,   "Irem", "X Multiply (World, M81)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dbreed,      0,        m81_dbreed,  m81_dbreed,m72_state,0,           ROT0,   "Irem", "Dragon Breed (M81 PCB version)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hharry,      0,        m81_hharry,  m81_hharry,m72_state,0,           ROT0,   "Irem", "Hammerin' Harry (World, M81)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
 /* M82 */
-GAME( 1990, majtitle,    0,        m82,         rtype2,   driver_device, 0,           ROT0,   "Irem", "Major Title (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // M82-A-A + M82-B-A
-GAME( 1990, majtitlej,   majtitle, m82,         rtype2,   driver_device, 0,           ROT0,   "Irem", "Major Title (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // ^
+GAME( 1990, majtitle,    0,        m82,         rtype2,   m72_state,     0,           ROT0,   "Irem", "Major Title (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // M82-A-A + M82-B-A
+GAME( 1990, majtitlej,   majtitle, m82,         rtype2,   m72_state,     0,           ROT0,   "Irem", "Major Title (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // ^
 
-GAME( 1990, airduel,     0,        m82,         airduel,  driver_device, 0,           ROT270, "Irem", "Air Duel (World, M82-A-A + M82-B-A)", MACHINE_SUPPORTS_SAVE ) // Major Title conversion
+GAME( 1990, airduel,     0,        m82,         airduel,  m72_state,     0,           ROT270, "Irem", "Air Duel (World, M82-A-A + M82-B-A)", MACHINE_SUPPORTS_SAVE ) // Major Title conversion
 
-GAME( 2009, rtypem82b,   rtype,    m82,         rtype,    driver_device, 0,           ROT0,   "bootleg", "R-Type (Japan, bootleg Major Title conversion, M82)", MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // unofficial conversion of Major Title, extensive wiremods, made in 2009 by Paul Swan
+GAME( 2009, rtypem82b,   rtype,    m82,         rtype,    m72_state,     0,           ROT0,   "bootleg", "R-Type (Japan, bootleg Major Title conversion, M82)", MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // unofficial conversion of Major Title, extensive wiremods, made in 2009 by Paul Swan
 
-GAME( 1997, rtype2m82b,  rtype2,   m82,         rtype2,   driver_device, 0,           ROT0,   "bootleg", "R-Type II (Japan, bootleg Major Title conversion, M82)", MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // made in 1997 by Chris Hardy
+GAME( 1997, rtype2m82b,  rtype2,   m82,         rtype2,   m72_state,     0,           ROT0,   "bootleg", "R-Type II (Japan, bootleg Major Title conversion, M82)", MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // made in 1997 by Chris Hardy
 
 /* M84 */
 
-GAME( 1990, hharryu,     hharry,   hharryu,     hharry,   driver_device, 0,           ROT0,   "Irem America", "Hammerin' Harry (US, M84)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, dkgensan,    hharry,   hharryu,     hharry,   driver_device, 0,           ROT0,   "Irem", "Daiku no Gensan (Japan, M84)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hharryu,     hharry,   hharryu,     hharry,   m72_state,     0,           ROT0,   "Irem America", "Hammerin' Harry (US, M84)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, dkgensan,    hharry,   hharryu,     hharry,   m72_state,     0,           ROT0,   "Irem", "Daiku no Gensan (Japan, M84)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, rtype2,      0,        rtype2,      rtype2,   driver_device, 0,           ROT0,   "Irem", "R-Type II", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, rtype2j,     rtype2,   rtype2,      rtype2,   driver_device, 0,           ROT0,   "Irem", "R-Type II (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, rtype2jc,    rtype2,   rtype2,      rtype2,   driver_device, 0,           ROT0,   "Irem", "R-Type II (Japan, revision C)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, rtype2,      0,        rtype2,      rtype2,   m72_state,     0,           ROT0,   "Irem", "R-Type II", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, rtype2j,     rtype2,   rtype2,      rtype2,   m72_state,     0,           ROT0,   "Irem", "R-Type II (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, rtype2jc,    rtype2,   rtype2,      rtype2,   m72_state,     0,           ROT0,   "Irem", "R-Type II (Japan, revision C)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, cosmccop,    0,        cosmccop,    gallop,   driver_device, 0,           ROT0,   "Irem", "Cosmic Cop (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, cosmccop,    0,        cosmccop,    gallop,   m72_state,     0,           ROT0,   "Irem", "Cosmic Cop (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, ltswords,    0,        kengo,       kengo,    driver_device, 0,           ROT0,   "Irem", "Lightning Swords", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, kengo,       ltswords, kengo,       kengo,    driver_device, 0,           ROT0,   "Irem", "Ken-Go (set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, kengoa,      ltswords, kengo,       kengo,    driver_device, 0,           ROT0,   "Irem", "Ken-Go (set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // has 'for use in Japan' message, above set doesn't
+GAME( 1991, ltswords,    0,        kengo,       kengo,    m72_state,     0,           ROT0,   "Irem", "Lightning Swords", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, kengo,       ltswords, kengo,       kengo,    m72_state,     0,           ROT0,   "Irem", "Ken-Go (set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, kengoa,      ltswords, kengo,       kengo,    m72_state,     0,           ROT0,   "Irem", "Ken-Go (set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // has 'for use in Japan' message, above set doesn't
 
 /* M85 */
 
-GAME( 1990, poundfor,    0,        poundfor,    poundfor, driver_device, 0,           ROT270, "Irem", "Pound for Pound (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )      // M85-A-B / M85-B
-GAME( 1990, poundforj,   poundfor, poundfor,    poundfor, driver_device, 0,           ROT270, "Irem", "Pound for Pound (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )      // ^
-GAME( 1990, poundforu,   poundfor, poundfor,    poundfor, driver_device, 0,           ROT270, "Irem America", "Pound for Pound (US)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // ^
+GAME( 1990, poundfor,    0,        poundfor,    poundfor, m72_state,     0,           ROT270, "Irem", "Pound for Pound (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )      // M85-A-B / M85-B
+GAME( 1990, poundforj,   poundfor, poundfor,    poundfor, m72_state,     0,           ROT270, "Irem", "Pound for Pound (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )      // ^
+GAME( 1990, poundforu,   poundfor, poundfor,    poundfor, m72_state,     0,           ROT270, "Irem America", "Pound for Pound (US)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // ^
 
 /* bootlegs, unique hw */
-GAME( 1989, lohtb,       loht,     m72,         loht,     driver_device, 0,           ROT0,   "bootleg", "Legend of Hero Tonma (unprotected bootleg)", MACHINE_NOT_WORKING| MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, lohtb,       loht,     m72,         loht,     m72_state,     0,           ROT0,   "bootleg", "Legend of Hero Tonma (unprotected bootleg)", MACHINE_NOT_WORKING| MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

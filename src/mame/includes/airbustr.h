@@ -9,6 +9,7 @@
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "video/kan_pand.h"
+#include "screen.h"
 
 class airbustr_state : public driver_device
 {
@@ -33,11 +34,11 @@ public:
 		{ }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_devram;
-	required_shared_ptr<UINT8> m_videoram2;
-	required_shared_ptr<UINT8> m_colorram2;
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<uint8_t> m_devram;
+	required_shared_ptr<uint8_t> m_videoram2;
+	required_shared_ptr<uint8_t> m_colorram2;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
 
 	/* video-related */
 	tilemap_t    *m_bg_tilemap;
@@ -75,20 +76,20 @@ public:
 	DECLARE_READ8_MEMBER(soundcommand2_r);
 	DECLARE_WRITE8_MEMBER(soundcommand_w);
 	DECLARE_WRITE8_MEMBER(soundcommand2_w);
-	DECLARE_WRITE8_MEMBER(airbustr_coin_counter_w);
-	DECLARE_WRITE8_MEMBER(airbustr_videoram_w);
-	DECLARE_WRITE8_MEMBER(airbustr_colorram_w);
-	DECLARE_WRITE8_MEMBER(airbustr_videoram2_w);
-	DECLARE_WRITE8_MEMBER(airbustr_colorram2_w);
-	DECLARE_WRITE8_MEMBER(airbustr_scrollregs_w);
+	DECLARE_WRITE8_MEMBER(coin_counter_w);
+	DECLARE_WRITE8_MEMBER(videoram_w);
+	DECLARE_WRITE8_MEMBER(colorram_w);
+	DECLARE_WRITE8_MEMBER(videoram2_w);
+	DECLARE_WRITE8_MEMBER(colorram2_w);
+	DECLARE_WRITE8_MEMBER(scrollregs_w);
 	DECLARE_DRIVER_INIT(airbustr);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_airbustr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_airbustr(screen_device &screen, bool state);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	INTERRUPT_GEN_MEMBER(slave_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(airbustr_scanline);
 };

@@ -65,15 +65,15 @@
     CORE IMPLEMENTATION
 ***************************************************************************/
 
-const device_type COCO_VHD = &device_creator<coco_vhd_image_device>;
+DEFINE_DEVICE_TYPE(COCO_VHD, coco_vhd_image_device, "coco_vhd_image", "CoCo Virtual Hard Disk")
 
 //-------------------------------------------------
 //  coco_vhd_image_device - constructor
 //-------------------------------------------------
 
-coco_vhd_image_device::coco_vhd_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, COCO_VHD, "Virtual Hard Disk", tag, owner, clock, "coco_vhd_image", __FILE__),
-		device_image_interface(mconfig, *this)
+coco_vhd_image_device::coco_vhd_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, COCO_VHD, tag, owner, clock)
+	, device_image_interface(mconfig, *this)
 {
 }
 
@@ -83,18 +83,6 @@ coco_vhd_image_device::coco_vhd_image_device(const machine_config &mconfig, cons
 
 coco_vhd_image_device::~coco_vhd_image_device()
 {
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void coco_vhd_image_device::device_config_complete()
-{
-	// set brief and instance name
-	update_names();
 }
 
 
@@ -116,12 +104,12 @@ void coco_vhd_image_device::device_start()
 //  call_load
 //-------------------------------------------------
 
-bool coco_vhd_image_device::call_load()
+image_init_result coco_vhd_image_device::call_load()
 {
 	m_status = VHDSTATUS_POWER_ON_STATE;
 	m_logical_record_number = 0;
 	m_buffer_address = 0;
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 
@@ -130,13 +118,13 @@ bool coco_vhd_image_device::call_load()
 //  coco_vhd_readwrite
 //-------------------------------------------------
 
-void coco_vhd_image_device::coco_vhd_readwrite(UINT8 data)
+void coco_vhd_image_device::coco_vhd_readwrite(uint8_t data)
 {
 	int result, i;
-	UINT32 bytes_to_read;
-	UINT32 bytes_to_write;
-	UINT64 seek_position;
-	UINT64 total_size;
+	uint32_t bytes_to_read;
+	uint32_t bytes_to_write;
+	uint64_t seek_position;
+	uint64_t total_size;
 	char buffer[1024];
 
 	/* access the image */
@@ -147,9 +135,9 @@ void coco_vhd_image_device::coco_vhd_readwrite(UINT8 data)
 	}
 
 	/* perform the seek */
-	seek_position = ((UINT64) 256) * m_logical_record_number;
+	seek_position = ((uint64_t) 256) * m_logical_record_number;
 	total_size = length();
-	result = fseek(MIN(seek_position, total_size), SEEK_SET);
+	result = fseek(std::min(seek_position, total_size), SEEK_SET);
 	if (result < 0)
 	{
 		m_status = VHDSTATUS_ACCESS_DENIED;
@@ -163,7 +151,7 @@ void coco_vhd_image_device::coco_vhd_readwrite(UINT8 data)
 		{
 			memset(buffer, 0, sizeof(buffer));
 
-			bytes_to_write = (UINT32) MIN(seek_position - total_size, (UINT64) sizeof(buffer));
+			bytes_to_write = (uint32_t)std::min(seek_position - total_size, (uint64_t) sizeof(buffer));
 			result = fwrite(buffer, bytes_to_write);
 			if (result != bytes_to_write)
 			{
@@ -181,7 +169,7 @@ void coco_vhd_image_device::coco_vhd_readwrite(UINT8 data)
 			memset(buffer, 0, 256);
 			if (total_size > seek_position)
 			{
-				bytes_to_read = (UINT32) MIN((UINT64) 256, total_size - seek_position);
+				bytes_to_read = (uint32_t)std::min((uint64_t) 256, total_size - seek_position);
 				result = fread(buffer, bytes_to_read);
 				if (result != bytes_to_read)
 				{
@@ -225,9 +213,9 @@ void coco_vhd_image_device::coco_vhd_readwrite(UINT8 data)
 
 
 
-UINT8 coco_vhd_image_device::read(offs_t offset)
+uint8_t coco_vhd_image_device::read(offs_t offset)
 {
-	UINT8 result = 0;
+	uint8_t result = 0;
 
 	switch(offset)
 	{
@@ -242,7 +230,7 @@ UINT8 coco_vhd_image_device::read(offs_t offset)
 
 
 
-void coco_vhd_image_device::write(offs_t offset, UINT8 data)
+void coco_vhd_image_device::write(offs_t offset, uint8_t data)
 {
 	int pos;
 

@@ -6,11 +6,6 @@
 this is an SMS multi-game bootleg with 32 games
 
 
-the dump is incomplete; there is a chip near a position marked on the board as ROM4 with the following markings
-"SG11004A
-79ST0086END
-9045"
-it should be a 512KB MASK rom containing 11 of the games.
 
 there are also empty k9/k10/k11/k12 positions, but they were clearly never used.
 
@@ -122,11 +117,10 @@ A Korean version has been seen too (unless this can be switched?)
 */
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "sound/sn76496.h"
-#include "sound/ym2413.h"
-#include "video/315_5124.h"
 #include "includes/sms_bootleg.h"
+
+#include "cpu/z80/z80.h"
+#include "speaker.h"
 
 
 
@@ -165,7 +159,7 @@ ADDRESS_MAP_END
 
 
 
-static MACHINE_CONFIG_START( sms_supergame, smsbootleg_state )
+static MACHINE_CONFIG_START( sms_supergame )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_10_738635MHz/3)
 	MCFG_CPU_PROGRAM_MAP(sms_supergame_map)
@@ -184,9 +178,9 @@ static MACHINE_CONFIG_START( sms_supergame, smsbootleg_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_10_738635MHz/2, \
-		SEGA315_5124_WIDTH , SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH - 2, SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH + 256 + 10, \
-		SEGA315_5124_HEIGHT_NTSC, SEGA315_5124_TBORDER_START + SEGA315_5124_NTSC_224_TBORDER_HEIGHT, SEGA315_5124_TBORDER_START + SEGA315_5124_NTSC_224_TBORDER_HEIGHT + 224)
-	MCFG_SCREEN_REFRESH_RATE((double) XTAL_10_738635MHz/2 / (SEGA315_5124_WIDTH * SEGA315_5124_HEIGHT_NTSC))
+			sega315_5124_device::WIDTH , sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH - 2, sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 256 + 10, \
+			sega315_5124_device::HEIGHT_NTSC, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT + 224)
+	MCFG_SCREEN_REFRESH_RATE((double) XTAL_10_738635MHz/2 / (sega315_5124_device::WIDTH * sega315_5124_device::HEIGHT_NTSC))
 	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms)
 
 	MCFG_DEVICE_ADD("sms_vdp", SEGA315_5246, 0)
@@ -271,7 +265,7 @@ INPUT_PORTS_END
 
 DRIVER_INIT_MEMBER(smsbootleg_state,sms_supergame)
 {
-	UINT8* rom = memregion("maincpu")->base();
+	uint8_t* rom = memregion("maincpu")->base();
 	size_t size = memregion("maincpu")->bytes();
 
 	for (int i = 0;i < size;i++)
@@ -283,12 +277,10 @@ DRIVER_INIT_MEMBER(smsbootleg_state,sms_supergame)
 
 ROM_START( smssgame )
 	ROM_REGION( 0x200000, "maincpu", 0 )
-	ROM_LOAD( "Rom1.bin", 0x00000, 0x10000, CRC(0e1f258e) SHA1(9240dc0d01e3061c0c8807c07c0a1d033ebe9116) ) // yes, this rom is smaller (menu rom)
+	ROM_LOAD( "rom1.bin", 0x00000, 0x10000, CRC(0e1f258e) SHA1(9240dc0d01e3061c0c8807c07c0a1d033ebe9116) ) // yes, this rom is smaller (menu rom)
 
 	ROM_LOAD( "rom2.bin",0x020000, 0x20000, CRC(c1478323) SHA1(27b524a234f072e81ef41fb89a5fff5617e9b951) ) // Buk Doo Sun
 	ROM_LOAD( "rom3.bin",0x040000, 0x20000, CRC(96c8705d) SHA1(ba4f4af0cfdad1d63a08201ed186c79aea062b95) ) // ? Kung Fu game (Hello Kang Si?)
-	// there is something in the position marked ROM4.
-
 	// k12 unpopulated
 	// k11 unpopulated
 	// k10 unpopulated
@@ -302,7 +294,8 @@ ROM_START( smssgame )
 	ROM_LOAD( "K2.bin",  0x120000, 0x20000, CRC(a12439f4) SHA1(e957d4fe275e982bedef28af8cc2957da27dc512) ) // Final Bubble Bobble (1/2)
 	ROM_LOAD( "K1.bin",  0x140000, 0x20000, CRC(dadffecd) SHA1(68ebb968539049a9e193da5200856b9f956f7e02) ) // Final Bubble Bobble (2/2)
 
-	ROM_LOAD( "rom4.bin",0x180000, 0x80000, NO_DUMP ) // missing
+	// this mask rom appears to be taken straight from an SMS multi-game cart, bank 0 of it is even a menu just for the games in this ROM! same style, so presumably the same developer (Seo Jin 1990 copyright)
+	ROM_LOAD( "SG11004A 79ST0086END 9045.rom4",0x180000, 0x080000, CRC(cdbfe86e) SHA1(83d6f261471dca20f8d2e33b9807d670e9b4eb9c) )
 
 	// there seems to be some kind of MCU for the timer?
 ROM_END

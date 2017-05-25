@@ -14,10 +14,15 @@
  ******************************************************************************/
 
 #include "emu.h"
-#include "includes/gamate.h"
-#include "ui/uimain.h"
+#include "audio/gamate.h"
+
+#include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
+#include "cpu/m6502/m6502.h"
 #include "rendlay.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 class gamate_state : public driver_device
 {
@@ -46,7 +51,7 @@ public:
 	DECLARE_READ8_MEMBER(gamate_nmi_r);
 	DECLARE_WRITE8_MEMBER(gamate_video_w);
 	DECLARE_DRIVER_INIT(gamate);
-	UINT32 screen_update_gamate(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_gamate(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(gamate_interrupt);
 	TIMER_CALLBACK_MEMBER(gamate_timer);
 	TIMER_CALLBACK_MEMBER(gamate_timer2);
@@ -56,14 +61,14 @@ private:
 
 	struct
 	{
-		UINT8 reg[8];
+		uint8_t reg[8];
 		struct
 		{
 			bool page2; // else page1
-			UINT8 ypos, xpos/*tennis*/;
-			UINT8 data[2][0x100][0x20];
+			uint8_t ypos, xpos/*tennis*/;
+			uint8_t data[2][0x100][0x20];
 		} bitmap;
-		UINT8 x, y;
+		uint8_t x, y;
 		bool y_increment;
 	} video;
 
@@ -71,8 +76,8 @@ private:
 	{
 		bool set;
 		int bit_shifter;
-		UINT8 cartridge_byte;
-		UINT16 address; // in reality something more like short local cartridge address offset
+		uint8_t cartridge_byte;
+		uint16_t address; // in reality something more like short local cartridge address offset
 		bool unprotected;
 		bool failed;
 	} card_protection;
@@ -82,13 +87,13 @@ private:
 	required_device<generic_slot_device> m_cart;
 	required_ioport m_io_joy;
 	required_device<palette_device> m_palette;
-	required_shared_ptr<UINT8> m_bios;
+	required_shared_ptr<uint8_t> m_bios;
 	required_memory_bank m_bank;
 	required_memory_bank m_bankmulti;
 	emu_timer *timer1;
 	emu_timer *timer2;
-	UINT8 bank_multi;
-	UINT8 *m_cart_ptr;
+	uint8_t bank_multi;
+	uint8_t *m_cart_ptr;
 };
 
 WRITE8_MEMBER( gamate_state::gamate_cart_protection_w )
@@ -111,7 +116,7 @@ WRITE8_MEMBER( gamate_state::gamate_cart_protection_w )
 
 READ8_MEMBER( gamate_state::gamate_cart_protection_r )
 {
-	UINT8 ret=1;
+	uint8_t ret=1;
 	if (card_protection.bit_shifter==7 && card_protection.unprotected)
 	{
 		ret=m_cart_ptr[bank_multi*0x4000];
@@ -206,9 +211,9 @@ READ8_MEMBER( gamate_state::gamate_video_r )
 {
 	if (offset!=6)
 		return 0;
-	UINT8 data = video.bitmap.data[video.bitmap.page2][video.y][video.x&(ARRAY_LENGTH(video.bitmap.data[0][0])-1)];
+	uint8_t data = video.bitmap.data[video.bitmap.page2][video.y][video.x&(ARRAY_LENGTH(video.bitmap.data[0][0])-1)];
 //  if (m_maincpu->pc()<0xf000)
-//    machine().ui().popup_time(2, "lcd read x:%x y:%x mode:%x data:%x\n", video.x, video.y, video.reg[1], data);
+//    popmessage("lcd read x:%x y:%x mode:%x data:%x\n", video.x, video.y, video.reg[1], data);
 	if (video.y_increment)
 		video.y++;
 	else
@@ -219,8 +224,8 @@ READ8_MEMBER( gamate_state::gamate_video_r )
 
 READ8_MEMBER( gamate_state::gamate_nmi_r )
 {
-	UINT8 data=0;
-	machine().ui().popup_time(2, "nmi/4800 read\n");
+	uint8_t data=0;
+	popmessage("nmi/4800 read\n");
 	return data;
 }
 
@@ -273,7 +278,7 @@ PALETTE_INIT_MEMBER(gamate_state, gamate)
 	}
 }
 
-static void BlitPlane(UINT16* line, UINT8 plane1, UINT8 plane2)
+static void BlitPlane(uint16_t* line, uint8_t plane1, uint8_t plane2)
 {
 	line[3]=(plane1&1)|((plane2<<1)&2);
 	line[2]=((plane1>>1)&1)|((plane2<<0)&2);
@@ -281,14 +286,14 @@ static void BlitPlane(UINT16* line, UINT8 plane1, UINT8 plane2)
 	line[0]=((plane1>>3)&1)|((plane2>>2)&2);
 }
 
-UINT32 gamate_state::screen_update_gamate(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t gamate_state::screen_update_gamate(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x, y, j;
 	for (y=0;y<152;y++)
 	{
 		for (x=-(video.bitmap.xpos&7), j=0;x<160;x+=8, j++)
 		{
-			UINT8 d1, d2;
+			uint8_t d1, d2;
 			if (video.bitmap.ypos<200)
 			{
 				d1=video.bitmap.data[0][(y+video.bitmap.ypos)%200][(j+video.bitmap.xpos/8)&0x1f];
@@ -337,7 +342,7 @@ void gamate_state::machine_start()
 	card_protection.set=false;
 	bank_multi=0;
 	card_protection.unprotected=false;
-	timer2->enable(TRUE);
+	timer2->enable(true);
 	timer2->reset(m_maincpu->cycles_to_attotime(1000));
 #if 0
 	save_item(NAME(m_video.data));
@@ -355,15 +360,15 @@ void gamate_state::machine_start()
 TIMER_CALLBACK_MEMBER(gamate_state::gamate_timer)
 {
 	m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
-	timer1->enable(FALSE);
+	timer1->enable(false);
 }
 
 TIMER_CALLBACK_MEMBER(gamate_state::gamate_timer2)
 {
 	m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
-	timer1->enable(TRUE);
+	timer1->enable(true);
 	timer1->reset(m_maincpu->cycles_to_attotime(10/* cycles short enought to clear irq line early enough*/));
-	timer2->enable(TRUE);
+	timer2->enable(true);
 	timer2->reset(m_maincpu->cycles_to_attotime(32768/2));
 }
 
@@ -372,7 +377,7 @@ INTERRUPT_GEN_MEMBER(gamate_state::gamate_interrupt)
 {
 }
 
-static MACHINE_CONFIG_START( gamate, gamate_state )
+static MACHINE_CONFIG_START( gamate )
 	MCFG_CPU_ADD("maincpu", M6502, 4433000/2)
 	MCFG_CPU_PROGRAM_MAP(gamate_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gamate_state,  gamate_interrupt)
@@ -428,5 +433,5 @@ ROM_START(gamate)
 ROM_END
 
 
-/*    YEAR  NAME     PARENT  COMPAT    MACHINE  INPUT   CLASS         INIT      COMPANY    FULLNAME */
-CONS( 1990, gamate,  0,      0,        gamate,  gamate, gamate_state, gamate, "Bit Corp", "Gamate", 0)
+//    YEAR  NAME     PARENT  COMPAT    MACHINE  INPUT   CLASS         INIT    COMPANY     FULLNAME  FLAGS
+CONS( 1990, gamate,  0,      0,        gamate,  gamate, gamate_state, gamate, "Bit Corp", "Gamate", 0 )

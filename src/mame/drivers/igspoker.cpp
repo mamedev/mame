@@ -64,13 +64,18 @@ FIX: PK Tetris have an input named AMUSE which I couldn't map.  Maybe it is
 
 *****************************************************************************/
 
-#define VERBOSE 0
-
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/i8255.h"
 #include "sound/ym2413.h"
 #include "sound/okim6295.h"
+#include "screen.h"
+#include "speaker.h"
+
 #include "igspoker.lh"
+
+
+#define VERBOSE 0
 
 
 class igspoker_state : public driver_device
@@ -87,9 +92,9 @@ public:
 		m_palette(*this, "palette"){ }
 
 	required_device<cpu_device> m_maincpu;
-	optional_shared_ptr<UINT8> m_bg_tile_ram;
-	required_shared_ptr<UINT8> m_fg_tile_ram;
-	required_shared_ptr<UINT8> m_fg_color_ram;
+	optional_shared_ptr<uint8_t> m_bg_tile_ram;
+	required_shared_ptr<uint8_t> m_fg_tile_ram;
+	required_shared_ptr<uint8_t> m_fg_color_ram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -98,8 +103,8 @@ public:
 	int m_hopper;
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_bg_tilemap;
-	UINT8 m_out[3];
-	UINT8 m_protection_res;
+	uint8_t m_out[3];
+	uint8_t m_protection_res;
 
 	DECLARE_READ8_MEMBER(igs_irqack_r);
 	DECLARE_WRITE8_MEMBER(igs_irqack_w);
@@ -128,8 +133,8 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_VIDEO_START(cpokerpk);
-	UINT32 screen_update_igs_video(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_cpokerpk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_igs_video(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_cpokerpk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(igs_interrupt);
 };
 
@@ -202,13 +207,13 @@ WRITE8_MEMBER(igspoker_state::fg_color_w)
 
 void igspoker_state::video_start()
 {
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(igspoker_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,   8,  8,  64, 32);
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(igspoker_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,   8,  32, 64, 8);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(igspoker_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,   8,  8,  64, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(igspoker_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,   8,  32, 64, 8);
 
 	m_fg_tilemap->set_transparent_pen(0);
 }
 
-UINT32 igspoker_state::screen_update_igs_video(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t igspoker_state::screen_update_igs_video(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
@@ -222,10 +227,10 @@ UINT32 igspoker_state::screen_update_igs_video(screen_device &screen, bitmap_ind
 
 VIDEO_START_MEMBER(igspoker_state,cpokerpk)
 {
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(igspoker_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,   8,  8,  64, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(igspoker_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,   8,  8,  64, 32);
 }
 
-UINT32 igspoker_state::screen_update_cpokerpk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t igspoker_state::screen_update_cpokerpk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
@@ -361,7 +366,7 @@ CUSTOM_INPUT_MEMBER(igspoker_state::hopper_r)
 
 READ8_MEMBER(igspoker_state::exp_rom_r)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 	return rom[offset+0x10000];
 }
 
@@ -378,9 +383,7 @@ static ADDRESS_MAP_START( igspoker_io_map, AS_IO, 8, igspoker_state )
 	AM_RANGE(0x4002, 0x4002) AM_READ_PORT("DSW3")           /* DSW3 */
 	AM_RANGE(0x4003, 0x4003) AM_READ_PORT("DSW4")           /* DSW4 */
 	AM_RANGE(0x4004, 0x4004) AM_READ_PORT("DSW5")           /* DSW5 */
-	AM_RANGE(0x5080, 0x5080) AM_WRITE(igs_nmi_and_coins_w)
-	AM_RANGE(0x5081, 0x5081) AM_READ_PORT("SERVICE")            /* Services */
-	AM_RANGE(0x5082, 0x5082) AM_READ_PORT("COINS")          /* Coing & Kbd */
+	AM_RANGE(0x5080, 0x5083) AM_DEVREADWRITE("ppi", i8255_device, read, write)
 	AM_RANGE(0x5090, 0x5090) AM_WRITE(custom_io_w)
 	AM_RANGE(0x5091, 0x5091) AM_READ(custom_io_r) AM_WRITE(igs_lamps_w )            /* Keyboard */
 	AM_RANGE(0x50a0, 0x50a0) AM_READ_PORT("BUTTONS2")           /* Not connected */
@@ -1774,13 +1777,18 @@ static GFXDECODE_START( cpokerpk )
 	GFXDECODE_ENTRY( "gfx2", 0x00000, charlayout2,  0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( igspoker, igspoker_state )
+static MACHINE_CONFIG_START( igspoker )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, 3579545)
 	MCFG_CPU_PROGRAM_MAP(igspoker_prg_map)
 	MCFG_CPU_IO_MAP(igspoker_io_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igspoker_state, igs_interrupt, "screen", 0, 1)
+
+	MCFG_DEVICE_ADD("ppi", I8255A, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(igspoker_state, igs_nmi_and_coins_w))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("SERVICE"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("COINS"))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1818,11 +1826,13 @@ static MACHINE_CONFIG_DERIVED( number10, igspoker )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(number10_io_map)
 
+	MCFG_DEVICE_REMOVE("ppi")
+
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(igspoker_state, screen_update_cpokerpk)
 	MCFG_VIDEO_START_OVERRIDE(igspoker_state,cpokerpk)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_12MHz / 12, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL_12MHz / 12, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1935,7 +1945,7 @@ ROM_END
 DRIVER_INIT_MEMBER(igspoker_state,cpoker)
 {
 	int A;
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 
 	for (A = 0; A < 0x10000; A++)
@@ -1949,7 +1959,7 @@ DRIVER_INIT_MEMBER(igspoker_state,cpoker)
 
 DRIVER_INIT_MEMBER(igspoker_state,cpokert)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 	int i;
 
 	/* decrypt the program ROM */
@@ -1979,7 +1989,7 @@ DRIVER_INIT_MEMBER(igspoker_state,cpokert)
 DRIVER_INIT_MEMBER(igspoker_state,cska)
 {
 	int A;
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 
 	for (A = 0; A < 0x10000; A++)
@@ -1996,7 +2006,7 @@ DRIVER_INIT_MEMBER(igspoker_state,cska)
 DRIVER_INIT_MEMBER(igspoker_state,igs_ncs)
 {
 	int A;
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 
 	for (A = 0; A < 0x10000; A++)
@@ -2157,7 +2167,7 @@ Clocks
 
 DRIVER_INIT_MEMBER(igspoker_state,igs_ncs2)
 {
-	UINT8 *src = (UINT8 *) (memregion("maincpu")->base());
+	uint8_t *src = (uint8_t *) (memregion("maincpu")->base());
 	int i;
 
 	for(i = 0; i < 0x10000; i++)
@@ -2232,7 +2242,7 @@ DRIVER_INIT_MEMBER(igspoker_state,chleague)
 {
 	int A;
 	int length;
-	UINT8 *rom;
+	uint8_t *rom;
 
 	rom = memregion("maincpu")->base();
 	length = memregion("maincpu")->bytes();
@@ -2442,7 +2452,7 @@ DRIVER_INIT_MEMBER(igspoker_state,number10)
 {
 	int A;
 	int length;
-	UINT8 *rom;
+	uint8_t *rom;
 
 	rom = memregion("maincpu")->base();
 	length = memregion("maincpu")->bytes();
@@ -2476,7 +2486,7 @@ DRIVER_INIT_MEMBER(igspoker_state,number10)
 	/* Descramble graphic */
 	rom = memregion("gfx1")->base();
 	length = memregion("gfx1")->bytes();
-	dynamic_buffer tmp(length);
+	std::vector<uint8_t> tmp(length);
 	memcpy(&tmp[0],rom,length);
 	for (A = 0; A < length; A++)
 	{
@@ -2521,7 +2531,7 @@ ROM_END
 DRIVER_INIT_MEMBER(igspoker_state,cpokerpk)
 {
 	int A;
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	for (A = 0x0714; A < 0xF000; A += 0x1000)
 		rom[A] ^= 0x20;
@@ -2589,7 +2599,7 @@ ROM_END
 DRIVER_INIT_MEMBER(igspoker_state,pktet346)
 {
 	int A;
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 
 	for (A = 0;A < 0x10000; A++)
@@ -2668,7 +2678,7 @@ ROM_END
 DRIVER_INIT_MEMBER(igspoker_state, kungfu)
 {
 	int A;
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	for (A = 0x4000;A < 0x10000; A++)
 	{
@@ -2696,7 +2706,7 @@ GAMEL( 199?, citalcup,  cpokerpk, cpokerpk, cpokerpk, igspoker_state, cpokerpk, 
 
 GAMEL( 2000, igs_ncs2,  0,        igs_ncs,  igs_ncs,  igspoker_state, igs_ncs2, ROT0, "IGS",                  "New Champion Skill (v100n 2000)",              MACHINE_IMPERFECT_GRAPHICS, layout_igspoker )
 
-GAMEL( 1998, stellecu,  0,        number10, number10, driver_device,  0,        ROT0, "Sure",                 "Stelle e Cubi (Italy)",                        MACHINE_NOT_WORKING, layout_igspoker )
+GAMEL( 1998, stellecu,  0,        number10, number10, igspoker_state, 0,        ROT0, "Sure",                 "Stelle e Cubi (Italy)",                        MACHINE_NOT_WORKING, layout_igspoker )
 
 GAMEL( 1993?,pktet346,  0,        pktetris, pktet346, igspoker_state, pktet346, ROT0, "IGS",                  "PK Tetris (v346I)",                            0, layout_igspoker )
 

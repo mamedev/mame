@@ -11,6 +11,8 @@
 #include "emu.h"
 #include "includes/btoads.h"
 
+#include "speaker.h"
+
 
 #define CPU_CLOCK           XTAL_64MHz
 #define VIDEO_CLOCK         XTAL_20MHz
@@ -298,11 +300,11 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( btoads, btoads_state )
+static MACHINE_CONFIG_START( btoads )
 
 	MCFG_CPU_ADD("maincpu", TMS34020, CPU_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_TMS340X0_HALT_ON_RESET(FALSE) /* halt on reset */
+	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(VIDEO_CLOCK/2) /* pixel clock */
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */
 	MCFG_TMS340X0_SCANLINE_RGB32_CB(btoads_state, scanline_update)     /* scanline updater (RGB32) */
@@ -367,4 +369,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1994, btoads, 0, btoads, btoads, driver_device, 0,  ROT0, "Rare / Electronic Arts", "Battletoads", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, btoads, 0, btoads, btoads, btoads_state, 0,  ROT0, "Rare / Electronic Arts", "Battletoads", MACHINE_SUPPORTS_SAVE )

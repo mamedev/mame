@@ -15,6 +15,7 @@
 #include "ui/ui.h"
 #include "ui/miscmenu.h"
 #include "ui/optsmenu.h"
+#include "ui/utils.h"
 
 #include "audit.h"
 #include "drivenum.h"
@@ -30,11 +31,11 @@ namespace ui {
 //  ctor
 //-------------------------------------------------
 
-simple_menu_select_game::simple_menu_select_game(mame_ui_manager &mui, render_container *container, const char *gamename) : menu(mui, container), m_driverlist(driver_list::total() + 1)
+simple_menu_select_game::simple_menu_select_game(mame_ui_manager &mui, render_container &container, const char *gamename) : menu(mui, container), m_driverlist(driver_list::total() + 1)
 {
 	build_driver_list();
-	if(gamename)
-		strcpy(m_search, gamename);
+	if (gamename)
+		m_search.assign(gamename);
 	m_matchlist[0] = -1;
 }
 
@@ -73,7 +74,7 @@ void simple_menu_select_game::build_driver_list()
 
 		// build a name for it
 		for (src = dir->name; *src != 0 && *src != '.' && dst < &drivername[ARRAY_LENGTH(drivername) - 1]; src++)
-			*dst++ = tolower((UINT8)*src);
+			*dst++ = tolower((uint8_t)*src);
 		*dst = 0;
 
 		int drivnum = m_drivlist->find(drivername);
@@ -132,7 +133,7 @@ void simple_menu_select_game::handle()
 
 	// if we're in an error state, overlay an error message
 	if (m_error)
-		ui().draw_text_box(container,
+		ui().draw_text_box(container(),
 							"The selected game is missing one or more required ROM or CHD images. "
 							"Please select a different game.\n\nPress any key to continue.",
 							ui::text_layout::CENTER, 0.5f, 0.5f, UI_RED_COLOR);
@@ -148,8 +149,8 @@ void simple_menu_select_game::inkey_select(const event *menu_event)
 	const game_driver *driver = (const game_driver *)menu_event->itemref;
 
 	// special case for configure inputs
-	if ((FPTR)driver == 1)
-		menu::stack_push<menu_game_options>(ui(), container);
+	if ((uintptr_t)driver == 1)
+		menu::stack_push<menu_game_options>(ui(), container());
 	// anything else is a driver
 	else
 	{
@@ -164,7 +165,7 @@ void simple_menu_select_game::inkey_select(const event *menu_event)
 		{
 			mame_machine_manager::instance()->schedule_new_driver(*driver);
 			machine().schedule_hard_reset();
-			menu::stack_reset(machine());
+			stack_reset();
 		}
 
 		// otherwise, display an error
@@ -184,9 +185,9 @@ void simple_menu_select_game::inkey_select(const event *menu_event)
 void simple_menu_select_game::inkey_cancel()
 {
 	// escape pressed with non-empty text clears the text
-	if (m_search[0] != 0)
+	if (!m_search.empty())
 	{
-		m_search[0] = '\0';
+		m_search.clear();
 		reset(reset_options::SELECT_FIRST);
 	}
 }
@@ -199,23 +200,12 @@ void simple_menu_select_game::inkey_cancel()
 void simple_menu_select_game::inkey_special(const event *menu_event)
 {
 	// typed characters append to the buffer
-	auto const buflen = std::strlen(m_search);
-
-	if ((menu_event->unichar == 8) || (menu_event->unichar == 0x7f))
+	size_t old_size = m_search.size();
+	if (input_character(m_search, menu_event->unichar, uchar_is_printable))
 	{
-		// if it's a backspace and we can handle it, do so
-		if (0 < buflen)
-		{
-			*const_cast<char *>(utf8_previous_char(&m_search[buflen])) = 0;
+		if (m_search.size() < old_size)
 			m_rerandomize = true;
-			reset(reset_options::SELECT_FIRST);
-		}
-	}
-	else if (menu_event->is_char_printable())
-	{
-		// if it's any other key and we're not maxed out, update
-		if (menu_event->append_char(m_search, buflen))
-			reset(reset_options::SELECT_FIRST);
+		reset(reset_options::SELECT_FIRST);
 	}
 }
 
@@ -224,7 +214,7 @@ void simple_menu_select_game::inkey_special(const event *menu_event)
 //  populate - populate the game select menu
 //-------------------------------------------------
 
-void simple_menu_select_game::populate()
+void simple_menu_select_game::populate(float &customtop, float &custombottom)
 {
 	int matchcount;
 	int curitem;
@@ -248,8 +238,8 @@ void simple_menu_select_game::populate()
 
 	// otherwise, rebuild the match list
 	assert(m_drivlist != nullptr);
-	if (m_search[0] != 0 || m_matchlist[0] == -1 || m_rerandomize)
-		m_drivlist->find_approximate_matches(m_search, matchcount, m_matchlist);
+	if (!m_search.empty() || m_matchlist[0] == -1 || m_rerandomize)
+		m_drivlist->find_approximate_matches(m_search.c_str(), matchcount, m_matchlist);
 	m_rerandomize = false;
 
 	// iterate over entries
@@ -259,12 +249,12 @@ void simple_menu_select_game::populate()
 		if (curmatch != -1)
 		{
 			int cloneof = m_drivlist->non_bios_clone(curmatch);
-			item_append(m_drivlist->driver(curmatch).name, m_drivlist->driver(curmatch).description, (cloneof == -1) ? 0 : FLAG_INVERT, (void *)&m_drivlist->driver(curmatch));
+			item_append(m_drivlist->driver(curmatch).name, m_drivlist->driver(curmatch).type.fullname(), (cloneof == -1) ? 0 : FLAG_INVERT, (void *)&m_drivlist->driver(curmatch));
 		}
 	}
 
 	// if we're forced into this, allow general input configuration as well
-	if (menu::stack_has_special_main_menu())
+	if (stack_has_special_main_menu())
 	{
 		item_append(menu_item_type::SEPARATOR);
 		item_append(_("Configure Options"), "", 0, (void *)1);
@@ -291,16 +281,16 @@ void simple_menu_select_game::custom_render(void *selectedref, float top, float 
 	int line;
 
 	// display the current typeahead
-	if (m_search[0] != 0)
+	if (!m_search.empty())
 		tempbuf[0] = string_format(_("Type name or select: %1$s_"), m_search);
 	else
 		tempbuf[0] = _("Type name or select: (random)");
 
 	// get the size of the text
-	ui().draw_text_full(container, tempbuf[0].c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
-						mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
+	ui().draw_text_full(container(), tempbuf[0].c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
+						mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(), &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
-	maxwidth = MAX(width, origx2 - origx1);
+	maxwidth = std::max(width, origx2 - origx1);
 
 	// compute our bounds
 	x1 = 0.5f - 0.5f * maxwidth;
@@ -309,7 +299,7 @@ void simple_menu_select_game::custom_render(void *selectedref, float top, float 
 	y2 = origy1 - UI_BOX_TB_BORDER;
 
 	// draw a box
-	ui().draw_outlined_box(container, x1, y1, x2, y2, UI_BACKGROUND_COLOR);
+	ui().draw_outlined_box(container(), x1, y1, x2, y2, UI_BACKGROUND_COLOR);
 
 	// take off the borders
 	x1 += UI_BOX_LR_BORDER;
@@ -317,23 +307,23 @@ void simple_menu_select_game::custom_render(void *selectedref, float top, float 
 	y1 += UI_BOX_TB_BORDER;
 
 	// draw the text within it
-	ui().draw_text_full(container, tempbuf[0].c_str(), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
+	ui().draw_text_full(container(), tempbuf[0].c_str(), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
 						mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 
 	// determine the text to render below
-	driver = ((FPTR)selectedref > skip_main_items) ? (const game_driver *)selectedref : nullptr;
+	driver = ((uintptr_t)selectedref > skip_main_items) ? (const game_driver *)selectedref : nullptr;
 	if (driver != nullptr)
 	{
 		const char *gfxstat, *soundstat;
 
 		// first line is game name
-		tempbuf[0] = string_format(_("%1$-.100s"), driver->description);
+		tempbuf[0] = string_format(_("%1$-.100s"), driver->type.fullname());
 
 		// next line is year, manufacturer
 		tempbuf[1] = string_format(_("%1$s, %2$-.100s"), driver->year, driver->manufacturer);
 
 		// next line source path
-		tempbuf[2] = string_format(_("Driver: %1$-.100s"), core_filename_extract_base(driver->source_file).c_str());
+		tempbuf[2] = string_format(_("Driver: %1$-.100s"), core_filename_extract_base(driver->type.source()));
 
 		// next line is overall driver status
 		if (driver->flags & MACHINE_NOT_WORKING)
@@ -387,10 +377,10 @@ void simple_menu_select_game::custom_render(void *selectedref, float top, float 
 	maxwidth = origx2 - origx1;
 	for (line = 0; line < 4; line++)
 	{
-		ui().draw_text_full(container, tempbuf[line].c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
-							mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
+		ui().draw_text_full(container(), tempbuf[line].c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
+							mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(), &width, nullptr);
 		width += 2 * UI_BOX_LR_BORDER;
-		maxwidth = MAX(maxwidth, width);
+		maxwidth = std::max(maxwidth, width);
 	}
 
 	// compute our bounds
@@ -407,7 +397,7 @@ void simple_menu_select_game::custom_render(void *selectedref, float top, float 
 		color = UI_YELLOW_COLOR;
 	if (driver != nullptr && (driver->flags & (MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION)) != 0)
 		color = UI_RED_COLOR;
-	ui().draw_outlined_box(container, x1, y1, x2, y2, color);
+	ui().draw_outlined_box(container(), x1, y1, x2, y2, color);
 
 	// take off the borders
 	x1 += UI_BOX_LR_BORDER;
@@ -417,7 +407,7 @@ void simple_menu_select_game::custom_render(void *selectedref, float top, float 
 	// draw all lines
 	for (line = 0; line < 4; line++)
 	{
-		ui().draw_text_full(container, tempbuf[line].c_str(), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
+		ui().draw_text_full(container(), tempbuf[line].c_str(), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
 							mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 		y1 += ui().get_line_height();
 	}
@@ -429,7 +419,7 @@ void simple_menu_select_game::custom_render(void *selectedref, float top, float 
 //  select menu to be visible and inescapable
 //-------------------------------------------------
 
-void simple_menu_select_game::force_game_select(mame_ui_manager &mui, render_container *container)
+void simple_menu_select_game::force_game_select(mame_ui_manager &mui, render_container &container)
 {
 	char *gamename = (char *)mui.machine().options().system_name();
 

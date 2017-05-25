@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:smf
+#include "emu.h"
 #include "t10mmc.h"
 
 static int to_msf(int frame)
@@ -251,6 +252,41 @@ void t10mmc::ExecCommand()
 		m_transfer_length = 0;
 		break;
 
+	case T10MMC_CMD_PLAY_AUDIO_MSF:
+		m_lba = (command[5] % 75) + ((command[4] * 75) % (60*75)) + (command[3] * (75*60));
+		m_blocks = (command[8] % 75) + ((command[7] * 75) % (60*75)) + (command[6] * (75*60)) - m_lba;
+
+		// special cases: lba of 0 means MSF of 00:02:00
+		if (m_lba == 0)
+		{
+			m_lba = 150;
+		}
+		else if (m_lba == 0xffffffff)
+		{
+			m_device->logerror("T10MMC: play audio from current not implemented!\n");
+		}
+
+		m_device->logerror("T10MMC: PLAY AUDIO MSF at LBA %x for %x blocks (MSF %i:%i:%i - %i:%i:%i)\n",
+			m_lba, m_blocks, command[3], command[4], command[5], command[6], command[7], command[8]);
+
+		trk = cdrom_get_track(m_cdrom, m_lba);
+
+		if (cdrom_get_track_type(m_cdrom, trk) == CD_TRACK_AUDIO)
+		{
+			m_cdda->start_audio(m_lba, m_blocks);
+			m_audio_sense = SCSI_SENSE_ASC_ASCQ_AUDIO_PLAY_OPERATION_IN_PROGRESS;
+		}
+		else
+		{
+			m_device->logerror("T10MMC: track is NOT audio!\n");
+			set_sense(SCSI_SENSE_KEY_ILLEGAL_REQUEST, SCSI_SENSE_ASC_ASCQ_ILLEGAL_MODE_FOR_THIS_TRACK);
+		}
+
+		m_phase = SCSI_PHASE_STATUS;
+		m_status_code = SCSI_STATUS_CODE_GOOD;
+		m_transfer_length = 0;
+		break;
+
 	case T10MMC_CMD_PLAY_AUDIO_TRACK_INDEX:
 		// be careful: tracks here are zero-based, but the SCSI command
 		// uses the real CD track number which is 1-based!
@@ -392,10 +428,10 @@ void t10mmc::ExecCommand()
 //
 // Read data from the device resulting from the execution of a command
 
-void t10mmc::ReadData( UINT8 *data, int dataLength )
+void t10mmc::ReadData( uint8_t *data, int dataLength )
 {
-	UINT32 temp;
-	UINT8 tmp_buffer[2048];
+	uint32_t temp;
+	uint8_t tmp_buffer[2048];
 
 	switch ( command[0] )
 	{
@@ -515,7 +551,7 @@ void t10mmc::ReadData( UINT8 *data, int dataLength )
 					data[6] = cdrom_get_track(m_cdrom, m_last_lba) + 1; // track
 					data[7] = 0;    // index
 
-					UINT32 frame = m_last_lba;
+					uint32_t frame = m_last_lba;
 
 					if (msf)
 					{
@@ -603,7 +639,7 @@ void t10mmc::ReadData( UINT8 *data, int dataLength )
 						data[dptr++] = track;
 						data[dptr++] = 0;
 
-						UINT32 tstart = cdrom_get_track_start(m_cdrom, cdrom_track);
+						uint32_t tstart = cdrom_get_track_start(m_cdrom, cdrom_track);
 
 						if (msf)
 						{
@@ -633,7 +669,7 @@ void t10mmc::ReadData( UINT8 *data, int dataLength )
 					data[dptr++] = 1;
 					data[dptr++] = 0;
 
-					UINT32 tstart = cdrom_get_track_start(m_cdrom, 0);
+					uint32_t tstart = cdrom_get_track_start(m_cdrom, 0);
 
 					if (msf)
 					{
@@ -714,7 +750,7 @@ void t10mmc::ReadData( UINT8 *data, int dataLength )
 //
 // Write data to the CD-ROM device as part of the execution of a command
 
-void t10mmc::WriteData( UINT8 *data, int dataLength )
+void t10mmc::WriteData( uint8_t *data, int dataLength )
 {
 	switch (command[ 0 ])
 	{

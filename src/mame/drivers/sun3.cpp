@@ -179,19 +179,26 @@ fefc34a - start of mem_size, which queries ECC registers for each memory board
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m68000/m68000.h"
-#include "machine/timekpr.h"
-#include "machine/ram.h"
-#include "machine/z80scc.h"
 #include "machine/bankdev.h"
 #include "machine/nvram.h"
+#include "machine/ram.h"
+#include "machine/timekpr.h"
+#include "machine/z80scc.h"
+
 #include "bus/rs232/rs232.h"
+#include "bus/sunkbd/sunkbd.h"
+
+#include "screen.h"
+
 
 #define TIMEKEEPER_TAG  "timekpr"
 #define SCC1_TAG        "scc1"
 #define SCC2_TAG        "scc2"
 #define RS232A_TAG      "rs232a"
 #define RS232B_TAG      "rs232b"
+#define KEYBOARD_TAG    "keyboard"
 
 // page table entry constants
 #define PM_VALID    (0x80000000)    // page is valid
@@ -234,8 +241,8 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	optional_shared_ptr<UINT32> m_p_ram;
-	optional_shared_ptr<UINT32> m_bw2_vram;
+	optional_shared_ptr<uint32_t> m_p_ram;
+	optional_shared_ptr<uint32_t> m_bw2_vram;
 	optional_device<address_map_bank_device> m_type0space, m_type1space, m_type2space, m_type3space;
 	required_memory_region m_rom, m_idprom;
 	required_device<ram_device> m_ram;
@@ -253,25 +260,25 @@ public:
 	DECLARE_READ8_MEMBER( rtc7170_r );
 	DECLARE_WRITE8_MEMBER( rtc7170_w );
 
-	UINT32 bw2_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	UINT32 bw2_16x11_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	UINT32 bw2_350_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t bw2_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t bw2_16x11_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t bw2_350_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(sun3_timer);
 
 private:
-	UINT32 *m_rom_ptr, *m_ram_ptr;
-	UINT8 *m_idprom_ptr;
-	UINT32 m_enable, m_diag, m_dvma_enable, m_parregs[8], m_irqctrl, m_ecc[4];
-	UINT8 m_buserr;
+	uint32_t *m_rom_ptr, *m_ram_ptr;
+	uint8_t *m_idprom_ptr;
+	uint32_t m_enable, m_diag, m_dvma_enable, m_parregs[8], m_irqctrl, m_ecc[4];
+	uint8_t m_buserr;
 
-	UINT32 m_context;
-	UINT8 m_segmap[8][2048];
-	UINT32 m_pagemap[4096];
-	UINT32 m_ram_size, m_ram_size_words;
+	uint32_t m_context;
+	uint8_t m_segmap[8][2048];
+	uint32_t m_pagemap[4096];
+	uint32_t m_ram_size, m_ram_size_words;
 	bool m_bInBusErr;
 
-	UINT32 m_cache_tags[0x4000], m_cache_data[0x4000];
+	uint32_t m_cache_tags[0x4000], m_cache_data[0x4000];
 };
 
 READ32_MEMBER( sun3_state::ram_r )
@@ -383,9 +390,9 @@ WRITE32_MEMBER( sun3_state::ram_w )
 
 READ32_MEMBER( sun3_state::tl_mmu_r )
 {
-	UINT8 fc = m_maincpu->get_fc();
+	uint8_t fc = m_maincpu->get_fc();
 
-	if ((fc == 3) && !space.debugger_access())
+	if ((fc == 3) && !machine().side_effect_disabled())
 	{
 		int page;
 
@@ -451,14 +458,14 @@ READ32_MEMBER( sun3_state::tl_mmu_r )
 	}
 
 	// debugger hack
-	if ((space.debugger_access()) && (offset >= (0xfef0000>>2)) && (offset <= (0xfefffff>>2)))
+	if (machine().side_effect_disabled() && (offset >= (0xfef0000>>2)) && (offset <= (0xfefffff>>2)))
 	{
 		return m_rom_ptr[offset & 0x3fff];
 	}
 
 	// it's translation time
-	UINT8 pmeg = m_segmap[m_context & 7][(offset >> 15) & 0x7ff];
-	UINT32 entry = (pmeg << 4) + ((offset >> 11) & 0xf);
+	uint8_t pmeg = m_segmap[m_context & 7][(offset >> 15) & 0x7ff];
+	uint32_t entry = (pmeg << 4) + ((offset >> 11) & 0xf);
 
 	//printf("sun3: Context = %d, pmeg = %d, offset >> 15 = %x, entry = %d, page = %d\n", m_context&7, pmeg, (offset >> 15) & 0x7ff, entry, (offset >> 11) & 0xf);
 
@@ -475,12 +482,12 @@ READ32_MEMBER( sun3_state::tl_mmu_r )
 
 		m_pagemap[entry] |= PM_ACCESSED;
 
-		UINT32 tmp = (m_pagemap[entry] & 0x7ffff) << 11;
+		uint32_t tmp = (m_pagemap[entry] & 0x7ffff) << 11;
 		tmp |= (offset & 0x7ff);
 
 		//printf("pmeg %d, entry %d = %08x, virt %08x => tmp %08x\n", pmeg, entry, m_pagemap[entry], offset << 2, tmp);
 
-	//  if (!space.debugger_access())
+	//  if (!machine().side_effect_disabled())
 		//printf("sun3: Translated addr: %08x, type %d (page %d page entry %08x, orig virt %08x, FC %d)\n", tmp << 2, (m_pagemap[entry] >> 26) & 3, entry, m_pagemap[entry], offset<<2, fc);
 
 		switch ((m_pagemap[entry] >> 26) & 3)
@@ -505,7 +512,7 @@ READ32_MEMBER( sun3_state::tl_mmu_r )
 	}
 	else
 	{
-//      if (!space.debugger_access()) printf("sun3: pagemap entry not valid! (PC=%x)\n", m_maincpu->pc);
+//      if (!machine().side_effect_disabled()) printf("sun3: pagemap entry not valid! (PC=%x)\n", m_maincpu->pc);
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 		m_buserr = BE_INVALID;
@@ -513,14 +520,14 @@ READ32_MEMBER( sun3_state::tl_mmu_r )
 		return 0xffffffff;
 	}
 
-	if (!space.debugger_access()) logerror("sun3: Unmapped read @ %08x (FC %d, mask %08x, PC=%x, seg %x)\n", offset<<2, fc, mem_mask, m_maincpu->pc, offset>>15);
+	if (!machine().side_effect_disabled()) logerror("sun3: Unmapped read @ %08x (FC %d, mask %08x, PC=%x, seg %x)\n", offset<<2, fc, mem_mask, m_maincpu->pc, offset>>15);
 
 	return 0xffffffff;
 }
 
 WRITE32_MEMBER( sun3_state::tl_mmu_w )
 {
-	UINT8 fc = m_maincpu->get_fc();
+	uint8_t fc = m_maincpu->get_fc();
 
 	//printf("sun3: Write %08x (FC %d, mask %08x, PC=%x) to %08x\n", data, fc, mem_mask, m_maincpu->pc, offset<<1);
 
@@ -610,8 +617,8 @@ WRITE32_MEMBER( sun3_state::tl_mmu_w )
 	}
 
 	// it's translation time
-	UINT8 pmeg = m_segmap[m_context & 7][(offset >> 15) & 0x7ff];
-	UINT32 entry = (pmeg << 4) + ((offset >> 11) & 0xf);
+	uint8_t pmeg = m_segmap[m_context & 7][(offset >> 15) & 0x7ff];
+	uint32_t entry = (pmeg << 4) + ((offset >> 11) & 0xf);
 
 	if (m_pagemap[entry] & PM_VALID)
 	{
@@ -628,10 +635,10 @@ WRITE32_MEMBER( sun3_state::tl_mmu_w )
 
 		m_pagemap[entry] |= (PM_ACCESSED | PM_MODIFIED);
 
-		UINT32 tmp = (m_pagemap[entry] & 0x7ffff) << 11;
+		uint32_t tmp = (m_pagemap[entry] & 0x7ffff) << 11;
 		tmp |= (offset & 0x7ff);
 
-		//if (!space.debugger_access()) printf("sun3: Translated addr: %08x, type %d (page entry %08x, orig virt %08x)\n", tmp << 2, (m_pagemap[entry] >> 26) & 3, m_pagemap[entry], offset<<2);
+		//if (!machine().side_effect_disabled()) printf("sun3: Translated addr: %08x, type %d (page entry %08x, orig virt %08x)\n", tmp << 2, (m_pagemap[entry] >> 26) & 3, m_pagemap[entry], offset<<2);
 
 		switch ((m_pagemap[entry] >> 26) & 3)
 		{
@@ -655,7 +662,7 @@ WRITE32_MEMBER( sun3_state::tl_mmu_w )
 	}
 	else
 	{
-		//if (!space.debugger_access()) printf("sun3: pagemap entry not valid!\n");
+		//if (!machine().side_effect_disabled()) printf("sun3: pagemap entry not valid!\n");
 		m_buserr = BE_INVALID;
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
@@ -668,7 +675,7 @@ WRITE32_MEMBER( sun3_state::tl_mmu_w )
 
 READ32_MEMBER(sun3_state::parity_r)
 {
-	UINT32 rv = m_parregs[offset];
+	uint32_t rv = m_parregs[offset];
 
 	if (offset == 0)    // clear interrupt if any
 	{
@@ -809,7 +816,7 @@ READ32_MEMBER(sun3_state::ecc_r)
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 	}
 
-	UINT32 rv = m_ecc[offset & 0xf];
+	uint32_t rv = m_ecc[offset & 0xf];
 
 	if ((offset & 0xf) == 0) rv |= 0x06000000;  // indicate each ECC board is 32MB, for 128MB total
 
@@ -834,13 +841,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(sun3_state::sun3_timer)
 	}
 }
 
-UINT32 sun3_state::bw2_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t sun3_state::bw2_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UINT32 *scanline;
+	uint32_t *scanline;
 	int x, y;
-	UINT8 pixels;
-	static const UINT32 palette[2] = { 0, 0xffffff };
-	UINT8 *m_vram = (UINT8 *)m_bw2_vram.target();
+	uint8_t pixels;
+	static const uint32_t palette[2] = { 0, 0xffffff };
+	uint8_t *m_vram = (uint8_t *)m_bw2_vram.target();
 
 	for (y = 0; y < 900; y++)
 	{
@@ -862,13 +869,13 @@ UINT32 sun3_state::bw2_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 	return 0;
 }
 
-UINT32 sun3_state::bw2_16x11_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t sun3_state::bw2_16x11_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UINT32 *scanline;
+	uint32_t *scanline;
 	int x, y;
-	UINT8 pixels;
-	static const UINT32 palette[2] = { 0, 0xffffff };
-	UINT8 *m_vram = (UINT8 *)m_bw2_vram.target();
+	uint8_t pixels;
+	static const uint32_t palette[2] = { 0, 0xffffff };
+	uint8_t *m_vram = (uint8_t *)m_bw2_vram.target();
 
 	for (y = 0; y < 1100; y++)
 	{
@@ -890,13 +897,13 @@ UINT32 sun3_state::bw2_16x11_update(screen_device &screen, bitmap_rgb32 &bitmap,
 	return 0;
 }
 
-UINT32 sun3_state::bw2_350_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t sun3_state::bw2_350_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UINT32 *scanline;
+	uint32_t *scanline;
 	int x, y;
-	UINT8 pixels;
-	static const UINT32 palette[2] = { 0, 0xffffff };
-	UINT8 *m_vram = (UINT8 *)&m_ram_ptr[(0x100000>>2)];
+	uint8_t pixels;
+	static const uint32_t palette[2] = { 0, 0xffffff };
+	uint8_t *m_vram = (uint8_t *)&m_ram_ptr[(0x100000>>2)];
 
 	for (y = 0; y < 900; y++)
 	{
@@ -924,9 +931,9 @@ INPUT_PORTS_END
 
 void sun3_state::machine_start()
 {
-	m_rom_ptr = (UINT32 *)m_rom->base();
-	m_ram_ptr = (UINT32 *)m_ram->pointer();
-	m_idprom_ptr = (UINT8 *)m_idprom->base();
+	m_rom_ptr = (uint32_t *)m_rom->base();
+	m_ram_ptr = (uint32_t *)m_ram->pointer();
+	m_idprom_ptr = (uint8_t *)m_idprom->base();
 	m_ram_size = m_ram->size();
 	m_ram_size_words = m_ram_size >> 2;
 }
@@ -943,7 +950,7 @@ void sun3_state::machine_reset()
 }
 
 // The base Sun 3004 CPU board
-static MACHINE_CONFIG_START( sun3, sun3_state )
+static MACHINE_CONFIG_START( sun3 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68020, 16670000)
 	MCFG_CPU_PROGRAM_MAP(sun3_mem)
@@ -992,6 +999,11 @@ static MACHINE_CONFIG_START( sun3, sun3_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer", sun3_state, sun3_timer, attotime::from_hz(100))
 
 	MCFG_SCC8530_ADD(SCC1_TAG, XTAL_4_9152MHz, 0, 0, 0, 0)
+	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE(KEYBOARD_TAG, sun_keyboard_port_device, write_txd))
+
+	MCFG_SUNKBD_PORT_ADD(KEYBOARD_TAG, default_sun_keyboard_devices, "type3hle")
+	MCFG_SUNKBD_RXD_HANDLER(DEVWRITELINE(SCC1_TAG, z80scc_device, rxa_w))
+
 	MCFG_SCC8530_ADD(SCC2_TAG, XTAL_4_9152MHz, 0, 0, 0, 0)
 	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE(RS232A_TAG, rs232_port_device, write_txd))
 	MCFG_Z80SCC_OUT_TXDB_CB(DEVWRITELINE(RS232B_TAG, rs232_port_device, write_txd))
@@ -1041,7 +1053,7 @@ static MACHINE_CONFIG_DERIVED( sun3200, sun3 )
 	MCFG_RAM_EXTRA_OPTIONS("64M,96M,128M")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sun3_50, sun3_state )
+static MACHINE_CONFIG_START( sun3_50 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68020, 15700000)
 	MCFG_CPU_PROGRAM_MAP(sun3_mem)
@@ -1089,6 +1101,11 @@ static MACHINE_CONFIG_START( sun3_50, sun3_state )
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x80000000)
 
 	MCFG_SCC8530_ADD(SCC1_TAG, XTAL_4_9152MHz, 0, 0, 0, 0)
+	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE(KEYBOARD_TAG, sun_keyboard_port_device, write_txd))
+
+	MCFG_SUNKBD_PORT_ADD(KEYBOARD_TAG, default_sun_keyboard_devices, "type3hle")
+	MCFG_SUNKBD_RXD_HANDLER(DEVWRITELINE(SCC1_TAG, z80scc_device, rxa_w))
+
 	MCFG_SCC8530_ADD(SCC2_TAG, XTAL_4_9152MHz, 0, 0, 0, 0)
 	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE(RS232A_TAG, rs232_port_device, write_txd))
 	MCFG_Z80SCC_OUT_TXDB_CB(DEVWRITELINE(RS232B_TAG, rs232_port_device, write_txd))
@@ -1240,10 +1257,10 @@ ROM_START( sun3_e )
 	ROM_LOAD( "sun3-e-idprom.bin", 0x000000, 0x000020, CRC(d1a92116) SHA1(4836f3188f2c3dd5ba49ab66e0b55caa6b1b1791) )
 ROM_END
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY         FULLNAME       FLAGS */
-COMP( 198?, sun3_50,   0,       0,       sun3_50,   sun3, driver_device,     0,  "Sun Microsystems", "Sun 3/50", MACHINE_NOT_WORKING | MACHINE_NO_SOUND) // Model 25
-COMP( 1988, sun3_60,   0,       0,       sun3_60,   sun3, driver_device,     0,  "Sun Microsystems", "Sun 3/60", MACHINE_NOT_WORKING | MACHINE_NO_SOUND) // Ferrari
-COMP( 198?, sun3_110,  0,       0,       sun3,      sun3, driver_device,     0,  "Sun Microsystems", "Sun 3/110", MACHINE_NOT_WORKING | MACHINE_NO_SOUND) // Prism
-COMP( 1985, sun3_150,  0,       0,       sun3,      sun3, driver_device,     0,  "Sun Microsystems", "Sun 3/75/140/150/160/180", MACHINE_NOT_WORKING | MACHINE_NO_SOUND) // AKA Carrera
-COMP( 198?, sun3_260,  0,       0,       sun3200,   sun3, driver_device,     0,  "Sun Microsystems", "Sun 3/260/280", MACHINE_NOT_WORKING | MACHINE_NO_SOUND) // Prism
-COMP( 198?, sun3_e,    0,       0,       sun3e,     sun3, driver_device,     0,  "Sun Microsystems", "Sun 3/E", MACHINE_NOT_WORKING | MACHINE_NO_SOUND) // Polaris
+//    YEAR  NAME       PARENT  COMPAT   MACHINE    INPUT  STATE       INIT  COMPANY             FULLNAME                    FLAGS
+COMP( 198?, sun3_50,   0,      0,       sun3_50,   sun3,  sun3_state, 0,    "Sun Microsystems", "Sun 3/50",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Model 25
+COMP( 1988, sun3_60,   0,      0,       sun3_60,   sun3,  sun3_state, 0,    "Sun Microsystems", "Sun 3/60",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Ferrari
+COMP( 198?, sun3_110,  0,      0,       sun3,      sun3,  sun3_state, 0,    "Sun Microsystems", "Sun 3/110",                MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Prism
+COMP( 1985, sun3_150,  0,      0,       sun3,      sun3,  sun3_state, 0,    "Sun Microsystems", "Sun 3/75/140/150/160/180", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // AKA Carrera
+COMP( 198?, sun3_260,  0,      0,       sun3200,   sun3,  sun3_state, 0,    "Sun Microsystems", "Sun 3/260/280",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Prism
+COMP( 198?, sun3_e,    0,      0,       sun3e,     sun3,  sun3_state, 0,    "Sun Microsystems", "Sun 3/E",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Polaris

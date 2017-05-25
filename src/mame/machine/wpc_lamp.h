@@ -3,8 +3,10 @@
 
 // Williams Pinball Controller lamp control
 
-#ifndef WPC_LAMP_H
-#define WPC_LAMP_H
+#ifndef MAME_MACHINE_WPC_LAMP_H
+#define MAME_MACHINE_WPC_LAMP_H
+
+#pragma once
 
 #define MCFG_WPC_LAMP_ADD( _tag ) \
 	MCFG_DEVICE_ADD( _tag, WPC_LAMP, 0 )
@@ -12,7 +14,7 @@
 class wpc_lamp_device : public device_t
 {
 public:
-	wpc_lamp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	wpc_lamp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~wpc_lamp_device();
 
 	DECLARE_WRITE8_MEMBER(row_w);
@@ -21,8 +23,8 @@ public:
 	void set_names(const char *const *lamp_names);
 
 protected:
-	UINT8 state[64];
-	UINT8 col, row;
+	uint8_t state[64];
+	uint8_t col, row;
 	emu_timer *timer;
 	const char *const *names;
 
@@ -33,6 +35,6 @@ protected:
 	void update();
 };
 
-extern const device_type WPC_LAMP;
+DECLARE_DEVICE_TYPE(WPC_LAMP, wpc_lamp_device)
 
-#endif
+#endif // MAME_MACHINE_WPC_LAMP_H

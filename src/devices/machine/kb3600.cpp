@@ -15,15 +15,11 @@
 
 */
 
+#include "emu.h"
 #include "kb3600.h"
 
-
-
-//**************************************************************************
-//  MACROS / CONSTANTS
-//**************************************************************************
-
-#define LOG 0
+//#define VERBOSE 1
+#include "logmacro.h"
 
 
 
@@ -32,7 +28,7 @@
 //**************************************************************************
 
 // devices
-const device_type AY3600 = &device_creator<ay3600_device>;
+DEFINE_DEVICE_TYPE(AY3600, ay3600_device, "ay3600", "AY-5-3600 Keyboard Encoder")
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -42,8 +38,8 @@ const device_type AY3600 = &device_creator<ay3600_device>;
 //  ay3600_device - constructor
 //-------------------------------------------------
 
-ay3600_device::ay3600_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, AY3600, "AY-5-3600", tag, owner, clock, "ay3600", __FILE__),
+ay3600_device::ay3600_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, AY3600, tag, owner, clock),
 	m_read_x0(*this),
 	m_read_x1(*this),
 	m_read_x2(*this),
@@ -116,7 +112,7 @@ void ay3600_device::device_timer(emu_timer &timer, device_timer_id id, int param
 
 	for (int x = 0; x < 9; x++)
 	{
-		UINT16 data = 0;
+		uint16_t data = 0;
 
 		switch(x)
 		{
@@ -191,9 +187,9 @@ void ay3600_device::device_timer(emu_timer &timer, device_timer_id id, int param
 //  b_r -
 //-------------------------------------------------
 
-UINT16 ay3600_device::b_r()
+uint16_t ay3600_device::b_r()
 {
-	UINT16 data = m_b;
+	uint16_t data = m_b;
 
 	m_write_data_ready(0);
 

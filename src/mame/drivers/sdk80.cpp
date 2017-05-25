@@ -61,8 +61,8 @@ private:
 	required_device<rs232_port_device> m_rs232;
 	required_ioport m_usart_baud_rate;
 
-	UINT8 m_usart_divide_counter;
-	UINT8 m_usart_clock_state;
+	uint8_t m_usart_divide_counter;
+	uint8_t m_usart_clock_state;
 };
 
 static ADDRESS_MAP_START(sdk80_mem, AS_PROGRAM, 8, sdk80_state)
@@ -94,10 +94,10 @@ INPUT_PORTS_END
 
 WRITE_LINE_MEMBER( sdk80_state::usart_clock_tick )
 {
-	UINT8 old_counter = m_usart_divide_counter;
+	uint8_t old_counter = m_usart_divide_counter;
 	m_usart_divide_counter++;
 
-	UINT8 transition = (old_counter ^ m_usart_divide_counter) & m_usart_baud_rate->read();
+	uint8_t transition = (old_counter ^ m_usart_divide_counter) & m_usart_baud_rate->read();
 	if (transition)
 	{
 		m_usart->write_txc(m_usart_clock_state);
@@ -115,7 +115,7 @@ static DEVICE_INPUT_DEFAULTS_START( terminal ) // set up terminal to default to 
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
 DEVICE_INPUT_DEFAULTS_END
 
-static MACHINE_CONFIG_START( sdk80, sdk80_state )
+static MACHINE_CONFIG_START( sdk80 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080A, XTAL_18_432MHz/9)
 	MCFG_CPU_PROGRAM_MAP(sdk80_mem)
@@ -145,5 +145,5 @@ ROM_START( sdk80 )
 	ROM_LOAD( "mcs80.a14", 0x0000, 0x0400, BAD_DUMP CRC(3ce7bd37) SHA1(04cc67875b53d4cdfefce07041af12be3acedf4f)) // Compiled from manual listing
 ROM_END
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE    INPUT   CLASS           INIT   COMPANY   FULLNAME     FLAGS */
-COMP( 1975, sdk80,  0,      0,      sdk80,     sdk80,  driver_device,  0,     "Intel",  "SDK-80",    MACHINE_NO_SOUND_HW )
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE    INPUT   CLASS         INIT   COMPANY   FULLNAME     FLAGS */
+COMP( 1975, sdk80,  0,      0,      sdk80,     sdk80,  sdk80_state,  0,     "Intel",  "SDK-80",    MACHINE_NO_SOUND_HW )

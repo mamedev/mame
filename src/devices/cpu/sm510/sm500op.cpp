@@ -3,6 +3,7 @@
 
 // SM500 opcode handlers
 
+#include "emu.h"
 #include "sm500.h"
 
 

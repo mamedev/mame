@@ -38,7 +38,7 @@
 /* note: difference from 65816.  when switching to 8-bit X/Y, X and Y are *not* truncated
    to 8 bits! */
 
-void m37710_cpu_device::m37710i_set_flag_mx(UINT32 value)
+void m37710_cpu_device::m37710i_set_flag_mx(uint32_t value)
 {
 #if FLAG_SET_M
 	if(!(value & FLAGPOS_M))
@@ -82,7 +82,7 @@ void m37710_cpu_device::m37710i_set_flag_mx(UINT32 value)
 }
 
 
-void m37710_cpu_device::m37710i_set_reg_p(UINT32 value)
+void m37710_cpu_device::m37710i_set_reg_p(uint32_t value)
 {
 	FLAG_N = value;
 	FLAG_V = value << 1;
@@ -235,12 +235,12 @@ void m37710_cpu_device::m37710i_set_reg_p(UINT32 value)
 #define OP_MPY(MODE)                                                        \
 	CLK(CLK_OP + CLK_R8 + CLK_##MODE + 14); \
 	SRC = OPER_8_##MODE();          \
-	{ UINT16 temp = SRC * (REG_A&0xff);  REG_A = temp & 0xff; REG_BA = (temp>>8)&0xff; FLAG_Z = temp; FLAG_N = (temp & 0x8000) ? 1 : 0; FLAG_C = 0; }
+	{ uint16_t temp = SRC * (REG_A&0xff);  REG_A = temp & 0xff; REG_BA = (temp>>8)&0xff; FLAG_Z = temp; FLAG_N = (temp & 0x8000) ? 1 : 0; FLAG_C = 0; }
 #else
 #define OP_MPY(MODE)                                                        \
 	CLK(CLK_OP + CLK_R16 + CLK_##MODE + 14+8);  \
 	SRC = OPER_16_##MODE();         \
-	{ UINT32 temp = SRC * REG_A;  REG_A = temp & 0xffff;  REG_BA = (temp>>16)&0xffff; FLAG_Z = temp; FLAG_N = (temp & 0x80000000) ? 1 : 0; FLAG_C = 0; }
+	{ uint32_t temp = SRC * REG_A;  REG_A = temp & 0xffff;  REG_BA = (temp>>16)&0xffff; FLAG_Z = temp; FLAG_N = (temp & 0x80000000) ? 1 : 0; FLAG_C = 0; }
 #endif
 
 /* M37710   Divide */
@@ -252,7 +252,7 @@ void m37710_cpu_device::m37710i_set_reg_p(UINT32 value)
 	DST = OPER_8_##MODE();          \
 	if (DST != 0)   \
 	{       \
-		UINT16 tempa = SRC / DST; UINT16 tempb = SRC % DST;     \
+		uint16_t tempa = SRC / DST; uint16_t tempb = SRC % DST;     \
 		FLAG_V = ((tempa | tempb) & 0xff00) ? VFLAG_SET : 0;    \
 		FLAG_C = FLAG_V ? CFLAG_SET : 0;    \
 		if (!FLAG_V) { FLAG_N = (tempa & 0x80) ? 1 : 0; }       \
@@ -266,7 +266,7 @@ void m37710_cpu_device::m37710i_set_reg_p(UINT32 value)
 	DST = OPER_16_##MODE();     \
 	if (DST != 0)   \
 	{       \
-		UINT32 tempa = SRC / DST; UINT32 tempb = SRC % DST;     \
+		uint32_t tempa = SRC / DST; uint32_t tempb = SRC % DST;     \
 		FLAG_V = ((tempa | tempb) & 0xffff0000) ? VFLAG_SET : 0;    \
 		FLAG_C = FLAG_V ? CFLAG_SET : 0;    \
 		if (!FLAG_V) { FLAG_N = (tempa & 0x8000) ? 1 : 0; }     \
@@ -2539,7 +2539,7 @@ TABLE_FUNCTION(void, set_line, (int line, int state))
 
 
 /* Get a register from the CPU core */
-TABLE_FUNCTION(UINT32, get_reg, (int regnum))
+TABLE_FUNCTION(uint32_t, get_reg, (int regnum))
 {
 	switch(regnum)
 	{
@@ -2559,7 +2559,7 @@ TABLE_FUNCTION(UINT32, get_reg, (int regnum))
 	return 0;
 }
 
-TABLE_FUNCTION(void, set_reg, (int regnum, UINT32 val))
+TABLE_FUNCTION(void, set_reg, (int regnum, uint32_t val))
 {
 	switch(regnum)
 	{

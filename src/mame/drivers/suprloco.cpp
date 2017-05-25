@@ -22,10 +22,13 @@ Sega PCB 834-5137
 ******************************************************************************/
 
 #include "emu.h"
+#include "includes/suprloco.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/segacrpt_device.h"
 #include "sound/sn76496.h"
-#include "includes/suprloco.h"
+#include "screen.h"
+#include "speaker.h"
 
 WRITE8_MEMBER(suprloco_state::soundport_w)
 {
@@ -164,7 +167,7 @@ static GFXDECODE_START( suprloco )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( suprloco, suprloco_state )
+static MACHINE_CONFIG_START( suprloco )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SEGA_315_5015, 4000000)   /* 4 MHz (?) */
@@ -272,7 +275,7 @@ DRIVER_INIT_MEMBER(suprloco_state,suprloco)
 	/* convert graphics to 4bpp from 3bpp */
 
 	int i, j, k, color_source, color_dest;
-	UINT8 *source, *dest, *lookup;
+	uint8_t *source, *dest, *lookup;
 
 	source = memregion("gfx1")->base();
 	dest   = source + 0x6000;
@@ -305,4 +308,4 @@ DRIVER_INIT_MEMBER(suprloco_state,suprloco)
 
 
 GAME( 1982, suprloco,         0, suprloco, suprloco, suprloco_state, suprloco, ROT0, "Sega", "Super Locomotive (Rev.A)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, suprlocoo, suprloco, suprloco, suprloco, suprloco_state, suprloco, ROT0, "Sega", "Super Locomotive", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, suprlocoo, suprloco, suprloco, suprloco, suprloco_state, suprloco, ROT0, "Sega", "Super Locomotive",         MACHINE_SUPPORTS_SAVE )

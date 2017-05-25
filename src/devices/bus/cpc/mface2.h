@@ -17,10 +17,11 @@
  *  It also monitors all I/O port writes, so that it can restore them when resuming the current application.
  */
 
-#ifndef MFACE2_H_
-#define MFACE2_H_
+#ifndef MAME_BUS_CPC_MFACE2_H
+#define MAME_BUS_CPC_MFACE2_H
 
-#include "emu.h"
+#pragma once
+
 #include "cpcexp.h"
 
 /* stop button has been pressed */
@@ -36,17 +37,17 @@ class cpc_multiface2_device :   public device_t,
 {
 public:
 	// construction/destruction
-	cpc_multiface2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cpc_multiface2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual ioport_constructor device_input_ports() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	int multiface_hardware_enabled();
 	void multiface_rethink_memory();
 	void multiface_stop();
-	int multiface_io_write(UINT16 offset, UINT8 data);
+	int multiface_io_write(uint16_t offset, uint8_t data);
 	void check_button_state();
 protected:
 	// device-level overrides
@@ -56,16 +57,13 @@ protected:
 private:
 	cpc_expansion_slot_device *m_slot;
 
-	DIRECT_UPDATE_MEMBER( amstrad_default );
-	DIRECT_UPDATE_MEMBER( amstrad_multiface_directoverride );
-
-	std::unique_ptr<UINT8[]> m_multiface_ram;
+	std::unique_ptr<uint8_t[]> m_multiface_ram;
 	unsigned long m_multiface_flags;
 
-	UINT8 m_romdis;
+	uint8_t m_romdis;
 };
 
 // device type definition
-extern const device_type CPC_MFACE2;
+DECLARE_DEVICE_TYPE(CPC_MFACE2, cpc_multiface2_device)
 
-#endif /* MFACE2_H_ */
+#endif // MAME_BUS_CPC_MFACE2_H

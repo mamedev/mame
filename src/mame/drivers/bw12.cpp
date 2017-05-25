@@ -25,9 +25,15 @@
 
 ****************************************************************************/
 
+#include "emu.h"
 #include "includes/bw12.h"
 #include "bus/rs232/rs232.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 /*
 
     TODO:
@@ -176,7 +182,7 @@ static ADDRESS_MAP_START( bw12_io, AS_IO, 8, bw12_state )
 	AM_RANGE(0x20, 0x21) AM_MIRROR(0x0e) AM_DEVICE(UPD765_TAG, upd765a_device, map)
 	AM_RANGE(0x30, 0x33) AM_MIRROR(0x0c) AM_DEVREADWRITE(PIA6821_TAG, pia6821_device, read, write)
 	AM_RANGE(0x40, 0x43) AM_MIRROR(0x0c) AM_DEVREADWRITE(Z80SIO_TAG, z80sio0_device, ba_cd_r, ba_cd_w)
-	AM_RANGE(0x50, 0x50) AM_MIRROR(0x0f) AM_DEVWRITE(MC1408_TAG, dac_device, write_unsigned8)
+	AM_RANGE(0x50, 0x50) AM_MIRROR(0x0f) AM_DEVWRITE("dac", dac_byte_interface, write)
 	AM_RANGE(0x60, 0x63) AM_MIRROR(0x0c) AM_DEVREADWRITE(PIT8253_TAG, pit8253_device, read, write)
 ADDRESS_MAP_END
 
@@ -333,9 +339,9 @@ MC6845_UPDATE_ROW( bw12_state::crtc_update_row )
 
 	for (column = 0; column < x_count; column++)
 	{
-		UINT8 code = m_video_ram[((ma + column) & BW12_VIDEORAM_MASK)];
-		UINT16 addr = code << 4 | (ra & 0x0f);
-		UINT8 data = m_char_rom->base()[addr & BW12_CHARROM_MASK];
+		uint8_t code = m_video_ram[((ma + column) & BW12_VIDEORAM_MASK)];
+		uint16_t addr = code << 4 | (ra & 0x0f);
+		uint8_t data = m_char_rom->base()[addr & BW12_CHARROM_MASK];
 
 		if (column == cursor_x)
 		{
@@ -389,7 +395,7 @@ READ8_MEMBER( bw12_state::pia_pa_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	data |= m_centronics_busy;
 	data |= (m_centronics_fault << 1);
@@ -450,7 +456,7 @@ WRITE_LINE_MEMBER( bw12_state::ay3600_data_ready_w )
 
 	if (state)
 	{
-		UINT16 data = m_kbc->b_r();
+		uint16_t data = m_kbc->b_r();
 
 		m_key_data[0] = BIT(data, 6);
 		m_key_data[1] = BIT(data, 3);
@@ -537,14 +543,14 @@ GFXDECODE_END
 
 
 /* Machine Driver */
-static MACHINE_CONFIG_START( common, bw12_state )
+static MACHINE_CONFIG_START( common )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/4)
 	MCFG_CPU_PROGRAM_MAP(bw12_mem)
 	MCFG_CPU_IO_MAP(bw12_io)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::amber)
+	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::amber())
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_UPDATE_DEVICE(MC6845_TAG, mc6845_device, screen_update)
@@ -560,10 +566,10 @@ static MACHINE_CONFIG_START( common, bw12_state )
 	MCFG_MC6845_UPDATE_ROW_CB(bw12_state, crtc_update_row)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_SOUND_ADD(MC1408_TAG, DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.125) // ls273.ic5 + mc1408.ic4
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	/* devices */
 	MCFG_TIMER_DRIVER_ADD(FLOPPY_TIMER_TAG, bw12_state, floppy_motor_off_tick)
@@ -668,6 +674,6 @@ ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY               FULLNAME        FLAGS */
-COMP( 1984, bw12,   0,      0,      bw12,   bw12, driver_device,   0,      "Bondwell Holding",   "Bondwell 12", MACHINE_SUPPORTS_SAVE )
-COMP( 1984, bw14,   bw12,   0,      bw14,   bw12, driver_device,   0,      "Bondwell Holding",   "Bondwell 14", MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT STATE         INIT    COMPANY               FULLNAME        FLAGS */
+COMP( 1984, bw12,   0,      0,      bw12,   bw12, bw12_state,   0,      "Bondwell Holding",   "Bondwell 12",  MACHINE_SUPPORTS_SAVE )
+COMP( 1984, bw14,   bw12,   0,      bw14,   bw12, bw12_state,   0,      "Bondwell Holding",   "Bondwell 14",  MACHINE_SUPPORTS_SAVE )

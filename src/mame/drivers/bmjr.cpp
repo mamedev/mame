@@ -16,25 +16,25 @@
 
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
-#include "sound/beep.h"
 #include "imagedev/cassette.h"
+#include "sound/beep.h"
 #include "sound/wave.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class bmjr_state : public driver_device
 {
 public:
 	bmjr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_cass(*this, "cassette"),
-	m_beep(*this, "beeper")
-	,
-		m_p_wram(*this, "p_wram"){ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_cass(*this, "cassette")
+		, m_beep(*this, "beeper")
+		, m_p_wram(*this, "wram")
+		, m_p_chargen(*this, "chargen")
+	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<cassette_image_device> m_cass;
-	required_device<beep_device> m_beep;
 	DECLARE_READ8_MEMBER(key_r);
 	DECLARE_WRITE8_MEMBER(key_w);
 	DECLARE_READ8_MEMBER(ff_r);
@@ -44,36 +44,35 @@ public:
 	DECLARE_READ8_MEMBER(tape_stop_r);
 	DECLARE_READ8_MEMBER(tape_start_r);
 	DECLARE_WRITE8_MEMBER(xor_display_w);
-	bool m_tape_switch;
-	required_shared_ptr<UINT8> m_p_wram;
-	UINT8 *m_p_chargen;
-	UINT8 m_xor_display;
-	UINT8 m_key_mux;
 	DECLARE_DRIVER_INIT(bmjr);
+	u32 screen_update_bmjr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+private:
+	bool m_tape_switch;
+	u8 m_xor_display;
+	u8 m_key_mux;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void video_start() override;
-	UINT32 screen_update_bmjr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_device<cpu_device> m_maincpu;
+	required_device<cassette_image_device> m_cass;
+	required_device<beep_device> m_beep;
+	required_shared_ptr<u8> m_p_wram;
+	required_region_ptr<u8> m_p_chargen;
 };
 
 
 
-void bmjr_state::video_start()
+u32 bmjr_state::screen_update_bmjr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_p_chargen = memregion("chargen")->base();
-}
-
-UINT32 bmjr_state::screen_update_bmjr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	UINT8 y,ra,chr,gfx,fg=4;
-	UINT16 sy=0,ma=0x100,x;
-	UINT8 inv = (m_xor_display) ? 0xff : 0;
+	u8 y,ra,chr,gfx,fg=4;
+	u16 sy=0,ma=0x100,x;
+	u8 inv = (m_xor_display) ? 0xff : 0;
 
 	for(y = 0; y < 24; y++ )
 	{
 		for (ra = 0; ra < 8; ra++)
 		{
-			UINT16 *p = &bitmap.pix16(sy++);
+			u16 *p = &bitmap.pix16(sy++);
 
 			for (x = ma; x < ma + 32; x++)
 			{
@@ -168,7 +167,7 @@ static ADDRESS_MAP_START(bmjr_mem, AS_PROGRAM, 8, bmjr_state)
 	//0x0100, 0x03ff basic vram
 	//0x0900, 0x20ff vram, modes 0x40 / 0xc0
 	//0x2100, 0x38ff vram, modes 0x44 / 0xcc
-	AM_RANGE(0x0000, 0xafff) AM_RAM AM_SHARE("p_wram")
+	AM_RANGE(0x0000, 0xafff) AM_RAM AM_SHARE("wram")
 	AM_RANGE(0xb000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xe7ff) AM_ROM
 //  AM_RANGE(0xe890, 0xe890) W MP-1710 tile color
@@ -334,7 +333,7 @@ void bmjr_state::machine_reset()
 	m_cass->change_state(CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
 }
 
-static MACHINE_CONFIG_START( bmjr, bmjr_state )
+static MACHINE_CONFIG_START( bmjr )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M6800, XTAL_4MHz/4) //unknown clock / divider
 	MCFG_CPU_PROGRAM_MAP(bmjr_mem)
@@ -380,5 +379,5 @@ DRIVER_INIT_MEMBER(bmjr_state,bmjr)
 {
 }
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY        FULLNAME       FLAGS */
-COMP( 1982, bmjr,   0,      0,       bmjr,      bmjr, bmjr_state,    bmjr,  "Hitachi", "Basic Master Jr", MACHINE_NOT_WORKING)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE        INIT   COMPANY    FULLNAME           FLAGS */
+COMP( 1982, bmjr,   0,      0,       bmjr,      bmjr,  bmjr_state,  bmjr,  "Hitachi", "Basic Master Jr", MACHINE_NOT_WORKING)

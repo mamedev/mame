@@ -7,12 +7,11 @@
 
 ***************************************************************************/
 
+#ifndef MAME_CPU_Z80_TMPZ84C011_H
+#define MAME_CPU_Z80_TMPZ84C011_H
+
 #pragma once
 
-#ifndef __TMPZ84C011__
-#define __TMPZ84C011__
-
-#include "emu.h"
 #include "z80.h"
 #include "machine/z80ctc.h"
 
@@ -75,7 +74,7 @@
 class tmpz84c011_device : public z80_device
 {
 public:
-	tmpz84c011_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32);
+	tmpz84c011_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_zc0_callback(device_t &device, _Object object) { return downcast<tmpz84c011_device &>(device).m_zc0_cb.set_callback(object); }
@@ -150,8 +149,8 @@ private:
 	required_device<z80ctc_device> m_ctc;
 
 	// internal state
-	UINT8 m_pio_dir[5];
-	UINT8 m_pio_latch[5];
+	uint8_t m_pio_dir[5];
+	uint8_t m_pio_latch[5];
 
 	// callbacks
 	devcb_write8 m_outportsa;
@@ -173,7 +172,7 @@ private:
 
 
 // device type definition
-extern const device_type TMPZ84C011;
+DECLARE_DEVICE_TYPE(TMPZ84C011, tmpz84c011_device)
 
 
-#endif /// __TMPZ84C011__
+#endif // MAME_CPU_Z80_TMPZ84C011_H

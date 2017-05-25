@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#ifndef _DC_CTRL_H_
-#define _DC_CTRL_H_
+#ifndef MAME_MACHINE_DC_CTRL_H
+#define MAME_MACHINE_DC_CTRL_H
+
+#pragma once
 
 #include "mapledev.h"
 
@@ -29,23 +31,23 @@ class dc_controller_device : public maple_device
 {
 public:
 	// construction/destruction
-	dc_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	dc_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	static void static_set_port_tag(device_t &device, int port, const char *tag);
 	static void static_set_id(device_t &device, const char *id);
 	static void static_set_license(device_t &device, const char *license);
 	static void static_set_versions(device_t &device, const char *versions);
 
-	void maple_w(const UINT32 *data, UINT32 in_size) override;
+	void maple_w(const uint32_t *data, uint32_t in_size) override;
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 
 private:
-	void fixed_status(UINT32 *dest);
-	void free_status(UINT32 *dest);
-	void read(UINT32 *dest);
+	void fixed_status(uint32_t *dest);
+	void free_status(uint32_t *dest);
+	void read(uint32_t *dest);
 
 	const char *port_tag[8];
 	const char *id, *license, *versions;
@@ -53,6 +55,6 @@ private:
 	ioport_port *port[8];
 };
 
-extern const device_type DC_CONTROLLER;
+DECLARE_DEVICE_TYPE(DC_CONTROLLER, dc_controller_device)
 
-#endif // _DC_CTRL_H_
+#endif // MAME_MACHINE_DC_CTRL_H

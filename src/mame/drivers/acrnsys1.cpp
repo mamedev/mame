@@ -52,6 +52,8 @@ Note that left-most digit is not wired up, and therefore will always be blank.
 #include "machine/74145.h"
 #include "imagedev/cassette.h"
 #include "sound/wave.h"
+#include "speaker.h"
+
 #include "acrnsys1.lh"
 
 
@@ -75,8 +77,8 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ttl74145_device> m_ttl74145;
 	required_device<cassette_image_device> m_cass;
-	UINT8 m_digit;
-	UINT8 m_cass_data[4];
+	uint8_t m_digit;
+	uint8_t m_cass_data[4];
 	bool m_cass_state;
 	bool m_cassold;
 };
@@ -89,7 +91,7 @@ private:
 // bit 7 is cassin
 READ8_MEMBER( acrnsys1_state::ins8154_b1_port_a_r )
 {
-	UINT8 data = 0x7f, i, key_line = m_ttl74145->read();
+	uint8_t data = 0x7f, i, key_line = m_ttl74145->read();
 
 	for (i = 0; i < 8; i++)
 	{
@@ -133,7 +135,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(acrnsys1_state::acrnsys1_p)
 {
 	/* cassette - turn 1200/2400Hz to a bit */
 	m_cass_data[1]++;
-	UINT8 cass_ws = (m_cass->input() > +0.03) ? 1 : 0;
+	uint8_t cass_ws = (m_cass->input() > +0.03) ? 1 : 0;
 
 	if (cass_ws != m_cass_data[0])
 	{
@@ -149,7 +151,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(acrnsys1_state::acrnsys1_p)
 
 WRITE8_MEMBER( acrnsys1_state::acrnsys1_led_segment_w )
 {
-	UINT8 key_line = m_ttl74145->read();
+	uint8_t key_line = m_ttl74145->read();
 
 	output().set_digit_value(key_line, data);
 }
@@ -240,7 +242,7 @@ INPUT_PORTS_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( acrnsys1, acrnsys1_state )
+static MACHINE_CONFIG_START( acrnsys1 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 1008000)  /* 1.008 MHz */
 	MCFG_CPU_PROGRAM_MAP(acrnsys1_map)
@@ -278,5 +280,5 @@ ROM_END
     GAME DRIVERS
 ***************************************************************************/
 
-/*    YEAR  NAME      PARENT COMPAT MACHINE   INPUT     INIT  COMPANY  FULLNAME    FLAGS */
-COMP( 1978, acrnsys1, 0,     0,     acrnsys1, acrnsys1, driver_device, 0,    "Acorn", "Acorn System 1", 0 )
+/*    YEAR  NAME      PARENT COMPAT MACHINE   INPUT     STATE           INIT  COMPANY  FULLNAME          FLAGS */
+COMP( 1978, acrnsys1, 0,     0,     acrnsys1, acrnsys1, acrnsys1_state, 0,    "Acorn", "Acorn System 1", 0 )

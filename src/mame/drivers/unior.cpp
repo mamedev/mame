@@ -43,19 +43,23 @@ ToDo:
 #include "machine/i8255.h"
 #include "machine/i8257.h"
 #include "video/i8275.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class unior_state : public driver_device
 {
 public:
-	unior_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_pit(*this, "pit"),
-		m_dma(*this, "dma"),
-		m_uart(*this, "uart"),
-		m_palette(*this, "palette")
+	unior_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_pit(*this, "pit")
+		, m_dma(*this, "dma")
+		, m_uart(*this, "uart")
+		, m_palette(*this, "palette")
+		, m_p_chargen(*this, "chargen")
+		, m_p_vram(*this, "vram")
 	{
 	}
 
@@ -74,19 +78,17 @@ public:
 	DECLARE_READ8_MEMBER(dma_r);
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 
-	UINT8 *m_p_vram;
-	UINT8 *m_p_chargen;
 private:
-	UINT8 m_4c;
-	UINT8 m_4e;
+	uint8_t m_4c;
+	uint8_t m_4e;
 	virtual void machine_reset() override;
-	virtual void video_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<pit8253_device> m_pit;
 	required_device<i8257_device> m_dma;
 	required_device<i8251_device> m_uart;
-public:
 	required_device<palette_device> m_palette;
+	required_region_ptr<u8> m_p_chargen;
+	required_region_ptr<u8> m_p_vram;
 };
 
 static ADDRESS_MAP_START( unior_mem, AS_PROGRAM, 8, unior_state )
@@ -255,13 +257,13 @@ WRITE8_MEMBER( unior_state::vram_w )
 WRITE8_MEMBER( unior_state::scroll_w )
 {
 	if (data)
-		memcpy(m_p_vram, m_p_vram+80, 24*80);
+		memmove(m_p_vram, m_p_vram+80, 24*80);
 }
 
 I8275_DRAW_CHARACTER_MEMBER(unior_state::display_pixels)
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT8 gfx = m_p_chargen[(linecount & 7) | (charcode << 3)];
+	uint8_t gfx = m_p_chargen[(linecount & 7) | (charcode << 3)];
 
 	if(linecount == 8)
 		gfx = 0;
@@ -275,7 +277,7 @@ I8275_DRAW_CHARACTER_MEMBER(unior_state::display_pixels)
 	if (rvv)
 		gfx ^= 0xff;
 
-	for(UINT8 i=0;i<6;i++)
+	for(uint8_t i=0;i<6;i++)
 		bitmap.pix32(y, x + i) = palette[BIT(gfx, 5-i) ? (hlgt ? 2 : 1) : 0];
 }
 
@@ -378,16 +380,10 @@ WRITE_LINE_MEMBER( unior_state::hrq_w )
 
 void unior_state::machine_reset()
 {
-	m_maincpu->set_state_int(I8085_PC, 0xF800);
+	m_maincpu->set_state_int(i8080_cpu_device::I8085_PC, 0xF800);
 }
 
-void unior_state::video_start()
-{
-	m_p_chargen = memregion("chargen")->base();
-	m_p_vram = memregion("vram")->base();
-}
-
-static MACHINE_CONFIG_START( unior, unior_state )
+static MACHINE_CONFIG_START( unior )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8080, XTAL_20MHz / 9)
 	MCFG_CPU_PROGRAM_MAP(unior_mem)
@@ -459,5 +455,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT    COMPAT   MACHINE    INPUT  CLASS           INIT    COMPANY      FULLNAME       FLAGS */
-COMP( 19??, unior,  radio86,  0,       unior,     unior, driver_device,   0,    "<unknown>",   "Unior", MACHINE_NOT_WORKING )
+/*    YEAR  NAME    PARENT    COMPAT   MACHINE    INPUT  CLASS          INIT  COMPANY      FULLNAME  FLAGS */
+COMP( 19??, unior,  radio86,  0,       unior,     unior, unior_state,   0,    "<unknown>", "Unior",  MACHINE_NOT_WORKING )

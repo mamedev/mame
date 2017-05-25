@@ -360,7 +360,7 @@
 	<software name="blanka" cloneof="blank">
 		<description>Blank (Alt)</description>
 		<year>19??</year>
-		<publisher></publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162818">
 				<rom name="blank (alt).ccvf" size="162818" crc="eac5f303" sha1="bd75191f6b4f9f6b75941851346860012f9fb486" offset="0" />

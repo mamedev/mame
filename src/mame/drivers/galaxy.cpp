@@ -24,21 +24,25 @@ Galaksija driver by Krzysztof Strzecha and Miodrag Milanovic
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "sound/wave.h"
 #include "includes/galaxy.h"
-#include "imagedev/snapquik.h"
-#include "imagedev/cassette.h"
-#include "sound/ay8910.h"
+
+#include "cpu/z80/z80.h"
 #include "formats/gtp_cas.h"
+#include "imagedev/cassette.h"
+#include "imagedev/snapquik.h"
 #include "machine/ram.h"
+#include "sound/ay8910.h"
+#include "sound/wave.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 
 static ADDRESS_MAP_START (galaxyp_io, AS_IO, 8, galaxy_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x01)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xbe, 0xbe) AM_DEVWRITE("ay8910", ay8910_device, address_w)
-	AM_RANGE(0xbf, 0xbf) AM_DEVWRITE("ay8910", ay8910_device, data_w)
+	AM_RANGE(0x00, 0x00) AM_DEVWRITE("ay8910", ay8910_device, address_w)
+	AM_RANGE(0x01, 0x01) AM_DEVWRITE("ay8910", ay8910_device, data_w)
 ADDRESS_MAP_END
 
 
@@ -168,7 +172,7 @@ static GFXDECODE_START( galaxy )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( galaxy, galaxy_state )
+static MACHINE_CONFIG_START( galaxy )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL / 2)
 	MCFG_CPU_PROGRAM_MAP(galaxy_mem)
@@ -210,7 +214,7 @@ static MACHINE_CONFIG_START( galaxy, galaxy_state )
 	MCFG_RAM_EXTRA_OPTIONS("2K,22K,38K,54K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( galaxyp, galaxy_state )
+static MACHINE_CONFIG_START( galaxyp )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL / 2)
 	MCFG_CPU_PROGRAM_MAP(galaxyp_mem)
@@ -270,6 +274,6 @@ ROM_START (galaxyp)
 	ROM_LOAD ("galchr.bin", 0x0000, 0x0800, CRC(5c3b5bb5) SHA1(19429a61dc5e55ddec3242a8f695e06dd7961f88))
 ROM_END
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY FULLNAME */
-COMP(1983,  galaxy,     0,      0,  galaxy, galaxy, galaxy_state,   galaxy, "Voja Antonic / Elektronika inzenjering",          "Galaksija",      0)
-COMP(1985,  galaxyp,    galaxy, 0,  galaxyp,galaxyp, galaxy_state,galaxyp,"Nenad Dunjic",            "Galaksija plus", 0)
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT    STATE         INIT    COMPANY                                   FULLNAME */
+COMP(1983,  galaxy,     0,      0,  galaxy, galaxy,  galaxy_state, galaxy, "Voja Antonic / Elektronika inzenjering", "Galaksija",      0)
+COMP(1985,  galaxyp,    galaxy, 0,  galaxyp,galaxyp, galaxy_state, galaxyp,"Nenad Dunjic",                           "Galaksija plus", 0)

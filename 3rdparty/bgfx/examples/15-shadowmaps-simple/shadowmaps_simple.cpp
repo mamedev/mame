@@ -140,7 +140,7 @@ int _main_(int _argc, char** _argv)
 		progShadow = loadProgram("vs_sms_shadow", "fs_sms_shadow");
 		progMesh   = loadProgram("vs_sms_mesh",   "fs_sms_mesh");
 
-		shadowMapTexture = bgfx::createTexture2D(shadowMapSize, shadowMapSize, 1, bgfx::TextureFormat::D16, BGFX_TEXTURE_RT | BGFX_TEXTURE_COMPARE_LEQUAL);
+		shadowMapTexture = bgfx::createTexture2D(shadowMapSize, shadowMapSize, false, 1, bgfx::TextureFormat::D16, BGFX_TEXTURE_RT | BGFX_TEXTURE_COMPARE_LEQUAL);
 		bgfx::TextureHandle fbtextures[] = { shadowMapTexture };
 		shadowMapFB = bgfx::createFrameBuffer(BX_COUNTOF(fbtextures), fbtextures, true);
 	}
@@ -151,11 +151,11 @@ int _main_(int _argc, char** _argv)
 		progShadow = loadProgram("vs_sms_shadow_pd", "fs_sms_shadow_pd");
 		progMesh   = loadProgram("vs_sms_mesh",      "fs_sms_mesh_pd");
 
-		shadowMapTexture = bgfx::createTexture2D(shadowMapSize, shadowMapSize, 1, bgfx::TextureFormat::BGRA8, BGFX_TEXTURE_RT);
+		shadowMapTexture = bgfx::createTexture2D(shadowMapSize, shadowMapSize, false, 1, bgfx::TextureFormat::BGRA8, BGFX_TEXTURE_RT);
 		bgfx::TextureHandle fbtextures[] =
 		{
 			shadowMapTexture,
-			bgfx::createTexture2D(shadowMapSize, shadowMapSize, 1, bgfx::TextureFormat::D16, BGFX_TEXTURE_RT_WRITE_ONLY),
+			bgfx::createTexture2D(shadowMapSize, shadowMapSize, false, 1, bgfx::TextureFormat::D16, BGFX_TEXTURE_RT_WRITE_ONLY),
 		};
 		shadowMapFB = bgfx::createFrameBuffer(BX_COUNTOF(fbtextures), fbtextures, true);
 	}
@@ -200,7 +200,7 @@ int _main_(int _argc, char** _argv)
 	bx::mtxLookAt(view, eye, at);
 
 	const float aspect = float(int32_t(width) ) / float(int32_t(height) );
-	bx::mtxProj(proj, 60.0f, aspect, 0.1f, 1000.0f, flipV);
+	bx::mtxProj(proj, 60.0f, aspect, 0.1f, 1000.0f, bgfx::getCaps()->homogeneousDepth);
 
 	// Time acumulators.
 	float timeAccumulatorLight = 0.0f;
@@ -230,9 +230,9 @@ int _main_(int _argc, char** _argv)
 
 		// Setup lights.
 		float lightPos[4];
-		lightPos[0] = -cosf(timeAccumulatorLight);
+		lightPos[0] = -bx::fcos(timeAccumulatorLight);
 		lightPos[1] = -1.0f;
-		lightPos[2] = -sinf(timeAccumulatorLight);
+		lightPos[2] = -bx::fsin(timeAccumulatorLight);
 		lightPos[3] = 0.0f;
 
 		bgfx::setUniform(u_lightPos, lightPos);
@@ -287,7 +287,7 @@ int _main_(int _argc, char** _argv)
 		bgfx::setViewFrameBuffer(RENDER_SHADOW_PASS_ID, shadowMapFB);
 		bgfx::setViewTransform(RENDER_SHADOW_PASS_ID, lightView, lightProj);
 
-		bgfx::setViewRect(RENDER_SCENE_PASS_ID, 0, 0, width, height);
+		bgfx::setViewRect(RENDER_SCENE_PASS_ID, 0, 0, uint16_t(width), uint16_t(height) );
 		bgfx::setViewTransform(RENDER_SCENE_PASS_ID, view, proj);
 
 		// Clear backbuffer and shadowmap framebuffer at beginning.
@@ -385,6 +385,7 @@ int _main_(int _argc, char** _argv)
 	bgfx::destroyUniform(u_shadowMap);
 	bgfx::destroyUniform(u_lightPos);
 	bgfx::destroyUniform(u_lightMtx);
+	bgfx::destroyUniform(u_depthScaleOffset);
 
 	// Shutdown bgfx.
 	bgfx::shutdown();

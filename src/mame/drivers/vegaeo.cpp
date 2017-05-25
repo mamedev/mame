@@ -14,11 +14,13 @@
  *********************************************************************/
 
 #include "emu.h"
+#include "includes/eolith.h"
+
 #include "cpu/e132xs/e132xs.h"
 #include "machine/at28c16.h"
 #include "machine/gen_latch.h"
 #include "sound/qs1000.h"
-#include "includes/eolith.h"
+#include "speaker.h"
 
 
 class vegaeo_state : public eolith_state
@@ -30,8 +32,8 @@ public:
 
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	std::unique_ptr<UINT32[]> m_vega_vram;
-	UINT8 m_vega_vbuffer;
+	std::unique_ptr<uint32_t[]> m_vega_vram;
+	uint8_t m_vega_vbuffer;
 
 	DECLARE_WRITE32_MEMBER(vega_vram_w);
 	DECLARE_READ32_MEMBER(vega_vram_r);
@@ -46,7 +48,7 @@ public:
 	DECLARE_DRIVER_INIT(vegaeo);
 	DECLARE_VIDEO_START(vega);
 
-	UINT32 screen_update_vega(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_vega(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 READ8_MEMBER( vegaeo_state::qs1000_p1_r )
@@ -181,12 +183,12 @@ INPUT_PORTS_END
 
 VIDEO_START_MEMBER(vegaeo_state,vega)
 {
-	m_vega_vram = std::make_unique<UINT32[]>(0x14000*2/4);
+	m_vega_vram = std::make_unique<uint32_t[]>(0x14000*2/4);
 	save_pointer(NAME(m_vega_vram.get()), 0x14000*2/4);
 	save_item(NAME(m_vega_vbuffer));
 }
 
-UINT32 vegaeo_state::screen_update_vega(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t vegaeo_state::screen_update_vega(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x,y,count;
 	int color;
@@ -215,7 +217,7 @@ UINT32 vegaeo_state::screen_update_vega(screen_device &screen, bitmap_ind16 &bit
 }
 
 
-static MACHINE_CONFIG_START( vega, vegaeo_state )
+static MACHINE_CONFIG_START( vega )
 	MCFG_CPU_ADD("maincpu", GMS30C2132, XTAL_55MHz)
 	MCFG_CPU_PROGRAM_MAP(vega_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", vegaeo_state, eolith_speedup, "screen", 0, 1)

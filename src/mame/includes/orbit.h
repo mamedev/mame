@@ -7,6 +7,7 @@
 *************************************************************************/
 
 #include "sound/discrete.h"
+#include "screen.h"
 
 /* Discrete Sound Input Nodes */
 #define ORBIT_NOTE_FREQ       NODE_01
@@ -31,8 +32,8 @@ public:
 		m_palette(*this, "palette") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_playfield_ram;
-	required_shared_ptr<UINT8> m_sprite_ram;
+	required_shared_ptr<uint8_t> m_playfield_ram;
+	required_shared_ptr<uint8_t> m_sprite_ram;
 
 	required_device<discrete_device> m_discrete;
 
@@ -41,7 +42,7 @@ public:
 	int        m_flip_screen;
 
 	/* misc */
-	UINT8      m_misc_flags;
+	uint8_t      m_misc_flags;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -55,7 +56,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_orbit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_orbit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(orbit_interrupt);
 	TIMER_CALLBACK_MEMBER(irq_off);
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi_32v);
@@ -64,7 +65,7 @@ public:
 	DECLARE_WRITE8_MEMBER(orbit_noise_amp_w);
 	DECLARE_WRITE8_MEMBER(orbit_noise_rst_w);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void update_misc_flags(address_space &space, UINT8 val);
+	void update_misc_flags(address_space &space, uint8_t val);
 };
 /*----------- defined in audio/orbit.c -----------*/
 

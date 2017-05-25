@@ -10,22 +10,29 @@
 
 
 #include "emu.h"
+#include "includes/radio86.h"
+
 #include "cpu/i8085/i8085.h"
-#include "sound/wave.h"
+#include "imagedev/cassette.h"
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
-#include "imagedev/cassette.h"
-#include "formats/rk_cas.h"
-#include "includes/radio86.h"
+#include "sound/wave.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
+#include "formats/rk_cas.h"
+
 
 class mikrosha_state : public radio86_state
 {
 public:
 	mikrosha_state(const machine_config &mconfig, device_type type, const char *tag)
-		: radio86_state(mconfig, type, tag),
-		m_cart(*this, "cartslot")
-		{ }
+		: radio86_state(mconfig, type, tag)
+		, m_cart(*this, "cartslot")
+	{ }
+
 	DECLARE_WRITE_LINE_MEMBER(mikrosha_pit_out2);
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 	DECLARE_MACHINE_RESET(mikrosha);
@@ -160,8 +167,8 @@ I8275_DRAW_CHARACTER_MEMBER(mikrosha_state::display_pixels)
 {
 	int i;
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	const UINT8 *charmap = m_charmap + (m_mikrosha_font_page & 1) * 0x400;
-	UINT8 pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
+	const uint8_t *charmap = m_charmap + (m_mikrosha_font_page & 1) * 0x400;
+	uint8_t pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
 	if(linecount == 8)
 		pixels = 0;
 	if (vsp) {
@@ -196,7 +203,7 @@ static GFXDECODE_START( mikrosha )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, mikrosha_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( mikrosha, mikrosha_state )
+static MACHINE_CONFIG_START( mikrosha )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, XTAL_16MHz / 9)
 	MCFG_CPU_PROGRAM_MAP(mikrosha_mem)
@@ -276,6 +283,6 @@ ROM_START( m86rk )
 ROM_END
 
 /* Driver */
-/*    YEAR  NAME      PARENT  COMPAT    MACHINE     INPUT       INIT        COMPANY     FULLNAME        FLAGS */
-COMP( 1987, mikrosha, radio86,0,        mikrosha,   mikrosha, radio86_state,    radio86,    "Lianozovo Electromechanical Factory",      "Mikrosha",     0)
-COMP( 1987, m86rk,    radio86,0,        mikrosha,   mikrosha, radio86_state,    radio86,    "<unknown>",        "Mikrosha-86RK",        0)
+//    YEAR  NAME      PARENT   COMPAT    MACHINE     INPUT     STATE           INIT        COMPANY     FULLNAME        FLAGS
+COMP( 1987, mikrosha, radio86, 0,        mikrosha,   mikrosha, mikrosha_state, radio86,    "Lianozovo Electromechanical Factory",      "Mikrosha",     0)
+COMP( 1987, m86rk,    radio86, 0,        mikrosha,   mikrosha, mikrosha_state, radio86,    "<unknown>",        "Mikrosha-86RK",        0)

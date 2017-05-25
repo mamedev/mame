@@ -75,7 +75,7 @@
 
 PALETTE_INIT_MEMBER(ampoker2_state, ampoker2)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 /*    - bits -
       76543210
       RRRGGGBB
@@ -116,14 +116,14 @@ PALETTE_INIT_MEMBER(ampoker2_state, ampoker2)
 
 WRITE8_MEMBER(ampoker2_state::ampoker2_videoram_w)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 	videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 TILE_GET_INFO_MEMBER(ampoker2_state::get_bg_tile_info)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 	int offs = tile_index * 2;
 	int attr = videoram[offs + 1];
 	int code = videoram[offs];
@@ -136,7 +136,7 @@ TILE_GET_INFO_MEMBER(ampoker2_state::get_bg_tile_info)
 
 TILE_GET_INFO_MEMBER(ampoker2_state::s2k_get_bg_tile_info)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 	int offs = tile_index * 2;
 	int attr = videoram[offs + 1];
 	int code = videoram[offs];
@@ -149,17 +149,17 @@ TILE_GET_INFO_MEMBER(ampoker2_state::s2k_get_bg_tile_info)
 
 void ampoker2_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(ampoker2_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ampoker2_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,
 			8, 8, 64, 32);
 }
 
 VIDEO_START_MEMBER(ampoker2_state,sigma2k)
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(ampoker2_state::s2k_get_bg_tile_info),this), TILEMAP_SCAN_ROWS,
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ampoker2_state::s2k_get_bg_tile_info),this), TILEMAP_SCAN_ROWS,
 			8, 8, 64, 32);
 }
 
-UINT32 ampoker2_state::screen_update_ampoker2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t ampoker2_state::screen_update_ampoker2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;

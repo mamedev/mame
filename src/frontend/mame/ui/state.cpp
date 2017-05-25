@@ -26,7 +26,7 @@ int menu_load_save_state_base::s_last_slot_selected;
 //  ctor
 //-------------------------------------------------
 
-menu_load_save_state_base::menu_load_save_state_base(mame_ui_manager &mui, render_container *container, const char *header, bool disable_not_found_items)
+menu_load_save_state_base::menu_load_save_state_base(mame_ui_manager &mui, render_container &container, const char *header, bool disable_not_found_items)
 	: menu(mui, container),
 		m_header(header),
 		m_disable_not_found_items(disable_not_found_items),
@@ -62,7 +62,7 @@ void *menu_load_save_state_base::itemref_from_slot_number(unsigned int slot)
 //  populate
 //-------------------------------------------------
 
-void menu_load_save_state_base::populate()
+void menu_load_save_state_base::populate(float &customtop, float &custombottom)
 {
 	m_enabled_mask = 0;
 
@@ -213,7 +213,7 @@ std::unique_ptr<osd::directory::entry> menu_load_save_state_base::stat_searchpat
 //  ctor
 //-------------------------------------------------
 
-menu_load_state::menu_load_state(mame_ui_manager &mui, render_container *container)
+menu_load_state::menu_load_state(mame_ui_manager &mui, render_container &container)
 	: menu_load_save_state_base(mui, container, _("Load State"), true)
 {
 }
@@ -237,7 +237,7 @@ void menu_load_state::process_file(const std::string &file_name)
 //  ctor
 //-------------------------------------------------
 
-menu_save_state::menu_save_state(mame_ui_manager &mui, render_container *container)
+menu_save_state::menu_save_state(mame_ui_manager &mui, render_container &container)
 	: menu_load_save_state_base(mui, container, _("Save State"), false)
 {
 }

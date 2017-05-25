@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "rex_ep256.h"
 
 
@@ -14,14 +15,14 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_REX_EP256 = &device_creator<c64_rex_ep256_cartridge_device>;
+DEFINE_DEVICE_TYPE(C64_REX_EP256, c64_rex_ep256_cartridge_device, "rexexp256", "C64 Rex 256KB EPROM cartridge")
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( c64_rex_ep256 )
+//  MACHINE_CONFIG_START( c64_rex_ep256 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( c64_rex_ep256 )
+static MACHINE_CONFIG_START( c64_rex_ep256 )
 	MCFG_GENERIC_SOCKET_ADD("rom1", generic_linear_slot, nullptr)
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 	MCFG_GENERIC_SOCKET_ADD("rom2", generic_linear_slot, nullptr)
@@ -61,8 +62,8 @@ machine_config_constructor c64_rex_ep256_cartridge_device::device_mconfig_additi
 //  c64_rex_ep256_cartridge_device - constructor
 //-------------------------------------------------
 
-c64_rex_ep256_cartridge_device::c64_rex_ep256_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, C64_REX_EP256, "C64 Rex 256KB EPROM cartridge", tag, owner, clock, "rexep256", __FILE__),
+c64_rex_ep256_cartridge_device::c64_rex_ep256_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, C64_REX_EP256, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this)
 {
 	for (int i = 0; i < 8; i++)
@@ -104,7 +105,7 @@ void c64_rex_ep256_cartridge_device::device_reset()
 //  c64_cd_r - cartridge data read
 //-------------------------------------------------
 
-UINT8 c64_rex_ep256_cartridge_device::c64_cd_r(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+uint8_t c64_rex_ep256_cartridge_device::c64_cd_r(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!roml)
 	{
@@ -138,7 +139,7 @@ UINT8 c64_rex_ep256_cartridge_device::c64_cd_r(address_space &space, offs_t offs
 //  c64_cd_w - cartridge data write
 //-------------------------------------------------
 
-void c64_rex_ep256_cartridge_device::c64_cd_w(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+void c64_rex_ep256_cartridge_device::c64_cd_w(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!io2 && ((offset & 0xf0) == 0xa0))
 	{

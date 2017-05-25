@@ -39,6 +39,7 @@ todo:
 
 #include "emu.h"
 #include "decmxc06.h"
+#include "screen.h"
 
 void deco_mxc06_device::set_gfx_region(device_t &device, int region)
 {
@@ -47,14 +48,14 @@ void deco_mxc06_device::set_gfx_region(device_t &device, int region)
 }
 
 
-const device_type DECO_MXC06 = &device_creator<deco_mxc06_device>;
+DEFINE_DEVICE_TYPE(DECO_MXC06, deco_mxc06_device, "deco_mxc06", "DECO MXC06 Sprite")
 
-deco_mxc06_device::deco_mxc06_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, DECO_MXC06, "DECO MXC06 Sprite", tag, owner, clock, "deco_mxc06", __FILE__),
-		device_video_interface(mconfig, *this),
-		m_gfxregion(0),
-		m_ramsize(0x800),
-		m_gfxdecode(*this)
+deco_mxc06_device::deco_mxc06_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, DECO_MXC06, tag, owner, clock)
+	, device_video_interface(mconfig, *this)
+	, m_gfxregion(0)
+	, m_ramsize(0x800)
+	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
 {
 }
 
@@ -70,7 +71,7 @@ void deco_mxc06_device::static_set_gfxdecode_tag(device_t &device, const char *t
 
 
 /* this implementation was originally from Mad Motor */
-void deco_mxc06_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16* spriteram, int pri_mask, int pri_val, int col_mask )
+void deco_mxc06_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t* spriteram, int pri_mask, int pri_val, int col_mask )
 {
 	int offs;
 
@@ -182,7 +183,7 @@ void deco_mxc06_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cli
 
 /* this is used by the automat bootleg, it seems to have greatly simplified sprites compared to the real chip */
 /* spriteram is twice the size tho! */
-void deco_mxc06_device::draw_sprites_bootleg( bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16* spriteram, int pri_mask, int pri_val, int col_mask )
+void deco_mxc06_device::draw_sprites_bootleg( bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t* spriteram, int pri_mask, int pri_val, int col_mask )
 {
 	int offs;
 

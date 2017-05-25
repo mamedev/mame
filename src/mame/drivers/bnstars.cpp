@@ -89,12 +89,15 @@ ROMs    : MR96004-10.1  [125661cd] (IC5 - Samples)
 */
 
 #include "emu.h"
+#include "includes/ms32.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/v60/v60.h"
-#include "rendlay.h"
 #include "sound/ymf271.h"
-#include "includes/ms32.h"
 #include "machine/jalcrpt.h"
+
+#include "rendlay.h"
+#include "speaker.h"
 
 
 class bnstars_state : public ms32_state
@@ -108,35 +111,35 @@ public:
 			m_ms32_bg1_ram(*this, "bg1_ram"),
 			m_ms32_roz0_ram(*this, "roz0_ram"),
 			m_ms32_roz1_ram(*this, "roz1_ram"),
-			m_ms32_roz_ctrl(*this, "roz_ctrl"),
+			m_ms32_roz_ctrl(*this, "roz_ctrl.%u", 0),
 			m_ms32_spram(*this, "spram"),
 			m_ms32_tx0_scroll(*this, "tx0_scroll"),
 			m_ms32_bg0_scroll(*this, "bg0_scroll"),
 			m_ms32_tx1_scroll(*this, "tx1_scroll"),
 			m_ms32_bg1_scroll(*this, "bg1_scroll"),
-			m_p1_keys(*this, "P1KEY"),
-			m_p2_keys(*this, "P2KEY") { }
+			m_p1_keys(*this, "P1KEY.%u", 0),
+			m_p2_keys(*this, "P2KEY.%u", 0) { }
 
 	tilemap_t *m_ms32_tx_tilemap[2];
 	tilemap_t *m_ms32_bg_tilemap[2];
 	tilemap_t *m_ms32_roz_tilemap[2];
-	required_shared_ptr<UINT32> m_ms32_tx0_ram;
-	required_shared_ptr<UINT32> m_ms32_tx1_ram;
-	required_shared_ptr<UINT32> m_ms32_bg0_ram;
-	required_shared_ptr<UINT32> m_ms32_bg1_ram;
-	required_shared_ptr<UINT32> m_ms32_roz0_ram;
-	required_shared_ptr<UINT32> m_ms32_roz1_ram;
-	required_shared_ptr_array<UINT32, 2> m_ms32_roz_ctrl;
-	required_shared_ptr<UINT32> m_ms32_spram;
-	required_shared_ptr<UINT32> m_ms32_tx0_scroll;
-	required_shared_ptr<UINT32> m_ms32_bg0_scroll;
-	required_shared_ptr<UINT32> m_ms32_tx1_scroll;
-	required_shared_ptr<UINT32> m_ms32_bg1_scroll;
+	required_shared_ptr<uint32_t> m_ms32_tx0_ram;
+	required_shared_ptr<uint32_t> m_ms32_tx1_ram;
+	required_shared_ptr<uint32_t> m_ms32_bg0_ram;
+	required_shared_ptr<uint32_t> m_ms32_bg1_ram;
+	required_shared_ptr<uint32_t> m_ms32_roz0_ram;
+	required_shared_ptr<uint32_t> m_ms32_roz1_ram;
+	required_shared_ptr_array<uint32_t, 2> m_ms32_roz_ctrl;
+	required_shared_ptr<uint32_t> m_ms32_spram;
+	required_shared_ptr<uint32_t> m_ms32_tx0_scroll;
+	required_shared_ptr<uint32_t> m_ms32_bg0_scroll;
+	required_shared_ptr<uint32_t> m_ms32_tx1_scroll;
+	required_shared_ptr<uint32_t> m_ms32_bg1_scroll;
 
 	required_ioport_array<4> m_p1_keys;
 	required_ioport_array<4> m_p2_keys;
 
-	UINT32 m_bnstars1_mahjong_select;
+	uint32_t m_bnstars1_mahjong_select;
 	DECLARE_WRITE32_MEMBER(ms32_tx0_ram_w);
 	DECLARE_WRITE32_MEMBER(ms32_tx1_ram_w);
 	DECLARE_WRITE32_MEMBER(ms32_bg0_ram_w);
@@ -154,10 +157,10 @@ public:
 	TILE_GET_INFO_MEMBER(get_ms32_roz1_tile_info);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_bnstars_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_bnstars_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_bnstars_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_bnstars_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority, int chip);
-	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT32 *sprram_top, size_t sprram_size);
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t *sprram_top, size_t sprram_size);
 };
 
 
@@ -250,7 +253,7 @@ void bnstars_state::draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const 
 
 		while (y <= maxy)
 		{
-		    UINT32 *lineaddr = ms32_lineram + 8 * (y & 0xff);
+		    uint32_t *lineaddr = ms32_lineram + 8 * (y & 0xff);
 
 		    int start2x = (lineaddr[0x00/4] & 0xffff) | ((lineaddr[0x04/4] & 3) << 16);
 		    int start2y = (lineaddr[0x08/4] & 0xffff) | ((lineaddr[0x0c/4] & 3) << 16);
@@ -349,7 +352,7 @@ WRITE32_MEMBER(bnstars_state::ms32_roz1_ram_w)
 
 
 /* SPRITES based on tetrisp2 for now, readd priority bits later */
-void bnstars_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT32 *sprram_top, size_t sprram_size)
+void bnstars_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t *sprram_top, size_t sprram_size)
 {
 /***************************************************************************
 
@@ -393,8 +396,8 @@ void bnstars_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 	int code, attr, color, size, pri, pri_mask;
 	gfx_element *gfx = m_gfxdecode->gfx(0);
 
-	UINT32      *source = sprram_top;
-	const UINT32    *finish = sprram_top + (sprram_size - 0x10) / 4;
+	uint32_t      *source = sprram_top;
+	const uint32_t    *finish = sprram_top + (sprram_size - 0x10) / 4;
 
 
 	if (m_reverse_sprite_order == 1)
@@ -477,18 +480,18 @@ void bnstars_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 
 void bnstars_state::video_start()
 {
-	m_ms32_tx_tilemap[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(bnstars_state::get_ms32_tx0_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8,64,64);
-	m_ms32_tx_tilemap[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(bnstars_state::get_ms32_tx1_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8,64,64);
+	m_ms32_tx_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(bnstars_state::get_ms32_tx0_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8,64,64);
+	m_ms32_tx_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(bnstars_state::get_ms32_tx1_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8,64,64);
 	m_ms32_tx_tilemap[0]->set_transparent_pen(0);
 	m_ms32_tx_tilemap[1]->set_transparent_pen(0);
 
-	m_ms32_bg_tilemap[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(bnstars_state::get_ms32_bg0_tile_info),this),TILEMAP_SCAN_ROWS,16,16,64,64);
-	m_ms32_bg_tilemap[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(bnstars_state::get_ms32_bg1_tile_info),this),TILEMAP_SCAN_ROWS,16,16,64,64);
+	m_ms32_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(bnstars_state::get_ms32_bg0_tile_info),this),TILEMAP_SCAN_ROWS,16,16,64,64);
+	m_ms32_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(bnstars_state::get_ms32_bg1_tile_info),this),TILEMAP_SCAN_ROWS,16,16,64,64);
 	m_ms32_bg_tilemap[0]->set_transparent_pen(0);
 	m_ms32_bg_tilemap[1]->set_transparent_pen(0);
 
-	m_ms32_roz_tilemap[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(bnstars_state::get_ms32_roz0_tile_info),this),TILEMAP_SCAN_ROWS,16,16,128,128);
-	m_ms32_roz_tilemap[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(bnstars_state::get_ms32_roz1_tile_info),this),TILEMAP_SCAN_ROWS,16,16,128,128);
+	m_ms32_roz_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(bnstars_state::get_ms32_roz0_tile_info),this),TILEMAP_SCAN_ROWS,16,16,128,128);
+	m_ms32_roz_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(bnstars_state::get_ms32_roz1_tile_info),this),TILEMAP_SCAN_ROWS,16,16,128,128);
 	m_ms32_roz_tilemap[0]->set_transparent_pen(0);
 	m_ms32_roz_tilemap[1]->set_transparent_pen(0);
 
@@ -499,7 +502,7 @@ void bnstars_state::video_start()
 
 
 
-UINT32 bnstars_state::screen_update_bnstars_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t bnstars_state::screen_update_bnstars_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	screen.priority().fill(0, cliprect);
 
@@ -522,7 +525,7 @@ UINT32 bnstars_state::screen_update_bnstars_left(screen_device &screen, bitmap_i
 	return 0;
 }
 
-UINT32 bnstars_state::screen_update_bnstars_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t bnstars_state::screen_update_bnstars_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	screen.priority().fill(0, cliprect);
 
@@ -708,7 +711,7 @@ GFXDECODE_END
 
 CUSTOM_INPUT_MEMBER(bnstars_state::mahjong_ctrl_r)
 {
-	required_ioport_array<4> &keys = (((int)(FPTR)param) == 0) ? m_p1_keys : m_p2_keys;
+	required_ioport_array<4> &keys = (((int)(uintptr_t)param) == 0) ? m_p1_keys : m_p2_keys;
 
 	switch (m_bnstars1_mahjong_select & 0x2080)
 	{
@@ -803,7 +806,7 @@ void bnstars_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( bnstars, bnstars_state )
+static MACHINE_CONFIG_START( bnstars )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V70, 20000000) // 20MHz
@@ -848,6 +851,8 @@ static MACHINE_CONFIG_START( bnstars, bnstars_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymf1", YMF271, 16934400)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)

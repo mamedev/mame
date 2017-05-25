@@ -1,6 +1,8 @@
 -- license:BSD-3-Clause
 -- copyright-holders:MAMEdev Team
 
+dofile('modules.lua')
+
 forcedincludes {
 	MAME_DIR .. "src/osd/sdl/sdlprefix.h"
 }
@@ -52,7 +54,7 @@ end
 
 if _OPTIONS["NO_USE_MIDI"]~="1" and _OPTIONS["targetos"]=="linux" then
 	buildoptions {
-		backtick("pkg-config --cflags alsa"),
+		backtick(pkgconfigcmd() .. " --cflags alsa"),
 	}
 end
 
@@ -94,7 +96,7 @@ if BASE_TARGETOS=="unix" then
 		}
 		if _OPTIONS["targetos"]~="asmjs" then
 			buildoptions {
-				backtick("pkg-config --cflags fontconfig"),
+				backtick(pkgconfigcmd() .. " --cflags fontconfig"),
 			}
 		end
 	end
@@ -106,12 +108,11 @@ if _OPTIONS["targetos"]=="windows" then
 			"UNICODE",
 			"_UNICODE",
 			"main=utf8_main",
+			"_WIN32_WINNT=0x0501",
+			"WIN32_LEAN_AND_MEAN",
+			"NOMINMAX",
 		}
 
-	configuration { "Debug" }
-		defines {
-			"MALLOC_DEBUG",
-		}
 	configuration { }
 
 elseif _OPTIONS["targetos"]=="linux" then
@@ -121,7 +122,7 @@ elseif _OPTIONS["targetos"]=="linux" then
 		}
 	else
 		buildoptions {
-			backtick("pkg-config --cflags Qt5Widgets"),
+			backtick(pkgconfigcmd() .. " --cflags Qt5Widgets"),
 		}
 	end
 elseif _OPTIONS["targetos"]=="macosx" then

@@ -44,7 +44,6 @@ Ports:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "formats/ace_tap.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
 #include "bus/centronics/ctronics.h"
@@ -53,9 +52,15 @@ Ports:
 #include "machine/z80pio.h"
 #include "sound/ay8910.h"
 #include "sound/sp0256.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
 #include "sound/wave.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
+#include "formats/ace_tap.h"
+
 
 #define Z80_TAG         "z0"
 #define AY8910_TAG      "ay8910"
@@ -93,7 +98,7 @@ public:
 
 	virtual void machine_start() override;
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER( io_r );
 	DECLARE_WRITE8_MEMBER( io_w );
@@ -131,8 +136,8 @@ private:
 	required_device<centronics_device> m_centronics;
 	required_device<ram_device> m_ram;
 	required_device<sp0256_device> m_sp0256;
-	required_shared_ptr<UINT8> m_video_ram;
-	required_shared_ptr<UINT8> m_char_ram;
+	required_shared_ptr<uint8_t> m_video_ram;
+	required_shared_ptr<uint8_t> m_char_ram;
 	required_ioport m_a8;
 	required_ioport m_a9;
 	required_ioport m_a10;
@@ -160,7 +165,7 @@ private:
 SNAPSHOT_LOAD_MEMBER( ace_state, ace )
 {
 	cpu_device *cpu = m_maincpu;
-	UINT8 *RAM = memregion(cpu->tag())->base();
+	uint8_t *RAM = memregion(cpu->tag())->base();
 	address_space &space = cpu->space(AS_PROGRAM);
 	unsigned char ace_repeat, ace_byte, loop;
 	int done=0, ace_index=0x2000;
@@ -169,7 +174,7 @@ SNAPSHOT_LOAD_MEMBER( ace_state, ace )
 	{
 		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "At least 16KB RAM expansion required");
 		image.message("At least 16KB RAM expansion required");
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
 	logerror("Loading file %s.\r\n", image.filename());
@@ -206,7 +211,7 @@ SNAPSHOT_LOAD_MEMBER( ace_state, ace )
 	{
 		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "EOF marker not found");
 		image.message("EOF marker not found");
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
 		// patch CPU registers
@@ -244,7 +249,7 @@ SNAPSHOT_LOAD_MEMBER( ace_state, ace )
 	for (ace_index = 0x2000; ace_index < 0x8000; ace_index++)
 		space.write_byte(ace_index, RAM[ace_index]);
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 //**************************************************************************
@@ -257,7 +262,7 @@ SNAPSHOT_LOAD_MEMBER( ace_state, ace )
 
 READ8_MEMBER( ace_state::io_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (!BIT(offset, 8)) data &= m_a8->read();
 	if (!BIT(offset, 9)) data &= m_a9->read();
@@ -569,16 +574,16 @@ TIMER_DEVICE_CALLBACK_MEMBER(ace_state::clear_irq)
 }
 
 
-UINT32 ace_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t ace_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 y,ra,chr,gfx;
-	UINT16 sy=56,ma=0,x;
+	uint8_t y,ra,chr,gfx;
+	uint16_t sy=56,ma=0,x;
 
 	for (y = 0; y < 24; y++)
 	{
 		for (ra = 0; ra < 8; ra++)
 		{
-			UINT16 *p = &bitmap.pix16(sy++, 40);
+			uint16_t *p = &bitmap.pix16(sy++, 40);
 
 			for (x = ma; x < ma+32; x++)
 			{
@@ -740,7 +745,7 @@ void ace_state::machine_start()
 //  MACHINE_CONFIG( ace )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( ace, ace_state )
+static MACHINE_CONFIG_START( ace )
 	// basic machine hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_6_5MHz/2)
 	MCFG_CPU_PROGRAM_MAP(ace_mem)
@@ -830,5 +835,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME     PARENT    COMPAT  MACHINE    INPUT     INIT     COMPANY         FULLNAME      FLAGS
-COMP( 1981, jupace,     0,        0,      ace,       ace, driver_device,      0,   "Jupiter Cantab", "Jupiter Ace" , 0 )
+//    YEAR  NAME     PARENT    COMPAT  MACHINE    INPUT  STATE      INIT  COMPANY           FULLNAME       FLAGS
+COMP( 1981, jupace,  0,        0,      ace,       ace,   ace_state, 0,    "Jupiter Cantab", "Jupiter Ace", 0 )

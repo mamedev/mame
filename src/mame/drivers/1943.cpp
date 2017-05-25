@@ -32,11 +32,14 @@
 */
 
 #include "emu.h"
+#include "includes/1943.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/2203intf.h"
-#include "includes/1943.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /* Protection Handlers */
@@ -306,7 +309,7 @@ void _1943_state::machine_reset()
 	m_prot_value = 0;
 }
 
-static MACHINE_CONFIG_START( 1943, _1943_state )
+static MACHINE_CONFIG_START( 1943 )
 
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz/4) /* verified on pcb */
@@ -874,7 +877,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(_1943_state,1943)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 }
 

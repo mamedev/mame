@@ -30,22 +30,22 @@ public:
 		m_palette(*this, "palette"){ }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_hvc;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_hvc;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
 
 	/* input */
-	UINT8 m_gear;
-	UINT8 m_track;
-	INT32 m_steering_buf;
-	INT32 m_steering_val;
-	UINT8 m_crash_en;
-	UINT8 m_crash_data;
-	UINT8 m_crash_data_en;  // IC D8
-	UINT8 m_ac_line;
-	INT32 m_last_steering_val;
+	uint8_t m_gear;
+	uint8_t m_track;
+	int32_t m_steering_buf;
+	int32_t m_steering_val;
+	uint8_t m_crash_en;
+	uint8_t m_crash_data;
+	uint8_t m_crash_data_en;  // IC D8
+	uint8_t m_ac_line;
+	int32_t m_last_steering_val;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -64,7 +64,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_nitedrvr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_nitedrvr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(nitedrvr_crash_toggle_callback);
 	void draw_box(bitmap_ind16 &bitmap, const rectangle &cliprect, int bx, int by, int ex, int ey);
 	void draw_roadway(bitmap_ind16 &bitmap, const rectangle &cliprect);

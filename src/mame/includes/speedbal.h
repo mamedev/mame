@@ -17,12 +17,12 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_background_videoram;
-	required_shared_ptr<UINT8> m_foreground_videoram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_background_videoram;
+	required_shared_ptr<uint8_t> m_foreground_videoram;
 
 	bool m_leds_start;
-	UINT32 m_leds_shiftreg;
+	uint32_t m_leds_shiftreg;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
 
@@ -42,6 +42,6 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info_bg);
 	TILE_GET_INFO_MEMBER(get_tile_info_fg);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 };

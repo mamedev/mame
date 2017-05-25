@@ -6,12 +6,11 @@
 
 ***************************************************************************/
 
+#ifndef MAME_BUS_SVI3X8_SLOT_SV805_H
+#define MAME_BUS_SVI3X8_SLOT_SV805_H
+
 #pragma once
 
-#ifndef __SVI3X8_SLOT_SV805_H__
-#define __SVI3X8_SLOT_SV805_H__
-
-#include "emu.h"
 #include "slot.h"
 #include "machine/ins8250.h"
 #include "bus/rs232/rs232.h"
@@ -27,7 +26,7 @@ class sv805_device : public device_t, public device_svi_slot_interface
 {
 public:
 	// construction/destruction
-	sv805_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sv805_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual DECLARE_READ8_MEMBER( iorq_r ) override;
 	virtual DECLARE_WRITE8_MEMBER( iorq_w ) override;
@@ -44,6 +43,6 @@ private:
 };
 
 // device type definition
-extern const device_type SV805;
+DECLARE_DEVICE_TYPE(SV805, sv805_device)
 
-#endif // __SVI3X8_SLOT_SV805_H__
+#endif // MAME_BUS_SVI3X8_SLOT_SV805_H

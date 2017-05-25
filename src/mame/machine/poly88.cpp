@@ -28,7 +28,7 @@ void poly88_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 		poly88_cassette_timer_callback(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in poly88_state::device_timer");
+		assert_always(false, "Unknown id in poly88_state::device_timer");
 	}
 }
 
@@ -47,25 +47,25 @@ WRITE8_MEMBER(poly88_state::poly88_baud_rate_w)
 
 }
 
-UINT8 poly88_state::row_number(UINT8 code) {
-	if BIT(code,0) return 0;
-	if BIT(code,1) return 1;
-	if BIT(code,2) return 2;
-	if BIT(code,3) return 3;
-	if BIT(code,4) return 4;
-	if BIT(code,5) return 5;
-	if BIT(code,6) return 6;
-	if BIT(code,7) return 7;
+uint8_t poly88_state::row_number(uint8_t code) {
+	if (BIT(code,0)) return 0;
+	if (BIT(code,1)) return 1;
+	if (BIT(code,2)) return 2;
+	if (BIT(code,3)) return 3;
+	if (BIT(code,4)) return 4;
+	if (BIT(code,5)) return 5;
+	if (BIT(code,6)) return 6;
+	if (BIT(code,7)) return 7;
 	return 0;
 }
 
 TIMER_CALLBACK_MEMBER(poly88_state::keyboard_callback)
 {
 	int i;
-	UINT8 code;
-	UINT8 key_code = 0;
-	UINT8 shift = m_linec->read() & 0x02 ? 1 : 0;
-	UINT8 ctrl =  m_linec->read() & 0x01 ? 1 : 0;
+	uint8_t code;
+	uint8_t key_code = 0;
+	uint8_t shift = m_linec->read() & 0x02 ? 1 : 0;
+	uint8_t ctrl =  m_linec->read() & 0x01 ? 1 : 0;
 
 	for(i = 0; i < 7; i++)
 	{
@@ -246,7 +246,7 @@ WRITE_LINE_MEMBER(poly88_state::poly88_usart_rxready)
 
 READ8_MEMBER(poly88_state::poly88_keyboard_r)
 {
-	UINT8 retVal = m_last_code;
+	uint8_t retVal = m_last_code;
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 	m_last_code = 0x00;
 	return retVal;
@@ -260,11 +260,11 @@ WRITE8_MEMBER(poly88_state::poly88_intr_w)
 SNAPSHOT_LOAD_MEMBER( poly88_state, poly88 )
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	UINT8* data= auto_alloc_array(machine(), UINT8, snapshot_size);
-	UINT16 recordNum;
-	UINT16 recordLen;
-	UINT16 address;
-	UINT8  recordType;
+	uint8_t* data= auto_alloc_array(machine(), uint8_t, snapshot_size);
+	uint16_t recordNum;
+	uint16_t recordLen;
+	uint16_t address;
+	uint8_t  recordType;
 
 	int pos = 0x300;
 	char name[9];
@@ -302,7 +302,7 @@ SNAPSHOT_LOAD_MEMBER( poly88_state, poly88 )
 					break;
 			case 3 :
 					/* 03 Auto Start @ Address */
-					m_maincpu->set_state_int(I8085_PC, address);
+					m_maincpu->set_state_int(i8080_cpu_device::I8085_PC, address);
 					theend = 1;
 					break;
 			case 4 :
@@ -328,5 +328,5 @@ SNAPSHOT_LOAD_MEMBER( poly88_state, poly88 )
 		pos+=recordLen;
 	}
 	machine().device("uart")->reset();
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }

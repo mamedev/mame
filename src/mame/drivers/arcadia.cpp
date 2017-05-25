@@ -119,8 +119,10 @@ anything in hardware. No cartridge has been found which uses them.
 
 ******************************************************************************/
 
+#include "emu.h"
 #include "includes/arcadia.h"
 #include "softlist.h"
+#include "speaker.h"
 
 static ADDRESS_MAP_START( arcadia_mem, AS_PROGRAM, 8, arcadia_state )
 	AM_RANGE( 0x0000, 0x0fff) AM_DEVREAD("cartslot", arcadia_cart_slot_device, read_rom)
@@ -416,14 +418,14 @@ GFXDECODE_END
 
 static const rgb_t arcadia_colors[] =
 {
-	rgb_t::white,                  /* white */
+	rgb_t::white(),                /* white */
 	rgb_t(0xff, 0xff, 0x00), /* yellow */
 	rgb_t(0x00, 0xff, 0xff), /* cyan */
 	rgb_t(0x00, 0xff, 0x00), /* green */
 	rgb_t(0xff, 0x00, 0xff), /* magenta */
 	rgb_t(0xff, 0x00, 0x00), /* red */
 	rgb_t(0x00, 0x00, 0xff), /* blue */
-	rgb_t::black                   /* black */
+	rgb_t::black()                 /* black */
 };
 
 static const unsigned short arcadia_palette[128+8] =  /* bgnd, fgnd */
@@ -471,7 +473,7 @@ static SLOT_INTERFACE_START(arcadia_cart)
 SLOT_INTERFACE_END
 
 
-static MACHINE_CONFIG_START( arcadia, arcadia_state )
+static MACHINE_CONFIG_START( arcadia )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", S2650, 3580000/4)        /* 0.895 MHz */
 	MCFG_CPU_PROGRAM_MAP(arcadia_mem)
@@ -676,16 +678,16 @@ ROM_END
 DRIVER_INIT_MEMBER(arcadia_state,arcadia)
 {
 	int i;
-	UINT8 *gfx=memregion("gfx1")->base();
+	uint8_t *gfx=memregion("gfx1")->base();
 	for (i=0; i<256; i++) gfx[i]=i;
 #if 0
 	// this is here to allow developement of some simple testroutines
 	// for a real console
 	{
-		UINT8 *rom=memregion("maincpu")->base();
+		uint8_t *rom=memregion("maincpu")->base();
 		/* this is a simple routine to display all rom characters
 		   on the display for a snapshot */
-		static const UINT8 prog[]={ // address 0 of course
+		static const uint8_t prog[]={ // address 0 of course
 		0x20, // eorz, 0
 		0x1b, 0x01, // bctr,a $0004
 		0x17, // retc a
@@ -808,7 +810,7 @@ DRIVER_INIT_MEMBER(arcadia_state,arcadia)
 }
 
 
-/*   YEAR  NAME       PARENT     COMPAT    MACHINE       INPUT     INIT          COMPANY               FULLNAME */
+/*   YEAR  NAME       PARENT     COMPAT    MACHINE       INPUT    STATE           INIT          COMPANY               FULLNAME */
 CONS(1983, advsnha,   arcadia,   0,        arcadia,      arcadia, arcadia_state,  arcadia,      "Advision",           "Advision Home Arcade", MACHINE_IMPERFECT_SOUND )    /* France */
 CONS(1982, bndarc,    arcadia,   0,        arcadia,      arcadia, arcadia_state,  arcadia,      "Bandai",             "Arcadia", MACHINE_IMPERFECT_SOUND )                 /* Japan */
 CONS(1982, arcadia,   0,         0,        arcadia,      arcadia, arcadia_state,  arcadia,      "Emerson",            "Arcadia 2001", MACHINE_IMPERFECT_SOUND )            /* U.S.A. */

@@ -1,11 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco
+#ifndef MAME_BUS_DMV_K210_H
+#define MAME_BUS_DMV_K210_H
+
 #pragma once
 
-#ifndef __DMV_K210_H__
-#define __DMV_K210_H__
-
-#include "emu.h"
 #include "dmvbus.h"
 #include "machine/i8255.h"
 #include "bus/centronics/ctronics.h"
@@ -22,7 +21,7 @@ class dmv_k210_device :
 {
 public:
 	// construction/destruction
-	dmv_k210_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	dmv_k210_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -49,8 +48,8 @@ protected:
 	void device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr) override;
 
 	// dmvcart_interface overrides
-	virtual void io_read(address_space &space, int ifsel, offs_t offset, UINT8 &data) override;
-	virtual void io_write(address_space &space, int ifsel, offs_t offset, UINT8 data) override;
+	virtual void io_read(address_space &space, int ifsel, offs_t offset, uint8_t &data) override;
+	virtual void io_write(address_space &space, int ifsel, offs_t offset, uint8_t data) override;
 
 private:
 	required_device<i8255_device> m_ppi;
@@ -60,12 +59,12 @@ private:
 	dmvcart_slot_device * m_bus;
 
 	emu_timer * m_clk1_timer;
-	UINT8       m_portb;
-	UINT8       m_portc;
+	uint8_t       m_portb;
+	uint8_t       m_portc;
 };
 
 
 // device type definition
-extern const device_type DMV_K210;
+DECLARE_DEVICE_TYPE(DMV_K210, dmv_k210_device)
 
-#endif  /* __DMV_K210_H__ */
+#endif  // MAME_BUS_DMV_K210_H

@@ -674,29 +674,29 @@ struct Mesh
 #define BGFX_CHUNK_MAGIC_IB  BX_MAKEFOURCC('I', 'B', ' ', 0x0)
 #define BGFX_CHUNK_MAGIC_PRI BX_MAKEFOURCC('P', 'R', 'I', 0x0)
 
-		bx::CrtFileReader reader;
-		bx::open(&reader, _filePath);
+		bx::FileReaderI* reader = entry::getFileReader();
+		bx::open(reader, _filePath);
 
 		Group group;
 
 		uint32_t chunk;
-		while (4 == bx::read(&reader, chunk) )
+		while (4 == bx::read(reader, chunk) )
 		{
 			switch (chunk)
 			{
 			case BGFX_CHUNK_MAGIC_VB:
 				{
-					bx::read(&reader, group.m_sphere);
-					bx::read(&reader, group.m_aabb);
-					bx::read(&reader, group.m_obb);
+					bx::read(reader, group.m_sphere);
+					bx::read(reader, group.m_aabb);
+					bx::read(reader, group.m_obb);
 
-					bgfx::read(&reader, m_decl);
+					bgfx::read(reader, m_decl);
 					uint16_t stride = m_decl.getStride();
 
 					uint16_t numVertices;
-					bx::read(&reader, numVertices);
+					bx::read(reader, numVertices);
 					const bgfx::Memory* mem = bgfx::alloc(numVertices*stride);
-					bx::read(&reader, mem->data, mem->size);
+					bx::read(reader, mem->data, mem->size);
 
 					group.m_vbh = bgfx::createVertexBuffer(mem, m_decl);
 				}
@@ -705,9 +705,9 @@ struct Mesh
 			case BGFX_CHUNK_MAGIC_IB:
 				{
 					uint32_t numIndices;
-					bx::read(&reader, numIndices);
+					bx::read(reader, numIndices);
 					const bgfx::Memory* mem = bgfx::alloc(numIndices*2);
-					bx::read(&reader, mem->data, mem->size);
+					bx::read(reader, mem->data, mem->size);
 					group.m_ibh = bgfx::createIndexBuffer(mem);
 				}
 				break;
@@ -715,31 +715,31 @@ struct Mesh
 			case BGFX_CHUNK_MAGIC_PRI:
 				{
 					uint16_t len;
-					bx::read(&reader, len);
+					bx::read(reader, len);
 
 					std::string material;
 					material.resize(len);
-					bx::read(&reader, const_cast<char*>(material.c_str() ), len);
+					bx::read(reader, const_cast<char*>(material.c_str() ), len);
 
 					uint16_t num;
-					bx::read(&reader, num);
+					bx::read(reader, num);
 
 					for (uint32_t ii = 0; ii < num; ++ii)
 					{
-						bx::read(&reader, len);
+						bx::read(reader, len);
 
 						std::string name;
 						name.resize(len);
-						bx::read(&reader, const_cast<char*>(name.c_str() ), len);
+						bx::read(reader, const_cast<char*>(name.c_str() ), len);
 
 						Primitive prim;
-						bx::read(&reader, prim.m_startIndex);
-						bx::read(&reader, prim.m_numIndices);
-						bx::read(&reader, prim.m_startVertex);
-						bx::read(&reader, prim.m_numVertices);
-						bx::read(&reader, prim.m_sphere);
-						bx::read(&reader, prim.m_aabb);
-						bx::read(&reader, prim.m_obb);
+						bx::read(reader, prim.m_startIndex);
+						bx::read(reader, prim.m_numIndices);
+						bx::read(reader, prim.m_startVertex);
+						bx::read(reader, prim.m_numVertices);
+						bx::read(reader, prim.m_sphere);
+						bx::read(reader, prim.m_aabb);
+						bx::read(reader, prim.m_obb);
 
 						group.m_prims.push_back(prim);
 					}
@@ -750,13 +750,13 @@ struct Mesh
 				break;
 
 			default:
-				DBG("%08x at %d", chunk, reader.seek() );
+				DBG("%08x at %d", chunk, bx::seek(reader) );
 				abort();
 				break;
 			}
 		}
 
-		bx::close(&reader);
+		bx::close(reader);
 	}
 
 	void unload()
@@ -896,7 +896,7 @@ int _main_(int _argc, char** _argv)
 		lightRgbInnerR[ii][2] = rgbInnerR[index][2];
 		lightRgbInnerR[ii][3] = rgbInnerR[index][3];
 	}
-	memcpy(s_uniforms.m_lightRgbInnerR, lightRgbInnerR, MAX_NUM_LIGHTS * 4*sizeof(float) );
+	bx::memCopy(s_uniforms.m_lightRgbInnerR, lightRgbInnerR, MAX_NUM_LIGHTS * 4*sizeof(float) );
 
 	// Set view and projection matrices.
 	const float aspect = float(viewState.m_width)/float(viewState.m_height);
@@ -937,8 +937,8 @@ int _main_(int _argc, char** _argv)
 			| (mouseState.m_buttons[entry::MouseButton::Right ] ? IMGUI_MBUT_RIGHT  : 0)
 			| (mouseState.m_buttons[entry::MouseButton::Middle] ? IMGUI_MBUT_MIDDLE : 0)
 			, mouseState.m_mz
-			, viewState.m_width
-			, viewState.m_height
+			, uint16_t(viewState.m_width)
+			, uint16_t(viewState.m_height)
 			);
 
 		static int32_t scrollArea = 0;
@@ -1021,12 +1021,12 @@ int _main_(int _argc, char** _argv)
 		const float radius = (scene == StencilReflectionScene) ? 15.0f : 25.0f;
 		for (uint8_t ii = 0; ii < numLights; ++ii)
 		{
-			lightPosRadius[ii][0] = sinf( (lightTimeAccumulator*1.1f + ii*0.03f + ii*bx::piHalf*1.07f ) )*20.0f;
-			lightPosRadius[ii][1] = 8.0f + (1.0f - cosf( (lightTimeAccumulator*1.5f + ii*0.29f + bx::piHalf*1.49f ) ) )*4.0f;
-			lightPosRadius[ii][2] = cosf( (lightTimeAccumulator*1.3f + ii*0.13f + ii*bx::piHalf*1.79f ) )*20.0f;
+			lightPosRadius[ii][0] = bx::fsin( (lightTimeAccumulator*1.1f + ii*0.03f + ii*bx::piHalf*1.07f ) )*20.0f;
+			lightPosRadius[ii][1] = 8.0f + (1.0f - bx::fcos( (lightTimeAccumulator*1.5f + ii*0.29f + bx::piHalf*1.49f ) ) )*4.0f;
+			lightPosRadius[ii][2] = bx::fcos( (lightTimeAccumulator*1.3f + ii*0.13f + ii*bx::piHalf*1.79f ) )*20.0f;
 			lightPosRadius[ii][3] = radius;
 		}
-		memcpy(s_uniforms.m_lightPosRadius, lightPosRadius, numLights * 4*sizeof(float) );
+		bx::memCopy(s_uniforms.m_lightPosRadius, lightPosRadius, numLights * 4*sizeof(float) );
 
 		// Floor position.
 		float floorMtx[16];
@@ -1093,9 +1093,9 @@ int _main_(int _argc, char** _argv)
 				, 0.0f
 				, 0.0f
 				, 0.0f
-				, sinf(ii * 2.0f + 13.0f - sceneTimeAccumulator) * 13.0f
+				, bx::fsin(ii * 2.0f + 13.0f - sceneTimeAccumulator) * 13.0f
 				, 4.0f
-				, cosf(ii * 2.0f + 13.0f - sceneTimeAccumulator) * 13.0f
+				, bx::fcos(ii * 2.0f + 13.0f - sceneTimeAccumulator) * 13.0f
 				);
 		}
 
@@ -1144,7 +1144,7 @@ int _main_(int _argc, char** _argv)
 					bx::vec3MulMtx(reflectedLights[ii], lightPosRadius[ii], reflectMtx);
 					reflectedLights[ii][3] = lightPosRadius[ii][3];
 				}
-				memcpy(s_uniforms.m_lightPosRadius, reflectedLights, numLights * 4*sizeof(float) );
+				bx::memCopy(s_uniforms.m_lightPosRadius, reflectedLights, numLights * 4*sizeof(float) );
 
 				// Reflect and submit bunny.
 				float mtxReflectedBunny[16];
@@ -1168,7 +1168,7 @@ int _main_(int _argc, char** _argv)
 				}
 
 				// Set lights back.
-				memcpy(s_uniforms.m_lightPosRadius, lightPosRadius, numLights * 4*sizeof(float) );
+				bx::memCopy(s_uniforms.m_lightPosRadius, lightPosRadius, numLights * 4*sizeof(float) );
 				// Third pass - Blend plane.
 
 				// Floor.
@@ -1237,7 +1237,7 @@ int _main_(int _argc, char** _argv)
 				float ground[4];
 				float plane_pos[3] = { 0.0f, 0.0f, 0.0f };
 				float normal[3] = { 0.0f, 1.0f, 0.0f };
-				memcpy(ground, normal, sizeof(float) * 3);
+				bx::memCopy(ground, normal, sizeof(float) * 3);
 				ground[3] = -bx::vec3Dot(plane_pos, normal) - 0.01f; // - 0.01 against z-fighting
 
 				for (uint8_t ii = 0, viewId = RENDER_VIEWID_RANGE5_PASS_6; ii < numLights; ++ii, ++viewId)
@@ -1250,7 +1250,7 @@ int _main_(int _argc, char** _argv)
 					// Get homogeneous light pos.
 					float* lightPos = lightPosRadius[ii];
 					float pos[4];
-					memcpy(pos, lightPos, sizeof(float) * 3);
+					bx::memCopy(pos, lightPos, sizeof(float) * 3);
 					pos[3] = 1.0f;
 
 					// Calculate shadow mtx for current light.
@@ -1358,7 +1358,7 @@ int _main_(int _argc, char** _argv)
 			);
 
 		// Setup view rect and transform for all used views.
-		setViewRectMask(s_viewMask, 0, 0, viewState.m_width, viewState.m_height);
+		setViewRectMask(s_viewMask, 0, 0, uint16_t(viewState.m_width), uint16_t(viewState.m_height) );
 		setViewTransformMask(s_viewMask, viewState.m_view, viewState.m_proj);
 		s_viewMask = 0;
 

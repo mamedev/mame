@@ -4,8 +4,8 @@
 
     NEC PC-9801-86 sound card
 
-    Almost the same thing as PC-9801-86, but this one has YM2608 instead of
-    YM2203
+    Similar to PC-9801-26, this one has YM2608 instead of YM2203 and an
+    additional DAC port
 
     TODO:
     - joystick code should be shared between -26, -86 and -118
@@ -17,6 +17,8 @@
 
 #include "emu.h"
 #include "machine/pc9801_86.h"
+#include "sound/volt_reg.h"
+#include "speaker.h"
 
 #define MAIN_CLOCK_X1 XTAL_1_9968MHz
 #define QUEUE_SIZE 32768
@@ -26,7 +28,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type PC9801_86 = &device_creator<pc9801_86_device>;
+DEFINE_DEVICE_TYPE(PC9801_86, pc9801_86_device, "pc9801_86", "pc9801_86")
 
 
 READ8_MEMBER(pc9801_86_device::opn_porta_r)
@@ -46,7 +48,7 @@ WRITE_LINE_MEMBER(pc9801_86_device::sound_irq)
 	machine().device<pic8259_device>(":pic8259_slave")->ir4_w(state || (m_pcmirq ? ASSERT_LINE : CLEAR_LINE));
 }
 
-static MACHINE_CONFIG_FRAGMENT( pc9801_86_config )
+static MACHINE_CONFIG_START( pc9801_86_config )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("opna", YM2608, MAIN_CLOCK_X1*4) // unknown clock / divider
 	MCFG_YM2608_IRQ_HANDLER(WRITELINE(pc9801_86_device, sound_irq))
@@ -56,10 +58,11 @@ static MACHINE_CONFIG_FRAGMENT( pc9801_86_config )
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(pc9801_86_device, opn_portb_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
-	MCFG_SOUND_ADD("dacl", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
-	MCFG_SOUND_ADD("dacr", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
+	MCFG_SOUND_ADD("ldac", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0) // unknown DAC
+	MCFG_SOUND_ADD("rdac", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 //-------------------------------------------------
@@ -77,7 +80,7 @@ ROM_START( pc9801_86 )
 	ROM_REGION( 0x100000, "opna", ROMREGION_ERASE00 )
 ROM_END
 
-const rom_entry *pc9801_86_device::device_rom_region() const
+const tiny_rom_entry *pc9801_86_device::device_rom_region() const
 {
 	return ROM_NAME( pc9801_86 );
 }
@@ -125,11 +128,11 @@ ioport_constructor pc9801_86_device::device_input_ports() const
 //  pc9801_86_device - constructor
 //-------------------------------------------------
 
-pc9801_86_device::pc9801_86_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, PC9801_86, "pc9801_86", tag, owner, clock, "pc9801_86", __FILE__),
+pc9801_86_device::pc9801_86_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, PC9801_86, tag, owner, clock),
 		m_opna(*this, "opna"),
-		m_dacl(*this, "dacl"),
-		m_dacr(*this, "dacr"),
+		m_ldac(*this, "ldac"),
+		m_rdac(*this, "rdac"),
 		m_queue(QUEUE_SIZE)
 {
 }
@@ -180,7 +183,7 @@ void pc9801_86_device::device_start()
 
 void pc9801_86_device::device_reset()
 {
-	UINT16 port_base = (ioport("OPNA_DSW")->read() & 1) << 8;
+	uint16_t port_base = (ioport("OPNA_DSW")->read() & 1) << 8;
 	install_device(port_base + 0x0088, port_base + 0x008f, read8_delegate(FUNC(pc9801_86_device::opn_r), this), write8_delegate(FUNC(pc9801_86_device::opn_w), this) );
 	install_device(0xa460, 0xa463, read8_delegate(FUNC(pc9801_86_device::id_r), this), write8_delegate(FUNC(pc9801_86_device::mask_w), this));
 	install_device(0xa464, 0xa46f, read8_delegate(FUNC(pc9801_86_device::pcm_r), this), write8_delegate(FUNC(pc9801_86_device::pcm_w), this));
@@ -303,11 +306,11 @@ int pc9801_86_device::queue_count()
 	return m_count;
 }
 
-UINT8 pc9801_86_device::queue_pop()
+uint8_t pc9801_86_device::queue_pop()
 {
 	if(!queue_count())
 		return 0;
-	UINT8 ret = m_queue[m_tail++];
+	uint8_t ret = m_queue[m_tail++];
 	m_tail %= QUEUE_SIZE;
 	m_count--;
 	return ret;
@@ -315,7 +318,7 @@ UINT8 pc9801_86_device::queue_pop()
 
 void pc9801_86_device::device_timer(emu_timer& timer, device_timer_id id, int param, void* ptr)
 {
-	INT16 lsample, rsample;
+	int16_t lsample, rsample;
 
 	if((m_pcm_ctrl & 0x40) || !(m_pcm_ctrl & 0x80) || !queue_count())
 		return;
@@ -323,32 +326,32 @@ void pc9801_86_device::device_timer(emu_timer& timer, device_timer_id id, int pa
 	switch(m_pcm_mode & 0x70)
 	{
 		case 0x70: // 8bit stereo
-			m_dacl->write(queue_pop() << 8);
-			m_dacr->write(queue_pop() << 8);
+			m_ldac->write(queue_pop() << 8);
+			m_rdac->write(queue_pop() << 8);
 			break;
 		case 0x60: // 8bit left only
-			m_dacl->write(queue_pop() << 8);
+			m_ldac->write(queue_pop() << 8);
 			break;
 		case 0x50: // 8bit right only
-			m_dacr->write(queue_pop() << 8);
+			m_rdac->write(queue_pop() << 8);
 			break;
 		case 0x30: // 16bit stereo
 			lsample = queue_pop();
 			lsample |= queue_pop() << 8;
 			rsample = queue_pop();
 			rsample |= queue_pop() << 8;
-			m_dacl->write(lsample);
-			m_dacr->write(rsample);
+			m_ldac->write(lsample);
+			m_rdac->write(rsample);
 			break;
 		case 0x20: // 16bit left only
 			lsample = queue_pop();
 			lsample |= queue_pop() << 8;
-			m_dacl->write(lsample);
+			m_ldac->write(lsample);
 			break;
 		case 0x10: // 16bit right only
 			rsample = queue_pop();
 			rsample |= queue_pop() << 8;
-			m_dacr->write(rsample);
+			m_rdac->write(rsample);
 			break;
 	}
 	if((queue_count() < m_irq_rate) && (m_pcm_ctrl & 0x20))

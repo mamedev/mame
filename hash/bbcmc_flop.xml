@@ -10,10 +10,46 @@
 
 <softwarelist name="bbcmc_flop" description="BBC Master Compact disks">
 
+	<software name="alps24">
+		<description>ALPS - Adventure Language Programming System</description>
+		<year>1988</year>
+		<publisher>Alpine Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="655360">
+				<rom name="alps24.adl" size="655360" crc="82b20916" sha1="fcf1c0290afb523cbab11069373fef28478b1ad3" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="astrobl">
+		<description>Astro Blaster</description>
+		<year>2016</year>
+		<publisher>Retro Software</publisher>
+		<info name="author" value="Richard Broadhurst" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="95488">
+				<rom name="AstroBlaster.adf" size="95488" crc="372f352b" sha1="cc247c41bad2c00f99639af93e89bfb29692b00f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carnival">
+		<description>Carnival</description>
+		<year>2014</year>
+		<publisher>Retro Software</publisher>
+		<info name="author" value="Richard Broadhurst" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="25600">
+				<rom name="carnival.adf" size="25600" crc="cbe0d763" sha1="5caf371370a1358540e8d042ccdb02db2c1470d6" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="elite">
 		<description>Elite</description>
 		<year>1986</year>
 		<publisher>Superior Software/Acornsoft</publisher>
+		<info name="release" value="SUG60" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
 				<rom name="elite.adm" size="327680" crc="4668a225" sha1="0716a525820045f6b2092dda2eca2fa6a651b381" offset="0"/>
@@ -22,7 +58,7 @@
 	</software>
 
 	<software name="welcome">
-		<description>BBC Master Compact Welcome Disc</description>
+		<description>Welcome &amp; Utilities Disc for Master Compact</description>
 		<year>1986</year>
 		<publisher>Acorn</publisher>
 		<part name="flop1" interface="floppy_3_5">

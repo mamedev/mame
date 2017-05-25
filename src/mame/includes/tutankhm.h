@@ -11,17 +11,17 @@ public:
 		m_palette(*this, "palette") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_scroll;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_scroll;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
-	UINT8     m_flip_x;
-	UINT8     m_flip_y;
+	uint8_t     m_flip_x;
+	uint8_t     m_flip_y;
 
 	/* misc */
-	UINT8    m_irq_toggle;
-	UINT8    m_irq_enable;
+	uint8_t    m_irq_toggle;
+	uint8_t    m_irq_enable;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -34,6 +34,6 @@ public:
 	DECLARE_WRITE8_MEMBER(tutankhm_flip_screen_y_w);
 	DECLARE_MACHINE_START(tutankhm);
 	DECLARE_MACHINE_RESET(tutankhm);
-	UINT32 screen_update_tutankhm(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_tutankhm(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(tutankhm_interrupt);
 };

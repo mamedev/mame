@@ -34,10 +34,12 @@
 #include "cpu/m6502/m6502.h"
 #include "machine/mos6530n.h"
 #include "machine/ram.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+
+#include "speaker.h"
 
 #include "beta.lh"
 
@@ -83,14 +85,14 @@ public:
 	/* EPROM state */
 	int m_eprom_oe;
 	int m_eprom_ce;
-	UINT16 m_eprom_addr;
-	UINT8 m_eprom_data;
-	UINT8 m_old_data;
-	dynamic_buffer m_eprom_rom;
+	uint16_t m_eprom_addr;
+	uint8_t m_eprom_data;
+	uint8_t m_old_data;
+	std::vector<uint8_t> m_eprom_rom;
 
 	/* display state */
-	UINT8 m_ls145_p;
-	UINT8 m_segment;
+	uint8_t m_ls145_p;
+	uint8_t m_segment;
 
 	emu_timer *m_led_refresh_timer;
 	TIMER_CALLBACK_MEMBER(led_refresh);
@@ -100,8 +102,8 @@ public:
 /* Memory Maps */
 
 static ADDRESS_MAP_START( beta_mem, AS_PROGRAM, 8, beta_state )
-	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x7f00) AM_DEVICE(M6532_TAG, mos6532_t, ram_map)
-	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x7f00) AM_DEVICE(M6532_TAG, mos6532_t, io_map)
+	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x7f00) AM_DEVICE(M6532_TAG, mos6532_new_device, ram_map)
+	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x7f00) AM_DEVICE(M6532_TAG, mos6532_new_device, io_map)
 	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x7800) AM_ROM
 ADDRESS_MAP_END
 
@@ -176,7 +178,7 @@ READ8_MEMBER( beta_state::riot_pa_r )
 
 	*/
 
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	switch (m_ls145_p)
 	{
@@ -284,23 +286,23 @@ WRITE8_MEMBER( beta_state::riot_pb_w )
 
 DEVICE_IMAGE_LOAD_MEMBER( beta_state, beta_eprom )
 {
-	UINT32 size = m_eprom->common_get_size("rom");
+	uint32_t size = m_eprom->common_get_size("rom");
 
 	if (size != 0x800)
 	{
 		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
 	m_eprom->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_eprom->common_load_rom(m_eprom->get_rom_base(), size, "rom");
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 DEVICE_IMAGE_UNLOAD_MEMBER( beta_state, beta_eprom )
 {
-	if (image.software_entry() == nullptr)
+	if (!image.loaded_through_softlist())
 		image.fwrite(&m_eprom_rom[0], 0x800);
 }
 
@@ -333,7 +335,7 @@ void beta_state::machine_start()
 
 /* Machine Driver */
 
-static MACHINE_CONFIG_START( beta, beta_state )
+static MACHINE_CONFIG_START( beta )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_4MHz/4)
 	MCFG_CPU_PROGRAM_MAP(beta_mem)
@@ -347,7 +349,7 @@ static MACHINE_CONFIG_START( beta, beta_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
-	MCFG_DEVICE_ADD(M6532_TAG, MOS6532n, XTAL_4MHz/4)
+	MCFG_DEVICE_ADD(M6532_TAG, MOS6532_NEW, XTAL_4MHz/4)
 	MCFG_MOS6530n_IN_PA_CB(READ8(beta_state, riot_pa_r))
 	MCFG_MOS6530n_OUT_PA_CB(WRITE8(beta_state, riot_pa_w))
 	MCFG_MOS6530n_IN_PB_CB(READ8(beta_state, riot_pb_r))
@@ -374,5 +376,5 @@ ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY    FULLNAME    FLAGS */
-COMP( 1984, beta,   0,      0,      beta,   beta, driver_device,   0,    "Pitronics", "Beta", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT STATE       INIT  COMPANY      FULLNAME  FLAGS
+COMP( 1984, beta,   0,      0,      beta,   beta, beta_state, 0,    "Pitronics", "Beta",   MACHINE_SUPPORTS_SAVE )

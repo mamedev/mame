@@ -12,9 +12,13 @@ except for the Promat licensed Korean version which is unprotected.
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/glass.h"
+
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
-#include "includes/glass.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 WRITE16_MEMBER(glass_state::clr_int_w)
 {
@@ -195,7 +199,7 @@ void glass_state::machine_reset()
 		m_blitter_serial_buffer[i] = 0;
 }
 
-static MACHINE_CONFIG_START( glass, glass_state )
+static MACHINE_CONFIG_START( glass )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)      /* 12 MHz verified on PCB */
@@ -219,7 +223,7 @@ static MACHINE_CONFIG_START( glass, glass_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_1MHz, OKIM6295_PIN7_HIGH) /* 1MHz Resonator & pin 7 high verified on PCB */
+	MCFG_OKIM6295_ADD("oki", XTAL_1MHz, PIN7_HIGH) /* 1MHz Resonator & pin 7 high verified on PCB */
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -324,10 +328,10 @@ void glass_state::ROM16_split_gfx( const char *src_reg, const char *dst_reg, int
 	int i;
 
 	/* get a pointer to the source data */
-	UINT8 *src = (UINT8 *)memregion(src_reg)->base();
+	uint8_t *src = (uint8_t *)memregion(src_reg)->base();
 
 	/* get a pointer to the destination data */
-	UINT8 *dst = (UINT8 *)memregion(dst_reg)->base();
+	uint8_t *dst = (uint8_t *)memregion(dst_reg)->base();
 
 	/* fill destination areas with the proper data */
 	for (i = 0; i < length / 2; i++)
@@ -346,7 +350,7 @@ void glass_state::ROM16_split_gfx( const char *src_reg, const char *dst_reg, int
 
 READ16_MEMBER( glass_state::mainram_r )
 {
-	UINT16 ret = m_mainram[offset];
+	uint16_t ret = m_mainram[offset];
 	int pc = space.device().safe_pc();
 
 	if (offset == (0xfede96 - 0xfec000)>>1)
@@ -388,7 +392,7 @@ WRITE16_MEMBER( glass_state::mainram_w )
 	{
 //      printf("%06x write %06x - %04x %04x\n",  pc, (offset*2 + 0xfec000), data, mem_mask);
 		// several checks write here then expect it to appear mirrored, might be some kind of command + command ack
-		if (mem_mask & 0xff00) // sometimes mask 0xff00, but not in cases which poll for change
+		if (ACCESSING_BITS_8_15) // sometimes mask 0xff00, but not in cases which poll for change
 		{
 			mem_mask = 0x00ff;
 			data >>=8;

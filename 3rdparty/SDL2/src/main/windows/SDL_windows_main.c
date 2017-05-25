@@ -126,44 +126,15 @@ main_utf8(int argc, char *argv[])
     return SDL_main(argc, argv);
 }
 
-/* This is where execution begins [console apps, ansi] */
-int
-console_ansi_main(int argc, char *argv[])
-{
-    /* !!! FIXME: are these in the system codepage? We need to convert to UTF-8. */
-    return main_utf8(argc, argv);
-}
-
-
-#if UNICODE
-/* This is where execution begins [console apps, unicode] */
-int
-console_wmain(int argc, wchar_t *wargv[], wchar_t *wenvp)
-{
-    int retval = 0;
-    char **argv = SDL_stack_alloc(char*, argc);
-    int i;
-
-    for (i = 0; i < argc; ++i) {
-        argv[i] = WIN_StringToUTF8(wargv[i]);
-    }
-
-    retval = main_utf8(argc, argv);
-
-    /* !!! FIXME: we are leaking all the elements of argv we allocated. */
-    SDL_stack_free(argv);
-
-    return retval;
-}
-#endif
-
-/* This is where execution begins [windowed apps] */
-int WINAPI
-WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
+/* Gets the arguments with GetCommandLine, converts them to argc and argv
+   and calls main_utf8 */
+static int
+main_getcmdline()
 {
     char **argv;
     int argc;
     char *cmdline;
+    int retval = 0;
 
     /* Grab the command line */
     TCHAR *text = GetCommandLine();
@@ -185,15 +156,50 @@ WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
     }
     ParseCommandLine(cmdline, argv);
 
-    /* Run the main program */
-    main_utf8(argc, argv);
+    retval = main_utf8(argc, argv);
 
     SDL_stack_free(argv);
-
     SDL_free(cmdline);
 
-    /* Hush little compiler, don't you cry... */
-    return 0;
+    return retval;
+}
+
+/* This is where execution begins [console apps, ansi] */
+int
+console_ansi_main(int argc, char *argv[])
+{
+    return main_getcmdline();
+}
+
+
+#if UNICODE
+/* This is where execution begins [console apps, unicode] */
+int
+console_wmain(int argc, wchar_t *wargv[], wchar_t *wenvp)
+{
+    int retval = 0;
+    char **argv = SDL_stack_alloc(char*, argc + 1);
+    int i;
+
+    for (i = 0; i < argc; ++i) {
+        argv[i] = WIN_StringToUTF8(wargv[i]);
+    }
+    argv[argc] = NULL;
+
+    retval = main_utf8(argc, argv);
+
+    /* !!! FIXME: we are leaking all the elements of argv we allocated. */
+    SDL_stack_free(argv);
+
+    return retval;
+}
+#endif
+
+/* This is where execution begins [windowed apps] */
+int WINAPI
+WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
+{
+    return main_getcmdline();
 }
 
 #endif /* __WIN32__ */

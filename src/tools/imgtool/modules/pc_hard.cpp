@@ -55,7 +55,7 @@
 
 #define FAT_SECLEN  512
 
-static OPTION_GUIDE_START( pc_chd_create_optionguide )
+OPTION_GUIDE_START( pc_chd_create_optionguide )
 	OPTION_INT('T', "cylinders",    "Cylinders" )
 	OPTION_INT('H', "heads",        "Heads" )
 	OPTION_INT('S', "sectors",      "Sectors" )
@@ -69,7 +69,7 @@ static const char fat16_string[8] = { 'F', 'A', 'T', '1', '6', ' ', ' ', ' ' };
 //static const char fat32_string[8] = { 'F', 'A', 'T', '3', '2', ' ', ' ', ' ' };
 
 /* imports from fat.c */
-extern void fat_get_info(const imgtool_class *imgclass, UINT32 state, union imgtoolinfo *info);
+extern void fat_get_info(const imgtool_class *imgclass, uint32_t state, union imgtoolinfo *info);
 
 
 struct pc_chd_image_info
@@ -79,29 +79,29 @@ struct pc_chd_image_info
 	struct
 	{
 		unsigned int corrupt : 1;
-		UINT8 partition_type;
-		UINT32 fat_bits;
-		UINT32 starting_track;
-		UINT32 starting_head;
-		UINT32 starting_sector;
-		UINT32 ending_track;
-		UINT32 ending_head;
-		UINT32 ending_sector;
-		UINT32 sector_index;
-		UINT32 total_sectors;
+		uint8_t partition_type;
+		uint32_t fat_bits;
+		uint32_t starting_track;
+		uint32_t starting_head;
+		uint32_t starting_sector;
+		uint32_t ending_track;
+		uint32_t ending_head;
+		uint32_t ending_sector;
+		uint32_t sector_index;
+		uint32_t total_sectors;
 	} partitions[4];
 };
 
 
 
-static pc_chd_image_info *pc_chd_get_image_info(imgtool_image *image)
+static pc_chd_image_info *pc_chd_get_image_info(imgtool::image &image)
 {
-	return (pc_chd_image_info *) imgtool_image_extra_bytes(image);
+	return (pc_chd_image_info *) image.extra_bytes();
 }
 
 
 
-static void pc_chd_locate_block(imgtool_image *image, UINT64 block, UINT32 *cylinder, UINT32 *head, UINT32 *sector)
+static void pc_chd_locate_block(imgtool::image &image, uint64_t block, uint32_t *cylinder, uint32_t *head, uint32_t *sector)
 {
 	pc_chd_image_info *info;
 	const hard_disk_info *hd_info;
@@ -116,18 +116,18 @@ static void pc_chd_locate_block(imgtool_image *image, UINT64 block, UINT32 *cyli
 
 
 
-static imgtoolerr_t pc_chd_partition_create(imgtool_image *image, int partition_index, UINT64 first_block, UINT64 block_count)
+static imgtoolerr_t pc_chd_partition_create(imgtool::image &image, int partition_index, uint64_t first_block, uint64_t block_count)
 {
 	imgtoolerr_t err;
-	UINT8 header_block[FAT_SECLEN];
-	UINT8 partition_block[FAT_SECLEN];
-	UINT8 partition_type;
-	UINT8 *fat_type;
-	UINT8 *partition_entry;
-	UINT32 first_cylinder, first_head, first_sector;
-	UINT32 last_cylinder, last_head, last_sector;
+	uint8_t header_block[FAT_SECLEN];
+	uint8_t partition_block[FAT_SECLEN];
+	uint8_t partition_type;
+	uint8_t *fat_type;
+	uint8_t *partition_entry;
+	uint32_t first_cylinder, first_head, first_sector;
+	uint32_t last_cylinder, last_head, last_sector;
 	imgtool_class imgclass = { fat_get_info };
-	imgtoolerr_t (*fat_partition_create)(imgtool_image *image, UINT64 first_block, UINT64 block_count);
+	imgtoolerr_t (*fat_partition_create)(imgtool::image &image, uint64_t first_block, uint64_t block_count);
 
 	/* sanity checks */
 	assert((partition_index >= 0) && (partition_index <= 3));
@@ -137,7 +137,7 @@ static imgtoolerr_t pc_chd_partition_create(imgtool_image *image, int partition_
 	pc_chd_locate_block(image, first_block + block_count - 1, &last_cylinder, &last_head, &last_sector);
 
 	/* load fat_partition_create */
-	fat_partition_create = (imgtoolerr_t (*)(imgtool_image *, UINT64, UINT64))
+	fat_partition_create = (imgtoolerr_t (*)(imgtool::image &, uint64_t, uint64_t))
 		imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_CREATE_PARTITION);
 
 	/* first create the actual partition */
@@ -146,7 +146,7 @@ static imgtoolerr_t pc_chd_partition_create(imgtool_image *image, int partition_
 		goto done;
 
 	/* read the first block of the partition, to determine the type of FAT */
-	err = imgtool_image_read_block(image, first_block, partition_block);
+	err = image.read_block(first_block, partition_block);
 	if (err)
 		goto done;
 	fat_type = &partition_block[54];
@@ -162,7 +162,7 @@ static imgtoolerr_t pc_chd_partition_create(imgtool_image *image, int partition_
 		partition_type = 0x0B;
 
 	/* read the partition header */
-	err = imgtool_image_read_block(image, 0, header_block);
+	err = image.read_block(0, header_block);
 	if (err)
 		goto done;
 
@@ -180,7 +180,7 @@ static imgtoolerr_t pc_chd_partition_create(imgtool_image *image, int partition_
 	place_integer_le(partition_entry, 12, 4, block_count);
 
 	/* write the partition header */
-	err = imgtool_image_write_block(image, 0, header_block);
+	err = image.write_block(0, header_block);
 	if (err)
 		goto done;
 
@@ -190,18 +190,18 @@ done:
 
 
 
-static imgtoolerr_t pc_chd_read_partition_header(imgtool_image *image)
+static imgtoolerr_t pc_chd_read_partition_header(imgtool::image &image)
 {
 	imgtoolerr_t err;
 	int i;
-	const UINT8 *partition_info;
+	const uint8_t *partition_info;
 	pc_chd_image_info *info;
-	UINT8 buffer[FAT_SECLEN];
+	uint8_t buffer[FAT_SECLEN];
 
 	info = pc_chd_get_image_info(image);
 
 	/* read the initial block */
-	err = imgtool_image_read_block(image, 0, buffer);
+	err = image.read_block(0, buffer);
 	if (err)
 		return err;
 
@@ -232,25 +232,25 @@ static imgtoolerr_t pc_chd_read_partition_header(imgtool_image *image)
 
 
 
-static imgtoolerr_t pc_chd_image_create(imgtool_image *image, imgtool_stream *f, option_resolution *opts)
+static imgtoolerr_t pc_chd_image_create(imgtool::image &image, imgtool::stream::ptr &&stream, util::option_resolution *opts)
 {
 	imgtoolerr_t err;
-	UINT32 cylinders, heads, sectors;
+	uint32_t cylinders, heads, sectors;
 	pc_chd_image_info *info;
-	UINT8 header_block[FAT_SECLEN];
+	uint8_t header_block[FAT_SECLEN];
 
-	cylinders = option_resolution_lookup_int(opts, 'T');
-	heads = option_resolution_lookup_int(opts, 'H');
-	sectors = option_resolution_lookup_int(opts, 'S');
+	cylinders = opts->lookup_int('T');
+	heads = opts->lookup_int('H');
+	sectors = opts->lookup_int('S');
 
 	info = pc_chd_get_image_info(image);
 
 	/* create the hard disk image */
-	err = imghd_create(f, 0, cylinders, heads, sectors, FAT_SECLEN);
+	err = imghd_create(*stream, 0, cylinders, heads, sectors, FAT_SECLEN);
 	if (err)
 		goto done;
 
-	err = imghd_open(f, &info->hard_disk);
+	err = imghd_open(*stream, &info->hard_disk);
 	if (err)
 		goto done;
 
@@ -258,7 +258,7 @@ static imgtoolerr_t pc_chd_image_create(imgtool_image *image, imgtool_stream *f,
 	memset(header_block, 0, sizeof(header_block));
 	header_block[510] = 0x55;
 	header_block[511] = 0xAA;
-	err = imgtool_image_write_block(image, 0, header_block);
+	err = image.write_block(0, header_block);
 	if (err)
 		goto done;
 
@@ -278,7 +278,7 @@ done:
 
 
 
-static imgtoolerr_t pc_chd_image_open(imgtool_image *image, imgtool_stream *stream)
+static imgtoolerr_t pc_chd_image_open(imgtool::image &image, imgtool::stream::ptr &&stream)
 {
 	imgtoolerr_t err;
 	pc_chd_image_info *info;
@@ -286,7 +286,7 @@ static imgtoolerr_t pc_chd_image_open(imgtool_image *image, imgtool_stream *stre
 	info = pc_chd_get_image_info(image);
 
 	/* open the hard drive */
-	err = imghd_open(stream, &info->hard_disk);
+	err = imghd_open(*stream, &info->hard_disk);
 	if (err)
 		return err;
 
@@ -299,7 +299,7 @@ static imgtoolerr_t pc_chd_image_open(imgtool_image *image, imgtool_stream *stre
 
 
 
-static void pc_chd_image_close(imgtool_image *image)
+static void pc_chd_image_close(imgtool::image &image)
 {
 	pc_chd_image_info *info;
 	info = pc_chd_get_image_info(image);
@@ -308,7 +308,7 @@ static void pc_chd_image_close(imgtool_image *image)
 
 
 
-static imgtoolerr_t pc_chd_image_get_geometry(imgtool_image *image, UINT32 *tracks, UINT32 *heads, UINT32 *sectors)
+static imgtoolerr_t pc_chd_image_get_geometry(imgtool::image &image, uint32_t *tracks, uint32_t *heads, uint32_t *sectors)
 {
 	pc_chd_image_info *info;
 	const hard_disk_info *hd_info;
@@ -324,22 +324,12 @@ static imgtoolerr_t pc_chd_image_get_geometry(imgtool_image *image, UINT32 *trac
 
 
 
-static imgtoolerr_t pc_chd_image_getsectorsize(imgtool_image *image, UINT32 track, UINT32 head, UINT32 sector, UINT32 *sector_size)
+static uint32_t pc_chd_calc_lbasector(pc_chd_image_info &info, uint32_t track, uint32_t head, uint32_t sector)
 {
-	pc_chd_image_info *info;
-	info = pc_chd_get_image_info(image);
-	*sector_size = imghd_get_header(&info->hard_disk)->sectorbytes;
-	return IMGTOOLERR_SUCCESS;
-}
-
-
-
-static UINT32 pc_chd_calc_lbasector(pc_chd_image_info *info, UINT32 track, UINT32 head, UINT32 sector)
-{
-	UINT32 lbasector;
+	uint32_t lbasector;
 	const hard_disk_info *hd_info;
 
-	hd_info = imghd_get_header(&info->hard_disk);
+	hd_info = imghd_get_header(&info.hard_disk);
 	lbasector = track;
 	lbasector *= hd_info->heads;
 	lbasector += head;
@@ -350,29 +340,35 @@ static UINT32 pc_chd_calc_lbasector(pc_chd_image_info *info, UINT32 track, UINT3
 
 
 
-static imgtoolerr_t pc_chd_image_readsector(imgtool_image *image, UINT32 track, UINT32 head, UINT32 sector, void *buffer, size_t len)
+static imgtoolerr_t pc_chd_image_readsector(imgtool::image &image, uint32_t track, uint32_t head, uint32_t sector, std::vector<uint8_t> &buffer)
 {
-	pc_chd_image_info *info;
-	info = pc_chd_get_image_info(image);
+	pc_chd_image_info *info = pc_chd_get_image_info(image);
+
+	// get the sector size and resize the buffer
+	uint32_t sector_size = imghd_get_header(&info->hard_disk)->sectorbytes;
+	try { buffer.resize(sector_size); }
+	catch (std::bad_alloc const &) { return IMGTOOLERR_OUTOFMEMORY; }
+
+	// read the data
 	return imghd_read(&info->hard_disk,
-		pc_chd_calc_lbasector(info, track, head, sector),
-		buffer);
+		pc_chd_calc_lbasector(*info, track, head, sector),
+		&buffer[0]);
 }
 
 
 
-static imgtoolerr_t pc_chd_image_writesector(imgtool_image *image, UINT32 track, UINT32 head, UINT32 sector, const void *buffer, size_t len, int ddam)
+static imgtoolerr_t pc_chd_image_writesector(imgtool::image &image, uint32_t track, uint32_t head, uint32_t sector, const void *buffer, size_t len, int ddam)
 {
 	pc_chd_image_info *info;
 	info = pc_chd_get_image_info(image);
 	return imghd_write(&info->hard_disk,
-		pc_chd_calc_lbasector(info, track, head, sector),
+		pc_chd_calc_lbasector(*info, track, head, sector),
 		buffer);
 }
 
 
 
-static imgtoolerr_t pc_chd_image_readblock(imgtool_image *image, void *buffer, UINT64 block)
+static imgtoolerr_t pc_chd_image_readblock(imgtool::image &image, void *buffer, uint64_t block)
 {
 	pc_chd_image_info *info;
 	info = pc_chd_get_image_info(image);
@@ -381,7 +377,7 @@ static imgtoolerr_t pc_chd_image_readblock(imgtool_image *image, void *buffer, U
 
 
 
-static imgtoolerr_t pc_chd_image_writeblock(imgtool_image *image, const void *buffer, UINT64 block)
+static imgtoolerr_t pc_chd_image_writeblock(imgtool::image &image, const void *buffer, uint64_t block)
 {
 	pc_chd_image_info *info;
 	info = pc_chd_get_image_info(image);
@@ -390,22 +386,21 @@ static imgtoolerr_t pc_chd_image_writeblock(imgtool_image *image, const void *bu
 
 
 
-static imgtoolerr_t pc_chd_list_partitions(imgtool_image *image, imgtool_partition_info *partitions, size_t len)
+static imgtoolerr_t pc_chd_list_partitions(imgtool::image &image, std::vector<imgtool::partition_info> &partitions)
 {
 	pc_chd_image_info *info;
 	size_t i;
 
 	info = pc_chd_get_image_info(image);
 
-	for (i = 0; i < MIN(4, len); i++)
+	for (i = 0; i < 4; i++)
 	{
-		partitions[i].base_block    = info->partitions[i].sector_index;
-		partitions[i].block_count   = info->partitions[i].total_sectors;
-
+		// what type of partition is this?
+		imgtool_get_info partition_get_info;
 		switch(info->partitions[i].partition_type)
 		{
 			case 0x00:  /* Empty Partition */
-				partitions[i].get_info = NULL;
+				partition_get_info = nullptr;
 				break;
 
 			case 0x01:  /* FAT12 */
@@ -426,20 +421,25 @@ static imgtoolerr_t pc_chd_list_partitions(imgtool_image *image, imgtool_partiti
 			case 0xD1:  /* Old Multiuser DOS FAT12 */
 			case 0xD4:  /* Old Multiuser DOS FAT16 (-32 MB) */
 			case 0xD6:  /* Old Multiuser DOS FAT16 (32+ MB) */
-				partitions[i].get_info = fat_get_info;
+				partition_get_info = fat_get_info;
 				break;
 
 			default:
-				partitions[i].get_info = unknown_partition_get_info;
+				partition_get_info = unknown_partition_get_info;
 				break;
 		}
+
+		partitions.emplace_back(
+			partition_get_info,
+			info->partitions[i].sector_index,
+			info->partitions[i].total_sectors);
 	}
 	return IMGTOOLERR_SUCCESS;
 }
 
 
 
-void pc_chd_get_info(const imgtool_class *imgclass, UINT32 state, union imgtoolinfo *info)
+void pc_chd_get_info(const imgtool_class *imgclass, uint32_t state, union imgtoolinfo *info)
 {
 	switch(state)
 	{
@@ -462,8 +462,7 @@ void pc_chd_get_info(const imgtool_class *imgclass, UINT32 state, union imgtooli
 		case IMGTOOLINFO_PTR_WRITE_SECTOR:                  info->write_sector = pc_chd_image_writesector; break;
 		case IMGTOOLINFO_PTR_READ_BLOCK:                    info->read_block = pc_chd_image_readblock; break;
 		case IMGTOOLINFO_PTR_WRITE_BLOCK:                   info->write_block = pc_chd_image_writeblock; break;
-		case IMGTOOLINFO_PTR_GET_SECTOR_SIZE:               info->get_sector_size = pc_chd_image_getsectorsize; break;
-		case IMGTOOLINFO_PTR_CREATEIMAGE_OPTGUIDE:          info->createimage_optguide = pc_chd_create_optionguide; break;
+		case IMGTOOLINFO_PTR_CREATEIMAGE_OPTGUIDE:          info->createimage_optguide = &pc_chd_create_optionguide; break;
 		case IMGTOOLINFO_PTR_GET_GEOMETRY:                  info->get_geometry = pc_chd_image_get_geometry; break;
 		case IMGTOOLINFO_PTR_LIST_PARTITIONS:               info->list_partitions = pc_chd_list_partitions; break;
 	}

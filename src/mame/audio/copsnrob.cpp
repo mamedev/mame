@@ -270,8 +270,8 @@ DISCRETE_CLASS_STEP_RESET(copsnrob_custom_noise, 2,
 	int     m_flip_flop;
 	int     m_noise1_had_xtime;
 	int     m_noise2_had_xtime;
-	UINT8   m_high_byte;
-	UINT8   m_low_byte;
+	uint8_t   m_high_byte;
+	uint8_t   m_low_byte;
 	double  m_t_used;
 	double  m_t1;
 );
@@ -283,9 +283,9 @@ DISCRETE_STEP(copsnrob_custom_noise)
 	double  t_used = m_t_used;
 	double  t1 = m_t1;
 	double  x_time = 0;
-	UINT8   low_byte = m_low_byte;
-	UINT8   high_byte = m_high_byte;
-	UINT8   xnor_out;                           /* IC F2, pin 2 */
+	uint8_t   low_byte = m_low_byte;
+	uint8_t   high_byte = m_high_byte;
+	uint8_t   xnor_out;                           /* IC F2, pin 2 */
 	int     last_noise1_bit = (low_byte >> 4) & 0x01;
 	int     last_noise2_bit = (low_byte >> 5) & 0x01;
 
@@ -689,8 +689,8 @@ DISCRETE_SOUND_END
 
 WRITE8_MEMBER(copsnrob_state::copsnrob_misc_w)
 {
-	UINT8 latched_data = m_ic_h3_data;
-	UINT8 special_data = data & 0x01;
+	uint8_t latched_data = m_ic_h3_data;
+	uint8_t special_data = data & 0x01;
 
 	/* ignore if no change */
 	if (((latched_data >> offset) & 0x01) == special_data)

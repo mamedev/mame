@@ -292,17 +292,17 @@ Notes & Todo:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/playch10.h"
+
 #include "cpu/m6502/n2a03.h"
 #include "cpu/z80/z80.h"
 #include "machine/rp5h01.h"
 #include "machine/nvram.h"
-#include "sound/dac.h"
 
 #include "rendlay.h"
-#include "includes/playch10.h"
+#include "screen.h"
+#include "speaker.h"
 
-/* clock frequency */
-#define N2A03_DEFAULTCLOCK (21477272.724 / 12)
 
 /******************************************************************************/
 
@@ -645,14 +645,14 @@ INTERRUPT_GEN_MEMBER(playch10_state::playch10_interrupt){
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( playch10, playch10_state )
+static MACHINE_CONFIG_START( playch10 )
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", Z80, 8000000/2) // 4 MHz
 	MCFG_CPU_PROGRAM_MAP(bios_map)
 	MCFG_CPU_IO_MAP(bios_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("top", playch10_state,  playch10_interrupt)
 
-	MCFG_CPU_ADD("cart", N2A03, N2A03_DEFAULTCLOCK)
+	MCFG_CPU_ADD("cart", N2A03, NTSC_APU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(cart_map)
 
 
@@ -1664,8 +1664,8 @@ GAME( 1986, playch10, 0, playch10, playch10, playch10_state, playch10, ROT0, "Ni
 
 DRIVER_INIT_MEMBER(playch10_state,virus)
 {
-	UINT8 *ROM = memregion("rp5h01")->base();
-	UINT32 len = memregion("rp5h01")->bytes();
+	uint8_t *ROM = memregion("rp5h01")->base();
+	uint32_t len = memregion("rp5h01")->bytes();
 	for (int i = 0; i < len; i++)
 	{
 		ROM[i] = BITSWAP8(ROM[i],0,1,2,3,4,5,6,7);
@@ -1678,8 +1678,8 @@ DRIVER_INIT_MEMBER(playch10_state,virus)
 
 DRIVER_INIT_MEMBER(playch10_state,ttoon)
 {
-	UINT8 *ROM = memregion("rp5h01")->base();
-	UINT32 len = memregion("rp5h01")->bytes();
+	uint8_t *ROM = memregion("rp5h01")->base();
+	uint32_t len = memregion("rp5h01")->bytes();
 	for (int i = 0; i < len; i++)
 	{
 		ROM[i] = BITSWAP8(ROM[i],0,1,2,3,4,5,6,7);
@@ -1690,7 +1690,7 @@ DRIVER_INIT_MEMBER(playch10_state,ttoon)
 	DRIVER_INIT_CALL(pcgboard);
 }
 
-/*     YEAR  NAME      PARENT    BIOS      MACHINE   INPUT     INIT      MONITOR  */
+/*    YEAR  NAME      PARENT    MACHINE   INPUT     STATE           INIT      MONITOR  */
 
 /* Standard Games */
 GAME( 1983, pc_tenis, playch10, playch10, playch10, playch10_state, playch10, ROT0, "Nintendo",                                 "Tennis (PlayChoice-10)", 0 )

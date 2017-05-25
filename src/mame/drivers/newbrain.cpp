@@ -31,11 +31,9 @@
 
     TODO:
 
-    - keyboard
-        - only key 7 is recognized
-        - escape key mapping
-    - VFD
-    - reset/powerup time constants
+    - COPINT @ 84Hz instead of 50Hz? (with clock 3240506 is 50Hz)
+    - CLKINT arrives too late and COP reads the VFD data before CPU writes it
+    - VFD does not receive data from main CPU
     - bitmapped video
     - accurate video timing
     - cassette
@@ -50,8 +48,13 @@
 
 */
 
-
+#include "emu.h"
 #include "includes/newbrain.h"
+
+#include "screen.h"
+
+#include "newbrain.lh"
+#include "newbraina.lh"
 
 
 
@@ -75,7 +78,7 @@
 
 void newbrain_state::check_interrupt()
 {
-	int level = (!m_clkint || !m_copint) ? ASSERT_LINE : CLEAR_LINE;
+	int level = ((!m_clk && !m_clkint) || !m_copint) ? ASSERT_LINE : CLEAR_LINE;
 
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, level);
 }
@@ -89,7 +92,7 @@ READ8_MEMBER( newbrain_state::mreq_r )
 {
 	bool romov = 1, raminh = 0;
 	int exrm = 0;
-	UINT8 data = m_exp->mreq_r(space, offset, 0xff, romov, exrm, raminh);
+	uint8_t data = m_exp->mreq_r(space, offset, 0xff, romov, exrm, raminh);
 
 	int rom0 = 1, rom1 = 1, rom2 = 1;
 	int a15_14_13 = romov ? (offset >> 13) : exrm;
@@ -155,7 +158,7 @@ WRITE8_MEMBER( newbrain_state::mreq_w )
 READ8_MEMBER( newbrain_state::iorq_r )
 {
 	bool prtov = 0;
-	UINT8 data = m_exp->iorq_r(space, offset, 0xff, prtov);
+	uint8_t data = m_exp->iorq_r(space, offset, 0xff, prtov);
 
 	if (!prtov)
 	{
@@ -216,7 +219,7 @@ WRITE8_MEMBER( newbrain_state::iorq_w )
 				break;
 
 			case 3: // ENRG1
-				enrg1_w(space, offset, data);
+				enrg_w(space, offset, data);
 				break;
 			}
 			break;
@@ -247,10 +250,10 @@ void newbrain_state::clclk()
 
 
 //-------------------------------------------------
-//  enrg1_w -
+//  enrg_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( newbrain_state::enrg1_w )
+WRITE8_MEMBER( newbrain_state::enrg_w )
 {
 	/*
 
@@ -267,10 +270,15 @@ WRITE8_MEMBER( newbrain_state::enrg1_w )
 
 	*/
 
-	if (LOG) logerror("%s %s ENRG1 %02x\n", machine().time().as_string(), machine().describe_context(), data);
+	if (LOG) logerror("%s %s ENRG %02x\n", machine().time().as_string(), machine().describe_context(), data);
 
 	// clock enable
-	m_clk = BIT(data, 0);
+	int clk = BIT(data, 0);
+
+	if (m_clk != clk) {
+		m_clk = clk;
+		check_interrupt();
+	}
 
 	// TV enable
 	m_tvp = BIT(data, 2);
@@ -305,7 +313,7 @@ READ8_MEMBER( newbrain_state::ust_a_r )
 
 	*/
 
-	UINT8 data = 0x5d;
+	uint8_t data = 0x5d;
 
 	// powered up
 	data |= m_pwrup << 1;
@@ -339,7 +347,7 @@ READ8_MEMBER( newbrain_state::ust_b_r )
 
 	*/
 
-	UINT8 data = 0x5c;
+	uint8_t data = 0x5c;
 
 	// V24
 	data |= m_rs232_v24->rxd_r();
@@ -372,10 +380,10 @@ READ8_MEMBER( newbrain_state::cop_in_r )
 
 	*/
 
-	UINT8 data = 0xe;
+	uint8_t data = 0xe;
 
 	// keyboard
-	data |= BIT(m_keydata, 2);
+	data |= BIT(m_403_q, 2);
 
 	if (LOG_COP) logerror("%s %s IN %01x\n", machine().time().as_string(), machine().describe_context(), data);
 
@@ -393,19 +401,19 @@ READ8_MEMBER( newbrain_state::cop_g_r )
 
 	    bit     description
 
-	    G0      +5V
+	    G0
 	    G1      K9 (CD4076 Q1)
 	    G2      K7 (CD4076 Q0)
 	    G3      K3 (CD4076 Q3)
 
 	*/
 
-	UINT8 data = 0x1;
+	uint8_t data = 0;
 
 	// keyboard
-	data |= BIT(m_keydata, 1) << 1;
-	data |= BIT(m_keydata, 0) << 2;
-	data |= BIT(m_keydata, 3) << 3;
+	data |= BIT(m_403_q, 1) << 1;
+	data |= BIT(m_403_q, 0) << 2;
+	data |= BIT(m_403_q, 3) << 3;
 
 	if (LOG_COP) logerror("%s %s G %01x\n", machine().time().as_string(), machine().describe_context(), data);
 
@@ -439,10 +447,15 @@ WRITE8_MEMBER( newbrain_state::cop_g_w )
 
 	*/
 
-	if (LOG_COP) logerror("%s %s COPINT %u TM1 %u TM2 %u\n", machine().time().as_string(), machine().describe_context(), BIT(data, 0), BIT(data, 1), BIT(data, 3));
+	int copint = !BIT(data, 0);
 
-	m_copint = !BIT(data, 0);
-	check_interrupt();
+	if (LOG_COP) logerror("%s %s COPINT %u\n", machine().time().as_string(), machine().describe_context(), copint);
+
+	if (m_copint != copint)
+	{
+		m_copint = copint;
+		check_interrupt();
+	}
 
 	m_cop_g1 = BIT(data, 1);
 	m_cop_g3 = BIT(data, 3);
@@ -476,50 +489,35 @@ WRITE8_MEMBER( newbrain_state::cop_d_w )
 	m_cassette2->output(m_cop_tdo ? -1.0 : +1.0);
 
 	if (k4) {
-		// CD4024 RST
-		m_keylatch = 0;
+		m_405_q = 0;
 
 		if (LOG_COP) logerror("%s %s keylatch reset\n", machine().time().as_string(), machine().describe_context());
 	} else if (m_cop_k6 && !k6) {
-		// CD4024 CLK
-		m_keylatch++;
-		m_keylatch &= 0x0f;
+		m_405_q++;
+		m_405_q &= 0x7f;
 
-		if (LOG_COP) logerror("%s %s keylatch %u\n", machine().time().as_string(), machine().describe_context(), m_keylatch);
+		if (LOG_COP) logerror("%s %s keylatch %u\n", machine().time().as_string(), machine().describe_context(), m_405_q);
 	}
 
 	if (!m_cop_k6 && k6) {
-		//CD4076 CLK
-		switch (m_keylatch)
-		{
-		case 0: m_keydata = m_y0->read(); break;
-		case 1: m_keydata = m_y1->read(); break;
-		case 2: m_keydata = m_y2->read(); break;
-		case 3: m_keydata = m_y3->read(); break;
-		case 4: m_keydata = m_y4->read(); break;
-		case 5: m_keydata = m_y5->read(); break;
-		case 6: m_keydata = m_y6->read(); break;
-		case 7: m_keydata = m_y7->read(); break;
-		case 8: m_keydata = m_y8->read(); break;
-		case 9: m_keydata = m_y9->read(); break;
-		case 10: m_keydata = m_y10->read(); break;
-		case 11: m_keydata = m_y11->read(); break;
-		case 12: m_keydata = m_y12->read(); break;
-		case 13: m_keydata = m_y13->read(); break;
-		case 14: m_keydata = m_y14->read(); break;
-		case 15: m_keydata = m_y15->read(); break;
-		}
+		m_403_d = m_y[m_405_q & 0x0f]->read() & 0x0f;
 
-		if (LOG_COP) logerror("%s %s keydata %01x\n", machine().time().as_string(), machine().describe_context(), m_keydata);
-	} else if (m_cop_k6 && k6) {
-		m_keydata = 0;
-	} else if (!k6) {
-		m_keydata = 0x0f;
+		if (LOG_COP) logerror("%s %s keydata %01x\n", machine().time().as_string(), machine().describe_context(), m_403_d);
+	}
+
+	if (k6) {
+		m_403_q = m_403_d;
+	} else {
+		m_403_q = 0xf;
 
 		if (LOG_COP) logerror("%s %s keydata disabled\n", machine().time().as_string(), machine().describe_context());
 
-		output().set_digit_value(m_keylatch, m_segment_data);
-	} else {
+		// COP to VFD serial format, bits 15..0
+		// A B J I x H G2 C x F G1 E K L M D
+		uint16_t value = BITSWAP16(m_402_q, 11, 7, 1, 13, 10, 3, 2, 12, 9, 5, 6, 4, 0, 8, 14, 15) & 0x3fff;
+		output().set_digit_value(m_405_q & 0x0f, value);
+
+		if (LOG_VFD) logerror("%s %s vfd segment %u 402.Q %04x data %04x\n", machine().time().as_string(), machine().describe_context(), m_405_q & 0x0f, m_402_q, value);
 	}
 
 	m_cop_k6 = k6;
@@ -549,10 +547,8 @@ WRITE_LINE_MEMBER( newbrain_state::k2_w )
 
 	if (state)
 	{
-		m_segment_data >>= 1;
-		m_segment_data = (m_cop_so << 15) | (m_segment_data & 0x7fff);
-
-		if (LOG_VFD) logerror("%s %s SEGMENT %04x\n", machine().time().as_string(), machine().describe_context(), m_segment_data);
+		m_402_q <<= 1;
+		m_402_q = (m_402_q & 0xfffe) | m_cop_so;
 	}
 }
 
@@ -609,7 +605,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( newbrain )
 	PORT_START("Y0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("STOP") PORT_CODE(KEYCODE_END) PORT_CHAR(UCHAR_MAMEKEY(END))
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("STOP") PORT_CODE(KEYCODE_ESC) PORT_CHAR(UCHAR_MAMEKEY(ESC))
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 
@@ -720,15 +716,6 @@ int newbrain_state::get_pwrup_t()
 	return RES_K(560) * CAP_U(10) * 1000; // t = R129 * C127 = 5.6s
 }
 
-INTERRUPT_GEN_MEMBER(newbrain_state::newbrain_interrupt)
-{
-	if (!m_clk)
-	{
-		m_clkint = 0;
-		check_interrupt();
-	}
-}
-
 
 //-------------------------------------------------
 //  machine_start -
@@ -750,9 +737,12 @@ void newbrain_state::machine_start()
 	save_item(NAME(m_cop_g1));
 	save_item(NAME(m_cop_g3));
 	save_item(NAME(m_cop_k6));
-	save_item(NAME(m_keylatch));
-	save_item(NAME(m_keydata));
-	save_item(NAME(m_segment_data));
+	save_item(NAME(m_405_q));
+	save_item(NAME(m_403_q));
+	save_item(NAME(m_402_q));
+
+	// patch COP ROM to read VFD data
+	//memregion(COP420_TAG)->base()[0x20a] = 0xc6;
 }
 
 
@@ -762,8 +752,14 @@ void newbrain_state::machine_start()
 
 void newbrain_state::machine_reset()
 {
-	m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	m_cop->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_maincpu->reset();
+	m_cop->reset();
+
+	m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	m_cop->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	enrg_w(space, 0, 0);
 
 	timer_set(attotime::from_usec(get_reset_t()), TIMER_ID_RESET);
 }
@@ -780,14 +776,21 @@ void newbrain_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	case TIMER_ID_RESET:
 		if (LOG) logerror("%s %s RESET 1\n", machine().time().as_string(), machine().describe_context());
 
-		m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-		m_cop->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+		m_cop->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 		break;
 
 	case TIMER_ID_PWRUP:
 		if (LOG) logerror("%s %s PWRUP 1\n", machine().time().as_string(), machine().describe_context());
 
 		m_pwrup = 1;
+		break;
+
+	case TIMER_ID_CLKINT:
+		if (LOG) logerror("%s CLKINT\n", machine().time().as_string());
+
+		m_clkint = 0;
+		check_interrupt();
 		break;
 	}
 }
@@ -802,14 +805,13 @@ void newbrain_state::device_timer(emu_timer &timer, device_timer_id id, int para
 //  MACHINE_CONFIG( newbrain )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( newbrain, newbrain_state )
+static MACHINE_CONFIG_START( newbrain )
 	// basic system hardware
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/8)
+	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/4)
 	MCFG_CPU_PROGRAM_MAP(newbrain_mreq)
 	MCFG_CPU_IO_MAP(newbrain_iorq)
-	MCFG_CPU_VBLANK_INT_DRIVER(SCREEN_TAG, newbrain_state, newbrain_interrupt) // TODO remove me
 
-	MCFG_CPU_ADD(COP420_TAG, COP420, XTAL_16MHz/8) // COP420-GUW/N
+	MCFG_CPU_ADD(COP420_TAG, COP420, XTAL_16MHz/4)
 	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, true)
 	MCFG_COP400_READ_G_CB(READ8(newbrain_state, cop_g_r))
 	MCFG_COP400_WRITE_G_CB(WRITE8(newbrain_state, cop_g_w))
@@ -823,13 +825,13 @@ static MACHINE_CONFIG_START( newbrain, newbrain_state )
 	MCFG_FRAGMENT_ADD(newbrain_video)
 
 	// devices
-	MCFG_NEWBRAIN_EXPANSION_SLOT_ADD(NEWBRAIN_EXPANSION_SLOT_TAG, XTAL_16MHz/8, newbrain_expansion_cards, "eim")
+	MCFG_NEWBRAIN_EXPANSION_SLOT_ADD(NEWBRAIN_EXPANSION_SLOT_TAG, XTAL_16MHz/4, newbrain_expansion_cards, "eim")
 
 	MCFG_CASSETTE_ADD(CASSETTE_TAG)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED)
 
 	MCFG_CASSETTE_ADD(CASSETTE2_TAG)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED)
 
 	MCFG_RS232_PORT_ADD(RS232_V24_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_PORT_ADD(RS232_PRN_TAG, default_rs232_devices, nullptr)
@@ -837,6 +839,33 @@ static MACHINE_CONFIG_START( newbrain, newbrain_state )
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("32K")
+MACHINE_CONFIG_END
+
+
+//-------------------------------------------------
+//  MACHINE_CONFIG( newbrain_ad )
+//-------------------------------------------------
+
+static MACHINE_CONFIG_DERIVED( newbrain_ad, newbrain )
+	MCFG_DEFAULT_LAYOUT(layout_newbrain)
+MACHINE_CONFIG_END
+
+
+//-------------------------------------------------
+//  MACHINE_CONFIG( newbrain_a )
+//-------------------------------------------------
+
+static MACHINE_CONFIG_DERIVED( newbrain_a, newbrain )
+	MCFG_DEFAULT_LAYOUT(layout_newbraina)
+MACHINE_CONFIG_END
+
+
+//-------------------------------------------------
+//  MACHINE_CONFIG( newbrain_md )
+//-------------------------------------------------
+
+static MACHINE_CONFIG_DERIVED( newbrain_md, newbrain )
+	MCFG_DEFAULT_LAYOUT(layout_newbrain)
 MACHINE_CONFIG_END
 
 
@@ -878,10 +907,10 @@ ROM_START( newbrain )
 	ROMX_LOAD( "cd20tci.rom",  0x2000, 0x4000, CRC(f65b2350) SHA1(1ada7fbf207809537ec1ffb69808524300622ada), ROM_BIOS(5) )
 
 	ROM_REGION( 0x400, COP420_TAG, 0 )
-	ROM_LOAD( "cop420.419", 0x000, 0x400, CRC(a1388ee7) SHA1(5822e16aa794545600bf7a9dbee2ef467ca2a3e0) )
+	ROM_LOAD( "cop420-guw.ic419", 0x000, 0x400, CRC(a1388ee7) SHA1(5822e16aa794545600bf7a9dbee2ef467ca2a3e0) ) // COP420-GUW/N
 
-	ROM_REGION( 0x1000, "chargen", ROMREGION_ERASE00 )
-	ROM_LOAD( "char eprom iss 1.ic453", 0x0000, 0x0a01, CRC(46ecbc65) SHA1(3fe064d49a4de5e3b7383752e98ad35a674e26dd) ) // 8248R7 bad dump!
+	ROM_REGION( 0x1000, "chargen", 0 )
+	ROM_LOAD( "char eprom iss 1.ic453", 0x0000, 0x1000, CRC(6a38b7a2) SHA1(29f3e672fc41792ac2f2b405e571d79235193561) ) // 8248R7
 ROM_END
 
 
@@ -902,10 +931,10 @@ ROM_START( newbrainmd )
 	ROM_LOAD( "efmd.rom", 0x4000, 0x2000, CRC(20dd0b49) SHA1(74b517ca223cefb588e9f49e72ff2d4f1627efc6) )
 
 	ROM_REGION( 0x400, COP420_TAG, 0 )
-	ROM_LOAD( "cop420.419", 0x000, 0x400, CRC(a1388ee7) SHA1(5822e16aa794545600bf7a9dbee2ef467ca2a3e0) )
+	ROM_LOAD( "cop420-guw.ic419", 0x000, 0x400, CRC(a1388ee7) SHA1(5822e16aa794545600bf7a9dbee2ef467ca2a3e0) ) // COP420-GUW/N
 
 	ROM_REGION( 0x1000, "chargen", 0 )
-	ROM_LOAD( "char eprom iss 1.ic453", 0x0000, 0x0a01, BAD_DUMP CRC(46ecbc65) SHA1(3fe064d49a4de5e3b7383752e98ad35a674e26dd) ) // 8248R7
+	ROM_LOAD( "char eprom iss 1.ic453", 0x0000, 0x1000, CRC(6a38b7a2) SHA1(29f3e672fc41792ac2f2b405e571d79235193561) ) // 8248R7
 ROM_END
 
 
@@ -914,7 +943,7 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME        PARENT      COMPAT  MACHINE         INPUT       INIT    COMPANY                         FULLNAME        FLAGS
-COMP( 1981, newbrain,   0,          0,      newbrain,     newbrain, driver_device,   0,      "Grundy Business Systems Ltd",   "NewBrain AD",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )
-COMP( 1981, newbraina,  newbrain,   0,      newbrain,     newbrain, driver_device,   0,      "Grundy Business Systems Ltd",   "NewBrain A",   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )
-COMP( 1981, newbrainmd, newbrain,   0,      newbrain,     newbrain, driver_device,   0,      "Grundy Business Systems Ltd",   "NewBrain MD",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )
+//    YEAR  NAME        PARENT      COMPAT  MACHINE         INPUT     STATE             INIT    COMPANY                         FULLNAME        FLAGS
+COMP( 1981, newbrain,   0,          0,      newbrain_ad,    newbrain, newbrain_state,   0,      "Grundy Business Systems Ltd",  "NewBrain AD",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )
+COMP( 1981, newbraina,  newbrain,   0,      newbrain_a,     newbrain, newbrain_state,   0,      "Grundy Business Systems Ltd",  "NewBrain A",   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )
+COMP( 1981, newbrainmd, newbrain,   0,      newbrain_md,    newbrain, newbrain_state,   0,      "Grundy Business Systems Ltd",  "NewBrain MD",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )

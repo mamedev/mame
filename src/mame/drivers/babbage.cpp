@@ -52,9 +52,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ctc_z0_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z2_w);
-	UINT8 m_segment;
-	UINT8 m_key;
-	UINT8 m_prev_key;
+	uint8_t m_segment;
+	uint8_t m_key;
+	uint8_t m_prev_key;
 	bool m_step;
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
@@ -195,9 +195,9 @@ static const z80_daisy_config babbage_daisy_chain[] =
 
 TIMER_DEVICE_CALLBACK_MEMBER(babbage_state::keyboard_callback)
 {
-	UINT8 i, j, inp;
+	uint8_t i, j, inp;
 	char kbdrow[6];
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	for (i = 0; i < 4; i++)
 	{
@@ -232,7 +232,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(babbage_state::keyboard_callback)
 
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( babbage, babbage_state )
+static MACHINE_CONFIG_START( babbage )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK) //2.5MHz
 	MCFG_CPU_PROGRAM_MAP(babbage_map)
@@ -274,5 +274,5 @@ ROM_START(babbage)
 ROM_END
 
 
-/*    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT    INIT       COMPANY           FULLNAME */
-COMP( 1986, babbage,  0,      0,      babbage,    babbage, driver_device, 0,   "Mr Takafumi Aihara",  "Babbage-2nd" , MACHINE_NO_SOUND_HW )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT    STATE          INIT  COMPANY               FULLNAME        FLAGS
+COMP( 1986, babbage,  0,      0,      babbage,    babbage, babbage_state, 0,    "Mr Takafumi Aihara", "Babbage-2nd" , MACHINE_NO_SOUND_HW )

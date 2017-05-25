@@ -47,9 +47,9 @@ public:
 	DECLARE_WRITE8_MEMBER(digit_w);
 	DECLARE_READ8_MEMBER(kbd_r);
 	DECLARE_MACHINE_RESET(dagz80);
-	UINT8 m_digit;
+	uint8_t m_digit;
 	required_device<cpu_device> m_maincpu;
-	optional_shared_ptr<UINT8> m_p_ram;
+	optional_shared_ptr<uint8_t> m_p_ram;
 };
 
 static ADDRESS_MAP_START(dagz80_mem, AS_PROGRAM, 8, selz80_state)
@@ -68,8 +68,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(selz80_io, AS_IO, 8, selz80_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("i8279", i8279_device, data_r, data_w )
-	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE("i8279", i8279_device, status_r, cmd_w)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("i8279", i8279_device, read, write)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -124,8 +123,8 @@ INPUT_PORTS_END
 
 MACHINE_RESET_MEMBER(selz80_state, dagz80)
 {
-	UINT8* rom = memregion("user1")->base();
-	UINT16 size = memregion("user1")->bytes();
+	uint8_t* rom = memregion("user1")->base();
+	uint16_t size = memregion("user1")->bytes();
 	memcpy(m_p_ram, rom, size);
 	m_maincpu->reset();
 }
@@ -142,7 +141,7 @@ WRITE8_MEMBER( selz80_state::digit_w )
 
 READ8_MEMBER( selz80_state::kbd_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (m_digit < 4)
 	{
@@ -153,7 +152,7 @@ READ8_MEMBER( selz80_state::kbd_r )
 	return data;
 }
 
-static MACHINE_CONFIG_START( selz80, selz80_state )
+static MACHINE_CONFIG_START( selz80 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(selz80_mem)
@@ -197,6 +196,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    CLASS,       INIT COMPANY   FULLNAME       FLAGS */
-COMP( 1985, selz80,  0,       0,     selz80,    selz80, driver_device, 0, "SEL", "SEL Z80 Trainer", MACHINE_NO_SOUND_HW)
-COMP( 1988, dagz80, selz80,   0,     dagz80,    selz80, driver_device, 0, "DAG", "DAG Z80 Trainer", MACHINE_NO_SOUND_HW)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT  COMPANY  FULLNAME           FLAGS
+COMP( 1985, selz80, 0,      0,      selz80,  selz80, selz80_state, 0,    "SEL",   "SEL Z80 Trainer", MACHINE_NO_SOUND_HW)
+COMP( 1988, dagz80, selz80, 0,      dagz80,  selz80, selz80_state, 0,    "DAG",   "DAG Z80 Trainer", MACHINE_NO_SOUND_HW)

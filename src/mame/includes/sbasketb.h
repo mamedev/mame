@@ -23,12 +23,12 @@ public:
 		m_palette(*this, "palette") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_colorram;
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_palettebank;
-	required_shared_ptr<UINT8> m_spriteram_select;
-	required_shared_ptr<UINT8> m_scroll;
+	required_shared_ptr<uint8_t> m_colorram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_palettebank;
+	required_shared_ptr<uint8_t> m_spriteram_select;
+	required_shared_ptr<uint8_t> m_scroll;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -41,7 +41,7 @@ public:
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
 
-	UINT8    m_irq_mask;
+	uint8_t    m_irq_mask;
 	DECLARE_WRITE8_MEMBER(sbasketb_sh_irqtrigger_w);
 	DECLARE_WRITE8_MEMBER(sbasketb_coin_counter_w);
 	DECLARE_WRITE8_MEMBER(irq_mask_w);
@@ -50,13 +50,13 @@ public:
 	DECLARE_WRITE8_MEMBER(sbasketb_flipscreen_w);
 	DECLARE_DRIVER_INIT(sbasketb);
 
-	UINT8 m_SN76496_latch;
+	uint8_t m_SN76496_latch;
 	DECLARE_WRITE8_MEMBER( konami_SN76496_latch_w ) { m_SN76496_latch = data; };
 	DECLARE_WRITE8_MEMBER( konami_SN76496_w ) { m_sn->write(space, offset, m_SN76496_latch); };
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(sbasketb);
-	UINT32 screen_update_sbasketb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_sbasketb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 };

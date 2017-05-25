@@ -18,6 +18,8 @@
 
 #include "emu.h"
 #include "cpu/sh4/sh4.h"
+#include "screen.h"
+#include "speaker.h"
 
 #define MASTER_CLOCK    XTAL_200MHz
 
@@ -31,7 +33,7 @@ public:
 
 	DECLARE_READ64_MEMBER(test_r);
 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
 
@@ -47,7 +49,7 @@ void alien_state::video_start()
 {
 }
 
-UINT32 alien_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t alien_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -78,7 +80,7 @@ void alien_state::machine_reset()
 	//m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( alien, alien_state )
+static MACHINE_CONFIG_START( alien )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH4LE, MASTER_CLOCK)    /* 200MHz */
 	MCFG_CPU_PROGRAM_MAP(alien_map)
@@ -120,4 +122,4 @@ ROM_START( alien )
 ROM_END
 
 
-GAME( 2005, alien,  0,      alien, alien, driver_device, 0, ROT0, "Capcom", "Alien: The Arcade Medal Edition", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2005, alien,  0,      alien, alien, alien_state, 0, ROT0, "Capcom", "Alien: The Arcade Medal Edition", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

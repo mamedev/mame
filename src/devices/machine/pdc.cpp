@@ -91,6 +91,7 @@
 
 */
 
+#include "emu.h"
 #include "pdc.h"
 
 
@@ -112,7 +113,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type PDC = &device_creator<pdc_device>;
+DEFINE_DEVICE_TYPE(PDC, pdc_device, "rolm_pdc", "ROLM PDC")
 
 //-------------------------------------------------
 //  ROM( PDC )
@@ -127,7 +128,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *pdc_device::device_rom_region() const
+const tiny_rom_entry *pdc_device::device_rom_region() const
 {
 	return ROM_NAME( pdc );
 }
@@ -250,7 +251,7 @@ FLOPPY_FORMATS_END
 //  MACHINE_DRIVER( pdc )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( pdc )
+static MACHINE_CONFIG_START( pdc )
 	/* CPU - Zilog Z0840006PSC */
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_10MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(pdc_mem)
@@ -306,8 +307,8 @@ ioport_constructor pdc_device::device_input_ports() const
 //  pdc_device - constructor
 //-------------------------------------------------
 
-pdc_device::pdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, PDC, "ROLM PDC", tag, owner, clock, "pdc", __FILE__),
+pdc_device::pdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, PDC, tag, owner, clock),
 	m_pdccpu(*this, Z80_TAG),
 	m_dma8237(*this, FDCDMA_TAG),
 	m_fdc(*this, FDC_TAG),
@@ -324,7 +325,6 @@ pdc_device::pdc_device(const machine_config &mconfig, const char *tag, device_t 
 
 void pdc_device::device_start()
 {
-
 	/* Save States */
 	save_item(NAME(reg_p0));
 	save_item(NAME(reg_p1));
@@ -389,7 +389,7 @@ WRITE8_MEMBER(pdc_device::i8237_dma_mem_w)
 
 READ8_MEMBER(pdc_device::i8237_fdc_dma_r)
 {
-	UINT8 ret = m_fdc->dma_r();
+	uint8_t ret = m_fdc->dma_r();
 	if(TRACE_PDC_DMA) logerror("PDC: 8237 DMA CHANNEL 0 READ ADDRESS: %08X, DATA: %02X\n", offset, ret );
 	return ret;
 }
@@ -402,8 +402,8 @@ WRITE8_MEMBER(pdc_device::i8237_fdc_dma_w)
 
 READ8_MEMBER(pdc_device::m68k_dma_r)
 {
-	UINT32 address;
-	UINT8 data;
+	uint32_t address;
+	uint8_t data;
 
 	address = fdd_68k_dma_address++;
 	data =  m_m68k_r_cb(address);
@@ -477,7 +477,7 @@ WRITE8_MEMBER(pdc_device::p0_7_w)
 
 READ8_MEMBER(pdc_device::fdd_68k_r)
 {
-	UINT8 address = offset + 0x21;
+	uint8_t address = offset + 0x21;
 	switch(address)
 	{
 		default:
@@ -487,7 +487,7 @@ READ8_MEMBER(pdc_device::fdd_68k_r)
 }
 WRITE8_MEMBER(pdc_device::fdd_68k_w)
 {
-	UINT8 address = offset + 0x21;
+	uint8_t address = offset + 0x21;
 	switch(address)
 	{
 		case 0x21: /* Port 21: ?? */
@@ -547,7 +547,7 @@ READ8_MEMBER(pdc_device::p38_r)
 
 READ8_MEMBER(pdc_device::p39_r)
 {
-	UINT8 data = 1;
+	uint8_t data = 1;
 	if(b_fdc_irq) data |= 8; // Set bit 3
 	if(TRACE_PDC_CMD) logerror("PDC: Port 0x39 READ: %02X, PC: %X\n", data, space.device().safe_pc());
 	return data;
@@ -555,7 +555,7 @@ READ8_MEMBER(pdc_device::p39_r)
 
 WRITE8_MEMBER(pdc_device::p50_5f_w)
 {
-	UINT8 address = 0x50 + offset;
+	uint8_t address = 0x50 + offset;
 	switch(address)
 	{
 		case 0x52:

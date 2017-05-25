@@ -46,35 +46,35 @@ public:
 	required_device<nvram_device> m_nvram2;
 	optional_device<nvram_device> m_nvram3;
 
-	UINT16 m_kb_counter;
-	UINT8 m_enable_nmi;
-	optional_shared_ptr<UINT8> m_sys_register;
-	UINT8 m_tcsr_value;
-	UINT8 m_stby_pwr;
-	UINT8 m_pulse;
+	uint16_t m_kb_counter;
+	uint8_t m_enable_nmi;
+	optional_shared_ptr<uint8_t> m_sys_register;
+	uint8_t m_tcsr_value;
+	uint8_t m_stby_pwr;
+	uint8_t m_pulse;
 
-	UINT8 m_port2_ddr;  // datapack i/o ddr
-	UINT8 m_port2;      // datapack i/o data bus
-	UINT8 m_port6_ddr;  // datapack control lines ddr
-	UINT8 m_port6;      // datapack control lines
+	uint8_t m_port2_ddr;  // datapack i/o ddr
+	uint8_t m_port2;      // datapack i/o data bus
+	uint8_t m_port6_ddr;  // datapack control lines ddr
+	uint8_t m_port6;      // datapack control lines
 
 	// RAM/ROM banks
-	required_shared_ptr<UINT8> m_ram;
-	std::unique_ptr<UINT8[]> m_paged_ram;
-	UINT8 m_rom_bank;
-	UINT8 m_ram_bank;
-	UINT8 m_ram_bank_count;
-	UINT8 m_rom_bank_count;
+	required_shared_ptr<uint8_t> m_ram;
+	std::unique_ptr<uint8_t[]> m_paged_ram;
+	uint8_t m_rom_bank;
+	uint8_t m_ram_bank;
+	uint8_t m_ram_bank_count;
+	uint8_t m_rom_bank_count;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void nvram_init(nvram_device &nvram, void *data, size_t size);
 
-	UINT8 kb_read();
+	uint8_t kb_read();
 	void update_banks();
 	DECLARE_WRITE8_MEMBER( hd63701_int_reg_w );
 	DECLARE_READ8_MEMBER( hd63701_int_reg_r );
-	void io_rw(address_space &space, UINT16 offset);
+	void io_rw(address_space &space, uint16_t offset);
 	DECLARE_WRITE8_MEMBER( io_w );
 	DECLARE_READ8_MEMBER( io_r );
 	DECLARE_PALETTE_INIT(psion);

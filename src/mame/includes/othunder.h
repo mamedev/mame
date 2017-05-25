@@ -53,7 +53,7 @@ public:
 		m_palette(*this, "palette") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_spriteram;
+	required_shared_ptr<uint16_t> m_spriteram;
 
 	/* video-related */
 	std::unique_ptr<othunder_tempsprite[]> m_spritelist;
@@ -62,6 +62,7 @@ public:
 	int        m_vblank_irq;
 	int        m_ad_irq;
 	int        m_pan[4];
+	emu_timer  *m_ad_interrupt_timer;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -92,7 +93,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_othunder(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_othunder(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_interrupt);
 	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, const int *primasks, int y_offs );
 	void update_irq();

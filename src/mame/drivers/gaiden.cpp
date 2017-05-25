@@ -131,13 +131,16 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/gaiden.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
 #include "sound/2203intf.h"
-#include "sound/ym2151.h"
 #include "sound/okim6295.h"
-#include "includes/gaiden.h"
+#include "sound/ym2151.h"
+#include "speaker.h"
+
 
 WRITE16_MEMBER(gaiden_state::gaiden_sound_command_w)
 {
@@ -230,7 +233,7 @@ startup codes
 it reads 00/36/0e/11/33/34/2d, fetching some code copied to RAM,
 and a value which is used as an offset to point to the code in RAM.
 19/12/31/28 are read repeatedly, from the interrupt, and the returned
-value chanes, some kind of mode set command?
+value changes, some kind of mode set command?
 
 level codes
 
@@ -739,7 +742,7 @@ static GFXDECODE_START( drgnbowl )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( shadoww, gaiden_state )
+static MACHINE_CONFIG_START( shadoww )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 18432000/2) /* 9.216 MHz */
@@ -774,7 +777,7 @@ static MACHINE_CONFIG_START( shadoww, gaiden_state )
 	MCFG_TECMO_MIXER_SHIFTS(10,9,4)
 	MCFG_TECMO_MIXER_BLENDCOLS(   0x0400 + 0x300, 0x0400 + 0x200, 0x0400 + 0x100, 0x0400 + 0x000 )
 	MCFG_TECMO_MIXER_REGULARCOLS( 0x0000 + 0x300, 0x0000 + 0x200, 0x0000 + 0x100, 0x0000 + 0x000 )
-	MCFG_TECMO_MIXER_BLENDSOUCE( 0x0800 + 0x000, 0x0800 + 0x200)
+	MCFG_TECMO_MIXER_BLENDSOURCE( 0x0800 + 0x000, 0x0800 + 0x200)
 	MCFG_TECMO_MIXER_REVSPRITETILE
 	MCFG_TECMO_MIXER_BGPEN(0x000 + 0x200)
 
@@ -798,7 +801,7 @@ static MACHINE_CONFIG_START( shadoww, gaiden_state )
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
 	MCFG_SOUND_ROUTE(3, "mono", 0.60)
 
-	MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
@@ -811,7 +814,7 @@ static MACHINE_CONFIG_DERIVED( raiga, shadoww )
 	MCFG_GFXDECODE_MODIFY("gfxdecode", raiga)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( drgnbowl, gaiden_state )
+static MACHINE_CONFIG_START( drgnbowl )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 20000000/2) /* 10 MHz */
@@ -838,7 +841,7 @@ static MACHINE_CONFIG_START( drgnbowl, gaiden_state )
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
-	/* NOT using Tecmo Sprite device - signifcant changes, maybe a clone of something else */
+	/* NOT using Tecmo Sprite device - significant changes, maybe a clone of something else */
 
 	MCFG_VIDEO_START_OVERRIDE(gaiden_state,drgnbowl)
 
@@ -850,7 +853,7 @@ static MACHINE_CONFIG_START( drgnbowl, gaiden_state )
 	MCFG_YM2151_ADD("ymsnd", 4000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -933,7 +936,7 @@ static ADDRESS_MAP_START( mastninj_map, AS_PROGRAM, 16, gaiden_state )
 //  AM_RANGE(0x07a808, 0x07a809) AM_WRITE(gaiden_flip_w)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( mastninj, gaiden_state )
+static MACHINE_CONFIG_START( mastninj )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)   /* 10 MHz? */
@@ -985,7 +988,7 @@ static MACHINE_CONFIG_START( mastninj, gaiden_state )
 	MCFG_SOUND_ROUTE(3, "mono", 0.60)
 
 	/* no OKI on the bootleg */
-//  MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)
+//  MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH)
 //  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
@@ -1262,7 +1265,7 @@ ROM_START( mastninj )
 ROM_END
 
 
-ROM_START( wildfang ) /* Dipswitch selectable title of Wild Fang or Temco Knight */
+ROM_START( wildfang ) /* Dipswitch selectable title of Wild Fang or Tecmo Knight */
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 2*128k for 68000 code */
 	ROM_LOAD16_BYTE( "1.3st",    0x00000, 0x20000, CRC(ab876c9b) SHA1(b02c822f107df4c9c4f0024998f225c1ddbbd496) )
 	ROM_LOAD16_BYTE( "2.5st",    0x00001, 0x20000, CRC(1dc74b3b) SHA1(c99051ebefd6ce666b13ab56c0a10b188f15ec28) )
@@ -1324,7 +1327,7 @@ ROM_START( wildfangs ) /* Wild Fang - No title change option */
 	ROM_LOAD( "tkni4.bin",    0x0000, 0x20000, CRC(a7a1dbcf) SHA1(2fee1d9745ce2ab54b0b9cbb6ab2e66ba9677245) ) /* samples */
 ROM_END
 
-ROM_START( tknight ) /* Temco Knight - No title change option */
+ROM_START( tknight ) /* Tecmo Knight - No title change option */
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 2*128k for 68000 code */
 	ROM_LOAD16_BYTE( "tkni1.bin",    0x00000, 0x20000, CRC(9121daa8) SHA1(06ba7779602df8fae32e859371d27c0dbb8d3430) )
 	ROM_LOAD16_BYTE( "tkni2.bin",    0x00001, 0x20000, CRC(6669cd87) SHA1(8888522a3aef76a979ffc80ba457dd49f279abf1) )
@@ -1562,12 +1565,12 @@ DRIVER_INIT_MEMBER(gaiden_state,raiga)
 void gaiden_state::descramble_drgnbowl(int descramble_cpu)
 {
 	int i;
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	size_t size = memregion("maincpu")->bytes();
 
 	if (descramble_cpu)
 	{
-		dynamic_buffer buffer(size);
+		std::vector<uint8_t> buffer(size);
 
 		memcpy(&buffer[0], ROM, size);
 		for( i = 0; i < size; i++ )
@@ -1584,7 +1587,7 @@ void gaiden_state::descramble_drgnbowl(int descramble_cpu)
 	ROM = memregion("gfx2")->base();
 	size = memregion("gfx2")->bytes();
 	{
-		dynamic_buffer buffer(size);
+		std::vector<uint8_t> buffer(size);
 
 		memcpy(&buffer[0],ROM,size);
 		for( i = 0; i < size; i++ )
@@ -1613,13 +1616,13 @@ DRIVER_INIT_MEMBER(gaiden_state,drgnbowla)
 	descramble_drgnbowl(0);
 }
 
-void gaiden_state::descramble_mastninj_gfx(UINT8* src)
+void gaiden_state::descramble_mastninj_gfx(uint8_t* src)
 {
 	int len = 0x80000;
 
 	/*  rearrange gfx */
 	{
-		dynamic_buffer buffer(len);
+		std::vector<uint8_t> buffer(len);
 		int i;
 		for (i = 0;i < len; i++)
 		{
@@ -1635,7 +1638,7 @@ void gaiden_state::descramble_mastninj_gfx(UINT8* src)
 	}
 
 	{
-		dynamic_buffer buffer(len);
+		std::vector<uint8_t> buffer(len);
 		int i;
 		for (i = 0; i < len; i++)
 		{
@@ -1659,19 +1662,19 @@ DRIVER_INIT_MEMBER(gaiden_state,mastninj)
 	DRIVER_INIT_CALL(shadoww);
 }
 
-//    YEAR, NAME,      PARENT,   MACHINE,  INPUT,    INIT,     MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1988, shadoww,   0,        shadoww,  common, gaiden_state,   shadoww,  ROT0,   "Tecmo", "Shadow Warriors (World, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, shadowwa,  shadoww,  shadoww,  common, gaiden_state,   shadoww,  ROT0,   "Tecmo", "Shadow Warriors (World, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, gaiden,    shadoww,  shadoww,  common, gaiden_state,   shadoww,  ROT0,   "Tecmo", "Ninja Gaiden (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, ryukendn,  shadoww,  shadoww,  common, gaiden_state,   shadoww,  ROT0,   "Tecmo", "Ninja Ryukenden (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, ryukendna, shadoww,  shadoww,  common, gaiden_state,   shadoww,  ROT0,   "Tecmo", "Ninja Ryukenden (Japan, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, mastninj,  shadoww,  mastninj, common, gaiden_state,   mastninj, ROT0,   "bootleg", "Master Ninja (bootleg of Shadow Warriors / Ninja Gaiden)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // sprites need fixing, sound and yscroll too. - it is confirmed the curtains don't scroll on the pcb
-GAME( 1992, drgnbowl,  0,        drgnbowl, drgnbowl, gaiden_state, drgnbowl, ROT0,   "Nics",  "Dragon Bowl (set 1, encrypted program)", MACHINE_SUPPORTS_SAVE ) // Draogn Bowl is based on Ninja Gaiden code
-GAME( 1992, drgnbowla, drgnbowl, drgnbowl, drgnbowl, gaiden_state, drgnbowla,ROT0,   "Nics",  "Dragon Bowl (set 2, unencrypted program)", MACHINE_SUPPORTS_SAVE )
+//    YEAR, NAME,      PARENT,   MACHINE,  INPUT,    STATE,        INIT,     MONITOR,COMPANY,   FULLNAME,FLAGS
+GAME( 1988, shadoww,   0,        shadoww,  common,   gaiden_state, shadoww,  ROT0,   "Tecmo",   "Shadow Warriors (World, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, shadowwa,  shadoww,  shadoww,  common,   gaiden_state, shadoww,  ROT0,   "Tecmo",   "Shadow Warriors (World, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, gaiden,    shadoww,  shadoww,  common,   gaiden_state, shadoww,  ROT0,   "Tecmo",   "Ninja Gaiden (US)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1989, ryukendn,  shadoww,  shadoww,  common,   gaiden_state, shadoww,  ROT0,   "Tecmo",   "Ninja Ryukenden (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, ryukendna, shadoww,  shadoww,  common,   gaiden_state, shadoww,  ROT0,   "Tecmo",   "Ninja Ryukenden (Japan, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mastninj,  shadoww,  mastninj, common,   gaiden_state, mastninj, ROT0,   "bootleg", "Master Ninja (bootleg of Shadow Warriors / Ninja Gaiden)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // sprites need fixing, sound and yscroll too. - it is confirmed the curtains don't scroll on the pcb
+GAME( 1992, drgnbowl,  0,        drgnbowl, drgnbowl, gaiden_state, drgnbowl, ROT0,   "Nics",    "Dragon Bowl (set 1, encrypted program)",   MACHINE_SUPPORTS_SAVE ) // Dragon Bowl is based on Ninja Gaiden code
+GAME( 1992, drgnbowla, drgnbowl, drgnbowl, drgnbowl, gaiden_state, drgnbowla,ROT0,   "Nics",    "Dragon Bowl (set 2, unencrypted program)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, wildfang,  0,        shadoww,  wildfang, gaiden_state, wildfang, ROT0,   "Tecmo", "Wild Fang / Tecmo Knight", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, wildfangs, wildfang, shadoww,  tknight, gaiden_state,  wildfang, ROT0,   "Tecmo", "Wild Fang", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, tknight,   wildfang, shadoww,  tknight, gaiden_state,  wildfang, ROT0,   "Tecmo", "Tecmo Knight", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wildfang,  0,        shadoww,  wildfang, gaiden_state, wildfang, ROT0,   "Tecmo",   "Wild Fang / Tecmo Knight", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wildfangs, wildfang, shadoww,  tknight,  gaiden_state, wildfang, ROT0,   "Tecmo",   "Wild Fang",                MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tknight,   wildfang, shadoww,  tknight,  gaiden_state, wildfang, ROT0,   "Tecmo",   "Tecmo Knight",             MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, stratof,   0,        raiga,    raiga, gaiden_state,    raiga,    ROT0,   "Tecmo", "Raiga - Strato Fighter (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, raiga,     stratof,  raiga,    raiga, gaiden_state,    raiga,    ROT0,   "Tecmo", "Raiga - Strato Fighter (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, stratof,   0,        raiga,    raiga,    gaiden_state, raiga,    ROT0,   "Tecmo",   "Raiga - Strato Fighter (US)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, raiga,     stratof,  raiga,    raiga,    gaiden_state, raiga,    ROT0,   "Tecmo",   "Raiga - Strato Fighter (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

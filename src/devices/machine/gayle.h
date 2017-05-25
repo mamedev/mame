@@ -8,12 +8,11 @@
 
 ***************************************************************************/
 
+#ifndef MAME_MACHINE_GAYLE_H
+#define MAME_MACHINE_GAYLE_H
+
 #pragma once
 
-#ifndef __GAYLE_H__
-#define __GAYLE_H__
-
-#include "emu.h"
 
 
 //**************************************************************************
@@ -50,23 +49,23 @@ class gayle_device : public device_t
 {
 public:
 	// construction/destruction
-	gayle_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	gayle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// callbacks
-	template<class _Object> static devcb_base &set_int2_handler(device_t &device, _Object object)
-		{ return downcast<gayle_device &>(device).m_int2_w.set_callback(object); }
+	template <class Object> static devcb_base &set_int2_handler(device_t &device, Object &&cb)
+	{ return downcast<gayle_device &>(device).m_int2_w.set_callback(std::forward<Object>(cb)); }
 
-	template<class _Object> static devcb_base &set_cs0_read_handler(device_t &device, _Object object)
-		{ return downcast<gayle_device &>(device).m_cs0_read.set_callback(object); }
+	template <class Object> static devcb_base &set_cs0_read_handler(device_t &device, Object &&cb)
+	{ return downcast<gayle_device &>(device).m_cs0_read.set_callback(std::forward<Object>(cb)); }
 
-	template<class _Object> static devcb_base &set_cs0_write_handler(device_t &device, _Object object)
-		{ return downcast<gayle_device &>(device).m_cs0_write.set_callback(object); }
+	template <class Object> static devcb_base &set_cs0_write_handler(device_t &device, Object &&cb)
+	{ return downcast<gayle_device &>(device).m_cs0_write.set_callback(std::forward<Object>(cb)); }
 
-	template<class _Object> static devcb_base &set_cs1_read_handler(device_t &device, _Object object)
-		{ return downcast<gayle_device &>(device).m_cs1_read.set_callback(object); }
+	template <class Object> static devcb_base &set_cs1_read_handler(device_t &device, Object &&cb)
+	{ return downcast<gayle_device &>(device).m_cs1_read.set_callback(std::forward<Object>(cb)); }
 
-	template<class _Object> static devcb_base &set_cs1_write_handler(device_t &device, _Object object)
-		{ return downcast<gayle_device &>(device).m_cs1_write.set_callback(object); }
+	template <class Object> static devcb_base &set_cs1_write_handler(device_t &device, Object &&cb)
+	{ return downcast<gayle_device &>(device).m_cs1_write.set_callback(std::forward<Object>(cb)); }
 
 	// interface
 	DECLARE_WRITE_LINE_MEMBER( ide_interrupt_w );
@@ -77,7 +76,7 @@ public:
 	DECLARE_WRITE16_MEMBER( gayle_id_w );
 
 	// inline configuration
-	static void set_id(device_t &device, UINT8 id);
+	static void set_id(device_t &device, uint8_t id);
 
 protected:
 	virtual void device_start() override;
@@ -99,12 +98,12 @@ private:
 	devcb_read16 m_cs1_read;
 	devcb_write16 m_cs1_write;
 
-	UINT8 m_gayle_id;
+	uint8_t m_gayle_id;
 	int m_gayle_id_count;
-	UINT8 m_gayle_reg[4];
+	uint8_t m_gayle_reg[4];
 };
 
 // device type definition
-extern const device_type GAYLE;
+DECLARE_DEVICE_TYPE(GAYLE, gayle_device)
 
-#endif
+#endif // MAME_MACHINE_GAYLE_H

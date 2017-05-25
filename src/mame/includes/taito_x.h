@@ -19,8 +19,8 @@ public:
 	DECLARE_MACHINE_START(superman);
 
 	// superman c-chip
-	UINT16 m_current_bank;
-	UINT8 m_cc_port;
+	uint16_t m_current_bank;
+	uint8_t m_cc_port;
 	DECLARE_READ16_MEMBER( cchip1_ctrl_r );
 	DECLARE_READ16_MEMBER( cchip1_ram_r );
 	DECLARE_WRITE16_MEMBER( cchip1_ctrl_w );

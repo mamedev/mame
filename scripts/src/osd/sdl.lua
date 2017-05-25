@@ -42,7 +42,7 @@ function maintargetosdoptions(_target,_subtarget)
 		links {
 			"SDL2_ttf",
 		}
-		local str = backtick("pkg-config --libs fontconfig")
+		local str = backtick(pkgconfigcmd() .. " --libs fontconfig")
 		addlibfromstring(str)
 		addoptionsfromstring(str)
 	end
@@ -113,7 +113,8 @@ function maintargetosdoptions(_target,_subtarget)
 	configuration { "mingw*" or "vs*" }
 		targetprefix "sdl"
 		links {
-			"psapi"
+			"psapi",
+			"Ole32",
 		}
 	configuration { }
 
@@ -132,7 +133,7 @@ function sdlconfigcmd()
 	if _OPTIONS["targetos"]=="asmjs" then
 		return "sdl2-config"
 	elseif not _OPTIONS["SDL_INSTALL_ROOT"] then
-		return _OPTIONS['TOOLCHAIN'] .. "pkg-config sdl2"
+		return pkgconfigcmd() .. " sdl2"
 	else
 		return path.join(_OPTIONS["SDL_INSTALL_ROOT"],"bin","sdl2") .. "-config"
 	end
@@ -340,7 +341,7 @@ project ("qtdbg_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/osd/modules/render",
 		MAME_DIR .. "3rdparty",
 	}
-	configuration { "linux-*" }
+	configuration { "linux-* or freebsd" }
 		buildoptions {
 			"-fPIC",
 		}
@@ -417,12 +418,10 @@ project ("osd_" .. _OPTIONS["osd"])
 
 	files {
 		MAME_DIR .. "src/osd/sdl/osdsdl.h",
-		MAME_DIR .. "src/osd/sdl/sdlinc.h",
 		MAME_DIR .. "src/osd/sdl/sdlprefix.h",
 		MAME_DIR .. "src/osd/sdl/sdlmain.cpp",
 		MAME_DIR .. "src/osd/osdepend.h",
 		MAME_DIR .. "src/osd/sdl/video.cpp",
-		MAME_DIR .. "src/osd/sdl/video.h",
 		MAME_DIR .. "src/osd/sdl/window.cpp",
 		MAME_DIR .. "src/osd/sdl/window.h",
 		MAME_DIR .. "src/osd/modules/osdwindow.cpp",

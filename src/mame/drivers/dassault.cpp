@@ -207,11 +207,15 @@ Dip locations verified with US conversion kit manual.
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/dassault.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/h6280/h6280.h"
-#include "includes/dassault.h"
 #include "sound/2203intf.h"
 #include "sound/ym2151.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 /**********************************************************************************/
 
@@ -523,7 +527,7 @@ GFXDECODE_END
 WRITE8_MEMBER(dassault_state::sound_bankswitch_w)
 {
 	/* the second OKIM6295 ROM is bank switched */
-	m_oki2->set_bank_base((data & 1) * 0x40000);
+	m_oki2->set_rom_bank(data & 1);
 }
 
 /**********************************************************************************/
@@ -533,7 +537,7 @@ DECO16IC_BANK_CB_MEMBER(dassault_state::bank_callback)
 	return ((bank >> 4) & 0xf) << 12;
 }
 
-static MACHINE_CONFIG_START( dassault, dassault_state )
+static MACHINE_CONFIG_START( dassault )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_28MHz/2)   /* 14MHz - Accurate */
@@ -624,11 +628,11 @@ static MACHINE_CONFIG_START( dassault, dassault_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
 
-	MCFG_OKIM6295_ADD("oki1", XTAL_32_22MHz/32, OKIM6295_PIN7_HIGH) // verified
+	MCFG_OKIM6295_ADD("oki1", XTAL_32_22MHz/32, PIN7_HIGH) // verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL_32_22MHz/16, OKIM6295_PIN7_HIGH) // verified
+	MCFG_OKIM6295_ADD("oki2", XTAL_32_22MHz/16, PIN7_HIGH) // verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
 MACHINE_CONFIG_END
@@ -1048,9 +1052,9 @@ ROM_END
 
 DRIVER_INIT_MEMBER(dassault_state,dassault)
 {
-	const UINT8 *src = memregion("gfx1")->base();
-	UINT8 *dst = memregion("gfx2")->base();
-	dynamic_buffer tmp(0x80000);
+	const uint8_t *src = memregion("gfx1")->base();
+	uint8_t *dst = memregion("gfx2")->base();
+	std::vector<uint8_t> tmp(0x80000);
 
 	/* Playfield 4 also has access to the char graphics, make things easier
 	by just copying the chars to both banks (if I just used a different gfx
@@ -1063,9 +1067,9 @@ DRIVER_INIT_MEMBER(dassault_state,dassault)
 
 DRIVER_INIT_MEMBER(dassault_state,thndzone)
 {
-	const UINT8 *src = memregion("gfx1")->base();
-	UINT8 *dst = memregion("gfx2")->base();
-	dynamic_buffer tmp(0x80000);
+	const uint8_t *src = memregion("gfx1")->base();
+	uint8_t *dst = memregion("gfx2")->base();
+	std::vector<uint8_t> tmp(0x80000);
 
 	/* Playfield 4 also has access to the char graphics, make things easier
 	by just copying the chars to both banks (if I just used a different gfx

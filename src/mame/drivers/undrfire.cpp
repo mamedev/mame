@@ -189,12 +189,14 @@ Board contains only 29 ROMs and not much else.
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/undrfire.h"
+#include "audio/taito_en.h"
+
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"
 #include "machine/watchdog.h"
 #include "sound/es5506.h"
-#include "audio/taito_en.h"
-#include "includes/undrfire.h"
+#include "screen.h"
 
 #include "cbombers.lh"
 
@@ -211,7 +213,7 @@ void undrfire_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		m_maincpu->set_input_line(5, HOLD_LINE);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in undrfire_state::device_timer");
+		assert_always(false, "Unknown id in undrfire_state::device_timer");
 	}
 }
 
@@ -674,7 +676,7 @@ INTERRUPT_GEN_MEMBER(undrfire_state::undrfire_interrupt)
 	device.execute().set_input_line(4, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( undrfire, undrfire_state )
+static MACHINE_CONFIG_START( undrfire )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, XTAL_40MHz/2) /* 20 MHz - NOT verified */
@@ -717,7 +719,7 @@ static MACHINE_CONFIG_START( undrfire, undrfire_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( cbombers, undrfire_state )
+static MACHINE_CONFIG_START( cbombers )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, XTAL_40MHz/2) /* 20 MHz - NOT verified */
@@ -1098,8 +1100,8 @@ ROM_END
 
 DRIVER_INIT_MEMBER(undrfire_state,undrfire)
 {
-	UINT32 offset,i;
-	UINT8 *gfx = memregion("gfx3")->base();
+	uint32_t offset,i;
+	uint8_t *gfx = memregion("gfx3")->base();
 	int size=memregion("gfx3")->bytes();
 	int data;
 
@@ -1127,8 +1129,8 @@ DRIVER_INIT_MEMBER(undrfire_state,undrfire)
 
 DRIVER_INIT_MEMBER(undrfire_state,cbombers)
 {
-	UINT32 offset,i;
-	UINT8 *gfx = memregion("gfx3")->base();
+	uint32_t offset,i;
+	uint8_t *gfx = memregion("gfx3")->base();
 	int size=memregion("gfx3")->bytes();
 	int data;
 
@@ -1156,9 +1158,9 @@ DRIVER_INIT_MEMBER(undrfire_state,cbombers)
 
 
 
-GAME( 1993, undrfire,  0,        undrfire, undrfire, undrfire_state, undrfire, ROT0, "Taito Corporation Japan",   "Under Fire (World)", 0 )
-GAME( 1993, undrfireu, undrfire, undrfire, undrfire, undrfire_state, undrfire, ROT0, "Taito America Corporation", "Under Fire (US)", 0 )
-GAME( 1993, undrfirej, undrfire, undrfire, undrfire, undrfire_state, undrfire, ROT0, "Taito Corporation",         "Under Fire (Japan)", 0 )
-GAMEL(1994, cbombers,  0,        cbombers, cbombers, undrfire_state, cbombers, ROT0, "Taito Corporation Japan",   "Chase Bombers (World)", MACHINE_IMPERFECT_GRAPHICS, layout_cbombers )
-GAMEL(1994, cbombersj, cbombers, cbombers, cbombers, undrfire_state, cbombers, ROT0, "Taito Corporation",         "Chase Bombers (Japan)", MACHINE_IMPERFECT_GRAPHICS, layout_cbombers )
+GAME( 1993, undrfire,  0,        undrfire, undrfire, undrfire_state, undrfire, ROT0, "Taito Corporation Japan",   "Under Fire (World)",              0 )
+GAME( 1993, undrfireu, undrfire, undrfire, undrfire, undrfire_state, undrfire, ROT0, "Taito America Corporation", "Under Fire (US)",                 0 )
+GAME( 1993, undrfirej, undrfire, undrfire, undrfire, undrfire_state, undrfire, ROT0, "Taito Corporation",         "Under Fire (Japan)",              0 )
+GAMEL(1994, cbombers,  0,        cbombers, cbombers, undrfire_state, cbombers, ROT0, "Taito Corporation Japan",   "Chase Bombers (World)",           MACHINE_IMPERFECT_GRAPHICS, layout_cbombers )
+GAMEL(1994, cbombersj, cbombers, cbombers, cbombers, undrfire_state, cbombers, ROT0, "Taito Corporation",         "Chase Bombers (Japan)",           MACHINE_IMPERFECT_GRAPHICS, layout_cbombers )
 GAMEL(1994, cbombersp, cbombers, cbombers, cbombers, undrfire_state, cbombers, ROT0, "Taito Corporation",         "Chase Bombers (Japan Prototype)", MACHINE_IMPERFECT_GRAPHICS, layout_cbombers )

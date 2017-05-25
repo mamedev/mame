@@ -33,24 +33,48 @@
     per-game TODO:
     Legionnaire
     - (fixed) player walks on spot on stage clear;
-    - several if not all enemies definitely wants some sort of "axis aligned bounding box" in order to stop from going out of range
+    - (fixed) several if not all enemies definitely wants some sort of "axis aligned bounding box" in order to stop from going out of range
         (when i.e. first boss goes to bottom of the screen and become unreachable)
     - (btanb) Throw is made by quickly double jumping (!)
     Heated Barrel
+	- (btanb) if player moves in diagonal a bogus projectile is fired.
     - gives random value to hi-score if you continue (only the first time, not a bug?);
-    - (fixed?) throws random address exceptions at level 3 and above, a RAM address arrives corrupt in the snippet at 0x136a;
-    - (fixed?) some corrupt sprites, probably a non-fatal version of the one above;
-    - stage 2 boss attacks only in vertical (regressed with the 130e / 3b30 / 42c2 command merge);
+    - (fixed) throws random address exceptions at level 3 and above, a RAM address arrives corrupt in the snippet at 0x136a;
+    - (fixed) some corrupt sprites, probably a non-fatal version of the one above;
+    - (fixed) stage 2 boss attacks only in vertical (regressed with the 130e / 3b30 / 42c2 command merge);
     - (fixed) level 3+ boss movements looks wrong;
     - stage 3 "homing" missiles doesn't seem to like our 6200 hookup here, except it's NOT 6200!?
-    - barrels seen in later levels seems to fail an axis aligned bounding box, not unlike Legionnaire.
+    - (fixed) barrels seen in later levels seems to fail an axis aligned bounding box, not unlike Legionnaire.
     SD Gundam
     - stage 3 mid-boss still has the sprite garbage bug;
     - stage 4: has sprite stuck on bottom-left of screen;
-    - palette dims too much on attract / continue screen.
-      It's known that the DMA data arrangement gives same results on a real Legionnaire board, so shrug?
+    Seibu Cup Soccer
+    - Handles collision detection via the 130e/3bb0 macros
+      130e version in this makes a sub instead of an add as last opcode, which in turn reflects with
+      the distance (which we do know that is internally loaded somehow).
+          d104 macro is called before this, it likely sets the range for the 130e snippets.
+          Example snippet (note: there are multiple calls to 130e)
+013F3C: 3D7C 130E 0100             move.w  #$130e, ($100,A6)    // angle macro
+013F42: 302E 01B4                  move.w  ($1b4,A6), D0        // take the angle
+013F46: 082E 000F 01B0             btst    #$f, ($1b0,A6)       // is status exception flag raised?
+013F4C: 6712                       beq     $13f60
+013F4E: 2228 0004                  move.l  ($4,A0), D1
+013F52: B2A8 0044                  cmp.l   ($44,A0), D1         // compares Y value against the next object (yes, cop_regs[1] + 0x40 = cop_regs[0])
+013F56: 6708                       beq     $13f60               // if equal then check the distance
+013F58: 6E04                       bgt     $13f5e
+013F5A: 7040                       moveq   #$40, D0             // set angle direction left ...
+013F5C: 6002                       bra     $13f60
+013F5E: 70C0                       moveq   #-$40, D0            // ... or right
+013F60: 3D7C 3BB0 0100             move.w  #$3bb0, ($100,A6)    // dist macro
+013F66: 1140 003D                  move.b  D0, ($3d,A0)         // move angle value to [0x3d]
+013F6A: 4E75                       rts
+    Zero Team
+    - Some faulty collision detection, e.g. crate in front of aquarium in stage 1
+    - Bird Boss jumps to wrong direction
+      the sequence called is:
+      write to reg 4 then execute 0xfc84 and 0xf790, finally reads the distance.
 
-    Tech notes (to move into mainpage):
+    Tech notes (to move into own file with doxy mainpage):
     -----------
     [0x6fc] DMA mode bit scheme:
     ---1 ---1 ---- ---- fill op if true, else transfer
@@ -58,6 +82,16 @@
     ---- ---- ---x ---- internal buffer selector
     ---- ---- ---- x--- size modifier? Bus transfer size actually?
     ---- ---- ---- -xxx select channel
+
+    work RAM object structure (in seibu cup soccer)
+    all object have a [0x40] boundary
+    [0x04-0x07] Y position
+    [0x08-0x0b] X position
+    [0x10-0x13] Y offset (a.k.a. calculated sine)
+    [0x14-0x17] X offset (a.k.a. calculated cosine)
+    [0x37] angle direction
+    TOC
+    [0x11381c] ball object
 
 ***************************************************************************/
 
@@ -77,10 +111,10 @@
 	if (LOG_Commands) logerror
 
 
-const device_type RAIDEN2COP = &device_creator<raiden2cop_device>;
+DEFINE_DEVICE_TYPE(RAIDEN2COP, raiden2cop_device, "raiden2cop", "Seibu COP (Raiden 2)")
 
-raiden2cop_device::raiden2cop_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, RAIDEN2COP, "Seibu COP (Raiden 2)", tag, owner, clock, "raiden2cop", __FILE__),
+raiden2cop_device::raiden2cop_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, RAIDEN2COP, tag, owner, clock),
 	cop_latch_addr(0),
 	cop_latch_trigger(0),
 	cop_latch_value(0),
@@ -131,18 +165,18 @@ raiden2cop_device::raiden2cop_device(const machine_config &mconfig, const char *
 	m_videoramout_cb(*this),
 	m_palette(*this, ":palette")
 {
-	memset(cop_func_trigger, 0, sizeof(UINT16)*(0x100/8));
-	memset(cop_func_value, 0, sizeof(UINT16)*(0x100/8));
-	memset(cop_func_mask, 0, sizeof(UINT16)*(0x100/8));
-	memset(cop_program, 0, sizeof(UINT16)*(0x100));
+	memset(cop_func_trigger, 0, sizeof(uint16_t)*(0x100/8));
+	memset(cop_func_value, 0, sizeof(uint16_t)*(0x100/8));
+	memset(cop_func_mask, 0, sizeof(uint16_t)*(0x100/8));
+	memset(cop_program, 0, sizeof(uint16_t)*(0x100));
 
-	memset(cop_dma_src, 0, sizeof(UINT16)*(0x200));
-	memset(cop_dma_dst, 0, sizeof(UINT16)*(0x200));
-	memset(cop_dma_size, 0, sizeof(UINT16)*(0x200));
+	memset(cop_dma_src, 0, sizeof(uint16_t)*(0x200));
+	memset(cop_dma_dst, 0, sizeof(uint16_t)*(0x200));
+	memset(cop_dma_size, 0, sizeof(uint16_t)*(0x200));
 
-	memset(cop_itoa_digits, 0, sizeof(UINT8)*10);
+	memset(cop_itoa_digits, 0, sizeof(uint8_t)*10);
 
-	memset(cop_regs, 0, sizeof(UINT32)*8);
+	memset(cop_regs, 0, sizeof(uint32_t)*8);
 
 
 	memset(cop_collision_info, 0, sizeof(colinfo)*2);
@@ -247,22 +281,22 @@ void raiden2cop_device::device_start()
 	m_word_endian_val = m_host_endian ? 2 : 0;
 }
 
-UINT16 raiden2cop_device::cop_read_word(int address)
+uint16_t raiden2cop_device::cop_read_word(int address)
 {
 	return m_host_space->read_word(address ^ m_word_endian_val);
 }
 
-UINT8 raiden2cop_device::cop_read_byte(int address)
+uint8_t raiden2cop_device::cop_read_byte(int address)
 {
 	return m_host_space->read_byte(address ^ m_byte_endian_val);
 }
 
-void raiden2cop_device::cop_write_word(int address, UINT16 data)
+void raiden2cop_device::cop_write_word(int address, uint16_t data)
 {
 	m_host_space->write_word(address ^ m_word_endian_val, data);
 }
 
-void raiden2cop_device::cop_write_byte(int address, UINT8 data)
+void raiden2cop_device::cop_write_byte(int address, uint8_t data)
 {
 	m_host_space->write_byte(address ^ m_byte_endian_val, data);
 }
@@ -280,10 +314,11 @@ WRITE16_MEMBER(raiden2cop_device::cop_pgm_data_w)
 	cop_func_trigger[idx] = cop_latch_trigger;
 	cop_func_value[idx]   = cop_latch_value;
 	cop_func_mask[idx]    = cop_latch_mask;
+	bool upper_regs = ((cop_latch_trigger >> 10) & 1) == 1; // f1
 
 	if(data) {
 		int off = data & 31;
-		int reg = (data >> 5) & 3;
+		int reg = ((data >> 5) & 3) + (upper_regs == true ? 4 : 0);
 		int op = (data >> 7) & 31;
 
 		logerror("COPDIS: %04x s=%02x f1=%x l=%x f2=%02x %x %04x %02x %03x %02x.%x.%02x ", cop_latch_trigger,  (cop_latch_trigger >> 11) << 3, (cop_latch_trigger >> 10) & 1, ((cop_latch_trigger >> 7) & 7)+1, cop_latch_trigger & 0x7f, cop_latch_value, cop_latch_mask, cop_latch_addr, data, op, reg, off);
@@ -417,7 +452,7 @@ WRITE16_MEMBER(raiden2cop_device::cop_pgm_trigger_w)
 
 
 // currently only used by legionna.c implementation
-int raiden2cop_device::find_trigger_match(UINT16 triggerval, UINT16 mask)
+int raiden2cop_device::find_trigger_match(uint16_t triggerval, uint16_t mask)
 {
 	/* search the uploaded 'trigger' table for a matching trigger*/
 	/* note, I don't know what the 'mask' or 'value' tables are... probably important, might determine what actually gets executed! */
@@ -616,7 +651,7 @@ int raiden2cop_device::find_trigger_match(UINT16 triggerval, UINT16 mask)
 }
 
 //  only used by legionna.c implementation
-int raiden2cop_device::check_command_matches(int command, UINT16 seq0, UINT16 seq1, UINT16 seq2, UINT16 seq3, UINT16 seq4, UINT16 seq5, UINT16 seq6, UINT16 seq7, UINT16 _funcval_, UINT16 _funcmask_)
+int raiden2cop_device::check_command_matches(int command, uint16_t seq0, uint16_t seq1, uint16_t seq2, uint16_t seq3, uint16_t seq4, uint16_t seq5, uint16_t seq6, uint16_t seq7, uint16_t _funcval_, uint16_t _funcmask_)
 {
 	command *= 8;
 
@@ -682,7 +717,7 @@ WRITE16_MEMBER(raiden2cop_device::cop_pal_brightness_mode_w)
 }
 
 /* RE from Seibu Cup Soccer bootleg */
-UINT8 raiden2cop_device::fade_table(int v)
+uint8_t raiden2cop_device::fade_table(int v)
 {
 	int low  = v & 0x001f;
 	int high = v & 0x03e0;
@@ -727,13 +762,15 @@ WRITE16_MEMBER(raiden2cop_device::cop_dma_trigger_w)
 		case 0x85:
 		case 0x86:
 		case 0x87:
-		{   dma_palette_brightness();
+		{
+			dma_palette_brightness();
 			break;
 		}
 
 	/********************************************************************************************************************/
-	case 0x09: {
-		UINT32 src, dst, size;
+	case 0x09:
+	{
+		uint32_t src, dst, size;
 		int i;
 
 		src = (cop_dma_src[cop_dma_mode] << 6);
@@ -754,7 +791,7 @@ WRITE16_MEMBER(raiden2cop_device::cop_dma_trigger_w)
 	/********************************************************************************************************************/
 	case 0x0e:  // Godzilla / Seibu Cup Soccer
 	{
-		UINT32 src, dst, size, i;
+		uint32_t src, dst, size, i;
 
 		src = (cop_dma_src[cop_dma_mode] << 6);
 		dst = (cop_dma_dst[cop_dma_mode] << 6);
@@ -772,7 +809,7 @@ WRITE16_MEMBER(raiden2cop_device::cop_dma_trigger_w)
 	/********************************************************************************************************************/
 	case 0x116: // Godzilla
 	{
-		UINT32 length, address;
+		uint32_t length, address;
 		int i;
 
 		//if(cop_dma_dst[cop_dma_mode] != 0x0000) // Invalid?
@@ -808,7 +845,7 @@ WRITE16_MEMBER(raiden2cop_device::cop_dma_trigger_w)
 void raiden2cop_device::bcd_update()
 {
 		//int digits = 1 << cop_itoa_mode*2;
-	UINT32 val = cop_itoa;
+	uint32_t val = cop_itoa;
 
 	//if(digits > 9)
 		int digits = 9;
@@ -835,7 +872,7 @@ void raiden2cop_device::bcd_update()
 
 WRITE16_MEMBER(raiden2cop_device::cop_itoa_low_w)
 {
-	cop_itoa = (cop_itoa & ~UINT32(mem_mask)) | (data & mem_mask);
+	cop_itoa = (cop_itoa & ~uint32_t(mem_mask)) | (data & mem_mask);
 
 	bcd_update();
 }
@@ -911,7 +948,7 @@ READ16_MEMBER( raiden2cop_device::cop_reg_low_r)
 
 WRITE16_MEMBER( raiden2cop_device::cop_reg_low_w)
 {
-	cop_regs[offset] = (cop_regs[offset] & ~UINT32(mem_mask)) | (data & mem_mask);
+	cop_regs[offset] = (cop_regs[offset] & ~uint32_t(mem_mask)) | (data & mem_mask);
 }
 
 WRITE16_MEMBER( raiden2cop_device::cop_hitbox_baseadr_w)
@@ -919,7 +956,7 @@ WRITE16_MEMBER( raiden2cop_device::cop_hitbox_baseadr_w)
 	COMBINE_DATA(&cop_hit_baseadr);
 }
 
-void  raiden2cop_device::cop_collision_read_pos(int slot, UINT32 spradr, bool allow_swap)
+void  raiden2cop_device::cop_collision_read_pos(int slot, uint32_t spradr, bool allow_swap)
 {
 	cop_collision_info[slot].allow_swap = allow_swap;
 	cop_collision_info[slot].flags_swap = cop_read_word(spradr+2);
@@ -948,9 +985,9 @@ Y = collides between 0xd0 and 0x30 (not inclusive)
 0x588 bits 2 & 3 = 0x580 bits 0 & 1
 */
 
-void  raiden2cop_device::cop_collision_update_hitbox(UINT16 data, int slot, UINT32 hitadr)
+void  raiden2cop_device::cop_collision_update_hitbox(uint16_t data, int slot, uint32_t hitadr)
 {
-	UINT32 hitadr2 = m_host_space->read_word(hitadr) | (cop_hit_baseadr << 16); // DON'T use cop_read_word here, doesn't need endian fixing?!
+	uint32_t hitadr2 = m_host_space->read_word(hitadr) | (cop_hit_baseadr << 16); // DON'T use cop_read_word here, doesn't need endian fixing?!
 	int num_axis = 2;
 	int extraxor = 0;
 	if (m_host_endian) extraxor = 1;
@@ -971,19 +1008,19 @@ void  raiden2cop_device::cop_collision_update_hitbox(UINT16 data, int slot, UINT
 		cop_collision_info[slot].size[i] = m_host_space->read_byte(extraxor^ (hitadr2++));
 	}
 
-	INT16 dx[3],size[3];
+	int16_t dx[3],size[3];
 
 	for (i = 0; i < num_axis; i++)
 	{
-		size[i] = UINT8(cop_collision_info[slot].size[i]);
-		dx[i] = INT8(cop_collision_info[slot].dx[i]);
+		size[i] = uint8_t(cop_collision_info[slot].size[i]);
+		dx[i] = int8_t(cop_collision_info[slot].dx[i]);
 	}
 
-	//printf("%02x %02x %02x %02x %02x %02x\n", (UINT8)size[i], (UINT8)dx[i], (UINT8)size[1], (UINT8)dx[1], (UINT8)size[2], (UINT8)dx[2]);
+	//printf("%02x %02x %02x %02x %02x %02x\n", (uint8_t)size[i], (uint8_t)dx[i], (uint8_t)size[1], (uint8_t)dx[1], (uint8_t)size[2], (uint8_t)dx[2]);
 
 	int j = slot;
 
-	UINT8 res;
+	uint8_t res;
 
 	if (num_axis==3) res = 7;
 	else res = 3;
@@ -1035,11 +1072,11 @@ WRITE16_MEMBER( raiden2cop_device::cop_cmd_w)
 
 	case 0x130e:   // 130e 0005 bf7f 0010 - 0984 0aa4 0d82 0aa2 039b 0b9a 0b9a 0a9a
 	case 0x138e:
-		execute_130e(offset, data); // angle from dx/dy
+		execute_130e(offset, data, false); // angle from dx/dy
 		break;
 
 	case 0x338e: { // 338e 0005 bf7f 0030 - 0984 0aa4 0d82 0aa2 039c 0b9c 0b9c 0a9a
-		execute_338e(offset, data); // angle from dx/dy
+		execute_338e(offset, data, false); // angle from dx/dy
 		break;
 	}
 
@@ -1317,7 +1354,7 @@ WRITE16_MEMBER(raiden2cop_device::LEGACY_cop_cmd_w)
 	{
 		return;
 	}
-	UINT16 funcval, funcmask;
+	uint16_t funcval, funcmask;
 	// this is pointless.. all we use it for is comparing against the same value
 	funcval = get_func_value(command);
 	funcmask = get_func_mask(command);
@@ -1398,6 +1435,7 @@ WRITE16_MEMBER(raiden2cop_device::LEGACY_cop_cmd_w)
 	if (check_command_matches(command, 0x984, 0xaa4, 0xd82, 0xaa2, 0x39b, 0xb9a, 0xb9a, 0xa9a, 5, 0xbf7f))
 	{
 		executed = 1;
+		// TODO: is it actually called by SD Gundam in any way?
 		LEGACY_execute_130e_cupsoc(offset, data);
 		return;
 	}
@@ -1407,7 +1445,7 @@ WRITE16_MEMBER(raiden2cop_device::LEGACY_cop_cmd_w)
 	if (check_command_matches(command, 0x984, 0xaa4, 0xd82, 0xaa2, 0x39b, 0xb9a, 0xb9a, 0xb9a, 5, 0xbf7f))
 	{
 		executed = 1;
-		execute_130e(offset, data);
+		execute_130e(offset, data, true);
 		return;
 	}
 
@@ -1459,8 +1497,8 @@ WRITE16_MEMBER(raiden2cop_device::LEGACY_cop_cmd_w)
 
 	if (check_command_matches(command, 0xb80, 0xb82, 0xb84, 0xb86, 0x000, 0x000, 0x000, 0x000, funcval, funcmask))
 	{
-		execute_a100(offset, data);
 		executed = 1;
+		execute_a100(offset, data);
 		return;
 	}
 
@@ -1505,8 +1543,6 @@ WRITE16_MEMBER(raiden2cop_device::LEGACY_cop_cmd_w)
 
 	// cupsoc 1b | 5 | 7ff7 | dde5 | f80 aa2 984 0c2
 	/* radar x/y positions */
-	/* FIXME: x/ys are offsetted */
-	/* FIXME: uses 0x10044a for something */
 	if (check_command_matches(command, 0xf80, 0xaa2, 0x984, 0x0c2, 0x000, 0x000, 0x000, 0x000, 5, 0x7ff7))
 	{
 		executed = 1;
@@ -1548,12 +1584,40 @@ WRITE16_MEMBER(raiden2cop_device::LEGACY_cop_cmd_w)
 		LEGACY_execute_d104(offset, data);
 		return;
 	}
+/*
+    [:raiden2cop] COPDIS: 5105 s=50 f1=0 l=3 f2=05 5 fefb 50 a80 15.0.00 [:raiden2cop] sub32 (r0)
+    [:raiden2cop] COPDIS: 5105 s=50 f1=0 l=3 f2=05 5 fefb 51 984 13.0.04 [:raiden2cop] write16h 8(r0)
+    [:raiden2cop] COPDIS: 5105 s=50 f1=0 l=3 f2=05 5 fefb 52 082 01.0.02 [:raiden2cop] addmem32 4(r0)
+*/
+
+	if (check_command_matches(command, 0xa80, 0x984, 0x082, 0x000, 0x000, 0x000, 0x000, 0x000, 5, 0xfefb))
+	{
+		//executed = 1;
+		printf("5105\n");
+		return;
+	}
+
+/*
+[:raiden2cop] COPDIS: 5905 s=58 f1=0 l=3 f2=05 5 fffb 58 9c8 13.2.08 [:raiden2cop] write16h 10(r2)
+[:raiden2cop] COPDIS: 5905 s=58 f1=0 l=3 f2=05 5 fffb 59 a84 15.0.04 [:raiden2cop] sub32 8(r0)
+[:raiden2cop] COPDIS: 5905 s=58 f1=0 l=3 f2=05 5 fffb 5a 0a2 01.1.02 [:raiden2cop] addmem32 4(r1)*/
+
+	if (check_command_matches(command, 0x9c8, 0xa84, 0x0a2, 0x000, 0x000, 0x000, 0x000, 0x000, 5, 0xfffb))
+	{
+		//executed = 1;
+		printf("5905\n");
+		return;
+	}
+
+	// player to ball collision
+	if (check_command_matches(command, 0xa88, 0x994, 0x088, 0x000, 0x000, 0x000, 0x000, 0x000, 5, 0xfefb))
+	{
+		execute_f105(offset,data);
+		return;
+	}
 
 	if (executed == 0)
 	{
-		if(data == 0xf105) // cupsoc transition from presentation to kick off
-			return;
-
 		printf("did not execute %04x\n", data); // cup soccer triggers this a lot (and others)
 	}
 }

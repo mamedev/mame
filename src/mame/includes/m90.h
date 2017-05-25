@@ -16,8 +16,8 @@ public:
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch") { }
 
-	required_shared_ptr<UINT16> m_video_data;
-	optional_shared_ptr<UINT16> m_spriteram;
+	required_shared_ptr<uint16_t> m_video_data;
+	optional_shared_ptr<uint16_t> m_spriteram;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
@@ -26,13 +26,13 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	UINT16 m_video_control_data[8];
+	uint16_t m_video_control_data[8];
 	tilemap_t *m_pf1_layer;
 	tilemap_t *m_pf2_layer;
 	tilemap_t *m_pf1_wide_layer;
 	tilemap_t *m_pf2_wide_layer;
-	UINT8 m_last_pf1;
-	UINT8 m_last_pf2;
+	uint8_t m_last_pf1;
+	uint8_t m_last_pf2;
 	DECLARE_WRITE16_MEMBER(m90_coincounter_w);
 	DECLARE_WRITE16_MEMBER(quizf1_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(dynablsb_sound_command_w);
@@ -56,9 +56,9 @@ public:
 	virtual void video_start() override;
 	DECLARE_VIDEO_START(bomblord);
 	DECLARE_VIDEO_START(dynablsb);
-	UINT32 screen_update_m90(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_bomblord(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_dynablsb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_m90(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_bomblord(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_dynablsb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(fake_nmi);
 	INTERRUPT_GEN_MEMBER(bomblord_fake_nmi);
 	INTERRUPT_GEN_MEMBER(m90_interrupt);

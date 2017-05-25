@@ -11,7 +11,6 @@
 #ifndef AIM65_H_
 #define AIM65_H_
 
-#include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "video/dl1416.h"
 #include "machine/6522via.h"
@@ -37,20 +36,21 @@ class aim65_state : public driver_device
 {
 public:
 	aim65_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_cassette1(*this, "cassette"),
-		m_cassette2(*this, "cassette2"),
-		m_z24(*this, "z24"),
-		m_z25(*this, "z25"),
-		m_z26(*this, "z26"),
-		m_ram(*this, RAM_TAG),
-		m_ds1(*this, "ds1"),
-		m_ds2(*this, "ds2"),
-		m_ds3(*this, "ds3"),
-		m_ds4(*this, "ds4"),
-		m_ds5(*this, "ds5")
-	{ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_cassette1(*this, "cassette")
+		, m_cassette2(*this, "cassette2")
+		, m_z24(*this, "z24")
+		, m_z25(*this, "z25")
+		, m_z26(*this, "z26")
+		, m_z12(*this, "z12")
+		, m_z13(*this, "z13")
+		, m_z14(*this, "z14")
+		, m_z15(*this, "z15")
+		, m_ram(*this, RAM_TAG)
+		, m_ds(*this, "ds%u", 1)
+	{
+	}
 
 	DECLARE_WRITE8_MEMBER(aim65_pia_a_w);
 	DECLARE_WRITE8_MEMBER(aim65_pia_b_w);
@@ -58,10 +58,24 @@ public:
 	DECLARE_WRITE8_MEMBER(aim65_riot_a_w);
 	DECLARE_WRITE8_MEMBER(aim65_pb_w);
 	DECLARE_READ8_MEMBER(aim65_pb_r);
-	UINT8 m_pia_a;
-	UINT8 m_pia_b;
-	UINT8 m_riot_port_a;
-	UINT8 m_pb_save;
+
+	template <unsigned D> DECLARE_WRITE16_MEMBER(aim65_update_ds);
+
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(z24_load) { return load_cart(image, m_z24, "z24"); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(z25_load) { return load_cart(image, m_z25, "z25"); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(z26_load) { return load_cart(image, m_z26, "z26"); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(z12_load) { return load_cart(image, m_z12, "z12"); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(z13_load) { return load_cart(image, m_z13, "z13"); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(z14_load) { return load_cart(image, m_z14, "z14"); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(z15_load) { return load_cart(image, m_z15, "z15"); }
+
+protected:
+	virtual void machine_start() override;
+
+	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot, const char *slot_tag);
+
+	uint8_t m_riot_port_a;
+	uint8_t m_pb_save;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette1;
@@ -69,27 +83,12 @@ public:
 	required_device<generic_slot_device> m_z24;
 	required_device<generic_slot_device> m_z25;
 	required_device<generic_slot_device> m_z26;
+	required_device<generic_slot_device> m_z12;
+	required_device<generic_slot_device> m_z13;
+	required_device<generic_slot_device> m_z14;
+	required_device<generic_slot_device> m_z15;
 	required_device<ram_device> m_ram;
-	required_device<dl1416_device> m_ds1;
-	required_device<dl1416_device> m_ds2;
-	required_device<dl1416_device> m_ds3;
-	required_device<dl1416_device> m_ds4;
-	required_device<dl1416_device> m_ds5;
-	virtual void machine_start() override;
-	void aim65_pia();
-
-	DECLARE_WRITE16_MEMBER(aim65_update_ds1);
-	DECLARE_WRITE16_MEMBER(aim65_update_ds2);
-	DECLARE_WRITE16_MEMBER(aim65_update_ds3);
-	DECLARE_WRITE16_MEMBER(aim65_update_ds4);
-	DECLARE_WRITE16_MEMBER(aim65_update_ds5);
-
-	void dl1416_update(dl1416_device *device, int index);
-
-	int load_cart(device_image_interface &image, generic_slot_device *slot, const char *slot_tag);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(z24_load) { return load_cart(image, m_z24, "z24"); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(z25_load) { return load_cart(image, m_z25, "z25"); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(z26_load) { return load_cart(image, m_z26, "z26"); }
+	required_device_array<dl1416_device, 5> m_ds;
 };
 
 

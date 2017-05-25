@@ -387,7 +387,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( redalert, redalert_state )
+static MACHINE_CONFIG_START( redalert )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MAIN_CPU_CLOCK)
@@ -401,7 +401,7 @@ static MACHINE_CONFIG_START( redalert, redalert_state )
 	MCFG_FRAGMENT_ADD(redalert_audio)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ww3, redalert_state )
+static MACHINE_CONFIG_START( ww3 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MAIN_CPU_CLOCK)
@@ -415,7 +415,7 @@ static MACHINE_CONFIG_START( ww3, redalert_state )
 	MCFG_FRAGMENT_ADD(ww3_audio)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( panther, redalert_state )
+static MACHINE_CONFIG_START( panther )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MAIN_CPU_CLOCK)
@@ -429,7 +429,7 @@ static MACHINE_CONFIG_START( panther, redalert_state )
 	MCFG_FRAGMENT_ADD(ww3_audio)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( demoneye, redalert_state )
+static MACHINE_CONFIG_START( demoneye )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MAIN_CPU_CLOCK)
@@ -538,7 +538,7 @@ ROM_END
  *
  *************************************/
 
-GAME( 1981, panther,  0,        panther,  panther, driver_device,  0, ROT270, "Irem",               "Panther",    MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, redalert, 0,        redalert, redalert, driver_device, 0, ROT270, "Irem (GDI license)", "Red Alert",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, ww3,      redalert, ww3,      redalert, driver_device, 0, ROT270, "Irem",               "WW III",     MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, demoneye, 0,        demoneye, demoneye, driver_device, 0, ROT270, "Irem",               "Demoneye-X", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, panther,  0,        panther,  panther,  redalert_state, 0, ROT270, "Irem",               "Panther",    MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, redalert, 0,        redalert, redalert, redalert_state, 0, ROT270, "Irem (GDI license)", "Red Alert",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, ww3,      redalert, ww3,      redalert, redalert_state, 0, ROT270, "Irem",               "WW III",     MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, demoneye, 0,        demoneye, demoneye, redalert_state, 0, ROT270, "Irem",               "Demoneye-X", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

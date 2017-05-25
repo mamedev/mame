@@ -8,18 +8,18 @@
 
 ***************************************************************************/
 
-#ifndef __DECO16_H__
-#define __DECO16_H__
+#ifndef MAME_CPU_M6502_DECO16_H
+#define MAME_CPU_M6502_DECO16_H
 
 #include "m6502.h"
 
 class deco16_device : public m6502_device {
 public:
-	deco16_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	deco16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	static const disasm_entry disasm_entries[0x100];
 
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 	virtual void do_exec_full() override;
 	virtual void do_exec_partial() override;
 
@@ -57,6 +57,6 @@ enum {
 	DECO16_SET_OVERFLOW = m6502_device::V_LINE
 };
 
-extern const device_type DECO16;
+DECLARE_DEVICE_TYPE(DECO16, deco16_device)
 
-#endif
+#endif // MAME_CPU_M6502_DECO16_H

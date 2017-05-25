@@ -66,13 +66,17 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "sound/speaker.h"
-#include "sound/wave.h"
 #include "includes/vtech2.h"
-#include "imagedev/cassette.h"
+
+#include "cpu/z80/z80.h"
 #include "imagedev/flopdrv.h"
+#include "sound/wave.h"
+
+#include "screen.h"
+#include "speaker.h"
+
 #include "formats/vt_cas.h"
+
 
 static ADDRESS_MAP_START(vtech2_mem, AS_PROGRAM, 8, vtech2_state )
 	ADDRESS_MAP_UNMAP_HIGH
@@ -360,7 +364,7 @@ GFXDECODE_END
 
 static const rgb_t vt_colors[] =
 {
-	rgb_t::black,
+	rgb_t::black(),
 	rgb_t(0x00, 0x00, 0x7f),  /* blue */
 	rgb_t(0x00, 0x7f, 0x00),  /* green */
 	rgb_t(0x00, 0x7f, 0x7f),  /* cyan */
@@ -375,7 +379,7 @@ static const rgb_t vt_colors[] =
 	rgb_t(0xff, 0x00, 0x00),  /* bright red */
 	rgb_t(0xff, 0x00, 0xff),  /* bright magenta */
 	rgb_t(0xff, 0xff, 0x00),  /* bright yellow */
-	rgb_t::white
+	rgb_t::white()
 };
 
 
@@ -409,7 +413,7 @@ static const floppy_interface vtech2_floppy_interface =
 	nullptr
 };
 
-static MACHINE_CONFIG_START( laser350, vtech2_state )
+static MACHINE_CONFIG_START( laser350 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 3694700)        /* 3.694700 MHz */
 	MCFG_CPU_PROGRAM_MAP(vtech2_mem)
@@ -500,7 +504,7 @@ ROM_END
 
 ***************************************************************************/
 
-/*    YEAR   NAME      PARENT    COMPAT MACHINE   INPUT     INIT      COMPANY              FULLNAME */
-COMP( 1984?, laser350, 0,        0,     laser350, laser350, vtech2_state, laser,    "Video Technology",  "Laser 350" , 0)
-COMP( 1984?, laser500, laser350, 0,     laser500, laser500, vtech2_state, laser,    "Video Technology",  "Laser 500" , 0)
-COMP( 1984?, laser700, laser350, 0,     laser700, laser500, vtech2_state, laser,    "Video Technology",  "Laser 700" , 0)
+//    YEAR   NAME      PARENT    COMPAT  MACHINE   INPUT     STATE         INIT   COMPANY             FULLNAME      FLAGS
+COMP( 1984?, laser350, 0,        0,      laser350, laser350, vtech2_state, laser, "Video Technology", "Laser 350" , 0)
+COMP( 1984?, laser500, laser350, 0,      laser500, laser500, vtech2_state, laser, "Video Technology", "Laser 500" , 0)
+COMP( 1984?, laser700, laser350, 0,      laser700, laser500, vtech2_state, laser, "Video Technology", "Laser 700" , 0)

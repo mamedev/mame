@@ -26,12 +26,12 @@ public:
 		m_palette(*this, "palette") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_radarattr;
-	UINT8 *  m_spriteram;
-	UINT8 *  m_spriteram2;
-	UINT8 *  m_radarx;
-	UINT8 *  m_radary;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_radarattr;
+	uint8_t *  m_spriteram;
+	uint8_t *  m_spriteram2;
+	uint8_t *  m_radarx;
+	uint8_t *  m_radary;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
@@ -42,7 +42,7 @@ public:
 	int      m_spriteram_base;
 	int      m_stars_enable;
 	int      m_total_stars;
-	UINT8    m_drawmode_table[4];
+	uint8_t    m_drawmode_table[4];
 	struct jungler_star m_stars[JUNGLER_MAX_STARS];
 
 	/* devices */
@@ -53,7 +53,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	UINT8    m_main_irq_mask;
+	uint8_t    m_main_irq_mask;
 	DECLARE_WRITE8_MEMBER(rallyx_interrupt_vector_w);
 	DECLARE_WRITE8_MEMBER(rallyx_bang_w);
 	DECLARE_WRITE8_MEMBER(rallyx_latch_w);
@@ -75,9 +75,9 @@ public:
 	DECLARE_PALETTE_INIT(jungler);
 	DECLARE_VIDEO_START(locomotn);
 	DECLARE_VIDEO_START(commsega);
-	UINT32 screen_update_rallyx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_jungler(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_locomotn(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_rallyx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_jungler(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_locomotn(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(rallyx_vblank_irq);
 	INTERRUPT_GEN_MEMBER(jungler_vblank_irq);
 	inline void rallyx_get_tile_info( tile_data &tileinfo, int tile_index, int ram_offs);
@@ -88,7 +88,7 @@ public:
 	void draw_stars( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void rallyx_draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void locomotn_draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void rallyx_draw_bullets( bitmap_ind16 &bitmap, const rectangle &cliprect, int transpen );
-	void jungler_draw_bullets( bitmap_ind16 &bitmap, const rectangle &cliprect, int transpen );
-	void locomotn_draw_bullets( bitmap_ind16 &bitmap, const rectangle &cliprect, int transpen );
+	void rallyx_draw_bullets( bitmap_ind16 &bitmap, const rectangle &cliprect, bool transpen );
+	void jungler_draw_bullets( bitmap_ind16 &bitmap, const rectangle &cliprect, bool transpen );
+	void locomotn_draw_bullets( bitmap_ind16 &bitmap, const rectangle &cliprect, bool transpen );
 };

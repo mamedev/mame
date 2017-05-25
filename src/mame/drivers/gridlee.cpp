@@ -80,11 +80,13 @@
 
 
 #include "emu.h"
+#include "includes/gridlee.h"
+
 #include "cpu/m6809/m6809.h"
 #include "sound/samples.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
-#include "includes/gridlee.h"
+#include "speaker.h"
 
 
 /* constants */
@@ -169,7 +171,7 @@ void gridlee_state::machine_reset()
 READ8_MEMBER(gridlee_state::analog_port_r)
 {
 	int delta, sign, magnitude;
-	UINT8 newval;
+	uint8_t newval;
 	static const char *const portnames[] = { "TRACK0_Y", "TRACK0_X", "TRACK1_Y", "TRACK1_X" };
 
 	/* first read the new trackball value and compute the signed delta */
@@ -220,11 +222,11 @@ READ8_MEMBER(gridlee_state::analog_port_r)
 
 void gridlee_state::poly17_init()
 {
-	UINT32 i, x = 0;
-	UINT8 *p, *r;
+	uint32_t i, x = 0;
+	uint8_t *p, *r;
 
 	/* allocate memory */
-	m_poly17 = std::make_unique<UINT8[]>(2 * (POLY17_SIZE + 1));
+	m_poly17 = std::make_unique<uint8_t[]>(2 * (POLY17_SIZE + 1));
 	p = m_poly17.get();
 	r = m_rand17 = m_poly17.get() + POLY17_SIZE + 1;
 
@@ -250,7 +252,7 @@ void gridlee_state::poly17_init()
 
 READ8_MEMBER(gridlee_state::random_num_r)
 {
-	UINT32 cc;
+	uint32_t cc;
 
 	/* CPU runs at 1.25MHz, noise source at 100kHz --> multiply by 12.5 */
 	cc = m_maincpu->total_cycles();
@@ -408,7 +410,7 @@ static const char *const sample_names[] =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( gridlee, gridlee_state )
+static MACHINE_CONFIG_START( gridlee )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, GRIDLEE_CPU_CLOCK)
@@ -476,4 +478,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, gridlee, 0,        gridlee, gridlee, driver_device, 0,     ROT0, "Videa", "Gridlee", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1983, gridlee, 0, gridlee, gridlee, gridlee_state, 0, ROT0, "Videa", "Gridlee", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )

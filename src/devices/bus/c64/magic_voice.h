@@ -6,15 +6,14 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_C64_MAGIC_VOICE_H
+#define MAME_BUS_C64_MAGIC_VOICE_H
+
 #pragma once
 
-#ifndef __MAGIC_VOICE__
-#define __MAGIC_VOICE__
-
-#include "emu.h"
+#include "exp.h"
 #include "machine/40105.h"
 #include "machine/6525tpi.h"
-#include "exp.h"
 #include "sound/t6721a.h"
 
 
@@ -30,7 +29,7 @@ class c64_magic_voice_cartridge_device : public device_t,
 {
 public:
 	// construction/destruction
-	c64_magic_voice_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	c64_magic_voice_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -53,8 +52,8 @@ protected:
 	virtual void device_reset() override;
 
 	// device_c64_expansion_card_interface overrides
-	virtual UINT8 c64_cd_r(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2) override;
-	virtual void c64_cd_w(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2) override;
+	virtual uint8_t c64_cd_r(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2) override;
+	virtual void c64_cd_w(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2) override;
 	virtual int c64_game_r(offs_t offset, int sphi2, int ba, int rw) override;
 
 private:
@@ -65,16 +64,15 @@ private:
 	required_device<cmos_40105_device> m_fifo;
 	required_device<c64_expansion_slot_device> m_exp;
 
-	UINT16 m_ca;
-	UINT8 m_tpi_pb;
+	uint16_t m_ca;
+	uint8_t m_tpi_pb;
 	int m_tpi_pc6;
-	UINT8 m_pd;
+	uint8_t m_pd;
 };
 
 
 // device type definition
-extern const device_type C64_MAGIC_VOICE;
+DECLARE_DEVICE_TYPE(C64_MAGIC_VOICE, c64_magic_voice_cartridge_device)
 
 
-
-#endif
+#endif // MAME_BUS_C64_MAGIC_VOICE_H

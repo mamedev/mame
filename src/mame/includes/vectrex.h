@@ -17,6 +17,8 @@
 #include "bus/vectrex/slot.h"
 #include "bus/vectrex/rom.h"
 
+#include "screen.h"
+
 #define NVECT 10000
 
 struct vectrex_point
@@ -49,10 +51,7 @@ public:
 		m_ay8912(*this, "ay8912"),
 		m_vector(*this, "vector"),
 		m_cart(*this, "cartslot"),
-		m_io_contr1x(*this, "CONTR1X"),
-		m_io_contr1y(*this, "CONTR1Y"),
-		m_io_contr2x(*this, "CONTR2X"),
-		m_io_contr2y(*this, "CONTR2Y"),
+		m_io_contr(*this, {"CONTR1X", "CONTR1Y", "CONTR2X", "CONTR2Y"}),
 		m_io_buttons(*this, "BUTTONS"),
 		m_io_3dconf(*this, "3DCONF"),
 		m_io_lpenconf(*this, "LPENCONF"),
@@ -62,9 +61,9 @@ public:
 		m_screen(*this, "screen")
 	{ }
 
-	required_shared_ptr<UINT8> m_gce_vectorram;
+	required_shared_ptr<uint8_t> m_gce_vectorram;
 	int m_imager_status;
-	UINT32 m_beam_color;
+	uint32_t m_beam_color;
 	unsigned char m_via_out[2];
 	double m_imager_freq;
 	emu_timer *m_imager_timer;
@@ -87,16 +86,16 @@ public:
 	int m_pen_y;
 	emu_timer *m_lp_t;
 	emu_timer *m_refresh;
-	UINT8 m_blank;
-	UINT8 m_ramp;
-	INT8 m_analog[5];
+	uint8_t m_blank;
+	uint8_t m_ramp;
+	int8_t m_analog[5];
 	int m_point_index;
 	int m_display_start;
 	int m_display_end;
 	vectrex_point m_points[NVECT];
-	UINT16 m_via_timer2;
+	uint16_t m_via_timer2;
 	attotime m_vector_start_time;
-	UINT8 m_cb2;
+	uint8_t m_cb2;
 	void (vectrex_state::*vector_add_point_function)(int, int, rgb_t, int);
 	DECLARE_WRITE8_MEMBER(vectrex_psg_port_w);
 	DECLARE_READ8_MEMBER(vectrex_via_r);
@@ -106,7 +105,7 @@ public:
 	virtual void video_start() override;
 	virtual void machine_start() override;
 	DECLARE_VIDEO_START(raaspec);
-	UINT32 screen_update_vectrex(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_vectrex(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(vectrex_imager_change_color);
 	TIMER_CALLBACK_MEMBER(update_level);
 	TIMER_CALLBACK_MEMBER(vectrex_imager_eye);
@@ -129,14 +128,11 @@ protected:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<via6522_device> m_via6522_0;
-	required_device<dac_device> m_dac;
+	required_device<dac_byte_interface> m_dac;
 	required_device<ay8910_device> m_ay8912;
 	required_device<vector_device> m_vector;
 	optional_device<vectrex_cart_slot_device> m_cart;
-	optional_ioport m_io_contr1x;
-	optional_ioport m_io_contr1y;
-	optional_ioport m_io_contr2x;
-	optional_ioport m_io_contr2y;
+	optional_ioport_array<4> m_io_contr;
 	required_ioport m_io_buttons;
 	required_ioport m_io_3dconf;
 	required_ioport m_io_lpenconf;

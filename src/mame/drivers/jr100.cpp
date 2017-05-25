@@ -15,12 +15,14 @@
 
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
-#include "machine/6522via.h"
 #include "imagedev/cassette.h"
-#include "sound/wave.h"
-#include "sound/speaker.h"
-#include "sound/beep.h"
 #include "imagedev/snapquik.h"
+#include "machine/6522via.h"
+#include "sound/beep.h"
+#include "sound/spkrdev.h"
+#include "sound/wave.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class jr100_state : public driver_device
@@ -47,25 +49,25 @@ public:
 		m_line8(*this, "LINE8") ,
 		m_maincpu(*this, "maincpu") { }
 
-	required_shared_ptr<UINT8> m_ram;
-	required_shared_ptr<UINT8> m_pcg;
-	required_shared_ptr<UINT8> m_vram;
-	UINT8 m_keyboard_line;
+	required_shared_ptr<uint8_t> m_ram;
+	required_shared_ptr<uint8_t> m_pcg;
+	required_shared_ptr<uint8_t> m_vram;
+	uint8_t m_keyboard_line;
 	bool m_use_pcg;
-	UINT8 m_speaker_data;
-	UINT16 m_t1latch;
-	UINT8 m_beep_en;
+	uint8_t m_speaker_data;
+	uint16_t m_t1latch;
+	uint8_t m_beep_en;
 	DECLARE_WRITE8_MEMBER(jr100_via_w);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_jr100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_jr100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(sound_tick);
 	DECLARE_READ8_MEMBER(jr100_via_read_b);
 	DECLARE_WRITE8_MEMBER(jr100_via_write_a);
 	DECLARE_WRITE8_MEMBER(jr100_via_write_b);
 	DECLARE_WRITE_LINE_MEMBER(jr100_via_write_cb2);
-	UINT32 readByLittleEndian(UINT8 *buf,int pos);
+	uint32_t readByLittleEndian(uint8_t *buf,int pos);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(jr100);
 
 
@@ -213,19 +215,19 @@ void jr100_state::video_start()
 {
 }
 
-UINT32 jr100_state::screen_update_jr100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t jr100_state::screen_update_jr100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x,y,xi,yi;
 
-	UINT8 *rom_pcg = m_region_maincpu->base() + 0xe000;
+	uint8_t *rom_pcg = m_region_maincpu->base() + 0xe000;
 	for (y = 0; y < 24; y++)
 	{
 		for (x = 0; x < 32; x++)
 		{
-			UINT8 tile = m_vram[x + y*32];
-			UINT8 attr = tile >> 7;
+			uint8_t tile = m_vram[x + y*32];
+			uint8_t attr = tile >> 7;
 			// ATTR is inverted for normal char or use PCG in case of CMODE1
-			UINT8 *gfx_data = rom_pcg;
+			uint8_t *gfx_data = rom_pcg;
 			if (m_use_pcg && attr) {
 				gfx_data = m_pcg;
 				attr = 0; // clear attr so bellow code stay same
@@ -235,7 +237,7 @@ UINT32 jr100_state::screen_update_jr100(screen_device &screen, bitmap_ind16 &bit
 			{
 				for(xi=0;xi<8;xi++)
 				{
-					UINT8 pen = (gfx_data[(tile*8)+yi]>>(7-xi) & 1);
+					uint8_t pen = (gfx_data[(tile*8)+yi]>>(7-xi) & 1);
 					bitmap.pix16(y*8+yi, x*8+xi) = attr ^ pen;
 				}
 			}
@@ -262,7 +264,7 @@ GFXDECODE_END
 
 READ8_MEMBER(jr100_state::jr100_via_read_b)
 {
-	UINT8 val = 0x1f;
+	uint8_t val = 0x1f;
 	switch ( m_keyboard_line )
 	{
 		case 0: val = m_line0->read(); break;
@@ -285,7 +287,7 @@ WRITE8_MEMBER(jr100_state::jr100_via_write_a)
 
 WRITE8_MEMBER(jr100_state::jr100_via_write_b)
 {
-	m_use_pcg = (data & 0x20) ? TRUE : FALSE;
+	m_use_pcg = (data & 0x20) ? true : false;
 	m_speaker_data = data>>7;
 }
 
@@ -309,7 +311,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(jr100_state::sound_tick)
 	}
 }
 
-UINT32 jr100_state::readByLittleEndian(UINT8 *buf,int pos)
+uint32_t jr100_state::readByLittleEndian(uint8_t *buf,int pos)
 {
 	return buf[pos] + (buf[pos+1] << 8) + (buf[pos+2] << 16) + (buf[pos+3] << 24);
 }
@@ -317,32 +319,32 @@ UINT32 jr100_state::readByLittleEndian(UINT8 *buf,int pos)
 QUICKLOAD_LOAD_MEMBER( jr100_state,jr100)
 {
 	int quick_length;
-	UINT8 buf[0x10000];
+	uint8_t buf[0x10000];
 	int read_;
 	quick_length = image.length();
 	if (quick_length >= 0xffff)
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	read_ = image.fread(buf, quick_length);
 	if (read_ != quick_length)
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 
 	if (buf[0]!=0x50 || buf[1]!=0x52 || buf[2]!=0x4F || buf[3]!=0x47) {
 		// this is not PRG
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 	int pos = 4;
 	if (readByLittleEndian(buf,pos)!=1) {
 		// not version 1 of PRG file
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 	pos += 4;
-	UINT32 len =readByLittleEndian(buf,pos); pos+= 4;
+	uint32_t len =readByLittleEndian(buf,pos); pos+= 4;
 	pos += len; // skip name
-	UINT32 start_address = readByLittleEndian(buf,pos); pos+= 4;
-	UINT32 code_length   = readByLittleEndian(buf,pos); pos+= 4;
-	UINT32 flag          = readByLittleEndian(buf,pos); pos+= 4;
+	uint32_t start_address = readByLittleEndian(buf,pos); pos+= 4;
+	uint32_t code_length   = readByLittleEndian(buf,pos); pos+= 4;
+	uint32_t flag          = readByLittleEndian(buf,pos); pos+= 4;
 
-	UINT32 end_address = start_address + code_length - 1;
+	uint32_t end_address = start_address + code_length - 1;
 	// copy code
 	memcpy(m_ram + start_address,buf + pos,code_length);
 	if (flag == 0) {
@@ -359,10 +361,10 @@ QUICKLOAD_LOAD_MEMBER( jr100_state,jr100)
 		m_ram[13] = ((end_address + 3) & 0xFF);
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
-static MACHINE_CONFIG_START( jr100, jr100_state )
+static MACHINE_CONFIG_START( jr100 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M6802, XTAL_14_31818MHz / 4) // clock devided internaly by 4
@@ -418,6 +420,6 @@ ROM_END
 
 /* Driver */
 
-/*   YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT  INIT        COMPANY   FULLNAME       FLAGS */
-COMP( 1981, jr100,  0,        0,    jr100,  jr100, driver_device,    0,       "National",   "JR-100",       0)
-COMP( 1981, jr100u, jr100,    0,    jr100,  jr100, driver_device,    0,       "Panasonic",   "JR-100U",     0)
+//    YEAR  NAME    PARENT    COMPAT  MACHINE  INPUT  STATE        INIT   COMPANY      FULLNAME   FLAGS
+COMP( 1981, jr100,  0,        0,      jr100,   jr100, jr100_state, 0,     "National",  "JR-100",  0 )
+COMP( 1981, jr100u, jr100,    0,      jr100,   jr100, jr100_state, 0,     "Panasonic", "JR-100U", 0 )

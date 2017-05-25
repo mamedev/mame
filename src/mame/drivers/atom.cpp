@@ -75,12 +75,12 @@ Hardware:   PPIA 8255
     The identity number of each station is set up in hardware by links to IC 8. IC 8 is an octal buffer which when enabled feeds the cards station ID to the computer bus.
     Each link codes a bit in an eight bit binary number allowing any station ID in the range 0 to 255 to be set up. if a link is left open then the bit is a one, when a
     link is made the bit is a zero. Hence all links open corresponds to station ID 255, and all links made to station ID 0. Each station must have a unique identity and
-    some indentities are associated with specific functions on the network. Station ID zero is reserved for broadcast signals and should not be used. Station ID 255 is
-    reserved at present for the file server, and 235 for the printer server. Wire links must be soldered to each network station card during installation, a sugested
+    some identities are associated with specific functions on the network. Station ID zero is reserved for broadcast signals and should not be used. Station ID 255 is
+    reserved at present for the file server, and 235 for the printer server. Wire links must be soldered to each network station card during installation, a suggested
     scheme for number allocation is to number normal user stations from one upwards and to number special stations and servers from 255 downwards.
 
     2011 June 04  - Phill Harvey-Smith
-        Fixed "ERROR" repeating infinite loop, caused by random values in machine_start() being poked into the wrong memory reigion causing the basic ROM to become
+        Fixed "ERROR" repeating infinite loop, caused by random values in machine_start() being poked into the wrong memory region causing the basic ROM to become
         corrupted. Values are now correctly placed in bytes 0x0008 - 0x000B of RAM.
 
 
@@ -90,10 +90,9 @@ Hardware:   PPIA 8255
 
     TODO:
 
-    - connect to softwarelist
     - e000 EPROM switching
     - display should be monochrome -- Should be optional, Acorn produced a Colour Card, and there is
-        at least one aftermarket Colour card.
+        at least one after market Colour card.
     - ram expansion
     - tap files
     - mouse
@@ -113,9 +112,12 @@ Hardware:   PPIA 8255
 
 */
 
+#include "emu.h"
 #include "includes/atom.h"
 #include "formats/imageutl.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 /***************************************************************************
     PARAMETERS
@@ -147,14 +149,14 @@ QUICKLOAD_LOAD_MEMBER( atom_state, atom_atm )
 
 	*/
 
-	UINT8 header[0x16] = { 0 };
+	uint8_t header[0x16] = { 0 };
 	void *ptr;
 
 	image.fread(header, 0x16);
 
-	UINT16 start_address = pick_integer_le(header, 0x10, 2);
-	UINT16 run_address = pick_integer_le(header, 0x12, 2);
-	UINT16 size = pick_integer_le(header, 0x14, 2);
+	uint16_t start_address = pick_integer_le(header, 0x10, 2);
+	uint16_t run_address = pick_integer_le(header, 0x12, 2);
+	uint16_t size = pick_integer_le(header, 0x14, 2);
 
 	if (LOG)
 	{
@@ -170,7 +172,7 @@ QUICKLOAD_LOAD_MEMBER( atom_state, atom_atm )
 
 	m_maincpu->set_pc(run_address);
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 /***************************************************************************
@@ -287,17 +289,16 @@ static ADDRESS_MAP_START( atombb_mem, AS_PROGRAM, 8, atom_state )
 ADDRESS_MAP_END
 
 /*-------------------------------------------------
-    ADDRESS_MAP( prophet2_mem )
+    ADDRESS_MAP( prophet_mem )
 -------------------------------------------------*/
 
-//static ADDRESS_MAP_START( prophet2_mem, AS_PROGRAM, 8, atom_state )
+//static ADDRESS_MAP_START( prophet_mem, AS_PROGRAM, 8, atom_state )
 //  AM_RANGE(0x0000, 0x09ff) AM_RAM
 //  AM_RANGE(0x0a00, 0x7fff) AM_RAM
 //  AM_RANGE(0x8000, 0x97ff) AM_RAM AM_SHARE("video_ram")
 //  AM_RANGE(0x9800, 0x9fff) AM_RAM
+//  AM_RANGE(0xa000, 0xafff) AM_ROM AM_REGION("ic24", 0)
 //  AM_RANGE(0xb000, 0xb003) AM_MIRROR(0x3fc) AM_DEVREADWRITE(INS8255_TAG, i8255_device, read, write)
-////  AM_RANGE(0xb400, 0xb403) AM_DEVREADWRITE(MC6854_TAG, mc6854_device, read, write)
-////  AM_RANGE(0xb404, 0xb404) AM_READ_PORT("ECONET")
 //  AM_RANGE(0xb800, 0xb80f) AM_MIRROR(0x3f0) AM_DEVREADWRITE(R6522_TAG, via6522_device, read, write)
 //  AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION(SY6502_TAG, 0)
 //ADDRESS_MAP_END
@@ -492,7 +493,7 @@ READ8_MEMBER( atom_state::ppi_pb_r )
 
 	*/
 
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	switch (m_keylatch)
 	{
@@ -530,7 +531,7 @@ READ8_MEMBER( atom_state::ppi_pc_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	/* 2400 Hz input */
 	data |= m_hz2400 << 4;
@@ -603,7 +604,7 @@ WRITE_LINE_MEMBER( atom_state::atom_8271_interrupt_callback )
 WRITE_LINE_MEMBER( atom_state::motor_w )
 {
 	for (int i=0; i != 2; i++) {
-		char devname[1];
+		char devname[8];
 		sprintf(devname, "%d", i);
 		floppy_connector *con = m_fdc->subdevice<floppy_connector>(devname);
 		if (con) {
@@ -651,7 +652,7 @@ void atom_state::machine_start()
 	generator. I don't know if this is hardware, or random data because the
 	ram chips are not cleared at start-up. So at this time, these numbers
 	are poked into the memory to simulate it. When I have more details I will fix it */
-	UINT8 *m_baseram = (UINT8 *)m_maincpu->space(AS_PROGRAM).get_write_ptr(0x0000);
+	uint8_t *m_baseram = (uint8_t *)m_maincpu->space(AS_PROGRAM).get_write_ptr(0x0000);
 
 	m_baseram[0x08] = machine().rand() & 0x0ff;
 	m_baseram[0x09] = machine().rand() & 0x0ff;
@@ -675,20 +676,20 @@ void atomeb_state::machine_start()
     MACHINE DRIVERS
 ***************************************************************************/
 
-int atom_state::load_cart(device_image_interface &image, generic_slot_device *slot)
+image_init_result atom_state::load_cart(device_image_interface &image, generic_slot_device *slot)
 {
-	UINT32 size = slot->common_get_size("rom");
+	uint32_t size = slot->common_get_size("rom");
 
 	if (size > 0x1000)
 	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
-		return IMAGE_INIT_FAIL;
+		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported ROM size");
+		return image_init_result::FAIL;
 	}
 
 	slot->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	slot->common_load_rom(slot->get_rom_base(), size, "rom");
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 static SLOT_INTERFACE_START(atom_floppies)
@@ -703,7 +704,7 @@ FLOPPY_FORMATS_END0
     MACHINE_DRIVER( atom )
 -------------------------------------------------*/
 
-static MACHINE_CONFIG_START( atom, atom_state )
+static MACHINE_CONFIG_START( atom )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(SY6502_TAG, M6502, X2/4)
 	MCFG_CPU_PROGRAM_MAP(atom_mem)
@@ -725,7 +726,7 @@ static MACHINE_CONFIG_START( atom, atom_state )
 	MCFG_DEVICE_ADD(R6522_TAG, VIA6522, X2/4)
 	MCFG_VIA6522_WRITEPA_HANDLER(DEVWRITE8("cent_data_out", output_latch_device, write))
 	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE(CENTRONICS_TAG, centronics_device, write_strobe))
-	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE(SY6502_TAG, m6502_device, irq_line))
+	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE(SY6502_TAG, M6502_IRQ_LINE))
 
 	MCFG_DEVICE_ADD(INS8255_TAG, I8255, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(atom_state, ppi_pa_w))
@@ -754,7 +755,7 @@ static MACHINE_CONFIG_START( atom, atom_state )
 
 	MCFG_QUICKLOAD_ADD("quickload", atom_state, atom_atm, "atm", 0)
 
-	/* cartridge */
+	/* utility rom slot */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_linear_slot, "atom_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 	MCFG_GENERIC_LOAD(atom_state, cart_load)
@@ -780,7 +781,7 @@ MACHINE_CONFIG_END
 	MCFG_GENERIC_EXTENSIONS("bin,rom") \
 	MCFG_GENERIC_LOAD(atomeb_state, _load)
 
-static MACHINE_CONFIG_DERIVED_CLASS( atomeb, atom, atomeb_state )
+static MACHINE_CONFIG_DERIVED( atomeb, atom )
 	MCFG_CPU_MODIFY(SY6502_TAG)
 	MCFG_CPU_PROGRAM_MAP(atomeb_mem)
 
@@ -812,7 +813,7 @@ MACHINE_CONFIG_END
     MACHINE_DRIVER( atombb )
 -------------------------------------------------*/
 
-static MACHINE_CONFIG_START( atombb, atom_state )
+static MACHINE_CONFIG_START( atombb )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(SY6502_TAG, M6502, X2/4)
 	MCFG_CPU_PROGRAM_MAP(atombb_mem)
@@ -834,7 +835,7 @@ static MACHINE_CONFIG_START( atombb, atom_state )
 	MCFG_DEVICE_ADD(R6522_TAG, VIA6522, X2/4)
 	MCFG_VIA6522_WRITEPA_HANDLER(DEVWRITE8("cent_data_out", output_latch_device, write))
 	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE(CENTRONICS_TAG, centronics_device, write_strobe))
-	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE(SY6502_TAG, m6502_device, irq_line))
+	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE(SY6502_TAG, M6502_IRQ_LINE))
 
 	MCFG_DEVICE_ADD(INS8255_TAG, I8255, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(atom_state, ppi_pa_w))
@@ -867,14 +868,19 @@ MACHINE_CONFIG_END
 //static MACHINE_CONFIG_DERIVED( prophet2, atom )
 //  /* basic machine hardware */
 //  MCFG_CPU_MODIFY(SY6502_TAG)
-//  MCFG_CPU_PROGRAM_MAP(prophet2_mem)
+//  MCFG_CPU_PROGRAM_MAP(prophet_mem)
 //
 //  /* fdc */
 //  MCFG_DEVICE_REMOVE(I8271_TAG)
 //  MCFG_DEVICE_REMOVE(I8271_TAG ":0")
 //  MCFG_DEVICE_REMOVE(I8271_TAG ":1")
 //
+//  /* internal ram */
+//  MCFG_RAM_MODIFY(RAM_TAG)
+//  MCFG_RAM_DEFAULT_SIZE("32K")
+
 //  /* Software lists */
+//  MCFG_SOFTWARE_LIST_REMOVE("rom_list")
 //  MCFG_SOFTWARE_LIST_REMOVE("flop_list")
 //MACHINE_CONFIG_END
 
@@ -883,7 +889,16 @@ MACHINE_CONFIG_END
 -------------------------------------------------*/
 
 //static MACHINE_CONFIG_DERIVED( prophet3, atom )
+//  /* basic machine hardware */
+//  MCFG_CPU_MODIFY(SY6502_TAG)
+//  MCFG_CPU_PROGRAM_MAP(prophet_mem)
 //
+//  /* internal ram */
+//  MCFG_RAM_MODIFY(RAM_TAG)
+//  MCFG_RAM_DEFAULT_SIZE("32K")
+
+//  /* Software lists */
+//  MCFG_SOFTWARE_LIST_REMOVE("rom_list")
 //MACHINE_CONFIG_END
 
 /*-------------------------------------------------
@@ -967,10 +982,10 @@ DRIVER_INIT_MEMBER(atomeb_state, atomeb)
     SYSTEM DRIVERS
 ***************************************************************************/
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT CLASS         INIT           COMPANY          FULLNAME                FLAGS */
-COMP( 1979, atom,     0,        0,      atom,     atom, driver_device,     0,        "Acorn",         "Atom"                , 0)
-COMP( 1979, atomeb,   atom,     0,      atomeb,   atom, atomeb_state, atomeb,        "Acorn",         "Atom with Eprom Box" , 0)
-COMP( 1982, atombb,   atom,     0,      atombb,   atom, driver_device,     0,        "Acorn",         "Atom with BBC Basic" , 0)
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT CLASS         INIT      COMPANY          FULLNAME                FLAGS */
+COMP( 1979, atom,     0,        0,      atom,     atom, atom_state,   0,        "Acorn",         "Atom"                , 0)
+COMP( 1979, atomeb,   atom,     0,      atomeb,   atom, atomeb_state, atomeb,   "Acorn",         "Atom with Eprom Box" , 0)
+COMP( 1982, atombb,   atom,     0,      atombb,   atom, atom_state,   0,        "Acorn",         "Atom with BBC Basic" , 0)
 //COMP( 1983, prophet2, atom,     0,      prophet2, atom, driver_device,     0,        "Busicomputers", "Prophet 2"           , 0)
 //COMP( 1983, prophet3, atom,     0,      prophet3, atom, driver_device,     0,        "Busicomputers", "Prophet 3"           , 0)
 //COMP( 2011, atommc,   atom,     0,      atommc,   atom, driver_device,     0,        "Acorn",         "Atom with AtoMMC2"   , 0)

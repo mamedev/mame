@@ -22,7 +22,10 @@ TODO:
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/i8155.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 class horse_state : public driver_device
 {
@@ -31,17 +34,17 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_speaker(*this, "speaker"),
-		m_inp_matrix(*this, "IN"),
+		m_inp_matrix(*this, "IN.%u", 0),
 		m_vram(*this, "vram")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_ioport_array<4> m_inp_matrix;
-	required_shared_ptr<UINT8> m_vram;
+	required_shared_ptr<uint8_t> m_vram;
 
-	std::unique_ptr<UINT8[]> m_colorram;
-	UINT8 m_output;
+	std::unique_ptr<uint8_t[]> m_colorram;
+	uint8_t m_output;
 
 	DECLARE_READ8_MEMBER(colorram_r) { return m_colorram[(offset >> 2 & 0x1e0) | (offset & 0x1f)] | 0x0f; }
 	DECLARE_WRITE8_MEMBER(colorram_w) { m_colorram[(offset >> 2 & 0x1e0) | (offset & 0x1f)] = data & 0xf0; }
@@ -49,13 +52,13 @@ public:
 	DECLARE_WRITE8_MEMBER(output_w);
 
 	virtual void machine_start() override;
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(interrupt);
 };
 
 void horse_state::machine_start()
 {
-	m_colorram = std::make_unique<UINT8 []>(0x200);
+	m_colorram = std::make_unique<uint8_t []>(0x200);
 	save_pointer(NAME(m_colorram.get()), 0x200);
 	save_item(NAME(m_output));
 }
@@ -68,14 +71,14 @@ void horse_state::machine_start()
 
 ***************************************************************************/
 
-UINT32 horse_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t horse_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		for (int x = 0; x < 32; x++)
 		{
-			UINT8 data = m_vram[y << 5 | x];
-			UINT8 color = m_colorram[(y << 1 & 0x1e0) | x] >> 4;
+			uint8_t data = m_vram[y << 5 | x];
+			uint8_t color = m_colorram[(y << 1 & 0x1e0) | x] >> 4;
 
 			for (int i = 0; i < 8; i++)
 				bitmap.pix16(y, x << 3 | i) = (data >> i & 1) ? color : 0;
@@ -188,7 +191,7 @@ INTERRUPT_GEN_MEMBER(horse_state::interrupt)
 	device.execute().set_input_line(I8085_RST75_LINE, CLEAR_LINE);
 }
 
-static MACHINE_CONFIG_START( horse, horse_state )
+static MACHINE_CONFIG_START( horse )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8085A, XTAL_12MHz / 2)
@@ -237,4 +240,4 @@ ROM_START( unkhorse )
 ROM_END
 
 
-GAME( 1981?, unkhorse, 0, horse, horse, driver_device, 0, ROT270, "<unknown>", "unknown Japanese horse gambling game", MACHINE_SUPPORTS_SAVE ) // copyright not shown, datecodes on pcb suggests early-1981
+GAME( 1981?, unkhorse, 0, horse, horse, horse_state, 0, ROT270, "<unknown>", "unknown Japanese horse gambling game", MACHINE_SUPPORTS_SAVE ) // copyright not shown, datecodes on pcb suggests early-1981
