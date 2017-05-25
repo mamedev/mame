@@ -15,7 +15,11 @@
 #ifndef __DRAWSDL1__
 #define __DRAWSDL1__
 
+#if defined(SDL2_BOUNDLED)
+#include <SDL.h>
+#else
 #include <SDL2/SDL.h>
+#endif
 
 /* renderer_sdl2 is the information about SDL for the current screen */
 class renderer_sdl1 : public osd_renderer

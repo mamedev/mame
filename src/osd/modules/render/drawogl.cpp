@@ -24,7 +24,11 @@
 #ifndef OSD_WINDOWS
 // standard SDL headers
 #define TOBEMIGRATED 1
+#if defined(SDL2_BOUNDLED)
+#include <SDL.h>
+#else
 #include <SDL2/SDL.h>
+#endif
 #endif
 
 #include "modules/lib/osdlib.h"

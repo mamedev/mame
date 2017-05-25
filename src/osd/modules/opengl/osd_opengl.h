@@ -33,14 +33,22 @@
 			#endif
 		#endif
 	#else
+	#if defined(SDL2_BOUNDLED)
+	#include <SDL_version.h>
+	#else
 	#include <SDL2/SDL_version.h>
+	#endif
 
 	#if (SDL_VERSION_ATLEAST(1,2,10))
 	#if defined(SDLMAME_WIN32)
 		// Avoid that winnt.h (included via sdl_opengl.h, windows.h, windef.h includes intrin.h
 		#define __INTRIN_H_
 	#endif
+	#if defined(SDL2_BOUNDLED)
+	#include <SDL_opengl.h>
+	#else
 	#include <SDL2/SDL_opengl.h>
+	#endif
 	#endif
 	#endif
 

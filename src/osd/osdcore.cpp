@@ -6,7 +6,7 @@
 #include <chrono>
 
 #if defined(SDLMAME_ANDROID)
-#include <SDL2/SDL.h>
+#include <SDL.h>
 #endif
 static const int MAXSTACK = 10;
 static osd_output *m_stack[MAXSTACK];

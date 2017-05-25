@@ -15,11 +15,12 @@
 #include "fileio.h"
 #include "unicode.h"
 
-#ifdef SDLMAME_EMSCRIPTEN
-#include <SDL_ttf.h>
+#if defined(SDLMAME_EMSCRIPTEN) || defined(SDL2_BOUNDLED)
+#include <SDL_ttf>
 #else
 #include <SDL2/SDL_ttf.h>
 #endif
+
 #if !defined(SDLMAME_HAIKU) && !defined(SDLMAME_EMSCRIPTEN)
 #include <fontconfig/fontconfig.h>
 #endif

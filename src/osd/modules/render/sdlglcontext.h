@@ -13,7 +13,12 @@
 #ifndef __SDL_GL_CONTEXT__
 #define __SDL_GL_CONTEXT__
 
+#if defined(SDL2_BOUNDLED)
+#include <SDL.h>
+#else
 #include <SDL2/SDL.h>
+#endif
+
 #include "modules/opengl/osd_opengl.h"
 
 class sdl_gl_context : public osd_gl_context

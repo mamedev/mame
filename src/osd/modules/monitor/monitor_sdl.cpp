@@ -12,7 +12,11 @@
 #if defined(OSD_SDL)
 
 #include <algorithm>
+#if defined(SDL2_BOUNDLED)
+#include <SDL.h>
+#else
 #include <SDL2/SDL.h>
+#endif
 
 #include "modules/osdwindow.h"
 #include "monitor_common.h"

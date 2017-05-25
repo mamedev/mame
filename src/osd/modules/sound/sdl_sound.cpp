@@ -14,7 +14,11 @@
 #if (defined(OSD_SDL) || defined(USE_SDL_SOUND))
 
 // standard sdl header
+#if defined(SDL2_BOUNDLED)
+#include <SDL.h>
+#else
 #include <SDL2/SDL.h>
+#endif
 
 // MAME headers
 #include "emu.h"

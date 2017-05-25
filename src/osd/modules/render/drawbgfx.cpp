@@ -11,9 +11,10 @@
 #if defined(SDLMAME_WIN32) || defined(OSD_WINDOWS) || defined(OSD_UWP)
 // standard windows headers
 #include <windows.h>
-#if defined(SDLMAME_WIN32)
-#include <SDL2/SDL_syswm.h>
 #endif
+
+#if defined(SDL2_BOUNDLED)
+#include <SDL_syswm.h>
 #else
 #include <SDL2/SDL_syswm.h>
 #endif
