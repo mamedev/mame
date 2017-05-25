@@ -304,14 +304,14 @@ static MACHINE_CONFIG_START( dcon )
 	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym3812_device, write))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sdgndmps )
+static MACHINE_CONFIG_START( sdgndmps ) /* PCB number is PB91008 */
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 10000000)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz/2)
 	MCFG_CPU_PROGRAM_MAP(dcon_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dcon_state,  irq4_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 14318180/4)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_14_31818MHz/4)
 	MCFG_CPU_PROGRAM_MAP(seibu_sound_map)
 
 	/* video hardware */
@@ -334,12 +334,12 @@ static MACHINE_CONFIG_START( sdgndmps )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_YM2151_ADD("ymsnd", 14318180/4)
+	MCFG_YM2151_ADD("ymsnd", XTAL_14_31818MHz/4)
 	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 
-	MCFG_OKIM6295_ADD("oki", 1320000, PIN7_LOW)
+	MCFG_OKIM6295_ADD("oki", XTAL_20MHz/16, PIN7_LOW) /* 1.25Mhz? unverified clock & divisor (was 1320000) */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
