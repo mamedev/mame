@@ -71,15 +71,16 @@ uint32_t accomm_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 	uint8_t pixels;
 	static const uint32_t palette[2] = { 0, 0xffffff };
 	uint8_t *vram = (uint8_t *)m_vram.target();
+	uint32_t ula_addr = 0;
 
 	vram += 0x3000;
 
 	for (y = 0; y < 256; y++)
 	{
 		scanline = &bitmap.pix32(y);
-		for (x = 0; x < 640/8; x++)
+		for (x = 0; x < 80; x++)
 		{
-			pixels = vram[(y * (640/8)) + x];
+			pixels = vram[ula_addr + (x << 3)];
 
 			*scanline++ = palette[(pixels>>7)&1];
 			*scanline++ = palette[(pixels>>6)&1];
@@ -89,6 +90,12 @@ uint32_t accomm_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 			*scanline++ = palette[(pixels>>2)&1];
 			*scanline++ = palette[(pixels>>1)&1];
 			*scanline++ = palette[(pixels&1)];
+		}
+		ula_addr++;
+		
+		if ((y & 7) == 7)
+		{
+			ula_addr += 0x278;
 		}
 	}
 
