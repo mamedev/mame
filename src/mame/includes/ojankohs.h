@@ -38,7 +38,7 @@ public:
 	int       m_screen_refresh;
 
 	/* misc */
-	int       m_portselect;
+	uint8_t   m_port_select;
 	int       m_adpcm_reset;
 	int       m_adpcm_data;
 	int       m_vclk_left;
@@ -54,9 +54,11 @@ public:
 	DECLARE_WRITE8_MEMBER(ojankoy_rombank_w);
 	DECLARE_WRITE8_MEMBER(ojankohs_msm5205_w);
 	DECLARE_WRITE8_MEMBER(ojankoc_ctrl_w);
-	DECLARE_WRITE8_MEMBER(ojankohs_portselect_w);
-	DECLARE_READ8_MEMBER(ojankohs_keymatrix_r);
-	DECLARE_READ8_MEMBER(ojankoc_keymatrix_r);
+	DECLARE_WRITE8_MEMBER(port_select_w);
+	DECLARE_READ8_MEMBER(keymatrix_p1_r);
+	DECLARE_READ8_MEMBER(keymatrix_p2_r);
+	DECLARE_READ8_MEMBER(ojankoc_keymatrix_p1_r);
+	DECLARE_READ8_MEMBER(ojankoc_keymatrix_p2_r);
 	DECLARE_READ8_MEMBER(ccasino_dipsw3_r);
 	DECLARE_READ8_MEMBER(ccasino_dipsw4_r);
 	DECLARE_WRITE8_MEMBER(ojankoy_coinctr_w);
@@ -70,8 +72,8 @@ public:
 	DECLARE_WRITE8_MEMBER(ojankohs_flipscreen_w);
 	DECLARE_WRITE8_MEMBER(ojankoc_videoram_w);
 	DECLARE_WRITE8_MEMBER(ojankohs_adpcm_reset_w);
-	DECLARE_READ8_MEMBER(ojankohs_ay8910_0_r);
-	DECLARE_READ8_MEMBER(ojankohs_ay8910_1_r);
+	DECLARE_READ8_MEMBER(ojankohs_dipsw1_r);
+	DECLARE_READ8_MEMBER(ojankohs_dipsw2_r);
 	TILE_GET_INFO_MEMBER(ojankohs_get_tile_info);
 	TILE_GET_INFO_MEMBER(ojankoy_get_tile_info);
 	virtual void machine_reset() override;
