@@ -291,6 +291,9 @@ ac1                             // 1984 Amateurcomputer AC1
 ac1_32                          // 1984 Amateurcomputer AC1 (32 lines)
 ac1scch                         // 1984 Amateurcomputer AC1 SCCH
 
+@source:accomm.cpp
+accomm							// 1986 Acorn Computer
+
 @source:aceex.cpp
 aceex2814
 
