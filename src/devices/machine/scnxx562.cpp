@@ -84,7 +84,7 @@ DONE (x) (p=partly)         NMOS         CMOS
 //  MACROS / CONSTANTS
 //**************************************************************************
 /* Useful temporary debug printout format */
-// printf("TAG %lld %s%s Data:%d\n", machine().firstcpu->total_cycles(), __PRETTY_FUNCTION__, m_owner->tag(), data);
+// printf("TAG %lld %s%s Data:%d\n", machine().firstcpu->total_cycles(), __PRETTY_FUNCTION__, owner()->tag(), data);
 
 #define LOG_GENERAL (1U << 0)
 #define LOG_R       (1U << 1)
@@ -950,7 +950,7 @@ void duscc_channel::tra_callback()
 	{
 		int db = transmit_register_get_data_bit();
 
-		LOGR(LLFORMAT " %s() \"%s \"Channel %c transmit data bit %d\n", machine().firstcpu->total_cycles(), FUNCNAME, m_owner->tag(), 'A' + m_index, db);
+		LOGR(LLFORMAT " %s() \"%s \"Channel %c transmit data bit %d\n", machine().firstcpu->total_cycles(), FUNCNAME, owner()->tag(), 'A' + m_index, db);
 
 		// transmit data
 		if (m_index == duscc_device::CHANNEL_A)
@@ -960,7 +960,7 @@ void duscc_channel::tra_callback()
 	}
 	else
 	{
-		LOG(LLFORMAT " %s() \"%s \"Channel %c Failed to transmit \n", machine().firstcpu->total_cycles(), FUNCNAME, m_owner->tag(), 'A' + m_index);
+		LOG(LLFORMAT " %s() \"%s \"Channel %c Failed to transmit \n", machine().firstcpu->total_cycles(), FUNCNAME, owner()->tag(), 'A' + m_index);
 		logerror("%s Channel %c Failed to transmit\n", FUNCNAME, 'A' + m_index);
 	}
 }
@@ -1000,7 +1000,7 @@ void duscc_channel::rcv_callback()
 {
 	if (m_rcv == 1)
 	{
-		LOG(LLFORMAT " %s() \"%s \"Channel %c received data bit %d\n", machine().firstcpu->total_cycles(), FUNCNAME, m_owner->tag(), 'A' + m_index, m_rxd);
+		LOG(LLFORMAT " %s() \"%s \"Channel %c received data bit %d\n", machine().firstcpu->total_cycles(), FUNCNAME, owner()->tag(), 'A' + m_index, m_rxd);
 		receive_register_update_bit(m_rxd);
 	}
 }
@@ -1016,7 +1016,7 @@ void duscc_channel::rcv_complete()
 
 	receive_register_extract();
 	data = get_received_char();
-	LOGINT(LLFORMAT " %s() \"%s \"Channel %c Received Data %c\n", machine().firstcpu->total_cycles(), FUNCNAME, m_owner->tag(), 'A' + m_index, data);
+	LOGINT(LLFORMAT " %s() \"%s \"Channel %c Received Data %c\n", machine().firstcpu->total_cycles(), FUNCNAME, owner()->tag(), 'A' + m_index, data);
 	receive_data(data);
 }
 
@@ -1050,7 +1050,7 @@ int duscc_channel::get_tx_clock_mode()
 
 void duscc_channel::set_rts(int state)
 {
-	LOG("%s(%d) \"%s\": %c \n", FUNCNAME, state, m_owner->tag(), 'A' + m_index);
+	LOG("%s(%d) \"%s\": %c \n", FUNCNAME, state, owner()->tag(), 'A' + m_index);
 	if (m_index == duscc_device::CHANNEL_A)
 		m_uart->m_out_rtsa_cb(state);
 	else
@@ -2216,7 +2216,7 @@ uint8_t duscc_channel::read(offs_t &offset)
 {
 	uint8_t data = 0;
 	int reg = (offset | m_a7) & ~0x20; // Add extended rgisters and remove the channel B bit from offset
-	LOG("\"%s\" %s: %c : Register read '%02x' <- [%02x]", m_owner->tag(), FUNCNAME, 'A' + m_index, data, reg );
+	LOG("\"%s\" %s: %c : Register read '%02x' <- [%02x]", owner()->tag(), FUNCNAME, 'A' + m_index, data, reg );
 	LOGR(" *  %c Reg %02x -> %02x  \n", 'A' + m_index, reg, data);
 	switch (reg)
 	{
@@ -2254,7 +2254,7 @@ uint8_t duscc_channel::read(offs_t &offset)
 		logerror("%s: %c : Unsupported RRx register:%02x\n", FUNCNAME, 'A' + m_index, reg);
 	}
 
-	LOGR("%s \"%s\": %c : Register R%d read '%02x'\n", FUNCNAME, m_owner->tag(), 'A' + m_index, reg, data);
+	LOGR("%s \"%s\": %c : Register R%d read '%02x'\n", FUNCNAME, owner()->tag(), 'A' + m_index, reg, data);
 	return data;
 }
 
@@ -2266,8 +2266,8 @@ void duscc_channel::write(uint8_t data, offs_t &offset)
 {
 	int reg = (offset | m_a7) & ~0x20; // Add extended rgisters and remove the channel B bit from offset
 
-	LOGSETUP(" *  %s%c Reg %02x <- %02x  \n", m_owner->tag(), 'A' + m_index, reg, data);
-	LOG("\"%s\" %s: %c : Register write '%02x' -> [%02x]", m_owner->tag(), FUNCNAME, 'A' + m_index, data, reg );
+	LOGSETUP(" *  %s%c Reg %02x <- %02x  \n", owner()->tag(), 'A' + m_index, reg, data);
+	LOG("\"%s\" %s: %c : Register write '%02x' -> [%02x]", owner()->tag(), FUNCNAME, 'A' + m_index, data, reg );
 	switch (reg)
 	{
 	case REG_CMR1:      do_dusccreg_cmr1_w(data); break;
@@ -2359,7 +2359,7 @@ void duscc_channel::m_tx_fifo_rp_step()
 
 void duscc_channel::receive_data(uint8_t data)
 {
-	LOG("\"%s\": %c : Receive Data Byte '%02x'\n", m_owner->tag(), 'A' + m_index, data);
+	LOG("\"%s\": %c : Receive Data Byte '%02x'\n", owner()->tag(), 'A' + m_index, data);
 
 	if (m_rx_fifo_wp + 1 == m_rx_fifo_rp || ( (m_rx_fifo_wp + 1 == m_rx_fifo_sz) && (m_rx_fifo_rp == 0) ))
 	{
@@ -2404,7 +2404,7 @@ void duscc_channel::receive_data(uint8_t data)
 
 WRITE_LINE_MEMBER( duscc_channel::cts_w )
 {
-	LOG("\"%s\" %s: %c : CTS %u\n", m_owner->tag(), FUNCNAME, 'A' + m_index, state);
+	LOG("\"%s\" %s: %c : CTS %u\n", owner()->tag(), FUNCNAME, 'A' + m_index, state);
 
 	if (m_cts != state)
 	{
@@ -2434,7 +2434,7 @@ WRITE_LINE_MEMBER( duscc_channel::cts_w )
 //-------------------------------------------------
 WRITE_LINE_MEMBER( duscc_channel::dcd_w )
 {
-	LOG("\"%s\" %s: %c : DCD %u - not implemented\n", m_owner->tag(), FUNCNAME, 'A' + m_index, state);
+	LOG("\"%s\" %s: %c : DCD %u - not implemented\n", owner()->tag(), FUNCNAME, 'A' + m_index, state);
 #if 0
 
 	if (m_dcd != state)
@@ -2458,7 +2458,7 @@ WRITE_LINE_MEMBER( duscc_channel::dcd_w )
 
 WRITE_LINE_MEMBER( duscc_channel::ri_w )
 {
-	LOG("\"%s\" %s: %c : RI %u - not implemented\n", m_owner->tag(), FUNCNAME, 'A' + m_index, state);
+	LOG("\"%s\" %s: %c : RI %u - not implemented\n", owner()->tag(), FUNCNAME, 'A' + m_index, state);
 #if 0
 	if (m_ri != state)
 	{
@@ -2473,7 +2473,7 @@ WRITE_LINE_MEMBER( duscc_channel::ri_w )
 //-------------------------------------------------
 WRITE_LINE_MEMBER( duscc_channel::sync_w )
 {
-	LOG("\"%s\" %s: %c : SYNC %u - not implemented\n", m_owner->tag(), FUNCNAME, 'A' + m_index, state);
+	LOG("\"%s\" %s: %c : SYNC %u - not implemented\n", owner()->tag(), FUNCNAME, 'A' + m_index, state);
 }
 
 //-------------------------------------------------
@@ -2481,7 +2481,7 @@ WRITE_LINE_MEMBER( duscc_channel::sync_w )
 //-------------------------------------------------
 WRITE_LINE_MEMBER( duscc_channel::rxc_w )
 {
-	LOG("\"%s\" %s: %c : RXC %u - not implemented\n", m_owner->tag(), FUNCNAME, 'A' + m_index, state);
+	LOG("\"%s\" %s: %c : RXC %u - not implemented\n", owner()->tag(), FUNCNAME, 'A' + m_index, state);
 }
 
 //-------------------------------------------------
@@ -2489,7 +2489,7 @@ WRITE_LINE_MEMBER( duscc_channel::rxc_w )
 //-------------------------------------------------
 WRITE_LINE_MEMBER( duscc_channel::txc_w )
 {
-	LOG("\"%s\" %s: %c : TXC %u - not implemented\n", m_owner->tag(), FUNCNAME, 'A' + m_index, state);
+	LOG("\"%s\" %s: %c : TXC %u - not implemented\n", owner()->tag(), FUNCNAME, 'A' + m_index, state);
 }
 
 //-------------------------------------------------
@@ -2511,7 +2511,7 @@ void duscc_channel::update_serial()
 	else
 		parity = PARITY_NONE;
 
-	LOG(LLFORMAT " %s() \"%s \"Channel %c setting data frame %d+%d%c%d\n", machine().firstcpu->total_cycles(), FUNCNAME, m_owner->tag(), 'A' + m_index, 1,
+	LOG(LLFORMAT " %s() \"%s \"Channel %c setting data frame %d+%d%c%d\n", machine().firstcpu->total_cycles(), FUNCNAME, owner()->tag(), 'A' + m_index, 1,
 			data_bit_count, parity == PARITY_NONE ? 'N' : parity == PARITY_EVEN ? 'E' : 'O', (stop_bits + 1) / 2);
 
 	set_data_frame(1, data_bit_count, parity, stop_bits);

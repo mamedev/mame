@@ -598,7 +598,7 @@ void z80dart_channel::tra_complete()
 {
 	if ((m_wr[5] & WR5_TX_ENABLE) && !(m_wr[5] & WR5_SEND_BREAK) && !(m_rr[0] & RR0_TX_BUFFER_EMPTY))
 	{
-		LOG("Z80DART \"%s\" Channel %c : Transmit Data Byte '%02x'\n", m_owner->tag(), 'A' + m_index, m_tx_data);
+		LOG("Z80DART \"%s\" Channel %c : Transmit Data Byte '%02x'\n", owner()->tag(), 'A' + m_index, m_tx_data);
 
 		transmit_register_setup(m_tx_data);
 
@@ -769,7 +769,7 @@ uint8_t z80dart_channel::control_read()
 		break;
 	}
 
-	//LOG("Z80DART \"%s\" Channel %c : Control Register Read '%02x'\n", m_owner->tag(), 'A' + m_index, data);
+	//LOG("Z80DART \"%s\" Channel %c : Control Register Read '%02x'\n", owner()->tag(), 'A' + m_index, data);
 
 	return data;
 }
@@ -784,7 +784,7 @@ void z80dart_channel::control_write(uint8_t data)
 	int reg = m_wr[0] & WR0_REGISTER_MASK;
 	uint8_t prev = m_wr[reg];
 
-	LOG("Z80DART \"%s\" Channel %c : Control Register Write '%02x'\n", m_owner->tag(), 'A' + m_index, data);
+	LOG("Z80DART \"%s\" Channel %c : Control Register Write '%02x'\n", owner()->tag(), 'A' + m_index, data);
 
 	// write data to selected register
 	if (reg < 6)
@@ -802,12 +802,12 @@ void z80dart_channel::control_write(uint8_t data)
 		switch (data & WR0_COMMAND_MASK)
 		{
 		case WR0_NULL:
-			LOG("Z80DART \"%s\" Channel %c : Null\n", m_owner->tag(), 'A' + m_index);
+			LOG("Z80DART \"%s\" Channel %c : Null\n", owner()->tag(), 'A' + m_index);
 			break;
 
 		case WR0_SEND_ABORT:
-			LOG("Z80DART \"%s\" Channel %c : Send Abort\n", m_owner->tag(), 'A' + m_index);
-			logerror("Z80DART \"%s\" Channel %c : unsupported command: Send Abort\n", m_owner->tag(), 'A' + m_index);
+			LOG("Z80DART \"%s\" Channel %c : Send Abort\n", owner()->tag(), 'A' + m_index);
+			logerror("Z80DART \"%s\" Channel %c : unsupported command: Send Abort\n", owner()->tag(), 'A' + m_index);
 			break;
 
 		case WR0_RESET_EXT_STATUS:
@@ -820,36 +820,36 @@ void z80dart_channel::control_write(uint8_t data)
 
 			m_rx_rr0_latch = 0;
 
-			LOG("Z80DART \"%s\" Channel %c : Reset External/Status Interrupt\n", m_owner->tag(), 'A' + m_index);
+			LOG("Z80DART \"%s\" Channel %c : Reset External/Status Interrupt\n", owner()->tag(), 'A' + m_index);
 			break;
 
 		case WR0_CHANNEL_RESET:
 			// channel reset
-			LOG("Z80DART \"%s\" Channel %c : Channel Reset\n", m_owner->tag(), 'A' + m_index);
+			LOG("Z80DART \"%s\" Channel %c : Channel Reset\n", owner()->tag(), 'A' + m_index);
 			device_reset();
 			break;
 
 		case WR0_ENABLE_INT_NEXT_RX:
 			// enable interrupt on next receive character
-			LOG("Z80DART \"%s\" Channel %c : Enable Interrupt on Next Received Character\n", m_owner->tag(), 'A' + m_index);
+			LOG("Z80DART \"%s\" Channel %c : Enable Interrupt on Next Received Character\n", owner()->tag(), 'A' + m_index);
 			m_rx_first = 1;
 			break;
 
 		case WR0_RESET_TX_INT:
 			// reset transmitter interrupt pending
-			LOG("Z80DART \"%s\" Channel %c : Reset Transmitter Interrupt Pending\n", m_owner->tag(), 'A' + m_index);
-			logerror("Z80DART \"%s\" Channel %c : unsupported command: Reset Transmitter Interrupt Pending\n", m_owner->tag(), 'A' + m_index);
+			LOG("Z80DART \"%s\" Channel %c : Reset Transmitter Interrupt Pending\n", owner()->tag(), 'A' + m_index);
+			logerror("Z80DART \"%s\" Channel %c : unsupported command: Reset Transmitter Interrupt Pending\n", owner()->tag(), 'A' + m_index);
 			break;
 
 		case WR0_ERROR_RESET:
 			// error reset
-			LOG("Z80DART \"%s\" Channel %c : Error Reset\n", m_owner->tag(), 'A' + m_index);
+			LOG("Z80DART \"%s\" Channel %c : Error Reset\n", owner()->tag(), 'A' + m_index);
 			m_rr[1] &= ~(RR1_CRC_FRAMING_ERROR | RR1_RX_OVERRUN_ERROR | RR1_PARITY_ERROR);
 			break;
 
 		case WR0_RETURN_FROM_INT:
 			// return from interrupt
-			LOG("Z80DART \"%s\" Channel %c : Return from Interrupt\n", m_owner->tag(), 'A' + m_index);
+			LOG("Z80DART \"%s\" Channel %c : Return from Interrupt\n", owner()->tag(), 'A' + m_index);
 			m_uart->z80daisy_irq_reti();
 			if((m_uart->m_variant == z80dart_device::TYPE_I8274) || (m_uart->m_variant == z80dart_device::TYPE_UPD7201))
 			{
@@ -866,29 +866,29 @@ void z80dart_channel::control_write(uint8_t data)
 		break;
 
 	case 1:
-		LOG("Z80DART \"%s\" Channel %c : External Interrupt Enable %u\n", m_owner->tag(), 'A' + m_index, (data & WR1_EXT_INT_ENABLE) ? 1 : 0);
-		LOG("Z80DART \"%s\" Channel %c : Transmit Interrupt Enable %u\n", m_owner->tag(), 'A' + m_index, (data & WR1_TX_INT_ENABLE) ? 1 : 0);
-		LOG("Z80DART \"%s\" Channel %c : Status Affects Vector %u\n", m_owner->tag(), 'A' + m_index, (data & WR1_STATUS_VECTOR) ? 1 : 0);
-		LOG("Z80DART \"%s\" Channel %c : Wait/Ready Enable %u\n", m_owner->tag(), 'A' + m_index, (data & WR1_WRDY_ENABLE) ? 1 : 0);
-		LOG("Z80DART \"%s\" Channel %c : Wait/Ready Function %s\n", m_owner->tag(), 'A' + m_index, (data & WR1_WRDY_FUNCTION) ? "Ready" : "Wait");
-		LOG("Z80DART \"%s\" Channel %c : Wait/Ready on %s\n", m_owner->tag(), 'A' + m_index, (data & WR1_WRDY_ON_RX_TX) ? "Receive" : "Transmit");
+		LOG("Z80DART \"%s\" Channel %c : External Interrupt Enable %u\n", owner()->tag(), 'A' + m_index, (data & WR1_EXT_INT_ENABLE) ? 1 : 0);
+		LOG("Z80DART \"%s\" Channel %c : Transmit Interrupt Enable %u\n", owner()->tag(), 'A' + m_index, (data & WR1_TX_INT_ENABLE) ? 1 : 0);
+		LOG("Z80DART \"%s\" Channel %c : Status Affects Vector %u\n", owner()->tag(), 'A' + m_index, (data & WR1_STATUS_VECTOR) ? 1 : 0);
+		LOG("Z80DART \"%s\" Channel %c : Wait/Ready Enable %u\n", owner()->tag(), 'A' + m_index, (data & WR1_WRDY_ENABLE) ? 1 : 0);
+		LOG("Z80DART \"%s\" Channel %c : Wait/Ready Function %s\n", owner()->tag(), 'A' + m_index, (data & WR1_WRDY_FUNCTION) ? "Ready" : "Wait");
+		LOG("Z80DART \"%s\" Channel %c : Wait/Ready on %s\n", owner()->tag(), 'A' + m_index, (data & WR1_WRDY_ON_RX_TX) ? "Receive" : "Transmit");
 
 		switch (data & WR1_RX_INT_MODE_MASK)
 		{
 		case WR1_RX_INT_DISABLE:
-			LOG("Z80DART \"%s\" Channel %c : Receiver Interrupt Disabled\n", m_owner->tag(), 'A' + m_index);
+			LOG("Z80DART \"%s\" Channel %c : Receiver Interrupt Disabled\n", owner()->tag(), 'A' + m_index);
 			break;
 
 		case WR1_RX_INT_FIRST:
-			LOG("Z80DART \"%s\" Channel %c : Receiver Interrupt on First Character\n", m_owner->tag(), 'A' + m_index);
+			LOG("Z80DART \"%s\" Channel %c : Receiver Interrupt on First Character\n", owner()->tag(), 'A' + m_index);
 			break;
 
 		case WR1_RX_INT_ALL_PARITY:
-			LOG("Z80DART \"%s\" Channel %c : Receiver Interrupt on All Characters, Parity Affects Vector\n", m_owner->tag(), 'A' + m_index);
+			LOG("Z80DART \"%s\" Channel %c : Receiver Interrupt on All Characters, Parity Affects Vector\n", owner()->tag(), 'A' + m_index);
 			break;
 
 		case WR1_RX_INT_ALL:
-			LOG("Z80DART \"%s\" Channel %c : Receiver Interrupt on All Characters\n", m_owner->tag(), 'A' + m_index);
+			LOG("Z80DART \"%s\" Channel %c : Receiver Interrupt on All Characters\n", owner()->tag(), 'A' + m_index);
 			break;
 		}
 
@@ -905,34 +905,34 @@ void z80dart_channel::control_write(uint8_t data)
 				m_rr[2] = m_wr[2];
 		}
 		m_uart->check_interrupts();
-		LOG("Z80DART \"%s\" Channel %c : Interrupt Vector %02x\n", m_owner->tag(), 'A' + m_index, data);
+		LOG("Z80DART \"%s\" Channel %c : Interrupt Vector %02x\n", owner()->tag(), 'A' + m_index, data);
 		break;
 
 	case 3:
-		LOG("Z80DART \"%s\" Channel %c : Receiver Enable %u\n", m_owner->tag(), 'A' + m_index, (data & WR3_RX_ENABLE) ? 1 : 0);
-		LOG("Z80DART \"%s\" Channel %c : Auto Enables %u\n", m_owner->tag(), 'A' + m_index, (data & WR3_AUTO_ENABLES) ? 1 : 0);
-		LOG("Z80DART \"%s\" Channel %c : Receiver Bits/Character %u\n", m_owner->tag(), 'A' + m_index, get_rx_word_length());
+		LOG("Z80DART \"%s\" Channel %c : Receiver Enable %u\n", owner()->tag(), 'A' + m_index, (data & WR3_RX_ENABLE) ? 1 : 0);
+		LOG("Z80DART \"%s\" Channel %c : Auto Enables %u\n", owner()->tag(), 'A' + m_index, (data & WR3_AUTO_ENABLES) ? 1 : 0);
+		LOG("Z80DART \"%s\" Channel %c : Receiver Bits/Character %u\n", owner()->tag(), 'A' + m_index, get_rx_word_length());
 
 		if (data != prev)
 			update_serial();
 		break;
 
 	case 4:
-		LOG("Z80DART \"%s\" Channel %c : Parity Enable %u\n", m_owner->tag(), 'A' + m_index, (data & WR4_PARITY_ENABLE) ? 1 : 0);
-		LOG("Z80DART \"%s\" Channel %c : Parity %s\n", m_owner->tag(), 'A' + m_index, (data & WR4_PARITY_EVEN) ? "Even" : "Odd");
-		LOG("Z80DART \"%s\" Channel %c : Stop Bits %s\n", m_owner->tag(), 'A' + m_index, stop_bits_tostring(get_stop_bits()));
-		LOG("Z80DART \"%s\" Channel %c : Clock Mode %uX\n", m_owner->tag(), 'A' + m_index, get_clock_mode());
+		LOG("Z80DART \"%s\" Channel %c : Parity Enable %u\n", owner()->tag(), 'A' + m_index, (data & WR4_PARITY_ENABLE) ? 1 : 0);
+		LOG("Z80DART \"%s\" Channel %c : Parity %s\n", owner()->tag(), 'A' + m_index, (data & WR4_PARITY_EVEN) ? "Even" : "Odd");
+		LOG("Z80DART \"%s\" Channel %c : Stop Bits %s\n", owner()->tag(), 'A' + m_index, stop_bits_tostring(get_stop_bits()));
+		LOG("Z80DART \"%s\" Channel %c : Clock Mode %uX\n", owner()->tag(), 'A' + m_index, get_clock_mode());
 
 		if (data != prev)
 			update_serial();
 		break;
 
 	case 5:
-		LOG("Z80DART \"%s\" Channel %c : Transmitter Enable %u\n", m_owner->tag(), 'A' + m_index, (data & WR5_TX_ENABLE) ? 1 : 0);
-		LOG("Z80DART \"%s\" Channel %c : Transmitter Bits/Character %u\n", m_owner->tag(), 'A' + m_index, get_tx_word_length());
-		LOG("Z80DART \"%s\" Channel %c : Send Break %u\n", m_owner->tag(), 'A' + m_index, (data & WR5_SEND_BREAK) ? 1 : 0);
-		LOG("Z80DART \"%s\" Channel %c : Request to Send %u\n", m_owner->tag(), 'A' + m_index, (data & WR5_RTS) ? 1 : 0);
-		LOG("Z80DART \"%s\" Channel %c : Data Terminal Ready %u\n", m_owner->tag(), 'A' + m_index, (data & WR5_DTR) ? 1 : 0);
+		LOG("Z80DART \"%s\" Channel %c : Transmitter Enable %u\n", owner()->tag(), 'A' + m_index, (data & WR5_TX_ENABLE) ? 1 : 0);
+		LOG("Z80DART \"%s\" Channel %c : Transmitter Bits/Character %u\n", owner()->tag(), 'A' + m_index, get_tx_word_length());
+		LOG("Z80DART \"%s\" Channel %c : Send Break %u\n", owner()->tag(), 'A' + m_index, (data & WR5_SEND_BREAK) ? 1 : 0);
+		LOG("Z80DART \"%s\" Channel %c : Request to Send %u\n", owner()->tag(), 'A' + m_index, (data & WR5_RTS) ? 1 : 0);
+		LOG("Z80DART \"%s\" Channel %c : Data Terminal Ready %u\n", owner()->tag(), 'A' + m_index, (data & WR5_DTR) ? 1 : 0);
 
 		if (data != prev)
 			update_serial();
@@ -954,12 +954,12 @@ void z80dart_channel::control_write(uint8_t data)
 		break;
 
 	case 6:
-		LOG("Z80DART \"%s\" Channel %c : Transmit Sync %02x\n", m_owner->tag(), 'A' + m_index, data);
+		LOG("Z80DART \"%s\" Channel %c : Transmit Sync %02x\n", owner()->tag(), 'A' + m_index, data);
 		m_sync = (m_sync & 0xff00) | data;
 		break;
 
 	case 7:
-		LOG("Z80DART \"%s\" Channel %c : Receive Sync %02x\n", m_owner->tag(), 'A' + m_index, data);
+		LOG("Z80DART \"%s\" Channel %c : Receive Sync %02x\n", owner()->tag(), 'A' + m_index, data);
 		m_sync = (data << 8) | (m_sync & 0xff);
 		break;
 	}
@@ -989,7 +989,7 @@ uint8_t z80dart_channel::data_read()
 		}
 	}
 
-	LOG("Z80DART \"%s\" Channel %c : Data Register Read '%02x'\n", m_owner->tag(), 'A' + m_index, data);
+	LOG("Z80DART \"%s\" Channel %c : Data Register Read '%02x'\n", owner()->tag(), 'A' + m_index, data);
 
 	return data;
 }
@@ -1005,7 +1005,7 @@ void z80dart_channel::data_write(uint8_t data)
 
 	if ((m_wr[5] & WR5_TX_ENABLE) && is_transmit_register_empty())
 	{
-		LOG("Z80DART \"%s\" Channel %c : Transmit Data Byte '%02x'\n", m_owner->tag(), 'A' + m_index, m_tx_data);
+		LOG("Z80DART \"%s\" Channel %c : Transmit Data Byte '%02x'\n", owner()->tag(), 'A' + m_index, m_tx_data);
 
 		transmit_register_setup(m_tx_data);
 
@@ -1022,7 +1022,7 @@ void z80dart_channel::data_write(uint8_t data)
 
 	m_rr[1] &= ~RR1_ALL_SENT;
 
-	LOG("Z80DART \"%s\" Channel %c : Data Register Write '%02x'\n", m_owner->tag(), 'A' + m_index, data);
+	LOG("Z80DART \"%s\" Channel %c : Data Register Write '%02x'\n", owner()->tag(), 'A' + m_index, data);
 }
 
 
@@ -1032,7 +1032,7 @@ void z80dart_channel::data_write(uint8_t data)
 
 void z80dart_channel::receive_data(uint8_t data)
 {
-	LOG("Z80DART \"%s\" Channel %c : Receive Data Byte '%02x'\n", m_owner->tag(), 'A' + m_index, data);
+	LOG("Z80DART \"%s\" Channel %c : Receive Data Byte '%02x'\n", owner()->tag(), 'A' + m_index, data);
 
 	if (m_rx_data_fifo.full())
 	{
@@ -1092,7 +1092,7 @@ void z80dart_channel::receive_data(uint8_t data)
 
 WRITE_LINE_MEMBER( z80dart_channel::cts_w )
 {
-	LOG("Z80DART \"%s\" Channel %c : CTS %u\n", m_owner->tag(), 'A' + m_index, state);
+	LOG("Z80DART \"%s\" Channel %c : CTS %u\n", owner()->tag(), 'A' + m_index, state);
 
 	if (m_cts != state)
 	{
@@ -1131,7 +1131,7 @@ WRITE_LINE_MEMBER( z80dart_channel::cts_w )
 
 WRITE_LINE_MEMBER( z80dart_channel::dcd_w )
 {
-	LOG("Z80DART \"%s\" Channel %c : DCD %u\n", m_owner->tag(), 'A' + m_index, state);
+	LOG("Z80DART \"%s\" Channel %c : DCD %u\n", owner()->tag(), 'A' + m_index, state);
 
 	if (m_dcd != state)
 	{
@@ -1169,7 +1169,7 @@ WRITE_LINE_MEMBER( z80dart_channel::dcd_w )
 
 WRITE_LINE_MEMBER( z80dart_channel::ri_w )
 {
-	LOG("Z80DART \"%s\" Channel %c : RI %u\n", m_owner->tag(), 'A' + m_index, state);
+	LOG("Z80DART \"%s\" Channel %c : RI %u\n", owner()->tag(), 'A' + m_index, state);
 
 	if (m_ri != state)
 	{
@@ -1202,7 +1202,7 @@ WRITE_LINE_MEMBER( z80dart_channel::ri_w )
 
 WRITE_LINE_MEMBER( z80dart_channel::sync_w )
 {
-	LOG("Z80DART \"%s\" Channel %c : SYNC %u\n", m_owner->tag(), 'A' + m_index, state);
+	LOG("Z80DART \"%s\" Channel %c : SYNC %u\n", owner()->tag(), 'A' + m_index, state);
 }
 
 
@@ -1212,7 +1212,7 @@ WRITE_LINE_MEMBER( z80dart_channel::sync_w )
 
 WRITE_LINE_MEMBER( z80dart_channel::rxc_w )
 {
-	//LOG("Z80DART \"%s\" Channel %c : Receiver Clock Pulse\n", m_owner->tag(), m_index + 'A');
+	//LOG("Z80DART \"%s\" Channel %c : Receiver Clock Pulse\n", owner()->tag(), m_index + 'A');
 	int clocks = get_clock_mode();
 	if (clocks == 1)
 		rx_clock_w(state);
@@ -1234,7 +1234,7 @@ WRITE_LINE_MEMBER( z80dart_channel::rxc_w )
 
 WRITE_LINE_MEMBER( z80dart_channel::txc_w )
 {
-	//LOG("Z80DART \"%s\" Channel %c : Transmitter Clock Pulse\n", m_owner->tag(), m_index + 'A');
+	//LOG("Z80DART \"%s\" Channel %c : Transmitter Clock Pulse\n", owner()->tag(), m_index + 'A');
 	int clocks = get_clock_mode();
 	if (clocks == 1)
 		tx_clock_w(state);
