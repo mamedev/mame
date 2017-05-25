@@ -256,7 +256,7 @@ peribox_device::peribox_device(const machine_config &mconfig, const char *tag, d
     Constructor called from subclasses.
 */
 peribox_device::peribox_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock):
-	bus::ti99::internal::ioport_attached_device(mconfig, TI99_PERIBOX, tag, owner, clock),
+	bus::ti99::internal::ioport_attached_device(mconfig, type, tag, owner, clock),
 	m_slot1_inta(*this),
 	m_slot1_intb(*this),
 	m_slot1_lcp(*this),
