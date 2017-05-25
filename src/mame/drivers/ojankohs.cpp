@@ -1,33 +1,30 @@
 // license: BSD-3-Clause
 // copyright-holders: Takahiro Nogi, Uki, Dirk Best
-/******************************************************************************
+/***************************************************************************
 
-    Game Driver for Video System Mahjong series.
+	Video System Mahjong hardware
 
-    Ojanko High School (Japan)
-    (c)1988 Video System Co.,Ltd.
+	Ojanko High School (お雀子ハイスクール)
+	© 1988 V-System Co.
 
-    Ojanko Yakata (Japan)
-    (c)1986 Video System Co.,Ltd.
+	Ojanko Yakata (勝ち抜き麻雀戦 お雀子館)
+	© 1986 V-System Co.
 
-    Ojanko Yakata 2bankan (Japan)
-    (c)1987 Video System Co.,Ltd.
+	Ojanko Yakata 2bankan (勝ち抜き麻雀戦 お雀子館2番館)
+	© 1987 V-System Co.
 
-    Chinese Casino [BET] (Japan)
-    (c)1987 Video System Co.,Ltd.
+	Chinese Casino (チャイニーズカジノ)
+	© 1987 V-System Co.
 
-    Ojanko Club (Japan)
-    (c)1986 Video System Co.,Ltd.
-
-    Driver by Takahiro Nogi <nogi@kt.rim.or.jp> 2000/06/10 -
-    Driver by Uki 2001/12/10 -
-
-******************************************************************************
+	Ojanko Club (お雀子クラブ)
+	© 1986 V-System Co.
 
 	TODO:
 	- Figure out the rest of the dip switches
+	- XTAL values/clocks
+	- Raw screen params
 
-******************************************************************************/
+***************************************************************************/
 
 #include "emu.h"
 #include "includes/ojankohs.h"
