@@ -97,7 +97,7 @@ WRITE8_MEMBER(vectrex_state::vectrex_via_w)
 			m_refresh->adjust(period, 0, period);
 		else
 			m_refresh->adjust(
-									min(period, m_refresh->remaining()),
+									std::min(period, m_refresh->remaining()),
 									0,
 									period);
 		break;
