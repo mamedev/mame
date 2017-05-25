@@ -47,7 +47,6 @@ public:
 	void video_update(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_PALETTE_INIT(huc6260);
 
 	READ8_MEMBER(palette_direct_read);
 	WRITE8_MEMBER(palette_direct_write);
@@ -57,14 +56,13 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	int     m_last_h;
 	int     m_last_v;
 	int     m_height;
 
-	/* callbacks */
 	/* Callback function to retrieve pixel data */
 	devcb_read16                    m_next_pixel_data_cb;
 
@@ -88,6 +86,8 @@ private:
 
 	emu_timer   *m_timer;
 	std::unique_ptr<bitmap_ind16>   m_bmp;
+
+	DECLARE_PALETTE_INIT(huc6260);
 };
 
 

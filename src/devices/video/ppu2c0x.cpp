@@ -308,7 +308,12 @@ inline void ppu2c0x_device::writebyte(offs_t address, uint8_t data)
  *
  *************************************/
 
-void ppu2c0x_device::init_palette( palette_device &palette, int first_entry )
+void ppu2c0x_device::init_palette(palette_device &palette, int first_entry)
+{
+	init_palette(palette, first_entry, false);
+}
+
+void ppu2c0x_device::init_palette(palette_device &palette, int first_entry, bool indirect)
 {
 	/* This routine builds a palette using a transformation from */
 	/* the YUV (Y, B-Y, R-Y) to the RGB color space */
@@ -346,14 +351,14 @@ void ppu2c0x_device::init_palette( palette_device &palette, int first_entry )
 
 		switch (color_emphasis)
 		{
-		    case 0: r_mod = 1.0;  g_mod = 1.0;  b_mod = 1.0;  break;
-		    case 1: r_mod = 1.24; g_mod = .915; b_mod = .743; break;
-		    case 2: r_mod = .794; g_mod = 1.09; b_mod = .882; break;
-		    case 3: r_mod = .905; g_mod = 1.03; b_mod = 1.28; break;
-		    case 4: r_mod = .741; g_mod = .987; b_mod = 1.0;  break;
-		    case 5: r_mod = 1.02; g_mod = .908; b_mod = .979; break;
-		    case 6: r_mod = 1.02; g_mod = .98;  b_mod = .653; break;
-		    case 7: r_mod = .75;  g_mod = .75;  b_mod = .75;  break;
+			case 0: r_mod = 1.0;  g_mod = 1.0;  b_mod = 1.0;  break;
+			case 1: r_mod = 1.24; g_mod = .915; b_mod = .743; break;
+			case 2: r_mod = .794; g_mod = 1.09; b_mod = .882; break;
+			case 3: r_mod = .905; g_mod = 1.03; b_mod = 1.28; break;
+			case 4: r_mod = .741; g_mod = .987; b_mod = 1.0;  break;
+			case 5: r_mod = 1.02; g_mod = .908; b_mod = .979; break;
+			case 6: r_mod = 1.02; g_mod = .98;  b_mod = .653; break;
+			case 7: r_mod = .75;  g_mod = .75;  b_mod = .75;  break;
 		}
 		*/
 
@@ -369,26 +374,26 @@ void ppu2c0x_device::init_palette( palette_device &palette, int first_entry )
 
 				switch (color_num)
 				{
-					case 0:
-						sat = 0; rad = 0;
-						y = brightness[0][color_intensity];
-						break;
+				case 0:
+					sat = 0; rad = 0;
+					y = brightness[0][color_intensity];
+					break;
 
-					case 13:
-						sat = 0; rad = 0;
-						y = brightness[2][color_intensity];
-						break;
+				case 13:
+					sat = 0; rad = 0;
+					y = brightness[2][color_intensity];
+					break;
 
-					case 14:
-					case 15:
-						sat = 0; rad = 0; y = 0;
-						break;
+				case 14:
+				case 15:
+					sat = 0; rad = 0; y = 0;
+					break;
 
-					default:
-						sat = tint;
-						rad = M_PI * ((color_num * 30 + hue) / 180.0);
-						y = brightness[1][color_intensity];
-						break;
+				default:
+					sat = tint;
+					rad = M_PI * ((color_num * 30 + hue) / 180.0);
+					y = brightness[1][color_intensity];
+					break;
 				}
 
 				u = sat * cos(rad);
@@ -414,7 +419,10 @@ void ppu2c0x_device::init_palette( palette_device &palette, int first_entry )
 					B = 255;
 
 				/* Round, and set the value */
-				palette.set_pen_color(first_entry++, floor(R + .5), floor(G + .5), floor(B + .5));
+				if (indirect)
+					palette.set_indirect_color(first_entry++, rgb_t(floor(R + .5), floor(G + .5), floor(B + .5)));
+				else
+					palette.set_pen_color(first_entry++, floor(R + .5), floor(G + .5), floor(B + .5));
 			}
 		}
 	}
@@ -564,6 +572,61 @@ void ppu2c0x_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	}
 }
 
+
+void ppu2c0x_device::read_tile_plane_data(int address, int color)
+{
+	m_planebuf[0] = readbyte((address & 0x1fff));
+	m_planebuf[1] = readbyte((address + 8) & 0x1fff);
+}
+
+void ppu2c0x_device::shift_tile_plane_data(uint8_t &pix)
+{
+	pix = ((m_planebuf[0] >> 7) & 1) | (((m_planebuf[1] >> 7) & 1) << 1);
+	m_planebuf[0] = m_planebuf[0] << 1;
+	m_planebuf[1] = m_planebuf[1] << 1;
+}
+
+void ppu2c0x_device::draw_tile_pixel(uint8_t pix, int color, uint16_t back_pen, uint16_t *&dest, const pen_t *color_table)
+{
+	uint16_t pen;
+
+	if (pix)
+	{
+		const pen_t *paldata = &color_table[4 * color];
+		pen = paldata[pix];
+	}
+	else
+	{
+		pen = back_pen;
+	}
+
+	*dest = pen;
+}
+
+void ppu2c0x_device::draw_tile(uint8_t *line_priority, int color_byte, int color_bits, int address, int start_x, uint16_t back_pen, uint16_t *&dest, const pen_t *color_table)
+{
+	int color = (((color_byte >> color_bits) & 0x03));
+
+	read_tile_plane_data(address, color);
+
+	/* render the pixel */
+	for (int i = 0; i < 8; i++)
+	{
+		uint8_t pix;
+		shift_tile_plane_data(pix);
+
+		if ((start_x + i) >= 0 && (start_x + i) < VISIBLE_SCREEN_WIDTH)
+		{
+			draw_tile_pixel(pix, color, back_pen, dest, color_table);
+
+			// priority marking
+			if (pix)
+				line_priority[start_x + i] |= 0x02;			
+		}
+		dest++;
+	}
+}
+
 void ppu2c0x_device::draw_background( uint8_t *line_priority )
 {
 	bitmap_ind16 &bitmap = *m_bitmap;
@@ -575,7 +638,6 @@ void ppu2c0x_device::draw_background( uint8_t *line_priority )
 	int x, tile_index, i;
 
 	const pen_t *color_table;
-	const pen_t *paldata;
 
 	m_tilecount = 0;
 
@@ -616,7 +678,6 @@ void ppu2c0x_device::draw_background( uint8_t *line_priority )
 		int pos;
 		int index1;
 		int page, page2, address;
-		uint16_t pen;
 
 		index1 = tile_index + x;
 
@@ -640,39 +701,12 @@ void ppu2c0x_device::draw_background( uint8_t *line_priority )
 
 		if (start_x < VISIBLE_SCREEN_WIDTH)
 		{
-			uint8_t plane1, plane2;
-			paldata = &color_table[4 * (((color_byte >> color_bits) & 0x03))];
-
 			// need to read 0x0000 or 0x1000 + 16*nametable data
 			address = ((m_tile_page) ? 0x1000 : 0) + (page2 * 16);
 			// plus something that accounts for y
 			address += scroll_y_fine;
 
-			plane1 = readbyte((address & 0x1fff));
-			plane2 = readbyte((address + 8) & 0x1fff);
-
-			/* render the pixel */
-			for (i = 0; i < 8; i++)
-			{
-				uint8_t pix;
-				pix = ((plane1 >> 7) & 1) | (((plane2 >> 7) & 1) << 1);
-				plane1 = plane1 << 1;
-				plane2 = plane2 << 1;
-				if ((start_x + i) >= 0 && (start_x + i) < VISIBLE_SCREEN_WIDTH)
-				{
-					if (pix)
-					{
-						pen = paldata[pix];
-						line_priority[start_x + i] |= 0x02;
-					}
-					else
-					{
-						pen = back_pen;
-					}
-					*dest = pen;
-				}
-				dest++;
-			}
+			draw_tile(line_priority, color_byte, color_bits, address, start_x, back_pen, dest, color_table);
 
 			start_x += 8;
 
@@ -699,6 +733,39 @@ void ppu2c0x_device::draw_background( uint8_t *line_priority )
 	}
 }
 
+void ppu2c0x_device::read_sprite_plane_data(int address)
+{
+	m_planebuf[0] = readbyte((address + 0) & 0x1fff);
+	m_planebuf[1] = readbyte((address + 8) & 0x1fff);
+}
+
+void ppu2c0x_device::make_sprite_pixel_data(uint8_t &pixel_data, int flipx)
+{
+	if (flipx)
+	{
+		pixel_data = (m_planebuf[0] & 1) + ((m_planebuf[1] & 1) << 1);
+		m_planebuf[0] = m_planebuf[0] >> 1;
+		m_planebuf[1] = m_planebuf[1] >> 1;
+	}
+	else
+	{
+		pixel_data = ((m_planebuf[0] >> 7) & 1) | (((m_planebuf[1] >> 7) & 1) << 1);
+		m_planebuf[0] = m_planebuf[0] << 1;
+		m_planebuf[1] = m_planebuf[1] << 1;
+	}
+}
+
+void ppu2c0x_device::draw_sprite_pixel(int sprite_xpos, int color, int pixel, uint8_t pixel_data, bitmap_ind16& bitmap)
+{
+	const pen_t *paldata = &m_colortable[4 * color];
+	bitmap.pix16(m_scanline, sprite_xpos + pixel) = paldata[pixel_data];
+}
+
+void ppu2c0x_device::read_extra_sprite_bits(int sprite_index)
+{
+	// needed for some clones
+}
+
 void ppu2c0x_device::draw_sprites( uint8_t *line_priority )
 {
 	bitmap_ind16 &bitmap = *m_bitmap;
@@ -713,8 +780,6 @@ void ppu2c0x_device::draw_sprites( uint8_t *line_priority )
 	int sprite_line;
 
 	int first_pixel;
-
-	const pen_t *paldata;
 	int pixel;
 
 	/* determine if the sprites are 8x8 or 8x16 */
@@ -724,9 +789,6 @@ void ppu2c0x_device::draw_sprites( uint8_t *line_priority )
 
 	for (sprite_index = 0; sprite_index < SPRITERAM_SIZE; sprite_index += 4)
 	{
-		uint8_t plane1;
-		uint8_t plane2;
-
 		sprite_ypos = m_spriteram[sprite_index] + 1;
 		sprite_xpos = m_spriteram[sprite_index + 3];
 
@@ -754,6 +816,7 @@ void ppu2c0x_device::draw_sprites( uint8_t *line_priority )
 		pri   =  m_spriteram[sprite_index + 2] & 0x20;
 		flipx =  m_spriteram[sprite_index + 2] & 0x40;
 		flipy =  m_spriteram[sprite_index + 2] & 0x80;
+		read_extra_sprite_bits(sprite_index);
 
 		if (size == 16)
 		{
@@ -774,8 +837,6 @@ void ppu2c0x_device::draw_sprites( uint8_t *line_priority )
 		if (flipy)
 			sprite_line = (size - 1) - sprite_line;
 
-		paldata = &m_colortable[4 * color];
-
 		if (size == 16 && sprite_line > 7)
 		{
 			tile++;
@@ -786,8 +847,7 @@ void ppu2c0x_device::draw_sprites( uint8_t *line_priority )
 		if (size == 8)
 			index1 += ((m_sprite_page == 0) ? 0 : 0x1000);
 
-		plane1 = readbyte((index1 + sprite_line + 0) & 0x1fff);
-		plane2 = readbyte((index1 + sprite_line + 8) & 0x1fff);
+		read_sprite_plane_data(index1+sprite_line);
 
 		/* if there are more than 8 sprites on this line, set the flag */
 		if (sprite_count == 8)
@@ -811,18 +871,7 @@ void ppu2c0x_device::draw_sprites( uint8_t *line_priority )
 			for (pixel = 0; pixel < 8; pixel++)
 			{
 				uint8_t pixel_data;
-				if (flipx)
-				{
-					pixel_data = (plane1 & 1) + ((plane2 & 1) << 1);
-					plane1 = plane1 >> 1;
-					plane2 = plane2 >> 1;
-				}
-				else
-				{
-					pixel_data = ((plane1 >> 7) & 1) | (((plane2 >> 7) & 1) << 1);
-					plane1 = plane1 << 1;
-					plane2 = plane2 << 1;
-				}
+				make_sprite_pixel_data(pixel_data, flipx);
 
 				/* is this pixel non-transparent? */
 				if (sprite_xpos + pixel >= first_pixel)
@@ -835,7 +884,7 @@ void ppu2c0x_device::draw_sprites( uint8_t *line_priority )
 							if (!line_priority[sprite_xpos + pixel])
 							{
 								/* no, draw */
-								bitmap.pix16(m_scanline, sprite_xpos + pixel) = paldata[pixel_data];
+								draw_sprite_pixel(sprite_xpos, color, pixel, pixel_data, bitmap);
 							}
 							/* indicate that a sprite was drawn at this location, even if it's not seen */
 							line_priority[sprite_xpos + pixel] |= 0x01;
@@ -854,18 +903,7 @@ void ppu2c0x_device::draw_sprites( uint8_t *line_priority )
 			for (pixel = 0; pixel < 8; pixel++)
 			{
 				uint8_t pixel_data;
-				if (flipx)
-				{
-					pixel_data = (plane1 & 1) + ((plane2 & 1) << 1);
-					plane1 = plane1 >> 1;
-					plane2 = plane2 >> 1;
-				}
-				else
-				{
-					pixel_data = ((plane1 >> 7) & 1) | (((plane2 >> 7) & 1) << 1);
-					plane1 = plane1 << 1;
-					plane2 = plane2 << 1;
-				}
+				make_sprite_pixel_data(pixel_data, flipx);
 
 				/* is this pixel non-transparent? */
 				if (sprite_xpos + pixel >= first_pixel)
@@ -878,7 +916,7 @@ void ppu2c0x_device::draw_sprites( uint8_t *line_priority )
 							if (!(line_priority[sprite_xpos + pixel] & 0x01))
 							{
 								/* no, draw */
-								bitmap.pix16(m_scanline, sprite_xpos + pixel) = paldata[pixel_data];
+								draw_sprite_pixel(sprite_xpos, color, pixel, pixel_data, bitmap);
 								line_priority[sprite_xpos + pixel] |= 0x01;
 							}
 						}

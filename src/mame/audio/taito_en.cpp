@@ -287,13 +287,12 @@ WRITE_LINE_MEMBER(taito_en_device::duart_irq_handler)
     IP5: 1MHz
 */
 
-/*************************************
- *
- *  Machine driver
- *
- *************************************/
 
-MACHINE_CONFIG_START( taito_en_sound )
+//-------------------------------------------------
+// device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( taito_en_device::device_add_mconfig )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("audiocpu", M68000, XTAL_30_4761MHz / 2)
@@ -315,13 +314,3 @@ MACHINE_CONFIG_START( taito_en_sound )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.08)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.08)
 MACHINE_CONFIG_END
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor taito_en_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( taito_en_sound );
-}

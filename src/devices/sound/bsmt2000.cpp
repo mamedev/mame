@@ -42,16 +42,6 @@ static ADDRESS_MAP_START(tms_io_map, AS_IO, 16, bsmt2000_device)
 ADDRESS_MAP_END
 
 
-// machine fragment
-static MACHINE_CONFIG_START( bsmt2000 )
-	MCFG_CPU_ADD("bsmt2000", TMS32015, DERIVED_CLOCK(1,1))
-	MCFG_CPU_PROGRAM_MAP(tms_program_map)
-	// data map is internal to the CPU
-	MCFG_CPU_IO_MAP(tms_io_map)
-	MCFG_TMS32010_BIO_IN_CB(READLINE(bsmt2000_device, tms_write_pending_r))
-MACHINE_CONFIG_END
-
-
 // ROM definition for the BSMT2000 program ROM
 ROM_START( bsmt2000 )
 	ROM_REGION( 0x2000, "bsmt2000", 0 )
@@ -111,14 +101,16 @@ const tiny_rom_entry *bsmt2000_device::device_rom_region() const
 
 
 //-------------------------------------------------
-//  machine_config_additions - return a pointer to
-//  the device's machine fragment
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor bsmt2000_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( bsmt2000 );
-}
+MACHINE_CONFIG_MEMBER( bsmt2000_device::device_add_mconfig )
+	MCFG_CPU_ADD("bsmt2000", TMS32015, DERIVED_CLOCK(1,1))
+	MCFG_CPU_PROGRAM_MAP(tms_program_map)
+	// data map is internal to the CPU
+	MCFG_CPU_IO_MAP(tms_io_map)
+	MCFG_TMS32010_BIO_IN_CB(READLINE(bsmt2000_device, tms_write_pending_r))
+MACHINE_CONFIG_END
 
 
 //-------------------------------------------------

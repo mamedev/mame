@@ -21,7 +21,6 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-class output_module;
 typedef void (*output_notifier_func)(const char *outname, s32 value, void *param);
 
 // ======================> output_manager

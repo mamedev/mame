@@ -145,7 +145,7 @@ WRITE8_MEMBER(cinemat_state::mux_select_w)
 
 READ8_MEMBER(cinemat_state::joystick_read)
 {
-	if (machine().phase() != MACHINE_PHASE_RUNNING)
+	if (machine().phase() != machine_phase::RUNNING)
 		return 0;
 	else
 	{

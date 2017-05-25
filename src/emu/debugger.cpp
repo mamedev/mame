@@ -164,7 +164,7 @@ void debugger_manager::refresh_display()
     execution
 -------------------------------------------------*/
 
-void debugger_flush_all_traces_on_abnormal_exit(void)
+void debugger_flush_all_traces_on_abnormal_exit()
 {
 	if(g_machine != nullptr)
 	{

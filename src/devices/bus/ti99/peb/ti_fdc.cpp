@@ -16,6 +16,10 @@
 #include "ti_fdc.h"
 #include "formats/ti99_dsk.h"
 
+DEFINE_DEVICE_TYPE_NS(TI99_FDC, bus::ti99::peb, ti_fdc_device, "ti99_fdc", "TI-99 Standard DSSD Floppy Controller")
+
+namespace bus { namespace ti99 { namespace peb {
+
 // ----------------------------------
 // Flags for debugging
 
@@ -478,4 +482,4 @@ const tiny_rom_entry *ti_fdc_device::device_rom_region() const
 	return ROM_NAME( ti_fdc );
 }
 
-DEFINE_DEVICE_TYPE(TI99_FDC, ti_fdc_device, "ti99_fdc", "TI-99 Standard DSSD Floppy Controller")
+} } } // end namespace bus::ti99::peb

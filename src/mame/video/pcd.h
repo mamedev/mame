@@ -38,18 +38,14 @@ public:
 	DECLARE_WRITE8_MEMBER(vram_sw_w);
 	DECLARE_READ8_MEMBER(vram_r);
 	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_READ_LINE_MEMBER(t1_r);
-	DECLARE_READ8_MEMBER(p1_r);
-	DECLARE_WRITE8_MEMBER(p2_w);
-	TIMER_DEVICE_CALLBACK_MEMBER(mouse_timer);
 
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual ioport_constructor device_input_ports() const override;
-	SCN2674_DRAW_CHARACTER_MEMBER(display_pixels);
 protected:
 	void device_start() override;
 	void device_reset() override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
+
 private:
 	required_ioport m_mouse_btn;
 	required_ioport m_mouse_x;
@@ -71,6 +67,13 @@ private:
 		int ya;
 		int yb;
 	} m_mouse;
+
+	DECLARE_READ_LINE_MEMBER(t1_r);
+	DECLARE_READ8_MEMBER(p1_r);
+	DECLARE_WRITE8_MEMBER(p2_w);
+	TIMER_DEVICE_CALLBACK_MEMBER(mouse_timer);
+
+	SCN2674_DRAW_CHARACTER_MEMBER(display_pixels);
 };
 
 class pcx_video_device : public pcdx_video_device,
@@ -85,8 +88,6 @@ public:
 	DECLARE_WRITE8_MEMBER(term_w);
 	DECLARE_READ8_MEMBER(term_mcu_r);
 	DECLARE_WRITE8_MEMBER(term_mcu_w);
-	DECLARE_READ8_MEMBER(rx_callback);
-	DECLARE_WRITE8_MEMBER(tx_callback);
 	DECLARE_READ8_MEMBER(vram_r);
 	DECLARE_WRITE8_MEMBER(vram_w);
 	DECLARE_READ8_MEMBER(vram_latch_r);
@@ -94,20 +95,26 @@ public:
 	DECLARE_READ8_MEMBER(unk_r);
 	DECLARE_WRITE8_MEMBER(p1_w);
 
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	SCN2674_DRAW_CHARACTER_MEMBER(display_pixels);
 protected:
 	void device_start() override;
 	void device_reset() override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
 	void tra_callback() override;
 	void rcv_complete() override;
-	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
 private:
 	std::vector<uint8_t> m_vram;
 	required_region_ptr<uint8_t> m_charrom;
 	devcb_write_line m_txd_handler;
 	uint8_t m_term_key, m_term_char, m_term_stat, m_vram_latch_r[2], m_vram_latch_w[2], m_p1;
+
+	DECLARE_READ8_MEMBER(rx_callback);
+	DECLARE_WRITE8_MEMBER(tx_callback);
+
+	SCN2674_DRAW_CHARACTER_MEMBER(display_pixels);
 };
 
 DECLARE_DEVICE_TYPE(PCD_VIDEO, pcd_video_device)

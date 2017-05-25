@@ -1521,15 +1521,10 @@ mos8568_device::mos8568_device(const machine_config &mconfig, const char *tag, d
 }
 
 
-static MACHINE_CONFIG_START(mos8563)
+MACHINE_CONFIG_MEMBER(mos8563_device::device_add_mconfig)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(mos8563_device, mos8563)
 MACHINE_CONFIG_END
-
-machine_config_constructor mos8563_device::device_mconfig_additions() const
-{
-		return MACHINE_CONFIG_NAME( mos8563 );
-}
 
 
 // VICE palette

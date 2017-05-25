@@ -1686,19 +1686,12 @@ void info_xml_creator::output_ramoptions(device_t &root)
 {
 	for (const ram_device &ram : ram_device_iterator(root))
 	{
-		fprintf(m_output, "\t\t<ramoption default=\"1\">%u</ramoption>\n", ram.default_size());
-
-		if (ram.extra_options() != nullptr)
+		for (uint32_t option : ram.extra_options())
 		{
-			std::string options(ram.extra_options());
-			for (int start = 0, end = options.find_first_of(',');; start = end + 1, end = options.find_first_of(',', start))
-			{
-				std::string option;
-				option.assign(options.substr(start, (end == -1) ? -1 : end - start));
-				fprintf(m_output, "\t\t<ramoption>%u</ramoption>\n", ram_device::parse_string(option.c_str()));
-				if (end == -1)
-					break;
-			}
+			if (option == ram.default_size())
+				fprintf(m_output, "\t\t<ramoption default=\"1\">%u</ramoption>\n", option);
+			else
+				fprintf(m_output, "\t\t<ramoption>%u</ramoption>\n", option);
 		}
 	}
 }

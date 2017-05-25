@@ -53,6 +53,10 @@
 #include "emu.h"
 #include "horizon.h"
 
+DEFINE_DEVICE_TYPE_NS(TI99_HORIZON, bus::ti99::peb, horizon_ramdisk_device, "ti99_horizon", "Horizon 4000 Ramdisk")
+
+namespace bus { namespace ti99 { namespace peb {
+
 #define RAMREGION "ram32k"
 #define ROSREGION "ros8k"
 #define NVRAMREGION "nvram"
@@ -491,4 +495,4 @@ ioport_constructor horizon_ramdisk_device::device_input_ports() const
 	return INPUT_PORTS_NAME(horizon);
 }
 
-DEFINE_DEVICE_TYPE(TI99_HORIZON, horizon_ramdisk_device, "ti99_horizon", "Horizon 4000 Ramdisk")
+} } } // end namespace bus::ti99::peb

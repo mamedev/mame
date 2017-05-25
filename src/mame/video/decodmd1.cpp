@@ -204,7 +204,7 @@ static ADDRESS_MAP_START( decodmd1_io_map, AS_IO, 8, decodmd_type1_device )
 	AM_RANGE(0x00, 0xff) AM_READWRITE(dmd_port_r, dmd_port_w)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( decodmd1 )
+MACHINE_CONFIG_MEMBER( decodmd_type1_device::device_add_mconfig )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("dmdcpu", Z80, XTAL_8MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(decodmd1_map)
@@ -212,14 +212,14 @@ static MACHINE_CONFIG_START( decodmd1 )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(50))
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_timer",decodmd_type1_device,dmd_nmi,attotime::from_hz(2000))  // seems a lot
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_timer", decodmd_type1_device, dmd_nmi, attotime::from_hz(2000))  // seems a lot
 
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	MCFG_SCREEN_ADD("dmd",LCD)
 	MCFG_SCREEN_SIZE(128, 16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 128-1, 0, 16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(decodmd_type1_device,screen_update)
+	MCFG_SCREEN_UPDATE_DRIVER(decodmd_type1_device, screen_update)
 	MCFG_SCREEN_REFRESH_RATE(50)
 
 	MCFG_RAM_ADD(RAM_TAG)
@@ -227,10 +227,6 @@ static MACHINE_CONFIG_START( decodmd1 )
 
 MACHINE_CONFIG_END
 
-machine_config_constructor decodmd_type1_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( decodmd1 );
-}
 
 decodmd_type1_device::decodmd_type1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, DECODMD1, tag, owner, clock),

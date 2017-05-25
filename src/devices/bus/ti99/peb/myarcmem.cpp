@@ -30,6 +30,10 @@
 #include "emu.h"
 #include "myarcmem.h"
 
+DEFINE_DEVICE_TYPE_NS(TI99_MYARCMEM, bus::ti99::peb, myarc_memory_expansion_device, "ti99_myarcmem", "Myarc Memory expansion card MEXP-1")
+
+namespace bus { namespace ti99 { namespace peb {
+
 /* This card has two CRU bases where it answers. */
 #define MYARCMEM_CRU_BASE1 0x1000
 #define MYARCMEM_CRU_BASE2 0x1900
@@ -211,4 +215,4 @@ ioport_constructor myarc_memory_expansion_device::device_input_ports() const
 	return INPUT_PORTS_NAME(myarc_exp);
 }
 
-DEFINE_DEVICE_TYPE(TI99_MYARCMEM, myarc_memory_expansion_device, "ti99_myarcmem", "Myarc Memory expansion card MEXP-1")
+} } } // end namespace bus::ti99::peb

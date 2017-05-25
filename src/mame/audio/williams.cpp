@@ -204,10 +204,10 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  machine configuration
+// device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( williams_cvsd_sound )
+MACHINE_CONFIG_MEMBER( williams_cvsd_sound_device::device_add_mconfig )
 	MCFG_CPU_ADD("cpu", M6809E, CVSD_MASTER_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(williams_cvsd_map)
 
@@ -228,17 +228,6 @@ static MACHINE_CONFIG_START( williams_cvsd_sound )
 	MCFG_SOUND_ADD("cvsd", HC55516, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.60)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  device_mconfig_additions - return a pointer to
-//  the device's machine fragment
-//-------------------------------------------------
-
-machine_config_constructor williams_cvsd_sound_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( williams_cvsd_sound );
-}
 
 
 //-------------------------------------------------
@@ -543,10 +532,11 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  machine configuration
+// device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( williams_narc_sound )
+
+MACHINE_CONFIG_MEMBER( williams_narc_sound_device::device_add_mconfig )
 	MCFG_CPU_ADD("cpu0", M6809E, NARC_MASTER_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(williams_narc_master_map)
 
@@ -566,17 +556,6 @@ static MACHINE_CONFIG_START( williams_narc_sound )
 	MCFG_SOUND_ADD("cvsd", HC55516, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.60)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  device_mconfig_additions - return a pointer to
-//  the device's machine fragment
-//-------------------------------------------------
-
-machine_config_constructor williams_narc_sound_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( williams_narc_sound );
-}
 
 
 //-------------------------------------------------
@@ -817,10 +796,10 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  machine configuration
+// device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( williams_adpcm_sound )
+MACHINE_CONFIG_MEMBER( williams_adpcm_sound_device::device_add_mconfig )
 	MCFG_CPU_ADD("cpu", M6809E, ADPCM_MASTER_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(williams_adpcm_map)
 
@@ -836,17 +815,6 @@ static MACHINE_CONFIG_START( williams_adpcm_sound )
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, williams_adpcm_oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.5)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  device_mconfig_additions - return a pointer to
-//  the device's machine fragment
-//-------------------------------------------------
-
-machine_config_constructor williams_adpcm_sound_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( williams_adpcm_sound );
-}
 
 
 //-------------------------------------------------

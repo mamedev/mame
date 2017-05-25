@@ -853,13 +853,11 @@ static ADDRESS_MAP_START( usb_portmap, AS_IO, 8, usb_sound_device )
 ADDRESS_MAP_END
 
 
-/*************************************
- *
- *  USB machine drivers
- *
- *************************************/
+//-------------------------------------------------
+// device_add_mconfig - add device configuration
+//-------------------------------------------------
 
-MACHINE_CONFIG_START( segausb )
+MACHINE_CONFIG_MEMBER( usb_sound_device::device_add_mconfig )
 
 	/* CPU for the usb board */
 	MCFG_CPU_ADD("ourcpu", I8035, USB_MASTER_CLOCK)     /* divide by 15 in CPU */
@@ -873,10 +871,6 @@ MACHINE_CONFIG_START( segausb )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("usb_timer", usb_sound_device, increment_t1_clock_timer_cb, attotime::from_hz(USB_2MHZ_CLOCK / 256))
 MACHINE_CONFIG_END
 
-machine_config_constructor usb_sound_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( segausb );
-}
 
 DEFINE_DEVICE_TYPE(SEGAUSBROM, usb_rom_sound_device, "segausbrom", "Sega Universal Sound Board with ROM")
 
@@ -889,7 +883,7 @@ static ADDRESS_MAP_START( usb_map_rom, AS_PROGRAM, 8, usb_sound_device )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION(":usbcpu", 0)
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_START( segausb_rom )
+MACHINE_CONFIG_MEMBER( usb_rom_sound_device::device_add_mconfig )
 
 	/* CPU for the usb board */
 	MCFG_CPU_ADD("ourcpu", I8035, USB_MASTER_CLOCK)     /* divide by 15 in CPU */
@@ -898,8 +892,3 @@ MACHINE_CONFIG_START( segausb_rom )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("usb_timer", usb_sound_device, increment_t1_clock_timer_cb, attotime::from_hz(USB_2MHZ_CLOCK / 256))
 MACHINE_CONFIG_END
-
-machine_config_constructor usb_rom_sound_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( segausb_rom );
-}

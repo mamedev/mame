@@ -40,25 +40,18 @@ public:
 	// construction/destruction
 	abc1600_mover_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
 	virtual DECLARE_ADDRESS_MAP(vram_map, 8);
 	virtual DECLARE_ADDRESS_MAP(crtc_map, 8);
 	virtual DECLARE_ADDRESS_MAP(iowr0_map, 8);
 	virtual DECLARE_ADDRESS_MAP(iowr1_map, 8);
 	virtual DECLARE_ADDRESS_MAP(iowr2_map, 8);
 
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
-	MC6845_UPDATE_ROW(crtc_update_row);
-	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_update);
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	// device_memory_interface overrides
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
@@ -103,6 +96,11 @@ private:
 	DECLARE_WRITE8_MEMBER( enable_clocks_w );
 	DECLARE_WRITE8_MEMBER( flag_strobe_w );
 	DECLARE_WRITE8_MEMBER( endisp_w );
+
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	MC6845_UPDATE_ROW(crtc_update_row);
+	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_update);
 
 	inline uint16_t read_videoram(offs_t offset);
 	inline void write_videoram(offs_t offset, uint16_t data, uint16_t mask);

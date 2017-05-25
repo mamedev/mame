@@ -154,10 +154,6 @@ const gfx_layout name = { width, height, RGN_FRAC(1,1), 8, { GFX_RAW }, { 0 }, {
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// forward declarations
-class gfx_element;
-class device_palette_interface;
-
 struct gfx_layout
 {
 	u32 xoffs(int x) const { return (extxoffs != nullptr) ? extxoffs[x] : xoffset[x]; }

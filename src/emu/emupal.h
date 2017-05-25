@@ -286,7 +286,6 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-class palette_device; // forward declaration
 typedef device_delegate<void (palette_device &)> palette_init_delegate;
 
 
@@ -355,7 +354,7 @@ private:
 // ======================> palette_device
 
 // device type definition
-extern const device_type PALETTE;
+DECLARE_DEVICE_TYPE(PALETTE, palette_device)
 
 class palette_device : public device_t, public device_palette_interface
 {

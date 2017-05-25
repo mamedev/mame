@@ -99,7 +99,7 @@ ioport_constructor pcd_video_device::device_input_ports() const
 	return INPUT_PORTS_NAME(pcd_mouse);
 }
 
-static MACHINE_CONFIG_START( pcd_video )
+MACHINE_CONFIG_MEMBER( pcd_video_device::device_add_mconfig )
 	MCFG_CPU_ADD("graphics", I8741, XTAL_16MHz/2)
 	MCFG_MCS48_PORT_P1_IN_CB(READ8(pcd_video_device, p1_r))
 	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(pcd_video_device, p2_w))
@@ -123,11 +123,6 @@ static MACHINE_CONFIG_START( pcd_video )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("mouse_timer", pcd_video_device, mouse_timer, attotime::from_hz(15000)) // guess
 MACHINE_CONFIG_END
 
-machine_config_constructor pcd_video_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( pcd_video );
-}
-
 static ADDRESS_MAP_START( pcx_vid_map, AS_PROGRAM, 8, pcx_video_device )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM AM_REGION("graphics", 0)
 ADDRESS_MAP_END
@@ -145,7 +140,7 @@ static ADDRESS_MAP_START( pcx_vram, AS_0, 8, pcx_video_device )
 	AM_RANGE(0x0000, 0x07ff) AM_READWRITE(vram_r, vram_w)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( pcx_video )
+MACHINE_CONFIG_MEMBER( pcx_video_device::device_add_mconfig )
 	MCFG_CPU_ADD("graphics", I8031, XTAL_24MHz/2)
 	MCFG_CPU_PROGRAM_MAP(pcx_vid_map)
 	MCFG_CPU_IO_MAP(pcx_vid_io)
@@ -170,10 +165,6 @@ static MACHINE_CONFIG_START( pcx_video )
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, pcx_vram)
 MACHINE_CONFIG_END
 
-machine_config_constructor pcx_video_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( pcx_video );
-}
 
 SCN2674_DRAW_CHARACTER_MEMBER(pcd_video_device::display_pixels)
 {

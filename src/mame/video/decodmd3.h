@@ -31,13 +31,11 @@ public:
 	DECLARE_WRITE16_MEMBER(crtc_address_w);
 	DECLARE_WRITE16_MEMBER(crtc_register_w);
 	DECLARE_READ16_MEMBER(crtc_status_r);
-	TIMER_DEVICE_CALLBACK_MEMBER(dmd_irq);
-	MC6845_UPDATE_ROW(crtc_update_row);
 
 	static void static_set_gfxregion(device_t &device, const char *tag);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -59,6 +57,9 @@ private:
 	uint8_t m_command;
 
 	const char* m_gfxtag;
+
+	TIMER_DEVICE_CALLBACK_MEMBER(dmd_irq);
+	MC6845_UPDATE_ROW(crtc_update_row);
 };
 
 DECLARE_DEVICE_TYPE(DECODMD3, decodmd_type3_device)

@@ -71,14 +71,9 @@
 #define ES_PCI_READ 0
 #define ES_PCI_WRITE 1
 
-static MACHINE_CONFIG_START( es1373 )
+MACHINE_CONFIG_MEMBER( es1373_device::device_add_mconfig )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 MACHINE_CONFIG_END
-
-machine_config_constructor es1373_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( es1373 );
-}
 
 DEFINE_DEVICE_TYPE(ES1373, es1373_device, "es1373", "Creative Labs Ensoniq AudioPCI97 ES1373")
 

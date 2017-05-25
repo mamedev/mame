@@ -68,22 +68,6 @@ static const char DEVICE_SELF_OWNER[] = "^";
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// forward references
-class memory_region;
-class device_debug;
-class device_t;
-class device_interface;
-class device_execute_interface;
-class device_memory_interface;
-class device_state_interface;
-class validity_checker;
-class rom_entry;
-class machine_config;
-class emu_timer;
-struct input_device_default;
-class finder_base;
-
-
 namespace emu { namespace detail {
 
 class device_type_impl;

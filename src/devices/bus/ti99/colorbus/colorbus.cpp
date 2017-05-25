@@ -20,7 +20,11 @@
 #include "emu.h"
 #include "colorbus.h"
 #include "busmouse.h"
-#include "bus/ti99x/ti99defs.h"
+#include "bus/ti99/ti99defs.h"
+
+DEFINE_DEVICE_TYPE_NS(TI99_COLORBUS, bus::ti99::colorbus, ti99_colorbus_device, "ti99_colorbus", "v9938 Color bus")
+
+namespace bus { namespace ti99 { namespace colorbus {
 
 ti99_colorbus_device::ti99_colorbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	:   device_t(mconfig, TI99_COLORBUS, tag, owner, clock),
@@ -58,8 +62,8 @@ void device_ti99_colorbus_interface::interface_config_complete()
 	m_colorbus = dynamic_cast<ti99_colorbus_device*>(device().owner());
 }
 
+} } } // end namespace bus::ti99::colorbus
+
 SLOT_INTERFACE_START( ti99_colorbus_port )
 	SLOT_INTERFACE("busmouse", TI99_BUSMOUSE)
 SLOT_INTERFACE_END
-
-DEFINE_DEVICE_TYPE(TI99_COLORBUS, ti99_colorbus_device, "ti99_colorbus", "v9938 Color bus")

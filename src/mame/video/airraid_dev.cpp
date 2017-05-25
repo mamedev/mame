@@ -58,7 +58,7 @@ static GFXDECODE_START( cshooter )
 	GFXDECODE_ENTRY( "fg_gfx", 0,     char16layout, 0, 16  )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( airraid_vid )
+MACHINE_CONFIG_MEMBER( airraid_video_device::device_add_mconfig )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -73,10 +73,6 @@ static MACHINE_CONFIG_START( airraid_vid )
 
 MACHINE_CONFIG_END
 
-machine_config_constructor airraid_video_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( airraid_vid );
-}
 
 void airraid_video_device::device_start()
 {

@@ -2,28 +2,28 @@
 // copyright-holders:Michael Zapf
 /***************************************************************************
     Gromport (Cartridge port) of the TI-99 consoles
-
-    For details see gromport.c
+    For details see gromport.cpp
+    
+    Michael Zapf
 ***************************************************************************/
 
-#ifndef MAME_BUS_TI99X_GROMPORT_H
-#define MAME_BUS_TI99X_GROMPORT_H
+#ifndef MAME_BUS_TI99_INTERNAL_GROMPORT_H
+#define MAME_BUS_TI99_INTERNAL_GROMPORT_H
 
 #pragma once
 
-#include "ti99defs.h"
+#include "bus/ti99/ti99defs.h"
 #include "machine/tmc0430.h"
 #include "softlist_dev.h"
 
+namespace bus { namespace ti99 { namespace internal {
 
-DECLARE_DEVICE_TYPE(TI99_GROMPORT, ti99_gromport_device)
+class cartridge_connector_device;
 
-class ti99_cartridge_connector_device;
-
-class ti99_gromport_device : public bus8z_device, public device_slot_interface
+class gromport_device : public bus8z_device, public device_slot_interface
 {
 public:
-	ti99_gromport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	gromport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	DECLARE_READ8Z_MEMBER(readz) override;
 	DECLARE_WRITE8_MEMBER(write) override;
 	DECLARE_READ8Z_MEMBER(crureadz);
@@ -37,10 +37,10 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(gclock_in);
 
-	static void set_mask(device_t &device, int mask) { downcast<ti99_gromport_device &>(device).m_mask = mask; }
+	static void set_mask(device_t &device, int mask) { downcast<gromport_device &>(device).m_mask = mask; }
 
-	template <class Object> static devcb_base &static_set_ready_callback(device_t &device, Object &&cb)  { return downcast<ti99_gromport_device &>(device).m_console_ready.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &static_set_reset_callback(device_t &device, Object &&cb) { return downcast<ti99_gromport_device &>(device).m_console_reset.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &static_set_ready_callback(device_t &device, Object &&cb)  { return downcast<gromport_device &>(device).m_console_ready.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &static_set_reset_callback(device_t &device, Object &&cb) { return downcast<gromport_device &>(device).m_console_reset.set_callback(std::forward<Object>(cb)); }
 
 	void    cartridge_inserted();
 	bool    is_grom_idle();
@@ -52,32 +52,13 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 
 private:
-	ti99_cartridge_connector_device*    m_connector;
+	cartridge_connector_device*    m_connector;
 	bool                m_reset_on_insert;
 	devcb_write_line   m_console_ready;
 	devcb_write_line   m_console_reset;
 	int             m_mask;
 	int m_romgq;
 };
-
-SLOT_INTERFACE_EXTERN(gromport4);
-SLOT_INTERFACE_EXTERN(gromport8);
-
-#define MCFG_GROMPORT4_ADD( _tag )   \
-	MCFG_DEVICE_ADD(_tag, TI99_GROMPORT, 0) \
-	ti99_gromport_device::set_mask(*device, 0x1fff); \
-	MCFG_DEVICE_SLOT_INTERFACE(gromport4, "single", false)
-
-#define MCFG_GROMPORT8_ADD( _tag )   \
-	MCFG_DEVICE_ADD(_tag, TI99_GROMPORT, 0) \
-	ti99_gromport_device::set_mask(*device, 0x3fff); \
-	MCFG_DEVICE_SLOT_INTERFACE(gromport8, "single", false)
-
-#define MCFG_GROMPORT_READY_HANDLER( _ready ) \
-	devcb = &ti99_gromport_device::static_set_ready_callback( *device, DEVCB_##_ready );
-
-#define MCFG_GROMPORT_RESET_HANDLER( _reset ) \
-	devcb = &ti99_gromport_device::static_set_reset_callback( *device, DEVCB_##_reset );
 
 /****************************************************************************/
 
@@ -137,18 +118,16 @@ private:
 	int     get_index_from_tagname();
 
 	std::unique_ptr<ti99_cartridge_pcb> m_pcb;          // inbound
-	ti99_cartridge_connector_device*    m_connector;    // outbound
+	cartridge_connector_device*    m_connector;    // outbound
 
 	// RPK which is associated to this cartridge
 	// When we close it, the contents are saved to NVRAM if available
 	rpk *m_rpk;
 };
 
-DECLARE_DEVICE_TYPE(TI99CART, ti99_cartridge_device)
-
 /****************************************************************************/
 
-class ti99_cartridge_connector_device : public bus8z_device
+class cartridge_connector_device : public bus8z_device
 {
 public:
 	virtual DECLARE_READ8Z_MEMBER(crureadz) = 0;
@@ -166,17 +145,17 @@ public:
 	virtual bool is_grom_idle() = 0;
 
 protected:
-	ti99_cartridge_connector_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	cartridge_connector_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	virtual void device_config_complete() override;
 
-	ti99_gromport_device*    m_gromport;
+	gromport_device*    m_gromport;
 	bool     m_grom_selected;
 };
 
 /*
     Single cartridge connector.
 */
-class ti99_single_cart_conn_device : public ti99_cartridge_connector_device
+class ti99_single_cart_conn_device : public cartridge_connector_device
 {
 public:
 	ti99_single_cart_conn_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -208,7 +187,7 @@ private:
    logical point of view we could have 256, but the operating system only checks
    the first 16 banks. */
 
-class ti99_multi_cart_conn_device : public ti99_cartridge_connector_device
+class ti99_multi_cart_conn_device : public cartridge_connector_device
 {
 public:
 	ti99_multi_cart_conn_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -249,7 +228,7 @@ private:
 /*
     GRAM Kracker.
 */
-class ti99_gkracker_device : public ti99_cartridge_connector_device, public device_nvram_interface
+class ti99_gkracker_device : public cartridge_connector_device, public device_nvram_interface
 {
 public:
 	ti99_gkracker_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -298,10 +277,6 @@ private:
 	// Just for proper initialization
 	void gk_install_menu(const char* menutext, int len, int ptr, int next, int start);
 };
-
-DECLARE_DEVICE_TYPE(TI99_GROMPORT_SINGLE, ti99_single_cart_conn_device)
-DECLARE_DEVICE_TYPE(TI99_GROMPORT_MULTI,  ti99_multi_cart_conn_device)
-DECLARE_DEVICE_TYPE(TI99_GROMPORT_GK,     ti99_gkracker_device)
 
 /****************************************************************************/
 
@@ -463,4 +438,31 @@ private:
 	bool    m_grom_address_mode;
 };
 
-#endif // MAME_BUS_TI99X_GROMPORT_H
+} } } // end namespace bus::ti99::internal
+
+SLOT_INTERFACE_EXTERN(gromport4);
+SLOT_INTERFACE_EXTERN(gromport8);
+
+#define MCFG_GROMPORT4_ADD( _tag )   \
+	MCFG_DEVICE_ADD(_tag, TI99_GROMPORT, 0) \
+	bus::ti99::internal::gromport_device::set_mask(*device, 0x1fff); \
+	MCFG_DEVICE_SLOT_INTERFACE(gromport4, "single", false)
+
+#define MCFG_GROMPORT8_ADD( _tag )   \
+	MCFG_DEVICE_ADD(_tag, TI99_GROMPORT, 0) \
+	bus::ti99::internal::gromport_device::set_mask(*device, 0x3fff); \
+	MCFG_DEVICE_SLOT_INTERFACE(gromport8, "single", false)
+
+#define MCFG_GROMPORT_READY_HANDLER( _ready ) \
+	devcb = &bus::ti99::internal::gromport_device::static_set_ready_callback( *device, DEVCB_##_ready );
+
+#define MCFG_GROMPORT_RESET_HANDLER( _reset ) \
+	devcb = &bus::ti99::internal::gromport_device::static_set_reset_callback( *device, DEVCB_##_reset );
+
+DECLARE_DEVICE_TYPE_NS(TI99_GROMPORT, bus::ti99::internal, gromport_device)
+DECLARE_DEVICE_TYPE_NS(TI99_CART, bus::ti99::internal, ti99_cartridge_device)
+DECLARE_DEVICE_TYPE_NS(TI99_GROMPORT_SINGLE, bus::ti99::internal, ti99_single_cart_conn_device)
+DECLARE_DEVICE_TYPE_NS(TI99_GROMPORT_MULTI,  bus::ti99::internal, ti99_multi_cart_conn_device)
+DECLARE_DEVICE_TYPE_NS(TI99_GROMPORT_GK,     bus::ti99::internal, ti99_gkracker_device)
+
+#endif // MAME_BUS_TI99_INTERNAL_GROMPORT_H

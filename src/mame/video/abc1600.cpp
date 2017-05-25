@@ -188,10 +188,10 @@ MC6845_ON_UPDATE_ADDR_CHANGED( abc1600_mover_device::crtc_update )
 }
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_START( abc1600_mover )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( abc1600_mover )
+MACHINE_CONFIG_MEMBER( abc1600_mover_device::device_add_mconfig )
 	MCFG_DEFAULT_LAYOUT(layout_abc1600)
 
 	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
@@ -206,18 +206,6 @@ static MACHINE_CONFIG_START( abc1600_mover )
 	MCFG_MC6845_UPDATE_ROW_CB(abc1600_mover_device, crtc_update_row)
 	MCFG_MC6845_ADDR_CHANGED_CB(abc1600_mover_device, crtc_update)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor abc1600_mover_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( abc1600_mover );
-}
-
 
 
 //**************************************************************************

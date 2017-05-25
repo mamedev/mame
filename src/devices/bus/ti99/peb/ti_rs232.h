@@ -18,10 +18,10 @@
 #include "peribox.h"
 #include "machine/tms9902.h"
 
-DECLARE_DEVICE_TYPE(TI99_RS232,     ti_rs232_pio_device)
-DECLARE_DEVICE_TYPE(TI99_RS232_DEV, ti_rs232_attached_device)
-DECLARE_DEVICE_TYPE(TI99_PIO_DEV,   ti_pio_attached_device)
+namespace bus { namespace ti99 { namespace peb {
 
+class ti_pio_attached_device;
+class ti_rs232_attached_device;
 
 class ti_rs232_pio_device : public ti_expansion_card_device
 {
@@ -158,5 +158,11 @@ protected:
 	image_init_result    call_load() override;
 	void    call_unload() override;
 };
+
+} } } // end namespace bus::ti99::peb
+
+DECLARE_DEVICE_TYPE_NS(TI99_RS232,     bus::ti99::peb, ti_rs232_pio_device)
+DECLARE_DEVICE_TYPE_NS(TI99_RS232_DEV, bus::ti99::peb, ti_rs232_attached_device)
+DECLARE_DEVICE_TYPE_NS(TI99_PIO_DEV,   bus::ti99::peb, ti_pio_attached_device)
 
 #endif // MAME_BUS_TI99_PEB_TI_RS232_H

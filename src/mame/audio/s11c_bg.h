@@ -35,13 +35,10 @@ public:
 	required_memory_bank m_cpubank;
 	memory_region* m_rom;
 
-	DECLARE_WRITE8_MEMBER(pia40_pb_w);
-	DECLARE_WRITE_LINE_MEMBER(pia40_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(pia40_cb2_w);
+
 	DECLARE_WRITE8_MEMBER(bg_speech_clock_w);
 	DECLARE_WRITE8_MEMBER(bg_speech_digit_w);
 	DECLARE_WRITE8_MEMBER(bgbank_w);
-	DECLARE_WRITE_LINE_MEMBER(ym2151_irq_w);
 	void ctrl_w(uint8_t data);
 	void data_w(uint8_t data);
 
@@ -51,10 +48,15 @@ protected:
 	// overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	const char* m_regiontag;
+
+	DECLARE_WRITE_LINE_MEMBER(ym2151_irq_w);
+	DECLARE_WRITE8_MEMBER(pia40_pb_w);
+	DECLARE_WRITE_LINE_MEMBER(pia40_ca2_w);
+	DECLARE_WRITE_LINE_MEMBER(pia40_cb2_w);
 };
 
 DECLARE_DEVICE_TYPE(S11C_BG, s11c_bg_device)

@@ -25,9 +25,6 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// forward declarations
-namespace util { class archive_file; }
-
 // ======================> path_iterator
 
 // helper class for iterating over configured paths
