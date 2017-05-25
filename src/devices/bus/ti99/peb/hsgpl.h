@@ -22,7 +22,7 @@
 #include "machine/at29x.h"
 #include "machine/ram.h"
 
-DECLARE_DEVICE_TYPE(TI99_HSGPL, snug_high_speed_gpl_device)
+namespace bus { namespace ti99 { namespace peb {
 
 class snug_high_speed_gpl_device : public ti_expansion_card_device
 {
@@ -80,5 +80,9 @@ private:
 	bool            m_raddr_LSB;
 	int             m_grom_address;
 };
+
+} } } // end namespace bus::ti99::peb
+
+DECLARE_DEVICE_TYPE_NS(TI99_HSGPL, bus::ti99::peb, snug_high_speed_gpl_device)
 
 #endif // MAME_BUS_TI99_PEB_HSGPL_H

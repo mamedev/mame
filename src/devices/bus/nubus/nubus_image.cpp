@@ -114,7 +114,7 @@ void nubus_image_device::messimg_disk_image_device::device_reset()
 {
 }
 
-MACHINE_CONFIG_FRAGMENT( image )
+MACHINE_CONFIG_START( image )
 	MCFG_DEVICE_ADD(IMAGE_DISK0_TAG, MESSIMG_DISK, 0)
 MACHINE_CONFIG_END
 

@@ -34,7 +34,7 @@ h83002_device::h83002_device(const machine_config &mconfig, const char *tag, dev
 	syscr = 0;
 }
 
-static MACHINE_CONFIG_FRAGMENT(h83002)
+static MACHINE_CONFIG_START(h83002)
 	MCFG_H8H_INTC_ADD("intc")
 	MCFG_H8_ADC_3337_ADD("adc", "intc", 60)
 	MCFG_H8_DMA_ADD("dma")

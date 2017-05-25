@@ -562,7 +562,7 @@ static SLOT_INTERFACE_START(a2600_cart)
 	SLOT_INTERFACE_INTERNAL("a26_harmony",   A26_ROM_HARMONY)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_FRAGMENT(a2600_cartslot)
+static MACHINE_CONFIG_START(a2600_cartslot)
 	MCFG_VCS_CARTRIDGE_ADD("cartslot", a2600_cart, nullptr)
 
 	/* software lists */

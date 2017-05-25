@@ -20,7 +20,7 @@
 
 #define VRAM_SIZE   (0x40000)   // 256k.  1152x880 1 bit per pixel fits nicely.
 
-MACHINE_CONFIG_FRAGMENT( radiustpd )
+MACHINE_CONFIG_START( radiustpd )
 	MCFG_SCREEN_ADD( RADIUSTPD_SCREEN_NAME, RASTER)
 	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, nubus_radiustpd_device, screen_update)
 	MCFG_SCREEN_SIZE(1280, 960)

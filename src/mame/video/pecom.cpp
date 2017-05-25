@@ -90,7 +90,7 @@ VIDEO_START_MEMBER(pecom_state,pecom)
 	save_pointer(NAME(m_charram.get()), PECOM_CHAR_RAM_SIZE);
 }
 
-MACHINE_CONFIG_FRAGMENT( pecom_video )
+MACHINE_CONFIG_START( pecom_video )
 	MCFG_CDP1869_SCREEN_PAL_ADD(CDP1869_TAG, SCREEN_TAG, cdp1869_device::DOT_CLK_PAL)
 
 	MCFG_VIDEO_START_OVERRIDE(pecom_state,pecom)

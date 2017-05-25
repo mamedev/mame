@@ -4783,7 +4783,7 @@ ROM_START( footchmp )
 	ROM_LOAD16_BYTE( "c80-11.6", 0x00000, 0x20000, CRC(f78630fb) SHA1(37da34401f664caaf5113a9abad78e447f4f4651) )
 	ROM_LOAD16_BYTE( "c80-10.4", 0x00001, 0x20000, CRC(32c109cb) SHA1(46a116127bcea18cc15ddf297e5e0d5cdcac9842) )
 	ROM_LOAD16_BYTE( "c80-12.7", 0x40000, 0x20000, CRC(80d46fef) SHA1(cc81c8ba19321e8bae9054021bfb61cb11c2aba5) )
-	ROM_LOAD16_BYTE( "c80-14.5", 0x40001, 0x20000, CRC(40ac4828) SHA1(9a2112b0ccd573a3e94d9817b78bb02909b972e1) )
+	ROM_LOAD16_BYTE( "c80-14.5", 0x40001, 0x20000, CRC(40ac4828) SHA1(9a2112b0ccd573a3e94d9817b78bb02909b972e1) ) // identical rom also found with c80-13 sticker, is this correct?
 
 	ROM_REGION( 0x100000, "gfx1", 0 )   /* SCR */
 	ROM_LOAD16_BYTE( "c80-04.1", 0x00000, 0x80000, CRC(9a17fe8c) SHA1(d2ea72743151f0f7bf78f33dba526214afb07389) )
@@ -5621,10 +5621,11 @@ GAME( 1990, growlp,     growl,    growl,     growl,      taitof2_state, 0,      
 GAME( 1990, mjnquest,   0,        mjnquest,  mjnquest,   taitof2_state, mjnquest, ROT0,   "Taito Corporation",         "Mahjong Quest (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, mjnquestb,  mjnquest, mjnquest,  mjnquest,   taitof2_state, mjnquest, ROT0,   "Taito Corporation",         "Mahjong Quest (No Nudity)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, footchmp,   0,        footchmp,  footchmp,   taitof2_state, 0,        ROT0,   "Taito Corporation Japan",   "Football Champ (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, footchmp,   0,        footchmp,  footchmp,   taitof2_state, 0,        ROT0,   "Taito Corporation Japan",   "Football Champ / Euro Football Champ (World)", MACHINE_SUPPORTS_SAVE ) // title depends on dipswitch
 GAME( 1990, hthero,     footchmp, hthero,    hthero,     taitof2_state, 0,        ROT0,   "Taito Corporation",         "Hat Trick Hero (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, euroch92,   footchmp, footchmp,  footchmp,   taitof2_state, 0,        ROT0,   "Taito Corporation Japan",   "Euro Champ '92 (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, footchmpbl, footchmp, footchmpbl,footchmpbl, taitof2_state, 0,        ROT0,   "bootleg",                   "Football Champ (World) (bootleg)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // very different hw register etc.
+GAME( 1992, footchmpbl, footchmp, footchmpbl,footchmpbl, taitof2_state, 0,        ROT0,   "bootleg",                   "Football Champ / Euro Football Champ (World) (bootleg)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // very different hw register etc.
+
+GAME( 1992, euroch92,   0,        footchmp,  footchmp,   taitof2_state, 0,        ROT0,   "Taito Corporation Japan",   "Euro Champ '92 (World)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1990, koshien,    0,        koshien,   koshien,    taitof2_state, 0,        ROT0,   "Taito Corporation",         "Ah Eikou no Koshien (Japan)", MACHINE_SUPPORTS_SAVE )
 

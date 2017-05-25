@@ -32,13 +32,14 @@ public:
 	DECLARE_WRITE8_MEMBER(brightness_w);
 
 	virtual void video_update(bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 protected:
 	vt100_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	// internal state
 	void recompute_parameters();
@@ -89,10 +90,11 @@ public:
 	int MHFU(int);
 	void palette_select(int choice);
 	void notify_vblank(bool choice);
+	
 protected:
 	virtual void display_char(bitmap_ind16 &bitmap, uint8_t code, int x, int y, uint8_t scroll_region, uint8_t display_type) override;
 	virtual void device_reset() override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 DECLARE_DEVICE_TYPE(VT100_VIDEO, vt100_video_device)

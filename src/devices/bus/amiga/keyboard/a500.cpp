@@ -58,11 +58,6 @@ ADDRESS_MAP_START( mpu6500_map, AS_PROGRAM, 8, a500_kbd_device )
 	AM_RANGE(0x800, 0xfff) AM_ROM AM_REGION("ic1", 0)
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_FRAGMENT( kbd_pcb )
-	MCFG_CPU_ADD("ic1", M6502, XTAL_3MHz / 2)
-	MCFG_CPU_PROGRAM_MAP(mpu6500_map)
-MACHINE_CONFIG_END
-
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
@@ -141,10 +136,10 @@ INPUT_PORTS_END
 } // anonymous namespace
 
 
-machine_config_constructor a500_kbd_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME(kbd_pcb);
-}
+MACHINE_CONFIG_MEMBER(a500_kbd_device::device_add_mconfig)
+	MCFG_CPU_ADD("ic1", M6502, XTAL_3MHz / 2)
+	MCFG_CPU_PROGRAM_MAP(mpu6500_map)
+MACHINE_CONFIG_END
 
 const tiny_rom_entry *a500_kbd_device::device_rom_region() const
 {

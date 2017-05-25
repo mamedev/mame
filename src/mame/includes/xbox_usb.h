@@ -340,6 +340,10 @@ struct usb_device_configuration
 	std::forward_list<usb_device_interfac *> interfaces;
 };
 
+/*
+ * OHCI Usb Controller
+ */
+
 class ohci_function; // forward declaration
 
 class ohci_usb_controller
@@ -396,6 +400,10 @@ private:
 		OHCIIsochronousTransferDescriptor isochronous_transfer_descriptor;
 	} ohcist;
 };
+
+/*
+ * Base class for usb devices
+ */
 
 class ohci_function {
 public:
@@ -455,9 +463,35 @@ protected:
 	usb_device_configuration *selected_configuration;
 };
 
+/*
+ * Usb port connector
+ */
+
+class ohci_usb_connector : public device_t, public device_slot_interface
+{
+public:
+	ohci_usb_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual ~ohci_usb_connector();
+
+	ohci_function *get_device();
+
+protected:
+	virtual void device_start() override;
+};
+
+extern const device_type OHCI_USB_CONNECTOR;
+
+#define MCFG_USB_PORT_ADD(_tag, _slot_intf, _def_slot, _fixed) \
+	MCFG_DEVICE_ADD(_tag, OHCI_USB_CONNECTOR, 0)                   \
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _fixed)
+
+/*
+ * Game controller usb device
+ */
+
 DECLARE_DEVICE_TYPE(OHCI_GAME_CONTROLLER, ohci_game_controller_device)
 
-class ohci_game_controller_device : public device_t, public ohci_function
+class ohci_game_controller_device : public device_t, public ohci_function, public device_slot_card_interface
 {
 public:
 	ohci_game_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);

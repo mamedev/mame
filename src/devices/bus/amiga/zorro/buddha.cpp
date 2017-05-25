@@ -58,7 +58,7 @@ ADDRESS_MAP_END
 //  machine configurations
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( buddha )
+static MACHINE_CONFIG_START( buddha )
 	MCFG_ATA_INTERFACE_ADD("ata_0", ata_devices, nullptr, nullptr, false)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(buddha_device, ide_0_interrupt_w))
 	MCFG_ATA_INTERFACE_ADD("ata_1", ata_devices, nullptr, nullptr, false)

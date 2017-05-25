@@ -196,7 +196,7 @@ static ADDRESS_MAP_START( mboard_map, AS_PROGRAM, 8, vicdual_state )
 ADDRESS_MAP_END
 
 
-MACHINE_CONFIG_FRAGMENT( carnival_audio )
+MACHINE_CONFIG_START( carnival_audio )
 
 	/* music board */
 	MCFG_CPU_ADD("audiocpu", I8039, XTAL_3_579545MHz)

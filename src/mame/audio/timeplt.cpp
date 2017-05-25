@@ -169,7 +169,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-MACHINE_CONFIG_FRAGMENT( timeplt_sound )
+MACHINE_CONFIG_START( timeplt_sound )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("tpsound",Z80,MASTER_CLOCK/8)

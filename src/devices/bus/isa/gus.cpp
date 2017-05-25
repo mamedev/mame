@@ -1231,7 +1231,7 @@ void gf1_device::eop_w(int state)
 
 /* 16-bit ISA card device implementation */
 
-static MACHINE_CONFIG_FRAGMENT( gus_config )
+static MACHINE_CONFIG_START( gus_config )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
 	MCFG_SOUND_ADD("gf1",GGF1,GF1_CLOCK)
 	MCFG_SOUND_ROUTE(0,"lspeaker",0.50)

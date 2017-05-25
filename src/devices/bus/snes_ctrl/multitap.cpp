@@ -41,7 +41,7 @@ static SLOT_INTERFACE_START( snes_multitap )
 	SLOT_INTERFACE("twintap", SNES_TWINTAP)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_FRAGMENT( multi5p )
+static MACHINE_CONFIG_START( multi5p )
 	MCFG_SNES_CONTROL_PORT_ADD("port1", snes_multitap, "joypad")
 	MCFG_SNES_CONTROL_PORT_ADD("port2", snes_multitap, "joypad")
 	MCFG_SNES_CONTROL_PORT_ADD("port3", snes_multitap, "joypad")

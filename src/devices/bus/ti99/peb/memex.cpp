@@ -15,6 +15,10 @@
 #include "emu.h"
 #include "memex.h"
 
+DEFINE_DEVICE_TYPE_NS(TI99_MEMEX, bus::ti99::peb, geneve_memex_device, "ti99_memex", "Geneve memory expansion card")
+
+namespace bus { namespace ti99 { namespace peb {
+
 #define RAMREGION "ram2meg"
 #define TRACE_CONFIG 0
 
@@ -142,7 +146,7 @@ INPUT_PORTS_START( memex )
 		PORT_DIPSETTING( MDIP8, "Lock out pages FC-FF")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_FRAGMENT( memex )
+MACHINE_CONFIG_START( memex )
 	MCFG_RAM_ADD(RAMREGION)
 	MCFG_RAM_DEFAULT_SIZE("2M")
 	MCFG_RAM_DEFAULT_VALUE(0)
@@ -158,4 +162,4 @@ ioport_constructor geneve_memex_device::device_input_ports() const
 	return INPUT_PORTS_NAME( memex );
 }
 
-DEFINE_DEVICE_TYPE(TI99_MEMEX, geneve_memex_device, "ti99_memex", "Geneve memory expansion card")
+} } } // end namespace bus::ti99::peb

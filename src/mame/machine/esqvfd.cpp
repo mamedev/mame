@@ -191,7 +191,7 @@ void esqvfd_device::update_display()
 
 /* 2x40 VFD display used in the ESQ-1, VFX-SD, SD-1, and others */
 
-static MACHINE_CONFIG_FRAGMENT(esq2x40)
+static MACHINE_CONFIG_START(esq2x40)
 	MCFG_DEFAULT_LAYOUT(layout_esq2by40)
 MACHINE_CONFIG_END
 
@@ -291,7 +291,7 @@ esq2x40_device::esq2x40_device(const machine_config &mconfig, const char *tag, d
 
 /* 1x22 display from the VFX (not right, but it'll do for now) */
 
-static MACHINE_CONFIG_FRAGMENT(esq1x22)
+static MACHINE_CONFIG_START(esq1x22)
 	MCFG_DEFAULT_LAYOUT(layout_esq1by22)
 MACHINE_CONFIG_END
 

@@ -96,7 +96,7 @@ WRITE8_MEMBER(sms_gender_adapter_device::write_ram)
 //  machine configurations
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( genderadp_slot )
+static MACHINE_CONFIG_START( genderadp_slot )
 	MCFG_SMS_CARTRIDGE_ADD("subslot", sms_cart, nullptr)
 MACHINE_CONFIG_END
 

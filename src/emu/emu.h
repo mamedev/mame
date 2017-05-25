@@ -57,8 +57,7 @@
 
 // define machine_config_constructor here due to circular dependency
 // between devices and the machine config
-class machine_config;
-typedef device_t * (*machine_config_constructor)(machine_config &config, device_t *owner, device_t *device);
+typedef void (*machine_config_constructor)(machine_config &config, device_t *owner, device_t *device);
 
 // I/O
 #include "input.h"
@@ -76,7 +75,6 @@ typedef device_t * (*machine_config_constructor)(machine_config &config, device_
 #include "dipalette.h"
 #include "digfx.h"
 #include "diimage.h"
-#include "dioutput.h"
 #include "diserial.h"
 #include "dislot.h"
 #include "disound.h"
@@ -86,7 +84,6 @@ typedef device_t * (*machine_config_constructor)(machine_config &config, device_
 #include "schedule.h"
 #include "timer.h"
 #include "dinetwork.h"
-#include "dipty.h"
 
 // machine and driver configuration
 #include "mconfig.h"

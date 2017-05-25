@@ -57,7 +57,7 @@ DEFINE_DEVICE_TYPE(A2BUS_HSSCSI, a2bus_hsscsi_device, "a2hsscsi", "Apple II High
 #define SCSI_BUS_TAG     "scsibus"
 #define SCSI_5380_TAG    "scsibus:7:ncr5380"
 
-static MACHINE_CONFIG_FRAGMENT( ncr5380 )
+static MACHINE_CONFIG_START( ncr5380 )
 	MCFG_DEVICE_CLOCK(10000000)
 	MCFG_NCR5380N_DRQ_HANDLER(DEVWRITELINE("^^", a2bus_hsscsi_device, drq_w))
 MACHINE_CONFIG_END
@@ -68,7 +68,7 @@ static SLOT_INTERFACE_START( hsscsi_devices )
 	SLOT_INTERFACE_INTERNAL("ncr5380", NCR5380N)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_FRAGMENT( hsscsi )
+static MACHINE_CONFIG_START( hsscsi )
 	MCFG_NSCSI_BUS_ADD(SCSI_BUS_TAG)
 	MCFG_NSCSI_ADD("scsibus:0", hsscsi_devices, nullptr, false)
 	MCFG_NSCSI_ADD("scsibus:1", hsscsi_devices, nullptr, false)

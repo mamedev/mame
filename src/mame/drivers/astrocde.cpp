@@ -1281,7 +1281,7 @@ static MACHINE_CONFIG_DERIVED( astrocade_16color_base, astrocade_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_FRAGMENT( astrocade_mono_sound )
+static MACHINE_CONFIG_START( astrocade_mono_sound )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1291,7 +1291,7 @@ static MACHINE_CONFIG_FRAGMENT( astrocade_mono_sound )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_FRAGMENT( astrocade_stereo_sound )
+static MACHINE_CONFIG_START( astrocade_stereo_sound )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

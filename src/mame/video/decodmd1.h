@@ -26,8 +26,6 @@ public:
 	required_device<ram_device> m_ram;
 	memory_region* m_rom;
 
-	uint32_t screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect );
-
 	DECLARE_READ8_MEMBER(latch_r);
 	DECLARE_WRITE8_MEMBER(data_w);
 	DECLARE_READ8_MEMBER(busy_r);
@@ -37,12 +35,11 @@ public:
 	DECLARE_WRITE8_MEMBER(status_w);
 	DECLARE_READ8_MEMBER(dmd_port_r);
 	DECLARE_WRITE8_MEMBER(dmd_port_w);
-	TIMER_DEVICE_CALLBACK_MEMBER(dmd_nmi);
 
 	static void static_set_gfxregion(device_t &device, const char *tag);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -73,6 +70,8 @@ private:
 
 	void output_data();
 	void set_busy(uint8_t input, uint8_t val);
+	uint32_t screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect );
+	TIMER_DEVICE_CALLBACK_MEMBER(dmd_nmi);
 };
 
 DECLARE_DEVICE_TYPE(DECODMD1, decodmd_type1_device)

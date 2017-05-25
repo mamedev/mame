@@ -44,7 +44,7 @@ WRITE_LINE_MEMBER(isa16_ide_device::ide_interrupt)
 	}
 }
 
-static MACHINE_CONFIG_FRAGMENT(cdrom_headphones)
+static MACHINE_CONFIG_START(cdrom_headphones)
 	MCFG_DEVICE_MODIFY("cdda")
 	MCFG_SOUND_ROUTE(0, "lheadphone", 1.0)
 	MCFG_SOUND_ROUTE(1, "rheadphone", 1.0)
@@ -52,7 +52,7 @@ static MACHINE_CONFIG_FRAGMENT(cdrom_headphones)
 	MCFG_SPEAKER_STANDARD_STEREO("lheadphone", "rheadphone")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( ide )
+static MACHINE_CONFIG_START( ide )
 	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", nullptr, false)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(isa16_ide_device, ide_interrupt))
 

@@ -26,6 +26,10 @@
 #include "emu.h"
 #include "samsmem.h"
 
+DEFINE_DEVICE_TYPE_NS(TI99_SAMSMEM, bus::ti99::peb, sams_memory_expansion_device, "ti99_sams", "SuperAMS memory expansion card")
+
+namespace bus { namespace ti99 { namespace peb {
+
 #define SAMS_CRU_BASE 0x1e00
 
 sams_memory_expansion_device::sams_memory_expansion_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -107,7 +111,7 @@ WRITE8_MEMBER(sams_memory_expansion_device::cruwrite)
 	}
 }
 
-MACHINE_CONFIG_FRAGMENT( sams_mem )
+MACHINE_CONFIG_START( sams_mem )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1M")
 	MCFG_RAM_DEFAULT_VALUE(0)
@@ -133,4 +137,4 @@ void sams_memory_expansion_device::device_reset()
 	for (auto & elem : m_mapper) elem = 0;
 }
 
-DEFINE_DEVICE_TYPE(TI99_SAMSMEM, sams_memory_expansion_device, "ti99_sams", "SuperAMS memory expansion card")
+} } } // end namespace bus::ti99::peb

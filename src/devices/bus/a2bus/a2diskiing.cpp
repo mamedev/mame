@@ -30,7 +30,7 @@ static SLOT_INTERFACE_START( a2_floppies )
 	SLOT_INTERFACE( "525", FLOPPY_525_SD )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_FRAGMENT( diskiing )
+static MACHINE_CONFIG_START( diskiing )
 	MCFG_DEVICE_ADD(WOZFDC_TAG, DISKII_FDC, 1021800*2)
 	MCFG_FLOPPY_DRIVE_ADD("0", a2_floppies, "525", a2bus_diskiing_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("1", a2_floppies, "525", a2bus_diskiing_device::floppy_formats)

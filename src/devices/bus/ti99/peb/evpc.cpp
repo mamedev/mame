@@ -39,6 +39,10 @@
 #include "evpc.h"
 #include "speaker.h"
 
+DEFINE_DEVICE_TYPE_NS(TI99_EVPC, bus::ti99::peb, snug_enhanced_video_device, "ti99_evpc", "SNUG Enhanced Video Processor Card")
+
+namespace bus { namespace ti99 { namespace peb {
+
 #define EVPC_CRU_BASE 0x1400
 
 #define TRACE_ADDRESS 0
@@ -387,7 +391,7 @@ void snug_enhanced_video_device::device_start()
 {
 	m_dsrrom = memregion(DSRROM)->base();
 	m_novram = std::make_unique<uint8_t[]>(NOVRAM_SIZE);
-	m_console_conn = downcast<evpc_clock_connector*>(machine().device(EVPC_CONN_TAG));
+	m_console_conn = downcast<bus::ti99::internal::evpc_clock_connector*>(machine().device(EVPC_CONN_TAG));
 	save_item(NAME(m_address));
 	save_item(NAME(m_dsr_page));
 	save_item(NAME(m_inDsrArea));
@@ -438,7 +442,7 @@ ROM_START( ti99_evpc )
 	ROM_LOAD("evpc_dsr.u21", 0, 0x10000, CRC(a062b75d) SHA1(6e8060f86e3bb9c36f244d88825e3fe237bfe9a9)) /* evpc DSR ROM */
 ROM_END
 
-MACHINE_CONFIG_FRAGMENT( ti99_evpc )
+MACHINE_CONFIG_START( ti99_evpc )
 	// video hardware
 	MCFG_V9938_ADD(VDP_TAG, SCREEN_TAG, 0x20000, XTAL_21_4772MHz)  /* typical 9938 clock, not verified */
 	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(snug_enhanced_video_device, video_interrupt_in))
@@ -495,4 +499,4 @@ machine_config_constructor snug_enhanced_video_device::device_mconfig_additions(
 	return MACHINE_CONFIG_NAME( ti99_evpc );
 }
 
-DEFINE_DEVICE_TYPE(TI99_EVPC, snug_enhanced_video_device, "ti99_evpc", "SNUG Enhanced Video Processor Card")
+} } } // end namespace bus::ti99::peb

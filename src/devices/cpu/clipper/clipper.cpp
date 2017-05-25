@@ -1269,7 +1269,7 @@ int clipper_device::execute_instruction ()
 			case 0x04:
 				// reti: restore psw, ssw and pc from supervisor stack
 				LOG_INTERRUPT("reti r%d, ssp = %08x, pc = %08x, next_pc = %08x\n",
-					(m_info.macro >> 4) & 0xf, m_rs[(m_info.macro >> 4) & 0xf], m_pc, m_insn->read_dword(m_rs[(m_info.macro >> 4) & 0xf] + 8));
+					(m_info.macro >> 4) & 0xf, m_rs[(m_info.macro >> 4) & 0xf], m_pc, m_data->read_dword(m_rs[(m_info.macro >> 4) & 0xf] + 8));
 
 				m_psw = m_data->read_dword(m_rs[(m_info.macro >> 4) & 0xf] + 0);
 				m_ssw = m_data->read_dword(m_rs[(m_info.macro >> 4) & 0xf] + 4);
@@ -1327,7 +1327,7 @@ int clipper_device::execute_instruction ()
 */
 u32 clipper_device::intrap(u32 vector, u32 pc, u32 cts, u32 mts)
 {
-	LOG_INTERRUPT("intrap - vector %x, pc = 0x%08x, next_pc = 0x%08x, ssp = 0x%08x\n", vector, pc, m_insn->read_dword(vector + 4), m_rs[15]);
+	LOG_INTERRUPT("intrap - vector %x, pc = 0x%08x, next_pc = 0x%08x, ssp = 0x%08x\n", vector, pc, m_data->read_dword(vector + 4), m_rs[15]);
 
 	// set cts and mts to indicate source of exception
 	m_psw = (m_psw & ~(PSW_CTS | PSW_MTS)) | mts | cts;

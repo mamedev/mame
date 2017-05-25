@@ -539,7 +539,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-MACHINE_CONFIG_FRAGMENT( asic65 )
+MACHINE_CONFIG_START( asic65 )
 
 	/* ASIC65 */
 	MCFG_CPU_ADD("asic65cpu", TMS32010, 20000000)

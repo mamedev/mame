@@ -1062,7 +1062,7 @@ static SLOT_INTERFACE_START(apollo_isa_cards)
 	SLOT_INTERFACE("3c505", ISA16_3C505)   // 3Com 3C505 Ethernet card
 SLOT_INTERFACE_END
 
-MACHINE_CONFIG_FRAGMENT( common )
+MACHINE_CONFIG_START( common )
 	// configuration MUST be reset first !
 	MCFG_DEVICE_ADD(APOLLO_CONF_TAG, APOLLO_CONF, 0)
 
@@ -1150,7 +1150,7 @@ MACHINE_CONFIG_FRAGMENT( common )
 MACHINE_CONFIG_END
 
 // for machines with the keyboard and a graphics head
-MACHINE_CONFIG_FRAGMENT( apollo )
+MACHINE_CONFIG_START( apollo )
 	MCFG_FRAGMENT_ADD(common)
 	MCFG_APOLLO_SIO_ADD( APOLLO_SIO_TAG, XTAL_3_6864MHz )
 	MCFG_APOLLO_SIO_IRQ_CALLBACK(WRITELINE(apollo_state, sio_irq_handler))
@@ -1172,7 +1172,7 @@ static DEVICE_INPUT_DEFAULTS_START( apollo_terminal )
 DEVICE_INPUT_DEFAULTS_END
 
 // for headless machines using a serial console
-MACHINE_CONFIG_FRAGMENT( apollo_terminal )
+MACHINE_CONFIG_START( apollo_terminal )
 	MCFG_FRAGMENT_ADD(common)
 	MCFG_APOLLO_SIO_ADD( APOLLO_SIO_TAG, XTAL_3_6864MHz )
 	MCFG_APOLLO_SIO_IRQ_CALLBACK(WRITELINE(apollo_state, sio_irq_handler))

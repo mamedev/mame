@@ -18,7 +18,7 @@ SLOT_INTERFACE_EXTERN(cpc_exp_cards);
 //**************************************************************************
 
 // device machine config
-static MACHINE_CONFIG_FRAGMENT( cpc_rom )
+static MACHINE_CONFIG_START( cpc_rom )
 	MCFG_CPC_ROMSLOT_ADD("rom1")
 	MCFG_CPC_ROMSLOT_ADD("rom2")
 	MCFG_CPC_ROMSLOT_ADD("rom3")

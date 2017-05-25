@@ -735,7 +735,7 @@ static const floppy_interface atari_floppy_interface =
 	"floppy_5_25"
 };
 
-static MACHINE_CONFIG_FRAGMENT( atari_fdc )
+static MACHINE_CONFIG_START( atari_fdc )
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(atari_floppy_interface)
 MACHINE_CONFIG_END
 

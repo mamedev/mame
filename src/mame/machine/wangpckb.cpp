@@ -112,7 +112,7 @@ ADDRESS_MAP_END
 //  MACHINE_DRIVER( wangpc_keyboard )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( wangpc_keyboard )
+static MACHINE_CONFIG_START( wangpc_keyboard )
 	MCFG_CPU_ADD(I8051_TAG, I8051, XTAL_4MHz)
 	MCFG_CPU_IO_MAP(wangpc_keyboard_io)
 	MCFG_MCS51_SERIAL_TX_CB(WRITE8(wangpc_keyboard_device, mcs51_tx_callback))

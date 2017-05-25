@@ -14,6 +14,10 @@
 #include "emu.h"
 #include "busmouse.h"
 
+DEFINE_DEVICE_TYPE_NS(TI99_BUSMOUSE, bus::ti99::colorbus, geneve_busmouse_device, "ti99_busmouse", "Geneve Bus Mouse")
+
+namespace bus { namespace ti99 { namespace colorbus {
+
 geneve_busmouse_device::geneve_busmouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TI99_BUSMOUSE, tag, owner, clock), device_ti99_colorbus_interface(mconfig, *this)
 	, m_buttons(*this, "MOUSEBUT"), m_xaxis(*this, "MOUSEX"), m_yaxis(*this, "MOUSEY")
@@ -64,5 +68,4 @@ ioport_constructor geneve_busmouse_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( busmouse );
 }
-
-DEFINE_DEVICE_TYPE(TI99_BUSMOUSE, geneve_busmouse_device, "ti99_busmouse", "Geneve Bus Mouse")
+} } } // end namespace bus::ti99::colorbus

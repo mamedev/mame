@@ -18,7 +18,7 @@
 #include "peribox.h"
 #include "machine/ram.h"
 
-DECLARE_DEVICE_TYPE(TI99_MYARCMEM, myarc_memory_expansion_device)
+namespace bus { namespace ti99 { namespace peb {
 
 class myarc_memory_expansion_device : public ti_expansion_card_device
 {
@@ -44,5 +44,9 @@ private:
 	int     m_bank;
 	int     m_size;
 };
+
+} } } // end namespace bus::ti99::peb
+
+DECLARE_DEVICE_TYPE_NS(TI99_MYARCMEM, bus::ti99::peb, myarc_memory_expansion_device)
 
 #endif // MAME_BUS_TI99_PEB_MYARCMEM_H

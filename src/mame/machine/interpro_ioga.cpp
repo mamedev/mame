@@ -18,19 +18,26 @@
 #include "emu.h"
 #include "interpro_ioga.h"
 
+#define LOG_HWINT_ENABLE ((1<<2) | LOG_GENERAL)
+#define LOG_DMA_ENABLE ((1<<2) | LOG_GENERAL)
+
+#define LOG_GENERAL (1 << 31)
+
+#define LOG_HWINT(interrupt, ...) if (LOG_HWINT_ENABLE & (1 << interrupt)) logerror(__VA_ARGS__)
+#define LOG_DMA(channel, ...) if (LOG_DMA_ENABLE & (1 << channel)) logerror(__VA_ARGS__)
+
 #define VERBOSE 0
+
 #if VERBOSE
 #define LOG_TIMER_MASK 0xff
 #define LOG_TIMER(timer, ...) if (LOG_TIMER_MASK & (1 << timer)) logerror(__VA_ARGS__)
 #define LOG_INTERRUPT(...) logerror(__VA_ARGS__)
 #define LOG_IOGA(...) logerror(__VA_ARGS__)
-#define LOG_DMA(...) logerror(__VA_ARGS__)
 #else
 #define LOG_TIMER_MASK 0x00
 #define LOG_TIMER(timer, ...)
 #define LOG_INTERRUPT(...)
 #define LOG_IOGA(...)
-#define LOG_DMA(...)
 #endif
 
 DEVICE_ADDRESS_MAP_START(map, 32, interpro_ioga_device)
@@ -61,7 +68,7 @@ DEFINE_DEVICE_TYPE(INTERPRO_IOGA, interpro_ioga_device, "ioga", "InterPro IOGA")
 interpro_ioga_device::interpro_ioga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, INTERPRO_IOGA, tag, owner, clock),
 	m_out_nmi_func(*this),
-	m_out_int_func(*this),
+	m_out_irq_func(*this),
 	m_memory_space(nullptr),
 	m_dma_channel{
 		{ 0,0,0,0,false, 0, {*this}, {*this} },
@@ -72,11 +79,39 @@ interpro_ioga_device::interpro_ioga_device(const machine_config &mconfig, const 
 {
 }
 
+#if LOG_HWINT_ENABLE
+static const char *interrupt_source[IOGA_INTERRUPT_COUNT] = {
+	// internal
+	"timer 2",
+	"timer 3", 
+	// external
+	"SCSI",
+	"floppy",
+	"plotter",
+	"SRX / CBUS 0",
+	"SRX / CBUS 1",
+	"SRX / CBUS 2",
+	"VB",
+	"",
+	"CBUS 3",
+	"clock / calendar",
+	"clock / SGA",
+	// internal
+	"mouse",
+	"timer 0",
+	"timer 1",
+	"serial DMA",
+	// external
+	"serial",
+	"Ethernet",
+};
+#endif
+
 void interpro_ioga_device::device_start()
 {
 	// resolve callbacks
 	m_out_nmi_func.resolve();
-	m_out_int_func.resolve();
+	m_out_irq_func.resolve();
 
 	// TODO: parameterise the cammu name and space number
 	// grab the main memory space from the mmu so we can do DMA to/from it
@@ -104,18 +139,26 @@ void interpro_ioga_device::device_start()
 	// allocate timer for DMA controller
 	m_dma_timer = timer_alloc(IOGA_TIMER_DMA);
 	m_dma_timer->adjust(attotime::never);
+
+	m_ioga_clock = timer_alloc(IOGA_CLOCK);
+	m_ioga_clock->adjust(attotime::never);
 }
 
 void interpro_ioga_device::device_reset()
 {
-	m_nmi_pending = false;
-
-	m_interrupt_active = 0;
-	m_irq_forced = 0;
+	// initialise interrupt state
+	m_active_interrupt_type = IOGA_INTERRUPT_NONE;
+	m_hwint_forced = 0;
+	m_nmi_state = CLEAR_LINE;
+	m_irq_state = CLEAR_LINE;
+	m_int_line = 0;
 
 	// configure timer 0 at 60Hz
 	m_timer_reg[0] = 0;
-	m_timer[0]->adjust(attotime::zero, IOGA_TIMER_0, attotime::from_hz(60));
+	//m_timer[0]->adjust(attotime::zero, IOGA_TIMER_0, attotime::from_hz(60));
+
+	// configure ioga clock timer
+	m_ioga_clock->adjust(attotime::zero, IOGA_CLOCK, attotime::from_hz(clock()));
 }
 
 /******************************************************************************
@@ -146,7 +189,7 @@ READ32_MEMBER(interpro_ioga_device::timer3_r)
 	return result;
 }
 
-void interpro_ioga_device::write_timer(int timer, uint32_t value, device_timer_id id)
+void interpro_ioga_device::write_timer(int timer, u32 value, device_timer_id id)
 {
 	switch (id)
 	{
@@ -240,59 +283,19 @@ void interpro_ioga_device::device_timer(emu_timer &timer, device_timer_id id, in
 		break;
 
 	case IOGA_TIMER_DMA:
-		// transfer data between device and main memory
+		dma_clock(param);
+		break;
 
-		// TODO: figure out what indicates dma write (memory -> device)
-		// TODO: implement multiple dma channels
-		// TODO: virtual memory?
-
-		if (!m_dma_channel[param].dma_active)
-		{
-			LOG_DMA("dma: transfer started, channel = %d, control 0x%08x, real address 0x%08x count 0x%08x\n",
-				param, m_dma_channel[param].control, m_dma_channel[param].real_address, m_dma_channel[param].transfer_count);
-			m_dma_channel[param].dma_active = true;
-		}
-
-		// while the device is requesting a data transfer and the transfer count is not zero
-		while (m_dma_channel[param].drq_state &&  m_dma_channel[param].transfer_count)
-		{
-			// transfer a byte between device and memory
-			if (true)
-				m_memory_space->write_byte(m_dma_channel[param].real_address, m_dma_channel[param].device_r());
-			else
-				m_dma_channel[param].device_w(m_memory_space->read_byte(m_dma_channel[param].real_address));
-
-			// increment addresses and decrement count
-			m_dma_channel[param].real_address++;
-			m_dma_channel[param].virtual_address++;
-			m_dma_channel[param].transfer_count--;
-		}
-
-		// if there are no more bytes remaining, terminate the transfer
-		if (m_dma_channel[param].transfer_count == 0)
-		{
-			LOG_DMA("dma: transfer stopped, control 0x%08x, real address 0x%08x count 0x%08x\n",
-				m_dma_channel[param].control, m_dma_channel[param].fdc_real_address, m_dma_channel[param].transfer_count);
-
-			if (param == IOGA_DMA_FLOPPY)
-			{
-				LOG_DMA("dma: asserting fdc terminal count line\n");
-
-				m_fdc_tc_func(ASSERT_LINE);
-				m_fdc_tc_func(CLEAR_LINE);
-			}
-
-			m_dma_channel[param].dma_active = false;
-		}
-	break;
+	case IOGA_CLOCK:
+		interrupt_clock();
+		break;
 	}
 }
 
 /******************************************************************************
  Interrupts
 ******************************************************************************/
-
-static const uint16_t irq_enable_mask[IOGA_INTERRUPT_COUNT] =
+static const u16 irq_enable_mask[IOGA_INTERRUPT_COUNT] =
 {
 	IOGA_INTERRUPT_ENABLE_EXTERNAL,
 	IOGA_INTERRUPT_ENABLE_EXTERNAL,
@@ -318,56 +321,70 @@ static const uint16_t irq_enable_mask[IOGA_INTERRUPT_COUNT] =
 	IOGA_INTERRUPT_ENABLE_EXTERNAL | IOGA_INTERRUPT_ENABLE_INTERNAL // external interrupt 12: Ethernet
 };
 
+bool interpro_ioga_device::nmi(int state)
+{
+	if (m_nmi_state != state)
+	{
+		m_nmi_state = state;
+		m_out_nmi_func(m_nmi_state);
+
+		return true;
+	}
+	else
+		return false;
+}
+
+bool interpro_ioga_device::irq(int state)
+{
+	if (m_irq_state != state)
+	{
+		m_irq_state = state;
+		m_out_irq_func(m_irq_state);
+
+		return true;
+	}
+	else
+		return false;
+}
+
 void interpro_ioga_device::set_nmi_line(int state)
 {
+	LOG_INTERRUPT("set_nmi_line(%d)\n", state);
 	switch (state)
 	{
 	case ASSERT_LINE:
-
-		LOG_INTERRUPT("nmi: ctrl = 0x%02x\n", m_nmictrl);
-
+#if 0
 		if ((m_nmictrl & IOGA_NMI_ENABLE) == IOGA_NMI_ENABLE)
 		{
 			// if edge triggered mode, clear enable in
 			if (m_nmictrl & IOGA_NMI_EDGE)
 				m_nmictrl &= ~IOGA_NMI_ENABLE_IN;
-
-			m_nmi_pending = true;
-			update_interrupt(ASSERT_LINE);
 		}
+#endif
+		m_nmictrl |= IOGA_NMI_PENDING;
 		break;
 
 	case CLEAR_LINE:
-		m_nmi_pending = false;
-		update_interrupt(ASSERT_LINE);
+		m_nmictrl &= ~IOGA_NMI_PENDING;
 		break;
 	}
 }
 
 void interpro_ioga_device::set_irq_line(int irq, int state)
 {
-	LOG_INTERRUPT("set_irq_line(%d, %d)\n", irq, state);
+	LOG_HWINT(irq, "set_irq_line(%d, %d)\n", irq, state);
 	switch (state)
 	{
 	case ASSERT_LINE:
-		if (m_int_vector[irq] & irq_enable_mask[irq])
-		{
-			// set pending bit
-			m_int_vector[irq] |= IOGA_INTERRUPT_PENDING;
-
-			// update irq line state
-			update_interrupt(state);
-		}
-		else
-			LOG_INTERRUPT("received disabled interrupt irq %d vector 0x%04x\n", irq, m_int_vector[irq]);
+		// set pending bit
+		m_int_line |= (1 << irq);
+		m_hwicr[irq] |= IOGA_INTERRUPT_PENDING;
 		break;
 
 	case CLEAR_LINE:
 		// clear pending bit
-		m_int_vector[irq] &= ~IOGA_INTERRUPT_PENDING;
-
-		// update irq line state
-		update_interrupt(state);
+		m_int_line &= (1 << irq);
+		m_hwicr[irq] &= ~IOGA_INTERRUPT_PENDING;
 		break;
 	}
 }
@@ -382,9 +399,7 @@ void interpro_ioga_device::set_irq_soft(int irq, int state)
 		if (irq < 8)
 			m_softint |= 1 << irq;
 		else
-			m_softint_vector[irq - 8] |= IOGA_INTERRUPT_PENDING;
-
-		update_interrupt(state);
+			m_swicr[irq - 8] |= IOGA_INTERRUPT_PENDING;
 		break;
 
 	case CLEAR_LINE:
@@ -392,170 +407,180 @@ void interpro_ioga_device::set_irq_soft(int irq, int state)
 		if (irq < 8)
 			m_softint &= ~(1 << irq);
 		else
-			m_softint_vector[irq - 8] &= ~IOGA_INTERRUPT_PENDING;
-
-		// update irq line state
-		update_interrupt(state);
+			m_swicr[irq - 8] &= ~IOGA_INTERRUPT_PENDING;
 		break;
 	}
 }
 
 IRQ_CALLBACK_MEMBER(interpro_ioga_device::inta_cb)
 {
+	int vector = 0;
+
 	switch (irqline)
 	{
 	case INPUT_LINE_IRQ0:
 		// FIXME: clear pending bit - can't rely on device callbacks
-		switch (m_interrupt_active)
+		switch (m_active_interrupt_type)
 		{
 		case IOGA_INTERRUPT_INTERNAL:
 		case IOGA_INTERRUPT_EXTERNAL:
-			m_int_vector[m_irq_current] &= ~IOGA_INTERRUPT_PENDING;
+			m_hwicr[m_active_interrupt_number] &= ~IOGA_INTERRUPT_PENDING;
 			break;
 
 		case IOGA_INTERRUPT_SOFT_LO:
-			m_softint &= ~(1 << m_irq_current);
+			m_softint &= ~(1 << m_active_interrupt_number);
 			break;
 
 		case IOGA_INTERRUPT_SOFT_HI:
-			m_softint_vector[m_irq_current] &= ~IOGA_INTERRUPT_PENDING;
+			m_swicr[m_active_interrupt_number] &= ~IOGA_INTERRUPT_PENDING;
 			break;
 		}
-
-		// clear irq line
-		update_interrupt(CLEAR_LINE);
 
 		// fall through to return interrupt vector
 	case -1:
 		// return vector for current interrupt without clearing irq line
-		switch (m_interrupt_active)
+		switch (m_active_interrupt_type)
 		{
-		case IOGA_INTERRUPT_EXTERNAL:
 		case IOGA_INTERRUPT_INTERNAL:
-			return m_int_vector[m_irq_current] & 0xff;
+		case IOGA_INTERRUPT_EXTERNAL:
+			vector = m_hwicr[m_active_interrupt_number] & 0xff;
+			break;
 
-		case IOGA_INTERRUPT_SOFT_LO:
-			return 0x8f + m_irq_current * 0x10;
+		case IOGA_INTERRUPT_SOFT_LO: 
+			vector = 0x8f + m_active_interrupt_number * 0x10;
+			break;
 
-		case IOGA_INTERRUPT_SOFT_HI:
-			return m_softint_vector[m_irq_current] & 0xff;
+		case IOGA_INTERRUPT_SOFT_HI: 
+			vector = m_swicr[m_active_interrupt_number] & 0xff;
+			break;
 		}
+
+		// interrupt is acknowledged
+		if (irqline == INPUT_LINE_IRQ0)
+			m_active_interrupt_type = IOGA_INTERRUPT_NONE;
 		break;
 
 	case INPUT_LINE_NMI:
 		// clear pending flag
-		m_nmi_pending = false;
-
-		// clear line
-		update_interrupt(CLEAR_LINE);
-
-		// return vector
-		return 0;
+		m_nmictrl &= ~IOGA_NMI_PENDING;
+		m_active_interrupt_type = IOGA_INTERRUPT_NONE;
+		break;
 	}
 
-	return 0;
+	return vector;
 }
 
-void interpro_ioga_device::update_interrupt(int state)
+void interpro_ioga_device::interrupt_clock()
 {
-	switch (state)
+	// called on every ioga clock cycle
+	// if there are no active interrupts, raise the next pending one
+
+	// don't do anything if any interrupts are currently being serviced
+	if (m_active_interrupt_type != IOGA_INTERRUPT_NONE)
+		return;
+
+	// if nmi line is asserted, clear it
+	if (nmi(CLEAR_LINE))
+		return;
+
+	// if irq line is asserted, clear it
+	if (irq(CLEAR_LINE))
+		return;
+
+	// check for pending nmi
+	if (m_nmictrl & IOGA_NMI_PENDING)
 	{
-	case CLEAR_LINE:
-		if (m_interrupt_active)
+		m_active_interrupt_type = IOGA_INTERRUPT_NMI;
+		nmi(ASSERT_LINE);
+		return;
+	}
+
+	// check for any pending and enabled hardware interrupts
+	for (int i = 0; i < IOGA_INTERRUPT_COUNT; i++)
+	{
+		if ((m_hwicr[i] & irq_enable_mask[i]) && (m_hwicr[i] & IOGA_INTERRUPT_PENDING))
 		{
-			// the cpu has acknowledged the active interrupt, deassert the nmi/irq line
-			m_interrupt_active == IOGA_INTERRUPT_NMI ? m_out_nmi_func(CLEAR_LINE) : m_out_int_func(CLEAR_LINE);
+			LOG_HWINT(i, "accepting interrupt %d - %s (%s)\n", i, interrupt_source[i], m_int_line & (1 << i) ? "real" : "forced");
 
-			// clear the active status
-			m_interrupt_active = 0;
+			m_active_interrupt_type = IOGA_INTERRUPT_EXTERNAL; // TODO: flag internal/external
+			m_active_interrupt_number = i;
+
+			irq(ASSERT_LINE);
+			return;
 		}
-		// fall through to handle any pending interrupts
+	}
 
-	case ASSERT_LINE:
-		// if an interrupt is currently active, don't do anything
-		if (m_interrupt_active == 0)
+	// check for any pending soft interrupts (low type)
+	for (int i = 0; i < 8; i++)
+	{
+		if (m_softint & (1 << i))
 		{
-			// check for pending nmi
-			if (m_nmi_pending)
-			{
-				m_interrupt_active = IOGA_INTERRUPT_NMI;
+			m_active_interrupt_type = IOGA_INTERRUPT_SOFT_LO;
+			m_active_interrupt_number = i;
 
-				m_out_nmi_func(ASSERT_LINE);
-				return;
-			}
-
-			// check for any pending irq
-			for (int i = 0; i < IOGA_INTERRUPT_COUNT; i++)
-			{
-				if (m_int_vector[i] & IOGA_INTERRUPT_PENDING)
-				{
-					m_interrupt_active = IOGA_INTERRUPT_INTERNAL; // TODO: flag internal/external
-					m_irq_current = i;
-
-					m_out_int_func(ASSERT_LINE);
-					return;
-				}
-			}
-
-			// check for any pending soft interrupts (low type)
-			for (int i = 0; i < 8; i++)
-			{
-				if (m_softint & (1 << i))
-				{
-					m_interrupt_active = IOGA_INTERRUPT_SOFT_LO;
-					m_irq_current = i;
-
-					m_out_int_func(ASSERT_LINE);
-					return;
-				}
-			}
-
-			// check for any pending soft interrupts (high type)
-			for (int i = 0; i < 8; i++)
-			{
-				if (m_softint_vector[i] & IOGA_INTERRUPT_PENDING)
-				{
-					m_interrupt_active = IOGA_INTERRUPT_SOFT_HI;
-					m_irq_current = i;
-
-					m_out_int_func(ASSERT_LINE);
-					return;
-				}
-			}
+			irq(ASSERT_LINE);
+			return;
 		}
-		break;
+	}
+
+	// check for any pending soft interrupts (high type)
+	for (int i = 0; i < 8; i++)
+	{
+		if (m_swicr[i] & IOGA_INTERRUPT_PENDING)
+		{
+			m_active_interrupt_type = IOGA_INTERRUPT_SOFT_HI;
+			m_active_interrupt_number = i;
+
+			irq(ASSERT_LINE);
+			return;
+		}
 	}
 }
 
 WRITE16_MEMBER(interpro_ioga_device::icr_w)
 {
-	LOG_INTERRUPT("interrupt vector %d set to 0x%04x at pc 0x%08x\n", offset, data, space.device().safe_pc());
+	/*
+	* It appears that writing the pending flag high and then low again is intended to
+	* "force" an interrupt to be generated. We record the initial write in m_hwint_forced,
+	* and when a subsequent write occurrs, turn the pending bit on to trigger the interrupt.
+	*
+	* FIXME: should we only flag a forced interrupt if pending is written high from low?
+	*/
 
-	// FIXME: now that the interrupt handling only depends on IOGA_INTERRUPT_PENDING, we might be able
-	// to avoid this hack
+	LOG_HWINT(offset, "interrupt vector %d set to 0x%04x at %s\n", offset, data, machine().describe_context());
+#if 1
 	if (data & IOGA_INTERRUPT_PENDING)
 	{
-		m_irq_forced |= 1 << offset;
-		m_int_vector[offset] = data & ~IOGA_INTERRUPT_PENDING;
+		m_hwint_forced |= 1 << offset;
+		m_hwicr[offset] = (m_hwicr[offset] & IOGA_INTERRUPT_PENDING) | (data & ~IOGA_INTERRUPT_PENDING);
 	}
-	else if (m_irq_forced & 1 << offset)
+	else if (m_hwint_forced & 1 << offset)
 	{
-		m_int_vector[offset] = data;
+		m_hwicr[offset] = data;
 
 		// clear forced flag
-		m_irq_forced &= ~(1 << offset);
+		m_hwint_forced &= ~(1 << offset);
 
 		// force an interrupt
-		set_irq_line(offset, ASSERT_LINE);
+		m_hwicr[offset] |= IOGA_INTERRUPT_PENDING;
 	}
 	else
-		m_int_vector[offset] = data;
+		m_hwicr[offset] = data;
+#else
+	if (data & IOGA_INTERRUPT_PENDING)
+		m_hwint_forced |= 1 << offset;
+
+	if (data & IOGA_INTERRUPT_ENABLE_EXTERNAL)
+		m_hwicr[offset] = data;
+	else
+		m_hwicr[offset] = data & ~IOGA_INTERRUPT_PENDING;
+#endif
 }
 
 WRITE8_MEMBER(interpro_ioga_device::softint_w)
 {
 	// save the existing value
-	uint8_t previous = m_softint;
+	u8 previous = m_softint;
 
 	// store the written value
 	m_softint = data;
@@ -563,7 +588,7 @@ WRITE8_MEMBER(interpro_ioga_device::softint_w)
 	// force soft interrupt for any bit written from 1 to 0
 	for (int i = 0; i < 8; i++)
 	{
-		uint8_t mask = 1 << i;
+		u8 mask = 1 << i;
 
 		// check for transition from 1 to 0 and force a soft interrupt
 		if (previous & mask && !(data & mask))
@@ -572,7 +597,8 @@ WRITE8_MEMBER(interpro_ioga_device::softint_w)
 }
 
 WRITE8_MEMBER(interpro_ioga_device::nmictrl_w)
-{
+{ 
+#if 0
 	// save the existing value
 	uint8_t previous = m_nmictrl;
 
@@ -582,15 +608,32 @@ WRITE8_MEMBER(interpro_ioga_device::nmictrl_w)
 	// force an nmi when pending bit is written low
 	if (previous & IOGA_NMI_PENDING && !(data & IOGA_NMI_PENDING))
 		set_nmi_line(ASSERT_LINE);
+#else
+	if (data & IOGA_NMI_PENDING)
+	{
+		m_nmi_forced = true;
+		m_nmictrl = (m_nmictrl & IOGA_NMI_PENDING) | (data & ~IOGA_NMI_PENDING);
+	}
+	else if (m_nmi_forced)
+	{
+		m_nmi_forced = false;
+
+		m_nmictrl = data | IOGA_NMI_PENDING;
+	}
+	else
+		m_nmictrl = data;
+
+	//m_nmictrl = data & ~IOGA_NMI_PENDING;
+#endif
 }
 
 WRITE16_MEMBER(interpro_ioga_device::softint_vector_w)
 {
 	// save the existing value
-	uint16_t previous = m_softint_vector[offset];
+	u16 previous = m_swicr[offset];
 
 	// store the written value
-	m_softint_vector[offset] = data;
+	m_swicr[offset] = data;
 
 	// check for transition from 1 to 0 and force a soft interrupt
 	if (previous & IOGA_INTERRUPT_PENDING && !(data & IOGA_INTERRUPT_PENDING))
@@ -600,6 +643,54 @@ WRITE16_MEMBER(interpro_ioga_device::softint_vector_w)
 /******************************************************************************
  DMA
 ******************************************************************************/
+void interpro_ioga_device::dma_clock(int channel)
+{
+	// transfer data between device and main memory
+
+	// TODO: figure out what indicates dma write (memory -> device)
+	// TODO: implement multiple dma channels
+	// TODO: virtual memory?
+
+	if (!m_dma_channel[channel].dma_active)
+	{
+		LOG_DMA(channel, "dma: transfer started, channel = %d, control 0x%08x, real address 0x%08x count 0x%08x\n",
+			channel, m_dma_channel[channel].control, m_dma_channel[channel].real_address, m_dma_channel[channel].transfer_count);
+		m_dma_channel[channel].dma_active = true;
+	}
+
+	// while the device is requesting a data transfer and the transfer count is not zero
+	while (m_dma_channel[channel].drq_state &&  m_dma_channel[channel].transfer_count)
+	{
+		// transfer a byte between device and memory
+		if (true)
+			m_memory_space->write_byte(m_dma_channel[channel].real_address, m_dma_channel[channel].device_r());
+		else
+			m_dma_channel[channel].device_w(m_memory_space->read_byte(m_dma_channel[channel].real_address));
+
+		// increment addresses and decrement count
+		m_dma_channel[channel].real_address++;
+		m_dma_channel[channel].virtual_address++;
+		m_dma_channel[channel].transfer_count--;
+	}
+
+	// if there are no more bytes remaining, terminate the transfer
+	if (m_dma_channel[channel].transfer_count == 0)
+	{
+		LOG_DMA(channel, "dma: transfer completed, control 0x%08x, real address 0x%08x count 0x%08x\n",
+			m_dma_channel[channel].control, m_dma_channel[channel].real_address, m_dma_channel[channel].transfer_count);
+
+		if (channel == IOGA_DMA_FLOPPY)
+		{
+			LOG_DMA(channel, "dma: asserting fdc terminal count line\n");
+
+			m_fdc_tc_func(ASSERT_LINE);
+			m_fdc_tc_func(CLEAR_LINE);
+		}
+
+		m_dma_channel[channel].dma_active = false;
+	}
+}
+
 void interpro_ioga_device::drq(int state, int channel)
 {
 	// this member is called when the device has data ready for reading via dma
@@ -607,6 +698,8 @@ void interpro_ioga_device::drq(int state, int channel)
 
 	if (state)
 	{
+		LOG_DMA(channel, "dma: recieved drq for channel %d\n", channel);
+
 		// TODO: check if dma is enabled
 		m_dma_timer->adjust(attotime::zero, channel);
 	}
@@ -620,7 +713,7 @@ void interpro_ioga_device::drq(int state, int channel)
 */
 // TODO: 7.0266 - forced BERR not working
 
-uint32_t interpro_ioga_device::dma_r(address_space &space, offs_t offset, uint32_t mem_mask, int channel)
+u32 interpro_ioga_device::dma_r(address_space &space, offs_t offset, u32 mem_mask, int channel)
 {
 	switch (offset)
 	{
@@ -641,7 +734,7 @@ uint32_t interpro_ioga_device::dma_r(address_space &space, offs_t offset, uint32
 	return 0;
 }
 
-void interpro_ioga_device::dma_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask, int channel)
+void interpro_ioga_device::dma_w(address_space &space, offs_t offset, u32 data, u32 mem_mask, int channel)
 {
 	switch (offset)
 	{
@@ -660,11 +753,24 @@ void interpro_ioga_device::dma_w(address_space &space, offs_t offset, uint32_t d
 	case 3:
 		m_dma_channel[channel].control = data & IOGA_DMA_CTRL_WMASK;
 
-		logerror("dma: channel = %d, control = 0x%08x, ra = 0x%08x, va = 0x%08x, tc = 0x%08x\n",
-			channel, data, m_dma_channel[channel].real_address, m_dma_channel[channel].virtual_address, m_dma_channel[channel].transfer_count);
+		logerror("dma: channel = %d, control = 0x%08x, ra = 0x%08x, va = 0x%08x, tc = 0x%08x at %s\n",
+			channel, data, m_dma_channel[channel].real_address, m_dma_channel[channel].virtual_address, m_dma_channel[channel].transfer_count, machine().describe_context());
+
+		// scsidiag
+		// dma ctrl = 0xbf000600
+		//          = 0xff000600
+		//          = 0x63xxxxxx
+		// 600 = scsi channel?
+		// b = 1011
+		// f = 1111
+		// 6 = 0101
+		// -> bit 0x4 = read/write?
+		
+
+		// mask 
 
 		// iogadiag test 7.0265
-		if (data == IOGA_DMA_CTRL_START)
+		if (data & IOGA_DMA_CTRL_START)
 		{
 			uint32_t mask = 0;
 
@@ -686,6 +792,14 @@ void interpro_ioga_device::dma_w(address_space &space, offs_t offset, uint32_t d
 			// if bus grant is not enabled, set the busy flag
 			if (!(m_arbctl & mask))
 				m_dma_channel[channel].control |= IOGA_DMA_CTRL_BUSY;
+#if 0
+			// flip transfer count zero on immediately if needed
+			if (m_dma_channel[channel].transfer_count == 0)
+			{
+				m_dma_channel[channel].control |= IOGA_DMA_CTRL_TCZERO;
+				set_irq_line(2, ASSERT_LINE);
+			}
+#endif
 		}
 		break;
 	}

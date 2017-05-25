@@ -40,21 +40,21 @@ driver_device::~driver_device()
 
 
 //-------------------------------------------------
-//  static_set_game - set the game in the device
+//  set_game_driver - set the game in the device
 //  configuration
 //-------------------------------------------------
 
-void driver_device::static_set_game(device_t &device, const game_driver &game)
+void driver_device::set_game_driver(const game_driver &game)
 {
-	driver_device &driver = downcast<driver_device &>(device);
+	assert(!m_system);
 
 	// set the system
-	driver.m_system = &game;
+	m_system = &game;
 
 	// and set the search path to include all parents
-	driver.m_searchpath = game.name;
+	m_searchpath = game.name;
 	for (int parent = driver_list::clone(game); parent != -1; parent = driver_list::clone(parent))
-		driver.m_searchpath.append(";").append(driver_list::driver(parent).name);
+		m_searchpath.append(";").append(driver_list::driver(parent).name);
 }
 
 
@@ -156,7 +156,19 @@ void driver_device::video_reset()
 
 const tiny_rom_entry *driver_device::device_rom_region() const
 {
+	assert(m_system);
 	return m_system->rom;
+}
+
+
+//-------------------------------------------------
+//  device_add_mconfig - add machine configuration
+//-------------------------------------------------
+
+void driver_device::device_add_mconfig(machine_config &config)
+{
+	assert(m_system);
+	m_system->machine_config(config, this, nullptr);
 }
 
 

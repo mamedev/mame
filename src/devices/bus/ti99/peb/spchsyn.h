@@ -18,7 +18,7 @@
 #include "peribox.h"
 #include "sound/tms5220.h"
 
-DECLARE_DEVICE_TYPE(TI99_SPEECH, ti_speech_synthesizer_device)
+namespace bus { namespace ti99 { namespace peb {
 
 class ti_speech_synthesizer_device : public ti_expansion_card_device
 {
@@ -45,5 +45,9 @@ private:
 	bool            m_reading;
 	bool            m_sbe;          // Signal "Speech block enable"
 };
+
+} } } // end namespace bus::ti99::peb
+
+DECLARE_DEVICE_TYPE_NS(TI99_SPEECH, bus::ti99::peb, ti_speech_synthesizer_device)
 
 #endif // MAME_BUS_TI99_PEB_SPCHSYN_H

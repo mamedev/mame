@@ -10,22 +10,21 @@
     February 2012: Rewritten as class
 
 *****************************************************************************/
-#ifndef MAME_BUS_TI99X_GENBOARD_H
-#define MAME_BUS_TI99X_GENBOARD_H
+#ifndef MAME_BUS_TI99_INTERNAL_GENBOARD_H
+#define MAME_BUS_TI99_INTERNAL_GENBOARD_H
 
 #pragma once
 
-#include "ti99defs.h"
-#include "machine/mm58274c.h"
+#include "bus/ti99/ti99defs.h"
+#include "bus/ti99/peb/peribox.h"
 #include "video/v9938.h"
 #include "cpu/tms9900/tms9995.h"
-#include "machine/at29x.h"
-#include "bus/ti99/peb/peribox.h"
 #include "sound/sn76496.h"
+#include "machine/mm58274c.h"
+#include "machine/at29x.h"
 #include "machine/ram.h"
 
-DECLARE_DEVICE_TYPE(GENEVE_KEYBOARD, geneve_keyboard_device)
-DECLARE_DEVICE_TYPE(GENEVE_MAPPER,   geneve_mapper_device)
+namespace bus { namespace ti99 { namespace internal {
 
 /*****************************************************************************/
 
@@ -84,7 +83,7 @@ private:
 };
 
 #define MCFG_GENEVE_KBINT_HANDLER( _intcallb ) \
-	devcb = &geneve_keyboard_device::static_set_int_callback( *device, DEVCB_##_intcallb );
+	devcb = &bus::ti99::internal::geneve_keyboard_device::static_set_int_callback( *device, DEVCB_##_intcallb );
 
 /*****************************************************************************/
 
@@ -188,15 +187,20 @@ private:
 	required_device<at29c040a_device>    m_pfm512a;
 	required_device<sn76496_base_device> m_sound;
 
-	required_device<geneve_keyboard_device> m_keyboard;
+	required_device<bus::ti99::internal::geneve_keyboard_device> m_keyboard;
 	required_device<v9938_device>           m_video;
-	required_device<peribox_device>         m_peribox;
+	required_device<bus::ti99::peb::peribox_device>         m_peribox;
 	uint8_t*                  m_eprom;
 	required_device<ram_device> m_sram;
 	required_device<ram_device> m_dram;
 };
 
 #define MCFG_GENEVE_READY_HANDLER( _intcallb ) \
-	devcb = &geneve_mapper_device::static_set_ready_callback( *device, DEVCB_##_intcallb );
+	devcb = &bus::ti99::internal::geneve_mapper_device::static_set_ready_callback( *device, DEVCB_##_intcallb );
 
-#endif // MAME_BUS_TI99X_GENBOARD_H
+} } } // end namespace bus::ti99::internal
+
+DECLARE_DEVICE_TYPE_NS(GENEVE_KEYBOARD, bus::ti99::internal, geneve_keyboard_device)
+DECLARE_DEVICE_TYPE_NS(GENEVE_MAPPER,   bus::ti99::internal, geneve_mapper_device)
+
+#endif // MAME_BUS_TI99_INTERNAL_GENBOARD_H

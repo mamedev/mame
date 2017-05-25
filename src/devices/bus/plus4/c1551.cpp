@@ -343,7 +343,7 @@ FLOPPY_FORMATS_END
 //  MACHINE_DRIVER( c1551 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( c1551 )
+static MACHINE_CONFIG_START( c1551 )
 	MCFG_CPU_ADD(M6510T_TAG, M6510T, XTAL_16MHz/8)
 	MCFG_CPU_PROGRAM_MAP(c1551_mem)
 	MCFG_M6510T_PORT_CALLBACKS(READ8(c1551_device, port_r), WRITE8(c1551_device, port_w))

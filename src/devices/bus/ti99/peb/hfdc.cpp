@@ -59,6 +59,10 @@
 #include "formats/mfm_hd.h"
 #include "formats/ti99_dsk.h"       // Format
 
+DEFINE_DEVICE_TYPE_NS(TI99_HFDC, bus::ti99::peb, myarc_hfdc_device, "ti99_hfdc", "Myarc Hard and Floppy Disk Controller")
+
+namespace bus { namespace ti99 { namespace peb {
+
 #define BUFFER "ram"
 #define FDC_TAG "hdc9234"
 #define CLOCK_TAG "mm58274c"
@@ -1059,7 +1063,7 @@ static SLOT_INTERFACE_START( hfdc_harddisks )
 	SLOT_INTERFACE( "st251", MFMHD_ST251 )        // Seagate ST-251 (40 MB)
 SLOT_INTERFACE_END
 
-MACHINE_CONFIG_FRAGMENT( ti99_hfdc )
+MACHINE_CONFIG_START( ti99_hfdc )
 	MCFG_DEVICE_ADD(FDC_TAG, HDC9234, 0)
 	MCFG_HDC92X4_INTRQ_CALLBACK(WRITELINE(myarc_hfdc_device, intrq_w))
 	MCFG_HDC92X4_DIP_CALLBACK(WRITELINE(myarc_hfdc_device, dip_w))
@@ -1112,4 +1116,4 @@ ioport_constructor myarc_hfdc_device::device_input_ports() const
 	return INPUT_PORTS_NAME( ti99_hfdc );
 }
 
-DEFINE_DEVICE_TYPE(TI99_HFDC, myarc_hfdc_device, "ti99_hfdc", "Myarc Hard and Floppy Disk Controller")
+} } } // end namespace bus::ti99::peb

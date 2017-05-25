@@ -26,7 +26,6 @@ public:
 	DECLARE_PALETTE_INIT(lvcards);
 	DECLARE_MACHINE_START(lvpoker);
 	DECLARE_MACHINE_RESET(lvpoker);
-	DECLARE_PALETTE_INIT(ponttehk);
 	uint32_t screen_update_lvcards(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;

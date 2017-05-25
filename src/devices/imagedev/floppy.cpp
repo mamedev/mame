@@ -737,7 +737,14 @@ uint32_t floppy_image_device::find_position(attotime &base, const attotime &when
 		base -= rev_time;
 	}
 
-	return (delta*floppy_ratio_1).as_ticks(1000000000/1000);
+	uint32_t res = (delta*floppy_ratio_1).as_ticks(1000000000/1000);
+	if (res > 200000000) {
+		// Due to rounding errors in the previous operation,
+		// 'res' sometimes overflows 2E+8
+		res -= 200000000;
+		base += rev_time;
+	}
+	return res;
 }
 
 attotime floppy_image_device::get_next_index_time(std::vector<uint32_t> &buf, int index, int delta, attotime base)
@@ -1337,7 +1344,7 @@ void floppy_sound_device::sound_stream_update(sound_stream &stream, stream_sampl
 
 #define FLOPSPK "flopsndout"
 
-MACHINE_CONFIG_FRAGMENT( floppy_img )
+MACHINE_CONFIG_START( floppy_img )
 	MCFG_SPEAKER_STANDARD_MONO(FLOPSPK)
 	MCFG_SOUND_ADD(FLOPSND_TAG, FLOPPYSOUND, 44100)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, FLOPSPK, 0.5)

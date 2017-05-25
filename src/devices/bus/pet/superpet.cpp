@@ -66,10 +66,10 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( superpet )
+//  MACHINE_CONFIG_START( superpet )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( superpet )
+static MACHINE_CONFIG_START( superpet )
 	MCFG_CPU_ADD(M6809_TAG, M6809, XTAL_16MHz/16)
 	MCFG_CPU_PROGRAM_MAP(superpet_mem)
 

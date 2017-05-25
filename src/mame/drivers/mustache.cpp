@@ -200,8 +200,7 @@ static MACHINE_CONFIG_START( mustache )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mustache)
-	MCFG_PALETTE_ADD("palette", 8*16+16*8)
-	MCFG_PALETTE_INIT_OWNER(mustache_state, mustache)
+	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

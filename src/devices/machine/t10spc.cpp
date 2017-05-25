@@ -67,6 +67,12 @@ void t10spc::ExecCommand()
 		}
 		break;
 
+	case T10SPC_CMD_START_STOP_UNIT:
+		m_phase = SCSI_PHASE_STATUS;
+		m_status_code = SCSI_STATUS_CODE_GOOD;
+		m_transfer_length = 0;
+		break;
+
 	case T10SPC_CMD_SEND_DIAGNOSTIC:
 		m_phase = SCSI_PHASE_DATAOUT;
 		m_status_code = SCSI_STATUS_CODE_GOOD;

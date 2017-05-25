@@ -1316,7 +1316,7 @@ files {
 	MAME_DIR .. "src/mame/machine/apricotkb.cpp",
 	MAME_DIR .. "src/mame/machine/apricotkb.h",
 	MAME_DIR .. "src/mame/drivers/victor9k.cpp",
-	MAME_DIR .. "src/mame/includes/victor9k.h",
+--	MAME_DIR .. "src/mame/includes/victor9k.h",
 	MAME_DIR .. "src/mame/machine/victor9k_kb.cpp",
 	MAME_DIR .. "src/mame/machine/victor9k_kb.h",
 	MAME_DIR .. "src/mame/machine/victor9k_fdc.cpp",
@@ -2133,6 +2133,8 @@ files {
 	MAME_DIR .. "src/mame/machine/interpro_mcga.cpp",
 	MAME_DIR .. "src/mame/machine/interpro_sga.h",
 	MAME_DIR .. "src/mame/machine/interpro_sga.cpp",
+	MAME_DIR .. "src/mame/machine/interpro_srarb.h",
+	MAME_DIR .. "src/mame/machine/interpro_srarb.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "interton")
@@ -2408,6 +2410,7 @@ files {
 	MAME_DIR .. "src/mame/includes/nes.h",
 	MAME_DIR .. "src/mame/machine/nes.cpp",
 	MAME_DIR .. "src/mame/video/nes.cpp",
+	MAME_DIR .. "src/mame/drivers/nes_vt.cpp",
 	MAME_DIR .. "src/mame/drivers/pokemini.cpp",
 	MAME_DIR .. "src/mame/drivers/snes.cpp",
 	MAME_DIR .. "src/mame/includes/snes.h",
@@ -2442,7 +2445,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/mk1.cpp",
 	MAME_DIR .. "src/mame/drivers/mk2.cpp",
 	MAME_DIR .. "src/mame/drivers/novag6502.cpp",
-	MAME_DIR .. "src/mame/drivers/novagbase.h",
+	MAME_DIR .. "src/mame/includes/novagbase.h",
 	MAME_DIR .. "src/mame/drivers/novag68k.cpp",
 	MAME_DIR .. "src/mame/drivers/novagmcs48.cpp",
 	MAME_DIR .. "src/mame/drivers/ssystem3.cpp",
@@ -3253,7 +3256,7 @@ files {
 createMESSProjects(_target, _subtarget, "wang")
 files {
 	MAME_DIR .. "src/mame/drivers/wangpc.cpp",
-	MAME_DIR .. "src/mame/includes/wangpc.h",
+	MAME_DIR .. "src/devices/bus/wangpc/wangpc.h",
 	MAME_DIR .. "src/mame/machine/wangpckb.cpp",
 	MAME_DIR .. "src/mame/machine/wangpckb.h",
 }

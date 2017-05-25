@@ -11,7 +11,7 @@
 DEFINE_DEVICE_TYPE(CENTRONICS_PRINTER, centronics_printer_device, "centronics_printer", "Centronics Printer")
 
 
-static MACHINE_CONFIG_FRAGMENT( centronics_printer )
+static MACHINE_CONFIG_START( centronics_printer )
 	MCFG_DEVICE_ADD("printer", PRINTER, 0)
 	MCFG_PRINTER_ONLINE_CB(WRITELINE(centronics_printer_device, printer_online))
 MACHINE_CONFIG_END

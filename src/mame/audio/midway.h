@@ -59,19 +59,14 @@ public:
 	void set_custom_output(int which, uint8_t mask, write8_delegate handler);
 
 	// internal communications
-	INTERRUPT_GEN_MEMBER(clock_14024);
 	DECLARE_READ8_MEMBER(irq_clear);
 	DECLARE_WRITE8_MEMBER(status_w);
 	DECLARE_READ8_MEMBER(data_r);
-	DECLARE_WRITE8_MEMBER(porta0_w);
-	DECLARE_WRITE8_MEMBER(portb0_w);
-	DECLARE_WRITE8_MEMBER(porta1_w);
-	DECLARE_WRITE8_MEMBER(portb1_w);
 
 protected:
 	// device-level overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -104,6 +99,13 @@ private:
 	read8_delegate m_custom_input[5];
 	uint8_t m_custom_output_mask[2];
 	write8_delegate m_custom_output[2];
+
+	INTERRUPT_GEN_MEMBER(clock_14024);
+	DECLARE_WRITE8_MEMBER(porta0_w);
+	DECLARE_WRITE8_MEMBER(portb0_w);
+	DECLARE_WRITE8_MEMBER(porta1_w);
+	DECLARE_WRITE8_MEMBER(portb1_w);
+
 };
 
 
@@ -121,14 +123,9 @@ public:
 	DECLARE_WRITE8_MEMBER(write);
 	DECLARE_WRITE_LINE_MEMBER(reset_write);
 
-	// internal communications
-	DECLARE_WRITE8_MEMBER(porta_w);
-	DECLARE_WRITE8_MEMBER(portb_w);
-	DECLARE_WRITE_LINE_MEMBER(irq_w);
-
 protected:
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -142,6 +139,11 @@ private:
 	// internal state
 	uint8_t m_status;
 	uint16_t m_dacval;
+
+	// internal communications
+	DECLARE_WRITE8_MEMBER(porta_w);
+	DECLARE_WRITE8_MEMBER(portb_w);
+	DECLARE_WRITE_LINE_MEMBER(irq_w);
 };
 
 
@@ -159,14 +161,9 @@ public:
 	DECLARE_WRITE8_MEMBER(write);
 	DECLARE_WRITE_LINE_MEMBER(reset_write);
 
-	// internal communications
-	DECLARE_WRITE8_MEMBER(porta_w);
-	DECLARE_WRITE8_MEMBER(portb_w);
-	DECLARE_WRITE_LINE_MEMBER(irq_w);
-
 protected:
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -180,6 +177,11 @@ private:
 	// internal state
 	uint8_t m_status;
 	uint16_t m_dacval;
+
+	// internal communications
+	DECLARE_WRITE8_MEMBER(porta_w);
+	DECLARE_WRITE8_MEMBER(portb_w);
+	DECLARE_WRITE_LINE_MEMBER(irq_w);
 };
 
 
@@ -197,15 +199,11 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(reset_write);
 
 	// internal communications
-	DECLARE_WRITE8_MEMBER(porta1_w);
 	DECLARE_WRITE8_MEMBER(dac_w);
-	DECLARE_WRITE8_MEMBER(porta2_w);
-	DECLARE_WRITE8_MEMBER(portb2_w);
-	DECLARE_WRITE_LINE_MEMBER(irq_w);
 
 protected:
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -220,6 +218,12 @@ private:
 	// internal state
 	uint8_t m_tms_command;
 	uint8_t m_tms_strobes;
+
+	// internal communications
+	DECLARE_WRITE8_MEMBER(porta1_w);
+	DECLARE_WRITE8_MEMBER(porta2_w);
+	DECLARE_WRITE8_MEMBER(portb2_w);
+	DECLARE_WRITE_LINE_MEMBER(irq_w);
 };
 
 

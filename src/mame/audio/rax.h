@@ -36,18 +36,13 @@ public:
 	void adsp_irq(int which);
 	void recompute_sample_rate(int which);
 
-	WRITE32_MEMBER(adsp_sound_tx_callback);
-
-	TIMER_DEVICE_CALLBACK_MEMBER(adsp_irq0);
-	TIMER_DEVICE_CALLBACK_MEMBER(sport0_irq);
-	WRITE32_MEMBER(dmovlay_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER( dma_timer_callback );
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	required_device<adsp2181_device>    m_cpu;
@@ -88,6 +83,12 @@ private:
 	required_device<generic_latch_16_device> m_data_out;
 
 	timer_device *m_dma_timer;
+
+	WRITE32_MEMBER(adsp_sound_tx_callback);
+
+	TIMER_DEVICE_CALLBACK_MEMBER(adsp_irq0);
+	TIMER_DEVICE_CALLBACK_MEMBER(sport0_irq);
+	WRITE32_MEMBER(dmovlay_callback);
 };
 
 // device type definition

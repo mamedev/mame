@@ -48,8 +48,6 @@ public:
 	DECLARE_READ8_MEMBER(cru_r);
 	DECLARE_WRITE8_MEMBER(cru_w);
 
-	DECLARE_PALETTE_INIT(vdt911);
-
 	template <class Object> static devcb_base &static_set_keyint_callback(device_t &device, Object &&cb)
 	{
 		return downcast<vdt911_device &>(device).m_keyint_line.set_callback(std::forward<Object>(cb));
@@ -60,14 +58,11 @@ public:
 		return downcast<vdt911_device &>(device).m_lineint_line.set_callback(std::forward<Object>(cb));
 	}
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
 protected:
 	// device-level overrides
 	void device_start() override;
 	void device_reset() override;
-
-	machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	ioport_constructor device_input_ports() const override;
 
 	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -76,6 +71,10 @@ private:
 	void refresh(bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int y);
 	int get_refresh_rate();
 	void check_keyboard();
+
+	DECLARE_PALETTE_INIT(vdt911);
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	screen_size    m_screen_size;  // char_960 for 960-char, 12-line model; char_1920 for 1920-char, 24-line model
 	model          m_model;        // country code

@@ -105,7 +105,7 @@ static ADDRESS_MAP_START(pc_io, AS_IO, 16, a2bus_pcxporter_device )
 	AM_RANGE(0x00a0, 0x00a1) AM_WRITE8(nmi_enable_w, 0xffff)
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_FRAGMENT( pcxporter )
+MACHINE_CONFIG_START( pcxporter )
 	MCFG_CPU_ADD("v30", V30, XTAL_14_31818MHz/2)    // 7.16 MHz as per manual
 	MCFG_CPU_PROGRAM_MAP(pc_map)
 	MCFG_CPU_IO_MAP(pc_io)

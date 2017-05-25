@@ -20,7 +20,6 @@ class leland_80186_sound_device : public device_t
 {
 public:
 	leland_80186_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	DECLARE_WRITE16_MEMBER(peripheral_ctrl);
 	DECLARE_WRITE8_MEMBER(leland_80186_control_w);
@@ -32,12 +31,13 @@ public:
 	DECLARE_READ8_MEMBER(leland_80186_response_r);
 	DECLARE_WRITE16_MEMBER(dac_w);
 	DECLARE_WRITE16_MEMBER(ataxx_dac_control);
+	DECLARE_WRITE_LINE_MEMBER(i80186_tmr0_w);
+	DECLARE_WRITE_LINE_MEMBER(i80186_tmr1_w);
+
 	DECLARE_WRITE_LINE_MEMBER(pit0_2_w);
 	DECLARE_WRITE_LINE_MEMBER(pit1_0_w);
 	DECLARE_WRITE_LINE_MEMBER(pit1_1_w);
 	DECLARE_WRITE_LINE_MEMBER(pit1_2_w);
-	DECLARE_WRITE_LINE_MEMBER(i80186_tmr0_w);
-	DECLARE_WRITE_LINE_MEMBER(i80186_tmr1_w);
 
 protected:
 	leland_80186_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -45,6 +45,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	int m_type;
 
 	enum {
@@ -102,7 +103,9 @@ class redline_80186_sound_device : public leland_80186_sound_device
 public:
 	redline_80186_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	DECLARE_WRITE16_MEMBER(redline_dac_w);
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	
+protected:
+	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 
@@ -110,7 +113,9 @@ class ataxx_80186_sound_device : public leland_80186_sound_device
 {
 public:
 	ataxx_80186_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual machine_config_constructor device_mconfig_additions() const override;
+
+protected:
+	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 
@@ -118,7 +123,9 @@ class wsf_80186_sound_device : public leland_80186_sound_device
 {
 public:
 	wsf_80186_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual machine_config_constructor device_mconfig_additions() const override;
+
+protected:
+	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 

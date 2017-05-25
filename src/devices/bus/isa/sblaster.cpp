@@ -78,7 +78,7 @@ static const int m_cmd_fifo_length[256] =
 
 static const int protection_magic[4] = { 0x96, 0xa5, 0x69, 0x5a };
 
-static MACHINE_CONFIG_FRAGMENT( sblaster1_0_config )
+static MACHINE_CONFIG_START( sblaster1_0_config )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("ym3812", YM3812, ym3812_StdClock)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 3.00)
@@ -103,7 +103,7 @@ static MACHINE_CONFIG_FRAGMENT( sblaster1_0_config )
 	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( sblaster1_5_config )
+static MACHINE_CONFIG_START( sblaster1_5_config )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("ym3812", YM3812, ym3812_StdClock)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
@@ -123,7 +123,7 @@ static MACHINE_CONFIG_FRAGMENT( sblaster1_5_config )
 	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( sblaster_16_config )
+static MACHINE_CONFIG_START( sblaster_16_config )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("ymf262", YMF262, ymf262_StdClock)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)

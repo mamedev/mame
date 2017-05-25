@@ -48,7 +48,7 @@ Newer version of the I/O chip ?
 #include "machine/taitoio.h"
 
 
-MACHINE_CONFIG_FRAGMENT( taitoio )
+MACHINE_CONFIG_START( taitoio )
 	MCFG_WATCHDOG_ADD("watchdog")
 MACHINE_CONFIG_END
 

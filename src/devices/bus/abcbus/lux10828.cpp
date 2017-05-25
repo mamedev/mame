@@ -326,7 +326,7 @@ WRITE_LINE_MEMBER( luxor_55_10828_device::fdc_drq_w )
 //  MACHINE_DRIVER( luxor_55_10828 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( luxor_55_10828 )
+static MACHINE_CONFIG_START( luxor_55_10828 )
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_4MHz/2)
 	MCFG_CPU_PROGRAM_MAP(luxor_55_10828_mem)
 	MCFG_CPU_IO_MAP(luxor_55_10828_io)

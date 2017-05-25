@@ -873,7 +873,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-MACHINE_CONFIG_FRAGMENT( exidy440_audio )
+MACHINE_CONFIG_START( exidy440_audio )
 
 	MCFG_CPU_ADD("audiocpu", M6809, EXIDY440_AUDIO_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(exidy440_audio_map)

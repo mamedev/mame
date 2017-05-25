@@ -400,6 +400,7 @@ nascom1.cpp
 nc.cpp
 neogeocd.cpp
 nes.cpp
+nes_vt.cpp
 newbrain.cpp
 next.cpp
 ngen.cpp

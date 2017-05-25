@@ -12,7 +12,7 @@ jvc_xvd701_device::jvc_xvd701_device(const machine_config &mconfig, const char *
 {
 }
 
-static MACHINE_CONFIG_FRAGMENT(xvd701)
+static MACHINE_CONFIG_START(xvd701)
 MACHINE_CONFIG_END
 
 machine_config_constructor jvc_xvd701_device::device_mconfig_additions() const

@@ -898,37 +898,6 @@ WRITE16_MEMBER(m72_state::soundram_w)
 }
 
 
-READ16_MEMBER(m72_state::poundfor_trackball_r)
-{
-	static const char *const axisnames[] = { "TRACK0_X", "TRACK0_Y", "TRACK1_X", "TRACK1_Y" };
-
-	if (offset == 0)
-	{
-		int i,curr;
-
-		for (i = 0;i < 4;i++)
-		{
-			curr = ioport(axisnames[i])->read();
-			m_diff[i] = (curr - m_prev[i]);
-			m_prev[i] = curr;
-		}
-	}
-
-	switch (offset)
-	{
-		default:
-		case 0:
-			return (m_diff[0] & 0xff) | ((m_diff[2] & 0xff) << 8);
-		case 1:
-			return ((m_diff[0] >> 8) & 0x1f) | (m_diff[2] & 0x1f00) | (ioport("IN0")->read() & 0xe0e0);
-		case 2:
-			return (m_diff[1] & 0xff) | ((m_diff[3] & 0xff) << 8);
-		case 3:
-			return ((m_diff[1] >> 8) & 0x1f) | (m_diff[3] & 0x1f00);
-	}
-}
-
-
 #define M72_CPU1_MEMORY(NAME,ROMSIZE,WORKRAM)                               \
 static ADDRESS_MAP_START( NAME##_map, AS_PROGRAM, 16 , m72_state )      \
 	AM_RANGE(0x00000, ROMSIZE-1) AM_ROM                                 \
@@ -1013,7 +982,7 @@ static ADDRESS_MAP_START( m72_portmap, AS_IO, 16, m72_state )
 	AM_RANGE(0x02, 0x03) AM_READ_PORT("IN1")
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("m72", m72_audio_device, sound_command_w)
-	AM_RANGE(0x02, 0x03) AM_WRITE(port02_w) /* coin counters, reset sound cpu, other stuff? */
+	AM_RANGE(0x02, 0x03) AM_WRITE8(port02_w, 0x00ff) /* coin counters, reset sound cpu, other stuff? */
 	AM_RANGE(0x04, 0x05) AM_WRITE(dmaon_w)
 	AM_RANGE(0x06, 0x07) AM_WRITE(irq_line_w)
 	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE8("upd71059c", pic8259_device, read, write, 0x00ff)
@@ -1029,7 +998,7 @@ static ADDRESS_MAP_START( m84_portmap, AS_IO, 16, m72_state )
 	AM_RANGE(0x02, 0x03) AM_READ_PORT("IN1")
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("m72", m72_audio_device, sound_command_w)
-	AM_RANGE(0x02, 0x03) AM_WRITE(rtype2_port02_w)
+	AM_RANGE(0x02, 0x03) AM_WRITE8(rtype2_port02_w, 0x00ff)
 	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE8("upd71059c", pic8259_device, read, write, 0x00ff)
 	AM_RANGE(0x80, 0x81) AM_WRITE(scrolly1_w)
 	AM_RANGE(0x82, 0x83) AM_WRITE(scrollx1_w)
@@ -1042,7 +1011,7 @@ static ADDRESS_MAP_START( m84_v33_portmap, AS_IO, 16, m72_state )
 	AM_RANGE(0x02, 0x03) AM_READ_PORT("IN1")
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("m72", m72_audio_device, sound_command_w)
-	AM_RANGE(0x02, 0x03) AM_WRITE(rtype2_port02_w)
+	AM_RANGE(0x02, 0x03) AM_WRITE8(rtype2_port02_w, 0x00ff)
 	AM_RANGE(0x80, 0x81) AM_WRITE(scrolly1_w)
 	AM_RANGE(0x82, 0x83) AM_WRITE(scrollx1_w)
 	AM_RANGE(0x84, 0x85) AM_WRITE(scrolly2_w)
@@ -1054,9 +1023,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( poundfor_portmap, AS_IO, 16, m72_state )
 	AM_RANGE(0x02, 0x03) AM_READ_PORT("IN1")
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
-	AM_RANGE(0x08, 0x0f) AM_READ(poundfor_trackball_r)
+	AM_RANGE(0x08, 0x0f) AM_DEVREAD8("upd4701l", upd4701_device, read_xy, 0x00ff)
+	AM_RANGE(0x08, 0x0f) AM_DEVREAD8("upd4701h", upd4701_device, read_xy, 0xff00)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("m72", m72_audio_device, sound_command_w)
-	AM_RANGE(0x02, 0x03) AM_WRITE(rtype2_port02_w)
+	AM_RANGE(0x02, 0x03) AM_WRITE8(poundfor_port02_w, 0x00ff)
 	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE8("upd71059c", pic8259_device, read, write, 0x00ff)
 	AM_RANGE(0x80, 0x81) AM_WRITE(scrolly1_w)
 	AM_RANGE(0x82, 0x83) AM_WRITE(scrollx1_w)
@@ -1069,7 +1039,7 @@ static ADDRESS_MAP_START( m82_portmap, AS_IO, 16, m72_state )
 	AM_RANGE(0x02, 0x03) AM_READ_PORT("IN1")
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("m72", m72_audio_device, sound_command_w)
-	AM_RANGE(0x02, 0x03) AM_WRITE(rtype2_port02_w)
+	AM_RANGE(0x02, 0x03) AM_WRITE8(rtype2_port02_w, 0x00ff)
 	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE8("upd71059c", pic8259_device, read, write, 0x00ff)
 	AM_RANGE(0x80, 0x81) AM_WRITE(scrolly1_w)
 	AM_RANGE(0x82, 0x83) AM_WRITE(scrollx1_w)
@@ -1086,7 +1056,7 @@ static ADDRESS_MAP_START( m81_portmap, AS_IO, 16, m72_state )
 	AM_RANGE(0x02, 0x03) AM_READ_PORT("IN1")
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("m72", m72_audio_device, sound_command_w)
-	AM_RANGE(0x02, 0x03) AM_WRITE(rtype2_port02_w)  /* coin counters, reset sound cpu, other stuff? */
+	AM_RANGE(0x02, 0x03) AM_WRITE8(rtype2_port02_w, 0x00ff)  /* coin counters, reset sound cpu, other stuff? */
 	AM_RANGE(0x04, 0x05) AM_WRITE(dmaon_w)
 	AM_RANGE(0x06, 0x07) AM_WRITE(irq_line_w)
 	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE8("upd71059c", pic8259_device, read, write, 0x00ff)
@@ -1616,15 +1586,12 @@ static INPUT_PORTS_START( m81_hharry )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( poundfor )
-	PORT_START("IN0")
-	PORT_BIT( 0x001f, IP_ACTIVE_HIGH, IPT_SPECIAL ) /* high bits of trackball X */
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x1f00, IP_ACTIVE_HIGH, IPT_SPECIAL ) /* high bits of trackball X */
-	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_START("IN0") // not read directly
+	PORT_BIT( 0x9f9f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_WRITE_LINE_DEVICE_MEMBER("upd4701l", upd4701_device, right_w)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_WRITE_LINE_DEVICE_MEMBER("upd4701l", upd4701_device, left_w)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_WRITE_LINE_DEVICE_MEMBER("upd4701h", upd4701_device, right_w)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_WRITE_LINE_DEVICE_MEMBER("upd4701h", upd4701_device, left_w)
 
 	PORT_START("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1 )
@@ -1691,16 +1658,16 @@ static INPUT_PORTS_START( poundfor )
 	IREM_COIN_MODE_2_HIGH
 
 	PORT_START("TRACK0_X")
-	PORT_BIT( 0xffff, 0x0000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(30) PORT_PLAYER(1)
+	PORT_BIT( 0x0fff, 0x0000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(30) PORT_RESET PORT_PLAYER(1)
 
 	PORT_START("TRACK0_Y")
-	PORT_BIT( 0xffff, 0x0000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(30) PORT_REVERSE PORT_PLAYER(1)
+	PORT_BIT( 0x0fff, 0x0000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(30) PORT_REVERSE PORT_RESET PORT_PLAYER(1)
 
 	PORT_START("TRACK1_X")
-	PORT_BIT( 0xffff, 0x0000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(30) PORT_REVERSE PORT_PLAYER(2)
+	PORT_BIT( 0x0fff, 0x0000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(30) PORT_REVERSE PORT_RESET PORT_PLAYER(2)
 
 	PORT_START("TRACK1_Y")
-	PORT_BIT( 0xffff, 0x0000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(30) PORT_PLAYER(2)
+	PORT_BIT( 0x0fff, 0x0000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(30) PORT_RESET PORT_PLAYER(2)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( airduel )
@@ -1871,7 +1838,7 @@ static GFXDECODE_START( majtitle )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_FRAGMENT( m72_audio_chips )
+static MACHINE_CONFIG_START( m72_audio_chips )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
@@ -2146,6 +2113,14 @@ static MACHINE_CONFIG_START( poundfor )
 								/* IRQs are generated by main Z80 and YM2151 */
 
 	MCFG_PIC8259_ADD( "upd71059c", INPUTLINE("maincpu", 0), VCC, NOOP)
+
+	MCFG_DEVICE_ADD("upd4701l", UPD4701A, 0)
+	MCFG_UPD4701_PORTX("TRACK0_X")
+	MCFG_UPD4701_PORTY("TRACK0_Y")
+
+	MCFG_DEVICE_ADD("upd4701h", UPD4701A, 0)
+	MCFG_UPD4701_PORTX("TRACK1_X")
+	MCFG_UPD4701_PORTY("TRACK1_Y")
 
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rtype2)

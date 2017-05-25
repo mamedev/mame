@@ -72,7 +72,7 @@ DEFINE_DEVICE_TYPE(ISA16_VGA_GFXULTRA,     isa16_vga_gfxultra_device,    "gfxulr
 DEFINE_DEVICE_TYPE(ISA16_SVGA_GFXULTRAPRO, isa16_vga_gfxultrapro_device, "gfxxultrp", "ATi Graphics Ultra Pro Card")
 DEFINE_DEVICE_TYPE(ISA16_SVGA_MACH64,      isa16_vga_mach64_device,      "mach64isa", "ATi mach64 Card")
 
-static MACHINE_CONFIG_FRAGMENT( vga_ati )
+static MACHINE_CONFIG_START( vga_ati )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
 	MCFG_SCREEN_UPDATE_DEVICE("vga", ati_vga_device, screen_update)
@@ -82,7 +82,7 @@ static MACHINE_CONFIG_FRAGMENT( vga_ati )
 	MCFG_DEVICE_ADD("vga", ATI_VGA, 0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( vga_mach32 )
+static MACHINE_CONFIG_START( vga_mach32 )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
 	MCFG_SCREEN_UPDATE_DEVICE("vga", mach32_device, screen_update)
@@ -92,7 +92,7 @@ static MACHINE_CONFIG_FRAGMENT( vga_mach32 )
 	MCFG_DEVICE_ADD("vga", ATIMACH32, 0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( vga_mach64 )
+static MACHINE_CONFIG_START( vga_mach64 )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
 	MCFG_SCREEN_UPDATE_DEVICE("vga", mach64_device, screen_update)

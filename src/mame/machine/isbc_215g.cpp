@@ -350,7 +350,7 @@ WRITE_LINE_MEMBER(isbc_215g_device::isbx_irq_11_w)
 	m_isbx_irq[3] = state ? true : false;
 }
 
-static MACHINE_CONFIG_FRAGMENT( isbc_215g )
+static MACHINE_CONFIG_START( isbc_215g )
 	MCFG_CPU_ADD("u84", I8089, XTAL_15MHz / 3)
 	MCFG_CPU_PROGRAM_MAP(isbc_215g_mem)
 	MCFG_CPU_IO_MAP(isbc_215g_io)

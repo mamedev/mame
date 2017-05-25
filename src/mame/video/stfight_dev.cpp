@@ -109,7 +109,7 @@ static GFXDECODE_START( stfight )
 	GFXDECODE_ENTRY( "spr_gfx", 0x0000, spritelayout, 0, 32 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_FRAGMENT( stfight_vid )
+MACHINE_CONFIG_MEMBER(stfight_video_device::device_add_mconfig)
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -121,11 +121,6 @@ static MACHINE_CONFIG_FRAGMENT( stfight_vid )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "^palette", stfight)
 MACHINE_CONFIG_END
-
-machine_config_constructor stfight_video_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( stfight_vid );
-}
 
 /*
         Graphics ROM Format

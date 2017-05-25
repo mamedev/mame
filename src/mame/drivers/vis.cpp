@@ -130,7 +130,7 @@ void vis_audio_device::device_timer(emu_timer &timer, device_timer_id id, int pa
 	}
 }
 
-static MACHINE_CONFIG_FRAGMENT( vis_pcm_config )
+static MACHINE_CONFIG_START( vis_pcm_config )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("ymf262", YMF262, XTAL_14_31818MHz)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
@@ -262,7 +262,7 @@ vis_vga_device::vis_vga_device(const machine_config &mconfig, const char *tag, d
 	m_screen.set_tag("screen");
 }
 
-static MACHINE_CONFIG_FRAGMENT( vis_vga_config )
+static MACHINE_CONFIG_START( vis_vga_config )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
 	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, vis_vga_device, screen_update)

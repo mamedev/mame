@@ -272,7 +272,7 @@ WRITE_LINE_MEMBER(isa8_ibm_mfc_device::ibm_mfc_ym_irq)
 //  Machine config
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( ibm_mfc )
+static MACHINE_CONFIG_START( ibm_mfc )
 	MCFG_CPU_ADD("ibm_mfc", Z80, XTAL_11_8MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(prg_map)
 	MCFG_CPU_IO_MAP(io_map)

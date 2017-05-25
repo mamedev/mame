@@ -50,7 +50,7 @@ SLOT_INTERFACE_END
 //  MACHINE_DRIVER( compucolor_floppy )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( compucolor_floppy )
+static MACHINE_CONFIG_START( compucolor_floppy )
 	MCFG_FLOPPY_DRIVE_ADD("floppy", compucolor_floppies, "525sssd", compucolor_floppy_device::floppy_formats)
 MACHINE_CONFIG_END
 

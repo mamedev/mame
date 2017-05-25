@@ -873,7 +873,7 @@ static const floppy_format_type hp9895_floppy_formats[] = {
 	nullptr
 };
 
-static MACHINE_CONFIG_FRAGMENT(hp9895)
+static MACHINE_CONFIG_START(hp9895)
 	MCFG_CPU_ADD("cpu" , Z80 , 4000000)
 	MCFG_CPU_PROGRAM_MAP(z80_program_map)
 	MCFG_CPU_IO_MAP(z80_io_map)

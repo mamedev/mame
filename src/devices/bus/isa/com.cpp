@@ -21,7 +21,7 @@ static SLOT_INTERFACE_START(isa_com)
 	SLOT_INTERFACE("null_modem", NULL_MODEM)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_FRAGMENT( com_config )
+static MACHINE_CONFIG_START( com_config )
 	MCFG_DEVICE_ADD( "uart_0", INS8250, XTAL_1_8432MHz )
 	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("serport0", rs232_port_device, write_txd))
 	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE("serport0", rs232_port_device, write_dtr))
@@ -129,7 +129,7 @@ void isa8_com_device::device_reset()
 {
 }
 
-static MACHINE_CONFIG_FRAGMENT( com_at_config )
+static MACHINE_CONFIG_START( com_at_config )
 	MCFG_DEVICE_ADD( "uart_0", NS16450, XTAL_1_8432MHz ) /* Verified: IBM P/N 6320947 Serial/Parallel card uses an NS16450N */
 	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("serport0", rs232_port_device, write_txd))
 	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE("serport0", rs232_port_device, write_dtr))

@@ -100,7 +100,7 @@ h8s2329_device::h8s2329_device(const machine_config &mconfig, const char *tag, d
 
 // TODO: the 2321 doesn't have the dma subdevice
 
-static MACHINE_CONFIG_FRAGMENT(h8s2320)
+static MACHINE_CONFIG_START(h8s2320)
 	MCFG_H8S_INTC_ADD("intc")
 	MCFG_H8_ADC_2320_ADD("adc", "intc", 28)
 	MCFG_H8_DMA_ADD("dma")

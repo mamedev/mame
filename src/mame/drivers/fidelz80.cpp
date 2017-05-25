@@ -812,7 +812,7 @@ MACHINE_START_MEMBER(fidelz80_state,vcc)
 WRITE8_MEMBER(fidelz80_state::vcc_ppi_porta_w)
 {
 	// pull output low during reset (see TODO)
-	if (machine().phase() == MACHINE_PHASE_RESET)
+	if (machine().phase() == machine_phase::RESET)
 		data = 0;
 
 	// d0-d6: digit segment data, bits are xABCDEFG
@@ -842,7 +842,7 @@ READ8_MEMBER(fidelz80_state::vcc_ppi_portb_r)
 WRITE8_MEMBER(fidelz80_state::vcc_ppi_portb_w)
 {
 	// pull output low during reset (see TODO)
-	if (machine().phase() == MACHINE_PHASE_RESET)
+	if (machine().phase() == machine_phase::RESET)
 		data = 0;
 
 	// d0,d2-d5: digit/led select

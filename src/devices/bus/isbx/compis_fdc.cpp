@@ -53,7 +53,7 @@ SLOT_INTERFACE_END
 //  MACHINE_DRIVER( compis_fdc )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( compis_fdc )
+static MACHINE_CONFIG_START( compis_fdc )
 	MCFG_I8272A_ADD(I8272_TAG, true)
 	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(compis_fdc_device, fdc_irq))
 	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(compis_fdc_device, fdc_drq))

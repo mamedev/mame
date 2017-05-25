@@ -20,7 +20,7 @@
 DEFINE_DEVICE_TYPE(AL_MAGICSOUND, al_magicsound_device, "al_magicsound", "Aleste Magic Sound Board")
 
 
-static MACHINE_CONFIG_FRAGMENT( al_magicsound )
+static MACHINE_CONFIG_START( al_magicsound )
 	MCFG_DEVICE_ADD( "dmac", AM9517A, XTAL_4MHz )  // CLK from expansion port
 	// According to the schematics, the TC pin (EOP on western chips) is connected to NMI on the expansion port.
 	// NMIs seem to occur too quickly when this is active, so either EOP is not triggered at the correct time, or

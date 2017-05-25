@@ -57,8 +57,6 @@ constexpr int AUTO_ALLOC_INPUT  = 65535;
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-class sound_stream;
-
 
 // ======================> device_sound_interface
 

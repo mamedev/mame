@@ -30,7 +30,7 @@ msx_slot_sony08_device::msx_slot_sony08_device(const machine_config &mconfig, co
 }
 
 
-static MACHINE_CONFIG_FRAGMENT( sony08 )
+static MACHINE_CONFIG_START( sony08 )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 

@@ -115,7 +115,7 @@ ioport_constructor a2091_device::device_input_ports() const
 //  machine configurations
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( dmac_hdc )
+static MACHINE_CONFIG_START( dmac_hdc )
 	MCFG_DMAC_ADD("dmac", 0)
 	MCFG_DMAC_SCSI_READ_HANDLER(READ8(dmac_hdc_device, dmac_scsi_r))
 	MCFG_DMAC_SCSI_WRITE_HANDLER(WRITE8(dmac_hdc_device, dmac_scsi_w))

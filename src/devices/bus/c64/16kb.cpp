@@ -19,10 +19,10 @@ DEFINE_DEVICE_TYPE(C64_16KB, c64_16kb_cartridge_device, "c64_16kb", "C64 16KB EP
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( c64_16kb )
+//  MACHINE_CONFIG_START( c64_16kb )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( c64_16kb )
+static MACHINE_CONFIG_START( c64_16kb )
 	MCFG_GENERIC_CARTSLOT_ADD("roml", generic_linear_slot, nullptr)
 	MCFG_GENERIC_EXTENSIONS("rom,bin,80")
 

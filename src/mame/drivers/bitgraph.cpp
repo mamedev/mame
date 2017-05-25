@@ -480,7 +480,7 @@ void bitgraph_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_FRAGMENT( bg_motherboard )
+static MACHINE_CONFIG_START( bg_motherboard )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(40)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
@@ -548,7 +548,7 @@ static MACHINE_CONFIG_FRAGMENT( bg_motherboard )
 MACHINE_CONFIG_END
 
 #ifdef UNUSED_FUNCTION
-static MACHINE_CONFIG_FRAGMENT( bg_ppu )
+static MACHINE_CONFIG_START( bg_ppu )
 	MCFG_CPU_ADD(PPU_TAG, I8035, XTAL_6_9MHz)
 	MCFG_CPU_IO_MAP(ppu_io)
 //  MCFG_MCS48_PORT_T0_IN_CB(READLINE(bitgraph_state, ppu_t0_r))

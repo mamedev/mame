@@ -653,17 +653,6 @@ enum
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// forward declarations
-namespace util { namespace xml { class data_node; } }
-class ioport_list;
-class ioport_port;
-struct ioport_port_live;
-class ioport_field;
-struct ioport_field_live;
-class ioport_manager;
-class natural_keyboard;
-class analog_field;
-
 // constructor function pointer
 typedef void(*ioport_constructor)(device_t &owner, ioport_list &portlist, std::string &errorbuf);
 
@@ -1378,8 +1367,6 @@ struct ioport_port_live
 };
 
 
-enum class config_type;
-
 // ======================> ioport_manager
 
 // private input port state
@@ -1824,4 +1811,4 @@ inline device_t &ioport_setting::device() const { return m_field.device(); }
 inline running_machine &ioport_setting::machine() const { return m_field.machine(); }
 
 
-#endif  // MAME_EMU_IOPORT_H */
+#endif // MAME_EMU_IOPORT_H

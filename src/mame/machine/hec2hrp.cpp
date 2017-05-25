@@ -803,7 +803,7 @@ static DISCRETE_SOUND_START( hec2hrp )
 	DISCRETE_OUTPUT(NODE_01, 5000)
 DISCRETE_SOUND_END
 
-MACHINE_CONFIG_FRAGMENT( hector_audio )
+MACHINE_CONFIG_START( hector_audio )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)  /* Sound level for cassette, as it is in mono => output channel=0*/

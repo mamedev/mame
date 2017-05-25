@@ -18,7 +18,7 @@
     IMPLEMENTATION
 ***************************************************************************/
 
-static MACHINE_CONFIG_FRAGMENT(coco_pak)
+static MACHINE_CONFIG_START(coco_pak)
 MACHINE_CONFIG_END
 
 ROM_START( coco_pak )

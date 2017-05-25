@@ -30,10 +30,10 @@ DEFINE_DEVICE_TYPE(VP595, vp595_device, "vp595", "VP-595 Simple Sound")
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( vp595 )
+//  MACHINE_CONFIG_START( vp595 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( vp595 )
+static MACHINE_CONFIG_START( vp595 )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_CDP1863_ADD(CDP1863_TAG, 0, CDP1863_XTAL)

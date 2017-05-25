@@ -41,7 +41,7 @@ DEFINE_DEVICE_TYPE(A2BUS_THUNDERCLOCK, a2bus_thunderclock_device, "a2thunpl", "T
 #define THUNDERCLOCK_ROM_REGION  "thunclk_rom"
 #define THUNDERCLOCK_UPD1990_TAG "thunclk_upd"
 
-MACHINE_CONFIG_FRAGMENT( thunderclock )
+MACHINE_CONFIG_START( thunderclock )
 	MCFG_UPD1990A_ADD(THUNDERCLOCK_UPD1990_TAG, 1021800, DEVWRITELINE(DEVICE_SELF, a2bus_thunderclock_device, upd_dataout_w), NOOP)
 MACHINE_CONFIG_END
 

@@ -195,7 +195,7 @@ ioport_constructor apricot_keyboard_hle_device::device_input_ports() const
 	return INPUT_PORTS_NAME( keyboard );
 }
 
-static MACHINE_CONFIG_FRAGMENT( keyboard_components )
+static MACHINE_CONFIG_START( keyboard_components )
 	MCFG_MSM5832_ADD("rtc", XTAL_32_768kHz)
 MACHINE_CONFIG_END
 

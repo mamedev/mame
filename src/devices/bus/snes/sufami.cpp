@@ -46,14 +46,14 @@ void sns_rom_strom_device::device_start()
 }
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( st_slot )
+//  MACHINE_CONFIG_START( st_slot )
 //-------------------------------------------------
 
 static SLOT_INTERFACE_START(sufamiturbo_cart)
 	SLOT_INTERFACE_INTERNAL("strom",  SNS_STROM)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_FRAGMENT( st_slot )
+static MACHINE_CONFIG_START( st_slot )
 	MCFG_SNS_SUFAMI_CARTRIDGE_ADD("st_slot1", sufamiturbo_cart, nullptr)
 	MCFG_SNS_SUFAMI_CARTRIDGE_ADD("st_slot2", sufamiturbo_cart, nullptr)
 MACHINE_CONFIG_END

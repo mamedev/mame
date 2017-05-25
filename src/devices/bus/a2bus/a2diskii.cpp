@@ -47,12 +47,12 @@ static const floppy_interface floppy_interface =
 	"floppy_5_25"
 };
 
-MACHINE_CONFIG_FRAGMENT( diskii )
+MACHINE_CONFIG_START( diskii )
 	MCFG_APPLEFDC_ADD(FDC_TAG, fdc_interface)
 	MCFG_LEGACY_FLOPPY_APPLE_2_DRIVES_ADD(floppy_interface,15,16)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_FRAGMENT( iwmflop )
+MACHINE_CONFIG_START( iwmflop )
 	MCFG_IWM_ADD(FDC_TAG, fdc_interface)
 	MCFG_LEGACY_FLOPPY_APPLE_2_DRIVES_ADD(floppy_interface,15,16)
 MACHINE_CONFIG_END

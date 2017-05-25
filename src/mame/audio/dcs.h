@@ -111,6 +111,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	void add_mconfig_dcs(machine_config &config);
 
 	struct sdrc_state
 	{
@@ -228,8 +229,9 @@ public:
 	// construction/destruction
 	dcs_audio_2k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 };
 
@@ -244,9 +246,9 @@ public:
 	// construction/destruction
 	dcs_audio_2k_uart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
+	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 // device type definition
@@ -260,9 +262,9 @@ public:
 	// construction/destruction
 	dcs_audio_8k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
+	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 // device type definition
@@ -276,8 +278,9 @@ public:
 	// construction/destruction
 	dcs_audio_wpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 // device type definition
@@ -294,6 +297,7 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override;
+	void add_mconfig_dcs2(machine_config &config);
 };
 
 // dcs2_audio_2115_device
@@ -304,9 +308,9 @@ public:
 	// construction/destruction
 	dcs2_audio_2115_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
+	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 // device type definition
@@ -320,9 +324,9 @@ public:
 	// construction/destruction
 	dcs2_audio_2104_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
+	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 // device type definition
@@ -336,9 +340,9 @@ public:
 	// construction/destruction
 	dcs2_audio_dsio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
+	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 // device type definition
@@ -352,9 +356,9 @@ public:
 	// construction/destruction
 	dcs2_audio_denver_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
+	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 // device type definition

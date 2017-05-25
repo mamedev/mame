@@ -19,7 +19,7 @@
 #include "peribox.h"
 #include "machine/ram.h"
 
-DECLARE_DEVICE_TYPE(TI99_HORIZON, horizon_ramdisk_device)
+namespace bus { namespace ti99 { namespace peb {
 
 class horizon_ramdisk_device : public ti_expansion_card_device, public device_nvram_interface
 {
@@ -65,5 +65,9 @@ private:
 	bool    m_hideswitch;
 	bool    m_use_rambo;
 };
+
+} } } // end namespace bus::ti99::peb
+
+DECLARE_DEVICE_TYPE_NS(TI99_HORIZON, bus::ti99::peb, horizon_ramdisk_device)
 
 #endif // MAME_BUS_TI99_PEB_HORIZON_H

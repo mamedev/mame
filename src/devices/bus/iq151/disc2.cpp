@@ -23,7 +23,7 @@ static SLOT_INTERFACE_START( iq151_disc2_floppies )
 	SLOT_INTERFACE( "8sssd", FLOPPY_8_SSSD )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_FRAGMENT( iq151_disc2 )
+static MACHINE_CONFIG_START( iq151_disc2 )
 	MCFG_UPD765A_ADD("fdc", false, true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", iq151_disc2_floppies, "8sssd", iq151_disc2_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:2", iq151_disc2_floppies, "8sssd", iq151_disc2_device::floppy_formats)

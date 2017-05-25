@@ -141,81 +141,6 @@ ADDRESS_MAP_END
 
 
 //**************************************************************************
-//  MACHINE FRAGMENTS
-//**************************************************************************
-
-MACHINE_CONFIG_FRAGMENT(zac1b111xx_base_config)
-	MCFG_CPU_ADD("melodycpu", M6802, XTAL_3_579545MHz) // verified on pcb
-	MCFG_CPU_PROGRAM_MAP(zac1b111xx_melody_base_map)
-
-	MCFG_DEVICE_ADD("timebase", CLOCK, XTAL_3_579545MHz/4096/2) // CPU clock divided using 4040 and half of 74LS74
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("melodypia", pia6821_device, cb1_w))
-
-	MCFG_DEVICE_ADD("melodypia", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(zac1b111xx_melody_base, melodypia_porta_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(zac1b111xx_melody_base, melodypia_porta_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(zac1b111xx_melody_base, melodypia_portb_w))
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE("melodycpu", INPUT_LINE_NMI))
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE("melodycpu", M6802_IRQ_LINE))
-
-	MCFG_SOUND_ADD("melodypsg1", AY8910, XTAL_3_579545MHz/2) // CPU clock divided using 4040
-	MCFG_AY8910_PORT_B_READ_CB(READ8(zac1b111xx_melody_base, melodypsg1_portb_r))
-
-	MCFG_SOUND_ADD("melodypsg2", AY8910, XTAL_3_579545MHz/2) // CPU clock divided using 4040
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_DERIVED(zac1b11107_config, zac1b111xx_base_config)
-	MCFG_CPU_MODIFY("melodycpu")
-	MCFG_CPU_PROGRAM_MAP(zac1b11107_melody_map)
-
-	MCFG_DEVICE_MODIFY("melodypsg1")
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(zac1b11107_audio_device, melodypsg1_porta_w))
-	MCFG_MIXER_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.5, 0)
-
-	MCFG_DEVICE_MODIFY("melodypsg2")
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(zac1b11107_audio_device, melodypsg2_porta_w))
-	MCFG_MIXER_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.5, 0)
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_DERIVED(zac1b11142_config, zac1b111xx_base_config)
-	MCFG_CPU_MODIFY("melodycpu")
-	MCFG_CPU_PROGRAM_MAP(zac1b11142_melody_map)
-
-	MCFG_DEVICE_MODIFY("melodypsg1")
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(zac1b11142_audio_device, ay_4g_porta_w))
-	MCFG_MIXER_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.15, 0)
-
-	MCFG_DEVICE_MODIFY("melodypsg2")
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(zac1b11142_audio_device, ay_4h_porta_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(zac1b11142_audio_device, ay_4h_portb_w))
-	MCFG_MIXER_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.15, 0)
-
-	MCFG_CPU_ADD("audiocpu", M6802, XTAL_3_579545MHz) // verified on pcb
-	MCFG_CPU_PROGRAM_MAP(zac1b11142_audio_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(zac1b11142_audio_device, input_poll, 60)
-
-	MCFG_DEVICE_ADD("pia_1i", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(DEVREAD8("speech", tms5220_device, status_r))
-	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8("speech", tms5220_device, data_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(zac1b11142_audio_device, pia_1i_portb_w))
-
-	MCFG_SOUND_ADD("dac", MC1408, 0) MCFG_MIXER_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.40, 0) // mc1408.1f
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-
-	// There is no xtal, the clock is obtained from a RC oscillator as shown in the TMS5220 datasheet (R=100kOhm C=22pF)
-	// 162kHz measured on pin 3 20 minutes after power on, clock would then be 162.3*4=649.2kHz
-	MCFG_SOUND_ADD("speech", TMS5200, 649200) // ROMCLK pin measured at 162.3Khz, OSC is exactly *4 of that)
-	MCFG_TMS52XX_IRQ_HANDLER(DEVWRITELINE("pia_1i", pia6821_device, cb1_w))
-	MCFG_TMS52XX_READYQ_HANDLER(DEVWRITELINE("pia_1i", pia6821_device, ca2_w))
-	MCFG_MIXER_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.80, 0)
-MACHINE_CONFIG_END
-
-
-
-//**************************************************************************
 //  I/O PORT DEFINITIONS
 //**************************************************************************
 
@@ -228,7 +153,7 @@ INPUT_PORTS_START(zac1b11142_ioports)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("P1") // test button?  generates NMI on master CPU
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("P1") PORT_CHANGED_MEMBER(DEVICE_SELF, zac1b11142_audio_device, p1_changed, 0) // test button?  generates NMI on master CPU
 INPUT_PORTS_END
 
 
@@ -292,6 +217,26 @@ READ8_MEMBER(zac1b111xx_melody_base::melodypsg1_portb_r)
 	return m_melody_command;
 }
 
+MACHINE_CONFIG_MEMBER(zac1b111xx_melody_base::device_add_mconfig)
+	MCFG_CPU_ADD("melodycpu", M6802, XTAL_3_579545MHz) // verified on pcb
+	MCFG_CPU_PROGRAM_MAP(zac1b111xx_melody_base_map)
+
+	MCFG_DEVICE_ADD("timebase", CLOCK, XTAL_3_579545MHz/4096/2) // CPU clock divided using 4040 and half of 74LS74
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("melodypia", pia6821_device, cb1_w))
+
+	MCFG_DEVICE_ADD("melodypia", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(READ8(zac1b111xx_melody_base, melodypia_porta_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(zac1b111xx_melody_base, melodypia_porta_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(zac1b111xx_melody_base, melodypia_portb_w))
+	MCFG_PIA_IRQA_HANDLER(INPUTLINE("melodycpu", INPUT_LINE_NMI))
+	MCFG_PIA_IRQB_HANDLER(INPUTLINE("melodycpu", M6802_IRQ_LINE))
+
+	MCFG_SOUND_ADD("melodypsg1", AY8910, XTAL_3_579545MHz/2) // CPU clock divided using 4040
+	MCFG_AY8910_PORT_B_READ_CB(READ8(zac1b111xx_melody_base, melodypsg1_portb_r))
+
+	MCFG_SOUND_ADD("melodypsg2", AY8910, XTAL_3_579545MHz/2) // CPU clock divided using 4040
+MACHINE_CONFIG_END
+
 void zac1b111xx_melody_base::device_start()
 {
 	save_item(NAME(m_melody_command));
@@ -351,10 +296,20 @@ WRITE8_MEMBER(zac1b11107_audio_device::melodypsg2_porta_w)
 	// TODO: assume LEVELT is controlled here as is the case for 1B11142?
 }
 
-machine_config_constructor zac1b11107_audio_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME(zac1b11107_config);
-}
+MACHINE_CONFIG_MEMBER(zac1b11107_audio_device::device_add_mconfig)
+	zac1b111xx_melody_base::device_add_mconfig(config);
+
+	MCFG_CPU_MODIFY("melodycpu")
+	MCFG_CPU_PROGRAM_MAP(zac1b11107_melody_map)
+
+	MCFG_DEVICE_MODIFY("melodypsg1")
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(zac1b11107_audio_device, melodypsg1_porta_w))
+	MCFG_MIXER_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.5, 0)
+
+	MCFG_DEVICE_MODIFY("melodypsg2")
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(zac1b11107_audio_device, melodypsg2_porta_w))
+	MCFG_MIXER_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.5, 0)
+MACHINE_CONFIG_END
 
 
 
@@ -425,22 +380,52 @@ WRITE8_MEMBER(zac1b11142_audio_device::melody_command_w)
 	m_melody_command = data;
 }
 
-WRITE8_MEMBER(zac1b11142_audio_device::pia_1i_portb_w)
-{
-	m_speech->rsq_w((data >> 0) & 0x01);
-	m_speech->wsq_w((data >> 1) & 0x01);
-	m_acs_cb((~data >> 3) & 0x01);
-	// TODO: a LED output().set_led_value(0, (data >> 4) & 0x01);
-}
-
-INTERRUPT_GEN_MEMBER(zac1b11142_audio_device::input_poll)
+INPUT_CHANGED_MEMBER(zac1b11142_audio_device::p1_changed)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, (m_inputs->read() & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 }
 
-machine_config_constructor zac1b11142_audio_device::device_mconfig_additions() const
+WRITE8_MEMBER(zac1b11142_audio_device::pia_1i_portb_w)
 {
-	return MACHINE_CONFIG_NAME(zac1b11142_config);
+	m_speech->rsq_w(BIT(data, 0));
+	m_speech->wsq_w(BIT(data, 1));
+	m_acs_cb(BIT(~data, 3));
+	// TODO: a LED output().set_led_value(0, BIT(data, 4));
+}
+
+MACHINE_CONFIG_MEMBER(zac1b11142_audio_device::device_add_mconfig)
+	zac1b111xx_melody_base::device_add_mconfig(config);
+
+	MCFG_CPU_MODIFY("melodycpu")
+	MCFG_CPU_PROGRAM_MAP(zac1b11142_melody_map)
+
+	MCFG_DEVICE_MODIFY("melodypsg1")
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(zac1b11142_audio_device, ay_4g_porta_w))
+	MCFG_MIXER_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.15, 0)
+
+	MCFG_DEVICE_MODIFY("melodypsg2")
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(zac1b11142_audio_device, ay_4h_porta_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(zac1b11142_audio_device, ay_4h_portb_w))
+	MCFG_MIXER_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.15, 0)
+
+	MCFG_CPU_ADD("audiocpu", M6802, XTAL_3_579545MHz) // verified on pcb
+	MCFG_CPU_PROGRAM_MAP(zac1b11142_audio_map)
+
+	MCFG_DEVICE_ADD("pia_1i", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(DEVREAD8("speech", tms5220_device, status_r))
+	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8("speech", tms5220_device, data_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(zac1b11142_audio_device, pia_1i_portb_w))
+
+	MCFG_SOUND_ADD("dac", MC1408, 0) MCFG_MIXER_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.40, 0) // mc1408.1f
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+
+	// There is no xtal, the clock is obtained from a RC oscillator as shown in the TMS5220 datasheet (R=100kOhm C=22pF)
+	// 162kHz measured on pin 3 20 minutes after power on, clock would then be 162.3*4=649.2kHz
+	MCFG_SOUND_ADD("speech", TMS5200, 649200) // ROMCLK pin measured at 162.3Khz, OSC is exactly *4 of that)
+	MCFG_TMS52XX_IRQ_HANDLER(DEVWRITELINE("pia_1i", pia6821_device, cb1_w))
+	MCFG_TMS52XX_READYQ_HANDLER(DEVWRITELINE("pia_1i", pia6821_device, ca2_w))
+	MCFG_MIXER_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.80, 0)
 }
 
 ioport_constructor zac1b11142_audio_device::device_input_ports() const

@@ -24,6 +24,9 @@ One i/o port is used:
 #include "cpu/z80/z80.h"
 #include "machine/terminal.h"
 
+#include <sstream>
+
+
 #define TERMINAL_TAG "terminal"
 
 class zexall_state : public driver_device
@@ -53,6 +56,7 @@ private:
 	uint8_t m_out_req_last; // old value at 0xFFFE before the most recent write
 	uint8_t m_out_ack; // byte written to 0xFFFC
 	virtual void machine_reset() override;
+	std::ostringstream m_outstring;
 };
 
 DRIVER_INIT_MEMBER(zexall_state,zexall)
@@ -70,6 +74,7 @@ void zexall_state::machine_reset()
 	uint8_t *ram = m_main_ram;
 	/* fill main ram with zexall code */
 	memcpy(ram, rom, 0x228a);
+	m_outstring.str("");
 }
 
 READ8_MEMBER( zexall_state::zexall_output_ack_r )
@@ -78,6 +83,13 @@ READ8_MEMBER( zexall_state::zexall_output_ack_r )
 	if (m_out_req != m_out_req_last)
 	{
 		m_terminal->write(space,0,m_out_data);
+		// turn text into a string for logerror
+		m_outstring.put(char(m_out_data));
+		if (m_out_data == 0x0a)
+		{
+			logerror("%s", m_outstring.str());
+			m_outstring.str("");
+		}
 		m_out_req_last = m_out_req;
 		m_out_ack++;
 	}

@@ -568,7 +568,7 @@ static INPUT_PORTS_START( dc )
 	PORT_CONFSETTING(    0x03, "S-Video" )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_FRAGMENT( gdrom_config )
+static MACHINE_CONFIG_START( gdrom_config )
 	MCFG_DEVICE_MODIFY("cdda")
 	MCFG_SOUND_ROUTE(0, "^^^^lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "^^^^rspeaker", 1.0)

@@ -20,7 +20,7 @@ midiin_port_device::midiin_port_device(const machine_config &mconfig, const char
 {
 }
 
-static MACHINE_CONFIG_FRAGMENT(midiin_port_config)
+static MACHINE_CONFIG_START(midiin_port_config)
 	MCFG_DEVICE_ADD("midiinimg", MIDIIN, 0)
 	MCFG_MIDIIN_INPUT_CB(WRITELINE(midiin_port_device, read))
 MACHINE_CONFIG_END

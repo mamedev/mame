@@ -22,16 +22,17 @@ public:
 	template <class Object> static devcb_base &set_irq_callback(device_t &device, Object &&cb) { return downcast<ad1848_device &>(device).m_irq_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_drq_callback(device_t &device, Object &&cb) { return downcast<ad1848_device &>(device).m_drq_cb.set_callback(std::forward<Object>(cb)); }
 
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
 	DECLARE_READ8_MEMBER(dack_r);
 	DECLARE_WRITE8_MEMBER(dack_w);
+
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	
 
 private:
 	union {

@@ -23,7 +23,7 @@ static SLOT_INTERFACE_START(pc_isa_onboard)
 	SLOT_INTERFACE("fdcsmc", ISA8_FDC_SMC)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_FRAGMENT( southbridge )
+static MACHINE_CONFIG_START( southbridge )
 	MCFG_DEVICE_ADD("pit8254", PIT8254, 0)
 	MCFG_PIT8253_CLK0(4772720/4) /* heartbeat IRQ */
 	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(southbridge_device, at_pit8254_out0_changed))

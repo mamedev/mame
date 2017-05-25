@@ -320,7 +320,7 @@ static MACHINE_CONFIG_START( mjkjidai )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mjkjidai)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 0x100)
+	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 0x100)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

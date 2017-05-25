@@ -19,7 +19,7 @@ static SLOT_INTERFACE_START( jasmin_floppies )
 	SLOT_INTERFACE( "3dsdd", FLOPPY_3_DSDD )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_FRAGMENT( jasmin )
+static MACHINE_CONFIG_START( jasmin )
 	MCFG_WD1770_ADD("fdc", XTAL_8MHz)
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(oricext_device, irq_w))
 

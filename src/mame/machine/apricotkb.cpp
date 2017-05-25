@@ -67,7 +67,7 @@ ADDRESS_MAP_END
 //  MACHINE_DRIVER( apricot_keyboard )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( apricot_keyboard )
+static MACHINE_CONFIG_START( apricot_keyboard )
 #ifdef UPD7507_EMULATED
 	MCFG_CPU_ADD(UPD7507C_TAG, UPD7507, XTAL_32_768kHz)
 	MCFG_CPU_IO_MAP(apricot_keyboard_io)

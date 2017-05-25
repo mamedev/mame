@@ -1118,7 +1118,7 @@ static MACHINE_CONFIG_START( by35 )
 	MCFG_TIMER_DRIVER_ADD("timer_d_pulse", by35_state, timer_d_pulse)                             // 555 Active pulse length
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_FRAGMENT( as2888_audio )
+MACHINE_CONFIG_START( as2888_audio )
 
 	MCFG_MACHINE_START_OVERRIDE( by35_state, as2888 )
 

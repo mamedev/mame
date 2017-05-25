@@ -70,7 +70,7 @@ ADDRESS_MAP_END
 //  MACHINE_DRIVER( iskr_1030_keyboard )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( iskr_1030_keyboard )
+static MACHINE_CONFIG_START( iskr_1030_keyboard )
 	MCFG_CPU_ADD(I8048_TAG, I8048, XTAL_5MHz)
 	MCFG_CPU_IO_MAP(iskr_1030_keyboard_io)
 	MCFG_MCS48_PORT_P1_IN_CB(READ8(iskr_1030_keyboard_device, p1_r))

@@ -1679,7 +1679,7 @@ GFXDECODE_END
 //  GENERIC MACHINE DRIVERS
 //**************************************************************************
 
-static MACHINE_CONFIG_FRAGMENT( xboard )
+static MACHINE_CONFIG_START( xboard )
 
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK/4)
@@ -1770,7 +1770,7 @@ static MACHINE_CONFIG_START( sega_xboard )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_FRAGMENT( xboard_fd1094 )
+static MACHINE_CONFIG_START( xboard_fd1094 )
 
 	MCFG_FRAGMENT_ADD( xboard )
 
@@ -1807,7 +1807,7 @@ MACHINE_CONFIG_END
 //  GAME-SPECIFIC MACHINE DRIVERS
 //**************************************************************************
 
-static MACHINE_CONFIG_FRAGMENT( aburner2 )
+static MACHINE_CONFIG_START( aburner2 )
 	MCFG_FRAGMENT_ADD( xboard )
 
 	// basic machine hardware
@@ -1833,7 +1833,7 @@ static MACHINE_CONFIG_START( sega_aburner2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_FRAGMENT( lastsurv_fd1094 )
+static MACHINE_CONFIG_START( lastsurv_fd1094 )
 
 	MCFG_FRAGMENT_ADD( xboard_fd1094 )
 
@@ -1869,7 +1869,7 @@ static MACHINE_CONFIG_START( sega_lastsurv_fd1094 )
 	MCFG_DEVICE_ADD("mainpcb", SEGA_XBD_LASTSURV_FD1094, 0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( lastsurv )
+static MACHINE_CONFIG_START( lastsurv )
 
 	MCFG_FRAGMENT_ADD( xboard )
 
@@ -1907,7 +1907,7 @@ MACHINE_CONFIG_END
 
 
 
-static MACHINE_CONFIG_FRAGMENT( smgp_fd1094 )
+static MACHINE_CONFIG_START( smgp_fd1094 )
 	MCFG_FRAGMENT_ADD( xboard_fd1094 )
 
 	// basic machine hardware
@@ -1954,7 +1954,7 @@ MACHINE_CONFIG_END
 
 
 
-static MACHINE_CONFIG_FRAGMENT( smgp )
+static MACHINE_CONFIG_START( smgp )
 	MCFG_FRAGMENT_ADD( xboard )
 
 	// basic machine hardware
@@ -2000,7 +2000,7 @@ static MACHINE_CONFIG_START( sega_smgp )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_FRAGMENT( rascot  )
+static MACHINE_CONFIG_START( rascot  )
 	MCFG_FRAGMENT_ADD( xboard )
 
 	// basic machine hardware

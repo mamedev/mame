@@ -16,7 +16,7 @@ serial_printer_device::serial_printer_device(const machine_config &mconfig, cons
 {
 }
 
-static MACHINE_CONFIG_FRAGMENT(serial_printer)
+static MACHINE_CONFIG_START(serial_printer)
 	MCFG_DEVICE_ADD("printer", PRINTER, 0)
 	MCFG_PRINTER_ONLINE_CB(WRITELINE(serial_printer_device, printer_online))
 MACHINE_CONFIG_END

@@ -494,7 +494,6 @@ public:
 	DECLARE_WRITE16_MEMBER(hdsnd68k_320ports_w);
 	DECLARE_READ16_MEMBER(hdsnd68k_320com_r);
 	DECLARE_WRITE16_MEMBER(hdsnd68k_320com_w);
-	DECLARE_READ_LINE_MEMBER(hdsnddsp_get_bio);
 
 	DECLARE_WRITE16_MEMBER(hdsnddsp_dac_w);
 	DECLARE_WRITE16_MEMBER(hdsnddsp_comport_w);
@@ -508,7 +507,7 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	required_device<cpu_device> m_soundcpu;
@@ -532,6 +531,8 @@ private:
 
 	void update_68k_interrupts();
 	TIMER_CALLBACK_MEMBER( delayed_68k_w );
+
+	DECLARE_READ_LINE_MEMBER(hdsnddsp_get_bio);
 };
 
 /* Hard Drivin' */

@@ -22,7 +22,7 @@
 DEFINE_DEVICE_TYPE(NES_MIRACLE, nes_miracle_device, "nes_miracle", "NES Miracle Piano Controller")
 
 
-MACHINE_CONFIG_FRAGMENT( nes_miracle )
+MACHINE_CONFIG_START( nes_miracle )
 	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
 	MCFG_MIDI_RX_HANDLER(WRITELINE(nes_miracle_device, rx_w))
 

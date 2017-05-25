@@ -1243,31 +1243,31 @@ WRITE_LINE_MEMBER(msx_state::turbo_w)
 #define MSX_VISIBLE_YBORDER_PIXELS  24
 
 
-static MACHINE_CONFIG_FRAGMENT( msx1_cartlist )
+static MACHINE_CONFIG_START( msx1_cartlist )
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "msx1_cart")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( msx1_floplist )
+static MACHINE_CONFIG_START( msx1_floplist )
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "msx1_flop")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( msx2_cartlist )
+static MACHINE_CONFIG_START( msx2_cartlist )
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "msx2_cart")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("msx1_crt_l", "msx1_cart")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( msx2_floplist )
+static MACHINE_CONFIG_START( msx2_floplist )
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "msx2_flop")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("msx1_flp_l", "msx1_flop")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( msx2p_floplist )
+static MACHINE_CONFIG_START( msx2p_floplist )
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "msx2p_flop")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("msx2_flp_l", "msx2_flop")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("msx1_flp_l", "msx1_flop")    // maybe not?
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( msxr_floplist )
+static MACHINE_CONFIG_START( msxr_floplist )
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "msxr_flop")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("msx2p_flp_l", "msx2p_flop")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("msx2_flp_l", "msx2_flop")    // maybe not?
@@ -1284,12 +1284,12 @@ static SLOT_INTERFACE_START( msx_floppies )
 	SLOT_INTERFACE( "35ssdd", FLOPPY_35_SSDD )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_FRAGMENT( msx_fd1793 )
+static MACHINE_CONFIG_START( msx_fd1793 )
 	MCFG_FD1793_ADD("fdc", XTAL_4MHz / 4)
 	MCFG_WD_FDC_FORCE_READY
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( msx_wd2793_force_ready )
+static MACHINE_CONFIG_START( msx_wd2793_force_ready )
 	// From NMS8245 schematics:
 	// READY + HLT - pulled high
 	// SSO/-ENMF + -DDEN + ENP + -5/8 - pulled low
@@ -1297,11 +1297,11 @@ static MACHINE_CONFIG_FRAGMENT( msx_wd2793_force_ready )
 	MCFG_WD_FDC_FORCE_READY
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( msx_wd2793 )
+static MACHINE_CONFIG_START( msx_wd2793 )
 	MCFG_WD2793_ADD("fdc", XTAL_4MHz / 4)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( msx_mb8877a )
+static MACHINE_CONFIG_START( msx_mb8877a )
 	// From CF-3300 FDC schematic:
 	// READY + HLT - pulled high
 	// -DDEN - pulled low
@@ -1309,34 +1309,34 @@ static MACHINE_CONFIG_FRAGMENT( msx_mb8877a )
 	MCFG_WD_FDC_FORCE_READY
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( msx_tc8566af )
+static MACHINE_CONFIG_START( msx_tc8566af )
 	MCFG_TC8566AF_ADD("fdc")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( msx_microsol )
+static MACHINE_CONFIG_START( msx_microsol )
 	MCFG_WD2793_ADD("fdc", XTAL_4MHz / 4)
 	MCFG_WD_FDC_FORCE_READY
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( msx_1_35_ssdd_drive )
+static MACHINE_CONFIG_START( msx_1_35_ssdd_drive )
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", msx_floppies, "35ssdd", msx_state::floppy_formats)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( msx_1_35_dd_drive )
+static MACHINE_CONFIG_START( msx_1_35_dd_drive )
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", msx_floppies, "35dd", msx_state::floppy_formats)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( msx_2_35_dd_drive )
+static MACHINE_CONFIG_START( msx_2_35_dd_drive )
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", msx_floppies, "35dd", msx_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", msx_floppies, "35dd", msx_state::floppy_formats)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( msx_ym2413 )
+static MACHINE_CONFIG_START( msx_ym2413 )
 	MCFG_SOUND_ADD("ym2413", YM2413, XTAL_21_4772MHz/6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( msx2_64kb_vram )
+static MACHINE_CONFIG_START( msx2_64kb_vram )
 	MCFG_DEVICE_MODIFY("v9938")
 	v9938_device::static_set_vram_size(*device, 0x10000);
 MACHINE_CONFIG_END

@@ -66,7 +66,7 @@ const tiny_rom_entry *ec_1841_keyboard_device::device_rom_region() const
 //  MACHINE_DRIVER( ec_1841_keyboard )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( ec_1841_keyboard )
+static MACHINE_CONFIG_START( ec_1841_keyboard )
 	MCFG_CPU_ADD(I8048_TAG, I8048, XTAL_5_46MHz)
 	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(ec_1841_keyboard_device, bus_w))
 	MCFG_MCS48_PORT_P1_IN_CB(READ8(ec_1841_keyboard_device, p1_r))

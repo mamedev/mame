@@ -1007,7 +1007,7 @@ static MACHINE_CONFIG_START( common )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vamphalf)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( sound_ym_oki )
+static MACHINE_CONFIG_START( sound_ym_oki )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_YM2151_ADD("ymsnd", XTAL_28MHz/8) /* 3.5MHz */
@@ -1019,7 +1019,7 @@ static MACHINE_CONFIG_FRAGMENT( sound_ym_oki )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( sound_suplup )
+static MACHINE_CONFIG_START( sound_suplup )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_YM2151_ADD("ymsnd", XTAL_14_31818MHz/4) /* 3.579545 MHz */
@@ -1031,7 +1031,7 @@ static MACHINE_CONFIG_FRAGMENT( sound_suplup )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( sound_qs1000 )
+static MACHINE_CONFIG_START( sound_qs1000 )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

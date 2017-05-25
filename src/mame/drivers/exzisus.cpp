@@ -255,7 +255,7 @@ static MACHINE_CONFIG_START( exzisus )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", exzisus)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 1024)
+	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 1024)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

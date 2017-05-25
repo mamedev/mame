@@ -195,8 +195,6 @@ public:
 	static void static_set_pcb_read(device_t &device, pcb_read_delegate &&cb) { downcast<cdp1869_device &>(device).m_in_pcb_func = std::move(cb); }
 	static void static_set_color_clock(device_t &device, int color_clock) { downcast<cdp1869_device &>(device).m_color_clock = color_clock; }
 
-	DECLARE_PALETTE_INIT(cdp1869);
-
 	virtual DECLARE_ADDRESS_MAP(io_map, 8);
 	virtual DECLARE_ADDRESS_MAP(char_map, 8);
 	virtual DECLARE_ADDRESS_MAP(page_map, 8);
@@ -220,7 +218,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_post_load() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -286,6 +284,8 @@ private:
 	uint8_t m_toneamp;                // tone output amplitude
 	uint8_t m_wnfreq;                 // white noise range select
 	uint8_t m_wnamp;                  // white noise output amplitude
+
+	DECLARE_PALETTE_INIT(cdp1869);
 };
 
 

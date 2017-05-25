@@ -103,7 +103,7 @@ void hyprolyb_adpcm_device::vck_callback( int st )
 	m_vck_ready = 0x80;
 }
 
-MACHINE_CONFIG_FRAGMENT( hyprolyb_adpcm )
+MACHINE_CONFIG_START( hyprolyb_adpcm )
 	MCFG_CPU_ADD("adpcm", M6802, XTAL_14_31818MHz/8)    /* unknown clock */
 	MCFG_CPU_PROGRAM_MAP(hyprolyb_adpcm_map)
 

@@ -402,7 +402,7 @@ static int genesis_is_SMD(unsigned char *buf, unsigned int len)
 	if (len > 0x2081 && buf[0x2080] == ' ' && buf[0x0080] == 'S' && buf[0x2081] == 'E' && buf[0x0081] == 'G')
 		return 1;
 
-	/* jap baseball 94 */
+	/* jpn baseball 94 */
 	if (len > (0xf0 + 9) && !strncmp("OL R-AEAL", (const char *) &buf[0xf0], 9))
 		return 1;
 

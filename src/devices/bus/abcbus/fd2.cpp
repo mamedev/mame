@@ -234,7 +234,7 @@ FLOPPY_FORMATS_END
 //  MACHINE_DRIVER( abc_fd2 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( abc_fd2 )
+static MACHINE_CONFIG_START( abc_fd2 )
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_4MHz/2)
 	MCFG_CPU_PROGRAM_MAP(abc_fd2_mem)
 	MCFG_CPU_IO_MAP(abc_fd2_io)

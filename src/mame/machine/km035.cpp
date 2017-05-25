@@ -53,7 +53,7 @@ ADDRESS_MAP_END
 //  MACHINE_CONFIG
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( km035 )
+static MACHINE_CONFIG_START( km035 )
 	MCFG_CPU_ADD(KM035_CPU_TAG, I8035, XTAL_4_608MHz)
 	MCFG_CPU_PROGRAM_MAP(km035_map)
 	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(km035_device, bus_w))
