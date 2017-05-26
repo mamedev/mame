@@ -11,8 +11,8 @@
 class ojankohs_state : public driver_device
 {
 public:
-	ojankohs_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	ojankohs_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_paletteram(*this, "paletteram"),
@@ -20,7 +20,15 @@ public:
 		m_msm(*this, "msm"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_coin(*this, "coin"),
+		m_inputs_p1(*this, {"p1_0", "p1_1", "p1_2", "p1_3"}),
+		m_inputs_p2(*this, {"p2_0", "p2_1", "p2_2", "p2_3"}),
+		m_inputs_p1_extra(*this, "p1_4"),
+		m_inputs_p2_extra(*this, "p2_4"),
+		m_dsw1(*this, "dsw1"), m_dsw2(*this, "dsw2"),
+		m_dsw3(*this, "dsw3"), m_dsw4(*this, "dsw4")
+	{ }
 
 	/* memory pointers */
 	optional_shared_ptr<uint8_t> m_videoram;
@@ -49,6 +57,15 @@ public:
 	optional_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_ioport m_coin;
+	required_ioport_array<4> m_inputs_p1;
+	required_ioport_array<4> m_inputs_p2;
+	optional_ioport m_inputs_p1_extra;
+	optional_ioport m_inputs_p2_extra;
+	required_ioport m_dsw1;
+	required_ioport m_dsw2;
+	optional_ioport m_dsw3;
+	optional_ioport m_dsw4;
 
 	DECLARE_WRITE8_MEMBER(ojankohs_rombank_w);
 	DECLARE_WRITE8_MEMBER(ojankoy_rombank_w);

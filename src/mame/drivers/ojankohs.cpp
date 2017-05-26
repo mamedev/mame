@@ -547,13 +547,13 @@ READ8_MEMBER( ojankohs_state::keymatrix_p1_r )
 {
 	uint8_t data = 0xff;
 
-	if (BIT(m_port_select, 0)) data &= ioport("p1_0")->read();
-	if (BIT(m_port_select, 1)) data &= ioport("p1_1")->read();
-	if (BIT(m_port_select, 2)) data &= ioport("p1_2")->read();
-	if (BIT(m_port_select, 3)) data &= ioport("p1_3")->read();
-	if (BIT(m_port_select, 4)) data &= ioport("p1_4")->read();
+	if (BIT(m_port_select, 0)) data &= m_inputs_p1[0]->read();
+	if (BIT(m_port_select, 1)) data &= m_inputs_p1[1]->read();
+	if (BIT(m_port_select, 2)) data &= m_inputs_p1[2]->read();
+	if (BIT(m_port_select, 3)) data &= m_inputs_p1[3]->read();
+	if (BIT(m_port_select, 4)) data &= m_inputs_p1_extra->read();
 
-	data &= ioport("coin")->read();
+	data &= m_coin->read();
 
 	return data;
 }
@@ -562,13 +562,13 @@ READ8_MEMBER( ojankohs_state::keymatrix_p2_r )
 {
 	uint8_t data = 0xff;
 
-	if (BIT(m_port_select, 0)) data &= ioport("p2_0")->read();
-	if (BIT(m_port_select, 1)) data &= ioport("p2_1")->read();
-	if (BIT(m_port_select, 2)) data &= ioport("p2_2")->read();
-	if (BIT(m_port_select, 3)) data &= ioport("p2_3")->read();
-	if (BIT(m_port_select, 4)) data &= ioport("p2_4")->read();
+	if (BIT(m_port_select, 0)) data &= m_inputs_p2[0]->read();
+	if (BIT(m_port_select, 1)) data &= m_inputs_p2[1]->read();
+	if (BIT(m_port_select, 2)) data &= m_inputs_p2[2]->read();
+	if (BIT(m_port_select, 3)) data &= m_inputs_p2[3]->read();
+	if (BIT(m_port_select, 4)) data &= m_inputs_p2_extra->read();
 
-	data &= ioport("coin")->read();
+	data &= m_coin->read();
 
 	return data;
 }
@@ -577,12 +577,12 @@ READ8_MEMBER( ojankohs_state::ojankoc_keymatrix_p1_r )
 {
 	uint8_t data = 0x00;
 
-	if (BIT(m_port_select, 0) == 0) data |= ioport("p1_0")->read();
-	if (BIT(m_port_select, 1) == 0) data |= ioport("p1_1")->read();
-	if (BIT(m_port_select, 2) == 0) data |= ioport("p1_2")->read();
-	if (BIT(m_port_select, 3) == 0) data |= ioport("p1_3")->read();
+	if (BIT(m_port_select, 0) == 0) data |= m_inputs_p1[0]->read();
+	if (BIT(m_port_select, 1) == 0) data |= m_inputs_p1[1]->read();
+	if (BIT(m_port_select, 2) == 0) data |= m_inputs_p1[2]->read();
+	if (BIT(m_port_select, 3) == 0) data |= m_inputs_p1[3]->read();
 
-	data |= ioport("coin")->read();
+	data |= m_coin->read();
 
 	return data;
 }
@@ -591,36 +591,36 @@ READ8_MEMBER( ojankohs_state::ojankoc_keymatrix_p2_r )
 {
 	uint8_t data = 0x00;
 
-	if (BIT(m_port_select, 0) == 0) data |= ioport("p2_0")->read();
-	if (BIT(m_port_select, 1) == 0) data |= ioport("p2_1")->read();
-	if (BIT(m_port_select, 2) == 0) data |= ioport("p2_2")->read();
-	if (BIT(m_port_select, 3) == 0) data |= ioport("p2_3")->read();
+	if (BIT(m_port_select, 0) == 0) data |= m_inputs_p2[0]->read();
+	if (BIT(m_port_select, 1) == 0) data |= m_inputs_p2[1]->read();
+	if (BIT(m_port_select, 2) == 0) data |= m_inputs_p2[2]->read();
+	if (BIT(m_port_select, 3) == 0) data |= m_inputs_p2[3]->read();
 
-	data |= ioport("coin")->read();
+	data |= m_coin->read();
 
 	return data;
 }
 
 READ8_MEMBER( ojankohs_state::ojankohs_dipsw1_r )
 {
-	uint8_t data = ioport("dsw1")->read();
+	uint8_t data = m_dsw1->read();
 	return BITSWAP8(data, 0, 1, 2, 3, 4, 5, 6, 7);
 }
 
 READ8_MEMBER( ojankohs_state::ojankohs_dipsw2_r )
 {
-	uint8_t data = ioport("dsw2")->read();
+	uint8_t data = m_dsw2->read();
 	return BITSWAP8(data, 0, 1, 2, 3, 4, 5, 6, 7);
 }
 
 READ8_MEMBER( ojankohs_state::ccasino_dipsw3_r )
 {
-	return ioport("dsw3")->read() ^ 0xff;
+	return m_dsw3->read() ^ 0xff;
 }
 
 READ8_MEMBER( ojankohs_state::ccasino_dipsw4_r )
 {
-	return ioport("dsw4")->read() ^ 0xff;
+	return m_dsw4->read() ^ 0xff;
 }
 
 WRITE8_MEMBER( ojankohs_state::ojankoy_coinctr_w )
