@@ -1796,4 +1796,4 @@ GAME( 1994, wingwar,    0,       model1,    wingwar, model1_state,  0,          
 GAME( 1994, wingwaru,   wingwar, model1,    wingwar, model1_state,  0,          ROT0, "Sega", "Wing War (US)", MACHINE_NOT_WORKING )
 GAME( 1994, wingwarj,   wingwar, model1,    wingwar, model1_state,  0,          ROT0, "Sega", "Wing War (Japan)", MACHINE_NOT_WORKING )
 GAME( 1994, wingwar360, wingwar, model1,    wingwar, model1_state,  wingwar360, ROT0, "Sega", "Wing War R360 (US)", MACHINE_NOT_WORKING )
-GAME( 1993, netmerc,    0,       netmerc,   vf,      model1_state,  0,          ROT0, "Sega", "NetMerc?", MACHINE_NOT_WORKING )
+GAME( 1993, netmerc,    0,       netmerc,   vf,      model1_state,  0,          ROT0, "Sega", "Sega NetMerc", MACHINE_NOT_WORKING )
