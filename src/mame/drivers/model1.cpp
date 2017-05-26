@@ -784,11 +784,24 @@ READ16_MEMBER(model1_state::network_ctl_r)
 	if(offset)
 		return 0x40;
 	else
-		return 0x00;
+		return m_io_command;
 }
 
 WRITE16_MEMBER(model1_state::network_ctl_w)
 {
+	if (offset == 0)
+	{
+		m_io_command = data & 0xff;
+
+		// totally made up; proper emulation of I/O board needed
+		// (command 3 is EEPROM write, so should take a lot longer)
+		m_io_timer->adjust(data == 3 ? attotime::from_msec(100) : attotime::from_usec(10));
+	}
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(model1_state::io_command_acknowledge)
+{
+	m_io_command = 0;
 }
 
 WRITE16_MEMBER(model1_state::md1_w)
@@ -1605,6 +1618,7 @@ static MACHINE_CONFIG_START( model1 )
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(model1_state,irq_callback)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", model1_state, model1_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD("iotimer", model1_state, io_command_acknowledge)
 
 	MCFG_MACHINE_START_OVERRIDE(model1_state,model1)
 	MCFG_MACHINE_RESET_OVERRIDE(model1_state,model1)
@@ -1654,7 +1668,9 @@ static MACHINE_CONFIG_START( model1_vr )
 	MCFG_CPU_PROGRAM_MAP(model1_vr_mem)
 	MCFG_CPU_IO_MAP(model1_vr_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(model1_state,irq_callback)
+
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", model1_state, model1_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD("iotimer", model1_state, io_command_acknowledge)
 
 	MCFG_CPU_ADD("tgp", MB86233, 16000000)
 	MCFG_CPU_PROGRAM_MAP(model1_vr_tgp_map)
