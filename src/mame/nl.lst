@@ -179,3 +179,6 @@ pongf                           // (c) 1972 Atari
 
 // usbilliards.cpp
 //sharkusb                      // (c) 1975 US Billiards
+
+@source:cheekyms.cpp
+cheekyms                        // 8004 (c) [1980?]
