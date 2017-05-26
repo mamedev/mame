@@ -553,7 +553,7 @@ orunners:  Interleaved with the dj and << >> buttons is the data the drives the 
  * TODO: Kokoroji hangs if CD comms are handled with current mb89352 core.
  * We currently hide this behind a compile switch to aid development
  */
-#define S32_KOKOROJI_TEST_CD 0
+#define S32_KOKOROJI_TEST_CD 1
 
 DEFINE_DEVICE_TYPE(SEGA_S32_PCB, segas32_state, "segas32_pcb", "Sega System 32 PCB")
 
@@ -2508,6 +2508,13 @@ static ADDRESS_MAP_START( system32_cd_map, AS_PROGRAM, 16, segas32_state )
 	AM_IMPORT_FROM(system32_map)
 ADDRESS_MAP_END
 
+static MACHINE_CONFIG_START( cdrom_config )
+	MCFG_DEVICE_MODIFY( "cdda" )
+	MCFG_SOUND_ROUTE( 0, "^^^^lspeaker", 0.30 )
+	MCFG_SOUND_ROUTE( 1, "^^^^rspeaker", 0.30 )
+MACHINE_CONFIG_END
+
+
 MACHINE_CONFIG_MEMBER(segas32_cd_state::device_add_mconfig)
 	segas32_state::device_add_mconfig(config);
 
@@ -2521,6 +2528,7 @@ MACHINE_CONFIG_MEMBER(segas32_cd_state::device_add_mconfig)
 
 	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
 	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "cdrom", SCSICD, SCSI_ID_0)
+	MCFG_SLOT_OPTION_MACHINE_CONFIG("cdrom", cdrom_config)
 
 	MCFG_DEVICE_ADD("cxdio", CXD1095, 0)
 	MCFG_CXD1095_OUT_PORTA_CB(WRITE8(segas32_cd_state, lamps1_w))
@@ -4084,7 +4092,7 @@ ROM_START( kokoroj2 )
 	ROMX_LOAD( "mpr-16196.ic25", 0x800006, 0x200000, CRC(b8e22e05) SHA1(dd667e2c5d421cba356421825e6aca9b5ca0af45) , ROM_SKIP(6)|ROM_GROUPWORD )
 
 	/* AUDIO CD */
-	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
+	DISK_REGION( "mainpcb:scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
 	DISK_IMAGE_READONLY( "cdp-00146", 0, SHA1(0b37e0ea2380ecd9abef2ccd6a8096d76d2ba344) )
 ROM_END
 
