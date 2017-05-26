@@ -6,6 +6,7 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "singleconn.h"
 
 DEFINE_DEVICE_TYPE_NS(TI99_GROMPORT_SINGLE, bus::ti99::gromport, ti99_single_cart_conn_device, "ti99_scartconn", "TI-99 Standard cartridge connector")
