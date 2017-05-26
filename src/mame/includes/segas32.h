@@ -327,6 +327,8 @@ public:
 
 	DECLARE_WRITE8_MEMBER(lamps1_w);
 	DECLARE_WRITE8_MEMBER(lamps2_w);
+	DECLARE_WRITE_LINE_MEMBER(scsi_irq_w);
+	DECLARE_WRITE_LINE_MEMBER(scsi_drq_w);	
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
