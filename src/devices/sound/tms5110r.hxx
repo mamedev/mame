@@ -53,7 +53,7 @@
 	VVVVVV VVVVV
 	T0280A 0281  = 1978 speak & spell, unknown difference to below, assumed same? uses old chirp
 	T0280B 0281A = 1979 speak & spell, also == TMS5100, uses old chirp
-	?????? ????? (no decap; likely 'T0280D 0281D') = 1980 speak & spell, 1981 speak & spell compact, changed energy table, otherwise same as above, uses old chirp
+	T0280F 0281D = 1980 speak & spell, 1981 speak & spell compact, changed energy table, otherwise same as above, uses old chirp
 	T0280F 2801A = 1980 speak & math, 1980 speak and read, uses old chirp
 	T0280F 2802  = touch and tell, language translator; uses a unique chirp rom.
 	?????? ????? = TMS5110
