@@ -184,6 +184,9 @@
 #include "emu.h"
 #include "includes/slapstic.h"
 
+#include "cpu/m6800/m6800.h"
+#include "cpu/m68000/m68000.h"
+
 
 /*************************************
  *

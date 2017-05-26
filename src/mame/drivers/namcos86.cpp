@@ -178,7 +178,7 @@ TODO:
 #include "includes/namcos86.h"
 
 #include "cpu/m6809/m6809.h"
-#include "cpu/m6800/m6800.h"
+#include "cpu/m6800/m6801.h"
 #include "sound/ym2151.h"
 #include "sound/n63701x.h"
 #include "screen.h"

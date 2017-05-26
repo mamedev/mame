@@ -1315,6 +1315,8 @@ if (CPUS["M6800"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/cpu/m6800/m6800.cpp",
 		MAME_DIR .. "src/devices/cpu/m6800/m6800.h",
+		MAME_DIR .. "src/devices/cpu/m6800/m6801.cpp",
+		MAME_DIR .. "src/devices/cpu/m6800/m6801.h",
 		MAME_DIR .. "src/devices/cpu/m6800/6800ops.hxx",
 		MAME_DIR .. "src/devices/cpu/m6800/6800tbl.hxx",
 	}

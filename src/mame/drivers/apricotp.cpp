@@ -27,7 +27,7 @@
 #include "emu.h"
 #include "bus/centronics/ctronics.h"
 #include "cpu/i86/i86.h"
-#include "cpu/m6800/m6800.h"
+#include "cpu/m6800/m6801.h"
 #include "formats/apridisk.h"
 #include "machine/am9517a.h"
 #include "machine/apricotkb.h"
