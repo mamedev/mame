@@ -532,14 +532,11 @@ static ADDRESS_MAP_START( asic65_io_map, AS_IO, 16, asic65_device )
 ADDRESS_MAP_END
 
 
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
 
-/*************************************
- *
- *  Machine driver for ROM-based
- *
- *************************************/
-
-MACHINE_CONFIG_START( asic65 )
+MACHINE_CONFIG_MEMBER( asic65_device::device_add_mconfig )
 
 	/* ASIC65 */
 	MCFG_CPU_ADD("asic65cpu", TMS32010, 20000000)
@@ -547,16 +544,6 @@ MACHINE_CONFIG_START( asic65 )
 	MCFG_CPU_IO_MAP(asic65_io_map)
 	MCFG_TMS32010_BIO_IN_CB(READLINE(asic65_device, get_bio))
 MACHINE_CONFIG_END
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor asic65_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( asic65 );
-}
 
 
 

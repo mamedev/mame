@@ -106,7 +106,7 @@ READ8_MEMBER(st0016_cpu_device::soundram_read)
 }
 
 /* CPU interface */
-static MACHINE_CONFIG_START( st0016_cpu )
+MACHINE_CONFIG_MEMBER( st0016_cpu_device::device_add_mconfig )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_PALETTE_ADD("palette", 16*16*4+1)
@@ -117,17 +117,6 @@ static MACHINE_CONFIG_START( st0016_cpu )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 MACHINE_CONFIG_END
-
-machine_config_constructor st0016_cpu_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( st0016_cpu );
-}
-
-
-
-
-
-
 
 
 static const gfx_layout charlayout =

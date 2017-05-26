@@ -35,11 +35,12 @@ public:
 	template <unsigned N, class Object> static devcb_base &set_input_callback(device_t &device, Object &&cb) { return downcast<namco_62xx_device &>(device).m_in[N].set_callback(std::forward<Object>(cb)); }
 
 	template <unsigned N, class Object> static devcb_base &set_output_callback(device_t &device, Object &&cb) { return downcast<namco_62xx_device &>(device).m_out[N].set_callback(std::forward<Object>(cb)); }
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	// internal state

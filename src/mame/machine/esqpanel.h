@@ -96,7 +96,7 @@ public:
 	esqpanel1x22_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	virtual void send_to_display(uint8_t data) override { m_vfd->write_char(data); }
 
@@ -108,7 +108,7 @@ public:
 	esqpanel2x40_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	virtual void send_to_display(uint8_t data) override { m_vfd->write_char(data); }
 
@@ -120,7 +120,7 @@ public:
 	esqpanel2x40_sq1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	virtual void send_to_display(uint8_t data) override { m_vfd->write_char(data); }
 
@@ -133,7 +133,7 @@ public:
 	esqpanel2x16_sq1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	virtual void send_to_display(uint8_t data) override { m_vfd->write_char(data); }
 

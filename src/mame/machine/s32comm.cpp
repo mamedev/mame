@@ -73,8 +73,6 @@ Sega System Multi32 Comm PCB 837-8792-91
 #define VERBOSE 0
 #include "logmacro.h"
 
-MACHINE_CONFIG_START( s32comm )
-MACHINE_CONFIG_END
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -83,14 +81,11 @@ MACHINE_CONFIG_END
 DEFINE_DEVICE_TYPE(S32COMM, s32comm_device, "s32comm", "System 32 Communication Board")
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor s32comm_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( s32comm );
-}
+MACHINE_CONFIG_MEMBER( s32comm_device::device_add_mconfig )
+MACHINE_CONFIG_END
 
 //**************************************************************************
 //  LIVE DEVICE

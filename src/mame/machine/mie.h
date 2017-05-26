@@ -36,10 +36,6 @@ public:
 	static void static_set_gpio_name(device_t &device, int entry, const char *name);
 	static void static_set_jvs_name(device_t &device, const char *name);
 
-	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
 	DECLARE_READ8_MEMBER(control_r);
 	DECLARE_WRITE8_MEMBER(control_w);
 	DECLARE_READ8_MEMBER(lreg_r);
@@ -72,8 +68,6 @@ public:
 	DECLARE_READ8_MEMBER(read_00);
 	DECLARE_READ8_MEMBER(read_78xx);
 
-	IRQ_CALLBACK_MEMBER(irq_callback);
-
 	void maple_w(const uint32_t *data, uint32_t in_size) override;
 	virtual void maple_reset() override;
 
@@ -85,6 +79,10 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	enum { TBUF_SIZE = 8 };
@@ -117,6 +115,7 @@ private:
 
 	void raise_irq(int level);
 	void recalc_irq();
+	IRQ_CALLBACK_MEMBER(irq_callback);
 };
 
 // Trampoline class, required for device discovery

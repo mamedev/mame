@@ -53,13 +53,6 @@ static ADDRESS_MAP_START( mie_port, AS_IO, 8, mie_device)
 	AM_RANGE(0x91, 0x91) AM_READ(jvs_sense_r)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( mie )
-	MCFG_CPU_ADD("mie", Z80, DERIVED_CLOCK(1,1))
-	MCFG_CPU_PROGRAM_MAP(mie_map)
-	MCFG_CPU_IO_MAP(mie_port)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE(DEVICE_SELF, mie_device,irq_callback)
-MACHINE_CONFIG_END
-
 ROM_START( mie )
 	ROM_REGION( 0x800, "mie", 0 )
 	ROM_LOAD( "315-6146.bin", 0x000, 0x800, CRC(9b197e35) SHA1(864d14d58732dd4e2ee538ccc71fa8df7013ba06))
@@ -82,10 +75,12 @@ const tiny_rom_entry *mie_device::device_rom_region() const
 	return ROM_NAME(mie);
 }
 
-machine_config_constructor mie_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME(mie);
-}
+MACHINE_CONFIG_MEMBER( mie_device::device_add_mconfig )
+	MCFG_CPU_ADD("mie", Z80, DERIVED_CLOCK(1,1))
+	MCFG_CPU_PROGRAM_MAP(mie_map)
+	MCFG_CPU_IO_MAP(mie_port)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE(DEVICE_SELF, mie_device, irq_callback)
+MACHINE_CONFIG_END
 
 mie_jvs_device::mie_jvs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: jvs_host(mconfig, MIE_JVS, tag, owner, clock)

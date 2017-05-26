@@ -21,9 +21,6 @@ public:
 	// construction/destruction
 	m2comm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
 	// single bit registers (74LS74)
 	DECLARE_READ8_MEMBER(zfg_r);
 	DECLARE_WRITE8_MEMBER(zfg_w);
@@ -51,6 +48,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	uint8_t m_shared[0x4000]; // 16k shared memory

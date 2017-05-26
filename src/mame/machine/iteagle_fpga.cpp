@@ -17,26 +17,6 @@
 
 DEFINE_DEVICE_TYPE(ITEAGLE_FPGA, iteagle_fpga_device, "iteagle_fpga", "ITEagle FPGA")
 
-MACHINE_CONFIG_START(iteagle_fpga)
-	MCFG_NVRAM_ADD_0FILL("eagle2_rtc")
-	// RS232 serial ports
-	// The console terminal (com1) operates at 38400 baud
-	MCFG_SCC85C30_ADD(AM85C30_TAG, XTAL_7_3728MHz, XTAL_7_3728MHz, 0, XTAL_7_3728MHz, 0)
-	MCFG_Z80SCC_OUT_INT_CB(WRITELINE(iteagle_fpga_device, serial_interrupt))
-	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE(COM2_TAG, rs232_port_device, write_txd))
-	MCFG_Z80SCC_OUT_TXDB_CB(DEVWRITELINE(COM1_TAG, rs232_port_device, write_txd))
-
-	MCFG_RS232_PORT_ADD(COM1_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(AM85C30_TAG, scc85c30_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(AM85C30_TAG, scc85c30_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(AM85C30_TAG, scc85c30_device, ctsb_w))
-
-	MCFG_RS232_PORT_ADD(COM2_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(AM85C30_TAG, scc85c30_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(AM85C30_TAG, scc85c30_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(AM85C30_TAG, scc85c30_device, ctsa_w))
-MACHINE_CONFIG_END
-
 DEVICE_ADDRESS_MAP_START(fpga_map, 32, iteagle_fpga_device)
 	AM_RANGE(0x000, 0x01f) AM_READWRITE(fpga_r, fpga_w)
 ADDRESS_MAP_END
@@ -55,10 +35,25 @@ iteagle_fpga_device::iteagle_fpga_device(const machine_config &mconfig, const ch
 {
 }
 
-machine_config_constructor iteagle_fpga_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME(iteagle_fpga);
-}
+MACHINE_CONFIG_MEMBER(iteagle_fpga_device::device_add_mconfig)
+	MCFG_NVRAM_ADD_0FILL("eagle2_rtc")
+	// RS232 serial ports
+	// The console terminal (com1) operates at 38400 baud
+	MCFG_SCC85C30_ADD(AM85C30_TAG, XTAL_7_3728MHz, XTAL_7_3728MHz, 0, XTAL_7_3728MHz, 0)
+	MCFG_Z80SCC_OUT_INT_CB(WRITELINE(iteagle_fpga_device, serial_interrupt))
+	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE(COM2_TAG, rs232_port_device, write_txd))
+	MCFG_Z80SCC_OUT_TXDB_CB(DEVWRITELINE(COM1_TAG, rs232_port_device, write_txd))
+
+	MCFG_RS232_PORT_ADD(COM1_TAG, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(AM85C30_TAG, scc85c30_device, rxb_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(AM85C30_TAG, scc85c30_device, dcdb_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(AM85C30_TAG, scc85c30_device, ctsb_w))
+
+	MCFG_RS232_PORT_ADD(COM2_TAG, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(AM85C30_TAG, scc85c30_device, rxa_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(AM85C30_TAG, scc85c30_device, dcda_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(AM85C30_TAG, scc85c30_device, ctsa_w))
+MACHINE_CONFIG_END
 
 void iteagle_fpga_device::device_start()
 {
@@ -615,18 +610,13 @@ DEVICE_ADDRESS_MAP_START(eeprom_map, 32, iteagle_eeprom_device)
 	AM_RANGE(0x0000, 0x000F) AM_READWRITE(eeprom_r, eeprom_w)
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_START( iteagle_eeprom )
+MACHINE_CONFIG_MEMBER( iteagle_eeprom_device::device_add_mconfig )
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 MACHINE_CONFIG_END
 
-machine_config_constructor iteagle_eeprom_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( iteagle_eeprom );
-}
-
 iteagle_eeprom_device::iteagle_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, ITEAGLE_EEPROM, tag, owner, clock),
-		m_eeprom(*this, "eeprom"), m_sw_version(0), m_hw_version(0)
+		m_sw_version(0), m_hw_version(0), m_eeprom(*this, "eeprom") 
 {
 	// When corrupt writes 0x3=2, 0x3e=2, 0xa=0, 0x30=0
 	// 0x4 = HW Version - 6-8 is GREEN board PCB, 9 is RED board PCB
@@ -734,14 +724,9 @@ WRITE32_MEMBER( iteagle_eeprom_device::eeprom_w )
 // Attached Peripheral Controller
 //************************************
 
-MACHINE_CONFIG_START(eagle1)
+MACHINE_CONFIG_MEMBER(iteagle_periph_device::device_add_mconfig)
 	MCFG_NVRAM_ADD_0FILL("eagle1_rtc")
 MACHINE_CONFIG_END
-
-machine_config_constructor iteagle_periph_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME(eagle1);
-}
 
 DEFINE_DEVICE_TYPE(ITEAGLE_PERIPH, iteagle_periph_device, "iteagle_periph", "ITEagle Peripheral Controller")
 

@@ -69,10 +69,10 @@ DISCRETE_SOUND_END
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( v1050_keyboard )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( v1050_keyboard )
+MACHINE_CONFIG_MEMBER( v1050_keyboard_device::device_add_mconfig )
 	MCFG_CPU_ADD(I8049_TAG, I8049, XTAL_4_608MHz)
 	MCFG_MCS48_PORT_P1_IN_CB(READ8(v1050_keyboard_device, kb_p1_r))
 	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(v1050_keyboard_device, kb_p1_w))
@@ -85,17 +85,6 @@ static MACHINE_CONFIG_START( v1050_keyboard )
 	MCFG_DISCRETE_INTF(v1050kb)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor v1050_keyboard_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( v1050_keyboard );
-}
 
 
 //-------------------------------------------------

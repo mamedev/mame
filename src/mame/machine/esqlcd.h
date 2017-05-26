@@ -24,7 +24,7 @@ public:
 	virtual void update_display() override;
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_reset() override;
 
 	uint8_t m_lcdpg[4][32];

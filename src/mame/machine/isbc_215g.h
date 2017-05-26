@@ -15,19 +15,11 @@ class isbc_215g_device : public device_t
 public:
 	isbc_215g_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	const tiny_rom_entry *device_rom_region() const override;
-
 	DECLARE_WRITE8_MEMBER(write);
 	DECLARE_READ16_MEMBER(io_r);
 	DECLARE_WRITE16_MEMBER(io_w);
 	DECLARE_READ16_MEMBER(mem_r);
 	DECLARE_WRITE16_MEMBER(mem_w);
-
-	DECLARE_WRITE_LINE_MEMBER(isbx_irq_00_w);
-	DECLARE_WRITE_LINE_MEMBER(isbx_irq_01_w);
-	DECLARE_WRITE_LINE_MEMBER(isbx_irq_10_w);
-	DECLARE_WRITE_LINE_MEMBER(isbx_irq_11_w);
 
 	static void static_set_wakeup_addr(device_t &device, uint32_t wakeup) { downcast<isbc_215g_device &>(device).m_wakeup = wakeup; }
 	static void static_set_maincpu_tag(device_t &device, const char *maincpu_tag) { downcast<isbc_215g_device &>(device).m_maincpu_tag = maincpu_tag; }
@@ -36,6 +28,8 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	const tiny_rom_entry *device_rom_region() const override;
 
 private:
 	void find_sector();
@@ -63,6 +57,11 @@ private:
 	bool m_isbx_irq[4], m_fdctc, m_step, m_format;
 
 	const struct hard_disk_info* m_geom[2];
+
+	DECLARE_WRITE_LINE_MEMBER(isbx_irq_00_w);
+	DECLARE_WRITE_LINE_MEMBER(isbx_irq_01_w);
+	DECLARE_WRITE_LINE_MEMBER(isbx_irq_10_w);
+	DECLARE_WRITE_LINE_MEMBER(isbx_irq_11_w);
 };
 
 #define MCFG_ISBC_215_ADD(_tag, _wakeup, _maincpu_tag) \

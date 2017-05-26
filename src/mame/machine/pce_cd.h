@@ -46,11 +46,6 @@ public:
 	// construction/destruction
 	pce_cd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual void device_start() override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual void device_reset() override;
-
 	void update();
 
 	void late_setup();
@@ -58,12 +53,15 @@ public:
 	DECLARE_WRITE8_MEMBER(bram_w);
 	DECLARE_WRITE8_MEMBER(intf_w);
 	DECLARE_WRITE8_MEMBER(acard_w);
-	DECLARE_WRITE_LINE_MEMBER(msm5205_int);
 	DECLARE_READ8_MEMBER(bram_r);
 	DECLARE_READ8_MEMBER(intf_r);
 	DECLARE_READ8_MEMBER(acard_r);
 
-	void nvram_init(nvram_device &nvram, void *data, size_t size);
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_reset() override;
 
 private:
 	void adpcm_stop(uint8_t irq_flag);
@@ -170,6 +168,9 @@ private:
 	emu_timer   *m_adpcm_fadeout_timer;
 	emu_timer   *m_adpcm_fadein_timer;
 	double  m_adpcm_volume;
+
+	DECLARE_WRITE_LINE_MEMBER(msm5205_int);
+	void nvram_init(nvram_device &nvram, void *data, size_t size);
 };
 
 

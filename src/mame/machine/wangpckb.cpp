@@ -109,10 +109,10 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( wangpc_keyboard )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( wangpc_keyboard )
+MACHINE_CONFIG_MEMBER( wangpc_keyboard_device::device_add_mconfig )
 	MCFG_CPU_ADD(I8051_TAG, I8051, XTAL_4MHz)
 	MCFG_CPU_IO_MAP(wangpc_keyboard_io)
 	MCFG_MCS51_SERIAL_TX_CB(WRITE8(wangpc_keyboard_device, mcs51_tx_callback))
@@ -123,17 +123,6 @@ static MACHINE_CONFIG_START( wangpc_keyboard )
 	MCFG_SOUND_ADD(SN76496_TAG, SN76496, 2000000) // ???
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor wangpc_keyboard_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( wangpc_keyboard );
-}
 
 
 //-------------------------------------------------

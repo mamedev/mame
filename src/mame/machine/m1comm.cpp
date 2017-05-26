@@ -81,11 +81,6 @@ static ADDRESS_MAP_START( m1comm_io, AS_IO, 8, m1comm_device )
 	AM_RANGE(0xff, 0xff) AM_RAM
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_START( m1comm )
-	MCFG_CPU_ADD(Z80_TAG, Z80, 8000000) /* 32 MHz / 4 */
-	MCFG_CPU_PROGRAM_MAP(m1comm_mem)
-	MCFG_CPU_IO_MAP(m1comm_io)
-MACHINE_CONFIG_END
 
 ROM_START( m1comm )
 	ROM_REGION( 0x20000, Z80_TAG, ROMREGION_ERASEFF )
@@ -99,14 +94,14 @@ ROM_END
 DEFINE_DEVICE_TYPE(M1COMM, m1comm_device, "m1comm", "Model 1 Communication Board")
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor m1comm_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( m1comm );
-}
+MACHINE_CONFIG_MEMBER( m1comm_device::device_add_mconfig )
+	MCFG_CPU_ADD(Z80_TAG, Z80, 8000000) /* 32 MHz / 4 */
+	MCFG_CPU_PROGRAM_MAP(m1comm_mem)
+	MCFG_CPU_IO_MAP(m1comm_io)
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region

@@ -51,11 +51,6 @@ public:
 
 	template <class Object> static devcb_base &set_txd_handler(device_t &device, Object &&cb) { return downcast<wangpc_keyboard_device &>(device).m_txd_handler.set_callback(std::forward<Object>(cb)); }
 
-	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual ioport_constructor device_input_ports() const override;
-
 	DECLARE_WRITE_LINE_MEMBER( write_rxd );
 
 	// not really public
@@ -64,14 +59,16 @@ public:
 	DECLARE_WRITE8_MEMBER( kb_p2_w );
 	DECLARE_WRITE8_MEMBER( kb_p3_w );
 
-	DECLARE_READ8_MEMBER( mcs51_rx_callback );
-	DECLARE_WRITE8_MEMBER( mcs51_tx_callback );
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	// device_serial_interface overrides
 	virtual void tra_callback() override;
@@ -86,6 +83,9 @@ private:
 
 	uint8_t m_keylatch;
 	int m_rxd;
+
+	DECLARE_READ8_MEMBER( mcs51_rx_callback );
+	DECLARE_WRITE8_MEMBER( mcs51_tx_callback );
 };
 
 

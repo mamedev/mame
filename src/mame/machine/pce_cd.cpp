@@ -241,7 +241,7 @@ void pce_cd_device::nvram_init(nvram_device &nvram, void *data, size_t size)
 }
 
 // TODO: left and right speaker tags should be passed from the parent config, instead of using the hard-coded ones below!?!
-static MACHINE_CONFIG_START( pce_cd )
+ MACHINE_CONFIG_MEMBER( pce_cd_device::device_add_mconfig )
 	MCFG_NVRAM_ADD_CUSTOM_DRIVER("bram", pce_cd_device, nvram_init)
 
 	MCFG_CDROM_ADD("cdrom")
@@ -257,12 +257,6 @@ static MACHINE_CONFIG_START( pce_cd )
 	MCFG_SOUND_ROUTE( 0, "^:lspeaker", 1.00 )
 	MCFG_SOUND_ROUTE( 1, "^:rspeaker", 1.00 )
 MACHINE_CONFIG_END
-
-
-machine_config_constructor pce_cd_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( pce_cd );
-}
 
 
 void pce_cd_device::adpcm_stop(uint8_t irq_flag)
