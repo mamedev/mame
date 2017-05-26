@@ -120,9 +120,14 @@ protected:
 	required_device<pia6821_device> m_pia_1i;
 	required_device<tms5220_device> m_speech;
 
+	required_device_array<netlist_mame_logic_input_device, 5>   m_ioa;
+	required_device<netlist_mame_logic_input_device>            m_level;
+	required_device<netlist_mame_logic_input_device>            m_levelt;
+	required_device<netlist_mame_logic_input_device>            m_sw1;
+
 	required_ioport                 m_inputs;
 
-	u8 m_host_command;
+	u8  m_host_command;
 };
 
 #endif // MAME_AUDIO_ZACCARIA_H

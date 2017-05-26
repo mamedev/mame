@@ -186,6 +186,12 @@
 #define TTL_7486_DIP(name)                                                     \
 		NET_REGISTER_DEV(TTL_7486_DIP, name)
 
+#define TTL_74155_DIP(name)                                                    \
+		NET_REGISTER_DEV(TTL_74155_DIP, name)
+
+#define TTL_74156_DIP(name)                                                    \
+		NET_REGISTER_DEV(TTL_74156_DIP, name)
+
 
 #define TTL_74260_GATE(name)                                                   \
 		NET_REGISTER_DEV(TTL_74260_GATE, name)
