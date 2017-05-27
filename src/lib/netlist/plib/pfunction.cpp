@@ -12,7 +12,6 @@
 
 #include <cmath>
 #include <stack>
-#include <stdlib.h>
 
 namespace plib {
 
@@ -204,7 +203,7 @@ double pfunction::evaluate(const std::vector<double> &values)
 			OP(SIN,  0, std::sin(ST2));
 			OP(COS,  0, std::cos(ST2));
 			case RAND:
-				stack[ptr++] = static_cast<double>(rand()) / static_cast<double>(RAND_MAX);
+				stack[ptr++] = lfsr_random();
 				break;
 			case PUSH_INPUT:
 				stack[ptr++] = values[static_cast<unsigned>(rc.m_param)];

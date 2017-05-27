@@ -44,6 +44,7 @@ namespace plib {
 		};
 	public:
 		pfunction()
+		: m_lfsr(0xACE1u)
 		{
 		}
 
@@ -79,7 +80,18 @@ namespace plib {
 		void compile_postfix(const std::vector<pstring> &inputs,
 				const std::vector<pstring> &cmds, const pstring &expr);
 
+		double lfsr_random()
+		{
+			std::uint16_t lsb = m_lfsr & 1;
+		    m_lfsr >>= 1;
+		    if (lsb)
+		    	m_lfsr ^= 0xB400u; // taps 15, 13, 12, 10
+		    return static_cast<double>(m_lfsr) / static_cast<double>(0xffffu);
+		}
+
 		std::vector<rpn_inst> m_precompiled; //!< precompiled expression
+
+		std::uint16_t m_lfsr; //!< lfsr used for generating random numbers
 	};
 
 
