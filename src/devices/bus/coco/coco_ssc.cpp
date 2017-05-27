@@ -166,11 +166,10 @@ MACHINE_CONFIG_MEMBER(coco_ssc_device::device_add_mconfig)
 	MCFG_RAM_DEFAULT_SIZE("2K")
 	MCFG_RAM_DEFAULT_VALUE(0x00)
 
-	MCFG_SPEAKER_STANDARD_MONO("ssc_speech")
-	MCFG_SPEAKER_STANDARD_MONO("ssc_psg")
+	MCFG_SPEAKER_STANDARD_MONO("ssc_audio")
 
 	MCFG_SOUND_ADD(SP0256_TAG, SP0256, XTAL_3_12MHz)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "ssc_speech", SP0256_GAIN)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "ssc_audio", SP0256_GAIN)
 	MCFG_SP0256_DATA_REQUEST_CB(INPUTLINE(PIC_TAG, TMS7000_INT1_LINE))
 
 	MCFG_SOUND_ADD(AY_TAG, AY8913, DERIVED_CLOCK(1, 2))
@@ -178,7 +177,7 @@ MACHINE_CONFIG_MEMBER(coco_ssc_device::device_add_mconfig)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "coco_sac_tag", AY8913_GAIN)
 
 	MCFG_DEVICE_ADD("coco_sac_tag", COCOSSC_SAC, DERIVED_CLOCK(1, 2))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "ssc_psg", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "ssc_audio", 1.0)
 MACHINE_CONFIG_END
 
 ROM_START(coco_ssc)
@@ -254,16 +253,12 @@ void coco_ssc_device::set_sound_enable(bool sound_enable)
 {
 	if( sound_enable )
 	{
-		m_ay->set_output_gain(0, 1);
-		m_ay->set_output_gain(1, 1);
-		m_ay->set_output_gain(2, 1);
-		m_spo->set_output_gain(0, 1);
+		m_sac->set_output_gain(0, 1.0);
+		m_spo->set_output_gain(0, 1.0);
 	}
 	else
 	{
-		m_ay->set_output_gain(0, 0.0);
-		m_ay->set_output_gain(1, 0.0);
-		m_ay->set_output_gain(2, 0.0);
+		m_sac->set_output_gain(0, 0.0);
 		m_spo->set_output_gain(0, 0.0);
 	}
 }
@@ -522,9 +517,9 @@ void cocossc_sac_device::sound_stream_update(sound_stream &stream, stream_sample
 
 bool cocossc_sac_device::sound_activity_circuit_output()
 {
-	double average = m_rms[0] + m_rms[2] + m_rms[3] + m_rms[4] + m_rms[5] +
-		m_rms[6] + m_rms[7] + m_rms[8] + m_rms[9] + m_rms[10] + m_rms[11] +
-		m_rms[12] + m_rms[13] + m_rms[14] + m_rms[15];
+  double average = m_rms[0] + m_rms[1] + m_rms[2] + m_rms[3] + m_rms[4] +
+    m_rms[5] + m_rms[6] + m_rms[7] + m_rms[8] + m_rms[9] + m_rms[10] +
+    m_rms[11] + m_rms[12] + m_rms[13] + m_rms[14] + m_rms[15];
 
 	average /= 16.0;
 
