@@ -352,7 +352,7 @@ protected:
 	uint16_t                  m_som_memory[0x8000/2];
 	uint16_t *                m_adsp_pgm_memory_word;
 
-	optional_region_ptr<uint16_t> m_ds3_sdata_memory;
+	uint16_t *                m_ds3_sdata_memory;
 	uint32_t                  m_ds3_sdata_memory_size;
 
 	uint8_t                   m_ds3_gcmd;
