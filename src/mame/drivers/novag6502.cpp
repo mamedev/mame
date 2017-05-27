@@ -12,7 +12,7 @@
 
     TODO:
     - cforte ACIA?
-    - verify supercon/cforte IRQ and beeper frequency
+    - verify supercon IRQ and beeper frequency
     - sforte irq active time (21.5us is too long)
     - sforte/sexpert led handling is correct?
     - printer port
@@ -29,14 +29,13 @@ Super Constellation Chess Computer (model 844):
 ******************************************************************************
 
 Constellation Forte:
-- 65C02 @ 5MHz
-- 4KB RAM, 64KB ROM
+- R65C02P4 @ 5MHz (10MHz XTAL)
+- 2*2KB RAM(NEC D449C-3), 2*32KB ROM(27C256)
 - HLCD0538P, 10-digit 7seg LCD display
 - TTL, 18 LEDs, 8*8 chessboard buttons
 
-When it was first added to MAME as skeleton driver in mmodular.c, this romset
-was assumed to be Super Forte B, but it definitely isn't. I/O is similar to
-Super Constellation, it's near-certainly a Constellation Forte B.
+When it was first added to MAME as skeleton driver in mmodular.c, cforteb romset
+was assumed to be Super Forte B, but it definitely isn't. I/O is similar to supercon.
 
 
 ******************************************************************************
@@ -61,6 +60,7 @@ instead of magnet sensors.
 #include "bus/rs232/rs232.h"
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6502/m65c02.h"
+#include "cpu/m6502/r65c02.h"
 #include "machine/mos6551.h"
 #include "machine/nvram.h"
 #include "video/hlcd0538.h"
@@ -892,9 +892,11 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( cforte )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M65C02, 5000000) // 5MHz
-	MCFG_CPU_PERIODIC_INT_DRIVER(novag6502_state, irq0_line_hold, 256) // approximation
+	MCFG_CPU_ADD("maincpu", R65C02, XTAL_10MHz/2)
 	MCFG_CPU_PROGRAM_MAP(cforte_map)
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", novag6502_state, irq_on, attotime::from_hz(XTAL_32_768kHz/128)) // 256Hz
+	MCFG_TIMER_START_DELAY(attotime::from_hz(XTAL_32_768kHz/128) - attotime::from_usec(11)) // active for 11us
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", novag6502_state, irq_off, attotime::from_hz(XTAL_32_768kHz/128))
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
@@ -907,7 +909,7 @@ static MACHINE_CONFIG_START( cforte )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 1024) // 1024Hz (measured from video reference)
+	MCFG_SOUND_ADD("beeper", BEEP, XTAL_32_768kHz/32) // 1024Hz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -964,7 +966,7 @@ static MACHINE_CONFIG_DERIVED( sforte, sexpert )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sforte_map)
 	MCFG_TIMER_MODIFY("irq_on")
-	MCFG_TIMER_START_DELAY(attotime::from_hz(XTAL_32_768kHz/128) - attotime::from_usec(15)) // active for ?us
+	MCFG_TIMER_START_DELAY(attotime::from_hz(XTAL_32_768kHz/128) - attotime::from_usec(11)) // active for ?us (assume same as cforte)
 
 	MCFG_DEFAULT_LAYOUT(layout_novag_sforte)
 MACHINE_CONFIG_END
@@ -982,8 +984,14 @@ ROM_START( supercon )
 ROM_END
 
 
+ROM_START( cfortea )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("a_903_l", 0x0000, 0x8000, CRC(01e7e306) SHA1(6a2b982bb0f412a63f5d3603958dd863e38669d9) ) // NEC D27C256AD-12
+	ROM_LOAD("a_903_h", 0x8000, 0x8000, CRC(c5a5573f) SHA1(7e11eb2f3d96bc41386a14a19635427a386ec1ec) ) // "
+ROM_END
+
 ROM_START( cforteb )
-	ROM_REGION( 0x18000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("forte_b_l.bin", 0x0000, 0x8000, CRC(e3d194a1) SHA1(80457580d7c57e07895fd14bfdaf14b30952afca) )
 	ROM_LOAD("forte_b_h.bin", 0x8000, 0x8000, CRC(dd824be8) SHA1(cd8666b6b525887f9fc48a730b71ceabcf07f3b9) )
 ROM_END
@@ -1055,7 +1063,8 @@ ROM_END
 //    YEAR  NAME       PARENT   CMP MACHINE   INPUT     STATE            INIT     COMPANY, FULLNAME, FLAGS
 CONS( 1984, supercon,  0,        0, supercon, supercon, novag6502_state, 0,       "Novag", "Super Constellation", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1986, cforteb,   0,        0, cforte,   cforte,   novag6502_state, 0,       "Novag", "Constellation Forte (version B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1986, cfortea,   0,        0, cforte,   cforte,   novag6502_state, 0,       "Novag", "Constellation Forte (version A)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1986, cforteb,   cfortea,  0, cforte,   cforte,   novag6502_state, 0,       "Novag", "Constellation Forte (version B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1987, sfortea,   0,        0, sforte,   sforte,   novag6502_state, sexpert, "Novag", "Super Forte (version A, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1987, sfortea1,  sfortea,  0, sforte,   sforte,   novag6502_state, sexpert, "Novag", "Super Forte (version A, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
