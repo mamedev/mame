@@ -6,6 +6,7 @@
  *  Should be compatible with the MB87030/31, and MB89351
  *
  *  Used on the Sharp X68000 Super, X68000 XVI and X68030 (internal), and on SCSI expansion cards for any X680x0 (external)
+ *  Also used in Sega's Soreike Kokology 1/2 (drives CD-ROM)
  *
  *  Registers (based on datasheet):
  *
@@ -470,7 +471,7 @@ WRITE8_MEMBER( mb89352_device::mb89352_w )
 			m_line_status |= MB89352_LINE_BSY;
 			m_spc_status &= ~SSTS_TARG_CONNECTED;
 			m_spc_status |= SSTS_INIT_CONNECTED;
-			//m_spc_status |= SSTS_SPC_BSY;
+			m_spc_status |= SSTS_SPC_BSY;
 			m_ints |= INTS_COMMAND_COMPLETE;
 			if(m_int_enable != 0)
 				m_irq_cb(1);
@@ -546,8 +547,8 @@ WRITE8_MEMBER( mb89352_device::mb89352_w )
 					else
 						set_phase(phase);
 					logerror("Command executed: ");
-					m_spc_status &= ~SSTS_SPC_BSY;
-					m_ints |= INTS_COMMAND_COMPLETE;
+					//m_spc_status &= ~SSTS_SPC_BSY;
+					//m_ints |= INTS_COMMAND_COMPLETE;
 
 					for(x=0;x<m_command_index;x++)
 						logerror(" %02x",m_command[x]);
@@ -608,7 +609,7 @@ WRITE8_MEMBER( mb89352_device::mb89352_w )
 				else
 					set_phase(phase);
 				logerror("Command executed: ");
-				m_ints |= INTS_COMMAND_COMPLETE;
+				//m_ints |= INTS_COMMAND_COMPLETE;
 
 				for(x=0;x<m_command_index;x++)
 					logerror(" %02x",m_command[x]);
