@@ -122,24 +122,25 @@ protected:
 };
 
 /*
+    Variation for ti99_4ev. We put the EVPC in slot 2.
+*/
+class peribox_ev_device : public peribox_device
+{
+public:
+	peribox_ev_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual machine_config_constructor device_mconfig_additions() const override;
+};
+
+
+/*
     Variation for Geneve.
 */
 class peribox_gen_device : public peribox_device
 {
 public:
 	peribox_gen_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	virtual machine_config_constructor device_mconfig_additions() const override;
-};
-
-/*
-    Variation for TI-99/8
-*/
-class peribox_998_device : public peribox_device
-{
-public:
-	peribox_998_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -257,6 +258,7 @@ protected:
 } } } // end namespace bus::ti99::peb
 
 DECLARE_DEVICE_TYPE_NS(TI99_PERIBOX,      bus::ti99::peb, peribox_device)
+DECLARE_DEVICE_TYPE_NS(TI99_PERIBOX_EV,   bus::ti99::peb, peribox_ev_device)
 DECLARE_DEVICE_TYPE_NS(TI99_PERIBOX_SLOT, bus::ti99::peb, peribox_slot_device)
 DECLARE_DEVICE_TYPE_NS(TI99_PERIBOX_SG,   bus::ti99::peb, peribox_sg_device)
 DECLARE_DEVICE_TYPE_NS(TI99_PERIBOX_GEN,  bus::ti99::peb, peribox_gen_device)

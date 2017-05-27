@@ -87,10 +87,15 @@ private:
 DECLARE_DEVICE_TYPE_NS(TI99_IOPORT, bus::ti99::internal, ioport_device)
 
 SLOT_INTERFACE_EXTERN(ti99_io_port);
+SLOT_INTERFACE_EXTERN(ti99_io_port_ev);
 
 #define MCFG_IOPORT_ADD( _tag )  \
 	MCFG_DEVICE_ADD(_tag, TI99_IOPORT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(ti99_io_port, nullptr, false)
+
+#define MCFG_IOPORT_ADD_WITH_PEB( _tag )  \
+	MCFG_DEVICE_ADD(_tag, TI99_IOPORT, 0) \
+	MCFG_DEVICE_SLOT_INTERFACE(ti99_io_port_ev, "peb", false)
 
 #define MCFG_IOPORT_EXTINT_HANDLER( _extint ) \
 	devcb = &bus::ti99::internal::ioport_device::static_set_extint_callback( *device, DEVCB_##_extint );
