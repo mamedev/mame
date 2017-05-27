@@ -1624,130 +1624,12 @@ static MACHINE_CONFIG_START( dsk2 )
 MACHINE_CONFIG_END
 
 
-
-/*************************************
- *
- *  Machine drivers
- *
- *************************************/
-
-static MACHINE_CONFIG_START( harddriv )
-	MCFG_FRAGMENT_ADD( driver_msp )
-	/* basic machine hardware */        /* original driver board with MSP */
-	MCFG_FRAGMENT_ADD( adsp )           /* ADSP board */
-	MCFG_DEVICE_ADD("harddriv_sound", HARDDRIV_SOUND_BOARD, 0)      /* driver sound board */
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_START( harddrivc )
-	MCFG_FRAGMENT_ADD( multisync_msp )
-
-	/* basic machine hardware */        /* multisync board with MSP */
-	MCFG_FRAGMENT_ADD( adsp )           /* ADSP board */
-	MCFG_DEVICE_ADD("harddriv_sound", HARDDRIV_SOUND_BOARD, 0)      /* driver sound board */
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_START( racedriv )
-	MCFG_FRAGMENT_ADD( driver_nomsp )
-
-	/* basic machine hardware */        /* original driver board without MSP */
-	MCFG_FRAGMENT_ADD( adsp )           /* ADSP board */
-	MCFG_FRAGMENT_ADD( dsk )            /* DSK board */
-	MCFG_DEVICE_ADD("harddriv_sound", HARDDRIV_SOUND_BOARD, 0)      /* driver sound board */
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_START( racedrivc )
-
-	MCFG_FRAGMENT_ADD( multisync_nomsp )
-
-	/* basic machine hardware */        /* multisync board without MSP */
-	MCFG_FRAGMENT_ADD( adsp )           /* ADSP board */
-	MCFG_FRAGMENT_ADD( dsk )            /* DSK board */
-	MCFG_DEVICE_ADD("harddriv_sound", HARDDRIV_SOUND_BOARD, 0)      /* driver sound board */
-MACHINE_CONFIG_END
-
-
-static MACHINE_CONFIG_START( racedrivc_panorama_side )
-
-	MCFG_FRAGMENT_ADD( multisync_nomsp )
-
-	/* basic machine hardware */        /* multisync board without MSP */
-	MCFG_FRAGMENT_ADD( adsp )           /* ADSP board */
-//  MCFG_FRAGMENT_ADD( dsk )            /* DSK board */
-//  MCFG_DEVICE_ADD("sound_board", HARDDRIV_SOUND_BOARD, 0)      /* driver sound board */
-MACHINE_CONFIG_END
-
 WRITE_LINE_MEMBER(harddriv_state::sound_int_write_line)
 {
 	m_sound_int_state = state;
 	update_interrupts();
 }
 
-
-static MACHINE_CONFIG_START( stunrun )
-
-	MCFG_FRAGMENT_ADD( multisync_nomsp )
-
-	/* basic machine hardware */        /* multisync board without MSP */
-	MCFG_CPU_MODIFY("gsp")
-	MCFG_TMS340X0_PIXEL_CLOCK(5000000)  /* pixel clock */
-	MCFG_FRAGMENT_ADD( adsp )           /* ADSP board */
-	MCFG_DEVICE_REMOVE("slapstic")
-
-	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_RAW_PARAMS(5000000*2, 317*2, 0, 256*2, 262, 0, 228)
-
-	/* sund hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_ATARI_JSA_II_ADD("jsa", WRITELINE(harddriv_state, sound_int_write_line))
-	MCFG_ATARI_JSA_TEST_PORT("IN0", 5)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_START( steeltal )
-	MCFG_FRAGMENT_ADD( multisync_msp )
-
-	/* basic machine hardware */        /* multisync board with MSP */
-	MCFG_FRAGMENT_ADD( ds3 )            /* DS III board */
-	MCFG_DEVICE_REMOVE("ds3sdsp")       /* DS III sound components are not present */
-	MCFG_DEVICE_REMOVE("ds3xdsp")
-	MCFG_DEVICE_REMOVE("ldac")
-	MCFG_DEVICE_REMOVE("rdac")
-	MCFG_DEVICE_REMOVE("vref")
-	MCFG_DEVICE_REMOVE("lspeaker")
-	MCFG_DEVICE_REMOVE("rspeaker")
-
-	MCFG_ASIC65_ADD("asic65", ASIC65_STEELTAL)         /* ASIC65 on DSPCOM board */
-
-	/* sund hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_ATARI_JSA_III_ADD("jsa", WRITELINE(harddriv_state, sound_int_write_line))
-	MCFG_ATARI_JSA_TEST_PORT("IN0", 5)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_START( strtdriv )
-
-	MCFG_FRAGMENT_ADD( multisync_nomsp )
-
-	/* basic machine hardware */        /* multisync board */
-	MCFG_FRAGMENT_ADD( ds3 )            /* DS III board */
-	MCFG_CPU_MODIFY("ds3xdsp")          /* DS III auxiliary sound DSP has no code */
-	MCFG_DEVICE_DISABLE()
-
-	MCFG_FRAGMENT_ADD( dsk )            /* DSK board */
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_START( hdrivair )
-
-	MCFG_FRAGMENT_ADD( multisync2 )
-
-	/* basic machine hardware */        /* multisync II board */
-	MCFG_FRAGMENT_ADD( ds3 )            /* DS IV board */
-	MCFG_FRAGMENT_ADD( dsk2 )           /* DSK II board */
-MACHINE_CONFIG_END
 
 DEFINE_DEVICE_TYPE(HARDDRIV_BOARD, harddriv_board_device_state, "harddriv_board", "Hard Drivin' Board Device")
 
@@ -1756,10 +1638,12 @@ harddriv_board_device_state::harddriv_board_device_state(const machine_config &m
 {
 }
 
-machine_config_constructor harddriv_board_device_state::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( harddriv );
-}
+MACHINE_CONFIG_MEMBER( harddriv_board_device_state::device_add_mconfig )
+	MCFG_FRAGMENT_ADD( driver_msp )
+	/* basic machine hardware */        /* original driver board with MSP */
+	MCFG_FRAGMENT_ADD( adsp )           /* ADSP board */
+	MCFG_DEVICE_ADD("harddriv_sound", HARDDRIV_SOUND_BOARD, 0)      /* driver sound board */
+MACHINE_CONFIG_END
 
 void harddriv_board_device_state::device_start()
 {
@@ -1782,10 +1666,13 @@ harddrivc_board_device_state::harddrivc_board_device_state(const machine_config 
 {
 }
 
-machine_config_constructor harddrivc_board_device_state::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( harddrivc );
-}
+MACHINE_CONFIG_MEMBER( harddrivc_board_device_state::device_add_mconfig )
+	MCFG_FRAGMENT_ADD( multisync_msp )
+
+	/* basic machine hardware */        /* multisync board with MSP */
+	MCFG_FRAGMENT_ADD( adsp )           /* ADSP board */
+	MCFG_DEVICE_ADD("harddriv_sound", HARDDRIV_SOUND_BOARD, 0)      /* driver sound board */
+MACHINE_CONFIG_END
 
 
 /* Race Drivin */
@@ -1820,11 +1707,14 @@ racedrivb1_board_device_state::racedrivb1_board_device_state(const machine_confi
 {
 }
 
-machine_config_constructor racedriv_board_device_state::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( racedriv );
-}
+MACHINE_CONFIG_MEMBER( racedriv_board_device_state::device_add_mconfig )
+	MCFG_FRAGMENT_ADD( driver_nomsp )
 
+	/* basic machine hardware */        /* original driver board without MSP */
+	MCFG_FRAGMENT_ADD( adsp )           /* ADSP board */
+	MCFG_FRAGMENT_ADD( dsk )            /* DSK board */
+	MCFG_DEVICE_ADD("harddriv_sound", HARDDRIV_SOUND_BOARD, 0)      /* driver sound board */
+MACHINE_CONFIG_END
 
 /* Race Drivin Compact */
 
@@ -1872,16 +1762,25 @@ racedrivc_panorama_side_board_device_state::racedrivc_panorama_side_board_device
 {
 }
 
-machine_config_constructor racedrivc_board_device_state::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( racedrivc );
-}
+MACHINE_CONFIG_MEMBER( racedrivc_board_device_state::device_add_mconfig )
 
-machine_config_constructor racedrivc_panorama_side_board_device_state::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( racedrivc_panorama_side );
-}
+	MCFG_FRAGMENT_ADD( multisync_nomsp )
 
+	/* basic machine hardware */        /* multisync board without MSP */
+	MCFG_FRAGMENT_ADD( adsp )           /* ADSP board */
+	MCFG_FRAGMENT_ADD( dsk )            /* DSK board */
+	MCFG_DEVICE_ADD("harddriv_sound", HARDDRIV_SOUND_BOARD, 0)      /* driver sound board */
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_MEMBER( racedrivc_panorama_side_board_device_state::device_add_mconfig )
+
+	MCFG_FRAGMENT_ADD( multisync_nomsp )
+
+	/* basic machine hardware */        /* multisync board without MSP */
+	MCFG_FRAGMENT_ADD( adsp )           /* ADSP board */
+//  MCFG_FRAGMENT_ADD( dsk )            /* DSK board */
+//  MCFG_DEVICE_ADD("sound_board", HARDDRIV_SOUND_BOARD, 0)      /* driver sound board */
+MACHINE_CONFIG_END
 
 /* Stun Runner */
 
@@ -1898,10 +1797,27 @@ stunrun_board_device_state::stunrun_board_device_state(const machine_config &mco
 {
 }
 
-machine_config_constructor stunrun_board_device_state::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( stunrun );
-}
+MACHINE_CONFIG_MEMBER( stunrun_board_device_state::device_add_mconfig )
+
+	MCFG_FRAGMENT_ADD( multisync_nomsp )
+
+	/* basic machine hardware */        /* multisync board without MSP */
+	MCFG_CPU_MODIFY("gsp")
+	MCFG_TMS340X0_PIXEL_CLOCK(5000000)  /* pixel clock */
+	MCFG_FRAGMENT_ADD( adsp )           /* ADSP board */
+	MCFG_DEVICE_REMOVE("slapstic")
+
+	/* video hardware */
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_RAW_PARAMS(5000000*2, 317*2, 0, 256*2, 262, 0, 228)
+
+	/* sund hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_ATARI_JSA_II_ADD("jsa", WRITELINE(harddriv_state, sound_int_write_line))
+	MCFG_ATARI_JSA_TEST_PORT("IN0", 5)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
 
 /* Steel Talons */
 
@@ -1947,10 +1863,28 @@ steeltalp_board_device_state::steeltalp_board_device_state(const machine_config 
 {
 }
 
-machine_config_constructor steeltal_board_device_state::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( steeltal );
-}
+MACHINE_CONFIG_MEMBER( steeltal_board_device_state::device_add_mconfig )
+	MCFG_FRAGMENT_ADD( multisync_msp )
+
+	/* basic machine hardware */        /* multisync board with MSP */
+	MCFG_FRAGMENT_ADD( ds3 )            /* DS III board */
+	MCFG_DEVICE_REMOVE("ds3sdsp")       /* DS III sound components are not present */
+	MCFG_DEVICE_REMOVE("ds3xdsp")
+	MCFG_DEVICE_REMOVE("ldac")
+	MCFG_DEVICE_REMOVE("rdac")
+	MCFG_DEVICE_REMOVE("vref")
+	MCFG_DEVICE_REMOVE("lspeaker")
+	MCFG_DEVICE_REMOVE("rspeaker")
+
+	MCFG_ASIC65_ADD("asic65", ASIC65_STEELTAL)         /* ASIC65 on DSPCOM board */
+
+	/* sund hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_ATARI_JSA_III_ADD("jsa", WRITELINE(harddriv_state, sound_int_write_line))
+	MCFG_ATARI_JSA_TEST_PORT("IN0", 5)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
 
 /* Street Drivin' */
 
@@ -1967,10 +1901,17 @@ strtdriv_board_device_state::strtdriv_board_device_state(const machine_config &m
 {
 }
 
-machine_config_constructor strtdriv_board_device_state::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( strtdriv );
-}
+MACHINE_CONFIG_MEMBER( strtdriv_board_device_state::device_add_mconfig )
+
+	MCFG_FRAGMENT_ADD( multisync_nomsp )
+
+	/* basic machine hardware */        /* multisync board */
+	MCFG_FRAGMENT_ADD( ds3 )            /* DS III board */
+	MCFG_CPU_MODIFY("ds3xdsp")          /* DS III auxiliary sound DSP has no code */
+	MCFG_DEVICE_DISABLE()
+
+	MCFG_FRAGMENT_ADD( dsk )            /* DSK board */
+MACHINE_CONFIG_END
 
 /* Hard Drivin' Airbourne */
 
@@ -2004,11 +1945,14 @@ hdrivairp_board_device_state::hdrivairp_board_device_state(const machine_config 
 {
 }
 
-machine_config_constructor hdrivair_board_device_state::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( hdrivair );
-}
+MACHINE_CONFIG_MEMBER( hdrivair_board_device_state::device_add_mconfig )
 
+	MCFG_FRAGMENT_ADD( multisync2 )
+
+	/* basic machine hardware */        /* multisync II board */
+	MCFG_FRAGMENT_ADD( ds3 )            /* DS IV board */
+	MCFG_FRAGMENT_ADD( dsk2 )           /* DSK II board */
+MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( harddriv_machine )
