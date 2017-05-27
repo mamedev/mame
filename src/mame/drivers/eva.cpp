@@ -3,10 +3,20 @@
 // thanks-to:David Viens, Sean Riddle
 /***************************************************************************
 
-  x
+  Chrysler Electronic Voice Alert
+  
+  11-function board "EVA-11"
+  - TMS1000 MCU (label 4230625-N1LL 32045B, die label 1000F M32045B)
+  - TMS5110A, TMS6125 CM73002
+  - 2 Nat.Semi. 20-pin SDIP, I/O expanders?
+  
+  24-function board "EVA-24"
+  - COP400 family? MCU
+  - TMS5110A, TMS6100 CM63002 (have dump)
 
   TODO:
-  - x
+  - make it work
+  - add EVA-24 (need MCU dump)
 
 ***************************************************************************/
 
@@ -32,6 +42,11 @@ public:
 	required_device<tms5110_device> m_tms5100;
 	required_device<tms6100_device> m_tms6100;
 
+	// EVA-11
+	DECLARE_READ8_MEMBER(eva11_read_k);
+	DECLARE_WRITE16_MEMBER(eva11_write_o);
+	DECLARE_WRITE16_MEMBER(eva11_write_r);
+
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -42,9 +57,6 @@ protected:
 
 void eva_state::machine_start()
 {
-	// zerofill
-
-	// register for savestates
 }
 
 void eva_state::machine_reset()
@@ -58,6 +70,26 @@ void eva_state::machine_reset()
   I/O
 
 ***************************************************************************/
+
+WRITE16_MEMBER(eva_state::eva11_write_r)
+{
+	// R7: TMS5100 PDC pin
+	m_tms5100->pdc_w(data >> 7 & 1);
+}
+
+WRITE16_MEMBER(eva_state::eva11_write_o)
+{
+	// O3210: TMS5100 CTL8124
+	u8 ctl = BITSWAP8(data,7,6,5,4,3,0,1,2) & 0xf;
+	m_tms5100->ctl_w(space, 0, ctl);
+}
+
+READ8_MEMBER(eva_state::eva11_read_k)
+{
+	// K8421: TMS5100 CTL8124
+	u8 ctl = m_tms5100->ctl_r(space, 0);
+	return BITSWAP8(ctl,7,6,5,4,3,0,1,2);
+}
 
 
 
@@ -93,6 +125,9 @@ static MACHINE_CONFIG_START( eva11 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS1000, XTAL_640kHz/2)
+	MCFG_TMS1XXX_READ_K_CB(READ8(eva_state, eva11_read_k))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(eva_state, eva11_write_o))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(eva_state, eva11_write_r))
 
 	/* sound hardware */
 	MCFG_DEVICE_ADD("tms6100", TMS6100, XTAL_640kHz/4)
@@ -119,11 +154,11 @@ ROM_START( eva11 )
 	ROM_REGION( 365, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1000_eva11_output.pla", 0, 365, CRC(f0f36970) SHA1(a6ad1f5e804ac98e5e1a1d07466b3db3a8d6c256) )
 
-	ROM_REGION( 0x10000, "tms6100", ROMREGION_ERASEFF )
+	ROM_REGION( 0x1000, "tms6100", ROMREGION_ERASEFF )
 	ROM_LOAD( "cm73002.vsm", 0x0000, 0x1000, CRC(d5340bf8) SHA1(81195e8f870275d39a1abe1c8e2a6afdfdb15725) )
 ROM_END
 
 
 
-//    YEAR  NAME  PARENT CMP MACHINE INPUT STATE   INIT  COMPANY, FULLNAME, FLAGS
-SYST( 1983, eva11,  0,      0, eva11,    eva11,  eva_state, 0, "Chrysler", "Electronic Voice Alert (11-function)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+//    YEAR  NAME   PARENT CMP MACHINE INPUT  STATE   INIT  COMPANY, FULLNAME, FLAGS
+SYST( 1983, eva11, 0,      0, eva11,  eva11, eva_state, 0, "Chrysler", "Electronic Voice Alert (11-function)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )

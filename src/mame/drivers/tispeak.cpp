@@ -625,7 +625,7 @@ WRITE16_MEMBER(tispeak_state::lantutor_write_r)
 WRITE16_MEMBER(tispeak_state::snspellc_write_r)
 {
 	// R10: TMS5100 PDC pin
-	m_tms5100->pdc_w(data >> 10);
+	m_tms5100->pdc_w(data >> 10 & 1);
 
 	// R9: power-off request, on falling edge
 	if (~data & m_r & 0x200)
