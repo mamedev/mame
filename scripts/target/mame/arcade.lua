@@ -4066,6 +4066,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/silkroad.cpp",
 	MAME_DIR .. "src/mame/includes/silkroad.h",
 	MAME_DIR .. "src/mame/video/silkroad.cpp",
+	MAME_DIR .. "src/mame/drivers/unianapc.cpp",
 	MAME_DIR .. "src/mame/drivers/unico.cpp",
 	MAME_DIR .. "src/mame/includes/unico.h",
 	MAME_DIR .. "src/mame/video/unico.cpp",

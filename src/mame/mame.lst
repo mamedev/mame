@@ -36735,6 +36735,10 @@ undrfire                        // D67 (c) 1993 Taito Corporation Japan (World)
 undrfirej                       // D67 (c) 1993 Taito Corporation (Japan)
 undrfireu                       // D67 (c) 1993 Taito America Corporation (US)
 
+@source:unianapc.cpp
+dhunting                        // (c) 2002 Game Box Entertainment
+hogwild                         // (c) 2003 Uniana
+
 @source:unichamp.cpp
 unichamp                        //
 
