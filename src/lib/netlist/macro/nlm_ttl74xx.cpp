@@ -2,6 +2,7 @@
 // copyright-holders:Couriersud
 #include "nlm_ttl74xx.h"
 
+#include "../devices/nld_schmitt.h"
 #include "../devices/nld_system.h"
 
 
@@ -229,6 +230,72 @@ static NETLIST_START(TTL_7411_DIP)
 		s2.C,  /*    C2 |5           10| B3   */ s3.B,
 		s2.Q,  /*    Y2 |6            9| A3   */ s3.A,
 		GND.I, /*   GND |7            8| Y3   */ s3.Q
+			   /*       +--------------+      */
+	)
+NETLIST_END()
+
+/*
+ *   DM7414/DM74LS14: Hex Inverter with
+ *                    Schmitt Trigger Inputs
+ *
+ */
+
+static NETLIST_START(TTL_7414_GATE)
+	SCHMITT_TRIGGER(X, "DM7414")
+	ALIAS(A, X.A)
+	ALIAS(Q, X.Q)
+	ALIAS(GND, X.GND)
+NETLIST_END()
+
+static NETLIST_START(TTL_74LS14_GATE)
+	SCHMITT_TRIGGER(X, "DM74LS14")
+	ALIAS(A, X.A)
+	ALIAS(Q, X.Q)
+	ALIAS(GND, X.GND)
+NETLIST_END()
+
+static NETLIST_START(TTL_7414_DIP)
+	SCHMITT_TRIGGER(s1, "DM7414")
+	SCHMITT_TRIGGER(s2, "DM7414")
+	SCHMITT_TRIGGER(s3, "DM7414")
+	SCHMITT_TRIGGER(s4, "DM7414")
+	SCHMITT_TRIGGER(s5, "DM7414")
+	SCHMITT_TRIGGER(s6, "DM7414")
+
+	NET_C(s1.GND, s2.GND, s3.GND, s4.GND, s5.GND, s6.GND)
+	DUMMY_INPUT(VCC)
+
+	DIPPINS(    /*       +--------------+      */
+		s1.A,   /*    A1 |1     ++    14| VCC  */ VCC.I,
+		s1.Q,   /*    Y1 |2           13| A6   */ s6.A,
+		s2.A,   /*    A2 |3           12| Y6   */ s6.Q,
+		s2.Q,   /*    Y2 |4    7414   11| A5   */ s5.A,
+		s3.A,   /*    A3 |5           10| Y5   */ s5.Q,
+		s3.Q,   /*    Y3 |6            9| A4   */ s4.A,
+		s1.GND, /*   GND |7            8| Y4   */ s4.Q
+				/*       +--------------+      */
+	)
+NETLIST_END()
+
+static NETLIST_START(TTL_74LS14_DIP)
+	SCHMITT_TRIGGER(s1, "DM74LS14")
+	SCHMITT_TRIGGER(s2, "DM74LS14")
+	SCHMITT_TRIGGER(s3, "DM74LS14")
+	SCHMITT_TRIGGER(s4, "DM74LS14")
+	SCHMITT_TRIGGER(s5, "DM74LS14")
+	SCHMITT_TRIGGER(s6, "DM74LS14")
+
+	NET_C(s1.GND, s2.GND, s3.GND, s4.GND, s5.GND, s6.GND)
+	DUMMY_INPUT(VCC)
+
+	DIPPINS(    /*       +--------------+      */
+		s1.A,   /*    A1 |1     ++    14| VCC  */ VCC.I,
+		s1.Q,   /*    Y1 |2           13| A6   */ s6.A,
+		s2.A,   /*    A2 |3           12| Y6   */ s6.Q,
+		s2.Q,   /*    Y2 |4   74LS14  11| A5   */ s5.A,
+		s3.A,   /*    A3 |5           10| Y5   */ s5.Q,
+		s3.Q,   /*    Y3 |6            9| A4   */ s4.A,
+		s1.GND, /*   GND |7            8| Y4   */ s4.Q
 				/*       +--------------+      */
 	)
 NETLIST_END()
@@ -758,6 +825,8 @@ NETLIST_END()
 
 
 NETLIST_START(TTL74XX_lib)
+	NET_MODEL("DM7414    SCHMITT_TRIGGER(VTP=1.7 VTM=0.9 VI=4.35 RI=6.15k VOH=3.5 ROH=120 VOL=0.1 ROL=37.5 TPLH=15 TPHL=15)")
+	NET_MODEL("DM74LS14  SCHMITT_TRIGGER(VTP=1.6 VTM=0.8 VI=4.4 RI=19.3k VOH=3.45 ROH=130 VOL=0.1 ROL=31.2 TPLH=15 TPHL=15)")
 
 	TRUTHTABLE_START(TTL_7400_GATE, 2, 1, "")
 		TT_HEAD("A,B|Q ")
@@ -1119,6 +1188,10 @@ NETLIST_START(TTL74XX_lib)
 	LOCAL_LIB_ENTRY(TTL_7408_DIP)
 	LOCAL_LIB_ENTRY(TTL_7410_DIP)
 	LOCAL_LIB_ENTRY(TTL_7411_DIP)
+	LOCAL_LIB_ENTRY(TTL_7414_GATE)
+	LOCAL_LIB_ENTRY(TTL_74LS14_GATE)
+	LOCAL_LIB_ENTRY(TTL_7414_DIP)
+	LOCAL_LIB_ENTRY(TTL_74LS14_DIP)
 	LOCAL_LIB_ENTRY(TTL_7416_DIP)
 	LOCAL_LIB_ENTRY(TTL_7420_DIP)
 	LOCAL_LIB_ENTRY(TTL_7425_DIP)

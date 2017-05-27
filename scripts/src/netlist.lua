@@ -192,6 +192,8 @@ project "netlist"
 		MAME_DIR .. "src/lib/netlist/devices/nld_r2r_dac.h",
 		MAME_DIR .. "src/lib/netlist/devices/nld_tristate.cpp",
 		MAME_DIR .. "src/lib/netlist/devices/nld_tristate.h",
+		MAME_DIR .. "src/lib/netlist/devices/nld_schmitt.cpp",
+		MAME_DIR .. "src/lib/netlist/devices/nld_schmitt.h",
 		MAME_DIR .. "src/lib/netlist/devices/nld_legacy.cpp",
 		MAME_DIR .. "src/lib/netlist/devices/nld_legacy.h",
 		MAME_DIR .. "src/lib/netlist/devices/net_lib.cpp",

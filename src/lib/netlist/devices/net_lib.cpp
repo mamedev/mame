@@ -101,6 +101,7 @@ namespace netlist
 	ENTRYX(CD4020,              CD4020,                 "")
 	ENTRYX(CD4066_GATE,         CD4066_GATE,            "")
 	ENTRYX(CD4316_GATE,         CD4316_GATE,            "")
+	ENTRYX(schmitt_trigger,     SCHMITT_TRIGGER,        "MODEL")
 	/* entries with suffix WI are legacy only */
 	ENTRYX(CD4020,              CD4020_WI,              "+IP,+RESET,+VDD,+VSS")
 	//ENTRY(4066,                 CD_4066,              "+A,B")
