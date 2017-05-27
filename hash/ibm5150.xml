@@ -4182,6 +4182,19 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="pcdos1p" cloneof="pcdos1">
+		<description>IBM Personal Computer DOS (Version 1.00, prototype 1981-06-05)</description>
+		<year>1981</year>
+		<publisher>IBM</publisher>
+		<info name="version" value="1.00" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "163840">
+				<!-- has been modified to rename AUTOEXEC.BAT to AUTOEXEC.BAK -->
+				<rom name="pcdos090.img" size="163840" crc="c39edae5" sha1="b8cd568b7bcfcb5851b9050c2a6b9d7bba0cfbaa" offset="0" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pcdos11">
 		<description>IBM Personal Computer DOS (Version 1.10)</description>
 		<year>1982</year>
@@ -4207,7 +4220,7 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<software name="pcdos2a" cloneof="pcdos2">
-		<description>IBM Personal Computer DOS (Version 2.00, Alt)</description>
+		<description>IBM Personal Computer DOS (Version 2.00, set 2)</description>
 		<year>1983</year>
 		<publisher>IBM</publisher>
 		<info name="version" value="2.00" />
@@ -4219,6 +4232,69 @@ has been replaced with an all-zero block. -->
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="184320">
 				<rom name="ibmdos 2 (disk 2).img" size="184320" crc="cf37729c" sha1="4f6fcc26d4382a8fed950bfaa8961669d513f93b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcdos2b" cloneof="pcdos2">
+		<description>IBM Personal Computer DOS (Version 2.00, set 3)</description>
+		<year>1983</year>
+		<publisher>IBM</publisher>
+		<info name="version" value="2.00" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "184320">
+				<rom name="Disk01.img" size="184320" crc="039a0346" sha1="ee72332533601b58b9966637e5783667874edabe" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "184320">
+				<rom name="Disk02.img" size="184320" crc="cf37729c" sha1="4f6fcc26d4382a8fed950bfaa8961669d513f93b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcdos2c" cloneof="pcdos2">
+		<description>IBM Personal Computer DOS (Version 2.00, set 4)</description>
+		<year>1983</year>
+		<publisher>IBM</publisher>
+		<info name="version" value="2.00" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="ibm200.img" size="368640" crc="98be5b86" sha1="9b6d06f1318fa2574b40e235ac275a787c906eee" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcdos21">
+		<description>IBM Personal Computer DOS (Version 2.10)</description>
+		<year>1983</year>
+		<publisher>IBM</publisher>
+		<info name="version" value="2.10" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="184320">
+				<rom name="disk1.img" size="184320" crc="6a568d95" sha1="db165cb9bf2b2abbf5fa826dfe3a8f9819ce7ea5" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="184320">
+				<rom name="disk2.img" size="184320" crc="d5f74e98" sha1="2bfda7185e769ceb5594cfae01c503eaac8449df" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcdos21a" cloneof="pcdos21">
+		<description>IBM Personal Computer DOS (Version 2.10, Alt)</description>
+		<year>1983</year>
+		<publisher>IBM</publisher>
+		<info name="version" value="2.10" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "184320">
+				<rom name="pcdos21b.img" size="184320" crc="8a86b767" sha1="6524b8cdd510cca13cecc92597cd5043adb3ad6d" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "184320">
+				<rom name="pcdos21s.img" size="184320" crc="66a85cd4" sha1="d87f5542579eebcc6ea3e7d9c316fc23fd1b5318" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4256,8 +4332,37 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="pcdos3de" cloneof="pcdos3">
+		<description>IBM Personal Computer DOS (Version 3.00, German)</description>
+		<year>1984</year>
+		<publisher>IBM</publisher>
+		<info name="version" value="3.00" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="disk01.img" size="368640" crc="706a73fc" sha1="fbfa1b87ebae90b93db3b99719ec83758975985d" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pcdos31">
-		<description>IBM Personal Computer DOS (Version 3.10)</description>
+		<description>IBM Personal Computer DOS (Version 3.10, 1985-04-22)</description>
+		<year>1985</year>
+		<publisher>IBM</publisher>
+		<info name="version" value="3.10" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Disk01.img" size="368640" crc="efd1b086" sha1="65ba06864b10083c7add0653cd757df96e8f8237" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Disk02.img" size="368640" crc="73eda674" sha1="1e6bb4a676137acbf6ff0cf59f94e206056c5821" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcdos31a" cloneof="pcdos31">
+		<description>IBM Personal Computer DOS (Version 3.10, 1985-03-07)</description>
 		<year>1985</year>
 		<publisher>IBM</publisher>
 		<info name="version" value="3.10" />
@@ -4273,9 +4378,26 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="pcdos32">
+		<description>IBM Personal Computer DOS (Version 3.20, 5.25", 1986-02-21)</description>
+		<year>1986</year>
+		<publisher>IBM</publisher>
+		<info name="version" value="3.20" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Disk01.img" size="368640" crc="89ba8428" sha1="63da20ae73e3cf0629d8ddf9ec914d74c22dc892" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Disk02.img" size="368640" crc="07e52054" sha1="9e27121d1626a57bd2502e0b488651d0fded9f75" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Fatal error: Device 5.25" double density floppy drive load failed: Unable to identify the image format -->
-	<software name="pcdos32" supported="no">
-		<description>IBM Personal Computer DOS (Version 3.20)</description>
+	<software name="pcdos32a" cloneof="pcdos32" supported="no">
+		<description>IBM Personal Computer DOS (Version 3.20, 5.25", 1986-02-21, Alt)</description>
 		<year>1986</year>
 		<publisher>IBM</publisher>
 		<info name="version" value="3.20" />
@@ -4286,8 +4408,37 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="pcdos32_35" cloneof="pcdos32">
+		<description>IBM Personal Computer DOS (Version 3.20, 3.5", 1985-12-30)</description>
+		<year>1986</year>
+		<publisher>IBM</publisher>
+		<info name="version" value="3.20" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Disk01_35.img" size="737280" crc="bbe2678d" sha1="56f98ab42a6e9bb04ed42fbba9110145d8985552" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pcdos33">
-		<description>IBM Personal Computer DOS (Version 3.30)</description>
+		<description>IBM Personal Computer DOS (Version 3.30, 5.25")</description>
+		<year>1987</year>
+		<publisher>IBM</publisher>
+		<info name="version" value="3.30" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Ibm330_1.img" size="368640" crc="e6cf0f74" sha1="64d6ca2e0ea4ab8ed2d51e90d40dffa015cde4bc" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Ibm330_2.img" size="368640" crc="06e647d7" sha1="552f901ae5a2346707fcf27240d320dc0cdcf4e8" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcdos33a" cloneof="pcdos33">
+		<description>IBM Personal Computer DOS (Version 3.30, 5.25", Alt)</description>
 		<year>1987</year>
 		<publisher>IBM</publisher>
 		<info name="version" value="3.30" />
@@ -4303,24 +4454,176 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="pcdos33nl" cloneof="pcdos33">
+		<description>IBM Personal Computer DOS (Version 3.30, 5.25", Dutch)</description>
+		<year>1987</year>
+		<publisher>IBM</publisher>
+		<info name="version" value="3.30" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="disk01nl.img" size="368640" crc="65540f51" sha1="662da39abfd581f43a3206d051cbfcd4c47f8b95" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="disk02nl.img" size="368640" crc="6e7dd215" sha1="6be3690b1c0d55924d442cf0fc472476a25b14cc" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcdos33de" cloneof="pcdos33">
+		<description>IBM Personal Computer DOS (Version 3.30, 5.25", German)</description>
+		<year>1987</year>
+		<publisher>IBM</publisher>
+		<info name="version" value="3.30" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Startdiskette" />
+			<dataarea name="flop" size = "368640">
+				<rom name="5.25Zoll_Startdiskette.img" size="368640" crc="798baf7f" sha1="81a7d27040e5b302972f9b4ce56dd4a2e5eed209" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Programmdiskette" />
+			<dataarea name="flop" size = "368640">
+				<rom name="5.25Zoll_Programmdiskette.img" size="368640" crc="ffeb45fb" sha1="59c324b7a0d03f66104d40ae726e0389214f264c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcdos33dea" cloneof="pcdos33">
+		<description>IBM Personal Computer DOS (Version 3.30, 5.25", German, Alt)</description>
+		<year>1987</year>
+		<publisher>IBM</publisher>
+		<info name="version" value="3.30" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="disk1.img" size="368640" crc="0b93ca52" sha1="58b8fedeaba68336886915822fce07b22921c623" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="disk2.img" size="368640" crc="ffeb45fb" sha1="59c324b7a0d03f66104d40ae726e0389214f264c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcdos33it" cloneof="pcdos33">
+		<description>IBM Personal Computer DOS (Version 3.30, 5.25", Italian)</description>
+		<year>1987</year>
+		<publisher>IBM</publisher>
+		<info name="version" value="3.30" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="dos 3.3 ita avvio.img" size="368640" crc="5fb272be" sha1="2515433f3fba6c3796608b1acfb59f7137ea950f" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="dos 3.3 ita app.img" size="368640" crc="6b026e42" sha1="0646b1e3856d6c3e21e0634bf1d025abb6b62437" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcdos33_35" cloneof="pcdos33">
+		<description>IBM Personal Computer DOS (Version 3.30, 3.5")</description>
+		<year>1987</year>
+		<publisher>IBM</publisher>
+		<info name="version" value="3.30" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Disk01_35.img" size="737280" crc="741a2b87" sha1="1db01ea5ddf2b7c8c23349de0bdd87ac06f07673" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcdos33nl35" cloneof="pcdos33">
+		<description>IBM Personal Computer DOS (Version 3.30, 3.5", Dutch)</description>
+		<year>1987</year>
+		<publisher>IBM</publisher>
+		<info name="version" value="3.30" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="disk01.img" size="737280" crc="03a1f8c6" sha1="1fbae3d550c08ece6d5051e62142178fe5626ece" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcdos33de35" cloneof="pcdos33">
+		<description>IBM Personal Computer DOS (Version 3.30, 3.5", German)</description>
+		<year>1987</year>
+		<publisher>IBM</publisher>
+		<info name="version" value="3.30" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Start-/Programmdiskette" />
+			<dataarea name="flop" size = "737280">
+				<rom name="3.5Zoll.img" size="737280" crc="5e7dfc6a" sha1="ddfd18a294899fb325af33544d18f52ce849c461" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pcdos5">
 		<description>IBM DOS (Version 5.00)</description>
 		<year>1991</year>
 		<publisher>IBM</publisher>
 		<info name="version" value="5.00" />
 		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="disk1.img" size="737280" crc="d04578ff" sha1="ed55e5ce1fff3c2051f55f7c50bdccfb4a9d84e7" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="disk2.img" size="737280" crc="d1af624a" sha1="4da7c5fcec5a21245537ef098e8bbcbb2828076c" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="disk3.img" size="737280" crc="3c62bf18" sha1="4ce9d72146c046f28aa19613a0600dbb75ff1698" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcdos5a" cloneof="pcdos5">
+		<!-- probably a bad/modified dump, has deleted Norton files -->
+		<description>IBM DOS (Version 5.00, Alt)</description>
+		<year>1991</year>
+		<publisher>IBM</publisher>
+		<info name="version" value="5.00" />
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="disk1.img" size="737280" crc="49ee0681" sha1="30fedf09e8b55eadc35c387968bcd02620630a27" offset="0" />
+				<rom name="disk1a.img" size="737280" crc="49ee0681" sha1="30fedf09e8b55eadc35c387968bcd02620630a27" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="disk2.img" size="737280" crc="9cfecb72" sha1="ffef155e6c746602e9ea28aef091119055f4cdb4" offset="0" />
+				<rom name="disk2a.img" size="737280" crc="9cfecb72" sha1="ffef155e6c746602e9ea28aef091119055f4cdb4" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="disk3.img" size="737280" crc="8414bc1f" sha1="d6ebe11bba3d995f574e0385358edbdd52a6b219" offset="0" />
+				<rom name="disk3a.img" size="737280" crc="8414bc1f" sha1="d6ebe11bba3d995f574e0385358edbdd52a6b219" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcdos5nl" cloneof="pcdos5">
+		<description>IBM DOS (Version 5.00, Dutch)</description>
+		<year>1991</year>
+		<publisher>IBM</publisher>
+		<info name="version" value="5.00" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="disk01.img" size="737280" crc="3d69d733" sha1="ea50342f1804b968c27a313d7ea514b9afff3a74" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="disk02.img" size="737280" crc="d60b47c9" sha1="c2ba183f87a8833e5fd935a816a9a842d55ede37" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="disk03.img" size="737280" crc="47b86948" sha1="c9babce2c0cf00a6cf51f44b488d6fe5a05f1a13" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4342,6 +4645,29 @@ has been replaced with an all-zero block. -->
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="disk3.img" size="737280" crc="d63b96f5" sha1="ae0ed2b14cd5477b2239a40a9987b23db8a1e28c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcdos502de" cloneof="pcdos502">
+		<!-- KryoFlux dump from original disks, shows as unmodified -->
+		<description>IBM DOS 5.02 "for preload" (German)</description>
+		<year>1992</year>
+		<publisher>IBM</publisher>
+		<info name="version" value="5.02" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="IBM_DOS_5.02_for_preload_German_disk1.img" size="737280" crc="e76398bc" sha1="2eeb89aff04aa28fa040d57e8f0b0ee899025a99" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="IBM_DOS_5.02_for_preload_German_disk2.img" size="737280" crc="484aa5a6" sha1="1b2741a4d20614ec744ed987c004269830cde6bd" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="IBM_DOS_5.02_for_preload_German_disk3.img" size="737280" crc="05cf4590" sha1="dcc750a969acc502629098cbc70552d939d98d90" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4856,6 +5182,17 @@ has been replaced with an all-zero block. -->
 		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Caveman Ugh-Lympics [1988] [5.25] [4 of 4].img" size="368640" crc="0091cb19" sha1="aeaf3725bbdf49a4ace38c7430183492a5da4384" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chipdale">
+		<description>Chip 'N Dale Rescue Rangers - The Adventure in Nimnul's Castle</description>
+		<year>1990</year>
+		<publisher>Hi-Tech Expressions, Inc.</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="chip and dale.img" size="368640" crc="5393ba1b" sha1="775683872ea2ef6a81fde73e4d9737f204636362" offset="0" />
 			</dataarea>
 		</part>
 	</software>

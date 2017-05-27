@@ -1154,10 +1154,11 @@ Missing files come here
 	</software>
 
 	<software name="pcdos4">
-		<description>IBM Personal Computer DOS (Version 4.00)</description>
+		<!-- the 4.01 bugfix release changed the printed disk label but not the version number reported by the software -->
+		<description>IBM Personal Computer DOS (Version 4.01, 1988-08-03)</description>
 		<year>1988</year>
 		<publisher>IBM</publisher>
-		<info name="version" value="4.00" />
+		<info name="version" value="4.01" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="install.img" size="737280" crc="edcb2ea3" sha1="352dffca01bd72349503024d0b9d16c4b684f791" offset="0" />
@@ -1170,25 +1171,19 @@ Missing files come here
 		</part>
 	</software>
 
-	<software name="pcdos5g">
-		<!-- KryoFlux dump from original disks, shows as unmodified -->
-		<description>IBM DOS 5.02 "for preload" (German)</description>
-		<year>1992</year>
+	<software name="pcdos4a" cloneof="pcdos4">
+		<description>IBM Personal Computer DOS (Version 4.00, 1988-06-17)</description>
+		<year>1988</year>
 		<publisher>IBM</publisher>
-		<info name="version" value="5.02" />
+		<info name="version" value="4.00" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="IBM_DOS_5.02_for_preload_German_disk1.img" size="737280" crc="e76398bc" sha1="2eeb89aff04aa28fa040d57e8f0b0ee899025a99" offset="0" />
+			<dataarea name="flop" size = "737280">
+				<rom name="install 1988-06-17.img" size="737280" crc="23cdec58" sha1="d287ed7a4555751472e106d47de25aa36f930df8" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="IBM_DOS_5.02_for_preload_German_disk2.img" size="737280" crc="484aa5a6" sha1="1b2741a4d20614ec744ed987c004269830cde6bd" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="IBM_DOS_5.02_for_preload_German_disk3.img" size="737280" crc="05cf4590" sha1="dcc750a969acc502629098cbc70552d939d98d90" offset="0" />
+			<dataarea name="flop" size = "737280">
+				<rom name="operating 1988-06-17.img" size="737280" crc="57956fab" sha1="589121b24790c749535e3af80b329724af5fbbb4" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1224,11 +1219,38 @@ Missing files come here
 		</part>
 	</software>
 
+	<software name="pcdos61a" cloneof="pcdos61">
+		<description>IBM DOS (Version 6.1, Alt)</description>
+		<year>1993</year>
+		<publisher>IBM</publisher>
+		<info name="version" value="6.1" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="IBM PC-DOS 6.1 Disk 1.img" size="1474560" crc="64f234c4" sha1="efdbe24f889f0685c209150d082c0faf2bf6e798" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="IBM PC-DOS 6.1 Disk 2.img" size="1474560" crc="5a955057" sha1="5c7b4c5f7592957f0c56f06e1098ab2dc3866f8f" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="IBM PC-DOS 6.1 Disk 3.img" size="1474560" crc="43b95074" sha1="419322c71f12cca2de47e516a64248cfc8fab81d" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="IBM PC-DOS 6.1 Disk 4.img" size="1474560" crc="36fc5a86" sha1="a74fe031f617a216ba0636ec56ec29c0d2a1aeb5" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pcdos63">
 		<description>PC DOS (Version 6.3)</description>
 		<year>1993</year>
 		<publisher>IBM</publisher>
-		<info name="version" value="6.3" />
+		<info name="version" value="6.3, Revision 0" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="disk1.img" size="1474560" crc="0fc87254" sha1="2b4166557ea8eba7d6b0f3a4d9376896bf5a217c" offset="0" />
@@ -1252,6 +1274,70 @@ Missing files come here
 		<part name="flop5" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="disk5.img" size="1474560" crc="49128f94" sha1="1c8d991d3adffa28b24e09e6c4ee4a0843d9eca1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcdos63a" cloneof="pcdos63">
+		<description>PC DOS (Version 6.3, Alt)</description>
+		<year>1993</year>
+		<publisher>IBM</publisher>
+		<info name="version" value="6.3, Revision 0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="dos63_1b.img" size="1474560" crc="26da6101" sha1="61e6c1a644db69a1e9cf27c098248c30354c9ae6" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="dos63_2.img" size="1474560" crc="f556052a" sha1="185ce4945c20cb2fc8aad11a4cf85342fb521d09" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="dos63_3.img" size="1474560" crc="ac9d67c0" sha1="f6cd2cb173d88bb16e476530f5420d6c750a39e6" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="dos63_4.img" size="1474560" crc="d1e7db52" sha1="dcf61faaf4fdceac5a7691842a35421039de2ca9" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="dos63_5.img" size="1474560" crc="eaac0e2b" sha1="5b35648f848fa62012538eedaec670a6d0491235" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcdos63u" cloneof="pcdos63">
+		<description>PC DOS (Version 6.3, Upgrade)</description>
+		<year>1993</year>
+		<publisher>IBM</publisher>
+		<info name="version" value="6.3, Revision 0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="dos63_1u.img" size="1474560" crc="6274feca" sha1="498bfccc5f0aeb73fe487591b760be44d62af048" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="dos63_2.img" size="1474560" crc="f556052a" sha1="185ce4945c20cb2fc8aad11a4cf85342fb521d09" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="dos63_3.img" size="1474560" crc="ac9d67c0" sha1="f6cd2cb173d88bb16e476530f5420d6c750a39e6" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="dos63_4.img" size="1474560" crc="d1e7db52" sha1="dcf61faaf4fdceac5a7691842a35421039de2ca9" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="dos63_5.img" size="1474560" crc="eaac0e2b" sha1="5b35648f848fa62012538eedaec670a6d0491235" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1288,6 +1374,241 @@ Missing files come here
 		<part name="flop6" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="disk6.img" size="1474560" crc="cba1f9e0" sha1="83851f0fd38aec897f6c4378a8598e17c4b17702" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcdos2k">
+		<description>IBM PC DOS 2000</description>
+		<year>1998</year>
+		<publisher>IBM</publisher>
+		<info name="version" value="7.0, Revision 1" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk01.img" size="1474560" crc="69909031" sha1="1fa1e65320ad3a5287746aca9c40fb9671f9cdc6" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk02.img" size="1474560" crc="553d1cae" sha1="75fd11da9b6567fd362c432c81accccd22e7d4ae" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk03.img" size="1474560" crc="49e9fa80" sha1="77704444d8afd756840bd7484c5d727b3eb8b555" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk04.img" size="1474560" crc="b38cd931" sha1="14b4b23bef5cf60a8151ac95f62b91bfd9a6f1ca" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk05.img" size="1474560" crc="5cfbfef6" sha1="5de6e9c19ccf270edecfaefaceffb3259be90565" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk06.img" size="1474560" crc="8f37413c" sha1="ac9a0208ef5019b68ff8879a80a6e1efa29fcc4c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcdos2kde" cloneof="pcdos2k">
+		<description>IBM PC DOS 2000 (German)</description>
+		<year>1998</year>
+		<publisher>IBM</publisher>
+		<info name="version" value="7.00, Revision 1" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk01de.img" size="1474560" crc="bb6f41f4" sha1="7e7d35214a7b842f44e8008a07a8b3939f1631a7" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk02de.img" size="1474560" crc="b1f175a6" sha1="d2472c360e28b7f484d44fad26f535b7d6c9059b" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk03de.img" size="1474560" crc="7aa1167b" sha1="b030a7c581b76c484d322512908ed1b60e8ee3a5" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk04de.img" size="1474560" crc="c71c10de" sha1="8e4fbdb034688b61370027db3fedcb0b8e6fa7bb" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk05de.img" size="1474560" crc="d104efc4" sha1="a79c462316cffe06543863bb3d97a8e35fe6033d" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk06de.img" size="1474560" crc="5837ea02" sha1="ca2f14279f17c58e836044987690d7d42f902d9c" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk07de.img" size="1474560" crc="6af1cf71" sha1="42f8deb978b1c131ff2ad9f289c7d7693d3f1300" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcdos2kja" cloneof="pcdos2k">
+		<description>IBM PC DOS 2000 (Japanese)</description>
+		<year>1998</year>
+		<publisher>IBM</publisher>
+		<info name="version" value="J7.0/V, Revision 1" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk01ja.img" size="1474560" crc="1558d677" sha1="ed5a2c5b115b8a79e99245e89ad4e16a5a387ab9" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk02ja.img" size="1474560" crc="108cbc5a" sha1="74e6423ae2af5e001c91d2213f7746c11300f878" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk03ja.img" size="1474560" crc="fef08581" sha1="8ea514805e59f8ecd4443c1b9145929be48739b8" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk04ja.img" size="1474560" crc="f7b52e6d" sha1="ec4a96303d8dd40f16cb4d141a92895765226925" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk05ja.img" size="1474560" crc="438612b1" sha1="1633d6cf7d475130cbc84e2f9b9f31784decd77f" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk06ja.img" size="1474560" crc="0bf79c9b" sha1="e55e55d471cb6f3ec039c8080550f2b7e30a23cf" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk07ja.img" size="1474560" crc="47e61ddf" sha1="206e8c8a94d3200f0c8f1337c26593507f5d9144" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk08ja.img" size="1474560" crc="6dc379cb" sha1="fb316aad3e82941a0a4f63a0ebb19b3a911f8855" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk09ja.img" size="1474560" crc="7f056f5e" sha1="c92d3ed7199838c06e0b142818dd265feb7a9ab1" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk10ja.img" size="1474560" crc="d4bb7852" sha1="cbbcd6e7be7ae4d3c9defb31e49b0569e881fee9" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop11" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk11ja.img" size="1474560" crc="da7cc371" sha1="a4ec62e9f9f621f12d29b262523c2eddbd86bbee" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcdos2kko" cloneof="pcdos2k">
+		<description>IBM PC DOS 2000 (Korean)</description>
+		<year>1998</year>
+		<publisher>IBM</publisher>
+		<info name="version" value="H7.00, Revision 1" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk01ko.img" size="1474560" crc="42d3890c" sha1="6583e0196aaeac9b8d10f69aef9e8d4fcf80c508" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk02ko.img" size="1474560" crc="2680e6af" sha1="8e4f0bd991cf93ac28873a626104dca796149c72" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk03ko.img" size="1474560" crc="ef33a9b0" sha1="b0aba99156c540f5854abddc99ee79f2b3261b0c" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk04ko.img" size="1474560" crc="6fcac5bf" sha1="371b50aa063abec45fffcfb694c4f2b14be66e21" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk05ko.img" size="1474560" crc="1145d7ca" sha1="c595aa2980dd673b0b34df152b37244ef8224c34" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk06ko.img" size="1474560" crc="519365f2" sha1="63b28d6200012689a0233739b7bafef824921b5d" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk07ko.img" size="1474560" crc="130f1d6c" sha1="c74f40d65a50cc51c575471c12399feb449f4b9c" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk08ko.img" size="1474560" crc="7c3c1eb8" sha1="3f4deb0fa2db31b8a16fc265cf117aa35e2fb094" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk09ko.img" size="1474560" crc="c1a4f40d" sha1="00973e43d6141ea6e3e0d3bf3eb50408b3ac89f8" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk10ko.img" size="1474560" crc="4d016845" sha1="a3f861b5a5a7bc9799f25a58c06ef1879e87a6ce" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcdos2ksv" cloneof="pcdos2k">
+		<description>IBM PC DOS 2000 (Swedish)</description>
+		<year>1998</year>
+		<publisher>IBM</publisher>
+		<info name="version" value="7.00, Revision 1" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk01sv.img" size="1474560" crc="3697cca7" sha1="abdcb520e564ee5730b6c111ed1f220e01df5f79" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk02sv.img" size="1474560" crc="f28bccc7" sha1="52312f95ec638e39a778c1694635fecd11a540a7" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk03sv.img" size="1474560" crc="3a8187be" sha1="429422e67e2500bee60a69ca1c14078a3220ef5b" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk04sv.img" size="1474560" crc="a8ef91be" sha1="2fb62678f21b02b4bb8c6f59a5c7aff7a582e9c5" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk05sv.img" size="1474560" crc="e9ea2ac3" sha1="97ba0fc4201f32f07a4e5490bc4f346dcc1b51df" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk06sv.img" size="1474560" crc="e8132cd8" sha1="bf196ba8a29c1a56abe04b8d60dec45c4ef50fbf" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4792,17 +5113,6 @@ Missing files come here
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Boppin' - Super Ultimate (USA) (v1.1) (Disk 2).img" size="1474560" crc="20c4dc37" sha1="e39ac3f58f81813e515e8fa203dff7e9b9ebf9d3" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="chipdale">
-		<description>Chip 'N Dale Rescue Rangers - The Adventure in Nimnul's Castle</description>
-		<year>1990</year>
-		<publisher>Hi-Tech Expressions, Inc.</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="368640">
-				<rom name="chip and dale.img" size="368640" crc="5393ba1b" sha1="775683872ea2ef6a81fde73e4d9737f204636362" offset="0" />
 			</dataarea>
 		</part>
 	</software>
