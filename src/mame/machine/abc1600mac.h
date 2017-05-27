@@ -47,10 +47,6 @@ class abc1600_mac_device : public device_t,
 public:
 	abc1600_mac_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-
 	void set_cpu_tag(const char *cpu_tag) { m_cpu_tag = cpu_tag; }
 
 	virtual DECLARE_ADDRESS_MAP(map, 8);
@@ -83,6 +79,10 @@ protected:
 
 	// device_memory_interface overrides
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_PROGRAM) const override;
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 
 private:
 	enum

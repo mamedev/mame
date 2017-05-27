@@ -14,7 +14,7 @@
 #pragma once
 
 #include "epson_sio.h"
-#include "cpu/m6800/m6800.h"
+#include "cpu/m6800/m6801.h"
 #include "machine/upd765.h"
 
 

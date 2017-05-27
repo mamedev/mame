@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+
+<!-- define elements -->
+
+<!-- note: TI's alphanumeric 14seg digits look different from MAME's default, most notably the right half is wider -->
+
+	<element name="digit" defstate="0">
+		<led14seg><color red="0.2" green="1.0" blue="0.85" /></led14seg>
+	</element>
+
+<!-- add our own for DP(display point) and the custom triangle accent mark segments -->
+
+	<element name="lamp_dp" defstate="0">
+		<disk state="0"><color red="0.0235" green="0.1255" blue="0.1059" /></disk>
+		<disk state="1"><color red="0.2" green="1.0" blue="0.85" /></disk>
+	</element>
+	<element name="triangle_mark" defstate="0">
+		<text state="0" string="&#x25bc;"><color red="0.0235" green="0.1255" blue="0.1059" /></text>
+		<text state="1" string="&#x25bc;"><color red="0.2" green="1.0" blue="0.85" /></text>
+	</element>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds left="0" right="88.5" top="0" bottom="19" />
+
+	<!-- 8 digits with accent mark and dp -->
+
+		<bezel name="digit0" element="digit"><bounds x="0" y="4" width="10" height="15" /></bezel>
+		<bezel name="digit1" element="digit"><bounds x="11" y="4" width="10" height="15" /></bezel>
+		<bezel name="digit2" element="digit"><bounds x="22" y="4" width="10" height="15" /></bezel>
+		<bezel name="digit3" element="digit"><bounds x="33" y="4" width="10" height="15" /></bezel>
+		<bezel name="digit4" element="digit"><bounds x="44" y="4" width="10" height="15" /></bezel>
+		<bezel name="digit5" element="digit"><bounds x="55" y="4" width="10" height="15" /></bezel>
+		<bezel name="digit6" element="digit"><bounds x="66" y="4" width="10" height="15" /></bezel>
+		<bezel name="digit7" element="digit"><bounds x="77" y="4" width="10" height="15" /></bezel>
+
+		<bezel name="lamp14" element="triangle_mark"><bounds x="4" y="0" width="4" height="3" /></bezel>
+		<bezel name="lamp114" element="triangle_mark"><bounds x="15" y="0" width="4" height="3" /></bezel>
+		<bezel name="lamp214" element="triangle_mark"><bounds x="26" y="0" width="4" height="3" /></bezel>
+		<bezel name="lamp314" element="triangle_mark"><bounds x="37" y="0" width="4" height="3" /></bezel>
+		<bezel name="lamp414" element="triangle_mark"><bounds x="48" y="0" width="4" height="3" /></bezel>
+		<bezel name="lamp514" element="triangle_mark"><bounds x="59" y="0" width="4" height="3" /></bezel>
+		<bezel name="lamp614" element="triangle_mark"><bounds x="70" y="0" width="4" height="3" /></bezel>
+		<bezel name="lamp714" element="triangle_mark"><bounds x="81" y="0" width="4" height="3" /></bezel>
+
+		<bezel name="lamp15" element="lamp_dp"><bounds x="9" y="17.5" width="1.5" height="1.5" /></bezel>
+		<bezel name="lamp115" element="lamp_dp"><bounds x="20" y="17.5" width="1.5" height="1.5" /></bezel>
+		<bezel name="lamp215" element="lamp_dp"><bounds x="31" y="17.5" width="1.5" height="1.5" /></bezel>
+		<bezel name="lamp315" element="lamp_dp"><bounds x="42" y="17.5" width="1.5" height="1.5" /></bezel>
+		<bezel name="lamp415" element="lamp_dp"><bounds x="53" y="17.5" width="1.5" height="1.5" /></bezel>
+		<bezel name="lamp515" element="lamp_dp"><bounds x="64" y="17.5" width="1.5" height="1.5" /></bezel>
+		<bezel name="lamp615" element="lamp_dp"><bounds x="75" y="17.5" width="1.5" height="1.5" /></bezel>
+		<bezel name="lamp715" element="lamp_dp"><bounds x="86" y="17.5" width="1.5" height="1.5" /></bezel>
+
+	</view>
+</mamelayout>

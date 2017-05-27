@@ -39,7 +39,6 @@ public:
 	DECLARE_READ8_MEMBER(st0016_vregs_r);
 	DECLARE_READ8_MEMBER(st0016_dma_r);
 	DECLARE_WRITE8_MEMBER(st0016_vregs_w);
-	DECLARE_READ8_MEMBER(soundram_read);
 
 	void set_st0016_game_flag(uint32_t flag) { m_game_flag = flag; }
 
@@ -84,7 +83,7 @@ protected:
 
 
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -107,6 +106,8 @@ private:
 	uint8_t m_dma_offset;
 	st0016_dma_offs_delegate m_dma_offs_cb;
 	uint32_t m_game_flag;
+
+	DECLARE_READ8_MEMBER(soundram_read);
 };
 
 

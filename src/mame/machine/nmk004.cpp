@@ -81,13 +81,6 @@ static ADDRESS_MAP_START( nmk004_sound_io_map, AS_IO, 8, nmk004_device )
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_START( nmk004 )
-	MCFG_CPU_ADD("mcu",TMP90840, DERIVED_CLOCK(1,1)) // Toshiba TMP90C840AF in QFP64 package with 8Kbyte internal ROM
-	MCFG_CPU_PROGRAM_MAP(nmk004_sound_mem_map)
-	MCFG_CPU_IO_MAP(nmk004_sound_io_map)
-MACHINE_CONFIG_END
-
-
 ROM_START( nmk004 )
 	ROM_REGION( 0x2000, "mcu", 0 )
 	ROM_LOAD( "nmk004.bin", 0x00000, 0x02000, CRC(83b6f611) SHA1(bb7ddc00affe8a066002ecd6858dbd2854af8940) )
@@ -118,13 +111,13 @@ void nmk004_device::device_start()
 }
 
 //-------------------------------------------------
-//  device_mconfig_additions - return a pointer to
-//  the device's machine fragment
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
-machine_config_constructor nmk004_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( nmk004  );
-}
+MACHINE_CONFIG_MEMBER( nmk004_device::device_add_mconfig )
+	MCFG_CPU_ADD("mcu",TMP90840, DERIVED_CLOCK(1,1)) // Toshiba TMP90C840AF in QFP64 package with 8Kbyte internal ROM
+	MCFG_CPU_PROGRAM_MAP(nmk004_sound_mem_map)
+	MCFG_CPU_IO_MAP(nmk004_sound_io_map)
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  device_rom_region - return a pointer to the

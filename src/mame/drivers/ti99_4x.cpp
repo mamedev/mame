@@ -48,7 +48,7 @@
 
 #include "bus/ti99/ti99defs.h"
 #include "bus/ti99/internal/datamux.h"
-#include "bus/ti99/internal/gromport.h"
+#include "bus/ti99/gromport/gromport.h"
 #include "bus/ti99/internal/evpcconn.h"
 
 #include "bus/ti99/joyport/joyport.h"
@@ -166,7 +166,7 @@ private:
 	// Connected devices
 	required_device<tms9900_device>     m_cpu;
 	required_device<tms9901_device>     m_tms9901;
-	required_device<bus::ti99::internal::gromport_device>   m_gromport;
+	required_device<bus::ti99::gromport::gromport_device>   m_gromport;
 	required_device<bus::ti99::internal::ioport_device>     m_ioport;
 	required_device<bus::ti99::joyport::joyport_device>     m_joyport;
 	required_device<bus::ti99::internal::datamux_device>    m_datamux;

@@ -113,9 +113,6 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
 	void update_total_scanlines(bool mode3) { m_total_scanlines = mode3 ? (m_base_total_scanlines * 2) : m_base_total_scanlines; }  // this gets set at each EOF
 
 	/* our main vblank handler resets this */
@@ -205,14 +202,18 @@ class sega_32x_ntsc_device : public sega_32x_device
 public:
 	sega_32x_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
+	virtual void device_add_mconfig(machine_config &config) override;
+
 };
 
 class sega_32x_pal_device : public sega_32x_device
 {
 public:
 	sega_32x_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 

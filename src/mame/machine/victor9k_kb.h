@@ -42,22 +42,15 @@ public:
 	template<class _Object> static devcb_base &set_kbrdy_cb(device_t &device, _Object object) { return downcast<victor_9000_keyboard_device &>(device).m_kbrdy_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_kbdata_cb(device_t &device, _Object object) { return downcast<victor_9000_keyboard_device &>(device).m_kbdata_cb.set_callback(object); }
 
-	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual ioport_constructor device_input_ports() const override;
-
 	DECLARE_WRITE_LINE_MEMBER( kback_w );
-
-	// not really public
-	DECLARE_READ8_MEMBER( kb_p1_r );
-	DECLARE_WRITE8_MEMBER( kb_p1_w );
-	DECLARE_WRITE8_MEMBER( kb_p2_w );
-	DECLARE_READ_LINE_MEMBER( kb_t1_r );
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -73,6 +66,11 @@ private:
 	int m_kbrdy;
 	int m_kbdata;
 	int m_kback;
+
+	DECLARE_READ8_MEMBER( kb_p1_r );
+	DECLARE_WRITE8_MEMBER( kb_p1_w );
+	DECLARE_WRITE8_MEMBER( kb_p2_w );
+	DECLARE_READ_LINE_MEMBER( kb_t1_r );
 };
 
 

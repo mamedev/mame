@@ -86,6 +86,7 @@ matrix_solver_t::matrix_solver_t(netlist_t &anetlist, const pstring &name,
 	, m_last_step(*this, "m_last_step", netlist_time::zero())
 	, m_fb_sync(*this, "FB_sync")
 	, m_Q_sync(*this, "Q_sync")
+	, m_ops(0)
 	, m_sort(sort)
 {
 	connect_post_start(m_fb_sync, m_Q_sync);
@@ -184,12 +185,14 @@ void matrix_solver_t::setup_matrix()
 		for (std::size_t i = 0; i < m_rails_temp[k]->count(); i++)
 			this->m_terms[k]->add(m_rails_temp[k]->terms()[i], m_rails_temp[k]->connected_net_idx()[i], false);
 
-		m_rails_temp[k]->clear(); // no longer needed
 		m_terms[k]->set_pointers();
 	}
 
-	for (unsigned k = 0; k < iN; k++)
-		plib::pfree(m_rails_temp[k]); // no longer needed
+	for (terms_for_net_t *rt : m_rails_temp)
+	{
+		rt->clear(); // no longer needed
+		plib::pfree(rt); // no longer needed
+	}
 
 	m_rails_temp.clear();
 
@@ -227,12 +230,12 @@ void matrix_solver_t::setup_matrix()
 				}
 			}
 
-		for (unsigned k = 0; k < iN; k++)
+		for (auto &term : m_terms)
 		{
-			int *other = m_terms[k]->connected_net_idx();
-			for (unsigned i = 0; i < m_terms[k]->count(); i++)
+			int *other = term->connected_net_idx();
+			for (unsigned i = 0; i < term->count(); i++)
 				if (other[i] != -1)
-					other[i] = get_net_idx(&m_terms[k]->terms()[i]->m_otherterm->net());
+					other[i] = get_net_idx(&term->terms()[i]->m_otherterm->net());
 		}
 	}
 
@@ -303,27 +306,27 @@ void matrix_solver_t::setup_matrix()
 			touched[k][m_terms[k]->m_nz[j]] = true;
 	}
 
-	unsigned ops = 0;
+	m_ops = 0;
 	for (unsigned k = 0; k < iN; k++)
 	{
-		ops++; // 1/A(k,k)
+		m_ops++; // 1/A(k,k)
 		for (unsigned row = k + 1; row < iN; row++)
 		{
 			if (touched[row][k])
 			{
-				ops++;
+				m_ops++;
 				if (!plib::container::contains(m_terms[k]->m_nzbd, row))
 					m_terms[k]->m_nzbd.push_back(row);
 				for (unsigned col = k + 1; col < iN; col++)
 					if (touched[k][col])
 					{
 						touched[row][col] = true;
-						ops += 2;
+						m_ops += 2;
 					}
 			}
 		}
 	}
-	log().verbose("Number of mults/adds for {1}: {2}", name(), ops);
+	log().verbose("Number of mults/adds for {1}: {2}", name(), m_ops);
 
 	if ((0))
 		for (unsigned k = 0; k < iN; k++)

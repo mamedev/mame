@@ -354,19 +354,10 @@ unsigned matrix_solver_w_t<m_N, storage_N>::solve_non_dynamic(const bool newton_
 			if (std::abs(tmp-RHS(i)) > 1e-6)
 				printf("%s failed on row %d: %f RHS: %f\n", this->name().c_str(), i, std::abs(tmp-RHS(i)), RHS(i));
 		}
-	if (newton_raphson)
-	{
-		nl_double err = delta(new_V);
 
-		store(new_V);
-
-		return (err > this->m_params.m_accuracy) ? 2 : 1;
-	}
-	else
-	{
-		store(new_V);
-		return 1;
-	}
+	const nl_double err = (newton_raphson ? delta(new_V) : 0.0);
+	store(new_V);
+	return (err > this->m_params.m_accuracy) ? 2 : 1;
 }
 
 template <std::size_t m_N, std::size_t storage_N>

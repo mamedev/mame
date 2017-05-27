@@ -100,11 +100,6 @@ DEVICE_ADDRESS_MAP_START(amap, 16, k573dio_device)
 	AM_RANGE(0xfe, 0xff) AM_WRITE(output_2_w)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( k573dio )
-	MCFG_MAS3507D_ADD( "mpeg" )
-	MCFG_DS2401_ADD( "digital_id" )
-MACHINE_CONFIG_END
-
 k573dio_device::k573dio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, KONAMI_573_DIGITAL_IO_BOARD, tag, owner, clock),
 	mas3507d(*this, "mpeg"),
@@ -136,10 +131,10 @@ const tiny_rom_entry *k573dio_device::device_rom_region() const
 	return ROM_NAME(k573dio);
 }
 
-machine_config_constructor k573dio_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( k573dio );
-}
+MACHINE_CONFIG_MEMBER( k573dio_device::device_add_mconfig )
+	MCFG_MAS3507D_ADD( "mpeg" )
+	MCFG_DS2401_ADD( "digital_id" )
+MACHINE_CONFIG_END
 
 void k573dio_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {

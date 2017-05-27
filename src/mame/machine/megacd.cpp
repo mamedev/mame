@@ -285,11 +285,11 @@ static GFXDECODE_START( segacd )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( segacd_fragment )
+MACHINE_CONFIG_MEMBER( sega_segacd_device::device_add_mconfig )
 
 	MCFG_CPU_ADD("segacd_68k", M68000, SEGACD_CLOCK ) /* 12.5 MHz */
 	MCFG_CPU_PROGRAM_MAP(segacd_map)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE(DEVICE_SELF, sega_segacd_device,segacd_sub_int_callback)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE(DEVICE_SELF, sega_segacd_device, segacd_sub_int_callback)
 
 	MCFG_DEVICE_ADD("cdc", LC89510, 0) // cd controller
 
@@ -312,13 +312,6 @@ static MACHINE_CONFIG_START( segacd_fragment )
 
 	MCFG_QUANTUM_PERFECT_CPU("segacd_68k") // perfect sync to the fastest cpu
 MACHINE_CONFIG_END
-
-
-
-machine_config_constructor sega_segacd_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( segacd_fragment );
-}
 
 
 sega_segacd_device::sega_segacd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)

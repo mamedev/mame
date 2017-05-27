@@ -2358,6 +2358,7 @@ end
 ---------------------------------------------------
 --
 --@src/devices/bus/ti99/colorbus/colorbus.h,BUSES["TI99"] = true
+--@src/devices/bus/ti99/gromport/cartridges.h,BUSES["TI99"] = true
 --@src/devices/bus/ti99/joyport/joyport.h,BUSES["TI99"] = true
 --@src/devices/bus/ti99/peb/peribox.h,BUSES["TI99"] = true
 --@src/devices/bus/ti99/internal/genboard.h,BUSES["TI99"] = true
@@ -2375,14 +2376,22 @@ if (BUSES["TI99"]~=null) then
 		MAME_DIR .. "src/devices/bus/ti99/internal/evpcconn.h",
 		MAME_DIR .. "src/devices/bus/ti99/internal/genboard.cpp",
 		MAME_DIR .. "src/devices/bus/ti99/internal/genboard.h",
-		MAME_DIR .. "src/devices/bus/ti99/internal/gromport.cpp",
-		MAME_DIR .. "src/devices/bus/ti99/internal/gromport.h",
 		MAME_DIR .. "src/devices/bus/ti99/internal/ioport.cpp",
 		MAME_DIR .. "src/devices/bus/ti99/internal/ioport.h",
 		MAME_DIR .. "src/devices/bus/ti99/colorbus/busmouse.cpp",
 		MAME_DIR .. "src/devices/bus/ti99/colorbus/busmouse.h",
 		MAME_DIR .. "src/devices/bus/ti99/colorbus/colorbus.cpp",
 		MAME_DIR .. "src/devices/bus/ti99/colorbus/colorbus.h",
+		MAME_DIR .. "src/devices/bus/ti99/gromport/gromport.cpp",
+		MAME_DIR .. "src/devices/bus/ti99/gromport/gromport.h",
+		MAME_DIR .. "src/devices/bus/ti99/gromport/cartridges.cpp",
+		MAME_DIR .. "src/devices/bus/ti99/gromport/cartridges.h",
+		MAME_DIR .. "src/devices/bus/ti99/gromport/gkracker.cpp",
+		MAME_DIR .. "src/devices/bus/ti99/gromport/gkracker.h",
+		MAME_DIR .. "src/devices/bus/ti99/gromport/multiconn.cpp",
+		MAME_DIR .. "src/devices/bus/ti99/gromport/multiconn.h",
+		MAME_DIR .. "src/devices/bus/ti99/gromport/singleconn.cpp",
+		MAME_DIR .. "src/devices/bus/ti99/gromport/singleconn.h",
 		MAME_DIR .. "src/devices/bus/ti99/joyport/handset.cpp",
 		MAME_DIR .. "src/devices/bus/ti99/joyport/handset.h",
 		MAME_DIR .. "src/devices/bus/ti99/joyport/joyport.cpp",

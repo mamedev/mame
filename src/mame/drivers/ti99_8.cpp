@@ -182,7 +182,7 @@ Known Issues (MZ, 2010-11-07)
 #include "imagedev/cassette.h"
 
 #include "bus/ti99/internal/998board.h"
-#include "bus/ti99/internal/gromport.h"
+#include "bus/ti99/gromport/gromport.h"
 
 #include "bus/ti99/joyport/joyport.h"
 #include "bus/ti99/internal/ioport.h"
@@ -275,7 +275,7 @@ private:
 	// Connected devices
 	required_device<tms9995_device>     m_cpu;
 	required_device<tms9901_device>     m_tms9901;
-	required_device<bus::ti99::internal::gromport_device> m_gromport;
+	required_device<bus::ti99::gromport::gromport_device> m_gromport;
 	required_device<bus::ti99::internal::ioport_device>     m_ioport;
 	required_device<bus::ti99::internal::mainboard8_device>  m_mainboard;
 	required_device<bus::ti99::joyport::joyport_device> m_joyport;

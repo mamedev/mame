@@ -2,7 +2,7 @@
 // copyright-holders:Miodrag Milanovic
 
 #include "emu.h"
-#include "cpu/m6800/m6800.h"
+#include "cpu/m6800/m6801.h"
 
 class by68701_state : public driver_device
 {

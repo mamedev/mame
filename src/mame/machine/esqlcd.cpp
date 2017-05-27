@@ -13,9 +13,6 @@
 DEFINE_DEVICE_TYPE(ESQ2X16_SQ1, esq2x16_sq1_device, "esq2x16_sq1", "Ensoniq 2x16 VFD (SQ-1 variant)")
 
 // --- SQ1 - Parduz --------------------------------------------------------------------------------------------------------------------------
-static MACHINE_CONFIG_START(esq2x16)
-	MCFG_DEFAULT_LAYOUT(layout_esq2by16)
-MACHINE_CONFIG_END
 
 /*! \file font5x7.h \brief Graphic LCD Font (Ascii Characters). */
 //*****************************************************************************
@@ -163,10 +160,11 @@ static unsigned char const Font5x7[][5] = {
 	{0x08, 0x1C, 0x2A, 0x08, 0x08}  // <-           0x7F
 };
 //--------------------------------------------------------------------------------------------------------------------------------------------
-machine_config_constructor esq2x16_sq1_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( esq2x16 );
-}
+
+MACHINE_CONFIG_MEMBER(esq2x16_sq1_device::device_add_mconfig)
+	MCFG_DEFAULT_LAYOUT(layout_esq2by16)
+MACHINE_CONFIG_END
+
 //--------------------------------------------------------------------------------------------------------------------------------------------
 void esq2x16_sq1_device::write_char(int data)
 {

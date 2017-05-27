@@ -11,7 +11,7 @@
 
 /* Core includes */
 #include "emu.h"
-#include "cpu/m6800/m6800.h"
+#include "cpu/m6800/m6801.h"
 #include "machine/mos6551.h"
 //#include "dectalk.lh" //  hack to avoid screenless system crash
 #include "machine/terminal.h"

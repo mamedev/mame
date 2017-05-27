@@ -1,7 +1,7 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
 /*
- * pstring.h
+ * pdynlib.h
  */
 
 #ifndef PDYNLIB_H_

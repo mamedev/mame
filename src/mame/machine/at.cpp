@@ -53,7 +53,7 @@ MACHINE_CONFIG_START( at_softlists )
 	MCFG_SOFTWARE_LIST_ADD("at_cdrom_list","ibm5170_cdrom")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( at_mb )
+MACHINE_CONFIG_MEMBER( at_mb_device::device_add_mconfig )
 	MCFG_DEVICE_ADD("pit8254", PIT8254, 0)
 	MCFG_PIT8253_CLK0(4772720/4) /* heartbeat IRQ */
 	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic8259_master", pic8259_device, ir0_w))
@@ -137,10 +137,6 @@ static MACHINE_CONFIG_START( at_mb )
 	MCFG_PC_KBDC_OUT_DATA_CB(DEVWRITELINE("keybc", at_keyboard_controller_device, keyboard_data_w))
 MACHINE_CONFIG_END
 
-machine_config_constructor at_mb_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME(at_mb);
-}
 
 DEVICE_ADDRESS_MAP_START( map, 16, at_mb_device )
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", am9517a_device, read, write, 0xffff)

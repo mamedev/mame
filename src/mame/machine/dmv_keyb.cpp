@@ -27,14 +27,6 @@ ROM_START( dmv_keyboard )
 ROM_END
 
 
-static MACHINE_CONFIG_START( dmv_keyboard )
-	MCFG_CPU_ADD("mcu", I8741, XTAL_6MHz)
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(dmv_keyboard_device, port1_r))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(dmv_keyboard_device, port2_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(dmv_keyboard_device, port2_w))
-MACHINE_CONFIG_END
-
-
 INPUT_PORTS_START( dmv_keyboard )
 	PORT_START("COL.0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_RCONTROL)  PORT_CHAR(UCHAR_MAMEKEY(RCONTROL))
@@ -232,14 +224,15 @@ void dmv_keyboard_device::device_reset()
 }
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor dmv_keyboard_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( dmv_keyboard );
-}
+MACHINE_CONFIG_MEMBER( dmv_keyboard_device::device_add_mconfig )
+	MCFG_CPU_ADD("mcu", I8741, XTAL_6MHz)
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(dmv_keyboard_device, port1_r))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(dmv_keyboard_device, port2_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(dmv_keyboard_device, port2_w))
+MACHINE_CONFIG_END
 
 
 //-------------------------------------------------

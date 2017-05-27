@@ -26,7 +26,7 @@ static ADDRESS_MAP_START( pcd_keyboard_map, AS_PROGRAM, 8, pcd_keyboard_device )
 	AM_RANGE(0x000, 0xfff) AM_ROM
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( pcd_keyboard )
+MACHINE_CONFIG_MEMBER( pcd_keyboard_device::device_add_mconfig )
 	MCFG_CPU_ADD("mcu", I8035, 5760000*2) // FIXME: the mc2661 baud rate calculation
 	MCFG_CPU_PROGRAM_MAP(pcd_keyboard_map)
 	MCFG_MCS48_PORT_BUS_IN_CB(READ8(pcd_keyboard_device, bus_r))
@@ -40,10 +40,6 @@ static MACHINE_CONFIG_START( pcd_keyboard )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-machine_config_constructor pcd_keyboard_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( pcd_keyboard );
-}
 
 INPUT_PORTS_START( pcd_keyboard )
 	PORT_START("ROW.0")

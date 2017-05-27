@@ -301,25 +301,6 @@ inline constexpr bool operator>=(const attotime &left, const attotime &right)
 }
 
 
-//-------------------------------------------------
-//  min - return the minimum of two attotimes
-//-------------------------------------------------
-
-inline constexpr attotime min(const attotime &left, const attotime &right)
-{
-	return (left.m_seconds > right.m_seconds) ? right : (left.m_seconds < right.m_seconds) ? left : (left.m_attoseconds > right.m_attoseconds) ? right : left;
-}
-
-
-//-------------------------------------------------
-//  max - return the maximum of two attotimes
-//-------------------------------------------------
-
-inline constexpr attotime max(const attotime &left, const attotime &right)
-{
-	return (left.m_seconds > right.m_seconds) ? left : (left.m_seconds < right.m_seconds) ? right : (left.m_attoseconds > right.m_attoseconds) ? left : right;
-}
-
 /** Convert to an attoseconds value, clamping to +/- 1 second */
 inline constexpr attoseconds_t attotime::as_attoseconds() const
 {

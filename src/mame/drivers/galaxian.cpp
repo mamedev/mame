@@ -4463,7 +4463,9 @@ static INPUT_PORTS_START( amidars )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x00, "A 1/1 B 1/6" )
 	PORT_DIPSETTING(    0x02, "A 2/1 B 1/3" )
-	PORT_DIPUNKNOWN( 0x04, 0x00 )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Bonus_Life ) )
+	PORT_DIPSETTING(    0x00, "30000 70000" )
+	PORT_DIPSETTING(    0x04, "50000 80000" )
 INPUT_PORTS_END
 
 
@@ -7077,6 +7079,16 @@ DRIVER_INIT_MEMBER(galaxian_state,scramble)
 	common_init(&galaxian_state::scramble_draw_bullet, &galaxian_state::scramble_draw_background, nullptr, nullptr);
 }
 
+DRIVER_INIT_MEMBER(galaxian_state,mandinga)
+{
+	DRIVER_INIT_CALL(scramble);
+
+	/* watchdog is in a different location) */
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	watchdog_timer_device *wdog = subdevice<watchdog_timer_device>("watchdog");
+	space.unmap_read(0x7000, 0x7000, 0x7ff);
+	space.install_read_handler(0x6800, 0x6800, 0, 0x7ff, 0, read8_delegate(FUNC(watchdog_timer_device::reset_r), wdog));
+}
 
 DRIVER_INIT_MEMBER(galaxian_state,sfx)
 {
@@ -10516,6 +10528,29 @@ ROM_START( amidars )
 	ROM_LOAD( "amidar.clr",   0x0000, 0x0020, CRC(f940dcc3) SHA1(1015e56f37c244a850a8f4bf0e36668f047fd46d) )
 ROM_END
 
+ROM_START( mandinga )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.bin",        0x0000, 0x0800, CRC(ac6b2f96) SHA1(3b41b6770e78158b72fa89bcb77b5bb9608c15f2) ) // 2716
+	ROM_LOAD( "2.bin",        0x0800, 0x0800, CRC(4c64161e) SHA1(5b2e49ff915295617671b13f15b566046a5dbc15) ) // 2716
+	ROM_LOAD( "3.bin",        0x1000, 0x0800, CRC(2aaccf1a) SHA1(9558a08f8a87e414fb72b72d3f4ee0abf7d7d60e) ) // 2716
+	ROM_LOAD( "4.bin",        0x1800, 0x0800, CRC(29873461) SHA1(7d0ee9a82f02163b4cc6a7097e88ae34e96ebf58) ) // 2716
+	ROM_LOAD( "5.bin",        0x2000, 0x0800, CRC(a684578c) SHA1(a71c06cc87fa7c64b49433a8d25a480c26a2d700) ) // 2716
+	ROM_LOAD( "6.bin",        0x2800, 0x0800, CRC(5382f7ed) SHA1(425ec2c2caf404fc8ab13ee38d6567413022e1a1) ) // 2716
+	ROM_LOAD( "7.bin",        0x3000, 0x0800, CRC(1d7109e9) SHA1(e0d24475547bbe5a94b45be6abefb84ad84d2534) ) // 2716
+	ROM_LOAD( "8.bin",        0x3800, 0x0800, CRC(049855ad) SHA1(b455e1ed0183559014722467b0f1c208b06167c3) ) // 2716
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "11.bin",       0x0000, 0x1000, BAD_DUMP CRC(25da6487) SHA1(6805a6a5e4ccedb0d35c56ea3301122b03253a0e) ) // 2732, 1st and 2nd half identical and identical to 1st half of amidar's rom
+	ROM_LOAD( "12.bin",       0x1000, 0x1000, BAD_DUMP CRC(e7eba6e9) SHA1(8b58d7ec12ca569bb28e45b3ff78bd4b926aeb0a) ) // 2732, 1st and 2nd half identical and identical to 1st half of amidar's rom
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "9.bin",        0x0000, 0x0800, CRC(09ed5818) SHA1(69dce85228b2c9176d4be429f530410350a1c76c) ) // 2716
+	ROM_LOAD( "10.bin",       0x0800, 0x0800, CRC(3029f94f) SHA1(3b432b42e79f8b0a7d65e197f373a04e3c92ff20) ) // 2716
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "6E.bin",       0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) ) // 82s123
+ROM_END
+
 ROM_START( theend )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ic13_1t.bin",  0x0000, 0x0800, CRC(93e555ba) SHA1(f684927cecabfbd7544f7549a6152c0a6a436019) )
@@ -11870,6 +11905,7 @@ GAME( 1982, amidaro,     amidar,   turtles,    amidaro,    galaxian_state, turtl
 GAME( 1982, amidarb,     amidar,   turtles,    amidaru,    galaxian_state, turtles,    ROT90,  "bootleg", "Amidar (bootleg)", MACHINE_SUPPORTS_SAVE ) /* similar to Amigo bootleg */
 GAME( 1982, amigo,       amidar,   turtles,    amidaru,    galaxian_state, turtles,    ROT90,  "bootleg", "Amigo", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, amidars,     amidar,   scramble,   amidars,    galaxian_state, scramble,   ROT90,  "Konami", "Amidar (Scramble hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, mandinga,    amidar,   scramble,   amidars,    galaxian_state, mandinga,   ROT90,  "bootleg (Artemi)", "Mandinga (bootleg of Amidar)", MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // sound ROMs have identical halves, reference for color http://www.youtube.com/watch?v=6uGK4AZxV2U
 
 
 /* The End/Scramble based hardware */

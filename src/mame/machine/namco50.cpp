@@ -225,12 +225,6 @@ static ADDRESS_MAP_START( namco_50xx_map_io, AS_IO, 8, namco_50xx_device )
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_START( namco_50xx )
-	MCFG_CPU_ADD("mcu", MB8842, DERIVED_CLOCK(1,1))     /* parent clock, internally divided by 6 */
-	MCFG_CPU_IO_MAP(namco_50xx_map_io)
-MACHINE_CONFIG_END
-
-
 ROM_START( namco_50xx )
 	ROM_REGION( 0x800, "mcu", 0 )
 	ROM_LOAD( "50xx.bin",     0x0000, 0x0800, CRC(a0acbaf7) SHA1(f03c79451e73b3a93c1591cdb27fedc9f130508d) )
@@ -261,14 +255,13 @@ void namco_50xx_device::device_start()
 }
 
 //-------------------------------------------------
-//  device_mconfig_additions - return a pointer to
-//  the device's machine fragment
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor namco_50xx_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( namco_50xx  );
-}
+MACHINE_CONFIG_MEMBER( namco_50xx_device::device_add_mconfig )
+	MCFG_CPU_ADD("mcu", MB8842, DERIVED_CLOCK(1,1))     /* parent clock, internally divided by 6 */
+	MCFG_CPU_IO_MAP(namco_50xx_map_io)
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  device_rom_region - return a pointer to the
