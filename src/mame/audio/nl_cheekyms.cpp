@@ -7,6 +7,9 @@
 
 #ifndef __PLIB_PREPROCESSOR__
 
+	#define NOISE(_name)                                                     \
+			NET_REGISTER_DEV(NOISE, _name)
+
 #endif
 
 /* Couriersud, 2013-05-26
@@ -58,15 +61,18 @@ NETLIST_START(cheekyms_schematics)
 	NET_C(C10.2, Q1.E, GND)
 
 	// Cheese
-#if 1
-	// FIXME: We need a generic noise voltage or current source which be can
-	// place in parallel to B-E so simulate device noise.
-
+#if 0
 	// RDUMMY will ensure the circuit does not become singular.
 
 	RES(RDUMMY, RES_M(1000))
 	NET_C(RDUMMY.1, GND)
 	NET_C(RDUMMY.2, Q2.C)
+	QBJT_EB(Q2, "2SC945")
+#else
+	// Use a simple noise generating macro device based on a current source
+	// to simulate the noise across B-E
+	NOISE(Q2)
+#endif
 
 	RES(R2, RES_M(1))
 	RES(R3, RES_K(1))
@@ -82,7 +88,6 @@ NETLIST_START(cheekyms_schematics)
 	CAP(C8, CAP_U(0.1))
 	CAP(C9, CAP_U(0.1))
 	CAP(C11, CAP_U(0.1))
-	QBJT_EB(Q2, "2SC945")
 	NET_C(R2.1, I_VPLUS.Q)
 	NET_C(R2.2, C8.1, Q2.E)
 	NET_C(R3.1, C8.2)
@@ -97,31 +102,6 @@ NETLIST_START(cheekyms_schematics)
 	NET_C(R9.2, I_V5.Q)
 	NET_C(R11.1, R12.1, C11.2)
 	NET_C(R4.2, R5.1, R11.2, Q2.B, GND)
-#else
-	// Rip out just enough to make it not blow up
-	RES(R4, RES_K(100))
-	RES(R5, RES_K(1))
-	RES(R6, RES_K(100))
-	RES(R7, RES_K(1))
-	RES(R8, RES_M(1))
-	RES(R9, RES_K(10))
-	RES(R10, RES_K(10))
-	RES(R11, RES_K(10))
-	RES(R12, RES_K(100))
-	CAP(C9, CAP_U(0.1))
-	CAP(C11, CAP_U(0.1))
-	NET_C(R4.1, IC5.10)
-	NET_C(R5.2, R6.1, IC5.9)
-	NET_C(R6.2, C9.1, IC5.8)
-	NET_C(R7.1, C9.2)
-	NET_C(R7.2, R8.1, IC5.13)
-	NET_C(R8.2, C11.1, IC5.14)
-	NET_C(R10.1, IC1.4)
-	NET_C(R9.1, R10.2, IC5.12)
-	NET_C(R9.2, I_V5.Q)
-	NET_C(R11.1, R12.1, C11.2)
-	NET_C(R4.2, R5.1, R11.2, GND)
-#endif
 
 	// Music
 	RES(R13, RES_K(100))
@@ -255,6 +235,17 @@ NETLIST_START(cheekyms_schematics)
 
 NETLIST_END()
 
+/* simple noise generator to replace BJT E-B one
+ *
+ */
+
+NETLIST_START(NOISE)
+	CS(FC, 0)
+	PARAM(FC.FUNC, "0.0000001 rand *")
+
+	ALIAS(E, FC.P)
+	ALIAS(B, FC.N)
+NETLIST_END()
 
 NETLIST_START(cheekyms)
 
@@ -267,7 +258,10 @@ NETLIST_START(cheekyms)
 	PARAM(Solver.DYNAMIC_LTE, 5e-4)
 	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 20e-6)
 
+	LOCAL_LIB_ENTRY(NOISE)
+
 	LOCAL_SOURCE(cheekyms_schematics)
+
 
 	ANALOG_INPUT(I_V5, 5)
 	ANALOG_INPUT(I_VPLUS, 12.9) // very approximate - 15V dropped by three diodes and filtered
@@ -294,3 +288,5 @@ NETLIST_START(cheekyms)
 	NET_C(I_COIN_EXTRA.Q, IC4_2.RESET)
 
 NETLIST_END()
+
+
