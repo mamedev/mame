@@ -100,7 +100,10 @@
         GAL22V10    = QP24 QF5892
 
     28-pin devices:
-        PLS100      = QP28 QF1928
+        PLS100      = QP28 QF1928 (Tri-State)
+		82S100      = QP20 QF1928 (Tri-State)
+        PLS101      = QP20 QF1928 (Open Collector)
+        82S101      = QP20 QF1928 (Open Collector)
 
 ****************************************************************************
 
@@ -319,6 +322,7 @@ static void print_pal18h4_product_terms(const pal_data* pal, const jed_data* jed
 static void print_pal18l4_product_terms(const pal_data* pal, const jed_data* jed);
 static void print_pal20c1_product_terms(const pal_data* pal, const jed_data* jed);
 static void print_pal20l2_product_terms(const pal_data* pal, const jed_data* jed);
+static void print_82s100_pls100_product_terms(const pal_data* pal, const jed_data* jed);
 
 
 
@@ -381,6 +385,7 @@ static void config_pal18h4_pins(const pal_data* pal, const jed_data* jed);
 static void config_pal18l4_pins(const pal_data* pal, const jed_data* jed);
 static void config_pal20c1_pins(const pal_data* pal, const jed_data* jed);
 static void config_pal20l2_pins(const pal_data* pal, const jed_data* jed);
+static void config_82s100_pls100_pins(const pal_data* pal, const jed_data* jed);
 
 
 
@@ -935,6 +940,16 @@ static pin_fuse_rows pal20c1pinfuserows[] = {
 static pin_fuse_rows pal20l2pinfuserows[] = {
 	{18, NO_OUTPUT_ENABLE_FUSE_ROW, 320, 600},
 	{19, NO_OUTPUT_ENABLE_FUSE_ROW, 0, 280}};
+
+static pin_fuse_rows _82s100_pls100_pinfuserows[] = {
+    {18, NO_OUTPUT_ENABLE_FUSE_ROW, 0},
+    {17, NO_OUTPUT_ENABLE_FUSE_ROW, 0},
+    {16, NO_OUTPUT_ENABLE_FUSE_ROW, 0},
+    {15, NO_OUTPUT_ENABLE_FUSE_ROW, 0},
+    {13, NO_OUTPUT_ENABLE_FUSE_ROW, 0},
+    {12, NO_OUTPUT_ENABLE_FUSE_ROW, 0},
+    {11, NO_OUTPUT_ENABLE_FUSE_ROW, 0},
+    {10, NO_OUTPUT_ENABLE_FUSE_ROW, 0}};
 
 static pin_fuse_columns pal10l8pinfusecolumns[] = {
 	{1, 3, 2},
@@ -1941,6 +1956,24 @@ static pin_fuse_columns pal20l2pinfusecolumns[] = {
 	{22, 11, 10},
 	{23, 7, 6}};
 
+static pin_fuse_columns _82s100_pls100_pinfusecolumns[] = {
+    {9,  1, 0},
+    {8,  3, 2},
+    {7,  5, 4},
+    {6,  7, 6},
+    {5,  9, 8},
+    {4,  11, 10},
+    {3,  13, 12},
+    {2,  15, 14},
+    {27, 17, 16},
+    {26, 19, 18},
+    {25, 21, 20},
+    {24, 23, 22},
+    {23, 25, 24},
+    {22, 27, 26},
+    {21, 29, 28},
+    {20, 31, 30}};
+
 static pal_data paldata[] = {
 	{"PAL10L8", 320,
 		pal10l8pinfuserows, ARRAY_LENGTH(pal10l8pinfuserows),
@@ -2136,8 +2169,7 @@ static pal_data paldata[] = {
 		nullptr},
 	/*{"PAL22V10", 0, NULL, 0, NULL, 0, NULL, NULL, NULL, NULL},
 	{"GAL20V8A", 0, NULL, 0, NULL, 0, NULL, NULL, NULL, NULL},
-	{"GAL22V10", 0, NULL, 0, NULL, 0, NULL, NULL, NULL, NULL},
-	{"PLS100", 0, NULL, 0, NULL, 0, NULL, NULL, NULL, NULL},*/
+	{"GAL22V10", 0, NULL, 0, NULL, 0, NULL, NULL, NULL, NULL},*/
 	{"82S153", 1842,
 		_82s153_pls153pinfuserows, ARRAY_LENGTH(_82s153_pls153pinfuserows),
 		_82s153_pls153pinfusecolumns, ARRAY_LENGTH(_82s153_pls153pinfusecolumns),
@@ -2355,6 +2387,34 @@ static pal_data paldata[] = {
 		pal20l2pinfusecolumns, ARRAY_LENGTH(pal20l2pinfusecolumns),
 		print_pal20l2_product_terms,
 		config_pal20l2_pins,
+		nullptr,
+		nullptr},
+	{"82S100", 1928,
+		_82s100_pls100_pinfuserows, ARRAY_LENGTH(_82s100_pls100_pinfuserows),
+		_82s100_pls100_pinfusecolumns, ARRAY_LENGTH(_82s100_pls100_pinfusecolumns),
+		print_82s100_pls100_product_terms,
+		config_82s100_pls100_pins,
+		nullptr,
+		nullptr},
+	{"PLS100", 1928,
+		_82s100_pls100_pinfuserows, ARRAY_LENGTH(_82s100_pls100_pinfuserows),
+		_82s100_pls100_pinfusecolumns, ARRAY_LENGTH(_82s100_pls100_pinfusecolumns),
+		print_82s100_pls100_product_terms,
+		config_82s100_pls100_pins,
+		nullptr,
+		nullptr},
+	{"82S101", 1928,
+		_82s100_pls100_pinfuserows, ARRAY_LENGTH(_82s100_pls100_pinfuserows),
+		_82s100_pls100_pinfusecolumns, ARRAY_LENGTH(_82s100_pls100_pinfusecolumns),
+		print_82s100_pls100_product_terms,
+		config_82s100_pls100_pins,
+		nullptr,
+		nullptr},
+	{"PLS101", 1928,
+		_82s100_pls100_pinfuserows, ARRAY_LENGTH(_82s100_pls100_pinfuserows),
+		_82s100_pls100_pinfusecolumns, ARRAY_LENGTH(_82s100_pls100_pinfusecolumns),
+		print_82s100_pls100_product_terms,
+		config_82s100_pls100_pins,
 		nullptr,
 		nullptr}};
 
@@ -4336,6 +4396,97 @@ static void print_pal20l2_product_terms(const pal_data* pal, const jed_data* jed
 
 
 /*-------------------------------------------------
+    print_82s100_pls100_product_terms - prints the product
+    terms for a 82S100 and PLS100
+-------------------------------------------------*/
+
+static void print_82s100_pls100_product_terms(const pal_data* pal, const jed_data* jed)
+{
+	uint16_t index, columncount, flags, row, haveterms, or_column, fuserow;
+	char buffer[200];
+	int indent, indentindex;
+
+	columncount = calc_fuse_column_count(pal);
+
+	print_input_pins();
+	print_output_pins();
+
+	printf("Equations:\n\n");
+
+	for (index = 0; index < outputpinscount; ++index)
+	{
+		flags = outputpins[index].flags;
+
+		indent = 0;
+
+		if (flags & OUTPUT_ACTIVELOW)
+		{
+			printf(LOW_SYMBOL);
+
+			indent += strlen(LOW_SYMBOL);
+		}
+
+		sprintf(buffer, OUTPUT_SYMBOL "%d " COMBINATORIAL_ASSIGNMENT " ", outputpins[index].pin);
+
+		printf("%s", buffer);
+
+		haveterms = 0;
+		indent += strlen(buffer);
+
+		fuserow = 0;
+
+		if (outputpins[index].pin >= 15)
+		{
+			or_column = 18 - outputpins[index].pin;
+		}
+		else
+		{
+			or_column = 17 - outputpins[index].pin;
+		}
+
+		for (row = 0; row < 48; ++row)
+		{
+			if (!jed_get_fuse(jed, fuserow + columncount + or_column))
+			{
+				generate_product_terms(pal, jed, fuserow, buffer);
+
+				if (strlen(buffer) > 0)
+				{
+					if (haveterms)
+					{
+						printf(" " OR_SYMBOL "\n");
+
+						for (indentindex = 0; indentindex < indent; ++indentindex)
+						{
+							printf(" ");
+						}
+					}
+					else
+					{
+						haveterms = 1;
+					}
+
+					printf("%s", buffer);
+				}
+			}
+
+			fuserow += (columncount + 8);
+		}
+
+		printf("\n");
+
+		/* output enable equations */
+
+		printf(OUTPUT_SYMBOL "%d.oe " COMBINATORIAL_ASSIGNMENT " ", outputpins[index].pin);
+		printf("OE\n");
+
+		printf("\n");
+	}
+}
+
+
+
+/*-------------------------------------------------
     config_pal10l8_pins - configures the pins for
     a PAL10L8
 -------------------------------------------------*/
@@ -5683,7 +5834,7 @@ a PAL20RA10
 
 static void config_pal20ra10_pins(const pal_data* pal, const jed_data* jed)
 {
-    static UINT16 input_pins[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23 };
+    static uint16_t input_pins[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23 };
     static pin_output_config output_pins[] = {
         {14, OUTPUT_ACTIVELOW | OUTPUT_REGISTERED | OUTPUT_FEEDBACK_REGISTERED},
         {15, OUTPUT_ACTIVELOW | OUTPUT_REGISTERED | OUTPUT_FEEDBACK_REGISTERED},
@@ -6918,6 +7069,37 @@ static void config_pal20l2_pins(const pal_data* pal, const jed_data* jed)
 	static pin_output_config output_pins[] = {
 		{18, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
 		{19, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE}};
+
+	set_input_pins(input_pins, ARRAY_LENGTH(input_pins));
+	set_output_pins(output_pins, ARRAY_LENGTH(output_pins));
+}
+
+
+
+/*-------------------------------------------------
+    config_82s100_pls100_pins - configures the pins for
+    a 82S100 and PLS100
+-------------------------------------------------*/
+
+static void config_82s100_pls100_pins(const pal_data* pal, const jed_data* jed)
+{
+	static uint16_t input_pins[] = {9, 8, 7, 6, 5, 4, 3, 2, 27, 26, 25, 24, 23, 22, 21, 20};
+	pin_output_config output_pins[8];
+
+	for (uint16_t index = 0; index < ARRAY_LENGTH(output_pins); ++index)
+	{
+		output_pins[index].pin = pal->pinfuserows[index].pin;
+		output_pins[index].flags = OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE;
+
+		if (jed_get_fuse(jed, 1920 + index))
+		{
+			output_pins[index].flags |= OUTPUT_ACTIVELOW;
+		}
+		else
+		{
+			output_pins[index].flags |= OUTPUT_ACTIVEHIGH;
+		}
+	}
 
 	set_input_pins(input_pins, ARRAY_LENGTH(input_pins));
 	set_output_pins(output_pins, ARRAY_LENGTH(output_pins));
