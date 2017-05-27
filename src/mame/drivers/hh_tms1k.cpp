@@ -6,6 +6,7 @@
   toys based around the TMS1000 MCU series. Anything more complex or clearly
   part of a series is (or will be) in its own driver, see:
   - hh_tms1k: here
+  - eva: Chrysler EVA-11 (and EVA-24)
   - microvsn: Milton Bradley MicroVision
   - ticalc1x: TI TMS1K-based calculators
   - tispellb: TI Spelling B series gen. 1
@@ -66,7 +67,7 @@
  *MP3320A  TMS1000   1979, Coleco Head to Head Basketball
  @M32001   TMS1000   1981, Coleco Quiz Wiz Challenger (note: MP3398, MP3399, M3200x?)
  *M32018   TMS1000   1990, unknown device (have decap/dump)
- *M32045B  TMS1000   1983, Chrysler Electronic Voice Alert (11-function) (have decap/dump)
+  M32045B  TMS1000   1983, Chrysler Electronic Voice Alert (11-function) -> eva.cpp
  @MP3403   TMS1100   1978, Marx Electronic Bowling
  @MP3404   TMS1100   1978, Parker Brothers Merlin
  @MP3405   TMS1100   1979, Coleco Amaze-A-Tron

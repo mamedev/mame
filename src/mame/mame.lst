@@ -12178,6 +12178,9 @@ waveterm                        //
 @source:europc.cpp
 europc                          // 1988 Schneider Euro PC (CGA or Hercules)
 
+@source:eva.cpp
+eva11                           //
+
 @source:evmbug.cpp
 evmbug                          //
 
