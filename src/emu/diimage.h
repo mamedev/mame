@@ -146,7 +146,7 @@ public:
 	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) { return image_init_result::PASS; }
 	virtual void call_unload() { }
 	virtual std::string call_display() { return std::string(); }
-	virtual uint32_t unhashed_header_length() const { return 0; }
+	virtual u32 unhashed_header_length() const { return 0; }
 	virtual bool core_opens_image_file() const { return true; }
 	virtual iodevice_t image_type()  const = 0;
 	virtual bool is_readable()  const = 0;

@@ -111,7 +111,7 @@ public:
 	virtual bool is_reset_on_load() const override { return 1; }
 	virtual const char *image_interface() const override { return "a7800_cart"; }
 	virtual const char *file_extensions() const override { return "bin,a78"; }
-	virtual uint32_t unhashed_header_length() const override { return 128; }
+	virtual u32 unhashed_header_length() const override { return 128; }
 
 	// slot interface overrides
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
