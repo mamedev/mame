@@ -40,7 +40,6 @@ public:
 	DECLARE_WRITE8_MEMBER(bg_speech_clock_w);
 	DECLARE_WRITE8_MEMBER(bg_speech_digit_w);
 	DECLARE_WRITE8_MEMBER(rombank_w);
-	DECLARE_WRITE_LINE_MEMBER(ym2151_irq_w);
 	DECLARE_READ8_MEMBER(latch_r);
 	DECLARE_WRITE8_MEMBER(latch_w);
 	DECLARE_WRITE8_MEMBER(volume_w);
@@ -59,7 +58,7 @@ protected:
 	// overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	uint8_t m_latch;
@@ -68,6 +67,8 @@ private:
 
 	// callback
 	devcb_write_line m_reply_cb;
+
+	DECLARE_WRITE_LINE_MEMBER(ym2151_irq_w);
 };
 
 DECLARE_DEVICE_TYPE(WPCSND, wpcsnd_device)

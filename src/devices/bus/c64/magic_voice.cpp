@@ -216,10 +216,10 @@ WRITE_LINE_MEMBER( c64_magic_voice_cartridge_device::apd_w )
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( c64_magic_voice )
+//  MACHINE_CONFIG_START( c64_magic_voice )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( c64_magic_voice )
+static MACHINE_CONFIG_START( c64_magic_voice )
 	MCFG_DEVICE_ADD(MOS6525_TAG, TPI6525, 0)
 	MCFG_TPI6525_OUT_IRQ_CB(WRITELINE(c64_magic_voice_cartridge_device, tpi_irq_w))
 	MCFG_TPI6525_IN_PA_CB(READ8(c64_magic_voice_cartridge_device, tpi_pa_r))

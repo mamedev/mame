@@ -114,7 +114,7 @@ extern const device_type MCPX_SMBUS;
 /*
  * OHCI USB Controller
  */
-
+class usb_function_device;
 class mcpx_ohci_device : public pci_device {
 public:
 	mcpx_ohci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -129,6 +129,7 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_config_complete() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
@@ -137,6 +138,11 @@ private:
 	emu_timer *timer;
 	std::function<void(void)> hack_callback;
 	DECLARE_ADDRESS_MAP(ohci_mmio, 32);
+	struct dev_t {
+		ohci_function *dev;
+		int port;
+	} connecteds[4];
+	int connecteds_count;
 };
 
 extern const device_type MCPX_OHCI;
@@ -267,18 +273,18 @@ extern const device_type MCPX_AC97_MODEM;
 class mcpx_ide_device : public pci_device {
 public:
 	mcpx_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
 
 	template<class _Object> static devcb_base &set_interrupt_handler(device_t &device, _Object object) { return downcast<mcpx_ide_device &>(device).m_interrupt_handler.set_callback(object); }
 
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	devcb_write_line m_interrupt_handler;
 	DECLARE_ADDRESS_MAP(mcpx_ide_io, 32);
+	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
 };
 
 extern const device_type MCPX_IDE;

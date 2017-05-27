@@ -24,6 +24,7 @@
 #define GROM0_TAG       "console_grom_0"
 #define GROM1_TAG       "console_grom_1"
 #define GROM2_TAG       "console_grom_2"
+#define TI99_IOPORT_TAG "ioport"
 #define JOYPORT_TAG     "joyport"
 #define EVPC_CONN_TAG   "evpc_conn"
 #define DATAMUX_TAG     "datamux_16_8"
@@ -138,51 +139,6 @@ public:
 	virtual DECLARE_WRITE16_MEMBER(write16) = 0;
 	virtual DECLARE_SETADDRESS_DBIN_MEMBER( setaddress_dbin ) { }
 };
-
-/****************************************************************************
-    Connector from EVPC
-    We need this for the TI-99/4A console as well as for the SGCPU, so we have
-    to use callbacks
-
-    This is actually a separate cable lead going from
-    the EPVC in the PEB to a pin inside the console. This cable sends the
-    video interrupt from the v9938 on the EVPC into the console.
-    This workaround must be done on the real system because the peripheral
-    box and its connector were not designed to deliver a video interrupt signal.
-    This was fixed with the EVPC2 which uses the external interrupt EXTINT
-    with a special firmware (DSR).
-
-    Emulation detail: We are using a separate device class in order to avoid
-    exposing the console class to the external class.
-
-****************************************************************************/
-
-DECLARE_DEVICE_TYPE(EVPC_CONN, evpc_clock_connector)
-
-class evpc_clock_connector : public device_t
-{
-public:
-	evpc_clock_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	template <class Object> static devcb_base &static_set_vdpint_callback(device_t &device, Object &&cb)
-	{
-		return downcast<evpc_clock_connector &>(device).m_vdpint.set_callback(std::forward<Object>(cb));
-	}
-
-	WRITE_LINE_MEMBER( vclock_line ) { m_vdpint(state); }
-
-protected:
-	void device_start() override;
-
-private:
-	// VDPINT line to the CPU
-	devcb_write_line m_vdpint;
-};
-
-
-#define MCFG_ADD_EVPC_CONNECTOR( _tag, _vdpint ) \
-	MCFG_DEVICE_ADD(_tag, EVPC_CONN, 0) \
-	devcb = &evpc_clock_connector::static_set_vdpint_callback( *device, DEVCB_##_vdpint );
 
 /****************************************************************************
     Constants

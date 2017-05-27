@@ -107,7 +107,7 @@ void i82730_device::device_start()
 
 void i82730_device::device_reset()
 {
-	cpu_device *cpu = m_owner->subdevice<cpu_device>(m_cpu_tag);
+	cpu_device *cpu = owner()->subdevice<cpu_device>(m_cpu_tag);
 	m_program = &cpu->space(AS_PROGRAM);
 
 	m_initialized = false;

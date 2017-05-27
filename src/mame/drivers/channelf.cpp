@@ -199,7 +199,7 @@ static SLOT_INTERFACE_START(cf_cart)
 SLOT_INTERFACE_END
 
 
-static MACHINE_CONFIG_FRAGMENT( channelf_cart )
+static MACHINE_CONFIG_START( channelf_cart )
 	/* cartridge */
 	MCFG_CHANNELF_CARTRIDGE_ADD("cartslot", cf_cart, nullptr)
 

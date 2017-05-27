@@ -16,6 +16,10 @@
 #include "ti_fdc.h"
 #include "formats/ti99_dsk.h"
 
+DEFINE_DEVICE_TYPE_NS(TI99_FDC, bus::ti99::peb, ti_fdc_device, "ti99_fdc", "TI-99 Standard DSSD Floppy Controller")
+
+namespace bus { namespace ti99 { namespace peb {
+
 // ----------------------------------
 // Flags for debugging
 
@@ -450,7 +454,7 @@ static SLOT_INTERFACE_START( tifdc_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
 
-MACHINE_CONFIG_FRAGMENT( ti_fdc )
+MACHINE_CONFIG_START( ti_fdc )
 	MCFG_FD1771_ADD(FDC_TAG, XTAL_1MHz)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(ti_fdc_device, fdc_irq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(ti_fdc_device, fdc_drq_w))
@@ -478,4 +482,4 @@ const tiny_rom_entry *ti_fdc_device::device_rom_region() const
 	return ROM_NAME( ti_fdc );
 }
 
-DEFINE_DEVICE_TYPE(TI99_FDC, ti_fdc_device, "ti99_fdc", "TI-99 Standard DSSD Floppy Controller")
+} } } // end namespace bus::ti99::peb

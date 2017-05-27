@@ -291,6 +291,9 @@ ac1                             // 1984 Amateurcomputer AC1
 ac1_32                          // 1984 Amateurcomputer AC1 (32 lines)
 ac1scch                         // 1984 Amateurcomputer AC1 SCCH
 
+@source:accomm.cpp
+accomm							// 1986 Acorn Computer
+
 @source:aceex.cpp
 aceex2814
 
@@ -12970,6 +12973,7 @@ levers                          // (c) 1983 Rock-ola
 losttomb                        // (c) 1982 Stern
 losttombh                       // (c) 1982 Stern
 luctoday                        // 1980 Sigma
+mandinga                        // bootleg (Artemi)
 mltiwars                        // bootleg (Gayton Games)
 monsterz                        // (c) 1982 Nihon (Arcade TV Game List - P.102, Left, 20 from top)
 moonal2                         // [1980] Nichibutsu
@@ -28661,10 +28665,11 @@ moeru                           // 2002.12 Moeru Casinyo
 mok                             // 2002.03.06 The Maze of the Kings
 monkeyba                        // 2001.05 Monkey Ball
 mslug6                          // 2006.02 Metal Slug 6
-mtkob2                          // 2003.02 MushiKing The King Of Beetle
-mushi2eo                        // 2005.?? Mushiking The King Of Beetles II / III / III+ (Ver. 1.001)
-mushi2k5                        // 2005.?? MushiKing The King Of Beetle 2K5 1st
-mushik2e                        // 2005.?? Mushiking The King Of Beetles II / III / III+ (Ver. 2.001)
+mtkob2                          // 2003.02 MushiKing The King Of Beetle (World)
+mushi2k4                        // 2004.?? MushiKing The King Of Beetles 2004 Second (Japan)
+mushi2k5                        // 2005.?? MushiKing The King Of Beetles 2005 First (Japan)
+mushi2eo                        // 2005.?? Mushiking The King Of Beetles II / III / III+ (Ver. 1.001) (World)
+mushik2e                        // 2005.?? Mushiking The King Of Beetles II / III / III+ (Ver. 2.001) (World)
 mvsc2                           // 2000.03 Marvel Vs. Capcom 2 New Age of Heroes (Export, Korea) (Rev A)
 mvsc2u                          // 2000.03 Marvel Vs. Capcom 2 New Age of Heroes (USA) (Rev A)
 naomi                           // 1998.?? Naomi BIOS
@@ -29291,6 +29296,16 @@ m82p                            // Nintendo M82 Display Unit PAL
 nes                             // Nintendo Entertainment System
 nespal                          // Nintendo Entertainment System PAL
 
+@source:nes_vt.cpp
+vdogdemo
+mc_dgear
+dgun2500
+dgun2561
+ii8in1
+ii32in1
+lexcyber
+cybar120
+
 @source:newbrain.cpp
 newbrain                        //
 newbraina                       //
@@ -29525,6 +29540,7 @@ raiders5                        // UPL-85004 (c) 1985
 raiders5t                       // UPL-85004 (c) 1985 Taito license
 
 @source:novag6502.cpp
+cfortea                         //
 cforteb                         //
 sexperta                        //
 sexpertb                        //
@@ -30481,6 +30497,7 @@ peps0470                        // (c) 1996 IGT - International Game Technology
 peps0581                        // (c) 1996 IGT - International Game Technology
 peps0615                        // (c) 1996 IGT - International Game Technology
 peps0628                        // (c) 1996 IGT - International Game Technology
+peps0629                        // (c) 1996 IGT - International Game Technology
 peps0631                        // (c) 1996 IGT - International Game Technology
 peps0708                        // (c) 1996 IGT - International Game Technology
 peps0716                        // (c) 1996 IGT - International Game Technology
@@ -33902,6 +33919,9 @@ shootout                        // (c) 1985 Data East USA (US)
 shootoutb                       // bootleg
 shootoutj                       // (c) 1985 Data East USA (Japan)
 
+@source:shootaway2.cpp
+shootaw2						// (c) 1996 Namco
+
 @source:shougi.cpp
 shougi                          // (c) 1982 (Arcade TV Game List - P.80, Left, 9 from top)
 shougi2                         // (c) 1982 (Arcade TV Game List - P.80, Left, 10 from top)
@@ -36078,6 +36098,7 @@ snspellfr                       //
 snspellit                       //
 snspelljp                       //
 snspellp                        //
+snspellsp                       //
 snspellua                       //
 snspellub                       //
 snspelluk                       //
@@ -36714,6 +36735,10 @@ cbombersp                       //
 undrfire                        // D67 (c) 1993 Taito Corporation Japan (World)
 undrfirej                       // D67 (c) 1993 Taito Corporation (Japan)
 undrfireu                       // D67 (c) 1993 Taito America Corporation (US)
+
+@source:unianapc.cpp
+dhunting                        // (c) 2002 Game Box Entertainment
+hogwild                         // (c) 2003 Uniana
 
 @source:unichamp.cpp
 unichamp                        //

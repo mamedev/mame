@@ -47,7 +47,7 @@ UPD7220_DISPLAY_PIXELS_MEMBER( isa8_number_9_rev_device::hgdc_display_pixels )
 	}
 }
 
-static MACHINE_CONFIG_FRAGMENT( num_9_rev )
+static MACHINE_CONFIG_START( num_9_rev )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_SIZE(512, 448)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 448-1)

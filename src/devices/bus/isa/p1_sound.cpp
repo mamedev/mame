@@ -29,7 +29,7 @@ DEFINE_DEVICE_TYPE(P1_SOUND, p1_sound_device, "p1_sound", "Poisk-1 sound card (B
 //  Machine config
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( p1_sound )
+static MACHINE_CONFIG_START( p1_sound )
 	MCFG_DEVICE_ADD("midi", I8251, 0)
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("mdout", midi_port_device, write_txd))
 	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE(":isa", isa8_device, irq3_w))

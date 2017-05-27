@@ -26,10 +26,8 @@ public:
 	DECLARE_WRITE8_MEMBER(vregs_w);
 	void layer_enable_w(uint8_t enable);
 
-	uint32_t screen_update_airraid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -71,6 +69,8 @@ private:
 	bitmap_ind16 m_temp_bitmap;
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void mix_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t* clut, int base);
+
+	uint32_t screen_update_airraid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 #endif // MAME_VIDEO_AIRRAID_DEV_H

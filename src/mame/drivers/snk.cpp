@@ -3881,7 +3881,7 @@ static MACHINE_CONFIG_START( ikari )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ikari)
 
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 0x400)
+	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 0x400)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 
 	MCFG_VIDEO_START_OVERRIDE(snk_state,ikari)
@@ -3940,7 +3940,7 @@ static MACHINE_CONFIG_START( bermudat )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gwar)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 0x400)
+	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 0x400)
 	MCFG_VIDEO_START_OVERRIDE(snk_state,gwar)
 
 	/* sound hardware */
@@ -4038,7 +4038,7 @@ static MACHINE_CONFIG_START( tdfever )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tdfever)
 
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 0x400)
+	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 0x400)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 
 	MCFG_VIDEO_START_OVERRIDE(snk_state,tdfever)

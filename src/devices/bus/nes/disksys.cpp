@@ -47,7 +47,7 @@ static const floppy_interface nes_floppy_interface =
 	"floppy_5_25"
 };
 
-static MACHINE_CONFIG_FRAGMENT( nes_disksys )
+static MACHINE_CONFIG_START( nes_disksys )
 	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, nes_floppy_interface)
 MACHINE_CONFIG_END
 

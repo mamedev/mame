@@ -30,15 +30,11 @@ public:
 	DECLARE_READ16_MEMBER( es5510_dsp_r );
 	DECLARE_WRITE16_MEMBER( es5510_dsp_w );
 
-	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
-
-	DECLARE_WRITE8_MEMBER(mb87078_gain_changed);
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	// inherited devices/pointers
@@ -57,6 +53,10 @@ private:
 	uint32_t   m_es5510_dadr_latch;
 	uint32_t   m_es5510_gpr_latch;
 	uint8_t    m_es5510_ram_sel;
+
+	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
+
+	DECLARE_WRITE8_MEMBER(mb87078_gain_changed);
 };
 
 DECLARE_DEVICE_TYPE(TAITO_EN, taito_en_device)

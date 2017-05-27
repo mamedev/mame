@@ -109,10 +109,10 @@ UPD7220_DISPLAY_PIXELS_MEMBER( wangpc_tig_device::hgdc_display_pixels )
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( wangpc_tig )
+//  MACHINE_CONFIG_START( wangpc_tig )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( wangpc_tig )
+static MACHINE_CONFIG_START( wangpc_tig )
 	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
 	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, wangpc_tig_device, screen_update)
 	MCFG_SCREEN_SIZE(80*10, 25*12)

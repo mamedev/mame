@@ -749,7 +749,7 @@ static ADDRESS_MAP_START(np_io_map , AS_IO , 8 , hp98035_io_card_device)
 	AM_RANGE(0xe , 0xe) AM_READWRITE(clr_inten_r , clr_inten_w)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_FRAGMENT(hp98035)
+static MACHINE_CONFIG_START(hp98035)
 	MCFG_CPU_ADD("np" , HP_NANOPROCESSOR , XTAL_1MHz)
 	MCFG_CPU_PROGRAM_MAP(np_program_map)
 	MCFG_CPU_IO_MAP(np_io_map)

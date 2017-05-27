@@ -275,7 +275,7 @@ TODO:
 #include "emu.h"
 #include "includes/bublbobl.h"
 
-#include "cpu/m6800/m6800.h"
+#include "cpu/m6800/m6801.h"
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
 #include "sound/2203intf.h"

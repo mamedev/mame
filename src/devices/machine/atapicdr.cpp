@@ -26,7 +26,7 @@ atapi_fixed_cdrom_device::atapi_fixed_cdrom_device(const machine_config &mconfig
 {
 }
 
-static MACHINE_CONFIG_FRAGMENT( atapicdr )
+static MACHINE_CONFIG_START( atapicdr )
 	MCFG_CDROM_ADD("image")
 	MCFG_CDROM_INTERFACE("cdrom")
 	MCFG_SOUND_ADD("cdda", CDDA, 0)

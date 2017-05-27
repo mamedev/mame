@@ -13,6 +13,7 @@ abc1600.cpp
 abc80.cpp
 abc80x.cpp
 ac1.cpp
+accomm.cpp
 aceex.cpp
 acrnsys1.cpp
 adam.cpp
@@ -400,6 +401,7 @@ nascom1.cpp
 nc.cpp
 neogeocd.cpp
 nes.cpp
+nes_vt.cpp
 newbrain.cpp
 next.cpp
 ngen.cpp

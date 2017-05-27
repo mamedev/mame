@@ -30,7 +30,7 @@ void neogeo_svcboot_cart_device::decrypt_all(DECRYPT_ALL_PARAMS)
 	m_prot->svcboot_cx_decrypt(spr_region, spr_region_size);
 }
 
-static MACHINE_CONFIG_FRAGMENT( svcboot_cart )
+static MACHINE_CONFIG_START( svcboot_cart )
 	MCFG_NEOBOOT_PROT_ADD("bootleg_prot")
 	MCFG_PVC_PROT_ADD("pvc_prot")
 MACHINE_CONFIG_END
@@ -101,7 +101,7 @@ void neogeo_svcsplus_cart_device::decrypt_all(DECRYPT_ALL_PARAMS)
 }
 
 
-static MACHINE_CONFIG_FRAGMENT( svcsplus_cart )
+static MACHINE_CONFIG_START( svcsplus_cart )
 	MCFG_NEOBOOT_PROT_ADD("bootleg_prot")
 	MCFG_PVC_PROT_ADD("pvc_prot")
 MACHINE_CONFIG_END

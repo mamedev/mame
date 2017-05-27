@@ -53,12 +53,12 @@ static SLOT_INTERFACE_START( hori_adapter )
 	SLOT_INTERFACE("joypad", NES_JOYPAD)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_FRAGMENT( horitwin )
+static MACHINE_CONFIG_START( horitwin )
 	MCFG_FC_EXPANSION_PORT_ADD("port1", hori_adapter, "joypad")
 	MCFG_FC_EXPANSION_PORT_ADD("port2", hori_adapter, "joypad")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( hori4p )
+static MACHINE_CONFIG_START( hori4p )
 	MCFG_FC_EXPANSION_PORT_ADD("port1", hori_adapter, "joypad")
 	MCFG_FC_EXPANSION_PORT_ADD("port2", hori_adapter, "joypad")
 	MCFG_FC_EXPANSION_PORT_ADD("port3", hori_adapter, "joypad")

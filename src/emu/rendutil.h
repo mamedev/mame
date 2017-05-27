@@ -7,8 +7,10 @@
     Core rendering utilities.
 ***************************************************************************/
 
-#ifndef __RENDUTIL_H__
-#define __RENDUTIL_H__
+#ifndef MAME_EMU_RENDUTIL_H
+#define MAME_EMU_RENDUTIL_H
+
+#pragma once
 
 #include "render.h"
 
@@ -198,4 +200,4 @@ static inline u8 apply_brightness_contrast_gamma(u8 src, float brightness, float
 }
 
 
-#endif  /* __RENDUTIL_H__ */
+#endif // MAME_EMU_RENDUTIL_H

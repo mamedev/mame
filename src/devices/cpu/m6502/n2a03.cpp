@@ -129,9 +129,23 @@ const address_space_config *n2a03_device::memory_space_config(address_spacenum s
 	}
 }
 
-static MACHINE_CONFIG_FRAGMENT( n2a03_device )
-	MCFG_SOUND_ADD("nesapu", NES_APU, DERIVED_CLOCK(1,1) )
 
+WRITE_LINE_MEMBER(n2a03_device::apu_irq)
+{
+	// games relying on the APU_IRQ don't seem to work anyway? (nes software list : timelord, mig29sf, firehawk)
+	set_input_line(N2A03_APU_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+READ8_MEMBER(n2a03_device::apu_read_mem)
+{
+	return mintf->program->read_byte(offset);
+}
+
+static MACHINE_CONFIG_START( n2a03_device )
+	MCFG_SOUND_ADD("nesapu", NES_APU, DERIVED_CLOCK(1,1) )
+	MCFG_NES_APU_IRQ_HANDLER(WRITELINE(n2a03_device, apu_irq))
+	MCFG_NES_APU_MEM_READ_CALLBACK(READ8(n2a03_device, apu_read_mem))
+ 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, ":mono", 0.50)
 
 MACHINE_CONFIG_END

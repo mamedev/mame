@@ -8,6 +8,7 @@
 #include "audio/m72.h"
 #include "sound/dac.h"
 #include "machine/pic8259.h"
+#include "machine/upd4701.h"
 #include "screen.h"
 
 #define M81_B_B_JUMPER_J3_S \
@@ -44,6 +45,7 @@ public:
 		m_generic_paletteram_16(*this, "paletteram"),
 		m_generic_paletteram2_16(*this, "paletteram2"),
 		m_upd71059c(*this, "upd71059c"),
+		m_upd4701(*this, {"upd4701l", "upd4701h"}),
 		m_fg_source(0),
 		m_bg_source(0),
 		m_m81_b_b_j3(*this, "JumperJ3"),
@@ -69,6 +71,7 @@ public:
 	required_shared_ptr<uint16_t> m_generic_paletteram_16;
 	required_shared_ptr<uint16_t> m_generic_paletteram2_16;
 	optional_device<pic8259_device> m_upd71059c;
+	optional_device_array<upd4701_device, 2> m_upd4701;
 
 	std::unique_ptr<uint16_t[]> m_protection_ram;
 	emu_timer *m_scanline_timer;
@@ -88,10 +91,6 @@ public:
 	int m_fg_source;
 	int m_bg_source;
 	optional_ioport m_m81_b_b_j3;
-
-	//poundfor specific
-	int m_prev[4];
-	int m_diff[4];
 
 	// majtitle specific
 	int m_m82_rowscroll;
@@ -131,7 +130,7 @@ public:
 	DECLARE_WRITE16_MEMBER(scrolly1_w);
 	DECLARE_WRITE16_MEMBER(scrolly2_w);
 	DECLARE_WRITE16_MEMBER(dmaon_w);
-	DECLARE_WRITE16_MEMBER(port02_w);
+	DECLARE_WRITE8_MEMBER(port02_w);
 	DECLARE_READ16_MEMBER(protection_r);
 	DECLARE_WRITE16_MEMBER(protection_w);
 
@@ -144,8 +143,8 @@ public:
 	DECLARE_WRITE16_MEMBER(airduelm72_sample_trigger_w);
 	DECLARE_WRITE16_MEMBER(dkgenm72_sample_trigger_w);
 	DECLARE_WRITE16_MEMBER(gallop_sample_trigger_w);
-	DECLARE_READ16_MEMBER(poundfor_trackball_r);
-	DECLARE_WRITE16_MEMBER(rtype2_port02_w);
+	DECLARE_WRITE8_MEMBER(rtype2_port02_w);
+	DECLARE_WRITE8_MEMBER(poundfor_port02_w);
 	DECLARE_WRITE16_MEMBER(m82_gfx_ctrl_w);
 	DECLARE_WRITE16_MEMBER(m82_tm_ctrl_w);
 

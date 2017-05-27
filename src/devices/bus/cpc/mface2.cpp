@@ -18,7 +18,7 @@ SLOT_INTERFACE_EXTERN(cpc_exp_cards);
 DEFINE_DEVICE_TYPE(CPC_MFACE2, cpc_multiface2_device, "cpc_mface2", "Multiface II")
 
 // device machine config
-static MACHINE_CONFIG_FRAGMENT( cpc_mface2 )
+static MACHINE_CONFIG_START( cpc_mface2 )
 	// pass-through
 	MCFG_DEVICE_ADD("exp", CPC_EXPANSION_SLOT, 0)
 	MCFG_DEVICE_SLOT_INTERFACE(cpc_exp_cards, nullptr, false)

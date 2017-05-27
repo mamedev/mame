@@ -140,7 +140,7 @@ static ADDRESS_MAP_START(dectalk_dsp_map, AS_PROGRAM, 16, dectalk_isa_device)
 	AM_RANGE(0x0000, 0x0FFF) AM_ROM AM_REGION("dectalk_dsp", 0)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_FRAGMENT( dectalk_isa )
+static MACHINE_CONFIG_START( dectalk_isa )
 	MCFG_CPU_ADD("dectalk_cpu", I80186, XTAL_20MHz)
 	MCFG_CPU_IO_MAP(dectalk_cpu_io)
 	MCFG_CPU_PROGRAM_MAP(dectalk_cpu_map)

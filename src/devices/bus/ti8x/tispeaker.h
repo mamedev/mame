@@ -17,7 +17,7 @@ public:
 	stereo_speaker_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 
 	virtual DECLARE_WRITE_LINE_MEMBER(input_tip) override;
@@ -34,7 +34,7 @@ public:
 	mono_speaker_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 
 	virtual DECLARE_WRITE_LINE_MEMBER(input_tip) override;

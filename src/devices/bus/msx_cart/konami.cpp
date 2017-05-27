@@ -141,7 +141,7 @@ msx_cart_konami_scc_device::msx_cart_konami_scc_device(const machine_config &mco
 }
 
 
-static MACHINE_CONFIG_FRAGMENT( konami_scc )
+static MACHINE_CONFIG_START( konami_scc )
 	// This is actually incorrect. The sound output is passed back into the MSX machine where it is mixed internally and output through the system 'speaker'.
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("k051649", K051649, XTAL_10_738635MHz/3/2)
@@ -478,7 +478,7 @@ msx_cart_synthesizer_device::msx_cart_synthesizer_device(const machine_config &m
 }
 
 
-static MACHINE_CONFIG_FRAGMENT( synthesizer )
+static MACHINE_CONFIG_START( synthesizer )
 	// This is actually incorrect. The sound output is passed back into the MSX machine where it is mixed internally and output through the system 'speaker'.
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1) // unknown DAC
@@ -557,7 +557,7 @@ msx_cart_konami_sound_device::msx_cart_konami_sound_device(const machine_config 
 }
 
 
-static MACHINE_CONFIG_FRAGMENT( konami_sound )
+static MACHINE_CONFIG_START( konami_sound )
 	// This is actually incorrect. The sound output is passed back into the MSX machine where it is mixed internally and output through the system 'speaker'.
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("k052539", K051649, XTAL_10_738635MHz/3/2)
@@ -889,7 +889,7 @@ static ADDRESS_MAP_START( vlm_map, AS_0, 8, msx_cart_keyboard_master_device )
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_FRAGMENT( msx_cart_keyboard_master )
+static MACHINE_CONFIG_START( msx_cart_keyboard_master )
 	// This is actually incorrect. The sound output is passed back into the MSX machine where it is mixed internally and output through the system 'speaker'.
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("vlm5030", VLM5030, XTAL_3_579545MHz)

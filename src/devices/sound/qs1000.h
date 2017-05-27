@@ -85,12 +85,10 @@ public:
 	DECLARE_READ8_MEMBER( p3_r );
 	DECLARE_WRITE8_MEMBER( p3_w );
 
-	DECLARE_READ8_MEMBER( data_to_i8052 );
-
 protected:
 	// device-level overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -153,6 +151,8 @@ private:
 	};
 
 	qs1000_channel                  m_channels[QS1000_CHANNELS];
+
+	DECLARE_READ8_MEMBER( data_to_i8052 );
 };
 
 

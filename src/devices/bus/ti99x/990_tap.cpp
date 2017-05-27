@@ -960,7 +960,7 @@ void ti990_tape_image_device::call_unload()
 	MCFG_DEVICE_ADD((_tag),  TI990_TAPE, 0)
 
 
-static MACHINE_CONFIG_FRAGMENT( tap_990 )
+static MACHINE_CONFIG_START( tap_990 )
 	MCFG_TI990_TAPE_ADD("tape0")
 	MCFG_TI990_TAPE_ADD("tape1")
 	MCFG_TI990_TAPE_ADD("tape2")

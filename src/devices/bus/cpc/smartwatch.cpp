@@ -19,7 +19,7 @@
 DEFINE_DEVICE_TYPE(CPC_SMARTWATCH, cpc_smartwatch_device, "cpc_smartwatch", "Dobbertin Smartwatch")
 
 
-static MACHINE_CONFIG_FRAGMENT( cpc_smartwatch )
+static MACHINE_CONFIG_START( cpc_smartwatch )
 	MCFG_DS1315_ADD("rtc")
 	// no pass-through (?)
 MACHINE_CONFIG_END

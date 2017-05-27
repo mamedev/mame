@@ -1254,7 +1254,7 @@ static INPUT_PORTS_START( van16 )
 
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_FRAGMENT ( chess_common )
+static MACHINE_CONFIG_START ( chess_common )
 
 	/* video hardware */
 

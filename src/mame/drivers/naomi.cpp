@@ -390,9 +390,9 @@ Derby Owners Club (Japan) (Rev B)               840-0016C    22099B  14 (64Mb)  
 Derby Owners Club 2000 Ver.2 (Japan) (Rev A)    840-0052C    22284A  16 (64Mb)   present     315-6213  not present
 Dynamite Baseball '99 (Japan) (Rev B)           840-0019C    22141B  19 (64Mb)   ?           315-6213  317-0269-JPN   requires special panel (joystick + 2 buttons + bat controller for each player)
 Dynamite Baseball NAOMI (Japan)                 840-0001C    21575   21 (64Mb)   ?           315-6213  317-0246-JPN   requires special panel (joystick + 2 buttons + bat controller for each player)
-Ferrari F355 Challenge (deluxe, no link)        834-13842    21902   21 (64Mb)   present     315-6213  317-0254-COM   BIOS 21862 (JAP), 21863 (USA), 21864 (EXP)
-Ferrari F355 Challenge (twin/deluxe)            834-13950    22848   21 (64Mb)   present     315-6213  317-0267-COM   BIOS 22849 (JAP), 22850 (USA), 22851 (EXP)
-Ferrari F355 Challenge 2 (twin/deluxe)          840-0042C    23399   21 (64Mb)   present     315-6213  317-0287-COM   BIOS 22849 (JAP), 22850 (USA), 22851 (EXP)
+Ferrari F355 Challenge (deluxe, no link)        834-13842    21902   21 (64Mb)   present     315-6213  317-0254-COM   BIOS 21862 (JPN), 21863 (USA), 21864 (EXP)
+Ferrari F355 Challenge (twin/deluxe)            834-13950    22848   21 (64Mb)   present     315-6213  317-0267-COM   BIOS 22849 (JPN), 22850 (USA), 22851 (EXP)
+Ferrari F355 Challenge 2 (twin/deluxe)          840-0042C    23399   21 (64Mb)   present     315-6213  317-0287-COM   BIOS 22849 (JPN), 22850 (USA), 22851 (EXP)
 Giant Gram: All Japan Pro Wrestling 2           840-0007C    21820    9 (64Mb)   ?           315-6213  317-0253-JPN   joystick + 3 buttons
 Guilty Gear X                                   841-0013C    23356   14 (64Mb)   present     315-6213  317-5063-COM
 Gun Spike                                       841-0012C    23210   12 (64Mb)   present     315-6213  317-5060-COM   \same ROM board
@@ -592,8 +592,8 @@ Derby Owners Club World Edition EX (Rev D)      840-0088C  22336D   7 (128Mb)  3
 Giga Wing 2                                     841-0014C  22270    5 (128Mb)  315-6319A  315-6213  317-5064-COM  ?
 Mobile Suit Gundam: Federation Vs. Zeon         841-0017C  23638   10 (128Mb)  315-6319A  315-6213  317-5070-COM  not present
 Moero! Justice Gakuen / Project Justice (Rev A) 841-0015C  23548A  11 (128Mb)  315-6319A  315-6213  317-5065-COM  present
-MushiKing - The King Of Beetle 2K4 2ND          840-0152C  24241    5 (128Mb)  315-6319A  315-6213  not present   not present  requires 610-0669 barcode reader
-MushiKing - The King Of Beetle 2K5 1ST          840-0158C  24286    7 (128Mb)  315-6319A  315-6213  not present   not present  requires 610-0669 barcode reader
+MushiKing The King Of Beetles 2004 Second (Jpn) 840-0152C  24241    5 (128Mb)  315-6319A  315-6213  not present   not present  requires 610-0669 barcode reader
+MushiKing The King Of Beetles 2005 First (Jpn)  840-0158C  24286    7 (128Mb)  315-6319A  315-6213  not present   not present  requires 610-0669 barcode reader
 Oinori-daimyoujin Matsuri                       840-0126B  24053    5 (128Mb)  315-6319A  315-6213  not present   not present  requires 837-14274 "G2 EXPANSION BD" (similar to hopper 837-14381 but with ARC NET chip)
 Samba de Amigo Ver. 2000                        840-0047C  23600   11 (128Mb)  315-6319A  315-6213  317-0295-COM  ?
 Star Horse (main screens)                       840-0054C  23625    4 (128Mb)  315-6319   315-6213  not present   present      requires 837-13785 ARCNET&IO BD
@@ -3243,7 +3243,7 @@ ROM_END
 
 /*
 SYSTEMID: NAOMI
-JAP: GUN SPIKE
+JPN: GUN SPIKE
 USA: CANNON SPIKE
 EXP: CANNON SPIKE
 
@@ -3290,7 +3290,7 @@ ROM_END
 /*
 
 SYSTEMID: NAOMI
-JAP: CAPCOM VS SNK  JAPAN
+JPN: CAPCOM VS SNK  JAPAN
 USA: CAPCOM VS SNK  USA
 EXP: CAPCOM VS SNK  EXPORT
 
@@ -3372,7 +3372,7 @@ ROM_END
 /*
 
 SYSTEMID: NAOMI
-JAP: COSMIC SMASH IN JAPAN
+JPN: COSMIC SMASH IN JAPAN
 USA: COSMIC SMASH IN USA
 EXP: COSMIC SMASH IN EXPORT
 
@@ -3432,7 +3432,7 @@ ROM_END
 /*
 
 SYSTEMID: NAOMI
-JAP: DEATH CRIMSON OX
+JPN: DEATH CRIMSON OX
 USA: DEATH CRIMSON OX
 EXP: DEATH CRIMSON OX
 
@@ -3462,7 +3462,7 @@ ROM_END
 /*
 
 SYSTEMID: NAOMI
-JAP: DEAD OR ALIVE 2
+JPN: DEAD OR ALIVE 2
 USA: DEAD OR ALIVE 2 USA ------
 EXP: DEAD OR ALIVE 2 EXPORT----
 
@@ -3572,7 +3572,7 @@ ROM_END
 /*
 
 SYSTEMID: NAOMI
-JAP: DEAD OR ALIVE 2
+JPN: DEAD OR ALIVE 2
 USA: DEAD OR ALIVE 2 USA ------
 EXP: DEAD OR ALIVE 2 EXPORT----
 
@@ -3644,7 +3644,7 @@ ROM_END
 /*
 
 SYSTEMID: NAOMI
-JAP:  DERBY OWNERS CLUB ------------
+JPN:  DERBY OWNERS CLUB ------------
 USA:  DERBY OWNERS CLUB ------------
 EXP:  DERBY OWNERS CLUB IN EXPORT --
 
@@ -3742,7 +3742,7 @@ ROM_END
 
 /*
 SYSTEMID: NAOMI
-JAP: DERBY OWNERS CLUB II-----------
+JPN: DERBY OWNERS CLUB II-----------
 USA: DERBY OWNERS CLUB II-----------
 EXP: DERBY OWNERS CLUB II-IN EXPORT
 */
@@ -3772,7 +3772,7 @@ ROM_END
 /*
 
 SYSTEMID: NAOMI
-JAP: DYNAMITE BASEBALL NAOMI
+JPN: DYNAMITE BASEBALL NAOMI
 USA: SAMPLE GAME IN USA--------
 EXP: SAMPLE GAME
 
@@ -3852,7 +3852,7 @@ ROM_END
 /*
 
 SYSTEMID: NAOMI
-JAP: DYNAMITE BASEBALL '99
+JPN: DYNAMITE BASEBALL '99
 USA: WORLD SERIES 99
 EXP: WORLD SERIES 99
 
@@ -3949,7 +3949,7 @@ ROM_END
 /*
 
 SYSTEMID: NAOMI
-JAP: F355 CHALLENGE JAPAN
+JPN: F355 CHALLENGE JAPAN
 USA: F355 CHALLENGE USA
 EXP: F355 CHALLENGE EXPORT
 
@@ -4210,7 +4210,7 @@ ROM_END
 
 /*
 SYSTEMID: NAOMI
-JAP: GIANT GRAM
+JPN: GIANT GRAM
 USA: GIANT GRAM
 EXP: GIANT GRAM
 
@@ -4247,7 +4247,7 @@ ROM_END
 /*
 
 SYSTEMID: NAOMI
-JAP: GIANT GRAM 2000
+JPN: GIANT GRAM 2000
 USA: GIANT GRAM 2000
 EXP: GIANT GRAM 2000
 
@@ -4382,6 +4382,21 @@ ROM_START( mtkob2 )
 	ROM_PARAMETER( ":rom_board:key", "3892fb3a" )
 ROM_END
 
+ROM_START( mushi2k4 )
+	NAOMI_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	ROM_REGION( 0x5800000, "rom_board", ROMREGION_ERASEFF)
+	ROM_LOAD( "epr-24241.ic22",	0x00000000,	0x00400000, CRC(ad9237ce) SHA1(f1010a30281ae55bbaece17b6c6a6e9e558d291f) )
+	ROM_LOAD( "mpr-24242.ic1",	0x00800000,	0x01000000, CRC(b4b81edb) SHA1(65f1527b276838b6b20e14c563fe5ef1e7d0ff27) )
+	ROM_LOAD( "mpr-24243.ic2",	0x01800000,	0x01000000, CRC(ff812290) SHA1(57835738ba7d47c999dfdef6c93d10b4f2c55cd4) )
+	ROM_LOAD( "mpr-24244.ic3",	0x02800000,	0x01000000, CRC(f6b97d21) SHA1(f45c868500fd6bf751c84546df40054510a673c9) )
+	ROM_LOAD( "mpr-24245.ic4",	0x03800000,	0x01000000, CRC(9dcee46f) SHA1(570bc01a2d5efdbec8403e68831a8eafe77ca31f) )
+	ROM_LOAD( "mpr-24246.ic5",	0x04800000,	0x01000000, CRC(fd97e2f5) SHA1(c9f7438049def346c9a2f2275110c5b385cb57f0) )
+
+	ROM_PARAMETER( ":rom_board:segam2crypt:key", "-1") // 315-5881 not populated
+ROM_END
+
 ROM_START( mushi2k5 )
 	NAOMI_BIOS
 	NAOMI_DEFAULT_EEPROM
@@ -4510,7 +4525,7 @@ ROM_END
 
 /*
 SYSTEMID: NAOMI
-JAP: GUILTY GEAR X
+JPN: GUILTY GEAR X
 USA: DISABLE
 EXP: DISABLE
 */
@@ -4543,7 +4558,7 @@ ROM_END
 /*
 
 SYSTEMID: NAOMI
-JAP: HEAVY METAL JAPAN
+JPN: HEAVY METAL JAPAN
 USA: HEAVY METAL USA
 EXP: HEAVY METAL EURO
 
@@ -4589,7 +4604,7 @@ ROM_END
 /*
 
 SYSTEMID: NAOMI
-JAP: GIGAWING2 JAPAN
+JPN: GIGAWING2 JAPAN
 USA: GIGAWING2 USA
 EXP: GIGAWING2 EXPORT
 
@@ -4627,7 +4642,7 @@ ROM_END
 
 /*
 SYSTEMID: NAOMI
-JAP: IDOL JANSHI SUCHIE-PAI 3
+JPN: IDOL JANSHI SUCHIE-PAI 3
 USA: DISABLE
 EXP: DISABLE
 
@@ -4677,7 +4692,7 @@ ROM_END
 
 /*
 SYSTEMID: NAOMI
-JAP: SHANGRI-LA
+JPN: SHANGRI-LA
 USA: SHANGRI-LA
 EXP: SHANGRI-LA
 */
@@ -5113,7 +5128,7 @@ ROM_END
 /*
 
 SYSTEMID: NAOMI
-JAP: SLASHOUT JAPAN VERSION
+JPN: SLASHOUT JAPAN VERSION
 USA: SLASHOUT USA VERSION
 EXP: SLASHOUT EXPORT VERSION
 
@@ -5171,7 +5186,7 @@ ROM_END
 /*
 
 SYSTEMID: NAOMI
-JAP: MOERO JUSTICE GAKUEN  JAPAN
+JPN: MOERO JUSTICE GAKUEN  JAPAN
 USA: PROJECT JUSTICE  USA
 EXP: PROJECT JUSTICE  EXPORT
 
@@ -5228,7 +5243,7 @@ ROM_END
 /*
 
 SYSTEMID: NAOMI
-JAP: POWER STONE JAPAN
+JPN: POWER STONE JAPAN
 USA: POWER STONE USA
 EXP: POWER STONE EURO
 
@@ -5270,7 +5285,7 @@ ROM_END
 /*
 
 SYSTEMID: NAOMI
-JAP: POWER STONE 2 JAPAN
+JPN: POWER STONE 2 JAPAN
 USA: POWER STONE 2 USA
 EXP: POWER STONE 2 EURO
 
@@ -5314,7 +5329,7 @@ ROM_END
 /*
 
 SYSTEMID: NAOMI
-JAP: OUTTRIGGER     JAPAN
+JPN: OUTTRIGGER     JAPAN
 USA: OUTTRIGGER     USA
 EXP: OUTTRIGGER     EXPORT
 
@@ -5381,7 +5396,7 @@ ROM_END
 /*
 
 SYSTEMID: NAOMI
-JAP: AH! MY GODDESS QUIZ GAME--
+JPN: AH! MY GODDESS QUIZ GAME--
 USA: AH! MY GODDESS QUIZ GAME--
 EXP: AH! MY GODDESS QUIZ GAME--
 
@@ -5419,7 +5434,7 @@ ROM_END
 /*
 
 SYSTEMID: NAOMI
-JAP: SAMBA DE AMIGO
+JPN: SAMBA DE AMIGO
 USA: SAMBADEAMIGO
 EXP: SAMBADEAMIGO
 
@@ -5504,7 +5519,7 @@ ROM_END
 /*
 
 SYSTEMID: NAOMI
-JAP: SEGA MARINE FISHING IN JAPAN
+JPN: SEGA MARINE FISHING IN JAPAN
 USA: SEGA MARINE FISHING IN USA
 EXP: SEGA MARINE FISHING IN EXPORT
 
@@ -5605,7 +5620,7 @@ ROM_END
 /*
 
 SYSTEMID: NAOMI
-JAP: SPAWN JAPAN
+JPN: SPAWN JAPAN
 USA: SPAWN USA
 EXP: SPAWN EURO
 
@@ -5650,7 +5665,7 @@ ROM_END
 /*
 
 SYSTEMID: NAOMI
-JAP: THE TYPING OF THE DEAD
+JPN: THE TYPING OF THE DEAD
 USA: THE TYPING OF THE DEAD
 EXP: THE TYPING OF THE DEAD
 
@@ -5723,7 +5738,7 @@ ROM_END
 /*
 
 SYSTEMID: NAOMI
-JAP: VIRTUA NBA
+JPN: VIRTUA NBA
 USA: VIRTUA NBA
 EXP: VIRTUA NBA
 
@@ -5851,7 +5866,7 @@ ROM_END
 /*
 
 SYSTEMID: NAOMI
-JAP: VIRTUA STRIKER 2 VER.2000
+JPN: VIRTUA STRIKER 2 VER.2000
 USA: VIRTUA STRIKER 2 VER.2000
 EXP: VIRTUA STRIKER 2 VER.2000
 
@@ -5904,7 +5919,7 @@ ROM_END
 /*
 
 SYSTEMID: NAOMI
-JAP:  POWER SMASH --------------
+JPN:  POWER SMASH --------------
 USA:  VIRTUA TENNIS IN USA -----
 EXP:  VIRTUA TENNIS IN EXPORT --
 
@@ -5948,7 +5963,7 @@ ROM_END
 
 /*
 SYSTEMID: NAOMI
-JAP: ROYAL RUMBLE
+JPN: ROYAL RUMBLE
 USA: ROYAL RUMBLE
 EXP: ROYAL RUMBLE
 */
@@ -6206,7 +6221,7 @@ ROM_END
 /*
 
 SYSTEMID: NAOMI
-JAP: ZOMBIE REVENGE IN JAPAN
+JPN: ZOMBIE REVENGE IN JAPAN
 USA: ZOMBIE REVENGE IN USA
 EXP: ZOMBIE REVENGE IN EXPORT
 
@@ -9964,9 +9979,9 @@ ROM_END
 // 0132 Mushiking 2K3 2ND (Japan)
 /* 0136    */ GAME( 2004, shootplm,  naomi,    naomim1, naomi,   naomi_state, naomi,   ROT0, "Sega", "Shootout Pool The Medal Version B / Shootout Pool Prize Version B (Export, Japan)", GAME_FLAGS )
 /* 0140    */ GAME( 2004, kick4csh,  naomi,    naomim1, naomi,   naomi_state, naomi,   ROT0, "Sega", "Kick '4' Cash (Export)", GAME_FLAGS )
-/* 0150    */ GAME( 2003, mtkob2,    naomi,    naomim1, naomi,   naomi_state, naomi,   ROT0, "Sega", "Mushiking The King Of Beetle 2K3 2nd (World)", GAME_FLAGS ) // not for Japan
-// 0152 Mushiking 2K4 2ND (Japan)
-/* 0158    */ GAME( 2005, mushi2k5,  naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Mushiking The King Of Beetle 2K5 1st (Japan)", GAME_FLAGS )
+/* 0150    */ GAME( 2003, mtkob2,    naomi,    naomim1, naomi,   naomi_state, naomi,   ROT0, "Sega", "Mushiking The King Of Beetle (2K3 2ND, World)", GAME_FLAGS ) // not for Japan
+/* 0152    */ GAME( 2004, mushi2k4,  naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Mushiking The King Of Beetles 2004 Second (Japan)", GAME_FLAGS )
+/* 0158    */ GAME( 2005, mushi2k5,  naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Mushiking The King Of Beetles 2005 First (Japan)", GAME_FLAGS )
 /* 0164    */ GAME( 2005, mushi2eo,  mushik2e, naomim4, naomi,   naomi_state, naomi,   ROT0, "Sega", "Mushiking The King Of Beetles - Mushiking II / III / III+ (Ver. 1.001) (World)", GAME_FLAGS ) // not for Japan, version can be changed in secret menu
 /* 0164    */ GAME( 2005, mushik2e,  naomi,    naomim4, naomi,   naomi_state, naomi,   ROT0, "Sega", "Mushiking The King Of Beetles - Mushiking II / III / III+ (Ver. 2.001) (World)", GAME_FLAGS ) // not for Japan, version can be changed in secret menu
 /* 0166    */ GAME( 2006, zunou,     naomi,    naomim4, naomi,   naomi_state, naomi,   ROT0, "Sega", "Touch De Zunou (Japan, Rev A)", GAME_FLAGS )

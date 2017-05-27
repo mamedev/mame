@@ -8,10 +8,10 @@
 
 ***************************************************************************/
 
-#pragma once
-
 #ifndef MAME_EMU_DIVTLB_H
 #define MAME_EMU_DIVTLB_H
+
+#pragma once
 
 
 

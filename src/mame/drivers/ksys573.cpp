@@ -392,8 +392,6 @@ public:
 		m_out2(*this, "OUT2" ),
 		m_cd(*this, "CD" ),
 		m_upd4701(*this, "upd4701" ),
-		m_upd4701_y(*this, "uPD4701_y" ),
-		m_upd4701_switches(*this, "uPD4701_switches" ),
 		m_stage(*this, "STAGE" ),
 		m_gunx(*this, "GUNX" ),
 		m_sensor(*this, "SENSOR" ),
@@ -534,8 +532,6 @@ private:
 	required_ioport m_out2;
 	required_ioport m_cd;
 	optional_device<upd4701_device> m_upd4701;
-	optional_ioport m_upd4701_y;
-	optional_ioport m_upd4701_switches;
 	optional_ioport m_stage;
 	optional_ioport m_gunx;
 	optional_ioport m_sensor;
@@ -842,38 +838,19 @@ todo:
 
 READ16_MEMBER( ksys573_state::ge765pwbba_r )
 {
-	uint32_t data = 0;
-
 	switch( offset )
 	{
 	case 0x4c:
 	case 0x4d:
-		m_upd4701->y_add( m_upd4701_y->read() );
-		m_upd4701->switches_set( m_upd4701_switches->read() );
-
-		m_upd4701->cs_w( 0 );
-		m_upd4701->xy_w( 1 );
-
-		if( offset == 0x4c )
-		{
-			m_upd4701->ul_w( 0 );
-		}
-		else
-		{
-			m_upd4701->ul_w( 1 );
-		}
-
-		data = m_upd4701->d_r( space, 0, 0xffff );
-		m_upd4701->cs_w( 1 );
-		break;
+		return m_upd4701->read_y(space, offset & 1);
 
 	default:
 		verboselog( 0, "ge765pwbba_r: unhandled offset %08x %08x\n", offset, mem_mask );
 		break;
 	}
 
-	verboselog( 2, "ge765pwbba_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
-	return data;
+	verboselog( 2, "ge765pwbba_r( %08x, %08x )\n", offset, mem_mask );
+	return 0;
 }
 
 WRITE16_MEMBER( ksys573_state::ge765pwbba_w )
@@ -1519,7 +1496,7 @@ WRITE_LINE_MEMBER( ksys573_state::salarymc_lamp_clk )
 	m_salarymc_lamp_clk = state;
 }
 
-static MACHINE_CONFIG_FRAGMENT( salarymc_cassette_install )
+static MACHINE_CONFIG_START( salarymc_cassette_install )
 	MCFG_DEVICE_MODIFY( DEVICE_SELF )
 	MCFG_KONAMI573_CASSETTE_Y_D5_HANDLER( DEVWRITELINE( ":", ksys573_state, salarymc_lamp_clk ) )
 	MCFG_KONAMI573_CASSETTE_Y_D6_HANDLER( DEVWRITELINE( ":", ksys573_state, salarymc_lamp_rst ) )
@@ -1600,7 +1577,7 @@ WRITE_LINE_MEMBER( ksys573_state::hyperbbc_lamp_strobe3 )
 	m_hyperbbc_lamp_strobe3 = state;
 }
 
-static MACHINE_CONFIG_FRAGMENT( hyperbbc_cassette_install )
+static MACHINE_CONFIG_START( hyperbbc_cassette_install )
 	MCFG_DEVICE_MODIFY( DEVICE_SELF )
 	MCFG_KONAMI573_CASSETTE_Y_D0_HANDLER( DEVWRITELINE( ":", ksys573_state, hyperbbc_lamp_strobe3 ) ) // line shared with x76f100 sda
 	MCFG_KONAMI573_CASSETTE_Y_D1_HANDLER( DEVWRITELINE( ":", ksys573_state, hyperbbc_lamp_strobe2 ) ) // line shared with x76f100 scl
@@ -1611,7 +1588,7 @@ static MACHINE_CONFIG_FRAGMENT( hyperbbc_cassette_install )
 	MCFG_KONAMI573_CASSETTE_Y_D7_HANDLER( DEVWRITELINE( ":", ksys573_state, hyperbbc_lamp_start ) )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( hypbbc2p_cassette_install )
+static MACHINE_CONFIG_START( hypbbc2p_cassette_install )
 	MCFG_DEVICE_MODIFY( DEVICE_SELF )
 	MCFG_KONAMI573_CASSETTE_Y_D0_HANDLER( DEVWRITELINE( ":", ksys573_state, hyperbbc_lamp_strobe2 ) ) // line shared with x76f100 sda
 	MCFG_KONAMI573_CASSETTE_Y_D3_HANDLER( DEVWRITELINE( ":", ksys573_state, hyperbbc_lamp_strobe1 ) ) // line shared with x76f100 rst
@@ -1724,7 +1701,7 @@ ADC083X_INPUT_CB(konami573_cassette_xi_device::punchmania_inputs_callback)
 }
 
 
-static MACHINE_CONFIG_FRAGMENT( punchmania_cassette_install )
+static MACHINE_CONFIG_START( punchmania_cassette_install )
 	MCFG_DEVICE_MODIFY( "adc0838" )
 	MCFG_ADC083X_INPUT_CB( konami573_cassette_xi_device, punchmania_inputs_callback )
 MACHINE_CONFIG_END
@@ -2015,7 +1992,7 @@ ADC083X_INPUT_CB(ksys573_state::analogue_inputs_callback)
 	return 0;
 }
 
-static MACHINE_CONFIG_FRAGMENT( cr589_config )
+static MACHINE_CONFIG_START( cr589_config )
 	MCFG_DEVICE_MODIFY( "cdda" )
 	MCFG_SOUND_ROUTE( 0, "^^^^lspeaker", 1.0 )
 	MCFG_SOUND_ROUTE( 1, "^^^^rspeaker", 1.0 )
@@ -2096,25 +2073,25 @@ static MACHINE_CONFIG_DERIVED( k573a, konami573 )
 	MCFG_CPU_PROGRAM_MAP( konami573a_map )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( pccard1_16mb )
+static MACHINE_CONFIG_START( pccard1_16mb )
 	MCFG_DEVICE_MODIFY( "pccard1" )
 	MCFG_SLOT_OPTION_ADD( "16mb", LINEAR_FLASH_PCCARD_16MB )
 	MCFG_SLOT_DEFAULT_OPTION( "16mb" )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( pccard1_32mb )
+static MACHINE_CONFIG_START( pccard1_32mb )
 	MCFG_DEVICE_MODIFY( "pccard1" )
 	MCFG_SLOT_OPTION_ADD( "32mb", LINEAR_FLASH_PCCARD_32MB )
 	MCFG_SLOT_DEFAULT_OPTION( "32mb" )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( pccard2_32mb )
+static MACHINE_CONFIG_START( pccard2_32mb )
 	MCFG_DEVICE_MODIFY( "pccard2" )
 	MCFG_SLOT_OPTION_ADD( "32mb", LINEAR_FLASH_PCCARD_32MB )
 	MCFG_SLOT_DEFAULT_OPTION( "32mb" )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( pccard2_64mb )
+static MACHINE_CONFIG_START( pccard2_64mb )
 	MCFG_DEVICE_MODIFY( "pccard2" )
 	MCFG_SLOT_OPTION_ADD( "64mb", LINEAR_FLASH_PCCARD_64MB )
 	MCFG_SLOT_DEFAULT_OPTION( "64mb" )
@@ -2131,44 +2108,44 @@ MACHINE_CONFIG_END
 //
 // Up to two carts can be used
 
-static MACHINE_CONFIG_FRAGMENT( cassx )
+static MACHINE_CONFIG_START( cassx )
 	MCFG_DEVICE_MODIFY( "cassette" )
 	MCFG_SLOT_OPTION_ADD( "game", KONAMI573_CASSETTE_X )
 	MCFG_SLOT_DEFAULT_OPTION( "game" )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( cassxi )
+static MACHINE_CONFIG_START( cassxi )
 	MCFG_DEVICE_MODIFY( "cassette" )
 	MCFG_SLOT_OPTION_ADD( "game", KONAMI573_CASSETTE_XI )
 	MCFG_SLOT_DEFAULT_OPTION( "game" )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( cassy )
+static MACHINE_CONFIG_START( cassy )
 	MCFG_DEVICE_MODIFY( "cassette" )
 	MCFG_SLOT_OPTION_ADD( "game", KONAMI573_CASSETTE_Y )
 	MCFG_SLOT_DEFAULT_OPTION( "game" )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( cassyi )
+static MACHINE_CONFIG_START( cassyi )
 	MCFG_DEVICE_MODIFY( "cassette" )
 	MCFG_SLOT_OPTION_ADD( "game", KONAMI573_CASSETTE_YI )
 	MCFG_SLOT_DEFAULT_OPTION( "game" )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( cassyyi )
+static MACHINE_CONFIG_START( cassyyi )
 	MCFG_DEVICE_MODIFY( "cassette" )
 	MCFG_SLOT_OPTION_ADD( "game", KONAMI573_CASSETTE_YI )
 	MCFG_SLOT_OPTION_ADD( "install", KONAMI573_CASSETTE_YI )
 	MCFG_SLOT_DEFAULT_OPTION( "game" )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( casszi )
+static MACHINE_CONFIG_START( casszi )
 	MCFG_DEVICE_MODIFY( "cassette" )
 	MCFG_SLOT_OPTION_ADD( "game", KONAMI573_CASSETTE_ZI )
 	MCFG_SLOT_DEFAULT_OPTION( "game" )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( cassxzi )
+static MACHINE_CONFIG_START( cassxzi )
 	MCFG_DEVICE_MODIFY( "cassette" )
 	MCFG_SLOT_OPTION_ADD( "game", KONAMI573_CASSETTE_ZI )
 	MCFG_SLOT_OPTION_ADD( "install", KONAMI573_CASSETTE_XI )
@@ -2330,7 +2307,9 @@ static MACHINE_CONFIG_DERIVED( fbaitbc, konami573 )
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP( fbaitbc_map )
 
-	MCFG_UPD4701_ADD( "upd4701" )
+	MCFG_DEVICE_ADD("upd4701", UPD4701A, 0)
+	MCFG_UPD4701_PORTY("uPD4701_y")
+
 	MCFG_FRAGMENT_ADD( cassx )
 MACHINE_CONFIG_END
 
@@ -2528,9 +2507,9 @@ static INPUT_PORTS_START( fbaitbc )
 	PORT_BIT( 0x0fff, 0, IPT_MOUSE_Y ) PORT_MINMAX( 0, 0xfff ) PORT_SENSITIVITY( 15 ) PORT_KEYDELTA( 8 ) PORT_RESET
 
 	PORT_START( "uPD4701_switches" )
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_PLAYER( 1 )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER( 1 )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_PLAYER( 1 )
+	PORT_BIT( 0x1, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_PLAYER(1) PORT_WRITE_LINE_DEVICE_MEMBER("upd4701", upd4701_device, middle_w)
+	PORT_BIT( 0x2, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(1) PORT_WRITE_LINE_DEVICE_MEMBER("upd4701", upd4701_device, right_w)
+	PORT_BIT( 0x4, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_PLAYER(1) PORT_WRITE_LINE_DEVICE_MEMBER("upd4701", upd4701_device, left_w)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( fbaitmc )

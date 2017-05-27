@@ -45,34 +45,6 @@
 */
 
 
-namespace {
-
-MACHINE_CONFIG_FRAGMENT( taito68705 )
-	MCFG_CPU_ADD("mcu", M68705P5, DERIVED_CLOCK(1, 1))
-	MCFG_M68705_PORTC_R_CB(READ8(taito68705_mcu_device, mcu_portc_r))
-	MCFG_M68705_PORTA_W_CB(WRITE8(taito68705_mcu_device, mcu_pa_w))
-	MCFG_M68705_PORTB_W_CB(WRITE8(taito68705_mcu_device, mcu_portb_w))
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_FRAGMENT( arkanoid_68705p3 )
-	MCFG_CPU_ADD("mcu", M68705P3, DERIVED_CLOCK(1, 1))
-	MCFG_M68705_PORTB_R_CB(READ8(arkanoid_mcu_device_base, mcu_pb_r))
-	MCFG_M68705_PORTC_R_CB(READ8(arkanoid_mcu_device_base, mcu_pc_r))
-	MCFG_M68705_PORTA_W_CB(WRITE8(arkanoid_mcu_device_base, mcu_pa_w))
-	MCFG_M68705_PORTC_W_CB(WRITE8(arkanoid_mcu_device_base, mcu_pc_w))
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_FRAGMENT( arkanoid_68705p5 )
-	MCFG_CPU_ADD("mcu", M68705P5, DERIVED_CLOCK(1, 1))
-	MCFG_M68705_PORTB_R_CB(READ8(arkanoid_mcu_device_base, mcu_pb_r))
-	MCFG_M68705_PORTC_R_CB(READ8(arkanoid_mcu_device_base, mcu_pc_r))
-	MCFG_M68705_PORTA_W_CB(WRITE8(arkanoid_mcu_device_base, mcu_pa_w))
-	MCFG_M68705_PORTC_W_CB(WRITE8(arkanoid_mcu_device_base, mcu_pc_w))
-MACHINE_CONFIG_END
-
-} // anonymous namespace
-
-
 DEFINE_DEVICE_TYPE(TAITO68705_MCU,       taito68705_mcu_device,       "taito68705",      "Taito MC68705 MCU Interface")
 DEFINE_DEVICE_TYPE(TAITO68705_MCU_TIGER, taito68705_mcu_tiger_device, "taito68705tiger", "Taito MC68705 MCU Interface (Tiger Heli)")
 DEFINE_DEVICE_TYPE(ARKANOID_68705P3,     arkanoid_68705p3_device,     "arkanoid68705p3", "Arkanoid MC68705P3 Interface")
@@ -114,11 +86,6 @@ WRITE_LINE_MEMBER(taito68705_mcu_device_base::reset_w)
 	m_mcu->set_input_line(INPUT_LINE_RESET, state);
 }
 
-WRITE8_MEMBER(taito68705_mcu_device_base::mcu_pa_w)
-{
-	m_pa_output = data;
-}
-
 taito68705_mcu_device_base::taito68705_mcu_device_base(
 		machine_config const &mconfig,
 		device_type type,
@@ -136,6 +103,11 @@ taito68705_mcu_device_base::taito68705_mcu_device_base(
 	, m_mcu_latch(0xff)
 	, m_pa_output(0xff)
 {
+}
+
+WRITE8_MEMBER(taito68705_mcu_device_base::mcu_pa_w)
+{
+	m_pa_output = data;
 }
 
 void taito68705_mcu_device_base::device_start()
@@ -217,10 +189,12 @@ taito68705_mcu_device::taito68705_mcu_device(const machine_config &mconfig, devi
 {
 }
 
-machine_config_constructor taito68705_mcu_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME(taito68705);
-}
+MACHINE_CONFIG_MEMBER(taito68705_mcu_device::device_add_mconfig)
+	MCFG_CPU_ADD("mcu", M68705P5, DERIVED_CLOCK(1, 1))
+	MCFG_M68705_PORTC_R_CB(READ8(taito68705_mcu_device, mcu_portc_r))
+	MCFG_M68705_PORTA_W_CB(WRITE8(taito68705_mcu_device, mcu_pa_w))
+	MCFG_M68705_PORTB_W_CB(WRITE8(taito68705_mcu_device, mcu_portb_w))
+MACHINE_CONFIG_END
 
 void taito68705_mcu_device::device_start()
 {
@@ -295,6 +269,18 @@ READ8_MEMBER(taito68705_mcu_tiger_device::mcu_portc_r)
 
 // Arkanoid/Puzznic (latch control on PC2 and PC3 instead of PB1 and PB2)
 
+arkanoid_mcu_device_base::arkanoid_mcu_device_base(
+		machine_config const &mconfig,
+		device_type type,
+		char const *tag,
+		device_t *owner,
+		u32 clock)
+	: taito68705_mcu_device_base(mconfig, type, tag, owner, clock)
+	, m_portb_r_cb(*this)
+	, m_pc_output(0xff)
+{
+}
+
 READ8_MEMBER(arkanoid_mcu_device_base::mcu_pb_r)
 {
 	return m_portb_r_cb(space, offset, mem_mask);
@@ -312,18 +298,6 @@ WRITE8_MEMBER(arkanoid_mcu_device_base::mcu_pc_w)
 	// rising edge on PC2 clears the host semaphore flag
 	// PC3 sets the MCU semaphore when low
 	latch_control(data, m_pc_output, 2, 3);
-}
-
-arkanoid_mcu_device_base::arkanoid_mcu_device_base(
-		machine_config const &mconfig,
-		device_type type,
-		char const *tag,
-		device_t *owner,
-		u32 clock)
-	: taito68705_mcu_device_base(mconfig, type, tag, owner, clock)
-	, m_portb_r_cb(*this)
-	, m_pc_output(0xff)
-{
 }
 
 void arkanoid_mcu_device_base::device_start()
@@ -347,10 +321,13 @@ arkanoid_68705p3_device::arkanoid_68705p3_device(
 {
 }
 
-machine_config_constructor arkanoid_68705p3_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME(arkanoid_68705p3);
-}
+MACHINE_CONFIG_MEMBER(arkanoid_68705p3_device::device_add_mconfig)
+	MCFG_CPU_ADD("mcu", M68705P3, DERIVED_CLOCK(1, 1))
+	MCFG_M68705_PORTB_R_CB(READ8(arkanoid_68705p3_device, mcu_pb_r))
+	MCFG_M68705_PORTC_R_CB(READ8(arkanoid_68705p3_device, mcu_pc_r))
+	MCFG_M68705_PORTA_W_CB(WRITE8(arkanoid_68705p3_device, mcu_pa_w))
+	MCFG_M68705_PORTC_W_CB(WRITE8(arkanoid_68705p3_device, mcu_pc_w))
+MACHINE_CONFIG_END
 
 
 arkanoid_68705p5_device::arkanoid_68705p5_device(
@@ -362,7 +339,10 @@ arkanoid_68705p5_device::arkanoid_68705p5_device(
 {
 }
 
-machine_config_constructor arkanoid_68705p5_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME(arkanoid_68705p5);
-}
+MACHINE_CONFIG_MEMBER(arkanoid_68705p5_device::device_add_mconfig)
+	MCFG_CPU_ADD("mcu", M68705P5, DERIVED_CLOCK(1, 1))
+	MCFG_M68705_PORTB_R_CB(READ8(arkanoid_68705p5_device, mcu_pb_r))
+	MCFG_M68705_PORTC_R_CB(READ8(arkanoid_68705p5_device, mcu_pc_r))
+	MCFG_M68705_PORTA_W_CB(WRITE8(arkanoid_68705p5_device, mcu_pa_w))
+	MCFG_M68705_PORTC_W_CB(WRITE8(arkanoid_68705p5_device, mcu_pc_w))
+MACHINE_CONFIG_END

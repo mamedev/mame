@@ -49,7 +49,7 @@ void neogeo_kof10th_cart_device::device_reset()
  mapper specific handlers
  -------------------------------------------------*/
 
-static MACHINE_CONFIG_FRAGMENT( kof10th_cart )
+static MACHINE_CONFIG_START( kof10th_cart )
 	MCFG_NEOBOOT_PROT_ADD("bootleg_prot")
 MACHINE_CONFIG_END
 

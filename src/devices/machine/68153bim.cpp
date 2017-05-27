@@ -66,7 +66,7 @@ DEFINE_DEVICE_TYPE(EI68C153,        ei68c153_device,  "ei68c153",         "EPIC 
 //-------------------------------------------------
 //  device_mconfig_additions -
 //-------------------------------------------------
-MACHINE_CONFIG_FRAGMENT( m68153 )
+MACHINE_CONFIG_START( m68153 )
 	MCFG_DEVICE_ADD(CHN0_TAG, MC68153_CHANNEL, 0)
 	MCFG_DEVICE_ADD(CHN1_TAG, MC68153_CHANNEL, 0)
 	MCFG_DEVICE_ADD(CHN2_TAG, MC68153_CHANNEL, 0)

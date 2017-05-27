@@ -196,6 +196,11 @@
 #include "emu.h"
 #include "genboard.h"
 
+DEFINE_DEVICE_TYPE_NS(GENEVE_KEYBOARD, bus::ti99::internal, geneve_keyboard_device, "geneve_keyboard", "Geneve XT-style keyboard")
+DEFINE_DEVICE_TYPE_NS(GENEVE_MAPPER, bus::ti99::internal, geneve_mapper_device, "geneve_mapper", "Geneve Gate Array")
+
+namespace bus { namespace ti99 { namespace internal {
+
 #define TRACE_READ 0
 #define TRACE_WRITE 0
 #define TRACE_DETAIL 0
@@ -1507,8 +1512,6 @@ void geneve_mapper_device::device_reset()
 	}
 }
 
-DEFINE_DEVICE_TYPE(GENEVE_MAPPER, geneve_mapper_device, "geneve_mapper", "Geneve Gate Array")
-
 /****************************************************************************
     Keyboard support
 ****************************************************************************/
@@ -2008,4 +2011,5 @@ ioport_constructor geneve_keyboard_device::device_input_ports() const
 	return INPUT_PORTS_NAME( genkeys );
 }
 
-DEFINE_DEVICE_TYPE(GENEVE_KEYBOARD, geneve_keyboard_device, "geneve_keyboard", "Geneve XT-style keyboard")
+} } } // end namespace bus::ti99::internal
+

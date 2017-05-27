@@ -365,10 +365,10 @@ WRITE8_MEMBER( d9060_device_base::scsi_data_w )
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( d9060 )
+//  MACHINE_CONFIG_START( d9060 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( d9060 )
+static MACHINE_CONFIG_START( d9060 )
 	// DOS
 	MCFG_CPU_ADD(M6502_DOS_TAG, M6502, XTAL_4MHz/4)
 	MCFG_CPU_PROGRAM_MAP(d9060_main_mem)

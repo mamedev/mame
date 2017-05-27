@@ -727,18 +727,6 @@ INPUT_PORTS_START( hle_type5_jp_device )
 	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Kana")         PORT_CODE(KEYCODE_RALT) // かな
 INPUT_PORTS_END
 
-
-
-/***************************************************************************
-    MACHINE CONFIGURATION FRAGMENTS
-***************************************************************************/
-
-MACHINE_CONFIG_FRAGMENT(sparc_keyboard)
-	MCFG_SPEAKER_STANDARD_MONO("bell")
-	MCFG_SOUND_ADD("beeper", BEEP, ATTOSECONDS_TO_HZ(480 * ATTOSECONDS_PER_MICROSECOND))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bell", 1.0)
-MACHINE_CONFIG_END
-
 } // anonymous namespace
 
 
@@ -784,17 +772,6 @@ hle_device_base::~hle_device_base()
 
 
 /*--------------------------------------------------
-    hle_device_base::device_mconfig_additions
-    get machine configuration additions
---------------------------------------------------*/
-
-machine_config_constructor hle_device_base::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME(sparc_keyboard);
-}
-
-
-/*--------------------------------------------------
     hle_device_base::input_txd
     handle serial input line changes
 --------------------------------------------------*/
@@ -803,6 +780,18 @@ WRITE_LINE_MEMBER( hle_device_base::input_txd )
 {
 	device_buffered_serial_interface::rx_w(state);
 }
+
+
+/*--------------------------------------------------
+    hle_device_base::device_add_mconfig
+    add machine configuration
+--------------------------------------------------*/
+
+MACHINE_CONFIG_MEMBER(hle_device_base::device_add_mconfig)
+	MCFG_SPEAKER_STANDARD_MONO("bell")
+	MCFG_SOUND_ADD("beeper", BEEP, ATTOSECONDS_TO_HZ(480 * ATTOSECONDS_PER_MICROSECOND))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bell", 1.0)
+MACHINE_CONFIG_END
 
 
 /*--------------------------------------------------

@@ -35,12 +35,12 @@ public:
 	DECLARE_READ16_MEMBER( read );
 	DECLARE_WRITE16_MEMBER( write );
 
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	void command_write(uint16_t data);
 	uint16_t status_read();
@@ -53,6 +53,7 @@ protected:
 	void position_head();
 	void read_sector();
 	void write_sector(int ddam);
+
 private:
 	enum rx01_state {
 		RX01_FILL,

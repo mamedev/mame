@@ -42,10 +42,10 @@ void vp575_device::update_interrupts()
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( vp575 )
+//  MACHINE_CONFIG_START( vp575 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( vp575 )
+static MACHINE_CONFIG_START( vp575 )
 	MCFG_VIP_EXPANSION_SLOT_ADD("exp1", XTAL_3_52128MHz/2, vip_expansion_cards, nullptr)
 	MCFG_VIP_EXPANSION_SLOT_INT_CALLBACK(WRITELINE(vp575_device, exp1_int_w))
 	MCFG_VIP_EXPANSION_SLOT_DMA_OUT_CALLBACK(WRITELINE(vp575_device, exp1_dma_out_w))

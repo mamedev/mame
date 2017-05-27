@@ -48,7 +48,7 @@ mach32_device::mach32_device(const machine_config &mconfig, device_type type, co
 {
 }
 
-static MACHINE_CONFIG_FRAGMENT( mach32_8514a )
+static MACHINE_CONFIG_START( mach32_8514a )
 	MCFG_DEVICE_ADD("8514a", ATIMACH32_8514A, 0)
 	MCFG_EEPROM_SERIAL_93C56_ADD("ati_eeprom")
 MACHINE_CONFIG_END
@@ -115,7 +115,7 @@ mach64_device::mach64_device(const machine_config &mconfig, device_type type, co
 {
 }
 
-static MACHINE_CONFIG_FRAGMENT( mach64_8514a )
+static MACHINE_CONFIG_START( mach64_8514a )
 	MCFG_DEVICE_ADD("8514a", ATIMACH64_8514A, 0)
 	MCFG_EEPROM_SERIAL_93C56_ADD("ati_eeprom")
 MACHINE_CONFIG_END

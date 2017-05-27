@@ -28,6 +28,9 @@
 #include "sound/wave.h"
 #include "speaker.h"
 
+DEFINE_DEVICE_TYPE_NS(TI99_SPEECH, bus::ti99::peb, ti_speech_synthesizer_device, "ti99_speech", "TI-99 Speech synthesizer (on adapter card)")
+
+namespace bus { namespace ti99 { namespace peb {
 
 #define TRACE_MEM 0
 #define TRACE_ADDR 0
@@ -149,7 +152,7 @@ void ti_speech_synthesizer_device::device_reset()
 	m_sbe = false;
 }
 
-MACHINE_CONFIG_FRAGMENT( ti99_speech )
+MACHINE_CONFIG_START( ti99_speech )
 	MCFG_DEVICE_ADD("vsm", SPEECHROM, 0)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -175,4 +178,5 @@ const tiny_rom_entry *ti_speech_synthesizer_device::device_rom_region() const
 	return ROM_NAME( ti99_speech );
 }
 
-DEFINE_DEVICE_TYPE(TI99_SPEECH, ti_speech_synthesizer_device, "ti99_speech", "TI-99 Speech synthesizer (on adapter card)")
+} } } // end namespace bus::ti99::peb
+

@@ -63,7 +63,7 @@ const int mos6551_device::transmitter_controls[4][3] =
 	{0, 1, 1}
 };
 
-static MACHINE_CONFIG_FRAGMENT( mos6551 )
+static MACHINE_CONFIG_START( mos6551 )
 	MCFG_DEVICE_ADD("clock", CLOCK, 0)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(mos6551_device, internal_clock))
 MACHINE_CONFIG_END

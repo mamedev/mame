@@ -20,10 +20,11 @@
 #include "peribox.h"
 #include "video/v9938.h"
 #include "sound/sn76496.h"
-#include "bus/ti99x/ti99defs.h"
+#include "bus/ti99/ti99defs.h"
 #include "bus/ti99/colorbus/colorbus.h"
+#include "bus/ti99/internal/evpcconn.h"
 
-DECLARE_DEVICE_TYPE(TI99_EVPC, snug_enhanced_video_device)
+namespace bus { namespace ti99 { namespace peb {
 
 class snug_enhanced_video_device : public ti_expansion_card_device, public device_nvram_interface
 {
@@ -82,8 +83,12 @@ private:
 	evpc_palette                            m_palette;
 	required_device<v9938_device>           m_video;
 	required_device<sn76496_base_device>    m_sound;
-	required_device<ti99_colorbus_device>   m_colorbus;
-	evpc_clock_connector*                   m_console_conn;
+	required_device<bus::ti99::colorbus::ti99_colorbus_device>   m_colorbus;
+	bus::ti99::internal::evpc_clock_connector*                   m_console_conn;
 };
+
+} } } // end namespace bus::ti99::peb
+
+DECLARE_DEVICE_TYPE_NS(TI99_EVPC, bus::ti99::peb, snug_enhanced_video_device)
 
 #endif // MAME_BUS_TI99_PEB_EVPC_H

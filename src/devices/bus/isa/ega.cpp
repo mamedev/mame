@@ -463,7 +463,7 @@ located at I/O port 0x3CE, and a data register located at I/O port 0x3CF.
     Prototypes
 */
 
-MACHINE_CONFIG_FRAGMENT( pcvideo_ega )
+MACHINE_CONFIG_START( pcvideo_ega )
 	MCFG_SCREEN_ADD(EGA_SCREEN_NAME, RASTER)
 	MCFG_SCREEN_RAW_PARAMS(16257000,912,0,640,262,0,200)
 	MCFG_SCREEN_UPDATE_DEVICE(EGA_CRTC_NAME, crtc_ega_device, screen_update)

@@ -112,7 +112,7 @@ void nes_state::machine_start()
 //  INPUTS
 //-------------------------------------------------
 
-READ8_MEMBER(nes_state::nes_in0_r)
+READ8_MEMBER(nes_base_state::nes_in0_r)
 {
 	uint8_t ret = 0x40;
 	ret |= m_ctrl1->read_bit0();
@@ -120,7 +120,7 @@ READ8_MEMBER(nes_state::nes_in0_r)
 	return ret;
 }
 
-READ8_MEMBER(nes_state::nes_in1_r)
+READ8_MEMBER(nes_base_state::nes_in1_r)
 {
 	uint8_t ret = 0x40;
 	ret |= m_ctrl2->read_bit0();
@@ -128,7 +128,7 @@ READ8_MEMBER(nes_state::nes_in1_r)
 	return ret;
 }
 
-WRITE8_MEMBER(nes_state::nes_in0_w)
+WRITE8_MEMBER(nes_base_state::nes_in0_w)
 {
 	m_ctrl1->write(data);
 	m_ctrl2->write(data);

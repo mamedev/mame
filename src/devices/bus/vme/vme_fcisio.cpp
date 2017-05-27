@@ -177,7 +177,7 @@ ADDRESS_MAP_END
 /*
  * Machine configuration
  */
-static MACHINE_CONFIG_FRAGMENT (fcisio1)
+static MACHINE_CONFIG_START (fcisio1)
 	/* basic machine hardware */
 	MCFG_CPU_ADD ("maincpu", M68010, CPU_CLOCK / 2)
 	MCFG_CPU_PROGRAM_MAP (fcisio1_mem)

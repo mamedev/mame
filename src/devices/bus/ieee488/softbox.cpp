@@ -229,10 +229,10 @@ DEVICE_INPUT_DEFAULTS_END
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( softbox )
+//  MACHINE_CONFIG_START( softbox )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( softbox )
+static MACHINE_CONFIG_START( softbox )
 	// basic machine hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/2)
 	MCFG_CPU_PROGRAM_MAP(softbox_mem)

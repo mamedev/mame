@@ -246,7 +246,7 @@ void hh_ucom4_state::set_interrupt(int state)
 
 	if (state != m_int)
 	{
-		if (machine().phase() >= MACHINE_PHASE_RESET)
+		if (machine().phase() >= machine_phase::RESET)
 			m_maincpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 		m_int = state;
 	}

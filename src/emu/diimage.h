@@ -28,9 +28,6 @@
 
 extern struct io_procs image_ioprocs;
 
-class software_list;
-class software_list_loader;
-
 enum iodevice_t
 {
 	/* List of all supported devices.  Refer to the device by these names only */
@@ -93,11 +90,6 @@ private:
 	std::string                 m_optspec;
 };
 
-
-class device_image_interface;
-struct feature_list;
-class software_part;
-class software_info;
 
 enum class image_init_result { PASS, FAIL };
 enum class image_verify_result { PASS, FAIL };

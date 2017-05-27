@@ -646,6 +646,20 @@ machine_config_constructor device_t::device_mconfig_additions() const
 
 
 //-------------------------------------------------
+//  device_add_mconfig - add device-specific
+//  machine configuration
+//-------------------------------------------------
+
+void device_t::device_add_mconfig(machine_config &config)
+{
+	// backwards-compatibility for devices using free functions
+	machine_config_constructor const additions(device_mconfig_additions());
+	if (additions)
+		additions(config, this, nullptr);
+}
+
+
+//-------------------------------------------------
 //  input_ports - return a pointer to the implicit
 //  input ports description for this device
 //-------------------------------------------------

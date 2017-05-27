@@ -299,6 +299,7 @@ GND  8A 8B GND
 #include "machine/i8255.h"
 #include "machine/mc8123.h"
 #include "machine/segacrp2_device.h"
+#include "machine/upd4701.h"
 #include "sound/sn76496.h"
 #include "video/315_5124.h"
 #include "speaker.h"
@@ -324,8 +325,6 @@ public:
 	DECLARE_WRITE8_MEMBER(bank_write);
 	DECLARE_WRITE8_MEMBER(coin_counters_write);
 
-	DECLARE_READ8_MEMBER( ridleofp_port_f8_read );
-	DECLARE_WRITE8_MEMBER( ridleofp_port_fa_write );
 	DECLARE_READ8_MEMBER( hangonjr_port_f8_read );
 	DECLARE_WRITE8_MEMBER( hangonjr_port_fa_write );
 
@@ -345,10 +344,6 @@ public:
 
 	// Analog input related
 	uint8_t m_port_select;
-	uint16_t m_last1;
-	uint16_t m_last2;
-	uint16_t m_diff1;
-	uint16_t m_diff2;
 
 	// Video RAM
 	uint8_t m_vram[2][0x4000 * 2];
@@ -455,10 +450,6 @@ void systeme_state::machine_start()
 	}
 
 	save_item(NAME(m_port_select));
-	save_item(NAME(m_last1));
-	save_item(NAME(m_last2));
-	save_item(NAME(m_diff1));
-	save_item(NAME(m_diff2));
 	save_item(NAME(m_vram));
 }
 
@@ -483,41 +474,6 @@ WRITE8_MEMBER( systeme_state::hangonjr_port_fa_write)
 {
 	/* Seems to write the same pattern again and again bits ---- xx-x used */
 	m_port_select = data & 0x0f;
-}
-
-/*- Riddle of Pythagoras Specific -*/
-
-READ8_MEMBER( systeme_state::ridleofp_port_f8_read )
-{
-	switch (m_port_select)
-	{
-		default:
-		case 0: return m_diff1 & 0xff;
-		case 1: return m_diff1 >> 8;
-		case 2: return m_diff2 & 0xff;
-		case 3: return m_diff2 >> 8;
-	}
-}
-
-WRITE8_MEMBER( systeme_state::ridleofp_port_fa_write )
-{
-	/* 0x10 is written before reading the dial (hold counters?) */
-	/* 0x03 is written after reading the dial (reset counters?) */
-
-	m_port_select = (data & 0x0c) >> 2;
-
-	if (data & 1)
-	{
-		int curr = ioport("IN2")->read();
-		m_diff1 = ((curr - m_last1) & 0x0fff) | (curr & 0xf000);
-		m_last1 = curr;
-	}
-	if (data & 2)
-	{
-		int curr = ioport("IN3")->read() & 0x0fff;
-		m_diff2 = ((curr - m_last2) & 0x0fff) | (curr & 0xf000);
-		m_last2 = curr;
-	}
 }
 
 
@@ -717,19 +673,16 @@ static INPUT_PORTS_START( segae_ridleofp_generic )
 	//PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNUSED )
 	//PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNUSED )
 
-	PORT_START("IN2")   /* Read from Port 0xf8 */
-	PORT_BIT( 0x0fff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(60) PORT_KEYDELTA(125)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW,  IPT_BUTTON2 ) /* is this used in the game? */
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW,  IPT_BUTTON1 )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_START("PAD1")
+	PORT_BIT( 0xfff, 0x000, IPT_DIAL ) PORT_SENSITIVITY(60) PORT_KEYDELTA(125) PORT_RESET
 
-	PORT_START("IN3")   /* Read from Port 0xf8 */
-	PORT_BIT( 0x0fff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(60) PORT_KEYDELTA(125) PORT_COCKTAIL
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_COCKTAIL
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_START("PAD2")
+	PORT_BIT( 0xfff, 0x000, IPT_DIAL ) PORT_SENSITIVITY(60) PORT_KEYDELTA(125) PORT_RESET PORT_COCKTAIL
+
+	PORT_START("BUTTONS")
+	PORT_BIT( 0x1, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_WRITE_LINE_DEVICE_MEMBER("upd4701", upd4701_device, middle_w) // is this used in the game?
+	PORT_BIT( 0x2, IP_ACTIVE_LOW,  IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER("upd4701", upd4701_device, right_w)
+	PORT_BIT( 0x4, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_WRITE_LINE_DEVICE_MEMBER("upd4701", upd4701_device, left_w)
 INPUT_PORTS_END
 
 
@@ -1044,9 +997,17 @@ static MACHINE_CONFIG_DERIVED( hangonjr, systeme )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ridleofp, systeme )
+	MCFG_DEVICE_ADD("upd4701", UPD4701A, 0)
+	MCFG_UPD4701_PORTX("PAD1")
+	MCFG_UPD4701_PORTY("PAD2")
+
 	MCFG_DEVICE_MODIFY("ppi")
-	MCFG_I8255_IN_PORTA_CB(READ8(systeme_state, ridleofp_port_f8_read))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(systeme_state, ridleofp_port_fa_write))
+	MCFG_I8255_IN_PORTA_CB(DEVREAD8("upd4701", upd4701_device, d_r))
+	MCFG_I8255_OUT_PORTC_CB(DEVWRITELINE("upd4701", upd4701_device, cs_w)) MCFG_DEVCB_BIT(4)
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("upd4701", upd4701_device, xy_w)) MCFG_DEVCB_BIT(3)
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("upd4701", upd4701_device, ul_w)) MCFG_DEVCB_BIT(2)
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("upd4701", upd4701_device, resetx_w)) MCFG_DEVCB_BIT(1) // or possibly bit 0
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("upd4701", upd4701_device, resety_w)) MCFG_DEVCB_BIT(0) // or possibly bit 1
 MACHINE_CONFIG_END
 
 

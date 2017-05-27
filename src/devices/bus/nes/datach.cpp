@@ -202,7 +202,7 @@ uint8_t *nes_datach_rom_device::get_cart_base()
 }
 
 
-MACHINE_CONFIG_FRAGMENT( subcart_i2c_24c01 )
+MACHINE_CONFIG_START( subcart_i2c_24c01 )
 	MCFG_24C01_ADD("i2cmem")
 MACHINE_CONFIG_END
 
@@ -373,7 +373,7 @@ static SLOT_INTERFACE_START(datach_cart)
 SLOT_INTERFACE_END
 
 
-MACHINE_CONFIG_FRAGMENT( bandai_datach )
+MACHINE_CONFIG_START( bandai_datach )
 	MCFG_BARCODE_READER_ADD("datach")
 	MCFG_DATACH_MINICART_ADD("datach_slot", datach_cart)
 	MCFG_24C02_ADD("i2cmem")

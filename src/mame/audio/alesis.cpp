@@ -25,13 +25,6 @@ DEFINE_DEVICE_TYPE(ALESIS_DM3AG, alesis_dm3ag_device, "alesis_dm3ag", "Alesis DM
     IMPLEMENTATION
 ***************************************************************************/
 
-static MACHINE_CONFIG_FRAGMENT( alesis_dm3ag )
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker1", "rspeaker1")
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker2", "rspeaker2")
-	MCFG_SOUND_ADD("dac", PCM54HP, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker1", 1.0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker1", 1.0) // PCM54HP DAC + R63/R73-75 + Sample and hold
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  alesis_dm3ag_device - constructor
@@ -45,13 +38,16 @@ alesis_dm3ag_device::alesis_dm3ag_device(const machine_config &mconfig, const ch
 }
 
 //-------------------------------------------------
-//  device_mconfig_additions
+//  device_add_mconfig
 //-------------------------------------------------
 
-machine_config_constructor alesis_dm3ag_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( alesis_dm3ag );
-}
+MACHINE_CONFIG_MEMBER( alesis_dm3ag_device::device_add_mconfig )
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker1", "rspeaker1")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker2", "rspeaker2")
+	MCFG_SOUND_ADD("dac", PCM54HP, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker1", 1.0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker1", 1.0) // PCM54HP DAC + R63/R73-75 + Sample and hold
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  device_start - device-specific startup

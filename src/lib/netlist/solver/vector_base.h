@@ -35,31 +35,40 @@ private:
 #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #endif
 
-template<typename T>
-inline static void vec_set (const std::size_t n, const T scalar, T * RESTRICT result)
+template<typename T, std::size_t N>
+inline static void vec_set (const std::size_t n, const T scalar, T (& RESTRICT v)[N])
 {
-	for ( std::size_t i = 0; i < n; i++ )
-		result[i] = scalar;
+	if (n != N)
+		for ( std::size_t i = 0; i < n; i++ )
+			v[i] = scalar;
+	else
+		for ( std::size_t i = 0; i < N; i++ )
+			v[i] = scalar;
 }
 
-template<typename T>
-inline static T vecmult (const std::size_t n, const T * RESTRICT a1, const T * RESTRICT a2 )
+template<typename T, std::size_t N>
+inline static T vec_mult (const std::size_t n, const T (& RESTRICT v1)[N], const T (& RESTRICT v2)[N] )
 {
 	T value = 0.0;
-	for ( std::size_t i = 0; i < n; i++ )
-		value = value + a1[i] * a2[i];
+	if (n != N)
+		for ( std::size_t i = 0; i < n; i++ )
+			value += v1[i] * v2[i];
+	else
+		for ( std::size_t i = 0; i < N; i++ )
+			value += v1[i] * v2[i];
 	return value;
 }
 
-template<typename T>
-inline static T vecmult2 (const std::size_t n, const T *a1)
+template<typename T, std::size_t N>
+inline static T vec_mult2 (const std::size_t n, const T (& RESTRICT v)[N])
 {
 	T value = 0.0;
-	for ( std::size_t i = 0; i < n; i++ )
-	{
-		const T temp = a1[i];
-		value = value + temp * temp;
-	}
+	if (n != N)
+		for ( std::size_t i = 0; i < n; i++ )
+			value += v[i] * v[i];
+	else
+		for ( std::size_t i = 0; i < N; i++ )
+			value += v[i] * v[i];
 	return value;
 }
 
@@ -98,18 +107,26 @@ inline static void vec_add_ip(const std::size_t n, const double * RESTRICT v, do
 		result[i] += v[i];
 }
 
-template<typename T>
-inline void vec_sub(const std::size_t n, const T * RESTRICT v1, const T * RESTRICT v2, T * RESTRICT result)
+template<typename T, std::size_t N>
+inline void vec_sub(const std::size_t n, const T (& RESTRICT v1)[N], const T (& RESTRICT v2)[N], T (& RESTRICT result)[N])
 {
-	for ( std::size_t i = 0; i < n; i++ )
-		result[i] = v1[i] - v2[i];
+	if (n != N)
+		for ( std::size_t i = 0; i < n; i++ )
+			result[i] = v1[i] - v2[i];
+	else
+		for ( std::size_t i = 0; i < N; i++ )
+			result[i] = v1[i] - v2[i];
 }
 
-template<typename T>
-inline void vec_scale (const std::size_t n, T * RESTRICT v, const T scalar)
+template<typename T, std::size_t N>
+inline void vec_scale(const std::size_t n, T (& RESTRICT v)[N], const T scalar)
 {
-	for ( std::size_t i = 0; i < n; i++ )
-		v[i] = scalar * v[i];
+	if (n != N)
+		for ( std::size_t i = 0; i < n; i++ )
+			v[i] = scalar * v[i];
+	else
+		for ( std::size_t i = 0; i < N; i++ )
+			v[i] = scalar * v[i];
 }
 
 inline double vec_maxabs(const std::size_t n, const double * RESTRICT v)

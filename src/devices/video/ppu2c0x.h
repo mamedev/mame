@@ -102,20 +102,31 @@ public:
 		// are non-rendering and non-vblank.
 	};
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( palette_read );
-	DECLARE_WRITE8_MEMBER( palette_write );
+	virtual DECLARE_READ8_MEMBER( read );
+	virtual DECLARE_WRITE8_MEMBER( write );
+	virtual DECLARE_READ8_MEMBER( palette_read );
+	virtual DECLARE_WRITE8_MEMBER( palette_write );
 
 	static void set_cpu_tag(device_t &device, const char *tag) { downcast<ppu2c0x_device &>(device).m_cpu.set_tag(tag); }
 	static void set_color_base(device_t &device, int colorbase) { downcast<ppu2c0x_device &>(device).m_color_base = colorbase; }
 	static void set_nmi_delegate(device_t &device, nmi_delegate &&cb);
 
 	/* routines */
-	void init_palette( palette_device &palette, int first_entry );
-	void init_palette_rgb( palette_device &palette, int first_entry );
+	virtual void init_palette(palette_device &palette, int first_entry);
+	void init_palette(palette_device &palette, int first_entry, bool indirect);
+	void init_palette_rgb(palette_device &palette, int first_entry);
 
+	virtual void read_tile_plane_data(int address, int color);
+	virtual void shift_tile_plane_data(uint8_t &pix);
+	virtual void draw_tile_pixel(uint8_t pix, int color, uint16_t back_pen, uint16_t *&dest, const pen_t *color_table);
+	virtual void draw_tile(uint8_t *line_priority, int color_byte, int color_bits, int address, int start_x, uint16_t back_pen, uint16_t *&dest, const pen_t *color_table);
 	void draw_background( uint8_t *line_priority );
+	
+	virtual void read_sprite_plane_data(int address);
+	virtual void make_sprite_pixel_data(uint8_t &pixel_data, int flipx);
+	virtual void draw_sprite_pixel(int sprite_xpos, int color, int pixel, uint8_t pixel_data, bitmap_ind16& bitmap);
+	virtual void read_extra_sprite_bits(int sprite_index);
+
 	void draw_sprites( uint8_t *line_priority );
 	void render_scanline();
 	void update_scanline();
@@ -203,6 +214,11 @@ protected:
 	int                         m_security_value;       /* 2C05 protection */
 	int                         m_vblank_first_scanline;  /* the very first scanline where VBLANK occurs */
 
+	// used in rendering
+	uint8_t m_planebuf[2];
+	int                         m_scanline;         /* scanline count */
+	std::unique_ptr<uint8_t[]>  m_spriteram;           /* sprite ram */
+
 private:
 	static constexpr device_timer_id TIMER_HBLANK = 0;
 	static constexpr device_timer_id TIMER_NMI = 1;
@@ -212,14 +228,14 @@ private:
 	inline void writebyte(offs_t address, uint8_t data);
 
 	std::unique_ptr<bitmap_ind16>                m_bitmap;          /* target bitmap */
-	std::unique_ptr<uint8_t[]>  m_spriteram;           /* sprite ram */
 	std::unique_ptr<pen_t[]>    m_colortable;          /* color table modified at run time */
 	std::unique_ptr<pen_t[]>    m_colortable_mono;     /* monochromatic color table modified at run time */
-	int                         m_scanline;         /* scanline count */
+
 	scanline_delegate           m_scanline_callback_proc;   /* optional scanline callback */
 	hblank_delegate             m_hblank_callback_proc; /* optional hblank callback */
 	vidaccess_delegate          m_vidaccess_callback_proc;  /* optional video access callback */
 	nmi_delegate                m_nmi_callback_proc;        /* nmi access callback from interface */
+
 	int                         m_regs[PPU_MAX_REG];        /* registers */
 	int                         m_refresh_data;         /* refresh-related */
 	int                         m_refresh_latch;        /* refresh-related */

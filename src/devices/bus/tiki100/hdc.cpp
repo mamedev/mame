@@ -27,10 +27,10 @@ DEFINE_DEVICE_TYPE(TIKI100_HDC, tiki100_hdc_device, "tiki100_hdc", "TIKI-100 Win
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( tiki100_hdc )
+//  MACHINE_CONFIG_START( tiki100_hdc )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( tiki100_hdc )
+static MACHINE_CONFIG_START( tiki100_hdc )
 	MCFG_DEVICE_ADD(WD1010_TAG, WD2010, 5000000)
 	//MCFG_WD2010_OUT_INTRQ_CB()
 	MCFG_WD2010_IN_DRDY_CB(VCC)

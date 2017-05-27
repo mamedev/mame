@@ -25,10 +25,10 @@
 DEFINE_DEVICE_TYPE(Z88_1024K_FLASH, z88_1024k_flash_device, "z88_1024k_flash", "Z88 1024KB Flash")
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( z88_flash )
+//  MACHINE_CONFIG_START( z88_flash )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT(z88_flash)
+static MACHINE_CONFIG_START(z88_flash)
 	MCFG_INTEL_E28F008SA_ADD(FLASH_TAG)
 MACHINE_CONFIG_END
 

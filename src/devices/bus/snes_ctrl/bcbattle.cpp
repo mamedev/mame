@@ -20,7 +20,7 @@
 DEFINE_DEVICE_TYPE(SNES_BARCODE_BATTLER, snes_bcbattle_device, "snes_bcbattle", "Epoch Barcode Battler (SFC)")
 
 
-MACHINE_CONFIG_FRAGMENT( snes_battler )
+MACHINE_CONFIG_START( snes_battler )
 	MCFG_BARCODE_READER_ADD("battler")
 MACHINE_CONFIG_END
 

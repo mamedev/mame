@@ -2401,7 +2401,7 @@ MACHINE_CONFIG_END
 
 
 /* this describes the additional 8751 MCU when present */
-static MACHINE_CONFIG_FRAGMENT( mcu )
+static MACHINE_CONFIG_START( mcu )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

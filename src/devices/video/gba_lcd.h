@@ -88,8 +88,6 @@ class gba_lcd_device
 public:
 	gba_lcd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
 	DECLARE_READ32_MEMBER(video_r);
 	DECLARE_WRITE32_MEMBER(video_w);
 	DECLARE_READ32_MEMBER(gba_pram_r);
@@ -98,7 +96,6 @@ public:
 	DECLARE_WRITE32_MEMBER(gba_vram_w);
 	DECLARE_READ32_MEMBER(gba_oam_r);
 	DECLARE_WRITE32_MEMBER(gba_oam_w);
-	DECLARE_PALETTE_INIT(gba);
 	TIMER_CALLBACK_MEMBER(perform_hbl);
 	TIMER_CALLBACK_MEMBER(perform_scan);
 
@@ -131,7 +128,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	struct internal_reg
@@ -228,6 +225,10 @@ private:
 	uint32_t alpha_blend(uint32_t color0, uint32_t color1);
 	uint32_t increase_brightness(uint32_t color);
 	uint32_t decrease_brightness(uint32_t color);
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_PALETTE_INIT(gba);
+
 
 	devcb_write_line m_int_hblank_cb;   /* H-Blank interrupt callback function */
 	devcb_write_line m_int_vblank_cb;   /* V-Blank interrupt callback function */

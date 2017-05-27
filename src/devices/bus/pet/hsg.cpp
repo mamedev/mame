@@ -86,10 +86,10 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( cbm8000_hsg_a )
+//  MACHINE_CONFIG_START( cbm8000_hsg_a )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( cbm8000_hsg_a )
+static MACHINE_CONFIG_START( cbm8000_hsg_a )
 	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
 	MCFG_SCREEN_UPDATE_DEVICE(EF9365_TAG, ef9365_device, screen_update)
 	MCFG_SCREEN_SIZE(512, 512)
@@ -107,10 +107,10 @@ MACHINE_CONFIG_END
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( cbm8000_hsg_b )
+//  MACHINE_CONFIG_START( cbm8000_hsg_b )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( cbm8000_hsg_b )
+static MACHINE_CONFIG_START( cbm8000_hsg_b )
 	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
 	MCFG_SCREEN_UPDATE_DEVICE(EF9366_TAG, ef9365_device, screen_update)
 	MCFG_SCREEN_SIZE(512, 256)

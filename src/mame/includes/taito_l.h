@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
+#include "machine/upd4701.h"
 #include "sound/msm5205.h"
 #include "sound/2203intf.h"
 
@@ -253,30 +254,17 @@ class horshoes_state : public taitol_1cpu_state
 public:
 	horshoes_state(const machine_config &mconfig, device_type type, const char *tag)
 		: taitol_1cpu_state(mconfig, type, tag)
-		, m_analog0(*this, "AN0")
-		, m_analog1(*this, "AN1")
-		, m_trackx(0)
-		, m_tracky(0)
+		, m_upd4701(*this, "upd4701")
 	{
 	}
 
 	DECLARE_READ8_MEMBER(tracky_reset_r);
 	DECLARE_READ8_MEMBER(trackx_reset_r);
-	DECLARE_READ8_MEMBER(tracky_lo_r);
-	DECLARE_READ8_MEMBER(tracky_hi_r);
-	DECLARE_READ8_MEMBER(trackx_lo_r);
-	DECLARE_READ8_MEMBER(trackx_hi_r);
+	DECLARE_READ8_MEMBER(trackball_r);
 	DECLARE_WRITE8_MEMBER(bankg_w);
 
 	DECLARE_MACHINE_RESET(horshoes);
 
 protected:
-	virtual void state_register() override;
-	virtual void taito_machine_reset() override;
-
-	required_ioport m_analog0;
-	required_ioport m_analog1;
-
-	int m_trackx;
-	int m_tracky;
+	required_device<upd4701_device> m_upd4701;
 };

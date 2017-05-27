@@ -42,6 +42,10 @@
 #include "emu.h"
 #include "tn_usbsm.h"
 
+DEFINE_DEVICE_TYPE_NS(TI99_USBSM, bus::ti99::peb, nouspikel_usb_smartmedia_device, "ti99_usbsm", "Nouspikel USB/Smartmedia card")
+
+namespace bus { namespace ti99 { namespace peb {
+
 #define STRATA_TAG "strata"
 
 #define RAM1_TAG "ram512k_lb"
@@ -355,7 +359,7 @@ INPUT_PORTS_START( tn_usbsm )
 		PORT_DIPSETTING( 0x01, "Geneve mode")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_FRAGMENT( tn_usbsm )
+MACHINE_CONFIG_START( tn_usbsm )
 	MCFG_DEVICE_ADD("smartmedia", SMARTMEDIA, 0)
 	MCFG_STRATAFLASH_ADD(STRATA_TAG)
 	MCFG_RAM_ADD(RAM1_TAG)
@@ -375,5 +379,4 @@ ioport_constructor nouspikel_usb_smartmedia_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(tn_usbsm);
 }
-
-DEFINE_DEVICE_TYPE(TI99_USBSM, nouspikel_usb_smartmedia_device, "ti99_usbsm", "Nouspikel USB/Smartmedia card")
+} } } // end namespace bus::ti99::peb

@@ -2453,7 +2453,7 @@ static ADDRESS_MAP_START( drive_io_map, AS_IO, 8, model2_state )
 	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("driveadc", msm6253_device, d0_r, address_w)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_FRAGMENT( sj25_0207_01 )
+static MACHINE_CONFIG_START( sj25_0207_01 )
 	MCFG_CPU_ADD("drivecpu", Z80, XTAL_8MHz/2) // confirmed
 	MCFG_CPU_PROGRAM_MAP(drive_map)
 	MCFG_CPU_IO_MAP(drive_io_map)

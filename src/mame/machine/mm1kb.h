@@ -20,7 +20,7 @@
 //**************************************************************************
 
 #define MCFG_MM1_KEYBOARD_KBST_CALLBACK(_write) \
-	devcb = &mm1_keyoard_device::set_kbst_wr_callback(*device, DEVCB_##_write);
+	devcb = &mm1_keyboard_device::set_kbst_wr_callback(*device, DEVCB_##_write);
 
 
 
@@ -28,20 +28,15 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> mm1_keyoard_device
+// ======================> mm1_keyboard_device
 
-class mm1_keyoard_device :  public device_t
+class mm1_keyboard_device :  public device_t
 {
 public:
 	// construction/destruction
-	mm1_keyoard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mm1_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_kbst_wr_callback(device_t &device, Object &&cb) { return downcast<mm1_keyoard_device &>(device).m_write_kbst.set_callback(std::forward<Object>(cb)); }
-
-	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual ioport_constructor device_input_ports() const override;
+	template <class Object> static devcb_base &set_kbst_wr_callback(device_t &device, Object &&cb) { return downcast<mm1_keyboard_device &>(device).m_write_kbst.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( read ) { return m_data; }
 
@@ -65,6 +60,11 @@ protected:
 	virtual void device_start() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
+	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
+
 private:
 	devcb_write_line m_write_kbst;
 
@@ -83,7 +83,7 @@ private:
 
 
 // device type definition
-DECLARE_DEVICE_TYPE(MM1_KEYBOARD, mm1_keyoard_device)
+DECLARE_DEVICE_TYPE(MM1_KEYBOARD, mm1_keyboard_device)
 
 
 

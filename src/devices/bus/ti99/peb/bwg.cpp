@@ -46,6 +46,10 @@
 #include "bwg.h"
 #include "formats/ti99_dsk.h"
 
+DEFINE_DEVICE_TYPE_NS(TI99_BWG, bus::ti99::peb, snug_bwg_device, "ti99_bwg", "SNUG BwG Floppy Controller")
+
+namespace bus { namespace ti99 { namespace peb {
+
 // ----------------------------------
 // Flags for debugging
 
@@ -683,7 +687,7 @@ static SLOT_INTERFACE_START( bwg_floppies )
 	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )          // 80 tracks
 SLOT_INTERFACE_END
 
-MACHINE_CONFIG_FRAGMENT( bwg_fdc )
+MACHINE_CONFIG_START( bwg_fdc )
 	MCFG_WD1773_ADD(FDC_TAG, XTAL_8MHz)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(snug_bwg_device, fdc_irq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(snug_bwg_device, fdc_drq_w))
@@ -726,4 +730,4 @@ const tiny_rom_entry *snug_bwg_device::device_rom_region() const
 	return ROM_NAME( bwg_fdc );
 }
 
-DEFINE_DEVICE_TYPE(TI99_BWG, snug_bwg_device, "ti99_bwg", "SNUG BwG Floppy Controller")
+} } } // end namespace bus::ti99::peb

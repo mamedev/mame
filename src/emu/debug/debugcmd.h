@@ -16,8 +16,6 @@
 #include "debugcpu.h"
 #include "debugcon.h"
 
-class parsed_expression;
-class symbol_table;
 
 class debugger_commands
 {

@@ -7,7 +7,7 @@
 
 
 #include "cpu/z80/z80.h"
-#include "cpu/m6800/m6800.h"
+#include "cpu/m6800/m6801.h"
 #include "imagedev/cassette.h"
 #include "machine/ram.h"
 #include "machine/i8251.h"

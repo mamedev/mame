@@ -140,7 +140,7 @@ void hng64_state::reset_net()
 	m_mmub[5] = 0; // rolls back to 0xffff
 }
 
-MACHINE_CONFIG_FRAGMENT( hng64_network )
+MACHINE_CONFIG_START( hng64_network )
 	MCFG_CPU_ADD("network", KL5C80A12, HNG64_MASTER_CLOCK / 4)        /* KL5C80A12CFP - binary compatible with Z80. */
 	MCFG_CPU_PROGRAM_MAP(hng_comm_map)
 	MCFG_CPU_IO_MAP(hng_comm_io_map)

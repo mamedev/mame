@@ -18,7 +18,8 @@
 #include "peribox.h"
 #include "machine/ram.h"
 
-DECLARE_DEVICE_TYPE(TI99_MEMEX, geneve_memex_device)
+namespace bus { namespace ti99 { namespace peb {
+
 
 class geneve_memex_device : public ti_expansion_card_device
 {
@@ -41,5 +42,8 @@ private:
 	required_device<ram_device> m_ram;
 	uint8_t   m_switches;
 };
+} } } // end namespace bus::ti99::peb
+
+DECLARE_DEVICE_TYPE_NS(TI99_MEMEX, bus::ti99::peb, geneve_memex_device)
 
 #endif // MAME_BUS_TI99_PEB_MEMEX_H

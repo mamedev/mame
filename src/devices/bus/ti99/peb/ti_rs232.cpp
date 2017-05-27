@@ -105,6 +105,12 @@
 #include "emu.h"
 #include "ti_rs232.h"
 
+DEFINE_DEVICE_TYPE_NS(TI99_RS232,     bus::ti99::peb, ti_rs232_pio_device,      "ti99_rs232",           "TI-99 RS232/PIO interface")
+DEFINE_DEVICE_TYPE_NS(TI99_RS232_DEV, bus::ti99::peb, ti_rs232_attached_device, "ti99_rs232_atttached", "TI-99 Serial attached device")
+DEFINE_DEVICE_TYPE_NS(TI99_PIO_DEV,   bus::ti99::peb, ti_pio_attached_device,   "ti99_pio_attached",    "TI-99 Parallel attached device")
+
+namespace bus { namespace ti99 { namespace peb {
+
 #define SENILA_0_BIT 0x80
 #define SENILA_1_BIT 0x40
 
@@ -1096,7 +1102,7 @@ void ti_rs232_pio_device::device_reset()
 	incoming_dtr(1, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_FRAGMENT( ti_rs232 )
+static MACHINE_CONFIG_START( ti_rs232 )
 	MCFG_DEVICE_ADD("tms9902_0", TMS9902, 3000000)
 	MCFG_TMS9902_INT_CB(WRITELINE(ti_rs232_pio_device, int0_callback))            /* called when interrupt pin state changes */
 	MCFG_TMS9902_RCV_CB(WRITELINE(ti_rs232_pio_device, rcv0_callback))            /* called when a character is received */
@@ -1145,6 +1151,4 @@ ioport_constructor ti_rs232_pio_device::device_input_ports() const
 	return INPUT_PORTS_NAME(ti_rs232);
 }
 
-DEFINE_DEVICE_TYPE(TI99_RS232,     ti_rs232_pio_device,      "ti99_rs232",           "TI-99 RS232/PIO interface")
-DEFINE_DEVICE_TYPE(TI99_RS232_DEV, ti_rs232_attached_device, "ti99_rs232_atttached", "TI-99 Serial attached device")
-DEFINE_DEVICE_TYPE(TI99_PIO_DEV,   ti_pio_attached_device,   "ti99_pio_attached",    "TI-99 Parallel attached device")
+} } } // end namespace bus::ti99::peb

@@ -53,7 +53,7 @@ SLOT_INTERFACE_END
 //  MACHINE_DRIVER( isbc_218a )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( isbc_218a )
+static MACHINE_CONFIG_START( isbc_218a )
 	MCFG_I8272A_ADD(I8272_TAG, true)
 	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(isbc_218a_device, fdc_irq))
 	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(isbc_218a_device, fdc_drq))

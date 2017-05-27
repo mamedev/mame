@@ -51,15 +51,19 @@
 #include "emu.h"
 #include "mecmouse.h"
 
+DEFINE_DEVICE_TYPE_NS(TI99_MECMOUSE, bus::ti99::joyport, mecmouse_device, "ti99_mecmouse", "TI-99 Mechatronics Mouse")
+
+namespace bus { namespace ti99 { namespace joyport {
+
 #define POLL_TIMER 1
 
-ti99_mecmouse_device::ti99_mecmouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mecmouse_device::mecmouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TI99_MECMOUSE, tag, owner, clock), device_ti99_joyport_interface(mconfig, *this), m_last_select(0), m_read_y_axis(false), m_x(0), m_y(0), m_x_buf(0), m_y_buf(0), m_last_mx(0), m_last_my(0), m_poll_timer(nullptr)
 {
 }
 
 
-uint8_t ti99_mecmouse_device::read_dev()
+uint8_t mecmouse_device::read_dev()
 {
 	int answer;
 	int buttons = ioport("MOUSE0")->read() & 3;
@@ -81,7 +85,7 @@ uint8_t ti99_mecmouse_device::read_dev()
 /*
     Used to select lines. data = 0x01 (Joy1), 0x02 (Joy2)
 */
-void ti99_mecmouse_device::write_dev(uint8_t data)
+void mecmouse_device::write_dev(uint8_t data)
 {
 	if (data == 0x02) {
 		if (m_last_select == 0x01) {
@@ -128,7 +132,7 @@ void ti99_mecmouse_device::write_dev(uint8_t data)
 	}
 }
 
-void ti99_mecmouse_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void mecmouse_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	// Poll the movement
 	int new_mx, new_my;
@@ -157,7 +161,7 @@ void ti99_mecmouse_device::device_timer(emu_timer &timer, device_timer_id id, in
 	m_y += delta_y;
 }
 
-void ti99_mecmouse_device::device_start()
+void mecmouse_device::device_start()
 {
 	m_poll_timer = timer_alloc(POLL_TIMER);
 	// The poll time cannot depend on the console settings, since the TI-99/4A
@@ -175,7 +179,7 @@ void ti99_mecmouse_device::device_start()
 	save_item(NAME(m_last_my));
 }
 
-void ti99_mecmouse_device::device_reset()
+void mecmouse_device::device_reset()
 {
 	m_poll_timer->enable(true);
 	m_last_select = 0;
@@ -199,9 +203,10 @@ INPUT_PORTS_START( mecmouse )
 		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Mouse Button 2") PORT_PLAYER(1)
 INPUT_PORTS_END
 
-ioport_constructor ti99_mecmouse_device::device_input_ports() const
+ioport_constructor mecmouse_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( mecmouse );
 }
 
-DEFINE_DEVICE_TYPE(TI99_MECMOUSE, ti99_mecmouse_device, "ti99_mecmouse", "TI-99 Mechatronics Mouse")
+} } } // end namespace bus::ti99::joyport
+

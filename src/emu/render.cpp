@@ -1267,7 +1267,7 @@ void render_target::compute_minimum_size(s32 &minwidth, s32 &minheight)
 	int screens_considered = 0;
 
 	// early exit in case we are called between device teardown and render teardown
-	if (m_manager.machine().phase() == MACHINE_PHASE_EXIT)
+	if (m_manager.machine().phase() == machine_phase::EXIT)
 	{
 		minwidth = 640;
 		minheight = 480;
@@ -1360,7 +1360,7 @@ render_primitive_list &render_target::get_primitives()
 	root_xform.no_center = false;
 
 	// iterate over layers back-to-front, but only if we're running
-	if (m_manager.machine().phase() >= MACHINE_PHASE_RESET)
+	if (m_manager.machine().phase() >= machine_phase::RESET)
 		for (item_layer layernum = ITEM_LAYER_FIRST; layernum < ITEM_LAYER_MAX; ++layernum)
 		{
 			int blendmode;

@@ -35,7 +35,18 @@ void decobsmt_device::bsmt_ready_callback()
 	m_ourcpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE); /* BSMT is ready */
 }
 
-MACHINE_CONFIG_FRAGMENT( decobsmt )
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE(DECOBSMT, decobsmt_device, "decobsmt", "Data East/Sega/Stern BSMT2000 Sound Board")
+
+
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( decobsmt_device::device_add_mconfig )
 	MCFG_CPU_ADD(M6809_TAG, M6809, (3579580/2))
 	MCFG_CPU_PROGRAM_MAP(decobsmt_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(decobsmt_device, decobsmt_firq_interrupt, 489) /* Fixed FIRQ of 489Hz as measured on real (pinball) machine */
@@ -47,23 +58,6 @@ MACHINE_CONFIG_FRAGMENT( decobsmt )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 2.0)
 MACHINE_CONFIG_END
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-DEFINE_DEVICE_TYPE(DECOBSMT, decobsmt_device, "decobsmt", "Data East/Sega/Stern BSMT2000 Sound Board")
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor decobsmt_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( decobsmt );
-}
 
 //**************************************************************************
 //  LIVE DEVICE

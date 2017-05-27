@@ -43,7 +43,7 @@ void neogeo_kof98_cart_device::device_reset()
  mapper specific handlers
  -------------------------------------------------*/
 
-static MACHINE_CONFIG_FRAGMENT( kof98_cart )
+static MACHINE_CONFIG_START( kof98_cart )
 	MCFG_KOF98_PROT_ADD("kof98_prot")
 MACHINE_CONFIG_END
 

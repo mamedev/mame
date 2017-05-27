@@ -168,7 +168,7 @@ WRITE16_MEMBER(taito_zoom_device::reg_address_w)
 
 ***************************************************************************/
 
-MACHINE_CONFIG_FRAGMENT( taito_zoom_sound )
+MACHINE_CONFIG_START( taito_zoom_sound )
 
 	/* basic machine hardware */
 	MCFG_TAITO_ZOOM_ADD("taito_zoom")

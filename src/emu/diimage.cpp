@@ -1048,7 +1048,7 @@ done:
 	if (m_err!=0) {
 		if (!init_phase())
 		{
-			if (device().machine().phase() == MACHINE_PHASE_RUNNING)
+			if (device().machine().phase() == machine_phase::RUNNING)
 				device().popmessage("Error: Unable to %s image '%s': %s", is_create ? "create" : "load", path, error());
 			else
 				osd_printf_error("Error: Unable to %s image '%s': %s\n", is_create ? "create" : "load", path.c_str(), error());
@@ -1484,7 +1484,7 @@ bool device_image_interface::init_phase() const
 	// differently at startup; this is an enc[r]apsulation of the "logic"
 	// that switches these behaviors
 	return !device().has_running_machine()
-		|| device().machine().phase() == MACHINE_PHASE_INIT;
+		|| device().machine().phase() == machine_phase::INIT;
 }
 
 

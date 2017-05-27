@@ -75,6 +75,10 @@
 #include "emu.h"
 #include "pcode.h"
 
+DEFINE_DEVICE_TYPE_NS(TI99_P_CODE, bus::ti99::peb, ti_pcode_card_device, "ti99_pcode", "TI-99 P-Code Card")
+
+namespace bus { namespace ti99 { namespace peb {
+
 #define PCODE_GROM_TAG "pcode_grom"
 #define PCODE_ROM_TAG "pcode_rom"
 
@@ -322,7 +326,7 @@ INPUT_CHANGED_MEMBER( ti_pcode_card_device::switch_changed )
 }
 
 
-MACHINE_CONFIG_FRAGMENT( ti99_pcode )
+MACHINE_CONFIG_START( ti99_pcode )
 	MCFG_GROM_ADD( PGROM0_TAG, 0, PCODE_GROM_TAG, 0x0000, WRITELINE(ti_pcode_card_device, ready_line))
 	MCFG_GROM_ADD( PGROM1_TAG, 1, PCODE_GROM_TAG, 0x2000, WRITELINE(ti_pcode_card_device, ready_line))
 	MCFG_GROM_ADD( PGROM2_TAG, 2, PCODE_GROM_TAG, 0x4000, WRITELINE(ti_pcode_card_device, ready_line))
@@ -373,4 +377,4 @@ ioport_constructor ti_pcode_card_device::device_input_ports() const
 	return INPUT_PORTS_NAME( ti99_pcode );
 }
 
-DEFINE_DEVICE_TYPE(TI99_P_CODE, ti_pcode_card_device, "ti99_pcode", "TI-99 P-Code Card")
+} } } // end namespace bus::ti99::peb

@@ -29,7 +29,7 @@ msx_cart_fmpac_device::msx_cart_fmpac_device(const machine_config &mconfig, cons
 }
 
 
-static MACHINE_CONFIG_FRAGMENT( fmpac )
+static MACHINE_CONFIG_START( fmpac )
 	// This is actually incorrect. The sound output is passed back into the MSX machine where it is mixed internally and output through the system 'speaker'.
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ym2413", YM2413, XTAL_10_738635MHz/3)

@@ -52,10 +52,10 @@ const tiny_rom_entry *comx_prn_device::device_rom_region() const
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( comx_prn )
+//  MACHINE_CONFIG_START( comx_prn )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( comx_prn )
+static MACHINE_CONFIG_START( comx_prn )
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit0))
 	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit1))

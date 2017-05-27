@@ -6,15 +6,14 @@
 
 #pragma once
 
-
 #define MCFG_INTERPRO_IOGA_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, INTERPRO_IOGA, 0)
+	MCFG_DEVICE_ADD(_tag, INTERPRO_IOGA, XTAL_12_5MHz)
 
 #define MCFG_INTERPRO_IOGA_NMI_CB(_out_nmi) \
 	devcb = &interpro_ioga_device::static_set_out_nmi_callback(*device, DEVCB_##_out_nmi);
 
-#define MCFG_INTERPRO_IOGA_IRQ_CB(_out_int) \
-	devcb = &interpro_ioga_device::static_set_out_int_callback(*device, DEVCB_##_out_int);
+#define MCFG_INTERPRO_IOGA_IRQ_CB(_out_irq) \
+	devcb = &interpro_ioga_device::static_set_out_irq_callback(*device, DEVCB_##_out_irq);
 
 #define MCFG_INTERPRO_IOGA_DMA_CB(_channel, _dma_r, _dma_w) \
 	devcb = &interpro_ioga_device::static_set_dma_r_callback(*device, _channel, DEVCB_##_dma_r); \
@@ -53,6 +52,7 @@
 #define IOGA_NMI_ENABLE_IN 0x10
 #define IOGA_NMI_ENABLE    (IOGA_NMI_EDGE | IOGA_NMI_ENABLE_IN)
 
+#define IOGA_INTERRUPT_NONE     0
 #define IOGA_INTERRUPT_NMI      1
 #define IOGA_INTERRUPT_INTERNAL 2
 #define IOGA_INTERRUPT_EXTERNAL 3
@@ -70,13 +70,23 @@
 #define IOGA_DMA_CTRL_RESET_L 0x61000000 // do not clear bus error bit
 #define IOGA_DMA_CTRL_RESET   0x60400000 // clear bus error bit
 
-#define IOGA_DMA_CTRL_START   0x63000800 // perhaps start a transfer? - maybe the 8 is the channel?
+#define IOGA_DMA_CTRL_START   0x10000000
+#define IOGA_DMA_CTRL_WRITE   0x40000000 // indicates memory to device transfer
+#define IOGA_DMA_CTRL_BUSY    0x02000000
+#define IOGA_DMA_CTRL_BERR    0x00400000  // iogadiag code expects 0x60400000 on bus error
+#define IOGA_DMA_CTRL_X       0x00800000  // another error bit?
+#define IOGA_DMA_CTRL_Y       0x01000000  // turned off if either of two above are found
+#define IOGA_DMA_CTRL_TCZERO  0x00000001
+
+// DMA_ENABLE, INT_ENABLE, 
+
+//#define IOGA_DMA_CTRL_START   0x63000800 // perhaps start a transfer? - maybe the 8 is the channel?
 #define IOGA_DMA_CTRL_UNK1    0x60000000 // don't know yet
 #define IOGA_DMA_CTRL_UNK2    0x67000600 // forced berr with nmi and interrupts disabled
+#define IOGA_DMA_CTRL_UNK3    0xbf000600 // set by scsidiag before executing scsi "transfer information" command
+
 
 // read values
-#define IOGA_DMA_CTRL_BUSY 0x02000000
-#define IOGA_DMA_CTRL_BERR 0x00400000  // iogadiag code expects 0x60400000 on bus error
 // iogadiag expects 0x64400800 after forced berr with nmi/interrupts disabled
 
 
@@ -97,7 +107,7 @@ public:
 	interpro_ioga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &static_set_out_nmi_callback(device_t &device, _Object object) { return downcast<interpro_ioga_device &>(device).m_out_nmi_func.set_callback(object); }
-	template<class _Object> static devcb_base &static_set_out_int_callback(device_t &device, _Object object) { return downcast<interpro_ioga_device &>(device).m_out_int_func.set_callback(object); }
+	template<class _Object> static devcb_base &static_set_out_irq_callback(device_t &device, _Object object) { return downcast<interpro_ioga_device &>(device).m_out_irq_func.set_callback(object); }
 
 	template<class _Object> static devcb_base &static_set_dma_r_callback(device_t &device, int channel, _Object object) { return downcast<interpro_ioga_device &>(device).m_dma_channel[channel].device_r.set_callback(object); }
 	template<class _Object> static devcb_base &static_set_dma_w_callback(device_t &device, int channel, _Object object) { return downcast<interpro_ioga_device &>(device).m_dma_channel[channel].device_w.set_callback(object); }
@@ -150,7 +160,7 @@ public:
 	DECLARE_WRITE32_MEMBER(timer2_w) { write_timer(2, data, IOGA_TIMER_2); }
 	DECLARE_WRITE32_MEMBER(timer3_w) { write_timer(3, data, IOGA_TIMER_3); }
 
-	DECLARE_READ16_MEMBER(icr_r) { return m_int_vector[offset]; }
+	DECLARE_READ16_MEMBER(icr_r) { return m_hwicr[offset]; }
 	DECLARE_WRITE16_MEMBER(icr_w);
 	DECLARE_READ16_MEMBER(icr18_r) { return icr_r(space, 18, mem_mask); }
 	DECLARE_WRITE16_MEMBER(icr18_w) { icr_w(space, 18, data, mem_mask); }
@@ -160,7 +170,7 @@ public:
 	DECLARE_READ8_MEMBER(nmictrl_r) { return m_nmictrl; }
 	DECLARE_WRITE8_MEMBER(nmictrl_w);
 
-	DECLARE_READ16_MEMBER(softint_vector_r) { return m_softint_vector[offset]; }
+	DECLARE_READ16_MEMBER(softint_vector_r) { return m_swicr[offset]; }
 	DECLARE_WRITE16_MEMBER(softint_vector_w);
 
 	DECLARE_READ32_MEMBER(dma_plotter_r) { return dma_r(space, offset, mem_mask, IOGA_DMA_PLOTTER); }
@@ -175,7 +185,9 @@ public:
 
 	DECLARE_READ32_MEMBER(error_address_r) { return m_error_address; }
 	DECLARE_READ32_MEMBER(error_businfo_r) { return m_error_businfo; }
-	void bus_error(uint32_t address, uint32_t cycle_type) { m_error_address = address; m_error_businfo = cycle_type; }
+
+	DECLARE_WRITE32_MEMBER(bus_error) { m_error_address = data; m_error_businfo = offset; }
+	//void bus_error(uint32_t address, uint32_t cycle_type) { m_error_address = address; m_error_businfo = cycle_type; }
 
 protected:
 	// device-level overrides
@@ -188,64 +200,75 @@ private:
 	static const device_timer_id IOGA_TIMER_1 = 1;
 	static const device_timer_id IOGA_TIMER_2 = 2;
 	static const device_timer_id IOGA_TIMER_3 = 3;
-
 	static const device_timer_id IOGA_TIMER_DMA = 4;
+	static const device_timer_id IOGA_CLOCK = 5;
 
 	void set_nmi_line(int state);
 	void set_irq_line(int irq, int state);
 	void set_irq_soft(int irq, int state);
-	void write_timer(int timer, uint32_t value, device_timer_id id);
+	void write_timer(int timer, u32 value, device_timer_id id);
 
-	void update_interrupt(int state);
+	void interrupt_clock();
+	void dma_clock(int channel);
 
 	void drq(int state, int channel);
 	devcb_write_line m_out_nmi_func;
-	devcb_write_line m_out_int_func;
+	devcb_write_line m_out_irq_func;
 	address_space *m_memory_space;
 
 	// dma channels
 	struct dma
 	{
-		uint32_t real_address;
-		uint32_t virtual_address;
-		uint32_t transfer_count;
-		uint32_t control;
+		u32 real_address;
+		u32 virtual_address;
+		u32 transfer_count;
+		u32 control;
 
 		bool dma_active;
 		int drq_state;
 		devcb_read8 device_r;
 		devcb_write8 device_w;
 	} m_dma_channel[IOGA_DMA_CHANNELS];
-	uint32_t m_dma_plotter_eosl;
+	u32 m_dma_plotter_eosl;
 
 	devcb_write_line m_fdc_tc_func;
 
-	bool m_nmi_pending;
-	uint32_t m_interrupt_active;
-	uint32_t m_irq_current;
-	uint32_t m_irq_forced;
+	u32 m_active_interrupt_type;
+	u32 m_active_interrupt_number;
 
-	uint16_t m_int_vector[IOGA_INTERRUPT_COUNT];
-	uint8_t m_softint;
-	uint8_t m_nmictrl;
-	uint16_t m_softint_vector[8];
+	u32 m_hwint_forced;
+	bool m_nmi_forced;
 
-	uint32_t m_prescaler;
-	uint32_t m_timer_reg[3];
-	uint16_t m_timer1_count;
-	uint32_t m_timer3_count;
+	u16 m_hwicr[IOGA_INTERRUPT_COUNT];
+	u8 m_softint;
+	u8 m_nmictrl;
+	u16 m_swicr[8];
+
+	u32 m_prescaler;
+	u32 m_timer_reg[3];
+	u16 m_timer1_count;
+	u32 m_timer3_count;
 	emu_timer *m_timer[4];
 
 	// dma state
 	emu_timer *m_dma_timer;
 
-	uint32_t dma_r(address_space &space, offs_t offset, uint32_t mem_mask, int channel);
-	void dma_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask, int channel);
+	u32 dma_r(address_space &space, offs_t offset, u32 mem_mask, int channel);
+	void dma_w(address_space &space, offs_t offset, u32 data, u32 mem_mask, int channel);
 
-	uint16_t m_arbctl;
+	u16 m_arbctl;
 
-	uint32_t m_error_address;
-	uint32_t m_error_businfo;
+	u32 m_error_address;
+	u32 m_error_businfo;
+
+	emu_timer *m_ioga_clock;
+	int m_nmi_state;
+	int m_irq_state;
+
+	u32 m_int_line;
+
+	bool nmi(int state);
+	bool irq(int state);
 };
 
 // device type definition

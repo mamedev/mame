@@ -391,7 +391,7 @@ WRITE_LINE_MEMBER (force68k_state::write_aciaremt_clock){
 */
 // Implementation of static 2 x 64K EPROM in sockets J10/J11 as 16 bit wide cartridge for easier
 // software handling. TODO: make configurable according to table above.
-static MACHINE_CONFIG_FRAGMENT( fccpu1_eprom_sockets )
+static MACHINE_CONFIG_START( fccpu1_eprom_sockets )
 		MCFG_GENERIC_CARTSLOT_ADD("exp_rom1", generic_plain_slot, "fccpu1_cart")
 		MCFG_GENERIC_EXTENSIONS("bin,rom")
 		MCFG_GENERIC_WIDTH(GENERIC_ROM16_WIDTH)

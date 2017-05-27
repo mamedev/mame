@@ -20,7 +20,7 @@
 #include "peribox.h"
 #include "machine/tmc0430.h"
 
-DECLARE_DEVICE_TYPE(TI99_P_CODE, ti_pcode_card_device)
+namespace bus { namespace ti99 { namespace peb {
 
 class ti_pcode_card_device : public ti_expansion_card_device
 {
@@ -63,5 +63,9 @@ private:
 	// Recent address
 	int m_address;
 };
+
+} } } // end namespace bus::ti99::peb
+
+DECLARE_DEVICE_TYPE_NS(TI99_P_CODE,  bus::ti99::peb, ti_pcode_card_device)
 
 #endif // MAME_BUS_TI99_PEB_PCODE_H

@@ -191,8 +191,8 @@ private:
 	required_device<tms9900_device>        m_cpu;
 	required_device<tms9901_device>        m_tms9901;
 	required_device<cassette_image_device> m_cassette;
-	required_device<peribox_device>        m_peribox;
-	required_device<ti99_joyport_device>   m_joyport;
+	required_device<bus::ti99::peb::peribox_device>        m_peribox;
+	required_device<bus::ti99::joyport::joyport_device>   m_joyport;
 	required_device<ram_device> m_scratchpad;
 	required_device<ram_device> m_amsram;
 
@@ -1011,7 +1011,7 @@ static MACHINE_CONFIG_START( ti99_4p_60hz )
 	MCFG_TMS9901_INTLEVEL_HANDLER( WRITE8( ti99_4p_state, tms9901_interrupt) )
 
 	// Peripheral expansion box (SGCPU composition)
-	MCFG_DEVICE_ADD( PERIBOX_TAG, PERIBOX_SG, 0)
+	MCFG_DEVICE_ADD( PERIBOX_TAG, TI99_PERIBOX_SG, 0)
 	MCFG_PERIBOX_INTA_HANDLER( WRITELINE(ti99_4p_state, extint) )
 	MCFG_PERIBOX_INTB_HANDLER( WRITELINE(ti99_4p_state, notconnected) )
 	MCFG_PERIBOX_READY_HANDLER( WRITELINE(ti99_4p_state, ready_line) )

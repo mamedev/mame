@@ -157,84 +157,6 @@ static ADDRESS_MAP_START( jsa3_oki2_map, AS_0, 8, atari_jsa_iiis_device )
 ADDRESS_MAP_END
 
 
-
-//**************************************************************************
-//  MACHINE FRAGMENTS
-//**************************************************************************
-
-// Fully populated JSA-I, not used by anyone
-MACHINE_CONFIG_FRAGMENT( jsa_i_config )
-
-	// basic machine hardware
-	MCFG_CPU_ADD("cpu", M6502, JSA_MASTER_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(atarijsa1_map)
-	MCFG_DEVICE_PERIODIC_INT_DEVICE("soundcomm", atari_sound_comm_device, sound_irq_gen, (double)JSA_MASTER_CLOCK/4/16/16/14)
-
-	// sound hardware
-	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "cpu", WRITELINE(atari_jsa_base_device, main_int_write_line))
-
-	MCFG_YM2151_ADD("ym2151", JSA_MASTER_CLOCK)
-	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("soundcomm", atari_sound_comm_device, ym2151_irq_gen))
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(atari_jsa_base_device, ym2151_port_w))
-	MCFG_MIXER_ROUTE(0, DEVICE_SELF_OWNER, 0.60, 0)
-	MCFG_MIXER_ROUTE(1, DEVICE_SELF_OWNER, 0.60, 1)
-
-	MCFG_SOUND_ADD("pokey", POKEY, JSA_MASTER_CLOCK/2)
-	MCFG_MIXER_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.40, 0)
-	MCFG_MIXER_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.40, 1)
-
-	MCFG_SOUND_ADD("tms", TMS5220C, JSA_MASTER_CLOCK*2/11) // potentially JSA_MASTER_CLOCK/9 as well
-	MCFG_MIXER_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 1.0, 0)
-	MCFG_MIXER_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 1.0, 1)
-MACHINE_CONFIG_END
-
-
-// Fully populated JSA-II
-MACHINE_CONFIG_FRAGMENT( jsa_ii_config )
-
-	// basic machine hardware
-	MCFG_CPU_ADD("cpu", M6502, JSA_MASTER_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(atarijsa2_map)
-	MCFG_DEVICE_PERIODIC_INT_DEVICE("soundcomm", atari_sound_comm_device, sound_irq_gen, (double)JSA_MASTER_CLOCK/4/16/16/14)
-
-	// sound hardware
-	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "cpu", WRITELINE(atari_jsa_base_device, main_int_write_line))
-
-	MCFG_YM2151_ADD("ym2151", JSA_MASTER_CLOCK)
-	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("soundcomm", atari_sound_comm_device, ym2151_irq_gen))
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(atari_jsa_base_device, ym2151_port_w))
-	MCFG_MIXER_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.60, 0)
-
-	MCFG_OKIM6295_ADD("oki1", JSA_MASTER_CLOCK/3, PIN7_HIGH)
-	MCFG_MIXER_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.75, 0)
-MACHINE_CONFIG_END
-
-
-// Fully populated JSA-III
-MACHINE_CONFIG_DERIVED( jsa_iii_config, jsa_ii_config )
-
-	// basic machine hardware
-	MCFG_CPU_MODIFY("cpu")
-	MCFG_CPU_PROGRAM_MAP(atarijsa3_map)
-
-	MCFG_DEVICE_MODIFY("oki1")
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, jsa3_oki1_map)
-MACHINE_CONFIG_END
-
-
-// Fully populated JSA_IIIs
-MACHINE_CONFIG_DERIVED( jsa_iiis_config, jsa_iii_config )
-
-	MCFG_DEVICE_MODIFY("ym2151")
-	MCFG_MIXER_ROUTE(1, DEVICE_SELF_OWNER, 0.60, 1)
-
-	MCFG_OKIM6295_ADD("oki2", JSA_MASTER_CLOCK/3, PIN7_HIGH)
-	MCFG_MIXER_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.75, 1)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, jsa3_oki2_map)
-MACHINE_CONFIG_END
-
-
-
 //**************************************************************************
 //  I/O PORT DEFINITIONS
 //**************************************************************************
@@ -767,14 +689,34 @@ WRITE8_MEMBER( atari_jsa_i_device::pokey_w )
 
 
 //-------------------------------------------------
-//  device_mconfig_additions - return a pointer to
-//  the device's machine fragment
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor atari_jsa_i_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( jsa_i_config );
-}
+// Fully populated JSA-I, not used by anyone
+MACHINE_CONFIG_MEMBER( atari_jsa_i_device::device_add_mconfig )
+
+	// basic machine hardware
+	MCFG_CPU_ADD("cpu", M6502, JSA_MASTER_CLOCK/2)
+	MCFG_CPU_PROGRAM_MAP(atarijsa1_map)
+	MCFG_DEVICE_PERIODIC_INT_DEVICE("soundcomm", atari_sound_comm_device, sound_irq_gen, (double)JSA_MASTER_CLOCK/4/16/16/14)
+
+	// sound hardware
+	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "cpu", WRITELINE(atari_jsa_base_device, main_int_write_line))
+
+	MCFG_YM2151_ADD("ym2151", JSA_MASTER_CLOCK)
+	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("soundcomm", atari_sound_comm_device, ym2151_irq_gen))
+	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(atari_jsa_base_device, ym2151_port_w))
+	MCFG_MIXER_ROUTE(0, DEVICE_SELF_OWNER, 0.60, 0)
+	MCFG_MIXER_ROUTE(1, DEVICE_SELF_OWNER, 0.60, 1)
+
+	MCFG_SOUND_ADD("pokey", POKEY, JSA_MASTER_CLOCK/2)
+	MCFG_MIXER_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.40, 0)
+	MCFG_MIXER_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.40, 1)
+
+	MCFG_SOUND_ADD("tms", TMS5220C, JSA_MASTER_CLOCK*2/11) // potentially JSA_MASTER_CLOCK/9 as well
+	MCFG_MIXER_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 1.0, 0)
+	MCFG_MIXER_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 1.0, 1)
+MACHINE_CONFIG_END
 
 
 //-------------------------------------------------
@@ -877,14 +819,28 @@ READ8_MEMBER( atari_jsa_ii_device::rdio_r )
 
 
 //-------------------------------------------------
-//  device_mconfig_additions - return a pointer to
-//  the device's machine fragment
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor atari_jsa_ii_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( jsa_ii_config );
-}
+// Fully populated JSA-II
+MACHINE_CONFIG_MEMBER( atari_jsa_ii_device::device_add_mconfig )
+
+	// basic machine hardware
+	MCFG_CPU_ADD("cpu", M6502, JSA_MASTER_CLOCK/2)
+	MCFG_CPU_PROGRAM_MAP(atarijsa2_map)
+	MCFG_DEVICE_PERIODIC_INT_DEVICE("soundcomm", atari_sound_comm_device, sound_irq_gen, (double)JSA_MASTER_CLOCK/4/16/16/14)
+
+	// sound hardware
+	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "cpu", WRITELINE(atari_jsa_base_device, main_int_write_line))
+
+	MCFG_YM2151_ADD("ym2151", JSA_MASTER_CLOCK)
+	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("soundcomm", atari_sound_comm_device, ym2151_irq_gen))
+	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(atari_jsa_base_device, ym2151_port_w))
+	MCFG_MIXER_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.60, 0)
+
+	MCFG_OKIM6295_ADD("oki1", JSA_MASTER_CLOCK/3, PIN7_HIGH)
+	MCFG_MIXER_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.75, 0)
+MACHINE_CONFIG_END
 
 
 //-------------------------------------------------
@@ -945,14 +901,29 @@ READ8_MEMBER( atari_jsa_iii_device::rdio_r )
 
 
 //-------------------------------------------------
-//  device_mconfig_additions - return a pointer to
-//  the device's machine fragment
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor atari_jsa_iii_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( jsa_iii_config );
-}
+	// Fully populated JSA-III
+MACHINE_CONFIG_MEMBER( atari_jsa_iii_device::device_add_mconfig )
+
+	// basic machine hardware
+	MCFG_CPU_ADD("cpu", M6502, JSA_MASTER_CLOCK/2)
+	MCFG_CPU_PROGRAM_MAP(atarijsa3_map)
+	MCFG_DEVICE_PERIODIC_INT_DEVICE("soundcomm", atari_sound_comm_device, sound_irq_gen, (double)JSA_MASTER_CLOCK/4/16/16/14)
+
+	// sound hardware
+	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "cpu", WRITELINE(atari_jsa_base_device, main_int_write_line))
+
+	MCFG_YM2151_ADD("ym2151", JSA_MASTER_CLOCK)
+	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("soundcomm", atari_sound_comm_device, ym2151_irq_gen))
+	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(atari_jsa_base_device, ym2151_port_w))
+	MCFG_MIXER_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.60, 0)
+
+	MCFG_OKIM6295_ADD("oki1", JSA_MASTER_CLOCK/3, PIN7_HIGH)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, jsa3_oki1_map)
+	MCFG_MIXER_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.75, 0)
+MACHINE_CONFIG_END
 
 
 //-------------------------------------------------
@@ -982,11 +953,18 @@ atari_jsa_iiis_device::atari_jsa_iiis_device(const machine_config &mconfig, cons
 
 
 //-------------------------------------------------
-//  device_mconfig_additions - return a pointer to
-//  the device's machine fragment
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor atari_jsa_iiis_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( jsa_iiis_config );
-}
+// Fully populated JSA_IIIs
+MACHINE_CONFIG_MEMBER( atari_jsa_iiis_device::device_add_mconfig )
+
+	atari_jsa_iii_device::device_add_mconfig(config);
+
+	MCFG_DEVICE_MODIFY("ym2151")
+	MCFG_MIXER_ROUTE(1, DEVICE_SELF_OWNER, 0.60, 1)
+
+	MCFG_OKIM6295_ADD("oki2", JSA_MASTER_CLOCK/3, PIN7_HIGH)
+	MCFG_MIXER_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.75, 1)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, jsa3_oki2_map)
+MACHINE_CONFIG_END

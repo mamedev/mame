@@ -251,7 +251,7 @@ FLOPPY_FORMATS_END
 //  MACHINE_DRIVER( pdc )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( pdc )
+static MACHINE_CONFIG_START( pdc )
 	/* CPU - Zilog Z0840006PSC */
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_10MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(pdc_mem)

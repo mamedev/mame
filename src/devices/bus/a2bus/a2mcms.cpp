@@ -41,7 +41,7 @@ DEFINE_DEVICE_TYPE(A2BUS_MCMS2, a2bus_mcms2_device, "a2mcms2", "Mountain Compute
 #define MCFG_MCMS_IRQ_CALLBACK(_cb) \
 	devcb = &mcms_device::set_irq_cb(*device, DEVCB_##_cb);
 
-MACHINE_CONFIG_FRAGMENT( a2mcms )
+MACHINE_CONFIG_START( a2mcms )
 	MCFG_SPEAKER_STANDARD_STEREO("mcms_l", "mcms_r")
 
 	MCFG_DEVICE_ADD(ENGINE_TAG, MCMS, 1000000)

@@ -30,6 +30,10 @@
 #include "emu.h"
 #include "myarcmem.h"
 
+DEFINE_DEVICE_TYPE_NS(TI99_MYARCMEM, bus::ti99::peb, myarc_memory_expansion_device, "ti99_myarcmem", "Myarc Memory expansion card MEXP-1")
+
+namespace bus { namespace ti99 { namespace peb {
+
 /* This card has two CRU bases where it answers. */
 #define MYARCMEM_CRU_BASE1 0x1000
 #define MYARCMEM_CRU_BASE2 0x1900
@@ -190,7 +194,7 @@ ROM_START( myarc_exp )
 	ROM_LOAD("myarc512k_xb2_dsr.bin", 0x0000, 0x2000, CRC(41fbb96d) SHA1(4dc7fdfa46842957bcbb0cf2c37764e4bb6d877a)) /* DSR for Ramdisk etc. */
 ROM_END
 
-MACHINE_CONFIG_FRAGMENT( myarc_exp )
+MACHINE_CONFIG_START( myarc_exp )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("512k")
 	MCFG_RAM_DEFAULT_VALUE(0)
@@ -211,4 +215,4 @@ ioport_constructor myarc_memory_expansion_device::device_input_ports() const
 	return INPUT_PORTS_NAME(myarc_exp);
 }
 
-DEFINE_DEVICE_TYPE(TI99_MYARCMEM, myarc_memory_expansion_device, "ti99_myarcmem", "Myarc Memory expansion card MEXP-1")
+} } } // end namespace bus::ti99::peb

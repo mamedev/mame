@@ -19,8 +19,6 @@ public:
 
 	asr733_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_PALETTE_INIT(asr733);
-
 	DECLARE_READ8_MEMBER(cru_r);
 	DECLARE_WRITE8_MEMBER(cru_w);
 
@@ -33,13 +31,11 @@ public:
 		return downcast<asr733_device &>(device).m_lineint_line.set_callback(std::forward<Object>(cb));
 	}
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
 protected:
 	// device-level overrides
 	void device_start() override;
 	void device_reset() override;
-	machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	ioport_constructor device_input_ports() const override;
 
@@ -58,6 +54,10 @@ private:
 	void draw_char(int character, int x, int y, int color);
 	void linefeed();
 	void transmit(uint8_t data);
+
+	DECLARE_PALETTE_INIT(asr733);
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	emu_timer *m_line_timer;                // screen line timer
 

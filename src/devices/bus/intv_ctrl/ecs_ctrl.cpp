@@ -143,7 +143,7 @@ static SLOT_INTERFACE_START( intvecs_controller )
 	SLOT_INTERFACE("handctrl", INTV_HANDCTRL)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_FRAGMENT( intvecs_ctrls )
+static MACHINE_CONFIG_START( intvecs_ctrls )
 	MCFG_INTV_CONTROL_PORT_ADD("port1", intvecs_controller, "handctrl")
 	MCFG_INTV_CONTROL_PORT_ADD("port2", intvecs_controller, "handctrl")
 MACHINE_CONFIG_END

@@ -32,6 +32,7 @@ namespace plib {
 			POW,
 			SIN,
 			COS,
+			RAND, /* random number between 0 and 1 */
 			PUSH_CONST,
 			PUSH_INPUT
 		};

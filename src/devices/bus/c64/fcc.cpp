@@ -71,10 +71,10 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( c64_fcc )
+//  MACHINE_CONFIG_START( c64_fcc )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( c64_fcc )
+static MACHINE_CONFIG_START( c64_fcc )
 	MCFG_CPU_ADD(G65SC02P4_TAG, M65SC02, XTAL_5MHz)
 	MCFG_CPU_PROGRAM_MAP(c64_fcc_map)
 MACHINE_CONFIG_END

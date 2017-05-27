@@ -33,7 +33,7 @@ DEFINE_DEVICE_TYPE(A2BUS_CFFA2_6502, a2bus_cffa2_6502_device, "a2cffa02", "CFFA2
 #define CFFA2_ROM_REGION  "cffa2_rom"
 #define CFFA2_ATA_TAG     "cffa2_ata"
 
-MACHINE_CONFIG_FRAGMENT( cffa2 )
+MACHINE_CONFIG_START( cffa2 )
 	MCFG_ATA_INTERFACE_ADD(CFFA2_ATA_TAG, ata_devices, "hdd", nullptr, false)
 
 // not yet, the core explodes

@@ -206,7 +206,11 @@ public:
 
 	void handle_sub_board_cpu_lines(cedar_magnet_board_interface &dev, int old_data, int data);
 	INTERRUPT_GEN_MEMBER(irq);
-	void(*m_prothack)(cedar_magnet_state*);
+	typedef void (cedar_magnet_state::*prot_func)();
+	prot_func m_prothack;
+	void mag_time_protection_hack();
+	void mag_xain_protection_hack();
+	void mag_exzi_protection_hack();
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -742,7 +746,7 @@ INPUT_PORTS_END
 INTERRUPT_GEN_MEMBER(cedar_magnet_state::irq)
 {
 	if (m_prothack)
-		m_prothack(this);
+		(this->*m_prothack)();
 
 	m_maincpu->set_input_line(0, HOLD_LINE);
 	m_cedplane0->irq_hold();
@@ -870,36 +874,35 @@ void protection_hack(uint8_t* ram, int address1, int address2)
 	if ((ram[address2] == 0x3e) && (ram[address2+1] == 0xff)) ram[address2] = 0xc9;
 }
 
-void mag_time_protection_hack(cedar_magnet_state* state)
+void cedar_magnet_state::mag_time_protection_hack()
 {
-	protection_hack(state->m_ram0, 0x8bc, 0x905);
+	protection_hack(m_ram0, 0x8bc, 0x905);
 }
 
-void mag_xain_protection_hack(cedar_magnet_state* state)
+void cedar_magnet_state::mag_xain_protection_hack()
 {
-	protection_hack(state->m_ram0, 0x796, 0x7df);
+	protection_hack(m_ram0, 0x796, 0x7df);
 }
 
-void mag_exzi_protection_hack(cedar_magnet_state* state)
+void cedar_magnet_state::mag_exzi_protection_hack()
 {
-	protection_hack(state->m_ram0, 0x8b6, 0x8ff);
+	protection_hack(m_ram0, 0x8b6, 0x8ff);
 }
-
 
 
 DRIVER_INIT_MEMBER(cedar_magnet_state, mag_time)
 {
-	m_prothack = mag_time_protection_hack;
+	m_prothack = &cedar_magnet_state::mag_time_protection_hack;
 }
 
 DRIVER_INIT_MEMBER(cedar_magnet_state, mag_xain)
 {
-	m_prothack = mag_xain_protection_hack;
+	m_prothack = &cedar_magnet_state::mag_xain_protection_hack;
 }
 
 DRIVER_INIT_MEMBER(cedar_magnet_state, mag_exzi)
 {
-	m_prothack = mag_exzi_protection_hack;
+	m_prothack = &cedar_magnet_state::mag_exzi_protection_hack;
 }
 
 GAME( 1987, cedmag,    0,         cedar_magnet, cedar_magnet, cedar_magnet_state,  0,        ROT0,  "EFO SA / Cedar", "Magnet System",                         MACHINE_IS_BIOS_ROOT )

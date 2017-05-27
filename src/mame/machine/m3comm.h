@@ -21,12 +21,6 @@ public:
 	// construction/destruction
 	m3comm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
-	required_shared_ptr<uint16_t> m68k_ram;
-	required_device<m68000_device> m_commcpu;
-
 	DECLARE_ADDRESS_MAP(m3_map, 32);
 
 	DECLARE_READ16_MEMBER(ctrl_r);
@@ -48,13 +42,13 @@ public:
 protected:
 	enum { TIMER_IRQ5 = 1 };
 
-	required_device<ram_device> m_ram;
-
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_reset_after_children() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
 private:
 	uint16_t naomi_control;
 	uint16_t naomi_offset;
@@ -74,6 +68,10 @@ private:
 	char m_remotehost[256];
 
 	emu_timer *timer;
+
+	required_shared_ptr<uint16_t> m68k_ram;
+	required_device<m68000_device> m_commcpu;
+	required_device<ram_device> m_ram;
 };
 
 // device type definition

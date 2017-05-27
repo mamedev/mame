@@ -124,7 +124,7 @@ SLOT_INTERFACE_END
 //  MACHINE_DRIVER( adam_fdc )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( adam_fdc )
+static MACHINE_CONFIG_START( adam_fdc )
 	MCFG_CPU_ADD(M6801_TAG, M6801, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(adam_fdc_mem)
 	MCFG_CPU_IO_MAP(adam_fdc_io)

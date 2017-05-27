@@ -12,6 +12,7 @@
 
 #include <cmath>
 #include <stack>
+#include <stdlib.h>
 
 namespace plib {
 
@@ -37,6 +38,7 @@ void pfunction::compile_postfix(const std::vector<pstring> &inputs,
 
 	for (const pstring &cmd : cmds)
 	{
+		printf("%s %d\n", cmd.c_str(), stk);
 		rpn_inst rc;
 		if (cmd == "+")
 			{ rc.m_cmd = ADD; stk -= 1; }
@@ -52,6 +54,8 @@ void pfunction::compile_postfix(const std::vector<pstring> &inputs,
 			{ rc.m_cmd = SIN; stk -= 0; }
 		else if (cmd == "cos")
 			{ rc.m_cmd = COS; stk -= 0; }
+		else if (cmd == "rand")
+			{ rc.m_cmd = RAND; stk += 1; }
 		else
 		{
 			for (unsigned i = 0; i < inputs.size(); i++)
@@ -199,6 +203,9 @@ double pfunction::evaluate(const std::vector<double> &values)
 			OP(POW,  1, std::pow(ST2, ST1))
 			OP(SIN,  0, std::sin(ST2));
 			OP(COS,  0, std::cos(ST2));
+			case RAND:
+				stack[ptr++] = static_cast<double>(rand()) / static_cast<double>(RAND_MAX);
+				break;
 			case PUSH_INPUT:
 				stack[ptr++] = values[static_cast<unsigned>(rc.m_param)];
 				break;

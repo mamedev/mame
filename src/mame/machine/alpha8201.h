@@ -16,10 +16,6 @@ public:
 	alpha_8201_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 	~alpha_8201_device() {}
 
-	DECLARE_READ8_MEMBER(mcu_data_r);
-	DECLARE_WRITE8_MEMBER(mcu_data_w);
-	DECLARE_WRITE16_MEMBER(mcu_d_w);
-
 	// external I/O
 	DECLARE_WRITE_LINE_MEMBER(bus_dir_w);
 	DECLARE_WRITE_LINE_MEMBER(mcu_start_w);
@@ -30,8 +26,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
+	virtual void device_add_mconfig(machine_config &config) override;
 private:
 	// devices/pointers
 	required_device<cpu_device> m_mcu;
@@ -45,6 +40,10 @@ private:
 
 	void mcu_update_address();
 	void mcu_writeram();
+
+	DECLARE_READ8_MEMBER(mcu_data_r);
+	DECLARE_WRITE8_MEMBER(mcu_data_w);
+	DECLARE_WRITE16_MEMBER(mcu_d_w);
 };
 
 

@@ -178,21 +178,15 @@ void sega315_5313_device::static_set_palette_tag(device_t &device, const char *t
 	downcast<sega315_5313_device &>(device).m_palette.set_tag(tag);
 }
 
+//-------------------------------------------------
+//  device_add_mconfig
+//  add machine configuration
+//-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( sega_genesis_vdp )
+MACHINE_CONFIG_MEMBER(sega315_5313_device::device_add_mconfig)
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_INIT_OWNER(sega315_5124_device, sega315_5124)
 MACHINE_CONFIG_END
-
-//-------------------------------------------------
-//  machine_config_additions - return a pointer to
-//  the device's machine fragment
-//-------------------------------------------------
-
-machine_config_constructor sega315_5313_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( sega_genesis_vdp );
-}
 
 TIMER_CALLBACK_MEMBER(sega315_5313_device::irq6_on_timer_callback)
 {

@@ -217,8 +217,11 @@ with magnet sensors and came with CB9 and CB16.
 8*(8+1) buttons, 8*8+1 LEDs
 36-pin edge connector, assume same as SC12
 4KB RAM(TMM2016P), 2*8KB ROM(HN48364P)
-R6502-13, 1.4MHz from resonator
+R6502-13, 1.4MHz from resonator, another pcb with the same resonator was measured 1.49MHz*
 PCB label 510-1046C01 2-1-82
+
+*: 2 other boards were measured 1.60MHz and 1.88MHz(newest serial). Online references
+suggest 3 versions of SC9(A) total: 1.5MHz, 1.6MHz, and 1.9MHz.
 
 I/O is via TTL, not further documented here
 
@@ -475,6 +478,9 @@ public:
 	DECLARE_WRITE8_MEMBER(sc9_control_w);
 	DECLARE_WRITE8_MEMBER(sc9_led_w);
 	DECLARE_READ8_MEMBER(sc9_input_r);
+	DECLARE_MACHINE_RESET(sc9);
+	DECLARE_INPUT_CHANGED_MEMBER(sc9_cpu_freq);
+	void sc9_set_cpu_freq();
 
 	// SC12
 	DECLARE_WRITE8_MEMBER(sc12_control_w);
@@ -670,7 +676,7 @@ READ8_MEMBER(fidel6502_state::eas_input_r)
 WRITE8_MEMBER(fidel6502_state::eas_ppi_porta_w)
 {
 	// pull output low during reset (see TODO)
-	if (machine().phase() == MACHINE_PHASE_RESET)
+	if (machine().phase() == machine_phase::RESET)
 		data = 0;
 
 	// d0-d5: TSI C0-C5
@@ -760,6 +766,19 @@ READ8_MEMBER(fidel6502_state::sc9_input_r)
 {
 	// multiplexed inputs (active low)
 	return read_inputs(9) ^ 0xff;
+}
+
+void fidel6502_state::sc9_set_cpu_freq()
+{
+	// SC9(A) was released with 1.5MHz, 1.6MHz, or 1.9MHz CPU
+	u8 inp = ioport("FAKE")->read();
+	m_maincpu->set_unscaled_clock((inp & 2) ? 1900000 : ((inp & 1) ? 1600000 : 1500000));
+}
+
+MACHINE_RESET_MEMBER(fidel6502_state, sc9)
+{
+	fidelbase_state::machine_reset();
+	sc9_set_cpu_freq();
 }
 
 
@@ -1360,6 +1379,21 @@ static INPUT_PORTS_START( playmatic )
 	PORT_INCLUDE( sc12_base )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( sc9 )
+	PORT_INCLUDE( sc12 )
+
+	PORT_START("FAKE")
+	PORT_CONFNAME( 0x03, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, fidel6502_state, sc9_cpu_freq, nullptr) // factory set
+	PORT_CONFSETTING(    0x00, "1.5MHz" )
+	PORT_CONFSETTING(    0x01, "1.6MHz" )
+	PORT_CONFSETTING(    0x02, "1.9MHz" )
+INPUT_PORTS_END
+
+INPUT_CHANGED_MEMBER(fidel6502_state::sc9_cpu_freq)
+{
+	sc9_set_cpu_freq();
+}
+
 
 static INPUT_PORTS_START( fexcelb )
 	PORT_INCLUDE( fidel_cb_buttons )
@@ -1557,11 +1591,11 @@ static MACHINE_CONFIG_DERIVED( eag, eas )
 	MCFG_DEFAULT_LAYOUT(layout_fidel_eag)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sc9 )
+static MACHINE_CONFIG_START( sc9b )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 1400000) // from ceramic resonator "681 JSA", measured. Also released as 1.5MHz, 1.6MHz, 1.9MHz
-	MCFG_CPU_PROGRAM_MAP(sc9_map)
+	MCFG_CPU_ADD("maincpu", M6502, XTAL_3_9MHz/2) // R6502AP, 3.9MHz resonator
+	MCFG_CPU_PROGRAM_MAP(sc9b_map)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", fidel6502_state, irq_on, attotime::from_hz(610)) // from 555 timer (22nF, 102K, 2.7K)
 	MCFG_TIMER_START_DELAY(attotime::from_hz(610) - attotime::from_usec(41)) // active for 41us
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel6502_state, irq_off, attotime::from_hz(610))
@@ -1582,14 +1616,16 @@ static MACHINE_CONFIG_START( sc9 )
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "fidel_scc")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sc9b, sc9 )
+static MACHINE_CONFIG_DERIVED( sc9, sc9b )
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", M6502, XTAL_3_9MHz/2) // R6502AP, 3.9MHz resonator
-	MCFG_CPU_PROGRAM_MAP(sc9b_map)
+	MCFG_CPU_REPLACE("maincpu", M6502, 1500000) // from ceramic resonator "681 JSA", measured, see sc9_set_cpu_freq
+	MCFG_CPU_PROGRAM_MAP(sc9_map)
+
+	MCFG_MACHINE_RESET_OVERRIDE(fidel6502_state, sc9)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( playmatic, sc9 )
+static MACHINE_CONFIG_DERIVED( playmatic, sc9b )
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", M6502, 3100000) // approximation
@@ -2061,13 +2097,13 @@ ROM_START( feag2100fr )
 ROM_END
 
 
-ROM_START( fscc9 )
+ROM_START( fscc9 ) // PCB label 510-1046C01
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("101-1034a01", 0xc000, 0x2000, CRC(b845c458) SHA1(d3fda65dbd9fae44fa4b93f8207839d8fa0c367a) ) // HN48364P
 	ROM_LOAD("101-1034b02", 0xe000, 0x2000, CRC(cbaf97d7) SHA1(7ed8e68bb74713d9e2ff1d9c037012320b7bfcbf) ) // "
 ROM_END
 
-ROM_START( fscc9b ) // this one came from an overclocked board, let's assume the roms were unmodified
+ROM_START( fscc9b ) // PCB label 510-1046D01
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("101-1034b01", 0xc000, 0x2000, CRC(65288753) SHA1(651f5ca5969ddd72a20cbebdec2de83c4bf10650) )
 	ROM_LOAD("101-1034c02", 0xe000, 0x2000, CRC(238b092f) SHA1(7ddffc6dba822aee9d8ad6815b23024ed5cdfd26) )
@@ -2230,8 +2266,8 @@ CONS( 1986, feag2100sp, feag2100, 0, eag,       eagg,      fidel6502_state, 0,  
 CONS( 1986, feag2100g,  feag2100, 0, eag,       eagg,      fidel6502_state, 0,        "Fidelity Electronics", "Elite Avant Garde 2100 (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1986, feag2100fr, feag2100, 0, eag,       eagg,      fidel6502_state, 0,        "Fidelity Electronics", "Elite Avant Garde 2100 (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1982, fscc9,      0,        0, sc9,       sc12,      fidel6502_state, 0,        "Fidelity Electronics", "Sensory Chess Challenger 9", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1982, fscc9b,     fscc9,    0, sc9b,      sc12,      fidel6502_state, 0,        "Fidelity Electronics", "Sensory Chess Challenger 9 (rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1982, fscc9,      0,        0, sc9,       sc9,       fidel6502_state, 0,        "Fidelity Electronics", "Sensory Chess Challenger 9 (rev. C01)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1982, fscc9b,     fscc9,    0, sc9b,      sc12,      fidel6502_state, 0,        "Fidelity Electronics", "Sensory Chess Challenger 9 (rev. D01)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1983, fscc9ps,    fscc9,    0, playmatic, playmatic, fidel6502_state, 0,        "Fidelity Electronics", "Sensory 9 Playmatic 'S'", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // Fidelity West Germany
 
 CONS( 1984, fscc12,     0,        0, sc12,      sc12,      fidel6502_state, 0,        "Fidelity Electronics", "Sensory Chess Challenger 12-B", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

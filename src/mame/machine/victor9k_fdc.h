@@ -57,35 +57,6 @@ public:
 	DECLARE_READ8_MEMBER( cs7_r );
 	DECLARE_WRITE8_MEMBER( cs7_w );
 
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
-
-	DECLARE_READ8_MEMBER( floppy_p1_r );
-	DECLARE_WRITE8_MEMBER( floppy_p1_w );
-	DECLARE_READ8_MEMBER( floppy_p2_r );
-	DECLARE_WRITE8_MEMBER( floppy_p2_w );
-	DECLARE_READ_LINE_MEMBER( tach0_r );
-	DECLARE_READ_LINE_MEMBER( tach1_r );
-	DECLARE_WRITE8_MEMBER( da_w );
-
-	DECLARE_READ8_MEMBER( via4_pa_r );
-	DECLARE_WRITE8_MEMBER( via4_pa_w );
-	DECLARE_READ8_MEMBER( via4_pb_r );
-	DECLARE_WRITE8_MEMBER( via4_pb_w );
-	DECLARE_WRITE_LINE_MEMBER( wrsync_w );
-	DECLARE_WRITE_LINE_MEMBER( via4_irq_w );
-
-	DECLARE_READ8_MEMBER( via5_pa_r );
-	DECLARE_WRITE8_MEMBER( via5_pb_w );
-	DECLARE_WRITE_LINE_MEMBER( via5_irq_w );
-
-	DECLARE_READ8_MEMBER( via6_pa_r );
-	DECLARE_READ8_MEMBER( via6_pb_r );
-	DECLARE_WRITE8_MEMBER( via6_pa_w );
-	DECLARE_WRITE8_MEMBER( via6_pb_w );
-	DECLARE_WRITE_LINE_MEMBER( drw_w );
-	DECLARE_WRITE_LINE_MEMBER( erase_w );
-	DECLARE_WRITE_LINE_MEMBER( via6_irq_w );
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -94,7 +65,7 @@ protected:
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	static const int rpm[0x100];
@@ -234,6 +205,35 @@ private:
 	void live_sync();
 	void live_abort();
 	void live_run(const attotime &limit = attotime::never);
+
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
+
+	DECLARE_READ8_MEMBER( floppy_p1_r );
+	DECLARE_WRITE8_MEMBER( floppy_p1_w );
+	DECLARE_READ8_MEMBER( floppy_p2_r );
+	DECLARE_WRITE8_MEMBER( floppy_p2_w );
+	DECLARE_READ_LINE_MEMBER( tach0_r );
+	DECLARE_READ_LINE_MEMBER( tach1_r );
+	DECLARE_WRITE8_MEMBER( da_w );
+
+	DECLARE_READ8_MEMBER( via4_pa_r );
+	DECLARE_WRITE8_MEMBER( via4_pa_w );
+	DECLARE_READ8_MEMBER( via4_pb_r );
+	DECLARE_WRITE8_MEMBER( via4_pb_w );
+	DECLARE_WRITE_LINE_MEMBER( wrsync_w );
+	DECLARE_WRITE_LINE_MEMBER( via4_irq_w );
+
+	DECLARE_READ8_MEMBER( via5_pa_r );
+	DECLARE_WRITE8_MEMBER( via5_pb_w );
+	DECLARE_WRITE_LINE_MEMBER( via5_irq_w );
+
+	DECLARE_READ8_MEMBER( via6_pa_r );
+	DECLARE_READ8_MEMBER( via6_pb_r );
+	DECLARE_WRITE8_MEMBER( via6_pa_w );
+	DECLARE_WRITE8_MEMBER( via6_pb_w );
+	DECLARE_WRITE_LINE_MEMBER( drw_w );
+	DECLARE_WRITE_LINE_MEMBER( erase_w );
+	DECLARE_WRITE_LINE_MEMBER( via6_irq_w );
 };
 
 

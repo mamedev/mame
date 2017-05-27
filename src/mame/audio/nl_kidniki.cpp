@@ -310,13 +310,13 @@ NETLIST_START(kidniki)
 
 #if (1 || USE_FRONTIERS)
 	SOLVER(Solver, 18000)
-	PARAM(Solver.ACCURACY, 1e-8)
-	PARAM(Solver.NR_LOOPS, 300)
-	PARAM(Solver.GS_LOOPS, 1)
+	PARAM(Solver.ACCURACY, 1e-7)
+	PARAM(Solver.NR_LOOPS, 100)
+	PARAM(Solver.GS_LOOPS, 10)
 	//PARAM(Solver.METHOD, "SOR")
 	PARAM(Solver.METHOD, "MAT_CR")
+	//PARAM(Solver.METHOD, "MAT")
 	//PARAM(Solver.METHOD, "GMRES")
-	PARAM(Solver.PARALLEL, 0)
 	PARAM(Solver.SOR_FACTOR, 1.00)
 	PARAM(Solver.DYNAMIC_TS, 0)
 	PARAM(Solver.DYNAMIC_LTE, 5e-4)
@@ -327,6 +327,11 @@ NETLIST_START(kidniki)
 	PARAM(Solver.NR_LOOPS, 300)
 	PARAM(Solver.GS_LOOPS, 20)
 	PARAM(Solver.METHOD, "GMRES")
+#endif
+
+#if (USE_FRONTIERS)
+	PARAM(Solver.PARALLEL, 2) // More does not help
+#else
 	PARAM(Solver.PARALLEL, 0)
 #endif
 

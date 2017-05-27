@@ -266,7 +266,7 @@ void a26_rom_dpc_device::setup_addon_ptr(uint8_t *ptr)
 }
 
 
-static MACHINE_CONFIG_FRAGMENT( a26_dpc )
+static MACHINE_CONFIG_START( a26_dpc )
 	MCFG_DEVICE_ADD("dpc", ATARI_DPC, 0)
 MACHINE_CONFIG_END
 

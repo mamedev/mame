@@ -1607,7 +1607,7 @@ void info_xml_creator::output_images(device_t &device, const char *root_tag)
 
 void info_xml_creator::output_slots(machine_config &config, device_t &device, const char *root_tag, device_type_set *devtypes)
 {
-	for (const device_slot_interface &slot : slot_interface_iterator(device))
+	for (device_slot_interface &slot : slot_interface_iterator(device))
 	{
 		// shall we list fixed slots as non-configurable?
 		bool const listed(!slot.fixed() && strcmp(slot.device().tag(), device.tag()));
@@ -1630,12 +1630,12 @@ void info_xml_creator::output_slots(machine_config &config, device_t &device, co
 			{
 				if (devtypes || (listed && option.second->selectable()))
 				{
-					device_t *const dev = config.device_add(&device, "_dummy", option.second->devtype(), 0);
+					device_t *const dev = config.device_add(&slot.device(), "_dummy", option.second->devtype(), 0);
 					if (!dev->configured())
 						dev->config_complete();
 
 					if (devtypes)
-						for (device_t &device : device_iterator(*dev)) devtypes->insert(&device.type());
+						for (device_t &subdevice : device_iterator(*dev)) devtypes->insert(&subdevice.type());
 
 					if (listed && option.second->selectable())
 					{
@@ -1647,7 +1647,7 @@ void info_xml_creator::output_slots(machine_config &config, device_t &device, co
 						fprintf(m_output, "/>\n");
 					}
 
-					config.device_remove(&device, "_dummy");
+					config.device_remove(&slot.device(), "_dummy");
 				}
 			}
 
@@ -1686,19 +1686,12 @@ void info_xml_creator::output_ramoptions(device_t &root)
 {
 	for (const ram_device &ram : ram_device_iterator(root))
 	{
-		fprintf(m_output, "\t\t<ramoption default=\"1\">%u</ramoption>\n", ram.default_size());
-
-		if (ram.extra_options() != nullptr)
+		for (uint32_t option : ram.extra_options())
 		{
-			std::string options(ram.extra_options());
-			for (int start = 0, end = options.find_first_of(',');; start = end + 1, end = options.find_first_of(',', start))
-			{
-				std::string option;
-				option.assign(options.substr(start, (end == -1) ? -1 : end - start));
-				fprintf(m_output, "\t\t<ramoption>%u</ramoption>\n", ram_device::parse_string(option.c_str()));
-				if (end == -1)
-					break;
-			}
+			if (option == ram.default_size())
+				fprintf(m_output, "\t\t<ramoption default=\"1\">%u</ramoption>\n", option);
+			else
+				fprintf(m_output, "\t\t<ramoption>%u</ramoption>\n", option);
 		}
 	}
 }

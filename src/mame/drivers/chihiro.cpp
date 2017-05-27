@@ -366,7 +366,7 @@ SegaBoot Ver.2.00.0 Build:Feb  7 2003 12:28:30
 SegaBoot Ver.2.13.0 Build:Mar  3 2005 17:03:15
 
 ic10_g24lc64.bin: This dump contains the firmware of the Base Board, serial number and REGION of the whole system
-Region is located at Offset 0x00001F10 , 01 means JAP, 02 Means USA, 03 Means EXPORT, if you
+Region is located at Offset 0x00001F10 , 01 means JPN, 02 Means USA, 03 Means EXPORT, if you
 want to change the region of your Chihiro Board, just change this byte.
 
 Thanks to Alex, Mr Mudkips, and Philip Burke for this info.
@@ -393,7 +393,10 @@ Thanks to Alex, Mr Mudkips, and Philip Burke for this info.
 //#define LOG_BASEBOARD
 //#define VERBOSE_MSG
 
-/////////////////////////
+/*
+ * Class declaration for jvs_master
+ */
+
 DECLARE_DEVICE_TYPE(JVS_MASTER, jvs_master)
 
 class jvs_master : public jvs_host
@@ -447,11 +450,13 @@ int jvs_master::received_packet(uint8_t *buffer)
 	return (int)length;
 }
 
-/////////////////////////
+/*
+ * Class declaration for ohci_hlean2131qc_device
+ */
 
 DECLARE_DEVICE_TYPE(OHCI_HLEAN2131QC, ohci_hlean2131qc_device)
 
-class ohci_hlean2131qc_device : public device_t, public ohci_function
+class ohci_hlean2131qc_device : public device_t, public ohci_function, public device_slot_card_interface
 {
 public:
 	ohci_hlean2131qc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -459,6 +464,7 @@ public:
 	int handle_nonstandard_request(int endpoint, USBSetupPacket *setup) override;
 	int handle_bulk_pid(int endpoint, int pid, uint8_t *buffer, int size) override;
 	void set_region_base(uint8_t *data);
+	void set_region(const char *_region_tag, int _region_offset);
 
 protected:
 	virtual void device_start() override;
@@ -482,6 +488,8 @@ private:
 	static const uint8_t strdesc1[];
 	static const uint8_t strdesc2[];
 	int maximum_send;
+	const char *region_tag;
+	int region_offset;
 	uint8_t *region;
 	struct
 	{
@@ -494,11 +502,18 @@ private:
 	} jvs;
 };
 
-DEFINE_DEVICE_TYPE(OHCI_HLEAN2131QC, ohci_hlean2131qc_device, "ohci_hlean2131qc", "OHCI Hlean2131qc")
+DEFINE_DEVICE_TYPE(OHCI_HLEAN2131QC, ohci_hlean2131qc_device, "ohci_hlean2131qc", "OHCI an2131qc HLE")
+
+#define MCFG_OHCI_HLEAN2131QC_REGION(_region_tag, _region_offset) \
+	downcast<ohci_hlean2131qc_device *>(device)->set_region(_region_tag, _region_offset);
+
+/*
+ * Class declaration for ohci_hlean2131sc_device
+ */
 
 DECLARE_DEVICE_TYPE(OHCI_HLEAN2131SC, ohci_hlean2131sc_device)
 
-class ohci_hlean2131sc_device : public device_t, public ohci_function
+class ohci_hlean2131sc_device : public device_t, public ohci_function, public device_slot_card_interface
 {
 public:
 	ohci_hlean2131sc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -506,6 +521,7 @@ public:
 	int handle_nonstandard_request(int endpoint, USBSetupPacket *setup) override;
 	int handle_bulk_pid(int endpoint, int pid, uint8_t *buffer, int size) override;
 	void set_region_base(uint8_t *data);
+	void set_region(const char *_region_tag, int _region_offset);
 
 protected:
 	virtual void device_start() override;
@@ -524,6 +540,8 @@ private:
 	static const uint8_t strdesc0[];
 	static const uint8_t strdesc1[];
 	static const uint8_t strdesc2[];
+	const char *region_tag;
+	int region_offset;
 	uint8_t *region;
 	uint8_t midi_rs232;
 	uint8_t response[256];
@@ -532,7 +550,14 @@ private:
 	int step;
 };
 
-DEFINE_DEVICE_TYPE(OHCI_HLEAN2131SC, ohci_hlean2131sc_device, "ohci_hlean2131sc", "OHCI Hlean2131sc")
+DEFINE_DEVICE_TYPE(OHCI_HLEAN2131SC, ohci_hlean2131sc_device, "ohci_hlean2131sc", "OHCI an2131sc HLE")
+
+#define MCFG_OHCI_HLEAN2131SC_REGION(_region_tag, _region_offset) \
+	downcast<ohci_hlean2131sc_device *>(device)->set_region(_region_tag, _region_offset);
+
+/*
+ * Class declaration for chihiro_state
+ */
 
 class chihiro_state : public xbox_base_state
 {
@@ -783,9 +808,12 @@ const uint8_t ohci_hlean2131qc_device::strdesc2[] = { 0x0E,0x03,0x42,0x00,0x41,0
 
 ohci_hlean2131qc_device::ohci_hlean2131qc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, OHCI_HLEAN2131QC, tag, owner, clock),
-	ohci_function()
+	ohci_function(),
+	device_slot_card_interface(mconfig, *this)
 {
 	maximum_send = 0;
+	region_tag = nullptr;
+	region_offset = 0;
 	region = nullptr;
 	jvs.buffer_in_expected = 0;
 	jvs.buffer_out_used = 0;
@@ -819,6 +847,12 @@ void ohci_hlean2131qc_device::initialize(running_machine &machine)
 void ohci_hlean2131qc_device::set_region_base(uint8_t *data)
 {
 	region = data;
+}
+
+void ohci_hlean2131qc_device::set_region(const char *_region_tag, int _region_offset)
+{
+	region_tag = _region_tag;
+	region_offset = _region_offset;
 }
 
 int ohci_hlean2131qc_device::handle_nonstandard_request(int endpoint, USBSetupPacket *setup)
@@ -1083,6 +1117,9 @@ void ohci_hlean2131qc_device::process_jvs_packet()
 
 void ohci_hlean2131qc_device::device_start()
 {
+	initialize(machine());
+	if (region_tag)
+		set_region_base(memregion(region_tag)->base() + region_offset);
 }
 
 //pc20
@@ -1101,9 +1138,12 @@ const uint8_t ohci_hlean2131sc_device::strdesc2[] = { 0x0E,0x03,0x42,0x00,0x41,0
 
 ohci_hlean2131sc_device::ohci_hlean2131sc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, OHCI_HLEAN2131SC, tag, owner, clock),
-	ohci_function()
+	ohci_function(),
+	device_slot_card_interface(mconfig, *this)
 {
 	region = nullptr;
+	region_tag = nullptr;
+	region_offset = 0;
 	midi_rs232 = 0;
 	response_size = 0;
 	step = 0;
@@ -1112,6 +1152,12 @@ ohci_hlean2131sc_device::ohci_hlean2131sc_device(const machine_config &mconfig, 
 void ohci_hlean2131sc_device::set_region_base(uint8_t *data)
 {
 	region = data;
+}
+
+void ohci_hlean2131sc_device::set_region(const char *_region_tag, int _region_offset)
+{
+	region_tag = _region_tag;
+	region_offset = _region_offset;
 }
 
 void ohci_hlean2131sc_device::initialize(running_machine &machine)
@@ -1403,6 +1449,9 @@ void ohci_hlean2131sc_device::process_packet()
 
 void ohci_hlean2131sc_device::device_start()
 {
+	initialize(machine());
+	if (region_tag)
+		set_region_base(memregion(region_tag)->base() + region_offset);
 }
 
 // ======================> ide_baseboard_device
@@ -1716,9 +1765,6 @@ static INPUT_PORTS_START(chihiro)
 
 void chihiro_state::machine_start()
 {
-	ohci_hlean2131qc_device *usb_device1;
-	ohci_hlean2131sc_device *usb_device2;
-
 	xbox_base_state::machine_start();
 	chihiro_devs.ide = machine().device<bus_master_ide_controller_device>("ide");
 	chihiro_devs.dimmboard = machine().device<naomi_gdrom_board>("rom_board");
@@ -1737,14 +1783,6 @@ void chihiro_state::machine_start()
 			break;
 		}
 	hack_counter = 0;
-	usb_device1 = machine().device<ohci_hlean2131qc_device>("ohci_hlean2131qc");
-	usb_device1->initialize(machine());
-	usb_device1->set_region_base(memregion(":others")->base()); // temporary
-	machine().device<mcpx_ohci_device>(":pci:02.0")->plug_usb_device(1, usb_device1); // connect
-	usb_device2 = machine().device<ohci_hlean2131sc_device>("ohci_hlean2131sc");
-	usb_device2->initialize(machine());
-	usb_device2->set_region_base(memregion(":others")->base() + 0x2080); // temporary
-	machine().device<mcpx_ohci_device>(":pci:02.0")->plug_usb_device(2, usb_device2); // connect
 	// savestates
 	save_item(NAME(hack_counter));
 }
@@ -1752,6 +1790,20 @@ void chihiro_state::machine_start()
 static SLOT_INTERFACE_START(ide_baseboard)
 	SLOT_INTERFACE("bb", IDE_BASEBOARD)
 SLOT_INTERFACE_END
+
+SLOT_INTERFACE_START(usb_baseboard)
+	SLOT_INTERFACE("an2131qc", OHCI_HLEAN2131QC)
+	SLOT_INTERFACE("an2131sc", OHCI_HLEAN2131SC)
+	SLOT_INTERFACE("xbox_controller", OHCI_GAME_CONTROLLER)
+SLOT_INTERFACE_END
+
+static MACHINE_CONFIG_START(an2131qc_configuration)
+	MCFG_OHCI_HLEAN2131QC_REGION(":others", 0)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_START(an2131sc_configuration)
+	MCFG_OHCI_HLEAN2131SC_REGION(":others", 0x2080)
+MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED(chihiro_base, xbox_base)
 	MCFG_CPU_MODIFY("maincpu")
@@ -1764,9 +1816,13 @@ static MACHINE_CONFIG_DERIVED(chihiro_base, xbox_base)
 	MCFG_DEVICE_MODIFY(":pci:09.0:ide:1")
 	MCFG_DEVICE_SLOT_INTERFACE(ide_baseboard, "bb", true)
 
-	// next lines are temporary
-	MCFG_DEVICE_ADD("ohci_hlean2131qc", OHCI_HLEAN2131QC, 0)
-	MCFG_DEVICE_ADD("ohci_hlean2131sc", OHCI_HLEAN2131SC, 0)
+	MCFG_USB_PORT_ADD(":pci:02.0:port1", usb_baseboard, "an2131qc", true)
+	MCFG_SLOT_OPTION_MACHINE_CONFIG("an2131qc", an2131qc_configuration)
+	MCFG_USB_PORT_ADD(":pci:02.0:port2", usb_baseboard, "an2131sc", true)
+	MCFG_SLOT_OPTION_MACHINE_CONFIG("an2131sc", an2131sc_configuration)
+	MCFG_USB_PORT_ADD(":pci:02.0:port3", usb_baseboard, nullptr, false)
+	MCFG_USB_PORT_ADD(":pci:02.0:port4", usb_baseboard, nullptr, false)
+
 	MCFG_DEVICE_ADD("jvs_master", JVS_MASTER, 0)
 	MCFG_SEGA_837_13551_DEVICE_ADD("837_13551", "jvs_master", ":TILT", ":P1", ":P2", ":A0", ":A1", ":A2", ":A3", ":A4", ":A5", ":A6", ":A7", ":OUTPUT")
 MACHINE_CONFIG_END

@@ -19,7 +19,7 @@ ROM_START( dmv_k806 )
 	ROM_LOAD( "dmv_mouse_8741a.bin", 0x0000, 0x0400, CRC(2163737a) SHA1(b82c14dba6c25cb1f60cf623989ca8c0c1ee4cc3))
 ROM_END
 
-static MACHINE_CONFIG_FRAGMENT( dmv_k806 )
+static MACHINE_CONFIG_START( dmv_k806 )
 	MCFG_CPU_ADD("mcu", I8741, XTAL_6MHz)
 	MCFG_MCS48_PORT_P1_IN_CB(READ8(dmv_k806_device, port1_r))
 	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(dmv_k806_device, port2_w))

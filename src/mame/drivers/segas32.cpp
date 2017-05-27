@@ -527,6 +527,8 @@ orunners:  Interleaved with the dj and << >> buttons is the data the drives the 
 #include "emu.h"
 #include "includes/segas32.h"
 
+#include "bus/scsi/scsi.h"
+#include "bus/scsi/scsicd.h"
 #include "cpu/z80/z80.h"
 #include "cpu/v60/v60.h"
 #include "cpu/nec/v25.h"
@@ -535,8 +537,9 @@ orunners:  Interleaved with the dj and << >> buttons is the data the drives the 
 #include "machine/eepromser.h"
 #include "machine/i8255.h"
 #include "machine/mb8421.h"
-//#include "machine/mb89352.h"
+#include "machine/mb89352.h"
 #include "machine/msm6253.h"
+#include "machine/upd4701.h"
 #include "machine/315_5296.h"
 #include "sound/2612intf.h"
 #include "sound/rf5c68.h"
@@ -546,6 +549,11 @@ orunners:  Interleaved with the dj and << >> buttons is the data the drives the 
 
 #include "radr.lh"
 
+/*
+ * TODO: Kokoroji hangs if CD comms are handled with current mb89352 core.
+ * We currently hide this behind a compile switch to aid development
+ */
+#define S32_KOKOROJI_TEST_CD 0
 
 DEFINE_DEVICE_TYPE(SEGA_S32_PCB, segas32_state, "segas32_pcb", "Sega System 32 PCB")
 
@@ -618,6 +626,7 @@ void segas32_trackball_state::device_start()
 void segas32_v25_state::device_start()
 {
 	common_start(0);
+	decrypt_protrom();
 }
 
 void segas32_upd7725_state::device_start()
@@ -899,56 +908,6 @@ WRITE_LINE_MEMBER(segas32_state::display_enable_0_w)
 WRITE_LINE_MEMBER(segas32_state::display_enable_1_w)
 {
 	m_system32_displayenable[1] = state;
-}
-
-
-
-/*************************************
- *
- *  I/O expansion range
- *
- *************************************/
-
-
-
-
-/*************************************
- *
- *  Game-specific custom I/O
- *
- *************************************/
-
-READ8_MEMBER(segas32_trackball_state::sonic_custom_io_r)
-{
-	switch (offset)
-	{
-		case 0x00/2:
-		case 0x04/2:
-		case 0x08/2:
-		case 0x0c/2:
-		case 0x10/2:
-		case 0x14/2:
-			return (uint8_t)(m_track_ports[offset/2]->read() - m_sonic_last[offset/2]);
-	}
-
-	logerror("%06X:unknown sonic_custom_io_r(%X) & %04X\n", space.device().safe_pc(), offset*2, mem_mask);
-	return 0xff;
-}
-
-
-WRITE8_MEMBER(segas32_trackball_state::sonic_custom_io_w)
-{
-	switch (offset)
-	{
-		case 0x00/2:
-		case 0x08/2:
-		case 0x10/2:
-			m_sonic_last[offset/2 + 0] = m_track_ports[offset/2 + 0]->read();
-			m_sonic_last[offset/2 + 1] = m_track_ports[offset/2 + 1]->read();
-			return;
-	}
-
-	logerror("%06X:unknown sonic_custom_io_w(%X) = %04X & %04X\n", space.device().safe_pc(), offset*2, data, mem_mask);
 }
 
 
@@ -1255,11 +1214,11 @@ ADDRESS_MAP_END
 
 /*************************************
  *
- *  GA2 Protection CPU memory handlers
+ *  V25 Protection CPU memory handlers
  *
  *************************************/
 
-static ADDRESS_MAP_START( ga2_v25_map, AS_PROGRAM, 8, segas32_state )
+static ADDRESS_MAP_START( v25_map, AS_PROGRAM, 8, segas32_state )
 	AM_RANGE(0x00000, 0x0ffff) AM_ROM AM_REGION("mcu", 0)
 	AM_RANGE(0x10000, 0x1ffff) AM_DEVREADWRITE("dpram", mb8421_device, left_r, left_w)
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION("mcu", 0)
@@ -2134,22 +2093,22 @@ static INPUT_PORTS_START( sonic )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START3 )
 
 	PORT_START("mainpcb:TRACKX1")
-	PORT_BIT( 0xff, 0, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_REVERSE PORT_PLAYER(1)
+	PORT_BIT( 0xfff, 0, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_RESET PORT_REVERSE PORT_PLAYER(1)
 
 	PORT_START("mainpcb:TRACKY1")
-	PORT_BIT( 0xff, 0, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_PLAYER(1)
+	PORT_BIT( 0xfff, 0, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_RESET PORT_PLAYER(1)
 
 	PORT_START("mainpcb:TRACKX2")
-	PORT_BIT( 0xff, 0, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_REVERSE PORT_PLAYER(2)
+	PORT_BIT( 0xfff, 0, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_RESET PORT_REVERSE PORT_PLAYER(2)
 
 	PORT_START("mainpcb:TRACKY2")
-	PORT_BIT( 0xff, 0, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_PLAYER(2)
+	PORT_BIT( 0xfff, 0, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_RESET PORT_PLAYER(2)
 
 	PORT_START("mainpcb:TRACKX3")
-	PORT_BIT( 0xff, 0, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_REVERSE PORT_PLAYER(3)
+	PORT_BIT( 0xfff, 0, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_RESET PORT_REVERSE PORT_PLAYER(3)
 
 	PORT_START("mainpcb:TRACKY3")
-	PORT_BIT( 0xff, 0, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_PLAYER(3)
+	PORT_BIT( 0xfff, 0, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_RESET PORT_PLAYER(3)
 INPUT_PORTS_END
 
 
@@ -2282,7 +2241,7 @@ GFXDECODE_END
  *************************************/
 
 
-static MACHINE_CONFIG_FRAGMENT( system32 )
+MACHINE_CONFIG_MEMBER(segas32_state::device_add_mconfig)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V60, MASTER_CLOCK/2)
@@ -2349,11 +2308,6 @@ segas32_regular_state::segas32_regular_state(const machine_config &mconfig, cons
 {
 }
 
-machine_config_constructor segas32_regular_state::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( system32 );
-}
-
 
 
 
@@ -2364,8 +2318,8 @@ static ADDRESS_MAP_START( system32_analog_map, AS_PROGRAM, 16, segas32_state )
 	AM_IMPORT_FROM(system32_map)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_FRAGMENT( system32_analog )
-	MCFG_FRAGMENT_ADD( system32 )
+MACHINE_CONFIG_MEMBER(segas32_analog_state::device_add_mconfig)
+	segas32_state::device_add_mconfig(config);
 
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(system32_analog_map)
@@ -2380,13 +2334,13 @@ MACHINE_CONFIG_END
 DEFINE_DEVICE_TYPE(SEGA_S32_ANALOG_DEVICE, segas32_analog_state, "segas32_pcb_analog", "Sega System 32 analog PCB")
 
 segas32_analog_state::segas32_analog_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: segas32_state(mconfig, SEGA_S32_ANALOG_DEVICE, tag, owner, clock)
+	: segas32_analog_state(mconfig, SEGA_S32_ANALOG_DEVICE, tag, owner, clock)
 {
 }
 
-machine_config_constructor segas32_analog_state::device_mconfig_additions() const
+segas32_analog_state::segas32_analog_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: segas32_state(mconfig, type, tag, owner, clock)
 {
-	return MACHINE_CONFIG_NAME( system32_analog );
 }
 
 
@@ -2395,28 +2349,37 @@ machine_config_constructor segas32_analog_state::device_mconfig_additions() cons
 
 static ADDRESS_MAP_START( system32_trackball_map, AS_PROGRAM, 16, segas32_trackball_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xc00040, 0xc0005f) AM_MIRROR(0x0fff80) AM_READWRITE8(sonic_custom_io_r, sonic_custom_io_w, 0x00ff)
+	//AM_RANGE(0xc00040, 0xc0005f) AM_MIRROR(0x0fff80) AM_READWRITE8(sonic_custom_io_r, sonic_custom_io_w, 0x00ff)
+	AM_RANGE(0xc00040, 0xc00047) AM_MIRROR(0x0fff80) AM_DEVREADWRITE8("upd1", upd4701_device, read_xy, reset_xy, 0x00ff)
+	AM_RANGE(0xc00048, 0xc0004f) AM_MIRROR(0x0fff80) AM_DEVREADWRITE8("upd2", upd4701_device, read_xy, reset_xy, 0x00ff)
+	AM_RANGE(0xc00050, 0xc00057) AM_MIRROR(0x0fff80) AM_DEVREADWRITE8("upd3", upd4701_device, read_xy, reset_xy, 0x00ff)
 	AM_IMPORT_FROM(system32_map)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_FRAGMENT( system32_trackball )
-	MCFG_FRAGMENT_ADD( system32 )
+MACHINE_CONFIG_MEMBER(segas32_trackball_state::device_add_mconfig)
+	segas32_state::device_add_mconfig(config);
 
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(system32_trackball_map)
+
+	MCFG_DEVICE_ADD("upd1", UPD4701A, 0)
+	MCFG_UPD4701_PORTX("TRACKX1")
+	MCFG_UPD4701_PORTY("TRACKY1")
+
+	MCFG_DEVICE_ADD("upd2", UPD4701A, 0)
+	MCFG_UPD4701_PORTX("TRACKX2")
+	MCFG_UPD4701_PORTY("TRACKY2")
+
+	MCFG_DEVICE_ADD("upd3", UPD4701A, 0)
+	MCFG_UPD4701_PORTX("TRACKX3")
+	MCFG_UPD4701_PORTY("TRACKY3")
 MACHINE_CONFIG_END
 
 DEFINE_DEVICE_TYPE(SEGA_S32_TRACKBALL_DEVICE, segas32_trackball_state, "segas32_pcb_trackball", "Sega System 32 trackball PCB")
 
 segas32_trackball_state::segas32_trackball_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: segas32_state(mconfig, SEGA_S32_TRACKBALL_DEVICE, tag, owner, clock)
-	, m_track_ports(*this, {"TRACKX1", "TRACKY1", "TRACKX2", "TRACKY2", "TRACKX3", "TRACKY3"})
 {
-}
-
-machine_config_constructor segas32_trackball_state::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( system32_trackball );
 }
 
 
@@ -2429,8 +2392,8 @@ static ADDRESS_MAP_START( system32_4player_map, AS_PROGRAM, 16, segas32_state )
 	AM_IMPORT_FROM(system32_map)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_FRAGMENT( system32_4player )
-	MCFG_FRAGMENT_ADD( system32 )
+MACHINE_CONFIG_MEMBER(segas32_4player_state::device_add_mconfig)
+	segas32_state::device_add_mconfig(config);
 
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(system32_4player_map)
@@ -2444,13 +2407,13 @@ MACHINE_CONFIG_END
 DEFINE_DEVICE_TYPE(SEGA_S32_4PLAYER_DEVICE, segas32_4player_state, "segas32_pcb_4player", "Sega System 32 4-player/fighting PCB")
 
 segas32_4player_state::segas32_4player_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: segas32_state(mconfig, SEGA_S32_4PLAYER_DEVICE, tag, owner, clock)
+	: segas32_4player_state(mconfig, SEGA_S32_4PLAYER_DEVICE, tag, owner, clock)
 {
 }
 
-machine_config_constructor segas32_4player_state::device_mconfig_additions() const
+segas32_4player_state::segas32_4player_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: segas32_state(mconfig, type, tag, owner, clock)
 {
-	return MACHINE_CONFIG_NAME( system32_4player );
 }
 
 
@@ -2463,8 +2426,8 @@ static ADDRESS_MAP_START( ga2_main_map, AS_PROGRAM, 16, segas32_state )
 	AM_IMPORT_FROM(system32_4player_map)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_FRAGMENT( system32_v25 )
-	MCFG_FRAGMENT_ADD( system32_4player )
+MACHINE_CONFIG_MEMBER(segas32_v25_state::device_add_mconfig)
+	segas32_4player_state::device_add_mconfig(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(ga2_main_map)
@@ -2473,28 +2436,22 @@ static MACHINE_CONFIG_FRAGMENT( system32_v25 )
 
 	/* add a V25 for protection */
 	MCFG_CPU_ADD("mcu", V25, 10000000)
-	MCFG_CPU_PROGRAM_MAP(ga2_v25_map)
-	MCFG_V25_CONFIG(ga2_v25_opcode_table)
+	MCFG_CPU_PROGRAM_MAP(v25_map)
 MACHINE_CONFIG_END
 
 DEFINE_DEVICE_TYPE(SEGA_S32_V25_DEVICE, segas32_v25_state, "segas32_pcb_v25", "Sega System 32 V25 PCB")
 
 segas32_v25_state::segas32_v25_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: segas32_state(mconfig, SEGA_S32_V25_DEVICE, tag, owner, clock)
+	: segas32_4player_state(mconfig, SEGA_S32_V25_DEVICE, tag, owner, clock)
 {
 }
 
-machine_config_constructor segas32_v25_state::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( system32_v25 );
-}
 
 
 
 
-
-static MACHINE_CONFIG_FRAGMENT( system32_upd7725 )
-	MCFG_FRAGMENT_ADD( system32_analog )
+MACHINE_CONFIG_MEMBER(segas32_upd7725_state::device_add_mconfig)
+	segas32_analog_state::device_add_mconfig(config);
 
 	/* add a upd7725; this is on the 837-8341 daughterboard which plugs into the socket on the master pcb's rom board where an fd1149 could go */
 	MCFG_CPU_ADD("dsp", UPD7725, 8000000) // TODO: Find real clock speed for the upd7725; this is a canned oscillator on the 837-8341 pcb
@@ -2510,13 +2467,8 @@ MACHINE_CONFIG_END
 DEFINE_DEVICE_TYPE(SEGA_S32_UPD7725_DEVICE, segas32_upd7725_state, "segas32_pcb_upd7725", "Sega System 32 uPD7725 PCB")
 
 segas32_upd7725_state::segas32_upd7725_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: segas32_state(mconfig, SEGA_S32_UPD7725_DEVICE, tag, owner, clock)
+	: segas32_analog_state(mconfig, SEGA_S32_UPD7725_DEVICE, tag, owner, clock)
 {
-}
-
-machine_config_constructor segas32_upd7725_state::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( system32_upd7725 );
 }
 
 
@@ -2534,20 +2486,41 @@ WRITE8_MEMBER(segas32_cd_state::lamps2_w)
 		machine().output().set_lamp_value(8 + i, BIT(data, i));
 }
 
+WRITE_LINE_MEMBER(segas32_cd_state::scsi_irq_w)
+{
+	printf("%02x IRQ\n",state);
+	// TODO: sent!
+}
+
+WRITE_LINE_MEMBER(segas32_cd_state::scsi_drq_w)
+{
+	printf("%02x DRQ\n",state);
+}
+
 static ADDRESS_MAP_START( system32_cd_map, AS_PROGRAM, 16, segas32_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xc00040, 0xc0005f) AM_MIRROR(0x0fff80) AM_NOP //AM_DEVREADWRITE8("mb89352", mb89352_device, mb89352_r, mb89352_w, 0x00ff)
+	#if S32_KOKOROJI_TEST_CD
+	AM_RANGE(0xc00040, 0xc0005f) AM_MIRROR(0x0fff80) AM_DEVREADWRITE8("mb89352", mb89352_device, mb89352_r, mb89352_w, 0x00ff)
+	#else
+	AM_RANGE(0xc00040, 0xc0005f) AM_MIRROR(0x0fff80) AM_NOP
+	#endif
 	AM_RANGE(0xc00060, 0xc0006f) AM_MIRROR(0x0fff80) AM_DEVREADWRITE8("cxdio", cxd1095_device, read, write, 0x00ff)
 	AM_IMPORT_FROM(system32_map)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_FRAGMENT( system32_cd )
-	MCFG_FRAGMENT_ADD( system32 )
+MACHINE_CONFIG_MEMBER(segas32_cd_state::device_add_mconfig)
+	segas32_state::device_add_mconfig(config);
 
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(system32_cd_map)
 
-	//MCFG_DEVICE_ADD("mb89352", MB89352A, 8000000)
+	MCFG_DEVICE_ADD("mb89352", MB89352A, 8000000)
+	MCFG_LEGACY_SCSI_PORT("scsi")
+	MCFG_MB89352A_IRQ_CB(WRITELINE(segas32_cd_state, scsi_irq_w))
+	MCFG_MB89352A_DRQ_CB(WRITELINE(segas32_cd_state, scsi_drq_w))
+
+	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
+	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "cdrom", SCSICD, SCSI_ID_0)
 
 	MCFG_DEVICE_ADD("cxdio", CXD1095, 0)
 	MCFG_CXD1095_OUT_PORTA_CB(WRITE8(segas32_cd_state, lamps1_w))
@@ -2562,15 +2535,9 @@ segas32_cd_state::segas32_cd_state(const machine_config &mconfig, const char *ta
 {
 }
 
-machine_config_constructor segas32_cd_state::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( system32_cd );
-}
 
 
-
-static MACHINE_CONFIG_FRAGMENT( multi32 )
-
+MACHINE_CONFIG_MEMBER(sega_multi32_state::device_add_mconfig)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V70, MULTI32_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(multi32_map)
@@ -2646,13 +2613,13 @@ MACHINE_CONFIG_END
 DEFINE_DEVICE_TYPE(SEGA_MULTI32_DEVICE, sega_multi32_state, "segas32_pcb_multi", "Sega Multi 32")
 
 sega_multi32_state::sega_multi32_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: segas32_state(mconfig, SEGA_MULTI32_DEVICE, tag, owner, clock)
+	: sega_multi32_state(mconfig, SEGA_MULTI32_DEVICE, tag, owner, clock)
 {
 }
 
-machine_config_constructor sega_multi32_state::device_mconfig_additions() const
+sega_multi32_state::sega_multi32_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: segas32_state(mconfig, type, tag, owner, clock)
 {
-	return MACHINE_CONFIG_NAME( multi32 );
 }
 
 
@@ -2664,8 +2631,8 @@ static ADDRESS_MAP_START( multi32_analog_map, AS_PROGRAM, 32, sega_multi32_analo
 	AM_IMPORT_FROM(multi32_map)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_FRAGMENT( multi32_analog )
-	MCFG_FRAGMENT_ADD(multi32)
+MACHINE_CONFIG_MEMBER(sega_multi32_analog_state::device_add_mconfig)
+	sega_multi32_state::device_add_mconfig(config);
 
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(multi32_analog_map)
@@ -2695,14 +2662,9 @@ WRITE8_MEMBER(sega_multi32_analog_state::analog_bank_w)
 DEFINE_DEVICE_TYPE(SEGA_MULTI32_ANALOG_DEVICE, sega_multi32_analog_state, "segas32_pcb_multi_analog", "Sega Multi 32 analog PCB")
 
 sega_multi32_analog_state::sega_multi32_analog_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: segas32_state(mconfig, SEGA_MULTI32_ANALOG_DEVICE, tag, owner, clock)
+	: sega_multi32_state(mconfig, SEGA_MULTI32_ANALOG_DEVICE, tag, owner, clock)
 	, m_analog_ports(*this, "ANALOG%u", 1)
 {
-}
-
-machine_config_constructor sega_multi32_analog_state::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( multi32_analog );
 }
 
 
@@ -2713,8 +2675,8 @@ static ADDRESS_MAP_START( multi32_6player_map, AS_PROGRAM, 32, segas32_state )
 	AM_IMPORT_FROM(multi32_map)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_FRAGMENT( multi32_6player )
-	MCFG_FRAGMENT_ADD(multi32)
+MACHINE_CONFIG_MEMBER(sega_multi32_6player_state::device_add_mconfig)
+	sega_multi32_state::device_add_mconfig(config);
 
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(multi32_6player_map)
@@ -2728,13 +2690,8 @@ MACHINE_CONFIG_END
 DEFINE_DEVICE_TYPE(SEGA_MULTI32_6PLAYER_DEVICE, sega_multi32_6player_state, "segas32_pcb_multi_6player", "Sega Multi 32 6-player PCB")
 
 sega_multi32_6player_state::sega_multi32_6player_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: segas32_state(mconfig, SEGA_MULTI32_6PLAYER_DEVICE, tag, owner, clock)
+	: sega_multi32_state(mconfig, SEGA_MULTI32_6PLAYER_DEVICE, tag, owner, clock)
 {
-}
-
-machine_config_constructor sega_multi32_6player_state::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( multi32_6player );
 }
 
 
@@ -2817,8 +2774,16 @@ static MACHINE_CONFIG_START( sega_system32_dual_direct_upd7725 )
 	MCFG_DEVICE_ADD("slavepcb", SEGA_S32_ANALOG_DEVICE, 0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sega_system32_v25 )
+static MACHINE_CONFIG_START( sega_system32_ga2 )
 	MCFG_DEVICE_ADD("mainpcb", SEGA_S32_V25_DEVICE, 0)
+	MCFG_CPU_MODIFY("mainpcb:mcu")
+	MCFG_V25_CONFIG(segas32_v25_state::ga2_opcode_table)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_START( sega_system32_arf )
+	MCFG_DEVICE_ADD("mainpcb", SEGA_S32_V25_DEVICE, 0)
+	MCFG_CPU_MODIFY("mainpcb:mcu")
+	MCFG_V25_CONFIG(segas32_v25_state::arf_opcode_table)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( sega_multi32 )
@@ -3192,9 +3157,8 @@ ROM_START( arabfgt )
 	ROM_LOAD( "mpr-14594f.ic34",    0x300000, 0x100000, CRC(01777645) SHA1(7bcbe7687bd80b94bd3b2b3099cdd036bf7e0cd3) )
 	ROM_LOAD( "mpr-14593f.ic24",    0x400000, 0x100000, CRC(aa037047) SHA1(5cb1cfb235bbbf875d2b07ac4a9130ba13d47e57) )
 
-	ROM_REGION( 0x100000, "cpu2", 0 ) /* Protection CPU */
+	ROM_REGION( 0x10000, "mainpcb:mcu", 0 ) /* Protection CPU */
 	ROM_LOAD( "epr-14468-01.u3", 0x00000, 0x10000, CRC(c3c591e4) SHA1(53e48066e85b61d0c456618d14334a509b354cb3) )
-	ROM_RELOAD(                  0xf0000, 0x10000)
 
 	ROM_REGION( 0x400000, "mainpcb:gfx1", 0 ) /* tiles */
 	ROM_LOAD16_BYTE( "mpr-14599f.ic14", 0x000000, 0x200000, CRC(94f1cf10) SHA1(34ec86487bcb6726c025149c319f00a854eb7a1d) )
@@ -3227,9 +3191,8 @@ ROM_START( arabfgtu )
 	ROM_LOAD( "mpr-14594f.ic34",    0x300000, 0x100000, CRC(01777645) SHA1(7bcbe7687bd80b94bd3b2b3099cdd036bf7e0cd3) )
 	ROM_LOAD( "mpr-14593f.ic24",    0x400000, 0x100000, CRC(aa037047) SHA1(5cb1cfb235bbbf875d2b07ac4a9130ba13d47e57) )
 
-	ROM_REGION( 0x100000, "cpu2", 0 ) /* Protection CPU */
+	ROM_REGION( 0x10000, "mainpcb:mcu", 0 ) /* Protection CPU */
 	ROM_LOAD( "epr-14468-01.u3", 0x00000, 0x10000, CRC(c3c591e4) SHA1(53e48066e85b61d0c456618d14334a509b354cb3) )
-	ROM_RELOAD(                  0xf0000, 0x10000)
 
 	ROM_REGION( 0x400000, "mainpcb:gfx1", 0 ) /* tiles */
 	ROM_LOAD16_BYTE( "mpr-14599f.ic14", 0x000000, 0x200000, CRC(94f1cf10) SHA1(34ec86487bcb6726c025149c319f00a854eb7a1d) )
@@ -3262,9 +3225,8 @@ ROM_START( arabfgtj )
 	ROM_LOAD( "mpr-14594f.ic34",    0x300000, 0x100000, CRC(01777645) SHA1(7bcbe7687bd80b94bd3b2b3099cdd036bf7e0cd3) )
 	ROM_LOAD( "mpr-14593f.ic24",    0x400000, 0x100000, CRC(aa037047) SHA1(5cb1cfb235bbbf875d2b07ac4a9130ba13d47e57) )
 
-	ROM_REGION( 0x100000, "cpu2", 0 ) /* Protection CPU */
+	ROM_REGION( 0x10000, "mainpcb:mcu", 0 ) /* Protection CPU */
 	ROM_LOAD( "epr-14468-01.u3", 0x00000, 0x10000, CRC(c3c591e4) SHA1(53e48066e85b61d0c456618d14334a509b354cb3) )
-	ROM_RELOAD(                  0xf0000, 0x10000)
 
 	ROM_REGION( 0x400000, "mainpcb:gfx1", 0 ) /* tiles */
 	ROM_LOAD16_BYTE( "mpr-14599f.ic14", 0x000000, 0x200000, CRC(94f1cf10) SHA1(34ec86487bcb6726c025149c319f00a854eb7a1d) )
@@ -3745,7 +3707,7 @@ ROM_START( ga2 )
 	ROM_LOAD( "mpr-14943.ic34",     0x300000, 0x100000, CRC(24d40333) SHA1(38faf8f3eac317a163e93bd2247fe98189b13d2d) )
 	ROM_LOAD( "mpr-14942.ic24",     0x400000, 0x100000, CRC(a89b0e90) SHA1(e14c62418eb7f9a2deb2a6dcf635bedc1c73c253) )
 
-	ROM_REGION( 0x100000, "mainpcb:mcu", 0 ) /* Protection CPU */
+	ROM_REGION( 0x10000, "mainpcb:mcu", 0 ) /* Protection CPU */
 	ROM_LOAD( "epr-14468-02.u3", 0x00000, 0x10000, CRC(77634daa) SHA1(339169d164b9ed7dc3787b084d33effdc8e9efc1) ) /* located on separate sub board */
 
 	ROM_REGION( 0x400000, "mainpcb:gfx1", 0 ) /* tiles */
@@ -3785,7 +3747,7 @@ ROM_START( ga2u )
 	ROM_LOAD( "mpr-14943.ic34",     0x300000, 0x100000, CRC(24d40333) SHA1(38faf8f3eac317a163e93bd2247fe98189b13d2d) )
 	ROM_LOAD( "mpr-14942.ic24",     0x400000, 0x100000, CRC(a89b0e90) SHA1(e14c62418eb7f9a2deb2a6dcf635bedc1c73c253) )
 
-	ROM_REGION( 0x100000, "mainpcb:mcu", 0 ) /* Protection CPU */
+	ROM_REGION( 0x10000, "mainpcb:mcu", 0 ) /* Protection CPU */
 	ROM_LOAD( "epr-14468-02.u3", 0x00000, 0x10000, CRC(77634daa) SHA1(339169d164b9ed7dc3787b084d33effdc8e9efc1) ) /* located on separate sub board */
 
 	ROM_REGION( 0x400000, "mainpcb:gfx1", 0 ) /* tiles */
@@ -3820,7 +3782,7 @@ ROM_START( ga2j )
 	ROM_LOAD( "mpr-14943.ic34",     0x300000, 0x100000, CRC(24d40333) SHA1(38faf8f3eac317a163e93bd2247fe98189b13d2d) )
 	ROM_LOAD( "mpr-14942.ic24",     0x400000, 0x100000, CRC(a89b0e90) SHA1(e14c62418eb7f9a2deb2a6dcf635bedc1c73c253) )
 
-	ROM_REGION( 0x100000, "mainpcb:mcu", 0 ) /* Protection CPU */
+	ROM_REGION( 0x10000, "mainpcb:mcu", 0 ) /* Protection CPU */
 	ROM_LOAD( "epr-14468-02.u3", 0x00000, 0x10000, CRC(77634daa) SHA1(339169d164b9ed7dc3787b084d33effdc8e9efc1) ) /* located on separate sub board */
 
 	ROM_REGION( 0x400000, "mainpcb:gfx1", 0 ) /* tiles */
@@ -4122,7 +4084,7 @@ ROM_START( kokoroj2 )
 	ROMX_LOAD( "mpr-16196.ic25", 0x800006, 0x200000, CRC(b8e22e05) SHA1(dd667e2c5d421cba356421825e6aca9b5ca0af45) , ROM_SKIP(6)|ROM_GROUPWORD )
 
 	/* AUDIO CD */
-	DISK_REGION( "cdrom" )
+	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
 	DISK_IMAGE_READONLY( "cdp-00146", 0, SHA1(0b37e0ea2380ecd9abef2ccd6a8096d76d2ba344) )
 ROM_END
 
@@ -5449,10 +5411,6 @@ void segas32_state::init_arescue(int m_hasdsp)
 void segas32_state::init_arabfgt(void)
 {
 	segas32_common_init();
-
-	/* install protection handlers */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa00100, 0xa0011f, read16_delegate(FUNC(segas32_state::arf_wakeup_protection_r),this));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa00000, 0xa00fff, read16_delegate(FUNC(segas32_state::arabfgt_protection_r),this), write16_delegate(FUNC(segas32_state::arabfgt_protection_w),this));
 }
 
 
@@ -5511,8 +5469,6 @@ void segas32_state::init_f1lap(void)
 void segas32_state::init_ga2(void)
 {
 	segas32_common_init();
-
-	decrypt_ga2_protrom();
 }
 
 
@@ -5645,9 +5601,9 @@ GAME( 1992, arescuej,  arescue,  sega_system32_dual_direct_upd7725,     arescue,
 GAME( 1993, alien3,    0,        sega_system32_analog, alien3, segas32_new_state, alien3,  ROT0, "Sega",   "Alien3: The Gun (World)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1993, alien3u,   alien3,   sega_system32_analog, alien3, segas32_new_state, alien3,  ROT0, "Sega",   "Alien3: The Gun (US)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1991, arabfgt,   0,        sega_system32_4p,  arabfgt,  segas32_new_state, arabfgt,  ROT0, "Sega",   "Arabian Fight (World)", MACHINE_IMPERFECT_GRAPHICS ) /* Released in 03.1992 */
-GAME( 1991, arabfgtu,  arabfgt,  sega_system32_4p,  arabfgtu, segas32_new_state, arabfgt,  ROT0, "Sega",   "Arabian Fight (US)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1991, arabfgtj,  arabfgt,  sega_system32_4p,  arabfgt,  segas32_new_state, arabfgt,  ROT0, "Sega",   "Arabian Fight (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1991, arabfgt,   0,        sega_system32_arf, arabfgt,  segas32_new_state, arabfgt,  ROT0, "Sega",   "Arabian Fight (World)", MACHINE_IMPERFECT_GRAPHICS ) /* Released in 03.1992 */
+GAME( 1991, arabfgtu,  arabfgt,  sega_system32_arf, arabfgtu, segas32_new_state, arabfgt,  ROT0, "Sega",   "Arabian Fight (US)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1991, arabfgtj,  arabfgt,  sega_system32_arf, arabfgt,  segas32_new_state, arabfgt,  ROT0, "Sega",   "Arabian Fight (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 
 GAME( 1992, brival,    0,        sega_system32_4p,  brival,   segas32_new_state, brival,   ROT0, "Sega",   "Burning Rival (World)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1992, brivalj,   brival,   sega_system32_4p,  brival,   segas32_new_state, brival,   ROT0, "Sega",   "Burning Rival (Japan)", MACHINE_IMPERFECT_GRAPHICS )
@@ -5664,9 +5620,9 @@ GAME( 1991, f1enj,     f1en,     sega_system32_dual_direct,     f1en,     segas3
 GAME( 1993, f1lap,     0,        sega_system32_analog, f1lap, segas32_new_state, f1lap,    ROT0, "Sega",   "F1 Super Lap (World)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1993, f1lapj,    f1lap,    sega_system32_analog, f1lap, segas32_new_state, f1lap,    ROT0, "Sega",   "F1 Super Lap (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1992, ga2,       0,        sega_system32_v25, ga2,      segas32_new_state, ga2,      ROT0, "Sega",   "Golden Axe: The Revenge of Death Adder (World)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1992, ga2u,      ga2,      sega_system32_v25, ga2u,     segas32_new_state, ga2,      ROT0, "Sega",   "Golden Axe: The Revenge of Death Adder (US)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1992, ga2j,      ga2,      sega_system32_v25, ga2,      segas32_new_state, ga2,      ROT0, "Sega",   "Golden Axe: The Revenge of Death Adder (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, ga2,       0,        sega_system32_ga2, ga2,      segas32_new_state, ga2,      ROT0, "Sega",   "Golden Axe: The Revenge of Death Adder (World)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, ga2u,      ga2,      sega_system32_ga2, ga2u,     segas32_new_state, ga2,      ROT0, "Sega",   "Golden Axe: The Revenge of Death Adder (US)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, ga2j,      ga2,      sega_system32_ga2, ga2,      segas32_new_state, ga2,      ROT0, "Sega",   "Golden Axe: The Revenge of Death Adder (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 
 GAME( 1992, holo,      0,        sega_system32,     holo,     segas32_new_state, holo,     ORIENTATION_FLIP_Y, "Sega",   "Holosseum (US)", MACHINE_IMPERFECT_GRAPHICS )
 

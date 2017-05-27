@@ -17,7 +17,7 @@
 
 #include "colorbus.h"
 
-DECLARE_DEVICE_TYPE(TI99_BUSMOUSE, geneve_busmouse_device)
+namespace bus { namespace ti99 { namespace colorbus {
 
 class geneve_busmouse_device : public device_t, public device_ti99_colorbus_interface
 {
@@ -35,5 +35,8 @@ private:
 	int             m_last_mx;
 	int             m_last_my;
 };
+} } } // end namespace bus::ti99::colorbus
+
+DECLARE_DEVICE_TYPE_NS(TI99_BUSMOUSE, bus::ti99::colorbus, geneve_busmouse_device)
 
 #endif // MAME_BUS_TI99_COLORBUS_BUSMOUSE_H

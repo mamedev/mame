@@ -14,16 +14,9 @@ class isbc_208_device : public device_t
 public:
 	isbc_208_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual machine_config_constructor device_mconfig_additions() const override;
 	DECLARE_ADDRESS_MAP(map, 8);
 	DECLARE_READ8_MEMBER(stat_r);
 	DECLARE_WRITE8_MEMBER(aux_w);
-	DECLARE_WRITE_LINE_MEMBER(out_eop_w);
-	DECLARE_WRITE_LINE_MEMBER(hreq_w);
-	DECLARE_READ8_MEMBER(dma_read_byte);
-	DECLARE_WRITE8_MEMBER(dma_write_byte);
-	DECLARE_WRITE_LINE_MEMBER(irq_w);
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 	template <class Object> static devcb_base &static_set_irq_callback(device_t &device, Object &&cb) { return downcast<isbc_208_device &>(device).m_out_irq_func.set_callback(std::forward<Object>(cb)); }
 	static void static_set_maincpu_tag(device_t &device, const char *maincpu_tag) { downcast<isbc_208_device &>(device).m_maincpu_tag = maincpu_tag; }
@@ -31,6 +24,7 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	required_device<am9517a_device> m_dmac;
@@ -41,6 +35,13 @@ private:
 	u16 m_seg;
 	const char *m_maincpu_tag;
 	address_space *m_maincpu_mem;
+
+	DECLARE_WRITE_LINE_MEMBER(out_eop_w);
+	DECLARE_WRITE_LINE_MEMBER(hreq_w);
+	DECLARE_READ8_MEMBER(dma_read_byte);
+	DECLARE_WRITE8_MEMBER(dma_write_byte);
+	DECLARE_WRITE_LINE_MEMBER(irq_w);
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
 };
 #define MCFG_ISBC_208_MAINCPU(_maincpu_tag) \
 	isbc_208_device::static_set_maincpu_tag(*device, _maincpu_tag);

@@ -31,6 +31,7 @@ public:
 	// from host
 	virtual DECLARE_WRITE_LINE_MEMBER(kdat_w) override;
 
+protected:
 	// MPU I/O
 	DECLARE_READ8_MEMBER(mpu_portb_r);
 	DECLARE_WRITE8_MEMBER(mpu_porta_w);
@@ -38,9 +39,8 @@ public:
 	DECLARE_WRITE8_MEMBER(mpu_portc_w);
 	DECLARE_WRITE_LINE_MEMBER(mpu_tcmp);
 
-protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 
 	virtual void device_start() override;

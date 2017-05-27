@@ -41,10 +41,10 @@ DEFINE_DEVICE_TYPE(C64_MUSIC64, c64_music64_cartridge_device, "c64_music64", "C6
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( c64_music64 )
+//  MACHINE_CONFIG_START( c64_music64 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( c64_music64 )
+static MACHINE_CONFIG_START( c64_music64 )
 	MCFG_C64_PASSTHRU_EXPANSION_SLOT_ADD()
 MACHINE_CONFIG_END
 

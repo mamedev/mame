@@ -352,7 +352,7 @@ protected:
 	uint16_t                  m_som_memory[0x8000/2];
 	uint16_t *                m_adsp_pgm_memory_word;
 
-	optional_region_ptr<uint16_t> m_ds3_sdata_memory;
+	uint16_t *                m_ds3_sdata_memory;
 	uint32_t                  m_ds3_sdata_memory_size;
 
 	uint8_t                   m_ds3_gcmd;
@@ -494,7 +494,6 @@ public:
 	DECLARE_WRITE16_MEMBER(hdsnd68k_320ports_w);
 	DECLARE_READ16_MEMBER(hdsnd68k_320com_r);
 	DECLARE_WRITE16_MEMBER(hdsnd68k_320com_w);
-	DECLARE_READ_LINE_MEMBER(hdsnddsp_get_bio);
 
 	DECLARE_WRITE16_MEMBER(hdsnddsp_dac_w);
 	DECLARE_WRITE16_MEMBER(hdsnddsp_comport_w);
@@ -508,7 +507,7 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	required_device<cpu_device> m_soundcpu;
@@ -532,6 +531,8 @@ private:
 
 	void update_68k_interrupts();
 	TIMER_CALLBACK_MEMBER( delayed_68k_w );
+
+	DECLARE_READ_LINE_MEMBER(hdsnddsp_get_bio);
 };
 
 /* Hard Drivin' */
@@ -542,7 +543,7 @@ public:
 	harddriv_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 //  virtual void device_reset();
 };
@@ -555,7 +556,7 @@ public:
 	harddrivc_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 //  virtual void device_reset();
 };
@@ -570,7 +571,7 @@ public:
 protected:
 	racedriv_board_device_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 //  virtual void device_reset();
 };
@@ -594,7 +595,7 @@ public:
 protected:
 	racedrivc_board_device_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 //  virtual void device_reset();
 };
@@ -614,7 +615,7 @@ public:
 	racedrivc_panorama_side_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 };
 
@@ -627,7 +628,7 @@ public:
 	stunrun_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 //  virtual void device_reset();
 };
@@ -642,7 +643,7 @@ public:
 protected:
 	steeltal_board_device_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 //  virtual void device_reset();
 };
@@ -675,7 +676,7 @@ public:
 	strtdriv_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 //  virtual void device_reset();
 };
@@ -690,7 +691,7 @@ public:
 protected:
 	hdrivair_board_device_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 //  virtual void device_reset();
 };

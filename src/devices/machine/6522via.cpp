@@ -855,7 +855,7 @@ WRITE8_MEMBER( via6522_device::write )
 		LOGSHIFT(" - ACR is: %02x ", m_acr);
 		if (SO_O2_CONTROL(m_acr) || SI_O2_CONTROL(m_acr))
 		{
-			m_shift_timer->adjust(clocks_to_attotime(8) / 2); // 8 flanks to start shifte from a write
+			m_shift_timer->adjust(clocks_to_attotime(8) / 2); // 8 flanks to start shifter from a write
 			LOGSHIFT(" - write SR starts O2 timer");
 		}
 		else if (SO_T2_RATE(m_acr) || SO_T2_CONTROL(m_acr) || SI_T2_CONTROL(m_acr))

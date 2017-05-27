@@ -234,14 +234,14 @@ void sns_rom_bsx_device::bsx_base::write(uint32_t offset, uint8_t data)
 }
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( bs_slot )
+//  MACHINE_CONFIG_START( bs_slot )
 //-------------------------------------------------
 
 static SLOT_INTERFACE_START(bsx_cart)
 	SLOT_INTERFACE_INTERNAL("bsmempak",  SNS_BSMEMPAK)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_FRAGMENT( bs_slot )
+static MACHINE_CONFIG_START( bs_slot )
 	MCFG_SNS_BSX_CARTRIDGE_ADD("bs_slot", bsx_cart, nullptr)
 MACHINE_CONFIG_END
 

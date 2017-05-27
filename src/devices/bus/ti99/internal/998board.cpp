@@ -106,6 +106,14 @@
 #include "emu.h"
 #include "998board.h"
 
+DEFINE_DEVICE_TYPE_NS(TI99_MAINBOARD8, bus::ti99::internal, mainboard8_device, "ti998_mainboard", "TI-99/8 Mainboard")
+DEFINE_DEVICE_TYPE_NS(TI99_VAQUERRO, bus::ti99::internal, vaquerro_device, "ti998_vaquerro", "TI-99/8 Logical Address Space Decoder")
+DEFINE_DEVICE_TYPE_NS(TI99_MOFETTA, bus::ti99::internal, mofetta_device, "ti998_mofetta", "TI-99/8 Physical Address Space Decoder")
+DEFINE_DEVICE_TYPE_NS(TI99_OSO, bus::ti99::internal, oso_device, "ti998_oso", "TI-99/8 Hexbus interface")
+DEFINE_DEVICE_TYPE_NS(TI99_AMIGO, bus::ti99::internal, amigo_device, "ti998_amigo", "TI-99/8 Address space mapper")
+
+namespace bus { namespace ti99 { namespace internal {
+
 #define TRACE_CRU 0
 #define TRACE_ADDRESS 0
 #define TRACE_MAP 0
@@ -149,7 +157,7 @@ mainboard8_device::mainboard8_device(const machine_config &mconfig, const char *
 	m_sound(*owner, TISOUNDCHIP_TAG),
 	m_speech(*owner, SPEECHSYN_TAG),
 	m_gromport(*owner, GROMPORT_TAG),
-	m_peb(*owner, PERIBOX_TAG),
+	m_ioport(*owner, TI99_IOPORT_TAG),
 	m_sram(*owner, SRAM_TAG),
 	m_dram(*owner, DRAM_TAG),
 	m_sgrom_idle(true),
@@ -206,9 +214,9 @@ READ8_MEMBER( mainboard8_device::debugger_read )
 		// Internal DSR, Hexbus DSR, or PEB
 		if (m_mofetta->hexbus_access_debug()) return m_rom1[(physical_address & 0x1fff) | 0x6000];
 		if (m_mofetta->intdsr_access_debug()) return m_rom1[(physical_address & 0x1fff) | 0x4000];
-		m_peb->memen_in(ASSERT_LINE);
-		m_peb->readz(space, physical_address & 0xffff, &value);
-		m_peb->memen_in(CLEAR_LINE);
+		m_ioport->memen_in(ASSERT_LINE);
+		m_ioport->readz(space, physical_address & 0xffff, &value);
+		m_ioport->memen_in(CLEAR_LINE);
 		return value;
 	}
 	if ((physical_address & 0x00ffe000)==0x00ff6000)
@@ -287,10 +295,9 @@ WRITE8_MEMBER( mainboard8_device::debugger_write )
 	{
 		if (m_mofetta->hexbus_access_debug()) return;
 		if (m_mofetta->intdsr_access_debug()) return;
-		m_peb->memen_in(ASSERT_LINE);
-		m_peb->write(space, physical_address & 0xffff, data & 0xff);
-		m_peb->memen_in(CLEAR_LINE);
-		return;
+		m_ioport->memen_in(ASSERT_LINE);
+		m_ioport->write(space, physical_address & 0xffff, data & 0xff);
+		m_ioport->memen_in(CLEAR_LINE);     return;
 	}
 	if ((physical_address & 0x00ffe000)==0x00ff6000)
 	{
@@ -317,7 +324,7 @@ WRITE8_MEMBER( mainboard8_device::debugger_write )
 
 READ8Z_MEMBER(mainboard8_device::crureadz)
 {
-	m_peb->crureadz(space, offset, value);
+	m_ioport->crureadz(space, offset, value);
 }
 
 /*
@@ -326,7 +333,7 @@ READ8Z_MEMBER(mainboard8_device::crureadz)
 WRITE8_MEMBER(mainboard8_device::cruwrite)
 {
 	m_mofetta->cruwrite(space, offset, data);
-	m_peb->cruwrite(space, offset, data);
+	m_ioport->cruwrite(space, offset, data);
 }
 
 // =============== Memory bus access ==================
@@ -500,7 +507,7 @@ WRITE_LINE_MEMBER( mainboard8_device::clock_in )
 
 		if (m_mofetta->dbc_out()==ASSERT_LINE)
 		{
-			m_peb->write(*m_space, m_physical_address, m_latched_data);
+			m_ioport->write(*m_space, m_physical_address, m_latched_data);
 			m_pending_write = false;
 			if (TRACE_MEM) logerror("Write %04x (phys %06x, PEB) <- %02x\n", m_logical_address, m_physical_address, m_latched_data);
 		}
@@ -601,7 +608,7 @@ void mainboard8_device::set_paddress(int address)
 	if (TRACE_DETAIL) logerror("Setting physical address %06x\n", m_physical_address);
 
 	m_mofetta->set_address(*m_space, address, m_dbin_level);
-	m_peb->setaddress_dbin(*m_space, address, m_dbin_level);
+	m_ioport->setaddress_dbin(*m_space, address, m_dbin_level);
 }
 
 WRITE_LINE_MEMBER( mainboard8_device::msast_in )
@@ -612,10 +619,10 @@ WRITE_LINE_MEMBER( mainboard8_device::msast_in )
 	if (state==CLEAR_LINE)
 	{
 		m_mofetta->pmemen_in(ASSERT_LINE);
-		m_peb->memen_in(ASSERT_LINE);
+		m_ioport->memen_in(ASSERT_LINE);
 	}
 	m_mofetta->msast_in(state);
-	m_peb->msast_in(state);
+	m_ioport->msast_in(state);
 }
 
 
@@ -777,7 +784,7 @@ READ8_MEMBER( mainboard8_device::read )
 
 		if (m_mofetta->dbc_out()==ASSERT_LINE)
 		{
-			m_peb->readz(*m_space, m_physical_address & 0xffff, &value);
+			m_ioport->readz(*m_space, m_physical_address & 0xffff, &value);
 			what = "PEB";
 			goto readdonephys;
 		}
@@ -807,7 +814,7 @@ void mainboard8_device::cycle_end()
 	m_vaquerro->memen_in(CLEAR_LINE);
 	m_amigo->memen_in(CLEAR_LINE);
 	m_mofetta->pmemen_in(CLEAR_LINE);
-	m_peb->memen_in(CLEAR_LINE);
+	m_ioport->memen_in(CLEAR_LINE);
 }
 
 /*
@@ -1002,7 +1009,7 @@ void mainboard8_device::device_reset()
 	m_space = &cpu->space(AS_PROGRAM);
 }
 
-MACHINE_CONFIG_FRAGMENT( ti998_mainboard )
+MACHINE_CONFIG_START( ti998_mainboard )
 	MCFG_DEVICE_ADD(VAQUERRO_TAG, TI99_VAQUERRO, 0)
 	MCFG_DEVICE_ADD(MOFETTA_TAG, TI99_MOFETTA, 0)
 	MCFG_DEVICE_ADD(AMIGO_TAG, TI99_AMIGO, 0)
@@ -1013,9 +1020,6 @@ machine_config_constructor mainboard8_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( ti998_mainboard );
 }
-
-DEFINE_DEVICE_TYPE(TI99_MAINBOARD8, mainboard8_device, "ti998_mainboard", "TI-99/8 Mainboard")
-
 
 /***************************************************************************
   ===== VAQUERRO: Logical Address Space decoder =====
@@ -1510,8 +1514,6 @@ void vaquerro_device::video_waitstate_generator::clock_in(line_state clkout)
 	}
 }
 
-DEFINE_DEVICE_TYPE(TI99_VAQUERRO, vaquerro_device, "ti998_vaquerro", "TI-99/8 Logical Address Space Decoder")
-
 /***************************************************************************
   ===== MOFETTA: Physical Address Space decoder =====
 
@@ -1769,9 +1771,6 @@ void mofetta_device::device_reset()
 	m_txspg = false;
 	m_prefix = 0;
 }
-
-
-DEFINE_DEVICE_TYPE(TI99_MOFETTA, mofetta_device, "ti998_mofetta", "TI-99/8 Physical Address Space Decoder")
 
 /***************************************************************************
 
@@ -2166,8 +2165,6 @@ void amigo_device::device_reset()
 	m_logical_space = true;
 }
 
-DEFINE_DEVICE_TYPE(TI99_AMIGO, amigo_device, "ti998_amigo", "TI-99/8 Address space mapper")
-
 /***************************************************************************
 
   ===== OSO: Hexbus interface =====
@@ -2305,4 +2302,5 @@ void oso_device::device_start()
 	save_item(NAME(m_xmit));
 }
 
-DEFINE_DEVICE_TYPE(TI99_OSO, oso_device, "ti998_oso", "TI-99/8 Hexbus interface")
+} } } // end namespace bus::ti99::internal
+
