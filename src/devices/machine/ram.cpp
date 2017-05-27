@@ -26,43 +26,39 @@ namespace {
 
 uint32_t parse_string(const char *s)
 {
-	unsigned ram;
-	char suffix;
-	char extraneous;
-
-	switch (sscanf(s, "%u%c%c", &ram, &suffix, &extraneous))
+	static const struct
 	{
-	case 1:
-		// no suffix; proceed
-		break;
+		const char *suffix;
+		unsigned multiple;
+	} s_suffixes[] =
+	{
+		{ "",		1 },
+		{ "k",		1024 },
+		{ "kb",		1024 },
+		{ "kib",	1024 },
+		{ "m",		1024 * 1024 },
+		{ "mb",		1024 * 1024 },
+		{ "mib",	1024 * 1024 }
+	};
 
-	case 2:
-		// suffix present; must interpret it
-		switch (tolower(suffix))
-		{
-		case 'k':
-			// kilobytes
-			ram *= 1024;
-			break;
+	// parse the string
+	unsigned ram = 0;
+	char suffix[8] = { 0, };
+	sscanf(s, "%u%7s", &ram, suffix);
 
-		case 'm':
-			// megabytes
-			ram *= 1024 * 1024;
-			break;
+	// perform the lookup
+	auto iter = std::find_if(
+		std::begin(s_suffixes),
+		std::end(s_suffixes),
+		[&suffix](const auto &potential_suffix) { return !core_stricmp(suffix, potential_suffix.suffix); });
 
-		default:
-			// parse failure
-			ram = 0;
-			break;
-		}
-		break;
+	// identify the multiplier (or 0 if not recognized, signalling a parse failure)
+	unsigned multiple = iter != std::end(s_suffixes)
+		? iter->multiple
+		: 0;
 
-	default:
-		// parse failure
-		ram = 0;
-		break;
-	}
-	return ram;
+	// return the result
+	return ram * multiple;
 }
 
 
