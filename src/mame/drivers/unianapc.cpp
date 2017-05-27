@@ -95,6 +95,9 @@ ROM_START( dhunting )
 	ROM_REGION( 0x10000, "vbios", 0 )   // video card BIOS
 	ROM_LOAD( "videobios", 0x000000, 0x00d000, NO_DUMP )
 
+	ROM_REGION( 0x2000, "gunio", 0 )   // IO card (VGA version)
+	ROM_LOAD( "U2.AT89C52", 0x0000, 0x2000, CRC(afb0e1c7) SHA1(2f621be62f935eafa9ff3c14de2096119132a973) )
+
 	DISK_REGION( "ide:0:hdd:image" ) // DM Storage DM2560V00 IDE flash storage
 	DISK_IMAGE( "dream hunting", 0, SHA1(3515c0617c52c7e8b7e5dba8de22e363cce00e10) )
 ROM_END
