@@ -124,8 +124,10 @@ private:
 	int m_y;
 	int m_w;
 	int m_h;
+#ifdef MAME_DEBUG
 	unsigned m_base;
 	int m_view_roms;
+#endif
 
 	/* misc */
 	uint16_t m_c00006;
