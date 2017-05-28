@@ -5403,6 +5403,23 @@ Missing files come here
 		</part>
 	</software>
 
+	<software name="aladdin">
+		<description>Disney's Aladdin</description>
+		<year>1994</year>
+		<publisher>Virgin Interactive Entertainment, Inc.</publisher>
+		<info name="developer" value="Virgin Interactive Entertainment, Inc." />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Disney's Aladdin [Virgin] [1994] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="ceaca4d7" sha1="068e75e0e5432eb337b468e647135f085ff3166e" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Disney's Aladdin [Virgin] [1994] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="5115f916" sha1="2745fbbe403911e5beceb983cbf86ee501cd69e7" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dogz">
 		<description>Dogz, Your Computer Pet</description>
 		<year>1995</year>
@@ -5815,6 +5832,75 @@ Missing files come here
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="737280">
 				<rom name="diskb.img" size="737280" crc="2b0662a2" sha1="5843c7bb6e4d6ad998042cfe53a6c6f07d3fd3e5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="goblins">
+		<description>Gobliiins (US - VGA release)</description>
+		<year>1992</year>
+		<publisher>Sierra On-Line, Inc.</publisher>
+		<info name="version" value="1.000 09/11/92" />
+		<info name="developer" value="Coktel Vision, M.D.O." />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Gobliiins [Sierra] [1992] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="65c9ed7a" sha1="02402420e3f334cb0c7f00a47499b3fd0939d29e" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Gobliiins [Sierra] [1992] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="56127b39" sha1="483b12b314a8e4200f2b32e7cbcc46efa02a92da" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="goblins2">
+		<description>Gobliins 2: The Prince Buffoon</description>
+		<year>1993</year>
+		<publisher>Sierra On-Line, Inc.</publisher>
+		<info name="version" value="1.000.000 02/10/93" />
+		<info name="developer" value="Coktel Vision, M.D.O." />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Gobliins 2 [Sierra] [1993] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="8b4ebf44" sha1="295d025ddb3953289aee6c96d69d3276111f8ea8" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Gobliins 2 [Sierra] [1993] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="38d1082b" sha1="c1eb84fa8e701a3ff8dd6464e3b96492d59d9de6" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="goblins3">
+		<description>Goblins Quest 3</description>
+		<year>1993</year>
+		<publisher>Sierra On-Line, Inc.</publisher>
+		<info name="version" value="1.00" />
+		<info name="developer" value="Coktel Vision" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Goblins 3 [Sierra] [1993] [3.5HD] [Disk 1 of 5].img" size="1474560" crc="6a1ad2ee" sha1="3f019ff748edc68d455d4606f42b0425135ccb3a" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Goblins 3 [Sierra] [1993] [3.5HD] [Disk 2 of 5].img" size="1474560" crc="06fd5e22" sha1="5983857f151513af6be873bb4fb3d24f18e4bade" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Goblins 3 [Sierra] [1993] [3.5HD] [Disk 3 of 5].img" size="1474560" crc="6241a908" sha1="71a2ba8183c6acb2211ef16ece4ee3ee5cc13516" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Goblins 3 [Sierra] [1993] [3.5HD] [Disk 4 of 5].img" size="1474560" crc="6f96ad1c" sha1="18ec37853726f72994b2cb3ca386f180b5510c56" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Goblins 3 [Sierra] [1993] [3.5HD] [Disk 5 of 5].img" size="1474560" crc="9c5f6d67" sha1="e0f87c8dcc57a07e6c653aef3bc671f06da791d3" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
