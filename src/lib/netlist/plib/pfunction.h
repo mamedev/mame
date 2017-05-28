@@ -9,6 +9,7 @@
 #define PFUNCTION_H_
 
 #include "pstring.h"
+#include "pstate.h"
 
 #include <vector>
 
@@ -43,6 +44,22 @@ namespace plib {
 			double m_param;
 		};
 	public:
+		/*! Constructor with state saving support
+		 *
+		 * @param name Name of this object
+		 * @param owner Owner of this object
+		 * @param state_manager State manager to handle saving object state
+		 *
+		 */
+		pfunction(const pstring &name, const void *owner, state_manager_t &state_manager)
+		: m_lfsr(0xACE1u)
+		{
+			state_manager.save_item(owner, m_lfsr, name + ".lfsr");
+		}
+
+		/*! Constructor without state saving support
+		 *
+		 */
 		pfunction()
 		: m_lfsr(0xACE1u)
 		{
