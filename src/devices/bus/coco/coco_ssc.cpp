@@ -353,7 +353,7 @@ WRITE8_MEMBER(coco_ssc_device::ff7d_write)
 
 			if (LOG_SSC)
 			{
-				logerror( "[0x%04x] ff7e write: %02x\n", space.device().safe_pc(), data );
+				logerror( "[%s] ff7e write: %02x\n", machine().describe_context(), data );
 			}
 
 			tms7000_porta = data;
@@ -371,7 +371,7 @@ READ8_MEMBER(coco_ssc_device::ssc_port_a_r)
 {
 	if (LOG_SSC)
 	{
-		logerror( "[0x%04x] port a read: %02x\n", space.device().safe_pc(), tms7000_porta );
+		logerror( "[%s] port a read: %02x\n", machine().describe_context(), tms7000_porta );
 	}
 
  	m_tms7040->set_input_line(TMS7000_INT3_LINE, CLEAR_LINE);
@@ -383,7 +383,7 @@ WRITE8_MEMBER(coco_ssc_device::ssc_port_b_w)
 {
 	if (LOG_SSC)
 	{
-		logerror( "[0x%04x] port b write: %02x\n", space.device().safe_pc(), data );
+		logerror( "[%s] port b write: %02x\n", machine().describe_context(), data );
 	}
 
 	tms7000_portb = data;
@@ -393,7 +393,7 @@ READ8_MEMBER(coco_ssc_device::ssc_port_c_r)
 {
 	if (LOG_SSC)
 	{
-		logerror( "[0x%04x] port c read: %02x\n", space.device().safe_pc(), tms7000_portc );
+		logerror( "[%s] port c read: %02x\n", machine().describe_context(), tms7000_portc );
 	}
 
 	return tms7000_portc;
@@ -430,8 +430,8 @@ WRITE8_MEMBER(coco_ssc_device::ssc_port_c_w)
 
 	if (LOG_SSC)
 	{
-		logerror( "[0x%04x] port c write: %c%c%c%c %c%c%c%c (%02x)\n",
-			space.device().safe_pc(),
+		logerror( "[%s] port c write: %c%c%c%c %c%c%c%c (%02x)\n",
+			machine().describe_context(),
 			data & 0x80 ? '.' : 'B',
 			data & 0x40 ? '.' : 'P',
 			data & 0x20 ? '.' : 'V',
@@ -449,7 +449,7 @@ WRITE8_MEMBER(coco_ssc_device::ssc_port_c_w)
 READ8_MEMBER(coco_ssc_device::ssc_port_d_r)
 {
 	if( ((tms7000_portc & C_RCS) == 0) && ((tms7000_portc & C_ACS) == 0))
-		logerror( "[0x%04x] Warning: Reading RAM and PSG at the same time!\n", space.device().safe_pc() );
+		logerror( "[%s] Warning: Reading RAM and PSG at the same time!\n", machine().describe_context() );
 
 	if( ((tms7000_portc & C_RCS) == 0)  && ((tms7000_portc & C_RRW) == C_RRW)) /* static ram chip select (low) and static ram chip read (high) */
 	{
@@ -470,7 +470,7 @@ READ8_MEMBER(coco_ssc_device::ssc_port_d_r)
 
 	if (LOG_SSC)
 	{
-		logerror( "[0x%04x] port d read: %02x\n", space.device().safe_pc(), tms7000_portd );
+		logerror( "[%s] port d read: %02x\n", machine().describe_context(), tms7000_portd );
 	}
 
 	return tms7000_portd;
@@ -480,7 +480,7 @@ WRITE8_MEMBER(coco_ssc_device::ssc_port_d_w)
 {
 	if (LOG_SSC)
 	{
-		logerror( "[0x%04x] port d write: %02x\n", space.device().safe_pc(), data );
+		logerror( "[%s] port d write: %02x\n", machine().describe_context(), data );
 	}
 
 	tms7000_portd = data;
