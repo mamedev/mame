@@ -41,7 +41,7 @@ SOUNDS["DISCRETE"] = true
 SOUNDS["AY8910"] = true
 SOUNDS["MSM5205"] = true
 --SOUNDS["ASTROCADE"] = true
---SOUNDS["TMS5220"] = true
+SOUNDS["TMS5220"] = true
 --SOUNDS["OKIM6295"] = true
 --SOUNDS["HC55516"] = true
 --SOUNDS["YM3812"] = true
@@ -69,7 +69,9 @@ MACHINES["COM8116"] = true
 MACHINES["TTL74145"] = true
 MACHINES["6522VIA"] = true
 
---MACHINES["6821PIA"] = true
+MACHINES["6821PIA"] = true
+MACHINES["I8255"] = true
+MACHINES["WATCHDOG"] = true
 --MACHINES["TTL74148"] = true
 --MACHINES["TTL74153"] = true
 --MACHINES["TTL7474"] = true
@@ -164,6 +166,14 @@ files{
   MAME_DIR .. "src/mame/drivers/cheekyms.cpp",
   MAME_DIR .. "src/mame/includes/cheekyms.h",
   MAME_DIR .. "src/mame/video/cheekyms.cpp",
+
+  MAME_DIR .. "src/mame/audio/nl_zac1b11142.cpp",
+  MAME_DIR .. "src/mame/audio/nl_zacc1b11142.h",
+  MAME_DIR .. "src/mame/audio/zaccaria.cpp",
+  MAME_DIR .. "src/mame/audio/zaccaria.h",
+  MAME_DIR .. "src/mame/drivers/zaccaria.cpp",
+  MAME_DIR .. "src/mame/includes/zaccaria.h",
+  MAME_DIR .. "src/mame/video/zaccaria.cpp",
 
 }
 end
