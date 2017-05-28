@@ -202,7 +202,7 @@ private:
 	simple_list<entry>      m_entrylist;            // head of list of entries
 	std::unordered_map<std::string,entry *>       m_entrymap;             // map for fast lookup
 	std::string             m_command;              // command found
-	std::vector<std::string>	m_command_arguments;	// command arguments
+	std::vector<std::string>    m_command_arguments;    // command arguments
 	static const char *const s_option_unadorned[];  // array of unadorned option "names"
 };
 

@@ -918,6 +918,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"cce",
 		"ccs",
 		"chromatics",
+		"chrysler",
 		"coleco",
 		"compugraphic",
 		"cromemco",
@@ -1317,7 +1318,7 @@ files {
 	MAME_DIR .. "src/mame/machine/apricotkb.cpp",
 	MAME_DIR .. "src/mame/machine/apricotkb.h",
 	MAME_DIR .. "src/mame/drivers/victor9k.cpp",
---	MAME_DIR .. "src/mame/includes/victor9k.h",
+--  MAME_DIR .. "src/mame/includes/victor9k.h",
 	MAME_DIR .. "src/mame/machine/victor9k_kb.cpp",
 	MAME_DIR .. "src/mame/machine/victor9k_kb.h",
 	MAME_DIR .. "src/mame/machine/victor9k_fdc.cpp",
@@ -1675,6 +1676,11 @@ files {
 	MAME_DIR .. "src/mame/drivers/cgc7900.cpp",
 	MAME_DIR .. "src/mame/includes/cgc7900.h",
 	MAME_DIR .. "src/mame/video/cgc7900.cpp",
+}
+
+createMESSProjects(_target, _subtarget, "chrysler")
+files {
+	MAME_DIR .. "src/mame/drivers/eva.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "coleco")

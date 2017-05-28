@@ -55,7 +55,7 @@ return ln.linenoise('\x1b[1;36m[MAME]\x1b[0m> ')
 
 		-- This function is called in a context where a keyword or a global
 		-- variable can be inserted. Local variables cannot be listed!
-		local function 	add_globals()
+		local function  add_globals()
 			for _, k in ipairs(keywords) do
 				add(k)
 			end

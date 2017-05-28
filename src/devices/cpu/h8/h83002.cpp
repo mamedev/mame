@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Olivier Galibert	
+// copyright-holders:Olivier Galibert
 #include "emu.h"
 #include "h83002.h"
 
@@ -66,7 +66,7 @@ DEVICE_ADDRESS_MAP_START(map, 16, h83002_device)
 	AM_RANGE(0xffff20, 0xffff21) AM_DEVREADWRITE( "dma:0",     h8_dma_channel_device,     marah_r,  marah_w         )
 	AM_RANGE(0xffff22, 0xffff23) AM_DEVREADWRITE( "dma:0",     h8_dma_channel_device,     maral_r,  maral_w         )
 	AM_RANGE(0xffff24, 0xffff25) AM_DEVREADWRITE( "dma:0",     h8_dma_channel_device,     etcra_r,  etcra_w         )
- 	AM_RANGE(0xffff26, 0xffff27) AM_DEVREADWRITE8("dma:0",     h8_dma_channel_device,     dtcra_r,  dtcra_w, 0x00ff )
+	AM_RANGE(0xffff26, 0xffff27) AM_DEVREADWRITE8("dma:0",     h8_dma_channel_device,     dtcra_r,  dtcra_w, 0x00ff )
 	AM_RANGE(0xffff28, 0xffff29) AM_DEVREADWRITE( "dma:0",     h8_dma_channel_device,     marbh_r,  marbh_w         )
 	AM_RANGE(0xffff2a, 0xffff2b) AM_DEVREADWRITE( "dma:0",     h8_dma_channel_device,     marbl_r,  marbl_w         )
 	AM_RANGE(0xffff2c, 0xffff2d) AM_DEVREADWRITE( "dma:0",     h8_dma_channel_device,     etcrb_r,  etcrb_w         )
@@ -74,7 +74,7 @@ DEVICE_ADDRESS_MAP_START(map, 16, h83002_device)
 	AM_RANGE(0xffff30, 0xffff31) AM_DEVREADWRITE( "dma:1",     h8_dma_channel_device,     marah_r,  marah_w         )
 	AM_RANGE(0xffff32, 0xffff33) AM_DEVREADWRITE( "dma:1",     h8_dma_channel_device,     maral_r,  maral_w         )
 	AM_RANGE(0xffff34, 0xffff35) AM_DEVREADWRITE( "dma:1",     h8_dma_channel_device,     etcra_r,  etcra_w         )
- 	AM_RANGE(0xffff36, 0xffff37) AM_DEVREADWRITE8("dma:1",     h8_dma_channel_device,     dtcra_r,  dtcra_w, 0x00ff )
+	AM_RANGE(0xffff36, 0xffff37) AM_DEVREADWRITE8("dma:1",     h8_dma_channel_device,     dtcra_r,  dtcra_w, 0x00ff )
 	AM_RANGE(0xffff38, 0xffff39) AM_DEVREADWRITE( "dma:1",     h8_dma_channel_device,     marbh_r,  marbh_w         )
 	AM_RANGE(0xffff3a, 0xffff3b) AM_DEVREADWRITE( "dma:1",     h8_dma_channel_device,     marbl_r,  marbl_w         )
 	AM_RANGE(0xffff3c, 0xffff3d) AM_DEVREADWRITE( "dma:1",     h8_dma_channel_device,     etcrb_r,  etcrb_w         )

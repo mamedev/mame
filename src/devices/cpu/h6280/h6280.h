@@ -47,7 +47,7 @@ public:
 	void io_set_buffer(uint8_t);
 
 protected:
-    // register enumeration
+	// register enumeration
 	enum
 	{
 		H6280_PC = 1,

@@ -121,7 +121,7 @@ public:
 	virtual void draw_tile_pixel(uint8_t pix, int color, uint16_t back_pen, uint16_t *&dest, const pen_t *color_table);
 	virtual void draw_tile(uint8_t *line_priority, int color_byte, int color_bits, int address, int start_x, uint16_t back_pen, uint16_t *&dest, const pen_t *color_table);
 	void draw_background( uint8_t *line_priority );
-	
+
 	virtual void read_sprite_plane_data(int address);
 	virtual void make_sprite_pixel_data(uint8_t &pixel_data, int flipx);
 	virtual void draw_sprite_pixel(int sprite_xpos, int color, int pixel, uint8_t pixel_data, bitmap_ind16& bitmap);
@@ -158,7 +158,7 @@ public:
 		ppu2c0x_device &dev = downcast<ppu2c0x_device &>(device);
 		dev.m_use_sprite_write_limitation = false;
 	}
-	
+
 protected:
 	// registers definition
 	enum
@@ -259,7 +259,7 @@ private:
 	emu_timer                   *m_hblank_timer;        /* hblank period at end of each scanline */
 	emu_timer                   *m_nmi_timer;           /* NMI timer */
 	emu_timer                   *m_scanline_timer;      /* scanline timer */
-	
+
 	bool m_use_sprite_write_limitation;
 };
 

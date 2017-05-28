@@ -88,7 +88,7 @@ struct ui_gfx_state
 		int   yoffs;                // current Y offset
 		int   zoom;                 // zoom factor
 		uint8_t rotate;               // current rotation (orientation) value
-		uint32_t flags;				// render flags
+		uint32_t flags;             // render flags
 	} tilemap;
 };
 

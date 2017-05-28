@@ -16,7 +16,7 @@
 #include "flopimg.h"
 
 // Geometry constants
-constexpr unsigned HPI_TRACKS =	77;
+constexpr unsigned HPI_TRACKS = 77;
 constexpr unsigned HPI_HEADS = 2;
 constexpr unsigned HPI_SECTORS = 30;
 constexpr unsigned HPI_SECTOR_SIZE = 256;
@@ -24,19 +24,19 @@ constexpr unsigned HPI_SECTOR_SIZE = 256;
 class hpi_format : public floppy_image_format_t
 {
 public:
-    hpi_format();
+	hpi_format();
 
-    virtual int identify(io_generic *io, uint32_t form_factor) override;
-    virtual bool load(io_generic *io, uint32_t form_factor, floppy_image *image) override;
-    virtual bool save(io_generic *io, floppy_image *image) override;
-    virtual const char *name() const override;
-    virtual const char *description() const override;
-    virtual const char *extensions() const override;
-    virtual bool supports_save() const override;
+	virtual int identify(io_generic *io, uint32_t form_factor) override;
+	virtual bool load(io_generic *io, uint32_t form_factor, floppy_image *image) override;
+	virtual bool save(io_generic *io, floppy_image *image) override;
+	virtual const char *name() const override;
+	virtual const char *description() const override;
+	virtual const char *extensions() const override;
+	virtual bool supports_save() const override;
 
 private:
 	typedef std::array<uint8_t , HPI_SECTORS> sector_list_t;
-    static void interleaved_sectors(unsigned il_factor , sector_list_t& sector_list);
+	static void interleaved_sectors(unsigned il_factor , sector_list_t& sector_list);
 	void write_mmfm_bit(std::vector<uint32_t> &buffer , bool data_bit , bool clock_bit);
 	void write_mmfm_byte(std::vector<uint32_t> &buffer , uint8_t data , uint8_t clock = 0);
 	void write_sync(std::vector<uint32_t> &buffer);

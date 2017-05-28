@@ -413,7 +413,7 @@ ROM_END
 ROM_START(specfrce)
 	ROM_REGION(0x400000, "maincpu", 0)  /* Boot ROM */
 	ROM_SYSTEM_BIOS(0, "default", "rev. 3.6")
-	ROMX_LOAD( "boot 3.6.u4.27c801", 0x000000, 0x100000, CRC(b1628dd9) SHA1(5970d31b0cf3d0c1ab4b10ee8e54d2696fafde24), ROM_BIOS(1) ) 
+	ROMX_LOAD( "boot 3.6.u4.27c801", 0x000000, 0x100000, CRC(b1628dd9) SHA1(5970d31b0cf3d0c1ab4b10ee8e54d2696fafde24), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS(1, "r35", "rev. 3.5")
 	ROMX_LOAD( "special_forces_boot_v3.5.u4", 0x000000, 0x100000, CRC(ae8dfdf0) SHA1(d64130e710d0c70095ad8ebd4e2194b8c461be4a), ROM_BIOS(2) ) /* Newer, but keep both in driver */
 	ROM_SYSTEM_BIOS(2, "r34", "rev. 3.4")
@@ -429,7 +429,7 @@ ROM_END
 ROM_START(specfrceo)
 	ROM_REGION(0x400000, "maincpu", 0)  /* Boot ROM */
 	ROM_SYSTEM_BIOS(0, "default", "rev. 3.6")
-	ROMX_LOAD( "boot 3.6.u4.27c801", 0x000000, 0x100000, CRC(b1628dd9) SHA1(5970d31b0cf3d0c1ab4b10ee8e54d2696fafde24), ROM_BIOS(1) ) 
+	ROMX_LOAD( "boot 3.6.u4.27c801", 0x000000, 0x100000, CRC(b1628dd9) SHA1(5970d31b0cf3d0c1ab4b10ee8e54d2696fafde24), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS(1, "r35", "rev. 3.5")
 	ROMX_LOAD( "special_forces_boot_v3.5.u4", 0x000000, 0x100000, CRC(ae8dfdf0) SHA1(d64130e710d0c70095ad8ebd4e2194b8c461be4a), ROM_BIOS(2) ) /* Newer, but keep both in driver */
 	ROM_SYSTEM_BIOS(2, "r34", "rev. 3.4")

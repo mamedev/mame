@@ -499,7 +499,7 @@ public:
 	//DECLARE_WRITE_LINE_MEMBER(coin_2_w);
 	static void static_set_main_board(device_t &device, bool enable);
 	void increase_coin_counter(uint8_t which);
-	
+
 protected:
 	virtual bool switches(uint8_t *&buf, uint8_t count_players, uint8_t bytes_per_switch) override;
 	virtual bool coin_counters(uint8_t *&buf, uint8_t count) override;
@@ -550,32 +550,32 @@ void cobra_jvs::increase_coin_counter(uint8_t which)
 
 // TODO: this certainly isn't correct, all three JVS points to the same capabilities!
 void cobra_jvs::function_list(uint8_t *&buf)
-{	
+{
 	if(this->is_main_board == false)
 		return;
-	
+
 	// SW input - 2 players, 13 bits
-	*buf++ = 0x01; 
-	*buf++ = 2; 
-	*buf++ = 13; 
+	*buf++ = 0x01;
+	*buf++ = 2;
+	*buf++ = 13;
 	*buf++ = 0;
 
 	// Coin input - 2 slots
-	*buf++ = 0x02; 
-	*buf++ = 2; 
-	*buf++ = 0; 
+	*buf++ = 0x02;
+	*buf++ = 2;
 	*buf++ = 0;
-	
+	*buf++ = 0;
+
 	// Analog input - 8 channels
-	*buf++ = 0x03; 
-	*buf++ = 8; 
-	*buf++ = 16; 
+	*buf++ = 0x03;
+	*buf++ = 8;
+	*buf++ = 16;
 	*buf++ = 0;
 
 	// Driver out - 6 channels
-	*buf++ = 0x12; 
-	*buf++ = 6; 
-	*buf++ = 0; 
+	*buf++ = 0x12;
+	*buf++ = 6;
+	*buf++ = 0;
 	*buf++ = 0;
 }
 
@@ -609,15 +609,15 @@ bool cobra_jvs::coin_counters(uint8_t *&buf, uint8_t count)
 #if LOG_JVS
 	printf("jvs coin counter read: count %d\n", count);
 #endif
-	
+
 	if(this->is_main_board == false)
 		return false;
-	
+
 	//printf("recv %04x\n",m_coin_counter[0]);
-	
+
 	if (count > 2)
 		return false;
-	
+
 	*buf++ = m_coin_counter[0] >> 8; *buf++ = m_coin_counter[0];
 
 	if(count > 1)
@@ -717,7 +717,7 @@ public:
 	required_device<k001604_device> m_k001604;
 	required_device<cobra_jvs> m_jvs1;
 	required_device<cobra_jvs> m_jvs2;
-	required_device<cobra_jvs> m_jvs3;	
+	required_device<cobra_jvs> m_jvs3;
 	required_device<ata_interface_device> m_ata;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -3223,7 +3223,7 @@ INPUT_PORTS_START( cobra )
 
 	PORT_START("P1")
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_SERVICE1 ) 
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
@@ -3251,11 +3251,11 @@ INPUT_PORTS_START( cobra )
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Guard")
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNUSED ) 
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_UNUSED ) 
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_UNUSED ) 
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNUSED ) 
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNUSED ) 
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("COINS")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_COIN1) PORT_CHANGED_MEMBER(DEVICE_SELF, cobra_state,coin_inserted, 0)//PORT_WRITE_LINE_DEVICE_MEMBER("cobra_jvs1", cobra_jvs, coin_1_w)

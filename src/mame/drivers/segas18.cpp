@@ -2915,9 +2915,9 @@ ROM_END
     CPU: 68000
     ROM Board: 171-5873B
 
-	game No. 833-7246-03
-	pcb  No. 837-7248-01
-	rom  No. 834-7247-02
+    game No. 833-7246-03
+    pcb  No. 837-7248-01
+    rom  No. 834-7247-02
 */
 ROM_START( shdancer )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code

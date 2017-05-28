@@ -5,10 +5,10 @@
     Skeleton driver for XaviX TV PNP console and childs (Let's! Play TV Classic)
 
     CPU is an M6502 derivative where opcode 0x22 has 3 bytes of operands.
-	Definitely not: 65C816 or Mitsu M740.
-    
+    Definitely not: 65C816 or Mitsu M740.
+
     Code at F34F is thus:
-    
+
     F34F:  STA $6200,X
     F352:  INX
     F353:  BNE $F34F
@@ -18,28 +18,28 @@
     F361:  SEC
     F362:  LDA #$CD
     F364:  SBC #$CA
-    
+
     later on
-    
+
     F3C9:  UNK 00 E4 C4
 
     TODO:
     - identify CPU
     - figure out ROM banking
-    
+
     Notes from http://www.videogameconsolelibrary.com/pg00-xavix.htm#page=reviews (thanks Guru!)
-    
-    XaviXPORT arrived on the scene with 3 game titles (XaviX Tennis, XaviX Bowling and XaviX Baseball) using their 
-    original XaviX Multiprocessor.  This proprietary chip is reported to contain an 8-bit high speed central processing 
-    unit (6502) at 21 MHz, picture processor, sound processor, DMA controller, 1K bytes high speed RAM, universal timer, 
-    AD/Converter and I/O device control.  Each cartridge comes with a wireless peripheral to be used with the game (Baseball Bat, 
-    Tennis Racquet, etc.) that requires "AA" batteries.  The XaviXPORT system retailed for $79.99 USD with the cartridges 
+
+    XaviXPORT arrived on the scene with 3 game titles (XaviX Tennis, XaviX Bowling and XaviX Baseball) using their
+    original XaviX Multiprocessor.  This proprietary chip is reported to contain an 8-bit high speed central processing
+    unit (6502) at 21 MHz, picture processor, sound processor, DMA controller, 1K bytes high speed RAM, universal timer,
+    AD/Converter and I/O device control.  Each cartridge comes with a wireless peripheral to be used with the game (Baseball Bat,
+    Tennis Racquet, etc.) that requires "AA" batteries.  The XaviXPORT system retailed for $79.99 USD with the cartridges
     retailing for $49.99 USD.
 
-    The following year at CES 2005, SSD COMPANY LIMITED introduced two new XaviXPORT titles (XaviX Golf and XaviX Bass Fishing) each 
-    containing the upgraded "Super XaviX".  This new chip is said to sport a 16-bit high central processing unit (65816) at 43 MHz.  
-    SSD COMPANY LIMITED is already working on their next chip called "XaviX II" that is said to be a 32-bit RISC processor 
-    with 3D capabilities. 
+    The following year at CES 2005, SSD COMPANY LIMITED introduced two new XaviXPORT titles (XaviX Golf and XaviX Bass Fishing) each
+    containing the upgraded "Super XaviX".  This new chip is said to sport a 16-bit high central processing unit (65816) at 43 MHz.
+    SSD COMPANY LIMITED is already working on their next chip called "XaviX II" that is said to be a 32-bit RISC processor
+    with 3D capabilities.
 
 ***************************************************************************/
 

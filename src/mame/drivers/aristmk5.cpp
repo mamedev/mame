@@ -114,7 +114,7 @@
     Note: On 3-payline games, press Collect (A) and Bet 1 Credit (E) to clear the memory.
 
     Optionally, the main door can be closed from this point on (press M again).
-   
+
     Step 2: Enter Operator Setup -> Machine Options
 
     Usually, the Machine ID can be set to anything, however some games complain if it set to zero.
@@ -144,7 +144,7 @@
     These games have a slightly updated menu system reminiscent of MK6 games, complete with a black background instead of blue.
 
     Step 1: Audit key in (F2), press Collect (A) and the first line button (S) together to clear the memory. The main door does not need to be open.
-   
+
     Step 2: Enter Operator Setup -> Machine Options
 
     Step 3: Set everything up as above, open the Security Cage/Logic Door (L), and save the machine options (which now has its own spot on the menu instead of a dedicated button).
@@ -3545,7 +3545,7 @@ ROM_END
 ROM_START( goldpyrb )
 	ARISTOCRAT_MK5_BIOS
 	/*
-            Using New Zealand 0700474V BIOS until an Australian casino BIOS is dumped.
+	        Using New Zealand 0700474V BIOS until an Australian casino BIOS is dumped.
 
 	    note, this actually contains a 2nd checksum for the game, this is the base/bios check only.
 

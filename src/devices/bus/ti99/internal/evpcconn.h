@@ -1,10 +1,10 @@
 // license:LGPL-2.1+
 // copyright-holders:Michael Zapf
 /****************************************************************************
-	
-	Connector from EVPC
-	For details see evpcconn.cpp
-	
+
+    Connector from EVPC
+    For details see evpcconn.cpp
+
 ****************************************************************************/
 #ifndef MAME_BUS_TI99_INTERNAL_EVPCCONN_H
 #define MAME_BUS_TI99_INTERNAL_EVPCCONN_H
@@ -25,8 +25,8 @@ public:
 	{
 		return downcast<evpc_clock_connector &>(device).m_vdpint.set_callback(object);
 	}
-	
-	DECLARE_WRITE_LINE_MEMBER( vclock_line ); 
+
+	DECLARE_WRITE_LINE_MEMBER( vclock_line );
 	void device_start() override;
 
 private:

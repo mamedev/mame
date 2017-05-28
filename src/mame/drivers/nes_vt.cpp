@@ -7,25 +7,25 @@
   The 'VT' series are SoC solutions that implement enhanced NES hardware
   there are several generations of these chips each adding additional
   functionality.
-  
+
   This list is incomplete
-  
+
   VT01 - plain famiclone?
   VT02 - banking scheme to access 32MB, Dual APU with PCM support
   VT03 - above + 4bpp sprite / bg modes, enhanced palette
-  
+
   VT08 - ?
 
   VT09 - 8bpp or direct colour modes?
-  
+
   VT16 - ?
   VT18 - ?
-  
+
   (more)
-  
+
   VT1682 - NOT compatible with NES, different video system, sound CPU (4x
            main CPU clock), optional internal ROM etc. (will need it's own
-		   driver)
+           driver)
 
   todo (VT03):
 
@@ -147,7 +147,7 @@ void nes_vt_state::update_banks()
 {
 	uint8_t bank;
 
-	// 8000-9fff 
+	// 8000-9fff
 	if ((m_410x[0xb] & 0x40) == 0)
 	{
 		if ((m_410x[0x5] & 0x40) == 0)
@@ -467,15 +467,15 @@ int nes_vt_state::calculate_real_video_address(int addr, int extended, int readt
 	| 201a & 0x7 |  VA17 |  VA16 |  VA15 |  VA14 |  VA13 |  VA12 |  VA11 |  VA10 |
 	|-----------------------------------------------------------------------------
 	| 0x0        | TVA17 | TVA16 | TVA15 | TVA14 | TVA13 | TVA12 | TVA11 | TVA10 |
-	| 0x1        |  TV67 | TVA16 | TVA15 | TVA14 | TVA13 | TVA12 | TVA11 | TVA10 |  
-	| 0x2        |  RV67 |  RV66 | TVA15 | TVA14 | TVA13 | TVA12 | TVA11 | TVA10 |  
+	| 0x1        |  TV67 | TVA16 | TVA15 | TVA14 | TVA13 | TVA12 | TVA11 | TVA10 |
+	| 0x2        |  RV67 |  RV66 | TVA15 | TVA14 | TVA13 | TVA12 | TVA11 | TVA10 |
 	| 0x3        | INVALID ***************************************************** |
-	| 0x4        |  RV67 |  RV66 |  RV65 | TVA14 | TVA13 | TVA12 | TVA11 | TVA10 | 
-	| 0x5        |  RV67 |  RV66 |  RV65 |  RV64 | TVA13 | TVA12 | TVA11 | TVA10 |  
-	| 0x6        |  RV67 |  RV66 |  RV65 |  RV64 |  RV63 | TVA12 | TVA11 | TVA10 |  
+	| 0x4        |  RV67 |  RV66 |  RV65 | TVA14 | TVA13 | TVA12 | TVA11 | TVA10 |
+	| 0x5        |  RV67 |  RV66 |  RV65 |  RV64 | TVA13 | TVA12 | TVA11 | TVA10 |
+	| 0x6        |  RV67 |  RV66 |  RV65 |  RV64 |  RV63 | TVA12 | TVA11 | TVA10 |
 	| 0x7        | INVALID ***************************************************** |
 	------------------------------------------------------------------------------
-	
+
 	RV67- RV63 = 0x201a & 0xf8
 
 	*/
@@ -507,7 +507,7 @@ int nes_vt_state::calculate_real_video_address(int addr, int extended, int readt
 		int va20_va18 = (m_ppu->get_201x_reg(0x8) & 0x70) >> 4;
 
 		finaladdr = ((m_410x[0x0] & 0x0F) << 21) | (va20_va18 << 18) | (va17_va10 << 10) | (addr & 0x03ff);
-		
+
 		if (is4bpp)
 		{
 			if (!alt_order)
@@ -545,8 +545,8 @@ int nes_vt_state::calculate_real_video_address(int addr, int extended, int readt
 		case 1: // sprite display
 			is4bpp = m_ppu->get_201x_reg(0x0) & 0x04; // 16 colors or 16-pixel wide (both adjust the read)
 
-			eva2_eva0 |= m_ppu->get_speva2_speva0();			
-			
+			eva2_eva0 |= m_ppu->get_speva2_speva0();
+
 			break;
 
 		case 2: // CPU R/W access
@@ -573,7 +573,7 @@ int nes_vt_state::calculate_real_video_address(int addr, int extended, int readt
 	return finaladdr;
 }
 
-/* 
+/*
    nes_vt_state::vt03_8000_w notes
 
    this is used by
@@ -604,25 +604,25 @@ WRITE8_MEMBER(nes_vt_state::vt03_8000_w)
 
 		case 0x02: // hand?
 			//if ((data != 0x00) && (data != 0x2f) && (data != 0x31) && (data != 0x32) )
-			//	logerror("%s vt03_8001_data_w latch %02x data %02x\n", machine().describe_context(), m_8000_addr_latch, data);
+			//  logerror("%s vt03_8001_data_w latch %02x data %02x\n", machine().describe_context(), m_8000_addr_latch, data);
 			m_ppu->set_201x_reg(0x2, data);
 			break;
 
 		case 0x03: // dog?
 			//if ((data != 0x00) && (data != 0x2c) && (data != 0x2d) && (data != 0x2e) && (data != 0x2f) && (data != 0x32) && (data != 0x3d) && (data != 0x3e) && (data != 0x3f) && (data != 0x40) && (data != 0x41) && (data != 0x42) && (data != 0x43) && (data != 0x44) && (data != 0x45) && (data != 0x46))
-			//	logerror("%s vt03_8001_data_w latch %02x data %02x\n", machine().describe_context(), m_8000_addr_latch, data);
+			//  logerror("%s vt03_8001_data_w latch %02x data %02x\n", machine().describe_context(), m_8000_addr_latch, data);
 			m_ppu->set_201x_reg(0x3, data);
 			break;
 
 		case 0x04: // ball thrown
 			//if ((data != 0x00) && (data != 0x10) && (data != 0x12))
-			//	logerror("%s vt03_8001_data_w latch %02x data %02x\n", machine().describe_context(), m_8000_addr_latch, data);	
+			//  logerror("%s vt03_8001_data_w latch %02x data %02x\n", machine().describe_context(), m_8000_addr_latch, data);
 			m_ppu->set_201x_reg(0x4, data);
 			break;
 
 		case 0x05: // ball thrown
 			//if ((data != 0x00) && (data != 0x11))
-			//	logerror("%s vt03_8001_data_w latch %02x data %02x\n", machine().describe_context(), m_8000_addr_latch, data);
+			//  logerror("%s vt03_8001_data_w latch %02x data %02x\n", machine().describe_context(), m_8000_addr_latch, data);
 			m_ppu->set_201x_reg(0x5, data);
 			break;
 
@@ -713,9 +713,9 @@ static ADDRESS_MAP_START( nes_vt_map, AS_PROGRAM, 8, nes_vt_state )
 	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu", ppu2c0x_device, read, write)        /* PPU registers */
 
 	AM_RANGE(0x4000, 0x4013) AM_DEVREADWRITE("apu", nesapu_device, read, write)
-	AM_RANGE(0x4014, 0x4014) AM_READ(psg1_4014_r) AM_WRITE(nes_vh_sprite_dma_w) 
+	AM_RANGE(0x4014, 0x4014) AM_READ(psg1_4014_r) AM_WRITE(nes_vh_sprite_dma_w)
 	AM_RANGE(0x4015, 0x4015) AM_READWRITE(psg1_4015_r, psg1_4015_w) /* PSG status / first control register */
-	AM_RANGE(0x4016, 0x4016) AM_READWRITE(nes_in0_r, nes_in0_w) 
+	AM_RANGE(0x4016, 0x4016) AM_READWRITE(nes_in0_r, nes_in0_w)
 	AM_RANGE(0x4017, 0x4017) AM_READ(nes_in1_r) AM_WRITE(psg1_4017_w)
 
 	AM_RANGE(0x4100, 0x410b) AM_WRITE(vt03_410x_w)
@@ -739,7 +739,7 @@ ADDRESS_MAP_END
 
 WRITE_LINE_MEMBER(nes_vt_state::apu_irq)
 {
-//	set_input_line(N2A03_APU_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+//  set_input_line(N2A03_APU_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 READ8_MEMBER(nes_vt_state::apu_read_mem)

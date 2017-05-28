@@ -929,7 +929,7 @@ Notes:
       Libero Grande (LG2/VER.A)
       Tekken 3      (TET2/VER.A)
       Ehrgeiz       (EG2/VER.A)
-	  Kart Duel     (KTD1/VER.A)
+      Kart Duel     (KTD1/VER.A)
 
       Note that the games will also work without this PCB, minus the network functionality.
 
@@ -1308,9 +1308,9 @@ static ADDRESS_MAP_START( namcos12_map, AS_PROGRAM, 32, namcos12_state )
 	AM_RANGE(0x1f1bff08, 0x1f1bff0f) AM_WRITENOP    /* ?? */
 	AM_RANGE(0x1f700000, 0x1f70ffff) AM_WRITE16(dmaoffset_w, 0xffffffff)  /* dma */
 	/* Network area */
-//	AM_RANGE(0x1f780000, 0x1f78ffff) AM_READWRITE16(link_sharedram_r, link_sharedram_w, 0xffffffff) /* H8 link CPU code */
-//	AM_RANGE(0x1f796000, 0x1f796003) AM_WRITE16(linkcpu_enable_w,0xffff0000)
-//	AM_RANGE(0x1f796020, 0x1f796023) AM_WRITE16(linkcpu_disable_w,0xffff0000)
+//  AM_RANGE(0x1f780000, 0x1f78ffff) AM_READWRITE16(link_sharedram_r, link_sharedram_w, 0xffffffff) /* H8 link CPU code */
+//  AM_RANGE(0x1f796000, 0x1f796003) AM_WRITE16(linkcpu_enable_w,0xffff0000)
+//  AM_RANGE(0x1f796020, 0x1f796023) AM_WRITE16(linkcpu_disable_w,0xffff0000)
 
 	AM_RANGE(0x1fa00000, 0x1fbfffff) AM_ROMBANK("bank1") /* banked roms */
 ADDRESS_MAP_END

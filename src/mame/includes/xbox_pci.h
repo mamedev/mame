@@ -30,7 +30,7 @@ private:
 
 extern const device_type NV2A_HOST;
 
-#define MCFG_NV2A_HOST_ADD(_tag, _cpu_tag) 	MCFG_PCI_HOST_ADD(_tag, NV2A_HOST, 0x10de02a5, 0, 0) \
+#define MCFG_NV2A_HOST_ADD(_tag, _cpu_tag)  MCFG_PCI_HOST_ADD(_tag, NV2A_HOST, 0x10de02a5, 0, 0) \
 	downcast<nv2a_host_device *>(device)->set_cpu_tag(_cpu_tag);
 
 /*
@@ -221,7 +221,7 @@ private:
 
 extern const device_type MCPX_APU;
 
-#define MCFG_MCPX_APU_ADD(_tag, _cpu_tag) 	MCFG_PCI_DEVICE_ADD(_tag, MCPX_APU, 0x10de01b0, 0, 0, 0) \
+#define MCFG_MCPX_APU_ADD(_tag, _cpu_tag)   MCFG_PCI_DEVICE_ADD(_tag, MCPX_APU, 0x10de01b0, 0, 0, 0) \
 	downcast<mcpx_apu_device *>(device)->set_cpu_tag(_cpu_tag);
 
 /*

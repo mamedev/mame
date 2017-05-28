@@ -1150,7 +1150,7 @@ static MACHINE_CONFIG_START( ti99_4ev_60hz )
 	MCFG_SOFTWARE_LIST_ADD("cart_list_ti99", "ti99_cart")
 
 	// Input/output port
-	MCFG_IOPORT_ADD( TI99_IOPORT_TAG )
+	MCFG_IOPORT_ADD_WITH_PEB( TI99_IOPORT_TAG )
 	MCFG_IOPORT_EXTINT_HANDLER( WRITELINE(ti99_4x_state, extint) )
 	MCFG_IOPORT_READY_HANDLER( DEVWRITELINE(DATAMUX_TAG, bus::ti99::internal::datamux_device, ready_line) )
 

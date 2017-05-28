@@ -37,7 +37,7 @@
         (when i.e. first boss goes to bottom of the screen and become unreachable)
     - (btanb) Throw is made by quickly double jumping (!)
     Heated Barrel
-	- (btanb) if player moves in diagonal a bogus projectile is fired.
+    - (btanb) if player moves in diagonal a bogus projectile is fired.
     - gives random value to hi-score if you continue (only the first time, not a bug?);
     - (fixed) throws random address exceptions at level 3 and above, a RAM address arrives corrupt in the snippet at 0x136a;
     - (fixed) some corrupt sprites, probably a non-fatal version of the one above;
