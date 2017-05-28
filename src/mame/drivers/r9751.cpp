@@ -68,6 +68,8 @@
 #define TRACE_LED 0
 #define TRACE_DMA 0
 
+#define TRACE_DEVICE 0x0
+
 class r9751_state : public driver_device
 {
 public:
@@ -113,9 +115,11 @@ private:
 	uint32_t fdd_cmd_complete;
 	uint32_t smioc_out_addr;
 	uint32_t smioc_dma_bank;
+	uint32_t smioc_dma_length;
 	uint32_t fdd_dma_bank;
 	attotime timer_32khz_last;
 	uint8_t m_term_data;
+	uint8_t m_serial_status;
 	// End registers
 
 	address_space *m_mem;
@@ -180,6 +184,8 @@ DRIVER_INIT_MEMBER(r9751_state,r9751)
 	fdd_dma_bank = 0;
 	smioc_out_addr = 0;
 	smioc_dma_bank = 0;
+	smioc_dma_length = 0;
+
 	m_mem = &m_maincpu->space(AS_PROGRAM);
 
 	m_maincpu->interface<m68000_base_device>(ptr_m68000);
@@ -214,6 +220,10 @@ READ32_MEMBER( r9751_state::r9751_mmio_5ff_r )
 {
 	uint32_t data;
 
+	if(TRACE_DEVICE)
+		if(((offset << 2) & 0xFF) == TRACE_DEVICE * 4)
+			logerror("(!) Device Read: 0x%02X - PC: %08X Register: %08X\n", TRACE_DEVICE, space.machine().firstcpu->pc(), offset << 2 | 0x5FF00000);
+
 	switch(offset << 2)
 	{
 		/* PDC HDD region (0x24, device 9) */
@@ -225,7 +235,10 @@ READ32_MEMBER( r9751_state::r9751_mmio_5ff_r )
 			return data;
 		/* SMIOC region (0x98, device 26) */
 		case 0x0898: /* Serial status or DMA status */
-			return 0x40;
+			//logerror("m_serial_status = %02X \n", m_serial_status);
+			return m_serial_status;
+		/* SMIOC region (0x9C, device 27) */
+
 		/* PDC FDD region (0xB0, device 44 */
 		case 0x08B0: /* FDD Command result code */
 			return 0x10;
@@ -245,6 +258,13 @@ READ32_MEMBER( r9751_state::r9751_mmio_5ff_r )
 WRITE32_MEMBER( r9751_state::r9751_mmio_5ff_w )
 {
 	uint8_t data_b0, data_b1;
+
+	//logerror("(!!) 0x5ff Register Write - PC: %08X Register: %08X Data: %08X\n", space.machine().firstcpu->pc(), offset << 2 | 0x5FF00000, data);
+
+	if(TRACE_DEVICE)
+		if(((offset << 2) & 0xFF) == TRACE_DEVICE * 4)
+			logerror("(!) Device Write: 0x%02X - PC: %08X Register: %08X Data: %08X\n", TRACE_DEVICE, space.machine().firstcpu->pc(), offset << 2 | 0x5FF00000, data);
+
 	/* Unknown mask */
 	if (mem_mask != 0xFFFFFFFF)
 		logerror("Mask found: %08X Register: %08X PC: %08X\n", mem_mask, offset << 2 | 0x5FF00000, space.machine().firstcpu->pc());
@@ -262,12 +282,19 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_5ff_w )
 			if(TRACE_HDC) logerror("@@@ HDD Command: %08X, From: %08X, Register: %08X\n", data, space.machine().firstcpu->pc(), offset << 2 | 0x5FF00000);
 			break;
 		/* SMIOC region (0x98, device 26) */
+		case 0x0298:
+			m_serial_status = data;
+			break;
 		case 0x4098: /* Serial DMA Command */
+			m_serial_status = 0x40;
 			switch(data)
 			{
 				case 0x4100: /* Send byte to serial */
-					if(TRACE_SMIOC) logerror("Serial byte: %02X PC: %08X\n", m_mem->read_dword(smioc_out_addr), space.machine().firstcpu->pc());
-					m_terminal->write(space,0,m_mem->read_dword(smioc_out_addr));
+					for(int i = 0; i < smioc_dma_length; i++)
+					{
+						if(TRACE_SMIOC) logerror("Serial byte: %02X PC: %08X\n", m_mem->read_dword(smioc_out_addr+i*2), space.machine().firstcpu->pc());
+						m_terminal->write(space,0,m_mem->read_dword(smioc_out_addr+i*2));
+					}
 					break;
 				default:
 					if(TRACE_SMIOC) logerror("Unknown serial DMA command: %X\n", data);
@@ -277,6 +304,12 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_5ff_w )
 			//smioc_out_addr = data * 2;
 			smioc_out_addr = (smioc_dma_bank & 0x7FFFF800) | ((data&0x3FF)<<1);
 			if(TRACE_SMIOC) logerror("Serial output address: %08X PC: %08X\n", smioc_out_addr, space.machine().firstcpu->pc());
+			break;
+		/* SMIOC region (0x9C, device 27) */
+		case 0x409C: /* Serial DMA length */
+			smioc_dma_length = (~data+1) & 0xFFFF;
+			if(TRACE_SMIOC) logerror("Serial DMA length: %08X PC: %08X\n", smioc_dma_length, space.machine().firstcpu->pc());
+			if(smioc_dma_length > 0x400) smioc_dma_length = 0x400;
 			break;
 		/* PDC FDD region (0xB0, device 44 */
 		case 0x01B0: /* FDD SCSI read command */
