@@ -80,7 +80,6 @@ namespace
 		// optional information overrides
 		virtual const tiny_rom_entry *device_rom_region() const override;
 		virtual void device_add_mconfig(machine_config &config) override;
-		virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 		virtual void device_reset() override;
 
 		DECLARE_READ8_MEMBER(ssc_port_a_r);
@@ -98,6 +97,7 @@ namespace
 		virtual void set_sound_enable(bool sound_enable) override;
 	private:
 		uint8_t reset_line;
+		uint8_t host_busy;
 		uint8_t tms7000_porta;
 		uint8_t tms7000_portb;
 		uint8_t tms7000_portc;
@@ -107,12 +107,6 @@ namespace
 		required_device<ay8910_device> m_ay;
 		required_device<sp0256_device> m_spo;
 		required_device<cocossc_sac_device> m_sac;
-		emu_timer *m_timer;
-		
-		enum
-		{
-			TIMER_CPUSYNC
-		};
 	};
 
 	// ======================> Color Computer Sound Activity Circuit filter
@@ -208,8 +202,7 @@ coco_ssc_device::coco_ssc_device(const machine_config &mconfig, const char *tag,
 		m_staticram(*this, "staticram"),
 		m_ay(*this, AY_TAG),
 		m_spo(*this, SP0256_TAG),
-		m_sac(*this, "coco_sac_tag"),
-		m_timer(nullptr)
+		m_sac(*this, "coco_sac_tag")
 {
 }
 
@@ -225,13 +218,11 @@ void coco_ssc_device::device_start()
 	install_readwrite_handler(0xFF7D, 0xFF7E, rh, wh);
 
 	save_item(NAME(reset_line));
+	save_item(NAME(host_busy));
 	save_item(NAME(tms7000_porta));
 	save_item(NAME(tms7000_portb));
 	save_item(NAME(tms7000_portc));
 	save_item(NAME(tms7000_portd));
-	
-	m_timer = timer_alloc(TIMER_CPUSYNC);
-	m_timer->adjust(attotime::never);
 }
 
 
@@ -242,6 +233,7 @@ void coco_ssc_device::device_start()
 void coco_ssc_device::device_reset()
 {
 	reset_line = 0;
+	host_busy = false;
 }
 
 
@@ -274,21 +266,6 @@ void coco_ssc_device::set_sound_enable(bool sound_enable)
 }
 
 //-------------------------------------------------
-//  device_timer - handler timer events
-//-------------------------------------------------
-
-void coco_ssc_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	switch (id)
-	{
-		case TIMER_CPUSYNC:
-			m_tms7040->set_input_line(TMS7000_INT3_LINE, ASSERT_LINE);
-			m_timer->adjust(attotime::never);
-			break;
-	}
-}
-
-//-------------------------------------------------
 //	ff7d_read
 //-------------------------------------------------
 
@@ -300,12 +277,17 @@ READ8_MEMBER(coco_ssc_device::ff7d_read)
 	{
 		case 0x00:
 			data = 0xff;
+
+			if (LOG_SSC)
+			{
+				logerror( "[%s] ff7d read: %02x\n", machine().describe_context(), data );
+			}
 			break;
 
 		case 0x01:
 			data = 0x1f;
 
-			if( tms7000_portc & C_BSY )
+			if( host_busy == false )
 			{
 				data |= 0x80;
 			}
@@ -320,6 +302,20 @@ READ8_MEMBER(coco_ssc_device::ff7d_read)
 				data |= 0x20;
 			}
 
+			if (LOG_SSC)
+			{
+				logerror( "[%s] ff7e read: %c%c%c%c %c%c%c%c (%02x)\n",
+					machine().describe_context(),
+					data & 0x80 ? '.' : 'B',
+					data & 0x40 ? '.' : 'S',
+					data & 0x20 ? '.' : 'P',
+					data & 0x10 ? '.' : '1',
+					data & 0x08 ? '.' : '1',
+					data & 0x04 ? '.' : '1',
+					data & 0x02 ? '.' : '1',
+					data & 0x01 ? '.' : '1',
+					data );
+			}
 			break;
 	}
 
@@ -336,6 +332,11 @@ WRITE8_MEMBER(coco_ssc_device::ff7d_write)
 	switch(offset)
 	{
 		case 0x00:
+			if (LOG_SSC)
+			{
+				logerror( "[%s] ff7d write: %02x\n", machine().describe_context(), data );
+			}
+
 			if( (reset_line & 1) == 1 )
 			{
 				if( (data & 1) == 0 )
@@ -343,6 +344,7 @@ WRITE8_MEMBER(coco_ssc_device::ff7d_write)
 					m_tms7040->reset();
 					m_ay->reset();
  					m_spo->reset();
+ 					host_busy = false;
 				}
 			}
 
@@ -357,7 +359,8 @@ WRITE8_MEMBER(coco_ssc_device::ff7d_write)
 			}
 
 			tms7000_porta = data;
-			m_timer->adjust(attotime::zero);
+			host_busy = true;
+			m_tms7040->set_input_line(TMS7000_INT3_LINE, ASSERT_LINE);
 			break;
 	}
 }
@@ -428,6 +431,11 @@ WRITE8_MEMBER(coco_ssc_device::ssc_port_c_w)
 		m_spo->ald_w(space, 0, tms7000_portd);
 	}
 
+	if( (data & C_BSY) == 0 )
+	{
+		host_busy = false;
+	}
+	
 	if (LOG_SSC)
 	{
 		logerror( "[%s] port c write: %c%c%c%c %c%c%c%c (%02x)\n",
