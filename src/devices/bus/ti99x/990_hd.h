@@ -46,7 +46,7 @@ protected:
 
 private:
 	// max disk units per controller: 4 is the protocol limit, but it may be overridden if more than one controller is used
-    static constexpr unsigned MAX_DISK_UNIT = 4;
+	static constexpr unsigned MAX_DISK_UNIT = 4;
 
 	enum format_t
 	{

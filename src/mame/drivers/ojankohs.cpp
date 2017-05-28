@@ -2,27 +2,27 @@
 // copyright-holders: Takahiro Nogi, Uki, Dirk Best
 /***************************************************************************
 
-	Video System Mahjong hardware
+    Video System Mahjong hardware
 
-	Ojanko High School (お雀子ハイスクール)
-	© 1988 V-System Co.
+    Ojanko High School (お雀子ハイスクール)
+    © 1988 V-System Co.
 
-	Ojanko Yakata (勝ち抜き麻雀戦 お雀子館)
-	© 1986 V-System Co.
+    Ojanko Yakata (勝ち抜き麻雀戦 お雀子館)
+    © 1986 V-System Co.
 
-	Ojanko Yakata 2bankan (勝ち抜き麻雀戦 お雀子館2番館)
-	© 1987 V-System Co.
+    Ojanko Yakata 2bankan (勝ち抜き麻雀戦 お雀子館2番館)
+    © 1987 V-System Co.
 
-	Chinese Casino (チャイニーズカジノ)
-	© 1987 V-System Co.
+    Chinese Casino (チャイニーズカジノ)
+    © 1987 V-System Co.
 
-	Ojanko Club (お雀子クラブ)
-	© 1986 V-System Co.
+    Ojanko Club (お雀子クラブ)
+    © 1986 V-System Co.
 
-	TODO:
-	- Figure out the rest of the dip switches
-	- XTAL values/clocks
-	- Raw screen params
+    TODO:
+    - Figure out the rest of the dip switches
+    - XTAL values/clocks
+    - Raw screen params
 
 ***************************************************************************/
 

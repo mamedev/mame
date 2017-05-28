@@ -141,8 +141,8 @@ WRITE8_MEMBER(stv_state::stv_ioga_w)
 	switch(offset)
 	{
 		case 0x07:
-//			if (data != m_system_output)
-//				logerror("OUT %02x\n", data);
+//          if (data != m_system_output)
+//              logerror("OUT %02x\n", data);
 			m_system_output = data;
 			/*Why does the BIOS tests these as ACTIVE HIGH? A program bug?*/
 			machine().bookkeeping().coin_counter_w(0,~data & 0x01);
@@ -1698,15 +1698,15 @@ static INPUT_PORTS_START( patocar )
 	PORT_INCLUDE( stv )
 
 	PORT_MODIFY("PORTA")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 )	// hopper ?
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 )   // hopper ?
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW,  IPT_UNUSED )
 
 	PORT_MODIFY("PORTB")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_BUTTON3 )	// ??
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON4 )	// Door switch ?
-	PORT_BIT( 0x0c, IP_ACTIVE_LOW,  IPT_BUTTON5 )	// ??
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_COIN3 )	PORT_NAME("Medal")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_BUTTON3 )   // ??
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON4 )   // Door switch ?
+	PORT_BIT( 0x0c, IP_ACTIVE_LOW,  IPT_BUTTON5 )   // ??
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_COIN3 ) PORT_NAME("Medal")
 	PORT_BIT( 0xd0, IP_ACTIVE_LOW,  IPT_UNUSED )
 
 	// TODO: sense/delta values seems wrong
@@ -2821,11 +2821,11 @@ ROM_START( tatacot ) /* Must use Japan or Asia BIOS */
 	ROM_RELOAD ( 0x0100001, 0x0080000 )
 	ROM_RELOAD_PLAIN( 0x0200000, 0x0080000)
 	ROM_RELOAD_PLAIN( 0x0300000, 0x0080000)
-//	ROM_LOAD16_WORD_SWAP( "mpr18138.2",    0x0400000, 0x0400000, CRC(f5567049) SHA1(6eb35e4b5fbda39cf7e8c42b6a568bd53a364d6d) ) // good
-//	ROM_LOAD16_WORD_SWAP( "mpr18139.3",    0x0800000, 0x0400000, CRC(f36b4878) SHA1(e3f63c0046bd37b7ab02fb3865b8ebcf4cf68e75) ) // good
-//	ROM_LOAD16_WORD_SWAP( "mpr18140.4",    0x0c00000, 0x0400000, CRC(228850a0) SHA1(d83f7fa7df08407fa45a13661393679b88800805) ) // good
-//	ROM_LOAD16_WORD_SWAP( "mpr18141.5",    0x1000000, 0x0400000, CRC(b51eef36) SHA1(2745cba48dc410d6d31327b956886ec284b9eac3) ) // good
-//	ROM_LOAD16_WORD_SWAP( "mpr18142.6",    0x1400000, 0x0400000, CRC(cf259541) SHA1(51e2c8d16506d6074f6511112ec4b6b44bed4886) ) // good
+//  ROM_LOAD16_WORD_SWAP( "mpr18138.2",    0x0400000, 0x0400000, CRC(f5567049) SHA1(6eb35e4b5fbda39cf7e8c42b6a568bd53a364d6d) ) // good
+//  ROM_LOAD16_WORD_SWAP( "mpr18139.3",    0x0800000, 0x0400000, CRC(f36b4878) SHA1(e3f63c0046bd37b7ab02fb3865b8ebcf4cf68e75) ) // good
+//  ROM_LOAD16_WORD_SWAP( "mpr18140.4",    0x0c00000, 0x0400000, CRC(228850a0) SHA1(d83f7fa7df08407fa45a13661393679b88800805) ) // good
+//  ROM_LOAD16_WORD_SWAP( "mpr18141.5",    0x1000000, 0x0400000, CRC(b51eef36) SHA1(2745cba48dc410d6d31327b956886ec284b9eac3) ) // good
+//  ROM_LOAD16_WORD_SWAP( "mpr18142.6",    0x1400000, 0x0400000, CRC(cf259541) SHA1(51e2c8d16506d6074f6511112ec4b6b44bed4886) ) // good
 	ROM_LOAD16_WORD_SWAP( "mpr-18789.ic8", 0x1c00000, 0x0400000, CRC(b388616f) SHA1(0b2c5a547c3a6a8fb9f4ca54336cf6dc9adb8c6a) ) // good
 	ROM_LOAD16_WORD_SWAP( "mpr-18788.ic9", 0x2000000, 0x0400000, CRC(feae5867) SHA1(7d2e47d5ab18700a246d53fdb7872a905cdac55a) ) // good
 
@@ -3549,7 +3549,7 @@ ROM_START( patocar )
 	ROM_LOAD16_WORD_SWAP( "ic24.bin",     0x0400000, 0x200000, CRC(cbbb687e) SHA1(cfc87ae6124f9978bb2432b98d77f0da07d020b7) )
 	ROM_LOAD16_WORD_SWAP( "ic26.bin",     0x0600000, 0x200000, CRC(91db9dbe) SHA1(8652fe45ce56633016403c75e8b3a7b77f279819) )
 	ROM_LOAD16_WORD_SWAP( "ic28.bin",     0x0800000, 0x200000, CRC(bff0cd9c) SHA1(3c62aa2d7f71bd6fb147fdcd8d99cd7815f3047e) )
-	ROM_LOAD16_WORD_SWAP( "ic30.bin",     0x0a00000, 0x200000, CRC(9a4109e5) SHA1(ba59caac5f5a80fc52c507d8a47f322a380aa9a1) )	// empty / FF filled
+	ROM_LOAD16_WORD_SWAP( "ic30.bin",     0x0a00000, 0x200000, CRC(9a4109e5) SHA1(ba59caac5f5a80fc52c507d8a47f322a380aa9a1) )   // empty / FF filled
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 ) // preconfigured to 1 player
 	ROM_LOAD( "patocar.nv", 0x0000, 0x0080, CRC(d9873ee8) SHA1(e74747816bba6745afd718b0beec67a884c6a31c) )

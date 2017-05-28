@@ -520,7 +520,7 @@ bool device_image_interface::run_hash(util::core_file &file, u32 skip_bytes, uti
 		const u32 actual_count = file.read(buffer, count);
 		if (actual_count == 0)
 			return false;
-		position += actual_count;		
+		position += actual_count;
 
 		// and compute the hashes
 		hashes.buffer(buffer, actual_count);

@@ -1663,12 +1663,12 @@ GAME( 1981, mtrapb2,  mtrap,   mtrap,    mtrap,    exidy_state, mtrap,    ROT0, 
 GAME( 1981, venture,  0,       venture,  venture,  exidy_state, venture,  ROT0, "Exidy",   "Venture (version 5 set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, venture2, venture, venture,  venture,  exidy_state, venture,  ROT0, "Exidy",   "Venture (version 5 set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, venture4, venture, venture,  venture,  exidy_state, venture,  ROT0, "Exidy",   "Venture (version 4)", MACHINE_SUPPORTS_SAVE )
-                                                   
+
 GAME( 1982, teetert,  0,       teetert,  teetert,  exidy_state, teetert,  ROT0, "Exidy",   "Teeter Torture (prototype)", MACHINE_SUPPORTS_SAVE )
-                                                   
+
 GAME( 1982, pepper2,  0,       pepper2,  pepper2,  exidy_state, pepper2,  ROT0, "Exidy",   "Pepper II (version 8)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, pepper27, pepper2, pepper2,  pepper2,  exidy_state, pepper2,  ROT0, "Exidy",   "Pepper II (version 7)", MACHINE_SUPPORTS_SAVE )
-                                                   
+
 GAME( 1982, hardhat,  0,       pepper2,  pepper2,  exidy_state, pepper2,  ROT0, "Exidy",   "Hard Hat", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1983, fax,      0,       fax,      fax,      exidy_state, fax,      ROT0, "Exidy",   "FAX", MACHINE_SUPPORTS_SAVE )

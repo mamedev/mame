@@ -872,15 +872,15 @@ void menu_select_game::inkey_select_favorite(const event *menu_event)
 
 		if (summary == media_auditor::CORRECT || summary == media_auditor::BEST_AVAILABLE || summary == media_auditor::NONE_NEEDED)
 		{
-            if ((ui_swinfo->driver->flags & MACHINE_TYPE_ARCADE) == 0)
-            {
-                for (software_list_device &swlistdev : software_list_device_iterator(enumerator.config()->root_device()))
-                    if (!swlistdev.get_info().empty())
-                    {
-                        menu::stack_push<menu_select_software>(ui(), container(), ui_swinfo->driver);
-                        return;
-                    }
-            }
+			if ((ui_swinfo->driver->flags & MACHINE_TYPE_ARCADE) == 0)
+			{
+				for (software_list_device &swlistdev : software_list_device_iterator(enumerator.config()->root_device()))
+					if (!swlistdev.get_info().empty())
+					{
+						menu::stack_push<menu_select_software>(ui(), container(), ui_swinfo->driver);
+						return;
+					}
+			}
 
 			// if everything looks good, schedule the new driver
 			s_bios biosname;

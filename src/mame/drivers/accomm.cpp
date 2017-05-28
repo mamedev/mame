@@ -7,8 +7,8 @@
     Driver-in-progress by R. Belmont
     Electron ULA emulation by Wilbert Pol
 
-	Main CPU: 65C816
-	Other chips: 6850 UART, 6522 VIA, SAA5240(video?), AM7910 modem, PCF0335(?)
+    Main CPU: 65C816
+    Other chips: 6850 UART, 6522 VIA, SAA5240(video?), AM7910 modem, PCF0335(?)
 
 ****************************************************************************/
 
@@ -73,12 +73,12 @@ public:
 	virtual void machine_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	
+
 	DECLARE_WRITE8_MEMBER(b0_rom_disable_w);
 	DECLARE_READ8_MEMBER(read_keyboard);
 	DECLARE_READ8_MEMBER(sheila_r);
 	DECLARE_WRITE8_MEMBER(sheila_w);
-	
+
 	DECLARE_PALETTE_INIT(accomm);
 	INTERRUPT_GEN_MEMBER(vbl_int);
 
@@ -92,11 +92,11 @@ protected:
 
 	// driver_device overrides
 	virtual void video_start() override;
-	
+
 	void interrupt_handler(int mode, int interrupt);
 	inline uint8_t read_vram( uint16_t addr );
 	inline void plot_pixel(bitmap_ind16 &bitmap, int x, int y, uint32_t color);
-	
+
 private:
 	ULA m_ula;
 	int m_map4[256];
@@ -543,13 +543,13 @@ void accomm_state::interrupt_handler(int mode, int interrupt)
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, accomm_state )
 	AM_RANGE(0x000000, 0x007fff) AM_RAM
 	AM_RANGE(0x008000, 0x00ffff) AM_DEVICE("bank0dev", address_map_bank_device, amap8)
-	AM_RANGE(0x010000, 0x08ffff) AM_RAM	// "576K RAM"
-	
+	AM_RANGE(0x010000, 0x08ffff) AM_RAM // "576K RAM"
+
 	AM_RANGE(0x440000, 0x440000) AM_WRITE(b0_rom_disable_w)
 	AM_RANGE(0x450000, 0x457fff) AM_RAM AM_SHARE("vram")
 	AM_RANGE(0x458000, 0x45bfff) AM_READ(read_keyboard)
 	AM_RANGE(0x45fe00, 0x45feff) AM_READWRITE(sheila_r, sheila_w)
-	AM_RANGE(0x460000, 0x467fff) AM_RAM	// nvram?
+	AM_RANGE(0x460000, 0x467fff) AM_RAM // nvram?
 	AM_RANGE(0xfc0000, 0xffffff) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
@@ -662,22 +662,22 @@ static MACHINE_CONFIG_START( accomm )
 
 	MCFG_PALETTE_ADD( "palette", 16 )
 	MCFG_PALETTE_INIT_OWNER(accomm_state, accomm)
-	
+
 	MCFG_DEVICE_ADD("bank0dev", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(b0dev_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
 	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x8000)
-	
+
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 MACHINE_CONFIG_END
 
 ROM_START(accomm)
 	ROM_REGION(0x40000, "maincpu", 0)       /* C68 / M37450 program ROM */
-	ROM_LOAD( "romv100-3.rom", 0x000000, 0x010000, CRC(bd87a157) SHA1(b9b9ed1aab9ffef2de988b2cfeac293afa11448a) ) 
-	ROM_LOAD( "romv100-2.rom", 0x010000, 0x010000, CRC(3438adee) SHA1(cd9d5522d9430cb2e1936210b77d2edd280f9419) ) 
-	ROM_LOAD( "romv100-1.rom", 0x020000, 0x010000, CRC(adc6a073) SHA1(3e87f21fafc1d69f33c5b541a20a98e82aacbfab) ) 
-	ROM_LOAD( "romv100-0.rom", 0x030000, 0x010000, CRC(6d22950d) SHA1(d4cbdccf8d2bc836fb81182b2ed344d7134fe5c9) ) 
+	ROM_LOAD( "romv100-3.rom", 0x000000, 0x010000, CRC(bd87a157) SHA1(b9b9ed1aab9ffef2de988b2cfeac293afa11448a) )
+	ROM_LOAD( "romv100-2.rom", 0x010000, 0x010000, CRC(3438adee) SHA1(cd9d5522d9430cb2e1936210b77d2edd280f9419) )
+	ROM_LOAD( "romv100-1.rom", 0x020000, 0x010000, CRC(adc6a073) SHA1(3e87f21fafc1d69f33c5b541a20a98e82aacbfab) )
+	ROM_LOAD( "romv100-0.rom", 0x030000, 0x010000, CRC(6d22950d) SHA1(d4cbdccf8d2bc836fb81182b2ed344d7134fe5c9) )
 ROM_END
 
 GAME( 1986,  accomm,  0,  accomm,  accomm, accomm_state,  0,  ROT0,  "Acorn", "Acorn Communicator", MACHINE_NOT_WORKING )

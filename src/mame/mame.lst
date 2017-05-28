@@ -292,7 +292,7 @@ ac1_32                          // 1984 Amateurcomputer AC1 (32 lines)
 ac1scch                         // 1984 Amateurcomputer AC1 SCCH
 
 @source:accomm.cpp
-accomm							// 1986 Acorn Computer
+accomm                          // 1986 Acorn Computer
 
 @source:aceex.cpp
 aceex2814
@@ -1238,7 +1238,7 @@ space84                         // 1985 IBS/ComputerTechnik Space 84
 uniap2en                        // 1982 Unitron AP II (in English)
 uniap2pt                        // 1982 Unitron AP II (in Brazilian Portuguese)
 uniap2ti                        // 1982 Unitron AP II+ (Teclado Inteligente)
-craft2p							// 1982 Craft?
+craft2p                         // 1982 Craft?
 
 @source:apple2e.cpp
 apple2c                         // Apr 1984 Apple //c
@@ -12062,7 +12062,7 @@ catapult                        // (c) 1982
 dealer                          // (c) 198?
 igmo                            // (c) 1984
 megadon                         // (c) 1982
-revngr84						// (c) 1984
+revngr84                        // (c) 1984
 revenger                        // (c) 1984
 suprglob                        // (c) 1983
 theglob                         // (c) 1983
@@ -15361,16 +15361,16 @@ jchan2                          // (c) 1995 Kaneko
 
 @source:jclub2.cpp
 darkhors                        // bootleg of Jockey Club II
-jclub2v100	                    // v1.00       5 OCT. 1994
-jclub2v101	                    // v1.01      20 FEB. 1995
-jclub2v110	                    // v1.10X      5 MAY. 1996
-jclub2v112	                    // v1.12X      3 JUN. 1996
-jclub2v200	                    // v2.00       7 SEP. 1996
-jclub2v201	                    // v2.01      20 NOV. 1996
-jclub2v203	                    // v2.03X RC  26 MAR. 1997
-jclub2v204	                    // v2.04      30 APR. 1997
-jclub2v205	                    // v2.05      21 JUL. 1997
-jclub2v220	                    // v2.20      14 APR. 1998
+jclub2v100                      // v1.00       5 OCT. 1994
+jclub2v101                      // v1.01      20 FEB. 1995
+jclub2v110                      // v1.10X      5 MAY. 1996
+jclub2v112                      // v1.12X      3 JUN. 1996
+jclub2v200                      // v2.00       7 SEP. 1996
+jclub2v201                      // v2.01      20 NOV. 1996
+jclub2v203                      // v2.03X RC  26 MAR. 1997
+jclub2v204                      // v2.04      30 APR. 1997
+jclub2v205                      // v2.05      21 JUL. 1997
+jclub2v220                      // v2.20      14 APR. 1998
 
 @source:jedi.cpp
 jedi                            // 136030           (c) 1984
@@ -20968,7 +20968,7 @@ monzagpb                        // bootleg
 bucky                           // GX173 (c) 1992 (World)
 buckyaab                        // GX173 (c) 1992 (Asia)
 buckyea                         // GX173 (c) 1992 (World)
-buckyjaa						// GX173 (c) 1992 (Japan)
+buckyjaa                        // GX173 (c) 1992 (Japan)
 buckyuab                        // GX173 (c) 1992 (US)
 moomesa                         // GX151 (c) 1992 (World)
 moomesaaab                      // GX151 (c) 1992 (Asia)
@@ -33923,7 +33923,7 @@ shootoutb                       // bootleg
 shootoutj                       // (c) 1985 Data East USA (Japan)
 
 @source:shootaway2.cpp
-shootaw2						// (c) 1996 Namco
+shootaw2                        // (c) 1996 Namco
 
 @source:shougi.cpp
 shougi                          // (c) 1982 (Arcade TV Game List - P.80, Left, 9 from top)
@@ -35570,7 +35570,7 @@ spacegunu                       // C57 (c) 1990 Taito America Corporation (US)
 ainferno                        // C45 (c) 1990 Taito America Corporation (US)
 ainfernoj                       // C45 (c) 1990 Taito Corporation (Japan)
 topland                         // B62 (c) 1988 Taito Corporation Japan (World)
-toplandj						// B62 (c) 1988 Taito Corporation (Japan)	
+toplandj                        // B62 (c) 1988 Taito Corporation (Japan)
 
 @source:taitogn.cpp
 chaoshea                        // 1998.10 Chaos Heat (V2.09O)
@@ -37133,7 +37133,7 @@ votrtnt                         // 1980 Votrax Type-'N-Talk
 
 @source:voyager.cpp
 voyager                         // (c) 2002 Team Play, Inc.
-voyagers						// (c) 2002 Team Play, Inc.
+voyagers                        // (c) 2002 Team Play, Inc.
 policet2                        // (c) 2003 Team Play, Inc.
 
 @source:vp101.cpp

@@ -35,7 +35,7 @@ TODO:
 #include "speaker.h"
 
 /* unknown divider, assume /5 */
-#define MAIN_CLOCK XTAL_18_432MHz/5 
+#define MAIN_CLOCK XTAL_18_432MHz/5
 
 void clshroad_state::machine_reset()
 {

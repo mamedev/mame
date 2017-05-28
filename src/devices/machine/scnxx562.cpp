@@ -100,7 +100,7 @@ DONE (x) (p=partly)         NMOS         CMOS
 #define LOGR(...)       LOGMASKED(LOG_R, __VA_ARGS__)
 #define LOGTX(...)      LOGMASKED(LOG_TX, __VA_ARGS__)
 #define LOGRX(...)      LOGMASKED(LOG_RX, __VA_ARGS__)
-#define LOGSETUP(...)	LOGMASKED(LOG_SETUP, __VA_ARGS__)
+#define LOGSETUP(...)   LOGMASKED(LOG_SETUP, __VA_ARGS__)
 #define LOGINT(...)     LOGMASKED(LOG_INT, __VA_ARGS__)
 
 #ifdef _MSC_VER

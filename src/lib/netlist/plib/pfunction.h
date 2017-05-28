@@ -83,10 +83,10 @@ namespace plib {
 		double lfsr_random()
 		{
 			std::uint16_t lsb = m_lfsr & 1;
-		    m_lfsr >>= 1;
-		    if (lsb)
-		    	m_lfsr ^= 0xB400u; // taps 15, 13, 12, 10
-		    return static_cast<double>(m_lfsr) / static_cast<double>(0xffffu);
+			m_lfsr >>= 1;
+			if (lsb)
+				m_lfsr ^= 0xB400u; // taps 15, 13, 12, 10
+			return static_cast<double>(m_lfsr) / static_cast<double>(0xffffu);
 		}
 
 		std::vector<rpn_inst> m_precompiled; //!< precompiled expression

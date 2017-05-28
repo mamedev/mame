@@ -299,7 +299,7 @@ ADDRESS_MAP_END
 // these maps represent the real main, i/o and boot spaces of the system
 static ADDRESS_MAP_START(interpro_main_map, AS_0, 32, interpro_state)
 	AM_RANGE(0x00000000, 0x00ffffff) AM_RAM // 16M RAM
-	
+
 	AM_RANGE(0x40000000, 0x4000003f) AM_DEVICE(INTERPRO_MCGA_TAG, interpro_fmcc_device, map)
 	AM_RANGE(0x4f007e00, 0x4f007eff) AM_DEVICE(INTERPRO_SGA_TAG, interpro_sga_device, map)
 

@@ -785,8 +785,8 @@ void imgtool::partition::get_attribute_name(uint32_t attribute, const imgtool_at
 
 
 //-------------------------------------------------
-//	imgtool_validitychecks - checks the validity
-//	of the imgtool modules
+//  imgtool_validitychecks - checks the validity
+//  of the imgtool modules
 //-------------------------------------------------
 
 bool imgtool_validitychecks(void)

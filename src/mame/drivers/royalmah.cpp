@@ -117,7 +117,7 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_rtc(*this, "rtc"),
 		m_soundlatch(*this, "soundlatch") { }
-		
+
 
 	DECLARE_READ8_MEMBER(player_1_port_r);
 	DECLARE_READ8_MEMBER(player_2_port_r);
@@ -4969,7 +4969,7 @@ ROM_START( jangtaku )
 	/*this is just a z80 Voice Player (and latches port I/O $00 with the main CPU)*/
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "1.a3",  0x00000, 0x8000, CRC(745162d3) SHA1(145269c60c87e772e6cbca40213d286ec05c9134) )
-	// THE Jantaku Voice   Ver 1.0     (C) Copy Right 1986             DYNA Computer Service CO.,LTD.  By Satoshi Kato  
+	// THE Jantaku Voice   Ver 1.0     (C) Copy Right 1986             DYNA Computer Service CO.,LTD.  By Satoshi Kato
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "82s123a.6k", 0x0000, 0x0020, CRC(e9598146) SHA1(619e7eb76cc3e882b5b3e55cdd23fe00b0a1fe45) )
@@ -4977,8 +4977,8 @@ ROM_END
 
 ROM_START( rkjanoh2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-    ROM_LOAD( "pf_1",         0x000000, 0x001000, CRC(582e7eda) SHA1(96578b6142051d9452f23c8c1b674e2d8a4c3b62) )
-    ROM_LOAD( "pf_2",         0x001000, 0x001000, CRC(49e7dc40) SHA1(d6232a82b6927c79dd47884e5e2a6589c5524424) )
+	ROM_LOAD( "pf_1",         0x000000, 0x001000, CRC(582e7eda) SHA1(96578b6142051d9452f23c8c1b674e2d8a4c3b62) )
+	ROM_LOAD( "pf_2",         0x001000, 0x001000, CRC(49e7dc40) SHA1(d6232a82b6927c79dd47884e5e2a6589c5524424) )
 	ROM_LOAD( "pf_3_1",       0x002000, 0x001000, CRC(a1fdc929) SHA1(27cab4da2365bcf311d7f00d75e8db150183b108) )
 	ROM_LOAD( "pf_4l",        0x003000, 0x001000, CRC(c9ccdfa0) SHA1(ce6f2df7fb6739ddf0529bcae0596e4593ecc3e0) )
 	//ROM_LOAD( "pf_4_fewest",  0x003000, 0x001000, CRC(9a1650a0) SHA1(2da5957879d9f207721fc2f0d63dccc32850cbe2) )
@@ -4986,12 +4986,12 @@ ROM_START( rkjanoh2 )
 	ROM_LOAD( "pf_5",         0x004000, 0x001000, CRC(8a858464) SHA1(55c71ce1c30e908dfc8c21237256dfbb75c55363) )
 	ROM_LOAD( "pf_6",         0x005000, 0x001000, CRC(5b649918) SHA1(191a221a515c261d90d7432443a7fbc8da71e7ac) )
 	ROM_LOAD( "pf_7",         0x006000, 0x001000, CRC(c4fdd2ac) SHA1(76c5645534b87dde87acfb4140d0f3ba18c95cd2) )
-	
+
 	ROM_REGION( 0x002000, "gfx", 0 )
 	ROM_LOAD( "pf_8",         0x000000, 0x002000, CRC(c789e2b3) SHA1(33b5c8f22a1e337816a61fd2c91bc175a412d10e) )
-	
+
 	ROM_REGION( 0x0020, "proms", 0 )
-    ROM_LOAD( "82s123",       0x000, 0x020, CRC(74a53e94) SHA1(ca9114bd9b2b07f5abe82616b41ae9fdb9537a4f) )
+	ROM_LOAD( "82s123",       0x000, 0x020, CRC(74a53e94) SHA1(ca9114bd9b2b07f5abe82616b41ae9fdb9537a4f) )
 ROM_END
 
 DRIVER_INIT_MEMBER(royalmah_state, tahjong)
@@ -5068,7 +5068,7 @@ GAME( 1986,  suzume,   0,        suzume,   suzume,   royalmah_state, suzume,   R
 GAME( 1986,  mjsiyoub, 0,        royalmah, royalmah, royalmah_state, 0,        ROT0,   "Visco",                      "Mahjong Shiyou (Japan)",                MACHINE_NOT_WORKING )
 GAME( 1986,  mjsenka,  0,        royalmah, royalmah, royalmah_state, 0,        ROT0,   "Visco",                      "Mahjong Senka (Japan)",                 MACHINE_NOT_WORKING )
 GAME( 1986,  mjyarou,  0,        mjyarou,  mjyarou,  royalmah_state, 0,        ROT0,   "Visco / Video System",       "Mahjong Yarou [BET] (Japan, set 1)",    MACHINE_IMPERFECT_GRAPHICS ) // girls aren't shown
-GAME( 1986,  mjyarou2, mjyarou,  mjyarou,  mjyarou,  royalmah_state, 0,        ROT0,   "Visco / Video System",       "Mahjong Yarou [BET] (Japan, set 2)",    MACHINE_IMPERFECT_GRAPHICS ) // girls aren't shown 
+GAME( 1986,  mjyarou2, mjyarou,  mjyarou,  mjyarou,  royalmah_state, 0,        ROT0,   "Visco / Video System",       "Mahjong Yarou [BET] (Japan, set 2)",    MACHINE_IMPERFECT_GRAPHICS ) // girls aren't shown
 GAME( 1986?, mjclub,   0,        mjclub,   mjclub,   royalmah_state, tontonb,  ROT0,   "Xex",                        "Mahjong Club [BET] (Japan)",            0 )
 GAME( 1987,  mjdiplob, 0,        mjdiplob, mjdiplob, royalmah_state, tontonb,  ROT0,   "Dynax",                      "Mahjong Diplomat [BET] (Japan)",        0 )
 GAME( 1987,  tontonb,  0,        tontonb,  tontonb,  royalmah_state, tontonb,  ROT0,   "Dynax",                      "Tonton [BET] (Japan, set 1)",           0 )

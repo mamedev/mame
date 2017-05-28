@@ -91,10 +91,10 @@ public:
 	DECLARE_WRITE8_MEMBER(ball_x_w);
 	DECLARE_WRITE8_MEMBER(ball_y_w);
 	DECLARE_WRITE8_MEMBER(paddle_x_w);
-	
+
 	DECLARE_INPUT_CHANGED_MEMBER(left_coin_inserted);
 	DECLARE_INPUT_CHANGED_MEMBER(right_coin_inserted);
-	
+
 	TILE_GET_INFO_MEMBER(m14_get_tile_info);
 	void draw_ball_and_paddle(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	virtual void machine_start() override;
@@ -136,7 +136,7 @@ TILE_GET_INFO_MEMBER(m14_state::m14_get_tile_info)
 	int color = m_color_ram[tile_index] & 0x0f;
 
 	/* colorram & 0xf0 used but unknown purpose*/
-	
+
 	SET_TILE_INFO_MEMBER(0,
 			code,
 			color,
@@ -146,8 +146,8 @@ TILE_GET_INFO_MEMBER(m14_state::m14_get_tile_info)
 void m14_state::video_start()
 {
 	m_m14_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(m14_state::m14_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	
-	
+
+
 }
 
 void m14_state::draw_ball_and_paddle(bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -158,7 +158,7 @@ void m14_state::draw_ball_and_paddle(bitmap_ind16 &bitmap, const rectangle &clip
 	const int xoffs = -8; // matches left-right wall bounces
 	const int p_ybase = 184; // matches ball bounce to paddle
 	int resx,resy;
-	
+
 	// draw ball
 	for(xi=0;xi<4;xi++)
 		for(yi=0;yi<4;yi++)
@@ -169,19 +169,19 @@ void m14_state::draw_ball_and_paddle(bitmap_ind16 &bitmap, const rectangle &clip
 			if(cliprect.contains(resx,resy))
 				bitmap.pix16(resy, resx) = m_palette->pen(white_pen);
 		}
-	
+
 	// draw paddle
 	for(xi=0;xi<16;xi++)
 		for(yi=0;yi<4;yi++)
-		{			
+		{
 			resx = flip_screen() ? 32*8-(m_paddlex+xi+xoffs) : (m_paddlex+xi+xoffs);
 			resy = flip_screen() ? 28*8-(p_ybase+yi) :         p_ybase+yi;
-			
+
 			if(cliprect.contains(resx,resy))
 				bitmap.pix16(resy, resx) = m_palette->pen(white_pen);
 		}
-		
-		
+
+
 }
 
 
@@ -321,7 +321,7 @@ static INPUT_PORTS_START( m14 )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	
+
 	PORT_START("IN1")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P1 Reach")
 

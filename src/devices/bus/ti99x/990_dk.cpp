@@ -61,35 +61,35 @@ void fd800_legacy_device::set_interrupt_line()
 #if 0
 void fd800_legacy_device::unload_proc(device_image_interface &image)
 {
-    int unit = floppy_get_drive(&image.device());
+	int unit = floppy_get_drive(&image.device());
 
-    m_drv[unit].log_cylinder[0] = m_drv[unit].log_cylinder[1] = -1;
+	m_drv[unit].log_cylinder[0] = m_drv[unit].log_cylinder[1] = -1;
 }
 
 
 void fd800_machine_init(void (*interrupt_callback)(running_machine &machine, int state))
 {
-    int i;
+	int i;
 
-    m_machine = &machine;
-    m_interrupt_callback = interrupt_callback;
+	m_machine = &machine;
+	m_interrupt_callback = interrupt_callback;
 
-    m_stat_reg = 0;
-    m_interrupt_f_f = 1;
+	m_stat_reg = 0;
+	m_interrupt_f_f = 1;
 
-    m_buf_pos = 0;
-    m_buf_mode = bm_off;
+	m_buf_pos = 0;
+	m_buf_mode = bm_off;
 
-    for (i=0; i<MAX_FLOPPIES; i++)
-    {
-        m_drv[i].img = dynamic_cast<device_image_interface *>(floppy_get_device(machine, i));
-        m_drv[i].phys_cylinder = -1;
-        m_drv[i].log_cylinder[0] = m_drv[i].log_cylinder[1] = -1;
-        m_drv[i].seclen = 64;
-        floppy_install_unload_proc(&m_drv[i].img->device(), unload_proc);
-    }
+	for (i=0; i<MAX_FLOPPIES; i++)
+	{
+		m_drv[i].img = dynamic_cast<device_image_interface *>(floppy_get_device(machine, i));
+		m_drv[i].phys_cylinder = -1;
+		m_drv[i].log_cylinder[0] = m_drv[i].log_cylinder[1] = -1;
+		m_drv[i].seclen = 64;
+		floppy_install_unload_proc(&m_drv[i].img->device(), unload_proc);
+	}
 
-    set_interrupt_line();
+	set_interrupt_line();
 }
 #endif
 

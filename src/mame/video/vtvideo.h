@@ -90,7 +90,7 @@ public:
 	int MHFU(int);
 	void palette_select(int choice);
 	void notify_vblank(bool choice);
-	
+
 protected:
 	virtual void display_char(bitmap_ind16 &bitmap, uint8_t code, int x, int y, uint8_t scroll_region, uint8_t display_type) override;
 	virtual void device_reset() override;

@@ -4,12 +4,12 @@
 /***************************************************************************
 
   Chrysler Electronic Voice Alert
-  
+
   11-function board "EVA-11"
   - TMS1000 MCU (label 4230625-N1LL 32045B, die label 1000F M32045B)
   - TMS5110A, TMS6125 CM73002
   - 2 Nat.Semi. 20-pin SDIP, I/O expanders?
-  
+
   24-function board "EVA-24"
   - COP400 family? MCU
   - TMS5110A, TMS6100 CM63002 (have dump)

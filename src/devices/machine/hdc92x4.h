@@ -52,7 +52,7 @@ class hdc92x4_device : public device_t
 {
 public:
 	/*
-		Enumeration of the latches outside of the controller
+	    Enumeration of the latches outside of the controller
 	*/
 	enum
 	{
@@ -64,7 +64,7 @@ public:
 
 
 	/*
-		Definition of bits in the Disk-Status register
+	    Definition of bits in the Disk-Status register
 	*/
 	enum
 	{

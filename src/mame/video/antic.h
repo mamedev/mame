@@ -24,7 +24,7 @@ private:
 	static constexpr unsigned   VBL_END             = 8;    // vblank ends in this scanline
 	static constexpr unsigned   VDATA_START         = 11;   // video display begins in this scanline
 	static constexpr unsigned   VDATA_END           = 244;  // video display ends in this scanline
-	static constexpr unsigned   VBL_START           = 248;	// vblank starts in this scanline
+	static constexpr unsigned   VBL_START           = 248;  // vblank starts in this scanline
 
 public:
 	// total number of lines per frame (incl. vblank)

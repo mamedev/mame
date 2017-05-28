@@ -86,7 +86,7 @@
         mocapglf            Security code error
         mocapb,j            Crash after self checks
         p911                "Distribution error"
-		p911e,j,uc,kc       Hangs at POST, with IRQ3 it crashes at first 3d frame
+        p911e,j,uc,kc       Hangs at POST, with IRQ3 it crashes at first 3d frame
         p9112               RTC self check bad
         popn9               Doesn't boot: bad CHD?
         sscopex/sogeki      Security code error
@@ -2242,10 +2242,10 @@ INPUT_PORTS_END
 // TODO: left/right escape, 2nd service switch?
 INPUT_PORTS_START( jpark3 )
 	PORT_INCLUDE( viper )
-	
+
 	PORT_MODIFY("IN3")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
-	
+
 	PORT_MODIFY("IN4")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Gun Trigger") PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P2 Gun Trigger") PORT_PLAYER(2)
@@ -2412,7 +2412,7 @@ ROM_START(ppp2nd)
 	ROM_LOAD("ds2430.u3", 0x00, 0x28, BAD_DUMP CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
 	// byte 0x1e (0) JAA (1) AAA
 	// byte 0x1f (1) rental
-	
+
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 
 	DISK_REGION( "ata:0:hdd:image" )

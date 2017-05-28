@@ -1737,17 +1737,17 @@ void z80scc_channel::do_sccreg_wr0(uint8_t data)
 		m_rx_first = 1;
 		break;
 	case WR0_RESET_TX_INT: // reset transmitter interrupt pending
-        /*Reset Tx Interrupt Pending Command (101). This command is used in cases where there are no
-          more characters to be sent; e.g., at the end of a message. This command prevents further transmit
-          interrupts until after the next character has been loaded into the transmit buffer or until CRC has
-          been completely sent. This command is necessary to prevent the transmitter from requesting an
-          interrupt when the transmit buffer becomes empty (with Transmit Interrupt Enabled).*/
+		/*Reset Tx Interrupt Pending Command (101). This command is used in cases where there are no
+		  more characters to be sent; e.g., at the end of a message. This command prevents further transmit
+		  interrupts until after the next character has been loaded into the transmit buffer or until CRC has
+		  been completely sent. This command is necessary to prevent the transmitter from requesting an
+		  interrupt when the transmit buffer becomes empty (with Transmit Interrupt Enabled).*/
 		m_tx_int_disarm = 1;
 		LOGCMD("%s: %c : WR0_RESET_TX_INT\n", owner()->tag(), 'A' + m_index);
 		m_uart->m_int_state[INT_TRANSMIT_PRIO + (m_index == z80scc_device::CHANNEL_A ? 0 : 3 )] = 0;
 		// Based on the fact that prio levels are aligned with the bitorder of rr3 we can do this...
 		m_uart->m_chanA->m_rr3 &=  ~((1 << INT_TRANSMIT_PRIO) + (m_index == z80scc_device::CHANNEL_A ? 3 : 0 ));
-        // Update interrupt line
+		// Update interrupt line
 		m_uart->check_interrupts();
 		break;
 	default:
@@ -2265,10 +2265,10 @@ void z80scc_channel::control_write(uint8_t data)
 	}
 
 	LOGSETUP(" * %s %c Reg %02x <- %02x - %s\n", owner()->tag(), 'A' + m_index, reg, data, std::array<char const *, 16>
-             {{	"Command register", 			 	"Tx/Rx Interrupt and Data Transfer Modes",	"Interrupt Vector", 					"Rx Parameters and Control",
-				"Tx/Rx Misc Parameters and Modes",	"Tx Parameters and Controls",				"Sync Characters or SDLC Address Field","Sync Character or SDLC Flag/Prime",
-				"Tx Buffer",						"Master Interrupt Control",					"Miscellaneous Tx/Rx Control Bits",		"Clock Mode Control",
-				"Lower Byte of BRG Time Constant",	"Upper Byte of BRg Time Constant",			"Miscellaneous Control Bits", 			"External/Status Interrupt Control"}}[reg]);
+			 {{ "Command register",                 "Tx/Rx Interrupt and Data Transfer Modes",  "Interrupt Vector",                     "Rx Parameters and Control",
+				"Tx/Rx Misc Parameters and Modes",  "Tx Parameters and Controls",               "Sync Characters or SDLC Address Field","Sync Character or SDLC Flag/Prime",
+				"Tx Buffer",                        "Master Interrupt Control",                 "Miscellaneous Tx/Rx Control Bits",     "Clock Mode Control",
+				"Lower Byte of BRG Time Constant",  "Upper Byte of BRg Time Constant",          "Miscellaneous Control Bits",           "External/Status Interrupt Control"}}[reg]);
 
 	scc_register_write(reg, data);
 }
@@ -2431,9 +2431,9 @@ void z80scc_channel::data_write(uint8_t data)
 	// check if to fire interrupt
 	LOG("- TX interrupt are %s\n", (m_wr1 & WR1_TX_INT_ENABLE) ? "enabled" : "disabled" );
 
-	/* Arm interrupts since we wrote another data byte, however it may be set by the reset tx int pending 
-       command before the shifter is done and the disarm flag is evaluated again in tra_complete()  */
-	m_tx_int_disarm = 0; 
+	/* Arm interrupts since we wrote another data byte, however it may be set by the reset tx int pending
+	   command before the shifter is done and the disarm flag is evaluated again in tra_complete()  */
+	m_tx_int_disarm = 0;
 	if (m_wr1 & WR1_TX_INT_ENABLE)
 	{
 		if ((m_uart->m_variant & z80scc_device::SET_ESCC) &&
