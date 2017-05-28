@@ -10,23 +10,23 @@
     SPO256-AL2 speech processor, AY-3-8913 programable sound generator, and
     2K of RAM.
 
-	All four ports of the microcontroller are under software control.
+    All four ports of the microcontroller are under software control.
 
-	Port A is input from the host CPU.
-	Port B is A0-A7 for the 2k of RAM.
-	Port C is the internal bus controller:
-		bit 7 6 5 4 3 2 1 0
-			| | | | | | | |
-			| | | | | | | + A8 for RAM and BC1 of AY3-8913
-			| | | | | | +-- A9 for RAM
-			| | | | | +---- A10 for RAM
-			| | | | +------ R/W* for RAM and BDIR for AY3-8913
-			| | | +-------- CS* for RAM
-			| | +---------- ALD* for SP0256
-			| +------------ CS* for AY3-8913
-			+-------------- BUSY* for host CPU (connects to a latch)
-		* – Active low
-	Port D is the 8-bit data bus.
+    Port A is input from the host CPU.
+    Port B is A0-A7 for the 2k of RAM.
+    Port C is the internal bus controller:
+        bit 7 6 5 4 3 2 1 0
+            | | | | | | | |
+            | | | | | | | + A8 for RAM and BC1 of AY3-8913
+            | | | | | | +-- A9 for RAM
+            | | | | | +---- A10 for RAM
+            | | | | +------ R/W* for RAM and BDIR for AY3-8913
+            | | | +-------- CS* for RAM
+            | | +---------- ALD* for SP0256
+            | +------------ CS* for AY3-8913
+            +-------------- BUSY* for host CPU (connects to a latch)
+        * – Active low
+    Port D is the 8-bit data bus.
 
 ***************************************************************************/
 
@@ -96,17 +96,17 @@ namespace
 		virtual DECLARE_WRITE8_MEMBER(ff7d_write);
 		virtual void set_sound_enable(bool sound_enable) override;
 	private:
-		uint8_t reset_line;
-		uint8_t host_busy;
-		uint8_t tms7000_porta;
-		uint8_t tms7000_portb;
-		uint8_t tms7000_portc;
-		uint8_t tms7000_portd;
-		required_device<cpu_device> m_tms7040;
-		required_device<ram_device> m_staticram;
-		required_device<ay8910_device> m_ay;
-		required_device<sp0256_device> m_spo;
-		required_device<cocossc_sac_device> m_sac;
+		uint8_t                                 m_reset_line;
+		bool                                    m_host_busy;
+		uint8_t                                 m_tms7000_porta;
+		uint8_t                                 m_tms7000_portb;
+		uint8_t                                 m_tms7000_portc;
+		uint8_t                                 m_tms7000_portd;
+		required_device<cpu_device>             m_tms7040;
+		required_device<ram_device>             m_staticram;
+		required_device<ay8910_device>          m_ay;
+		required_device<sp0256_device>          m_spo;
+		required_device<cocossc_sac_device>     m_sac;
 	};
 
 	// ======================> Color Computer Sound Activity Circuit filter
@@ -217,12 +217,12 @@ void coco_ssc_device::device_start()
 	read8_delegate rh = read8_delegate(FUNC(coco_ssc_device::ff7d_read), this);
 	install_readwrite_handler(0xFF7D, 0xFF7E, rh, wh);
 
-	save_item(NAME(reset_line));
-	save_item(NAME(host_busy));
-	save_item(NAME(tms7000_porta));
-	save_item(NAME(tms7000_portb));
-	save_item(NAME(tms7000_portc));
-	save_item(NAME(tms7000_portd));
+	save_item(NAME(m_reset_line));
+	save_item(NAME(m_host_busy));
+	save_item(NAME(m_tms7000_porta));
+	save_item(NAME(m_tms7000_portb));
+	save_item(NAME(m_tms7000_portc));
+	save_item(NAME(m_tms7000_portd));
 }
 
 
@@ -232,8 +232,8 @@ void coco_ssc_device::device_start()
 
 void coco_ssc_device::device_reset()
 {
-	reset_line = 0;
-	host_busy = false;
+	m_reset_line = 0;
+	m_host_busy = false;
 }
 
 
@@ -266,7 +266,7 @@ void coco_ssc_device::set_sound_enable(bool sound_enable)
 }
 
 //-------------------------------------------------
-//	ff7d_read
+//  ff7d_read
 //-------------------------------------------------
 
 READ8_MEMBER(coco_ssc_device::ff7d_read)
@@ -287,7 +287,7 @@ READ8_MEMBER(coco_ssc_device::ff7d_read)
 		case 0x01:
 			data = 0x1f;
 
-			if( host_busy == false )
+			if( m_host_busy == false )
 			{
 				data |= 0x80;
 			}
@@ -324,7 +324,7 @@ READ8_MEMBER(coco_ssc_device::ff7d_read)
 
 
 //-------------------------------------------------
-//	ff7d_write
+//  ff7d_write
 //-------------------------------------------------
 
 WRITE8_MEMBER(coco_ssc_device::ff7d_write)
@@ -337,18 +337,18 @@ WRITE8_MEMBER(coco_ssc_device::ff7d_write)
 				logerror( "[%s] ff7d write: %02x\n", machine().describe_context(), data );
 			}
 
-			if( (reset_line & 1) == 1 )
+			if( (m_reset_line & 1) == 1 )
 			{
 				if( (data & 1) == 0 )
 				{
 					m_tms7040->reset();
 					m_ay->reset();
- 					m_spo->reset();
- 					host_busy = false;
+					m_spo->reset();
+					m_host_busy = false;
 				}
 			}
 
-			reset_line = data;
+			m_reset_line = data;
 			break;
 
 		case 0x01:
@@ -358,8 +358,8 @@ WRITE8_MEMBER(coco_ssc_device::ff7d_write)
 				logerror( "[%s] ff7e write: %02x\n", machine().describe_context(), data );
 			}
 
-			tms7000_porta = data;
-			host_busy = true;
+			m_tms7000_porta = data;
+			m_host_busy = true;
 			m_tms7040->set_input_line(TMS7000_INT3_LINE, ASSERT_LINE);
 			break;
 	}
@@ -374,12 +374,12 @@ READ8_MEMBER(coco_ssc_device::ssc_port_a_r)
 {
 	if (LOG_SSC)
 	{
-		logerror( "[%s] port a read: %02x\n", machine().describe_context(), tms7000_porta );
+		logerror( "[%s] port a read: %02x\n", machine().describe_context(), m_tms7000_porta );
 	}
 
- 	m_tms7040->set_input_line(TMS7000_INT3_LINE, CLEAR_LINE);
+	m_tms7040->set_input_line(TMS7000_INT3_LINE, CLEAR_LINE);
 
-	return tms7000_porta;
+	return m_tms7000_porta;
 }
 
 WRITE8_MEMBER(coco_ssc_device::ssc_port_b_w)
@@ -389,17 +389,17 @@ WRITE8_MEMBER(coco_ssc_device::ssc_port_b_w)
 		logerror( "[%s] port b write: %02x\n", machine().describe_context(), data );
 	}
 
-	tms7000_portb = data;
+	m_tms7000_portb = data;
 }
 
 READ8_MEMBER(coco_ssc_device::ssc_port_c_r)
 {
 	if (LOG_SSC)
 	{
-		logerror( "[%s] port c read: %02x\n", machine().describe_context(), tms7000_portc );
+		logerror( "[%s] port c read: %02x\n", machine().describe_context(), m_tms7000_portc );
 	}
 
-	return tms7000_portc;
+	return m_tms7000_portc;
 }
 
 WRITE8_MEMBER(coco_ssc_device::ssc_port_c_w)
@@ -407,35 +407,35 @@ WRITE8_MEMBER(coco_ssc_device::ssc_port_c_w)
 	if( (data & C_RCS) == 0 && (data & C_RRW) == 0) /* static RAM write */
 	{
 		uint16_t address = (uint16_t)data << 8;
-		address += tms7000_portb;
+		address += m_tms7000_portb;
 		address &= 0x7ff;
 
-		m_staticram->write(address, tms7000_portd);
+		m_staticram->write(address, m_tms7000_portd);
 	}
 
 	if( (data & C_ACS) == 0 ) /* chip select for AY-3-8913 */
 	{
 		if( (data & (C_BDR|C_BC1)) == (C_BDR|C_BC1) ) /* BDIR = 1, BC1 = 1: latch address */
 		{
-			m_ay->address_w(space, 0, tms7000_portd);
+			m_ay->address_w(space, 0, m_tms7000_portd);
 		}
 
 		if( ((data & C_BDR) == C_BDR) && ((data & C_BC1) == 0) ) /* BDIR = 1, BC1 = 0: write data */
 		{
-			m_ay->data_w(space, 0, tms7000_portd);
+			m_ay->data_w(space, 0, m_tms7000_portd);
 		}
 	}
 
 	if( (data & C_ALD) == 0 )
 	{
-		m_spo->ald_w(space, 0, tms7000_portd);
+		m_spo->ald_w(space, 0, m_tms7000_portd);
 	}
 
 	if( (data & C_BSY) == 0 )
 	{
-		host_busy = false;
+		m_host_busy = false;
 	}
-	
+
 	if (LOG_SSC)
 	{
 		logerror( "[%s] port c write: %c%c%c%c %c%c%c%c (%02x)\n",
@@ -451,37 +451,37 @@ WRITE8_MEMBER(coco_ssc_device::ssc_port_c_w)
 			data );
 	}
 
-	tms7000_portc = data;
+	m_tms7000_portc = data;
 }
 
 READ8_MEMBER(coco_ssc_device::ssc_port_d_r)
 {
-	if( ((tms7000_portc & C_RCS) == 0) && ((tms7000_portc & C_ACS) == 0))
+	if( ((m_tms7000_portc & C_RCS) == 0) && ((m_tms7000_portc & C_ACS) == 0))
 		logerror( "[%s] Warning: Reading RAM and PSG at the same time!\n", machine().describe_context() );
 
-	if( ((tms7000_portc & C_RCS) == 0)  && ((tms7000_portc & C_RRW) == C_RRW)) /* static ram chip select (low) and static ram chip read (high) */
+	if( ((m_tms7000_portc & C_RCS) == 0)  && ((m_tms7000_portc & C_RRW) == C_RRW)) /* static ram chip select (low) and static ram chip read (high) */
 	{
-		uint16_t address = (uint16_t)tms7000_portc << 8;
-		address += tms7000_portb;
+		uint16_t address = (uint16_t)m_tms7000_portc << 8;
+		address += m_tms7000_portb;
 		address &= 0x7ff;
 
-		tms7000_portd = m_staticram->read(address);
+		m_tms7000_portd = m_staticram->read(address);
 	}
 
-	if( (tms7000_portc & C_ACS) == 0 ) /* chip select for AY-3-8913 */
+	if( (m_tms7000_portc & C_ACS) == 0 ) /* chip select for AY-3-8913 */
 	{
-		if( ((tms7000_portc & C_BDR) == 0) && ((tms7000_portc & C_BC1) == C_BC1) ) /* psg read data */
+		if( ((m_tms7000_portc & C_BDR) == 0) && ((m_tms7000_portc & C_BC1) == C_BC1) ) /* psg read data */
 		{
-			tms7000_portd = m_ay->data_r(space, 0);
+			m_tms7000_portd = m_ay->data_r(space, 0);
 		}
 	}
 
 	if (LOG_SSC)
 	{
-		logerror( "[%s] port d read: %02x\n", machine().describe_context(), tms7000_portd );
+		logerror( "[%s] port d read: %02x\n", machine().describe_context(), m_tms7000_portd );
 	}
 
-	return tms7000_portd;
+	return m_tms7000_portd;
 }
 
 WRITE8_MEMBER(coco_ssc_device::ssc_port_d_w)
@@ -491,7 +491,7 @@ WRITE8_MEMBER(coco_ssc_device::ssc_port_d_w)
 		logerror( "[%s] port d write: %02x\n", machine().describe_context(), data );
 	}
 
-	tms7000_portd = data;
+	m_tms7000_portd = data;
 }
 
 
@@ -550,8 +550,8 @@ void cocossc_sac_device::sound_stream_update(sound_stream &stream, stream_sample
 bool cocossc_sac_device::sound_activity_circuit_output()
 {
   double average = m_rms[0] + m_rms[1] + m_rms[2] + m_rms[3] + m_rms[4] +
-    m_rms[5] + m_rms[6] + m_rms[7] + m_rms[8] + m_rms[9] + m_rms[10] +
-    m_rms[11] + m_rms[12] + m_rms[13] + m_rms[14] + m_rms[15];
+	m_rms[5] + m_rms[6] + m_rms[7] + m_rms[8] + m_rms[9] + m_rms[10] +
+	m_rms[11] + m_rms[12] + m_rms[13] + m_rms[14] + m_rms[15];
 
 	average /= 16.0;
 
