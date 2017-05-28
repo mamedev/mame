@@ -175,7 +175,7 @@ void srmp6_state::video_start()
 	m_sprram_old = make_unique_clear<uint16_t[]>(0x80000/2);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(0, std::make_unique<gfx_element>(*m_palette, tiles8x8_layout, (uint8_t*)m_tileram.get(), 0, m_palette->entries() / 256, 0));
+	m_gfxdecode->set_gfx(0, std::make_unique<gfx_element>(m_palette, tiles8x8_layout, (uint8_t*)m_tileram.get(), 0, m_palette->entries() / 256, 0));
 	m_gfxdecode->gfx(0)->set_granularity(256);
 
 	m_brightness = 0x60;
