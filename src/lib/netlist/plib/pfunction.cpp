@@ -37,7 +37,6 @@ void pfunction::compile_postfix(const std::vector<pstring> &inputs,
 
 	for (const pstring &cmd : cmds)
 	{
-		printf("%s %d\n", cmd.c_str(), stk);
 		rpn_inst rc;
 		if (cmd == "+")
 			{ rc.m_cmd = ADD; stk -= 1; }
