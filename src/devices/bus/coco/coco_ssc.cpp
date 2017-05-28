@@ -80,7 +80,7 @@ namespace
 		// optional information overrides
 		virtual const tiny_rom_entry *device_rom_region() const override;
 		virtual void device_add_mconfig(machine_config &config) override;
-
+		virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 		virtual void device_reset() override;
 
 		DECLARE_READ8_MEMBER(ssc_port_a_r);
@@ -107,6 +107,12 @@ namespace
 		required_device<ay8910_device> m_ay;
 		required_device<sp0256_device> m_spo;
 		required_device<cocossc_sac_device> m_sac;
+		emu_timer *m_timer;
+		
+		enum
+		{
+			TIMER_CPUSYNC
+		};
 	};
 
 	// ======================> Color Computer Sound Activity Circuit filter
@@ -202,7 +208,8 @@ coco_ssc_device::coco_ssc_device(const machine_config &mconfig, const char *tag,
 		m_staticram(*this, "staticram"),
 		m_ay(*this, AY_TAG),
 		m_spo(*this, SP0256_TAG),
-		m_sac(*this, "coco_sac_tag")
+		m_sac(*this, "coco_sac_tag"),
+		m_timer(nullptr)
 {
 }
 
@@ -222,6 +229,9 @@ void coco_ssc_device::device_start()
 	save_item(NAME(tms7000_portb));
 	save_item(NAME(tms7000_portc));
 	save_item(NAME(tms7000_portd));
+	
+	m_timer = timer_alloc(TIMER_CPUSYNC);
+	m_timer->adjust(attotime::never);
 }
 
 
@@ -263,6 +273,20 @@ void coco_ssc_device::set_sound_enable(bool sound_enable)
 	}
 }
 
+//-------------------------------------------------
+//  device_timer - handler timer events
+//-------------------------------------------------
+
+void coco_ssc_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+		case TIMER_CPUSYNC:
+			m_tms7040->set_input_line(TMS7000_INT3_LINE, ASSERT_LINE);
+			m_timer->adjust(attotime::never);
+			break;
+	}
+}
 
 //-------------------------------------------------
 //	ff7d_read
@@ -333,7 +357,7 @@ WRITE8_MEMBER(coco_ssc_device::ff7d_write)
 			}
 
 			tms7000_porta = data;
-			m_tms7040->set_input_line(TMS7000_INT3_LINE, ASSERT_LINE);
+			m_timer->adjust(attotime::zero);
 			break;
 	}
 }
@@ -406,7 +430,7 @@ WRITE8_MEMBER(coco_ssc_device::ssc_port_c_w)
 
 	if (LOG_SSC)
 	{
-		logerror( "[0x%04x] pord c write: %c%c%c%c %c%c%c%c (%02x)\n",
+		logerror( "[0x%04x] port c write: %c%c%c%c %c%c%c%c (%02x)\n",
 			space.device().safe_pc(),
 			data & 0x80 ? '.' : 'B',
 			data & 0x40 ? '.' : 'P',
