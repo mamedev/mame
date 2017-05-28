@@ -182,17 +182,6 @@ static SLOT_INTERFACE_START( beta_disk_floppies )
 	SLOT_INTERFACE( "drive3", FLOPPY_525_QD )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( beta_disk )
-	MCFG_KR1818VG93_ADD("wd179x", XTAL_8MHz / 8)
-	MCFG_FLOPPY_DRIVE_ADD("wd179x:0", beta_disk_floppies, "drive0", beta_disk_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("wd179x:1", beta_disk_floppies, "drive1", beta_disk_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("wd179x:2", beta_disk_floppies, "drive2", beta_disk_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("wd179x:3", beta_disk_floppies, "drive3", beta_disk_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-MACHINE_CONFIG_END
 
 ROM_START( beta_disk )
 	ROM_REGION( 0x60000, "beta", 0 )
@@ -277,14 +266,20 @@ ROM_END
 
 
 //-------------------------------------------------
-//  device_mconfig_additions - return a pointer to
-//  the device's machine fragment
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor beta_disk_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( beta_disk  );
-}
+MACHINE_CONFIG_MEMBER( beta_disk_device::device_add_mconfig )
+	MCFG_KR1818VG93_ADD("wd179x", XTAL_8MHz / 8)
+	MCFG_FLOPPY_DRIVE_ADD("wd179x:0", beta_disk_floppies, "drive0", beta_disk_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+	MCFG_FLOPPY_DRIVE_ADD("wd179x:1", beta_disk_floppies, "drive1", beta_disk_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+	MCFG_FLOPPY_DRIVE_ADD("wd179x:2", beta_disk_floppies, "drive2", beta_disk_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+	MCFG_FLOPPY_DRIVE_ADD("wd179x:3", beta_disk_floppies, "drive3", beta_disk_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  device_rom_region - return a pointer to the

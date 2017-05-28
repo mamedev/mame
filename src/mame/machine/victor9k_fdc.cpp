@@ -155,10 +155,10 @@ FLOPPY_FORMATS_END
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_START( victor_9000_fdc )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( victor_9000_fdc )
+MACHINE_CONFIG_MEMBER( victor_9000_fdc_device::device_add_mconfig )
 	MCFG_CPU_ADD(I8048_TAG, I8048, XTAL_30MHz/6)
 	MCFG_MCS48_PORT_P1_IN_CB(READ8(victor_9000_fdc_device, floppy_p1_r))
 	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(victor_9000_fdc_device, floppy_p1_w))
@@ -193,18 +193,6 @@ static MACHINE_CONFIG_START( victor_9000_fdc )
 	MCFG_FLOPPY_DRIVE_ADD(I8048_TAG":0", victor9k_floppies, "525qd", victor_9000_fdc_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(I8048_TAG":1", victor9k_floppies, "525qd", victor_9000_fdc_device::floppy_formats)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor victor_9000_fdc_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( victor_9000_fdc );
-}
-
 
 
 //**************************************************************************

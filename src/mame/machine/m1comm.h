@@ -22,11 +22,6 @@ public:
 	// construction/destruction
 	m1comm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
-	required_device<z80_device> m_commcpu;
-
 	// internal API - stuff that happens on the comm board
 	// MB89374 registers
 	DECLARE_READ8_MEMBER(dlc_reg_r);
@@ -64,8 +59,12 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
+	required_device<z80_device> m_commcpu;
+
 	uint8_t m_shared[0x1000]; // 2x 2k = 4k; model1 accesses this with 16bit data and 11bit address (A0 to A10)
 	uint8_t m_dlc_reg[0x20];  // MB89374 registers
 	uint8_t m_dma_reg[0x20];  // MB89237A registers

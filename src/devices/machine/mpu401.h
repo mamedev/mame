@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "cpu/m6800/m6800.h"
+#include "cpu/m6800/m6801.h"
 
 #define MCFG_MPU401_ADD(tag, irqf) \
 		MCFG_DEVICE_ADD((tag), MPU401, 0) \

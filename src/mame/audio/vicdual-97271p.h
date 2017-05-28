@@ -20,9 +20,6 @@ public:
 	// construction/destruction
 	s97271p_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
 	// daughterboard logic
 	void port_w(uint8_t data);
 
@@ -30,6 +27,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	required_device<samples_device> m_samples;

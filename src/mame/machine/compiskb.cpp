@@ -52,10 +52,10 @@ const tiny_rom_entry *compis_keyboard_device::device_rom_region() const
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( compis_keyboard )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( compis_keyboard )
+MACHINE_CONFIG_MEMBER( compis_keyboard_device::device_add_mconfig )
 	MCFG_CPU_ADD(I8748_TAG, I8748, 2016000) // XTAL_4_032MHz/2 ???
 	MCFG_MCS48_PORT_BUS_IN_CB(READ8(compis_keyboard_device, bus_r))
 	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(compis_keyboard_device, bus_w))
@@ -69,17 +69,6 @@ static MACHINE_CONFIG_START( compis_keyboard )
 	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor compis_keyboard_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( compis_keyboard );
-}
 
 
 //-------------------------------------------------

@@ -16,12 +16,12 @@
 
 #include "joyport.h"
 
-DECLARE_DEVICE_TYPE(TI99_MECMOUSE, ti99_mecmouse_device)
+namespace bus { namespace ti99 { namespace joyport {
 
-class ti99_mecmouse_device : public device_t, public device_ti99_joyport_interface
+class mecmouse_device : public device_t, public device_ti99_joyport_interface
 {
 public:
-	ti99_mecmouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mecmouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	uint8_t read_dev() override;
 	void  write_dev(uint8_t data) override;
@@ -44,5 +44,8 @@ private:
 
 	emu_timer   *m_poll_timer;
 };
+} } } // end namespace bus::ti99::joyport
+
+DECLARE_DEVICE_TYPE_NS(TI99_MECMOUSE, bus::ti99::joyport, mecmouse_device)
 
 #endif // MAME_BUS_TI99_JOYPORT_MECMOUSE_H

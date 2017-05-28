@@ -291,6 +291,9 @@ ac1                             // 1984 Amateurcomputer AC1
 ac1_32                          // 1984 Amateurcomputer AC1 (32 lines)
 ac1scch                         // 1984 Amateurcomputer AC1 SCCH
 
+@source:accomm.cpp
+accomm                          // 1986 Acorn Computer
+
 @source:aceex.cpp
 aceex2814
 
@@ -1235,7 +1238,7 @@ space84                         // 1985 IBS/ComputerTechnik Space 84
 uniap2en                        // 1982 Unitron AP II (in English)
 uniap2pt                        // 1982 Unitron AP II (in Brazilian Portuguese)
 uniap2ti                        // 1982 Unitron AP II+ (Teclado Inteligente)
-craft2p							// 1982 Craft?
+craft2p                         // 1982 Craft?
 
 @source:apple2e.cpp
 apple2c                         // Apr 1984 Apple //c
@@ -12059,7 +12062,7 @@ catapult                        // (c) 1982
 dealer                          // (c) 198?
 igmo                            // (c) 1984
 megadon                         // (c) 1982
-revngr84						// (c) 1984
+revngr84                        // (c) 1984
 revenger                        // (c) 1984
 suprglob                        // (c) 1983
 theglob                         // (c) 1983
@@ -12174,6 +12177,9 @@ waveterm                        //
 
 @source:europc.cpp
 europc                          // 1988 Schneider Euro PC (CGA or Hercules)
+
+@source:eva.cpp
+eva11                           //
 
 @source:evmbug.cpp
 evmbug                          //
@@ -12970,6 +12976,7 @@ levers                          // (c) 1983 Rock-ola
 losttomb                        // (c) 1982 Stern
 losttombh                       // (c) 1982 Stern
 luctoday                        // 1980 Sigma
+mandinga                        // bootleg (Artemi)
 mltiwars                        // bootleg (Gayton Games)
 monsterz                        // (c) 1982 Nihon (Arcade TV Game List - P.102, Left, 20 from top)
 moonal2                         // [1980] Nichibutsu
@@ -15354,16 +15361,16 @@ jchan2                          // (c) 1995 Kaneko
 
 @source:jclub2.cpp
 darkhors                        // bootleg of Jockey Club II
-jclub2v100	                    // v1.00       5 OCT. 1994
-jclub2v101	                    // v1.01      20 FEB. 1995
-jclub2v110	                    // v1.10X      5 MAY. 1996
-jclub2v112	                    // v1.12X      3 JUN. 1996
-jclub2v200	                    // v2.00       7 SEP. 1996
-jclub2v201	                    // v2.01      20 NOV. 1996
-jclub2v203	                    // v2.03X RC  26 MAR. 1997
-jclub2v204	                    // v2.04      30 APR. 1997
-jclub2v205	                    // v2.05      21 JUL. 1997
-jclub2v220	                    // v2.20      14 APR. 1998
+jclub2v100                      // v1.00       5 OCT. 1994
+jclub2v101                      // v1.01      20 FEB. 1995
+jclub2v110                      // v1.10X      5 MAY. 1996
+jclub2v112                      // v1.12X      3 JUN. 1996
+jclub2v200                      // v2.00       7 SEP. 1996
+jclub2v201                      // v2.01      20 NOV. 1996
+jclub2v203                      // v2.03X RC  26 MAR. 1997
+jclub2v204                      // v2.04      30 APR. 1997
+jclub2v205                      // v2.05      21 JUL. 1997
+jclub2v220                      // v2.20      14 APR. 1998
 
 @source:jedi.cpp
 jedi                            // 136030           (c) 1984
@@ -20961,7 +20968,7 @@ monzagpb                        // bootleg
 bucky                           // GX173 (c) 1992 (World)
 buckyaab                        // GX173 (c) 1992 (Asia)
 buckyea                         // GX173 (c) 1992 (World)
-buckyjaa						// GX173 (c) 1992 (Japan)
+buckyjaa                        // GX173 (c) 1992 (Japan)
 buckyuab                        // GX173 (c) 1992 (US)
 moomesa                         // GX151 (c) 1992 (World)
 moomesaaab                      // GX151 (c) 1992 (Asia)
@@ -28661,10 +28668,11 @@ moeru                           // 2002.12 Moeru Casinyo
 mok                             // 2002.03.06 The Maze of the Kings
 monkeyba                        // 2001.05 Monkey Ball
 mslug6                          // 2006.02 Metal Slug 6
-mtkob2                          // 2003.02 MushiKing The King Of Beetle
-mushi2eo                        // 2005.?? Mushiking The King Of Beetles II / III / III+ (Ver. 1.001)
-mushi2k5                        // 2005.?? MushiKing The King Of Beetle 2K5 1st
-mushik2e                        // 2005.?? Mushiking The King Of Beetles II / III / III+ (Ver. 2.001)
+mtkob2                          // 2003.02 MushiKing The King Of Beetle (World)
+mushi2k4                        // 2004.?? MushiKing The King Of Beetles 2004 Second (Japan)
+mushi2k5                        // 2005.?? MushiKing The King Of Beetles 2005 First (Japan)
+mushi2eo                        // 2005.?? Mushiking The King Of Beetles II / III / III+ (Ver. 1.001) (World)
+mushik2e                        // 2005.?? Mushiking The King Of Beetles II / III / III+ (Ver. 2.001) (World)
 mvsc2                           // 2000.03 Marvel Vs. Capcom 2 New Age of Heroes (Export, Korea) (Rev A)
 mvsc2u                          // 2000.03 Marvel Vs. Capcom 2 New Age of Heroes (USA) (Rev A)
 naomi                           // 1998.?? Naomi BIOS
@@ -29291,6 +29299,16 @@ m82p                            // Nintendo M82 Display Unit PAL
 nes                             // Nintendo Entertainment System
 nespal                          // Nintendo Entertainment System PAL
 
+@source:nes_vt.cpp
+vdogdemo
+mc_dgear
+dgun2500
+dgun2561
+ii8in1
+ii32in1
+lexcyber
+cybar120
+
 @source:newbrain.cpp
 newbrain                        //
 newbraina                       //
@@ -29525,6 +29543,7 @@ raiders5                        // UPL-85004 (c) 1985
 raiders5t                       // UPL-85004 (c) 1985 Taito license
 
 @source:novag6502.cpp
+cfortea                         //
 cforteb                         //
 sexperta                        //
 sexpertb                        //
@@ -30481,6 +30500,7 @@ peps0470                        // (c) 1996 IGT - International Game Technology
 peps0581                        // (c) 1996 IGT - International Game Technology
 peps0615                        // (c) 1996 IGT - International Game Technology
 peps0628                        // (c) 1996 IGT - International Game Technology
+peps0629                        // (c) 1996 IGT - International Game Technology
 peps0631                        // (c) 1996 IGT - International Game Technology
 peps0708                        // (c) 1996 IGT - International Game Technology
 peps0716                        // (c) 1996 IGT - International Game Technology
@@ -33902,6 +33922,9 @@ shootout                        // (c) 1985 Data East USA (US)
 shootoutb                       // bootleg
 shootoutj                       // (c) 1985 Data East USA (Japan)
 
+@source:shootaway2.cpp
+shootaw2                        // (c) 1996 Namco
+
 @source:shougi.cpp
 shougi                          // (c) 1982 (Arcade TV Game List - P.80, Left, 9 from top)
 shougi2                         // (c) 1982 (Arcade TV Game List - P.80, Left, 10 from top)
@@ -35547,7 +35570,7 @@ spacegunu                       // C57 (c) 1990 Taito America Corporation (US)
 ainferno                        // C45 (c) 1990 Taito America Corporation (US)
 ainfernoj                       // C45 (c) 1990 Taito Corporation (Japan)
 topland                         // B62 (c) 1988 Taito Corporation Japan (World)
-toplandj						// B62 (c) 1988 Taito Corporation (Japan)	
+toplandj                        // B62 (c) 1988 Taito Corporation (Japan)
 
 @source:taitogn.cpp
 chaoshea                        // 1998.10 Chaos Heat (V2.09O)
@@ -36078,6 +36101,7 @@ snspellfr                       //
 snspellit                       //
 snspelljp                       //
 snspellp                        //
+snspellsp                       //
 snspellua                       //
 snspellub                       //
 snspelluk                       //
@@ -36715,6 +36739,10 @@ undrfire                        // D67 (c) 1993 Taito Corporation Japan (World)
 undrfirej                       // D67 (c) 1993 Taito Corporation (Japan)
 undrfireu                       // D67 (c) 1993 Taito America Corporation (US)
 
+@source:unianapc.cpp
+dhunting                        // (c) 2002 Game Box Entertainment
+hogwild                         // (c) 2003 Uniana
+
 @source:unichamp.cpp
 unichamp                        //
 
@@ -37105,7 +37133,7 @@ votrtnt                         // 1980 Votrax Type-'N-Talk
 
 @source:voyager.cpp
 voyager                         // (c) 2002 Team Play, Inc.
-voyagers						// (c) 2002 Team Play, Inc.
+voyagers                        // (c) 2002 Team Play, Inc.
 policet2                        // (c) 2003 Team Play, Inc.
 
 @source:vp101.cpp

@@ -75,19 +75,19 @@ protected:
 
 
 	template <typename T1, typename T2>
-	inline nl_ext_double &A(const T1 &r, const T2 &c) { return m_A[r][c]; }
+	nl_ext_double &A(const T1 &r, const T2 &c) { return m_A[r][c]; }
 	template <typename T1, typename T2>
-	inline nl_ext_double &W(const T1 &r, const T2 &c) { return m_W[r][c]; }
+	nl_ext_double &W(const T1 &r, const T2 &c) { return m_W[r][c]; }
 	template <typename T1, typename T2>
-	inline nl_ext_double &Ainv(const T1 &r, const T2 &c) { return m_Ainv[r][c]; }
+	nl_ext_double &Ainv(const T1 &r, const T2 &c) { return m_Ainv[r][c]; }
 	template <typename T1>
-	inline nl_ext_double &RHS(const T1 &r) { return m_RHS[r]; }
+	nl_ext_double &RHS(const T1 &r) { return m_RHS[r]; }
 
 
 	template <typename T1, typename T2>
-	inline nl_ext_double &lA(const T1 &r, const T2 &c) { return m_lA[r][c]; }
+	nl_ext_double &lA(const T1 &r, const T2 &c) { return m_lA[r][c]; }
 	template <typename T1, typename T2>
-	inline nl_ext_double &lAinv(const T1 &r, const T2 &c) { return m_lAinv[r][c]; }
+	nl_ext_double &lAinv(const T1 &r, const T2 &c) { return m_lAinv[r][c]; }
 
 	nl_double m_last_RHS[storage_N]; // right hand side - contains currents
 
@@ -104,6 +104,7 @@ private:
 	//nl_ext_double m_RHSx[storage_N];
 
 	const std::size_t m_dim;
+	std::size_t m_cnt;
 
 };
 
@@ -114,9 +115,6 @@ private:
 template <std::size_t m_N, std::size_t storage_N>
 matrix_solver_sm_t<m_N, storage_N>::~matrix_solver_sm_t()
 {
-#if (NL_USE_DYNAMIC_ALLOCATION)
-	plib::pfree_array(m_A);
-#endif
 }
 
 template <std::size_t m_N, std::size_t storage_N>
@@ -218,13 +216,12 @@ void matrix_solver_sm_t<m_N, storage_N>::LE_compute_x(
 template <std::size_t m_N, std::size_t storage_N>
 unsigned matrix_solver_sm_t<m_N, storage_N>::solve_non_dynamic(const bool newton_raphson)
 {
-	static constexpr bool incremental = true;
-	static unsigned cnt = 0;
-	const auto iN = N();
+	static constexpr const bool incremental = true;
+	const std::size_t iN = N();
 
 	nl_double new_V[storage_N]; // = { 0.0 };
 
-	if (0 || ((cnt % 200) == 0))
+	if ((m_cnt % 50) == 0)
 	{
 		/* complete calculation */
 		this->LE_invert();
@@ -233,18 +230,18 @@ unsigned matrix_solver_sm_t<m_N, storage_N>::solve_non_dynamic(const bool newton
 	{
 		if (!incremental)
 		{
-			for (unsigned row = 0; row < iN; row ++)
-				for (unsigned k = 0; k < iN; k++)
+			for (std::size_t row = 0; row < iN; row ++)
+				for (std::size_t k = 0; k < iN; k++)
 					Ainv(row,k) = lAinv(row, k);
 		}
-		for (unsigned row = 0; row < iN; row ++)
+		for (std::size_t row = 0; row < iN; row ++)
 		{
 			nl_double v[m_pitch] = {0};
-			unsigned cols[m_pitch];
-			unsigned colcount = 0;
+			std::size_t cols[m_pitch];
+			std::size_t colcount = 0;
 
 			auto &nz = m_terms[row]->m_nz;
-			for (auto & col : nz)
+			for (unsigned & col : nz)
 			{
 				v[col] = A(row,col) - lA(row,col);
 				if (incremental)
@@ -257,28 +254,29 @@ unsigned matrix_solver_sm_t<m_N, storage_N>::solve_non_dynamic(const bool newton
 			{
 				nl_double lamba = 0.0;
 				nl_double w[m_pitch] = {0};
+
 				nl_double z[m_pitch];
 				/* compute w and lamba */
-				for (unsigned i = 0; i < iN; i++)
+				for (std::size_t i = 0; i < iN; i++)
 					z[i] = Ainv(i, row); /* u is row'th column */
 
-				for (unsigned j = 0; j < colcount; j++)
+				for (std::size_t j = 0; j < colcount; j++)
 					lamba += v[cols[j]] * z[cols[j]];
 
-				for (unsigned j=0; j<colcount; j++)
+				for (std::size_t j=0; j<colcount; j++)
 				{
-					auto col = cols[j];
-					auto f = v[col];
-					for (unsigned k = 0; k < iN; k++)
+					std::size_t col = cols[j];
+					nl_double f = v[col];
+					for (std::size_t k = 0; k < iN; k++)
 						w[k] += Ainv(col,k) * f; /* Transpose(Ainv) * v */
 				}
 
 				lamba = -1.0 / (1.0 + lamba);
-				for (unsigned i=0; i<iN; i++)
+				for (std::size_t i=0; i<iN; i++)
 				{
 					const nl_double f = lamba * z[i];
 					if (f != 0.0)
-						for (unsigned k = 0; k < iN; k++)
+						for (std::size_t k = 0; k < iN; k++)
 							Ainv(i,k) += f * w[k];
 				}
 			}
@@ -286,23 +284,13 @@ unsigned matrix_solver_sm_t<m_N, storage_N>::solve_non_dynamic(const bool newton
 		}
 	}
 
-	cnt++;
+	m_cnt++;
 
 	this->LE_compute_x(new_V);
 
-	if (newton_raphson)
-	{
-		nl_double err = delta(new_V);
-
-		store(new_V);
-
-		return (err > this->m_params.m_accuracy) ? 2 : 1;
-	}
-	else
-	{
-		store(new_V);
-		return 1;
-	}
+	const nl_double err = (newton_raphson ? delta(new_V) : 0.0);
+	store(new_V);
+	return (err > this->m_params.m_accuracy) ? 2 : 1;
 }
 
 template <std::size_t m_N, std::size_t storage_N>
@@ -323,6 +311,7 @@ matrix_solver_sm_t<m_N, storage_N>::matrix_solver_sm_t(netlist_t &anetlist, cons
 		const solver_parameters_t *params, const std::size_t size)
 : matrix_solver_t(anetlist, name, NOSORT, params)
 , m_dim(size)
+, m_cnt(0)
 {
 	for (std::size_t k = 0; k < N(); k++)
 	{

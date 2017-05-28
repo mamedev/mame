@@ -23,8 +23,6 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-class render_target;
-
 enum ui_event_type
 {
 	UI_EVENT_NONE,
@@ -119,4 +117,4 @@ private:
 	int                         m_events_end;
 };
 
-#endif  /* MAME_EMU_UIINPUT_H */
+#endif // MAME_EMU_UIINPUT_H

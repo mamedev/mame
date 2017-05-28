@@ -8,50 +8,33 @@
 
 int voodoo_pci_device::m_type = 0;
 
-static MACHINE_CONFIG_START( voodoo_1_pci )
-	MCFG_DEVICE_ADD("voodoo", VOODOO_1, STD_VOODOO_1_CLOCK)
-	MCFG_VOODOO_FBMEM(4)
-	MCFG_VOODOO_TMUMEM(1, 0)
-	MCFG_VOODOO_SCREEN_TAG("screen")
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_START( voodoo_2_pci )
-	MCFG_DEVICE_ADD("voodoo", VOODOO_2, STD_VOODOO_2_CLOCK)
-	MCFG_VOODOO_FBMEM(4)
-	MCFG_VOODOO_TMUMEM(1, 0)
-	MCFG_VOODOO_SCREEN_TAG("screen")
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_START( voodoo_banshee_pci )
-	MCFG_DEVICE_ADD("voodoo", VOODOO_BANSHEE, STD_VOODOO_BANSHEE_CLOCK)
-	MCFG_VOODOO_FBMEM(16)
-	MCFG_VOODOO_SCREEN_TAG("screen")
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_START( voodoo_3_pci )
-	MCFG_DEVICE_ADD("voodoo", VOODOO_3, STD_VOODOO_3_CLOCK)
-	MCFG_VOODOO_FBMEM(16)
-	MCFG_VOODOO_SCREEN_TAG("screen")
-MACHINE_CONFIG_END
-
-machine_config_constructor voodoo_pci_device::device_mconfig_additions() const
-{
+MACHINE_CONFIG_MEMBER(voodoo_pci_device::device_add_mconfig)
 	switch (m_type) {
 		case TYPE_VOODOO_1:
-			return MACHINE_CONFIG_NAME( voodoo_1_pci );
+				MCFG_DEVICE_ADD("voodoo", VOODOO_1, STD_VOODOO_1_CLOCK)
+				MCFG_VOODOO_FBMEM(4)
+				MCFG_VOODOO_TMUMEM(1, 0)
+				MCFG_VOODOO_SCREEN_TAG("screen")
 			break;
 		case TYPE_VOODOO_2:
-			return MACHINE_CONFIG_NAME( voodoo_2_pci );
+				MCFG_DEVICE_ADD("voodoo", VOODOO_2, STD_VOODOO_2_CLOCK)
+				MCFG_VOODOO_FBMEM(4)
+				MCFG_VOODOO_TMUMEM(1, 0)
+				MCFG_VOODOO_SCREEN_TAG("screen")
 			break;
 		case TYPE_VOODOO_BANSHEE:
-			return MACHINE_CONFIG_NAME( voodoo_banshee_pci );
+				MCFG_DEVICE_ADD("voodoo", VOODOO_BANSHEE, STD_VOODOO_BANSHEE_CLOCK)
+				MCFG_VOODOO_FBMEM(16)
+				MCFG_VOODOO_SCREEN_TAG("screen")
 			break;
 		//case TYPE_VOODOO_3
 		default:
-			return MACHINE_CONFIG_NAME( voodoo_3_pci );
-			break;
-	}
-}
+				MCFG_DEVICE_ADD("voodoo", VOODOO_3, STD_VOODOO_3_CLOCK)
+				MCFG_VOODOO_FBMEM(16)
+				MCFG_VOODOO_SCREEN_TAG("screen")
+			break;}
+MACHINE_CONFIG_END
+
 
 DEFINE_DEVICE_TYPE(VOODOO_PCI, voodoo_pci_device, "voodoo_pci", "Voodoo PCI")
 

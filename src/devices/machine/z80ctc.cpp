@@ -128,9 +128,6 @@ WRITE_LINE_MEMBER( z80ctc_device::trg3 ) { m_channel[3].trigger(state); }
 
 void z80ctc_device::device_start()
 {
-	m_period16 = attotime::from_hz(m_clock) * 16;
-	m_period256 = attotime::from_hz(m_clock) * 256;
-
 	// resolve callbacks
 	m_intr_cb.resolve_safe();
 	m_zc0_cb.resolve_safe();
@@ -345,7 +342,7 @@ attotime z80ctc_device::ctc_channel::period() const
 	}
 
 	// compute the period
-	attotime period = ((m_mode & PRESCALER) == PRESCALER_16) ? m_device->m_period16 : m_device->m_period256;
+	attotime period = m_device->clocks_to_attotime((m_mode & PRESCALER) == PRESCALER_16 ? 16 : 256);
 	return period * m_tconst;
 }
 
@@ -363,7 +360,7 @@ uint8_t z80ctc_device::ctc_channel::read()
 	// else compute the down counter value
 	else
 	{
-		attotime period = ((m_mode & PRESCALER) == PRESCALER_16) ? m_device->m_period16 : m_device->m_period256;
+		attotime period = m_device->clocks_to_attotime((m_mode & PRESCALER) == PRESCALER_16 ? 16 : 256);
 
 		VPRINTF_CHANNEL(("CTC clock %f\n",ATTOSECONDS_TO_HZ(period.attoseconds())));
 

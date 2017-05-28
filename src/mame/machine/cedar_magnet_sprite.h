@@ -24,21 +24,6 @@ public:
 	// construction/destruction
 	cedar_magnet_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(pio0_pa_r);
-	DECLARE_WRITE8_MEMBER(pio0_pa_w);
-//  DECLARE_READ8_MEMBER(pio0_pb_r);
-	DECLARE_WRITE8_MEMBER(pio0_pb_w);
-
-//  DECLARE_READ8_MEMBER(pio1_pa_r);
-	DECLARE_WRITE8_MEMBER(pio1_pa_w);
-//  DECLARE_READ8_MEMBER(pio1_pb_r);
-	DECLARE_WRITE8_MEMBER(pio1_pb_w);
-
-//  DECLARE_READ8_MEMBER(pio2_pa_r);
-	DECLARE_WRITE8_MEMBER(pio2_pa_w);
-//  DECLARE_READ8_MEMBER(pio2_pb_r);
-	DECLARE_WRITE8_MEMBER(pio2_pb_w);
-
 	DECLARE_WRITE8_MEMBER(sprite_port80_w);
 	DECLARE_WRITE8_MEMBER(sprite_port84_w);
 	DECLARE_WRITE8_MEMBER(sprite_port88_w);
@@ -52,7 +37,7 @@ public:
 	uint32_t draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int palbase);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -74,6 +59,21 @@ private:
 
 	int m_high_write;
 	uint8_t m_uppersprite;
+
+	DECLARE_READ8_MEMBER(pio0_pa_r);
+	DECLARE_WRITE8_MEMBER(pio0_pa_w);
+//  DECLARE_READ8_MEMBER(pio0_pb_r);
+	DECLARE_WRITE8_MEMBER(pio0_pb_w);
+
+//  DECLARE_READ8_MEMBER(pio1_pa_r);
+	DECLARE_WRITE8_MEMBER(pio1_pa_w);
+//  DECLARE_READ8_MEMBER(pio1_pb_r);
+	DECLARE_WRITE8_MEMBER(pio1_pb_w);
+
+//  DECLARE_READ8_MEMBER(pio2_pa_r);
+	DECLARE_WRITE8_MEMBER(pio2_pa_w);
+//  DECLARE_READ8_MEMBER(pio2_pb_r);
+	DECLARE_WRITE8_MEMBER(pio2_pb_w);
 
 	required_device<z80pio_device> m_pio0;
 	required_device<z80pio_device> m_pio1;

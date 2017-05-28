@@ -30,14 +30,12 @@ public:
 	DECLARE_READ32_MEMBER (reg_r);
 	DECLARE_WRITE32_MEMBER(reg_w);
 
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
 protected:
 	virtual void device_start() override;
 	virtual void device_stop() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 	// Sound stream

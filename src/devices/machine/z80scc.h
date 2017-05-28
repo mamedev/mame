@@ -614,8 +614,8 @@ protected:
 	int m_tx_fifo_wp;           // FIFO write pointer
 	int m_tx_fifo_sz;           // FIFO size
 	uint8_t m_tx_error;         // current error
-	int m_tx_clock;     		// transmit clock pulse count
-	int	m_tx_int_disarm;		// temp Tx int disarm until next byte written
+	int m_tx_clock;             // transmit clock pulse count
+	int m_tx_int_disarm;        // temp Tx int disarm until next byte written
 
 
 	int m_dtr;      // data terminal ready

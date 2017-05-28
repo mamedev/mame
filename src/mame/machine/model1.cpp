@@ -1942,6 +1942,7 @@ WRITE16_MEMBER(model1_state::model1_tgp_copro_ram_w)
 MACHINE_START_MEMBER(model1_state,model1)
 {
 	m_ram_data = std::make_unique<uint32_t[]>(0x10000);
+	m_io_command = 0;
 
 	save_pointer(NAME(m_ram_data.get()), 0x10000);
 	save_item(NAME(m_ram_adr));
@@ -1959,6 +1960,7 @@ MACHINE_START_MEMBER(model1_state,model1)
 	save_item(NAME(m_mat_stack_pos));
 	save_item(NAME(m_acc));
 	save_item(NAME(m_list_length));
+	save_item(NAME(m_io_command));
 }
 
 void model1_state::tgp_reset(bool swa)

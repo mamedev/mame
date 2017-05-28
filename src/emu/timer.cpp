@@ -36,7 +36,7 @@ DEFINE_DEVICE_TYPE(TIMER, timer_device, "timer", "Timer")
 timer_device::timer_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, TIMER, tag, owner, clock),
 		m_type(TIMER_TYPE_GENERIC),
-		m_callback(timer_device_expired_delegate()),
+		m_callback(),
 		m_ptr(nullptr),
 		m_start_delay(attotime::zero),
 		m_period(attotime::zero),
@@ -56,7 +56,7 @@ timer_device::timer_device(const machine_config &mconfig, const char *tag, devic
 //  helper to set up a generic timer
 //-------------------------------------------------
 
-void timer_device::static_configure_generic(device_t &device, timer_device_expired_delegate callback)
+void timer_device::static_configure_generic(device_t &device, expired_delegate callback)
 {
 	timer_device &timer = downcast<timer_device &>(device);
 	timer.m_type = TIMER_TYPE_GENERIC;
@@ -69,7 +69,7 @@ void timer_device::static_configure_generic(device_t &device, timer_device_expir
 //  helper to set up a periodic timer
 //-------------------------------------------------
 
-void timer_device::static_configure_periodic(device_t &device, timer_device_expired_delegate callback, const attotime &period)
+void timer_device::static_configure_periodic(device_t &device, expired_delegate callback, const attotime &period)
 {
 	timer_device &timer = downcast<timer_device &>(device);
 	timer.m_type = TIMER_TYPE_PERIODIC;
@@ -83,7 +83,7 @@ void timer_device::static_configure_periodic(device_t &device, timer_device_expi
 //  helper to set up a scanline timer
 //-------------------------------------------------
 
-void timer_device::static_configure_scanline(device_t &device, timer_device_expired_delegate callback, const char *screen, int first_vpos, int increment)
+void timer_device::static_configure_scanline(device_t &device, expired_delegate callback, const char *screen, int first_vpos, int increment)
 {
 	timer_device &timer = downcast<timer_device &>(device);
 	timer.m_type = TIMER_TYPE_SCANLINE;
@@ -99,7 +99,7 @@ void timer_device::static_configure_scanline(device_t &device, timer_device_expi
 //  to set the callback
 //-------------------------------------------------
 
-void timer_device::static_set_callback(device_t &device, timer_device_expired_delegate callback)
+void timer_device::static_set_callback(device_t &device, expired_delegate callback)
 {
 	timer_device &timer = downcast<timer_device &>(device);
 	timer.m_callback = callback;

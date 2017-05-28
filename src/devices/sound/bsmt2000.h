@@ -56,7 +56,7 @@ public:
 protected:
 	// device-level overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -76,7 +76,6 @@ public:
 	DECLARE_WRITE16_MEMBER( tms_rom_bank_w );
 	DECLARE_WRITE16_MEMBER( tms_left_w );
 	DECLARE_WRITE16_MEMBER( tms_right_w );
-	DECLARE_READ_LINE_MEMBER( tms_write_pending_r );
 
 private:
 	// timers
@@ -100,6 +99,8 @@ private:
 	int16_t                       m_left_data;
 	int16_t                       m_right_data;
 	bool                        m_write_pending;
+
+	DECLARE_READ_LINE_MEMBER( tms_write_pending_r );
 };
 
 

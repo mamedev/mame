@@ -35,13 +35,9 @@ public:
 	void writedata(uint8_t data);
 	int busy(void);
 
-	INTERRUPT_GEN_MEMBER(nmi_line_assert);
-
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
 protected:
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -68,6 +64,9 @@ private:
 
 	bitmap_ind16 m_tmpbitmap;
 
+	INTERRUPT_GEN_MEMBER(nmi_line_assert);
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 DECLARE_DEVICE_TYPE(BFM_DM01, bfm_dm01_device)

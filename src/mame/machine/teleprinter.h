@@ -24,18 +24,17 @@
 class teleprinter_device : public generic_terminal_device
 {
 public:
-	static constexpr unsigned WIDTH = 80;
-	static constexpr unsigned HEIGHT = 50;
-
 	teleprinter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	uint32_t tp_update(screen_device &device, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
 	virtual void term_write(uint8_t data) override;
 	virtual void device_reset() override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
+	static constexpr unsigned WIDTH = 80;
+	static constexpr unsigned HEIGHT = 50;
+	uint32_t tp_update(screen_device &device, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void scroll_line();
 	void write_char(uint8_t data);
 	void clear();

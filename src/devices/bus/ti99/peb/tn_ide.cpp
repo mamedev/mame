@@ -30,6 +30,10 @@
 #include "emu.h"
 #include "tn_ide.h"
 
+DEFINE_DEVICE_TYPE_NS(TI99_IDE, bus::ti99::peb, nouspikel_ide_interface_device, "ti99_ide", "Nouspikel IDE interface card")
+
+namespace bus { namespace ti99 { namespace peb {
+
 #define CRU_BASE 0x1000
 
 #define RAMREGION "ram"
@@ -382,4 +386,5 @@ ioport_constructor nouspikel_ide_interface_device::device_input_ports() const
 	return INPUT_PORTS_NAME(tn_ide);
 }
 
-DEFINE_DEVICE_TYPE(TI99_IDE, nouspikel_ide_interface_device, "ti99_ide", "Nouspikel IDE interface card")
+} } } // end namespace bus::ti99::peb
+

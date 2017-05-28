@@ -133,7 +133,7 @@ WRITE_LINE_MEMBER(leland_80186_sound_device::i80186_tmr1_w)
 	set_clock_line(7, state);
 }
 
-static MACHINE_CONFIG_START( leland_80186_sound )
+MACHINE_CONFIG_MEMBER( leland_80186_sound_device::device_add_mconfig )
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("dac1", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // 74hc374.u31 + ad7524.u46
 	MCFG_SOUND_ADD("dac2", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // 74hc374.u32 + ad7524.u47
@@ -174,7 +174,7 @@ static MACHINE_CONFIG_START( leland_80186_sound )
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(leland_80186_sound_device, pit1_2_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( redline_80186_sound )
+MACHINE_CONFIG_MEMBER( redline_80186_sound_device::device_add_mconfig )
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("dac1", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // unknown DAC
 	MCFG_SOUND_ADD("dac2", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // unknown DAC
@@ -224,7 +224,7 @@ static MACHINE_CONFIG_START( redline_80186_sound )
 	MCFG_PIT8253_CLK2(7000000)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ataxx_80186_sound )
+MACHINE_CONFIG_MEMBER( ataxx_80186_sound_device::device_add_mconfig )
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("dac1", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // unknown DAC
 	MCFG_SOUND_ADD("dac2", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // unknown DAC
@@ -251,7 +251,7 @@ static MACHINE_CONFIG_START( ataxx_80186_sound )
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(leland_80186_sound_device, pit0_2_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( wsf_80186_sound )
+MACHINE_CONFIG_MEMBER( wsf_80186_sound_device::device_add_mconfig )
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("dac1", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // unknown DAC
 	MCFG_SOUND_ADD("dac2", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // unknown DAC
@@ -283,25 +283,6 @@ static MACHINE_CONFIG_START( wsf_80186_sound )
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(leland_80186_sound_device, pit0_2_w))
 MACHINE_CONFIG_END
 
-machine_config_constructor leland_80186_sound_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( leland_80186_sound );
-}
-
-machine_config_constructor redline_80186_sound_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( redline_80186_sound );
-}
-
-machine_config_constructor ataxx_80186_sound_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( ataxx_80186_sound );
-}
-
-machine_config_constructor wsf_80186_sound_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( wsf_80186_sound );
-}
 
 /*************************************
  *

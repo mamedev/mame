@@ -224,6 +224,7 @@ To Do:
 #include "sound/okim6295.h"
 #include "sound/ym2413.h"
 #include "sound/3812intf.h"
+#include "video/ramdac.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -277,8 +278,6 @@ public:
 	uint8_t m_flash_val;
 	uint8_t m_flash_packet;
 	uint8_t m_flash_packet_start;
-	int m_colordac_offs;
-	std::unique_ptr<uint8_t[]> m_stbsub_colorram;
 
 	ticket_dispenser_device *m_hopper;
 
@@ -294,7 +293,6 @@ public:
 	DECLARE_WRITE8_MEMBER(flash_w);
 	DECLARE_READ8_MEMBER(hwcheck_r);
 	DECLARE_WRITE8_MEMBER(subsino_out_c_w);
-	DECLARE_WRITE8_MEMBER(colordac_w);
 	DECLARE_WRITE8_MEMBER(reel_scrollattr_w);
 	DECLARE_READ8_MEMBER(reel_scrollattr_r);
 	DECLARE_DRIVER_INIT(stbsub);
@@ -1074,34 +1072,9 @@ static ADDRESS_MAP_START( tisub_map, AS_PROGRAM, 8, subsino_state )
 	AM_RANGE( 0x15c00, 0x15dff ) AM_RAM_WRITE(subsino_reel3_ram_w) AM_SHARE("reel3_ram")
 ADDRESS_MAP_END
 
-
-WRITE8_MEMBER(subsino_state::colordac_w)
-{
-	switch ( offset )
-	{
-		case 0:
-			m_colordac_offs = data * 3;
-			break;
-
-		case 1:
-			m_stbsub_colorram[m_colordac_offs] = data;
-			m_palette->set_pen_color(m_colordac_offs/3,
-				pal6bit(m_stbsub_colorram[(m_colordac_offs/3)*3+0]),
-				pal6bit(m_stbsub_colorram[(m_colordac_offs/3)*3+1]),
-				pal6bit(m_stbsub_colorram[(m_colordac_offs/3)*3+2])
-			);
-			m_colordac_offs = (m_colordac_offs+1) % (256*3);
-			break;
-
-		case 2:
-			// ff?
-			break;
-
-		case 3:
-			break;
-	}
-}
-
+static ADDRESS_MAP_START( ramdac_map, AS_0, 8, subsino_state )
+	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac", ramdac_device, ramdac_pal_r, ramdac_rgb666_w)
+ADDRESS_MAP_END
 
 // this stuff is banked..
 // not 100% sure on the bank bits.. other bits are also set
@@ -1174,7 +1147,9 @@ static ADDRESS_MAP_START( stbsub_map, AS_PROGRAM, 8, subsino_state )
 
 	AM_RANGE( 0x0d00c, 0x0d00c ) AM_READ_PORT( "INC" )
 
-	AM_RANGE( 0x0d010, 0x0d013 ) AM_WRITE(colordac_w)
+	AM_RANGE( 0x0d010, 0x0d010 ) AM_DEVWRITE("ramdac", ramdac_device, index_w)
+	AM_RANGE( 0x0d011, 0x0d011 ) AM_DEVWRITE("ramdac", ramdac_device, pal_w)
+	AM_RANGE( 0x0d012, 0x0d012 ) AM_DEVWRITE("ramdac", ramdac_device, mask_w)
 
 	AM_RANGE( 0x0d016, 0x0d017 ) AM_DEVWRITE("ymsnd", ym3812_device, write)
 
@@ -1213,7 +1188,9 @@ static ADDRESS_MAP_START( mtrainnv_map, AS_PROGRAM, 8, subsino_state )
 //  AM_RANGE( 0x0d00b, 0x0d00b ) AM_WRITE
 	AM_RANGE( 0x0d00c, 0x0d00c ) AM_READ_PORT( "INC" )
 
-	AM_RANGE( 0x0d010, 0x0d013 ) AM_WRITE(colordac_w)
+	AM_RANGE( 0x0d010, 0x0d010 ) AM_DEVWRITE("ramdac", ramdac_device, index_w)
+	AM_RANGE( 0x0d011, 0x0d011 ) AM_DEVWRITE("ramdac", ramdac_device, pal_w)
+	AM_RANGE( 0x0d012, 0x0d012 ) AM_DEVWRITE("ramdac", ramdac_device, mask_w)
 
 //  AM_RANGE( 0x0d012, 0x0d012 ) AM_WRITE
 
@@ -2968,6 +2945,8 @@ static MACHINE_CONFIG_START( stbsub )
 	MCFG_PALETTE_ADD("palette", 0x100)
 	//MCFG_PALETTE_INIT_OWNER(subsino_state,subsino_3proms)
 
+	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette") // HMC HM86171 VGA 256 colour RAMDAC
+
 	MCFG_VIDEO_START_OVERRIDE(subsino_state,stbsub)
 
 	/* sound hardware */
@@ -3843,8 +3822,6 @@ DRIVER_INIT_MEMBER(subsino_state,stbsub)
 	rom[0x957] = 0x18; //patch "losing protection" check
 #endif
 
-	m_stbsub_colorram = std::make_unique<uint8_t[]>(256*3);
-
 	m_reel1_scroll.allocate(0x40);
 	m_reel2_scroll.allocate(0x40);
 	m_reel3_scroll.allocate(0x40);
@@ -3859,8 +3836,6 @@ DRIVER_INIT_MEMBER(subsino_state, stisub)
 	uint8_t *rom = memregion( "maincpu" )->base();
 	rom[0x0FA0] = 0x28;
 	rom[0x0FA1] = 0x1d; //patch protection check
-
-	m_stbsub_colorram = std::make_unique<uint8_t[]>(256*3);
 
 	m_reel1_scroll.allocate(0x40);
 	m_reel2_scroll.allocate(0x40);
@@ -3881,8 +3856,6 @@ DRIVER_INIT_MEMBER(subsino_state,tesorone)
 	rom[0xa84] = 0x18; //patch "losing protection" check
 #endif
 
-	m_stbsub_colorram = std::make_unique<uint8_t[]>(256*3);
-
 	m_reel1_scroll.allocate(0x40);
 	m_reel2_scroll.allocate(0x40);
 	m_reel3_scroll.allocate(0x40);
@@ -3902,8 +3875,6 @@ DRIVER_INIT_MEMBER(subsino_state,tesorone230)
 	rom[0xa88] = 0x18; //patch "losing protection" check
 #endif
 
-	m_stbsub_colorram = std::make_unique<uint8_t[]>(256*3);
-
 	m_reel1_scroll.allocate(0x40);
 	m_reel2_scroll.allocate(0x40);
 	m_reel3_scroll.allocate(0x40);
@@ -3916,8 +3887,6 @@ DRIVER_INIT_MEMBER(subsino_state,tesorone230)
 
 DRIVER_INIT_MEMBER(subsino_state,mtrainnv)
 {
-	m_stbsub_colorram = std::make_unique<uint8_t[]>(256*3);
-
 	m_reel1_scroll.allocate(0x40);
 	m_reel2_scroll.allocate(0x40);
 	m_reel3_scroll.allocate(0x40);

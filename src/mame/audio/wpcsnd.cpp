@@ -66,7 +66,7 @@ uint8_t wpcsnd_device::data_r()
 	return m_reply;
 }
 
-MACHINE_CONFIG_START( wpcsnd )
+MACHINE_CONFIG_MEMBER( wpcsnd_device::device_add_mconfig )
 	MCFG_CPU_ADD("bgcpu", M6809E, XTAL_8MHz) // MC68B09E
 	MCFG_CPU_PROGRAM_MAP(wpcsnd_map)
 	MCFG_QUANTUM_TIME(attotime::from_hz(50))
@@ -83,10 +83,6 @@ MACHINE_CONFIG_START( wpcsnd )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.5)
 MACHINE_CONFIG_END
 
-machine_config_constructor wpcsnd_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( wpcsnd );
-}
 
 void wpcsnd_device::device_start()
 {

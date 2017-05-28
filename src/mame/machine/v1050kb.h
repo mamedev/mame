@@ -39,22 +39,16 @@ public:
 
 	template <class Object> static devcb_base &set_out_tx_handler(device_t &device, Object &&cb) { return downcast<v1050_keyboard_device &>(device).m_out_tx_handler.set_callback(std::forward<Object>(cb)); }
 
-	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual ioport_constructor device_input_ports() const override;
-
 	DECLARE_WRITE_LINE_MEMBER( si_w );
-
-	// not really public
-	DECLARE_READ8_MEMBER( kb_p1_r );
-	DECLARE_WRITE8_MEMBER( kb_p1_w );
-	DECLARE_WRITE8_MEMBER( kb_p2_w );
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -63,6 +57,10 @@ private:
 	devcb_write_line   m_out_tx_handler;
 
 	uint8_t m_keylatch;
+
+	DECLARE_READ8_MEMBER( kb_p1_r );
+	DECLARE_WRITE8_MEMBER( kb_p1_w );
+	DECLARE_WRITE8_MEMBER( kb_p2_w );
 };
 
 

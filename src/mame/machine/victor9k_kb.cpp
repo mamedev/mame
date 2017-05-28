@@ -377,10 +377,10 @@ const tiny_rom_entry *victor_9000_keyboard_device::device_rom_region() const
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( victor9k_keyboard )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( victor9k_keyboard )
+MACHINE_CONFIG_MEMBER( victor_9000_keyboard_device::device_add_mconfig )
 	MCFG_CPU_ADD(I8021_TAG, I8021, XTAL_3_579545MHz)
 	// P0 is unconnected on pcb
 	MCFG_MCS48_PORT_P1_IN_CB(READ8(victor_9000_keyboard_device, kb_p1_r))
@@ -388,17 +388,6 @@ static MACHINE_CONFIG_START( victor9k_keyboard )
 	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(victor_9000_keyboard_device, kb_p2_w))
 	MCFG_MCS48_PORT_T1_IN_CB(READLINE(victor_9000_keyboard_device, kb_t1_r))
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor victor_9000_keyboard_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( victor9k_keyboard );
-}
 
 
 //-------------------------------------------------

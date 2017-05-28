@@ -1461,7 +1461,7 @@ void cli_frontend::romident(const std::vector<std::string> &args)
 
 
 //-------------------------------------------------
-//	find_command
+//  find_command
 //-------------------------------------------------
 
 const cli_frontend::info_command_struct *cli_frontend::find_command(const std::string &s)

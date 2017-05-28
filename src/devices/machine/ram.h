@@ -56,12 +56,11 @@ public:
 	ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// accessors
-	uint32_t size(void) const { return m_size; }
-	uint32_t mask(void) const { return m_size - 1; }
-	uint8_t *pointer(void) { return &m_pointer[0]; }
-	static uint32_t parse_string(const char *s);
-	uint32_t default_size(void) const;
-	const char *extra_options(void) const { return m_extra_options; }
+	uint32_t size() const { return m_size; }
+	uint32_t mask() const { return m_size - 1; }
+	uint8_t *pointer() { return &m_pointer[0]; }
+	uint32_t default_size() const;
+	const std::vector<uint32_t> &extra_options() const;
 
 	// read/write
 	uint8_t read(offs_t offset)               { return m_pointer[offset % m_size]; }
@@ -69,22 +68,27 @@ public:
 
 	// inline configuration helpers
 	static void static_set_default_size(device_t &device, const char *default_size)     { downcast<ram_device &>(device).m_default_size = default_size; }
-	static void static_set_extra_options(device_t &device, const char *extra_options)   { downcast<ram_device &>(device).m_extra_options = extra_options; }
+	static void static_set_extra_options(device_t &device, const char *extra_options)   { downcast<ram_device &>(device).m_extra_options_string = extra_options && extra_options[0] ? extra_options : nullptr; downcast<ram_device &>(device).m_extra_options.clear(); }
 	static void static_set_default_value(device_t &device, uint8_t default_value)       { downcast<ram_device &>(device).m_default_value = default_value; }
 
 protected:
-	virtual void device_start(void) override;
+	virtual void device_start() override;
 	virtual void device_validity_check(validity_checker &valid) const override;
 
 private:
+	static std::vector<uint32_t> calculate_extra_options(const char *extra_options_string, std::string *bad_option);
+	static uint32_t parse_string(const char *s);
+	bool is_valid_size(uint32_t size) const;
+
 	// device state
-	uint32_t m_size;
-	std::vector<uint8_t> m_pointer;
+	uint32_t                        m_size;
+	std::vector<uint8_t>            m_pointer;
 
 	// device config
-	const char *m_default_size;
-	const char *m_extra_options;
-	uint8_t m_default_value;
+	const char *                    m_default_size;
+	uint8_t                         m_default_value;
+	mutable std::vector<uint32_t>   m_extra_options;
+	const char *                    m_extra_options_string;
 };
 
 

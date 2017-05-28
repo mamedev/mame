@@ -201,9 +201,9 @@ void video_manager::set_frameskip(int frameskip)
 void video_manager::frame_update(bool from_debugger)
 {
 	// only render sound and video if we're in the running phase
-	int phase = machine().phase();
+	machine_phase const phase = machine().phase();
 	bool skipped_it = m_skipping_this_frame;
-	if (phase == MACHINE_PHASE_RUNNING && (!machine().paused() || machine().options().update_in_pause()))
+	if (phase == machine_phase::RUNNING && (!machine().paused() || machine().options().update_in_pause()))
 	{
 		bool anything_changed = finish_screen_updates();
 
@@ -244,7 +244,7 @@ void video_manager::frame_update(bool from_debugger)
 		recompute_speed(current_time);
 
 	// call the end-of-frame callback
-	if (phase == MACHINE_PHASE_RUNNING)
+	if (phase == machine_phase::RUNNING)
 	{
 		// reset partial updates if we're paused or if the debugger is active
 		screen_device *const screen = machine().first_screen();

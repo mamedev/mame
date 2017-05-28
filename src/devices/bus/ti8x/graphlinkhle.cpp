@@ -10,16 +10,6 @@ DEFINE_DEVICE_TYPE_NS(TI8X_GRAPH_LINK_HLE, bus::ti8x, graph_link_hle_device, "ti
 
 namespace bus { namespace ti8x {
 
-namespace {
-
-MACHINE_CONFIG_START(graph_link_hle)
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(graph_link_hle_device, rx_w))
-MACHINE_CONFIG_END
-
-} // anonymous namespace
-
-
 graph_link_hle_device::graph_link_hle_device(
 		machine_config const &mconfig,
 		char const *tag,
@@ -68,10 +58,10 @@ void graph_link_hle_device::device_timer(emu_timer &timer, device_timer_id id, i
 }
 
 
-machine_config_constructor graph_link_hle_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME(graph_link_hle);
-}
+MACHINE_CONFIG_MEMBER(graph_link_hle_device::device_add_mconfig)
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(graph_link_hle_device, rx_w))
+MACHINE_CONFIG_END
 
 
 void graph_link_hle_device::byte_collision()

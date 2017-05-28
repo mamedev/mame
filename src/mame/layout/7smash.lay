@@ -52,10 +52,10 @@
 			<bounds x="0" y="0.2" width="1" height="0.6" />
 		</text>
 	</element>
-	
+
 	<!-- ToDo: Two of the Dipswitches enable an alt control schemes where Odds and Bet use
 	     different buttons and lamps, but this is not the default and is supported neither
-		 here nor in the driver -->
+	     here nor in the driver -->
 	<view name="Button Lamps">
 		<screen index="0">
 			<bounds left="0" top="0" right="4" bottom="3" />

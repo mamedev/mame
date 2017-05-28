@@ -33,6 +33,9 @@ public:
 	WRITE8_MEMBER(psg1_4015_w);
 	WRITE8_MEMBER(psg1_4017_w);
 
+	DECLARE_WRITE_LINE_MEMBER(apu_irq);
+	DECLARE_READ8_MEMBER(apu_read_mem);
+
 protected:
 	class mi_2a03_normal : public memory_interface {
 	public:

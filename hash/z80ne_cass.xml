@@ -4,10 +4,10 @@
 Thanks to http://z80ne.com for info!
 
 Tape loading instructions
- 
+
 Before using these instructions, make sure that the LX385 data date,
 configured in the Machine Configuration menu, matches the cassette data rate
-in the software description (1200bps, 600bps, or 300bps). The default 
+in the software description (1200bps, 600bps, or 300bps). The default
 setting of 1200 bps is recommended as it is the fastest loading setting.
 
 Loading generic machine language programs (e.g. bioritmi)
@@ -18,7 +18,7 @@ Loading generic machine language programs (e.g. bioritmi)
 5. After loading all required tapes, press any key on the numeric keypad, enter "1000", and press Control-4. The program should now be running.
 
 Loading Tape BASIC (aka BASIC Italiano-Inglese da Cassetta)
- 
+
 1. Follow steps 1-3 and 5 from standard machine language program loading instructions with Tape 1 (Lettura).
    After loading is complete, a nice title screen should appear, and the numeric display should read "BASIC".
 2. At the title screen, mount tape 2 (BASIC) in cass1, then press Play on tape control.

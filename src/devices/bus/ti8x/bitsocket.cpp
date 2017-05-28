@@ -10,15 +10,6 @@ DEFINE_DEVICE_TYPE_NS(TI8X_BIT_SOCKET, bus::ti8x, bit_socket_device, "ti8x_bitso
 
 namespace bus { namespace ti8x {
 
-namespace {
-
-MACHINE_CONFIG_START(bit_socket)
-	MCFG_DEVICE_ADD("stream", BITBANGER, 0)
-MACHINE_CONFIG_END
-
-} // anonymous namespace
-
-
 bit_socket_device::bit_socket_device(
 		machine_config const &mconfig,
 		char const *tag,
@@ -34,10 +25,9 @@ bit_socket_device::bit_socket_device(
 }
 
 
-machine_config_constructor bit_socket_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME(bit_socket);
-}
+MACHINE_CONFIG_MEMBER(bit_socket_device::device_add_mconfig)
+	MCFG_DEVICE_ADD("stream", BITBANGER, 0)
+MACHINE_CONFIG_END
 
 
 void bit_socket_device::device_start()

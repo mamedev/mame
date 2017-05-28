@@ -5,9 +5,6 @@
 Mr F Lea
 Pacific Novelty 1982
 
-TODO:
-- fix slave cpu irq generation
-
 4 way joystick and jump button
 
 I/O Board
@@ -69,6 +66,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
 #include "includes/mrflea.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/i8255.h"
 #include "sound/ay8910.h"
 #include "speaker.h"
 
@@ -79,74 +77,14 @@ Stephh's notes (based on the games Z80 code and some tests) :
  *
  *************************************/
 
-WRITE8_MEMBER(mrflea_state::mrflea_main_w)
-{
-	m_status |= 0x01; // pending command to main CPU
-	m_main = data;
-}
-
-WRITE8_MEMBER(mrflea_state::mrflea_io_w)
-{
-	m_status |= 0x08; // pending command to IO CPU
-	m_io = data;
-	m_subcpu->set_input_line(0, HOLD_LINE );
-}
-
-READ8_MEMBER(mrflea_state::mrflea_main_r)
-{
-	m_status &= ~0x01; // main CPU command read
-	return m_main;
-}
-
-READ8_MEMBER(mrflea_state::mrflea_io_r)
-{
-	m_status &= ~0x08; // IO CPU command read
-	return m_io;
-}
-
-READ8_MEMBER(mrflea_state::mrflea_main_status_r)
-{
-	/*  0x01: main CPU command pending
-	    0x08: io cpu ready */
-	return m_status ^ 0x08;
-}
-
-READ8_MEMBER(mrflea_state::mrflea_io_status_r)
-{
-	/*  0x08: IO CPU command pending
-	    0x01: main cpu ready */
-	return m_status ^ 0x01;
-}
-
 TIMER_DEVICE_CALLBACK_MEMBER(mrflea_state::mrflea_slave_interrupt)
 {
 	int scanline = param;
 
-	if ((scanline == 248) || (scanline == 248/2 && (m_status & 0x08)))
-		m_subcpu->set_input_line(0, HOLD_LINE);
-}
-
-READ8_MEMBER(mrflea_state::mrflea_interrupt_type_r)
-{
-/* there are two interrupt types:
-    1. triggered (in response to sound command)
-    2. heartbeat (for music timing)
-*/
-
-	if (m_status & 0x08 )
-		return 0x00; /* process command */
-
-	return 0x01; /* music/sound update? */
-}
-
-WRITE8_MEMBER(mrflea_state::mrflea_select1_w)
-{
-	m_select1 = data;
-}
-
-READ8_MEMBER(mrflea_state::mrflea_input1_r)
-{
-	return 0x00;
+	if (scanline == 248)
+		m_pic->ir1_w(ASSERT_LINE);
+	if (scanline == 0)
+		m_pic->ir1_w(CLEAR_LINE);
 }
 
 WRITE8_MEMBER(mrflea_state::mrflea_data1_w)
@@ -170,10 +108,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mrflea_master_io_map, AS_IO, 8, mrflea_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITENOP /* watchdog? */
-	AM_RANGE(0x40, 0x40) AM_WRITE(mrflea_io_w)
-	AM_RANGE(0x41, 0x41) AM_READ(mrflea_main_r)
-	AM_RANGE(0x42, 0x42) AM_READ(mrflea_main_status_r)
-	AM_RANGE(0x43, 0x43) AM_WRITENOP /* 0xa6,0x0d,0x05 */
+	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("mainppi", i8255_device, read, write)
 	AM_RANGE(0x60, 0x60) AM_WRITE(mrflea_gfx_bank_w)
 ADDRESS_MAP_END
 
@@ -188,20 +123,16 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mrflea_slave_io_map, AS_IO, 8, mrflea_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITENOP /* watchdog */
-	AM_RANGE(0x10, 0x10) AM_READ(mrflea_interrupt_type_r) AM_WRITENOP /* ? / irq ACK */
-	AM_RANGE(0x11, 0x11) AM_WRITENOP /* 0x83,0x00,0xfc */
-	AM_RANGE(0x20, 0x20) AM_READ(mrflea_io_r)
-	AM_RANGE(0x21, 0x21) AM_WRITE(mrflea_main_w)
-	AM_RANGE(0x22, 0x22) AM_READ(mrflea_io_status_r)
-	AM_RANGE(0x23, 0x23) AM_WRITENOP /* 0xb4,0x09,0x05 */
-	AM_RANGE(0x40, 0x40) AM_DEVREAD("ay1", ay8910_device, data_r)
-	AM_RANGE(0x40, 0x41) AM_DEVWRITE("ay1", ay8910_device, data_address_w)
-	AM_RANGE(0x42, 0x42) AM_READWRITE(mrflea_input1_r, mrflea_data1_w)
-	AM_RANGE(0x43, 0x43) AM_WRITE(mrflea_select1_w)
-	AM_RANGE(0x44, 0x44) AM_DEVREAD("ay2", ay8910_device, data_r)
-	AM_RANGE(0x44, 0x45) AM_DEVWRITE("ay2", ay8910_device, data_address_w)
-	AM_RANGE(0x46, 0x46) AM_DEVREAD("ay3", ay8910_device, data_r)
-	AM_RANGE(0x46, 0x47) AM_DEVWRITE("ay3", ay8910_device, data_address_w)
+	AM_RANGE(0x10, 0x11) AM_DEVREADWRITE("pic", pic8259_device, read, write)
+	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("subppi", i8255_device, read, write)
+	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE("ay1", ay8910_device, data_r, data_w)
+	AM_RANGE(0x41, 0x41) AM_DEVWRITE("ay1", ay8910_device, address_w)
+	AM_RANGE(0x42, 0x42) AM_DEVREADWRITE("ay2", ay8910_device, data_r, data_w)
+	AM_RANGE(0x43, 0x43) AM_DEVWRITE("ay2", ay8910_device, address_w)
+	AM_RANGE(0x44, 0x44) AM_DEVREADWRITE("ay3", ay8910_device, data_r, data_w)
+	AM_RANGE(0x45, 0x45) AM_DEVWRITE("ay3", ay8910_device, address_w)
+	AM_RANGE(0x46, 0x46) AM_DEVREADWRITE("ay4", ay8910_device, data_r, data_w)
+	AM_RANGE(0x47, 0x47) AM_DEVWRITE("ay4", ay8910_device, address_w)
 ADDRESS_MAP_END
 
 /*************************************
@@ -264,6 +195,9 @@ static INPUT_PORTS_START( mrflea )
 	PORT_DIPSETTING( 0x00, DEF_STR( Hardest ) )
 	PORT_DIPUNUSED( 0x40, 0x40 )
 	PORT_DIPUNUSED( 0x80, 0x80 )
+
+	PORT_START("UNKNOWN")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 
@@ -310,19 +244,11 @@ GFXDECODE_END
 void mrflea_state::machine_start()
 {
 	save_item(NAME(m_gfx_bank));
-	save_item(NAME(m_io));
-	save_item(NAME(m_main));
-	save_item(NAME(m_status));
-	save_item(NAME(m_select1));
 }
 
 void mrflea_state::machine_reset()
 {
 	m_gfx_bank = 0;
-	m_io = 0;
-	m_main = 0;
-	m_status = 0;
-	m_select1 = 0;
 }
 
 static MACHINE_CONFIG_START( mrflea )
@@ -333,13 +259,25 @@ static MACHINE_CONFIG_START( mrflea )
 	MCFG_CPU_IO_MAP(mrflea_master_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mrflea_state,  irq0_line_hold) /* NMI resets the game */
 
-	MCFG_CPU_ADD("sub", Z80, 6000000)
+	MCFG_CPU_ADD("subcpu", Z80, 6000000) // runs in IM 1, so doesn't use 8259 INTA
 	MCFG_CPU_PROGRAM_MAP(mrflea_slave_map)
 	MCFG_CPU_IO_MAP(mrflea_slave_io_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mrflea_state, mrflea_slave_interrupt, "screen", 0, 1)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
+	MCFG_DEVICE_ADD("mainppi", I8255, 0)
+	MCFG_I8255_IN_PORTB_CB(DEVREAD8("subppi", i8255_device, pb_r))
+	MCFG_I8255_OUT_PORTC_CB(DEVWRITELINE("subppi", i8255_device, pc4_w)) MCFG_DEVCB_BIT(7) // OBFA -> STBA
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("subppi", i8255_device, pc2_w)) MCFG_DEVCB_BIT(1) // IBFB -> ACKB
+
+	MCFG_DEVICE_ADD("subppi", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(DEVREAD8("mainppi", i8255_device, pa_r))
+	MCFG_I8255_OUT_PORTC_CB(DEVWRITELINE("mainppi", i8255_device, pc6_w)) MCFG_DEVCB_BIT(5) // IBFA -> ACKA
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("pic", pic8259_device, ir0_w)) MCFG_DEVCB_BIT(3) // INTRA
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("mainppi", i8255_device, pc2_w)) MCFG_DEVCB_BIT(1) // OBFB -> STBB
+
+	MCFG_PIC8259_ADD("pic", INPUTLINE("subcpu", 0), VCC, NOOP)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -363,13 +301,18 @@ static MACHINE_CONFIG_START( mrflea )
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN0"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 2000000)
+	MCFG_SOUND_ADD("ay2", AY8910, 2000000) // not used for sound?
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	MCFG_SOUND_ADD("ay3", AY8910, 2000000)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW2"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW1"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay3", AY8910, 2000000)
+	MCFG_SOUND_ADD("ay4", AY8910, 2000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("UNKNOWN"))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(mrflea_state, mrflea_data1_w))
 MACHINE_CONFIG_END
 
 /*************************************
@@ -387,7 +330,7 @@ ROM_START( mrflea )
 	ROM_LOAD( "cpu_b3", 0x8000, 0x2000, CRC(f55b01e4) SHA1(93689fa02aab9d1f1acd55b305eafe542ee447b8) )
 	ROM_LOAD( "cpu_b5", 0xa000, 0x2000, CRC(79f560aa) SHA1(7326693d7369682f5770bf80df0181d603212900) )
 
-	ROM_REGION( 0x10000, "sub", 0 ) /* Z80 code; IO CPU */
+	ROM_REGION( 0x10000, "subcpu", 0 ) /* Z80 code; IO CPU */
 	ROM_LOAD( "io_a11", 0x0000, 0x1000, CRC(7a20c3ee) SHA1(8e0d5770881e6d3d1df17a2ede5a8823ca9d78e3) )
 	ROM_LOAD( "io_c11", 0x2000, 0x1000, CRC(8d26e0c8) SHA1(e90e37bd64e991dc47ab80394337073c69b450da) )
 	ROM_LOAD( "io_d11", 0x3000, 0x1000, CRC(abd9afc0) SHA1(873314164707ee84739ec76c6119a65a17001620) )

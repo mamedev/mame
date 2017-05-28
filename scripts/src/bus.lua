@@ -2342,7 +2342,6 @@ end
 --@src/devices/bus/ti99x/990_dk.h,BUSES["TI99X"] = true
 --@src/devices/bus/ti99x/990_tap.h,BUSES["TI99X"] = true
 --@src/devices/bus/ti99x/990_hd.h,BUSES["TI99X"] = true
---@src/devices/bus/ti99x/genboard.h,BUSES["TI99X"] = true
 ---------------------------------------------------
 
 if (BUSES["TI99X"]~=null) then
@@ -2353,32 +2352,46 @@ if (BUSES["TI99X"]~=null) then
 		MAME_DIR .. "src/devices/bus/ti99x/990_hd.h",
 		MAME_DIR .. "src/devices/bus/ti99x/990_tap.cpp",
 		MAME_DIR .. "src/devices/bus/ti99x/990_tap.h",
-		MAME_DIR .. "src/devices/bus/ti99x/998board.cpp",
-		MAME_DIR .. "src/devices/bus/ti99x/998board.h",
-		MAME_DIR .. "src/devices/bus/ti99x/datamux.cpp",
-		MAME_DIR .. "src/devices/bus/ti99x/datamux.h",
-		MAME_DIR .. "src/devices/bus/ti99x/genboard.cpp",
-		MAME_DIR .. "src/devices/bus/ti99x/genboard.h",
-		MAME_DIR .. "src/devices/bus/ti99x/gromport.cpp",
-		MAME_DIR .. "src/devices/bus/ti99x/gromport.h",
-		MAME_DIR .. "src/devices/bus/ti99x/ti99defs.cpp",
-		MAME_DIR .. "src/devices/bus/ti99x/ti99defs.h",
 	}
 end
 
 ---------------------------------------------------
 --
 --@src/devices/bus/ti99/colorbus/colorbus.h,BUSES["TI99"] = true
+--@src/devices/bus/ti99/gromport/cartridges.h,BUSES["TI99"] = true
 --@src/devices/bus/ti99/joyport/joyport.h,BUSES["TI99"] = true
 --@src/devices/bus/ti99/peb/peribox.h,BUSES["TI99"] = true
+--@src/devices/bus/ti99/internal/genboard.h,BUSES["TI99"] = true
+
 ---------------------------------------------------
 
 if (BUSES["TI99"]~=null) then
 	files {
+		MAME_DIR .. "src/devices/bus/ti99/ti99defs.h",
+		MAME_DIR .. "src/devices/bus/ti99/internal/998board.cpp",
+		MAME_DIR .. "src/devices/bus/ti99/internal/998board.h",
+		MAME_DIR .. "src/devices/bus/ti99/internal/datamux.cpp",
+		MAME_DIR .. "src/devices/bus/ti99/internal/datamux.h",
+		MAME_DIR .. "src/devices/bus/ti99/internal/evpcconn.cpp",
+		MAME_DIR .. "src/devices/bus/ti99/internal/evpcconn.h",
+		MAME_DIR .. "src/devices/bus/ti99/internal/genboard.cpp",
+		MAME_DIR .. "src/devices/bus/ti99/internal/genboard.h",
+		MAME_DIR .. "src/devices/bus/ti99/internal/ioport.cpp",
+		MAME_DIR .. "src/devices/bus/ti99/internal/ioport.h",
 		MAME_DIR .. "src/devices/bus/ti99/colorbus/busmouse.cpp",
 		MAME_DIR .. "src/devices/bus/ti99/colorbus/busmouse.h",
 		MAME_DIR .. "src/devices/bus/ti99/colorbus/colorbus.cpp",
 		MAME_DIR .. "src/devices/bus/ti99/colorbus/colorbus.h",
+		MAME_DIR .. "src/devices/bus/ti99/gromport/gromport.cpp",
+		MAME_DIR .. "src/devices/bus/ti99/gromport/gromport.h",
+		MAME_DIR .. "src/devices/bus/ti99/gromport/cartridges.cpp",
+		MAME_DIR .. "src/devices/bus/ti99/gromport/cartridges.h",
+		MAME_DIR .. "src/devices/bus/ti99/gromport/gkracker.cpp",
+		MAME_DIR .. "src/devices/bus/ti99/gromport/gkracker.h",
+		MAME_DIR .. "src/devices/bus/ti99/gromport/multiconn.cpp",
+		MAME_DIR .. "src/devices/bus/ti99/gromport/multiconn.h",
+		MAME_DIR .. "src/devices/bus/ti99/gromport/singleconn.cpp",
+		MAME_DIR .. "src/devices/bus/ti99/gromport/singleconn.h",
 		MAME_DIR .. "src/devices/bus/ti99/joyport/handset.cpp",
 		MAME_DIR .. "src/devices/bus/ti99/joyport/handset.h",
 		MAME_DIR .. "src/devices/bus/ti99/joyport/joyport.cpp",

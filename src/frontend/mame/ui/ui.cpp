@@ -402,7 +402,7 @@ void mame_ui_manager::update_and_render(render_container &container)
 	container.empty();
 
 	// if we're paused, dim the whole screen
-	if (machine().phase() >= MACHINE_PHASE_RESET && (single_step() || machine().paused()))
+	if (machine().phase() >= machine_phase::RESET && (single_step() || machine().paused()))
 	{
 		int alpha = (1.0f - machine().options().pause_brightness()) * 255.0f;
 		if (ui::menu::stack_has_special_main_menu(machine()))
@@ -414,7 +414,7 @@ void mame_ui_manager::update_and_render(render_container &container)
 	}
 
 	// render any cheat stuff at the bottom
-	if (machine().phase() >= MACHINE_PHASE_RESET)
+	if (machine().phase() >= machine_phase::RESET)
 		mame_machine_manager::instance()->cheat().render_text(*this, container);
 
 	// call the current UI handler
@@ -1016,7 +1016,7 @@ void mame_ui_manager::start_load_state()
 void mame_ui_manager::image_handler_ingame()
 {
 	// run display routine for devices
-	if (machine().phase() == MACHINE_PHASE_RUNNING)
+	if (machine().phase() == machine_phase::RUNNING)
 	{
 		auto layout = create_layout(machine().render().ui_container());
 
@@ -1111,7 +1111,7 @@ uint32_t mame_ui_manager::handler_ingame(render_container &container)
 	}
 
 	// is the natural keyboard enabled?
-	if (machine().ioport().natkeyboard().in_use() && (machine().phase() == MACHINE_PHASE_RUNNING))
+	if (machine().ioport().natkeyboard().in_use() && (machine().phase() == machine_phase::RUNNING))
 		process_natural_keyboard();
 
 	if (!ui_disabled)

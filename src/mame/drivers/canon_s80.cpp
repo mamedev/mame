@@ -17,7 +17,7 @@
  */
 
 #include "emu.h"
-#include "cpu/m6800/m6800.h"
+#include "cpu/m6800/m6801.h"
 //#include "video/hd44780.h"
 
 class canons80_state : public driver_device

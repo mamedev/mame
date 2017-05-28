@@ -79,11 +79,6 @@ constexpr u32 VIDEO_UPDATE_SCANLINE         = 0x0100;
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// forward references
-class render_texture;
-class screen_device;
-
-
 // ======================> screen_bitmap
 
 class screen_bitmap
@@ -165,9 +160,6 @@ typedef device_delegate<u32 (screen_device &, bitmap_rgb32 &, const rectangle &)
 
 
 // ======================> screen_device
-
-class screen_device_svg_renderer;
-class render_container;
 
 class screen_device : public device_t
 {
@@ -258,6 +250,8 @@ public:
 	static const attotime DEFAULT_FRAME_PERIOD;
 
 private:
+	class svg_renderer;
+
 	// timer IDs
 	enum
 	{
@@ -300,7 +294,7 @@ private:
 
 	// internal state
 	render_container *  m_container;                // pointer to our container
-	std::unique_ptr<screen_device_svg_renderer> m_svg; // the svg renderer
+	std::unique_ptr<svg_renderer> m_svg; // the svg renderer
 	// dimensions
 	int                 m_width;                    // current width (HTOTAL)
 	int                 m_height;                   // current height (VTOTAL)

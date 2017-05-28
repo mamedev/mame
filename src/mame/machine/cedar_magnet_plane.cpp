@@ -69,7 +69,7 @@ WRITE8_MEMBER(cedar_magnet_plane_device::plane_portcf_w)
 	m_cf_data = data;
 }
 
-static MACHINE_CONFIG_START( cedar_magnet_plane )
+MACHINE_CONFIG_MEMBER( cedar_magnet_plane_device::device_add_mconfig )
 	MCFG_CPU_ADD("planecpu", Z80,4000000)
 	MCFG_CPU_PROGRAM_MAP(cedar_magnet_plane_map)
 	MCFG_CPU_IO_MAP(cedar_magnet_plane_io)
@@ -124,11 +124,6 @@ WRITE8_MEMBER(cedar_magnet_plane_device::pio1_pa_w)
 WRITE8_MEMBER(cedar_magnet_plane_device::pio1_pb_w)
 {
 	m_scrolly = data;
-}
-
-machine_config_constructor cedar_magnet_plane_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( cedar_magnet_plane );
 }
 
 void cedar_magnet_plane_device::device_start()

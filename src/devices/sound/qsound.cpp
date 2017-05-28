@@ -56,14 +56,6 @@ static ADDRESS_MAP_START( dsp16_data_map, AS_DATA, 16, qsound_device )
 ADDRESS_MAP_END
 
 
-// machine fragment
-static MACHINE_CONFIG_START( qsound )
-	MCFG_CPU_ADD("qsound", DSP16, QSOUND_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(dsp16_program_map)
-	MCFG_CPU_DATA_MAP(dsp16_data_map)
-MACHINE_CONFIG_END
-
-
 // ROM definition for the Qsound program ROM
 ROM_START( qsound )
 	ROM_REGION( 0x6000, "qsound", 0 )
@@ -102,14 +94,14 @@ const tiny_rom_entry *qsound_device::device_rom_region() const
 
 
 //-------------------------------------------------
-//  machine_config_additions - return a pointer to
-//  the device's machine fragment
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor qsound_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( qsound );
-}
+MACHINE_CONFIG_MEMBER( qsound_device::device_add_mconfig )
+	MCFG_CPU_ADD("qsound", DSP16, QSOUND_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(dsp16_program_map)
+	MCFG_CPU_DATA_MAP(dsp16_data_map)
+MACHINE_CONFIG_END
 
 
 //-------------------------------------------------

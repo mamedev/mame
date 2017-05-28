@@ -20,7 +20,7 @@
 #include "machine/wd_fdc.h"
 #include "imagedev/floppy.h"
 
-DECLARE_DEVICE_TYPE(TI99_FDC, ti_fdc_device)
+namespace bus { namespace ti99 { namespace peb {
 
 class ti_fdc_device : public ti_expansion_card_device
 {
@@ -111,5 +111,9 @@ private:
 	// Debugging
 	bool m_debug_dataout;
 };
+
+} } } // end namespace bus::ti99::peb
+
+DECLARE_DEVICE_TYPE_NS(TI99_FDC, bus::ti99::peb, ti_fdc_device)
 
 #endif // MAME_BUS_TI99_PEB_TI_FDC_H

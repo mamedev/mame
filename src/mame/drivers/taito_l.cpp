@@ -28,6 +28,9 @@ Notes:
   TileMap system, so we have to tilemap_mark_all_tiles_dirty() to compensate
 - kurikinta has some debug dip switches (invulnerability, slow motion) so might
   be a prototype. It also doesn't have service mode (or has it disabled).
+- Of the several multi-processor games that use the MB8421 dual-port RAM for
+  communications, Evil Stone seems to be the only one to use its special
+  interrupt feature.
 
 TODO:
 - plgirls doesn't work without a kludge because of an interrupt issue. This
@@ -40,8 +43,6 @@ TODO:
 - Text Plane colours are only right in Cuby Bop once you've started a game
   & reset
 - Scrolling in Cuby Bop's Game seems incorrect.
-- Repeated SFXs in Evil Stone (with previous hack, it was used to die at level 1 boss)
-- Evil Stone audio NMI source is unknown.
 
 puzznici note
 - this set is a bootleg, it uses a converted board without the MCU and has
@@ -56,10 +57,14 @@ puzznici note
 #include "includes/taito_l.h"
 #include "includes/taitoipt.h"
 #include "machine/taito68705interface.h"
+#include "machine/taitoio.h"
 
 #include "audio/taitosnd.h"
 
 #include "cpu/z80/z80.h"
+
+#include "machine/i8255.h"
+#include "machine/mb8421.h"
 
 #include "sound/2203intf.h"
 #include "sound/2610intf.h"
@@ -282,6 +287,7 @@ MACHINE_RESET_MEMBER(horshoes_state, horshoes)
 
 IRQ_CALLBACK_MEMBER(taitol_state::irq_callback)
 {
+	m_main_cpu->set_input_line(0, CLEAR_LINE);
 	return m_irq_adr_table[m_last_irq_level];
 }
 
@@ -298,17 +304,17 @@ TIMER_DEVICE_CALLBACK_MEMBER(taitol_state::vbl_interrupt)
 	if (scanline == 120 && (m_irq_enable & 1))
 	{
 		m_last_irq_level = 0;
-		m_main_cpu->set_input_line(0, HOLD_LINE);
+		m_main_cpu->set_input_line(0, ASSERT_LINE);
 	}
 	else if (scanline == 0 && (m_irq_enable & 2))
 	{
 		m_last_irq_level = 1;
-		m_main_cpu->set_input_line(0, HOLD_LINE);
+		m_main_cpu->set_input_line(0, ASSERT_LINE);
 	}
 	else if (scanline == 240 && (m_irq_enable & 4))
 	{
 		m_last_irq_level = 2;
-		m_main_cpu->set_input_line(0, HOLD_LINE);
+		m_main_cpu->set_input_line(0, ASSERT_LINE);
 	}
 }
 
@@ -621,13 +627,7 @@ static ADDRESS_MAP_START( fhawk_2_map, AS_PROGRAM, 8, fhawk_state )
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(rombank2switch_w)
 	AM_RANGE(0xc800, 0xc800) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_device, master_port_w)
 	AM_RANGE(0xc801, 0xc801) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w)
-	AM_RANGE(0xd000, 0xd000) AM_READ_PORT("DSWA") AM_WRITENOP   // Direct copy of input port 0
-	AM_RANGE(0xd001, 0xd001) AM_READ_PORT("DSWB")
-	AM_RANGE(0xd002, 0xd002) AM_READ_PORT("IN0")
-	AM_RANGE(0xd003, 0xd003) AM_READ_PORT("IN1")
-	AM_RANGE(0xd004, 0xd004) AM_WRITE(control2_w)
-	AM_RANGE(0xd005, 0xd006) AM_WRITENOP    // Always 0
-	AM_RANGE(0xd007, 0xd007) AM_READ_PORT("IN2")
+	AM_RANGE(0xd000, 0xd007) AM_DEVREADWRITE("tc0220ioc", tc0220ioc_device, read, write)
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
 
@@ -643,7 +643,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( raimais_map, AS_PROGRAM, 8, taitol_2cpu_state )
 	COMMON_BANKS_MAP
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0x8000, 0x87ff) AM_DEVREADWRITE("dpram", mb8421_device, right_r, right_w)
 	AM_RANGE(0x8800, 0x8800) AM_READWRITE(mux_r, mux_w)
 	AM_RANGE(0x8801, 0x8801) AM_WRITE(mux_ctrl_w) AM_READNOP    // Watchdog or interrupt ack (value ignored)
 	AM_RANGE(0x8c00, 0x8c00) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_device, master_port_w)
@@ -654,7 +654,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( raimais_2_map, AS_PROGRAM, 8, taitol_2cpu_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0xe000, 0xe7ff) AM_DEVREADWRITE("dpram", mb8421_device, left_r, left_w)
 ADDRESS_MAP_END
 
 
@@ -688,12 +688,7 @@ static ADDRESS_MAP_START( champwr_2_map, AS_PROGRAM, 8, champwr_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank6")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("DSWA") AM_WRITENOP   // Watchdog
-	AM_RANGE(0xe001, 0xe001) AM_READ_PORT("DSWB")
-	AM_RANGE(0xe002, 0xe002) AM_READ_PORT("IN0")
-	AM_RANGE(0xe003, 0xe003) AM_READ_PORT("IN1")
-	AM_RANGE(0xe004, 0xe004) AM_WRITE(control2_w)
-	AM_RANGE(0xe007, 0xe007) AM_READ_PORT("IN2")
+	AM_RANGE(0xe000, 0xe007) AM_DEVREADWRITE("tc0220ioc", tc0220ioc_device, read, write)
 	AM_RANGE(0xe008, 0xe00f) AM_READNOP
 	AM_RANGE(0xe800, 0xe800) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_device, master_port_w)
 	AM_RANGE(0xe801, 0xe801) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w)
@@ -718,7 +713,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( kurikint_map, AS_PROGRAM, 8, taitol_2cpu_state )
 	COMMON_BANKS_MAP
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0xa000, 0xa7ff) AM_DEVREADWRITE("dpram", mb8421_device, right_r, right_w)
 	AM_RANGE(0xa800, 0xa800) AM_READWRITE(mux_r, mux_w)
 	AM_RANGE(0xa801, 0xa801) AM_WRITE(mux_ctrl_w) AM_READNOP    // Watchdog or interrupt ack (value ignored)
 ADDRESS_MAP_END
@@ -726,7 +721,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( kurikint_2_map, AS_PROGRAM, 8, taitol_2cpu_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0xe000, 0xe7ff) AM_DEVREADWRITE("dpram", mb8421_device, left_r, left_w)
 	AM_RANGE(0xe800, 0xe801) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
 ADDRESS_MAP_END
 
@@ -763,10 +758,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( palamed_map, AS_PROGRAM, 8, taitol_1cpu_state )
 	COMMON_BANKS_MAP
 	COMMON_SINGLE_MAP
-	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("IN0")
-	AM_RANGE(0xa801, 0xa801) AM_READ_PORT("IN1")
-	AM_RANGE(0xa802, 0xa802) AM_READ_PORT("IN2")
-	AM_RANGE(0xa803, 0xa803) AM_WRITENOP    // Control register, function unknown
+	AM_RANGE(0xa800, 0xa803) AM_DEVREADWRITE("ppi", i8255_device, read, write)
 	AM_RANGE(0xb000, 0xb000) AM_WRITENOP    // Control register, function unknown (copy of 8822)
 	AM_RANGE(0xb001, 0xb001) AM_READNOP // Watchdog or interrupt ack
 ADDRESS_MAP_END
@@ -775,10 +767,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cachat_map, AS_PROGRAM, 8, taitol_1cpu_state )
 	COMMON_BANKS_MAP
 	COMMON_SINGLE_MAP
-	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("IN0")
-	AM_RANGE(0xa801, 0xa801) AM_READ_PORT("IN1")
-	AM_RANGE(0xa802, 0xa802) AM_READ_PORT("IN2")
-	AM_RANGE(0xa803, 0xa803) AM_WRITENOP    // Control register, function unknown
+	AM_RANGE(0xa800, 0xa803) AM_DEVREADWRITE("ppi", i8255_device, read, write)
 	AM_RANGE(0xb000, 0xb000) AM_WRITENOP    // Control register, function unknown
 	AM_RANGE(0xb001, 0xb001) AM_READNOP // Watchdog or interrupt ack (value ignored)
 	AM_RANGE(0xfff8, 0xfff8) AM_READWRITE(rombankswitch_r, rombankswitch_w)
@@ -799,19 +788,14 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( evilston_map, AS_PROGRAM, 8, taitol_2cpu_state )
 	COMMON_BANKS_MAP
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("DSWA") AM_WRITENOP   //watchdog ?
-	AM_RANGE(0xa801, 0xa801) AM_READ_PORT("DSWB")
-	AM_RANGE(0xa802, 0xa802) AM_READ_PORT("IN0")
-	AM_RANGE(0xa803, 0xa803) AM_READ_PORT("IN1")
-	AM_RANGE(0xa804, 0xa804) AM_WRITENOP    //coin couters/locks ?
-	AM_RANGE(0xa807, 0xa807) AM_READ_PORT("IN2")
+	AM_RANGE(0xa000, 0xa7ff) AM_DEVREADWRITE("dpram", mb8421_device, right_r, right_w)
+	AM_RANGE(0xa800, 0xa807) AM_DEVREADWRITE("tc0510nio", tc0510nio_device, read, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( evilston_2_map, AS_PROGRAM, 8, taitol_2cpu_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0xe000, 0xe7ff) AM_DEVREADWRITE("dpram", mb8421_device, left_r, left_w)
 	AM_RANGE(0xe800, 0xe801) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
 	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("bank7")
 ADDRESS_MAP_END
@@ -1586,8 +1570,8 @@ static INPUT_PORTS_START( evilston )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(4)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(4)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1)
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
@@ -1682,6 +1666,13 @@ static MACHINE_CONFIG_START( fhawk )
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
+	MCFG_DEVICE_ADD("tc0220ioc", TC0220IOC, 0)
+	MCFG_TC0220IOC_READ_0_CB(IOPORT("DSWA"))
+	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
+	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
+	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
+
 	MCFG_MACHINE_START_OVERRIDE(taitol_state, taito_l)
 	MCFG_MACHINE_RESET_OVERRIDE(taitol_state, taito_l)
 
@@ -1755,6 +1746,10 @@ static MACHINE_CONFIG_DERIVED( raimais, fhawk )
 	MCFG_CPU_MODIFY("slave")
 	MCFG_CPU_PROGRAM_MAP(raimais_2_map)
 
+	MCFG_DEVICE_REMOVE("tc0220ioc") // I/O chip is a TC0040IOC
+
+	MCFG_DEVICE_ADD("dpram", MB8421, 0)
+
 	/* sound hardware */
 	MCFG_SOUND_REPLACE("ymsnd", YM2610, XTAL_8MHz)      /* verified on pcb (8Mhz OSC is also for the 2nd z80) */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -1778,6 +1773,8 @@ static MACHINE_CONFIG_START( kurikint )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitol_state, irq0_line_hold)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+
+	MCFG_DEVICE_ADD("dpram", MB8421, 0)
 
 	MCFG_MACHINE_START_OVERRIDE(taitol_state, taito_l)
 	MCFG_MACHINE_RESET_OVERRIDE(taitol_state, taito_l)
@@ -1888,6 +1885,11 @@ static MACHINE_CONFIG_DERIVED( palamed, plotting )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(palamed_map)
 
+	MCFG_DEVICE_ADD("ppi", I8255, 0) // Toshiba TMP8255AP-5
+	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
+
 	MCFG_MACHINE_RESET_OVERRIDE(taitol_1cpu_state, palamed)
 MACHINE_CONFIG_END
 
@@ -1897,6 +1899,11 @@ static MACHINE_CONFIG_DERIVED( cachat, plotting )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(cachat_map)
+
+	MCFG_DEVICE_ADD("ppi", I8255, 0) // NEC D70155C
+	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
 
 	MCFG_MACHINE_RESET_OVERRIDE(taitol_1cpu_state, cachat)
 MACHINE_CONFIG_END
@@ -1912,9 +1919,18 @@ static MACHINE_CONFIG_START( evilston )
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_12MHz/3)     /* not verified */
 	MCFG_CPU_PROGRAM_MAP(evilston_2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitol_state, irq0_line_hold)
-	MCFG_CPU_PERIODIC_INT_DRIVER(taitol_state, nmi_line_pulse, 60)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+
+	MCFG_DEVICE_ADD("tc0510nio", TC0510NIO, 0)
+	MCFG_TC0510NIO_READ_0_CB(IOPORT("DSWA"))
+	MCFG_TC0510NIO_READ_1_CB(IOPORT("DSWB"))
+	MCFG_TC0510NIO_READ_2_CB(IOPORT("IN0"))
+	MCFG_TC0510NIO_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0510NIO_READ_7_CB(IOPORT("IN2"))
+
+	MCFG_DEVICE_ADD("dpram", MB8421, 0)
+	MCFG_MB8421_INTL_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_MACHINE_START_OVERRIDE(taitol_state, taito_l)
 	MCFG_MACHINE_RESET_OVERRIDE(taitol_state, taito_l)
@@ -2567,4 +2583,4 @@ GAME( 1992, lagirl,    plgirls,  cachat,    plgirls,   taitol_1cpu_state, 0,    
 GAME( 1993, plgirls2,  0,        cachat,    plgirls2,  taitol_1cpu_state, 0,         ROT270, "Hot-B", "Play Girls 2", 0 )
 GAME( 1993, plgirls2b, plgirls2, cachat,    plgirls2,  taitol_1cpu_state, 0,         ROT270, "bootleg", "Play Girls 2 (bootleg)", MACHINE_IMPERFECT_GRAPHICS ) // bootleg hardware (regular Z80 etc. instead of TC0090LVC, but acts almost the same - scroll offset problems)
 
-GAME( 1990, evilston,  0,        evilston,  evilston,  taitol_2cpu_state, 0,         ROT270, "Spacy Industrial, Ltd.", "Evil Stone", MACHINE_IMPERFECT_SOUND ) // not Taito PCB, just uses TC0090LVC
+GAME( 1990, evilston,  0,        evilston,  evilston,  taitol_2cpu_state, 0,         ROT270, "Spacy Industrial, Ltd.", "Evil Stone", 0 )

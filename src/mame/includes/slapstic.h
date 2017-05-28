@@ -16,9 +16,6 @@
 
 #pragma once
 
-#include "cpu/m6800/m6800.h"
-#include "cpu/m68000/m68000.h"
-
 
 DECLARE_DEVICE_TYPE(SLAPSTIC, atari_slapstic_device)
 

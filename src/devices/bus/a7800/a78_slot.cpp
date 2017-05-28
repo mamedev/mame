@@ -468,15 +468,6 @@ image_init_result a78_cart_slot_device::call_load()
 }
 
 
-void a78_partialhash(util::hash_collection &dest, const unsigned char *data,
-						unsigned long length, const char *functions)
-{
-	if (length <= 128)
-		return;
-	dest.compute(&data[128], length - 128, functions);
-}
-
-
 /*-------------------------------------------------
  call_unload
  -------------------------------------------------*/

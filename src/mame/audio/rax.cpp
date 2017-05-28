@@ -464,13 +464,28 @@ WRITE32_MEMBER(acclaim_rax_device::dmovlay_callback)
 }
 
 
-/*************************************
- *
- *  Machine Driver
- *
- *************************************/
+DEFINE_DEVICE_TYPE(ACCLAIM_RAX, acclaim_rax_device, "rax_audio", "Acclaim RAX")
 
-MACHINE_CONFIG_START( rax )
+//-------------------------------------------------
+//  acclaim_rax_device - constructor
+//-------------------------------------------------
+
+acclaim_rax_device::acclaim_rax_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, ACCLAIM_RAX, tag, owner, clock)
+	, m_cpu(*this, "adsp")
+	, m_adsp_pram(*this, "adsp_pram")
+	, m_adsp_data_bank(*this, "databank")
+	, m_data_in(*this, "data_in")
+	, m_data_out(*this, "data_out")
+{
+
+}
+
+//-------------------------------------------------
+// device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( acclaim_rax_device::device_add_mconfig )
 	MCFG_CPU_ADD("adsp", ADSP2181, XTAL_16_67MHz)
 	MCFG_ADSP21XX_SPORT_TX_CB(WRITE32(acclaim_rax_device, adsp_sound_tx_callback))      /* callback for serial transmit */
 	MCFG_ADSP21XX_DMOVLAY_CB(WRITE32(acclaim_rax_device, dmovlay_callback)) // callback for adsp 2181 dmovlay instruction
@@ -492,32 +507,4 @@ MACHINE_CONFIG_START( rax )
 	MCFG_SOUND_ADD("dacr", DMADAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
-
-
-DEFINE_DEVICE_TYPE(ACCLAIM_RAX, acclaim_rax_device, "rax_audio", "Acclaim RAX")
-
-//-------------------------------------------------
-//  acclaim_rax_device - constructor
-//-------------------------------------------------
-
-acclaim_rax_device::acclaim_rax_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ACCLAIM_RAX, tag, owner, clock)
-	, m_cpu(*this, "adsp")
-	, m_adsp_pram(*this, "adsp_pram")
-	, m_adsp_data_bank(*this, "databank")
-	, m_data_in(*this, "data_in")
-	, m_data_out(*this, "data_out")
-{
-
-}
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor acclaim_rax_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( rax );
-}
 

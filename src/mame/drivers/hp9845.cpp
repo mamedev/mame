@@ -1372,7 +1372,7 @@ INPUT_PORTS_END
 
 hp9845ct_base_state::hp9845ct_base_state(const machine_config &mconfig, device_type type, const char *tag)
 	: hp9845_base_state(mconfig , type , tag),
-      m_io_softkeys(*this, "SOFTKEYS"),
+	  m_io_softkeys(*this, "SOFTKEYS"),
 	  m_lightpen_x(*this, "LIGHTPENX"),
 	  m_lightpen_y(*this, "LIGHTPENY"),
 	  m_lightpen_sw(*this, "GKEY")
@@ -2787,7 +2787,7 @@ READ16_MEMBER(hp9845t_state::graphic_r)
 		}
 		// TODO: gsr/
 		if (m_gv_sk_status) {
-			BIT_SET(res, 1);	// Softkey service request
+			BIT_SET(res, 1);    // Softkey service request
 		}
 		BIT_SET(res, 9);        // ID
 		BIT_SET(res, 11);       // ID
@@ -3258,10 +3258,10 @@ void hp9845t_state::advance_gv_fsm(bool ds , bool trigger)
 				break;
 			case 0xc:   // load color mask (no effect, just for compatibility with 9845c), takes a single word as parameter
 				break;
-			case 0xe:	// Y cursor position
+			case 0xe:   // Y cursor position
 				m_gv_lyc = m_gv_data_w;
 				break;
-			case 0xf:	// X cursor position
+			case 0xf:   // X cursor position
 				m_gv_lxc = m_gv_data_w;
 				break;
 			default:

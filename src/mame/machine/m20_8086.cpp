@@ -55,17 +55,12 @@ static ADDRESS_MAP_START(i86_io, AS_IO, 16, m20_8086_device)
 	AM_RANGE(0x7ffa, 0x7ffd) AM_WRITE(handshake_w)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( m20_8086 )
+MACHINE_CONFIG_MEMBER( m20_8086_device::device_add_mconfig )
 	MCFG_CPU_ADD("8086", I8086, XTAL_24MHz/3)
 	MCFG_CPU_PROGRAM_MAP(i86_prog)
 	MCFG_CPU_IO_MAP(i86_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(m20_8086_device, int_cb)
 MACHINE_CONFIG_END
-
-machine_config_constructor m20_8086_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( m20_8086 );
-}
 
 READ16_MEMBER(m20_8086_device::z8000_io_r)
 {

@@ -67,6 +67,7 @@ Notes:
 #include "emu.h"
 #include "cpu/h8/h83048.h"
 #include "machine/nvram.h"
+#include "video/ramdac.h"
 #include "screen.h"
 
 
@@ -80,9 +81,35 @@ public:
 		m_palette(*this, "palette")
 		{ }
 
+	/* memory */
+	DECLARE_WRITE16_MEMBER(hi_w);
+	DECLARE_WRITE16_MEMBER(x_w);
+	DECLARE_WRITE16_MEMBER(yw_w);
+	DECLARE_WRITE16_MEMBER(h_w);
+	DECLARE_WRITE16_MEMBER(sx_w);
+	DECLARE_WRITE16_MEMBER(sy_w);
+	DECLARE_WRITE16_MEMBER(sr_w);
+	DECLARE_WRITE16_MEMBER(sd_w);
+	DECLARE_WRITE16_MEMBER(blit_w);
+	DECLARE_WRITE16_MEMBER(dest_w);
+	DECLARE_READ16_MEMBER(c00000_r);
+	DECLARE_READ16_MEMBER(c00002_r);
+	DECLARE_READ16_MEMBER(c00004_r);
+	DECLARE_READ16_MEMBER(c00006_r);
+	DECLARE_WRITE16_MEMBER(c00006_w);
+	DECLARE_READ16_MEMBER(sound_r);
+	DECLARE_WRITE16_MEMBER(sound_w);
+	DECLARE_DRIVER_INIT(lastfght);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
 	/* video-related */
 	bitmap_ind16 m_bitmap[2];
-	int m_clr_offset;
 	int m_dest;
 	int m_hi;
 	int m_sx;
@@ -97,8 +124,10 @@ public:
 	int m_y;
 	int m_w;
 	int m_h;
+#ifdef MAME_DEBUG
 	unsigned m_base;
 	int m_view_roms;
+#endif
 
 	/* misc */
 	uint16_t m_c00006;
@@ -107,32 +136,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-
-	/* memory */
-	uint8_t   m_colorram[256 * 3];
-	DECLARE_WRITE16_MEMBER(colordac_w);
-	DECLARE_WRITE16_MEMBER(lastfght_hi_w);
-	DECLARE_WRITE16_MEMBER(lastfght_x_w);
-	DECLARE_WRITE16_MEMBER(lastfght_yw_w);
-	DECLARE_WRITE16_MEMBER(lastfght_h_w);
-	DECLARE_WRITE16_MEMBER(lastfght_sx_w);
-	DECLARE_WRITE16_MEMBER(lastfght_sy_w);
-	DECLARE_WRITE16_MEMBER(lastfght_sr_w);
-	DECLARE_WRITE16_MEMBER(lastfght_sd_w);
-	DECLARE_WRITE16_MEMBER(lastfght_blit_w);
-	DECLARE_WRITE16_MEMBER(lastfght_dest_w);
-	DECLARE_READ16_MEMBER(lastfght_c00000_r);
-	DECLARE_READ16_MEMBER(lastfght_c00002_r);
-	DECLARE_READ16_MEMBER(lastfght_c00004_r);
-	DECLARE_READ16_MEMBER(lastfght_c00006_r);
-	DECLARE_WRITE16_MEMBER(lastfght_c00006_w);
-	DECLARE_READ16_MEMBER(lastfght_sound_r);
-	DECLARE_WRITE16_MEMBER(lastfght_sound_w);
-	DECLARE_DRIVER_INIT(lastfght);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	uint32_t screen_update_lastfght(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -148,11 +151,10 @@ void lastfght_state::video_start()
 
 	save_item(NAME(m_bitmap[0]));
 	save_item(NAME(m_bitmap[1]));
-	save_item(NAME(m_colorram));
 }
 
 
-uint32_t lastfght_state::screen_update_lastfght(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t lastfght_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 #ifdef MAME_DEBUG
 #if 1
@@ -191,141 +193,121 @@ uint32_t lastfght_state::screen_update_lastfght(screen_device &screen, bitmap_in
 	return 0;
 }
 
-// Palette: HMC HM86171 VGA 256 colour RAMDAC
-
-WRITE16_MEMBER(lastfght_state::colordac_w)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		m_colorram[m_clr_offset] = data;
-		m_palette->set_pen_color(m_clr_offset / 3,
-			pal6bit(m_colorram[(m_clr_offset / 3) * 3 + 0]),
-			pal6bit(m_colorram[(m_clr_offset / 3) * 3 + 1]),
-			pal6bit(m_colorram[(m_clr_offset / 3) * 3 + 2])
-		);
-		m_clr_offset = (m_clr_offset + 1) % (256 * 3);
-	}
-	if (ACCESSING_BITS_8_15)
-	{
-		m_clr_offset = (data >> 8) * 3;
-	}
-}
-
 //  Blitter (supports zooming)
 
 // high byte of a 16 bit register
-WRITE16_MEMBER(lastfght_state::lastfght_hi_w)
+WRITE16_MEMBER(lastfght_state::hi_w)
 {
 	if (ACCESSING_BITS_8_15)
 		logerror("%06x: 600000.b = %02x\n", space.device().safe_pc(), data >> 8);
 	if (ACCESSING_BITS_0_7)
 	{
 		m_hi = data << 8;
-		//logerror("%06x: lastfght_hi  = %02x\n", space.device().safe_pc(), data);
+		//logerror("%06x: hi  = %02x\n", space.device().safe_pc(), data);
 	}
 }
 
 // screen x
-WRITE16_MEMBER(lastfght_state::lastfght_x_w)
+WRITE16_MEMBER(lastfght_state::x_w)
 {
 	if (ACCESSING_BITS_8_15)
 		logerror("%06x: 800008.b = %02x\n", space.device().safe_pc(), data >> 8);
 	if (ACCESSING_BITS_0_7)
 	{
 		m_x = m_hi | data;
-		//logerror("%06x: lastfght_x   = %02x\n", space.device().safe_pc(),data);
+		//logerror("%06x: x   = %02x\n", space.device().safe_pc(),data);
 	}
 }
 
 // screen y, screen width - 1
-WRITE16_MEMBER(lastfght_state::lastfght_yw_w)
+WRITE16_MEMBER(lastfght_state::yw_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
 		m_y = m_hi | (data >> 8);
-		//logerror("%06x: lastfght_y   = %02x\n", space.device().safe_pc(), data >> 8);
+		//logerror("%06x: y   = %02x\n", space.device().safe_pc(), data >> 8);
 	}
 	if (ACCESSING_BITS_0_7)
 	{
 		m_w = m_hi | data;
-		//logerror("%06x: lastfght_w   = %02x\n", space.device().safe_pc(), data);
+		//logerror("%06x: w   = %02x\n", space.device().safe_pc(), data);
 	}
 }
 
 // screen height - 1
-WRITE16_MEMBER(lastfght_state::lastfght_h_w)
+WRITE16_MEMBER(lastfght_state::h_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
 		m_h = m_hi | (data >> 8);
-		//logerror("%06x: lastfght_h   = %02x\n", space.device().safe_pc(), data >> 8);
+		//logerror("%06x: h   = %02x\n", space.device().safe_pc(), data >> 8);
 	}
 	if (ACCESSING_BITS_0_7)
 		logerror("%06x: 80000d.b = %02x\n", space.device().safe_pc(), data);
 }
 
 // source delta x << 6, source x << 6
-WRITE16_MEMBER(lastfght_state::lastfght_sx_w)
+WRITE16_MEMBER(lastfght_state::sx_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
 		m_dsx = m_hi | (data >> 8);
-		//logerror("%06x: lastfght_dsx = %02x\n", space.device().safe_pc(), data >> 8);
+		//logerror("%06x: dsx = %02x\n", space.device().safe_pc(), data >> 8);
 	}
 	if (ACCESSING_BITS_0_7)
 	{
 		m_sx = m_hi | data;
-		//logerror("%06x: lastfght_sx  = %02x\n", space.device().safe_pc(), data);
+		//logerror("%06x: sx  = %02x\n", space.device().safe_pc(), data);
 	}
 }
 
 // source y << 6, source y1 << 6
-WRITE16_MEMBER(lastfght_state::lastfght_sy_w)
+WRITE16_MEMBER(lastfght_state::sy_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
 		m_sy = m_hi | (data >> 8);
-		//logerror("%06x: lastfght_sy  = %02x\n", space.device().safe_pc(), data >> 8);
+		//logerror("%06x: sy  = %02x\n", space.device().safe_pc(), data >> 8);
 	}
 	if (ACCESSING_BITS_0_7)
 	{
 		m_sy1 = m_hi | data;
-		//logerror("%06x: lastfght_sy1 = %02x\n", space.device().safe_pc(), data);
+		//logerror("%06x: sy1 = %02x\n", space.device().safe_pc(), data);
 	}
 }
 
 // source rom (0x200000 bytes), source page (512x256 bytes)
-WRITE16_MEMBER(lastfght_state::lastfght_sr_w)
+WRITE16_MEMBER(lastfght_state::sr_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
 		m_sp = (m_hi >> 8) >> 4;
-		//logerror("%06x: lastfght_sp  = %02x\n", space.device().safe_pc(), data >> 8);
+		//logerror("%06x: sp  = %02x\n", space.device().safe_pc(), data >> 8);
 	}
 	if (ACCESSING_BITS_0_7)
 	{
 		m_sr = data;
-		//logerror("%06x: lastfght_sr  = %02x\n", space.device().safe_pc(), data);
+		//logerror("%06x: sr  = %02x\n", space.device().safe_pc(), data);
 	}
 }
 
 // source x1 << 6, source delta y << 6
-WRITE16_MEMBER(lastfght_state::lastfght_sd_w)
+WRITE16_MEMBER(lastfght_state::sd_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
 		m_sx1 = m_hi | (data >> 8);
-		//logerror("%06x: lastfght_sx1 = %02x\n", space.device().safe_pc(), data >> 8);
+		//logerror("%06x: sx1 = %02x\n", space.device().safe_pc(), data >> 8);
 	}
 	if (ACCESSING_BITS_0_7)
 	{
 		m_dsy = m_hi | data;
-		//logerror("%06x: lastfght_dsy = %02x\n", space.device().safe_pc(), data);
+		//logerror("%06x: dsy = %02x\n", space.device().safe_pc(), data);
 	}
 }
 
 // start blit
-WRITE16_MEMBER(lastfght_state::lastfght_blit_w)
+WRITE16_MEMBER(lastfght_state::blit_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -362,13 +344,13 @@ WRITE16_MEMBER(lastfght_state::lastfght_blit_w)
 }
 
 // toggle framebuffer
-WRITE16_MEMBER(lastfght_state::lastfght_dest_w)
+WRITE16_MEMBER(lastfght_state::dest_w)
 {
 	if (ACCESSING_BITS_0_7)
 		m_dest ^= 1;
 }
 
-READ16_MEMBER(lastfght_state::lastfght_c00000_r)
+READ16_MEMBER(lastfght_state::c00000_r)
 {
 	// high byte:
 	// bit 7 = blitter busy
@@ -377,19 +359,19 @@ READ16_MEMBER(lastfght_state::lastfght_c00000_r)
 
 }
 
-READ16_MEMBER(lastfght_state::lastfght_c00002_r)
+READ16_MEMBER(lastfght_state::c00002_r)
 {
 	// high byte:
 	// mask 0x1c: from sound?
 	return (machine().rand() & 0x1c00) | ioport("IN0")->read();
 }
 
-READ16_MEMBER(lastfght_state::lastfght_c00004_r)
+READ16_MEMBER(lastfght_state::c00004_r)
 {
 	return ioport("IN1")->read();
 }
 
-READ16_MEMBER(lastfght_state::lastfght_c00006_r)
+READ16_MEMBER(lastfght_state::c00006_r)
 {
 	// low byte:
 	// bit 7 = protection?
@@ -397,20 +379,20 @@ READ16_MEMBER(lastfght_state::lastfght_c00006_r)
 	return ioport("IN2")->read();
 }
 
-WRITE16_MEMBER(lastfght_state::lastfght_c00006_w)
+WRITE16_MEMBER(lastfght_state::c00006_w)
 {
 	COMBINE_DATA(&m_c00006);
 	//  popmessage("%04x", m_c00006);
 }
 
-READ16_MEMBER(lastfght_state::lastfght_sound_r)
+READ16_MEMBER(lastfght_state::sound_r)
 {
 	// low byte:
 	// bit 3
 	return 8;
 }
 
-WRITE16_MEMBER(lastfght_state::lastfght_sound_w)
+WRITE16_MEMBER(lastfght_state::sound_w)
 {
 	if (ACCESSING_BITS_8_15)
 		logerror("%06x: sound_w msb = %02x\n", space.device().safe_pc(), data >> 8);
@@ -430,28 +412,32 @@ static ADDRESS_MAP_START( lastfght_map, AS_PROGRAM, 16, lastfght_state )
 
 	AM_RANGE( 0x200000, 0x20ffff ) AM_RAM AM_SHARE("nvram") // battery
 
-	AM_RANGE( 0x600000, 0x600001 ) AM_WRITE(lastfght_hi_w )
-	AM_RANGE( 0x600002, 0x600003 ) AM_READWRITE(lastfght_sound_r, lastfght_sound_w )
-	AM_RANGE( 0x600006, 0x600007 ) AM_WRITE(lastfght_blit_w )
-	AM_RANGE( 0x600008, 0x600009 ) AM_WRITE(colordac_w )
-	AM_RANGE( 0x60000a, 0x60000b ) AM_WRITENOP  // colordac?
+	AM_RANGE( 0x600000, 0x600001 ) AM_WRITE(hi_w )
+	AM_RANGE( 0x600002, 0x600003 ) AM_READWRITE(sound_r, sound_w )
+	AM_RANGE( 0x600006, 0x600007 ) AM_WRITE(blit_w )
+	AM_RANGE( 0x600008, 0x600009 ) AM_DEVWRITE8("ramdac", ramdac_device, pal_w, 0x00ff )
+	AM_RANGE( 0x600008, 0x600009 ) AM_DEVWRITE8("ramdac", ramdac_device, index_w, 0xff00 )
+	AM_RANGE( 0x60000a, 0x60000b ) AM_DEVWRITE8("ramdac", ramdac_device, mask_w, 0xff00 )
 
-	AM_RANGE( 0x800000, 0x800001 ) AM_WRITE(lastfght_sx_w )
-	AM_RANGE( 0x800002, 0x800003 ) AM_WRITE(lastfght_sd_w )
-	AM_RANGE( 0x800004, 0x800005 ) AM_WRITE(lastfght_sy_w )
-	AM_RANGE( 0x800006, 0x800007 ) AM_WRITE(lastfght_sr_w )
-	AM_RANGE( 0x800008, 0x800009 ) AM_WRITE(lastfght_x_w )
-	AM_RANGE( 0x80000a, 0x80000b ) AM_WRITE(lastfght_yw_w )
-	AM_RANGE( 0x80000c, 0x80000d ) AM_WRITE(lastfght_h_w )
+	AM_RANGE( 0x800000, 0x800001 ) AM_WRITE(sx_w )
+	AM_RANGE( 0x800002, 0x800003 ) AM_WRITE(sd_w )
+	AM_RANGE( 0x800004, 0x800005 ) AM_WRITE(sy_w )
+	AM_RANGE( 0x800006, 0x800007 ) AM_WRITE(sr_w )
+	AM_RANGE( 0x800008, 0x800009 ) AM_WRITE(x_w )
+	AM_RANGE( 0x80000a, 0x80000b ) AM_WRITE(yw_w )
+	AM_RANGE( 0x80000c, 0x80000d ) AM_WRITE(h_w )
 
-	AM_RANGE( 0x800014, 0x800015 ) AM_WRITE(lastfght_dest_w )
+	AM_RANGE( 0x800014, 0x800015 ) AM_WRITE(dest_w )
 
-	AM_RANGE( 0xc00000, 0xc00001 ) AM_READ(lastfght_c00000_r )
-	AM_RANGE( 0xc00002, 0xc00003 ) AM_READ(lastfght_c00002_r )
-	AM_RANGE( 0xc00004, 0xc00005 ) AM_READ(lastfght_c00004_r )
-	AM_RANGE( 0xc00006, 0xc00007 ) AM_READWRITE(lastfght_c00006_r, lastfght_c00006_w )
+	AM_RANGE( 0xc00000, 0xc00001 ) AM_READ(c00000_r )
+	AM_RANGE( 0xc00002, 0xc00003 ) AM_READ(c00002_r )
+	AM_RANGE( 0xc00004, 0xc00005 ) AM_READ(c00004_r )
+	AM_RANGE( 0xc00006, 0xc00007 ) AM_READWRITE(c00006_r, c00006_w )
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( ramdac_map, AS_0, 8, lastfght_state )
+	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac", ramdac_device, ramdac_pal_r, ramdac_rgb666_w)
+ADDRESS_MAP_END
 
 /***************************************************************************
                                 Input Ports
@@ -523,7 +509,6 @@ INPUT_PORTS_END
 
 void lastfght_state::machine_start()
 {
-	save_item(NAME(m_clr_offset));
 	save_item(NAME(m_dest));
 	save_item(NAME(m_hi));
 	save_item(NAME(m_sx));
@@ -543,7 +528,6 @@ void lastfght_state::machine_start()
 
 void lastfght_state::machine_reset()
 {
-	m_clr_offset = 0;
 	m_dest = 0;
 	m_hi = 0;
 	m_sx = 0;
@@ -574,11 +558,13 @@ static MACHINE_CONFIG_START( lastfght )
 	/* video hardware */
 	MCFG_PALETTE_ADD( "palette", 256 )
 
+	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette") // HMC HM86171 VGA 256 colour RAMDAC
+
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_SIZE( 512, 256 )
 	MCFG_SCREEN_VISIBLE_AREA( 0, 512-1, 0, 256-16-1 )
 	MCFG_SCREEN_REFRESH_RATE( 60 )
-	MCFG_SCREEN_UPDATE_DRIVER(lastfght_state, screen_update_lastfght)
+	MCFG_SCREEN_UPDATE_DRIVER(lastfght_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 MACHINE_CONFIG_END
 

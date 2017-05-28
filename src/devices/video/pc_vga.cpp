@@ -2228,29 +2228,18 @@ MACHINE_CONFIG_START( pcvideo_s3_vga )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( ati_vga )
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( ati_vga_device::device_add_mconfig )
 	MCFG_MACH8_ADD_OWNER("8514a")
 	MCFG_EEPROM_SERIAL_93C46_ADD("ati_eeprom")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( s3_764 )
+MACHINE_CONFIG_MEMBER( s3_vga_device::device_add_mconfig )
 	MCFG_8514A_ADD_OWNER("8514a")
 MACHINE_CONFIG_END
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor ati_vga_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( ati_vga );
-}
-
-machine_config_constructor s3_vga_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( s3_764 );
-}
 
 /******************************************
 

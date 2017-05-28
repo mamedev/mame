@@ -6,7 +6,7 @@
 
 #pragma once
 
-#define MCFG_K054321_ADD(_tag, _left, _right)	\
+#define MCFG_K054321_ADD(_tag, _left, _right)   \
 	MCFG_DEVICE_ADD(_tag, K054321, 0) \
 	downcast<k054321_device *>(device)->set_gain_devices(_left, _right);
 

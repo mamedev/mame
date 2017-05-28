@@ -1252,7 +1252,7 @@ ROM_START( mtrapb2 )
 	ROM_LOAD( "ms10.2m",   0xb000, 0x1000, CRC(d7378af9) SHA1(44c8ba4c84f51306e5bdd64e6c255d1c1018db72) )
 	ROM_LOAD( "ms9.2l",    0xc000, 0x1000, CRC(be667e64) SHA1(c5f686e3c403691f14992354af690dc89e1722f7) )
 	ROM_LOAD( "ms8.2k",    0xd000, 0x1000, CRC(de0442f8) SHA1(61774921adf016b3a2ae18baa79af60dca2d9e45) )
-	ROM_LOAD( "ms6.2f",    0xe000, 0x1000, CRC(cdf8c6a8) SHA1(932ae9c0ea5700bd79862efa94742136d8e15641) )
+	ROM_LOAD( "ms7.2h",    0xe000, 0x1000, CRC(cdf8c6a8) SHA1(932ae9c0ea5700bd79862efa94742136d8e15641) )
 	ROM_LOAD( "ms6.2f",    0xf000, 0x1000, CRC(77d3f2e6) SHA1(2c21dd7ee326ccb41d3c64eec90a19198382edea) )
 
 	ROM_REGION( 0x8000, "audiocpu", 0 )
@@ -1663,12 +1663,12 @@ GAME( 1981, mtrapb2,  mtrap,   mtrap,    mtrap,    exidy_state, mtrap,    ROT0, 
 GAME( 1981, venture,  0,       venture,  venture,  exidy_state, venture,  ROT0, "Exidy",   "Venture (version 5 set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, venture2, venture, venture,  venture,  exidy_state, venture,  ROT0, "Exidy",   "Venture (version 5 set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, venture4, venture, venture,  venture,  exidy_state, venture,  ROT0, "Exidy",   "Venture (version 4)", MACHINE_SUPPORTS_SAVE )
-                                                   
+
 GAME( 1982, teetert,  0,       teetert,  teetert,  exidy_state, teetert,  ROT0, "Exidy",   "Teeter Torture (prototype)", MACHINE_SUPPORTS_SAVE )
-                                                   
+
 GAME( 1982, pepper2,  0,       pepper2,  pepper2,  exidy_state, pepper2,  ROT0, "Exidy",   "Pepper II (version 8)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, pepper27, pepper2, pepper2,  pepper2,  exidy_state, pepper2,  ROT0, "Exidy",   "Pepper II (version 7)", MACHINE_SUPPORTS_SAVE )
-                                                   
+
 GAME( 1982, hardhat,  0,       pepper2,  pepper2,  exidy_state, pepper2,  ROT0, "Exidy",   "Hard Hat", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1983, fax,      0,       fax,      fax,      exidy_state, fax,      ROT0, "Exidy",   "FAX", MACHINE_SUPPORTS_SAVE )

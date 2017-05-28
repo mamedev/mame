@@ -40,7 +40,11 @@
 #include "handset.h"
 #include "mecmouse.h"
 
-ti99_joyport_device::ti99_joyport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+DEFINE_DEVICE_TYPE_NS(TI99_JOYPORT, bus::ti99::joyport, joyport_device, "ti99_joyport", "TI-99 Joystick port")
+
+namespace bus { namespace ti99 { namespace joyport {
+
+joyport_device::joyport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	:   device_t(mconfig, TI99_JOYPORT, tag, owner, clock),
 		device_slot_interface(mconfig, *this),
 		m_interrupt(*this), m_connected(nullptr)
@@ -50,7 +54,7 @@ ti99_joyport_device::ti99_joyport_device(const machine_config &mconfig, const ch
 /*
     Reads a value from the port.
 */
-uint8_t ti99_joyport_device::read_port()
+uint8_t joyport_device::read_port()
 {
 	return m_connected->read_dev();
 }
@@ -59,7 +63,7 @@ uint8_t ti99_joyport_device::read_port()
     This is used to select the device at the port. The device should keep this
     value until read() is called.
 */
-void ti99_joyport_device::write_port(int data)
+void joyport_device::write_port(int data)
 {
 	m_connected->write_dev(data);
 }
@@ -67,7 +71,7 @@ void ti99_joyport_device::write_port(int data)
 /*
     This is only used for the handset device of the TI-99/4. It is driven by the VDP interrupt.
 */
-void ti99_joyport_device::pulse_clock()
+void joyport_device::pulse_clock()
 {
 	m_connected->pulse_clock();
 }
@@ -76,17 +80,17 @@ void ti99_joyport_device::pulse_clock()
     Propagate the interrupt to the defined target. Only used for the handset
     at the prototype 99/4.
 */
-WRITE_LINE_MEMBER( ti99_joyport_device::set_interrupt )
+WRITE_LINE_MEMBER( joyport_device::set_interrupt )
 {
 	m_interrupt(state);
 }
 
-void ti99_joyport_device::device_start()
+void joyport_device::device_start()
 {
 	m_interrupt.resolve();
 }
 
-void ti99_joyport_device::device_config_complete()
+void joyport_device::device_config_complete()
 {
 	m_connected = dynamic_cast<device_ti99_joyport_interface*>(subdevices().first());
 }
@@ -95,8 +99,10 @@ void ti99_joyport_device::device_config_complete()
 
 void device_ti99_joyport_interface::interface_config_complete()
 {
-	m_joyport = dynamic_cast<ti99_joyport_device*>(device().owner());
+	m_joyport = dynamic_cast<joyport_device*>(device().owner());
 }
+
+} } } // end namespace bus::ti99::joyport
 
 SLOT_INTERFACE_START( ti99_joystick_port )
 	SLOT_INTERFACE("twinjoy", TI99_JOYSTICK)
@@ -113,4 +119,3 @@ SLOT_INTERFACE_START( ti99_joystick_port_994 )
 	SLOT_INTERFACE("handset", TI99_HANDSET)
 SLOT_INTERFACE_END
 
-DEFINE_DEVICE_TYPE(TI99_JOYPORT, ti99_joyport_device, "ti99_joyport", "TI-99 Joystick port")

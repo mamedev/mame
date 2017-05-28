@@ -10813,7 +10813,7 @@ ROM_END
 
 ROM_START( dinoa ) // only 22 and 23 in the romset. Seems to come from an official capcom board but no PCB scans / pics available.
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
-	ROM_LOAD16_WORD_SWAP( "23.bin",     0x000000, 0x80000, CRC(f477f7a0) SHA1(bad4979093ced8ae09273454c80de704b798e590) ) 
+	ROM_LOAD16_WORD_SWAP( "23.bin",     0x000000, 0x80000, CRC(f477f7a0) SHA1(bad4979093ced8ae09273454c80de704b798e590) )
 	ROM_LOAD16_WORD_SWAP( "22.bin",     0x080000, 0x80000, CRC(1e534ca5) SHA1(8233a1a5de2a1fdd2b1c2b8616eda29db4be725a) )
 	ROM_LOAD16_WORD_SWAP( "cdj_21a.6f", 0x100000, 0x80000, CRC(66d23de2) SHA1(19b8a365f630411d524d055459020f4c8cf930f1) )   // == cde_21a.6f
 

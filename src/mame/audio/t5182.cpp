@@ -366,22 +366,12 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_START( t5182 )
+// device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START( t5182 )
+MACHINE_CONFIG_MEMBER( t5182_device::device_add_mconfig )
 	MCFG_CPU_ADD("t5182_z80", Z80, T5182_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(t5182_map)
 	MCFG_CPU_IO_MAP(t5182_io)
 
 MACHINE_CONFIG_END
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor t5182_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( t5182 );
-}

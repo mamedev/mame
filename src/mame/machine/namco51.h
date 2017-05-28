@@ -46,7 +46,8 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
 private:
 	// internal state
 	required_device<mb88_cpu_device> m_cpu;

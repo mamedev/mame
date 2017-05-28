@@ -21,7 +21,7 @@
 #include "machine/strata.h"
 #include "machine/ram.h"
 
-DECLARE_DEVICE_TYPE(TI99_USBSM, nouspikel_usb_smartmedia_device)
+namespace bus { namespace ti99 { namespace peb {
 
 class nouspikel_usb_smartmedia_device : public ti_expansion_card_device
 {
@@ -59,5 +59,8 @@ private:
 	required_device<smartmedia_image_device> m_smartmedia;
 	required_device<strataflash_device> m_flash;
 };
+} } } // end namespace bus::ti99::peb
+
+DECLARE_DEVICE_TYPE_NS(TI99_USBSM, bus::ti99::peb, nouspikel_usb_smartmedia_device)
 
 #endif // MAME_BUS_TI99_PEB_TN_USBSM_H

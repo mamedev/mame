@@ -46,7 +46,12 @@ WRITE_LINE_MEMBER(pc9801_26_device::pc9801_sound_irq)
 	machine().device<pic8259_device>(":pic8259_slave")->ir4_w(state);
 }
 
-static MACHINE_CONFIG_START( pc9801_26_config )
+
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( pc9801_26_device::device_add_mconfig )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("opn", YM2203, MAIN_CLOCK_X1*2) // unknown clock / divider
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(pc9801_26_device, pc9801_sound_irq))
@@ -56,16 +61,6 @@ static MACHINE_CONFIG_START( pc9801_26_config )
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(pc9801_26_device, opn_portb_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor pc9801_26_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( pc9801_26_config );
-}
 
 
 //-------------------------------------------------

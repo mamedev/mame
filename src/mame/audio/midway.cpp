@@ -373,31 +373,6 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  machine configuration
-//-------------------------------------------------
-
-static MACHINE_CONFIG_START( midway_ssio )
-	MCFG_CPU_ADD("cpu", Z80, SSIO_CLOCK/2/4)
-	MCFG_CPU_PROGRAM_MAP(ssio_map)
-	MCFG_DEVICE_PERIODIC_INT_DEVICE(DEVICE_SELF, midway_ssio_device, clock_14024, SSIO_CLOCK/2/16/10)
-
-	MCFG_SOUND_ADD("ay0", AY8910, SSIO_CLOCK/2/4)
-
-
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(midway_ssio_device, porta0_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(midway_ssio_device, portb0_w))
-	MCFG_MIXER_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.33, 0)
-
-	MCFG_SOUND_ADD("ay1", AY8910, SSIO_CLOCK/2/4)
-
-
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(midway_ssio_device, porta1_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(midway_ssio_device, portb1_w))
-	MCFG_MIXER_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.33, 1)
-MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
 //  ROM definitions
 //-------------------------------------------------
 
@@ -419,14 +394,24 @@ const tiny_rom_entry *midway_ssio_device::device_rom_region() const
 
 
 //-------------------------------------------------
-//  device_mconfig_additions - return a pointer to
-//  the device's machine fragment
+// device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor midway_ssio_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( midway_ssio );
-}
+MACHINE_CONFIG_MEMBER( midway_ssio_device::device_add_mconfig )
+	MCFG_CPU_ADD("cpu", Z80, SSIO_CLOCK/2/4)
+	MCFG_CPU_PROGRAM_MAP(ssio_map)
+	MCFG_DEVICE_PERIODIC_INT_DEVICE(DEVICE_SELF, midway_ssio_device, clock_14024, SSIO_CLOCK/2/16/10)
+
+	MCFG_SOUND_ADD("ay0", AY8910, SSIO_CLOCK/2/4)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(midway_ssio_device, porta0_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(midway_ssio_device, portb0_w))
+	MCFG_MIXER_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.33, 0)
+
+	MCFG_SOUND_ADD("ay1", AY8910, SSIO_CLOCK/2/4)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(midway_ssio_device, porta1_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(midway_ssio_device, portb1_w))
+	MCFG_MIXER_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.33, 1)
+MACHINE_CONFIG_END
 
 
 //-------------------------------------------------
@@ -586,10 +571,10 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  machine configuration
+// device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START(midway_sounds_good)
+MACHINE_CONFIG_MEMBER(midway_sounds_good_device::device_add_mconfig)
 	MCFG_CPU_ADD("cpu", M68000, SOUNDSGOOD_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(soundsgood_map)
 
@@ -603,17 +588,6 @@ static MACHINE_CONFIG_START(midway_sounds_good)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  device_mconfig_additions - return a pointer to
-//  the device's machine fragment
-//-------------------------------------------------
-
-machine_config_constructor midway_sounds_good_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( midway_sounds_good );
-}
 
 
 //-------------------------------------------------
@@ -751,10 +725,10 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  machine configuration
+// device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START(midway_turbo_cheap_squeak)
+MACHINE_CONFIG_MEMBER(midway_turbo_cheap_squeak_device::device_add_mconfig)
 	MCFG_CPU_ADD("cpu", M6809E, TURBOCS_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(turbocs_map)
 
@@ -768,17 +742,6 @@ static MACHINE_CONFIG_START(midway_turbo_cheap_squeak)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  device_mconfig_additions - return a pointer to
-//  the device's machine fragment
-//-------------------------------------------------
-
-machine_config_constructor midway_turbo_cheap_squeak_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( midway_turbo_cheap_squeak );
-}
 
 
 //-------------------------------------------------
@@ -964,10 +927,10 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  machine configuration
+// device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START(midway_squawk_n_talk)
+MACHINE_CONFIG_MEMBER(midway_squawk_n_talk_device::device_add_mconfig)
 	MCFG_CPU_ADD("cpu", M6802, SQUAWKTALK_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(squawkntalk_map)
 
@@ -989,17 +952,6 @@ static MACHINE_CONFIG_START(midway_squawk_n_talk)
 	// the board also supports an AY-8912 and/or an 8-bit DAC, neither of
 	// which are populated on the Discs of Tron board
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  device_mconfig_additions - return a pointer to
-//  the device's machine fragment
-//-------------------------------------------------
-
-machine_config_constructor midway_squawk_n_talk_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( midway_squawk_n_talk );
-}
 
 
 //-------------------------------------------------

@@ -30,8 +30,6 @@ constexpr float PALETTE_DEFAULT_HIGHLIGHT_FACTOR = 1.0f/PALETTE_DEFAULT_SHADOW_F
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-class gfx_element;
-
 typedef u16 indirect_pen_t;
 
 

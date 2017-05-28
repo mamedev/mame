@@ -11,6 +11,8 @@
 #ifndef MAME_EMU_DEBUG_DVBPOINTS_H
 #define MAME_EMU_DEBUG_DVBPOINTS_H
 
+#pragma once
+
 #include "debugvw.h"
 #include "debugcpu.h"
 
@@ -49,6 +51,5 @@ private:
 	int (*m_sortType)(void const *, void const *);
 	std::vector<device_debug::breakpoint *> m_buffer;
 };
-
 
 #endif // MAME_EMU_DEBUG_DVBPOINTS_H

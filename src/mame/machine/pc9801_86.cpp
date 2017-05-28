@@ -48,7 +48,12 @@ WRITE_LINE_MEMBER(pc9801_86_device::sound_irq)
 	machine().device<pic8259_device>(":pic8259_slave")->ir4_w(state || (m_pcmirq ? ASSERT_LINE : CLEAR_LINE));
 }
 
-static MACHINE_CONFIG_START( pc9801_86_config )
+
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( pc9801_86_device::device_add_mconfig )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("opna", YM2608, MAIN_CLOCK_X1*4) // unknown clock / divider
 	MCFG_YM2608_IRQ_HANDLER(WRITELINE(pc9801_86_device, sound_irq))
@@ -64,16 +69,6 @@ static MACHINE_CONFIG_START( pc9801_86_config )
 	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
 	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor pc9801_86_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( pc9801_86_config );
-}
 
 // RAM
 ROM_START( pc9801_86 )

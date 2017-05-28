@@ -95,11 +95,10 @@ public:
 	pcvideo_t1000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_WRITE_LINE_MEMBER( t1000_vsync_changed );
 	DECLARE_WRITE_LINE_MEMBER( disable_w );
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 
 private:
@@ -108,6 +107,8 @@ private:
 	void bank_w(int data);
 	void mode_control_w(int data);
 	bool m_disable;
+
+	DECLARE_WRITE_LINE_MEMBER( t1000_vsync_changed );
 };
 
 DECLARE_DEVICE_TYPE(PCVIDEO_T1000, pcvideo_t1000_device)
@@ -122,14 +123,12 @@ public:
 	pcvideo_pcjr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_WRITE_LINE_MEMBER( pcjr_vsync_changed );
 
-	virtual MC6845_UPDATE_ROW( crtc_update_row ) override;
 	MC6845_UPDATE_ROW( pcjx_text_update_row );
 	MC6845_UPDATE_ROW( pcjr_gfx_2bpp_high_update_row );
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 
 	uint8_t   *m_jxkanji;
@@ -139,6 +138,10 @@ private:
 	void pc_pcjr_vga_data_w(int data);
 	void pc_pcjr_bank_w(int data);
 	void pc_pcjx_bank_w(int data);
+
+	DECLARE_WRITE_LINE_MEMBER( pcjr_vsync_changed );
+
+	virtual MC6845_UPDATE_ROW( crtc_update_row ) override;
 };
 
 DECLARE_DEVICE_TYPE(PCVIDEO_PCJR, pcvideo_pcjr_device)

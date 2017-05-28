@@ -149,7 +149,7 @@ vrc5074_device::vrc5074_device(const machine_config &mconfig, const char *tag, d
 {
 	for (int i = 0; i < 2; i++)
 		m_sdram_size[i] = 0x0;
-	
+
 	for (int csIndex = 2; csIndex < 9; csIndex++) {
 		m_cs_devices[csIndex - 2] = nullptr;
 	}
@@ -311,7 +311,7 @@ void vrc5074_device::map_cpu_space()
 				if (index == 0) {
 					m_cpu_space->install_read_handler(winStart, winStart + winSize - 1, read32_delegate(FUNC(vrc5074_device::pci0_r), this));
 					m_cpu_space->install_write_handler(winStart, winStart + winSize - 1, write32_delegate(FUNC(vrc5074_device::pci0_w), this));
-				} 
+				}
 				else {
 					m_cpu_space->install_read_handler(winStart, winStart + winSize - 1, read32_delegate(FUNC(vrc5074_device::pci1_r), this));
 					m_cpu_space->install_write_handler(winStart, winStart + winSize - 1, write32_delegate(FUNC(vrc5074_device::pci1_w), this));
@@ -336,7 +336,7 @@ void vrc5074_device::map_extra(uint64_t memory_window_start, uint64_t memory_win
 		winSize = m_sdram[0].size() * 4;
 	if (m_sdram[0].size() && mask > 0) {
 		winStart = 0x0;
-		
+
 		winEnd = winStart + winSize -1;
 		memory_space->install_read_handler(winStart, winEnd, read32_delegate(FUNC(vrc5074_device::target1_r), this));
 		memory_space->install_write_handler(winStart, winEnd, write32_delegate(FUNC(vrc5074_device::target1_w), this));
@@ -345,13 +345,13 @@ void vrc5074_device::map_extra(uint64_t memory_window_start, uint64_t memory_win
 	}
 	//// PCI Target Window 2
 	//if (m_cpu_regs[NREG_PCITW2]&0x1000) {
-	//	winStart = m_cpu_regs[NREG_PCITW2]&0xffe00000;
-	//	winEnd = winStart | (~(0xf0000000 | (((m_cpu_regs[NREG_PCITW2]>>13)&0x7f)<<21)));
-	//	winSize = winEnd - winStart + 1;
-	//	memory_space->install_read_handler(winStart, winEnd, read32_delegate(FUNC(vrc5074_device::target2_r), this));
-	//	memory_space->install_write_handler(winStart, winEnd, write32_delegate(FUNC(vrc5074_device::target2_w), this));
-	//	if (LOG_NILE)
-	//		logerror("%s: map_extra Target Window 2 start=%08X end=%08X size=%08X laddr=%08X\n", tag(), winStart, winEnd, winSize,  m_target2_laddr);
+	//  winStart = m_cpu_regs[NREG_PCITW2]&0xffe00000;
+	//  winEnd = winStart | (~(0xf0000000 | (((m_cpu_regs[NREG_PCITW2]>>13)&0x7f)<<21)));
+	//  winSize = winEnd - winStart + 1;
+	//  memory_space->install_read_handler(winStart, winEnd, read32_delegate(FUNC(vrc5074_device::target2_r), this));
+	//  memory_space->install_write_handler(winStart, winEnd, write32_delegate(FUNC(vrc5074_device::target2_w), this));
+	//  if (LOG_NILE)
+	//      logerror("%s: map_extra Target Window 2 start=%08X end=%08X size=%08X laddr=%08X\n", tag(), winStart, winEnd, winSize,  m_target2_laddr);
 	//}
 }
 
@@ -433,7 +433,7 @@ READ32_MEMBER (vrc5074_device::pci0_r)
 	return result;
 }
 WRITE32_MEMBER (vrc5074_device::pci0_w)
-{	
+{
 	int index = 0;
 	uint32_t pci_addr = m_pci_laddr[index] | ((offset << 2) & m_pci_mask[index]);
 	switch (m_pci_type[index]) {
@@ -572,9 +572,9 @@ TIMER_CALLBACK_MEMBER (vrc5074_device::dma_transfer)
 
 	//// Check for dma suspension
 	//if (m_cpu_regs[NREG_DMACR1 + which * 0xc] & DMA_SUS) {
-	//	if (LOG_NILE)
-	//		logerror("%08X:nile DMA Suspended PCI: %08X MEM: %08X Words: %X\n", m_cpu->space(AS_PROGRAM).device().safe_pc(), m_cpu_regs[NREG_DMA_CPAR], m_cpu_regs[NREG_DMA_CMAR], m_cpu_regs[NREG_DMA_REM]);
-	//	return;
+	//  if (LOG_NILE)
+	//      logerror("%08X:nile DMA Suspended PCI: %08X MEM: %08X Words: %X\n", m_cpu->space(AS_PROGRAM).device().safe_pc(), m_cpu_regs[NREG_DMA_CPAR], m_cpu_regs[NREG_DMA_CMAR], m_cpu_regs[NREG_DMA_REM]);
+	//  return;
 	//}
 
 	//int pciSel = (m_cpu_regs[NREG_DMACR1+which*0xC] & DMA_MIO) ? AS_DATA : AS_IO;
@@ -582,50 +582,50 @@ TIMER_CALLBACK_MEMBER (vrc5074_device::dma_transfer)
 	//uint32_t srcAddr, dstAddr;
 
 	//if (m_cpu_regs[NREG_DMACR1+which*0xC]&DMA_RW) {
-	//	// Read data from PCI and write to cpu
-	//	src = &this->space(pciSel);
-	//	dst = &m_cpu->space(AS_PROGRAM);
-	//	srcAddr = m_cpu_regs[NREG_DMA_CPAR];
-	//	dstAddr = m_cpu_regs[NREG_DMA_CMAR];
+	//  // Read data from PCI and write to cpu
+	//  src = &this->space(pciSel);
+	//  dst = &m_cpu->space(AS_PROGRAM);
+	//  srcAddr = m_cpu_regs[NREG_DMA_CPAR];
+	//  dstAddr = m_cpu_regs[NREG_DMA_CMAR];
 	//} else {
-	//	// Read data from cpu and write to PCI
-	//	src = &m_cpu->space(AS_PROGRAM);
-	//	dst = &this->space(pciSel);
-	//	srcAddr = m_cpu_regs[NREG_DMA_CMAR];
-	//	dstAddr = m_cpu_regs[NREG_DMA_CPAR];
+	//  // Read data from cpu and write to PCI
+	//  src = &m_cpu->space(AS_PROGRAM);
+	//  dst = &this->space(pciSel);
+	//  srcAddr = m_cpu_regs[NREG_DMA_CMAR];
+	//  dstAddr = m_cpu_regs[NREG_DMA_CPAR];
 	//}
 	//int dataCount = m_cpu_regs[NREG_DMA_REM];
 	//int burstCount = DMA_BURST_SIZE;
 	//while (dataCount>0 && burstCount>0) {
-	//	dst->write_dword(dstAddr, src->read_dword(srcAddr));
-	//	dstAddr += 0x4;
-	//	srcAddr += 0x4;
-	//	--dataCount;
-	//	--burstCount;
+	//  dst->write_dword(dstAddr, src->read_dword(srcAddr));
+	//  dstAddr += 0x4;
+	//  srcAddr += 0x4;
+	//  --dataCount;
+	//  --burstCount;
 	//}
 	//if (m_cpu_regs[NREG_DMACR1+which*0xC]&DMA_RW) {
-	//	m_cpu_regs[NREG_DMA_CPAR] = srcAddr;
-	//	m_cpu_regs[NREG_DMA_CMAR] = dstAddr;
+	//  m_cpu_regs[NREG_DMA_CPAR] = srcAddr;
+	//  m_cpu_regs[NREG_DMA_CMAR] = dstAddr;
 	//} else {
-	//	m_cpu_regs[NREG_DMA_CMAR] = srcAddr;
-	//	m_cpu_regs[NREG_DMA_CPAR] = dstAddr;
+	//  m_cpu_regs[NREG_DMA_CMAR] = srcAddr;
+	//  m_cpu_regs[NREG_DMA_CPAR] = dstAddr;
 	//}
 	//m_cpu_regs[NREG_DMA_REM] = dataCount;
 	//// Check for end of DMA
 	//if (dataCount == 0) {
-	//	// Clear the busy and go flags
-	//	m_cpu_regs[NREG_DMACR1 + which * 0xc] &= ~DMA_BUSY;
-	//	m_cpu_regs[NREG_DMACR1 + which * 0xc] &= ~DMA_GO;
-	//	// Set the interrupt
-	//	if (m_cpu_regs[NREG_DMACR1 + which * 0xc] & DMA_INT_EN) {
-	//		if (m_irq_num != -1) {
-	//			m_cpu->set_input_line(m_irq_num, ASSERT_LINE);
-	//		} else {
-	//			logerror("vrc5074_device::dma_transfer Error: DMA configured to trigger interrupt but no interrupt line configured\n");
-	//		}
-	//	}
-	//	// Turn off the timer
-	//	m_dma_timer->adjust(attotime::never);
+	//  // Clear the busy and go flags
+	//  m_cpu_regs[NREG_DMACR1 + which * 0xc] &= ~DMA_BUSY;
+	//  m_cpu_regs[NREG_DMACR1 + which * 0xc] &= ~DMA_GO;
+	//  // Set the interrupt
+	//  if (m_cpu_regs[NREG_DMACR1 + which * 0xc] & DMA_INT_EN) {
+	//      if (m_irq_num != -1) {
+	//          m_cpu->set_input_line(m_irq_num, ASSERT_LINE);
+	//      } else {
+	//          logerror("vrc5074_device::dma_transfer Error: DMA configured to trigger interrupt but no interrupt line configured\n");
+	//      }
+	//  }
+	//  // Turn off the timer
+	//  m_dma_timer->adjust(attotime::never);
 	//}
 }
 
@@ -929,7 +929,7 @@ WRITE32_MEMBER(vrc5074_device::cpu_reg_w)
 	case NREG_PCIINIT0 + 0:   /* PCI master */
 	case NREG_PCIINIT1 + 0:   /* PCI master */
 	//if (((olddata & 0xe) == 0xa) != ((m_cpu_regs[offset] & 0xe) == 0xa))
-		//	remap_dynamic_addresses();
+		//  remap_dynamic_addresses();
 		//remap_cb();
 		setup_pci_space();
 		logit = 0;

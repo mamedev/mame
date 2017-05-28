@@ -23,46 +23,17 @@ public:
 	DECLARE_WRITE8_MEMBER(page8_w);
 	DECLARE_READ8_MEMBER(portb_r);
 	DECLARE_WRITE8_MEMBER(portb_w);
-	DECLARE_READ8_MEMBER(get_slave_ack);
-	DECLARE_WRITE_LINE_MEMBER(pit8254_out2_changed);
-	DECLARE_WRITE_LINE_MEMBER(dma_hrq_changed);
-	DECLARE_READ8_MEMBER(dma8237_0_dack_r);
-	DECLARE_READ8_MEMBER(dma8237_1_dack_r);
-	DECLARE_READ8_MEMBER(dma8237_2_dack_r);
-	DECLARE_READ8_MEMBER(dma8237_3_dack_r);
-	DECLARE_READ8_MEMBER(dma8237_5_dack_r);
-	DECLARE_READ8_MEMBER(dma8237_6_dack_r);
-	DECLARE_READ8_MEMBER(dma8237_7_dack_r);
-	DECLARE_WRITE8_MEMBER(dma8237_0_dack_w);
-	DECLARE_WRITE8_MEMBER(dma8237_1_dack_w);
-	DECLARE_WRITE8_MEMBER(dma8237_2_dack_w);
-	DECLARE_WRITE8_MEMBER(dma8237_3_dack_w);
-	DECLARE_WRITE8_MEMBER(dma8237_5_dack_w);
-	DECLARE_WRITE8_MEMBER(dma8237_6_dack_w);
-	DECLARE_WRITE8_MEMBER(dma8237_7_dack_w);
-	DECLARE_WRITE_LINE_MEMBER(dma8237_out_eop);
-	DECLARE_WRITE_LINE_MEMBER(dack0_w);
-	DECLARE_WRITE_LINE_MEMBER(dack1_w);
-	DECLARE_WRITE_LINE_MEMBER(dack2_w);
-	DECLARE_WRITE_LINE_MEMBER(dack3_w);
-	DECLARE_WRITE_LINE_MEMBER(dack4_w);
-	DECLARE_WRITE_LINE_MEMBER(dack5_w);
-	DECLARE_WRITE_LINE_MEMBER(dack6_w);
-	DECLARE_WRITE_LINE_MEMBER(dack7_w);
 	DECLARE_WRITE8_MEMBER(write_rtc);
 
 	DECLARE_WRITE_LINE_MEMBER(shutdown);
 
-	DECLARE_READ8_MEMBER(dma_read_byte);
-	DECLARE_WRITE8_MEMBER(dma_write_byte);
-	DECLARE_READ8_MEMBER(dma_read_word);
-	DECLARE_WRITE8_MEMBER(dma_write_word);
-
 	uint32_t a20_286(bool state);
+
 protected:
 	void device_start() override;
 	void device_reset() override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
 private:
 	void set_dma_channel(int channel, int state);
 	void speaker_set_spkrdata(uint8_t data);
@@ -85,6 +56,39 @@ private:
 	uint8_t m_at_speaker;
 	uint8_t m_channel_check;
 	uint8_t m_nmi_enabled;
+
+	DECLARE_WRITE_LINE_MEMBER(pit8254_out2_changed);
+
+	DECLARE_WRITE_LINE_MEMBER(dma8237_out_eop);
+	DECLARE_READ8_MEMBER(dma8237_0_dack_r);
+	DECLARE_READ8_MEMBER(dma8237_1_dack_r);
+	DECLARE_READ8_MEMBER(dma8237_2_dack_r);
+	DECLARE_READ8_MEMBER(dma8237_3_dack_r);
+	DECLARE_READ8_MEMBER(dma8237_5_dack_r);
+	DECLARE_READ8_MEMBER(dma8237_6_dack_r);
+	DECLARE_READ8_MEMBER(dma8237_7_dack_r);
+	DECLARE_WRITE8_MEMBER(dma8237_0_dack_w);
+	DECLARE_WRITE8_MEMBER(dma8237_1_dack_w);
+	DECLARE_WRITE8_MEMBER(dma8237_2_dack_w);
+	DECLARE_WRITE8_MEMBER(dma8237_3_dack_w);
+	DECLARE_WRITE8_MEMBER(dma8237_5_dack_w);
+	DECLARE_WRITE8_MEMBER(dma8237_6_dack_w);
+	DECLARE_WRITE8_MEMBER(dma8237_7_dack_w);
+	DECLARE_WRITE_LINE_MEMBER(dack0_w);
+	DECLARE_WRITE_LINE_MEMBER(dack1_w);
+	DECLARE_WRITE_LINE_MEMBER(dack2_w);
+	DECLARE_WRITE_LINE_MEMBER(dack3_w);
+	DECLARE_WRITE_LINE_MEMBER(dack4_w);
+	DECLARE_WRITE_LINE_MEMBER(dack5_w);
+	DECLARE_WRITE_LINE_MEMBER(dack6_w);
+	DECLARE_WRITE_LINE_MEMBER(dack7_w);
+	DECLARE_READ8_MEMBER(get_slave_ack);
+	DECLARE_WRITE_LINE_MEMBER(dma_hrq_changed);
+
+	DECLARE_READ8_MEMBER(dma_read_byte);
+	DECLARE_WRITE8_MEMBER(dma_write_byte);
+	DECLARE_READ8_MEMBER(dma_read_word);
+	DECLARE_WRITE8_MEMBER(dma_write_word);
 };
 
 DECLARE_DEVICE_TYPE(AT_MB, at_mb_device)

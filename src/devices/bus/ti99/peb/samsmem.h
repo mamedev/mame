@@ -20,7 +20,7 @@
 #include "peribox.h"
 #include "machine/ram.h"
 
-DECLARE_DEVICE_TYPE(TI99_SAMSMEM, sams_memory_expansion_device)
+namespace bus { namespace ti99 { namespace peb {
 
 class sams_memory_expansion_device : public ti_expansion_card_device
 {
@@ -45,5 +45,9 @@ private:
 	bool    m_map_mode;
 	bool    m_access_mapper;
 };
+
+} } } // end namespace bus::ti99::peb
+
+DECLARE_DEVICE_TYPE_NS(TI99_SAMSMEM, bus::ti99::peb, sams_memory_expansion_device)
 
 #endif // MAME_BUS_TI99_PEB_SAMSMEM_H

@@ -56,7 +56,7 @@ void sm510_device::clock_melody()
 	u8 out = m_div >> 2 & 1;
 	out |= (out << 1 ^ 2);
 	out &= m_r;
-	
+
 	// output to R pin
 	if (out != m_r_out)
 	{

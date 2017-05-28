@@ -43,17 +43,17 @@ public:
 
 	template<class _Object> static devcb_base &set_keydown_wr_callback(device_t &device, _Object object) { return downcast<abc80_keyboard_device &>(device).m_write_keydown.set_callback(object); }
 
-	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual ioport_constructor device_input_ports() const override;
-
 	uint8_t data_r();
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
 
 private:
 	devcb_write_line m_write_keydown;

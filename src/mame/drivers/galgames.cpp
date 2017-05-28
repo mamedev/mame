@@ -143,10 +143,6 @@ DEFINE_DEVICE_TYPE(GALGAMES_CART, galgames_cart_device, "starpak_cart", "Galaxy 
 
 // BIOS "cart"
 
-static MACHINE_CONFIG_START( bios )
-	MCFG_EEPROM_SERIAL_93C76_8BIT_ADD("eeprom")
-MACHINE_CONFIG_END
-
 class galgames_bios_cart_device : public galgames_cart_device
 {
 public:
@@ -156,10 +152,14 @@ public:
 	{ }
 protected:
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const override { return MACHINE_CONFIG_NAME(bios); }
+	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 DEFINE_DEVICE_TYPE(GALGAMES_BIOS_CART, galgames_bios_cart_device, "galgames_bios_cart", "Galaxy Games BIOS Cartridge")
+
+MACHINE_CONFIG_MEMBER( galgames_bios_cart_device::device_add_mconfig )
+	MCFG_EEPROM_SERIAL_93C76_8BIT_ADD("eeprom")
+MACHINE_CONFIG_END
 
 #define MCFG_GALGAMES_BIOS_CART_ADD(_tag, _cart) \
 	MCFG_DEVICE_ADD(_tag, GALGAMES_BIOS_CART, 0) \
@@ -168,14 +168,6 @@ DEFINE_DEVICE_TYPE(GALGAMES_BIOS_CART, galgames_bios_cart_device, "galgames_bios
 
 
 // STARPAK2 cart
-
-static MACHINE_CONFIG_START( starpak2 )
-	MCFG_CPU_ADD("pic", PIC16C56, XTAL_4MHz)  // !! PIC12C508 !! 4MHz internal RC oscillator (selected by the configuration word)
-	MCFG_PIC16C5x_READ_B_CB( READ8( galgames_cart_device, int_pic_data_r))
-	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(galgames_cart_device, int_pic_data_w))
-
-	MCFG_EEPROM_SERIAL_93C76_8BIT_ADD("eeprom")
-MACHINE_CONFIG_END
 
 class galgames_starpak2_cart_device : public galgames_cart_device
 {
@@ -186,10 +178,18 @@ public:
 	{ }
 protected:
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const override { return MACHINE_CONFIG_NAME(starpak2); }
+	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 DEFINE_DEVICE_TYPE(GALGAMES_STARPAK2_CART, galgames_starpak2_cart_device, "starpak2_cart", "Galaxy Games StarPak 2 Cartridge")
+
+MACHINE_CONFIG_MEMBER( galgames_starpak2_cart_device::device_add_mconfig )
+	MCFG_CPU_ADD("pic", PIC16C56, XTAL_4MHz)  // !! PIC12C508 !! 4MHz internal RC oscillator (selected by the configuration word)
+	MCFG_PIC16C5x_READ_B_CB( READ8( galgames_cart_device, int_pic_data_r))
+	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(galgames_cart_device, int_pic_data_w))
+
+	MCFG_EEPROM_SERIAL_93C76_8BIT_ADD("eeprom")
+MACHINE_CONFIG_END
 
 #define MCFG_GALGAMES_STARPAK2_CART_ADD(_tag, _cart) \
 	MCFG_DEVICE_ADD(_tag, GALGAMES_STARPAK2_CART, 0) \
@@ -200,15 +200,6 @@ DEFINE_DEVICE_TYPE(GALGAMES_STARPAK2_CART, galgames_starpak2_cart_device, "starp
 
 // STARPAK3 cart
 
-static MACHINE_CONFIG_START( starpak3 )
-	MCFG_CPU_ADD("pic", PIC16C56, XTAL_4MHz)
-	MCFG_PIC16C5x_WRITE_A_CB(WRITE8(galgames_cart_device, int_pic_bank_w))
-	MCFG_PIC16C5x_READ_B_CB( READ8( galgames_cart_device, int_pic_data_r))
-	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(galgames_cart_device, int_pic_data_w))
-
-	MCFG_EEPROM_SERIAL_93C76_8BIT_ADD("eeprom")
-MACHINE_CONFIG_END
-
 class galgames_starpak3_cart_device : public galgames_cart_device
 {
 public:
@@ -218,10 +209,19 @@ public:
 	{ }
 protected:
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const override { return MACHINE_CONFIG_NAME(starpak3); }
+	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 DEFINE_DEVICE_TYPE(GALGAMES_STARPAK3_CART, galgames_starpak3_cart_device, "starpak3_cart", "Galaxy Games StarPak 3 Cartridge")
+
+MACHINE_CONFIG_MEMBER( galgames_starpak3_cart_device::device_add_mconfig )
+	MCFG_CPU_ADD("pic", PIC16C56, XTAL_4MHz)
+	MCFG_PIC16C5x_WRITE_A_CB(WRITE8(galgames_cart_device, int_pic_bank_w))
+	MCFG_PIC16C5x_READ_B_CB( READ8( galgames_cart_device, int_pic_data_r))
+	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(galgames_cart_device, int_pic_data_w))
+
+	MCFG_EEPROM_SERIAL_93C76_8BIT_ADD("eeprom")
+MACHINE_CONFIG_END
 
 #define MCFG_GALGAMES_STARPAK3_CART_ADD(_tag, _cart) \
 	MCFG_DEVICE_ADD(_tag, GALGAMES_STARPAK3_CART, 0) \

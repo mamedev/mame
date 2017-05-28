@@ -16,14 +16,10 @@ cedar_magnet_flop_device::cedar_magnet_flop_device(const machine_config &mconfig
 }
 
 
-static MACHINE_CONFIG_START( cedar_magnet_flop )
+MACHINE_CONFIG_MEMBER( cedar_magnet_flop_device::device_add_mconfig )
 	MCFG_NVRAM_ADD_NO_FILL("floppy_nvram")
 MACHINE_CONFIG_END
 
-machine_config_constructor cedar_magnet_flop_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( cedar_magnet_flop );
-}
 
 void cedar_magnet_flop_device::device_start()
 {

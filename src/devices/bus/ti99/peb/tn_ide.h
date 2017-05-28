@@ -21,7 +21,7 @@
 #include "machine/ram.h"
 #include "machine/rtc65271.h"
 
-DECLARE_DEVICE_TYPE(TI99_IDE, nouspikel_ide_interface_device)
+namespace bus { namespace ti99 { namespace peb {
 
 class nouspikel_ide_interface_device : public ti_expansion_card_device
 {
@@ -62,5 +62,9 @@ private:
 
 	required_device<ram_device> m_ram;
 };
+
+} } } // end namespace bus::ti99::peb
+
+DECLARE_DEVICE_TYPE_NS(TI99_IDE, bus::ti99::peb, nouspikel_ide_interface_device)
 
 #endif // MAME_BUS_TI99_PEB_TN_IDE_H

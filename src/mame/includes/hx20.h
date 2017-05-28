@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "cpu/m6800/m6800.h"
+#include "cpu/m6800/m6801.h"
 #include "imagedev/cassette.h"
 #include "machine/mc146818.h"
 #include "machine/ram.h"
