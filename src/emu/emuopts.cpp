@@ -235,6 +235,11 @@ namespace
 
 		virtual const char *value() const override
 		{
+			// This is returning an empty string instead of nullptr to signify that
+			// specifying the value is a meaningful operation.  The option types that
+			// return nullptr are option types that cannot have a value (e.g. - commands)
+			//
+			// See comments in core_options::entry::value() and core_options::simple_entry::value()
 			return m_host.system() ? m_host.system()->name : "";
 		}
 
@@ -283,6 +288,12 @@ namespace
 			const char *result = nullptr;
 			if (m_host.specified())
 			{
+				// m_temp is a temporary variable used to keep the specified value
+				// so the result can be returned as 'const char *'.  Obviously, this
+				// value will be trampled upon if value() is called again.  This doesn't
+				// happen in practice
+				//
+				// In reality, I want to really return std::optional<std::string> here
 				m_temp = m_host.specified_value();
 				result = m_temp.c_str();
 			}
@@ -1208,7 +1219,7 @@ core_options::entry::shared_ptr slot_option::setup_option_entry(const char *name
 
 image_option::image_option(emu_options &host, const std::string &cannonical_instance_name)
 	: m_host(host)
-	, m_cannonical_instance_name(cannonical_instance_name)
+	, m_canonical_instance_name(cannonical_instance_name)
 {
 }
 

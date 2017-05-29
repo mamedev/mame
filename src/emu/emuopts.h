@@ -239,12 +239,12 @@ private:
 class image_option
 {
 public:
-	image_option(emu_options &host, const std::string &cannonical_instance_name);
+	image_option(emu_options &host, const std::string &canonical_instance_name);
 	image_option(const image_option &that) = delete;
 	image_option(image_option &&that) = default;
 
 	// accessors
-	const std::string &cannonical_instance_name() const { return m_cannonical_instance_name; }
+	const std::string &canonical_instance_name() const { return m_canonical_instance_name; }
 	const std::string &value() const { return m_value; }
 	core_options::entry::shared_ptr option_entry() const { return m_entry.lock(); }
 
@@ -257,7 +257,7 @@ public:
 
 private:
 	emu_options &                   m_host;
-	std::string                     m_cannonical_instance_name;
+	std::string                     m_canonical_instance_name;
 	std::string                     m_value;
 	core_options::entry::weak_ptr   m_entry;
 };

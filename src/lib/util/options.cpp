@@ -325,6 +325,8 @@ const char *core_options::simple_entry::value() const
 		break;
 
 	default:
+		// this is an option type for which returning a value is
+		// a meaningless operation (e.g. - core_options::option_type::COMMAND)
 		result = nullptr;
 		break;
 	}

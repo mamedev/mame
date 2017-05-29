@@ -1301,10 +1301,10 @@ void device_image_interface::update_names()
 	if (brief_name == nullptr)
 		brief_name = device_brieftypename(image_type());
 
-	m_cannonical_instance_name = string_format("%s%d", inst_name, index + 1);
+	m_canonical_instance_name = string_format("%s%d", inst_name, index + 1);
 	if (count > 1)
 	{
-		m_instance_name = m_cannonical_instance_name;
+		m_instance_name = m_canonical_instance_name;
 		m_brief_instance_name = string_format("%s%d", brief_name, index + 1);
 	}
 	else
