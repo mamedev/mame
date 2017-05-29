@@ -130,8 +130,6 @@ public:
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void bootleg_decode();
 	void configure_banks(void (*decode)(uint8_t *src, uint8_t *dst, int size));
-	DECLARE_WRITE8_MEMBER(sound_command_w);
-	DECLARE_READ8_MEMBER(sound_command_r);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	DECLARE_WRITE_LINE_MEMBER(spangbl_adpcm_int);
 };

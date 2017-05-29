@@ -349,7 +349,7 @@ static ADDRESS_MAP_START( mitchell_io_map, AS_IO, 8, mitchell_state )
 	AM_RANGE(0x03, 0x03) AM_DEVWRITE("ymsnd", ym2413_device, data_port_w)
 	AM_RANGE(0x04, 0x04) AM_DEVWRITE("ymsnd", ym2413_device, register_port_w)
 	AM_RANGE(0x05, 0x05) AM_READ(pang_port5_r) AM_DEVWRITE("oki", okim6295_device, write)
-	AM_RANGE(0x06, 0x06) AM_WRITENOP                /* watchdog? irq ack? */
+	AM_RANGE(0x06, 0x06) AM_NOP                     /* watchdog? IRQ ack? video buffering? */
 	AM_RANGE(0x07, 0x07) AM_WRITE(pang_video_bank_w)    /* Video RAM bank register */
 	AM_RANGE(0x08, 0x08) AM_WRITE(eeprom_cs_w)
 	AM_RANGE(0x10, 0x10) AM_WRITE(eeprom_clock_w)
@@ -366,18 +366,12 @@ static ADDRESS_MAP_START( spangbl_map, AS_PROGRAM, 8, mitchell_state )
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("nvram")     /* Work RAM */
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(mitchell_state::sound_command_w)
-{
-	m_soundlatch->write(space, 0, data);
-	m_audiocpu->set_input_line(0, HOLD_LINE);
-}
-
 static ADDRESS_MAP_START( spangbl_io_map, AS_IO, 8, mitchell_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x02) AM_READ(input_r)
 	AM_RANGE(0x00, 0x00) AM_WRITE(pangbl_gfxctrl_w)    /* Palette bank, layer enable, coin counters, more */
 	AM_RANGE(0x02, 0x02) AM_WRITE(pang_bankswitch_w)      /* Code bank register */
-	AM_RANGE(0x03, 0x03) AM_WRITE(sound_command_w)
+	AM_RANGE(0x03, 0x03) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x05, 0x05) AM_READ_PORT("SYS0")
 	AM_RANGE(0x06, 0x06) AM_WRITENOP    /* watchdog? irq ack? */
 	AM_RANGE(0x07, 0x07) AM_WRITE(pang_video_bank_w)      /* Video RAM bank register */
@@ -385,12 +379,6 @@ static ADDRESS_MAP_START( spangbl_io_map, AS_IO, 8, mitchell_state )
 	AM_RANGE(0x10, 0x10) AM_WRITE(eeprom_clock_w)
 	AM_RANGE(0x18, 0x18) AM_WRITE(eeprom_serial_w)
 ADDRESS_MAP_END
-
-READ8_MEMBER(mitchell_state::sound_command_r)
-{
-	m_audiocpu->set_input_line(0, CLEAR_LINE);
-	return m_soundlatch->read(space, 0);
-}
 
 WRITE8_MEMBER(mitchell_state::sound_bankswitch_w)
 {
@@ -406,7 +394,7 @@ static ADDRESS_MAP_START( spangbl_sound_map, AS_PROGRAM, 8, mitchell_state )
 	AM_RANGE(0xe400, 0xe400) AM_DEVWRITE("adpcm_select", ls157_device, ba_w)
 	AM_RANGE(0xec00, 0xec01) AM_DEVWRITE("ymsnd", ym2413_device, write)
 	AM_RANGE(0xf000, 0xf4ff) AM_RAM
-	AM_RANGE(0xf800, 0xf800) AM_READ(sound_command_r)
+	AM_RANGE(0xf800, 0xf800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pangba_sound_map, AS_PROGRAM, 8, mitchell_state )
@@ -416,7 +404,7 @@ static ADDRESS_MAP_START( pangba_sound_map, AS_PROGRAM, 8, mitchell_state )
 	AM_RANGE(0xe400, 0xe400) AM_DEVWRITE("adpcm_select", ls157_device, ba_w)
 	AM_RANGE(0xec00, 0xec01) AM_DEVWRITE("ymsnd", ym3812_device, write)
 	AM_RANGE(0xf000, 0xf4ff) AM_RAM
-	AM_RANGE(0xf800, 0xf800) AM_READ(sound_command_r)
+	AM_RANGE(0xf800, 0xf800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 
@@ -1294,11 +1282,12 @@ static MACHINE_CONFIG_DERIVED( spangbl, pangnv )
 	MCFG_GFXDECODE_MODIFY("gfxdecode", spangbl)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 
 	MCFG_DEVICE_REMOVE("oki")
-	MCFG_SOUND_ADD("msm", MSM5205, 384000) // clock and prescaler unknown
+	MCFG_SOUND_ADD("msm", MSM5205, 400000) // clock and prescaler unknown
 	MCFG_MSM5205_VCLK_CB(WRITELINE(mitchell_state, spangbl_adpcm_int)) // controls music as well as ADCPM rate
-	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 4KHz 4-bit? */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_DEVICE_ADD("adpcm_select", LS157, 0)
@@ -1807,7 +1796,7 @@ ROM_START( pangba )
 	ROM_LOAD( "pang.10",    0x010000, 0x10000, CRC(082151ee) SHA1(0857b9f7430e0fc6217eafbaf008ff9da8e7a493) )
 ROM_END
 
-ROM_START( pangbb )
+ROM_START( pangbb ) // Same bootleg hardware as pangba, but with original YM2413 music instead of YM3812 arrangement
 	ROM_REGION( 2*0x50000, "maincpu", 0 )
 	ROM_LOAD( "3", 0x50000, 0x08000, CRC(2548534f) SHA1(c67964e1d0b51ea7bb62685055dee1910e9f0fb9) )
 	ROM_CONTINUE( 0x00000, 0x08000 )
@@ -1825,7 +1814,7 @@ ROM_START( pangbb )
 	ROM_CONTINUE( 0x24000, 0x04000 )
 
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Sound Z80 + M5205(?) samples */
-	ROM_LOAD( "24", 0x00000, 0x10000, CRC(09c43210) SHA1(79b5aed2c5d6d9110129885e8979c1f13b7b8aac) ) // Same music as pangba, but arranged for YM2413 instead of YM3812
+	ROM_LOAD( "24", 0x00000, 0x10000, CRC(09c43210) SHA1(79b5aed2c5d6d9110129885e8979c1f13b7b8aac) )
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_INVERT | ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "14", 0x000001, 0x10000, CRC(c90095ee) SHA1(bf380f289eb42030a9f911aa5f697ba76f5723db) )
