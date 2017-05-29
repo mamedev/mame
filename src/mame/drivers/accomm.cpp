@@ -66,7 +66,8 @@ public:
 			m_maincpu(*this, "maincpu"),
 			m_bank0dev(*this, "bank0dev"),
 			m_vram(*this, "vram"),
-			m_keybd(*this, "LINE.%u", 0)
+			m_keybd(*this, "LINE.%u", 0),
+			m_keybd2(*this, "LINE2.%u", 0)
 	{ }
 
 	virtual void machine_reset() override;
@@ -76,6 +77,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER(b0_rom_disable_w);
 	DECLARE_READ8_MEMBER(read_keyboard);
+	DECLARE_READ8_MEMBER(read_keyboard2);
 	DECLARE_READ8_MEMBER(sheila_r);
 	DECLARE_WRITE8_MEMBER(sheila_w);
 
@@ -88,7 +90,7 @@ protected:
 	required_device<g65816_device> m_maincpu;
 	required_device<address_map_bank_device> m_bank0dev;
 	required_shared_ptr<uint8_t> m_vram;
-	required_ioport_array<14> m_keybd;
+	required_ioport_array<14> m_keybd, m_keybd2;
 
 	// driver_device overrides
 	virtual void video_start() override;
@@ -124,11 +126,27 @@ READ8_MEMBER(accomm_state::read_keyboard)
 {
 	uint8_t data = 0;
 
-	//logerror( "PC=%04x: keyboard read from paged rom area, address: %04x", activecpu_get_pc(), offset );
+	//printf( "keyboard read @ %x\n", offset );
 	for (int i = 0; i < 14; i++)
 	{
 		if (!(offset & 1))
 			data |= m_keybd[i]->read() & 0x0f;
+
+		offset = offset >> 1;
+	}
+	//logerror( ", data: %02x\n", data );
+	return data;
+}
+
+READ8_MEMBER(accomm_state::read_keyboard2)
+{
+	uint8_t data = 0;
+
+	//printf( "keyboard read @ %x\n", offset );
+	for (int i = 0; i < 14; i++)
+	{
+		if (!(offset & 1))
+			data |= m_keybd2[i]->read() & 0x0f;
 
 		offset = offset >> 1;
 	}
@@ -547,7 +565,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, accomm_state )
 
 	AM_RANGE(0x440000, 0x440000) AM_WRITE(b0_rom_disable_w)
 	AM_RANGE(0x450000, 0x457fff) AM_RAM AM_SHARE("vram")
-	AM_RANGE(0x458000, 0x45bfff) AM_READ(read_keyboard)
+	AM_RANGE(0x458000, 0x459fff) AM_READ(read_keyboard)
+	AM_RANGE(0x45a000, 0x45bfff) AM_READ(read_keyboard2)
 	AM_RANGE(0x45fe00, 0x45feff) AM_READWRITE(sheila_r, sheila_w)
 	AM_RANGE(0x460000, 0x467fff) AM_RAM // nvram?
 	AM_RANGE(0xfc0000, 0xffffff) AM_ROM AM_REGION("maincpu", 0)
@@ -601,15 +620,10 @@ static INPUT_PORTS_START( accomm )
 	PORT_BIT(0x02,  IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6)          PORT_CHAR('6') PORT_CHAR('&')
 	PORT_BIT(0x04,  IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS)     PORT_CHAR('=') PORT_CHAR('+')
 
-	PORT_START("LINE.9") // back, forward, down, up
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_LEFT)      PORT_CODE(KEYCODE_LEFT)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_RIGHT)     PORT_CODE(KEYCODE_RIGHT)
+	PORT_START("LINE.9") // backspace, unk, down arrow, unk
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_DOWN)      PORT_CODE(KEYCODE_DOWN)     PORT_CHAR(10)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_UP)        PORT_CODE(KEYCODE_UP)
 
-	PORT_START("LINE.10")
-	PORT_BIT(0x02,  IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4)          PORT_CHAR('4') PORT_CHAR('$')
-	PORT_BIT(0x04,  IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0)          PORT_CHAR('0') PORT_CHAR('@')
+	PORT_START("LINE.10") // unk, KP4, KP0, unk
 
 	PORT_START("LINE.11")
 
@@ -617,6 +631,64 @@ static INPUT_PORTS_START( accomm )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F1) PORT_NAME("F1")
 	
 	PORT_START("LINE.13")
+
+	PORT_START("LINE2.0")	// colon, caret, open bracket, semicolon
+
+
+	PORT_START("LINE2.1")	// L, 0, O, K
+	PORT_BIT(0x01,  IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_L)          PORT_CHAR('l') PORT_CHAR('L')
+	PORT_BIT(0x02,  IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0)          PORT_CHAR('0') PORT_CHAR('@')
+	PORT_BIT(0x04,  IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_O)          PORT_CHAR('o') PORT_CHAR('O')
+	PORT_BIT(0x08,  IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_K)          PORT_CHAR('k') PORT_CHAR('K')
+
+	PORT_START("LINE2.2")	// G, 6, T, F
+	PORT_BIT(0x01,  IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_G)          PORT_CHAR('g') PORT_CHAR('G')
+	PORT_BIT(0x04,  IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_T)          PORT_CHAR('t') PORT_CHAR('T')
+	PORT_BIT(0x08,  IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F)          PORT_CHAR('f') PORT_CHAR('F')
+
+	PORT_START("LINE2.3")	// unk, unk, unk, help?
+
+
+	PORT_START("LINE2.4")	// unk, unk, unk, unk
+
+	
+	PORT_START("LINE2.5")
+	PORT_BIT(0x01,  IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_D)          PORT_CHAR('d') PORT_CHAR('D')
+	PORT_BIT(0x02,  IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4)          PORT_CHAR('4') PORT_CHAR('$')
+	PORT_BIT(0x04,  IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_E)          PORT_CHAR('e') PORT_CHAR('E')
+	PORT_BIT(0x08,  IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_S)          PORT_CHAR('s') PORT_CHAR('S')
+
+	PORT_START("LINE2.6")
+	PORT_BIT(0x01,  IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_A)          PORT_CHAR('a') PORT_CHAR('A')
+	PORT_BIT(0x02,  IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2)          PORT_CHAR('2') PORT_CHAR('"')
+	PORT_BIT(0x04,  IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q)          PORT_CHAR('q') PORT_CHAR('Q')
+	PORT_BIT(0x08,  IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_CAPSLOCK)   PORT_NAME("Caps Lock")
+	
+	PORT_START("LINE2.7")
+	PORT_BIT(0x01,  IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_J)          PORT_CHAR('j') PORT_CHAR('J')
+	PORT_BIT(0x02,  IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8)          PORT_CHAR('8') PORT_CHAR('(')
+	PORT_BIT(0x04,  IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_U)          PORT_CHAR('u') PORT_CHAR('U')
+	PORT_BIT(0x08,  IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_H)          PORT_CHAR('h') PORT_CHAR('H')
+
+	PORT_START("LINE2.8")	// 
+
+	PORT_START("LINE2.9")	// right, unk, up, left?
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_RIGHT)     PORT_CODE(KEYCODE_RIGHT)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_UP)        PORT_CODE(KEYCODE_UP)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_LEFT)      PORT_CODE(KEYCODE_LEFT)
+
+	PORT_START("LINE2.10")	// 8, 2, 5, 7
+
+
+	PORT_START("LINE2.11")
+
+	
+	PORT_START("LINE2.12")
+
+
+	PORT_START("LINE2.13")	// module back, space, calculator, enter
+	PORT_BIT(0x02,  IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE)      PORT_CHAR(' ')
+	PORT_BIT(0x08,  IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RETURN") PORT_CODE(KEYCODE_ENTER)     PORT_CHAR(13)
 
 	PORT_START("BRK")       /* BREAK */
 	//PORT_BIT(0x01,  IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("BREAK") PORT_CODE(KEYCODE_F12) PORT_CHAR(UCHAR_MAMEKEY(F12)) PORT_CHANGED_MEMBER(DEVICE_SELF, accomm_state, trigger_reset, 0)
