@@ -658,7 +658,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(hp9845_base_state::kb_scan)
 
 		if (max_seq_len) {
 			// Key pressed, store scancode & generate IRL
-			logerror("idx=%u msl=%d\n" , max_seq_idx , max_seq_len);
+			//logerror("idx=%u msl=%d\n" , max_seq_idx , max_seq_len);
 			m_kb_scancode = max_seq_idx;
 			irq_w(0 , 1);
 			BIT_SET(m_kb_status, 0);
