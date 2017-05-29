@@ -238,7 +238,7 @@ static int getGameInfo(char* gameName, int* rotation, int* driverIndex,bool *Arc
       if (log_cb)
          log_cb(RETRO_LOG_INFO, "Game name: %s, Game description: %s\n",
                driver_list::driver(num).name,
-               driver_list::driver(num).description);
+               driver_list::driver(num).type.fullname());
    }
    else
    {
