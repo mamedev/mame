@@ -279,16 +279,6 @@ int cli_frontend::execute(std::vector<std::string> &args)
 
 	try
 	{
-//		std::string option_errors;
-//		mame_options::parse_standard_inis(m_options, option_errors);
-//		load_translation(m_options);
-
-//		manager->start_http_server();
-
-//		manager->start_luaengine();
-
-//		manager->start_context();
-
       		start_execution(manager, args);
 #if defined(__LIBRETRO__)
       return m_result;

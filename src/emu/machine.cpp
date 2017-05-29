@@ -1365,7 +1365,7 @@ extern int retro_pause;
 void running_machine::retro_machineexit(){
 
 	// and out via the exit phase
-	m_current_phase = MACHINE_PHASE_EXIT;
+	m_current_phase = machine_phase::EXIT;
 
 	// save the NVRAM and configuration
 	sound().ui_mute(true);
@@ -1382,29 +1382,25 @@ void running_machine::retro_loop(){
 
 	while (RLOOP==1) {
 
-		//manager().web()->serve();
- 
 		// execute CPUs if not paused
 		if (!m_paused)
 		{
 			m_scheduler.timeslice();
-			//emulator_info::periodic_check();
-			//FIXME: LUA PERIODIC TAKE TOO MUCH CPU 
 		}
 		// otherwise, just pump video updates through
 		else
 			m_video->frame_update();
 
 		// handle save/load
-		if (m_saveload_schedule != SLS_NONE)
+		if (m_saveload_schedule != saveload_schedule::NONE)
 			handle_saveload();
 
 	}
 
-	if( (m_hard_reset_pending || m_exit_pending) && m_saveload_schedule == SLS_NONE){
+	if( (m_hard_reset_pending || m_exit_pending) && m_saveload_schedule == saveload_schedule::NONE){
 
 	 	// and out via the exit phase
-		m_current_phase = MACHINE_PHASE_EXIT;
+		m_current_phase = machine_phase::EXIT;
 
 		// save the NVRAM and configuration
 		sound().ui_mute(true);
