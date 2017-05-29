@@ -76,6 +76,7 @@ protected:
 	void setup_ram_block(unsigned block , unsigned offset);
 
 	virtual void advance_gv_fsm(bool ds , bool trigger) = 0;
+	void kb_scan_ioport(ioport_value pressed , ioport_port *port , unsigned idx_base , int& max_seq_len , unsigned& max_seq_idx);
 
 	// Character generator
 	required_region_ptr<uint8_t> m_chargen;
