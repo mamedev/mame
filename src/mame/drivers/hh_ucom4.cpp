@@ -82,7 +82,7 @@ TODO:
 #include "mvbfree.lh"
 #include "tactix.lh" // clickable
 
-//#include "hh_ucom4_test.lh" // common test-layout - no svg artwork(yet), use external artwork
+#include "hh_ucom4_test.lh" // common test-layout - no svg artwork(yet), use external artwork
 
 
 // machine start/reset
@@ -1244,8 +1244,6 @@ MACHINE_CONFIG_END
   - USA: Electronic Football (aka Pro-Bowl Football)
   - Japan: American Football
 
-  note: MAME external artwork is not needed for this game
-
 ***************************************************************************/
 
 class efball_state : public hh_ucom4_state
@@ -1668,7 +1666,7 @@ MACHINE_CONFIG_END
 
   Mattel Computer Gin
   * NEC uCOM-43 MCU, label D650C 060
-  * Hughes HLCD0569 LCD driver
+  * Hughes HLCD0569 LCD driver, 5 by 14 segments LCD panel, no sound
 
 ***************************************************************************/
 
@@ -1683,18 +1681,24 @@ public:
 	required_device<hlcd0569_device> m_lcd;
 
 	DECLARE_WRITE32_MEMBER(lcd_output_w);
-	DECLARE_WRITE8_MEMBER(unk_w);
+	DECLARE_WRITE8_MEMBER(lcd_w);
 };
 
 // handlers
 
 WRITE32_MEMBER(mcompgin_state::lcd_output_w)
 {
+	display_matrix(26, 8, data, 1 << offset);
 }
 
-WRITE8_MEMBER(mcompgin_state::unk_w)
+WRITE8_MEMBER(mcompgin_state::lcd_w)
 {
-	// E=lcd
+	// E0: HLCD0569 _CS
+	// E1: HLCD0569 clock
+	// E2: HLCD0569 data in
+	m_lcd->write_cs(data & 1);
+	m_lcd->write_data(data >> 2 & 1);
+	m_lcd->write_clock(data >> 1 & 1);
 }
 
 
@@ -1702,16 +1706,15 @@ WRITE8_MEMBER(mcompgin_state::unk_w)
 
 static INPUT_PORTS_START( mcompgin )
 	PORT_START("IN.0") // port A
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) // 21 select
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) // 23 deal
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) // 22 discard
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) // 20 draw
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Select")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Deal / Gin")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Discard")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Draw")
 
 	PORT_START("IN.1") // port B
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 ) // 24 comp
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON6 ) // 25 score
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON7 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON8 )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Compare")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Score")
+	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( mcompgin )
@@ -1720,23 +1723,16 @@ static MACHINE_CONFIG_START( mcompgin )
 	MCFG_CPU_ADD("maincpu", NEC_D650, 400000) // approximation
 	MCFG_UCOM4_READ_A_CB(IOPORT("IN.0"))
 	MCFG_UCOM4_READ_B_CB(IOPORT("IN.1"))
-	MCFG_UCOM4_WRITE_C_CB(WRITE8(mcompgin_state, unk_w))
-	MCFG_UCOM4_WRITE_D_CB(WRITE8(mcompgin_state, unk_w))
-	MCFG_UCOM4_WRITE_E_CB(WRITE8(mcompgin_state, unk_w))
-	MCFG_UCOM4_WRITE_F_CB(WRITE8(mcompgin_state, unk_w))
-	MCFG_UCOM4_WRITE_G_CB(WRITE8(mcompgin_state, unk_w))
-	MCFG_UCOM4_WRITE_H_CB(WRITE8(mcompgin_state, unk_w))
-	MCFG_UCOM4_WRITE_I_CB(WRITE8(mcompgin_state, unk_w))
+	MCFG_UCOM4_WRITE_E_CB(WRITE8(mcompgin_state, lcd_w))
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("lcd", HLCD0569, 1000) // C=?
 	MCFG_HLCD0515_WRITE_COLS_CB(WRITE32(mcompgin_state, lcd_output_w))
-	MCFG_DEFAULT_LAYOUT(layout_mcompgin)
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
+	//MCFG_DEFAULT_LAYOUT(layout_mcompgin)
 
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	/* no sound! */
 MACHINE_CONFIG_END
 
 
@@ -1749,8 +1745,6 @@ MACHINE_CONFIG_END
   * PCB label Mego 79 rev F
   * NEC uCOM-43 MCU, label D553C 049
   * cyan VFD display Futaba DM-4.5 91
-
-  note: MAME external artwork is not needed for this game
 
 ***************************************************************************/
 
@@ -2781,7 +2775,7 @@ ROM_END
 
 ROM_START( mcompgin )
 	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "d650c-060", 0x0000, 0x0800, BAD_DUMP CRC(92a4d8be) SHA1(d67f14a2eb53b79a7d9eb08103325299bc643781) ) // d5 stuck: xx1x xxxx
+	ROM_LOAD( "d650c-060", 0x0000, 0x0800, CRC(985e6da6) SHA1(ea4102a10a5741f06297c5426156e4b2f0d85a68) )
 ROM_END
 
 
@@ -2870,7 +2864,7 @@ CONS( 1981, galaxy2b, galaxy2,  0, galaxy2b, galaxy2,  galaxy2_state,  0, "Epoch
 CONS( 1982, astrocmd, 0,        0, astrocmd, astrocmd, astrocmd_state, 0, "Epoch", "Astro Command", MACHINE_SUPPORTS_SAVE )
 CONS( 1982, edracula, 0,        0, edracula, edracula, edracula_state, 0, "Epoch", "Dracula (Epoch)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1979, mcompgin, 0,        0, mcompgin, mcompgin, mcompgin_state, 0, "Mattel", "Computer Gin", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1979, mcompgin, 0,        0, mcompgin, mcompgin, mcompgin_state, 0, "Mattel", "Computer Gin", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
 
 CONS( 1979, mvbfree,  0,        0, mvbfree,  mvbfree,  mvbfree_state,  0, "Mego", "Mini-Vid Break Free", MACHINE_SUPPORTS_SAVE )
 
