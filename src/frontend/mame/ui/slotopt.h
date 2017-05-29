@@ -34,7 +34,6 @@ private:
 	const char *get_previous_slot(device_slot_interface &slot) const;
 	void set_slot_device(device_slot_interface &slot, const char *val);
 	void record_current_options();
-	void refresh_current_options();
 	bool try_refresh_current_options();
 
 	// variables
