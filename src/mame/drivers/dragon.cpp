@@ -22,6 +22,7 @@
 #include "bus/coco/coco_multi.h"
 #include "formats/vdk_dsk.h"
 #include "formats/dmk_dsk.h"
+#include "formats/sdf_dsk.h"
 #include "imagedev/flopdrv.h"
 
 
@@ -140,7 +141,8 @@ SLOT_INTERFACE_END
 
 FLOPPY_FORMATS_MEMBER( dragon_alpha_state::dragon_formats )
 	FLOPPY_VDK_FORMAT,
-	FLOPPY_DMK_FORMAT
+	FLOPPY_DMK_FORMAT,
+	FLOPPY_SDF_FORMAT
 FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START( dragon_alpha_floppies )
