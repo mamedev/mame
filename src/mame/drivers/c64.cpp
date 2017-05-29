@@ -1311,7 +1311,7 @@ void c64_state::machine_reset()
 //  MACHINE_CONFIG( ntsc )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( ntsc, c64_state )
+static MACHINE_CONFIG_START( ntsc )
 	// basic hardware
 	MCFG_CPU_ADD(M6510_TAG, M6510, XTAL_14_31818MHz/14)
 	MCFG_CPU_PROGRAM_MAP(c64_mem)
@@ -1424,7 +1424,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( ntsc_sx )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( ntsc_sx, sx64_state )
+static MACHINE_CONFIG_START( ntsc_sx )
 	MCFG_FRAGMENT_ADD(ntsc)
 
 	// basic hardware
@@ -1442,7 +1442,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( ntsc_dx )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( ntsc_dx, sx64_state )
+static MACHINE_CONFIG_START( ntsc_dx )
 	MCFG_FRAGMENT_ADD(ntsc_sx)
 
 	// devices
@@ -1455,7 +1455,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( ntsc_c )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED_CLASS( ntsc_c, ntsc, c64c_state )
+static MACHINE_CONFIG_DERIVED( ntsc_c, ntsc )
 	MCFG_SOUND_REPLACE(MOS6581_TAG, MOS8580, XTAL_14_31818MHz/14)
 	MCFG_MOS6581_POTX_CALLBACK(READ8(c64_state, sid_potx_r))
 	MCFG_MOS6581_POTY_CALLBACK(READ8(c64_state, sid_poty_r))
@@ -1467,7 +1467,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( pal )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( pal, c64_state )
+static MACHINE_CONFIG_START( pal )
 	// basic hardware
 	MCFG_CPU_ADD(M6510_TAG, M6510, XTAL_17_734472MHz/18)
 	MCFG_CPU_PROGRAM_MAP(c64_mem)
@@ -1572,7 +1572,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( pal_sx )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( pal_sx, sx64_state )
+static MACHINE_CONFIG_START( pal_sx )
 	MCFG_FRAGMENT_ADD(pal)
 
 	// basic hardware
@@ -1590,7 +1590,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( pal_c )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED_CLASS( pal_c, pal, c64c_state )
+static MACHINE_CONFIG_DERIVED( pal_c, pal )
 	MCFG_SOUND_REPLACE(MOS6581_TAG, MOS8580, XTAL_17_734472MHz/18)
 	MCFG_MOS6581_POTX_CALLBACK(READ8(c64_state, sid_potx_r))
 	MCFG_MOS6581_POTY_CALLBACK(READ8(c64_state, sid_poty_r))
@@ -1602,7 +1602,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( pal_gs )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( pal_gs, c64gs_state )
+static MACHINE_CONFIG_START( pal_gs )
 	// basic hardware
 	MCFG_CPU_ADD(M6510_TAG, M6510, XTAL_17_734472MHz/18)
 	MCFG_CPU_PROGRAM_MAP(c64_mem)
@@ -2020,21 +2020,21 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE     INPUT   INIT                        COMPANY                        FULLNAME                                     FLAGS
-COMP( 1982, c64,     0,      0,      ntsc,       c64,    driver_device,      0,      "Commodore Business Machines", "Commodore 64 (NTSC)",                       MACHINE_SUPPORTS_SAVE )
-COMP( 1982, c64_jp,  c64,    0,      ntsc,       c64,    driver_device,      0,      "Commodore Business Machines", "Commodore 64 (Japan)",                      MACHINE_SUPPORTS_SAVE )
-COMP( 1982, c64p,    c64,    0,      pal,        c64,    driver_device,      0,      "Commodore Business Machines", "Commodore 64 (PAL)",                        MACHINE_SUPPORTS_SAVE )
-COMP( 1982, c64_se,  c64,    0,      pal,        c64sw,  driver_device,      0,      "Commodore Business Machines", "Commodore 64 / VIC-64S (Sweden/Finland)",   MACHINE_SUPPORTS_SAVE )
-COMP( 1983, pet64,   c64,    0,      pet64,      c64,    driver_device,      0,      "Commodore Business Machines", "PET 64 / CBM 4064 (NTSC)",                  MACHINE_SUPPORTS_SAVE | MACHINE_WRONG_COLORS )
-COMP( 1983, edu64,   c64,    0,      pet64,      c64,    driver_device,      0,      "Commodore Business Machines", "Educator 64 (NTSC)",                        MACHINE_SUPPORTS_SAVE | MACHINE_WRONG_COLORS )
-COMP( 1984, sx64,    c64,    0,      ntsc_sx,    c64,    driver_device,      0,      "Commodore Business Machines", "SX-64 / Executive 64 (NTSC)",               MACHINE_SUPPORTS_SAVE )
-COMP( 1984, sx64p,   c64,    0,      pal_sx,     c64,    driver_device,      0,      "Commodore Business Machines", "SX-64 / Executive 64 (PAL)",                MACHINE_SUPPORTS_SAVE )
-COMP( 1984, vip64,   c64,    0,      pal_sx,     c64sw,  driver_device,      0,      "Commodore Business Machines", "VIP-64 (Sweden/Finland)",                   MACHINE_SUPPORTS_SAVE )
-COMP( 1984, dx64,    c64,    0,      ntsc_dx,    c64,    driver_device,      0,      "Commodore Business Machines", "DX-64 (NTSC)",                              MACHINE_SUPPORTS_SAVE )
-COMP( 1984, tesa6240,c64,    0,      pal_sx,     c64,    driver_device,      0,      "Tesa Etikett",                "Etikettendrucker 6240",                     MACHINE_SUPPORTS_SAVE )
-COMP( 1986, c64c,    c64,    0,      ntsc_c,     c64,    driver_device,      0,      "Commodore Business Machines", "Commodore 64C (NTSC)",                      MACHINE_SUPPORTS_SAVE )
-COMP( 1986, c64cp,   c64,    0,      pal_c,      c64,    driver_device,      0,      "Commodore Business Machines", "Commodore 64C (PAL)",                       MACHINE_SUPPORTS_SAVE )
-COMP( 1988, c64c_es, c64,    0,      pal_c,      c64sw,  driver_device,      0,      "Commodore Business Machines", "Commodore 64C (Spain)",                     MACHINE_SUPPORTS_SAVE )
-COMP( 1986, c64c_se, c64,    0,      pal_c,      c64sw,  driver_device,      0,      "Commodore Business Machines", "Commodore 64C (Sweden/Finland)",            MACHINE_SUPPORTS_SAVE )
-COMP( 1986, c64g,    c64,    0,      pal_c,      c64,    driver_device,      0,      "Commodore Business Machines", "Commodore 64G (PAL)",                       MACHINE_SUPPORTS_SAVE )
-CONS( 1990, c64gs,   c64,    0,      pal_gs,     c64gs,  driver_device,      0,      "Commodore Business Machines", "Commodore 64 Games System (PAL)",           MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE     INPUT   STATE           INIT    COMPANY                        FULLNAME                                     FLAGS
+COMP( 1982, c64,     0,      0,      ntsc,       c64,    c64_state,      0,      "Commodore Business Machines", "Commodore 64 (NTSC)",                       MACHINE_SUPPORTS_SAVE )
+COMP( 1982, c64_jp,  c64,    0,      ntsc,       c64,    c64_state,      0,      "Commodore Business Machines", "Commodore 64 (Japan)",                      MACHINE_SUPPORTS_SAVE )
+COMP( 1982, c64p,    c64,    0,      pal,        c64,    c64_state,      0,      "Commodore Business Machines", "Commodore 64 (PAL)",                        MACHINE_SUPPORTS_SAVE )
+COMP( 1982, c64_se,  c64,    0,      pal,        c64sw,  c64_state,      0,      "Commodore Business Machines", "Commodore 64 / VIC-64S (Sweden/Finland)",   MACHINE_SUPPORTS_SAVE )
+COMP( 1983, pet64,   c64,    0,      pet64,      c64,    c64_state,      0,      "Commodore Business Machines", "PET 64 / CBM 4064 (NTSC)",                  MACHINE_SUPPORTS_SAVE | MACHINE_WRONG_COLORS )
+COMP( 1983, edu64,   c64,    0,      pet64,      c64,    c64_state,      0,      "Commodore Business Machines", "Educator 64 (NTSC)",                        MACHINE_SUPPORTS_SAVE | MACHINE_WRONG_COLORS )
+COMP( 1984, sx64,    c64,    0,      ntsc_sx,    c64,    sx64_state,     0,      "Commodore Business Machines", "SX-64 / Executive 64 (NTSC)",               MACHINE_SUPPORTS_SAVE )
+COMP( 1984, sx64p,   c64,    0,      pal_sx,     c64,    sx64_state,     0,      "Commodore Business Machines", "SX-64 / Executive 64 (PAL)",                MACHINE_SUPPORTS_SAVE )
+COMP( 1984, vip64,   c64,    0,      pal_sx,     c64sw,  sx64_state,     0,      "Commodore Business Machines", "VIP-64 (Sweden/Finland)",                   MACHINE_SUPPORTS_SAVE )
+COMP( 1984, dx64,    c64,    0,      ntsc_dx,    c64,    sx64_state,     0,      "Commodore Business Machines", "DX-64 (NTSC)",                              MACHINE_SUPPORTS_SAVE )
+COMP( 1984, tesa6240,c64,    0,      pal_sx,     c64,    sx64_state,     0,      "Tesa Etikett",                "Etikettendrucker 6240",                     MACHINE_SUPPORTS_SAVE )
+COMP( 1986, c64c,    c64,    0,      ntsc_c,     c64,    c64c_state,     0,      "Commodore Business Machines", "Commodore 64C (NTSC)",                      MACHINE_SUPPORTS_SAVE )
+COMP( 1986, c64cp,   c64,    0,      pal_c,      c64,    c64c_state,     0,      "Commodore Business Machines", "Commodore 64C (PAL)",                       MACHINE_SUPPORTS_SAVE )
+COMP( 1988, c64c_es, c64,    0,      pal_c,      c64sw,  c64c_state,     0,      "Commodore Business Machines", "Commodore 64C (Spain)",                     MACHINE_SUPPORTS_SAVE )
+COMP( 1986, c64c_se, c64,    0,      pal_c,      c64sw,  c64c_state,     0,      "Commodore Business Machines", "Commodore 64C (Sweden/Finland)",            MACHINE_SUPPORTS_SAVE )
+COMP( 1986, c64g,    c64,    0,      pal_c,      c64,    c64c_state,     0,      "Commodore Business Machines", "Commodore 64G (PAL)",                       MACHINE_SUPPORTS_SAVE )
+CONS( 1990, c64gs,   c64,    0,      pal_gs,     c64gs,  c64gs_state,    0,      "Commodore Business Machines", "Commodore 64 Games System (PAL)",           MACHINE_SUPPORTS_SAVE )

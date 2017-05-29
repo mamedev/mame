@@ -177,7 +177,7 @@ INTERRUPT_GEN_MEMBER(gameplan_state::trvquest_interrupt)
 	m_via_2->write_ca1(0);
 }
 
-static MACHINE_CONFIG_START( trvquest, gameplan_state )
+static MACHINE_CONFIG_START( trvquest )
 
 	MCFG_CPU_ADD("maincpu", M6809,XTAL_6MHz/4)
 	MCFG_CPU_PROGRAM_MAP(cpu_map)
@@ -238,4 +238,4 @@ ROM_START( trvquest )
 	ROM_LOAD( "roma", 0x16000, 0x2000, CRC(b4bcaf33) SHA1(c6b08fb8d55b2834d0c6c5baff9f544c795e4c15) )
 ROM_END
 
-GAME( 1984, trvquest, 0, trvquest, trvquest, driver_device, 0, ROT90, "Sunn / Techstar", "Trivia Quest", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, trvquest, 0, trvquest, trvquest, gameplan_state, 0, ROT90, "Sunn / Techstar", "Trivia Quest", MACHINE_SUPPORTS_SAVE )

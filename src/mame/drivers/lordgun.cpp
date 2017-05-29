@@ -632,7 +632,7 @@ void lordgun_state::machine_start()
 	save_item(NAME(m_whitescreen));
 }
 
-static MACHINE_CONFIG_START( lordgun, lordgun_state )
+static MACHINE_CONFIG_START( lordgun )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(lordgun_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", lordgun_state,  irq4_line_hold)
@@ -679,12 +679,12 @@ static MACHINE_CONFIG_START( lordgun, lordgun_state )
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_20MHz / 20, OKIM6295_PIN7_HIGH)   // ? 5MHz can't be right!
+	MCFG_OKIM6295_ADD("oki", XTAL_20MHz / 20, PIN7_HIGH)   // ? 5MHz can't be right!
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( aliencha, lordgun_state )
+static MACHINE_CONFIG_START( aliencha )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(aliencha_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", lordgun_state,  irq4_line_hold)
@@ -732,10 +732,10 @@ static MACHINE_CONFIG_START( aliencha, lordgun_state )
 	MCFG_YMF278B_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_20MHz / 20, OKIM6295_PIN7_HIGH)   // ? 5MHz can't be right
+	MCFG_OKIM6295_ADD("oki", XTAL_20MHz / 20, PIN7_HIGH)   // ? 5MHz can't be right
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL_20MHz / 20, OKIM6295_PIN7_HIGH)  // ? 5MHz can't be right
+	MCFG_OKIM6295_ADD("oki2", XTAL_20MHz / 20, PIN7_HIGH)  // ? 5MHz can't be right
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1080,6 +1080,6 @@ DRIVER_INIT_MEMBER(lordgun_state, aliencha)
 
 ***************************************************************************/
 
-GAME( 1994, lordgun,   0,        lordgun,  lordgun,  lordgun_state, lordgun,  ROT0, "IGS", "Lord of Gun (USA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, aliencha,  0,        aliencha, aliencha, driver_device, 0,        ROT0, "IGS", "Alien Challenge (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, alienchac, aliencha, aliencha, aliencha, driver_device, 0,        ROT0, "IGS", "Alien Challenge (China)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, lordgun,   0,        lordgun,  lordgun,  lordgun_state, lordgun,  ROT0, "IGS", "Lord of Gun (USA)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, aliencha,  0,        aliencha, aliencha, lordgun_state, 0,        ROT0, "IGS", "Alien Challenge (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, alienchac, aliencha, aliencha, aliencha, lordgun_state, 0,        ROT0, "IGS", "Alien Challenge (China)", MACHINE_SUPPORTS_SAVE )

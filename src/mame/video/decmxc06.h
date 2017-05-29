@@ -1,10 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail, David Haywood
-/* MXC06 */
+#ifndef MAME_VIDEO_DECMXC06_H
+#define MAME_VIDEO_DECMXC06_H
+
+#pragma once
 
 
-class deco_mxc06_device : public device_t,
-								public device_video_interface
+class deco_mxc06_device : public device_t, public device_video_interface
 {
 public:
 	deco_mxc06_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -36,7 +38,7 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 };
 
-extern const device_type DECO_MXC06;
+DECLARE_DEVICE_TYPE(DECO_MXC06, deco_mxc06_device)
 
 #define MCFG_DECO_MXC06_GFXDECODE(_gfxtag) \
 	deco_mxc06_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
@@ -46,3 +48,5 @@ extern const device_type DECO_MXC06;
 
 #define MCFG_DECO_MXC06_RAMSIZE(_size) \
 	deco_mxc06_device::set_ram_size(*device, _size);
+
+#endif // MAME_VIDEO_DECMXC06_H

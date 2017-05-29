@@ -45,7 +45,7 @@
 //****************************************************************************
 
 // device type definition
-const device_type NAMCO_C45_ROAD = device_creator<namco_c45_road_device>;
+DEFINE_DEVICE_TYPE(NAMCO_C45_ROAD, namco_c45_road_device, "namco_c45_road", "Namco C45 Road")
 
 
 const gfx_layout namco_c45_road_device::tilelayout =
@@ -77,7 +77,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 namco_c45_road_device::namco_c45_road_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, NAMCO_C45_ROAD, "Namco C45 Road", tag, owner, clock, "namco_c45_road", __FILE__),
+	: device_t(mconfig, NAMCO_C45_ROAD, tag, owner, clock),
 		device_gfx_interface(mconfig, *this, gfxinfo),
 		device_memory_interface(mconfig, *this),
 		m_space_config("c45", ENDIANNESS_BIG, 16, 17, 0, address_map_delegate(FUNC(namco_c45_road_device::map), this)),

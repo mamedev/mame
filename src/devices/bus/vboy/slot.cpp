@@ -15,7 +15,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type VBOY_CART_SLOT = device_creator<vboy_cart_slot_device>;
+DEFINE_DEVICE_TYPE(VBOY_CART_SLOT, vboy_cart_slot_device, "vboy_cart_slot", "Nintendo Virtual Boy Cartridge Slot")
 
 //**************************************************************************
 //    vboy cartridges Interface
@@ -75,10 +75,11 @@ void device_vboy_cart_interface::eeprom_alloc(uint32_t size)
 //  vboy_cart_slot_device - constructor
 //-------------------------------------------------
 vboy_cart_slot_device::vboy_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-						device_t(mconfig, VBOY_CART_SLOT, "Nintendo Virtual Boy Cartridge Slot", tag, owner, clock, "vboy_cart_slot", __FILE__),
-						device_image_interface(mconfig, *this),
-						device_slot_interface(mconfig, *this),
-						m_type(VBOY_STD), m_cart(nullptr)
+	device_t(mconfig, VBOY_CART_SLOT, tag, owner, clock),
+	device_image_interface(mconfig, *this),
+	device_slot_interface(mconfig, *this),
+	m_type(VBOY_STD),
+	m_cart(nullptr)
 {
 }
 

@@ -490,7 +490,7 @@ void destroyr_state::machine_start()
 	save_item(NAME(m_potsense));
 }
 
-static MACHINE_CONFIG_START( destroyr, destroyr_state )
+static MACHINE_CONFIG_START( destroyr )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, XTAL_12_096MHz / 16)
@@ -565,5 +565,5 @@ ROM_START( destroyr1 )
 ROM_END
 
 
-GAMEL( 1977, destroyr,  0,        destroyr, destroyr, driver_device, 0, ORIENTATION_FLIP_X, "Atari", "Destroyer (version O2)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_destroyr )
-GAMEL( 1977, destroyr1, destroyr, destroyr, destroyr, driver_device, 0, ORIENTATION_FLIP_X, "Atari", "Destroyer (version O1)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_destroyr )
+GAMEL( 1977, destroyr,  0,        destroyr, destroyr, destroyr_state, 0, ORIENTATION_FLIP_X, "Atari", "Destroyer (version O2)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_destroyr )
+GAMEL( 1977, destroyr1, destroyr, destroyr, destroyr, destroyr_state, 0, ORIENTATION_FLIP_X, "Atari", "Destroyer (version O1)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_destroyr )

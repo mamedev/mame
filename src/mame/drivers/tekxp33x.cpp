@@ -89,7 +89,7 @@ void tekxp330_state::machine_start()
 
 /* Machine Driver */
 
-static MACHINE_CONFIG_START( tekxp330, tekxp330_state )
+static MACHINE_CONFIG_START( tekxp330 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", R3052, XTAL_20MHz) /* IDT 79R3052E, clock unknown */
 	MCFG_R3000_ENDIANNESS(ENDIANNESS_BIG)
@@ -119,5 +119,5 @@ ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT     CLASS          INIT    COMPANY      FULLNAME           FLAGS */
-COMP( 1992, tekxp330,   0,          0,      tekxp330,   tekxp330, driver_device,   0,    "Tektronix", "TekXpress XP330", MACHINE_IS_SKELETON )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT  COMPANY      FULLNAME           FLAGS
+COMP( 1992, tekxp330, 0,      0,      tekxp330, tekxp330, tekxp330_state, 0,    "Tektronix", "TekXpress XP330", MACHINE_IS_SKELETON )

@@ -57,7 +57,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( sh4robot )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( sh4robot, sh4robot_state )
+static MACHINE_CONFIG_START( sh4robot )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH4LE, 200000000) // SH7750
 	MCFG_SH4_MD0(1)
@@ -89,5 +89,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    CONFIG COMPANY   FULLNAME       FLAGS */
-COMP( 20??, sh4robot,  0,       0,  sh4robot,   sh4robot, driver_device,   0,   "<unknown>", "Robot", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     STATE           INIT  COMPANY      FULLNAME  FLAGS
+COMP( 20??, sh4robot, 0,      0,      sh4robot, sh4robot, sh4robot_state, 0,    "<unknown>", "Robot",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

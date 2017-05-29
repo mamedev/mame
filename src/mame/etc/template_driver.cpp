@@ -2,7 +2,7 @@
 // copyright-holders:<author_name>
 /***************************************************************************
 
-Template for skeleton drivers
+Template for squeleton drivers
 
 ***************************************************************************/
 
@@ -17,22 +17,24 @@ class xxx_state : public driver_device
 {
 public:
 	xxx_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu")
-	{ }
-
-	// devices
-	required_device<cpu_device> m_maincpu;
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+	{
+	}
 
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(xxx);
+
 protected:
 	// driver_device overrides
 	virtual void machine_start();
 	virtual void machine_reset();
 
 	virtual void video_start();
+
+	// devices
+	required_device<cpu_device> m_maincpu;
 };
 
 void xxx_state::video_start()
@@ -137,7 +139,7 @@ PALETTE_INIT_MEMBER(xxx_state, xxx)
 {
 }
 
-static MACHINE_CONFIG_START( xxx, xxx_state )
+static MACHINE_CONFIG_START( xxx )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80,MAIN_CLOCK/2)
@@ -191,4 +193,4 @@ ROM_END
 // For a generic system:
 // SYST(YEAR,NAME,PARENT,COMPAT,MACHINE,INPUT,CLASS,INIT,COMPANY,FULLNAME,FLAGS)
 
-GAME( 198?, xxx,  0,   xxx,  xxx, driver_device,  0,       ROT0, "<template_manufacturer>",      "<template_machinename>", MACHINE_IS_SKELETON )
+GAME( 198?, xxx,  0,   xxx,  xxx, xxxx_state,  0,       ROT0, "<template_manufacturer>",      "<template_machinename>", MACHINE_IS_SKELETON )

@@ -480,7 +480,7 @@ void boxer_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( boxer, boxer_state )
+static MACHINE_CONFIG_START( boxer )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 16)
@@ -545,4 +545,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1978, boxer, 0, boxer, boxer, driver_device, 0, 0, "Atari", "Boxer (prototype)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1978, boxer, 0, boxer, boxer, boxer_state, 0, 0, "Atari", "Boxer (prototype)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

@@ -11,8 +11,8 @@
 */
 
 #include "emu.h"
-#include "debugger.h"
 #include "tx0.h"
+#include "debugger.h"
 
 #define LOG 0
 #define LOG_EXTRA 0
@@ -40,17 +40,17 @@
 #define INCREMENT_PC_8KW    (PC = (PC+1) & ADDRESS_MASK_8KW)
 
 
-const device_type TX0_8KW  = device_creator<tx0_8kw_device>;
-const device_type TX0_64KW = device_creator<tx0_64kw_device>;
+DEFINE_DEVICE_TYPE(TX0_8KW,  tx0_8kw_device,  "tx0_8kw_cpu",  "TX-0 8KW")
+DEFINE_DEVICE_TYPE(TX0_64KW, tx0_64kw_device, "tx0_64kw_cpu", "TX-0 64KW")
 
 
-tx0_device::tx0_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, int addr_bits, int address_mask, int ir_mask)
-	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
-	, m_program_config("program", ENDIANNESS_BIG, 32, addr_bits , -2), m_mbr(0), m_ac(0), m_mar(0), m_pc(0), m_ir(0), m_lr(0), m_xr(0), m_pf(0), m_tbr(0), m_tac(0), m_cm_sel(0),
-	m_lr_sel(0), m_gbl_cm_sel(0), m_stop_cyc0(0), m_stop_cyc1(0), m_run(0), m_rim(0), m_cycle(0), m_ioh(0), m_ios(0), m_rim_step(0)
-		, m_address_mask(address_mask)
+tx0_device::tx0_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int addr_bits, int address_mask, int ir_mask)
+	: cpu_device(mconfig, type, tag, owner, clock)
+	, m_program_config("program", ENDIANNESS_BIG, 32, addr_bits , -2), m_mbr(0), m_ac(0), m_mar(0), m_pc(0), m_ir(0), m_lr(0), m_xr(0), m_pf(0), m_tbr(0), m_tac(0), m_cm_sel(0)
+	, m_lr_sel(0), m_gbl_cm_sel(0), m_stop_cyc0(0), m_stop_cyc1(0), m_run(0), m_rim(0), m_cycle(0), m_ioh(0), m_ios(0), m_rim_step(0)
+	, m_address_mask(address_mask)
 	, m_ir_mask(ir_mask), m_icount(0), m_program(nullptr)
-		, m_cpy_handler(*this)
+	, m_cpy_handler(*this)
 	, m_r1l_handler(*this)
 	, m_dis_handler(*this)
 	, m_r3l_handler(*this)
@@ -65,13 +65,13 @@ tx0_device::tx0_device(const machine_config &mconfig, device_type type, const ch
 }
 
 tx0_8kw_device::tx0_8kw_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tx0_device(mconfig, TX0_8KW, "TX-0 8KW", tag, owner, clock, "tx0_8w_cpu", __FILE__, 13, ADDRESS_MASK_8KW, 037)
+	: tx0_device(mconfig, TX0_8KW, tag, owner, clock, 13, ADDRESS_MASK_8KW, 037)
 {
 }
 
 
 tx0_64kw_device::tx0_64kw_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tx0_device(mconfig, TX0_64KW, "TX-0 64KW", tag, owner, clock, "tx0_64kw_cpu", __FILE__, 16, ADDRESS_MASK_64KW, 03)
+	: tx0_device(mconfig, TX0_64KW, tag, owner, clock, 16, ADDRESS_MASK_64KW, 03)
 {
 }
 

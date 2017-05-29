@@ -300,7 +300,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( btoads, btoads_state )
+static MACHINE_CONFIG_START( btoads )
 
 	MCFG_CPU_ADD("maincpu", TMS34020, CPU_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
@@ -369,4 +369,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1994, btoads, 0, btoads, btoads, driver_device, 0,  ROT0, "Rare / Electronic Arts", "Battletoads", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, btoads, 0, btoads, btoads, btoads_state, 0,  ROT0, "Rare / Electronic Arts", "Battletoads", MACHINE_SUPPORTS_SAVE )

@@ -301,7 +301,7 @@ static ADDRESS_MAP_START( leapster_aux, AS_IO, 32, leapster_state )
 	AM_RANGE(0x00000012c, 0x00000012f) AM_WRITE(leapster_aux004b_w) // this address isn't used by ARC internal stuff afaik, so probably leapster specific
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( leapster, leapster_state )
+static MACHINE_CONFIG_START( leapster )
 	/* basic machine hardware */
 	// CPU is ArcTangent-A5 '5.1' (ARCompact core)
 	MCFG_CPU_ADD("maincpu", ARCA5, 96000000/10)
@@ -338,5 +338,5 @@ DRIVER_INIT_MEMBER(leapster_state,leapster)
 {
 }
 
-CONS(2003,  leapster,    0,         0,  leapster,    leapster, leapster_state, leapster,    "LeapFrog",   "Leapster (Germany)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IS_SKELETON )
-CONS(2005,  leapstertv,  leapster,  0,  leapster,    leapster, leapster_state, leapster,    "LeapFrog",   "Leapster TV (Germany)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IS_SKELETON )
+CONS( 2003,  leapster,    0,         0,  leapster,    leapster, leapster_state, leapster,    "LeapFrog",   "Leapster (Germany)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IS_SKELETON )
+CONS( 2005,  leapstertv,  leapster,  0,  leapster,    leapster, leapster_state, leapster,    "LeapFrog",   "Leapster TV (Germany)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IS_SKELETON )

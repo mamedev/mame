@@ -568,13 +568,13 @@ static INPUT_PORTS_START( dc )
 	PORT_CONFSETTING(    0x03, "S-Video" )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_FRAGMENT( gdrom_config )
+static MACHINE_CONFIG_START( gdrom_config )
 	MCFG_DEVICE_MODIFY("cdda")
 	MCFG_SOUND_ROUTE(0, "^^^^lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "^^^^rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( dc, dc_cons_state )
+static MACHINE_CONFIG_START( dc )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH4LE, CPU_CLOCK)
 	MCFG_SH4_MD0(1)
@@ -654,6 +654,9 @@ MACHINE_CONFIG_END
 	ROM_LOAD_BIOS(3, "dc101d_ch.bin",   0x000000, 0x200000, CRC(a2564fad) SHA1(edc5d3d70a93c935703d26119b37731fd317d2bf) )
 // ^^^ dc101d_eu.bin ^^^ is selfmade chinese translation, doesn't work on real hardware, does it must be here at all ?
 
+// note: Dreamcast Flash ROMs actually 256KB MBM29F002TC (VA0) or MBM29LV002TC (VA1) devices, only 2nd 128KB half is used, A17 pin tied to VCC
+// sector SA5 (1A000 - 1BFFF) is read-only, contain factory information (region, broadcast, serial number, etc)
+
 ROM_START(dc)
 	DREAMCAST_COMMON_BIOS
 
@@ -674,9 +677,7 @@ ROM_START( dcjp )
 	ROM_LOAD_BIOS(4, "mpr-21068.ic501", 0x000000, 0x200000, CRC(5454841f) SHA1(1ea132c0fbbf07ef76789eadc07908045c089bd6) )
 
 	ROM_REGION(0x020000, "dcflash", 0)
-	/* ROM_LOAD( "dcjp_ntsc.bad", 0x000000, 0x020000, BAD_DUMP CRC(307a7035) SHA1(1411423a9d071340ea52c56e19c1aafc4e1309ee) )      // Hacked Flash */
-	ROM_LOAD( "dcjp_ntsc.bin", 0x000000, 0x020000, BAD_DUMP CRC(5f92bf76) SHA1(be78b834f512ab2cf3d67b96e377c9f3093ff82a) )         // hacked PAL flash
-	ROM_FILL( 0x1a004, 1, 0x30 ) // patch broadcast back to NTSC
+	ROM_LOAD( "dcjp_ntsc.bin", 0x000000, 0x020000, CRC(f77c15a1) SHA1(66fd8ee40b207ce03a5fd6abbc00d27bbd5f92bd) ) // from VA0 with 1.004 BIOS
 ROM_END
 
 // normally, with DIP switch 4 off, HKT-100/110/120 AKA "Katana Set 5.xx", will be booted from flash ROM IC507 (first 2 dumps below)
@@ -699,8 +700,8 @@ ROM_START( dcdev )
 	ROM_LOAD( "hkt-0120-flash.bin", 0x000000, 0x020000, CRC(7784c304) SHA1(31ef57f550d8cd13e40263cbc657253089e53034) )
 ROM_END
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT      COMPANY FULLNAME */
-CONS( 1999, dc,     dcjp,   0,      dc,     dc, dc_cons_state,     dcus,   "Sega", "Dreamcast (USA, NTSC)", MACHINE_NOT_WORKING )
-CONS( 1998, dcjp,   0,      0,      dc,     dc, dc_cons_state,     dcjp,   "Sega", "Dreamcast (Japan, NTSC)", MACHINE_NOT_WORKING )
-CONS( 1999, dceu,   dcjp,   0,      dc,     dc, dc_cons_state,     dcus,   "Sega", "Dreamcast (Europe, PAL)", MACHINE_NOT_WORKING )
-CONS( 1998, dcdev,  0,      0,      dc,     dc, dc_cons_state,     dc,     "Sega", "HKT-0120 Sega Dreamcast Development Box", MACHINE_NOT_WORKING )
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT STATE            INIT    COMPANY FULLNAME */
+CONS( 1999, dc,     dcjp,   0,      dc,     dc,   dc_cons_state,   dcus,   "Sega", "Dreamcast (USA, NTSC)", MACHINE_NOT_WORKING )
+CONS( 1998, dcjp,   0,      0,      dc,     dc,   dc_cons_state,   dcjp,   "Sega", "Dreamcast (Japan, NTSC)", MACHINE_NOT_WORKING )
+CONS( 1999, dceu,   dcjp,   0,      dc,     dc,   dc_cons_state,   dcus,   "Sega", "Dreamcast (Europe, PAL)", MACHINE_NOT_WORKING )
+CONS( 1998, dcdev,  0,      0,      dc,     dc,   dc_cons_state,   dc,     "Sega", "HKT-0120 Sega Dreamcast Development Box", MACHINE_NOT_WORKING )

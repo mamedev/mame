@@ -71,8 +71,8 @@ const int32_t multipcm_device::VALUE_TO_CHANNEL[32] =
 	21,22,23,24,25,26,27, -1,
 };
 
-const uint32_t multipcm_device::TL_SHIFT = 12;
-const uint32_t multipcm_device::EG_SHIFT = 16;
+constexpr uint32_t multipcm_device::TL_SHIFT;
+constexpr uint32_t multipcm_device::EG_SHIFT;
 
 void multipcm_device::init_sample(sample_t *sample, uint32_t index)
 {
@@ -187,7 +187,7 @@ void multipcm_device::envelope_generator_calc(slot_t *slot)
         LFO  SECTION
 *****************************/
 
-const uint32_t multipcm_device::LFO_SHIFT = 8;
+constexpr uint32_t multipcm_device::LFO_SHIFT;
 
 const float multipcm_device::LFO_FREQ[8] = // In Hertz
 {
@@ -284,8 +284,8 @@ void multipcm_device::lfo_init()
 
 uint32_t multipcm_device::value_to_fixed(const uint32_t bits, const float value)
 {
-	const float float_shift = (float)(1 << bits);
-	return (uint32_t)(float_shift * value);
+	const float float_shift = float(1 << bits);
+	return uint32_t(float_shift * value);
 }
 
 int32_t multipcm_device::pitch_lfo_step(lfo_t *lfo)
@@ -307,7 +307,7 @@ int32_t multipcm_device::amplitude_lfo_step(lfo_t *lfo)
 void multipcm_device::lfo_compute_step(lfo_t *lfo, uint32_t lfo_frequency, uint32_t lfo_scale, int32_t amplitude_lfo)
 {
 	float step = (float)LFO_FREQ[lfo_frequency] * 256.0f / (float)m_rate;
-	lfo->m_phase_step = (uint32_t)((float)(1 << LFO_SHIFT) * step);
+	lfo->m_phase_step = uint32_t(float(1 << LFO_SHIFT) * step);
 	if (amplitude_lfo)
 	{
 		lfo->m_table = m_amplitude_table;
@@ -464,10 +464,10 @@ void multipcm_device::set_bank(uint32_t leftoffs, uint32_t rightoffs)
 	printf("%08x, %08x\n", leftoffs, rightoffs);
 }
 
-const device_type MULTIPCM = device_creator<multipcm_device>;
+DEFINE_DEVICE_TYPE(MULTIPCM, multipcm_device, "multipcm", "Sega/Yamaha 315-5560 MultiPCM")
 
 multipcm_device::multipcm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MULTIPCM, "Sega/Yamaha 315-5560", tag, owner, clock, "multipcm", __FILE__),
+	: device_t(mconfig, MULTIPCM, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		device_rom_interface(mconfig, *this, 24),
 		m_stream(nullptr),

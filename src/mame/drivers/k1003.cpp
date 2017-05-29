@@ -134,7 +134,7 @@ void k1003_state::machine_reset()
 {
 }
 
-static MACHINE_CONFIG_START( k1003, k1003_state )
+static MACHINE_CONFIG_START( k1003 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8008, 800000)
 	MCFG_CPU_PROGRAM_MAP(k1003_mem)
@@ -193,5 +193,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1978, k1003,  0,      0,       k1003,     k1003, driver_device,   0,    "Robotron", "K1003", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE        INIT  COMPANY     FULLNAME  FLAGS
+COMP( 1978, k1003,  0,      0,       k1003,     k1003, k1003_state, 0,    "Robotron", "K1003",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

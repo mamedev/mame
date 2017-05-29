@@ -1,22 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:Frank Palazzolo, Aaron Giles, Jonathan Gevaryahu, Raphael Nabet, Couriersud, Michael Zapf
-#pragma once
+#ifndef MAME_SOUND_TMS5220_H
+#define MAME_SOUND_TMS5220_H
 
-#ifndef __TMS5220_H__
-#define __TMS5220_H__
+#pragma once
 
 #include "machine/spchrom.h"
 
-enum
-{
-	RS=2,
-	WS=1
-};
-
 /* HACK: if defined, uses impossibly perfect 'straight line' interpolation */
-#undef PERFECT_INTERPOLATION_HACK
-
-#define FIFO_SIZE 16
+#undef TMS5220_PERFECT_INTERPOLATION_HACK
 
 /* clock rate = 80 * output sample rate,     */
 /* usually 640000 for 8000 Hz sample rate or */
@@ -49,30 +41,33 @@ enum
 
 #define MCFG_TMS52XX_ROMCLK_CB(_devcb) \
 	devcb = &tms5220_device::set_romclk_callback(*device, DEVCB_##_devcb);
-class tms5220_device : public device_t,
-									public device_sound_interface
+
+class tms5220_device : public device_t, public device_sound_interface
 {
 public:
+	enum
+	{
+		RS=2,
+		WS=1
+	};
+
 	tms5220_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	tms5220_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<tms5220_device &>(device).m_irq_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_readyq_handler(device_t &device, _Object object) { return downcast<tms5220_device &>(device).m_readyq_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb) { return downcast<tms5220_device &>(device).m_irq_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_readyq_handler(device_t &device, Object &&cb) { return downcast<tms5220_device &>(device).m_readyq_handler.set_callback(std::forward<Object>(cb)); }
 	// old VSM support, remove me!
 	static void set_speechrom_tag(device_t &device, const char *_tag) { downcast<tms5220_device &>(device).m_speechrom_tag = _tag; }
 	// new VSM support
-	template<class _Object> static devcb_base &set_m0_callback(device_t &device, _Object object) { return downcast<tms5220_device &>(device).m_m0_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_m1_callback(device_t &device, _Object object) { return downcast<tms5220_device &>(device).m_m1_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_addr_callback(device_t &device, _Object object) { return downcast<tms5220_device &>(device).m_addr_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_data_callback(device_t &device, _Object object) { return downcast<tms5220_device &>(device).m_data_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_romclk_callback(device_t &device, _Object object) { return downcast<tms5220_device &>(device).m_romclk_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_m0_callback(device_t &device, Object &&cb) { return downcast<tms5220_device &>(device).m_m0_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_m1_callback(device_t &device, Object &&cb) { return downcast<tms5220_device &>(device).m_m1_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_addr_callback(device_t &device, Object &&cb) { return downcast<tms5220_device &>(device).m_addr_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_data_callback(device_t &device, Object &&cb) { return downcast<tms5220_device &>(device).m_data_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_romclk_callback(device_t &device, Object &&cb) { return downcast<tms5220_device &>(device).m_romclk_cb.set_callback(std::forward<Object>(cb)); }
 
-	/* Control lines - once written to will switch interface into
-	 * "true" timing behaviour.
-	 */
+	// Control lines - once written to will switch interface into * "true" timing behaviour.
 
-	/* all lines with suffix q are active low! */
+	// all lines with suffix q are active low!
 
 	WRITE_LINE_MEMBER( rsq_w );
 	WRITE_LINE_MEMBER( wsq_w );
@@ -97,6 +92,8 @@ public:
 	void set_frequency(int frequency);
 
 protected:
+	tms5220_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int variant);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -106,9 +103,9 @@ protected:
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
-	void set_variant(int variant);
-
 private:
+	static constexpr unsigned FIFO_SIZE = 16;
+
 	// 51xx and VSM related
 	void new_int_write(uint8_t rc, uint8_t m0, uint8_t m1, uint8_t addr);
 	void new_int_write_addr(uint8_t addr);
@@ -130,10 +127,17 @@ private:
 	void set_interrupt_state(int state);
 	void update_ready_state();
 
+	uint8_t TALK_STATUS() const { return m_SPEN | m_TALKD; }
+	uint8_t &OLD_FRAME_SILENCE_FLAG() { return m_OLDE; } // 1 if E=0, 0 otherwise.
+	uint8_t &OLD_FRAME_UNVOICED_FLAG() { return m_OLDP; } // 1 if P=0 (unvoiced), 0 if voiced
+	bool NEW_FRAME_STOP_FLAG() const { return m_new_frame_energy_idx == 0x0F; } // 1 if this is a stop (Energy = 0xF) frame
+	bool NEW_FRAME_SILENCE_FLAG() const { return m_new_frame_energy_idx == 0; } // ditto as above
+	bool NEW_FRAME_UNVOICED_FLAG() const { return m_new_frame_pitch_idx == 0; } // ditto as above
+
 	// internal state
 
 	/* coefficient tables */
-	int m_variant;                /* Variant of the 5xxx - see tms5110r.h */
+	const int m_variant;                /* Variant of the 5xxx - see tms5110r.h */
 
 	/* coefficient tables */
 	const struct tms5100_coeffs *m_coeff;
@@ -169,7 +173,6 @@ private:
 	uint8_t m_SPEN;             /* set on speak(or speak external and BL falling edge) command, cleared on stop command, reset command, or buffer out */
 	uint8_t m_DDIS;             /* If 1, DDIS is 1, i.e. Speak External command in progress, writes go to FIFO. */
 	uint8_t m_TALK;             /* set on SPEN & RESETL4(pc12->pc0 transition), cleared on stop command or reset command */
-#define TALK_STATUS (m_SPEN|m_TALKD)
 	uint8_t m_TALKD;            /* TALK(TCON) value, latched every RESETL4 */
 	uint8_t m_buffer_low;       /* If 1, FIFO has less than 8 bytes in it */
 	uint8_t m_buffer_empty;     /* If 1, FIFO is empty */
@@ -177,21 +180,16 @@ private:
 	uint8_t m_ready_pin;        /* state of the READY pin (output) */
 
 	/* these contain data describing the current and previous voice frames */
-#define OLD_FRAME_SILENCE_FLAG m_OLDE // 1 if E=0, 0 otherwise.
-#define OLD_FRAME_UNVOICED_FLAG m_OLDP // 1 if P=0 (unvoiced), 0 if voiced
 	uint8_t m_OLDE;
 	uint8_t m_OLDP;
 
-#define NEW_FRAME_STOP_FLAG (m_new_frame_energy_idx == 0xF) // 1 if this is a stop (Energy = 0xF) frame
-#define NEW_FRAME_SILENCE_FLAG (m_new_frame_energy_idx == 0) // ditto as above
-#define NEW_FRAME_UNVOICED_FLAG (m_new_frame_pitch_idx == 0) // ditto as above
 	uint8_t m_new_frame_energy_idx;
 	uint8_t m_new_frame_pitch_idx;
 	uint8_t m_new_frame_k_idx[10];
 
 
 	/* these are all used to contain the current state of the sound generation */
-#ifndef PERFECT_INTERPOLATION_HACK
+#ifndef TMS5220_PERFECT_INTERPOLATION_HACK
 	int16_t m_current_energy;
 	int16_t m_current_pitch;
 	int16_t m_current_k[10];
@@ -270,50 +268,39 @@ private:
 	devcb_write_line   m_romclk_cb;  // rom clock - Only used to drive the data lines
 };
 
-extern const device_type TMS5220;
 
 class tms5220c_device : public tms5220_device
 {
 public:
 	tms5220c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-protected:
-	// device-level overrides
-	virtual void device_start() override;
 };
 
-extern const device_type TMS5220C;
 
 class cd2501e_device : public tms5220_device
 {
 public:
 	cd2501e_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-protected:
-	// device-level overrides
-	virtual void device_start() override;
 };
 
-extern const device_type CD2501E;
 
 class tms5200_device : public tms5220_device
 {
 public:
 	tms5200_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-protected:
-	// device-level overrides
-	virtual void device_start() override;
 };
 
-extern const device_type TMS5200;
 
 class cd2501ecd_device : public tms5220_device
 {
 public:
 	cd2501ecd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-protected:
-	// device-level overrides
-	virtual void device_start() override;
 };
 
-extern const device_type CD2501ECD;
 
-#endif
+DECLARE_DEVICE_TYPE(TMS5220,   tms5220_device)
+DECLARE_DEVICE_TYPE(TMS5220C,  tms5220c_device)
+DECLARE_DEVICE_TYPE(CD2501E,   cd2501e_device)
+DECLARE_DEVICE_TYPE(TMS5200,   tms5200_device)
+DECLARE_DEVICE_TYPE(CD2501ECD, cd2501ecd_device)
+
+#endif // MAME_SOUND_TMS5220_H

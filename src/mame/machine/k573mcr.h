@@ -4,14 +4,14 @@
  * Konami 573 Memory Card Reader
  *
  */
+#ifndef MAME_MACHINE_K573_MCR_H
+#define MAME_MACHINE_K573_MCR_H
 
 #pragma once
 
-#ifndef __K573MCR_H__
-#define __K573MCR_H__
 
 
-extern const device_type KONAMI_573_MEMORY_CARD_READER;
+DECLARE_DEVICE_TYPE(KONAMI_573_MEMORY_CARD_READER, k573mcr_device)
 
 class k573mcr_device : public device_t
 {
@@ -24,4 +24,4 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
-#endif
+#endif // MAME_MACHINE_K573_MCR_H

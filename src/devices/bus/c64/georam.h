@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUC_C64_GEORAM_H
+#define MAME_BUC_C64_GEORAM_H
 
-#ifndef __GEORAM__
-#define __GEORAM__
+#pragma once
 
 
 #include "exp.h"
@@ -46,7 +46,7 @@ private:
 
 
 // device type definition
-extern const device_type C64_GEORAM;
+DECLARE_DEVICE_TYPE(C64_GEORAM, c64_georam_cartridge_device)
 
 
-#endif
+#endif // MAME_BUC_C64_GEORAM_H

@@ -13,7 +13,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type NES_SUBORKEYBOARD = device_creator<nes_suborkey_device>;
+DEFINE_DEVICE_TYPE(NES_SUBORKEYBOARD, nes_suborkey_device, "nes_suborkey", "Subor FC Keyboard")
 
 
 static INPUT_PORTS_START( fc_suborkey )
@@ -162,7 +162,7 @@ ioport_constructor nes_suborkey_device::device_input_ports() const
 //-------------------------------------------------
 
 nes_suborkey_device::nes_suborkey_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, NES_SUBORKEYBOARD, "Subor FC Keyboard", tag, owner, clock, "nes_suborkey", __FILE__)
+	: device_t(mconfig, NES_SUBORKEYBOARD, tag, owner, clock)
 	, device_nes_control_port_interface(mconfig, *this)
 	, m_kbd(*this, "SUBOR.%u", 0)
 	, m_fck_scan(0)

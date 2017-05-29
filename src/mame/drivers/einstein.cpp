@@ -108,14 +108,14 @@ MC6845_UPDATE_ROW( einstein_state::crtc_update_row )
 		char_code = m_crtc_ram[(ma + i) & 0x07ff];
 		data_byte = data[(char_code << 3) + (ra & 0x07) + ((ra & 0x08) << 8)];
 
-		bitmap.pix32(y, x + 0) = palette[TMS9928A_PALETTE_SIZE + BIT(data_byte, 7)];
-		bitmap.pix32(y, x + 1) = palette[TMS9928A_PALETTE_SIZE + BIT(data_byte, 6)];
-		bitmap.pix32(y, x + 2) = palette[TMS9928A_PALETTE_SIZE + BIT(data_byte, 5)];
-		bitmap.pix32(y, x + 3) = palette[TMS9928A_PALETTE_SIZE + BIT(data_byte, 4)];
-		bitmap.pix32(y, x + 4) = palette[TMS9928A_PALETTE_SIZE + BIT(data_byte, 3)];
-		bitmap.pix32(y, x + 5) = palette[TMS9928A_PALETTE_SIZE + BIT(data_byte, 2)];
-		bitmap.pix32(y, x + 6) = palette[TMS9928A_PALETTE_SIZE + BIT(data_byte, 1)];
-		bitmap.pix32(y, x + 7) = palette[TMS9928A_PALETTE_SIZE + BIT(data_byte, 0)];
+		bitmap.pix32(y, x + 0) = palette[tms9928a_device::PALETTE_SIZE + BIT(data_byte, 7)];
+		bitmap.pix32(y, x + 1) = palette[tms9928a_device::PALETTE_SIZE + BIT(data_byte, 6)];
+		bitmap.pix32(y, x + 2) = palette[tms9928a_device::PALETTE_SIZE + BIT(data_byte, 5)];
+		bitmap.pix32(y, x + 3) = palette[tms9928a_device::PALETTE_SIZE + BIT(data_byte, 4)];
+		bitmap.pix32(y, x + 4) = palette[tms9928a_device::PALETTE_SIZE + BIT(data_byte, 3)];
+		bitmap.pix32(y, x + 5) = palette[tms9928a_device::PALETTE_SIZE + BIT(data_byte, 2)];
+		bitmap.pix32(y, x + 6) = palette[tms9928a_device::PALETTE_SIZE + BIT(data_byte, 1)];
+		bitmap.pix32(y, x + 7) = palette[tms9928a_device::PALETTE_SIZE + BIT(data_byte, 0)];
 	}
 }
 
@@ -161,14 +161,14 @@ void einstein_state::einstein_scan_keyboard()
 {
 	uint8_t data = 0xff;
 
-	if (!BIT(m_keyboard_line, 0)) data &= m_line0->read();
-	if (!BIT(m_keyboard_line, 1)) data &= m_line1->read();
-	if (!BIT(m_keyboard_line, 2)) data &= m_line2->read();
-	if (!BIT(m_keyboard_line, 3)) data &= m_line3->read();
-	if (!BIT(m_keyboard_line, 4)) data &= m_line4->read();
-	if (!BIT(m_keyboard_line, 5)) data &= m_line5->read();
-	if (!BIT(m_keyboard_line, 6)) data &= m_line6->read();
-	if (!BIT(m_keyboard_line, 7)) data &= m_line7->read();
+	if (!BIT(m_keyboard_line, 0)) data &= m_line[0]->read();
+	if (!BIT(m_keyboard_line, 1)) data &= m_line[1]->read();
+	if (!BIT(m_keyboard_line, 2)) data &= m_line[2]->read();
+	if (!BIT(m_keyboard_line, 3)) data &= m_line[3]->read();
+	if (!BIT(m_keyboard_line, 4)) data &= m_line[4]->read();
+	if (!BIT(m_keyboard_line, 5)) data &= m_line[5]->read();
+	if (!BIT(m_keyboard_line, 6)) data &= m_line[6]->read();
+	if (!BIT(m_keyboard_line, 7)) data &= m_line[7]->read();
 
 	m_keyboard_data = data;
 }
@@ -435,8 +435,8 @@ MACHINE_RESET_MEMBER(einstein_state,einstein2)
 	einstein_state::machine_reset();
 
 	/* 80 column card palette */
-	m_palette->set_pen_color(TMS9928A_PALETTE_SIZE, rgb_t::black());
-	m_palette->set_pen_color(TMS9928A_PALETTE_SIZE + 1, rgb_t(0, 224, 0));
+	m_palette->set_pen_color(tms9928a_device::PALETTE_SIZE, rgb_t::black());
+	m_palette->set_pen_color(tms9928a_device::PALETTE_SIZE + 1, rgb_t(0, 224, 0));
 }
 
 MACHINE_START_MEMBER(einstein_state,einstein2)
@@ -490,7 +490,7 @@ static ADDRESS_MAP_START( einstein_io, AS_IO, 8, einstein_state )
 	AM_RANGE(0x10, 0x10) AM_MIRROR(0xff06) AM_DEVREADWRITE(IC_I060, i8251_device, data_r, data_w)
 	AM_RANGE(0x11, 0x11) AM_MIRROR(0xff06) AM_DEVREADWRITE(IC_I060, i8251_device, status_r, control_w)
 	/* block 3, wd1770 floppy controller */
-	AM_RANGE(0x18, 0x1b) AM_MIRROR(0xff04) AM_DEVREADWRITE(IC_I042, wd1770_t, read, write)
+	AM_RANGE(0x18, 0x1b) AM_MIRROR(0xff04) AM_DEVREADWRITE(IC_I042, wd1770_device, read, write)
 	/* block 4, internal controls */
 	AM_RANGE(0x20, 0x20) AM_MIRROR(0xff00) AM_READWRITE(einstein_kybintmsk_r, einstein_kybintmsk_w)
 	AM_RANGE(0x21, 0x21) AM_MIRROR(0xff00) AM_WRITE(einstein_adcintmsk_w)
@@ -685,7 +685,7 @@ static SLOT_INTERFACE_START( einstein_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( einstein, einstein_state )
+static MACHINE_CONFIG_START( einstein )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(IC_I001, Z80, XTAL_X002 / 2)
 	MCFG_CPU_PROGRAM_MAP(einstein_mem)
@@ -776,7 +776,7 @@ static MACHINE_CONFIG_DERIVED( einstei2, einstein )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", einstei2)
 
 	/* 2 additional colors for the 80 column screen */
-	MCFG_PALETTE_ADD("palette", TMS9928A_PALETTE_SIZE + 2)
+	MCFG_PALETTE_ADD("palette", tms9928a_device::PALETTE_SIZE + 2)
 
 	MCFG_MC6845_ADD("crtc", MC6845, "80column", XTAL_X002 / 4)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
@@ -832,7 +832,7 @@ ROM_END
     GAME DRIVERS
 ***************************************************************************/
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT           INIT  COMPANY   FULLNAME                             FLAGS */
-COMP( 1984, einstein, 0,        0,      einstein, einstein, driver_device,       0,    "Tatung", "Einstein TC-01",                    0 )
-COMP( 1984, einstei2, einstein, 0,      einstei2, einstein_80col, driver_device, 0,    "Tatung", "Einstein TC-01 + 80 column device", 0 )
-COMP( 1984, einst256, 0,        0,      einstein, einstein, driver_device,       0,    "Tatung", "Einstein 256",                         MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT           STATE           INIT  COMPANY   FULLNAME                             FLAGS
+COMP( 1984, einstein, 0,        0,      einstein, einstein,       einstein_state, 0,    "Tatung", "Einstein TC-01",                    0 )
+COMP( 1984, einstei2, einstein, 0,      einstei2, einstein_80col, einstein_state, 0,    "Tatung", "Einstein TC-01 + 80 column device", 0 )
+COMP( 1984, einst256, 0,        0,      einstein, einstein,       einstein_state, 0,    "Tatung", "Einstein 256",                      MACHINE_NOT_WORKING )

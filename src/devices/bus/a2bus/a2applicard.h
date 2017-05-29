@@ -8,8 +8,10 @@
 
 *********************************************************************/
 
-#ifndef __A2BUS_APPLICARD__
-#define __A2BUS_APPLICARD__
+#ifndef MAME_BUS_A2BUS_A2APPLICARD_H
+#define MAME_BUS_A2BUS_A2APPLICARD_H
+
+#pragma once
 
 #include "a2bus.h"
 
@@ -23,7 +25,6 @@ class a2bus_applicard_device:
 {
 public:
 	// construction/destruction
-	a2bus_applicard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	a2bus_applicard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
@@ -35,6 +36,8 @@ public:
 	DECLARE_WRITE8_MEMBER( z80_io_w );
 
 protected:
+	a2bus_applicard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -55,6 +58,6 @@ private:
 };
 
 // device type definition
-extern const device_type A2BUS_APPLICARD;
+DECLARE_DEVICE_TYPE(A2BUS_APPLICARD, a2bus_applicard_device)
 
-#endif /* __A2BUS_APPLICARD__ */
+#endif // MAME_BUS_A2BUS_A2APPLICARD_H

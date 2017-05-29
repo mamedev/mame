@@ -15,10 +15,10 @@
 #define K001604_NUM_TILES_LAYER0        16384
 #define K001604_NUM_TILES_LAYER1        4096
 
-const device_type K001604 = device_creator<k001604_device>;
+DEFINE_DEVICE_TYPE(K001604, k001604_device, "k001604_device", "K001604 2D tilemaps + 2x ROZ")
 
 k001604_device::k001604_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, K001604, "K001604 2D tilemaps + 2x ROZ", tag, owner, clock, "k001604", __FILE__),
+	: device_t(mconfig, K001604, tag, owner, clock),
 	device_gfx_interface(mconfig, *this, nullptr),
 	m_layer_size(0),
 	m_roz_size(0),
@@ -89,8 +89,8 @@ void k001604_device::device_start()
 	m_layer_8x8[0]->set_transparent_pen(0);
 	m_layer_8x8[1]->set_transparent_pen(0);
 
-	set_gfx(0, std::make_unique<gfx_element>(palette(), k001604_char_layout_layer_8x8, (uint8_t*)&m_char_ram[0], 0, palette().entries() / 16, 0));
-	set_gfx(1, std::make_unique<gfx_element>(palette(), k001604_char_layout_layer_16x16, (uint8_t*)&m_char_ram[0], 0, palette().entries() / 16, 0));
+	set_gfx(0, std::make_unique<gfx_element>(&palette(), k001604_char_layout_layer_8x8, (uint8_t*)&m_char_ram[0], 0, palette().entries() / 16, 0));
+	set_gfx(1, std::make_unique<gfx_element>(&palette(), k001604_char_layout_layer_16x16, (uint8_t*)&m_char_ram[0], 0, palette().entries() / 16, 0));
 
 	save_pointer(NAME(m_reg.get()), 0x400 / 4);
 	save_pointer(NAME(m_char_ram.get()), 0x200000 / 4);

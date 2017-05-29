@@ -34,7 +34,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type KM035 = device_creator<km035_device>;
+DEFINE_DEVICE_TYPE(KM035, km035_device, "km035", "KM035 Keyboard")
 
 ROM_START( km035 )
 	ROM_REGION (0x800, KM035_CPU_TAG, 0)
@@ -49,38 +49,26 @@ static ADDRESS_MAP_START( km035_map, AS_PROGRAM, 8, km035_device )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( km035_iomap, AS_IO, 8, km035_device )
-	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_WRITE(bus_w)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(p1_r, p1_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(p2_r, p2_w)
-	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(t0_r)
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(t1_r)
-ADDRESS_MAP_END
 
 //-------------------------------------------------
-//  MACHINE_CONFIG
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( km035 )
+MACHINE_CONFIG_MEMBER( km035_device::device_add_mconfig )
 	MCFG_CPU_ADD(KM035_CPU_TAG, I8035, XTAL_4_608MHz)
 	MCFG_CPU_PROGRAM_MAP(km035_map)
-	MCFG_CPU_IO_MAP(km035_iomap)
+	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(km035_device, bus_w))
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(km035_device, p1_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(km035_device, p1_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(km035_device, p2_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(km035_device, p2_w))
+	MCFG_MCS48_PORT_T0_IN_CB(READLINE(km035_device, t0_r))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(km035_device, t1_r))
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(KM035_SPK_TAG, BEEP, 3250)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor km035_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( km035 );
-}
 
 const tiny_rom_entry *km035_device::device_rom_region() const
 {
@@ -271,7 +259,7 @@ ioport_constructor km035_device::device_input_ports() const
 //-------------------------------------------------
 
 km035_device::km035_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, KM035, "KM035 keyboard", tag, owner, clock, "km035", __FILE__),
+	: device_t(mconfig, KM035, tag, owner, clock),
 	m_maincpu(*this, KM035_CPU_TAG),
 	m_speaker(*this, KM035_SPK_TAG),
 	m_kbd(*this, "KBD%u", 0),
@@ -369,7 +357,7 @@ WRITE8_MEMBER( km035_device::bus_w )
 //  t0_r -
 //-------------------------------------------------
 
-READ8_MEMBER( km035_device::t0_r )
+READ_LINE_MEMBER( km035_device::t0_r )
 {
 	return m_keylatch;
 }
@@ -378,7 +366,7 @@ READ8_MEMBER( km035_device::t0_r )
 //  t1_r -
 //-------------------------------------------------
 
-READ8_MEMBER( km035_device::t1_r )
+READ_LINE_MEMBER( km035_device::t1_r )
 {
 	return m_rx;
 }

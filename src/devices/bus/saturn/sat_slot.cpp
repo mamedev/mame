@@ -29,17 +29,18 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type SATURN_CART_SLOT = device_creator<sat_cart_slot_device>;
+DEFINE_DEVICE_TYPE(SATURN_CART_SLOT, sat_cart_slot_device, "sat_cart_slot", "Saturn Cartridge Slot")
 
 
 //-------------------------------------------------
 //  device_sat_cart_interface - constructor
 //-------------------------------------------------
 
-device_sat_cart_interface::device_sat_cart_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device), m_cart_type(0),
-		m_rom(nullptr),
-		m_rom_size(0)
+device_sat_cart_interface::device_sat_cart_interface(const machine_config &mconfig, device_t &device, int cart_type) :
+	device_slot_card_interface(mconfig, device),
+	m_cart_type(cart_type),
+	m_rom(nullptr),
+	m_rom_size(0)
 {
 }
 
@@ -102,9 +103,9 @@ void device_sat_cart_interface::dram1_alloc(uint32_t size)
 //  sat_cart_slot_device - constructor
 //-------------------------------------------------
 sat_cart_slot_device::sat_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-						device_t(mconfig, SATURN_CART_SLOT, "Saturn Cartridge Slot", tag, owner, clock, "sat_cart_slot", __FILE__),
-						device_image_interface(mconfig, *this),
-						device_slot_interface(mconfig, *this), m_cart(nullptr)
+	device_t(mconfig, SATURN_CART_SLOT, tag, owner, clock),
+	device_image_interface(mconfig, *this),
+	device_slot_interface(mconfig, *this), m_cart(nullptr)
 {
 }
 

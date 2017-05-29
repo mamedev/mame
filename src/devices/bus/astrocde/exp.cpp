@@ -14,7 +14,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ASTROCADE_EXP_SLOT = device_creator<astrocade_exp_device>;
+DEFINE_DEVICE_TYPE(ASTROCADE_EXP_SLOT, astrocade_exp_device, "astrocade_exp", "Bally Astrocade expansion")
 
 
 device_astrocade_card_interface::device_astrocade_card_interface(const machine_config &mconfig, device_t &device)
@@ -36,9 +36,9 @@ device_astrocade_card_interface::~device_astrocade_card_interface()
 //  astrocade_exp_device - constructor
 //-------------------------------------------------
 astrocade_exp_device::astrocade_exp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-						device_t(mconfig, ASTROCADE_EXP_SLOT, "Bally Astrocade expansion", tag, owner, clock, "astrocde_exp", __FILE__),
-						device_slot_interface(mconfig, *this),
-						m_card_mounted(false), m_card(nullptr)
+	device_t(mconfig, ASTROCADE_EXP_SLOT, tag, owner, clock),
+	device_slot_interface(mconfig, *this),
+	m_card_mounted(false), m_card(nullptr)
 {
 }
 

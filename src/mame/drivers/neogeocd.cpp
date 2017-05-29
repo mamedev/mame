@@ -1036,7 +1036,7 @@ uint32_t ngcd_state::screen_update_neocd(screen_device &screen, bitmap_rgb32 &bi
 }
 
 
-static MACHINE_CONFIG_DERIVED_CLASS( neocd, neogeo_base, ngcd_state )
+static MACHINE_CONFIG_DERIVED( neocd, neogeo_base )
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(neocd_main_map)
@@ -1139,9 +1139,8 @@ DRIVER_INIT_MEMBER(ngcd_state,neocdzj)
 }
 
 
-/*    YEAR  NAME  PARENT COMPAT MACHINE INPUT  INIT     COMPANY      FULLNAME            FLAGS */
-CONS( 1996, neocdz,  0,      0,   neocd, neocd, ngcd_state,  neocdz,  "SNK", "Neo-Geo CDZ (US)", 0 ) // the CDZ is the newer model
-CONS( 1996, neocdzj, neocdz, 0,   neocd, neocd, ngcd_state,  neocdzj,  "SNK", "Neo-Geo CDZ (Japan)", 0 )
+//    YEAR  NAME     PARENT  COMPAT MACHINE INPUT  STATE       INIT     COMPANY FULLNAME               FLAGS */
+CONS( 1996, neocdz,  0,      0,     neocd,  neocd, ngcd_state, neocdz,  "SNK",  "Neo-Geo CDZ (US)",    0 ) // the CDZ is the newer model
+CONS( 1996, neocdzj, neocdz, 0,     neocd,  neocd, ngcd_state, neocdzj, "SNK",  "Neo-Geo CDZ (Japan)", 0 )
 
-
-CONS( 1994, neocd,   neocdz, 0,   neocd, neocd, driver_device,  0,  "SNK", "Neo-Geo CD", MACHINE_NOT_WORKING ) // older  model, ignores disc protections?
+CONS( 1994, neocd,   neocdz, 0,     neocd,  neocd, ngcd_state, 0,       "SNK",  "Neo-Geo CD",          MACHINE_NOT_WORKING ) // older  model, ignores disc protections?

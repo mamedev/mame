@@ -346,7 +346,7 @@ static INPUT_PORTS_START( pntnpuzl )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_D)
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( pntnpuzl, pntnpuzl_state )
+static MACHINE_CONFIG_START( pntnpuzl )
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)//??
 	MCFG_CPU_PROGRAM_MAP(pntnpuzl_map)
 

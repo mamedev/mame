@@ -6,13 +6,13 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_NES_CTRL_MJPANEL_H
+#define MAME_BUS_NES_CTRL_MJPANEL_H
+
 #pragma once
 
-#ifndef __NES_MJPANEL__
-#define __NES_MJPANEL__
-
-
 #include "ctrl.h"
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -44,7 +44,7 @@ private:
 
 
 // device type definition
-extern const device_type NES_MJPANEL;
+DECLARE_DEVICE_TYPE(NES_MJPANEL, nes_mjpanel_device)
 
 
-#endif
+#endif // MAME_BUS_NES_CTRL_MJPANEL_H

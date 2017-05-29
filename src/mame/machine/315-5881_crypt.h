@@ -1,14 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
+#ifndef MAME_MACHINE_315_5881_CRYPT_H
+#define MAME_MACHINE_315_5881_CRYPT_H
 
 #pragma once
 
-#ifndef __SEGA315_5881_CRYPT__
-#define __SEGA315_5881_CRYPT__
 
 typedef device_delegate<uint16_t (uint32_t)> sega_m2_read_delegate;
 
-extern const device_type SEGA315_5881_CRYPT;
+DECLARE_DEVICE_TYPE(SEGA315_5881_CRYPT, sega_315_5881_crypt_device)
 
 #define MCFG_SET_READ_CALLBACK( _class, _method) \
 	sega_315_5881_crypt_device::set_read_cb(*device, sega_m2_read_delegate(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
@@ -97,4 +97,4 @@ private:
 
 };
 
-#endif
+#endif // MAME_MACHINE_315_5881_CRYPT_H

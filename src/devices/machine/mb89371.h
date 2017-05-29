@@ -8,8 +8,10 @@
  *
  */
 
-#ifndef __MB89371_H__
-#define __MB89371_H__
+#ifndef MAME_MACHINE_MB89371_H
+#define MAME_MACHINE_MB89371_H
+
+#pragma once
 
 
 class mb89371_device : public device_t
@@ -22,13 +24,12 @@ public:
 	DECLARE_READ8_MEMBER( read );
 
 protected:
-
 	// device-level overrides
 	virtual void device_start() override;
 };
 
 
 // device type definition
-extern const device_type MB89371;
+DECLARE_DEVICE_TYPE(MB89371, mb89371_device)
 
-#endif
+#endif // MAME_MACHINE_MB89371_H

@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli
-#ifndef __A78_HISCORE_H
-#define __A78_HISCORE_H
+#ifndef MAME_BUS_A7800_HISCORE_H
+#define MAME_BUS_A7800_HISCORE_H
+
+#pragma once
 
 #include "a78_slot.h"
 #include "rom.h"
@@ -34,7 +36,7 @@ protected:
 
 
 // device type definition
-extern const device_type A78_HISCORE;
+DECLARE_DEVICE_TYPE(A78_HISCORE, a78_hiscore_device)
 
 
-#endif
+#endif // MAME_BUS_A7800_HISCORE_H

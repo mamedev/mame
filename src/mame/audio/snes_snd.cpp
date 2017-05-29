@@ -153,11 +153,11 @@ static const int ENVCNT[0x20]
 #define MEtoLE16( x ) little_endianize_int16(x)
 
 
-const device_type SNES = device_creator<snes_sound_device>;
+DEFINE_DEVICE_TYPE(SNES, snes_sound_device, "snes_sound", "SNES Custom DSP (SPC700)")
 
 snes_sound_device::snes_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-						: device_t(mconfig, SNES, "SNES Custom DSP (SPC700)", tag, owner, clock, "snes_sound", __FILE__),
-							device_sound_interface(mconfig, *this)
+	: device_t(mconfig, SNES, tag, owner, clock)
+	, device_sound_interface(mconfig, *this)
 {
 }
 

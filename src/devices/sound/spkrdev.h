@@ -7,17 +7,11 @@
     driven by one or more output bits
 
 **********************************************************************/
-#ifndef MAME_DEVICES_SOUND_SPKRDEV_H
-#define MAME_DEVICES_SOUND_SPKRDEV_H
+#ifndef MAME_SOUND_SPKRDEV_H
+#define MAME_SOUND_SPKRDEV_H
 
 #pragma once
 
-
-// Length of anti-aliasing filter kernel, measured in number of intermediate samples
-enum
-{
-	FILTER_LENGTH = 64
-};
 
 #define MCFG_SPEAKER_LEVELS(_num, _levels) \
 		speaker_sound_device::static_set_levels(*device, _num, _levels);
@@ -43,6 +37,12 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
+	// Length of anti-aliasing filter kernel, measured in number of intermediate samples
+	enum
+	{
+		FILTER_LENGTH = 64
+	};
+
 	// internal state
 
 	// Updates the composed volume array according to time
@@ -87,9 +87,6 @@ private:
 	const int16_t  *m_levels;     /* optional: pointer to level lookup table */
 };
 
-extern const device_type SPEAKER_SOUND;
+DECLARE_DEVICE_TYPE(SPEAKER_SOUND, speaker_sound_device)
 
-extern template class device_finder<speaker_sound_device, false>;
-extern template class device_finder<speaker_sound_device, true>;
-
-#endif // MAME_DEVICES_SOUND_SPKRDEV_H
+#endif // MAME_SOUND_SPKRDEV_H

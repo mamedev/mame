@@ -178,7 +178,7 @@ INPUT_PORTS_END
     Machine Drivers
 ******************************************************************************/
 
-static MACHINE_CONFIG_START( diablo68k, novag68k_state )
+static MACHINE_CONFIG_START( diablo68k )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
@@ -233,5 +233,5 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-/*    YEAR  NAME      PARENT COMPAT  MACHINE    INPUT      INIT              COMPANY, FULLNAME, FLAGS */
-CONS( 1991, diablo68, 0,     0,      diablo68k, diablo68k, driver_device, 0, "Novag", "Diablo 68000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME      PARENT CMP MACHINE    INPUT      STATE        INIT  COMPANY, FULLNAME, FLAGS
+CONS( 1991, diablo68, 0,      0, diablo68k, diablo68k, novag68k_state, 0, "Novag", "Diablo 68000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

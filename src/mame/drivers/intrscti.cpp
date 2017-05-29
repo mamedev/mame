@@ -176,7 +176,7 @@ static GFXDECODE_START( intrscti )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( intrscti, intrscti_state )
+static MACHINE_CONFIG_START( intrscti )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)        /* ? MHz */

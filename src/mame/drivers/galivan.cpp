@@ -418,7 +418,7 @@ MACHINE_RESET_MEMBER(galivan_state,ninjemak)
 	m_ninjemak_dispdisable = 0;
 }
 
-static MACHINE_CONFIG_START( galivan, galivan_state )
+static MACHINE_CONFIG_START( galivan )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)      /* 6 MHz? */
@@ -468,7 +468,7 @@ static MACHINE_CONFIG_START( galivan, galivan_state )
 	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ninjemak, galivan_state )
+static MACHINE_CONFIG_START( ninjemak )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)      /* 6 MHz? */
@@ -1180,16 +1180,16 @@ DRIVER_INIT_MEMBER(galivan_state,youmab)
 
 }
 
-GAME( 1985, galivan,  0,        galivan,  galivan,  driver_device, 0,      ROT270, "Nichibutsu",   "Cosmo Police Galivan (12/26/1985)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, galivan2, galivan,  galivan,  galivan,  driver_device, 0,      ROT270, "Nichibutsu",   "Cosmo Police Galivan (12/16/1985)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, galivan3, galivan,  galivan,  galivan,  driver_device, 0,      ROT270, "Nichibutsu",   "Cosmo Police Galivan (12/11/1985)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, dangar,   0,        galivan,  dangar,   driver_device, 0,      ROT270, "Nichibutsu",   "Ufo Robo Dangar (4/07/1987)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, dangara,  dangar,   galivan,  dangar2,  driver_device, 0,      ROT270, "Nichibutsu",   "Ufo Robo Dangar (12/1/1986)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, dangarb,  dangar,   galivan,  dangar2,  driver_device, 0,      ROT270, "Nichibutsu",   "Ufo Robo Dangar (9/26/1986)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, dangarj,  dangar,   galivan,  dangar2,  driver_device, 0,      ROT270, "Nichibutsu",   "Ufo Robo Dangar (9/26/1986, Japan)", MACHINE_SUPPORTS_SAVE|MACHINE_NOT_WORKING ) // no sprites visable
-GAME( 1986, dangarbt, dangar,   galivan,  dangarb,  driver_device, 0,      ROT270, "bootleg",      "Ufo Robo Dangar (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, ninjemak, 0,        ninjemak, ninjemak, driver_device, 0,      ROT270, "Nichibutsu",   "Ninja Emaki (US)", MACHINE_SUPPORTS_SAVE|MACHINE_UNEMULATED_PROTECTION )
-GAME( 1986, youma,    ninjemak, ninjemak, ninjemak, driver_device, 0,      ROT270, "Nichibutsu",   "Youma Ninpou Chou (Japan)", MACHINE_SUPPORTS_SAVE|MACHINE_UNEMULATED_PROTECTION )
-GAME( 1986, youma2,   ninjemak, ninjemak, ninjemak, driver_device, 0,      ROT270, "Nichibutsu",   "Youma Ninpou Chou (Japan, alt)", MACHINE_SUPPORTS_SAVE|MACHINE_UNEMULATED_PROTECTION )
+GAME( 1985, galivan,  0,        galivan,  galivan,  galivan_state, 0,      ROT270, "Nichibutsu",   "Cosmo Police Galivan (12/26/1985)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, galivan2, galivan,  galivan,  galivan,  galivan_state, 0,      ROT270, "Nichibutsu",   "Cosmo Police Galivan (12/16/1985)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, galivan3, galivan,  galivan,  galivan,  galivan_state, 0,      ROT270, "Nichibutsu",   "Cosmo Police Galivan (12/11/1985)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, dangar,   0,        galivan,  dangar,   galivan_state, 0,      ROT270, "Nichibutsu",   "Ufo Robo Dangar (4/07/1987)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, dangara,  dangar,   galivan,  dangar2,  galivan_state, 0,      ROT270, "Nichibutsu",   "Ufo Robo Dangar (12/1/1986)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, dangarb,  dangar,   galivan,  dangar2,  galivan_state, 0,      ROT270, "Nichibutsu",   "Ufo Robo Dangar (9/26/1986)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, dangarj,  dangar,   galivan,  dangar2,  galivan_state, 0,      ROT270, "Nichibutsu",   "Ufo Robo Dangar (9/26/1986, Japan)", MACHINE_SUPPORTS_SAVE|MACHINE_NOT_WORKING ) // no sprites visable
+GAME( 1986, dangarbt, dangar,   galivan,  dangarb,  galivan_state, 0,      ROT270, "bootleg",      "Ufo Robo Dangar (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, ninjemak, 0,        ninjemak, ninjemak, galivan_state, 0,      ROT270, "Nichibutsu",   "Ninja Emaki (US)", MACHINE_SUPPORTS_SAVE|MACHINE_UNEMULATED_PROTECTION )
+GAME( 1986, youma,    ninjemak, ninjemak, ninjemak, galivan_state, 0,      ROT270, "Nichibutsu",   "Youma Ninpou Chou (Japan)", MACHINE_SUPPORTS_SAVE|MACHINE_UNEMULATED_PROTECTION )
+GAME( 1986, youma2,   ninjemak, ninjemak, ninjemak, galivan_state, 0,      ROT270, "Nichibutsu",   "Youma Ninpou Chou (Japan, alt)", MACHINE_SUPPORTS_SAVE|MACHINE_UNEMULATED_PROTECTION )
 GAME( 1986, youmab,   ninjemak, youmab,   ninjemak, galivan_state, youmab, ROT270, "bootleg",      "Youma Ninpou Chou (Game Electronics bootleg, set 1)", MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE|MACHINE_UNEMULATED_PROTECTION ) // player is invincible
 GAME( 1986, youmab2,  ninjemak, youmab,   ninjemak, galivan_state, youmab, ROT270, "bootleg",      "Youma Ninpou Chou (Game Electronics bootleg, set 2)", MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE|MACHINE_UNEMULATED_PROTECTION ) // ""

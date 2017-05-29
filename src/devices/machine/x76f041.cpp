@@ -32,10 +32,10 @@ inline void ATTR_PRINTF( 3, 4 ) x76f041_device::verboselog( int n_level, const c
 }
 
 // device type definition
-const device_type X76F041 = device_creator<x76f041_device>;
+DEFINE_DEVICE_TYPE(X76F041, x76f041_device, "x76f041", "X76F041 Secure SerialFlash")
 
 x76f041_device::x76f041_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock )
-	: device_t( mconfig, X76F041, "X76F041 Flash", tag, owner, clock, "x76f041", __FILE__ ),
+	: device_t( mconfig, X76F041, tag, owner, clock ),
 	device_nvram_interface(mconfig, *this),
 	m_region(*this, DEVICE_SELF),
 	m_cs( 0 ),

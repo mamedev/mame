@@ -311,7 +311,7 @@ void driver_enumerator::find_approximate_matches(const char *string, std::size_t
 			if (m_included[index] &&  !(s_drivers_sorted[index]->flags & MACHINE_NO_STANDALONE))
 			{
 				// pick the best match between driver name and description
-				int curpenalty = penalty_compare(string, s_drivers_sorted[index]->description);
+				int curpenalty = penalty_compare(string, s_drivers_sorted[index]->type.fullname());
 				int tmp = penalty_compare(string, s_drivers_sorted[index]->name);
 				curpenalty = (std::min)(curpenalty, tmp);
 

@@ -381,7 +381,7 @@ void decwriter_state::machine_reset()
 //  MACHINE DRIVERS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( la120, decwriter_state )
+static MACHINE_CONFIG_START( la120 )
 
 	MCFG_CPU_ADD("maincpu",I8080, XTAL_18MHz / 9) // 18Mhz xtal on schematics, using an i8224 clock divider/reset sanitizer IC
 	MCFG_CPU_PROGRAM_MAP(la120_mem)
@@ -438,5 +438,5 @@ ROM_END
 //**************************************************************************
 //  DRIVERS
 //**************************************************************************
-/*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS          INIT  COMPANY                          FULLNAME       FLAGS */
-COMP( 1978, la120, 0,      0,      la120,   la120, driver_device, 0,    "Digital Equipment Corporation", "DECwriter III (LA120)", MACHINE_NO_SOUND | MACHINE_IS_SKELETON | MACHINE_NOT_WORKING )
+/*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS            INIT  COMPANY                          FULLNAME       FLAGS */
+COMP( 1978, la120, 0,      0,      la120,   la120, decwriter_state, 0,    "Digital Equipment Corporation", "DECwriter III (LA120)", MACHINE_NO_SOUND | MACHINE_IS_SKELETON | MACHINE_NOT_WORKING )

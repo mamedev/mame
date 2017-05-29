@@ -356,7 +356,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(metlfrzr_state::scanline)
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0x08); /* RST 08h */
 }
 
-static MACHINE_CONFIG_START(metlfrzr, metlfrzr_state)
+static MACHINE_CONFIG_START(metlfrzr)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz / 2)

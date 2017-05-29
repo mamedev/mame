@@ -185,9 +185,9 @@ void simple_menu_select_game::inkey_select(const event *menu_event)
 void simple_menu_select_game::inkey_cancel()
 {
 	// escape pressed with non-empty text clears the text
-	if (m_search[0] != 0)
+	if (!m_search.empty())
 	{
-		m_search[0] = '\0';
+		m_search.clear();
 		reset(reset_options::SELECT_FIRST);
 	}
 }
@@ -238,7 +238,7 @@ void simple_menu_select_game::populate(float &customtop, float &custombottom)
 
 	// otherwise, rebuild the match list
 	assert(m_drivlist != nullptr);
-	if (m_search[0] != 0 || m_matchlist[0] == -1 || m_rerandomize)
+	if (!m_search.empty() || m_matchlist[0] == -1 || m_rerandomize)
 		m_drivlist->find_approximate_matches(m_search.c_str(), matchcount, m_matchlist);
 	m_rerandomize = false;
 
@@ -249,7 +249,7 @@ void simple_menu_select_game::populate(float &customtop, float &custombottom)
 		if (curmatch != -1)
 		{
 			int cloneof = m_drivlist->non_bios_clone(curmatch);
-			item_append(m_drivlist->driver(curmatch).name, m_drivlist->driver(curmatch).description, (cloneof == -1) ? 0 : FLAG_INVERT, (void *)&m_drivlist->driver(curmatch));
+			item_append(m_drivlist->driver(curmatch).name, m_drivlist->driver(curmatch).type.fullname(), (cloneof == -1) ? 0 : FLAG_INVERT, (void *)&m_drivlist->driver(curmatch));
 		}
 	}
 
@@ -281,7 +281,7 @@ void simple_menu_select_game::custom_render(void *selectedref, float top, float 
 	int line;
 
 	// display the current typeahead
-	if (m_search[0] != 0)
+	if (!m_search.empty())
 		tempbuf[0] = string_format(_("Type name or select: %1$s_"), m_search);
 	else
 		tempbuf[0] = _("Type name or select: (random)");
@@ -317,13 +317,13 @@ void simple_menu_select_game::custom_render(void *selectedref, float top, float 
 		const char *gfxstat, *soundstat;
 
 		// first line is game name
-		tempbuf[0] = string_format(_("%1$-.100s"), driver->description);
+		tempbuf[0] = string_format(_("%1$-.100s"), driver->type.fullname());
 
 		// next line is year, manufacturer
 		tempbuf[1] = string_format(_("%1$s, %2$-.100s"), driver->year, driver->manufacturer);
 
 		// next line source path
-		tempbuf[2] = string_format(_("Driver: %1$-.100s"), core_filename_extract_base(driver->source_file));
+		tempbuf[2] = string_format(_("Driver: %1$-.100s"), core_filename_extract_base(driver->type.source()));
 
 		// next line is overall driver status
 		if (driver->flags & MACHINE_NOT_WORKING)

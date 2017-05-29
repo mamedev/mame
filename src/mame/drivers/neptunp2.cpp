@@ -92,7 +92,7 @@ static GFXDECODE_START( neptunp2 )
 //  GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 8 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( neptunp2, neptunp2_state )
+static MACHINE_CONFIG_START( neptunp2 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I80188,20000000) // N80C188-20 AMD
@@ -139,4 +139,4 @@ ROM_START( neptunp2 )
 ROM_END
 
 
-GAME( 199?, neptunp2,  0,   neptunp2, neptunp2, driver_device,  0, ROT0, "Unidesa?", "Neptune's Pearls 2", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 199?, neptunp2,  0,   neptunp2, neptunp2, neptunp2_state,  0, ROT0, "Unidesa?", "Neptune's Pearls 2", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

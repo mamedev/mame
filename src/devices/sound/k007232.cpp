@@ -145,13 +145,13 @@ static const float kdaca_fn[][2] = {
 /*************************************************************/
 
 
-const device_type K007232 = device_creator<k007232_device>;
+DEFINE_DEVICE_TYPE(K007232, k007232_device, "k007232", "K007232 PCM Controller")
 
 k007232_device::k007232_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, K007232, "K007232 PCM Controller", tag, owner, clock, "k007232", __FILE__),
-		device_sound_interface(mconfig, *this),
-		m_rom(*this, DEVICE_SELF),
-		m_port_write_handler(*this)
+	: device_t(mconfig, K007232, tag, owner, clock)
+	, device_sound_interface(mconfig, *this)
+	, m_rom(*this, DEVICE_SELF)
+	, m_port_write_handler(*this)
 {
 }
 

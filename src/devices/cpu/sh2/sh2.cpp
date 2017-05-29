@@ -93,9 +93,13 @@
  *****************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "sh2.h"
 #include "sh2comn.h"
+
+#include "debugger.h"
+
+//#define VERBOSE 1
+#include "logmacro.h"
 
 
 /***************************************************************************
@@ -105,8 +109,6 @@
 #define DISABLE_FAST_REGISTERS              (0) // set to 1 to turn off usage of register caching
 #define SINGLE_INSTRUCTION_MODE             (0)
 
-#define VERBOSE 0
-#define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
 
 /***************************************************************************
     CONSTANTS
@@ -122,9 +124,9 @@
 #define COMPILE_MAX_SEQUENCE            64
 
 
-const device_type SH1 = device_creator<sh1_device>;
-const device_type SH2 = device_creator<sh2_device>;
-const device_type SH2A = device_creator<sh2a_device>;
+DEFINE_DEVICE_TYPE(SH1,  sh1_device,  "sh1",  "SH-1")
+DEFINE_DEVICE_TYPE(SH2,  sh2_device,  "sh2",  "SH-2")
+DEFINE_DEVICE_TYPE(SH2A, sh2a_device, "sh21", "SH-2A")
 
 /*-------------------------------------------------
     sh2_internal_a5 - read handler for
@@ -170,11 +172,22 @@ static ADDRESS_MAP_START( sh7032_map, AS_PROGRAM, 32, sh1_device )
 ADDRESS_MAP_END
 
 sh2_device::sh2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, SH2, "SH-2", tag, owner, clock, "sh2", __FILE__)
-	, m_program_config("program", ENDIANNESS_BIG, 32, 32, 0, ADDRESS_MAP_NAME(sh7604_map))
-	, m_decrypted_program_config("decrypted_opcodes", ENDIANNESS_BIG, 32, 32, 0)
+	: sh2_device(mconfig, SH2, tag, owner, clock, CPU_TYPE_SH2, ADDRESS_MAP_NAME(sh7604_map), 32)
+{
+}
+
+
+void sh2_device::device_stop()
+{
+}
+
+
+sh2_device::sh2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int cpu_type, address_map_constructor internal_map, int addrlines)
+	: cpu_device(mconfig, type, tag, owner, clock)
+	, m_program_config("program", ENDIANNESS_BIG, 32, addrlines, 0, internal_map)
+	, m_decrypted_program_config("decrypted_opcodes", ENDIANNESS_BIG, 32, addrlines, 0)
 	, m_is_slave(0)
-	, m_cpu_type(CPU_TYPE_SH2)
+	, m_cpu_type(cpu_type)
 	, m_cache(CACHE_SIZE + sizeof(internal_sh2_state))
 	, m_drcuml(nullptr)
 //  , m_drcuml(*this, m_cache, 0, 1, 32, 1)
@@ -196,45 +209,13 @@ sh2_device::sh2_device(const machine_config &mconfig, const char *tag, device_t 
 	m_isdrc = allow_drc();
 }
 
-
-void sh2_device::device_stop()
-{
-}
-
-
-sh2_device::sh2_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, int cpu_type, address_map_constructor internal_map, int addrlines )
-	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
-	, m_program_config("program", ENDIANNESS_BIG, 32, addrlines, 0, internal_map)
-	, m_decrypted_program_config("decrypted_opcodes", ENDIANNESS_BIG, 32, addrlines, 0)
-	, m_is_slave(0)
-	, m_cpu_type(cpu_type)
-	, m_cache(CACHE_SIZE + sizeof(internal_sh2_state))
-	, m_drcuml(nullptr)
-//  , m_drcuml(*this, m_cache, 0, 1, 32, 1)
-	, m_drcfe(nullptr)
-	, m_drcoptions(0)
-	, m_sh2_state(nullptr)
-	, m_entry(nullptr)
-	, m_read8(nullptr)
-	, m_write8(nullptr)
-	, m_read16(nullptr)
-	, m_write16(nullptr)
-	, m_read32(nullptr)
-	, m_write32(nullptr)
-	, m_interrupt(nullptr)
-	, m_nocode(nullptr)
-	, m_out_of_cycles(nullptr)
-{
-	m_isdrc = allow_drc();
-}
-
 sh2a_device::sh2a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sh2_device(mconfig, SH2A, "SH-2A", tag, owner, clock, "sh2a", __FILE__, CPU_TYPE_SH2, ADDRESS_MAP_NAME(sh7021_map), 28)
+	: sh2_device(mconfig, SH2A, tag, owner, clock, CPU_TYPE_SH2, ADDRESS_MAP_NAME(sh7021_map), 28)
 {
 }
 
 sh1_device::sh1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sh2_device(mconfig, SH1, "SH-1", tag, owner, clock, "sh1", __FILE__, CPU_TYPE_SH1, ADDRESS_MAP_NAME(sh7032_map), 28)
+	: sh2_device(mconfig, SH1, tag, owner, clock, CPU_TYPE_SH1, ADDRESS_MAP_NAME(sh7032_map), 28)
 {
 }
 
@@ -257,10 +238,6 @@ offs_t sh2_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uin
 
 /* speed up delay loops, bail out of tight loops */
 #define BUSY_LOOP_HACKS     1
-
-#define VERBOSE 0
-
-#define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
 
 uint8_t sh2_device::RB(offs_t A)
 {
@@ -2609,13 +2586,13 @@ void sh2_device::execute_set_input(int irqline, int state)
 			return;
 		m_nmi_line_state = state;
 
-		if( state == CLEAR_LINE )
+		if (state == CLEAR_LINE)
 		{
-			LOG(("SH-2 '%s' cleared nmi\n", tag()));
+			LOG("SH-2 cleared nmi\n");
 		}
 		else
 		{
-			LOG(("SH-2 '%s' assert nmi\n", tag()));
+			LOG("SH-2 asserted nmi\n");
 
 			sh2_exception("Set IRQ line", 16);
 
@@ -2629,14 +2606,14 @@ void sh2_device::execute_set_input(int irqline, int state)
 			return;
 		m_irq_line_state[irqline] = state;
 
-		if( state == CLEAR_LINE )
+		if (state == CLEAR_LINE)
 		{
-			LOG(("SH-2 '%s' cleared irq #%d\n", tag(), irqline));
+			LOG("SH-2 cleared irq #%d\n", irqline);
 			m_sh2_state->pending_irq &= ~(1 << irqline);
 		}
 		else
 		{
-			LOG(("SH-2 '%s' assert irq #%d\n", tag(), irqline));
+			LOG("SH-2 asserted irq #%d\n", irqline);
 			m_sh2_state->pending_irq |= 1 << irqline;
 			if (m_isdrc)
 			{
@@ -2651,5 +2628,74 @@ void sh2_device::execute_set_input(int irqline, int state)
 	}
 }
 
-#include "sh2comn.cpp"
+void sh2_device::sh2_exception(const char *message, int irqline)
+{
+	int vector;
+
+	if (irqline != 16)
+	{
+		if (irqline <= ((m_sh2_state->sr >> 4) & 15)) /* If the cpu forbids this interrupt */
+			return;
+
+		// if this is an sh2 internal irq, use its vector
+		if (m_sh2_state->internal_irq_level == irqline)
+		{
+			vector = m_internal_irq_vector;
+			/* avoid spurious irqs with this (TODO: needs a better fix) */
+			m_sh2_state->internal_irq_level = -1;
+			LOG("SH-2 exception #%d (internal vector: $%x) after [%s]\n", irqline, vector, message);
+		}
+		else
+		{
+			if(m_m[0x38] & 0x00010000)
+			{
+				vector = standard_irq_callback(irqline);
+				LOG("SH-2 exception #%d (external vector: $%x) after [%s]\n", irqline, vector, message);
+			}
+			else
+			{
+				standard_irq_callback(irqline);
+				vector = 64 + irqline/2;
+				LOG("SH-2 exception #%d (autovector: $%x) after [%s]\n", irqline, vector, message);
+			}
+		}
+	}
+	else
+	{
+		vector = 11;
+		LOG("SH-2 nmi exception (autovector: $%x) after [%s]\n", vector, message);
+	}
+
+	if (m_isdrc)
+	{
+		m_sh2_state->evec = RL( m_sh2_state->vbr + vector * 4 );
+		m_sh2_state->evec &= AM;
+		m_sh2_state->irqsr = m_sh2_state->sr;
+
+		/* set I flags in SR */
+		if (irqline > SH2_INT_15)
+			m_sh2_state->sr = m_sh2_state->sr | I;
+		else
+			m_sh2_state->sr = (m_sh2_state->sr & ~I) | (irqline << 4);
+
+//  printf("sh2_exception [%s] irqline %x evec %x save SR %x new SR %x\n", message, irqline, m_sh2_state->evec, m_sh2_state->irqsr, m_sh2_state->sr);
+	} else {
+		m_sh2_state->r[15] -= 4;
+		WL( m_sh2_state->r[15], m_sh2_state->sr );     /* push SR onto stack */
+		m_sh2_state->r[15] -= 4;
+		WL( m_sh2_state->r[15], m_sh2_state->pc );     /* push PC onto stack */
+
+		/* set I flags in SR */
+		if (irqline > SH2_INT_15)
+			m_sh2_state->sr = m_sh2_state->sr | I;
+		else
+			m_sh2_state->sr = (m_sh2_state->sr & ~I) | (irqline << 4);
+
+		/* fetch PC */
+		m_sh2_state->pc = RL( m_sh2_state->vbr + vector * 4 );
+	}
+
+	if(m_sh2_state->sleep_mode == 1) { m_sh2_state->sleep_mode = 2; }
+}
+
 #include "sh2drc.cpp"

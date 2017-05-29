@@ -343,7 +343,7 @@ MACHINE_RESET_MEMBER(blmbycar_state,blmbycar)
 }
 
 
-static MACHINE_CONFIG_START( blmbycar, blmbycar_state )
+static MACHINE_CONFIG_START( blmbycar )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* 12MHz */
@@ -370,7 +370,7 @@ static MACHINE_CONFIG_START( blmbycar, blmbycar_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_1MHz, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL_1MHz, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, blmbycar_oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
@@ -514,5 +514,5 @@ DRIVER_INIT_MEMBER(blmbycar_state,blmbycar)
 ***************************************************************************/
 
 GAME( 1994, blmbycar,  0,        blmbycar, blmbycar, blmbycar_state, blmbycar, ROT0, "ABM & Gecas", "Blomby Car", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, blmbycaru, blmbycar, blmbycar, blmbycar, driver_device,  0,        ROT0, "ABM & Gecas", "Blomby Car (not encrypted)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, watrball,  0,        watrball, watrball, driver_device,  0,        ROT0, "ABM",         "Water Balls", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, blmbycaru, blmbycar, blmbycar, blmbycar, blmbycar_state, 0,        ROT0, "ABM & Gecas", "Blomby Car (not encrypted)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, watrball,  0,        watrball, watrball, blmbycar_state, 0,        ROT0, "ABM",         "Water Balls", MACHINE_SUPPORTS_SAVE )

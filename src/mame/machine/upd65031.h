@@ -6,11 +6,10 @@
 
 **********************************************************************/
 
+#ifndef MAME_MACHINE_UPD65031_H
+#define MAME_MACHINE_UPD65031_H
+
 #pragma once
-
-#ifndef __UPD65031__
-#define __UPD65031__
-
 
 
 
@@ -114,7 +113,7 @@ private:
 
 
 // device type definition
-extern const device_type UPD65031;
+DECLARE_DEVICE_TYPE(UPD65031, upd65031_device)
 
 
-#endif
+#endif // MAME_MACHINE_UPD65031_H

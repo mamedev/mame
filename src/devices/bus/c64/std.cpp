@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_STD = device_creator<c64_standard_cartridge_device>;
+DEFINE_DEVICE_TYPE(C64_STD, c64_standard_cartridge_device, "c64_standard", "C64 standard cartridge")
 
 
 
@@ -28,7 +28,7 @@ const device_type C64_STD = device_creator<c64_standard_cartridge_device>;
 //-------------------------------------------------
 
 c64_standard_cartridge_device::c64_standard_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, C64_STD, "C64 standard cartridge", tag, owner, clock, "c64_standard", __FILE__),
+	device_t(mconfig, C64_STD, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this)
 {
 }

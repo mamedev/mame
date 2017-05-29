@@ -309,7 +309,7 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_CONFIG_FRAGMENT( mystston_video )
+MACHINE_CONFIG_START( mystston_video )
 	MCFG_VIDEO_START_OVERRIDE(mystston_state,mystston)
 	MCFG_VIDEO_RESET_OVERRIDE(mystston_state,mystston)
 

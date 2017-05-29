@@ -106,8 +106,7 @@
 #include "i8085cpu.h"
 
 #define VERBOSE 0
-
-#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
+#include "logmacro.h"
 
 #define CPUTYPE_8080    0
 #define CPUTYPE_8085    1
@@ -177,26 +176,19 @@ M_CALL 8085    11        +7(18)   -2(9)
 */
 
 
-const device_type I8080 = device_creator<i8080_cpu_device>;
-const device_type I8080A = device_creator<i8080a_cpu_device>;
-const device_type I8085A = device_creator<i8085a_cpu_device>;
+DEFINE_DEVICE_TYPE(I8080,  i8080_cpu_device,  "i8080",  "8080")
+DEFINE_DEVICE_TYPE(I8080A, i8080a_cpu_device, "i8080a", "8080A")
+DEFINE_DEVICE_TYPE(I8085A, i8085a_cpu_device, "i8085a", "8085A")
 
 
 i8085a_cpu_device::i8085a_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, I8085A, "8085A", tag, owner, clock, "i8085a", __FILE__)
-	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0)
-	, m_io_config("io", ENDIANNESS_LITTLE, 8, 8, 0)
-	, m_out_status_func(*this)
-	, m_out_inte_func(*this)
-	, m_in_sid_func(*this)
-	, m_out_sod_func(*this)
-	, m_cputype(CPUTYPE_8085)
+	: i8085a_cpu_device(mconfig, I8085A, tag, owner, clock, CPUTYPE_8085)
 {
 }
 
 
-i8085a_cpu_device::i8085a_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, int cputype)
-	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
+i8085a_cpu_device::i8085a_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int cputype)
+	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 8, 0)
 	, m_out_status_func(*this)
@@ -209,13 +201,13 @@ i8085a_cpu_device::i8085a_cpu_device(const machine_config &mconfig, device_type 
 
 
 i8080_cpu_device::i8080_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: i8085a_cpu_device(mconfig, I8080, "8080", tag, owner, clock, "i8080", __FILE__, CPUTYPE_8080)
+	: i8085a_cpu_device(mconfig, I8080, tag, owner, clock, CPUTYPE_8080)
 {
 }
 
 
 i8080a_cpu_device::i8080a_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: i8085a_cpu_device(mconfig, I8080A, "8080A", tag, owner, clock, "i8080a", __FILE__, CPUTYPE_8080)
+	: i8085a_cpu_device(mconfig, I8080A, tag, owner, clock, CPUTYPE_8080)
 {
 }
 
@@ -429,7 +421,7 @@ void i8085a_cpu_device::check_for_interrupts()
 				break;
 
 			default:
-				LOG(("i8085 take int $%02x\n", vector));
+				LOG("i8085 take int $%02x\n", vector);
 				execute_one(vector & 0xff);
 				break;
 		}

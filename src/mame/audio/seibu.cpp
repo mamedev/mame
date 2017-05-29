@@ -71,10 +71,10 @@
     00002CA2: 17 37
 */
 
-const device_type SEIBU_SOUND = device_creator<seibu_sound_device>;
+DEFINE_DEVICE_TYPE(SEIBU_SOUND, seibu_sound_device, "seibu_sound", "Seibu Sound System")
 
 seibu_sound_device::seibu_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SEIBU_SOUND, "Seibu Sound System", tag, owner, clock, "seibu_sound", __FILE__),
+	: device_t(mconfig, SEIBU_SOUND, tag, owner, clock),
 		m_ym_read_cb(*this),
 		m_ym_write_cb(*this),
 		m_sound_cpu(*this, finder_base::DUMMY_TAG),
@@ -320,10 +320,10 @@ ADDRESS_MAP_END
 
 /***************************************************************************/
 
-const device_type SEI80BU = device_creator<sei80bu_device>;
+DEFINE_DEVICE_TYPE(SEI80BU, sei80bu_device, "sei80bu", "SEI80BU Encrypted Z80 Interface")
 
 sei80bu_device::sei80bu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SEI80BU, "SEI80BU Encrypted Z80 Interface", tag, owner, clock, "sei80bu", __FILE__),
+	: device_t(mconfig, SEI80BU, tag, owner, clock),
 		device_rom_interface(mconfig, *this, 16)
 {
 }
@@ -374,10 +374,10 @@ READ8_MEMBER(sei80bu_device::opcode_r)
     FIXME: hook up an actual MSM5205 in place of this custom implementation
 ***************************************************************************/
 
-const device_type SEIBU_ADPCM = device_creator<seibu_adpcm_device>;
+DEFINE_DEVICE_TYPE(SEIBU_ADPCM, seibu_adpcm_device, "seibu_adpcm", "Seibu ADPCM (MSM5205)")
 
 seibu_adpcm_device::seibu_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SEIBU_ADPCM, "Seibu ADPCM (MSM5205)", tag, owner, clock, "seibu_adpcm", __FILE__),
+	: device_t(mconfig, SEIBU_ADPCM, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		m_stream(nullptr),
 		m_current(0),

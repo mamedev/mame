@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#pragma once
+#ifndef MAME_INCLUDES_XOR100_H
+#define MAME_INCLUDES_XOR100_H
 
-#ifndef __XOR100__
-#define __XOR100__
+#pragma once
 
 #include "bus/s100/s100.h"
 #include "cpu/z80/z80.h"
@@ -48,24 +48,6 @@ public:
 			m_rom(*this, Z80_TAG)
 	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<com8116_device> m_dbrg;
-	required_device<i8251_device> m_uart_a;
-	required_device<i8251_device> m_uart_b;
-	required_device<fd1795_t> m_fdc;
-	required_device<z80ctc_device> m_ctc;
-	required_device<ram_device> m_ram;
-	required_device<centronics_device> m_centronics;
-	required_device<s100_bus_t> m_s100;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
-	required_device<floppy_connector> m_floppy2;
-	required_device<floppy_connector> m_floppy3;
-	required_memory_region m_rom;
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
 	DECLARE_WRITE8_MEMBER( mmu_w );
 	DECLARE_WRITE8_MEMBER( prom_toggle_w );
 	DECLARE_READ8_MEMBER( prom_disable_r );
@@ -78,8 +60,36 @@ public:
 	void fdc_intrq_w(bool state);
 	void fdc_drq_w(bool state);
 
+	DECLARE_WRITE_LINE_MEMBER(com5016_fr_w);
+	DECLARE_WRITE_LINE_MEMBER(com5016_ft_w);
+	DECLARE_READ8_MEMBER(i8255_pc_r);
+	DECLARE_WRITE_LINE_MEMBER(ctc_z0_w);
+	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
+	DECLARE_WRITE_LINE_MEMBER(ctc_z2_w);
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_select);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 	void bankswitch();
 	void post_load();
+
+	required_device<cpu_device> m_maincpu;
+	required_device<com8116_device> m_dbrg;
+	required_device<i8251_device> m_uart_a;
+	required_device<i8251_device> m_uart_b;
+	required_device<fd1795_device> m_fdc;
+	required_device<z80ctc_device> m_ctc;
+	required_device<ram_device> m_ram;
+	required_device<centronics_device> m_centronics;
+	required_device<s100_bus_device> m_s100;
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
+	required_device<floppy_connector> m_floppy2;
+	required_device<floppy_connector> m_floppy3;
+	required_memory_region m_rom;
 
 	// memory state
 	int m_mode;
@@ -89,17 +99,9 @@ public:
 	bool m_fdc_irq;
 	bool m_fdc_drq;
 	int m_fdc_dden;
-	DECLARE_WRITE_LINE_MEMBER(com5016_fr_w);
-	DECLARE_WRITE_LINE_MEMBER(com5016_ft_w);
-	DECLARE_READ8_MEMBER(i8255_pc_r);
-	DECLARE_WRITE_LINE_MEMBER(ctc_z0_w);
-	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
-	DECLARE_WRITE_LINE_MEMBER(ctc_z2_w);
 
 	int m_centronics_busy;
 	int m_centronics_select;
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_select);
 };
 
-#endif
+#endif // MAME_INCLUDES_XOR100_H

@@ -68,14 +68,14 @@ i960 CPU, needs to write its clip and raster values byteswapped.
 #include "emu.h"
 #include "video/namco_c116.h"
 
-const device_type NAMCO_C116 = device_creator<namco_c116_device>;
+DEFINE_DEVICE_TYPE(NAMCO_C116, namco_c116_device, "namco_c116", "Namco C116 Video Controller")
 
 //-------------------------------------------------
 //  namco_c116_device -- constructor
 //-------------------------------------------------
 
 namco_c116_device::namco_c116_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, NAMCO_C116, "Namco C116 Video Controller", tag, owner, clock, "namco_c116", __FILE__),
+	: device_t(mconfig, NAMCO_C116, tag, owner, clock),
 		device_gfx_interface(mconfig, *this),
 		device_video_interface(mconfig, *this)
 {

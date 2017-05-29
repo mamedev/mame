@@ -646,16 +646,16 @@ TIMER_CALLBACK_MEMBER(rtc65271_device::rtc_end_update_cb)
 }
 
 // device type definition
-const device_type RTC65271 = device_creator<rtc65271_device>;
+DEFINE_DEVICE_TYPE(RTC65271, rtc65271_device, "rtc65271", "Epson RTC-65271 RTC")
 
 //-------------------------------------------------
 //  rtc65271_device - constructor
 //-------------------------------------------------
 
 rtc65271_device::rtc65271_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, RTC65271, "RTC-65271", tag, owner, clock, "rtc65271", __FILE__),
-		device_nvram_interface(mconfig, *this),
-		m_interrupt_cb(*this)
+	: device_t(mconfig, RTC65271, tag, owner, clock)
+	, device_nvram_interface(mconfig, *this)
+	, m_interrupt_cb(*this)
 {
 }
 

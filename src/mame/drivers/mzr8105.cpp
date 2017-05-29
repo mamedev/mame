@@ -203,7 +203,7 @@ SLOT_INTERFACE_END
 /*
  * Machine configuration
  */
-MACHINE_CONFIG_START (mzr8105, mzr8105_state)
+MACHINE_CONFIG_START (mzr8105)
 	MCFG_CPU_ADD ("maincpu", M68000, XTAL_10MHz)
 	MCFG_CPU_PROGRAM_MAP (mzr8105_mem)
 	MCFG_VME_DEVICE_ADD("vme")
@@ -227,5 +227,5 @@ ROM_START (mzr8105)
 ROM_END
 
 /* Driver */
-/*    YEAR  NAME          PARENT  COMPAT   MACHINE         INPUT     CLASS          INIT COMPANY                  FULLNAME          FLAGS */
-COMP (1987, mzr8105,      0,      0,       mzr8105,        mzr8105, driver_device,  0,   "Mizar Inc",             "Mizar VME8105",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
+//    YEAR  NAME          PARENT  COMPAT   MACHINE         INPUT    CLASS           INIT  COMPANY      FULLNAME          FLAGS
+COMP (1987, mzr8105,      0,      0,       mzr8105,        mzr8105, mzr8105_state,  0,    "Mizar Inc", "Mizar VME8105",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )

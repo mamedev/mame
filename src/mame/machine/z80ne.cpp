@@ -19,8 +19,8 @@
 /* Devices */
 #include "imagedev/flopdrv.h"
 
-#define VERBOSE 0
-#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
+//#define VERBOSE 1
+#include "logmacro.h"
 
 
 
@@ -170,8 +170,8 @@ void z80ne_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 
 void z80ne_state::reset_lx388()
 {
-	m_lx388_kr2376->set_input_pin( KR2376_DSII, 0);
-	m_lx388_kr2376->set_input_pin( KR2376_PII, 0);
+	m_lx388_kr2376->set_input_pin( kr2376_device::KR2376_DSII, 0);
+	m_lx388_kr2376->set_input_pin( kr2376_device::KR2376_PII, 0);
 }
 
 void z80ne_state::reset_lx382_banking()
@@ -241,7 +241,7 @@ MACHINE_RESET_MEMBER(z80ne_state,z80ne_base)
 {
 	int i;
 
-	LOG(("In machine_reset z80ne_base\n"));
+	LOG("In machine_reset z80ne_base\n");
 
 	for ( i=0; i<LX383_KEYS; i++)
 		m_lx383_key[i] = 0xf0 | i;
@@ -291,28 +291,28 @@ MACHINE_RESET_MEMBER(z80ne_state,z80ne_base)
 
 MACHINE_RESET_MEMBER(z80ne_state,z80ne)
 {
-	LOG(("In machine_reset z80ne\n"));
+	LOG("In machine_reset z80ne\n");
 	reset_lx382_banking();
 	MACHINE_RESET_CALL_MEMBER( z80ne_base );
 }
 
 MACHINE_RESET_MEMBER(z80ne_state,z80net)
 {
-	LOG(("In machine_reset z80net\n"));
+	LOG("In machine_reset z80net\n");
 	MACHINE_RESET_CALL_MEMBER( z80ne );
 	reset_lx388();
 }
 
 MACHINE_RESET_MEMBER(z80ne_state,z80netb)
 {
-	LOG(("In machine_reset z80netb\n"));
+	LOG("In machine_reset z80netb\n");
 	MACHINE_RESET_CALL_MEMBER( z80ne_base );
 	reset_lx388();
 }
 
 MACHINE_RESET_MEMBER(z80ne_state,z80netf)
 {
-	LOG(("In machine_reset z80netf\n"));
+	LOG("In machine_reset z80netf\n");
 	reset_lx390_banking();
 	MACHINE_RESET_CALL_MEMBER( z80ne_base );
 	reset_lx388();
@@ -342,7 +342,7 @@ INPUT_CHANGED_MEMBER(z80ne_state::z80ne_nmi)
 
 MACHINE_START_MEMBER(z80ne_state,z80ne)
 {
-	LOG(("In MACHINE_START z80ne\n"));
+	LOG("In MACHINE_START z80ne\n");
 
 	m_timer_nmi = timer_alloc(0);
 	m_timer_reset = timer_alloc(1);
@@ -351,26 +351,27 @@ MACHINE_START_MEMBER(z80ne_state,z80ne)
 	save_item(NAME(m_lx383_scan_counter));
 	save_item(NAME(m_lx383_downsampler));
 	save_item(NAME(m_lx383_key));
-	m_cassette_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(z80ne_state::z80ne_cassette_tc),this));
-	machine().scheduler().timer_pulse( attotime::from_hz(1000), timer_expired_delegate(FUNC(z80ne_state::z80ne_kbd_scan),this));
+	m_cassette_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(z80ne_state::z80ne_cassette_tc), this));
+	m_kbd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(z80ne_state::z80ne_kbd_scan), this));
+	m_kbd_timer->adjust(attotime::from_hz(1000), 0, attotime::from_hz(1000));
 }
 
 MACHINE_START_MEMBER(z80ne_state,z80net)
 {
 	MACHINE_START_CALL_MEMBER( z80ne );
-	LOG(("In MACHINE_START z80net\n"));
+	LOG("In MACHINE_START z80net\n");
 }
 
 MACHINE_START_MEMBER(z80ne_state,z80netb)
 {
 	MACHINE_START_CALL_MEMBER( z80net );
-	LOG(("In MACHINE_START z80netb\n"));
+	LOG("In MACHINE_START z80netb\n");
 }
 
 MACHINE_START_MEMBER(z80ne_state,z80netf)
 {
 	MACHINE_START_CALL_MEMBER( z80net );
-	LOG(("In MACHINE_START z80netf\n"));
+	LOG("In MACHINE_START z80netf\n");
 }
 
 /******************************************************************************
@@ -584,7 +585,7 @@ READ8_MEMBER(z80ne_state::lx388_data_r)
 	uint8_t data;
 
 	data = m_lx388_kr2376->data_r(space, 0) & 0x7f;
-	data |= m_lx388_kr2376->get_output_pin(KR2376_SO) << 7;
+	data |= m_lx388_kr2376->get_output_pin(kr2376_device::KR2376_SO) << 7;
 	return data;
 }
 
@@ -650,12 +651,12 @@ READ8_MEMBER(z80ne_state::lx390_reset_bank)
 	pc = m_maincpu->pc();
 	if((pc >= 0xf000) && (pc <=0xffff))
 	{
-		LOG(("lx390_reset_bank, reset memory bank 1\n"));
+		LOG("lx390_reset_bank, reset memory bank 1\n");
 		m_bank1->set_entry(0); /* RAM at 0x0000 (bank 1) */
 	}
 	else
 	{
-		LOG(("lx390_reset_bank, bypass because in debugger\n"));
+		LOG("lx390_reset_bank, bypass because in debugger\n");
 	}
 	return 0xff;
 }
@@ -668,19 +669,19 @@ READ8_MEMBER(z80ne_state::lx390_fdc_r)
 	{
 	case 0:
 		d = m_wd1771->status_r(space, 0) ^ 0xff;
-		LOG(("lx390_fdc_r, WD17xx status: %02x\n", d));
+		LOG("lx390_fdc_r, WD17xx status: %02x\n", d);
 		break;
 	case 1:
 		d = m_wd1771->track_r(space, 0) ^ 0xff;
-		LOG(("lx390_fdc_r, WD17xx track:  %02x\n", d));
+		LOG("lx390_fdc_r, WD17xx track:  %02x\n", d);
 		break;
 	case 2:
 		d = m_wd1771->sector_r(space, 0) ^ 0xff;
-		LOG(("lx390_fdc_r, WD17xx sector: %02x\n", d));
+		LOG("lx390_fdc_r, WD17xx sector: %02x\n", d);
 		break;
 	case 3:
 		d = m_wd1771->data_r(space, 0) ^ 0xff;
-		LOG(("lx390_fdc_r, WD17xx data3:  %02x\n", d));
+		LOG("lx390_fdc_r, WD17xx data3:  %02x\n", d);
 		break;
 	case 6:
 		d = 0xff;
@@ -688,7 +689,7 @@ READ8_MEMBER(z80ne_state::lx390_fdc_r)
 		break;
 	case 7:
 		d = m_wd1771->data_r(space, 3) ^ 0xff;
-		LOG(("lx390_fdc_r, WD17xx data7, force:  %02x\n", d));
+		LOG("lx390_fdc_r, WD17xx data7, force:  %02x\n", d);
 		break;
 	default:
 		d = 0x00;
@@ -704,7 +705,7 @@ WRITE8_MEMBER(z80ne_state::lx390_fdc_w)
 	switch(offset)
 	{
 	case 0:
-		LOG(("lx390_fdc_w, WD17xx command: %02x\n", d));
+		LOG("lx390_fdc_w, WD17xx command: %02x\n", d);
 		m_wd1771->cmd_w(space, offset, d ^ 0xff);
 		if (m_wd17xx_state.drive & 1)
 			output().set_value("drv0", 2);
@@ -712,23 +713,23 @@ WRITE8_MEMBER(z80ne_state::lx390_fdc_w)
 			output().set_value("drv1", 2);
 		break;
 	case 1:
-		LOG(("lx390_fdc_w, WD17xx track:   %02x\n", d));
+		LOG("lx390_fdc_w, WD17xx track:   %02x\n", d);
 		m_wd1771->track_w(space, offset, d ^ 0xff);
 		break;
 	case 2:
-		LOG(("lx390_fdc_w, WD17xx sector:  %02x\n", d));
+		LOG("lx390_fdc_w, WD17xx sector:  %02x\n", d);
 		m_wd1771->sector_w(space, offset, d ^ 0xff);
 		break;
 	case 3:
 		m_wd1771->data_w(space, 0, d ^ 0xff);
-		LOG(("lx390_fdc_w, WD17xx data3:   %02x\n", d));
+		LOG("lx390_fdc_w, WD17xx data3:   %02x\n", d);
 		break;
 	case 6:
-		LOG(("lx390_fdc_w, motor_w:   %02x\n", d));
+		LOG("lx390_fdc_w, motor_w:   %02x\n", d);
 		lx390_motor_w(space, 0, d);
 		break;
 	case 7:
-		LOG(("lx390_fdc_w, WD17xx data7, force:   %02x\n", d));
+		LOG("lx390_fdc_w, WD17xx data7, force:   %02x\n", d);
 		m_wd1771->data_w(space, 3, d ^ 0xff);
 		break;
 	}

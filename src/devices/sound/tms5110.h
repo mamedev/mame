@@ -1,30 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:Frank Palazzolo, Jarek Burczynski, Aaron Giles, Jonathan Gevaryahu, Couriersud
-#pragma once
+#ifndef MAME_SOUND_TMS5110_H
+#define MAME_SOUND_TMS5110_H
 
-#ifndef __TMS5110_H__
-#define __TMS5110_H__
+#pragma once
 
 
 /* HACK: if defined, uses impossibly perfect 'straight line' interpolation */
-#undef PERFECT_INTERPOLATION_HACK
-
-/* TMS5110 commands */
-										/* CTL8  CTL4  CTL2  CTL1  |   PDC's  */
-										/* (MSB)             (LSB) | required */
-#define TMS5110_CMD_RESET        (0) /*    0     0     0     x  |     1    */
-#define TMS5110_CMD_LOAD_ADDRESS (2) /*    0     0     1     x  |     2    */
-#define TMS5110_CMD_OUTPUT       (4) /*    0     1     0     x  |     3    */
-#define TMS5110_CMD_SPKSLOW      (6) /*    0     1     1     x  |     1    */
-/* Note: TMS5110_CMD_SPKSLOW is undocumented on the datasheets, it only appears
-   on the patents. It might not actually work properly on some of the real
-   chips as manufactured. Acts the same as CMD_SPEAK, but makes the
-   interpolator take two A cycles wherever it would normally only take one,
-   effectively making speech of any given word take 1.5x as long as normal. */
-#define TMS5110_CMD_READ_BIT     (8) /*    1     0     0     x  |     1    */
-#define TMS5110_CMD_SPEAK       (10) /*    1     0     1     x  |     1    */
-#define TMS5110_CMD_READ_BRANCH (12) /*    1     1     0     x  |     1    */
-#define TMS5110_CMD_TEST_TALK   (14) /*    1     1     1     x  |     3    */
+#undef TMS5110_PERFECT_INTERPOLATION_HACK
 
 /* clock rate = 80 * output sample rate,     */
 /* usually 640000 for 8000 Hz sample rate or */
@@ -46,31 +29,47 @@
 	devcb = &tms5110_device::set_romclk_callback(*device, DEVCB_##_devcb);
 
 
-class tms5110_device : public device_t,
-						public device_sound_interface
+class tms5110_device : public device_t, public device_sound_interface
 {
 public:
-	tms5110_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	tms5110_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+	/* TMS5110 commands */
+													/* CTL8  CTL4  CTL2  CTL1  |   PDC's  */
+													/* (MSB)             (LSB) | required */
+	static constexpr uint8_t CMD_RESET        = 0;  /*    0     0     0     x  |     1    */
+	static constexpr uint8_t CMD_LOAD_ADDRESS = 2;  /*    0     0     1     x  |     2    */
+	static constexpr uint8_t CMD_OUTPUT       = 4;  /*    0     1     0     x  |     3    */
+	static constexpr uint8_t CMD_SPKSLOW      = 6;  /*    0     1     1     x  |     1    */
+	/* Note: TMS5110_CMD_SPKSLOW is undocumented on the datasheets, it only appears
+	   on the patents. It might not actually work properly on some of the real
+	   chips as manufactured. Acts the same as CMD_SPEAK, but makes the
+	   interpolator take two A cycles wherever it would normally only take one,
+	   effectively making speech of any given word take 1.5x as long as normal. */
+	static constexpr uint8_t CMD_READ_BIT    =  8;  /*    1     0     0     x  |     1    */
+	static constexpr uint8_t CMD_SPEAK       = 10;  /*    1     0     1     x  |     1    */
+	static constexpr uint8_t CMD_READ_BRANCH = 12;  /*    1     1     0     x  |     1    */
+	static constexpr uint8_t CMD_TEST_TALK   = 14;  /*    1     1     1     x  |     3    */
 
-	template<class _Object> static devcb_base &set_m0_callback(device_t &device, _Object object) { return downcast<tms5110_device &>(device).m_m0_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_m1_callback(device_t &device, _Object object) { return downcast<tms5110_device &>(device).m_m1_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_addr_callback(device_t &device, _Object object) { return downcast<tms5110_device &>(device).m_addr_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_data_callback(device_t &device, _Object object) { return downcast<tms5110_device &>(device).m_data_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_romclk_callback(device_t &device, _Object object) { return downcast<tms5110_device &>(device).m_romclk_cb.set_callback(object); }
+	tms5110_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	template <class Object> static devcb_base &set_m0_callback(device_t &device, Object &&cb) { return downcast<tms5110_device &>(device).m_m0_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_m1_callback(device_t &device, Object &&cb) { return downcast<tms5110_device &>(device).m_m1_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_addr_callback(device_t &device, Object &&cb) { return downcast<tms5110_device &>(device).m_addr_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_data_callback(device_t &device, Object &&cb) { return downcast<tms5110_device &>(device).m_data_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_romclk_callback(device_t &device, Object &&cb) { return downcast<tms5110_device &>(device).m_romclk_cb.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE8_MEMBER( ctl_w );
 	DECLARE_READ8_MEMBER( ctl_r );
 	DECLARE_WRITE_LINE_MEMBER( pdc_w );
 
-	/* this is only used by cvs.c
-	 * it is not related at all to the speech generation
-	 * and conflicts with the new rom controller interface.
-	 */
+	// this is only used by cvs.c
+	// it is not related at all to the speech generation and conflicts with the new ROM controller interface.
 	DECLARE_READ8_MEMBER( romclk_hack_r );
 
 	void set_frequency(int frequency);
+
 protected:
+	tms5110_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int variant);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -80,11 +79,10 @@ protected:
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
-	void set_variant(int variant);
+	uint8_t TALK_STATUS() const { return m_SPEN | m_TALKD; }
 
 	uint8_t m_SPEN;             /* set on speak command, cleared on stop command or reset command */
 	uint8_t m_TALK;             /* set on SPEN & RESETL4(pc12->pc0 transition), cleared on stop command or reset command */
-#define TALK_STATUS (m_SPEN|m_TALKD)
 	uint8_t m_TALKD;            /* TALK(TCON) value, latched every RESETL4 */
 	sound_stream *m_stream;
 
@@ -100,12 +98,19 @@ private:
 	void PDC_set(int data);
 	void parse_frame();
 
+	uint8_t &OLD_FRAME_SILENCE_FLAG() { return m_OLDE; } // 1 if E=0, 0 otherwise.
+	uint8_t &OLD_FRAME_UNVOICED_FLAG() { return m_OLDP; } // 1 if P=0 (unvoiced), 0 if voiced
+
+	bool NEW_FRAME_STOP_FLAG() const { return m_new_frame_energy_idx == 0x0F; } // 1 if this is a stop (Energy = 0x0F) frame
+	bool NEW_FRAME_SILENCE_FLAG() const { return m_new_frame_energy_idx == 0; } // ditto as above
+	bool NEW_FRAME_UNVOICED_FLAG() const { return m_new_frame_pitch_idx == 0; } // ditto as above
+
 	// internal state
 	/* table */
 	optional_region_ptr<uint8_t> m_table;
 
 	/* coefficient tables */
-	int m_variant;                /* Variant of the 5110 - see tms5110.h */
+	const int m_variant;                /* Variant of the 5110 - see tms5110.h */
 
 	/* coefficient tables */
 	const struct tms5100_coeffs *m_coeff;
@@ -134,21 +139,16 @@ private:
 	devcb_write_line   m_romclk_cb;  // rom clock - Only used to drive the data lines
 
 	/* these contain data describing the current and previous voice frames */
-#define OLD_FRAME_SILENCE_FLAG m_OLDE // 1 if E=0, 0 otherwise.
-#define OLD_FRAME_UNVOICED_FLAG m_OLDP // 1 if P=0 (unvoiced), 0 if voiced
 	uint8_t m_OLDE;
 	uint8_t m_OLDP;
 
-#define NEW_FRAME_STOP_FLAG (m_new_frame_energy_idx == 0xF) // 1 if this is a stop (Energy = 0xF) frame
-#define NEW_FRAME_SILENCE_FLAG (m_new_frame_energy_idx == 0) // ditto as above
-#define NEW_FRAME_UNVOICED_FLAG (m_new_frame_pitch_idx == 0) // ditto as above
 	uint8_t m_new_frame_energy_idx;
 	uint8_t m_new_frame_pitch_idx;
 	uint8_t m_new_frame_k_idx[10];
 
 
 	/* these are all used to contain the current state of the sound generation */
-#ifndef PERFECT_INTERPOLATION_HACK
+#ifndef TMS5110_PERFECT_INTERPOLATION_HACK
 	int16_t m_current_energy;
 	int16_t m_current_pitch;
 	int16_t m_current_k[10];
@@ -200,84 +200,55 @@ private:
 	emu_timer *m_romclk_hack_timer;
 };
 
-extern const device_type TMS5110;
 
 class tms5100_device : public tms5110_device
 {
 public:
 	tms5100_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-protected:
-	// device-level overrides
-	virtual void device_start() override;
 };
 
-extern const device_type TMS5100;
 
 class tmc0281_device : public tms5110_device
 {
 public:
 	tmc0281_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-protected:
-	// device-level overrides
-	virtual void device_start() override;
 };
 
-extern const device_type TMC0281;
 
 class tms5100a_device : public tms5110_device
 {
 public:
 	tms5100a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-protected:
-	// device-level overrides
-	virtual void device_start() override;
 };
 
-extern const device_type TMS5100A;
 
 class tmc0281d_device : public tms5110_device
 {
 public:
 	tmc0281d_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-protected:
-	// device-level overrides
-	virtual void device_start() override;
 };
 
-extern const device_type TMC0281D;
 
 class cd2801_device : public tms5110_device
 {
 public:
 	cd2801_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-protected:
-	// device-level overrides
-	virtual void device_start() override;
 };
 
-extern const device_type CD2801;
 
 class cd2802_device : public tms5110_device
 {
 public:
 	cd2802_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-protected:
-	// device-level overrides
-	virtual void device_start() override;
 };
 
-extern const device_type CD2802;
 
 class tms5110a_device : public tms5110_device
 {
 public:
 	tms5110a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-protected:
-	// device-level overrides
-	virtual void device_start() override;
 };
 
-extern const device_type TMS5110A;
 
 class m58817_device : public tms5110_device
 {
@@ -285,13 +256,18 @@ public:
 	m58817_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ8_MEMBER( status_r );
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
 };
 
-extern const device_type M58817;
+
+DECLARE_DEVICE_TYPE(TMS5110,  tms5110_device)
+DECLARE_DEVICE_TYPE(TMS5100,  tms5100_device)
+DECLARE_DEVICE_TYPE(TMC0281,  tmc0281_device)
+DECLARE_DEVICE_TYPE(TMS5100A, tms5100a_device)
+DECLARE_DEVICE_TYPE(TMC0281D, tmc0281d_device)
+DECLARE_DEVICE_TYPE(CD2801,   cd2801_device)
+DECLARE_DEVICE_TYPE(CD2802,   cd2802_device)
+DECLARE_DEVICE_TYPE(TMS5110A, tms5110a_device)
+DECLARE_DEVICE_TYPE(M58817,   m58817_device)
 
 
 
@@ -360,7 +336,7 @@ private:
 	emu_timer *m_romclk_timer;
 };
 
-extern const device_type TMSPROM;
+DECLARE_DEVICE_TYPE(TMSPROM, tmsprom_device)
 
 #define MCFG_TMSPROM_REGION(_region) \
 	tmsprom_device::set_region(*device, "^" _region);
@@ -395,4 +371,4 @@ extern const device_type TMSPROM;
 #define MCFG_TMSPROM_CTL_CB(_devcb) \
 	devcb = &tmsprom_device::set_ctl_callback(*device, DEVCB_##_devcb);
 
-#endif /* __TMS5110_H__ */
+#endif // MAME_SOUND_TMS5110_H

@@ -9,16 +9,17 @@
 \**************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "unsp.h"
+#include "debugger.h"
 
 
-const device_type UNSP = device_creator<unsp_device>;
+DEFINE_DEVICE_TYPE(UNSP, unsp_device, "unsp", "u'nSP")
 
 
 unsp_device::unsp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, UNSP, "u'nSP", tag, owner, clock, "unsp", __FILE__)
-	, m_program_config("program", ENDIANNESS_BIG, 16, 23, -1), m_irq(0), m_fiq(0), m_curirq(0), m_sirq(0), m_sb(0), m_saved_sb(0), m_program(nullptr), m_icount(0), m_debugger_temp(0)
+	: cpu_device(mconfig, UNSP, tag, owner, clock)
+	, m_program_config("program", ENDIANNESS_BIG, 16, 23, -1)
+	, m_irq(0), m_fiq(0), m_curirq(0), m_sirq(0), m_sb(0), m_saved_sb(0), m_program(nullptr), m_icount(0), m_debugger_temp(0)
 {
 }
 

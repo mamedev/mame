@@ -45,30 +45,23 @@ void (*arm7_coproc_dt_r_callback)(arm_state *arm, uint32_t insn, uint32_t *prn, 
 void (*arm7_coproc_dt_w_callback)(arm_state *arm, uint32_t insn, uint32_t *prn, void (*write32)(arm_state *arm, uint32_t addr, uint32_t data));
 
 
-const device_type ARM7 = device_creator<arm7_cpu_device>;
-const device_type ARM7_BE = device_creator<arm7_be_cpu_device>;
-const device_type ARM7500 = device_creator<arm7500_cpu_device>;
-const device_type ARM9 = device_creator<arm9_cpu_device>;
-const device_type ARM920T = device_creator<arm920t_cpu_device>;
-const device_type PXA255 = device_creator<pxa255_cpu_device>;
-const device_type SA1110 = device_creator<sa1110_cpu_device>;
+DEFINE_DEVICE_TYPE(ARM7,    arm7_cpu_device,    "arm7_le", "ARM7 (little)")
+DEFINE_DEVICE_TYPE(ARM7_BE, arm7_be_cpu_device, "arm7_be", "ARM7 (big)")
+DEFINE_DEVICE_TYPE(ARM7500, arm7500_cpu_device, "arm7500", "ARM7500")
+DEFINE_DEVICE_TYPE(ARM9,    arm9_cpu_device,    "arm9",    "ARM9")
+DEFINE_DEVICE_TYPE(ARM920T, arm920t_cpu_device, "arm920t", "ARM920T")
+DEFINE_DEVICE_TYPE(PXA255,  pxa255_cpu_device,  "pxa255",  "Intel XScale PXA255")
+DEFINE_DEVICE_TYPE(SA1110,  sa1110_cpu_device,  "sa1110",  "Intel StrongARM SA-1110")
 
 
 arm7_cpu_device::arm7_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, ARM7, "ARM7", tag, owner, clock, "arm7", __FILE__)
-	, m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0)
-	, m_endian(ENDIANNESS_LITTLE)
-	, m_archRev(4)  // ARMv4
-	, m_archFlags(eARM_ARCHFLAGS_T)  // has Thumb
-	, m_copro_id(0x41 | (1 << 23) | (7 << 12))  // <-- where did this come from?
-	, m_pc(0)
+	: arm7_cpu_device(mconfig, ARM7, tag, owner, clock, 4, eARM_ARCHFLAGS_T, ENDIANNESS_LITTLE)
 {
-	memset(m_r, 0x00, sizeof(m_r));
 }
 
 
-arm7_cpu_device::arm7_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, uint8_t archRev, uint8_t archFlags, endianness_t endianness)
-	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
+arm7_cpu_device::arm7_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t archRev, uint8_t archFlags, endianness_t endianness)
+	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", endianness, 32, 32, 0)
 	, m_endian(endianness)
 	, m_archRev(archRev)
@@ -81,20 +74,20 @@ arm7_cpu_device::arm7_cpu_device(const machine_config &mconfig, device_type type
 
 
 arm7_be_cpu_device::arm7_be_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: arm7_cpu_device(mconfig, ARM7_BE, "ARM7 (big endian)", tag, owner, clock, "arm7_be", __FILE__, 4, eARM_ARCHFLAGS_T, ENDIANNESS_BIG)
+	: arm7_cpu_device(mconfig, ARM7_BE, tag, owner, clock, 4, eARM_ARCHFLAGS_T, ENDIANNESS_BIG)
 {
 }
 
 
 arm7500_cpu_device::arm7500_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: arm7_cpu_device(mconfig, ARM7500, "ARM7500", tag, owner, clock, "arm7500", __FILE__, 3, eARM_ARCHFLAGS_MODE26)
+	: arm7_cpu_device(mconfig, ARM7500, tag, owner, clock, 3, eARM_ARCHFLAGS_MODE26, ENDIANNESS_LITTLE)
 {
 	m_copro_id = (0x41 << 24) | (0 << 20) | (1 << 16) | (0x710 << 4) | (0 << 0);
 }
 
 
 arm9_cpu_device::arm9_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: arm7_cpu_device(mconfig, ARM9, "ARM9", tag, owner, clock, "arm9", __FILE__, 5, eARM_ARCHFLAGS_T | eARM_ARCHFLAGS_E)
+	: arm7_cpu_device(mconfig, ARM9, tag, owner, clock, 5, eARM_ARCHFLAGS_T | eARM_ARCHFLAGS_E, ENDIANNESS_LITTLE)
 	// ARMv5
 	// has TE extensions
 {
@@ -102,7 +95,7 @@ arm9_cpu_device::arm9_cpu_device(const machine_config &mconfig, const char *tag,
 
 
 arm920t_cpu_device::arm920t_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: arm7_cpu_device(mconfig, ARM920T, "ARM920T", tag, owner, clock, "arm920t", __FILE__, 4, eARM_ARCHFLAGS_T)
+	: arm7_cpu_device(mconfig, ARM920T, tag, owner, clock, 4, eARM_ARCHFLAGS_T, ENDIANNESS_LITTLE)
 	// ARMv4
 	// has T extension
 {
@@ -111,7 +104,7 @@ arm920t_cpu_device::arm920t_cpu_device(const machine_config &mconfig, const char
 
 
 pxa255_cpu_device::pxa255_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: arm7_cpu_device(mconfig, PXA255, "PXA255", tag, owner, clock, "pxa255", __FILE__, 5, eARM_ARCHFLAGS_T | eARM_ARCHFLAGS_E | eARM_ARCHFLAGS_XSCALE)
+	: arm7_cpu_device(mconfig, PXA255, tag, owner, clock, 5, eARM_ARCHFLAGS_T | eARM_ARCHFLAGS_E | eARM_ARCHFLAGS_XSCALE, ENDIANNESS_LITTLE)
 	// ARMv5
 	// has TE and XScale extensions
 {
@@ -119,7 +112,7 @@ pxa255_cpu_device::pxa255_cpu_device(const machine_config &mconfig, const char *
 
 
 sa1110_cpu_device::sa1110_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: arm7_cpu_device(mconfig, SA1110, "SA1110", tag, owner, clock, "sa1110", __FILE__, 4, eARM_ARCHFLAGS_SA)
+	: arm7_cpu_device(mconfig, SA1110, tag, owner, clock, 4, eARM_ARCHFLAGS_SA, ENDIANNESS_LITTLE)
 	// ARMv4
 	// has StrongARM, no Thumb, no Enhanced DSP
 {

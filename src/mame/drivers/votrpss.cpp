@@ -101,7 +101,7 @@ public:
 	{
 	}
 
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	void kbd_put(u8 data);
 	DECLARE_READ8_MEMBER(ppi_pa_r);
 	DECLARE_READ8_MEMBER(ppi_pb_r);
 	DECLARE_READ8_MEMBER(ppi_pc_r);
@@ -111,6 +111,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer);
 	DECLARE_WRITE_LINE_MEMBER(write_uart_clock);
 	IRQ_CALLBACK_MEMBER(irq_ack);
+
 private:
 	uint8_t m_term_data;
 	uint8_t m_porta;
@@ -239,7 +240,7 @@ WRITE8_MEMBER( votrpss_state::ppi_pc_w )
 	m_portc = data;
 }
 
-WRITE8_MEMBER( votrpss_state::kbd_put )
+void votrpss_state::kbd_put(u8 data)
 {
 	m_term_data = data;
 }
@@ -254,7 +255,7 @@ DECLARE_WRITE_LINE_MEMBER( votrpss_state::write_uart_clock )
  Machine Drivers
 ******************************************************************************/
 
-static MACHINE_CONFIG_START( votrpss, votrpss_state )
+static MACHINE_CONFIG_START( votrpss )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz/2)  /* 4.000 MHz, verified */
 	MCFG_CPU_PROGRAM_MAP(votrpss_mem)
@@ -275,7 +276,7 @@ static MACHINE_CONFIG_START( votrpss, votrpss_state )
 
 	/* Devices */
 	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(votrpss_state, kbd_put))
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(votrpss_state, kbd_put))
 
 	MCFG_DEVICE_ADD("uart", I8251, 0)
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
@@ -334,5 +335,5 @@ ROM_END
  Drivers
 ******************************************************************************/
 
-/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT      COMPANY                     FULLNAME                            FLAGS */
-COMP( 1982, votrpss,   0,          0,      votrpss,   votrpss, driver_device, 0,      "Votrax",        "Personal Speech System", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME     PARENT  COMPAT  MACHINE    INPUT    STATE          INIT  COMPANY   FULLNAME                  FLAGS
+COMP( 1982, votrpss, 0,      0,      votrpss,   votrpss, votrpss_state, 0,    "Votrax", "Personal Speech System", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

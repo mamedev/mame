@@ -11,9 +11,6 @@
 #include "ti8x.h"
 
 
-extern device_type const TI8X_TEE_CONNECTOR;
-
-
 namespace bus { namespace ti8x {
 
 class tee_connector_device : public device_t, public device_ti8x_link_port_interface
@@ -21,17 +18,17 @@ class tee_connector_device : public device_t, public device_ti8x_link_port_inter
 public:
 	tee_connector_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE_LINE_MEMBER(tip_a_w);
-	DECLARE_WRITE_LINE_MEMBER(ring_a_w);
-	DECLARE_WRITE_LINE_MEMBER(tip_b_w);
-	DECLARE_WRITE_LINE_MEMBER(ring_b_w);
-
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 
 	virtual DECLARE_WRITE_LINE_MEMBER(input_tip) override;
 	virtual DECLARE_WRITE_LINE_MEMBER(input_ring) override;
+
+	DECLARE_WRITE_LINE_MEMBER(tip_a_w);
+	DECLARE_WRITE_LINE_MEMBER(ring_a_w);
+	DECLARE_WRITE_LINE_MEMBER(tip_b_w);
+	DECLARE_WRITE_LINE_MEMBER(ring_b_w);
 
 	required_device<ti8x_link_port_device>  m_port_a;
 	required_device<ti8x_link_port_device>  m_port_b;
@@ -41,5 +38,8 @@ protected:
 };
 
 } } // namespace bus::ti8x
+
+
+DECLARE_DEVICE_TYPE_NS(TI8X_TEE_CONNECTOR, bus::ti8x, tee_connector_device)
 
 #endif // MAME_DEVICES_BUS_TI8X_TEECONN_H

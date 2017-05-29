@@ -14,7 +14,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type BBC_JOYPORT_SLOT = device_creator<bbc_joyport_slot_device>;
+DEFINE_DEVICE_TYPE(BBC_JOYPORT_SLOT, bbc_joyport_slot_device, "bbc_joyport_slot", "BBC Master Compact Joystick/Mouse port")
 
 
 //**************************************************************************
@@ -50,8 +50,8 @@ device_bbc_joyport_interface::~device_bbc_joyport_interface()
 //-------------------------------------------------
 
 bbc_joyport_slot_device::bbc_joyport_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, BBC_JOYPORT_SLOT, "BBC Master Compact Joystick/Mouse port", tag, owner, clock, "bbc_joyport_slot", __FILE__),
-		device_slot_interface(mconfig, *this),
+	device_t(mconfig, BBC_JOYPORT_SLOT, tag, owner, clock),
+	device_slot_interface(mconfig, *this),
 	m_device(nullptr)
 {
 }

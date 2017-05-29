@@ -6,10 +6,10 @@
 
 ******************************************************************************/
 
-#pragma once
-
 #ifndef MAME_VIDEO_VSYSTEM_GGA_H
 #define MAME_VIDEO_VSYSTEM_GGA_H
+
+#pragma once
 
 //**************************************************************************
 //  CONFIGURATION MACROS
@@ -52,6 +52,6 @@ private:
 };
 
 // device type definition
-extern const device_type VSYSTEM_GGA;
+DECLARE_DEVICE_TYPE(VSYSTEM_GGA, vsystem_gga_device)
 
-#endif
+#endif // MAME_VIDEO_VSYSTEM_GGA_H

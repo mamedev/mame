@@ -291,7 +291,7 @@ void cham24_state::machine_reset()
 	/* uses 8K swapping, all ROM!*/
 	m_ppu->space(AS_PROGRAM).install_read_bank(0x0000, 0x1fff, "bank1");
 	membank("bank1")->set_base(memregion("gfx1")->base());
-	
+
 	m_nt_page[0] = m_nt_ram.get();
 	m_nt_page[1] = m_nt_ram.get() + 0x400;
 	m_nt_page[2] = m_nt_ram.get() + 0x800;
@@ -309,7 +309,7 @@ static GFXDECODE_START( cham24 )
 	/* none, the ppu generates one */
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( cham24, cham24_state )
+static MACHINE_CONFIG_START( cham24 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", N2A03, NTSC_APU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(cham24_map)

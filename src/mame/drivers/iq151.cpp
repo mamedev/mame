@@ -380,7 +380,7 @@ static SLOT_INTERFACE_START(iq151_cart)
 	SLOT_INTERFACE("amos3"  , IQ151_AMOS3)              // AMOS cart 3
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( iq151, iq151_state )
+static MACHINE_CONFIG_START( iq151 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8080, XTAL_2MHz)
 	MCFG_CPU_PROGRAM_MAP(iq151_mem)
@@ -476,5 +476,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT   COMPANY   FULLNAME       FLAGS */
-COMP( 198?, iq151,  0,       0,      iq151,     iq151, iq151_state,   iq151, "ZPA Novy Bor", "IQ-151", 0 )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  STATE        INIT   COMPANY         FULLNAME  FLAGS
+COMP( 198?, iq151, 0,      0,      iq151,   iq151, iq151_state, iq151, "ZPA Novy Bor", "IQ-151", 0 )

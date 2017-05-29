@@ -85,8 +85,8 @@ AUD_A_RIGHT EQU %00000001
 
 
 // device type definition
-const device_type LYNX_SND = device_creator<lynx_sound_device>;
-const device_type LYNX2_SND = device_creator<lynx2_sound_device>;
+DEFINE_DEVICE_TYPE(LYNX_SND,  lynx_sound_device,  "lynx_sound",  "Mikey")
+DEFINE_DEVICE_TYPE(LYNX2_SND, lynx2_sound_device, "lynx2_sound", "Mikey (Lynx II)")
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -97,25 +97,24 @@ const device_type LYNX2_SND = device_creator<lynx2_sound_device>;
 //-------------------------------------------------
 
 lynx_sound_device::lynx_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: device_t(mconfig, LYNX_SND, "Mikey", tag, owner, clock, "lynx_sound", __FILE__),
-						device_sound_interface(mconfig, *this)
+	: lynx_sound_device(mconfig, LYNX_SND, tag, owner, clock)
 {
-	m_timer_delegate = lynx_sound_timer_delegate();
+	m_timer_delegate = timer_delegate();
 }
 
-lynx_sound_device::lynx_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-						device_sound_interface(mconfig, *this)
+lynx_sound_device::lynx_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_sound_interface(mconfig, *this)
 {
 }
 
 
 lynx2_sound_device::lynx2_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: lynx_sound_device(mconfig, LYNX2_SND, "Mikey (Lynx II)", tag, owner, clock, "lynx2_sound", __FILE__)
+	: lynx_sound_device(mconfig, LYNX2_SND, tag, owner, clock)
 {
 }
 
-void lynx_sound_device::set_timer_delegate(device_t &device, lynx_sound_timer_delegate cb)
+void lynx_sound_device::set_timer_delegate(device_t &device, timer_delegate cb)
 {
 	lynx_sound_device &dev = downcast<lynx_sound_device &>(device);
 	dev.m_timer_delegate = cb;

@@ -9,8 +9,10 @@
 
 */
 
-#ifndef _TMS1KBASE_H_
-#define _TMS1KBASE_H_
+#ifndef MAME_CPU_TMS1000_TMS1K_BASE_H
+#define MAME_CPU_TMS1000_TMS1K_BASE_H
+
+#pragma once
 
 #include "machine/pla.h"
 
@@ -82,32 +84,11 @@
 class tms1k_base_device : public cpu_device
 {
 public:
-	// construction/destruction
-	tms1k_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source)
-		: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
-		, m_program_config("program", ENDIANNESS_BIG, byte_bits > 8 ? 16 : 8, prgwidth, 0, program)
-		, m_data_config("data", ENDIANNESS_BIG, 8, datawidth, 0, data)
-		, m_mpla(*this, "mpla")
-		, m_ipla(*this, "ipla")
-		, m_opla(*this, "opla")
-		, m_spla(*this, "spla")
-		, m_o_pins(o_pins)
-		, m_r_pins(r_pins)
-		, m_pc_bits(pc_bits)
-		, m_byte_bits(byte_bits)
-		, m_x_bits(x_bits)
-		, m_output_pla_table(nullptr)
-		, m_read_k(*this)
-		, m_write_o(*this)
-		, m_write_r(*this)
-		, m_power_off(*this)
-	{ }
-
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_read_k_callback(device_t &device, _Object object) { return downcast<tms1k_base_device &>(device).m_read_k.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_o_callback(device_t &device, _Object object) { return downcast<tms1k_base_device &>(device).m_write_o.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_r_callback(device_t &device, _Object object) { return downcast<tms1k_base_device &>(device).m_write_r.set_callback(object); }
-	template<class _Object> static devcb_base &set_power_off_callback(device_t &device, _Object object) { return downcast<tms1k_base_device &>(device).m_power_off.set_callback(object); }
+	template <class Object> static devcb_base &set_read_k_callback(device_t &device, Object &&cb) { return downcast<tms1k_base_device &>(device).m_read_k.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_write_o_callback(device_t &device, Object &&cb) { return downcast<tms1k_base_device &>(device).m_write_o.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_write_r_callback(device_t &device, Object &&cb) { return downcast<tms1k_base_device &>(device).m_write_r.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_power_off_callback(device_t &device, Object &&cb) { return downcast<tms1k_base_device &>(device).m_power_off.set_callback(std::forward<Object>(cb)); }
 	static void set_output_pla(device_t &device, const u16 *output_pla) { downcast<tms1k_base_device &>(device).m_output_pla_table = output_pla; }
 
 	u8 debug_peek_o_index() { return m_o_index; } // get output PLA index, for debugging (don't use in emulation)
@@ -171,6 +152,9 @@ public:
 	};
 
 protected:
+	// construction/destruction
+	tms1k_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -298,4 +282,4 @@ protected:
 };
 
 
-#endif /* _TMS1KBASE_H_ */
+#endif // MAME_CPU_TMS1000_TMS1K_BASE_H

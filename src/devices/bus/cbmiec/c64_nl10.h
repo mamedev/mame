@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_CBMIEC_C64_NL10_H
+#define MAME_BUS_CBMIEC_C64_NL10_H
 
-#ifndef __C64_NL10_INTERFACE__
-#define __C64_NL10_INTERFACE__
+#pragma once
 
 #include "cbmiec.h"
 
@@ -21,8 +21,7 @@
 
 // ======================> c64_nl10_interface_device
 
-class c64_nl10_interface_device :  public device_t,
-									public device_cbm_iec_interface
+class c64_nl10_interface_device : public device_t, public device_cbm_iec_interface
 {
 public:
 	// construction/destruction
@@ -44,8 +43,7 @@ protected:
 
 
 // device type definition
-extern const device_type C64_NL10_INTERFACE;
+DECLARE_DEVICE_TYPE(C64_NL10_INTERFACE, c64_nl10_interface_device)
 
 
-
-#endif
+#endif // MAME_BUS_CBMIEC_C64_NL10_H

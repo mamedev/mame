@@ -13,16 +13,16 @@
 #include "sound/volt_reg.h"
 
 
-const device_type S11C_BG = device_creator<s11c_bg_device>;
+DEFINE_DEVICE_TYPE(S11C_BG, s11c_bg_device, "s11c_bg", "Williams System 11C Background Music")
 
 s11c_bg_device::s11c_bg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig,S11C_BG,"Williams System 11C Background Music",tag,owner,clock, "s11c_bg", __FILE__),
-	device_mixer_interface(mconfig, *this),
-	m_cpu(*this,"bgcpu"),
-	m_ym2151(*this,"ym2151"),
-	m_hc55516(*this,"hc55516_bg"),
-	m_pia40(*this,"pia40"),
-	m_cpubank(*this,"bgbank")
+	: device_t(mconfig, S11C_BG,tag,owner,clock)
+	, device_mixer_interface(mconfig, *this)
+	, m_cpu(*this, "bgcpu")
+	, m_ym2151(*this, "ym2151")
+	, m_hc55516(*this, "hc55516_bg")
+	, m_pia40(*this, "pia40")
+	, m_cpubank(*this, "bgbank")
 {
 }
 
@@ -62,7 +62,7 @@ void s11c_bg_device::data_w(uint8_t data)
 	m_pia40->portb_w(data);
 }
 
-MACHINE_CONFIG_FRAGMENT( s11c_bg )
+MACHINE_CONFIG_MEMBER( s11c_bg_device::device_add_mconfig )
 	MCFG_CPU_ADD("bgcpu", M6809E, XTAL_8MHz) // MC68B09E (note: schematics show this as 8mhz/2, but games crash very quickly with that speed?)
 	MCFG_CPU_PROGRAM_MAP(s11c_bg_map)
 	MCFG_QUANTUM_TIME(attotime::from_hz(50))
@@ -86,11 +86,6 @@ MACHINE_CONFIG_FRAGMENT( s11c_bg )
 	MCFG_PIA_IRQA_HANDLER(INPUTLINE("bgcpu", M6809_FIRQ_LINE))
 	MCFG_PIA_IRQB_HANDLER(INPUTLINE("bgcpu", INPUT_LINE_NMI))
 MACHINE_CONFIG_END
-
-machine_config_constructor s11c_bg_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( s11c_bg );
-}
 
 void s11c_bg_device::device_start()
 {

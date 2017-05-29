@@ -7,10 +7,10 @@
  *
  */
 
-#pragma once
+#ifndef MAME_CPU_PSX_GTE_H
+#define MAME_CPU_PSX_GTE_H
 
-#ifndef __PSXGTE_H__
-#define __PSXGTE_H__
+#pragma once
 
 
 #define GTE_SF( op ) ( ( op >> 19 ) & 1 )
@@ -110,4 +110,4 @@ protected:
 	int64_t m_mac3;
 };
 
-#endif
+#endif // MAME_CPU_PSX_GTE_H

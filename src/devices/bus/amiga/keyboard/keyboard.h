@@ -12,10 +12,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_AMIGA_KEYBOARD_H
+#define MAME_BUS_AMIGA_KEYBOARD_H
 
-#ifndef DEVICES_BUS_AMIGA_KEYBOARD_H
-#define DEVICES_BUS_AMIGA_KEYBOARD_H
+#pragma once
 
 
 
@@ -53,14 +53,14 @@ public:
 	virtual ~amiga_keyboard_bus_device();
 
 	// callbacks
-	template<class _Object> static devcb_base &set_kclk_handler(device_t &device, _Object object)
-		{ return downcast<amiga_keyboard_bus_device &>(device).m_kclk_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_kclk_handler(device_t &device, Object &&cb)
+	{ return downcast<amiga_keyboard_bus_device &>(device).m_kclk_handler.set_callback(std::forward<Object>(cb)); }
 
-	template<class _Object> static devcb_base &set_kdat_handler(device_t &device, _Object object)
-		{ return downcast<amiga_keyboard_bus_device &>(device).m_kdat_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_kdat_handler(device_t &device, Object &&cb)
+	{ return downcast<amiga_keyboard_bus_device &>(device).m_kdat_handler.set_callback(std::forward<Object>(cb)); }
 
-	template<class _Object> static devcb_base &set_krst_handler(device_t &device, _Object object)
-		{ return downcast<amiga_keyboard_bus_device &>(device).m_krst_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_krst_handler(device_t &device, Object &&cb)
+	{ return downcast<amiga_keyboard_bus_device &>(device).m_krst_handler.set_callback(std::forward<Object>(cb)); }
 
 	// called from keyboard
 	DECLARE_WRITE_LINE_MEMBER(kclk_w) { m_kclk_handler(state); }
@@ -89,19 +89,20 @@ class device_amiga_keyboard_interface : public device_slot_card_interface
 {
 public:
 	// construction/destruction
-	device_amiga_keyboard_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_amiga_keyboard_interface();
 
 	virtual DECLARE_WRITE_LINE_MEMBER(kdat_w) = 0;
 
 protected:
+	device_amiga_keyboard_interface(const machine_config &mconfig, device_t &device);
+
 	amiga_keyboard_bus_device *m_host;
 };
 
 // device type definition
-extern const device_type AMIGA_KEYBOARD_INTERFACE;
+DECLARE_DEVICE_TYPE(AMIGA_KEYBOARD_INTERFACE, amiga_keyboard_bus_device)
 
 // supported devices
 SLOT_INTERFACE_EXTERN( amiga_keyboard_devices );
 
-#endif // DEVICES_BUS_AMIGA_KEYBOARD_H
+#endif // MAME_BUS_AMIGA_KEYBOARD_H

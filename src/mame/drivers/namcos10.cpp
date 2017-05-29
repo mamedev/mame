@@ -775,7 +775,7 @@ MACHINE_RESET_MEMBER(namcos10_state,namcos10)
 	i2c_bit = 0;
 }
 
-static MACHINE_CONFIG_START( namcos10_memm, namcos10_state )
+static MACHINE_CONFIG_START( namcos10_memm )
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", CXD8606BQ, XTAL_101_4912MHz )
 	MCFG_CPU_PROGRAM_MAP( namcos10_memm_map )
@@ -799,7 +799,7 @@ static MACHINE_CONFIG_START( namcos10_memm, namcos10_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( namcos10_memn, namcos10_state )
+static MACHINE_CONFIG_START( namcos10_memn )
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", CXD8606BQ, XTAL_101_4912MHz )
 	MCFG_CPU_PROGRAM_MAP( namcos10_memn_map )

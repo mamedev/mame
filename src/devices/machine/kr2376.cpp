@@ -64,10 +64,10 @@ static const uint8_t KR2376_KEY_CODES[3][8][11] =
 };
 
 
-const device_type KR2376 = device_creator<kr2376_device>;
+DEFINE_DEVICE_TYPE(KR2376, kr2376_device, "kr2376", "SMC KR2376 Keyboard Encoder")
 
 kr2376_device::kr2376_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, KR2376, "SMC KR2376", tag, owner, clock, "kr2376", __FILE__),
+	: device_t(mconfig, KR2376, tag, owner, clock),
 	m_write_strobe(*this)
 {
 }
@@ -110,7 +110,7 @@ void kr2376_device::device_start()
 /*-------------------------------------------------
     set_input_pin - set an input pin
 -------------------------------------------------*/
-void kr2376_device::set_input_pin( kr2376_input_pin_t pin, int data )
+void kr2376_device::set_input_pin( input_pin_t pin, int data )
 {
 	data = data ? 1 : 0;
 	switch ( pin )
@@ -126,7 +126,7 @@ void kr2376_device::set_input_pin( kr2376_input_pin_t pin, int data )
 /*-------------------------------------------------
     get_output_pin - get the status of an output pin
 -------------------------------------------------*/
-int kr2376_device::get_output_pin( kr2376_output_pin_t pin )
+int kr2376_device::get_output_pin( output_pin_t pin )
 {
 	return m_pins[pin];
 }

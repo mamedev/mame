@@ -29,10 +29,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_TMS5501_H
+#define MAME_MACHINE_TMS5501_H
 
-#ifndef __TMS5501__
-#define __TMS5501__
+#pragma once
 
 
 
@@ -68,10 +68,10 @@ public:
 	// construction/destruction
 	tms5501_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<tms5501_device &>(device).m_write_irq.set_callback(object); }
-	template<class _Object> static devcb_base &set_xmt_wr_callback(device_t &device, _Object object) { return downcast<tms5501_device &>(device).m_write_xmt.set_callback(object); }
-	template<class _Object> static devcb_base &set_xi_rd_callback(device_t &device, _Object object) { return downcast<tms5501_device &>(device).m_read_xi.set_callback(object); }
-	template<class _Object> static devcb_base &set_xo_wr_callback(device_t &device, _Object object) { return downcast<tms5501_device &>(device).m_write_xo.set_callback(object); }
+	template <class Object> static devcb_base &set_irq_wr_callback(device_t &device, Object &&cb) { return downcast<tms5501_device &>(device).m_write_irq.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_xmt_wr_callback(device_t &device, Object &&cb) { return downcast<tms5501_device &>(device).m_write_xmt.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_xi_rd_callback(device_t &device, Object &&cb) { return downcast<tms5501_device &>(device).m_read_xi.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_xo_wr_callback(device_t &device, Object &&cb) { return downcast<tms5501_device &>(device).m_write_xo.set_callback(std::forward<Object>(cb)); }
 
 	virtual DECLARE_ADDRESS_MAP(io_map, 8);
 
@@ -188,7 +188,6 @@ private:
 
 // device type definition
 extern const device_type TMS5501;
+DECLARE_DEVICE_TYPE(TMS5501, tms5501_device)
 
-
-
-#endif
+#endif // MAME_MACHINE_TMS5501_H

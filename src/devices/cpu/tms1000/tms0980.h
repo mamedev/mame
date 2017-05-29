@@ -6,8 +6,10 @@
 
 */
 
-#ifndef _TMS0980_H_
-#define _TMS0980_H_
+#ifndef MAME_CPU_TMS1000_TMS0980_H
+#define MAME_CPU_TMS1000_TMS0980_H
+
+#pragma once
 
 #include "tms0970.h"
 
@@ -16,9 +18,10 @@ class tms0980_cpu_device : public tms0970_cpu_device
 {
 public:
 	tms0980_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-	tms0980_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source);
 
 protected:
+	tms0980_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
+
 	// overrides
 	virtual u32 decode_fixed(u16 op);
 	virtual u32 decode_micro(u8 sel);
@@ -55,7 +58,7 @@ protected:
 };
 
 
-extern const device_type TMS0980;
-extern const device_type TMS1980;
+DECLARE_DEVICE_TYPE(TMS0980, tms0980_cpu_device)
+DECLARE_DEVICE_TYPE(TMS1980, tms1980_cpu_device)
 
-#endif /* _TMS0980_H_ */
+#endif // MAME_CPU_TMS1000_TMS0980_H

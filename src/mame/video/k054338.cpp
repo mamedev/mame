@@ -4,9 +4,9 @@
 #include "emu.h"
 #include "k054338.h"
 
-
 #define VERBOSE 0
-#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
+#include "logmacro.h"
+
 
 /***************************************************************************/
 /*                                                                         */
@@ -18,10 +18,10 @@
 // because the implementation is video dependant, this is just a
 // register-handling shell.
 
-const device_type K054338 = device_creator<k054338_device>;
+DEFINE_DEVICE_TYPE(K054338, k054338_device, "k054338", "K054338 Mixer")
 
 k054338_device::k054338_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, K054338, "K054338 Mixer", tag, owner, clock, "k054338", __FILE__),
+	: device_t(mconfig, K054338, tag, owner, clock),
 	device_video_interface(mconfig, *this),
 	m_alpha_inv(0),
 	m_k055555_tag(nullptr)

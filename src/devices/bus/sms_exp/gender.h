@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_SMS_EXP_GENDER_H
+#define MAME_BUS_SMS_EXP_GENDER_H
 
-#ifndef __SMS_GENDER_ADAPTER__
-#define __SMS_GENDER_ADAPTER__
+#pragma once
 
 
 #include "smsexp.h"
@@ -50,7 +50,6 @@ private:
 
 
 // device type definition
-extern const device_type SMS_GENDER_ADAPTER;
+DECLARE_DEVICE_TYPE(SMS_GENDER_ADAPTER, sms_gender_adapter_device)
 
-
-#endif
+#endif // MAME_BUS_SMS_EXP_GENDER_H

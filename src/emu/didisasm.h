@@ -23,12 +23,12 @@
 //**************************************************************************
 
 // Disassembler constants
-const u32 DASMFLAG_SUPPORTED       = 0x80000000;   // are disassembly flags supported?
-const u32 DASMFLAG_STEP_OUT        = 0x40000000;   // this instruction should be the end of a step out sequence
-const u32 DASMFLAG_STEP_OVER       = 0x20000000;   // this instruction should be stepped over by setting a breakpoint afterwards
-const u32 DASMFLAG_OVERINSTMASK    = 0x18000000;   // number of extra instructions to skip when stepping over
-const u32 DASMFLAG_OVERINSTSHIFT   = 27;           // bits to shift after masking to get the value
-const u32 DASMFLAG_LENGTHMASK      = 0x0000ffff;   // the low 16-bits contain the actual length
+constexpr u32 DASMFLAG_SUPPORTED       = 0x80000000;   // are disassembly flags supported?
+constexpr u32 DASMFLAG_STEP_OUT        = 0x40000000;   // this instruction should be the end of a step out sequence
+constexpr u32 DASMFLAG_STEP_OVER       = 0x20000000;   // this instruction should be stepped over by setting a breakpoint afterwards
+constexpr u32 DASMFLAG_OVERINSTMASK    = 0x18000000;   // number of extra instructions to skip when stepping over
+constexpr u32 DASMFLAG_OVERINSTSHIFT   = 27;           // bits to shift after masking to get the value
+constexpr u32 DASMFLAG_LENGTHMASK      = 0x0000ffff;   // the low 16-bits contain the actual length
 
 
 

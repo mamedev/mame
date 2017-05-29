@@ -6,8 +6,10 @@ t10spc.h
 
 ***************************************************************************/
 
-#ifndef _T10SPC_H_
-#define _T10SPC_H_
+#ifndef MAME_MACHINE_T10SPC_H
+#define MAME_MACHINE_T10SPC_H
+
+#pragma once
 
 
 class t10spc
@@ -17,7 +19,7 @@ public:
 	{
 	}
 
-	virtual ~t10spc() {};
+	virtual ~t10spc() { }
 	virtual void SetDevice( void *device ) = 0;
 	virtual void GetDevice( void **device ) = 0;
 
@@ -138,4 +140,4 @@ protected:
 #define SCSI_PHASE_BUS_FREE ( 8 )
 #define SCSI_PHASE_SELECT ( 9 )
 
-#endif
+#endif // MAME_MACHINE_T10SPC_H

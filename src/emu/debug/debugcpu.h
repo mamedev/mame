@@ -8,17 +8,14 @@
 
 ***************************************************************************/
 
-#pragma once
-
 #ifndef MAME_EMU_DEBUG_DEBUGCPU_H
 #define MAME_EMU_DEBUG_DEBUGCPU_H
+
+#pragma once
 
 #include "express.h"
 
 #include <set>
-
-
-namespace util { namespace xml { class data_node; } }
 
 
 //**************************************************************************

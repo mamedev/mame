@@ -593,7 +593,7 @@ uint32_t pc1512_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 //  MACHINE_CONFIG( pc1512 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_FRAGMENT( pc1512_video )
+MACHINE_CONFIG_START( pc1512_video )
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(pc1512_state, screen_update)
 	MCFG_SCREEN_SIZE(80*8, 24*8)

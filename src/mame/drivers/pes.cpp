@@ -69,7 +69,7 @@ Address map:
 
 
 /* Devices */
-WRITE8_MEMBER(pes_state::pes_kbd_input)
+void pes_state::pes_kbd_input(u8 data)
 {
 #ifdef DEBUG_FIFO
 	fprintf(stderr,"keyboard input: %c, ", data);
@@ -245,7 +245,7 @@ INPUT_PORTS_END
 /******************************************************************************
  Machine Drivers
 ******************************************************************************/
-static MACHINE_CONFIG_START( pes, pes_state )
+static MACHINE_CONFIG_START( pes )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I80C31, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(i80c31_mem)
@@ -259,7 +259,7 @@ static MACHINE_CONFIG_START( pes, pes_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(pes_state, pes_kbd_input))
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(pes_state, pes_kbd_input))
 MACHINE_CONFIG_END
 
 /******************************************************************************
@@ -278,5 +278,5 @@ ROM_END
  Drivers
 ******************************************************************************/
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   INIT    COMPANY                        FULLNAME            FLAGS */
-COMP( 1987, pes,    0,      0,      pes,        pes, driver_device,    0, "Pacific Educational Systems", "VPU-01 Speech box", MACHINE_NOT_WORKING )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT  STATE       INIT  COMPANY                        FULLNAME             FLAGS
+COMP( 1987, pes,    0,      0,      pes,        pes,   pes_state,  0,    "Pacific Educational Systems", "VPU-01 Speech box", MACHINE_NOT_WORKING )

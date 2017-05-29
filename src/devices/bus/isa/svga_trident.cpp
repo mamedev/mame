@@ -23,10 +23,10 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ISA16_SVGA_TGUI9680 = device_creator<isa16_svga_tgui9680_device>;
+DEFINE_DEVICE_TYPE(ISA16_SVGA_TGUI9680, isa16_svga_tgui9680_device, "igui9680", "Trident TGUI9680 Graphics Card (BIOS X5.5 (02) 02/13/96)")
 
 
-static MACHINE_CONFIG_FRAGMENT( vga_trident )
+static MACHINE_CONFIG_START( vga_trident )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
 	MCFG_SCREEN_UPDATE_DEVICE("vga", trident_vga_device, screen_update)
@@ -64,8 +64,9 @@ const tiny_rom_entry *isa16_svga_tgui9680_device::device_rom_region() const
 //-------------------------------------------------
 
 isa16_svga_tgui9680_device::isa16_svga_tgui9680_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, ISA16_SVGA_TGUI9680, "Trident TGUI9680 Graphics Card (BIOS X5.5 (02) 02/13/96)", tag, owner, clock, "tgui9680", __FILE__),
-		device_isa16_card_interface(mconfig, *this), m_vga(nullptr)
+	device_t(mconfig, ISA16_SVGA_TGUI9680, tag, owner, clock),
+	device_isa16_card_interface(mconfig, *this),
+	m_vga(nullptr)
 {
 }
 

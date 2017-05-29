@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Vas Crabb
-#ifndef MAME_DEVICES_SUNKBD_SUNKBD_H
-#define MAME_DEVICES_SUNKBD_SUNKBD_H
+#ifndef MAME_BUS_SUNKBD_SUNKBD_H
+#define MAME_BUS_SUNKBD_SUNKBD_H
 
 #pragma once
 
@@ -27,14 +27,14 @@ public:
 	virtual ~sun_keyboard_port_device();
 
 	// static configuration helpers
-	template <class Object> static devcb_base &set_rxd_handler(device_t &device, Object object) { return downcast<sun_keyboard_port_device &>(device).m_rxd_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_rxd_handler(device_t &device, Object &&cb) { return downcast<sun_keyboard_port_device &>(device).m_rxd_handler.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE_LINE_MEMBER( write_txd );
 
 	DECLARE_READ_LINE_MEMBER( rxd_r ) { return m_rxd; }
 
 protected:
-	sun_keyboard_port_device(machine_config const &mconfig, device_type type, char const *name, char const *tag, device_t *owner, uint32_t clock, char const *shortname, char const *source);
+	sun_keyboard_port_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override;
 	virtual void device_config_complete() override;
@@ -72,7 +72,7 @@ protected:
 };
 
 
-extern device_type const SUNKBD_PORT;
+DECLARE_DEVICE_TYPE(SUNKBD_PORT, sun_keyboard_port_device)
 
 
 SLOT_INTERFACE_EXTERN( default_sun_keyboard_devices );

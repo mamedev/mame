@@ -23,8 +23,8 @@
 // - Speed is all wrong
 
 
-const device_type MIE = device_creator<mie_device>;
-const device_type MIE_JVS = device_creator<mie_jvs_device>;
+DEFINE_DEVICE_TYPE(MIE,     mie_device,     "mie",     "Sega 315-6146 MIE")
+DEFINE_DEVICE_TYPE(MIE_JVS, mie_jvs_device, "mie_jvs", "JVS (MIE)")
 
 static ADDRESS_MAP_START( mie_map, AS_PROGRAM, 8, mie_device)
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
@@ -53,13 +53,6 @@ static ADDRESS_MAP_START( mie_port, AS_IO, 8, mie_device)
 	AM_RANGE(0x91, 0x91) AM_READ(jvs_sense_r)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_FRAGMENT( mie )
-	MCFG_CPU_ADD("mie", Z80, DERIVED_CLOCK(1,1))
-	MCFG_CPU_PROGRAM_MAP(mie_map)
-	MCFG_CPU_IO_MAP(mie_port)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE(DEVICE_SELF, mie_device,irq_callback)
-MACHINE_CONFIG_END
-
 ROM_START( mie )
 	ROM_REGION( 0x800, "mie", 0 )
 	ROM_LOAD( "315-6146.bin", 0x000, 0x800, CRC(9b197e35) SHA1(864d14d58732dd4e2ee538ccc71fa8df7013ba06))
@@ -82,18 +75,20 @@ const tiny_rom_entry *mie_device::device_rom_region() const
 	return ROM_NAME(mie);
 }
 
-machine_config_constructor mie_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME(mie);
-}
+MACHINE_CONFIG_MEMBER( mie_device::device_add_mconfig )
+	MCFG_CPU_ADD("mie", Z80, DERIVED_CLOCK(1,1))
+	MCFG_CPU_PROGRAM_MAP(mie_map)
+	MCFG_CPU_IO_MAP(mie_port)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE(DEVICE_SELF, mie_device, irq_callback)
+MACHINE_CONFIG_END
 
 mie_jvs_device::mie_jvs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: jvs_host(mconfig, MIE_JVS, "JVS (MIE)", tag, owner, clock, "mie_jvs", __FILE__)
+	: jvs_host(mconfig, MIE_JVS, tag, owner, clock)
 {
 }
 
 mie_device::mie_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: maple_device(mconfig, MIE, "Sega 315-6146 MIE", tag, owner, clock, "mie", __FILE__)
+	: maple_device(mconfig, MIE, tag, owner, clock)
 {
 	memset(gpio_name, 0, sizeof(gpio_name));
 	jvs_name = nullptr;

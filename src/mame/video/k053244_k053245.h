@@ -1,8 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
+#ifndef MAME_VIDEO_K053244_K053245_H
+#define MAME_VIDEO_K053244_K053245_H
+
 #pragma once
-#ifndef __K053244_K053245_H__
-#define __K053244_K053245_H__
 
 
 typedef device_delegate<void (int *code, int *color, int *priority)> k05324x_cb_delegate;
@@ -19,8 +20,7 @@ typedef device_delegate<void (int *code, int *color, int *priority)> k05324x_cb_
 	k05324x_device::set_offsets(*device, _xoffs, _yoffs);
 
 
-class k05324x_device : public device_t,
-							public device_gfx_interface
+class k05324x_device : public device_t, public device_gfx_interface
 {
 	static const gfx_layout spritelayout;
 	static const gfx_layout spritelayout_6bpp;
@@ -29,7 +29,6 @@ class k05324x_device : public device_t,
 
 public:
 	k05324x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~k05324x_device() {}
 
 	// static configuration
 	static void set_bpp(device_t &device, int bpp);
@@ -78,7 +77,7 @@ private:
 };
 
 
-extern const device_type K053244;
-#define K053245 K053244
+DECLARE_DEVICE_TYPE(K053244, k05324x_device)
+extern device_type const K053245;
 
-#endif
+#endif // MAME_VIDEO_K053244_K053245_H

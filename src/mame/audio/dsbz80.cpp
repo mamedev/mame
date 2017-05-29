@@ -32,7 +32,18 @@ static ADDRESS_MAP_START( dsbz80io_map, AS_IO, 8, dsbz80_device )
 ADDRESS_MAP_END
 
 
-MACHINE_CONFIG_FRAGMENT( dsbz80 )
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE(DSBZ80, dsbz80_device, "dsbz80_device", "Sega Z80-based Digital Sound Board")
+
+
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( dsbz80_device::device_add_mconfig )
 	MCFG_CPU_ADD(Z80_TAG, Z80, 4000000)     /* unknown clock, but probably pretty slow considering the z80 does like nothing */
 	MCFG_CPU_PROGRAM_MAP(dsbz80_map)
 	MCFG_CPU_IO_MAP(dsbz80io_map)
@@ -46,23 +57,6 @@ MACHINE_CONFIG_FRAGMENT( dsbz80 )
 MACHINE_CONFIG_END
 
 //**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-const device_type DSBZ80 = device_creator<dsbz80_device>;
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor dsbz80_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( dsbz80 );
-}
-
-//**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
 
@@ -71,7 +65,7 @@ machine_config_constructor dsbz80_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 dsbz80_device::dsbz80_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, DSBZ80, "Sega Z80-based Digital Sound Board", tag, owner, clock, "dsbz80", __FILE__),
+	device_t(mconfig, DSBZ80, tag, owner, clock),
 	device_sound_interface(mconfig, *this),
 	m_ourcpu(*this, Z80_TAG),
 	m_uart(*this, "uart"),

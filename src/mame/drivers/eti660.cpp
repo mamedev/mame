@@ -255,8 +255,8 @@ void eti660_state::machine_reset()
 	m_resetcnt = 0;
 	m_color_on = 0;
 	// fix for F3 soft reboot
-	m_maincpu->set_state_int(COSMAC_R0, 0); // set R0 to start of rom
-	m_maincpu->set_state_int(COSMAC_P, 0); // set R0 as the PC register
+	m_maincpu->set_state_int(cosmac_device::COSMAC_R0, 0); // set R0 to start of rom
+	m_maincpu->set_state_int(cosmac_device::COSMAC_P, 0); // set R0 as the PC register
 }
 
 void eti660_state::machine_start()
@@ -302,7 +302,7 @@ QUICKLOAD_LOAD_MEMBER( eti660_state, eti660 )
 
 /* Machine Drivers */
 
-static MACHINE_CONFIG_START( eti660, eti660_state )
+static MACHINE_CONFIG_START( eti660 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_8_867238MHz/5)
 	MCFG_CPU_PROGRAM_MAP(eti660_map)
@@ -349,5 +349,5 @@ ROM_START( eti660 )
 	ROM_LOAD( "eti660.bin", 0x0000, 0x0400, CRC(811dfa62) SHA1(c0c4951e02f873f15560bdc3f35cdf3f99653922) )
 ROM_END
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT   CLASS            INIT   COMPANY                             FULLNAME                FLAGS */
-COMP( 1981, eti660,     0,      0,      eti660,     eti660, driver_device,    0,    "Electronics Today International",  "ETI-660",  0 )
+//    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT   CLASS            INIT  COMPANY                             FULLNAME    FLAGS
+COMP( 1981, eti660,     0,      0,      eti660,     eti660, eti660_state,    0,    "Electronics Today International",  "ETI-660",  0 )

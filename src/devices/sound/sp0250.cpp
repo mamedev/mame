@@ -34,10 +34,10 @@ should be 312, but 312 = 39*8 so it doesn't look right because a divider by 39 i
 */
 #define CLOCK_DIVIDER (7*6*8)
 
-const device_type SP0250 = device_creator<sp0250_device>;
+DEFINE_DEVICE_TYPE(SP0250, sp0250_device, "sp0250", "GI SP0250 LPC")
 
 sp0250_device::sp0250_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SP0250, "SP0250", tag, owner, clock, "sp0250", __FILE__),
+	: device_t(mconfig, SP0250, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		m_amp(0),
 		m_pitch(0),
@@ -76,7 +76,8 @@ void sp0250_device::device_start()
 	if (!m_drq.isnull())
 	{
 		m_drq( ASSERT_LINE);
-		machine().scheduler().timer_pulse(attotime::from_hz(clock()) * CLOCK_DIVIDER, timer_expired_delegate(FUNC(sp0250_device::timer_tick), this));
+		m_tick_timer= machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sp0250_device::timer_tick), this));
+		m_tick_timer->adjust(attotime::from_hz(clock()) * CLOCK_DIVIDER, 0, attotime::from_hz(clock()) * CLOCK_DIVIDER);
 	}
 
 	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock() / CLOCK_DIVIDER);

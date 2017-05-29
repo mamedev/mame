@@ -118,19 +118,19 @@ really exist.
 #include "emu.h"
 #include "ns10crypt.h"
 
-const device_type CHOCOVDR_DECRYPTER = device_creator<chocovdr_decrypter_device>;
-const device_type GAMSHARA_DECRYPTER = device_creator<gamshara_decrypter_device>;
-const device_type  GJSPACE_DECRYPTER = device_creator<gjspace_decrypter_device>;
-const device_type KNPUZZLE_DECRYPTER = device_creator<knpuzzle_decrypter_device>;
-const device_type KONOTAKO_DECRYPTER = device_creator<konotako_decrypter_device>;
-const device_type MRDRILR2_DECRYPTER = device_creator<mrdrilr2_decrypter_device>;
-const device_type NFLCLSFB_DECRYPTER = device_creator<nflclsfb_decrypter_device>;
-const device_type STARTRGN_DECRYPTER = device_creator<startrgn_decrypter_device>;
+DEFINE_DEVICE_TYPE(CHOCOVDR_DECRYPTER, chocovdr_decrypter_device, "chocovdr_decrypter", "Chocovader Contactee decrypter")
+DEFINE_DEVICE_TYPE(GAMSHARA_DECRYPTER, gamshara_decrypter_device, "gamshara_decrypter", "Gamshara decrypter")
+DEFINE_DEVICE_TYPE(GJSPACE_DECRYPTER,  gjspace_decrypter_device,  "gjspace_decrypter",  "Gekitorider-Jong Space decrypter")
+DEFINE_DEVICE_TYPE(KNPUZZLE_DECRYPTER, knpuzzle_decrypter_device, "knpuzzle_decrypter", "Kotoba no Puzzle Mojipittan decrypter")
+DEFINE_DEVICE_TYPE(KONOTAKO_DECRYPTER, konotako_decrypter_device, "konotako_decrypter", "Kono Tako decrypter")
+DEFINE_DEVICE_TYPE(MRDRILR2_DECRYPTER, mrdrilr2_decrypter_device, "mrdrilr2_decrypter", "Mr Driller 2 decrypter")
+DEFINE_DEVICE_TYPE(NFLCLSFB_DECRYPTER, nflclsfb_decrypter_device, "nflclsfg_decrypter", "NFL Classic Football decrypter")
+DEFINE_DEVICE_TYPE(STARTRGN_DECRYPTER, startrgn_decrypter_device, "startrgn_decrypter", "Star Trigon decrypter")
 
 // base class
 
-ns10_decrypter_device::ns10_decrypter_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__)
+ns10_decrypter_device::ns10_decrypter_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
 {
 	_active = false;
 }
@@ -163,8 +163,8 @@ constexpr int U {UNKNOWN};
 // this could perfectly be part of the per-game logic but, with only one known type-1 game, we cannot say anything definitive
 const int ns10_type1_decrypter_device::initSbox[16] {U,U,U,0,4,9,U,U,U,8,U,1,U,9,U,5};
 
-ns10_type1_decrypter_device::ns10_type1_decrypter_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: ns10_decrypter_device(mconfig, type, name, tag, owner, clock, shortname, source)
+ns10_type1_decrypter_device::ns10_type1_decrypter_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: ns10_decrypter_device(mconfig, type, tag, owner, clock)
 {
 }
 
@@ -213,8 +213,8 @@ void ns10_type1_decrypter_device::device_start()
 // this could perfectly be part of the per-game logic; by now, only gamshara seems to use it, so we keep it global
 const int ns10_type2_decrypter_device::initSbox[16] {0,12,13,6,2,4,9,8,11,1,7,15,10,5,14,3};
 
-ns10_type2_decrypter_device::ns10_type2_decrypter_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, const ns10_type2_decrypter_device::ns10_crypto_logic &logic)
-	: ns10_decrypter_device(mconfig, type, name, tag, owner, clock, shortname, source)
+ns10_type2_decrypter_device::ns10_type2_decrypter_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const ns10_type2_decrypter_device::ns10_crypto_logic &logic)
+	: ns10_decrypter_device(mconfig, type, tag, owner, clock)
 	, _logic(logic)
 {
 }
@@ -257,7 +257,7 @@ void ns10_type2_decrypter_device::device_start()
 }
 
 
-gf2_reducer::gf2_reducer()
+ns10_type2_decrypter_device::gf2_reducer::gf2_reducer()
 {
 	int reduction;
 
@@ -274,7 +274,7 @@ gf2_reducer::gf2_reducer()
 	}
 }
 
-int gf2_reducer::gf2_reduce(uint64_t num)const
+int ns10_type2_decrypter_device::gf2_reducer::gf2_reduce(uint64_t num)const
 {
 	return
 		_gf2Reduction[num & 0xffff]         ^
@@ -298,13 +298,13 @@ int gf2_reducer::gf2_reduce(uint64_t num)const
 			// & (reducer.gf2_reduce(0x0000a13140090000ull & previous_cipherwords) ^ reducer.gf2_reduce(0x0000806240090000ull & previous_plainwords))) << 2;
 // }
 
-static uint16_t chocovdr_nonlinear_calc(uint64_t previous_cipherwords, uint64_t previous_plainwords, const gf2_reducer& reducer)
+uint16_t chocovdr_decrypter_device::nonlinear_calc(uint64_t previous_cipherwords, uint64_t previous_plainwords, const gf2_reducer& reducer)
 {
 	uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
 	return ((previous_masks >> 9) & (reducer.gf2_reduce(0x0000000010065810ull & previous_cipherwords) ^ reducer.gf2_reduce(0x0000000021005810ull & previous_plainwords)) & 1) << 10;
 }
 
-static constexpr ns10_type2_decrypter_device::ns10_crypto_logic chocovdr_crypto_logic = {
+const ns10_type2_decrypter_device::ns10_crypto_logic chocovdr_decrypter_device::crypto_logic = {
 	{
 		0x00005239351ec1daull, 0x0000000000008090ull, 0x0000000048264808ull, 0x0000000000004820ull,
 		0x0000000000000500ull, 0x0000000058ff5a54ull, 0x00000000d8220208ull, 0x00005239351e91d3ull,
@@ -317,16 +317,16 @@ static constexpr ns10_type2_decrypter_device::ns10_crypto_logic chocovdr_crypto_
 		0x000000006800d3f5ull, 0x0000000000000058ull, 0x000000006800d2d5ull, 0x0000000000001840ull,
 	},
 	0x5b22,
-	chocovdr_nonlinear_calc
+	&nonlinear_calc
 };
 
-static uint16_t gamshara_nonlinear_calc(uint64_t previous_cipherwords, uint64_t previous_plainwords, const gf2_reducer&)
+uint16_t gamshara_decrypter_device::nonlinear_calc(uint64_t previous_cipherwords, uint64_t previous_plainwords, const gf2_reducer&)
 {
 	uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
 	return ((previous_masks >> 7) & (previous_masks >> 13) & 1) << 2;
 }
 
-static constexpr ns10_type2_decrypter_device::ns10_crypto_logic gamshara_crypto_logic = {
+const ns10_type2_decrypter_device::ns10_crypto_logic gamshara_decrypter_device::crypto_logic = {
 	{
 		0x0000000000000028ull, 0x0000cae83f389fd9ull, 0x0000000000001000ull, 0x0000000042823402ull,
 		0x0000cae8736a0592ull, 0x0000cae8736a8596ull, 0x000000008b4095b9ull, 0x0000000000002100ull,
@@ -339,15 +339,15 @@ static constexpr ns10_type2_decrypter_device::ns10_crypto_logic gamshara_crypto_
 		0x000000004400d1f1ull, 0x000000006001ce08ull, 0x00000000000000c8ull, 0x0000000054023002ull,
 	},
 	0x25ab,
-	gamshara_nonlinear_calc
+	&nonlinear_calc
 };
 
-static uint16_t gjspace_nonlinear_calc(uint64_t previous_cipherwords, uint64_t previous_plainwords, const gf2_reducer&)
+uint16_t gjspace_decrypter_device::nonlinear_calc(uint64_t previous_cipherwords, uint64_t previous_plainwords, const gf2_reducer&)
 {
 	return 0;
 }
 
-static constexpr ns10_type2_decrypter_device::ns10_crypto_logic gjspace_crypto_logic = {
+const ns10_type2_decrypter_device::ns10_crypto_logic gjspace_decrypter_device::crypto_logic = {
 	{
 		0x0000000000000240ull, 0x0000d617eb0f1ab1ull, 0x00000000451111c0ull, 0x00000000013b1f44ull,
 		0x0000aab0b356abceull, 0x00007ca76b89602aull, 0x0000000000001800ull, 0x00000000031d1303ull,
@@ -360,16 +360,16 @@ static constexpr ns10_type2_decrypter_device::ns10_crypto_logic gjspace_crypto_l
 		0x0000000000001101ull, 0x000000000000a002ull, 0x0000000029001740ull, 0x00000000a4309bfcull,
 	},
 	0x2e7f,
-	gjspace_nonlinear_calc
+	&nonlinear_calc
 };
 
-static uint16_t knpuzzle_nonlinear_calc(uint64_t previous_cipherwords, uint64_t previous_plainwords, const gf2_reducer& reducer)
+uint16_t knpuzzle_decrypter_device::nonlinear_calc(uint64_t previous_cipherwords, uint64_t previous_plainwords, const gf2_reducer& reducer)
 {
 	uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
 	return ((previous_masks >> 0x13) & (reducer.gf2_reduce(0x0000000014001290ull & previous_cipherwords) ^ reducer.gf2_reduce(0x0000000000021290ull & previous_plainwords)) & 1) << 1;
 }
 
-static constexpr ns10_type2_decrypter_device::ns10_crypto_logic knpuzzle_crypto_logic = {
+const ns10_type2_decrypter_device::ns10_crypto_logic knpuzzle_decrypter_device::crypto_logic = {
 	{
 		0x00000000c0a4208cull, 0x00000000204100a8ull, 0x000000000c0306a0ull, 0x000000000819e944ull,
 		0x0000000000001400ull, 0x0000000000000061ull, 0x000000000141401cull, 0x0000000000000020ull,
@@ -382,16 +382,16 @@ static constexpr ns10_type2_decrypter_device::ns10_crypto_logic knpuzzle_crypto_
 		0x00000000012a04a2ull, 0x00000000003984a4ull, 0x0000000000000700ull, 0x0000000000000882ull,
 	},
 	0x01e2,
-	knpuzzle_nonlinear_calc
+	&nonlinear_calc
 };
 
-static uint16_t konotako_nonlinear_calc(uint64_t previous_cipherwords, uint64_t previous_plainwords, const gf2_reducer&)
+uint16_t konotako_decrypter_device::nonlinear_calc(uint64_t previous_cipherwords, uint64_t previous_plainwords, const gf2_reducer&)
 {
 	uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
 	return ((previous_masks >> 7) & (previous_masks >> 15) & 1) << 15;
 }
 
-static constexpr ns10_type2_decrypter_device::ns10_crypto_logic konotako_crypto_logic = {
+const ns10_type2_decrypter_device::ns10_crypto_logic konotako_decrypter_device::crypto_logic = {
 	{
 		0x000000000000004cull, 0x00000000d39e3d3dull, 0x0000000000001110ull, 0x0000000000002200ull,
 		0x000000003680c008ull, 0x0000000000000281ull, 0x0000000000005002ull, 0x00002a7371895a47ull,
@@ -404,16 +404,16 @@ static constexpr ns10_type2_decrypter_device::ns10_crypto_logic konotako_crypto_
 		0x000000009000200bull, 0x0000000000000310ull, 0x0000000000001840ull, 0x0000000000000400ull,
 	},
 	0x0748,
-	konotako_nonlinear_calc
+	&nonlinear_calc
 };
 
-static uint16_t nflclsfb_nonlinear_calc(uint64_t previous_cipherwords, uint64_t previous_plainwords, const gf2_reducer& reducer)
+uint16_t nflclsfb_decrypter_device::nonlinear_calc(uint64_t previous_cipherwords, uint64_t previous_plainwords, const gf2_reducer& reducer)
 {
 	uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
 	return ((previous_masks >> 1) & (reducer.gf2_reduce(0x0000000040de8fb3ull & previous_cipherwords) ^ reducer.gf2_reduce(0x0000000088008fb3ull & previous_plainwords)) & 1) << 2;
 }
 
-static constexpr ns10_type2_decrypter_device::ns10_crypto_logic nflclsfb_crypto_logic = {
+const ns10_type2_decrypter_device::ns10_crypto_logic nflclsfb_decrypter_device::crypto_logic = {
 	{
 		0x000034886e281880ull, 0x0000000012c5e7baull, 0x0000000000000200ull, 0x000000002900002aull,
 		0x00000000000004c0ull, 0x0000000012c5e6baull, 0x00000000e0df8bbbull, 0x000000002011532aull,
@@ -426,16 +426,16 @@ static constexpr ns10_type2_decrypter_device::ns10_crypto_logic nflclsfb_crypto_
 		0x0000000000000404ull, 0x0000000000004201ull, 0x0000000000001100ull, 0x000000008c0057b2ull,
 	},
 	0xbe32,
-	nflclsfb_nonlinear_calc
+	&nonlinear_calc
 };
 
-static uint16_t startrgn_nonlinear_calc(uint64_t previous_cipherwords, uint64_t previous_plainwords, const gf2_reducer&)
+uint16_t startrgn_decrypter_device::nonlinear_calc(uint64_t previous_cipherwords, uint64_t previous_plainwords, const gf2_reducer&)
 {
 	uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
 	return ((previous_masks >> 12) & (previous_masks >> 14) & 1) << 4;
 }
 
-static constexpr ns10_type2_decrypter_device::ns10_crypto_logic startrgn_crypto_logic = {
+const ns10_type2_decrypter_device::ns10_crypto_logic startrgn_decrypter_device::crypto_logic = {
 	{
 		0x00003e4bfe92c6a9ull, 0x000000000000010cull, 0x00003e4b7bd6c4aaull, 0x0000b1a904b8fab8ull,
 		0x0000000000000080ull, 0x0000000000008c00ull, 0x0000b1a9b2f0b4cdull, 0x000000006c100828ull,
@@ -448,48 +448,48 @@ static constexpr ns10_type2_decrypter_device::ns10_crypto_logic startrgn_crypto_
 		0x0000000000000428ull, 0x0000000000001001ull, 0x000012020b10ceabull, 0x0000000000000144ull,
 	},
 	0x8c46,
-	startrgn_nonlinear_calc
+	&nonlinear_calc
 };
 
 
 // game-specific devices
 
 mrdrilr2_decrypter_device::mrdrilr2_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ns10_type1_decrypter_device(mconfig, MRDRILR2_DECRYPTER, "Mr Driller 2 decrypter", tag, owner, clock, "mrdrilr2_decrypter", __FILE__)
+	: ns10_type1_decrypter_device(mconfig, MRDRILR2_DECRYPTER, tag, owner, clock)
 {
 }
 
 chocovdr_decrypter_device::chocovdr_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ns10_type2_decrypter_device(mconfig, CHOCOVDR_DECRYPTER, "Chocovader Contactee decrypter", tag, owner, clock, "chocovdr_decrypter", __FILE__, chocovdr_crypto_logic)
+	: ns10_type2_decrypter_device(mconfig, CHOCOVDR_DECRYPTER, tag, owner, clock, crypto_logic)
 {
 }
 
 gamshara_decrypter_device::gamshara_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ns10_type2_decrypter_device(mconfig, GAMSHARA_DECRYPTER, "Gamshara decrypter", tag, owner, clock, "gamshara_decrypter", __FILE__, gamshara_crypto_logic)
+	: ns10_type2_decrypter_device(mconfig, GAMSHARA_DECRYPTER, tag, owner, clock, crypto_logic)
 {
 }
 
 gjspace_decrypter_device::gjspace_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ns10_type2_decrypter_device(mconfig, GJSPACE_DECRYPTER, "Gekitoride-Jong Space decrypter", tag, owner, clock, "gjspace_decrypter", __FILE__, gjspace_crypto_logic)
+	: ns10_type2_decrypter_device(mconfig, GJSPACE_DECRYPTER, tag, owner, clock, crypto_logic)
 {
 }
 
 knpuzzle_decrypter_device::knpuzzle_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ns10_type2_decrypter_device(mconfig, KNPUZZLE_DECRYPTER, "Kotoba no Puzzle Mojipittan decrypter", tag, owner, clock, "knpuzzle_decrypter", __FILE__, knpuzzle_crypto_logic)
+	: ns10_type2_decrypter_device(mconfig, KNPUZZLE_DECRYPTER, tag, owner, clock, crypto_logic)
 {
 }
 
 konotako_decrypter_device::konotako_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ns10_type2_decrypter_device(mconfig, KONOTAKO_DECRYPTER, "Kono Tako decrypter", tag, owner, clock, "konotako_decrypter", __FILE__, konotako_crypto_logic)
+	: ns10_type2_decrypter_device(mconfig, KONOTAKO_DECRYPTER, tag, owner, clock, crypto_logic)
 {
 }
 
 nflclsfb_decrypter_device::nflclsfb_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ns10_type2_decrypter_device(mconfig, NFLCLSFB_DECRYPTER, "NFL Classic Football decrypter", tag, owner, clock, "nflclsfb_decrypter", __FILE__, nflclsfb_crypto_logic)
+	: ns10_type2_decrypter_device(mconfig, NFLCLSFB_DECRYPTER, tag, owner, clock, crypto_logic)
 {
 }
 
 startrgn_decrypter_device::startrgn_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ns10_type2_decrypter_device(mconfig, STARTRGN_DECRYPTER, "Star Trigon decrypter", tag, owner, clock, "startrgn_decrypter", __FILE__, startrgn_crypto_logic)
+	: ns10_type2_decrypter_device(mconfig, STARTRGN_DECRYPTER, tag, owner, clock, crypto_logic)
 {
 }

@@ -621,7 +621,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( looping, looping_state )
+static MACHINE_CONFIG_START( looping )
 
 	// CPU TMS9995, standard variant; no line connections
 	MCFG_TMS99xx_ADD("maincpu", TMS9995, MAIN_CPU_CLOCK, looping_map, looping_io_map)

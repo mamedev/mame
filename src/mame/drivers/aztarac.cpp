@@ -147,7 +147,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( aztarac, aztarac_state )
+static MACHINE_CONFIG_START( aztarac )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)
@@ -231,4 +231,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, aztarac, 0, aztarac, aztarac, driver_device, 0, ROT0, "Centuri", "Aztarac", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, aztarac, 0, aztarac, aztarac, aztarac_state, 0, ROT0, "Centuri", "Aztarac", MACHINE_SUPPORTS_SAVE )

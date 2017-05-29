@@ -237,7 +237,7 @@ void taitopjc_state::video_start()
 	m_tilemap[0]->set_transparent_pen(0);
 	m_tilemap[1]->set_transparent_pen(1);
 
-	m_gfxdecode->set_gfx(0, std::make_unique<gfx_element>(*m_palette, char_layout, (uint8_t*)m_screen_ram.get(), 0, m_palette->entries() / 256, 0));
+	m_gfxdecode->set_gfx(0, std::make_unique<gfx_element>(m_palette, char_layout, (uint8_t*)m_screen_ram.get(), 0, m_palette->entries() / 256, 0));
 
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&taitopjc_state::video_exit, this));
 }
@@ -752,7 +752,7 @@ INTERRUPT_GEN_MEMBER(taitopjc_state::taitopjc_vbi)
 }
 
 
-static MACHINE_CONFIG_START( taitopjc, taitopjc_state )
+static MACHINE_CONFIG_START( taitopjc )
 	MCFG_CPU_ADD("maincpu", PPC603E, 100000000)
 	MCFG_PPC_BUS_FREQUENCY(XTAL_66_6667MHz)    /* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
 	MCFG_CPU_PROGRAM_MAP(ppc603e_mem)

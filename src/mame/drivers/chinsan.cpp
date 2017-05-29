@@ -2,11 +2,11 @@
 // copyright-holders: David Haywood, Uki, Dirk Best
 /***************************************************************************
 
-	Ganbare Chinsan Ooshoubu (がんばれ珍さん！大勝負)
-	© 1987 Sanritsu
+    Ganbare Chinsan Ooshoubu (がんばれ珍さん！大勝負)
+    © 1987 Sanritsu
 
-	Kiki-Ippatsu Mayumi-chan (危機一髪真由美ちゃん)
-	© 1988 Victory L.L.C. (developed by Sanritsu)
+    Kiki-Ippatsu Mayumi-chan (危機一髪真由美ちゃん)
+    © 1988 Victory L.L.C. (developed by Sanritsu)
 
     TODO:
     - Figure out the rest of the dip switches
@@ -495,7 +495,7 @@ DRIVER_INIT_MEMBER( chinsan_state, chinsan )
 //**************************************************************************
 
 // C1-00114-B
-static MACHINE_CONFIG_START( chinsan, chinsan_state )
+static MACHINE_CONFIG_START( chinsan )
 	MCFG_CPU_ADD("maincpu", MC8123, XTAL_10MHz/2) // 317-5012
 	MCFG_CPU_PROGRAM_MAP(chinsan_map)
 	MCFG_CPU_IO_MAP(chinsan_io_map)
@@ -519,7 +519,7 @@ static MACHINE_CONFIG_START( chinsan, chinsan_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", chinsan)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 256)
+	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -534,7 +534,7 @@ static MACHINE_CONFIG_START( chinsan, chinsan_state )
 
 	MCFG_SOUND_ADD("adpcm", MSM5205, XTAL_384kHz)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(chinsan_state, adpcm_int_w))
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S64_4B) // 8kHz
+	MCFG_MSM5205_PRESCALER_SELECTOR(S64_4B) // 8kHz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -604,4 +604,4 @@ ROM_END
 
 //    YEAR  NAME      PARENT  MACHINE  INPUT    CLASS          INIT     ROTATION  COMPANY           FULLNAME                                         FLAGS
 GAME( 1987, chinsan,  0,      chinsan, chinsan, chinsan_state, chinsan, ROT0,     "Sanritsu",       "Ganbare Chinsan Ooshoubu (MC-8123A, 317-5012)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, mayumi,   0,      mayumi,  mayumi,  driver_device, 0,       ROT0,     "Victory L.L.C.", "Kiki-Ippatsu Mayumi-chan",                      MACHINE_SUPPORTS_SAVE )
+GAME( 1988, mayumi,   0,      mayumi,  mayumi,  chinsan_state, 0,       ROT0,     "Victory L.L.C.", "Kiki-Ippatsu Mayumi-chan",                      MACHINE_SUPPORTS_SAVE )

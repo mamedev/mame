@@ -29,8 +29,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_DEVICES_SOUND_MOS6560_H
-#define MAME_DEVICES_SOUND_MOS6560_H
+#ifndef MAME_SOUND_MOS6560_H
+#define MAME_SOUND_MOS6560_H
 
 #pragma once
 
@@ -134,11 +134,10 @@ class mos6560_device : public device_t,
 						public device_video_interface
 {
 public:
-	mos6560_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, uint32_t variant, const char *shortname, const char *source);
 	mos6560_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_potx_rd_callback(device_t &device, _Object object) { return downcast<mos6560_device &>(device).m_read_potx.set_callback(object); }
-	template<class _Object> static devcb_base &set_poty_rd_callback(device_t &device, _Object object) { return downcast<mos6560_device &>(device).m_read_poty.set_callback(object); }
+	template <class Object> static devcb_base &set_potx_rd_callback(device_t &device, Object &&cb) { return downcast<mos6560_device &>(device).m_read_potx.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_poty_rd_callback(device_t &device, Object &&cb) { return downcast<mos6560_device &>(device).m_read_poty.set_callback(std::forward<Object>(cb)); }
 
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 
@@ -164,6 +163,8 @@ protected:
 		TIMER_LINE
 	};
 
+	mos6560_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -182,7 +183,7 @@ protected:
 	void sound_start();
 	void raster_interrupt_gen();
 
-	int  m_variant;
+	const int  m_variant;
 
 	const address_space_config      m_videoram_space_config;
 	const address_space_config      m_colorram_space_config;
@@ -231,7 +232,7 @@ protected:
 
 // ======================> mos6561_device
 
-class mos6561_device :  public mos6560_device
+class mos6561_device : public mos6560_device
 {
 public:
 	// construction/destruction
@@ -241,7 +242,7 @@ public:
 
 // ======================> mos656x_attack_ufo_device
 
-class mos656x_attack_ufo_device :  public mos6560_device
+class mos656x_attack_ufo_device : public mos6560_device
 {
 public:
 	// construction/destruction
@@ -250,10 +251,8 @@ public:
 
 
 // device type definitions
-extern const device_type MOS6560;
-extern const device_type MOS6561;
-extern const device_type MOS656X_ATTACK_UFO;
+DECLARE_DEVICE_TYPE(MOS6560,            mos6560_device)
+DECLARE_DEVICE_TYPE(MOS6561,            mos6561_device)
+DECLARE_DEVICE_TYPE(MOS656X_ATTACK_UFO, mos656x_attack_ufo_device)
 
-
-
-#endif // MAME_DEVICES_SOUND_MOS6560_H
+#endif // MAME_SOUND_MOS6560_H

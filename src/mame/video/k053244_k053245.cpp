@@ -33,7 +33,7 @@ main ram and the buffer.
 #include "konami_helper.h"
 
 #define VERBOSE 0
-#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
+#include "logmacro.h"
 
 
 
@@ -41,7 +41,8 @@ main ram and the buffer.
     DEVICE INTERFACE
 *****************************************************************************/
 
-const device_type K053244 = device_creator<k05324x_device>;
+DEFINE_DEVICE_TYPE(K053244, k05324x_device, "k05324x", "K053244/053245 Sprite Generator")
+device_type const K053245 = K053244;
 
 const gfx_layout k05324x_device::spritelayout =
 {
@@ -82,7 +83,7 @@ GFXDECODE_END
 
 
 k05324x_device::k05324x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, K053244, "K053244 & 053245 Sprite Generator", tag, owner, clock, "k05324x", __FILE__),
+	: device_t(mconfig, K053244, tag, owner, clock),
 	device_gfx_interface(mconfig, *this, gfxinfo),
 	m_ram(nullptr),
 	m_buffer(nullptr),

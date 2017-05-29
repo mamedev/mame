@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Juergen Buchmueller
-#pragma once
+#ifndef MAME_CPU_S2650_S2650_H
+#define MAME_CPU_S2650_S2650_H
 
-#ifndef __S2650_H__
-#define __S2650_H__
+#pragma once
 
 
 #define S2650_SENSE_LINE INPUT_LINE_IRQ1
@@ -25,7 +25,7 @@ enum
 };
 
 
-extern const device_type S2650;
+DECLARE_DEVICE_TYPE(S2650, s2650_device)
 
 
 #define MCFG_S2650_FLAG_HANDLER(_devcb) \
@@ -41,8 +41,8 @@ public:
 	s2650_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_flag_handler(device_t &device, _Object object) { return downcast<s2650_device &>(device).m_flag_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_intack_handler(device_t &device, _Object object) { return downcast<s2650_device &>(device).m_intack_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_flag_handler(device_t &device, Object &&cb) { return downcast<s2650_device &>(device).m_flag_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_intack_handler(device_t &device, Object &&cb) { return downcast<s2650_device &>(device).m_intack_handler.set_callback(std::forward<Object>(cb)); }
 
 protected:
 	// device-level overrides
@@ -113,4 +113,4 @@ private:
 };
 
 
-#endif /* __S2650_H__ */
+#endif // MAME_CPU_S2650_S2650_H

@@ -7,30 +7,10 @@
  *
  */
 
-#ifndef FM_SCSI_H_
-#define FM_SCSI_H_
+#ifndef MAME_MACHINE_FM_SCSI_H
+#define MAME_MACHINE_FM_SCSI_H
 
 #include "machine/legscsi.h"
-
-// SCSI input lines (from target)
-#define FMSCSI_LINE_REQ   0x80
-#define FMSCSI_LINE_IO    0x40
-#define FMSCSI_LINE_MSG   0x20
-#define FMSCSI_LINE_CD    0x10
-#define FMSCSI_LINE_BSY   0x08
-#define FMSCSI_LINE_EX    0x04
-#define FMSCSI_LINE_INT   0x02
-#define FMSCSI_LINE_PERR  0x01
-
-// SCSI output lines (to target)
-#define FMSCSI_LINE_WEN   0x80
-#define FMSCSI_LINE_IMSK  0x40
-#define FMSCSI_LINE_RMSK  0x20
-#define FMSCSI_LINE_ATN   0x10
-#define FMSCSI_LINE_WRD   0x08
-#define FMSCSI_LINE_SEL   0x04
-#define FMSCSI_LINE_DMAE  0x02
-#define FMSCSI_LINE_RST   0x01
 
 #define MCFG_FMSCSI_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, FMSCSI, 0)
@@ -47,8 +27,8 @@ public:
 	fmscsi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<fmscsi_device &>(device).m_irq_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_drq_handler(device_t &device, _Object object) { return downcast<fmscsi_device &>(device).m_drq_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb) { return downcast<fmscsi_device &>(device).m_irq_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_drq_handler(device_t &device, Object &&cb) { return downcast<fmscsi_device &>(device).m_drq_handler.set_callback(std::forward<Object>(cb)); }
 
 	// any publically accessible interfaces needed for runtime
 	uint8_t fmscsi_data_r(void);
@@ -98,6 +78,6 @@ private:
 	emu_timer* m_phase_timer;
 };
 
-extern const device_type FMSCSI;
+DECLARE_DEVICE_TYPE(FMSCSI, fmscsi_device)
 
-#endif /* FM_SCSI_H_ */
+#endif // MAME_MACHINE_FM_SCSI_H

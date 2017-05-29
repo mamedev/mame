@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Kevin Horton,Jonathan Gevaryahu,Sandro Ronco,hap
-// thanks-to:Berger,yovan
+// thanks-to:Berger,yoyo_chessboard
 /******************************************************************************
 
     Fidelity Electronics 6502 based board driver
@@ -217,8 +217,11 @@ with magnet sensors and came with CB9 and CB16.
 8*(8+1) buttons, 8*8+1 LEDs
 36-pin edge connector, assume same as SC12
 4KB RAM(TMM2016P), 2*8KB ROM(HN48364P)
-R6502-13, 1.4MHz from resonator
+R6502-13, 1.4MHz from resonator, another pcb with the same resonator was measured 1.49MHz*
 PCB label 510-1046C01 2-1-82
+
+*: 2 other boards were measured 1.60MHz and 1.88MHz(newest serial). Online references
+suggest 3 versions of SC9(A) total: 1.5MHz, 1.6MHz, and 1.9MHz.
 
 I/O is via TTL, not further documented here
 
@@ -475,6 +478,9 @@ public:
 	DECLARE_WRITE8_MEMBER(sc9_control_w);
 	DECLARE_WRITE8_MEMBER(sc9_led_w);
 	DECLARE_READ8_MEMBER(sc9_input_r);
+	DECLARE_MACHINE_RESET(sc9);
+	DECLARE_INPUT_CHANGED_MEMBER(sc9_cpu_freq);
+	void sc9_set_cpu_freq();
 
 	// SC12
 	DECLARE_WRITE8_MEMBER(sc12_control_w);
@@ -670,7 +676,7 @@ READ8_MEMBER(fidel6502_state::eas_input_r)
 WRITE8_MEMBER(fidel6502_state::eas_ppi_porta_w)
 {
 	// pull output low during reset (see TODO)
-	if (machine().phase() == MACHINE_PHASE_RESET)
+	if (machine().phase() == machine_phase::RESET)
 		data = 0;
 
 	// d0-d5: TSI C0-C5
@@ -760,6 +766,19 @@ READ8_MEMBER(fidel6502_state::sc9_input_r)
 {
 	// multiplexed inputs (active low)
 	return read_inputs(9) ^ 0xff;
+}
+
+void fidel6502_state::sc9_set_cpu_freq()
+{
+	// SC9(A) was released with 1.5MHz, 1.6MHz, or 1.9MHz CPU
+	u8 inp = ioport("FAKE")->read();
+	m_maincpu->set_unscaled_clock((inp & 2) ? 1900000 : ((inp & 1) ? 1600000 : 1500000));
+}
+
+MACHINE_RESET_MEMBER(fidel6502_state, sc9)
+{
+	fidelbase_state::machine_reset();
+	sc9_set_cpu_freq();
 }
 
 
@@ -1360,6 +1379,21 @@ static INPUT_PORTS_START( playmatic )
 	PORT_INCLUDE( sc12_base )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( sc9 )
+	PORT_INCLUDE( sc12 )
+
+	PORT_START("FAKE")
+	PORT_CONFNAME( 0x03, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, fidel6502_state, sc9_cpu_freq, nullptr) // factory set
+	PORT_CONFSETTING(    0x00, "1.5MHz" )
+	PORT_CONFSETTING(    0x01, "1.6MHz" )
+	PORT_CONFSETTING(    0x02, "1.9MHz" )
+INPUT_PORTS_END
+
+INPUT_CHANGED_MEMBER(fidel6502_state::sc9_cpu_freq)
+{
+	sc9_set_cpu_freq();
+}
+
 
 static INPUT_PORTS_START( fexcelb )
 	PORT_INCLUDE( fidel_cb_buttons )
@@ -1440,7 +1474,7 @@ INPUT_PORTS_END
     Machine Drivers
 ******************************************************************************/
 
-static MACHINE_CONFIG_START( rsc, fidel6502_state )
+static MACHINE_CONFIG_START( rsc )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 1800000) // measured approx 1.81MHz
@@ -1468,7 +1502,7 @@ static MACHINE_CONFIG_START( rsc, fidel6502_state )
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( csc, fidel6502_state )
+static MACHINE_CONFIG_START( csc )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_3_9MHz/2) // from 3.9MHz resonator
@@ -1513,7 +1547,7 @@ static MACHINE_CONFIG_DERIVED( su9, csc )
 	MCFG_DEFAULT_LAYOUT(layout_fidel_su9)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( eas, fidel6502_state )
+static MACHINE_CONFIG_START( eas )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", R65C02, XTAL_3MHz)
@@ -1557,11 +1591,11 @@ static MACHINE_CONFIG_DERIVED( eag, eas )
 	MCFG_DEFAULT_LAYOUT(layout_fidel_eag)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sc9, fidel6502_state )
+static MACHINE_CONFIG_START( sc9b )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 1400000) // from ceramic resonator "681 JSA", measured
-	MCFG_CPU_PROGRAM_MAP(sc9_map)
+	MCFG_CPU_ADD("maincpu", M6502, XTAL_3_9MHz/2) // R6502AP, 3.9MHz resonator
+	MCFG_CPU_PROGRAM_MAP(sc9b_map)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", fidel6502_state, irq_on, attotime::from_hz(610)) // from 555 timer (22nF, 102K, 2.7K)
 	MCFG_TIMER_START_DELAY(attotime::from_hz(610) - attotime::from_usec(41)) // active for 41us
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel6502_state, irq_off, attotime::from_hz(610))
@@ -1582,14 +1616,16 @@ static MACHINE_CONFIG_START( sc9, fidel6502_state )
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "fidel_scc")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sc9b, sc9 )
+static MACHINE_CONFIG_DERIVED( sc9, sc9b )
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", M6502, 2000000) // approximation
-	MCFG_CPU_PROGRAM_MAP(sc9b_map)
+	MCFG_CPU_REPLACE("maincpu", M6502, 1500000) // from ceramic resonator "681 JSA", measured, see sc9_set_cpu_freq
+	MCFG_CPU_PROGRAM_MAP(sc9_map)
+
+	MCFG_MACHINE_RESET_OVERRIDE(fidel6502_state, sc9)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( playmatic, sc9 )
+static MACHINE_CONFIG_DERIVED( playmatic, sc9b )
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", M6502, 3100000) // approximation
@@ -1598,7 +1634,7 @@ static MACHINE_CONFIG_DERIVED( playmatic, sc9 )
 	MCFG_DEFAULT_LAYOUT(layout_fidel_playmatic)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sc12, fidel6502_state )
+static MACHINE_CONFIG_START( sc12 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", R65C02, XTAL_4MHz)
@@ -1623,7 +1659,7 @@ static MACHINE_CONFIG_START( sc12, fidel6502_state )
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "fidel_scc")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( fexcel, fidel6502_state )
+static MACHINE_CONFIG_START( fexcel )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M65SC02, XTAL_12MHz/4) // G65SC102P-3, 12.0M ceramic resonator
@@ -1707,7 +1743,7 @@ static MACHINE_CONFIG_DERIVED( fexceld, fexcelb )
 	MCFG_DEFAULT_LAYOUT(layout_fidel_exd)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( fdes2100d, fidel6502_state )
+static MACHINE_CONFIG_START( fdes2100d )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M65C02, XTAL_6MHz) // W65C02P-6
@@ -1733,7 +1769,7 @@ static MACHINE_CONFIG_DERIVED( fdes2000d, fdes2100d )
 	MCFG_CPU_PROGRAM_MAP(fdesdis_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( fphantom, fidel6502_state )
+static MACHINE_CONFIG_START( fphantom )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", R65C02, XTAL_4_9152MHz) // R65C02P4
@@ -1752,7 +1788,7 @@ static MACHINE_CONFIG_START( fphantom, fidel6502_state )
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( chesster, fidel6502_state )
+static MACHINE_CONFIG_START( chesster )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", R65C02, XTAL_5MHz) // RP65C02G
@@ -2061,13 +2097,13 @@ ROM_START( feag2100fr )
 ROM_END
 
 
-ROM_START( fscc9 )
+ROM_START( fscc9 ) // PCB label 510-1046C01
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("101-1034a01", 0xc000, 0x2000, CRC(b845c458) SHA1(d3fda65dbd9fae44fa4b93f8207839d8fa0c367a) ) // HN48364P
 	ROM_LOAD("101-1034b02", 0xe000, 0x2000, CRC(cbaf97d7) SHA1(7ed8e68bb74713d9e2ff1d9c037012320b7bfcbf) ) // "
 ROM_END
 
-ROM_START( fscc9b ) // this one came from an overclocked board, let's assume the roms were unmodified
+ROM_START( fscc9b ) // PCB label 510-1046D01
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("101-1034b01", 0xc000, 0x2000, CRC(65288753) SHA1(651f5ca5969ddd72a20cbebdec2de83c4bf10650) )
 	ROM_LOAD("101-1034c02", 0xe000, 0x2000, CRC(238b092f) SHA1(7ddffc6dba822aee9d8ad6815b23024ed5cdfd26) )
@@ -2189,12 +2225,12 @@ ROM_START( chesstera ) // model 6120, PCB label 510.1141C01
 	ROM_LOAD("101-1091a02.ic10", 0x0000, 0x20000, CRC(2b4d243c) SHA1(921e51978facb502b207b4f64a73b1e74127e826) ) // AMI, 27C010 or equivalent
 ROM_END
 
-ROM_START( kishon ) // model 6120G, PCB label 510.1141C01
+ROM_START( kishon ) // model 6120G or 6127(same), PCB label 510.1141C01
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("kishon.ic9", 0x8000, 0x8000, CRC(121c007f) SHA1(652e9ea47b6bb1632d10eb0fcd7f98cdba22fce7) ) // 27C256
 
 	ROM_REGION( 0x80000, "user1", 0 )
-	ROM_LOAD("kishon_v2.6_1-14-91.ic10", 0x0000, 0x80000, CRC(50598869) SHA1(2087e0c2f40a2408fe217a6502c8c3a247bdd063) ) // Toshiba TC544000P-12
+	ROM_LOAD("kishon_v2.6_1-14-91.ic10", 0x0000, 0x80000, CRC(50598869) SHA1(2087e0c2f40a2408fe217a6502c8c3a247bdd063) ) // Toshiba TC544000P-12, aka 101-1094A01
 ROM_END
 
 
@@ -2203,57 +2239,57 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-/*    YEAR  NAME        PARENT    COMPAT  MACHINE    INPUT      INIT, COMPANY, FULLNAME, FLAGS */
-CONS( 1981, reversic,   0,        0,      rsc,       rsc,       driver_device, 0, "Fidelity Electronics", "Reversi Sensory Challenger (green version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME        PARENT   CMP MACHINE    INPUT      STATE            INIT      COMPANY, FULLNAME, FLAGS
+CONS( 1981, reversic,   0,        0, rsc,       rsc,       fidel6502_state, 0,        "Fidelity Electronics", "Reversi Sensory Challenger (green version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1981, csc,        0,        0,      csc,       csc,       driver_device, 0, "Fidelity Electronics", "Champion Sensory Chess Challenger (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1981, cscsp,      csc,      0,      csc,       cscg,      driver_device, 0, "Fidelity Electronics", "Champion Sensory Chess Challenger (Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1981, cscg,       csc,      0,      csc,       cscg,      driver_device, 0, "Fidelity Electronics", "Champion Sensory Chess Challenger (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1981, cscfr,      csc,      0,      csc,       cscg,      driver_device, 0, "Fidelity Electronics", "Champion Sensory Chess Challenger (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1981, csc,        0,        0, csc,       csc,       fidel6502_state, 0,        "Fidelity Electronics", "Champion Sensory Chess Challenger (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1981, cscsp,      csc,      0, csc,       cscg,      fidel6502_state, 0,        "Fidelity Electronics", "Champion Sensory Chess Challenger (Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1981, cscg,       csc,      0, csc,       cscg,      fidel6502_state, 0,        "Fidelity Electronics", "Champion Sensory Chess Challenger (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1981, cscfr,      csc,      0, csc,       cscg,      fidel6502_state, 0,        "Fidelity Electronics", "Champion Sensory Chess Challenger (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1983, super9cc,   0,        0,      su9,       su9,       driver_device, 0, "Fidelity Electronics", "Super 9 Sensory Chess Challenger (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1983, super9ccsp, super9cc, 0,      su9,       su9g,      driver_device, 0, "Fidelity Electronics", "Super 9 Sensory Chess Challenger (Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1983, super9ccg,  super9cc, 0,      su9,       su9g,      driver_device, 0, "Fidelity Electronics", "Super 9 Sensory Chess Challenger (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1983, super9ccfr, super9cc, 0,      su9,       su9g,      driver_device, 0, "Fidelity Electronics", "Super 9 Sensory Chess Challenger (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1983, super9cc,   0,        0, su9,       su9,       fidel6502_state, 0,        "Fidelity Electronics", "Super 9 Sensory Chess Challenger (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1983, super9ccsp, super9cc, 0, su9,       su9g,      fidel6502_state, 0,        "Fidelity Electronics", "Super 9 Sensory Chess Challenger (Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1983, super9ccg,  super9cc, 0, su9,       su9g,      fidel6502_state, 0,        "Fidelity Electronics", "Super 9 Sensory Chess Challenger (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1983, super9ccfr, super9cc, 0, su9,       su9g,      fidel6502_state, 0,        "Fidelity Electronics", "Super 9 Sensory Chess Challenger (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1983, feasbu,     0,        0,      eas,       eas,       driver_device, 0, "Fidelity Electronics", "Elite A/S Challenger (Budapest program, English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1983, feasbusp,   feasbu,   0,      eas,       easg,      driver_device, 0, "Fidelity Electronics", "Elite A/S Challenger (Budapest program, Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1983, feasbug,    feasbu,   0,      eas,       easg,      driver_device, 0, "Fidelity Electronics", "Elite A/S Challenger (Budapest program, German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1983, feasbufr,   feasbu,   0,      eas,       easg,      driver_device, 0, "Fidelity Electronics", "Elite A/S Challenger (Budapest program, French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1984, feasgla,    feasbu,   0,      eas,       eas,       driver_device, 0, "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1984, feasglasp,  feasbu,   0,      eas,       easg,      driver_device, 0, "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1984, feasglag,   feasbu,   0,      eas,       easg,      driver_device, 0, "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1984, feasglafr,  feasbu,   0,      eas,       easg,      driver_device, 0, "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1983, feasbu,     0,        0, eas,       eas,       fidel6502_state, 0,        "Fidelity Electronics", "Elite A/S Challenger (Budapest program, English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1983, feasbusp,   feasbu,   0, eas,       easg,      fidel6502_state, 0,        "Fidelity Electronics", "Elite A/S Challenger (Budapest program, Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1983, feasbug,    feasbu,   0, eas,       easg,      fidel6502_state, 0,        "Fidelity Electronics", "Elite A/S Challenger (Budapest program, German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1983, feasbufr,   feasbu,   0, eas,       easg,      fidel6502_state, 0,        "Fidelity Electronics", "Elite A/S Challenger (Budapest program, French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1984, feasgla,    feasbu,   0, eas,       eas,       fidel6502_state, 0,        "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1984, feasglasp,  feasbu,   0, eas,       easg,      fidel6502_state, 0,        "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1984, feasglag,   feasbu,   0, eas,       easg,      fidel6502_state, 0,        "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1984, feasglafr,  feasbu,   0, eas,       easg,      fidel6502_state, 0,        "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1986, feag2100,   0,        0,      eag,       eag,       driver_device, 0, "Fidelity Electronics", "Elite Avant Garde 2100 (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1986, feag2100sp, feag2100, 0,      eag,       eagg,      driver_device, 0, "Fidelity Electronics", "Elite Avant Garde 2100 (Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1986, feag2100g,  feag2100, 0,      eag,       eagg,      driver_device, 0, "Fidelity Electronics", "Elite Avant Garde 2100 (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1986, feag2100fr, feag2100, 0,      eag,       eagg,      driver_device, 0, "Fidelity Electronics", "Elite Avant Garde 2100 (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1986, feag2100,   0,        0, eag,       eag,       fidel6502_state, 0,        "Fidelity Electronics", "Elite Avant Garde 2100 (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1986, feag2100sp, feag2100, 0, eag,       eagg,      fidel6502_state, 0,        "Fidelity Electronics", "Elite Avant Garde 2100 (Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1986, feag2100g,  feag2100, 0, eag,       eagg,      fidel6502_state, 0,        "Fidelity Electronics", "Elite Avant Garde 2100 (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1986, feag2100fr, feag2100, 0, eag,       eagg,      fidel6502_state, 0,        "Fidelity Electronics", "Elite Avant Garde 2100 (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1982, fscc9,      0,        0,      sc9,       sc12,      driver_device, 0, "Fidelity Electronics", "Sensory Chess Challenger 9", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1982, fscc9b,     fscc9,    0,      sc9b,      sc12,      driver_device, 0, "Fidelity Electronics", "Sensory Chess Challenger 9 (rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1983, fscc9ps,    fscc9,    0,      playmatic, playmatic, driver_device, 0, "Fidelity Electronics", "Sensory 9 Playmatic 'S'", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // Fidelity West Germany
+CONS( 1982, fscc9,      0,        0, sc9,       sc9,       fidel6502_state, 0,        "Fidelity Electronics", "Sensory Chess Challenger 9 (rev. C01)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1982, fscc9b,     fscc9,    0, sc9b,      sc12,      fidel6502_state, 0,        "Fidelity Electronics", "Sensory Chess Challenger 9 (rev. D01)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1983, fscc9ps,    fscc9,    0, playmatic, playmatic, fidel6502_state, 0,        "Fidelity Electronics", "Sensory 9 Playmatic 'S'", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // Fidelity West Germany
 
-CONS( 1984, fscc12,     0,        0,      sc12,      sc12,      driver_device, 0, "Fidelity Electronics", "Sensory Chess Challenger 12-B", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1984, fscc12,     0,        0, sc12,      sc12,      fidel6502_state, 0,        "Fidelity Electronics", "Sensory Chess Challenger 12-B", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1987, fexcel,     0,        0,      fexcelb,   fexcelb,   driver_device, 0, "Fidelity Electronics", "The Excellence (model 6080B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1987, fexcelv,    fexcel,   0,      fexcelv,   fexcelv,   driver_device, 0, "Fidelity Electronics", "Voice Excellence", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1987, fexceld,    fexcel,   0,      fexceld,   fexcelb,   driver_device, 0, "Fidelity Electronics", "Excel Display", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1985, fexcel12,   fexcel,   0,      fexcel,    fexcel,    driver_device, 0, "Fidelity Electronics", "The Excellence (model EP12, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // 1st version of The Excellence
-CONS( 1985, fexcel124,  fexcel,   0,      fexcel4,   fexcel,    driver_device, 0, "Fidelity Electronics", "The Excellence (model EP12, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1985, fexcela,    fexcel,   0,      fexcel,    fexcel,    driver_device, 0, "Fidelity Electronics", "The Excellence (model 6080)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1987, fexcel,     0,        0, fexcelb,   fexcelb,   fidel6502_state, 0,        "Fidelity Electronics", "The Excellence (model 6080B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1987, fexcelv,    fexcel,   0, fexcelv,   fexcelv,   fidel6502_state, 0,        "Fidelity Electronics", "Voice Excellence", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1987, fexceld,    fexcel,   0, fexceld,   fexcelb,   fidel6502_state, 0,        "Fidelity Electronics", "Excel Display", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1985, fexcel12,   fexcel,   0, fexcel,    fexcel,    fidel6502_state, 0,        "Fidelity Electronics", "The Excellence (model EP12, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // 1st version of The Excellence
+CONS( 1985, fexcel124,  fexcel,   0, fexcel4,   fexcel,    fidel6502_state, 0,        "Fidelity Electronics", "The Excellence (model EP12, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1985, fexcela,    fexcel,   0, fexcel,    fexcel,    fidel6502_state, 0,        "Fidelity Electronics", "The Excellence (model 6080)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1986, fexcelp,    0,        0,      fexcelp,   fexcel,    driver_device, 0, "Fidelity Electronics", "The Par Excellence", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1986, fexcelpb,   fexcelp,  0,      fexcelp,   fexcel,    driver_device, 0, "Fidelity Electronics", "The Par Excellence (rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1986, granits,    fexcelp,  0,      granits,   fexcel,    driver_device, 0, "hack (RCS)", "Granit 'S'", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1988, fdes2000,   fexcelp,  0,      fdes2000,  fdes,      driver_device, 0, "Fidelity Electronics", "Designer 2000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // Excellence series hardware
-CONS( 1988, fdes2100,   fexcelp,  0,      fdes2100,  fdes,      driver_device, 0, "Fidelity Electronics", "Designer 2100", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // "
+CONS( 1986, fexcelp,    0,        0, fexcelp,   fexcel,    fidel6502_state, 0,        "Fidelity Electronics", "The Par Excellence", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1986, fexcelpb,   fexcelp,  0, fexcelp,   fexcel,    fidel6502_state, 0,        "Fidelity Electronics", "The Par Excellence (rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1986, granits,    fexcelp,  0, granits,   fexcel,    fidel6502_state, 0,        "hack (RCS)", "Granit 'S'", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1988, fdes2000,   fexcelp,  0, fdes2000,  fdes,      fidel6502_state, 0,        "Fidelity Electronics", "Designer 2000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // Excellence series hardware
+CONS( 1988, fdes2100,   fexcelp,  0, fdes2100,  fdes,      fidel6502_state, 0,        "Fidelity Electronics", "Designer 2100", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // "
 
-CONS( 1988, fdes2100d,  0,        0,      fdes2100d, fdesdis,   fidel6502_state, fdesdis, "Fidelity Electronics", "Designer 2100 Display (rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1988, fdes2000d,  fdes2100d,0,      fdes2000d, fdesdis,   fidel6502_state, fdesdis, "Fidelity Electronics", "Designer 2000 Display", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1988, fdes2100d,  0,        0, fdes2100d, fdesdis,   fidel6502_state, fdesdis,  "Fidelity Electronics", "Designer 2100 Display (rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1988, fdes2000d,  fdes2100d,0, fdes2000d, fdesdis,   fidel6502_state, fdesdis,  "Fidelity Electronics", "Designer 2000 Display", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1988, fphantom,   0,        0,      fphantom,  fphantom,  fidel6502_state, fphantom, "Fidelity Electronics", "Phantom (Fidelity)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+CONS( 1988, fphantom,   0,        0, fphantom,  fphantom,  fidel6502_state, fphantom, "Fidelity Electronics", "Phantom (Fidelity)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
 
-CONS( 1990, chesster,   0,        0,      chesster,  chesster,  fidel6502_state, chesster, "Fidelity Electronics", "Chesster Challenger (V1.3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1990, chesstera,  chesster, 0,      chesster,  chesster,  fidel6502_state, chesster, "Fidelity Electronics", "Chesster Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1991, kishon,     chesster, 0,      kishon,    chesster,  fidel6502_state, chesster, "Fidelity Electronics", "Kishon Chesster", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, chesster,   0,        0, chesster,  chesster,  fidel6502_state, chesster, "Fidelity Electronics", "Chesster Challenger (V1.3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, chesstera,  chesster, 0, chesster,  chesster,  fidel6502_state, chesster, "Fidelity Electronics", "Chesster Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1991, kishon,     chesster, 0, kishon,    chesster,  fidel6502_state, chesster, "Fidelity Electronics", "Kishon Chesster", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

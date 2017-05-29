@@ -11,14 +11,15 @@
 
 #include "screen.h"
 
+//#define VERBOSE 1
+#include "logmacro.h"
 
-#define LOG          0
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type PCD8544 = device_creator<pcd8544_device>;
+DEFINE_DEVICE_TYPE(PCD8544, pcd8544_device, "pcd8544_device", "Philips PCD8544 LCD Controller")
 
 
 //**************************************************************************
@@ -30,7 +31,7 @@ const device_type PCD8544 = device_creator<pcd8544_device>;
 //-------------------------------------------------
 
 pcd8544_device::pcd8544_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, PCD8544, "PCD8544", tag, owner, clock, "pcd8544", __FILE__)
+	device_t(mconfig, PCD8544, tag, owner, clock)
 {
 }
 
@@ -85,7 +86,7 @@ void pcd8544_device::exec_command(uint8_t cmd)
 		if(cmd & 0x80)
 		{
 			m_op_vol = cmd & 0x7f;
-			if (LOG) logerror("PCD8544: set Vop %d\n", m_op_vol);
+			LOG("PCD8544: set Vop %d\n", m_op_vol);
 		}
 		else if(cmd & 0x40)
 		{
@@ -94,12 +95,12 @@ void pcd8544_device::exec_command(uint8_t cmd)
 		else if(cmd & 0x20)
 		{
 			m_mode = cmd & 0x07;
-			if (LOG) logerror("PCD8544: set PD=%d V=%d H=%d\n", BIT(m_mode, 2), BIT(m_mode, 1), BIT(m_mode, 0));
+			LOG("PCD8544: set PD=%d V=%d H=%d\n", BIT(m_mode, 2), BIT(m_mode, 1), BIT(m_mode, 0));
 		}
 		else if(cmd & 0x10)
 		{
 			m_bias = cmd & 0x07;
-			if (LOG) logerror("PCD8544: set bias system %d\n", m_bias);
+			LOG("PCD8544: set bias system %d\n", m_bias);
 		}
 		else if(cmd & 0x08)
 		{
@@ -108,7 +109,7 @@ void pcd8544_device::exec_command(uint8_t cmd)
 		else if(cmd & 0x04)
 		{
 			m_temp_coef = cmd & 0x03;
-			if (LOG) logerror("PCD8544: set temperature coefficient %d\n", m_temp_coef);
+			LOG("PCD8544: set temperature coefficient %d\n", m_temp_coef);
 		}
 		else if (cmd)
 		{
@@ -120,17 +121,17 @@ void pcd8544_device::exec_command(uint8_t cmd)
 		if(cmd & 0x80)
 		{
 			m_addr_x = (cmd & 0x7f) % 84;
-			if (LOG) logerror("PCD8544: set X-address %d\n", cmd & 0x7f);
+			LOG("PCD8544: set X-address %d\n", cmd & 0x7f);
 		}
 		else if(cmd & 0x40)
 		{
 			m_addr_y = (cmd & 0x07) % 6;
-			if (LOG) logerror("PCD8544: set Y-address %d\n", cmd & 0x07);
+			LOG("PCD8544: set Y-address %d\n", cmd & 0x07);
 		}
 		else if(cmd & 0x20)
 		{
 			m_mode = cmd & 0x07;
-			if (LOG) logerror("PCD8544: set PD=%d V=%d H=%d\n", BIT(m_mode, 2), BIT(m_mode, 1), BIT(m_mode, 0));
+			LOG("PCD8544: set PD=%d V=%d H=%d\n", BIT(m_mode, 2), BIT(m_mode, 1), BIT(m_mode, 0));
 		}
 		else if(cmd & 0x10)
 		{
@@ -139,7 +140,7 @@ void pcd8544_device::exec_command(uint8_t cmd)
 		else if(cmd & 0x08)
 		{
 			m_control = ((cmd & 0x04) >> 1) | (cmd & 0x01);
-			if (LOG) logerror("PCD8544: set D=%d E=%d\n", BIT(m_control, 1), BIT(m_control, 0));
+			LOG("PCD8544: set D=%d E=%d\n", BIT(m_control, 1), BIT(m_control, 0));
 		}
 		else if (cmd)
 		{

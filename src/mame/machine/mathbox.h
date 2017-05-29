@@ -6,6 +6,10 @@
  * Copyright Eric Smith
  *
  */
+#ifndef MAME_MACHINE_MATHBOX_H
+#define MAME_MACHINE_MATHBOX_H
+
+#pragma once
 
 /***************************************************************************
     DEVICE CONFIGURATION MACROS
@@ -41,4 +45,6 @@ protected:
 	int16_t m_result;
 };
 
-extern const device_type MATHBOX;
+DECLARE_DEVICE_TYPE(MATHBOX, mathbox_device)
+
+#endif // MAME_MACHINE_MATHBOX_H

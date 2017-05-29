@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
-// thanks-to:yovan
+// thanks-to:yoyo_chessboard
 /******************************************************************************
 
     Fidelity generic MCS-48 based chess computer driver
@@ -46,8 +46,8 @@ public:
 	DECLARE_WRITE8_MEMBER(sc6_mux_w);
 	DECLARE_WRITE8_MEMBER(sc6_select_w);
 	DECLARE_READ8_MEMBER(sc6_input_r);
-	DECLARE_READ8_MEMBER(sc6_input6_r);
-	DECLARE_READ8_MEMBER(sc6_input7_r);
+	DECLARE_READ_LINE_MEMBER(sc6_input6_r);
+	DECLARE_READ_LINE_MEMBER(sc6_input7_r);
 };
 
 
@@ -71,12 +71,12 @@ WRITE8_MEMBER(fidelmcs48_state::sc6_mux_w)
 {
 	// P24-P27: 7442 A-D
 	u16 sel = 1 << (data >> 4 & 0xf) & 0x3ff;
-	
+
 	// 7442 0-8: input mux, 7seg data
 	m_inp_mux = sel & 0x1ff;
 	m_7seg_data = sel & 0x7f;
 	sc6_prepare_display();
-	
+
 	// 7442 9: speaker out
 	m_dac->write(BIT(sel, 9));
 }
@@ -94,13 +94,13 @@ READ8_MEMBER(fidelmcs48_state::sc6_input_r)
 	return (~read_inputs(9) & 0x3f) | 0xc0;
 }
 
-READ8_MEMBER(fidelmcs48_state::sc6_input6_r)
+READ_LINE_MEMBER(fidelmcs48_state::sc6_input6_r)
 {
 	// T0: multiplexed inputs bit 6
 	return ~read_inputs(9) >> 6 & 1;
 }
 
-READ8_MEMBER(fidelmcs48_state::sc6_input7_r)
+READ_LINE_MEMBER(fidelmcs48_state::sc6_input7_r)
 {
 	// T1: multiplexed inputs bit 7
 	return ~read_inputs(9) >> 7 & 1;
@@ -116,14 +116,6 @@ READ8_MEMBER(fidelmcs48_state::sc6_input7_r)
 
 static ADDRESS_MAP_START( sc6_map, AS_PROGRAM, 8, fidelmcs48_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sc6_io, AS_IO, 8, fidelmcs48_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(sc6_mux_w) AM_READNOP
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(sc6_input_r, sc6_select_w)
-	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(sc6_input6_r)
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(sc6_input7_r)
 ADDRESS_MAP_END
 
 
@@ -152,12 +144,16 @@ INPUT_PORTS_END
     Machine Drivers
 ******************************************************************************/
 
-static MACHINE_CONFIG_START( sc6, fidelmcs48_state )
+static MACHINE_CONFIG_START( sc6 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8040, XTAL_11MHz)
 	MCFG_CPU_PROGRAM_MAP(sc6_map)
-	MCFG_CPU_IO_MAP(sc6_io)
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(fidelmcs48_state, sc6_mux_w))
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(fidelmcs48_state, sc6_input_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(fidelmcs48_state, sc6_select_w))
+	MCFG_MCS48_PORT_T0_IN_CB(READLINE(fidelmcs48_state, sc6_input6_r))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(fidelmcs48_state, sc6_input7_r))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_fidel_sc6)
@@ -186,5 +182,5 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-/*    YEAR  NAME      PARENT   COMPAT  MACHINE    INPUT      INIT              COMPANY, FULLNAME, FLAGS */
-CONS( 1982, fscc6,    0,       0,      sc6,       sc6,       driver_device, 0, "Fidelity", "Sensory Chess Challenger 6", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME      PARENT  CMP MACHINE    INPUT   STATE          INIT  COMPANY, FULLNAME, FLAGS
+CONS( 1982, fscc6,    0,       0, sc6,       sc6,    fidelmcs48_state, 0, "Fidelity", "Sensory Chess Challenger 6", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

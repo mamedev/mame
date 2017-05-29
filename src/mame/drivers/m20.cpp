@@ -84,7 +84,7 @@ public:
 	required_device<i8251_device> m_ttyi8251;
 	required_device<i8255_device> m_i8255;
 	required_device<pic8259_device> m_i8259;
-	required_device<fd1797_t> m_fd1797;
+	required_device<fd1797_device> m_fd1797;
 	required_device<floppy_image_device> m_floppy0;
 	required_device<floppy_image_device> m_floppy1;
 	optional_device<m20_8086_device> m_apb;
@@ -698,7 +698,7 @@ void m20_state::install_memory()
 static ADDRESS_MAP_START(m20_io, AS_IO, 16, m20_state)
 	ADDRESS_MAP_UNMAP_HIGH
 
-	AM_RANGE(0x00, 0x07) AM_DEVREADWRITE8("fd1797", fd1797_t, read, write, 0x00ff)
+	AM_RANGE(0x00, 0x07) AM_DEVREADWRITE8("fd1797", fd1797_device, read, write, 0x00ff)
 
 	AM_RANGE(0x20, 0x21) AM_READWRITE(port21_r, port21_w);
 
@@ -760,8 +760,8 @@ void m20_state::machine_reset()
 	memcpy(RAM, ROM, 8);  // we need only the reset vector
 	m_maincpu->reset();     // reset the CPU to ensure it picks up the new vector
 	m_kbdi8251->write_cts(0);
-	if(m_apb)
-		m_apb->m_8086->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	if (m_apb)
+		m_apb->halt();
 }
 
 
@@ -778,7 +778,7 @@ static SLOT_INTERFACE_START(keyboard)
 	SLOT_INTERFACE("m20", M20_KEYBOARD)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( m20, m20_state )
+static MACHINE_CONFIG_START( m20 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z8001, MAIN_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(m20_program_mem)
@@ -867,6 +867,6 @@ ROM_START(m40)
 	ROM_REGION(0x4000, "apb_bios", ROMREGION_ERASEFF) // Processor board with 8086
 ROM_END
 
-/*    YEAR  NAME   PARENT  COMPAT  MACHINE INPUT   INIT COMPANY     FULLNAME        FLAGS */
-COMP( 1981, m20,   0,      0,      m20,    0,   driver_device,    0, "Olivetti", "Olivetti L1 M20", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1981, m40,   m20,    0,      m20,    0,   driver_device,    0, "Olivetti", "Olivetti L1 M40", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME   PARENT  COMPAT  MACHINE INPUT STATE      INIT COMPANY     FULLNAME           FLAGS
+COMP( 1981, m20,   0,      0,      m20,    0,    m20_state, 0,   "Olivetti", "Olivetti L1 M20", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1981, m40,   m20,    0,      m20,    0,    m20_state, 0,   "Olivetti", "Olivetti L1 M40", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

@@ -38,6 +38,8 @@
 #include "corestr.h"
 #include "bitmap.h"
 
+#include "emufwd.h"
+
 
 //**************************************************************************
 //  COMPILER-SPECIFIC NASTINESS
@@ -73,9 +75,6 @@ typedef u32 pen_t;
 
 // stream_sample_t is used to represent a single sample in a sound stream
 typedef s32 stream_sample_t;
-
-// running_machine is core to pretty much everything
-class running_machine;
 
 
 
@@ -304,8 +303,6 @@ private:
 //**************************************************************************
 //  CASTING TEMPLATES
 //**************************************************************************
-
-class device_t;
 
 void report_bad_cast(const std::type_info &src_type, const std::type_info &dst_type);
 void report_bad_device_cast(const device_t *dev, const std::type_info &src_type, const std::type_info &dst_type);

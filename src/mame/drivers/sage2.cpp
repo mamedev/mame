@@ -407,7 +407,7 @@ READ16_MEMBER(sage2_state::rom_r)
 //  MACHINE_CONFIG( sage2 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( sage2, sage2_state )
+static MACHINE_CONFIG_START( sage2 )
 	// basic machine hardware
 	MCFG_CPU_ADD(M68000_TAG, M68000, XTAL_16MHz/2)
 	MCFG_CPU_PROGRAM_MAP(sage2_mem)
@@ -525,5 +525,5 @@ DRIVER_INIT_MEMBER(sage2_state,sage2)
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY                             FULLNAME    FLAGS
-COMP( 1982, sage2,  0,       0,      sage2,     sage2, sage2_state,    sage2, "Sage Technology", "Sage II", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE        INIT   COMPANY            FULLNAME   FLAGS
+COMP( 1982, sage2,  0,      0,      sage2,   sage2, sage2_state, sage2, "Sage Technology", "Sage II", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

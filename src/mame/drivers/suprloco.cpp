@@ -167,7 +167,7 @@ static GFXDECODE_START( suprloco )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( suprloco, suprloco_state )
+static MACHINE_CONFIG_START( suprloco )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SEGA_315_5015, 4000000)   /* 4 MHz (?) */
@@ -308,4 +308,4 @@ DRIVER_INIT_MEMBER(suprloco_state,suprloco)
 
 
 GAME( 1982, suprloco,         0, suprloco, suprloco, suprloco_state, suprloco, ROT0, "Sega", "Super Locomotive (Rev.A)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, suprlocoo, suprloco, suprloco, suprloco, suprloco_state, suprloco, ROT0, "Sega", "Super Locomotive", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, suprlocoo, suprloco, suprloco, suprloco, suprloco_state, suprloco, ROT0, "Sega", "Super Locomotive",         MACHINE_SUPPORTS_SAVE )

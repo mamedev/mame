@@ -1,36 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:ElSemi
-#ifndef __VR0VIDEO_H__
-#define __VR0VIDEO_H__
+#ifndef MAME_VIDEO_VRENDER0_H
+#define MAME_VIDEO_VRENDER0_H
+
+#pragma once
 
 
 /***************************************************************************
  TYPE DEFINITIONS
  ***************************************************************************/
-
-struct RenderStateInfo
-{
-	uint32_t Tx;
-	uint32_t Ty;
-	uint32_t Txdx;
-	uint32_t Tydx;
-	uint32_t Txdy;
-	uint32_t Tydy;
-	uint32_t SrcAlphaColor;
-	uint32_t SrcBlend;
-	uint32_t DstAlphaColor;
-	uint32_t DstBlend;
-	uint32_t ShadeColor;
-	uint32_t TransColor;
-	uint32_t TileOffset;
-	uint32_t FontOffset;
-	uint32_t PalOffset;
-	uint32_t PaletteBank;
-	uint32_t TextureMode;
-	uint32_t PixelFormat;
-	uint32_t Width;
-	uint32_t Height;
-};
 
 class vr0video_device : public device_t
 {
@@ -48,6 +26,30 @@ protected:
 	virtual void device_reset() override;
 
 private:
+	struct RenderStateInfo
+	{
+		uint32_t Tx;
+		uint32_t Ty;
+		uint32_t Txdx;
+		uint32_t Tydx;
+		uint32_t Txdy;
+		uint32_t Tydy;
+		uint32_t SrcAlphaColor;
+		uint32_t SrcBlend;
+		uint32_t DstAlphaColor;
+		uint32_t DstBlend;
+		uint32_t ShadeColor;
+		uint32_t TransColor;
+		uint32_t TileOffset;
+		uint32_t FontOffset;
+		uint32_t PalOffset;
+		uint32_t PaletteBank;
+		uint32_t TextureMode;
+		uint32_t PixelFormat;
+		uint32_t Width;
+		uint32_t Height;
+	};
+
 	// internal state
 	required_device<cpu_device> m_cpu;
 
@@ -57,10 +59,10 @@ private:
 	RenderStateInfo m_RenderState;
 };
 
-extern const device_type VIDEO_VRENDER0;
+DECLARE_DEVICE_TYPE(VIDEO_VRENDER0, vr0video_device)
 
 
 #define MCFG_VIDEO_VRENDER0_CPU(_tag) \
 	vr0video_device::set_cpu_tag(*device, "^" _tag);
 
-#endif /* __VR0VIDEO_H__ */
+#endif // MAME_VIDEO_VRENDER0_H

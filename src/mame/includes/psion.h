@@ -11,7 +11,7 @@
 #ifndef _PSION_H_
 #define _PSION_H_
 
-#include "cpu/m6800/m6800.h"
+#include "cpu/m6800/m6801.h"
 #include "machine/nvram.h"
 #include "machine/psion_pack.h"
 #include "video/hd44780.h"

@@ -912,7 +912,7 @@ DRIVER_INIT_MEMBER(cops_state,cops)
 	membank("sysbank1")->set_entry(2);
 }
 
-static MACHINE_CONFIG_START( cops, cops_state )
+static MACHINE_CONFIG_START( cops )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M6502,MAIN_CLOCK/2)
@@ -948,7 +948,7 @@ static MACHINE_CONFIG_START( cops, cops_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( revlatns, cops_state )
+static MACHINE_CONFIG_START( revlatns )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M6502,MAIN_CLOCK/2)
@@ -1023,6 +1023,6 @@ ROM_START( revlatns )
 ROM_END
 
 
-GAMEL( 1994, cops,      0,   cops,  cops,      cops_state, cops,       ROT0, "Atari Games",                     "Cops (USA)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_cops )
-GAMEL( 1994, copsuk,    cops,cops,  cops,      cops_state, cops,       ROT0, "Nova Productions / Deith Leisure","Cops (UK)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_cops )
+GAMEL( 1994, cops,      0,   cops,      cops,      cops_state, cops,       ROT0, "Atari Games",                     "Cops (USA)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_cops )
+GAMEL( 1994, copsuk,    cops,cops,      cops,      cops_state, cops,       ROT0, "Nova Productions / Deith Leisure","Cops (UK)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_cops )
 GAMEL( 1994, revlatns,  0,   revlatns,  revlatns,  cops_state, cops,       ROT0, "Nova Productions",                "Revelations",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_cops )

@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type VB_STD = device_creator<videobrain_standard_cartridge_device>;
+DEFINE_DEVICE_TYPE(VB_STD, videobrain_standard_cartridge_device, "vb_std", "VideoBrain standard cartridge")
 
 
 
@@ -28,7 +28,7 @@ const device_type VB_STD = device_creator<videobrain_standard_cartridge_device>;
 //-------------------------------------------------
 
 videobrain_standard_cartridge_device::videobrain_standard_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, VB_STD, "VideoBrain standard cartridge", tag, owner, clock, "vb_std", __FILE__),
+	device_t(mconfig, VB_STD, tag, owner, clock),
 	device_videobrain_expansion_card_interface(mconfig, *this)
 {
 }

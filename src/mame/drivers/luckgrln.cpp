@@ -860,7 +860,7 @@ static INPUT_PORTS_START( _7smash )
 	PORT_DIPSETTING(    0x40, "85%" )
 	PORT_DIPSETTING(    0x50, "90%" )
 	PORT_DIPSETTING(    0x60, "95%" )
-	PORT_DIPSETTING(    0x70, "105%" )	
+	PORT_DIPSETTING(    0x70, "105%" )
 	PORT_DIPNAME( 0x80, 0x80, "Reset Mode" )
 	PORT_DIPSETTING(    0x80, "Auto" )
 	PORT_DIPSETTING(    0x00, "Manual" )
@@ -887,13 +887,13 @@ static INPUT_PORTS_START( _7smash )
 	PORT_DIPNAME( 0x80, 0x80, "Alt. Test" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	
+
 	PORT_START("DSW3")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x00, "1 Coin/10 Credits" )	
+	PORT_DIPSETTING(    0x00, "1 Coin/10 Credits" )
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )
 	PORT_DIPSETTING(    0x0c, "10 Coins/1 Credit" )
 	PORT_DIPSETTING(    0x08, DEF_STR( 5C_1C ) )
@@ -916,7 +916,7 @@ static INPUT_PORTS_START( _7smash )
 	PORT_DIPSETTING(    0xd0, "5 Coins/2 Credits" )
 	PORT_DIPSETTING(    0xe0, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0xf0, "10 Coins/1 Credit" )
-	
+
 	PORT_START("DSW4")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW,  IPT_UNUSED  )
 
@@ -986,7 +986,7 @@ INTERRUPT_GEN_MEMBER(luckgrln_state::luckgrln_irq)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( luckgrln, luckgrln_state )
+static MACHINE_CONFIG_START( luckgrln )
 	MCFG_CPU_ADD("maincpu", Z180,8000000)
 	MCFG_CPU_PROGRAM_MAP(mainmap)
 	MCFG_CPU_IO_MAP(portmap)
@@ -1092,8 +1092,8 @@ ROM_END
 
 /*********************************************
 *                Game Drivers                *
-**********************************************
+**********************************************/
 
-       YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT      ROT    COMPANY           FULLNAME                                 FLAGS             LAYOUT  */
+//     YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT      ROT   COMPANY           FULL NAME                                 FLAGS             LAYOUT
 GAMEL( 1991, luckgrln, 0,      luckgrln, luckgrln, luckgrln_state, luckgrln, ROT0, "Wing Co., Ltd.", "Lucky Girl (newer Z180 based hardware)", MACHINE_NO_SOUND, layout_luckgrln )
-GAMEL( 1993, 7smash,   0,      _7smash,  _7smash,  driver_device,  0,        ROT0, "Sovic",          "7 Smash",                                MACHINE_NO_SOUND, layout_7smash )
+GAMEL( 1993, 7smash,   0,      _7smash,  _7smash,  luckgrln_state, 0,        ROT0, "Sovic",          "7 Smash",                                MACHINE_NO_SOUND, layout_7smash )

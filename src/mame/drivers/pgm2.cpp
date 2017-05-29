@@ -198,7 +198,7 @@ void pgm2_state::pgm_create_dummy_internal_arm_region()
 
 
 
-static MACHINE_CONFIG_START( pgm2, pgm2_state )
+static MACHINE_CONFIG_START( pgm2 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM9, 20000000) // ?? ARM baesd CPU, has internal ROM.

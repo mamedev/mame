@@ -1,44 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Ernesto Corvi
+#ifndef MAME_CPU_MB86233_MB86233_H
+#define MAME_CPU_MB86233_MB86233_H
+
 #pragma once
-
-#ifndef __MB86233_H__
-#define __MB86233_H__
-
-
-/***************************************************************************
-    REGISTER ENUMERATION
-***************************************************************************/
-
-enum
-{
-	MB86233_PC=1,
-	MB86233_A,
-	MB86233_B,
-	MB86233_D,
-	MB86233_P,
-	MB86233_REP,
-	MB86233_SP,
-	MB86233_EB,
-	MB86233_SHIFT,
-	MB86233_FLAGS,
-	MB86233_R0,
-	MB86233_R1,
-	MB86233_R2,
-	MB86233_R3,
-	MB86233_R4,
-	MB86233_R5,
-	MB86233_R6,
-	MB86233_R7,
-	MB86233_R8,
-	MB86233_R9,
-	MB86233_R10,
-	MB86233_R11,
-	MB86233_R12,
-	MB86233_R13,
-	MB86233_R14,
-	MB86233_R15
-};
 
 
 #define MCFG_MB86233_FIFO_READ_CB(_devcb) \
@@ -58,12 +23,43 @@ public:
 	mb86233_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_fifo_read_cb(device_t &device, _Object object) { return downcast<mb86233_cpu_device &>(device).m_fifo_read_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_fifo_read_ok_cb(device_t &device, _Object object) { return downcast<mb86233_cpu_device &>(device).m_fifo_read_ok_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_fifo_write_cb(device_t &device, _Object object) { return downcast<mb86233_cpu_device &>(device).m_fifo_write_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_fifo_read_cb(device_t &device, Object &&cb) { return downcast<mb86233_cpu_device &>(device).m_fifo_read_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_fifo_read_ok_cb(device_t &device, Object &&cb) { return downcast<mb86233_cpu_device &>(device).m_fifo_read_ok_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_fifo_write_cb(device_t &device, Object &&cb) { return downcast<mb86233_cpu_device &>(device).m_fifo_write_cb.set_callback(std::forward<Object>(cb)); }
 	static void set_tablergn(device_t &device, const char *tablergn) { downcast<mb86233_cpu_device &>(device).m_tablergn = tablergn; }
 
 protected:
+	// register enumeration
+	enum
+	{
+		MB86233_PC=1,
+		MB86233_A,
+		MB86233_B,
+		MB86233_D,
+		MB86233_P,
+		MB86233_REP,
+		MB86233_SP,
+		MB86233_EB,
+		MB86233_SHIFT,
+		MB86233_FLAGS,
+		MB86233_R0,
+		MB86233_R1,
+		MB86233_R2,
+		MB86233_R3,
+		MB86233_R4,
+		MB86233_R5,
+		MB86233_R6,
+		MB86233_R7,
+		MB86233_R8,
+		MB86233_R9,
+		MB86233_R10,
+		MB86233_R11,
+		MB86233_R12,
+		MB86233_R13,
+		MB86233_R14,
+		MB86233_R15
+	};
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -75,7 +71,7 @@ protected:
 	virtual void execute_run() override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_DATA) ? &m_data_config :  nullptr ); }
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_DATA) ? &m_data_config :  nullptr ); }
 
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
@@ -144,6 +140,6 @@ private:
 };
 
 
-extern const device_type MB86233;
+DECLARE_DEVICE_TYPE(MB86233, mb86233_cpu_device)
 
-#endif /* __MB86233_H__ */
+#endif // MAME_CPU_MB86233_MB86233_H

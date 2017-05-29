@@ -23,7 +23,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type TANDY2K_KEYBOARD = device_creator<tandy2k_keyboard_device>;
+DEFINE_DEVICE_TYPE(TANDY2K_KEYBOARD, tandy2k_keyboard_device, "tandy2kb", "Tandy 2000 Keyboard")
 
 
 
@@ -48,36 +48,16 @@ const tiny_rom_entry *tandy2k_keyboard_device::device_rom_region() const
 
 
 //-------------------------------------------------
-//  ADDRESS_MAP( kb_io )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( tandy2k_keyboard_io, AS_IO, 8, tandy2k_keyboard_device )
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(kb_p1_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(kb_p2_w)
-	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_READ(kb_p1_r)
-ADDRESS_MAP_END
-
-
-//-------------------------------------------------
-//  MACHINE_DRIVER( tandy2k_keyboard )
-//-------------------------------------------------
-
-static MACHINE_CONFIG_FRAGMENT( tandy2k_keyboard )
+MACHINE_CONFIG_MEMBER( tandy2k_keyboard_device::device_add_mconfig )
 	MCFG_CPU_ADD(I8048_TAG, I8048, 1000000) // ?
-	MCFG_CPU_IO_MAP(tandy2k_keyboard_io)
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(tandy2k_keyboard_device, kb_p1_w))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(tandy2k_keyboard_device, kb_p2_w))
+	MCFG_MCS48_PORT_BUS_IN_CB(READ8(tandy2k_keyboard_device, kb_p1_r))
 	MCFG_DEVICE_DISABLE() // TODO
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor tandy2k_keyboard_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( tandy2k_keyboard );
-}
 
 
 //-------------------------------------------------
@@ -227,7 +207,7 @@ ioport_constructor tandy2k_keyboard_device::device_input_ports() const
 //-------------------------------------------------
 
 tandy2k_keyboard_device::tandy2k_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, TANDY2K_KEYBOARD, "Tandy 2000 Keyboard", tag, owner, clock, "tandy2kb", __FILE__),
+	device_t(mconfig, TANDY2K_KEYBOARD, tag, owner, clock),
 	m_maincpu(*this, I8048_TAG),
 	m_y(*this, "Y%u", 0),
 	m_write_clock(*this),

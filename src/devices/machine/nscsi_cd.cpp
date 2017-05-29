@@ -4,10 +4,10 @@
 #include "machine/nscsi_cd.h"
 #include "imagedev/chd_cd.h"
 
-const device_type NSCSI_CDROM = device_creator<nscsi_cdrom_device>;
+DEFINE_DEVICE_TYPE(NSCSI_CDROM, nscsi_cdrom_device, "scsi_cdrom", "SCSI CD-ROM")
 
 nscsi_cdrom_device::nscsi_cdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	nscsi_full_device(mconfig, NSCSI_CDROM, "SCSI CDROM", tag, owner, clock, "scsi_cdrom", __FILE__), cdrom(nullptr), bytes_per_sector(0), lba(0), cur_lba(0), blocks(0)
+	nscsi_full_device(mconfig, NSCSI_CDROM, tag, owner, clock), cdrom(nullptr), bytes_per_sector(0), lba(0), cur_lba(0), blocks(0)
 {
 }
 
@@ -31,7 +31,7 @@ void nscsi_cdrom_device::device_reset()
 	cur_lba = -1;
 }
 
-static MACHINE_CONFIG_FRAGMENT(scsi_cdrom)
+static MACHINE_CONFIG_START(scsi_cdrom)
 	MCFG_CDROM_ADD("image")
 	MCFG_CDROM_INTERFACE("cdrom")
 MACHINE_CONFIG_END

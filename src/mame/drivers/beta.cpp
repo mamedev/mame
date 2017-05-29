@@ -102,8 +102,8 @@ public:
 /* Memory Maps */
 
 static ADDRESS_MAP_START( beta_mem, AS_PROGRAM, 8, beta_state )
-	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x7f00) AM_DEVICE(M6532_TAG, mos6532_t, ram_map)
-	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x7f00) AM_DEVICE(M6532_TAG, mos6532_t, io_map)
+	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x7f00) AM_DEVICE(M6532_TAG, mos6532_new_device, ram_map)
+	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x7f00) AM_DEVICE(M6532_TAG, mos6532_new_device, io_map)
 	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x7800) AM_ROM
 ADDRESS_MAP_END
 
@@ -335,7 +335,7 @@ void beta_state::machine_start()
 
 /* Machine Driver */
 
-static MACHINE_CONFIG_START( beta, beta_state )
+static MACHINE_CONFIG_START( beta )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_4MHz/4)
 	MCFG_CPU_PROGRAM_MAP(beta_mem)
@@ -349,7 +349,7 @@ static MACHINE_CONFIG_START( beta, beta_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
-	MCFG_DEVICE_ADD(M6532_TAG, MOS6532n, XTAL_4MHz/4)
+	MCFG_DEVICE_ADD(M6532_TAG, MOS6532_NEW, XTAL_4MHz/4)
 	MCFG_MOS6530n_IN_PA_CB(READ8(beta_state, riot_pa_r))
 	MCFG_MOS6530n_OUT_PA_CB(WRITE8(beta_state, riot_pa_w))
 	MCFG_MOS6530n_IN_PB_CB(READ8(beta_state, riot_pb_r))
@@ -376,5 +376,5 @@ ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY    FULLNAME    FLAGS */
-COMP( 1984, beta,   0,      0,      beta,   beta, driver_device,   0,    "Pitronics", "Beta", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT STATE       INIT  COMPANY      FULLNAME  FLAGS
+COMP( 1984, beta,   0,      0,      beta,   beta, beta_state, 0,    "Pitronics", "Beta",   MACHINE_SUPPORTS_SAVE )

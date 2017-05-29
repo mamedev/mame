@@ -6,9 +6,8 @@
 
 **********************************************************************/
 
-
-#ifndef __ELECTRON_PLUS3__
-#define __ELECTRON_PLUS3__
+#ifndef MAME_BUS_ELECTRON_PLUS3_H
+#define MAME_BUS_ELECTRON_PLUS3_H
 
 #include "exp.h"
 #include "machine/wd_fdc.h"
@@ -42,7 +41,7 @@ protected:
 
 private:
 	required_memory_region m_exp_rom;
-	required_device<wd1770_t> m_fdc;
+	required_device<wd1770_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	optional_device<floppy_connector> m_floppy1;
 
@@ -51,7 +50,7 @@ private:
 
 
 // device type definition
-extern const device_type ELECTRON_PLUS3;
+DECLARE_DEVICE_TYPE(ELECTRON_PLUS3, electron_plus3_device)
 
 
-#endif /* __ELECTRON_PLUS3__ */
+#endif // MAME_BUS_ELECTRON_PLUS3_H

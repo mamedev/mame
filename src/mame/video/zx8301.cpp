@@ -52,7 +52,7 @@ static const rgb_t PALETTE_ZX8301[] =
 //**************************************************************************
 
 // devices
-const device_type ZX8301 = device_creator<zx8301_device>;
+DEFINE_DEVICE_TYPE(ZX8301, zx8301_device, "zx8301", "Sinclair ZX8301")
 
 
 // default address map
@@ -107,7 +107,7 @@ inline void zx8301_device::writebyte(offs_t address, uint8_t data)
 //-------------------------------------------------
 
 zx8301_device::zx8301_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ZX8301, "Sinclair ZX8301", tag, owner, clock, "zx8301", __FILE__)
+	: device_t(mconfig, ZX8301, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
 	, device_video_interface(mconfig, *this)
 	, m_space_config("videoram", ENDIANNESS_LITTLE, 8, 17, 0, nullptr, *ADDRESS_MAP_NAME(zx8301))

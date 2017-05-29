@@ -41,7 +41,7 @@ static INPUT_PORTS_START( gamepock )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( gamepock, gamepock_state )
+static MACHINE_CONFIG_START( gamepock )
 	MCFG_CPU_ADD("maincpu", UPD78C06, XTAL_6MHz)    /* uPD78C06AG */
 	MCFG_CPU_PROGRAM_MAP( gamepock_mem)
 	MCFG_UPD7810_PORTA_WRITE_CB(WRITE8(gamepock_state, port_a_w))
@@ -80,4 +80,4 @@ ROM_START( gamepock )
 ROM_END
 
 
-CONS( 1984, gamepock, 0, 0, gamepock, gamepock, driver_device, 0, "Epoch", "Game Pocket Computer", 0 )
+CONS( 1984, gamepock, 0, 0, gamepock, gamepock, gamepock_state, 0, "Epoch", "Game Pocket Computer", 0 )

@@ -593,9 +593,9 @@ void comx35_state::machine_reset()
 //  MACHINE_CONFIG( pal )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( pal, comx35_state )
+static MACHINE_CONFIG_START( pal )
 	// basic system hardware
-	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, CDP1869_CPU_CLK_PAL)
+	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, cdp1869_device::CPU_CLK_PAL)
 	MCFG_CPU_PROGRAM_MAP(comx35_mem)
 	MCFG_CPU_IO_MAP(comx35_io)
 	MCFG_COSMAC_WAIT_CALLBACK(VCC)
@@ -609,7 +609,7 @@ static MACHINE_CONFIG_START( pal, comx35_state )
 	MCFG_FRAGMENT_ADD(comx35_pal_video)
 
 	// peripheral hardware
-	MCFG_DEVICE_ADD(CDP1871_TAG, CDP1871, CDP1869_CPU_CLK_PAL/8)
+	MCFG_DEVICE_ADD(CDP1871_TAG, CDP1871, cdp1869_device::CPU_CLK_PAL/8)
 	MCFG_CDP1871_D1_CALLBACK(IOPORT("D1"))
 	MCFG_CDP1871_D2_CALLBACK(IOPORT("D2"))
 	MCFG_CDP1871_D3_CALLBACK(IOPORT("D3"))
@@ -643,9 +643,9 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( ntsc )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( ntsc, comx35_state )
+static MACHINE_CONFIG_START( ntsc )
 	// basic system hardware
-	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, CDP1869_CPU_CLK_NTSC)
+	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, cdp1869_device::CPU_CLK_NTSC)
 	MCFG_CPU_PROGRAM_MAP(comx35_mem)
 	MCFG_CPU_IO_MAP(comx35_io)
 	MCFG_COSMAC_WAIT_CALLBACK(VCC)
@@ -659,7 +659,7 @@ static MACHINE_CONFIG_START( ntsc, comx35_state )
 	MCFG_FRAGMENT_ADD(comx35_ntsc_video)
 
 	// peripheral hardware
-	MCFG_DEVICE_ADD(CDP1871_TAG, CDP1871, CDP1869_CPU_CLK_PAL/8)
+	MCFG_DEVICE_ADD(CDP1871_TAG, CDP1871, cdp1869_device::CPU_CLK_PAL/8)
 	MCFG_CDP1871_D1_CALLBACK(IOPORT("D1"))
 	MCFG_CDP1871_D2_CALLBACK(IOPORT("D2"))
 	MCFG_CDP1871_D3_CALLBACK(IOPORT("D3"))
@@ -720,6 +720,6 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT     INIT  COMPANY                         FULLNAME            FLAGS
-COMP( 1983, comx35p,    0,      0,      pal,        comx35, driver_device,   0, "Comx World Operations Ltd",    "COMX 35 (PAL)",    MACHINE_IMPERFECT_SOUND )
-COMP( 1983, comx35n,    comx35p,0,      ntsc,       comx35, driver_device,   0, "Comx World Operations Ltd",    "COMX 35 (NTSC)",   MACHINE_IMPERFECT_SOUND )
+//    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT   STATE         INIT  COMPANY                         FULLNAME            FLAGS
+COMP( 1983, comx35p,    0,      0,      pal,        comx35, comx35_state, 0,    "Comx World Operations Ltd",    "COMX 35 (PAL)",    MACHINE_IMPERFECT_SOUND )
+COMP( 1983, comx35n,    comx35p,0,      ntsc,       comx35, comx35_state, 0,    "Comx World Operations Ltd",    "COMX 35 (NTSC)",   MACHINE_IMPERFECT_SOUND )

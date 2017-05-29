@@ -14,10 +14,10 @@ Konami 037122
 
 #define K037122_NUM_TILES       16384
 
-const device_type K037122 = device_creator<k037122_device>;
+DEFINE_DEVICE_TYPE(K037122, k037122_device, "k037122", "K037122 2D Tilemap")
 
 k037122_device::k037122_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, K037122, "K037122 2D Tilemap", tag, owner, clock, "k037122", __FILE__),
+	: device_t(mconfig, K037122, tag, owner, clock),
 	device_video_interface(mconfig, *this),
 	device_gfx_interface(mconfig, *this, nullptr),
 	m_tile_ram(nullptr),
@@ -57,7 +57,7 @@ void k037122_device::device_start()
 	m_layer[0]->set_transparent_pen(0);
 	m_layer[1]->set_transparent_pen(0);
 
-	set_gfx(m_gfx_index,std::make_unique<gfx_element>(palette(), k037122_char_layout, (uint8_t*)m_char_ram.get(), 0, palette().entries() / 16, 0));
+	set_gfx(m_gfx_index,std::make_unique<gfx_element>(&palette(), k037122_char_layout, (uint8_t*)m_char_ram.get(), 0, palette().entries() / 16, 0));
 
 	save_pointer(NAME(m_reg.get()), 0x400 / 4);
 	save_pointer(NAME(m_char_ram.get()), 0x200000 / 4);

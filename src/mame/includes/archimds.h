@@ -100,7 +100,7 @@ public:
 protected:
 	required_device<cpu_device> m_maincpu;
 	optional_device<i2cmem_device> m_i2cmem;
-	optional_device<wd1772_t> m_fdc;
+	optional_device<wd1772_device> m_fdc;
 	optional_device<floppy_connector> m_floppy0;
 	optional_device<floppy_connector> m_floppy1;
 	required_memory_region m_region_maincpu;

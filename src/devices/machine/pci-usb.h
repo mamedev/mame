@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#ifndef PCI_USB_H
-#define PCI_USB_H
+#ifndef MAME_MACHINE_PCI_USB_H
+#define MAME_MACHINE_PCI_USB_H
+
+#pragma once
 
 #include "pci.h"
 
@@ -50,8 +52,8 @@ private:
 	DECLARE_ADDRESS_MAP(map, 32);
 };
 
-extern const device_type USB_OHCI;
-extern const device_type USB_UHCI;
-extern const device_type USB_EHCI;
+DECLARE_DEVICE_TYPE(USB_OHCI, usb_ohci_device)
+DECLARE_DEVICE_TYPE(USB_UHCI, usb_uhci_device)
+DECLARE_DEVICE_TYPE(USB_EHCI, usb_ehci_device)
 
-#endif
+#endif // MAME_MACHINE_PCI_USB_H

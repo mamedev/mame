@@ -43,7 +43,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_sn1_ready);
 	DECLARE_WRITE_LINE_MEMBER(write_sn2_ready);
 	DECLARE_WRITE_LINE_MEMBER(write_sn3_ready);
-	DECLARE_READ8_MEMBER(t0_r);
+	DECLARE_READ_LINE_MEMBER(t0_r);
 	DECLARE_WRITE8_MEMBER(soundtrigger_w);
 	DECLARE_WRITE8_MEMBER(irq_mask_w);
 	DECLARE_WRITE8_MEMBER(flip_screen_w);

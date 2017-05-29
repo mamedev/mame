@@ -45,89 +45,87 @@
 //  constructor
 //-------------------------------------------------
 
-const device_type NES_NROM = device_creator<nes_nrom_device>;
-const device_type NES_NROM368 = device_creator<nes_nrom368_device>;
-const device_type NES_FCBASIC = device_creator<nes_fcbasic_device>;
-const device_type NES_AXROM = device_creator<nes_axrom_device>;
-const device_type NES_BXROM = device_creator<nes_bxrom_device>;
-const device_type NES_CNROM = device_creator<nes_cnrom_device>;
-const device_type NES_CPROM = device_creator<nes_cprom_device>;
-const device_type NES_GXROM = device_creator<nes_gxrom_device>;
-const device_type NES_UXROM = device_creator<nes_uxrom_device>;
-const device_type NES_UXROM_CC = device_creator<nes_uxrom_cc_device>;
-const device_type NES_UN1ROM = device_creator<nes_un1rom_device>;
-const device_type NES_NOCHR = device_creator<nes_nochr_device>;
+DEFINE_DEVICE_TYPE(NES_NROM,     nes_nrom_device,     "nes_nrom",     "NES Cart NROM PCB")
+DEFINE_DEVICE_TYPE(NES_NROM368,  nes_nrom368_device,  "nes_nrom368",  "NES Cart NROM-368 PCB")
+DEFINE_DEVICE_TYPE(NES_FCBASIC,  nes_fcbasic_device,  "nes_fcbasic",  "NES Cart Famicom BASIC PCB")
+DEFINE_DEVICE_TYPE(NES_AXROM,    nes_axrom_device,    "nes_axrom",    "NES Cart AxROM PCB")
+DEFINE_DEVICE_TYPE(NES_BXROM,    nes_bxrom_device,    "nes_bxrom",    "NES Cart BxROM PCB")
+DEFINE_DEVICE_TYPE(NES_CNROM,    nes_cnrom_device,    "nes_cnrom",    "NES Cart CNROM PCB")
+DEFINE_DEVICE_TYPE(NES_CPROM,    nes_cprom_device,    "nes_cprom",    "NES Cart CPROM PCB")
+DEFINE_DEVICE_TYPE(NES_GXROM,    nes_gxrom_device,    "nes_gxrom",    "NES Cart GxROM PCB")
+DEFINE_DEVICE_TYPE(NES_UXROM,    nes_uxrom_device,    "nes_uxrom",    "NES Cart UxROM PCB")
+DEFINE_DEVICE_TYPE(NES_UXROM_CC, nes_uxrom_cc_device, "nes_uxrom_cc", "NES Cart UNROM M5 (Crazy Climber) PCB")
+DEFINE_DEVICE_TYPE(NES_UN1ROM,   nes_un1rom_device,   "nes_un1rom",   "NES Cart UN1ROM PCB")
+DEFINE_DEVICE_TYPE(NES_NOCHR,    nes_nochr_device,    "nes_nochr",    "NES Cart NoCash NOCHR PCB")
 
 
-nes_nrom_device::nes_nrom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-						device_nes_cart_interface( mconfig, *this )
+nes_nrom_device::nes_nrom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock), device_nes_cart_interface(mconfig, *this)
 {
 }
 
 nes_nrom_device::nes_nrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: device_t(mconfig, NES_NROM, "NES Cart NROM PCB", tag, owner, clock, "nes_nrom", __FILE__),
-						device_nes_cart_interface( mconfig, *this )
+	: nes_nrom_device(mconfig, NES_NROM, tag, owner, clock)
 {
 }
 
 nes_nrom368_device::nes_nrom368_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_NROM368, "NES Cart NROM-368 PCB", tag, owner, clock, "nes_nrom368", __FILE__)
+	: nes_nrom_device(mconfig, NES_NROM368, tag, owner, clock)
 {
 }
 
 nes_fcbasic_device::nes_fcbasic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_FCBASIC, "NES Cart Famicom BASIC PCB", tag, owner, clock, "nes_fcbasic", __FILE__)
+	: nes_nrom_device(mconfig, NES_FCBASIC, tag, owner, clock)
 {
 }
 
 nes_axrom_device::nes_axrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_AXROM, "NES Cart AxROM PCB", tag, owner, clock, "nes_axrom", __FILE__)
+	: nes_nrom_device(mconfig, NES_AXROM, tag, owner, clock)
 {
 }
 
 nes_bxrom_device::nes_bxrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_BXROM, "NES Cart BxROM PCB", tag, owner, clock, "nes_bxrom", __FILE__)
+	: nes_nrom_device(mconfig, NES_BXROM, tag, owner, clock)
 {
 }
 
-nes_cnrom_device::nes_cnrom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-					: nes_nrom_device(mconfig, type, name, tag, owner, clock, shortname, source), m_chr_open_bus(0)
-				{
+nes_cnrom_device::nes_cnrom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: nes_nrom_device(mconfig, type, tag, owner, clock), m_chr_open_bus(0)
+{
 }
 
 nes_cnrom_device::nes_cnrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_CNROM, "NES Cart CNROM PCB", tag, owner, clock, "nes_cnrom", __FILE__), m_chr_open_bus(0)
-				{
+	: nes_cnrom_device(mconfig, NES_CNROM, tag, owner, clock)
+{
 }
 
 nes_cprom_device::nes_cprom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_CPROM, "NES Cart CPROM PCB", tag, owner, clock, "nes_cprom", __FILE__)
+	: nes_nrom_device(mconfig, NES_CPROM, tag, owner, clock)
 {
 }
 
 nes_gxrom_device::nes_gxrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_GXROM, "NES Cart GxROM PCB", tag, owner, clock, "nes_gxrom", __FILE__)
+	: nes_nrom_device(mconfig, NES_GXROM, tag, owner, clock)
 {
 }
 
 nes_uxrom_device::nes_uxrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_UXROM, "NES Cart UxROM PCB", tag, owner, clock, "nes_uxrom", __FILE__)
+	: nes_nrom_device(mconfig, NES_UXROM, tag, owner, clock)
 {
 }
 
 nes_uxrom_cc_device::nes_uxrom_cc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_UXROM_CC, "NES Cart UNROM M5 PCB (Crazy Climber)", tag, owner, clock, "nes_uxrom_cc", __FILE__)
+	: nes_nrom_device(mconfig, NES_UXROM_CC, tag, owner, clock)
 {
 }
 
 nes_un1rom_device::nes_un1rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_UN1ROM, "NES Cart UN1ROM PCB", tag, owner, clock, "nes_un1rom", __FILE__)
+	: nes_nrom_device(mconfig, NES_UN1ROM, tag, owner, clock)
 {
 }
 
 nes_nochr_device::nes_nochr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_NOCHR, "NES Cart NoCash NOCHR PCB", tag, owner, clock, "nes_nochr", __FILE__)
+	: nes_nrom_device(mconfig, NES_NOCHR, tag, owner, clock)
 {
 }
 

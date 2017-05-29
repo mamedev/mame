@@ -306,6 +306,7 @@ namespace netlist
 		, m_N(*this, "N", 1)
 		, m_func(*this, "FUNC", "A0")
 		, m_Q(*this, "Q")
+		, m_compiled(this->name() + ".FUNCC", this, this->netlist().state())
 		{
 			std::vector<pstring> inps;
 			for (int i=0; i < m_N(); i++)
@@ -315,7 +316,7 @@ namespace netlist
 				inps.push_back(n);
 				m_vals.push_back(0.0);
 			}
-			m_precompiled.compile(inps, m_func());
+			m_compiled.compile(inps, m_func());
 		}
 
 	protected:
@@ -331,7 +332,7 @@ namespace netlist
 		std::vector<std::unique_ptr<analog_input_t>> m_I;
 
 		std::vector<double> m_vals;
-		plib::pfunction m_precompiled;
+		plib::pfunction m_compiled;
 	};
 
 	// -----------------------------------------------------------------------------

@@ -24,7 +24,7 @@
 
 
 // devices
-const device_type HD44352 = device_creator<hd44352_device>;
+DEFINE_DEVICE_TYPE(HD44352, hd44352_device, "hd44352", "Hitachi HD44352 LCD Controller")
 
 //**************************************************************************
 //  live device
@@ -35,7 +35,7 @@ const device_type HD44352 = device_creator<hd44352_device>;
 //-------------------------------------------------
 
 hd44352_device::hd44352_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock):
-	device_t(mconfig, HD44352, "hd44352", tag, owner, clock, "hd44352", __FILE__),
+	device_t(mconfig, HD44352, tag, owner, clock),
 	m_on_cb(*this),
 	m_char_rom(*this, DEVICE_SELF)
 {

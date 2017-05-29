@@ -6,13 +6,11 @@
 
 ***************************************************************************/
 
+#ifndef MAME_BUS_APRICOT_EXPANSION_CARDS_H
+#define MAME_BUS_APRICOT_EXPANSION_CARDS_H
+
 #pragma once
-
-#ifndef __APRICOT_CARDS_H__
-#define __APRICOT_CARDS_H__
-
-#include "ram.h"
 
 SLOT_INTERFACE_EXTERN( apricot_expansion_cards );
 
-#endif // __APRICOT_CARDS_H__
+#endif // MAME_BUS_APRICOT_EXPANSION_CARDS_H

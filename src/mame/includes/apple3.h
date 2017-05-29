@@ -69,7 +69,7 @@ public:
 	required_device<via6522_device> m_via_0;
 	required_device<via6522_device> m_via_1;
 	required_device<mos6551_device> m_acia;
-	required_device<appleiii_fdc> m_fdc;
+	required_device<appleiii_fdc_device> m_fdc;
 	required_device<ay3600_device> m_ay3600;
 	required_device<a2bus_device> m_a2bus;
 	required_device<mm58167_device> m_rtc;

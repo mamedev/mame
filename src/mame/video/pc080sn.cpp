@@ -49,10 +49,10 @@ Control registers
 #define PC080SN_RAM_SIZE 0x10000
 #define TOPSPEED_ROAD_COLORS
 
-const device_type PC080SN = device_creator<pc080sn_device>;
+DEFINE_DEVICE_TYPE(PC080SN, pc080sn_device, "pc080sn", "Taito PC080SN")
 
 pc080sn_device::pc080sn_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, PC080SN, "Taito PC080SN", tag, owner, clock, "pc080sn", __FILE__),
+	: device_t(mconfig, PC080SN, tag, owner, clock),
 	m_ram(nullptr),
 	m_gfxnum(0),
 	m_x_offset(0),

@@ -702,7 +702,7 @@ GFXDECODE_END
 *              Machine Drivers               *
 *********************************************/
 
-static MACHINE_CONFIG_START( megadpkr, blitz_state )
+static MACHINE_CONFIG_START( megadpkr )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, CPU_CLOCK)
@@ -833,6 +833,6 @@ ROM_END
 *                Game Drivers                *
 *********************************************/
 
-/*    YEAR  NAME       PARENT    MACHINE   INPUT     STATE          INIT  ROT     COMPANY              FULLNAME                                    FLAGS */
-GAME( 1990, megadpkr,  0,        megadpkr, megadpkr, driver_device, 0,    ROT0,  "Blitz System Inc.", "Mega Double Poker (conversion kit, set 1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1990, megadpkrb, megadpkr, megadpkr, megadpkr, driver_device, 0,    ROT0,  "Blitz System Inc.", "Mega Double Poker (conversion kit, set 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+/*    YEAR  NAME       PARENT    MACHINE   INPUT     STATE        INIT  ROT    COMPANY              FULLNAME                                     FLAGS */
+GAME( 1990, megadpkr,  0,        megadpkr, megadpkr, blitz_state, 0,    ROT0,  "Blitz System Inc.", "Mega Double Poker (conversion kit, set 1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1990, megadpkrb, megadpkr, megadpkr, megadpkr, blitz_state, 0,    ROT0,  "Blitz System Inc.", "Mega Double Poker (conversion kit, set 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

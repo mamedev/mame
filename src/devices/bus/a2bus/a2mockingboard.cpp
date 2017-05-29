@@ -30,11 +30,11 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_MOCKINGBOARD = device_creator<a2bus_mockingboard_device>;
-const device_type A2BUS_PHASOR = device_creator<a2bus_phasor_device>;
-const device_type A2BUS_ECHOPLUS = device_creator<a2bus_echoplus_device>;
+DEFINE_DEVICE_TYPE(A2BUS_MOCKINGBOARD, a2bus_mockingboard_device, "a2mockbd", "Sweet Micro Systems Mockingboard")
+DEFINE_DEVICE_TYPE(A2BUS_PHASOR,       a2bus_phasor_device,       "a2phasor", "Applied Engineering Phasor")
+DEFINE_DEVICE_TYPE(A2BUS_ECHOPLUS,     a2bus_echoplus_device,     "a2echop",  "Street Electronics Echo Plus")
 
-MACHINE_CONFIG_FRAGMENT( mockingboard )
+MACHINE_CONFIG_START( mockingboard )
 	MCFG_DEVICE_ADD(VIA1_TAG, VIA6522, 1022727)
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(a2bus_ayboard_device, via1_out_a))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(a2bus_ayboard_device, via1_out_b))
@@ -52,7 +52,7 @@ MACHINE_CONFIG_FRAGMENT( mockingboard )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_FRAGMENT( phasor )
+MACHINE_CONFIG_START( phasor )
 	MCFG_DEVICE_ADD(VIA1_TAG, VIA6522, 1022727)
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(a2bus_ayboard_device, via1_out_a))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(a2bus_ayboard_device, via1_out_b))
@@ -75,7 +75,7 @@ MACHINE_CONFIG_FRAGMENT( phasor )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker2", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_FRAGMENT( echoplus )
+MACHINE_CONFIG_START( echoplus )
 	MCFG_DEVICE_ADD(VIA1_TAG, VIA6522, 1022727)
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(a2bus_ayboard_device, via1_out_a))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(a2bus_ayboard_device, via1_out_b))
@@ -121,8 +121,8 @@ machine_config_constructor a2bus_echoplus_device::device_mconfig_additions() con
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_ayboard_device::a2bus_ayboard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+a2bus_ayboard_device::a2bus_ayboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this),
 	m_via1(*this, VIA1_TAG),
 	m_via2(*this, VIA2_TAG),
@@ -134,21 +134,21 @@ a2bus_ayboard_device::a2bus_ayboard_device(const machine_config &mconfig, device
 }
 
 a2bus_mockingboard_device::a2bus_mockingboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	a2bus_ayboard_device(mconfig, A2BUS_MOCKINGBOARD, "Sweet Micro Systems Mockingboard", tag, owner, clock, "a2mockbd", __FILE__)
+	a2bus_ayboard_device(mconfig, A2BUS_MOCKINGBOARD, tag, owner, clock)
 {
 	m_isPhasor = false;
 	m_PhasorNative = false;
 }
 
 a2bus_phasor_device::a2bus_phasor_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	a2bus_ayboard_device(mconfig, A2BUS_PHASOR, "Applied Engineering Phasor", tag, owner, clock, "a2phasor", __FILE__)
+	a2bus_ayboard_device(mconfig, A2BUS_PHASOR, tag, owner, clock)
 {
 	m_isPhasor = true;
 	m_PhasorNative = false;
 }
 
 a2bus_echoplus_device::a2bus_echoplus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	a2bus_ayboard_device(mconfig, A2BUS_ECHOPLUS, "Street Electronics Echo Plus", tag, owner, clock, "a2echop", __FILE__),
+	a2bus_ayboard_device(mconfig, A2BUS_ECHOPLUS, tag, owner, clock),
 	m_tms(*this, E2P_TMS_TAG)
 {
 	m_isPhasor = false;

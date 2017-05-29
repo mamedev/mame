@@ -737,7 +737,7 @@ GFXDECODE_END
 *      Machine Drivers      *
 ****************************/
 
-static MACHINE_CONFIG_START( magic10, magic10_state )
+static MACHINE_CONFIG_START( magic10 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, CPU_CLOCK)  // 10 MHz.
 	MCFG_CPU_PROGRAM_MAP(magic10_map)
@@ -760,7 +760,7 @@ static MACHINE_CONFIG_START( magic10, magic10_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH)   /* clock frequency & pin 7 not verified */
+	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH)   /* clock frequency & pin 7 not verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1492,7 +1492,7 @@ DRIVER_INIT_MEMBER(magic10_state, altaten)
 *        Game Drivers         *
 ******************************/
 
-/*     YEAR  NAME      PARENT    MACHINE   INPUT     STATE          INIT      ROT    COMPANY                 FULLNAME                         FLAGS            LAYOUT  */
+//     YEAR  NAME      PARENT    MACHINE   INPUT     STATE          INIT      ROT   COMPANY                 FULLNAME                          FLAGS            LAYOUT
 GAMEL( 1995, magic10,  0,        magic10,  magic10,  magic10_state, magic10,  ROT0, "A.W.P. Games",         "Magic's 10 (ver. 16.55)",        0,               layout_sgsafari )
 GAMEL( 1995, magic10a, magic10,  magic10,  magic10,  magic10_state, magic10,  ROT0, "A.W.P. Games",         "Magic's 10 (ver. 16.54)",        0,               layout_sgsafari )
 GAMEL( 1995, magic10b, magic10,  magic10a, magic10,  magic10_state, magic10,  ROT0, "A.W.P. Games",         "Magic's 10 (ver. 16.45)",        0,               layout_sgsafari )

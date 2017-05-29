@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "lpc-pit.h"
 
-const device_type LPC_PIT = device_creator<lpc_pit_device>;
+DEFINE_DEVICE_TYPE(LPC_PIT, lpc_pit_device, "lpc_pit", "LPC PIT")
 
 DEVICE_ADDRESS_MAP_START(map, 32, lpc_pit_device)
 	AM_RANGE(0x40, 0x43) AM_READWRITE8(status_r, access_w,  0x00ffffff)
@@ -13,7 +13,7 @@ DEVICE_ADDRESS_MAP_START(map, 32, lpc_pit_device)
 ADDRESS_MAP_END
 
 lpc_pit_device::lpc_pit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: lpc_device(mconfig, LPC_PIT, "LPC PIT", tag, owner, clock, "lpc_pit", __FILE__)
+	: lpc_device(mconfig, LPC_PIT, tag, owner, clock)
 {
 }
 

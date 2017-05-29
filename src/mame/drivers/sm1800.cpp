@@ -153,7 +153,7 @@ static GFXDECODE_START( sm1800 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( sm1800, sm1800_state )
+static MACHINE_CONFIG_START( sm1800 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8080, XTAL_2MHz)
 	MCFG_CPU_PROGRAM_MAP(sm1800_mem)
@@ -198,5 +198,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( ????, sm1800,  0,       0,     sm1800,    sm1800, driver_device,     0,   "<unknown>", "SM1800", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT   STATE           INIT   COMPANY      FULLNAME   FLAGS */
+COMP( ????, sm1800,  0,      0,       sm1800,    sm1800, sm1800_state,   0,     "<unknown>", "SM1800",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

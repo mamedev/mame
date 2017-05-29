@@ -17,8 +17,10 @@
  *  It also monitors all I/O port writes, so that it can restore them when resuming the current application.
  */
 
-#ifndef MFACE2_H_
-#define MFACE2_H_
+#ifndef MAME_BUS_CPC_MFACE2_H
+#define MAME_BUS_CPC_MFACE2_H
+
+#pragma once
 
 #include "cpcexp.h"
 
@@ -62,6 +64,6 @@ private:
 };
 
 // device type definition
-extern const device_type CPC_MFACE2;
+DECLARE_DEVICE_TYPE(CPC_MFACE2, cpc_multiface2_device)
 
-#endif /* MFACE2_H_ */
+#endif // MAME_BUS_CPC_MFACE2_H

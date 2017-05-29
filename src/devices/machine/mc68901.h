@@ -33,10 +33,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_MC68901_H
+#define MAME_MACHINE_MC68901_H
 
-#ifndef __MC68901__
-#define __MC68901__
+#pragma once
 
 
 
@@ -98,15 +98,15 @@ public:
 	static void set_timer_clock(device_t &device, int timer_clock) { downcast<mc68901_device &>(device).m_timer_clock = timer_clock; }
 	static void set_rx_clock(device_t &device, int rx_clock) { downcast<mc68901_device &>(device).m_rx_clock = rx_clock; }
 	static void set_tx_clock(device_t &device, int tx_clock) { downcast<mc68901_device &>(device).m_tx_clock = tx_clock; }
-	template<class _Object> static devcb_base &set_out_irq_callback(device_t &device, _Object object) { return downcast<mc68901_device &>(device).m_out_irq_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_gpio_callback(device_t &device, _Object object) { return downcast<mc68901_device &>(device).m_out_gpio_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_tao_callback(device_t &device, _Object object) { return downcast<mc68901_device &>(device).m_out_tao_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_tbo_callback(device_t &device, _Object object) { return downcast<mc68901_device &>(device).m_out_tbo_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_tco_callback(device_t &device, _Object object) { return downcast<mc68901_device &>(device).m_out_tco_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_tdo_callback(device_t &device, _Object object) { return downcast<mc68901_device &>(device).m_out_tdo_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_so_callback(device_t &device, _Object object) { return downcast<mc68901_device &>(device).m_out_so_cb.set_callback(object); }
-	//template<class _Object> static devcb_base &set_rr_callback(device_t &device, _Object object) { return downcast<mc68901_device &>(device).m_out_rr_cb.set_callback(object); }
-	//template<class _Object> static devcb_base &set_tr_callback(device_t &device, _Object object) { return downcast<mc68901_device &>(device).m_out_tr_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_out_irq_callback(device_t &device, Object &&cb) { return downcast<mc68901_device &>(device).m_out_irq_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_gpio_callback(device_t &device, Object &&cb) { return downcast<mc68901_device &>(device).m_out_gpio_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_tao_callback(device_t &device, Object &&cb) { return downcast<mc68901_device &>(device).m_out_tao_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_tbo_callback(device_t &device, Object &&cb) { return downcast<mc68901_device &>(device).m_out_tbo_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_tco_callback(device_t &device, Object &&cb) { return downcast<mc68901_device &>(device).m_out_tco_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_tdo_callback(device_t &device, Object &&cb) { return downcast<mc68901_device &>(device).m_out_tdo_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_so_callback(device_t &device, Object &&cb) { return downcast<mc68901_device &>(device).m_out_so_cb.set_callback(std::forward<Object>(cb)); }
+	//template <class Object> static devcb_base &set_rr_callback(device_t &device, Object &&cb) { return downcast<mc68901_device &>(device).m_out_rr_cb.set_callback(std::forward<Object>(cb)); }
+	//template <class Object> static devcb_base &set_tr_callback(device_t &device, Object &&cb) { return downcast<mc68901_device &>(device).m_out_tr_cb.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -303,8 +303,6 @@ private:
 
 
 // device type definition
-extern const device_type MC68901;
+DECLARE_DEVICE_TYPE(MC68901, mc68901_device)
 
-
-
-#endif
+#endif // MAME_MACHINE_MC68901_H

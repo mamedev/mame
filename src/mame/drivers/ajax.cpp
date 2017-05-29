@@ -167,7 +167,7 @@ WRITE8_MEMBER(ajax_state::volume_callback1)
 }
 
 
-static MACHINE_CONFIG_START( ajax, ajax_state )
+static MACHINE_CONFIG_START( ajax )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI, XTAL_24MHz/2/4)    /* 052001 12/4 MHz*/
@@ -377,6 +377,6 @@ ROM_START( ajaxj )
 ROM_END
 
 
-GAME( 1987, ajax,    0,    ajax, ajax, driver_device, 0, ROT90, "Konami", "Ajax", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, typhoon, ajax, ajax, ajax, driver_device, 0, ROT90, "Konami", "Typhoon", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ajaxj,   ajax, ajax, ajax, driver_device, 0, ROT90, "Konami", "Ajax (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ajax,    0,    ajax, ajax, ajax_state, 0, ROT90, "Konami", "Ajax", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, typhoon, ajax, ajax, ajax, ajax_state, 0, ROT90, "Konami", "Typhoon", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ajaxj,   ajax, ajax, ajax, ajax_state, 0, ROT90, "Konami", "Ajax (Japan)", MACHINE_SUPPORTS_SAVE )

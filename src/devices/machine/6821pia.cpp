@@ -40,10 +40,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type PIA6821 = device_creator<pia6821_device>;
-
-template class device_finder<pia6821_device, false>;
-template class device_finder<pia6821_device, true>;
+DEFINE_DEVICE_TYPE(PIA6821, pia6821_device, "pia6821", "6821 PIA")
 
 
 //-------------------------------------------------
@@ -51,7 +48,7 @@ template class device_finder<pia6821_device, true>;
 //-------------------------------------------------
 
 pia6821_device::pia6821_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, PIA6821, "6821 PIA", tag, owner, clock, "pia6821", __FILE__),
+	: device_t(mconfig, PIA6821, tag, owner, clock),
 		m_in_a_handler(*this),
 		m_in_b_handler(*this),
 		m_in_ca1_handler(*this),

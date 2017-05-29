@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_CENTRONICS_EPSON_EX800_H
+#define MAME_BUS_CENTRONICS_EPSON_EX800_H
 
-#ifndef __EPSON_EX800__
-#define __EPSON_EX800__
+#pragma once
 
 #include "ctronics.h"
 #include "cpu/upd7810/upd7810.h"
@@ -21,14 +21,14 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> epson_ex800_t
+// ======================> epson_ex800_device
 
-class epson_ex800_t :  public device_t,
+class epson_ex800_device :  public device_t,
 						public device_centronics_peripheral_interface
 {
 public:
 	// construction/destruction
-	epson_ex800_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	epson_ex800_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -67,8 +67,8 @@ private:
 
 
 // device type definition
-extern const device_type EPSON_EX800;
+DECLARE_DEVICE_TYPE(EPSON_EX800, epson_ex800_device)
 
 
 
-#endif
+#endif // MAME_BUS_CENTRONICS_EPSON_EX800_H

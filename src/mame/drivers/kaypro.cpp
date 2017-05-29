@@ -71,7 +71,7 @@ static ADDRESS_MAP_START( kayproii_io, AS_IO, 8, kaypro_state )
 	AM_RANGE(0x04, 0x07) AM_READWRITE(kaypro_sio_r, kaypro_sio_w)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("z80pio_g", z80pio_device, read_alt, write_alt)
 	AM_RANGE(0x0c, 0x0f) AM_DEVWRITE("brg", com8116_device, str_w)
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("fdc", fd1793_t, read, write)
+	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("fdc", fd1793_device, read, write)
 	AM_RANGE(0x1c, 0x1f) AM_DEVREADWRITE("z80pio_s", z80pio_device, read_alt, write_alt)
 ADDRESS_MAP_END
 
@@ -82,7 +82,7 @@ static ADDRESS_MAP_START( kaypro2x_io, AS_IO, 8, kaypro_state )
 	AM_RANGE(0x04, 0x07) AM_READWRITE(kaypro_sio_r, kaypro_sio_w)
 	AM_RANGE(0x08, 0x0b) AM_DEVWRITE("brg", com8116_device, stt_w)
 	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE("z80sio_2x", z80sio0_device, ba_cd_r, ba_cd_w)
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("fdc", fd1793_t, read, write)
+	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("fdc", fd1793_device, read, write)
 	AM_RANGE(0x14, 0x17) AM_READWRITE(kaypro2x_system_port_r,kaypro2x_system_port_w)
 	AM_RANGE(0x18, 0x1b) AM_DEVWRITE("cent_data_out", output_latch_device, write)
 	AM_RANGE(0x1c, 0x1c) AM_READWRITE(kaypro2x_status_r,kaypro2x_index_w)
@@ -195,7 +195,7 @@ static SLOT_INTERFACE_START( kaypro_floppies )
 SLOT_INTERFACE_END
 
 
-static MACHINE_CONFIG_START( kayproii, kaypro_state )
+static MACHINE_CONFIG_START( kayproii )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_20MHz / 8)
 	MCFG_CPU_PROGRAM_MAP(kaypro_map)
@@ -265,7 +265,7 @@ static MACHINE_CONFIG_DERIVED( kaypro4, kayproii )
 	MCFG_Z80PIO_OUT_PA_CB(WRITE8(kaypro_state, kaypro4_pio_system_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( kaypro2x, kaypro_state )
+static MACHINE_CONFIG_START( kaypro2x )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(kaypro_map)
@@ -454,13 +454,13 @@ ROM_START(robie)
 	ROM_LOAD("81-235.u9",    0x0000, 0x1000, CRC(5f72da5b) SHA1(8a597000cce1a7e184abfb7bebcb564c6bf24fb7) )
 ROM_END
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT    CLASS         INIT         COMPANY                 FULLNAME */
-COMP( 1982, kayproii,   0,        0,    kayproii, kay_kbd, kaypro_state, kaypro, "Non Linear Systems",  "Kaypro II - 2/83" , 0 )
-COMP( 1983, kaypro4,    kayproii, 0,    kaypro4,  kay_kbd, kaypro_state, kaypro, "Non Linear Systems",  "Kaypro 4 - 4/83" , 0 ) // model 81-004
-COMP( 1983, kaypro4p88, kayproii, 0,    kaypro4,  kay_kbd, kaypro_state, kaypro, "Non Linear Systems",  "Kaypro 4 plus88 - 4/83" , MACHINE_NOT_WORKING ) // model 81-004 with an added 8088 daughterboard and rom
-COMP( 198?, omni2,      kayproii, 0,    omni2,    kay_kbd, kaypro_state, kaypro, "Non Linear Systems",  "Omni II Logic Analyzer" , 0 )
-COMP( 1984, kaypro2x,   0,        0,    kaypro2x, kay_kbd, kaypro_state, kaypro, "Non Linear Systems",  "Kaypro 2x" , MACHINE_NOT_WORKING ) // model 81-025
-COMP( 1984, kaypro4a,   kaypro2x, 0,    kaypro2x, kay_kbd, kaypro_state, kaypro, "Non Linear Systems",  "Kaypro 4 - 4/84" , MACHINE_NOT_WORKING ) // model 81-015
+/*    YEAR  NAME        PARENT    COMPAT  MACHINE   INPUT    CLASS         INIT    COMPANY                FULLNAME */
+COMP( 1982, kayproii,   0,        0,      kayproii, kay_kbd, kaypro_state, kaypro, "Non Linear Systems",  "Kaypro II - 2/83" , 0 )
+COMP( 1983, kaypro4,    kayproii, 0,      kaypro4,  kay_kbd, kaypro_state, kaypro, "Non Linear Systems",  "Kaypro 4 - 4/83" , 0 ) // model 81-004
+COMP( 1983, kaypro4p88, kayproii, 0,      kaypro4,  kay_kbd, kaypro_state, kaypro, "Non Linear Systems",  "Kaypro 4 plus88 - 4/83" , MACHINE_NOT_WORKING ) // model 81-004 with an added 8088 daughterboard and rom
+COMP( 198?, omni2,      kayproii, 0,      omni2,    kay_kbd, kaypro_state, kaypro, "Non Linear Systems",  "Omni II Logic Analyzer" , 0 )
+COMP( 1984, kaypro2x,   0,        0,      kaypro2x, kay_kbd, kaypro_state, kaypro, "Non Linear Systems",  "Kaypro 2x" , MACHINE_NOT_WORKING ) // model 81-025
+COMP( 1984, kaypro4a,   kaypro2x, 0,      kaypro2x, kay_kbd, kaypro_state, kaypro, "Non Linear Systems",  "Kaypro 4 - 4/84" , MACHINE_NOT_WORKING ) // model 81-015
 // Kaypro 4/84 plus 88 goes here, model 81-015 with an added 8088 daughterboard and rom
-COMP( 1983, kaypro10,   0,        0,    kaypro10, kay_kbd, kaypro_state, kaypro, "Non Linear Systems",  "Kaypro 10" , MACHINE_NOT_WORKING ) // model 81-005
-COMP( 1984, robie,      0,        0,    kaypro2x, kay_kbd, kaypro_state, kaypro, "Non Linear Systems",  "Kaypro Robie" , MACHINE_NOT_WORKING ) // model 81-005
+COMP( 1983, kaypro10,   0,        0,      kaypro10, kay_kbd, kaypro_state, kaypro, "Non Linear Systems",  "Kaypro 10" , MACHINE_NOT_WORKING ) // model 81-005
+COMP( 1984, robie,      0,        0,      kaypro2x, kay_kbd, kaypro_state, kaypro, "Non Linear Systems",  "Kaypro Robie" , MACHINE_NOT_WORKING ) // model 81-005

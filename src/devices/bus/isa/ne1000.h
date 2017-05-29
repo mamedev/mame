@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
-#ifndef __NE1000_H__
-#define __NE1000_H__
+#ifndef MAME_BUS_ISA_NE1000_H
+#define MAME_BUS_ISA_NE1000_H
+
+#pragma once
 
 // NE1000 is 8bit has 8KB ram; NE2000 is 16bit has 16KB ram
 
@@ -31,6 +33,6 @@ private:
 	uint8_t m_prom[16];
 };
 
-extern const device_type NE1000;
+DECLARE_DEVICE_TYPE(NE1000, ne1000_device)
 
-#endif
+#endif // MAME_BUS_ISA_NE1000_H

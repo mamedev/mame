@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Ariane Fugmann
-#pragma once
-
 #ifndef MAME_AUDIO_VICDUAL_97271P_H
 #define MAME_AUDIO_VICDUAL_97271P_H
+
+#pragma once
 
 #include "sound/samples.h"
 
@@ -20,9 +20,6 @@ public:
 	// construction/destruction
 	s97271p_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
 	// daughterboard logic
 	void port_w(uint8_t data);
 
@@ -30,6 +27,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	required_device<samples_device> m_samples;
@@ -38,6 +36,6 @@ private:
 };
 
 // device type definition
-extern const device_type S97271P;
+DECLARE_DEVICE_TYPE(S97271P, s97271p_device)
 
-#endif  /* MAME_AUDIO_VICDUAL_97271P_H */
+#endif // MAME_AUDIO_VICDUAL_97271P_H

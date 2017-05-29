@@ -368,7 +368,7 @@ static GFXDECODE_START( madalien )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_FRAGMENT( madalien_video )
+MACHINE_CONFIG_START( madalien_video )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 336, 0, 256, 288, 0, 256)
 	MCFG_SCREEN_UPDATE_DRIVER(madalien_state, screen_update_madalien)

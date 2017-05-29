@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:smf
-#ifndef __CLOCK_H__
-#define __CLOCK_H__
+#ifndef MAME_MACHINE_CLOCK_H
+#define MAME_MACHINE_CLOCK_H
 
 #pragma once
 
@@ -17,7 +17,7 @@ class clock_device : public device_t
 public:
 	clock_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_signal_handler(device_t &device, _Object object) { return downcast<clock_device &>(device).m_signal_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_signal_handler(device_t &device, Object &&cb) { return downcast<clock_device &>(device).m_signal_handler.set_callback(std::forward<Object>(cb)); }
 
 protected:
 	virtual void device_start() override;
@@ -34,6 +34,6 @@ private:
 	devcb_write_line m_signal_handler;
 };
 
-extern const device_type CLOCK;
+DECLARE_DEVICE_TYPE(CLOCK, clock_device)
 
-#endif
+#endif // MAME_MACHINE_CLOCK_H

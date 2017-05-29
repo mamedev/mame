@@ -28,7 +28,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type GENERIC_SOCKET = device_creator<generic_slot_device>;
+DEFINE_DEVICE_TYPE(GENERIC_SOCKET, generic_slot_device, "generic_socket", "Generic ROM Socket / RAM Socket / Cartridge Slot")
 
 
 //-------------------------------------------------
@@ -85,15 +85,16 @@ void device_generic_cart_interface::ram_alloc(uint32_t size)
 //  generic_slot_device - constructor
 //-------------------------------------------------
 generic_slot_device::generic_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-						device_t(mconfig, GENERIC_SOCKET, "Generic ROM Socket / RAM Socket / Cartridge Slot", tag, owner, clock, "generic_socket", __FILE__),
-						device_image_interface(mconfig, *this),
-						device_slot_interface(mconfig, *this),
-						m_interface(nullptr),
-						m_default_card("rom"),
-						m_extensions("bin"),
-						m_must_be_loaded(false),
-						m_width(GENERIC_ROM8_WIDTH),
-						m_endianness(ENDIANNESS_LITTLE), m_cart(nullptr)
+	device_t(mconfig, GENERIC_SOCKET, tag, owner, clock),
+	device_image_interface(mconfig, *this),
+	device_slot_interface(mconfig, *this),
+	m_interface(nullptr),
+	m_default_card("rom"),
+	m_extensions("bin"),
+	m_must_be_loaded(false),
+	m_width(GENERIC_ROM8_WIDTH),
+	m_endianness(ENDIANNESS_LITTLE),
+	m_cart(nullptr)
 {
 }
 

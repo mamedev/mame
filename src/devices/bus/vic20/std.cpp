@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type VIC20_STD = device_creator<vic20_standard_cartridge_device>;
+DEFINE_DEVICE_TYPE(VIC20_STD, vic20_standard_cartridge_device, "vic20_standard", "VIC-20 Standard Cartridge")
 
 
 
@@ -28,8 +28,7 @@ const device_type VIC20_STD = device_creator<vic20_standard_cartridge_device>;
 //-------------------------------------------------
 
 vic20_standard_cartridge_device::vic20_standard_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, VIC20_STD, "VIC-20 Standard Cartridge", tag, owner, clock, "vic20_standard", __FILE__),
-		device_vic20_expansion_card_interface(mconfig, *this)
+	: device_t(mconfig, VIC20_STD, tag, owner, clock), device_vic20_expansion_card_interface(mconfig, *this)
 {
 }
 

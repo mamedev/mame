@@ -21,7 +21,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type NAMCO_C139 = device_creator<namco_c139_device>;
+DEFINE_DEVICE_TYPE(NAMCO_C139, namco_c139_device, "namco_c139", "Namco C139 Serial")
 
 
 //**************************************************************************
@@ -45,7 +45,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 namco_c139_device::namco_c139_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, NAMCO_C139, "namco_c139_longname", tag, owner, clock, "namco_c139", __FILE__),
+	: device_t(mconfig, NAMCO_C139, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	m_space_config("data", ENDIANNESS_BIG, 16, 14, 0, *ADDRESS_MAP_NAME(data_map))
 {

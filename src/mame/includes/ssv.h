@@ -3,6 +3,7 @@
 #include "cpu/upd7725/upd7725.h"
 #include "video/st0020.h"
 #include "machine/eepromser.h"
+#include "machine/upd4701.h"
 #include "sound/es5506.h"
 #include "screen.h"
 
@@ -15,6 +16,7 @@ public:
 		m_ensoniq(*this, "ensoniq"),
 		m_eeprom(*this, "eeprom"),
 		m_dsp(*this, "dsp"),
+		m_upd4701(*this, "upd4701"),
 		m_mainram(*this, "mainram"),
 		m_spriteram(*this, "spriteram"),
 		m_scroll(*this, "scroll"),
@@ -30,8 +32,6 @@ public:
 		m_io_key3(*this, "KEY3"),
 		m_io_service(*this, "SERVICE"),
 		m_io_paddle(*this, "PADDLE"),
-		m_io_trackx(*this, "TRACKX"),
-		m_io_tracky(*this, "TRACKY"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette")
@@ -41,6 +41,7 @@ public:
 	required_device<es5506_device> m_ensoniq;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 	optional_device<upd96050_device> m_dsp;
+	optional_device<upd4701_device> m_upd4701;
 
 	required_shared_ptr<uint16_t> m_mainram;
 	required_shared_ptr<uint16_t> m_spriteram;
@@ -91,9 +92,8 @@ public:
 	DECLARE_WRITE32_MEMBER(latch32_w);
 	DECLARE_READ16_MEMBER(latch16_r);
 	DECLARE_WRITE16_MEMBER(latch16_w);
-	DECLARE_WRITE16_MEMBER(eaglshot_gfxrom_bank_w);
-	DECLARE_READ16_MEMBER(eaglshot_trackball_r);
-	DECLARE_WRITE16_MEMBER(eaglshot_trackball_w);
+	DECLARE_WRITE8_MEMBER(eaglshot_gfxrom_bank_w);
+	DECLARE_WRITE8_MEMBER(eaglshot_trackball_w);
 	DECLARE_READ16_MEMBER(eaglshot_gfxram_r);
 	DECLARE_WRITE16_MEMBER(eaglshot_gfxram_w);
 	DECLARE_WRITE16_MEMBER(gdfs_tmapram_w);
@@ -158,8 +158,6 @@ protected:
 	optional_ioport m_io_key3;
 	optional_ioport m_io_service;
 	optional_ioport m_io_paddle;
-	optional_ioport m_io_trackx;
-	optional_ioport m_io_tracky;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;

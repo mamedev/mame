@@ -1,8 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli
-#ifndef __A78_CARTS_H
-#define __A78_CARTS_H
+#ifndef MAME_BUS_A7800_A78_CARTS_H
+#define MAME_BUS_A7800_A78_CARTS_H
 
+#pragma once
 
 #include "rom.h"
 #include "xboard.h"
@@ -36,4 +37,4 @@ SLOT_INTERFACE_END
 // supported devices
 SLOT_INTERFACE_EXTERN(a78_cart);
 
-#endif
+#endif // MAME_BUS_A7800_A78_CARTS_H

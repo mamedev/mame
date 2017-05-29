@@ -5,10 +5,10 @@
     ISA 8 bit XT Hard Disk Controller
 
 **********************************************************************/
-#pragma once
+#ifndef MAME_BUS_ISA_HDC_H
+#define MAME_BUS_ISA_HDC_H
 
-#ifndef ISA_HDC_H
-#define ISA_HDC_H
+#pragma once
 
 #include "isa.h"
 #include "imagedev/harddriv.h"
@@ -31,10 +31,9 @@ class xt_hdc_device :
 public:
 	// construction/destruction
 	xt_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	xt_hdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
-	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<xt_hdc_device &>(device).m_irq_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_drq_handler(device_t &device, _Object object) { return downcast<xt_hdc_device &>(device).m_drq_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb) { return downcast<xt_hdc_device &>(device).m_irq_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_drq_handler(device_t &device, Object &&cb) { return downcast<xt_hdc_device &>(device).m_drq_handler.set_callback(std::forward<Object>(cb)); }
 
 	int dack_r();
 	int dack_rs();
@@ -53,6 +52,8 @@ public:
 	bool install_rom() { return (m_type != EC1841); }
 
 protected:
+	xt_hdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -132,9 +133,9 @@ protected:
 	devcb_write_line m_drq_handler;
 };
 
-extern const device_type XT_HDC;
-extern const device_type EC1841_HDC;
-extern const device_type ST11M_HDC;
+DECLARE_DEVICE_TYPE(XT_HDC,     xt_hdc_device)
+DECLARE_DEVICE_TYPE(EC1841_HDC, ec1841_device)
+DECLARE_DEVICE_TYPE(ST11M_HDC,  st11m_device)
 
 // ======================> isa8_hdc_device
 
@@ -143,30 +144,32 @@ class isa8_hdc_device :
 		public device_isa8_card_interface
 {
 public:
-		// construction/destruction
-		isa8_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-		isa8_hdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+	// construction/destruction
+	isa8_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-		DECLARE_READ8_MEMBER(pc_hdc_r);
-		DECLARE_WRITE8_MEMBER(pc_hdc_w);
-		DECLARE_WRITE_LINE_MEMBER(irq_w);
-		DECLARE_WRITE_LINE_MEMBER(drq_w);
-		required_device<xt_hdc_device> m_hdc;
+	DECLARE_READ8_MEMBER(pc_hdc_r);
+	DECLARE_WRITE8_MEMBER(pc_hdc_w);
+	DECLARE_WRITE_LINE_MEMBER(irq_w);
+	DECLARE_WRITE_LINE_MEMBER(drq_w);
+	required_device<xt_hdc_device> m_hdc;
 
-		// optional information overrides
-		virtual machine_config_constructor device_mconfig_additions() const override;
-		virtual const tiny_rom_entry *device_rom_region() const override;
-		virtual ioport_constructor device_input_ports() const override;
+	// optional information overrides
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual ioport_constructor device_input_ports() const override;
+
 protected:
-		// device-level overrides
-		virtual void device_start() override;
-		virtual void device_reset() override;
-public:
-		virtual uint8_t dack_r(int line) override;
-		virtual void dack_w(int line,uint8_t data) override;
-		uint8_t pc_hdc_dipswitch_r();
+	isa8_hdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-		int dip;                /* dip switches */
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+public:
+	virtual uint8_t dack_r(int line) override;
+	virtual void dack_w(int line,uint8_t data) override;
+	uint8_t pc_hdc_dipswitch_r();
+
+	int dip;                /* dip switches */
 };
 
 
@@ -182,7 +185,7 @@ public:
 };
 
 // device type definition
-extern const device_type ISA8_HDC;
-extern const device_type ISA8_HDC_EC1841;
+DECLARE_DEVICE_TYPE(ISA8_HDC,        isa8_hdc_device)
+DECLARE_DEVICE_TYPE(ISA8_HDC_EC1841, isa8_hdc_ec1841_device)
 
-#endif  /* ISA_HDC_H */
+#endif // MAME_BUS_ISA_HDC_H

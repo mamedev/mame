@@ -523,7 +523,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(thedealr_state::thedealr_interrupt)
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( thedealr, thedealr_state )
+static MACHINE_CONFIG_START( thedealr )
 
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", R65C02, XTAL_16MHz/8)   // 2 MHz?
@@ -592,4 +592,4 @@ ROM_START( thedealr )
 	ROM_LOAD( "xb0-u68.u68", 0x200, 0x200, CRC(c0c54d43) SHA1(5ce352fb888c8e683014c73e6da00ec95f2ae572) )
 ROM_END
 
-GAME( 1988?, thedealr, 0, thedealr, thedealr, driver_device, 0, ROT0, "Visco Games", "The Dealer (Visco)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988?, thedealr, 0, thedealr, thedealr, thedealr_state, 0, ROT0, "Visco Games", "The Dealer (Visco)", MACHINE_SUPPORTS_SAVE )

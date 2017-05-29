@@ -5,6 +5,11 @@
     Sega G-80 raster hardware
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_SEGAG80R_H
+#define MAME_INCLUDES_SEGAG80R_H
+
+#pragma once
+
 #include "sound/samples.h"
 #include "machine/segag80.h"
 #include "sound/sn76496.h"
@@ -114,7 +119,6 @@ public:
 	DECLARE_WRITE8_MEMBER(spaceod_sound_w);
 	DECLARE_READ8_MEMBER(n7751_rom_r);
 	DECLARE_READ8_MEMBER(n7751_command_r);
-	DECLARE_READ8_MEMBER(n7751_t1_r);
 	DECLARE_INPUT_CHANGED_MEMBER(service_switch);
 	DECLARE_WRITE8_MEMBER(usb_ram_w);
 	DECLARE_WRITE8_MEMBER(sindbadm_soundport_w);
@@ -158,6 +162,7 @@ public:
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	emu_timer *m_vblank_latch_clear_timer;
 };
 
 
@@ -185,7 +190,7 @@ private:
 	TIMER_CALLBACK_MEMBER( sega005_auto_timer );
 };
 
-extern const device_type SEGA005;
+DECLARE_DEVICE_TYPE(SEGA005, sega005_sound_device)
 
 
 MACHINE_CONFIG_EXTERN( astrob_sound_board );
@@ -200,3 +205,5 @@ MACHINE_CONFIG_EXTERN( monsterb_sound_board );
 #define G80_BACKGROUND_MONSTERB     2
 #define G80_BACKGROUND_PIGNEWT      3
 #define G80_BACKGROUND_SINDBADM     4
+
+#endif // MAME_INCLUDES_SEGAG80R_H

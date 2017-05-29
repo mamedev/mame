@@ -81,31 +81,28 @@ emu::detail::device_registrar const registered_device_types;
 //  from the provided config
 //-------------------------------------------------
 
-device_t::device_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, const char *shortname, const char *source)
-	: m_type(type),
-		m_name(name),
-		m_shortname(shortname),
-		m_searchpath(shortname),
-		m_source(source),
-		m_owner(owner),
-		m_next(nullptr),
+device_t::device_t(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: m_type(type)
+	, m_searchpath(type.shortname())
+	, m_owner(owner)
+	, m_next(nullptr)
 
-		m_configured_clock(clock),
-		m_unscaled_clock(clock),
-		m_clock(clock),
-		m_clock_scale(1.0),
-		m_attoseconds_per_clock((clock == 0) ? 0 : HZ_TO_ATTOSECONDS(clock)),
+	, m_configured_clock(clock)
+	, m_unscaled_clock(clock)
+	, m_clock(clock)
+	, m_clock_scale(1.0)
+	, m_attoseconds_per_clock((clock == 0) ? 0 : HZ_TO_ATTOSECONDS(clock))
 
-		m_machine_config(mconfig),
-		m_input_defaults(nullptr),
-		m_default_bios_tag(""),
+	, m_machine_config(mconfig)
+	, m_input_defaults(nullptr)
+	, m_default_bios_tag("")
 
-		m_machine(nullptr),
-		m_save(nullptr),
-		m_basetag(tag),
-		m_config_complete(false),
-		m_started(false),
-		m_auto_finder_list(nullptr)
+	, m_machine(nullptr)
+	, m_save(nullptr)
+	, m_basetag(tag)
+	, m_config_complete(false)
+	, m_started(false)
+	, m_auto_finder_list(nullptr)
 {
 	if (owner != nullptr)
 		m_tag.assign((owner->owner() == nullptr) ? "" : owner->tag()).append(":").append(tag);
@@ -645,6 +642,20 @@ machine_config_constructor device_t::device_mconfig_additions() const
 {
 	// none by default
 	return nullptr;
+}
+
+
+//-------------------------------------------------
+//  device_add_mconfig - add device-specific
+//  machine configuration
+//-------------------------------------------------
+
+void device_t::device_add_mconfig(machine_config &config)
+{
+	// backwards-compatibility for devices using free functions
+	machine_config_constructor const additions(device_mconfig_additions());
+	if (additions)
+		additions(config, this, nullptr);
 }
 
 

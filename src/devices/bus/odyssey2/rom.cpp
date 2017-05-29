@@ -17,32 +17,30 @@
 //  o2_rom_device - constructor
 //-------------------------------------------------
 
-const device_type O2_ROM_STD = device_creator<o2_rom_device>;
-const device_type O2_ROM_12K = device_creator<o2_rom12_device>;
-const device_type O2_ROM_16K = device_creator<o2_rom16_device>;
+DEFINE_DEVICE_TYPE(O2_ROM_STD, o2_rom_device,   "o2_rom",   "Odyssey 2 Standard Carts")
+DEFINE_DEVICE_TYPE(O2_ROM_12K, o2_rom12_device, "o2_rom12", "Odyssey 2 12K Carts")
+DEFINE_DEVICE_TYPE(O2_ROM_16K, o2_rom16_device, "o2_rom16", "Odyssey 2 16K Carts")
 
 
-o2_rom_device::o2_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_o2_cart_interface(mconfig, *this),
-		m_bank_base(0)
+o2_rom_device::o2_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_o2_cart_interface(mconfig, *this)
+	, m_bank_base(0)
 {
 }
 
 o2_rom_device::o2_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: device_t(mconfig, O2_ROM_STD, "Odyssey 2 Standard Carts", tag, owner, clock, "o2_rom", __FILE__),
-						device_o2_cart_interface( mconfig, *this ),
-	m_bank_base(0)
-				{
+	: o2_rom_device(mconfig, O2_ROM_STD, tag, owner, clock)
+{
 }
 
 o2_rom12_device::o2_rom12_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: o2_rom_device(mconfig, O2_ROM_12K, "Odyssey 2 12K Carts", tag, owner, clock, "o2_rom12", __FILE__)
+	: o2_rom_device(mconfig, O2_ROM_12K, tag, owner, clock)
 {
 }
 
 o2_rom16_device::o2_rom16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: o2_rom_device(mconfig, O2_ROM_16K, "Odyssey 2 16K Carts", tag, owner, clock, "o2_rom16", __FILE__)
+	: o2_rom_device(mconfig, O2_ROM_16K, tag, owner, clock)
 {
 }
 

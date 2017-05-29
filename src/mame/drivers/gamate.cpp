@@ -14,8 +14,11 @@
  ******************************************************************************/
 
 #include "emu.h"
-#include "includes/gamate.h"
+#include "audio/gamate.h"
 
+#include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
+#include "cpu/m6502/m6502.h"
 #include "rendlay.h"
 #include "screen.h"
 #include "softlist.h"
@@ -374,7 +377,7 @@ INTERRUPT_GEN_MEMBER(gamate_state::gamate_interrupt)
 {
 }
 
-static MACHINE_CONFIG_START( gamate, gamate_state )
+static MACHINE_CONFIG_START( gamate )
 	MCFG_CPU_ADD("maincpu", M6502, 4433000/2)
 	MCFG_CPU_PROGRAM_MAP(gamate_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gamate_state,  gamate_interrupt)
@@ -430,5 +433,5 @@ ROM_START(gamate)
 ROM_END
 
 
-/*    YEAR  NAME     PARENT  COMPAT    MACHINE  INPUT   CLASS         INIT      COMPANY    FULLNAME */
-CONS( 1990, gamate,  0,      0,        gamate,  gamate, gamate_state, gamate, "Bit Corp", "Gamate", 0)
+//    YEAR  NAME     PARENT  COMPAT    MACHINE  INPUT   CLASS         INIT    COMPANY     FULLNAME  FLAGS
+CONS( 1990, gamate,  0,      0,        gamate,  gamate, gamate_state, gamate, "Bit Corp", "Gamate", 0 )

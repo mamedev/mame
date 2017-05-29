@@ -191,7 +191,7 @@ WRITE8_MEMBER( aliens_state::banking_callback )
 	m_rombank->set_entry(data & 0x1f);
 }
 
-static MACHINE_CONFIG_START( aliens, aliens_state )
+static MACHINE_CONFIG_START( aliens )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI, XTAL_24MHz/2/4)       /* 052001 (verified on pcb) */
@@ -479,10 +479,10 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1990, aliens,   0,      aliens, aliens, driver_device, 0, ROT0, "Konami", "Aliens (World set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, aliens2,  aliens, aliens, aliens, driver_device, 0, ROT0, "Konami", "Aliens (World set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, aliens3,  aliens, aliens, aliens, driver_device, 0, ROT0, "Konami", "Aliens (World set 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, aliensu,  aliens, aliens, aliens, driver_device, 0, ROT0, "Konami", "Aliens (US)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1990, aliensj,  aliens, aliens, aliens, driver_device, 0, ROT0, "Konami", "Aliens (Japan set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, aliensj2, aliens, aliens, aliens, driver_device, 0, ROT0, "Konami", "Aliens (Japan set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, aliensa,  aliens, aliens, aliens, driver_device, 0, ROT0, "Konami", "Aliens (Asia)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1990, aliens,   0,      aliens, aliens, aliens_state, 0, ROT0, "Konami", "Aliens (World set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, aliens2,  aliens, aliens, aliens, aliens_state, 0, ROT0, "Konami", "Aliens (World set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, aliens3,  aliens, aliens, aliens, aliens_state, 0, ROT0, "Konami", "Aliens (World set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, aliensu,  aliens, aliens, aliens, aliens_state, 0, ROT0, "Konami", "Aliens (US)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1990, aliensj,  aliens, aliens, aliens, aliens_state, 0, ROT0, "Konami", "Aliens (Japan set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, aliensj2, aliens, aliens, aliens, aliens_state, 0, ROT0, "Konami", "Aliens (Japan set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, aliensa,  aliens, aliens, aliens, aliens_state, 0, ROT0, "Konami", "Aliens (Asia)",        MACHINE_SUPPORTS_SAVE )

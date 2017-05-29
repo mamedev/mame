@@ -6,10 +6,10 @@ Seiko/Epson S-3520CF
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_S3520CF_H
+#define MAME_MACHINE_S3520CF_H
 
-#ifndef __S3520CFDEV_H__
-#define __S3520CFDEV_H__
+#pragma once
 
 
 
@@ -17,24 +17,12 @@ Seiko/Epson S-3520CF
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_S3520CF_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, S3520CF, XTAL_32_768kHz)
+#define MCFG_S3520CF_ADD(tag) \
+		MCFG_DEVICE_ADD((tag), S3520CF, XTAL_32_768kHz)
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
-
-enum s3520cf_state_t
-{
-	RTC_SET_ADDRESS = 0,
-	RTC_SET_DATA
-};
-
-struct rtc_regs_t
-{
-	uint8_t sec, min, hour, day, wday, month, year;
-};
-
 
 // ======================> s3520cf_device
 
@@ -53,6 +41,17 @@ public:
 	TIMER_CALLBACK_MEMBER(timer_callback);
 
 protected:
+	enum state_t
+	{
+		RTC_SET_ADDRESS = 0,
+		RTC_SET_DATA
+	};
+
+	struct rtc_regs_t
+	{
+		uint8_t sec, min, hour, day, wday, month, year;
+	};
+
 	// device-level overrides
 	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override;
@@ -69,21 +68,14 @@ protected:
 	uint8_t m_rtc_addr;
 	uint8_t m_mode, m_sysr;
 
-	s3520cf_state_t m_rtc_state;
+	state_t m_rtc_state;
 	rtc_regs_t m_rtc;
 
+	emu_timer *m_timer;
 };
 
 
 // device type definition
-extern const device_type S3520CF;
+DECLARE_DEVICE_TYPE(S3520CF, s3520cf_device)
 
-
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-
-
-#endif
+#endif // MAME_MACHINE_S3520CF_H

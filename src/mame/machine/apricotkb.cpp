@@ -23,7 +23,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type APRICOT_KEYBOARD = device_creator<apricot_keyboard_device>;
+DEFINE_DEVICE_TYPE(APRICOT_KEYBOARD, apricot_keyboard_device, "aprikb", "Apricot Keyboard")
 
 
 //-------------------------------------------------
@@ -64,26 +64,15 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( apricot_keyboard )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( apricot_keyboard )
+MACHINE_CONFIG_MEMBER( apricot_keyboard_device::device_add_mconfig )
 #ifdef UPD7507_EMULATED
 	MCFG_CPU_ADD(UPD7507C_TAG, UPD7507, XTAL_32_768kHz)
 	MCFG_CPU_IO_MAP(apricot_keyboard_io)
 #endif
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor apricot_keyboard_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( apricot_keyboard );
-}
 
 
 //-------------------------------------------------
@@ -247,7 +236,7 @@ ioport_constructor apricot_keyboard_device::device_input_ports() const
 //-------------------------------------------------
 
 apricot_keyboard_device::apricot_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, APRICOT_KEYBOARD, "Apricot Keyboard", tag, owner, clock, "aprikb", __FILE__),
+	device_t(mconfig, APRICOT_KEYBOARD, tag, owner, clock),
 	m_write_txd(*this),
 	m_y(*this, "Y%u", 0),
 	m_modifiers(*this, "MODIFIERS")

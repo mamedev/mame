@@ -9,34 +9,39 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "crsshair.h"
-#include "emuopts.h"
-#include "natkeyboard.h"
-#include "mame.h"
-#include "luaengine.h"
-#include "ui/menu.h"
-#include "ui/filemngr.h"
+#include "ui/mainmenu.h"
+
 #include "ui/barcode.h"
 #include "ui/cheatopt.h"
+#include "ui/datmenu.h"
+#include "ui/filemngr.h"
 #include "ui/info.h"
 #include "ui/info_pty.h"
+#include "ui/inifile.h"
 #include "ui/inputmap.h"
-#include "ui/mainmenu.h"
 #include "ui/miscmenu.h"
+#include "ui/pluginopt.h"
 #include "ui/selgame.h"
 #include "ui/simpleselgame.h"
 #include "ui/sliders.h"
 #include "ui/slotopt.h"
 #include "ui/tapectrl.h"
 #include "ui/videoopt.h"
-#include "imagedev/cassette.h"
+
+#include "mame.h"
+#include "luaengine.h"
+
 #include "machine/bcreader.h"
-#include "ui/inifile.h"
-#include "ui/datmenu.h"
-#include "ui/pluginopt.h"
+#include "imagedev/cassette.h"
+
+#include "crsshair.h"
+#include "dipty.h"
+#include "emuopts.h"
+#include "natkeyboard.h"
 
 
 namespace ui {
+
 /***************************************************************************
     MENU HANDLERS
 ***************************************************************************/

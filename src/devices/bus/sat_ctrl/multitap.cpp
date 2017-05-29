@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SATURN_MULTITAP = device_creator<saturn_multitap_device>;
+DEFINE_DEVICE_TYPE(SATURN_MULTITAP, saturn_multitap_device, "saturn_multitap", "Sega Saturn Multitap")
 
 
 //**************************************************************************
@@ -27,7 +27,7 @@ const device_type SATURN_MULTITAP = device_creator<saturn_multitap_device>;
 //-------------------------------------------------
 
 saturn_multitap_device::saturn_multitap_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, SATURN_MULTITAP, "Sega Saturn Multitap", tag, owner, clock, "saturn_multitap", __FILE__),
+	device_t(mconfig, SATURN_MULTITAP, tag, owner, clock),
 	device_saturn_control_port_interface(mconfig, *this),
 	m_subctrl1_port(*this, "ctrl1"),
 	m_subctrl2_port(*this, "ctrl2"),
@@ -124,7 +124,7 @@ uint8_t saturn_multitap_device::read_id(int idx)
 }
 
 
-static MACHINE_CONFIG_FRAGMENT( multitap_slot )
+static MACHINE_CONFIG_START( multitap_slot )
 	MCFG_SATURN_CONTROL_PORT_ADD("ctrl1", saturn_joys, "joypad")
 	MCFG_SATURN_CONTROL_PORT_ADD("ctrl2", saturn_joys, "joypad")
 	MCFG_SATURN_CONTROL_PORT_ADD("ctrl3", saturn_joys, "joypad")

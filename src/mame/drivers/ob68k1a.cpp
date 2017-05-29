@@ -217,7 +217,7 @@ void ob68k1a_state::machine_reset()
 //  MACHINE_CONFIG( ob68k1a )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( ob68k1a, ob68k1a_state )
+static MACHINE_CONFIG_START( ob68k1a )
 	// basic machine hardware
 	MCFG_CPU_ADD(MC68000L10_TAG, M68000, XTAL_10MHz)
 	MCFG_CPU_PROGRAM_MAP(ob68k1a_mem)
@@ -288,5 +288,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS
-COMP( 1982, ob68k1a,  0,       0,   ob68k1a,    ob68k1a, driver_device,  0,  "Omnibyte",   "OB68K1A",   MACHINE_NO_SOUND_HW )
+//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    STATE          INIT  COMPANY     FULLNAME     FLAGS
+COMP( 1982, ob68k1a,  0,       0,   ob68k1a,    ob68k1a, ob68k1a_state, 0,    "Omnibyte", "OB68K1A",   MACHINE_NO_SOUND_HW )

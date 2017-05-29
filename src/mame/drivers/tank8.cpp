@@ -326,7 +326,7 @@ static GFXDECODE_START( tank8 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( tank8, tank8_state )
+static MACHINE_CONFIG_START( tank8 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, 11055000 / 10) /* ? */
@@ -481,8 +481,8 @@ DRIVER_INIT_MEMBER(tank8_state,decode)
 }
 
 
-GAME( 1976, tank8,    0,        tank8,    tank8, driver_device,    0,         ROT0, "Atari (Kee Games)", "Tank 8 (set 1)", MACHINE_SUPPORTS_SAVE)
+GAME( 1976, tank8,    0,        tank8,    tank8, tank8_state,    0,        ROT0, "Atari (Kee Games)", "Tank 8 (set 1)",  MACHINE_SUPPORTS_SAVE)
 GAME( 1976, tank8a,   tank8,    tank8,    tank8, tank8_state,    decode,   ROT0, "Atari (Kee Games)", "Tank 8 (set 2)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1976, tank8b,   tank8,    tank8,    tank8, tank8_state,    decode,   ROT0, "Atari (Kee Games)", "Tank 8 (set 3)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1976, tank8c,   tank8,    tank8,    tank8, driver_device,    0,        ROT0, "Atari (Kee Games)", "Tank 8 (set 4)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1976, tank8d,   tank8,    tank8,    tank8, driver_device,    0,        ROT0, "Atari (Kee Games)", "Tank 8 (set 5)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1976, tank8c,   tank8,    tank8,    tank8, tank8_state,    0,        ROT0, "Atari (Kee Games)", "Tank 8 (set 4)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1976, tank8d,   tank8,    tank8,    tank8, tank8_state,    0,        ROT0, "Atari (Kee Games)", "Tank 8 (set 5)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

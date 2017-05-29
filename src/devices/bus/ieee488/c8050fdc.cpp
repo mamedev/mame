@@ -40,7 +40,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C8050_FDC = device_creator<c8050_fdc_t>;
+DEFINE_DEVICE_TYPE(C8050_FDC, c8050_fdc_device, "c8050fdc", "Commodore 8050 FDC")
 
 
 //-------------------------------------------------
@@ -57,7 +57,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const tiny_rom_entry *c8050_fdc_t::device_rom_region() const
+const tiny_rom_entry *c8050_fdc_device::device_rom_region() const
 {
 	return ROM_NAME( c8050_fdc );
 }
@@ -69,11 +69,11 @@ const tiny_rom_entry *c8050_fdc_t::device_rom_region() const
 //**************************************************************************
 
 //-------------------------------------------------
-//  c8050_fdc_t - constructor
+//  c8050_fdc_device - constructor
 //-------------------------------------------------
 
-c8050_fdc_t::c8050_fdc_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, C8050_FDC, "Commodore 8050 FDC", tag, owner, clock, "c8050fdc", __FILE__),
+c8050_fdc_device::c8050_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, C8050_FDC, tag, owner, clock),
 	m_write_sync(*this),
 	m_write_ready(*this),
 	m_write_brdy(*this),
@@ -103,7 +103,7 @@ c8050_fdc_t::c8050_fdc_t(const machine_config &mconfig, const char *tag, device_
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void c8050_fdc_t::device_start()
+void c8050_fdc_device::device_start()
 {
 	// resolve callbacks
 	m_write_sync.resolve_safe();
@@ -134,7 +134,7 @@ void c8050_fdc_t::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void c8050_fdc_t::device_reset()
+void c8050_fdc_device::device_reset()
 {
 	live_abort();
 }
@@ -144,18 +144,18 @@ void c8050_fdc_t::device_reset()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void c8050_fdc_t::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void c8050_fdc_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	live_sync();
 	live_run();
 }
 
-floppy_image_device* c8050_fdc_t::get_floppy()
+floppy_image_device* c8050_fdc_device::get_floppy()
 {
 	return cur_live.drv_sel ? m_floppy1 : m_floppy0;
 }
 
-void c8050_fdc_t::stp_w(floppy_image_device *floppy, int mtr, int &old_stp, int stp)
+void c8050_fdc_device::stp_w(floppy_image_device *floppy, int mtr, int &old_stp, int stp)
 {
 	if (mtr) return;
 
@@ -185,7 +185,7 @@ void c8050_fdc_t::stp_w(floppy_image_device *floppy, int mtr, int &old_stp, int 
 	old_stp = stp;
 }
 
-void c8050_fdc_t::stp0_w(int stp)
+void c8050_fdc_device::stp0_w(int stp)
 {
 	if (m_stp0 != stp)
 	{
@@ -196,7 +196,7 @@ void c8050_fdc_t::stp0_w(int stp)
 	}
 }
 
-void c8050_fdc_t::stp1_w(int stp)
+void c8050_fdc_device::stp1_w(int stp)
 {
 	if (m_stp1 != stp)
 	{
@@ -207,7 +207,7 @@ void c8050_fdc_t::stp1_w(int stp)
 	}
 }
 
-void c8050_fdc_t::ds_w(int ds)
+void c8050_fdc_device::ds_w(int ds)
 {
 	if (m_ds != ds)
 	{
@@ -220,7 +220,7 @@ void c8050_fdc_t::ds_w(int ds)
 	}
 }
 
-void c8050_fdc_t::set_floppy(floppy_connector *floppy0, floppy_connector *floppy1)
+void c8050_fdc_device::set_floppy(floppy_connector *floppy0, floppy_connector *floppy1)
 {
 	m_floppy0 = floppy0->get_device();
 
@@ -229,7 +229,7 @@ void c8050_fdc_t::set_floppy(floppy_connector *floppy0, floppy_connector *floppy
 	}
 }
 
-void c8050_fdc_t::live_start()
+void c8050_fdc_device::live_start()
 {
 	cur_live.tm = machine().time();
 	cur_live.state = RUNNING;
@@ -251,63 +251,63 @@ void c8050_fdc_t::live_start()
 	live_run();
 }
 
-void c8050_fdc_t::pll_reset(const attotime &when)
+void c8050_fdc_device::pll_reset(const attotime &when)
 {
 	cur_pll.reset(when);
 	cur_pll.set_clock(attotime::from_hz(clock() / (16 - m_ds)));
 }
 
-void c8050_fdc_t::pll_start_writing(const attotime &tm)
+void c8050_fdc_device::pll_start_writing(const attotime &tm)
 {
 	cur_pll.start_writing(tm);
 	pll_reset(cur_live.tm);
 }
 
-void c8050_fdc_t::pll_commit(floppy_image_device *floppy, const attotime &tm)
+void c8050_fdc_device::pll_commit(floppy_image_device *floppy, const attotime &tm)
 {
 	cur_pll.commit(floppy, tm);
 }
 
-void c8050_fdc_t::pll_stop_writing(floppy_image_device *floppy, const attotime &tm)
+void c8050_fdc_device::pll_stop_writing(floppy_image_device *floppy, const attotime &tm)
 {
 	cur_pll.stop_writing(floppy, tm);
 	pll_reset(cur_live.tm);
 }
 
-void c8050_fdc_t::pll_save_checkpoint()
+void c8050_fdc_device::pll_save_checkpoint()
 {
 	checkpoint_pll = cur_pll;
 }
 
-void c8050_fdc_t::pll_retrieve_checkpoint()
+void c8050_fdc_device::pll_retrieve_checkpoint()
 {
 	cur_pll = checkpoint_pll;
 }
 
-int c8050_fdc_t::pll_get_next_bit(attotime &tm, floppy_image_device *floppy, const attotime &limit)
+int c8050_fdc_device::pll_get_next_bit(attotime &tm, floppy_image_device *floppy, const attotime &limit)
 {
 	return cur_pll.get_next_bit(tm, floppy, limit);
 }
 
-bool c8050_fdc_t::pll_write_next_bit(bool bit, attotime &tm, floppy_image_device *floppy, const attotime &limit)
+bool c8050_fdc_device::pll_write_next_bit(bool bit, attotime &tm, floppy_image_device *floppy, const attotime &limit)
 {
 	return cur_pll.write_next_bit(bit, tm, floppy, limit);
 }
 
-void c8050_fdc_t::checkpoint()
+void c8050_fdc_device::checkpoint()
 {
 	pll_commit(get_floppy(), cur_live.tm);
 	checkpoint_live = cur_live;
 	pll_save_checkpoint();
 }
 
-void c8050_fdc_t::rollback()
+void c8050_fdc_device::rollback()
 {
 	cur_live = checkpoint_live;
 	pll_retrieve_checkpoint();
 }
 
-void c8050_fdc_t::live_delay(int state)
+void c8050_fdc_device::live_delay(int state)
 {
 	cur_live.next_state = state;
 	if(cur_live.tm != machine().time())
@@ -316,7 +316,7 @@ void c8050_fdc_t::live_delay(int state)
 		live_sync();
 }
 
-void c8050_fdc_t::live_sync()
+void c8050_fdc_device::live_sync()
 {
 	if(!cur_live.tm.is_never()) {
 		if(cur_live.tm > machine().time()) {
@@ -339,7 +339,7 @@ void c8050_fdc_t::live_sync()
 	}
 }
 
-void c8050_fdc_t::live_abort()
+void c8050_fdc_device::live_abort()
 {
 	if(!cur_live.tm.is_never() && cur_live.tm > machine().time()) {
 		rollback();
@@ -358,7 +358,7 @@ void c8050_fdc_t::live_abort()
 	cur_live.error = 1;
 }
 
-void c8050_fdc_t::live_run(const attotime &limit)
+void c8050_fdc_device::live_run(const attotime &limit)
 {
 	if(cur_live.state == IDLE || cur_live.next_state != -1)
 		return;
@@ -497,7 +497,7 @@ void c8050_fdc_t::live_run(const attotime &limit)
 	}
 }
 
-READ8_MEMBER( c8050_fdc_t::read )
+READ8_MEMBER( c8050_fdc_device::read )
 {
 	uint8_t e = checkpoint_live.e;
 	offs_t i = checkpoint_live.i;
@@ -505,7 +505,7 @@ READ8_MEMBER( c8050_fdc_t::read )
 	return GCR_DECODE(e, i);
 }
 
-WRITE8_MEMBER( c8050_fdc_t::write )
+WRITE8_MEMBER( c8050_fdc_device::write )
 {
 	if (LOG) logerror("%s %s PI %02x\n", machine().time().as_string(), machine().describe_context(), data);
 
@@ -518,19 +518,19 @@ WRITE8_MEMBER( c8050_fdc_t::write )
 	}
 }
 
-WRITE_LINE_MEMBER( c8050_fdc_t::ds0_w )
+WRITE_LINE_MEMBER( c8050_fdc_device::ds0_w )
 {
 	m_ds0 = state;
 }
 
-WRITE_LINE_MEMBER( c8050_fdc_t::ds1_w )
+WRITE_LINE_MEMBER( c8050_fdc_device::ds1_w )
 {
 	m_ds1 = state;
 
 	ds_w(m_ds1 << 1 | m_ds0);
 }
 
-WRITE_LINE_MEMBER( c8050_fdc_t::drv_sel_w )
+WRITE_LINE_MEMBER( c8050_fdc_device::drv_sel_w )
 {
 	if (m_drv_sel != state)
 	{
@@ -542,7 +542,7 @@ WRITE_LINE_MEMBER( c8050_fdc_t::drv_sel_w )
 	}
 }
 
-WRITE_LINE_MEMBER( c8050_fdc_t::mode_sel_w )
+WRITE_LINE_MEMBER( c8050_fdc_device::mode_sel_w )
 {
 	if (m_mode_sel != state)
 	{
@@ -554,7 +554,7 @@ WRITE_LINE_MEMBER( c8050_fdc_t::mode_sel_w )
 	}
 }
 
-WRITE_LINE_MEMBER( c8050_fdc_t::rw_sel_w )
+WRITE_LINE_MEMBER( c8050_fdc_device::rw_sel_w )
 {
 	if (m_rw_sel != state)
 	{
@@ -571,7 +571,7 @@ WRITE_LINE_MEMBER( c8050_fdc_t::rw_sel_w )
 	}
 }
 
-WRITE_LINE_MEMBER( c8050_fdc_t::mtr0_w )
+WRITE_LINE_MEMBER( c8050_fdc_device::mtr0_w )
 {
 	if (m_mtr0 != state)
 	{
@@ -593,7 +593,7 @@ WRITE_LINE_MEMBER( c8050_fdc_t::mtr0_w )
 	}
 }
 
-WRITE_LINE_MEMBER( c8050_fdc_t::mtr1_w )
+WRITE_LINE_MEMBER( c8050_fdc_device::mtr1_w )
 {
 	if (m_mtr1 != state)
 	{
@@ -615,7 +615,7 @@ WRITE_LINE_MEMBER( c8050_fdc_t::mtr1_w )
 	}
 }
 
-WRITE_LINE_MEMBER( c8050_fdc_t::odd_hd_w )
+WRITE_LINE_MEMBER( c8050_fdc_device::odd_hd_w )
 {
 	if (m_odd_hd != state)
 	{
@@ -629,7 +629,7 @@ WRITE_LINE_MEMBER( c8050_fdc_t::odd_hd_w )
 	}
 }
 
-WRITE_LINE_MEMBER( c8050_fdc_t::pull_sync_w )
+WRITE_LINE_MEMBER( c8050_fdc_device::pull_sync_w )
 {
 	if (LOG_MORE) logerror("%s %s PULL SYNC %u\n", machine().time().as_string(), machine().describe_context(), state);
 }

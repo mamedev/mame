@@ -652,7 +652,7 @@ static const char *const astinvad_sample_names[] =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( kamikaze, astinvad_state )
+static MACHINE_CONFIG_START( kamikaze )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK)
@@ -703,7 +703,7 @@ static MACHINE_CONFIG_DERIVED( spcking2, kamikaze )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( spaceint, astinvad_state )
+static MACHINE_CONFIG_START( spaceint )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK)        /* a guess */
@@ -847,9 +847,9 @@ DRIVER_INIT_MEMBER(astinvad_state,spcking2)
  *
  *************************************/
 
-GAME( 1980, kamikaze, 0,        kamikaze, kamikaze,  astinvad_state, kamikaze, ROT270, "Leijac Corporation", "Kamikaze", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, astinvad, kamikaze, kamikaze, astinvad,  astinvad_state, kamikaze, ROT270, "Leijac Corporation (Stern Electronics license)", "Astro Invader", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980,  kamikaze, 0,        kamikaze, kamikaze,  astinvad_state, kamikaze, ROT270, "Leijac Corporation", "Kamikaze", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980,  astinvad, kamikaze, kamikaze, astinvad,  astinvad_state, kamikaze, ROT270, "Leijac Corporation (Stern Electronics license)", "Astro Invader", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1980?, kosmokil, kamikaze, kamikaze, kamikaze,  astinvad_state, kamikaze, ROT270, "bootleg (BEM)", "Kosmo Killer", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // says >BEM< Mi Italy but it looks hacked in, dif revision of game tho.
-GAME( 1979, spcking2, 0,        spcking2, spcking2,  astinvad_state, spcking2, ROT270, "Konami", "Space King 2", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, spaceint, 0,        spaceint, spaceint,  driver_device,  0,        ROT90,  "Shoei", "Space Intruder", MACHINE_IMPERFECT_SOUND | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, spaceintj,spaceint, spaceint, spaceintj, driver_device,  0,        ROT90,  "Shoei", "Space Intruder (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1979,  spcking2, 0,        spcking2, spcking2,  astinvad_state, spcking2, ROT270, "Konami", "Space King 2", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980,  spaceint, 0,        spaceint, spaceint,  astinvad_state, 0,        ROT90,  "Shoei", "Space Intruder", MACHINE_IMPERFECT_SOUND | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1980,  spaceintj,spaceint, spaceint, spaceintj, astinvad_state, 0,        ROT90,  "Shoei", "Space Intruder (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )

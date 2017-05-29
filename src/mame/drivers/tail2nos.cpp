@@ -232,7 +232,7 @@ void tail2nos_state::machine_reset()
 	m_video_enable = 0;
 }
 
-static MACHINE_CONFIG_START( tail2nos, tail2nos_state )
+static MACHINE_CONFIG_START( tail2nos )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,XTAL_20MHz/2)    /* verified on pcb */
@@ -351,8 +351,8 @@ ROM_START( sformulaa )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "04.bin",      0x00000, 0x10000, CRC(f40e9c3c) SHA1(2ab45f46f92bce42748692cafe601c5893de127b) )
 	ROM_LOAD16_BYTE( "07.bin",      0x00001, 0x10000, CRC(d1cf6dca) SHA1(18228cc98722eb5907850e2d0317d1f4bf04fb8f) )
-	ROM_LOAD16_BYTE( "v3",           0x20000, 0x10000, CRC(e2e0abad) SHA1(1a1054bada9654484fe81fe4b4b32af5ab7b53f0) )
-	ROM_LOAD16_BYTE( "v6",           0x20001, 0x10000, CRC(069817a7) SHA1(cca382fe2a49c8c3c84b879a1c30dffff84ef406) )
+	ROM_LOAD16_BYTE( "v3",          0x20000, 0x10000, CRC(e2e0abad) SHA1(1a1054bada9654484fe81fe4b4b32af5ab7b53f0) )
+	ROM_LOAD16_BYTE( "v6",          0x20001, 0x10000, CRC(069817a7) SHA1(cca382fe2a49c8c3c84b879a1c30dffff84ef406) )
 
 	ROM_REGION16_BE( 0x80000, "user1", 0 )
 	/* extra ROM mapped at 200000 */
@@ -370,7 +370,7 @@ ROM_START( sformulaa )
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_ERASE00 )
 	ROM_LOAD( "a24",          0x00000, 0x80000, CRC(b1e9de43) SHA1(0144252dd9ed561fbebd4994cccf11f6c87e1825) )
 	ROM_LOAD( "o1s",          0x80000, 0x40000, CRC(e27a8eb4) SHA1(4fcadabf42a1c3deeb6d74d75cdbee802cf16db5) )
-	ROM_LOAD( "9.bin",           0xc0000, 0x08000, CRC(c76edc0a) SHA1(2c6c21f8d1f3bcb0f65ba5a779fe479783271e0b) ) // present on this PCB, contains Japanese text + same font as in above roms, where does it map? is there another layer?
+	ROM_LOAD( "9.bin",        0xc0000, 0x08000, CRC(c76edc0a) SHA1(2c6c21f8d1f3bcb0f65ba5a779fe479783271e0b) ) // present on this PCB, contains Japanese text + same font as in above roms, where does it map? is there another layer?
 
 	ROM_REGION( 0x80000, "gfx2", 0 )
 	ROM_LOAD( "oj1",          0x000000, 0x40000, CRC(39c36b35) SHA1(a97480696bf6d81bf415737e03cc5324d439ab84) )
@@ -380,6 +380,6 @@ ROM_START( sformulaa )
 	ROM_LOAD( "osb",          0x00000, 0x20000, CRC(d49ab2f5) SHA1(92f7f6c8f35ac39910879dd88d2cfb6db7c848c9) )
 ROM_END
 
-GAME( 1989, tail2nos, 0,        tail2nos, tail2nos, driver_device, 0, ROT90, "V-System Co.", "Tail to Nose - Great Championship", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, sformula, tail2nos, tail2nos, tail2nos, driver_device, 0, ROT90, "V-System Co.", "Super Formula (Japan, set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, sformulaa,tail2nos, tail2nos, tail2nos, driver_device, 0, ROT90, "V-System Co.", "Super Formula (Japan, set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // No Japan warning, but Japanese version
+GAME( 1989, tail2nos,  0,        tail2nos, tail2nos, tail2nos_state, 0, ROT90, "V-System Co.", "Tail to Nose - Great Championship", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, sformula,  tail2nos, tail2nos, tail2nos, tail2nos_state, 0, ROT90, "V-System Co.", "Super Formula (Japan, set 1)",      MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, sformulaa, tail2nos, tail2nos, tail2nos, tail2nos_state, 0, ROT90, "V-System Co.", "Super Formula (Japan, set 2)",      MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // No Japan warning, but Japanese version

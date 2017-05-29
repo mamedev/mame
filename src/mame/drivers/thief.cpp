@@ -387,7 +387,7 @@ static const char *const natodef_sample_names[] =
 };
 
 
-static MACHINE_CONFIG_START( thief, thief_state )
+static MACHINE_CONFIG_START( thief )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz/2)
 	MCFG_CPU_PROGRAM_MAP(thief_main_map)
 	MCFG_CPU_IO_MAP(io_map)
@@ -549,7 +549,7 @@ DRIVER_INIT_MEMBER(thief_state,thief)
 }
 
 
-GAME( 1980, sharkatt, 0,       sharkatt, sharkatt, driver_device, 0,     ROT0, "Pacific Novelty", "Shark Attack", 0 )
-GAME( 1981, thief,    0,       thief,    thief, thief_state,    thief, ROT0, "Pacific Novelty", "Thief", 0 )
-GAME( 1982, natodef,  0,       natodef,  natodef, thief_state,  thief, ROT0, "Pacific Novelty", "NATO Defense" , 0 )
-GAME( 1982, natodefa, natodef, natodef,  natodef, thief_state,  thief, ROT0, "Pacific Novelty", "NATO Defense (alternate mazes)" , 0 )
+GAME( 1980, sharkatt, 0,       sharkatt, sharkatt, thief_state, 0,     ROT0, "Pacific Novelty", "Shark Attack",                    0 )
+GAME( 1981, thief,    0,       thief,    thief,    thief_state, thief, ROT0, "Pacific Novelty", "Thief",                           0 )
+GAME( 1982, natodef,  0,       natodef,  natodef,  thief_state, thief, ROT0, "Pacific Novelty", "NATO Defense" ,                   0 )
+GAME( 1982, natodefa, natodef, natodef,  natodef,  thief_state, thief, ROT0, "Pacific Novelty", "NATO Defense (alternate mazes)" , 0 )

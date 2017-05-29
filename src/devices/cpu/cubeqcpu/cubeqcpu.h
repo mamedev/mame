@@ -8,110 +8,8 @@
 
 ***************************************************************************/
 
-#ifndef _CUBEQCPU_H
-#define _CUBEQCPU_H
-
-
-/***************************************************************************
-    COMPILE-TIME DEFINITIONS
-***************************************************************************/
-
-
-/***************************************************************************
-    GLOBAL CONSTANTS
-***************************************************************************/
-
-
-/***************************************************************************
-    REGISTER ENUMERATION
-***************************************************************************/
-
-enum
-{
-	CQUESTSND_PC = 1,
-	CQUESTSND_Q,
-	CQUESTSND_RAM0,
-	CQUESTSND_RAM1,
-	CQUESTSND_RAM2,
-	CQUESTSND_RAM3,
-	CQUESTSND_RAM4,
-	CQUESTSND_RAM5,
-	CQUESTSND_RAM6,
-	CQUESTSND_RAM7,
-	CQUESTSND_RAM8,
-	CQUESTSND_RAM9,
-	CQUESTSND_RAMA,
-	CQUESTSND_RAMB,
-	CQUESTSND_RAMC,
-	CQUESTSND_RAMD,
-	CQUESTSND_RAME,
-	CQUESTSND_RAMF,
-	CQUESTSND_RTNLATCH,
-	CQUESTSND_ADRCNTR,
-	CQUESTSND_DINLATCH
-};
-
-enum
-{
-	CQUESTROT_PC = 1,
-	CQUESTROT_Q,
-	CQUESTROT_RAM0,
-	CQUESTROT_RAM1,
-	CQUESTROT_RAM2,
-	CQUESTROT_RAM3,
-	CQUESTROT_RAM4,
-	CQUESTROT_RAM5,
-	CQUESTROT_RAM6,
-	CQUESTROT_RAM7,
-	CQUESTROT_RAM8,
-	CQUESTROT_RAM9,
-	CQUESTROT_RAMA,
-	CQUESTROT_RAMB,
-	CQUESTROT_RAMC,
-	CQUESTROT_RAMD,
-	CQUESTROT_RAME,
-	CQUESTROT_RAMF,
-	CQUESTROT_SEQCNT,
-	CQUESTROT_DYNADDR,
-	CQUESTROT_DYNDATA,
-	CQUESTROT_YRLATCH,
-	CQUESTROT_YDLATCH,
-	CQUESTROT_DINLATCH,
-	CQUESTROT_DSRCLATCH,
-	CQUESTROT_RSRCLATCH,
-	CQUESTROT_LDADDR,
-	CQUESTROT_LDDATA
-};
-
-enum
-{
-	CQUESTLIN_FGPC = 1,
-	CQUESTLIN_BGPC,
-	CQUESTLIN_Q,
-	CQUESTLIN_RAM0,
-	CQUESTLIN_RAM1,
-	CQUESTLIN_RAM2,
-	CQUESTLIN_RAM3,
-	CQUESTLIN_RAM4,
-	CQUESTLIN_RAM5,
-	CQUESTLIN_RAM6,
-	CQUESTLIN_RAM7,
-	CQUESTLIN_RAM8,
-	CQUESTLIN_RAM9,
-	CQUESTLIN_RAMA,
-	CQUESTLIN_RAMB,
-	CQUESTLIN_RAMC,
-	CQUESTLIN_RAMD,
-	CQUESTLIN_RAME,
-	CQUESTLIN_RAMF,
-	CQUESTLIN_FADLATCH,
-	CQUESTLIN_BADLATCH,
-	CQUESTLIN_SREG,
-	CQUESTLIN_XCNT,
-	CQUESTLIN_YCNT,
-	CQUESTLIN_CLATCH,
-	CQUESTLIN_ZLATCH
-};
+#ifndef MAME_CPU_CUBEQCPU_CUBEQCPU_H
+#define MAME_CPU_CUBEQCPU_CUBEQCPU_H
 
 
 /***************************************************************************
@@ -143,13 +41,38 @@ public:
 	cquestsnd_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_dac_w(device_t &device, _Object object) { return downcast<cquestsnd_cpu_device &>(device).m_dac_w.set_callback(object); }
+	template <class Object> static devcb_base &set_dac_w(device_t &device, Object &&cb) { return downcast<cquestsnd_cpu_device &>(device).m_dac_w.set_callback(std::forward<Object>(cb)); }
 	static void set_sound_region(device_t &device, const char *tag) { downcast<cquestsnd_cpu_device &>(device).m_sound_region_tag = tag; }
 
 	DECLARE_WRITE16_MEMBER(sndram_w);
 	DECLARE_READ16_MEMBER(sndram_r);
 
 protected:
+	enum
+	{
+		CQUESTSND_PC = 1,
+		CQUESTSND_Q,
+		CQUESTSND_RAM0,
+		CQUESTSND_RAM1,
+		CQUESTSND_RAM2,
+		CQUESTSND_RAM3,
+		CQUESTSND_RAM4,
+		CQUESTSND_RAM5,
+		CQUESTSND_RAM6,
+		CQUESTSND_RAM7,
+		CQUESTSND_RAM8,
+		CQUESTSND_RAM9,
+		CQUESTSND_RAMA,
+		CQUESTSND_RAMB,
+		CQUESTSND_RAMC,
+		CQUESTSND_RAMD,
+		CQUESTSND_RAME,
+		CQUESTSND_RAMF,
+		CQUESTSND_RTNLATCH,
+		CQUESTSND_ADRCNTR,
+		CQUESTSND_DINLATCH
+	};
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -211,13 +134,45 @@ public:
 	cquestrot_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_linedata_w(device_t &device, _Object object) { return downcast<cquestrot_cpu_device &>(device).m_linedata_w.set_callback(object); }
+	template <class Object> static devcb_base &set_linedata_w(device_t &device, Object &&cb) { return downcast<cquestrot_cpu_device &>(device).m_linedata_w.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ16_MEMBER(linedata_r);
 	DECLARE_WRITE16_MEMBER(rotram_w);
 	DECLARE_READ16_MEMBER(rotram_r);
 
 protected:
+	enum
+	{
+		CQUESTROT_PC = 1,
+		CQUESTROT_Q,
+		CQUESTROT_RAM0,
+		CQUESTROT_RAM1,
+		CQUESTROT_RAM2,
+		CQUESTROT_RAM3,
+		CQUESTROT_RAM4,
+		CQUESTROT_RAM5,
+		CQUESTROT_RAM6,
+		CQUESTROT_RAM7,
+		CQUESTROT_RAM8,
+		CQUESTROT_RAM9,
+		CQUESTROT_RAMA,
+		CQUESTROT_RAMB,
+		CQUESTROT_RAMC,
+		CQUESTROT_RAMD,
+		CQUESTROT_RAME,
+		CQUESTROT_RAMF,
+		CQUESTROT_SEQCNT,
+		CQUESTROT_DYNADDR,
+		CQUESTROT_DYNDATA,
+		CQUESTROT_YRLATCH,
+		CQUESTROT_YDLATCH,
+		CQUESTROT_DINLATCH,
+		CQUESTROT_DSRCLATCH,
+		CQUESTROT_RSRCLATCH,
+		CQUESTROT_LDADDR,
+		CQUESTROT_LDDATA
+	};
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -293,7 +248,7 @@ public:
 	cquestlin_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_linedata_r(device_t &device, _Object object) { return downcast<cquestlin_cpu_device &>(device).m_linedata_r.set_callback(object); }
+	template <class Object> static devcb_base &set_linedata_r(device_t &device, Object &&cb) { return downcast<cquestlin_cpu_device &>(device).m_linedata_r.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE16_MEMBER( linedata_w );
 	void cubeqcpu_swap_line_banks();
@@ -302,6 +257,36 @@ public:
 	uint32_t* cubeqcpu_get_stack_ram();
 
 protected:
+	enum
+	{
+		CQUESTLIN_FGPC = 1,
+		CQUESTLIN_BGPC,
+		CQUESTLIN_Q,
+		CQUESTLIN_RAM0,
+		CQUESTLIN_RAM1,
+		CQUESTLIN_RAM2,
+		CQUESTLIN_RAM3,
+		CQUESTLIN_RAM4,
+		CQUESTLIN_RAM5,
+		CQUESTLIN_RAM6,
+		CQUESTLIN_RAM7,
+		CQUESTLIN_RAM8,
+		CQUESTLIN_RAM9,
+		CQUESTLIN_RAMA,
+		CQUESTLIN_RAMB,
+		CQUESTLIN_RAMC,
+		CQUESTLIN_RAMD,
+		CQUESTLIN_RAME,
+		CQUESTLIN_RAMF,
+		CQUESTLIN_FADLATCH,
+		CQUESTLIN_BADLATCH,
+		CQUESTLIN_SREG,
+		CQUESTLIN_XCNT,
+		CQUESTLIN_YCNT,
+		CQUESTLIN_CLATCH,
+		CQUESTLIN_ZLATCH
+	};
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -376,9 +361,9 @@ private:
 };
 
 
-extern const device_type CQUESTSND;
-extern const device_type CQUESTROT;
-extern const device_type CQUESTLIN;
+DECLARE_DEVICE_TYPE(CQUESTSND, cquestsnd_cpu_device)
+DECLARE_DEVICE_TYPE(CQUESTROT, cquestrot_cpu_device)
+DECLARE_DEVICE_TYPE(CQUESTLIN, cquestlin_cpu_device)
 
 
-#endif /* _CUBEQCPU_H */
+#endif // MAME_CPU_CUBEQCPU_CUBEQCPU_H

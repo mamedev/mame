@@ -11,7 +11,7 @@
 #include "emu.h"
 #include "bfm_bd1.h"
 
-const device_type BFM_BD1 = device_creator<bfm_bd1_t>;
+DEFINE_DEVICE_TYPE(BFM_BD1, bfm_bd1_device, "bfm_bd1", "BFM BD1 VFD controller")
 
 
 /*
@@ -101,19 +101,19 @@ static const uint16_t BD1charset[]=
 	0x4406, // 0100 0100 0000 0110 ?
 };
 
-bfm_bd1_t::bfm_bd1_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, BFM_BD1, "BFM BD1 VFD controller", tag, owner, clock, "bfm_bd1", __FILE__),
+bfm_bd1_device::bfm_bd1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, BFM_BD1, tag, owner, clock),
 	m_port_val(0)
 {
 }
 
-void bfm_bd1_t::static_set_value(device_t &device, int val)
+void bfm_bd1_device::static_set_value(device_t &device, int val)
 {
-	bfm_bd1_t &bd1 = downcast<bfm_bd1_t &>(device);
+	bfm_bd1_device &bd1 = downcast<bfm_bd1_device &>(device);
 	bd1.m_port_val = val;
 }
 
-void bfm_bd1_t::device_start()
+void bfm_bd1_device::device_start()
 {
 	save_item(NAME(m_cursor));
 	save_item(NAME(m_cursor_pos));
@@ -138,7 +138,7 @@ void bfm_bd1_t::device_start()
 	device_reset();
 }
 
-void bfm_bd1_t::device_reset()
+void bfm_bd1_device::device_reset()
 {
 	m_cursor = 0;
 	m_cursor_pos = 0;
@@ -162,17 +162,17 @@ void bfm_bd1_t::device_reset()
 	memset(m_attrs, 0, sizeof(m_attrs));
 }
 
-uint16_t bfm_bd1_t::set_display(uint16_t segin)
+uint16_t bfm_bd1_device::set_display(uint16_t segin)
 {
 	return BITSWAP16(segin,8,12,11,7,6,4,10,3,14,15,0,13,9,5,1,2);
 }
 
-void bfm_bd1_t::device_post_load()
+void bfm_bd1_device::device_post_load()
 {
 	update_display();
 }
 
-void bfm_bd1_t::update_display()
+void bfm_bd1_device::update_display()
 {
 	for (int i =0; i<16; i++)
 	{
@@ -188,7 +188,7 @@ void bfm_bd1_t::update_display()
 	}
 }
 ///////////////////////////////////////////////////////////////////////////
-void bfm_bd1_t::blank(int data)
+void bfm_bd1_device::blank(int data)
 {
 	switch ( data & 0x03 )
 	{
@@ -241,7 +241,7 @@ void bfm_bd1_t::blank(int data)
 	}
 }
 
-int bfm_bd1_t::write_char(int data)
+int bfm_bd1_device::write_char(int data)
 {
 	int change = 0;
 	if ( m_user_def )
@@ -374,7 +374,7 @@ int bfm_bd1_t::write_char(int data)
 }
 ///////////////////////////////////////////////////////////////////////////
 
-void bfm_bd1_t::setdata(int segdata, int data)
+void bfm_bd1_device::setdata(int segdata, int data)
 {
 	int move = 0;
 	int change =0;
@@ -538,7 +538,7 @@ void bfm_bd1_t::setdata(int segdata, int data)
 	}
 }
 
-void bfm_bd1_t::shift_clock(int state)
+void bfm_bd1_device::shift_clock(int state)
 {
 	if (m_sclk != state)
 	{
@@ -561,10 +561,10 @@ void bfm_bd1_t::shift_clock(int state)
 	m_sclk = state;
 }
 
-WRITE_LINE_MEMBER( bfm_bd1_t::sclk ) { shift_clock(state); }
-WRITE_LINE_MEMBER( bfm_bd1_t::data ) { m_data = state; }
+WRITE_LINE_MEMBER( bfm_bd1_device::sclk ) { shift_clock(state); }
+WRITE_LINE_MEMBER( bfm_bd1_device::data ) { m_data = state; }
 
-WRITE_LINE_MEMBER( bfm_bd1_t::por )
+WRITE_LINE_MEMBER( bfm_bd1_device::por )
 {
 	if (!state)
 	{

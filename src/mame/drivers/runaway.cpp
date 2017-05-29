@@ -327,7 +327,7 @@ static GFXDECODE_START( qwak )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( runaway, runaway_state )
+static MACHINE_CONFIG_START( runaway )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 12096000 / 8) /* ? */
@@ -414,5 +414,5 @@ ROM_START( qwak )
 ROM_END
 
 
-GAME( 1982, qwak,    0, qwak,    qwak, driver_device,    0, ROT270, "Atari", "Qwak (prototype)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, runaway, 0, runaway, runaway, driver_device, 0, ROT0,   "Atari", "Runaway (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, qwak,    0, qwak,    qwak,    runaway_state, 0, ROT270, "Atari", "Qwak (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, runaway, 0, runaway, runaway, runaway_state, 0, ROT0,   "Atari", "Runaway (prototype)", MACHINE_SUPPORTS_SAVE )

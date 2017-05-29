@@ -2999,7 +2999,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::propcycl_pedal_update)
 		const int range = 10000;
 
 		attotime freq = attotime::from_usec(base + range * (1.0 / (double)i));
-		m_pc_pedal_interrupt->adjust(min(freq, m_pc_pedal_interrupt->time_left()), 0, freq);
+		m_pc_pedal_interrupt->adjust(std::min(freq, m_pc_pedal_interrupt->time_left()), 0, freq);
 	}
 	else
 	{
@@ -3056,7 +3056,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::adillor_trackball_update)
 			if (t[axis] >  (1.0 / (double)(range)))
 			{
 				attotime freq = attotime::from_usec((base + range) - ((double)(range) * t[axis]));
-				m_ar_tb_interrupt[axis]->adjust(min(freq, m_ar_tb_interrupt[axis]->remaining()), axis, freq);
+				m_ar_tb_interrupt[axis]->adjust(std::min(freq, m_ar_tb_interrupt[axis]->remaining()), axis, freq);
 			}
 			else
 			{
@@ -3732,7 +3732,7 @@ void namcos22_state::machine_start()
 }
 
 // System 22
-static MACHINE_CONFIG_START( namcos22, namcos22_state )
+static MACHINE_CONFIG_START( namcos22 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68020,SS22_MASTER_CLOCK/2) /* 25 MHz? */
@@ -3798,7 +3798,7 @@ static MACHINE_CONFIG_DERIVED( cybrcomm, namcos22 )
 MACHINE_CONFIG_END
 
 // Super System 22
-static MACHINE_CONFIG_START( namcos22s, namcos22_state )
+static MACHINE_CONFIG_START( namcos22s )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020,SS22_MASTER_CLOCK/2)

@@ -10,13 +10,12 @@
 
 #include "emu.h"
 #include "transtape.h"
-SLOT_INTERFACE_EXTERN(cpc_exp_cards);
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CPC_TRANSTAPE = device_creator<cpc_transtape_device>;
+DEFINE_DEVICE_TYPE(CPC_TRANSTAPE, cpc_transtape_device, "cpc_transtape", "Hard Micro Transtape")
 
 ROM_START( cpc_transtape )
 	ROM_REGION( 0x4000, "tt_rom", 0 )
@@ -44,8 +43,9 @@ ioport_constructor cpc_transtape_device::device_input_ports() const
 //**************************************************************************
 
 cpc_transtape_device::cpc_transtape_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, CPC_TRANSTAPE, "HM Transtape", tag, owner, clock, "cpc_transtape", __FILE__),
-	device_cpc_expansion_card_interface(mconfig, *this), m_slot(nullptr), m_cpu(nullptr), m_space(nullptr), m_ram(nullptr),
+	device_t(mconfig, CPC_TRANSTAPE, tag, owner, clock),
+	device_cpc_expansion_card_interface(mconfig, *this),
+	m_slot(nullptr), m_cpu(nullptr), m_space(nullptr), m_ram(nullptr),
 	m_rom_active(false),
 	m_romen(true),
 	m_output(0)

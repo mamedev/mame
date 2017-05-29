@@ -1,11 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Ariane Fugmann
+#ifndef MAME_MACHINE_M2COMM_H
+#define MAME_MACHINE_M2COMM_H
+
 #pragma once
 
-#ifndef __M2COMM_H__
-#define __M2COMM_H__
-
-#define __M2COMM_SIMULATION__
+#define M2COMM_SIMULATION
 
 
 #define MCFG_M2COMM_ADD(_tag ) \
@@ -20,9 +20,6 @@ class m2comm_device : public device_t
 public:
 	// construction/destruction
 	m2comm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// single bit registers (74LS74)
 	DECLARE_READ8_MEMBER(zfg_r);
@@ -51,6 +48,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	uint8_t m_shared[0x4000]; // 16k shared memory
@@ -64,7 +62,7 @@ private:
 	char m_remotehost[256];
 	uint8_t m_buffer[0x4000];
 
-#ifdef __M2COMM_SIMULATION__
+#ifdef M2COMM_SIMULATION
 	uint8_t m_linkenable;
 	uint16_t m_linktimer;
 	uint8_t m_linkalive;
@@ -76,6 +74,6 @@ private:
 };
 
 // device type definition
-extern const device_type M2COMM;
+DECLARE_DEVICE_TYPE(M2COMM, m2comm_device)
 
-#endif  /* __M2COMM_H__ */
+#endif  // MAME_MACHINE_M2COMM_H

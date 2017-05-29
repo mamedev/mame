@@ -499,7 +499,7 @@ void exprraid_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( exprraid, exprraid_state )
+static MACHINE_CONFIG_START( exprraid )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", DECO16, XTAL_12MHz / 8)
@@ -523,7 +523,7 @@ static MACHINE_CONFIG_START( exprraid, exprraid_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", exprraid)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 256)
+	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

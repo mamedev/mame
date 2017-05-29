@@ -24,7 +24,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ABC_HDC = device_creator<abc_hdc_device>;
+DEFINE_DEVICE_TYPE(ABC_HDC, abc_hdc_device, "abc_hdc", "ABC HDC")
 
 
 //-------------------------------------------------
@@ -81,7 +81,7 @@ static const z80_daisy_config daisy_chain[] =
 //  MACHINE_DRIVER( abc_hdc )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( abc_hdc )
+static MACHINE_CONFIG_START( abc_hdc )
 	MCFG_CPU_ADD(Z80_TAG, Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(abc_hdc_mem)
 	MCFG_CPU_IO_MAP(abc_hdc_io)
@@ -113,9 +113,9 @@ machine_config_constructor abc_hdc_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 abc_hdc_device::abc_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ABC_HDC, "ABC HDC", tag, owner, clock, "abc_hdc", __FILE__),
-		device_abcbus_card_interface(mconfig, *this),
-		m_maincpu(*this, Z80_TAG)
+	: device_t(mconfig, ABC_HDC, tag, owner, clock)
+	, device_abcbus_card_interface(mconfig, *this)
+	, m_maincpu(*this, Z80_TAG)
 {
 }
 

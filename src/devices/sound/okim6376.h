@@ -1,32 +1,17 @@
 // license:BSD-3-Clause
 // copyright-holders:Mirko Buffoni, James Wallace
+#ifndef MAME_SOUND_OKIM6376_H
+#define MAME_SOUND_OKIM6376_H
+
 #pragma once
 
-#ifndef __OKIM6376_H__
-#define __OKIM6376_H__
-
 /* an interface for the OKIM6376 and similar chips (CPU interface only) */
-
-/* struct describing a single playing ADPCM voice */
-struct ADPCMVoice
-{
-	uint8_t playing;          /* 1 if we are actively playing */
-
-	uint32_t base_offset;     /* pointer to the base memory location */
-	uint32_t sample;          /* current sample number */
-	uint32_t count;           /* total samples to play */
-
-	uint32_t volume;          /* output volume */
-	int32_t signal;
-	int32_t step;
-};
 
 class okim6376_device : public device_t,
 									public device_sound_interface
 {
 public:
 	okim6376_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~okim6376_device() {}
 
 	DECLARE_WRITE8_MEMBER( write );
 
@@ -38,7 +23,6 @@ public:
 
 	void set_frequency(int frequency);
 
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -48,10 +32,27 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
+	/* struct describing a single playing ADPCM voice */
+	struct ADPCMVoice
+	{
+		uint8_t playing;          /* 1 if we are actively playing */
+
+		uint32_t base_offset;     /* pointer to the base memory location */
+		uint32_t sample;          /* current sample number */
+		uint32_t count;           /* total samples to play */
+
+		uint32_t volume;          /* output volume */
+		int32_t signal;
+		int32_t step;
+
+		void reset();
+		int16_t clock(uint8_t nibble);
+	};
+
 	// internal state
 	required_region_ptr<uint8_t> m_region_base;     /* pointer to the base of the region */
 
-	#define OKIM6376_VOICES     2
+	static constexpr unsigned OKIM6376_VOICES = 2;
 	struct ADPCMVoice m_voice[OKIM6376_VOICES];
 	int32_t m_command[OKIM6376_VOICES];
 	int32_t m_latch;            /* Command data is held before transferring to either channel */
@@ -76,6 +77,6 @@ private:
 	void adpcm_state_save_register(struct ADPCMVoice *voice, int index);
 };
 
-extern const device_type OKIM6376;
+DECLARE_DEVICE_TYPE(OKIM6376, okim6376_device)
 
-#endif /* __OKIM6376_H__ */
+#endif // MAME_SOUND_OKIM6376_H

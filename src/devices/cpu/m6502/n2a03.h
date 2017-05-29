@@ -7,9 +7,10 @@
     6502, NES variant
 
 ***************************************************************************/
+#ifndef MAME_CPU_M6502_N2A03_H
+#define MAME_CPU_M6502_N2A03_H
 
-#ifndef __N2A03_H__
-#define __N2A03_H__
+#pragma once
 
 #include "m6502.h"
 #include "sound/nes_apu.h"
@@ -31,6 +32,9 @@ public:
 	READ8_MEMBER(psg1_4015_r);
 	WRITE8_MEMBER(psg1_4015_w);
 	WRITE8_MEMBER(psg1_4017_w);
+
+	DECLARE_WRITE_LINE_MEMBER(apu_irq);
+	DECLARE_READ8_MEMBER(apu_read_mem);
 
 protected:
 	class mi_2a03_normal : public memory_interface {
@@ -89,6 +93,6 @@ enum {
 	N2A03_SET_OVERFLOW = m6502_device::V_LINE
 };
 
-extern const device_type N2A03;
+DECLARE_DEVICE_TYPE(N2A03, n2a03_device)
 
-#endif
+#endif // MAME_CPU_M6502_N2A03_H

@@ -137,12 +137,12 @@ static GFXDECODE_START( adder2 )
 	GFXDECODE_ENTRY( ":gfx1",  0, charlayout, 0, 16 )
 GFXDECODE_END
 
-const device_type BFM_ADDER2 = device_creator<bfm_adder2_device>;
+DEFINE_DEVICE_TYPE(BFM_ADDER2, bfm_adder2_device, "bfm_adder2", "BFM ADDER2")
 
 bfm_adder2_device::bfm_adder2_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock )
-	: device_t(mconfig, BFM_ADDER2, "BFM ADDER2", tag, owner, clock, "bfm_adder2", __FILE__),
-		device_gfx_interface(mconfig, *this, GFXDECODE_NAME(adder2), "palette"),
-		m_cpu(*this, "adder2")
+	: device_t(mconfig, BFM_ADDER2, tag, owner, clock)
+	, device_gfx_interface(mconfig, *this, GFXDECODE_NAME(adder2), "palette")
+	, m_cpu(*this, "adder2")
 {
 }
 
@@ -540,9 +540,12 @@ static ADDRESS_MAP_START( adder2_memmap, AS_PROGRAM, 8, bfm_adder2_device )
 	AM_RANGE(0xE000, 0xFFFF) AM_ROM  AM_REGION(":adder2", 0xE000)                         // 8k  ROM
 ADDRESS_MAP_END
 
-///////////////////////////////////////////////////////////////////////////
 
-static MACHINE_CONFIG_FRAGMENT( adder2 )
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( bfm_adder2_device::device_add_mconfig )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_SIZE( 400, 280)
 	MCFG_SCREEN_VISIBLE_AREA(  0, 400-1, 0, 280-1)
@@ -556,13 +559,3 @@ static MACHINE_CONFIG_FRAGMENT( adder2 )
 	MCFG_CPU_PROGRAM_MAP(adder2_memmap)             // setup adder2 board memorymap
 	MCFG_DEVICE_VBLANK_INT_DEVICE("screen", DEVICE_SELF, bfm_adder2_device, adder2_vbl)        // board has a VBL IRQ
 MACHINE_CONFIG_END
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor bfm_adder2_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( adder2 );
-}

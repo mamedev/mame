@@ -244,7 +244,7 @@ void techno_state::machine_reset()
 	m_digit = 0;
 }
 
-static MACHINE_CONFIG_START( techno, techno_state )
+static MACHINE_CONFIG_START( techno )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(techno_map)
@@ -276,5 +276,5 @@ ROM_START(spcteam)
 	ROM_RELOAD(0, 0x8000)
 ROM_END
 
-GAME(1987,  xforce,  0,  techno,  techno, driver_device,  0,  ROT0,  "Tecnoplay", "X Force", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1988,  spcteam, 0,  techno,  techno, driver_device,  0,  ROT0,  "Tecnoplay", "Space Team", MACHINE_IS_SKELETON_MECHANICAL) // needs correct layout
+GAME(1987,  xforce,  0,  techno,  techno, techno_state,  0,  ROT0,  "Tecnoplay", "X Force",    MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1988,  spcteam, 0,  techno,  techno, techno_state,  0,  ROT0,  "Tecnoplay", "Space Team", MACHINE_IS_SKELETON_MECHANICAL) // needs correct layout

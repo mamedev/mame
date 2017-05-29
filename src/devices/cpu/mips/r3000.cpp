@@ -9,8 +9,8 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "r3000.h"
+#include "debugger.h"
 
 
 #define ENABLE_OVERFLOWS    0
@@ -113,19 +113,19 @@
 //  DEVICE INTERFACE
 //**************************************************************************
 
-const device_type R3041 = device_creator<r3041_device>;
-const device_type R3051 = device_creator<r3051_device>;
-const device_type R3052 = device_creator<r3052_device>;
-const device_type R3071 = device_creator<r3071_device>;
-const device_type R3081 = device_creator<r3081_device>;
+DEFINE_DEVICE_TYPE(R3041, r3041_device, "r3041", "R3041")
+DEFINE_DEVICE_TYPE(R3051, r3051_device, "r3051", "R3051")
+DEFINE_DEVICE_TYPE(R3052, r3052_device, "r3052", "R3052")
+DEFINE_DEVICE_TYPE(R3071, r3071_device, "r3071", "R3071")
+DEFINE_DEVICE_TYPE(R3081, r3081_device, "r3081", "R3081")
 
 
 //-------------------------------------------------
 //  r3000_device - constructor
 //-------------------------------------------------
 
-r3000_device::r3000_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, chip_type chiptype, const char *shortname, const char *source)
-	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
+r3000_device::r3000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, chip_type chiptype)
+	: cpu_device(mconfig, type, tag, owner, clock),
 		m_program_config_be("program", ENDIANNESS_BIG, 32, 29),
 		m_program_config_le("program", ENDIANNESS_LITTLE, 32, 29),
 		m_program(nullptr),
@@ -170,7 +170,7 @@ r3000_device::~r3000_device()
 //-------------------------------------------------
 
 r3041_device::r3041_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: r3000_device(mconfig, R3041, "R3041", tag, owner, clock, CHIP_TYPE_R3041, "r3041", __FILE__) { }
+	: r3000_device(mconfig, R3041, tag, owner, clock, CHIP_TYPE_R3041) { }
 
 
 //-------------------------------------------------
@@ -178,7 +178,7 @@ r3041_device::r3041_device(const machine_config &mconfig, const char *tag, devic
 //-------------------------------------------------
 
 r3051_device::r3051_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: r3000_device(mconfig, R3051, "R3051", tag, owner, clock, CHIP_TYPE_R3051, "r3051", __FILE__) { }
+	: r3000_device(mconfig, R3051, tag, owner, clock, CHIP_TYPE_R3051) { }
 
 
 //-------------------------------------------------
@@ -186,7 +186,7 @@ r3051_device::r3051_device(const machine_config &mconfig, const char *tag, devic
 //-------------------------------------------------
 
 r3052_device::r3052_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: r3000_device(mconfig, R3052, "R3052", tag, owner, clock, CHIP_TYPE_R3052, "r3052", __FILE__) { }
+	: r3000_device(mconfig, R3052, tag, owner, clock, CHIP_TYPE_R3052) { }
 
 
 //-------------------------------------------------
@@ -194,7 +194,7 @@ r3052_device::r3052_device(const machine_config &mconfig, const char *tag, devic
 //-------------------------------------------------
 
 r3071_device::r3071_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: r3000_device(mconfig, R3071, "R3071", tag, owner, clock, CHIP_TYPE_R3071, "r3071", __FILE__) { }
+	: r3000_device(mconfig, R3071, tag, owner, clock, CHIP_TYPE_R3071) { }
 
 
 //-------------------------------------------------
@@ -202,7 +202,7 @@ r3071_device::r3071_device(const machine_config &mconfig, const char *tag, devic
 //-------------------------------------------------
 
 r3081_device::r3081_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: r3000_device(mconfig, R3081, "R3081", tag, owner, clock, CHIP_TYPE_R3081, "r3081", __FILE__) { }
+	: r3000_device(mconfig, R3081, tag, owner, clock, CHIP_TYPE_R3081) { }
 
 
 //-------------------------------------------------

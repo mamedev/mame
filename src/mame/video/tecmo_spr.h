@@ -1,7 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 /* Tecmo Sprites */
+#ifndef MAME_VIDEO_TECMO_SPR_H
+#define MAME_VIDEO_TECMO_SPR_H
 
+#pragma once
 
 
 class tecmo_spr_device : public device_t
@@ -31,11 +34,9 @@ protected:
 	uint8_t m_gfxregion;
 	int m_bootleg; // for Gals Pinball / Hot Pinball
 	int m_yoffset;
-
-private:
 };
 
-extern const device_type TECMO_SPRITE;
+DECLARE_DEVICE_TYPE(TECMO_SPRITE, tecmo_spr_device)
 
 
 #define MCFG_TECMO_SPRITE_GFX_REGION(_region) \
@@ -46,3 +47,5 @@ extern const device_type TECMO_SPRITE;
 
 #define MCFG_TECMO_SPRITE_YOFFSET(_yoffset) \
 	tecmo_spr_device::set_yoffset(*device, _yoffset);
+
+#endif // MAME_VIDEO_TECMO_SPR_H

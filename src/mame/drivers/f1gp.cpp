@@ -392,7 +392,7 @@ MACHINE_RESET_MEMBER(f1gp_state,f1gp)
 	m_scroll[1] = 0;
 }
 
-static MACHINE_CONFIG_START( f1gp, f1gp_state )
+static MACHINE_CONFIG_START( f1gp )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000,XTAL_20MHz/2) /* verified on pcb */
@@ -458,7 +458,7 @@ static MACHINE_CONFIG_START( f1gp, f1gp_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( f1gpb, f1gp_state )
+static MACHINE_CONFIG_START( f1gpb )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000,10000000) /* 10 MHz ??? */
@@ -494,7 +494,7 @@ static MACHINE_CONFIG_START( f1gpb, f1gp_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END
@@ -672,7 +672,7 @@ ROM_START( f1gp2 )
 ROM_END
 
 
-GAME( 1991, f1gp,  0,    f1gp,  f1gp, driver_device,  0, ROT90, "Video System Co.", "F-1 Grand Prix", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, f1gpb, f1gp, f1gpb, f1gp, driver_device,  0, ROT90, "bootleg (Playmark)", "F-1 Grand Prix (Playmark bootleg)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // PCB marked 'Super Formula II', manufactured by Playmark.
+GAME( 1991, f1gp,  0,    f1gp,  f1gp,  f1gp_state, 0, ROT90, "Video System Co.",   "F-1 Grand Prix",                    MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, f1gpb, f1gp, f1gpb, f1gp,  f1gp_state, 0, ROT90, "bootleg (Playmark)", "F-1 Grand Prix (Playmark bootleg)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // PCB marked 'Super Formula II', manufactured by Playmark.
 
-GAME( 1992, f1gp2, 0,    f1gp2, f1gp2, driver_device, 0, ROT90, "Video System Co.", "F-1 Grand Prix Part II", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, f1gp2, 0,    f1gp2, f1gp2, f1gp_state, 0, ROT90, "Video System Co.",   "F-1 Grand Prix Part II",            MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

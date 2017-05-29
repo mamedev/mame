@@ -37,7 +37,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_FCC = device_creator<c64_final_chesscard_device>;
+DEFINE_DEVICE_TYPE(C64_FCC, c64_final_chesscard_device, "c64_fcc", "Final ChessCard")
 
 
 //-------------------------------------------------
@@ -71,10 +71,10 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( c64_fcc )
+//  MACHINE_CONFIG_START( c64_fcc )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( c64_fcc )
+static MACHINE_CONFIG_START( c64_fcc )
 	MCFG_CPU_ADD(G65SC02P4_TAG, M65SC02, XTAL_5MHz)
 	MCFG_CPU_PROGRAM_MAP(c64_fcc_map)
 MACHINE_CONFIG_END
@@ -120,7 +120,7 @@ ioport_constructor c64_final_chesscard_device::device_input_ports() const
 //-------------------------------------------------
 
 c64_final_chesscard_device::c64_final_chesscard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, C64_FCC, "Final ChessCard", tag, owner, clock, "c64_fcc", __FILE__),
+	device_t(mconfig, C64_FCC, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
 	device_nvram_interface(mconfig, *this),
 	m_maincpu(*this, G65SC02P4_TAG),

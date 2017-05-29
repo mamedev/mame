@@ -523,7 +523,7 @@ INTERRUPT_GEN_MEMBER(dmndrby_state::dderby_timer_irq)
 	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf); /* RST 08h */
 }
 
-static MACHINE_CONFIG_START( dderby, dmndrby_state )
+static MACHINE_CONFIG_START( dderby )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,4000000)         /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(memmap)
@@ -658,6 +658,6 @@ ROM_START( dmndrbya )
 ROM_END
 
 
-/*    YEAR, NAME,    PARENT,   MACHINE, INPUT,   INIT,    MONITOR, COMPANY,   FULLNAME */
-GAME( 1994, dmndrby,  0,       dderby, dderby, driver_device,  0, ROT0, "Electrocoin", "Diamond Derby (Newer)",MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_COLORS|MACHINE_NOT_WORKING ) // hack?
-GAME( 1986, dmndrbya, dmndrby, dderby, dderbya, driver_device, 0, ROT0, "Electrocoin", "Diamond Derby (Original)",MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_COLORS|MACHINE_NOT_WORKING )
+//    YEAR, NAME,     PARENT,  MACHINE, INPUT,   STATE,         INIT, MONITOR, COMPANY,       FULLNAME                    FLAGS
+GAME( 1994, dmndrby,  0,       dderby,  dderby,  dmndrby_state, 0,    ROT0,    "Electrocoin", "Diamond Derby (Newer)",    MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_COLORS|MACHINE_NOT_WORKING ) // hack?
+GAME( 1986, dmndrbya, dmndrby, dderby,  dderbya, dmndrby_state, 0,    ROT0,    "Electrocoin", "Diamond Derby (Original)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_COLORS|MACHINE_NOT_WORKING )

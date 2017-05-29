@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type COLECOVISION_XIN1 = device_creator<colecovision_xin1_cartridge_device>;
+DEFINE_DEVICE_TYPE(COLECOVISION_XIN1, colecovision_xin1_cartridge_device, "colecovision_xin1", "ColecoVision X-in-1 cartridge")
 
 
 
@@ -28,7 +28,7 @@ const device_type COLECOVISION_XIN1 = device_creator<colecovision_xin1_cartridge
 //-------------------------------------------------
 
 colecovision_xin1_cartridge_device::colecovision_xin1_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, COLECOVISION_XIN1, "ColecoVision X-in-1 cartridge", tag, owner, clock, "colecovision_xin1", __FILE__),
+	device_t(mconfig, COLECOVISION_XIN1, tag, owner, clock),
 	device_colecovision_cartridge_interface(mconfig, *this),
 	m_current_offset(0)
 {

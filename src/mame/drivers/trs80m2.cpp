@@ -490,7 +490,7 @@ WRITE_LINE_MEMBER( trs80m2_state::kb_clock_w )
 	m_kbclk = state;
 }
 
-WRITE8_MEMBER( trs80m2_state::kbd_w )
+void trs80m2_state::kbd_w(u8 data)
 {
 	// latch key data
 	m_key_data = data;
@@ -702,7 +702,7 @@ void trs80m2_state::machine_reset()
 //  MACHINE_CONFIG( trs80m2 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( trs80m2, trs80m2_state )
+static MACHINE_CONFIG_START( trs80m2 )
 	// basic machine hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/2)
 	MCFG_Z80_DAISY_CHAIN(trs80m2_daisy_chain)
@@ -771,7 +771,7 @@ static MACHINE_CONFIG_START( trs80m2, trs80m2_state )
 	MCFG_DEVICE_ADD(TRS80M2_KEYBOARD_TAG, TRS80M2_KEYBOARD, 0)
 	MCFG_TRS80M2_KEYBOARD_CLOCK_CALLBACK(WRITELINE(trs80m2_state, kb_clock_w))
 	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(WRITE8(trs80m2_state, kbd_w))
+	MCFG_GENERIC_KEYBOARD_CB(PUT(trs80m2_state, kbd_w))
 
 	// internal RAM
 	MCFG_RAM_ADD(RAM_TAG)
@@ -787,7 +787,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( trs80m16 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( trs80m16, trs80m16_state )
+static MACHINE_CONFIG_START( trs80m16 )
 	// basic machine hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/2)
 	MCFG_Z80_DAISY_CHAIN(trs80m2_daisy_chain)
@@ -863,7 +863,7 @@ static MACHINE_CONFIG_START( trs80m16, trs80m16_state )
 	MCFG_DEVICE_ADD(TRS80M2_KEYBOARD_TAG, TRS80M2_KEYBOARD, 0)
 	MCFG_TRS80M2_KEYBOARD_CLOCK_CALLBACK(WRITELINE(trs80m2_state, kb_clock_w))
 	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(WRITE8(trs80m2_state, kbd_w))
+	MCFG_GENERIC_KEYBOARD_CB(PUT(trs80m2_state, kbd_w))
 
 	// internal RAM
 	MCFG_RAM_ADD(RAM_TAG)
@@ -950,9 +950,9 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT     COMPANY             FULLNAME        FLAGS
-COMP( 1979, trs80m2,    0,          0,      trs80m2,    trs80m2, driver_device,     0,      "Tandy Radio Shack",    "TRS-80 Model II",  MACHINE_NO_SOUND_HW | MACHINE_IMPERFECT_KEYBOARD )
-COMP( 1982, trs80m16,   trs80m2,    0,      trs80m16,   trs80m2, driver_device,     0,      "Tandy Radio Shack",    "TRS-80 Model 16",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_IMPERFECT_KEYBOARD )
-//COMP( 1983, trs80m12, trs80m2,    0,      trs80m16,   trs80m2, driver_device,     0,      "Tandy Radio Shack",    "TRS-80 Model 12",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_IMPERFECT_KEYBOARD )
-//COMP( 1984, trs80m16b,trs80m2,    0,      trs80m16,   trs80m2, driver_device,     0,      "Tandy Radio Shack",    "TRS-80 Model 16B", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_IMPERFECT_KEYBOARD )
-//COMP( 1985, tandy6k,  trs80m2,    0,      tandy6k,    trs80m2, driver_device,     0,      "Tandy Radio Shack",    "Tandy 6000 HD",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_IMPERFECT_KEYBOARD )
+//    YEAR  NAME        PARENT   COMPAT  MACHINE     INPUT    STATE           INIT  COMPANY              FULLNAME            FLAGS
+COMP( 1979, trs80m2,    0,       0,      trs80m2,    trs80m2, trs80m2_state,  0,    "Tandy Radio Shack", "TRS-80 Model II",  MACHINE_NO_SOUND_HW | MACHINE_IMPERFECT_KEYBOARD )
+COMP( 1982, trs80m16,   trs80m2, 0,      trs80m16,   trs80m2, trs80m16_state, 0,    "Tandy Radio Shack", "TRS-80 Model 16",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_IMPERFECT_KEYBOARD )
+//COMP( 1983, trs80m12, trs80m2, 0,      trs80m16,   trs80m2, trs80m16_state, 0,    "Tandy Radio Shack", "TRS-80 Model 12",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_IMPERFECT_KEYBOARD )
+//COMP( 1984, trs80m16b,trs80m2, 0,      trs80m16,   trs80m2, trs80m16_state, 0,    "Tandy Radio Shack", "TRS-80 Model 16B", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_IMPERFECT_KEYBOARD )
+//COMP( 1985, tandy6k,  trs80m2, 0,      tandy6k,    trs80m2, tandy6k_state,  0,    "Tandy Radio Shack", "Tandy 6000 HD",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_IMPERFECT_KEYBOARD )

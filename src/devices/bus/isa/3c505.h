@@ -8,20 +8,12 @@
  *
  */
 
+#ifndef MAME_BUS_ISA_3C505_H
+#define MAME_BUS_ISA_3C505_H
+
 #pragma once
 
-#ifndef THREECOM3C505_H_
-#define THREECOM3C505_H_
-
 #include "bus/isa/isa.h"
-
-#define CMD_BUFFER_SIZE 100
-#define ETH_BUFFER_SIZE 2048
-#define PGM_BUFFER_SIZE 0x2000
-
-#define ETHERNET_ADDR_SIZE 6                 /* size of ethernet addr */
-
-#define RX_FIFO_SIZE 32
 
 // ======================> PCB data structure
 
@@ -123,7 +115,6 @@ class threecom3c505_device:  public device_t,
 public:
 	// construction/destruction
 	threecom3c505_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	threecom3c505_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device register I/O
 	virtual DECLARE_READ16_MEMBER(read);
@@ -131,13 +122,19 @@ public:
 
 	static void set_verbose(int on_off);
 
-	required_ioport m_iobase;
-	required_ioport m_irqdrq;
-	required_ioport m_romopts;
-
 	virtual void recv_cb(uint8_t *data, int length) override;
 
 protected:
+	static constexpr unsigned CMD_BUFFER_SIZE = 100;
+	static constexpr unsigned ETH_BUFFER_SIZE = 2048;
+	static constexpr unsigned PGM_BUFFER_SIZE = 0x2000;
+
+	static constexpr unsigned ETHERNET_ADDR_SIZE = 6;
+
+	static constexpr unsigned RX_FIFO_SIZE = 32;
+
+	threecom3c505_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual int tx_data(device_t *, const uint8_t *, int);
 	virtual int setfilter(device_t *, int);
 
@@ -147,6 +144,10 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
+
+	required_ioport m_iobase;
+	required_ioport m_irqdrq;
+	required_ioport m_romopts;
 
 private:
 	// device-level overrides
@@ -276,6 +277,6 @@ private:
 };
 
 // device type definition
-extern const device_type ISA16_3C505;
+DECLARE_DEVICE_TYPE(ISA16_3C505, threecom3c505_device)
 
-#endif /* THREECOM3C505_H_ */
+#endif // MAME_BUS_ISA_3C505_H

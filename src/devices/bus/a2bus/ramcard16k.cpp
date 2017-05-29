@@ -19,7 +19,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_RAMCARD16K = device_creator<a2bus_ramcard_device>;
+DEFINE_DEVICE_TYPE(A2BUS_RAMCARD16K, a2bus_ramcard_device, "a2ram16k", "Apple II 16K Language Card")
 
 /***************************************************************************
     FUNCTION PROTOTYPES
@@ -29,15 +29,14 @@ const device_type A2BUS_RAMCARD16K = device_creator<a2bus_ramcard_device>;
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_ramcard_device::a2bus_ramcard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+a2bus_ramcard_device::a2bus_ramcard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this), m_inh_state(0), m_prewrite(false), m_dxxx_bank(0)
 {
 }
 
 a2bus_ramcard_device::a2bus_ramcard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, A2BUS_RAMCARD16K, "Apple II 16K Language Card", tag, owner, clock, "a2ram16k", __FILE__),
-	device_a2bus_card_interface(mconfig, *this), m_inh_state(0), m_prewrite(false), m_dxxx_bank(0)
+	a2bus_ramcard_device(mconfig, A2BUS_RAMCARD16K, tag, owner, clock)
 {
 }
 

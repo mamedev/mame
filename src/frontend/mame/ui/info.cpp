@@ -204,10 +204,10 @@ std::string machine_info::game_info_string()
 
 	// print description, manufacturer, and CPU:
 	util::stream_format(buf, _("%1$s\n%2$s %3$s\nDriver: %4$s\n\nCPU:\n"),
-			m_machine.system().description,
+			m_machine.system().type.fullname(),
 			m_machine.system().year,
 			m_machine.system().manufacturer,
-			core_filename_extract_base(m_machine.system().source_file));
+			core_filename_extract_base(m_machine.system().type.source()));
 
 	// loop over all CPUs
 	execute_interface_iterator execiter(m_machine.root_device());
@@ -396,7 +396,7 @@ menu_image_info::~menu_image_info()
 
 void menu_image_info::populate(float &customtop, float &custombottom)
 {
-	item_append(machine().system().description, "", FLAG_DISABLE, nullptr);
+	item_append(machine().system().type.fullname(), "", FLAG_DISABLE, nullptr);
 	item_append("", "", FLAG_DISABLE, nullptr);
 
 	for (device_image_interface &image : image_interface_iterator(machine().root_device()))

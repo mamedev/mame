@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles
-#ifndef RC_MACROS_H
-#define RC_MACROS_H
+#ifndef MAME_MACHINE_RESCAP_H
+#define MAME_MACHINE_RESCAP_H
 
 /* Little helpers for magnitude conversions */
 #define RES_R(res) ((double)(res))
@@ -26,4 +26,4 @@
 
 #define RES_2_SERIAL(r1,r2)             ((r1)+(r2))
 
-#endif
+#endif // MAME_MACHINE_RESCAP_H

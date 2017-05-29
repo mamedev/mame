@@ -4,14 +4,14 @@
  * Konami 573 Network PCB Unit
  *
  */
+#ifndef MAME_MACHINE_K573NPU_H
+#define MAME_MACHINE_K573NPU_H
 
 #pragma once
 
-#ifndef __K573NPU_H__
-#define __K573NPU_H__
 
 
-extern const device_type KONAMI_573_NETWORK_PCB_UNIT;
+DECLARE_DEVICE_TYPE(KONAMI_573_NETWORK_PCB_UNIT, k573npu_device)
 
 class k573npu_device : public device_t
 {
@@ -24,4 +24,4 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
-#endif
+#endif // MAME_MACHINE_K573NPU_H

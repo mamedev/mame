@@ -16,6 +16,7 @@
 #include "softlist_dev.h"
 #include "zippath.h"
 #include "hashfile.h"
+#include "clifront.h"
 
 #include <ctype.h>
 #include <stack>
@@ -321,6 +322,11 @@ bool mame_options::parse_command_line(emu_options &options, std::vector<std::str
 	if (!options.parse_command_line(args, OPTION_PRIORITY_CMDLINE, error_string))
 		return false;
 
+	// in order to evaluate softlist options, we need to fish any hashpath variable out of INI files; this is
+	// because hashpath in particular can affect softlist evaluation
+	if (options.software_name()[0] != '\0' && options.read_config())
+		populate_hashpath_from_ini_files(options);
+
 	// identify any options as a result of softlists
 	auto softlist_opts = evaluate_initial_softlist_options(options);
 
@@ -348,6 +354,21 @@ bool mame_options::parse_command_line(emu_options &options, std::vector<std::str
 			? arg_value
 			: value_specifier_invalid_value();
 	};
+
+	// some auxillary verbs expect that slot options are specified; and to do this we need to figure
+	// out if this is necessary for this particular auxillary verb, and if so, set the system name
+	if (!options.command().empty()
+		&& cli_frontend::parse_slot_options_for_auxverb(options.command())
+		&& !options.command_arguments().empty()
+		&& !core_iswildstr(options.command_arguments()[0].c_str()))
+	{
+		std::string error_string;
+		options.set_value(OPTION_SYSTEMNAME, options.command_arguments()[0].c_str(), OPTION_PRIORITY_CMDLINE, error_string);
+
+		const game_driver *system = mame_options::system(options);
+		if (!system)
+			throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "Unknown system '%s'", options.system_name());
+	}
 
 	// parse the slot devices
 	parse_slot_devices(options, value_specifier);
@@ -551,7 +572,7 @@ void mame_options::parse_standard_inis(emu_options &options, std::string &error_
 	}
 
 	// next parse "source/<sourcefile>.ini"
-	std::string sourcename = core_filename_extract_base(cursystem->source_file, true).insert(0, "source" PATH_SEPARATOR);
+	std::string sourcename = core_filename_extract_base(cursystem->type.source(), true).insert(0, "source" PATH_SEPARATOR);
 	parse_one_ini(options,sourcename.c_str(), OPTION_PRIORITY_SOURCE_INI, &error_string);
 
 	// then parse the grandparent, parent, and system-specific INIs
@@ -681,7 +702,7 @@ bool mame_options::parse_one_ini(emu_options &options, const char *basename, int
 	// parse the file
 	osd_printf_verbose("Parsing %s.ini\n", basename);
 	std::string error;
-	bool result = options.parse_ini_file((util::core_file&)file, priority, OPTION_PRIORITY_DRIVER_INI, error);
+	bool result = options.parse_ini_file((util::core_file&)file, priority, priority < OPTION_PRIORITY_DRIVER_INI, error);
 
 	// append errors if requested
 	if (!error.empty() && error_string)
@@ -690,3 +711,24 @@ bool mame_options::parse_one_ini(emu_options &options, const char *basename, int
 	return result;
 }
 
+
+//-------------------------------------------------
+//  populate_hashpath_from_ini_files
+//-------------------------------------------------
+
+void mame_options::populate_hashpath_from_ini_files(emu_options &options)
+{
+	// create temporary emu_options for the purposes of evaluating the INI files
+	emu_options temp_options;
+	std::string temp_error_string;
+	temp_options.set_value(OPTION_SYSTEMNAME, options.system_name(), OPTION_PRIORITY_MAXIMUM, temp_error_string);
+	temp_options.set_value(OPTION_INIPATH, options.ini_path(), OPTION_PRIORITY_MAXIMUM, temp_error_string);
+
+	// read the INIs into temp_options
+	parse_standard_inis(temp_options, temp_error_string);
+
+	// and fish out hashpath
+	const auto entry = temp_options.get_entry(OPTION_HASHPATH);
+	if (entry)
+		options.set_value(OPTION_HASHPATH, entry->value(), entry->priority(), temp_error_string);
+}

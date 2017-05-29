@@ -142,7 +142,7 @@ INTERRUPT_GEN_MEMBER(trucocl_state::trucocl_interrupt)
 
 }
 
-static MACHINE_CONFIG_START( trucocl, trucocl_state )
+static MACHINE_CONFIG_START( trucocl )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 18432000/6)
 	MCFG_CPU_PROGRAM_MAP(main_map)
@@ -207,6 +207,5 @@ DRIVER_INIT_MEMBER(trucocl_state,trucocl)
 
 
 /******************************************************************************/
-/*    YEAR   NAME     PARENT  MACHINE  INPUT    INIT     MONITOR  */
-
+//    YEAR  NAME      PARENT  MACHINE  INPUT    STATE          INIT     MONITOR
 GAME( 1991, trucocl,  0,      trucocl, trucocl, trucocl_state, trucocl, ROT0, "Miky SRL", "Truco Clemente", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )

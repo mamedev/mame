@@ -174,7 +174,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( blstroid, blstroid_state )
+static MACHINE_CONFIG_START( blstroid )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)

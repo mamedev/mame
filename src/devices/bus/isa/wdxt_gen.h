@@ -13,14 +13,14 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_ISA8_WDXT_GEN_H
+#define MAME_BUS_ISA8_WDXT_GEN_H
+
 #pragma once
 
-#ifndef __ISA8_WDXT_GEN__
-#define __ISA8_WDXT_GEN__
 
-
-#include "cpu/mcs48/mcs48.h"
 #include "isa.h"
+#include "cpu/mcs48/mcs48.h"
 #include "machine/wd11c00_17.h"
 #include "machine/wd2010.h"
 #include "imagedev/harddriv.h"
@@ -51,8 +51,7 @@ public:
 	DECLARE_READ8_MEMBER( rd322_r );
 	DECLARE_READ8_MEMBER( ram_r );
 	DECLARE_WRITE8_MEMBER( ram_w );
-	DECLARE_READ8_MEMBER( wd1015_t0_r );
-	DECLARE_READ8_MEMBER( wd1015_t1_r );
+	DECLARE_READ_LINE_MEMBER( wd1015_t1_r );
 	DECLARE_READ8_MEMBER( wd1015_p1_r );
 	DECLARE_WRITE8_MEMBER( wd1015_p1_w );
 	DECLARE_READ8_MEMBER( wd1015_p2_r );
@@ -79,6 +78,6 @@ private:
 
 
 // device type definition
-extern const device_type ISA8_WDXT_GEN;
+DECLARE_DEVICE_TYPE(ISA8_WDXT_GEN, wdxt_gen_device)
 
-#endif
+#endif // MAME_BUS_ISA8_WDXT_GEN_H

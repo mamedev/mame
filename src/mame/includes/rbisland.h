@@ -36,6 +36,7 @@ public:
 	std::unique_ptr<uint8_t[]>    m_CRAM[8];
 	int         m_extra_version;
 	uint8_t       m_current_bank;
+	emu_timer *m_cchip_timer;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

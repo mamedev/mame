@@ -6,13 +6,13 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_NES_CTRL_PACHINKO_H
+#define MAME_BUS_NES_CTRL_PACHINKO_H
+
 #pragma once
 
-#ifndef __NES_PACHINKO__
-#define __NES_PACHINKO__
-
-
 #include "ctrl.h"
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -43,6 +43,6 @@ protected:
 };
 
 // device type definition
-extern const device_type NES_PACHINKO;
+DECLARE_DEVICE_TYPE(NES_PACHINKO, nes_pachinko_device)
 
-#endif
+#endif // MAME_BUS_NES_CTRL_PACHINKO_H

@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_TRS80M2KB_H
+#define MAME_MACHINE_TRS80M2KB_H
 
-#ifndef __TRS80M2_KEYBOARD__
-#define __TRS80M2_KEYBOARD__
+#pragma once
 
 #include "cpu/mcs48/mcs48.h"
 #include "sound/discrete.h"
@@ -45,26 +45,19 @@ public:
 	// construction/destruction
 	trs80m2_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_clock_wr_callback(device_t &device, _Object object) { return downcast<trs80m2_keyboard_device &>(device).m_write_clock.set_callback(object); }
-
-	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual ioport_constructor device_input_ports() const override;
+	template <class Object> static devcb_base &set_clock_wr_callback(device_t &device, Object &&cb) { return downcast<trs80m2_keyboard_device &>(device).m_write_clock.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE_LINE_MEMBER( busy_w );
 	DECLARE_READ_LINE_MEMBER( data_r );
-
-	// not really public
-	DECLARE_READ8_MEMBER( kb_t1_r );
-	DECLARE_READ8_MEMBER( kb_p0_r );
-	DECLARE_WRITE8_MEMBER( kb_p1_w );
-	DECLARE_WRITE8_MEMBER( kb_p2_w );
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
 
 private:
 	enum
@@ -83,12 +76,17 @@ private:
 	int m_clk;
 
 	uint8_t m_keylatch;
+
+	DECLARE_READ_LINE_MEMBER( kb_t1_r );
+	DECLARE_READ8_MEMBER( kb_p0_r );
+	DECLARE_WRITE8_MEMBER( kb_p1_w );
+	DECLARE_WRITE8_MEMBER( kb_p2_w );
 };
 
 
 // device type definition
-extern const device_type TRS80M2_KEYBOARD;
+DECLARE_DEVICE_TYPE(TRS80M2_KEYBOARD, trs80m2_keyboard_device)
 
 
 
-#endif
+#endif // MAME_MACHINE_TRS80M2KB_H

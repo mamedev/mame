@@ -54,7 +54,7 @@ public:
 		, m_ram(*this, "ram")
 		, m_palette(*this, "palette")
 		, m_p_chargen(*this, "chargen")
-		{ }
+	{ }
 
 	DECLARE_READ16_MEMBER( dim68k_duart_r );
 	DECLARE_READ16_MEMBER( dim68k_fdc_r );
@@ -69,7 +69,7 @@ public:
 	DECLARE_WRITE16_MEMBER( dim68k_video_control_w );
 	DECLARE_WRITE16_MEMBER( dim68k_video_high_w );
 	DECLARE_WRITE16_MEMBER( dim68k_video_reset_w );
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	void kbd_put(u8 data);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
 private:
@@ -298,12 +298,12 @@ static SLOT_INTERFACE_START( dim68k_floppies )
 	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
 SLOT_INTERFACE_END
 
-WRITE8_MEMBER( dim68k_state::kbd_put )
+void dim68k_state::kbd_put(u8 data)
 {
 	m_term_data = data;
 }
 
-static MACHINE_CONFIG_START( dim68k, dim68k_state )
+static MACHINE_CONFIG_START( dim68k )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
 	MCFG_CPU_PROGRAM_MAP(dim68k_mem)
@@ -334,7 +334,7 @@ static MACHINE_CONFIG_START( dim68k, dim68k_state )
 	MCFG_MC6845_UPDATE_ROW_CB(dim68k_state, crtc_update_row)
 
 	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(WRITE8(dim68k_state, kbd_put))
+	MCFG_GENERIC_KEYBOARD_CB(PUT(dim68k_state, kbd_put))
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "dim68k")
@@ -397,5 +397,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1984, dim68k,  0,       0,     dim68k,   dim68k, driver_device,   0,     "Micro Craft", "Dimension 68000", MACHINE_NOT_WORKING)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE   INPUT   STATE         INIT  COMPANY        FULLNAME           FLAGS
+COMP( 1984, dim68k, 0,      0,      dim68k,   dim68k, dim68k_state, 0,    "Micro Craft", "Dimension 68000", MACHINE_NOT_WORKING)

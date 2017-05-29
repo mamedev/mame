@@ -35,7 +35,7 @@
 
 #include <math.h>
 
-const device_type K054321 = device_creator<k054321_device>;
+DEFINE_DEVICE_TYPE(K054321, k054321_device, "k054321", "K054321 Maincpu-Soundcpu interface")
 
 DEVICE_ADDRESS_MAP_START(main_map, 8, k054321_device)
 	AM_RANGE(0x0, 0x0) AM_WRITE(active_w)
@@ -55,7 +55,7 @@ DEVICE_ADDRESS_MAP_START(sound_map, 8, k054321_device)
 ADDRESS_MAP_END
 
 k054321_device::k054321_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, K054321, "K053421 Maincpu-Soundcpu interface", tag, owner, clock, "k054321", __FILE__),
+	: device_t(mconfig, K054321, tag, owner, clock),
 	  m_left(*this, finder_base::DUMMY_TAG),
 	  m_right(*this, finder_base::DUMMY_TAG)
 {

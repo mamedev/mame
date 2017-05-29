@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type S100_MDS_A = device_creator<s100_mds_a_device>;
+DEFINE_DEVICE_TYPE(S100_MDS_A, s100_mds_a_device, "s100_nsmdsa", "North Star MDS-A")
 
 
 //-------------------------------------------------
@@ -53,10 +53,10 @@ SLOT_INTERFACE_END
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( mds_a )
+//  MACHINE_CONFIG_START( mds_a )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( mds_a )
+static MACHINE_CONFIG_START( mds_a )
 	MCFG_FLOPPY_DRIVE_ADD("floppy0", mds_a_floppies, "525sd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("floppy1", mds_a_floppies, "525sd", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
@@ -83,7 +83,7 @@ machine_config_constructor s100_mds_a_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 s100_mds_a_device::s100_mds_a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, S100_MDS_A, "MDS-A", tag, owner, clock, "nsmdsa", __FILE__),
+	device_t(mconfig, S100_MDS_A, tag, owner, clock),
 	device_s100_card_interface(mconfig, *this),
 	m_floppy0(*this, "floppy0"),
 	m_floppy1(*this, "floppy1"),

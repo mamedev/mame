@@ -18,7 +18,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_AGAT7LANGCARD = device_creator<a2bus_agat7langcard_device>;
+DEFINE_DEVICE_TYPE(A2BUS_AGAT7LANGCARD, a2bus_agat7langcard_device, "a7lang", "Agat-7 32K Language Card")
 
 /***************************************************************************
     FUNCTION PROTOTYPES
@@ -28,15 +28,14 @@ const device_type A2BUS_AGAT7LANGCARD = device_creator<a2bus_agat7langcard_devic
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_agat7langcard_device::a2bus_agat7langcard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+a2bus_agat7langcard_device::a2bus_agat7langcard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this), m_inh_state(0), m_last_offset(0), m_dxxx_bank(0), m_main_bank(0)
 {
 }
 
 a2bus_agat7langcard_device::a2bus_agat7langcard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, A2BUS_AGAT7LANGCARD, "Agat-7 32K Language Card", tag, owner, clock, "a7lang", __FILE__),
-	device_a2bus_card_interface(mconfig, *this), m_inh_state(0), m_last_offset(0), m_dxxx_bank(0), m_main_bank(0)
+	a2bus_agat7langcard_device(mconfig, A2BUS_AGAT7LANGCARD, tag, owner, clock)
 {
 }
 

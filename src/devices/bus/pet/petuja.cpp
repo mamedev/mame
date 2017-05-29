@@ -17,7 +17,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type PET_USERPORT_JOYSTICK_ADAPTER = device_creator<pet_userport_joystick_adapter_device>;
+DEFINE_DEVICE_TYPE(PET_USERPORT_JOYSTICK_ADAPTER, pet_userport_joystick_adapter_device, "petuja", "PET Userport Joystick Adapter")
 
 
 //-------------------------------------------------
@@ -61,7 +61,7 @@ ioport_constructor pet_userport_joystick_adapter_device::device_input_ports() co
 //-------------------------------------------------
 
 pet_userport_joystick_adapter_device::pet_userport_joystick_adapter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, PET_USERPORT_JOYSTICK_ADAPTER, "PET Userport Joystick Adapter", tag, owner, clock, "petuja", __FILE__),
+	device_t(mconfig, PET_USERPORT_JOYSTICK_ADAPTER, tag, owner, clock),
 	device_pet_user_port_interface(mconfig, *this),
 	m_up1(1),
 	m_down1(1),

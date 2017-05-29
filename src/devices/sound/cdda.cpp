@@ -231,10 +231,12 @@ int16_t cdda_device::get_channel_volume(int channel)
 	return m_audio_volume[channel];
 }
 
-const device_type CDDA = device_creator<cdda_device>;
+DEFINE_DEVICE_TYPE(CDDA, cdda_device, "cdda", "CD/DA")
 
 cdda_device::cdda_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, CDDA, "CD/DA", tag, owner, clock, "cdda", __FILE__),
-		device_sound_interface(mconfig, *this)
+	: device_t(mconfig, CDDA, tag, owner, clock)
+	, device_sound_interface(mconfig, *this)
+	, m_disc(nullptr)
+	, m_stream(nullptr)
 {
 }

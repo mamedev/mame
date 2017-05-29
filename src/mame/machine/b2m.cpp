@@ -269,9 +269,6 @@ void b2m_state::b2m_postload()
 
 void b2m_state::machine_start()
 {
-	m_pic = machine().device<pic8259_device>("pic8259");
-	m_fdc = machine().device<fd1793_t>("fd1793");
-
 	/* register for state saving */
 	save_item(NAME(m_b2m_8255_porta));
 	save_item(NAME(m_b2m_video_scroll));

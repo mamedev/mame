@@ -21,10 +21,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_CDP1852_H
+#define MAME_MACHINE_CDP1852_H
 
-#ifndef __CDP1852__
-#define __CDP1852__
+#pragma once
 
 
 
@@ -53,16 +53,16 @@
 
 // ======================> cdp1852_device
 
-class cdp1852_device :  public device_t
+class cdp1852_device : public device_t
 {
 public:
 	// construction/destruction
 	cdp1852_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_mode_rd_callback(device_t &device, _Object object) { return downcast<cdp1852_device &>(device).m_read_mode.set_callback(object); }
-	template<class _Object> static devcb_base &set_sr_wr_callback(device_t &device, _Object object) { return downcast<cdp1852_device &>(device).m_write_sr.set_callback(object); }
-	template<class _Object> static devcb_base &set_data_rd_callback(device_t &device, _Object object) { return downcast<cdp1852_device &>(device).m_read_data.set_callback(object); }
-	template<class _Object> static devcb_base &set_data_wr_callback(device_t &device, _Object object) { return downcast<cdp1852_device &>(device).m_write_data.set_callback(object); }
+	template <class Object> static devcb_base &set_mode_rd_callback(device_t &device, Object &&cb) { return downcast<cdp1852_device &>(device).m_read_mode.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_sr_wr_callback(device_t &device, Object &&cb) { return downcast<cdp1852_device &>(device).m_write_sr.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_data_rd_callback(device_t &device, Object &&cb) { return downcast<cdp1852_device &>(device).m_read_data.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_data_wr_callback(device_t &device, Object &&cb) { return downcast<cdp1852_device &>(device).m_write_data.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -94,8 +94,6 @@ private:
 
 
 // device type definition
-extern const device_type CDP1852;
+DECLARE_DEVICE_TYPE(CDP1852, cdp1852_device)
 
-
-
-#endif
+#endif // MAME_MACHINE_CDP1852_H

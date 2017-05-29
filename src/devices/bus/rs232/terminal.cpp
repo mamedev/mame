@@ -4,7 +4,7 @@
 #include "terminal.h"
 
 serial_terminal_device::serial_terminal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: generic_terminal_device(mconfig, SERIAL_TERMINAL, "Serial Terminal", tag, owner, clock, "serial_terminal", __FILE__)
+	: generic_terminal_device(mconfig, SERIAL_TERMINAL, tag, owner, clock, TERMINAL_WIDTH, TERMINAL_HEIGHT)
 	, device_buffered_serial_interface(mconfig, *this)
 	, device_rs232_port_interface(mconfig, *this)
 	, m_rs232_txbaud(*this, "RS232_TXBAUD")
@@ -93,4 +93,4 @@ void serial_terminal_device::received_byte(uint8_t byte)
 	term_write(byte);
 }
 
-const device_type SERIAL_TERMINAL = device_creator<serial_terminal_device>;
+DEFINE_DEVICE_TYPE(SERIAL_TERMINAL, serial_terminal_device, "serial_terminal", "Serial Terminal")

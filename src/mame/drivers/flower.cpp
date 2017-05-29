@@ -5,13 +5,13 @@
     Flower (c) 1986 Clarue
 
     driver by Angelo Salese,
-	original "wiped off due of not anymore licenseable" driver by insideoutboy.
-	
-	TODO:
-	- sprite zooming;
-	- some video glitches;
-	- $a000 outputs;
-	- sound, third z80 not hooked up;
+    original "wiped off due of not anymore licenseable" driver by insideoutboy.
+
+    TODO:
+    - sprite zooming;
+    - some video glitches;
+    - $a000 outputs;
+    - sound, third z80 not hooked up;
 
 ===============================================================================
 
@@ -94,7 +94,7 @@ class flower_state : public driver_device
 public:
 	flower_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"), 
+		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_txvram(*this, "txvram"),
@@ -115,8 +115,8 @@ public:
 	required_shared_ptr<uint8_t> m_bgscroll;
 	required_shared_ptr<uint8_t> m_fgscroll;
 
-	
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted); 
+
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void legacy_tx_draw(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void legacy_layers_draw(bitmap_ind16 &bitmap,const rectangle &cliprect);
@@ -166,13 +166,13 @@ void flower_state::legacy_layers_draw(bitmap_ind16 &bitmap,const rectangle &clip
 	int bg_ybase = m_bgscroll[0];
 	int fg_ybase = m_fgscroll[0];
 	int count;
-	
+
 	for (count=0;count<16*16;count++)
 	{
 		int x = count % 16;
 		int y = count / 16;
 		uint8_t tile, attr;
-		
+
 		tile = m_bgvram[count];
 		attr = m_bgvram[count+0x100];
 		if(attr & 0xf) // debug
@@ -180,14 +180,14 @@ void flower_state::legacy_layers_draw(bitmap_ind16 &bitmap,const rectangle &clip
 
 		gfx_1->opaque(bitmap,cliprect, tile,  attr >> 4, 0, 0, x*16, (y*16 - bg_ybase) & 0xff);
 	}
-	
-	
+
+
 	for (count=0;count<16*16;count++)
 	{
 		int x = count % 16;
 		int y = count / 16;
 		uint8_t tile, attr;
-		
+
 		tile = m_fgvram[count];
 		attr = m_fgvram[count+0x100];
 		if(attr & 0xf)
@@ -225,7 +225,7 @@ void flower_state::sprites_draw(bitmap_ind16 &bitmap,const rectangle &cliprect)
 
 		if(ysize == 2)
 			y-=16;
-		
+
 		tile |= (attr & 1) << 6;
 		tile |= (attr & 8) << 4;
 		// TODO: zoom
@@ -234,10 +234,10 @@ void flower_state::sprites_draw(bitmap_ind16 &bitmap,const rectangle &cliprect)
 			for(int xi=0;xi<xsize;xi++)
 			{
 				int tile_offs;
-				
+
 				tile_offs = fx ? (xsize-xi-1) * 8 : xi*8;
 				tile_offs+= fy ? (ysize-yi-1) : yi;
-				
+
 				gfx_2->transpen(bitmap,cliprect, tile+tile_offs, color, fx, fy, x+xi*16, y+yi*16, 15);
 			}
 		}
@@ -270,7 +270,7 @@ ADDRESS_MAP_END
 INPUT_CHANGED_MEMBER(flower_state::coin_inserted)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
-} 
+}
 
 static INPUT_PORTS_START( flower )
 	PORT_START("P1")
@@ -367,7 +367,7 @@ static GFXDECODE_START( flower )
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout, 0,  16 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( flower, flower_state )
+static MACHINE_CONFIG_START( flower )
 	MCFG_CPU_ADD("maincpu",Z80,4000000)
 	MCFG_CPU_PROGRAM_MAP(shared_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", flower_state,  irq0_line_hold)
@@ -382,7 +382,7 @@ static MACHINE_CONFIG_START( flower, flower_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", flower)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 256)
+	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 
 MACHINE_CONFIG_END
 
@@ -474,5 +474,5 @@ ROM_START( flowerj ) /* Sega/Alpha version.  Sega game number 834-5998 */
 ROM_END
 
 
-GAME( 1986, flower,  0,      flower, flower, driver_device, 0, ROT0, "Clarue (Komax license)", "Flower (US)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_IMPERFECT_GRAPHICS|MACHINE_NO_COCKTAIL )
-GAME( 1986, flowerj, flower, flower, flower, driver_device, 0, ROT0, "Clarue (Sega / Alpha Denshi Co. license)", "Flower (Japan)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_IMPERFECT_GRAPHICS|MACHINE_NO_COCKTAIL )
+GAME( 1986, flower,  0,      flower, flower, flower_state, 0, ROT0, "Clarue (Komax license)",                   "Flower (US)",    MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_IMPERFECT_GRAPHICS|MACHINE_NO_COCKTAIL )
+GAME( 1986, flowerj, flower, flower, flower, flower_state, 0, ROT0, "Clarue (Sega / Alpha Denshi Co. license)", "Flower (Japan)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_IMPERFECT_GRAPHICS|MACHINE_NO_COCKTAIL )

@@ -48,10 +48,10 @@ static const int channel_bits[4] =
 };
 
 
-const device_type EXIDY440 = device_creator<exidy440_sound_device>;
+DEFINE_DEVICE_TYPE(EXIDY440, exidy440_sound_device, "exidy440_sound", "Exidy 440 CVSD")
 
 exidy440_sound_device::exidy440_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, EXIDY440, "Exidy 440 CVSD", tag, owner, clock, "exidy440_sound", __FILE__),
+	: device_t(mconfig, EXIDY440, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		m_sound_command(0),
 		m_sound_command_ack(0),
@@ -873,7 +873,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-MACHINE_CONFIG_FRAGMENT( exidy440_audio )
+MACHINE_CONFIG_START( exidy440_audio )
 
 	MCFG_CPU_ADD("audiocpu", M6809, EXIDY440_AUDIO_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(exidy440_audio_map)

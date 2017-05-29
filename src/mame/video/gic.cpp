@@ -65,7 +65,7 @@
 #include "screen.h"
 
 // device type definition
-const device_type GIC = device_creator<gic_device>;
+DEFINE_DEVICE_TYPE(GIC, gic_device, "gic", "AY-3-8800-1 GIC")
 
 
 //Font data taken from Paul Robson's simulator
@@ -82,27 +82,20 @@ ROM_END
 //-------------------------------------------------
 
 gic_device::gic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, GIC, "GIC", tag, owner, clock, "gic", __FILE__)
-	, device_sound_interface(mconfig, *this)
-	, device_video_interface(mconfig, *this)
-	, m_cgrom(nullptr)
-	, m_audiocnt(0)
-	, m_audioval(0)
-	, m_audioreset(0)
-	, m_ram(nullptr)
+	: gic_device(mconfig, GIC, tag, owner, clock)
 {
 }
 
 
-gic_device::gic_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, int lines, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+gic_device::gic_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, device_video_interface(mconfig, *this)
-	, m_cgrom(nullptr)
+	, m_cgrom(*this, "cgrom")
 	, m_audiocnt(0)
 	, m_audioval(0)
 	, m_audioreset(0)
-	, m_ram(nullptr)
+	, m_ram(*this)
 {
 }
 
@@ -118,8 +111,6 @@ const tiny_rom_entry *gic_device::device_rom_region() const
 
 void gic_device::device_start()
 {
-	m_cgrom = memregion("cgrom")->base();
-
 	// Let the screen create our temporary bitmap with the screen's dimensions
 	m_screen->register_screen_bitmap(m_bitmap);
 
@@ -128,6 +119,8 @@ void gic_device::device_start()
 
 	// allocate the audio stream
 	m_stream = stream_alloc( 0, 1, clock()/(2*228) );
+
+	m_ram.resolve_safe(0xff);
 }
 
 
@@ -193,7 +186,7 @@ uint32_t gic_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 		for(uint8_t cx=0;cx<GIC_LEFT_W;cx++){
 			draw_char_left(XSTART+(cx*GIC_CHAR_W),
 							YSTART+(cy*GIC_CHAR_H),
-							m_ram[current],
+							m_ram(machine().dummy_space(), current, 0xff),
 							m_bitmap);
 			current++;
 		}
@@ -206,7 +199,7 @@ uint32_t gic_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 	for(uint8_t cy=0;cy<GIC_RIGHT_H;cy++){
 		for(uint8_t cx=0;cx<GIC_RIGHT_W;cx++){
 			//complex case
-			uint8_t data = m_ram[current++];
+			uint8_t data = m_ram(machine().dummy_space(), current++, 0xff);
 
 			size_t currX   = (XSTART+           (cx*(3+GIC_CHAR_W)));
 			size_t currUP  = (YSTART+           (cy*(2*GIC_CHAR_H)));
@@ -302,9 +295,7 @@ void gic_device::sound_stream_update(sound_stream &stream, stream_sample_t **inp
 	//lo for 1824(228*8)
 	//hi for 1824(228*8)
 
-	if(!m_ram) return;
-
-	uint8_t audioByte = m_ram[GIC_AUDIO_BYTE]*2;
+	uint8_t audioByte = m_ram(machine().dummy_space(), GIC_AUDIO_BYTE, 0xff)*2;
 
 	if(!audioByte){
 		for(size_t i = 0; i < samples; i++)

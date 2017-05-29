@@ -5,10 +5,10 @@
 
 */
 
-#pragma once
+#ifndef MAME_SOUND_FM_H
+#define MAME_SOUND_FM_H
 
-#ifndef __FM_H__
-#define __FM_H__
+#pragma once
 
 /* --- select emulation chips --- */
 #define BUILD_YM2203  (1)       /* build YM2203(OPN)   emulator */
@@ -32,46 +32,22 @@
 /* used by YM2203,YM2608,and YM2610 */
 struct ssg_callbacks
 {
-	void (*set_clock)(void *param, int clock);
-	void (*write)(void *param, int address, int data);
-	int (*read)(void *param);
-	void (*reset)(void *param);
+	void (*set_clock)(device_t *device, int clock);
+	void (*write)(device_t *device, int address, int data);
+	int (*read)(device_t *device);
+	void (*reset)(device_t *device);
 };
 
 /* --- external callback functions for realtime update --- */
 
 #if FM_BUSY_FLAG_SUPPORT
-#define TIME_TYPE                   attotime
+using TIME_TYPE = attotime;
 #define UNDEFINED_TIME              attotime::zero
 #define FM_GET_TIME_NOW(machine)    (machine)->time()
-#define ADD_TIMES(t1, t2)           ((t1) + (t2))
-#define COMPARE_TIMES(t1, t2)       (((t1) == (t2)) ? 0 : ((t1) < (t2)) ? -1 : 1)
-#define MULTIPLY_TIME_BY_INT(t,i)   ((t) * (i))
+inline TIME_TYPE ADD_TIMES(TIME_TYPE const &t1, TIME_TYPE const &t2) { return t1 + t2; }
+constexpr int COMPARE_TIMES(TIME_TYPE const &t1, TIME_TYPE const &t2) { return (t1 == t2) ? 0 : (t1 < t2) ? -1 : 1; }
+template <typename X> constexpr TIME_TYPE MULTIPLY_TIME_BY_INT(TIME_TYPE const &t, X &&i) { return t * i; }
 #endif
-
-#if BUILD_YM2203
-	/* in 2203intf.c */
-	void ym2203_update_request(void *param);
-	#define ym2203_update_req(chip) ym2203_update_request(chip)
-#endif /* BUILD_YM2203 */
-
-#if BUILD_YM2608
-	/* in 2608intf.c */
-	void ym2608_update_request(void *param);
-	#define ym2608_update_req(chip) ym2608_update_request(chip);
-#endif /* BUILD_YM2608 */
-
-#if (BUILD_YM2610||BUILD_YM2610B)
-	/* in 2610intf.c */
-	void ym2610_update_request(void *param);
-	#define ym2610_update_req(chip) ym2610_update_request(chip);
-#endif /* (BUILD_YM2610||BUILD_YM2610B) */
-
-#if (BUILD_YM2612||BUILD_YM3438)
-	/* in 2612intf.c */
-	void ym2612_update_request(void *param);
-	#define ym2612_update_req(chip) ym2612_update_request(chip);
-#endif /* (BUILD_YM2612||BUILD_YM3438) */
 
 
 typedef stream_sample_t FMSAMPLE;
@@ -84,8 +60,8 @@ typedef unsigned char  FMSAMPLE;
 #endif
 */
 
-typedef void (*FM_TIMERHANDLER)(void *param,int c,int cnt,int clock);
-typedef void (*FM_IRQHANDLER)(void *param,int irq);
+typedef void (*FM_TIMERHANDLER)(device_t *device,int c,int cnt,int clock);
+typedef void (*FM_IRQHANDLER)(device_t *device,int irq);
 /* FM_TIMERHANDLER : Stop or Start timer         */
 /* int n          = chip number                  */
 /* int c          = Channel 0=TimerA,1=TimerB    */
@@ -109,7 +85,7 @@ typedef void (*FM_IRQHANDLER)(void *param,int irq);
 ** 'IRQHandler'    IRQ callback handler when changed IRQ level
 ** return      0 = success
 */
-void * ym2203_init(void *param, device_t *device, int baseclock, int rate,
+void * ym2203_init(device_t *device, int baseclock, int rate,
 				FM_TIMERHANDLER TimerHandler,FM_IRQHANDLER IRQHandler, const ssg_callbacks *ssg);
 
 /*
@@ -157,7 +133,7 @@ void ym2203_postload(void *chip);
 
 #if BUILD_YM2608
 /* -------------------- YM2608(OPNA) Interface -------------------- */
-void * ym2608_init(void *param, device_t *device, int baseclock, int rate,
+void * ym2608_init(device_t *device, int baseclock, int rate,
 				void *pcmroma,int pcmsizea,
 				FM_TIMERHANDLER TimerHandler,FM_IRQHANDLER IRQHandler, const ssg_callbacks *ssg);
 void ym2608_shutdown(void *chip);
@@ -172,7 +148,7 @@ void ym2608_postload(void *chip);
 
 #if (BUILD_YM2610||BUILD_YM2610B)
 /* -------------------- YM2610(OPNB) Interface -------------------- */
-void * ym2610_init(void *param, device_t *device, int baseclock, int rate,
+void * ym2610_init(device_t *device, int baseclock, int rate,
 				void *pcmroma,int pcmasize,void *pcmromb,int pcmbsize,
 				FM_TIMERHANDLER TimerHandler,FM_IRQHANDLER IRQHandler, const ssg_callbacks *ssg);
 void ym2610_shutdown(void *chip);
@@ -190,7 +166,7 @@ void ym2610_postload(void *chip);
 #endif /* (BUILD_YM2610||BUILD_YM2610B) */
 
 #if (BUILD_YM2612||BUILD_YM3438)
-void * ym2612_init(void *param, device_t *device, int baseclock, int rate,
+void * ym2612_init(device_t *device, int baseclock, int rate,
 				FM_TIMERHANDLER TimerHandler,FM_IRQHANDLER IRQHandler);
 void ym2612_clock_changed(void *chip, int clock, int rate);
 void ym2612_shutdown(void *chip);
@@ -204,4 +180,4 @@ void ym2612_postload(void *chip);
 #endif /* (BUILD_YM2612||BUILD_YM3438) */
 
 
-#endif /* __FM_H__ */
+#endif // MAME_SOUND_FM_H

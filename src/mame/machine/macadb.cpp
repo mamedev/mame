@@ -641,22 +641,11 @@ TIMER_CALLBACK_MEMBER(mac_state::mac_adb_tick)
 		if (!m_adb_direction)
 		{
 			m_via1->write_cb2((m_adb_send & 0x80)>>7);
-			if (m_adb_timer_ticks != 9)
-			{
-				m_adb_send <<= 1;
-			}
+			m_adb_send <<= 1;
 		}
 
 		// do one clock transition on CB1 to advance the VIA shifter
-		m_adb_extclock ^= 1;
-		m_via1->write_cb1(m_adb_extclock);
-
-		if ((m_adb_direction) && (m_adb_timer_ticks > 1))
-		{
-			m_adb_command <<= 1;
-		}
-
-		m_adb_extclock ^= 1;
+		m_via1->write_cb1(m_adb_extclock ^ 1);
 		m_via1->write_cb1(m_adb_extclock);
 
 		m_adb_timer_ticks--;
@@ -668,7 +657,7 @@ TIMER_CALLBACK_MEMBER(mac_state::mac_adb_tick)
 			{
 				adb_talk();
 				if((m_adb_last_talk == 2) && m_adb_datasize) {
-					m_adb_timer_ticks = 9;
+					m_adb_timer_ticks = 8;
 					m_adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
 				}
 			}
@@ -689,7 +678,7 @@ void mac_state::mac_adb_newaction(int state)
 		#endif
 
 		m_adb_state = state;
-		m_adb_timer_ticks = 9;
+		m_adb_timer_ticks = 8;
 
 		switch (state)
 		{
@@ -1126,7 +1115,7 @@ void mac_state::adb_vblank()
 				m_adb_waiting_cmd = 1;
 				this->adb_talk();
 
-				m_adb_timer_ticks = 9;
+				m_adb_timer_ticks = 8;
 				this->m_adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
 			}
 			#if 0
@@ -1163,7 +1152,7 @@ void mac_state::adb_vblank()
 				m_adb_waiting_cmd = 1;
 				this->adb_talk();
 
-				m_adb_timer_ticks = 9;
+				m_adb_timer_ticks = 8;
 				this->m_adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
 			}
 			#if 0

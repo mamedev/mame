@@ -67,7 +67,7 @@ TILE_GET_INFO_MEMBER(ksayakyu_state::get_text_tile_info)
 	int attr = m_videoram[tile_index * 2];
 	int flags = ((attr & 0x80) ? TILE_FLIPX : 0);// | ((attr & 0x40) ? TILE_FLIPY : 0);
 	int color = (attr & 0x3c) >> 2;
-	
+
 	code |= (attr & 3) << 8;
 
 	SET_TILE_INFO_MEMBER(0, code, color, flags);

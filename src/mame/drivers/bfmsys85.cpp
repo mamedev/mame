@@ -126,7 +126,7 @@ public:
 	virtual void machine_reset() override;
 	INTERRUPT_GEN_MEMBER(timer_irq);
 	int b85_find_project_string( );
-	optional_device<roc10937_t> m_vfd;
+	optional_device<roc10937_device> m_vfd;
 	required_device<cpu_device> m_maincpu;
 	required_device<stepper_device> m_reel0;
 	required_device<stepper_device> m_reel1;
@@ -388,7 +388,7 @@ ADDRESS_MAP_END
 
 // machine driver for system85 board //////////////////////////////////////
 
-static MACHINE_CONFIG_START( bfmsys85, bfmsys85_state )
+static MACHINE_CONFIG_START( bfmsys85 )
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/4)          // 6809 CPU at 1 Mhz
 	MCFG_CPU_PROGRAM_MAP(memmap)                        // setup read and write memorymap
 	MCFG_CPU_PERIODIC_INT_DRIVER(bfmsys85_state, timer_irq,  1000)              // generate 1000 IRQ's per second

@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_CPU_SCORE_SCORE_H
+#define MAME_CPU_SCORE_SCORE_H
 
-#ifndef __SCORE_H__
-#define __SCORE_H__
+#pragma once
 
 
 //**************************************************************************
@@ -33,7 +33,8 @@ class score7_cpu_device : public cpu_device
 {
 public:
 	// construction/destruction
-	score7_cpu_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
+	score7_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -110,7 +111,6 @@ private:
 	void op_iform1a();
 	void op_iform1b();
 
-private:
 	address_space_config m_program_config;
 	address_space *     m_program;
 	direct_read_data *  m_direct;
@@ -145,6 +145,6 @@ private:
 	static const char *const m_cr_op[2];
 };
 
-extern const device_type SCORE7;
+DECLARE_DEVICE_TYPE(SCORE7, score7_cpu_device)
 
-#endif /* __SCORE_H__ */
+#endif // MAME_CPU_SCORE_SCORE_H

@@ -311,7 +311,7 @@ WRITE_LINE_MEMBER(ti990_10_state::tape_interrupt)
 	// set_int9(state);
 }
 
-static MACHINE_CONFIG_START( ti990_10, ti990_10_state )
+static MACHINE_CONFIG_START( ti990_10 )
 	/* basic machine hardware */
 	/* TI990/10 CPU @ 4.0(???) MHz */
 	MCFG_TMS99xx_ADD("maincpu", TI990_10, 4000000, ti990_10_memmap, ti990_10_io )
@@ -371,7 +371,7 @@ ROM_START(ti990_10)
 
 
 	/* VDT911 character definitions */
-	ROM_REGION(vdt911_chr_region_len, vdt911_chr_region, ROMREGION_ERASEFF)
+	ROM_REGION(vdt911_device::chr_region_len, vdt911_chr_region, ROMREGION_ERASEFF)
 
 ROM_END
 
@@ -385,5 +385,5 @@ DRIVER_INIT_MEMBER(ti990_10_state,ti990_10)
 #endif
 }
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        COMPANY                 FULLNAME */
-COMP( 1975, ti990_10,   0,      0,      ti990_10,   0, ti990_10_state,   ti990_10,   "Texas Instruments",    "TI Model 990/10 Minicomputer System" , MACHINE_NOT_WORKING )
+//    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT  STATE           INIT      COMPANY              FULLNAME                               FLAGS
+COMP( 1975, ti990_10,   0,      0,      ti990_10,   0,     ti990_10_state, ti990_10, "Texas Instruments", "TI Model 990/10 Minicomputer System", MACHINE_NOT_WORKING )

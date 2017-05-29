@@ -14,7 +14,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type MC1502_ROM = device_creator<mc1502_rom_device>;
+DEFINE_DEVICE_TYPE(MC1502_ROM, mc1502_rom_device, "mc1502_rom", "MC-1502 ROM cart")
 
 
 //-------------------------------------------------
@@ -46,7 +46,7 @@ const tiny_rom_entry *mc1502_rom_device::device_rom_region() const
 //-------------------------------------------------
 
 mc1502_rom_device::mc1502_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MC1502_ROM, "MC-1502 ROM cart", tag, owner, clock, "mc1502_rom", __FILE__)
+	: device_t(mconfig, MC1502_ROM, tag, owner, clock)
 	, device_isa8_card_interface(mconfig, *this)
 {
 }

@@ -3,6 +3,28 @@
 <softwarelist name="t1000" description="Tandy 1000 series disk images">
 
 	<!-- OS -->
+	<software name="msdos211t">
+		<description>MS-DOS (Version 2.11, Tandy version 02.11.24)</description>
+		<year>1986</year>
+		<publisher>Tandy</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Disk01.img" size="368640" crc="ddd53ecc" sha1="6a13687c33cec90a81d20931057aa7c80643e274" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msdos211ta" cloneof="msdos211t">
+		<description>MS-DOS (Version 2.11, Tandy version 02.11.24, Alt)</description>
+		<year>1986</year>
+		<publisher>Tandy</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Disk01 alt.img" size="368640" crc="bdf729aa" sha1="725ae80df87211bba47e33596994ac05cebf9d40" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="msdos32tx">
 		<description>MS-DOS (Verson 3.20, Tandy version 03.20.21) (Tandy 1000 TX)</description>
 		<year>1986</year>
@@ -11,6 +33,24 @@
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="tandy_1000_tx_dos.img" size="737280" crc="c8ce9264" sha1="51a5bd4bec7fa3f0c4e956e904861973ae3fc67f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msdos33t">
+		<description>MS-DOS (Verson 3.30, Tandy Version 03.30.20)</description>
+		<year>1988</year>
+		<publisher>Tandy</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="MS-DOS/GW-Basic 3.30" />
+			<dataarea name="flop" size = "368640">
+				<rom name="Disk1.img" size="368640" crc="d4ef3158" sha1="c5b2f173a5392767b60903d56bf11acee854c091" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Supplemental Programs" />
+			<dataarea name="flop" size = "368640">
+				<rom name="Disk2.img" size="368640" crc="8b491cdc" sha1="c14ea0f683a90b95d2be21a15813aad187280af2" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

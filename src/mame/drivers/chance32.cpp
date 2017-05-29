@@ -444,7 +444,7 @@ void chance32_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( chance32, chance32_state )
+static MACHINE_CONFIG_START( chance32 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,12000000/2)
@@ -474,7 +474,7 @@ static MACHINE_CONFIG_START( chance32, chance32_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	/* clock at 1050 kHz match the 8000 Hz samples stored inside the ROM */
-	MCFG_OKIM6295_ADD("oki", XTAL_1_056MHz, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL_1_056MHz, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -517,5 +517,5 @@ ROM_END
 *      Game Drivers      *
 *************************/
 
-/*     YEAR  NAME      PARENT  MACHINE   INPUT     STATE          INIT  ROT    COMPANY                FULLNAME            FLAGS  LAYOUT */
-GAMEL( 19??, chance32, 0,      chance32, chance32, driver_device, 0,    ROT0, "PAL System Co, Ltd.", "Chance Thirty Two", 0,     layout_chance32 )
+/*     YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT  ROT   COMPANY                FULLNAME             FLAGS  LAYOUT */
+GAMEL( 19??, chance32, 0,      chance32, chance32, chance32_state, 0,    ROT0, "PAL System Co, Ltd.", "Chance Thirty Two", 0,     layout_chance32 )

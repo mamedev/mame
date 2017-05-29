@@ -59,7 +59,8 @@
 
 
 #define VERBOSE 0
-#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
+#include "logmacro.h"
+
 
 READ8_MEMBER( namco_53xx_device::K_r )
 {
@@ -68,14 +69,7 @@ READ8_MEMBER( namco_53xx_device::K_r )
 
 READ8_MEMBER( namco_53xx_device::Rx_r )
 {
-	switch(offset) {
-		case 0 : return m_in_0(0);
-		case 1 : return m_in_1(0);
-		case 2 : return m_in_2(0);
-		case 3 : return m_in_3(0);
-		default : return 0xff;
-	}
-
+	return (offset < ARRAY_LENGTH(m_in)) ? m_in[offset](0) : 0xff;
 }
 
 WRITE8_MEMBER( namco_53xx_device::O_w )
@@ -132,28 +126,19 @@ static ADDRESS_MAP_START( namco_53xx_map_io, AS_IO, 8,namco_53xx_device )
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_FRAGMENT( namco_53xx )
-	MCFG_CPU_ADD("mcu", MB8843, DERIVED_CLOCK(1,1))     /* parent clock, internally divided by 6 */
-	MCFG_CPU_IO_MAP(namco_53xx_map_io)
-MACHINE_CONFIG_END
-
-
 ROM_START( namco_53xx )
 	ROM_REGION( 0x400, "mcu", 0 )
 	ROM_LOAD( "53xx.bin",     0x0000, 0x0400, CRC(b326fecb) SHA1(758d8583d658e4f1df93184009d86c3eb8713899) )
 ROM_END
 
-const device_type NAMCO_53XX = device_creator<namco_53xx_device>;
+DEFINE_DEVICE_TYPE(NAMCO_53XX, namco_53xx_device, "namco53", "Namco 53xx")
 
 namco_53xx_device::namco_53xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, NAMCO_53XX, "Namco 53xx", tag, owner, clock, "namco53", __FILE__),
+	: device_t(mconfig, NAMCO_53XX, tag, owner, clock),
 	m_cpu(*this, "mcu"),
 	m_portO(0),
 	m_k(*this),
-	m_in_0(*this),
-	m_in_1(*this),
-	m_in_2(*this),
-	m_in_3(*this),
+	m_in{ { *this }, { *this }, { *this }, { *this } },
 	m_p(*this)
 {
 }
@@ -165,24 +150,21 @@ void namco_53xx_device::device_start()
 {
 	/* resolve our read/write callbacks */
 	m_k.resolve_safe(0);
-	m_in_0.resolve_safe(0);
-	m_in_1.resolve_safe(0);
-	m_in_2.resolve_safe(0);
-	m_in_3.resolve_safe(0);
+	for (devcb_read8 &cb : m_in)
+		cb.resolve_safe(0);
 	m_p.resolve_safe();
 
 	save_item(NAME(m_portO));
 }
 
 //-------------------------------------------------
-//  device_mconfig_additions - return a pointer to
-//  the device's machine fragment
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor namco_53xx_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( namco_53xx  );
-}
+MACHINE_CONFIG_MEMBER( namco_53xx_device::device_add_mconfig )
+	MCFG_CPU_ADD("mcu", MB8843, DERIVED_CLOCK(1,1))     /* parent clock, internally divided by 6 */
+	MCFG_CPU_IO_MAP(namco_53xx_map_io)
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  device_rom_region - return a pointer to the

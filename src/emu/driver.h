@@ -118,15 +118,8 @@ public:
 	};
 
 	// inline configuration helpers
-	static void static_set_game(device_t &device, const game_driver &game);
+	void set_game_driver(const game_driver &game);
 	static void static_set_callback(device_t &device, callback_type type, driver_callback_delegate callback);
-
-	// generic helpers
-	template<class _DriverClass, void (_DriverClass::*_Function)()>
-	static void driver_init_wrapper(running_machine &machine)
-	{
-		(machine.driver_data<_DriverClass>()->*_Function)();
-	}
 
 	// dummy driver_init callbacks
 	void init_0() { }
@@ -204,6 +197,7 @@ protected:
 
 	// device-level overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;
 	virtual void device_reset_after_children() override;

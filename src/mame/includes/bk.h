@@ -26,6 +26,7 @@ public:
 	uint16_t m_key_pressed;
 	uint16_t m_key_irq_vector;
 	uint16_t m_drive;
+	emu_timer *m_kbd_timer;
 	DECLARE_READ16_MEMBER(bk_key_state_r);
 	DECLARE_READ16_MEMBER(bk_key_code_r);
 	DECLARE_READ16_MEMBER(bk_vid_scrool_r);

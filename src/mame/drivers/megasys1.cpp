@@ -1604,7 +1604,7 @@ GFXDECODE_END
 
 /* Provided by Jim Hernandez: 3.5MHz for FM, 30KHz (!) for ADPCM */
 
-static MACHINE_CONFIG_START( system_A, megasys1_state )
+static MACHINE_CONFIG_START( system_A )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, SYS_A_CPU_CLOCK) /* 6MHz verified */
@@ -1649,11 +1649,11 @@ static MACHINE_CONFIG_START( system_A, megasys1_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 
-	MCFG_OKIM6295_ADD("oki1", OKI4_SOUND_CLOCK, OKIM6295_PIN7_HIGH) /* 4MHz verified */
+	MCFG_OKIM6295_ADD("oki1", OKI4_SOUND_CLOCK, PIN7_HIGH) /* 4MHz verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 
-	MCFG_OKIM6295_ADD("oki2", OKI4_SOUND_CLOCK, OKIM6295_PIN7_HIGH) /* 4MHz verified */
+	MCFG_OKIM6295_ADD("oki2", OKI4_SOUND_CLOCK, PIN7_HIGH) /* 4MHz verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 MACHINE_CONFIG_END
@@ -1693,7 +1693,7 @@ static MACHINE_CONFIG_DERIVED( system_B_monkelf, system_B )
 	MCFG_CPU_PROGRAM_MAP(megasys1B_monkelf_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( system_Bbl, megasys1_state )
+static MACHINE_CONFIG_START( system_Bbl )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, SYS_B_CPU_CLOCK)
@@ -1727,7 +1727,7 @@ static MACHINE_CONFIG_START( system_Bbl, megasys1_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	/* just the one OKI, used for sound and music */
-	MCFG_OKIM6295_ADD("oki1", OKI4_SOUND_CLOCK, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki1", OKI4_SOUND_CLOCK, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 MACHINE_CONFIG_END
@@ -1736,11 +1736,11 @@ static MACHINE_CONFIG_DERIVED( system_B_hayaosi1, system_B )
 
 	/* basic machine hardware */
 
-	MCFG_OKIM6295_REPLACE("oki1", 2000000, OKIM6295_PIN7_HIGH) /* correct speed, but unknown OSC + divider combo */
+	MCFG_OKIM6295_REPLACE("oki1", 2000000, PIN7_HIGH) /* correct speed, but unknown OSC + divider combo */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 
-	MCFG_OKIM6295_REPLACE("oki2", 2000000, OKIM6295_PIN7_HIGH) /* correct speed, but unknown OSC + divider combo */
+	MCFG_OKIM6295_REPLACE("oki2", 2000000, PIN7_HIGH) /* correct speed, but unknown OSC + divider combo */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 MACHINE_CONFIG_END
@@ -1771,7 +1771,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 
-static MACHINE_CONFIG_START( system_D, megasys1_state )
+static MACHINE_CONFIG_START( system_D )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, SYS_D_CPU_CLOCK)    /* 8MHz */
@@ -1802,7 +1802,7 @@ static MACHINE_CONFIG_START( system_D, megasys1_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki1", SYS_D_CPU_CLOCK/4, OKIM6295_PIN7_HIGH)    /* 2MHz (8MHz / 4) */
+	MCFG_OKIM6295_ADD("oki1", SYS_D_CPU_CLOCK/4, PIN7_HIGH)    /* 2MHz (8MHz / 4) */
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, megasys1D_oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -1821,7 +1821,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 
-static MACHINE_CONFIG_START( system_Z, megasys1_state )
+static MACHINE_CONFIG_START( system_Z )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, SYS_A_CPU_CLOCK) /* 6MHz (12MHz / 2) */
@@ -4091,7 +4091,7 @@ ROM_END
 void megasys1_state::rodland_gfx_unmangle(const char *region)
 {
 	uint8_t *rom = memregion(region)->base();
-	int size = memregion(region)->bytes();
+	uint32_t size = memregion(region)->bytes();
 	int i;
 
 	/* data lines swap: 76543210 -> 64537210 */
@@ -4120,7 +4120,7 @@ void megasys1_state::rodland_gfx_unmangle(const char *region)
 void megasys1_state::jitsupro_gfx_unmangle(const char *region)
 {
 	uint8_t *rom = memregion(region)->base();
-	int size = memregion(region)->bytes();
+	uint32_t size = memregion(region)->bytes();
 	int i;
 
 	/* data lines swap: 76543210 -> 43576210 */
@@ -4144,7 +4144,7 @@ void megasys1_state::jitsupro_gfx_unmangle(const char *region)
 void megasys1_state::stdragona_gfx_unmangle(const char *region)
 {
 	uint8_t *rom = memregion(region)->base();
-	int size = memregion(region)->bytes();
+	uint32_t size = memregion(region)->bytes();
 	int i;
 
 	/* data lines swap: 76543210 -> 37564210 */
@@ -4591,14 +4591,14 @@ DRIVER_INIT_MEMBER(megasys1_state,monkelf)
  *************************************/
 
 // Type Z
-GAME( 1988, lomakai,  0,        system_Z,          lomakai,  driver_device,  0,        ROT0,   "Jaleco", "Legend of Makai (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, makaiden, lomakai,  system_Z,          lomakai,  driver_device,  0,        ROT0,   "Jaleco", "Makai Densetsu (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, lomakai,  0,        system_Z,          lomakai,  megasys1_state, 0,        ROT0,   "Jaleco", "Legend of Makai (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, makaiden, lomakai,  system_Z,          lomakai,  megasys1_state, 0,        ROT0,   "Jaleco", "Makai Densetsu (Japan)", MACHINE_SUPPORTS_SAVE )
 
 // Type A
-GAME( 1988, p47,      0,        system_A,          p47,      driver_device,  0,        ROT0,   "Jaleco", "P-47 - The Phantom Fighter (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, p47j,     p47,      system_A,          p47,      driver_device,  0,        ROT0,   "Jaleco", "P-47 - The Freedom Fighter (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, p47je,    p47,      system_A,          p47,      driver_device,  0,        ROT0,   "Jaleco", "P-47 - The Freedom Fighter (Japan, Export)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, kickoff,  0,        system_A,          kickoff,  driver_device,  0,        ROT0,   "Jaleco", "Kick Off (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, p47,      0,        system_A,          p47,      megasys1_state, 0,        ROT0,   "Jaleco", "P-47 - The Phantom Fighter (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, p47j,     p47,      system_A,          p47,      megasys1_state, 0,        ROT0,   "Jaleco", "P-47 - The Freedom Fighter (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, p47je,    p47,      system_A,          p47,      megasys1_state, 0,        ROT0,   "Jaleco", "P-47 - The Freedom Fighter (Japan, Export)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, kickoff,  0,        system_A,          kickoff,  megasys1_state, 0,        ROT0,   "Jaleco", "Kick Off (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, tshingen, 0,        system_A,          tshingen, megasys1_state, phantasm, ROT0,   "Jaleco", "Shingen Samurai-Fighter (Japan, English)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1988, tshingena,tshingen, system_A,          tshingen, megasys1_state, phantasm, ROT0,   "Jaleco", "Takeda Shingen (Japan, Japanese)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1988, kazan,    0,        system_A_iganinju, kazan,    megasys1_state, iganinju, ROT0,   "Jaleco", "Ninja Kazan (World)", MACHINE_SUPPORTS_SAVE )
@@ -4626,7 +4626,7 @@ GAME( 1990, monkelf,  avspirit, system_B_monkelf,  avspirit, megasys1_state, mon
 GAME( 1991, edf,      0,        system_B,          edf,      megasys1_state, edf,      ROT0,   "Jaleco", "E.D.F. : Earth Defense Force (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, edfa,     edf,      system_B,          edf,      megasys1_state, edf,      ROT0,   "Jaleco", "E.D.F. : Earth Defense Force (set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, edfu,     edf,      system_B,          edf,      megasys1_state, edf,      ROT0,   "Jaleco", "E.D.F. : Earth Defense Force (North America)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, edfbl,    edf,      system_Bbl,        edf,      driver_device,  0,        ROT0,   "bootleg","E.D.F. : Earth Defense Force (bootleg)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, edfbl,    edf,      system_Bbl,        edf,      megasys1_state, 0,        ROT0,   "bootleg","E.D.F. : Earth Defense Force (bootleg)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1993, hayaosi1, 0,        system_B_hayaosi1, hayaosi1, megasys1_state, hayaosi1, ROT0,   "Jaleco", "Hayaoshi Quiz Ouza Ketteisen - The King Of Quiz", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 // Type C

@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_MAGIC_DESK = device_creator<c64_magic_desk_cartridge_device>;
+DEFINE_DEVICE_TYPE(C64_MAGIC_DESK, c64_magic_desk_cartridge_device, "c64_magic_desk", "C64 Magic Desk cartridge")
 
 
 
@@ -28,7 +28,7 @@ const device_type C64_MAGIC_DESK = device_creator<c64_magic_desk_cartridge_devic
 //-------------------------------------------------
 
 c64_magic_desk_cartridge_device::c64_magic_desk_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, C64_MAGIC_DESK, "C64 Magic Desk cartridge", tag, owner, clock, "c64_magic_desk", __FILE__),
+	device_t(mconfig, C64_MAGIC_DESK, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_bank(0)
 {

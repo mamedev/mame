@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_C64_PS64_H
+#define MAME_BUS_C64_PS64_H
 
-#ifndef __PS64__
-#define __PS64__
+#pragma once
 
 
 #include "exp.h"
@@ -45,7 +45,7 @@ protected:
 
 
 // device type definition
-extern const device_type C64_PS64;
+DECLARE_DEVICE_TYPE(C64_PS64, c64_ps64_cartridge_device)
 
 
-#endif
+#endif // MAME_BUS_C64_PS64_H

@@ -339,7 +339,7 @@ C - uses sub board with support for player 3 and 4 controls
 #include "includes/namcos1.h"
 
 #include "cpu/m6809/m6809.h"
-#include "cpu/m6800/m6800.h"
+#include "cpu/m6800/m6801.h"
 #include "machine/nvram.h"
 #include "sound/volt_reg.h"
 #include "sound/ym2151.h"
@@ -1012,7 +1012,7 @@ GFXDECODE_END
     LPF info : Fco = 3.3KHz , g = -12dB/oct
 */
 
-static MACHINE_CONFIG_START( ns1, namcos1_state )
+static MACHINE_CONFIG_START( ns1 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809,XTAL_49_152MHz/32)

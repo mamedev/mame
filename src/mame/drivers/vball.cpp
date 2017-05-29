@@ -401,7 +401,7 @@ static GFXDECODE_START( vb )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( vball, vball_state )
+static MACHINE_CONFIG_START( vball )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, CPU_CLOCK)   /* 2 MHz - measured by guru but it makes the game far far too slow ?! */
@@ -432,7 +432,7 @@ static MACHINE_CONFIG_START( vball, vball_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)
 
-	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -563,7 +563,7 @@ ROM_START( vball2pjb ) /* bootleg of the Japan set with unmoddified program rom 
 ROM_END
 
 
-GAME( 1988, vball,    0,     vball,    vball, driver_device,    0, ROT0, "Technos Japan", "U.S. Championship V'ball (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, vball2pj, vball, vball,    vball2pj, driver_device, 0, ROT0, "Technos Japan", "U.S. Championship V'ball (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, vballb,   vball, vball,    vball, driver_device,    0, ROT0, "bootleg", "U.S. Championship V'ball (bootleg of US set)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, vball2pjb,vball, vball,    vball, driver_device,    0, ROT0, "bootleg", "U.S. Championship V'ball (bootleg of Japan set)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vball,    0,     vball,    vball,    vball_state, 0, ROT0, "Technos Japan", "U.S. Championship V'ball (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vball2pj, vball, vball,    vball2pj, vball_state, 0, ROT0, "Technos Japan", "U.S. Championship V'ball (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vballb,   vball, vball,    vball,    vball_state, 0, ROT0, "bootleg", "U.S. Championship V'ball (bootleg of US set)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vball2pjb,vball, vball,    vball,    vball_state, 0, ROT0, "bootleg", "U.S. Championship V'ball (bootleg of Japan set)", MACHINE_SUPPORTS_SAVE )

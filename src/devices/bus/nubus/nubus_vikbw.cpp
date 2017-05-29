@@ -19,7 +19,7 @@
 
 #define VRAM_SIZE   (0x18000)  // 1024x768 @ 1bpp is 98,304 bytes (0x18000)
 
-MACHINE_CONFIG_FRAGMENT( vikbw )
+MACHINE_CONFIG_START( vikbw )
 	MCFG_SCREEN_ADD( VIKBW_SCREEN_NAME, RASTER)
 	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, nubus_vikbw_device, screen_update)
 	MCFG_SCREEN_SIZE(1024,768)
@@ -36,7 +36,7 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type NUBUS_VIKBW = device_creator<nubus_vikbw_device>;
+DEFINE_DEVICE_TYPE(NUBUS_VIKBW, nubus_vikbw_device, "nb_vikbw", "Moniterm Viking video card")
 
 
 //-------------------------------------------------
@@ -67,14 +67,14 @@ const tiny_rom_entry *nubus_vikbw_device::device_rom_region() const
 //-------------------------------------------------
 
 nubus_vikbw_device::nubus_vikbw_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, NUBUS_VIKBW, "Moniterm Viking video card", tag, owner, clock, "nb_vikbw", __FILE__),
-		device_nubus_card_interface(mconfig, *this), m_vbl_disable(0)
+	nubus_vikbw_device(mconfig, NUBUS_VIKBW, tag, owner, clock)
 {
 }
 
-nubus_vikbw_device::nubus_vikbw_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_nubus_card_interface(mconfig, *this), m_vbl_disable(0)
+nubus_vikbw_device::nubus_vikbw_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	device_nubus_card_interface(mconfig, *this),
+	m_vbl_disable(0)
 {
 }
 

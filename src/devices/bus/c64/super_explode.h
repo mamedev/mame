@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_C64_SUPER_EXPLODE_H
+#define MAME_BUS_C64_SUPER_EXPLODE_H
 
-#ifndef __SUPER_EXPLODE__
-#define __SUPER_EXPLODE__
+#pragma once
 
 
 #include "exp.h"
@@ -47,7 +47,7 @@ private:
 
 
 // device type definition
-extern const device_type C64_SUPER_EXPLODE;
+DECLARE_DEVICE_TYPE(C64_SUPER_EXPLODE, c64_super_explode_cartridge_device)
 
 
-#endif
+#endif // MAME_BUS_C64_SUPER_EXPLODE_H

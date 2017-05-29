@@ -279,7 +279,7 @@ static GFXDECODE_START( osborne1 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( osborne1, osborne1_state )
+static MACHINE_CONFIG_START( osborne1 )
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(osborne1_mem)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(osborne1_op)
@@ -338,7 +338,7 @@ static MACHINE_CONFIG_START( osborne1, osborne1_state )
 	MCFG_SOFTWARE_LIST_ADD("flop_list","osborne1")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED_CLASS( osborne1nv, osborne1, osborne1nv_state )
+MACHINE_CONFIG_DERIVED( osborne1nv, osborne1 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(osborne1nv_io)
 
@@ -387,6 +387,6 @@ ROM_START( osborne1nv )
 	ROM_LOAD( "character_generator_6-29-84.14", 0x0000, 0x800, CRC(6c1eab0d) SHA1(b04459d377a70abc9155a5486003cb795342c801) )
 ROM_END
 
-/*    YEAR  NAME        PARENT    COMPAT  MACHINE     INPUT       CLASS            INIT        COMPANY          FULLNAME                   FLAGS */
-COMP( 1981, osborne1,   0,        0,      osborne1,   osborne1,   osborne1_state,  osborne1,   "Osborne",       "Osborne-1",               MACHINE_SUPPORTS_SAVE )
-COMP( 1984, osborne1nv, osborne1, 0,      osborne1nv, osborne1nv, osborne1_state,  osborne1,   "Osborne/Nuevo", "Osborne-1 (Nuevo Video)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME        PARENT    COMPAT  MACHINE     INPUT       CLASS              INIT        COMPANY          FULLNAME                   FLAGS
+COMP( 1981, osborne1,   0,        0,      osborne1,   osborne1,   osborne1_state,    osborne1,   "Osborne",       "Osborne-1",               MACHINE_SUPPORTS_SAVE )
+COMP( 1984, osborne1nv, osborne1, 0,      osborne1nv, osborne1nv, osborne1nv_state,  osborne1,   "Osborne/Nuevo", "Osborne-1 (Nuevo Video)", MACHINE_SUPPORTS_SAVE )

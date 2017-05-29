@@ -29,7 +29,7 @@
 #include "mmc3.h"
 
 #include "cpu/m6502/m6502.h"
-#include "video/ppu2c0x.h"      // this has to be included so that IRQ functions can access PPU_BOTTOM_VISIBLE_SCANLINE
+#include "video/ppu2c0x.h"      // this has to be included so that IRQ functions can access ppu2c0x_device::BOTTOM_VISIBLE_SCANLINE
 #include "screen.h"
 
 
@@ -46,48 +46,47 @@
 //  constructor
 //-------------------------------------------------
 
-const device_type NES_TXROM = device_creator<nes_txrom_device>;
-const device_type NES_HKROM = device_creator<nes_hkrom_device>;
-const device_type NES_TXSROM = device_creator<nes_txsrom_device>;
-const device_type NES_TQROM = device_creator<nes_tqrom_device>;
-const device_type NES_QJ_PCB = device_creator<nes_qj_device>;
-const device_type NES_ZZ_PCB = device_creator<nes_zz_device>;
+DEFINE_DEVICE_TYPE(NES_TXROM,  nes_txrom_device,  "nes_txrom",  "NES Cart TxROM (MMC-3) PCB")
+DEFINE_DEVICE_TYPE(NES_HKROM,  nes_hkrom_device,  "nes_hkrom",  "NES Cart HKROM (MMC-6) PCB")
+DEFINE_DEVICE_TYPE(NES_TXSROM, nes_txsrom_device, "nes_txsrom", "NES Cart TxSROM PCB")
+DEFINE_DEVICE_TYPE(NES_TQROM,  nes_tqrom_device,  "nes_tqrom",  "NES Cart TQROM PCB")
+DEFINE_DEVICE_TYPE(NES_QJ_PCB, nes_qj_device,     "nes_qj",     "NES Cart NES-QJ PCB")
+DEFINE_DEVICE_TYPE(NES_ZZ_PCB, nes_zz_device,     "nes_zz",     "NES Cart PAL-ZZ PCB")
 
 
-nes_txrom_device::nes_txrom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-					: nes_nrom_device(mconfig, type, name, tag, owner, clock, shortname, source), m_prg_base(0), m_prg_mask(0), m_chr_base(0), m_chr_mask(0),
-	m_latch(0), m_wram_protect(0), m_alt_irq(0), m_irq_count(0), m_irq_count_latch(0), m_irq_clear(0), m_irq_enable(0)
-				{
+nes_txrom_device::nes_txrom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: nes_nrom_device(mconfig, type, tag, owner, clock), m_prg_base(0), m_prg_mask(0), m_chr_base(0), m_chr_mask(0)
+	, m_latch(0), m_wram_protect(0), m_alt_irq(0), m_irq_count(0), m_irq_count_latch(0), m_irq_clear(0), m_irq_enable(0)
+{
 }
 
 nes_txrom_device::nes_txrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_TXROM, "NES Cart TxROM (MMC-3) PCB", tag, owner, clock, "nes_txrom", __FILE__), m_prg_base(0), m_prg_mask(0), m_chr_base(0), m_chr_mask(0),
-	m_latch(0), m_wram_protect(0), m_alt_irq(0), m_irq_count(0), m_irq_count_latch(0), m_irq_clear(0), m_irq_enable(0)
-				{
+	: nes_txrom_device(mconfig, NES_TXROM, tag, owner, clock)
+{
 }
 
 nes_hkrom_device::nes_hkrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_txrom_device(mconfig, NES_HKROM, "NES Cart HKROM (MMC-6) PCB", tag, owner, clock, "nes_hkrom", __FILE__), m_wram_enable(0), m_mmc6_reg(0)
-				{
+	: nes_txrom_device(mconfig, NES_HKROM, tag, owner, clock), m_wram_enable(0), m_mmc6_reg(0)
+{
 }
 
 nes_txsrom_device::nes_txsrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_txrom_device(mconfig, NES_TXSROM, "NES Cart TxSROM PCB", tag, owner, clock, "nes_txsrom", __FILE__)
+	: nes_txrom_device(mconfig, NES_TXSROM, tag, owner, clock)
 {
 }
 
 nes_tqrom_device::nes_tqrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_txrom_device(mconfig, NES_TQROM, "NES Cart TQROM PCB", tag, owner, clock, "nes_tqrom", __FILE__)
+	: nes_txrom_device(mconfig, NES_TQROM, tag, owner, clock)
 {
 }
 
 nes_qj_device::nes_qj_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_txrom_device(mconfig, NES_QJ_PCB, "NES Cart NES-QJ PCB", tag, owner, clock, "nes_qj", __FILE__)
+	: nes_txrom_device(mconfig, NES_QJ_PCB, tag, owner, clock)
 {
 }
 
 nes_zz_device::nes_zz_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_txrom_device(mconfig, NES_ZZ_PCB, "NES Cart PAL-ZZ PCB", tag, owner, clock, "nes_zz", __FILE__)
+	: nes_txrom_device(mconfig, NES_ZZ_PCB, tag, owner, clock)
 {
 }
 
@@ -192,7 +191,7 @@ void nes_zz_device::pcb_reset()
 /* Here, IRQ counter decrements every scanline. */
 void nes_txrom_device::hblank_irq(int scanline, int vblank, int blanked)
 {
-	if (scanline < PPU_BOTTOM_VISIBLE_SCANLINE)
+	if (scanline < ppu2c0x_device::BOTTOM_VISIBLE_SCANLINE)
 	{
 		int prior_count = m_irq_count;
 		if ((m_irq_count == 0) || m_irq_clear)

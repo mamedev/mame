@@ -58,7 +58,7 @@ Notes:
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type COMX_FD = device_creator<comx_fd_device>;
+DEFINE_DEVICE_TYPE(COMX_FD, comx_fd_device, "comx_fd", "COMX FD")
 
 
 //-------------------------------------------------
@@ -92,10 +92,10 @@ SLOT_INTERFACE_END
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( comx_fd )
+//  MACHINE_CONFIG_START( comx_fd )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( comx_fd )
+static MACHINE_CONFIG_START( comx_fd )
 	MCFG_WD1770_ADD(WD1770_TAG, XTAL_8MHz)
 
 	MCFG_FLOPPY_DRIVE_ADD(WD1770_TAG":0", comx_fd_floppies, "525sd35t", comx_fd_device::floppy_formats)
@@ -124,7 +124,7 @@ machine_config_constructor comx_fd_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 comx_fd_device::comx_fd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, COMX_FD, "COMX FD", tag, owner, clock, "comx_fd", __FILE__),
+	device_t(mconfig, COMX_FD, tag, owner, clock),
 	device_comx_expansion_card_interface(mconfig, *this),
 	m_fdc(*this, WD1770_TAG),
 	m_floppy0(*this, WD1770_TAG":0"),

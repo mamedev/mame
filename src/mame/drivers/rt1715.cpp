@@ -29,22 +29,28 @@ class rt1715_state : public driver_device
 {
 public:
 	rt1715_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_maincpu(*this, "maincpu"),
-		m_ram(*this, RAM_TAG) { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_ram(*this, RAM_TAG)
+	{
+	}
 
-	int m_led1_val;
-	int m_led2_val;
 	DECLARE_WRITE8_MEMBER(rt1715_floppy_enable);
 	DECLARE_READ8_MEMBER(k7658_led1_r);
 	DECLARE_READ8_MEMBER(k7658_led2_r);
 	DECLARE_READ8_MEMBER(k7658_data_r);
 	DECLARE_WRITE8_MEMBER(k7658_data_w);
 	DECLARE_WRITE8_MEMBER(rt1715_rom_disable);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(rt1715);
 	I8275_DRAW_CHARACTER_MEMBER( crtc_display_pixels );
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+	int m_led1_val;
+	int m_led2_val;
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 };
@@ -266,7 +272,7 @@ static const z80_daisy_config rt1715_daisy_chain[] =
 	{ nullptr }
 };
 
-static MACHINE_CONFIG_START( rt1715, rt1715_state )
+static MACHINE_CONFIG_START( rt1715 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_2_4576MHz)
 	MCFG_CPU_PROGRAM_MAP(rt1715_mem)
@@ -372,7 +378,7 @@ ROM_END
     GAME DRIVERS
 ***************************************************************************/
 
-/*    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT  INIT  COMPANY     FULLNAME                             FLAGS */
-COMP( 1986, rt1715,   0,      0,      rt1715,  k7658, driver_device, 0,    "Robotron",  "Robotron PC-1715",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 1986, rt1715lc, rt1715, 0,      rt1715,  k7658, driver_device, 0,    "Robotron",  "Robotron PC-1715 (latin/cyrillic)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 1986, rt1715w,  rt1715, 0,      rt1715w, k7658, driver_device, 0,    "Robotron",  "Robotron PC-1715W",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT  STATE         INIT  COMPANY     FULLNAME                             FLAGS
+COMP( 1986, rt1715,   0,      0,      rt1715,  k7658, rt1715_state, 0,    "Robotron", "Robotron PC-1715",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1986, rt1715lc, rt1715, 0,      rt1715,  k7658, rt1715_state, 0,    "Robotron", "Robotron PC-1715 (latin/cyrillic)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1986, rt1715w,  rt1715, 0,      rt1715w, k7658, rt1715_state, 0,    "Robotron", "Robotron PC-1715W",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

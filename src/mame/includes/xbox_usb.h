@@ -1,5 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Samuele Zannoli
+#ifndef MAME_INCLUDES_XBOX_USB_H
+#define MAME_INCLUDES_XBOX_USB_H
 
 #pragma once
 
@@ -338,6 +340,10 @@ struct usb_device_configuration
 	std::forward_list<usb_device_interfac *> interfaces;
 };
 
+/*
+ * OHCI Usb Controller
+ */
+
 class ohci_function; // forward declaration
 
 class ohci_usb_controller
@@ -395,13 +401,18 @@ private:
 	} ohcist;
 };
 
+/*
+ * Base class for usb devices
+ */
+
 class ohci_function {
 public:
 	ohci_function();
-	virtual void initialize(running_machine &machine, ohci_usb_controller *usb_bus_manager);
+	virtual void initialize(running_machine &machine);
 	virtual void execute_reset();
 	virtual void execute_connect() {};
 	virtual void execute_disconnect() {};
+	void set_bus_manager(ohci_usb_controller *usb_bus_manager);
 	int execute_transfer(int endpoint, int pid, uint8_t *buffer, int size);
 protected:
 	virtual int handle_nonstandard_request(int endpoint, USBSetupPacket *setup) { return -1; };
@@ -452,13 +463,39 @@ protected:
 	usb_device_configuration *selected_configuration;
 };
 
-extern const device_type OHCI_GAME_CONTROLLER;
+/*
+ * Usb port connector
+ */
 
-class ohci_game_controller : public device_t, public ohci_function
+class ohci_usb_connector : public device_t, public device_slot_interface
 {
 public:
-	ohci_game_controller(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	void initialize(running_machine &machine, ohci_usb_controller *usb_bus_manager) override;
+	ohci_usb_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual ~ohci_usb_connector();
+
+	ohci_function *get_device();
+
+protected:
+	virtual void device_start() override;
+};
+
+extern const device_type OHCI_USB_CONNECTOR;
+
+#define MCFG_USB_PORT_ADD(_tag, _slot_intf, _def_slot, _fixed) \
+	MCFG_DEVICE_ADD(_tag, OHCI_USB_CONNECTOR, 0)                   \
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _fixed)
+
+/*
+ * Game controller usb device
+ */
+
+DECLARE_DEVICE_TYPE(OHCI_GAME_CONTROLLER, ohci_game_controller_device)
+
+class ohci_game_controller_device : public device_t, public ohci_function, public device_slot_card_interface
+{
+public:
+	ohci_game_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	void initialize(running_machine &machine) override;
 	int handle_nonstandard_request(int endpoint, USBSetupPacket *setup) override;
 	int handle_interrupt_pid(int endpoint, int pid, uint8_t *buffer, int size) override;
 
@@ -486,3 +523,5 @@ private:
 	required_ioport m_Black; // analog button
 	required_ioport m_White; // analog button
 };
+
+#endif // MAME_INCLUDES_XBOX_USB_H

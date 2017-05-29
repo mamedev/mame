@@ -1376,7 +1376,7 @@ void djmain_state::machine_reset()
  *
  *************************************/
 
-static MACHINE_CONFIG_START( djmainj, djmain_state )
+static MACHINE_CONFIG_START( djmainj )
 
 	/* basic machine hardware */
 	// popn3 works 9.6 MHz or slower in some songs */

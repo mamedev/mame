@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef __CENTRONICS_COVOX_H__
-#define __CENTRONICS_COVOX_H__
+#ifndef MAME_BUS_CENTRONICS_COVOX_H
+#define MAME_BUS_CENTRONICS_COVOX_H
 
 #pragma once
 
@@ -48,7 +48,7 @@ private:
 };
 
 // device type definition
-extern const device_type CENTRONICS_COVOX;
+DECLARE_DEVICE_TYPE(CENTRONICS_COVOX, centronics_covox_device)
 
 // ======================> centronics_covox_stereo_device
 
@@ -89,6 +89,6 @@ private:
 };
 
 // device type definition
-extern const device_type CENTRONICS_COVOX_STEREO;
+DECLARE_DEVICE_TYPE(CENTRONICS_COVOX_STEREO, centronics_covox_stereo_device)
 
-#endif /* __CENTRONICS_COVOX_H__ */
+#endif // MAME_BUS_CENTRONICS_COVOX_H

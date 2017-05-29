@@ -3,10 +3,10 @@
 #include "emu.h"
 #include "h83008.h"
 
-const device_type H83008 = device_creator<h83008_device>;
+DEFINE_DEVICE_TYPE(H83008, h83008_device, "h83008", "H8/3008")
 
 h83008_device::h83008_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	h8h_device(mconfig, H83008, "H8/3008", tag, owner, clock, "h83008", __FILE__, address_map_delegate(FUNC(h83008_device::map), this)),
+	h8h_device(mconfig, H83008, tag, owner, clock, address_map_delegate(FUNC(h83008_device::map), this)),
 	intc(*this, "intc"),
 	adc(*this, "adc"),
 	port4(*this, "port4"),
@@ -26,12 +26,12 @@ h83008_device::h83008_device(const machine_config &mconfig, const char *tag, dev
 	timer16_2(*this, "timer16:2"),
 	sci0(*this, "sci0"),
 	sci1(*this, "sci1"),
-	watchdog(*this, "watchdog")
+	watchdog(*this, "watchdog"),
+	syscr(0)
 {
-	syscr = 0;
 }
 
-static MACHINE_CONFIG_FRAGMENT(h83008)
+static MACHINE_CONFIG_START(h83008)
 	MCFG_H8H_INTC_ADD("intc")
 	MCFG_H8_ADC_3006_ADD("adc", "intc", 23)
 	MCFG_H8_PORT_ADD("port4", h8_device::PORT_4, 0x00, 0x00)

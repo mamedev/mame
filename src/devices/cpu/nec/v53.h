@@ -1,14 +1,17 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail
 /* V53 */
+#ifndef MAME_CPU_NEC_V53_H
+#define MAME_CPU_NEC_V53_H
+
+#pragma once
 
 #include "nec.h"
-#include "necpriv.h"
 
-#include "machine/pit8253.h"
 #include "machine/am9517a.h"
-#include "machine/pic8259.h"
 #include "machine/i8251.h"
+#include "machine/pic8259.h"
+#include "machine/pit8253.h"
 
 // SCU
 
@@ -107,8 +110,6 @@
 class v53_base_device : public nec_common_device
 {
 public:
-	v53_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, offs_t fetch_xor, uint8_t prefetch_size, uint8_t prefetch_cycles, uint32_t chip_type);
-
 	DECLARE_WRITE8_MEMBER(BSEL_w);
 	DECLARE_WRITE8_MEMBER(BADR_w);
 	DECLARE_WRITE8_MEMBER(BRC_w);
@@ -131,29 +132,19 @@ public:
 	DECLARE_WRITE8_MEMBER(OPSEL_w);
 	DECLARE_WRITE8_MEMBER(SCTL_w);
 
-	uint8_t m_SCTL;
-	uint8_t m_OPSEL;
-
-	uint8_t m_SULA;
-	uint8_t m_TULA;
-	uint8_t m_IULA;
-	uint8_t m_DULA;
-	uint8_t m_OPHA;
-
 	// SCU
 	DECLARE_READ8_MEMBER(scu_simk_r);
 	DECLARE_WRITE8_MEMBER(scu_simk_w);
-	uint8_t m_simk;
-	template<class _Object> static devcb_base &set_txd_handler(device_t &device, _Object object) { return downcast<v53_base_device &>(device).m_txd_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_dtr_handler(device_t &device, _Object object) { return downcast<v53_base_device &>(device).m_dtr_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_rts_handler(device_t &device, _Object object) { return downcast<v53_base_device &>(device).m_rts_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_rxrdy_handler(device_t &device, _Object object) { return downcast<v53_base_device &>(device).m_rxrdy_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_txrdy_handler(device_t &device, _Object object) { return downcast<v53_base_device &>(device).m_txrdy_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_txempty_handler(device_t &device, _Object object) { return downcast<v53_base_device &>(device).m_txempty_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_syndet_handler(device_t &device, _Object object) { return downcast<v53_base_device &>(device).m_syndet_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_txd_handler(device_t &device, Object &&cb) { return downcast<v53_base_device &>(device).m_txd_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_dtr_handler(device_t &device, Object &&cb) { return downcast<v53_base_device &>(device).m_dtr_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_rts_handler(device_t &device, Object &&cb) { return downcast<v53_base_device &>(device).m_rts_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_rxrdy_handler(device_t &device, Object &&cb) { return downcast<v53_base_device &>(device).m_rxrdy_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_txrdy_handler(device_t &device, Object &&cb) { return downcast<v53_base_device &>(device).m_txrdy_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_txempty_handler(device_t &device, Object &&cb) { return downcast<v53_base_device &>(device).m_txempty_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_syndet_handler(device_t &device, Object &&cb) { return downcast<v53_base_device &>(device).m_syndet_handler.set_callback(std::forward<Object>(cb)); }
 	DECLARE_WRITE_LINE_MEMBER(scu_txd_trampoline_cb) { m_txd_handler(state); }
 	DECLARE_WRITE_LINE_MEMBER(scu_dtr_trampoline_cb) { m_dtr_handler(state); }
-	DECLARE_WRITE_LINE_MEMBER(scu_rts_trampoline_cb) {  m_rts_handler(state); }
+	DECLARE_WRITE_LINE_MEMBER(scu_rts_trampoline_cb) { m_rts_handler(state); }
 	DECLARE_WRITE_LINE_MEMBER(scu_rxrdy_trampoline_cb) { m_rxrdy_handler(state); } /* should we mask this here based on m_simk? it can mask the interrupt */
 	DECLARE_WRITE_LINE_MEMBER(scu_txrdy_trampoline_cb) { m_txrdy_handler(state); } /* should we mask this here based on m_simk? it can mask the interrupt */
 	DECLARE_WRITE_LINE_MEMBER(scu_txempty_trampoline_cb) {  m_txempty_handler(state); }
@@ -170,30 +161,30 @@ public:
 //  static void set_clk0(device_t &device, double clk0) { downcast<v53_base_device &>(device).m_clk0 = clk0; }
 //  static void set_clk1(device_t &device, double clk1) { downcast<v53_base_device &>(device).m_clk1 = clk1; }
 //  static void set_clk2(device_t &device, double clk2) { downcast<v53_base_device &>(device).m_clk2 = clk2; }
-	template<class _Object> static devcb_base &set_out0_handler(device_t &device, _Object object) { return downcast<v53_base_device &>(device).m_out0_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_out1_handler(device_t &device, _Object object) { return downcast<v53_base_device &>(device).m_out1_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_out2_handler(device_t &device, _Object object) { return downcast<v53_base_device &>(device).m_out2_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_out0_handler(device_t &device, Object &&cb) { return downcast<v53_base_device &>(device).m_out0_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out1_handler(device_t &device, Object &&cb) { return downcast<v53_base_device &>(device).m_out1_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out2_handler(device_t &device, Object &&cb) { return downcast<v53_base_device &>(device).m_out2_handler.set_callback(std::forward<Object>(cb)); }
 	DECLARE_WRITE_LINE_MEMBER(tcu_out0_trampoline_cb){ m_out0_handler(state); }
 	DECLARE_WRITE_LINE_MEMBER(tcu_out1_trampoline_cb){ m_out1_handler(state); }
 	DECLARE_WRITE_LINE_MEMBER(tcu_out2_trampoline_cb){ m_out2_handler(state); }
 
 	// DMAU
-	template<class _Object> static devcb_base &set_out_hreq_callback(device_t &device, _Object object) { return downcast<v53_base_device &>(device).m_out_hreq_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_eop_callback(device_t &device, _Object object) { return downcast<v53_base_device &>(device).m_out_eop_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_in_memr_callback(device_t &device, _Object object) { return downcast<v53_base_device &>(device).m_in_memr_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_memw_callback(device_t &device, _Object object) { return downcast<v53_base_device &>(device).m_out_memw_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_in_ior_0_callback(device_t &device, _Object object) { return downcast<v53_base_device &>(device).m_in_ior_0_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_in_ior_1_callback(device_t &device, _Object object) { return downcast<v53_base_device &>(device).m_in_ior_1_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_in_ior_2_callback(device_t &device, _Object object) { return downcast<v53_base_device &>(device).m_in_ior_2_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_in_ior_3_callback(device_t &device, _Object object) { return downcast<v53_base_device &>(device).m_in_ior_3_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_iow_0_callback(device_t &device, _Object object) { return downcast<v53_base_device &>(device).m_out_iow_0_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_iow_1_callback(device_t &device, _Object object) { return downcast<v53_base_device &>(device).m_out_iow_1_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_iow_2_callback(device_t &device, _Object object) { return downcast<v53_base_device &>(device).m_out_iow_2_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_iow_3_callback(device_t &device, _Object object) { return downcast<v53_base_device &>(device).m_out_iow_3_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_dack_0_callback(device_t &device, _Object object) { return downcast<v53_base_device &>(device).m_out_dack_0_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_dack_1_callback(device_t &device, _Object object) { return downcast<v53_base_device &>(device).m_out_dack_1_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_dack_2_callback(device_t &device, _Object object) { return downcast<v53_base_device &>(device).m_out_dack_2_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_dack_3_callback(device_t &device, _Object object) { return downcast<v53_base_device &>(device).m_out_dack_3_cb.set_callback(object); }
+	template<class Object> static devcb_base &set_out_hreq_callback(device_t &device, Object &&cb) { return downcast<v53_base_device &>(device).m_out_hreq_cb.set_callback(std::forward<Object>(cb)); }
+	template<class Object> static devcb_base &set_out_eop_callback(device_t &device, Object &&cb) { return downcast<v53_base_device &>(device).m_out_eop_cb.set_callback(std::forward<Object>(cb)); }
+	template<class Object> static devcb_base &set_in_memr_callback(device_t &device, Object &&cb) { return downcast<v53_base_device &>(device).m_in_memr_cb.set_callback(std::forward<Object>(cb)); }
+	template<class Object> static devcb_base &set_out_memw_callback(device_t &device, Object &&cb) { return downcast<v53_base_device &>(device).m_out_memw_cb.set_callback(std::forward<Object>(cb)); }
+	template<class Object> static devcb_base &set_in_ior_0_callback(device_t &device, Object &&cb) { return downcast<v53_base_device &>(device).m_in_ior_0_cb.set_callback(std::forward<Object>(cb)); }
+	template<class Object> static devcb_base &set_in_ior_1_callback(device_t &device, Object &&cb) { return downcast<v53_base_device &>(device).m_in_ior_1_cb.set_callback(std::forward<Object>(cb)); }
+	template<class Object> static devcb_base &set_in_ior_2_callback(device_t &device, Object &&cb) { return downcast<v53_base_device &>(device).m_in_ior_2_cb.set_callback(std::forward<Object>(cb)); }
+	template<class Object> static devcb_base &set_in_ior_3_callback(device_t &device, Object &&cb) { return downcast<v53_base_device &>(device).m_in_ior_3_cb.set_callback(std::forward<Object>(cb)); }
+	template<class Object> static devcb_base &set_out_iow_0_callback(device_t &device, Object &&cb) { return downcast<v53_base_device &>(device).m_out_iow_0_cb.set_callback(std::forward<Object>(cb)); }
+	template<class Object> static devcb_base &set_out_iow_1_callback(device_t &device, Object &&cb) { return downcast<v53_base_device &>(device).m_out_iow_1_cb.set_callback(std::forward<Object>(cb)); }
+	template<class Object> static devcb_base &set_out_iow_2_callback(device_t &device, Object &&cb) { return downcast<v53_base_device &>(device).m_out_iow_2_cb.set_callback(std::forward<Object>(cb)); }
+	template<class Object> static devcb_base &set_out_iow_3_callback(device_t &device, Object &&cb) { return downcast<v53_base_device &>(device).m_out_iow_3_cb.set_callback(std::forward<Object>(cb)); }
+	template<class Object> static devcb_base &set_out_dack_0_callback(device_t &device, Object &&cb) { return downcast<v53_base_device &>(device).m_out_dack_0_cb.set_callback(std::forward<Object>(cb)); }
+	template<class Object> static devcb_base &set_out_dack_1_callback(device_t &device, Object &&cb) { return downcast<v53_base_device &>(device).m_out_dack_1_cb.set_callback(std::forward<Object>(cb)); }
+	template<class Object> static devcb_base &set_out_dack_2_callback(device_t &device, Object &&cb) { return downcast<v53_base_device &>(device).m_out_dack_2_cb.set_callback(std::forward<Object>(cb)); }
+	template<class Object> static devcb_base &set_out_dack_3_callback(device_t &device, Object &&cb) { return downcast<v53_base_device &>(device).m_out_dack_3_cb.set_callback(std::forward<Object>(cb)); }
 	DECLARE_WRITE_LINE_MEMBER(hreq_trampoline_cb) { m_out_hreq_cb(state); }
 	DECLARE_WRITE_LINE_MEMBER(eop_trampoline_cb) { m_out_eop_cb(state); }
 	DECLARE_READ8_MEMBER(dma_memr_trampoline_r) { return m_in_memr_cb(space, offset); }
@@ -219,6 +210,18 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(hack_w);
 
 
+	DECLARE_READ8_MEMBER(get_pic_ack);
+	DECLARE_WRITE_LINE_MEMBER(internal_irq_w);
+
+
+protected:
+	v53_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, offs_t fetch_xor, uint8_t prefetch_size, uint8_t prefetch_cycles, uint32_t chip_type);
+
+	// device-level overrides
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void execute_set_input(int inputnum, int state) override;
 
 	void install_peripheral_io();
 
@@ -234,18 +237,16 @@ public:
 	}
 
 
+	uint8_t m_SCTL;
+	uint8_t m_OPSEL;
 
+	uint8_t m_SULA;
+	uint8_t m_TULA;
+	uint8_t m_IULA;
+	uint8_t m_DULA;
+	uint8_t m_OPHA;
 
-	DECLARE_READ8_MEMBER(get_pic_ack);
-	DECLARE_WRITE_LINE_MEMBER(internal_irq_w);
-
-
-protected:
-	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void execute_set_input(int inputnum, int state) override;
+	uint8_t m_simk;
 
 	required_device<pit8253_device> m_v53tcu;
 	required_device<upd71071_v53_device> m_v53dmau;
@@ -287,9 +288,6 @@ protected:
 	devcb_write_line   m_out_dack_1_cb;
 	devcb_write_line   m_out_dack_2_cb;
 	devcb_write_line   m_out_dack_3_cb;
-
-
-
 };
 
 
@@ -305,5 +303,7 @@ public:
 	v53a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
-extern const device_type V53;
-extern const device_type V53A;
+DECLARE_DEVICE_TYPE(V53,  v53_device)
+DECLARE_DEVICE_TYPE(V53A, v53a_device)
+
+#endif // MAME_CPU_NEC_V53_H

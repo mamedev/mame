@@ -53,14 +53,14 @@
 #include "bcreader.h"
 
 // device type definition
-const device_type BARCODE_READER = device_creator<barcode_reader_device>;
+DEFINE_DEVICE_TYPE(BARCODE_READER, barcode_reader_device, "bcreader", "Barcode Reader")
 
 //-------------------------------------------------
 //  barcode_reader_device - constructor
 //-------------------------------------------------
 
 barcode_reader_device::barcode_reader_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, BARCODE_READER, "Barcode Reader", tag, owner, clock, "bcreader", __FILE__)
+	: device_t(mconfig, BARCODE_READER, tag, owner, clock)
 	, m_byte_length(0)
 	, m_pixel_length(0)
 	, m_byte_count(0)

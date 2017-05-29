@@ -16,7 +16,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SV806 = device_creator<sv806_device>;
+DEFINE_DEVICE_TYPE(SV806, sv806_device, "sv806", "SV-806 80 Column Cartridge")
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -40,7 +40,7 @@ const tiny_rom_entry *sv806_device::device_rom_region() const
 //  machine configurations
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( sv806 )
+static MACHINE_CONFIG_START( sv806 )
 	MCFG_SCREEN_ADD_MONOCHROME("80col", RASTER, rgb_t::green())
 	MCFG_SCREEN_RAW_PARAMS((XTAL_12MHz / 6) * 8, 864, 0, 640, 317, 0, 192)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", hd6845_device, screen_update)
@@ -68,7 +68,7 @@ machine_config_constructor sv806_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 sv806_device::sv806_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, SV806, "SV-806 80 Column Cartridge", tag, owner, clock, "sv806", __FILE__),
+	device_t(mconfig, SV806, tag, owner, clock),
 	device_svi_slot_interface(mconfig, *this),
 	m_crtc(*this, "crtc"),
 	m_palette(*this, "palette"),

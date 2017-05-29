@@ -13,7 +13,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ELECTRON_PWRJOY = device_creator<electron_pwrjoy_device>;
+DEFINE_DEVICE_TYPE(ELECTRON_PWRJOY, electron_pwrjoy_device, "electron_pwrjoy", "Power Software Joystick Interface")
 
 
 ROM_START( pwrjoy )
@@ -56,10 +56,10 @@ const tiny_rom_entry *electron_pwrjoy_device::device_rom_region() const
 //-------------------------------------------------
 
 electron_pwrjoy_device::electron_pwrjoy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ELECTRON_PWRJOY, "Power Software Joystick Interface", tag, owner, clock, "electron_pwrjoy", __FILE__),
-	device_electron_expansion_interface(mconfig, *this),
-	m_exp_rom(*this, "exp_rom"),
-	m_joy(*this, "JOY")
+	: device_t(mconfig, ELECTRON_PWRJOY, tag, owner, clock)
+	, device_electron_expansion_interface(mconfig, *this)
+	, m_exp_rom(*this, "exp_rom")
+	, m_joy(*this, "JOY")
 {
 }
 

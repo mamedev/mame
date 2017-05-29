@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco
-#pragma once
+#ifndef MAME_BUS_DMV_K230_H
+#define MAME_BUS_DMV_K230_H
 
-#ifndef __DMV_K230_H__
-#define __DMV_K230_H__
+#pragma once
 
 #include "dmvbus.h"
 #include "cpu/i86/i86.h"
@@ -28,7 +28,6 @@ class dmv_k230_device :
 {
 public:
 	// construction/destruction
-	dmv_k230_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	dmv_k230_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
@@ -42,6 +41,8 @@ public:
 	DECLARE_READ8_MEMBER(rom_r);
 
 protected:
+	dmv_k230_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -137,9 +138,9 @@ private:
 };
 
 // device type definition
-extern const device_type DMV_K230;
-extern const device_type DMV_K231;
-extern const device_type DMV_K234;
-extern const device_type DMV_K235;
+DECLARE_DEVICE_TYPE(DMV_K230, dmv_k230_device)
+DECLARE_DEVICE_TYPE(DMV_K231, dmv_k231_device)
+DECLARE_DEVICE_TYPE(DMV_K234, dmv_k234_device)
+DECLARE_DEVICE_TYPE(DMV_K235, dmv_k235_device)
 
-#endif  /* __DMV_K230_H__ */
+#endif // MAME_BUS_DMV_K230_H

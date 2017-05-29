@@ -8,7 +8,7 @@
 //#define LOG_OHCI
 
 /*
- * Ohci usb controller
+ * OHCI usb controller
  */
 
 #ifdef LOG_OHCI
@@ -721,11 +721,9 @@ void ohci_usb_controller::usb_ohci_interrupts()
 {
 	if (((ohcist.hc_regs[HcInterruptStatus] & ohcist.hc_regs[HcInterruptEnable]) != 0) && ((ohcist.hc_regs[HcInterruptEnable] & MasterInterruptEnable) != 0))
 	{
-		//m_interrupt_handler(1);
 		irq_callback(1);
 	} else
 	{
-		//m_interrupt_handler(0);
 		irq_callback(0);
 	}
 }
@@ -849,16 +847,15 @@ void ohci_usb_controller::usb_ohci_device_address_changed(int old_address, int n
 }
 
 /*
-* ohci device base class
-*/
+ * Base class for usb devices
+ */
 
 ohci_function::ohci_function()
 {
 }
 
-void ohci_function::initialize(running_machine &machine, ohci_usb_controller *usb_bus_manager)
+void ohci_function::initialize(running_machine &machine)
 {
-	busmanager = usb_bus_manager;
 	state = DefaultState;
 	descriptors = auto_alloc_array(machine, uint8_t, 1024);
 	descriptors_pos = 0;
@@ -880,6 +877,12 @@ void ohci_function::initialize(running_machine &machine, ohci_usb_controller *us
 	latest_configuration = nullptr;
 	latest_alternate = nullptr;
 }
+
+void ohci_function::set_bus_manager(ohci_usb_controller *usb_bus_manager)
+{
+	busmanager = usb_bus_manager;
+}
+
 
 void ohci_function::add_device_descriptor(const USBStandardDeviceDescriptor &descriptor)
 {
@@ -1317,6 +1320,35 @@ int ohci_function::execute_transfer(int endpoint, int pid, uint8_t *buffer, int 
 	return size;
 }
 
+/*
+ * Usb port connector
+ */
+
+DEFINE_DEVICE_TYPE(OHCI_USB_CONNECTOR, ohci_usb_connector, "usb_connector", "Usb Connector Abstraction");
+
+ohci_usb_connector::ohci_usb_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, OHCI_USB_CONNECTOR, tag, owner, clock),
+	device_slot_interface(mconfig, *this)
+{
+}
+
+ohci_usb_connector::~ohci_usb_connector()
+{
+}
+
+void ohci_usb_connector::device_start()
+{
+}
+
+ohci_function* ohci_usb_connector::get_device()
+{
+	return dynamic_cast<ohci_function *>(get_card_device());
+}
+
+/*
+ * Game controller usb device
+ */
+
 INPUT_PORTS_START(xbox_controller)
 	PORT_START("ThumbstickLh") // left analog thumbstick horizontal movement
 	PORT_BIT(0xff, 0x80, IPT_AD_STICK_X) PORT_NAME("ThumbstickLh") PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_MINMAX(0, 0xff)
@@ -1375,17 +1407,18 @@ INPUT_PORTS_START(xbox_controller)
 		PORT_CODE_DEC(KEYCODE_H) PORT_CODE_INC(KEYCODE_Y)
 INPUT_PORTS_END
 
-const USBStandardDeviceDescriptor ohci_game_controller::devdesc = { 18,1,0x110,0x00,0x00,0x00,64,0x45e,0x202,0x100,0,0,0,1 };
-const USBStandardConfigurationDescriptor ohci_game_controller::condesc = { 9,2,0x20,1,1,0,0x80,50 };
-const USBStandardInterfaceDescriptor ohci_game_controller::intdesc = { 9,4,0,0,2,0x58,0x42,0,0 };
-const USBStandardEndpointDescriptor ohci_game_controller::enddesc82 = { 7,5,0x82,3,0x20,4 };
-const USBStandardEndpointDescriptor ohci_game_controller::enddesc02 = { 7,5,0x02,3,0x20,4 };
+const USBStandardDeviceDescriptor ohci_game_controller_device::devdesc = { 18,1,0x110,0x00,0x00,0x00,64,0x45e,0x202,0x100,0,0,0,1 };
+const USBStandardConfigurationDescriptor ohci_game_controller_device::condesc = { 9,2,0x20,1,1,0,0x80,50 };
+const USBStandardInterfaceDescriptor ohci_game_controller_device::intdesc = { 9,4,0,0,2,0x58,0x42,0,0 };
+const USBStandardEndpointDescriptor ohci_game_controller_device::enddesc82 = { 7,5,0x82,3,0x20,4 };
+const USBStandardEndpointDescriptor ohci_game_controller_device::enddesc02 = { 7,5,0x02,3,0x20,4 };
 
-const device_type OHCI_GAME_CONTROLLER = device_creator<ohci_game_controller>;
+DEFINE_DEVICE_TYPE(OHCI_GAME_CONTROLLER, ohci_game_controller_device, "ohci_gc", "OHCI Game Controller")
 
-ohci_game_controller::ohci_game_controller(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, OHCI_GAME_CONTROLLER, "OHCI Game Controller", tag, owner, clock, "ohci_gc", __FILE__),
+ohci_game_controller_device::ohci_game_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, OHCI_GAME_CONTROLLER, tag, owner, clock),
 	ohci_function(),
+	device_slot_card_interface(mconfig, *this),
 	m_ThumbstickLh(*this, "ThumbstickLh"),
 	m_ThumbstickLv(*this, "ThumbstickLv"),
 	m_ThumbstickRh(*this, "ThumbstickRh"),
@@ -1403,9 +1436,9 @@ ohci_game_controller::ohci_game_controller(const machine_config &mconfig, const 
 {
 }
 
-void ohci_game_controller::initialize(running_machine &machine, ohci_usb_controller *usb_bus_manager)
+void ohci_game_controller_device::initialize(running_machine &machine)
 {
-	ohci_function::initialize(machine, usb_bus_manager);
+	ohci_function::initialize(machine);
 	add_device_descriptor(devdesc);
 	add_configuration_descriptor(condesc);
 	add_interface_descriptor(intdesc);
@@ -1413,7 +1446,7 @@ void ohci_game_controller::initialize(running_machine &machine, ohci_usb_control
 	add_endpoint_descriptor(enddesc02);
 }
 
-int ohci_game_controller::handle_nonstandard_request(int endpoint, USBSetupPacket *setup)
+int ohci_game_controller_device::handle_nonstandard_request(int endpoint, USBSetupPacket *setup)
 {
 	//                                    >=8  ==42  !=0  !=0  1,3       2<20 <=20
 	static const uint8_t reportinfo[16] = { 0x10,0x42 ,0x32,0x43,1   ,0x65,0x14,0x20,0x98,0xa9,0xba,0xcb,0xdc,0xed,0xfe };
@@ -1466,7 +1499,7 @@ int ohci_game_controller::handle_nonstandard_request(int endpoint, USBSetupPacke
 	return -1;
 }
 
-int ohci_game_controller::handle_interrupt_pid(int endpoint, int pid, uint8_t *buffer, int size)
+int ohci_game_controller_device::handle_interrupt_pid(int endpoint, int pid, uint8_t *buffer, int size)
 {
 	if ((endpoint == 2) && (pid == InPid)) {
 		int v;
@@ -1506,11 +1539,11 @@ int ohci_game_controller::handle_interrupt_pid(int endpoint, int pid, uint8_t *b
 	return -1;
 }
 
-void ohci_game_controller::device_start()
+void ohci_game_controller_device::device_start()
 {
 }
 
-ioport_constructor ohci_game_controller::device_input_ports() const
+ioport_constructor ohci_game_controller_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(xbox_controller);
 }

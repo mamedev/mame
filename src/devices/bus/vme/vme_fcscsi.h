@@ -1,7 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Joakim Larsson Edstrom
-#ifndef VME_FCSCSI_H
-#define VME_FCSCSI_H
+#ifndef MAME_BUS_VME_VME_FCSCSI_H
+#define MAME_BUS_VME_VME_FCSCSI_H
+
 #pragma once
 
 #include "machine/68230pit.h"
@@ -16,7 +17,6 @@ class vme_fcscsi1_card_device :
 	,public device_vme_card_interface
 {
 public:
-	vme_fcscsi1_card_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	vme_fcscsi1_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
@@ -41,25 +41,27 @@ public:
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 	/* Dummy driver routines */
-	DECLARE_READ8_MEMBER (not_implemented_r);
-	DECLARE_WRITE8_MEMBER (not_implemented_w);
+	DECLARE_READ8_MEMBER(not_implemented_r);
+	DECLARE_WRITE8_MEMBER(not_implemented_w);
 
-	DECLARE_READ8_MEMBER (scsi_r);
-	DECLARE_WRITE8_MEMBER (scsi_w);
+	DECLARE_READ8_MEMBER(scsi_r);
+	DECLARE_WRITE8_MEMBER(scsi_w);
+
+protected:
+	vme_fcscsi1_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	void update_irq_to_maincpu();
 
 	uint8_t fdc_irq_state;
 	uint8_t dmac_irq_state;
 	int dmac_irq_vector;
 
-	void update_irq_to_maincpu();
-
-protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-
 private:
 	required_device<cpu_device> m_maincpu;
-	required_device<wd1772_t> m_fdc;
+	required_device<wd1772_device> m_fdc;
 	required_device<pit68230_device> m_pit;
 	required_device<hd63450_device> m_dmac;
 
@@ -69,5 +71,4 @@ private:
 	uint16_t  *m_sysrom;
 };
 
-#endif // VME_FCSCSI_H
-
+#endif // MAME_BUS_VME_VME_FCSCSI_H

@@ -107,6 +107,16 @@ int core_strwildcmp(const char *sp1, const char *sp2)
 	return core_stricmp(s1, s2);
 }
 
+bool core_iswildstr(const char *sp)
+{
+	for ( ; sp && *sp; sp++)
+	{
+		if (('?' == *sp) || ('*' == *sp))
+			return true;
+	}
+	return false;
+}
+
 
 /*-------------------------------------------------
     core_strdup - string duplication via malloc

@@ -247,7 +247,7 @@ static GFXDECODE_START( portrait )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( portrait, portrait_state )
+static MACHINE_CONFIG_START( portrait )
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)     /* 4 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(portrait_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", portrait_state,  irq0_line_hold)
@@ -390,5 +390,5 @@ ROM_END
 
 
 
-GAME( 1983, portrait, 0,        portrait, portrait, driver_device,  0, ROT270, "Olympia", "Portraits (set 1)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, portraita,portrait, portrait, portrait, driver_device,  0, ROT270, "Olympia", "Portraits (set 2)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, portrait, 0,        portrait, portrait, portrait_state, 0, ROT270, "Olympia", "Portraits (set 1)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, portraita,portrait, portrait, portrait, portrait_state, 0, ROT270, "Olympia", "Portraits (set 2)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )

@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli
-#ifndef __M5_SLOT_H
-#define __M5_SLOT_H
+#ifndef MAME_BUS_M5_SLOT_H
+#define MAME_BUS_M5_SLOT_H
+
+#pragma once
 
 #include "softlist_dev.h"
 
@@ -30,7 +32,6 @@ class device_m5_cart_interface : public device_slot_card_interface
 {
 public:
 	// construction/destruction
-	device_m5_cart_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_m5_cart_interface();
 
 	// reading and writing
@@ -48,6 +49,8 @@ public:
 	void save_ram() { device().save_item(NAME(m_ram)); }
 
 protected:
+	device_m5_cart_interface(const machine_config &mconfig, device_t &device);
+
 	// internal state
 	uint8_t *m_rom;
 	uint32_t m_rom_size;
@@ -104,7 +107,7 @@ protected:
 
 
 // device type definition
-extern const device_type M5_CART_SLOT;
+DECLARE_DEVICE_TYPE(M5_CART_SLOT, m5_cart_slot_device)
 
 
 /***************************************************************************
@@ -116,4 +119,6 @@ extern const device_type M5_CART_SLOT;
 #define MCFG_M5_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
 	MCFG_DEVICE_ADD(_tag, M5_CART_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
-#endif
+
+
+#endif // MAME_BUS_M5_SLOT_H

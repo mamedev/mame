@@ -28,9 +28,6 @@
 
 extern struct io_procs image_ioprocs;
 
-class software_list;
-class software_list_loader;
-
 enum iodevice_t
 {
 	/* List of all supported devices.  Refer to the device by these names only */
@@ -94,19 +91,12 @@ private:
 };
 
 
-class device_image_interface;
-struct feature_list;
-class software_part;
-class software_info;
-
 enum class image_init_result { PASS, FAIL };
 enum class image_verify_result { PASS, FAIL };
 
 // device image interface function types
 typedef delegate<image_init_result (device_image_interface &)> device_image_load_delegate;
 typedef delegate<void (device_image_interface &)> device_image_func_delegate;
-// legacy
-typedef void (*device_image_partialhash_func)(util::hash_collection &, const unsigned char *, unsigned long, const char *);
 
 //**************************************************************************
 //  MACROS
@@ -144,13 +134,11 @@ public:
 	static const char *device_brieftypename(iodevice_t type);
 	static iodevice_t device_typeid(const char *name);
 
-	virtual void device_compute_hash(util::hash_collection &hashes, const void *data, size_t length, const char *types) const;
-
 	virtual image_init_result call_load() { return image_init_result::PASS; }
 	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) { return image_init_result::PASS; }
 	virtual void call_unload() { }
 	virtual std::string call_display() { return std::string(); }
-	virtual device_image_partialhash_func get_partial_hash() const { return nullptr; }
+	virtual u32 unhashed_header_length() const { return 0; }
 	virtual bool core_opens_image_file() const { return true; }
 	virtual iodevice_t image_type()  const = 0;
 	virtual bool is_readable()  const = 0;
@@ -275,7 +263,7 @@ protected:
 
 	void make_readonly() { m_readonly = true; }
 
-	void image_checkhash();
+	bool image_checkhash();
 
 	const software_part *find_software_item(const std::string &identifier, bool restrict_to_interface, software_list_device **device = nullptr) const;
 	std::string software_get_default_slot(const char *default_card_slot) const;
@@ -313,7 +301,7 @@ private:
 	bool load_software_part(const std::string &identifier);
 
 	bool init_phase() const;
-	static void run_hash(util::core_file &file, void(*partialhash)(util::hash_collection &, const unsigned char *, unsigned long, const char *), util::hash_collection &hashes, const char *types);
+	static bool run_hash(util::core_file &file, u32 skip_bytes, util::hash_collection &hashes, const char *types);
 
 	// loads an image or software items and resets - called internally when we
 	// load an is_reset_on_load() item

@@ -483,7 +483,7 @@ GFXDECODE_END
 *    Machine Drivers     *
 *************************/
 
-static MACHINE_CONFIG_START( mpu12wbk, mpu12wbk_state )
+static MACHINE_CONFIG_START( mpu12wbk )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/2)  /* guess */
@@ -560,5 +560,5 @@ DRIVER_INIT_MEMBER(mpu12wbk_state, mpu12wbk)
 *      Game Drivers      *
 *************************/
 
-/*    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT      ROT    COMPANY             FULLNAME                         FLAGS */
+//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT      ROT   COMPANY             FULLNAME                          FLAGS
 GAME( 1997, fruitstb, 0,      mpu12wbk, mpu12wbk, mpu12wbk_state, mpu12wbk, ROT0, "Webak Elektronik", "Fruit Star Bonus (Ver 8.20PIR)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

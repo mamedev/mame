@@ -36,7 +36,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<com8116_device> m_dbrg;
 	required_device<ieee488_device> m_ieee;
-	required_device<corvus_hdc_t> m_hdc;
+	required_device<corvus_hdc_device> m_hdc;
 
 	virtual void machine_start() override;
 	virtual void device_reset_after_children() override;

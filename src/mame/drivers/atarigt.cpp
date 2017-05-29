@@ -53,10 +53,9 @@
 
 
 #include "emu.h"
-#include "machine/atarigen.h"
-#include "video/atarirle.h"
-#include "cpu/m68000/m68000.h"
 #include "includes/atarigt.h"
+
+#include "cpu/m68000/m68000.h"
 
 
 #define LOG_PROTECTION      (0)
@@ -800,7 +799,7 @@ static const atari_rle_objects_config modesc =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( atarigt, atarigt_state )
+static MACHINE_CONFIG_START( atarigt )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, ATARI_CLOCK_50MHz/2)
@@ -1331,10 +1330,10 @@ DRIVER_INIT_MEMBER(atarigt_state,primrage)
  *
  *************************************/
 
-GAME( 1994, tmek,       0,        tmek,      tmek, atarigt_state,     tmek,       ROT0, "Atari Games", "T-MEK (v5.1, The Warlords)", MACHINE_UNEMULATED_PROTECTION )
-GAME( 1994, tmek51p,    tmek,     tmek,      tmek, atarigt_state,     tmek,       ROT0, "Atari Games", "T-MEK (v5.1, prototype)", MACHINE_UNEMULATED_PROTECTION )
-GAME( 1994, tmek45,     tmek,     tmek,      tmek, atarigt_state,     tmek,       ROT0, "Atari Games", "T-MEK (v4.5)", MACHINE_UNEMULATED_PROTECTION )
-GAME( 1994, tmek44,     tmek,     tmek,      tmek, atarigt_state,     tmek,       ROT0, "Atari Games", "T-MEK (v4.4)", MACHINE_UNEMULATED_PROTECTION )
-GAME( 1994, tmek20,     tmek,     tmek,      tmek, atarigt_state,     tmek,       ROT0, "Atari Games", "T-MEK (v2.0, prototype)", 0 )
-GAME( 1994, primrage,   0,        primrage,  primrage, atarigt_state, primrage,   ROT0, "Atari Games", "Primal Rage (version 2.3)", MACHINE_UNEMULATED_PROTECTION )
+GAME( 1994, tmek,       0,        tmek,      tmek,     atarigt_state, tmek,     ROT0, "Atari Games", "T-MEK (v5.1, The Warlords)", MACHINE_UNEMULATED_PROTECTION )
+GAME( 1994, tmek51p,    tmek,     tmek,      tmek,     atarigt_state, tmek,     ROT0, "Atari Games", "T-MEK (v5.1, prototype)", MACHINE_UNEMULATED_PROTECTION )
+GAME( 1994, tmek45,     tmek,     tmek,      tmek,     atarigt_state, tmek,     ROT0, "Atari Games", "T-MEK (v4.5)", MACHINE_UNEMULATED_PROTECTION )
+GAME( 1994, tmek44,     tmek,     tmek,      tmek,     atarigt_state, tmek,     ROT0, "Atari Games", "T-MEK (v4.4)", MACHINE_UNEMULATED_PROTECTION )
+GAME( 1994, tmek20,     tmek,     tmek,      tmek,     atarigt_state, tmek,     ROT0, "Atari Games", "T-MEK (v2.0, prototype)", 0 )
+GAME( 1994, primrage,   0,        primrage,  primrage, atarigt_state, primrage, ROT0, "Atari Games", "Primal Rage (version 2.3)", MACHINE_UNEMULATED_PROTECTION )
 GAME( 1994, primrage20, primrage, primrage20,primrage, atarigt_state, primrage, ROT0, "Atari Games", "Primal Rage (version 2.0)", MACHINE_UNEMULATED_PROTECTION )

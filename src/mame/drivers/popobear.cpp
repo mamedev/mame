@@ -634,7 +634,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(popobear_state::irq)
 		m_maincpu->set_input_line(2, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( popobear, popobear_state )
+static MACHINE_CONFIG_START( popobear )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_42MHz/4)  // XTAL CORRECT, DIVISOR GUESSED
 	MCFG_CPU_PROGRAM_MAP(popobear_mem)
 	// levels 2,3,5 look interesting
@@ -661,7 +661,7 @@ static MACHINE_CONFIG_START( popobear, popobear_state )
 	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_42MHz/16)  // XTAL CORRECT, DIVISOR GUESSED
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_42MHz/32, OKIM6295_PIN7_LOW)  // XTAL CORRECT, DIVISOR GUESSED
+	MCFG_OKIM6295_ADD("oki", XTAL_42MHz/32, PIN7_LOW)  // XTAL CORRECT, DIVISOR GUESSED
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -679,4 +679,4 @@ ROM_START( popobear )
 	ROM_LOAD( "popobear_ta-a-901.u9", 0x00000, 0x40000,  CRC(f1e94926) SHA1(f4d6f5b5811d90d0069f6efbb44d725ff0d07e1c) )
 ROM_END
 
-GAME( 2000, popobear,    0, popobear,    popobear, driver_device,    0, ROT0,  "BMC", "PoPo Bear",  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 2000, popobear,    0, popobear,    popobear, popobear_state,    0, ROT0,  "BMC", "PoPo Bear",  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

@@ -54,7 +54,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CUDA = device_creator<cuda_device>;
+DEFINE_DEVICE_TYPE(CUDA, cuda_device, "cuda", "Apple Cuda")
 
 ROM_START( cuda )
 	ROM_REGION(0x4400, CUDA_CPU_TAG, 0)
@@ -79,25 +79,15 @@ static ADDRESS_MAP_START( cuda_map, AS_PROGRAM, 8, cuda_device )
 	AM_RANGE(0x0f00, 0x1fff) AM_ROM AM_REGION(CUDA_CPU_TAG, 0)
 ADDRESS_MAP_END
 
+
 //-------------------------------------------------
-//  MACHINE_CONFIG
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( cuda )
+MACHINE_CONFIG_MEMBER( cuda_device::device_add_mconfig )
 	MCFG_CPU_ADD(CUDA_CPU_TAG, M68HC05EG, XTAL_32_768kHz*192)   // 32.768 kHz input clock, can be PLL'ed to x128 = 4.1 MHz under s/w control
 	MCFG_CPU_PROGRAM_MAP(cuda_map)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor cuda_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( cuda );
-}
 
 const tiny_rom_entry *cuda_device::device_rom_region() const
 {
@@ -383,7 +373,7 @@ WRITE8_MEMBER( cuda_device::pram_w )
 //-------------------------------------------------
 
 cuda_device::cuda_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, CUDA, "Apple Cuda", tag, owner, clock, "cuda", __FILE__),
+	: device_t(mconfig, CUDA, tag, owner, clock),
 	device_nvram_interface(mconfig, *this),
 	write_reset(*this),
 	write_linechange(*this),

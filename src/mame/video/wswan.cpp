@@ -17,12 +17,12 @@
 #include "wswan.h"
 #include "screen.h"
 
-const device_type WSWAN_VIDEO = device_creator<wswan_video_device>;
+DEFINE_DEVICE_TYPE(WSWAN_VIDEO, wswan_video_device, "wswan_video", "Bandai WonderSwam VDP")
 
 
 wswan_video_device::wswan_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: device_t(mconfig, WSWAN_VIDEO, "Bandai WonderSwan VDP", tag, owner, clock, "wswan_video", __FILE__),
-					m_vdp_type(VDP_TYPE_WSWAN)
+	: device_t(mconfig, WSWAN_VIDEO, tag, owner, clock)
+	, m_vdp_type(VDP_TYPE_WSWAN)
 {
 }
 

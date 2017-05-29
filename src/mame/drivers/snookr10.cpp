@@ -1037,7 +1037,7 @@ GFXDECODE_END
 *     Machine Drivers     *
 **************************/
 
-static MACHINE_CONFIG_START( snookr10, snookr10_state )
+static MACHINE_CONFIG_START( snookr10 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M65SC02, MASTER_CLOCK/8)    /* 2 MHz (1.999 MHz measured) */
@@ -1062,7 +1062,7 @@ static MACHINE_CONFIG_START( snookr10, snookr10_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", MASTER_CLOCK/16, OKIM6295_PIN7_HIGH)   /* 1 MHz (995.5 kHz measured); pin7 checked HIGH on PCB */
+	MCFG_OKIM6295_ADD("oki", MASTER_CLOCK/16, PIN7_HIGH)   /* 1 MHz (995.5 kHz measured); pin7 checked HIGH on PCB */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.8)
 
 MACHINE_CONFIG_END
@@ -1220,9 +1220,9 @@ ROM_END
 *      Game Drivers      *
 *************************/
 
-/*     YEAR  NAME       PARENT    MACHINE   INPUT      STATE          INIT ROT    COMPANY      FULLNAME                      FLAGS   LAYOUT */
-GAMEL( 1998, snookr10,  0,        snookr10, snookr10,  driver_device, 0,   ROT0, "Sandii'",   "Snooker 10 (Ver 1.11)",       0,      layout_snookr10 )
-GAMEL( 1998, apple10,   0,        apple10,  apple10,   driver_device, 0,   ROT0, "Sandii'",   "Apple 10 (Ver 1.21)",         0,      layout_snookr10 )
-GAMEL( 1997, tenballs,  snookr10, tenballs, tenballs,  driver_device, 0,   ROT0, "<unknown>", "Ten Balls (Ver 1.05)",        0,      layout_snookr10 )
-GAMEL( 1998, crystalc,  0,        crystalc, crystalc,  driver_device, 0,   ROT0, "JCD srl",   "Crystals Colours (Ver 1.02)", 0,      layout_snookr10 )
-GAMEL( 1998, crystalca, crystalc, crystalc, crystalca, driver_device, 0,   ROT0, "JCD srl",   "Crystals Colours (Ver 1.01)", 0,      layout_snookr10 )
+/*     YEAR  NAME       PARENT    MACHINE   INPUT      STATE           INIT ROT   COMPANY      FULLNAME                       FLAGS   LAYOUT */
+GAMEL( 1998, snookr10,  0,        snookr10, snookr10,  snookr10_state, 0,   ROT0, "Sandii'",   "Snooker 10 (Ver 1.11)",       0,      layout_snookr10 )
+GAMEL( 1998, apple10,   0,        apple10,  apple10,   snookr10_state, 0,   ROT0, "Sandii'",   "Apple 10 (Ver 1.21)",         0,      layout_snookr10 )
+GAMEL( 1997, tenballs,  snookr10, tenballs, tenballs,  snookr10_state, 0,   ROT0, "<unknown>", "Ten Balls (Ver 1.05)",        0,      layout_snookr10 )
+GAMEL( 1998, crystalc,  0,        crystalc, crystalc,  snookr10_state, 0,   ROT0, "JCD srl",   "Crystals Colours (Ver 1.02)", 0,      layout_snookr10 )
+GAMEL( 1998, crystalca, crystalc, crystalc, crystalca, snookr10_state, 0,   ROT0, "JCD srl",   "Crystals Colours (Ver 1.01)", 0,      layout_snookr10 )

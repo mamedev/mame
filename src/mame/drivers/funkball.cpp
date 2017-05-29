@@ -764,7 +764,7 @@ void funkball_state::machine_reset()
 	m_voodoo_pci_regs.base_addr = 0xff000000;
 }
 
-static MACHINE_CONFIG_START( funkball, funkball_state )
+static MACHINE_CONFIG_START( funkball )
 	MCFG_CPU_ADD("maincpu", MEDIAGX, 66666666*3.5) // 66,6 MHz x 3.5
 	MCFG_CPU_PROGRAM_MAP(funkball_map)
 	MCFG_CPU_IO_MAP(funkball_io)
@@ -822,4 +822,4 @@ ROM_START( funkball )
 ROM_END
 
 
-GAME(1998, funkball, 0, funkball, funkball, driver_device, 0, ROT0, "dgPIX Entertainment Inc.", "Funky Ball", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME(1998, funkball, 0, funkball, funkball, funkball_state, 0, ROT0, "dgPIX Entertainment Inc.", "Funky Ball", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

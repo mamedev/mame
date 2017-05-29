@@ -179,7 +179,7 @@ static GFXDECODE_START( poly88 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, poly88_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( poly88, poly88_state )
+static MACHINE_CONFIG_START( poly88 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8080, 1853000)
 	MCFG_CPU_PROGRAM_MAP(poly88_mem)
@@ -247,6 +247,6 @@ ROM_START( poly8813 )
 ROM_END
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY                   FULLNAME       FLAGS */
-COMP( 1976, poly88,  0,     0,       poly88,    poly88, poly88_state,  poly88, "PolyMorphic Systems",   "Poly-88",   0)
-COMP( 1977, poly8813,poly88,0,       poly8813,  poly88, poly88_state,  poly88, "PolyMorphic Systems",   "Poly-8813",MACHINE_NOT_WORKING)
+//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   STATE          INIT    COMPANY                  FULLNAME     FLAGS
+COMP( 1976, poly88,  0,     0,       poly88,    poly88, poly88_state,  poly88, "PolyMorphic Systems",   "Poly-88",   0 )
+COMP( 1977, poly8813,poly88,0,       poly8813,  poly88, poly88_state,  poly88, "PolyMorphic Systems",   "Poly-8813", MACHINE_NOT_WORKING )

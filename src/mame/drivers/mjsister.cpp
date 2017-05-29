@@ -483,7 +483,7 @@ void mjsister_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( mjsister, mjsister_state )
+static MACHINE_CONFIG_START( mjsister )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MCLK/2) /* 6.000 MHz */
@@ -501,7 +501,7 @@ static MACHINE_CONFIG_START( mjsister, mjsister_state )
 	MCFG_SCREEN_UPDATE_DRIVER(mjsister_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 256)
+	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 
 
 	/* sound hardware */
@@ -547,4 +547,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1986, mjsister, 0, mjsister, mjsister, driver_device, 0, ROT0, "Toaplan", "Mahjong Sisters (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, mjsister, 0, mjsister, mjsister, mjsister_state, 0, ROT0, "Toaplan", "Mahjong Sisters (Japan)", MACHINE_SUPPORTS_SAVE )

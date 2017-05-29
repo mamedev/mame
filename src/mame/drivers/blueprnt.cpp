@@ -342,7 +342,7 @@ void blueprnt_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( blueprnt, blueprnt_state )
+static MACHINE_CONFIG_START( blueprnt )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 7000000/2) // 3.5 MHz
@@ -498,7 +498,7 @@ ROM_END
  *
  *************************************/
 
-GAME( 1982, blueprnt,  0,        blueprnt, blueprnt, driver_device, 0, ROT270, "Zilec Electronics / Bally Midway", "Blue Print (Midway)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, blueprntj, blueprnt, blueprnt, blueprnt, driver_device, 0, ROT270, "Zilec Electronics / Jaleco",       "Blue Print (Jaleco)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, saturnzi,  0,        blueprnt, saturn,   driver_device, 0, ROT270, "Zilec Electronics / Jaleco",       "Saturn", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, grasspin,  0,        grasspin, grasspin, driver_device, 0, ROT270, "Zilec Electronics / Jaleco",       "Grasspin", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // a few issues with dip reading + video hw, but nothing major
+GAME( 1982, blueprnt,  0,        blueprnt, blueprnt, blueprnt_state, 0, ROT270, "Zilec Electronics / Bally Midway", "Blue Print (Midway)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, blueprntj, blueprnt, blueprnt, blueprnt, blueprnt_state, 0, ROT270, "Zilec Electronics / Jaleco",       "Blue Print (Jaleco)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, saturnzi,  0,        blueprnt, saturn,   blueprnt_state, 0, ROT270, "Zilec Electronics / Jaleco",       "Saturn", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, grasspin,  0,        grasspin, grasspin, blueprnt_state, 0, ROT270, "Zilec Electronics / Jaleco",       "Grasspin", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // a few issues with dip reading + video hw, but nothing major

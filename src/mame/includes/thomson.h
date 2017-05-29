@@ -8,8 +8,10 @@
 
 **********************************************************************/
 
-#ifndef _THOMSON_H_
-#define _THOMSON_H_
+#ifndef MAME_INCLUDES_THOMSON_H
+#define MAME_INCLUDES_THOMSON_H
+
+#pragma once
 
 #include "cpu/m6809/m6809.h"
 #include "formats/thom_cas.h"
@@ -671,6 +673,20 @@ public:
 	// construction/destruction
 	to7_io_line_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
+private:
+	required_device<pia6821_device> m_pia_io;
+	required_device<rs232_port_device> m_rs232;
+	int m_last_low;
+	int m_centronics_busy;
+	int m_rxd;
+	int m_cts;
+	int m_dsr;
+
 	/* read data register */
 	DECLARE_READ8_MEMBER(porta_in);
 
@@ -681,25 +697,11 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_cts);
 	DECLARE_WRITE_LINE_MEMBER(write_dsr);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
-	machine_config_constructor device_mconfig_additions() const override;
-
-private:
-	required_device<pia6821_device> m_pia_io;
-	required_device<rs232_port_device> m_rs232;
-	int m_last_low;
-	int m_centronics_busy;
-	int m_rxd;
-	int m_cts;
-	int m_dsr;
 };
 
-extern const device_type TO7_IO_LINE;
+DECLARE_DEVICE_TYPE(TO7_IO_LINE, to7_io_line_device)
 
 #define MCFG_TO7_IO_LINE_ADD(_tag)  \
 	MCFG_DEVICE_ADD((_tag), TO7_IO_LINE, 0)
 
-#endif /* _THOMSON_H_ */
+#endif // MAME_INCLUDES_THOMSON_H

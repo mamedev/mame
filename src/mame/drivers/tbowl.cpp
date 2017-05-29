@@ -437,7 +437,7 @@ void tbowl_state::machine_reset()
 	m_adpcm_data[0] = m_adpcm_data[1] = -1;
 }
 
-static MACHINE_CONFIG_START( tbowl, tbowl_state )
+static MACHINE_CONFIG_START( tbowl )
 
 	/* CPU on Board '6206B' */
 	MCFG_CPU_ADD("maincpu", Z80, 8000000) /* NEC D70008AC-8 (Z80 Clone) */
@@ -496,12 +496,12 @@ static MACHINE_CONFIG_START( tbowl, tbowl_state )
 	/* something for the samples? */
 	MCFG_SOUND_ADD("msm1", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(tbowl_state, adpcm_int_1))    /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8KHz               */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8KHz               */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_SOUND_ADD("msm2", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(tbowl_state, adpcm_int_2))    /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8KHz               */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8KHz               */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -709,6 +709,6 @@ ROM_START( tbowlj )
 	ROM_LOAD( "6206a.2",    0x10000, 0x10000, CRC(1e9e5936) SHA1(60370d1de28b1c5ffeff7843702aaddb19ff1f58) )
 ROM_END
 
-GAME( 1987, tbowl,    0,        tbowl,    tbowl, driver_device,    0, ROT0,  "Tecmo", "Tecmo Bowl (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, tbowlp,   tbowl,    tbowl,    tbowl, driver_device,    0, ROT0,  "Tecmo", "Tecmo Bowl (World, prototype?)", MACHINE_SUPPORTS_SAVE ) // or early version, handwritten labels
-GAME( 1987, tbowlj,   tbowl,    tbowl,    tbowlj, driver_device,   0, ROT0,  "Tecmo", "Tecmo Bowl (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, tbowl,    0,        tbowl,    tbowl,  tbowl_state,   0, ROT0,  "Tecmo", "Tecmo Bowl (World)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1987, tbowlp,   tbowl,    tbowl,    tbowl,  tbowl_state,   0, ROT0,  "Tecmo", "Tecmo Bowl (World, prototype?)", MACHINE_SUPPORTS_SAVE ) // or early version, handwritten labels
+GAME( 1987, tbowlj,   tbowl,    tbowl,    tbowlj, tbowl_state,   0, ROT0,  "Tecmo", "Tecmo Bowl (Japan)",             MACHINE_SUPPORTS_SAVE )

@@ -1265,7 +1265,7 @@ void wangpc_state::on_disk1_unload(floppy_image_device *image)
 //  MACHINE_CONFIG( wangpc )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( wangpc, wangpc_state )
+static MACHINE_CONFIG_START( wangpc )
 	MCFG_CPU_ADD(I8086_TAG, I8086, 8000000)
 	MCFG_CPU_PROGRAM_MAP(wangpc_mem)
 	MCFG_CPU_IO_MAP(wangpc_io)
@@ -1305,7 +1305,7 @@ static MACHINE_CONFIG_START( wangpc, wangpc_state )
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(wangpc_state, pit2_w))
 
 	MCFG_IM6402_ADD(IM6402_TAG, 62500*16, 62500*16)
-	MCFG_IM6402_TRO_CALLBACK(DEVWRITELINE(WANGPC_KEYBOARD_TAG, wangpc_keyboard_t, write_rxd))
+	MCFG_IM6402_TRO_CALLBACK(DEVWRITELINE(WANGPC_KEYBOARD_TAG, wangpc_keyboard_device, write_rxd))
 	MCFG_IM6402_DR_CALLBACK(WRITELINE(wangpc_state, uart_dr_w))
 	MCFG_IM6402_TBRE_CALLBACK(WRITELINE(wangpc_state, uart_tbre_w))
 
@@ -1386,4 +1386,4 @@ ROM_END
 //  GAME DRIVERS
 //**************************************************************************
 
-COMP( 1985, wangpc, 0, 0, wangpc, wangpc, driver_device, 0, "Wang Laboratories", "Wang Professional Computer", MACHINE_SUPPORTS_SAVE )
+COMP( 1985, wangpc, 0, 0, wangpc, wangpc, wangpc_state, 0, "Wang Laboratories", "Wang Professional Computer", MACHINE_SUPPORTS_SAVE )

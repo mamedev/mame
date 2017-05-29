@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type PET_64K = device_creator<pet_64k_expansion_device>;
+DEFINE_DEVICE_TYPE(PET_64K, pet_64k_expansion_device, "pet_64k", "PET 64KB RAM")
 
 
 
@@ -77,7 +77,7 @@ inline void pet_64k_expansion_device::write_ram(offs_t offset, uint8_t data)
 //-------------------------------------------------
 
 pet_64k_expansion_device::pet_64k_expansion_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, PET_64K, "PET 64KB RAM", tag, owner, clock, "pet_64k", __FILE__),
+	device_t(mconfig, PET_64K, tag, owner, clock),
 	device_pet_expansion_card_interface(mconfig, *this),
 	m_ram(*this, "ram"),
 	m_ctrl(0)

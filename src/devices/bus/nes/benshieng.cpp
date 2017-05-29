@@ -28,13 +28,13 @@
 //  constructor
 //-------------------------------------------------
 
-const device_type NES_BENSHIENG = device_creator<nes_benshieng_device>;
+DEFINE_DEVICE_TYPE(NES_BENSHIENG, nes_benshieng_device, "nes_benshieng", "NES Cart Benshieng PCB")
 
 
 nes_benshieng_device::nes_benshieng_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_BENSHIENG, "NES Cart Benshieng PCB", tag, owner, clock, "nes_benshieng", __FILE__),
-	m_dipsetting(0)
-				{
+	: nes_nrom_device(mconfig, NES_BENSHIENG, tag, owner, clock)
+	, m_dipsetting(0)
+{
 }
 
 

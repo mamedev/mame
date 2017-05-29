@@ -6,9 +6,10 @@
 
 */
 
-#ifndef _HMCS40_H_
-#define _HMCS40_H_
+#ifndef MAME_CPU_HMCS40_HMCS40_H
+#define MAME_CPU_HMCS40_HMCS40_H
 
+#pragma once
 
 
 // I/O ports setup
@@ -27,31 +28,9 @@
 
 enum
 {
-	HMCS40_PORT_R0X = 0,
-	HMCS40_PORT_R1X,
-	HMCS40_PORT_R2X,
-	HMCS40_PORT_R3X,
-	HMCS40_PORT_R4X,
-	HMCS40_PORT_R5X,
-	HMCS40_PORT_R6X,
-	HMCS40_PORT_R7X
-};
-
-enum
-{
 	HMCS40_INPUT_LINE_INT0 = 0,
 	HMCS40_INPUT_LINE_INT1,
 	HMCS40_INPUT_LINE_HLT
-};
-
-enum
-{
-	HMCS40_FAMILY_HMCS42 = 0,
-	HMCS40_FAMILY_HMCS43,
-	HMCS40_FAMILY_HMCS44,
-	HMCS40_FAMILY_HMCS45,
-	HMCS40_FAMILY_HMCS46,
-	HMCS40_FAMILY_HMCS47
 };
 
 
@@ -114,46 +93,54 @@ enum
 class hmcs40_cpu_device : public cpu_device
 {
 public:
-	// construction/destruction
-	hmcs40_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, int family, u16 polarity, int stack_levels, int pcwidth, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source)
-		: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
-		, m_program_config("program", ENDIANNESS_LITTLE, 16, prgwidth, -1, program)
-		, m_data_config("data", ENDIANNESS_LITTLE, 8, datawidth, 0, data)
-		, m_pcwidth(pcwidth)
-		, m_prgwidth(prgwidth)
-		, m_datawidth(datawidth)
-		, m_family(family)
-		, m_polarity(polarity)
-		, m_stack_levels(stack_levels)
-		, m_read_r0(*this), m_read_r1(*this), m_read_r2(*this), m_read_r3(*this), m_read_r4(*this), m_read_r5(*this), m_read_r6(*this), m_read_r7(*this)
-		, m_write_r0(*this), m_write_r1(*this), m_write_r2(*this), m_write_r3(*this), m_write_r4(*this), m_write_r5(*this), m_write_r6(*this), m_write_r7(*this)
-		, m_read_d(*this)
-		, m_write_d(*this)
-	{ }
+	enum
+	{
+		PORT_R0X = 0,
+		PORT_R1X,
+		PORT_R2X,
+		PORT_R3X,
+		PORT_R4X,
+		PORT_R5X,
+		PORT_R6X,
+		PORT_R7X
+	};
 
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_read_r0_callback(device_t &device, _Object object) { return downcast<hmcs40_cpu_device &>(device).m_read_r0.set_callback(object); }
-	template<class _Object> static devcb_base &set_read_r1_callback(device_t &device, _Object object) { return downcast<hmcs40_cpu_device &>(device).m_read_r1.set_callback(object); }
-	template<class _Object> static devcb_base &set_read_r2_callback(device_t &device, _Object object) { return downcast<hmcs40_cpu_device &>(device).m_read_r2.set_callback(object); }
-	template<class _Object> static devcb_base &set_read_r3_callback(device_t &device, _Object object) { return downcast<hmcs40_cpu_device &>(device).m_read_r3.set_callback(object); }
-	template<class _Object> static devcb_base &set_read_r4_callback(device_t &device, _Object object) { return downcast<hmcs40_cpu_device &>(device).m_read_r4.set_callback(object); }
-	template<class _Object> static devcb_base &set_read_r5_callback(device_t &device, _Object object) { return downcast<hmcs40_cpu_device &>(device).m_read_r5.set_callback(object); }
-	template<class _Object> static devcb_base &set_read_r6_callback(device_t &device, _Object object) { return downcast<hmcs40_cpu_device &>(device).m_read_r6.set_callback(object); }
-	template<class _Object> static devcb_base &set_read_r7_callback(device_t &device, _Object object) { return downcast<hmcs40_cpu_device &>(device).m_read_r7.set_callback(object); }
+	template <class Object> static devcb_base &set_read_r0_callback(device_t &device, Object &&cb) { return downcast<hmcs40_cpu_device &>(device).m_read_r0.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_read_r1_callback(device_t &device, Object &&cb) { return downcast<hmcs40_cpu_device &>(device).m_read_r1.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_read_r2_callback(device_t &device, Object &&cb) { return downcast<hmcs40_cpu_device &>(device).m_read_r2.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_read_r3_callback(device_t &device, Object &&cb) { return downcast<hmcs40_cpu_device &>(device).m_read_r3.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_read_r4_callback(device_t &device, Object &&cb) { return downcast<hmcs40_cpu_device &>(device).m_read_r4.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_read_r5_callback(device_t &device, Object &&cb) { return downcast<hmcs40_cpu_device &>(device).m_read_r5.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_read_r6_callback(device_t &device, Object &&cb) { return downcast<hmcs40_cpu_device &>(device).m_read_r6.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_read_r7_callback(device_t &device, Object &&cb) { return downcast<hmcs40_cpu_device &>(device).m_read_r7.set_callback(std::forward<Object>(cb)); }
 
-	template<class _Object> static devcb_base &set_write_r0_callback(device_t &device, _Object object) { return downcast<hmcs40_cpu_device &>(device).m_write_r0.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_r1_callback(device_t &device, _Object object) { return downcast<hmcs40_cpu_device &>(device).m_write_r1.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_r2_callback(device_t &device, _Object object) { return downcast<hmcs40_cpu_device &>(device).m_write_r2.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_r3_callback(device_t &device, _Object object) { return downcast<hmcs40_cpu_device &>(device).m_write_r3.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_r4_callback(device_t &device, _Object object) { return downcast<hmcs40_cpu_device &>(device).m_write_r4.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_r5_callback(device_t &device, _Object object) { return downcast<hmcs40_cpu_device &>(device).m_write_r5.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_r6_callback(device_t &device, _Object object) { return downcast<hmcs40_cpu_device &>(device).m_write_r6.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_r7_callback(device_t &device, _Object object) { return downcast<hmcs40_cpu_device &>(device).m_write_r7.set_callback(object); }
+	template <class Object> static devcb_base &set_write_r0_callback(device_t &device, Object &&cb) { return downcast<hmcs40_cpu_device &>(device).m_write_r0.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_write_r1_callback(device_t &device, Object &&cb) { return downcast<hmcs40_cpu_device &>(device).m_write_r1.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_write_r2_callback(device_t &device, Object &&cb) { return downcast<hmcs40_cpu_device &>(device).m_write_r2.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_write_r3_callback(device_t &device, Object &&cb) { return downcast<hmcs40_cpu_device &>(device).m_write_r3.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_write_r4_callback(device_t &device, Object &&cb) { return downcast<hmcs40_cpu_device &>(device).m_write_r4.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_write_r5_callback(device_t &device, Object &&cb) { return downcast<hmcs40_cpu_device &>(device).m_write_r5.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_write_r6_callback(device_t &device, Object &&cb) { return downcast<hmcs40_cpu_device &>(device).m_write_r6.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_write_r7_callback(device_t &device, Object &&cb) { return downcast<hmcs40_cpu_device &>(device).m_write_r7.set_callback(std::forward<Object>(cb)); }
 
-	template<class _Object> static devcb_base &set_read_d_callback(device_t &device, _Object object) { return downcast<hmcs40_cpu_device &>(device).m_read_d.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_d_callback(device_t &device, _Object object) { return downcast<hmcs40_cpu_device &>(device).m_write_d.set_callback(object); }
+	template <class Object> static devcb_base &set_read_d_callback(device_t &device, Object &&cb) { return downcast<hmcs40_cpu_device &>(device).m_read_d.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_write_d_callback(device_t &device, Object &&cb) { return downcast<hmcs40_cpu_device &>(device).m_write_d.set_callback(std::forward<Object>(cb)); }
 
 protected:
+	enum
+	{
+		HMCS40_FAMILY_HMCS42 = 0,
+		HMCS40_FAMILY_HMCS43,
+		HMCS40_FAMILY_HMCS44,
+		HMCS40_FAMILY_HMCS45,
+		HMCS40_FAMILY_HMCS46,
+		HMCS40_FAMILY_HMCS47
+	};
+
+	// construction/destruction
+	hmcs40_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int family, u16 polarity, int stack_levels, int pcwidth, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -347,10 +334,9 @@ protected:
 
 class hmcs43_cpu_device : public hmcs40_cpu_device
 {
-public:
-	hmcs43_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, u16 polarity, const char *shortname);
-
 protected:
+	hmcs43_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u16 polarity);
+
 	// overrides
 	virtual u8 read_r(int index) override;
 	virtual void write_r(int index, u8 data) override;
@@ -384,10 +370,9 @@ public:
 
 class hmcs44_cpu_device : public hmcs40_cpu_device
 {
-public:
-	hmcs44_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, u16 polarity, const char *shortname);
-
 protected:
+	hmcs44_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u16 polarity);
+
 	// overrides
 	virtual u8 read_r(int index) override;
 	virtual void write_r(int index, u8 data) override;
@@ -420,10 +405,9 @@ public:
 
 class hmcs45_cpu_device : public hmcs40_cpu_device
 {
-public:
-	hmcs45_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, u16 polarity, const char *shortname);
-
 protected:
+	hmcs45_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u16 polarity);
+
 	// overrides
 	virtual u8 read_r(int index) override;
 	virtual void write_r(int index, u8 data) override;
@@ -455,20 +439,19 @@ public:
 
 
 
-extern const device_type HD38750;
-extern const device_type HD38755;
-extern const device_type HD44750;
-extern const device_type HD44758;
+DECLARE_DEVICE_TYPE(HD38750, hd38750_device)
+DECLARE_DEVICE_TYPE(HD38755, hd38755_device)
+DECLARE_DEVICE_TYPE(HD44750, hd44750_device)
+DECLARE_DEVICE_TYPE(HD44758, hd44758_device)
 
-extern const device_type HD38800;
-extern const device_type HD38805;
-extern const device_type HD44801;
-extern const device_type HD44808;
+DECLARE_DEVICE_TYPE(HD38800, hd38800_device)
+DECLARE_DEVICE_TYPE(HD38805, hd38805_device)
+DECLARE_DEVICE_TYPE(HD44801, hd44801_device)
+DECLARE_DEVICE_TYPE(HD44808, hd44808_device)
 
-extern const device_type HD38820;
-extern const device_type HD38825;
-extern const device_type HD44820;
-extern const device_type HD44828;
+DECLARE_DEVICE_TYPE(HD38820, hd38820_device)
+DECLARE_DEVICE_TYPE(HD38825, hd38825_device)
+DECLARE_DEVICE_TYPE(HD44820, hd44820_device)
+DECLARE_DEVICE_TYPE(HD44828, hd44828_device)
 
-
-#endif /* _HMCS40_H_ */
+#endif // MAME_CPU_HMCS40_HMCS40_H

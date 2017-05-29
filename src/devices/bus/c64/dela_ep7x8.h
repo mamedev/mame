@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_C64_DELA_EP7X8_H
+#define MAME_BUS_C64_DELA_EP7X8_H
 
-#ifndef __DELA_EP7X8__
-#define __DELA_EP7X8__
+#pragma once
 
 
 #include "bus/generic/slot.h"
@@ -57,8 +57,7 @@ private:
 
 
 // device type definition
-extern const device_type C64_DELA_EP7X8;
+DECLARE_DEVICE_TYPE(C64_DELA_EP7X8, c64_dela_ep7x8_cartridge_device)
 
 
-
-#endif
+#endif // MAME_BUS_C64_DELA_EP7X8_H

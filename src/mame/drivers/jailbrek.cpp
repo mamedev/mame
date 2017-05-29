@@ -259,7 +259,7 @@ void jailbrek_state::machine_reset()
 	m_nmi_enable = 0;
 }
 
-static MACHINE_CONFIG_START( jailbrek, jailbrek_state )
+static MACHINE_CONFIG_START( jailbrek )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI1, MASTER_CLOCK/12)
@@ -421,6 +421,6 @@ ROM_START( jailbrekb )
 	ROM_LOAD( "k8.bin",  0x0000, 0x0001, NO_DUMP ) /* PAL16L8 */
 ROM_END
 
-GAME( 1986, jailbrek, 0,        jailbrek, jailbrek, driver_device, 0, ROT0, "Konami", "Jail Break", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, jailbrekb,jailbrek, jailbrek, jailbrek, driver_device, 0, ROT0, "bootleg","Jail Break (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, manhatan, jailbrek, jailbrek, jailbrek, driver_device, 0, ROT0, "Konami", "Manhattan 24 Bunsyo (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, jailbrek,  0,        jailbrek, jailbrek, jailbrek_state, 0, ROT0, "Konami",  "Jail Break",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1986, jailbrekb, jailbrek, jailbrek, jailbrek, jailbrek_state, 0, ROT0, "bootleg", "Jail Break (bootleg)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1986, manhatan,  jailbrek, jailbrek, jailbrek, jailbrek_state, 0, ROT0, "Konami",  "Manhattan 24 Bunsyo (Japan)", MACHINE_SUPPORTS_SAVE )

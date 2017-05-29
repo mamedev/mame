@@ -9,24 +9,19 @@
 
 **********************************************************************/
 
-#ifndef KBDC8042_H
-#define KBDC8042_H
+#ifndef MAME_MACHINE_8042KBDC_H
+#define MAME_MACHINE_8042KBDC_H
+
+#pragma once
 
 #include "machine/pckeybrd.h"
-
-enum kbdc8042_type_t
-{
-	KBDC8042_STANDARD,
-	KBDC8042_PS2,       /* another timing of integrated controller */
-	KBDC8042_AT386      /* hack for at386 driver */
-};
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
 #define MCFG_KBDC8042_KEYBOARD_TYPE(_kbdt) \
-	kbdc8042_device::set_keyboard_type(*device, _kbdt);
+	kbdc8042_device::set_keyboard_type(*device, kbdc8042_device::_kbdt);
 
 #define MCFG_KBDC8042_SYSTEM_RESET_CB(_devcb) \
 	devcb = &kbdc8042_device::set_system_reset_callback(*device, DEVCB_##_devcb);
@@ -52,17 +47,24 @@ enum kbdc8042_type_t
 class kbdc8042_device : public device_t
 {
 public:
+	enum kbdc8042_type_t
+	{
+		KBDC8042_STANDARD,
+		KBDC8042_PS2,       /* another timing of integrated controller */
+		KBDC8042_AT386      /* hack for at386 driver */
+	};
+
 	// construction/destruction
 	kbdc8042_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	static void set_keyboard_type(device_t &device, kbdc8042_type_t keybtype) { downcast<kbdc8042_device &>(device).m_keybtype = keybtype; }
-	template<class _Object> static devcb_base &set_system_reset_callback(device_t &device, _Object object) { return downcast<kbdc8042_device &>(device).m_system_reset_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_gate_a20_callback(device_t &device, _Object object) { return downcast<kbdc8042_device &>(device).m_gate_a20_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_input_buffer_full_callback(device_t &device, _Object object) { return downcast<kbdc8042_device &>(device).m_input_buffer_full_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_output_buffer_empty_callback(device_t &device, _Object object) { return downcast<kbdc8042_device &>(device).m_output_buffer_empty_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_speaker_callback(device_t &device, _Object object) { return downcast<kbdc8042_device &>(device).m_speaker_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_system_reset_callback(device_t &device, Object &&cb) { return downcast<kbdc8042_device &>(device).m_system_reset_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_gate_a20_callback(device_t &device, Object &&cb) { return downcast<kbdc8042_device &>(device).m_gate_a20_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_input_buffer_full_callback(device_t &device, Object &&cb) { return downcast<kbdc8042_device &>(device).m_input_buffer_full_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_output_buffer_empty_callback(device_t &device, Object &&cb) { return downcast<kbdc8042_device &>(device).m_output_buffer_empty_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_speaker_callback(device_t &device, Object &&cb) { return downcast<kbdc8042_device &>(device).m_speaker_cb.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( data_r );
 	DECLARE_WRITE8_MEMBER( data_w );
@@ -120,6 +122,6 @@ protected:
 
 // device type definition
 extern const device_type KBDC8042;
+DECLARE_DEVICE_TYPE(KBDC8042, kbdc8042_device)
 
-
-#endif /* KBDC8042_H */
+#endif // MAME_MACHINE_8042KBDC_H

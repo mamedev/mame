@@ -19,13 +19,18 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "rsp.h"
+
 #include "rspfe.h"
 #include "rspcp2.h"
 #include "cpu/drcfe.h"
 #include "cpu/drcuml.h"
 #include "cpu/drcumlsh.h"
+
+#include "debugger.h"
+
+#include "rspdefs.h"
+
 
 using namespace uml;
 

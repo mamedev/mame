@@ -356,7 +356,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( gp2x )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( gp2x, gp2x_state )
+static MACHINE_CONFIG_START( gp2x )
 	MCFG_CPU_ADD("maincpu", ARM9, 80000000)
 	MCFG_CPU_PROGRAM_MAP(gp2x_map)
 
@@ -392,4 +392,4 @@ ROM_START(gp2x)
 	ROMX_LOAD( "gp2xyaffs.v4",   0x300000, 0x2dfed0, CRC(e77efc53) SHA1(21477ff77aacb84005bc465a03066d71031a6098), ROM_BIOS(3))
 ROM_END
 
-CONS(2005, gp2x, 0, 0, gp2x, gp2x, driver_device, 0, "Game Park Holdings", "GP2X", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+CONS(2005, gp2x, 0, 0, gp2x, gp2x, gp2x_state, 0, "Game Park Holdings", "GP2X", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)

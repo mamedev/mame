@@ -4,20 +4,16 @@
 #include "holy_quran.h"
 
 
-const device_type MSX_CART_HOLY_QURAN = device_creator<msx_cart_holy_quran>;
+DEFINE_DEVICE_TYPE(MSX_CART_HOLY_QURAN, msx_cart_holy_quran_device, "msx_cart_holy_quran", "MSX Cartridge - Holy Quran")
 
 
-msx_cart_holy_quran::msx_cart_holy_quran(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MSX_CART_HOLY_QURAN, "MSX Cartridge - Holy Quran", tag, owner, clock, "msx_cart_holy_quran", __FILE__)
+msx_cart_holy_quran_device::msx_cart_holy_quran_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, MSX_CART_HOLY_QURAN, tag, owner, clock)
 	, msx_cart_interface(mconfig, *this)
+	, m_selected_bank{ 0, 0, 0, 0 }
+	, m_bank_base{ nullptr, nullptr, nullptr, nullptr }
 	, m_decrypt(false)
 {
-	for (int i = 0; i < 4; i++)
-	{
-		m_selected_bank[i] = 0;
-		m_bank_base[i] = nullptr;
-	}
-
 	/* protection uses a simple rotation on databus, some lines inverted:
 	    D0   D4                 D4   D5
 	    D1 ~ D3                 D5 ~ D2
@@ -30,16 +26,16 @@ msx_cart_holy_quran::msx_cart_holy_quran(const machine_config &mconfig, const ch
 }
 
 
-void msx_cart_holy_quran::device_start()
+void msx_cart_holy_quran_device::device_start()
 {
 	save_item(NAME(m_selected_bank));
 	save_item(NAME(m_decrypt));
 
-	machine().save().register_postload(save_prepost_delegate(FUNC(msx_cart_holy_quran::restore_banks), this));
+	machine().save().register_postload(save_prepost_delegate(FUNC(msx_cart_holy_quran_device::restore_banks), this));
 }
 
 
-void msx_cart_holy_quran::restore_banks()
+void msx_cart_holy_quran_device::restore_banks()
 {
 	m_bank_base[0] = get_rom_base() + (m_selected_bank[0] & 0x7f) * 0x2000;
 	m_bank_base[1] = get_rom_base() + (m_selected_bank[1] & 0x7f) * 0x2000;
@@ -48,7 +44,7 @@ void msx_cart_holy_quran::restore_banks()
 }
 
 
-void msx_cart_holy_quran::device_reset()
+void msx_cart_holy_quran_device::device_reset()
 {
 	for (auto & elem : m_selected_bank)
 	{
@@ -57,7 +53,7 @@ void msx_cart_holy_quran::device_reset()
 }
 
 
-void msx_cart_holy_quran::initialize_cartridge()
+void msx_cart_holy_quran_device::initialize_cartridge()
 {
 	if (get_rom_size() != 0x100000)
 	{
@@ -68,7 +64,7 @@ void msx_cart_holy_quran::initialize_cartridge()
 }
 
 
-READ8_MEMBER(msx_cart_holy_quran::read_cart)
+READ8_MEMBER(msx_cart_holy_quran_device::read_cart)
 {
 	if (offset >= 0x4000 && offset < 0xc000)
 	{
@@ -92,7 +88,7 @@ READ8_MEMBER(msx_cart_holy_quran::read_cart)
 }
 
 
-WRITE8_MEMBER(msx_cart_holy_quran::write_cart)
+WRITE8_MEMBER(msx_cart_holy_quran_device::write_cart)
 {
 	switch (offset)
 	{
@@ -113,7 +109,7 @@ WRITE8_MEMBER(msx_cart_holy_quran::write_cart)
 			restore_banks();
 			break;
 		default:
-			logerror("msx_cart_holy_quran: unhandled write %02x to %04x\n", data, offset);
+			logerror("msx_cart_holy_quran_device: unhandled write %02x to %04x\n", data, offset);
 			break;
 	}
 }

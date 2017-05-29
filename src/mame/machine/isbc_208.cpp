@@ -6,10 +6,13 @@
 #include "emu.h"
 #include "isbc_208.h"
 
-const device_type ISBC_208 = device_creator<isbc_208_device>;
+#include "formats/pc_dsk.h"
+
+
+DEFINE_DEVICE_TYPE(ISBC_208, isbc_208_device, "isbc_208", "ISBC 208 Flexible Disk Driver Controller")
 
 isbc_208_device::isbc_208_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, ISBC_208, "ISBC 208 Flexible Disk Drive Controller", tag, owner, clock, "isbc_208", __FILE__),
+	device_t(mconfig, ISBC_208, tag, owner, clock),
 	m_dmac(*this, "dmac"),
 	m_fdc(*this, "fdc"),
 	m_out_irq_func(*this)
@@ -25,7 +28,7 @@ static SLOT_INTERFACE_START( isbc_208_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_FRAGMENT( isbc_208 )
+MACHINE_CONFIG_MEMBER( isbc_208_device::device_add_mconfig )
 	MCFG_DEVICE_ADD("dmac", AM9517A, XTAL_8MHz/4)
 	MCFG_I8237_OUT_HREQ_CB(WRITELINE(isbc_208_device, hreq_w))
 	MCFG_I8237_OUT_EOP_CB(WRITELINE(isbc_208_device, out_eop_w))
@@ -47,10 +50,6 @@ DEVICE_ADDRESS_MAP_START( map, 8, isbc_208_device )
 	AM_RANGE(0x12, 0x15) AM_READWRITE(stat_r, aux_w)
 ADDRESS_MAP_END
 
-machine_config_constructor isbc_208_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( isbc_208 );
-}
 
 WRITE_LINE_MEMBER(isbc_208_device::out_eop_w)
 {

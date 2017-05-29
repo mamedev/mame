@@ -6,10 +6,10 @@
 
 *********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_ABCBUS_TURBO_H
+#define MAME_BUS_ABCBUS_TURBO_H
 
-#ifndef __TURBO_KONTROLLER__
-#define __TURBO_KONTROLLER__
+#pragma once
 
 #include "abcbus.h"
 #include "cpu/z80/z80.h"
@@ -49,7 +49,6 @@ private:
 
 // device type definition
 extern const device_type TURBO_KONTROLLER;
+DECLARE_DEVICE_TYPE(TURBO_KONTROLLER, turbo_kontroller_device)
 
-
-
-#endif
+#endif // MAME_BUS_ABCBUS_TURBO_H

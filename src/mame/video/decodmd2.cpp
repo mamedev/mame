@@ -13,7 +13,7 @@
 #include "rendlay.h"
 #include "screen.h"
 
-const device_type DECODMD2 = device_creator<decodmd_type2_device>;
+DEFINE_DEVICE_TYPE(DECODMD2, decodmd_type2_device, "decodmd2", "Data East Pinball Dot Matrix Display Type 2")
 
 WRITE8_MEMBER( decodmd_type2_device::bank_w )
 {
@@ -128,14 +128,14 @@ static ADDRESS_MAP_START( decodmd2_map, AS_PROGRAM, 8, decodmd_type2_device )
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("dmdbank2") // last 32k of ROM
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_FRAGMENT( decodmd2 )
+MACHINE_CONFIG_MEMBER( decodmd_type2_device::device_add_mconfig )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("dmdcpu", M6809E, XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(decodmd2_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("firq_timer",decodmd_type2_device,dmd_firq,attotime::from_hz(80))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("firq_timer", decodmd_type2_device, dmd_firq, attotime::from_hz(80))
 
 	MCFG_MC6845_ADD("dmd6845", MC6845, nullptr, XTAL_8MHz / 8)  // TODO: confirm clock speed
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
@@ -147,7 +147,7 @@ static MACHINE_CONFIG_FRAGMENT( decodmd2 )
 	MCFG_SCREEN_ADD("dmd",RASTER)
 	MCFG_SCREEN_SIZE(128, 32)
 	MCFG_SCREEN_VISIBLE_AREA(0, 128-1, 0, 32-1)
-	MCFG_SCREEN_UPDATE_DEVICE("dmd6845",mc6845_device, screen_update)
+	MCFG_SCREEN_UPDATE_DEVICE("dmd6845", mc6845_device, screen_update)
 	MCFG_SCREEN_REFRESH_RATE(60)
 
 	MCFG_RAM_ADD(RAM_TAG)
@@ -155,13 +155,9 @@ static MACHINE_CONFIG_FRAGMENT( decodmd2 )
 
 MACHINE_CONFIG_END
 
-machine_config_constructor decodmd_type2_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( decodmd2 );
-}
 
 decodmd_type2_device::decodmd_type2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, DECODMD2, "Data East Pinball Dot Matrix Display Type 2", tag, owner, clock, "decodmd2", __FILE__),
+	: device_t(mconfig, DECODMD2, tag, owner, clock),
 		m_cpu(*this,"dmdcpu"),
 		m_mc6845(*this,"dmd6845"),
 		m_rombank1(*this,"dmdbank1"),

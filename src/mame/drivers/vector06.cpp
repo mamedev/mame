@@ -46,10 +46,10 @@ static ADDRESS_MAP_START(vector06_io, AS_IO, 8, vector06_state)
 	AM_RANGE( 0x0C, 0x0C) AM_WRITE(vector06_color_set)
 	AM_RANGE( 0x10, 0x10) AM_WRITE(vector06_ramdisk_w)
 	AM_RANGE( 0x14, 0x15) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_address_w)
-	AM_RANGE( 0x18, 0x18) AM_DEVREADWRITE("wd1793", kr1818vg93_t, data_r, data_w)
-	AM_RANGE( 0x19, 0x19) AM_DEVREADWRITE("wd1793", kr1818vg93_t, sector_r, sector_w)
-	AM_RANGE( 0x1a, 0x1a) AM_DEVREADWRITE("wd1793", kr1818vg93_t, track_r, track_w)
-	AM_RANGE( 0x1b, 0x1b) AM_DEVREADWRITE("wd1793", kr1818vg93_t, status_r, cmd_w)
+	AM_RANGE( 0x18, 0x18) AM_DEVREADWRITE("wd1793", kr1818vg93_device, data_r, data_w)
+	AM_RANGE( 0x19, 0x19) AM_DEVREADWRITE("wd1793", kr1818vg93_device, sector_r, sector_w)
+	AM_RANGE( 0x1a, 0x1a) AM_DEVREADWRITE("wd1793", kr1818vg93_device, track_r, track_w)
+	AM_RANGE( 0x1b, 0x1b) AM_DEVREADWRITE("wd1793", kr1818vg93_device, status_r, cmd_w)
 	AM_RANGE( 0x1C, 0x1C) AM_WRITE(vector06_disc_w)
 ADDRESS_MAP_END
 
@@ -153,7 +153,7 @@ SLOT_INTERFACE_END
 
 
 /* Machine driver */
-static MACHINE_CONFIG_START( vector06, vector06_state )
+static MACHINE_CONFIG_START( vector06 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, 3000000)     // actual speed is wrong due to unemulated latency
 //  MCFG_CPU_ADD("maincpu", Z80, 3000000)
@@ -266,8 +266,8 @@ ROM_START( krista2 )
 ROM_END
 /* Driver */
 
-/*    YEAR  NAME         PARENT    COMPAT  MACHINE     INPUT       INIT     COMPANY    FULLNAME      FLAGS */
-COMP( 1987, vector06,    0,        0,      vector06,   vector06, driver_device,   0,    "<unknown>", "Vector 06c",  0)
-COMP( 1987, vec1200,     vector06, 0,      vector06,   vector06, driver_device,   0,    "<unknown>", "Vector 1200", MACHINE_NOT_WORKING)
-COMP( 1987, pk6128c,     vector06, 0,      vector06,   vector06, driver_device,   0,    "<unknown>", "PK-6128c",    MACHINE_NOT_WORKING)
-COMP( 1987, krista2,     vector06, 0,      vector06,   vector06, driver_device,   0,    "<unknown>", "Krista-2",    MACHINE_NOT_WORKING)
+/*    YEAR  NAME         PARENT    COMPAT  MACHINE     INPUT     STATE           INIT  COMPANY      FULLNAME       FLAGS */
+COMP( 1987, vector06,    0,        0,      vector06,   vector06, vector06_state, 0,    "<unknown>", "Vector 06c",  0)
+COMP( 1987, vec1200,     vector06, 0,      vector06,   vector06, vector06_state, 0,    "<unknown>", "Vector 1200", MACHINE_NOT_WORKING)
+COMP( 1987, pk6128c,     vector06, 0,      vector06,   vector06, vector06_state, 0,    "<unknown>", "PK-6128c",    MACHINE_NOT_WORKING)
+COMP( 1987, krista2,     vector06, 0,      vector06,   vector06, vector06_state, 0,    "<unknown>", "Krista-2",    MACHINE_NOT_WORKING)

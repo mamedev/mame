@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_VIC20_MEGACART_H
+#define MAME_BUS_VIC20_MEGACART_H
 
-#ifndef __VIC20_MEGACART__
-#define __VIC20_MEGACART__
+#pragma once
 
 #include "exp.h"
 
@@ -52,8 +52,6 @@ private:
 
 
 // device type definition
-extern const device_type VIC20_MEGACART;
+DECLARE_DEVICE_TYPE(VIC20_MEGACART, vic20_megacart_device)
 
-
-
-#endif
+#endif // MAME_BUS_VIC20_MEGACART_H

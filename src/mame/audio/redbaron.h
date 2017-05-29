@@ -1,13 +1,15 @@
 // license:BSD-3-Clause
 // copyright-holders:Brad Oliver, Nicola Salmoria
+#ifndef MAME_AUDIO_REDBARON_H
+#define MAME_AUDIO_REDBARON_H
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
 // ======================> redbaron_sound_device
 
-class redbaron_sound_device : public device_t,
-								public device_sound_interface
+class redbaron_sound_device : public device_t, public device_sound_interface
 {
 public:
 	redbaron_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -44,4 +46,6 @@ private:
 	int m_squeal_out;
 };
 
-extern const device_type REDBARON;
+DECLARE_DEVICE_TYPE(REDBARON, redbaron_sound_device)
+
+#endif // MAME_AUDIO_REDBARON_H

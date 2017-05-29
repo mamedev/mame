@@ -484,7 +484,7 @@ void imolagp_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( imolagp, imolagp_state )
+static MACHINE_CONFIG_START( imolagp )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 3000000) // ? (assume slower than slave)
@@ -572,6 +572,6 @@ ROM_START( imolagpo )
 ROM_END
 
 
-/*    YEAR,  NAME,     PARENT,  MACHINE, INPUT,    INIT,              MONITOR, COMPANY, FULLNAME, FLAGS */
-GAMEL(1983?, imolagp,  0,       imolagp, imolagp,  driver_device, 0,  ROT90,   "RB Bologna", "Imola Grand Prix (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE, layout_imolagp ) // made by Alberici? year not shown, PCB labels suggests it's from 1983
-GAMEL(1983?, imolagpo, imolagp, imolagp, imolagpo, driver_device, 0,  ROT90,   "RB Bologna", "Imola Grand Prix (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE, layout_imolagp ) // "
+//    YEAR,  NAME,     PARENT,  MACHINE, INPUT,    STATE,         INIT, MONITOR, COMPANY,       FULLNAME,                  FLAGS
+GAMEL(1983?, imolagp,  0,       imolagp, imolagp,  imolagp_state, 0,    ROT90,   "RB Bologna", "Imola Grand Prix (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE, layout_imolagp ) // made by Alberici? year not shown, PCB labels suggests it's from 1983
+GAMEL(1983?, imolagpo, imolagp, imolagp, imolagpo, imolagp_state, 0,    ROT90,   "RB Bologna", "Imola Grand Prix (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE, layout_imolagp ) // "

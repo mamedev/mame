@@ -6,10 +6,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_NASBUS_AVC_H
+#define MAME_BUS_NASBUS_AVC_H
 
-#ifndef __NASBUS_AVC_H__
-#define __NASBUS_AVC_H__
+#pragma once
 
 #include "nasbus.h"
 #include "video/mc6845.h"
@@ -50,6 +50,6 @@ private:
 };
 
 // device type definition
-extern const device_type NASCOM_AVC;
+DECLARE_DEVICE_TYPE(NASCOM_AVC, nascom_avc_device)
 
-#endif // __NASBUS_AVC_H__
+#endif // MAME_BUS_NASBUS_AVC_H

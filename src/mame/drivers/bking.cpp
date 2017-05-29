@@ -396,7 +396,7 @@ MACHINE_RESET_MEMBER(bking_state,bking3)
 	m_addr_l = 0;
 }
 
-static MACHINE_CONFIG_START( bking, bking_state )
+static MACHINE_CONFIG_START( bking )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("main_cpu", Z80, XTAL_12MHz/4) /* 3 MHz */
@@ -750,6 +750,6 @@ ROM_START( bking3 )
 ROM_END
 
 
-GAME( 1982, bking,  0, bking,  bking,  driver_device, 0, ROT270, "Taito Corporation", "Birdie King", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, bking2, 0, bking,  bking2, driver_device, 0, ROT90,  "Taito Corporation", "Birdie King 2", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, bking3, 0, bking3, bking2, driver_device, 0, ROT90,  "Taito Corporation", "Birdie King 3", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bking,  0, bking,  bking,  bking_state, 0, ROT270, "Taito Corporation", "Birdie King",   MACHINE_SUPPORTS_SAVE )
+GAME( 1983, bking2, 0, bking,  bking2, bking_state, 0, ROT90,  "Taito Corporation", "Birdie King 2", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, bking3, 0, bking3, bking2, bking_state, 0, ROT90,  "Taito Corporation", "Birdie King 3", MACHINE_SUPPORTS_SAVE )

@@ -404,7 +404,7 @@ uint32_t fk1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	return 0;
 }
 
-static MACHINE_CONFIG_START( fk1, fk1_state )
+static MACHINE_CONFIG_START( fk1 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_8MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(fk1_mem)
@@ -474,5 +474,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT COMPANY   FULLNAME       FLAGS */
-COMP( 1989, fk1,    0,      0,       fk1,       fk1, driver_device,      0,  "Statni statek Klicany", "FK-1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE      INIT  COMPANY                  FULLNAME  FLAGS
+COMP( 1989, fk1,    0,      0,       fk1,       fk1,   fk1_state, 0,    "Statni statek Klicany", "FK-1",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

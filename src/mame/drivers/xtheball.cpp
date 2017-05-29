@@ -337,7 +337,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( xtheball, xtheball_state )
+static MACHINE_CONFIG_START( xtheball )
 
 	MCFG_CPU_ADD("maincpu", TMS34010, 40000000)
 	MCFG_CPU_PROGRAM_MAP(main_map)
@@ -400,4 +400,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1991, xtheball, 0, xtheball, xtheball, driver_device, 0,  ROT0, "Rare", "X the Ball", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, xtheball, 0, xtheball, xtheball, xtheball_state, 0,  ROT0, "Rare", "X the Ball", MACHINE_SUPPORTS_SAVE )

@@ -11,11 +11,11 @@
 
 #include "emu.h"
 #include "includes/xbox.h"
+#include "includes/xbox_pci.h"
 
 #include "cpu/i386/i386.h"
 #include "machine/atapicdr.h"
 #include "machine/idehd.h"
-#include "machine/lpci.h"
 #include "machine/pit8253.h"
 
 #include "debug/debugcmd.h"
@@ -130,15 +130,8 @@ void xbox_state::hack_eeprom()
 
 void xbox_state::machine_start()
 {
-	ohci_game_controller *usb_device;
-
 	xbox_base_state::machine_start();
 	xbox_devs.ide = machine().device<bus_master_ide_controller_device>("ide");
-	usb_device = machine().device<ohci_game_controller>("ohci_gamepad");
-	if (usb_device != nullptr) {
-		usb_device->initialize(machine(), ohci_usb);
-		ohci_usb->usb_ohci_plug(3, usb_device); // connect to root hub port 3, chihiro needs to use 1 and 2
-	}
 	// savestates
 	//save_item(NAME(item));
 }
@@ -150,22 +143,26 @@ void xbox_state::machine_reset()
 	uint16_t *id;
 
 	// set some needed parameters
-	devh = machine().device<ata_mass_storage_device>("ide:0:hdd");
+	devh = machine().device<ata_mass_storage_device>(":pci:09.0:ide:0:hdd");
 	id = devh->identify_device_buffer();
 	id[88] |= (1 << 2); // ultra dma mode 2 supported
 	id[128] |= 2; // bits 2-1=01 drive already unlocked
-	devc = machine().device<atapi_cdrom_device>("ide:1:cdrom");
+	devc = machine().device<atapi_cdrom_device>(":pci:09.0:ide:1:cdrom");
 	id = devc->identify_device_buffer();
 	id[64] |= (1 << 1);
 	id[88] |= (1 << 2); // ultra dma mode 2 supported
 }
+
+SLOT_INTERFACE_START(usb_xbox)
+	SLOT_INTERFACE("xbox_controller", OHCI_GAME_CONTROLLER)
+SLOT_INTERFACE_END
 
 SLOT_INTERFACE_START(xbox_ata_devices)
 	SLOT_INTERFACE("hdd", IDE_HARDDISK)
 	SLOT_INTERFACE("cdrom", ATAPI_CDROM)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_DERIVED_CLASS(xbox, xbox_base, xbox_state)
+static MACHINE_CONFIG_DERIVED(xbox, xbox_base)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(xbox_map)
 	MCFG_CPU_IO_MAP(xbox_map_io)
@@ -175,7 +172,12 @@ static MACHINE_CONFIG_DERIVED_CLASS(xbox, xbox_base, xbox_state)
 	MCFG_DEVICE_MODIFY(":pci:09.0:ide:1")
 	MCFG_DEVICE_SLOT_INTERFACE(xbox_ata_devices, "cdrom", true)
 
-	/* sound hardware */
+	MCFG_USB_PORT_ADD(":pci:02.0:port1", usb_xbox, nullptr, false)
+	MCFG_USB_PORT_ADD(":pci:02.0:port2", usb_xbox, nullptr, false)
+	MCFG_USB_PORT_ADD(":pci:02.0:port3", usb_xbox, "xbox_controller", false)
+	MCFG_USB_PORT_ADD(":pci:02.0:port4", usb_xbox, nullptr, false)
+
+/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 //  MCFG_SOUND_ADD("aysnd", AY8910, MAIN_CLOCK/4)
 //  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
@@ -194,8 +196,7 @@ MACHINE_CONFIG_END
 
 ROM_START( xbox )
 	ROM_REGION( 0x400, "mcpx", 0 )
-	// mcpx_1_0.bin is bad, first byte (0x7f) sould be removed and a byte with value 0xee added at the end
-	ROM_LOAD( "mcpx_1_0.bin", 0, 0x200, CRC(f31429fc) SHA1(a9ecbf8896d10db81594923e485862aa3aac7b58) )
+	ROM_LOAD( "mcpx_1_0.bin", 0, 0x200, CRC(0b07d1f1) SHA1(5d270675b54eb8071b480e42d22a3015ac211cef) )
 	ROM_LOAD( "mcpx_1_1.bin", 0x200, 0x200, CRC(94ce376b) SHA1(6c875f17f773aaec51eb434068bb6c657c4343c0) )
 
 	ROM_REGION( 0x100000, "bios", 0)
@@ -207,10 +208,10 @@ ROM_START( xbox )
 	ROM_LOAD_BIOS(2, "4034_1024k.bin", 0x000000, 0x100000, CRC(0d6fc88f) SHA1(ab676b712204fb1728bf89f9cd541a8f5a64ab97)) \
 	ROM_SYSTEM_BIOS(3, "bios3", "Chihiro Bios 4817 1024k") \
 	ROM_LOAD_BIOS(3, "4817_1024k.bin", 0x000000, 0x100000, CRC(3f30863a) SHA1(dc955bd4d3ca71e01214a49e5d0aba615270c03c))
-	ROM_COPY( "mcpx", 1, 0x3fe00, 0x1ff)
-	ROM_COPY( "mcpx", 1, 0x7fe00, 0x1ff)
-	ROM_COPY( "mcpx", 1, 0xbfe00, 0x1ff)
-	ROM_COPY( "mcpx", 1, 0xffe00, 0x1ff)
+	ROM_COPY( "mcpx", 0, 0x3fe00, 0x200)
+	ROM_COPY( "mcpx", 0, 0x7fe00, 0x200)
+	ROM_COPY( "mcpx", 0, 0xbfe00, 0x200)
+	ROM_COPY( "mcpx", 0, 0xffe00, 0x200)
 
 
 	ROM_REGION( 0x1000000, "tbp", 0 ) // To Be Processed, of course
@@ -232,4 +233,4 @@ ROM_END
 // For a generic system:
 // SYST(YEAR,NAME,PARENT,COMPAT,MACHINE,INPUT,CLASS,INIT,COMPANY,FULLNAME,FLAGS)
 
-CONS( 2001, xbox,  0,  0,   xbox,  xbox, driver_device,  0,       "Microsoft",      "XBOX", MACHINE_IS_SKELETON )
+CONS( 2001, xbox,  0,  0,   xbox,  xbox, xbox_state,  0,       "Microsoft",      "XBOX", MACHINE_IS_SKELETON )

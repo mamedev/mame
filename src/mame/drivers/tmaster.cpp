@@ -358,7 +358,7 @@ int tmaster_compute_addr(uint16_t reg_low, uint16_t reg_mid, uint16_t reg_high)
 	return (reg_low & 0xff) | ((reg_mid & 0x1ff) << 8) | (reg_high << 17);
 }
 
-static MACHINE_CONFIG_START( tm, tmaster_state )
+static MACHINE_CONFIG_START( tm )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2) /* 12MHz */
 	MCFG_CPU_PROGRAM_MAP(tmaster_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", tmaster_state, scanline_interrupt, "screen", 0, 1)
@@ -390,7 +390,7 @@ static MACHINE_CONFIG_START( tm, tmaster_state )
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_24MHz / 16, OKIM6295_PIN7_HIGH)  /* 1.5Mhz? clock frequency & pin 7 not verified */
+	MCFG_OKIM6295_ADD("oki", XTAL_24MHz / 16, PIN7_HIGH)  /* 1.5Mhz? clock frequency & pin 7 not verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -654,8 +654,7 @@ ROM_START( tm3keval ) /* FREEPLAY ONLY / NOT FOR RELEASE / FOR EVALUATION ONLY *
 	ROM_LOAD16_BYTE( "u40_touchmaster_10-21-97_7086.u40", 0x400001, 0x100000, CRC(e3ae6fa6) SHA1(02c98f59553f4343f0dd855794364ad95aa81063) ) /* U40  TOUCHMASTER 10-21-97 7086 (date and checksum hand written) */
 
 	ROM_REGION( 0x100000, "oki", 0 ) // Samples
-	ROM_LOAD( "touchmaster_u8_1.0.u8", 0x40000, 0x040000, CRC(f39ad4cf) SHA1(9bcb9a5dd3636d6541eeb3e737c7253ab0ed4e8d) ) /* Labeled TOUCHMASTER U8 1.0 (pink label) */
-	ROM_CONTINUE(                      0xc0000, 0x040000 )
+	ROM_LOAD( "tm3k_sound.u8", 0x00000, 0x100000, CRC(d0ae33c1) SHA1(a079def9a086a091fcc4493a44fec756d2470415) ) /* Labeled TOUCHMASTER U8 5.0 (green label) */
 ROM_END
 
 /***************************************************************************
@@ -1136,31 +1135,31 @@ ROM_START( tm8k902 )
 	ROM_LOAD( "tm8k_sound.u8", 0x00000, 0x100000, CRC(c6070a60) SHA1(2dc20bf2217a36374b5a691133ad43f53dbe29ca) ) /* Mask rom labeled 5341-16513-03 U8 SOUND */
 ROM_END
 
-GAME( 1996, tm,         0,        tm,       tm,       driver_device, 0,        ROT0, "Midway Games Inc. / CES Inc.",            "Touchmaster (v3.00 Euro)",                          0 )
-GAME( 1996, tmdo,       tm,       tm,       tm,       driver_device, 0,        ROT0, "Midway Games Inc. / CES Inc.",            "Touchmaster (v2.2-01 Standard)",                    0 )
-GAME( 1996, tm2k,       0,        tm,       tm2k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 2000 Plus (v4.63 Standard)",            0 )
-GAME( 1996, tm2ka,      tm2k,     tm,       tm2k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 2000 (v4.02 Standard)",                 0 )
-GAME( 1996, tm2kb,      tm2k,     tm,       tm2k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 2000 (v4.00 Standard)",                 0 )
-GAME( 1996, tm2kspeval, tm2k,     tm,       tm2k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 2000 (v4.XX3 Spanish Evaluation)",      0 )
-GAME( 1997, tm3k,       0,        tm,       tm2k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 3000 (v5.02 Standard)",                 0 )
-GAME( 1997, tm3ksp,     tm3k,     tm,       tm2k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 3000 (v5.02 Spanish)",                  0 )
-GAME( 1997, tm3ka,      tm3k,     tm,       tm2k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 3000 (v5.01 Standard)",                 0 )
-GAME( 1997, tm3keval,   tm3k,     tm,       tm2k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 3000 (v5.XX Standard AMOA Evaluation)", 0 )
-GAME( 1998, tm4k,       0,        tmds1204, tm4k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 4000 (v6.03 Standard)",                 0 )
-GAME( 1998, tm4knj,     tm4k,     tmds1204, tm4k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 4000 (v6.03 New Jersey)",               0 )
-GAME( 1998, tm4ka,      tm4k,     tmds1204, tm4k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 4000 (v6.02 Standard)",                 0 )
-GAME( 1998, tm4kca,     tm4k,     tmds1204, tm4k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 4000 (v6.02 California)",               0 )
-GAME( 1998, tm4kb,      tm4k,     tmds1204, tm4k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 4000 (v6.01 Standard)",                 0 )
-GAME( 1998, tm4kmn,     tm4k,     tmds1204, tm4k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 4000 (v6.01 Minnesota)",                0 )
-GAME( 1998, tm5k,       0,        tmds1204, tm4k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 5000 (v7.10 Standard)",                 0 )
-GAME( 1998, tm5kca,     tm5k,     tmds1204, tm4k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 5000 (v7.10 California)",               0 )
-GAME( 1998, tm5kmn,     tm5k,     tmds1204, tm4k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 5000 (v7.10 Minnesota)",                0 )
-GAME( 1998, tm5ka,      tm5k,     tmds1204, tm4k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 5000 (v7.01 Standard)",                 0 )
-GAME( 1999, tm7k,       0,        tmds1204, tm4k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 7000 (v8.04 Standard)",                 0 )
-GAME( 1999, tm7knj,     tm7k,     tmds1204, tm4k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 7000 (v8.05 New Jersey)",               0 )
-GAME( 1999, tm7kmn,     tm7k,     tmds1204, tm4k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 7000 (v8.04 Minnesota)",                0 )
-GAME( 1999, tm7ka,      tm7k,     tmds1204, tm4k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 7000 (v8.00 Standard)",                 0 )
-GAME( 1999, tm7kmna,    tm7k,     tmds1204, tm4k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 7000 (v8.00 Minnesota)",                0 )
-GAME( 1999, tm7keval,   tm7k,     tmds1204, tm4k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 7000 (v8.1X ASI Standard Evaluation)",  0 )
-GAME( 2000, tm8k,       0,        tmds1204, tm4k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 8000 (v9.04 Standard)",                 0 )
-GAME( 2000, tm8k902,    tm8k,     tmds1204, tm4k,     driver_device, 0,        ROT0, "Midway Games Inc.",                       "Touchmaster 8000 (v9.02 Standard)",                 0 )
+GAME( 1996, tm,         0,        tm,       tm,       tmaster_state, 0,        ROT0, "Midway Games Inc. / CES Inc.", "Touchmaster (v3.00 Euro)",                          0 )
+GAME( 1996, tmdo,       tm,       tm,       tm,       tmaster_state, 0,        ROT0, "Midway Games Inc. / CES Inc.", "Touchmaster (v2.2-01 Standard)",                    0 )
+GAME( 1996, tm2k,       0,        tm,       tm2k,     tmaster_state, 0,        ROT0, "Midway Games Inc.",            "Touchmaster 2000 Plus (v4.63 Standard)",            0 )
+GAME( 1996, tm2ka,      tm2k,     tm,       tm2k,     tmaster_state, 0,        ROT0, "Midway Games Inc.",            "Touchmaster 2000 (v4.02 Standard)",                 0 )
+GAME( 1996, tm2kb,      tm2k,     tm,       tm2k,     tmaster_state, 0,        ROT0, "Midway Games Inc.",            "Touchmaster 2000 (v4.00 Standard)",                 0 )
+GAME( 1996, tm2kspeval, tm2k,     tm,       tm2k,     tmaster_state, 0,        ROT0, "Midway Games Inc.",            "Touchmaster 2000 (v4.XX3 Spanish Evaluation)",      0 )
+GAME( 1997, tm3k,       0,        tm,       tm2k,     tmaster_state, 0,        ROT0, "Midway Games Inc.",            "Touchmaster 3000 (v5.02 Standard)",                 0 )
+GAME( 1997, tm3ksp,     tm3k,     tm,       tm2k,     tmaster_state, 0,        ROT0, "Midway Games Inc.",            "Touchmaster 3000 (v5.02 Spanish)",                  0 )
+GAME( 1997, tm3ka,      tm3k,     tm,       tm2k,     tmaster_state, 0,        ROT0, "Midway Games Inc.",            "Touchmaster 3000 (v5.01 Standard)",                 0 )
+GAME( 1997, tm3keval,   tm3k,     tm,       tm2k,     tmaster_state, 0,        ROT0, "Midway Games Inc.",            "Touchmaster 3000 (v5.XX Standard AMOA Evaluation)", 0 )
+GAME( 1998, tm4k,       0,        tmds1204, tm4k,     tmaster_state, 0,        ROT0, "Midway Games Inc.",            "Touchmaster 4000 (v6.03 Standard)",                 0 )
+GAME( 1998, tm4knj,     tm4k,     tmds1204, tm4k,     tmaster_state, 0,        ROT0, "Midway Games Inc.",            "Touchmaster 4000 (v6.03 New Jersey)",               0 )
+GAME( 1998, tm4ka,      tm4k,     tmds1204, tm4k,     tmaster_state, 0,        ROT0, "Midway Games Inc.",            "Touchmaster 4000 (v6.02 Standard)",                 0 )
+GAME( 1998, tm4kca,     tm4k,     tmds1204, tm4k,     tmaster_state, 0,        ROT0, "Midway Games Inc.",            "Touchmaster 4000 (v6.02 California)",               0 )
+GAME( 1998, tm4kb,      tm4k,     tmds1204, tm4k,     tmaster_state, 0,        ROT0, "Midway Games Inc.",            "Touchmaster 4000 (v6.01 Standard)",                 0 )
+GAME( 1998, tm4kmn,     tm4k,     tmds1204, tm4k,     tmaster_state, 0,        ROT0, "Midway Games Inc.",            "Touchmaster 4000 (v6.01 Minnesota)",                0 )
+GAME( 1998, tm5k,       0,        tmds1204, tm4k,     tmaster_state, 0,        ROT0, "Midway Games Inc.",            "Touchmaster 5000 (v7.10 Standard)",                 0 )
+GAME( 1998, tm5kca,     tm5k,     tmds1204, tm4k,     tmaster_state, 0,        ROT0, "Midway Games Inc.",            "Touchmaster 5000 (v7.10 California)",               0 )
+GAME( 1998, tm5kmn,     tm5k,     tmds1204, tm4k,     tmaster_state, 0,        ROT0, "Midway Games Inc.",            "Touchmaster 5000 (v7.10 Minnesota)",                0 )
+GAME( 1998, tm5ka,      tm5k,     tmds1204, tm4k,     tmaster_state, 0,        ROT0, "Midway Games Inc.",            "Touchmaster 5000 (v7.01 Standard)",                 0 )
+GAME( 1999, tm7k,       0,        tmds1204, tm4k,     tmaster_state, 0,        ROT0, "Midway Games Inc.",            "Touchmaster 7000 (v8.04 Standard)",                 0 )
+GAME( 1999, tm7knj,     tm7k,     tmds1204, tm4k,     tmaster_state, 0,        ROT0, "Midway Games Inc.",            "Touchmaster 7000 (v8.05 New Jersey)",               0 )
+GAME( 1999, tm7kmn,     tm7k,     tmds1204, tm4k,     tmaster_state, 0,        ROT0, "Midway Games Inc.",            "Touchmaster 7000 (v8.04 Minnesota)",                0 )
+GAME( 1999, tm7ka,      tm7k,     tmds1204, tm4k,     tmaster_state, 0,        ROT0, "Midway Games Inc.",            "Touchmaster 7000 (v8.00 Standard)",                 0 )
+GAME( 1999, tm7kmna,    tm7k,     tmds1204, tm4k,     tmaster_state, 0,        ROT0, "Midway Games Inc.",            "Touchmaster 7000 (v8.00 Minnesota)",                0 )
+GAME( 1999, tm7keval,   tm7k,     tmds1204, tm4k,     tmaster_state, 0,        ROT0, "Midway Games Inc.",            "Touchmaster 7000 (v8.1X ASI Standard Evaluation)",  0 )
+GAME( 2000, tm8k,       0,        tmds1204, tm4k,     tmaster_state, 0,        ROT0, "Midway Games Inc.",            "Touchmaster 8000 (v9.04 Standard)",                 0 )
+GAME( 2000, tm8k902,    tm8k,     tmds1204, tm4k,     tmaster_state, 0,        ROT0, "Midway Games Inc.",            "Touchmaster 8000 (v9.02 Standard)",                 0 )

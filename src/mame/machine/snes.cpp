@@ -105,11 +105,11 @@ TIMER_CALLBACK_MEMBER(snes_state::snes_reset_oam_address)
 	// make sure we're in the 65816's context since we're messing with the OAM and stuff
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
-	if (!(m_ppu->m_screen_disabled)) //Reset OAM address, byuu says it happens at H=10
+	if (!m_ppu->screen_disabled()) //Reset OAM address, byuu says it happens at H=10
 	{
-		space.write_byte(OAMADDL, m_ppu->m_oam.saved_address_low); /* Reset oam address */
-		space.write_byte(OAMADDH, m_ppu->m_oam.saved_address_high);
-		m_ppu->m_oam.first_sprite = m_ppu->m_oam.priority_rotation ? (m_ppu->m_oam.address >> 1) & 127 : 0;
+		space.write_byte(OAMADDL, m_ppu->saved_oam_address_low()); /* Reset oam address */
+		space.write_byte(OAMADDH, m_ppu->saved_oam_address_high());
+		m_ppu->set_first_sprite();
 	}
 }
 
@@ -130,7 +130,7 @@ TIMER_CALLBACK_MEMBER(snes_state::snes_update_io)
 TIMER_CALLBACK_MEMBER(snes_state::snes_scanline_tick)
 {
 	/* Increase current line - we want to latch on this line during it, not after it */
-	m_ppu->m_beam.current_vert = m_screen->vpos();
+	m_ppu->set_current_vert(m_screen->vpos());
 
 	// not in hblank
 	SNES_CPU_REG(HVBJOY) &= ~0x40;
@@ -138,7 +138,7 @@ TIMER_CALLBACK_MEMBER(snes_state::snes_scanline_tick)
 	/* Vertical IRQ timer - only if horizontal isn't also enabled! */
 	if ((SNES_CPU_REG(NMITIMEN) & 0x20) && !(SNES_CPU_REG(NMITIMEN) & 0x10))
 	{
-		if (m_ppu->m_beam.current_vert == m_vtime)
+		if (m_ppu->current_vert() == m_vtime)
 		{
 			SNES_CPU_REG(TIMEUP) = 0x80;    /* Indicate that irq occurred */
 			// IRQ latches the counters, do it now
@@ -155,7 +155,7 @@ TIMER_CALLBACK_MEMBER(snes_state::snes_scanline_tick)
 		// is the HIRQ on a specific scanline?
 		if (SNES_CPU_REG(NMITIMEN) & 0x20)
 		{
-			if (m_ppu->m_beam.current_vert != m_vtime)
+			if (m_ppu->current_vert() != m_vtime)
 			{
 				setirq = 0;
 			}
@@ -163,22 +163,22 @@ TIMER_CALLBACK_MEMBER(snes_state::snes_scanline_tick)
 
 		if (setirq)
 		{
-//          printf("HIRQ @ %d, %d\n", pixel * m_ppu->m_htmult, m_ppu->m_beam.current_vert);
+//          printf("HIRQ @ %d, %d\n", pixel * m_ppu->htmult(), m_ppu->current_vert());
 			if (pixel == 0)
 			{
 				hirq_tick();
 			}
 			else
 			{
-				m_hirq_timer->adjust(m_screen->time_until_pos(m_ppu->m_beam.current_vert, pixel * m_ppu->m_htmult));
+				m_hirq_timer->adjust(m_screen->time_until_pos(m_ppu->current_vert(), pixel * m_ppu->htmult()));
 			}
 		}
 	}
 
 	/* Start of VBlank */
-	if (m_ppu->m_beam.current_vert == m_ppu->m_beam.last_visible_line)
+	if (m_ppu->current_vert() == m_ppu->last_visible_line())
 	{
-		timer_set(m_screen->time_until_pos(m_ppu->m_beam.current_vert, 10), TIMER_RESET_OAM_ADDRESS);
+		timer_set(m_screen->time_until_pos(m_ppu->current_vert(), 10), TIMER_RESET_OAM_ADDRESS);
 
 		SNES_CPU_REG(HVBJOY) |= 0x81;       /* Set vblank bit to on & indicate controllers being read */
 		SNES_CPU_REG(RDNMI) |= 0x80;        /* Set NMI occurred bit */
@@ -190,30 +190,30 @@ TIMER_CALLBACK_MEMBER(snes_state::snes_scanline_tick)
 		}
 
 		/* three lines after start of vblank we update the controllers (value from snes9x) */
-		m_io_timer->adjust(m_screen->time_until_pos(m_ppu->m_beam.current_vert + 2, m_hblank_offset * m_ppu->m_htmult));
+		m_io_timer->adjust(m_screen->time_until_pos(m_ppu->current_vert() + 2, m_hblank_offset * m_ppu->htmult()));
 	}
 
 	// hdma reset happens at scanline 0, H=~6
-	if (m_ppu->m_beam.current_vert == 0)
+	if (m_ppu->current_vert() == 0)
 	{
 		address_space &cpu0space = m_maincpu->space(AS_PROGRAM);
 		hdma_init(cpu0space);
 	}
 
-	if (m_ppu->m_beam.current_vert == 0)
+	if (m_ppu->current_vert() == 0)
 	{   /* VBlank is over, time for a new frame */
 		SNES_CPU_REG(HVBJOY) &= 0x7f;       /* Clear vblank bit */
 		SNES_CPU_REG(RDNMI)  &= 0x7f;       /* Clear nmi occurred bit */
-		m_ppu->m_stat78 ^= 0x80;       /* Toggle field flag */
-		m_ppu->m_stat77 &= 0x3f;  /* Clear Time Over and Range Over bits */
+		m_ppu->toggle_field();
+		m_ppu->clear_time_range_over();
 
 		m_maincpu->set_input_line(G65816_LINE_NMI, CLEAR_LINE );
 	}
 
 	m_scanline_timer->adjust(attotime::never);
-	m_hblank_timer->adjust(m_screen->time_until_pos(m_ppu->m_beam.current_vert, m_hblank_offset * m_ppu->m_htmult));
+	m_hblank_timer->adjust(m_screen->time_until_pos(m_ppu->current_vert(), m_hblank_offset * m_ppu->htmult()));
 
-//  printf("%02x %d\n",SNES_CPU_REG(HVBJOY),m_ppu->m_beam.current_vert);
+//  printf("%02x %d\n",SNES_CPU_REG(HVBJOY),m_ppu->current_vert());
 }
 
 /* This is called at the start of hblank *before* the scanline indicated in current_vert! */
@@ -222,13 +222,13 @@ TIMER_CALLBACK_MEMBER(snes_state::snes_hblank_tick)
 	address_space &cpu0space = m_maincpu->space(AS_PROGRAM);
 	int nextscan;
 
-	m_ppu->m_beam.current_vert = m_screen->vpos();
+	m_ppu->set_current_vert(m_screen->vpos());
 
 	/* make sure we halt */
 	m_hblank_timer->adjust(attotime::never);
 
 	/* draw a scanline */
-	if (m_ppu->m_beam.current_vert <= m_ppu->m_beam.last_visible_line)
+	if (m_ppu->current_vert() <= m_ppu->last_visible_line())
 	{
 		if (m_screen->vpos() > 0)
 		{
@@ -236,7 +236,7 @@ TIMER_CALLBACK_MEMBER(snes_state::snes_hblank_tick)
 			if (SNES_CPU_REG(HDMAEN))
 				hdma(cpu0space);
 
-			m_screen->update_partial((m_ppu->m_interlace == 2) ? (m_ppu->m_beam.current_vert * m_ppu->m_interlace) : m_ppu->m_beam.current_vert - 1);
+			m_screen->update_partial((m_ppu->interlace() == 2) ? (m_ppu->current_vert() * m_ppu->interlace()) : m_ppu->current_vert() - 1);
 		}
 	}
 
@@ -244,8 +244,8 @@ TIMER_CALLBACK_MEMBER(snes_state::snes_hblank_tick)
 	SNES_CPU_REG(HVBJOY) |= 0x40;
 
 	/* kick off the start of scanline timer */
-	nextscan = m_ppu->m_beam.current_vert + 1;
-	if (nextscan >= (((m_ppu->m_stat78 & 0x10) == SNES_NTSC) ? SNES_VTOTAL_NTSC : SNES_VTOTAL_PAL))
+	nextscan = m_ppu->current_vert() + 1;
+	if (nextscan >= m_ppu->vtotal())
 	{
 		nextscan = 0;
 	}
@@ -561,7 +561,7 @@ WRITE8_MEMBER( snes_state::snes_w_io )
 			return;
 		case HDMAEN:    /* HDMA channel designation */
 			if (data) //if a HDMA is enabled, data is inited at the next scanline
-				timer_set(m_screen->time_until_pos(m_ppu->m_beam.current_vert + 1), TIMER_RESET_HDMA);
+				timer_set(m_screen->time_until_pos(m_ppu->current_vert() + 1), TIMER_RESET_HDMA);
 			SNES_CPU_REG(HDMAEN) = data;
 			return;
 		case TIMEUP:    // IRQ Flag is cleared on both read and write
@@ -1038,7 +1038,7 @@ void snes_state::snes_init_timers()
 	// SNES hcounter has a 0-339 range.  hblank starts at counter 260.
 	// clayfighter sets an HIRQ at 260, apparently it wants it to be before hdma kicks off, so we'll delay 2 pixels.
 	m_hblank_offset = 274;
-	m_hblank_timer->adjust(m_screen->time_until_pos(((m_ppu->m_stat78 & 0x10) == SNES_NTSC) ? SNES_VTOTAL_NTSC - 1 : SNES_VTOTAL_PAL - 1, m_hblank_offset));
+	m_hblank_timer->adjust(m_screen->time_until_pos(m_ppu->vtotal() - 1, m_hblank_offset));
 }
 
 void snes_state::snes_init_ram()
@@ -1065,9 +1065,9 @@ void snes_state::snes_init_ram()
 
 	// init frame counter so first line is 0
 	if (ATTOSECONDS_TO_HZ(m_screen->frame_period().attoseconds()) >= 59)
-		m_ppu->m_beam.current_vert = SNES_VTOTAL_NTSC;
+		m_ppu->set_current_vert(SNES_VTOTAL_NTSC);
 	else
-		m_ppu->m_beam.current_vert = SNES_VTOTAL_PAL;
+		m_ppu->set_current_vert(SNES_VTOTAL_PAL);
 }
 
 void snes_state::machine_start()
@@ -1141,9 +1141,7 @@ void snes_state::machine_reset()
 	m_htime = 0x1ff;
 	m_vtime = 0x1ff;
 
-	m_ppu->m_htmult = 1;
-	m_ppu->m_interlace = 1;
-	m_ppu->m_obj_interlace = 1;
+	m_ppu->reset_interlace();
 }
 
 

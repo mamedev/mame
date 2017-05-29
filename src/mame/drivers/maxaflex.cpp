@@ -305,9 +305,9 @@ TIMER_DEVICE_CALLBACK_MEMBER( maxaflex_state::mf_interrupt )
 	m_antic->generic_interrupt(2);
 }
 
-static MACHINE_CONFIG_START( maxaflex, maxaflex_state )
+static MACHINE_CONFIG_START( maxaflex )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, FREQ_17_EXACT)
+	MCFG_CPU_ADD("maincpu", M6502, pokey_device::FREQ_17_EXACT)
 	MCFG_CPU_PROGRAM_MAP(a600xl_mem)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", maxaflex_state, mf_interrupt, "screen", 0, 1)
 
@@ -332,9 +332,9 @@ static MACHINE_CONFIG_START( maxaflex, maxaflex_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_VISIBLE_AREA(MIN_X, MAX_X, MIN_Y, MAX_Y)
-	MCFG_SCREEN_REFRESH_RATE(FRAME_RATE_60HZ)
-	MCFG_SCREEN_SIZE(HWIDTH*8, TOTAL_LINES_60HZ)
+	MCFG_SCREEN_VISIBLE_AREA_ANTIC()
+	MCFG_SCREEN_REFRESH_RATE_ANTIC_60HZ()
+	MCFG_SCREEN_SIZE_ANTIC_60HZ()
 	MCFG_SCREEN_UPDATE_DEVICE("antic", antic_device, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -345,7 +345,7 @@ static MACHINE_CONFIG_START( maxaflex, maxaflex_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("pokey", POKEY, FREQ_17_EXACT)
+	MCFG_SOUND_ADD("pokey", POKEY, pokey_device::FREQ_17_EXACT)
 	MCFG_POKEY_INTERRUPT_CB(atari_common_state, interrupt_cb)
 	MCFG_POKEY_OUTPUT_RC(RES_K(1), CAP_U(0.0), 5.0)
 
@@ -417,8 +417,8 @@ ROM_START(mf_flip)
 ROM_END
 
 
-GAME( 1984, maxaflex, 0,        maxaflex, a600xl, driver_device,    0, ROT0, "Exidy", "Max-A-Flex", MACHINE_IS_BIOS_ROOT )
-GAME( 1982, mf_achas, maxaflex, maxaflex, a600xl, driver_device,    0, ROT0, "Exidy / First Star Software", "Astro Chase (Max-A-Flex)",  0 )
-GAME( 1983, mf_brist, maxaflex, maxaflex, a600xl, driver_device,    0, ROT0, "Exidy / First Star Software", "Bristles (Max-A-Flex)",     0 )
-GAME( 1983, mf_flip,  maxaflex, maxaflex, a600xl, driver_device,    0, ROT0, "Exidy / First Star Software", "Flip & Flop (Max-A-Flex)",  0 )
-GAME( 1984, mf_bdash, maxaflex, maxaflex, a600xl, driver_device,    0, ROT0, "Exidy / First Star Software", "Boulder Dash (Max-A-Flex)", 0 )
+GAME( 1984, maxaflex, 0,        maxaflex, a600xl, maxaflex_state, 0, ROT0, "Exidy",                       "Max-A-Flex",                MACHINE_IS_BIOS_ROOT )
+GAME( 1982, mf_achas, maxaflex, maxaflex, a600xl, maxaflex_state, 0, ROT0, "Exidy / First Star Software", "Astro Chase (Max-A-Flex)",  0 )
+GAME( 1983, mf_brist, maxaflex, maxaflex, a600xl, maxaflex_state, 0, ROT0, "Exidy / First Star Software", "Bristles (Max-A-Flex)",     0 )
+GAME( 1983, mf_flip,  maxaflex, maxaflex, a600xl, maxaflex_state, 0, ROT0, "Exidy / First Star Software", "Flip & Flop (Max-A-Flex)",  0 )
+GAME( 1984, mf_bdash, maxaflex, maxaflex, a600xl, maxaflex_state, 0, ROT0, "Exidy / First Star Software", "Boulder Dash (Max-A-Flex)", 0 )

@@ -68,11 +68,11 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ISA16_VGA_GFXULTRA = device_creator<isa16_vga_gfxultra_device>;
-const device_type ISA16_SVGA_GFXULTRAPRO = device_creator<isa16_vga_gfxultrapro_device>;
-const device_type ISA16_SVGA_MACH64 = device_creator<isa16_vga_mach64_device>;
+DEFINE_DEVICE_TYPE(ISA16_VGA_GFXULTRA,     isa16_vga_gfxultra_device,    "gfxulra",   "ATi Graphics Ultra Card")
+DEFINE_DEVICE_TYPE(ISA16_SVGA_GFXULTRAPRO, isa16_vga_gfxultrapro_device, "gfxxultrp", "ATi Graphics Ultra Pro Card")
+DEFINE_DEVICE_TYPE(ISA16_SVGA_MACH64,      isa16_vga_mach64_device,      "mach64isa", "ATi mach64 Card")
 
-static MACHINE_CONFIG_FRAGMENT( vga_ati )
+static MACHINE_CONFIG_START( vga_ati )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
 	MCFG_SCREEN_UPDATE_DEVICE("vga", ati_vga_device, screen_update)
@@ -82,7 +82,7 @@ static MACHINE_CONFIG_FRAGMENT( vga_ati )
 	MCFG_DEVICE_ADD("vga", ATI_VGA, 0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( vga_mach32 )
+static MACHINE_CONFIG_START( vga_mach32 )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
 	MCFG_SCREEN_UPDATE_DEVICE("vga", mach32_device, screen_update)
@@ -92,7 +92,7 @@ static MACHINE_CONFIG_FRAGMENT( vga_mach32 )
 	MCFG_DEVICE_ADD("vga", ATIMACH32, 0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( vga_mach64 )
+static MACHINE_CONFIG_START( vga_mach64 )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
 	MCFG_SCREEN_UPDATE_DEVICE("vga", mach64_device, screen_update)
@@ -150,20 +150,23 @@ const tiny_rom_entry *isa16_vga_mach64_device::device_rom_region() const
 //-------------------------------------------------
 
 isa16_vga_gfxultra_device::isa16_vga_gfxultra_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, ISA16_VGA_GFXULTRA, "ATi Graphics Ultra Card", tag, owner, clock, "gfxultra", __FILE__),
-		device_isa16_card_interface(mconfig, *this), m_vga(nullptr), m_8514(nullptr)
+	device_t(mconfig, ISA16_VGA_GFXULTRA, tag, owner, clock),
+	device_isa16_card_interface(mconfig, *this),
+	m_vga(nullptr), m_8514(nullptr)
 {
 }
 
 isa16_vga_gfxultrapro_device::isa16_vga_gfxultrapro_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, ISA16_SVGA_GFXULTRAPRO, "ATi Graphics Ultra Pro Card", tag, owner, clock, "gfxultrp", __FILE__),
-		device_isa16_card_interface(mconfig, *this), m_vga(nullptr)
+	device_t(mconfig, ISA16_SVGA_GFXULTRAPRO, tag, owner, clock),
+	device_isa16_card_interface(mconfig, *this),
+	m_vga(nullptr)
 {
 }
 
 isa16_vga_mach64_device::isa16_vga_mach64_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, ISA16_SVGA_MACH64, "ATi mach64 Card", tag, owner, clock, "mach64isa", __FILE__),
-		device_isa16_card_interface(mconfig, *this), m_vga(nullptr)
+	device_t(mconfig, ISA16_SVGA_MACH64, tag, owner, clock),
+	device_isa16_card_interface(mconfig, *this),
+	m_vga(nullptr)
 {
 }
 

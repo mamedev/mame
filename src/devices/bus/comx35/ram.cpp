@@ -23,7 +23,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type COMX_RAM = device_creator<comx_ram_device>;
+DEFINE_DEVICE_TYPE(COMX_RAM, comx_ram_device, "comx_ram", "COMX-35 RAM Card")
 
 
 //**************************************************************************
@@ -35,7 +35,7 @@ const device_type COMX_RAM = device_creator<comx_ram_device>;
 //-------------------------------------------------
 
 comx_ram_device::comx_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, COMX_RAM, "COMX-35 RAM Card", tag, owner, clock, "comx_ram", __FILE__),
+	device_t(mconfig, COMX_RAM, tag, owner, clock),
 	device_comx_expansion_card_interface(mconfig, *this),
 	m_ram(*this, "ram"),
 	m_bank(0)

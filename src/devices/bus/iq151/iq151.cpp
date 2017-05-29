@@ -20,7 +20,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type IQ151CART_SLOT = device_creator<iq151cart_slot_device>;
+DEFINE_DEVICE_TYPE(IQ151CART_SLOT, iq151cart_slot_device, "iq151cart_slot", "IQ151 cartridge slot")
 
 //**************************************************************************
 //    IQ151 cartridge interface
@@ -53,15 +53,16 @@ device_iq151cart_interface::~device_iq151cart_interface()
 //  iq151cart_slot_device - constructor
 //-------------------------------------------------
 iq151cart_slot_device::iq151cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, IQ151CART_SLOT, "IQ151 cartridge slot", tag, owner, clock, "iq151cart_slot", __FILE__),
-		device_slot_interface(mconfig, *this),
-		device_image_interface(mconfig, *this),
-		m_out_irq0_cb(*this),
-		m_out_irq1_cb(*this),
-		m_out_irq2_cb(*this),
-		m_out_irq3_cb(*this),
-		m_out_irq4_cb(*this),
-		m_out_drq_cb(*this), m_cart(nullptr)
+	device_t(mconfig, IQ151CART_SLOT, tag, owner, clock),
+	device_slot_interface(mconfig, *this),
+	device_image_interface(mconfig, *this),
+	m_out_irq0_cb(*this),
+	m_out_irq1_cb(*this),
+	m_out_irq2_cb(*this),
+	m_out_irq3_cb(*this),
+	m_out_irq4_cb(*this),
+	m_out_drq_cb(*this),
+	m_cart(nullptr)
 {
 }
 

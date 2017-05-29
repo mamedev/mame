@@ -32,10 +32,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_MSM6242_H
+#define MAME_MACHINE_MSM6242_H
 
-#ifndef __MSM6242DEV_H__
-#define __MSM6242DEV_H__
+#pragma once
 
 #include "dirtc.h"
 
@@ -46,21 +46,21 @@
 
 // ======================> msm6242_device
 
-class msm6242_device :  public device_t,
-								public device_rtc_interface
+class msm6242_device : public device_t, public device_rtc_interface
 {
 public:
 	// construction/destruction
 	msm6242_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	msm6242_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *filename);
 
-	template<class _Object> static devcb_base &set_out_int_handler(device_t &device, _Object object) { return downcast<msm6242_device &>(device).m_out_int_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_out_int_handler(device_t &device, Object &&cb) { return downcast<msm6242_device &>(device).m_out_int_handler.set_callback(std::forward<Object>(cb)); }
 
 	// I/O operations
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_READ8_MEMBER( read );
 
 protected:
+	msm6242_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -72,12 +72,12 @@ protected:
 	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) override;
 
 private:
-	static const int RTC_TICKS = ~0;
+	static constexpr int RTC_TICKS = ~0;
 
-	static const uint8_t IRQ_64THSECOND = 0;
-	static const uint8_t IRQ_SECOND = 1;
-	static const uint8_t IRQ_MINUTE = 2;
-	static const uint8_t IRQ_HOUR = 3;
+	static constexpr uint8_t IRQ_64THSECOND = 0;
+	static constexpr uint8_t IRQ_SECOND = 1;
+	static constexpr uint8_t IRQ_MINUTE = 2;
+	static constexpr uint8_t IRQ_HOUR = 3;
 
 	// state
 	uint8_t                       m_reg[3];
@@ -139,11 +139,11 @@ public:
 
 
 // device type definition
-extern const device_type MSM6242;
-extern const device_type RTC62421;
-extern const device_type RTC62423;
-extern const device_type RTC72421;
-extern const device_type RTC72423;
+DECLARE_DEVICE_TYPE(MSM6242,  msm6242_device)
+DECLARE_DEVICE_TYPE(RTC62421, rtc62421_device)
+DECLARE_DEVICE_TYPE(RTC62423, rtc62423_device)
+DECLARE_DEVICE_TYPE(RTC72421, rtc72421_device)
+DECLARE_DEVICE_TYPE(RTC72423, rtc72423_device)
 
 
-#endif /* __MSM6242DEV_H__ */
+#endif // MAME_MACHINE_MSM6242_H

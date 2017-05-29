@@ -908,7 +908,7 @@ WRITE8_MEMBER(_8080bw_state::schaser_sh_port_1_w)
 		m_sn->amplitude_res_w(RES_K(200));
 	}
 	m_sn->enable_w(!(m_schaser_effect_555_is_low || m_schaser_explosion));
-	m_sn->one_shot_cap_voltage_w(!(m_schaser_effect_555_is_low || m_schaser_explosion) ? 0 : SN76477_EXTERNAL_VOLTAGE_DISCONNECT);
+	m_sn->one_shot_cap_voltage_w(!(m_schaser_effect_555_is_low || m_schaser_explosion) ? 0 : sn76477_device::EXTERNAL_VOLTAGE_DISCONNECT);
 	m_sn->mixer_b_w(m_schaser_explosion);
 }
 
@@ -958,7 +958,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(_8080bw_state::schaser_effect_555_cb)
 	}
 	m_schaser_effect_555_timer->adjust(new_time, effect);
 	m_sn->enable_w(!(m_schaser_effect_555_is_low || m_schaser_explosion));
-	m_sn->one_shot_cap_voltage_w(!(m_schaser_effect_555_is_low || m_schaser_explosion) ? 0 : SN76477_EXTERNAL_VOLTAGE_DISCONNECT);
+	m_sn->one_shot_cap_voltage_w(!(m_schaser_effect_555_is_low || m_schaser_explosion) ? 0 : sn76477_device::EXTERNAL_VOLTAGE_DISCONNECT);
 }
 
 
