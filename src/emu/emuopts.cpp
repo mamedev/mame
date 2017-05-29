@@ -721,47 +721,49 @@ bool emu_options::add_and_remove_image_options()
 
 void emu_options::reevaluate_default_card_software()
 {
-	if (m_system)
+	// if we don't have a system specified, this is
+	// a meaningless operation
+	if (!m_system)
+		return;
+
+	bool found;
+	do
 	{
-		bool found;
-		do
+		// set up the machine_config
+		machine_config config(*m_system, *this);
+		found = false;
+
+		// iterate through all slot devices
+		for (device_slot_interface &slot : slot_interface_iterator(config.root_device()))
 		{
-			// set up the machine_config
-			machine_config config(*m_system, *this);
-			found = false;
+			// retrieve info about the device instance
+			auto &slot_opt(slot_option(slot.slot_name()));
 
-			// iterate through all slot devices
-			for (device_slot_interface &slot : slot_interface_iterator(config.root_device()))
+			// device_slot_interface::get_default_card_software() is essentially a hook
+			// that lets devices provide a feedback loop to force a specified software
+			// list entry to be loaded
+			//
+			// In the repeated cycle of adding slots and slot devices, this gives a chance
+			// for devices to "plug in" default software list items.  Of course, the fact
+			// that this is all shuffling options is brittle and roundabout, but such is
+			// the nature of software lists.
+			//
+			// In reality, having some sort of hook into the pipeline of slot/device evaluation
+			// makes sense, but the fact that it is joined at the hip to device_image_interface
+			// and device_slot_interface is unfortunate
+			std::string default_card_software = get_default_card_software(slot);
+			if (slot_opt.default_card_software() != default_card_software)
 			{
-				// retrieve info about the device instance
-				auto &slot_opt(slot_option(slot.slot_name()));
+				slot_opt.set_default_card_software(std::move(default_card_software));
 
-				// device_slot_interface::get_default_card_software() is essentially a hook
-				// that lets devices provide a feedback loop to force a specified software
-				// list entry to be loaded
-				//
-				// In the repeated cycle of adding slots and slot devices, this gives a chance
-				// for devices to "plug in" default software list items.  Of course, the fact
-				// that this is all shuffling options is brittle and roundabout, but such is
-				// the nature of software lists.
-				//
-				// In reality, having some sort of hook into the pipeline of slot/device evaluation
-				// makes sense, but the fact that it is joined at the hip to device_image_interface
-				// and device_slot_interface is unfortunate
-				std::string default_card_software = get_default_card_software(slot);
-				if (slot_opt.default_card_software() != default_card_software)
-				{
-					slot_opt.set_default_card_software(std::move(default_card_software));
-
-					// calling set_default_card_software() can cause a cascade of slot/image
-					// evaluations; we need to bail out of this loop because the iterator
-					// may be bad
-					found = true;
-					break;
-				}
+				// calling set_default_card_software() can cause a cascade of slot/image
+				// evaluations; we need to bail out of this loop because the iterator
+				// may be bad
+				found = true;
+				break;
 			}
-		} while (found);
-	}
+		}
+	} while (found);
 }
 
 
