@@ -214,5 +214,5 @@ ROM_START( marywu )
 	ROM_LOAD( "marywu_sunkiss_chen.rom", 0x0000, 0x8000, CRC(11f67c7d) SHA1(9c1fd1a5cc6e2b0d675f0217aa8ff21c30609a0c) )
 ROM_END
 
-//    YEAR  NAME       PARENT   MACHINE   INPUT     STATE         INIT   ROT   COMPANY      FULLNAME                                                  FLAGS
-GAME( ????, marywu,    0,       marywu,   marywu,   marywu_state, 0,     ROT0, "<unknown>", "<unknown> Labeled 'WU- MARY-1A' Music by: SunKiss Chen", MACHINE_NOT_WORKING )
+//    YEAR  NAME       PARENT   MACHINE   INPUT     STATE         INIT   ROT   COMPANY      FULLNAME                                                FLAGS
+GAME( ????, marywu,    0,       marywu,   marywu,   marywu_state, 0,     ROT0, "<unknown>", "unknown Labeled 'WU- MARY-1A' Music by: SunKiss Chen", MACHINE_NOT_WORKING )

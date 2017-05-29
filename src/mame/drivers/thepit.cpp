@@ -1271,7 +1271,7 @@ DRIVER_INIT_MEMBER(thepit_state,rtriv)
 GAME( 1981, roundup,    0,        thepit,   roundup,  thepit_state, 0,     ROT90, "Taito Corporation (Amenip/Centuri license)",  "Round-Up", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, fitter,     roundup,  thepit,   fitter,   thepit_state, 0,     ROT90, "Taito Corporation",                           "Fitter", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, fitterbl,   roundup,  thepit,   fitter,   thepit_state, 0,     ROT90, "bootleg",                                     "Fitter (bootleg of Round-Up)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, ttfitter,   roundup,  thepit,   fitter,   thepit_state, 0,     ROT90, "Taito Corporation",                           "T.T. Fitter (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, ttfitter,   roundup,  thepit,   fitter,   thepit_state, 0,     ROT90, "Taito Corporation",                           "T.T Fitter (Japan)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1982, thepit,     0,        thepit,   thepit,   thepit_state, 0,     ROT90, "Zilec Electronics",                           "The Pit", MACHINE_SUPPORTS_SAVE ) // AW == Andy Walker
 GAME( 1982, thepitu1,   thepit,   thepit,   thepit,   thepit_state, 0,     ROT90, "Zilec Electronics (Centuri license)",         "The Pit (US set 1)", MACHINE_SUPPORTS_SAVE )
