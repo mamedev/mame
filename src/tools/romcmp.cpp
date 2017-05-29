@@ -133,12 +133,12 @@ static void checkintegrity(const fileinfo *file, int side)
 	{
 		is_ascii = is_ascii && is_ascii_char(file->buf[i]);
 		mask0 |= file->buf[i] << 8;
-		mask1 &= file->buf[i] << 8;
+		mask1 &= (file->buf[i] << 8) | 0x00ff;
 		if (i < file->size - 1)
 		{
 			is_ascii = is_ascii && is_ascii_char(file->buf[i+1]);
 			mask0 |= file->buf[i+1];
-			mask1 &= file->buf[i+1];
+			mask1 &= file->buf[i+1] | 0xff00;
 		}
 		if (mask0 == 0xffff && mask1 == 0x0000) break;
 	}
