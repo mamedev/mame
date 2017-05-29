@@ -966,6 +966,13 @@ emu_options::software_options emu_options::evaluate_initial_softlist_options(con
 			if (!compatible)
 			{
 				software_list_device::display_matches(config, nullptr, software_name);
+
+				// The text of this options_error_exception() is then passed to osd_printf_error() in cli_frontend::execute().  Therefore, it needs
+				// to be human readable text.  We want to snake through a message about software incompatibility while being silent if that is not
+				// the case.
+				//
+				// Arguably, anything related to user-visible text should really be done within src/frontend.  The invocation of
+				// software_list_device::display_matches() should really be done there as well
 				if (!found)
 					throw options_error_exception("");
 				else
