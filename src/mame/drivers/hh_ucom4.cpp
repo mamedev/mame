@@ -1688,6 +1688,7 @@ public:
 
 WRITE32_MEMBER(mcompgin_state::lcd_output_w)
 {
+	// uses ROW0-4, COL11-24
 	display_matrix(26, 8, data, 1 << offset);
 }
 
@@ -1729,8 +1730,7 @@ static MACHINE_CONFIG_START( mcompgin )
 	MCFG_DEVICE_ADD("lcd", HLCD0569, 1000) // C=?
 	MCFG_HLCD0515_WRITE_COLS_CB(WRITE32(mcompgin_state, lcd_output_w))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
-	//MCFG_DEFAULT_LAYOUT(layout_mcompgin)
+	MCFG_DEFAULT_LAYOUT(layout_mcompgin)
 
 	/* no sound! */
 MACHINE_CONFIG_END
@@ -2864,7 +2864,7 @@ CONS( 1981, galaxy2b, galaxy2,  0, galaxy2b, galaxy2,  galaxy2_state,  0, "Epoch
 CONS( 1982, astrocmd, 0,        0, astrocmd, astrocmd, astrocmd_state, 0, "Epoch", "Astro Command", MACHINE_SUPPORTS_SAVE )
 CONS( 1982, edracula, 0,        0, edracula, edracula, edracula_state, 0, "Epoch", "Dracula (Epoch)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1979, mcompgin, 0,        0, mcompgin, mcompgin, mcompgin_state, 0, "Mattel", "Computer Gin", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+CONS( 1979, mcompgin, 0,        0, mcompgin, mcompgin, mcompgin_state, 0, "Mattel", "Computer Gin", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
 CONS( 1979, mvbfree,  0,        0, mvbfree,  mvbfree,  mvbfree_state,  0, "Mego", "Mini-Vid Break Free", MACHINE_SUPPORTS_SAVE )
 
