@@ -165,6 +165,7 @@ public:
 	u32 colors() const { return m_total_colors; }
 	u32 rowbytes() const { return m_line_modulo; }
 	bool has_pen_usage() const { return !m_pen_usage.empty(); }
+	bool has_palette() const { return m_palette; }
 
 	// used by tilemaps
 	u32 dirtyseq() const { return m_dirtyseq; }
