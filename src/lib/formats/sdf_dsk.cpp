@@ -46,6 +46,11 @@ int sdf_format::identify(io_generic *io, uint32_t form_factor)
 
 	uint64_t size = io_generic_size(io);
 
+	if (size < 512)
+	{
+		return 0;
+	}
+	
 	io_generic_read(io, header, 0, header_size);
 
 	int tracks = header[4];
