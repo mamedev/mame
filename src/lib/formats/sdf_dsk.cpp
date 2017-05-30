@@ -46,7 +46,7 @@ int sdf_format::identify(io_generic *io, uint32_t form_factor)
 
 	uint64_t size = io_generic_size(io);
 
-	if (size < 512)
+	if (size < header_size)
 	{
 		return 0;
 	}
