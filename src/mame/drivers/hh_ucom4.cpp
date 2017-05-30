@@ -1665,8 +1665,8 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Mattel Computer Gin
-  * NEC uCOM-43 MCU, label D650C 060
-  * Hughes HLCD0569 LCD driver, 5 by 14 segments LCD panel, no sound
+  * NEC uCOM-43 MCU, label D650C 060 (die label same)
+  * Hughes HLCD0530 LCD driver, 5 by 14 segments LCD panel, no sound
 
 ***************************************************************************/
 
@@ -1678,7 +1678,7 @@ public:
 		m_lcd(*this, "lcd")
 	{ }
 
-	required_device<hlcd0569_device> m_lcd;
+	required_device<hlcd0530_device> m_lcd;
 
 	DECLARE_WRITE32_MEMBER(lcd_output_w);
 	DECLARE_WRITE8_MEMBER(lcd_w);
@@ -1689,7 +1689,7 @@ public:
 WRITE32_MEMBER(mcompgin_state::lcd_output_w)
 {
 	// uses ROW0-4, COL11-24
-	display_matrix(26, 8, data, 1 << offset);
+	display_matrix(24, 8, data, 1 << offset);
 }
 
 WRITE8_MEMBER(mcompgin_state::lcd_w)
@@ -1721,13 +1721,13 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( mcompgin )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", NEC_D650, 400000) // approximation
+	MCFG_CPU_ADD("maincpu", NEC_D650, XTAL_400kHz) // TDK FCR400K
 	MCFG_UCOM4_READ_A_CB(IOPORT("IN.0"))
 	MCFG_UCOM4_READ_B_CB(IOPORT("IN.1"))
 	MCFG_UCOM4_WRITE_E_CB(WRITE8(mcompgin_state, lcd_w))
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("lcd", HLCD0569, 1000) // C=?
+	MCFG_DEVICE_ADD("lcd", HLCD0530, 500) // C=0.01uF
 	MCFG_HLCD0515_WRITE_COLS_CB(WRITE32(mcompgin_state, lcd_output_w))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_mcompgin)
