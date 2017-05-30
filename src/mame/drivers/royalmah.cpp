@@ -1030,15 +1030,6 @@ WRITE8_MEMBER(royalmah_state::mjifb_p8_w)
 	m_mjifb_rom_enable = (data & 0x08);
 }
 
-static ADDRESS_MAP_START( mjifb_iomap, AS_IO, 8, royalmah_state )
-	AM_RANGE( T90_P3, T90_P3 ) AM_READWRITE(mjifb_p3_r, mjifb_p3_w )
-	AM_RANGE( T90_P4, T90_P4 ) AM_WRITE(mjifb_p4_w )
-	AM_RANGE( T90_P5, T90_P5 ) AM_READ(mjifb_p5_r )
-	AM_RANGE( T90_P6, T90_P6 ) AM_READ(mjifb_p6_r )
-	AM_RANGE( T90_P7, T90_P7 ) AM_READ(mjifb_p7_r )
-	AM_RANGE( T90_P8, T90_P8 ) AM_READWRITE(mjifb_p8_r, mjifb_p8_w )
-ADDRESS_MAP_END
-
 
 /****************************************************************************
                            Mahjong Shinkirou Deja Vu
@@ -1135,11 +1126,6 @@ static ADDRESS_MAP_START( mjtensin_map, AS_PROGRAM, 8, royalmah_state )
 	AM_RANGE( 0x8000, 0xffff ) AM_WRITEONLY AM_SHARE("videoram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mjtensin_iomap, AS_IO, 8, royalmah_state )
-	AM_RANGE( T90_P3, T90_P3 ) AM_READ(mjtensin_p3_r )
-	AM_RANGE( T90_P4, T90_P4 ) AM_WRITE(mjtensin_p4_w )
-ADDRESS_MAP_END
-
 
 /****************************************************************************
                                 Mahjong Cafe Time
@@ -1203,12 +1189,6 @@ static ADDRESS_MAP_START( cafetime_map, AS_PROGRAM, 8, royalmah_state )
 	AM_RANGE( 0x7ff0, 0x7fff ) AM_DEVREADWRITE("rtc", msm6242_device, read, write)
 	AM_RANGE( 0x8000, 0xffff ) AM_ROMBANK( "mainbank" )
 	AM_RANGE( 0x8000, 0xffff ) AM_WRITEONLY AM_SHARE("videoram")
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( cafetime_iomap, AS_IO, 8, royalmah_state )
-	AM_RANGE( T90_P3, T90_P3 ) AM_WRITE(cafetime_p3_w )
-	AM_RANGE( T90_P4, T90_P4 ) AM_WRITE(cafetime_p4_w )
 ADDRESS_MAP_END
 
 
@@ -1302,11 +1282,6 @@ static ADDRESS_MAP_START( mjvegasa_map, AS_PROGRAM, 8, royalmah_state )
 	AM_RANGE( 0x12400, 0x12400 ) AM_WRITE(mjvegasa_12400_w )
 	AM_RANGE( 0x12500, 0x12500 ) AM_READ(mjvegasa_12500_r )
 
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( mjvegasa_iomap, AS_IO, 8, royalmah_state )
-	AM_RANGE( T90_P3, T90_P3 ) AM_READWRITE(mjtensin_p3_r, mjvegasa_p3_w )
-	AM_RANGE( T90_P4, T90_P4 ) AM_WRITE(mjvegasa_p4_w )
 ADDRESS_MAP_END
 
 
@@ -3515,7 +3490,14 @@ static MACHINE_CONFIG_DERIVED( janptr96, mjderngr )
 static MACHINE_CONFIG_DERIVED( mjifb, mjderngr )
 	MCFG_CPU_REPLACE("maincpu",TMP90841, 8000000)   /* ? */
 	MCFG_CPU_PROGRAM_MAP(mjifb_map)
-	MCFG_CPU_IO_MAP(mjifb_iomap)
+	MCFG_TLCS90_PORT_P3_READ_CB(READ8(royalmah_state, mjifb_p3_r))
+	MCFG_TLCS90_PORT_P3_WRITE_CB(WRITE8(royalmah_state, mjifb_p3_w))
+	MCFG_TLCS90_PORT_P4_WRITE_CB(WRITE8(royalmah_state, mjifb_p4_w))
+	MCFG_TLCS90_PORT_P5_READ_CB(READ8(royalmah_state, mjifb_p5_r))
+	MCFG_TLCS90_PORT_P6_READ_CB(READ8(royalmah_state, mjifb_p6_r))
+	MCFG_TLCS90_PORT_P7_READ_CB(READ8(royalmah_state, mjifb_p7_r))
+	MCFG_TLCS90_PORT_P8_READ_CB(READ8(royalmah_state, mjifb_p8_r))
+	MCFG_TLCS90_PORT_P8_WRITE_CB(WRITE8(royalmah_state, mjifb_p8_w))
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", royalmah_state,  irq0_line_hold)
 
 	MCFG_SCREEN_MODIFY("screen")
@@ -3526,7 +3508,14 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( mjdejavu, mjderngr )
 	MCFG_CPU_REPLACE("maincpu",TMP90841, 8000000)   /* ? */
 	MCFG_CPU_PROGRAM_MAP(mjdejavu_map)
-	MCFG_CPU_IO_MAP(mjifb_iomap)
+	MCFG_TLCS90_PORT_P3_READ_CB(READ8(royalmah_state, mjifb_p3_r))
+	MCFG_TLCS90_PORT_P3_WRITE_CB(WRITE8(royalmah_state, mjifb_p3_w))
+	MCFG_TLCS90_PORT_P4_WRITE_CB(WRITE8(royalmah_state, mjifb_p4_w))
+	MCFG_TLCS90_PORT_P5_READ_CB(READ8(royalmah_state, mjifb_p5_r))
+	MCFG_TLCS90_PORT_P6_READ_CB(READ8(royalmah_state, mjifb_p6_r))
+	MCFG_TLCS90_PORT_P7_READ_CB(READ8(royalmah_state, mjifb_p7_r))
+	MCFG_TLCS90_PORT_P8_READ_CB(READ8(royalmah_state, mjifb_p8_r))
+	MCFG_TLCS90_PORT_P8_WRITE_CB(WRITE8(royalmah_state, mjifb_p8_w))
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", royalmah_state,  irq0_line_hold)
 
 	MCFG_SCREEN_MODIFY("screen")
@@ -3548,7 +3537,8 @@ WRITE_LINE_MEMBER(royalmah_state::mjtensin_rtc_irq)
 static MACHINE_CONFIG_DERIVED( mjtensin, mjderngr )
 	MCFG_CPU_REPLACE("maincpu",TMP90841, 12000000)  /* ? */
 	MCFG_CPU_PROGRAM_MAP(mjtensin_map)
-	MCFG_CPU_IO_MAP(mjtensin_iomap)
+	MCFG_TLCS90_PORT_P3_READ_CB(READ8(royalmah_state, mjtensin_p3_r))
+	MCFG_TLCS90_PORT_P4_WRITE_CB(WRITE8(royalmah_state, mjtensin_p4_w))
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", royalmah_state,  mjtensin_interrupt)
 
 	MCFG_SCREEN_MODIFY("screen")
@@ -3562,7 +3552,8 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( cafetime, mjderngr )
 	MCFG_CPU_REPLACE("maincpu",TMP90841, 12000000)  /* ? */
 	MCFG_CPU_PROGRAM_MAP(cafetime_map)
-	MCFG_CPU_IO_MAP(cafetime_iomap)
+	MCFG_TLCS90_PORT_P3_WRITE_CB(WRITE8(royalmah_state, cafetime_p3_w))
+	MCFG_TLCS90_PORT_P4_WRITE_CB(WRITE8(royalmah_state, cafetime_p4_w))
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", royalmah_state,  mjtensin_interrupt)
 
 	MCFG_SCREEN_MODIFY("screen")
@@ -3576,7 +3567,9 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( mjvegasa, mjderngr )
 	MCFG_CPU_REPLACE("maincpu",TMP90841, XTAL_8MHz) /* ? */
 	MCFG_CPU_PROGRAM_MAP(mjvegasa_map)
-	MCFG_CPU_IO_MAP(mjvegasa_iomap)
+	MCFG_TLCS90_PORT_P3_READ_CB(READ8(royalmah_state, mjtensin_p3_r))
+	MCFG_TLCS90_PORT_P3_WRITE_CB(WRITE8(royalmah_state, mjvegasa_p3_w))
+	MCFG_TLCS90_PORT_P4_WRITE_CB(WRITE8(royalmah_state, mjvegasa_p4_w))
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", royalmah_state,  mjtensin_interrupt)
 
 	MCFG_SCREEN_MODIFY("screen")
