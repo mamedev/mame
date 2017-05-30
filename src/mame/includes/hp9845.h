@@ -53,6 +53,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(t15_flg_w);
 	DECLARE_WRITE_LINE_MEMBER(t15_sts_w);
 
+	DECLARE_INPUT_CHANGED_MEMBER(togglekey_changed);
+
 protected:
 	required_device<hp_5061_3001_cpu_device> m_lpu;
 	required_device<hp_5061_3001_cpu_device> m_ppu;
@@ -63,6 +65,7 @@ protected:
 	required_ioport m_io_key1;
 	required_ioport m_io_key2;
 	required_ioport m_io_key3;
+	required_ioport m_io_shiftlock;
 	required_device<hp_taco_device> m_t14;
 	required_device<hp_taco_device> m_t15;
 	required_device<beep_device> m_beeper;
