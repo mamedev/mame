@@ -18,7 +18,7 @@
 // - LPU & PPU RAMs
 // - Text mode screen
 // - Graphic screen
-// - Keyboard
+// - Keyboard (US & German layouts)
 // - T14 and T15 tape drive
 // - Software list to load optional ROMs
 // - Beeper
@@ -28,8 +28,6 @@
 // What's not yet in:
 // - Better naming of tape drive image (it's now "magt1" and "magt2", should be "t15" and "t14")
 // - Better documentation of this file
-// - Better keyboard mapping
-// - German keyboard
 // What's wrong:
 // - Speed, as usual
 // - Light pen tracing sometimes behaves erratically in 45C and 45T
@@ -359,6 +357,48 @@ static INPUT_PORTS_START(hp9845_base)
  	PORT_START("SHIFTLOCK");
  	PORT_BIT(BIT_MASK(0)  , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE PORT_NAME("Shift lock") PORT_CHANGED_MEMBER(DEVICE_SELF, hp9845_base_state, togglekey_changed, 0) // Shift lock
 
+INPUT_PORTS_END
+
+/*
+	German keyboard layout
+
+	Remarks:
+	- Most keys including umlauts map correctly to the German keyboard layout of the 9845 without special configuration,
+	  provided that the German keyboard firmware ROM is used on the 9845
+	- '#' maps positionally correct to Shift+3
+	- AltGr modifier on the Germany PC keyboard for 9845 shifted keycodes 23=| and 5=@ need to get assigned dynamically
+	- ~{}\'` are not available on the German 9845 keyboard, ^ is available via keypad only
+*/
+static INPUT_PORTS_START(hp9845_base_de)
+	PORT_INCLUDE(hp9845_base)
+
+	PORT_MODIFY("KEY0")
+	PORT_BIT(BIT_MASK(10) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('-') PORT_CHAR('_')			// - _
+	PORT_BIT(BIT_MASK(11) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR(';')			// , ;
+	PORT_BIT(BIT_MASK(27) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR(':')			// . :
+	PORT_BIT(BIT_MASK(31) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_Z) PORT_CHAR('y') PORT_CHAR('Y')				// Y
+
+	PORT_MODIFY("KEY1")
+	PORT_BIT(BIT_MASK(10) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON) PORT_NAME("ö Ö")			      		// Ö
+	PORT_BIT(BIT_MASK(26) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE) PORT_NAME("ä Ä")						// Ä
+
+	PORT_MODIFY("KEY2")
+	PORT_BIT(BIT_MASK(8)  , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH2) PORT_CHAR('<') PORT_CHAR('>') 		// < >
+	PORT_BIT(BIT_MASK(9)  , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('+') PORT_CHAR('*')		// + *
+	PORT_BIT(BIT_MASK(12) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_Y) PORT_CHAR('z') PORT_CHAR('Z')				// Z
+	PORT_BIT(BIT_MASK(23) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)       					// Backspace
+	PORT_BIT(BIT_MASK(24) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_TILDE) PORT_CHAR(']') PORT_CHAR('@')			// ] @
+	PORT_BIT(BIT_MASK(25) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('[') PORT_CHAR('|') 			// [ |
+	PORT_BIT(BIT_MASK(26) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE) PORT_NAME("ü Ü")					// Ü
+
+	PORT_MODIFY("KEY3")
+	PORT_BIT(BIT_MASK(10) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR('=')				// 0 =
+	PORT_BIT(BIT_MASK(11) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('(')				// 8 (
+	PORT_BIT(BIT_MASK(12) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('&')				// 6 &
+	PORT_BIT(BIT_MASK(14) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('"')				// 2 "
+	PORT_BIT(BIT_MASK(26) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS) PORT_NAME("ß ?")						// ß ?
+	PORT_BIT(BIT_MASK(27) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR(')')				// 9 )
+	PORT_BIT(BIT_MASK(28) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('/') 				// 7 /
 INPUT_PORTS_END
 
 // *******************
@@ -1389,6 +1429,28 @@ protected:
  */
 static INPUT_PORTS_START(hp9845ct)
 	PORT_INCLUDE(hp9845_base)
+	PORT_START("SOFTKEYS")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Softkey0") PORT_CHANGED_MEMBER(DEVICE_SELF, hp9845ct_base_state, softkey_changed, 0)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Softkey1") PORT_CHANGED_MEMBER(DEVICE_SELF, hp9845ct_base_state, softkey_changed, 0)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Softkey2") PORT_CHANGED_MEMBER(DEVICE_SELF, hp9845ct_base_state, softkey_changed, 0)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Softkey3") PORT_CHANGED_MEMBER(DEVICE_SELF, hp9845ct_base_state, softkey_changed, 0)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Softkey4") PORT_CHANGED_MEMBER(DEVICE_SELF, hp9845ct_base_state, softkey_changed, 0)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Softkey5") PORT_CHANGED_MEMBER(DEVICE_SELF, hp9845ct_base_state, softkey_changed, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Softkey6") PORT_CHANGED_MEMBER(DEVICE_SELF, hp9845ct_base_state, softkey_changed, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Softkey7") PORT_CHANGED_MEMBER(DEVICE_SELF, hp9845ct_base_state, softkey_changed, 0)
+
+	PORT_START("LIGHTPENX")
+	PORT_BIT( 0x3ff, 0x000, IPT_LIGHTGUN_X ) PORT_SENSITIVITY(20) PORT_MINMAX(0, VIDEO_TOT_HPIXELS - 1) PORT_CROSSHAIR(X, 1.0, 0.0, 0)
+
+	PORT_START("LIGHTPENY")
+	PORT_BIT( 0x3ff, 0x000, IPT_LIGHTGUN_Y ) PORT_SENSITIVITY(20) PORT_MINMAX(0, GVIDEO_VPIXELS - 1) PORT_CROSSHAIR(Y, 1.0, 0.0, 0)
+
+	PORT_START("GKEY")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_CODE(MOUSECODE_BUTTON1) PORT_NAME("Gkey")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START(hp9845ct_de)
+	PORT_INCLUDE(hp9845_base_de)
 	PORT_START("SOFTKEYS")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Softkey0") PORT_CHANGED_MEMBER(DEVICE_SELF, hp9845ct_base_state, softkey_changed, 0)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Softkey1") PORT_CHANGED_MEMBER(DEVICE_SELF, hp9845ct_base_state, softkey_changed, 0)
@@ -3893,11 +3955,53 @@ ROM_START( hp9845t )
 	ROM_LOAD("9845-PPU-Color-Enhanced-Graphics.bin", 0, 0x10000, CRC(96e11edc) SHA1(3f1da50edb35dfc57ec2ecfd816a8c8230e110bd))
 ROM_END
 
-//    YEAR  NAME       PARENT   COMPAT  MACHINE        INPUT        STATE          INIT  COMPANY             FULLNAME  FLAGS
-COMP( 1977, hp9845a,   0,       0,      hp9845a,       hp9845,      hp9845_state,  0,    "Hewlett-Packard",  "9845A",  MACHINE_IS_SKELETON | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1977, hp9845s,   hp9845a, 0,      hp9845a,       hp9845,      hp9845_state,  0,    "Hewlett-Packard",  "9845S",  MACHINE_IS_SKELETON | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1979, hp9835a,   0,       0,      hp9835a,       hp9845,      hp9845_state,  0,    "Hewlett-Packard",  "9835A",  MACHINE_IS_SKELETON | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1979, hp9835b,   hp9835a, 0,      hp9835a,       hp9845,      hp9845_state,  0,    "Hewlett-Packard",  "9835B",  MACHINE_IS_SKELETON | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1979, hp9845b,   0,       0,      hp9845b,       hp9845_base, hp9845b_state, 0,    "Hewlett-Packard",  "9845B",  0 )
-COMP( 1982, hp9845t,   0,       0,      hp9845t,       hp9845ct,    hp9845t_state, 0,    "Hewlett-Packard",  "9845T",  0 )
-COMP( 1980, hp9845c,   0,       0,      hp9845c,       hp9845ct,    hp9845c_state, 0,    "Hewlett-Packard",  "9845C",  0 )
+ROM_START( hp9845b_de )
+	ROM_REGION(0x800 , "chargen" , 0)
+	ROM_LOAD("chrgen.bin" , 0 , 0x800 , CRC(fe9e844f) SHA1(0c45ae00766ceba94a19bd5e154bd6d23e208cca))
+
+	ROM_REGION(0x800 , "optional_chargen" , 0)
+	ROM_LOAD("optional_chrgen.bin" , 0 , 0x800 , CRC(0ecfa63b) SHA1(c295e6393d1503d903c1d2ce576fa597df9746bf))
+
+	ROM_REGION(0x10000, "lpu", ROMREGION_16BIT | ROMREGION_BE)
+	ROM_LOAD("9845-LPU-Standard-Processor.bin", 0, 0x10000, CRC(dc266c1b) SHA1(1cf3267f13872fbbfc035b70f8b4ec6b5923f182))
+
+	ROM_REGION(0x10000, "ppu", ROMREGION_16BIT | ROMREGION_BE)
+	ROM_LOAD("9845-PPU-Standard-Graphics-Ger.bin", 0, 0x10000, CRC(c968363d) SHA1(bc6805403371ca49d1a137f22cd254e3b0e0dbb4))
+ROM_END
+
+ROM_START( hp9845c_de )
+	ROM_REGION(0x800 , "chargen" , 0)
+	ROM_LOAD("chrgen.bin" , 0 , 0x800 , CRC(fe9e844f) SHA1(0c45ae00766ceba94a19bd5e154bd6d23e208cca))
+
+	ROM_REGION(0x800 , "optional_chargen" , 0)
+	ROM_LOAD("optional_chrgen.bin" , 0 , 0x800 , CRC(0ecfa63b) SHA1(c295e6393d1503d903c1d2ce576fa597df9746bf))
+
+	ROM_REGION(0x10000, "lpu", ROMREGION_16BIT | ROMREGION_BE)
+	ROM_LOAD("9845-LPU-Standard-Processor.bin", 0, 0x10000, CRC(dc266c1b) SHA1(1cf3267f13872fbbfc035b70f8b4ec6b5923f182))
+
+	ROM_REGION(0x10000, "ppu", ROMREGION_16BIT | ROMREGION_BE)
+	ROM_LOAD("9845-PPU-Color-Enhanced-Graphics-Ger.bin", 0, 0x10000, CRC(a7ef79ee) SHA1(637742ed8fc8201a8e7bac62654f21c5409dfb76))
+ROM_END
+
+ROM_START( hp9845t_de )
+	ROM_REGION(0x1000 , "chargen" , 0)
+	ROM_LOAD("1818-1395.bin" , 0 , 0x1000 , CRC(7b555edf) SHA1(3b08e094635ef02aef9a2e37b049c61bcf1ec037))
+
+	ROM_REGION(0x10000, "lpu", ROMREGION_16BIT | ROMREGION_BE)
+	ROM_LOAD("9845-LPU-Standard-Processor.bin", 0, 0x10000, CRC(dc266c1b) SHA1(1cf3267f13872fbbfc035b70f8b4ec6b5923f182))
+
+	ROM_REGION(0x10000, "ppu", ROMREGION_16BIT | ROMREGION_BE)
+	ROM_LOAD("9845-PPU-Color-Enhanced-Graphics-Ger.bin", 0, 0x10000, CRC(a7ef79ee) SHA1(637742ed8fc8201a8e7bac62654f21c5409dfb76))
+ROM_END
+
+//    YEAR  NAME        PARENT   COMPAT  MACHINE        INPUT        	STATE          INIT  COMPANY             FULLNAME  FLAGS
+COMP( 1977, hp9845a,    0,       0,      hp9845a,       hp9845,         hp9845_state,  0,    "Hewlett-Packard",  "9845A",  MACHINE_IS_SKELETON | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1977, hp9845s,    hp9845a, 0,      hp9845a,       hp9845,         hp9845_state,  0,    "Hewlett-Packard",  "9845S",  MACHINE_IS_SKELETON | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1979, hp9835a,    0,       0,      hp9835a,       hp9845,         hp9845_state,  0,    "Hewlett-Packard",  "9835A",  MACHINE_IS_SKELETON | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1979, hp9835b,    hp9835a, 0,      hp9835a,       hp9845,         hp9845_state,  0,    "Hewlett-Packard",  "9835B",  MACHINE_IS_SKELETON | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1979, hp9845b,    0,       0,      hp9845b,       hp9845_base,    hp9845b_state, 0,    "Hewlett-Packard",  "9845B",  0 )
+COMP( 1982, hp9845t,    0,       0,      hp9845t,       hp9845ct,       hp9845t_state, 0,    "Hewlett-Packard",  "9845T",  0 )
+COMP( 1980, hp9845c,    0,       0,      hp9845c,       hp9845ct,       hp9845c_state, 0,    "Hewlett-Packard",  "9845C",  0 )
+COMP( 1979, hp9845b_de, hp9845b, 0,      hp9845b,       hp9845_base_de, hp9845b_state, 0,    "Hewlett-Packard",  "9845B (Germany)", 0 )
+COMP( 1982, hp9845t_de, hp9845t, 0,      hp9845t,       hp9845ct_de,    hp9845t_state, 0,    "Hewlett-Packard",  "9845T (Germany)", 0 )
+COMP( 1980, hp9845c_de, hp9845c, 0,      hp9845c,       hp9845ct_de,    hp9845c_state, 0,    "Hewlett-Packard",  "9845C (Germany)", 0 )
