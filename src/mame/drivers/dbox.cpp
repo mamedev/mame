@@ -311,7 +311,7 @@ class dbox_state : public driver_device
 		m_maincpu(*this, "maincpu"){ }
 	required_device<m68340_cpu_device> m_maincpu;
 
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	DECLARE_DRIVER_INIT(dbox);
 };
 
