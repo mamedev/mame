@@ -1568,22 +1568,19 @@ WRITE_LINE_MEMBER(hp9845ct_base_state::vblank_w)
 
 INPUT_CHANGED_MEMBER(hp9845ct_base_state::softkey_changed)
 {
-	if (!m_gv_sk_status) {
-		uint8_t softkey_data = m_io_softkeys->read();
-		unsigned softkey;
-		for (softkey = 0; softkey < 8 && BIT(softkey_data , 7 - softkey); softkey++) {
-		}
-		LOG("SK %02x => %u\n" , softkey_data , softkey);
-		if (softkey < 8) {
-			// softkey pressed
-			m_gv_softkey = softkey;
-			m_gv_sk_status = true;
-			update_graphic_bits();
-		}
-		for (softkey = 0; softkey < 8; softkey++) {
-			output().set_indexed_value("Softkey" , softkey , !BIT(softkey_data , 7 - softkey));
-		}
-
+	uint8_t softkey_data = m_io_softkeys->read();
+	unsigned softkey;
+	for (softkey = 0; softkey < 8; softkey++) {
+		output().set_indexed_value("Softkey" , softkey , !BIT(softkey_data , 7 - softkey));
+	}
+	for (softkey = 0; softkey < 8 && BIT(softkey_data , 7 - softkey); softkey++) {
+	}
+	LOG("SK %02x => %u\n" , softkey_data , softkey);
+	if (softkey < 8 && !m_gv_sk_status) {
+		// softkey pressed
+		m_gv_softkey = softkey;
+		m_gv_sk_status = true;
+		update_graphic_bits();
 	}
 }
 
