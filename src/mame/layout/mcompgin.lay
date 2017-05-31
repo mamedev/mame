@@ -12,6 +12,9 @@
 	<element name="text_score" defstate="0">
 		<text state="1" string="Score:"><color red="0.9" green="0.9" blue="0.9" /></text>
 	</element>
+	<element name="text_knock" defstate="0">
+		<text state="1" string="Knock"><color red="0.9" green="0.9" blue="0.9" /></text>
+	</element>
 	<element name="text_draw" defstate="0">
 		<text state="1" string="Go Draw"><color red="0.9" green="0.9" blue="0.9" /></text>
 	</element>
@@ -23,6 +26,9 @@
 	</element>
 	<element name="text_thanks" defstate="0">
 		<text state="1" string="Thanks"><color red="0.9" green="0.9" blue="0.9" /></text>
+	</element>
+	<element name="text_note" defstate="0">
+		<text state="1" string="&#x266a;"><color red="0.9" green="0.9" blue="0.9" /></text>
 	</element>
 	<element name="text_star" defstate="0">
 		<text state="1" string="*"><color red="0.8" green="0.1" blue="0.1" /></text>
@@ -166,18 +172,17 @@
 	<view name="Internal Layout">
 		<bounds left="4.2" right="49.2" top="6.7" bottom="26.2" />
 
-		<bezel name="3.23" element="text_gin"><bounds x="3.5" y="10.55" width="7" height="2.5" /></bezel> <!-- 2.1 -->
-		<bezel name="2.23" element="crx"><bounds x="5.5" y="14" width="2.6" height="3.6" /></bezel> <!-- 3.1 -->
-		<bezel name="1.23" element="text_star"><bounds x="5.5" y="18.5" width="2.6" height="3.6" /></bezel> <!-- 4.1 -->
+		<bezel name="3.23" element="text_gin"><bounds x="3.5" y="10.55" width="7" height="2.5" /></bezel>
+		<bezel name="2.23" element="crx"><bounds x="5.5" y="14" width="2.6" height="3.6" /></bezel>
+		<bezel name="1.23" element="text_star"><bounds x="5.5" y="18.5" width="2.6" height="3.6" /></bezel>
+		<bezel name="0.23" element="text_note"><bounds x="3.5" y="22" width="7" height="3.6" /></bezel>
 
-		<bezel name="4.23" element="text_no"><bounds x="6" y="7" width="3" height="2.5" /></bezel> <!-- 1.1 -->
-		<bezel name="4.22" element="text_thanks"><bounds x="9" y="7" width="7" height="2.5" /></bezel> <!-- 1.2 -->
-		<bezel name="4.20" element="text_33"><bounds x="16" y="7" width="3" height="2.5" /></bezel> <!-- 1.4 -->
-		<bezel name="4.18" element="text_score"><bounds x="19" y="7" width="6" height="2.5" /></bezel> <!-- 1.6 -->
-		<bezel name="4.15" element="text_draw"><bounds x="31" y="7" width="9" height="2.5" /></bezel> <!-- 1.9 -->
-
-		<bezel name="4.14" element="text_card"><bounds x="40" y="7" width="9" height="2.5" /></bezel> <!-- 1.10/1.11/1.12? -->
-		<bezel name="4.13" element="text_card"><bounds x="40" y="7" width="9" height="2.5" /></bezel>
+		<bezel name="4.23" element="text_no"><bounds x="6" y="7" width="3" height="2.5" /></bezel>
+		<bezel name="4.22" element="text_thanks"><bounds x="9" y="7" width="7" height="2.5" /></bezel>
+		<bezel name="4.20" element="text_33"><bounds x="16" y="7" width="3" height="2.5" /></bezel>
+		<bezel name="4.18" element="text_score"><bounds x="19" y="7" width="6" height="2.5" /></bezel>
+		<bezel name="4.16" element="text_knock"><bounds x="25" y="7" width="6" height="2.5" /></bezel>
+		<bezel name="4.15" element="text_draw"><bounds x="31" y="7" width="9" height="2.5" /></bezel>
 		<bezel name="4.12" element="text_card"><bounds x="40" y="7" width="9" height="2.5" /></bezel>
 
 	<!-- cards -->
