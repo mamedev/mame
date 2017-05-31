@@ -29,6 +29,15 @@ public:
 	virtual const char *description() const override;
 	virtual const char *extensions() const override;
 	virtual bool supports_save() const override;
+
+protected:
+	static constexpr int HEADER_SIZE  = 512;
+	static constexpr int TRACK_HEADER_SIZE  = 256;
+	static constexpr int TRACK_SIZE  = 6250;
+	static constexpr int TRACK_PADDING  = 150;
+	static constexpr int TOTAL_TRACK_SIZE  = TRACK_HEADER_SIZE + TRACK_SIZE + TRACK_PADDING;
+
+	static constexpr int SECTOR_SLOT_COUNT  = 31;
 };
 
 extern const floppy_format_type FLOPPY_SDF_FORMAT;

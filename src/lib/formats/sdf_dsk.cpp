@@ -11,10 +11,8 @@
 
 *********************************************************************/
 
-#include <assert.h>
-
 #include "sdf_dsk.h"
-
+#include <assert.h>
 
 sdf_format::sdf_format()
 {
@@ -41,24 +39,22 @@ const char *sdf_format::extensions() const
 
 int sdf_format::identify(io_generic *io, uint32_t form_factor)
 {
-	const int header_size = 512;
-	uint8_t header[header_size];
+	uint8_t header[HEADER_SIZE];
 
 	uint64_t size = io_generic_size(io);
 
-	if (size < header_size)
+	if (size < HEADER_SIZE)
 	{
 		return 0;
 	}
 	
-	io_generic_read(io, header, 0, header_size);
+	io_generic_read(io, header, 0, HEADER_SIZE);
 
 	int tracks = header[4];
-	int track_size = 256 + 6250 + 150; // header, track, padding
 	int heads = header[5];
 
 	// Check magic bytes
-	if (header[0] != 'S' && header[1] != 'D' && header[2] != 'F' && header[3] != '1')
+	if (header[0] != 'S' || header[1] != 'D' || header[2] != 'F' || header[3] != '1')
 	{
 		return 0;
 	}
@@ -69,7 +65,7 @@ int sdf_format::identify(io_generic *io, uint32_t form_factor)
 		return 0;
 	}
 	
-	if (size == header_size + heads * tracks * track_size)
+	if (size == HEADER_SIZE + heads * tracks * TOTAL_TRACK_SIZE)
 	{
 		return 100;
 	}
@@ -80,13 +76,13 @@ int sdf_format::identify(io_generic *io, uint32_t form_factor)
 
 bool sdf_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 {
-	const int header_size = 512;
-	uint8_t header[header_size];
+	uint8_t header[HEADER_SIZE];
+	std::vector<uint8_t> track_data(TOTAL_TRACK_SIZE);
+	std::vector<uint32_t> raw_track_data;
 
-	io_generic_read(io, header, 0, header_size);
+	io_generic_read(io, header, 0, HEADER_SIZE);
 
 	const int tracks = header[4];
-	const int track_size = 256 + 6250 + 150; // header, track, padding
 	const int heads = header[5];
 
 	if (heads == 2)
@@ -102,30 +98,28 @@ bool sdf_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 	{
 		for (int head = 0; head < heads; head++)
 		{
-			std::vector<uint8_t> track_data(track_size);
-			std::vector<uint32_t> raw_track_data;
 			int iam_location = -1;
-			int idam_location[32];
-			int dam_location[32];
-
+			int idam_location[SECTOR_SLOT_COUNT+1];
+			int dam_location[SECTOR_SLOT_COUNT+1];
+			raw_track_data.clear();
+			
 			// Read track
-			io_generic_read(io, &track_data[0], header_size + ( heads * track + head ) * track_size, track_size);
+			io_generic_read(io, &track_data[0], HEADER_SIZE + ( heads * track + head ) * TOTAL_TRACK_SIZE, TOTAL_TRACK_SIZE);
 			
 			int sector_count = track_data[0];
 			
-			if (sector_count > 31) return false;
+			if (sector_count > SECTOR_SLOT_COUNT) return false;
 			
 			// Transfer IDAM and DAM locations to table
-			
-			for (int i = 0; i < 32; i++)
+			for (int i = 0; i < SECTOR_SLOT_COUNT+1; i++)
 			{
 				if (i < sector_count )
 				{
 					idam_location[i] = ((track_data[ 8 * (i+1) + 1] << 8 | track_data[ 8 * (i+1)]) & 0x3FFF) - 4;
 					dam_location[i] = ((track_data[ 8 * (i+1) + 1 + 2] << 8 | track_data[ 8 * (i+1) + 2]) & 0x3FFF) - 4;
 					
-					if (idam_location[i] > 6250 + 256) return false;
-					if (dam_location[i] > 6250 + 256) return false;
+					if (idam_location[i] > TOTAL_TRACK_SIZE) return false;
+					if (dam_location[i] > TOTAL_TRACK_SIZE) return false;
 				}
 				else
 				{
@@ -135,7 +129,7 @@ bool sdf_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 			}
 
 			// Find IAM location
-			for(int i = idam_location[0] - 1; i >= 256 + 3; i--)
+			for (int i = idam_location[0] - 1; i >= TRACK_HEADER_SIZE + 3; i--)
 			{
 				// It's usually 3 bytes but several dumped tracks seem to contain only 2 bytes
 				if (track_data[i] == 0xfc && track_data[i-1] == 0xc2 && track_data[i-2] == 0xc2)
@@ -147,7 +141,7 @@ bool sdf_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 
 			int idam_index = 0;
 			int dam_index = 0;
-			for (int offset = 256; offset < 6250 + 256; offset++)
+			for (int offset = TRACK_HEADER_SIZE; offset < TRACK_HEADER_SIZE + TRACK_SIZE; offset++)
 			{
 				if (offset == iam_location)
 				{
