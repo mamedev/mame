@@ -207,21 +207,15 @@ void i8089_device::state_string_export(const device_state_entry &entry, std::str
 }
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( i8089 )
+MACHINE_CONFIG_MEMBER( i8089_device::device_add_mconfig )
 	MCFG_I8089_CHANNEL_ADD("1")
 	MCFG_I8089_CHANNEL_SINTR(WRITELINE(i8089_device, ch1_sintr_w))
 	MCFG_I8089_CHANNEL_ADD("2")
 	MCFG_I8089_CHANNEL_SINTR(WRITELINE(i8089_device, ch2_sintr_w))
 MACHINE_CONFIG_END
-
-machine_config_constructor i8089_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( i8089 );
-}
 
 
 //**************************************************************************

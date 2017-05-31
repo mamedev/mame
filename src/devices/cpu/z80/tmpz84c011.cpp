@@ -111,15 +111,10 @@ void tmpz84c011_device::device_reset()
 
 
 /* CPU interface */
-static MACHINE_CONFIG_START( tmpz84c011 )
+MACHINE_CONFIG_MEMBER( tmpz84c011_device::device_add_mconfig )
 	MCFG_DEVICE_ADD("tmpz84c011_ctc", Z80CTC, DERIVED_CLOCK(1,1) )
 	MCFG_Z80CTC_INTR_CB(INPUTLINE(DEVICE_SELF, INPUT_LINE_IRQ0))
 	MCFG_Z80CTC_ZC0_CB(WRITELINE(tmpz84c011_device, zc0_cb_trampoline_w))
 	MCFG_Z80CTC_ZC1_CB(WRITELINE(tmpz84c011_device, zc1_cb_trampoline_w))
 	MCFG_Z80CTC_ZC2_CB(WRITELINE(tmpz84c011_device, zc2_cb_trampoline_w))
 MACHINE_CONFIG_END
-
-machine_config_constructor tmpz84c011_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( tmpz84c011 );
-}
