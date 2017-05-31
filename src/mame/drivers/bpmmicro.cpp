@@ -414,4 +414,4 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT     STATE           INIT         COMPANY              FULLNAME      FLAGS
-COMP( 1992, bp1200,     0,          0,      bpmmicro,   bpmmicro, bpmmicro_state, bp1200,      "BP Microsystems",   "BP-1200",    MACHINE_IS_SKELETON | MACHINE_NO_SOUND_HW )
+COMP( 1992, bp1200,     0,          0,      bpmmicro,   bpmmicro, bpmmicro_state, bp1200,      "BP Microsystems",   "BP-1200",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
