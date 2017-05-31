@@ -8,6 +8,10 @@
 
     keep pressed F1 during POST to see ROM/RAM/GFX tests.
 
+    The "Country" DIP switch is intended to select the game's title.
+    However, the program code in all known sets forces it to one value or
+    the other whenever it reads it outside of service mode.
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -55,7 +59,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, tail2nos_state )
 	AM_RANGE(0xffc300, 0xffcfff) AM_RAM
 	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE(tail2nos_txvideoram_w) AM_SHARE("txvideoram")
 	AM_RANGE(0xffe000, 0xffefff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("IN0") AM_WRITE(tail2nos_gfxbank_w)
+	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("IN0") AM_WRITE8(tail2nos_gfxbank_w, 0x00ff)
 	AM_RANGE(0xfff002, 0xfff003) AM_READ_PORT("IN1")
 	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("DSW")
 	AM_RANGE(0xfff008, 0xfff009) AM_READWRITE8(sound_semaphore_r,sound_command_w,0x00ff)
@@ -172,10 +176,9 @@ static INPUT_PORTS_START( tail2nos )
 	PORT_DIPNAME( 0x4000, 0x4000, "Control Panel" ) PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(      0x4000, DEF_STR( Standard ) )
 	PORT_DIPSETTING(      0x0000, "Original" )
-	// TODO: what's this for?
 	PORT_DIPNAME( 0x8000, 0x0000, "Country" ) PORT_DIPLOCATION("SW2:8")
-	PORT_DIPSETTING(      0x0000, "Domestic" )
-	PORT_DIPSETTING(      0x8000, "Overseas" )
+	PORT_DIPSETTING(      0x0000, "Domestic" ) // "Super Formula"
+	PORT_DIPSETTING(      0x8000, "Overseas" ) // "Tail to Nose"
 INPUT_PORTS_END
 
 
@@ -219,17 +222,20 @@ void tail2nos_state::machine_start()
 	membank("bank3")->configure_entries(0, 2, &ROM[0x10000], 0x8000);
 	membank("bank3")->set_entry(0);
 
+	m_txbank = 0;
+	m_txpalette = 0;
+	m_video_enable = false;
+	m_flip_screen = false;
+
 	save_item(NAME(m_txbank));
 	save_item(NAME(m_txpalette));
 	save_item(NAME(m_video_enable));
+	save_item(NAME(m_flip_screen));
 	save_item(NAME(m_pending_command));
 }
 
 void tail2nos_state::machine_reset()
 {
-	m_txbank = 0;
-	m_txpalette = 0;
-	m_video_enable = 0;
 }
 
 static MACHINE_CONFIG_START( tail2nos )
@@ -380,6 +386,6 @@ ROM_START( sformulaa )
 	ROM_LOAD( "osb",          0x00000, 0x20000, CRC(d49ab2f5) SHA1(92f7f6c8f35ac39910879dd88d2cfb6db7c848c9) )
 ROM_END
 
-GAME( 1989, tail2nos,  0,        tail2nos, tail2nos, tail2nos_state, 0, ROT90, "V-System Co.", "Tail to Nose - Great Championship", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, sformula,  tail2nos, tail2nos, tail2nos, tail2nos_state, 0, ROT90, "V-System Co.", "Super Formula (Japan, set 1)",      MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, sformulaa, tail2nos, tail2nos, tail2nos, tail2nos_state, 0, ROT90, "V-System Co.", "Super Formula (Japan, set 2)",      MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // No Japan warning, but Japanese version
+GAME( 1989, tail2nos,  0,        tail2nos, tail2nos, tail2nos_state, 0, ROT90, "V-System Co.", "Tail to Nose - Great Championship", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, sformula,  tail2nos, tail2nos, tail2nos, tail2nos_state, 0, ROT90, "V-System Co.", "Super Formula (Japan, set 1)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1989, sformulaa, tail2nos, tail2nos, tail2nos, tail2nos_state, 0, ROT90, "V-System Co.", "Super Formula (Japan, set 2)",      MACHINE_SUPPORTS_SAVE ) // No Japan warning, but Japanese version
