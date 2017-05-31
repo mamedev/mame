@@ -3721,7 +3721,7 @@ static MACHINE_CONFIG_START(hp9845_base)
 	// Beeper
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("beeper" , BEEP , KEY_SCAN_OSCILLATOR / 512)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS , "mono" , 1.00)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS , "mono" , 0.50)
 
 	MCFG_TIMER_DRIVER_ADD("beep_timer" , hp9845_base_state , beeper_off);
 
