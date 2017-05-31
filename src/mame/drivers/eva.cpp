@@ -15,7 +15,7 @@
   - TMS5110A, TMS6100 CM63002 (have dump)
 
   TODO:
-  - make it work
+  - add sensors
   - add EVA-24 (need MCU dump)
 
 ***************************************************************************/
@@ -79,16 +79,18 @@ WRITE16_MEMBER(eva_state::eva11_write_r)
 
 WRITE16_MEMBER(eva_state::eva11_write_o)
 {
-	// O3210: TMS5100 CTL8124
-	u8 ctl = BITSWAP8(data,7,6,5,4,3,0,1,2) & 0xf;
-	m_tms5100->ctl_w(space, 0, ctl);
+	// O3210: TMS5100 CTL8421
+	m_tms5100->ctl_w(space, 0, data & 0xf);
 }
 
 READ8_MEMBER(eva_state::eva11_read_k)
 {
-	// K8421: TMS5100 CTL8124
-	u8 ctl = m_tms5100->ctl_r(space, 0);
-	return BITSWAP8(ctl,7,6,5,4,3,0,1,2);
+	// K84: TMS5100 CTL81(O30)
+	u8 ctl = BITSWAP8(m_tms5100->ctl_r(space, 0),7,6,5,4,3,0,1,2) & 0xc;
+	
+	// TODO: sensors
+	
+	return ctl;
 }
 
 
@@ -124,7 +126,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( eva11 )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1000, XTAL_640kHz/2)
+	MCFG_CPU_ADD("maincpu", TMS1000, XTAL_640kHz/2) // from TMS5110A CPU CK
 	MCFG_TMS1XXX_READ_K_CB(READ8(eva_state, eva11_read_k))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(eva_state, eva11_write_o))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(eva_state, eva11_write_r))
