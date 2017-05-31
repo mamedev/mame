@@ -4222,7 +4222,7 @@ files {
 createMAMEProjects(_target, _subtarget, "zaccaria")
 files {
 	MAME_DIR .. "src/mame/audio/nl_zac1b11142.cpp",
-	MAME_DIR .. "src/mame/audio/nl_zacc1b11142.h",
+	MAME_DIR .. "src/mame/audio/nl_zac1b11142.h",
 	MAME_DIR .. "src/mame/audio/zaccaria.cpp",
 	MAME_DIR .. "src/mame/audio/zaccaria.h",
 	MAME_DIR .. "src/mame/drivers/laserbat.cpp",

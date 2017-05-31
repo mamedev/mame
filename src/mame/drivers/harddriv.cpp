@@ -4701,7 +4701,8 @@ void harddriv_state::init_ds3()
 
 	/* predetermine memory regions, can't use a region_ptr because strtdriv expects uint8_t while hdrivair expects uint16_t, also need to check if region exists for steeltal*/
 	if (memregion("ds3sdsp_data") != nullptr)
-	{	m_ds3_sdata_memory = (uint16_t*)memregion("ds3sdsp_data")->base();
+	{
+		m_ds3_sdata_memory = (uint16_t *)memregion("ds3sdsp_data")->base();
 		m_ds3_sdata_memory_size = memregion("ds3sdsp_data")->bytes() / 2;
 	}
 /*
