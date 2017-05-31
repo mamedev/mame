@@ -469,6 +469,9 @@ flags {
 }
 
 configuration { "vs*" }
+	buildoptions {
+		"/bigobj",
+	}
 	flags {
 		"NoPCH",
 		"ExtraWarnings",
@@ -485,9 +488,6 @@ configuration { "Debug", "vs*" }
 	flags {
 		"Symbols",
 		"NoIncrementalLink",
-	}
-	buildoptions {
-		"/bigobj",
 	}
 
 configuration { "Release", "vs*" }
