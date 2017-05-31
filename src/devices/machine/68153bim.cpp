@@ -64,20 +64,15 @@ DEFINE_DEVICE_TYPE(MC68153,         bim68153_device,  "m68153bim",        "Motor
 DEFINE_DEVICE_TYPE(EI68C153,        ei68c153_device,  "ei68c153",         "EPIC EI68C153 BIM")
 
 //-------------------------------------------------
-//  device_mconfig_additions -
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
-MACHINE_CONFIG_START( m68153 )
+MACHINE_CONFIG_MEMBER( bim68153_device::device_add_mconfig )
+	LOG("%s\n", FUNCNAME);
 	MCFG_DEVICE_ADD(CHN0_TAG, MC68153_CHANNEL, 0)
 	MCFG_DEVICE_ADD(CHN1_TAG, MC68153_CHANNEL, 0)
 	MCFG_DEVICE_ADD(CHN2_TAG, MC68153_CHANNEL, 0)
 	MCFG_DEVICE_ADD(CHN3_TAG, MC68153_CHANNEL, 0)
 MACHINE_CONFIG_END
-
-machine_config_constructor bim68153_device::device_mconfig_additions() const
-{
-	LOG("%s\n", FUNCNAME);
-	return MACHINE_CONFIG_NAME( m68153 );
-}
 
 //**************************************************************************
 //  LIVE DEVICE

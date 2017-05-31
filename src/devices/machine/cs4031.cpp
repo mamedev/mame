@@ -93,11 +93,10 @@ const float cs4031_device::m_dma_clock_divider[] =
 };
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( cs4031 )
+MACHINE_CONFIG_MEMBER( cs4031_device::device_add_mconfig )
 	MCFG_DEVICE_ADD("dma1", AM9517A, 0)
 	MCFG_I8237_OUT_HREQ_CB(DEVWRITELINE("dma2", am9517a_device, dreq0_w))
 	MCFG_I8237_OUT_EOP_CB(WRITELINE(cs4031_device, dma1_eop_w))
@@ -144,11 +143,6 @@ static MACHINE_CONFIG_START( cs4031 )
 	MCFG_MC146818_IRQ_HANDLER(WRITELINE(cs4031_device, rtc_irq_w))
 	MCFG_MC146818_CENTURY_INDEX(0x32)
 MACHINE_CONFIG_END
-
-machine_config_constructor cs4031_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( cs4031 );
-}
 
 
 //**************************************************************************

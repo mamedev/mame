@@ -2,7 +2,7 @@
 // copyright-holders:Wilbert Pol, Miodrag Milanovic
 /***************************************************************************
 
-    machine/genpc.c
+    machine/genpc.cpp
 
 
 ***************************************************************************/
@@ -395,7 +395,12 @@ DEFINE_DEVICE_TYPE(IBM5160_MOTHERBOARD, ibm5160_mb_device, "ibm5160_mb", "IBM 51
 //  DEVICE CONFIGURATION
 //**************************************************************************
 
-static MACHINE_CONFIG_START( ibm5160_mb_config )
+
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( ibm5160_mb_device::device_add_mconfig )
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL_14_31818MHz/12) /* heartbeat IRQ */
 	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir0_w))
@@ -449,17 +454,6 @@ static MACHINE_CONFIG_START( ibm5160_mb_config )
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor ibm5160_mb_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( ibm5160_mb_config );
-}
 
 
 static INPUT_PORTS_START( ibm5160_mb )
@@ -524,8 +518,8 @@ ibm5160_mb_device::ibm5160_mb_device(
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_maincpu(*owner, "maincpu")
 	, m_pic8259(*this, "pic8259")
-	, m_dma8237(*this, "dma8237")
 	, m_pit8253(*this, "pit8253")
+	, m_dma8237(*this, "dma8237")
 	, m_ppi8255(*this, "ppi8255")
 	, m_speaker(*this, "speaker")
 	, m_isabus(*this, "isa")
@@ -591,8 +585,13 @@ DEFINE_DEVICE_TYPE(IBM5150_MOTHERBOARD, ibm5150_mb_device, "ibm5150_mb", "IBM 51
 //**************************************************************************
 //  DEVICE CONFIGURATION
 //**************************************************************************
-static MACHINE_CONFIG_START( ibm5150_mb_config )
-	MCFG_FRAGMENT_ADD(ibm5160_mb_config)
+
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( ibm5150_mb_device::device_add_mconfig )
+	ibm5160_mb_device::device_add_mconfig(config);
 
 	MCFG_DEVICE_MODIFY("pc_kbdc")
 	MCFG_PC_KBDC_OUT_CLOCK_CB(WRITELINE(ibm5150_mb_device, keyboard_clock_w))
@@ -604,17 +603,6 @@ static MACHINE_CONFIG_START( ibm5150_mb_config )
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor ibm5150_mb_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( ibm5150_mb_config );
-}
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -775,8 +763,13 @@ WRITE8_MEMBER( ibm5150_mb_device::pc_ppi_portb_w )
 
 DEFINE_DEVICE_TYPE(EC1841_MOTHERBOARD, ec1841_mb_device, "ec1841_mb", "EC-1840 motherboard")
 
-static MACHINE_CONFIG_START( ec1841_mb_config )
-	MCFG_FRAGMENT_ADD(ibm5160_mb_config)
+
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( ec1841_mb_device::device_add_mconfig )
+	ibm5160_mb_device::device_add_mconfig(config);
 
 	MCFG_DEVICE_MODIFY("ppi8255")
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(ec1841_mb_device, pc_ppi_portb_w))
@@ -785,17 +778,6 @@ static MACHINE_CONFIG_START( ec1841_mb_config )
 	MCFG_DEVICE_MODIFY("pc_kbdc")
 	MCFG_PC_KBDC_OUT_CLOCK_CB(WRITELINE(ec1841_mb_device, keyboard_clock_w))
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor ec1841_mb_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( ec1841_mb_config );
-}
 
 static INPUT_PORTS_START( ec1841_mb )
 	PORT_START("DSW0") /* SA1 */
@@ -908,8 +890,13 @@ pc_noppi_mb_device::pc_noppi_mb_device(const machine_config &mconfig, device_typ
 //  DEVICE CONFIGURATION
 //**************************************************************************
 
-static MACHINE_CONFIG_START( pc_noppi_mb_config )
-	MCFG_FRAGMENT_ADD(ibm5160_mb_config)
+
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( pc_noppi_mb_device::device_add_mconfig )
+	ibm5160_mb_device::device_add_mconfig(config);
 
 	MCFG_DEVICE_REMOVE("pc_kbdc")
 	MCFG_DEVICE_REMOVE("ppi8255")
@@ -917,16 +904,6 @@ MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( pc_noppi_mb )
 INPUT_PORTS_END
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor pc_noppi_mb_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( pc_noppi_mb_config );
-}
 
 ioport_constructor pc_noppi_mb_device::device_input_ports() const
 {

@@ -42,11 +42,6 @@ public:
 	template <class Object> static devcb_base &set_inport_cb(device_t &device, Object &&cb) { return downcast<m68307_cpu_device &>(device).read_inport.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_outport_cb(device_t &device, Object &&cb) { return downcast<m68307_cpu_device &>(device).write_outport.set_callback(std::forward<Object>(cb)); }
 
-	DECLARE_WRITE_LINE_MEMBER(m68307_duart_irq_handler);
-	DECLARE_WRITE_LINE_MEMBER(m68307_duart_txa) { write_a_tx(state); }
-	DECLARE_WRITE_LINE_MEMBER(m68307_duart_txb) { write_b_tx(state);  }
-	DECLARE_READ8_MEMBER(m68307_duart_input_r) { return read_inport();  }
-	DECLARE_WRITE8_MEMBER(m68307_duart_output_w) { write_outport(data);  }
 	uint16_t simple_read_immediate_16_m68307(offs_t address);
 
 
@@ -80,7 +75,7 @@ protected:
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; }
 	virtual uint32_t disasm_max_opcode_bytes() const override { return 10; }
@@ -93,6 +88,12 @@ protected:
 	void timer1_interrupt();
 	void serial_interrupt(int vector);
 	void mbus_interrupt();
+
+	DECLARE_WRITE_LINE_MEMBER(m68307_duart_irq_handler);
+	DECLARE_WRITE_LINE_MEMBER(m68307_duart_txa) { write_a_tx(state); }
+	DECLARE_WRITE_LINE_MEMBER(m68307_duart_txb) { write_b_tx(state);  }
+	DECLARE_READ8_MEMBER(m68307_duart_input_r) { return read_inport();  }
+	DECLARE_WRITE8_MEMBER(m68307_duart_output_w) { write_outport(data);  }
 
 	void init16_m68307(address_space &space);
 

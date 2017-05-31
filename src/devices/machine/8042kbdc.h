@@ -57,8 +57,6 @@ public:
 	// construction/destruction
 	kbdc8042_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
 	static void set_keyboard_type(device_t &device, kbdc8042_type_t keybtype) { downcast<kbdc8042_device &>(device).m_keybtype = keybtype; }
 	template <class Object> static devcb_base &set_system_reset_callback(device_t &device, Object &&cb) { return downcast<kbdc8042_device &>(device).m_system_reset_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_gate_a20_callback(device_t &device, Object &&cb) { return downcast<kbdc8042_device &>(device).m_gate_a20_cb.set_callback(std::forward<Object>(cb)); }
@@ -70,7 +68,6 @@ public:
 	DECLARE_WRITE8_MEMBER( data_w );
 
 	DECLARE_WRITE_LINE_MEMBER( write_out2 );
-	DECLARE_WRITE_LINE_MEMBER( keyboard_w );
 
 	void at_8042_set_outport(uint8_t data, int initial);
 	void at_8042_receive(uint8_t data);
@@ -81,7 +78,9 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
+private:
 	uint8_t m_inport, m_outport, m_data, m_command;
 
 	struct {
@@ -118,6 +117,8 @@ protected:
 	devcb_write_line    m_output_buffer_empty_cb;
 
 	devcb_write8        m_speaker_cb;
+
+	DECLARE_WRITE_LINE_MEMBER( keyboard_w );
 };
 
 // device type definition
