@@ -77,6 +77,7 @@ dummy_profiler_state::dummy_profiler_state()
 //-------------------------------------------------
 
 real_profiler_state::real_profiler_state()
+	: m_text_real_time(0)
 {
 	memset(m_filo, 0, sizeof(m_filo));
 	memset(m_data, 0, sizeof(m_data));
@@ -91,7 +92,8 @@ real_profiler_state::real_profiler_state()
 
 void real_profiler_state::reset(bool enabled)
 {
-	m_text_time = attotime::never;
+	m_text_emu_time = attotime::never;
+	m_text_real_time = 0;
 
 	if (enabled)
 	{
@@ -120,13 +122,16 @@ const char *real_profiler_state::text(running_machine &machine)
 	start(PROFILER_PROFILER);
 
 	// get the current time
-	attotime current_time = machine.scheduler().time();
+	attotime current_emu_time = machine.scheduler().time();
+	osd_ticks_t current_real_time = osd_ticks();
 
 	// we only want to update the text periodically
-	if ((m_text_time == attotime::never) || ((current_time - m_text_time).as_double() >= TEXT_UPDATE_TIME))
+	if (((m_text_emu_time == attotime::never) || ((current_emu_time - m_text_emu_time).as_double() >= TEXT_UPDATE_TIME))
+		&& ((m_text_real_time == 0) || ((current_real_time - m_text_real_time) >= TEXT_UPDATE_TIME * osd_ticks_per_second())))
 	{
 		update_text(machine);
-		m_text_time = current_time;
+		m_text_emu_time = current_emu_time;
+		m_text_real_time = current_real_time;
 	}
 
 	stop();

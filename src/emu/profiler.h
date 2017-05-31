@@ -168,7 +168,8 @@ private:
 	// internal state
 	filo_entry *        m_filoptr;                  // current FILO index
 	std::string         m_text;                     // profiler text
-	attotime            m_text_time;                // profiler text last update
+	attotime            m_text_emu_time;            // profiler text last update (emulated time)
+	osd_ticks_t         m_text_real_time;           // profiler text last update (real time)
 	filo_entry          m_filo[32];                 // array of FILO entries
 	osd_ticks_t         m_data[PROFILER_TOTAL + 1]; // array of data
 };
