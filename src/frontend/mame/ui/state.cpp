@@ -154,7 +154,7 @@ void menu_load_save_state_base::populate(float &customtop, float &custombottom)
 		// get the time as a local time string
 		char time_string[128];
 		auto last_modified_time_t = std::chrono::system_clock::to_time_t(entry->last_modified());
-		std::strftime(time_string, sizeof(time_string), "%#c", std::localtime(&last_modified_time_t));
+		std::strftime(time_string, sizeof(time_string), "%c", std::localtime(&last_modified_time_t));
 
 		// format the text
 		std::string text = util::string_format("%s: %s",
