@@ -66,8 +66,8 @@ DEFINE_DEVICE_TYPE(EI68C153,        ei68c153_device,  "ei68c153",         "EPIC 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
+
 MACHINE_CONFIG_MEMBER( bim68153_device::device_add_mconfig )
-	LOG("%s\n", FUNCNAME);
 	MCFG_DEVICE_ADD(CHN0_TAG, MC68153_CHANNEL, 0)
 	MCFG_DEVICE_ADD(CHN1_TAG, MC68153_CHANNEL, 0)
 	MCFG_DEVICE_ADD(CHN2_TAG, MC68153_CHANNEL, 0)

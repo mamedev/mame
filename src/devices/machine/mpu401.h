@@ -24,11 +24,6 @@ public:
 	// construction/destruction
 	mpu401_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
-	required_device<m6801_cpu_device> m_ourcpu;
-
 	template <class Write> devcb_base &set_irqf(Write &&wr)
 	{
 		return write_irq.set_callback(std::forward<Write>(wr));
@@ -42,7 +37,6 @@ public:
 	DECLARE_WRITE8_MEMBER(port1_w);
 	DECLARE_READ8_MEMBER(port2_r);
 	DECLARE_WRITE8_MEMBER(port2_w);
-	DECLARE_WRITE_LINE_MEMBER(midi_rx_w);
 
 	// public API - call for reads/writes at I/O 330/331 on PC, C0n0/C0n1 on Apple II, etc.
 	DECLARE_READ8_MEMBER(mpu_r);
@@ -54,8 +48,13 @@ protected:
 	virtual void device_reset() override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
+	DECLARE_WRITE_LINE_MEMBER(midi_rx_w);
+
+	required_device<m6801_cpu_device> m_ourcpu;
+
 	devcb_write_line write_irq;
 
 	uint8_t m_port2;

@@ -75,15 +75,15 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-	// internal state
-	upi41_cpu_device *m_cpu;
-
 	// internal 8042 interface
 	DECLARE_READ_LINE_MEMBER( t0_r );
 	DECLARE_READ_LINE_MEMBER( t1_r );
 	DECLARE_READ8_MEMBER( p1_r );
 	DECLARE_READ8_MEMBER( p2_r );
 	DECLARE_WRITE8_MEMBER( p2_w );
+
+	// internal state
+	upi41_cpu_device *m_cpu;
 
 	// interface to the host pc
 	devcb_write_line    m_system_reset_cb;

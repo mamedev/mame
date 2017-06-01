@@ -12,11 +12,11 @@ class nscsi_cdrom_device : public nscsi_full_device
 {
 public:
 	nscsi_cdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual machine_config_constructor device_mconfig_additions() const override;
 
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	virtual void scsi_command() override;
 	virtual uint8_t scsi_get_data(int id, int pos) override;
