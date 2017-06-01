@@ -258,7 +258,7 @@ bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 						std::string opt_name = img->instance_name();
 						std::string as = slmap.find(opt_name)->second;
 
-						/* Make sure a folder was specified in the tab, and that it exists */
+						/* Make sure a folder was specified, and that it exists */
 						if ((!osd::directory::open(as.c_str())) || (as.find(':') == std::string::npos))
 						{
 							/* Default to emu directory */
@@ -318,6 +318,24 @@ bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 								t_filter[i] = '\0';
 						}
 
+						char buf[400];
+						std::string as;
+						strcpy(buf, machine().options().emu_options::sw_path());
+						// This pulls out the first path from a multipath field
+						const char* t1 = strtok(buf, ";");
+						if (t1)
+							as = t1; // the first path of many
+						else
+							as = buf; // the only path
+
+						/* Make sure a folder was specified, and that it exists */
+						if ((!osd::directory::open(as.c_str())) || (as.find(':') == std::string::npos))
+						{
+							/* Default to emu directory */
+							osd_get_full_path(as, ".");
+						}
+						osd::text::tstring t_dir = osd::text::to_tstring(as);
+
 						TCHAR selectedFilename[MAX_PATH];
 						selectedFilename[0] = '\0';
 						OPENFILENAME ofn;
@@ -331,7 +349,7 @@ bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 						ofn.nFilterIndex = 1;
 						ofn.lpstrFileTitle = nullptr;
 						ofn.nMaxFileTitle = 0;
-						ofn.lpstrInitialDir = nullptr;
+						ofn.lpstrInitialDir = t_dir.c_str();
 						ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
 
 						if (GetOpenFileName(&ofn))
@@ -355,6 +373,24 @@ bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 								t_filter[i] = '\0';
 						}
 
+						char buf[400];
+						std::string as;
+						strcpy(buf, machine().options().emu_options::sw_path());
+						// This pulls out the first path from a multipath field
+						const char* t1 = strtok(buf, ";");
+						if (t1)
+							as = t1; // the first path of many
+						else
+							as = buf; // the only path
+
+						/* Make sure a folder was specified, and that it exists */
+						if ((!osd::directory::open(as.c_str())) || (as.find(':') == std::string::npos))
+						{
+							/* Default to emu directory */
+							osd_get_full_path(as, ".");
+						}
+						osd::text::tstring t_dir = osd::text::to_tstring(as);
+
 						TCHAR selectedFilename[MAX_PATH];
 						selectedFilename[0] = '\0';
 						OPENFILENAME ofn;
@@ -368,7 +404,7 @@ bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 						ofn.nFilterIndex = 1;
 						ofn.lpstrFileTitle = nullptr;
 						ofn.nMaxFileTitle = 0;
-						ofn.lpstrInitialDir = nullptr;
+						ofn.lpstrInitialDir = t_dir.c_str();
 						ofn.Flags = OFN_PATHMUSTEXIST;
 
 						if (GetSaveFileName(&ofn))
