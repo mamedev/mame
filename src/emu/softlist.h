@@ -8,13 +8,17 @@
 
 *********************************************************************/
 
-#ifndef __SOFTLIST_H_
-#define __SOFTLIST_H_
+#ifndef MAME_EMU_SOFTLIST_H
+#define MAME_EMU_SOFTLIST_H
 
-#include <list>
+#pragma once
+
+
 #include "emucore.h"
 #include "romentry.h"
 #include "corefile.h"
+
+#include <list>
 
 
 //**************************************************************************
@@ -29,9 +33,6 @@
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
-
-struct XML_ParserStruct;
-class software_info;
 
 // ======================> feature_list_item
 
@@ -211,4 +212,4 @@ private:
 // parses a software identifier (e.g. - 'apple2e:agentusa:flop1') into its constituent parts (returns false if cannot parse)
 bool software_name_parse(const std::string &identifier, std::string *list_name = nullptr, std::string *software_name = nullptr, std::string *part_name = nullptr);
 
-#endif // __SOFTLIST_H_
+#endif // MAME_EMU_SOFTLIST_H

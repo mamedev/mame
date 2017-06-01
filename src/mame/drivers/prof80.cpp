@@ -501,7 +501,7 @@ void prof80_state::machine_reset()
 //  MACHINE_CONFIG( prof80 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( prof80, prof80_state )
+static MACHINE_CONFIG_START( prof80 )
 	// basic machine hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_6MHz)
 	MCFG_CPU_PROGRAM_MAP(prof80_mem)
@@ -563,5 +563,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    INIT    COMPANY                          FULLNAME        FLAGS
-COMP( 1984, prof80,     0,      0,      prof80, prof80, driver_device,  0,      "Conitec Datensysteme", "PROF-80",              MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   STATE          INIT  COMPANY                 FULLNAME    FLAGS
+COMP( 1984, prof80,  0,      0,      prof80,  prof80, prof80_state,  0,    "Conitec Datensysteme", "PROF-80",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

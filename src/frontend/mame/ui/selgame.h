@@ -27,7 +27,7 @@ public:
 	static void force_game_select(mame_ui_manager &mui, render_container &container);
 
 protected:
-	virtual bool menu_has_search_active() override { return (m_search[0] != 0); }
+	virtual bool menu_has_search_active() override { return !m_search.empty(); }
 
 private:
 	enum

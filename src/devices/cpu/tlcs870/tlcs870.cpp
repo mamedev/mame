@@ -15,8 +15,9 @@
 
 
 #include "emu.h"
-#include "debugger.h"
 #include "tlcs870.h"
+#include "debugger.h"
+
 
 // di, ei, j, and test are just 'alias' opcodes
 static const char *const op_names[] = {
@@ -95,8 +96,61 @@ static const char *const reg16p[] = {
 #endif
 
 
+#define IS16BIT 0x80
+#define BITPOS 0x40
+#define BITPOS_INDIRECT 0x20
 
-const device_type TMP87PH40AN = device_creator<tmp87ph40an_device>;
+#define ABSOLUTE_VAL_8 0x01
+#define REG_8BIT 0x02
+
+// special
+#define CONDITIONAL 0x03
+#define STACKPOINTER (0x04 | IS16BIT) // this is a 16-bit reg
+#define CARRYFLAG (0x5 | BITPOS) // also flag as BITPOS since it's a bit operation?
+#define MEMVECTOR_16BIT 0x6
+#define REGISTERBANK 0x7
+#define PROGRAMSTATUSWORD 0x8
+
+#define ABSOLUTE_VAL_16 (ABSOLUTE_VAL_8|IS16BIT)
+#define REG_16BIT (REG_8BIT|IS16BIT)
+
+#define ADDR_IN_BASE 0x10
+#define ADDR_IN_IMM_X (ADDR_IN_BASE+0x0)
+#define ADDR_IN_PC_PLUS_REG_A (ADDR_IN_BASE+0x1)
+#define ADDR_IN_DE (ADDR_IN_BASE+0x2)
+#define ADDR_IN_HL (ADDR_IN_BASE+0x3)
+#define ADDR_IN_HL_PLUS_IMM_D (ADDR_IN_BASE+0x4)
+#define ADDR_IN_HL_PLUS_REG_C (ADDR_IN_BASE+0x5)
+#define ADDR_IN_HLINC (ADDR_IN_BASE+0x6)
+#define ADDR_IN_DECHL (ADDR_IN_BASE+0x7)
+
+#define MODE_MASK 0x1f
+
+
+#define FLAG_J (0x80)
+#define FLAG_Z (0x40)
+#define FLAG_C (0x20)
+#define FLAG_H (0x10)
+
+
+#define IS_JF ((m_F & FLAG_J) ? 1 : 0)
+#define IS_ZF ((m_F & FLAG_Z) ? 1 : 0)
+#define IS_CF ((m_F & FLAG_C) ? 1 : 0)
+#define IS_HF ((m_F & FLAG_H) ? 1 : 0)
+
+#define SET_JF (m_F |= FLAG_J)
+#define SET_ZF (m_F |= FLAG_Z)
+#define SET_CF (m_F |= FLAG_C)
+#define SET_HF (m_F |= FLAG_H)
+
+#define CLEAR_JF (m_F &= ~FLAG_J)
+#define CLEAR_ZF (m_F &= ~FLAG_Z)
+#define CLEAR_CF (m_F &= ~FLAG_C)
+#define CLEAR_HF (m_F &= ~FLAG_H)
+
+
+
+DEFINE_DEVICE_TYPE(TMP87PH40AN, tmp87ph40an_device, "tmp87ph40an", "TMP87PH40AN")
 
 static ADDRESS_MAP_START(tmp87ph40an_mem, AS_PROGRAM, 8, tlcs870_device)
 #if 0
@@ -179,8 +233,8 @@ static ADDRESS_MAP_START(tmp87ph40an_mem, AS_PROGRAM, 8, tlcs870_device)
 ADDRESS_MAP_END
 
 
-tlcs870_device::tlcs870_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, address_map_constructor program_map)
-	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
+tlcs870_device::tlcs870_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor program_map)
+	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0, program_map)
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 16, 0)
 	, m_intram(*this, "intram")
@@ -189,7 +243,7 @@ tlcs870_device::tlcs870_device(const machine_config &mconfig, device_type type, 
 
 
 tmp87ph40an_device::tmp87ph40an_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tlcs870_device(mconfig, TMP87PH40AN, "TMP87PH40AN", tag, owner, clock, "tmp87ph40an", __FILE__, ADDRESS_MAP_NAME(tmp87ph40an_mem))
+	: tlcs870_device(mconfig, TMP87PH40AN, tag, owner, clock, ADDRESS_MAP_NAME(tmp87ph40an_mem))
 {
 }
 

@@ -134,7 +134,7 @@ static const char *const starcrus_sample_names[] =
 };
 
 
-static MACHINE_CONFIG_START( starcrus, starcrus_state )
+static MACHINE_CONFIG_START( starcrus )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080,9750000/9)  /* 8224 chip is a divide by 9 */
@@ -193,4 +193,4 @@ ROM_START( starcrus )
 ROM_END
 
 
-GAME( 1977, starcrus, 0, starcrus, starcrus, driver_device, 0, ROT0, "Ramtek", "Star Cruiser", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1977, starcrus, 0, starcrus, starcrus, starcrus_state, 0, ROT0, "Ramtek", "Star Cruiser", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

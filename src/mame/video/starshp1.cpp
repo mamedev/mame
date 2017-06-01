@@ -119,13 +119,13 @@ WRITE8_MEMBER(starshp1_state::starshp1_ssadd_w)
 WRITE8_MEMBER(starshp1_state::starshp1_sspic_w)
 {
 	/*
-	 * Some mysterious game code at address $2CCE is causing
-	 * erratic images in the target explosion sequence. The
-	 * following condition is a hack to filter these images.
+	 * Some mysterious game code at address $2CCE is causes
+	 * erratic images in the target explosion sequence. But
+	 * This is the way the actual game worked!
 	 */
 
-	if (data != 0x87)
-		m_ship_picture = data;
+	m_ship_picture = data;
+
 }
 
 

@@ -855,7 +855,7 @@ static GFXDECODE_START( montecar )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( firetrk, firetrk_state )
+static MACHINE_CONFIG_START( firetrk )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, MASTER_CLOCK/12) /* 750Khz during service mode */
@@ -1012,6 +1012,6 @@ ROM_START( montecar )
 ROM_END
 
 
-GAMEL(1977, superbug, 0, superbug, superbug, driver_device, 0, ROT270, "Atari (Kee Games)", "Super Bug", 0, layout_superbug )
-GAME( 1978, firetrk,  0, firetrk,  firetrk, driver_device,  0, ROT270, "Atari", "Fire Truck / Smokey Joe", 0 )
-GAME( 1979, montecar, 0, montecar, montecar, driver_device, 0, ROT270, "Atari", "Monte Carlo", 0 )
+GAMEL(1977, superbug, 0, superbug, superbug, firetrk_state, 0, ROT270, "Atari (Kee Games)", "Super Bug", 0, layout_superbug )
+GAME( 1978, firetrk,  0, firetrk,  firetrk,  firetrk_state, 0, ROT270, "Atari", "Fire Truck / Smokey Joe", 0 )
+GAME( 1979, montecar, 0, montecar, montecar, firetrk_state, 0, ROT270, "Atari", "Monte Carlo", 0 )

@@ -402,7 +402,7 @@ WRITE8_MEMBER(jokrwild_state::testb_w)
 *    Machine Drivers     *
 *************************/
 
-static MACHINE_CONFIG_START( jokrwild, jokrwild_state )
+static MACHINE_CONFIG_START( jokrwild )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/2)  /* guess */
@@ -505,5 +505,5 @@ DRIVER_INIT_MEMBER(jokrwild_state,jokrwild)
 *      Game Drivers      *
 *************************/
 
-/*    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT      ROT    COMPANY  FULLNAME                   FLAGS */
+//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT      ROT   COMPANY  FULLNAME                    FLAGS
 GAME( 1988, jokrwild, 0,      jokrwild, jokrwild, jokrwild_state, jokrwild, ROT0, "Sigma", "Joker's Wild (encrypted)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

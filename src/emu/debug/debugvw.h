@@ -79,10 +79,6 @@ constexpr int DCK_MIDDLE_CLICK  = 3;        // middle instantaneous click
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// forward references
-class debug_view;
-
-
 // OSD callback function for a view
 typedef void (*debug_view_osd_update_func)(debug_view &view, void *osdprivate);
 

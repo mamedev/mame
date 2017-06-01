@@ -14,15 +14,12 @@
 #pragma once
 
 #include "drivenum.h"
+#include "emuopts.h"
 
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
-
-// forward declarations
-class machine_config;
-
 
 // core validity checker class
 class validity_checker : public osd_output
@@ -97,6 +94,9 @@ private:
 
 	// internal driver list
 	driver_enumerator       m_drivlist;
+
+	// blank options for use during validation
+	emu_options             m_blank_options;
 
 	// error tracking
 	int                     m_errors;

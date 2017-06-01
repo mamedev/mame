@@ -18,9 +18,6 @@
 #include "isa.h"
 #include "machine/pc_fdc.h"
 
-#define OMTI_MAX_LUN 1
-#define CDB_SIZE 10
-
 /***************************************************************************
  FUNCTION PROTOTYPES
  ***************************************************************************/
@@ -37,24 +34,20 @@ public:
 
 	static void set_verbose(int on_off);
 
-	required_device<pc_fdc_interface> m_fdc;
-	required_ioport m_iobase;
-	required_ioport m_biosopts;
-
 	DECLARE_WRITE_LINE_MEMBER( fdc_irq_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 protected:
+	static constexpr unsigned OMTI_MAX_LUN = 1;
+	static constexpr unsigned CDB_SIZE = 10;
+
 	omti8621_device(
 			const machine_config &mconfig,
 			device_type type,
-			const char *name,
 			const char *tag,
 			device_t *owner,
-			uint32_t clock,
-			const char *shortname,
-			const char *source);
+			uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -69,6 +62,10 @@ protected:
 	virtual void eop_w(int state) override;
 
 	void set_interrupt(enum line_state line_state);
+
+	required_device<pc_fdc_interface> m_fdc;
+	required_ioport m_iobase;
+	required_ioport m_biosopts;
 
 	omti_disk_image_device *our_disks[OMTI_MAX_LUN+1];
 
@@ -141,7 +138,7 @@ public:
 	omti8621_pc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
-extern const device_type ISA16_OMTI8621;
+DECLARE_DEVICE_TYPE(ISA16_OMTI8621, omti8621_pc_device)
 
 /* ----- omti8621 for apollo device interface ----- */
 
@@ -156,7 +153,7 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
-extern const device_type ISA16_OMTI8621_APOLLO;
+DECLARE_DEVICE_TYPE(ISA16_OMTI8621_APOLLO, omti8621_apollo_device)
 
 //###############################################################
 

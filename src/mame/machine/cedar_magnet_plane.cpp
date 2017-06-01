@@ -6,12 +6,12 @@
 #include "cedar_magnet_plane.h"
 
 
-const device_type CEDAR_MAGNET_PLANE = device_creator<cedar_magnet_plane_device>;
+DEFINE_DEVICE_TYPE(CEDAR_MAGNET_PLANE, cedar_magnet_plane_device, "cedmag_plane", "Cedar Plane")
 
 
 cedar_magnet_plane_device::cedar_magnet_plane_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, CEDAR_MAGNET_PLANE, "Cedar Plane", tag, owner, clock, "cedmag_plane", __FILE__),
-	cedar_magnet_board_interface(mconfig, *this, "planecpu", "ram")
+	: device_t(mconfig, CEDAR_MAGNET_PLANE, tag, owner, clock)
+	, cedar_magnet_board_interface(mconfig, *this, "planecpu", "ram")
 {
 }
 
@@ -69,7 +69,7 @@ WRITE8_MEMBER(cedar_magnet_plane_device::plane_portcf_w)
 	m_cf_data = data;
 }
 
-static MACHINE_CONFIG_FRAGMENT( cedar_magnet_plane )
+MACHINE_CONFIG_MEMBER( cedar_magnet_plane_device::device_add_mconfig )
 	MCFG_CPU_ADD("planecpu", Z80,4000000)
 	MCFG_CPU_PROGRAM_MAP(cedar_magnet_plane_map)
 	MCFG_CPU_IO_MAP(cedar_magnet_plane_io)
@@ -124,11 +124,6 @@ WRITE8_MEMBER(cedar_magnet_plane_device::pio1_pa_w)
 WRITE8_MEMBER(cedar_magnet_plane_device::pio1_pb_w)
 {
 	m_scrolly = data;
-}
-
-machine_config_constructor cedar_magnet_plane_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( cedar_magnet_plane );
 }
 
 void cedar_magnet_plane_device::device_start()

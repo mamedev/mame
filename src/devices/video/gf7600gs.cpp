@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "gf7600gs.h"
 
-const device_type GEFORCE_7600GS = device_creator<geforce_7600gs_device>;
+DEFINE_DEVICE_TYPE(GEFORCE_7600GS, geforce_7600gs_device, "geforce_7600gs", "NVIDIA GeForce 7600GS")
 
 DEVICE_ADDRESS_MAP_START(map1, 32, geforce_7600gs_device)
 ADDRESS_MAP_END
@@ -15,7 +15,7 @@ DEVICE_ADDRESS_MAP_START(map3, 32, geforce_7600gs_device)
 ADDRESS_MAP_END
 
 geforce_7600gs_device::geforce_7600gs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_device(mconfig, GEFORCE_7600GS, "NVidia GeForce 7600GS", tag, owner, clock, "geforce_7600gs", __FILE__)
+	: pci_device(mconfig, GEFORCE_7600GS, tag, owner, clock)
 {
 }
 

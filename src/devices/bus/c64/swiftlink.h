@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_C64_SWIFTLINK_H
+#define MAME_BUS_C64_SWIFTLINK_H
 
-#ifndef __SWIFTLINK__
-#define __SWIFTLINK__
+#pragma once
 
 
 #include "exp.h"
@@ -70,7 +70,7 @@ private:
 
 
 // device type definition
-extern const device_type C64_SWIFTLINK;
+DECLARE_DEVICE_TYPE(C64_SWIFTLINK, c64_swiftlink_cartridge_device)
 
 
-#endif
+#endif // MAME_BUS_C64_SWIFTLINK_H

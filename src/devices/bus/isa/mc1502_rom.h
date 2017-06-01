@@ -2,14 +2,14 @@
 // copyright-holders:Sergey Svishchev
 /**********************************************************************
 
-	MC-1502 ROM cartridge device
+    MC-1502 ROM cartridge device
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_ISA_MC1502_ROM_H
+#define MAME_BUS_ISA_MC1502_ROM_H
 
-#ifndef __MC1502_ROM__
-#define __MC1502_ROM__
+#pragma once
 
 #include "isa.h"
 
@@ -35,7 +35,7 @@ protected:
 
 
 // device type definition
-extern const device_type MC1502_ROM;
+DECLARE_DEVICE_TYPE(MC1502_ROM, mc1502_rom_device)
 
 
-#endif
+#endif // MAME_BUS_ISA_MC1502_ROM_H

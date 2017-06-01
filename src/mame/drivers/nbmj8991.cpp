@@ -1314,7 +1314,7 @@ static INPUT_PORTS_START( av2mj2rg )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( nbmjdrv1, nbmj8991_state ) // galkoku
+static MACHINE_CONFIG_START( nbmjdrv1 ) // galkoku
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 25000000/5)        /* 5.00 MHz ? */
@@ -1346,7 +1346,7 @@ static MACHINE_CONFIG_START( nbmjdrv1, nbmj8991_state ) // galkoku
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( nbmjdrv2, nbmj8991_state ) // pstadium
+static MACHINE_CONFIG_START( nbmjdrv2 ) // pstadium
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 6000000/2) /* 3.00 MHz */
@@ -2104,22 +2104,22 @@ ROM_START( av2mj2rg )
 ROM_END
 
 
-GAME( 1989, galkoku,  0,        galkoku,  galkoku,  driver_device,  0,        ROT180, "Nichibutsu / T.R.Tec", "Mahjong Gal no Kokuhaku (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, hyouban,  galkoku,  hyouban,  hyouban,  driver_device,  0,        ROT180, "Nichibutsu / T.R.Tec", "Mahjong Hyouban Musume [BET] (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, galkoku,  0,        galkoku,  galkoku,  nbmj8991_state, 0,        ROT180, "Nichibutsu / T.R.Tec", "Mahjong Gal no Kokuhaku (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, hyouban,  galkoku,  hyouban,  hyouban,  nbmj8991_state, 0,        ROT180, "Nichibutsu / T.R.Tec", "Mahjong Hyouban Musume [BET] (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, galkaika, 0,        galkaika, galkaika, nbmj8991_state, galkaika, ROT180, "Nichibutsu / T.R.Tec", "Mahjong Gal no Kaika (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, tokyogal, 0,        tokyogal, tokyogal, nbmj8991_state, tokyogal, ROT180, "Nichibutsu", "Tokyo Gal Zukan (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, tokimbsj, tokyogal, tokimbsj, tokimbsj, nbmj8991_state, tokimbsj, ROT180, "Nichibutsu", "Tokimeki Bishoujo [BET] (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, mcontest, 0,        mcontest, mcontest, driver_device,  0,        ROT180, "Nichibutsu", "Miss Mahjong Contest (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, uchuuai,  0,        uchuuai,  uchuuai,  driver_device,  0,        ROT180, "Nichibutsu", "Mahjong Uchuu yori Ai wo komete (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, triplew1, 0,        triplew1, triplew1, driver_device,  0,        ROT180, "Nichibutsu", "Mahjong Triple Wars (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, pstadium, 0,        pstadium, pstadium, driver_device,  0,        ROT180, "Nichibutsu", "Mahjong Panic Stadium (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, triplew2, 0,        triplew2, triplew1, driver_device,  0,        ROT180, "Nichibutsu", "Mahjong Triple Wars 2 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ntopstar, 0,        ntopstar, ntopstar, driver_device,  0,        ROT180, "Nichibutsu", "Mahjong Nerae! Top Star (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, mjlstory, 0,        mjlstory, mjlstory, driver_device,  0,        ROT180, "Nichibutsu", "Mahjong Jikken Love Story (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ladymakr, mjlstory, mjlstory, finalbny, driver_device,  0,        ROT180, "Nichibutsu", "Lady Maker [BET] (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, vanilla,  0,        vanilla,  vanilla,  driver_device,  0,        ROT180, "Nichibutsu", "Mahjong Vanilla Syndrome (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mcontest, 0,        mcontest, mcontest, nbmj8991_state, 0,        ROT180, "Nichibutsu", "Miss Mahjong Contest (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, uchuuai,  0,        uchuuai,  uchuuai,  nbmj8991_state, 0,        ROT180, "Nichibutsu", "Mahjong Uchuu yori Ai wo komete (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, triplew1, 0,        triplew1, triplew1, nbmj8991_state, 0,        ROT180, "Nichibutsu", "Mahjong Triple Wars (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pstadium, 0,        pstadium, pstadium, nbmj8991_state, 0,        ROT180, "Nichibutsu", "Mahjong Panic Stadium (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, triplew2, 0,        triplew2, triplew1, nbmj8991_state, 0,        ROT180, "Nichibutsu", "Mahjong Triple Wars 2 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ntopstar, 0,        ntopstar, ntopstar, nbmj8991_state, 0,        ROT180, "Nichibutsu", "Mahjong Nerae! Top Star (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mjlstory, 0,        mjlstory, mjlstory, nbmj8991_state, 0,        ROT180, "Nichibutsu", "Mahjong Jikken Love Story (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ladymakr, mjlstory, mjlstory, finalbny, nbmj8991_state, 0,        ROT180, "Nichibutsu", "Lady Maker [BET] (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, vanilla,  0,        vanilla,  vanilla,  nbmj8991_state, 0,        ROT180, "Nichibutsu", "Mahjong Vanilla Syndrome (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, finalbny, vanilla,  finalbny, finalbny, nbmj8991_state, finalbny, ROT180, "Nichibutsu", "Mahjong Final Bunny [BET] (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, qmhayaku, 0,        qmhayaku, qmhayaku, driver_device,  0,        ROT180, "Nichibutsu", "Quiz-Mahjong Hayaku Yatteyo! (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, mjgottub, 0,        mjgottub, mjgottub, driver_device,  0,        ROT180, "Nichibutsu", "Medal Mahjong Gottsu ee-kanji [BET] (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, av2mj1bb, 0,        av2mj1bb, av2mj1bb, driver_device,  0,        ROT0,   "Miki Syouji / AV Japan", "AV2Mahjong No.1 Bay Bridge no Seijo (Japan)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, av2mj2rg, 0,        av2mj2rg, av2mj2rg, driver_device,  0,        ROT0,   "Miki Syouji / AV Japan", "AV2Mahjong No.2 Rouge no Kaori (Japan)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, qmhayaku, 0,        qmhayaku, qmhayaku, nbmj8991_state, 0,        ROT180, "Nichibutsu", "Quiz-Mahjong Hayaku Yatteyo! (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mjgottub, 0,        mjgottub, mjgottub, nbmj8991_state, 0,        ROT180, "Nichibutsu", "Medal Mahjong Gottsu ee-kanji [BET] (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, av2mj1bb, 0,        av2mj1bb, av2mj1bb, nbmj8991_state, 0,        ROT0,   "Miki Syouji / AV Japan", "AV2Mahjong No.1 Bay Bridge no Seijo (Japan)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, av2mj2rg, 0,        av2mj2rg, av2mj2rg, nbmj8991_state, 0,        ROT0,   "Miki Syouji / AV Japan", "AV2Mahjong No.2 Rouge no Kaori (Japan)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

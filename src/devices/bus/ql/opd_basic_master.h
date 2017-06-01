@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_QL_OPD_BASIC_MASTER_H
+#define MAME_BUS_QL_OPD_BASIC_MASTER_H
 
-#ifndef __OPD_BASIC_MASTER__
-#define __OPD_BASIC_MASTER__
+#pragma once
 
 #include "exp.h"
 
@@ -19,14 +19,13 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> opd_basic_master_t
+// ======================> opd_basic_master_device
 
-class opd_basic_master_t : public device_t,
-							public device_ql_expansion_card_interface
+class opd_basic_master_device : public device_t, public device_ql_expansion_card_interface
 {
 public:
 	// construction/destruction
-	opd_basic_master_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	opd_basic_master_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -41,10 +40,7 @@ protected:
 };
 
 
-
 // device type definition
-extern const device_type OPD_BASIC_MASTER;
+DECLARE_DEVICE_TYPE(OPD_BASIC_MASTER, opd_basic_master_device)
 
-
-
-#endif
+#endif // MAME_BUS_QL_OPD_BASIC_MASTER_H

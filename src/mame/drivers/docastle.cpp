@@ -563,7 +563,7 @@ void docastle_state::machine_start()
 	save_item(NAME(m_buffer1));
 }
 
-static MACHINE_CONFIG_START( docastle, docastle_state )
+static MACHINE_CONFIG_START( docastle )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz)
@@ -579,18 +579,18 @@ static MACHINE_CONFIG_START( docastle, docastle_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", docastle_state, nmi_line_pulse)
 
 	MCFG_DEVICE_ADD("inp1", TMS1025, 0)
-	MCFG_TMS1025_READ_PORT_CB(TMS1025_PORT1, IOPORT("DSW2"))
-	MCFG_TMS1025_READ_PORT_CB(TMS1025_PORT2, IOPORT("DSW1"))
-	MCFG_TMS1025_READ_PORT_CB(TMS1025_PORT3, IOPORT("JOYS"))
-	MCFG_TMS1025_READ_PORT_CB(TMS1025_PORT5, IOPORT("BUTTONS"))
-	MCFG_TMS1025_READ_PORT_CB(TMS1025_PORT7, IOPORT("SYSTEM"))
+	MCFG_TMS1025_READ_PORT_CB(PORT1, IOPORT("DSW2"))
+	MCFG_TMS1025_READ_PORT_CB(PORT2, IOPORT("DSW1"))
+	MCFG_TMS1025_READ_PORT_CB(PORT3, IOPORT("JOYS"))
+	MCFG_TMS1025_READ_PORT_CB(PORT5, IOPORT("BUTTONS"))
+	MCFG_TMS1025_READ_PORT_CB(PORT7, IOPORT("SYSTEM"))
 
 	MCFG_DEVICE_ADD("inp2", TMS1025, 0)
-	MCFG_TMS1025_READ_PORT_CB(TMS1025_PORT1, IOPORT("DSW2")) MCFG_DEVCB_RSHIFT(4)
-	MCFG_TMS1025_READ_PORT_CB(TMS1025_PORT2, IOPORT("DSW1")) MCFG_DEVCB_RSHIFT(4)
-	MCFG_TMS1025_READ_PORT_CB(TMS1025_PORT3, IOPORT("JOYS")) MCFG_DEVCB_RSHIFT(4)
-	MCFG_TMS1025_READ_PORT_CB(TMS1025_PORT5, IOPORT("BUTTONS")) MCFG_DEVCB_RSHIFT(4)
-	MCFG_TMS1025_READ_PORT_CB(TMS1025_PORT7, IOPORT("SYSTEM")) MCFG_DEVCB_RSHIFT(4)
+	MCFG_TMS1025_READ_PORT_CB(PORT1, IOPORT("DSW2")) MCFG_DEVCB_RSHIFT(4)
+	MCFG_TMS1025_READ_PORT_CB(PORT2, IOPORT("DSW1")) MCFG_DEVCB_RSHIFT(4)
+	MCFG_TMS1025_READ_PORT_CB(PORT3, IOPORT("JOYS")) MCFG_DEVCB_RSHIFT(4)
+	MCFG_TMS1025_READ_PORT_CB(PORT5, IOPORT("BUTTONS")) MCFG_DEVCB_RSHIFT(4)
+	MCFG_TMS1025_READ_PORT_CB(PORT7, IOPORT("SYSTEM")) MCFG_DEVCB_RSHIFT(4)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -652,10 +652,10 @@ static MACHINE_CONFIG_DERIVED( idsoccer, docastle )
 	MCFG_CPU_PROGRAM_MAP(idsoccer_map)
 
 	MCFG_DEVICE_MODIFY("inp1")
-	MCFG_TMS1025_READ_PORT_CB(TMS1025_PORT4, IOPORT("JOYS_RIGHT"))
+	MCFG_TMS1025_READ_PORT_CB(PORT4, IOPORT("JOYS_RIGHT"))
 
 	MCFG_DEVICE_MODIFY("inp2")
-	MCFG_TMS1025_READ_PORT_CB(TMS1025_PORT4, IOPORT("JOYS_RIGHT")) MCFG_DEVCB_RSHIFT(4)
+	MCFG_TMS1025_READ_PORT_CB(PORT4, IOPORT("JOYS_RIGHT")) MCFG_DEVCB_RSHIFT(4)
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(docastle_state,dorunrun)
@@ -663,7 +663,7 @@ static MACHINE_CONFIG_DERIVED( idsoccer, docastle )
 	/* sound hardware */
 	MCFG_SOUND_ADD("msm", MSM5205, XTAL_384kHz) /* Crystal verified on American Soccer board. */
 	MCFG_MSM5205_VCLK_CB(WRITELINE(docastle_state, idsoccer_adpcm_int)) // interrupt function
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S64_4B)      // 6 kHz    ???
+	MCFG_MSM5205_PRESCALER_SELECTOR(S64_4B)      // 6 kHz    ???
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
@@ -1087,18 +1087,18 @@ ROM_END
 
 /* Game Drivers */
 
-GAME( 1983, docastle,  0,        docastle, docastle, driver_device, 0, ROT270, "Universal", "Mr. Do's Castle (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, docastle2, docastle, docastle, docastle, driver_device, 0, ROT270, "Universal", "Mr. Do's Castle (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, docastleo, docastle, docastle, docastle, driver_device, 0, ROT270, "Universal", "Mr. Do's Castle (older)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, douni,     docastle, docastle, docastle, driver_device, 0, ROT270, "Universal", "Mr. Do vs. Unicorns", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, dorunrun,  0,        dorunrun, dorunrun, driver_device, 0, ROT0,   "Universal", "Do! Run Run (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, dorunrun2, dorunrun, dorunrun, dorunrun, driver_device, 0, ROT0,   "Universal", "Do! Run Run (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, dorunrunc, dorunrun, docastle, dorunrun, driver_device, 0, ROT0,   "Universal", "Do! Run Run (Do's Castle hardware, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, dorunrunca,dorunrun, docastle, dorunrun, driver_device, 0, ROT0,   "Universal", "Do! Run Run (Do's Castle hardware, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, spiero,    dorunrun, dorunrun, dorunrun, driver_device, 0, ROT0,   "Universal", "Super Pierrot (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, dowild,    0,        dorunrun, dowild,   driver_device, 0, ROT0,   "Universal", "Mr. Do's Wild Ride", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, jjack,     0,        dorunrun, jjack,    driver_device, 0, ROT270, "Universal", "Jumping Jack", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, kickridr,  0,        dorunrun, kickridr, driver_device, 0, ROT0,   "Universal", "Kick Rider", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, idsoccer,  0,        idsoccer, idsoccer, driver_device, 0, ROT0,   "Universal", "Indoor Soccer (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1985, idsoccera, idsoccer, idsoccer, idsoccer, driver_device, 0, ROT0,   "Universal", "Indoor Soccer (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND )
-GAME( 1987, asoccer,   idsoccer, idsoccer, idsoccer, driver_device, 0, ROT0,   "Universal", "American Soccer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND )
+GAME( 1983, docastle,  0,        docastle, docastle, docastle_state, 0, ROT270, "Universal", "Mr. Do's Castle (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, docastle2, docastle, docastle, docastle, docastle_state, 0, ROT270, "Universal", "Mr. Do's Castle (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, docastleo, docastle, docastle, docastle, docastle_state, 0, ROT270, "Universal", "Mr. Do's Castle (older)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, douni,     docastle, docastle, docastle, docastle_state, 0, ROT270, "Universal", "Mr. Do vs. Unicorns", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, dorunrun,  0,        dorunrun, dorunrun, docastle_state, 0, ROT0,   "Universal", "Do! Run Run (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, dorunrun2, dorunrun, dorunrun, dorunrun, docastle_state, 0, ROT0,   "Universal", "Do! Run Run (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, dorunrunc, dorunrun, docastle, dorunrun, docastle_state, 0, ROT0,   "Universal", "Do! Run Run (Do's Castle hardware, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, dorunrunca,dorunrun, docastle, dorunrun, docastle_state, 0, ROT0,   "Universal", "Do! Run Run (Do's Castle hardware, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, spiero,    dorunrun, dorunrun, dorunrun, docastle_state, 0, ROT0,   "Universal", "Super Pierrot (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, dowild,    0,        dorunrun, dowild,   docastle_state, 0, ROT0,   "Universal", "Mr. Do's Wild Ride", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, jjack,     0,        dorunrun, jjack,    docastle_state, 0, ROT270, "Universal", "Jumping Jack", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, kickridr,  0,        dorunrun, kickridr, docastle_state, 0, ROT0,   "Universal", "Kick Rider", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, idsoccer,  0,        idsoccer, idsoccer, docastle_state, 0, ROT0,   "Universal", "Indoor Soccer (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1985, idsoccera, idsoccer, idsoccer, idsoccer, docastle_state, 0, ROT0,   "Universal", "Indoor Soccer (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND )
+GAME( 1987, asoccer,   idsoccer, idsoccer, idsoccer, docastle_state, 0, ROT0,   "Universal", "American Soccer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND )

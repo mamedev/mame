@@ -2,22 +2,22 @@
 // copyright-holders:Sergey Svishchev
 /***************************************************************************
 
-	drivers/poisk1.c
+    drivers/poisk1.c
 
-	Driver file for Poisk-1
+    Driver file for Poisk-1
 
-	to do:
-	- cassette i/o and softlist
-	- verify palette
-	- monochrome output
-	- trap: does memory always get written or it's up to NMI ISR to complete writes?
-	- keyboard layout for earliest revision (v89r0)
+    to do:
+    - cassette i/o and softlist
+    - verify palette
+    - monochrome output
+    - trap: does memory always get written or it's up to NMI ISR to complete writes?
+    - keyboard layout for earliest revision (v89r0)
 
-	slot devices:
-	- hard disk controllers
-	- network cards
-	- joystick, mouse, serial, parallel ports
-	- sound card
+    slot devices:
+    - hard disk controllers
+    - network cards
+    - joystick, mouse, serial, parallel ports
+    - sound card
 
 ***************************************************************************/
 
@@ -35,6 +35,7 @@
 #include "sound/spkrdev.h"
 #include "video/cgapal.h"
 
+#include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
 
@@ -247,7 +248,7 @@ WRITE8_MEMBER(p1_state::p1_ppi2_porta_w)
 
 /*
 06Ah    Dxx 6   Enable/Disable color burst (?)
-		7   Enable/Disable D7H/D7L
+        7   Enable/Disable D7H/D7L
 */
 
 WRITE8_MEMBER(p1_state::p1_ppi_portc_w)
@@ -630,7 +631,7 @@ static INPUT_PORTS_START( poisk1 )
 	PORT_INCLUDE( poisk1_keyboard_v91 )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( poisk1, p1_state )
+static MACHINE_CONFIG_START( poisk1 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8088, 5000000)
 	MCFG_CPU_PROGRAM_MAP(poisk1_map)
@@ -736,5 +737,5 @@ ROM_END
 
 ***************************************************************************/
 
-/*     YEAR     NAME        PARENT      COMPAT  MACHINE     INPUT       INIT                COMPANY       FULLNAME */
-COMP ( 1989,    poisk1,    ibm5150,    0,      poisk1,    poisk1,    p1_state, poisk1,   "Electronmash",  "Poisk-1", 0)
+//     YEAR     NAME       PARENT      COMPAT  MACHINE   INPUT    STATE     INIT    COMPANY          FULLNAME   FLAGS
+COMP ( 1989,    poisk1,    ibm5150,    0,      poisk1,   poisk1,  p1_state, poisk1, "Electronmash",  "Poisk-1", 0 )

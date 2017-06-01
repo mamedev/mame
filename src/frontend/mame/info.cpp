@@ -189,11 +189,9 @@ const char info_xml_creator::s_dtd_string[] =
 //  info_xml_creator - constructor
 //-------------------------------------------------
 
-info_xml_creator::info_xml_creator(driver_enumerator &drivlist, bool filter_devices)
+info_xml_creator::info_xml_creator(emu_options const &options)
 	: m_output(nullptr)
-	, m_drivlist(drivlist)
-	, m_filter_devices(filter_devices)
-	, m_lookup_options(m_drivlist.options())
+	, m_lookup_options(options)
 {
 	mame_options::remove_device_options(m_lookup_options);
 }
@@ -204,10 +202,108 @@ info_xml_creator::info_xml_creator(driver_enumerator &drivlist, bool filter_devi
 //  for all known games
 //-------------------------------------------------
 
-void info_xml_creator::output(FILE *out, bool nodevices)
+void info_xml_creator::output(FILE *out, std::vector<std::string> const &patterns)
 {
 	m_output = out;
 
+	std::unique_ptr<device_type_set> devfilter(patterns.empty() ? nullptr : new device_type_set);
+
+	// track which patterns match machines
+	driver_enumerator drivlist(m_lookup_options);
+	std::vector<bool> matched(patterns.size(), false);
+	auto const included = [&patterns, &drivlist, &matched] () -> bool
+	{
+		if (patterns.empty())
+			return true;
+
+		char const *const name = drivlist.driver().name;
+		bool result = false;
+		auto it = matched.begin();
+		for (std::string const &pat : patterns)
+		{
+			if (!core_strwildcmp(pat.c_str(), name))
+			{
+				result = true;
+				*it = true;
+			}
+			++it;
+		}
+		return result;
+	};
+
+	// iterate through the drivers, outputting one at a time
+	bool first = true;
+	while (drivlist.next())
+	{
+		if (included())
+		{
+			if (first)
+			{
+				output_header();
+				first = false;
+			}
+			output_one(drivlist, devfilter.get());
+		}
+	}
+
+	// output devices (both devices with roms and slot devices)
+	if (!devfilter || !devfilter->empty())
+	{
+		if (first)
+		{
+			output_header();
+			first = false;
+		}
+		output_devices(devfilter.get());
+	}
+
+	if (!first)
+		output_footer();
+
+	// throw an error if there were unmatched patterns
+	auto it = matched.begin();
+	for (std::string const &pat : patterns)
+	{
+		if (!*it)
+			throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching machines found for '%s'", pat.c_str());
+
+		++it;
+	}
+}
+
+
+//-------------------------------------------------
+//  output_mame_xml - print the XML information
+//  for a subset of games
+//-------------------------------------------------
+
+void info_xml_creator::output(FILE *out, driver_enumerator &drivlist, bool nodevices)
+{
+	m_output = out;
+
+	device_type_set devfilter;
+
+	output_header();
+
+	// iterate through the drivers, outputting one at a time
+	while (drivlist.next())
+		output_one(drivlist, &devfilter);
+
+	// output devices (both devices with roms and slot devices)
+	if (!nodevices)
+		output_devices(&devfilter);
+
+	output_footer();
+}
+
+
+//-------------------------------------------------
+//  output_header - print the XML DTD and open
+//  the root element
+//-------------------------------------------------
+
+void info_xml_creator::output_header()
+{
 	// output the DTD
 	fprintf(m_output, "<?xml version=\"1.0\"?>\n");
 	std::string dtd(s_dtd_string);
@@ -228,19 +324,17 @@ void info_xml_creator::output(FILE *out, bool nodevices)
 		util::xml::normalize_string(emulator_info::get_build_version()),
 		CONFIG_VERSION
 	);
+}
 
-	std::unique_ptr<device_type_set> devfilter((m_filter_devices && !nodevices) ? new device_type_set : nullptr);
 
-	// iterate through the drivers, outputting one at a time
-	while (m_drivlist.next())
-		output_one(devfilter.get());
+//-------------------------------------------------
+//  output_header - close the root element
+//-------------------------------------------------
 
-	// output devices (both devices with roms and slot devices)
-	if (!nodevices)
-		output_devices(devfilter.get());
-
+void info_xml_creator::output_footer()
+{
 	// close the top level tag
-	fprintf(m_output, "</%s>\n",XML_ROOT);
+	fprintf(m_output, "</%s>\n", XML_ROOT);
 }
 
 
@@ -249,14 +343,14 @@ void info_xml_creator::output(FILE *out, bool nodevices)
 //  for one particular game driver
 //-------------------------------------------------
 
-void info_xml_creator::output_one(device_type_set *devtypes)
+void info_xml_creator::output_one(driver_enumerator &drivlist, device_type_set *devtypes)
 {
 	// no action if not a game
-	const game_driver &driver = m_drivlist.driver();
+	const game_driver &driver = drivlist.driver();
 	if (driver.flags & MACHINE_NO_STANDALONE)
 		return;
 
-	std::shared_ptr<machine_config> const config(m_drivlist.config());
+	std::shared_ptr<machine_config> const config(drivlist.config());
 	device_iterator iter(config->root_device());
 
 	// allocate input ports
@@ -303,10 +397,10 @@ void info_xml_creator::output_one(device_type_set *devtypes)
 	fprintf(m_output, " name=\"%s\"", util::xml::normalize_string(driver.name));
 
 	// strip away any path information from the source_file and output it
-	const char *start = strrchr(driver.source_file, '/');
+	const char *start = strrchr(driver.type.source(), '/');
 	if (!start)
-		start = strrchr(driver.source_file, '\\');
-	start = start ? (start + 1) : driver.source_file;
+		start = strrchr(driver.type.source(), '\\');
+	start = start ? (start + 1) : driver.type.source();
 	fprintf(m_output, " sourcefile=\"%s\"", util::xml::normalize_string(start));
 
 	// append bios and runnable flags
@@ -318,19 +412,19 @@ void info_xml_creator::output_one(device_type_set *devtypes)
 		fprintf(m_output, " ismechanical=\"yes\"");
 
 	// display clone information
-	int clone_of = m_drivlist.find(driver.parent);
-	if (clone_of != -1 && !(m_drivlist.driver(clone_of).flags & MACHINE_IS_BIOS_ROOT))
-		fprintf(m_output, " cloneof=\"%s\"", util::xml::normalize_string(m_drivlist.driver(clone_of).name));
+	int clone_of = drivlist.find(driver.parent);
+	if (clone_of != -1 && !(drivlist.driver(clone_of).flags & MACHINE_IS_BIOS_ROOT))
+		fprintf(m_output, " cloneof=\"%s\"", util::xml::normalize_string(drivlist.driver(clone_of).name));
 	if (clone_of != -1)
-		fprintf(m_output, " romof=\"%s\"", util::xml::normalize_string(m_drivlist.driver(clone_of).name));
+		fprintf(m_output, " romof=\"%s\"", util::xml::normalize_string(drivlist.driver(clone_of).name));
 
 	// display sample information and close the game tag
 	output_sampleof(config->root_device());
 	fprintf(m_output, ">\n");
 
 	// output game description
-	if (driver.description != nullptr)
-		fprintf(m_output, "\t\t<description>%s</description>\n", util::xml::normalize_string(driver.description));
+	if (driver.type.fullname() != nullptr)
+		fprintf(m_output, "\t\t<description>%s</description>\n", util::xml::normalize_string(driver.type.fullname()));
 
 	// print the year only if is a number or another allowed character (? or +)
 	if (driver.year != nullptr && strspn(driver.year, "0123456789?+") == strlen(driver.year))
@@ -341,23 +435,23 @@ void info_xml_creator::output_one(device_type_set *devtypes)
 		fprintf(m_output, "\t\t<manufacturer>%s</manufacturer>\n", util::xml::normalize_string(driver.manufacturer));
 
 	// now print various additional information
-	output_bios();
-	output_rom(config->root_device());
-	output_device_roms();
+	output_bios(driver);
+	output_rom(&drivlist, config->root_device());
+	output_device_roms(config->root_device());
 	output_sample(config->root_device());
 	output_chips(config->root_device(), "");
-	output_display(config->root_device(), &m_drivlist.driver().flags, "");
+	output_display(config->root_device(), &drivlist.driver().flags, "");
 	output_sound(config->root_device());
 	output_input(portlist);
 	output_switches(portlist, "", IPT_DIPSWITCH, "dipswitch", "dipvalue");
 	output_switches(portlist, "", IPT_CONFIG, "configuration", "confsetting");
 	output_ports(portlist);
 	output_adjusters(portlist);
-	output_driver();
+	output_driver(driver);
 	output_images(config->root_device(), "");
 	output_slots(*config, config->root_device(), "", devtypes);
-	output_software_list();
-	output_ramoptions();
+	output_software_list(config->root_device());
+	output_ramoptions(config->root_device());
 
 	// close the topmost tag
 	fprintf(m_output, "\t</%s>\n",XML_TOP);
@@ -402,7 +496,7 @@ void info_xml_creator::output_one_device(machine_config &config, device_t &devic
 	fprintf(m_output, ">\n");
 	fprintf(m_output, "\t\t<description>%s</description>\n", util::xml::normalize_string(device.name()));
 
-	output_rom(device);
+	output_rom(nullptr, device);
 
 	if (device.type().type() != typeid(samples_device)) // ignore samples_device itself
 		output_sample(device);
@@ -471,10 +565,10 @@ void info_xml_creator::output_devices(device_type_set const *filter)
 //  included in a device set, print a reference
 //-------------------------------------------------
 
-void info_xml_creator::output_device_roms()
+void info_xml_creator::output_device_roms(device_t &root)
 {
-	for (device_t &device : device_iterator(m_drivlist.config()->root_device()))
-		if (device.owner() != nullptr && device.shortname() != nullptr && device.shortname()[0] != '\0')
+	for (device_t &device : device_iterator(root))
+		if (device.owner())
 			fprintf(m_output, "\t\t<device_ref name=\"%s\"/>\n", util::xml::normalize_string(device.shortname()));
 }
 
@@ -506,32 +600,32 @@ void info_xml_creator::output_sampleof(device_t &device)
 //  game
 //-------------------------------------------------
 
-void info_xml_creator::output_bios()
+void info_xml_creator::output_bios(game_driver const &driver)
 {
 	// skip if no ROMs
-	if (m_drivlist.driver().rom == nullptr)
-		return;
+	if (driver.rom)
+	{
+		auto rom_entries = rom_build_entries(driver.rom);
 
-	auto rom_entries = rom_build_entries(m_drivlist.driver().rom);
+		// first determine the default BIOS name
+		std::string defaultname;
+		for (const rom_entry &rom : rom_entries)
+			if (ROMENTRY_ISDEFAULT_BIOS(&rom))
+				defaultname = ROM_GETNAME(&rom);
 
-	// first determine the default BIOS name
-	std::string defaultname;
-	for (const rom_entry &rom : rom_entries)
-		if (ROMENTRY_ISDEFAULT_BIOS(&rom))
-			defaultname = ROM_GETNAME(&rom);
-
-	// iterate over ROM entries and look for BIOSes
-	for (const rom_entry &rom : rom_entries)
-		if (ROMENTRY_ISSYSTEM_BIOS(&rom))
-		{
-			// output extracted name and descriptions
-			fprintf(m_output, "\t\t<biosset");
-			fprintf(m_output, " name=\"%s\"", util::xml::normalize_string(ROM_GETNAME(&rom)));
-			fprintf(m_output, " description=\"%s\"", util::xml::normalize_string(ROM_GETHASHDATA(&rom)));
-			if (defaultname == ROM_GETNAME(&rom))
-				fprintf(m_output, " default=\"yes\"");
-			fprintf(m_output, "/>\n");
-		}
+		// iterate over ROM entries and look for BIOSes
+		for (const rom_entry &rom : rom_entries)
+			if (ROMENTRY_ISSYSTEM_BIOS(&rom))
+			{
+				// output extracted name and descriptions
+				fprintf(m_output, "\t\t<biosset");
+				fprintf(m_output, " name=\"%s\"", util::xml::normalize_string(ROM_GETNAME(&rom)));
+				fprintf(m_output, " description=\"%s\"", util::xml::normalize_string(ROM_GETHASHDATA(&rom)));
+				if (defaultname == ROM_GETNAME(&rom))
+					fprintf(m_output, " default=\"yes\"");
+				fprintf(m_output, "/>\n");
+			}
+	}
 }
 
 
@@ -540,47 +634,45 @@ void info_xml_creator::output_bios()
 //  the XML output
 //-------------------------------------------------
 
-void info_xml_creator::output_rom(device_t &device)
+void info_xml_creator::output_rom(driver_enumerator *drivlist, device_t &device)
 {
 	// iterate over 3 different ROM "types": BIOS, ROMs, DISKs
+	bool const do_merge_name = drivlist && dynamic_cast<driver_device *>(&device);
 	for (int rom_type = 0; rom_type < 3; rom_type++)
 		for (const rom_entry *region = rom_first_region(device); region != nullptr; region = rom_next_region(region))
 		{
-			bool is_disk = ROMREGION_ISDISKDATA(region);
+			bool const is_disk = ROMREGION_ISDISKDATA(region);
 
 			// disk regions only work for disks
 			if ((is_disk && rom_type != 2) || (!is_disk && rom_type == 2))
 				continue;
 
 			// iterate through ROM entries
+			std::string bios_name;
 			for (const rom_entry *rom = rom_first_file(region); rom != nullptr; rom = rom_next_file(rom))
 			{
-				bool is_bios = ROM_GETBIOSFLAGS(rom);
-				const char *name = ROM_GETNAME(rom);
-				int offset = ROM_GETOFFSET(rom);
-				const char *merge_name = nullptr;
-				char bios_name[100];
-
 				// BIOS ROMs only apply to bioses
+				bool const is_bios = ROM_GETBIOSFLAGS(rom);
 				if ((is_bios && rom_type != 0) || (!is_bios && rom_type == 0))
 					continue;
 
 				// if we have a valid ROM and we are a clone, see if we can find the parent ROM
 				util::hash_collection hashes(ROM_GETHASHDATA(rom));
-				if (dynamic_cast<driver_device *>(&device) &&!hashes.flag(util::hash_collection::FLAG_NO_DUMP))
-					merge_name = get_merge_name(hashes);
+				const char *const merge_name = (do_merge_name && !hashes.flag(util::hash_collection::FLAG_NO_DUMP)) ? get_merge_name(*drivlist, hashes) : nullptr;
 
 				// scan for a BIOS name
-				bios_name[0] = 0;
+				bios_name.clear();
 				if (!is_disk && is_bios)
 				{
 					// scan backwards through the ROM entries
 					for (const rom_entry *brom = rom - 1; brom != device.rom_region(); brom--)
+					{
 						if (ROMENTRY_ISSYSTEM_BIOS(brom))
 						{
-							strcpy(bios_name, ROM_GETNAME(brom));
+							bios_name = ROM_GETNAME(brom);
 							break;
 						}
+					}
 				}
 
 				std::ostringstream output;
@@ -592,12 +684,13 @@ void info_xml_creator::output_rom(device_t &device)
 					output << "\t\t<disk";
 
 				// add name, merge, bios, and size tags */
-				if (name != nullptr && name[0] != 0)
+				const char *const name = ROM_GETNAME(rom);
+				if (name && name[0])
 					util::stream_format(output, " name=\"%s\"", util::xml::normalize_string(name));
-				if (merge_name != nullptr)
+				if (merge_name)
 					util::stream_format(output, " merge=\"%s\"", util::xml::normalize_string(merge_name));
-				if (bios_name[0] != 0)
-					util::stream_format(output, " bios=\"%s\"", util::xml::normalize_string(bios_name));
+				if (!bios_name.empty())
+					util::stream_format(output, " bios=\"%s\"", util::xml::normalize_string(bios_name.c_str()));
 				if (!is_disk)
 					util::stream_format(output, " size=\"%u\"", rom_file_size(rom));
 
@@ -613,13 +706,14 @@ void info_xml_creator::output_rom(device_t &device)
 				// append a region name
 				util::stream_format(output, " region=\"%s\"", ROMREGION_GETTAG(region));
 
-				// for non-disk entries, print offset
 				if (!is_disk)
-					util::stream_format(output, " offset=\"%x\"", offset);
-
-				// for disk entries, add the disk index
+				{
+					// for non-disk entries, print offset
+					util::stream_format(output, " offset=\"%x\"", ROM_GETOFFSET(rom));
+				}
 				else
 				{
+					// for disk entries, add the disk index
 					util::stream_format(output, " index=\"%x\"", DISK_GETINDEX(rom));
 					util::stream_format(output, " writable=\"%s\"", DISK_ISREADONLY(rom) ? "no" : "yes");
 				}
@@ -1385,7 +1479,7 @@ void info_xml_creator::output_adjusters(const ioport_list &portlist)
 //  output_driver - print driver status
 //-------------------------------------------------
 
-void info_xml_creator::output_driver()
+void info_xml_creator::output_driver(game_driver const &driver)
 {
 	fprintf(m_output, "\t\t<driver");
 
@@ -1397,7 +1491,7 @@ void info_xml_creator::output_driver()
 	/* some minor issues, games marked as status=preliminary */
 	/* don't work or have major emulation problems. */
 
-	u32 const flags = m_drivlist.driver().flags;
+	u32 const flags = driver.flags;
 	if (flags & (MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_MECHANICAL))
 		fprintf(m_output, " status=\"preliminary\"");
 	else if (flags & (MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS))
@@ -1513,7 +1607,7 @@ void info_xml_creator::output_images(device_t &device, const char *root_tag)
 
 void info_xml_creator::output_slots(machine_config &config, device_t &device, const char *root_tag, device_type_set *devtypes)
 {
-	for (const device_slot_interface &slot : slot_interface_iterator(device))
+	for (device_slot_interface &slot : slot_interface_iterator(device))
 	{
 		// shall we list fixed slots as non-configurable?
 		bool const listed(!slot.fixed() && strcmp(slot.device().tag(), device.tag()));
@@ -1536,12 +1630,12 @@ void info_xml_creator::output_slots(machine_config &config, device_t &device, co
 			{
 				if (devtypes || (listed && option.second->selectable()))
 				{
-					device_t *const dev = config.device_add(&device, "_dummy", option.second->devtype(), 0);
+					device_t *const dev = config.device_add(&slot.device(), "_dummy", option.second->devtype(), 0);
 					if (!dev->configured())
 						dev->config_complete();
 
 					if (devtypes)
-						for (device_t &device : device_iterator(*dev)) devtypes->insert(&device.type());
+						for (device_t &subdevice : device_iterator(*dev)) devtypes->insert(&subdevice.type());
 
 					if (listed && option.second->selectable())
 					{
@@ -1553,7 +1647,7 @@ void info_xml_creator::output_slots(machine_config &config, device_t &device, co
 						fprintf(m_output, "/>\n");
 					}
 
-					config.device_remove(&device, "_dummy");
+					config.device_remove(&slot.device(), "_dummy");
 				}
 			}
 
@@ -1569,9 +1663,9 @@ void info_xml_creator::output_slots(machine_config &config, device_t &device, co
 //  for all known software lists for this system
 //-------------------------------------------------
 
-void info_xml_creator::output_software_list()
+void info_xml_creator::output_software_list(device_t &root)
 {
-	for (const software_list_device &swlist : software_list_device_iterator(m_drivlist.config()->root_device()))
+	for (const software_list_device &swlist : software_list_device_iterator(root))
 	{
 		fprintf(m_output, "\t\t<softwarelist name=\"%s\" ", swlist.list_name().c_str());
 		fprintf(m_output, "status=\"%s\" ", (swlist.list_type() == SOFTWARE_LIST_ORIGINAL_SYSTEM) ? "original" : "compatible");
@@ -1588,23 +1682,16 @@ void info_xml_creator::output_software_list()
 //  options for this system
 //-------------------------------------------------
 
-void info_xml_creator::output_ramoptions()
+void info_xml_creator::output_ramoptions(device_t &root)
 {
-	for (const ram_device &ram : ram_device_iterator(m_drivlist.config()->root_device()))
+	for (const ram_device &ram : ram_device_iterator(root))
 	{
-		fprintf(m_output, "\t\t<ramoption default=\"1\">%u</ramoption>\n", ram.default_size());
-
-		if (ram.extra_options() != nullptr)
+		for (uint32_t option : ram.extra_options())
 		{
-			std::string options(ram.extra_options());
-			for (int start = 0, end = options.find_first_of(',');; start = end + 1, end = options.find_first_of(',', start))
-			{
-				std::string option;
-				option.assign(options.substr(start, (end == -1) ? -1 : end - start));
-				fprintf(m_output, "\t\t<ramoption>%u</ramoption>\n", ram_device::parse_string(option.c_str()));
-				if (end == -1)
-					break;
-			}
+			if (option == ram.default_size())
+				fprintf(m_output, "\t\t<ramoption default=\"1\">%u</ramoption>\n", option);
+			else
+				fprintf(m_output, "\t\t<ramoption>%u</ramoption>\n", option);
 		}
 	}
 }
@@ -1615,14 +1702,14 @@ void info_xml_creator::output_ramoptions()
 //  parent set
 //-------------------------------------------------
 
-const char *info_xml_creator::get_merge_name(const util::hash_collection &romhashes)
+const char *info_xml_creator::get_merge_name(driver_enumerator &drivlist, util::hash_collection const &romhashes)
 {
 	// walk the parent chain
 	const char *merge_name = nullptr;
-	for (int clone_of = m_drivlist.find(m_drivlist.driver().parent); clone_of != -1; clone_of = m_drivlist.find(m_drivlist.driver(clone_of).parent))
+	for (int clone_of = drivlist.find(drivlist.driver().parent); clone_of != -1; clone_of = drivlist.find(drivlist.driver(clone_of).parent))
 	{
 		// look in the parent's ROMs
-		device_t *device = &m_drivlist.config(clone_of, m_lookup_options)->root_device();
+		device_t *device = &drivlist.config(clone_of, m_lookup_options)->root_device();
 		for (const rom_entry *pregion = rom_first_region(*device); pregion != nullptr; pregion = rom_next_region(pregion))
 			for (const rom_entry *prom = rom_first_file(pregion); prom != nullptr; prom = rom_next_file(prom))
 			{

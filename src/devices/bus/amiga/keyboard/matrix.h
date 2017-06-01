@@ -6,8 +6,8 @@
 
  ***************************************************************************/
 
-#ifndef DEVICES_BUS_AMIGA_KEYBOARD_MATRIX_H
-#define DEVICES_BUS_AMIGA_KEYBOARD_MATRIX_H
+#ifndef MAME_BUS_AMIGA_KEYBOARD_MATRIX_H
+#define MAME_BUS_AMIGA_KEYBOARD_MATRIX_H
 
 #pragma once
 
@@ -26,4 +26,4 @@ INPUT_PORTS_EXTERN(matrix_gb);
 
 } } } // namespace bus::amiga::keyboard
 
-#endif // DEVICES_BUS_AMIGA_KEYBOARD_MATRIX_H
+#endif // MAME_BUS_AMIGA_KEYBOARD_MATRIX_H

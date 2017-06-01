@@ -13,7 +13,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type NES_PACHINKO = device_creator<nes_pachinko_device>;
+DEFINE_DEVICE_TYPE(NES_PACHINKO, nes_pachinko_device, "nes_pachinko", "Famicom Pachinko Controller")
 
 
 static INPUT_PORTS_START( nes_pachinko )
@@ -49,10 +49,11 @@ ioport_constructor nes_pachinko_device::device_input_ports() const
 //-------------------------------------------------
 
 nes_pachinko_device::nes_pachinko_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-					device_t(mconfig, NES_PACHINKO, "Famicom Pachinko Controller", tag, owner, clock, "nes_pachinko", __FILE__),
-					device_nes_control_port_interface(mconfig, *this),
-					m_joypad(*this, "JOYPAD"),
-					m_trigger(*this, "TRIGGER"), m_latch(0)
+	device_t(mconfig, NES_PACHINKO, tag, owner, clock),
+	device_nes_control_port_interface(mconfig, *this),
+	m_joypad(*this, "JOYPAD"),
+	m_trigger(*this, "TRIGGER"),
+	m_latch(0)
 {
 }
 

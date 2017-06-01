@@ -17,10 +17,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_MCCS1850_H
+#define MAME_MACHINE_MCCS1850_H
 
-#ifndef __MCCS1850__
-#define __MCCS1850__
+#pragma once
 
 #include "dirtc.h"
 
@@ -55,9 +55,9 @@ public:
 	// construction/destruction
 	mccs1850_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_int_wr_callback(device_t &device, _Object object) { return downcast<mccs1850_device &>(device).int_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_pse_wr_callback(device_t &device, _Object object) { return downcast<mccs1850_device &>(device).pse_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_nuc_wr_callback(device_t &device, _Object object) { return downcast<mccs1850_device &>(device).nuc_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_int_wr_callback(device_t &device, Object &&cb) { return downcast<mccs1850_device &>(device).int_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_pse_wr_callback(device_t &device, Object &&cb) { return downcast<mccs1850_device &>(device).pse_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_nuc_wr_callback(device_t &device, Object &&cb) { return downcast<mccs1850_device &>(device).nuc_cb.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE_LINE_MEMBER( ce_w );
 	DECLARE_WRITE_LINE_MEMBER( sck_w );
@@ -116,8 +116,6 @@ private:
 
 
 // device type definition
-extern const device_type MCCS1850;
+DECLARE_DEVICE_TYPE(MCCS1850, mccs1850_device)
 
-
-
-#endif
+#endif // MAME_MACHINE_MCCS1850_H

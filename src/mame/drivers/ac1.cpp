@@ -126,7 +126,7 @@ static INPUT_PORTS_START( ac1 )
 INPUT_PORTS_END
 
 /* Machine driver */
-static MACHINE_CONFIG_START( ac1, ac1_state )
+static MACHINE_CONFIG_START( ac1 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(ac1_mem)
@@ -216,7 +216,7 @@ ROM_START( ac1scch )
 ROM_END
 
 /* Driver */
-/*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT   INIT  COMPANY                 FULLNAME   FLAGS */
-COMP( 1984, ac1,     0,      0,     ac1,    ac1, ac1_state, ac1,  "Frank Heyder", "Amateurcomputer AC1 Berlin", 0 )
-COMP( 1984, ac1_32,  ac1,    0,     ac1_32, ac1, ac1_state, ac1,  "Frank Heyder", "Amateurcomputer AC1 Berlin (32 lines)", 0 )
-COMP( 1984, ac1scch, ac1,    0,     ac1_32, ac1, ac1_state, ac1,  "Frank Heyder", "Amateurcomputer AC1 SCCH", 0 )
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  STATE      INIT  COMPANY         FULLNAME   FLAGS */
+COMP( 1984, ac1,     0,      0,      ac1,     ac1,   ac1_state, ac1,  "Frank Heyder", "Amateurcomputer AC1 Berlin", 0 )
+COMP( 1984, ac1_32,  ac1,    0,      ac1_32,  ac1,   ac1_state, ac1,  "Frank Heyder", "Amateurcomputer AC1 Berlin (32 lines)", 0 )
+COMP( 1984, ac1scch, ac1,    0,      ac1_32,  ac1,   ac1_state, ac1,  "Frank Heyder", "Amateurcomputer AC1 SCCH", 0 )

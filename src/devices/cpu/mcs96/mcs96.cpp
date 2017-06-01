@@ -12,9 +12,10 @@
 #include "debugger.h"
 #include "mcs96.h"
 
-mcs96_device::mcs96_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, int data_width, const char *shortname, const char *source) :
-	cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
-	program_config("program", ENDIANNESS_LITTLE, data_width, 16), program(nullptr), direct(nullptr), icount(0), bcount(0), inst_state(0), cycles_scaling(0), pending_irq(0),
+mcs96_device::mcs96_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int data_width) :
+	cpu_device(mconfig, type, tag, owner, clock),
+	program_config("program", ENDIANNESS_LITTLE, data_width, 16),
+	program(nullptr), direct(nullptr), icount(0), bcount(0), inst_state(0), cycles_scaling(0), pending_irq(0),
 	PC(0), PPC(0), PSW(0), OP1(0), OP2(0), OP3(0), OPI(0), TMP(0), irq_requested(false)
 {
 }

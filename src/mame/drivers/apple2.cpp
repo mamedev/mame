@@ -1316,7 +1316,7 @@ static SLOT_INTERFACE_START(apple2_cards)
 //  SLOT_INTERFACE("magicmusician", A2BUS_MAGICMUSICIAN)    /* Magic Musician Card */
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( apple2_common, napple2_state )
+static MACHINE_CONFIG_START( apple2_common )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(A2_CPU_TAG, M6502, 1021800)     /* close to actual CPU frequency of 1.020484 MHz */
 	MCFG_CPU_PROGRAM_MAP(apple2_map)
@@ -1495,6 +1495,17 @@ ROM_START(prav8m)
 	ROM_LOAD ( "pravetz8m.f8", 0x3800, 0x0800, CRC(5bab0a46) SHA1(f6c0817ce37d2e2c43f482c339acaede0a73359b))
 ROM_END
 
+ROM_START(craft2p)
+	ROM_REGION(0x1000,"gfx1",0)
+	ROM_LOAD( "gc.bin",       0x000000, 0x001000, CRC(93e4a754) SHA1(25f5f5fd1cbd763d43362e80de3acc5b34a25963) )
+
+	ROM_REGION(0x4000,"maincpu",0)
+	// the d0 and e0 ROMs match the Unitron English ones, only f0 differs
+	ROM_LOAD ( "unitron_en.d0", 0x1000, 0x1000, CRC(24d73c7b) SHA1(d17a15868dc875c67061c95ec53a6b2699d3a425))
+	ROM_LOAD ( "unitron.e0"   , 0x2000, 0x1000, CRC(0d494efd) SHA1(a2fd1223a3ca0cfee24a6afe66ea3c4c144dd98e))
+	ROM_LOAD ( "craftii-roms-f0-f7.bin", 0x3000, 0x1000, CRC(3f9dea08) SHA1(0e23bc884b8108675267d30b85b770066bdd94c9) )
+ROM_END
+
 ROM_START(uniap2pt)
 	ROM_REGION(0x1000,"gfx1",0)
 	ROM_LOAD ( "unitron.chr", 0x0000, 0x1000, CRC(7fdd1af6) SHA1(2f4f90d90f2f3a8c1fbea304e1072780fb22e698))
@@ -1642,21 +1653,22 @@ ROM_START(laba2p) /* II Plus clone with on-board Disk II controller and Videx-co
 ROM_END
 #endif
 
-/*    YEAR  NAME      PARENT    COMPAT    MACHINE      INPUT     INIT      COMPANY            FULLNAME */
-COMP( 1977, apple2,   0,        0,        apple2,      apple2,  driver_device,  0,        "Apple Computer",    "Apple ][", MACHINE_SUPPORTS_SAVE )
-COMP( 1979, apple2p,  apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Apple Computer",    "Apple ][+", MACHINE_SUPPORTS_SAVE )
-COMP( 1980, apple2jp, apple2,   0,        apple2jp,    apple2p, driver_device,  0,        "Apple Computer",    "Apple ][ J-Plus", MACHINE_SUPPORTS_SAVE )
-COMP( 198?, elppa,    apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Victor do Brasil",  "Elppa II+", MACHINE_SUPPORTS_SAVE )
-COMP( 1982, microeng, apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Spectrum Eletronica (SCOPUS)", "Micro Engenho", MACHINE_SUPPORTS_SAVE )
-COMP( 1982, maxxi,    apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Polymax",  "Maxxi", MACHINE_SUPPORTS_SAVE )
-COMP( 1982, prav82,   apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Pravetz",           "Pravetz 82", MACHINE_SUPPORTS_SAVE )
-COMP( 1982, ace100,   apple2,   0,        apple2,      apple2p, driver_device,  0,        "Franklin Computer", "Franklin Ace 100", MACHINE_SUPPORTS_SAVE )
-COMP( 1982, uniap2en, apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Unitron Eletronica", "Unitron AP II (in English)", MACHINE_SUPPORTS_SAVE )
-COMP( 1982, uniap2pt, apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Unitron Eletronica", "Unitron AP II (in Brazilian Portuguese)", MACHINE_SUPPORTS_SAVE )
-COMP( 1984, uniap2ti, apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Unitron Eletronica", "Unitron AP II+ (Teclado Inteligente)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT    COMPAT    MACHINE      INPUT    STATE           INIT      COMPANY                FULLNAME
+COMP( 1977, apple2,   0,        0,        apple2,      apple2,  napple2_state,  0,        "Apple Computer",      "Apple ][", MACHINE_SUPPORTS_SAVE )
+COMP( 1979, apple2p,  apple2,   0,        apple2p,     apple2p, napple2_state,  0,        "Apple Computer",      "Apple ][+", MACHINE_SUPPORTS_SAVE )
+COMP( 1980, apple2jp, apple2,   0,        apple2jp,    apple2p, napple2_state,  0,        "Apple Computer",      "Apple ][ J-Plus", MACHINE_SUPPORTS_SAVE )
+COMP( 198?, elppa,    apple2,   0,        apple2p,     apple2p, napple2_state,  0,        "Victor do Brasil",    "Elppa II+", MACHINE_SUPPORTS_SAVE )
+COMP( 1982, microeng, apple2,   0,        apple2p,     apple2p, napple2_state,  0,        "Spectrum Eletronica (SCOPUS)", "Micro Engenho", MACHINE_SUPPORTS_SAVE )
+COMP( 1982, maxxi,    apple2,   0,        apple2p,     apple2p, napple2_state,  0,        "Polymax",             "Maxxi", MACHINE_SUPPORTS_SAVE )
+COMP( 1982, prav82,   apple2,   0,        apple2p,     apple2p, napple2_state,  0,        "Pravetz",             "Pravetz 82", MACHINE_SUPPORTS_SAVE )
+COMP( 1982, ace100,   apple2,   0,        apple2,      apple2p, napple2_state,  0,        "Franklin Computer",   "Franklin Ace 100", MACHINE_SUPPORTS_SAVE )
+COMP( 1982, uniap2en, apple2,   0,        apple2p,     apple2p, napple2_state,  0,        "Unitron Eletronica",  "Unitron AP II (in English)", MACHINE_SUPPORTS_SAVE )
+COMP( 1982, uniap2pt, apple2,   0,        apple2p,     apple2p, napple2_state,  0,        "Unitron Eletronica",  "Unitron AP II (in Brazilian Portuguese)", MACHINE_SUPPORTS_SAVE )
+COMP( 1984, uniap2ti, apple2,   0,        apple2p,     apple2p, napple2_state,  0,        "Unitron Eletronica",  "Unitron AP II+ (Teclado Inteligente)", MACHINE_SUPPORTS_SAVE )
+COMP( 1982, craft2p,  apple2,   0,        apple2p,     apple2p, napple2_state,  0,        "Craft",               "Craft II+", MACHINE_SUPPORTS_SAVE )
 // reverse font direction -\/
-COMP( 1984, ivelultr, apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Ivasim",            "Ivel Ultra", MACHINE_SUPPORTS_SAVE )
-COMP( 1985, prav8m,   apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Pravetz",           "Pravetz 8M", MACHINE_SUPPORTS_SAVE )
-COMP( 1985, space84,  apple2,   0,        space84,     apple2p, driver_device,  0,        "ComputerTechnik/IBS",  "Space 84",   MACHINE_NOT_WORKING )
-COMP( 1985, am64,     apple2,   0,        space84,     apple2p, driver_device,  0,        "ASEM",              "AM 64", MACHINE_SUPPORTS_SAVE )
-//COMP( 19??, laba2p,   apple2,   0,        laba2p,      apple2p, driver_device,  0,        "<unknown>",         "Lab equipment Apple II Plus clone", MACHINE_SUPPORTS_SAVE )
+COMP( 1984, ivelultr, apple2,   0,        apple2p,     apple2p, napple2_state,  0,        "Ivasim",              "Ivel Ultra", MACHINE_SUPPORTS_SAVE )
+COMP( 1985, prav8m,   apple2,   0,        apple2p,     apple2p, napple2_state,  0,        "Pravetz",             "Pravetz 8M", MACHINE_SUPPORTS_SAVE )
+COMP( 1985, space84,  apple2,   0,        space84,     apple2p, napple2_state,  0,        "ComputerTechnik/IBS", "Space 84",   MACHINE_NOT_WORKING )
+COMP( 1985, am64,     apple2,   0,        space84,     apple2p, napple2_state,  0,        "ASEM",                "AM 64", MACHINE_SUPPORTS_SAVE )
+//COMP( 19??, laba2p,   apple2,   0,        laba2p,      apple2p, napple2_state,  0,        "<unknown>",           "Lab equipment Apple II Plus clone", MACHINE_SUPPORTS_SAVE )

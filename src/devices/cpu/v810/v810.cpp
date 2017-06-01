@@ -28,18 +28,18 @@
 ******************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "v810.h"
+#include "debugger.h"
 
 #define clkIF 3
 #define clkMEM 3
 
 
-const device_type V810 = device_creator<v810_device>;
+DEFINE_DEVICE_TYPE(V810, v810_device, "v810", "V810")
 
 
 v810_device::v810_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, V810, "V810", tag, owner, clock, "v810", __FILE__)
+	: cpu_device(mconfig, V810, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, 32, 32, 0)
 {

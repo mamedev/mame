@@ -33,7 +33,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type NAMCOIO_GEARBOX = device_creator<namcoio_gearbox_device>;
+DEFINE_DEVICE_TYPE(NAMCOIO_GEARBOX, namcoio_gearbox_device, "namcoio_gearbox", "Namco I/O Gearbox")
 
 
 //**************************************************************************
@@ -45,7 +45,7 @@ const device_type NAMCOIO_GEARBOX = device_creator<namcoio_gearbox_device>;
 //-------------------------------------------------
 
 namcoio_gearbox_device::namcoio_gearbox_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, NAMCOIO_GEARBOX, "Namco I/O Gearbox", tag, owner, clock, "namcoio_gearbox", __FILE__)
+	: device_t(mconfig, NAMCOIO_GEARBOX, tag, owner, clock)
 {
 }
 

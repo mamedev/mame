@@ -39,8 +39,8 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type FD2000 = device_creator<fd2000_device>;
-const device_type FD4000 = device_creator<fd4000_device>;
+DEFINE_DEVICE_TYPE(FD2000, fd2000_device, "fd2000", "FD-2000")
+DEFINE_DEVICE_TYPE(FD4000, fd4000_device, "fd4000", "FD-4000")
 
 
 //-------------------------------------------------
@@ -213,7 +213,7 @@ FLOPPY_FORMATS_END
 //  MACHINE_DRIVER( fd2000 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( fd2000 )
+static MACHINE_CONFIG_START( fd2000 )
 	MCFG_CPU_ADD(G65SC02PI2_TAG, M65C02, XTAL_24MHz/12)
 	MCFG_CPU_PROGRAM_MAP(fd2000_mem)
 
@@ -233,7 +233,7 @@ MACHINE_CONFIG_END
 //  MACHINE_DRIVER( fd4000 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( fd4000 )
+static MACHINE_CONFIG_START( fd4000 )
 	MCFG_CPU_ADD(R65C02P4_TAG, M65C02, XTAL_24MHz/6)
 	MCFG_CPU_PROGRAM_MAP(fd4000_mem)
 
@@ -276,22 +276,17 @@ machine_config_constructor fd2000_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 fd2000_device::fd2000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, FD2000, "FD-2000", tag, owner, clock, "fd2000", __FILE__),
-		device_cbm_iec_interface(mconfig, *this),
-		m_maincpu(*this, G65SC02PI2_TAG),
-		m_fdc(*this, DP8473V_TAG),
-		m_floppy0(*this, DP8473V_TAG":0"),
-		m_variant(TYPE_FD2000)
+	: fd2000_device(mconfig, FD2000, tag, owner, clock, TYPE_FD2000)
 {
 }
 
-fd2000_device::fd2000_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, uint32_t variant, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_cbm_iec_interface(mconfig, *this),
-		m_maincpu(*this, R65C02P4_TAG),
-		m_fdc(*this, PC8477AV1_TAG),
-		m_floppy0(*this, PC8477AV1_TAG":0"),
-		m_variant(variant)
+fd2000_device::fd2000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_cbm_iec_interface(mconfig, *this)
+	, m_maincpu(*this, R65C02P4_TAG)
+	, m_fdc(*this, PC8477AV1_TAG)
+	, m_floppy0(*this, PC8477AV1_TAG":0")
+	, m_variant(variant)
 {
 }
 
@@ -301,7 +296,9 @@ fd2000_device::fd2000_device(const machine_config &mconfig, device_type type, co
 //-------------------------------------------------
 
 fd4000_device::fd4000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: fd2000_device(mconfig, FD4000, "FD-4000", tag, owner, clock, TYPE_FD4000, "fd4000", __FILE__ ) { }
+	: fd2000_device(mconfig, FD4000, tag, owner, clock, TYPE_FD4000)
+{
+}
 
 
 //-------------------------------------------------

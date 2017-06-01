@@ -6,10 +6,10 @@
 
 *********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_PC_KBD_PC83_H
+#define MAME_BUS_PC_KBD_PC83_H
 
-#ifndef __PC_KBD_IBM_PC_83__
-#define __PC_KBD_IBM_PC_83__
+#pragma once
 
 #include "cpu/mcs48/mcs48.h"
 #include "pc_kbdc.h"
@@ -38,7 +38,7 @@ public:
 	DECLARE_WRITE8_MEMBER( bus_w );
 	DECLARE_READ8_MEMBER( p1_r );
 	DECLARE_WRITE8_MEMBER( p2_w );
-	DECLARE_READ8_MEMBER( t1_r );
+	DECLARE_READ_LINE_MEMBER( t0_r );
 
 protected:
 	// device-level overrides
@@ -58,8 +58,7 @@ private:
 
 
 // device type definition
-extern const device_type PC_KBD_IBM_PC_83;
+DECLARE_DEVICE_TYPE(PC_KBD_IBM_PC_83, ibm_pc_83_keyboard_device)
 
 
-
-#endif
+#endif // MAME_BUS_PC_KBD_PC83_H

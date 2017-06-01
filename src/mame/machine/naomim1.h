@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#ifndef _NAOMIM1_H_
-#define _NAOMIM1_H_
+#ifndef MAME_MACHINE_NAOMIM1_H
+#define MAME_MACHINE_NAOMIM1_H
+
+#pragma once
 
 #include "naomibd.h"
 
@@ -51,6 +53,6 @@ private:
 	void wb(uint8_t byte);
 };
 
-extern const device_type NAOMI_M1_BOARD;
+DECLARE_DEVICE_TYPE(NAOMI_M1_BOARD, naomi_m1_board)
 
-#endif
+#endif // MAME_MACHINE_NAOMIM1_H

@@ -389,7 +389,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_CONFIG_START( mainsnk, mainsnk_state )
+static MACHINE_CONFIG_START( mainsnk )
 
 	MCFG_CPU_ADD("maincpu", Z80, 3360000)
 	MCFG_CPU_PROGRAM_MAP(main_map)
@@ -491,5 +491,5 @@ ROM_START( canvas )
 ROM_END
 
 
-GAME( 1984, mainsnk,   0,   mainsnk, mainsnk, driver_device, 0,   ROT0, "SNK", "Main Event (1984)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, canvas,    0,   mainsnk, canvas, driver_device,  0,   ROT0, "SNK", "Canvas Croquis", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, mainsnk,   0,   mainsnk, mainsnk, mainsnk_state, 0,   ROT0, "SNK", "Main Event (1984)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, canvas,    0,   mainsnk, canvas,  mainsnk_state, 0,   ROT0, "SNK", "Canvas Croquis", MACHINE_SUPPORTS_SAVE )

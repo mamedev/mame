@@ -209,7 +209,7 @@ void dietgo_state::machine_start()
 {
 }
 
-static MACHINE_CONFIG_START( dietgo, dietgo_state )
+static MACHINE_CONFIG_START( dietgo )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_28MHz/2) /* DE102 (verified on pcb) */
@@ -268,7 +268,7 @@ static MACHINE_CONFIG_START( dietgo, dietgo_state )
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1)) /* IRQ 2 */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_32_22MHz/32, OKIM6295_PIN7_HIGH) /* verified on pcb */
+	MCFG_OKIM6295_ADD("oki", XTAL_32_22MHz/32, PIN7_HIGH) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 

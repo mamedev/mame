@@ -2,7 +2,7 @@
 // copyright-holders:Nathan Woods
 /***************************************************************************
 
-    6883sam.c
+    6883sam.cpp
 
     Motorola 6883 Synchronous Address Multiplexer
 
@@ -59,7 +59,7 @@
 
 #define LOG_SAM     0
 
-const device_type SAM6883 = device_creator<sam6883_device>;
+DEFINE_DEVICE_TYPE(SAM6883, sam6883_device, "sam6883", "MC6883 SAM")
 
 
 
@@ -72,7 +72,7 @@ const device_type SAM6883 = device_creator<sam6883_device>;
 //-------------------------------------------------
 
 sam6883_device::sam6883_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SAM6883, "SAM6883", tag, owner, clock, "sam6883", __FILE__),
+	: device_t(mconfig, SAM6883, tag, owner, clock),
 		m_cpu_tag(nullptr),
 		m_cpu_space_ref(AS_PROGRAM),
 		m_read_res(*this),
@@ -330,7 +330,7 @@ void sam6883_friend_device::update_cpu_clock(void)
 	int speed = (m_sam_state & (SAM_STATE_R1|SAM_STATE_R0)) / SAM_STATE_R0;
 
 	// the line below is weird because we are not strictly emulating the M6809E with emphasis on the 'E'
-	m_cpu->set_clock_scale(speed ? 2 : 1);
+	m_cpu->owner()->set_clock_scale(speed ? 2 : 1);
 }
 
 

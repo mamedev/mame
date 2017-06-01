@@ -2,16 +2,18 @@
 // copyright-holders:Sergey Svishchev
 /***************************************************************************
 
-	15IE-00-013 Terminal
+    15IE-00-013 Terminal
 
-	A serial (RS232 or current loop) green-screen terminal, mostly VT52
-	compatible (no Hold Screen mode and no graphics character set).
+    A serial (RS232 or current loop) green-screen terminal, mostly VT52
+    compatible (no Hold Screen mode and no graphics character set).
 
-	Alternate character set (selected by SO/SI chars) is Cyrillic.
+    Alternate character set (selected by SO/SI chars) is Cyrillic.
 
 ****************************************************************************/
 
+#include "emu.h"
 #include "machine/ie15.h"
+
 #include "ie15.lh"
 
 
@@ -28,8 +30,8 @@
 	} while (0)
 
 
-ie15_device::ie15_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+ie15_device::ie15_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, device_serial_interface(mconfig, *this)
 	, m_maincpu(*this, "maincpu")
 	, m_p_videoram(*this, "video")
@@ -43,7 +45,7 @@ ie15_device::ie15_device(const machine_config &mconfig, device_type type, const 
 }
 
 ie15_device::ie15_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ie15_device(mconfig, IE15, "IE15", tag, owner, clock, "ie15_device", __FILE__)
+	: ie15_device(mconfig, IE15, tag, owner, clock)
 {
 }
 
@@ -168,38 +170,38 @@ READ8_MEMBER(ie15_device::kb_ready_r)
 WRITE8_MEMBER(ie15_device::kb_ready_w)
 {
 	DBG_LOG(2, "keyboard", ("clear ready\n"));
-	m_kb_flag = IE_TRUE | IE_KB_ACK;
+	m_kb_flag = IE_TRUE | ie15_keyboard_device::IE_KB_ACK;
 }
 
 
 // active high; active = interpret controls, inactive = display controls
 READ8_MEMBER(ie15_device::kb_s_red_r)
 {
-	return m_io_keyboard->read() & IE_KB_RED ? IE_TRUE : 0;
+	return m_io_keyboard->read() & ie15_keyboard_device::IE_KB_RED ? IE_TRUE : 0;
 }
 
 // active high; active = setup mode
 READ8_MEMBER(ie15_device::kb_s_sdv_r)
 {
-	return m_kb_control & IE_KB_SDV ? IE_TRUE : 0;
+	return m_kb_control & ie15_keyboard_device::IE_KB_SDV ? IE_TRUE : 0;
 }
 
 // active high; active = keypress detected on aux keypad
 READ8_MEMBER(ie15_device::kb_s_dk_r)
 {
-	return m_kb_control & IE_KB_DK ? IE_TRUE : 0;
+	return m_kb_control & ie15_keyboard_device::IE_KB_DK ? IE_TRUE : 0;
 }
 
 // active low; active = full duplex, inactive = half duplex
 READ8_MEMBER(ie15_device::kb_s_dupl_r)
 {
-	return m_io_keyboard->read() & IE_KB_DUP ? IE_TRUE : 0;
+	return m_io_keyboard->read() & ie15_keyboard_device::IE_KB_DUP ? IE_TRUE : 0;
 }
 
 // active high; active = on-line, inactive = local editing
 READ8_MEMBER(ie15_device::kb_s_lin_r)
 {
-	return m_io_keyboard->read() & IE_KB_LIN ? IE_TRUE : 0;
+	return m_io_keyboard->read() & ie15_keyboard_device::IE_KB_LIN ? IE_TRUE : 0;
 }
 
 /* serial port */
@@ -362,15 +364,15 @@ ADDRESS_MAP_END
 /* Input ports */
 INPUT_PORTS_START( ie15 )
 	PORT_START("io_keyboard")
-	PORT_DIPNAME(IE_KB_RED, IE_KB_RED, "RED (Interpret controls)")
+	PORT_DIPNAME(ie15_keyboard_device::IE_KB_RED, ie15_keyboard_device::IE_KB_RED, "RED (Interpret controls)")
 	PORT_DIPSETTING(0x00, "Off")
-	PORT_DIPSETTING(IE_KB_RED, "On")
-	PORT_DIPNAME(IE_KB_DUP, IE_KB_DUP, "DUP (Full duplex)")
+	PORT_DIPSETTING(ie15_keyboard_device::IE_KB_RED, "On")
+	PORT_DIPNAME(ie15_keyboard_device::IE_KB_DUP, ie15_keyboard_device::IE_KB_DUP, "DUP (Full duplex)")
 	PORT_DIPSETTING(0x00, "Off")
-	PORT_DIPSETTING(IE_KB_DUP, "On")
-	PORT_DIPNAME(IE_KB_LIN, IE_KB_LIN, "LIN (Online)")
+	PORT_DIPSETTING(ie15_keyboard_device::IE_KB_DUP, "On")
+	PORT_DIPNAME(ie15_keyboard_device::IE_KB_LIN, ie15_keyboard_device::IE_KB_LIN, "LIN (Online)")
 	PORT_DIPSETTING(0x00, "Off")
-	PORT_DIPSETTING(IE_KB_LIN, "On")
+	PORT_DIPSETTING(ie15_keyboard_device::IE_KB_LIN, "On")
 INPUT_PORTS_END
 
 WRITE16_MEMBER( ie15_device::kbd_put )
@@ -416,32 +418,32 @@ void ie15_device::device_reset()
 }
 
 /*
-	Usable raster is 800 x 275 pixels (80 x 25 characters).  24 lines are
-	available to the user and 25th (topmost) line is the status line.
-	Status line, if enabled, displays current serial port speed, 16 setup
-	bits, and clock.  There is no NVRAM, so setup bits are always 0 after
-	reset and clock starts counting at 0 XXX.
+    Usable raster is 800 x 275 pixels (80 x 25 characters).  24 lines are
+    available to the user and 25th (topmost) line is the status line.
+    Status line, if enabled, displays current serial port speed, 16 setup
+    bits, and clock.  There is no NVRAM, so setup bits are always 0 after
+    reset and clock starts counting at 0 XXX.
 
-	No character attributes are available, but in 'display controls' mode
-	control characters stored in memory are shown as blinking chars.
+    No character attributes are available, but in 'display controls' mode
+    control characters stored in memory are shown as blinking chars.
 
-	Character cell is 10 x 11; character generator provides 7 x 8 of that.
-	3 extra horizontal pixels are always blank.  Blinking cursor may be
-	displayed on 3 extra scan lines.
+    Character cell is 10 x 11; character generator provides 7 x 8 of that.
+    3 extra horizontal pixels are always blank.  Blinking cursor may be
+    displayed on 3 extra scan lines.
 
-	On each scan line, video board draws 80 characters from any location
-	in video memory; this is used by firmware to provide instant scroll
-	and cursor, which is a character with code 0x7F stored in off-screen
-	memory.
+    On each scan line, video board draws 80 characters from any location
+    in video memory; this is used by firmware to provide instant scroll
+    and cursor, which is a character with code 0x7F stored in off-screen
+    memory.
 
-	Video board output is controlled by
-	- control flag 0 "disable video": 0 == disable
-	- control flag 1 "cursor": 0 == if this scan line is one of extra 3,
-	  enable video every 5 frames.
-	- control flag 3 "status line": 0 == current scan line is part of status line
-	- keyboard mode 'RED' ('display controls'): if character code is
-	  less than 0x20 and RED is set, enable video every 5 frames; if RED is
-	  unset, disable video.
+    Video board output is controlled by
+    - control flag 0 "disable video": 0 == disable
+    - control flag 1 "cursor": 0 == if this scan line is one of extra 3,
+      enable video every 5 frames.
+    - control flag 3 "status line": 0 == current scan line is part of status line
+    - keyboard mode 'RED' ('display controls'): if character code is
+      less than 0x20 and RED is set, enable video every 5 frames; if RED is
+      unset, disable video.
 */
 
 void ie15_device::draw_scanline(uint32_t *p, uint16_t offset, uint8_t scanline)
@@ -451,7 +453,7 @@ void ie15_device::draw_scanline(uint32_t *p, uint16_t offset, uint8_t scanline)
 	uint8_t ra = scanline % 8;
 	uint32_t ra_high = 0x200 | ra;
 	bool blink((m_screen->frame_number() % 10) > 4);
-	bool red(m_io_keyboard->read() & IE_KB_RED);
+	bool red(m_io_keyboard->read() & ie15_keyboard_device::IE_KB_RED);
 	bool blink_red_line25 = blink && red && m_video.line25;
 	bool cursor_blank = scanline > 7 && (!m_video.cursor || blink);
 
@@ -496,19 +498,19 @@ void ie15_device::update_leds()
 	uint8_t data = m_io_keyboard->read();
 
 	machine().output().set_value("lat_led", m_kb_ruslat ^ 1);
-	machine().output().set_value("nr_led", BIT(m_kb_control, IE_KB_NR_BIT) ^ 1);
-	machine().output().set_value("pch_led", BIT(data, IE_KB_PCH_BIT) ^ 1);
-	machine().output().set_value("dup_led", BIT(data, IE_KB_DUP_BIT) ^ 1);
-	machine().output().set_value("lin_led", BIT(data, IE_KB_LIN_BIT) ^ 1);
-	machine().output().set_value("red_led", BIT(data, IE_KB_RED_BIT) ^ 1);
-	machine().output().set_value("sdv_led", BIT(m_kb_control, IE_KB_SDV_BIT) ^ 1);
+	machine().output().set_value("nr_led", BIT(m_kb_control, ie15_keyboard_device::IE_KB_NR_BIT) ^ 1);
+	machine().output().set_value("pch_led", BIT(data, ie15_keyboard_device::IE_KB_PCH_BIT) ^ 1);
+	machine().output().set_value("dup_led", BIT(data, ie15_keyboard_device::IE_KB_DUP_BIT) ^ 1);
+	machine().output().set_value("lin_led", BIT(data, ie15_keyboard_device::IE_KB_LIN_BIT) ^ 1);
+	machine().output().set_value("red_led", BIT(data, ie15_keyboard_device::IE_KB_RED_BIT) ^ 1);
+	machine().output().set_value("sdv_led", BIT(m_kb_control, ie15_keyboard_device::IE_KB_SDV_BIT) ^ 1);
 	machine().output().set_value("prd_led", 1); // XXX
 }
 
 /*
-	VBlank is active for 3 topmost on-screen rows and 1 at the bottom; however, control flag 3
+    VBlank is active for 3 topmost on-screen rows and 1 at the bottom; however, control flag 3
    overrides VBlank,
-	allowing status line to be switched on and off.
+    allowing status line to be switched on and off.
 */
 void ie15_device::scanline_callback()
 {
@@ -564,7 +566,7 @@ static GFXDECODE_START( ie15 )
 	GFXDECODE_ENTRY("chargen", 0x0000, ie15_charlayout, 0, 1)
 GFXDECODE_END
 
-static MACHINE_CONFIG_FRAGMENT( ie15core )
+static MACHINE_CONFIG_START( ie15core )
 	/* Basic machine hardware */
 	MCFG_CPU_ADD("maincpu", IE15_CPU, XTAL_30_8MHz/10)
 	MCFG_CPU_PROGRAM_MAP(ie15_mem)
@@ -584,7 +586,7 @@ static MACHINE_CONFIG_FRAGMENT( ie15core )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( ie15 )
+static MACHINE_CONFIG_START( ie15 )
 	MCFG_FRAGMENT_ADD(ie15core)
 
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
@@ -628,4 +630,4 @@ const tiny_rom_entry *ie15_device::device_rom_region() const
 	return ROM_NAME(ie15);
 }
 
-const device_type IE15 = device_creator<ie15_device>;
+DEFINE_DEVICE_TYPE(IE15, ie15_device, "ie15_device", "IE15")

@@ -862,58 +862,44 @@ void k1ge_device::device_reset()
 }
 
 
-const device_type K1GE = device_creator<k1ge_device>;
+DEFINE_DEVICE_TYPE(K1GE, k1ge_device, "k1ge", "K1GE Monochrome Graphics + LCD")
 
 k1ge_device::k1ge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, K1GE, "K1GE Monochrome Graphics + LCD", tag, owner, clock, "k1ge", __FILE__)
+	: k1ge_device(mconfig, K1GE, tag, owner, clock)
+{
+}
+
+k1ge_device::k1ge_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, m_vblank_pin_w(*this)
 	, m_hblank_pin_w(*this)
 {
 }
 
-k1ge_device::k1ge_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
-	, device_video_interface(mconfig, *this)
-	, m_vblank_pin_w(*this)
-	, m_hblank_pin_w(*this)
-{
-}
 
-static MACHINE_CONFIG_FRAGMENT( k1ge )
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( k1ge_device::device_add_mconfig )
 	MCFG_PALETTE_ADD("palette", 8 )
 	MCFG_PALETTE_INIT_OWNER(k1ge_device, k1ge)
 MACHINE_CONFIG_END
 
-//-------------------------------------------------
-//  machine_config_additions - return a pointer to
-//  the device's machine fragment
-//-------------------------------------------------
 
-machine_config_constructor k1ge_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( k1ge );
-}
-
-
-const device_type K2GE = device_creator<k2ge_device>;
+DEFINE_DEVICE_TYPE(K2GE, k2ge_device, "k2ge", "K2GE Color Graphics + LCD")
 
 k2ge_device::k2ge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: k1ge_device(mconfig, K2GE, "K2GE Color Graphics + LCD", tag, owner, clock, "k2ge", __FILE__)
+	: k1ge_device(mconfig, K2GE, tag, owner, clock)
 {
 }
 
-static MACHINE_CONFIG_FRAGMENT( k2ge )
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( k2ge_device::device_add_mconfig )
 	MCFG_PALETTE_ADD("palette", 4096 )
 	MCFG_PALETTE_INIT_OWNER(k2ge_device, k2ge)
 MACHINE_CONFIG_END
-
-//-------------------------------------------------
-//  machine_config_additions - return a pointer to
-//  the device's machine fragment
-//-------------------------------------------------
-
-machine_config_constructor k2ge_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( k2ge );
-}

@@ -8,8 +8,8 @@
 
 *********************************************************************/
 
-#ifndef __MIDIOUT_H__
-#define __MIDIOUT_H__
+#ifndef MAME_DEVICES_IMAGEDEV_MIDIOUT_H
+#define MAME_DEVICES_IMAGEDEV_MIDIOUT_H
 
 
 /***************************************************************************
@@ -63,9 +63,9 @@ private:
 };
 
 // device type definition
-extern const device_type MIDIOUT;
+DECLARE_DEVICE_TYPE(MIDIOUT, midiout_device)
 
 // device iterator
 typedef device_type_iterator<midiout_device> midiout_device_iterator;
 
-#endif /* __MIDIOUT_H__ */
+#endif // MAME_DEVICES_IMAGEDEV_MIDIOUT_H

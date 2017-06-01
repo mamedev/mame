@@ -201,7 +201,7 @@ READ32_MEMBER(juicebox_state::s3c44b0_gpio_port_r)
 		}
 		break;
 	}
-//  data = ((rand() & 0xFF) << 24) | ((rand() & 0xFF) << 16) | ((rand() & 0xFF) << 8) | ((rand() & 0xFF) << 0);
+//  data = ((machine().rand() & 0xFF) << 24) | ((machine().rand() & 0xFF) << 16) | ((machine().rand() & 0xFF) << 8) | ((machine().rand() & 0xFF) << 0);
 	return data;
 }
 
@@ -301,7 +301,7 @@ DRIVER_INIT_MEMBER(juicebox_state,juicebox)
 	// do nothing
 }
 
-static MACHINE_CONFIG_START( juicebox, juicebox_state )
+static MACHINE_CONFIG_START( juicebox )
 	MCFG_CPU_ADD("maincpu", ARM7, 66000000)
 	MCFG_CPU_PROGRAM_MAP(juicebox_map)
 

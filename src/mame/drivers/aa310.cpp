@@ -89,6 +89,7 @@
 #include "cpu/arm/arm.h"
 #include "formats/acorn_dsk.h"
 #include "formats/apd_dsk.h"
+#include "formats/jfd_dsk.h"
 #include "machine/i2cmem.h"
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
@@ -355,7 +356,8 @@ INPUT_PORTS_END
 FLOPPY_FORMATS_MEMBER( aa310_state::floppy_formats )
 	FLOPPY_ACORN_ADFS_NEW_FORMAT,
 	FLOPPY_ACORN_ADFS_OLD_FORMAT,
-	FLOPPY_APD_FORMAT
+	FLOPPY_APD_FORMAT,
+	FLOPPY_JFD_FORMAT
 FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START( aa310_floppies )
@@ -379,11 +381,11 @@ WRITE_LINE_MEMBER( archimedes_state::a310_kart_rx_w )
 		archimedes_clear_irq_b(ARCHIMEDES_IRQB_KBD_XMIT_EMPTY);
 }
 
-static MACHINE_CONFIG_START( aa310, aa310_state )
+static MACHINE_CONFIG_START( aa310 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM, XTAL_24MHz / 3)        /* ARM2 8 MHz */
 	MCFG_CPU_PROGRAM_MAP(aa310_mem)
-	MCFG_ARM_COPRO(ARM_COPRO_TYPE_VL86C020)
+	MCFG_ARM_COPRO(VL86C020)
 
 	MCFG_DEVICE_ADD("kart", AAKART, 8000000/256)
 	MCFG_AAKART_OUT_TX_CB(WRITELINE(archimedes_state, a310_kart_tx_w))

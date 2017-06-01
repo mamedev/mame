@@ -17,31 +17,29 @@
 //  astrocade_rom_device - constructor
 //-------------------------------------------------
 
-const device_type ASTROCADE_ROM_STD = device_creator<astrocade_rom_device>;
-const device_type ASTROCADE_ROM_256K = device_creator<astrocade_rom_256k_device>;
-const device_type ASTROCADE_ROM_512K = device_creator<astrocade_rom_512k_device>;
+DEFINE_DEVICE_TYPE(ASTROCADE_ROM_STD,  astrocade_rom_device,      "astrocade_rom",  "Bally Astrocade Standard Carts")
+DEFINE_DEVICE_TYPE(ASTROCADE_ROM_256K, astrocade_rom_256k_device, "astrocade_256k", "Bally Astrocade 256K Carts")
+DEFINE_DEVICE_TYPE(ASTROCADE_ROM_512K, astrocade_rom_512k_device, "astrocade_512k", "Bally Astrocade 512K Carts")
 
 
-astrocade_rom_device::astrocade_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-						device_astrocade_cart_interface(mconfig, *this)
+astrocade_rom_device::astrocade_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock), device_astrocade_cart_interface(mconfig, *this)
 {
 }
 
 astrocade_rom_device::astrocade_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: device_t(mconfig, ASTROCADE_ROM_STD, "Bally Astrocade Standard Carts", tag, owner, clock, "astrocade_rom", __FILE__),
-						device_astrocade_cart_interface(mconfig, *this)
+	: astrocade_rom_device(mconfig, ASTROCADE_ROM_STD, tag, owner, clock)
 {
 }
 
 astrocade_rom_256k_device::astrocade_rom_256k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: astrocade_rom_device(mconfig, ASTROCADE_ROM_256K, "Bally Astrocade 256K Carts", tag, owner, clock, "astrocade_256k", __FILE__), m_base_bank(0)
-				{
+	: astrocade_rom_device(mconfig, ASTROCADE_ROM_256K, tag, owner, clock), m_base_bank(0)
+{
 }
 
 astrocade_rom_512k_device::astrocade_rom_512k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: astrocade_rom_device(mconfig, ASTROCADE_ROM_512K, "Bally Astrocade 512K Carts", tag, owner, clock, "astrocade_512k", __FILE__), m_base_bank(0)
-				{
+	: astrocade_rom_device(mconfig, ASTROCADE_ROM_512K, tag, owner, clock), m_base_bank(0)
+{
 }
 
 

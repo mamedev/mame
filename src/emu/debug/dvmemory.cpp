@@ -9,12 +9,12 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "debugvw.h"
 #include "dvmemory.h"
+
 #include "debugcpu.h"
 #include "debugger.h"
-#include <ctype.h>
 
+#include <ctype.h>
 
 
 //**************************************************************************

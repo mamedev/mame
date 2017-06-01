@@ -156,9 +156,10 @@ void amiga_state::machine_start()
 	m_irq_timer = timer_alloc(TIMER_AMIGA_IRQ);
 	m_blitter_timer = timer_alloc(TIMER_AMIGA_BLITTER);
 	m_serial_timer = timer_alloc(TIMER_SERIAL);
+	m_scanline_timer = timer_alloc(TIMER_SCANLINE);
 
 	// start the scanline timer
-	timer_set(m_screen->time_until_pos(0), TIMER_SCANLINE);
+	m_scanline_timer->adjust(m_screen->time_until_pos(0));
 }
 
 WRITE_LINE_MEMBER( amiga_state::m68k_reset )
@@ -297,7 +298,7 @@ TIMER_CALLBACK_MEMBER( amiga_state::scanline_callback )
 
 	// set timer for next line
 	scanline = (scanline + 1) % m_screen->height();
-	timer_set(m_screen->time_until_pos(scanline), TIMER_SCANLINE, scanline);
+	m_scanline_timer->adjust(m_screen->time_until_pos(scanline), scanline);
 }
 
 

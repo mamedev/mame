@@ -6,8 +6,8 @@
 
 */
 
-#ifndef _E0C6S46_H_
-#define _E0C6S46_H_
+#ifndef MAME_CPU_E0C6200_E0C6S46_H
+#define MAME_CPU_E0C6200_E0C6S46_H
 
 #include "e0c6200.h"
 
@@ -59,32 +59,33 @@ enum
 #define MCFG_E0C6S46_PIXEL_UPDATE_CB(_cb) \
 	e0c6s46_device::static_set_pixel_update_cb(*device, _cb);
 
-typedef void (*e0c6s46_pixel_update_func)(device_t &device, bitmap_ind16 &bitmap, const rectangle &cliprect, int contrast, int seg, int com, int state);
 #define E0C6S46_PIXEL_UPDATE_CB(name) void name(device_t &device, bitmap_ind16 &bitmap, const rectangle &cliprect, int contrast, int seg, int com, int state)
 
 
 class e0c6s46_device : public e0c6200_cpu_device
 {
 public:
+	typedef void (*pixel_update_func)(device_t &device, bitmap_ind16 &bitmap, const rectangle &cliprect, int contrast, int seg, int com, int state);
+
 	e0c6s46_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_write_r0_callback(device_t &device, _Object object) { return downcast<e0c6s46_device &>(device).m_write_r0.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_r1_callback(device_t &device, _Object object) { return downcast<e0c6s46_device &>(device).m_write_r1.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_r2_callback(device_t &device, _Object object) { return downcast<e0c6s46_device &>(device).m_write_r2.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_r3_callback(device_t &device, _Object object) { return downcast<e0c6s46_device &>(device).m_write_r3.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_r4_callback(device_t &device, _Object object) { return downcast<e0c6s46_device &>(device).m_write_r4.set_callback(object); }
+	template <class Object> static devcb_base &set_write_r0_callback(device_t &device, Object &&cb) { return downcast<e0c6s46_device &>(device).m_write_r0.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_write_r1_callback(device_t &device, Object &&cb) { return downcast<e0c6s46_device &>(device).m_write_r1.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_write_r2_callback(device_t &device, Object &&cb) { return downcast<e0c6s46_device &>(device).m_write_r2.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_write_r3_callback(device_t &device, Object &&cb) { return downcast<e0c6s46_device &>(device).m_write_r3.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_write_r4_callback(device_t &device, Object &&cb) { return downcast<e0c6s46_device &>(device).m_write_r4.set_callback(std::forward<Object>(cb)); }
 
-	template<class _Object> static devcb_base &set_read_p0_callback(device_t &device, _Object object) { return downcast<e0c6s46_device &>(device).m_read_p0.set_callback(object); }
-	template<class _Object> static devcb_base &set_read_p1_callback(device_t &device, _Object object) { return downcast<e0c6s46_device &>(device).m_read_p1.set_callback(object); }
-	template<class _Object> static devcb_base &set_read_p2_callback(device_t &device, _Object object) { return downcast<e0c6s46_device &>(device).m_read_p2.set_callback(object); }
-	template<class _Object> static devcb_base &set_read_p3_callback(device_t &device, _Object object) { return downcast<e0c6s46_device &>(device).m_read_p3.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_p0_callback(device_t &device, _Object object) { return downcast<e0c6s46_device &>(device).m_write_p0.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_p1_callback(device_t &device, _Object object) { return downcast<e0c6s46_device &>(device).m_write_p1.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_p2_callback(device_t &device, _Object object) { return downcast<e0c6s46_device &>(device).m_write_p2.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_p3_callback(device_t &device, _Object object) { return downcast<e0c6s46_device &>(device).m_write_p3.set_callback(object); }
+	template <class Object> static devcb_base &set_read_p0_callback(device_t &device, Object &&cb) { return downcast<e0c6s46_device &>(device).m_read_p0.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_read_p1_callback(device_t &device, Object &&cb) { return downcast<e0c6s46_device &>(device).m_read_p1.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_read_p2_callback(device_t &device, Object &&cb) { return downcast<e0c6s46_device &>(device).m_read_p2.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_read_p3_callback(device_t &device, Object &&cb) { return downcast<e0c6s46_device &>(device).m_read_p3.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_write_p0_callback(device_t &device, Object &&cb) { return downcast<e0c6s46_device &>(device).m_write_p0.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_write_p1_callback(device_t &device, Object &&cb) { return downcast<e0c6s46_device &>(device).m_write_p1.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_write_p2_callback(device_t &device, Object &&cb) { return downcast<e0c6s46_device &>(device).m_write_p2.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_write_p3_callback(device_t &device, Object &&cb) { return downcast<e0c6s46_device &>(device).m_write_p3.set_callback(std::forward<Object>(cb)); }
 
-	static void static_set_pixel_update_cb(device_t &device, e0c6s46_pixel_update_func _cb) { downcast<e0c6s46_device &>(device).m_pixel_update_handler = _cb; }
+	static void static_set_pixel_update_cb(device_t &device, pixel_update_func cb) { downcast<e0c6s46_device &>(device).m_pixel_update_handler = cb; }
 
 	DECLARE_READ8_MEMBER(io_r);
 	DECLARE_WRITE8_MEMBER(io_w);
@@ -113,7 +114,7 @@ private:
 
 	u8 m_lcd_control;
 	u8 m_lcd_contrast;
-	e0c6s46_pixel_update_func m_pixel_update_handler;
+	pixel_update_func m_pixel_update_handler;
 
 	// i/o ports
 	devcb_write8 m_write_r0, m_write_r1, m_write_r2, m_write_r3, m_write_r4;
@@ -176,7 +177,6 @@ private:
 };
 
 
+DECLARE_DEVICE_TYPE(E0C6S46, e0c6s46_device)
 
-extern const device_type E0C6S46;
-
-#endif /* _E0C6S46_H_ */
+#endif // MAME_CPU_E0C6200_E0C6S46_H

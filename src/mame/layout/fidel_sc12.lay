@@ -251,7 +251,7 @@
 		<disk><color red="0.81" green="0.8" blue="0.79" /></disk>
 		<text string="&#x2658;"><color red="0.17" green="0.15" blue="0.15" /></text>
 	</element>
-	<element name="text_pion">
+	<element name="text_pawn">
 		<disk><color red="0.81" green="0.8" blue="0.79" /></disk>
 		<text string="&#x2659;"><color red="0.17" green="0.15" blue="0.15" /></text>
 	</element>
@@ -484,7 +484,7 @@
 		<bezel element="text_rook"><bounds x="87.7" y="39.2" width="4.6" height="4" /></bezel>
 		<bezel element="text_bishop"><bounds x="87.7" y="48.5" width="4.6" height="4" /></bezel>
 		<bezel element="text_knight"><bounds x="87.7" y="57.8" width="4.6" height="4" /></bezel>
-		<bezel element="text_pion"><bounds x="87.7" y="67.1" width="4.6" height="4" /></bezel>
+		<bezel element="text_pawn"><bounds x="87.7" y="67.1" width="4.6" height="4" /></bezel>
 
 		<bezel element="disk_black"><bounds x="87" y="3.1" width="6" height="6" /></bezel>
 		<bezel element="disk_black"><bounds x="87" y="12.4" width="6" height="6" /></bezel>

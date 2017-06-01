@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco
-#pragma once
+#ifndef MAME_BUS_DMV_K806_H
+#define MAME_BUS_DMV_K806_H
 
-#ifndef __DMV_K806_H__
-#define __DMV_K806_H__
+#pragma once
 
 #include "dmvbus.h"
 #include "cpu/mcs48/mcs48.h"
@@ -28,7 +28,7 @@ public:
 	virtual ioport_constructor device_input_ports() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	DECLARE_READ8_MEMBER(portt1_r);
+	DECLARE_READ_LINE_MEMBER(portt1_r);
 	DECLARE_READ8_MEMBER(port1_r);
 	DECLARE_WRITE8_MEMBER(port2_w);
 
@@ -66,6 +66,6 @@ private:
 
 
 // device type definition
-extern const device_type DMV_K806;
+DECLARE_DEVICE_TYPE(DMV_K806, dmv_k806_device)
 
-#endif  /* __DMV_K806_H__ */
+#endif // MAME_BUS_DMV_K806_H

@@ -58,8 +58,9 @@
 #include "tbaskb.lh"
 #include "touchme.lh" // clickable
 #include "ttfball.lh"
+#include "us2pfball.lh"
 
-//#include "hh_pic16_test.lh" // common test-layout - use external artwork
+#include "hh_pic16_test.lh" // common test-layout - use external artwork
 
 
 class hh_pic16_state : public driver_device
@@ -374,7 +375,7 @@ INPUT_PORTS_END
 
 static const s16 touchme_speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
 
-static MACHINE_CONFIG_START( touchme, touchme_state )
+static MACHINE_CONFIG_START( touchme )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PIC1655, 300000) // approximation - RC osc. R=100K, C=47pF
@@ -404,7 +405,7 @@ MACHINE_CONFIG_END
 
   Caprice Pro-Action Baseball (manufactured by Calfax)
   * PIC 1655A-043
-  * x
+  * 1 7seg LED + 36 other LEDs, CD4028, 1-bit sound
 
 ***************************************************************************/
 
@@ -416,51 +417,84 @@ public:
 	{ }
 
 	void prepare_display();
-	DECLARE_READ8_MEMBER(read_a);
 	DECLARE_WRITE8_MEMBER(write_b);
 	DECLARE_WRITE8_MEMBER(write_c);
+
+	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 };
 
 // handlers
 
 void pabball_state::prepare_display()
 {
-}
+	// CD4028 BCD to decimal decoder
+	u16 sel = m_c & 0xf;
+	if (sel & 8) sel &= 9;
+	sel = 1 << sel;
 
-READ8_MEMBER(pabball_state::read_a)
-{
-	return 0xf;
+	// CD4028 9 is 7seg
+	set_display_segmask(0x200, 0xff);
+	display_matrix(8, 10, m_b, sel);
 }
 
 WRITE8_MEMBER(pabball_state::write_b)
 {
+	// B: led data
+	m_b = ~data;
+	prepare_display();
 }
 
 WRITE8_MEMBER(pabball_state::write_c)
 {
+	// C2: RTCC pin
+	m_maincpu->set_input_line(PIC16C5x_RTCC, data >> 2 & 1);
+
+	// C7: speaker out
+	m_speaker->level_w(data >> 7 & 1);
+
+	// C0-C3: CD4028 A-D
+	m_c = data;
+	prepare_display();
 }
 
 
 // config
 
 static INPUT_PORTS_START( pabball )
-	PORT_START("IN.0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 )
+	PORT_START("IN.0") // port A
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL PORT_NAME("P2 Curve Left")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL PORT_NAME("P2 Curve Right")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL PORT_NAME("P2 Straight")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN.1") // port C
+	PORT_BIT( 0xcf, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Hit")
+	PORT_CONFNAME( 0x20, 0x00, DEF_STR( Players ) )
+	PORT_CONFSETTING(    0x00, "1" )
+	PORT_CONFSETTING(    0x20, "2" )
+
+	PORT_START("RESET")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P1 Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, pabball_state, reset_button, nullptr)
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( pabball, pabball_state )
+INPUT_CHANGED_MEMBER(pabball_state::reset_button)
+{
+	// reset button is directly tied to MCLR pin
+	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
+}
+
+static MACHINE_CONFIG_START( pabball )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PIC1655, 1000000) // approximation - RC osc. R=18K, C=27pF
-	MCFG_PIC16C5x_READ_A_CB(READ8(pabball_state, read_a))
+	MCFG_CPU_ADD("maincpu", PIC1655, 1200000) // approximation - RC osc. R=18K, C=27pF
+	MCFG_PIC16C5x_READ_A_CB(IOPORT("IN.0"))
 	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(pabball_state, write_b))
+	MCFG_PIC16C5x_READ_C_CB(IOPORT("IN.1"))
 	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(pabball_state, write_c))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_pic16_state, display_decay_tick, attotime::from_msec(1))
-	//MCFG_DEFAULT_LAYOUT(layout_pabball)
+	MCFG_DEFAULT_LAYOUT(layout_hh_pic16_test)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -565,7 +599,7 @@ static INPUT_PORTS_START( melodym )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_NAME("Note")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( melodym, melodym_state )
+static MACHINE_CONFIG_START( melodym )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PIC1655, 1000000) // approximation
@@ -665,7 +699,7 @@ INPUT_PORTS_END
 
 static const s16 maniac_speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
 
-static MACHINE_CONFIG_START( maniac, maniac_state )
+static MACHINE_CONFIG_START( maniac )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PIC1655, 1000000) // approximation - RC osc. R=~13.4K, C=470pF
@@ -821,7 +855,7 @@ void leboom_state::machine_start()
 	save_item(NAME(m_speaker_volume));
 }
 
-static MACHINE_CONFIG_START( leboom, leboom_state )
+static MACHINE_CONFIG_START( leboom )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PIC1655, 1000000) // approximation
@@ -931,7 +965,7 @@ static INPUT_PORTS_START( tbaskb )
 	PORT_CONFSETTING(    0x00, "2" )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( tbaskb, tbaskb_state )
+static MACHINE_CONFIG_START( tbaskb )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PIC1655, 950000) // approximation - RC osc. R=18K, C=47pF
@@ -1040,7 +1074,7 @@ INPUT_PORTS_END
 
 static const s16 rockpin_speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
 
-static MACHINE_CONFIG_START( rockpin, rockpin_state )
+static MACHINE_CONFIG_START( rockpin )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PIC1650, 450000) // approximation - RC osc. R=47K, C=47pF
@@ -1158,7 +1192,7 @@ static INPUT_PORTS_START( hccbaskb )
 	PORT_CONFSETTING(    0x00, "2" )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( hccbaskb, hccbaskb_state )
+static MACHINE_CONFIG_START( hccbaskb )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PIC1655, 950000) // approximation - RC osc. R=15K, C=47pF
@@ -1310,7 +1344,7 @@ static INPUT_PORTS_START( ttfballa )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( ttfball, ttfball_state )
+static MACHINE_CONFIG_START( ttfball )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PIC1655, 1000000) // approximation - RC osc. R=27K(set 1) or 33K(set 2), C=68pF
@@ -1336,7 +1370,7 @@ MACHINE_CONFIG_END
 
   U.S. Games Programmable Baseball
   * PIC 1650A-133
-  * x
+  * 3 7seg LEDs + 36 other LEDs, 1-bit sound
 
   known releases:
   - USA(1): Programmable Baseball
@@ -1352,54 +1386,86 @@ public:
 	{ }
 
 	void prepare_display();
-	DECLARE_READ8_MEMBER(read_a);
+	DECLARE_WRITE8_MEMBER(write_a);
 	DECLARE_WRITE8_MEMBER(write_b);
 	DECLARE_WRITE8_MEMBER(write_c);
+	DECLARE_WRITE8_MEMBER(write_d);
 };
 
 // handlers
 
 void uspbball_state::prepare_display()
 {
+	// D0-D2 are 7segs
+	set_display_segmask(7, 0x7f);
+	display_matrix(16, 6, m_c << 8 | m_b, m_d);
 }
 
-READ8_MEMBER(uspbball_state::read_a)
+WRITE8_MEMBER(uspbball_state::write_a)
 {
-	return 0xff;
+	// A0: speaker out
+	m_speaker->level_w(data & 1);
 }
 
 WRITE8_MEMBER(uspbball_state::write_b)
 {
+	// B: digit segment data
+	m_b = BITSWAP8(data,0,1,2,3,4,5,6,7);
+	prepare_display();
 }
 
 WRITE8_MEMBER(uspbball_state::write_c)
 {
+	// C: led data
+	m_c = ~data;
+	prepare_display();
+}
+
+WRITE8_MEMBER(uspbball_state::write_d)
+{
+	// D0-D5: led/digit select
+	m_d = ~data;
+	prepare_display();
 }
 
 
 // config
 
 static INPUT_PORTS_START( uspbball )
-	PORT_START("IN.0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 )
+	PORT_START("IN.0") // port A
+	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL PORT_NAME("P2 Curve Right")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL PORT_NAME("P2 Slow")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL PORT_NAME("P2 Fast")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_COCKTAIL PORT_NAME("P2 Curve Left")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_COCKTAIL PORT_NAME("P2 Change Up/Fielder")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Batter")
+
+	PORT_START("IN.1") // port D
+	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_CONFNAME( 0x80, 0x80, DEF_STR( Players ) )
+	PORT_CONFSETTING(    0x80, "1" )
+	PORT_CONFSETTING(    0x00, "2" )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( uspbball, uspbball_state )
+static MACHINE_CONFIG_START( uspbball )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PIC1650, 1000000) // approximation - RC osc. R=22K, C=47pF
-	MCFG_PIC16C5x_READ_A_CB(READ8(uspbball_state, read_a))
+	MCFG_PIC16C5x_READ_A_CB(IOPORT("IN.0"))
+	MCFG_PIC16C5x_WRITE_A_CB(WRITE8(uspbball_state, write_a))
+	MCFG_PIC16C5x_READ_B_CB(CONSTANT(0xff))
 	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(uspbball_state, write_b))
+	MCFG_PIC16C5x_READ_C_CB(CONSTANT(0xff))
 	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(uspbball_state, write_c))
+	MCFG_PIC16C5x_READ_D_CB(IOPORT("IN.1"))
+	MCFG_PIC16C5x_WRITE_D_CB(WRITE8(uspbball_state, write_d))
 
 	MCFG_DEVICE_ADD("clock", CLOCK, 1000000/4) // PIC CLKOUT, tied to RTCC
 	MCFG_CLOCK_SIGNAL_HANDLER(INPUTLINE("maincpu", PIC16C5x_RTCC))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_pic16_state, display_decay_tick, attotime::from_msec(1))
-	//MCFG_DEFAULT_LAYOUT(layout_uspbball)
+	MCFG_DEFAULT_LAYOUT(layout_hh_pic16_test)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1432,53 +1498,109 @@ public:
 
 	void prepare_display();
 	DECLARE_READ8_MEMBER(read_a);
+	DECLARE_WRITE8_MEMBER(write_a);
 	DECLARE_WRITE8_MEMBER(write_b);
 	DECLARE_WRITE8_MEMBER(write_c);
+	DECLARE_WRITE8_MEMBER(write_d);
 };
 
 // handlers
 
 void us2pfball_state::prepare_display()
 {
+	set_display_segmask(0xff, 0x7f);
+	display_matrix(7, 10, m_c, m_d | (m_a << 6 & 0x300));
 }
 
 READ8_MEMBER(us2pfball_state::read_a)
 {
-	return 0xff;
+	// A0,A1: multiplexed inputs, A4-A7: other inputs
+	return (read_inputs(4) & 3) | (m_inp_matrix[4]->read() & 0xf0) | 0x0c;
+}
+
+WRITE8_MEMBER(us2pfball_state::write_a)
+{
+	// A2,A3: leds
+	m_a = data;
+	prepare_display();
 }
 
 WRITE8_MEMBER(us2pfball_state::write_b)
 {
+	// B0-B3: input mux
+	m_inp_mux = data & 0xf;
 }
 
 WRITE8_MEMBER(us2pfball_state::write_c)
 {
+	// C7: speaker out
+	m_speaker->level_w(data >> 7 & 1);
+
+	// C0-C6: digit segments
+	m_c = data;
+	prepare_display();
+}
+
+WRITE8_MEMBER(us2pfball_state::write_d)
+{
+	// D0-D7: digit select
+	m_d = ~data;
+	prepare_display();
 }
 
 
 // config
 
 static INPUT_PORTS_START( us2pfball )
-	PORT_START("IN.0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 )
+	PORT_START("IN.0") // B0 port A low
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2) PORT_16WAY
+
+	PORT_START("IN.1") // B1 port A low
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2) PORT_16WAY
+
+	PORT_START("IN.2") // B2 port A low
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2) PORT_16WAY
+
+	PORT_START("IN.3") // B3 port A low
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_16WAY
+
+	PORT_START("IN.4") // port A high
+	PORT_CONFNAME( 0x10, 0x10, DEF_STR( Players ) )
+	PORT_CONFSETTING(    0x10, "1" )
+	PORT_CONFSETTING(    0x00, "2" )
+	PORT_CONFNAME( 0x20, 0x20, DEF_STR( Difficulty ) )
+	PORT_CONFSETTING(    0x20, "1" ) // college
+	PORT_CONFSETTING(    0x00, "2" ) // pro
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SELECT ) PORT_TOGGLE PORT_NAME("Play Selector") // pass
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Kick/Pass") // K/P
+
+	PORT_START("IN.5") // port B
+	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START ) PORT_NAME("Status/Score") // S
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( us2pfball, us2pfball_state )
+static MACHINE_CONFIG_START( us2pfball )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PIC1650, 1000000) // approximation - RC osc. R=39K, C=75pF
+	MCFG_CPU_ADD("maincpu", PIC1650, 800000) // approximation - RC osc. R=39K, C=75pF
 	MCFG_PIC16C5x_READ_A_CB(READ8(us2pfball_state, read_a))
+	MCFG_PIC16C5x_WRITE_A_CB(WRITE8(us2pfball_state, write_a))
+	MCFG_PIC16C5x_READ_B_CB(IOPORT("IN.5"))
 	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(us2pfball_state, write_b))
+	MCFG_PIC16C5x_READ_C_CB(CONSTANT(0xff))
 	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(us2pfball_state, write_c))
+	MCFG_PIC16C5x_READ_D_CB(CONSTANT(0xff))
+	MCFG_PIC16C5x_WRITE_D_CB(WRITE8(us2pfball_state, write_d))
 
-	MCFG_DEVICE_ADD("clock", CLOCK, 1000000/4) // PIC CLKOUT, tied to RTCC
+	MCFG_DEVICE_ADD("clock", CLOCK, 800000/4) // PIC CLKOUT, tied to RTCC
 	MCFG_CLOCK_SIGNAL_HANDLER(INPUTLINE("maincpu", PIC16C5x_RTCC))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_pic16_state, display_decay_tick, attotime::from_msec(1))
-	//MCFG_DEFAULT_LAYOUT(layout_us2pfball)
+	MCFG_DEFAULT_LAYOUT(layout_us2pfball)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1568,24 +1690,24 @@ ROM_END
 
 
 
-/*    YEAR  NAME       PARENT COMPAT MACHINE   INPUT      INIT              COMPANY, FULLNAME, FLAGS */
-CONS( 1979, touchme,   0,        0, touchme,   touchme,   driver_device, 0, "Atari", "Touch Me (handheld, Rev 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME       PARENT  CMP MACHINE    INPUT      STATE         INIT  COMPANY, FULLNAME, FLAGS
+CONS( 1979, touchme,   0,       0, touchme,   touchme,   touchme_state,   0, "Atari", "Touch Me (handheld, Rev 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1979, pabball,   0,        0, pabball,   pabball,   driver_device, 0, "Caprice / Calfax", "Pro-Action Baseball", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1979, pabball,   0,       0, pabball,   pabball,   pabball_state,   0, "Caprice / Calfax", "Pro-Action Baseball", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
-CONS( 1980, melodym,   0,        0, melodym,   melodym,   driver_device, 0, "GAF", "Melody Madness", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1980, melodym,   0,       0, melodym,   melodym,   melodym_state,   0, "GAF", "Melody Madness", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1979, maniac,    0,        0, maniac,    maniac,    driver_device, 0, "Ideal", "Maniac", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1979, maniac,    0,       0, maniac,    maniac,    maniac_state,    0, "Ideal", "Maniac", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1980, leboom,    0,        0, leboom,    leboom,    driver_device, 0, "Lakeside", "Le Boom", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1980, leboom,    0,       0, leboom,    leboom,    leboom_state,    0, "Lakeside", "Le Boom", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1979, tbaskb,    0,        0, tbaskb,    tbaskb,    driver_device, 0, "Tandy Radio Shack", "Electronic Basketball (Tandy)", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, tbaskb,    0,       0, tbaskb,    tbaskb,    tbaskb_state,    0, "Tandy Radio Shack", "Electronic Basketball (Tandy)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1979, rockpin,   0,        0, rockpin,   rockpin,   driver_device, 0, "Tiger Electronics", "Rocket Pinball", MACHINE_SUPPORTS_SAVE )
-CONS( 1979, hccbaskb,  0,        0, hccbaskb,  hccbaskb,  driver_device, 0, "Tiger Electronics", "Half Court Computer Basketball", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, rockpin,   0,       0, rockpin,   rockpin,   rockpin_state,   0, "Tiger Electronics", "Rocket Pinball", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, hccbaskb,  0,       0, hccbaskb,  hccbaskb,  hccbaskb_state,  0, "Tiger Electronics", "Half Court Computer Basketball", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1979, ttfball,   0,        0, ttfball,   ttfball,   driver_device, 0, "Toytronic", "Football (Toytronic, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-CONS( 1979, ttfballa,  ttfball,  0, ttfball,   ttfballa,  driver_device, 0, "Toytronic", "Football (Toytronic, set 2)", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, ttfball,   0,       0, ttfball,   ttfball,   ttfball_state,   0, "Toytronic", "Football (Toytronic, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+CONS( 1979, ttfballa,  ttfball, 0, ttfball,   ttfballa,  ttfball_state,   0, "Toytronic", "Football (Toytronic, set 2)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1981, uspbball,  0,        0, uspbball,  uspbball,  driver_device, 0, "U.S. Games", "Programmable Baseball", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-CONS( 1981, us2pfball, 0,        0, us2pfball, us2pfball, driver_device, 0, "U.S. Games", "Electronic 2-Player Football", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1981, uspbball,  0,       0, uspbball,  uspbball,  uspbball_state,  0, "U.S. Games", "Programmable Baseball", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1981, us2pfball, 0,       0, us2pfball, us2pfball, us2pfball_state, 0, "U.S. Games", "Electronic 2-Player Football", MACHINE_SUPPORTS_SAVE )

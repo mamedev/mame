@@ -8,10 +8,10 @@
 
 *************************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_LASERDSC_H
+#define MAME_MACHINE_LASERDSC_H
 
-#ifndef MAME_DEVICES_MACHINE_LASERDSC_H
-#define MAME_DEVICES_MACHINE_LASERDSC_H
+#pragma once
 
 #include "screen.h"
 #include "vbiparse.h"
@@ -111,14 +111,6 @@ enum laserdisc_field_code
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// forward declarations
-class laserdisc_device;
-
-// delegates
-typedef delegate<chd_file *(laserdisc_device &device)> laserdisc_get_disc_delegate;
-typedef delegate<void (laserdisc_device &device, int samplerate, int samples, const int16_t *ch0, const int16_t *ch1)> laserdisc_audio_delegate;
-
-
 // ======================> laserdisc_overlay_config
 
 // overlay configuration
@@ -141,10 +133,16 @@ class laserdisc_device :    public device_t,
 {
 protected:
 	// construction/destruction
-	laserdisc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	virtual ~laserdisc_device();
 
 public:
+	// delegates
+	typedef delegate<chd_file *(laserdisc_device &device)> get_disc_delegate;
+	typedef delegate<void (laserdisc_device &device, int samplerate, int samples, const int16_t *ch0, const int16_t *ch1)> audio_delegate;
+
+
+	laserdisc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// reset line control
 
 	// core control and status
@@ -165,10 +163,10 @@ public:
 	void set_overlay_config(const laserdisc_overlay_config &config) { static_cast<laserdisc_overlay_config &>(*this) = config; }
 
 	// static configuration helpers
-	static void static_set_get_disc(device_t &device, laserdisc_get_disc_delegate callback);
-	static void static_set_audio(device_t &device, laserdisc_audio_delegate callback);
-	static void static_set_overlay(device_t &device, uint32_t width, uint32_t height, screen_update_ind16_delegate update);
-	static void static_set_overlay(device_t &device, uint32_t width, uint32_t height, screen_update_rgb32_delegate update);
+	static void static_set_get_disc(device_t &device, get_disc_delegate &&callback);
+	static void static_set_audio(device_t &device, audio_delegate &&callback);
+	static void static_set_overlay(device_t &device, uint32_t width, uint32_t height, screen_update_ind16_delegate &&update);
+	static void static_set_overlay(device_t &device, uint32_t width, uint32_t height, screen_update_rgb32_delegate &&update);
 	static void static_set_overlay_clip(device_t &device, int32_t minx, int32_t maxx, int32_t miny, int32_t maxy);
 	static void static_set_overlay_position(device_t &device, float posx, float posy);
 	static void static_set_overlay_scale(device_t &device, float scalex, float scaley);
@@ -291,8 +289,8 @@ private:
 	void config_save(config_type cfg_type, util::xml::data_node *parentnode);
 
 	// configuration
-	laserdisc_get_disc_delegate m_getdisc_callback;
-	laserdisc_audio_delegate m_audio_callback;  // audio streaming callback
+	get_disc_delegate m_getdisc_callback;
+	audio_delegate m_audio_callback;  // audio streaming callback
 	laserdisc_overlay_config m_orig_config;     // original overlay configuration
 	uint32_t              m_overwidth;            // overlay screen width
 	uint32_t              m_overheight;           // overlay screen height
@@ -412,5 +410,4 @@ inline int laserdisc_device::chapter_from_metadata(const vbi_metadata &metadata)
 	return CHAPTER_NOT_PRESENT;
 }
 
-
-#endif // MAME_DEVICES_MACHINE_LASERDSC_H
+#endif // MAME_MACHINE_LASERDSC_H

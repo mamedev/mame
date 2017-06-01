@@ -144,7 +144,7 @@ static const z80_daisy_config daisy_chain[] =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( cchasm, cchasm_state )
+static MACHINE_CONFIG_START( cchasm )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, CCHASM_68K_CLOCK)    /* 8 MHz (from schematics) */
@@ -263,5 +263,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, cchasm,  0,      cchasm, cchasm, driver_device, 0, ROT270, "Cinematronics / GCE", "Cosmic Chasm (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, cchasm1, cchasm, cchasm, cchasm, driver_device, 0, ROT270, "Cinematronics / GCE", "Cosmic Chasm (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, cchasm,  0,      cchasm, cchasm, cchasm_state, 0, ROT270, "Cinematronics / GCE", "Cosmic Chasm (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, cchasm1, cchasm, cchasm, cchasm, cchasm_state, 0, ROT270, "Cinematronics / GCE", "Cosmic Chasm (set 2)", MACHINE_SUPPORTS_SAVE )

@@ -6,8 +6,10 @@
  *
  ****************************************************************************/
 
-#ifndef X1_H_
-#define X1_H_
+#ifndef MAME_INCLUDES_X1_H
+#define MAME_INCLUDES_X1_H
+
+#pragma once
 
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
@@ -44,35 +46,35 @@ private:
 	virtual void z80daisy_irq_reti() override;
 };
 
-struct scrn_reg_t
-{
-	uint8_t gfx_bank;
-	uint8_t disp_bank;
-	uint8_t pcg_mode;
-	uint8_t v400_mode;
-	uint8_t ank_sel;
-
-	uint8_t pri;
-	uint8_t blackclip; // x1 turbo specific
-};
-
-struct turbo_reg_t
-{
-	uint8_t pal;
-	uint8_t gfx_pal;
-	uint8_t txt_pal[8];
-	uint8_t txt_disp;
-};
-
-struct x1_rtc_t
-{
-	uint8_t sec, min, hour, day, wday, month, year;
-};
-
-
 class x1_state : public driver_device
 {
 public:
+	struct scrn_reg_t
+	{
+		uint8_t gfx_bank;
+		uint8_t disp_bank;
+		uint8_t pcg_mode;
+		uint8_t v400_mode;
+		uint8_t ank_sel;
+
+		uint8_t pri;
+		uint8_t blackclip; // x1 turbo specific
+	};
+
+	struct turbo_reg_t
+	{
+		uint8_t pal;
+		uint8_t gfx_pal;
+		uint8_t txt_pal[8];
+		uint8_t txt_disp;
+	};
+
+	struct x1_rtc_t
+	{
+		uint8_t sec, min, hour, day, wday, month, year;
+	};
+
+
 	x1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"x1_cpu"),
@@ -95,7 +97,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
 	required_device<generic_slot_device> m_cart;
-	required_device<mb8877_t> m_fdc;
+	required_device<mb8877_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	required_device<floppy_connector> m_floppy2;
@@ -299,6 +301,6 @@ public:
 
 /*----------- defined in machine/x1.c -----------*/
 
-extern const device_type X1_KEYBOARD;
+DECLARE_DEVICE_TYPE(X1_KEYBOARD, x1_keyboard_device)
 
-#endif /* X1_H_ */
+#endif // MAME_INCLUDES_X1_H

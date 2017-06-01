@@ -30,10 +30,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_A800_A8SIO_H
+#define MAME_BUS_A800_A8SIO_H
 
-#ifndef __A8SIO_H_
-#define __A8SIO_H_
+#pragma once
 
 
 //**************************************************************************
@@ -55,15 +55,16 @@ class a8sio_slot_device : public device_t,
 public:
 	// construction/destruction
 	a8sio_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	a8sio_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
-
-	// device-level overrides
-	virtual void device_start() override;
 
 	// inline configuration
 	static void static_set_a8sio_slot(device_t &device, const char *tag, const char *slottag);
 
 protected:
+	a8sio_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	// device-level overrides
+	virtual void device_start() override;
+
 	// configuration
 	const char *m_a8sio_tag;
 	const char *m_a8sio_slottag;
@@ -71,7 +72,7 @@ protected:
 
 
 // device type definition
-extern const device_type A8SIO_SLOT;
+DECLARE_DEVICE_TYPE(A8SIO_SLOT, a8sio_slot_device)
 
 
 class device_a8sio_card_interface;
@@ -81,12 +82,11 @@ class a8sio_device : public device_t
 public:
 	// construction/destruction
 	a8sio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	a8sio_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	// inline configuration
-	template<class _Object> static devcb_base &set_clock_in_callback(device_t &device, _Object object) { return downcast<a8sio_device &>(device).m_out_clock_in_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_data_in_callback(device_t &device, _Object object) { return downcast<a8sio_device &>(device).m_out_data_in_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_audio_in_callback(device_t &device, _Object object) { return downcast<a8sio_device &>(device).m_out_audio_in_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_clock_in_callback(device_t &device, Object &&cb) { return downcast<a8sio_device &>(device).m_out_clock_in_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_data_in_callback(device_t &device, Object &&cb) { return downcast<a8sio_device &>(device).m_out_data_in_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_audio_in_callback(device_t &device, Object &&cb) { return downcast<a8sio_device &>(device).m_out_audio_in_cb.set_callback(std::forward<Object>(cb)); }
 
 	void add_a8sio_card(device_a8sio_card_interface *card);
 	device_a8sio_card_interface *get_a8sio_card();
@@ -101,6 +101,8 @@ public:
 	DECLARE_WRITE8_MEMBER( audio_in_w );      // pin 11
 
 protected:
+	a8sio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -122,7 +124,6 @@ class device_a8sio_card_interface : public device_slot_card_interface
 	friend class a8sio_device;
 public:
 	// construction/destruction
-	device_a8sio_card_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_a8sio_card_interface();
 
 	void set_a8sio_device();
@@ -133,6 +134,8 @@ public:
 	virtual DECLARE_WRITE_LINE_MEMBER( motor_w );
 
 public:
+	device_a8sio_card_interface(const machine_config &mconfig, device_t &device);
+
 	a8sio_device  *m_a8sio;
 	const char *m_a8sio_tag;
 	const char *m_a8sio_slottag;
@@ -141,4 +144,4 @@ public:
 
 SLOT_INTERFACE_EXTERN(a8sio_cards);
 
-#endif
+#endif // MAME_BUS_A800_A8SIO_H

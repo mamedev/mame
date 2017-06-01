@@ -81,7 +81,7 @@ private:
 	required_device<ram_device> m_ram;
 	required_device<hd6845_device> m_crtc;
 	required_device<rs232_port_device> m_rs232;
-	required_device<expansion_slot_device> m_exp;
+	required_device<cg_exp_slot_device> m_exp;
 	required_memory_region m_char_rom;
 	required_shared_ptr<uint8_t> m_color_ram;
 	required_shared_ptr<uint8_t> m_font_ram;
@@ -433,7 +433,7 @@ const rgb_t cgenie_state::m_palette_nz[] =
 //  MACHINE DEFINTIONS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( cgenie, cgenie_state )
+static MACHINE_CONFIG_START( cgenie )
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_17_73447MHz / 8)  // 2.2168 MHz
 	MCFG_CPU_PROGRAM_MAP(cgenie_mem)
@@ -453,10 +453,10 @@ static MACHINE_CONFIG_START( cgenie, cgenie_state )
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ay8910", AY8910, XTAL_17_73447MHz / 8)
-	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("par", parallel_slot_device, pa_r))
-	MCFG_AY8910_PORT_A_WRITE_CB(DEVWRITE8("par", parallel_slot_device, pa_w))
-	MCFG_AY8910_PORT_B_READ_CB(DEVREAD8("par", parallel_slot_device, pb_r))
-	MCFG_AY8910_PORT_B_WRITE_CB(DEVWRITE8("par", parallel_slot_device, pb_w))
+	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("par", cg_parallel_slot_device, pa_r))
+	MCFG_AY8910_PORT_A_WRITE_CB(DEVWRITE8("par", cg_parallel_slot_device, pa_w))
+	MCFG_AY8910_PORT_B_READ_CB(DEVREAD8("par", cg_parallel_slot_device, pb_r))
+	MCFG_AY8910_PORT_B_WRITE_CB(DEVWRITE8("par", cg_parallel_slot_device, pb_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	MCFG_CASSETTE_ADD("cassette")
@@ -472,11 +472,11 @@ static MACHINE_CONFIG_START( cgenie, cgenie_state )
 	MCFG_RS232_DCD_HANDLER(WRITELINE(cgenie_state, rs232_dcd_w))
 
 	// cartridge expansion slot
-	MCFG_EXPANSION_SLOT_ADD("exp")
-	MCFG_EXPANSION_SLOT_INT_HANDLER(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_CG_EXP_SLOT_ADD("exp")
+	MCFG_CG_EXP_SLOT_INT_HANDLER(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
 	// parallel slot
-	MCFG_PARALLEL_SLOT_ADD("par")
+	MCFG_CG_PARALLEL_SLOT_ADD("par")
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)

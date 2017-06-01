@@ -211,7 +211,7 @@ MACHINE_START_MEMBER(pgm_arm_type1_state,pgm_arm_type1)
 	save_item(NAME(m_slots));
 }
 
-MACHINE_CONFIG_START( pgm_arm_type1_cave, pgm_arm_type1_state )
+MACHINE_CONFIG_START( pgm_arm_type1_cave )
 	MCFG_FRAGMENT_ADD(pgmbase)
 
 	MCFG_CPU_MODIFY("maincpu")

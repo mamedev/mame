@@ -102,7 +102,7 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( cspin2, capr1_state )
+static MACHINE_CONFIG_START( cspin2 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000) // clock frequency unknown
@@ -123,7 +123,7 @@ static MACHINE_CONFIG_START( cspin2, capr1_state )
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
 	MCFG_SOUND_ROUTE(3, "mono", 0.40)
 
-	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -156,4 +156,4 @@ ROM_START( cspin2 )
 ROM_END
 
 
-GAME (1996, cspin2, 0, cspin2, cspin2, driver_device, 0, ROT0, "Taito", "Capriccio Spin 2", MACHINE_IS_SKELETON_MECHANICAL )
+GAME (1996, cspin2, 0, cspin2, cspin2, capr1_state, 0, ROT0, "Taito", "Capriccio Spin 2", MACHINE_IS_SKELETON_MECHANICAL )

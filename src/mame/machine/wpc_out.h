@@ -3,8 +3,10 @@
 
 // Williams Pinball Controller outputs control (solenoids, flashers, generic logic, global illumination, coin counter, cpu led)
 
-#ifndef WPC_OUT_H
-#define WPC_OUT_H
+#ifndef MAME_MACHINE_WPC_OUT_H
+#define MAME_MACHINE_WPC_OUT_H
+
+#pragma once
 
 #define MCFG_WPC_OUT_ADD( _tag, _count )    \
 	MCFG_DEVICE_ADD( _tag, WPC_OUT, 0 )     \
@@ -46,6 +48,6 @@ protected:
 	void gi_update();
 };
 
-extern const device_type WPC_OUT;
+DECLARE_DEVICE_TYPE(WPC_OUT, wpc_out_device)
 
-#endif
+#endif // MAME_MACHINE_WPC_OUT_H

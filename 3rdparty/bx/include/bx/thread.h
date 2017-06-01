@@ -7,24 +7,7 @@
 #define BX_THREAD_H_HEADER_GUARD
 
 #include "bx.h"
-
-#if BX_PLATFORM_POSIX
-#	include <pthread.h>
-#	if defined(__FreeBSD__)
-#		include <pthread_np.h>
-#	endif
-#	if BX_PLATFORM_LINUX && (BX_CRT_GLIBC < 21200)
-#		include <sys/prctl.h>
-#	endif // BX_PLATFORM_
-#elif BX_PLATFORM_WINRT
-using namespace Platform;
-using namespace Windows::Foundation;
-using namespace Windows::System::Threading;
-#endif // BX_PLATFORM_
-
-#include "sem.h"
-
-#if BX_CONFIG_SUPPORTS_THREADING
+#include "semaphore.h"
 
 namespace bx
 {
@@ -62,16 +45,10 @@ namespace bx
 		void setThreadName(const char* _name);
 
 	private:
+		friend struct ThreadInternal;
 		int32_t entry();
 
-#if BX_PLATFORM_WINDOWS || BX_PLATFORM_XBOX360 || BX_PLATFORM_XBOXONE || BX_PLATFORM_WINRT
-		static DWORD WINAPI threadFunc(LPVOID _arg);
-		HANDLE m_handle;
-		DWORD  m_threadId;
-#elif BX_PLATFORM_POSIX
-		static void* threadFunc(void* _arg);
-		pthread_t m_handle;
-#endif // BX_PLATFORM_
+		BX_ALIGN_DECL(16, uint8_t) m_internal[64];
 
 		ThreadFn  m_fn;
 		void*     m_userData;
@@ -98,17 +75,9 @@ namespace bx
 		void set(void* _ptr);
 
 	private:
-#if BX_PLATFORM_WINDOWS
-		uint32_t m_id;
-#elif !(BX_PLATFORM_XBOXONE || BX_PLATFORM_WINRT)
-		pthread_key_t m_id;
-#endif // BX_PLATFORM_*
+		BX_ALIGN_DECL(16, uint8_t) m_internal[64];
 	};
 
 } // namespace bx
-
-#endif // BX_CONFIG_SUPPORTS_THREADING
-
-#include "thread.inl"
 
 #endif // BX_THREAD_H_HEADER_GUARD

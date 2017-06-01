@@ -9,10 +9,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_CPU_MB88XX_MB88XX_H
+#define MAME_CPU_MB88XX_MB88XX_H
 
-#ifndef __MB88XX_H__
-#define __MB88XX_H__
+#pragma once
 
 
 /***************************************************************************
@@ -65,7 +65,6 @@ class mb88_cpu_device : public cpu_device
 public:
 	// construction/destruction
 	mb88_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	mb88_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, int program_width, int data_width);
 
 	// static configuration helpers
 	static void set_pla(device_t &device, uint8_t *pla) { downcast<mb88_cpu_device &>(device).m_PLA = pla; }
@@ -73,6 +72,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( clock_w );
 
 protected:
+	mb88_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int data_width);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -87,7 +88,7 @@ protected:
 	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const override { return (cycles * 6); }
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_DATA) ? &m_data_config : ( (spacenum == AS_IO) ? &m_io_config : nullptr ) ); }
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : (spacenum == AS_DATA) ? &m_data_config : (spacenum == AS_IO) ? &m_io_config : nullptr; }
 
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
@@ -205,13 +206,12 @@ public:
 };
 
 
-extern const device_type MB88;
-extern const device_type MB88201;
-extern const device_type MB88202;
-extern const device_type MB8841;
-extern const device_type MB8842;
-extern const device_type MB8843;
-extern const device_type MB8844;
+DECLARE_DEVICE_TYPE(MB88,    mb88_cpu_device)
+DECLARE_DEVICE_TYPE(MB88201, mb88201_cpu_device)
+DECLARE_DEVICE_TYPE(MB88202, mb88202_cpu_device)
+DECLARE_DEVICE_TYPE(MB8841,  mb8841_cpu_device)
+DECLARE_DEVICE_TYPE(MB8842,  mb8842_cpu_device)
+DECLARE_DEVICE_TYPE(MB8843,  mb8843_cpu_device)
+DECLARE_DEVICE_TYPE(MB8844,  mb8844_cpu_device)
 
-
-#endif /* __MB88XX_H__ */
+#endif // MAME_CPU_MB88XX_MB88XX_H

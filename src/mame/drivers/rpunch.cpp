@@ -247,7 +247,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, rpunch_state )
 	AM_RANGE(0x080000, 0x083fff) AM_RAM_WRITE(rpunch_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x0a0000, 0x0a07ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x0c0000, 0x0c0007) AM_WRITE(rpunch_scrollreg_w)
-	AM_RANGE(0x0c0008, 0x0c0009) AM_SELECT(0x20) AM_WRITE(rpunch_gga_w)
+	AM_RANGE(0x0c0008, 0x0c0009) AM_SELECT(0x20) AM_WRITE8(rpunch_gga_w, 0x00ff)
 	AM_RANGE(0x0c000c, 0x0c000d) AM_WRITE(rpunch_videoreg_w)
 	AM_RANGE(0x0c000e, 0x0c000f) AM_WRITE(sound_command_w)
 	AM_RANGE(0x0c0010, 0x0c0013) AM_WRITE(rpunch_ins_w)
@@ -492,7 +492,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( rpunch, rpunch_state )
+static MACHINE_CONFIG_START( rpunch )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK/2)
@@ -537,7 +537,7 @@ MACHINE_CONFIG_END
 
 
 // c+p of above for now, bootleg hw, things need verifying
-static MACHINE_CONFIG_START( svolleybl, rpunch_state )
+static MACHINE_CONFIG_START( svolleybl )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK/2)
@@ -839,12 +839,12 @@ DRIVER_INIT_MEMBER(rpunch_state,svolley)
  *
  *************************************/
 
-GAME( 1987, rabiolep, 0,        rpunch,   rabiolep, rpunch_state, rabiolep, ROT0, "V-System Co.", "Rabio Lepus (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1987, rpunch,   rabiolep, rpunch,   rpunch, rpunch_state,   rabiolep, ROT0, "V-System Co. (Bally/Midway/Sente license)", "Rabbit Punch (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1989, svolley,  0,        svolley,  svolley, rpunch_state,  svolley,  ROT0, "V-System Co.", "Super Volleyball (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1989, svolleyk, svolley,  svolley,  svolley, rpunch_state,  svolley,  ROT0, "V-System Co.", "Super Volleyball (Korea)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1989, svolleyu, svolley,  svolley,  svolley, rpunch_state,  svolley,  ROT0, "V-System Co. (Data East license)", "Super Volleyball (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1987, rabiolep,  0,        rpunch,    rabiolep, rpunch_state, rabiolep, ROT0, "V-System Co.",                              "Rabio Lepus (Japan)",      MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1987, rpunch,    rabiolep, rpunch,    rpunch,   rpunch_state, rabiolep, ROT0, "V-System Co. (Bally/Midway/Sente license)", "Rabbit Punch (US)",        MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1989, svolley,   0,        svolley,   svolley,  rpunch_state, svolley,  ROT0, "V-System Co.",                              "Super Volleyball (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1989, svolleyk,  svolley,  svolley,   svolley,  rpunch_state, svolley,  ROT0, "V-System Co.",                              "Super Volleyball (Korea)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1989, svolleyu,  svolley,  svolley,   svolley,  rpunch_state, svolley,  ROT0, "V-System Co. (Data East license)",          "Super Volleyball (US)",    MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 
 // video registers are changed, and there's some kind of RAM at 090xxx, possible a different sprite scheme for the bootleg (even if the original is intact)
 // the sound system seems to be ripped from the later Power Spikes (see aerofgt.c)
-GAME( 1991, svolleybl,svolley,  svolleybl,svolley, rpunch_state,  svolley,  ROT0, "bootleg",  "Super Volleyball (bootleg)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_NO_COCKTAIL ) // aka 1991 Spikes?
+GAME( 1991, svolleybl, svolley,  svolleybl, svolley,  rpunch_state, svolley,  ROT0, "bootleg",  "Super Volleyball (bootleg)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_NO_COCKTAIL ) // aka 1991 Spikes?

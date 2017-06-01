@@ -570,7 +570,7 @@ MACHINE_RESET_MEMBER(unico_state,unico)
                                 Burglar X
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( burglarx, unico_state )
+static MACHINE_CONFIG_START( burglarx )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2) /* 16MHz */
@@ -600,7 +600,7 @@ static MACHINE_CONFIG_START( burglarx, unico_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_32MHz/32, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL_32MHz/32, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
 MACHINE_CONFIG_END
@@ -616,7 +616,7 @@ MACHINE_RESET_MEMBER(unico_state,zeropt)
 	MACHINE_RESET_CALL_MEMBER(unico);
 }
 
-static MACHINE_CONFIG_START( zeropnt, unico_state )
+static MACHINE_CONFIG_START( zeropnt )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2) /* 16MHz */
@@ -646,7 +646,7 @@ static MACHINE_CONFIG_START( zeropnt, unico_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_32MHz/32, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL_32MHz/32, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
 MACHINE_CONFIG_END
@@ -657,7 +657,7 @@ MACHINE_CONFIG_END
                                 Zero Point 2
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( zeropnt2, unico_state )
+static MACHINE_CONFIG_START( zeropnt2 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, XTAL_32MHz/2) /* 16MHz */
@@ -689,11 +689,11 @@ static MACHINE_CONFIG_START( zeropnt2, unico_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.70)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.70)
 
-	MCFG_OKIM6295_ADD("oki1", XTAL_32MHz/32, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki1", XTAL_32MHz/32, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL_14_31818MHz/4, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki2", XTAL_14_31818MHz/4, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.20)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.20)
 MACHINE_CONFIG_END
@@ -1050,8 +1050,8 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1997, burglarx, 0,       burglarx, burglarx, driver_device, 0, ROT0, "Unico", "Burglar X" , 0 )
-GAME( 1998, zeropnt,  0,       zeropnt,  zeropnt,  driver_device, 0, ROT0, "Unico", "Zero Point (set 1)", 0 )
-GAME( 1998, zeropnta, zeropnt, zeropnt,  zeropnt,  driver_device, 0, ROT0, "Unico", "Zero Point (set 2)", 0 )
-GAME( 1998, zeropntj, zeropnt, zeropnt,  zeropnt,  driver_device, 0, ROT0, "Unico", "Zero Point (Japan)", 0 )
-GAME( 1999, zeropnt2, 0,       zeropnt2, zeropnt2, driver_device, 0, ROT0, "Unico", "Zero Point 2", 0 )
+GAME( 1997, burglarx, 0,       burglarx, burglarx, unico_state, 0, ROT0, "Unico", "Burglar X" ,         0 )
+GAME( 1998, zeropnt,  0,       zeropnt,  zeropnt,  unico_state, 0, ROT0, "Unico", "Zero Point (set 1)", 0 )
+GAME( 1998, zeropnta, zeropnt, zeropnt,  zeropnt,  unico_state, 0, ROT0, "Unico", "Zero Point (set 2)", 0 )
+GAME( 1998, zeropntj, zeropnt, zeropnt,  zeropnt,  unico_state, 0, ROT0, "Unico", "Zero Point (Japan)", 0 )
+GAME( 1999, zeropnt2, 0,       zeropnt2, zeropnt2, unico_state, 0, ROT0, "Unico", "Zero Point 2",       0 )

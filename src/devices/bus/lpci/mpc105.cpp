@@ -18,7 +18,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type MPC105 = device_creator<mpc105_device>;
+DEFINE_DEVICE_TYPE(MPC105, mpc105_device, "mpc105", "Motorola MPC105")
 
 
 //**************************************************************************
@@ -30,7 +30,7 @@ const device_type MPC105 = device_creator<mpc105_device>;
 //-------------------------------------------------
 
 mpc105_device::mpc105_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MPC105, "MPC105", tag, owner, clock, "mpc105", __FILE__),
+	: device_t(mconfig, MPC105, tag, owner, clock),
 	pci_device_interface( mconfig, *this ),
 	m_cpu_tag(nullptr),
 	m_bank_base_default(0),
@@ -102,7 +102,7 @@ void mpc105_device::update_memory()
 
 				if (m_bank_base > 0)
 				{
-					sprintf(bank_str,"bank%d",bank + m_bank_base);
+					sprintf(bank_str,"bank%d",uint8_t(bank + m_bank_base));
 					membank(bank_str)->set_base(machine().device<ram_device>(RAM_TAG)->pointer());
 				}
 			}

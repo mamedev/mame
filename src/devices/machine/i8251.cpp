@@ -17,26 +17,16 @@
 #include "emu.h"
 #include "i8251.h"
 
+//#define VERBOSE 1
+#include "logmacro.h"
 
-/***************************************************************************
-    MACROS
-***************************************************************************/
-
-#define VERBOSE 0
-
-#define LOG(...)  do { if (VERBOSE) logerror(__VA_ARGS__); } while (0)
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type I8251 = device_creator<i8251_device>;
-const device_type V53_SCU = device_creator<v53_scu_device>;
-
-template class device_finder<i8251_device, false>;
-template class device_finder<i8251_device, true>;
-template class device_finder<v53_scu_device, false>;
-template class device_finder<v53_scu_device, true>;
+DEFINE_DEVICE_TYPE(I8251,   i8251_device,  "i8251",    "Intel 8251 USART")
+DEFINE_DEVICE_TYPE(V53_SCU, v53_scu_device, "v63_scu", "NEC V53 SCU")
 
 
 //-------------------------------------------------
@@ -46,13 +36,10 @@ template class device_finder<v53_scu_device, true>;
 i8251_device::i8251_device(
 		const machine_config &mconfig,
 		device_type type,
-		const char *name,
 		const char *tag,
 		device_t *owner,
-		uint32_t clock,
-		const char *shortname,
-		const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+		uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock),
 	device_serial_interface(mconfig, *this),
 	m_txd_handler(*this),
 	m_dtr_handler(*this),
@@ -70,12 +57,12 @@ i8251_device::i8251_device(
 }
 
 i8251_device::i8251_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: i8251_device(mconfig, I8251, "8251 USART", tag, owner, clock, "i8251", __FILE__)
+	: i8251_device(mconfig, I8251, tag, owner, clock)
 {
 }
 
 v53_scu_device::v53_scu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: i8251_device(mconfig, V53_SCU, "V53 SCU", tag, owner, clock, "v53_scu", __FILE__)
+	: i8251_device(mconfig, V53_SCU, tag, owner, clock)
 {
 }
 
@@ -186,6 +173,7 @@ void i8251_device::check_for_tx_start()
 -------------------------------------------------*/
 void i8251_device::start_tx()
 {
+	LOG("start_tx %02x\n", m_tx_data);
 	transmit_register_setup(m_tx_data);
 	m_status &= ~I8251_STATUS_TX_EMPTY;
 	m_status |= I8251_STATUS_TX_READY;
@@ -340,7 +328,7 @@ void i8251_device::device_reset()
     control_w
 -------------------------------------------------*/
 
-WRITE8_MEMBER(i8251_device::command_w)
+void i8251_device::command_w(uint8_t data)
 {
 	/* command */
 	LOG("I8251: Command byte\n");
@@ -419,7 +407,7 @@ WRITE8_MEMBER(i8251_device::command_w)
 	update_tx_empty();
 }
 
-WRITE8_MEMBER(i8251_device::mode_w)
+void i8251_device::mode_w(uint8_t data)
 {
 	LOG("I8251: Mode byte = %X\n", data);
 
@@ -597,12 +585,12 @@ WRITE8_MEMBER(i8251_device::control_w)
 		}
 		else
 		{
-			mode_w(space, offset, data);
+			mode_w(data);
 		}
 	}
 	else
 	{
-		command_w(space, offset, data);
+		command_w(data);
 	}
 }
 
@@ -660,6 +648,8 @@ WRITE8_MEMBER(i8251_device::data_w)
 
 void i8251_device::receive_character(uint8_t ch)
 {
+	LOG("receive_character %02x\n", ch);
+
 	m_rx_data = ch;
 
 	/* char has not been read and another has arrived! */
@@ -734,4 +724,14 @@ WRITE_LINE_MEMBER(i8251_device::write_txc)
 		if (!m_txc)
 			transmit_clock();
 	}
+}
+
+WRITE8_MEMBER(v53_scu_device::command_w)
+{
+	i8251_device::command_w(data);
+}
+
+WRITE8_MEMBER(v53_scu_device::mode_w)
+{
+	i8251_device::mode_w(data);
 }

@@ -72,7 +72,7 @@ public:
 	u16 m_display_segmask[0x20];    // if not 0, display matrix row is a digit, mask indicates connected segments
 	u32 m_display_cache[0x20];      // (internal use)
 	u8 m_display_decay[0x20][0x20]; // (internal use)
-	
+
 	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
 	void display_update();
 	void set_display_size(int maxx, int maxy);
@@ -260,7 +260,7 @@ WRITE8_MEMBER(cxgz80_state::ch2001_leds_w)
 	// 74ls273 Q1-Q4: 74ls145 A-D
 	// 74ls145 0-9: input mux/led select
 	m_inp_mux = 1 << (data & 0xf) & 0x3ff;
-	
+
 	// 74ls273 Q5-Q8: MC14028 A-D
 	// MC14028 Q0-Q7: led data, Q8,Q9: N/C
 	u8 led_data = 1 << (data >> 4 & 0xf) & 0xff;
@@ -407,7 +407,7 @@ INPUT_PORTS_END
     Machine Drivers
 ******************************************************************************/
 
-static MACHINE_CONFIG_START( ch2001, cxgz80_state )
+static MACHINE_CONFIG_START( ch2001 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz/2)
@@ -445,5 +445,5 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-/*    YEAR  NAME       PARENT    COMPAT  MACHINE   INPUT     INIT                      COMPANY, FULLNAME, FLAGS */
-CONS( 1984, ch2001,    0,        0,      ch2001,   ch2001,   driver_device,   0,       "CXG", "Chess 2001", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+/*    YEAR  NAME       PARENT    COMPAT  MACHINE   INPUT     STATE          INIT  COMPANY  FULLNAME       FLAGS */
+CONS( 1984, ch2001,    0,        0,      ch2001,   ch2001,   cxgz80_state,  0,    "CXG",   "Chess 2001",  MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

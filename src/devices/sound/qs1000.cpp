@@ -131,7 +131,7 @@
 
 
 // device type definition
-const device_type QS1000 = device_creator<qs1000_device>;
+DEFINE_DEVICE_TYPE(QS1000, qs1000_device, "qs1000", "QS1000")
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -151,15 +151,6 @@ static ADDRESS_MAP_START( qs1000_io_map, AS_IO, 8, qs1000_device )
 ADDRESS_MAP_END
 
 
-// Machine fragment
-static MACHINE_CONFIG_FRAGMENT( qs1000 )
-	MCFG_CPU_ADD("cpu", I8052, DERIVED_CLOCK(1, 1))
-	MCFG_CPU_PROGRAM_MAP(qs1000_prg_map)
-	MCFG_CPU_IO_MAP(qs1000_io_map)
-	MCFG_MCS51_SERIAL_RX_CB(READ8(qs1000_device, data_to_i8052))
-MACHINE_CONFIG_END
-
-
 // ROM definition for the QS1000 internal program ROM
 ROM_START( qs1000 )
 	ROM_REGION( 0x10000, "cpu", 0 )
@@ -175,7 +166,7 @@ ROM_END
 //  qs1000_device - constructor
 //-------------------------------------------------
 qs1000_device::qs1000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, QS1000, "QS1000", tag, owner, clock, "qs1000", __FILE__),
+	: device_t(mconfig, QS1000, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		device_rom_interface(mconfig, *this, 24),
 		m_external_rom(false),
@@ -203,13 +194,14 @@ const tiny_rom_entry *qs1000_device::device_rom_region() const
 
 
 //-------------------------------------------------
-//  machine_config_additions - return a pointer to
-//  the device's machine fragment
+//  device_add_mconfig - add machine configuration
 //-------------------------------------------------
-machine_config_constructor qs1000_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( qs1000 );
-}
+MACHINE_CONFIG_MEMBER( qs1000_device::device_add_mconfig )
+	MCFG_CPU_ADD("cpu", I8052, DERIVED_CLOCK(1, 1))
+	MCFG_CPU_PROGRAM_MAP(qs1000_prg_map)
+	MCFG_CPU_IO_MAP(qs1000_io_map)
+	MCFG_MCS51_SERIAL_RX_CB(READ8(qs1000_device, data_to_i8052))
+MACHINE_CONFIG_END
 
 
 //-------------------------------------------------

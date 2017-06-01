@@ -15,27 +15,27 @@
 #include "screen.h"
 
 
-const device_type TRIDENT_VGA = device_creator<tgui9860_device>;
-const device_type TVGA9000_VGA = device_creator<tvga9000_device>;
+DEFINE_DEVICE_TYPE(TRIDENT_VGA,  tgui9860_device, "trident_vga",  "Trident TGUI9860")
+DEFINE_DEVICE_TYPE(TVGA9000_VGA, tvga9000_device, "tvga9000_vga", "Trident TVGA9000")
 
 #define CRTC_PORT_ADDR ((vga.miscellaneous_output&1)?0x3d0:0x3b0)
 
 #define LOG (1)
 #define LOG_ACCEL (1)
 
-trident_vga_device::trident_vga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: svga_device(mconfig, type, name, tag, owner, clock, shortname, source)
+trident_vga_device::trident_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: svga_device(mconfig, type, tag, owner, clock)
 {
 }
 
 tgui9860_device::tgui9860_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: trident_vga_device(mconfig, TRIDENT_VGA, "Trident TGUI9680", tag, owner, clock, "trident_vga", __FILE__)
+	: trident_vga_device(mconfig, TRIDENT_VGA, tag, owner, clock)
 {
 	m_version = 0xd3;   // 0xd3 identifies at TGUI9660XGi (set to 0xe3 to identify at TGUI9440AGi)
 }
 
 tvga9000_device::tvga9000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: trident_vga_device(mconfig, TVGA9000_VGA, "Trident TVGA9000", tag, owner, clock, "tvga9000_vga", __FILE__)
+	: trident_vga_device(mconfig, TVGA9000_VGA, tag, owner, clock)
 {
 	m_version = 0x43;
 }

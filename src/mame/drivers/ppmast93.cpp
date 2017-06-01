@@ -360,7 +360,7 @@ uint32_t ppmast93_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-static MACHINE_CONFIG_START( ppmast93, ppmast93_state )
+static MACHINE_CONFIG_START( ppmast93 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,5000000)         /* 5 MHz */
 	MCFG_CPU_PROGRAM_MAP(ppmast93_cpu1_map)
@@ -383,7 +383,7 @@ static MACHINE_CONFIG_START( ppmast93, ppmast93_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ppmast93)
 
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 0x100)
+	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 0x100)
 
 
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
@@ -415,4 +415,4 @@ ROM_START( ppmast93 )
 	ROM_LOAD( "prom1.ug26", 0x200, 0x100, CRC(d979c64e) SHA1(172c9579013d58e35a5b4f732e360811ac36295e) )
 ROM_END
 
-GAME( 1993, ppmast93, 0, ppmast93, ppmast93, driver_device, 0, ROT0, "Electronic Devices S.R.L.", "Ping Pong Masters '93", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, ppmast93, 0, ppmast93, ppmast93, ppmast93_state, 0, ROT0, "Electronic Devices S.R.L.", "Ping Pong Masters '93", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

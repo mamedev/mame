@@ -65,10 +65,10 @@ Priority word (Midres):
 #include "emu.h"
 #include "decbac06.h"
 
-const device_type DECO_BAC06 = device_creator<deco_bac06_device>;
+DEFINE_DEVICE_TYPE(DECO_BAC06, deco_bac06_device, "deco_back06", "DECO BAC06 Tilemap")
 
 deco_bac06_device::deco_bac06_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, DECO_BAC06, "DECO BAC06 Tilemap", tag, owner, clock, "deco_bac06", __FILE__),
+	: device_t(mconfig, DECO_BAC06, tag, owner, clock),
 		m_pf_data(nullptr),
 		m_pf_rowscroll(nullptr),
 		m_pf_colscroll(nullptr),

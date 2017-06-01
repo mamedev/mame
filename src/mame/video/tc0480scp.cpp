@@ -150,10 +150,10 @@ Control registers
 #define TC0480SCP_TOTAL_CHARS 256
 
 
-const device_type TC0480SCP = device_creator<tc0480scp_device>;
+DEFINE_DEVICE_TYPE(TC0480SCP, tc0480scp_device, "tc0480scp", "Taito TC0480SCP")
 
 tc0480scp_device::tc0480scp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TC0480SCP, "Taito TC0480SCP", tag, owner, clock, "tc0480scp", __FILE__),
+	: device_t(mconfig, TC0480SCP, tag, owner, clock),
 	m_tx_ram(nullptr),
 	m_char_ram(nullptr),
 	m_pri_reg(0),
@@ -287,7 +287,7 @@ void tc0480scp_device::device_start()
 	set_layer_ptrs();
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(m_txnum, std::make_unique<gfx_element>(m_gfxdecode->palette(), tc0480scp_charlayout, (uint8_t *)m_char_ram, NATIVE_ENDIAN_VALUE_LE_BE(8,0), 64, m_col_base));
+	m_gfxdecode->set_gfx(m_txnum, std::make_unique<gfx_element>(&m_gfxdecode->palette(), tc0480scp_charlayout, (uint8_t *)m_char_ram, NATIVE_ENDIAN_VALUE_LE_BE(8,0), 64, m_col_base));
 	m_gfxdecode->gfx(m_gfxnum)->set_colorbase(m_col_base);
 
 	save_item(NAME(m_ram));

@@ -16,12 +16,12 @@ INPUT_PORTS_END
 } // anonymous namespace
 
 serial_keyboard_device::serial_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: serial_keyboard_device(mconfig, SERIAL_KEYBOARD, "Serial Keyboard", tag, owner, clock, "serial_keyboard", __FILE__)
+	: serial_keyboard_device(mconfig, SERIAL_KEYBOARD, tag, owner, clock)
 {
 }
 
-serial_keyboard_device::serial_keyboard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: generic_keyboard_device(mconfig, type, name, tag, owner, clock, shortname, source)
+serial_keyboard_device::serial_keyboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: generic_keyboard_device(mconfig, type, tag, owner, clock)
 	, device_buffered_serial_interface(mconfig, *this)
 	, device_rs232_port_interface(mconfig, *this)
 	, m_rs232_txbaud(*this, "RS232_TXBAUD")
@@ -100,4 +100,4 @@ void serial_keyboard_device::received_byte(uint8_t byte)
 {
 }
 
-const device_type SERIAL_KEYBOARD = device_creator<serial_keyboard_device>;
+DEFINE_DEVICE_TYPE(SERIAL_KEYBOARD, serial_keyboard_device, "serial_keyboard", "Serial Keyboard")

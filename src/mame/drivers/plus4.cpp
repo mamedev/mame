@@ -16,7 +16,9 @@
 #include "softlist.h"
 #include "speaker.h"
 #include "bus/cbmiec/cbmiec.h"
+#include "bus/pet/c2n.h"
 #include "bus/pet/cass.h"
+#include "bus/pet/diag264_lb_tape.h"
 #include "bus/plus4/exp.h"
 #include "bus/plus4/user.h"
 #include "bus/vcs_ctrl/ctrl.h"
@@ -882,7 +884,7 @@ void plus4_state::machine_reset()
 //  MACHINE_CONFIG( plus4 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( plus4, plus4_state )
+static MACHINE_CONFIG_START( plus4 )
 	// basic machine hardware
 	MCFG_CPU_ADD(MOS7501_TAG, M7501, 0)
 	MCFG_CPU_PROGRAM_MAP(plus4_mem)
@@ -966,7 +968,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( plus4p )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED_CLASS( plus4p, plus4, c16_state )
+static MACHINE_CONFIG_DERIVED( plus4p, plus4 )
 	MCFG_DEVICE_MODIFY(MOS7501_TAG)
 	MCFG_DEVICE_CLOCK(XTAL_17_73447MHz/20)
 
@@ -987,7 +989,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( plus4n )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED_CLASS( plus4n, plus4, c16_state )
+static MACHINE_CONFIG_DERIVED( plus4n, plus4 )
 	MCFG_DEVICE_MODIFY(MOS7501_TAG)
 	MCFG_DEVICE_CLOCK(XTAL_14_31818MHz/16)
 
@@ -1008,7 +1010,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( c16n )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED_CLASS( c16n, plus4n, c16_state )
+static MACHINE_CONFIG_DERIVED( c16n, plus4n )
 	MCFG_CPU_MODIFY(MOS7501_TAG)
 	MCFG_M7501_PORT_CALLBACKS(READ8(c16_state, cpu_r), WRITE8(plus4_state, cpu_w))
 	MCFG_M7501_PORT_PULLS(0x00, 0xc0)
@@ -1030,7 +1032,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( c16p )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED_CLASS( c16p, plus4p, c16_state )
+static MACHINE_CONFIG_DERIVED( c16p, plus4p )
 	MCFG_CPU_MODIFY(MOS7501_TAG)
 	MCFG_M7501_PORT_CALLBACKS(READ8(c16_state, cpu_r), WRITE8(plus4_state, cpu_w))
 	MCFG_M7501_PORT_PULLS(0x00, 0xc0)
@@ -1267,13 +1269,13 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT                    COMPANY                         FULLNAME                        FLAGS
-COMP( 1984, c264,   0,      0,      plus4n, plus4,  driver_device,  0,      "Commodore Business Machines",  "Commodore 264 (Prototype)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-COMP( 1984, c232,   c264,   0,      c232,   plus4,  driver_device,  0,      "Commodore Business Machines",  "Commodore 232 (Prototype)",    MACHINE_SUPPORTS_SAVE )
-COMP( 1984, v364,   c264,   0,      v364,   plus4,  driver_device,  0,      "Commodore Business Machines",  "Commodore V364 (Prototype)",   MACHINE_SUPPORTS_SAVE )
-COMP( 1984, plus4,  c264,   0,      plus4n, plus4,  driver_device,  0,      "Commodore Business Machines",  "Plus/4 (NTSC)",                MACHINE_SUPPORTS_SAVE )
-COMP( 1984, plus4p, c264,   0,      plus4p, plus4,  driver_device,  0,      "Commodore Business Machines",  "Plus/4 (PAL)",                 MACHINE_SUPPORTS_SAVE )
-COMP( 1984, c16,    c264,   0,      c16n,   c16,    driver_device,  0,      "Commodore Business Machines",  "Commodore 16 (NTSC)",          MACHINE_SUPPORTS_SAVE )
-COMP( 1984, c16p,   c264,   0,      c16p,   c16,    driver_device,  0,      "Commodore Business Machines",  "Commodore 16 (PAL)",           MACHINE_SUPPORTS_SAVE )
-COMP( 1984, c16_hu, c264,   0,      c16p,   c16,    driver_device,  0,      "Commodore Business Machines",  "Commodore 16 (Hungary)",       MACHINE_SUPPORTS_SAVE )
-COMP( 1984, c116,   c264,   0,      c16p,   c16,    driver_device,  0,      "Commodore Business Machines",  "Commodore 116",                MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   STATE       INIT    COMPANY                         FULLNAME                        FLAGS
+COMP( 1984, c264,   0,      0,      plus4n, plus4,  c16_state,  0,      "Commodore Business Machines",  "Commodore 264 (Prototype)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+COMP( 1984, c232,   c264,   0,      c232,   plus4,  c16_state,  0,      "Commodore Business Machines",  "Commodore 232 (Prototype)",    MACHINE_SUPPORTS_SAVE )
+COMP( 1984, v364,   c264,   0,      v364,   plus4,  c16_state,  0,      "Commodore Business Machines",  "Commodore V364 (Prototype)",   MACHINE_SUPPORTS_SAVE )
+COMP( 1984, plus4,  c264,   0,      plus4n, plus4,  c16_state,  0,      "Commodore Business Machines",  "Plus/4 (NTSC)",                MACHINE_SUPPORTS_SAVE )
+COMP( 1984, plus4p, c264,   0,      plus4p, plus4,  c16_state,  0,      "Commodore Business Machines",  "Plus/4 (PAL)",                 MACHINE_SUPPORTS_SAVE )
+COMP( 1984, c16,    c264,   0,      c16n,   c16,    c16_state,  0,      "Commodore Business Machines",  "Commodore 16 (NTSC)",          MACHINE_SUPPORTS_SAVE )
+COMP( 1984, c16p,   c264,   0,      c16p,   c16,    c16_state,  0,      "Commodore Business Machines",  "Commodore 16 (PAL)",           MACHINE_SUPPORTS_SAVE )
+COMP( 1984, c16_hu, c264,   0,      c16p,   c16,    c16_state,  0,      "Commodore Business Machines",  "Commodore 16 (Hungary)",       MACHINE_SUPPORTS_SAVE )
+COMP( 1984, c116,   c264,   0,      c16p,   c16,    c16_state,  0,      "Commodore Business Machines",  "Commodore 116",                MACHINE_SUPPORTS_SAVE )

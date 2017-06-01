@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol
-#ifndef __PCE_CD_H
-#define __PCE_CD_H
+#ifndef MAME_MACHINE_PCE_CD_H
+#define MAME_MACHINE_PCE_CD_H
+
+#pragma once
 
 /***************************************************************************
  TYPE DEFINITIONS
@@ -43,12 +45,6 @@ class pce_cd_device : public device_t
 public:
 	// construction/destruction
 	pce_cd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual ~pce_cd_device() {}
-
-	// device-level overrides
-	virtual void device_start() override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual void device_reset() override;
 
 	void update();
 
@@ -57,12 +53,15 @@ public:
 	DECLARE_WRITE8_MEMBER(bram_w);
 	DECLARE_WRITE8_MEMBER(intf_w);
 	DECLARE_WRITE8_MEMBER(acard_w);
-	DECLARE_WRITE_LINE_MEMBER(msm5205_int);
 	DECLARE_READ8_MEMBER(bram_r);
 	DECLARE_READ8_MEMBER(intf_r);
 	DECLARE_READ8_MEMBER(acard_r);
 
-	void nvram_init(nvram_device &nvram, void *data, size_t size);
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_reset() override;
 
 private:
 	void adpcm_stop(uint8_t irq_flag);
@@ -169,12 +168,15 @@ private:
 	emu_timer   *m_adpcm_fadeout_timer;
 	emu_timer   *m_adpcm_fadein_timer;
 	double  m_adpcm_volume;
+
+	DECLARE_WRITE_LINE_MEMBER(msm5205_int);
+	void nvram_init(nvram_device &nvram, void *data, size_t size);
 };
 
 
 
 // device type definition
-extern const device_type PCE_CD;
+DECLARE_DEVICE_TYPE(PCE_CD, pce_cd_device)
 
 
 /***************************************************************************
@@ -185,4 +187,4 @@ extern const device_type PCE_CD;
 	MCFG_DEVICE_ADD(_tag, PCE_CD, 0)
 
 
-#endif
+#endif // MAME_MACHINE_PCE_CD_H

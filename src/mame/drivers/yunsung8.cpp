@@ -350,7 +350,7 @@ void yunsung8_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( yunsung8, yunsung8_state )
+static MACHINE_CONFIG_START( yunsung8 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz/2)           /* Z80B @ 8MHz? */
@@ -385,7 +385,7 @@ static MACHINE_CONFIG_START( yunsung8, yunsung8_state )
 
 	MCFG_SOUND_ADD("msm", MSM5205, XTAL_400kHz) /* verified on pcb */
 	MCFG_MSM5205_VCLK_CB(WRITELINE(yunsung8_state, adpcm_int)) /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S96_4B)      /* 4KHz, 4 Bits */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)      /* 4KHz, 4 Bits */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
 MACHINE_CONFIG_END
@@ -608,8 +608,8 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1995,  cannball,  0,        yunsung8, cannball, driver_device, 0, ROT0,   "Yun Sung / Soft Vision",    "Cannon Ball (Yun Sung, horizontal)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1995,  cannballv, cannball, yunsung8, cannbalv, driver_device, 0, ROT270, "Yun Sung / J&K Production", "Cannon Ball (Yun Sung, vertical)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1995,  magix,     0,        yunsung8, magix,    driver_device, 0, ROT0,   "Yun Sung",                  "Magix / Rock",                        MACHINE_SUPPORTS_SAVE )
-GAME( 1995,  magixb,    magix,    yunsung8, magix,    driver_device, 0, ROT0,   "Yun Sung",                  "Magix / Rock (no copyright message)", MACHINE_SUPPORTS_SAVE ) // was marked as bootleg, but has been seen on original PCBs
-GAME( 1994?, rocktris,  0,        yunsung8, rocktris, driver_device, 0, ROT0,   "Yun Sung",                  "Rock Tris",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1995,  cannball,  0,        yunsung8, cannball, yunsung8_state, 0, ROT0,   "Yun Sung / Soft Vision",    "Cannon Ball (Yun Sung, horizontal)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1995,  cannballv, cannball, yunsung8, cannbalv, yunsung8_state, 0, ROT270, "Yun Sung / J&K Production", "Cannon Ball (Yun Sung, vertical)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1995,  magix,     0,        yunsung8, magix,    yunsung8_state, 0, ROT0,   "Yun Sung",                  "Magix / Rock",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1995,  magixb,    magix,    yunsung8, magix,    yunsung8_state, 0, ROT0,   "Yun Sung",                  "Magix / Rock (no copyright message)", MACHINE_SUPPORTS_SAVE ) // was marked as bootleg, but has been seen on original PCBs
+GAME( 1994?, rocktris,  0,        yunsung8, rocktris, yunsung8_state, 0, ROT0,   "Yun Sung",                  "Rock Tris",                           MACHINE_SUPPORTS_SAVE )

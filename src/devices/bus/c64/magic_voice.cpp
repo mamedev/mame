@@ -66,7 +66,7 @@ http://www.stefan-uhlmann.de/cbm/MVM/index.html
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_MAGIC_VOICE = device_creator<c64_magic_voice_cartridge_device>;
+DEFINE_DEVICE_TYPE(C64_MAGIC_VOICE, c64_magic_voice_cartridge_device, "c64_magic_voice", "C64 Magic Voice cartridge")
 
 
 //-------------------------------------------------
@@ -216,10 +216,10 @@ WRITE_LINE_MEMBER( c64_magic_voice_cartridge_device::apd_w )
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( c64_magic_voice )
+//  MACHINE_CONFIG_START( c64_magic_voice )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( c64_magic_voice )
+static MACHINE_CONFIG_START( c64_magic_voice )
 	MCFG_DEVICE_ADD(MOS6525_TAG, TPI6525, 0)
 	MCFG_TPI6525_OUT_IRQ_CB(WRITELINE(c64_magic_voice_cartridge_device, tpi_irq_w))
 	MCFG_TPI6525_IN_PA_CB(READ8(c64_magic_voice_cartridge_device, tpi_pa_r))
@@ -265,7 +265,7 @@ machine_config_constructor c64_magic_voice_cartridge_device::device_mconfig_addi
 //-------------------------------------------------
 
 c64_magic_voice_cartridge_device::c64_magic_voice_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, C64_MAGIC_VOICE, "C64 Magic Voice cartridge", tag, owner, clock, "c64_magic_voice", __FILE__),
+	device_t(mconfig, C64_MAGIC_VOICE, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_vslsi(*this, T6721A_TAG),
 	m_tpi(*this, MOS6525_TAG),

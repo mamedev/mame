@@ -46,12 +46,12 @@ typedef uint32_t DWORD;
 #include "v25priv.h"
 #include "nec_common.h"
 
-const device_type V25 = device_creator<v25_device>;
-const device_type V35 = device_creator<v35_device>;
+DEFINE_DEVICE_TYPE(V25, v25_device, "v25", "V25")
+DEFINE_DEVICE_TYPE(V35, v35_device, "v35", "V35")
 
 
-v25_common_device::v25_common_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, bool is_16bit, offs_t fetch_xor, uint8_t prefetch_size, uint8_t prefetch_cycles, uint32_t chip_type)
-	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, __FILE__)
+v25_common_device::v25_common_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool is_16bit, offs_t fetch_xor, uint8_t prefetch_size, uint8_t prefetch_cycles, uint32_t chip_type)
+	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, is_16bit ? 16 : 8, 20, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, is_16bit ? 16 : 8, 16, 0)
 	, m_fetch_xor(fetch_xor)
@@ -72,13 +72,13 @@ v25_common_device::v25_common_device(const machine_config &mconfig, device_type 
 
 
 v25_device::v25_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: v25_common_device(mconfig, V25, "V25", tag, owner, clock, "v25", false, 0, 4, 4, V20_TYPE)
+	: v25_common_device(mconfig, V25, tag, owner, clock, false, 0, 4, 4, V20_TYPE)
 {
 }
 
 
 v35_device::v35_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: v25_common_device(mconfig, V35, "V35", tag, owner, clock, "v35", true, BYTE_XOR_LE(0), 6, 2, V30_TYPE)
+	: v25_common_device(mconfig, V35, tag, owner, clock, true, BYTE_XOR_LE(0), 6, 2, V30_TYPE)
 {
 }
 

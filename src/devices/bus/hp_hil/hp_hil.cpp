@@ -28,7 +28,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type HP_HIL_SLOT = device_creator<hp_hil_slot_device>;
+DEFINE_DEVICE_TYPE(HP_HIL_SLOT, hp_hil_slot_device, "hp_hil_slot", "HP-HIL Slot")
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -38,7 +38,7 @@ const device_type HP_HIL_SLOT = device_creator<hp_hil_slot_device>;
 //  hp_hil_slot_device - constructor
 //-------------------------------------------------
 hp_hil_slot_device::hp_hil_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, HP_HIL_SLOT, "HP_HIL_SLOT", tag, owner, clock, "hp_hil_slot", __FILE__)
+	: device_t(mconfig, HP_HIL_SLOT, tag, owner, clock)
 	, device_slot_interface(mconfig, *this)
 {
 }
@@ -67,14 +67,14 @@ void hp_hil_slot_device::device_start()
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type HP_HIL_MLC = device_creator<hp_hil_mlc_device>;
+DEFINE_DEVICE_TYPE(HP_HIL_MLC, hp_hil_mlc_device, "hp_hil_mlc", "HP-HIL Master Link Controller")
 
 
 //-------------------------------------------------
 //  hp_hil_mlc_device - constructor
 //-------------------------------------------------
 hp_hil_mlc_device::hp_hil_mlc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, HP_HIL_MLC, "HP-HIL Master Link Controller", tag, owner, clock, "hp_hil", __FILE__)
+	: device_t(mconfig, HP_HIL_MLC, tag, owner, clock)
 	, int_cb(*this)
 	, nmi_cb(*this)
 {
@@ -119,7 +119,7 @@ WRITE8_MEMBER(hp_hil_mlc_device::write)
 	{
 	case 0:
 		DBG_LOG(1,"Transmit", ("%scommand 0x%02x to device %d\n", !m_loop?"loopback ":"", data, m_w1 & 7));
-		if (m_loop & 2)	// no devices on 2nd link loop
+		if (m_loop & 2) // no devices on 2nd link loop
 			return;
 		if (m_loop == 0)
 		{
@@ -160,7 +160,7 @@ WRITE8_MEMBER(hp_hil_mlc_device::write)
 		m_w3 = data;
 		break;
 
-	case 32:	// loopback switch: bit 0 = loop0, bit 1 = loop1
+	case 32:    // loopback switch: bit 0 = loop0, bit 1 = loop1
 		m_loop = data;
 		break;
 	}
@@ -170,7 +170,7 @@ READ8_MEMBER(hp_hil_mlc_device::read)
 {
 	uint8_t data = 0;
 
-	switch (offset) 
+	switch (offset)
 	{
 	case 0:
 		if (!m_fifo.empty())
@@ -201,16 +201,16 @@ READ8_MEMBER(hp_hil_mlc_device::read)
 
 void hp_hil_mlc_device::hil_write(uint16_t data)
 {
-	DBG_LOG(1,"Receive", ("%s %04X fifo %s\n", 
+	DBG_LOG(1,"Receive", ("%s %04X fifo %s\n",
 		BIT(data, 11)?"command":"data", data, m_fifo.full()?"full":(m_fifo.empty()?"empty":"ok")));
 
-	if (!m_fifo.full()) 
+	if (!m_fifo.full())
 	{
-		if (!BIT(data, 11)) 
+		if (!BIT(data, 11))
 		{
 			m_fifo.enqueue(data);
 		}
-		else if (!m_fifo.empty() || !(m_w2 & HPMLC_W2_IPF)) 
+		else if (!m_fifo.empty() || !(m_w2 & HPMLC_W2_IPF))
 		{
 			m_fifo.enqueue(data);
 			m_r3 |= HPMLC_R3_INT;

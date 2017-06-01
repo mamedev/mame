@@ -817,7 +817,7 @@ void nss_state::machine_reset()
 	m_joy_flag = 1;
 }
 
-static MACHINE_CONFIG_START( nss, nss_state )
+static MACHINE_CONFIG_START( nss )
 
 	/* base snes hardware */
 	MCFG_CPU_ADD("maincpu", _5A22, MCLK_NTSC)   /* 2.68Mhz, also 3.58Mhz */
@@ -1069,7 +1069,7 @@ DRIVER_INIT_MEMBER(nss_state,nss)
 	DRIVER_INIT_CALL(snes);
 }
 
-GAME( 199?, nss,       0,     nss,      snes, snes_state,    snes,    ROT0, "Nintendo",                    "Nintendo Super System BIOS", MACHINE_IS_BIOS_ROOT )
+GAME( 199?, nss,       0,     nss,      snes, nss_state,    snes,   ROT0, "Nintendo",                    "Nintendo Super System BIOS", MACHINE_IS_BIOS_ROOT )
 GAME( 1992, nss_actr,  nss,   nss,      snes, nss_state,    nss,    ROT0, "Enix",                        "Act Raiser (Nintendo Super System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 GAME( 1992, nss_adam,  nss,   nss,      snes, nss_state,    nss,    ROT0, "Ocean",                       "The Addams Family (Nintendo Super System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 GAME( 1992, nss_aten,  nss,   nss,      snes, nss_state,    nss,    ROT0, "Absolute Entertainment Inc.", "David Crane's Amazing Tennis (Nintendo Super System)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )

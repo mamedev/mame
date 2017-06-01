@@ -1,13 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder, Olivier Galibert
-#pragma once
+#ifndef MAME_INCLUDES_ATARI_ST_H
+#define MAME_INCLUDES_ATARI_ST_H
 
-#ifndef __ATARI_ST__
-#define __ATARI_ST__
+#pragma once
 
 #include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
-#include "cpu/m6800/m6800.h"
+#include "cpu/m6800/m6801.h"
 #include "machine/6850acia.h"
 #include "machine/8530scc.h"
 #include "bus/centronics/ctronics.h"
@@ -124,7 +124,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<wd1772_t> m_fdc;
+	required_device<wd1772_device> m_fdc;
 	required_device<mc68901_device> m_mfp;
 	required_device<acia6850_device> m_acia0;
 	required_device<acia6850_device> m_acia1;
@@ -465,4 +465,4 @@ public:
 	DECLARE_READ8_MEMBER( mfp_gpio_r );
 };
 
-#endif
+#endif // MAME_INCLUDES_ATARI_ST_H

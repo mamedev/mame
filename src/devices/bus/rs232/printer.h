@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:smf
-#ifndef __RS232_PRINTER_H__
-#define __RS232_PRINTER_H__
+#ifndef MAME_BUS_RS232_PRINTER_H
+#define MAME_BUS_RS232_PRINTER_H
 
 #pragma once
 
@@ -39,6 +39,6 @@ private:
 	required_ioport m_rs232_stopbits;
 };
 
-extern const device_type SERIAL_PRINTER;
+DECLARE_DEVICE_TYPE(SERIAL_PRINTER, serial_printer_device)
 
-#endif
+#endif // MAME_BUS_RS232_PRINTER_H

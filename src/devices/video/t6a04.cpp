@@ -15,7 +15,7 @@
 #include "video/t6a04.h"
 
 // devices
-const device_type T6A04 = device_creator<t6a04_device>;
+DEFINE_DEVICE_TYPE(T6A04, t6a04_device, "t6a04", "Toshiba T6A04 LCD Controller")
 
 //-------------------------------------------------
 //  device_validity_check - perform validity checks
@@ -37,10 +37,12 @@ void t6a04_device::device_validity_check(validity_checker &valid) const
 //-------------------------------------------------
 
 t6a04_device::t6a04_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, T6A04, "T6A04", tag, owner, clock, "t6a04", __FILE__), m_busy_flag(0), m_display_on(0), m_contrast(0), m_xpos(0), m_ypos(0), m_zpos(0), m_direction(0),
-	m_active_counter(0), m_word_len(0), m_opa1(0), m_opa2(0), m_output_reg(0),
-	m_height(0),
-	m_width(0)
+	device_t(mconfig, T6A04, tag, owner, clock),
+	m_busy_flag(0), m_display_on(0), m_contrast(0),
+	m_xpos(0), m_ypos(0), m_zpos(0),
+	m_direction(0), m_active_counter(0), m_word_len(0),
+	m_opa1(0), m_opa2(0), m_output_reg(0),
+	m_height(0), m_width(0)
 {
 }
 

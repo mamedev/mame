@@ -16,11 +16,11 @@ C76     System 11
 #include "namcomcu.h"
 
 
-const device_type NAMCO_C69 = device_creator<namco_c69_device>;
-const device_type NAMCO_C70 = device_creator<namco_c70_device>;
-const device_type NAMCO_C74 = device_creator<namco_c74_device>;
-const device_type NAMCO_C75 = device_creator<namco_c75_device>;
-const device_type NAMCO_C76 = device_creator<namco_c76_device>;
+DEFINE_DEVICE_TYPE(NAMCO_C69, namco_c69_device, "namcoc69", "Namco C69 (M37702)")
+DEFINE_DEVICE_TYPE(NAMCO_C70, namco_c70_device, "namcoc70", "Namco C70 (M37702)")
+DEFINE_DEVICE_TYPE(NAMCO_C74, namco_c74_device, "namcoc74", "Namco C74 (M37702)")
+DEFINE_DEVICE_TYPE(NAMCO_C75, namco_c75_device, "namcoc75", "Namco C75 (M37702)")
+DEFINE_DEVICE_TYPE(NAMCO_C76, namco_c76_device, "namcoc76", "Namco C76 (M37702)")
 
 
 ROM_START( c69 )
@@ -54,27 +54,27 @@ ROM_END
 
 
 namco_c69_device::namco_c69_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: m37702m2_device(mconfig, NAMCO_C69, "C69 (M37702)", tag, owner, clock, "namcoc69", __FILE__)
+	: m37702m2_device(mconfig, NAMCO_C69, tag, owner, clock)
 {
 }
 
 namco_c70_device::namco_c70_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: m37702m2_device(mconfig, NAMCO_C70, "C70 (M37702)", tag, owner, clock, "namcoc70", __FILE__)
+	: m37702m2_device(mconfig, NAMCO_C70, tag, owner, clock)
 {
 }
 
 namco_c74_device::namco_c74_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: m37702m2_device(mconfig, NAMCO_C74, "C74 (M37702)", tag, owner, clock, "namcoc74", __FILE__)
+	: m37702m2_device(mconfig, NAMCO_C74, tag, owner, clock)
 {
 }
 
 namco_c75_device::namco_c75_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: m37702m2_device(mconfig, NAMCO_C75, "C75 (M37702)", tag, owner, clock, "namcoc75", __FILE__)
+	: m37702m2_device(mconfig, NAMCO_C75, tag, owner, clock)
 {
 }
 
 namco_c76_device::namco_c76_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: m37702m2_device(mconfig, NAMCO_C76, "C76 (M37702)", tag, owner, clock, "namcoc76", __FILE__)
+	: m37702m2_device(mconfig, NAMCO_C76, tag, owner, clock)
 {
 }
 

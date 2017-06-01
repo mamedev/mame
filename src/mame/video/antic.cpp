@@ -20,40 +20,321 @@
 
 #define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
 
+#define CYCLES_PER_LINE 114     /* total number of cpu cycles per scanline (incl. hblank) */
+#define CYCLES_REFRESH  9       /* number of cycles lost for ANTICs RAM refresh using DMA */
+#define CYCLES_HSTART   32      /* where does the ANTIC DMA fetch start */
+#define CYCLES_DLI_NMI  7       /* number of cycles until the CPU recognizes a DLI */
+#define CYCLES_HSYNC    104     /* where does the HSYNC position of a scanline start */
+
+#define PMOFFSET        32      /* # of pixels to adjust p/m hpos */
+
+#define VPAGE           0xf000  /* 4K page mask for video data src */
+#define VOFFS           0x0fff  /* 4K offset mask for video data src */
+#define DPAGE           0xfc00  /* 1K page mask for display list */
+#define DOFFS           0x03ff  /* 1K offset mask for display list */
+
+#define DLI_NMI         0x80    /* 10000000b bit mask for display list interrupt */
+#define VBL_NMI         0x40    /* 01000000b bit mask for vertical blank interrupt */
+
+#define ANTIC_DLI       0x80    /* 10000000b cmds with display list intr    */
+#define ANTIC_LMS       0x40    /* 01000000b cmds with load memory scan     */
+#define ANTIC_VSCR      0x20    /* 00100000b cmds with vertical scroll      */
+#define ANTIC_HSCR      0x10    /* 00010000b cmds with horizontal scroll    */
+#define ANTIC_MODE      0x0f    /* 00001111b cmd mode mask                  */
+
+#define DMA_ANTIC       0x20    /* 00100000b ANTIC DMA enable               */
+#define DMA_PM_DBLLINE  0x10    /* 00010000b double line player/missile     */
+#define DMA_PLAYER      0x08    /* 00001000b player DMA enable              */
+#define DMA_MISSILE     0x04    /* 00000100b missile DMA enable             */
+
+#define OFS_MIS_SINGLE  3*256   /* offset missiles single line DMA          */
+#define OFS_PL0_SINGLE  4*256   /* offset player 0 single line DMA          */
+#define OFS_PL1_SINGLE  5*256   /* offset player 1 single line DMA          */
+#define OFS_PL2_SINGLE  6*256   /* offset player 2 single line DMA          */
+#define OFS_PL3_SINGLE  7*256   /* offset player 3 single line DMA          */
+
+#define OFS_MIS_DOUBLE  3*128   /* offset missiles double line DMA          */
+#define OFS_PL0_DOUBLE  4*128   /* offset player 0 double line DMA          */
+#define OFS_PL1_DOUBLE  5*128   /* offset player 1 double line DMA          */
+#define OFS_PL2_DOUBLE  6*128   /* offset player 2 double line DMA          */
+#define OFS_PL3_DOUBLE  7*128   /* offset player 3 double line DMA          */
+
+#define PFD     0x00    /* 00000000b playfield default color */
+
+#define PBK     0x00    /* 00000000b playfield background */
+#define PF0     0x01    /* 00000001b playfield color #0   */
+#define PF1     0x02    /* 00000010b playfield color #1   */
+#define PF2     0x04    /* 00000100b playfield color #2   */
+#define PF3     0x08    /* 00001000b playfield color #3   */
+#define PL0     0x11    /* 00010001b player #0            */
+#define PL1     0x12    /* 00010010b player #1            */
+#define PL2     0x14    /* 00010100b player #2            */
+#define PL3     0x18    /* 00011000b player #3            */
+#define MI0     0x21    /* 00100001b missile #0           */
+#define MI1     0x22    /* 00100010b missile #1           */
+#define MI2     0x24    /* 00100100b missile #2           */
+#define MI3     0x28    /* 00101000b missile #3           */
+#define T00     0x40    /* 01000000b text mode pixels 00  */
+#define P000    0x48    /* 01001000b player #0 pixels 00  */
+#define P100    0x4a    /* 01001010b player #1 pixels 00  */
+#define P200    0x4c    /* 01001100b player #2 pixels 00  */
+#define P300    0x4e    /* 01001110b player #3 pixels 00  */
+#define P400    0x4f    /* 01001111b missiles  pixels 00  */
+#define T01     0x50    /* 01010000b text mode pixels 01  */
+#define P001    0x58    /* 01011000b player #0 pixels 01  */
+#define P101    0x5a    /* 01011010b player #1 pixels 01  */
+#define P201    0x5c    /* 01011100b player #2 pixels 01  */
+#define P301    0x5e    /* 01011110b player #3 pixels 01  */
+#define P401    0x5f    /* 01011111b missiles  pixels 01  */
+#define T10     0x60    /* 01100000b text mode pixels 10  */
+#define P010    0x68    /* 01101000b player #0 pixels 10  */
+#define P110    0x6a    /* 01101010b player #1 pixels 10  */
+#define P210    0x6c    /* 01101100b player #2 pixels 10  */
+#define P310    0x6e    /* 01101110b player #3 pixels 10  */
+#define P410    0x6f    /* 01101111b missiles  pixels 10  */
+#define T11     0x70    /* 01110000b text mode pixels 11  */
+#define P011    0x78    /* 01111000b player #0 pixels 11  */
+#define P111    0x7a    /* 01111010b player #1 pixels 11  */
+#define P211    0x7c    /* 01111100b player #2 pixels 11  */
+#define P311    0x7e    /* 01111110b player #3 pixels 11  */
+#define P411    0x7f    /* 01111111b missiles  pixels 11  */
+#define G00     0x80    /* 10000000b hires gfx pixels 00  */
+#define G01     0x90    /* 10010000b hires gfx pixels 01  */
+#define G10     0xa0    /* 10100000b hires gfx pixels 10  */
+#define G11     0xb0    /* 10110000b hires gfx pixels 11  */
+#define GT1     0xc0    /* 11000000b gtia mode 1          */
+#define GT2     0xd0    /* 11010000b gtia mode 2          */
+#define GT3     0xe0    /* 11100000b gtia mode 3          */
+#define ILL     0xfe    /* 11111110b illegal priority     */
+#define EOR     0xff    /* 11111111b EOR mode color       */
+
+#define LUM     0x0f    /* 00001111b luminance bits       */
+#define HUE     0xf0    /* 11110000b hue bits             */
+
+#define TRIGGER_VBLANK  64715
+#define TRIGGER_STEAL   64716
+#define TRIGGER_HSYNC   64717
+
+
+/*****************************************************************************
+ * If your memcpy does not expand too well if you use it with constant
+ * size_t field, you might want to define these macros somehow different.
+ * NOTE: dst is not necessarily uint32_t aligned (because of horz scrolling)!
+ *****************************************************************************/
+#define COPY4(dst,s1) *dst++ = s1
+#define COPY8(dst,s1,s2) *dst++ = s1; *dst++ = s2
+#define COPY16(dst,s1,s2,s3,s4) *dst++ = s1; *dst++ = s2; *dst++ = s3; *dst++ = s4
+
+#define RDANTIC(space)      space.read_byte(m_dpage+m_doffs)
+#define RDVIDEO(space,o)    space.read_byte(m_vpage+((m_voffs+(o))&VOFFS))
+#define RDCHGEN(space,o)    space.read_byte(m_chbase+(o))
+#define RDPMGFXS(space,o)   space.read_byte(m_pmbase_s+(o)+(m_scanline>>1))
+#define RDPMGFXD(space,o)   space.read_byte(m_pmbase_d+(o)+m_scanline)
+
+#define PREPARE()                                               \
+	uint32_t *dst = (uint32_t *)&m_cclock[PMOFFSET]
+
+#define PREPARE_TXT2(space,width)                               \
+	uint32_t *dst = (uint32_t *)&m_cclock[PMOFFSET];            \
+	for (int i = 0; i < width; i++)                             \
+	{                                                           \
+		uint16_t ch = RDVIDEO(space,i) << 3;                      \
+		if (ch & 0x400)                                         \
+		{                                                       \
+			ch = RDCHGEN(space,(ch & 0x3f8) + m_w.chbasl);  \
+			ch = (ch ^ m_chxor) & m_chand;              \
+		}                                                       \
+		else                                                    \
+		{                                                       \
+			ch = RDCHGEN(space,ch + m_w.chbasl);            \
+		}                                                       \
+		video->data[i] = ch;                                    \
+	}
+
+#define PREPARE_TXT3(space,width)                               \
+	uint32_t *dst = (uint32_t *)&m_cclock[PMOFFSET];            \
+	for (int i = 0; i < width; i++)                             \
+	{                                                           \
+		uint16_t ch = RDVIDEO(space,i) << 3;                      \
+		if (ch & 0x400)                                         \
+		{                                                       \
+			ch &= 0x3f8;                                        \
+			if ((ch & 0x300) == 0x300)                          \
+			{                                                   \
+				if (m_w.chbasl < 2) /* first two lines empty */ \
+					ch = 0x00;                                  \
+				else /* lines 2..7 are standard, 8&9 are 0&1 */ \
+					ch = RDCHGEN(space,ch + (m_w.chbasl & 7));\
+			}                                                   \
+			else                                                \
+			{                                                   \
+				if (m_w.chbasl > 7) /* last two lines empty */  \
+					ch = 0x00;                                  \
+				else /* lines 0..7 are standard */              \
+					ch = RDCHGEN(space,ch + m_w.chbasl);    \
+			}                                                   \
+			ch = (ch ^ m_chxor) & m_chand;              \
+		}                                                       \
+		else                                                    \
+		{                                                       \
+			if ((ch & 0x300) == 0x300)                          \
+			{                                                   \
+				if (m_w.chbasl < 2) /* first two lines empty */ \
+					ch = 0x00;                                  \
+				else /* lines 2..7 are standard, 8&9 are 0&1 */ \
+					ch = RDCHGEN(space,ch + (m_w.chbasl & 7));\
+			}                                                   \
+			else                                                \
+			{                                                   \
+				if (m_w.chbasl > 7) /* last two lines empty */  \
+					ch = 0x00;                                  \
+				else /* lines 0..7 are standard */              \
+					ch = RDCHGEN(space,ch + m_w.chbasl);    \
+			}                                                   \
+		}                                                       \
+		video->data[i] = ch;                                    \
+	}
+
+#define PREPARE_TXT45(space,width,shift)                        \
+	uint32_t *dst = (uint32_t *)&m_cclock[PMOFFSET];            \
+	for (int i = 0; i < width; i++)                             \
+	{                                                           \
+		uint16_t ch = RDVIDEO(space,i) << 3;                      \
+		ch = ((ch>>2)&0x100)|RDCHGEN(space,(ch&0x3f8)+(m_w.chbasl>>shift)); \
+		video->data[i] = ch;                                    \
+	}
+
+
+#define PREPARE_TXT67(space,width,shift)                        \
+	uint32_t *dst = (uint32_t *)&m_cclock[PMOFFSET];            \
+	for (int i = 0; i < width; i++)                             \
+	{                                                           \
+		uint16_t ch = RDVIDEO(space,i) << 3;                      \
+		ch = (ch&0x600)|(RDCHGEN(space,(ch&0x1f8)+(m_w.chbasl>>shift))<<1); \
+		video->data[i] = ch;                                    \
+	}
+
+#define PREPARE_GFX8(space,width)                               \
+	uint32_t *dst = (uint32_t *)&m_cclock[PMOFFSET];            \
+	for (int i = 0; i < width; i++)                             \
+		video->data[i] = RDVIDEO(space,i) << 2
+
+#define PREPARE_GFX9BC(space,width)                             \
+	uint32_t *dst = (uint32_t *)&m_cclock[PMOFFSET];            \
+	for (int i = 0; i < width; i++)                             \
+		video->data[i] = RDVIDEO(space,i) << 1
+
+#define PREPARE_GFXA(space,width)                               \
+	uint32_t *dst = (uint32_t *)&m_cclock[PMOFFSET];            \
+	for (int i = 0; i < width; i++)                             \
+		video->data[i] = RDVIDEO(space,i) << 1
+
+#define PREPARE_GFXDE(space,width)                              \
+	uint32_t *dst = (uint32_t *)&m_cclock[PMOFFSET];            \
+	for (int i = 0; i < width; i++)                             \
+		video->data[i] = RDVIDEO(space,i)
+
+#define PREPARE_GFXF(space,width)                               \
+	uint32_t *dst = (uint32_t *)&m_cclock[PMOFFSET];            \
+	for (int i = 0; i < width; i++)                             \
+		video->data[i] = RDVIDEO(space,i)
+
+#define PREPARE_GFXG1(space,width)                              \
+	uint32_t *dst = (uint32_t *)&m_cclock[PMOFFSET];            \
+	for (int i = 0; i < width; i++)                             \
+		video->data[i] = RDVIDEO(space,i)
+
+#define PREPARE_GFXG2(space,width)                              \
+	uint32_t *dst = (uint32_t *)&m_cclock[PMOFFSET];            \
+	for (int i = 0; i < width; i++)                             \
+		video->data[i] = RDVIDEO(space,i)
+
+#define PREPARE_GFXG3(space,width)                              \
+	uint32_t *dst = (uint32_t *)&m_cclock[PMOFFSET];            \
+	for (int i = 0; i < width; i++)                             \
+		video->data[i] = RDVIDEO(space,i)
+
+/******************************************************************
+ * common end of a single antic/gtia mode emulation function
+ ******************************************************************/
+#define POST()                                                  \
+	--m_modelines
+
+#define POST_GFX(width)                                         \
+	m_steal_cycles += width;                                \
+	if (--m_modelines == 0)                                 \
+		m_voffs = (m_voffs + width) & VOFFS
+
+#define POST_TXT(width)                                         \
+	m_steal_cycles += width;                                \
+	if (--m_modelines == 0)                                 \
+		m_voffs = (m_voffs + width) & VOFFS;            \
+	else if (m_w.chactl & 4)                                \
+		m_w.chbasl--;                                       \
+	else                                                        \
+		m_w.chbasl++
+
+/* erase a number of color clocks to background color PBK */
+#define ERASE(size)                         \
+	for (int i = 0; i < size; i++)          \
+	{                                       \
+		*dst++ = (PBK << 24) | (PBK << 16) | (PBK << 8) | PBK;  \
+	}
+#define ZAP48()                                                 \
+	dst = (uint32_t *)&antic.cclock[PMOFFSET];                    \
+	dst[ 0] = (PBK << 24) | (PBK << 16) | (PBK << 8) | PBK;     \
+	dst[ 1] = (PBK << 24) | (PBK << 16) | (PBK << 8) | PBK;     \
+	dst[ 2] = (PBK << 24) | (PBK << 16) | (PBK << 8) | PBK;     \
+	dst[45] = (PBK << 24) | (PBK << 16) | (PBK << 8) | PBK;     \
+	dst[46] = (PBK << 24) | (PBK << 16) | (PBK << 8) | PBK;     \
+	dst[47] = (PBK << 24) | (PBK << 16) | (PBK << 8) | PBK
+
+#define REP(FUNC, size)                     \
+	for (int i = 0; i < size; i++)          \
+	{                                       \
+		FUNC(i);                            \
+	}
+
+
+constexpr unsigned antic_device::TOTAL_LINES_60HZ;
+constexpr unsigned antic_device::TOTAL_LINES_50HZ;
+constexpr double antic_device::FRAME_RATE_50HZ;
+constexpr double antic_device::FRAME_RATE_60HZ;
+
 // devices
-const device_type ATARI_ANTIC = device_creator<antic_device>;
+DEFINE_DEVICE_TYPE(ATARI_ANTIC, antic_device, "antic", "Atari ANTIC")
 
 //-------------------------------------------------
 //  antic_device - constructor
 //-------------------------------------------------
 
 antic_device::antic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-				device_t(mconfig, ATARI_ANTIC, "Atari ANTIC", tag, owner, clock, "antic", __FILE__),
-				device_video_interface(mconfig, *this),
-				m_gtia_tag(nullptr),
-				m_maincpu(*this, ":maincpu"),
-				m_djoy_b(*this, ":djoy_b"),
-				m_artifacts(*this, ":artifacts"),
-				m_tv_artifacts(0),
-				m_render1(0),
-				m_render2(0),
-				m_render3(0),
-				m_cmd(0),
-				m_steal_cycles(0),
-				m_vscrol_old(0),
-				m_hscrol_old(0),
-				m_modelines(0),
-				m_chbase(0),
-				m_chand(0),
-				m_chxor(0),
-				m_scanline(0),
-				m_pfwidth(0),
-				m_dpage(0),
-				m_doffs(0),
-				m_vpage(0),
-				m_voffs(0),
-				m_pmbase_s(0),
-				m_pmbase_d(0)
+	device_t(mconfig, ATARI_ANTIC, tag, owner, clock),
+	device_video_interface(mconfig, *this),
+	m_gtia_tag(nullptr),
+	m_maincpu(*this, ":maincpu"),
+	m_djoy_b(*this, ":djoy_b"),
+	m_artifacts(*this, ":artifacts"),
+	m_tv_artifacts(0),
+	m_render1(0),
+	m_render2(0),
+	m_render3(0),
+	m_cmd(0),
+	m_steal_cycles(0),
+	m_vscrol_old(0),
+	m_hscrol_old(0),
+	m_modelines(0),
+	m_chbase(0),
+	m_chand(0),
+	m_chxor(0),
+	m_scanline(0),
+	m_pfwidth(0),
+	m_dpage(0),
+	m_doffs(0),
+	m_vpage(0),
+	m_voffs(0),
+	m_pmbase_s(0),
+	m_pmbase_d(0)
 {
 }
 

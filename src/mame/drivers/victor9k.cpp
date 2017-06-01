@@ -34,7 +34,7 @@
 #include "machine/pit8253.h"
 #include "machine/pic8259.h"
 #include "machine/ram.h"
-#include "machine/victor9kb.h"
+#include "machine/victor9k_kb.h"
 #include "machine/victor9k_fdc.h"
 #include "machine/z80dart.h"
 #include "sound/hc55516.h"
@@ -108,8 +108,8 @@ public:
 	required_device<hc55516_device> m_cvsd;
 	required_device<mc6845_device> m_crtc;
 	required_device<ram_device> m_ram;
-	required_device<victor_9000_keyboard_t> m_kb;
-	required_device<victor_9000_fdc_t> m_fdc;
+	required_device<victor_9000_keyboard_device> m_kb;
+	required_device<victor_9000_fdc_device> m_fdc;
 	required_device<centronics_device> m_centronics;
 	required_device<rs232_port_device> m_rs232a;
 	required_device<rs232_port_device> m_rs232b;
@@ -201,9 +201,9 @@ static ADDRESS_MAP_START( victor9k_mem, AS_PROGRAM, 8, victor9k_state )
 	AM_RANGE(0xe8040, 0xe804f) AM_MIRROR(0x7f00) AM_DEVREADWRITE(M6522_2_TAG, via6522_device, read, write)
 	AM_RANGE(0xe8060, 0xe8061) AM_MIRROR(0x7f00) AM_DEVREADWRITE(MC6852_TAG, mc6852_device, read, write)
 	AM_RANGE(0xe8080, 0xe808f) AM_MIRROR(0x7f00) AM_DEVREADWRITE(M6522_3_TAG, via6522_device, read, write)
-	AM_RANGE(0xe80a0, 0xe80af) AM_MIRROR(0x7f00) AM_DEVREADWRITE(FDC_TAG, victor_9000_fdc_t, cs5_r, cs5_w)
-	AM_RANGE(0xe80c0, 0xe80cf) AM_MIRROR(0x7f00) AM_DEVREADWRITE(FDC_TAG, victor_9000_fdc_t, cs6_r, cs6_w)
-	AM_RANGE(0xe80e0, 0xe80ef) AM_MIRROR(0x7f00) AM_DEVREADWRITE(FDC_TAG, victor_9000_fdc_t, cs7_r, cs7_w)
+	AM_RANGE(0xe80a0, 0xe80af) AM_MIRROR(0x7f00) AM_DEVREADWRITE(FDC_TAG, victor_9000_fdc_device, cs5_r, cs5_w)
+	AM_RANGE(0xe80c0, 0xe80cf) AM_MIRROR(0x7f00) AM_DEVREADWRITE(FDC_TAG, victor_9000_fdc_device, cs6_r, cs6_w)
+	AM_RANGE(0xe80e0, 0xe80ef) AM_MIRROR(0x7f00) AM_DEVREADWRITE(FDC_TAG, victor_9000_fdc_device, cs7_r, cs7_w)
 	AM_RANGE(0xf0000, 0xf0fff) AM_MIRROR(0x1000) AM_RAM AM_SHARE("video_ram")
 	AM_RANGE(0xf8000, 0xf9fff) AM_MIRROR(0x6000) AM_ROM AM_REGION(I8088_TAG, 0)
 ADDRESS_MAP_END
@@ -674,7 +674,7 @@ void victor9k_state::machine_reset()
 //  MACHINE_CONFIG( victor9k )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( victor9k, victor9k_state )
+static MACHINE_CONFIG_START( victor9k )
 	// basic machine hardware
 	MCFG_CPU_ADD(I8088_TAG, I8088, XTAL_30MHz/6)
 	MCFG_CPU_PROGRAM_MAP(victor9k_mem)
@@ -816,5 +816,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS
-COMP( 1982, victor9k, 0,      0,      victor9k, victor9k, driver_device, 0,    "Victor Business Products", "Victor 9000",   MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     STATE           INIT  COMPANY                     FULLNAME       FLAGS
+COMP( 1982, victor9k, 0,      0,      victor9k, victor9k, victor9k_state, 0,    "Victor Business Products", "Victor 9000", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

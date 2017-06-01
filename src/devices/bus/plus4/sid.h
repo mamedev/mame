@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_PLUS4_SID_H
+#define MAME_BUS_PLUS4_SID_H
 
-#ifndef __PLUS4_SID_CARTRIDGE__
-#define __PLUS4_SID_CARTRIDGE__
+#pragma once
 
 #include "exp.h"
 #include "bus/vcs_ctrl/ctrl.h"
@@ -51,7 +51,7 @@ private:
 
 
 // device type definition
-extern const device_type PLUS4_SID;
+DECLARE_DEVICE_TYPE(PLUS4_SID, plus4_sid_cartridge_device)
 
 
-#endif
+#endif // MAME_BUS_PLUS4_SID_H

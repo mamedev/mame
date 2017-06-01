@@ -12,8 +12,10 @@
 
 ***************************************************************************/
 
-#ifndef __FD1094_H__
-#define __FD1094_H__
+#ifndef MAME_MACHINE_FD1094_H
+#define MAME_MACHINE_FD1094_H
+
+#pragma once
 
 #include "cpu/m68000/m68000.h"
 
@@ -127,4 +129,4 @@ struct fd1094_constraint
 	uint16_t  mask;
 };
 
-#endif
+#endif // MAME_MACHINE_FD1094_H

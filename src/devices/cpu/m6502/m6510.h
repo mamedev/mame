@@ -7,9 +7,10 @@
     6502 with 6 i/o pins, also known as 8500
 
 ***************************************************************************/
+#ifndef MAME_CPU_M6502_M6510_H
+#define MAME_CPU_M6502_M6510_H
 
-#ifndef __M6510FAM_H__
-#define __M6510FAM_H__
+#pragma once
 
 #include "m6502.h"
 
@@ -22,7 +23,6 @@
 class m6510_device : public m6502_device {
 public:
 	m6510_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	m6510_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	uint8_t get_port();
 	void set_pulls(uint8_t pullup, uint8_t pulldown);
@@ -39,6 +39,8 @@ public:
 	virtual void do_exec_partial() override;
 
 protected:
+	m6510_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	class mi_6510_normal : public memory_interface {
 	public:
 		m6510_device *base;
@@ -93,6 +95,6 @@ enum {
 	M6510_NMI_LINE = m6502_device::NMI_LINE
 };
 
-extern const device_type M6510;
+DECLARE_DEVICE_TYPE(M6510, m6510_device)
 
-#endif
+#endif // MAME_CPU_M6502_M6510_H

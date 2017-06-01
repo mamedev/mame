@@ -13,12 +13,20 @@ skeleton device
 
 
 
+/* status flags */
+#define BSY 1<<7
+#define REQ 1<<6
+#define EXT 1<<5
+#define ERR 1<<4
+
+
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
 
 // device type definition
-const device_type UPD7752 = device_creator<upd7752_device>;
+DEFINE_DEVICE_TYPE(UPD7752, upd7752_device, "upd7752", "NEC uPD7752")
+
 
 /* TODO: unknown exact size */
 static ADDRESS_MAP_START( upd7752_ram, AS_0, 8, upd7752_device )
@@ -35,7 +43,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 upd7752_device::upd7752_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, UPD7752, "uPD7752", tag, owner, clock, "upd7752", __FILE__),
+	: device_t(mconfig, UPD7752, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		device_memory_interface(mconfig, *this), m_stream(nullptr),
 		m_space_config("ram", ENDIANNESS_LITTLE, 8, 16, 0, nullptr, *ADDRESS_MAP_NAME(upd7752_ram)), m_status(0), m_ram_addr(0), m_mode(0)

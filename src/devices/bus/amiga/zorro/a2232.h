@@ -10,10 +10,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_AMIGA_ZORRO_A2232_H
+#define MAME_BUS_AMIGA_ZORRO_A2232_H
 
-#ifndef __A2232_H__
-#define __A2232_H__
+#pragma once
 
 #include "zorro.h"
 #include "machine/autoconfig.h"
@@ -145,6 +145,6 @@ private:
 };
 
 // device type definition
-extern const device_type A2232;
+DECLARE_DEVICE_TYPE(A2232, a2232_device)
 
-#endif // __A2232_H__
+#endif // MAME_BUS_AMIGA_ZORRO_A2232_H

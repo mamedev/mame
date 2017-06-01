@@ -188,7 +188,7 @@ static GFXDECODE_START( stlforce )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( stlforce, stlforce_state )
+static MACHINE_CONFIG_START( stlforce )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 15000000)
@@ -213,7 +213,7 @@ static MACHINE_CONFIG_START( stlforce, stlforce_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_32MHz/32 , OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL_32MHz/32 , PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

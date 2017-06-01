@@ -6,8 +6,10 @@
 
 ***************************************************************************/
 
-#ifndef __ISA_LPT_H__
-#define __ISA_LPT_H__
+#ifndef MAME_BUS_ISA_LPT_H
+#define MAME_BUS_ISA_LPT_H
+
+#pragma once
 
 #include "isa.h"
 
@@ -45,6 +47,6 @@ private:
 };
 
 // device type definition
-extern const device_type ISA8_LPT;
+DECLARE_DEVICE_TYPE(ISA8_LPT, isa8_lpt_device)
 
-#endif /* __ISA_LPT_H__ */
+#endif // MAME_BUS_ISA_LPT_H

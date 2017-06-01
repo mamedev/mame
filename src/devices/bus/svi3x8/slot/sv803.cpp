@@ -14,7 +14,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SV803 = device_creator<sv803_device>;
+DEFINE_DEVICE_TYPE(SV803, sv803_device, "sv803", "SV-803 16k RAM Cartridge")
 
 
 //**************************************************************************
@@ -26,7 +26,7 @@ const device_type SV803 = device_creator<sv803_device>;
 //-------------------------------------------------
 
 sv803_device::sv803_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, SV803, "SV-803 16k RAM Cartridge", tag, owner, clock, "sv803", __FILE__),
+	device_t(mconfig, SV803, tag, owner, clock),
 	device_svi_slot_interface(mconfig, *this)
 {
 	m_ram = std::make_unique<uint8_t[]>(0x4000);

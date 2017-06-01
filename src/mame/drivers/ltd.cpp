@@ -43,7 +43,7 @@ ToDo:
 #include "emu.h"
 #include "machine/genpin.h"
 
-#include "cpu/m6800/m6800.h"
+#include "cpu/m6800/m6801.h"
 #include "sound/ay8910.h"
 #include "speaker.h"
 
@@ -515,7 +515,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( ltd_state::timer_r )
 	}
 }
 
-static MACHINE_CONFIG_START( ltd3, ltd_state )
+static MACHINE_CONFIG_START( ltd3 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6802, XTAL_3_579545MHz)
 	MCFG_CPU_PROGRAM_MAP(ltd3_map)
@@ -531,7 +531,7 @@ static MACHINE_CONFIG_START( ltd3, ltd_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_r", ltd_state, timer_r, attotime::from_hz(500))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ltd4, ltd_state )
+static MACHINE_CONFIG_START( ltd4 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6803, XTAL_3_579545MHz) // guess, no details available
 	MCFG_CPU_PROGRAM_MAP(ltd4_map)
@@ -587,12 +587,6 @@ ROM_END
 ROM_START(hustlerp)
 	ROM_REGION(0x1000, "roms", 0)
 	ROM_LOAD("hustler_1.bin", 0x0000, 0x0800, CRC(43f323f5) SHA1(086b81699bea08b10b4231e398f4f689395355b0))
-	ROM_RELOAD(0x0800, 0x0800)
-ROM_END
-
-ROM_START(hustlerpa)
-	ROM_REGION(0x1000, "roms", 0)
-	ROM_LOAD("hustler_2.bin", 0x0000, 0x0800, CRC(83c79157) SHA1(286fd0c984870639fcd7d7b8f6a5a5ddabcddcf5))
 	ROM_RELOAD(0x0800, 0x0800)
 ROM_END
 
@@ -749,7 +743,6 @@ GAME(1981, arizona,          0,  ltd3,  ltd3, ltd_state, atla_ltd, ROT0, "LTD", 
 GAME(1981, atla_ltd,         0,  ltd3,  ltd3, ltd_state, atla_ltd, ROT0, "LTD", "Atlantis (LTD)",                    MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME(1981, discodan,         0,  ltd3,  ltd3, ltd_state, atla_ltd, ROT0, "LTD", "Disco Dancing",                     MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1981, hustlerp,         0,  ltd3,  ltd3, ltd_state, atla_ltd, ROT0, "LTD", "Hustler",                           MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981, hustlerpa, hustlerp,  ltd3,  ltd3, ltd_state, atla_ltd, ROT0, "LTD", "Hustler (alternate set)",           MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1981, kkongltd,         0,  ltd3,  ltd3, ltd_state, atla_ltd, ROT0, "LTD", "King Kong",                         MACHINE_IS_SKELETON_MECHANICAL)
 GAME(198?, vikngkng,         0,  ltd3,  ltd3, ltd_state, atla_ltd, ROT0, "LTD", "Viking King",                       MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1981, force,            0,  ltd3,  ltd3, ltd_state, atla_ltd, ROT0, "LTD", "Force",                             MACHINE_IS_SKELETON_MECHANICAL)

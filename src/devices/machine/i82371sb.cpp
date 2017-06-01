@@ -12,7 +12,7 @@
 #include "speaker.h"
 
 
-const device_type I82371SB_ISA = device_creator<i82371sb_isa_device>;
+DEFINE_DEVICE_TYPE(I82371SB_ISA, i82371sb_isa_device, "i82371sb_isa", "Intel 82371 southbridge ISA bridge")
 
 DEVICE_ADDRESS_MAP_START(config_map, 32, i82371sb_isa_device)
 	AM_RANGE(0x4c, 0x4f) AM_READWRITE8 (iort_r,    iort_w,    0x000000ff)
@@ -53,7 +53,7 @@ DEVICE_ADDRESS_MAP_START(internal_io_map, 32, i82371sb_isa_device)
 	// end-VGA-HACK
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_FRAGMENT( southbridge )
+static MACHINE_CONFIG_START( southbridge )
 	MCFG_DEVICE_ADD("pit8254", PIT8254, 0)
 	MCFG_PIT8253_CLK0(4772720/4) /* heartbeat IRQ */
 	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(i82371sb_isa_device, at_pit8254_out0_changed))
@@ -168,7 +168,7 @@ machine_config_constructor i82371sb_isa_device::device_mconfig_additions() const
 
 
 i82371sb_isa_device::i82371sb_isa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_device(mconfig, I82371SB_ISA, "i82371sb southbridge ISA bridge", tag, owner, clock, "i82371sb_isa", __FILE__),
+	: pci_device(mconfig, I82371SB_ISA, tag, owner, clock),
 	  m_boot_state_hook(*this),
 	m_maincpu(*this, ":maincpu"),
 	m_pic8259_master(*this, "pic8259_master"),

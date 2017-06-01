@@ -63,7 +63,7 @@ static const z80_daisy_config kc_d004_daisy_chain[] =
 	{ nullptr }
 };
 
-static MACHINE_CONFIG_FRAGMENT(kc_d004)
+static MACHINE_CONFIG_START(kc_d004)
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/2)
 	MCFG_CPU_PROGRAM_MAP(kc_d004_mem)
 	MCFG_CPU_IO_MAP(kc_d004_io)
@@ -83,7 +83,7 @@ static MACHINE_CONFIG_FRAGMENT(kc_d004)
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":3", kc_d004_floppies, "525qd", kc_d004_device::floppy_formats)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT(kc_d004_gide)
+static MACHINE_CONFIG_START(kc_d004_gide)
 	MCFG_FRAGMENT_ADD(kc_d004)
 
 	MCFG_CPU_MODIFY(Z80_TAG)
@@ -117,8 +117,8 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type KC_D004 = device_creator<kc_d004_device>;
-const device_type KC_D004_GIDE = device_creator<kc_d004_gide_device>;
+DEFINE_DEVICE_TYPE(KC_D004,      kc_d004_device,      "kc_d004",      "D004 Floppy Disk Interface")
+DEFINE_DEVICE_TYPE(KC_D004_GIDE, kc_d004_gide_device, "kc_d004_gide", "D004 Floppy Disk + GIDE Interface")
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -129,21 +129,22 @@ const device_type KC_D004_GIDE = device_creator<kc_d004_gide_device>;
 //-------------------------------------------------
 
 kc_d004_device::kc_d004_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: kc_d004_device(mconfig, KC_D004, "D004 Floppy Disk Interface", tag, owner, clock, "kc_d004", __FILE__)
+	: kc_d004_device(mconfig, KC_D004, tag, owner, clock)
 {
 }
 
-kc_d004_device::kc_d004_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-		: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_kcexp_interface( mconfig, *this ),
-		m_cpu(*this, Z80_TAG),
-		m_fdc(*this, UPD765_TAG),
-		m_floppy0(*this, UPD765_TAG ":0"),
-		m_floppy1(*this, UPD765_TAG ":1"),
-		m_floppy2(*this, UPD765_TAG ":2"),
-		m_floppy3(*this, UPD765_TAG ":3"),
-		m_koppel_ram(*this, "koppelram"), m_reset_timer(nullptr), m_rom(nullptr), m_rom_base(0), m_enabled(0), m_connected(0), m_floppy(nullptr)
-	{
+kc_d004_device::kc_d004_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock),
+	device_kcexp_interface( mconfig, *this ),
+	m_cpu(*this, Z80_TAG),
+	m_fdc(*this, UPD765_TAG),
+	m_floppy0(*this, UPD765_TAG ":0"),
+	m_floppy1(*this, UPD765_TAG ":1"),
+	m_floppy2(*this, UPD765_TAG ":2"),
+	m_floppy3(*this, UPD765_TAG ":3"),
+	m_koppel_ram(*this, "koppelram"),
+	m_reset_timer(nullptr), m_rom(nullptr), m_rom_base(0), m_enabled(0), m_connected(0), m_floppy(nullptr)
+{
 }
 
 //-------------------------------------------------
@@ -375,9 +376,9 @@ WRITE_LINE_MEMBER(kc_d004_device::fdc_irq)
 //-------------------------------------------------
 
 kc_d004_gide_device::kc_d004_gide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: kc_d004_device(mconfig, KC_D004_GIDE, "D004 Floppy Disk + GIDE Interface", tag, owner, clock, "kc_d004gide", __FILE__),
-		m_ata(*this, ATA_TAG), m_ata_data(0), m_lh(0)
-	{
+	: kc_d004_device(mconfig, KC_D004_GIDE, tag, owner, clock),
+	m_ata(*this, ATA_TAG), m_ata_data(0), m_lh(0)
+{
 }
 
 //-------------------------------------------------

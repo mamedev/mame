@@ -99,13 +99,13 @@ WRITE8_MEMBER(bladestl_state::bladestl_port_B_w)
 	m_upd7759->set_bank_base(((data & 0x38) >> 3) * 0x20000);
 
 	// bit 2 = SSG-C rc filter enable
-	m_filter3->filter_rc_set_RC(FLT_RC_LOWPASS, 1000, 2200, 1000, data & 0x04 ? CAP_N(150) : 0); /* YM2203-SSG-C */
+	m_filter3->filter_rc_set_RC(filter_rc_device::LOWPASS, 1000, 2200, 1000, data & 0x04 ? CAP_N(150) : 0); /* YM2203-SSG-C */
 
 	// bit 1 = SSG-B rc filter enable
-	m_filter2->filter_rc_set_RC(FLT_RC_LOWPASS, 1000, 2200, 1000, data & 0x02 ? CAP_N(150) : 0); /* YM2203-SSG-B */
+	m_filter2->filter_rc_set_RC(filter_rc_device::LOWPASS, 1000, 2200, 1000, data & 0x02 ? CAP_N(150) : 0); /* YM2203-SSG-B */
 
 	// bit 0 = SSG-A rc filter enable
-	m_filter1->filter_rc_set_RC(FLT_RC_LOWPASS, 1000, 2200, 1000, data & 0x01 ? CAP_N(150) : 0); /* YM2203-SSG-A */
+	m_filter1->filter_rc_set_RC(filter_rc_device::LOWPASS, 1000, 2200, 1000, data & 0x01 ? CAP_N(150) : 0); /* YM2203-SSG-A */
 }
 
 READ8_MEMBER(bladestl_state::bladestl_speech_busy_r)
@@ -299,7 +299,7 @@ void bladestl_state::machine_reset()
 		m_last_track[i] = 0;
 }
 
-static MACHINE_CONFIG_START( bladestl, bladestl_state )
+static MACHINE_CONFIG_START( bladestl )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309, 24000000/2)     /* 24MHz/2 (?) */
@@ -443,6 +443,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1987, bladestl,  0,        bladestl, bladestl, driver_device, 0, ROT90, "Konami", "Blades of Steel (version T)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, bladestll, bladestl, bladestl, bladestle, driver_device,0, ROT90, "Konami", "Blades of Steel (version L)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, bladestle, bladestl, bladestl, bladestle, driver_device,0, ROT90, "Konami", "Blades of Steel (version E)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, bladestl,  0,        bladestl, bladestl,  bladestl_state, 0, ROT90, "Konami", "Blades of Steel (version T)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, bladestll, bladestl, bladestl, bladestle, bladestl_state, 0, ROT90, "Konami", "Blades of Steel (version L)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, bladestle, bladestl, bladestl, bladestle, bladestl_state, 0, ROT90, "Konami", "Blades of Steel (version E)", MACHINE_SUPPORTS_SAVE )

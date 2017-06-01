@@ -237,21 +237,6 @@ INPUT_PORTS_START(zorba_keyboard)
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_FRAGMENT(zorba_keyboard)
-	// MC68705P3S
-	MCFG_CPU_ADD("mcu", M68705P3, XTAL_3_579545MHz)
-	MCFG_M68705_PORTA_R_CB(READ8(zorba_keyboard_device, mcu_pa_r));
-	MCFG_M68705_PORTB_R_CB(READ8(zorba_keyboard_device, mcu_pb_r));
-	MCFG_M68705_PORTB_W_CB(WRITE8(zorba_keyboard_device, mcu_pb_w));
-	MCFG_M68705_PORTC_W_CB(WRITE8(zorba_keyboard_device, mcu_pc_w));
-
-	// TODO: beeper frequency is unknown, using value from Sun keyboard for now
-	MCFG_SPEAKER_STANDARD_MONO("bell")
-	MCFG_SOUND_ADD("beeper", BEEP, ATTOSECONDS_TO_HZ(480 * ATTOSECONDS_PER_MICROSECOND))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bell", 0.4)
-MACHINE_CONFIG_END
-
-
 ROM_START(zorba_keyboard)
 	ROM_REGION(0x0800, "mcu", 0)
 	ROM_LOAD( "8999-1 3-28-83", 0x080, 0x780, CRC(79fe6c0d) SHA1(4b6fca9379d5199d1347ad1187cbfdebfc4c73e7) )
@@ -260,7 +245,7 @@ ROM_END
 } // anonymous namespace
 
 
-device_type const ZORBA_KEYBOARD = device_creator<zorba_keyboard_device>;
+DEFINE_DEVICE_TYPE(ZORBA_KEYBOARD, zorba_keyboard_device, "zorba_kbd", "Zorba Keyboard")
 
 
 zorba_keyboard_device::zorba_keyboard_device(
@@ -268,15 +253,7 @@ zorba_keyboard_device::zorba_keyboard_device(
 		char const *tag,
 		device_t *owner,
 		uint32_t clock)
-	: device_t(
-			mconfig,
-			ZORBA_KEYBOARD,
-			"Zorba Keyboard",
-			tag,
-			owner,
-			clock,
-			"zorba_kbd",
-			__FILE__)
+	: device_t(mconfig, ZORBA_KEYBOARD, tag, owner, clock)
 	, m_rows(*this, "ROW%u", 0)
 	, m_beeper(*this, "beeper")
 	, m_rxd_cb(*this)
@@ -332,10 +309,19 @@ void zorba_keyboard_device::device_start()
 }
 
 
-machine_config_constructor zorba_keyboard_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME(zorba_keyboard);
-}
+MACHINE_CONFIG_MEMBER(zorba_keyboard_device::device_add_mconfig)
+	// MC68705P3S
+	MCFG_CPU_ADD("mcu", M68705P3, XTAL_3_579545MHz)
+	MCFG_M68705_PORTA_R_CB(READ8(zorba_keyboard_device, mcu_pa_r));
+	MCFG_M68705_PORTB_R_CB(READ8(zorba_keyboard_device, mcu_pb_r));
+	MCFG_M68705_PORTB_W_CB(WRITE8(zorba_keyboard_device, mcu_pb_w));
+	MCFG_M68705_PORTC_W_CB(WRITE8(zorba_keyboard_device, mcu_pc_w));
+
+	// TODO: beeper frequency is unknown, using value from Sun keyboard for now
+	MCFG_SPEAKER_STANDARD_MONO("bell")
+	MCFG_SOUND_ADD("beeper", BEEP, ATTOSECONDS_TO_HZ(480 * ATTOSECONDS_PER_MICROSECOND))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bell", 0.4)
+MACHINE_CONFIG_END
 
 
 ioport_constructor zorba_keyboard_device::device_input_ports() const

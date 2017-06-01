@@ -25,7 +25,7 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void dack16_w(int line, uint16_t data) override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 private:
 	required_device<dac_word_interface> m_rdac;
 	required_device<dac_word_interface> m_ldac;
@@ -41,10 +41,10 @@ private:
 	emu_timer *m_pcm;
 };
 
-const device_type VIS_AUDIO = device_creator<vis_audio_device>;
+DEFINE_DEVICE_TYPE(VIS_AUDIO, vis_audio_device, "vis_pcm", "vis_pcm")
 
 vis_audio_device::vis_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, VIS_AUDIO, "vis_pcm", tag, owner, clock, "vis_pcm", __FILE__),
+	: device_t(mconfig, VIS_AUDIO, tag, owner, clock),
 	device_isa16_card_interface(mconfig, *this),
 	m_rdac(*this, "rdac"),
 	m_ldac(*this, "ldac")
@@ -130,7 +130,7 @@ void vis_audio_device::device_timer(emu_timer &timer, device_timer_id id, int pa
 	}
 }
 
-static MACHINE_CONFIG_FRAGMENT( vis_pcm_config )
+MACHINE_CONFIG_MEMBER( vis_audio_device::device_add_mconfig )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("ymf262", YMF262, XTAL_14_31818MHz)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
@@ -143,11 +143,6 @@ static MACHINE_CONFIG_FRAGMENT( vis_pcm_config )
 	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
 	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
-
-machine_config_constructor vis_audio_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( vis_pcm_config );
-}
 
 READ8_MEMBER(vis_audio_device::pcm_r)
 {
@@ -234,15 +229,15 @@ public:
 	DECLARE_WRITE8_MEMBER(vga_w);
 	DECLARE_READ8_MEMBER(visvgamem_r);
 	DECLARE_WRITE8_MEMBER(visvgamem_w);
-	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void recompute_params() override;
 private:
 	void vga_vh_yuv8(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	rgb_t yuv_to_rgb(int y, int u, int v) const;
+	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 
 	int m_extcnt;
 	uint8_t m_extreg;
@@ -252,27 +247,22 @@ private:
 	uint8_t m_crtc_regs[0x31];
 };
 
-const device_type VIS_VGA = device_creator<vis_vga_device>;
+DEFINE_DEVICE_TYPE(VIS_VGA, vis_vga_device, "vis_vga", "vis_vga")
 
 vis_vga_device::vis_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: svga_device(mconfig, VIS_VGA, "vis_vga", tag, owner, clock, "vis_vga", __FILE__),
+	: svga_device(mconfig, VIS_VGA, tag, owner, clock),
 	device_isa16_card_interface(mconfig, *this)
 {
 	m_palette.set_tag("palette");
 	m_screen.set_tag("screen");
 }
 
-static MACHINE_CONFIG_FRAGMENT( vis_vga_config )
+MACHINE_CONFIG_MEMBER( vis_vga_device::device_add_mconfig )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
 	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, vis_vga_device, screen_update)
 	MCFG_PALETTE_ADD("palette", 0x100)
 MACHINE_CONFIG_END
-
-machine_config_constructor vis_vga_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( vis_vga_config );
-}
 
 void vis_vga_device::recompute_params()
 {
@@ -890,7 +880,7 @@ static INPUT_PORTS_START(vis)
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, vis_state, update, 0)
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( vis, vis_state )
+static MACHINE_CONFIG_START( vis )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I80286, XTAL_12MHz )
 	MCFG_CPU_PROGRAM_MAP(at16_map)
@@ -920,5 +910,4 @@ ROM_START(vis)
 	ROM_LOAD( "p513bk1b.bin", 0x80000, 0x80000, CRC(e18239c4) SHA1(a0262109e10a07a11eca43371be9978fff060bc5))
 ROM_END
 
-COMP ( 1992, vis,  0, 0, vis, vis, driver_device, 0, "Tandy/Memorex", "Video Information System MD-2500", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-
+COMP ( 1992, vis,  0, 0, vis, vis, vis_state, 0, "Tandy/Memorex", "Video Information System MD-2500", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

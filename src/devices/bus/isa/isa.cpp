@@ -14,7 +14,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ISA8_SLOT = device_creator<isa8_slot_device>;
+DEFINE_DEVICE_TYPE(ISA8_SLOT, isa8_slot_device, "isa8_slot", "8-bit ISA slot")
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -24,16 +24,14 @@ const device_type ISA8_SLOT = device_creator<isa8_slot_device>;
 //  isa8_slot_device - constructor
 //-------------------------------------------------
 isa8_slot_device::isa8_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, ISA8_SLOT, "ISA8_SLOT", tag, owner, clock, "isa8_slot", __FILE__),
-		device_slot_interface(mconfig, *this),
-	m_owner(nullptr),
-	m_isa_tag(nullptr)
+	isa8_slot_device(mconfig, ISA8_SLOT, tag, owner, clock)
 {
 }
 
-isa8_slot_device::isa8_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_slot_interface(mconfig, *this), m_owner(nullptr), m_isa_tag(nullptr)
+isa8_slot_device::isa8_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	device_slot_interface(mconfig, *this),
+	m_owner(nullptr), m_isa_tag(nullptr)
 {
 }
 
@@ -64,7 +62,7 @@ void isa8_slot_device::device_start()
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ISA16_SLOT = device_creator<isa16_slot_device>;
+DEFINE_DEVICE_TYPE(ISA16_SLOT, isa16_slot_device, "isa16_slot", "16-bit ISA slot")
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -74,7 +72,7 @@ const device_type ISA16_SLOT = device_creator<isa16_slot_device>;
 //  isa16_slot_device - constructor
 //-------------------------------------------------
 isa16_slot_device::isa16_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		isa8_slot_device(mconfig, ISA16_SLOT, "ISA16_SLOT", tag, owner, clock, "isa16_slot", __FILE__)
+	isa8_slot_device(mconfig, ISA16_SLOT, tag, owner, clock)
 {
 }
 
@@ -100,7 +98,7 @@ void isa16_slot_device::device_start()
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ISA8 = device_creator<isa8_device>;
+DEFINE_DEVICE_TYPE(ISA8, isa8_device, "isa8", "8-bit ISA bus")
 
 void isa8_device::static_set_cputag(device_t &device, const char *tag)
 {
@@ -124,50 +122,30 @@ void isa8_device::static_set_custom_spaces(device_t &device)
 //-------------------------------------------------
 
 isa8_device::isa8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, ISA8, "ISA8", tag, owner, clock, "isa8", __FILE__),
-		device_memory_interface(mconfig, *this),
-		m_program_config("ISA 8-bit program", ENDIANNESS_LITTLE, 8, 24, 0, nullptr),
-		m_io_config("ISA 8-bit I/O", ENDIANNESS_LITTLE, 8, 16, 0, nullptr),
-		m_program16_config("ISA 16-bit program", ENDIANNESS_LITTLE, 16, 24, 0, nullptr),
-		m_io16_config("ISA 16-bit I/O", ENDIANNESS_LITTLE, 16, 16, 0, nullptr), m_maincpu(nullptr), m_iospace(nullptr), m_prgspace(nullptr),
-		m_out_irq2_cb(*this),
-		m_out_irq3_cb(*this),
-		m_out_irq4_cb(*this),
-		m_out_irq5_cb(*this),
-		m_out_irq6_cb(*this),
-		m_out_irq7_cb(*this),
-		m_out_drq1_cb(*this),
-		m_out_drq2_cb(*this),
-		m_out_drq3_cb(*this), m_cputag(nullptr),
-		m_write_iochck(*this)
+	isa8_device(mconfig, ISA8, tag, owner, clock)
 {
-	for(int i=0;i<8;i++)
-	{
-		m_dma_device[i] = nullptr;
-		m_dma_eop[i] = false;
-	}
-	m_nmi_enabled = false;
-	m_iowidth = m_prgwidth = 0;
-	m_allocspaces = false;
 }
 
-isa8_device::isa8_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_memory_interface(mconfig, *this),
-		m_program_config("ISA 8-bit program", ENDIANNESS_LITTLE, 8, 24, 0, nullptr),
-		m_io_config("ISA 8-bit I/O", ENDIANNESS_LITTLE, 8, 16, 0, nullptr),
-		m_program16_config("ISA 16-bit program", ENDIANNESS_LITTLE, 16, 24, 0, nullptr),
-		m_io16_config("ISA 16-bit I/O", ENDIANNESS_LITTLE, 16, 16, 0, nullptr), m_maincpu(nullptr), m_iospace(nullptr), m_prgspace(nullptr),
-		m_out_irq2_cb(*this),
-		m_out_irq3_cb(*this),
-		m_out_irq4_cb(*this),
-		m_out_irq5_cb(*this),
-		m_out_irq6_cb(*this),
-		m_out_irq7_cb(*this),
-		m_out_drq1_cb(*this),
-		m_out_drq2_cb(*this),
-		m_out_drq3_cb(*this), m_cputag(nullptr),
-		m_write_iochck(*this)
+isa8_device::isa8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	device_memory_interface(mconfig, *this),
+	m_program_config("ISA 8-bit program", ENDIANNESS_LITTLE, 8, 24, 0, nullptr),
+	m_io_config("ISA 8-bit I/O", ENDIANNESS_LITTLE, 8, 16, 0, nullptr),
+	m_program16_config("ISA 16-bit program", ENDIANNESS_LITTLE, 16, 24, 0, nullptr),
+	m_io16_config("ISA 16-bit I/O", ENDIANNESS_LITTLE, 16, 16, 0, nullptr),
+	m_maincpu(nullptr),
+	m_iospace(nullptr),
+	m_prgspace(nullptr),
+	m_out_irq2_cb(*this),
+	m_out_irq3_cb(*this),
+	m_out_irq4_cb(*this),
+	m_out_irq5_cb(*this),
+	m_out_irq6_cb(*this),
+	m_out_irq7_cb(*this),
+	m_out_drq1_cb(*this),
+	m_out_drq2_cb(*this),
+	m_out_drq3_cb(*this), m_cputag(nullptr),
+	m_write_iochck(*this)
 {
 	for(int i=0;i<8;i++)
 	{
@@ -444,23 +422,23 @@ void device_isa8_card_interface::set_isa_device()
 }
 
 
-const device_type ISA16 = device_creator<isa16_device>;
+DEFINE_DEVICE_TYPE(ISA16, isa16_device, "isa16", "16-bit ISA bus")
 
 //-------------------------------------------------
 //  isa16_device - constructor
 //-------------------------------------------------
 
 isa16_device::isa16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		isa8_device(mconfig, ISA16, "ISA16", tag, owner, clock, "isa16", __FILE__),
-		m_out_irq10_cb(*this),
-		m_out_irq11_cb(*this),
-		m_out_irq12_cb(*this),
-		m_out_irq14_cb(*this),
-		m_out_irq15_cb(*this),
-		m_out_drq0_cb(*this),
-		m_out_drq5_cb(*this),
-		m_out_drq6_cb(*this),
-		m_out_drq7_cb(*this)
+	isa8_device(mconfig, ISA16, tag, owner, clock),
+	m_out_irq10_cb(*this),
+	m_out_irq11_cb(*this),
+	m_out_irq12_cb(*this),
+	m_out_irq14_cb(*this),
+	m_out_irq15_cb(*this),
+	m_out_drq0_cb(*this),
+	m_out_drq5_cb(*this),
+	m_out_drq6_cb(*this),
+	m_out_drq7_cb(*this)
 {
 }
 

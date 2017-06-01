@@ -33,6 +33,10 @@
 #include "emu.h"
 #include "ymz280b.h"
 
+#if YMZ280B_MAKE_WAVS
+#include "sound/wavwrite.h"
+#endif
+
 
 #define MAX_SAMPLE_CHUNK    10000
 
@@ -43,14 +47,10 @@
 #define INTERNAL_BUFFER_SIZE    (1 << 15)
 #define INTERNAL_SAMPLE_RATE    (m_master_clock * 2.0)
 
-#if MAKE_WAVS
-#include "sound/wavwrite.h"
-#endif
-
 
 
 /* step size index shift table */
-static const int index_scale[8] = { 0x0e6, 0x0e6, 0x0e6, 0x0e6, 0x133, 0x199, 0x200, 0x266 };
+static constexpr int index_scale[8] = { 0x0e6, 0x0e6, 0x0e6, 0x0e6, 0x133, 0x199, 0x200, 0x266 };
 
 /* lookup table for the precomputed difference */
 static int diff_lookup[16];
@@ -166,7 +166,7 @@ void ymz280b_device::update_irq_state_timer_common(int voicenum)
 
 ***********************************************************************************************/
 
-static void compute_tables(void)
+static void compute_tables()
 {
 	/* loop over all nibbles and compute the difference */
 	for (int nib = 0; nib < 16; nib++)
@@ -643,7 +643,7 @@ void ymz280b_device::device_start()
 		save_item(NAME(m_voice[j].irq_schedule), j);
 	}
 
-#if MAKE_WAVS
+#if YMZ280B_MAKE_WAVS
 	m_wavresample = wav_open("resamp.wav", INTERNAL_SAMPLE_RATE, 2);
 #endif
 }
@@ -940,25 +940,25 @@ WRITE8_MEMBER( ymz280b_device::write )
 }
 
 
-const device_type YMZ280B = device_creator<ymz280b_device>;
+DEFINE_DEVICE_TYPE(YMZ280B, ymz280b_device, "ymz280b", "Yamaha YMZ280B PCMD8")
 
 ymz280b_device::ymz280b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, YMZ280B, "YMZ280B", tag, owner, clock, "ymz280b", __FILE__),
-		device_sound_interface(mconfig, *this),
-		m_current_register(0),
-		m_status_register(0),
-		m_irq_state(0),
-		m_irq_mask(0),
-		m_irq_enable(0),
-		m_keyon_enable(0),
-		m_ext_mem_enable(0),
-		m_ext_readlatch(0),
-		m_ext_mem_address_hi(0),
-		m_ext_mem_address_mid(0),
-		m_ext_mem_address(0),
-		m_irq_handler(*this),
-		m_ext_read_handler(*this),
-		m_ext_write_handler(*this)
+	: device_t(mconfig, YMZ280B, tag, owner, clock)
+	, device_sound_interface(mconfig, *this)
+	, m_current_register(0)
+	, m_status_register(0)
+	, m_irq_state(0)
+	, m_irq_mask(0)
+	, m_irq_enable(0)
+	, m_keyon_enable(0)
+	, m_ext_mem_enable(0)
+	, m_ext_readlatch(0)
+	, m_ext_mem_address_hi(0)
+	, m_ext_mem_address_mid(0)
+	, m_ext_mem_address(0)
+	, m_irq_handler(*this)
+	, m_ext_read_handler(*this)
+	, m_ext_write_handler(*this)
 {
 	memset(m_voice, 0, sizeof(m_voice));
 }

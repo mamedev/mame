@@ -8,10 +8,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_BML3_BML3BUS_H
+#define MAME_BUS_BML3_BML3BUS_H
 
-#ifndef __BML3BUS_H__
-#define __BML3BUS_H__
+#pragma once
 
 
 #define BML3BUS_MAX_SLOTS 6
@@ -56,20 +56,22 @@ class bml3bus_slot_device : public device_t,
 public:
 	// construction/destruction
 	bml3bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	bml3bus_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	// device-level overrides
 	virtual void device_start() override;
 
 	// inline configuration
 	static void static_set_bml3bus_slot(device_t &device, const char *tag, const char *slottag);
+
 protected:
+	bml3bus_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// configuration
 	const char *m_bml3bus_tag, *m_bml3bus_slottag;
 };
 
 // device type definition
-extern const device_type BML3BUS_SLOT;
+DECLARE_DEVICE_TYPE(BML3BUS_SLOT, bml3bus_slot_device)
 
 
 class device_bml3bus_card_interface;
@@ -79,13 +81,12 @@ class bml3bus_device : public device_t
 public:
 	// construction/destruction
 	bml3bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	bml3bus_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	// inline configuration
 	static void static_set_cputag(device_t &device, const char *tag);
-	template<class _Object> static devcb_base &set_out_nmi_callback(device_t &device, _Object object) { return downcast<bml3bus_device &>(device).m_out_nmi_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_irq_callback(device_t &device, _Object object) { return downcast<bml3bus_device &>(device).m_out_irq_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_firq_callback(device_t &device, _Object object) { return downcast<bml3bus_device &>(device).m_out_firq_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_out_nmi_callback(device_t &device, Object &&cb) { return downcast<bml3bus_device &>(device).m_out_nmi_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_irq_callback(device_t &device, Object &&cb) { return downcast<bml3bus_device &>(device).m_out_irq_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_firq_callback(device_t &device, Object &&cb) { return downcast<bml3bus_device &>(device).m_out_firq_cb.set_callback(std::forward<Object>(cb)); }
 
 	void add_bml3bus_card(int slot, device_bml3bus_card_interface *card);
 	device_bml3bus_card_interface *get_bml3bus_card(int slot);
@@ -99,6 +100,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( firq_w );
 
 protected:
+	bml3bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -116,7 +119,7 @@ protected:
 
 
 // device type definition
-extern const device_type BML3BUS;
+DECLARE_DEVICE_TYPE(BML3BUS, bml3bus_device)
 
 // ======================> device_bml3bus_card_interface
 
@@ -126,7 +129,6 @@ class device_bml3bus_card_interface : public device_slot_card_interface
 	friend class bml3bus_device;
 public:
 	// construction/destruction
-	device_bml3bus_card_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_bml3bus_card_interface();
 
 	device_bml3bus_card_interface *next() const { return m_next; }
@@ -142,11 +144,14 @@ public:
 
 	// inline configuration
 	static void static_set_bml3bus_tag(device_t &device, const char *tag, const char *slottag);
-public:
+
+protected:
+	device_bml3bus_card_interface(const machine_config &mconfig, device_t &device);
+
 	bml3bus_device  *m_bml3bus;
 	const char *m_bml3bus_tag, *m_bml3bus_slottag;
 	int m_slot;
 	device_bml3bus_card_interface *m_next;
 };
 
-#endif  /* __BML3BUS_H__ */
+#endif // MAME_BUS_BML3_BML3BUS_H

@@ -98,6 +98,7 @@ public:
 	int         m_sprite_xoffs;
 	int         m_sprite_yoffs;
 	int         m_sprite_xoffs_dx;
+	emu_timer   *m_blit_done_timer;
 
 	std::unique_ptr<uint8_t[]>      m_expanded_gfx1;
 
@@ -105,8 +106,9 @@ public:
 	int         m_vblank_bit;
 	int         m_blitter_bit;
 	int         m_irq_line;
-	uint8_t       m_requested_int[8];
+	uint8_t     m_requested_int[8];
 	emu_timer   *m_mouja_irq_timer;
+	emu_timer   *m_karatour_irq_timer;
 
 	/* sound related */
 	uint16_t      m_soundstatus;
@@ -183,6 +185,7 @@ public:
 	DECLARE_DRIVER_INIT(dharmak);
 	DECLARE_DRIVER_INIT(puzzlet);
 	DECLARE_DRIVER_INIT(metro);
+	DECLARE_DRIVER_INIT(lastfortg);
 	TILE_GET_INFO_MEMBER(metro_k053936_get_tile_info);
 	TILE_GET_INFO_MEMBER(metro_k053936_gstrik2_get_tile_info);
 	TILEMAP_MAPPER_MEMBER(tilemap_scan_gstrik2);

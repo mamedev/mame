@@ -30,10 +30,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_INS8154_H
+#define MAME_MACHINE_INS8154_H
 
-#ifndef __INS8154_H__
-#define __INS8154_H__
+#pragma once
 
 
 
@@ -69,11 +69,11 @@ public:
 	// construction/destruction
 	ins8154_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_in_a_callback(device_t &device, _Object object) { return downcast<ins8154_device &>(device).m_in_a_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_a_callback(device_t &device, _Object object) { return downcast<ins8154_device &>(device).m_out_a_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_in_b_callback(device_t &device, _Object object) { return downcast<ins8154_device &>(device).m_in_b_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_b_callback(device_t &device, _Object object) { return downcast<ins8154_device &>(device).m_out_b_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_irq_callback(device_t &device, _Object object) { return downcast<ins8154_device &>(device).m_out_irq_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_in_a_callback(device_t &device, Object &&cb) { return downcast<ins8154_device &>(device).m_in_a_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_a_callback(device_t &device, Object &&cb) { return downcast<ins8154_device &>(device).m_out_a_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_in_b_callback(device_t &device, Object &&cb) { return downcast<ins8154_device &>(device).m_in_b_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_b_callback(device_t &device, Object &&cb) { return downcast<ins8154_device &>(device).m_out_b_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_irq_callback(device_t &device, Object &&cb) { return downcast<ins8154_device &>(device).m_out_irq_cb.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( ins8154_r );
 	DECLARE_WRITE8_MEMBER( ins8154_w );
@@ -109,6 +109,6 @@ private:
 
 
 // device type definition
-extern const device_type INS8154;
+DECLARE_DEVICE_TYPE(INS8154, ins8154_device)
 
-#endif /* __INS8154_H__ */
+#endif // MAME_MACHINE_INS8154_H

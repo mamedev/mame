@@ -4,11 +4,11 @@
 
 
 **********************************************************************/
+#ifndef MAME_MACHINE_PC9801_CBUS_H
+#define MAME_MACHINE_PC9801_CBUS_H
 
 #pragma once
 
-#ifndef __PC9801_SLOTCBUS__
-#define __PC9801_SLOTCBUS__
 
 
 
@@ -52,13 +52,13 @@ public:
 
 // ======================> pc9801_slot_device
 
-class pc9801_slot_device : public device_t,
-								public device_slot_interface
+class pc9801_slot_device : public device_t, public device_slot_interface
 {
 public:
 	// construction/destruction
 	pc9801_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_config_complete() override;
@@ -69,8 +69,6 @@ public:
 
 
 // device type definition
-extern const device_type PC9801CBUS_SLOT;
+DECLARE_DEVICE_TYPE(PC9801CBUS_SLOT, pc9801_slot_device)
 
-
-
-#endif
+#endif // MAME_MACHINE_PC9801_CBUS_H

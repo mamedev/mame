@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_IEEE488_C8280_H
+#define MAME_BUS_IEEE488_C8280_H
 
-#ifndef __C8280__
-#define __C8280__
+#pragma once
 
 #include "ieee488.h"
 #include "cpu/m6502/m6502.h"
@@ -23,14 +23,13 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> c8280_t
+// ======================> c8280_device
 
-class c8280_t :  public device_t,
-					public device_ieee488_interface
+class c8280_device : public device_t, public device_ieee488_interface
 {
 public:
 	// construction/destruction
-	c8280_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	c8280_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -63,9 +62,9 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_fdccpu;
-	required_device<mos6532_t> m_riot0;
-	required_device<mos6532_t> m_riot1;
-	required_device<fd1797_t> m_fdc;
+	required_device<mos6532_new_device> m_riot0;
+	required_device<mos6532_new_device> m_riot1;
+	required_device<fd1797_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	required_ioport m_address;
@@ -82,8 +81,7 @@ private:
 
 
 // device type definition
-extern const device_type C8280;
+DECLARE_DEVICE_TYPE(C8280, c8280_device)
 
 
-
-#endif
+#endif // MAME_BUS_IEEE488_C8280_H

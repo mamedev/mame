@@ -46,9 +46,6 @@
 #ifndef MAME_EMU_RENDER_H
 #define MAME_EMU_RENDER_H
 
-//#include "osdepend.h"
-
-//#include "bitmap.h"
 #include "screen.h"
 
 #include <math.h>
@@ -161,17 +158,8 @@ constexpr u32 PRIMFLAG_PACKABLE = 1 << PRIMFLAG_PACKABLE_SHIFT;
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// forward definitions
-namespace util { namespace xml { class data_node; } }
-class device_t;
-class screen_device;
-class render_container;
-class render_manager;
-class render_font;
+// private classes declared in render.cpp
 struct object_transform;
-class layout_element;
-class layout_view;
-
 
 // texture scaling callback
 typedef void (*texture_scaler_func)(bitmap_argb32 &dest, bitmap_argb32 &source, const rectangle &sbounds, void *param);
@@ -1110,7 +1098,7 @@ public:
 	void set_max_texture_size(int maxwidth, int maxheight);
 	void set_transform_container(bool transform_container) { m_transform_container = transform_container; }
 	void set_keepaspect(bool keepaspect) { m_keepaspect = keepaspect; }
-	void set_scale_mode(bool scale_mode) { m_scale_mode = scale_mode; }
+	void set_scale_mode(int scale_mode) { m_scale_mode = scale_mode; }
 
 	// layer config getters
 	bool backdrops_enabled() const { return m_layerconfig.backdrops_enabled(); }

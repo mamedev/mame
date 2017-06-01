@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_PDC_H
+#define MAME_MACHINE_PDC_H
 
-#ifndef __R9751_PDC_H__
-#define __R9751_PDC_H__
+#pragma once
 
 #include "cpu/z80/z80.h"
 #include "machine/upd765.h"
@@ -30,7 +30,7 @@
 
 // ======================> pdc_device
 
-class pdc_device :  public device_t
+class pdc_device : public device_t
 {
 public:
 	/* Constructor and Destructor */
@@ -42,8 +42,8 @@ public:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	/* Callbacks */
-	template<class _Object> static devcb_base &m68k_r_callback(device_t &device, _Object object) { return downcast<pdc_device &>(device).m_m68k_r_cb.set_callback(object); }
-	template<class _Object> static devcb_base &m68k_w_callback(device_t &device, _Object object) { return downcast<pdc_device &>(device).m_m68k_w_cb.set_callback(object); }
+	template <class Object> static devcb_base &m68k_r_callback(device_t &device, Object &&cb) { return downcast<pdc_device &>(device).m_m68k_r_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &m68k_w_callback(device_t &device, Object &&cb) { return downcast<pdc_device &>(device).m_m68k_w_cb.set_callback(std::forward<Object>(cb)); }
 
 	/* Read and Write members */
 	DECLARE_WRITE_LINE_MEMBER(i8237_hreq_w);
@@ -82,6 +82,7 @@ public:
 	uint8_t reg_p21;
 	uint8_t reg_p38;
 	uint32_t fdd_68k_dma_address; /* FDD <-> m68k DMA read/write address */
+
 protected:
 	/* Device-level overrides */
 	virtual void device_start() override;
@@ -108,10 +109,12 @@ protected:
 
 /* Device type */
 extern const device_type PDC;
+DECLARE_DEVICE_TYPE(PDC, pdc_device)
 
 /* MCFG defines */
 #define MCFG_PDC_R_CB(_devcb) \
 	devcb = &pdc_device::m68k_r_callback(*device, DEVCB_##_devcb);
 #define MCFG_PDC_W_CB(_devcb) \
 	devcb = &pdc_device::m68k_w_callback(*device, DEVCB_##_devcb);
-#endif
+
+#endif // MAME_MACHINE_PDC_H

@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#ifndef _NAOMIG1_H_
-#define _NAOMIG1_H_
+#ifndef MAME_MACHINE_NAOMIG1_H
+#define MAME_MACHINE_NAOMIG1_H
+
+#pragma once
 
 #include "cpu/sh4/sh4.h"
 
@@ -18,9 +20,8 @@ public:
 
 	typedef delegate<void (uint32_t main_adr, void *dma_ptr, uint32_t length, uint32_t size, bool to_mainram)> dma_cb;
 
-	naomi_g1_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
-	template<class _cb> void set_irq_cb(_cb cb) { irq_cb.set_callback(cb); }
-	void set_dma_cb(dma_cb _cb) { _dma_cb = _cb; }
+	template <class Object> void set_irq_cb(Object &&cb) { irq_cb.set_callback(std::forward<Object>(cb)); }
+	void set_dma_cb(dma_cb cb) { _dma_cb = cb; }
 
 	DECLARE_ADDRESS_MAP(amap, 32);
 
@@ -53,6 +54,8 @@ public:
 protected:
 	enum { G1_TIMER_ID = 0x42 };
 
+	naomi_g1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -70,4 +73,4 @@ private:
 	void dma(void *dma_ptr, uint32_t main_adr, uint32_t size, bool to_mainram);
 };
 
-#endif
+#endif // MAME_MACHINE_NAOMIG1_H

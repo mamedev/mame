@@ -282,7 +282,7 @@ static ADDRESS_MAP_START(mbee56_io, AS_IO, 8, mbee_state)
 	AM_RANGE(0x0b, 0x0b) AM_WRITE(port0b_w)
 	AM_RANGE(0x0c, 0x0c) AM_DEVREAD("crtc", mc6845_device, status_r) AM_WRITE(m6545_index_w)
 	AM_RANGE(0x0d, 0x0d) AM_DEVREAD("crtc", mc6845_device, register_r) AM_WRITE(m6545_data_w)
-	AM_RANGE(0x44, 0x47) AM_DEVREADWRITE("fdc", wd2793_t, read, write)
+	AM_RANGE(0x44, 0x47) AM_DEVREADWRITE("fdc", wd2793_device, read, write)
 	AM_RANGE(0x48, 0x4f) AM_READWRITE(fdc_status_r, fdc_motor_w)
 ADDRESS_MAP_END
 
@@ -299,7 +299,7 @@ static ADDRESS_MAP_START(mbee128_io, AS_IO, 8, mbee_state)
 	AM_RANGE(0x0c, 0x0c) AM_DEVREAD("crtc", mc6845_device, status_r) AM_WRITE(m6545_index_w)
 	AM_RANGE(0x0d, 0x0d) AM_DEVREAD("crtc", mc6845_device, register_r) AM_WRITE(m6545_data_w)
 	AM_RANGE(0x1c, 0x1f) AM_READWRITE(port1c_r, port1c_w)
-	AM_RANGE(0x44, 0x47) AM_DEVREADWRITE("fdc", wd2793_t, read, write)
+	AM_RANGE(0x44, 0x47) AM_DEVREADWRITE("fdc", wd2793_device, read, write)
 	AM_RANGE(0x48, 0x4f) AM_READWRITE(fdc_status_r, fdc_motor_w)
 	AM_RANGE(0x50, 0x57) AM_WRITE(mbee128_50_w)
 ADDRESS_MAP_END
@@ -320,7 +320,7 @@ static ADDRESS_MAP_START(mbee256_io, AS_IO, 8, mbee_state)
 	// AM_RANGE(0x0010, 0x0013) AM_MIRROR(0xff00) Optional SN76489AN audio chip
 	AM_RANGE(0x0018, 0x001b) AM_MIRROR(0xff00) AM_READ(port18_r)
 	AM_RANGE(0x001c, 0x001f) AM_MIRROR(0xff00) AM_READWRITE(port1c_r, port1c_w)
-	AM_RANGE(0x0044, 0x0047) AM_MIRROR(0xff00) AM_DEVREADWRITE("fdc", wd2793_t, read, write)
+	AM_RANGE(0x0044, 0x0047) AM_MIRROR(0xff00) AM_DEVREADWRITE("fdc", wd2793_device, read, write)
 	AM_RANGE(0x0048, 0x004f) AM_MIRROR(0xff00) AM_READWRITE(fdc_status_r, fdc_motor_w)
 	AM_RANGE(0x0050, 0x0057) AM_MIRROR(0xff00) AM_WRITE(mbee256_50_w)
 	// AM_RANGE(0x0058, 0x005f) AM_MIRROR(0xff00) External options: floppy drive, hard drive and keyboard
@@ -631,7 +631,7 @@ static SLOT_INTERFACE_START( mbee_floppies )
 SLOT_INTERFACE_END
 
 
-static MACHINE_CONFIG_START( mbee, mbee_state )
+static MACHINE_CONFIG_START( mbee )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz / 6)         /* 2 MHz */
 	MCFG_CPU_PROGRAM_MAP(mbee_mem)
@@ -690,7 +690,7 @@ static MACHINE_CONFIG_START( mbee, mbee_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( mbeeic, mbee_state )
+static MACHINE_CONFIG_START( mbeeic )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_13_5MHz / 4)         /* 3.37500 MHz */
 	MCFG_CPU_PROGRAM_MAP(mbeeic_mem)
@@ -1191,4 +1191,4 @@ COMP( 1986, mbee56,   mbee,     0,      mbee56,   mbee,     mbee_state,  mbee56,
 COMP( 1986, mbee128,  mbee,     0,      mbee128,  mbee128,  mbee_state,  mbee128,    "Applied Technology",  "Microbee 128k Standard" , MACHINE_NOT_WORKING )
 COMP( 1986, mbee128p, mbee,     0,      mbee128p, mbee128,  mbee_state,  mbee128,    "Applied Technology",  "Microbee 128k Premium" , MACHINE_NOT_WORKING )
 COMP( 1987, mbee256,  mbee,     0,      mbee256,  mbee256,  mbee_state,  mbee256,    "Applied Technology",  "Microbee 256TC" , MACHINE_NOT_WORKING )
-COMP( 2012, mbeepp,   mbee,     0,      mbee256,  mbee128,  mbee_state,  mbee128,    "Microbee Systems",  "Microbee Premium Plus" , MACHINE_NOT_WORKING )
+COMP( 2012, mbeepp,   mbee,     0,      mbee256,  mbee128,  mbee_state,  mbee128,    "Microbee Systems",    "Microbee Premium Plus" , MACHINE_NOT_WORKING )

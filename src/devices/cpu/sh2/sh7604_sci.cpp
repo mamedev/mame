@@ -22,7 +22,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type SH7604_SCI = device_creator<sh7604_sci_device>;
+DEFINE_DEVICE_TYPE(SH7604_SCI, sh7604_sci_device, "sh7604sci", "SH7604 SCI Controller")
 
 
 //**************************************************************************
@@ -113,9 +113,9 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 sh7604_sci_device::sh7604_sci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SH7604_SCI, "sh7604_sci_longname", tag, owner, clock, "sh7604_sci", __FILE__),
-	device_memory_interface(mconfig, *this),
-	m_space_config("regs", ENDIANNESS_BIG, 8, 4, 0, nullptr, *ADDRESS_MAP_NAME(sci_regs))
+	: device_t(mconfig, SH7604_SCI, tag, owner, clock)
+	, device_memory_interface(mconfig, *this)
+	, m_space_config("regs", ENDIANNESS_BIG, 8, 4, 0, nullptr, *ADDRESS_MAP_NAME(sci_regs))
 
 {
 }

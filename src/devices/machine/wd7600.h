@@ -6,8 +6,10 @@
  *  Created on: 5/05/2014
  */
 
-#ifndef WD7600_H_
-#define WD7600_H_
+#ifndef MAME_MACHINE_WD7600_H
+#define MAME_MACHINE_WD7600_H
+
+#pragma once
 
 #include "machine/am9517a.h"
 #include "machine/pic8259.h"
@@ -68,15 +70,15 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// callbacks
-	template<class _ior> devcb_base &set_ior_callback(_ior ior) { return m_read_ior.set_callback(ior); }
-	template<class _iow> devcb_base &set_iow_callback(_iow iow) { return m_write_iow.set_callback(iow); }
-	template<class _tc> devcb_base &set_tc_callback(_tc tc) { return m_write_tc.set_callback(tc); }
-	template<class _hold> devcb_base &set_hold_callback(_hold hold) { return m_write_hold.set_callback(hold); }
-	template<class _cpureset> devcb_base &set_cpureset_callback(_cpureset cpureset) { return m_write_cpureset.set_callback(cpureset); }
-	template<class _nmi> devcb_base &set_nmi_callback(_nmi nmi) { return m_write_nmi.set_callback(nmi); }
-	template<class _intr> devcb_base &set_intr_callback(_intr intr) { return m_write_intr.set_callback(intr); }
-	template<class _a20m> devcb_base &set_a20m_callback(_a20m a20m) { return m_write_a20m.set_callback(a20m); }
-	template<class _spkr> devcb_base &set_spkr_callback(_spkr spkr) { return m_write_spkr.set_callback(spkr); }
+	template <class Object> devcb_base &set_ior_callback(Object &&ior) { return m_read_ior.set_callback(std::forward<Object>(ior)); }
+	template <class Object> devcb_base &set_iow_callback(Object &&iow) { return m_write_iow.set_callback(std::forward<Object>(iow)); }
+	template <class Object> devcb_base &set_tc_callback(Object &&tc) { return m_write_tc.set_callback(std::forward<Object>(tc)); }
+	template <class Object> devcb_base &set_hold_callback(Object &&hold) { return m_write_hold.set_callback(std::forward<Object>(hold)); }
+	template <class Object> devcb_base &set_cpureset_callback(Object &&cpureset) { return m_write_cpureset.set_callback(std::forward<Object>(cpureset)); }
+	template <class Object> devcb_base &set_nmi_callback(Object &&nmi) { return m_write_nmi.set_callback(std::forward<Object>(nmi)); }
+	template <class Object> devcb_base &set_intr_callback(Object &&intr) { return m_write_intr.set_callback(std::forward<Object>(intr)); }
+	template <class Object> devcb_base &set_a20m_callback(Object &&a20m) { return m_write_a20m.set_callback(std::forward<Object>(a20m)); }
+	template <class Object> devcb_base &set_spkr_callback(Object &&spkr) { return m_write_spkr.set_callback(std::forward<Object>(spkr)); }
 
 	// inline configuration
 	static void static_set_cputag(device_t &device, const char *tag);
@@ -234,6 +236,6 @@ private:
 };
 
 // device type definition
-extern const device_type WD7600;
+DECLARE_DEVICE_TYPE(WD7600, wd7600_device)
 
-#endif /* WD7600_H_ */
+#endif // MAME_MACHINE_WD7600_H

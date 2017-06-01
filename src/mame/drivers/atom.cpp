@@ -704,7 +704,7 @@ FLOPPY_FORMATS_END0
     MACHINE_DRIVER( atom )
 -------------------------------------------------*/
 
-static MACHINE_CONFIG_START( atom, atom_state )
+static MACHINE_CONFIG_START( atom )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(SY6502_TAG, M6502, X2/4)
 	MCFG_CPU_PROGRAM_MAP(atom_mem)
@@ -781,7 +781,7 @@ MACHINE_CONFIG_END
 	MCFG_GENERIC_EXTENSIONS("bin,rom") \
 	MCFG_GENERIC_LOAD(atomeb_state, _load)
 
-static MACHINE_CONFIG_DERIVED_CLASS( atomeb, atom, atomeb_state )
+static MACHINE_CONFIG_DERIVED( atomeb, atom )
 	MCFG_CPU_MODIFY(SY6502_TAG)
 	MCFG_CPU_PROGRAM_MAP(atomeb_mem)
 
@@ -813,7 +813,7 @@ MACHINE_CONFIG_END
     MACHINE_DRIVER( atombb )
 -------------------------------------------------*/
 
-static MACHINE_CONFIG_START( atombb, atom_state )
+static MACHINE_CONFIG_START( atombb )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(SY6502_TAG, M6502, X2/4)
 	MCFG_CPU_PROGRAM_MAP(atombb_mem)
@@ -982,10 +982,10 @@ DRIVER_INIT_MEMBER(atomeb_state, atomeb)
     SYSTEM DRIVERS
 ***************************************************************************/
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT CLASS         INIT           COMPANY          FULLNAME                FLAGS */
-COMP( 1979, atom,     0,        0,      atom,     atom, driver_device,     0,        "Acorn",         "Atom"                , 0)
-COMP( 1979, atomeb,   atom,     0,      atomeb,   atom, atomeb_state, atomeb,        "Acorn",         "Atom with Eprom Box" , 0)
-COMP( 1982, atombb,   atom,     0,      atombb,   atom, driver_device,     0,        "Acorn",         "Atom with BBC Basic" , 0)
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT CLASS         INIT      COMPANY          FULLNAME                FLAGS */
+COMP( 1979, atom,     0,        0,      atom,     atom, atom_state,   0,        "Acorn",         "Atom"                , 0)
+COMP( 1979, atomeb,   atom,     0,      atomeb,   atom, atomeb_state, atomeb,   "Acorn",         "Atom with Eprom Box" , 0)
+COMP( 1982, atombb,   atom,     0,      atombb,   atom, atom_state,   0,        "Acorn",         "Atom with BBC Basic" , 0)
 //COMP( 1983, prophet2, atom,     0,      prophet2, atom, driver_device,     0,        "Busicomputers", "Prophet 2"           , 0)
 //COMP( 1983, prophet3, atom,     0,      prophet3, atom, driver_device,     0,        "Busicomputers", "Prophet 3"           , 0)
 //COMP( 2011, atommc,   atom,     0,      atommc,   atom, driver_device,     0,        "Acorn",         "Atom with AtoMMC2"   , 0)

@@ -9,7 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "osdcore.h"
+#include "dipty.h"
 
 device_pty_interface::device_pty_interface(const machine_config &mconfig, device_t &device)
 	: device_interface(device, "pty")

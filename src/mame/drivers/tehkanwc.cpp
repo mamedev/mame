@@ -102,6 +102,8 @@ TO DO :
 
 void tehkanwc_state::machine_start()
 {
+	m_reset_timer = timer_alloc(TIMER_RESET);
+
 	save_item(NAME(m_track0));
 	save_item(NAME(m_track1));
 	save_item(NAME(m_msm_data_offs));
@@ -175,7 +177,7 @@ WRITE8_MEMBER(tehkanwc_state::sound_answer_w)
 
 	/* in Gridiron, the sound CPU goes in a tight loop after the self test, */
 	/* probably waiting to be reset by a watchdog */
-	if (space.device().safe_pc() == 0x08bc) timer_set(attotime::from_seconds(1), TIMER_RESET);
+	if (space.device().safe_pc() == 0x08bc) m_reset_timer->adjust(attotime::from_seconds(1));
 }
 
 
@@ -627,7 +629,7 @@ static GFXDECODE_START( tehkanwc )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( tehkanwc, tehkanwc_state )
+static MACHINE_CONFIG_START( tehkanwc )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 18432000/4)    /* 18.432000 / 4 */
@@ -679,7 +681,7 @@ static MACHINE_CONFIG_START( tehkanwc, tehkanwc_state )
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(tehkanwc_state, adpcm_int)) /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8KHz               */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8KHz               */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 MACHINE_CONFIG_END
 
@@ -900,8 +902,8 @@ ROM_END
 
 
 
-GAME( 1985, tehkanwc,  0,        tehkanwc, tehkanwc, driver_device, 0,        ROT0,  "Tehkan", "Tehkan World Cup (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, tehkanwcb, tehkanwc, tehkanwc, tehkanwc, driver_device, 0,        ROT0,  "Tehkan", "Tehkan World Cup (set 2, bootleg?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, tehkanwcc, tehkanwc, tehkanwc, tehkanwc, driver_device, 0,        ROT0,  "bootleg", "Tehkan World Cup (set 3, bootleg)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // aka 'World Cup 85', different inputs?
-GAMEL(1985, gridiron,  0,        tehkanwc, gridiron, driver_device, 0,        ROT0,  "Tehkan", "Gridiron Fight", MACHINE_SUPPORTS_SAVE, layout_gridiron )
-GAME( 1986, teedoff,   0,        tehkanwc, teedoff, tehkanwc_state,  teedoff,  ROT90, "Tecmo", "Tee'd Off (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, tehkanwc,  0,        tehkanwc, tehkanwc, tehkanwc_state, 0,        ROT0,  "Tehkan",  "Tehkan World Cup (set 1)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1985, tehkanwcb, tehkanwc, tehkanwc, tehkanwc, tehkanwc_state, 0,        ROT0,  "Tehkan",  "Tehkan World Cup (set 2, bootleg?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, tehkanwcc, tehkanwc, tehkanwc, tehkanwc, tehkanwc_state, 0,        ROT0,  "bootleg", "Tehkan World Cup (set 3, bootleg)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // aka 'World Cup 85', different inputs?
+GAMEL(1985, gridiron,  0,        tehkanwc, gridiron, tehkanwc_state, 0,        ROT0,  "Tehkan",  "Gridiron Fight",                     MACHINE_SUPPORTS_SAVE, layout_gridiron )
+GAME( 1986, teedoff,   0,        tehkanwc, teedoff,  tehkanwc_state, teedoff,  ROT90, "Tecmo",   "Tee'd Off (Japan)",                  MACHINE_SUPPORTS_SAVE )

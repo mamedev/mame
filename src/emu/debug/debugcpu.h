@@ -8,17 +8,14 @@
 
 ***************************************************************************/
 
-#pragma once
-
 #ifndef MAME_EMU_DEBUG_DEBUGCPU_H
 #define MAME_EMU_DEBUG_DEBUGCPU_H
+
+#pragma once
 
 #include "express.h"
 
 #include <set>
-
-
-namespace util { namespace xml { class data_node; } }
 
 
 //**************************************************************************
@@ -578,10 +575,10 @@ private:
 	static const size_t NUM_TEMP_VARIABLES;
 
 	/* expression handlers */
-	u64 expression_read_memory(void *param, const char *name, expression_space space, u32 address, int size, bool with_se);
+	u64 expression_read_memory(void *param, const char *name, expression_space space, u32 address, int size, bool disable_se);
 	u64 expression_read_program_direct(address_space &space, int opcode, offs_t address, int size);
 	u64 expression_read_memory_region(const char *rgntag, offs_t address, int size);
-	void expression_write_memory(void *param, const char *name, expression_space space, u32 address, int size, u64 data, bool with_se);
+	void expression_write_memory(void *param, const char *name, expression_space space, u32 address, int size, u64 data, bool disable_se);
 	void expression_write_program_direct(address_space &space, int opcode, offs_t address, int size, u64 data);
 	void expression_write_memory_region(const char *rgntag, offs_t address, int size, u64 data);
 	expression_error::error_code expression_validate(void *param, const char *name, expression_space space);

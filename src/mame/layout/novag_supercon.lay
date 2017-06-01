@@ -92,7 +92,7 @@
 	<element name="text_rook1"><text string="&#x265c;"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_bishop1"><text string="&#x265d;"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_knight1"><text string="&#x265e;"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_pion1"><text string="&#x265f;"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_pawn1"><text string="&#x265f;"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 
 	<element name="text_king2">
 		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
@@ -114,7 +114,7 @@
 		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
 		<text string="&#x265e;"><color red="0.1" green="0.1" blue="0.1" /></text>
 	</element>
-	<element name="text_pion2">
+	<element name="text_pawn2">
 		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
 		<text string="&#x265f;"><color red="0.1" green="0.1" blue="0.1" /></text>
 	</element>
@@ -384,7 +384,7 @@
 		<bezel element="text_bishop2"><bounds x="88" y="26.1" width="6" height="3.5" /></bezel>
 		<bezel element="text_knight2"><bounds x="88" y="36.1" width="6" height="3.5" /></bezel>
 		<bezel element="text_rook2"><bounds x="88" y="46.1" width="6" height="3.5" /></bezel>
-		<bezel element="text_pion2"><bounds x="88" y="56.1" width="6" height="3.5" /></bezel>
+		<bezel element="text_pawn2"><bounds x="88" y="56.1" width="6" height="3.5" /></bezel>
 
 		<bezel element="hlb" inputtag="IN.0" inputmask="0x200"><bounds x="88" y="6" width="6" height="4" /><color alpha="0.4" /></bezel>
 		<bezel element="hlb" inputtag="IN.1" inputmask="0x200"><bounds x="88" y="16" width="6" height="4" /><color alpha="0.4" /></bezel>
@@ -431,7 +431,7 @@
 		<bezel element="text_bishop1"><bounds x="108.2" y="28.6" width="10" height="2" /></bezel>
 		<bezel element="text_knight1"><bounds x="108.2" y="38.6" width="10" height="2" /></bezel>
 		<bezel element="text_rook1"><bounds x="108.2" y="48.6" width="10" height="2" /></bezel>
-		<bezel element="text_pion1"><bounds x="108.2" y="58.6" width="10" height="2" /></bezel>
+		<bezel element="text_pawn1"><bounds x="108.2" y="58.6" width="10" height="2" /></bezel>
 
 		<bezel name="0.0" element="ledg"><bounds x="112" y="7.5" width="2" height="1" /></bezel>
 		<bezel name="0.1" element="ledg"><bounds x="112" y="17.5" width="2" height="1" /></bezel>

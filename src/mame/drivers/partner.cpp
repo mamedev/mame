@@ -167,7 +167,7 @@ static GFXDECODE_START( partner )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( partner, partner_state )
+static MACHINE_CONFIG_START( partner )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, XTAL_16MHz / 9)
 	MCFG_CPU_PROGRAM_MAP(partner_mem)
@@ -204,8 +204,8 @@ static MACHINE_CONFIG_START( partner, partner_state )
 	MCFG_I8257_OUT_HRQ_CB(WRITELINE(partner_state, hrq_w))
 	MCFG_I8257_IN_MEMR_CB(READ8(radio86_state, memory_read_byte))
 	MCFG_I8257_OUT_MEMW_CB(WRITE8(radio86_state, memory_write_byte))
-	MCFG_I8257_IN_IOR_0_CB(DEVREAD8("wd1793", fd1793_t, data_r))
-	MCFG_I8257_OUT_IOW_0_CB(DEVWRITE8("wd1793", fd1793_t, data_w))
+	MCFG_I8257_IN_IOR_0_CB(DEVREAD8("wd1793", fd1793_device, data_r))
+	MCFG_I8257_OUT_IOW_0_CB(DEVWRITE8("wd1793", fd1793_device, data_w))
 	MCFG_I8257_OUT_IOW_2_CB(DEVWRITE8("i8275", i8275_device, dack_w))
 	MCFG_I8257_REVERSE_RW_MODE(1)
 
@@ -242,5 +242,5 @@ ROM_START( partner )
 ROM_END
 
 /* Driver */
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   INIT        COMPANY   FULLNAME       FLAGS */
-COMP( 1987, partner, radio86,   0,  partner,    partner, partner_state,partner, "SAM SKB VM",   "Partner-01.01",    MACHINE_NOT_WORKING)
+//    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT    STATE          INIT     COMPANY       FULLNAME         FLAGS
+COMP( 1987, partner, radio86, 0,      partner, partner, partner_state, partner, "SAM SKB VM", "Partner-01.01", MACHINE_NOT_WORKING )

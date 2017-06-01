@@ -56,7 +56,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( barni )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( barni, barni_state )
+static MACHINE_CONFIG_START( barni )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 2000000)
 	MCFG_CPU_PROGRAM_MAP(maincpu_map)
@@ -99,4 +99,4 @@ ROM_START(redbarnp)
 ROM_END
 
 
-GAME( 1985, redbarnp, 0, barni, barni, driver_device, 0, ROT0, "Barni", "Red Baron (Pinball)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1985, redbarnp, 0, barni, barni, barni_state, 0, ROT0, "Barni", "Red Baron (Pinball)", MACHINE_IS_SKELETON_MECHANICAL )

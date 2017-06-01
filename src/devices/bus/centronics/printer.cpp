@@ -8,10 +8,10 @@
 //**************************************************************************
 
 // device type definition
-const device_type CENTRONICS_PRINTER = device_creator<centronics_printer_device>;
+DEFINE_DEVICE_TYPE(CENTRONICS_PRINTER, centronics_printer_device, "centronics_printer", "Centronics Printer")
 
 
-static MACHINE_CONFIG_FRAGMENT( centronics_printer )
+static MACHINE_CONFIG_START( centronics_printer )
 	MCFG_DEVICE_ADD("printer", PRINTER, 0)
 	MCFG_PRINTER_ONLINE_CB(WRITELINE(centronics_printer_device, printer_online))
 MACHINE_CONFIG_END
@@ -25,7 +25,7 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 centronics_printer_device::centronics_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, CENTRONICS_PRINTER, "Centronics Printer", tag, owner, clock, "centronics_printer", __FILE__),
+	device_t(mconfig, CENTRONICS_PRINTER, tag, owner, clock),
 	device_centronics_peripheral_interface( mconfig, *this ),
 	m_strobe(0),
 	m_data(0),

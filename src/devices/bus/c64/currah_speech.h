@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_C64_CURRAH_SPEECH_H
+#define MAME_BUS_C64_CURRAH_SPEECH_H
 
-#ifndef __CURRAH_SPEECH_64__
-#define __CURRAH_SPEECH_64__
+#pragma once
 
 
 #include "exp.h"
@@ -51,7 +51,7 @@ private:
 
 
 // device type definition
-extern const device_type C64_CURRAH_SPEECH;
+DECLARE_DEVICE_TYPE(C64_CURRAH_SPEECH, c64_currah_speech_cartridge_device)
 
 
-#endif
+#endif // MAME_BUS_C64_CURRAH_SPEECH_H

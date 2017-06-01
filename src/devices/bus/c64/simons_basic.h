@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_C64_SIMONS_BASIC_H
+#define MAME_BUS_C64_SIMONS_BASIC_H
 
-#ifndef __SIMONS_BASIC__
-#define __SIMONS_BASIC__
+#pragma once
 
 
 #include "exp.h"
@@ -41,7 +41,7 @@ protected:
 
 
 // device type definition
-extern const device_type C64_SIMONS_BASIC;
+DECLARE_DEVICE_TYPE(C64_SIMONS_BASIC, c64_simons_basic_cartridge_device)
 
 
-#endif
+#endif // MAME_BUS_C64_SIMONS_BASIC_H

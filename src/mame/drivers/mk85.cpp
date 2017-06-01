@@ -64,7 +64,7 @@ uint32_t mk85_state::screen_update_mk85(screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
-static MACHINE_CONFIG_START( mk85, mk85_state )
+static MACHINE_CONFIG_START( mk85 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", K1801VM2, XTAL_4MHz)
 	MCFG_T11_INITIAL_MODE(0)
@@ -91,5 +91,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY     FULLNAME       FLAGS */
-COMP( 1986, mk85,   0,      0,       mk85,      mk85, driver_device,    0,   "Elektronika", "MK-85", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE       INIT  COMPANY        FULLNAME  FLAGS */
+COMP( 1986, mk85,   0,      0,       mk85,      mk85,  mk85_state, 0,    "Elektronika", "MK-85",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

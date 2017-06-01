@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_C64_MIDI_PASSPORT_H
+#define MAME_BUS_C64_MIDI_PASSPORT_H
 
-#ifndef __C64_MIDI_PASSPORT__
-#define __C64_MIDI_PASSPORT__
+#pragma once
 
 #include "exp.h"
 #include "machine/6840ptm.h"
@@ -56,7 +56,7 @@ private:
 
 
 // device type definition
-extern const device_type C64_MIDI_PASSPORT;
+DECLARE_DEVICE_TYPE(C64_MIDI_PASSPORT, c64_passport_midi_cartridge_device)
 
 
-#endif
+#endif // MAME_BUS_C64_MIDI_PASSPORT_H

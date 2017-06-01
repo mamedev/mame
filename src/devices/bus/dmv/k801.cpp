@@ -21,7 +21,7 @@
 ***************************************************************************/
 
 
-static MACHINE_CONFIG_FRAGMENT( dmv_k801 )
+static MACHINE_CONFIG_START( dmv_k801 )
 	MCFG_DEVICE_ADD("epci", MC2661, XTAL_5_0688MHz)
 	MCFG_MC2661_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_MC2661_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
@@ -36,21 +36,21 @@ static MACHINE_CONFIG_FRAGMENT( dmv_k801 )
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("epci", mc2661_device, cts_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( dmv_k211 )
+static MACHINE_CONFIG_START( dmv_k211 )
 	MCFG_FRAGMENT_ADD( dmv_k801 )
 
 	MCFG_DEVICE_MODIFY("rs232")
 	MCFG_SLOT_DEFAULT_OPTION("null_modem")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( dmv_k212 )
+static MACHINE_CONFIG_START( dmv_k212 )
 	MCFG_FRAGMENT_ADD( dmv_k801 )
 
 	MCFG_DEVICE_MODIFY("rs232")
 	MCFG_SLOT_DEFAULT_OPTION("printer")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( dmv_k213 )
+static MACHINE_CONFIG_START( dmv_k213 )
 	MCFG_FRAGMENT_ADD( dmv_k801 )
 
 	MCFG_DEVICE_MODIFY("rs232")
@@ -98,10 +98,10 @@ INPUT_PORTS_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type DMV_K801 = device_creator<dmv_k801_device>;
-const device_type DMV_K211 = device_creator<dmv_k211_device>;
-const device_type DMV_K212 = device_creator<dmv_k212_device>;
-const device_type DMV_K213 = device_creator<dmv_k213_device>;
+DEFINE_DEVICE_TYPE(DMV_K801, dmv_k801_device, "dmv_k801", "K801 RS-232 Switchable Interface")
+DEFINE_DEVICE_TYPE(DMV_K211, dmv_k211_device, "dmv_k211", "K211 RS-232 Communications Interface")
+DEFINE_DEVICE_TYPE(DMV_K212, dmv_k212_device, "dmv_k212", "K212 RS-232 Printer Interface")
+DEFINE_DEVICE_TYPE(DMV_K213, dmv_k213_device, "dmv_k213", "K213 RS-232 Plotter Interface")
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -112,19 +112,16 @@ const device_type DMV_K213 = device_creator<dmv_k213_device>;
 //-------------------------------------------------
 
 dmv_k801_device::dmv_k801_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: device_t(mconfig, DMV_K801, "K801 RS-232 Switchable Interface", tag, owner, clock, "dmv_k801", __FILE__),
-		device_dmvslot_interface( mconfig, *this ),
-		m_epci(*this, "epci"),
-		m_dsw(*this, "DSW"), m_bus(nullptr)
-	{
+	: dmv_k801_device(mconfig, DMV_K801, tag, owner, clock)
+{
 }
 
-dmv_k801_device::dmv_k801_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-		: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_dmvslot_interface( mconfig, *this ),
-		m_epci(*this, "epci"),
-		m_dsw(*this, "DSW"), m_bus(nullptr)
-	{
+dmv_k801_device::dmv_k801_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock),
+	device_dmvslot_interface( mconfig, *this ),
+	m_epci(*this, "epci"),
+	m_dsw(*this, "DSW"), m_bus(nullptr)
+{
 }
 
 //-------------------------------------------------
@@ -132,13 +129,13 @@ dmv_k801_device::dmv_k801_device(const machine_config &mconfig, device_type type
 //-------------------------------------------------
 
 dmv_k211_device::dmv_k211_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: dmv_k801_device(mconfig, DMV_K211, "K211 RS-232 Communications Interface", tag, owner, clock, "dmv_k211", __FILE__)
+	: dmv_k211_device(mconfig, DMV_K211, tag, owner, clock)
 {
 }
 
 
-dmv_k211_device::dmv_k211_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-		: dmv_k801_device(mconfig, type, name, tag, owner, clock, shortname, source)
+dmv_k211_device::dmv_k211_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: dmv_k801_device(mconfig, type, tag, owner, clock)
 {
 }
 
@@ -147,7 +144,7 @@ dmv_k211_device::dmv_k211_device(const machine_config &mconfig, device_type type
 //-------------------------------------------------
 
 dmv_k212_device::dmv_k212_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: dmv_k211_device(mconfig, DMV_K212, "K212 RS-232 Printer Interface", tag, owner, clock, "dmv_k212", __FILE__)
+	: dmv_k211_device(mconfig, DMV_K212, tag, owner, clock)
 {
 }
 
@@ -156,7 +153,7 @@ dmv_k212_device::dmv_k212_device(const machine_config &mconfig, const char *tag,
 //-------------------------------------------------
 
 dmv_k213_device::dmv_k213_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: dmv_k211_device(mconfig, DMV_K213, "K213 RS-232 Plotter Interface", tag, owner, clock, "dmv_k213", __FILE__)
+	: dmv_k211_device(mconfig, DMV_K213, tag, owner, clock)
 {
 }
 

@@ -6,13 +6,13 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_ADAMNET_PRINTER_H
+#define MAME_BUS_ADAMNET_PRINTER_H
+
 #pragma once
 
-#ifndef __ADAM_PRN__
-#define __ADAM_PRN__
-
 #include "adamnet.h"
-#include "cpu/m6800/m6800.h"
+#include "cpu/m6800/m6801.h"
 
 
 
@@ -53,8 +53,6 @@ protected:
 
 
 // device type definition
-extern const device_type ADAM_PRN;
+DECLARE_DEVICE_TYPE(ADAM_PRN, adam_printer_device)
 
-
-
-#endif
+#endif // MAME_BUS_ADAMNET_PRINTER_H

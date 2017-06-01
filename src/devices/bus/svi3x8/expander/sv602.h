@@ -6,10 +6,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_SVI3X8_EXPANDER_SV602_H
+#define MAME_BUS_SVI3X8_EXPANDER_SV602_H
 
-#ifndef __SVI3X8_EXPANDER_SV602_H__
-#define __SVI3X8_EXPANDER_SV602_H__
+#pragma once
 
 #include "expander.h"
 #include "bus/svi3x8/slot/slot.h"
@@ -52,6 +52,6 @@ private:
 };
 
 // device type definition
-extern const device_type SV602;
+DECLARE_DEVICE_TYPE(SV602, sv602_device)
 
-#endif // __SVI3X8_EXPANDER_SV602_H__
+#endif // MAME_BUS_SVI3X8_EXPANDER_SV602_H

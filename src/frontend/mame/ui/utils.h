@@ -156,14 +156,11 @@ struct ui_software_info
 
 	bool operator==(const ui_software_info& r)
 	{
-		if (shortname == r.shortname && longname == r.longname && parentname == r.parentname
-			&& year == r.year && publisher == r.publisher && supported == r.supported
-			&& part == r.part && driver == r.driver && listname == r.listname
-			&& interface == r.interface && instance == r.instance && startempty == r.startempty
-			&& parentlongname == r.parentlongname && usage == r.usage && devicetype == r.devicetype)
-			return true;
-
-		return false;
+		return shortname == r.shortname && longname == r.longname && parentname == r.parentname
+			   && year == r.year && publisher == r.publisher && supported == r.supported
+			   && part == r.part && driver == r.driver && listname == r.listname
+			   && interface == r.interface && instance == r.instance && startempty == r.startempty
+			   && parentlongname == r.parentlongname && usage == r.usage && devicetype == r.devicetype;
 	}
 };
 

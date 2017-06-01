@@ -295,30 +295,28 @@ INPUT_PORTS_END
  IMPLEMENTATION
  ***************************************************************************/
 
+constexpr unsigned threecom3c505_device::ETH_BUFFER_SIZE;
+
 // device type definition
-const device_type ISA16_3C505 = device_creator<threecom3c505_device> ;
+DEFINE_DEVICE_TYPE(ISA16_3C505, threecom3c505_device, "3c505", "3Com 3C505 Network Adaptor")
 
 //-------------------------------------------------
 // threecom3c505_device - constructor
 //-------------------------------------------------
 
 threecom3c505_device::threecom3c505_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ISA16_3C505, "3Com 3C505 Network Adaptor", tag, owner, clock, "3c505", __FILE__),
-	device_network_interface(mconfig, *this, 10.0f),
-	device_isa16_card_interface(mconfig, *this),
-	m_iobase(*this, "IO_BASE"),
-	m_irqdrq(*this, "IRQ_DRQ"),
-	m_romopts(*this, "ROM_OPTS"), m_status(0), m_control(0), m_command_index(0), m_command_pending(0), m_wait_for_ack(0), m_wait_for_nak(0), m_rx_data_index(0), m_rx_pending(0), m_tx_data_length(0), m_program_length(0), m_response_length(0), m_response_index(0), m_microcode_version(0), m_microcode_running(0), m_i82586_config(0), irq_state(), m_do_command_timer(nullptr), m_installed(false), m_irq(0), m_drq(0)
+	: threecom3c505_device(mconfig, ISA16_3C505, tag, owner, clock)
 {
 }
 
 threecom3c505_device::threecom3c505_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, "3Com 3C505 Network Adaptor", tag, owner, clock, "3c505", __FILE__),
+	: device_t(mconfig, type, tag, owner, clock),
 	device_network_interface(mconfig, *this, 10.0f),
 	device_isa16_card_interface(mconfig, *this),
 	m_iobase(*this, "IO_BASE"),
 	m_irqdrq(*this, "IRQ_DRQ"),
-	m_romopts(*this, "ROM_OPTS"), m_status(0), m_control(0), m_command_index(0), m_command_pending(0), m_wait_for_ack(0), m_wait_for_nak(0), m_rx_data_index(0), m_rx_pending(0), m_tx_data_length(0), m_program_length(0), m_response_length(0), m_response_index(0), m_microcode_version(0), m_microcode_running(0), m_i82586_config(0), irq_state(), m_do_command_timer(nullptr), m_installed(false), m_irq(0), m_drq(0)
+	m_romopts(*this, "ROM_OPTS"),
+	m_status(0), m_control(0), m_command_index(0), m_command_pending(0), m_wait_for_ack(0), m_wait_for_nak(0), m_rx_data_index(0), m_rx_pending(0), m_tx_data_length(0), m_program_length(0), m_response_length(0), m_response_index(0), m_microcode_version(0), m_microcode_running(0), m_i82586_config(0), irq_state(), m_do_command_timer(nullptr), m_installed(false), m_irq(0), m_drq(0)
 {
 }
 

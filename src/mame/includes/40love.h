@@ -108,7 +108,6 @@ public:
 	DECLARE_DRIVER_INIT(40love);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(fortyl);
 	DECLARE_MACHINE_START(40love);
 	DECLARE_MACHINE_RESET(40love);
 	DECLARE_MACHINE_START(undoukai);

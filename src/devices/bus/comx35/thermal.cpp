@@ -21,7 +21,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type COMX_THM = device_creator<comx_thm_device>;
+DEFINE_DEVICE_TYPE(COMX_THM, comx_thm_device, "comx_thm", "COMX-35 Thermal Printer Card")
 
 
 //-------------------------------------------------
@@ -53,7 +53,7 @@ const tiny_rom_entry *comx_thm_device::device_rom_region() const
 //-------------------------------------------------
 
 comx_thm_device::comx_thm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, COMX_THM, "COMX-35 Thermal Printer Card", tag, owner, clock, "comx_thm", __FILE__),
+	device_t(mconfig, COMX_THM, tag, owner, clock),
 	device_comx_expansion_card_interface(mconfig, *this),
 	m_rom(*this, "c000")
 {

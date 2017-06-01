@@ -177,7 +177,7 @@ public:
 	required_device<pia6821_device> m_pia1;
 	required_device<pic8259_device> m_picm;
 	required_device<pic8259_device> m_pics;
-	required_device<fd1797_t> m_fdc;
+	required_device<fd1797_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	required_device<floppy_connector> m_floppy2;
@@ -392,7 +392,7 @@ static ADDRESS_MAP_START(z100_io, AS_IO, 8, z100_state)
 //  AM_RANGE (0xa4, 0xa7) gateway (reserved)
 //  AM_RANGE (0xac, 0xad) Z-217 secondary disk controller (winchester)
 //  AM_RANGE (0xae, 0xaf) Z-217 primary disk controller (winchester)
-	AM_RANGE (0xb0, 0xb3) AM_DEVREADWRITE("z207_fdc", fd1797_t, read, write)
+	AM_RANGE (0xb0, 0xb3) AM_DEVREADWRITE("z207_fdc", fd1797_device, read, write)
 	AM_RANGE (0xb4, 0xb4) AM_WRITE(floppy_select_w)
 	AM_RANGE (0xb5, 0xb5) AM_WRITE(floppy_motor_w)
 //  z-207 secondary disk controller (wd1797)
@@ -664,7 +664,7 @@ static SLOT_INTERFACE_START( z100_floppies )
 	SLOT_INTERFACE("dd", FLOPPY_525_DD)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( z100, z100_state )
+static MACHINE_CONFIG_START( z100 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8088, XTAL_14_31818MHz/3)
 	MCFG_CPU_PROGRAM_MAP(z100_mem)
@@ -728,5 +728,5 @@ DRIVER_INIT_MEMBER(z100_state,z100)
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1982, z100,   0,      0,       z100,      z100, z100_state,    z100,  "Zenith", "Z-100", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  STATE       INIT  COMPANY   FULLNAME  FLAGS
+COMP( 1982, z100, 0,      0,      z100,    z100,  z100_state, z100, "Zenith", "Z-100",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

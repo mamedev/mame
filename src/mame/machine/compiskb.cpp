@@ -28,7 +28,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type COMPIS_KEYBOARD = device_creator<compis_keyboard_device>;
+DEFINE_DEVICE_TYPE(COMPIS_KEYBOARD, compis_keyboard_device, "compiskb", "Compis Keyboard")
 
 
 //-------------------------------------------------
@@ -52,42 +52,23 @@ const tiny_rom_entry *compis_keyboard_device::device_rom_region() const
 
 
 //-------------------------------------------------
-//  ADDRESS_MAP( compis_keyboard_io )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( compis_keyboard_io, AS_IO, 8, compis_keyboard_device )
-	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_READWRITE(bus_r, bus_w)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READ(p1_r) AM_WRITENOP
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READ(p2_r) AM_WRITENOP
-	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_NOP
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_NOP
-ADDRESS_MAP_END
-
-
-//-------------------------------------------------
-//  MACHINE_DRIVER( compis_keyboard )
-//-------------------------------------------------
-
-static MACHINE_CONFIG_FRAGMENT( compis_keyboard )
+MACHINE_CONFIG_MEMBER( compis_keyboard_device::device_add_mconfig )
 	MCFG_CPU_ADD(I8748_TAG, I8748, 2016000) // XTAL_4_032MHz/2 ???
-	MCFG_CPU_IO_MAP(compis_keyboard_io)
+	MCFG_MCS48_PORT_BUS_IN_CB(READ8(compis_keyboard_device, bus_r))
+	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(compis_keyboard_device, bus_w))
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(compis_keyboard_device, p1_r))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(compis_keyboard_device, p2_r))
+	MCFG_MCS48_PORT_T0_IN_CB(NOOP) // ???
+	MCFG_MCS48_PORT_T1_IN_CB(NOOP) // ???
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor compis_keyboard_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( compis_keyboard );
-}
 
 
 //-------------------------------------------------
@@ -241,7 +222,7 @@ ioport_constructor compis_keyboard_device::device_input_ports() const
 //-------------------------------------------------
 
 compis_keyboard_device::compis_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, COMPIS_KEYBOARD, "Compis Keyboard", tag, owner, clock, "compiskb", __FILE__),
+	: device_t(mconfig, COMPIS_KEYBOARD, tag, owner, clock),
 		m_maincpu(*this, I8748_TAG),
 		m_speaker(*this, SPEAKER_TAG),
 		m_y(*this, "Y%u", 1),

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Nathan Woods
+// copyright-holders:Aaron Giles, Nathan Woods
 /**********************************************************************
 
     Motorola 6821 PIA interface and emulation
@@ -19,10 +19,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_DEVICES_MACHINE_6821PIA_H
+#define MAME_DEVICES_MACHINE_6821PIA_H
 
-#ifndef __6821PIA_H__
-#define __6821PIA_H__
+#pragma once
 
 
 
@@ -112,8 +112,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( ca1_w );
 
 	DECLARE_WRITE_LINE_MEMBER( ca2_w );
-	int ca2_output();
-	int ca2_output_z();
+	bool ca2_output();
+	bool ca2_output_z();
 
 	DECLARE_WRITE8_MEMBER( portb_w ) { portb_w(data); }
 	void portb_w(uint8_t data);
@@ -122,8 +122,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( cb1_w );
 
 	DECLARE_WRITE_LINE_MEMBER( cb2_w );
-	int cb2_output();
-	int cb2_output_z();
+	bool cb2_output();
+	bool cb2_output_z();
 
 	int irq_a_state() const { return m_irq_a_state; }
 	int irq_b_state() const { return m_irq_b_state; }
@@ -167,6 +167,21 @@ private:
 
 	void control_a_w(uint8_t data);
 	void control_b_w(uint8_t data);
+
+	static bool irq1_enabled(uint8_t c);
+	static bool c1_low_to_high(uint8_t c);
+	static bool c1_high_to_low(uint8_t c);
+	static bool output_selected(uint8_t c);
+	static bool irq2_enabled(uint8_t c);
+	static bool strobe_e_reset(uint8_t c);
+	static bool strobe_c1_reset(uint8_t c);
+	static bool c2_set(uint8_t c);
+	static bool c2_low_to_high(uint8_t c);
+	static bool c2_high_to_low(uint8_t c);
+	static bool c2_set_mode(uint8_t c);
+	static bool c2_strobe_mode(uint8_t c);
+	static bool c2_output(uint8_t c);
+	static bool c2_input(uint8_t c);
 
 	devcb_read8 m_in_a_handler;
 	devcb_read8 m_in_b_handler;
@@ -226,10 +241,7 @@ private:
 
 
 // device type definition
-extern const device_type PIA6821;
-
-extern template class device_finder<pia6821_device, false>;
-extern template class device_finder<pia6821_device, true>;
+DECLARE_DEVICE_TYPE(PIA6821, pia6821_device)
 
 
-#endif /* __6821PIA_H__ */
+#endif // MAME_DEVICES_MACHINE_6821PIA_H

@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "ctrl.h"
+
 // slot devices
 #include "bcbattle.h"
 #include "joypad.h"
@@ -23,7 +24,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type SNES_CONTROL_PORT = device_creator<snes_control_port_device>;
+DEFINE_DEVICE_TYPE(SNES_CONTROL_PORT, snes_control_port_device, "snes_control_port", "Nintendo SNES / SFC controller port")
 
 
 //**************************************************************************
@@ -59,8 +60,8 @@ device_snes_control_port_interface::~device_snes_control_port_interface()
 //-------------------------------------------------
 
 snes_control_port_device::snes_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-						device_t(mconfig, SNES_CONTROL_PORT, "Nintendo SNES / SFC control port", tag, owner, clock, "snes_control_port", __FILE__),
-						device_slot_interface(mconfig, *this), m_device(nullptr)
+	device_t(mconfig, SNES_CONTROL_PORT, tag, owner, clock),
+	device_slot_interface(mconfig, *this), m_device(nullptr)
 {
 }
 

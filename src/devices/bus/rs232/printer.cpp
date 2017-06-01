@@ -4,7 +4,7 @@
 #include "printer.h"
 
 serial_printer_device::serial_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SERIAL_PRINTER, "Serial Printer", tag, owner, clock, "serial_printer", __FILE__),
+	: device_t(mconfig, SERIAL_PRINTER, tag, owner, clock),
 	device_serial_interface(mconfig, *this),
 	device_rs232_port_interface(mconfig, *this),
 	m_printer(*this, "printer"),
@@ -16,7 +16,7 @@ serial_printer_device::serial_printer_device(const machine_config &mconfig, cons
 {
 }
 
-static MACHINE_CONFIG_FRAGMENT(serial_printer)
+static MACHINE_CONFIG_START(serial_printer)
 	MCFG_DEVICE_ADD("printer", PRINTER, 0)
 	MCFG_PRINTER_ONLINE_CB(WRITELINE(serial_printer_device, printer_online))
 MACHINE_CONFIG_END
@@ -83,4 +83,4 @@ void serial_printer_device::rcv_complete()
 	m_printer->output(get_received_char());
 }
 
-const device_type SERIAL_PRINTER = device_creator<serial_printer_device>;
+DEFINE_DEVICE_TYPE(SERIAL_PRINTER, serial_printer_device, "serial_printer", "Serial Printer")

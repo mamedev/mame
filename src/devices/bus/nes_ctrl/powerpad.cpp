@@ -13,7 +13,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type NES_POWERPAD = device_creator<nes_powerpad_device>;
+DEFINE_DEVICE_TYPE(NES_POWERPAD, nes_powerpad_device, "nes_powerpad", "Bandai Power Pad")
 
 
 static INPUT_PORTS_START( nes_powerpad )
@@ -79,10 +79,10 @@ ioport_constructor nes_powerpad_device::device_input_ports() const
 //-------------------------------------------------
 
 nes_powerpad_device::nes_powerpad_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-					device_t(mconfig, NES_POWERPAD, "Bandai Power Pad", tag, owner, clock, "nes_powerpad", __FILE__),
-					device_nes_control_port_interface(mconfig, *this),
-					m_ipt1(*this, "POWERPAD1"),
-					m_ipt2(*this, "POWERPAD2")
+	device_t(mconfig, NES_POWERPAD, tag, owner, clock),
+	device_nes_control_port_interface(mconfig, *this),
+	m_ipt1(*this, "POWERPAD1"),
+	m_ipt2(*this, "POWERPAD2")
 {
 }
 

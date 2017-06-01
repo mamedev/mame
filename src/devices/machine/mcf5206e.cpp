@@ -822,14 +822,14 @@ WRITE16_MEMBER( mcf5206e_peripheral_device::TCN1_w)
 //**************************************************************************
 
 // device type definition
-const device_type MCF5206E_PERIPHERAL = device_creator<mcf5206e_peripheral_device>;
+DEFINE_DEVICE_TYPE(MCF5206E_PERIPHERAL, mcf5206e_peripheral_device, "mcf5206e_peripheral", "MCF5206E Peripheral")
 
 //-------------------------------------------------
 //  mcf5206e_peripheral_device - constructor
 //-------------------------------------------------
 
 mcf5206e_peripheral_device::mcf5206e_peripheral_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MCF5206E_PERIPHERAL, "MCF5206E Peripheral", tag, owner, clock, "mcf5206e_peripheral", __FILE__),
+	: device_t(mconfig, MCF5206E_PERIPHERAL, tag, owner, clock),
 		device_memory_interface(mconfig, *this),
 		m_space_config("coldfire_regs", ENDIANNESS_BIG, 32,10, 0, nullptr, *ADDRESS_MAP_NAME(coldfire_regs_map))
 

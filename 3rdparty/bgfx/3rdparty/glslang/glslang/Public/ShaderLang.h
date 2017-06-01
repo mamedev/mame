@@ -203,14 +203,6 @@ SH_IMPORT_EXPORT int ShCompile(
     EShMessages messages = EShMsgDefault // warnings and errors
     );
 
-SH_IMPORT_EXPORT int ShLink(
-    const ShHandle,               // linker object
-    const ShHandle h[],           // compiler objects to link together
-    const int numHandles,
-    ShHandle uniformMap,          // updated with new uniforms
-    short int** uniformsAccessed,  // returned with indexes of uniforms accessed
-    int* numUniformsAccessed);
-
 SH_IMPORT_EXPORT int ShLinkExt(
     const ShHandle,               // linker object
     const ShHandle h[],           // compiler objects to link together
@@ -310,6 +302,7 @@ public:
     void setShiftTextureBinding(unsigned int base);
     void setShiftImageBinding(unsigned int base);
     void setShiftUboBinding(unsigned int base);
+    void setShiftSsboBinding(unsigned int base);
     void setAutoMapBindings(bool map);
     void setFlattenUniformArrays(bool flatten);
     void setNoStorageFormat(bool useUnknownFormat);
@@ -459,10 +452,12 @@ class TIoMapper;
 // and resolveSet are invoked to resolve the binding and descriptor
 // set index respectively.
 // Invocations happen in a particular order:
-// 1) var with binding and set already defined
-// 2) var with binding but no set defined
-// 3) var with set but no binding defined
-// 4) var with no binding and no set defined
+// 1) all shader inputs
+// 2) all shader outputs
+// 3) all uniforms with binding and set already defined
+// 4) all uniforms with binding but no set defined
+// 5) all uniforms with set but no binding defined
+// 6) all uniforms with no binding and no set defined
 //
 // NOTE: that still limit checks are applied to bindings and sets
 // and may result in an error.
@@ -480,6 +475,18 @@ public:
   // Should return a value >= 0 if the current set should be overriden.
   // Return -1 if the current set (including no set) should be kept.
   virtual int resolveSet(EShLanguage stage, const char* name, const TType& type, bool is_live) = 0;
+  // Should return true if the resuling/current setup would be ok.
+  // Basic idea is to do aliasing checks and reject invalid semantic names.
+  virtual bool validateInOut(EShLanguage stage, const char* name, const TType& type, bool is_live) = 0;
+  // Should return a value >= 0 if the current location should be overriden.
+  // Return -1 if the current location (including no location) should be kept.
+  virtual int resolveInOutLocation(EShLanguage stage, const char* name, const TType& type, bool is_live) = 0;
+  // Should return a value >= 0 if the current component index should be overriden.
+  // Return -1 if the current component index (including no index) should be kept.
+  virtual int resolveInOutComponent(EShLanguage stage, const char* name, const TType& type, bool is_live) = 0;
+  // Should return a value >= 0 if the current color index should be overriden.
+  // Return -1 if the current color index (including no index) should be kept.
+  virtual int resolveInOutIndex(EShLanguage stage, const char* name, const TType& type, bool is_live) = 0;
 };
 
 // Make one TProgram per set of shaders that will get linked together.  Add all
@@ -514,6 +521,7 @@ public:
     int getUniformBufferOffset(int index) const;           // can be used for glGetActiveUniformsiv(GL_UNIFORM_OFFSET)
     int getUniformArraySize(int index) const;              // can be used for glGetActiveUniformsiv(GL_UNIFORM_SIZE)
     int getNumLiveAttributes() const;                      // can be used for glGetProgramiv(GL_ACTIVE_ATTRIBUTES)
+    unsigned getLocalSize(int dim) const;                  // return dim'th local size
     const char *getAttributeName(int index) const;         // can be used for glGetActiveAttrib()
     int getAttributeType(int index) const;                 // can be used for glGetActiveAttrib()
     const TType* getUniformTType(int index) const;         // returns a TType*

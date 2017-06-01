@@ -2,8 +2,8 @@
 // copyright-holders:Angelo Salese
 /**  Konami 053252  **/
 /* CRT and interrupt control unit */
-#ifndef MAME_DEVICES_MACHINE_K053252_H
-#define MAME_DEVICES_MACHINE_K053252_H
+#ifndef MAME_MACHINE_K053252_H
+#define MAME_MACHINE_K053252_H
 
 #pragma once
 
@@ -49,9 +49,7 @@ public:
 
 	void res_change();
 
-
 	static void static_set_slave_screen(device_t &device, const char *tag);
-
 
 protected:
 	// device-level overrides
@@ -76,10 +74,8 @@ protected:
 	int                m_offsy;
 
 	optional_device<screen_device> m_slave_screen;
-
 };
 
-extern const device_type K053252;
+DECLARE_DEVICE_TYPE(K053252, k053252_device)
 
-
-#endif  // MAME_DEVICES_MACHINE_K053252_H
+#endif  // MAME_MACHINE_K053252_H

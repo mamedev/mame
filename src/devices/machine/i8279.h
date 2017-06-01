@@ -30,10 +30,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_I8279_H
+#define MAME_MACHINE_I8279_H
 
-#ifndef __I8279__
-#define __I8279__
+#pragma once
 
 
 
@@ -75,13 +75,13 @@ public:
 	// construction/destruction
 	i8279_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_out_irq_callback(device_t &device, _Object object) { return downcast<i8279_device &>(device).m_out_irq_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_sl_callback(device_t &device, _Object object) { return downcast<i8279_device &>(device).m_out_sl_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_disp_callback(device_t &device, _Object object) { return downcast<i8279_device &>(device).m_out_disp_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_bd_callback(device_t &device, _Object object) { return downcast<i8279_device &>(device).m_out_bd_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_in_rl_callback(device_t &device, _Object object) { return downcast<i8279_device &>(device).m_in_rl_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_in_shift_callback(device_t &device, _Object object) { return downcast<i8279_device &>(device).m_in_shift_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_in_ctrl_callback(device_t &device, _Object object) { return downcast<i8279_device &>(device).m_in_ctrl_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_out_irq_callback(device_t &device, Object &&cb) { return downcast<i8279_device &>(device).m_out_irq_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_sl_callback(device_t &device, Object &&cb) { return downcast<i8279_device &>(device).m_out_sl_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_disp_callback(device_t &device, Object &&cb) { return downcast<i8279_device &>(device).m_out_disp_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_bd_callback(device_t &device, Object &&cb) { return downcast<i8279_device &>(device).m_out_bd_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_in_rl_callback(device_t &device, Object &&cb) { return downcast<i8279_device &>(device).m_in_rl_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_in_shift_callback(device_t &device, Object &&cb) { return downcast<i8279_device &>(device).m_in_shift_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_in_ctrl_callback(device_t &device, Object &&cb) { return downcast<i8279_device &>(device).m_in_ctrl_cb.set_callback(std::forward<Object>(cb)); }
 
 	// read & write handlers
 	DECLARE_READ8_MEMBER(read);
@@ -137,8 +137,6 @@ private:
 
 
 // device type definition
-extern const device_type I8279;
+DECLARE_DEVICE_TYPE(I8279, i8279_device)
 
-
-
-#endif
+#endif // MAME_MACHINE_I8279_H

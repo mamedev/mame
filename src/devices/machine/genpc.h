@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef MAME_DEVICES_MACHINE_GENPC_H
-#define MAME_DEVICES_MACHINE_GENPC_H
+#ifndef MAME_MACHINE_GENPC_H
+#define MAME_MACHINE_GENPC_H
 
 #include "imagedev/cassette.h"
 #include "machine/am9517a.h"
@@ -36,22 +36,32 @@ public:
 	// inline configuration
 	static void static_set_cputag(device_t &device, const char *tag);
 
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual ioport_constructor device_input_ports() const override;
-
 	DECLARE_ADDRESS_MAP(map, 8);
+
+	uint8_t m_pit_out2;
+
+	DECLARE_WRITE8_MEMBER(pc_page_w);
+	DECLARE_WRITE8_MEMBER(nmi_enable_w);
+
+	DECLARE_WRITE_LINE_MEMBER( pc_speaker_set_spkrdata );
+
 protected:
-	ibm5160_mb_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+	ibm5160_mb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-public:
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
+
+protected:
 	required_device<cpu_device>             m_maincpu;
+public:
 	required_device<pic8259_device>         m_pic8259;
-	required_device<am9517a_device>         m_dma8237;
 	required_device<pit8253_device>         m_pit8253;
+	required_device<am9517a_device>         m_dma8237;
+protected:
 	optional_device<i8255_device>           m_ppi8255;
 	required_device<speaker_sound_device>   m_speaker;
 	required_device<isa8_device>            m_isabus;
@@ -65,7 +75,6 @@ public:
 	int m_dma_channel;
 	uint8_t m_dma_offset[4];
 	uint8_t m_pc_spkrdata;
-	uint8_t m_pit_out2;
 	bool m_cur_eop;
 
 	uint8_t m_nmi_enabled;
@@ -107,20 +116,14 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( pc_dack2_w );
 	DECLARE_WRITE_LINE_MEMBER( pc_dack3_w );
 
-	DECLARE_WRITE_LINE_MEMBER( pc_speaker_set_spkrdata );
-
-	DECLARE_WRITE8_MEMBER(pc_page_w);
-	DECLARE_WRITE8_MEMBER(nmi_enable_w);
-
 	const char *m_cputag;
 
-private:
 	void pc_select_dma_channel(int channel, bool state);
 };
 
 
 // device type definition
-extern const device_type IBM5160_MOTHERBOARD;
+DECLARE_DEVICE_TYPE(IBM5160_MOTHERBOARD, ibm5160_mb_device)
 
 
 #define MCFG_IBM5150_MOTHERBOARD_ADD(_tag, _cputag) \
@@ -134,18 +137,17 @@ public:
 	// construction/destruction
 	ibm5150_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
 	DECLARE_WRITE_LINE_MEMBER( keyboard_clock_w );
 
 protected:
-	ibm5150_mb_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+	ibm5150_mb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
 
+private:
 	required_device<cassette_image_device>  m_cassette;
-public:
+
 	DECLARE_READ8_MEMBER ( pc_ppi_porta_r );
 	DECLARE_READ8_MEMBER ( pc_ppi_portc_r );
 	DECLARE_WRITE8_MEMBER( pc_ppi_portb_w );
@@ -153,7 +155,7 @@ public:
 
 
 // device type definition
-extern const device_type IBM5150_MOTHERBOARD;
+DECLARE_DEVICE_TYPE(IBM5150_MOTHERBOARD, ibm5150_mb_device)
 
 
 #define MCFG_EC1841_MOTHERBOARD_ADD(_tag, _cputag) \
@@ -166,19 +168,20 @@ public:
 	// construction/destruction
 	ec1841_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;
 
-public:
+private:
 	DECLARE_READ8_MEMBER ( pc_ppi_portc_r );
 	DECLARE_WRITE8_MEMBER( pc_ppi_portb_w );
 
 	DECLARE_WRITE_LINE_MEMBER( keyboard_clock_w );
 };
 
-extern const device_type EC1841_MOTHERBOARD;
+DECLARE_DEVICE_TYPE(EC1841_MOTHERBOARD, ec1841_mb_device)
 
 #define MCFG_PCNOPPI_MOTHERBOARD_ADD(_tag, _cputag) \
 	MCFG_DEVICE_ADD(_tag, PCNOPPI_MOTHERBOARD, 0) \
@@ -194,12 +197,12 @@ public:
 	DECLARE_ADDRESS_MAP(map, 8);
 
 protected:
-	pc_noppi_mb_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+	pc_noppi_mb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 };
 
-extern const device_type PCNOPPI_MOTHERBOARD;
+DECLARE_DEVICE_TYPE(PCNOPPI_MOTHERBOARD, pc_noppi_mb_device)
 
-#endif // MAME_DEVICES_MACHINE_GENPC_H
+#endif // MAME_MACHINE_GENPC_H

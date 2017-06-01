@@ -8,12 +8,12 @@
 
 ***************************************************************************/
 
-#ifndef MAME_DEVICES_VIDEO_VOODDEFS_H
-#define MAME_DEVICES_VIDEO_VOODDEFS_H
+#ifndef MAME_VIDEO_VOODDEFS_H
+#define MAME_VIDEO_VOODDEFS_H
 
 #pragma once
 
-#include "video/rgbutil.h"
+#include "voodoo.h"
 
 
 
@@ -23,8 +23,7 @@
  *
  *************************************/
 
-struct voodoo_state;
-struct poly_extra_data;
+typedef voodoo_reg rgb_union;
 
 
 
@@ -36,85 +35,50 @@ struct poly_extra_data;
  *
  *************************************/
 
-static inline void fifo_reset(fifo_state *f)
+inline void voodoo_device::fifo_state::add(uint32_t data)
 {
-	f->in = f->out = 0;
-}
-
-
-static inline void fifo_add(fifo_state *f, uint32_t data)
-{
-	int32_t next_in;
-
 	/* compute the value of 'in' after we add this item */
-	next_in = f->in + 1;
-	if (next_in >= f->size)
+	int32_t next_in = in + 1;
+	if (next_in >= size)
 		next_in = 0;
 
 	/* as long as it's not equal to the output pointer, we can do it */
-	if (next_in != f->out)
+	if (next_in != out)
 	{
-		f->base[f->in] = data;
-		f->in = next_in;
+		base[in] = data;
+		in = next_in;
 	}
 }
 
 
-static inline uint32_t fifo_remove(fifo_state *f)
+inline uint32_t voodoo_device::fifo_state::remove()
 {
 	uint32_t data = 0xffffffff;
 
 	/* as long as we have data, we can do it */
-	if (f->out != f->in)
+	if (out != in)
 	{
 		int32_t next_out;
 
 		/* fetch the data */
-		data = f->base[f->out];
+		data = base[out];
 
 		/* advance the output pointer */
-		next_out = f->out + 1;
-		if (next_out >= f->size)
+		next_out = out + 1;
+		if (next_out >= size)
 			next_out = 0;
-		f->out = next_out;
+		out = next_out;
 	}
 	return data;
 }
 
 
-static inline uint32_t fifo_peek(fifo_state *f)
+inline int32_t voodoo_device::fifo_state::items() const
 {
-	return f->base[f->out];
-}
-
-
-static inline int fifo_empty(fifo_state *f)
-{
-	return (f->in == f->out);
-}
-
-
-static inline int fifo_full(fifo_state *f)
-{
-	return (f->in + 1 == f->out || (f->in == f->size - 1 && f->out == 0));
-}
-
-
-static inline int32_t fifo_items(fifo_state *f)
-{
-	int32_t items = f->in - f->out;
+	int32_t items = in - out;
 	if (items < 0)
-		items += f->size;
+		items += size;
 	return items;
-}
-
-
-static inline int32_t fifo_space(fifo_state *f)
-{
-	int32_t items = f->in - f->out;
-	if (items < 0)
-		items += f->size;
-	return f->size - 1 - items;
 }
 
 
@@ -333,24 +297,24 @@ static inline uint32_t normalize_tex_mode(uint32_t eff_tex_mode)
 }
 
 
-static inline uint32_t compute_raster_hash(const raster_info *info)
+inline uint32_t voodoo_device::raster_info::compute_hash() const
 {
-	uint32_t hash;
+	uint32_t result;
 
 	/* make a hash */
-	hash = info->eff_color_path;
-	hash = (hash << 1) | (hash >> 31);
-	hash ^= info->eff_fbz_mode;
-	hash = (hash << 1) | (hash >> 31);
-	hash ^= info->eff_alpha_mode;
-	hash = (hash << 1) | (hash >> 31);
-	hash ^= info->eff_fog_mode;
-	hash = (hash << 1) | (hash >> 31);
-	hash ^= info->eff_tex_mode_0;
-	hash = (hash << 1) | (hash >> 31);
-	hash ^= info->eff_tex_mode_1;
+	result = eff_color_path;
+	result = (result << 1) | (result >> 31);
+	result ^= eff_fbz_mode;
+	result = (result << 1) | (result >> 31);
+	result ^= eff_alpha_mode;
+	result = (result << 1) | (result >> 31);
+	result ^= eff_fog_mode;
+	result = (result << 1) | (result >> 31);
+	result ^= eff_tex_mode_0;
+	result = (result << 1) | (result >> 31);
+	result ^= eff_tex_mode_1;
 
-	return hash % RASTER_HASH_SIZE;
+	return result % RASTER_HASH_SIZE;
 }
 
 
@@ -637,7 +601,7 @@ do                                                                              
 }                                                                               \
 while (0)
 
-static inline bool ATTR_FORCE_INLINE chromaKeyTest(voodoo_device *vd, stats_block *stats, uint32_t fbzModeReg, rgbaint_t rgbaIntColor)
+inline bool ATTR_FORCE_INLINE voodoo_device::chromaKeyTest(voodoo_device *vd, stats_block *stats, uint32_t fbzModeReg, rgbaint_t rgbaIntColor)
 {
 	if (FBZMODE_ENABLE_CHROMAKEY(fbzModeReg))
 	{
@@ -726,7 +690,7 @@ do                                                                              
 }                                                                               \
 while (0)
 
-static inline bool alphaMaskTest(stats_block *stats, uint32_t fbzModeReg, uint8_t alpha)
+inline bool voodoo_device::alphaMaskTest(stats_block *stats, uint32_t fbzModeReg, uint8_t alpha)
 {
 	if (FBZMODE_ENABLE_ALPHA_MASK(fbzModeReg))
 	{
@@ -812,7 +776,7 @@ do                                                                              
 }                                                                               \
 while (0)
 
-static inline bool ATTR_FORCE_INLINE alphaTest(voodoo_device *vd, stats_block *stats, uint32_t alphaModeReg, uint8_t alpha)
+inline bool ATTR_FORCE_INLINE voodoo_device::alphaTest(voodoo_device *vd, stats_block *stats, uint32_t alphaModeReg, uint8_t alpha)
 {
 	if (ALPHAMODE_ALPHATEST(alphaModeReg))
 	{
@@ -2002,7 +1966,7 @@ do                                                                              
 }                                                                               \
 while (0)
 
-static inline bool ATTR_FORCE_INLINE depthTest(uint16_t zaColorReg, stats_block *stats, int32_t destDepth, uint32_t fbzModeReg, int32_t biasdepth)
+inline bool ATTR_FORCE_INLINE voodoo_device::depthTest(uint16_t zaColorReg, stats_block *stats, int32_t destDepth, uint32_t fbzModeReg, int32_t biasdepth)
 {
 	/* handle depth buffer testing */
 	if (FBZMODE_ENABLE_DEPTHBUF(fbzModeReg))
@@ -2413,7 +2377,7 @@ do                                                                              
 }                                                                               \
 while (0)
 
-static inline bool ATTR_FORCE_INLINE combineColor(voodoo_device *vd, stats_block *STATS, uint32_t FBZCOLORPATH, uint32_t FBZMODE, uint32_t ALPHAMODE,
+inline bool ATTR_FORCE_INLINE voodoo_device::combineColor(voodoo_device *vd, stats_block *STATS, uint32_t FBZCOLORPATH, uint32_t FBZMODE, uint32_t ALPHAMODE,
 													rgbaint_t TEXELARGB, int32_t ITERZ, int64_t ITERW, rgbaint_t &srcColor)
 {
 	rgbaint_t c_other;
@@ -2767,9 +2731,9 @@ void voodoo_device::raster_##name(void *destbase, int32_t y, const poly_extent *
 		if (TMUS >= 2 && vd->tmu[1].lodmin < (8 << 8))                    {       \
 			int32_t tmp; \
 			const rgbaint_t texelZero(0);  \
-			texel = genTexture(&vd->tmu[1], x, dither4, TEXMODE1, vd->tmu[1].lookup, extra->lodbase1, \
+			texel = vd->tmu[1].genTexture(x, dither4, TEXMODE1, vd->tmu[1].lookup, extra->lodbase1, \
 														iters1, itert1, iterw1, tmp); \
-			texel = combineTexture(&vd->tmu[1], TEXMODE1, texel, texelZero, tmp); \
+			texel = vd->tmu[1].combineTexture(TEXMODE1, texel, texelZero, tmp); \
 		} \
 		/* run the texture pipeline on TMU0 to produce a final */               \
 		/* result in texel */                                                   \
@@ -2780,9 +2744,9 @@ void voodoo_device::raster_##name(void *destbase, int32_t y, const poly_extent *
 			{                                                                   \
 				int32_t lod0; \
 				rgbaint_t texelT0;                                                \
-				texelT0 = genTexture(&vd->tmu[0], x, dither4, TEXMODE0, vd->tmu[0].lookup, extra->lodbase0, \
+				texelT0 = vd->tmu[0].genTexture(x, dither4, TEXMODE0, vd->tmu[0].lookup, extra->lodbase0, \
 																iters0, itert0, iterw0, lod0); \
-				texel = combineTexture(&vd->tmu[0], TEXMODE0, texelT0, texel, lod0); \
+				texel = vd->tmu[0].combineTexture(TEXMODE0, texelT0, texel, lod0); \
 			}                                                                   \
 			else                                                                \
 			{                                                                   \
@@ -2853,7 +2817,7 @@ static inline void ATTR_FORCE_INLINE multi_reciplog(int64_t valueA, int64_t valu
 }
 
 
-static inline rgbaint_t ATTR_FORCE_INLINE genTexture(tmu_state *TT, int32_t x, const uint8_t *dither4, const uint32_t TEXMODE, rgb_t *LOOKUP, int32_t LODBASE, int64_t ITERS, int64_t ITERT, int64_t ITERW, int32_t &lod)
+inline rgbaint_t ATTR_FORCE_INLINE voodoo_device::tmu_state::genTexture(int32_t x, const uint8_t *dither4, const uint32_t TEXMODE, rgb_t *LOOKUP, int32_t LODBASE, int64_t ITERS, int64_t ITERT, int64_t ITERW, int32_t &lod)
 {
 	rgbaint_t result;
 	int32_t s, t, ilod;
@@ -2885,29 +2849,29 @@ static inline rgbaint_t ATTR_FORCE_INLINE genTexture(tmu_state *TT, int32_t x, c
 	}
 
 	/* clamp the LOD */
-	lod += (TT)->lodbias;
+	lod += lodbias;
 	if (TEXMODE_ENABLE_LOD_DITHER(TEXMODE))
 		lod += dither4[x&3] << 4;
-	if (lod < (TT)->lodmin)
-		lod = (TT)->lodmin;
-	else if (lod > (TT)->lodmax)
-		lod = (TT)->lodmax;
+	if (lod < lodmin)
+		lod = lodmin;
+	else if (lod > lodmax)
+		lod = lodmax;
 
 	/* now the LOD is in range; if we don't own this LOD, take the next one */
 	ilod = lod >> 8;
-	if (!(((TT)->lodmask >> ilod) & 1))
+	if (!((lodmask >> ilod) & 1))
 		ilod++;
 
 	/* fetch the texture base */
-	uint32_t texbase = (TT)->lodoffset[ilod];
+	uint32_t texbase = lodoffset[ilod];
 
 	/* compute the maximum s and t values at this LOD */
-	int32_t smax = (TT)->wmask >> ilod;
-	int32_t tmax = (TT)->hmask >> ilod;
+	int32_t smax = wmask >> ilod;
+	int32_t tmax = hmask >> ilod;
 
 	/* determine whether we are point-sampled or bilinear */
-	if ((lod == (TT)->lodmin && !TEXMODE_MAGNIFICATION_FILTER(TEXMODE)) ||
-		(lod != (TT)->lodmin && !TEXMODE_MINIFICATION_FILTER(TEXMODE)))
+	if ((lod == lodmin && !TEXMODE_MAGNIFICATION_FILTER(TEXMODE)) ||
+		(lod != lodmin && !TEXMODE_MINIFICATION_FILTER(TEXMODE)))
 	{
 		/* point sampled */
 
@@ -2929,12 +2893,12 @@ static inline rgbaint_t ATTR_FORCE_INLINE genTexture(tmu_state *TT, int32_t x, c
 		/* fetch texel data */
 		if (TEXMODE_FORMAT(TEXMODE) < 8)
 		{
-			texel0 = *(uint8_t *)&(TT)->ram[(texbase + t + s) & (TT)->mask];
+			texel0 = *(uint8_t *)&ram[(texbase + t + s) & mask];
 			result.set((LOOKUP)[texel0]);
 		}
 		else
 		{
-			texel0 = *(uint16_t *)&(TT)->ram[(texbase + 2*(t + s)) & (TT)->mask];
+			texel0 = *(uint16_t *)&ram[(texbase + 2*(t + s)) & mask];
 			if (TEXMODE_FORMAT(TEXMODE) >= 10 && TEXMODE_FORMAT(TEXMODE) <= 12)
 				result.set((LOOKUP)[texel0]);
 			else
@@ -2959,8 +2923,8 @@ static inline rgbaint_t ATTR_FORCE_INLINE genTexture(tmu_state *TT, int32_t x, c
 		t -= 0x80;
 
 		/* extract the fractions */
-		sfrac = s & (TT)->bilinear_mask;
-		tfrac = t & (TT)->bilinear_mask;
+		sfrac = s & bilinear_mask;
+		tfrac = t & bilinear_mask;
 
 		/* now toss the rest */
 		s >>= 8;
@@ -3006,10 +2970,10 @@ static inline rgbaint_t ATTR_FORCE_INLINE genTexture(tmu_state *TT, int32_t x, c
 		/* fetch texel data */
 		if (TEXMODE_FORMAT(TEXMODE) < 8)
 		{
-			texel0 = *(uint8_t *)&(TT)->ram[(texbase + t + s)];
-			texel1 = *(uint8_t *)&(TT)->ram[(texbase + t + s1)];
-			texel2 = *(uint8_t *)&(TT)->ram[(texbase + t1 + s)];
-			texel3 = *(uint8_t *)&(TT)->ram[(texbase + t1 + s1)];
+			texel0 = *(uint8_t *)&ram[(texbase + t + s)];
+			texel1 = *(uint8_t *)&ram[(texbase + t + s1)];
+			texel2 = *(uint8_t *)&ram[(texbase + t1 + s)];
+			texel3 = *(uint8_t *)&ram[(texbase + t1 + s1)];
 			texel0 = (LOOKUP)[texel0];
 			texel1 = (LOOKUP)[texel1];
 			texel2 = (LOOKUP)[texel2];
@@ -3017,10 +2981,10 @@ static inline rgbaint_t ATTR_FORCE_INLINE genTexture(tmu_state *TT, int32_t x, c
 		}
 		else
 		{
-			texel0 = *(uint16_t *)&(TT)->ram[(texbase + 2*(t + s))];
-			texel1 = *(uint16_t *)&(TT)->ram[(texbase + 2*(t + s1))];
-			texel2 = *(uint16_t *)&(TT)->ram[(texbase + 2*(t1 + s))];
-			texel3 = *(uint16_t *)&(TT)->ram[(texbase + 2*(t1 + s1))];
+			texel0 = *(uint16_t *)&ram[(texbase + 2*(t + s))];
+			texel1 = *(uint16_t *)&ram[(texbase + 2*(t + s1))];
+			texel2 = *(uint16_t *)&ram[(texbase + 2*(t1 + s))];
+			texel3 = *(uint16_t *)&ram[(texbase + 2*(t1 + s1))];
 			if (TEXMODE_FORMAT(TEXMODE) >= 10 && TEXMODE_FORMAT(TEXMODE) <= 12)
 			{
 				texel0 = (LOOKUP)[texel0];
@@ -3044,7 +3008,7 @@ static inline rgbaint_t ATTR_FORCE_INLINE genTexture(tmu_state *TT, int32_t x, c
 	return result;
 }
 
-static inline rgbaint_t ATTR_FORCE_INLINE combineTexture(tmu_state *TT, const uint32_t TEXMODE, rgbaint_t c_local, rgbaint_t c_other, int32_t lod)
+inline rgbaint_t ATTR_FORCE_INLINE voodoo_device::tmu_state::combineTexture(const uint32_t TEXMODE, rgbaint_t c_local, rgbaint_t c_other, int32_t lod)
 {
 	int32_t a_other = c_other.get_a();
 	int32_t a_local = c_local.get_a();
@@ -3093,13 +3057,13 @@ static inline rgbaint_t ATTR_FORCE_INLINE combineTexture(tmu_state *TT, const ui
 			break;
 
 		case 4:     /* LOD (detail factor) */
-			if ((TT)->detailbias <= lod)
+			if (detailbias <= lod)
 				c_local.and_imm_rgba(-1, 0, 0, 0);
 			else
 			{
-				tmp = ((((TT)->detailbias - lod) << (TT)->detailscale) >> 8);
-				if (tmp > (TT)->detailmax)
-					tmp = (TT)->detailmax;
+				tmp = (((detailbias - lod) << detailscale) >> 8);
+				if (tmp > detailmax)
+					tmp = detailmax;
 				c_local.set(a_local, tmp, tmp, tmp);
 			}
 			break;
@@ -3129,13 +3093,13 @@ static inline rgbaint_t ATTR_FORCE_INLINE combineTexture(tmu_state *TT, const ui
 			break;
 
 		case 4:     /* LOD (detail factor) */
-			if ((TT)->detailbias <= lod)
+			if (detailbias <= lod)
 				c_local.set_a(0);
 			else
 			{
-				tmp = ((((TT)->detailbias - lod) << (TT)->detailscale) >> 8);
-				if (tmp > (TT)->detailmax)
-					tmp = (TT)->detailmax;
+				tmp = (((detailbias - lod) << detailscale) >> 8);
+				if (tmp > detailmax)
+					tmp = detailmax;
 				c_local.set_a(tmp);
 			}
 			break;
@@ -3201,4 +3165,4 @@ static inline rgbaint_t ATTR_FORCE_INLINE combineTexture(tmu_state *TT, const ui
 	return result;
 }
 
-#endif // MAME_DEVICES_VIDEO_VOODDEFS_H
+#endif // MAME_VIDEO_VOODDEFS_H

@@ -13,10 +13,10 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type X68K_NEPTUNEX = device_creator<x68k_neptune_device>;
+DEFINE_DEVICE_TYPE(X68K_NEPTUNEX, x68k_neptune_device, "x68k_neptunex", "Neptune-X")
 
 // device machine config
-static MACHINE_CONFIG_FRAGMENT( x68k_neptunex )
+static MACHINE_CONFIG_START( x68k_neptunex )
 	MCFG_DEVICE_ADD("dp8390d", DP8390D, 0)
 	MCFG_DP8390D_IRQ_CB(WRITELINE(x68k_neptune_device, x68k_neptune_irq_w))
 	MCFG_DP8390D_MEM_READ_CB(READ8(x68k_neptune_device, x68k_neptune_mem_read))
@@ -29,10 +29,10 @@ machine_config_constructor x68k_neptune_device::device_mconfig_additions() const
 }
 
 x68k_neptune_device::x68k_neptune_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: device_t(mconfig, X68K_NEPTUNEX, "Neptune-X", tag, owner, clock, "x68k_neptunex", __FILE__),
-		device_x68k_expansion_card_interface(mconfig, *this),
-	m_slot(nullptr),
-		m_dp8390(*this, "dp8390d")
+	: device_t(mconfig, X68K_NEPTUNEX, tag, owner, clock)
+	, device_x68k_expansion_card_interface(mconfig, *this)
+	, m_slot(nullptr)
+	, m_dp8390(*this, "dp8390d")
 {
 }
 
@@ -44,7 +44,7 @@ void x68k_neptune_device::device_start()
 {
 	device_t* cpu = machine().device("maincpu");
 	char mac[7];
-	uint32_t num = rand();
+	uint32_t num = machine().rand();
 	address_space& space = cpu->memory().space(AS_PROGRAM);
 	m_slot = dynamic_cast<x68k_expansion_slot_device *>(owner());
 	memset(m_prom, 0x57, 16);

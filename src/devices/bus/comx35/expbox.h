@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_COMX35_EXPBOX_H
+#define MAME_BUS_COMX35_EXPBOX_H
 
-#ifndef __COMX_EB__
-#define __COMX_EB__
+#pragma once
 
 #include "exp.h"
 
@@ -71,7 +71,7 @@ private:
 
 
 // device type definition
-extern const device_type COMX_EB;
+DECLARE_DEVICE_TYPE(COMX_EB, comx_eb_device)
 
 
-#endif
+#endif // MAME_BUS_COMX35_EXPBOX_H

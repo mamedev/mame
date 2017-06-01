@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "includes/leland.h"
+#include "audio/leland.h"
 
 
 /* constants */
@@ -529,7 +530,7 @@ uint32_t leland_state::screen_update_ataxx(screen_device &screen, bitmap_ind16 &
  *
  *************************************/
 
-MACHINE_CONFIG_FRAGMENT( leland_video )
+MACHINE_CONFIG_START( leland_video )
 
 	MCFG_VIDEO_START_OVERRIDE(leland_state,leland)
 

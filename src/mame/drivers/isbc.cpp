@@ -51,8 +51,8 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<i8251_device> m_uart8251;
-//	optional_device<i8274_device> m_uart8274;
-	optional_device<i8274N_device> m_uart8274;
+//  optional_device<i8274_device> m_uart8274;
+	optional_device<i8274_new_device> m_uart8274;
 	required_device<pic8259_device> m_pic_0;
 	optional_device<pic8259_device> m_pic_1;
 	optional_device<centronics_device> m_centronics;
@@ -64,7 +64,7 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(isbc86_tmr2_w);
 	DECLARE_WRITE_LINE_MEMBER(isbc286_tmr2_w);
-//	DECLARE_WRITE_LINE_MEMBER(isbc_uart8274_irq);
+//  DECLARE_WRITE_LINE_MEMBER(isbc_uart8274_irq);
 	DECLARE_READ8_MEMBER(get_slave_ack);
 	DECLARE_WRITE8_MEMBER(ppi_c_w);
 	DECLARE_WRITE8_MEMBER(upperen_w);
@@ -153,7 +153,7 @@ static ADDRESS_MAP_START(isbc286_io, AS_IO, 16, isbc_state)
 	AM_RANGE(0x00c8, 0x00cf) AM_DEVREADWRITE8("ppi", i8255_device, read, write, 0x00ff)
 	AM_RANGE(0x00c8, 0x00cf) AM_WRITE8(upperen_w, 0xff00)
 	AM_RANGE(0x00d0, 0x00d7) AM_DEVREADWRITE8("pit", pit8254_device, read, write, 0x00ff)
-	AM_RANGE(0x00d8, 0x00df) AM_DEVREADWRITE8("uart8274", i8274N_device, cd_ba_r, cd_ba_w, 0x00ff)
+	AM_RANGE(0x00d8, 0x00df) AM_DEVREADWRITE8("uart8274", i8274_new_device, cd_ba_r, cd_ba_w, 0x00ff)
 	AM_RANGE(0x0100, 0x0101) AM_DEVWRITE8("isbc_215g", isbc_215g_device, write, 0x00ff)
 ADDRESS_MAP_END
 
@@ -168,7 +168,7 @@ static ADDRESS_MAP_START(isbc2861_mem, AS_PROGRAM, 16, isbc_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0xdffff) AM_RAM
 	AM_RANGE(0xe0000, 0xfffff) AM_READWRITE(bioslo_r, bioslo_w) AM_SHARE("biosram")
-//	AM_RANGE(0x100000, 0x1fffff) AM_RAM // FIXME: XENIX doesn't like this, IRMX is okay with it
+//  AM_RANGE(0x100000, 0x1fffff) AM_RAM // FIXME: XENIX doesn't like this, IRMX is okay with it
 	AM_RANGE(0xff0000, 0xffffff) AM_ROM AM_REGION("user1",0)
 ADDRESS_MAP_END
 
@@ -258,7 +258,7 @@ WRITE_LINE_MEMBER(isbc_state::isbc_uart8274_irq)
 }
 #endif
 
-static MACHINE_CONFIG_START( isbc86, isbc_state )
+static MACHINE_CONFIG_START( isbc86 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8086, XTAL_5MHz)
 	MCFG_CPU_PROGRAM_MAP(isbc86_mem)
@@ -290,7 +290,7 @@ static MACHINE_CONFIG_START( isbc86, isbc_state )
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", isbc86_terminal)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( rpc86, isbc_state )
+static MACHINE_CONFIG_START( rpc86 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8086, XTAL_5MHz)
 	MCFG_CPU_PROGRAM_MAP(rpc86_mem)
@@ -347,7 +347,7 @@ static MACHINE_CONFIG_DERIVED( isbc8630, rpc86 )
 	MCFG_ISBC_215_IRQ(DEVWRITELINE("pic_0", pic8259_device, ir5_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( isbc286, isbc_state )
+static MACHINE_CONFIG_START( isbc286 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I80286, XTAL_16MHz/2)
 	MCFG_CPU_PROGRAM_MAP(isbc286_mem)
@@ -361,8 +361,8 @@ static MACHINE_CONFIG_START( isbc286, isbc_state )
 	MCFG_PIT8253_CLK0(XTAL_22_1184MHz/18)
 	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic_0", pic8259_device, ir0_w))
 	MCFG_PIT8253_CLK1(XTAL_22_1184MHz/18)
-//	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("uart8274", z80dart_device, rxtxcb_w))
-	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("uart8274", i8274N_device, rxtxcb_w))
+//  MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("uart8274", z80dart_device, rxtxcb_w))
+	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("uart8274", i8274_new_device, rxtxcb_w))
 	MCFG_PIT8253_CLK2(XTAL_22_1184MHz/18)
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(isbc_state, isbc286_tmr2_w))
 
@@ -396,7 +396,7 @@ static MACHINE_CONFIG_START( isbc286, isbc_state )
 	MCFG_Z80SIO_OUT_TXDB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_txd))
 	MCFG_Z80SIO_OUT_DTRB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_dtr))
 	MCFG_Z80SIO_OUT_RTSB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_rts))
-//	MCFG_Z80SIO_OUT_INT_CB(WRITELINE(isbc_state, isbc_uart8274_irq))
+//  MCFG_Z80SIO_OUT_INT_CB(WRITELINE(isbc_state, isbc_uart8274_irq))
 	MCFG_Z80SIO_OUT_INT_CB(DEVWRITELINE("pic_0", pic8259_device, ir6_w))
 #endif
 
@@ -406,9 +406,9 @@ static MACHINE_CONFIG_START( isbc286, isbc_state )
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("uart8274", z80dart_device, dcda_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart8274", z80dart_device, ctsa_w))
 #else
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart8274", i8274N_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("uart8274", i8274N_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart8274", i8274N_device, ctsa_w))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart8274", i8274_new_device, rxa_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("uart8274", i8274_new_device, dcda_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart8274", i8274_new_device, ctsa_w))
 #endif
 
 	MCFG_RS232_PORT_ADD("rs232b", default_rs232_devices, "terminal")
@@ -417,9 +417,9 @@ static MACHINE_CONFIG_START( isbc286, isbc_state )
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("uart8274", z80dart_device, dcdb_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart8274", z80dart_device, ctsb_w))
 #else
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart8274", i8274N_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("uart8274", i8274N_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart8274", i8274N_device, ctsb_w))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart8274", i8274_new_device, rxb_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("uart8274", i8274_new_device, dcdb_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart8274", i8274_new_device, ctsb_w))
 #endif
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", isbc286_terminal)
 
@@ -481,13 +481,13 @@ ROM_END
  * :uart8274 B Reg 00 <- 18 - Channel reset command
  * :uart8274 B Reg 04 <- 44 - x16 clock, 1 stop bit, no parity
  * :uart8274 B Reg 05 <- ea - Tx Enabled, Transmitter Bits/Character 8, Send Break 0, RTS=0, DTR=0
- * :uart8274 B Reg 03 <- c1 - Rx 8 bits, No Auto Enables, Rx Enabled, 
+ * :uart8274 B Reg 03 <- c1 - Rx 8 bits, No Auto Enables, Rx Enabled,
 
  * :uart8274 B Reg 00 <- 18 - Channel reset command
  * :uart8274 B Reg 04 <- 4e - x16 clock, 2 stop bit, even parity but parity disabled
  * :uart8274 B Reg 05 <- ea - Tx Enabled, Tx 8 bits, Send Break 0, RTS=0, DTR=0
  * :uart8274 B Reg 03 <- c1 - Rx Enabled, Rx 8 bits, No Auto Enables
- * :uart8274 B Reg 07 <- 00 - Hi SYNC bits 
+ * :uart8274 B Reg 07 <- 00 - Hi SYNC bits
  * :uart8274 B Reg 06 <- 00 - Lo SYNC bits
  * :uart8274 A Reg 02 <- 04 - RTSB selected, non vectored mode, 85-1 mode selected, A over B interleaved int prios
  * :uart8274 B Reg 02 <- 26 - interrupt vector 26
@@ -497,7 +497,7 @@ ROM_END
  * :uart8274 B Reg 00 <- 18 - Channel reset command
  * :uart8274 B Reg 04 <- 44 - x16 clock, 1 stop bit, no parity
  * :uart8274 B Reg 05 <- ea - Tx Enabled, Tx 8 bits, Send Break 0, RTS=0, DTR=0
- * :uart8274 B Reg 03 <- c1 - Rx Enabled, Rx 8 bits, No Auto Enables 
+ * :uart8274 B Reg 03 <- c1 - Rx Enabled, Rx 8 bits, No Auto Enables
  * :uart8274 B Reg 00 <- 28 - Reset Transmitter Interrupt Pending
  * :uart8274 B Reg 00 <- 28 - Reset Transmitter Interrupt Pending
  * :uart8274 B Reg 00 <- 28 - Reset Transmitter Interrupt Pending
@@ -507,7 +507,7 @@ ROM_END
  * :uart8274 A Reg 04 <- 4e - x16 clock, 2 stop bit, even parity but parity disabled
  * :uart8274 A Reg 05 <- ea - Tx Enabled, Tx 8 bits, Send Break 0, RTS=0, DTR=0
  * :uart8274 A Reg 03 <- c1 - Rx Enabled, Rx 8 bits, No Auto Enables
- * :uart8274 A Reg 07 <- 00 - Hi SYNC bits 
+ * :uart8274 A Reg 07 <- 00 - Hi SYNC bits
  * :uart8274 A Reg 06 <- 00 - Lo SYNC bits
  * :uart8274 A Reg 02 <- 04 - RTSB selected, non vectored mode, 85-1 mode selected, A over B interleaved int prios
  * :uart8274 B Reg 02 <- 26 - interrupt vector 26
@@ -520,7 +520,7 @@ ROM_END
  * :uart8274 A Reg 04 <- 4e - x16 clock, 2 stop bit, even parity but parity disabled
  * :uart8274 A Reg 05 <- ea - Tx Enabled, Tx 8 bits, Send Break 0, RTS=0, DTR=0
  * :uart8274 A Reg 03 <- c1 - Rx Enabled, Rx 8 bits, No Auto Enables
- * :uart8274 A Reg 07 <- 00 - Hi SYNC bits 
+ * :uart8274 A Reg 07 <- 00 - Hi SYNC bits
  * :uart8274 A Reg 06 <- 00 - Lo SYNC bits
  * :uart8274 A Reg 02 <- 04 - RTSB selected, non vectored mode, 85-1 mode selected, A over B interleaved int prios
  * :uart8274 B Reg 02 <- 26 - interrupt vector 26
@@ -574,11 +574,11 @@ ROM_START( rpc86 )
 ROM_END
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT COMPANY   FULLNAME       FLAGS */
-COMP( 19??, rpc86,    0,       0,    rpc86,      isbc, driver_device,    0,   "Intel",   "RPC 86",MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 1978, isbc86,   0,       0,    isbc86,     isbc, driver_device,    0,   "Intel",   "iSBC 86/12A",MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 1981, isbc8605, 0,       0,    isbc8605,   isbc, driver_device,    0,   "Intel",   "iSBC 86/05",MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 1981, isbc8630, 0,       0,    isbc8630,   isbc, driver_device,    0,   "Intel",   "iSBC 86/30",MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 19??, isbc286,  0,       0,    isbc286,    isbc, driver_device,    0,   "Intel",   "iSBC 286",MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 1983, isbc2861, 0,       0,    isbc2861,   isbc, driver_device,    0,   "Intel",   "iSBC 286/10", MACHINE_NO_SOUND_HW)
-COMP( 1983, isbc28612,0,       0,    isbc2861,   isbc, driver_device,    0,   "Intel",   "iSBC 286/12", MACHINE_NO_SOUND_HW)
+/*    YEAR  NAME       PARENT  COMPAT  MACHINE    INPUT  STATE        INIT  COMPANY   FULLNAME        FLAGS */
+COMP( 19??, rpc86,     0,      0,      rpc86,     isbc,  isbc_state,  0,    "Intel",  "RPC 86",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1978, isbc86,    0,      0,      isbc86,    isbc,  isbc_state,  0,    "Intel",  "iSBC 86/12A",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1981, isbc8605,  0,      0,      isbc8605,  isbc,  isbc_state,  0,    "Intel",  "iSBC 86/05",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1981, isbc8630,  0,      0,      isbc8630,  isbc,  isbc_state,  0,    "Intel",  "iSBC 86/30",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 19??, isbc286,   0,      0,      isbc286,   isbc,  isbc_state,  0,    "Intel",  "iSBC 286",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1983, isbc2861,  0,      0,      isbc2861,  isbc,  isbc_state,  0,    "Intel",  "iSBC 286/10",  MACHINE_NO_SOUND_HW)
+COMP( 1983, isbc28612, 0,      0,      isbc2861,  isbc,  isbc_state,  0,    "Intel",  "iSBC 286/12",  MACHINE_NO_SOUND_HW)

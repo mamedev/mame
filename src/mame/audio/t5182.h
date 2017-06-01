@@ -1,5 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Jonathan Gevaryahu
+#ifndef MAME_AUDIO_T5182_H
+#define MAME_AUDIO_T5182_H
+
+#pragma once
+
 #include "sound/ym2151.h"
 #include "cpu/z80/z80.h"
 
@@ -8,7 +13,6 @@ class t5182_device : public device_t
 {
 public:
 	t5182_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~t5182_device() {}
 
 	enum
 	{
@@ -44,7 +48,7 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual ioport_constructor device_input_ports() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	// internal state
@@ -57,4 +61,6 @@ private:
 	TIMER_CALLBACK_MEMBER( setirq_callback );
 };
 
-extern const device_type T5182;
+DECLARE_DEVICE_TYPE(T5182, t5182_device)
+
+#endif // MAME_AUDIO_T5182_H

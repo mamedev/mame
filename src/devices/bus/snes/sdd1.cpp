@@ -20,13 +20,13 @@
 
 // Input Manager
 
-void SDD1_IM::IM_prepareDecomp(uint32_t in_buf)
+void sns_rom_sdd1_device::SDD1_IM::IM_prepareDecomp(uint32_t in_buf)
 {
 	m_byte_ptr = in_buf;
 	m_bit_count = 4;
 }
 
-uint8_t SDD1_IM::IM_getCodeword(uint8_t *ROM, uint32_t *mmc, const uint8_t code_len)
+uint8_t sns_rom_sdd1_device::SDD1_IM::IM_getCodeword(uint8_t *ROM, uint32_t *mmc, const uint8_t code_len)
 {
 	uint8_t codeword = ROM[SSD1_ADD(m_byte_ptr)] << m_bit_count;
 
@@ -49,9 +49,9 @@ uint8_t SDD1_IM::IM_getCodeword(uint8_t *ROM, uint32_t *mmc, const uint8_t code_
 
 // GCD
 
-void SDD1_GCD::GCD_getRunCount(uint8_t *ROM, uint32_t *mmc, uint8_t code_num, uint8_t* MPScount, uint8_t* LPSind)
+void sns_rom_sdd1_device::SDD1_GCD::GCD_getRunCount(uint8_t *ROM, uint32_t *mmc, uint8_t code_num, uint8_t* MPScount, uint8_t* LPSind)
 {
-	const uint8_t run_count[] =
+	static constexpr uint8_t run_count[] =
 	{
 		0x00, 0x00, 0x01, 0x00, 0x03, 0x01, 0x02, 0x00,
 		0x07, 0x03, 0x05, 0x01, 0x06, 0x02, 0x04, 0x00,
@@ -102,13 +102,13 @@ void SDD1_GCD::GCD_getRunCount(uint8_t *ROM, uint32_t *mmc, uint8_t code_num, ui
 
 // BG
 
-void SDD1_BG::BG_prepareDecomp()
+void sns_rom_sdd1_device::SDD1_BG::BG_prepareDecomp()
 {
 	m_MPScount = 0;
 	m_LPSind = 0;
 }
 
-uint8_t SDD1_BG::BG_getBit(uint8_t *ROM, uint32_t *mmc, uint8_t* endOfRun)
+uint8_t sns_rom_sdd1_device::SDD1_BG::BG_getBit(uint8_t *ROM, uint32_t *mmc, uint8_t* endOfRun)
 {
 	uint8_t bit;
 
@@ -149,7 +149,7 @@ struct SDD1_PEM_state
 	uint8_t nextIfLPS;
 };
 
-static const SDD1_PEM_state PEM_evolution_table[33] =
+static constexpr SDD1_PEM_state PEM_evolution_table[33] =
 {
 	{ 0,25,25},
 	{ 0, 2, 1},
@@ -186,7 +186,7 @@ static const SDD1_PEM_state PEM_evolution_table[33] =
 	{ 7,24,22}
 };
 
-void SDD1_PEM::PEM_prepareDecomp()
+void sns_rom_sdd1_device::SDD1_PEM::PEM_prepareDecomp()
 {
 	for (auto & elem : m_contextInfo)
 	{
@@ -195,7 +195,7 @@ void SDD1_PEM::PEM_prepareDecomp()
 	}
 }
 
-uint8_t SDD1_PEM::PEM_getBit(uint8_t *ROM, uint32_t *mmc, uint8_t context)
+uint8_t sns_rom_sdd1_device::SDD1_PEM::PEM_getBit(uint8_t *ROM, uint32_t *mmc, uint8_t context)
 {
 	uint8_t endOfRun;
 	uint8_t bit;
@@ -228,7 +228,7 @@ uint8_t SDD1_PEM::PEM_getBit(uint8_t *ROM, uint32_t *mmc, uint8_t context)
 
 // CM
 
-void SDD1_CM::CM_prepareDecomp(uint8_t *ROM, uint32_t *mmc, uint32_t first_byte)
+void sns_rom_sdd1_device::SDD1_CM::CM_prepareDecomp(uint8_t *ROM, uint32_t *mmc, uint32_t first_byte)
 {
 	int32_t i = 0;
 	m_bitplanesInfo = ROM[SSD1_ADD(first_byte)] & 0xc0;
@@ -252,7 +252,7 @@ void SDD1_CM::CM_prepareDecomp(uint8_t *ROM, uint32_t *mmc, uint32_t first_byte)
 	}
 }
 
-uint8_t SDD1_CM::CM_getBit(uint8_t *ROM, uint32_t *mmc)
+uint8_t sns_rom_sdd1_device::SDD1_CM::CM_getBit(uint8_t *ROM, uint32_t *mmc)
 {
 	uint8_t currContext;
 	uint16_t *context_bits;
@@ -309,14 +309,14 @@ uint8_t SDD1_CM::CM_getBit(uint8_t *ROM, uint32_t *mmc)
 
 // OL
 
-void SDD1_OL::OL_prepareDecomp(uint8_t *ROM, uint32_t *mmc, uint32_t first_byte, uint16_t out_len, uint8_t *out_buf)
+void sns_rom_sdd1_device::SDD1_OL::OL_prepareDecomp(uint8_t *ROM, uint32_t *mmc, uint32_t first_byte, uint16_t out_len, uint8_t *out_buf)
 {
 	m_bitplanesInfo = ROM[SSD1_ADD(first_byte)] & 0xc0;
 	m_length = out_len;
 	m_buffer = out_buf;
 }
 
-void SDD1_OL::OL_launch(uint8_t *ROM, uint32_t *mmc)
+void sns_rom_sdd1_device::SDD1_OL::OL_launch(uint8_t *ROM, uint32_t *mmc)
 {
 	uint8_t i;
 	uint8_t register1, register2 = 0;
@@ -366,7 +366,7 @@ void SDD1_OL::OL_launch(uint8_t *ROM, uint32_t *mmc)
 
 // S-DD1
 
-SDD1_emu::SDD1_emu(running_machine &machine)
+sns_rom_sdd1_device::SDD1_emu::SDD1_emu(running_machine &machine)
 		: m_machine(machine)
 {
 	m_IM = std::make_unique<SDD1_IM>();
@@ -385,7 +385,7 @@ SDD1_emu::SDD1_emu(running_machine &machine)
 	m_OL = std::make_unique<SDD1_OL>(m_CM.get());
 }
 
-void SDD1_emu::SDD1emu_decompress(uint8_t *ROM, uint32_t *mmc, uint32_t in_buf, uint16_t out_len, uint8_t *out_buf)
+void sns_rom_sdd1_device::SDD1_emu::SDD1emu_decompress(uint8_t *ROM, uint32_t *mmc, uint32_t in_buf, uint16_t out_len, uint8_t *out_buf)
 {
 	m_IM->IM_prepareDecomp(in_buf);
 	m_BG0->BG_prepareDecomp();
@@ -408,19 +408,19 @@ void SDD1_emu::SDD1emu_decompress(uint8_t *ROM, uint32_t *mmc, uint32_t in_buf, 
 //  sns_rom_sdd1_device - constructor
 //-------------------------------------------------
 
-const device_type SNS_LOROM_SDD1 = device_creator<sns_rom_sdd1_device>;
+DEFINE_DEVICE_TYPE(SNS_LOROM_SDD1, sns_rom_sdd1_device, "sns_rom_sdd1", "SNES Cart + S-DD1")
 
 
-sns_rom_sdd1_device::sns_rom_sdd1_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-						device_sns_cart_interface( mconfig, *this ), m_sdd1_enable(0), m_xfer_enable(0), m_sdd1emu(nullptr)
-				{
+sns_rom_sdd1_device::sns_rom_sdd1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_sns_cart_interface(mconfig, *this)
+	, m_sdd1_enable(0), m_xfer_enable(0), m_sdd1emu(nullptr)
+{
 }
 
 sns_rom_sdd1_device::sns_rom_sdd1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: device_t(mconfig, SNS_LOROM_SDD1, "SNES Cart + S-DD1", tag, owner, clock, "sns_rom_sdd1", __FILE__),
-						device_sns_cart_interface( mconfig, *this ), m_sdd1_enable(0), m_xfer_enable(0), m_sdd1emu(nullptr)
-				{
+	: sns_rom_sdd1_device(mconfig, SNS_LOROM_SDD1, tag, owner, clock)
+{
 }
 
 

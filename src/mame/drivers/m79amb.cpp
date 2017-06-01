@@ -189,7 +189,7 @@ INTERRUPT_GEN_MEMBER(m79amb_state::m79amb_interrupt)
 	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xcf);  /* RST 08h */
 }
 
-static MACHINE_CONFIG_START( m79amb, m79amb_state )
+static MACHINE_CONFIG_START( m79amb )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, XTAL_19_6608MHz / 10)

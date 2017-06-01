@@ -7,14 +7,18 @@
 */
 
 #include "emu.h"
-#include "debugger.h"
 #include "rsp.h"
+
 #include "rspfe.h"
 #include "rspcp2.h"
 #include "rspcp2d.h"
 
+#include "debugger.h"
 
-const device_type RSP = device_creator<rsp_device>;
+#include "rspdefs.h"
+
+
+DEFINE_DEVICE_TYPE(RSP, rsp_device, "rsp", "RSP")
 
 
 #define LOG_INSTRUCTION_EXECUTION       0
@@ -97,7 +101,7 @@ const device_type RSP = device_creator<rsp_device>;
 
 
 rsp_device::rsp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, RSP, "RSP", tag, owner, clock, "rsp", __FILE__)
+	: cpu_device(mconfig, RSP, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 32, 32)
 	, m_cache(CACHE_SIZE + sizeof(internal_rsp_state))
 	, m_drcuml(nullptr)

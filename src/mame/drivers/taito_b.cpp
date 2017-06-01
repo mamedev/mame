@@ -1914,7 +1914,7 @@ void taitob_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( rastsag2, taitob_state )
+static MACHINE_CONFIG_START( rastsag2 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* 12 MHz */
@@ -1970,7 +1970,7 @@ static MACHINE_CONFIG_START( rastsag2, taitob_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( masterw, taitob_state )
+static MACHINE_CONFIG_START( masterw )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* 12 MHz */
@@ -2045,7 +2045,7 @@ static MACHINE_CONFIG_DERIVED( tetrista, masterw ) /* Master of Weapon conversio
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( ashura, taitob_state )
+static MACHINE_CONFIG_START( ashura )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* 12 MHz */
@@ -2101,7 +2101,7 @@ static MACHINE_CONFIG_START( ashura, taitob_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( crimec, taitob_state )
+static MACHINE_CONFIG_START( crimec )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* 12 MHz */
@@ -2158,7 +2158,7 @@ static MACHINE_CONFIG_START( crimec, taitob_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( hitice, taitob_state )
+static MACHINE_CONFIG_START( hitice )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* 12 MHz */
@@ -2211,7 +2211,7 @@ static MACHINE_CONFIG_START( hitice, taitob_state )
 	MCFG_SOUND_ROUTE(2, "mono", 0.25)
 	MCFG_SOUND_ROUTE(3, "mono", 0.80)
 
-	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
@@ -2220,7 +2220,7 @@ static MACHINE_CONFIG_START( hitice, taitob_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( rambo3p, taitob_state )
+static MACHINE_CONFIG_START( rambo3p )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* verified on pcb */
@@ -2277,7 +2277,7 @@ static MACHINE_CONFIG_START( rambo3p, taitob_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( rambo3, taitob_state )
+static MACHINE_CONFIG_START( rambo3 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* 12MHz verified on pcb */
@@ -2333,7 +2333,7 @@ static MACHINE_CONFIG_START( rambo3, taitob_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( pbobble, taitob_state )
+static MACHINE_CONFIG_START( pbobble )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* 12 MHz */
@@ -2395,7 +2395,7 @@ static MACHINE_CONFIG_START( pbobble, taitob_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( spacedx, taitob_state )
+static MACHINE_CONFIG_START( spacedx )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* 12 MHz */
@@ -2457,7 +2457,7 @@ static MACHINE_CONFIG_START( spacedx, taitob_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( spacedxo, taitob_state )
+static MACHINE_CONFIG_START( spacedxo )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* 12 MHz */
@@ -2513,7 +2513,7 @@ static MACHINE_CONFIG_START( spacedxo, taitob_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( qzshowby, taitob_state )
+static MACHINE_CONFIG_START( qzshowby )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz according to the readme*/
@@ -2575,7 +2575,7 @@ static MACHINE_CONFIG_START( qzshowby, taitob_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( viofight, taitob_state )
+static MACHINE_CONFIG_START( viofight )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* 12 MHz */
@@ -2627,7 +2627,7 @@ static MACHINE_CONFIG_START( viofight, taitob_state )
 	MCFG_SOUND_ROUTE(2, "mono", 0.25)
 	MCFG_SOUND_ROUTE(3, "mono", 0.80)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_4_224MHz/4, OKIM6295_PIN7_HIGH) // 1.056MHz clock frequency, but pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL_4_224MHz/4, PIN7_HIGH) // 1.056MHz clock frequency, but pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
@@ -2636,7 +2636,7 @@ static MACHINE_CONFIG_START( viofight, taitob_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( silentd, taitob_state )
+static MACHINE_CONFIG_START( silentd )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* 12 MHz */
@@ -2692,7 +2692,7 @@ static MACHINE_CONFIG_START( silentd, taitob_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( selfeena, taitob_state )
+static MACHINE_CONFIG_START( selfeena )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* 12 MHz */
@@ -2757,7 +2757,7 @@ void taitob_state::ryujin_patch(void)
 }
 #endif
 
-static MACHINE_CONFIG_START( ryujin, taitob_state )
+static MACHINE_CONFIG_START( ryujin )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* 12 MHz */
@@ -2820,7 +2820,7 @@ void taitob_state::sbm_patch(void)
 }
 #endif
 
-static MACHINE_CONFIG_START( sbm, taitob_state )
+static MACHINE_CONFIG_START( sbm )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz */
@@ -2875,7 +2875,7 @@ static MACHINE_CONFIG_START( sbm, taitob_state )
 	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( realpunc, taitob_state )
+static MACHINE_CONFIG_START( realpunc )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
@@ -3672,6 +3672,35 @@ ROM_END
 
 ROM_START( sbm )
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 256k for 68000 code */
+	ROM_LOAD16_BYTE( "c69-20-2.ic10", 0x00000, 0x20000, CRC(225952a3) SHA1(d95ef971929d4a8c19193e80499052f57d205001) )
+	ROM_LOAD16_BYTE( "c69-22-2.ic12", 0x00001, 0x20000, CRC(d900ce83) SHA1(b86c3e7c2f9f2dbd415b7a355e5978de46fc3564) )
+	ROM_LOAD16_BYTE( "c69-19-2.ic9" , 0x40000, 0x20000, CRC(d6cfacfb) SHA1(0f910e92a81e0d7ac35d0ffc799dd723f64d47d1) )
+	ROM_LOAD16_BYTE( "c69-25-2.ic11", 0x40001, 0x20000, CRC(70903898) SHA1(879412e3c385533fd0bf1e47956e3e9bea78378d) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )     /* 64k for Z80 code */
+	ROM_LOAD( "c69-31.ic28",0x00000, 0x10000, CRC(c999f753) SHA1(5d944b492893a0bb605743e2928c802427a85fbf) )
+
+	ROM_REGION( 0x400000, "gfx1", 0 )
+	ROM_LOAD       ( "c69-01.ic5", 0x000000, 0x100000, CRC(521fabe3) SHA1(f81303688ac014145a7e9325affc4a0f86755ba9) )
+	ROM_LOAD16_BYTE( "c69-13.ic2", 0x100000, 0x020000, CRC(d1550884) SHA1(f3a65827c45959fe5ac4bfc92831a8bed76bf287) )
+	ROM_LOAD16_BYTE( "c69-12.ic1", 0x100001, 0x020000, CRC(eb56582c) SHA1(41b77704aeaecf3eaa3f87e97c0b59fd00e5349e) )
+	/* 140000-1fffff empty */
+	ROM_LOAD       ( "c69-02.ic6", 0x200000, 0x100000, CRC(f0e20d35) SHA1(af67f39498f68523ece4cd91045456092038e0a4) )
+	ROM_LOAD16_BYTE( "c69-15.ic4", 0x300000, 0x020000, CRC(9761d316) SHA1(f03216bbade96948ff433a925e8bffb8760b4101) )
+	ROM_LOAD16_BYTE( "c69-14.ic3", 0x300001, 0x020000, CRC(0ed0272a) SHA1(03b15654213ff71ffc96d3a87657bdeb724e9269) )
+	/* 340000-3fffff empty */
+
+	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_LOAD( "c69-26.ic36", 0x00000, 0x80000, CRC(8784058b) SHA1(c3d9c620704fb5e80719e996e97f6191a5bd9f8c) )
+
+	ROM_REGION( 0x1800, "plds", 0 )
+	ROM_LOAD( "c69-04.ic6",  0x000, 0x104, CRC(80498715) SHA1(076c26f365b74f3b6adb2c4c1a3add5a46a257ea) ) // 16l8
+	ROM_LOAD( "c69-05.ic25", 0x200, 0x104, CRC(35e345b4) SHA1(befbea944c645dafb143d8dba83fcc16f1edd3e6) ) // 16l8
+	ROM_LOAD( "c69-06.ic17", 0x400, 0x144, CRC(3988e5d1) SHA1(24e03455fd9e653e3fc901bef2c3f3ea59f04ea5) ) // 20l8
+ROM_END
+
+ROM_START( sbmj )
+	ROM_REGION( 0x80000, "maincpu", 0 )     /* 256k for 68000 code */
 	ROM_LOAD16_BYTE( "c69-20-1.10", 0x00000, 0x20000, CRC(b40e4910) SHA1(1436990b8c3c1d0763283133b2ce9d47cd65f825) )
 	ROM_LOAD16_BYTE( "c69-22-1.12", 0x00001, 0x20000, CRC(ecbcf830) SHA1(49f04a198d327866b26b978a302ddc7aea5ac6de) )
 	ROM_LOAD16_BYTE( "c69-19-1.9" , 0x40000, 0x20000, CRC(5719c158) SHA1(e1cdf89695e1dba75f92e449d08fa6df57e9b388) )
@@ -3716,43 +3745,43 @@ DRIVER_INIT_MEMBER(taitob_state,taito_b)
 	membank("bank1")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
 }
 
-GAME( 1989, masterw,  0,       masterw,  masterw,   taitob_state, taito_b, ROT270, "Taito Corporation Japan", "Master of Weapon (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, masterwu, masterw, masterw,  masterwu,  taitob_state, taito_b, ROT270, "Taito America Corporation", "Master of Weapon (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, masterwj, masterw, masterw,  masterwj,  taitob_state, taito_b, ROT270, "Taito Corporation", "Master of Weapon (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, yukiwo,   masterw, masterw,  yukiwo,    taitob_state, taito_b, ROT270, "Taito Corporation Japan", "Yukiwo (World, prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, masterw,  0,       masterw,  masterw,   taitob_state, taito_b, ROT270, "Taito Corporation Japan",   "Master of Weapon (World)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1989, masterwu, masterw, masterw,  masterwu,  taitob_state, taito_b, ROT270, "Taito America Corporation", "Master of Weapon (US)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1989, masterwj, masterw, masterw,  masterwj,  taitob_state, taito_b, ROT270, "Taito Corporation",         "Master of Weapon (Japan)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1989, yukiwo,   masterw, masterw,  yukiwo,    taitob_state, taito_b, ROT270, "Taito Corporation Japan",   "Yukiwo (World, prototype)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, nastar,   0,       rastsag2, nastar,    taitob_state, taito_b, ROT0,   "Taito Corporation Japan", "Nastar (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, nastarw,  nastar,  rastsag2, nastarw,   taitob_state, taito_b, ROT0,   "Taito America Corporation", "Nastar Warrior (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, rastsag2, nastar,  rastsag2, rastsag2,  taitob_state, taito_b, ROT0,   "Taito Corporation", "Rastan Saga 2 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, nastar,   0,       rastsag2, nastar,    taitob_state, taito_b, ROT0,   "Taito Corporation Japan",   "Nastar (World)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1988, nastarw,  nastar,  rastsag2, nastarw,   taitob_state, taito_b, ROT0,   "Taito America Corporation", "Nastar Warrior (US)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1988, rastsag2, nastar,  rastsag2, rastsag2,  taitob_state, taito_b, ROT0,   "Taito Corporation",         "Rastan Saga 2 (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, rambo3,   0,       rambo3,   rambo3,    taitob_state, taito_b, ROT0,   "Taito Europe Corporation", "Rambo III (Europe)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, rambo3u,  rambo3,  rambo3,   rambo3u,   taitob_state, taito_b, ROT0,   "Taito America Corporation", "Rambo III (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, rambo3p,  rambo3,  rambo3p,  rambo3p,   taitob_state, taito_b, ROT0,   "Taito Europe Corporation", "Rambo III (Europe, Proto?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, rambo3,   0,       rambo3,   rambo3,    taitob_state, taito_b, ROT0,   "Taito Europe Corporation",  "Rambo III (Europe)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1989, rambo3u,  rambo3,  rambo3,   rambo3u,   taitob_state, taito_b, ROT0,   "Taito America Corporation", "Rambo III (US)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1989, rambo3p,  rambo3,  rambo3p,  rambo3p,   taitob_state, taito_b, ROT0,   "Taito Europe Corporation",  "Rambo III (Europe, Proto?)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, crimec,   0,       crimec,   crimec,    taitob_state, taito_b, ROT0,   "Taito Corporation Japan", "Crime City (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, crimecu,  crimec,  crimec,   crimecu,   taitob_state, taito_b, ROT0,   "Taito America Corporation", "Crime City (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, crimecj,  crimec,  crimec,   crimecj,   taitob_state, taito_b, ROT0,   "Taito Corporation", "Crime City (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, crimec,   0,       crimec,   crimec,    taitob_state, taito_b, ROT0,   "Taito Corporation Japan",   "Crime City (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, crimecu,  crimec,  crimec,   crimecu,   taitob_state, taito_b, ROT0,   "Taito America Corporation", "Crime City (US)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1989, crimecj,  crimec,  crimec,   crimecj,   taitob_state, taito_b, ROT0,   "Taito Corporation",         "Crime City (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, tetrist,  tetris,  tetrist,  tetrist,   taitob_state, taito_b, ROT0,   "Sega", "Tetris (Japan, Taito B-System, Nastar Conversion Kit)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, tetrist,  tetris,  tetrist,  tetrist,   taitob_state, taito_b, ROT0,   "Sega", "Tetris (Japan, Taito B-System, Nastar Conversion Kit)",           MACHINE_SUPPORTS_SAVE )
 GAME( 1988, tetrista, tetris,  tetrista, tetrist,   taitob_state, taito_b, ROT0,   "Sega", "Tetris (Japan, Taito B-System, Master of Weapon Conversion Kit)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, viofight, 0,       viofight, viofight,  taitob_state, taito_b, ROT0,   "Taito Corporation Japan", "Violence Fight (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, viofightu,viofight,viofight, viofightu, taitob_state, taito_b, ROT0,   "Taito America Corporation", "Violence Fight (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, viofightj,viofight,viofight, viofightj, taitob_state, taito_b, ROT0,   "Taito Corporation", "Violence Fight (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, viofight, 0,       viofight, viofight,  taitob_state, taito_b, ROT0,   "Taito Corporation Japan",   "Violence Fight (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, viofightu,viofight,viofight, viofightu, taitob_state, taito_b, ROT0,   "Taito America Corporation", "Violence Fight (US)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1989, viofightj,viofight,viofight, viofightj, taitob_state, taito_b, ROT0,   "Taito Corporation",         "Violence Fight (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, ashura,   0,       ashura,   ashura,    taitob_state, taito_b, ROT270, "Taito Corporation Japan", "Ashura Blaster (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ashuraj,  ashura,  ashura,   ashuraj,   taitob_state, taito_b, ROT270, "Taito Corporation", "Ashura Blaster (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ashurau,  ashura,  ashura,   ashurau,   taitob_state, taito_b, ROT270, "Taito America Corporation", "Ashura Blaster (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ashura,   0,       ashura,   ashura,    taitob_state, taito_b, ROT270, "Taito Corporation Japan",   "Ashura Blaster (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ashuraj,  ashura,  ashura,   ashuraj,   taitob_state, taito_b, ROT270, "Taito Corporation",         "Ashura Blaster (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ashurau,  ashura,  ashura,   ashurau,   taitob_state, taito_b, ROT270, "Taito America Corporation", "Ashura Blaster (US)",    MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, hitice,   0,       hitice,   hitice,    taitob_state, taito_b, ROT0,   "Taito Corporation (Williams license)", "Hit the Ice (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, hiticerb, hitice,  hitice,   hitice,    taitob_state, taito_b, ROT0,   "Taito Corporation (Williams license)", "Hit the Ice (US, with riser board)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, hiticej,  hitice,  hitice,   hiticej,   taitob_state, taito_b, ROT0,   "Taito Corporation (licensed from Midway)", "Hit the Ice (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hitice,   0,       hitice,   hitice,    taitob_state, taito_b, ROT0,   "Taito Corporation (Williams license)",     "Hit the Ice (US)",                   MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hiticerb, hitice,  hitice,   hitice,    taitob_state, taito_b, ROT0,   "Taito Corporation (Williams license)",     "Hit the Ice (US, with riser board)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hiticej,  hitice,  hitice,   hiticej,   taitob_state, taito_b, ROT0,   "Taito Corporation (licensed from Midway)", "Hit the Ice (Japan)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1991, selfeena, 0,       selfeena, selfeena,  taitob_state, taito_b, ROT0,   "East Technology", "Sel Feena", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1992, silentd,  0,       silentd,  silentd,   taitob_state, taito_b, ROT0,   "Taito Corporation Japan", "Silent Dragon (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, silentdj, silentd, silentd,  silentdj,  taitob_state, taito_b, ROT0,   "Taito Corporation", "Silent Dragon (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, silentdu, silentd, silentd,  silentdu,  taitob_state, taito_b, ROT0,   "Taito America Corporation", "Silent Dragon (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, silentd,  0,       silentd,  silentd,   taitob_state, taito_b, ROT0,   "Taito Corporation Japan",   "Silent Dragon (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, silentdj, silentd, silentd,  silentdj,  taitob_state, taito_b, ROT0,   "Taito Corporation",         "Silent Dragon (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, silentdu, silentd, silentd,  silentdu,  taitob_state, taito_b, ROT0,   "Taito America Corporation", "Silent Dragon (US)",    MACHINE_SUPPORTS_SAVE )
 
 GAME( 1993, ryujin,   0,       ryujin,   ryujin,    taitob_state, taito_b, ROT270, "Taito Corporation", "Ryu Jin (Japan)", MACHINE_SUPPORTS_SAVE )
 
@@ -3760,7 +3789,7 @@ GAME( 1993, qzshowby, 0,       qzshowby, qzshowby,  taitob_state, taito_b, ROT0,
 
 GAME( 1994, pbobble,  0,       pbobble,  pbobble,   taitob_state, taito_b, ROT0,   "Taito Corporation", "Puzzle Bobble (Japan, B-System)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1994, spacedx,  0,       spacedx,  pbobble,   taitob_state, taito_b, ROT0,   "Taito Corporation", "Space Invaders DX (US, v2.1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, spacedx,  0,       spacedx,  pbobble,   taitob_state, taito_b, ROT0,   "Taito Corporation", "Space Invaders DX (US, v2.1)",    MACHINE_SUPPORTS_SAVE )
 GAME( 1994, spacedxj, spacedx, spacedx,  pbobble,   taitob_state, taito_b, ROT0,   "Taito Corporation", "Space Invaders DX (Japan, v2.1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, spacedxo, spacedx, spacedxo, spacedxo,  taitob_state, taito_b, ROT0,   "Taito Corporation", "Space Invaders DX (Japan, v2.0)", MACHINE_SUPPORTS_SAVE )
 /*
@@ -3770,5 +3799,6 @@ GAME( 1994, spacedxo, spacedx, spacedxo, spacedxo,  taitob_state, taito_b, ROT0,
     in that it has a punching pad that player needs to punch to hit
     the enemy.
 */
-GAME( 1990, sbm,      0,       sbm,      sbm,      taitob_state, taito_b, ROT0,   "Taito Corporation", "Sonic Blast Man (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL )
-GAME( 1994, realpunc, 0,       realpunc, realpunc, taitob_state, taito_b, ROT0,   "Taito Corporation Japan", "Real Puncher",       MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL )
+GAME( 1990, sbm,      0,       sbm,      sbm,       taitob_state, taito_b, ROT0,   "Taito Corporation",       "Sonic Blast Man (US)",    MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL )
+GAME( 1990, sbmj,     sbm,     sbm,      sbm,       taitob_state, taito_b, ROT0,   "Taito Corporation",       "Sonic Blast Man (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL )
+GAME( 1994, realpunc, 0,       realpunc, realpunc,  taitob_state, taito_b, ROT0,   "Taito Corporation Japan", "Real Puncher",            MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL )

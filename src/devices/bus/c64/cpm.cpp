@@ -33,7 +33,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_CPM = device_creator<c64_cpm_cartridge_device>;
+DEFINE_DEVICE_TYPE(C64_CPM, c64_cpm_cartridge_device, "c64_cpm", "C64 CP/M cartridge")
 
 
 //-------------------------------------------------
@@ -55,10 +55,10 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( c64_cpm )
+//  MACHINE_CONFIG_START( c64_cpm )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( c64_cpm )
+static MACHINE_CONFIG_START( c64_cpm )
 	MCFG_CPU_ADD(Z80_TAG, Z80, 3000000)
 	MCFG_CPU_PROGRAM_MAP(z80_mem)
 	MCFG_CPU_IO_MAP(z80_io)
@@ -131,7 +131,7 @@ inline void c64_cpm_cartridge_device::update_signals()
 //-------------------------------------------------
 
 c64_cpm_cartridge_device::c64_cpm_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, C64_CPM, "C64 CP/M cartridge", tag, owner, clock, "c64_cpm", __FILE__),
+	device_t(mconfig, C64_CPM, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_maincpu(*this, Z80_TAG),
 	m_enabled(0),

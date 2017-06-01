@@ -418,7 +418,7 @@ WRITE8_MEMBER( vendetta_state::banking_callback )
 		membank("bank1")->set_entry(data);
 }
 
-static MACHINE_CONFIG_START( vendetta, vendetta_state )
+static MACHINE_CONFIG_START( vendetta )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI, XTAL_24MHz/8)   /* 052001 (verified on pcb) */
@@ -793,14 +793,14 @@ ROM_END
 ***************************************************************************/
 
 
-GAME( 1991, vendetta,    0,        vendetta, vendet4p, driver_device, 0, ROT0, "Konami", "Vendetta (World, 4 Players, ver. T)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, vendettar,   vendetta, vendetta, vendet4p, driver_device, 0, ROT0, "Konami", "Vendetta (US, 4 Players, ver. R)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, vendettaz,   vendetta, vendetta, vendet4p, driver_device, 0, ROT0, "Konami", "Vendetta (Asia, 4 Players, ver. Z)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, vendetta2p,  vendetta, vendetta, vendetta, driver_device, 0, ROT0, "Konami", "Vendetta (World, 2 Players, ver. W)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, vendetta2peba,vendetta,vendetta, vendetta, driver_device, 0, ROT0, "Konami", "Vendetta (World, 2 Players, ver. EB-A?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, vendetta2pun,vendetta, vendetta, vendetta, driver_device, 0, ROT0, "Konami", "Vendetta (World, 2 Players, ver. ?)", MACHINE_SUPPORTS_SAVE ) /* program rom labeled as 1 */
-GAME( 1991, vendetta2pu, vendetta, vendetta, vendetta, driver_device, 0, ROT0, "Konami", "Vendetta (Asia, 2 Players, ver. U)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, vendetta2pd, vendetta, vendetta, vendetta, driver_device, 0, ROT0, "Konami", "Vendetta (Asia, 2 Players, ver. D)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, vendettaj,   vendetta, vendetta, vendetta, driver_device, 0, ROT0, "Konami", "Crime Fighters 2 (Japan, 2 Players, ver. P)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, esckids,     0,        esckids,  esckids,  driver_device, 0, ROT0, "Konami", "Escape Kids (Asia, 4 Players)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, esckidsj,    esckids,  esckids,  esckidsj, driver_device, 0, ROT0, "Konami", "Escape Kids (Japan, 2 Players)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, vendetta,    0,        vendetta, vendet4p, vendetta_state, 0, ROT0, "Konami", "Vendetta (World, 4 Players, ver. T)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, vendettar,   vendetta, vendetta, vendet4p, vendetta_state, 0, ROT0, "Konami", "Vendetta (US, 4 Players, ver. R)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, vendettaz,   vendetta, vendetta, vendet4p, vendetta_state, 0, ROT0, "Konami", "Vendetta (Asia, 4 Players, ver. Z)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, vendetta2p,  vendetta, vendetta, vendetta, vendetta_state, 0, ROT0, "Konami", "Vendetta (World, 2 Players, ver. W)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, vendetta2peba,vendetta,vendetta, vendetta, vendetta_state, 0, ROT0, "Konami", "Vendetta (World, 2 Players, ver. EB-A?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, vendetta2pun,vendetta, vendetta, vendetta, vendetta_state, 0, ROT0, "Konami", "Vendetta (World, 2 Players, ver. ?)", MACHINE_SUPPORTS_SAVE ) /* program rom labeled as 1 */
+GAME( 1991, vendetta2pu, vendetta, vendetta, vendetta, vendetta_state, 0, ROT0, "Konami", "Vendetta (Asia, 2 Players, ver. U)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, vendetta2pd, vendetta, vendetta, vendetta, vendetta_state, 0, ROT0, "Konami", "Vendetta (Asia, 2 Players, ver. D)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, vendettaj,   vendetta, vendetta, vendetta, vendetta_state, 0, ROT0, "Konami", "Crime Fighters 2 (Japan, 2 Players, ver. P)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, esckids,     0,        esckids,  esckids,  vendetta_state, 0, ROT0, "Konami", "Escape Kids (Asia, 4 Players)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, esckidsj,    esckids,  esckids,  esckidsj, vendetta_state, 0, ROT0, "Konami", "Escape Kids (Japan, 2 Players)", MACHINE_SUPPORTS_SAVE )

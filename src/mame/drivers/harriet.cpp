@@ -29,15 +29,8 @@ public:
 	{
 	}
 
-	// devices
-	required_device<cpu_device> m_maincpu;
-	required_device<generic_terminal_device> m_terminal;
-
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	uint8_t m_teletype_data;
-	uint8_t m_teletype_status;
 
 	DECLARE_READ8_MEMBER(unk_r);
 	DECLARE_WRITE8_MEMBER(unk_w);
@@ -45,13 +38,21 @@ public:
 	DECLARE_READ8_MEMBER(unk2_r);
 	DECLARE_READ8_MEMBER(unk3_r);
 	DECLARE_READ8_MEMBER(keyboard_status_r);
-	DECLARE_WRITE8_MEMBER( kbd_put );
+	void kbd_put(u8 data);
+
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	virtual void video_start() override;
+
+	// devices
+	required_device<cpu_device> m_maincpu;
+	required_device<generic_terminal_device> m_terminal;
+
+	uint8_t m_teletype_data;
+	uint8_t m_teletype_status;
 };
 
 void harriet_state::video_start()
@@ -177,7 +178,7 @@ static INPUT_PORTS_START( harriet )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-WRITE8_MEMBER( harriet_state::kbd_put )
+void harriet_state::kbd_put(u8 data)
 {
 	m_teletype_data = data;
 	m_teletype_status |= 0x80;
@@ -192,7 +193,7 @@ void harriet_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( harriet, harriet_state )
+static MACHINE_CONFIG_START( harriet )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68010,XTAL_8MHz) // TODO: clock
@@ -200,7 +201,7 @@ static MACHINE_CONFIG_START( harriet, harriet_state )
 
 	/* video hardware */
 	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(harriet_state, kbd_put))
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(harriet_state, kbd_put))
 
 	MCFG_PALETTE_ADD("palette", 8)
 
@@ -223,4 +224,4 @@ ROM_START( harriet )
 	ROM_LOAD16_BYTE( "harriet 36-74c.tdb v5.01 hibyte 2a0c.bin", 0x0000, 0x4000, CRC(a61f441d) SHA1(76af6eddd5c042f1b2eef590eb822379944b9b28) )
 ROM_END
 
-COMP( 1990, harriet,  0,  0, harriet,  harriet, driver_device,  0,    "Quantel",      "Harriet", MACHINE_IS_SKELETON )
+COMP( 1990, harriet,  0,  0, harriet,  harriet, harriet_state,  0,    "Quantel",      "Harriet", MACHINE_IS_SKELETON )

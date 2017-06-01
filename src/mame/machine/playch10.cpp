@@ -752,7 +752,7 @@ DRIVER_INIT_MEMBER(playch10_state,pceboard)
 	machine().device("cart")->memory().space(AS_PROGRAM).install_write_handler(0x8000, 0xffff, write8_delegate(FUNC(playch10_state::eboard_rom_switch_w),this));
 
 	/* ppu_latch callback */
-	m_ppu->set_latch(ppu2c0x_latch_delegate(FUNC(playch10_state::mapper9_latch),this));
+	m_ppu->set_latch(ppu2c0x_device::latch_delegate(FUNC(playch10_state::mapper9_latch),this));
 
 	/* nvram at $6000-$6fff */
 	machine().device("cart")->memory().space(AS_PROGRAM).install_ram(0x6000, 0x6fff);
@@ -804,7 +804,7 @@ DRIVER_INIT_MEMBER(playch10_state,pcfboard_2)
 
 void playch10_state::gboard_scanline_cb( int scanline, int vblank, int blanked )
 {
-	if (scanline < PPU_BOTTOM_VISIBLE_SCANLINE)
+	if (scanline < ppu2c0x_device::BOTTOM_VISIBLE_SCANLINE)
 	{
 		int priorCount = m_IRQ_count;
 		if (m_IRQ_count == 0)
@@ -979,7 +979,7 @@ DRIVER_INIT_MEMBER(playch10_state,pcgboard)
 	/* common init */
 	DRIVER_INIT_CALL(playch10);
 
-	m_ppu->set_scanline_callback(ppu2c0x_scanline_delegate(FUNC(playch10_state::gboard_scanline_cb),this));
+	m_ppu->set_scanline_callback(ppu2c0x_device::scanline_delegate(FUNC(playch10_state::gboard_scanline_cb),this));
 }
 
 DRIVER_INIT_MEMBER(playch10_state,pcgboard_type2)
@@ -1099,7 +1099,7 @@ DRIVER_INIT_MEMBER(playch10_state,pchboard)
 	/* common init */
 	DRIVER_INIT_CALL(playch10);
 
-	m_ppu->set_scanline_callback(ppu2c0x_scanline_delegate(FUNC(playch10_state::gboard_scanline_cb),this));
+	m_ppu->set_scanline_callback(ppu2c0x_device::scanline_delegate(FUNC(playch10_state::gboard_scanline_cb),this));
 }
 
 /**********************************************************************************/

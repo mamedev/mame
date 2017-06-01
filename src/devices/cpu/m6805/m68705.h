@@ -12,10 +12,10 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-extern device_type const M68705P3;
-extern device_type const M68705P5;
-extern device_type const M68705R3;
-extern device_type const M68705U3;
+DECLARE_DEVICE_TYPE(M68705P3, m68705p3_device)
+DECLARE_DEVICE_TYPE(M68705P5, m68705p5_device)
+DECLARE_DEVICE_TYPE(M68705R3, m68705r3_device)
+DECLARE_DEVICE_TYPE(M68705U3, m68705u3_device)
 
 
 //**************************************************************************
@@ -97,11 +97,8 @@ protected:
 			device_t *owner,
 			u32 clock,
 			device_type type,
-			char const *name,
 			u32 addr_width,
-			address_map_delegate internal_map,
-			char const *shortname,
-			char const *source);
+			address_map_delegate internal_map);
 
 	template <offs_t B> DECLARE_READ8_MEMBER(eprom_r);
 	template <offs_t B> DECLARE_WRITE8_MEMBER(eprom_w);
@@ -201,10 +198,7 @@ protected:
 			char const *tag,
 			device_t *owner,
 			u32 clock,
-			device_type type,
-			char const *name,
-			char const *shortname,
-			char const *source);
+			device_type type);
 
 	virtual void device_start() override;
 
@@ -236,19 +230,13 @@ protected:
 			device_t *owner,
 			u32 clock,
 			device_type type,
-			char const *name,
-			address_map_delegate internal_map,
-			char const *shortname,
-			char const *source);
+			address_map_delegate internal_map);
 	m68705u_device(
 			machine_config const &mconfig,
 			char const *tag,
 			device_t *owner,
 			u32 clock,
-			device_type type,
-			char const *name,
-			char const *shortname,
-			char const *source);
+			device_type type);
 
 	virtual void device_start() override;
 
@@ -276,10 +264,7 @@ protected:
 			char const *tag,
 			device_t *owner,
 			u32 clock,
-			device_type type,
-			char const *name,
-			char const *shortname,
-			char const *source);
+			device_type type);
 
 	virtual void device_start() override;
 

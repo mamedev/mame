@@ -137,7 +137,7 @@ static ADDRESS_MAP_START( upd7220_map, AS_0, 16, mz6500_state )
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_START( mz6500, mz6500_state )
+static MACHINE_CONFIG_START( mz6500 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8086, 8000000) //unk clock
 	MCFG_CPU_PROGRAM_MAP(mz6500_map)
@@ -177,5 +177,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY           FULLNAME       FLAGS */
-COMP( 198?, mz6500,  0,      0,       mz6500,     mz6500, driver_device,    0,     "Sharp",   "MZ-6500", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT   STATE            INIT   COMPANY    FULLNAME   FLAGS
+COMP( 198?, mz6500,  0,      0,       mz6500,    mz6500, mz6500_state,    0,     "Sharp",   "MZ-6500", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

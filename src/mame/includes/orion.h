@@ -49,27 +49,6 @@ public:
 		, m_bank8(*this, "bank8")
 	{ }
 
-	uint8_t m_orion128_video_mode;
-	uint8_t m_orion128_video_page;
-	uint8_t m_orion128_video_width;
-	uint8_t m_video_mode_mask;
-	uint8_t m_orionpro_pseudo_color;
-	uint8_t m_romdisk_lsb;
-	uint8_t m_romdisk_msb;
-	uint8_t m_orion128_memory_page;
-	uint8_t m_orionz80_memory_page;
-	uint8_t m_orionz80_dispatcher;
-	uint8_t m_speaker_data;
-	uint8_t m_orionpro_ram0_segment;
-	uint8_t m_orionpro_ram1_segment;
-	uint8_t m_orionpro_ram2_segment;
-	uint8_t m_orionpro_page;
-	uint8_t m_orionpro_128_page;
-	uint8_t m_orionpro_rom2_segment;
-	uint8_t m_orionpro_dispatcher;
-
-	required_device<fd1793_t> m_fdc;
-
 	DECLARE_READ8_MEMBER(orion128_system_r);
 	DECLARE_WRITE8_MEMBER(orion128_system_w);
 	DECLARE_READ8_MEMBER(orion128_romdisk_r);
@@ -106,6 +85,27 @@ public:
 	DECLARE_FLOPPY_FORMATS( orion_floppy_formats );
 
 protected:
+	uint8_t m_orion128_video_mode;
+	uint8_t m_orion128_video_page;
+	uint8_t m_orion128_video_width;
+	uint8_t m_video_mode_mask;
+	uint8_t m_orionpro_pseudo_color;
+	uint8_t m_romdisk_lsb;
+	uint8_t m_romdisk_msb;
+	uint8_t m_orion128_memory_page;
+	uint8_t m_orionz80_memory_page;
+	uint8_t m_orionz80_dispatcher;
+	uint8_t m_speaker_data;
+	uint8_t m_orionpro_ram0_segment;
+	uint8_t m_orionpro_ram1_segment;
+	uint8_t m_orionpro_ram2_segment;
+	uint8_t m_orionpro_page;
+	uint8_t m_orionpro_128_page;
+	uint8_t m_orionpro_rom2_segment;
+	uint8_t m_orionpro_dispatcher;
+
+	required_device<fd1793_device> m_fdc;
+
 	required_device<ram_device> m_ram;
 	required_device<floppy_connector> m_fd0;
 	required_device<floppy_connector> m_fd1;

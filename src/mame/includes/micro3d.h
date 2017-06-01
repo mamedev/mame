@@ -5,6 +5,10 @@
      Microprose Games 3D hardware
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_MICRO3D_H
+#define MAME_INCLUDES_MICRO3D_H
+
+#pragma once
 
 #include "cpu/tms34010/tms34010.h"
 #include "cpu/mcs51/mcs51.h"
@@ -30,13 +34,6 @@ enum planes
 		CLIP_X_MAX,
 		CLIP_Y_MIN,
 		CLIP_Y_MAX
-};
-
-enum dac_registers {
-	VCF,
-	VCQ,
-	VCA,
-	PAN
 };
 
 class micro3d_sound_device;
@@ -93,7 +90,6 @@ public:
 
 	/* Sound */
 	uint8_t               m_sound_port_latch[4];
-	uint8_t               m_dac_data;
 
 	/* TI UART */
 	uint8_t               m_ti_uart[9];
@@ -203,66 +199,4 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
-/*----------- defined in audio/micro3d.c -----------*/
-
-struct biquad
-{
-	double a0, a1, a2;      /* Numerator coefficients */
-	double b0, b1, b2;      /* Denominator coefficients */
-};
-
-struct lp_filter
-{
-	std::unique_ptr<float[]> history;
-	std::unique_ptr<float[]> coef;
-	double fs;
-	biquad ProtoCoef[2];
-};
-
-struct m3d_filter_state
-{
-	double      capval;
-	double      exponent;
-};
-
-class micro3d_sound_device : public device_t,
-									public device_sound_interface
-{
-public:
-	micro3d_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~micro3d_sound_device() {}
-
-	void noise_sh_w(uint8_t data);
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-
-	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
-private:
-	// internal state
-//  union
-//  {
-//      struct
-//      {
-//          uint8_t m_vcf;
-//          uint8_t m_vcq;
-//          uint8_t m_vca;
-//          uint8_t m_pan;
-//      };
-		uint8_t m_dac[4];
-//  };
-
-	float               m_gain;
-	uint32_t              m_noise_shift;
-	uint8_t               m_noise_value;
-	uint8_t               m_noise_subcount;
-
-	m3d_filter_state    m_noise_filters[4];
-	lp_filter           m_filter;
-	sound_stream        *m_stream;
-};
-
-extern const device_type MICRO3D;
+#endif // MAME_INCLUDES_MICRO3D_H

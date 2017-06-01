@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_BBC_FDC_FDC_H
+#define MAME_BUS_BBC_FDC_FDC_H
 
-#ifndef __BBC_FDC_SLOT__
-#define __BBC_FDC_SLOT__
+#pragma once
 
 
 
@@ -44,10 +44,10 @@ public:
 	virtual ~bbc_fdc_slot_device();
 
 	// callbacks
-	template<class _Object> static devcb_base &set_intrq_handler(device_t &device, _Object object)
-		{ return downcast<bbc_fdc_slot_device &>(device).m_intrq_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_drq_handler(device_t &device, _Object object)
-		{ return downcast<bbc_fdc_slot_device &>(device).m_drq_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_intrq_handler(device_t &device, Object &&cb)
+	{ return downcast<bbc_fdc_slot_device &>(device).m_intrq_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_drq_handler(device_t &device, Object &&cb)
+	{ return downcast<bbc_fdc_slot_device &>(device).m_drq_handler.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE_LINE_MEMBER( intrq_w ) { m_intrq_handler(state); }
 	DECLARE_WRITE_LINE_MEMBER( drq_w) { m_drq_handler(state); }
@@ -71,18 +71,19 @@ class device_bbc_fdc_interface : public device_slot_card_interface
 {
 public:
 	// construction/destruction
-	device_bbc_fdc_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_bbc_fdc_interface();
 
 protected:
+	device_bbc_fdc_interface(const machine_config &mconfig, device_t &device);
+
 	bbc_fdc_slot_device *m_slot;
 };
 
 
 // device type definition
-extern const device_type BBC_FDC_SLOT;
+DECLARE_DEVICE_TYPE(BBC_FDC_SLOT, bbc_fdc_slot_device)
 
 SLOT_INTERFACE_EXTERN( bbc_fdc_devices );
 
 
-#endif
+#endif // MAME_BUS_BBC_FDC_FDC_H

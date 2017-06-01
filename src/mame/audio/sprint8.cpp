@@ -295,22 +295,22 @@ DISCRETE_SOUND_START( sprint8 )
 DISCRETE_SOUND_END
 
 
-WRITE8_MEMBER(sprint8_state::sprint8_crash_w)
+WRITE8_MEMBER(sprint8_state::crash_w)
 {
 	m_discrete->write(space, SPRINT8_CRASH_EN, data & 0x01);
 }
 
-WRITE8_MEMBER(sprint8_state::sprint8_screech_w)
+WRITE8_MEMBER(sprint8_state::screech_w)
 {
 	m_discrete->write(space, SPRINT8_SCREECH_EN, data & 0x01);
 }
 
-WRITE8_MEMBER(sprint8_state::sprint8_attract_w)
+WRITE8_MEMBER(sprint8_state::attract_w)
 {
 	m_discrete->write(space, SPRINT8_ATTRACT_EN, data & 0x01);
 }
 
-WRITE8_MEMBER(sprint8_state::sprint8_motor_w)
+WRITE8_MEMBER(sprint8_state::motor_w)
 {
 	m_discrete->write(space, NODE_RELATIVE(SPRINT8_MOTOR1_EN, offset & 0x07), data & 0x01);
 }

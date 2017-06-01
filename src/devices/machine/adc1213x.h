@@ -9,15 +9,16 @@
 
 ***************************************************************************/
 
-#ifndef __ADC1213X_H__
-#define __ADC1213X_H__
+#ifndef MAME_MACHINE_ADC1213X_H
+#define MAME_MACHINE_ADC1213X_H
+
+#pragma once
 
 
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef device_delegate<double (uint8_t input)> adc1213x_ipt_convert_delegate;
 #define ADC12138_IPT_CONVERT_CB(name)  double name(uint8_t input)
 
 /***************************************************************************
@@ -27,11 +28,11 @@ typedef device_delegate<double (uint8_t input)> adc1213x_ipt_convert_delegate;
 class adc12138_device : public device_t
 {
 public:
-	adc12138_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	adc12138_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
-	~adc12138_device() {}
+	typedef device_delegate<double (uint8_t input)> ipt_convert_delegate;
 
-	static void set_ipt_convert_callback(device_t &device, adc1213x_ipt_convert_delegate callback) { downcast<adc12138_device &>(device).m_ipt_read_cb = callback; }
+	adc12138_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	static void set_ipt_convert_callback(device_t &device, ipt_convert_delegate &&cb) { downcast<adc12138_device &>(device).m_ipt_read_cb = std::move(cb); }
 
 	DECLARE_WRITE8_MEMBER( di_w );
 	DECLARE_WRITE8_MEMBER( cs_w );
@@ -41,13 +42,15 @@ public:
 	DECLARE_READ8_MEMBER( eoc_r );
 
 protected:
+	adc12138_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 	void convert(int channel, int bits16, int lsbfirst);
 
-	adc1213x_ipt_convert_delegate m_ipt_read_cb;
+	ipt_convert_delegate m_ipt_read_cb;
 
 private:
 	// internal state
@@ -64,7 +67,6 @@ private:
 	int m_end_conv;
 };
 
-extern const device_type ADC12138;
 
 class adc12130_device : public adc12138_device
 {
@@ -72,7 +74,6 @@ public:
 	adc12130_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
-extern const device_type ADC12130;
 
 class adc12132_device : public adc12138_device
 {
@@ -80,10 +81,13 @@ public:
 	adc12132_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
-extern const device_type ADC12132;
+
+DECLARE_DEVICE_TYPE(ADC12138, adc12138_device)
+DECLARE_DEVICE_TYPE(ADC12130, adc12130_device)
+DECLARE_DEVICE_TYPE(ADC12132, adc12132_device)
 
 
 #define MCFG_ADC1213X_IPT_CONVERT_CB(_class, _method) \
-	adc12138_device::set_ipt_convert_callback(*device, adc1213x_ipt_convert_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	adc12138_device::set_ipt_convert_callback(*device, adc12138_device::ipt_convert_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
-#endif  /* __ADC1213X_H__ */
+#endif // MAME_MACHINE_ADC1213X_H

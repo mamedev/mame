@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_S100_DJDMA_H
+#define MAME_BUS_S100_DJDMA_H
 
-#ifndef __S100_DJDMA__
-#define __S100_DJDMA__
+#pragma once
 
 #include "s100.h"
 #include "cpu/z80/z80.h"
@@ -41,7 +41,6 @@ protected:
 
 
 // device type definition
-extern const device_type S100_DJDMA;
+DECLARE_DEVICE_TYPE(S100_DJDMA, s100_djdma_device)
 
-
-#endif
+#endif // MAME_BUS_S100_DJDMA_H

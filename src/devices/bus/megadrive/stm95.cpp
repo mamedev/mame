@@ -16,9 +16,9 @@
 
 
 stm95_eeprom_device::stm95_eeprom_device(running_machine &machine, uint8_t *eeprom) :
-			stm_state(IDLE),
-			stream_pos(0),
-			m_machine(machine)
+	stm_state(IDLE),
+	stream_pos(0),
+	m_machine(machine)
 {
 	eeprom_data = eeprom;
 	m_machine.save().save_item(latch, "STM95/latch");
@@ -172,25 +172,25 @@ void stm95_eeprom_device::set_sck_line(int state)
 //  md_rom_device - constructor
 //-------------------------------------------------
 
-const device_type MD_EEPROM_STM95 = device_creator<md_eeprom_stm95_device>;
+DEFINE_DEVICE_TYPE(MD_EEPROM_STM95, md_eeprom_stm95_device, "md_eeprom_stm95", "MD Cart + EEPROM STM95")
 
 
-md_eeprom_stm95_device::md_eeprom_stm95_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-					device_md_cart_interface( mconfig, *this ), m_rdcnt(0)
-				{
+md_eeprom_stm95_device::md_eeprom_stm95_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_md_cart_interface(mconfig, *this)
+	, m_rdcnt(0)
+{
 }
 
 md_eeprom_stm95_device::md_eeprom_stm95_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: device_t(mconfig, MD_EEPROM_STM95, "MD Cart + EEPROM STM95", tag, owner, clock, "md_eeprom_stm95", __FILE__),
-					device_md_cart_interface( mconfig, *this ), m_rdcnt(0)
-				{
+	: md_eeprom_stm95_device(mconfig, MD_EEPROM_STM95, tag, owner, clock)
+{
 }
 
 
 void md_eeprom_stm95_device::device_start()
 {
-	nvram_alloc(M95320_SIZE);
+	nvram_alloc(stm95_eeprom_device::M95320_SIZE);
 	m_stm95 = std::make_unique<stm95_eeprom_device>(machine(), (uint8_t*)get_nvram_base());
 
 	save_item(NAME(m_rdcnt));

@@ -18,10 +18,10 @@
 
 ***************************************************************************/
 
-#pragma once
-
 #ifndef MAME_DEVICES_MACHINE_74153_H
 #define MAME_DEVICES_MACHINE_74153_H
+
+#pragma once
 
 
 
@@ -50,11 +50,11 @@ public:
 	ttl153_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	template<class _Object> static devcb_base &set_za_callback(device_t &device, _Object object)
-		{ return downcast<ttl153_device &>(device).m_za_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_za_callback(device_t &device, Object &&cb)
+	{ return downcast<ttl153_device &>(device).m_za_cb.set_callback(std::forward<Object>(cb)); }
 
-	template<class _Object> static devcb_base &set_zb_callback(device_t &device, _Object object)
-		{ return downcast<ttl153_device &>(device).m_zb_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_zb_callback(device_t &device, Object &&cb)
+	{ return downcast<ttl153_device &>(device).m_zb_cb.set_callback(std::forward<Object>(cb)); }
 
 	// select
 	DECLARE_WRITE_LINE_MEMBER(s0_w);
@@ -93,6 +93,6 @@ private:
 };
 
 // device type definition
-extern const device_type TTL153;
+DECLARE_DEVICE_TYPE(TTL153, ttl153_device)
 
 #endif // MAME_DEVICES_MACHINE_74153_H

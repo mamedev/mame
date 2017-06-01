@@ -24,7 +24,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_DQBB = device_creator<c64_dqbb_cartridge_device>;
+DEFINE_DEVICE_TYPE(C64_DQBB, c64_dqbb_cartridge_device, "c64_dqbb", "C64 Double Quick Brown Box cartridge")
 
 
 
@@ -37,7 +37,7 @@ const device_type C64_DQBB = device_creator<c64_dqbb_cartridge_device>;
 //-------------------------------------------------
 
 c64_dqbb_cartridge_device::c64_dqbb_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, C64_DQBB, "C64 Double Quick Brown Box cartridge", tag, owner, clock, "c64_dqbb", __FILE__),
+	device_t(mconfig, C64_DQBB, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
 	device_nvram_interface(mconfig, *this),
 	m_cs(0),

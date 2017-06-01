@@ -6,14 +6,13 @@
 
 ***************************************************************************/
 
+#ifndef MAME_MACHINE_TL009XLVC_H
+#define MAME_MACHINE_TL009XLVC_H
+
 #pragma once
 
-#ifndef __ramdacDEV_H__
-#define __ramdacDEV_H__
 
-
-class tc0091lvc_device : public device_t,
-							public device_memory_interface
+class tc0091lvc_device : public device_t, public device_memory_interface
 {
 public:
 	tc0091lvc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -45,6 +44,15 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void screen_eof();
+
+protected:
+	virtual void device_start() override;
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const override;
+
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t global_flip);
+
 	uint8_t *m_pcg1_ram;
 	uint8_t *m_pcg2_ram;
 	uint8_t *m_vram0;
@@ -66,21 +74,14 @@ public:
 	uint8_t m_pcg_ram[0x10000];
 	uint8_t m_sprram_buffer[0x400];
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t global_flip);
-	void screen_eof(void);
-
-protected:
-	virtual void device_start() override;
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 	address_space_config        m_space_config;
 	required_device<gfxdecode_device> m_gfxdecode;
 };
 
-extern const device_type TC0091LVC;
-
-#define MCFG_TC0091LVC_GFXDECODE(_gfxtag) \
-	tc0091lvc_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
+DECLARE_DEVICE_TYPE(TC0091LVC, tc0091lvc_device)
 
 
-#endif
+#define MCFG_TC0091LVC_GFXDECODE(gfxtag) \
+	tc0091lvc_device::static_set_gfxdecode_tag(*device, ("^" gfxtag));
+
+#endif // MAME_MACHINE_TL009XLVC_H

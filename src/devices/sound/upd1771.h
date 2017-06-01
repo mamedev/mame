@@ -6,11 +6,9 @@
 
 **********************************************************************/
 
-#ifndef __UPD1771_H__
-#define __UPD1771_H__
+#ifndef MAME_SOUND_UPD1771_H
+#define MAME_SOUND_UPD1771_H
 
-
-#define MAX_PACKET_SIZE 0x8000
 
 #define MCFG_UPD1771_ACK_HANDLER(_devcb) \
 	devcb = &upd1771c_device::set_ack_handler(*device, DEVCB_##_devcb);
@@ -25,9 +23,8 @@ class upd1771c_device : public device_t,
 {
 public:
 	upd1771c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~upd1771c_device() {}
 
-	template<class _Object> static devcb_base &set_ack_handler(device_t &device, _Object object) { return downcast<upd1771c_device &>(device).m_ack_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_ack_handler(device_t &device, Object &&cb) { return downcast<upd1771c_device &>(device).m_ack_handler.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -42,12 +39,14 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
+	static constexpr unsigned MAX_PACKET_SIZE = 0x8000;
+
+	TIMER_CALLBACK_MEMBER(ack_callback);
+
 	// internal state
 	sound_stream *m_channel;
 	devcb_write_line m_ack_handler;
 	emu_timer *m_timer;
-
-	TIMER_CALLBACK_MEMBER(ack_callback);
 
 	uint8_t   m_packet[MAX_PACKET_SIZE];
 	uint32_t  m_index;
@@ -78,7 +77,6 @@ private:
 	uint32_t   m_n_ppos[3];   //period pos
 };
 
-extern const device_type UPD1771C;
+DECLARE_DEVICE_TYPE(UPD1771C, upd1771c_device)
 
-
-#endif /* __UPD1771_H__ */
+#endif // MAME_SOUND_UPD1771_H

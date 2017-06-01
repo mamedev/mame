@@ -6,13 +6,13 @@
 
 *********************************************************************/
 
+#ifndef MAME_BUS_PC_KBD_ISKR1030_H
+#define MAME_BUS_PC_KBD_ISKR1030_H
+
 #pragma once
 
-#ifndef __PC_KBD_ISKR_1030__
-#define __PC_KBD_ISKR_1030__
-
-#include "cpu/mcs48/mcs48.h"
 #include "pc_kbdc.h"
+#include "cpu/mcs48/mcs48.h"
 #include "machine/rescap.h"
 
 
@@ -23,8 +23,7 @@
 
 // ======================> iskr_1030_keyboard_device
 
-class iskr_1030_keyboard_device :  public device_t,
-										public device_pc_kbd_interface
+class iskr_1030_keyboard_device : public device_t, public device_pc_kbd_interface
 {
 public:
 	// construction/destruction
@@ -40,7 +39,7 @@ public:
 	DECLARE_READ8_MEMBER( p1_r );
 	DECLARE_WRITE8_MEMBER( p1_w );
 	DECLARE_WRITE8_MEMBER( p2_w );
-	DECLARE_READ8_MEMBER( t1_r );
+	DECLARE_READ_LINE_MEMBER( t1_r );
 
 protected:
 	// device-level overrides
@@ -87,6 +86,6 @@ private:
 
 
 // device type definition
-extern const device_type PC_KBD_ISKR_1030;
+DECLARE_DEVICE_TYPE(PC_KBD_ISKR_1030, iskr_1030_keyboard_device)
 
-#endif
+#endif // MAME_BUS_PC_KBD_ISKR1030_H

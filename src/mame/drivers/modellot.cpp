@@ -35,7 +35,7 @@ public:
 
 	DECLARE_READ8_MEMBER(port77_r);
 	DECLARE_READ8_MEMBER(portff_r);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	void kbd_put(u8 data);
 	uint32_t screen_update_modellot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 private:
@@ -77,7 +77,7 @@ READ8_MEMBER( modellot_state::portff_r)
 	return data;
 }
 
-WRITE8_MEMBER( modellot_state::kbd_put )
+void modellot_state::kbd_put(u8 data)
 {
 	m_term_data = data;
 }
@@ -149,7 +149,7 @@ uint32_t modellot_state::screen_update_modellot(screen_device &screen, bitmap_in
 	return 0;
 }
 
-static MACHINE_CONFIG_START( modellot, modellot_state )
+static MACHINE_CONFIG_START( modellot )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(modellot_mem)
@@ -169,7 +169,7 @@ static MACHINE_CONFIG_START( modellot, modellot_state )
 
 	/* Devices */
 	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(WRITE8(modellot_state, kbd_put))
+	MCFG_GENERIC_KEYBOARD_CB(PUT(modellot_state, kbd_put))
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -187,4 +187,4 @@ ROM_START( modellot )
 ROM_END
 
 /* Driver */
-COMP( 1979, modellot, 0, 0, modellot, modellot, driver_device, 0, "General Processor", "Modello T", MACHINE_IS_SKELETON)
+COMP( 1979, modellot, 0, 0, modellot, modellot, modellot_state, 0, "General Processor", "Modello T", MACHINE_IS_SKELETON )

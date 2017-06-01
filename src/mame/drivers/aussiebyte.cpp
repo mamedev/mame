@@ -57,7 +57,7 @@ static ADDRESS_MAP_START( aussiebyte_io, AS_IO, 8, aussiebyte_state )
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("pio1", z80pio_device, read, write)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
 	AM_RANGE(0x0c, 0x0f) AM_NOP // winchester interface
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("fdc", wd2797_t, read, write)
+	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("fdc", wd2797_device, read, write)
 	AM_RANGE(0x14, 0x14) AM_DEVREADWRITE("dma", z80dma_device, read, write)
 	AM_RANGE(0x15, 0x15) AM_WRITE(port15_w) // boot rom disable
 	AM_RANGE(0x16, 0x16) AM_WRITE(port16_w) // fdd select
@@ -465,7 +465,7 @@ MACHINE_RESET_MEMBER( aussiebyte_state, aussiebyte )
 	m_maincpu->reset();
 }
 
-static MACHINE_CONFIG_START( aussiebyte, aussiebyte_state )
+static MACHINE_CONFIG_START( aussiebyte )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(aussiebyte_map)
@@ -595,5 +595,5 @@ ROM_START(aussieby)
 	ROM_REGION(0x00800, "aram", ROMREGION_ERASEFF) // attribute ram, 2k static
 ROM_END
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT        CLASS             INIT         COMPANY         FULLNAME          FLAGS */
+//    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT        CLASS             INIT        COMPANY         FULLNAME           FLAGS
 COMP( 1984, aussieby,     0,        0,  aussiebyte, aussiebyte,  aussiebyte_state, aussiebyte, "SME Systems",  "Aussie Byte II" , MACHINE_IMPERFECT_GRAPHICS )

@@ -942,28 +942,6 @@ void ymf278b_device::register_save_state()
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-static void ymf278b_ymf262_irq_handler(void *param,int irq)
-{
-}
-
-
-static void ymf278b_ymf262_timer_handler(void *param, int c, const attotime &period)
-{
-}
-
-static void ymf278b_ymf262_update_request(void *param, int interval)
-{
-	ymf278b_device *ymf278b = (ymf278b_device *) param;
-	ymf278b->ymf262_update_request();
-}
-
-
-void ymf278b_device::ymf262_update_request()
-{
-	m_stream_ymf262->update();
-}
-
-
 void ymf278b_device::device_start()
 {
 	int i;
@@ -1019,19 +997,19 @@ void ymf278b_device::device_start()
 	m_stream_ymf262 = machine().sound().stream_alloc(*this, 0, 4, ymf262_clock / 288);
 
 	/* YMF262 setup */
-	ymf262_set_timer_handler (m_ymf262, ymf278b_ymf262_timer_handler, this);
-	ymf262_set_irq_handler   (m_ymf262, ymf278b_ymf262_irq_handler, this);
-	ymf262_set_update_handler(m_ymf262, ymf278b_ymf262_update_request, this);
+	ymf262_set_timer_handler (m_ymf262, ymf278b_device::static_timer_handler, this);
+	ymf262_set_irq_handler   (m_ymf262, ymf278b_device::static_irq_handler, this);
+	ymf262_set_update_handler(m_ymf262, ymf278b_device::static_update_request, this);
 }
 
 
-const device_type YMF278B = device_creator<ymf278b_device>;
+DEFINE_DEVICE_TYPE(YMF278B, ymf278b_device, "ymf278b", "Yamaha YMF278B OPL4")
 
 ymf278b_device::ymf278b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, YMF278B, "YMF278B", tag, owner, clock, "ymf278b", __FILE__),
-		device_sound_interface(mconfig, *this),
-		device_rom_interface(mconfig, *this, 22),
-		m_irq_handler(*this),
-		m_last_fm_data(0)
+	: device_t(mconfig, YMF278B, tag, owner, clock)
+	, device_sound_interface(mconfig, *this)
+	, device_rom_interface(mconfig, *this, 22)
+	, m_irq_handler(*this)
+	, m_last_fm_data(0)
 {
 }

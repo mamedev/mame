@@ -12,21 +12,22 @@
 #include "plaparse.h"
 
 
-const device_type PLA = device_creator<pla_device>;
+DEFINE_DEVICE_TYPE(PLA, pla_device, "pla", "PLA")
 
 //-------------------------------------------------
 //  pla_device - constructor
 //-------------------------------------------------
 
 pla_device::pla_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, PLA, "PLA", tag, owner, clock, "pla", __FILE__),
-		m_region(*this, DEVICE_SELF),
-		m_format(PLA_FMT_JEDBIN),
-		m_inputs(0),
-		m_outputs(0),
-		m_terms(0),
-		m_input_mask(0),
-		m_xor(0), m_cache_size(0), m_cache2_ptr(0)
+	: device_t(mconfig, PLA, tag, owner, clock)
+	, m_region(*this, DEVICE_SELF)
+	, m_format(FMT::JEDBIN)
+	, m_inputs(0)
+	, m_outputs(0)
+	, m_terms(0)
+	, m_input_mask(0)
+	, m_xor(0)
+	, m_cache_size(0), m_cache2_ptr(0)
 {
 }
 
@@ -74,11 +75,11 @@ void pla_device::parse_fusemap()
 	// read pla file
 	switch (m_format)
 	{
-		case PLA_FMT_JEDBIN:
+		case FMT::JEDBIN:
 			result = jedbin_parse(m_region->base(), m_region->bytes(), &jed);
 			break;
 
-		case PLA_FMT_BERKELEY:
+		case FMT::BERKELEY:
 			result = pla_parse(m_region->base(), m_region->bytes(), &jed);
 			break;
 	}

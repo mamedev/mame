@@ -86,7 +86,7 @@ void tek4107a_state::machine_start()
 
 /* Machine Driver */
 
-static MACHINE_CONFIG_START( tek4107a, tek4107a_state )
+static MACHINE_CONFIG_START( tek4107a )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(I80188_TAG, I80188, 21000000)
 	MCFG_CPU_PROGRAM_MAP(tek4107a_mem)
@@ -145,6 +145,6 @@ ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT    COMPANY         FULLNAME            FLAGS */
-COMP( 1983, tek4107a,   0,          0,      tek4107a,   tek4107a, driver_device,   0,    "Tektronix", "Tektronix 4107A", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1983, tek4109a,   tek4107a,   0,      tek4109a,   tek4107a, driver_device,   0,    "Tektronix", "Tektronix 4109A", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT     STATE           INIT  COMPANY      FULLNAME           FLAGS
+COMP( 1983, tek4107a,   0,          0,      tek4107a,   tek4107a, tek4107a_state, 0,    "Tektronix", "Tektronix 4107A", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1983, tek4109a,   tek4107a,   0,      tek4109a,   tek4107a, tek4107a_state, 0,    "Tektronix", "Tektronix 4109A", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

@@ -186,8 +186,8 @@ public:
 	required_device<mc68681_device> m_duart;
 	required_device<es5505_device> m_otis;
 	required_device<es5510_device> m_esp;
-	required_device<esq_5505_5510_pump> m_pump;
-	optional_device<wd1772_t> m_fdc;
+	required_device<esq_5505_5510_pump_device> m_pump;
+	optional_device<wd1772_device> m_fdc;
 	required_device<esqpanel_device> m_panel;
 	optional_device<hd63450_device> m_dmac;
 	required_device<midi_port_device> m_mdout;
@@ -386,7 +386,7 @@ static ADDRESS_MAP_START( vfxsd_map, AS_PROGRAM, 16, esq5505_state )
 	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE("otis", es5505_device, read, write)
 	AM_RANGE(0x280000, 0x28001f) AM_DEVREADWRITE8("duart", mc68681_device, read, write, 0x00ff)
 	AM_RANGE(0x260000, 0x2601ff) AM_DEVREADWRITE8("esp", es5510_device, host_r, host_w, 0x00ff)
-	AM_RANGE(0x2c0000, 0x2c0007) AM_DEVREADWRITE8("wd1772", wd1772_t, read, write, 0x00ff)
+	AM_RANGE(0x2c0000, 0x2c0007) AM_DEVREADWRITE8("wd1772", wd1772_device, read, write, 0x00ff)
 	AM_RANGE(0x330000, 0x3bffff) AM_RAM // sequencer memory?
 	AM_RANGE(0xc00000, 0xc3ffff) AM_ROM AM_REGION("osrom", 0)
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("osram")
@@ -397,7 +397,7 @@ static ADDRESS_MAP_START( eps_map, AS_PROGRAM, 16, esq5505_state )
 	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE("otis", es5505_device, read, write)
 	AM_RANGE(0x240000, 0x2400ff) AM_DEVREADWRITE("mc68450", hd63450_device, read, write)
 	AM_RANGE(0x280000, 0x28001f) AM_DEVREADWRITE8("duart", mc68681_device, read, write, 0x00ff)
-	AM_RANGE(0x2c0000, 0x2c0007) AM_DEVREADWRITE8("wd1772", wd1772_t, read, write, 0x00ff)
+	AM_RANGE(0x2c0000, 0x2c0007) AM_DEVREADWRITE8("wd1772", wd1772_device, read, write, 0x00ff)
 	AM_RANGE(0x580000, 0x7fffff) AM_RAM         // sample RAM?
 	AM_RANGE(0xc00000, 0xc1ffff) AM_ROM AM_REGION("osrom", 0)
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("osram")
@@ -604,7 +604,7 @@ INPUT_CHANGED_MEMBER(esq5505_state::key_stroke)
 }
 #endif
 
-static MACHINE_CONFIG_START( vfx, esq5505_state )
+static MACHINE_CONFIG_START( vfx )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
 	MCFG_CPU_PROGRAM_MAP(vfx_map)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(esq5505_state,maincpu_irq_acknowledge_callback)
@@ -612,7 +612,7 @@ static MACHINE_CONFIG_START( vfx, esq5505_state )
 	MCFG_CPU_ADD("esp", ES5510, XTAL_10MHz)
 	MCFG_DEVICE_DISABLE()
 
-	MCFG_ESQPANEL2x40_ADD("panel")
+	MCFG_ESQPANEL2X40_ADD("panel")
 	MCFG_ESQPANEL_TX_CALLBACK(DEVWRITELINE("duart", mc68681_device, rx_b_w))
 	MCFG_ESQPANEL_ANALOG_CALLBACK(WRITE16(esq5505_state, analog_w))
 
@@ -654,8 +654,8 @@ static MACHINE_CONFIG_DERIVED(eps, vfx)
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(eps_map)
 
-	MCFG_ESQPANEL_2x40_REMOVE("panel")
-	MCFG_ESQPANEL1x22_ADD("panel")
+	MCFG_ESQPANEL_2X40_REMOVE("panel")
+	MCFG_ESQPANEL1X22_ADD("panel")
 	MCFG_ESQPANEL_TX_CALLBACK(DEVWRITELINE("duart", mc68681_device, rx_b_w))
 	MCFG_ESQPANEL_ANALOG_CALLBACK(WRITE16(esq5505_state, analog_w))
 
@@ -681,7 +681,7 @@ static MACHINE_CONFIG_DERIVED(vfxsd, vfx)
 MACHINE_CONFIG_END
 
 // 32-voice machines with the VFX-SD type config
-static MACHINE_CONFIG_START(vfx32, esq5505_state)
+static MACHINE_CONFIG_START(vfx32)
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_30_4761MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(vfxsd_map)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(esq5505_state,maincpu_irq_acknowledge_callback)
@@ -689,7 +689,7 @@ static MACHINE_CONFIG_START(vfx32, esq5505_state)
 	MCFG_CPU_ADD("esp", ES5510, XTAL_10MHz)
 	MCFG_DEVICE_DISABLE()
 
-	MCFG_ESQPANEL2x40_ADD("panel")
+	MCFG_ESQPANEL2X40_ADD("panel")
 	MCFG_ESQPANEL_TX_CALLBACK(DEVWRITELINE("duart", mc68681_device, rx_b_w))
 	MCFG_ESQPANEL_ANALOG_CALLBACK(WRITE16(esq5505_state, analog_w))
 
@@ -734,8 +734,8 @@ static MACHINE_CONFIG_DERIVED(sq1, vfx)
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(sq1_map)
 
-	MCFG_ESQPANEL_2x40_REMOVE("panel")
-	MCFG_ESQPANEL2x16_SQ1_ADD("panel")
+	MCFG_ESQPANEL_2X40_REMOVE("panel")
+	MCFG_ESQPANEL2X16_SQ1_ADD("panel")
 	MCFG_ESQPANEL_TX_CALLBACK(DEVWRITELINE("duart", mc68681_device, rx_b_w))
 	MCFG_ESQPANEL_ANALOG_CALLBACK(WRITE16(esq5505_state, analog_w))
 MACHINE_CONFIG_END
@@ -1013,12 +1013,12 @@ DRIVER_INIT_MEMBER(esq5505_state,denib)
 	}
 }
 
-CONS( 1988, eps,   0, 0,   eps,   vfx, esq5505_state, eps,    "Ensoniq", "EPS", MACHINE_NOT_WORKING )   // custom VFD: one alphanumeric 22-char row, one graphics-capable row (alpha row can also do bar graphs)
-CONS( 1989, vfx,   0, 0,   vfx,   vfx, esq5505_state, denib,  "Ensoniq", "VFX", MACHINE_NOT_WORKING )       // 2x40 VFD
-CONS( 1989, vfxsd, 0, 0,   vfxsd, vfx, esq5505_state, denib,  "Ensoniq", "VFX-SD", MACHINE_NOT_WORKING )    // 2x40 VFD
-CONS( 1990, eps16p,eps, 0, eps,   vfx, esq5505_state, eps,    "Ensoniq", "EPS-16 Plus", MACHINE_NOT_WORKING )   // custom VFD: one alphanumeric 22-char row, one graphics-capable row (alpha row can also do bar graphs)
-CONS( 1990, sd1,   0, 0,   vfxsd, vfx, esq5505_state, denib,  "Ensoniq", "SD-1 (21 voice)", MACHINE_NOT_WORKING )  // 2x40 VFD
-CONS( 1990, sq1,   0, 0,   sq1,   sq1, esq5505_state, sq1,    "Ensoniq", "SQ-1", MACHINE_NOT_WORKING )      // 2x16 LCD
-CONS( 1990, sqrack,sq1, 0, sq1,   sq1, esq5505_state, sq1,    "Ensoniq", "SQ-Rack", MACHINE_NOT_WORKING )   // 2x16 LCD
-CONS( 1991, sq2,   0, 0,   sq1,   sq1, esq5505_state, sq1,    "Ensoniq", "SQ-2", MACHINE_NOT_WORKING )      // 2x16 LCD
-CONS( 1991, sd132, sd1,0,  vfx32, vfx, esq5505_state, denib,  "Ensoniq", "SD-1 (32 voice)", MACHINE_NOT_WORKING )  // 2x40 VFD
+CONS( 1988, eps,   0,   0, eps,   vfx, esq5505_state, eps,    "Ensoniq", "EPS",             MACHINE_NOT_WORKING )  // custom VFD: one alphanumeric 22-char row, one graphics-capable row (alpha row can also do bar graphs)
+CONS( 1989, vfx,   0,   0, vfx,   vfx, esq5505_state, denib,  "Ensoniq", "VFX",             MACHINE_NOT_WORKING )  // 2x40 VFD
+CONS( 1989, vfxsd, 0,   0, vfxsd, vfx, esq5505_state, denib,  "Ensoniq", "VFX-SD",          MACHINE_NOT_WORKING )  // 2x40 VFD
+CONS( 1990, eps16p,eps, 0, eps,   vfx, esq5505_state, eps,    "Ensoniq", "EPS-16 Plus",     MACHINE_NOT_WORKING )  // custom VFD: one alphanumeric 22-char row, one graphics-capable row (alpha row can also do bar graphs)
+CONS( 1990, sd1,   0,   0, vfxsd, vfx, esq5505_state, denib,  "Ensoniq", "SD-1 (21 voice)", MACHINE_NOT_WORKING )  // 2x40 VFD
+CONS( 1990, sq1,   0,   0, sq1,   sq1, esq5505_state, sq1,    "Ensoniq", "SQ-1",            MACHINE_NOT_WORKING )  // 2x16 LCD
+CONS( 1990, sqrack,sq1, 0, sq1,   sq1, esq5505_state, sq1,    "Ensoniq", "SQ-Rack",         MACHINE_NOT_WORKING )  // 2x16 LCD
+CONS( 1991, sq2,   0,   0, sq1,   sq1, esq5505_state, sq1,    "Ensoniq", "SQ-2",            MACHINE_NOT_WORKING )  // 2x16 LCD
+CONS( 1991, sd132, sd1, 0, vfx32, vfx, esq5505_state, denib,  "Ensoniq", "SD-1 (32 voice)", MACHINE_NOT_WORKING )  // 2x40 VFD

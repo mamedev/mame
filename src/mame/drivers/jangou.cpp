@@ -44,15 +44,17 @@ class jangou_state : public driver_device
 {
 public:
 	jangou_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_cpu_0(*this, "cpu0"),
-		m_cpu_1(*this, "cpu1"),
-		m_nsc(*this, "nsc"),
-		m_msm(*this, "msm"),
-		m_cvsd(*this, "cvsd"),
-		m_palette(*this, "palette"),
-		m_blitter(*this, "blitter"),
-		m_soundlatch(*this, "soundlatch") { }
+		: driver_device(mconfig, type, tag)
+		, m_cpu_0(*this, "cpu0")
+		, m_cpu_1(*this, "cpu1")
+		, m_nsc(*this, "nsc")
+		, m_msm(*this, "msm")
+		, m_cvsd(*this, "cvsd")
+		, m_palette(*this, "palette")
+		, m_blitter(*this, "blitter")
+		, m_soundlatch(*this, "soundlatch")
+	{
+	}
 
 	/* sound-related */
 	// Jangou CVSD Sound
@@ -168,7 +170,7 @@ uint32_t jangou_state::screen_update_jangou(screen_device &screen, bitmap_ind16 
 
 	for (y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
-		uint8_t *src = &m_blitter->m_blit_buffer[y * 256 + cliprect.min_x];
+		const uint8_t *src = &m_blitter->blit_buffer(y, cliprect.min_x);
 		uint16_t *dst = &m_tmp_bitmap->pix16(y, cliprect.min_x);
 
 		for (x = cliprect.min_x; x <= cliprect.max_x; x += 2)
@@ -836,7 +838,7 @@ MACHINE_RESET_MEMBER(jangou_state,jngolady)
 }
 
 /* Note: All frequencies and dividers are unverified */
-static MACHINE_CONFIG_START( jangou, jangou_state )
+static MACHINE_CONFIG_START( jangou )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("cpu0", Z80, MASTER_CLOCK / 8)
@@ -895,7 +897,7 @@ static MACHINE_CONFIG_DERIVED( jngolady, jangou )
 
 	MCFG_SOUND_ADD("msm", MSM5205, XTAL_400kHz)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(jangou_state, jngolady_vclk_cb))
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S96_4B)
+	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
@@ -1265,13 +1267,13 @@ DRIVER_INIT_MEMBER(jangou_state,luckygrl)
  *
  *************************************/
 
-GAME( 1983,  jangou,     0,        jangou,   jangou, driver_device,    0,        ROT0, "Nichibutsu",     "Jangou [BET] (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983,  macha,      0,        jangou,   macha,  driver_device,     0,        ROT0, "Logitec",        "Monoshiri Quiz Osyaberi Macha (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983,  jangou,     0,        jangou,   jangou,   jangou_state,  0,        ROT0, "Nichibutsu",     "Jangou [BET] (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983,  macha,      0,        jangou,   macha,    jangou_state,  0,        ROT0, "Logitec",        "Monoshiri Quiz Osyaberi Macha (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984,  jngolady,   0,        jngolady, jngolady, jangou_state,  jngolady, ROT0, "Nichibutsu",     "Jangou Lady (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984,  cntrygrl,   0,        cntrygrl, cntrygrl, driver_device,  0,        ROT0, "Royal Denshi",   "Country Girl (Japan set 1)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1984,  cntrygrla,  cntrygrl, cntrygrl, cntrygrl, driver_device,  0,        ROT0, "Nichibutsu",     "Country Girl (Japan set 2)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1984,  fruitbun,   cntrygrl, cntrygrl, cntrygrl, driver_device,  0,        ROT0, "Nichibutsu",     "Fruits & Bunny (World?)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1985,  roylcrdn,   0,        roylcrdn, roylcrdn, driver_device,  0,        ROT0, "Nichibutsu",     "Royal Card (Nichibutsu)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984,  cntrygrl,   0,        cntrygrl, cntrygrl, jangou_state,  0,        ROT0, "Royal Denshi",   "Country Girl (Japan set 1)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1984,  cntrygrla,  cntrygrl, cntrygrl, cntrygrl, jangou_state,  0,        ROT0, "Nichibutsu",     "Country Girl (Japan set 2)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1984,  fruitbun,   cntrygrl, cntrygrl, cntrygrl, jangou_state,  0,        ROT0, "Nichibutsu",     "Fruits & Bunny (World?)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1985,  roylcrdn,   0,        roylcrdn, roylcrdn, jangou_state,  0,        ROT0, "Nichibutsu",     "Royal Card (Nichibutsu)", MACHINE_SUPPORTS_SAVE )
 
 /* The following might not run there... */
 GAME( 1984?, luckygrl,   0,        cntrygrl, cntrygrl, jangou_state,  luckygrl, ROT0, "Wing Co., Ltd.", "Lucky Girl? (Wing)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

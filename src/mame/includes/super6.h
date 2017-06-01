@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#pragma once
+#ifndef MAME_INCLUDES_SUPER6_H
+#define MAME_INCLUDES_SUPER6_H
 
-#ifndef __SUPER6__
-#define __SUPER6__
+#pragma once
 
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
@@ -45,22 +45,6 @@ public:
 			m_j7(*this, "J7")
 	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<z80ctc_device> m_ctc;
-	required_device<z80dart_device> m_dart;
-	required_device<z80dma_device> m_dma;
-	required_device<z80pio_device> m_pio;
-	required_device<wd2793_t> m_fdc;
-	required_device<com8116_device> m_brg;
-	required_device<ram_device> m_ram;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
-	required_region_ptr<uint8_t> m_rom;
-	required_ioport m_j7;
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
 	DECLARE_READ8_MEMBER( fdc_r );
 	DECLARE_WRITE8_MEMBER( fdc_w );
 	DECLARE_WRITE8_MEMBER( s100_w );
@@ -71,17 +55,35 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
 
-	void bankswitch();
-
-	// memory state
-	uint8_t m_s100;
-	uint8_t m_bank0;
-	uint8_t m_bank1;
 	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
 	DECLARE_READ8_MEMBER(memory_read_byte);
 	DECLARE_WRITE8_MEMBER(memory_write_byte);
 	DECLARE_READ8_MEMBER(io_read_byte);
 	DECLARE_WRITE8_MEMBER(io_write_byte);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	void bankswitch();
+
+	required_device<cpu_device> m_maincpu;
+	required_device<z80ctc_device> m_ctc;
+	required_device<z80dart_device> m_dart;
+	required_device<z80dma_device> m_dma;
+	required_device<z80pio_device> m_pio;
+	required_device<wd2793_device> m_fdc;
+	required_device<com8116_device> m_brg;
+	required_device<ram_device> m_ram;
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
+	required_region_ptr<uint8_t> m_rom;
+	required_ioport m_j7;
+
+	// memory state
+	uint8_t m_s100;
+	uint8_t m_bank0;
+	uint8_t m_bank1;
 };
 
-#endif
+#endif // MAME_INCLUDES_SUPER6_H

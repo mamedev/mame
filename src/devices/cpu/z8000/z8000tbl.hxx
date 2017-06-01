@@ -8,7 +8,7 @@
  *
  *****************************************************************************/
 
-static const Z8000_init table[] = {
+const z8002_device::Z8000_init z8002_device::table[] = {
 {0x0000,0x000f, 1,2,  7,&z8002_device::Z00_0000_dddd_imm8,                      "addb    %rb3,%#b3",               0},
 {0x0010,0x00ff, 1,1,  7,&z8002_device::Z00_ssN0_dddd,                           "addb    %rb3,@%rw2",              0},
 {0x0100,0x010f, 1,2,  7,&z8002_device::Z01_0000_dddd_imm16,                     "add     %rw3,%#w1",               0},
@@ -347,16 +347,16 @@ static const Z8000_init table[] = {
 {0x7d01,0x7df1,16,1,  7,&z8002_device::Z7D_dddd_0ccc,                           "ldctl   %rw2,ctrl1",              0},
 {0x7d02,0x7df2,16,1,  7,&z8002_device::Z7D_dddd_0ccc,                           "ldctl   %rw2,fcw",                0},
 {0x7d03,0x7df3,16,1,  7,&z8002_device::Z7D_dddd_0ccc,                           "ldctl   %rw2,refresh",            0},
-{0x7d04,0x7df4,16,1,  7,&z8002_device::Z7D_dddd_0ccc,                           "ldctl   %rw2,psapseg",                0},
-{0x7d05,0x7df5,16,1,  7,&z8002_device::Z7D_dddd_0ccc,                           "ldctl   %rw2,psapoff",                0},
+{0x7d04,0x7df4,16,1,  7,&z8002_device::Z7D_dddd_0ccc,                           "ldctl   %rw2,psapseg",            0},
+{0x7d05,0x7df5,16,1,  7,&z8002_device::Z7D_dddd_0ccc,                           "ldctl   %rw2,psapoff",            0},
 {0x7d06,0x7df6,16,1,  7,&z8002_device::Z7D_dddd_0ccc,                           "ldctl   %rw2,nspseg",             0},
 {0x7d07,0x7df7,16,1,  7,&z8002_device::Z7D_dddd_0ccc,                           "ldctl   %rw2,nspoff",             0},
 {0x7d08,0x7df8,16,1,  7,&z8002_device::Z7D_ssss_1ccc,                           "ldctl   ctrl0,%rw2",              0},
 {0x7d09,0x7df9,16,1,  7,&z8002_device::Z7D_ssss_1ccc,                           "ldctl   ctrl1,%rw2",              0},
 {0x7d0a,0x7dfa,16,1,  7,&z8002_device::Z7D_ssss_1ccc,                           "ldctl   fcw,%rw2",                0},
 {0x7d0b,0x7dfb,16,1,  7,&z8002_device::Z7D_ssss_1ccc,                           "ldctl   refresh,%rw2",            0},
-{0x7d0c,0x7dfc,16,1,  7,&z8002_device::Z7D_ssss_1ccc,                           "ldctl   psapseg,%rw2",                0},
-{0x7d0d,0x7dfd,16,1,  7,&z8002_device::Z7D_ssss_1ccc,                           "ldctl   psapoff,%rw2",                0},
+{0x7d0c,0x7dfc,16,1,  7,&z8002_device::Z7D_ssss_1ccc,                           "ldctl   psapseg,%rw2",            0},
+{0x7d0d,0x7dfd,16,1,  7,&z8002_device::Z7D_ssss_1ccc,                           "ldctl   psapoff,%rw2",            0},
 {0x7d0e,0x7dfe,16,1,  7,&z8002_device::Z7D_ssss_1ccc,                           "ldctl   nspseg,%rw2",             0},
 {0x7d0f,0x7dff,16,1,  7,&z8002_device::Z7D_ssss_1ccc,                           "ldctl   nspoff,%rw2",             0},
 {0x7e00,0x7eff, 1,1, 10,&z8002_device::Z7E_imm8,                                "rsvd7e  %#b1",                    0},
@@ -527,17 +527,21 @@ static const Z8000_init table[] = {
 {0xfd80,0xfdff, 1,1, 11,&z8002_device::ZF_dddd_1dsp7,                           "djnz    %rw1,%d0",                DASMFLAG_STEP_OVER},
 {0xfe80,0xfeff, 1,1, 11,&z8002_device::ZF_dddd_1dsp7,                           "djnz    %rw1,%d0",                DASMFLAG_STEP_OVER},
 {0xff80,0xffff, 1,1, 11,&z8002_device::ZF_dddd_1dsp7,                           "djnz    %rw1,%d0",                DASMFLAG_STEP_OVER},
-{0,     0,      0,0,  0,nullptr,                                   nullptr,                               0}
+{0,     0,      0,0,  0,nullptr,                                                nullptr,                           0}
 };
 
 
-void z8000_init_tables(void)
+void z8002_device::init_tables()
 {
+	/* already initialized? */
+	if (z8000_exec)
+		return;
+
 	const Z8000_init *init;
 	int i;
 
 	/* allocate the opcode execution and disassembler array */
-	z8000_exec = global_alloc_array(Z8000_exec, 0x10000);
+	std::unique_ptr<Z8000_exec []> exec(new Z8000_exec[0x10000]);
 
 	/* set up the zero, sign, parity lookup table */
 	for (i = 0; i < 256; i++)
@@ -548,11 +552,11 @@ void z8000_init_tables(void)
 	/* first set all 64K opcodes to invalid */
 	for (i = 0; i < 0x10000; i++)
 	{
-		z8000_exec[i].opcode = &z8002_device::zinvalid;
-		z8000_exec[i].cycles = 4;
-		z8000_exec[i].size   = 1;
-		z8000_exec[i].dasm   = ".word   %#w0";
-		z8000_exec[i].dasmflags = 0;
+		exec[i].opcode = &z8002_device::zinvalid;
+		exec[i].cycles = 4;
+		exec[i].size   = 1;
+		exec[i].dasm   = ".word   %#w0";
+		exec[i].dasmflags = 0;
 	}
 
 	/* now decompose the initialization table */
@@ -560,20 +564,28 @@ void z8000_init_tables(void)
 	{
 		for (i = init->beg; i <= init->end; i += init->step)
 		{
-			if (z8000_exec[i].opcode != &z8002_device::zinvalid)
-				osd_printf_error("Z8000 opcode %04x clash '%s'\n", i, z8000_exec[i].dasm);
+			if (exec[i].opcode != &z8002_device::zinvalid)
+				osd_printf_error("Z8000 opcode %04x clash '%s'\n", i, exec[i].dasm);
 
-			z8000_exec[i].opcode = init->opcode;
-			z8000_exec[i].cycles = init->cycles;
-			z8000_exec[i].size   = init->size;
-			z8000_exec[i].dasm   = init->dasm;
-			z8000_exec[i].dasmflags = init->dasmflags;
+			exec[i].opcode = init->opcode;
+			exec[i].cycles = init->cycles;
+			exec[i].size   = init->size;
+			exec[i].dasm   = init->dasm;
+			exec[i].dasmflags = init->dasmflags;
 		}
 	}
+
+	z8000_exec = std::move(exec);
 }
 
-void z8000_deinit_tables(void)
+void z8002_device::deinit_tables()
 {
-	global_free_array( z8000_exec );
 	z8000_exec = nullptr;
+}
+
+z8002_device::Z8000_dasm z8002_device::dasm(unsigned w)
+{
+	init_tables();
+	Z8000_exec const &exec(z8000_exec[w]);
+	return Z8000_dasm{ exec.dasm, exec.dasmflags, exec.size };
 }

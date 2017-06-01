@@ -5,15 +5,12 @@
  *
  */
 
-#ifndef _NCR539x_H_
-#define _NCR539x_H_
+#ifndef MAME_MACHINE_NCR539X_H
+#define MAME_MACHINE_NCR539X_H
+
+#pragma once
 
 #include "legscsi.h"
-
-//// 539x registers
-//enum
-//{
-//};
 
 // device stuff
 
@@ -29,8 +26,8 @@ public:
 	// construction/destruction
 	ncr539x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_out_irq_callback(device_t &device, _Object object) { return downcast<ncr539x_device &>(device).m_out_irq_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_drq_callback(device_t &device, _Object object) { return downcast<ncr539x_device &>(device).m_out_drq_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_out_irq_callback(device_t &device, Object &&cb) { return downcast<ncr539x_device &>(device).m_out_irq_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_drq_callback(device_t &device, Object &&cb) { return downcast<ncr539x_device &>(device).m_out_drq_cb.set_callback(std::forward<Object>(cb)); }
 
 	// our API
 	DECLARE_READ8_MEMBER(read);
@@ -86,5 +83,6 @@ private:
 };
 
 // device type definition
-extern const device_type NCR539X;
-#endif
+DECLARE_DEVICE_TYPE(NCR539X, ncr539x_device)
+
+#endif // MAME_MACHINE_NCR539X_H

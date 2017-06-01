@@ -87,10 +87,10 @@ constexpr u16 M68705_INT_MASK           = 0x03;
  * Global variables
  ****************************************************************************/
 
-device_type const M68705P3 = device_creator<m68705p3_device>;
-device_type const M68705P5 = device_creator<m68705p5_device>;
-device_type const M68705R3 = device_creator<m68705r3_device>;
-device_type const M68705U3 = device_creator<m68705u3_device>;
+DEFINE_DEVICE_TYPE(M68705P3, m68705p3_device, "m68705p3", "MC68705P3")
+DEFINE_DEVICE_TYPE(M68705P5, m68705p5_device, "m68705p5", "MC68705P5")
+DEFINE_DEVICE_TYPE(M68705R3, m68705r3_device, "m68705r3", "MC68705R3")
+DEFINE_DEVICE_TYPE(M68705U3, m68705u3_device, "m68705u3", "MC68705U3")
 
 
 /****************************************************************************
@@ -191,22 +191,16 @@ m68705_device::m68705_device(
 		device_t *owner,
 		u32 clock,
 		device_type type,
-		char const *name,
 		u32 addr_width,
-		address_map_delegate internal_map,
-		char const *shortname,
-		char const *source)
+		address_map_delegate internal_map)
 	: m6805_base_device(
 			mconfig,
 			tag,
 			owner,
 			clock,
 			type,
-			name,
 			{ s_hmos_ops, s_hmos_cycles, addr_width, 0x007f, 0x0060, M68705_VECTOR_SWI },
-			internal_map,
-			shortname,
-			source)
+			internal_map)
 	, device_nvram_interface(mconfig, *this)
 	, m_user_rom(*this, DEVICE_SELF, u32(1) << addr_width)
 	, m_port_open_drain{ false, false, false, false }
@@ -680,11 +674,8 @@ m68705p_device::m68705p_device(
 		char const *tag,
 		device_t *owner,
 		u32 clock,
-		device_type type,
-		char const *name,
-		char const *shortname,
-		char const *source)
-	: m68705_device(mconfig, tag, owner, clock, type, name, 11, address_map_delegate(FUNC(m68705p_device::p_map), this), shortname, source)
+		device_type type)
+	: m68705_device(mconfig, tag, owner, clock, type, 11, address_map_delegate(FUNC(m68705p_device::p_map), this))
 {
 	set_port_open_drain<0>(true);   // Port A is open drain with internal pull-ups
 	set_port_mask<2>(0xf0);         // Port C is four bits wide
@@ -751,11 +742,8 @@ m68705u_device::m68705u_device(
 		device_t *owner,
 		u32 clock,
 		device_type type,
-		char const *name,
-		address_map_delegate internal_map,
-		char const *shortname,
-		char const *source)
-	: m68705_device(mconfig, tag, owner, clock, type, name, 12, internal_map, shortname, source)
+		address_map_delegate internal_map)
+	: m68705_device(mconfig, tag, owner, clock, type, 12, internal_map)
 {
 	set_port_open_drain<0>(true);   // Port A is open drain with internal pull-ups
 }
@@ -765,11 +753,8 @@ m68705u_device::m68705u_device(
 		char const *tag,
 		device_t *owner,
 		u32 clock,
-		device_type type,
-		char const *name,
-		char const *shortname,
-		char const *source)
-	: m68705u_device(mconfig, tag, owner, clock, type, name, address_map_delegate(FUNC(m68705u_device::u_map), this), shortname, source)
+		device_type type)
+	: m68705u_device(mconfig, tag, owner, clock, type, address_map_delegate(FUNC(m68705u_device::u_map), this))
 {
 }
 
@@ -837,11 +822,8 @@ m68705r_device::m68705r_device(
 		char const *tag,
 		device_t *owner,
 		u32 clock,
-		device_type type,
-		char const *name,
-		char const *shortname,
-		char const *source)
-	: m68705u_device(mconfig, tag, owner, clock, type, name, address_map_delegate(FUNC(m68705r_device::r_map), this), shortname, source)
+		device_type type)
+	: m68705u_device(mconfig, tag, owner, clock, type, address_map_delegate(FUNC(m68705r_device::r_map), this))
 {
 }
 
@@ -868,7 +850,7 @@ offs_t m68705r_device::disasm_disassemble(
  ****************************************************************************/
 
 m68705p3_device::m68705p3_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
-	: m68705p_device(mconfig, tag, owner, clock, M68705P3, "MC68705P3", "m68705p3", __FILE__)
+	: m68705p_device(mconfig, tag, owner, clock, M68705P3)
 {
 }
 
@@ -888,7 +870,7 @@ u8 m68705p3_device::get_mask_options() const
  ****************************************************************************/
 
 m68705p5_device::m68705p5_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
-	: m68705p_device(mconfig, tag, owner, clock, M68705P5, "MC68705P5", "m68705p5", __FILE__)
+	: m68705p_device(mconfig, tag, owner, clock, M68705P5)
 {
 }
 
@@ -908,7 +890,7 @@ u8 m68705p5_device::get_mask_options() const
  ****************************************************************************/
 
 m68705r3_device::m68705r3_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
-	: m68705r_device(mconfig, tag, owner, clock, M68705R3, "MC68705R3", "m68705r3", __FILE__)
+	: m68705r_device(mconfig, tag, owner, clock, M68705R3)
 {
 }
 
@@ -928,7 +910,7 @@ u8 m68705r3_device::get_mask_options() const
  ****************************************************************************/
 
 m68705u3_device::m68705u3_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
-	: m68705u_device(mconfig, tag, owner, clock, M68705U3, "MC68705U3", "m68705u3", __FILE__)
+	: m68705u_device(mconfig, tag, owner, clock, M68705U3)
 {
 }
 

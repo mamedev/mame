@@ -8,8 +8,8 @@
 
 *********************************************************************/
 
-#ifndef __BCREADER_H_
-#define __BCREADER_H_
+#ifndef MAME_DEVICES_MACHINE_BCREADER_H
+#define MAME_DEVICES_MACHINE_BCREADER_H
 
 #define MCFG_BARCODE_READER_ADD( _tag ) \
 	MCFG_DEVICE_ADD( _tag, BARCODE_READER, 0 )
@@ -51,10 +51,10 @@ protected:
 
 
 // device type definition
-extern const device_type BARCODE_READER;
+DECLARE_DEVICE_TYPE(BARCODE_READER, barcode_reader_device)
 
 // device type iterator
 typedef device_type_iterator<barcode_reader_device> barcode_reader_device_iterator;
 
 
-#endif
+#endif // MAME_DEVICES_MACHINE_BCREADER_H

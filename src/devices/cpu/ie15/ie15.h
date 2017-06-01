@@ -1,27 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:Sergey Svishchev
-#ifndef __IE15_H__
-#define __IE15_H__
+#ifndef MAME_CPU_IE15_IE15_H
+#define MAME_CPU_IE15_IE15_H
 
-//**************************************************************************
-//  ENUMERATIONS
-//**************************************************************************
-
-enum
-{
-	IE15_PC,
-	IE15_A,
-	IE15_R0, IE15_R1, IE15_R2, IE15_R3, IE15_R4, IE15_R5, IE15_R6, IE15_R7,
-	IE15_R8, IE15_R9, IE15_R10, IE15_R11, IE15_R12, IE15_R13, IE15_R14, IE15_R15,
-	IE15_R16, IE15_R17, IE15_R18, IE15_R19, IE15_R20, IE15_R21, IE15_R22, IE15_R23,
-	IE15_R24, IE15_R25, IE15_R26, IE15_R27, IE15_R28, IE15_R29, IE15_R30, IE15_R31
-};
+#pragma once
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
-
-class ie15_cpu_device;
 
 class ie15_cpu_device : public cpu_device
 {
@@ -30,6 +16,16 @@ public:
 	ie15_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
+	enum
+	{
+		IE15_PC,
+		IE15_A,
+		IE15_R0, IE15_R1, IE15_R2, IE15_R3, IE15_R4, IE15_R5, IE15_R6, IE15_R7,
+		IE15_R8, IE15_R9, IE15_R10, IE15_R11, IE15_R12, IE15_R13, IE15_R14, IE15_R15,
+		IE15_R16, IE15_R17, IE15_R18, IE15_R19, IE15_R20, IE15_R21, IE15_R22, IE15_R23,
+		IE15_R24, IE15_R25, IE15_R26, IE15_R27, IE15_R28, IE15_R29, IE15_R30, IE15_R31
+	};
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -84,6 +80,6 @@ protected:
 };
 
 // device type definition
-extern const device_type IE15_CPU;
+DECLARE_DEVICE_TYPE(IE15_CPU, ie15_cpu_device)
 
-#endif
+#endif // MAME_CPU_IE15_IE15_H

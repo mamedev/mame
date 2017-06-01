@@ -15,7 +15,7 @@
 //  DEVICE TYPE DEFINITIONS
 //**************************************************************************
 
-const device_type DS75160A = device_creator<ds75160a_device>;
+DEFINE_DEVICE_TYPE(DS75160A, ds75160a_device, "ds75160a", "DS75160A GPIB Transceiver")
 
 
 
@@ -28,7 +28,7 @@ const device_type DS75160A = device_creator<ds75160a_device>;
 //-------------------------------------------------
 
 ds75160a_device::ds75160a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, DS75160A, "DS75160A", tag, owner, clock, "ds75160a", __FILE__),
+	: device_t(mconfig, DS75160A, tag, owner, clock),
 		m_read(*this),
 		m_write(*this),
 		m_data(0xff),

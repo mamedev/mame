@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_VIP_VP550_H
+#define MAME_BUS_VIP_VP550_H
 
-#ifndef __VP550__
-#define __VP550__
+#pragma once
 
 #include "exp.h"
 #include "sound/cdp1863.h"
@@ -59,7 +59,6 @@ private:
 
 
 // device type definition
-extern const device_type VP550;
+DECLARE_DEVICE_TYPE(VP550, vp550_device)
 
-
-#endif
+#endif // MAME_BUS_VIP_VP550_H

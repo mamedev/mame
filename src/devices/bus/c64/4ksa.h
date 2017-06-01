@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_C64_4KSA_H
+#define MAME_BUS_C64_4KSA_H
 
-#ifndef __C64_4KSA__
-#define __C64_4KSA__
+#pragma once
 
 
 #include "user.h"
@@ -43,7 +43,7 @@ protected:
 
 
 // device type definition
-extern const device_type C64_4KSA;
+DECLARE_DEVICE_TYPE(C64_4KSA, c64_4ksa_device)
 
 
-#endif
+#endif // MAME_BUS_C64_4KSA_H

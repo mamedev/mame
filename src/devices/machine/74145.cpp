@@ -50,7 +50,7 @@
 #include "coreutil.h"
 
 
-const device_type TTL74145 = device_creator<ttl74145_device>;
+DEFINE_DEVICE_TYPE(TTL74145, ttl74145_device, "ttl74145", "TTL74145")
 
 /***************************************************************************
     DEVICE INTERFACE
@@ -60,7 +60,7 @@ const device_type TTL74145 = device_creator<ttl74145_device>;
 //-------------------------------------------------
 
 ttl74145_device::ttl74145_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TTL74145, "TTL74145", tag, owner, clock, "ttl74145", __FILE__)
+	: device_t(mconfig, TTL74145, tag, owner, clock)
 	, m_output_line_0_cb(*this)
 	, m_output_line_1_cb(*this)
 	, m_output_line_2_cb(*this)

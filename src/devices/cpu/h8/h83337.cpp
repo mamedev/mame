@@ -3,13 +3,13 @@
 #include "emu.h"
 #include "h83337.h"
 
-const device_type H83334 = device_creator<h83334_device>;
-const device_type H83336 = device_creator<h83336_device>;
-const device_type H83337 = device_creator<h83337_device>;
+DEFINE_DEVICE_TYPE(H83334, h83334_device, "h83334", "H8/3334")
+DEFINE_DEVICE_TYPE(H83336, h83336_device, "h83336", "H8/3336")
+DEFINE_DEVICE_TYPE(H83337, h83337_device, "h83337", "H8/3337")
 
 
-h83337_device::h83337_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	h8_device(mconfig, type, name, tag, owner, clock, shortname, source, true, address_map_delegate(FUNC(h83337_device::map), this)),
+h83337_device::h83337_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t start) :
+	h8_device(mconfig, type, tag, owner, clock, true, address_map_delegate(FUNC(h83337_device::map), this)),
 	intc(*this, "intc"),
 	adc(*this, "adc"),
 	port1(*this, "port1"),
@@ -27,69 +27,26 @@ h83337_device::h83337_device(const machine_config &mconfig, device_type type, co
 	timer16_0(*this, "timer16:0"),
 	sci0(*this, "sci0"),
 	sci1(*this, "sci1"),
-	watchdog(*this, "watchdog")
+	watchdog(*this, "watchdog"),
+	syscr(0),
+	ram_start(start)
 {
-	syscr = 0;
-	ram_start = 0;
 }
 
 h83337_device::h83337_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	h8_device(mconfig, H83337, "H8/3337", tag, owner, clock, "h83337", __FILE__, true, address_map_delegate(FUNC(h83337_device::map), this)),
-	intc(*this, "intc"),
-	adc(*this, "adc"),
-	port1(*this, "port1"),
-	port2(*this, "port2"),
-	port3(*this, "port3"),
-	port4(*this, "port4"),
-	port5(*this, "port5"),
-	port6(*this, "port6"),
-	port7(*this, "port7"),
-	port8(*this, "port8"),
-	port9(*this, "port9"),
-	timer8_0(*this, "timer8_0"),
-	timer8_1(*this, "timer8_1"),
-	timer16(*this, "timer16"),
-	timer16_0(*this, "timer16:0"),
-	sci0(*this, "sci0"),
-	sci1(*this, "sci1"),
-	watchdog(*this, "watchdog")
+	h83337_device(mconfig, H83337, tag, owner, clock, 0xf780)
 {
-	syscr = 0;
-	ram_start = 0xf780;
 }
 
 h83334_device::h83334_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	h83337_device(mconfig, H83334, "H8/3334", tag, owner, clock, "h83334", __FILE__)
+	h83337_device(mconfig, H83334, tag, owner, clock, 0xfb80)
 {
-	ram_start = 0xfb80;
 }
 
 h83336_device::h83336_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	h83337_device(mconfig, H83336, "H8/3336", tag, owner, clock, "h83336", __FILE__)
+	h83337_device(mconfig, H83336, tag, owner, clock, 0xf780)
 {
-	ram_start = 0xf780;
 }
-
-static MACHINE_CONFIG_FRAGMENT(h83337)
-	MCFG_H8_INTC_ADD("intc")
-	MCFG_H8_ADC_3337_ADD("adc", "intc", 35)
-	MCFG_H8_PORT_ADD("port1", h8_device::PORT_1, 0x00, 0x00)
-	MCFG_H8_PORT_ADD("port2", h8_device::PORT_2, 0x00, 0x00)
-	MCFG_H8_PORT_ADD("port3", h8_device::PORT_3, 0x00, 0x00)
-	MCFG_H8_PORT_ADD("port4", h8_device::PORT_4, 0x00, 0x00)
-	MCFG_H8_PORT_ADD("port5", h8_device::PORT_5, 0xf8, 0xf8)
-	MCFG_H8_PORT_ADD("port6", h8_device::PORT_6, 0x00, 0x00)
-	MCFG_H8_PORT_ADD("port7", h8_device::PORT_7, 0x00, 0x00)
-	MCFG_H8_PORT_ADD("port8", h8_device::PORT_8, 0x80, 0x80)
-	MCFG_H8_PORT_ADD("port9", h8_device::PORT_9, 0x00, 0x00)
-	MCFG_H8_TIMER8_CHANNEL_ADD("timer8_0", "intc", 19, 20, 21, 8, 2, 64, 32, 1024, 256)
-	MCFG_H8_TIMER8_CHANNEL_ADD("timer8_1", "intc", 22, 23, 24, 8, 2, 64, 128, 1024, 2048)
-	MCFG_H8_TIMER16_ADD("timer16", 1, 0xff)
-	MCFG_H8_TIMER16_CHANNEL_ADD("timer16:0", 4, 0, "intc", 32)
-	MCFG_H8_SCI_ADD("sci0", "intc", 27, 28, 29, 30)
-	MCFG_H8_SCI_ADD("sci1", "intc", 31, 32, 33, 34)
-	MCFG_H8_WATCHDOG_ADD("watchdog", "intc", 36, h8_watchdog_device::B)
-MACHINE_CONFIG_END
 
 DEVICE_ADDRESS_MAP_START(map, 16, h83337_device)
 	AM_RANGE(ram_start, 0xff7f) AM_RAM
@@ -157,10 +114,26 @@ DEVICE_ADDRESS_MAP_START(map, 16, h83337_device)
 	AM_RANGE(0xfff2, 0xfff3) AM_DEVREADWRITE8("port6",     h8_port_device,            pcr_r,   pcr_w,   0xff00)
 ADDRESS_MAP_END
 
-machine_config_constructor h83337_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME(h83337);
-}
+MACHINE_CONFIG_MEMBER(h83337_device::device_add_mconfig)
+	MCFG_H8_INTC_ADD("intc")
+	MCFG_H8_ADC_3337_ADD("adc", "intc", 35)
+	MCFG_H8_PORT_ADD("port1", h8_device::PORT_1, 0x00, 0x00)
+	MCFG_H8_PORT_ADD("port2", h8_device::PORT_2, 0x00, 0x00)
+	MCFG_H8_PORT_ADD("port3", h8_device::PORT_3, 0x00, 0x00)
+	MCFG_H8_PORT_ADD("port4", h8_device::PORT_4, 0x00, 0x00)
+	MCFG_H8_PORT_ADD("port5", h8_device::PORT_5, 0xf8, 0xf8)
+	MCFG_H8_PORT_ADD("port6", h8_device::PORT_6, 0x00, 0x00)
+	MCFG_H8_PORT_ADD("port7", h8_device::PORT_7, 0x00, 0x00)
+	MCFG_H8_PORT_ADD("port8", h8_device::PORT_8, 0x80, 0x80)
+	MCFG_H8_PORT_ADD("port9", h8_device::PORT_9, 0x00, 0x00)
+	MCFG_H8_TIMER8_CHANNEL_ADD("timer8_0", "intc", 19, 20, 21, 8, 2, 64, 32, 1024, 256)
+	MCFG_H8_TIMER8_CHANNEL_ADD("timer8_1", "intc", 22, 23, 24, 8, 2, 64, 128, 1024, 2048)
+	MCFG_H8_TIMER16_ADD("timer16", 1, 0xff)
+	MCFG_H8_TIMER16_CHANNEL_ADD("timer16:0", 4, 0, "intc", 32)
+	MCFG_H8_SCI_ADD("sci0", "intc", 27, 28, 29, 30)
+	MCFG_H8_SCI_ADD("sci1", "intc", 31, 32, 33, 34)
+	MCFG_H8_WATCHDOG_ADD("watchdog", "intc", 36, h8_watchdog_device::B)
+MACHINE_CONFIG_END
 
 void h83337_device::execute_set_input(int inputnum, int state)
 {

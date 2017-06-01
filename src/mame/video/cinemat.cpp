@@ -86,7 +86,7 @@ WRITE8_MEMBER(cinemat_state::cinemat_vector_control_w)
 			/* X register as the intensity */
 			if (data != m_last_control && data)
 			{
-				int xval = cpu->state_int(CCPU_X) & 0x0f;
+				int xval = cpu->state_int(ccpu_cpu_device::CCPU_X) & 0x0f;
 				i = (xval + 1) * 255 / 16;
 				m_vector_color = rgb_t(i,i,i);
 			}
@@ -97,7 +97,7 @@ WRITE8_MEMBER(cinemat_state::cinemat_vector_control_w)
 			/* X register as the intensity */
 			if (data != m_last_control && data)
 			{
-				int xval = cpu->state_int(CCPU_X);
+				int xval = cpu->state_int(ccpu_cpu_device::CCPU_X);
 				xval = (~xval >> 2) & 0x3f;
 				i = (xval + 1) * 255 / 64;
 				m_vector_color = rgb_t(i,i,i);
@@ -109,7 +109,7 @@ WRITE8_MEMBER(cinemat_state::cinemat_vector_control_w)
 			/* as 4-4-4 BGR values */
 			if (data != m_last_control && data)
 			{
-				int xval = cpu->state_int(CCPU_X);
+				int xval = cpu->state_int(ccpu_cpu_device::CCPU_X);
 				r = (~xval >> 0) & 0x0f;
 				r = r * 255 / 15;
 				g = (~xval >> 4) & 0x0f;
@@ -128,15 +128,15 @@ WRITE8_MEMBER(cinemat_state::cinemat_vector_control_w)
 				/* on an IV instruction if data == 0 here */
 				if (data != m_last_control && !data)
 				{
-					m_qb3_lastx = cpu->state_int(CCPU_X);
-					m_qb3_lasty = cpu->state_int(CCPU_Y);
+					m_qb3_lastx = cpu->state_int(ccpu_cpu_device::CCPU_X);
+					m_qb3_lasty = cpu->state_int(ccpu_cpu_device::CCPU_Y);
 				}
 
 				/* on the rising edge of the data value, latch the Y register */
 				/* as 2-3-3 BGR values */
 				if (data != m_last_control && data)
 				{
-					int yval = cpu->state_int(CCPU_Y);
+					int yval = cpu->state_int(ccpu_cpu_device::CCPU_Y);
 					r = (~yval >> 0) & 0x07;
 					r = r * 255 / 7;
 					g = (~yval >> 3) & 0x07;
@@ -146,8 +146,8 @@ WRITE8_MEMBER(cinemat_state::cinemat_vector_control_w)
 					m_vector_color = rgb_t(r,g,b);
 
 					/* restore the original X,Y values */
-					cpu->set_state_int(CCPU_X, m_qb3_lastx);
-					cpu->set_state_int(CCPU_Y, m_qb3_lasty);
+					cpu->set_state_int(ccpu_cpu_device::CCPU_X, m_qb3_lastx);
+					cpu->set_state_int(ccpu_cpu_device::CCPU_Y, m_qb3_lasty);
 				}
 			}
 			break;

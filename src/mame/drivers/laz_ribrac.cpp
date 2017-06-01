@@ -46,7 +46,7 @@ void laz_ribrac_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( laz_ribrac, laz_ribrac_state )
+static MACHINE_CONFIG_START( laz_ribrac )
 
 	/* basic machine hardware */
 //  MCFG_CPU_ADD("maincpu", ??, 8000000) // unknown
@@ -56,7 +56,7 @@ static MACHINE_CONFIG_START( laz_ribrac, laz_ribrac_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH) // maybe
+	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH) // maybe
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -79,4 +79,4 @@ ROM_START( ribrac )
 	ROM_LOAD( "RIBBITR_SND.U11", 0x30000, 0x10000, NO_DUMP )
 ROM_END
 
-GAME( 1993, ribrac,  0,    laz_ribrac, laz_ribrac, driver_device,  0, ROT0, "Lazer-tron", "Ribbit Racing (Lazer-tron)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1993, ribrac,  0,    laz_ribrac, laz_ribrac, laz_ribrac_state,  0, ROT0, "Lazer-tron", "Ribbit Racing (Lazer-tron)", MACHINE_IS_SKELETON_MECHANICAL )

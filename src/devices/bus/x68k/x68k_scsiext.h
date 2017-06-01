@@ -6,11 +6,13 @@
  *  Created on: 5/06/2012
  */
 
-#ifndef X68K_SCSIEXT_H_
-#define X68K_SCSIEXT_H_
+#ifndef MAME_BUS_X68K_X68K_SCSIEXT_H
+#define MAME_BUS_X68K_X68K_SCSIEXT_H
 
-#include "machine/mb89352.h"
+#pragma once
+
 #include "x68kexp.h"
+#include "machine/mb89352.h"
 
 class x68k_scsiext_device : public device_t,
 							public device_x68k_expansion_card_interface
@@ -32,6 +34,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
 private:
 	x68k_expansion_slot_device *m_slot;
 
@@ -39,7 +42,6 @@ private:
 };
 
 // device type definition
-extern const device_type X68K_SCSIEXT;
+DECLARE_DEVICE_TYPE(X68K_SCSIEXT, x68k_scsiext_device)
 
-
-#endif /* X68K_SCSIEXT_H_ */
+#endif // MAME_BUS_X68K_X68K_SCSIEXT_H

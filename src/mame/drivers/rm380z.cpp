@@ -183,7 +183,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( rm380z_io , AS_IO, 8, rm380z_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0xbf) AM_READWRITE(rm380z_portlow_r, rm380z_portlow_w)
-	AM_RANGE(0xc0, 0xc3) AM_DEVREADWRITE("wd1771", fd1771_t, read, write)
+	AM_RANGE(0xc0, 0xc3) AM_DEVREADWRITE("wd1771", fd1771_device, read, write)
 	AM_RANGE(0xc4, 0xc4) AM_WRITE(disk_0_control)
 	AM_RANGE(0xc5, 0xff) AM_READWRITE(rm380z_porthi_r, rm380z_porthi_w)
 ADDRESS_MAP_END
@@ -228,7 +228,7 @@ uint32_t rm380z_state::screen_update_rm380z(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-static MACHINE_CONFIG_START( rm380z, rm380z_state )
+static MACHINE_CONFIG_START( rm380z )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(RM380Z_MAINCPU_TAG, Z80, XTAL_16MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(rm380z_mem)
@@ -265,10 +265,10 @@ static MACHINE_CONFIG_START( rm380z, rm380z_state )
 
 	/* keyboard */
 	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(WRITE8(rm380z_state, keyboard_put))
+	MCFG_GENERIC_KEYBOARD_CB(PUT(rm380z_state, keyboard_put))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( rm480z, rm380z_state )
+static MACHINE_CONFIG_START( rm480z )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(RM380Z_MAINCPU_TAG, Z80, XTAL_16MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(rm480z_mem)
@@ -288,7 +288,7 @@ static MACHINE_CONFIG_START( rm480z, rm380z_state )
 
 	/* keyboard */
 //  MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-//  MCFG_GENERIC_KEYBOARD_CB(WRITE8(rm380z_state, keyboard_put))
+//  MCFG_GENERIC_KEYBOARD_CB(PUT(rm380z_state, keyboard_put))
 MACHINE_CONFIG_END
 
 
@@ -345,10 +345,10 @@ ROM_END
 
 
 /* Driver */
-/*   YEAR  NAME        PARENT    COMPAT   MACHINE     INPUT     CLASS            INIT        COMPANY                 FULLNAME */
-COMP(1978, rm380z,      0,         0,     rm380z,     rm380z,   rm380z_state,    rm380z,     "Research Machines",    "RM-380Z, COS 4.0B", MACHINE_NO_SOUND_HW)
-COMP(1978, rm380z34d,   rm380z,    0,     rm380z,     rm380z,   rm380z_state,    rm380z34d,  "Research Machines",    "RM-380Z, COS 3.4D", MACHINE_BTANB_FLAGS)
-COMP(1978, rm380z34e,   rm380z,    0,     rm380z,     rm380z,   rm380z_state,    rm380z34e,  "Research Machines",    "RM-380Z, COS 3.4E", MACHINE_BTANB_FLAGS)
-COMP(1981, rm480z,      rm380z,    0,     rm480z,     rm380z,   rm380z_state,    rm380z34e,  "Research Machines",    "LINK RM-480Z (set 1)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP(1981, rm480za,     rm380z,    0,     rm480z,     rm380z,   rm380z_state,    rm380z34e,  "Research Machines",    "LINK RM-480Z (set 2)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//   YEAR  NAME        PARENT    COMPAT  MACHINE     INPUT     CLASS            INIT        COMPANY                 FULLNAME                FLAGS
+COMP(1978, rm380z,     0,         0,     rm380z,     rm380z,   rm380z_state,    rm380z,     "Research Machines",    "RM-380Z, COS 4.0B",    MACHINE_NO_SOUND_HW)
+COMP(1978, rm380z34d,  rm380z,    0,     rm380z,     rm380z,   rm380z_state,    rm380z34d,  "Research Machines",    "RM-380Z, COS 3.4D",    MACHINE_BTANB_FLAGS)
+COMP(1978, rm380z34e,  rm380z,    0,     rm380z,     rm380z,   rm380z_state,    rm380z34e,  "Research Machines",    "RM-380Z, COS 3.4E",    MACHINE_BTANB_FLAGS)
+COMP(1981, rm480z,     rm380z,    0,     rm480z,     rm380z,   rm380z_state,    rm380z34e,  "Research Machines",    "LINK RM-480Z (set 1)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP(1981, rm480za,    rm380z,    0,     rm480z,     rm380z,   rm380z_state,    rm380z34e,  "Research Machines",    "LINK RM-480Z (set 2)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 

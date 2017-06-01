@@ -157,7 +157,7 @@ void abc80_state::draw_scanline(bitmap_rgb32 &bitmap, int y)
 void abc80_state::video_start()
 {
 	m_screen->register_screen_bitmap(m_bitmap);
-	
+
 	// start timers
 	m_scanline_timer = timer_alloc(TIMER_ID_SCANLINE);
 	m_scanline_timer->adjust(m_screen->time_until_pos(0, ABC80_HBEND), 0, m_screen->scan_period());
@@ -189,10 +189,10 @@ uint32_t abc80_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( abc80_video )
+//  MACHINE_CONFIG_START( abc80_video )
 //-------------------------------------------------
 
-MACHINE_CONFIG_FRAGMENT( abc80_video )
+MACHINE_CONFIG_START( abc80_video )
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(abc80_state, screen_update)
 

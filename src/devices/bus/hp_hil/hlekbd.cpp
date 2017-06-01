@@ -9,11 +9,13 @@
     DEVICE TYPE GLOBALS
 ***************************************************************************/
 
-device_type const HP_IPC_HLE_KEYBOARD    = device_creator<bus::hp_hil::hle_hp_ipc_device>;
+DEFINE_DEVICE_TYPE_NS(HP_IPC_HLE_KEYBOARD, bus::hp_hil, hle_hp_ipc_device, "hp_ipc_hle_kbd", "HP Integral Keyboard (HLE)")
 
 
 namespace bus { namespace hp_hil {
+
 namespace {
+
 /***************************************************************************
     INPUT PORT DEFINITIONS
 ***************************************************************************/
@@ -228,8 +230,8 @@ INPUT_PORTS_END
     designated device constructor
 --------------------------------------------------*/
 
-hle_device_base::hle_device_base(machine_config const &mconfig, device_type type, char const *name, char const *tag, device_t *owner, uint32_t clock, char const *shortname, char const *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+hle_device_base::hle_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, device_hp_hil_interface(mconfig, *this)
 	, device_matrix_keyboard_interface(mconfig, *this, "COL1", "COL2", "COL3", "COL4", "COL5", "COL6", "COL7", "COL8", "COL9", "COL10", "COL11", "COL12", "COL13", "COL14", "COL15")
 { }
@@ -288,7 +290,7 @@ void hle_device_base::device_timer(emu_timer &timer, device_timer_id id, int par
 void hle_device_base::hil_write(uint16_t data)
 {
 	int frames = 0;
-//	printf("rx from mlc %04X (%s %02X)\n", data, BIT(data, 11) ? "command" : "data", data & 255);
+//  printf("rx from mlc %04X (%s %02X)\n", data, BIT(data, 11) ? "command" : "data", data & 255);
 
 	if (BIT(data, 11)) switch (data & 255)
 	{
@@ -314,7 +316,7 @@ void hle_device_base::hil_write(uint16_t data)
 	case HPHIL_POL:
 		if (!m_fifo.empty())
 		{
-			m_hp_hil_mlc->hil_write(m_device_id16 | 0x40);	// Keycode Set 1, no coordinate data
+			m_hp_hil_mlc->hil_write(m_device_id16 | 0x40);  // Keycode Set 1, no coordinate data
 			frames = 1;
 			while (!m_fifo.empty())
 			{
@@ -348,18 +350,18 @@ void hle_device_base::hil_write(uint16_t data)
 
 	if (!m_passthru)
 		m_hp_hil_mlc->hil_write(data);
-//	else
-//		m_next->hil_write(data);
+//  else
+//      m_next->hil_write(data);
 }
 
 void hle_device_base::transmit_byte(uint8_t byte)
 {
 	if (!m_fifo.full()) {
-//		printf("queuing %02X\n", byte);
+//      printf("queuing %02X\n", byte);
 		m_fifo.enqueue(byte);
 	}
-//	else
-//		printf("queuing fail (fifo full)\n");
+//  else
+//      printf("queuing fail (fifo full)\n");
 }
 
 /*--------------------------------------------------
@@ -394,7 +396,7 @@ void hle_device_base::key_break(uint8_t row, uint8_t column)
 --------------------------------------------------*/
 
 hle_hp_ipc_device::hle_hp_ipc_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
-	: hle_device_base(mconfig, HP_IPC_HLE_KEYBOARD, "HP Integral Keyboard (HLE)", tag, owner, clock, "hp_ipc_hle_kbd", __FILE__)
+	: hle_device_base(mconfig, HP_IPC_HLE_KEYBOARD, tag, owner, clock)
 { }
 
 

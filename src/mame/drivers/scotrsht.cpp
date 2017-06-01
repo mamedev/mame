@@ -184,7 +184,7 @@ static GFXDECODE_START( scotrsht )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 16*16*8, 16*8 ) /* sprites */
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( scotrsht, scotrsht_state )
+static MACHINE_CONFIG_START( scotrsht )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 18432000/6)        /* 3.072 MHz */
@@ -251,4 +251,4 @@ ROM_START( scotrsht )
 	ROM_LOAD( "gx545_6301_8f.bin", 0x0400, 0x0100, CRC(c1c7cf58) SHA1(08452228bf13e43ce4a05806f79e9cd1542416f1) ) /* sprites lookup */
 ROM_END
 
-GAME( 1985, scotrsht, 0, scotrsht, scotrsht, driver_device, 0, ROT90,"Konami", "Scooter Shooter", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, scotrsht, 0, scotrsht, scotrsht, scotrsht_state, 0, ROT90,"Konami", "Scooter Shooter", MACHINE_SUPPORTS_SAVE )

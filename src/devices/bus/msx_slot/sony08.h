@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol
-#ifndef __MSX_SLOT_SONY08_H
-#define __MSX_SLOT_SONY08_H
+#ifndef MAME_BUS_MSX_SLOT_SONY08_H
+#define MAME_BUS_MSX_SLOT_SONY08_H
+
+#pragma once
 
 #include "slot.h"
 #include "machine/nvram.h"
@@ -23,11 +25,13 @@ public:
 	// static configuration helpers
 	static void set_rom_start(device_t &device, const char *region, uint32_t offset);
 
-	virtual void device_start() override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	virtual DECLARE_READ8_MEMBER(read) override;
 	virtual DECLARE_WRITE8_MEMBER(write) override;
+
+protected:
+	virtual void device_start() override;
 
 	void restore_banks();
 
@@ -44,4 +48,4 @@ private:
 };
 
 
-#endif
+#endif // MAME_BUS_MSX_SLOT_SONY08_H

@@ -28,8 +28,6 @@ ft5_v6_c4.u58 /
 
 */
 
-#define NVRAM_HACK 1
-
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
@@ -38,6 +36,8 @@ ft5_v6_c4.u58 /
 #include "screen.h"
 #include "speaker.h"
 
+
+#define NVRAM_HACK 1
 
 class koftball_state : public driver_device
 {
@@ -228,7 +228,7 @@ static GFXDECODE_START( koftball )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( koftball, koftball_state )
+static MACHINE_CONFIG_START( koftball )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_21_4772MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(koftball_mem)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", koftball_state, bmc_interrupt, "screen", 0, 1)
@@ -252,7 +252,7 @@ static MACHINE_CONFIG_START( koftball, koftball_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
-	MCFG_OKIM6295_ADD("oki", 1122000, OKIM6295_PIN7_LOW) /* clock frequency & pin 7 not verified */
+	MCFG_OKIM6295_ADD("oki", 1122000, PIN7_LOW) /* clock frequency & pin 7 not verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END

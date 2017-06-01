@@ -21,17 +21,17 @@
 #include "emu.h"
 #include "msm5832.h"
 
+//#define VERBOSE 1
+#include "logmacro.h"
+
 
 // device type definition
-const device_type MSM5832 = device_creator<msm5832_device>;
+DEFINE_DEVICE_TYPE(MSM5832, msm5832_device, "msm5832", "OKI MSM5832 RTC")
 
 
 //**************************************************************************
 //  MACROS / CONSTANTS
 //**************************************************************************
-
-#define LOG 0
-
 
 // registers
 enum
@@ -89,7 +89,7 @@ inline void msm5832_device::write_counter(int counter, int value)
 //-------------------------------------------------
 
 msm5832_device::msm5832_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MSM5832, "MSM5832", tag, owner, clock, "msm5832", __FILE__),
+	: device_t(mconfig, MSM5832, tag, owner, clock),
 		device_rtc_interface(mconfig, *this),
 		m_hold(0),
 		m_address(0),
@@ -148,7 +148,7 @@ void msm5832_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 void msm5832_device::rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second)
 {
-	if (LOG) logerror("MSM5832 Clock Update: %d.%d.%d %d %d:%d:%d\n", year, month, day, day_of_week, hour, minute, second);
+	LOG("MSM5832 Clock Update: %d.%d.%d %d %d:%d:%d\n", year, month, day, day_of_week, hour, minute, second);
 
 	write_counter(REGISTER_Y1, year);
 	write_counter(REGISTER_MO1, month);
@@ -166,7 +166,7 @@ void msm5832_device::rtc_clock_updated(int year, int month, int day, int day_of_
 
 READ8_MEMBER( msm5832_device::data_r )
 {
-	if (LOG) logerror("MSM5832 Register Read %01x: %01x\n", m_address, m_data & 0x0f);
+	LOG("MSM5832 Register Read %01x: %01x\n", m_address, m_data & 0x0f);
 
 	return m_data & 0x0f;
 }
@@ -178,7 +178,7 @@ READ8_MEMBER( msm5832_device::data_r )
 
 WRITE8_MEMBER( msm5832_device::data_w )
 {
-	if (LOG) logerror("MSM5832 Register Write %01x: %01x\n", m_address, data & 0x0f);
+	LOG("MSM5832 Register Write %01x: %01x\n", m_address, data & 0x0f);
 
 	m_data = data & 0x0f;
 }
@@ -190,7 +190,7 @@ WRITE8_MEMBER( msm5832_device::data_w )
 
 void msm5832_device::address_w(uint8_t data)
 {
-	if (LOG) logerror("MSM5832 Address: %01x\n", data & 0x0f);
+	LOG("MSM5832 Address: %01x\n", data & 0x0f);
 
 	m_address = data & 0x0f;
 
@@ -219,7 +219,7 @@ void msm5832_device::address_w(uint8_t data)
 
 WRITE_LINE_MEMBER( msm5832_device::adj_w )
 {
-	if (LOG) logerror("MSM5832 30 ADJ: %u\n", state);
+	LOG("MSM5832 30 ADJ: %u\n", state);
 
 	if (state)
 	{
@@ -234,7 +234,7 @@ WRITE_LINE_MEMBER( msm5832_device::adj_w )
 
 WRITE_LINE_MEMBER( msm5832_device::test_w )
 {
-	if (LOG) logerror("MSM5832 TEST: %u\n", state);
+	LOG("MSM5832 TEST: %u\n", state);
 }
 
 
@@ -244,7 +244,7 @@ WRITE_LINE_MEMBER( msm5832_device::test_w )
 
 WRITE_LINE_MEMBER( msm5832_device::hold_w )
 {
-	if (LOG) logerror("MSM5832 HOLD: %u\n", state);
+	LOG("MSM5832 HOLD: %u\n", state);
 
 	m_hold = state;
 }
@@ -256,7 +256,7 @@ WRITE_LINE_MEMBER( msm5832_device::hold_w )
 
 WRITE_LINE_MEMBER( msm5832_device::read_w )
 {
-	if (LOG) logerror("MSM5832 READ: %u\n", state);
+	LOG("MSM5832 READ: %u\n", state);
 
 	m_read = state;
 }
@@ -271,7 +271,7 @@ WRITE_LINE_MEMBER( msm5832_device::write_w )
 	if (m_write == state)
 		return;
 
-	if (LOG) logerror("MSM5832 WR: %u\n", state);
+	LOG("MSM5832 WR: %u\n", state);
 
 	if (m_cs && state)
 	{
@@ -298,7 +298,7 @@ WRITE_LINE_MEMBER( msm5832_device::write_w )
 
 WRITE_LINE_MEMBER( msm5832_device::cs_w )
 {
-	if (LOG) logerror("MSM5832 CS: %u\n", state);
+	LOG("MSM5832 CS: %u\n", state);
 
 	m_cs = state;
 }

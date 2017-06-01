@@ -15,7 +15,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type SCV_CART_SLOT = device_creator<scv_cart_slot_device>;
+DEFINE_DEVICE_TYPE(SCV_CART_SLOT, scv_cart_slot_device, "scv_cart_slot", "SCV Cartridge Slot")
 
 //**************************************************************************
 //    SCV cartridges Interface
@@ -73,10 +73,10 @@ void device_scv_cart_interface::ram_alloc(uint32_t size)
 //  scv_cart_slot_device - constructor
 //-------------------------------------------------
 scv_cart_slot_device::scv_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-						device_t(mconfig, SCV_CART_SLOT, "SCV Cartridge Slot", tag, owner, clock, "scv_cart_slot", __FILE__),
-						device_image_interface(mconfig, *this),
-						device_slot_interface(mconfig, *this),
-						m_type(SCV_8K), m_cart(nullptr)
+	device_t(mconfig, SCV_CART_SLOT, tag, owner, clock),
+	device_image_interface(mconfig, *this),
+	device_slot_interface(mconfig, *this),
+	m_type(SCV_8K), m_cart(nullptr)
 {
 }
 
@@ -203,7 +203,7 @@ image_init_result scv_cart_slot_device::call_load()
  fullpath
  -------------------------------------------------*/
 
-int scv_cart_slot_device::get_cart_type(uint8_t *ROM, uint32_t len)
+int scv_cart_slot_device::get_cart_type(const uint8_t *ROM, uint32_t len)
 {
 	int type = SCV_8K;
 
@@ -235,22 +235,21 @@ int scv_cart_slot_device::get_cart_type(uint8_t *ROM, uint32_t len)
  get default card software
  -------------------------------------------------*/
 
-std::string scv_cart_slot_device::get_default_card_software()
+std::string scv_cart_slot_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
-	if (open_image_file(mconfig().options()))
+	if (hook.image_file())
 	{
 		const char *slot_string;
-		uint32_t len = m_file->size();
+		uint32_t len = hook.image_file()->size();
 		std::vector<uint8_t> rom(len);
 		int type;
 
-		m_file->read(&rom[0], len);
+		hook.image_file()->read(&rom[0], len);
 
 		type = get_cart_type(&rom[0], len);
 		slot_string = scv_get_slot(type);
 
 		//printf("type: %s\n", slot_string);
-		clear();
 
 		return std::string(slot_string);
 	}

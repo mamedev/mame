@@ -20,11 +20,11 @@
 #include "screen.h"
 
 
-const device_type EXCELLENT_SPRITE = device_creator<excellent_spr_device>;
+DEFINE_DEVICE_TYPE(EXCELLENT_SPRITE, excellent_spr_device, "excellent_spr", "Excellent 8-bit Sprite")
 
 excellent_spr_device::excellent_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, EXCELLENT_SPRITE, "Excellent 8-bit Sprite", tag, owner, clock, "excellent_spr", __FILE__),
-		device_video_interface(mconfig, *this)
+	: device_t(mconfig, EXCELLENT_SPRITE, tag, owner, clock)
+	, device_video_interface(mconfig, *this)
 {
 }
 

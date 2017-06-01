@@ -21,10 +21,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_VIDEO_CDP1862_H
+#define MAME_VIDEO_CDP1862_H
 
-#ifndef __CDP1862__
-#define __CDP1862__
+#pragma once
 
 
 
@@ -71,9 +71,9 @@ public:
 	// construction/destruction
 	cdp1862_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_rd_rd_callback(device_t &device, _Object object) { return downcast<cdp1862_device &>(device).m_read_rd.set_callback(object); }
-	template<class _Object> static devcb_base &set_bd_rd_callback(device_t &device, _Object object) { return downcast<cdp1862_device &>(device).m_read_bd.set_callback(object); }
-	template<class _Object> static devcb_base &set_gd_rd_callback(device_t &device, _Object object) { return downcast<cdp1862_device &>(device).m_read_gd.set_callback(object); }
+	template <class Object> static devcb_base &set_rd_rd_callback(device_t &device, Object &&cb) { return downcast<cdp1862_device &>(device).m_read_rd.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_bd_rd_callback(device_t &device, Object &&cb) { return downcast<cdp1862_device &>(device).m_read_bd.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_gd_rd_callback(device_t &device, Object &&cb) { return downcast<cdp1862_device &>(device).m_read_gd.set_callback(std::forward<Object>(cb)); }
 
 	static void static_set_luminance(device_t &device, double r, double b, double g, double bkg) { downcast<cdp1862_device &>(device).m_lum_r = r; downcast<cdp1862_device &>(device).m_lum_b = b; downcast<cdp1862_device &>(device).m_lum_g = g; downcast<cdp1862_device &>(device).m_lum_bkg = bkg; }
 	static void static_set_chrominance(device_t &device, double r, double b, double g, double bkg) { downcast<cdp1862_device &>(device).m_chr_r = r; downcast<cdp1862_device &>(device).m_chr_b = b; downcast<cdp1862_device &>(device).m_chr_g = g; downcast<cdp1862_device &>(device).m_chr_bkg = bkg; }
@@ -115,8 +115,6 @@ private:
 
 
 // device type definition
-extern const device_type CDP1862;
+DECLARE_DEVICE_TYPE(CDP1862, cdp1862_device)
 
-
-
-#endif
+#endif // MAME_VIDEO_CDP1862_H

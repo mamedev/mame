@@ -50,6 +50,8 @@ public:
 	u16         m_adpcm_pos;
 	bool        m_adpcm_ff;
 
+	emu_timer *m_cadash_int5_timer;
+
 	optional_shared_ptr<uint8_t> m_cadash_shared_ram;
 
 	/* devices */
@@ -76,6 +78,7 @@ public:
 	uint32_t screen_update_asuka(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_asuka);
 	INTERRUPT_GEN_MEMBER(cadash_interrupt);
+	DECLARE_DRIVER_INIT(cadash);
 
 	/*----------- defined in machine/bonzeadv.c -----------*/
 	void WriteLevelData();

@@ -11,6 +11,8 @@
 #ifndef MAME_EMU_DEBUG_DVTEXT_H
 #define MAME_EMU_DEBUG_DVTEXT_H
 
+#pragma once
+
 #include "debugvw.h"
 #include "textbuf.h"
 
@@ -56,6 +58,5 @@ class debug_view_log : public debug_view_textbuf
 	friend class debug_view_manager;
 	debug_view_log(running_machine &machine, debug_view_osd_update_func osdupdate, void *osdprivate);
 };
-
 
 #endif // MAME_EMU_DEBUG_DVTEXT_H

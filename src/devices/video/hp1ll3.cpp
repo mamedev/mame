@@ -3,38 +3,130 @@
 /*
     HP 1LL3-0005 GPU emulation.
 
-	Used by HP Integral PC, possibly other HP products.
+    Used by HP Integral PC, possibly other HP products.
 
-	On IPC, memory is 4 16Kx4bit DRAM chips = 32KB total (16K words),
-	but firmware probes memory size and can work with 128KB memory.
-	Undocumented "_desktop" mode requires this.
+    On IPC, memory is 4 16Kx4bit DRAM chips = 32KB total (16K words),
+    but firmware probes memory size and can work with 128KB memory.
+    Undocumented "_desktop" mode requires this.
 
-	Capabilities:
-	- up to 1024x1024 px on screen
-	- lines
-	- rectangles
-	- area fill with user-defined pattern
-	- 16x16 user-defined proportional font, with automatic cursor
-	- 16x16 user-defined sprite for mouse cursor (not a sprite layer)
-	- windows with blitter (copy, fill and scroll) and clipping
+    Capabilities:
+    - up to 1024x1024 px on screen
+    - lines
+    - rectangles
+    - area fill with user-defined pattern
+    - 16x16 user-defined proportional font, with automatic cursor
+    - 16x16 user-defined sprite for mouse cursor (not a sprite layer)
+    - windows with blitter (copy, fill and scroll) and clipping
 
-	To do:
-	. proper cursor and mouse pointers [cursor can be offset from the pen location]
-	+ variable width fonts [?? placed relative to current window]
-	+ basic lines
-	- patterned lines
-	. bit blits & scroll
-	. meaning of WRRR bits
-	. meaning of CONF data [+ autoconfiguration]
-	- interrupt generation
-	- realistic timing?
-	- &c.
+    To do:
+    . proper cursor and mouse pointers [cursor can be offset from the pen location]
+    + variable width fonts [?? placed relative to current window]
+    + basic lines
+    - patterned lines
+    . bit blits & scroll
+    . meaning of WRRR bits
+    . meaning of CONF data [+ autoconfiguration]
+    - interrupt generation
+    - realistic timing?
+    - &c.
 */
 
 #include "emu.h"
 #include "hp1ll3.h"
 
 #include "screen.h"
+
+
+///*************************************************************************
+//  MACROS / CONSTANTS
+///*************************************************************************
+
+/*
+ * command types (send)
+ *
+ * 0 -- no data
+ * 1 -- write 1 word of data, then command
+ * 2 -- write 2 words of data, then command
+ * 3 -- write command, then 11 words of data (= CONF only?)
+ * 4 -- write 1 word of data, then command, then write X words of data, then write NOP
+ *
+ * (read)
+ *
+ * 3 -- ???
+ * 4 -- write 1 word of data, then command, then read X words of data, then write NOP
+ */
+#define NOP         0   // type 0
+#define CONF        2   // type 3, configure GPU (screen size, timings...).  11 words of data.
+#define DISVID      3   // type 0, disable video
+#define ENVID       4   // type 0, enable video
+#define WRMEM       7   // type 4, write GPU memory at offset, terminate by NOP
+#define RDMEM       8   // type 4, read GPU memory from offset, terminate by NOP
+#define WRSAD       9   // type 1, set screen area start address
+#define WRORG       10  // type 1, set ???
+#define WRDAD       11  // type 1, set data area start address (16x16 area fill, sprite and cursor)
+#define WRRR        12  // type 1, set replacement rule (rasterop)
+#define MOVEP       13  // type 2, move pointer
+#define IMOVEP      14
+#define DRAWP       15  // type 2, draw line
+#define IDRAWP      16
+#define RDP         17
+#define WRUDL       18  // type 1, set user-defined line pattern (16-bit)
+#define WRWINSIZ    19  // type 2, set ???
+#define WRWINORG    20  // type 2, set ???
+#define COPY        21  // type 2
+#define FILL        22  // type 1, fill area
+#define FRAME       23  // type _, draw rectangle
+#define SCROLUP     24  // type 2
+#define SCROLDN     25  // type 2
+#define SCROLLF     26  // type 2
+#define SCROLRT     27  // type 2
+#define RDWIN       28  // type 1
+#define WRWIN       29  // type 1
+#define RDWINPARM   30
+#define CR          31
+#define CRLFx       32
+#define LABEL       36  // type 1, draw text
+#define ENSP        38  // type 0, enable sprite
+#define DISSP       39  // type 0, disable sprite
+#define MOVESP      40  // type 2, move sprite
+#define IMOVESP     41
+#define RDSP        42
+#define DRAWPX      43  // type _, draw single pixel
+#define WRFAD       44  // type 1, set font area start address
+#define ENCURS      45  // type 0
+#define DISCURS     46  // type 0
+#define ID          63
+
+
+/*
+ * Replacement Rules (rops).  sources:
+ *
+ * - NetBSD's diofbvar.h (definitions for Topcat chip)
+ * - pdf/hp/9000_300/specs/A-5958-4362-9_Series_300_Display_Color_Card_Theory_of_Operation_Oct85.pdf
+ *   refers to TOPCAT documentation p/n A-1FH2-2001-7 (not online)
+ */
+#define RR_FORCE_ZERO   0x0
+#define RR_CLEAR        RR_FORCE_ZERO
+#define RR_AND          0x1
+#define RR_AND_NOT_OLD  0x2
+#define RR_NEW          0x3
+#define RR_COPY         RR_NEW
+#define RR_AND_NOT_NEW  0x4
+#define RR_OLD          0x5
+#define RR_XOR          0x6
+#define RR_OR           0x7
+#define RR_NOR          0x8
+#define RR_XNOR         0x9
+#define RR_NOT_OLD      0xa
+#define RR_INVERT       RR_NOT_OLD
+#define RR_OR_NOT_OLD   0xb
+#define RR_NOT_NEW      0xc
+#define RR_COPYINVERTED RR_NOT_NEW
+#define RR_OR_NOT_NEW   0xd
+#define RR_NAND         0xe
+#define RR_FORCE_ONE    0xf
+
+#define WS 16 // bits in a word
 
 
 //**************************************************************************
@@ -54,7 +146,7 @@
 	} while (0)
 
 
-#define HPGPU_VRAM_SIZE	16384 // *4	// experiment
+#define HPGPU_VRAM_SIZE 16384 // *4 // experiment
 #define HPGPU_HORZ_TOTAL 512
 #define HPGPU_VERT_TOTAL 256
 
@@ -64,7 +156,7 @@
 //**************************************************************************
 
 // devices
-const device_type HP1LL3 = device_creator<hp1ll3_device>;
+DEFINE_DEVICE_TYPE(HP1LL3, hp1ll3_device, "hp1ll3", "Hewlett-Packard 1LL3-0005 GPU")
 
 
 //**************************************************************************
@@ -76,7 +168,7 @@ const device_type HP1LL3 = device_creator<hp1ll3_device>;
 //-------------------------------------------------
 
 hp1ll3_device::hp1ll3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, HP1LL3, "Hewlett-Package 1LL3-0005 GPU", tag, owner, clock, "hp1ll3", __FILE__)
+	: device_t(mconfig, HP1LL3, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 {
 }
@@ -96,7 +188,7 @@ void hp1ll3_device::device_start()
 	m_cursor.allocate(16, 16);
 	m_sprite.allocate(16, 16);
 
-	m_videoram = std::make_unique<uint16_t[]>(HPGPU_VRAM_SIZE*2);	// x2 size to make WRWIN/RDWIN easier
+	m_videoram = std::make_unique<uint16_t[]>(HPGPU_VRAM_SIZE*2);   // x2 size to make WRWIN/RDWIN easier
 }
 
 void hp1ll3_device::device_reset()
@@ -397,14 +489,14 @@ uint32_t hp1ll3_device::screen_update(screen_device &screen, bitmap_ind16 &bitma
 //-------------------------------------------------
 
 /*
- * 	offset 0: CSR
+ *  offset 0: CSR
  *
- * 	bit 0	gpu is busy
- * 	bit 1	data is ready
- * 	bit 3	vert blank time
- * 	bit 7	out of window
+ *  bit 0   gpu is busy
+ *  bit 1   data is ready
+ *  bit 3   vert blank time
+ *  bit 7   out of window
  *
- * 	offset 2: data
+ *  offset 2: data
  */
 
 READ8_MEMBER( hp1ll3_device::read )

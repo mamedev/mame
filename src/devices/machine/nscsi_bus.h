@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#ifndef __NSCSI_BUS_H__
-#define __NSCSI_BUS_H__
+#ifndef MAME_MACHINE_NSCSI_BUS_H
+#define MAME_MACHINE_NSCSI_BUS_H
+
+#pragma once
 
 
 #define MCFG_NSCSI_BUS_ADD(_tag)        \
@@ -59,8 +61,7 @@ protected:
 	virtual void device_start() override;
 };
 
-class nscsi_device : public device_t,
-						public device_slot_card_interface
+class nscsi_device : public device_t, public device_slot_card_interface
 {
 public:
 	// Here because the biggest users are the devices, not the bus
@@ -85,23 +86,22 @@ public:
 		S_PHASE_MASK     = S_MSG|S_CTL|S_INP
 	};
 
-	nscsi_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
-
 	void connect_to_bus(nscsi_bus_device *bus, int refid, int default_scsi_id);
 	virtual void scsi_ctrl_changed();
+
 protected:
+	nscsi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void device_start() override;
+
 	int scsi_id;
 	int scsi_refid;
 	nscsi_bus_device *scsi_bus;
-
-	virtual void device_start() override;
 };
 
 class nscsi_full_device : public nscsi_device
 {
 public:
-	nscsi_full_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
-
 	virtual void scsi_ctrl_changed() override;
 protected:
 	enum { SCSI_TIMER = 100 };
@@ -271,9 +271,7 @@ protected:
 		SBUF_SENSE
 	};
 
-	uint8_t scsi_cmdbuf[4096], scsi_sense_buffer[8];
-	int scsi_cmdsize;
-	uint8_t scsi_identify;
+	using nscsi_device::nscsi_device;
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -356,6 +354,10 @@ protected:
 	// Fast negation period (30ns)
 	virtual attotime scsi_fast_negation_period();
 
+	uint8_t scsi_cmdbuf[4096], scsi_sense_buffer[8];
+	int scsi_cmdsize;
+	uint8_t scsi_identify;
+
 private:
 	enum {
 		IDLE
@@ -421,7 +423,7 @@ private:
 };
 
 
-extern const device_type NSCSI_BUS;
-extern const device_type NSCSI_CONNECTOR;
+DECLARE_DEVICE_TYPE(NSCSI_BUS,       nscsi_bus_device)
+DECLARE_DEVICE_TYPE(NSCSI_CONNECTOR, nscsi_connector)
 
-#endif
+#endif // MAME_MACHINE_NSCSI_BUS_H

@@ -166,7 +166,7 @@ void taito_type_x_state::machine_reset()
 }
 
 // todo: different configs for the different machine types.
-static MACHINE_CONFIG_START( taito_type_x, taito_type_x_state )
+static MACHINE_CONFIG_START( taito_type_x )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PENTIUM3, 733333333) /* Wrong, much newer processors, much faster. */
@@ -389,6 +389,6 @@ ROM_START( kofxii )
 ROM_END
 
 
-GAME( 2006, chasehq2,  0,    taito_type_x, taito_type_x, driver_device,  0, ROT0, "Taito Corporation", "Chase H.Q. 2 (v2.0.6.JP)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2008, samspsen,  0,    taito_type_x, taito_type_x, driver_device,  0, ROT0, "SNK Playmore", "Samurai Spirits Sen (v1.00)",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2009, kofxii,    0,    taito_type_x, taito_type_x, driver_device,  0, ROT0, "SNK Playmore", "The King of Fighters XII (v1.00)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2006, chasehq2,  0,    taito_type_x, taito_type_x, taito_type_x_state,  0, ROT0, "Taito Corporation", "Chase H.Q. 2 (v2.0.6.JP)",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2008, samspsen,  0,    taito_type_x, taito_type_x, taito_type_x_state,  0, ROT0, "SNK Playmore",      "Samurai Spirits Sen (v1.00)",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2009, kofxii,    0,    taito_type_x, taito_type_x, taito_type_x_state,  0, ROT0, "SNK Playmore",      "The King of Fighters XII (v1.00)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

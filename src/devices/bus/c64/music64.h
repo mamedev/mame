@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_C64_MUSIC64_H
+#define MAME_BUS_C64_MUSIC64_H
 
-#ifndef __MUSIC64__
-#define __MUSIC64__
+#pragma once
 
 #include "exp.h"
 
@@ -50,7 +50,7 @@ private:
 
 
 // device type definition
-extern const device_type C64_MUSIC64;
+DECLARE_DEVICE_TYPE(C64_MUSIC64, c64_music64_cartridge_device)
 
 
-#endif
+#endif // MAME_BUS_C64_MUSIC64_H

@@ -90,7 +90,7 @@ private:
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cassette;
 	required_device<generic_slot_device> m_cart;
-	required_device<kr1818vg93_t> m_fdc;
+	required_device<kr1818vg93_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	required_device<i8255_device> m_ppi;
@@ -116,6 +116,7 @@ private:
 	uint8_t m_aylatch;
 	bool m_stack_state;
 	bool m_romen;
+	emu_timer *m_reset_check_timer;
 
 	void update_mem();
 };

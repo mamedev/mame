@@ -1,87 +1,13 @@
 // license:GPL-2.0+
 // copyright-holders:Fabio Priuli, byuu
-#ifndef __SNS_SPC7110_H
-#define __SNS_SPC7110_H
+#ifndef MAME_BUS_SNES_SPC7110_H
+#define MAME_BUS_SNES_SPC7110_H
+
+#pragma once
 
 #include "snes_slot.h"
 #include "rom21.h"
 
-
-enum RTC_State
-{
-	RTCS_Inactive,
-	RTCS_ModeSelect,
-	RTCS_IndexSelect,
-	RTCS_Write
-};
-
-enum RTC_Mode
-{
-	RTCM_Linear = 0x03,
-	RTCM_Indexed = 0x0c
-};
-
-class SPC7110_Decomp
-{
-public:
-	SPC7110_Decomp(running_machine &machine);
-
-	running_machine &machine() const { return m_machine; }
-
-	void init(running_machine &machine, uint8_t *ROM, uint32_t len, uint32_t mode, uint32_t offset, uint32_t index);
-	void reset();
-
-	uint8_t read(uint8_t *ROM, uint32_t len);
-	void write(uint8_t data);
-	void mode0(uint8_t init, uint8_t *ROM, uint32_t len);
-	void mode1(uint8_t init, uint8_t *ROM, uint32_t len);
-	void mode2(uint8_t init, uint8_t *ROM, uint32_t len);
-
-private:
-
-	uint8_t dataread(uint8_t *ROM, uint32_t len);
-	uint8_t probability(uint32_t n);
-	uint8_t next_lps(uint32_t n);
-	uint8_t next_mps(uint32_t n);
-	uint8_t toggle_invert(uint32_t n);
-	uint32_t morton_2x8(uint32_t data);
-	uint32_t morton_4x8(uint32_t data);
-
-	uint32_t m_decomp_mode;
-	uint32_t m_decomp_offset;
-
-	std::unique_ptr<uint8_t[]> m_decomp_buffer;
-	uint32_t m_decomp_buffer_rdoffset;
-	uint32_t m_decomp_buffer_wroffset;
-	uint32_t m_decomp_buffer_length;
-
-	struct ContextState
-	{
-		uint8_t index;
-		uint8_t invert;
-	} m_context[32];
-
-	uint32_t m_morton16[2][256];
-	uint32_t m_morton32[4][256];
-
-	// mode 0 vars
-	uint8_t m_m0_val, m_m0_in, m_m0_span;
-	int32_t m_m0_out, m_m0_inverts, m_m0_lps, m_m0_in_count;
-
-	// mode 1 vars
-	int32_t m_m1_pixelorder[4], m_m1_realorder[4];
-	uint8_t m_m1_in, m_m1_val, m_m1_span;
-	int32_t m_m1_out, m_m1_inverts, m_m1_lps, m_m1_in_count;
-
-	// mode 2 vars
-	int32_t m_m2_pixelorder[16], m_m2_realorder[16];
-	uint8_t m_m2_bitplanebuffer[16], m_m2_buffer_index;
-	uint8_t m_m2_in, m_m2_val, m_m2_span;
-	int32_t m_m2_out0, m_m2_out1, m_m2_inverts, m_m2_lps, m_m2_in_count;
-
-	running_machine& m_machine;
-	//uint32_t m_rom_size;
-};
 
 // ======================> sns_rom_spc7110_device
 
@@ -89,11 +15,7 @@ class sns_rom_spc7110_device : public sns_rom21_device
 {
 public:
 	// construction/destruction
-	sns_rom_spc7110_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	sns_rom_spc7110_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	// device-level overrides
-	virtual void device_start() override;
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_l) override;
@@ -103,6 +25,74 @@ public:
 
 	virtual DECLARE_READ8_MEMBER(chip_read) override;
 	virtual DECLARE_WRITE8_MEMBER(chip_write) override;
+
+protected:
+	sns_rom_spc7110_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	// device-level overrides
+	virtual void device_start() override;
+
+	class SPC7110_Decomp
+	{
+	public:
+		SPC7110_Decomp(running_machine &machine);
+
+		running_machine &machine() const { return m_machine; }
+
+		void init(running_machine &machine, uint8_t *ROM, uint32_t len, uint32_t mode, uint32_t offset, uint32_t index);
+		void reset();
+
+		uint8_t read(uint8_t *ROM, uint32_t len);
+		void write(uint8_t data);
+		void mode0(uint8_t init, uint8_t *ROM, uint32_t len);
+		void mode1(uint8_t init, uint8_t *ROM, uint32_t len);
+		void mode2(uint8_t init, uint8_t *ROM, uint32_t len);
+
+	private:
+
+		uint8_t dataread(uint8_t *ROM, uint32_t len);
+		uint8_t probability(uint32_t n);
+		uint8_t next_lps(uint32_t n);
+		uint8_t next_mps(uint32_t n);
+		uint8_t toggle_invert(uint32_t n);
+		uint32_t morton_2x8(uint32_t data);
+		uint32_t morton_4x8(uint32_t data);
+
+		uint32_t m_decomp_mode;
+		uint32_t m_decomp_offset;
+
+		std::unique_ptr<uint8_t[]> m_decomp_buffer;
+		uint32_t m_decomp_buffer_rdoffset;
+		uint32_t m_decomp_buffer_wroffset;
+		uint32_t m_decomp_buffer_length;
+
+		struct ContextState
+		{
+			uint8_t index;
+			uint8_t invert;
+		} m_context[32];
+
+		uint32_t m_morton16[2][256];
+		uint32_t m_morton32[4][256];
+
+		// mode 0 vars
+		uint8_t m_m0_val, m_m0_in, m_m0_span;
+		int32_t m_m0_out, m_m0_inverts, m_m0_lps, m_m0_in_count;
+
+		// mode 1 vars
+		int32_t m_m1_pixelorder[4], m_m1_realorder[4];
+		uint8_t m_m1_in, m_m1_val, m_m1_span;
+		int32_t m_m1_out, m_m1_inverts, m_m1_lps, m_m1_in_count;
+
+		// mode 2 vars
+		int32_t m_m2_pixelorder[16], m_m2_realorder[16];
+		uint8_t m_m2_bitplanebuffer[16], m_m2_buffer_index;
+		uint8_t m_m2_in, m_m2_val, m_m2_span;
+		int32_t m_m2_out0, m_m2_out1, m_m2_inverts, m_m2_lps, m_m2_in_count;
+
+		running_machine& m_machine;
+		//uint32_t m_rom_size;
+	};
 
 	void spc7110_start();
 	uint32_t spc7110_datarom_addr(uint32_t addr, uint32_t len);
@@ -206,9 +196,6 @@ public:
 	// construction/destruction
 	sns_rom_spc7110rtc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual void device_start() override;
-
 	// reading and writing
 
 // we just use the spc7110 ones for the moment, pending the split of regs 0x4840-0x4842 (RTC) from the base add-on
@@ -217,10 +204,14 @@ public:
 
 //  virtual DECLARE_READ8_MEMBER(chip_read);
 //  virtual DECLARE_WRITE8_MEMBER(chip_write);
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
 };
 
 // device type definition
-extern const device_type SNS_HIROM_SPC7110;
-extern const device_type SNS_HIROM_SPC7110_RTC;
+DECLARE_DEVICE_TYPE(SNS_HIROM_SPC7110,     sns_rom_spc7110_device)
+DECLARE_DEVICE_TYPE(SNS_HIROM_SPC7110_RTC, sns_rom_spc7110rtc_device)
 
-#endif
+#endif // MAME_BUS_SNES_SPC7110_H

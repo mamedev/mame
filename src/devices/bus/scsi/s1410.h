@@ -6,14 +6,14 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_SCSI_S1410_H
+#define MAME_BUS_SCSI_S1410_H
 
-#ifndef __S1410__
-#define __S1410__
+#pragma once
 
 #include "scsihd.h"
 
-class s1410_device  : public scsihd_device
+class s1410_device : public scsihd_device
 {
 public:
 	// construction/destruction
@@ -30,6 +30,6 @@ public:
 
 
 // device type definition
-extern const device_type S1410;
+DECLARE_DEVICE_TYPE(S1410, s1410_device)
 
-#endif
+#endif // MAME_BUS_SCSI_S1410_H

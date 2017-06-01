@@ -1,13 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#ifndef __MICRODISC_H__
-#define __MICRODISC_H__
+#ifndef MAME_BUS_ORICEXT_MICRODISC_H
+#define MAME_BUS_ORICEXT_MICRODISC_H
 
 #include "oricext.h"
 #include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
 
-extern const device_type MICRODISC;
+DECLARE_DEVICE_TYPE(MICRODISC, microdisc_device)
 
 class microdisc_device : public oricext_device
 {
@@ -36,7 +36,7 @@ protected:
 		P_EPROM  = 0x80
 	};
 
-	required_device<fd1793_t> fdc;
+	required_device<fd1793_device> fdc;
 
 	uint8_t *microdisc_rom;
 	floppy_image_device *floppies[4];
@@ -51,4 +51,4 @@ protected:
 	void remap();
 };
 
-#endif
+#endif // MAME_BUS_ORICEXT_MICRODISC_H

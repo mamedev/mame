@@ -28,6 +28,9 @@ Notes:
   TileMap system, so we have to tilemap_mark_all_tiles_dirty() to compensate
 - kurikinta has some debug dip switches (invulnerability, slow motion) so might
   be a prototype. It also doesn't have service mode (or has it disabled).
+- Of the several multi-processor games that use the MB8421 dual-port RAM for
+  communications, Evil Stone seems to be the only one to use its special
+  interrupt feature.
 
 TODO:
 - plgirls doesn't work without a kludge because of an interrupt issue. This
@@ -40,8 +43,6 @@ TODO:
 - Text Plane colours are only right in Cuby Bop once you've started a game
   & reset
 - Scrolling in Cuby Bop's Game seems incorrect.
-- Repeated SFXs in Evil Stone (with previous hack, it was used to die at level 1 boss)
-- Evil Stone audio NMI source is unknown.
 
 puzznici note
 - this set is a bootleg, it uses a converted board without the MCU and has
@@ -56,10 +57,14 @@ puzznici note
 #include "includes/taito_l.h"
 #include "includes/taitoipt.h"
 #include "machine/taito68705interface.h"
+#include "machine/taitoio.h"
 
 #include "audio/taitosnd.h"
 
 #include "cpu/z80/z80.h"
+
+#include "machine/i8255.h"
+#include "machine/mb8421.h"
 
 #include "sound/2203intf.h"
 #include "sound/2610intf.h"
@@ -157,14 +162,6 @@ void taitol_1cpu_state::state_register()
 	save_item(NAME(m_extport));
 }
 
-void horshoes_state::state_register()
-{
-	taitol_1cpu_state::state_register();
-
-	save_item(NAME(m_trackx));
-	save_item(NAME(m_tracky));
-}
-
 
 MACHINE_START_MEMBER(taitol_state, taito_l)
 {
@@ -236,13 +233,6 @@ void taitol_1cpu_state::taito_machine_reset()
 	m_extport = 0;
 }
 
-void horshoes_state::taito_machine_reset()
-{
-	taitol_1cpu_state::taito_machine_reset();
-
-	m_trackx = m_tracky = 0;
-}
-
 
 MACHINE_RESET_MEMBER(taitol_state, taito_l)
 {
@@ -297,6 +287,7 @@ MACHINE_RESET_MEMBER(horshoes_state, horshoes)
 
 IRQ_CALLBACK_MEMBER(taitol_state::irq_callback)
 {
+	m_main_cpu->set_input_line(0, CLEAR_LINE);
 	return m_irq_adr_table[m_last_irq_level];
 }
 
@@ -313,17 +304,17 @@ TIMER_DEVICE_CALLBACK_MEMBER(taitol_state::vbl_interrupt)
 	if (scanline == 120 && (m_irq_enable & 1))
 	{
 		m_last_irq_level = 0;
-		m_main_cpu->set_input_line(0, HOLD_LINE);
+		m_main_cpu->set_input_line(0, ASSERT_LINE);
 	}
 	else if (scanline == 0 && (m_irq_enable & 2))
 	{
 		m_last_irq_level = 1;
-		m_main_cpu->set_input_line(0, HOLD_LINE);
+		m_main_cpu->set_input_line(0, ASSERT_LINE);
 	}
 	else if (scanline == 240 && (m_irq_enable & 4))
 	{
 		m_last_irq_level = 2;
-		m_main_cpu->set_input_line(0, HOLD_LINE);
+		m_main_cpu->set_input_line(0, ASSERT_LINE);
 	}
 }
 
@@ -585,35 +576,22 @@ WRITE8_MEMBER(champwr_state::msm5205_volume_w)
 READ8_MEMBER(horshoes_state::tracky_reset_r)
 {
 	/* reset the trackball counter */
-	m_tracky = m_analog0->read();
+	m_upd4701->resetx_w(1);
+	m_upd4701->resetx_w(0);
 	return 0;
 }
 
 READ8_MEMBER(horshoes_state::trackx_reset_r)
 {
 	/* reset the trackball counter */
-	m_trackx = m_analog1->read();
+	m_upd4701->resety_w(1);
+	m_upd4701->resety_w(0);
 	return 0;
 }
 
-READ8_MEMBER(horshoes_state::tracky_lo_r)
+READ8_MEMBER(horshoes_state::trackball_r)
 {
-	return (m_analog0->read() - m_tracky) & 0xff;
-}
-
-READ8_MEMBER(horshoes_state::tracky_hi_r)
-{
-	return (m_analog0->read() - m_tracky) >> 8;
-}
-
-READ8_MEMBER(horshoes_state::trackx_lo_r)
-{
-	return (m_analog1->read() - m_trackx) & 0xff;
-}
-
-READ8_MEMBER(horshoes_state::trackx_hi_r)
-{
-	return (m_analog1->read() - m_trackx) >> 8;
+	return m_upd4701->read_xy(space, offset >> 2);
 }
 
 
@@ -649,13 +627,7 @@ static ADDRESS_MAP_START( fhawk_2_map, AS_PROGRAM, 8, fhawk_state )
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(rombank2switch_w)
 	AM_RANGE(0xc800, 0xc800) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_device, master_port_w)
 	AM_RANGE(0xc801, 0xc801) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w)
-	AM_RANGE(0xd000, 0xd000) AM_READ_PORT("DSWA") AM_WRITENOP   // Direct copy of input port 0
-	AM_RANGE(0xd001, 0xd001) AM_READ_PORT("DSWB")
-	AM_RANGE(0xd002, 0xd002) AM_READ_PORT("IN0")
-	AM_RANGE(0xd003, 0xd003) AM_READ_PORT("IN1")
-	AM_RANGE(0xd004, 0xd004) AM_WRITE(control2_w)
-	AM_RANGE(0xd005, 0xd006) AM_WRITENOP    // Always 0
-	AM_RANGE(0xd007, 0xd007) AM_READ_PORT("IN2")
+	AM_RANGE(0xd000, 0xd007) AM_DEVREADWRITE("tc0220ioc", tc0220ioc_device, read, write)
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
 
@@ -671,7 +643,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( raimais_map, AS_PROGRAM, 8, taitol_2cpu_state )
 	COMMON_BANKS_MAP
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0x8000, 0x87ff) AM_DEVREADWRITE("dpram", mb8421_device, right_r, right_w)
 	AM_RANGE(0x8800, 0x8800) AM_READWRITE(mux_r, mux_w)
 	AM_RANGE(0x8801, 0x8801) AM_WRITE(mux_ctrl_w) AM_READNOP    // Watchdog or interrupt ack (value ignored)
 	AM_RANGE(0x8c00, 0x8c00) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_device, master_port_w)
@@ -682,7 +654,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( raimais_2_map, AS_PROGRAM, 8, taitol_2cpu_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0xe000, 0xe7ff) AM_DEVREADWRITE("dpram", mb8421_device, left_r, left_w)
 ADDRESS_MAP_END
 
 
@@ -716,12 +688,7 @@ static ADDRESS_MAP_START( champwr_2_map, AS_PROGRAM, 8, champwr_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank6")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("DSWA") AM_WRITENOP   // Watchdog
-	AM_RANGE(0xe001, 0xe001) AM_READ_PORT("DSWB")
-	AM_RANGE(0xe002, 0xe002) AM_READ_PORT("IN0")
-	AM_RANGE(0xe003, 0xe003) AM_READ_PORT("IN1")
-	AM_RANGE(0xe004, 0xe004) AM_WRITE(control2_w)
-	AM_RANGE(0xe007, 0xe007) AM_READ_PORT("IN2")
+	AM_RANGE(0xe000, 0xe007) AM_DEVREADWRITE("tc0220ioc", tc0220ioc_device, read, write)
 	AM_RANGE(0xe008, 0xe00f) AM_READNOP
 	AM_RANGE(0xe800, 0xe800) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_device, master_port_w)
 	AM_RANGE(0xe801, 0xe801) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w)
@@ -746,7 +713,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( kurikint_map, AS_PROGRAM, 8, taitol_2cpu_state )
 	COMMON_BANKS_MAP
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0xa000, 0xa7ff) AM_DEVREADWRITE("dpram", mb8421_device, right_r, right_w)
 	AM_RANGE(0xa800, 0xa800) AM_READWRITE(mux_r, mux_w)
 	AM_RANGE(0xa801, 0xa801) AM_WRITE(mux_ctrl_w) AM_READNOP    // Watchdog or interrupt ack (value ignored)
 ADDRESS_MAP_END
@@ -754,7 +721,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( kurikint_2_map, AS_PROGRAM, 8, taitol_2cpu_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0xe000, 0xe7ff) AM_DEVREADWRITE("dpram", mb8421_device, left_r, left_w)
 	AM_RANGE(0xe800, 0xe801) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
 ADDRESS_MAP_END
 
@@ -791,10 +758,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( palamed_map, AS_PROGRAM, 8, taitol_1cpu_state )
 	COMMON_BANKS_MAP
 	COMMON_SINGLE_MAP
-	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("IN0")
-	AM_RANGE(0xa801, 0xa801) AM_READ_PORT("IN1")
-	AM_RANGE(0xa802, 0xa802) AM_READ_PORT("IN2")
-	AM_RANGE(0xa803, 0xa803) AM_WRITENOP    // Control register, function unknown
+	AM_RANGE(0xa800, 0xa803) AM_DEVREADWRITE("ppi", i8255_device, read, write)
 	AM_RANGE(0xb000, 0xb000) AM_WRITENOP    // Control register, function unknown (copy of 8822)
 	AM_RANGE(0xb001, 0xb001) AM_READNOP // Watchdog or interrupt ack
 ADDRESS_MAP_END
@@ -803,10 +767,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cachat_map, AS_PROGRAM, 8, taitol_1cpu_state )
 	COMMON_BANKS_MAP
 	COMMON_SINGLE_MAP
-	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("IN0")
-	AM_RANGE(0xa801, 0xa801) AM_READ_PORT("IN1")
-	AM_RANGE(0xa802, 0xa802) AM_READ_PORT("IN2")
-	AM_RANGE(0xa803, 0xa803) AM_WRITENOP    // Control register, function unknown
+	AM_RANGE(0xa800, 0xa803) AM_DEVREADWRITE("ppi", i8255_device, read, write)
 	AM_RANGE(0xb000, 0xb000) AM_WRITENOP    // Control register, function unknown
 	AM_RANGE(0xb001, 0xb001) AM_READNOP // Watchdog or interrupt ack (value ignored)
 	AM_RANGE(0xfff8, 0xfff8) AM_READWRITE(rombankswitch_r, rombankswitch_w)
@@ -816,12 +777,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( horshoes_map, AS_PROGRAM, 8, horshoes_state )
 	COMMON_BANKS_MAP
 	COMMON_SINGLE_MAP
-	AM_RANGE(0xa800, 0xa800) AM_READ(tracky_lo_r)
+	AM_RANGE(0xa800, 0xa800) AM_SELECT(0x000c) AM_READ(trackball_r)
 	AM_RANGE(0xa802, 0xa802) AM_READ(tracky_reset_r)
 	AM_RANGE(0xa803, 0xa803) AM_READ(trackx_reset_r)
-	AM_RANGE(0xa804, 0xa804) AM_READ(tracky_hi_r)
-	AM_RANGE(0xa808, 0xa808) AM_READ(trackx_lo_r)
-	AM_RANGE(0xa80c, 0xa80c) AM_READ(trackx_hi_r)
 	AM_RANGE(0xb801, 0xb801) AM_READNOP // Watchdog or interrupt ack
 	AM_RANGE(0xb802, 0xb802) AM_WRITE(bankg_w)
 	AM_RANGE(0xbc00, 0xbc00) AM_WRITENOP
@@ -830,19 +788,14 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( evilston_map, AS_PROGRAM, 8, taitol_2cpu_state )
 	COMMON_BANKS_MAP
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("DSWA") AM_WRITENOP   //watchdog ?
-	AM_RANGE(0xa801, 0xa801) AM_READ_PORT("DSWB")
-	AM_RANGE(0xa802, 0xa802) AM_READ_PORT("IN0")
-	AM_RANGE(0xa803, 0xa803) AM_READ_PORT("IN1")
-	AM_RANGE(0xa804, 0xa804) AM_WRITENOP    //coin couters/locks ?
-	AM_RANGE(0xa807, 0xa807) AM_READ_PORT("IN2")
+	AM_RANGE(0xa000, 0xa7ff) AM_DEVREADWRITE("dpram", mb8421_device, right_r, right_w)
+	AM_RANGE(0xa800, 0xa807) AM_DEVREADWRITE("tc0510nio", tc0510nio_device, read, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( evilston_2_map, AS_PROGRAM, 8, taitol_2cpu_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0xe000, 0xe7ff) AM_DEVREADWRITE("dpram", mb8421_device, left_r, left_w)
 	AM_RANGE(0xe800, 0xe801) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
 	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("bank7")
 ADDRESS_MAP_END
@@ -1391,10 +1344,10 @@ static INPUT_PORTS_START( horshoes )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 
 	PORT_START("AN0")
-	PORT_BIT( 0xffff, 0x0000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(30) PORT_REVERSE
+	PORT_BIT( 0xffff, 0x0000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(30) PORT_RESET PORT_REVERSE
 
 	PORT_START("AN1")
-	PORT_BIT( 0xffff, 0x0000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(30)
+	PORT_BIT( 0xffff, 0x0000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(30) PORT_RESET
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( plgirls )
@@ -1617,8 +1570,8 @@ static INPUT_PORTS_START( evilston )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(4)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(4)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1)
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
@@ -1695,7 +1648,7 @@ WRITE8_MEMBER(fhawk_state::portA_w)
 }
 
 
-static MACHINE_CONFIG_START( fhawk, fhawk_state )
+static MACHINE_CONFIG_START( fhawk )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_13_33056MHz/2)    /* verified freq on pin122 of TC0090LVC cpu */
@@ -1712,6 +1665,13 @@ static MACHINE_CONFIG_START( fhawk, fhawk_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitol_state, irq0_line_hold)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+
+	MCFG_DEVICE_ADD("tc0220ioc", TC0220IOC, 0)
+	MCFG_TC0220IOC_READ_0_CB(IOPORT("DSWA"))
+	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
+	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
+	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
 
 	MCFG_MACHINE_START_OVERRIDE(taitol_state, taito_l)
 	MCFG_MACHINE_RESET_OVERRIDE(taitol_state, taito_l)
@@ -1748,7 +1708,7 @@ static MACHINE_CONFIG_START( fhawk, fhawk_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED_CLASS( champwr, fhawk, champwr_state )
+static MACHINE_CONFIG_DERIVED( champwr, fhawk )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1768,13 +1728,13 @@ static MACHINE_CONFIG_DERIVED_CLASS( champwr, fhawk, champwr_state )
 
 	MCFG_SOUND_ADD("msm", MSM5205, XTAL_384kHz)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(champwr_state, msm5205_vck)) /* VCK function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8 kHz */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
 
 
-static MACHINE_CONFIG_DERIVED_CLASS( raimais, fhawk, taitol_2cpu_state )
+static MACHINE_CONFIG_DERIVED( raimais, fhawk )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1786,6 +1746,10 @@ static MACHINE_CONFIG_DERIVED_CLASS( raimais, fhawk, taitol_2cpu_state )
 	MCFG_CPU_MODIFY("slave")
 	MCFG_CPU_PROGRAM_MAP(raimais_2_map)
 
+	MCFG_DEVICE_REMOVE("tc0220ioc") // I/O chip is a TC0040IOC
+
+	MCFG_DEVICE_ADD("dpram", MB8421, 0)
+
 	/* sound hardware */
 	MCFG_SOUND_REPLACE("ymsnd", YM2610, XTAL_8MHz)      /* verified on pcb (8Mhz OSC is also for the 2nd z80) */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -1795,7 +1759,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( raimais, fhawk, taitol_2cpu_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( kurikint, taitol_2cpu_state )
+static MACHINE_CONFIG_START( kurikint )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_13_33056MHz/2)    /* verified freq on pin122 of TC0090LVC cpu */
@@ -1809,6 +1773,8 @@ static MACHINE_CONFIG_START( kurikint, taitol_2cpu_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitol_state, irq0_line_hold)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+
+	MCFG_DEVICE_ADD("dpram", MB8421, 0)
 
 	MCFG_MACHINE_START_OVERRIDE(taitol_state, taito_l)
 	MCFG_MACHINE_RESET_OVERRIDE(taitol_state, taito_l)
@@ -1839,7 +1805,7 @@ static MACHINE_CONFIG_START( kurikint, taitol_2cpu_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( plotting, taitol_1cpu_state )
+static MACHINE_CONFIG_START( plotting )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_13_33056MHz/2)    /* verified freq on pin122 of TC0090LVC cpu */
@@ -1899,11 +1865,15 @@ static MACHINE_CONFIG_DERIVED( puzznici, plotting )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED_CLASS( horshoes, plotting, horshoes_state )
+static MACHINE_CONFIG_DERIVED( horshoes, plotting )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(horshoes_map)
+
+	MCFG_DEVICE_ADD("upd4701", UPD4701A, 0)
+	MCFG_UPD4701_PORTX("AN0")
+	MCFG_UPD4701_PORTY("AN1")
 
 	MCFG_MACHINE_RESET_OVERRIDE(horshoes_state, horshoes)
 MACHINE_CONFIG_END
@@ -1915,6 +1885,11 @@ static MACHINE_CONFIG_DERIVED( palamed, plotting )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(palamed_map)
 
+	MCFG_DEVICE_ADD("ppi", I8255, 0) // Toshiba TMP8255AP-5
+	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
+
 	MCFG_MACHINE_RESET_OVERRIDE(taitol_1cpu_state, palamed)
 MACHINE_CONFIG_END
 
@@ -1925,10 +1900,15 @@ static MACHINE_CONFIG_DERIVED( cachat, plotting )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(cachat_map)
 
+	MCFG_DEVICE_ADD("ppi", I8255, 0) // NEC D70155C
+	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
+
 	MCFG_MACHINE_RESET_OVERRIDE(taitol_1cpu_state, cachat)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( evilston, taitol_2cpu_state )
+static MACHINE_CONFIG_START( evilston )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_13_33056MHz/2)    /* not verified */
@@ -1939,9 +1919,18 @@ static MACHINE_CONFIG_START( evilston, taitol_2cpu_state )
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_12MHz/3)     /* not verified */
 	MCFG_CPU_PROGRAM_MAP(evilston_2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitol_state, irq0_line_hold)
-	MCFG_CPU_PERIODIC_INT_DRIVER(taitol_state, nmi_line_pulse, 60)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+
+	MCFG_DEVICE_ADD("tc0510nio", TC0510NIO, 0)
+	MCFG_TC0510NIO_READ_0_CB(IOPORT("DSWA"))
+	MCFG_TC0510NIO_READ_1_CB(IOPORT("DSWB"))
+	MCFG_TC0510NIO_READ_2_CB(IOPORT("IN0"))
+	MCFG_TC0510NIO_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0510NIO_READ_7_CB(IOPORT("IN2"))
+
+	MCFG_DEVICE_ADD("dpram", MB8421, 0)
+	MCFG_MB8421_INTL_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_MACHINE_START_OVERRIDE(taitol_state, taito_l)
 	MCFG_MACHINE_RESET_OVERRIDE(taitol_state, taito_l)
@@ -2550,48 +2539,48 @@ DRIVER_INIT_MEMBER(taitol_1cpu_state, plottinga)
 }
 
 
-GAME( 1988, raimais,   0,        raimais,   raimais,   driver_device,     0,         ROT0,   "Taito Corporation Japan", "Raimais (World)", 0 )
-GAME( 1988, raimaisj,  raimais,  raimais,   raimaisj,  driver_device,     0,         ROT0,   "Taito Corporation", "Raimais (Japan)", 0 )
-GAME( 1988, raimaisjo, raimais,  raimais,   raimaisj,  driver_device,     0,         ROT0,   "Taito Corporation", "Raimais (Japan, first revision)", 0 )
+GAME( 1988, raimais,   0,        raimais,   raimais,   taitol_2cpu_state, 0,         ROT0,   "Taito Corporation Japan", "Raimais (World)", 0 )
+GAME( 1988, raimaisj,  raimais,  raimais,   raimaisj,  taitol_2cpu_state, 0,         ROT0,   "Taito Corporation", "Raimais (Japan)", 0 )
+GAME( 1988, raimaisjo, raimais,  raimais,   raimaisj,  taitol_2cpu_state, 0,         ROT0,   "Taito Corporation", "Raimais (Japan, first revision)", 0 )
 
-GAME( 1988, fhawk,     0,        fhawk,     fhawk,     driver_device,     0,         ROT270, "Taito Corporation Japan", "Fighting Hawk (World)", 0 )
-GAME( 1988, fhawkj,    fhawk,    fhawk,     fhawkj,    driver_device,     0,         ROT270, "Taito Corporation", "Fighting Hawk (Japan)", 0 )
+GAME( 1988, fhawk,     0,        fhawk,     fhawk,     fhawk_state,       0,         ROT270, "Taito Corporation Japan", "Fighting Hawk (World)", 0 )
+GAME( 1988, fhawkj,    fhawk,    fhawk,     fhawkj,    fhawk_state,       0,         ROT270, "Taito Corporation", "Fighting Hawk (Japan)", 0 )
 
-GAME( 1989, champwr,   0,        champwr,   champwr,   driver_device,     0,         ROT0,   "Taito Corporation Japan", "Champion Wrestler (World)", MACHINE_IMPERFECT_SOUND )
-GAME( 1989, champwru,  champwr,  champwr,   champwru,  driver_device,     0,         ROT0,   "Taito America Corporation", "Champion Wrestler (US)", MACHINE_IMPERFECT_SOUND )
-GAME( 1989, champwrj,  champwr,  champwr,   champwrj,  driver_device,     0,         ROT0,   "Taito Corporation", "Champion Wrestler (Japan)", MACHINE_IMPERFECT_SOUND )
+GAME( 1989, champwr,   0,        champwr,   champwr,   champwr_state,     0,         ROT0,   "Taito Corporation Japan", "Champion Wrestler (World)", MACHINE_IMPERFECT_SOUND )
+GAME( 1989, champwru,  champwr,  champwr,   champwru,  champwr_state,     0,         ROT0,   "Taito America Corporation", "Champion Wrestler (US)", MACHINE_IMPERFECT_SOUND )
+GAME( 1989, champwrj,  champwr,  champwr,   champwrj,  champwr_state,     0,         ROT0,   "Taito Corporation", "Champion Wrestler (Japan)", MACHINE_IMPERFECT_SOUND )
 
-GAME( 1988, kurikint,  0,        kurikint,  kurikint,  driver_device,     0,         ROT0,   "Taito Corporation Japan", "Kuri Kinton (World)", 0 )
-GAME( 1988, kurikintu, kurikint, kurikint,  kurikintj, driver_device,     0,         ROT0,   "Taito America Corporation", "Kuri Kinton (US)", 0 )
-GAME( 1988, kurikintj, kurikint, kurikint,  kurikintj, driver_device,     0,         ROT0,   "Taito Corporation", "Kuri Kinton (Japan)", 0 )
-GAME( 1988, kurikinta, kurikint, kurikint,  kurikinta, driver_device,     0,         ROT0,   "Taito Corporation Japan", "Kuri Kinton (World, prototype?)", 0 )
+GAME( 1988, kurikint,  0,        kurikint,  kurikint,  taitol_2cpu_state, 0,         ROT0,   "Taito Corporation Japan", "Kuri Kinton (World)", 0 )
+GAME( 1988, kurikintu, kurikint, kurikint,  kurikintj, taitol_2cpu_state, 0,         ROT0,   "Taito America Corporation", "Kuri Kinton (US)", 0 )
+GAME( 1988, kurikintj, kurikint, kurikint,  kurikintj, taitol_2cpu_state, 0,         ROT0,   "Taito Corporation", "Kuri Kinton (Japan)", 0 )
+GAME( 1988, kurikinta, kurikint, kurikint,  kurikinta, taitol_2cpu_state, 0,         ROT0,   "Taito Corporation Japan", "Kuri Kinton (World, prototype?)", 0 )
 
-GAME( 1989, plotting,  0,        plotting,  plotting,  driver_device,     0,         ROT0,   "Taito Corporation Japan", "Plotting (World set 1)", 0 )
+GAME( 1989, plotting,  0,        plotting,  plotting,  taitol_1cpu_state, 0,         ROT0,   "Taito Corporation Japan", "Plotting (World set 1)", 0 )
 GAME( 1989, plottinga, plotting, plotting,  plotting,  taitol_1cpu_state, plottinga, ROT0,   "Taito Corporation Japan", "Plotting (World set 2, protected)", 0 )
-GAME( 1989, plottingb, plotting, plotting,  plotting,  driver_device,     0,         ROT0,   "Taito Corporation Japan", "Plotting (World set 3, earliest version)", 0 )
-GAME( 1989, plottingu, plotting, plotting,  plottingu, driver_device,     0,         ROT0,   "Taito America Corporation", "Plotting (US)", 0 )
-GAME( 1989, flipull,   plotting, plotting,  plotting,  driver_device,     0,         ROT0,   "Taito Corporation", "Flipull (Japan)", 0 )
+GAME( 1989, plottingb, plotting, plotting,  plotting,  taitol_1cpu_state, 0,         ROT0,   "Taito Corporation Japan", "Plotting (World set 3, earliest version)", 0 )
+GAME( 1989, plottingu, plotting, plotting,  plottingu, taitol_1cpu_state, 0,         ROT0,   "Taito America Corporation", "Plotting (US)", 0 )
+GAME( 1989, flipull,   plotting, plotting,  plotting,  taitol_1cpu_state, 0,         ROT0,   "Taito Corporation", "Flipull (Japan)", 0 )
 
-GAME( 1989, puzznic,   0,        puzznic,   puzznic,   driver_device,     0,         ROT0,   "Taito Corporation Japan", "Puzznic (World)", 0 )
-GAME( 1989, puzznicu,  puzznic,  puzznic,   puzznic,   driver_device,     0,         ROT0,   "Taito America Corporation", "Puzznic (US)", 0 )
-GAME( 1989, puzznicj,  puzznic,  puzznic,   puzznic,   driver_device,     0,         ROT0,   "Taito Corporation", "Puzznic (Japan)", 0 )
-GAME( 1989, puzznici,  puzznic,  puzznici,  puzznic,   driver_device,     0,         ROT0,   "bootleg", "Puzznic (Italian bootleg)", 0 )
-GAME( 1989, puzznicb,  puzznic,  puzznici,  puzznic,   driver_device,     0,         ROT0,   "bootleg", "Puzznic (bootleg, set 1)", 0 )
-GAME( 1989, puzznicba, puzznic,  puzznici,  puzznic,   driver_device,     0,         ROT0,   "bootleg", "Puzznic (bootleg, set 2)", 0 )
+GAME( 1989, puzznic,   0,        puzznic,   puzznic,   taitol_1cpu_state, 0,         ROT0,   "Taito Corporation Japan", "Puzznic (World)", 0 )
+GAME( 1989, puzznicu,  puzznic,  puzznic,   puzznic,   taitol_1cpu_state, 0,         ROT0,   "Taito America Corporation", "Puzznic (US)", 0 )
+GAME( 1989, puzznicj,  puzznic,  puzznic,   puzznic,   taitol_1cpu_state, 0,         ROT0,   "Taito Corporation", "Puzznic (Japan)", 0 )
+GAME( 1989, puzznici,  puzznic,  puzznici,  puzznic,   taitol_1cpu_state, 0,         ROT0,   "bootleg", "Puzznic (Italian bootleg)", 0 )
+GAME( 1989, puzznicb,  puzznic,  puzznici,  puzznic,   taitol_1cpu_state, 0,         ROT0,   "bootleg", "Puzznic (bootleg, set 1)", 0 )
+GAME( 1989, puzznicba, puzznic,  puzznici,  puzznic,   taitol_1cpu_state, 0,         ROT0,   "bootleg", "Puzznic (bootleg, set 2)", 0 )
 
-GAME( 1990, horshoes,  0,        horshoes,  horshoes,  driver_device,     0,         ROT270, "Taito America Corporation", "American Horseshoes (US)", 0 )
+GAME( 1990, horshoes,  0,        horshoes,  horshoes,  horshoes_state,    0,         ROT270, "Taito America Corporation", "American Horseshoes (US)", 0 )
 
-GAME( 1990, palamed,   0,        palamed,   palamed,   driver_device,     0,         ROT0,   "Taito Corporation", "Palamedes (Japan)", 0 )
+GAME( 1990, palamed,   0,        palamed,   palamed,   taitol_1cpu_state, 0,         ROT0,   "Taito Corporation", "Palamedes (Japan)", 0 )
 
-GAME( 1993, cachat,    0,        cachat,    cachat,    driver_device,     0,         ROT0,   "Taito Corporation", "Cachat (Japan)", 0 )
-GAME( 1993, tubeit,    cachat,   cachat,    tubeit,    driver_device,     0,         ROT0,   "bootleg", "Tube-It", 0 ) // No (c) message
+GAME( 1993, cachat,    0,        cachat,    cachat,    taitol_1cpu_state, 0,         ROT0,   "Taito Corporation", "Cachat (Japan)", 0 )
+GAME( 1993, tubeit,    cachat,   cachat,    tubeit,    taitol_1cpu_state, 0,         ROT0,   "bootleg", "Tube-It", 0 ) // No (c) message
 
-GAME( 199?, cubybop,   0,        cachat,    cubybop,   driver_device,     0,         ROT0,   "Hot-B", "Cuby Bop (location test)", 0 ) // No (c) message, but Hot-B company logo in tile gfx
+GAME( 199?, cubybop,   0,        cachat,    cubybop,   taitol_1cpu_state, 0,         ROT0,   "Hot-B", "Cuby Bop (location test)", 0 ) // No (c) message, but Hot-B company logo in tile gfx
 
-GAME( 1992, plgirls,   0,        cachat,    plgirls,   driver_device,     0,         ROT270, "Hot-B", "Play Girls", 0 )
-GAME( 1992, lagirl,    plgirls,  cachat,    plgirls,   driver_device,     0,         ROT270, "bootleg", "LA Girl", 0 ) // bootleg hardware with changed title & backgrounds
+GAME( 1992, plgirls,   0,        cachat,    plgirls,   taitol_1cpu_state, 0,         ROT270, "Hot-B", "Play Girls", 0 )
+GAME( 1992, lagirl,    plgirls,  cachat,    plgirls,   taitol_1cpu_state, 0,         ROT270, "bootleg", "LA Girl", 0 ) // bootleg hardware with changed title & backgrounds
 
-GAME( 1993, plgirls2,  0,        cachat,    plgirls2,  driver_device,     0,         ROT270, "Hot-B", "Play Girls 2", 0 )
-GAME( 1993, plgirls2b, plgirls2, cachat,    plgirls2,  driver_device,     0,         ROT270, "bootleg", "Play Girls 2 (bootleg)", MACHINE_IMPERFECT_GRAPHICS ) // bootleg hardware (regular Z80 etc. instead of TC0090LVC, but acts almost the same - scroll offset problems)
+GAME( 1993, plgirls2,  0,        cachat,    plgirls2,  taitol_1cpu_state, 0,         ROT270, "Hot-B", "Play Girls 2", 0 )
+GAME( 1993, plgirls2b, plgirls2, cachat,    plgirls2,  taitol_1cpu_state, 0,         ROT270, "bootleg", "Play Girls 2 (bootleg)", MACHINE_IMPERFECT_GRAPHICS ) // bootleg hardware (regular Z80 etc. instead of TC0090LVC, but acts almost the same - scroll offset problems)
 
-GAME( 1990, evilston,  0,        evilston,  evilston,  driver_device,     0,         ROT270, "Spacy Industrial, Ltd.", "Evil Stone", MACHINE_IMPERFECT_SOUND ) // not Taito PCB, just uses TC0090LVC
+GAME( 1990, evilston,  0,        evilston,  evilston,  taitol_2cpu_state, 0,         ROT270, "Spacy Industrial, Ltd.", "Evil Stone", 0 )

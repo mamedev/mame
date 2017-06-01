@@ -286,7 +286,7 @@ void fcombat_state::machine_reset()
 	m_ty = 0;
 }
 
-static MACHINE_CONFIG_START( fcombat, fcombat_state )
+static MACHINE_CONFIG_START( fcombat )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 10000000/3)

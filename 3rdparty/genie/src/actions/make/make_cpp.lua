@@ -33,7 +33,7 @@
 		local objdirs = {}
 		local additionalobjdirs = {}
 		for _, file in ipairs(prj.allfiles) do
-			if path.isSourceFile(file) then
+			if path.issourcefile(file) then
 				objdirs[_MAKE.esc(path.getdirectory(path.trimdots(file)))] = 1
 			end
 		end
@@ -318,7 +318,7 @@
 		-- add objects for compilation, and remove any that are excluded per config.
 		_p('  OBJECTS := \\')
 		for _, file in ipairs(cfg.files) do
-			if path.isSourceFile(file) then
+			if path.issourcefile(file) then
 				-- check if file is excluded.
 				if not is_excluded(prj, cfg, file) then
 					-- if not excluded, add it.
@@ -523,7 +523,7 @@
 		table.sort(prj.allfiles)
 
 		for _, file in ipairs(prj.allfiles or {}) do
-			if path.isSourceFile(file) then
+			if path.issourcefile(file) then
 				if (path.isobjcfile(file)) then
 					_p('$(OBJDIR)/%s.o: %s $(GCH_OBJC) $(MAKEFILE)'
 						, _MAKE.esc(path.trimdots(path.removeext(file)))

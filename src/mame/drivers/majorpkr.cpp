@@ -985,7 +985,7 @@ GFXDECODE_END
 *    Machine Drivers     *
 *************************/
 
-static MACHINE_CONFIG_START( majorpkr, majorpkr_state )
+static MACHINE_CONFIG_START( majorpkr )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)  // 6 MHz.
 	MCFG_CPU_PROGRAM_MAP(map)
@@ -1026,7 +1026,7 @@ static MACHINE_CONFIG_START( majorpkr, majorpkr_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", OKI_CLOCK, OKIM6295_PIN7_HIGH)  // clock frequency & pin 7 verified.
+	MCFG_OKIM6295_ADD("oki", OKI_CLOCK, PIN7_HIGH)  // clock frequency & pin 7 verified.
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

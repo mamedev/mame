@@ -258,7 +258,7 @@ PALETTE_INIT_MEMBER(itgambl3_state, itgambl3)
 *     Machine Drivers     *
 **************************/
 
-static MACHINE_CONFIG_START( itgambl3, itgambl3_state )
+static MACHINE_CONFIG_START( itgambl3 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", H83044, MAIN_CLOCK) /* wrong CPU, but we have not a M16C core ATM */
@@ -279,7 +279,7 @@ static MACHINE_CONFIG_START( itgambl3, itgambl3_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", MAIN_CLOCK/16, OKIM6295_PIN7_HIGH) /* 1MHz */
+	MCFG_OKIM6295_ADD("oki", MAIN_CLOCK/16, PIN7_HIGH) /* 1MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -515,10 +515,10 @@ ROM_END
 *      Game Drivers      *
 *************************/
 
-/*    YEAR  NAME      PARENT  MACHINE   INPUT     INIT ROT    COMPANY        FULLNAME        FLAGS  */
-GAME( 200?, ejollyx5, 0,      itgambl3, itgambl3, driver_device, 0,   ROT0, "Solar Games",           "Euro Jolly X5",                  MACHINE_IS_SKELETON )
-GAME( 200?, grandprx, 0,      itgambl3, itgambl3, driver_device, 0,   ROT0, "4fun",                  "Grand Prix",                     MACHINE_IS_SKELETON )
-GAME( 200?, supjolly, 0,      itgambl3, itgambl3, driver_device, 0,   ROT0, "<unknown>",             "Super Jolly",                    MACHINE_IS_SKELETON )
-GAME( 200?, x5jokers, 0,      itgambl3, itgambl3, driver_device, 0,   ROT0, "Electronic Projects",   "X Five Jokers (Version 1.12)",   MACHINE_IS_SKELETON )
-GAME( 200?, queenotg, 0,      itgambl3, itgambl3, driver_device, 0,   ROT0, "<unknown>",             "Queen of the Games",             MACHINE_IS_SKELETON )
-GAME( 200?, ejollyx9, 0,      itgambl3, itgambl3, driver_device, 0,   ROT0, "Solar Games",           "Euro Jolly X9",                  MACHINE_IS_SKELETON )
+//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT ROT   COMPANY                  FULLNAME                          FLAGS
+GAME( 200?, ejollyx5, 0,      itgambl3, itgambl3, itgambl3_state, 0,   ROT0, "Solar Games",           "Euro Jolly X5",                  MACHINE_IS_SKELETON )
+GAME( 200?, grandprx, 0,      itgambl3, itgambl3, itgambl3_state, 0,   ROT0, "4fun",                  "Grand Prix",                     MACHINE_IS_SKELETON )
+GAME( 200?, supjolly, 0,      itgambl3, itgambl3, itgambl3_state, 0,   ROT0, "<unknown>",             "Super Jolly",                    MACHINE_IS_SKELETON )
+GAME( 200?, x5jokers, 0,      itgambl3, itgambl3, itgambl3_state, 0,   ROT0, "Electronic Projects",   "X Five Jokers (Version 1.12)",   MACHINE_IS_SKELETON )
+GAME( 200?, queenotg, 0,      itgambl3, itgambl3, itgambl3_state, 0,   ROT0, "<unknown>",             "Queen of the Games",             MACHINE_IS_SKELETON )
+GAME( 200?, ejollyx9, 0,      itgambl3, itgambl3, itgambl3_state, 0,   ROT0, "Solar Games",           "Euro Jolly X9",                  MACHINE_IS_SKELETON )

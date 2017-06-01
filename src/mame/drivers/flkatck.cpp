@@ -106,10 +106,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( flkatck_sound_map, AS_PROGRAM, 8, flkatck_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM                                             /* ROM */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM                                             /* RAM */
-	AM_RANGE(0x9000, 0x9000) AM_READWRITE(multiply_r, multiply_w)               /* ??? */
-//  AM_RANGE(0x9001, 0x9001) AM_RAM                                             /* ??? */
-	AM_RANGE(0x9004, 0x9004) AM_READNOP                                         /* ??? */
-	AM_RANGE(0x9006, 0x9006) AM_WRITENOP                                        /* ??? */
+	AM_RANGE(0x9000, 0x9000) AM_READ(multiply_r)                                // 007452: Protection (see wecleman, but unused here?)
+	AM_RANGE(0x9001, 0x9001) AM_READNOP                                         // 007452: ?
+	AM_RANGE(0x9000, 0x9001) AM_WRITE(multiply_w)                               // 007452: Protection (see wecleman, but unused here?)
+	AM_RANGE(0x9004, 0x9004) AM_READNOP                                         // 007452: ?
+	AM_RANGE(0x9006, 0x9006) AM_WRITENOP                                        // 007452: ?
 	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("k007232", k007232_device, read, write) /* 007232 registers */
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)           /* YM2151 */
@@ -207,7 +208,7 @@ void flkatck_state::machine_reset()
 	m_flipscreen = 0;
 }
 
-static MACHINE_CONFIG_START( flkatck, flkatck_state )
+static MACHINE_CONFIG_START( flkatck )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309,3000000*4) /* HD63C09EP, 24/8 MHz */
@@ -310,6 +311,6 @@ ROM_START( flkatcka )
 	ROM_LOAD( "mask2m.11a",  0x000000, 0x040000, CRC(6d1ea61c) SHA1(9e6eb9ac61838df6e1f74e74bb72f3edf1274aed) )
 ROM_END
 
-GAME( 1987, mx5000,  0,      flkatck, flkatck, driver_device, 0, ROT90, "Konami", "MX5000", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, flkatck, mx5000, flkatck, flkatck, driver_device, 0, ROT90, "Konami", "Flak Attack (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, flkatcka,mx5000, flkatck, flkatck, driver_device, 0, ROT90, "Konami", "Flak Attack (Japan, PWB 450593 sub-board)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, mx5000,  0,      flkatck, flkatck, flkatck_state, 0, ROT90, "Konami", "MX5000", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, flkatck, mx5000, flkatck, flkatck, flkatck_state, 0, ROT90, "Konami", "Flak Attack (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, flkatcka,mx5000, flkatck, flkatck, flkatck_state, 0, ROT90, "Konami", "Flak Attack (Japan, PWB 450593 sub-board)", MACHINE_SUPPORTS_SAVE )

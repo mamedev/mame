@@ -6,10 +6,10 @@
 
 */
 
-#pragma once
+#ifndef MAME_CPU_TMS7000_TMS7000_H
+#define MAME_CPU_TMS7000_TMS7000_H
 
-#ifndef __TMS7000_H__
-#define __TMS7000_H__
+#pragma once
 
 #include "debugger.h"
 
@@ -32,20 +32,12 @@ enum
 	TMS7000_PORTE           /* TMS70C46 only */
 };
 
-// chip info flags
-#define TMS7000_CHIP_IS_CMOS        0x01
-#define TMS7000_CHIP_FAMILY_70X0    0x00
-#define TMS7000_CHIP_FAMILY_70X2    0x02
-#define TMS7000_CHIP_FAMILY_70CX2   0x04
-#define TMS7000_CHIP_FAMILY_MASK    0x06
-
 
 class tms7000_device : public cpu_device
 {
 public:
 	// construction/destruction
 	tms7000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	tms7000_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal, uint32_t info_flags, const char *shortname, const char *source);
 
 	DECLARE_READ8_MEMBER(tms7000_unmapped_rf_r) { if (!machine().side_effect_disabled()) logerror("'%s' (%04X): unmapped_rf_r @ $%04x\n", tag(), m_pc, offset + 0x80); return 0; };
 	DECLARE_WRITE8_MEMBER(tms7000_unmapped_rf_w) { logerror("'%s' (%04X): unmapped_rf_w @ $%04x = $%02x\n", tag(), m_pc, offset + 0x80, data); };
@@ -55,13 +47,21 @@ public:
 	DECLARE_READ8_MEMBER(tms7002_pf_r) { return tms7000_pf_r(space, offset + 0x10); }
 	DECLARE_WRITE8_MEMBER(tms7002_pf_w) { tms7000_pf_w(space, offset + 0x10, data); }
 
-	bool chip_is_cmos() { return (m_info_flags & TMS7000_CHIP_IS_CMOS) ? true : false; }
-	uint32_t chip_get_family() { return m_info_flags & TMS7000_CHIP_FAMILY_MASK; }
-	bool chip_is_family_70x0() { return chip_get_family() == TMS7000_CHIP_FAMILY_70X0; }
-	bool chip_is_family_70x2() { return chip_get_family() == TMS7000_CHIP_FAMILY_70X2; }
-	bool chip_is_family_70cx2() { return chip_get_family() == TMS7000_CHIP_FAMILY_70CX2; }
+	bool chip_is_cmos() const { return (m_info_flags & CHIP_IS_CMOS) ? true : false; }
+	bool chip_is_family_70x0() const { return chip_get_family() == CHIP_FAMILY_70X0; }
+	bool chip_is_family_70x2() const { return chip_get_family() == CHIP_FAMILY_70X2; }
+	bool chip_is_family_70cx2() const { return chip_get_family() == CHIP_FAMILY_70CX2; }
 
 protected:
+	// chip info flags
+	static constexpr uint32_t CHIP_IS_CMOS        = 0x01;
+	static constexpr uint32_t CHIP_FAMILY_70X0    = 0x00;
+	static constexpr uint32_t CHIP_FAMILY_70X2    = 0x02;
+	static constexpr uint32_t CHIP_FAMILY_70CX2   = 0x04;
+	static constexpr uint32_t CHIP_FAMILY_MASK    = 0x06;
+
+	tms7000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal, uint32_t info_flags);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -85,6 +85,8 @@ protected:
 	virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
 	virtual uint32_t disasm_max_opcode_bytes() const override { return 4; }
 	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+
+	uint32_t chip_get_family() const { return m_info_flags & CHIP_FAMILY_MASK; }
 
 	virtual void execute_one(uint8_t op);
 
@@ -358,17 +360,17 @@ public:
 };
 
 
-extern const device_type TMS7000;
-extern const device_type TMS7020;
-extern const device_type TMS7020_EXL;
-extern const device_type TMS7040;
-extern const device_type TMS70C00;
-extern const device_type TMS70C20;
-extern const device_type TMS70C40;
-extern const device_type TMS70C46;
-extern const device_type TMS7001;
-extern const device_type TMS7041;
-extern const device_type TMS7002;
-extern const device_type TMS7042;
+DECLARE_DEVICE_TYPE(TMS7000,     tms7000_device)
+DECLARE_DEVICE_TYPE(TMS7020,     tms7020_device)
+DECLARE_DEVICE_TYPE(TMS7020_EXL, tms7020_exl_device)
+DECLARE_DEVICE_TYPE(TMS7040,     tms7040_device)
+DECLARE_DEVICE_TYPE(TMS70C00,    tms70c00_device)
+DECLARE_DEVICE_TYPE(TMS70C20,    tms70c20_device)
+DECLARE_DEVICE_TYPE(TMS70C40,    tms70c40_device)
+DECLARE_DEVICE_TYPE(TMS70C46,    tms70c46_device)
+DECLARE_DEVICE_TYPE(TMS7001,     tms7001_device)
+DECLARE_DEVICE_TYPE(TMS7041,     tms7041_device)
+DECLARE_DEVICE_TYPE(TMS7002,     tms7002_device)
+DECLARE_DEVICE_TYPE(TMS7042,     tms7042_device)
 
-#endif /* __TMS7000_H__ */
+#endif // MAME_CPU_TMS7000_TMS7000_H

@@ -53,7 +53,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type EGRET = device_creator<egret_device>;
+DEFINE_DEVICE_TYPE(EGRET, egret_device, "egret", "Apple Egret")
 
 ROM_START( egret )
 	ROM_REGION(0x4400, EGRET_CPU_TAG, 0)
@@ -78,25 +78,15 @@ static ADDRESS_MAP_START( egret_map, AS_PROGRAM, 8, egret_device )
 	AM_RANGE(0x0f00, 0x1fff) AM_ROM AM_REGION(EGRET_CPU_TAG, 0)
 ADDRESS_MAP_END
 
+
 //-------------------------------------------------
-//  MACHINE_CONFIG
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( egret )
+MACHINE_CONFIG_MEMBER( egret_device::device_add_mconfig )
 	MCFG_CPU_ADD(EGRET_CPU_TAG, M68HC05EG, XTAL_32_768kHz*192)  // 32.768 kHz input clock, can be PLL'ed to x128 = 4.1 MHz under s/w control
 	MCFG_CPU_PROGRAM_MAP(egret_map)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor egret_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( egret );
-}
 
 const tiny_rom_entry *egret_device::device_rom_region() const
 {
@@ -334,7 +324,7 @@ WRITE8_MEMBER( egret_device::pram_w )
 //-------------------------------------------------
 
 egret_device::egret_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, EGRET, "Apple Egret", tag, owner, clock, "egret", __FILE__),
+	: device_t(mconfig, EGRET, tag, owner, clock),
 	device_nvram_interface(mconfig, *this),
 	write_reset(*this),
 	write_linechange(*this),

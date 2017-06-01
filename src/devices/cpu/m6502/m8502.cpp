@@ -11,9 +11,9 @@
 #include "emu.h"
 #include "m8502.h"
 
-const device_type M8502 = device_creator<m8502_device>;
+DEFINE_DEVICE_TYPE(M8502, m8502_device, "m8502", "M8502")
 
 m8502_device::m8502_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	m6510_device(mconfig, M8502, "M8502", tag, owner, clock, "m8502", __FILE__)
+	m6510_device(mconfig, M8502, tag, owner, clock)
 {
 }

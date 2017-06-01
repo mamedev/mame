@@ -65,6 +65,7 @@ Verification still needed for the other PCBs.
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
+#include "machine/vs9209.h"
 #include "sound/2610intf.h"
 #include "sound/3812intf.h"
 #include "video/vsystem_gga.h"
@@ -93,6 +94,12 @@ READ8_MEMBER(aerofgt_state::pending_command_r)
 WRITE8_MEMBER(aerofgt_state::pending_command_clear_w)
 {
 	m_pending_command = 0;
+}
+
+WRITE8_MEMBER(aerofgt_state::aerofgt_unknown_output_w)
+{
+	if (data != 0)
+		logerror("Writing %02X to unknown output port\n", data);
 }
 
 WRITE8_MEMBER(aerofgt_state::aerofgt_sh_bankswitch_w)
@@ -299,13 +306,7 @@ static ADDRESS_MAP_START( aerofgt_map, AS_PROGRAM, 16, aerofgt_state )
 	AM_RANGE(0xffff80, 0xffff87) AM_WRITE(aerofgt_gfxbank_w)
 	AM_RANGE(0xffff88, 0xffff89) AM_WRITE(aerofgt_bg1scrolly_w) /* + something else in the top byte */
 	AM_RANGE(0xffff90, 0xffff91) AM_WRITE(aerofgt_bg2scrolly_w) /* + something else in the top byte */
-	AM_RANGE(0xffffa0, 0xffffa1) AM_READ_PORT("P1")
-	AM_RANGE(0xffffa2, 0xffffa3) AM_READ_PORT("P2")
-	AM_RANGE(0xffffa4, 0xffffa5) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xffffa6, 0xffffa7) AM_READ_PORT("DSW1")
-	AM_RANGE(0xffffa8, 0xffffa9) AM_READ_PORT("DSW2")
-	AM_RANGE(0xffffac, 0xffffad) AM_READ8(pending_command_r, 0x00ff) AM_WRITENOP /* ??? */
-	AM_RANGE(0xffffae, 0xffffaf) AM_READ_PORT("DSW3")
+	AM_RANGE(0xffffa0, 0xffffbf) AM_DEVREADWRITE8("io", vs9209_device, read, write, 0x00ff)
 	AM_RANGE(0xffffc0, 0xffffc1) AM_WRITE8(sound_command_w, 0x00ff)
 ADDRESS_MAP_END
 
@@ -994,92 +995,92 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( aerofgt )
 	PORT_START("P1")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("P2")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SERVICE1  )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1  )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW1")
 	/* "Free Play mode: Have SW1:1-8 ON." */
-	PORT_DIPNAME( 0x0001, 0x0001, "Coin Slot" )                 PORT_DIPLOCATION("SW1:1")
-	PORT_DIPSETTING(      0x0001, "Same" )
-	PORT_DIPSETTING(      0x0000, "Individual" )
-	PORT_DIPNAME( 0x000e, 0x000e, DEF_STR( Coin_A ) )           PORT_DIPLOCATION("SW1:2,3,4")
-	PORT_DIPSETTING(      0x000a, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(      0x000c, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(      0x000e, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(      0x0006, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x0070, 0x0070, DEF_STR( Coin_B ) )           PORT_DIPLOCATION("SW1:5,6,7")
-	PORT_DIPSETTING(      0x0050, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(      0x0060, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(      0x0070, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(      0x0030, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x0080, 0x0080, "Continue Coin" )             PORT_DIPLOCATION("SW1:8") /* "When ON, SW1:2-7 are disabled." */
-	PORT_DIPSETTING(      0x0080, "Start 1 Coin/Continue 1 Coin" )
-	PORT_DIPSETTING(      0x0000, "Start 2 Coin/Continue 1 Coin" )
+	PORT_DIPNAME( 0x01, 0x01, "Coin Slot" )                 PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x01, "Same" )
+	PORT_DIPSETTING(    0x00, "Individual" )
+	PORT_DIPNAME( 0x0e, 0x0e, DEF_STR( Coin_A ) )           PORT_DIPLOCATION("SW1:2,3,4")
+	PORT_DIPSETTING(    0x0a, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )
+	PORT_DIPNAME( 0x70, 0x70, DEF_STR( Coin_B ) )           PORT_DIPLOCATION("SW1:5,6,7")
+	PORT_DIPSETTING(    0x50, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x60, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x70, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )
+	PORT_DIPNAME( 0x80, 0x80, "Continue Coin" )             PORT_DIPLOCATION("SW1:8") /* "When ON, SW1:2-7 are disabled." */
+	PORT_DIPSETTING(    0x80, "Start 1 Coin/Continue 1 Coin" )
+	PORT_DIPSETTING(    0x00, "Start 2 Coin/Continue 1 Coin" )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Flip_Screen ) )      PORT_DIPLOCATION("SW2:1")
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0000, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION("SW2:2")
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x000c, 0x000c, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("SW2:3,4")
-	PORT_DIPSETTING(      0x0008, DEF_STR( Easy ) )
-	PORT_DIPSETTING(      0x000c, DEF_STR( Normal ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Hard ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0030, 0x0030, DEF_STR( Lives ) )            PORT_DIPLOCATION("SW2:5,6")
-	PORT_DIPSETTING(      0x0020, "1" )
-	PORT_DIPSETTING(      0x0010, "2" )
-	PORT_DIPSETTING(      0x0030, "3" )
-	PORT_DIPSETTING(      0x0000, "4" )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Bonus_Life ) )       PORT_DIPLOCATION("SW2:7")
-	PORT_DIPSETTING(      0x0040, "200000" )
-	PORT_DIPSETTING(      0x0000, "300000" )
-	PORT_SERVICE_DIPLOC( 0x0080, IP_ACTIVE_LOW, "SW2:8" )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )      PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )            PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPSETTING(    0x20, "1" )
+	PORT_DIPSETTING(    0x10, "2" )
+	PORT_DIPSETTING(    0x30, "3" )
+	PORT_DIPSETTING(    0x00, "4" )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Bonus_Life ) )       PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(    0x40, "200000" )
+	PORT_DIPSETTING(    0x00, "300000" )
+	PORT_SERVICE_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW2:8" )
 
-	/* This DSW3 is not documented in the Aero Fighters manual */
-	PORT_START("DSW3")
-	PORT_DIPNAME( 0x000f, 0x0000, DEF_STR( Region ) )
-	PORT_DIPSETTING(      0x0000, "Any" )
-	PORT_DIPSETTING(      0x000f, "USA/Canada" )
-	PORT_DIPSETTING(      0x000e, DEF_STR( Korea ) )
-	PORT_DIPSETTING(      0x000d, DEF_STR( Hong_Kong ) )
-	PORT_DIPSETTING(      0x000b, DEF_STR( Taiwan ) )
+	/* Jumpers not documented in the Aero Fighters manual */
+	PORT_START("JP1")
+	PORT_DIPNAME( 0xf, 0x0, DEF_STR( Region ) )
+	PORT_DIPSETTING(   0x0, "Any" )
+	PORT_DIPSETTING(   0xf, "USA/Canada" )
+	PORT_DIPSETTING(   0xe, DEF_STR( Korea ) )
+	PORT_DIPSETTING(   0xd, DEF_STR( Hong_Kong ) )
+	PORT_DIPSETTING(   0xb, DEF_STR( Taiwan ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( wbbc97 )
@@ -1331,7 +1332,7 @@ MACHINE_RESET_MEMBER(aerofgt_state,aerofgt)
 	m_soundbank->set_entry(0); /* needed by spinlbrk */
 }
 
-static MACHINE_CONFIG_START( pspikes, aerofgt_state )
+static MACHINE_CONFIG_START( pspikes )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000,XTAL_20MHz/2)    /* verified on pcb */
@@ -1381,7 +1382,7 @@ static MACHINE_CONFIG_START( pspikes, aerofgt_state )
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( spikes91, aerofgt_state )
+static MACHINE_CONFIG_START( spikes91 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000,20000000/2)   /* 10 MHz (?) */
@@ -1419,7 +1420,7 @@ static MACHINE_CONFIG_START( spikes91, aerofgt_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( pspikesb, aerofgt_state )
+static MACHINE_CONFIG_START( pspikesb )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000,20000000/2)   /* 10 MHz (?) */
@@ -1449,11 +1450,11 @@ static MACHINE_CONFIG_START( pspikesb, aerofgt_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_LOW) // clock frequency & pin 7 not verified, pin high causes sound pitch to be too high
+	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_LOW) // clock frequency & pin 7 not verified, pin high causes sound pitch to be too high
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( pspikesc, aerofgt_state )
+static MACHINE_CONFIG_START( pspikesc )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000,20000000/2)   /* 10 MHz (?) */
@@ -1488,11 +1489,11 @@ static MACHINE_CONFIG_START( pspikesc, aerofgt_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( karatblz, aerofgt_state )
+static MACHINE_CONFIG_START( karatblz )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000,20000000/2)   /* 10 MHz (?) */
@@ -1547,7 +1548,7 @@ static MACHINE_CONFIG_START( karatblz, aerofgt_state )
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( karatblzbl, aerofgt_state )
+static MACHINE_CONFIG_START( karatblzbl )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000,20000000/2)   /* 10 MHz (?) */
@@ -1603,7 +1604,7 @@ static MACHINE_CONFIG_START( karatblzbl, aerofgt_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( spinlbrk, aerofgt_state )
+static MACHINE_CONFIG_START( spinlbrk )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000,XTAL_20MHz/2) /* verified on pcb */
@@ -1659,7 +1660,7 @@ static MACHINE_CONFIG_START( spinlbrk, aerofgt_state )
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( turbofrc, aerofgt_state )
+static MACHINE_CONFIG_START( turbofrc )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000,XTAL_20MHz/2) /* verified on pcb */
@@ -1714,7 +1715,7 @@ static MACHINE_CONFIG_START( turbofrc, aerofgt_state )
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( aerofgtb, aerofgt_state )
+static MACHINE_CONFIG_START( aerofgtb )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000,20000000/2)   /* 10 MHz (?) */
@@ -1770,7 +1771,7 @@ static MACHINE_CONFIG_START( aerofgtb, aerofgt_state )
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( aerofgt, aerofgt_state )
+static MACHINE_CONFIG_START( aerofgt )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000,XTAL_20MHz/2) /* verified on pcb */
@@ -1784,6 +1785,16 @@ static MACHINE_CONFIG_START( aerofgt, aerofgt_state )
 
 	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,aerofgt)
 	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,aerofgt)
+
+	MCFG_DEVICE_ADD("io", VS9209, 0)
+	MCFG_VS9209_IN_PORTA_CB(IOPORT("P1"))
+	MCFG_VS9209_IN_PORTB_CB(IOPORT("P2"))
+	MCFG_VS9209_IN_PORTC_CB(IOPORT("SYSTEM"))
+	MCFG_VS9209_IN_PORTD_CB(IOPORT("DSW1"))
+	MCFG_VS9209_IN_PORTE_CB(IOPORT("DSW2"))
+	MCFG_VS9209_IN_PORTG_CB(READ8(aerofgt_state, pending_command_r))
+	MCFG_VS9209_OUT_PORTG_CB(WRITE8(aerofgt_state, aerofgt_unknown_output_w))
+	MCFG_VS9209_IN_PORTH_CB(IOPORT("JP1"))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1819,7 +1830,7 @@ static MACHINE_CONFIG_START( aerofgt, aerofgt_state )
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( aerfboot, aerofgt_state )
+static MACHINE_CONFIG_START( aerfboot )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000,20000000/2)   /* 10 MHz (?) */
@@ -1855,12 +1866,12 @@ static MACHINE_CONFIG_START( aerfboot, aerofgt_state )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( aerfboo2, aerofgt_state )
+static MACHINE_CONFIG_START( aerfboo2 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000,20000000/2)   /* 10 MHz (?) */
@@ -1891,11 +1902,11 @@ static MACHINE_CONFIG_START( aerfboo2, aerofgt_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( wbbc97, aerofgt_state )
+static MACHINE_CONFIG_START( wbbc97 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000,20000000/2)   /* 10 MHz (?) */
@@ -1938,7 +1949,7 @@ static MACHINE_CONFIG_START( wbbc97, aerofgt_state )
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -2845,34 +2856,34 @@ DRIVER_INIT_MEMBER(aerofgt_state, banked_oki)
 }
 
 
-GAME( 1990, spinlbrk, 0,        spinlbrk, spinlbrk, driver_device, 0, ROT0,   "V-System Co.",     "Spinal Breakers (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1990, spinlbrku,spinlbrk, spinlbrk, spinlbrku, driver_device,0, ROT0,   "V-System Co.",     "Spinal Breakers (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1990, spinlbrkj,spinlbrk, spinlbrk, spinlbrk, driver_device, 0, ROT0,   "V-System Co.",     "Spinal Breakers (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1990, spinlbrk,  0,        spinlbrk, spinlbrk,  aerofgt_state, 0, ROT0,   "V-System Co.",     "Spinal Breakers (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1990, spinlbrku, spinlbrk, spinlbrk, spinlbrku, aerofgt_state, 0, ROT0,   "V-System Co.",     "Spinal Breakers (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1990, spinlbrkj, spinlbrk, spinlbrk, spinlbrk,  aerofgt_state, 0, ROT0,   "V-System Co.",     "Spinal Breakers (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 
-GAME( 1991, pspikes,  0,        pspikes,  pspikes, driver_device,  0, ROT0,   "Video System Co.",   "Power Spikes (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1991, pspikesk, pspikes,  pspikes,  pspikes, driver_device,  0, ROT0,   "Video System Co.",   "Power Spikes (Korea)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1991, pspikesu, pspikes,  pspikes,  pspikes, driver_device,  0, ROT0,   "Video System Co.",   "Power Spikes (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1991, svolly91, pspikes,  pspikes,  pspikes, driver_device,  0, ROT0,   "Video System Co.",   "Super Volley '91 (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1991, pspikesb, pspikes,  pspikesb, pspikesb, driver_device, 0, ROT0,   "bootleg",            "Power Spikes (bootleg)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1991, pspikesba,pspikes,  pspikesb, pspikesb, driver_device, 0, ROT0,   "bootleg (Playmark?)","Power Spikes (Italian bootleg)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1991, spikes91, pspikes,  spikes91, pspikes, driver_device,  0, ROT0,   "bootleg",            "1991 Spikes (Italian bootleg, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND | MACHINE_NO_COCKTAIL )
-GAME( 1991, spikes91b,pspikes,  spikes91, pspikes, driver_device,  0, ROT0,   "bootleg",            "1991 Spikes (Italian bootleg, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND | MACHINE_NO_COCKTAIL )
-GAME( 1991, pspikesc, pspikes,  pspikesc, pspikesc, driver_device, 0, ROT0,   "bootleg",            "Power Spikes (China)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND )
-GAME( 1997, wbbc97,   0,        wbbc97,   wbbc97, driver_device,   0, ROT0,   "Comad",              "Beach Festival World Championship 1997", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // based on power spikes codebase
+GAME( 1991, pspikes,   0,        pspikes,  pspikes,  aerofgt_state, 0, ROT0,   "Video System Co.",   "Power Spikes (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1991, pspikesk,  pspikes,  pspikes,  pspikes,  aerofgt_state, 0, ROT0,   "Video System Co.",   "Power Spikes (Korea)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1991, pspikesu,  pspikes,  pspikes,  pspikes,  aerofgt_state, 0, ROT0,   "Video System Co.",   "Power Spikes (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1991, svolly91,  pspikes,  pspikes,  pspikes,  aerofgt_state, 0, ROT0,   "Video System Co.",   "Super Volley '91 (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1991, pspikesb,  pspikes,  pspikesb, pspikesb, aerofgt_state, 0, ROT0,   "bootleg",            "Power Spikes (bootleg)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1991, pspikesba, pspikes,  pspikesb, pspikesb, aerofgt_state, 0, ROT0,   "bootleg (Playmark?)","Power Spikes (Italian bootleg)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1991, spikes91,  pspikes,  spikes91, pspikes,  aerofgt_state, 0, ROT0,   "bootleg",            "1991 Spikes (Italian bootleg, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND | MACHINE_NO_COCKTAIL )
+GAME( 1991, spikes91b, pspikes,  spikes91, pspikes,  aerofgt_state, 0, ROT0,   "bootleg",            "1991 Spikes (Italian bootleg, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND | MACHINE_NO_COCKTAIL )
+GAME( 1991, pspikesc,  pspikes,  pspikesc, pspikesc, aerofgt_state, 0, ROT0,   "bootleg",            "Power Spikes (China)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, wbbc97,    0,        wbbc97,   wbbc97,   aerofgt_state, 0, ROT0,   "Comad",              "Beach Festival World Championship 1997", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // based on power spikes codebase
 
-GAME( 1991, karatblz, 0,        karatblz, karatblz, driver_device, 0, ROT0,   "Video System Co.", "Karate Blazers (World, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1991, karatblza,karatblz, karatblz, karatblz, driver_device, 0, ROT0,   "Video System Co.", "Karate Blazers (World, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1991, karatblzu,karatblz, karatblz, karatblz, driver_device, 0, ROT0,   "Video System Co.", "Karate Blazers (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1991, karatblzj,karatblz, karatblz, karatblz, driver_device, 0, ROT0,   "Video System Co.", "Toushin Blazers (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1991, karatblzbl,karatblz,karatblzbl,karatblz,driver_device, 0, ROT0,   "bootleg",          "Karate Blazers (bootleg with Street Smart sound hardware)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND )
+GAME( 1991, karatblz,   0,        karatblz,   karatblz, aerofgt_state, 0, ROT0,   "Video System Co.", "Karate Blazers (World, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1991, karatblza,  karatblz, karatblz,   karatblz, aerofgt_state, 0, ROT0,   "Video System Co.", "Karate Blazers (World, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1991, karatblzu,  karatblz, karatblz,   karatblz, aerofgt_state, 0, ROT0,   "Video System Co.", "Karate Blazers (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1991, karatblzj,  karatblz, karatblz,   karatblz, aerofgt_state, 0, ROT0,   "Video System Co.", "Toushin Blazers (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1991, karatblzbl, karatblz, karatblzbl, karatblz, aerofgt_state, 0, ROT0,   "bootleg",          "Karate Blazers (bootleg with Street Smart sound hardware)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1991, turbofrc, 0,        turbofrc, turbofrc, driver_device, 0, ROT270, "Video System Co.", "Turbo Force (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1991, turbofrcu,turbofrc, turbofrc, turbofrc, driver_device, 0, ROT270, "Video System Co.", "Turbo Force (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1991, turbofrc,  0,        turbofrc, turbofrc, aerofgt_state, 0, ROT270, "Video System Co.", "Turbo Force (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1991, turbofrcu, turbofrc, turbofrc, turbofrc, aerofgt_state, 0, ROT270, "Video System Co.", "Turbo Force (US)",    MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 
 // the tiles on these also contain an alt title 'The Final War' for both the title screen and attract logo was it ever used?
-GAME( 1992, aerofgt,  0,        aerofgt,  aerofgt, driver_device,  0, ROT270, "Video System Co.", "Aero Fighters (World / USA + Canada / Korea / Hong Kong / Taiwan) (newer hardware)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // this has the newer sprite chip etc. unlike all other games in this driver..
-GAME( 1992, aerofgtb, aerofgt,  aerofgtb, aerofgtb, driver_device, 0, ROT270, "Video System Co.", "Aero Fighters (Taiwan / Japan, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // probably intended for Taiwan because the Japanese name is Sonic Wings (below)
-GAME( 1992, aerofgtc, aerofgt,  aerofgtb, aerofgtb, driver_device, 0, ROT270, "Video System Co.", "Aero Fighters (Taiwan / Japan, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1992, sonicwi,  aerofgt,  aerofgtb, aerofgtb, driver_device, 0, ROT270, "Video System Co.", "Sonic Wings (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1992, aerfboot, aerofgt,  aerfboot, aerofgtb, aerofgt_state, banked_oki, ROT270, "bootleg", "Aero Fighters (bootleg set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND )
-GAME( 1992, aerfboo2, aerofgt,  aerfboo2, aerofgtb, driver_device, 0, ROT270, "bootleg",          "Aero Fighters (bootleg set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND )
+GAME( 1992, aerofgt,  0,        aerofgt,  aerofgt,  aerofgt_state, 0,          ROT270, "Video System Co.", "Aero Fighters (World / USA + Canada / Korea / Hong Kong / Taiwan) (newer hardware)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // this has the newer sprite chip etc. unlike all other games in this driver..
+GAME( 1992, aerofgtb, aerofgt,  aerofgtb, aerofgtb, aerofgt_state, 0,          ROT270, "Video System Co.", "Aero Fighters (Taiwan / Japan, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // probably intended for Taiwan because the Japanese name is Sonic Wings (below)
+GAME( 1992, aerofgtc, aerofgt,  aerofgtb, aerofgtb, aerofgt_state, 0,          ROT270, "Video System Co.", "Aero Fighters (Taiwan / Japan, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1992, sonicwi,  aerofgt,  aerofgtb, aerofgtb, aerofgt_state, 0,          ROT270, "Video System Co.", "Sonic Wings (Japan)",                   MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1992, aerfboot, aerofgt,  aerfboot, aerofgtb, aerofgt_state, banked_oki, ROT270, "bootleg",          "Aero Fighters (bootleg set 1)",         MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND )
+GAME( 1992, aerfboo2, aerofgt,  aerfboo2, aerofgtb, aerofgt_state, 0,          ROT270, "bootleg",          "Aero Fighters (bootleg set 2)",         MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND )

@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_C64_GEOCABLE_H
+#define MAME_BUS_C64_GEOCABLE_H
 
-#ifndef __C64_GEOCABLE__
-#define __C64_GEOCABLE__
+#pragma once
 
 
 #include "user.h"
@@ -55,6 +55,7 @@ private:
 
 // device type definition
 extern const device_type C64_GEOCABLE;
+DECLARE_DEVICE_TYPE(C64_GEOCABLE, c64_geocable_device)
 
 
-#endif
+#endif // MAME_BUS_C64_GEOCABLE_H

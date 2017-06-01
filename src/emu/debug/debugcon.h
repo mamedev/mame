@@ -8,12 +8,15 @@
 
 *********************************************************************/
 
-#ifndef __DEBUGCON_H__
-#define __DEBUGCON_H__
+#ifndef MAME_EMU_DEBUG_DEBUGCON_H
+#define MAME_EMU_DEBUG_DEBUGCON_H
+
+#pragma once
+
+#include "textbuf.h"
 
 #include <functional>
 
-#include "textbuf.h"
 
 /***************************************************************************
     CONSTANTS
@@ -131,4 +134,4 @@ private:
 	debug_command   *m_commandlist;
 };
 
-#endif
+#endif // MAME_EMU_DEBUG_DEBUGCON_H

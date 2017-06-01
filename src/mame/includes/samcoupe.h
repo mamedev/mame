@@ -162,7 +162,7 @@ public:
 	required_device<centronics_device> m_lpt2;
 	required_device<ram_device> m_ram;
 	required_device<msm6242_device> m_rtc;
-	required_device<wd1772_t> m_fdc;
+	required_device<wd1772_device> m_fdc;
 	required_device<floppy_connector> m_wd1772_0;
 	required_device<floppy_connector> m_wd1772_1;
 	required_memory_region m_region_maincpu;

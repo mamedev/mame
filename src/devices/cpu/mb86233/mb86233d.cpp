@@ -10,7 +10,7 @@
         0   1   2   3   4   5   6   7   8   9   a   b   c   d   e   f
     0  b0  b1  x0  x1  x2  i0  i1  i2  sp pag vsm dmc  c0  c1  pc   -
     1   a  ah  al   b  bh  bl   c  ch  cl   d  dh  dl   p  ph  pl sft
-    
+
     Second register bank:
          0    1    2    3    4    5    6    7    8    9    a    b    c    d    e    f
     2 <register file>
@@ -69,7 +69,7 @@
     1011 11.c 0110 1110 .... .... .... .... iret
 
     Top 3 bits = instruction group, except when it isn't.
-    
+
  */
 
 
@@ -161,7 +161,7 @@ static std::string memory(uint32_t reg, bool x1)
 			else
 				util::stream_format(stream, "x0");
 		}
-			
+
 		if(reg & 0x10) {
 			if((0x10 - (reg & 0xf)) < 10)
 				util::stream_format(stream, "-%d", 0x10 - (reg & 0xf));
@@ -334,7 +334,7 @@ static unsigned dasm_mb86233(std::ostream &stream, uint32_t opcode )
 		default:
 			util::stream_format(stream, "mov {%d} %s, %s", op, memory(r1, false), memory(r2, true));
 			break;
-		}				
+		}
 		break;
 	}
 
@@ -398,7 +398,7 @@ static unsigned dasm_mb86233(std::ostream &stream, uint32_t opcode )
 	case 0x10: case 0x11: case 0x12: case 0x13: case 0x14: case 0x15: case 0x16: case 0x17:
 		util::stream_format(stream, "ldi #0x%x, %s", opcode & 0xffffff, regnames[(opcode >> 24) & 0x3f]); break;
 		break;
-		
+
 	case 0x2f: case 0x3f: {
 		uint32_t cond = ( opcode >> 20 ) & 0x1f;
 		uint32_t subtype = ( opcode >> 17 ) & 7;

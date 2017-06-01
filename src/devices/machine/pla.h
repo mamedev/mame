@@ -6,27 +6,11 @@
 
 **********************************************************************/
 
+#ifndef MAME_MACHINE_PLA_H
+#define MAME_MACHINE_PLA_H
+
 #pragma once
 
-#ifndef __PLA__
-#define __PLA__
-
-
-
-
-//**************************************************************************
-//  MACROS / CONSTANTS
-//**************************************************************************
-
-#define MAX_TERMS       512
-#define MAX_CACHE_BITS  20
-#define CACHE2_SIZE     8
-
-enum
-{
-	PLA_FMT_JEDBIN = 0,
-	PLA_FMT_BERKELEY
-};
 
 
 
@@ -34,17 +18,17 @@ enum
 //  INTERFACE CONFIGURATION MACROS
 ///*************************************************************************
 
-#define MCFG_PLA_ADD(_tag, _inputs, _outputs, _terms) \
-	MCFG_DEVICE_ADD(_tag, PLA, 0) \
-	pla_device::set_num_inputs(*device, _inputs); \
-	pla_device::set_num_outputs(*device, _outputs); \
-	pla_device::set_num_terms(*device, _terms);
+#define MCFG_PLA_ADD(tag, inputs, outputs, terms) \
+		MCFG_DEVICE_ADD((tag), PLA, 0) \
+		pla_device::set_num_inputs(*device, (inputs)); \
+		pla_device::set_num_outputs(*device, (outputs)); \
+		pla_device::set_num_terms(*device, (terms));
 
-#define MCFG_PLA_INPUTMASK(_mask) \
-	pla_device::set_inputmask(*device, _mask);
+#define MCFG_PLA_INPUTMASK(mask) \
+		pla_device::set_inputmask(*device, (mask));
 
-#define MCFG_PLA_FILEFORMAT(_format) \
-	pla_device::set_format(*device, _format);
+#define MCFG_PLA_FILEFORMAT(format) \
+		pla_device::set_format(*device, (pla_device::FMT::format));
 
 
 // macros for known (and used) devices
@@ -67,13 +51,13 @@ enum
      F4  13 |             | 16  F2
     GND  14 |_____________| 15  F3
 */
-#define MCFG_PLS100_ADD(_tag) \
-	MCFG_PLA_ADD(_tag, 16, 8, 48)
+#define MCFG_PLS100_ADD(tag) \
+		MCFG_PLA_ADD((tag), 16, 8, 48)
 
 // MOS 8721 PLA
 // TODO: actual number of terms is unknown
-#define MCFG_MOS8721_ADD(_tag) \
-	MCFG_PLA_ADD(_tag, 27, 18, 379)
+#define MCFG_MOS8721_ADD(tag) \
+		MCFG_PLA_ADD((tag), 27, 18, 379)
 
 
 
@@ -86,6 +70,12 @@ enum
 class pla_device : public device_t
 {
 public:
+	enum class FMT
+	{
+		JEDBIN = 0,
+		BERKELEY
+	};
+
 	// construction/destruction
 	pla_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
@@ -94,7 +84,7 @@ public:
 	static void set_num_outputs(device_t &device, uint32_t o) { downcast<pla_device &>(device).m_outputs = o; }
 	static void set_num_terms(device_t &device, uint32_t t) { downcast<pla_device &>(device).m_terms = t; }
 	static void set_inputmask(device_t &device, uint32_t mask) { downcast<pla_device &>(device).m_input_mask = mask; } // uint32_t!
-	static void set_format(device_t &device, int format) { downcast<pla_device &>(device).m_format = format; }
+	static void set_format(device_t &device, FMT format) { downcast<pla_device &>(device).m_format = format; }
 
 	uint32_t inputs() { return m_inputs; }
 	uint32_t outputs() { return m_outputs; }
@@ -106,11 +96,15 @@ protected:
 	virtual void device_start() override;
 
 private:
+	static constexpr unsigned MAX_TERMS       = 512;
+	static constexpr unsigned MAX_CACHE_BITS  = 20;
+	static constexpr unsigned CACHE2_SIZE     = 8;
+
 	void parse_fusemap();
 
 	required_memory_region m_region;
 
-	int m_format;
+	FMT m_format;
 
 	uint32_t m_inputs;
 	uint32_t m_outputs;
@@ -132,7 +126,6 @@ private:
 
 
 // device type definition
-extern const device_type PLA;
+DECLARE_DEVICE_TYPE(PLA, pla_device)
 
-
-#endif
+#endif // MAME_MACHINE_PLA_H

@@ -896,7 +896,7 @@ DECOSPR_COLOUR_CB_MEMBER(rohga_state::schmeisr_col_callback)
 	return colour;
 }
 
-static MACHINE_CONFIG_START( rohga, rohga_state )
+static MACHINE_CONFIG_START( rohga )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14000000)
@@ -972,16 +972,16 @@ static MACHINE_CONFIG_START( rohga, rohga_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.78)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.78)
 
-	MCFG_OKIM6295_ADD("oki1", 32220000/32, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki1", 32220000/32, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki2", 32220000/16, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki2", 32220000/16, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( wizdfire, rohga_state )
+static MACHINE_CONFIG_START( wizdfire )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14000000)
@@ -1062,16 +1062,16 @@ static MACHINE_CONFIG_START( wizdfire, rohga_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 
-	MCFG_OKIM6295_ADD("oki1", 32220000/32, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki1", 32220000/32, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki2", 32220000/16, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki2", 32220000/16, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( nitrobal, rohga_state )
+static MACHINE_CONFIG_START( nitrobal )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14000000)
@@ -1154,16 +1154,16 @@ static MACHINE_CONFIG_START( nitrobal, rohga_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 
-	MCFG_OKIM6295_ADD("oki1", 32220000/32, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki1", 32220000/32, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki2", 32220000/16, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki2", 32220000/16, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( schmeisr, rohga_state )
+static MACHINE_CONFIG_START( schmeisr )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14000000)
@@ -1239,11 +1239,11 @@ static MACHINE_CONFIG_START( schmeisr, rohga_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 
-	MCFG_OKIM6295_ADD("oki1", 32220000/32, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki1", 32220000/32, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki2", 32220000/16, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki2", 32220000/16, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 MACHINE_CONFIG_END
@@ -1921,12 +1921,12 @@ DRIVER_INIT_MEMBER(rohga_state,hangzo)
 	memcpy(dst + 0x20000, src + 0x80000, 0x20000);
 }
 
-GAME( 1991, rohga,     0,        rohga,    rohga, rohga_state,    rohga,    ROT0,   "Data East Corporation", "Rohga Armor Force (Asia/Europe v5.0)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, rohga1,    rohga,    rohga,    rohga, rohga_state,    rohga,    ROT0,   "Data East Corporation", "Rohga Armor Force (Asia/Europe v3.0 set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, rohga2,    rohga,    rohga,    rohga, rohga_state,    rohga,    ROT0,   "Data East Corporation", "Rohga Armor Force (Asia/Europe v3.0 set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, rohgah,    rohga,    rohga,    rohga, rohga_state,    rohga,    ROT0,   "Data East Corporation", "Rohga Armor Force (Hong Kong v3.0)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, rohgau,    rohga,    rohga,    rohga, rohga_state,    rohga,    ROT0,   "Data East Corporation", "Rohga Armor Force (US v1.0)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, wolffang,  rohga,    rohga,    rohga, rohga_state,    rohga,    ROT0,   "Data East Corporation", "Wolf Fang -Kuhga 2001- (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, rohga,     0,        rohga,    rohga,    rohga_state, rohga,    ROT0,   "Data East Corporation", "Rohga Armor Force (Asia/Europe v5.0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, rohga1,    rohga,    rohga,    rohga,    rohga_state, rohga,    ROT0,   "Data East Corporation", "Rohga Armor Force (Asia/Europe v3.0 set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, rohga2,    rohga,    rohga,    rohga,    rohga_state, rohga,    ROT0,   "Data East Corporation", "Rohga Armor Force (Asia/Europe v3.0 set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, rohgah,    rohga,    rohga,    rohga,    rohga_state, rohga,    ROT0,   "Data East Corporation", "Rohga Armor Force (Hong Kong v3.0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, rohgau,    rohga,    rohga,    rohga,    rohga_state, rohga,    ROT0,   "Data East Corporation", "Rohga Armor Force (US v1.0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, wolffang,  rohga,    rohga,    rohga,    rohga_state, rohga,    ROT0,   "Data East Corporation", "Wolf Fang -Kuhga 2001- (Japan)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1992, wizdfire,  0,        wizdfire, wizdfire, rohga_state, wizdfire, ROT0,   "Data East Corporation", "Wizard Fire (Over Sea v2.1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, wizdfireu, wizdfire, wizdfire, wizdfire, rohga_state, wizdfire, ROT0,   "Data East Corporation", "Wizard Fire (US v1.1)", MACHINE_SUPPORTS_SAVE )

@@ -55,7 +55,7 @@ DECLARE_ENUM_OPERATORS(input_device_class)
 
 
 // device index
-const int DEVICE_INDEX_MAXIMUM = 0xff;
+constexpr int DEVICE_INDEX_MAXIMUM = 0xff;
 
 
 // input item classes
@@ -345,12 +345,6 @@ DECLARE_ENUM_OPERATORS(input_item_id)
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
-
-// forward declarations
-class input_device_item;
-class input_device;
-class input_class;
-
 
 // controller alias table typedef
 typedef std::map<std::string, std::string> devicemap_table_type;

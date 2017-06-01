@@ -8,14 +8,15 @@
  *
  */
 
-#ifndef CPC_DDI1_H_
-#define CPC_DDI1_H_
+#ifndef MAME_BUS_CPC_DDI1_H
+#define MAME_BUS_CPC_DDI1_H
+
+#pragma once
 
 #include "cpcexp.h"
 #include "machine/upd765.h"
 
-class cpc_ddi1_device : public device_t,
-			public device_cpc_expansion_card_interface
+class cpc_ddi1_device : public device_t, public device_cpc_expansion_card_interface
 {
 public:
 	// construction/destruction
@@ -48,5 +49,6 @@ private:
 
 // device type definition
 extern const device_type CPC_DDI1;
+DECLARE_DEVICE_TYPE(CPC_DDI1, cpc_ddi1_device)
 
-#endif /* CPC_DDI1_H_ */
+#endif // MAME_BUS_CPC_DDI1_H

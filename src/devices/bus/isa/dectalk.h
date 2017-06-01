@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
-#ifndef ISA_DECTALK_H_
-#define ISA_DECTALK_H_
+#ifndef MAME_BUS_ISA_DECTALK_H
+#define MAME_BUS_ISA_DECTALK_H
+
+#pragma once
 
 #include "isa.h"
 #include "sound/dac.h"
@@ -50,6 +52,6 @@ private:
 	required_device<cpu_device> m_dsp;
 };
 
-extern const device_type ISA8_DECTALK;
+DECLARE_DEVICE_TYPE(ISA8_DECTALK, dectalk_isa_device)
 
-#endif /* ISA_DECTALK_H_ */
+#endif // MAME_BUS_ISA_DECTALK_H

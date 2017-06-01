@@ -9,13 +9,17 @@
 #include "emu.h"
 #include "smsexp.h"
 
+// slot devices
+#include "gender.h"
+
+
 
 
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type SMS_EXPANSION_SLOT = device_creator<sms_expansion_slot_device>;
+DEFINE_DEVICE_TYPE(SMS_EXPANSION_SLOT, sms_expansion_slot_device, "sms_expansion_slot", "Sega SMS expansion slot")
 
 
 
@@ -52,8 +56,9 @@ device_sms_expansion_slot_interface::~device_sms_expansion_slot_interface()
 //-------------------------------------------------
 
 sms_expansion_slot_device::sms_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-						device_t(mconfig, SMS_EXPANSION_SLOT, "Sega SMS expansion slot", tag, owner, clock, "sms_expansion_slot", __FILE__),
-						device_slot_interface(mconfig, *this), m_device(nullptr)
+	device_t(mconfig, SMS_EXPANSION_SLOT, tag, owner, clock),
+	device_slot_interface(mconfig, *this),
+	m_device(nullptr)
 {
 }
 
@@ -74,58 +79,6 @@ sms_expansion_slot_device::~sms_expansion_slot_device()
 void sms_expansion_slot_device::device_start()
 {
 	m_device = dynamic_cast<device_sms_expansion_slot_interface *>(get_card_device());
-}
-
-
-//-------------------------------------------------
-// read
-//-------------------------------------------------
-
-READ8_MEMBER(sms_expansion_slot_device::read)
-{
-	if (m_device)
-		return m_device->read(space, offset);
-	else
-		return 0xff;
-}
-
-READ8_MEMBER(sms_expansion_slot_device::read_ram)
-{
-	if (m_device)
-		return m_device->read_ram(space, offset);
-	else
-		return 0xff;
-}
-
-int sms_expansion_slot_device::get_lphaser_xoffs()
-{
-	if (m_device)
-		return m_device->get_lphaser_xoffs();
-	else
-		return 0;
-}
-
-
-//-------------------------------------------------
-// write
-//-------------------------------------------------
-
-WRITE8_MEMBER(sms_expansion_slot_device::write_mapper)
-{
-	if (m_device)
-		m_device->write_mapper(space, offset, data);
-}
-
-WRITE8_MEMBER(sms_expansion_slot_device::write)
-{
-	if (m_device)
-		m_device->write(space, offset, data);
-}
-
-WRITE8_MEMBER(sms_expansion_slot_device::write_ram)
-{
-	if (m_device)
-		m_device->write_ram(space, offset, data);
 }
 
 

@@ -285,6 +285,6 @@ namespace bx
 
 } // namespace bx
 
-#include "uint32_t.inl"
+#include "inline/uint32_t.inl"
 
 #endif // BX_UINT32_T_H_HEADER_GUARD

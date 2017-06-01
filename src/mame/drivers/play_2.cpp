@@ -351,9 +351,9 @@ WRITE8_MEMBER( play_2_state::psg_w )
 }
 
 // **************** Machine *****************************
-static MACHINE_CONFIG_START( play_2, play_2_state )
+static MACHINE_CONFIG_START( play_2 )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", CDP1802, 2950000)
+	MCFG_CPU_ADD("maincpu", CDP1802, XTAL_2_95MHz)
 	MCFG_CPU_PROGRAM_MAP(play_2_map)
 	MCFG_CPU_IO_MAP(play_2_io)
 	MCFG_COSMAC_WAIT_CALLBACK(VCC)
@@ -367,7 +367,7 @@ static MACHINE_CONFIG_START( play_2, play_2_state )
 	/* Video */
 	MCFG_DEFAULT_LAYOUT(layout_play_2)
 
-	MCFG_DEVICE_ADD("tpb_clock", CLOCK, 2950000 / 8) // TPB line from CPU
+	MCFG_DEVICE_ADD("tpb_clock", CLOCK, XTAL_2_95MHz / 8) // TPB line from CPU
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(play_2_state, clock_w))
 
 	MCFG_DEVICE_ADD("xpoint", CLOCK, 60) // crossing-point detector
@@ -386,7 +386,7 @@ static MACHINE_CONFIG_START( play_2, play_2_state )
 	MCFG_FRAGMENT_ADD( genpin_audio )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_CDP1863_ADD("1863", 0, 2950000 / 8)
+	MCFG_CDP1863_ADD("1863", 0, XTAL_2_95MHz / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
@@ -506,11 +506,11 @@ ROM_START(madrace)
 ROM_END
 
 
-GAME(1979,  antar,     0,     play_2, play_2, driver_device, 0,    ROT0, "Playmatic", "Antar (set 1)",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1979,  antar2,    antar, play_2, play_2, driver_device, 0,    ROT0, "Playmatic", "Antar (set 2)",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1980,  evlfight,  0,     play_2, play_2, driver_device, 0,    ROT0, "Playmatic", "Evil Fight",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1980,  attack,    0,     play_2, play_2, driver_device, 0,    ROT0, "Playmatic", "Attack",             MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1980,  blkfever,  0,     play_2, play_2, driver_device, 0,    ROT0, "Playmatic", "Black Fever",        MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1982,  cerberup,  0,     play_2, play_2, driver_device, 0,    ROT0, "Playmatic", "Cerberus (Pinball)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-GAME(1985,  madrace,   0,     play_2, play_2, driver_device, 0,    ROT0, "Playmatic", "Mad Race",           MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-GAME(1980,  zira,      0,     zira,   play_2, play_2_state,  zira, ROT0, "Playmatic", "Zira",               MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME(1979,  antar,     0,     play_2, play_2, play_2_state, 0,    ROT0, "Playmatic", "Antar (set 1)",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1979,  antar2,    antar, play_2, play_2, play_2_state, 0,    ROT0, "Playmatic", "Antar (set 2)",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1980,  evlfight,  0,     play_2, play_2, play_2_state, 0,    ROT0, "Playmatic", "Evil Fight",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1980,  attack,    0,     play_2, play_2, play_2_state, 0,    ROT0, "Playmatic", "Attack",             MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1980,  blkfever,  0,     play_2, play_2, play_2_state, 0,    ROT0, "Playmatic", "Black Fever",        MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1982,  cerberup,  0,     play_2, play_2, play_2_state, 0,    ROT0, "Playmatic", "Cerberus (Pinball)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME(1985,  madrace,   0,     play_2, play_2, play_2_state, 0,    ROT0, "Playmatic", "Mad Race",           MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME(1980,  zira,      0,     zira,   play_2, play_2_state, zira, ROT0, "Playmatic", "Zira",               MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

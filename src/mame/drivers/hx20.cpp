@@ -817,7 +817,7 @@ void hx20_state::machine_start()
 //  MACHINE_CONFIG( hx20 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( hx20, hx20_state )
+static MACHINE_CONFIG_START( hx20 )
 	// basic machine hardware
 	MCFG_CPU_ADD(HD6301V1_MAIN_TAG, HD63701, XTAL_2_4576MHz)
 	MCFG_CPU_PROGRAM_MAP(hx20_mem)
@@ -920,6 +920,6 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT                     COMPANY   FULLNAME           FLAGS
-COMP( 1983, ehx20,  0,      0,       hx20,      hx20,    driver_device,    0,     "Epson",  "Epson HX-20",           MACHINE_NOT_WORKING )
-COMP( 1983, ehx20e, ehx20,  0,       hx20,      hx20e,   driver_device,    0,     "Epson",  "Epson HX-20 (Europe)",  MACHINE_NOT_WORKING )
+//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    STATE          INIT   COMPANY   FULLNAME                 FLAGS
+COMP( 1983, ehx20,  0,      0,       hx20,      hx20,    hx20_state,    0,     "Epson",  "Epson HX-20",           MACHINE_NOT_WORKING )
+COMP( 1983, ehx20e, ehx20,  0,       hx20,      hx20e,   hx20_state,    0,     "Epson",  "Epson HX-20 (Europe)",  MACHINE_NOT_WORKING )

@@ -149,7 +149,29 @@
 		end
 	end
 
+	local function removevalue(tbl, remove)
+		for index, item in ipairs(tbl) do
+			if item == remove then
+				table.remove(tbl, index)
+				break
+			end
+		end
+	end
 
+	local function removevalues(tbl, removes)
+		for k, v in pairs(tbl) do
+			for _, pattern in ipairs(removes) do
+				if pattern == tbl[k] then
+					if type(k) == "number" then
+						table.remove(tbl, k)
+					else
+						tbl[k] = nil
+					end
+					break
+				end
+			end
+		end
+	end
 
 --
 -- Merge all of the fields from one object into another. String values are overwritten,
@@ -161,36 +183,27 @@
 --    The source object, containing the settings to added to the destination.
 --
 
-	local function mergefield(kind, dest, src)
+	local function mergefield(kind, dest, src, mergecopiestotail)
 		local tbl = dest or { }
 		if kind == "keyvalue" or kind == "keypath" then
 			for key, value in pairs(src) do
-				tbl[key] = mergefield("list", tbl[key], value)
+				tbl[key] = mergefield("list", tbl[key], value, mergecopiestotail)
 			end
 		else
 			for _, item in ipairs(src) do
-				if not tbl[item] then
+				if tbl[item] then
+					if mergecopiestotail then
+						removevalue(tbl, item)
+						table.insert(tbl, item)
+						tbl[item] = item
+					end
+				else
 					table.insert(tbl, item)
 					tbl[item] = item
 				end
 			end
 		end
 		return tbl
-	end
-
-	local function removevalues(tbl, removes)
-		for k, v in pairs(tbl) do
-			for _, pattern in ipairs(removes) do
-				if pattern == tbl[k] then
-					if type(k) == "number" then 
-						table.remove(tbl, k) 
-					else 
-						tbl[k] = nil 
-					end
-					break
-				end
-			end
-		end
 	end
 
 	local function mergeobject(dest, src)
@@ -205,7 +218,7 @@
 				local field = premake.fields[fieldname]
 				if field then
 					if type(value) == "table" then
-						dest[fieldname] = mergefield(field.kind, dest[fieldname], value)
+						dest[fieldname] = mergefield(field.kind, dest[fieldname], value, field.mergecopiestotail)
 						if src.removes then
 							removes = src.removes[fieldname]
 							if removes then
@@ -609,11 +622,11 @@
   			end
   		end
   	end
-    
+
 --
 -- Build an inverse dictionary of literal vpaths for fast lookup
 --
-    
+
     local function inverseliteralvpaths()
         for sln in premake.solution.each() do
             for _,prj in ipairs(sln.projects) do
@@ -645,7 +658,7 @@
 			end
 			sln.location = sln.location or sln.basedir
 		end
-        
+
         -- convert paths for imported projects to be relative to solution location
 		for sln in premake.solution.each() do
 			for _, iprj in ipairs(sln.importedprojects) do
@@ -654,7 +667,7 @@
 		end
 
         inverseliteralvpaths()
-        
+
 		-- collapse configuration blocks, so that there is only one block per build
 		-- configuration/platform pair, filtered to the current operating environment
 		for sln in premake.solution.each() do
@@ -676,6 +689,29 @@
 					for cfgname, cfg in pairs(prj.__configs) do
 						local usesPrjs = getprojectsconnections(cfg, cfgname);
 						copyusagedata(cfg, cfgname, usesPrjs)
+					end
+				end
+			end
+		end
+
+		-- mark all configurations that have been removed via their removes table.
+		for sln in premake.solution.each() do
+			for prjIx, prj in ipairs(sln.projects) do
+				for cfgName, cfg in pairs(prj.__configs) do
+					cfg.build = true
+
+					local removes = nil
+
+					if cfg.removes ~= nil then
+						removes = cfg.removes["platforms"];
+					end
+
+					if removes ~= nil  then
+						for _,p in ipairs(removes) do
+							if p == cfg.platform then
+								cfg.build = false
+							end
+						end
 					end
 				end
 			end
@@ -739,25 +775,34 @@
 			cfg.kind = "StaticLib"
 		end
 
-		-- remove excluded files from the file list
 		local removefiles = cfg.removefiles
 		if _ACTION == 'gmake' or _ACTION == 'ninja' then
 			removefiles = table.join(removefiles, cfg.excludes)
 		end
+
+		-- build a table of removed files, indexed by file name
+		local removefilesDict = {}
+		for _, fname in ipairs(removefiles) do
+			removefilesDict[fname] = true
+		end
+
+		-- remove excluded files from the file list
 		local files = {}
 		for _, fname in ipairs(cfg.files) do
-			if not table.icontains(removefiles, fname) then
+			if removefilesDict[fname] == nil then
 				table.insert(files, fname)
 			end
 		end
 		cfg.files = files
 
-		-- remove excluded files from the project's allfiles list, and un-duplify
-		-- it
+		-- remove excluded files from the project's allfiles list, and
+		-- un-duplify it
 		local allfiles = {}
+		local allfilesDict = {}
 		for _, fname in ipairs(cfg.allfiles) do
-			if not table.icontains(allfiles, fname) then
-				if not table.icontains(removefiles, fname) then
+			if allfilesDict[fname] == nil then
+				if removefilesDict[fname] == nil then
+					allfilesDict[fname] = true
 					table.insert(allfiles, fname)
 				end
 			end

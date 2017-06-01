@@ -28,13 +28,13 @@
 
 
 // devices
-const device_type EF9364 = device_creator<ef9364_device>;
+DEFINE_DEVICE_TYPE(EF9364, ef9364_device, "ef9364", "Thomson EF9364")
 
 //-------------------------------------------------
 // default address map
 //-------------------------------------------------
 static ADDRESS_MAP_START( ef9364, AS_0, 8, ef9364_device )
-	AM_RANGE(0x00000, ( ( EF9364_TXTPLANE_MAX_SIZE * EF9364_MAX_TXTPLANES ) - 1 ) ) AM_RAM
+	AM_RANGE(0x00000, ( ( ef9364_device::TXTPLANE_MAX_SIZE * ef9364_device::MAX_TXTPLANES ) - 1 ) ) AM_RAM
 ADDRESS_MAP_END
 
 //-------------------------------------------------
@@ -60,7 +60,7 @@ const address_space_config *ef9364_device::memory_space_config(address_spacenum 
 //-------------------------------------------------
 
 ef9364_device::ef9364_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, EF9364, "EF9364", tag, owner, clock, "ef9364", __FILE__),
+	device_t(mconfig, EF9364, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
 	m_space_config("textram", ENDIANNESS_LITTLE, 8, 12, 0, nullptr, *ADDRESS_MAP_NAME(ef9364)),
@@ -117,8 +117,8 @@ void ef9364_device::device_start()
 {
 	m_textram = &space(0);
 
-	bitplane_xres = EF9364_NB_OF_COLUMNS*8;
-	bitplane_yres = EF9364_NB_OF_ROWS*(8+4);
+	bitplane_xres = NB_OF_COLUMNS*8;
+	bitplane_yres = NB_OF_ROWS*(8+4);
 
 	vsync_scanline_pos = 250;
 
@@ -149,7 +149,7 @@ void ef9364_device::device_reset()
 
 	char_latch = 0x00;
 
-	for(i=0;i<EF9364_NB_OF_COLUMNS * EF9364_NB_OF_ROWS * nb_of_pages;i++)
+	for(i = 0; i < NB_OF_COLUMNS * NB_OF_ROWS * nb_of_pages; i++)
 	{
 		m_textram->write_byte ( i , 0x7F );
 	}
@@ -199,15 +199,15 @@ uint32_t ef9364_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	int x,y,r;
 	unsigned char c;
 
-	for( r = 0 ; r < EF9364_NB_OF_ROWS ; r++ )
+	for( r = 0 ; r < NB_OF_ROWS ; r++ )
 	{
 		for( y = 0 ; y < 8 ; y++ )
 		{
-			for( x = 0 ; x < EF9364_NB_OF_COLUMNS * 8 ; x++ )
+			for( x = 0 ; x < NB_OF_COLUMNS * 8 ; x++ )
 			{
 				if( ( ( x >> 3 ) != x_curs_pos )   ||  ( r != y_curs_pos ) || !cursor_state)
 				{
-					c = m_textram->read_byte( ( r * EF9364_NB_OF_COLUMNS ) + ( x>>3 ) );
+					c = m_textram->read_byte( ( r * NB_OF_COLUMNS ) + ( x>>3 ) );
 
 					if( m_charset[((c&0x7F)<<3) + y] & (0x80>>(x&7)) )
 						m_screen_out.pix32((r*12)+y, x) = palette[1];
@@ -261,11 +261,11 @@ void ef9364_device::command_w(uint8_t cmd)
 	switch( cmd&7 )
 	{
 		case 0x0: // Page Erase & Cursor home
-			for( y=0 ; y < EF9364_NB_OF_ROWS ; y++ )
+			for( y=0 ; y < NB_OF_ROWS ; y++ )
 			{
-				for( x=0 ; x < EF9364_NB_OF_COLUMNS ; x++ )
+				for( x=0 ; x < NB_OF_COLUMNS ; x++ )
 				{
-					m_textram->write_byte ( y * EF9364_NB_OF_COLUMNS + x , 0x7F );
+					m_textram->write_byte ( y * NB_OF_COLUMNS + x , 0x7F );
 				}
 			}
 			x_curs_pos = 0;
@@ -273,32 +273,32 @@ void ef9364_device::command_w(uint8_t cmd)
 		break;
 
 		case 0x1: // Erase to end of the line and return cursor
-			for( ; x_curs_pos < EF9364_NB_OF_COLUMNS ; x_curs_pos++ )
+			for( ; x_curs_pos < NB_OF_COLUMNS ; x_curs_pos++ )
 			{
-				m_textram->write_byte ( y_curs_pos * EF9364_NB_OF_COLUMNS + x_curs_pos , 0x7F );
+				m_textram->write_byte ( y_curs_pos * NB_OF_COLUMNS + x_curs_pos , 0x7F );
 			}
 			x_curs_pos = 0;
 		break;
 
 		case 0x2: // Line feed
 			y_curs_pos++;
-			if( y_curs_pos >= EF9364_NB_OF_ROWS )
+			if( y_curs_pos >= NB_OF_ROWS )
 			{
 				// Scroll
-				for( j = 1 ; j < EF9364_NB_OF_ROWS ; j++ )
+				for( j = 1 ; j < NB_OF_ROWS ; j++ )
 				{
-					for( i = 0 ; i < EF9364_NB_OF_COLUMNS ; i++ )
+					for( i = 0 ; i < NB_OF_COLUMNS ; i++ )
 					{
-						m_textram->write_byte ( (j-1) * EF9364_NB_OF_COLUMNS + i ,  m_textram->read_byte ( j * EF9364_NB_OF_COLUMNS + i ) );
+						m_textram->write_byte ( (j-1) * NB_OF_COLUMNS + i ,  m_textram->read_byte ( j * NB_OF_COLUMNS + i ) );
 					}
 				}
 				// Erase last line
-				for( i = 0 ; i < EF9364_NB_OF_COLUMNS ; i++ )
+				for( i = 0 ; i < NB_OF_COLUMNS ; i++ )
 				{
-					m_textram->write_byte ( ( EF9364_NB_OF_ROWS - 1 ) * EF9364_NB_OF_COLUMNS + i , 0x7F );
+					m_textram->write_byte ( ( NB_OF_ROWS - 1 ) * NB_OF_COLUMNS + i , 0x7F );
 				}
 
-				y_curs_pos = EF9364_NB_OF_ROWS - 1;
+				y_curs_pos = NB_OF_ROWS - 1;
 			}
 		break;
 
@@ -312,9 +312,9 @@ void ef9364_device::command_w(uint8_t cmd)
 		break;
 
 		case 0x5: // Erasure of cursor Line.
-			for( x = 0 ; x < EF9364_NB_OF_COLUMNS ; x++ )
+			for( x = 0 ; x < NB_OF_COLUMNS ; x++ )
 			{
-				m_textram->write_byte ( y_curs_pos * EF9364_NB_OF_COLUMNS + x , 0x7F );
+				m_textram->write_byte ( y_curs_pos * NB_OF_COLUMNS + x , 0x7F );
 			}
 		break;
 
@@ -325,30 +325,30 @@ void ef9364_device::command_w(uint8_t cmd)
 
 		case 0x7: // Write char
 			if(cmd&0x8)
-				m_textram->write_byte ( y_curs_pos * EF9364_NB_OF_COLUMNS + x_curs_pos , char_latch );
+				m_textram->write_byte ( y_curs_pos * NB_OF_COLUMNS + x_curs_pos , char_latch );
 
 			x_curs_pos++;
-			if( x_curs_pos >= EF9364_NB_OF_COLUMNS )
+			if( x_curs_pos >= NB_OF_COLUMNS )
 			{
 				x_curs_pos=0;
 				y_curs_pos++;
-				if( y_curs_pos >= EF9364_NB_OF_ROWS )
+				if( y_curs_pos >= NB_OF_ROWS )
 				{
 					// Scroll
-					for( j = 1 ; j < EF9364_NB_OF_ROWS ; j++ )
+					for( j = 1 ; j < NB_OF_ROWS ; j++ )
 					{
-						for( i = 0 ; i < EF9364_NB_OF_COLUMNS ; i++ )
+						for( i = 0 ; i < NB_OF_COLUMNS ; i++ )
 						{
-							m_textram->write_byte ( (j-1) * EF9364_NB_OF_COLUMNS + i ,  m_textram->read_byte ( j * EF9364_NB_OF_COLUMNS + i ) );
+							m_textram->write_byte ( (j-1) * NB_OF_COLUMNS + i ,  m_textram->read_byte ( j * NB_OF_COLUMNS + i ) );
 						}
 					}
 					// Erase last line
-					for( i = 0 ; i < EF9364_NB_OF_COLUMNS ; i++ )
+					for( i = 0 ; i < NB_OF_COLUMNS ; i++ )
 					{
-						m_textram->write_byte ( ( EF9364_NB_OF_ROWS - 1 ) * EF9364_NB_OF_COLUMNS + i , 0x7F );
+						m_textram->write_byte ( ( NB_OF_ROWS - 1 ) * NB_OF_COLUMNS + i , 0x7F );
 					}
 
-					y_curs_pos = EF9364_NB_OF_ROWS - 1;
+					y_curs_pos = NB_OF_ROWS - 1;
 				}
 			}
 		break;

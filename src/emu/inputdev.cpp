@@ -9,8 +9,9 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "emuopts.h"
 #include "inputdev.h"
+
+#include "emuopts.h"
 
 
 //**************************************************************************
@@ -276,7 +277,7 @@ input_device::~input_device()
 
 input_item_id input_device::add_item(const char *name, input_item_id itemid, item_get_state_func getstate, void *internal)
 {
-	assert_always(machine().phase() == MACHINE_PHASE_INIT, "Can only call input_device::add_item at init time!");
+	assert_always(machine().phase() == machine_phase::INIT, "Can only call input_device::add_item at init time!");
 	assert(name != nullptr);
 	assert(itemid > ITEM_ID_INVALID && itemid < ITEM_ID_MAXIMUM);
 	assert(getstate != nullptr);
@@ -493,7 +494,7 @@ input_class::~input_class()
 
 input_device *input_class::add_device(const char *name, const char *id, void *internal)
 {
-	assert_always(machine().phase() == MACHINE_PHASE_INIT, "Can only call input_class::add_device at init time!");
+	assert_always(machine().phase() == machine_phase::INIT, "Can only call input_class::add_device at init time!");
 	assert(name != nullptr);
 	assert(id != nullptr);
 

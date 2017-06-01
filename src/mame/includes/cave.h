@@ -100,6 +100,7 @@ public:
 
 	int          m_spritetype[2];
 	int          m_kludge;
+	emu_timer *m_vblank_end_timer;
 
 
 	/* misc */

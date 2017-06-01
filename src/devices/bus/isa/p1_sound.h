@@ -2,21 +2,21 @@
 // copyright-holders:Sergey Svishchev
 /**********************************************************************
 
-	Poisk-1 sound card
+    Poisk-1 sound card
 
-	Copyright MESS Team.
-	Visit http://mamedev.org for licensing and usage restrictions.
+    Copyright MESS Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
 
 **********************************************************************/
 
+#ifndef MAME_BUS_P1_SOUND_H
+#define MAME_BUS_P1_SOUND_H
+
 #pragma once
 
-#ifndef __P1_SOUND__
-#define __P1_SOUND__
 
-
-#include "bus/midi/midi.h"
 #include "isa.h"
+#include "bus/midi/midi.h"
 #include "machine/i8251.h"
 #include "machine/pit8253.h"
 #include "sound/dac.h"
@@ -66,7 +66,7 @@ private:
 
 
 // device type definition
-extern const device_type P1_SOUND;
+DECLARE_DEVICE_TYPE(P1_SOUND, p1_sound_device)
 
 
-#endif
+#endif // MAME_BUS_P1_SOUND_H

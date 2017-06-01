@@ -10,7 +10,7 @@
 #include "bus/coleco/ctrl.h"
 #include "bus/coleco/exp.h"
 #include "cpu/z80/z80.h"
-#include "cpu/m6800/m6800.h"
+#include "cpu/m6800/m6801.h"
 #include "machine/coleco.h"
 #include "machine/ram.h"
 #include "sound/sn76496.h"

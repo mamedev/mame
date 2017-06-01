@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_TIKI100_8088_H
+#define MAME_BUS_TIKI100_8088_H
 
-#ifndef __TIKI100_8088__
-#define __TIKI100_8088__
+#pragma once
 
 #include "bus/tiki100/exp.h"
 #include "cpu/i86/i86.h"
@@ -20,14 +20,14 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> tiki100_8088_t
+// ======================> tiki100_8088_device
 
-class tiki100_8088_t : public device_t,
+class tiki100_8088_device : public device_t,
 						public device_tiki100bus_card_interface
 {
 public:
 	// construction/destruction
-	tiki100_8088_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tiki100_8088_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -53,7 +53,6 @@ private:
 
 
 // device type definition
-extern const device_type TIKI100_8088;
+DECLARE_DEVICE_TYPE(TIKI100_8088, tiki100_8088_device)
 
-
-#endif
+#endif // MAME_BUS_TIKI100_8088_H

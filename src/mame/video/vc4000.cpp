@@ -218,6 +218,7 @@ READ8_MEMBER( vc4000_state::vc4000_video_r )
 				case 0x20:
 					m_joy2_x+=5;
 					if (m_joy2_x > STICKHIGH) m_joy2_x=STICKHIGH;
+					break;
 				case 0x00:
 					m_joy2_x = vc4000_joystick_return_to_centre(m_joy2_x);
 					break;

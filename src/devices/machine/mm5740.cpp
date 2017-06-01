@@ -18,7 +18,7 @@
 //**************************************************************************
 
 // devices
-const device_type MM5740 = device_creator<mm5740_device>;
+DEFINE_DEVICE_TYPE(MM5740, mm5740_device, "mm5740", "MM5740 Keyboard Encoder")
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
@@ -44,7 +44,7 @@ const tiny_rom_entry *mm5740_device::device_rom_region() const
 //-------------------------------------------------
 
 mm5740_device::mm5740_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, MM5740, "MM5740", tag, owner, clock, "mm5740", __FILE__),
+	device_t(mconfig, MM5740, tag, owner, clock),
 	m_read_x{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}},
 	m_read_shift(*this),
 	m_read_control(*this),
@@ -73,7 +73,7 @@ uint32_t mm5740_device::calc_effective_clock_key_debounce(uint32_t capacitance)
 void mm5740_device::device_start()
 {
 	// resolve callbacks
-	for(int i = 0; i < 9; i++) 
+	for(int i = 0; i < 9; i++)
 	{
 		m_read_x[i].resolve_safe(0x3ff);
 	}

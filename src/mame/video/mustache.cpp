@@ -12,40 +12,6 @@
 #include "includes/mustache.h"
 
 
-PALETTE_INIT_MEMBER(mustache_state, mustache)
-{
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
-
-	for (i = 0;i < 256;i++)
-	{
-		int bit0,bit1,bit2,bit3,r,g,b;
-
-		/* red component */
-		bit0 = (color_prom[i] >> 0) & 0x01;
-		bit1 = (color_prom[i] >> 1) & 0x01;
-		bit2 = (color_prom[i] >> 2) & 0x01;
-		bit3 = (color_prom[i] >> 3) & 0x01;
-		r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-
-		/* green component */
-		bit0 = (color_prom[i + 256] >> 0) & 0x01;
-		bit1 = (color_prom[i + 256] >> 1) & 0x01;
-		bit2 = (color_prom[i + 256] >> 2) & 0x01;
-		bit3 = (color_prom[i + 256] >> 3) & 0x01;
-		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-
-		/* blue component */
-		bit0 = (color_prom[i + 512] >> 0) & 0x01;
-		bit1 = (color_prom[i + 512] >> 1) & 0x01;
-		bit2 = (color_prom[i + 512] >> 2) & 0x01;
-		bit3 = (color_prom[i + 512] >> 3) & 0x01;
-		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-
-		palette.set_pen_color(i,rgb_t(r,g,b));
-	}
-}
-
 WRITE8_MEMBER(mustache_state::videoram_w)
 {
 	m_videoram[offset] = data;

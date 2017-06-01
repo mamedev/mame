@@ -340,6 +340,7 @@ public:
 	std::unique_ptr<hng64_poly_renderer> m_poly_renderer;
 
 	TIMER_CALLBACK_MEMBER(hng64_3dfifo_processed);
+	emu_timer *m_3dfifo_timer;
 
 	uint8_t *m_texturerom;
 	uint16_t* m_vertsrom;

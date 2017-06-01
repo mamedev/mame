@@ -1,16 +1,16 @@
 // license:BSD-3-Clause
 // copyright-holders:S. Smith,David Haywood,Fabio Priuli
 
+#ifndef MAME_BUS_NEOGEO_PROT_CMC_H
+#define MAME_BUS_NEOGEO_PROT_CMC_H
 
 #pragma once
 
-#ifndef __CMC_PROT__
-#define __CMC_PROT__
 
-extern const device_type CMC_PROT;
+DECLARE_DEVICE_TYPE(NG_CMC_PROT, cmc_prot_device)
 
 #define MCFG_CMC_PROT_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, CMC_PROT, 0)
+	MCFG_DEVICE_ADD(_tag, NG_CMC_PROT, 0)
 
 // cmc42
 #define KOF99_GFX_KEY (0x00)
@@ -81,4 +81,4 @@ protected:
 	const uint8_t *address_0_7_xor;
 };
 
-#endif
+#endif // MAME_BUS_NEOGEO_PROT_CMC_H

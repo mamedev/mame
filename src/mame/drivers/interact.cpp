@@ -120,7 +120,7 @@ uint32_t interact_state::screen_update_interact(screen_device &screen, bitmap_in
 	return 0;
 }
 
-static MACHINE_CONFIG_START( interact, interact_state )
+static MACHINE_CONFIG_START( interact )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, XTAL_2MHz)
@@ -157,7 +157,7 @@ static MACHINE_CONFIG_START( interact, interact_state )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( hector1, interact_state )
+static MACHINE_CONFIG_START( hector1 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_1_75MHz)
@@ -296,6 +296,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP(1979, interact, 0,         0,  interact,   interact, driver_device, 0,  "Interact",   "Interact Family Computer", MACHINE_IMPERFECT_SOUND)
-COMP(1983, hector1,  interact,  0,   hector1,   interact, driver_device, 0,  "Micronique", "Hector 1",  MACHINE_IMPERFECT_SOUND)
+/*   YEAR  NAME      PARENT     COMPA   MACHINE    INPUT     STATE           INIT  COMPANY       FULLNAME       FLAGS */
+COMP(1979, interact, 0,         0,      interact,  interact, interact_state, 0,    "Interact",   "Interact Family Computer", MACHINE_IMPERFECT_SOUND)
+COMP(1983, hector1,  interact,  0,      hector1,   interact, interact_state, 0,    "Micronique", "Hector 1",  MACHINE_IMPERFECT_SOUND)

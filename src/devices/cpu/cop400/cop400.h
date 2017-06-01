@@ -8,10 +8,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_DEVICES_CPU_COP400_H
+#define MAME_DEVICES_CPU_COP400_H
 
-#ifndef __COP400__
-#define __COP400__
+#pragma once
 
 // i/o pins
 
@@ -118,9 +118,6 @@ enum cop400_cko_bond {
 class cop400_cpu_device : public cpu_device
 {
 public:
-	// construction/destruction
-	cop400_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, uint8_t program_addr_bits, uint8_t data_addr_bits, uint8_t featuremask, uint8_t g_mask, uint8_t d_mask, uint8_t in_mask, bool has_counter, bool has_inil, address_map_constructor internal_map_program, address_map_constructor internal_map_data);
-
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// static configuration helpers
@@ -144,6 +141,9 @@ public:
 	DECLARE_WRITE8_MEMBER( microbus_wr );
 
 protected:
+	// construction/destruction
+	cop400_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t program_addr_bits, uint8_t data_addr_bits, uint8_t featuremask, uint8_t g_mask, uint8_t d_mask, uint8_t in_mask, bool has_counter, bool has_inil, address_map_constructor internal_map_program, address_map_constructor internal_map_data);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -519,22 +519,22 @@ public:
 };
 
 
-extern const device_type COP401;
-extern const device_type COP410;
-extern const device_type COP411;
-extern const device_type COP402;
-extern const device_type COP420;
-extern const device_type COP421;
-extern const device_type COP422;
-extern const device_type COP404L;
-extern const device_type COP444L;
-extern const device_type COP445L;
-extern const device_type COP404C;
-extern const device_type COP424C;
-extern const device_type COP425C;
-extern const device_type COP426C;
-extern const device_type COP444C;
-extern const device_type COP445C;
-extern const device_type COP446C;
+DECLARE_DEVICE_TYPE(COP401, cop401_cpu_device)
+DECLARE_DEVICE_TYPE(COP410, cop410_cpu_device)
+DECLARE_DEVICE_TYPE(COP411, cop411_cpu_device)
+DECLARE_DEVICE_TYPE(COP402, cop402_cpu_device)
+DECLARE_DEVICE_TYPE(COP420, cop420_cpu_device)
+DECLARE_DEVICE_TYPE(COP421, cop421_cpu_device)
+DECLARE_DEVICE_TYPE(COP422, cop422_cpu_device)
+DECLARE_DEVICE_TYPE(COP404L, cop404l_cpu_device)
+DECLARE_DEVICE_TYPE(COP444L, cop444l_cpu_device)
+DECLARE_DEVICE_TYPE(COP445L, cop445l_cpu_device)
+DECLARE_DEVICE_TYPE(COP404C, cop404c_cpu_device)
+DECLARE_DEVICE_TYPE(COP424C, cop424c_cpu_device)
+DECLARE_DEVICE_TYPE(COP425C, cop425c_cpu_device)
+DECLARE_DEVICE_TYPE(COP426C, cop426c_cpu_device)
+DECLARE_DEVICE_TYPE(COP444C, cop444c_cpu_device)
+DECLARE_DEVICE_TYPE(COP445C, cop445c_cpu_device)
+DECLARE_DEVICE_TYPE(COP446C, cop446c_cpu_device)
 
-#endif  /* __COP400__ */
+#endif  // MAME_DEVICES_CPU_COP400_H

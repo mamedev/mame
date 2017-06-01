@@ -1,10 +1,15 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol
 #include "emu.h"
-#include "coreutil.h"
+
+#include "cpu/i86/i86.h"
+#include "bus/isa/aga.h"
 #include "machine/genpc.h"
 #include "machine/nvram.h"
 #include "machine/pckeybrd.h"
+
+#include "coreutil.h"
+
 
 class europc_pc_state : public driver_device
 {
@@ -471,7 +476,7 @@ static ADDRESS_MAP_START(europc_io, AS_IO, 8, europc_pc_state )
 	AM_RANGE(0x02e0, 0x02e0) AM_READ(europc_jim2_r)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( europc, europc_pc_state )
+static MACHINE_CONFIG_START( europc )
 	MCFG_CPU_ADD("maincpu", I8088, 4772720*2)
 	MCFG_CPU_PROGRAM_MAP(europc_map)
 	MCFG_CPU_IO_MAP(europc_io)

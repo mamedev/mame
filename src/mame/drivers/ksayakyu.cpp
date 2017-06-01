@@ -10,8 +10,7 @@ TODO:
 - sprite glitches (sometimes) .. missing vertical flip flag? <- (*)
 - sound cpu int freq (timer ? $a010 writes ?)
 
-(*) this looks a BTANB, when the player slide the relative sand drawing is made with the text tilemap and it's virtually impossible
-to fix it without breaking anything else. -AS
+(*) this was caused by flip Y being hooked up as bit 6 in text videoram attribute. -AS
 
 M6100097A
 
@@ -251,7 +250,7 @@ void ksayakyu_state::machine_reset()
 	m_flipscreen = 0;
 }
 
-static MACHINE_CONFIG_START( ksayakyu, ksayakyu_state )
+static MACHINE_CONFIG_START( ksayakyu )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,MAIN_CLOCK/8) //divider is guessed
@@ -334,4 +333,4 @@ ROM_START( ksayakyu )
 	ROM_LOAD( "9f.bin", 0x0000, 0x0100, CRC(ff71b27f) SHA1(6aad2bd2be997595a05ddb81d24df8fe1435910b) )
 ROM_END
 
-GAME( 1985, ksayakyu, 0, ksayakyu, ksayakyu, driver_device, 0, ORIENTATION_FLIP_Y, "Taito Corporation", "Kusayakyuu", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, ksayakyu, 0, ksayakyu, ksayakyu, ksayakyu_state, 0, ORIENTATION_FLIP_Y, "Taito Corporation", "Kusayakyuu", MACHINE_SUPPORTS_SAVE )

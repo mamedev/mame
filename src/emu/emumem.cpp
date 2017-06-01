@@ -1853,10 +1853,7 @@ void address_space::allocate(std::vector<std::unique_ptr<address_space>> &space_
 inline void address_space::adjust_addresses(offs_t &start, offs_t &end, offs_t &mask, offs_t &mirror)
 {
 	// adjust start/end/mask values
-	if (mask == 0)
-		mask = m_addrmask & ~mirror;
-	else
-		mask &= m_addrmask;
+	mask &= m_addrmask;
 	start &= ~mirror & m_addrmask;
 	end &= ~mirror & m_addrmask;
 
@@ -2027,7 +2024,7 @@ void address_space::prepare_map()
 		entry.m_bytestart = entry.m_addrstart;
 		entry.m_byteend = entry.m_addrend;
 		entry.m_bytemirror = entry.m_addrmirror;
-		entry.m_bytemask = entry.m_addrmask;
+		entry.m_bytemask = entry.m_addrmask ? entry.m_addrmask : ~entry.m_addrmirror;
 		adjust_addresses(entry.m_bytestart, entry.m_byteend, entry.m_bytemask, entry.m_bytemirror);
 
 		// if we have a share entry, add it to our map
@@ -2584,7 +2581,7 @@ void address_space::install_ram_generic(offs_t addrstart, offs_t addrend, offs_t
 		// if we still don't have a pointer, and we're past the initialization phase, allocate a new block
 		if (bank.base() == nullptr && manager().m_initialized)
 		{
-			if (machine().phase() >= MACHINE_PHASE_RESET)
+			if (machine().phase() >= machine_phase::RESET)
 				fatalerror("Attempted to call install_ram_generic() after initialization time without a baseptr!\n");
 			auto block = std::make_unique<memory_block>(*this, address_to_byte(addrstart), address_to_byte_end(addrend));
 			bank.set_base(block.get()->data());
@@ -2614,7 +2611,7 @@ void address_space::install_ram_generic(offs_t addrstart, offs_t addrend, offs_t
 		// if we still don't have a pointer, and we're past the initialization phase, allocate a new block
 		if (bank.base() == nullptr && manager().m_initialized)
 		{
-			if (machine().phase() >= MACHINE_PHASE_RESET)
+			if (machine().phase() >= machine_phase::RESET)
 				fatalerror("Attempted to call install_ram_generic() after initialization time without a baseptr!\n");
 			auto block = std::make_unique<memory_block>(*this, address_to_byte(addrstart), address_to_byte_end(addrend));
 			bank.set_base(block.get()->data());
@@ -2857,7 +2854,7 @@ memory_bank &address_space::bank_find_or_allocate(const char *tag, offs_t addrst
 	// adjust the addresses, handling mirrors and such
 	offs_t bytemirror = addrmirror;
 	offs_t bytestart = addrstart;
-	offs_t bytemask = 0;
+	offs_t bytemask = ~addrmirror;
 	offs_t byteend = addrend;
 	adjust_addresses(bytestart, byteend, bytemask, bytemirror);
 
@@ -3918,21 +3915,10 @@ direct_read_data::~direct_read_data()
 //  update the opcode base for the given address
 //-------------------------------------------------
 
-bool direct_read_data::set_direct_region(offs_t &byteaddress)
+bool direct_read_data::set_direct_region(offs_t byteaddress)
 {
-	// allow overrides
-	offs_t overrideaddress = byteaddress;
-	if (!m_directupdate.isnull())
-	{
-		overrideaddress = m_directupdate(*this, overrideaddress);
-		if (overrideaddress == ~0)
-			return true;
-
-		byteaddress = overrideaddress;
-	}
-
 	// find or allocate a matching range
-	direct_range *range = find_range(overrideaddress, m_entry);
+	direct_range *range = find_range(byteaddress, m_entry);
 
 	// if we don't map to a bank, return false
 	if (m_entry < STATIC_BANK1 || m_entry > STATIC_BANKMAX)
@@ -3946,7 +3932,7 @@ bool direct_read_data::set_direct_region(offs_t &byteaddress)
 	u8 *base = *m_space.manager().bank_pointer_addr(m_entry);
 
 	// compute the adjusted base
-	offs_t maskedbits = overrideaddress & ~m_space.bytemask();
+	offs_t maskedbits = byteaddress & ~m_space.bytemask();
 	const handler_entry_read &handler = m_space.read().handler_read(m_entry);
 	m_bytemask = handler.bytemask();
 	m_ptr = base - (handler.bytestart() & m_bytemask);
@@ -4001,35 +3987,6 @@ void direct_read_data::remove_intersecting_ranges(offs_t bytestart, offs_t bytee
 		}
 	}
 }
-
-
-//-------------------------------------------------
-//  set_direct_update - set a custom direct range
-//  update callback
-//-------------------------------------------------
-
-direct_update_delegate direct_read_data::set_direct_update(direct_update_delegate function)
-{
-	direct_update_delegate old = m_directupdate;
-	m_directupdate = function;
-	return old;
-}
-
-
-//-------------------------------------------------
-//  explicit_configure - explicitly configure
-//  the start/end/mask and the pointers from
-//  within a custom callback
-//-------------------------------------------------
-
-void direct_read_data::explicit_configure(offs_t bytestart, offs_t byteend, offs_t bytemask, void *ptr)
-{
-	m_bytestart = bytestart;
-	m_byteend = byteend;
-	m_bytemask = bytemask;
-	m_ptr = reinterpret_cast<u8 *>(ptr) - (bytestart & bytemask);
-}
-
 
 
 //**************************************************************************
@@ -4380,6 +4337,13 @@ void handler_entry::configure_subunits(u64 handlermask, int handlerbits, int &st
 		if ((scanmask & unitmask) != 0)
 			count++;
 	}
+	if (count == 0 || count > maxunits)
+		throw emu_fatalerror("Invalid subunit mask %s for %d-bit space", core_i64_hex_format(handlermask, m_datawidth / 4), m_datawidth);
+
+	// make sure that the multiplier is a power of 2
+	int multiplier = count;
+	while (maxunits % multiplier != 0)
+		multiplier++;
 
 	// fill in the shifts
 	int cur_offset = 0;
@@ -4389,12 +4353,12 @@ void handler_entry::configure_subunits(u64 handlermask, int handlerbits, int &st
 		u32 shift = (unitnum^shift_xor_mask) * handlerbits;
 		if (((handlermask >> shift) & unitmask) != 0)
 		{
-			m_subunit_infos[m_subunits].m_bytemask = m_bytemask;
+			m_subunit_infos[m_subunits].m_bytemask = m_bytemask / (maxunits / multiplier);
 			m_subunit_infos[m_subunits].m_mask = unitmask;
 			m_subunit_infos[m_subunits].m_offset = cur_offset++;
 			m_subunit_infos[m_subunits].m_size = handlerbits;
 			m_subunit_infos[m_subunits].m_shift = shift;
-			m_subunit_infos[m_subunits].m_multiplier = count;
+			m_subunit_infos[m_subunits].m_multiplier = multiplier;
 
 			m_subunits++;
 		}

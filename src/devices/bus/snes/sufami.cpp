@@ -20,19 +20,19 @@
 //  sns_rom_sufami_device - constructor
 //-------------------------------------------------
 
-const device_type SNS_LOROM_SUFAMI = device_creator<sns_rom_sufami_device>;
-const device_type SNS_STROM = device_creator<sns_rom_strom_device>;
+DEFINE_DEVICE_TYPE(SNS_LOROM_SUFAMI, sns_rom_sufami_device, "sns_rom_sufami", "SNES Sufami Turbo Cart")
+DEFINE_DEVICE_TYPE(SNS_STROM,        sns_rom_strom_device,  "sns_strom",      "SNES Sufami Turbo Minicart")
 
 
 sns_rom_sufami_device::sns_rom_sufami_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: sns_rom_device(mconfig, SNS_LOROM_SUFAMI, "SNES Sufami Turbo Cart", tag, owner, clock, "sns_rom_sufami", __FILE__),
-						m_slot1(*this, "st_slot1"),
-						m_slot2(*this, "st_slot2")
+	: sns_rom_device(mconfig, SNS_LOROM_SUFAMI, tag, owner, clock)
+	, m_slot1(*this, "st_slot1")
+	, m_slot2(*this, "st_slot2")
 {
 }
 
 sns_rom_strom_device::sns_rom_strom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: sns_rom_device(mconfig, SNS_STROM, "SNES Sufami Turbo Minicart", tag, owner, clock, "sns_strom", __FILE__)
+	: sns_rom_device(mconfig, SNS_STROM, tag, owner, clock)
 {
 }
 
@@ -46,14 +46,14 @@ void sns_rom_strom_device::device_start()
 }
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( st_slot )
+//  MACHINE_CONFIG_START( st_slot )
 //-------------------------------------------------
 
 static SLOT_INTERFACE_START(sufamiturbo_cart)
 	SLOT_INTERFACE_INTERNAL("strom",  SNS_STROM)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_FRAGMENT( st_slot )
+static MACHINE_CONFIG_START( st_slot )
 	MCFG_SNS_SUFAMI_CARTRIDGE_ADD("st_slot1", sufamiturbo_cart, nullptr)
 	MCFG_SNS_SUFAMI_CARTRIDGE_ADD("st_slot2", sufamiturbo_cart, nullptr)
 MACHINE_CONFIG_END

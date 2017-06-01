@@ -139,8 +139,6 @@ public:
 	DECLARE_WRITE8_MEMBER(bbcm_wd1772l_write);
 	DECLARE_WRITE8_MEMBER(bbc_videoULA_w);
 	DECLARE_READ8_MEMBER(bbc_fe_r);
-	DECLARE_DIRECT_UPDATE_MEMBER(bbcbp_direct_handler);
-	DECLARE_DIRECT_UPDATE_MEMBER(bbcm_direct_handler);
 
 	DECLARE_DRIVER_INIT(bbc);
 	DECLARE_VIDEO_START(bbc);
@@ -232,8 +230,8 @@ public: // HACK FOR MC6845
 	optional_device<mc146818_device> m_rtc;
 	optional_device<bbc_fdc_slot_device> m_fdc;
 	optional_device<i8271_device> m_i8271;
-	optional_device<wd1770_t> m_wd1770;
-	optional_device<wd1772_t> m_wd1772;
+	optional_device<wd1770_device> m_wd1770;
+	optional_device<wd1772_device> m_wd1772;
 	optional_device<generic_slot_device> m_exp1;
 	optional_device<generic_slot_device> m_exp2;
 	optional_device<generic_slot_device> m_exp3;

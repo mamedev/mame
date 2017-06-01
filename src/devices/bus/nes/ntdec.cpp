@@ -34,18 +34,18 @@
 //  constructor
 //-------------------------------------------------
 
-const device_type NES_NTDEC_ASDER = device_creator<nes_ntdec_asder_device>;
-const device_type NES_NTDEC_FH = device_creator<nes_ntdec_fh_device>;
+DEFINE_DEVICE_TYPE(NES_NTDEC_ASDER, nes_ntdec_asder_device, "nes_ntdec_asder", "NES Cart NTDEC Asder PCB")
+DEFINE_DEVICE_TYPE(NES_NTDEC_FH,    nes_ntdec_fh_device,    "nes_fh_asder",    "NES Cart NTDEC Fighting Hero PCB")
 
 
 nes_ntdec_asder_device::nes_ntdec_asder_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_NTDEC_ASDER, "NES Cart NTDEC Asder PCB", tag, owner, clock, "nes_ntdec_asder", __FILE__),
-	m_latch(0)
-				{
+	: nes_nrom_device(mconfig, NES_NTDEC_ASDER, tag, owner, clock)
+	, m_latch(0)
+{
 }
 
 nes_ntdec_fh_device::nes_ntdec_fh_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_NTDEC_FH, "NES Cart NTDEC Fighting Hero PCB", tag, owner, clock, "nes_ntdec_fh", __FILE__)
+	: nes_nrom_device(mconfig, NES_NTDEC_FH, tag, owner, clock)
 {
 }
 

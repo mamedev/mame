@@ -7,11 +7,11 @@
     NEOGEO Memory card functions.
 
 *********************************************************************/
+#ifndef MAME_MACHINE_NG_MEMCARD_H
+#define MAME_MACHINE_NG_MEMCARD_H
 
 #pragma once
 
-#ifndef __NG_MEMCARD_H__
-#define __NG_MEMCARD_H__
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
@@ -60,7 +60,7 @@ private:
 
 
 // device type definition
-extern const device_type NG_MEMCARD;
+DECLARE_DEVICE_TYPE(NG_MEMCARD, ng_memcard_device)
 
 
-#endif  /* __NG_MEMCARD_H__ */
+#endif // MAME_MACHINE_NG_MEMCARD_H

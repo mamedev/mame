@@ -742,7 +742,7 @@ static GFXDECODE_START( drgnbowl )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( shadoww, gaiden_state )
+static MACHINE_CONFIG_START( shadoww )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 18432000/2) /* 9.216 MHz */
@@ -801,7 +801,7 @@ static MACHINE_CONFIG_START( shadoww, gaiden_state )
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
 	MCFG_SOUND_ROUTE(3, "mono", 0.60)
 
-	MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
@@ -814,7 +814,7 @@ static MACHINE_CONFIG_DERIVED( raiga, shadoww )
 	MCFG_GFXDECODE_MODIFY("gfxdecode", raiga)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( drgnbowl, gaiden_state )
+static MACHINE_CONFIG_START( drgnbowl )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 20000000/2) /* 10 MHz */
@@ -853,7 +853,7 @@ static MACHINE_CONFIG_START( drgnbowl, gaiden_state )
 	MCFG_YM2151_ADD("ymsnd", 4000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -936,7 +936,7 @@ static ADDRESS_MAP_START( mastninj_map, AS_PROGRAM, 16, gaiden_state )
 //  AM_RANGE(0x07a808, 0x07a809) AM_WRITE(gaiden_flip_w)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( mastninj, gaiden_state )
+static MACHINE_CONFIG_START( mastninj )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)   /* 10 MHz? */
@@ -988,7 +988,7 @@ static MACHINE_CONFIG_START( mastninj, gaiden_state )
 	MCFG_SOUND_ROUTE(3, "mono", 0.60)
 
 	/* no OKI on the bootleg */
-//  MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)
+//  MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH)
 //  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
@@ -1662,19 +1662,19 @@ DRIVER_INIT_MEMBER(gaiden_state,mastninj)
 	DRIVER_INIT_CALL(shadoww);
 }
 
-//    YEAR, NAME,      PARENT,   MACHINE,  INPUT,    INIT,     MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1988, shadoww,   0,        shadoww,  common, gaiden_state,   shadoww,  ROT0,   "Tecmo", "Shadow Warriors (World, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, shadowwa,  shadoww,  shadoww,  common, gaiden_state,   shadoww,  ROT0,   "Tecmo", "Shadow Warriors (World, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, gaiden,    shadoww,  shadoww,  common, gaiden_state,   shadoww,  ROT0,   "Tecmo", "Ninja Gaiden (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, ryukendn,  shadoww,  shadoww,  common, gaiden_state,   shadoww,  ROT0,   "Tecmo", "Ninja Ryukenden (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, ryukendna, shadoww,  shadoww,  common, gaiden_state,   shadoww,  ROT0,   "Tecmo", "Ninja Ryukenden (Japan, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, mastninj,  shadoww,  mastninj, common, gaiden_state,   mastninj, ROT0,   "bootleg", "Master Ninja (bootleg of Shadow Warriors / Ninja Gaiden)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // sprites need fixing, sound and yscroll too. - it is confirmed the curtains don't scroll on the pcb
-GAME( 1992, drgnbowl,  0,        drgnbowl, drgnbowl, gaiden_state, drgnbowl, ROT0,   "Nics",  "Dragon Bowl (set 1, encrypted program)", MACHINE_SUPPORTS_SAVE ) // Dragon Bowl is based on Ninja Gaiden code
-GAME( 1992, drgnbowla, drgnbowl, drgnbowl, drgnbowl, gaiden_state, drgnbowla,ROT0,   "Nics",  "Dragon Bowl (set 2, unencrypted program)", MACHINE_SUPPORTS_SAVE )
+//    YEAR, NAME,      PARENT,   MACHINE,  INPUT,    STATE,        INIT,     MONITOR,COMPANY,   FULLNAME,FLAGS
+GAME( 1988, shadoww,   0,        shadoww,  common,   gaiden_state, shadoww,  ROT0,   "Tecmo",   "Shadow Warriors (World, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, shadowwa,  shadoww,  shadoww,  common,   gaiden_state, shadoww,  ROT0,   "Tecmo",   "Shadow Warriors (World, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, gaiden,    shadoww,  shadoww,  common,   gaiden_state, shadoww,  ROT0,   "Tecmo",   "Ninja Gaiden (US)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1989, ryukendn,  shadoww,  shadoww,  common,   gaiden_state, shadoww,  ROT0,   "Tecmo",   "Ninja Ryukenden (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, ryukendna, shadoww,  shadoww,  common,   gaiden_state, shadoww,  ROT0,   "Tecmo",   "Ninja Ryukenden (Japan, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mastninj,  shadoww,  mastninj, common,   gaiden_state, mastninj, ROT0,   "bootleg", "Master Ninja (bootleg of Shadow Warriors / Ninja Gaiden)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // sprites need fixing, sound and yscroll too. - it is confirmed the curtains don't scroll on the pcb
+GAME( 1992, drgnbowl,  0,        drgnbowl, drgnbowl, gaiden_state, drgnbowl, ROT0,   "Nics",    "Dragon Bowl (set 1, encrypted program)",   MACHINE_SUPPORTS_SAVE ) // Dragon Bowl is based on Ninja Gaiden code
+GAME( 1992, drgnbowla, drgnbowl, drgnbowl, drgnbowl, gaiden_state, drgnbowla,ROT0,   "Nics",    "Dragon Bowl (set 2, unencrypted program)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, wildfang,  0,        shadoww,  wildfang, gaiden_state, wildfang, ROT0,   "Tecmo", "Wild Fang / Tecmo Knight", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, wildfangs, wildfang, shadoww,  tknight, gaiden_state,  wildfang, ROT0,   "Tecmo", "Wild Fang", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, tknight,   wildfang, shadoww,  tknight, gaiden_state,  wildfang, ROT0,   "Tecmo", "Tecmo Knight", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wildfang,  0,        shadoww,  wildfang, gaiden_state, wildfang, ROT0,   "Tecmo",   "Wild Fang / Tecmo Knight", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wildfangs, wildfang, shadoww,  tknight,  gaiden_state, wildfang, ROT0,   "Tecmo",   "Wild Fang",                MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tknight,   wildfang, shadoww,  tknight,  gaiden_state, wildfang, ROT0,   "Tecmo",   "Tecmo Knight",             MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, stratof,   0,        raiga,    raiga, gaiden_state,    raiga,    ROT0,   "Tecmo", "Raiga - Strato Fighter (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, raiga,     stratof,  raiga,    raiga, gaiden_state,    raiga,    ROT0,   "Tecmo", "Raiga - Strato Fighter (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, stratof,   0,        raiga,    raiga,    gaiden_state, raiga,    ROT0,   "Tecmo",   "Raiga - Strato Fighter (US)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, raiga,     stratof,  raiga,    raiga,    gaiden_state, raiga,    ROT0,   "Tecmo",   "Raiga - Strato Fighter (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

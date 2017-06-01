@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli, R. Belmont
-#ifndef __SNS_SA1_H
-#define __SNS_SA1_H
+#ifndef MAME_BUS_SNES_SA1_H
+#define MAME_BUS_SNES_SA1_H
+
+#pragma once
 
 #include "snes_slot.h"
 #include "cpu/g65816/g65816.h"
@@ -16,10 +18,7 @@ public:
 	// construction/destruction
 	sns_sa1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual void device_start() override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual void device_reset() override;
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_l) override;
@@ -36,8 +35,12 @@ public:
 	DECLARE_WRITE8_MEMBER(sa1_lo_w);
 	DECLARE_WRITE8_MEMBER(sa1_hi_w);
 
-private:
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
+private:
 	uint8_t var_length_read(address_space &space, uint32_t offset);
 	void dma_transfer(address_space &space);
 	void dma_cctype1_transfer(address_space &space);
@@ -108,6 +111,6 @@ private:
 
 
 // device type definition
-extern const device_type SNS_LOROM_SA1;
+DECLARE_DEVICE_TYPE(SNS_LOROM_SA1, sns_sa1_device)
 
-#endif
+#endif // MAME_BUS_SNES_SA1_H

@@ -219,8 +219,8 @@ protected:
 
 private:
 	required_device<cpu_device> m_maincpu;
-	required_device<scc85C30_device> m_sccterm;
-	required_device<scc85C30_device> m_sccterm2;
+	required_device<scc85c30_device> m_sccterm;
+	required_device<scc85c30_device> m_sccterm2;
 
 	// Pointer to System ROMs needed by bootvect_r and masking RAM buffer for post reset accesses
 	uint32_t  *m_sysrom;
@@ -249,8 +249,8 @@ static ADDRESS_MAP_START (mvme147_mem, AS_PROGRAM, 32, mvme147_state)
 	AM_RANGE (0xfffe1018, 0xfffe102f) AM_READWRITE8(pcc8_r,   pcc8_w,  0xffffffff) /* PCC 8 bits registers */
 	AM_RANGE (0xfffe2000, 0xfffe201b) AM_READWRITE8(vmechip_r, vmechip_w, 0x00ff00ff) /* VMEchip 8 bits registers on odd adresses */
 
-	AM_RANGE (0xfffe3000, 0xfffe3003) AM_DEVREADWRITE8("scc",  scc85C30_device, ba_cd_inv_r, ba_cd_inv_w, 0xffffffff) /* Port 1&2 - Dual serial port Z80-SCC */
-	AM_RANGE (0xfffe3800, 0xfffe3803) AM_DEVREADWRITE8("scc2", scc85C30_device, ba_cd_inv_r, ba_cd_inv_w, 0xffffffff) /* Port 3&4 - Dual serial port Z80-SCC */
+	AM_RANGE (0xfffe3000, 0xfffe3003) AM_DEVREADWRITE8("scc",  scc85c30_device, ba_cd_inv_r, ba_cd_inv_w, 0xffffffff) /* Port 1&2 - Dual serial port Z80-SCC */
+	AM_RANGE (0xfffe3800, 0xfffe3803) AM_DEVREADWRITE8("scc2", scc85c30_device, ba_cd_inv_r, ba_cd_inv_w, 0xffffffff) /* Port 3&4 - Dual serial port Z80-SCC */
 
 	//AM_RANGE(0x100000, 0xfeffff)  AM_READWRITE(vme_a24_r, vme_a24_w) /* VMEbus Rev B addresses (24 bits) - not verified */
 	//AM_RANGE(0xff0000, 0xffffff)  AM_READWRITE(vme_a16_r, vme_a16_w) /* VMEbus Rev B addresses (16 bits) - not verified */
@@ -644,7 +644,7 @@ SLOT_INTERFACE_END
 /*
  * Machine configuration
  */
-static MACHINE_CONFIG_START (mvme147, mvme147_state)
+static MACHINE_CONFIG_START (mvme147)
 	/* basic machine hardware */
 	MCFG_CPU_ADD ("maincpu", M68030, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP (mvme147_mem)
@@ -660,8 +660,8 @@ static MACHINE_CONFIG_START (mvme147, mvme147_state)
 	MCFG_Z80SCC_OUT_RTSA_CB(DEVWRITELINE("rs232trm", rs232_port_device, write_rts))
 
 	MCFG_RS232_PORT_ADD ("rs232trm", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("scc", scc85C30_device, rxa_w))
-	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("scc", scc85C30_device, ctsa_w))
+	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("scc", scc85c30_device, rxa_w))
+	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("scc", scc85c30_device, ctsa_w))
 
 	MCFG_SCC85C30_ADD("scc2", SCC_CLOCK, 0, 0, 0, 0 )
 MACHINE_CONFIG_END
@@ -710,5 +710,5 @@ ROM_START (mvme147)
 ROM_END
 
 /* Driver */
-/*    YEAR  NAME          PARENT  COMPAT   MACHINE         INPUT     CLASS          INIT COMPANY                  FULLNAME          FLAGS */
-COMP (1989, mvme147,      0,      0,       mvme147,        mvme147, driver_device, 0,   "Motorola",   "MVME-147", MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
+//    YEAR  NAME          PARENT  COMPAT   MACHINE         INPUT    CLASS          INIT COMPANY       FULLNAME    FLAGS
+COMP (1989, mvme147,      0,      0,       mvme147,        mvme147, mvme147_state, 0,   "Motorola",   "MVME-147", MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )

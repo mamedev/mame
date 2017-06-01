@@ -638,7 +638,7 @@ INTERRUPT_GEN_MEMBER(ttchamp_state::irq)/* right? */
 	device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( ttchamp, ttchamp_state )
+static MACHINE_CONFIG_START( ttchamp )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V30, 8000000)
 	MCFG_CPU_PROGRAM_MAP(ttchamp_map)
@@ -660,7 +660,7 @@ static MACHINE_CONFIG_START( ttchamp, ttchamp_state )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 8000000/8, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", 8000000/8, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_CONFIG_END
@@ -695,5 +695,5 @@ ROM_END
 
 
 // only the graphics differ between the two sets, code section is the same
-GAME( 1995, ttchamp, 0,        ttchamp, ttchamp, driver_device, 0, ROT0,  "Gamart",                               "Table Tennis Champions", MACHINE_SUPPORTS_SAVE ) // this has various advertising boards, including 'Electronic Devices' and 'Deniam'
-GAME( 1995, ttchampa,ttchamp,  ttchamp, ttchamp, driver_device, 0, ROT0,  "Gamart (Palencia Elektronik license)", "Table Tennis Champions (Palencia Elektronik license)", MACHINE_SUPPORTS_SAVE ) // this only has Palencia Elektronik advertising boards
+GAME( 1995, ttchamp, 0,        ttchamp, ttchamp, ttchamp_state, 0, ROT0,  "Gamart",                               "Table Tennis Champions",                               MACHINE_SUPPORTS_SAVE ) // this has various advertising boards, including 'Electronic Devices' and 'Deniam'
+GAME( 1995, ttchampa,ttchamp,  ttchamp, ttchamp, ttchamp_state, 0, ROT0,  "Gamart (Palencia Elektronik license)", "Table Tennis Champions (Palencia Elektronik license)", MACHINE_SUPPORTS_SAVE ) // this only has Palencia Elektronik advertising boards

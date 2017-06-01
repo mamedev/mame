@@ -30,7 +30,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type VME_MZR8105 = device_creator<vme_mzr8105_card_device>;
+DEFINE_DEVICE_TYPE(VME_MZR8105, vme_mzr8105_card_device, "mzr8105", "Mizar 8105 68K CPU board")
 
 //-------------------------------------------------
 //  machine_config_additions - device-specific
@@ -46,15 +46,14 @@ machine_config_constructor vme_mzr8105_card_device::device_mconfig_additions() c
 }
 
 vme_mzr8105_card_device::vme_mzr8105_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, VME_MZR8105, "Mizar 8105 68K CPU board", tag, owner, clock, "mzr8105", __FILE__),
-	device_vme_card_interface(mconfig, *this)
+	vme_mzr8105_card_device(mconfig, VME_MZR8105, tag, owner, clock)
 {
 	m_slot = 1;
 	LOG("%s %s\n", tag, FUNCNAME);
 }
 
-vme_mzr8105_card_device::vme_mzr8105_card_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+vme_mzr8105_card_device::vme_mzr8105_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_vme_card_interface(mconfig, *this)
 {
 	LOG("%s %s\n", tag, FUNCNAME);

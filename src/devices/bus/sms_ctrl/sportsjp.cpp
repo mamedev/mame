@@ -50,7 +50,7 @@ Notes:
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SMS_SPORTS_PAD_JP = device_creator<sms_sports_pad_jp_device>;
+DEFINE_DEVICE_TYPE(SMS_SPORTS_PAD_JP, sms_sports_pad_jp_device, "sms_sports_pad_jp", "Sega SMS Sports Pad (JP)")
 
 // time interval not verified
 #define SPORTS_PAD_JP_INTERVAL attotime::from_hz(20000)
@@ -104,7 +104,7 @@ ioport_constructor sms_sports_pad_jp_device::device_input_ports() const
 //-------------------------------------------------
 
 sms_sports_pad_jp_device::sms_sports_pad_jp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, SMS_SPORTS_PAD_JP, "Sega SMS Sports Pad JP", tag, owner, clock, "sms_sports_pad_jp", __FILE__),
+	device_t(mconfig, SMS_SPORTS_PAD_JP, tag, owner, clock),
 	device_sms_control_port_interface(mconfig, *this),
 	m_sports_jp_in(*this, "SPORTS_JP_IN"),
 	m_sports_jp_bt(*this, "SPORTS_JP_BT"),

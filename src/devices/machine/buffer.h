@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:smf
-#ifndef __BUFFER_H__
-#define __BUFFER_H__
+#ifndef MAME_DEVICES_MACHINE_BUFFER_H
+#define MAME_DEVICES_MACHINE_BUFFER_H
 
 class input_buffer_device : public device_t
 {
@@ -26,6 +26,6 @@ protected:
 	uint8_t m_input_data;
 };
 
-extern const device_type INPUT_BUFFER;
+DECLARE_DEVICE_TYPE(INPUT_BUFFER, input_buffer_device)
 
-#endif
+#endif // MAME_DEVICES_MACHINE_BUFFER_H

@@ -315,7 +315,7 @@ static GFXDECODE_START( buster )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( buster, buster_state )
+static MACHINE_CONFIG_START( buster )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,XTAL_3_579545MHz)        /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(mainmap)
@@ -359,4 +359,4 @@ ROM_START( buster )
 ROM_END
 
 
-GAME( 1982, buster,  0,    buster, buster, driver_device,  0, ROT0, "Marian Electronics Ltd.", "Buster", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+GAME( 1982, buster,  0,    buster, buster, buster_state,  0, ROT0, "Marian Electronics Ltd.", "Buster", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )

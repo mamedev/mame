@@ -1,24 +1,17 @@
 // license:BSD-3-Clause
-// copyright-holders: Vas Crabb
+// copyright-holders:Vas Crabb
 /***************************************************************************
 
     Amiga 1200 Keyboard
 
  ***************************************************************************/
 
-#ifndef DEVICES_BUS_AMIGA_KEYBOARD_A1200_H
-#define DEVICES_BUS_AMIGA_KEYBOARD_A1200_H
+#ifndef MAME_BUS_AMIGA_KEYBOARD_A1200_H
+#define MAME_BUS_AMIGA_KEYBOARD_A1200_H
 
 #pragma once
 
 #include "keyboard.h"
-
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-extern device_type const A1200_KBD;
 
 
 namespace bus { namespace amiga { namespace keyboard {
@@ -38,6 +31,7 @@ public:
 	// from host
 	virtual DECLARE_WRITE_LINE_MEMBER(kdat_w) override;
 
+protected:
 	// MPU I/O
 	DECLARE_READ8_MEMBER(mpu_portb_r);
 	DECLARE_WRITE8_MEMBER(mpu_porta_w);
@@ -45,9 +39,8 @@ public:
 	DECLARE_WRITE8_MEMBER(mpu_portc_w);
 	DECLARE_WRITE_LINE_MEMBER(mpu_tcmp);
 
-protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 
 	virtual void device_start() override;
@@ -63,4 +56,11 @@ private:
 
 } } } // namespace bus::amiga::keyboard
 
-#endif // DEVICES_BUS_AMIGA_KEYBOARD_A1200_H
+
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+DECLARE_DEVICE_TYPE_NS(A1200_KBD, bus::amiga::keyboard, a1200_kbd_device)
+
+#endif // MAME_BUS_AMIGA_KEYBOARD_A1200_H

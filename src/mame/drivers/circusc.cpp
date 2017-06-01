@@ -337,7 +337,7 @@ INTERRUPT_GEN_MEMBER(circusc_state::vblank_irq)
 		device.execute().set_input_line(0, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( circusc, circusc_state )
+static MACHINE_CONFIG_START( circusc )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI1, 2048000)        /* 2 MHz? */

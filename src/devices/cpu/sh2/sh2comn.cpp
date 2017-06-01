@@ -9,13 +9,13 @@
  *****************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "sh2.h"
 #include "sh2comn.h"
 
-#define VERBOSE 0
+#include "debugger.h"
 
-#define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
+//#define VERBOSE 1
+#include "logmacro.h"
 
 static const int div_tab[4] = { 3, 5, 7, 0 };
 
@@ -365,7 +365,7 @@ void sh2_device::sh2_do_dma(int dma)
 		}
 
 
-		LOG(("SH2.%s: DMA %d complete\n", tag(), dma));
+		LOG("SH2: DMA %d complete\n", dma);
 		m_m[0x62+4*dma] = 0;
 		m_m[0x63+4*dma] |= 2;
 		m_dma_timer_active[dma] = 0;
@@ -405,7 +405,7 @@ void sh2_device::sh2_dmac_check(int dma)
 			if(!m_active_dma_count[dma])
 				m_active_dma_count[dma] = 0x1000000;
 
-			LOG(("SH2: DMA %d start %x, %x, %x, %04x, %d, %d, %d\n", dma, m_active_dma_src[dma], m_active_dma_dst[dma], m_active_dma_count[dma], m_m[0x63+4*dma], m_active_dma_incs[dma], m_active_dma_incd[dma], m_active_dma_size[dma]));
+			LOG("SH2: DMA %d start %x, %x, %x, %04x, %d, %d, %d\n", dma, m_active_dma_src[dma], m_active_dma_dst[dma], m_active_dma_count[dma], m_m[0x63+4*dma], m_active_dma_incs[dma], m_active_dma_incd[dma], m_active_dma_size[dma]);
 
 			m_dma_timer_active[dma] = 1;
 
@@ -584,7 +584,7 @@ WRITE32_MEMBER( sh2_device::sh7604_w )
 		{
 			int32_t a = m_m[0x41];
 			int32_t b = m_m[0x40];
-			LOG(("SH2 '%s' div+mod %d/%d\n", tag(), a, b));
+			LOG("SH2 div+mod %d/%d\n", a, b);
 			if (b)
 			{
 				m_m[0x45] = a / b;
@@ -612,7 +612,7 @@ WRITE32_MEMBER( sh2_device::sh7604_w )
 		{
 			int64_t a = m_m[0x45] | ((uint64_t)(m_m[0x44]) << 32);
 			int64_t b = (int32_t)m_m[0x40];
-			LOG(("SH2 '%s' div+mod %d/%d\n", tag(), a, b));
+			LOG("SH2 div+mod %d/%d\n", a, b);
 			if (b)
 			{
 				int64_t q = a / b;
@@ -812,76 +812,6 @@ void sh2_device::sh2_recalc_irq()
 	m_sh2_state->internal_irq_level = irq;
 	m_internal_irq_vector = vector;
 	m_test_irq = 1;
-}
-
-void sh2_device::sh2_exception(const char *message, int irqline)
-{
-	int vector;
-
-	if (irqline != 16)
-	{
-		if (irqline <= ((m_sh2_state->sr >> 4) & 15)) /* If the cpu forbids this interrupt */
-			return;
-
-		// if this is an sh2 internal irq, use its vector
-		if (m_sh2_state->internal_irq_level == irqline)
-		{
-			vector = m_internal_irq_vector;
-			/* avoid spurious irqs with this (TODO: needs a better fix) */
-			m_sh2_state->internal_irq_level = -1;
-			LOG(("SH-2 '%s' exception #%d (internal vector: $%x) after [%s]\n", tag(), irqline, vector, message));
-		}
-		else
-		{
-			if(m_m[0x38] & 0x00010000)
-			{
-				vector = standard_irq_callback(irqline);
-				LOG(("SH-2 '%s' exception #%d (external vector: $%x) after [%s]\n", tag(), irqline, vector, message));
-			}
-			else
-			{
-				standard_irq_callback(irqline);
-				vector = 64 + irqline/2;
-				LOG(("SH-2 '%s' exception #%d (autovector: $%x) after [%s]\n", tag(), irqline, vector, message));
-			}
-		}
-	}
-	else
-	{
-		vector = 11;
-		LOG(("SH-2 '%s' nmi exception (autovector: $%x) after [%s]\n", tag(), vector, message));
-	}
-
-	if (m_isdrc)
-	{
-		m_sh2_state->evec = RL( m_sh2_state->vbr + vector * 4 );
-		m_sh2_state->evec &= AM;
-		m_sh2_state->irqsr = m_sh2_state->sr;
-
-		/* set I flags in SR */
-		if (irqline > SH2_INT_15)
-			m_sh2_state->sr = m_sh2_state->sr | I;
-		else
-			m_sh2_state->sr = (m_sh2_state->sr & ~I) | (irqline << 4);
-
-//  printf("sh2_exception [%s] irqline %x evec %x save SR %x new SR %x\n", message, irqline, m_sh2_state->evec, m_sh2_state->irqsr, m_sh2_state->sr);
-	} else {
-		m_sh2_state->r[15] -= 4;
-		WL( m_sh2_state->r[15], m_sh2_state->sr );     /* push SR onto stack */
-		m_sh2_state->r[15] -= 4;
-		WL( m_sh2_state->r[15], m_sh2_state->pc );     /* push PC onto stack */
-
-		/* set I flags in SR */
-		if (irqline > SH2_INT_15)
-			m_sh2_state->sr = m_sh2_state->sr | I;
-		else
-			m_sh2_state->sr = (m_sh2_state->sr & ~I) | (irqline << 4);
-
-		/* fetch PC */
-		m_sh2_state->pc = RL( m_sh2_state->vbr + vector * 4 );
-	}
-
-	if(m_sh2_state->sleep_mode == 1) { m_sh2_state->sleep_mode = 2; }
 }
 
 /*

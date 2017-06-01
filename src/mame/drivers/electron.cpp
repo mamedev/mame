@@ -202,7 +202,7 @@ static INPUT_PORTS_START( electron )
 	PORT_BIT(0x01,  IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("BREAK") PORT_CODE(KEYCODE_F12) PORT_CHAR(UCHAR_MAMEKEY(F12)) PORT_CHANGED_MEMBER(DEVICE_SELF, electron_state, trigger_reset, 0)
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( electron, electron_state )
+static MACHINE_CONFIG_START( electron )
 	MCFG_CPU_ADD( "maincpu", M6502, XTAL_16MHz/8 )
 	MCFG_CPU_PROGRAM_MAP( electron_mem )
 
@@ -284,6 +284,6 @@ ROM_END
 #define rom_btm2105 rom_electron
 
 
-/*     YEAR  NAME       PARENT    COMPAT  MACHINE   INPUT     CLASS          INIT  COMPANY                             FULLNAME           FLAGS */
-COMP ( 1983, electron,  0,        0,      electron, electron, driver_device, 0,    "Acorn",                            "Acorn Electron",  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-COMP ( 1985, btm2105,   electron, 0,      btm2105,  electron, driver_device, 0,    "British Telecom Business Systems", "BT Merlin M2105", MACHINE_NOT_WORKING )
+/*     YEAR  NAME       PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT  COMPANY                             FULLNAME           FLAGS */
+COMP ( 1983, electron,  0,        0,      electron, electron, electron_state, 0,    "Acorn",                            "Acorn Electron",  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+COMP ( 1985, btm2105,   electron, 0,      btm2105,  electron, electron_state, 0,    "British Telecom Business Systems", "BT Merlin M2105", MACHINE_NOT_WORKING )

@@ -490,7 +490,7 @@ void jongkyo_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( jongkyo, jongkyo_state )
+static MACHINE_CONFIG_START( jongkyo )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SEGA_315_5084,JONGKYO_CLOCK/4)

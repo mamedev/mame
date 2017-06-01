@@ -9,6 +9,9 @@
 #include "psx.h"
 #include "gte.h"
 
+#include "psxdefs.h"
+
+
 static char *make_signed_hex_str_16( uint32_t value )
 {
 	static char s_hex[ 20 ];

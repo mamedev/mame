@@ -8,8 +8,10 @@
  *
  */
 
-#ifndef DOUBLER_H_
-#define DOUBLER_H_
+#ifndef MAME_BUS_CPC_DOUBLER_H
+#define MAME_BUS_CPC_DOUBLER_H
+
+#pragma once
 
 #include "cpcexp.h"
 #include "imagedev/cassette.h"
@@ -39,6 +41,6 @@ private:
 };
 
 // device type definition
-extern const device_type CPC_DOUBLER;
+DECLARE_DEVICE_TYPE(CPC_DOUBLER, cpc_doubler_device)
 
-#endif /* DOUBLER_H_ */
+#endif // MAME_BUS_CPC_DOUBLER_H

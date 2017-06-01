@@ -38,7 +38,6 @@ namespace netlist
 
 	public:
 		void update_outputs(unsigned v);
-		static const uint_fast8_t tab7448[16][7];
 
 		logic_input_t m_A;
 		logic_input_t m_B;
@@ -134,6 +133,28 @@ namespace netlist
 
 	#else
 
+#define BITS7(b6,b5,b4,b3,b2,b1,b0) (b6<<6) | (b5<<5) | (b4<<4) | (b3<<3) | (b2<<2) | (b1<<1) | (b0<<0)
+
+	static constexpr uint8_t tab7448[16] =
+	{
+			BITS7(   1, 1, 1, 1, 1, 1, 0 ),  /* 00 - not blanked ! */
+			BITS7(   0, 1, 1, 0, 0, 0, 0 ),  /* 01 */
+			BITS7(   1, 1, 0, 1, 1, 0, 1 ),  /* 02 */
+			BITS7(   1, 1, 1, 1, 0, 0, 1 ),  /* 03 */
+			BITS7(   0, 1, 1, 0, 0, 1, 1 ),  /* 04 */
+			BITS7(   1, 0, 1, 1, 0, 1, 1 ),  /* 05 */
+			BITS7(   0, 0, 1, 1, 1, 1, 1 ),  /* 06 */
+			BITS7(   1, 1, 1, 0, 0, 0, 0 ),  /* 07 */
+			BITS7(   1, 1, 1, 1, 1, 1, 1 ),  /* 08 */
+			BITS7(   1, 1, 1, 0, 0, 1, 1 ),  /* 09 */
+			BITS7(   0, 0, 0, 1, 1, 0, 1 ),  /* 10 */
+			BITS7(   0, 0, 1, 1, 0, 0, 1 ),  /* 11 */
+			BITS7(   0, 1, 0, 0, 0, 1, 1 ),  /* 12 */
+			BITS7(   1, 0, 0, 1, 0, 1, 1 ),  /* 13 */
+			BITS7(   0, 0, 0, 1, 1, 1, 1 ),  /* 14 */
+			BITS7(   0, 0, 0, 0, 0, 0, 0 ),  /* 15 */
+	};
+
 	NETLIB_UPDATE(7448)
 	{
 		if (!m_BIQ() || (m_BIQ() && !m_LTQ()))
@@ -157,9 +178,7 @@ namespace netlist
 			m_C.activate();
 			m_B.activate();
 			m_A.activate();
-			unsigned v;
-
-			v = (m_A() << 0) | (m_B() << 1) | (m_C() << 2) | (m_D() << 3);
+			unsigned v = (m_A() << 0) | (m_B() << 1) | (m_C() << 2) | (m_D() << 3);
 			if ((!m_RBIQ() && (v==0)))
 					v = 15;
 			update_outputs(v);
@@ -183,31 +202,13 @@ namespace netlist
 		{
 			// max transfer time is 100 NS */
 
-			for (std::size_t i=0; i<7; i++)
-				m_Q[i].push(tab7448[v][i], NLTIME_FROM_NS(100));
+			uint8_t t = tab7448[v];
+			for (std::size_t i = 0; i < 7; i++)
+				m_Q[i].push((t >> (6-i)) & 1, NLTIME_FROM_NS(100));
 			m_state = v;
 		}
 	}
 
-	const uint_fast8_t NETLIB_NAME(7448)::tab7448[16][7] =
-	{
-			{   1, 1, 1, 1, 1, 1, 0 },  /* 00 - not blanked ! */
-			{   0, 1, 1, 0, 0, 0, 0 },  /* 01 */
-			{   1, 1, 0, 1, 1, 0, 1 },  /* 02 */
-			{   1, 1, 1, 1, 0, 0, 1 },  /* 03 */
-			{   0, 1, 1, 0, 0, 1, 1 },  /* 04 */
-			{   1, 0, 1, 1, 0, 1, 1 },  /* 05 */
-			{   0, 0, 1, 1, 1, 1, 1 },  /* 06 */
-			{   1, 1, 1, 0, 0, 0, 0 },  /* 07 */
-			{   1, 1, 1, 1, 1, 1, 1 },  /* 08 */
-			{   1, 1, 1, 0, 0, 1, 1 },  /* 09 */
-			{   0, 0, 0, 1, 1, 0, 1 },  /* 10 */
-			{   0, 0, 1, 1, 0, 0, 1 },  /* 11 */
-			{   0, 1, 0, 0, 0, 1, 1 },  /* 12 */
-			{   1, 0, 0, 1, 0, 1, 1 },  /* 13 */
-			{   0, 0, 0, 1, 1, 1, 1 },  /* 14 */
-			{   0, 0, 0, 0, 0, 0, 0 },  /* 15 */
-	};
 	#endif
 
 	NETLIB_DEVICE_IMPL(7448)

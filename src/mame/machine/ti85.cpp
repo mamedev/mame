@@ -2,7 +2,7 @@
 // copyright-holders:Krzysztof Strzecha,Jon Sturm
 /***************************************************************************
   TI-85 driver by Krzysztof Strzecha
-  TI-83 Plus, TI-84 Plus, and Siliver Edition support by Jon Sturm
+  TI-83 Plus, TI-84 Plus, and Silver Edition support by Jon Sturm
 
   Functions to emulate general aspects of the machine (RAM, ROM, interrupts,
   I/O ports)
@@ -255,7 +255,8 @@ void ti85_state::machine_start()
 	m_port4_bit0 = 0;
 	m_ti81_port_7_data = 0;
 
-	machine().scheduler().timer_pulse(attotime::from_hz(256), timer_expired_delegate(FUNC(ti85_state::ti85_timer_callback),this));
+	m_ti85_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ti85_state::ti85_timer_callback), this));
+	m_ti85_timer->adjust(attotime::from_hz(256), 0, attotime::from_hz(256));
 
 	space.unmap_write(0x0000, 0x3fff);
 	space.unmap_write(0x4000, 0x7fff);
@@ -267,20 +268,6 @@ MACHINE_RESET_MEMBER(ti85_state,ti85)
 {
 	m_PCR = 0xc0;
 }
-
-DIRECT_UPDATE_MEMBER(ti85_state::ti83p_direct_update_handler)
-{
-	if (m_booting)
-	{
-		if (((m_ti83p_port4 & 1) && (address >= 0x4000 && address < 0xc000)) || (address >= 0x4000 && address < 0x8000))
-		{
-			m_booting = false;
-			update_ti83p_memory();
-		}
-	}
-	return address;
-}
-
 
 MACHINE_RESET_MEMBER(ti85_state,ti83p)
 {
@@ -307,7 +294,6 @@ MACHINE_START_MEMBER(ti85_state,ti83p)
 	m_model = TI83P;
 	//address_space &space = m_maincpu->space(AS_PROGRAM);
 	//m_bios = memregion("flash")->base();
-	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(&ti85_state::ti83p_direct_update_handler, this));
 
 	m_timer_interrupt_mask = 0;
 	m_timer_interrupt_status = 0;
@@ -331,10 +317,10 @@ MACHINE_START_MEMBER(ti85_state,ti83p)
 
 	ti85_state::update_ti83p_memory();
 
-
-	machine().scheduler().timer_pulse(attotime::from_hz(256), timer_expired_delegate(FUNC(ti85_state::ti83_timer1_callback),this));
-	machine().scheduler().timer_pulse(attotime::from_hz(512), timer_expired_delegate(FUNC(ti85_state::ti83_timer2_callback),this));
-
+	m_ti83_1st_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ti85_state::ti83_timer1_callback), this));
+	m_ti83_1st_timer->adjust(attotime::from_hz(256), 0, attotime::from_hz(256));
+	m_ti83_2nd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ti85_state::ti83_timer2_callback), this));
+	m_ti83_2nd_timer->adjust(attotime::from_hz(512), 0, attotime::from_hz(512));
 
 	/* save states and debugging */
 	save_item(NAME(m_timer_interrupt_status));
@@ -371,11 +357,11 @@ void ti85_state::ti8xpse_init_common()
 	m_flash_unlocked = 0;
 
 	ti85_state::update_ti83pse_memory();
-	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(&ti85_state::ti83p_direct_update_handler, this));
 
-
-	machine().scheduler().timer_pulse(attotime::from_hz(256), timer_expired_delegate(FUNC(ti85_state::ti83_timer1_callback),this));
-	machine().scheduler().timer_pulse(attotime::from_hz(512), timer_expired_delegate(FUNC(ti85_state::ti83_timer2_callback),this));
+	m_ti83_1st_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ti85_state::ti83_timer1_callback), this));
+	m_ti83_1st_timer->adjust(attotime::from_hz(256), 0, attotime::from_hz(256));
+	m_ti83_2nd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ti85_state::ti83_timer2_callback), this));
+	m_ti83_2nd_timer->adjust(attotime::from_hz(512), 0, attotime::from_hz(512));
 
 	m_crystal_timer1 = timer_alloc(CRYSTAL_TIMER1);
 	m_crystal_timer2 = timer_alloc(CRYSTAL_TIMER2);
@@ -444,7 +430,8 @@ MACHINE_START_MEMBER(ti85_state,ti86)
 	membank("bank4")->set_base(m_ti8x_ram.get());
 	machine().device<nvram_device>("nvram")->set_base(m_ti8x_ram.get(), sizeof(uint8_t)*128*1024);
 
-	machine().scheduler().timer_pulse(attotime::from_hz(256), timer_expired_delegate(FUNC(ti85_state::ti85_timer_callback),this));
+	m_ti85_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ti85_state::ti85_timer_callback), this));
+	m_ti85_timer->adjust(attotime::from_hz(256), 0, attotime::from_hz(256));
 }
 
 
