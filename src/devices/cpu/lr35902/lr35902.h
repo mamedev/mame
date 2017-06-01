@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol
-#pragma once
+#ifndef MAME_CPU_LR35902_LR35902_H
+#define MAME_CPU_LR35902_LR35902_H
 
-#ifndef __LR35902_H__
-#define __LR35902_H__
+#pragma once
 
 
 #define MCFG_LR35902_TIMER_CB(_devcb) \
@@ -33,7 +33,7 @@ enum
 };
 
 
-class lr35902_cpu_device :  public cpu_device
+class lr35902_cpu_device : public cpu_device
 {
 public:
 	// construction/destruction
@@ -140,6 +140,6 @@ protected:
 	devcb_write32 m_incdec16_func;
 };
 
-extern const device_type LR35902;
+DECLARE_DEVICE_TYPE(LR35902, lr35902_cpu_device)
 
-#endif /* __LR35902_H__ */
+#endif // MAME_CPU_LR35902_LR35902_H

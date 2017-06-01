@@ -1,14 +1,15 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli,Acho A. Tang, R. Belmont
+#ifndef MAME_VIDEO_K007121_H
+#define MAME_VIDEO_K007121_H
+
 #pragma once
-#ifndef __K007121_H__
-#define __K007121_H__
+
 
 class k007121_device : public device_t
 {
 public:
 	k007121_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~k007121_device() {}
 
 	static void static_set_palette_tag(device_t &device, const char *tag);
 
@@ -31,7 +32,7 @@ private:
 	required_device<palette_device> m_palette;
 };
 
-extern const device_type K007121;
+DECLARE_DEVICE_TYPE(K007121, k007121_device)
 
 #define MCFG_K007121_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, K007121, 0)
@@ -39,4 +40,4 @@ extern const device_type K007121;
 #define MCFG_K007121_PALETTE(_palette_tag) \
 	k007121_device::static_set_palette_tag(*device, "^" _palette_tag);
 
-#endif
+#endif // MAME_VIDEO_K007121_H

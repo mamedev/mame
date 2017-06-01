@@ -20,7 +20,7 @@
 
   jumperable? normally 0x220
 */
-static MACHINE_CONFIG_FRAGMENT( game_blaster_config )
+static MACHINE_CONFIG_START( game_blaster_config )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SAA1099_ADD("saa1099.1", 7159090)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
@@ -78,7 +78,7 @@ WRITE8_MEMBER( isa8_gblaster_device::detect_w )
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ISA8_GAME_BLASTER = device_creator<isa8_gblaster_device>;
+DEFINE_DEVICE_TYPE(ISA8_GAME_BLASTER, isa8_gblaster_device, "isa_gblaster", "Game Blaster Sound Card")
 
 //-------------------------------------------------
 //  machine_config_additions - device-specific
@@ -99,11 +99,11 @@ machine_config_constructor isa8_gblaster_device::device_mconfig_additions() cons
 //-------------------------------------------------
 
 isa8_gblaster_device::isa8_gblaster_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, ISA8_GAME_BLASTER, "Game Blaster Sound Card", tag, owner, clock, "isa_gblaster", __FILE__),
-		device_isa8_card_interface(mconfig, *this),
-		m_saa1099_1(*this, "saa1099.1"),
-		m_saa1099_2(*this, "saa1099.2"),
-		detect_reg(0xFF)
+	device_t(mconfig, ISA8_GAME_BLASTER, tag, owner, clock),
+	device_isa8_card_interface(mconfig, *this),
+	m_saa1099_1(*this, "saa1099.1"),
+	m_saa1099_2(*this, "saa1099.2"),
+	detect_reg(0xFF)
 {
 }
 

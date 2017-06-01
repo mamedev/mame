@@ -74,7 +74,6 @@ public:
 	DECLARE_READ8_MEMBER( n7751_rom_r );
 	DECLARE_READ8_MEMBER( n7751_p2_r );
 	DECLARE_WRITE8_MEMBER( n7751_p2_w );
-	DECLARE_READ8_MEMBER( n7751_t1_r );
 
 	// I8751 MCU read/write handlers
 	DECLARE_WRITE8_MEMBER( mcu_control_w );

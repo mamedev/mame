@@ -15,7 +15,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type PET_DATASSETTE_PORT = device_creator<pet_datassette_port_device>;
+DEFINE_DEVICE_TYPE(PET_DATASSETTE_PORT, pet_datassette_port_device, "pet_datassette_port", "Commodore Datasette Port")
 
 
 
@@ -53,7 +53,7 @@ device_pet_datassette_port_interface::~device_pet_datassette_port_interface()
 //-------------------------------------------------
 
 pet_datassette_port_device::pet_datassette_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, PET_DATASSETTE_PORT, "Datassette Port", tag, owner, clock, "pet_datassette_port", __FILE__),
+	device_t(mconfig, PET_DATASSETTE_PORT, tag, owner, clock),
 	device_slot_interface(mconfig, *this),
 	m_read_handler(*this), m_cart(nullptr)
 {
@@ -89,6 +89,10 @@ WRITE_LINE_MEMBER( pet_datassette_port_device::motor_w ) { if (m_cart != nullptr
 
 WRITE_LINE_MEMBER( pet_datassette_port_device::read_w ) { m_read_handler(state); }
 
+
+// slot devices
+#include "c2n.h"
+#include "diag264_lb_tape.h"
 
 //-------------------------------------------------
 //  SLOT_INTERFACE( cbm_datassette_devices )

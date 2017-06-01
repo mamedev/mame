@@ -40,8 +40,8 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_ULTRATERM = device_creator<a2bus_ultraterm_device>;
-const device_type A2BUS_ULTRATERMENH = device_creator<a2bus_ultratermenh_device>;
+DEFINE_DEVICE_TYPE(A2BUS_ULTRATERM,    a2bus_ultraterm_device,    "a2ulttrm", "Videx UltraTerm (original)")
+DEFINE_DEVICE_TYPE(A2BUS_ULTRATERMENH, a2bus_ultratermenh_device, "a2ultrme", "Videx UltraTerm (enhanced //e)")
 
 #define ULTRATERM_ROM_REGION  "uterm_rom"
 #define ULTRATERM_GFX_REGION  "uterm_gfx"
@@ -73,7 +73,7 @@ static const rgb_t ultraterm_palette[4] =
 	rgb_t(0xff,0xff,0xff)
 };
 
-MACHINE_CONFIG_FRAGMENT( a2ultraterm )
+MACHINE_CONFIG_START( a2ultraterm )
 	MCFG_SCREEN_ADD( ULTRATERM_SCREEN_NAME, RASTER)
 	MCFG_SCREEN_RAW_PARAMS(CLOCK_LOW, 882, 0, 720, 370, 0, 350 )
 	MCFG_SCREEN_UPDATE_DEVICE( ULTRATERM_MC6845_NAME, mc6845_device, screen_update )
@@ -139,20 +139,20 @@ const tiny_rom_entry *a2bus_ultratermenh_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_videx160_device::a2bus_videx160_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+a2bus_videx160_device::a2bus_videx160_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this), m_rom(nullptr), m_chrrom(nullptr), m_framecnt(0), m_ctrl1(0), m_ctrl2(0),
 	m_crtc(*this, ULTRATERM_MC6845_NAME), m_rambank(0)
 {
 }
 
 a2bus_ultraterm_device::a2bus_ultraterm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	a2bus_videx160_device(mconfig, A2BUS_ULTRATERM, "Videx UltraTerm (original)", tag, owner, clock, "a2ulttrm", __FILE__)
+	a2bus_videx160_device(mconfig, A2BUS_ULTRATERM, tag, owner, clock)
 {
 }
 
 a2bus_ultratermenh_device::a2bus_ultratermenh_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	a2bus_videx160_device(mconfig, A2BUS_ULTRATERMENH, "Videx UltraTerm (enhanced //e)", tag, owner, clock, "a2ultrme", __FILE__)
+	a2bus_videx160_device(mconfig, A2BUS_ULTRATERMENH, tag, owner, clock)
 {
 }
 

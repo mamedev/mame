@@ -23,7 +23,7 @@ constexpr int mm5837_device::m_frequency[];
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type MM5837 = device_creator<mm5837_device>;
+DEFINE_DEVICE_TYPE(MM5837, mm5837_device, "mm5837", "MM5837 Digital Noise Source")
 
 
 //**************************************************************************
@@ -35,7 +35,7 @@ const device_type MM5837 = device_creator<mm5837_device>;
 //-------------------------------------------------
 
 mm5837_device::mm5837_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, MM5837, "MM5837 Digital Noise Source", tag, owner, clock, "mm5837", __FILE__),
+	device_t(mconfig, MM5837, tag, owner, clock),
 	m_output_cb(*this),
 	m_vdd(0),
 	m_timer(nullptr),

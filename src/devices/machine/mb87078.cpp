@@ -102,10 +102,10 @@ static const int mb87078_gain_percent[66] = {
     DEVICE INTERFACE
 *****************************************************************************/
 
-const device_type MB87078 = device_creator<mb87078_device>;
+DEFINE_DEVICE_TYPE(MB87078, mb87078_device, "mb87078", "MB87078 Volume Controller")
 
 mb87078_device::mb87078_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MB87078, "MB87078 Volume Controller", tag, owner, clock, "mb87078", __FILE__),
+	: device_t(mconfig, MB87078, tag, owner, clock),
 	m_channel_latch(0),
 	m_reset_comp(0),
 	m_gain_changed_cb(*this)

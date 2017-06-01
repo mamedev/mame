@@ -90,7 +90,7 @@ uint32_t terak_state::screen_update_terak(screen_device &screen, bitmap_ind16 &b
 }
 
 
-static MACHINE_CONFIG_START( terak, terak_state )
+static MACHINE_CONFIG_START( terak )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",T11, XTAL_4MHz)
 	MCFG_T11_INITIAL_MODE(6 << 13)
@@ -118,5 +118,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT  COMPANY   FULLNAME       FLAGS */
-COMP( ????, terak,  0,      0,       terak,     terak, driver_device,   0,    "Terak", "Terak 8510A", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE        INIT  COMPANY  FULLNAME       FLAGS
+COMP( ????, terak,  0,      0,       terak,     terak, terak_state, 0,    "Terak", "Terak 8510A", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

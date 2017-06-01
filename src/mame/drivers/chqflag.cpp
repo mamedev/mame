@@ -288,7 +288,7 @@ void chqflag_state::machine_reset()
 	m_wheel = 0;
 }
 
-static MACHINE_CONFIG_START( chqflag, chqflag_state )
+static MACHINE_CONFIG_START( chqflag )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI, XTAL_24MHz/2/4)    /* 052001 (verified on pcb) */
@@ -422,6 +422,6 @@ ROM_START( chqflagj )
 ROM_END
 
 
-//     YEAR, NAME,     PARENT,  MACHINE, INPUT,    INIT,MONITOR,COMPANY,FULLNAME,FLAGS
-GAMEL( 1988, chqflag,  0,       chqflag, chqflag, driver_device,  0,   ROT90,  "Konami", "Chequered Flag", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_chqflag )
-GAMEL( 1988, chqflagj, chqflag, chqflag, chqflagj, driver_device, 0,   ROT90,  "Konami", "Chequered Flag (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_chqflag )
+//     YEAR, NAME,     PARENT,  MACHINE, INPUT,    STATE,         INIT, MONITOR, COMPANY,  FULLNAME,                 FLAGS,                                           LAYOUT
+GAMEL( 1988, chqflag,  0,       chqflag, chqflag,  chqflag_state, 0,    ROT90,   "Konami", "Chequered Flag",         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_chqflag )
+GAMEL( 1988, chqflagj, chqflag, chqflag, chqflagj, chqflag_state, 0,    ROT90,   "Konami", "Chequered Flag (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_chqflag )

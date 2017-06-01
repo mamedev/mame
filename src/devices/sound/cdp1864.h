@@ -32,8 +32,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_DEVICES_SOUND_CDP1864_H
-#define MAME_DEVICES_SOUND_CDP1864_H
+#ifndef MAME_SOUND_CDP1864_H
+#define MAME_SOUND_CDP1864_H
 
 #pragma once
 
@@ -50,32 +50,6 @@
 
 #define CDP1864_CLOCK   XTAL_1_75MHz
 
-#define CDP1864_VISIBLE_COLUMNS 64
-#define CDP1864_VISIBLE_LINES   192
-
-#define CDP1864_HBLANK_END       1 * 8
-#define CDP1864_HBLANK_START    13 * 8
-#define CDP1864_HSYNC_START      0 * 8
-#define CDP1864_HSYNC_END        1 * 8
-#define CDP1864_SCREEN_START     4 * 8
-#define CDP1864_SCREEN_END      12 * 8
-#define CDP1864_SCREEN_WIDTH    14 * 8
-
-#define CDP1864_TOTAL_SCANLINES             312
-
-#define CDP1864_SCANLINE_VBLANK_START       CDP1864_TOTAL_SCANLINES - 4
-#define CDP1864_SCANLINE_VBLANK_END         20
-#define CDP1864_SCANLINE_VSYNC_START        0
-#define CDP1864_SCANLINE_VSYNC_END          4
-#define CDP1864_SCANLINE_DISPLAY_START      60 // ???
-#define CDP1864_SCANLINE_DISPLAY_END        CDP1864_SCANLINE_DISPLAY_START + CDP1864_VISIBLE_LINES
-#define CDP1864_SCANLINE_INT_START          CDP1864_SCANLINE_DISPLAY_START - 2
-#define CDP1864_SCANLINE_INT_END            CDP1864_SCANLINE_DISPLAY_START
-#define CDP1864_SCANLINE_EFX_TOP_START      CDP1864_SCANLINE_DISPLAY_START - 4
-#define CDP1864_SCANLINE_EFX_TOP_END        CDP1864_SCANLINE_DISPLAY_START
-#define CDP1864_SCANLINE_EFX_BOTTOM_START   CDP1864_SCANLINE_DISPLAY_END - 4
-#define CDP1864_SCANLINE_EFX_BOTTOM_END     CDP1864_SCANLINE_DISPLAY_END
-
 
 
 //**************************************************************************
@@ -83,23 +57,23 @@
 //**************************************************************************
 
 #define MCFG_CDP1864_ADD(_tag, _screen_tag, _clock, _inlace, _irq, _dma_out, _efx, _hsync, _rdata, _bdata, _gdata) \
-	MCFG_SOUND_ADD(_tag, CDP1864, _clock) \
-	MCFG_VIDEO_SET_SCREEN(_screen_tag) \
-	downcast<cdp1864_device *>(device)->set_inlace_callback(DEVCB_##_inlace); \
-	downcast<cdp1864_device *>(device)->set_irq_callback(DEVCB_##_irq); \
-	downcast<cdp1864_device *>(device)->set_dma_out_callback(DEVCB_##_dma_out); \
-	downcast<cdp1864_device *>(device)->set_efx_callback(DEVCB_##_efx); \
-	downcast<cdp1864_device *>(device)->set_hsync_callback(DEVCB_##_hsync); \
-	downcast<cdp1864_device *>(device)->set_rdata_callback(DEVCB_##_rdata); \
-	downcast<cdp1864_device *>(device)->set_bdata_callback(DEVCB_##_bdata); \
-	downcast<cdp1864_device *>(device)->set_gdata_callback(DEVCB_##_gdata);
+		MCFG_SOUND_ADD(_tag, CDP1864, _clock) \
+		MCFG_VIDEO_SET_SCREEN(_screen_tag) \
+		downcast<cdp1864_device *>(device)->set_inlace_callback(DEVCB_##_inlace); \
+		downcast<cdp1864_device *>(device)->set_irq_callback(DEVCB_##_irq); \
+		downcast<cdp1864_device *>(device)->set_dma_out_callback(DEVCB_##_dma_out); \
+		downcast<cdp1864_device *>(device)->set_efx_callback(DEVCB_##_efx); \
+		downcast<cdp1864_device *>(device)->set_hsync_callback(DEVCB_##_hsync); \
+		downcast<cdp1864_device *>(device)->set_rdata_callback(DEVCB_##_rdata); \
+		downcast<cdp1864_device *>(device)->set_bdata_callback(DEVCB_##_bdata); \
+		downcast<cdp1864_device *>(device)->set_gdata_callback(DEVCB_##_gdata);
 
 #define MCFG_CDP1864_CHROMINANCE(_r, _b, _g, _bkg) \
-	downcast<cdp1864_device *>(device)->set_chrominance_resistors(_r, _b, _g, _bkg);
+		downcast<cdp1864_device *>(device)->set_chrominance_resistors(_r, _b, _g, _bkg);
 
 #define MCFG_CDP1864_SCREEN_ADD(_tag, _clock) \
-	MCFG_SCREEN_ADD(_tag, RASTER) \
-	MCFG_SCREEN_RAW_PARAMS(_clock, CDP1864_SCREEN_WIDTH, CDP1864_HBLANK_END, CDP1864_HBLANK_START, CDP1864_TOTAL_SCANLINES, CDP1864_SCANLINE_VBLANK_END, CDP1864_SCANLINE_VBLANK_START)
+		MCFG_SCREEN_ADD(_tag, RASTER) \
+		MCFG_SCREEN_RAW_PARAMS(_clock, cdp1864_device::SCREEN_WIDTH, cdp1864_device::HBLANK_END, cdp1864_device::HBLANK_START, cdp1864_device::TOTAL_SCANLINES, cdp1864_device::SCANLINE_VBLANK_END, cdp1864_device::SCANLINE_VBLANK_START)
 
 
 
@@ -114,17 +88,43 @@ class cdp1864_device :  public device_t,
 						public device_video_interface
 {
 public:
+	static constexpr unsigned VISIBLE_COLUMNS = 64;
+	static constexpr unsigned VISIBLE_LINES   = 192;
+
+	static constexpr unsigned HBLANK_END      =  1 * 8;
+	static constexpr unsigned HBLANK_START    = 13 * 8;
+	static constexpr unsigned HSYNC_START     =  0 * 8;
+	static constexpr unsigned HSYNC_END       =  1 * 8;
+	static constexpr unsigned SCREEN_START    =  4 * 8;
+	static constexpr unsigned SCREEN_END      = 12 * 8;
+	static constexpr unsigned SCREEN_WIDTH    = 14 * 8;
+
+	static constexpr unsigned TOTAL_SCANLINES             = 312;
+
+	static constexpr unsigned SCANLINE_VBLANK_START       = TOTAL_SCANLINES - 4;
+	static constexpr unsigned SCANLINE_VBLANK_END         = 20;
+	static constexpr unsigned SCANLINE_VSYNC_START        = 0;
+	static constexpr unsigned SCANLINE_VSYNC_END          = 4;
+	static constexpr unsigned SCANLINE_DISPLAY_START      = 60; // ???
+	static constexpr unsigned SCANLINE_DISPLAY_END        = SCANLINE_DISPLAY_START + VISIBLE_LINES;
+	static constexpr unsigned SCANLINE_INT_START          = SCANLINE_DISPLAY_START - 2;
+	static constexpr unsigned SCANLINE_INT_END            = SCANLINE_DISPLAY_START;
+	static constexpr unsigned SCANLINE_EFX_TOP_START      = SCANLINE_DISPLAY_START - 4;
+	static constexpr unsigned SCANLINE_EFX_TOP_END        = SCANLINE_DISPLAY_START;
+	static constexpr unsigned SCANLINE_EFX_BOTTOM_START   = SCANLINE_DISPLAY_END - 4;
+	static constexpr unsigned SCANLINE_EFX_BOTTOM_END     = SCANLINE_DISPLAY_END;
+
 	// construction/destruction
 	cdp1864_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _inlace> void set_inlace_callback(_inlace inlace) { m_read_inlace.set_callback(inlace); }
-	template<class _irq> void set_irq_callback(_irq irq) { m_write_irq.set_callback(irq); }
-	template<class _dma_out> void set_dma_out_callback(_dma_out dma_out) { m_write_dma_out.set_callback(dma_out); }
-	template<class _efx> void set_efx_callback(_efx efx) { m_write_efx.set_callback(efx); }
-	template<class _hsync> void set_hsync_callback(_hsync hsync) { m_write_hsync.set_callback(hsync); }
-	template<class _rdata> void set_rdata_callback(_rdata rdata) { m_read_rdata.set_callback(rdata); }
-	template<class _bdata> void set_bdata_callback(_bdata bdata) { m_read_bdata.set_callback(bdata); }
-	template<class _gdata> void set_gdata_callback(_gdata gdata) { m_read_gdata.set_callback(gdata); }
+	template <class Object> void set_inlace_callback(Object &&inlace) { m_read_inlace.set_callback(std::forward<Object>(inlace)); }
+	template <class Object> void set_irq_callback(Object &&irq) { m_write_irq.set_callback(std::forward<Object>(irq)); }
+	template <class Object> void set_dma_out_callback(Object &&dma_out) { m_write_dma_out.set_callback(std::forward<Object>(dma_out)); }
+	template <class Object> void set_efx_callback(Object &&efx) { m_write_efx.set_callback(std::forward<Object>(efx)); }
+	template <class Object> void set_hsync_callback(Object &&hsync) { m_write_hsync.set_callback(std::forward<Object>(hsync)); }
+	template <class Object> void set_rdata_callback(Object &&rdata) { m_read_rdata.set_callback(std::forward<Object>(rdata)); }
+	template <class Object> void set_bdata_callback(Object &&bdata) { m_read_bdata.set_callback(std::forward<Object>(bdata)); }
+	template <class Object> void set_gdata_callback(Object &&gdata) { m_read_gdata.set_callback(std::forward<Object>(gdata)); }
 	void set_chrominance_resistors(double r, double b, double g, double bkg) { m_chr_r = r; m_chr_b = b; m_chr_g = g; m_chr_bkg = bkg; }
 
 	DECLARE_READ8_MEMBER( dispon_r );
@@ -161,7 +161,7 @@ private:
 
 	void initialize_palette();
 
-	static const int bckgnd[];
+	static constexpr int bckgnd[4] = { 2, 0, 4, 1 };
 
 	devcb_read_line        m_read_inlace;
 	devcb_read_line        m_read_rdata;
@@ -202,6 +202,6 @@ private:
 
 
 // device type definition
-extern const device_type CDP1864;
+DECLARE_DEVICE_TYPE(CDP1864, cdp1864_device)
 
 #endif // MAME_DEVICES_SOUND_CDP1864_H

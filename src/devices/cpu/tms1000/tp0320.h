@@ -6,8 +6,10 @@
 
 */
 
-#ifndef _TP0320_H_
-#define _TP0320_H_
+#ifndef MAME_CPU_TMS1000_TP0320_H
+#define MAME_CPU_TMS1000_TP0320_H
+
+#pragma once
 
 #include "tms0980.h"
 
@@ -26,10 +28,10 @@ protected:
 	virtual void device_reset() override;
 	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options) override;
 
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 
-extern const device_type TP0320;
+DECLARE_DEVICE_TYPE(TP0320, tp0320_cpu_device)
 
-#endif /* _TP0320_H_ */
+#endif // MAME_CPU_TMS1000_TP0320_H

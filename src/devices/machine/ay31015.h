@@ -6,8 +6,10 @@
 
 */
 
-#ifndef __AY31015_H_
-#define __AY31015_H_
+#ifndef MAME_MACHINE_AY31015_H
+#define MAME_MACHINE_AY31015_H
+
+#pragma once
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -45,31 +47,27 @@ enum ay31015_output_pin_t
     DEVICE INTERFACE
 ***************************************************************************/
 
-enum state_t
-{
-	IDLE,
-	START_BIT,
-	PROCESSING,
-	PARITY_BIT,
-	FIRST_STOP_BIT,
-	SECOND_STOP_BIT,
-	PREP_TIME
-};
-
-ALLOW_SAVE_TYPE(state_t);
-
 class ay31015_device : public device_t
 {
 public:
+	enum state_t
+	{
+		IDLE,
+		START_BIT,
+		PROCESSING,
+		PARITY_BIT,
+		FIRST_STOP_BIT,
+		SECOND_STOP_BIT,
+		PREP_TIME
+	};
+
 	ay31015_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	ay31015_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
-	~ay31015_device() {}
 
 	static void set_tx_clock(device_t &device, double tx_clock) { downcast<ay31015_device &>(device).m_tx_clock = tx_clock; }
 	static void set_rx_clock(device_t &device, double rx_clock) { downcast<ay31015_device &>(device).m_rx_clock = rx_clock; }
-	template<class _Object> static devcb_base &set_read_si_callback(device_t &device, _Object object) { return downcast<ay31015_device &>(device).m_read_si_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_so_callback(device_t &device, _Object object) { return downcast<ay31015_device &>(device).m_write_so_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_status_changed_callback(device_t &device, _Object object) { return downcast<ay31015_device &>(device).m_status_changed_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_read_si_callback(device_t &device, Object &&cb) { return downcast<ay31015_device &>(device).m_read_si_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_write_so_callback(device_t &device, Object &&cb) { return downcast<ay31015_device &>(device).m_write_so_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_status_changed_callback(device_t &device, Object &&cb) { return downcast<ay31015_device &>(device).m_status_changed_cb.set_callback(std::forward<Object>(cb)); }
 
 	/* Set an input pin */
 	void set_input_pin( ay31015_input_pin_t pin, int data );
@@ -95,8 +93,10 @@ public:
 	void tx_process();
 
 protected:
-	static const device_timer_id TIMER_RX = 0;
-	static const device_timer_id TIMER_TX = 1;
+	static constexpr device_timer_id TIMER_RX = 0;
+	static constexpr device_timer_id TIMER_TX = 1;
+
+	ay31015_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -154,8 +154,10 @@ protected:
 
 };
 
-extern const device_type AY31015;   // For AY-3-1014A, AY-3-1015(D) and HD6402 variants
-extern const device_type AY51013;   // For AY-3-1014, AY-5-1013 and AY-6-1013 variants
+ALLOW_SAVE_TYPE(ay31015_device::state_t);
+
+DECLARE_DEVICE_TYPE(AY31015, ay31015_device)   // For AY-3-1014A, AY-3-1015(D) and HD6402 variants
+DECLARE_DEVICE_TYPE(AY51013, ay51013_device)   // For AY-3-1014, AY-5-1013 and AY-6-1013 variants
 
 
 
@@ -195,4 +197,4 @@ extern const device_type AY51013;   // For AY-3-1014, AY-5-1013 and AY-6-1013 va
 #define MCFG_AY51013_STATUS_CHANGED_CB(_devcb) \
 	devcb = &ay51013_device::set_status_changed_callback(*device, DEVCB_##_devcb);
 
-#endif
+#endif // MAME_MACHINE_AY31015_H

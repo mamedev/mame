@@ -816,7 +816,7 @@ void ngp_state::nvram_write(emu_file &file)
 }
 
 
-static MACHINE_CONFIG_START( ngp_common, ngp_state )
+static MACHINE_CONFIG_START( ngp_common )
 
 	MCFG_CPU_ADD( "maincpu", TMP95C061, XTAL_6_144MHz )
 	MCFG_TLCS900H_AM8_16(1)
@@ -895,6 +895,6 @@ ROM_START( ngpc )
 ROM_END
 
 
-/*    YEAR  NAME  PARENT COMPAT MACHINE INPUT INIT              COMPANY, FULLNAME, FLAGS */
-CONS( 1998, ngp,  0,     0,     ngp,    ngp,  driver_device, 0, "SNK", "NeoGeo Pocket", MACHINE_SUPPORTS_SAVE )
-CONS( 1999, ngpc, ngp,   0,     ngpc,   ngp,  driver_device, 0, "SNK", "NeoGeo Pocket Color", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME  PARENT COMPAT MACHINE INPUT STATE      INIT COMPANY  FULLNAME               FLAGS
+CONS( 1998, ngp,  0,     0,     ngp,    ngp,  ngp_state, 0,   "SNK",   "NeoGeo Pocket",       MACHINE_SUPPORTS_SAVE )
+CONS( 1999, ngpc, ngp,   0,     ngpc,   ngp,  ngp_state, 0,   "SNK",   "NeoGeo Pocket Color", MACHINE_SUPPORTS_SAVE )

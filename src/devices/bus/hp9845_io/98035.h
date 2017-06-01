@@ -8,28 +8,24 @@
 
 *********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_HP_9845_IO_98035_H
+#define MAME_BUS_HP_9845_IO_98035_H
 
-#ifndef _98035_H_
-#define _98035_H_
+#pragma once
 
 #include "hp9845_io.h"
 #include "cpu/nanoprocessor/nanoprocessor.h"
 #include "dirtc.h"
 
-class hp98035_io_card : public hp9845_io_card_device,
-						public device_rtc_interface
+class hp98035_io_card_device : public hp9845_io_card_device, public device_rtc_interface
 {
 public:
 	// construction/destruction
-	hp98035_io_card(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual ~hp98035_io_card();
+	hp98035_io_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual ~hp98035_io_card_device();
 
 	// device-level overrides
 	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
@@ -54,6 +50,11 @@ public:
 	DECLARE_WRITE8_MEMBER(clr_inten_w);
 
 	DECLARE_WRITE8_MEMBER(dc_w);
+
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	required_device<hp_nanoprocessor_device> m_cpu;
@@ -102,21 +103,21 @@ private:
 	uint8_t m_prev_clock_keys;
 	unsigned m_clock_key_cnt;
 
-	void half_init(void);
+	void half_init();
 	void set_flg(bool value);
-	void update_irq(void);
-	void update_dc(void);
+	void update_irq();
+	void update_dc();
 
 	void set_lhs_digits(unsigned v);
 	void set_rhs_digits(unsigned v);
-	void regen_clock_image(void);
-	void clock_short_press(void);
-	void clock_long_press(void);
-	void log_current_time(void);
+	void regen_clock_image();
+	void clock_short_press();
+	void clock_long_press();
+	void log_current_time();
 	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) override;
 };
 
 // device type definition
-extern const device_type HP98035_IO_CARD;
+DECLARE_DEVICE_TYPE(HP98035_IO_CARD, hp98035_io_card_device)
 
-#endif /* _98035_H_ */
+#endif // MAME_BUS_HP_9845_IO_98035_H

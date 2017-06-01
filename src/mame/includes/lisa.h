@@ -181,6 +181,7 @@ public:
 	int m_mouse_data_offset;
 	int m_COPS_force_unplug;
 	emu_timer *m_mouse_timer;
+	emu_timer *m_cops_ready_timer;
 	int m_hold_COPS_data;
 	int m_NMIcode;
 	clock_regs_t m_clock_regs;

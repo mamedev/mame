@@ -27,7 +27,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type M50458 = device_creator<m50458_device>;
+DEFINE_DEVICE_TYPE(M50458, m50458_device, "m50458", "Mitsubishi M50458 OSD")
 
 static ADDRESS_MAP_START( m50458_vram, AS_0, 16, m50458_device )
 	AM_RANGE(0x0000, 0x023f) AM_RAM // vram
@@ -174,10 +174,10 @@ inline void m50458_device::write_word(offs_t address, uint16_t data)
 //-------------------------------------------------
 
 m50458_device::m50458_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, M50458, "M50458 OSD", tag, owner, clock, "m50458", __FILE__),
-		device_memory_interface(mconfig, *this),
-		device_video_interface(mconfig, *this),
-		m_space_config("videoram", ENDIANNESS_LITTLE, 16, 16, 0, nullptr, *ADDRESS_MAP_NAME(m50458_vram))
+	: device_t(mconfig, M50458, tag, owner, clock)
+	, device_memory_interface(mconfig, *this)
+	, device_video_interface(mconfig, *this)
+	, m_space_config("videoram", ENDIANNESS_LITTLE, 16, 16, 0, nullptr, *ADDRESS_MAP_NAME(m50458_vram))
 {
 }
 

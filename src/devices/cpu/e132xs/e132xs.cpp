@@ -214,14 +214,42 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "e132xs.h"
+
+#include "debugger.h"
+
+#include "32xsdefs.h"
 
 #ifdef MAME_DEBUG
 #define DEBUG_PRINTF(x) do { osd_printf_debug x; } while (0)
 #else
 #define DEBUG_PRINTF(x) do { } while (0)
 #endif
+
+/* Memory access */
+/* read byte */
+#define READ_B(addr)            m_program->read_byte((addr))
+/* read half-word */
+#define READ_HW(addr)           m_program->read_word((addr) & ~1)
+/* read word */
+#define READ_W(addr)            m_program->read_dword((addr) & ~3)
+
+/* write byte */
+#define WRITE_B(addr, data)     m_program->write_byte(addr, data)
+/* write half-word */
+#define WRITE_HW(addr, data)    m_program->write_word((addr) & ~1, data)
+/* write word */
+#define WRITE_W(addr, data)     m_program->write_dword((addr) & ~3, data)
+
+
+/* I/O access */
+/* read word */
+#define IO_READ_W(addr)         m_io->read_dword(((addr) >> 11) & 0x7ffc)
+/* write word */
+#define IO_WRITE_W(addr, data)  m_io->write_dword(((addr) >> 11) & 0x7ffc, data)
+
+
+#define READ_OP(addr)          m_direct->read_word((addr), m_opcodexor)
 
 // set C in adds/addsi/subs/sums
 #define SETCARRYS 0
@@ -318,9 +346,9 @@ ADDRESS_MAP_END
 //  hyperstone_device - constructor
 //-------------------------------------------------
 
-hyperstone_device::hyperstone_device(const machine_config &mconfig, const char *name, const char *tag, device_t *owner, uint32_t clock,
-										const device_type type, uint32_t prg_data_width, uint32_t io_data_width, address_map_constructor internal_map, const char *shortname, const char *source)
-	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
+hyperstone_device::hyperstone_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock,
+										const device_type type, uint32_t prg_data_width, uint32_t io_data_width, address_map_constructor internal_map)
+	: cpu_device(mconfig, type, tag, owner, clock),
 		m_program_config("program", ENDIANNESS_BIG, prg_data_width, 32, 0, internal_map),
 		m_io_config("io", ENDIANNESS_BIG, io_data_width, 15),
 		m_icount(0)
@@ -336,7 +364,7 @@ hyperstone_device::hyperstone_device(const machine_config &mconfig, const char *
 //-------------------------------------------------
 
 e116t_device::e116t_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: hyperstone_device(mconfig, "E1-16T", tag, owner, clock, E116T, 16, 16, ADDRESS_MAP_NAME(e116_4k_iram_map), "e116t", __FILE__)
+	: hyperstone_device(mconfig, tag, owner, clock, E116T, 16, 16, ADDRESS_MAP_NAME(e116_4k_iram_map))
 {
 }
 
@@ -346,7 +374,7 @@ e116t_device::e116t_device(const machine_config &mconfig, const char *tag, devic
 //-------------------------------------------------
 
 e116xt_device::e116xt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: hyperstone_device(mconfig, "E1-16XT", tag, owner, clock, E116XT, 16, 16, ADDRESS_MAP_NAME(e116_8k_iram_map), "e116xt", __FILE__)
+	: hyperstone_device(mconfig, tag, owner, clock, E116XT, 16, 16, ADDRESS_MAP_NAME(e116_8k_iram_map))
 {
 }
 
@@ -356,7 +384,7 @@ e116xt_device::e116xt_device(const machine_config &mconfig, const char *tag, dev
 //-------------------------------------------------
 
 e116xs_device::e116xs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: hyperstone_device(mconfig, "E1-16XS", tag, owner, clock, E116XS, 16, 16, ADDRESS_MAP_NAME(e116_16k_iram_map), "e116xs", __FILE__)
+	: hyperstone_device(mconfig, tag, owner, clock, E116XS, 16, 16, ADDRESS_MAP_NAME(e116_16k_iram_map))
 {
 }
 
@@ -366,7 +394,7 @@ e116xs_device::e116xs_device(const machine_config &mconfig, const char *tag, dev
 //-------------------------------------------------
 
 e116xsr_device::e116xsr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: hyperstone_device(mconfig, "E1-16XSR", tag, owner, clock, E116XSR, 16, 16, ADDRESS_MAP_NAME(e116_16k_iram_map), "e116xsr", __FILE__)
+	: hyperstone_device(mconfig, tag, owner, clock, E116XSR, 16, 16, ADDRESS_MAP_NAME(e116_16k_iram_map))
 {
 }
 
@@ -376,7 +404,7 @@ e116xsr_device::e116xsr_device(const machine_config &mconfig, const char *tag, d
 //-------------------------------------------------
 
 e132n_device::e132n_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: hyperstone_device(mconfig, "E1-32N", tag, owner, clock, E132N, 32, 32, ADDRESS_MAP_NAME(e132_4k_iram_map), "e132n", __FILE__)
+	: hyperstone_device(mconfig, tag, owner, clock, E132N, 32, 32, ADDRESS_MAP_NAME(e132_4k_iram_map))
 {
 }
 
@@ -386,7 +414,7 @@ e132n_device::e132n_device(const machine_config &mconfig, const char *tag, devic
 //-------------------------------------------------
 
 e132t_device::e132t_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: hyperstone_device(mconfig, "E1-32T", tag, owner, clock, E132T, 32, 32, ADDRESS_MAP_NAME(e132_4k_iram_map), "e132t", __FILE__)
+	: hyperstone_device(mconfig, tag, owner, clock, E132T, 32, 32, ADDRESS_MAP_NAME(e132_4k_iram_map))
 {
 }
 
@@ -396,7 +424,7 @@ e132t_device::e132t_device(const machine_config &mconfig, const char *tag, devic
 //-------------------------------------------------
 
 e132xn_device::e132xn_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: hyperstone_device(mconfig, "E1-32XN", tag, owner, clock, E132XN, 32, 32, ADDRESS_MAP_NAME(e132_8k_iram_map), "e132xn", __FILE__)
+	: hyperstone_device(mconfig, tag, owner, clock, E132XN, 32, 32, ADDRESS_MAP_NAME(e132_8k_iram_map))
 {
 }
 
@@ -406,7 +434,7 @@ e132xn_device::e132xn_device(const machine_config &mconfig, const char *tag, dev
 //-------------------------------------------------
 
 e132xt_device::e132xt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: hyperstone_device(mconfig, "E1-32XT", tag, owner, clock, E132XT, 32, 32, ADDRESS_MAP_NAME(e132_8k_iram_map), "e132xt", __FILE__)
+	: hyperstone_device(mconfig, tag, owner, clock, E132XT, 32, 32, ADDRESS_MAP_NAME(e132_8k_iram_map))
 {
 }
 
@@ -416,7 +444,7 @@ e132xt_device::e132xt_device(const machine_config &mconfig, const char *tag, dev
 //-------------------------------------------------
 
 e132xs_device::e132xs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: hyperstone_device(mconfig, "E1-32XS", tag, owner, clock, E132XS, 32, 32, ADDRESS_MAP_NAME(e132_16k_iram_map), "e132xs", __FILE__)
+	: hyperstone_device(mconfig, tag, owner, clock, E132XS, 32, 32, ADDRESS_MAP_NAME(e132_16k_iram_map))
 {
 }
 
@@ -426,7 +454,7 @@ e132xs_device::e132xs_device(const machine_config &mconfig, const char *tag, dev
 //-------------------------------------------------
 
 e132xsr_device::e132xsr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: hyperstone_device(mconfig, "E1-32XSR", tag, owner, clock, E132XSR, 32, 32, ADDRESS_MAP_NAME(e132_16k_iram_map), "e132xsr", __FILE__)
+	: hyperstone_device(mconfig, tag, owner, clock, E132XSR, 32, 32, ADDRESS_MAP_NAME(e132_16k_iram_map))
 {
 }
 
@@ -436,7 +464,7 @@ e132xsr_device::e132xsr_device(const machine_config &mconfig, const char *tag, d
 //-------------------------------------------------
 
 gms30c2116_device::gms30c2116_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: hyperstone_device(mconfig, "GMS30C2116", tag, owner, clock, GMS30C2116, 16, 16, ADDRESS_MAP_NAME(e116_4k_iram_map), "gms30c2116", __FILE__)
+	: hyperstone_device(mconfig, tag, owner, clock, GMS30C2116, 16, 16, ADDRESS_MAP_NAME(e116_4k_iram_map))
 {
 }
 
@@ -446,7 +474,7 @@ gms30c2116_device::gms30c2116_device(const machine_config &mconfig, const char *
 //-------------------------------------------------
 
 gms30c2132_device::gms30c2132_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: hyperstone_device(mconfig, "GMS30C2132", tag, owner, clock, GMS30C2132, 32, 32, ADDRESS_MAP_NAME(e132_4k_iram_map), "gms30c2132", __FILE__)
+	: hyperstone_device(mconfig, tag, owner, clock, GMS30C2132, 32, 32, ADDRESS_MAP_NAME(e132_4k_iram_map))
 {
 }
 
@@ -456,7 +484,7 @@ gms30c2132_device::gms30c2132_device(const machine_config &mconfig, const char *
 //-------------------------------------------------
 
 gms30c2216_device::gms30c2216_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: hyperstone_device(mconfig, "GMS30C2216", tag, owner, clock, GMS30C2216, 16, 16, ADDRESS_MAP_NAME(e116_8k_iram_map), "gms30c2216", __FILE__)
+	: hyperstone_device(mconfig, tag, owner, clock, GMS30C2216, 16, 16, ADDRESS_MAP_NAME(e116_8k_iram_map))
 {
 }
 
@@ -466,7 +494,7 @@ gms30c2216_device::gms30c2216_device(const machine_config &mconfig, const char *
 //-------------------------------------------------
 
 gms30c2232_device::gms30c2232_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: hyperstone_device(mconfig, "GMS30C2232", tag, owner, clock, GMS30C2232, 32, 32, ADDRESS_MAP_NAME(e132_8k_iram_map), "gms30c2232", __FILE__)
+	: hyperstone_device(mconfig, tag, owner, clock, GMS30C2232, 32, 32, ADDRESS_MAP_NAME(e132_8k_iram_map))
 {
 }
 
@@ -4990,17 +5018,17 @@ void hyperstone_device::execute_run()
 	} while( m_icount > 0 );
 }
 
-const device_type E116T = device_creator<e116t_device>;
-const device_type E116XT = device_creator<e116xt_device>;
-const device_type E116XS = device_creator<e116xs_device>;
-const device_type E116XSR = device_creator<e116xsr_device>;
-const device_type E132N = device_creator<e132n_device>;
-const device_type E132T = device_creator<e132t_device>;
-const device_type E132XN = device_creator<e132xn_device>;
-const device_type E132XT = device_creator<e132xt_device>;
-const device_type E132XS = device_creator<e132xs_device>;
-const device_type E132XSR = device_creator<e132xsr_device>;
-const device_type GMS30C2116 = device_creator<gms30c2116_device>;
-const device_type GMS30C2132 = device_creator<gms30c2132_device>;
-const device_type GMS30C2216 = device_creator<gms30c2216_device>;
-const device_type GMS30C2232 = device_creator<gms30c2232_device>;
+DEFINE_DEVICE_TYPE(E116T,      e116t_device,      "e116t",      "E1-16T")
+DEFINE_DEVICE_TYPE(E116XT,     e116xt_device,     "e116xt",     "E1-16XT")
+DEFINE_DEVICE_TYPE(E116XS,     e116xs_device,     "e116xs",     "E1-16XS")
+DEFINE_DEVICE_TYPE(E116XSR,    e116xsr_device,    "e116xsr",    "E1-16XSR")
+DEFINE_DEVICE_TYPE(E132N,      e132n_device,      "e132n",      "E1-32N")
+DEFINE_DEVICE_TYPE(E132T,      e132t_device,      "e132t",      "E1-32T")
+DEFINE_DEVICE_TYPE(E132XN,     e132xn_device,     "e132xn",     "E1-32XN")
+DEFINE_DEVICE_TYPE(E132XT,     e132xt_device,     "e132xt",     "E1-32XT")
+DEFINE_DEVICE_TYPE(E132XS,     e132xs_device,     "e132xs",     "E1-32XS")
+DEFINE_DEVICE_TYPE(E132XSR,    e132xsr_device,    "e132xsr",    "E1-32XSR")
+DEFINE_DEVICE_TYPE(GMS30C2116, gms30c2116_device, "gms30c2116", "GMS30C2116")
+DEFINE_DEVICE_TYPE(GMS30C2132, gms30c2132_device, "gms30c2132", "GMS30C2132")
+DEFINE_DEVICE_TYPE(GMS30C2216, gms30c2216_device, "gms30c2216", "GMS30C2216")
+DEFINE_DEVICE_TYPE(GMS30C2232, gms30c2232_device, "gms30c2232", "GMS30C2232")

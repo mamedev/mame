@@ -856,8 +856,8 @@ static bool test_imgtool_datetime()
 
 
 //-------------------------------------------------
-//	imgtool_validitychecks - checks the validity
-//	of the imgtool modules
+//  imgtool_validitychecks - checks the validity
+//  of the imgtool modules
 //-------------------------------------------------
 
 bool imgtool_validitychecks(void)

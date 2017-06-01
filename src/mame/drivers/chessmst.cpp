@@ -353,7 +353,7 @@ static const z80_daisy_config chessmstdm_daisy_chain[] =
 	{ nullptr }
 };
 
-static MACHINE_CONFIG_START( chessmst, chessmst_state )
+static MACHINE_CONFIG_START( chessmst )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_9_8304MHz/4) // U880 Z80 clone
@@ -378,7 +378,7 @@ static MACHINE_CONFIG_START( chessmst, chessmst_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( chessmsta, chessmst_state )
+static MACHINE_CONFIG_START( chessmsta )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz/4) // U880 Z80 clone
@@ -403,7 +403,7 @@ static MACHINE_CONFIG_START( chessmsta, chessmst_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( chessmstdm, chessmst_state )
+static MACHINE_CONFIG_START( chessmstdm )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz/2) // U880 Z80 clone
@@ -465,7 +465,7 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME       PARENT COMPAT MACHINE    INPUT     INIT              COMPANY, FULLNAME, FLAGS */
-COMP( 1984, chessmst,  0,        0,  chessmst,  chessmst, driver_device, 0, "VEB Mikroelektronik Erfurt", "Chess-Master (set 1)", MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
-COMP( 1984, chessmsta, chessmst, 0,  chessmsta, chessmst, driver_device, 0, "VEB Mikroelektronik Erfurt", "Chess-Master (set 2)", MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
-COMP( 1987, chessmstdm,0,     0,  chessmstdm, chessmstdm, driver_device, 0, "VEB Mikroelektronik Erfurt", "Chess-Master Diamond", MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME        PARENT    COMPAT  MACHINE     INPUT       STATE           INIT  COMPANY                       FULLNAME                FLAGS
+COMP( 1984, chessmst,   0,        0,      chessmst,   chessmst,   chessmst_state, 0,    "VEB Mikroelektronik Erfurt", "Chess-Master (set 1)", MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
+COMP( 1984, chessmsta,  chessmst, 0,      chessmsta,  chessmst,   chessmst_state, 0,    "VEB Mikroelektronik Erfurt", "Chess-Master (set 2)", MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
+COMP( 1987, chessmstdm, 0,        0,      chessmstdm, chessmstdm, chessmst_state, 0,    "VEB Mikroelektronik Erfurt", "Chess-Master Diamond", MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )

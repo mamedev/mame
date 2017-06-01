@@ -426,12 +426,6 @@ enum tilemap_standard_mapper
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// forward declarations
-class tilemap_t;
-class tilemap_manager;
-class tilemap_device;
-
-
 // global types
 typedef u32 tilemap_memory_index;
 
@@ -556,7 +550,7 @@ public:
 	void draw(screen_device &screen, bitmap_rgb32 &dest, const rectangle &cliprect, u32 flags, u8 priority = 0, u8 priority_mask = 0xff);
 	void draw_roz(screen_device &screen, bitmap_ind16 &dest, const rectangle &cliprect, u32 startx, u32 starty, int incxx, int incxy, int incyx, int incyy, bool wraparound, u32 flags, u8 priority = 0, u8 priority_mask = 0xff);
 	void draw_roz(screen_device &screen, bitmap_rgb32 &dest, const rectangle &cliprect, u32 startx, u32 starty, int incxx, int incxy, int incyx, int incyy, bool wraparound, u32 flags, u8 priority = 0, u8 priority_mask = 0xff);
-	void draw_debug(screen_device &screen, bitmap_rgb32 &dest, u32 scrollx, u32 scrolly);
+	void draw_debug(screen_device &screen, bitmap_rgb32 &dest, u32 scrollx, u32 scrolly, u32 flags = TILEMAP_DRAW_ALL_CATEGORIES);
 
 	// mappers
 	// scan in row-major order with optional flipping
@@ -818,4 +812,4 @@ inline running_machine &tilemap_t::machine() const
 }
 
 
-#endif  // MAME_EMU_TILEMAP_H
+#endif // MAME_EMU_TILEMAP_H

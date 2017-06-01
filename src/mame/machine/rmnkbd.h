@@ -23,5 +23,6 @@ private:
 };
 
 extern const device_type RMNIMBUS_KEYBOARD;
+DECLARE_DEVICE_TYPE(RMNIMBUS_KEYBOARD, rmnimbus_keyboard_device)
 
 #endif // MAME_MACHINE_RMNKBD_H

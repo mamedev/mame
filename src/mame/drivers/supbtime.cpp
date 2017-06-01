@@ -316,7 +316,7 @@ void supbtime_state::machine_start()
 {
 }
 
-static MACHINE_CONFIG_START( supbtime, supbtime_state )
+static MACHINE_CONFIG_START( supbtime )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14000000)
@@ -368,12 +368,12 @@ static MACHINE_CONFIG_START( supbtime, supbtime_state )
 	MCFG_SOUND_ROUTE(0, "mono", 0.45)
 	MCFG_SOUND_ROUTE(1, "mono", 0.45)
 
-	MCFG_OKIM6295_ADD("oki", 1023924, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 1023924, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( chinatwn, supbtime_state )
+static MACHINE_CONFIG_START( chinatwn )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14000000)
@@ -424,7 +424,7 @@ static MACHINE_CONFIG_START( chinatwn, supbtime_state )
 	MCFG_SOUND_ROUTE(0, "mono", 0.45)
 	MCFG_SOUND_ROUTE(1, "mono", 0.45)
 
-	MCFG_OKIM6295_ADD("oki", 1023924, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 1023924, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -509,7 +509,7 @@ ROM_END
 
 /******************************************************************************/
 
-GAME( 1990, supbtime, 0,        supbtime, supbtime, driver_device, 0, ROT0, "Data East Corporation", "Super Burger Time (World, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, supbtimea,supbtime, supbtime, supbtime, driver_device, 0, ROT0, "Data East Corporation", "Super Burger Time (World, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, supbtimej,supbtime, supbtime, supbtime, driver_device, 0, ROT0, "Data East Corporation", "Super Burger Time (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, chinatwn, 0,        chinatwn, chinatwn, driver_device, 0, ROT0, "Data East Corporation", "China Town (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, supbtime, 0,        supbtime, supbtime, supbtime_state, 0, ROT0, "Data East Corporation", "Super Burger Time (World, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, supbtimea,supbtime, supbtime, supbtime, supbtime_state, 0, ROT0, "Data East Corporation", "Super Burger Time (World, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, supbtimej,supbtime, supbtime, supbtime, supbtime_state, 0, ROT0, "Data East Corporation", "Super Burger Time (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, chinatwn, 0,        chinatwn, chinatwn, supbtime_state, 0, ROT0, "Data East Corporation", "China Town (Japan)", MACHINE_SUPPORTS_SAVE )

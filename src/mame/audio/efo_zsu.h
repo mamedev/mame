@@ -1,10 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood,AJR
 
-#pragma once
+#ifndef MAME_AUDIO_EFO_ZSU_H
+#define MAME_AUDIO_EFO_ZSU_H
 
-#ifndef CEDAR_MAGNET_SOUND_DEF
-#define CEDAR_MAGNET_SOUND_DEF
+#pragma once
 
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
@@ -15,9 +15,9 @@
 #include "sound/msm5205.h"
 #include "machine/cedar_magnet_board.h"
 
-extern const device_type EFO_ZSU;
-extern const device_type EFO_ZSU1;
-extern const device_type CEDAR_MAGNET_SOUND;
+DECLARE_DEVICE_TYPE(EFO_ZSU,            efo_zsu_device)
+DECLARE_DEVICE_TYPE(EFO_ZSU1,           efo_zsu1_device)
+DECLARE_DEVICE_TYPE(CEDAR_MAGNET_SOUND, cedar_magnet_sound_device)
 
 #define MCFG_CEDAR_MAGNET_SOUND_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, CEDAR_MAGNET_SOUND, 0)
@@ -27,7 +27,6 @@ class efo_zsu_device : public device_t
 {
 public:
 	// construction/destruction
-	efo_zsu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, const char *shortname, const char *source);
 	efo_zsu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	required_device<z80ctc_device> m_ctc0;
@@ -38,6 +37,14 @@ public:
 
 	DECLARE_WRITE8_MEMBER(sound_command_w);
 	DECLARE_WRITE8_MEMBER(adpcm_fifo_w);
+
+protected:
+	efo_zsu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override;
+
+private:
 	DECLARE_WRITE8_MEMBER(ay1_porta_w);
 
 	DECLARE_WRITE_LINE_MEMBER(ctc1_z0_w);
@@ -47,12 +54,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ctc0_z1_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc0_z2_w);
 	DECLARE_WRITE_LINE_MEMBER(fifo_dor_w);
-
-protected:
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual void device_start() override;
-
-private:
 };
 
 
@@ -73,15 +74,14 @@ public:
 	// construction/destruction
 	cedar_magnet_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	DECLARE_WRITE8_MEMBER(ay0_porta_w);
-
 	TIMER_CALLBACK_MEMBER(reset_assert_callback) override;
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 
 private:
+	DECLARE_WRITE8_MEMBER(ay0_porta_w);
 };
 
-#endif
+#endif // MAME_AUDIO_EFO_ZSU_H

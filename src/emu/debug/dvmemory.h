@@ -11,8 +11,13 @@
 #ifndef MAME_EMU_DEBUG_DVMEMORY_H
 #define MAME_EMU_DEBUG_DVMEMORY_H
 
+#pragma once
+
+#include "debugvw.h"
+
 #include "softfloat/mamesf.h"
 #include "softfloat/softfloat.h"
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -128,8 +133,7 @@ private:
 	static const memory_view_pos s_memory_pos_table[12]; // table for rendering at different data formats
 
 	// constants
-	static const int MEM_MAX_LINE_WIDTH = 1024;
+	static constexpr int MEM_MAX_LINE_WIDTH = 1024;
 };
-
 
 #endif // MAME_EMU_DEBUG_DVMEMORY_H

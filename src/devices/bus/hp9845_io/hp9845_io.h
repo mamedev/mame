@@ -8,10 +8,10 @@
 
 *********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_HP9845_IO_HP9845_IO_H
+#define MAME_BUS_HP9845_IO_HP9845_IO_H
 
-#ifndef _HP9845_IO_H_
-#define _HP9845_IO_H_
+#pragma once
 
 
 #define MCFG_HP9845_IO_SLOT_ADD(_tag) \
@@ -57,9 +57,9 @@ public:
 	virtual void device_start() override;
 
 	// Callback setups
-	template<class _Object> static devcb_base &set_irq_cb_func(device_t &device, _Object object) { return downcast<hp9845_io_slot_device &>(device).m_irq_cb_func.set_callback(object); }
-	template<class _Object> static devcb_base &set_sts_cb_func(device_t &device, _Object object) { return downcast<hp9845_io_slot_device &>(device).m_sts_cb_func.set_callback(object); }
-	template<class _Object> static devcb_base &set_flg_cb_func(device_t &device, _Object object) { return downcast<hp9845_io_slot_device &>(device).m_flg_cb_func.set_callback(object); }
+	template <class Object> static devcb_base &set_irq_cb_func(device_t &device, Object &&cb) { return downcast<hp9845_io_slot_device &>(device).m_irq_cb_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_sts_cb_func(device_t &device, Object &&cb) { return downcast<hp9845_io_slot_device &>(device).m_sts_cb_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_flg_cb_func(device_t &device, Object &&cb) { return downcast<hp9845_io_slot_device &>(device).m_flg_cb_func.set_callback(std::forward<Object>(cb)); }
 
 	// irq/sts/flg signal handlers
 	void irq_w(uint8_t sc , int state);
@@ -90,7 +90,7 @@ public:
 
 protected:
 	// construction/destruction
-	hp9845_io_card_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+	hp9845_io_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~hp9845_io_card_device();
 
 	// device-level overrides
@@ -107,8 +107,8 @@ protected:
 };
 
 // device type definition
-extern const device_type HP9845_IO_SLOT;
+DECLARE_DEVICE_TYPE(HP9845_IO_SLOT, hp9845_io_slot_device)
 
 SLOT_INTERFACE_EXTERN(hp9845_io_slot_devices);
 
-#endif /* _HP9845_IO_H_ */
+#endif // MAME_BUS_HP9845_IO_HP9845_IO_H

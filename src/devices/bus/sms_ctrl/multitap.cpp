@@ -17,7 +17,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SMS_MULTITAP = device_creator<sms_multitap_device>;
+DEFINE_DEVICE_TYPE(SMS_MULTITAP, sms_multitap_device, "sms_multitap", "Sega SMS Multitap")
 
 
 //**************************************************************************
@@ -29,7 +29,7 @@ const device_type SMS_MULTITAP = device_creator<sms_multitap_device>;
 //-------------------------------------------------
 
 sms_multitap_device::sms_multitap_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, SMS_MULTITAP, "Sega SMS Multitap", tag, owner, clock, "sms_multitap", __FILE__),
+	device_t(mconfig, SMS_MULTITAP, tag, owner, clock),
 	device_sms_control_port_interface(mconfig, *this),
 	m_subctrl1_port(*this, "ctrl1"),
 	m_subctrl2_port(*this, "ctrl2"),
@@ -49,11 +49,6 @@ void sms_multitap_device::device_start()
 {
 	save_item(NAME(m_read_state));
 	save_item(NAME(m_last_data));
-
-	m_subctrl1_port->device_start();
-	m_subctrl2_port->device_start();
-	m_subctrl3_port->device_start();
-	m_subctrl4_port->device_start();
 }
 
 
@@ -135,7 +130,7 @@ READ32_MEMBER( sms_multitap_device::pixel_r )
 }
 
 
-static MACHINE_CONFIG_FRAGMENT( multitap_slot )
+static MACHINE_CONFIG_START( multitap_slot )
 	// Controller subports setup, without the TH callback declaration,
 	// because the circuit scheme shows TH of subports without connection.
 	MCFG_SMS_CONTROL_PORT_ADD("ctrl1", sms_control_port_devices, "joypad")

@@ -55,13 +55,13 @@ enum
     Constructor for all variants
 */
 
-at29x_device::at29x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+at29x_device::at29x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int memory_size, int device_id, int sector_size)
+	: device_t(mconfig, type, tag, owner, clock),
 	device_nvram_interface(mconfig, *this),
-	m_memory_size(0),   // bytes
+	m_memory_size(memory_size),   // bytes
 	m_word_width(8),
-	m_device_id(0),
-	m_sector_size(0),
+	m_device_id(device_id),
+	m_sector_size(sector_size),
 	m_cycle_time(10),    // ms
 	m_boot_block_size(16*1024),
 	m_version(0)
@@ -72,33 +72,24 @@ at29x_device::at29x_device(const machine_config &mconfig, device_type type, cons
     Constructor for AT29C020
 */
 at29c020_device::at29c020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: at29x_device(mconfig, AT29C020, "ATMEL 29C020 256K x 8 FEEPROM", tag, owner, clock, "at29c020", __FILE__)
+	: at29x_device(mconfig, AT29C020, tag, owner, clock, 256*1024, 0xda, 256)
 {
-	m_memory_size = 256*1024;
-	m_device_id = 0xda;
-	m_sector_size = 256;
 }
 
 /*
     Constructor for AT29C040
 */
 at29c040_device::at29c040_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: at29x_device(mconfig, AT29C040, "ATMEL 29C040 512K x 8 FEEPROM", tag, owner, clock, "at29c040", __FILE__)
+	: at29x_device(mconfig, AT29C040, tag, owner, clock, 512*1024, 0x5b, 512)
 {
-	m_memory_size = 512*1024;
-	m_device_id = 0x5b;
-	m_sector_size = 512;
 }
 
 /*
     Constructor for AT29C040A
 */
 at29c040a_device::at29c040a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: at29x_device(mconfig, AT29C040A, "ATMEL 29C040A 512K x 8 FEEPROM", tag, owner, clock, "at29c040a", __FILE__)
+	: at29x_device(mconfig, AT29C040A, tag, owner, clock, 512*1024, 0xa4, 256)
 {
-	m_memory_size = 512*1024;
-	m_device_id = 0xa4;
-	m_sector_size = 256;
 }
 
 
@@ -478,7 +469,7 @@ WRITE8_MEMBER( at29x_device::write )
 	}
 }
 
-void at29x_device::device_start(void)
+void at29x_device::device_start()
 {
 	m_programming_buffer = std::make_unique<uint8_t[]>(m_sector_size);
 	m_eememory = std::make_unique<uint8_t[]>(m_memory_size+2);
@@ -521,6 +512,6 @@ void at29x_device::device_reset(void)
 	m_programming_last_offset = 0;
 }
 
-const device_type AT29C020 = device_creator<at29c020_device>;
-const device_type AT29C040 = device_creator<at29c040_device>;
-const device_type AT29C040A = device_creator<at29c040a_device>;
+DEFINE_DEVICE_TYPE(AT29C020,  at29c020_device,  "at29c020",  "ATMEL 29C020 256Kx8 FEEPROM")
+DEFINE_DEVICE_TYPE(AT29C040,  at29c040_device,  "at29c040",  "ATMEL 29C040 512Kx8 FEEPROM")
+DEFINE_DEVICE_TYPE(AT29C040A, at29c040a_device, "at29c040a", "ATMEL 29C040A 512Kx8 FEEPROM")

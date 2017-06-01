@@ -21,7 +21,7 @@
     IMPLEMENTATION
 ***************************************************************************/
 
-static MACHINE_CONFIG_FRAGMENT( iq151_staper )
+static MACHINE_CONFIG_START( iq151_staper )
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(iq151_staper_device, ppi_porta_r))
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(iq151_staper_device, ppi_portb_w))
@@ -34,7 +34,7 @@ MACHINE_CONFIG_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type IQ151_STAPER = device_creator<iq151_staper_device>;
+DEFINE_DEVICE_TYPE(IQ151_STAPER, iq151_staper_device, "iq151_staper", "IQ151 STAPER")
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -45,11 +45,13 @@ const device_type IQ151_STAPER = device_creator<iq151_staper_device>;
 //-------------------------------------------------
 
 iq151_staper_device::iq151_staper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: device_t(mconfig, IQ151_STAPER, "IQ151 STAPER", tag, owner, clock, "iq151_staper", __FILE__),
-		device_iq151cart_interface( mconfig, *this ),
-		m_ppi(*this, "ppi8255"),
-		m_printer(*this, "printer"), m_printer_timer(nullptr), m_ppi_portc(0)
-	{
+	: device_t(mconfig, IQ151_STAPER, tag, owner, clock)
+	, device_iq151cart_interface(mconfig, *this)
+	, m_ppi(*this, "ppi8255")
+	, m_printer(*this, "printer")
+	, m_printer_timer(nullptr)
+	, m_ppi_portc(0)
+{
 }
 
 //-------------------------------------------------

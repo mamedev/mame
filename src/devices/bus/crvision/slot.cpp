@@ -15,7 +15,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type CRVISION_CART_SLOT = device_creator<crvision_cart_slot_device>;
+DEFINE_DEVICE_TYPE(CRVISION_CART_SLOT, crvision_cart_slot_device, "crvision_cart_slot", "CreatiVision Cartridge Slot")
 
 //**************************************************************************
 //    CreatiVision Cartridges Interface
@@ -63,10 +63,10 @@ void device_crvision_cart_interface::rom_alloc(uint32_t size, const char *tag)
 //  crvision_cart_slot_device - constructor
 //-------------------------------------------------
 crvision_cart_slot_device::crvision_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-						device_t(mconfig, CRVISION_CART_SLOT, "CreatiVision Cartridge Slot", tag, owner, clock, "crvision_cart_slot", __FILE__),
-						device_image_interface(mconfig, *this),
-						device_slot_interface(mconfig, *this),
-						m_type(CRV_4K), m_cart(nullptr)
+	device_t(mconfig, CRVISION_CART_SLOT, tag, owner, clock),
+	device_image_interface(mconfig, *this),
+	device_slot_interface(mconfig, *this),
+	m_type(CRV_4K), m_cart(nullptr)
 {
 }
 

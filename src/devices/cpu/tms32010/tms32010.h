@@ -10,11 +10,10 @@
 	*                                                                          *
 	\**************************************************************************/
 
+#ifndef MAME_CPU_TMS32010_TMS32010_H
+#define MAME_CPU_TMS32010_TMS32010_H
+
 #pragma once
-
-#ifndef __TMS32010_H__
-#define __TMS32010_H__
-
 
 
 
@@ -44,12 +43,13 @@ class tms32010_device : public cpu_device
 public:
 	// construction/destruction
 	tms32010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	tms32010_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, int addr_mask);
 
 	// static configuration helpers
-	template<class _Object> static devcb_base & set_bio_in_cb(device_t &device, _Object object) { return downcast<tms32010_device &>(device).m_bio_in.set_callback(object); }
+	template <class Object> static devcb_base & set_bio_in_cb(device_t &device, Object &&cb) { return downcast<tms32010_device &>(device).m_bio_in.set_callback(std::forward<Object>(cb)); }
 
 protected:
+	tms32010_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor data_map, int addr_mask);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -64,7 +64,7 @@ protected:
 	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const override { return (cycles * 4); }
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : ( (spacenum == AS_DATA) ? &m_data_config : nullptr ) ); }
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : (spacenum == AS_IO) ? &m_io_config : (spacenum == AS_DATA) ? &m_data_config : nullptr; }
 
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
@@ -191,7 +191,6 @@ private:
 	void zals();
 	inline int add_branch_cycle();
 	int Ext_IRQ();
-
 };
 
 
@@ -211,9 +210,9 @@ public:
 };
 
 
-extern const device_type TMS32010;
-extern const device_type TMS32015;
-extern const device_type TMS32016;
+DECLARE_DEVICE_TYPE(TMS32010, tms32010_device)
+DECLARE_DEVICE_TYPE(TMS32015, tms32015_device)
+DECLARE_DEVICE_TYPE(TMS32016, tms32016_device)
 
 
-#endif  /* __TMS32010_H__ */
+#endif // MAME_CPU_TMS32010_TMS32010_H

@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol, Robbbert
-#pragma once
+#ifndef MAME_INCLUDES_JUPITER_H
+#define MAME_INCLUDES_JUPITER_H
 
-#ifndef __JUPITER__
-#define __JUPITER__
+#pragma once
 
 #define MCM6571AP_TAG   "vid125_6c"
 #define S6820_TAG       "vid125_4a"
@@ -19,12 +19,13 @@ public:
 	jupiter2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, MCM6571AP_TAG)
-		{ }
+	{ }
 
 	DECLARE_DRIVER_INIT(jupiter);
 
 private:
 	required_device<cpu_device> m_maincpu;
+
 	virtual void machine_start() override;
 };
 
@@ -37,22 +38,23 @@ public:
 		, m_p_videoram(*this, "videoram")
 		, m_p_ram(*this, "ram")
 		, m_p_chargen(*this, "chargen")
-		{ }
+	{ }
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_DRIVER_INIT(jupiter3);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	void kbd_put(u8 data);
 	DECLARE_READ8_MEMBER(status_r);
 	DECLARE_READ8_MEMBER(key_r);
 	DECLARE_READ8_MEMBER(ff_r);
 
 private:
-	uint8_t m_term_data;
 	virtual void machine_reset() override;
+
+	uint8_t m_term_data;
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_p_videoram;
 	required_shared_ptr<uint8_t> m_p_ram;
 	required_region_ptr<u8> m_p_chargen;
 };
 
-#endif
+#endif // MAME_INCLUDES_JUPITER_H

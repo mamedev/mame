@@ -130,7 +130,7 @@ void multi16_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( multi16, multi16_state )
+static MACHINE_CONFIG_START( multi16 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8086, 8000000)
 	MCFG_CPU_PROGRAM_MAP(multi16_map)
@@ -164,5 +164,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY     FULLNAME       FLAGS */
-COMP( 1986, multi16, 0,      0,       multi16,   multi16, driver_device, 0,   "Mitsubishi", "Multi 16", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT    STATE          INIT  COMPANY       FULLNAME    FLAGS
+COMP( 1986, multi16, 0,      0,       multi16,   multi16, multi16_state, 0,    "Mitsubishi", "Multi 16", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

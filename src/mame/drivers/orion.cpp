@@ -85,7 +85,7 @@ static SLOT_INTERFACE_START( orion_floppies )
 SLOT_INTERFACE_END
 
 /* Machine driver */
-static MACHINE_CONFIG_START( orion128, orion_state )
+static MACHINE_CONFIG_START( orion128 )
 	MCFG_CPU_ADD("maincpu", I8080, 2000000)
 	MCFG_CPU_PROGRAM_MAP(orion128_mem)
 	MCFG_CPU_IO_MAP(orion128_io)
@@ -157,7 +157,7 @@ static MACHINE_CONFIG_DERIVED( orion128ms, orion128 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( orionz80, orion_state )
+static MACHINE_CONFIG_START( orionz80 )
 	MCFG_CPU_ADD("maincpu", Z80, 2500000)
 	MCFG_CPU_PROGRAM_MAP(orionz80_mem)
 	MCFG_CPU_IO_MAP(orionz80_io)
@@ -236,7 +236,7 @@ static MACHINE_CONFIG_DERIVED( orionz80ms, orionz80 )
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(radio86_state, radio86_8255_portc_w2))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( orionpro, orion_state )
+static MACHINE_CONFIG_START( orionpro )
 	MCFG_CPU_ADD("maincpu", Z80, 5000000)
 	MCFG_CPU_PROGRAM_MAP(orionpro_mem)
 	MCFG_CPU_IO_MAP(orionpro_io)
@@ -368,11 +368,11 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT      COMPANY              FULLNAME   FLAGS */
-COMP( 1990, orion128,    0,         0,      orion128,   radio86, driver_device, 0,        "<unknown>",               "Orion 128",    0)
-COMP( 1990, orionms,     orion128,  0,      orion128ms, ms7007, driver_device,  0,        "<unknown>",               "Orion 128 (MS7007)",   0)
-COMP( 1990, orionz80,    orion128,  0,      orionz80,   radio86, driver_device, 0,        "<unknown>",               "Orion 128 + Z80 Card II",  0)
-COMP( 1990, orionide,    orion128,  0,      orionz80,   radio86, driver_device, 0,        "<unknown>",               "Orion 128 + Z80 Card II + IDE",    0)
-COMP( 1990, orionzms,    orion128,  0,      orionz80ms, ms7007, driver_device,  0,        "<unknown>",               "Orion 128 + Z80 Card II (MS7007)",     0)
-COMP( 1990, orionidm,    orion128,  0,      orionz80ms, ms7007, driver_device,  0,        "<unknown>",               "Orion 128 + Z80 Card II + IDE (MS7007)",   0)
-COMP( 1994, orionpro,    orion128,  0,      orionpro,   radio86, driver_device, 0,        "<unknown>",               "Orion Pro",    0)
+//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT    STATE        INIT  COMPANY      FULLNAME                                  FLAGS
+COMP( 1990, orion128,    0,         0,      orion128,   radio86, orion_state, 0,    "<unknown>", "Orion 128",                              0 )
+COMP( 1990, orionms,     orion128,  0,      orion128ms, ms7007,  orion_state, 0,    "<unknown>", "Orion 128 (MS7007)",                     0 )
+COMP( 1990, orionz80,    orion128,  0,      orionz80,   radio86, orion_state, 0,    "<unknown>", "Orion 128 + Z80 Card II",                0 )
+COMP( 1990, orionide,    orion128,  0,      orionz80,   radio86, orion_state, 0,    "<unknown>", "Orion 128 + Z80 Card II + IDE",          0 )
+COMP( 1990, orionzms,    orion128,  0,      orionz80ms, ms7007,  orion_state, 0,    "<unknown>", "Orion 128 + Z80 Card II (MS7007)",       0 )
+COMP( 1990, orionidm,    orion128,  0,      orionz80ms, ms7007,  orion_state, 0,    "<unknown>", "Orion 128 + Z80 Card II + IDE (MS7007)", 0 )
+COMP( 1994, orionpro,    orion128,  0,      orionpro,   radio86, orion_state, 0,    "<unknown>", "Orion Pro",                              0 )

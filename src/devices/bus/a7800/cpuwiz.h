@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli
-#ifndef __A78_CPUWIZ_H
-#define __A78_CPUWIZ_H
+#ifndef MAME_BUS_A7800_CPUWIZ_H
+#define MAME_BUS_A7800_CPUWIZ_H
+
+#pragma once
 
 #include "a78_slot.h"
 #include "rom.h"
@@ -13,7 +15,6 @@ class a78_versaboard_device : public a78_rom_sg_device
 {
 public:
 	// construction/destruction
-	a78_versaboard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	a78_versaboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
@@ -25,6 +26,8 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(write_40xx) override;
 
 protected:
+	a78_versaboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	int m_ram_bank;
 };
 
@@ -66,9 +69,9 @@ protected:
 
 
 // device type definition
-extern const device_type A78_ROM_VERSABOARD;
-extern const device_type A78_ROM_MEGACART;
+DECLARE_DEVICE_TYPE(A78_ROM_VERSABOARD, a78_versaboard_device)
+DECLARE_DEVICE_TYPE(A78_ROM_MEGACART, a78_megacart_device)
 
-extern const device_type A78_ROM_P450_VB;
+DECLARE_DEVICE_TYPE(A78_ROM_P450_VB, a78_rom_p450_vb_device)
 
-#endif
+#endif // MAME_BUS_A7800_CPUWIZ_H

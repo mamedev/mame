@@ -3,8 +3,9 @@
 #ifndef MAME_VIDEO_SKNSSPR_H
 #define MAME_VIDEO_SKNSSPR_H
 
-class sknsspr_device : public device_t,
-							public device_video_interface
+#pragma once
+
+class sknsspr_device : public device_t, public device_video_interface
 {
 public:
 	sknsspr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -16,12 +17,12 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 private:
+	static constexpr unsigned SUPRNOVA_DECODE_BUFFER_SIZE = 0x2000;
 	int sprite_kludge_x, sprite_kludge_y;
-	#define SUPRNOVA_DECODE_BUFFER_SIZE 0x2000
 	uint8_t decodebuffer[SUPRNOVA_DECODE_BUFFER_SIZE];
 	int skns_rle_decode ( int romoffset, int size, uint8_t*gfx_source, size_t gfx_length );
 };
 
-extern const device_type SKNS_SPRITE;
+DECLARE_DEVICE_TYPE(SKNS_SPRITE, sknsspr_device)
 
 #endif // MAME_VIDEO_SKNSSPR_H

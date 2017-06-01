@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_VIC20_VIC1011_H
+#define MAME_BUS_VIC20_VIC1011_H
 
-#ifndef __VIC1011__
-#define __VIC1011__
+#pragma once
 
 #include "user.h"
 #include "bus/rs232/rs232.h"
@@ -54,4 +54,4 @@ extern const device_type VIC1011;
 
 
 
-#endif
+#endif // MAME_BUS_VIC20_VIC1011_H

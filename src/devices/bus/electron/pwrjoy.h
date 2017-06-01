@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_ELECTRON_PWRJOY_H
+#define MAME_BUS_ELECTRON_PWRJOY_H
 
-#ifndef __ELECTRON_PWRJOY__
-#define __ELECTRON_PWRJOY__
+#pragma once
 
 
 #include "exp.h"
@@ -46,7 +46,6 @@ private:
 
 
 // device type definition
-extern const device_type ELECTRON_PWRJOY;
+DECLARE_DEVICE_TYPE(ELECTRON_PWRJOY, electron_pwrjoy_device)
 
-
-#endif
+#endif // MAME_BUS_ELECTRON_PWRJOY_H

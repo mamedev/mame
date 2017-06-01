@@ -48,21 +48,16 @@ Newer version of the I/O chip ?
 #include "machine/taitoio.h"
 
 
-MACHINE_CONFIG_FRAGMENT( taitoio )
-	MCFG_WATCHDOG_ADD("watchdog")
-MACHINE_CONFIG_END
-
-
 /***************************************************************************/
 /*                                                                         */
 /*                              TC0220IOC                                  */
 /*                                                                         */
 /***************************************************************************/
 
-const device_type TC0220IOC = device_creator<tc0220ioc_device>;
+DEFINE_DEVICE_TYPE(TC0220IOC, tc0220ioc_device, "tc0220ioc", "Taito TC0220IOC")
 
 tc0220ioc_device::tc0220ioc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TC0220IOC, "Taito TC0220IOC", tag, owner, clock, "tc0220ioc", __FILE__),
+	: device_t(mconfig, TC0220IOC, tag, owner, clock),
 	m_watchdog(*this, "watchdog"),
 	m_read_0_cb(*this),
 	m_read_1_cb(*this),
@@ -101,14 +96,12 @@ void tc0220ioc_device::device_reset()
 }
 
 //-------------------------------------------------
-//  device_mconfig_additions - return a pointer to
-//  the device's machine fragment
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor tc0220ioc_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( taitoio );
-}
+MACHINE_CONFIG_MEMBER( tc0220ioc_device::device_add_mconfig )
+	MCFG_WATCHDOG_ADD("watchdog")
+MACHINE_CONFIG_END
 
 /*****************************************************************************
     DEVICE HANDLERS
@@ -196,10 +189,10 @@ WRITE8_MEMBER( tc0220ioc_device::portreg_w )
 /***************************************************************************/
 
 
-const device_type TC0510NIO = device_creator<tc0510nio_device>;
+DEFINE_DEVICE_TYPE(TC0510NIO, tc0510nio_device, "tc0510nio", "Taito TC0510NIO")
 
 tc0510nio_device::tc0510nio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TC0510NIO, "Taito TC0510NIO", tag, owner, clock, "tc0510nio", __FILE__),
+	: device_t(mconfig, TC0510NIO, tag, owner, clock),
 	m_watchdog(*this, "watchdog"),
 	m_read_0_cb(*this),
 	m_read_1_cb(*this),
@@ -235,14 +228,12 @@ void tc0510nio_device::device_reset()
 }
 
 //-------------------------------------------------
-//  device_mconfig_additions - return a pointer to
-//  the device's machine fragment
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor tc0510nio_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( taitoio );
-}
+MACHINE_CONFIG_MEMBER( tc0510nio_device::device_add_mconfig )
+	MCFG_WATCHDOG_ADD("watchdog")
+MACHINE_CONFIG_END
 
 /*****************************************************************************
     DEVICE HANDLERS
@@ -334,10 +325,10 @@ WRITE16_MEMBER( tc0510nio_device::halfword_wordswap_w )
 /***************************************************************************/
 
 
-const device_type TC0640FIO = device_creator<tc0640fio_device>;
+DEFINE_DEVICE_TYPE(TC0640FIO, tc0640fio_device, "tc0640fio", "Taito TC0640FIO")
 
 tc0640fio_device::tc0640fio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TC0640FIO, "Taito TC0640FIO", tag, owner, clock, "tc0640fio", __FILE__),
+	: device_t(mconfig, TC0640FIO, tag, owner, clock),
 	m_watchdog(*this, "watchdog"),
 	m_read_0_cb(*this),
 	m_read_1_cb(*this),
@@ -373,14 +364,12 @@ void tc0640fio_device::device_reset()
 }
 
 //-------------------------------------------------
-//  device_mconfig_additions - return a pointer to
-//  the device's machine fragment
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor tc0640fio_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( taitoio );
-}
+MACHINE_CONFIG_MEMBER( tc0640fio_device::device_add_mconfig )
+	MCFG_WATCHDOG_ADD("watchdog")
+MACHINE_CONFIG_END
 
 
 /*****************************************************************************

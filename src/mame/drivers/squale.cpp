@@ -57,6 +57,7 @@
 #include "emu.h"
 
 #include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
 #include "machine/6850acia.h"
@@ -139,7 +140,7 @@ private:
 	required_device<pia6821_device> m_pia_u75;
 	required_device<ef9365_device> m_ef9365;
 	required_device<cpu_device> m_maincpu;
-	required_device<wd1770_t> m_fdc;
+	required_device<wd1770_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	floppy_image_device *m_floppy;
@@ -624,7 +625,7 @@ static ADDRESS_MAP_START(squale_mem, AS_PROGRAM, 8, squale_state)
 	AM_RANGE(0xf048,0xf04b) AM_DEVREADWRITE("pia_u72", pia6821_device, read, write)
 	AM_RANGE(0xf050,0xf05f) AM_DEVREADWRITE("ef6850", acia6850_device, data_r, data_w)
 	AM_RANGE(0xf060,0xf06f) AM_DEVREADWRITE("ay8910", ay8910_device, data_r, address_data_w)
-	AM_RANGE(0xf080,0xf083) AM_DEVREADWRITE("wd1770", wd1770_t, read, write)
+	AM_RANGE(0xf080,0xf083) AM_DEVREADWRITE("wd1770", wd1770_device, read, write)
 	AM_RANGE(0xf08a,0xf08a) AM_READWRITE( fdc_sel0_r, fdc_sel0_w )
 	AM_RANGE(0xf08b,0xf08b) AM_READWRITE( fdc_sel1_r, fdc_sel1_w )
 	AM_RANGE(0xf100,0xffff) AM_ROMBANK("rom_bank");
@@ -776,7 +777,7 @@ void squale_state::machine_reset()
 {
 }
 
-static MACHINE_CONFIG_START( squale, squale_state )
+static MACHINE_CONFIG_START( squale )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M6809E, CPU_CLOCK) // 12/2015 : Should be set to M6809 but it actually have the wrong clock divisor (1 instead of 4) and working 4 times too fast...
 	MCFG_CPU_PROGRAM_MAP(squale_mem)
@@ -823,7 +824,7 @@ static MACHINE_CONFIG_START( squale, squale_state )
 	MCFG_DEVICE_ADD("ef9365", EF9365, VIDEO_CLOCK)
 	MCFG_EF936X_PALETTE("palette")
 	MCFG_EF936X_BITPLANES_CNT(4);
-	MCFG_EF936X_DISPLAYMODE(EF936X_256x256_DISPLAY_MODE);
+	MCFG_EF936X_DISPLAYMODE(DISPLAY_MODE_256x256);
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("squale_sl", squale_state, squale_scanline, "screen", 0, 10)
 
 	/* Floppy */
@@ -852,5 +853,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR   NAME   PARENT  COMPAT   MACHINE    INPUT  CLASS           INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1984, squale, 0,      0,       squale,    squale,driver_device,   0,     "Apollo 7", "Squale",    MACHINE_TYPE_COMPUTER )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT  COMPANY     FULLNAME  FLAGS
+COMP( 1984, squale, 0,      0,      squale,  squale, squale_state, 0,    "Apollo 7", "Squale", 0 )

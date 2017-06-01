@@ -27,7 +27,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type PC9801_118 = device_creator<pc9801_118_device>;
+DEFINE_DEVICE_TYPE(PC9801_118, pc9801_118_device, "pc9801_118", "pc9801_118")
 
 
 READ8_MEMBER(pc9801_118_device::opn_porta_r)
@@ -46,7 +46,11 @@ WRITE_LINE_MEMBER(pc9801_118_device::pc9801_sound_irq)
 	machine().device<pic8259_device>(":pic8259_slave")->ir4_w(state);
 }
 
-static MACHINE_CONFIG_FRAGMENT( pc9801_118_config )
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( pc9801_118_device::device_add_mconfig )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("opn3", YM2608, MAIN_CLOCK_X2*4) // actually YMF288, unknown clock / divider, might be X1 x 5 actually
 	MCFG_YM2608_IRQ_HANDLER(WRITELINE(pc9801_118_device, pc9801_sound_irq))
@@ -56,16 +60,6 @@ static MACHINE_CONFIG_FRAGMENT( pc9801_118_config )
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(pc9801_118_device, opn_portb_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor pc9801_118_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( pc9801_118_config );
-}
 
 
 //-------------------------------------------------
@@ -121,7 +115,7 @@ const tiny_rom_entry *pc9801_118_device::device_rom_region() const
 //-------------------------------------------------
 
 pc9801_118_device::pc9801_118_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, PC9801_118, "pc9801_118", tag, owner, clock, "pc9801_118", __FILE__),
+	: device_t(mconfig, PC9801_118, tag, owner, clock),
 //      m_maincpu(*this, "^maincpu"),
 		m_opn3(*this, "opn3")
 {

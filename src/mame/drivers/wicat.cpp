@@ -121,7 +121,7 @@ public:
 	required_device<x2210_device> m_videosram;
 	required_device<palette_device> m_palette;
 	required_memory_region m_chargen;
-	required_device<fd1795_t> m_fdc;
+	required_device<fd1795_device> m_fdc;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) { return 0; }
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -276,6 +276,10 @@ static INPUT_PORTS_START( wicat )
 	PORT_BIT(0x40000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Set-up (FE)") PORT_CODE(KEYCODE_F1)
 
 INPUT_PORTS_END
+
+static SLOT_INTERFACE_START(wicat_floppies)
+	SLOT_INTERFACE("525qd", FLOPPY_525_QD)
+SLOT_INTERFACE_END
 
 void wicat_state::driver_start()
 {
@@ -759,7 +763,7 @@ I8275_DRAW_CHARACTER_MEMBER(wicat_state::wicat_display_pixels)
 	}
 }
 
-static MACHINE_CONFIG_START( wicat, wicat_state )
+static MACHINE_CONFIG_START( wicat )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(wicat_mem)
@@ -900,8 +904,16 @@ static MACHINE_CONFIG_START( wicat, wicat_state )
 	MCFG_CPU_PROGRAM_MAP(wicat_wd1000_mem)
 	MCFG_CPU_IO_MAP(wicat_wd1000_io)
 	MCFG_FD1795_ADD("fdc",XTAL_8MHz)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", wicat_floppies, "525qd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", wicat_floppies, nullptr, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:2", wicat_floppies, nullptr, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:3", wicat_floppies, nullptr, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 
-
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "wicat")
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -989,5 +1001,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   CLASS         INIT    COMPANY          FULLNAME       FLAGS */
-COMP( 1982, wicat, 0,       0,     wicat, wicat, driver_device, 0, "Millennium Systems", "Wicat System 150", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT  COMPANY               FULLNAME            FLAGS
+COMP( 1982, wicat, 0,      0,      wicat,   wicat, wicat_state, 0,    "Millennium Systems", "Wicat System 150", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

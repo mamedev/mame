@@ -14,7 +14,7 @@
 
      Todo:
         - implement CS
-        - TMS5110_CMD_TEST_TALK is only partially implemented
+        - CMD_TEST_TALK is only partially implemented
 
      TMS5100:
 
@@ -147,35 +147,6 @@ static int16_t clip_analog(int16_t cliptemp);
 
 #define DEBUG_5110  0
 
-void tms5110_device::set_variant(int variant)
-{
-	switch (variant)
-	{
-		case TMS5110_IS_TMC0281:
-			m_coeff = &T0280B_0281A_coeff;
-			break;
-		case TMS5110_IS_TMC0281D:
-			m_coeff = &T0280D_0281D_coeff;
-			break;
-		case TMS5110_IS_CD2801:
-			m_coeff = &T0280F_2801A_coeff;
-			break;
-		case TMS5110_IS_M58817:
-			m_coeff = &M58817_coeff;
-			break;
-		case TMS5110_IS_CD2802:
-			m_coeff = &T0280F_2802_coeff;
-			break;
-		case TMS5110_IS_TMS5110A:
-			m_coeff = &tms5110a_coeff;
-			break;
-		default:
-			fatalerror("Unknown variant in tms5110_create\n");
-	}
-
-	m_variant = variant;
-}
-
 void tms5110_device::new_int_write(uint8_t rc, uint8_t m0, uint8_t m1, uint8_t addr)
 {
 	if (!m_m0_cb.isnull())
@@ -213,8 +184,6 @@ uint8_t tms5110_device::new_int_read()
 
 void tms5110_device::register_for_save_states()
 {
-	save_item(NAME(m_variant));
-
 	save_item(NAME(m_PDC));
 	save_item(NAME(m_CTL_pins));
 	save_item(NAME(m_SPEN));
@@ -234,7 +203,7 @@ void tms5110_device::register_for_save_states()
 	save_item(NAME(m_new_frame_energy_idx));
 	save_item(NAME(m_new_frame_pitch_idx));
 	save_item(NAME(m_new_frame_k_idx));
-#ifdef PERFECT_INTERPOLATION_HACK
+#ifdef TMS5110_PERFECT_INTERPOLATION_HACK
 	save_item(NAME(m_old_frame_energy_idx));
 	save_item(NAME(m_old_frame_pitch_idx));
 	save_item(NAME(m_old_frame_k_idx));
@@ -369,7 +338,7 @@ void tms5110_device::process(int16_t *buffer, unsigned int size)
 				//m_RNG = 0x1234;
 				// end HACK
 
-#ifdef PERFECT_INTERPOLATION_HACK
+#ifdef TMS5110_PERFECT_INTERPOLATION_HACK
 				/* remember previous frame energy, pitch, and coefficients */
 				m_old_frame_energy_idx = m_new_frame_energy_idx;
 				m_old_frame_pitch_idx = m_new_frame_pitch_idx;
@@ -381,10 +350,8 @@ void tms5110_device::process(int16_t *buffer, unsigned int size)
 				parse_frame();
 
 				/* if the new frame is a stop frame, unset both TALK and SPEN (via TCON). TALKD remains active while the energy is ramping to 0. */
-				if (NEW_FRAME_STOP_FLAG == 1)
-				{
+				if (NEW_FRAME_STOP_FLAG())
 					m_TALK = m_SPEN = 0;
-				}
 
 				/* in all cases where interpolation would be inhibited, set the inhibit flag; otherwise clear it.
 				 * Interpolation inhibit cases:
@@ -393,18 +360,18 @@ void tms5110_device::process(int16_t *buffer, unsigned int size)
 				 * Old frame was unvoiced, new is voiced
 				 * Old frame was unvoiced, new frame is silence/zero energy (non-existent on tms51xx rev D and F (present and working on tms52xx, present but buggy on tms51xx rev A and B))
 				 */
-				if ( ((OLD_FRAME_UNVOICED_FLAG == 0) && NEW_FRAME_UNVOICED_FLAG)
-					|| ((OLD_FRAME_UNVOICED_FLAG == 1) && !NEW_FRAME_UNVOICED_FLAG)
-					|| ((OLD_FRAME_SILENCE_FLAG == 1) && !NEW_FRAME_SILENCE_FLAG) )
-					//|| ((m_inhibit == 1) && (OLD_FRAME_UNVOICED_FLAG == 1) && (NEW_FRAME_SILENCE_FLAG == 1)) ) //TMS51xx INTERP BUG1
-					//|| ((OLD_FRAME_UNVOICED_FLAG == 1) && (NEW_FRAME_SILENCE_FLAG == 1)) )
+				if ( ((OLD_FRAME_UNVOICED_FLAG() == 0) && NEW_FRAME_UNVOICED_FLAG())
+					|| ((OLD_FRAME_UNVOICED_FLAG() == 1) && !NEW_FRAME_UNVOICED_FLAG())
+					|| ((OLD_FRAME_SILENCE_FLAG() == 1) && !NEW_FRAME_SILENCE_FLAG()) )
+					//|| ((m_inhibit == 1) && (OLD_FRAME_UNVOICED_FLAG() == 1) && NEW_FRAME_SILENCE_FLAG()) ) //TMS51xx INTERP BUG1
+					//|| ((OLD_FRAME_UNVOICED_FLAG() == 1) && NEW_FRAME_SILENCE_FLAG()) )
 					m_inhibit = 1;
 				else // normal frame, normal interpolation
 					m_inhibit = 0;
 
 #ifdef DEBUG_GENERATION
 				/* Debug info for current parsed frame */
-				fprintf(stderr, "OLDE: %d; NEWE: %d; OLDP: %d; NEWP: %d ", OLD_FRAME_SILENCE_FLAG, NEW_FRAME_SILENCE_FLAG, OLD_FRAME_UNVOICED_FLAG, NEW_FRAME_UNVOICED_FLAG);
+				fprintf(stderr, "OLDE: %d; NEWE: %d; OLDP: %d; NEWP: %d ", OLD_FRAME_SILENCE_FLAG(), NEW_FRAME_SILENCE_FLAG(), OLD_FRAME_UNVOICED_FLAG(), NEW_FRAME_UNVOICED_FLAG());
 				fprintf(stderr,"Processing new frame: ");
 				if (m_inhibit == 0)
 					fprintf(stderr, "Normal Frame\n");
@@ -431,7 +398,7 @@ void tms5110_device::process(int16_t *buffer, unsigned int size)
 			else // Not a new frame, just interpolate the existing frame.
 			{
 				int inhibit_state = ((m_inhibit==1)&&(m_IP != 0)); // disable inhibit when reaching the last interp period, but don't overwrite the m_inhibit value
-#ifdef PERFECT_INTERPOLATION_HACK
+#ifdef TMS5110_PERFECT_INTERPOLATION_HACK
 				int samples_per_frame = m_subc_reload?175:266; // either (13 A cycles + 12 B cycles) * 7 interps for normal SPEAK/SPKEXT, or (13*2 A cycles + 12 B cycles) * 7 interps for SPKSLOW
 				//int samples_per_frame = m_subc_reload?200:304; // either (13 A cycles + 12 B cycles) * 8 interps for normal SPEAK/SPKEXT, or (13*2 A cycles + 12 B cycles) * 8 interps for SPKSLOW
 				int current_sample = (m_subcycle - m_subc_reload)+(m_PC*(3-m_subc_reload))+((m_subc_reload?25:38)*((m_IP-1)&7));
@@ -483,7 +450,7 @@ void tms5110_device::process(int16_t *buffer, unsigned int size)
 			}
 
 			// calculate the output
-			if (OLD_FRAME_UNVOICED_FLAG == 1)
+			if (OLD_FRAME_UNVOICED_FLAG() == 1)
 			{
 				// generate unvoiced samples here
 				if (m_RNG & 1)
@@ -491,7 +458,7 @@ void tms5110_device::process(int16_t *buffer, unsigned int size)
 				else
 					m_excitation_data = 0x40;
 			}
-			else /* (OLD_FRAME_UNVOICED_FLAG == 0) */
+			else /* (OLD_FRAME_UNVOICED_FLAG() == 0) */
 			{
 				// generate voiced samples here
 				/* US patent 4331836 Figure 14B shows, and logic would hold, that a pitch based chirp
@@ -524,7 +491,7 @@ void tms5110_device::process(int16_t *buffer, unsigned int size)
 			for (i=0; i<10; i++)
 				fprintf(stderr,"K%d:%04d ", i+1, m_current_k[i]);
 			fprintf(stderr,"Out:%06d ", this_sample);
-//#ifdef PERFECT_INTERPOLATION_HACK
+//#ifdef TMS5110_PERFECT_INTERPOLATION_HACK
 //          fprintf(stderr,"%d%d%d%d",m_old_zpar,m_zpar,m_old_uv_zpar,m_uv_zpar);
 //#else
 //          fprintf(stderr,"x%dx%d",m_zpar,m_uv_zpar);
@@ -569,9 +536,9 @@ void tms5110_device::process(int16_t *buffer, unsigned int size)
 				if (m_IP == 7) // RESETL4
 				{
 					// Latch OLDE and OLDP
-					//if (OLD_FRAME_SILENCE_FLAG) m_uv_zpar = 0; // TMS51xx INTERP BUG2
-					OLD_FRAME_SILENCE_FLAG = NEW_FRAME_SILENCE_FLAG; // m_OLDE
-					OLD_FRAME_UNVOICED_FLAG = NEW_FRAME_UNVOICED_FLAG; // m_OLDP
+					//if (OLD_FRAME_SILENCE_FLAG()) m_uv_zpar = 0; // TMS51xx INTERP BUG2
+					OLD_FRAME_SILENCE_FLAG() = NEW_FRAME_SILENCE_FLAG() ? 1 : 0; // m_OLDE
+					OLD_FRAME_UNVOICED_FLAG() = NEW_FRAME_UNVOICED_FLAG() ? 1 : 0; // m_OLDP
 					/* if TALK was clear last frame, halt speech now, since TALKD (latched from TALK on new frame) just went inactive. */
 #ifdef DEBUG_GENERATION
 					if ((!m_TALK) && (!m_SPEN))
@@ -827,7 +794,7 @@ void tms5110_device::PDC_set(int data)
 #endif
 				switch (m_CTL_pins & 0xe) /*CTL1 - don't care*/
 				{
-				case TMS5110_CMD_RESET:
+				case CMD_RESET:
 #ifdef DEBUG_COMMAND_DUMP
 					fprintf(stderr,"RESET\n");
 #endif
@@ -835,21 +802,21 @@ void tms5110_device::PDC_set(int data)
 					reset();
 					break;
 
-				case TMS5110_CMD_LOAD_ADDRESS:
+				case CMD_LOAD_ADDRESS:
 #ifdef DEBUG_COMMAND_DUMP
 					fprintf(stderr,"LOAD ADDRESS\n");
 #endif
 					m_next_is_address = true;
 					break;
 
-				case TMS5110_CMD_OUTPUT:
+				case CMD_OUTPUT:
 #ifdef DEBUG_COMMAND_DUMP
 					fprintf(stderr,"OUTPUT (from read-bit buffer)\n");
 #endif
 					m_state = CTL_STATE_NEXT_OUTPUT;
 					break;
 
-				case TMS5110_CMD_SPKSLOW:
+				case CMD_SPKSLOW:
 #ifdef DEBUG_COMMAND_DUMP
 					fprintf(stderr,"SPKSLOW\n");
 #endif
@@ -863,14 +830,14 @@ void tms5110_device::PDC_set(int data)
 					m_uv_zpar = 1; // zero k4-k10 as well
 					m_OLDE = 1; // 'silence/zpar' frames are zero energy
 					m_OLDP = 1; // 'silence/zpar' frames are zero pitch
-#ifdef PERFECT_INTERPOLATION_HACK
+#ifdef TMS5110_PERFECT_INTERPOLATION_HACK
 					m_old_zpar = 1; // zero all the old parameters
 					m_old_uv_zpar = 1; // zero old k4-k10 as well
 #endif
 					m_subc_reload = 0; // SPKSLOW means this is 0
 					break;
 
-				case TMS5110_CMD_READ_BIT:
+				case CMD_READ_BIT:
 #ifdef DEBUG_COMMAND_DUMP
 					fprintf(stderr,"READ BIT\n");
 #endif
@@ -887,7 +854,7 @@ void tms5110_device::PDC_set(int data)
 					}
 					break;
 
-				case TMS5110_CMD_SPEAK:
+				case CMD_SPEAK:
 #ifdef DEBUG_COMMAND_DUMP
 					fprintf(stderr,"SPEAK\n");
 #endif
@@ -901,14 +868,14 @@ void tms5110_device::PDC_set(int data)
 					m_uv_zpar = 1; // zero k4-k10 as well
 					m_OLDE = 1; // 'silence/zpar' frames are zero energy
 					m_OLDP = 1; // 'silence/zpar' frames are zero pitch
-#ifdef PERFECT_INTERPOLATION_HACK
+#ifdef TMS5110_PERFECT_INTERPOLATION_HACK
 					m_old_zpar = 1; // zero all the old parameters
 					m_old_uv_zpar = 1; // zero old k4-k10 as well
 #endif
 					m_subc_reload = 1; // SPEAK means this is 1
 					break;
 
-				case TMS5110_CMD_READ_BRANCH:
+				case CMD_READ_BRANCH:
 #ifdef DEBUG_COMMAND_DUMP
 					fprintf(stderr,"READ AND BRANCH\n");
 #endif
@@ -921,7 +888,7 @@ void tms5110_device::PDC_set(int data)
 					m_schedule_dummy_read = false;
 					break;
 
-				case TMS5110_CMD_TEST_TALK:
+				case CMD_TEST_TALK:
 #ifdef DEBUG_COMMAND_DUMP
 					fprintf(stderr,"TEST TALK\n");
 #endif
@@ -951,7 +918,7 @@ void tms5110_device::PDC_set(int data)
 void tms5110_device::parse_frame()
 {
 	int i, rep_flag;
-#ifdef PERFECT_INTERPOLATION_HACK
+#ifdef TMS5110_PERFECT_INTERPOLATION_HACK
 	m_old_uv_zpar = m_uv_zpar;
 	m_old_zpar = m_zpar;
 #endif
@@ -982,7 +949,7 @@ void tms5110_device::parse_frame()
 	fprintf(stderr," ");
 #endif
 	// if the new frame is unvoiced, be sure to zero out the k5-k10 parameters
-	m_uv_zpar = NEW_FRAME_UNVOICED_FLAG;
+	m_uv_zpar = NEW_FRAME_UNVOICED_FLAG() ? 1 : 0;
 	// if this is a repeat frame, just do nothing, it will reuse the old coefficients
 	if (rep_flag)
 		return;
@@ -1049,7 +1016,29 @@ static const unsigned int example_word_TEN[619]={
 
 void tms5110_device::device_start()
 {
-	set_variant(TMS5110_IS_TMS5110A);
+	switch (m_variant)
+	{
+	case TMS5110_IS_TMC0281:
+		m_coeff = &T0280B_0281A_coeff;
+		break;
+	case TMS5110_IS_TMC0281D:
+		m_coeff = &T0280D_0281D_coeff;
+		break;
+	case TMS5110_IS_CD2801:
+		m_coeff = &T0280F_2801A_coeff;
+		break;
+	case TMS5110_IS_M58817:
+		m_coeff = &M58817_coeff;
+		break;
+	case TMS5110_IS_CD2802:
+		m_coeff = &T0280F_2802_coeff;
+		break;
+	case TMS5110_IS_TMS5110A:
+		m_coeff = &tms5110a_coeff;
+		break;
+	default:
+		fatalerror("Unknown variant in tms5110_create\n");
+	}
 
 	/* resolve lines */
 	m_m0_cb.resolve();
@@ -1065,86 +1054,6 @@ void tms5110_device::device_start()
 	m_romclk_hack_timer = timer_alloc(0);
 
 	register_for_save_states();
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void tms5100_device::device_start()
-{
-	tms5110_device::device_start();
-	set_variant(TMS5110_IS_TMC0281);
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void tmc0281_device::device_start()
-{
-	tms5110_device::device_start();
-	set_variant(TMS5110_IS_TMC0281);
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void tms5100a_device::device_start()
-{
-	tms5110_device::device_start();
-	set_variant(TMS5110_IS_TMC0281D);
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void tmc0281d_device::device_start()
-{
-	tms5110_device::device_start();
-	set_variant(TMS5110_IS_TMC0281D);
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void cd2801_device::device_start()
-{
-	tms5110_device::device_start();
-	set_variant(TMS5110_IS_CD2801);
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void cd2802_device::device_start()
-{
-	tms5110_device::device_start();
-	set_variant(TMS5110_IS_CD2802);
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void tms5110a_device::device_start()
-{
-	tms5110_device::device_start();
-	set_variant(TMS5110_IS_TMS5110A);
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void m58817_device::device_start()
-{
-	tms5110_device::device_start();
-	set_variant(TMS5110_IS_M58817);
 }
 
 
@@ -1164,7 +1073,7 @@ void tms5110_device::device_reset()
 	m_PDC = 0;
 
 	/* initialize the energy/pitch/k states */
-#ifdef PERFECT_INTERPOLATION_HACK
+#ifdef TMS5110_PERFECT_INTERPOLATION_HACK
 	m_old_frame_energy_idx = m_old_frame_pitch_idx = 0;
 	memset(m_old_frame_k_idx, 0, sizeof(m_old_frame_k_idx));
 	m_old_zpar = m_old_uv_zpar = 0;
@@ -1256,8 +1165,8 @@ READ8_MEMBER( tms5110_device::ctl_r )
 	m_stream->update();
 	if (m_state == CTL_STATE_TTALK_OUTPUT)
 	{
-		if (DEBUG_5110) logerror("Status read while outputting Test Talk (status=%2d)\n", TALK_STATUS);
-		return (TALK_STATUS << 0); /*CTL1 = still talking ? */
+		if (DEBUG_5110) logerror("Status read while outputting Test Talk (status=%2d)\n", TALK_STATUS());
+		return (TALK_STATUS() << 0); /*CTL1 = still talking ? */
 	}
 	else if (m_state == CTL_STATE_OUTPUT)
 	{
@@ -1275,7 +1184,7 @@ READ8_MEMBER( m58817_device::status_r )
 {
 	/* bring up to date first */
 	m_stream->update();
-	return (TALK_STATUS << 0); /*CTL1 = still talking ? */
+	return (TALK_STATUS() << 0); /*CTL1 = still talking ? */
 }
 
 /******************************************************************************
@@ -1521,17 +1430,27 @@ WRITE_LINE_MEMBER( tmsprom_device::enable_w )
     TMS 5110 device definition
 -------------------------------------------------*/
 
-const device_type TMS5110 = device_creator<tms5110_device>;
+DEFINE_DEVICE_TYPE(TMS5110,  tms5110_device,  "tms5110",  "TMS5110")
+DEFINE_DEVICE_TYPE(TMS5100,  tms5100_device,  "tms5100",  "TMS5100")
+DEFINE_DEVICE_TYPE(TMC0281,  tmc0281_device,  "tmc0281",  "TMC0281")
+DEFINE_DEVICE_TYPE(TMS5100A, tms5100a_device, "tms5100a", "TMS5100A")
+DEFINE_DEVICE_TYPE(TMC0281D, tmc0281d_device, "tmc0281d", "TMC0281D")
+DEFINE_DEVICE_TYPE(CD2801,   cd2801_device,   "cd2801",   "CD2801")
+DEFINE_DEVICE_TYPE(CD2802,   cd2802_device,   "cd2802",   "CD2802")
+DEFINE_DEVICE_TYPE(TMS5110A, tms5110a_device, "tms5110a", "TMS5110A")
+DEFINE_DEVICE_TYPE(M58817,   m58817_device,   "m58817",   "M58817")
+
 
 tms5110_device::tms5110_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms5110_device(mconfig, TMS5110, "TMS5110", tag, owner, clock, "tms5110", __FILE__)
+	: tms5110_device(mconfig, TMS5110, tag, owner, clock, TMS5110_IS_TMS5110A)
 {
 }
 
-tms5110_device::tms5110_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+tms5110_device::tms5110_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int variant)
+	: device_t(mconfig, type, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_table(*this, DEVICE_SELF)
+	, m_variant(variant)
 	, m_m0_cb(*this)
 	, m_m1_cb(*this)
 	, m_addr_cb(*this)
@@ -1541,67 +1460,58 @@ tms5110_device::tms5110_device(const machine_config &mconfig, device_type type, 
 }
 
 
-const device_type TMS5100 = device_creator<tms5100_device>;
-
 tms5100_device::tms5100_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms5110_device(mconfig, TMS5100, "TMS5100", tag, owner, clock, "tms5100", __FILE__)
+	: tms5110_device(mconfig, TMS5100, tag, owner, clock, TMS5110_IS_TMC0281)
 {
 }
 
-const device_type TMC0281 = device_creator<tmc0281_device>;
 
 tmc0281_device::tmc0281_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms5110_device(mconfig, TMC0281, "TMC0281", tag, owner, clock, "tmc0281", __FILE__)
+	: tms5110_device(mconfig, TMC0281, tag, owner, clock, TMS5110_IS_TMC0281)
 {
 }
 
-const device_type TMS5100A = device_creator<tms5100a_device>;
 
 tms5100a_device::tms5100a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms5110_device(mconfig, TMS5100A, "TMS5100A", tag, owner, clock, "tms5100a", __FILE__)
+	: tms5110_device(mconfig, TMS5100A, tag, owner, clock, TMS5110_IS_TMC0281D)
 {
 }
 
-const device_type TMC0281D = device_creator<tmc0281d_device>;
 
 tmc0281d_device::tmc0281d_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms5110_device(mconfig, TMC0281D, "TMC0281D", tag, owner, clock, "tmc0281d", __FILE__)
+	: tms5110_device(mconfig, TMC0281D, tag, owner, clock, TMS5110_IS_TMC0281D)
 {
 }
 
-const device_type CD2801 = device_creator<cd2801_device>;
 
 cd2801_device::cd2801_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms5110_device(mconfig, CD2801, "CD2801", tag, owner, clock, "cd2801", __FILE__)
+	: tms5110_device(mconfig, CD2801, tag, owner, clock, TMS5110_IS_CD2801)
 {
 }
 
-const device_type CD2802 = device_creator<cd2802_device>;
 
 cd2802_device::cd2802_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms5110_device(mconfig, CD2802, "CD2802", tag, owner, clock, "cd2802", __FILE__)
+	: tms5110_device(mconfig, CD2802, tag, owner, clock, TMS5110_IS_CD2802)
 {
 }
 
-const device_type TMS5110A = device_creator<tms5110a_device>;
 
 tms5110a_device::tms5110a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms5110_device(mconfig, TMS5110A, "TMS5110A", tag, owner, clock, "tms5110a", __FILE__)
+	: tms5110_device(mconfig, TMS5110A, tag, owner, clock, TMS5110_IS_TMS5110A)
 {
 }
 
-const device_type M58817 = device_creator<m58817_device>;
 
 m58817_device::m58817_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms5110_device(mconfig, M58817, "M58817", tag, owner, clock, "m58817", __FILE__)
+	: tms5110_device(mconfig, M58817, tag, owner, clock, TMS5110_IS_M58817)
 {
 }
 
 
-const device_type TMSPROM = device_creator<tmsprom_device>;
+DEFINE_DEVICE_TYPE(TMSPROM, tmsprom_device, "tmsprom", "TMSPROM")
 
 tmsprom_device::tmsprom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TMSPROM, "TMSPROM", tag, owner, clock, "tmsprom", __FILE__),
+	: device_t(mconfig, TMSPROM, tag, owner, clock),
 		m_rom(*this, DEVICE_SELF),
 		m_prom(*this, finder_base::DUMMY_TAG, 0x20),
 		m_rom_size(0),

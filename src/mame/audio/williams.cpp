@@ -56,9 +56,9 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type WILLIAMS_NARC_SOUND = device_creator<williams_narc_sound_device>;
-const device_type WILLIAMS_CVSD_SOUND = device_creator<williams_cvsd_sound_device>;
-const device_type WILLIAMS_ADPCM_SOUND = device_creator<williams_adpcm_sound_device>;
+DEFINE_DEVICE_TYPE(WILLIAMS_CVSD_SOUND, williams_cvsd_sound_device, "wmscvsd", "Williams CVSD Sound Board")
+DEFINE_DEVICE_TYPE(WILLIAMS_NARC_SOUND, williams_narc_sound_device, "wmsnarc", "Williams NARC Sound Board")
+DEFINE_DEVICE_TYPE(WILLIAMS_ADPCM_SOUND, williams_adpcm_sound_device, "wmsadpcm", "Williams ADPCM Sound Board")
 
 
 
@@ -71,7 +71,7 @@ const device_type WILLIAMS_ADPCM_SOUND = device_creator<williams_adpcm_sound_dev
 //-------------------------------------------------
 
 williams_cvsd_sound_device::williams_cvsd_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, WILLIAMS_CVSD_SOUND, "Williams CVSD Sound Board", tag, owner, clock, "wmscvsd", __FILE__),
+	: device_t(mconfig, WILLIAMS_CVSD_SOUND, tag, owner, clock),
 		device_mixer_interface(mconfig, *this),
 		m_cpu(*this, "cpu"),
 		m_pia(*this, "pia"),
@@ -204,10 +204,10 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  machine configuration
+// device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( williams_cvsd_sound )
+MACHINE_CONFIG_MEMBER( williams_cvsd_sound_device::device_add_mconfig )
 	MCFG_CPU_ADD("cpu", M6809E, CVSD_MASTER_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(williams_cvsd_map)
 
@@ -228,17 +228,6 @@ static MACHINE_CONFIG_FRAGMENT( williams_cvsd_sound )
 	MCFG_SOUND_ADD("cvsd", HC55516, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.60)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  device_mconfig_additions - return a pointer to
-//  the device's machine fragment
-//-------------------------------------------------
-
-machine_config_constructor williams_cvsd_sound_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( williams_cvsd_sound );
-}
 
 
 //-------------------------------------------------
@@ -305,7 +294,7 @@ void williams_cvsd_sound_device::device_timer(emu_timer &timer, device_timer_id 
 //-------------------------------------------------
 
 williams_narc_sound_device::williams_narc_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, WILLIAMS_NARC_SOUND, "Williams NARC Sound Board", tag, owner, clock, "wmsnarc", __FILE__),
+	: device_t(mconfig, WILLIAMS_NARC_SOUND, tag, owner, clock),
 		device_mixer_interface(mconfig, *this),
 		m_cpu0(*this, "cpu0"),
 		m_cpu1(*this, "cpu1"),
@@ -543,10 +532,11 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  machine configuration
+// device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( williams_narc_sound )
+
+MACHINE_CONFIG_MEMBER( williams_narc_sound_device::device_add_mconfig )
 	MCFG_CPU_ADD("cpu0", M6809E, NARC_MASTER_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(williams_narc_master_map)
 
@@ -566,17 +556,6 @@ static MACHINE_CONFIG_FRAGMENT( williams_narc_sound )
 	MCFG_SOUND_ADD("cvsd", HC55516, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.60)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  device_mconfig_additions - return a pointer to
-//  the device's machine fragment
-//-------------------------------------------------
-
-machine_config_constructor williams_narc_sound_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( williams_narc_sound );
-}
 
 
 //-------------------------------------------------
@@ -678,7 +657,7 @@ void williams_narc_sound_device::device_timer(emu_timer &timer, device_timer_id 
 //-------------------------------------------------
 
 williams_adpcm_sound_device::williams_adpcm_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, WILLIAMS_ADPCM_SOUND, "Williams ADPCM Sound Board", tag, owner, clock, "wmsadpcm", __FILE__),
+	: device_t(mconfig, WILLIAMS_ADPCM_SOUND, tag, owner, clock),
 		device_mixer_interface(mconfig, *this),
 		m_cpu(*this, "cpu"),
 		m_latch(0),
@@ -817,10 +796,10 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  machine configuration
+// device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( williams_adpcm_sound )
+MACHINE_CONFIG_MEMBER( williams_adpcm_sound_device::device_add_mconfig )
 	MCFG_CPU_ADD("cpu", M6809E, ADPCM_MASTER_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(williams_adpcm_map)
 
@@ -832,21 +811,10 @@ static MACHINE_CONFIG_FRAGMENT( williams_adpcm_sound )
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
-	MCFG_OKIM6295_ADD("oki", ADPCM_MASTER_CLOCK/8, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", ADPCM_MASTER_CLOCK/8, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, williams_adpcm_oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.5)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  device_mconfig_additions - return a pointer to
-//  the device's machine fragment
-//-------------------------------------------------
-
-machine_config_constructor williams_adpcm_sound_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( williams_adpcm_sound );
-}
 
 
 //-------------------------------------------------

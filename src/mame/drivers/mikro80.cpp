@@ -160,7 +160,7 @@ static GFXDECODE_START( mikro80 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, mikro80_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( mikro80, mikro80_state )
+static MACHINE_CONFIG_START( mikro80 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8080, 2000000)
 	MCFG_CPU_PROGRAM_MAP(mikro80_mem)
@@ -237,7 +237,7 @@ ROM_END
 
 
 /* Driver */
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT       INIT     COMPANY                  FULLNAME   FLAGS */
-COMP( 1983, mikro80,     0,      0, mikro80,    mikro80, mikro80_state, mikro80, "<unknown>", "Mikro-80",    0)
-COMP( 1993, radio99, mikro80,    0, radio99,    mikro80, mikro80_state, radio99, "<unknown>", "Radio-99DM",  0)
-COMP( 1987, kristall2, mikro80,  0, kristall,   mikro80, mikro80_state, mikro80, "<unknown>", "Kristall-2",  0)
+/*    YEAR  NAME       PARENT   COMPAT  MACHINE     INPUT    STATE          INIT     COMPANY      FULLNAME       FLAGS */
+COMP( 1983, mikro80,   0,       0,      mikro80,    mikro80, mikro80_state, mikro80, "<unknown>", "Mikro-80",    0)
+COMP( 1993, radio99,   mikro80, 0,      radio99,    mikro80, mikro80_state, radio99, "<unknown>", "Radio-99DM",  0)
+COMP( 1987, kristall2, mikro80, 0,      kristall,   mikro80, mikro80_state, mikro80, "<unknown>", "Kristall-2",  0)

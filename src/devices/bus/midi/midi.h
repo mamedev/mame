@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont
-#ifndef __BUS_MIDI_H__
-#define __BUS_MIDI_H__
+#ifndef MAME_BUS_MIDI_MIDI_H
+#define MAME_BUS_MIDI_MIDI_H
+
+#pragma once
 
 
 #define MCFG_MIDI_PORT_ADD(_tag, _slot_intf, _def_slot) \
@@ -23,7 +25,7 @@ public:
 	virtual ~midi_port_device();
 
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_rx_handler(device_t &device, _Object object) { return downcast<midi_port_device &>(device).m_rxd_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_rx_handler(device_t &device, Object &&cb) { return downcast<midi_port_device &>(device).m_rxd_handler.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE_LINE_MEMBER( write_txd );
 
@@ -46,19 +48,21 @@ class device_midi_port_interface : public device_slot_card_interface
 	friend class midi_port_device;
 
 public:
-	device_midi_port_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_midi_port_interface();
 
-	virtual DECLARE_WRITE_LINE_MEMBER( input_txd ) {}
+	virtual DECLARE_WRITE_LINE_MEMBER( input_txd ) { }
 	DECLARE_WRITE_LINE_MEMBER( output_rxd ) { m_port->m_rxd = state; m_port->m_rxd_handler(state); }
 
 protected:
+	device_midi_port_interface(const machine_config &mconfig, device_t &device);
+
 	midi_port_device *m_port;
 };
 
 extern const device_type MIDI_PORT;
+DECLARE_DEVICE_TYPE(MIDI_PORT, midi_port_device)
 
 SLOT_INTERFACE_EXTERN(midiin_slot);
 SLOT_INTERFACE_EXTERN(midiout_slot);
 
-#endif
+#endif // MAME_BUS_MIDI_MIDI_H

@@ -153,7 +153,7 @@ ROM board internal layouts:
 
 */
 
-const device_type AW_ROM_BOARD = device_creator<aw_rom_board>;
+DEFINE_DEVICE_TYPE(AW_ROM_BOARD, aw_rom_board, "aw_rom_board", "Sammy Atomiswave ROM Board")
 
 DEVICE_ADDRESS_MAP_START(submap, 16, aw_rom_board)
 	AM_RANGE(0x00, 0x01) AM_WRITE(epr_offsetl_w)
@@ -166,7 +166,7 @@ DEVICE_ADDRESS_MAP_START(submap, 16, aw_rom_board)
 ADDRESS_MAP_END
 
 aw_rom_board::aw_rom_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: naomi_g1_device(mconfig, AW_ROM_BOARD, "Sammy Atomiswave ROM Board", tag, owner, clock, "aw_rom_board", __FILE__)
+	: naomi_g1_device(mconfig, AW_ROM_BOARD, tag, owner, clock)
 	, m_region(*this, DEVICE_SELF)
 	, m_keyregion(*this, finder_base::DUMMY_TAG)
 {

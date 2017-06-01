@@ -36,6 +36,8 @@
          D - SPG243 - Wall-E
          D - SPG243 - Chintendo / KenSingTon / Siatronics / Jungle Soft Vii
  Partial D - SPG200 - V-Tech V-Smile
+        ND - unknown - Zone 40
+         D - SPG243 - Zone 60
          D - SPG243 - Wireless 60
         ND - unknown - Wireless Air 60
         ND - Likely many more
@@ -69,6 +71,9 @@ Detailed list of bugs:
 -- The "EEPROM TEST" option in the diagnostic menu (accessible by holding 1+2 or A+B during startup) freezes when selected
 -- The "MOTOR" option in the diagnostic menu does nothing when selected
 -- The input for the gyroscopic sensor tests in the "KEYBOARD + G-SENSOR" sub-menu goes haywire
+- Zone 60 / Wireless 60:
+-- Auto Racing / Auto X, Dragon, Yummy, some other games: some sprites are inverted or opaque where they should be transparent
+-- Basketball: emulator crashes when starting the game due to an unimplemented instruction
 
 
 *******************************************************************************/
@@ -1174,7 +1179,7 @@ INTERRUPT_GEN_MEMBER(vii_state::vii_vblank)
 
 }
 
-static MACHINE_CONFIG_START( vii, vii_state )
+static MACHINE_CONFIG_START( vii )
 
 	MCFG_CPU_ADD( "maincpu", UNSP, XTAL_27MHz)
 	MCFG_CPU_PROGRAM_MAP( vii_mem )
@@ -1195,7 +1200,7 @@ static MACHINE_CONFIG_START( vii, vii_state )
 	MCFG_SOFTWARE_LIST_ADD("vii_cart","vii")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( vsmile, vii_state )
+static MACHINE_CONFIG_START( vsmile )
 
 	MCFG_CPU_ADD( "maincpu", UNSP, XTAL_27MHz)
 	MCFG_CPU_PROGRAM_MAP( vii_mem )
@@ -1216,7 +1221,7 @@ static MACHINE_CONFIG_START( vsmile, vii_state )
 	MCFG_SOFTWARE_LIST_ADD("cart_list","vsmile_cart")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( batman, vii_state )
+static MACHINE_CONFIG_START( batman )
 
 	MCFG_CPU_ADD( "maincpu", UNSP, XTAL_27MHz)
 	MCFG_CPU_PROGRAM_MAP( vii_mem )
@@ -1234,7 +1239,7 @@ static MACHINE_CONFIG_START( batman, vii_state )
 	MCFG_PALETTE_ADD("palette", 32768)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( wirels60, vii_state )
+static MACHINE_CONFIG_START( wirels60 )
 
 	MCFG_CPU_ADD( "maincpu", UNSP, XTAL_27MHz)
 	MCFG_CPU_PROGRAM_MAP( vii_mem )
@@ -1293,12 +1298,22 @@ ROM_END
 
 ROM_START( vsmile )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )      /* dummy region for u'nSP */
+	ROM_LOAD( "vsmilebios.bin", 0x000000, 0x200000, CRC(11f1b416) SHA1(11f77c4973d29c962567390e41879c86a759c93b) )
+ROM_END
+
+ROM_START( vsmileg )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )      /* dummy region for u'nSP */
 	ROM_LOAD16_WORD_SWAP( "bios german.bin", 0x000000, 0x200000, CRC(205c5296) SHA1(7fbcf761b5885c8b1524607aabaf364b4559c8cc) )
 ROM_END
 
 ROM_START( vsmilef )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )      /* dummy region for u'nSP */
 	ROM_LOAD16_WORD_SWAP( "sysrom_france", 0x000000, 0x200000, CRC(0cd0bdf5) SHA1(5c8d1eada1b6b545555b8d2b09325d7127681af8) )
+ROM_END
+
+ROM_START( vsmileb )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )      /* dummy region for u'nSP */
+	ROM_LOAD( "vbabybios.bin", 0x000000, 0x800000, CRC(ddc7f845) SHA1(2c17d0f54200070176d03d44a40c7923636e596a) )
 ROM_END
 
 ROM_START( walle )
@@ -1308,6 +1323,13 @@ ROM_START( walle )
 	//ROM_LOAD16_WORD_SWAP( "walle.bin", 0x000000, 0x400000, CRC(6bc90b16) SHA1(184d72de059057aae7800da510fcf05ed1da9ec9))
 ROM_END
 
+ROM_START( zone60 )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )      /* dummy region for u'nSP */
+
+	ROM_REGION( 0x4000000, "bios", 0 )
+	ROM_LOAD( "zone60.bin", 0x0000, 0x4000000, CRC(4cb637d1) SHA1(1f97cbdb4299ac0fbafc2a3aa592066cb0727066))
+ROM_END
+
 ROM_START( wirels60 )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )      /* dummy region for u'nSP */
 
@@ -1315,10 +1337,13 @@ ROM_START( wirels60 )
 	ROM_LOAD( "wirels60.bin", 0x0000, 0x4000000, CRC(b4df8b28) SHA1(00e3da542e4bc14baf4724ad436f66d4c0f65c84))
 ROM_END
 
-/*    YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT                INIT      COMPANY                                              FULLNAME             FLAGS */
+//    YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     STATE      INIT      COMPANY                                              FULLNAME             FLAGS
 CONS( 2004, batmantv, vii,      0,        batman,   batman,   vii_state, batman,   "JAKKS Pacific Inc / HotGen Ltd",                    "The Batman",        MACHINE_NO_SOUND )
-CONS( 2005, vsmile,   0,        0,        vsmile,   vsmile,   vii_state, vsmile,   "V-Tech",                                            "V-Smile (Germany)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2005, vsmile,   0,        0,        vsmile,   vsmile,   vii_state, vsmile,   "V-Tech",                                            "V-Smile (US)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2005, vsmileg,  vsmile,   0,        vsmile,   vsmile,   vii_state, vsmile,   "V-Tech",                                            "V-Smile (Germany)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 CONS( 2005, vsmilef,  vsmile,   0,        vsmile,   vsmile,   vii_state, vsmile,   "V-Tech",                                            "V-Smile (France)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2005, vsmileb,  0,        0,        vsmile,   vsmile,   vii_state, vsmile,   "V-Tech",                                            "V-Smile Baby (US)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 CONS( 2007, vii,      0,        0,        vii,      vii,      vii_state, vii,      "Jungle Soft / KenSingTon / Chintendo / Siatronics", "Vii",               MACHINE_NO_SOUND )
 CONS( 2008, walle,    vii,      0,        batman,   walle,    vii_state, walle,    "JAKKS Pacific Inc",                                 "Wall-E",            MACHINE_NO_SOUND )
+CONS( 2010, zone60,   0,        0,        wirels60, wirels60, vii_state, wirels60, "Jungle Soft / Ultimate Products (HK) Ltd",          "Zone 60",           MACHINE_NO_SOUND )
 CONS( 2010, wirels60, 0,        0,        wirels60, wirels60, vii_state, wirels60, "Jungle Soft / Kids Station Toys Inc",               "Wireless 60",       MACHINE_NO_SOUND )

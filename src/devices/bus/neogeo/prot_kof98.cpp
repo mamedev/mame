@@ -5,13 +5,14 @@
 #include "emu.h"
 #include "prot_kof98.h"
 
-const device_type KOF98_PROT = device_creator<kof98_prot_device>;
+DEFINE_DEVICE_TYPE(NG_KOF98_PROT, kof98_prot_device, "ng_kof98_prot", "Neo Geo KoF 98 Protection")
 
 
 kof98_prot_device::kof98_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, KOF98_PROT, "Neo Geo KOF 98 Protection", tag, owner, clock, "kof98_prot", __FILE__),
+	device_t(mconfig, NG_KOF98_PROT, tag, owner, clock),
 	m_prot_state(0)
-{}
+{
+}
 
 
 void kof98_prot_device::device_start()

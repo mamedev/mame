@@ -6,11 +6,10 @@
 
 **********************************************************************/
 
+#ifndef MAME_VIDEO_UPD7227_H
+#define MAME_VIDEO_UPD7227_H
+
 #pragma once
-
-#ifndef __UPD7227__
-#define __UPD7227__
-
 
 
 
@@ -54,7 +53,7 @@ protected:
 	virtual void device_reset() override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const override;
 
 	address_space_config        m_space_config;
 
@@ -87,8 +86,6 @@ private:
 
 
 // device type definition
-extern const device_type UPD7227;
+DECLARE_DEVICE_TYPE(UPD7227, upd7227_device)
 
-
-
-#endif
+#endif // MAME_VIDEO_UPD7227_H

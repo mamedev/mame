@@ -6,8 +6,10 @@
 
 ***************************************************************************/
 
-#ifndef __PC_LPT_H__
-#define __PC_LPT_H__
+#ifndef MAME_MACHINE_PC_LPT_H
+#define MAME_MACHINE_PC_LPT_H
+
+#pragma once
 
 #include "bus/centronics/ctronics.h"
 
@@ -24,7 +26,7 @@ public:
 	pc_lpt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<pc_lpt_device &>(device).m_irq_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb) { return downcast<pc_lpt_device &>(device).m_irq_handler.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -82,6 +84,6 @@ private:
 	required_device<output_latch_device> m_cent_ctrl_out;
 };
 
-extern const device_type PC_LPT;
+DECLARE_DEVICE_TYPE(PC_LPT, pc_lpt_device)
 
-#endif /* __PC_LPT__ */
+#endif // MAME_MACHINE_PC_LPT_H

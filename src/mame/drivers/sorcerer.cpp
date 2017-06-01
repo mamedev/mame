@@ -413,7 +413,7 @@ static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_2 )
 DEVICE_INPUT_DEFAULTS_END
 
-static MACHINE_CONFIG_START( sorcerer, sorcerer_state )
+static MACHINE_CONFIG_START( sorcerer )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, ES_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(sorcerer_mem)
@@ -535,7 +535,7 @@ ROM_START(sorcerer2)
 	ROMX_LOAD("tvc-2.2e",    0xe800, 0x0800, CRC(bc194487) SHA1(dcfd916558e3e3be22091c5558ea633c332cf6c7), ROM_BIOS(2) )
 ROM_END
 
-/*   YEAR  NAME       PARENT    COMPAT    MACHINE    INPUT     INIT        COMPANY     FULLNAME */
-COMP(1979, sorcerer,  0,        0,        sorcerer,  sorcerer, sorcerer_state, sorcerer, "Exidy Inc", "Sorcerer", 0 )
-COMP(1979, sorcerer2, sorcerer, 0,        sorcerer,  sorcerer, sorcerer_state, sorcerer, "Exidy Inc", "Sorcerer 2", 0 )
+/*   YEAR  NAME       PARENT    COMPAT    MACHINE    INPUT     STATE           INIT      COMPANY      FULLNAME */
+COMP(1979, sorcerer,  0,        0,        sorcerer,  sorcerer, sorcerer_state, sorcerer, "Exidy Inc", "Sorcerer",                     0 )
+COMP(1979, sorcerer2, sorcerer, 0,        sorcerer,  sorcerer, sorcerer_state, sorcerer, "Exidy Inc", "Sorcerer 2",                   0 )
 COMP(1979, sorcererd, sorcerer, 0,        sorcererd, sorcerer, sorcerer_state, sorcerer, "Exidy Inc", "Sorcerer (with floppy disks)", 0 )

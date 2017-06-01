@@ -14,9 +14,10 @@
 
 *********************************************************************/
 
-#ifndef __APPLEFDC_H__
-#define __APPLEFDC_H__
+#ifndef MAME_MACHINE_APPLEFDC_H
+#define MAME_MACHINE_APPLEFDC_H
 
+#pragma once
 
 
 
@@ -29,9 +30,8 @@
 #define APPLEFDC_PH2    0x04
 #define APPLEFDC_PH3    0x08
 
-extern const device_type APPLEFDC;
-extern const device_type IWM;
-extern const device_type SWIM;
+DECLARE_DEVICE_TYPE(APPLEFDC, applefdc_device)
+DECLARE_DEVICE_TYPE(IWM, iwm_device)
 
 
 
@@ -83,7 +83,7 @@ protected:
 	};
 
 	// constructor
-	applefdc_base_device(applefdc_t fdc_type, const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+	applefdc_base_device(applefdc_t fdc_type, const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -166,4 +166,4 @@ public:
 	MCFG_APPLEFDC_CONFIG(_intrf)
 
 
-#endif /* __APPLEFDC_H__ */
+#endif // MAME_MACHINE_APPLEFDC_H

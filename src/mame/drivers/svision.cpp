@@ -512,7 +512,7 @@ MACHINE_RESET_MEMBER(svision_state,tvlink)
 	m_tvlink.palette[3] = MAKE24_RGB32(svisionp_palette[(PALETTE_START+3)*3+0], svisionp_palette[(PALETTE_START+3)*3+1], svisionp_palette[(PALETTE_START+3)*3+2]);
 }
 
-static MACHINE_CONFIG_START( svision, svision_state )
+static MACHINE_CONFIG_START( svision )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M65C02, 4000000)        /* ? stz used! speed? */
 	MCFG_CPU_PROGRAM_MAP(svision_mem)
@@ -598,14 +598,14 @@ ROM_END
 
 ***************************************************************************/
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT             COMPANY     FULLNAME */
+//    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT     STATE          INIT      COMPANY   FULLNAME                                       FLAGS
 // marketed under a ton of firms and names
-CONS(1992,  svision,    0,  0,  svision,    svision, svision_state, svision,    "Watara",   "Super Vision", 0)
+CONS(1992,  svision,  0,       0,      svision,  svision,  svision_state, svision,  "Watara", "Super Vision",                                0 )
 // svdual 2 connected via communication port
-CONS( 1992, svisions,      svision,          0,svisions,  svisions, svision_state,    svisions,   "Watara", "Super Vision (PeT Communication Simulation)", 0 )
+CONS( 1992, svisions, svision, 0,      svisions, svisions, svision_state, svisions, "Watara", "Super Vision (PeT Communication Simulation)", 0 )
 
-CONS( 1993, svisionp,      svision,          0,svisionp,  svision, svision_state,    svision,   "Watara", "Super Vision (PAL TV Link Colored)", 0 )
-CONS( 1993, svisionn,      svision,          0,svisionn,  svision, svision_state,    svision,   "Watara", "Super Vision (NTSC TV Link Colored)", 0 )
+CONS( 1993, svisionp, svision, 0,      svisionp, svision,  svision_state, svision,  "Watara", "Super Vision (PAL TV Link Colored)",          0 )
+CONS( 1993, svisionn, svision, 0,      svisionn, svision,  svision_state, svision,  "Watara", "Super Vision (NTSC TV Link Colored)",         0 )
 // svtvlink (2 supervisions)
 // tvlink (pad supervision simulated)
-CONS( 199?, tvlinkp,      svision,          0,tvlinkp,  svision, svision_state,    svision,   "Watara", "TV Link PAL", 0 )
+CONS( 199?, tvlinkp,  svision, 0,      tvlinkp,  svision,  svision_state, svision,  "Watara", "TV Link PAL",                                 0 )

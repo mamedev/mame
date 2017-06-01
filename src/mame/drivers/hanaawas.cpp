@@ -213,7 +213,7 @@ void hanaawas_state::machine_reset()
 	m_mux = 0;
 }
 
-static MACHINE_CONFIG_START( hanaawas, hanaawas_state )
+static MACHINE_CONFIG_START( hanaawas )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,18432000/6) /* 3.072 MHz ??? */
@@ -272,4 +272,4 @@ ROM_START( hanaawas )
 ROM_END
 
 
-GAME( 1982, hanaawas, 0, hanaawas, hanaawas, driver_device, 0, ROT0, "Seta Kikaku, Ltd.", "Hana Awase", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, hanaawas, 0, hanaawas, hanaawas, hanaawas_state, 0, ROT0, "Seta Kikaku, Ltd.", "Hana Awase", MACHINE_SUPPORTS_SAVE )

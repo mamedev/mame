@@ -486,10 +486,10 @@ PALETTE_INIT_MEMBER( abc806_state, abc806 )
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( abc806_video )
+//  MACHINE_CONFIG_START( abc806_video )
 //-------------------------------------------------
 
-MACHINE_CONFIG_FRAGMENT( abc806_video )
+MACHINE_CONFIG_START( abc806_video )
 	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_TAG, ABC800_CCLK)
 	MCFG_MC6845_SHOW_BORDER_AREA(true)
 	MCFG_MC6845_CHAR_WIDTH(ABC800_CHAR_WIDTH)

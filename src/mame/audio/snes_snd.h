@@ -6,11 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef __SNES_SPC_H__
-#define __SNES_SPC_H__
-
-
-#define SNES_SPCRAM_SIZE      0x10000
+#ifndef MAME_AUDIO_SNES_SND_H
+#define MAME_AUDIO_SNES_SND_H
 
 
 /***************************************************************************
@@ -27,34 +24,6 @@ enum env_state_t32                        /* ADSR state type              */
 
 ALLOW_SAVE_TYPE(env_state_t32);
 
-struct voice_state_type                      /* Voice state type             */
-{
-	uint16_t          mem_ptr;        /* Sample data memory pointer   */
-	int             end;            /* End or loop after block      */
-	int             envcnt;         /* Counts to envelope update    */
-	env_state_t32   envstate;       /* Current envelope state       */
-	int             envx;           /* Last env height (0-0x7FFF)   */
-	int             filter;         /* Last header's filter         */
-	int             half;           /* Active nybble of BRR         */
-	int             header_cnt;     /* Bytes before new header (0-8)*/
-	int             mixfrac;        /* Fractional part of smpl pstn */
-	int             on_cnt;         /* Is it time to turn on yet?   */
-	int             pitch;          /* Sample pitch (4096->32000Hz) */
-	int             range;          /* Last header's range          */
-	uint32_t          samp_id;        /* Sample ID#                   */
-	int             sampptr;        /* Where in sampbuf we are      */
-	int32_t           smp1;           /* Last sample (for BRR filter) */
-	int32_t           smp2;           /* Second-to-last sample decoded*/
-	short           sampbuf[4];   /* Buffer for Gaussian interp   */
-};
-
-struct src_dir_type                      /* Source directory entry       */
-{
-	uint16_t  vptr;           /* Ptr to start of sample data  */
-	uint16_t  lptr;           /* Loop pointer in sample data  */
-};
-
-
 /***************************************************************************
  DEVICE CONFIGURATION MACROS
  ***************************************************************************/
@@ -64,7 +33,6 @@ class snes_sound_device : public device_t,
 {
 public:
 	snes_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~snes_sound_device() {}
 
 	void set_volume(int volume);
 
@@ -86,6 +54,37 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
+
+	static constexpr unsigned SNES_SPCRAM_SIZE = 0x10000;
+
+
+	struct voice_state_type                      /* Voice state type             */
+	{
+		uint16_t          mem_ptr;        /* Sample data memory pointer   */
+		int             end;            /* End or loop after block      */
+		int             envcnt;         /* Counts to envelope update    */
+		env_state_t32   envstate;       /* Current envelope state       */
+		int             envx;           /* Last env height (0-0x7FFF)   */
+		int             filter;         /* Last header's filter         */
+		int             half;           /* Active nybble of BRR         */
+		int             header_cnt;     /* Bytes before new header (0-8)*/
+		int             mixfrac;        /* Fractional part of smpl pstn */
+		int             on_cnt;         /* Is it time to turn on yet?   */
+		int             pitch;          /* Sample pitch (4096->32000Hz) */
+		int             range;          /* Last header's range          */
+		uint32_t          samp_id;        /* Sample ID#                   */
+		int             sampptr;        /* Where in sampbuf we are      */
+		int32_t           smp1;           /* Last sample (for BRR filter) */
+		int32_t           smp2;           /* Second-to-last sample decoded*/
+		short           sampbuf[4];   /* Buffer for Gaussian interp   */
+	};
+
+	struct src_dir_type                      /* Source directory entry       */
+	{
+		uint16_t  vptr;           /* Ptr to start of sample data  */
+		uint16_t  lptr;           /* Loop pointer in sample data  */
+	};
+
 
 	DECLARE_READ8_MEMBER(dsp_io_r);
 	DECLARE_WRITE8_MEMBER(dsp_io_w);
@@ -127,7 +126,7 @@ private:
 	uint8_t                   m_port_out[4];        /* SPC output ports */
 };
 
-extern const device_type SNES;
+DECLARE_DEVICE_TYPE(SNES, snes_sound_device)
 
 
-#endif /* __SNES_SPC_H__ */
+#endif // MAME_AUDIO_SNES_SND_H

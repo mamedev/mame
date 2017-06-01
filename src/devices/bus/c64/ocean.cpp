@@ -37,7 +37,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_OCEAN = device_creator<c64_ocean_cartridge_device>;
+DEFINE_DEVICE_TYPE(C64_OCEAN, c64_ocean_cartridge_device, "c64_ocean", "C64 Ocean cartridge")
 
 
 
@@ -50,7 +50,7 @@ const device_type C64_OCEAN = device_creator<c64_ocean_cartridge_device>;
 //-------------------------------------------------
 
 c64_ocean_cartridge_device::c64_ocean_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, C64_OCEAN, "C64 Ocean cartridge", tag, owner, clock, "c64_ocean", __FILE__),
+	device_t(mconfig, C64_OCEAN, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_bank(0)
 {

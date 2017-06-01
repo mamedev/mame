@@ -982,6 +982,8 @@ if (VIDEOS["PPU2C0X"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/video/ppu2c0x.cpp",
 		MAME_DIR .. "src/devices/video/ppu2c0x.h",
+		MAME_DIR .. "src/devices/video/ppu2c0x_vt.cpp",
+		MAME_DIR .. "src/devices/video/ppu2c0x_vt.h",
 	}
 end
 

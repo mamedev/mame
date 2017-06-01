@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_C64_MIDI_SCI_H
+#define MAME_BUS_C64_MIDI_SCI_H
 
-#ifndef __C64_MIDI_SCI__
-#define __C64_MIDI_SCI__
+#pragma once
 
 #include "exp.h"
 #include "machine/6850acia.h"
@@ -50,7 +50,7 @@ private:
 
 
 // device type definition
-extern const device_type C64_MIDI_SCI;
+DECLARE_DEVICE_TYPE(C64_MIDI_SCI, c64_sequential_midi_cartridge_device)
 
 
-#endif
+#endif // MAME_BUS_C64_MIDI_SCI_H

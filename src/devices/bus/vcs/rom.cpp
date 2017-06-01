@@ -21,167 +21,164 @@
 //  a26_rom_*k_device - constructor
 //-------------------------------------------------
 
-const device_type A26_ROM_2K = device_creator<a26_rom_2k_device>;
-const device_type A26_ROM_4K = device_creator<a26_rom_4k_device>;
-const device_type A26_ROM_F4 = device_creator<a26_rom_f4_device>;
-const device_type A26_ROM_F6 = device_creator<a26_rom_f6_device>;
-const device_type A26_ROM_F8 = device_creator<a26_rom_f8_device>;
-const device_type A26_ROM_F8_SW = device_creator<a26_rom_f8_sw_device>;
-const device_type A26_ROM_FA = device_creator<a26_rom_fa_device>;
-const device_type A26_ROM_FE = device_creator<a26_rom_fe_device>;
-const device_type A26_ROM_3E = device_creator<a26_rom_3e_device>;
-const device_type A26_ROM_3F = device_creator<a26_rom_3f_device>;
-const device_type A26_ROM_E0 = device_creator<a26_rom_e0_device>;
-const device_type A26_ROM_E7 = device_creator<a26_rom_e7_device>;
-const device_type A26_ROM_UA = device_creator<a26_rom_ua_device>;
-const device_type A26_ROM_CV = device_creator<a26_rom_cv_device>;
-const device_type A26_ROM_DC = device_creator<a26_rom_dc_device>;
-const device_type A26_ROM_FV = device_creator<a26_rom_fv_device>;
-const device_type A26_ROM_JVP = device_creator<a26_rom_jvp_device>;
-const device_type A26_ROM_4IN1 = device_creator<a26_rom_4in1_device>;
-const device_type A26_ROM_8IN1 = device_creator<a26_rom_8in1_device>;
-const device_type A26_ROM_32IN1 = device_creator<a26_rom_32in1_device>;
-const device_type A26_ROM_X07 = device_creator<a26_rom_x07_device>;
+DEFINE_DEVICE_TYPE(A26_ROM_2K,    a26_rom_2k_device,    "vcs_2k",    "Atari VCS 2600 2K ROM Carts")
+DEFINE_DEVICE_TYPE(A26_ROM_4K,    a26_rom_4k_device,    "vcs_4k",    "Atari VCS 2600 4K ROM Carts")
+DEFINE_DEVICE_TYPE(A26_ROM_F4,    a26_rom_f4_device,    "vcs_f4",    "Atari VCS 2600 ROM Carts w/F4 bankswitch")
+DEFINE_DEVICE_TYPE(A26_ROM_F6,    a26_rom_f6_device,    "vcs_f6",    "Atari VCS 2600 ROM Carts w/F6 bankswitch")
+DEFINE_DEVICE_TYPE(A26_ROM_F8,    a26_rom_f8_device,    "vcs_f8",    "Atari VCS 2600 ROM Carts w/F8 bankswitch")
+DEFINE_DEVICE_TYPE(A26_ROM_F8_SW, a26_rom_f8_sw_device, "vcs_f8_sw", "Atari VCS 2600 ROM Cart Snow White")
+DEFINE_DEVICE_TYPE(A26_ROM_FA,    a26_rom_fa_device,    "vcs_fa",    "Atari VCS 2600 ROM Carts w/FA bankswitch")
+DEFINE_DEVICE_TYPE(A26_ROM_FE,    a26_rom_fe_device,    "vcs_fe",    "Atari VCS 2600 ROM Carts w/FE bankswitch")
+DEFINE_DEVICE_TYPE(A26_ROM_3E,    a26_rom_3e_device,    "vcs_3e",    "Atari VCS 2600 ROM Carts w/3E bankswitch")
+DEFINE_DEVICE_TYPE(A26_ROM_3F,    a26_rom_3f_device,    "vcs_3f",    "Atari VCS 2600 ROM Carts w/3F bankswitch")
+DEFINE_DEVICE_TYPE(A26_ROM_E0,    a26_rom_e0_device,    "vcs_e0",    "Atari VCS 2600 ROM Carts w/E0 bankswitch")
+DEFINE_DEVICE_TYPE(A26_ROM_E7,    a26_rom_e7_device,    "vcs_e7",    "Atari VCS 2600 ROM Carts w/E7 bankswitch")
+DEFINE_DEVICE_TYPE(A26_ROM_UA,    a26_rom_ua_device,    "vcs_ua",    "Atari VCS 2600 ROM Carts w/UA bankswitch")
+DEFINE_DEVICE_TYPE(A26_ROM_CV,    a26_rom_cv_device,    "vcs_cv",    "Atari VCS 2600 ROM Carts w/Commavid bankswitch")
+DEFINE_DEVICE_TYPE(A26_ROM_DC,    a26_rom_dc_device,    "vcs_dc",    "Atari VCS 2600 ROM Carts w/Dynacom bankswitch")
+DEFINE_DEVICE_TYPE(A26_ROM_FV,    a26_rom_fv_device,    "vcs_fv",    "Atari VCS 2600 ROM Carts w/FV bankswitch")
+DEFINE_DEVICE_TYPE(A26_ROM_JVP,   a26_rom_jvp_device,   "vcs_jvp",   "Atari VCS 2600 ROM Carts w/JVP bankswitch")
+DEFINE_DEVICE_TYPE(A26_ROM_4IN1,  a26_rom_4in1_device,  "vcs_4in1",  "Atari VCS 2600 ROM Cart 4 in 1")
+DEFINE_DEVICE_TYPE(A26_ROM_8IN1,  a26_rom_8in1_device,  "vcs_8in1",  "Atari VCS 2600 ROM Cart 8 in 1")
+DEFINE_DEVICE_TYPE(A26_ROM_32IN1, a26_rom_32in1_device, "vcs_32in1", "Atari VCS 2600 ROM Cart 32 in 1")
+DEFINE_DEVICE_TYPE(A26_ROM_X07,   a26_rom_x07_device,   "vcs_x07",   "Atari VCS 2600 ROM Carts w/X07 bankswitch")
 
 
-a26_rom_2k_device::a26_rom_2k_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-						device_vcs_cart_interface( mconfig, *this )
+a26_rom_2k_device::a26_rom_2k_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock), device_vcs_cart_interface(mconfig, *this)
 {
 }
 
 a26_rom_2k_device::a26_rom_2k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: device_t(mconfig, A26_ROM_2K, "Atari VCS 2600 2K ROM Carts", tag, owner, clock, "vcs_2k", __FILE__),
-						device_vcs_cart_interface( mconfig, *this )
+	: a26_rom_2k_device(mconfig, A26_ROM_2K, tag, owner, clock)
 {
 }
 
 
 a26_rom_4k_device::a26_rom_4k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: a26_rom_2k_device(mconfig, A26_ROM_4K, "Atari VCS 2600 4K ROM Carts", tag, owner, clock, "vcs_4k", __FILE__)
+	: a26_rom_2k_device(mconfig, A26_ROM_4K, tag, owner, clock)
 {
 }
 
 
-a26_rom_f6_device::a26_rom_f6_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-					: a26_rom_2k_device(mconfig, type, name, tag, owner, clock, shortname, source),
-						m_base_bank(-1) // set to -1 to help the Xin1 multicart...
+a26_rom_f6_device::a26_rom_f6_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: a26_rom_2k_device(mconfig, type, tag, owner, clock)
+	, m_base_bank(-1) // set to -1 to help the Xin1 multicart...
 {
 }
 
 a26_rom_f6_device::a26_rom_f6_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: a26_rom_2k_device(mconfig, A26_ROM_F6, "Atari VCS 2600 ROM Carts w/F6 bankswitch", tag, owner, clock, "vcs_f6", __FILE__),
-						m_base_bank(-1) // set to -1 to help the Xin1 multicart...
+	: a26_rom_f6_device(mconfig, A26_ROM_F6, tag, owner, clock)
 {
 }
 
 
 a26_rom_f4_device::a26_rom_f4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: a26_rom_f6_device(mconfig, A26_ROM_F4, "Atari VCS 2600 ROM Carts w/F4 bankswitch", tag, owner, clock, "vcs_f4", __FILE__)
+	: a26_rom_f6_device(mconfig, A26_ROM_F4, tag, owner, clock)
 {
 }
 
 
-a26_rom_f8_device::a26_rom_f8_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-					: a26_rom_f6_device(mconfig, type, name, tag, owner, clock, shortname, source)
+a26_rom_f8_device::a26_rom_f8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: a26_rom_f6_device(mconfig, type, tag, owner, clock)
 {
 }
 
 a26_rom_f8_device::a26_rom_f8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: a26_rom_f6_device(mconfig, A26_ROM_F8, "Atari VCS 2600 ROM Carts w/F8 bankswitch", tag, owner, clock, "vcs_f8", __FILE__)
+	: a26_rom_f8_device(mconfig, A26_ROM_F8, tag, owner, clock)
 {
 }
 
 a26_rom_f8_sw_device::a26_rom_f8_sw_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: a26_rom_f8_device(mconfig, A26_ROM_F8_SW, "Atari VCS 2600 ROM Cart Snow White", tag, owner, clock, "vcs_f8_sw", __FILE__)
+	: a26_rom_f8_device(mconfig, A26_ROM_F8_SW, tag, owner, clock)
 {
 }
 
 a26_rom_fa_device::a26_rom_fa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: a26_rom_f6_device(mconfig, A26_ROM_FA, "Atari VCS 2600 ROM Carts w/FA bankswitch", tag, owner, clock, "vcs_fa", __FILE__)
+	: a26_rom_f6_device(mconfig, A26_ROM_FA, tag, owner, clock)
 {
 }
 
 
 a26_rom_fe_device::a26_rom_fe_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: a26_rom_2k_device(mconfig, A26_ROM_FE, "Atari VCS 2600 ROM Carts w/FE bankswitch", tag, owner, clock, "vcs_fe", __FILE__), m_base_bank(0), m_trigger_on_next_access(0)
-				{
+	: a26_rom_2k_device(mconfig, A26_ROM_FE, tag, owner, clock), m_base_bank(0), m_trigger_on_next_access(0)
+{
 }
 
 
 a26_rom_3e_device::a26_rom_3e_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: a26_rom_f6_device(mconfig, A26_ROM_3E, "Atari VCS 2600 ROM Carts w/3E bankswitch", tag, owner, clock, "vcs_3e", __FILE__), m_num_bank(0), m_ram_bank(0), m_ram_enable(0)
-				{
+	: a26_rom_f6_device(mconfig, A26_ROM_3E, tag, owner, clock), m_num_bank(0), m_ram_bank(0), m_ram_enable(0)
+{
 }
 
 
 a26_rom_3f_device::a26_rom_3f_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: a26_rom_f6_device(mconfig, A26_ROM_3F, "Atari VCS 2600 ROM Carts w/3F bankswitch", tag, owner, clock, "vcs_3f", __FILE__), m_num_bank(0)
-				{
+	: a26_rom_f6_device(mconfig, A26_ROM_3F, tag, owner, clock), m_num_bank(0)
+{
 }
 
 
 a26_rom_e0_device::a26_rom_e0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: a26_rom_f6_device(mconfig, A26_ROM_E0, "Atari VCS 2600 ROM Carts w/E0 bankswitch", tag, owner, clock, "vcs_e0", __FILE__)
+	: a26_rom_f6_device(mconfig, A26_ROM_E0, tag, owner, clock)
 {
 }
 
 
 a26_rom_e7_device::a26_rom_e7_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: a26_rom_f6_device(mconfig, A26_ROM_E7, "Atari VCS 2600 ROM Carts w/E7 bankswitch", tag, owner, clock, "vcs_e7", __FILE__), m_ram_bank(0)
-				{
+	: a26_rom_f6_device(mconfig, A26_ROM_E7, tag, owner, clock), m_ram_bank(0)
+{
 }
 
 
 a26_rom_ua_device::a26_rom_ua_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: a26_rom_f6_device(mconfig, A26_ROM_UA, "Atari VCS 2600 ROM Carts w/UA bankswitch", tag, owner, clock, "vcs_ua", __FILE__)
+	: a26_rom_f6_device(mconfig, A26_ROM_UA, tag, owner, clock)
 {
 }
 
 
 a26_rom_cv_device::a26_rom_cv_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: a26_rom_2k_device(mconfig, A26_ROM_CV, "Atari VCS 2600 ROM Carts w/Commavid bankswitch", tag, owner, clock, "vcs_cv", __FILE__)
+	: a26_rom_2k_device(mconfig, A26_ROM_CV, tag, owner, clock)
 {
 }
 
 
 a26_rom_dc_device::a26_rom_dc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: a26_rom_f6_device(mconfig, A26_ROM_DC, "Atari VCS 2600 ROM Carts w/Dynacom bankswitch", tag, owner, clock, "vcs_dc", __FILE__)
+	: a26_rom_f6_device(mconfig, A26_ROM_DC, tag, owner, clock)
 {
 }
 
 
 a26_rom_fv_device::a26_rom_fv_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: a26_rom_f6_device(mconfig, A26_ROM_FV, "Atari VCS 2600 ROM Carts w/FV bankswitch", tag, owner, clock, "vcs_fv", __FILE__), m_locked(0)
-				{
+	: a26_rom_f6_device(mconfig, A26_ROM_FV, tag, owner, clock), m_locked(0)
+{
 }
 
 
 a26_rom_jvp_device::a26_rom_jvp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: a26_rom_f6_device(mconfig, A26_ROM_JVP, "Atari VCS 2600 ROM Carts w/JVP bankswitch", tag, owner, clock, "vcs_jvp", __FILE__)
+	: a26_rom_f6_device(mconfig, A26_ROM_JVP, tag, owner, clock)
 {
 }
 
 
 a26_rom_4in1_device::a26_rom_4in1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: a26_rom_f6_device(mconfig, A26_ROM_4IN1, "Atari VCS 2600 ROM Cart 4 in 1", tag, owner, clock, "vcs_4in1", __FILE__)
+	: a26_rom_f6_device(mconfig, A26_ROM_4IN1, tag, owner, clock)
 {
 }
 
 
 a26_rom_8in1_device::a26_rom_8in1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: a26_rom_f8_device(mconfig, A26_ROM_8IN1, "Atari VCS 2600 ROM Cart 8 in 1", tag, owner, clock, "vcs_8in1", __FILE__), m_reset_bank(0)
-				{
+	: a26_rom_f8_device(mconfig, A26_ROM_8IN1, tag, owner, clock), m_reset_bank(0)
+{
 }
 
 
 a26_rom_32in1_device::a26_rom_32in1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: a26_rom_f6_device(mconfig, A26_ROM_32IN1, "Atari VCS 2600 ROM Cart 32 in 1", tag, owner, clock, "vcs_32in1", __FILE__)
+	: a26_rom_f6_device(mconfig, A26_ROM_32IN1, tag, owner, clock)
 {
 }
 
 a26_rom_x07_device::a26_rom_x07_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: a26_rom_f6_device(mconfig, A26_ROM_X07, "Atari VCS 2600 ROM Carts w/X07 bankswitch", tag, owner, clock, "vcs_x07", __FILE__)
+	: a26_rom_f6_device(mconfig, A26_ROM_X07, tag, owner, clock)
 {
 }
 

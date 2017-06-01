@@ -1168,7 +1168,7 @@ void amstrad_state::amstrad_setLowerRom()
 		if ((m_gate_array.mrer & (1<<2)) == 0 && m_gate_array.romdis == 0)
 		{
 			if (m_exp)
-				m_exp->set_mapping(MAP_LOWER);
+				m_exp->set_mapping(device_cpc_expansion_card_interface::MAP_LOWER);
 		}
 	}
 	else  // CPC+/GX4000
@@ -1235,7 +1235,7 @@ void amstrad_state::amstrad_setLowerRom()
 				m_bank1->set_base(m_region_cart->base());
 				m_bank2->set_base(m_region_cart->base() + 0x2000);
 				if (m_exp)
-					m_exp->set_mapping(MAP_LOWER);
+					m_exp->set_mapping(device_cpc_expansion_card_interface::MAP_LOWER);
 			}
 		}
 	}
@@ -1270,7 +1270,7 @@ void amstrad_state::amstrad_setUpperRom()
 	if ( ! ( m_gate_array.mrer & 0x08 ) && m_gate_array.romdis == 0)
 	{
 		if (m_exp)
-			m_exp->set_mapping(MAP_UPPER);
+			m_exp->set_mapping(device_cpc_expansion_card_interface::MAP_UPPER);
 	}
 
 }
@@ -2462,7 +2462,7 @@ void amstrad_state::amstrad_rethinkMemory()
 
 	/* mappings for other expansion devices */
 	if (m_exp)
-		m_exp->set_mapping(MAP_OTHER);
+		m_exp->set_mapping(device_cpc_expansion_card_interface::MAP_OTHER);
 }
 
 
@@ -3007,7 +3007,7 @@ void amstrad_state::enumerate_roms()
 		{
 			char str[20];
 			sprintf(str, "rom%i", i + 1);
-			rom_image_device* romimage = romexp->subdevice<rom_image_device>(str);
+			cpc_rom_image_device* romimage = romexp->subdevice<cpc_rom_image_device>(str);
 			if(romimage != nullptr && romimage->base() != nullptr)
 			{
 				m_Amstrad_ROM_Table[m_rom_count] = romimage->base();

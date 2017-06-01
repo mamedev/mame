@@ -10,11 +10,10 @@
 
 ***************************************************************************/
 
+#ifndef MAME_VIDEO_GBA_LCD_H
+#define MAME_VIDEO_GBA_LCD_H
+
 #pragma once
-
-#ifndef __GBA_LCD_H__
-#define __GBA_LCD_H__
-
 
 
 
@@ -23,7 +22,7 @@
 //**************************************************************************
 
 // device type definition
-extern const device_type GBA_LCD;
+DECLARE_DEVICE_TYPE(GBA_LCD, gba_lcd_device)
 
 
 //**************************************************************************
@@ -89,8 +88,6 @@ class gba_lcd_device
 public:
 	gba_lcd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
 	DECLARE_READ32_MEMBER(video_r);
 	DECLARE_WRITE32_MEMBER(video_w);
 	DECLARE_READ32_MEMBER(gba_pram_r);
@@ -99,40 +96,39 @@ public:
 	DECLARE_WRITE32_MEMBER(gba_vram_w);
 	DECLARE_READ32_MEMBER(gba_oam_r);
 	DECLARE_WRITE32_MEMBER(gba_oam_w);
-	DECLARE_PALETTE_INIT(gba);
 	TIMER_CALLBACK_MEMBER(perform_hbl);
 	TIMER_CALLBACK_MEMBER(perform_scan);
 
-	template<class _Object> static devcb_base &set_int_hblank_callback(device_t &device, _Object object)
+	template <class Object> static devcb_base &set_int_hblank_callback(device_t &device, Object &&cb)
 	{
-		return downcast<gba_lcd_device &>(device).m_int_hblank_cb.set_callback(object);
+		return downcast<gba_lcd_device &>(device).m_int_hblank_cb.set_callback(std::forward<Object>(cb));
 	}
 
-	template<class _Object> static devcb_base &set_int_vblank_callback(device_t &device, _Object object)
+	template <class Object> static devcb_base &set_int_vblank_callback(device_t &device, Object &&cb)
 	{
-		return downcast<gba_lcd_device &>(device).m_int_vblank_cb.set_callback(object);
+		return downcast<gba_lcd_device &>(device).m_int_vblank_cb.set_callback(std::forward<Object>(cb));
 	}
 
-	template<class _Object> static devcb_base &set_int_vcount_callback(device_t &device, _Object object)
+	template <class Object> static devcb_base &set_int_vcount_callback(device_t &device, Object &&cb)
 	{
-		return downcast<gba_lcd_device &>(device).m_int_vcount_cb.set_callback(object);
+		return downcast<gba_lcd_device &>(device).m_int_vcount_cb.set_callback(std::forward<Object>(cb));
 	}
 
-	template<class _Object> static devcb_base &set_dma_hblank_callback(device_t &device, _Object object)
+	template <class Object> static devcb_base &set_dma_hblank_callback(device_t &device, Object &&cb)
 	{
-		return downcast<gba_lcd_device &>(device).m_dma_hblank_cb.set_callback(object);
+		return downcast<gba_lcd_device &>(device).m_dma_hblank_cb.set_callback(std::forward<Object>(cb));
 	}
 
-	template<class _Object> static devcb_base &set_dma_vblank_callback(device_t &device, _Object object)
+	template <class Object> static devcb_base &set_dma_vblank_callback(device_t &device, Object &&cb)
 	{
-		return downcast<gba_lcd_device &>(device).m_dma_vblank_cb.set_callback(object);
+		return downcast<gba_lcd_device &>(device).m_dma_vblank_cb.set_callback(std::forward<Object>(cb));
 	}
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	struct internal_reg
@@ -230,6 +226,10 @@ private:
 	uint32_t increase_brightness(uint32_t color);
 	uint32_t decrease_brightness(uint32_t color);
 
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_PALETTE_INIT(gba);
+
+
 	devcb_write_line m_int_hblank_cb;   /* H-Blank interrupt callback function */
 	devcb_write_line m_int_vblank_cb;   /* V-Blank interrupt callback function */
 	devcb_write_line m_int_vcount_cb;   /* V-Counter Match interrupt callback function */
@@ -250,4 +250,4 @@ private:
 	static constexpr uint32_t TRANSPARENT_PIXEL = 0x80000000;
 };
 
-#endif /* GBA_LCD_H_ */
+#endif // MAME_VIDEO_GBA_LCD_H

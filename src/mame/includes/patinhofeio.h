@@ -1,5 +1,10 @@
 // license:GPL2+
 // copyright-holders:Felipe Sanches
+#ifndef MAME_INCLUDES_PATINHOFEIO_H
+#define MAME_INCLUDES_PATINHOFEIO_H
+
+#pragma once
+
 #include "machine/teleprinter.h"
 
 class patinho_feio_state : public driver_device {
@@ -12,26 +17,29 @@ public:
 	{ }
 
 	DECLARE_DRIVER_INIT(patinho_feio);
-	DECLARE_READ16_MEMBER(rc_r);
-	DECLARE_READ16_MEMBER(buttons_r);
 
 	DECLARE_WRITE8_MEMBER(decwriter_data_w);
-	DECLARE_WRITE8_MEMBER(decwriter_kbd_input);
+	void decwriter_kbd_input(u8 data);
 	TIMER_CALLBACK_MEMBER(decwriter_callback);
 
 	DECLARE_WRITE8_MEMBER(teletype_data_w);
-	DECLARE_WRITE8_MEMBER(teletype_kbd_input);
+	void teletype_kbd_input(u8 data);
 	TIMER_CALLBACK_MEMBER(teletype_callback);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( patinho_tape );
+
+	void update_panel(uint8_t ACC, uint8_t opcode, uint8_t mem_data, uint16_t mem_addr, uint16_t PC, uint8_t FLAGS, uint16_t RC, uint8_t mode);
+
+protected:
+	virtual void machine_start() override;
+
 	void load_tape(const char* name);
 	void load_raw_data(const char* name, unsigned int start_address, unsigned int data_length);
-	void update_panel(uint8_t ACC, uint8_t opcode, uint8_t mem_data, uint16_t mem_addr, uint16_t PC, uint8_t FLAGS, uint16_t RC, uint8_t mode);
-	virtual void machine_start() override;
 
 	required_device<patinho_feio_cpu_device> m_maincpu;
 	required_device<teleprinter_device> m_decwriter;
 	required_device<teleprinter_device> m_tty;
+
 private:
 	uint8_t* paper_tape_data;
 	uint32_t paper_tape_length;
@@ -48,3 +56,5 @@ private:
 	uint8_t m_prev_FLAGS;
 	uint16_t m_prev_RC;
 };
+
+#endif // MAME_INCLUDES_PATINHOFEIO_H

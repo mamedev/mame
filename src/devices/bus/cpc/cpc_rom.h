@@ -6,22 +6,23 @@
  *
  */
 
-#ifndef CPC_ROM_H_
-#define CPC_ROM_H_
+#ifndef MAME_BUS_CPC_CPC_ROM_H
+#define MAME_BUS_CPC_CPC_ROM_H
+
+#pragma once
 
 #include "cpcexp.h"
 
 /*** ROM image device ***/
 
-// ======================> rom_image_device
+// ======================> cpc_rom_image_device
 
-class rom_image_device :    public device_t,
-							public device_image_interface
+class cpc_rom_image_device : public device_t, public device_image_interface
 {
 public:
 	// construction/destruction
-	rom_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual ~rom_image_device();
+	cpc_rom_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual ~cpc_rom_image_device();
 
 	// image-level overrides
 	virtual image_init_result call_load() override;
@@ -49,11 +50,11 @@ private:
 
 
 // device type definition
-extern const device_type ROMSLOT;
+DECLARE_DEVICE_TYPE(CPC_ROMSLOT, cpc_rom_image_device)
 
 
-#define MCFG_ROMSLOT_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, ROMSLOT, 0)
+#define MCFG_CPC_ROMSLOT_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, CPC_ROMSLOT, 0)
 
 /*** ROM box device ***/
 
@@ -75,13 +76,11 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	//cpc_expansion_slot_device *m_slot;
-
-	rom_image_device* m_rom[8];
+	required_device_array<cpc_rom_image_device, 8> m_rom;
 };
 
 // device type definition
-extern const device_type CPC_ROM;
+DECLARE_DEVICE_TYPE(CPC_ROM, cpc_rom_device)
 
 
-#endif
+#endif // MAME_BUS_CPC_CPC_ROM_H

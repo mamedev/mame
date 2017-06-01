@@ -15,7 +15,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type CHANF_CART_SLOT = device_creator<channelf_cart_slot_device>;
+DEFINE_DEVICE_TYPE(CHANF_CART_SLOT, channelf_cart_slot_device, "chanf_cart_slot", "Fairchild Channel F Cartridge Slot")
 
 //**************************************************************************
 //    Channel F cartridges Interface
@@ -73,10 +73,10 @@ void device_channelf_cart_interface::ram_alloc(uint32_t size)
 //  channelf_cart_slot_device - constructor
 //-------------------------------------------------
 channelf_cart_slot_device::channelf_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-						device_t(mconfig, CHANF_CART_SLOT, "Fairchild Channel F Cartridge Slot", tag, owner, clock, "cf_cart_slot", __FILE__),
-						device_image_interface(mconfig, *this),
-						device_slot_interface(mconfig, *this),
-						m_type(CF_CHESS), m_cart(nullptr)
+	device_t(mconfig, CHANF_CART_SLOT, tag, owner, clock),
+	device_image_interface(mconfig, *this),
+	device_slot_interface(mconfig, *this),
+	m_type(CF_CHESS), m_cart(nullptr)
 {
 }
 

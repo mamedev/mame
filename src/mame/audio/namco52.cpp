@@ -145,22 +145,16 @@ static ADDRESS_MAP_START( namco_52xx_map_io, AS_IO, 8, namco_52xx_device )
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_FRAGMENT( namco_52xx )
-	MCFG_CPU_ADD("mcu", MB8843, DERIVED_CLOCK(1,1))     /* parent clock, internally divided by 6 */
-	MCFG_CPU_IO_MAP(namco_52xx_map_io)
-MACHINE_CONFIG_END
-
-
 ROM_START( namco_52xx )
 	ROM_REGION( 0x400, "mcu", 0 )
 	ROM_LOAD( "52xx.bin",     0x0000, 0x0400, CRC(3257d11e) SHA1(4883b2fdbc99eb7b9906357fcc53915842c2c186) )
 ROM_END
 
 
-const device_type NAMCO_52XX = device_creator<namco_52xx_device>;
+DEFINE_DEVICE_TYPE(NAMCO_52XX, namco_52xx_device, "namco52", "Namco 52xx")
 
 namco_52xx_device::namco_52xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, NAMCO_52XX, "Namco 52xx", tag, owner, clock, "namco52", __FILE__),
+	: device_t(mconfig, NAMCO_52XX, tag, owner, clock),
 	m_cpu(*this, "mcu"),
 	m_discrete(*this, finder_base::DUMMY_TAG),
 	m_basenode(0),
@@ -184,18 +178,20 @@ void namco_52xx_device::device_start()
 
 	/* start the external clock */
 	if (m_extclock != 0)
-		machine().scheduler().timer_pulse(attotime(0, m_extclock), timer_expired_delegate(FUNC(namco_52xx_device::external_clock_pulse),this), 0);
+	{
+		m_extclock_pulse_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(namco_52xx_device::external_clock_pulse), this));
+		m_extclock_pulse_timer->adjust(attotime(0, m_extclock), 0, attotime(0, m_extclock));
+	}
 }
 
 //-------------------------------------------------
-//  device_mconfig_additions - return a pointer to
-//  the device's machine fragment
+// device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor namco_52xx_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( namco_52xx  );
-}
+MACHINE_CONFIG_MEMBER( namco_52xx_device::device_add_mconfig )
+	MCFG_CPU_ADD("mcu", MB8843, DERIVED_CLOCK(1,1))     /* parent clock, internally divided by 6 */
+	MCFG_CPU_IO_MAP(namco_52xx_map_io)
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  device_rom_region - return a pointer to the

@@ -8,12 +8,13 @@
 
 ***************************************************************************/
 
+#ifndef MAME_EMU_DEBUG_EXPRESS_H
+#define MAME_EMU_DEBUG_EXPRESS_H
+
 #pragma once
 
-#ifndef __EXPRESS_H__
-#define __EXPRESS_H__
-
 #include "emucore.h"
+
 #include <functional>
 #include <unordered_map>
 
@@ -45,10 +46,6 @@ enum expression_space
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
-
-// forward references
-class symbol_table;
-
 
 // ======================> expression_error
 
@@ -389,5 +386,4 @@ private:
 	parse_token         m_token_stack[MAX_STACK_DEPTH]; // token stack (used during execution)
 };
 
-
-#endif
+#endif // MAME_EMU_DEBUG_EXPRESS_H

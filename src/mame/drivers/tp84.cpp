@@ -100,7 +100,7 @@ WRITE8_MEMBER(tp84_state::tp84_filter_w)
 	C = 0;
 	if (offset & 0x008) C +=  47000;    /*  47000pF = 0.047uF */
 	if (offset & 0x010) C += 470000;    /* 470000pF = 0.47uF */
-	dynamic_cast<filter_rc_device*>(machine().device("filter1"))->filter_rc_set_RC(FLT_RC_LOWPASS,1000,2200,1000,CAP_P(C));
+	downcast<filter_rc_device*>(machine().device("filter1"))->filter_rc_set_RC(filter_rc_device::LOWPASS,1000,2200,1000,CAP_P(C));
 
 	/* 76489 #1 (optional) */
 	C = 0;
@@ -111,12 +111,12 @@ WRITE8_MEMBER(tp84_state::tp84_filter_w)
 	/* 76489 #2 */
 	C = 0;
 	if (offset & 0x080) C += 470000;    /* 470000pF = 0.47uF */
-	dynamic_cast<filter_rc_device*>(machine().device("filter2"))->filter_rc_set_RC(FLT_RC_LOWPASS,1000,2200,1000,CAP_P(C));
+	downcast<filter_rc_device*>(machine().device("filter2"))->filter_rc_set_RC(filter_rc_device::LOWPASS,1000,2200,1000,CAP_P(C));
 
 	/* 76489 #3 */
 	C = 0;
 	if (offset & 0x100) C += 470000;    /* 470000pF = 0.47uF */
-	dynamic_cast<filter_rc_device*>(machine().device("filter3"))->filter_rc_set_RC(FLT_RC_LOWPASS,1000,2200,1000,CAP_P(C));
+	downcast<filter_rc_device*>(machine().device("filter3"))->filter_rc_set_RC(filter_rc_device::LOWPASS,1000,2200,1000,CAP_P(C));
 }
 
 WRITE8_MEMBER(tp84_state::tp84_sh_irqtrigger_w)
@@ -286,7 +286,7 @@ INTERRUPT_GEN_MEMBER(tp84_state::sub_vblank_irq)
 }
 
 
-static MACHINE_CONFIG_START( tp84, tp84_state )
+static MACHINE_CONFIG_START( tp84 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("cpu1",M6809, XTAL_18_432MHz/12) /* verified on pcb */
@@ -442,6 +442,6 @@ ROM_START( tp84b )
 ROM_END
 
 
-GAME( 1984, tp84,  0,    tp84,  tp84, driver_device, 0, ROT90, "Konami", "Time Pilot '84 (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, tp84a, tp84, tp84,  tp84a, driver_device,0, ROT90, "Konami", "Time Pilot '84 (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, tp84b, tp84, tp84b, tp84, driver_device, 0, ROT90, "Konami", "Time Pilot '84 (set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, tp84,  0,    tp84,  tp84,  tp84_state, 0, ROT90, "Konami", "Time Pilot '84 (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, tp84a, tp84, tp84,  tp84a, tp84_state, 0, ROT90, "Konami", "Time Pilot '84 (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, tp84b, tp84, tp84b, tp84,  tp84_state, 0, ROT90, "Konami", "Time Pilot '84 (set 3)", MACHINE_SUPPORTS_SAVE )

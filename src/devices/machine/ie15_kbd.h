@@ -1,29 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Sergey Svishchev
-#ifndef __IE15_KEYBOARD_H__
-#define __IE15_KEYBOARD_H__
+#ifndef MAME_MACHINE_IE15_KBD_H
+#define MAME_MACHINE_IE15_KBD_H
 
-
-#define IE_KB_ACK   1
-
-#define IE_KB_RED   0x01
-#define IE_KB_SDV   0x02
-#define IE_KB_DUP   0x08
-#define IE_KB_LIN   0x10
-#define IE_KB_DK    0x20
-#define IE_KB_PCH   0x40
-#define IE_KB_NR    0x80
-
-#define IE_KB_RED_BIT   0
-#define IE_KB_SDV_BIT   1
-#define IE_KB_DUP_BIT   3
-#define IE_KB_LIN_BIT   4
-#define IE_KB_DK_BIT    5
-#define IE_KB_PCH_BIT   6
-#define IE_KB_NR_BIT    7
-
-#define IE_KB_SI    0x0f
-#define IE_KB_SO    0x0e
+#pragma once
 
 
 /***************************************************************************
@@ -37,27 +17,53 @@
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-class ie15_keyboard_device :
-	public device_t
+class ie15_keyboard_device : public device_t
 {
 public:
-	ie15_keyboard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+	enum
+	{
+		IE_KB_ACK   = 1,
+
+		IE_KB_RED   = 0x01,
+		IE_KB_SDV   = 0x02,
+		IE_KB_DUP   = 0x08,
+		IE_KB_LIN   = 0x10,
+		IE_KB_DK    = 0x20,
+		IE_KB_PCH   = 0x40,
+		IE_KB_NR    = 0x80,
+
+		IE_KB_RED_BIT   = 0,
+		IE_KB_SDV_BIT   = 1,
+		IE_KB_DUP_BIT   = 3,
+		IE_KB_LIN_BIT   = 4,
+		IE_KB_DK_BIT    = 5,
+		IE_KB_PCH_BIT   = 6,
+		IE_KB_NR_BIT    = 7,
+
+		IE_KB_SI    = 0x0f,
+		IE_KB_SO    = 0x0e
+	};
+
+
 	ie15_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_keyboard_callback(device_t &device, _Object object) { return downcast<ie15_keyboard_device &>(device).m_keyboard_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_keyboard_callback(device_t &device, Object &&cb) { return downcast<ie15_keyboard_device &>(device).m_keyboard_cb.set_callback(std::forward<Object>(cb)); }
 
 	virtual ioport_constructor device_input_ports() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 protected:
-	required_ioport_array<4> m_io_kbd;
-	required_ioport m_io_kbdc;
+	ie15_keyboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	virtual void send_key(uint16_t code) { m_keyboard_cb((offs_t)0, code); }
+	virtual void send_key(uint16_t code) { m_keyboard_cb(offs_t(0), code); }
+
+	required_ioport_array<4> m_io_kbd;
+	required_ioport m_io_kbdc;
+
 	emu_timer *m_timer;
 
 private:
@@ -71,6 +77,6 @@ private:
 	devcb_write16 m_keyboard_cb;
 };
 
-extern const device_type IE15_KEYBOARD;
+DECLARE_DEVICE_TYPE(IE15_KEYBOARD, ie15_keyboard_device)
 
-#endif /* __IE15_KEYBOARD_H__ */
+#endif // MAME_MACHINE_IE15_KBD_H

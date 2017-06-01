@@ -237,8 +237,8 @@ void casloopy_state::video_start()
 	for(int i=0;i<0x10000;i++)
 		m_vram[i] = i & 0xff;
 
-	m_gfxdecode->set_gfx(m_gfx_index, std::make_unique<gfx_element>(*m_palette, casloopy_4bpp_layout, m_vram.get(), 0, 0x10, 0));
-	m_gfxdecode->set_gfx(m_gfx_index+1, std::make_unique<gfx_element>(*m_palette, casloopy_8bpp_layout, m_vram.get(), 0, 1, 0));
+	m_gfxdecode->set_gfx(m_gfx_index, std::make_unique<gfx_element>(m_palette, casloopy_4bpp_layout, m_vram.get(), 0, 0x10, 0));
+	m_gfxdecode->set_gfx(m_gfx_index+1, std::make_unique<gfx_element>(m_palette, casloopy_8bpp_layout, m_vram.get(), 0, 1, 0));
 }
 
 uint32_t casloopy_state::screen_update_casloopy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -502,7 +502,7 @@ DEVICE_IMAGE_LOAD_MEMBER( casloopy_state, loopy_cart )
 	return image_init_result::PASS;
 }
 
-static MACHINE_CONFIG_START( casloopy, casloopy_state )
+static MACHINE_CONFIG_START( casloopy )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",SH2A,8000000)

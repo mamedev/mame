@@ -62,6 +62,7 @@ private:
 	uint8_t m_mux_data;
 	bool m_video_wl;
 	bool m_ram_bank;
+	emu_timer *m_pio_timer;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -272,10 +273,11 @@ We preset all banks here, so that bankswitching will incur no speed penalty.
 	membank("bank1")->configure_entries(0, 2, &ram[0x00000], 0x10000);
 	membank("bank2")->configure_entry(0, &ram[0x10000]);
 
-	machine().scheduler().timer_pulse(attotime::from_hz(50), timer_expired_delegate(FUNC(pasopia_state::pio_timer),this));
+	m_pio_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pasopia_state::pio_timer), this));
+	m_pio_timer->adjust(attotime::from_hz(50), 0, attotime::from_hz(50));
 }
 
-static MACHINE_CONFIG_START( pasopia, pasopia_state )
+static MACHINE_CONFIG_START( pasopia )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(pasopia_map)
@@ -336,5 +338,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT    INIT      COMPANY      FULLNAME       FLAGS */
-COMP( 1986, pasopia, 0,      0,       pasopia,   pasopia, pasopia_state, pasopia, "Toshiba",   "Pasopia", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT    STATE          INIT     COMPANY      FULLNAME   FLAGS
+COMP( 1986, pasopia, 0,      0,       pasopia,   pasopia, pasopia_state, pasopia, "Toshiba",   "Pasopia", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

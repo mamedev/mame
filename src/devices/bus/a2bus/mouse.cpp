@@ -83,22 +83,7 @@
     GLOBAL VARIABLES
 ***************************************************************************/
 
-const device_type A2BUS_MOUSE = device_creator<a2bus_mouse_device>;
-
-static MACHINE_CONFIG_FRAGMENT( mouse )
-	MCFG_CPU_ADD(MOUSE_MCU_TAG, M68705P3, 2043600)
-	MCFG_M68705_PORTA_R_CB(READ8(a2bus_mouse_device, mcu_port_a_r))
-	MCFG_M68705_PORTB_R_CB(READ8(a2bus_mouse_device, mcu_port_b_r))
-	MCFG_M68705_PORTA_W_CB(WRITE8(a2bus_mouse_device, mcu_port_a_w))
-	MCFG_M68705_PORTB_W_CB(WRITE8(a2bus_mouse_device, mcu_port_b_w))
-	MCFG_M68705_PORTC_W_CB(WRITE8(a2bus_mouse_device, mcu_port_c_w))
-
-	MCFG_DEVICE_ADD(MOUSE_PIA_TAG, PIA6821, 1021800)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(a2bus_mouse_device, pia_out_a))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(a2bus_mouse_device, pia_out_b))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(a2bus_mouse_device, pia_irqa_w))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(a2bus_mouse_device, pia_irqb_w))
-MACHINE_CONFIG_END
+DEFINE_DEVICE_TYPE(A2BUS_MOUSE, a2bus_mouse_device, "a2mouse", "Apple II Mouse Card")
 
 ROM_START( mouse )
 	ROM_REGION(0x800, MOUSE_ROM_REGION, 0)
@@ -138,14 +123,24 @@ ioport_constructor a2bus_mouse_device::device_input_ports() const
 }
 
 /*-------------------------------------------------
-    machine_config_additions - device-specific
+    device_add_mconfig - device-specific
     machine configurations
 -------------------------------------------------*/
 
-machine_config_constructor a2bus_mouse_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME(mouse);
-}
+MACHINE_CONFIG_MEMBER(a2bus_mouse_device::device_add_mconfig)
+	MCFG_CPU_ADD(MOUSE_MCU_TAG, M68705P3, 2043600)
+	MCFG_M68705_PORTA_R_CB(READ8(a2bus_mouse_device, mcu_port_a_r))
+	MCFG_M68705_PORTB_R_CB(READ8(a2bus_mouse_device, mcu_port_b_r))
+	MCFG_M68705_PORTA_W_CB(WRITE8(a2bus_mouse_device, mcu_port_a_w))
+	MCFG_M68705_PORTB_W_CB(WRITE8(a2bus_mouse_device, mcu_port_b_w))
+	MCFG_M68705_PORTC_W_CB(WRITE8(a2bus_mouse_device, mcu_port_c_w))
+
+	MCFG_DEVICE_ADD(MOUSE_PIA_TAG, PIA6821, 1021800)
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(a2bus_mouse_device, pia_out_a))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(a2bus_mouse_device, pia_out_b))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(a2bus_mouse_device, pia_irqa_w))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(a2bus_mouse_device, pia_irqb_w))
+MACHINE_CONFIG_END
 
 /*-------------------------------------------------
     rom_region - device-specific ROM region
@@ -161,8 +156,8 @@ const tiny_rom_entry *a2bus_mouse_device::device_rom_region() const
     LIVE DEVICE
 ***************************************************************************/
 
-a2bus_mouse_device::a2bus_mouse_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+a2bus_mouse_device::a2bus_mouse_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this),
 	m_pia(*this, MOUSE_PIA_TAG),
 	m_mcu(*this, MOUSE_MCU_TAG),
@@ -175,7 +170,7 @@ a2bus_mouse_device::a2bus_mouse_device(const machine_config &mconfig, device_typ
 }
 
 a2bus_mouse_device::a2bus_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	a2bus_mouse_device(mconfig, A2BUS_MOUSE, "Apple II Mouse Card", tag, owner, clock, "a2mouse", __FILE__)
+	a2bus_mouse_device(mconfig, A2BUS_MOUSE, tag, owner, clock)
 {
 }
 

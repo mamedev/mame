@@ -1,7 +1,7 @@
 // license:LGPL-2.1+
 // copyright-holders:Michael Zapf
 /******************************************************************************
-    MESS Driver for the Myarc Geneve 9640.
+    Myarc Geneve 9640.
 
     The Geneve has two operation modes.  One is compatible with the TI-99/4a,
     the other is not.
@@ -202,18 +202,17 @@
     Rewritten 2012 by Michael Zapf
 ******************************************************************************/
 
-
 #include "emu.h"
 #include "cpu/tms9900/tms9995.h"
 #include "machine/tms9901.h"
 #include "machine/mm58274c.h"
 #include "sound/sn76496.h"
 
-#include "bus/ti99x/genboard.h"
-#include "bus/ti99x/joyport.h"
-#include "bus/ti99x/colorbus.h"
+#include "bus/ti99/internal/genboard.h"
 
-#include "bus/ti99_peb/peribox.h"
+#include "bus/ti99/colorbus/colorbus.h"
+#include "bus/ti99/joyport/joyport.h"
+#include "bus/ti99/peb/peribox.h"
 
 #include "speaker.h"
 
@@ -235,8 +234,10 @@ public:
 		m_keyboard(*this, GKEYBOARD_TAG),
 		m_mapper(*this, GMAPPER_TAG),
 		m_peribox(*this, PERIBOX_TAG),
-		m_joyport(*this,JOYPORT_TAG),
-		m_colorbus(*this, COLORBUS_TAG) { }
+		m_joyport(*this, JOYPORT_TAG),
+		m_colorbus(*this, COLORBUS_TAG)
+	{
+	}
 
 	// CRU (Communication Register Unit) handling
 	DECLARE_READ8_MEMBER(cruread);
@@ -261,11 +262,11 @@ public:
 
 	required_device<tms9995_device>         m_cpu;
 	required_device<tms9901_device>         m_tms9901;
-	required_device<geneve_keyboard_device> m_keyboard;
-	required_device<geneve_mapper_device>   m_mapper;
-	required_device<peribox_device>         m_peribox;
-	required_device<joyport_device>         m_joyport;
-	required_device<colorbus_device>        m_colorbus;
+	required_device<bus::ti99::internal::geneve_keyboard_device> m_keyboard;
+	required_device<bus::ti99::internal::geneve_mapper_device>   m_mapper;
+	required_device<bus::ti99::peb::peribox_device>         m_peribox;
+	required_device<bus::ti99::joyport::joyport_device>    m_joyport;
+	required_device<bus::ti99::colorbus::ti99_colorbus_device>   m_colorbus;
 
 	DECLARE_WRITE_LINE_MEMBER( inta );
 	DECLARE_WRITE_LINE_MEMBER( intb );
@@ -293,7 +294,7 @@ public:
 */
 
 static ADDRESS_MAP_START(memmap, AS_PROGRAM, 8, geneve_state)
-	AM_RANGE(0x0000, 0xffff) AM_DEVREADWRITE(GMAPPER_TAG, geneve_mapper_device, readm, writem) AM_DEVSETOFFSET(GMAPPER_TAG, geneve_mapper_device, setoffset)
+	AM_RANGE(0x0000, 0xffff) AM_DEVREADWRITE(GMAPPER_TAG, bus::ti99::internal::geneve_mapper_device, readm, writem) AM_DEVSETOFFSET(GMAPPER_TAG, bus::ti99::internal::geneve_mapper_device, setoffset)
 ADDRESS_MAP_END
 
 /*
@@ -316,12 +317,12 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START(geneve)
 
 	PORT_START( "MODE" )
-	PORT_CONFNAME( 0x01, 0x00, "Operating mode" ) PORT_CHANGED_MEMBER(PERIBOX_TAG, peribox_device, genmod_changed, 0)
+	PORT_CONFNAME( 0x01, 0x00, "Operating mode" ) PORT_CHANGED_MEMBER(PERIBOX_TAG, bus::ti99::peb::peribox_device, genmod_changed, 0)
 		PORT_CONFSETTING(    0x00, "Standard" )
 		PORT_CONFSETTING(    GENMOD, "GenMod" )
 
 	PORT_START( "BOOTROM" )
-	PORT_CONFNAME( 0x03, GENEVE_098, "Boot ROM" ) PORT_CHANGED_MEMBER(GMAPPER_TAG, geneve_mapper_device, settings_changed, 3)
+	PORT_CONFNAME( 0x03, GENEVE_098, "Boot ROM" ) PORT_CHANGED_MEMBER(GMAPPER_TAG, bus::ti99::internal::geneve_mapper_device, settings_changed, 3)
 		PORT_CONFSETTING( GENEVE_098, "Version 0.98" )
 		PORT_CONFSETTING( GENEVE_100, "Version 1.00" )
 		PORT_CONFSETTING( GENEVE_PFM512, "PFM 512" )
@@ -334,10 +335,10 @@ static INPUT_PORTS_START(geneve)
 		PORT_CONFSETTING( 0x02, "384 KiB" )
 
 	PORT_START( "GENMODDIPS" )
-	PORT_DIPNAME( GM_TURBO, 0x00, "Genmod Turbo mode") PORT_CONDITION( "MODE", 0x01, EQUALS, GENMOD ) PORT_CHANGED_MEMBER(GMAPPER_TAG, geneve_mapper_device, settings_changed, 1)
+	PORT_DIPNAME( GM_TURBO, 0x00, "Genmod Turbo mode") PORT_CONDITION( "MODE", 0x01, EQUALS, GENMOD ) PORT_CHANGED_MEMBER(GMAPPER_TAG, bus::ti99::internal::geneve_mapper_device, settings_changed, 1)
 		PORT_CONFSETTING( 0x00, DEF_STR( Off ))
 		PORT_CONFSETTING( GM_TURBO, DEF_STR( On ))
-	PORT_DIPNAME( GM_TIM, GM_TIM, "Genmod TI mode") PORT_CONDITION( "MODE", 0x01, EQUALS, GENMOD ) PORT_CHANGED_MEMBER(GMAPPER_TAG, geneve_mapper_device, settings_changed, 2)
+	PORT_DIPNAME( GM_TIM, GM_TIM, "Genmod TI mode") PORT_CONDITION( "MODE", 0x01, EQUALS, GENMOD ) PORT_CHANGED_MEMBER(GMAPPER_TAG, bus::ti99::internal::geneve_mapper_device, settings_changed, 2)
 		PORT_CONFSETTING( 0x00, DEF_STR( Off ))
 		PORT_CONFSETTING( GM_TIM, DEF_STR( On ))
 
@@ -452,7 +453,7 @@ READ8_MEMBER( geneve_state::read_by_9901 )
 
 	switch (offset & 0x03)
 	{
-	case TMS9901_CB_INT7:
+	case tms9901_device::CB_INT7:
 		//
 		// Read pins INT3*-INT7* of Geneve's 9901.
 		// bit 1: INTA status
@@ -466,7 +467,7 @@ READ8_MEMBER( geneve_state::read_by_9901 )
 		answer |= m_joyport->read_port()<<3;
 		break;
 
-	case TMS9901_INT8_INT15:
+	case tms9901_device::INT8_INT15:
 		// Read pins int8_t*-INT15* of Geneve 9901.
 		//
 		// bit 0: keyboard interrupt
@@ -485,11 +486,11 @@ READ8_MEMBER( geneve_state::read_by_9901 )
 		if (TRACE_LINES) logerror("INT15-8 = %02x\n", answer);
 		break;
 
-	case TMS9901_P0_P7:
+	case tms9901_device::P0_P7:
 		// Read pins P0-P7 of TMS9901. All pins are configured as outputs, so nothing here.
 		break;
 
-	case TMS9901_P8_P15:
+	case tms9901_device::P8_P15:
 		// Read pins P8-P15 of TMS 9901.
 		// bit 4: mouse left button
 		// video wait is an output; no input possible here
@@ -682,7 +683,7 @@ void geneve_state::machine_reset()
 	m_joyport->write_port(0x01);    // select Joystick 1
 }
 
-static MACHINE_CONFIG_START( geneve_60hz, geneve_state )
+static MACHINE_CONFIG_START( geneve_60hz )
 	// basic machine hardware
 	// TMS9995 CPU @ 12.0 MHz
 	MCFG_TMS99xx_ADD("maincpu", TMS9995, 12000000, memmap, crumap)
@@ -701,12 +702,12 @@ static MACHINE_CONFIG_START( geneve_60hz, geneve_state )
 	MCFG_TMS9901_P0_HANDLER( WRITELINE( geneve_state, peripheral_bus_reset) )
 	MCFG_TMS9901_P1_HANDLER( WRITELINE( geneve_state, VDP_reset) )
 	MCFG_TMS9901_P2_HANDLER( WRITELINE( geneve_state, joystick_select) )
-	MCFG_TMS9901_P4_HANDLER( DEVWRITELINE( GMAPPER_TAG, geneve_mapper_device, pfm_select_lsb) )  // new for PFM
-	MCFG_TMS9901_P5_HANDLER( DEVWRITELINE( GMAPPER_TAG, geneve_mapper_device, pfm_output_enable) )  // new for PFM
-	MCFG_TMS9901_P6_HANDLER( DEVWRITELINE( GKEYBOARD_TAG, geneve_keyboard_device, reset_line) )
+	MCFG_TMS9901_P4_HANDLER( DEVWRITELINE( GMAPPER_TAG, bus::ti99::internal::geneve_mapper_device, pfm_select_lsb) )  // new for PFM
+	MCFG_TMS9901_P5_HANDLER( DEVWRITELINE( GMAPPER_TAG, bus::ti99::internal::geneve_mapper_device, pfm_output_enable) )  // new for PFM
+	MCFG_TMS9901_P6_HANDLER( DEVWRITELINE( GKEYBOARD_TAG, bus::ti99::internal::geneve_keyboard_device, reset_line) )
 	MCFG_TMS9901_P7_HANDLER( WRITELINE( geneve_state, extbus_wait_states) )
 	MCFG_TMS9901_P9_HANDLER( WRITELINE( geneve_state, video_wait_states) )
-	MCFG_TMS9901_P13_HANDLER( DEVWRITELINE( GMAPPER_TAG, geneve_mapper_device, pfm_select_msb) )   // new for PFM
+	MCFG_TMS9901_P13_HANDLER( DEVWRITELINE( GMAPPER_TAG, bus::ti99::internal::geneve_mapper_device, pfm_select_msb) )   // new for PFM
 	MCFG_TMS9901_INTLEVEL_HANDLER( WRITE8( geneve_state, tms9901_interrupt) )
 
 	// Mapper
@@ -719,7 +720,7 @@ static MACHINE_CONFIG_START( geneve_60hz, geneve_state )
 	MCFG_MM58274C_DAY1(0)   // sunday
 
 	// Peripheral expansion box (Geneve composition)
-	MCFG_DEVICE_ADD( PERIBOX_TAG, PERIBOX_GEN, 0)
+	MCFG_DEVICE_ADD( PERIBOX_TAG, TI99_PERIBOX_GEN, 0)
 	MCFG_PERIBOX_INTA_HANDLER( WRITELINE(geneve_state, inta) )
 	MCFG_PERIBOX_INTB_HANDLER( WRITELINE(geneve_state, intb) )
 	MCFG_PERIBOX_READY_HANDLER( WRITELINE(geneve_state, ext_ready) )
@@ -764,5 +765,5 @@ ROM_START(geneve)
 	ROM_LOAD_OPTIONAL("gnmbt100.bin", 0x8000, 0x4000, CRC(19b89479) SHA1(6ef297eda78dc705946f6494e9d7e95e5216ec47)) /* CPU ROMs GenMod */
 ROM_END
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE      INPUT    INIT       COMPANY     FULLNAME */
-COMP( 1987,geneve,   0,     0,      geneve_60hz,  geneve, geneve_state,  geneve,        "Myarc",    "Geneve 9640" , MACHINE_SUPPORTS_SAVE)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE      INPUT   STATE         INIT    COMPANY  FULLNAME       FLAGS
+COMP( 1987, geneve, 0,      0,      geneve_60hz, geneve, geneve_state, geneve, "Myarc", "Geneve 9640", MACHINE_SUPPORTS_SAVE)

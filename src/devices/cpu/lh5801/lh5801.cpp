@@ -15,13 +15,14 @@
  *****************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
-
 #include "lh5801.h"
+
+#include "debugger.h"
 
 #define VERBOSE 0
 
-#define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
+#include "logmacro.h"
+
 
 enum
 {
@@ -62,11 +63,11 @@ enum
 #define H 0x10
 
 
-const device_type LH5801 = device_creator<lh5801_cpu_device>;
+DEFINE_DEVICE_TYPE(LH5801, lh5801_cpu_device, "lh5801", "LH5801")
 
 
 lh5801_cpu_device::lh5801_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, LH5801, "LH5801", tag, owner, clock, "lh5801", __FILE__)
+	: cpu_device(mconfig, LH5801, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 16, 0)
 	, m_in_func(*this)

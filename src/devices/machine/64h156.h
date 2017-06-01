@@ -54,10 +54,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_64H156_H
+#define MAME_MACHINE_64H156_H
 
-#ifndef __C64H156__
-#define __C64H156__
+#pragma once
 
 #include "imagedev/floppy.h"
 #include "formats/d64_dsk.h"
@@ -93,9 +93,9 @@ public:
 	// construction/destruction
 	c64h156_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_atn_wr_callback(device_t &device, _Object object) { return downcast<c64h156_device &>(device).m_write_atn.set_callback(object); }
-	template<class _Object> static devcb_base &set_sync_wr_callback(device_t &device, _Object object) { return downcast<c64h156_device &>(device).m_write_sync.set_callback(object); }
-	template<class _Object> static devcb_base &set_byte_wr_callback(device_t &device, _Object object) { return downcast<c64h156_device &>(device).m_write_byte.set_callback(object); }
+	template <class Object> static devcb_base &set_atn_wr_callback(device_t &device, Object &&cb) { return downcast<c64h156_device &>(device).m_write_atn.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_sync_wr_callback(device_t &device, Object &&cb) { return downcast<c64h156_device &>(device).m_write_sync.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_byte_wr_callback(device_t &device, Object &&cb) { return downcast<c64h156_device &>(device).m_write_byte.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( yb_r );
 	DECLARE_WRITE8_MEMBER( yb_w );
@@ -196,10 +196,7 @@ private:
 };
 
 
-
 // device type definition
-extern const device_type C64H156;
+DECLARE_DEVICE_TYPE(C64H156, c64h156_device)
 
-
-
-#endif
+#endif // MAME_MACHINE_64H156_H

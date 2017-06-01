@@ -66,10 +66,10 @@ static inline s32 normalize_yscroll(const bitmap_t &bitmap, s32 yscroll)
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type GFXDECODE = device_creator<gfxdecode_device>;
+DEFINE_DEVICE_TYPE(GFXDECODE, gfxdecode_device, "gfxdecode", "gfxdecode")
 
 gfxdecode_device::gfxdecode_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	device_t(mconfig, GFXDECODE, "gfxdecode", tag, owner, clock, "gfxdecode", __FILE__),
+	device_t(mconfig, GFXDECODE, tag, owner, clock),
 	device_gfx_interface(mconfig, *this)
 {
 }
@@ -86,8 +86,8 @@ gfxdecode_device::gfxdecode_device(const machine_config &mconfig, const char *ta
 //  gfx_element - constructor
 //-------------------------------------------------
 
-gfx_element::gfx_element(device_palette_interface &palette, u8 *base, u16 width, u16 height, u32 rowbytes, u32 total_colors, u32 color_base, u32 color_granularity)
-	: m_palette(&palette),
+gfx_element::gfx_element(device_palette_interface *palette, u8 *base, u16 width, u16 height, u32 rowbytes, u32 total_colors, u32 color_base, u32 color_granularity)
+	: m_palette(palette),
 		m_width(width),
 		m_height(height),
 		m_startx(0),
@@ -111,8 +111,8 @@ gfx_element::gfx_element(device_palette_interface &palette, u8 *base, u16 width,
 {
 }
 
-gfx_element::gfx_element(device_palette_interface &palette, const gfx_layout &gl, const u8 *srcdata, u32 xormask, u32 total_colors, u32 color_base)
-	: m_palette(&palette),
+gfx_element::gfx_element(device_palette_interface *palette, const gfx_layout &gl, const u8 *srcdata, u32 xormask, u32 total_colors, u32 color_base)
+	: m_palette(palette),
 		m_width(0),
 		m_height(0),
 		m_startx(0),

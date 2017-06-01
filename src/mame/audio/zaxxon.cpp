@@ -92,7 +92,7 @@ static const char *const zaxxon_sample_names[] =
 };
 
 
-MACHINE_CONFIG_FRAGMENT( zaxxon_samples )
+MACHINE_CONFIG_START( zaxxon_samples )
 	MCFG_SOUND_ADD("samples", SAMPLES, 0)
 	MCFG_SAMPLES_CHANNELS(12)
 	MCFG_SAMPLES_NAMES(zaxxon_sample_names)
@@ -192,7 +192,7 @@ static const char *const congo_sample_names[] =
 };
 
 
-MACHINE_CONFIG_FRAGMENT( congo_samples )
+MACHINE_CONFIG_START( congo_samples )
 	MCFG_SOUND_ADD("samples", SAMPLES, 0)
 	MCFG_SAMPLES_CHANNELS(5)
 	MCFG_SAMPLES_NAMES(congo_sample_names)

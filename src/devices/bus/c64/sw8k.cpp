@@ -38,7 +38,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_SW8K = device_creator<c64_switchable_8k_cartridge_device>;
+DEFINE_DEVICE_TYPE(C64_SW8K, c64_switchable_8k_cartridge_device, "c64_sw8k", "C64 Switchable 8K cartridge")
 
 
 //-------------------------------------------------
@@ -73,7 +73,7 @@ ioport_constructor c64_switchable_8k_cartridge_device::device_input_ports() cons
 //-------------------------------------------------
 
 c64_switchable_8k_cartridge_device::c64_switchable_8k_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, C64_SW8K, "C64 Switchable 8K cartridge", tag, owner, clock, "c64_sw8k", __FILE__),
+	device_t(mconfig, C64_SW8K, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_sw(*this, "SW"), m_bank(0)
 {

@@ -18,19 +18,18 @@
 #include "s2650cpu.h"
 
 /* define this to have some interrupt information logged */
-#define VERBOSE 0
-
-#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
+//#define VERBOSE 1
+#include "logmacro.h"
 
 /* define this to expand all EA calculations inline */
 #define INLINE_EA   1
 
 
-const device_type S2650 = device_creator<s2650_device>;
+DEFINE_DEVICE_TYPE(S2650, s2650_device, "s2650", "S2650")
 
 
 s2650_device::s2650_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, S2650, "S2650", tag, owner, clock, "s2650", __FILE__ )
+	: cpu_device(mconfig, S2650, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 15)
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 9)
 	, m_flag_handler(*this), m_intack_handler(*this)
@@ -197,7 +196,7 @@ inline int s2650_device::check_irq_line()
 				if (!(++addr & PMSK)) addr -= PLEN;
 				m_ea = (m_ea + RDMEM(addr)) & AMSK;
 			}
-			LOG(("S2650 interrupt to $%04x\n", m_ea));
+			LOG("S2650 interrupt to $%04x\n", m_ea);
 			set_sp(get_sp() + 1);
 			set_psu(m_psu | II);
 			m_ras[get_sp()] = m_page + m_iar;

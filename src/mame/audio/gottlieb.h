@@ -18,10 +18,10 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-extern const device_type GOTTLIEB_SOUND_REV0;
-extern const device_type GOTTLIEB_SOUND_REV1;
-extern const device_type GOTTLIEB_SOUND_REV1_WITH_VOTRAX;
-extern const device_type GOTTLIEB_SOUND_REV2;
+DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_REV0,        gottlieb_sound_r0_device)
+DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_REV1,        gottlieb_sound_r1_device)
+DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_REV1_VOTRAX, gottlieb_sound_r1_with_votrax_device)
+DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_REV2,        gottlieb_sound_r2_device)
 
 
 
@@ -50,12 +50,11 @@ public:
 	DECLARE_WRITE8_MEMBER( write );
 
 	// internal communications
-	DECLARE_READ8_MEMBER( r6530b_r );
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
 
 protected:
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;
 
@@ -65,6 +64,8 @@ private:
 	required_device<mos6530_device>     m_r6530;
 
 	uint8_t m_sndcmd;
+
+	DECLARE_READ8_MEMBER( r6530b_r );
 };
 
 // ======================> gottlieb_sound_r1_device
@@ -80,8 +81,6 @@ public:
 	DECLARE_WRITE8_MEMBER( write );
 
 	// internal communications
-	DECLARE_WRITE_LINE_MEMBER( snd_interrupt );
-	DECLARE_WRITE8_MEMBER( r6532_portb_w );
 	DECLARE_WRITE8_MEMBER( votrax_data_w );
 	DECLARE_WRITE8_MEMBER( speech_clock_dac_w );
 	DECLARE_WRITE_LINE_MEMBER( votrax_request );
@@ -90,15 +89,12 @@ protected:
 	gottlieb_sound_r1_device(
 			const machine_config &mconfig,
 			device_type type,
-			const char *name,
 			const char *tag,
 			device_t *owner,
-			uint32_t clock,
-			const char *shortname,
-			const char *source);
+			uint32_t clock);
 
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;
 
@@ -111,6 +107,9 @@ private:
 	// internal state
 	//bool            m_populate_votrax;
 	uint8_t           m_last_speech_clock;
+
+	DECLARE_WRITE_LINE_MEMBER( snd_interrupt );
+	DECLARE_WRITE8_MEMBER( r6532_portb_w );
 };
 
 // fully populated rev 1 sound board
@@ -122,7 +121,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 };
 
@@ -154,7 +153,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;

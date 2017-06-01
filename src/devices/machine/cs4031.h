@@ -20,10 +20,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_CS4031_H
+#define MAME_MACHINE_CS4031_H
 
-#ifndef __CS4031_H__
-#define __CS4031_H__
+#pragma once
 
 #include "machine/am9517a.h"
 #include "machine/pic8259.h"
@@ -83,54 +83,16 @@ public:
 	// construction/destruction
 	cs4031_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
 	// callbacks
-	template<class _ior> devcb_base &set_ior_callback(_ior ior) { return m_read_ior.set_callback(ior); }
-	template<class _iow> devcb_base &set_iow_callback(_iow iow) { return m_write_iow.set_callback(iow); }
-	template<class _tc> devcb_base &set_tc_callback(_tc tc) { return m_write_tc.set_callback(tc); }
-	template<class _hold> devcb_base &set_hold_callback(_hold hold) { return m_write_hold.set_callback(hold); }
-	template<class _cpureset> devcb_base &set_cpureset_callback(_cpureset cpureset) { return m_write_cpureset.set_callback(cpureset); }
-	template<class _nmi> devcb_base &set_nmi_callback(_nmi nmi) { return m_write_nmi.set_callback(nmi); }
-	template<class _intr> devcb_base &set_intr_callback(_intr intr) { return m_write_intr.set_callback(intr); }
-	template<class _a20m> devcb_base &set_a20m_callback(_a20m a20m) { return m_write_a20m.set_callback(a20m); }
-	template<class _spkr> devcb_base &set_spkr_callback(_spkr spkr) { return m_write_spkr.set_callback(spkr); }
-
-	// not really public
-	DECLARE_READ8_MEMBER( dma_read_byte );
-	DECLARE_WRITE8_MEMBER( dma_write_byte );
-	DECLARE_READ8_MEMBER( dma_read_word );
-	DECLARE_WRITE8_MEMBER( dma_write_word );
-	DECLARE_WRITE_LINE_MEMBER( dma1_eop_w );
-	DECLARE_READ8_MEMBER( dma1_ior0_r ) { return m_read_ior(0); }
-	DECLARE_READ8_MEMBER( dma1_ior1_r ) { return m_read_ior(1); }
-	DECLARE_READ8_MEMBER( dma1_ior2_r ) { return m_read_ior(2); }
-	DECLARE_READ8_MEMBER( dma1_ior3_r ) { return m_read_ior(3); }
-	DECLARE_READ8_MEMBER( dma2_ior1_r ) { uint16_t result = m_read_ior(5); m_dma_high_byte = result >> 8; return result; }
-	DECLARE_READ8_MEMBER( dma2_ior2_r ) { uint16_t result = m_read_ior(6); m_dma_high_byte = result >> 8; return result; }
-	DECLARE_READ8_MEMBER( dma2_ior3_r ) { uint16_t result = m_read_ior(7); m_dma_high_byte = result >> 8; return result; }
-	DECLARE_WRITE8_MEMBER( dma1_iow0_w ) { m_write_iow(0, data, 0xffff); }
-	DECLARE_WRITE8_MEMBER( dma1_iow1_w ) { m_write_iow(1, data, 0xffff); }
-	DECLARE_WRITE8_MEMBER( dma1_iow2_w ) { m_write_iow(2, data, 0xffff); }
-	DECLARE_WRITE8_MEMBER( dma1_iow3_w ) { m_write_iow(3, data, 0xffff); }
-	DECLARE_WRITE8_MEMBER( dma2_iow1_w ) { m_write_iow(5, (m_dma_high_byte << 8) | data, 0xffff); }
-	DECLARE_WRITE8_MEMBER( dma2_iow2_w ) { m_write_iow(6, (m_dma_high_byte << 8) | data, 0xffff); }
-	DECLARE_WRITE8_MEMBER( dma2_iow3_w ) { m_write_iow(7, (m_dma_high_byte << 8) | data, 0xffff); }
-	DECLARE_WRITE_LINE_MEMBER( dma1_dack0_w ) { set_dma_channel(0, state); }
-	DECLARE_WRITE_LINE_MEMBER( dma1_dack1_w ) { set_dma_channel(1, state); }
-	DECLARE_WRITE_LINE_MEMBER( dma1_dack2_w ) { set_dma_channel(2, state); }
-	DECLARE_WRITE_LINE_MEMBER( dma1_dack3_w ) { set_dma_channel(3, state); }
-	DECLARE_WRITE_LINE_MEMBER( dma2_dack0_w );
-	DECLARE_WRITE_LINE_MEMBER( dma2_dack1_w ) { set_dma_channel(5, state); }
-	DECLARE_WRITE_LINE_MEMBER( dma2_dack2_w ) { set_dma_channel(6, state); }
-	DECLARE_WRITE_LINE_MEMBER( dma2_dack3_w ) { set_dma_channel(7, state); }
-	DECLARE_WRITE_LINE_MEMBER( dma2_hreq_w ) { m_write_hold(state); }
-	DECLARE_WRITE_LINE_MEMBER( intc1_int_w ) { m_write_intr(state); }
-	DECLARE_READ8_MEMBER( intc1_slave_ack_r );
-	DECLARE_WRITE_LINE_MEMBER( ctc_out1_w );
-	DECLARE_WRITE_LINE_MEMBER( ctc_out2_w );
-	DECLARE_WRITE_LINE_MEMBER( rtc_irq_w );
+	template <class Obj> devcb_base &set_ior_callback(Obj &&ior) { return m_read_ior.set_callback(std::forward<Obj>(ior)); }
+	template <class Obj> devcb_base &set_iow_callback(Obj &&iow) { return m_write_iow.set_callback(std::forward<Obj>(iow)); }
+	template <class Obj> devcb_base &set_tc_callback(Obj &&tc) { return m_write_tc.set_callback(std::forward<Obj>(tc)); }
+	template <class Obj> devcb_base &set_hold_callback(Obj &&hold) { return m_write_hold.set_callback(std::forward<Obj>(hold)); }
+	template <class Obj> devcb_base &set_cpureset_callback(Obj &&cpureset) { return m_write_cpureset.set_callback(std::forward<Obj>(cpureset)); }
+	template <class Obj> devcb_base &set_nmi_callback(Obj &&nmi) { return m_write_nmi.set_callback(std::forward<Obj>(nmi)); }
+	template <class Obj> devcb_base &set_intr_callback(Obj &&intr) { return m_write_intr.set_callback(std::forward<Obj>(intr)); }
+	template <class Obj> devcb_base &set_a20m_callback(Obj &&a20m) { return m_write_a20m.set_callback(std::forward<Obj>(a20m)); }
+	template <class Obj> devcb_base &set_spkr_callback(Obj &&spkr) { return m_write_spkr.set_callback(std::forward<Obj>(spkr)); }
 
 	// internal io
 	DECLARE_WRITE8_MEMBER( config_address_w );
@@ -190,6 +152,8 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_reset_after_children() override;
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	devcb_read16 m_read_ior;
@@ -260,7 +224,7 @@ private:
 	bool m_keybc_data_blocked;
 
 	// chipset configuration
-	static const char* m_register_names[];
+	static const char* const m_register_names[];
 	static const float m_dma_clock_divider[];
 
 	enum
@@ -279,11 +243,44 @@ private:
 	bool m_address_valid;
 
 	uint8_t m_registers[0x20];
+
+	DECLARE_READ8_MEMBER( dma_read_byte );
+	DECLARE_WRITE8_MEMBER( dma_write_byte );
+	DECLARE_READ8_MEMBER( dma_read_word );
+	DECLARE_WRITE8_MEMBER( dma_write_word );
+	DECLARE_WRITE_LINE_MEMBER( dma1_eop_w );
+	DECLARE_READ8_MEMBER( dma1_ior0_r ) { return m_read_ior(0); }
+	DECLARE_READ8_MEMBER( dma1_ior1_r ) { return m_read_ior(1); }
+	DECLARE_READ8_MEMBER( dma1_ior2_r ) { return m_read_ior(2); }
+	DECLARE_READ8_MEMBER( dma1_ior3_r ) { return m_read_ior(3); }
+	DECLARE_READ8_MEMBER( dma2_ior1_r ) { uint16_t const result = m_read_ior(5); m_dma_high_byte = result >> 8; return result; }
+	DECLARE_READ8_MEMBER( dma2_ior2_r ) { uint16_t const result = m_read_ior(6); m_dma_high_byte = result >> 8; return result; }
+	DECLARE_READ8_MEMBER( dma2_ior3_r ) { uint16_t const result = m_read_ior(7); m_dma_high_byte = result >> 8; return result; }
+	DECLARE_WRITE8_MEMBER( dma1_iow0_w ) { m_write_iow(0, data, 0xffff); }
+	DECLARE_WRITE8_MEMBER( dma1_iow1_w ) { m_write_iow(1, data, 0xffff); }
+	DECLARE_WRITE8_MEMBER( dma1_iow2_w ) { m_write_iow(2, data, 0xffff); }
+	DECLARE_WRITE8_MEMBER( dma1_iow3_w ) { m_write_iow(3, data, 0xffff); }
+	DECLARE_WRITE8_MEMBER( dma2_iow1_w ) { m_write_iow(5, (m_dma_high_byte << 8) | data, 0xffff); }
+	DECLARE_WRITE8_MEMBER( dma2_iow2_w ) { m_write_iow(6, (m_dma_high_byte << 8) | data, 0xffff); }
+	DECLARE_WRITE8_MEMBER( dma2_iow3_w ) { m_write_iow(7, (m_dma_high_byte << 8) | data, 0xffff); }
+	DECLARE_WRITE_LINE_MEMBER( dma1_dack0_w ) { set_dma_channel(0, state); }
+	DECLARE_WRITE_LINE_MEMBER( dma1_dack1_w ) { set_dma_channel(1, state); }
+	DECLARE_WRITE_LINE_MEMBER( dma1_dack2_w ) { set_dma_channel(2, state); }
+	DECLARE_WRITE_LINE_MEMBER( dma1_dack3_w ) { set_dma_channel(3, state); }
+	DECLARE_WRITE_LINE_MEMBER( dma2_dack0_w );
+	DECLARE_WRITE_LINE_MEMBER( dma2_dack1_w ) { set_dma_channel(5, state); }
+	DECLARE_WRITE_LINE_MEMBER( dma2_dack2_w ) { set_dma_channel(6, state); }
+	DECLARE_WRITE_LINE_MEMBER( dma2_dack3_w ) { set_dma_channel(7, state); }
+	DECLARE_WRITE_LINE_MEMBER( dma2_hreq_w ) { m_write_hold(state); }
+	DECLARE_WRITE_LINE_MEMBER( intc1_int_w ) { m_write_intr(state); }
+	DECLARE_READ8_MEMBER( intc1_slave_ack_r );
+	DECLARE_WRITE_LINE_MEMBER( ctc_out1_w );
+	DECLARE_WRITE_LINE_MEMBER( ctc_out2_w );
+	DECLARE_WRITE_LINE_MEMBER( rtc_irq_w );
 };
 
 
 // device type definition
-extern const device_type CS4031;
+DECLARE_DEVICE_TYPE(CS4031, cs4031_device)
 
-
-#endif  /* __CS4031_H__ */
+#endif // MAME_MACHINE_CS4031_H

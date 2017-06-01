@@ -789,7 +789,7 @@ MACHINE_RESET_MEMBER(sat_console_state,saturn)
 }
 
 
-static MACHINE_CONFIG_START( saturn, sat_console_state )
+static MACHINE_CONFIG_START( saturn )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH2, MASTER_CLOCK_352/2) // 28.6364 MHz
@@ -992,7 +992,7 @@ ROM_START(hisaturn)
 	ROM_COPY( "maincpu",0x000000,0,0x080000)
 ROM_END
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE INPUT   INIT        COMPANY     FULLNAME            FLAGS */
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE   INPUT   STATE              INIT        COMPANY     FULLNAME            FLAGS */
 CONS( 1994, saturn,     0,      0,      saturnus, saturn, sat_console_state, saturnus,   "Sega",     "Saturn (USA)",     MACHINE_NOT_WORKING )
 CONS( 1994, saturnjp,   saturn, 0,      saturnjp, saturn, sat_console_state, saturnjp,   "Sega",     "Saturn (Japan)",   MACHINE_NOT_WORKING )
 CONS( 1994, saturneu,   saturn, 0,      saturneu, saturn, sat_console_state, saturneu,   "Sega",     "Saturn (PAL)",     MACHINE_NOT_WORKING )

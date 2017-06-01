@@ -8,10 +8,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_IDEHD_H
+#define MAME_MACHINE_IDEHD_H
 
-#ifndef __IDEHD_H__
-#define __IDEHD_H__
+#pragma once
 
 #include "atahle.h"
 #include "harddisk.h"
@@ -20,8 +20,6 @@
 class ata_mass_storage_device : public ata_hle_device
 {
 public:
-	ata_mass_storage_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock,const char *shortname, const char *source);
-
 	uint16_t *identify_device_buffer() { return m_identify_buffer; }
 
 	void set_master_password(const uint8_t *password)
@@ -37,6 +35,8 @@ public:
 	}
 
 protected:
+	ata_mass_storage_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_start() override;
 
 	virtual int read_sector(uint32_t lba, void *buffer) = 0;
@@ -88,9 +88,10 @@ class ide_hdd_device : public ata_mass_storage_device
 public:
 	// construction/destruction
 	ide_hdd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	ide_hdd_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 protected:
+	ide_hdd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -98,8 +99,8 @@ protected:
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	virtual int read_sector(uint32_t lba, void *buffer) override { if (m_disk == nullptr) return 0; return hard_disk_read(m_disk, lba, buffer); }
-	virtual int write_sector(uint32_t lba, const void *buffer) override { if (m_disk == nullptr) return 0; return hard_disk_write(m_disk, lba, buffer); }
+	virtual int read_sector(uint32_t lba, void *buffer) override { return !m_disk ? 0 : hard_disk_read(m_disk, lba, buffer); }
+	virtual int write_sector(uint32_t lba, const void *buffer) override { return !m_disk ? 0 : hard_disk_write(m_disk, lba, buffer); }
 	virtual uint8_t calculate_status() override;
 
 	chd_file       *m_handle;
@@ -117,6 +118,6 @@ private:
 };
 
 // device type definition
-extern const device_type IDE_HARDDISK;
+DECLARE_DEVICE_TYPE(IDE_HARDDISK, ide_hdd_device)
 
-#endif
+#endif // MAME_MACHINE_IDEHD_H

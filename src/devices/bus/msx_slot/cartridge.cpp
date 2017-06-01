@@ -29,23 +29,18 @@ enum
 };
 
 
-const device_type MSX_SLOT_CARTRIDGE = device_creator<msx_slot_cartridge_device>;
-const device_type MSX_SLOT_YAMAHA_EXPANSION = device_creator<msx_slot_yamaha_expansion_device>;
+DEFINE_DEVICE_TYPE(MSX_SLOT_CARTRIDGE,        msx_slot_cartridge_device,        "msx_slot_cartridge",        "MSX Cartridge slot")
+DEFINE_DEVICE_TYPE(MSX_SLOT_YAMAHA_EXPANSION, msx_slot_yamaha_expansion_device, "msx_slot_yamaha_expansion", "MSX Yamaha Expansion slot")
 
 
 msx_slot_cartridge_device::msx_slot_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MSX_SLOT_CARTRIDGE, "MSX Cartridge slot", tag, owner, clock, "msx_slot_cartridge", __FILE__)
-	, device_image_interface(mconfig, *this)
-	, device_slot_interface(mconfig, *this)
-	, msx_internal_slot_interface()
-	, m_irq_handler(*this)
-	, m_cartridge(nullptr)
+	: msx_slot_cartridge_device(mconfig, MSX_SLOT_CARTRIDGE, tag, owner, clock)
 {
 }
 
 
-msx_slot_cartridge_device::msx_slot_cartridge_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+msx_slot_cartridge_device::msx_slot_cartridge_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, device_image_interface(mconfig, *this)
 	, device_slot_interface(mconfig, *this)
 	, msx_internal_slot_interface()
@@ -358,7 +353,7 @@ WRITE8_MEMBER(msx_slot_cartridge_device::write)
 
 
 msx_slot_yamaha_expansion_device::msx_slot_yamaha_expansion_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: msx_slot_cartridge_device(mconfig, MSX_SLOT_YAMAHA_EXPANSION, "MSX Yamaha Expansion slot", tag, owner, clock, "msx_slot_yamaha_expansion", __FILE__)
+	: msx_slot_cartridge_device(mconfig, MSX_SLOT_YAMAHA_EXPANSION, tag, owner, clock)
 {
 }
 

@@ -17,21 +17,29 @@
   - *SM531: x
   - *KB1013VK1-2: Soviet-era clone of SM500, minor differences
 
+  Sharp SM590 MCU family:
+  - *SM590: 512x8 ROM, 32x4 RAM
+  - *SM591: 1kx8 ROM, 56x4 RAM
+  - *SM595: 768x8 ROM, 32x4 RAM
+
   References:
   - 1990 Sharp Microcomputers Data Book
   - 1996 Sharp Microcomputer Databook
   - KB1013VK1-2/KB1013VK4-2 manual
 
   TODO:
+  - finish SM500 emulation (gen.1 Game & Watch)
+  - finish SM590/SM595 emulation (NES/SNES CIC)
   - proper support for LFSR program counter in debugger
   - callback for lcd screen as MAME bitmap (when needed)
   - LCD bs pin blink mode via Y register (0.5s off, 0.5s on)
+  - wake up after CEND doesn't work right
   - SM510 buzzer control divider bit is mask-programmable?
   - SM511 undocumented/guessed opcodes:
     * $01 is guessed as DIV to ACC transfer, unknown which bits
     * $5d is certainly CEND
     * $65 is certainly divider reset, but not sure if it behaves same as on SM510
-    * $6036 may be instruction timing? (16KHz vs 8KHz)
+    * $6036 and $6037 may be instruction timing? (16kHz and 8kHz), mnemonics unknown
 
 */
 
@@ -46,7 +54,7 @@
 
 enum
 {
-	SM510_PC=1, SM510_ACC, SM510_BL, SM510_BM,
+	SM510_PC=1, SM510_ACC, SM510_X, SM510_BL, SM510_BM,
 	SM510_C, SM510_W
 };
 
@@ -69,7 +77,7 @@ void sm510_base_device::device_start()
 	m_write_segbs.resolve_safe();
 	m_write_segc.resolve_safe();
 
-	// zerofill
+	// init/zerofill
 	memset(m_stack, 0, sizeof(m_stack));
 	m_pc = 0;
 	m_prev_pc = 0;
@@ -99,6 +107,7 @@ void sm510_base_device::device_start()
 	m_melody_duty_count = 0;
 	m_melody_duty_index = 0;
 	m_melody_address = 0;
+	m_clk_div = 2; // 16kHz
 
 	// register for savestates
 	save_item(NAME(m_stack));
@@ -130,10 +139,12 @@ void sm510_base_device::device_start()
 	save_item(NAME(m_melody_duty_count));
 	save_item(NAME(m_melody_duty_index));
 	save_item(NAME(m_melody_address));
+	save_item(NAME(m_clk_div));
 
 	// register state for debugger
 	state_add(SM510_PC,  "PC",  m_pc).formatstr("%04X");
 	state_add(SM510_ACC, "ACC", m_acc).formatstr("%01X");
+	state_add(SM510_X,   "X",   m_x).formatstr("%01X");
 	state_add(SM510_BL,  "BL",  m_bl).formatstr("%01X");
 	state_add(SM510_BM,  "BM",  m_bm).formatstr("%01X");
 	state_add(SM510_C,   "C",   m_c).formatstr("%01X");
@@ -174,7 +185,6 @@ void sm510_base_device::device_reset()
 
 	m_r = m_r_out = 0;
 	m_write_r(0, 0, 0xff);
-	m_melody_rd &= ~1;
 }
 
 

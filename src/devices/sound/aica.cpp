@@ -35,8 +35,8 @@
 */
 
 //SLOT PARAMETERS
-#define KEYONEX(slot)       ((slot->udata.data[0x0]>>0x0)&0x8000)
-#define KEYONB(slot)        ((slot->udata.data[0x0]>>0x0)&0x4000)
+#define KEYONEX(slot)   ((slot->udata.data[0x0]>>0x0)&0x8000)
+#define KEYONB(slot)    ((slot->udata.data[0x0]>>0x0)&0x4000)
 #define SSCTL(slot)     ((slot->udata.data[0x0]>>0xA)&0x0001)
 #define LPCTL(slot)     ((slot->udata.data[0x0]>>0x9)&0x0001)
 #define PCMS(slot)      ((slot->udata.data[0x0]>>0x7)&0x0003)
@@ -51,7 +51,7 @@
 #define D1R(slot)       ((slot->udata.data[0x10/2]>>0x6)&0x001F)
 #define AR(slot)        ((slot->udata.data[0x10/2]>>0x0)&0x001F)
 
-#define LPSLNK(slot)        ((slot->udata.data[0x14/2]>>0x0)&0x4000)
+#define LPSLNK(slot)    ((slot->udata.data[0x14/2]>>0x0)&0x4000)
 #define KRS(slot)       ((slot->udata.data[0x14/2]>>0xA)&0x000F)
 #define DL(slot)        ((slot->udata.data[0x14/2]>>0x5)&0x001F)
 #define RR(slot)        ((slot->udata.data[0x14/2]>>0x0)&0x001F)
@@ -63,9 +63,9 @@
 
 #define LFORE(slot)     ((slot->udata.data[0x1c/2]>>0x0)&0x8000)
 #define LFOF(slot)      ((slot->udata.data[0x1c/2]>>0xA)&0x001F)
-#define PLFOWS(slot)        ((slot->udata.data[0x1c/2]>>0x8)&0x0003)
+#define PLFOWS(slot)    ((slot->udata.data[0x1c/2]>>0x8)&0x0003)
 #define PLFOS(slot)     ((slot->udata.data[0x1c/2]>>0x5)&0x0007)
-#define ALFOWS(slot)        ((slot->udata.data[0x1c/2]>>0x3)&0x0003)
+#define ALFOWS(slot)    ((slot->udata.data[0x1c/2]>>0x3)&0x0003)
 #define ALFOS(slot)     ((slot->udata.data[0x1c/2]>>0x0)&0x0007)
 
 #define ISEL(slot)      ((slot->udata.data[0x20/2]>>0x0)&0x000F)
@@ -78,32 +78,32 @@
 #define EFPAN(slot)     ((m_EFSPAN[slot*4]>>0)&0x001f)
 
 //Envelope times in ms
-static const double ARTimes[64]={100000/*infinity*/,100000/*infinity*/,8100.0,6900.0,6000.0,4800.0,4000.0,3400.0,3000.0,2400.0,2000.0,1700.0,1500.0,
+static constexpr double ARTimes[64]={100000/*infinity*/,100000/*infinity*/,8100.0,6900.0,6000.0,4800.0,4000.0,3400.0,3000.0,2400.0,2000.0,1700.0,1500.0,
 					1200.0,1000.0,860.0,760.0,600.0,500.0,430.0,380.0,300.0,250.0,220.0,190.0,150.0,130.0,110.0,95.0,
 					76.0,63.0,55.0,47.0,38.0,31.0,27.0,24.0,19.0,15.0,13.0,12.0,9.4,7.9,6.8,6.0,4.7,3.8,3.4,3.0,2.4,
 					2.0,1.8,1.6,1.3,1.1,0.93,0.85,0.65,0.53,0.44,0.40,0.35,0.0,0.0};
-static const double DRTimes[64]={100000/*infinity*/,100000/*infinity*/,118200.0,101300.0,88600.0,70900.0,59100.0,50700.0,44300.0,35500.0,29600.0,25300.0,22200.0,17700.0,
+static constexpr double DRTimes[64]={100000/*infinity*/,100000/*infinity*/,118200.0,101300.0,88600.0,70900.0,59100.0,50700.0,44300.0,35500.0,29600.0,25300.0,22200.0,17700.0,
 					14800.0,12700.0,11100.0,8900.0,7400.0,6300.0,5500.0,4400.0,3700.0,3200.0,2800.0,2200.0,1800.0,1600.0,1400.0,1100.0,
 					920.0,790.0,690.0,550.0,460.0,390.0,340.0,270.0,230.0,200.0,170.0,140.0,110.0,98.0,85.0,68.0,57.0,49.0,43.0,34.0,
 					28.0,25.0,22.0,18.0,14.0,12.0,11.0,8.5,7.1,6.1,5.4,4.3,3.6,3.1};
 
 #define MEM4B(aica)     ((m_udata.data[0]>>0x0)&0x0200)
-#define DAC18B(aica)        ((m_udata.data[0]>>0x0)&0x0100)
+#define DAC18B(aica)    ((m_udata.data[0]>>0x0)&0x0100)
 #define MVOL(aica)      ((m_udata.data[0]>>0x0)&0x000F)
 #define RBL(aica)       ((m_udata.data[2]>>0xD)&0x0003)
 #define RBP(aica)       ((m_udata.data[2]>>0x0)&0x0fff)
-#define MOFULL(aica)        ((m_udata.data[4]>>0x0)&0x1000)
-#define MOEMPTY(aica)       ((m_udata.data[4]>>0x0)&0x0800)
+#define MOFULL(aica)    ((m_udata.data[4]>>0x0)&0x1000)
+#define MOEMPTY(aica)   ((m_udata.data[4]>>0x0)&0x0800)
 #define MIOVF(aica)     ((m_udata.data[4]>>0x0)&0x0400)
-#define MIFULL(aica)        ((m_udata.data[4]>>0x0)&0x0200)
-#define MIEMPTY(aica)       ((m_udata.data[4]>>0x0)&0x0100)
+#define MIFULL(aica)    ((m_udata.data[4]>>0x0)&0x0200)
+#define MIEMPTY(aica)   ((m_udata.data[4]>>0x0)&0x0100)
 
 #define AFSEL(aica)     ((m_udata.data[0xc/2]>>0x0)&0x4000)
 #define MSLC(aica)      ((m_udata.data[0xc/2]>>0x8)&0x3F)
 
-#define SCILV0(aica)        ((m_udata.data[0xa8/2]>>0x0)&0xff)
-#define SCILV1(aica)        ((m_udata.data[0xac/2]>>0x0)&0xff)
-#define SCILV2(aica)        ((m_udata.data[0xb0/2]>>0x0)&0xff)
+#define SCILV0(aica)    ((m_udata.data[0xa8/2]>>0x0)&0xff)
+#define SCILV1(aica)    ((m_udata.data[0xac/2]>>0x0)&0xff)
+#define SCILV2(aica)    ((m_udata.data[0xb0/2]>>0x0)&0xff)
 
 #define MCIEB(aica)     ((m_udata.data[0xb4/2]>>0x0)&0xff)
 #define MCIPD(aica)     ((m_udata.data[0xb8/2]>>0x0)&0xff)
@@ -118,7 +118,7 @@ static const double DRTimes[64]={100000/*infinity*/,100000/*infinity*/,118200.0,
 #define SCITMA  6
 #define SCITMB  7
 
-static const float SDLT[16]={-1000000.0,-42.0,-39.0,-36.0,-33.0,-30.0,-27.0,-24.0,-21.0,-18.0,-15.0,-12.0,-9.0,-6.0,-3.0,0.0};
+static constexpr float SDLT[16]={-1000000.0,-42.0,-39.0,-36.0,-33.0,-30.0,-27.0,-24.0,-21.0,-18.0,-15.0,-12.0,-9.0,-6.0,-3.0,0.0};
 
 unsigned char aica_device::DecodeSCI(unsigned char irq)
 {
@@ -338,10 +338,10 @@ void aica_device::Compute_LFO(AICA_SLOT *slot)
 }
 
 #define ADPCMSHIFT  8
-#define ADFIX(f)    (int) ((float) f*(float) (1<<ADPCMSHIFT))
+static constexpr int ADFIX(float f) { return int(f * float(1 << ADPCMSHIFT)); }
 
-static const int TableQuant[8]={ADFIX(0.8984375),ADFIX(0.8984375),ADFIX(0.8984375),ADFIX(0.8984375),ADFIX(1.19921875),ADFIX(1.59765625),ADFIX(2.0),ADFIX(2.3984375)};
-static const int quant_mul[16]= { 1, 3, 5, 7, 9, 11, 13, 15, -1, -3, -5, -7, -9, -11, -13, -15};
+static constexpr int TableQuant[8]={ADFIX(0.8984375),ADFIX(0.8984375),ADFIX(0.8984375),ADFIX(0.8984375),ADFIX(1.19921875),ADFIX(1.59765625),ADFIX(2.0),ADFIX(2.3984375)};
+static constexpr int quant_mul[16]= { 1, 3, 5, 7, 9, 11, 13, 15, -1, -3, -5, -7, -9, -11, -13, -15};
 
 void aica_device::InitADPCM(int *PrevSignal, int *PrevQuant)
 {
@@ -408,8 +408,6 @@ void aica_device::StopSlot(AICA_SLOT *slot,int keyoff)
 	}
 	slot->udata.data[0]&=~0x4000;
 }
-
-#define log_base_2(n) (log((float) n)/log((float) 2))
 
 void aica_device::Init()
 {
@@ -922,7 +920,7 @@ void aica_device::w16(address_space &space,unsigned int addr,unsigned short val)
 
 			if (addr == 0x3bfe)
 			{
-				aica_dsp_start(&m_DSP);
+				m_DSP.start();
 			}
 		}
 		else if(addr<0x4000)
@@ -1034,8 +1032,6 @@ unsigned short aica_device::r16(address_space &space, unsigned int addr)
 	return v;
 }
 
-
-#define REVSIGN(v) ((~v)+1)
 
 #ifdef UNUSED_FUNCTION
 void aica_device::TimersAddTicks(int ticks)
@@ -1267,7 +1263,7 @@ void aica_device::DoMasterSamples(int nsamples)
 				sample=UpdateSlot(slot);
 
 				Enc=((TL(slot))<<0x0)|((IMXL(slot))<<0xd);
-				aica_dsp_setsample(&m_DSP,(sample*m_LPANTABLE[Enc])>>(SHIFT-2),ISEL(slot),IMXL(slot));
+				m_DSP.setsample((sample*m_LPANTABLE[Enc])>>(SHIFT-2),ISEL(slot),IMXL(slot));
 				Enc=((TL(slot))<<0x0)|((DIPAN(slot))<<0x8)|((DISDL(slot))<<0xd);
 				{
 					smpl+=(sample*m_LPANTABLE[Enc])>>SHIFT;
@@ -1279,7 +1275,7 @@ void aica_device::DoMasterSamples(int nsamples)
 		}
 
 		// process the DSP
-		aica_dsp_step(&m_DSP);
+		m_DSP.step();
 
 		// mix DSP output
 		for(i=0;i<16;++i)
@@ -1468,10 +1464,10 @@ READ16_MEMBER( aica_device::midi_out_r )
 	return val;
 }
 
-const device_type AICA = device_creator<aica_device>;
+DEFINE_DEVICE_TYPE(AICA, aica_device, "aica", "AICA")
 
 aica_device::aica_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, AICA, "AICA", tag, owner, clock, "aica", __FILE__),
+	: device_t(mconfig, AICA, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		m_master(false),
 		m_roffset(0),

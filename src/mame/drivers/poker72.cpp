@@ -363,7 +363,7 @@ void poker72_state::machine_reset()
 	membank("bank1")->set_entry(0);
 }
 
-static MACHINE_CONFIG_START( poker72, poker72_state )
+static MACHINE_CONFIG_START( poker72 )
 
 
 	/* basic machine hardware */

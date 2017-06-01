@@ -40,21 +40,13 @@ inline unsigned matrix_solver_direct2_t::vsolve_non_dynamic(ATTR_UNUSED const bo
 	const nl_double c = A(1,0);
 	const nl_double d = A(1,1);
 
-	nl_double new_val[2];
-	new_val[1] = (a * RHS(1) - c * RHS(0)) / (a * d - b * c);
-	new_val[0] = (RHS(0) - b * new_val[1]) / a;
+	nl_double new_V[2];
+	new_V[1] = (a * RHS(1) - c * RHS(0)) / (a * d - b * c);
+	new_V[0] = (RHS(0) - b * new_V[1]) / a;
 
-	if (has_dynamic_devices())
-	{
-		nl_double err = this->delta(new_val);
-		store(new_val);
-		if (err > m_params.m_accuracy )
-			return 2;
-		else
-			return 1;
-	}
-	store(new_val);
-	return 1;
+	const nl_double err = (newton_raphson ? delta(new_V) : 0.0);
+	store(new_V);
+	return (err > this->m_params.m_accuracy) ? 2 : 1;
 }
 
 	} //namespace devices

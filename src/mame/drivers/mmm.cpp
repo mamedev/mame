@@ -35,7 +35,7 @@ static INPUT_PORTS_START( mmm )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( mmm, mmm_state )
+static MACHINE_CONFIG_START( mmm )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,2000000)         /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(mmm_map)
@@ -51,4 +51,4 @@ ROM_START( mmm_ldip )
 ROM_END
 
 
-GAME( 198?,  mmm_ldip,  0,  mmm,  mmm, driver_device,  0,  ROT0,  "Maygay",    "Lucky Dip (Maygay)",    MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 198?,  mmm_ldip,  0,  mmm,  mmm, mmm_state,  0,  ROT0,  "Maygay",    "Lucky Dip (Maygay)",    MACHINE_IS_SKELETON_MECHANICAL)

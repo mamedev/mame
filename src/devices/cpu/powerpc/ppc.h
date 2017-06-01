@@ -9,10 +9,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_CPU_POWERPC_PPC_H
+#define MAME_CPU_POWERPC_PPC_H
 
-#ifndef __PPC_H__
-#define __PPC_H__
+#pragma once
 
 #include "divtlb.h"
 #include "cpu/drcfe.h"
@@ -209,10 +209,10 @@ protected:
 		PPC_MODEL_MPC8245           = 0x80811014    /* "Kahlua II" */
 	};
 
-public:
 	// construction/destruction
-	ppc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, int address_bits, int data_bits, powerpc_flavor flavor, uint32_t cap, uint32_t tb_divisor, address_map_constructor internal_map);
+	ppc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int address_bits, int data_bits, powerpc_flavor flavor, uint32_t cap, uint32_t tb_divisor, address_map_constructor internal_map);
 
+public:
 	static void set_bus_frequency(device_t &device, uint32_t bus_frequency) { downcast<ppc_device &>(device).c_bus_frequency = bus_frequency; }
 
 	void ppc_set_dcstore_callback(write32_delegate callback);
@@ -750,8 +750,6 @@ public:
 class ppc4xx_device : public ppc_device
 {
 public:
-	ppc4xx_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, powerpc_flavor flavor, uint32_t cap, uint32_t tb_divisor);
-
 	void ppc4xx_spu_set_tx_handler(write8_delegate callback);
 	void ppc4xx_spu_receive_byte(uint8_t byteval);
 
@@ -764,6 +762,8 @@ public:
 	DECLARE_WRITE8_MEMBER( ppc4xx_spu_w );
 
 protected:
+	ppc4xx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, powerpc_flavor flavor, uint32_t cap, uint32_t tb_divisor);
+
 	virtual uint32_t execute_input_lines() const override { return 5; }
 	virtual void execute_set_input(int inputnum, int state) override;
 };
@@ -790,16 +790,15 @@ public:
 };
 
 
-extern const device_type PPC601;
-extern const device_type PPC602;
-extern const device_type PPC603;
-extern const device_type PPC603E;
-extern const device_type PPC603R;
-extern const device_type PPC604;
-extern const device_type MPC8240;
-extern const device_type PPC403GA;
-extern const device_type PPC403GCX;
-extern const device_type PPC405GP;
+DECLARE_DEVICE_TYPE(PPC601,    ppc601_device)
+DECLARE_DEVICE_TYPE(PPC602,    ppc602_device)
+DECLARE_DEVICE_TYPE(PPC603,    ppc603_device)
+DECLARE_DEVICE_TYPE(PPC603E,   ppc603e_device)
+DECLARE_DEVICE_TYPE(PPC603R,   ppc603r_device)
+DECLARE_DEVICE_TYPE(PPC604,    ppc604_device)
+DECLARE_DEVICE_TYPE(MPC8240,   mpc8240_device)
+DECLARE_DEVICE_TYPE(PPC403GA,  ppc403ga_device)
+DECLARE_DEVICE_TYPE(PPC403GCX, ppc403ga_device)
+DECLARE_DEVICE_TYPE(PPC405GP,  ppc405gp_device)
 
-
-#endif  /* __PPC_H__ */
+#endif  // MAME_CPU_POWERPC_PPC_H

@@ -4,17 +4,20 @@
  * Namco System 11 Protection
  *
  */
+#ifndef MAME_MACHINE_NS11PROT_H
+#define MAME_MACHINE_NS11PROT_H
+
+#pragma once
 
 
 class ns11_keycus_device : public device_t
 {
 protected:
-	ns11_keycus_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock,const char *shortname, const char *source);
+	ns11_keycus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-protected:
 	uint16_t m_p1;
 	uint16_t m_p2;
 	uint16_t m_p3;
@@ -35,7 +38,7 @@ public:
 	virtual DECLARE_WRITE16_MEMBER( write ) override;
 };
 
-extern const device_type KEYCUS_C406;
+DECLARE_DEVICE_TYPE(KEYCUS_C406, keycus_c406_device)
 
 /* soul edge */
 
@@ -48,7 +51,7 @@ public:
 	virtual DECLARE_WRITE16_MEMBER( write ) override;
 };
 
-extern const device_type KEYCUS_C409;
+DECLARE_DEVICE_TYPE(KEYCUS_C409, keycus_c409_device)
 
 /* dunk mania */
 
@@ -61,7 +64,7 @@ public:
 	virtual DECLARE_WRITE16_MEMBER( write ) override;
 };
 
-extern const device_type KEYCUS_C410;
+DECLARE_DEVICE_TYPE(KEYCUS_C410, keycus_c410_device)
 
 /* prime goal ex */
 
@@ -74,7 +77,7 @@ public:
 	virtual DECLARE_WRITE16_MEMBER( write ) override;
 };
 
-extern const device_type KEYCUS_C411;
+DECLARE_DEVICE_TYPE(KEYCUS_C411, keycus_c411_device)
 
 /* xevious 3d/g */
 
@@ -87,7 +90,7 @@ public:
 	virtual DECLARE_WRITE16_MEMBER( write ) override;
 };
 
-extern const device_type KEYCUS_C430;
+DECLARE_DEVICE_TYPE(KEYCUS_C430, keycus_c430_device)
 
 /* dancing eyes */
 
@@ -100,7 +103,7 @@ public:
 	virtual DECLARE_WRITE16_MEMBER( write ) override;
 };
 
-extern const device_type KEYCUS_C431;
+DECLARE_DEVICE_TYPE(KEYCUS_C431, keycus_c431_device)
 
 /* pocket racer */
 
@@ -113,7 +116,7 @@ public:
 	virtual DECLARE_WRITE16_MEMBER( write ) override;
 };
 
-extern const device_type KEYCUS_C432;
+DECLARE_DEVICE_TYPE(KEYCUS_C432, keycus_c432_device)
 
 /* star sweep */
 
@@ -126,7 +129,7 @@ public:
 	virtual DECLARE_WRITE16_MEMBER( write ) override;
 };
 
-extern const device_type KEYCUS_C442;
+DECLARE_DEVICE_TYPE(KEYCUS_C442, keycus_c442_device)
 
 /* kosodate quiz my angel 3 / point blank 2 */
 
@@ -139,4 +142,6 @@ public:
 	virtual DECLARE_WRITE16_MEMBER( write ) override;
 };
 
-extern const device_type KEYCUS_C443;
+DECLARE_DEVICE_TYPE(KEYCUS_C443, keycus_c443_device)
+
+#endif // MAME_MACHINE_NS11PROT_H

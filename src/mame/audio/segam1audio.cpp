@@ -9,8 +9,9 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/clock.h"
 #include "audio/segam1audio.h"
+
+#include "machine/clock.h"
 #include "speaker.h"
 
 #define M68000_TAG      "sndcpu"
@@ -20,8 +21,8 @@
 #define UART_TAG        "uart"
 
 static ADDRESS_MAP_START( segam1audio_map, AS_PROGRAM, 16, segam1audio_device )
-		AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_REGION(":m1sndcpu", 0)
-		AM_RANGE(0x080000, 0x09ffff) AM_ROM AM_REGION(":m1sndcpu", 0x20000) // mirror of upper ROM socket
+	AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_REGION(":m1sndcpu", 0)
+	AM_RANGE(0x080000, 0x09ffff) AM_ROM AM_REGION(":m1sndcpu", 0x20000) // mirror of upper ROM socket
 	AM_RANGE(0xc20000, 0xc20001) AM_DEVREADWRITE8(UART_TAG, i8251_device, data_r, data_w, 0x00ff)
 	AM_RANGE(0xc20002, 0xc20003) AM_DEVREADWRITE8(UART_TAG, i8251_device, status_r, control_w, 0x00ff)
 	AM_RANGE(0xc40000, 0xc40007) AM_DEVREADWRITE8(MULTIPCM_1_TAG, multipcm_device, read, write, 0x00ff)
@@ -41,7 +42,17 @@ static ADDRESS_MAP_START( mpcm2_map, AS_0, 8, segam1audio_device )
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM AM_REGION(":m1pcm2", 0)
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_FRAGMENT( segam1audio )
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE(SEGAM1AUDIO, segam1audio_device, "segam1audio", "Sega Model 1 Sound Board")
+
+//-------------------------------------------------
+// device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( segam1audio_device::device_add_mconfig )
 	MCFG_CPU_ADD(M68000_TAG, M68000, 10000000)  // verified on real h/w
 	MCFG_CPU_PROGRAM_MAP(segam1audio_map)
 
@@ -71,22 +82,6 @@ MACHINE_CONFIG_FRAGMENT( segam1audio )
 MACHINE_CONFIG_END
 
 //**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-const device_type SEGAM1AUDIO = device_creator<segam1audio_device>;
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor segam1audio_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( segam1audio );
-}
-
-//**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
 
@@ -95,7 +90,7 @@ machine_config_constructor segam1audio_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 segam1audio_device::segam1audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, SEGAM1AUDIO, "Sega Model 1 Sound Board", tag, owner, clock, "segam1audio", __FILE__),
+	device_t(mconfig, SEGAM1AUDIO, tag, owner, clock),
 	m_audiocpu(*this, M68000_TAG),
 	m_multipcm_1(*this, MULTIPCM_1_TAG),
 	m_multipcm_2(*this, MULTIPCM_2_TAG),

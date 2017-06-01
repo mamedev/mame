@@ -39,7 +39,7 @@ const int tea1002_device::m_amplitute[] =
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type TEA1002 = device_creator<tea1002_device>;
+DEFINE_DEVICE_TYPE(TEA1002, tea1002_device, "tea1002", "Mullard TEA1002 PAL colour encoder")
 
 
 //**************************************************************************
@@ -51,7 +51,7 @@ const device_type TEA1002 = device_creator<tea1002_device>;
 //-------------------------------------------------
 
 tea1002_device::tea1002_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, TEA1002, "TEA1002 PAL colour encoder", tag, owner, clock, "tea1002", __FILE__)
+	device_t(mconfig, TEA1002, tag, owner, clock)
 {
 }
 

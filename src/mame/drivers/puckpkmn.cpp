@@ -275,7 +275,7 @@ static ADDRESS_MAP_START( puckpkmna_map, AS_PROGRAM, 16, md_boot_state )
 	AM_RANGE(0x70001c, 0x70001d) AM_READ(puckpkmna_70001c_r)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( puckpkmn, md_boot_state )
+static MACHINE_CONFIG_START( puckpkmn )
 	MCFG_FRAGMENT_ADD(md_ntsc)
 
 	MCFG_CPU_MODIFY("maincpu")
@@ -285,7 +285,7 @@ static MACHINE_CONFIG_START( puckpkmn, md_boot_state )
 
 	MCFG_DEVICE_REMOVE("genesis_snd_z80")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_4MHz / 4, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL_4MHz / 4, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25)
 MACHINE_CONFIG_END
@@ -488,4 +488,4 @@ ROM_END
 GAME( 2000, puckpkmn, 0,        puckpkmn,  puckpkmn, md_boot_state, puckpkmn, ROT0, "Genie",                  "Puckman Pockimon (set 1)", 0 )
 GAME( 2000, puckpkmna,puckpkmn, puckpkmna, puckpkmn, md_boot_state, puckpkmn, ROT0, "IBS",                    "Puckman Pockimon (set 2)", 0 )
 GAME( 2000, puckpkmnb,puckpkmn, puckpkmna, puckpkmn, md_boot_state, puckpkmn, ROT0, "Sun Mixing",             "Puckman Pockimon (set 3)", 0 )
-GAME( 2000, jzth,     0,        jzth,      jzth, md_boot_state,     puckpkmn, ROT0, "<unknown>",              "Jue Zhan Tian Huang", MACHINE_IMPERFECT_SOUND )
+GAME( 2000, jzth,     0,        jzth,      jzth,     md_boot_state, puckpkmn, ROT0, "<unknown>",              "Jue Zhan Tian Huang", MACHINE_IMPERFECT_SOUND )

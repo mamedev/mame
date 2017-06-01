@@ -156,7 +156,7 @@ void zapcomp_state::machine_start()
 {
 }
 
-static MACHINE_CONFIG_START( zapcomp, zapcomp_state )
+static MACHINE_CONFIG_START( zapcomp )
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_2MHz)
 	MCFG_CPU_PROGRAM_MAP(zapcomp_mem)
@@ -171,5 +171,5 @@ ROM_START( zapcomp )
 	ROM_LOAD("zap.rom", 0x0000, 0x0400, CRC(3f4416e9) SHA1(d6493707bfba1a1e1e551f8144194afa5bda3316) )
 ROM_END
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT    CLASS         INIT    COMPANY                              FULLNAME                              FLAGS
-COMP( 1981, zapcomp,  0,      0,      zapcomp, zapcomp, driver_device,  0,  "Steve Ciarcia / BYTE / McGRAW-HILL",  "ZAP - Z80 Applications Processor", MACHINE_NO_SOUND_HW )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT  COMPANY                               FULLNAME                            FLAGS
+COMP( 1981, zapcomp, 0,      0,      zapcomp, zapcomp, zapcomp_state, 0,    "Steve Ciarcia / BYTE / McGRAW-HILL", "ZAP - Z80 Applications Processor", MACHINE_NO_SOUND_HW )

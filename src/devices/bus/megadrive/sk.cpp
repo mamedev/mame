@@ -24,20 +24,18 @@
 //  md_rom_device - constructor
 //-------------------------------------------------
 
-const device_type MD_ROM_SK = device_creator<md_rom_sk_device>;
+DEFINE_DEVICE_TYPE(MD_ROM_SK, md_rom_sk_device, "md_rom_sk", "MD Sonic & Knuckles")
 
 
-md_rom_sk_device::md_rom_sk_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-						device_md_cart_interface( mconfig, *this ),
-						m_exp(*this, "subslot")
+md_rom_sk_device::md_rom_sk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_md_cart_interface(mconfig, *this)
+	, m_exp(*this, "subslot")
 {
 }
 
 md_rom_sk_device::md_rom_sk_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: device_t(mconfig, MD_ROM_SK, "MD Sonic & Knuckles", tag, owner, clock, "md_rom_sk", __FILE__),
-						device_md_cart_interface( mconfig, *this ),
-						m_exp(*this, "subslot")
+	: md_rom_sk_device(mconfig, MD_ROM_SK, tag, owner, clock)
 {
 }
 
@@ -66,7 +64,7 @@ WRITE16_MEMBER(md_rom_sk_device::write)
 }
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( sk_slot )
+//  MACHINE_CONFIG_START( sk_slot )
 //-------------------------------------------------
 
 static SLOT_INTERFACE_START(sk_sub_cart)
@@ -78,7 +76,7 @@ static SLOT_INTERFACE_START(sk_sub_cart)
 // add all types??
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_FRAGMENT( sk_slot )
+static MACHINE_CONFIG_START( sk_slot )
 	MCFG_MD_CARTRIDGE_ADD("subslot", sk_sub_cart, nullptr)
 	MCFG_MD_CARTRIDGE_NOT_MANDATORY
 MACHINE_CONFIG_END

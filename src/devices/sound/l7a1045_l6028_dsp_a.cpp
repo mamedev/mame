@@ -89,7 +89,7 @@
 
 
 // device type definition
-const device_type L7A1045 = device_creator<l7a1045_sound_device>;
+DEFINE_DEVICE_TYPE(L7A1045, l7a1045_sound_device, "l7a1045", "L7A1045 L6028 DSP-A")
 
 
 //**************************************************************************
@@ -101,7 +101,7 @@ const device_type L7A1045 = device_creator<l7a1045_sound_device>;
 //-------------------------------------------------
 
 l7a1045_sound_device::l7a1045_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, L7A1045, "L7A1045 L6028 DSP-A", tag, owner, clock, "l7a1045_custom", __FILE__),
+	: device_t(mconfig, L7A1045, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		m_stream(nullptr),
 		m_key(0),
@@ -326,7 +326,7 @@ WRITE16_MEMBER(l7a1045_sound_device::sound_status_w)
 	{
 		l7a1045_voice *vptr = &m_voice[m_audiochannel];
 
-		#if 0
+#if 0
 		if(vptr->start != 0)
 		{
 		printf("%08x START\n",vptr->start);
@@ -335,7 +335,7 @@ WRITE16_MEMBER(l7a1045_sound_device::sound_status_w)
 		for(int i=0;i<0x10;i++)
 			printf("%02x (%02x) = %04x%04x%04x\n",m_audiochannel,i,m_audiodat[i][m_audiochannel].dat[2],m_audiodat[i][m_audiochannel].dat[1],m_audiodat[i][m_audiochannel].dat[0]);
 		}
-		#endif
+#endif
 
 		vptr->frac = 0;
 		vptr->pos = 0;

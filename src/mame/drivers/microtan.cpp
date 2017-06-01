@@ -209,7 +209,7 @@ static GFXDECODE_START( microtan )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( microtan, microtan_state )
+static MACHINE_CONFIG_START( microtan )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 750000)  // 750 kHz
 	MCFG_CPU_PROGRAM_MAP(microtan_map)
@@ -284,5 +284,5 @@ ROM_START( microtan )
 ROM_END
 
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT      COMPANY      FULLNAME
-COMP( 1979, microtan, 0,        0,      microtan, microtan, microtan_state, microtan, "Tangerine", "Microtan 65" , 0)
+//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     STATE           INIT      COMPANY      FULLNAME        FLAGS
+COMP( 1979, microtan, 0,        0,      microtan, microtan, microtan_state, microtan, "Tangerine", "Microtan 65" , 0 )

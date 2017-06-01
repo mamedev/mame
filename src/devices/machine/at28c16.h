@@ -8,10 +8,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_AT28C16_H
+#define MAME_MACHINE_AT28C16_H
 
-#ifndef __AT28C16_H__
-#define __AT28C16_H__
+#pragma once
 
 
 //**************************************************************************
@@ -35,7 +35,7 @@ class at28c16_device :
 {
 public:
 	// construction/destruction
-	at28c16_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock );
+	at28c16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// I/O operations
 	DECLARE_WRITE8_MEMBER( write );
@@ -49,12 +49,12 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config( address_spacenum spacenum = AS_0 ) const override;
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const override;
 
 	// device_nvram_interface overrides
 	virtual void nvram_default() override;
-	virtual void nvram_read( emu_file &file ) override;
-	virtual void nvram_write( emu_file &file ) override;
+	virtual void nvram_read(emu_file &file) override;
+	virtual void nvram_write(emu_file &file) override;
 
 	// internal state
 	address_space_config m_space_config;
@@ -68,5 +68,6 @@ protected:
 
 // device type definition
 extern const device_type AT28C16;
+DECLARE_DEVICE_TYPE(AT28C16, at28c16_device)
 
-#endif
+#endif // MAME_MACHINE_AT28C16_H

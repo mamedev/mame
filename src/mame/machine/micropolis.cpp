@@ -63,10 +63,10 @@ static const uint8_t track_SD[][2] = {
     MAME DEVICE INTERFACE
 ***************************************************************************/
 
-const device_type MICROPOLIS = device_creator<micropolis_device>;
+DEFINE_DEVICE_TYPE(MICROPOLIS, micropolis_device, "micropolis", "Micropolis FDC")
 
 micropolis_device::micropolis_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MICROPOLIS, "MICROPOLIS", tag, owner, clock, "micropolis", __FILE__),
+	: device_t(mconfig, MICROPOLIS, tag, owner, clock),
 	m_read_dden(*this),
 	m_write_intrq(*this),
 	m_write_drq(*this),
@@ -82,11 +82,8 @@ micropolis_device::micropolis_device(const machine_config &mconfig, const char *
 	m_sector_length(0),
 	m_drive(nullptr)
 {
-	for (auto & elem : m_buffer)
-		elem = 0;
-
-	for (auto & elem : m_floppy_drive_tags)
-		elem = nullptr;
+	std::fill(std::begin(m_buffer), std::end(m_buffer), 0);
+	std::fill(std::begin(m_floppy_drive_tags), std::end(m_floppy_drive_tags), nullptr);
 }
 
 //-------------------------------------------------

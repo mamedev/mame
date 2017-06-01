@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:smf
-#pragma once
+#ifndef MAME_MACHINE_K573DIO_H
+#define MAME_MACHINE_K573DIO_H
 
-#ifndef _K573DIO_H_
-#define _K573DIO_H_
+#pragma once
 
 #include "sound/mas3507d.h"
 #include "machine/ds2401.h"
@@ -67,7 +67,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
@@ -80,6 +80,6 @@ private:
 	void output(int offset, uint16_t data);
 };
 
-extern const device_type KONAMI_573_DIGITAL_IO_BOARD;
+DECLARE_DEVICE_TYPE(KONAMI_573_DIGITAL_IO_BOARD, k573dio_device)
 
-#endif
+#endif // MAME_MACHINE_K573DIO_H

@@ -114,7 +114,7 @@ public:
 	DECLARE_WRITE8_MEMBER(portcc_w );
 	DECLARE_READ8_MEMBER(portc4_r);
 	DECLARE_READ8_MEMBER(portd0_r);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	void kbd_put(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(clock_w);
 	DECLARE_WRITE_LINE_MEMBER(busreq_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
@@ -148,7 +148,7 @@ private:
 	required_device<z80ctc_device> m_ctc2;
 	required_device<z80sio_device> m_sio;
 	required_device<z80dma_device> m_dma;
-	required_device<mb8877_t> m_fdc;
+	required_device<mb8877_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	required_device<beep_device> m_beeper;
@@ -189,7 +189,7 @@ READ8_MEMBER( bigbord2_state::portd0_r )
 	return ret;
 }
 
-WRITE8_MEMBER( bigbord2_state::kbd_put )
+void bigbord2_state::kbd_put(u8 data)
 {
 	if (data)
 	{
@@ -375,7 +375,7 @@ static ADDRESS_MAP_START( bigbord2_io, AS_IO, 8, bigbord2_state )
 	AM_RANGE(0xC8, 0xCB) AM_WRITE(portc8_w)
 	AM_RANGE(0xCC, 0xCF) AM_WRITE(portcc_w)
 	AM_RANGE(0xD0, 0xD3) AM_READ (portd0_r)
-	AM_RANGE(0xD4, 0xD7) AM_DEVREADWRITE("fdc", mb8877_t, read, write) // u10
+	AM_RANGE(0xD4, 0xD7) AM_DEVREADWRITE("fdc", mb8877_device, read, write) // u10
 	//AM_RANGE(0xD8, 0xDB) AM_READWRITE(portd8_r, portd8_w) // various external data ports; DB = centronics printer
 	AM_RANGE(0xDC, 0xDC) AM_MIRROR(2) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w) // u30
 	AM_RANGE(0xDD, 0xDD) AM_MIRROR(2) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
@@ -579,7 +579,7 @@ MC6845_UPDATE_ROW( bigbord2_state::crtc_update_row )
 
 #define MAIN_CLOCK XTAL_8MHz / 2
 
-static MACHINE_CONFIG_START( bigbord2, bigbord2_state )
+static MACHINE_CONFIG_START( bigbord2 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(bigbord2_mem)
@@ -635,7 +635,7 @@ static MACHINE_CONFIG_START( bigbord2, bigbord2_state )
 
 	/* keyboard */
 	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(WRITE8(bigbord2_state, kbd_put))
+	MCFG_GENERIC_KEYBOARD_CB(PUT(bigbord2_state, kbd_put))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -656,5 +656,5 @@ ROM_START( bigbord2 )
 ROM_END
 /* System Drivers */
 
-/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT        COMPANY                      FULLNAME        FLAGS */
-COMP( 1982, bigbord2,   bigboard,   0,      bigbord2,   bigbord2, bigbord2_state,   bigbord2, "Digital Research Computers", "Big Board II", MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     STATE           INIT      COMPANY                       FULLNAME        FLAGS
+COMP( 1982, bigbord2, bigboard, 0,      bigbord2, bigbord2, bigbord2_state, bigbord2, "Digital Research Computers", "Big Board II", MACHINE_NOT_WORKING )

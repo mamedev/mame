@@ -39,7 +39,7 @@ enum
 
 
 // device type definition
-const device_type CRT = device_creator<crt_device>;
+DEFINE_DEVICE_TYPE(CRT, crt_device, "crt", "CRT Video")
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -50,7 +50,7 @@ const device_type CRT = device_creator<crt_device>;
 //-------------------------------------------------
 
 crt_device::crt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, CRT, "CRT Video", tag, owner, clock, "crt", __FILE__),
+	: device_t(mconfig, CRT, tag, owner, clock),
 		m_list(nullptr),
 		m_list_head(nullptr),
 		m_decay_counter(0),

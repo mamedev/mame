@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef __HP_HIL_DEVICES_H__
-#define __HP_HIL_DEVICES_H__
+#ifndef MAME_BUS_HP_HIL_HIL_DEVICES_H
+#define MAME_BUS_HP_HIL_HIL_DEVICES_H
 
 
 #define STR_KBD_HP_46020A    "hp_46020a"    // ITF Keyboard
@@ -22,4 +22,4 @@
 SLOT_INTERFACE_EXTERN(hp_hil_devices);
 
 
-#endif  /* __HP_HIL_DEVICES_H__ */
+#endif // MAME_BUS_HP_HIL_HIL_DEVICES_H

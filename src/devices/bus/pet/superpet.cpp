@@ -28,7 +28,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SUPERPET = device_creator<superpet_device>;
+DEFINE_DEVICE_TYPE(SUPERPET, superpet_device, "pet_superpet", "Commodore SuperPET")
 
 
 //-------------------------------------------------
@@ -66,10 +66,10 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( superpet )
+//  MACHINE_CONFIG_START( superpet )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( superpet )
+static MACHINE_CONFIG_START( superpet )
 	MCFG_CPU_ADD(M6809_TAG, M6809, XTAL_16MHz/16)
 	MCFG_CPU_PROGRAM_MAP(superpet_mem)
 
@@ -176,7 +176,7 @@ inline bool superpet_device::is_ram_writable()
 //-------------------------------------------------
 
 superpet_device::superpet_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, SUPERPET, "SuperPET", tag, owner, clock, "pet_superpet", __FILE__),
+	device_t(mconfig, SUPERPET, tag, owner, clock),
 	device_pet_expansion_card_interface(mconfig, *this),
 	m_maincpu(*this, M6809_TAG),
 	m_acia(*this, MOS6551_TAG),

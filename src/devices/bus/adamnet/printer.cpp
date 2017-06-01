@@ -23,7 +23,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ADAM_PRN = device_creator<adam_printer_device>;
+DEFINE_DEVICE_TYPE(ADAM_PRN, adam_printer_device, "adam_prn", "Adam printer")
 
 
 //-------------------------------------------------
@@ -73,7 +73,7 @@ ADDRESS_MAP_END
 //  MACHINE_DRIVER( adam_prn )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( adam_prn )
+static MACHINE_CONFIG_START( adam_prn )
 	MCFG_CPU_ADD(M6801_TAG, M6801, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(adam_prn_mem)
 	MCFG_CPU_IO_MAP(adam_prn_io)
@@ -102,7 +102,7 @@ machine_config_constructor adam_printer_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 adam_printer_device::adam_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ADAM_PRN, "Adam printer", tag, owner, clock, "adam_prn", __FILE__),
+	: device_t(mconfig, ADAM_PRN, tag, owner, clock),
 		device_adamnet_card_interface(mconfig, *this),
 		m_maincpu(*this, M6801_TAG)
 {

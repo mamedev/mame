@@ -364,10 +364,12 @@ unsigned matrix_solver_GCR_t<m_N, storage_N>::vsolve_non_dynamic(const bool newt
 	}
 #else
 		for (std::size_t i = 0; i < railstart; i++)
-		{
 			mat.A[tcr[i]] -= go[i];
-			gtot_t = gtot_t + gt[i];
-			RHS_t = RHS_t + Idr[i];
+
+		for (std::size_t i = 0; i < railstart; i++)
+		{
+			gtot_t        += gt[i];
+			RHS_t         += Idr[i];
 		}
 
 		for (std::size_t i = railstart; i < term_count; i++)
@@ -448,19 +450,9 @@ unsigned matrix_solver_GCR_t<m_N, storage_N>::vsolve_non_dynamic(const bool newt
 
 	this->m_stat_calculations++;
 
-	if (newton_raphson)
-	{
-		nl_double err = this->delta(new_V);
-
-		this->store(new_V);
-
-		return (err > this->m_params.m_accuracy) ? 2 : 1;
-	}
-	else
-	{
-		this->store(new_V);
-		return 1;
-	}
+	const nl_double err = (newton_raphson ? delta(new_V) : 0.0);
+	store(new_V);
+	return (err > this->m_params.m_accuracy) ? 2 : 1;
 }
 
 	} //namespace devices

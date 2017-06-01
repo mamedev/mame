@@ -5,10 +5,10 @@
 #include "emu.h"
 #include "snk68_spr.h"
 
-const device_type SNK68_SPR = device_creator<snk68_spr_device>;
+DEFINE_DEVICE_TYPE(SNK68_SPR, snk68_spr_device, "snk68_spr", "SNK68 Sprites")
 
 snk68_spr_device::snk68_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SNK68_SPR, "SNK68 Sprites", tag, owner, clock, "snk68_spr", __FILE__)
+	: device_t(mconfig, SNK68_SPR, tag, owner, clock)
 	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
 	, m_spriteram(*this, "^spriteram")
 	, m_screen(*this, "^screen")

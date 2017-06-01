@@ -49,7 +49,7 @@ static INPUT_PORTS_START( bntyhunt )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( bntyhunt, bntyhunt_state )
+static MACHINE_CONFIG_START( bntyhunt )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PENTIUM, 200000000) /* Probably a Pentium or higher .. ?? Mhz*/
 	MCFG_CPU_PROGRAM_MAP(bntyhunt_map)
@@ -76,4 +76,4 @@ ROM_START(bntyhunt)
 ROM_END
 
 
-GAME( 200?, bntyhunt,  0,   bntyhunt,  bntyhunt, driver_device,  0,  ROT0,  "GCTech Co., LTD",    "Bounty Hunter (GCTech Co., LTD)",   MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+GAME( 200?, bntyhunt,  0,   bntyhunt,  bntyhunt, bntyhunt_state,  0,  ROT0,  "GCTech Co., LTD",    "Bounty Hunter (GCTech Co., LTD)",   MACHINE_NOT_WORKING|MACHINE_NO_SOUND )

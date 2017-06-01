@@ -591,7 +591,7 @@ It needs at least 64 instances because 0xa05b will be eventually nuked by the vb
 }
 
 
-static MACHINE_CONFIG_START( dblcrown, dblcrown_state )
+static MACHINE_CONFIG_START( dblcrown )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -653,5 +653,5 @@ ROM_START( dblcrown )
 ROM_END
 
 
-/*     YEAR  NAME      PARENT    MACHINE   INPUT     STATE          INIT   ROT    COMPANY                FULLNAME                FLAGS                    LAYOUT  */
-GAMEL( 1997, dblcrown, 0,        dblcrown, dblcrown, driver_device, 0,     ROT0, "Cadence Technology",  "Double Crown (v1.0.3)", MACHINE_IMPERFECT_GRAPHICS, layout_dblcrown ) // 1997 DYNA copyright in tile GFX
+/*     YEAR  NAME      PARENT    MACHINE   INPUT     STATE           INIT   ROT    COMPANY                FULLNAME                FLAGS                    LAYOUT  */
+GAMEL( 1997, dblcrown, 0,        dblcrown, dblcrown, dblcrown_state, 0,     ROT0, "Cadence Technology",  "Double Crown (v1.0.3)", MACHINE_IMPERFECT_GRAPHICS, layout_dblcrown ) // 1997 DYNA copyright in tile GFX

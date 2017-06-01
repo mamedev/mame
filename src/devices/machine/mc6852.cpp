@@ -24,20 +24,15 @@
 #include "emu.h"
 #include "mc6852.h"
 
+//#define VERBOSE 1
+#include "logmacro.h"
+
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type MC6852 = device_creator<mc6852_device>;
-
-
-
-//**************************************************************************
-//  MACROS / CONSTANTS
-//**************************************************************************
-
-#define LOG 0
+DEFINE_DEVICE_TYPE(MC6852, mc6852_device, "mc6852", "Motorola MC6852 SSDA")
 
 
 
@@ -50,7 +45,7 @@ const device_type MC6852 = device_creator<mc6852_device>;
 //-------------------------------------------------
 
 mc6852_device::mc6852_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, MC6852, "MC6852", tag, owner, clock, "mc6852", __FILE__),
+	device_t(mconfig, MC6852, tag, owner, clock),
 	device_serial_interface(mconfig, *this),
 	m_write_tx_data(*this),
 	m_write_irq(*this),
@@ -195,7 +190,7 @@ WRITE8_MEMBER( mc6852_device::write )
 		{
 		case C1_AC_C2: {
 			/* control 2 */
-			if (LOG) logerror("MC6852 '%s' Control 2 %02x\n", tag(), data);
+			LOG("MC6852 Control 2 %02x\n", data);
 			m_cr[1] = data;
 
 			int data_bit_count = 0;
@@ -220,13 +215,13 @@ WRITE8_MEMBER( mc6852_device::write )
 
 		case C1_AC_C3:
 			/* control 3 */
-			if (LOG) logerror("MC6852 '%s' Control 3 %02x\n", tag(), data);
+			LOG("MC6852 Control 3 %02x\n", data);
 			m_cr[2] = data;
 			break;
 
 		case C1_AC_SYNC:
 			/* sync code */
-			if (LOG) logerror("MC6852 '%s' Sync Code %02x\n", tag(), data);
+			LOG("MC6852 Sync Code %02x\n", data);
 			m_scr = data;
 			break;
 
@@ -234,7 +229,7 @@ WRITE8_MEMBER( mc6852_device::write )
 			/* transmit data FIFO */
 			if (m_tx_fifo.size() < 3)
 			{
-				if (LOG) logerror("MC6852 '%s' Transmit FIFO %02x\n", tag(), data);
+				LOG("MC6852 Transmit FIFO %02x\n", data);
 				m_tx_fifo.push(data);
 			}
 			break;
@@ -242,7 +237,7 @@ WRITE8_MEMBER( mc6852_device::write )
 	}
 	else
 	{
-		if (LOG) logerror("MC6852 '%s' Control 1 %02x\n", tag(), data);
+		LOG("MC6852 Control 1 %02x\n", data);
 
 		/* receiver reset */
 		if (data & C1_RX_RS)
@@ -253,7 +248,7 @@ WRITE8_MEMBER( mc6852_device::write )
 			Register is set to ones.
 			*/
 
-			if (LOG) logerror("MC6852 '%s' Receiver Reset\n", tag());
+			LOG("MC6852 Receiver Reset\n");
 
 			m_status &= ~(S_RX_OVRN | S_PE | S_DCD | S_RDA);
 			m_rsr = 0xff;
@@ -271,18 +266,15 @@ WRITE8_MEMBER( mc6852_device::write )
 			and inhibits the TDRA status bit (in the one-sync-character
 			and two-sync-character modes).*/
 
-			if (LOG) logerror("MC6852 '%s' Transmitter Reset\n", tag());
+			LOG("MC6852 Transmitter Reset\n");
 
 			m_status &= ~(S_TUF | S_CTS | S_TDRA);
 
 			transmit_register_reset();
 		}
 
-		if (LOG)
-		{
-			if (data & C1_STRIP_SYNC) logerror("MC6852 '%s' Strip Synchronization Characters\n", tag());
-			if (data & C1_CLEAR_SYNC) logerror("MC6852 '%s' Clear Synchronization\n", tag());
-		}
+		if (data & C1_STRIP_SYNC) LOG("MC6852 Strip Synchronization Characters\n");
+		if (data & C1_CLEAR_SYNC) LOG("MC6852 Clear Synchronization\n");
 
 		m_cr[0] = data;
 	}

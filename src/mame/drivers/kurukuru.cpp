@@ -848,7 +848,7 @@ void kurukuru_state::machine_reset()
 *                 Machine Driver                 *
 *************************************************/
 
-static MACHINE_CONFIG_START( kurukuru, kurukuru_state )
+static MACHINE_CONFIG_START( kurukuru )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, CPU_CLOCK)
@@ -881,12 +881,12 @@ static MACHINE_CONFIG_START( kurukuru, kurukuru_state )
 
 	MCFG_SOUND_ADD("adpcm", MSM5205, M5205_CLOCK)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(kurukuru_state, kurukuru_msm5205_vck))
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* changed on the fly */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* changed on the fly */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( ppj, kurukuru_state )
+static MACHINE_CONFIG_START( ppj )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, CPU_CLOCK)
@@ -919,7 +919,7 @@ static MACHINE_CONFIG_START( ppj, kurukuru_state )
 
 	MCFG_SOUND_ADD("adpcm", MSM5205, M5205_CLOCK)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(kurukuru_state, kurukuru_msm5205_vck))
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)  // changed on the fly
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)  // changed on the fly
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
@@ -982,9 +982,9 @@ ROM_END
 *                              Game Drivers                                *
 ***************************************************************************/
 
-/*    YEAR  NAME      PARENT  MACHINE   INPUT     STATE          INIT  ROT    COMPANY                   FULLNAME                        FLAGS  */
-GAME( 1990, kurukuru, 0,      kurukuru, kurukuru, driver_device, 0,    ROT0, "Success / Taiyo Jidoki", "Kuru Kuru Pyon Pyon (Japan)",   0 )
-GAME( 199?, ppj,      0,      ppj,      ppj,      driver_device, 0,    ROT0, "Success / Taiyo Jidoki", "Pyon Pyon Jump (V1.40, Japan)", 0 )
+//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT  ROT   COMPANY                   FULLNAME                         FLAGS
+GAME( 1990, kurukuru, 0,      kurukuru, kurukuru, kurukuru_state, 0,    ROT0, "Success / Taiyo Jidoki", "Kuru Kuru Pyon Pyon (Japan)",   0 )
+GAME( 199?, ppj,      0,      ppj,      ppj,      kurukuru_state, 0,    ROT0, "Success / Taiyo Jidoki", "Pyon Pyon Jump (V1.40, Japan)", 0 )
 
 // unemulated....
 

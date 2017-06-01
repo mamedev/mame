@@ -241,7 +241,7 @@ void sonson_state::machine_reset()
 	m_last_irq = 0;
 }
 
-static MACHINE_CONFIG_START( sonson, sonson_state )
+static MACHINE_CONFIG_START( sonson )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, XTAL_12MHz/8)   /* 1.5 MHz */
@@ -349,5 +349,5 @@ ROM_START( sonsonj )
 ROM_END
 
 
-GAME( 1984, sonson,  0,      sonson, sonson, driver_device, 0, ROT0, "Capcom", "Son Son", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, sonsonj, sonson, sonson, sonson, driver_device, 0, ROT0, "Capcom", "Son Son (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sonson,  0,      sonson, sonson, sonson_state, 0, ROT0, "Capcom", "Son Son",         MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sonsonj, sonson, sonson, sonson, sonson_state, 0, ROT0, "Capcom", "Son Son (Japan)", MACHINE_SUPPORTS_SAVE )

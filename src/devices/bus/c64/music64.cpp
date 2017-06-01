@@ -37,14 +37,14 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_MUSIC64 = device_creator<c64_music64_cartridge_device>;
+DEFINE_DEVICE_TYPE(C64_MUSIC64, c64_music64_cartridge_device, "c64_music64", "C64 Music 64 cartridge")
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( c64_music64 )
+//  MACHINE_CONFIG_START( c64_music64 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( c64_music64 )
+static MACHINE_CONFIG_START( c64_music64 )
 	MCFG_C64_PASSTHRU_EXPANSION_SLOT_ADD()
 MACHINE_CONFIG_END
 
@@ -151,7 +151,7 @@ ioport_constructor c64_music64_cartridge_device::device_input_ports() const
 //-------------------------------------------------
 
 c64_music64_cartridge_device::c64_music64_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, C64_MUSIC64, "C64 Music 64 cartridge", tag, owner, clock, "c64_music64", __FILE__),
+	device_t(mconfig, C64_MUSIC64, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_exp(*this, C64_EXPANSION_SLOT_TAG),
 	m_kb(*this, "KB%u", 0)

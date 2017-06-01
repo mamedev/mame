@@ -465,7 +465,7 @@ void hmcs40_cpu_device::op_lpu()
 	if (m_s)
 		m_page = m_op & 0x1f;
 	else
-		m_op = 0; // fake nop
+		m_op |= 0x400; // indicate unhandled LPU
 }
 
 void hmcs40_cpu_device::op_tbr()

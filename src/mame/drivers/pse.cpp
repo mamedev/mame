@@ -55,7 +55,7 @@ public:
 	}
 
 	// devices
-	required_device<netlist_mame_device_t> m_maincpu;
+	required_device<netlist_mame_device> m_maincpu;
 	required_device<fixedfreq_device> m_video;
 
 protected:
@@ -98,7 +98,7 @@ void pse_state::video_start()
 {
 }
 
-static MACHINE_CONFIG_START( pse, pse_state )
+static MACHINE_CONFIG_START( pse )
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, NETLIST_CLOCK)
@@ -204,9 +204,9 @@ ROM_START( gametree )
 ROM_END
 
 
-GAME( 1976, bazooka,    0,       pse, 0, driver_device,  0, ROT0, "Project Support Engineering", "Bazooka [TTL]", MACHINE_IS_SKELETON )
-GAME( 1977, bazookabr,  bazooka, pse, 0, driver_device,  0, ROT0, "Taito do Brasil", "Bazooka (Brazil) [TTL]", MACHINE_IS_SKELETON )
-GAME( 1977, dpatrol,    0,       pse, 0, driver_device,  0, ROT0, "Project Support Engineering", "Desert Patrol [TTL]", MACHINE_IS_SKELETON )
-GAME( 1977, dpatrola,   dpatrol, pse, 0, driver_device,  0, ROT0, "Project Support Engineering (Telegames license)", "Desert Patrol (set 2) [TTL]", MACHINE_IS_SKELETON )
-GAME( 1978, gametree, 0,       pse, 0, driver_device,  0, ROT0, "Project Support Engineering", "Game Tree [TTL]", MACHINE_IS_SKELETON )
-//GAME( 1976, knightar, 0,       pse, 0, driver_device,  0, ROT0, "Project Support Engineering", "Knights in Armor [TTL]", MACHINE_IS_SKELETON )
+GAME( 1976, bazooka,    0,       pse, 0, pse_state,  0, ROT0, "Project Support Engineering", "Bazooka [TTL]", MACHINE_IS_SKELETON )
+GAME( 1977, bazookabr,  bazooka, pse, 0, pse_state,  0, ROT0, "Taito do Brasil", "Bazooka (Brazil) [TTL]", MACHINE_IS_SKELETON )
+GAME( 1977, dpatrol,    0,       pse, 0, pse_state,  0, ROT0, "Project Support Engineering", "Desert Patrol [TTL]", MACHINE_IS_SKELETON )
+GAME( 1977, dpatrola,   dpatrol, pse, 0, pse_state,  0, ROT0, "Project Support Engineering (Telegames license)", "Desert Patrol (set 2) [TTL]", MACHINE_IS_SKELETON )
+GAME( 1978, gametree,   0,       pse, 0, pse_state,  0, ROT0, "Project Support Engineering", "Game Tree [TTL]", MACHINE_IS_SKELETON )
+//GAME( 1976, knightar, 0,       pse, 0, pse_state,  0, ROT0, "Project Support Engineering", "Knights in Armor [TTL]", MACHINE_IS_SKELETON )

@@ -372,7 +372,7 @@ void sidepckt_state::machine_reset()
 	m_scroll_y      = 0;
 }
 
-static MACHINE_CONFIG_START( sidepckt, sidepckt_state )
+static MACHINE_CONFIG_START( sidepckt )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 2000000) /* 2 MHz */
@@ -527,4 +527,4 @@ DRIVER_INIT_MEMBER(sidepckt_state,sidepcktj)
 
 GAME( 1986, sidepckt,  0,        sidepckt,  sidepckt,  sidepckt_state, sidepckt,  ROT0, "Data East Corporation", "Side Pocket (World)",   MACHINE_SUPPORTS_SAVE )
 GAME( 1986, sidepcktj, sidepckt, sidepckt,  sidepcktj, sidepckt_state, sidepcktj, ROT0, "Data East Corporation", "Side Pocket (Japan)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1986, sidepcktb, sidepckt, sidepcktb, sidepcktb, driver_device,  0,         ROT0, "bootleg",               "Side Pocket (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sidepcktb, sidepckt, sidepcktb, sidepcktb, sidepckt_state, 0,         ROT0, "bootleg",               "Side Pocket (bootleg)", MACHINE_SUPPORTS_SAVE )

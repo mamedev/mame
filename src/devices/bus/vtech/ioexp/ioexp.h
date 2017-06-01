@@ -24,10 +24,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_VTECH_IOEXP_IOEXP_H
+#define MAME_BUS_VTECH_IOEXP_IOEXP_H
 
-#ifndef __VTECH_IOEXP_H__
-#define __VTECH_IOEXP_H__
+#pragma once
 
 
 
@@ -36,51 +36,55 @@
 //**************************************************************************
 
 #define MCFG_IOEXP_SLOT_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, IOEXP_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(ioexp_slot_carts, nullptr, false)
+	MCFG_DEVICE_ADD(_tag, VTECH_IOEXP_SLOT, 0) \
+	MCFG_DEVICE_SLOT_INTERFACE(vtech_ioexp_slot_carts, nullptr, false)
 
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-class device_ioexp_interface;
+class device_vtech_ioexp_interface;
 
-class ioexp_slot_device : public device_t, public device_slot_interface
+class vtech_ioexp_slot_device : public device_t, public device_slot_interface
 {
+	friend class device_vtech_ioexp_interface;
 public:
 	// construction/destruction
-	ioexp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual ~ioexp_slot_device();
+	vtech_ioexp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual ~vtech_ioexp_slot_device();
 
 	void set_io_space(address_space *io);
-
-	address_space *m_io;
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	device_ioexp_interface *m_cart;
+	address_space *m_io;
+
+	device_vtech_ioexp_interface *m_cart;
 };
 
 // class representing interface-specific live ioexp device
-class device_ioexp_interface : public device_slot_card_interface
+class device_vtech_ioexp_interface : public device_slot_card_interface
 {
 public:
 	// construction/destruction
-	device_ioexp_interface(const machine_config &mconfig, device_t &device);
-	virtual ~device_ioexp_interface();
+	virtual ~device_vtech_ioexp_interface();
 
 protected:
-	ioexp_slot_device *m_slot;
+	device_vtech_ioexp_interface(const machine_config &mconfig, device_t &device);
+
+	address_space &io_space() { return *m_slot->m_io; }
+
+	vtech_ioexp_slot_device *m_slot;
 };
 
 // device type definition
-extern const device_type IOEXP_SLOT;
+DECLARE_DEVICE_TYPE(VTECH_IOEXP_SLOT, vtech_ioexp_slot_device)
 
 // include here so drivers don't need to
 #include "carts.h"
 
-#endif // __VTECH_IOEXP_H__
+#endif // MAME_BUS_VTECH_IOEXP_IOEXP_H

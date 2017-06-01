@@ -6,11 +6,11 @@
 
 ***************************************************************************/
 
+#ifndef MAME_MACHINE_PC9801_86_H
+#define MAME_MACHINE_PC9801_86_H
 
 #pragma once
 
-#ifndef __PC9801_86DEV_H__
-#define __PC9801_86DEV_H__
 
 #include "machine/pic8259.h"
 #include "sound/2608intf.h"
@@ -28,25 +28,22 @@ public:
 	// construction/destruction
 	pc9801_86_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual ioport_constructor device_input_ports() const override;
-
-	DECLARE_READ8_MEMBER(opn_porta_r);
-	DECLARE_WRITE8_MEMBER(opn_portb_w);
 	DECLARE_READ8_MEMBER(opn_r);
 	DECLARE_WRITE8_MEMBER(opn_w);
 	DECLARE_READ8_MEMBER(id_r);
 	DECLARE_WRITE8_MEMBER(mask_w);
 	DECLARE_READ8_MEMBER(pcm_r);
 	DECLARE_WRITE8_MEMBER(pcm_w);
-	DECLARE_WRITE_LINE_MEMBER(sound_irq);
-	virtual const tiny_rom_entry *device_rom_region() const override;
+
 protected:
 	// device-level overrides
 	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 	void install_device(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler);
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
@@ -62,11 +59,15 @@ private:
 	required_device<dac_word_interface> m_rdac;
 	std::vector<uint8_t> m_queue;
 	emu_timer *m_dac_timer;
+
+	DECLARE_WRITE_LINE_MEMBER(sound_irq);
+	DECLARE_READ8_MEMBER(opn_porta_r);
+	DECLARE_WRITE8_MEMBER(opn_portb_w);
 };
 
 
 // device type definition
-extern const device_type PC9801_86;
+DECLARE_DEVICE_TYPE(PC9801_86, pc9801_86_device)
 
 
 
@@ -76,4 +77,4 @@ extern const device_type PC9801_86;
 
 
 
-#endif
+#endif // MAME_MACHINE_PC9801_86_H

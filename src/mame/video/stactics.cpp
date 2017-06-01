@@ -405,7 +405,7 @@ uint32_t stactics_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
  *
  *************************************/
 
-MACHINE_CONFIG_FRAGMENT( stactics_video )
+MACHINE_CONFIG_START( stactics_video )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 	MCFG_SCREEN_REFRESH_RATE(60)

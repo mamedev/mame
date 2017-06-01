@@ -397,7 +397,7 @@ void mugsmash_state::machine_start()
 {
 }
 
-static MACHINE_CONFIG_START( mugsmash, mugsmash_state )
+static MACHINE_CONFIG_START( mugsmash )
 
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(mugsmash_map)
@@ -430,7 +430,7 @@ static MACHINE_CONFIG_START( mugsmash, mugsmash_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)   /* music */
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 
-	MCFG_OKIM6295_ADD("oki", 1122000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 1122000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50) /* sound fx */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END
@@ -462,4 +462,4 @@ ROM_START( mugsmash )
 	ROM_LOAD( "mugs_15.bin", 0x180000, 0x080000, CRC(82e8187c) SHA1(c7a0e1b3d90dbbe2588886a27a07a9c336447ae3) )
 ROM_END
 
-GAME( 1990?, mugsmash, 0, mugsmash, mugsmash, driver_device, 0, ROT0, "Electronic Devices Italy / 3D Games England", "Mug Smashers", MACHINE_SUPPORTS_SAVE )
+GAME( 1990?, mugsmash, 0, mugsmash, mugsmash, mugsmash_state, 0, ROT0, "Electronic Devices Italy / 3D Games England", "Mug Smashers", MACHINE_SUPPORTS_SAVE )

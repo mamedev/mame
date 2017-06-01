@@ -108,17 +108,10 @@ VIDEO_START_MEMBER(toaplan2_state,fixeightbl)
 	create_tx_tilemap();
 
 	/* This bootleg has additional layer offsets on the VDP */
-	m_vdp0->bg.extra_xoffset.normal  = -0x1d6  -26;
-	m_vdp0->bg.extra_yoffset.normal  = -0x1ef  -15;
-
-	m_vdp0->fg.extra_xoffset.normal  = -0x1d8  -22;
-	m_vdp0->fg.extra_yoffset.normal  = -0x1ef  -15;
-
-	m_vdp0->top.extra_xoffset.normal = -0x1da  -18;
-	m_vdp0->top.extra_yoffset.normal = -0x1ef  -15;
-
-	m_vdp0->sp.extra_xoffset.normal  = 8;//-0x1cc  -64;
-	m_vdp0->sp.extra_yoffset.normal  = 8;//-0x1ef  -128;
+	m_vdp0->set_bg_extra_offsets(  -0x1d6 - 26, -0x1ef - 15, 0, 0 );
+	m_vdp0->set_fg_extra_offsets(  -0x1d8 - 22, -0x1ef - 15, 0, 0 );
+	m_vdp0->set_top_extra_offsets( -0x1da - 18, -0x1ef - 15, 0, 0 );
+	m_vdp0->set_sp_extra_offsets(8/*-0x1cc - 64*/, 8/*-0x1ef - 128*/, 0, 0);
 
 	m_vdp0->init_scroll_regs();
 }
@@ -143,7 +136,7 @@ VIDEO_START_MEMBER(toaplan2_state,batrider)
 {
 	VIDEO_START_CALL_MEMBER( toaplan2 );
 
-	m_vdp0->sp.use_sprite_buffer = 0; // disable buffering on this game
+	m_vdp0->disable_sprite_buffer(); // disable buffering on this game
 
 	/* Create the Text tilemap for this game */
 	m_tx_gfxram16.allocate(RAIZING_TX_GFXRAM_SIZE/2);
@@ -153,7 +146,7 @@ VIDEO_START_MEMBER(toaplan2_state,batrider)
 	create_tx_tilemap(0x1d4, 0x16b);
 
 	/* Has special banking */
-	m_vdp0->gp9001_gfxrom_is_banked = 1;
+	m_vdp0->set_gfxrom_banked();
 }
 
 WRITE16_MEMBER(toaplan2_state::toaplan2_tx_videoram_w)
@@ -214,14 +207,7 @@ WRITE16_MEMBER(toaplan2_state::batrider_unknown_dma_w)
 WRITE16_MEMBER(toaplan2_state::batrider_objectbank_w)
 {
 	if (ACCESSING_BITS_0_7)
-	{
-		data &= 0xf;
-		if (m_vdp0->gp9001_gfxrom_bank[offset] != data)
-		{
-			m_vdp0->gp9001_gfxrom_bank[offset] = data;
-			m_vdp0->gp9001_gfxrom_bank_dirty = 1;
-		}
-	}
+		m_vdp0->set_gfxrom_bank(offset, data & 0x0f);
 }
 
 

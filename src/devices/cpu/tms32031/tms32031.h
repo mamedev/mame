@@ -8,10 +8,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_CPU_TMS32031_TMS32031_H
+#define MAME_CPU_TMS32031_TMS32031_H
 
-#ifndef __TMS32031_H__
-#define __TMS32031_H__
+#pragma once
 
 
 //**************************************************************************
@@ -135,23 +135,14 @@ class tms3203x_device : public cpu_device
 		uint32_t      i32[2];
 	};
 
-protected:
-	enum
-	{
-		CHIP_TYPE_TMS32031,
-		CHIP_TYPE_TMS32032
-	};
-
-	// construction/destruction
-	tms3203x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, uint32_t chiptype, address_map_constructor internal_map, const char *shortname, const char *source);
+public:
 	virtual ~tms3203x_device();
 
-public:
 	// inline configuration helpers
 	static void set_mcbl_mode(device_t &device, bool mode) { downcast<tms3203x_device &>(device).m_mcbl_mode = mode; }
-	template<class _Object> static devcb_base &set_xf0_callback(device_t &device, _Object object) { return downcast<tms3203x_device &>(device).m_xf0_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_xf1_callback(device_t &device, _Object object) { return downcast<tms3203x_device &>(device).m_xf1_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_iack_callback(device_t &device, _Object object) { return downcast<tms3203x_device &>(device).m_iack_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_xf0_callback(device_t &device, Object &&cb) { return downcast<tms3203x_device &>(device).m_xf0_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_xf1_callback(device_t &device, Object &&cb) { return downcast<tms3203x_device &>(device).m_xf1_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_iack_callback(device_t &device, Object &&cb) { return downcast<tms3203x_device &>(device).m_iack_cb.set_callback(std::forward<Object>(cb)); }
 
 	// public interfaces
 	static float fp_to_float(uint32_t floatdata);
@@ -160,6 +151,15 @@ public:
 	static uint32_t double_to_fp(double dval);
 
 protected:
+	enum
+	{
+		CHIP_TYPE_TMS32031,
+		CHIP_TYPE_TMS32032
+	};
+
+	// construction/destruction
+	tms3203x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t chiptype, address_map_constructor internal_map);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -401,10 +401,10 @@ protected:
 	void rolc(uint32_t op);
 	void ror(uint32_t op);
 	void rorc(uint32_t op);
-	void rtps_reg(uint32_t op);
-	void rtps_dir(uint32_t op);
-	void rtps_ind(uint32_t op);
-	void rtps_imm(uint32_t op);
+	void rpts_reg(uint32_t op);
+	void rpts_dir(uint32_t op);
+	void rpts_ind(uint32_t op);
+	void rpts_imm(uint32_t op);
 	void stf_dir(uint32_t op);
 	void stf_ind(uint32_t op);
 	void stfi_dir(uint32_t op);
@@ -807,9 +807,7 @@ public:
 
 
 // device type definition
-extern const device_type TMS32031;
-extern const device_type TMS32032;
+DECLARE_DEVICE_TYPE(TMS32031, tms32031_device)
+DECLARE_DEVICE_TYPE(TMS32032, tms32032_device)
 
-
-
-#endif /* __TMS32031_H__ */
+#endif // MAME_CPU_TMS32031_TMS32031_H

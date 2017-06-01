@@ -582,7 +582,7 @@ WRITE_LINE_MEMBER(c65_state::cia0_irq)
 //  c65_irq(state || m_vicirq);
 }
 
-static MACHINE_CONFIG_START( c65, c65_state )
+static MACHINE_CONFIG_START( c65 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M4510,MAIN_CLOCK)

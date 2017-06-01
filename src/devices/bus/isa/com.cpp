@@ -21,7 +21,7 @@ static SLOT_INTERFACE_START(isa_com)
 	SLOT_INTERFACE("null_modem", NULL_MODEM)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_FRAGMENT( com_config )
+static MACHINE_CONFIG_START( com_config )
 	MCFG_DEVICE_ADD( "uart_0", INS8250, XTAL_1_8432MHz )
 	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("serport0", rs232_port_device, write_txd))
 	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE("serport0", rs232_port_device, write_dtr))
@@ -76,7 +76,7 @@ MACHINE_CONFIG_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ISA8_COM = device_creator<isa8_com_device>;
+DEFINE_DEVICE_TYPE(ISA8_COM, isa8_com_device, "isa_com", "Communications Adapter PC/XT")
 
 //-------------------------------------------------
 //  machine_config_additions - device-specific
@@ -97,14 +97,13 @@ machine_config_constructor isa8_com_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 isa8_com_device::isa8_com_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, ISA8_COM, "Communications Adapter PC/XT", tag, owner, clock, "isa_com", __FILE__),
-		device_isa8_card_interface(mconfig, *this)
+	isa8_com_device(mconfig, ISA8_COM, tag, owner, clock)
 {
 }
 
-isa8_com_device::isa8_com_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_isa8_card_interface(mconfig, *this)
+isa8_com_device::isa8_com_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	device_isa8_card_interface(mconfig, *this)
 {
 }
 
@@ -130,7 +129,7 @@ void isa8_com_device::device_reset()
 {
 }
 
-static MACHINE_CONFIG_FRAGMENT( com_at_config )
+static MACHINE_CONFIG_START( com_at_config )
 	MCFG_DEVICE_ADD( "uart_0", NS16450, XTAL_1_8432MHz ) /* Verified: IBM P/N 6320947 Serial/Parallel card uses an NS16450N */
 	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("serport0", rs232_port_device, write_txd))
 	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE("serport0", rs232_port_device, write_dtr))
@@ -173,7 +172,7 @@ MACHINE_CONFIG_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ISA8_COM_AT = device_creator<isa8_com_at_device>;
+DEFINE_DEVICE_TYPE(ISA8_COM_AT, isa8_com_at_device, "isa_com_at", "Communications Adapter")
 
 //-------------------------------------------------
 //  machine_config_additions - device-specific
@@ -190,6 +189,6 @@ machine_config_constructor isa8_com_at_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 isa8_com_at_device::isa8_com_at_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		isa8_com_device(mconfig, ISA8_COM_AT, "Communications Adapter", tag, owner, clock, "isa_com_at", __FILE__)
+	isa8_com_device(mconfig, ISA8_COM_AT, tag, owner, clock)
 {
 }

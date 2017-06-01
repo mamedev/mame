@@ -83,8 +83,6 @@
 class ioc2_device : public device_t
 {
 public:
-	ioc2_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, uint8_t id);
-
 	DECLARE_WRITE32_MEMBER( write );
 	DECLARE_READ32_MEMBER( read );
 
@@ -98,9 +96,11 @@ public:
 	void raise_local1_irq(uint8_t source_mask);
 
 protected:
+	ioc2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t id);
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 
 	required_device<mips3_device> m_maincpu;
@@ -141,28 +141,32 @@ class ioc2_guinness_device : public ioc2_device
 {
 public:
 	ioc2_guinness_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	ioc2_guinness_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-		: ioc2_device(mconfig, type, name, tag, owner, clock, shortname, source, 0x01) { }
+protected:
+	ioc2_guinness_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+		: ioc2_device(mconfig, type, tag, owner, clock, 0x01)
+	{ }
 };
 
 class ioc2_full_house_device : public ioc2_device
 {
 public:
 	ioc2_full_house_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	ioc2_full_house_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-		: ioc2_device(mconfig, type, name, tag, owner, clock, shortname, source, 0x20) { }
+protected:
+	ioc2_full_house_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+		: ioc2_device(mconfig, type, tag, owner, clock, 0x20)
+	{ }
 };
 
-const device_type SGI_IOC2_GUINNESS = device_creator<ioc2_guinness_device>;
-const device_type SGI_IOC2_FULL_HOUSE = device_creator<ioc2_full_house_device>;
+DEFINE_DEVICE_TYPE(SGI_IOC2_GUINNESS,   ioc2_guinness_device,   "ioc2g", "SGI IOC2 (Guiness)")
+DEFINE_DEVICE_TYPE(SGI_IOC2_FULL_HOUSE, ioc2_full_house_device, "ioc2f", "SGI IOC2 (Full House)")
 
 ioc2_guinness_device::ioc2_guinness_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ioc2_guinness_device(mconfig, SGI_IOC2_GUINNESS, "SGI IOC2 (Guinness)", tag, owner, clock, "ioc2g", __FILE__)
+	: ioc2_guinness_device(mconfig, SGI_IOC2_GUINNESS, tag, owner, clock)
 {
 }
 
 ioc2_full_house_device::ioc2_full_house_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ioc2_full_house_device(mconfig, SGI_IOC2_FULL_HOUSE, "SGI IOC2 (Full House)", tag, owner, clock, "ioc2f", __FILE__)
+	: ioc2_full_house_device(mconfig, SGI_IOC2_FULL_HOUSE, tag, owner, clock)
 {
 }
 
@@ -178,7 +182,7 @@ ioport_constructor ioc2_device::device_input_ports() const
 	return INPUT_PORTS_NAME(front_panel);
 }
 
-MACHINE_CONFIG_FRAGMENT( ioc2_device )
+MACHINE_CONFIG_MEMBER( ioc2_device::device_add_mconfig )
 	MCFG_SCC85230_ADD(SCC_TAG, SCC_PCLK, SCC_RXA_CLK, SCC_TXA_CLK, SCC_RXB_CLK, SCC_TXB_CLK)
 	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE(RS232A_TAG, rs232_port_device, write_txd))
 	MCFG_Z80SCC_OUT_DTRA_CB(DEVWRITELINE(RS232A_TAG, rs232_port_device, write_dtr))
@@ -210,13 +214,9 @@ MACHINE_CONFIG_FRAGMENT( ioc2_device )
 	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE(KBDC_TAG, kbdc8042_device, write_out2))
 MACHINE_CONFIG_END
 
-machine_config_constructor ioc2_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME(ioc2_device);
-}
 
-ioc2_device::ioc2_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, uint8_t id)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+ioc2_device::ioc2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t id)
+	: device_t(mconfig, type, tag, owner, clock)
 	, m_maincpu(*this, "^maincpu")
 	, m_scc(*this, SCC_TAG)
 	, m_pi1(*this, PI1_TAG)
@@ -1471,13 +1471,13 @@ static INPUT_PORTS_START( ip225015 )
 	PORT_INCLUDE( at_keyboard )     /* IN4 - IN11 */
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_FRAGMENT( cdrom_config )
+static MACHINE_CONFIG_START( cdrom_config )
 	MCFG_DEVICE_MODIFY( "cdda" )
 	MCFG_SOUND_ROUTE( 0, "^^^^lspeaker", 1.0 )
 	MCFG_SOUND_ROUTE( 1, "^^^^rspeaker", 1.0 )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ip225015, ip22_state )
+static MACHINE_CONFIG_START( ip225015 )
 	MCFG_CPU_ADD( "maincpu", R5000BE, 50000000*3 )
 	//MCFG_MIPS3_ICACHE_SIZE(32768)
 	//MCFG_MIPS3_DCACHE_SIZE(32768)
@@ -1575,7 +1575,7 @@ ROM_START( ip244415 )
 	ROM_LOAD( "ip244415.bin", 0x000000, 0x080000, CRC(2f37825a) SHA1(0d48c573b53a307478820b85aacb57b868297ca3) )
 ROM_END
 
-/*     YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     INIT     COMPANY   FULLNAME */
-COMP( 1993, ip225015, 0,        0,        ip225015, ip225015, ip22_state, ip225015, "Silicon Graphics Inc", "Indy (R5000, 150MHz)", MACHINE_NOT_WORKING )
-COMP( 1993, ip224613, 0,        0,        ip224613, ip225015, ip22_state, ip225015, "Silicon Graphics Inc", "Indy (R4600, 133MHz)", MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     STATE       INIT      COMPANY                 FULLNAME                   FLAGS
+COMP( 1993, ip225015, 0,        0,        ip225015, ip225015, ip22_state, ip225015, "Silicon Graphics Inc", "Indy (R5000, 150MHz)",    MACHINE_NOT_WORKING )
+COMP( 1993, ip224613, 0,        0,        ip224613, ip225015, ip22_state, ip225015, "Silicon Graphics Inc", "Indy (R4600, 133MHz)",    MACHINE_NOT_WORKING )
 COMP( 1994, ip244415, 0,        0,        ip244415, ip225015, ip22_state, ip225015, "Silicon Graphics Inc", "Indigo2 (R4400, 150MHz)", MACHINE_NOT_WORKING )

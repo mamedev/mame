@@ -26,7 +26,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type V1050_KEYBOARD = device_creator<v1050_keyboard_device>;
+DEFINE_DEVICE_TYPE(V1050_KEYBOARD, v1050_keyboard_device, "v1050kb", "Visual 1050 Keyboard")
 
 
 //-------------------------------------------------
@@ -51,16 +51,6 @@ const tiny_rom_entry *v1050_keyboard_device::device_rom_region() const
 
 
 //-------------------------------------------------
-//  ADDRESS_MAP( kb_io )
-//-------------------------------------------------
-
-static ADDRESS_MAP_START( v1050_keyboard_io, AS_IO, 8, v1050_keyboard_device )
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(kb_p1_r, kb_p1_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(kb_p2_w)
-ADDRESS_MAP_END
-
-
-//-------------------------------------------------
 //  DISCRETE_SOUND_START( v1050kb )
 //-------------------------------------------------
 
@@ -79,12 +69,14 @@ DISCRETE_SOUND_END
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( v1050_keyboard )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( v1050_keyboard )
+MACHINE_CONFIG_MEMBER( v1050_keyboard_device::device_add_mconfig )
 	MCFG_CPU_ADD(I8049_TAG, I8049, XTAL_4_608MHz)
-	MCFG_CPU_IO_MAP(v1050_keyboard_io)
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(v1050_keyboard_device, kb_p1_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(v1050_keyboard_device, kb_p1_w))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(v1050_keyboard_device, kb_p2_w))
 	MCFG_DEVICE_DISABLE() // TODO
 
 	// discrete sound
@@ -93,17 +85,6 @@ static MACHINE_CONFIG_FRAGMENT( v1050_keyboard )
 	MCFG_DISCRETE_INTF(v1050kb)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor v1050_keyboard_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( v1050_keyboard );
-}
 
 
 //-------------------------------------------------
@@ -305,7 +286,7 @@ ioport_constructor v1050_keyboard_device::device_input_ports() const
 //-------------------------------------------------
 
 v1050_keyboard_device::v1050_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, V1050_KEYBOARD, "Visual 1050 Keyboard", tag, owner, clock, "v1050kb", __FILE__),
+	device_t(mconfig, V1050_KEYBOARD, tag, owner, clock),
 	m_maincpu(*this, I8049_TAG),
 	m_discrete(*this, DISCRETE_TAG),
 	m_y(*this, "Y%u", 0),

@@ -17,11 +17,11 @@
 #include "emu.h"
 #include "machine/315-5881_crypt.h"
 
-const device_type SEGA315_5881_CRYPT = device_creator<sega_315_5881_crypt_device>;
+DEFINE_DEVICE_TYPE(SEGA315_5881_CRYPT, sega_315_5881_crypt_device, "sega315_5881", "Sega 315-5881 Encryption")
 
 
 sega_315_5881_crypt_device::sega_315_5881_crypt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SEGA315_5881_CRYPT, "Sega 315-5881 Encryption", tag, owner, clock, "sega315_5881", __FILE__)
+	: device_t(mconfig, SEGA315_5881_CRYPT, tag, owner, clock)
 {
 }
 

@@ -21,9 +21,9 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_SAM = device_creator<a2bus_sam_device>;
+DEFINE_DEVICE_TYPE(A2BUS_SAM, a2bus_sam_device, "a2sam", "Don't Ask Software SAM")
 
-MACHINE_CONFIG_FRAGMENT( a2sam )
+MACHINE_CONFIG_START( a2sam )
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
@@ -49,7 +49,7 @@ machine_config_constructor a2bus_sam_device::device_mconfig_additions() const
 //**************************************************************************
 
 a2bus_sam_device::a2bus_sam_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, A2BUS_SAM, "Don't Ask Software SAM", tag, owner, clock, "a2sam", __FILE__),
+	device_t(mconfig, A2BUS_SAM, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this),
 	m_dac(*this, "dac")
 {

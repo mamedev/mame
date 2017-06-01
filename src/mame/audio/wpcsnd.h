@@ -6,8 +6,10 @@
  *  Created on: 4/10/2013
  */
 
-#ifndef WPCSND_H_
-#define WPCSND_H_
+#ifndef MAME_AUDIO_WPCSND_H
+#define MAME_AUDIO_WPCSND_H
+
+#pragma once
 
 #include "cpu/m6809/m6809.h"
 #include "sound/ym2151.h"
@@ -38,7 +40,6 @@ public:
 	DECLARE_WRITE8_MEMBER(bg_speech_clock_w);
 	DECLARE_WRITE8_MEMBER(bg_speech_digit_w);
 	DECLARE_WRITE8_MEMBER(rombank_w);
-	DECLARE_WRITE_LINE_MEMBER(ym2151_irq_w);
 	DECLARE_READ8_MEMBER(latch_r);
 	DECLARE_WRITE8_MEMBER(latch_w);
 	DECLARE_WRITE8_MEMBER(volume_w);
@@ -51,13 +52,13 @@ public:
 	static void static_set_romregion(device_t &device, const char *tag);
 
 	// callbacks
-	template<class _reply> void set_reply_callback(_reply reply) { m_reply_cb.set_callback(reply); }
+	template <class Reply> void set_reply_callback(Reply &&cb) { m_reply_cb.set_callback(std::forward<Reply>(cb)); }
 
 protected:
 	// overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	uint8_t m_latch;
@@ -66,8 +67,10 @@ private:
 
 	// callback
 	devcb_write_line m_reply_cb;
+
+	DECLARE_WRITE_LINE_MEMBER(ym2151_irq_w);
 };
 
-extern const device_type WPCSND;
+DECLARE_DEVICE_TYPE(WPCSND, wpcsnd_device)
 
-#endif /* WPCSND_H_ */
+#endif // MAME_AUDIO_WPCSND_H

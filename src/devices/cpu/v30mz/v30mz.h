@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol,Bryan McPhail
-#ifndef __V30MZ_H__
-#define __V30MZ_H__
+#ifndef MAME_CPU_V32MZ_V30MZ_H
+#define MAME_CPU_V32MZ_V30MZ_H
 
 
 struct nec_config
@@ -20,7 +20,7 @@ enum
 
 /////////////////////////////////////////////////////////////////
 
-extern const device_type V30MZ;
+DECLARE_DEVICE_TYPE(V30MZ, v30mz_cpu_device)
 
 class v30mz_cpu_device : public cpu_device
 {
@@ -166,7 +166,6 @@ protected:
 	inline void ADJ4(int8_t param1, int8_t param2);
 	inline void ADJB(int8_t param1, int8_t param2);
 
-protected:
 	address_space_config m_program_config;
 	address_space_config m_io_config;
 
@@ -222,5 +221,4 @@ protected:
 	} m_Mod_RM;
 };
 
-
-#endif /* __V30MZ_H__ */
+#endif // MAME_CPU_V32MZ_V30MZ_H

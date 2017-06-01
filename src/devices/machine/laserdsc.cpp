@@ -57,8 +57,8 @@ const uint32_t VIRTUAL_LEAD_OUT_TRACKS = LEAD_OUT_MIN_SIZE_IN_UM * 1000 / NOMINA
 //  laserdisc_device - constructor
 //-------------------------------------------------
 
-laserdisc_device::laserdisc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+laserdisc_device::laserdisc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		device_video_interface(mconfig, *this),
 		m_overwidth(0),
@@ -212,9 +212,9 @@ uint32_t laserdisc_device::screen_update(screen_device &screen, bitmap_rgb32 &bi
 //  delegate
 //-------------------------------------------------
 
-void laserdisc_device::static_set_get_disc(device_t &device, laserdisc_get_disc_delegate callback)
+void laserdisc_device::static_set_get_disc(device_t &device, get_disc_delegate &&callback)
 {
-	downcast<laserdisc_device &>(device).m_getdisc_callback = callback;
+	downcast<laserdisc_device &>(device).m_getdisc_callback = std::move(callback);
 }
 
 
@@ -223,9 +223,9 @@ void laserdisc_device::static_set_get_disc(device_t &device, laserdisc_get_disc_
 //  delegate
 //-------------------------------------------------
 
-void laserdisc_device::static_set_audio(device_t &device, laserdisc_audio_delegate callback)
+void laserdisc_device::static_set_audio(device_t &device, audio_delegate &&callback)
 {
-	downcast<laserdisc_device &>(device).m_audio_callback = callback;
+	downcast<laserdisc_device &>(device).m_audio_callback = std::move(callback);
 }
 
 
@@ -233,24 +233,24 @@ void laserdisc_device::static_set_audio(device_t &device, laserdisc_audio_delega
 //  static_set_overlay - set the overlay parameters
 //-------------------------------------------------
 
-void laserdisc_device::static_set_overlay(device_t &device, uint32_t width, uint32_t height, screen_update_ind16_delegate update)
+void laserdisc_device::static_set_overlay(device_t &device, uint32_t width, uint32_t height, screen_update_ind16_delegate &&update)
 {
 	laserdisc_device &ld = downcast<laserdisc_device &>(device);
 	ld.m_overwidth = width;
 	ld.m_overheight = height;
 	ld.m_overclip.set(0, width - 1, 0, height - 1);
-	ld.m_overupdate_ind16 = update;
+	ld.m_overupdate_ind16 = std::move(update);
 	ld.m_overupdate_rgb32 = screen_update_rgb32_delegate();
 }
 
-void laserdisc_device::static_set_overlay(device_t &device, uint32_t width, uint32_t height, screen_update_rgb32_delegate update)
+void laserdisc_device::static_set_overlay(device_t &device, uint32_t width, uint32_t height, screen_update_rgb32_delegate &&update)
 {
 	laserdisc_device &ld = downcast<laserdisc_device &>(device);
 	ld.m_overwidth = width;
 	ld.m_overheight = height;
 	ld.m_overclip.set(0, width - 1, 0, height - 1);
 	ld.m_overupdate_ind16 = screen_update_ind16_delegate();
-	ld.m_overupdate_rgb32 = update;
+	ld.m_overupdate_rgb32 = std::move(update);
 }
 
 

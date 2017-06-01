@@ -6,8 +6,10 @@
  *  Created on: 7/10/2013
  */
 
-#ifndef WPC_H_
-#define WPC_H_
+#ifndef MAME_MACHINE_WPC_H
+#define MAME_MACHINE_WPC_H
+
+#pragma once
 
 
 /* A = Alpha-numeric
@@ -101,38 +103,40 @@
 class wpc_device : public device_t
 {
 public:
+	static constexpr device_timer_id TIMER_IRQ = 1;
+	static constexpr device_timer_id TIMER_ZEROCROSS = 2;
+
 	wpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
 
 	uint16_t get_memprotect_mask() { return m_memprotect_mask; }
-	bool memprotect_active() { if(m_memprotect == 0xb4) return false; else return true; }
-	uint16_t get_alphanumeric(uint8_t offset) { if(offset < 40) return m_alpha_data[offset]; else return 0; }
-	void reset_alphanumeric() { memset(m_alpha_data,0,40*2); }
+	bool memprotect_active() { return m_memprotect != 0xb4; }
+	uint16_t get_alphanumeric(uint8_t offset) { return (offset < 40) ? m_alpha_data[offset] : 0; }
+	void reset_alphanumeric() { std::fill(std::begin(m_alpha_data), std::end(m_alpha_data), 0); }
 	uint8_t get_visible_page() { return m_dmd_visiblepage; }
 	uint8_t get_dmd_firq_line() { return m_dmd_irqline; }
 	void set_dmd_firq() { m_dmd_irqsrc = true; }
 	void set_snd_firq() { m_snd_irqsrc = true; }
 
 	// callbacks
-	template<class _irq> void set_irq_callback(_irq irq) { m_irq_cb.set_callback(irq); }
-	template<class _firq> void set_firq_callback(_firq firq) { m_firq_cb.set_callback(firq); }
-	template<class _sounddata_r> void set_sound_data_read(_sounddata_r sounddata_r) { m_sounddata_r.set_callback(sounddata_r); }
-	template<class _sounddata_w> void set_sound_data_write(_sounddata_w sounddata_w) { m_sounddata_w.set_callback(sounddata_w); }
-	template<class _soundctrl_r> void set_sound_ctrl_read(_soundctrl_r soundctrl_r) { m_soundctrl_r.set_callback(soundctrl_r); }
-	template<class _soundctrl_w> void set_sound_ctrl_write(_soundctrl_w soundctrl_w) { m_soundctrl_w.set_callback(soundctrl_w); }
-	template<class _sounds11> void set_sound_s11_write(_sounds11 sounds11) { m_sounds11_w.set_callback(sounds11); }
-	template<class _bank_w> void set_bank_write(_bank_w bank_w) { m_bank_w.set_callback(bank_w); }
-	template<class _dmdbank_w> void set_dmdbank_write(_dmdbank_w dmdbank_w) { m_dmdbank_w.set_callback(dmdbank_w); }
+	template <class Object> void set_irq_callback(Object &&cb) { m_irq_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> void set_firq_callback(Object &&cb) { m_firq_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> void set_sound_data_read(Object &&cb) { m_sounddata_r.set_callback(std::forward<Object>(cb)); }
+	template <class Object> void set_sound_data_write(Object &&cb) { m_sounddata_w.set_callback(std::forward<Object>(cb)); }
+	template <class Object> void set_sound_ctrl_read(Object &&cb) { m_soundctrl_r.set_callback(std::forward<Object>(cb)); }
+	template <class Object> void set_sound_ctrl_write(Object &&cb) { m_soundctrl_w.set_callback(std::forward<Object>(cb)); }
+	template <class Object> void set_sound_s11_write(Object &&cb) { m_sounds11_w.set_callback(std::forward<Object>(cb)); }
+	template <class Object> void set_bank_write(Object &&cb) { m_bank_w.set_callback(std::forward<Object>(cb)); }
+	template <class Object> void set_dmdbank_write(Object &&cb) { m_dmdbank_w.set_callback(std::forward<Object>(cb)); }
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	static const device_timer_id TIMER_IRQ = 1;
-	static const device_timer_id TIMER_ZEROCROSS = 2;
 protected:
 	// overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	uint8_t m_shift_addr_high;
@@ -163,6 +167,6 @@ private:
 	devcb_write8 m_dmdbank_w;
 };
 
-extern const device_type WPCASIC;
+DECLARE_DEVICE_TYPE(WPCASIC, wpc_device)
 
-#endif /* WPC_H_ */
+#endif // MAME_MACHINE_WPC_H

@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco
-#pragma once
+#ifndef MAME_BUS_KC_ROM_H
+#define MAME_BUS_KC_ROM_H
 
-#ifndef __KC_ROM_H__
-#define __KC_ROM_H__
+#pragma once
 
 #include "kc.h"
 
@@ -20,11 +20,10 @@ class kc_8k_device :
 public:
 	// construction/destruction
 	kc_8k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	kc_8k_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
-
-	// optional information overrides
 
 protected:
+	kc_8k_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -90,8 +89,8 @@ private:
 
 
 // device type definition
-extern const device_type KC_STANDARD;
-extern const device_type KC_M006;
-extern const device_type KC_M033;
+DECLARE_DEVICE_TYPE(KC_STANDARD, kc_8k_device)
+DECLARE_DEVICE_TYPE(KC_M006,     kc_m006_device)
+DECLARE_DEVICE_TYPE(KC_M033,     kc_m033_device)
 
-#endif  /* __KC_ROM_H__ */
+#endif // MAME_BUS_KC_ROM_H

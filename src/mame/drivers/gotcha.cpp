@@ -262,7 +262,7 @@ void gotcha_state::machine_reset()
 	m_banksel = 0;
 }
 
-static MACHINE_CONFIG_START( gotcha, gotcha_state )
+static MACHINE_CONFIG_START( gotcha )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,14318180)    /* 14.31818 MHz */
@@ -304,7 +304,7 @@ static MACHINE_CONFIG_START( gotcha, gotcha_state )
 	MCFG_SOUND_ROUTE(0, "mono", 0.80)
 	MCFG_SOUND_ROUTE(1, "mono", 0.80)
 
-	MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
@@ -388,5 +388,5 @@ ROM_START( ppchamp )
 	ROM_LOAD( "uz11", 0x00000, 0x80000, CRC(3d96274c) SHA1(c7a670af86194c370bf8fb30afbe027ab78a0227) )
 ROM_END
 
-GAMEL( 1997, gotcha,  0,      gotcha, gotcha, driver_device, 0, ROT0, "Dongsung / Para", "Got-cha Mini Game Festival",                   MACHINE_SUPPORTS_SAVE, layout_gotcha )
-GAMEL( 1997, ppchamp, gotcha, gotcha, gotcha, driver_device, 0, ROT0, "Dongsung / Para", "Pasha Pasha Champ Mini Game Festival (Korea)", MACHINE_SUPPORTS_SAVE, layout_gotcha )
+GAMEL( 1997, gotcha,  0,      gotcha, gotcha, gotcha_state, 0, ROT0, "Dongsung / Para", "Got-cha Mini Game Festival",                   MACHINE_SUPPORTS_SAVE, layout_gotcha )
+GAMEL( 1997, ppchamp, gotcha, gotcha, gotcha, gotcha_state, 0, ROT0, "Dongsung / Para", "Pasha Pasha Champ Mini Game Festival (Korea)", MACHINE_SUPPORTS_SAVE, layout_gotcha )

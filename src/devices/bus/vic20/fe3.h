@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_VIC20_FE3_H
+#define MAME_BUS_VIC20_FE3_H
 
-#ifndef __VIC20_FE3__
-#define __VIC20_FE3__
+#pragma once
 
 #include "exp.h"
 #include "machine/intelfsh.h"
@@ -20,14 +20,14 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> vic20_final_expansion_3_t
+// ======================> vic20_final_expansion_3_device
 
-class vic20_final_expansion_3_t :  public device_t,
+class vic20_final_expansion_3_device :  public device_t,
 									public device_vic20_expansion_card_interface
 {
 public:
 	// construction/destruction
-	vic20_final_expansion_3_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vic20_final_expansion_3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -86,8 +86,6 @@ private:
 
 
 // device type definition
-extern const device_type VIC20_FE3;
+DECLARE_DEVICE_TYPE(VIC20_FE3, vic20_final_expansion_3_device)
 
-
-
-#endif
+#endif // MAME_BUS_VIC20_FE3_H

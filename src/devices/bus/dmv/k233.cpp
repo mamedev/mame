@@ -18,7 +18,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type DMV_K233 = device_creator<dmv_k233_device>;
+DEFINE_DEVICE_TYPE(DMV_K233, dmv_k233_device, "dmv_k233", "K233 16K Shared RAM")
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -29,11 +29,11 @@ const device_type DMV_K233 = device_creator<dmv_k233_device>;
 //-------------------------------------------------
 
 dmv_k233_device::dmv_k233_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: device_t(mconfig, DMV_K233, "K233 16K Shared RAM", tag, owner, clock, "dmv_k233", __FILE__),
-		device_dmvslot_interface( mconfig, *this ),
-	m_enabled(false),
-	m_ram(nullptr)
-	{
+	: device_t(mconfig, DMV_K233, tag, owner, clock)
+	, device_dmvslot_interface(mconfig, *this)
+	, m_enabled(false)
+	, m_ram(nullptr)
+{
 }
 
 //-------------------------------------------------

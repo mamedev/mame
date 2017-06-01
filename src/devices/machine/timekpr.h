@@ -14,10 +14,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_TIMEKPR_H
+#define MAME_MACHINE_TIMEKPR_H
 
-#ifndef __TIMEKPR_H__
-#define __TIMEKPR_H__
+#pragma once
 
 
 
@@ -53,18 +53,16 @@
 
 // ======================> timekeeper_device
 
-class timekeeper_device :   public device_t,
-							public device_nvram_interface
+class timekeeper_device : public device_t, public device_nvram_interface
 {
-protected:
-	// construction/destruction
-	timekeeper_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, int size);
-
 public:
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_READ8_MEMBER( read );
 
 protected:
+	// construction/destruction
+	timekeeper_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int size);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -94,7 +92,7 @@ private:
 	optional_region_ptr<uint8_t> m_default_data;
 
 protected:
-	int m_size;
+	int const m_size;
 	int m_offset_control;
 	int m_offset_seconds;
 	int m_offset_minutes;
@@ -144,11 +142,11 @@ public:
 };
 
 // device type definition
-extern const device_type M48T02;
-extern const device_type M48T35;
-extern const device_type M48T37;
-extern const device_type M48T58;
-extern const device_type MK48T08;
-extern const device_type MK48T12;
+DECLARE_DEVICE_TYPE(M48T02,  m48t02_device)
+DECLARE_DEVICE_TYPE(M48T35,  m48t35_device)
+DECLARE_DEVICE_TYPE(M48T37,  m48t37_device)
+DECLARE_DEVICE_TYPE(M48T58,  m48t58_device)
+DECLARE_DEVICE_TYPE(MK48T08, mk48t08_device)
+DECLARE_DEVICE_TYPE(MK48T12, mk48t12_device)
 
-#endif // __TIMEKPR_H__
+#endif // MAME_MACHINE_TIMEKPR_H

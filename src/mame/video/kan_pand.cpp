@@ -53,10 +53,10 @@
 #include "video/kan_pand.h"
 #include "screen.h"
 
-const device_type KANEKO_PANDORA = device_creator<kaneko_pandora_device>;
+DEFINE_DEVICE_TYPE(KANEKO_PANDORA, kaneko_pandora_device, "kaneko_pandora", "Kaneko PANDORA GFX")
 
 kaneko_pandora_device::kaneko_pandora_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, KANEKO_PANDORA, "Kaneko PANDORA GFX", tag, owner, clock, "kaneko_pandora", __FILE__)
+	: device_t(mconfig, KANEKO_PANDORA, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, m_gfx_region(0)
 	, m_xoffset(0)

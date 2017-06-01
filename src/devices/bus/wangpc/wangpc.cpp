@@ -14,8 +14,8 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type WANGPC_BUS = device_creator<wangpcbus_device>;
-const device_type WANGPC_BUS_SLOT = device_creator<wangpcbus_slot_device>;
+DEFINE_DEVICE_TYPE(WANGPC_BUS,      wangpcbus_device,      "wangpcbus",      "Wang PC bus")
+DEFINE_DEVICE_TYPE(WANGPC_BUS_SLOT, wangpcbus_slot_device, "wangpcbus_slot", "Wang PC bus slot")
 
 
 
@@ -28,7 +28,7 @@ const device_type WANGPC_BUS_SLOT = device_creator<wangpcbus_slot_device>;
 //-------------------------------------------------
 
 wangpcbus_slot_device::wangpcbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, WANGPC_BUS_SLOT, "Wang PC bus slot", tag, owner, clock, "wangpcbus_slot", __FILE__),
+	device_t(mconfig, WANGPC_BUS_SLOT, tag, owner, clock),
 	device_slot_interface(mconfig, *this),
 	m_bus(nullptr),
 	m_sid(0)
@@ -59,7 +59,7 @@ void wangpcbus_slot_device::device_start()
 //-------------------------------------------------
 
 wangpcbus_device::wangpcbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, WANGPC_BUS, "Wang PC bus", tag, owner, clock, "wangpcbus", __FILE__),
+	device_t(mconfig, WANGPC_BUS, tag, owner, clock),
 	m_write_irq2(*this),
 	m_write_irq3(*this),
 	m_write_irq4(*this),

@@ -535,7 +535,7 @@ void slotcarn_state::machine_start()
 *          Machine Driver          *
 ***********************************/
 
-static MACHINE_CONFIG_START( slotcarn, slotcarn_state )
+static MACHINE_CONFIG_START( slotcarn )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK) // 2.5 Mhz?
@@ -699,8 +699,8 @@ ROM_END
 
 /*********************************************
 *                Game Drivers                *
-**********************************************
+**********************************************/
 
-      YEAR  NAME      PARENT   MACHINE   INPUT     INIT   ROT    COMPANY           FULLNAME               FLAGS  */
-GAME( 1985, slotcarn, 0,       slotcarn, slotcarn, driver_device, 0,     ROT0, "Wing Co., Ltd.", "Slot Carnival",        MACHINE_NOT_WORKING )
-GAME( 1985, spielbud, 0,       slotcarn, spielbud, driver_device, 0,     ROT0, "ADP",            "Spiel Bude (German)",  MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT   MACHINE   INPUT     STATE           INIT   ROT   COMPANY           FULLNAME                FLAGS
+GAME( 1985, slotcarn, 0,       slotcarn, slotcarn, slotcarn_state, 0,     ROT0, "Wing Co., Ltd.", "Slot Carnival",        MACHINE_NOT_WORKING )
+GAME( 1985, spielbud, 0,       slotcarn, spielbud, slotcarn_state, 0,     ROT0, "ADP",            "Spiel Bude (German)",  MACHINE_NOT_WORKING )

@@ -62,7 +62,7 @@ void konami_pc_state::machine_reset()
 {
 }
 
-static MACHINE_CONFIG_START( konami_pc, konami_pc_state )
+static MACHINE_CONFIG_START( konami_pc )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PENTIUM3, 100000000) // not correct, but why bother?
@@ -94,4 +94,4 @@ ROM_START( otomedius )
 	DISK_IMAGE( "otomedius", 0, SHA1(9283f8b7cd747be7b8e7321953adbf6cbe926f25) )
 ROM_END
 
-GAME( 2007, otomedius,  0,   konami_pc, konami_pc, driver_device,  0, ROT0, "Konami", "Otomedius (ver GGG:J:A:A:2008041801)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2007, otomedius,  0,   konami_pc, konami_pc, konami_pc_state,  0, ROT0, "Konami", "Otomedius (ver GGG:J:A:A:2008041801)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco
-#pragma once
+#ifndef MAME_BUS_DMV_K210_H
+#define MAME_BUS_DMV_K210_H
 
-#ifndef __DMV_K210_H__
-#define __DMV_K210_H__
+#pragma once
 
 #include "dmvbus.h"
 #include "machine/i8255.h"
@@ -65,6 +65,6 @@ private:
 
 
 // device type definition
-extern const device_type DMV_K210;
+DECLARE_DEVICE_TYPE(DMV_K210, dmv_k210_device)
 
-#endif  /* __DMV_K210_H__ */
+#endif  // MAME_BUS_DMV_K210_H

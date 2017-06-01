@@ -17,7 +17,7 @@
 
 
 #include "emu.h"
-#include "cpu/m6800/m6800.h"
+#include "cpu/m6800/m6801.h"
 #include "machine/6821pia.h"
 
 class ace_sp_state : public driver_device
@@ -79,7 +79,7 @@ static INPUT_PORTS_START( ace_sp )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( ace_sp, ace_sp_state )
+static MACHINE_CONFIG_START( ace_sp )
 	MCFG_CPU_ADD("maincpu", HD6303Y, 1000000)
 	MCFG_CPU_PROGRAM_MAP(ace_sp_map)
 	MCFG_CPU_IO_MAP(ace_sp_portmap)

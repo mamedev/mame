@@ -20,6 +20,7 @@
 #include <iterator>
 #include <memory>
 #include <string>
+#include <type_traits>
 #include <typeinfo>
 #include <unordered_map>
 #include <vector>
@@ -66,22 +67,6 @@ static const char DEVICE_SELF_OWNER[] = "^";
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
-
-// forward references
-class memory_region;
-class device_debug;
-class device_t;
-class device_interface;
-class device_execute_interface;
-class device_memory_interface;
-class device_state_interface;
-class validity_checker;
-class rom_entry;
-class machine_config;
-class emu_timer;
-struct input_device_default;
-class finder_base;
-
 
 namespace emu { namespace detail {
 
@@ -141,59 +126,90 @@ private:
 };
 
 
-template <class DeviceClass> struct device_tag_struct { typedef DeviceClass type; };
-template <class DriverClass> struct driver_tag_struct { typedef DriverClass type; };
+template <class DeviceClass, char const *ShortName, char const *FullName, char const *Source> struct device_tag_struct { typedef DeviceClass type; };
+template <class DriverClass, char const *ShortName, char const *FullName, char const *Source> struct driver_tag_struct { typedef DriverClass type; };
 
-template <class DeviceClass> inline device_tag_struct<DeviceClass> device_tag_func() { return device_tag_struct<DeviceClass>{ }; }
-template <class DriverClass> inline driver_tag_struct<DriverClass> driver_tag_func() { return driver_tag_struct<DriverClass>{ }; }
+template <class DeviceClass, char const *ShortName, char const *FullName, char const *Source> auto device_tag_func() { return device_tag_struct<DeviceClass, ShortName, FullName, Source>{ }; };
+template <class DriverClass, char const *ShortName, char const *FullName, char const *Source> auto driver_tag_func() { return driver_tag_struct<DriverClass, ShortName, FullName, Source>{ }; };
 
 class device_type_impl
 {
 private:
 	friend class device_registrar;
 
-	typedef std::unique_ptr<device_t> (*create_func)(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	typedef std::unique_ptr<device_t> (*create_func)(device_type_impl const &type, machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
 	device_type_impl(device_type_impl const &) = delete;
 	device_type_impl(device_type_impl &&) = delete;
 	device_type_impl &operator=(device_type_impl const &) = delete;
 	device_type_impl &operator=(device_type_impl &&) = delete;
 
-	// don't make these static member function templates inline
-	template <typename DeviceClass> static std::unique_ptr<device_t> create_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
-	template <typename DriverClass> static std::unique_ptr<device_t> create_driver(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	template <typename DeviceClass>
+	static std::unique_ptr<device_t> create_device(device_type_impl const &type, machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	{
+		return make_unique_clear<DeviceClass>(mconfig, tag, owner, clock);
+	}
+
+	template <typename DriverClass>
+	static std::unique_ptr<device_t> create_driver(device_type_impl const &type, machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	{
+		assert(!owner);
+		assert(!clock);
+
+		return make_unique_clear<DriverClass>(mconfig, type, tag);
+	}
 
 	create_func const m_creator;
 	std::type_info const &m_type;
+	char const *const m_shortname;
+	char const *const m_fullname;
+	char const *const m_source;
+
 	device_type_impl *m_next;
+	device_type_impl *m_parent = nullptr, *m_left = nullptr, *m_right = nullptr;
+	bool m_colour = false;
 
 public:
 	device_type_impl(std::nullptr_t)
 		: m_creator(nullptr)
 		, m_type(typeid(std::nullptr_t))
+		, m_shortname(nullptr)
+		, m_fullname(nullptr)
+		, m_source(nullptr)
 		, m_next(nullptr)
 	{
 	}
 
-	template <class DeviceClass> device_type_impl(device_tag_struct<DeviceClass> (*)())
+	template <class DeviceClass, char const *ShortName, char const *FullName, char const *Source>
+	device_type_impl(device_tag_struct<DeviceClass, ShortName, FullName, Source> (*)())
 		: m_creator(&create_device<DeviceClass>)
 		, m_type(typeid(DeviceClass))
+		, m_shortname(ShortName)
+		, m_fullname(FullName)
+		, m_source(Source)
 		, m_next(device_registrar::register_device(*this))
 	{
 	}
 
-	template <class DriverClass> device_type_impl(driver_tag_struct<DriverClass> (*)())
+	template <class DriverClass, char const *ShortName, char const *FullName, char const *Source>
+	device_type_impl(driver_tag_struct<DriverClass, ShortName, FullName, Source> (*)())
 		: m_creator(&create_driver<DriverClass>)
 		, m_type(typeid(DriverClass))
+		, m_shortname(ShortName)
+		, m_fullname(FullName)
+		, m_source(Source)
 		, m_next(nullptr)
 	{
 	}
 
 	std::type_info const &type() const { return m_type; }
+	char const *shortname() const { return m_shortname; }
+	char const *fullname() const { return m_fullname; }
+	char const *source() const { return m_source; }
 
 	std::unique_ptr<device_t> operator()(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) const
 	{
-		return m_creator(mconfig, tag, owner, clock);
+		return m_creator(*this, mconfig, tag, owner, clock);
 	}
 
 	explicit operator bool() const { return bool(m_creator); }
@@ -204,34 +220,48 @@ public:
 
 inline device_registrar::const_iterator &device_registrar::const_iterator::operator++() { m_type = m_type->m_next; return *this; }
 
-
-template <typename DeviceClass>
-std::unique_ptr<device_t> device_type_impl::create_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
-{
-	return make_unique_clear<DeviceClass>(mconfig, tag, owner, clock);
-}
-
-template <typename DriverClass>
-std::unique_ptr<device_t> device_type_impl::create_driver(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
-{
-	assert(!owner);
-	assert(!clock);
-
-	// this is not thread-safe
-	// we can get away with it because driver creators aren't registered
-	// hence all members are initialised with constant values and the race won't cause issues
-	static device_type_impl const &driver_type = &driver_tag_func<DriverClass>;
-	return make_unique_clear<DriverClass>(mconfig, driver_type, tag);
-}
-
 } } // namespace emu::detail
 
 
 // device types
 typedef emu::detail::device_type_impl const &device_type;
-template <class DeviceClass> constexpr auto device_creator = &emu::detail::device_tag_func<DeviceClass>;
-template <class DriverClass> constexpr auto driver_device_creator = &emu::detail::driver_tag_func<DriverClass>;
+typedef std::add_pointer_t<device_type> device_type_ptr;
 extern emu::detail::device_registrar const registered_device_types;
+
+template <typename DeviceClass, char const *ShortName, char const *FullName, char const *Source>
+constexpr auto device_creator = &emu::detail::device_tag_func<DeviceClass, ShortName, FullName, Source>;
+
+template <typename DriverClass, char const *ShortName, char const *FullName, char const *Source>
+constexpr auto driver_device_creator = &emu::detail::driver_tag_func<DriverClass, ShortName, FullName, Source>;
+
+#define DECLARE_DEVICE_TYPE(Type, Class) \
+		extern device_type const Type; \
+		class Class; \
+		extern template class device_finder<Class, false>; \
+		extern template class device_finder<Class, true>;
+
+#define DECLARE_DEVICE_TYPE_NS(Type, Namespace, Class) \
+		extern device_type const Type; \
+		extern template class device_finder<Namespace::Class, false>; \
+		extern template class device_finder<Namespace::Class, true>;
+
+#define DEFINE_DEVICE_TYPE(Type, Class, ShortName, FullName) \
+		namespace { \
+			struct Class##_device_traits { static constexpr char const shortname[] = ShortName, fullname[] = FullName, source[] = __FILE__; }; \
+			constexpr char const Class##_device_traits::shortname[], Class##_device_traits::fullname[], Class##_device_traits::source[]; \
+		} \
+		device_type const Type = device_creator<Class, (Class##_device_traits::shortname), (Class##_device_traits::fullname), (Class##_device_traits::source)>; \
+		template class device_finder<Class, false>; \
+		template class device_finder<Class, true>;
+
+#define DEFINE_DEVICE_TYPE_NS(Type, Namespace, Class, ShortName, FullName) \
+		namespace { \
+			struct Class##_device_traits { static constexpr char const shortname[] = ShortName, fullname[] = FullName, source[] = __FILE__; }; \
+			constexpr char const Class##_device_traits::shortname[], Class##_device_traits::fullname[], Class##_device_traits::source[]; \
+		} \
+		device_type const Type = device_creator<Namespace::Class, (Class##_device_traits::shortname), (Class##_device_traits::fullname), (Class##_device_traits::source)>; \
+		template class device_finder<Namespace::Class, false>; \
+		template class device_finder<Namespace::Class, true>;
 
 
 // exception classes
@@ -343,12 +373,10 @@ protected:
 	device_t(
 			const machine_config &mconfig,
 			device_type type,
-			const char *name,
 			const char *tag,
 			device_t *owner,
-			u32 clock,
-			const char *shortname,
-			const char *source);
+			u32 clock);
+
 public:
 	virtual ~device_t();
 
@@ -358,10 +386,10 @@ public:
 	const char *tag() const { return m_tag.c_str(); }
 	const char *basetag() const { return m_basetag.c_str(); }
 	device_type type() const { return m_type; }
-	const char *name() const { return m_name.c_str(); }
-	const char *shortname() const { return m_shortname.c_str(); }
+	const char *name() const { return m_type.fullname(); }
+	const char *shortname() const { return m_type.shortname(); }
 	const char *searchpath() const { return m_searchpath.c_str(); }
-	const char *source() const { return m_source.c_str(); }
+	const char *source() const { return m_type.source(); }
 	device_t *owner() const { return m_owner; }
 	device_t *next() const { return m_next; }
 	u32 configured_clock() const { return m_configured_clock; }
@@ -369,7 +397,6 @@ public:
 	const input_device_default *input_ports_defaults() const { return m_input_defaults; }
 	const std::vector<rom_entry> &rom_region_vector() const;
 	const rom_entry *rom_region() const { return rom_region_vector().data(); }
-	machine_config_constructor machine_config_additions() const { return device_mconfig_additions(); }
 	ioport_constructor input_ports() const { return device_input_ports(); }
 	u8 default_bios() const { return m_default_bios; }
 	u8 system_bios() const { return m_system_bios; }
@@ -410,6 +437,7 @@ public:
 	std::string parameter(const char *tag) const;
 
 	// configuration helpers
+	void add_machine_configuration(machine_config &config) { device_add_mconfig(config); }
 	static void static_set_clock(device_t &device, u32 clock);
 	static void static_set_input_default(device_t &device, const input_device_default *config) { device.m_input_defaults = config; }
 	static void static_set_default_bios_tag(device_t &device, const char *tag) { std::string default_bios_tag(tag); device.m_default_bios_tag = default_bios_tag; }
@@ -471,6 +499,7 @@ protected:
 	// device-level overrides
 	virtual const tiny_rom_entry *device_rom_region() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_add_mconfig(machine_config &config);
 	virtual ioport_constructor device_input_ports() const;
 	virtual void device_config_complete();
 	virtual void device_validity_check(validity_checker &valid) const ATTR_COLD;
@@ -488,10 +517,7 @@ protected:
 
 	// core device properties
 	device_type             m_type;                 // device type
-	std::string             m_name;                 // name of the device
-	std::string             m_shortname;            // short name of the device
 	std::string             m_searchpath;           // search path, used for media loading
-	std::string             m_source;               // device source file name
 
 	// device relationships & interfaces
 	device_t *              m_owner;                // device that owns us
@@ -517,6 +543,7 @@ protected:
 private:
 	// internal helpers
 	device_t *subdevice_slow(const char *tag) const;
+	void calculate_derived_clock();
 
 	// private state; accessor use required
 	running_machine *       m_machine;

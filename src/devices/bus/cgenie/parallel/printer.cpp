@@ -21,14 +21,14 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CGENIE_PRINTER = device_creator<cgenie_printer_device>;
+DEFINE_DEVICE_TYPE(CGENIE_PRINTER, cgenie_printer_device, "cgenie_printer", "Printer Interface EG2012")
 
 //-------------------------------------------------
 //  machine_config_additions - device-specific
 //  machine configurations
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( cgenie_printer )
+static MACHINE_CONFIG_START( cgenie_printer )
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(cgenie_printer_device, busy_w))
 	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(cgenie_printer_device, perror_w))
@@ -52,8 +52,8 @@ machine_config_constructor cgenie_printer_device::device_mconfig_additions() con
 //-------------------------------------------------
 
 cgenie_printer_device::cgenie_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, CGENIE_PRINTER, "Printer Interface EG2012", tag, owner, clock, "cgenie_printer", __FILE__),
-	device_parallel_interface(mconfig, *this),
+	device_t(mconfig, CGENIE_PRINTER, tag, owner, clock),
+	device_cg_parallel_interface(mconfig, *this),
 	m_centronics(*this, "centronics"),
 	m_latch(*this, "latch"),
 	m_centronics_busy(0),

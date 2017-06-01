@@ -47,17 +47,18 @@
 #include "mc68901.h"
 #include "cpu/m68000/m68000.h"
 
+//#define VERBOSE 1
+#include "logmacro.h"
+
+
 
 // device type definition
-const device_type MC68901 = device_creator<mc68901_device>;
+DEFINE_DEVICE_TYPE(MC68901, mc68901_device, "mc68901", "Motorola MC68901 MFP")
 
 
 //**************************************************************************
 //  MACROS / CONSTANTS
 //**************************************************************************
-
-#define LOG 0
-
 
 
 #define AER_GPIP_0              0x01
@@ -294,11 +295,11 @@ inline void mc68901_device::gpio_input(int bit, int state)
 	{
 		if (state == BIT(m_aer, bit))
 		{
-			if (LOG) logerror("MC68901 '%s' Edge Transition Detected on GPIO%u\n", tag(), bit);
+			LOG("MC68901 Edge Transition Detected on GPIO%u\n", bit);
 
 			if (m_ier & INT_MASK_GPIO[bit]) // AND interrupt enabled bit is set...
 			{
-				if (LOG) logerror("MC68901 '%s' Interrupt Pending for GPIO%u\n", tag(), bit);
+				LOG("MC68901 Interrupt Pending for GPIO%u\n", bit);
 
 				take_interrupt(INT_MASK_GPIO[bit]); // set interrupt pending bit
 			}
@@ -333,7 +334,7 @@ void mc68901_device::gpio_output()
 //-------------------------------------------------
 
 mc68901_device::mc68901_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MC68901, "MC68901 MFP", tag, owner, clock, "mc68901", __FILE__),
+	: device_t(mconfig, MC68901, tag, owner, clock),
 		device_serial_interface(mconfig, *this),
 		m_timer_clock(0),
 		m_rx_clock(0),
@@ -596,84 +597,84 @@ void mc68901_device::register_w(offs_t offset, uint8_t data)
 	switch (offset)
 	{
 	case REGISTER_GPIP:
-		if (LOG) logerror("MC68901 '%s' General Purpose I/O : %x\n", tag(), data);
+		LOG("MC68901 General Purpose I/O : %x\n", data);
 		m_gpip = data;
 		gpio_output();
 		break;
 
 	case REGISTER_AER:
-		if (LOG) logerror("MC68901 '%s' Active Edge Register : %x\n", tag(), data);
+		LOG("MC68901 Active Edge Register : %x\n", data);
 		m_aer = data;
 		break;
 
 	case REGISTER_DDR:
-		if (LOG) logerror("MC68901 '%s' Data Direction Register : %x\n", tag(), data);
+		LOG("MC68901 Data Direction Register : %x\n", data);
 		m_ddr = data;
 		gpio_output();
 		break;
 
 	case REGISTER_IERA:
-		if (LOG) logerror("MC68901 '%s' Interrupt Enable Register A : %x\n", tag(), data);
+		LOG("MC68901 Interrupt Enable Register A : %x\n", data);
 		m_ier = (data << 8) | (m_ier & 0xff);
 		m_ipr &= m_ier;
 		check_interrupts();
 		break;
 
 	case REGISTER_IERB:
-		if (LOG) logerror("MC68901 '%s' Interrupt Enable Register B : %x\n", tag(), data);
+		LOG("MC68901 Interrupt Enable Register B : %x\n", data);
 		m_ier = (m_ier & 0xff00) | data;
 		m_ipr &= m_ier;
 		check_interrupts();
 		break;
 
 	case REGISTER_IPRA:
-		if (LOG) logerror("MC68901 '%s' Interrupt Pending Register A : %x\n", tag(), data);
+		LOG("MC68901 Interrupt Pending Register A : %x\n", data);
 		m_ipr &= (data << 8) | (m_ipr & 0xff);
 		check_interrupts();
 		break;
 
 	case REGISTER_IPRB:
-		if (LOG) logerror("MC68901 '%s' Interrupt Pending Register B : %x\n", tag(), data);
+		LOG("MC68901 Interrupt Pending Register B : %x\n", data);
 		m_ipr &= (m_ipr & 0xff00) | data;
 		check_interrupts();
 		break;
 
 	case REGISTER_ISRA:
-		if (LOG) logerror("MC68901 '%s' Interrupt In-Service Register A : %x\n", tag(), data);
+		LOG("MC68901 Interrupt In-Service Register A : %x\n", data);
 		m_isr &= (data << 8) | (m_isr & 0xff);
 		break;
 
 	case REGISTER_ISRB:
-		if (LOG) logerror("MC68901 '%s' Interrupt In-Service Register B : %x\n", tag(), data);
+		LOG("MC68901 Interrupt In-Service Register B : %x\n", data);
 		m_isr &= (m_isr & 0xff00) | data;
 		break;
 
 	case REGISTER_IMRA:
-		if (LOG) logerror("MC68901 '%s' Interrupt Mask Register A : %x\n", tag(), data);
+		LOG("MC68901 Interrupt Mask Register A : %x\n", data);
 		m_imr = (data << 8) | (m_imr & 0xff);
 		m_isr &= m_imr;
 		check_interrupts();
 		break;
 
 	case REGISTER_IMRB:
-		if (LOG) logerror("MC68901 '%s' Interrupt Mask Register B : %x\n", tag(), data);
+		LOG("MC68901 Interrupt Mask Register B : %x\n", data);
 		m_imr = (m_imr & 0xff00) | data;
 		m_isr &= m_imr;
 		check_interrupts();
 		break;
 
 	case REGISTER_VR:
-		if (LOG) logerror("MC68901 '%s' Interrupt Vector : %x\n", tag(), data & 0xf0);
+		LOG("MC68901 Interrupt Vector : %x\n", data & 0xf0);
 
 		m_vr = data & 0xf8;
 
 		if (m_vr & VR_S)
 		{
-			if (LOG) logerror("MC68901 '%s' Software End-Of-Interrupt Mode\n", tag());
+			LOG("MC68901 Software End-Of-Interrupt Mode\n");
 		}
 		else
 		{
-			if (LOG) logerror("MC68901 '%s' Automatic End-Of-Interrupt Mode\n", tag());
+			LOG("MC68901 Automatic End-Of-Interrupt Mode\n");
 
 			m_isr = 0;
 		}
@@ -685,7 +686,7 @@ void mc68901_device::register_w(offs_t offset, uint8_t data)
 		switch (m_tacr & 0x0f)
 		{
 		case TCR_TIMER_STOPPED:
-			if (LOG) logerror("MC68901 '%s' Timer A Stopped\n", tag());
+			LOG("MC68901 Timer A Stopped\n");
 			m_timer[TIMER_A]->enable(false);
 			break;
 
@@ -697,14 +698,14 @@ void mc68901_device::register_w(offs_t offset, uint8_t data)
 		case TCR_TIMER_DELAY_100:
 		case TCR_TIMER_DELAY_200:
 			{
-			int divisor = PRESCALER[m_tacr & 0x07];
-			if (LOG) logerror("MC68901 '%s' Timer A Delay Mode : %u Prescale\n", tag(), divisor);
-			m_timer[TIMER_A]->adjust(attotime::from_hz(m_timer_clock / divisor), 0, attotime::from_hz(m_timer_clock / divisor));
+				int divisor = PRESCALER[m_tacr & 0x07];
+				LOG("MC68901 Timer A Delay Mode : %u Prescale\n", divisor);
+				m_timer[TIMER_A]->adjust(attotime::from_hz(m_timer_clock / divisor), 0, attotime::from_hz(m_timer_clock / divisor));
 			}
 			break;
 
 		case TCR_TIMER_EVENT:
-			if (LOG) logerror("MC68901 '%s' Timer A Event Count Mode\n", tag());
+			LOG("MC68901 Timer A Event Count Mode\n");
 			m_timer[TIMER_A]->enable(false);
 			break;
 
@@ -716,17 +717,17 @@ void mc68901_device::register_w(offs_t offset, uint8_t data)
 		case TCR_TIMER_PULSE_100:
 		case TCR_TIMER_PULSE_200:
 			{
-			int divisor = PRESCALER[m_tacr & 0x07];
-			if (LOG) logerror("MC68901 '%s' Timer A Pulse Width Mode : %u Prescale\n", tag(), divisor);
-			m_timer[TIMER_A]->adjust(attotime::never, 0, attotime::from_hz(m_timer_clock / divisor));
-			m_timer[TIMER_A]->enable(false);
+				int divisor = PRESCALER[m_tacr & 0x07];
+				LOG("MC68901 Timer A Pulse Width Mode : %u Prescale\n", divisor);
+				m_timer[TIMER_A]->adjust(attotime::never, 0, attotime::from_hz(m_timer_clock / divisor));
+				m_timer[TIMER_A]->enable(false);
 			}
 			break;
 		}
 
 		if (m_tacr & TCR_TIMER_RESET)
 		{
-			if (LOG) logerror("MC68901 '%s' Timer A Reset\n", tag());
+			LOG("MC68901 Timer A Reset\n");
 
 			m_to[TIMER_A] = 0;
 
@@ -740,7 +741,7 @@ void mc68901_device::register_w(offs_t offset, uint8_t data)
 		switch (m_tbcr & 0x0f)
 		{
 		case TCR_TIMER_STOPPED:
-			if (LOG) logerror("MC68901 '%s' Timer B Stopped\n", tag());
+			LOG("MC68901 Timer B Stopped\n");
 			m_timer[TIMER_B]->enable(false);
 			break;
 
@@ -753,13 +754,13 @@ void mc68901_device::register_w(offs_t offset, uint8_t data)
 		case TCR_TIMER_DELAY_200:
 			{
 			int divisor = PRESCALER[m_tbcr & 0x07];
-			if (LOG) logerror("MC68901 '%s' Timer B Delay Mode : %u Prescale\n", tag(), divisor);
+			LOG("MC68901 Timer B Delay Mode : %u Prescale\n", divisor);
 			m_timer[TIMER_B]->adjust(attotime::from_hz(m_timer_clock / divisor), 0, attotime::from_hz(m_timer_clock / divisor));
 			}
 			break;
 
 		case TCR_TIMER_EVENT:
-			if (LOG) logerror("MC68901 '%s' Timer B Event Count Mode\n", tag());
+			LOG("MC68901 Timer B Event Count Mode\n");
 			m_timer[TIMER_B]->enable(false);
 			break;
 
@@ -772,7 +773,7 @@ void mc68901_device::register_w(offs_t offset, uint8_t data)
 		case TCR_TIMER_PULSE_200:
 			{
 			int divisor = PRESCALER[m_tbcr & 0x07];
-			if (LOG) logerror("MC68901 '%s' Timer B Pulse Width Mode : %u Prescale\n", tag(), DIVISOR);
+			LOG("MC68901 Timer B Pulse Width Mode : %u Prescale\n", DIVISOR);
 			m_timer[TIMER_B]->adjust(attotime::never, 0, attotime::from_hz(m_timer_clock / divisor));
 			m_timer[TIMER_B]->enable(false);
 			}
@@ -781,7 +782,7 @@ void mc68901_device::register_w(offs_t offset, uint8_t data)
 
 		if (m_tacr & TCR_TIMER_RESET)
 		{
-			if (LOG) logerror("MC68901 '%s' Timer B Reset\n", tag());
+			LOG("MC68901 Timer B Reset\n");
 
 			m_to[TIMER_B] = 0;
 
@@ -795,7 +796,7 @@ void mc68901_device::register_w(offs_t offset, uint8_t data)
 		switch (m_tcdcr & 0x07)
 		{
 		case TCR_TIMER_STOPPED:
-			if (LOG) logerror("MC68901 '%s' Timer D Stopped\n", tag());
+			LOG("MC68901 Timer D Stopped\n");
 			m_timer[TIMER_D]->enable(false);
 			break;
 
@@ -807,9 +808,9 @@ void mc68901_device::register_w(offs_t offset, uint8_t data)
 		case TCR_TIMER_DELAY_100:
 		case TCR_TIMER_DELAY_200:
 			{
-			int divisor = PRESCALER[m_tcdcr & 0x07];
-			if (LOG) logerror("MC68901 '%s' Timer D Delay Mode : %u Prescale\n", tag(), divisor);
-			m_timer[TIMER_D]->adjust(attotime::from_hz(m_timer_clock / divisor), 0, attotime::from_hz(m_timer_clock / divisor));
+				int divisor = PRESCALER[m_tcdcr & 0x07];
+				LOG("MC68901 Timer D Delay Mode : %u Prescale\n", divisor);
+				m_timer[TIMER_D]->adjust(attotime::from_hz(m_timer_clock / divisor), 0, attotime::from_hz(m_timer_clock / divisor));
 			}
 			break;
 		}
@@ -817,7 +818,7 @@ void mc68901_device::register_w(offs_t offset, uint8_t data)
 		switch ((m_tcdcr >> 4) & 0x07)
 		{
 		case TCR_TIMER_STOPPED:
-			if (LOG) logerror("MC68901 '%s' Timer C Stopped\n", tag());
+			LOG("MC68901 Timer C Stopped\n");
 			m_timer[TIMER_C]->enable(false);
 			break;
 
@@ -829,16 +830,16 @@ void mc68901_device::register_w(offs_t offset, uint8_t data)
 		case TCR_TIMER_DELAY_100:
 		case TCR_TIMER_DELAY_200:
 			{
-			int divisor = PRESCALER[(m_tcdcr >> 4) & 0x07];
-			if (LOG) logerror("MC68901 '%s' Timer C Delay Mode : %u Prescale\n", tag(), divisor);
-			m_timer[TIMER_C]->adjust(attotime::from_hz(m_timer_clock / divisor), 0, attotime::from_hz(m_timer_clock / divisor));
+				int divisor = PRESCALER[(m_tcdcr >> 4) & 0x07];
+				LOG("MC68901 Timer C Delay Mode : %u Prescale\n", divisor);
+				m_timer[TIMER_C]->adjust(attotime::from_hz(m_timer_clock / divisor), 0, attotime::from_hz(m_timer_clock / divisor));
 			}
 			break;
 		}
 		break;
 
 	case REGISTER_TADR:
-		if (LOG) logerror("MC68901 '%s' Timer A Data Register : %x\n", tag(), data);
+		LOG("MC68901 Timer A Data Register : %x\n", data);
 
 		m_tdr[TIMER_A] = data;
 
@@ -849,7 +850,7 @@ void mc68901_device::register_w(offs_t offset, uint8_t data)
 		break;
 
 	case REGISTER_TBDR:
-		if (LOG) logerror("MC68901 '%s' Timer B Data Register : %x\n", tag(), data);
+		LOG("MC68901 Timer B Data Register : %x\n", data);
 
 		m_tdr[TIMER_B] = data;
 
@@ -860,7 +861,7 @@ void mc68901_device::register_w(offs_t offset, uint8_t data)
 		break;
 
 	case REGISTER_TCDR:
-		if (LOG) logerror("MC68901 '%s' Timer C Data Register : %x\n", tag(), data);
+		LOG("MC68901 Timer C Data Register : %x\n", data);
 
 		m_tdr[TIMER_C] = data;
 
@@ -871,7 +872,7 @@ void mc68901_device::register_w(offs_t offset, uint8_t data)
 		break;
 
 	case REGISTER_TDDR:
-		if (LOG) logerror("MC68901 '%s' Timer D Data Register : %x\n", tag(), data);
+		LOG("MC68901 Timer D Data Register : %x\n", data);
 
 		m_tdr[TIMER_D] = data;
 
@@ -882,7 +883,7 @@ void mc68901_device::register_w(offs_t offset, uint8_t data)
 		break;
 
 	case REGISTER_SCR:
-		if (LOG) logerror("MC68901 '%s' Sync Character : %x\n", tag(), data);
+		LOG("MC68901 Sync Character : %x\n", data);
 
 		m_scr = data;
 		break;
@@ -905,25 +906,25 @@ void mc68901_device::register_w(offs_t offset, uint8_t data)
 		{
 			if (data & UCR_PARITY_EVEN)
 			{
-				if (LOG) logerror("MC68901 '%s' Parity : Even\n", tag());
+				LOG("MC68901 Parity : Even\n");
 
 				parity = PARITY_EVEN;
 			}
 			else
 			{
-				if (LOG) logerror("MC68901 '%s' Parity : Odd\n", tag());
+				LOG("MC68901 Parity : Odd\n");
 
 				parity = PARITY_ODD;
 			}
 		}
 		else
 		{
-			if (LOG) logerror("MC68901 '%s' Parity : Disabled\n", tag());
+			LOG("MC68901 Parity : Disabled\n");
 
 			parity = PARITY_NONE;
 		}
 
-		if (LOG) logerror("MC68901 '%s' Word Length : %u bits\n", tag(), data_bit_count);
+		LOG("MC68901 Word Length : %u bits\n", data_bit_count);
 
 
 		int start_bits;
@@ -935,35 +936,35 @@ void mc68901_device::register_w(offs_t offset, uint8_t data)
 		default:
 			start_bits = 0;
 			stop_bits = STOP_BITS_0;
-			if (LOG) logerror("MC68901 '%s' Start Bits : 0, Stop Bits : 0, Format : synchronous\n", tag());
+			LOG("MC68901 Start Bits : 0, Stop Bits : 0, Format : synchronous\n");
 			break;
 
 		case UCR_START_STOP_1_1:
 			start_bits = 1;
 			stop_bits = STOP_BITS_1;
-			if (LOG) logerror("MC68901 '%s' Start Bits : 1, Stop Bits : 1, Format : asynchronous\n", tag());
+			LOG("MC68901 Start Bits : 1, Stop Bits : 1, Format : asynchronous\n");
 			break;
 
 		case UCR_START_STOP_1_15:
 			start_bits = 1;
 			stop_bits = STOP_BITS_1_5;
-			if (LOG) logerror("MC68901 '%s' Start Bits : 1, Stop Bits : 1.5, Format : asynchronous\n", tag());
+			LOG("MC68901 Start Bits : 1, Stop Bits : 1.5, Format : asynchronous\n");
 			break;
 
 		case UCR_START_STOP_1_2:
 			start_bits = 1;
 			stop_bits = STOP_BITS_2;
-			if (LOG) logerror("MC68901 '%s' Start Bits : 1, Stop Bits : 2, Format : asynchronous\n", tag());
+			LOG("MC68901 Start Bits : 1, Stop Bits : 2, Format : asynchronous\n");
 			break;
 		}
 
 		if (data & UCR_CLOCK_DIVIDE_16)
 		{
-			if (LOG) logerror("MC68901 '%s' Rx/Tx Clock Divisor : 16\n", tag());
+			LOG("MC68901 Rx/Tx Clock Divisor : 16\n");
 		}
 		else
 		{
-			if (LOG) logerror("MC68901 '%s' Rx/Tx Clock Divisor : 1\n", tag());
+			LOG("MC68901 Rx/Tx Clock Divisor : 1\n");
 		}
 
 		set_data_frame(start_bits, data_bit_count, parity, stop_bits);
@@ -975,24 +976,24 @@ void mc68901_device::register_w(offs_t offset, uint8_t data)
 	case REGISTER_RSR:
 		if ((data & RSR_RCV_ENABLE) == 0)
 		{
-			if (LOG) logerror("MC68901 '%s' Receiver Disabled\n", tag());
+			LOG("MC68901 Receiver Disabled\n");
 			m_rsr = 0;
 		}
 		else
 		{
-			if (LOG) logerror("MC68901 '%s' Receiver Enabled\n", tag());
+			LOG("MC68901 Receiver Enabled\n");
 
 			if (data & RSR_SYNC_STRIP_ENABLE)
 			{
-				if (LOG) logerror("MC68901 '%s' Sync Strip Enabled\n", tag());
+				LOG("MC68901 Sync Strip Enabled\n");
 			}
 			else
 			{
-				if (LOG) logerror("MC68901 '%s' Sync Strip Disabled\n", tag());
+				LOG("MC68901 Sync Strip Disabled\n");
 			}
 
 			if (data & RSR_FOUND_SEARCH)
-				if (LOG) logerror("MC68901 '%s' Receiver Search Mode Enabled\n", tag());
+				LOG("MC68901 Receiver Search Mode Enabled\n");
 
 			m_rsr = data & 0x0b;
 		}
@@ -1003,7 +1004,7 @@ void mc68901_device::register_w(offs_t offset, uint8_t data)
 
 		if ((data & TSR_XMIT_ENABLE) == 0)
 		{
-			if (LOG) logerror("MC68901 '%s' Transmitter Disabled\n", tag());
+			LOG("MC68901 Transmitter Disabled\n");
 
 			m_tsr &= ~TSR_UNDERRUN_ERROR;
 
@@ -1012,40 +1013,40 @@ void mc68901_device::register_w(offs_t offset, uint8_t data)
 		}
 		else
 		{
-			if (LOG) logerror("MC68901 '%s' Transmitter Enabled\n", tag());
+			LOG("MC68901 Transmitter Enabled\n");
 
 			switch (data & 0x06)
 			{
 			case TSR_OUTPUT_HI_Z:
-				if (LOG) logerror("MC68901 '%s' Transmitter Disabled Output State : Hi-Z\n", tag());
+				LOG("MC68901 Transmitter Disabled Output State : Hi-Z\n");
 				break;
 			case TSR_OUTPUT_LOW:
-				if (LOG) logerror("MC68901 '%s' Transmitter Disabled Output State : 0\n", tag());
+				LOG("MC68901 Transmitter Disabled Output State : 0\n");
 				break;
 			case TSR_OUTPUT_HIGH:
-				if (LOG) logerror("MC68901 '%s' Transmitter Disabled Output State : 1\n", tag());
+				LOG("MC68901 Transmitter Disabled Output State : 1\n");
 				break;
 			case TSR_OUTPUT_LOOP:
-				if (LOG) logerror("MC68901 '%s' Transmitter Disabled Output State : Loop\n", tag());
+				LOG("MC68901 Transmitter Disabled Output State : Loop\n");
 				break;
 			}
 
 			if (data & TSR_BREAK)
 			{
-				if (LOG) logerror("MC68901 '%s' Transmitter Break Enabled\n", tag());
+				LOG("MC68901 Transmitter Break Enabled\n");
 			}
 			else
 			{
-				if (LOG) logerror("MC68901 '%s' Transmitter Break Disabled\n", tag());
+				LOG("MC68901 Transmitter Break Disabled\n");
 			}
 
 			if (data & TSR_AUTO_TURNAROUND)
 			{
-				if (LOG) logerror("MC68901 '%s' Transmitter Auto Turnaround Enabled\n", tag());
+				LOG("MC68901 Transmitter Auto Turnaround Enabled\n");
 			}
 			else
 			{
-				if (LOG) logerror("MC68901 '%s' Transmitter Auto Turnaround Disabled\n", tag());
+				LOG("MC68901 Transmitter Auto Turnaround Disabled\n");
 			}
 
 			m_tsr &= ~TSR_END_OF_XMIT;
@@ -1060,7 +1061,7 @@ void mc68901_device::register_w(offs_t offset, uint8_t data)
 		break;
 
 	case REGISTER_UDR:
-		if (LOG) logerror("MC68901 '%s' UDR %x\n", tag(), data);
+		LOG("MC68901 UDR %x\n", data);
 		m_transmit_buffer = data;
 		m_transmit_pending = 1;
 		m_tsr &= ~TSR_BUFFER_EMPTY;

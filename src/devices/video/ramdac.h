@@ -6,10 +6,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_VIDEO_RAMDAC_H
+#define MAME_VIDEO_RAMDAC_H
 
-#ifndef __ramdacDEV_H__
-#define __ramdacDEV_H__
+#pragma once
 
 
 
@@ -85,7 +85,6 @@ private:
 
 
 // device type definition
-extern const device_type RAMDAC;
+DECLARE_DEVICE_TYPE(RAMDAC, ramdac_device)
 
-
-#endif
+#endif // MAME_VIDEO_RAMDAC_H

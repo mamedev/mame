@@ -15,41 +15,37 @@
 //  constructor
 //-------------------------------------------------
 
-const device_type SATURN_BRAM_4MB = device_creator<saturn_bram4mb_device>;
-const device_type SATURN_BRAM_8MB = device_creator<saturn_bram8mb_device>;
-const device_type SATURN_BRAM_16MB = device_creator<saturn_bram16mb_device>;
-const device_type SATURN_BRAM_32MB = device_creator<saturn_bram32mb_device>;
+DEFINE_DEVICE_TYPE(SATURN_BRAM_4MB,  saturn_bram4mb_device,  "sat_bram_4mb",  "Saturn Battery RAM 4Mbit Cart")
+DEFINE_DEVICE_TYPE(SATURN_BRAM_8MB,  saturn_bram8mb_device,  "sat_bram_8mb",  "Saturn Battery RAM 8Mbit Cart")
+DEFINE_DEVICE_TYPE(SATURN_BRAM_16MB, saturn_bram16mb_device, "sat_bram_16mb", "Saturn Battery RAM 16Mbit Cart")
+DEFINE_DEVICE_TYPE(SATURN_BRAM_32MB, saturn_bram32mb_device, "sat_bram_32mb", "Saturn Battery RAM 32Mbit Cart")
 
 
-saturn_bram_device::saturn_bram_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-						device_sat_cart_interface( mconfig, *this ),
-						device_nvram_interface(mconfig, *this)
+saturn_bram_device::saturn_bram_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int cart_type)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_sat_cart_interface(mconfig, *this, cart_type)
+	, device_nvram_interface(mconfig, *this)
 {
 }
 
 saturn_bram4mb_device::saturn_bram4mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: saturn_bram_device(mconfig, SATURN_BRAM_4MB, "Saturn Battery RAM 4Mbit Cart", tag, owner, clock, "sat_bram_4mb", __FILE__)
+	: saturn_bram_device(mconfig, SATURN_BRAM_4MB, tag, owner, clock, 0x21)
 {
-	m_cart_type = 0x21;
 }
 
 saturn_bram8mb_device::saturn_bram8mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: saturn_bram_device(mconfig, SATURN_BRAM_8MB, "Saturn Battery RAM 8Mbit Cart", tag, owner, clock, "sat_bram_8mb", __FILE__)
+	: saturn_bram_device(mconfig, SATURN_BRAM_8MB, tag, owner, clock, 0x22)
 {
-	m_cart_type = 0x22;
 }
 
 saturn_bram16mb_device::saturn_bram16mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: saturn_bram_device(mconfig, SATURN_BRAM_16MB, "Saturn Battery RAM 16Mbit Cart", tag, owner, clock, "sat_bram_16mb", __FILE__)
+	: saturn_bram_device(mconfig, SATURN_BRAM_16MB, tag, owner, clock, 0x23)
 {
-	m_cart_type = 0x23;
 }
 
 saturn_bram32mb_device::saturn_bram32mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: saturn_bram_device(mconfig, SATURN_BRAM_32MB, "Saturn Battery RAM 32Mbit Cart", tag, owner, clock, "sat_bram_32mb", __FILE__)
+	: saturn_bram_device(mconfig, SATURN_BRAM_32MB, tag, owner, clock, 0x24)
 {
-	m_cart_type = 0x24;
 }
 
 

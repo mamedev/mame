@@ -45,7 +45,7 @@ public:
 	DECLARE_WRITE8_MEMBER(port3_w);
 	DECLARE_READ8_MEMBER(port1_r);
 	DECLARE_READ8_MEMBER(port3_r);
-	DECLARE_WRITE8_MEMBER(pes_kbd_input);
+	void pes_kbd_input(u8 data);
 	DECLARE_READ8_MEMBER(data_to_i8031);
 	DECLARE_WRITE8_MEMBER(data_from_i8031);
 };

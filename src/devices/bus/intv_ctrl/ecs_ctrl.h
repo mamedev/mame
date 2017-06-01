@@ -6,11 +6,11 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_INTV_CTRL_ECS_CTRL_H
+#define MAME_BUS_INTV_CTRL_ECS_CTRL_H
 
 #pragma once
 
-#ifndef __INTVECS_CONTROL_PORT__
-#define __INTVECS_CONTROL_PORT__
 
 #include "bus/intv_ctrl/ctrl.h"
 #include "bus/intv_ctrl/handctrl.h"
@@ -27,14 +27,15 @@ class device_intvecs_control_port_interface : public device_slot_card_interface
 {
 public:
 	// construction/destruction
-	device_intvecs_control_port_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_intvecs_control_port_interface();
 
-	virtual uint8_t read_portA() { return 0xff; };
-	virtual uint8_t read_portB() { return 0xff; };
-	virtual void write_portA(uint8_t data) { };
+	virtual uint8_t read_portA() { return 0xff; }
+	virtual uint8_t read_portB() { return 0xff; }
+	virtual void write_portA(uint8_t data) { }
 
 protected:
+	device_intvecs_control_port_interface(const machine_config &mconfig, device_t &device);
+
 	intvecs_control_port_device *m_port;
 };
 
@@ -64,7 +65,7 @@ protected:
 
 
 // device type definition
-extern const device_type INTVECS_CONTROL_PORT;
+DECLARE_DEVICE_TYPE(INTVECS_CONTROL_PORT, intvecs_control_port_device)
 
 
 //**************************************************************************
@@ -161,10 +162,9 @@ private:
 
 
 // device type definition
-extern const device_type ECS_CTRLS;
-extern const device_type ECS_KEYBD;
-extern const device_type ECS_SYNTH;
+DECLARE_DEVICE_TYPE(ECS_CTRLS, intvecs_ctrls_device)
+DECLARE_DEVICE_TYPE(ECS_KEYBD, intvecs_keybd_device)
+DECLARE_DEVICE_TYPE(ECS_SYNTH, intvecs_synth_device)
 
 
-
-#endif
+#endif // MAME_BUS_INTV_CTRL_ECS_CTRL_H

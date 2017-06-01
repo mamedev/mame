@@ -245,7 +245,6 @@ private:
 	std::unique_ptr<uint8_t[]> m_non_char_keys_down;
 	render_texture *        m_mouse_arrow_texture;
 	bool                    m_mouse_show;
-	bool                    m_load_save_hold;
 	ui_options              m_ui_options;
 
 	std::unique_ptr<ui::machine_info> m_machine_info;

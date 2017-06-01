@@ -19,12 +19,12 @@
 //  sns_rom_sgb_device - constructor
 //-------------------------------------------------
 
-const device_type SNS_LOROM_SUPERGB = device_creator<sns_rom_sgb1_device>;
-const device_type SNS_LOROM_SUPERGB2 = device_creator<sns_rom_sgb2_device>;
+DEFINE_DEVICE_TYPE(SNS_LOROM_SUPERGB,  sns_rom_sgb1_device, "sns_rom_sgb",  "SNES Super Game Boy Cart")
+DEFINE_DEVICE_TYPE(SNS_LOROM_SUPERGB2, sns_rom_sgb2_device, "sns_rom_sgb2", "SNES Super Game Boy 2 Cart")
 
 
-sns_rom_sgb_device::sns_rom_sgb_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: sns_rom_device(mconfig, type, name, tag, owner, clock, shortname, source),
+sns_rom_sgb_device::sns_rom_sgb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: sns_rom_device(mconfig, type, tag, owner, clock),
 	m_sgb_cpu(*this, "sgb_cpu"),
 	m_sgb_apu(*this, "sgb_apu"),
 	m_sgb_ppu(*this, "sgb_ppu"),
@@ -48,13 +48,13 @@ sns_rom_sgb_device::sns_rom_sgb_device(const machine_config &mconfig, device_typ
 
 
 sns_rom_sgb1_device::sns_rom_sgb1_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
-	sns_rom_sgb_device(mconfig, SNS_LOROM_SUPERGB, "SNES Super Game Boy Cart", tag, owner, clock, "sns_rom_sgb", __FILE__)
+	sns_rom_sgb_device(mconfig, SNS_LOROM_SUPERGB, tag, owner, clock)
 {
 }
 
 
 sns_rom_sgb2_device::sns_rom_sgb2_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
-	sns_rom_sgb_device(mconfig, SNS_LOROM_SUPERGB2, "SNES Super Game Boy 2 Cart", tag, owner, clock, "sns_rom_sgb2", __FILE__)
+	sns_rom_sgb_device(mconfig, SNS_LOROM_SUPERGB2, tag, owner, clock)
 {
 }
 
@@ -160,7 +160,7 @@ static SLOT_INTERFACE_START(supergb_cart)
 SLOT_INTERFACE_END
 
 
-static MACHINE_CONFIG_FRAGMENT( supergb )
+static MACHINE_CONFIG_START( supergb )
 	MCFG_CPU_ADD("sgb_cpu", LR35902, 4295454)   /* 4.295454 MHz */
 	MCFG_CPU_PROGRAM_MAP(supergb_map)
 	MCFG_LR35902_TIMER_CB(WRITE8(sns_rom_sgb_device, gb_timer_callback))
@@ -192,7 +192,7 @@ const tiny_rom_entry *sns_rom_sgb1_device::device_rom_region() const
 }
 
 
-static MACHINE_CONFIG_FRAGMENT( supergb2 )
+static MACHINE_CONFIG_START( supergb2 )
 	MCFG_CPU_ADD("sgb_cpu", LR35902, XTAL_4_194304Mhz)   /* 4.194MHz derived from clock on sgb2 pcb */
 	MCFG_CPU_PROGRAM_MAP(supergb_map)
 	MCFG_LR35902_TIMER_CB(WRITE8(sns_rom_sgb_device, gb_timer_callback))

@@ -94,7 +94,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type LUXOR_55_21056 = device_creator<luxor_55_21056_device>;
+DEFINE_DEVICE_TYPE(LUXOR_55_21056, luxor_55_21056_device, "lux21056", "Luxor 55 21056")
 
 
 //-------------------------------------------------
@@ -244,7 +244,7 @@ WRITE_LINE_MEMBER( luxor_55_21056_device::write_sasi_msg )
 //  MACHINE_DRIVER( luxor_55_21056 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( luxor_55_21056 )
+static MACHINE_CONFIG_START( luxor_55_21056 )
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/2)
 	MCFG_CPU_PROGRAM_MAP(luxor_55_21056_mem)
 	MCFG_CPU_IO_MAP(luxor_55_21056_io)
@@ -339,7 +339,7 @@ ioport_constructor luxor_55_21056_device::device_input_ports() const
 //-------------------------------------------------
 
 luxor_55_21056_device::luxor_55_21056_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, LUXOR_55_21056, "Luxor 55 21056", tag, owner, clock, "lux21056", __FILE__),
+	: device_t(mconfig, LUXOR_55_21056, tag, owner, clock),
 		device_abcbus_card_interface(mconfig, *this),
 		m_maincpu(*this, Z80_TAG),
 		m_dma(*this, Z80DMA_TAG),

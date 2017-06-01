@@ -59,7 +59,7 @@ public:
 	required_device<generic_terminal_device> m_terminal;
 	DECLARE_READ8_MEMBER( ipc_f4_r );
 	DECLARE_READ8_MEMBER( ipc_f5_r );
-	DECLARE_WRITE8_MEMBER( kbd_put );
+	void kbd_put(u8 data);
 	uint8_t *m_ram;
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
@@ -99,15 +99,15 @@ INPUT_PORTS_END
 
 void ipc_state::machine_reset()
 {
-	m_maincpu->set_state_int(I8085_PC, 0xE800);
+	m_maincpu->set_state_int(i8085a_cpu_device::I8085_PC, 0xE800);
 }
 
-WRITE8_MEMBER( ipc_state::kbd_put )
+void ipc_state::kbd_put(u8 data)
 {
 	m_term_data = data;
 }
 
-static MACHINE_CONFIG_START( ipc, ipc_state )
+static MACHINE_CONFIG_START( ipc )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8085A, XTAL_19_6608MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(ipc_mem)
@@ -115,7 +115,7 @@ static MACHINE_CONFIG_START( ipc, ipc_state )
 
 	/* video hardware */
 	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(ipc_state, kbd_put))
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(ipc_state, kbd_put))
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -135,6 +135,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 19??, ipb,      0,      0,      ipc,      ipc, driver_device,     0,     "Intel",   "iPB", MACHINE_NO_SOUND)
-COMP( 19??, ipc,      ipb,    0,      ipc,      ipc, driver_device,     0,     "Intel",   "iPC", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE   INPUT  STATE      INIT   COMPANY    FULLNAME  FLAGS */
+COMP( 19??, ipb,    0,      0,       ipc,      ipc,   ipc_state, 0,     "Intel",   "iPB",    MACHINE_NO_SOUND)
+COMP( 19??, ipc,    ipb,    0,       ipc,      ipc,   ipc_state, 0,     "Intel",   "iPC",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

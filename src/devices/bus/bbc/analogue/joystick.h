@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_BBC_ANALOGUE_JOYSTICK_H
+#define MAME_BUS_BBC_ANALOGUE_JOYSTICK_H
 
-#ifndef __BBC_JOYSTICK__
-#define __BBC_JOYSTICK__
+#pragma once
 
 
 #include "analogue.h"
@@ -24,11 +24,10 @@ class bbc_joystick_device :
 	public device_t,
 	public device_bbc_analogue_interface
 {
-public:
-	// construction/destruction
-	bbc_joystick_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
-
 protected:
+	// construction/destruction
+	bbc_joystick_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -59,8 +58,7 @@ public:
 
 
 // device type definition
-extern const device_type BBC_ACORNJOY;
-extern const device_type BBC_VOLTMACE3B;
+DECLARE_DEVICE_TYPE(BBC_ACORNJOY,   bbc_acornjoy_device)
+DECLARE_DEVICE_TYPE(BBC_VOLTMACE3B, bbc_voltmace3b_device)
 
-
-#endif
+#endif // MAME_BUS_BBC_ANALOGUE_JOYSTICK_H

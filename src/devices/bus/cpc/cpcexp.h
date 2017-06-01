@@ -43,10 +43,10 @@
  *
  */
 
-#pragma once
+#ifndef MAME_BUS_CPC_CPCEXP_H
+#define MAME_BUS_CPC_CPCEXP_H
 
-#ifndef CPCEXP_H_
-#define CPCEXP_H_
+#pragma once
 
 
 //**************************************************************************
@@ -54,13 +54,6 @@
 //**************************************************************************
 
 #define CPC_EXP_SLOT_TAG        "cpcexp"
-
-enum
-{
-	MAP_LOWER = 0,  // special lower ROM handling
-	MAP_UPPER,      // special upper ROM handling
-	MAP_OTHER       // custom ROM handling (eg: Brunword MK4)
-};
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
@@ -91,18 +84,27 @@ enum
 class device_cpc_expansion_card_interface : public device_slot_card_interface
 {
 public:
+	enum
+	{
+		MAP_LOWER = 0,  // special lower ROM handling
+		MAP_UPPER,      // special upper ROM handling
+		MAP_OTHER       // custom ROM handling (eg: Brunword MK4)
+	};
+
 	// construction/destruction
-	device_cpc_expansion_card_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_cpc_expansion_card_interface();
 
 	// reset
-	virtual void cpc_reset_w() { };
-	virtual WRITE_LINE_MEMBER( cursor_w ) { };
-	virtual WRITE_LINE_MEMBER( romen_w ) { };
+	virtual void cpc_reset_w() { }
+	virtual WRITE_LINE_MEMBER( cursor_w ) { }
+	virtual WRITE_LINE_MEMBER( romen_w ) { }
 
 	void set_rom_bank(uint8_t sel) { m_rom_sel = sel; }  // tell device the currently selected ROM
 	uint8_t get_rom_bank() { return m_rom_sel; }
-	virtual void set_mapping(uint8_t type) { };
+	virtual void set_mapping(uint8_t type) { }
+
+protected:
+	device_cpc_expansion_card_interface(const machine_config &mconfig, device_t &device);
 
 private:
 	uint8_t m_rom_sel;  // currently selected ROM
@@ -119,11 +121,11 @@ public:
 	cpc_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~cpc_expansion_slot_device();
 
-	template<class _Object> static devcb_base &set_out_irq_callback(device_t &device, _Object object) { return downcast<cpc_expansion_slot_device &>(device).m_out_irq_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_nmi_callback(device_t &device, _Object object) { return downcast<cpc_expansion_slot_device &>(device).m_out_nmi_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_reset_callback(device_t &device, _Object object) { return downcast<cpc_expansion_slot_device &>(device).m_out_reset_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_romdis_callback(device_t &device, _Object object) { return downcast<cpc_expansion_slot_device &>(device).m_out_romdis_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_rom_select_callback(device_t &device, _Object object) { return downcast<cpc_expansion_slot_device &>(device).m_out_rom_select.set_callback(object); }
+	template <class Object> static devcb_base &set_out_irq_callback(device_t &device, Object &&cb) { return downcast<cpc_expansion_slot_device &>(device).m_out_irq_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_nmi_callback(device_t &device, Object &&cb) { return downcast<cpc_expansion_slot_device &>(device).m_out_nmi_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_reset_callback(device_t &device, Object &&cb) { return downcast<cpc_expansion_slot_device &>(device).m_out_reset_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_romdis_callback(device_t &device, Object &&cb) { return downcast<cpc_expansion_slot_device &>(device).m_out_romdis_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_rom_select_callback(device_t &device, Object &&cb) { return downcast<cpc_expansion_slot_device &>(device).m_out_rom_select.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE_LINE_MEMBER( irq_w );
 	DECLARE_WRITE_LINE_MEMBER( nmi_w );
@@ -153,6 +155,6 @@ protected:
 
 
 // device type definition
-extern const device_type CPC_EXPANSION_SLOT;
+DECLARE_DEVICE_TYPE(CPC_EXPANSION_SLOT, cpc_expansion_slot_device)
 
-#endif /* CPCEXP_H_ */
+#endif // MAME_BUS_CPC_CPCEXP_H

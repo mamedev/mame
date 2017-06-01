@@ -9,14 +9,15 @@
 
 */
 
-#ifndef SMARTWATCH_H_
-#define SMARTWATCH_H_
+#ifndef MAME_BUS_CPC_SMARTWATCH_H
+#define MAME_BUS_CPC_SMARTWATCH_H
+
+#pragma once
 
 #include "cpcexp.h"
 #include "machine/ds1315.h"
 
-class cpc_smartwatch_device   : public device_t,
-				public device_cpc_expansion_card_interface
+class cpc_smartwatch_device : public device_t, public device_cpc_expansion_card_interface
 {
 public:
 	// construction/destruction
@@ -41,7 +42,7 @@ private:
 };
 
 // device type definition
-extern const device_type CPC_SMARTWATCH;
+DECLARE_DEVICE_TYPE(CPC_SMARTWATCH, cpc_smartwatch_device)
 
 
-#endif /* SMARTWATCH_H_ */
+#endif // MAME_BUS_CPC_SMARTWATCH_H

@@ -902,7 +902,7 @@ MACHINE_RESET_MEMBER(jack_state,joinem)
 
 /***************************************************************/
 
-static MACHINE_CONFIG_START( jack, jack_state )
+static MACHINE_CONFIG_START( jack )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18MHz/6)

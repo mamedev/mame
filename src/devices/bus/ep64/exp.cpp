@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type EP64_EXPANSION_BUS_SLOT = device_creator<ep64_expansion_bus_slot_device>;
+DEFINE_DEVICE_TYPE(EP64_EXPANSION_BUS_SLOT, ep64_expansion_bus_slot_device, "ep64_expansion_bus_slot", "Enterprise Sixty Four expansion bus slot")
 
 
 
@@ -44,7 +44,7 @@ device_ep64_expansion_bus_card_interface::device_ep64_expansion_bus_card_interfa
 //-------------------------------------------------
 
 ep64_expansion_bus_slot_device::ep64_expansion_bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, EP64_EXPANSION_BUS_SLOT, "Enterprise Sixty Four expansion bus slot", tag, owner, clock, "ep64_expansion_bus_slot", __FILE__)
+	: device_t(mconfig, EP64_EXPANSION_BUS_SLOT, tag, owner, clock)
 	, device_slot_interface(mconfig, *this)
 	, m_write_irq(*this)
 	, m_write_nmi(*this)

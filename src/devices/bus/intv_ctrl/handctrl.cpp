@@ -13,7 +13,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type INTV_HANDCTRL = device_creator<intv_handctrl_device>;
+DEFINE_DEVICE_TYPE(INTV_HANDCTRL, intv_handctrl_device, "intv_handctrl", "Mattel Intellivision Hand Controller")
 
 
 static INPUT_PORTS_START( intv_handctrl )
@@ -87,13 +87,13 @@ ioport_constructor intv_handctrl_device::device_input_ports() const
 //-------------------------------------------------
 
 intv_handctrl_device::intv_handctrl_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-					device_t(mconfig, INTV_HANDCTRL, "Mattel Intellivision Hand Controller", tag, owner, clock, "intv_hand", __FILE__),
-					device_intv_control_port_interface(mconfig, *this),
-					m_cfg(*this, "OPTIONS"),
-					m_keypad(*this, "KEYPAD"),
-					m_disc_dig(*this, "DISC_DG"),
-					m_disc_anx(*this, "DISC_AN_X"),
-					m_disc_any(*this, "DISC_AN_Y")
+	device_t(mconfig, INTV_HANDCTRL, tag, owner, clock),
+	device_intv_control_port_interface(mconfig, *this),
+	m_cfg(*this, "OPTIONS"),
+	m_keypad(*this, "KEYPAD"),
+	m_disc_dig(*this, "DISC_DG"),
+	m_disc_anx(*this, "DISC_AN_X"),
+	m_disc_any(*this, "DISC_AN_Y")
 {
 }
 

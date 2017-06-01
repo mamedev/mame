@@ -174,7 +174,7 @@ F3853_INTERRUPT_REQ_CB(mk1_state::mk1_interrupt)
 	m_maincpu->set_input_line(F8_INPUT_LINE_INT_REQ, level ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static MACHINE_CONFIG_START( mk1, mk1_state )
+static MACHINE_CONFIG_START( mk1 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", F8, MAIN_CLOCK )        /* MK3850 */
 	MCFG_CPU_PROGRAM_MAP(mk1_mem)
@@ -205,5 +205,5 @@ ROM_END
 ***************************************************************************/
 
 // seams to be developed by mostek (MK)
-/*    YEAR   NAME  PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY                 FULLNAME */
-CONS( 1979,  ccmk1,  0,      0,      mk1,    mk1, driver_device,    0,   "Novag", "Chess Champion MK I", MACHINE_NO_SOUND_HW )
+//    YEAR   NAME    PARENT  COMPAT  MACHINE  INPUT  STATE      INIT  COMPANY  FULLNAME               FLAGS
+CONS( 1979,  ccmk1,  0,      0,      mk1,     mk1,   mk1_state, 0,    "Novag", "Chess Champion MK I", MACHINE_NO_SOUND_HW )

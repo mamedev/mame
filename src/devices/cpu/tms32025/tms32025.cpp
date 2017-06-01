@@ -119,8 +119,8 @@ Table 3-2.  TMS32025/26 Memory Blocks
 
 
 #include "emu.h"
-#include "debugger.h"
 #include "tms32025.h"
+#include "debugger.h"
 
 
 #define CLK 4   /* 1 cycle equals 4 clock ticks */      /* PE/DI */
@@ -183,8 +183,8 @@ Table 3-2.  TMS32025/26 Memory Blocks
 #define IND     m_AR[ARP]                       /* address used in indirect memory access operations */
 
 
-const device_type TMS32025 = device_creator<tms32025_device>;
-const device_type TMS32026 = device_creator<tms32026_device>;
+DEFINE_DEVICE_TYPE(TMS32025, tms32025_device, "tms32025", "TMS32025")
+DEFINE_DEVICE_TYPE(TMS32026, tms32026_device, "tms32026", "TMS32026")
 
 static ADDRESS_MAP_START( tms32025_data, AS_DATA, 16, tms32025_device )
 	AM_RANGE(0x0000, 0x0000) AM_READWRITE(drr_r, drr_w)
@@ -213,27 +213,14 @@ ADDRESS_MAP_END
 
 
 tms32025_device::tms32025_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, TMS32025, "TMS32025", tag, owner, clock, "tms32025", __FILE__)
-	, m_program_config("program", ENDIANNESS_BIG, 16, 16, -1)
-	, m_data_config("data", ENDIANNESS_BIG, 16, 16, -1, ADDRESS_MAP_NAME(tms32025_data))
-	, m_io_config("io", ENDIANNESS_BIG, 16, 16, -1)
-	, m_b0(*this, "b0")
-	, m_b1(*this, "b1")
-	, m_b2(*this, "b2")
-	, m_b3(*this, "b3")
-	, m_bio_in(*this)
-	, m_hold_in(*this)
-	, m_hold_ack_out(*this)
-	, m_xf_out(*this)
-	, m_dr_in(*this)
-	, m_dx_out(*this)
+	: tms32025_device(mconfig, TMS32025, tag, owner, clock, ADDRESS_MAP_NAME(tms32025_data))
 {
 	m_fixed_STR1 = 0x0180;
 }
 
 
-tms32025_device::tms32025_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, address_map_constructor map)
-	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
+tms32025_device::tms32025_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor map)
+	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 16, 16, -1)
 	, m_data_config("data", ENDIANNESS_BIG, 16, 16, -1, map)
 	, m_io_config("io", ENDIANNESS_BIG, 16, 16, -1)
@@ -248,12 +235,11 @@ tms32025_device::tms32025_device(const machine_config &mconfig, device_type type
 	, m_dr_in(*this)
 	, m_dx_out(*this)
 {
-	m_fixed_STR1 = 0x0180;
 }
 
 
 tms32026_device::tms32026_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms32025_device(mconfig, TMS32026, "TMS32026", tag, owner, clock, "tms32026", __FILE__, ADDRESS_MAP_NAME(tms32026_data))
+	: tms32025_device(mconfig, TMS32026, tag, owner, clock, ADDRESS_MAP_NAME(tms32026_data))
 {
 	m_fixed_STR1 = 0x0100;
 }

@@ -9,14 +9,16 @@
 
 ***************************************************************************/
 
-#ifndef __ADC1038_H__
-#define __ADC1038_H__
+#ifndef MAME_MACHINE_ADC1038_H
+#define MAME_MACHINE_ADC1038_H
+
+#pragma once
+
 
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef device_delegate<int (int input)> adc1038_input_delegate;
 #define ADC1038_INPUT_CB(name)  int name(int input)
 
 /***************************************************************************
@@ -26,10 +28,11 @@ typedef device_delegate<int (int input)> adc1038_input_delegate;
 class adc1038_device : public device_t
 {
 public:
-	adc1038_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~adc1038_device() {}
+	typedef device_delegate<int (int input)> input_delegate;
 
-	static void set_input_callback(device_t &device, adc1038_input_delegate callback) { downcast<adc1038_device &>(device).m_input_cb = callback; }
+	adc1038_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	static void set_input_callback(device_t &device, input_delegate &&callback) { downcast<adc1038_device &>(device).m_input_cb = std::move(callback); }
 	static void set_gti_club_hack(device_t &device, int hack) { downcast<adc1038_device &>(device).m_gticlub_hack = hack; }
 
 	DECLARE_READ_LINE_MEMBER( do_read );
@@ -53,17 +56,16 @@ private:
 	int m_sars;
 
 	int m_gticlub_hack;
-	adc1038_input_delegate       m_input_cb;
+	input_delegate m_input_cb;
 };
 
-extern const device_type ADC1038;
+DECLARE_DEVICE_TYPE(ADC1038, adc1038_device)
 
 
 #define MCFG_ADC1038_INPUT_CB(_class, _method) \
-	adc1038_device::set_input_callback(*device, adc1038_input_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	adc1038_device::set_input_callback(*device, adc1038_device::input_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
 #define MCFG_ADC1038_GTIHACK(_hack) \
 	adc1038_device::set_gti_club_hack(*device, _hack);
 
-
-#endif  /* __ADC1038_H__ */
+#endif // MAME_MACHINE_ADC1038_H

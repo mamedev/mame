@@ -449,7 +449,7 @@ WRITE8_MEMBER(supdrapo_state::ay8910_outputb_w)
                            Machine Driver
 **********************************************************************/
 
-static MACHINE_CONFIG_START( supdrapo, supdrapo_state )
+static MACHINE_CONFIG_START( supdrapo )
 
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK) /* guess */
 	MCFG_CPU_PROGRAM_MAP(sdpoker_mem)
@@ -610,7 +610,7 @@ ROM_END
                            Games Drivers
 **********************************************************************/
 
-/*    YEAR  NAME       PARENT    MACHINE   INPUT     STATE          INIT  ROT     COMPANY                                           FULLNAME                     FLAGS... */
-GAME( 1983, supdrapo,  0,        supdrapo, supdrapo, driver_device, 0,    ROT90, "Valadon Automation (Stern Electronics license)", "Super Draw Poker (set 1)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1983, supdrapoa, supdrapo, supdrapo, supdrapo, driver_device, 0,    ROT90, "Valadon Automation / Jeutel",                    "Super Draw Poker (set 2)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1983, supdrapob, supdrapo, supdrapo, supdrapo, driver_device, 0,    ROT90, "bootleg",                                        "Super Draw Poker (bootleg)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT  ROT    COMPANY                                           FULLNAME                      FLAGS
+GAME( 1983, supdrapo,  0,        supdrapo, supdrapo, supdrapo_state, 0,    ROT90, "Valadon Automation (Stern Electronics license)", "Super Draw Poker (set 1)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1983, supdrapoa, supdrapo, supdrapo, supdrapo, supdrapo_state, 0,    ROT90, "Valadon Automation / Jeutel",                    "Super Draw Poker (set 2)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1983, supdrapob, supdrapo, supdrapo, supdrapo, supdrapo_state, 0,    ROT90, "bootleg",                                        "Super Draw Poker (bootleg)", MACHINE_SUPPORTS_SAVE )

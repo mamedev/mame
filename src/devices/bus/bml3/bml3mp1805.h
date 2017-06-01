@@ -9,8 +9,10 @@
 
 *********************************************************************/
 
-#ifndef __BML3BUS_MP1805__
-#define __BML3BUS_MP1805__
+#ifndef MAME_BUS_BML3_BML3MP1805_H
+#define MAME_BUS_BML3_BML3MP1805_H
+
+#pragma once
 
 #include "bml3bus.h"
 #include "imagedev/flopdrv.h"
@@ -48,6 +50,6 @@ private:
 };
 
 // device type definition
-extern const device_type BML3BUS_MP1805;
+DECLARE_DEVICE_TYPE(BML3BUS_MP1805, bml3bus_mp1805_device)
 
-#endif /* __BML3BUS_MP1805__ */
+#endif // MAME_BUS_BML3_BML3MP1805_H

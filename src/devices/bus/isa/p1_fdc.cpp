@@ -29,7 +29,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type P1_FDC = device_creator<p1_fdc_device>;
+DEFINE_DEVICE_TYPE(P1_FDC, p1_fdc_device, "p1_fdc", "Poisk-1 floppy B504")
 
 FLOPPY_FORMATS_MEMBER( p1_fdc_device::floppy_formats )
 	FLOPPY_PC_FORMAT
@@ -39,7 +39,7 @@ static SLOT_INTERFACE_START( poisk1_floppies )
 	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_FRAGMENT( fdc_b504 )
+static MACHINE_CONFIG_START( fdc_b504 )
 	MCFG_FD1793_ADD("fdc", XTAL_16MHz / 16)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(p1_fdc_device, p1_fdc_irq_drq))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(p1_fdc_device, p1_fdc_irq_drq))
@@ -178,7 +178,7 @@ WRITE8_MEMBER(p1_fdc_device::p1_fdc_w)
 //-------------------------------------------------
 
 p1_fdc_device::p1_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, P1_FDC, "Poisk-1 floppy B504", tag, owner, clock, "p1_fdc", __FILE__)
+	: device_t(mconfig, P1_FDC, tag, owner, clock)
 	, device_isa8_card_interface(mconfig, *this)
 	, m_fdc(*this, "fdc")
 {
@@ -194,8 +194,8 @@ void p1_fdc_device::device_start()
 	set_isa_device();
 	m_isa->install_rom(this, 0xe0000, 0xe07ff, "XXX", "p1_fdc");
 	m_isa->install_device(0x00c0, 0x00c3,
-		READ8_DEVICE_DELEGATE(m_fdc, fd1793_t, read),
-		WRITE8_DEVICE_DELEGATE(m_fdc, fd1793_t, write) );
+		READ8_DEVICE_DELEGATE(m_fdc, fd1793_device, read),
+		WRITE8_DEVICE_DELEGATE(m_fdc, fd1793_device, write) );
 	m_isa->install_device(0x00c4, 0x00c7, read8_delegate( FUNC(p1_fdc_device::p1_fdc_r), this ), write8_delegate( FUNC(p1_fdc_device::p1_fdc_w), this ) );
 }
 

@@ -15,7 +15,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type EA2001_CART_SLOT = device_creator<arcadia_cart_slot_device>;
+DEFINE_DEVICE_TYPE(EA2001_CART_SLOT, arcadia_cart_slot_device, "arcadia_cart_slot", "Emerson Arcadia Cartridge Slot")
 
 //**************************************************************************
 //    ARCADIA Cartridges Interface
@@ -63,10 +63,10 @@ void device_arcadia_cart_interface::rom_alloc(uint32_t size, const char *tag)
 //  arcadia_cart_slot_device - constructor
 //-------------------------------------------------
 arcadia_cart_slot_device::arcadia_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-						device_t(mconfig, EA2001_CART_SLOT, "Emerson Arcadia Cartridge Slot", tag, owner, clock, "arcadia_cart_slot", __FILE__),
-						device_image_interface(mconfig, *this),
-						device_slot_interface(mconfig, *this),
-						m_type(ARCADIA_STD), m_cart(nullptr)
+	device_t(mconfig, EA2001_CART_SLOT, tag, owner, clock),
+	device_image_interface(mconfig, *this),
+	device_slot_interface(mconfig, *this),
+	m_type(ARCADIA_STD), m_cart(nullptr)
 {
 }
 

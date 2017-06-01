@@ -96,7 +96,7 @@ public:
 	int m_slidesout;
 	int m_hopper[3];
 	int m_motor[3];
-	optional_device<s16lf01_t> m_vfd;
+	optional_device<s16lf01_device> m_vfd;
 	optional_shared_ptr<uint16_t> m_vram;
 	struct bt477_t m_bt477;
 	DECLARE_READ16_MEMBER(duart_1_r);

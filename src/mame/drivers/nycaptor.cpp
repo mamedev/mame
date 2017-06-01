@@ -778,7 +778,7 @@ void nycaptor_state::machine_reset()
 	memset(m_vol_ctrl, 0, sizeof(m_vol_ctrl));
 }
 
-static MACHINE_CONFIG_START( nycaptor, nycaptor_state )
+static MACHINE_CONFIG_START( nycaptor )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,8000000/2)      /* ??? */
@@ -844,7 +844,7 @@ static MACHINE_CONFIG_START( nycaptor, nycaptor_state )
 	// Does the DAC also exist on this board? nycaptor writes 0x80 to 0xd600
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( cyclshtg, nycaptor_state )
+static MACHINE_CONFIG_START( cyclshtg )
 
 	MCFG_CPU_ADD("maincpu", Z80,8000000/2)
 	MCFG_CPU_PROGRAM_MAP(cyclshtg_master_map)
@@ -911,7 +911,7 @@ static MACHINE_CONFIG_START( cyclshtg, nycaptor_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( bronx, nycaptor_state )
+static MACHINE_CONFIG_START( bronx )
 
 	MCFG_CPU_ADD("maincpu", Z80,8000000/2)
 	MCFG_CPU_PROGRAM_MAP(bronx_master_map)
@@ -1335,8 +1335,8 @@ DRIVER_INIT_MEMBER(nycaptor_state,colt)
 	m_gametype = 2;
 }
 
-GAME( 1985, nycaptor, 0,        nycaptor, nycaptor, nycaptor_state, nycaptor, ROT0,  "Taito",   "N.Y. Captor", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, nycaptor, 0,        nycaptor, nycaptor, nycaptor_state, nycaptor, ROT0,  "Taito",   "N.Y. Captor",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1986, cyclshtg, 0,        cyclshtg, cyclshtg, nycaptor_state, cyclshtg, ROT90, "Taito",   "Cycle Shooting", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 /* bootlegs */
-GAME( 1986, bronx,    cyclshtg, bronx,    bronx, nycaptor_state,    bronx,    ROT90, "bootleg", "Bronx", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, colt,     nycaptor, bronx,    colt, nycaptor_state,     colt,     ROT0,  "bootleg", "Colt", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, bronx,    cyclshtg, bronx,    bronx,    nycaptor_state, bronx,    ROT90, "bootleg", "Bronx",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, colt,     nycaptor, bronx,    colt,     nycaptor_state, colt,     ROT0,  "bootleg", "Colt",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )

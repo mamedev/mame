@@ -34,30 +34,29 @@
 
 
 
-const device_type ADC12130 = device_creator<adc12130_device>;
+DEFINE_DEVICE_TYPE(ADC12130, adc12130_device, "adc12130", "ADC12130")
+DEFINE_DEVICE_TYPE(ADC12132, adc12132_device, "adc12132", "ADC12132")
+DEFINE_DEVICE_TYPE(ADC12138, adc12138_device, "adc12138", "ADC12138")
+
 
 adc12130_device::adc12130_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: adc12138_device(mconfig, ADC12130, "ADC12130", tag, owner, clock, "adc12130", __FILE__)
+	: adc12138_device(mconfig, ADC12130, tag, owner, clock)
 {
 }
 
-
-const device_type ADC12132 = device_creator<adc12132_device>;
 
 adc12132_device::adc12132_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: adc12138_device(mconfig, ADC12132, "ADC12132", tag, owner, clock, "adc12132", __FILE__)
+	: adc12138_device(mconfig, ADC12132, tag, owner, clock)
 {
 }
 
-
-const device_type ADC12138 = device_creator<adc12138_device>;
 
 adc12138_device::adc12138_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ADC12138, "ADC12138", tag, owner, clock, "adc12138", __FILE__)
+	: adc12138_device(mconfig, ADC12138, tag, owner, clock)
 {
 }
-adc12138_device::adc12138_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+adc12138_device::adc12138_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
 {
 }
 

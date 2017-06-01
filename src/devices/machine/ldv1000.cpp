@@ -52,7 +52,7 @@
 //**************************************************************************
 
 // devices
-const device_type PIONEER_LDV1000 = device_creator<pioneer_ldv1000_device>;
+DEFINE_DEVICE_TYPE(PIONEER_LDV1000, pioneer_ldv1000_device, "ldv1000", "Pioneer LD-V1000")
 
 
 
@@ -84,7 +84,7 @@ static const z80_daisy_config daisy_chain[] =
 };
 
 
-static MACHINE_CONFIG_FRAGMENT( ldv1000 )
+static MACHINE_CONFIG_START( ldv1000 )
 	MCFG_CPU_ADD("ldv1000", Z80, XTAL_5MHz/2)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(ldv1000_map)
@@ -122,7 +122,7 @@ ROM_END
 //-------------------------------------------------
 
 pioneer_ldv1000_device::pioneer_ldv1000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: laserdisc_device(mconfig, PIONEER_LDV1000, "Pioneer LD-V1000", tag, owner, clock, "ldv1000", __FILE__),
+	: laserdisc_device(mconfig, PIONEER_LDV1000, tag, owner, clock),
 		m_z80_cpu(*this, "ldv1000"),
 		m_z80_ctc(*this, "ldvctc"),
 		m_multitimer(nullptr),

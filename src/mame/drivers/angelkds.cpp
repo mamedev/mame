@@ -511,7 +511,7 @@ void angelkds_state::machine_reset()
 	m_bgtopbank = 0;
 }
 
-static MACHINE_CONFIG_START( angelkds, angelkds_state )
+static MACHINE_CONFIG_START( angelkds )
 
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_6MHz)
 	MCFG_CPU_PROGRAM_MAP(main_map)

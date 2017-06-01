@@ -22,11 +22,11 @@
 
 
 
-const device_type JALECO_BLEND = device_creator<jaleco_blend_device>;
+DEFINE_DEVICE_TYPE(JALECO_BLEND, jaleco_blend_device, "jaleco_blend", "Jaleco Blending Device")
 
 jaleco_blend_device::jaleco_blend_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, JALECO_BLEND, "Jaleco Blending Device", tag, owner, clock, "jaleco_blend", __FILE__),
-	m_table(nullptr)
+	: device_t(mconfig, JALECO_BLEND, tag, owner, clock)
+	, m_table(nullptr)
 {
 }
 

@@ -9,10 +9,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_CPU_MIPS_MIPS3_H
+#define MAME_CPU_MIPS_MIPS3_H
 
-#ifndef __MIPS3_H__
-#define __MIPS3_H__
+#pragma once
 
 
 #include "divtlb.h"
@@ -22,27 +22,27 @@
 
 
 // NEC VR4300 series is MIPS III with 32-bit address bus and slightly custom COP0/TLB
-extern const device_type VR4300BE;
-extern const device_type VR4300LE;
+DECLARE_DEVICE_TYPE(VR4300BE,  vr4300be_device)
+DECLARE_DEVICE_TYPE(VR4300LE,  vr4300le_device)
 // VR4310 = VR4300 with different speed bin
-extern const device_type VR4310BE;
-extern const device_type VR4310LE;
-extern const device_type R4600BE;
-extern const device_type R4600LE;
-extern const device_type R4650BE;
-extern const device_type R4650LE;
-extern const device_type R4700BE;
-extern const device_type R4700LE;
-extern const device_type TX4925BE;
-extern const device_type TX4925LE;
-extern const device_type R5000BE;
-extern const device_type R5000LE;
-extern const device_type VR5500BE;
-extern const device_type VR5500LE;
-extern const device_type QED5271BE;
-extern const device_type QED5271LE;
-extern const device_type RM7000BE;
-extern const device_type RM7000LE;
+DECLARE_DEVICE_TYPE(VR4310BE,  vr4310be_device)
+DECLARE_DEVICE_TYPE(VR4310LE,  vr4310le_device)
+DECLARE_DEVICE_TYPE(R4600BE,   r4600be_device)
+DECLARE_DEVICE_TYPE(R4600LE,   r4600le_device)
+DECLARE_DEVICE_TYPE(R4650BE,   r4650be_device)
+DECLARE_DEVICE_TYPE(R4650LE,   r4650le_device)
+DECLARE_DEVICE_TYPE(R4700BE,   r4700be_device)
+DECLARE_DEVICE_TYPE(R4700LE,   r4700le_device)
+DECLARE_DEVICE_TYPE(TX4925BE,  tx4925be_device)
+DECLARE_DEVICE_TYPE(TX4925LE,  tx4925le_device)
+DECLARE_DEVICE_TYPE(R5000BE,   r5000be_device)
+DECLARE_DEVICE_TYPE(R5000LE,   r5000le_device)
+DECLARE_DEVICE_TYPE(VR5500BE,  vr5500be_device)
+DECLARE_DEVICE_TYPE(VR5500LE,  vr5500le_device)
+DECLARE_DEVICE_TYPE(QED5271BE, qed5271be_device)
+DECLARE_DEVICE_TYPE(QED5271LE, qed5271le_device)
+DECLARE_DEVICE_TYPE(RM7000BE,  rm7000be_device)
+DECLARE_DEVICE_TYPE(RM7000LE,  rm7000le_device)
 
 
 /***************************************************************************
@@ -275,7 +275,7 @@ protected:
 
 public:
 	// construction/destruction
-	mips3_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, mips3_flavor flavor, endianness_t endiannes);
+	mips3_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, mips3_flavor flavor, endianness_t endiannes);
 
 	static void set_icache_size(device_t &device, size_t icache_size) { downcast<mips3_device &>(device).c_icache_size = icache_size; }
 	static void set_dcache_size(device_t &device, size_t dcache_size) { downcast<mips3_device &>(device).c_dcache_size = dcache_size; }
@@ -583,7 +583,7 @@ class vr4300be_device : public mips3_device
 public:
 	// construction/destruction
 	vr4300be_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mips3_device(mconfig, VR4300BE, "VR4300 (big)", tag, owner, clock, "vr4300be", MIPS3_TYPE_VR4300, ENDIANNESS_BIG)
+		: mips3_device(mconfig, VR4300BE, tag, owner, clock, MIPS3_TYPE_VR4300, ENDIANNESS_BIG)
 	{ }
 };
 
@@ -592,7 +592,7 @@ class vr4300le_device : public mips3_device
 public:
 	// construction/destruction
 	vr4300le_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mips3_device(mconfig, VR4300LE, "VR4300 (little)", tag, owner, clock, "vr4300le", MIPS3_TYPE_VR4300, ENDIANNESS_LITTLE)
+		: mips3_device(mconfig, VR4300LE, tag, owner, clock, MIPS3_TYPE_VR4300, ENDIANNESS_LITTLE)
 	{ }
 };
 
@@ -601,7 +601,7 @@ class vr4310be_device : public mips3_device
 public:
 	// construction/destruction
 	vr4310be_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mips3_device(mconfig, VR4310BE, "VR4310 (big)", tag, owner, clock, "vr4310be", MIPS3_TYPE_VR4300, ENDIANNESS_BIG)
+		: mips3_device(mconfig, VR4310BE, tag, owner, clock, MIPS3_TYPE_VR4300, ENDIANNESS_BIG)
 	{ }
 };
 
@@ -610,7 +610,7 @@ class vr4310le_device : public mips3_device
 public:
 	// construction/destruction
 	vr4310le_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mips3_device(mconfig, VR4310LE, "VR4310 (little)", tag, owner, clock, "vr4310le", MIPS3_TYPE_VR4300, ENDIANNESS_LITTLE)
+		: mips3_device(mconfig, VR4310LE, tag, owner, clock, MIPS3_TYPE_VR4300, ENDIANNESS_LITTLE)
 	{ }
 };
 
@@ -619,7 +619,7 @@ class r4600be_device : public mips3_device
 public:
 	// construction/destruction
 	r4600be_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mips3_device(mconfig, R4600BE, "R4600 (big)", tag, owner, clock, "r4600be", MIPS3_TYPE_R4600, ENDIANNESS_BIG)
+		: mips3_device(mconfig, R4600BE, tag, owner, clock, MIPS3_TYPE_R4600, ENDIANNESS_BIG)
 	{ }
 };
 
@@ -628,7 +628,7 @@ class r4600le_device : public mips3_device
 public:
 	// construction/destruction
 	r4600le_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mips3_device(mconfig, R4600LE, "R4600 (little)", tag, owner, clock, "r4600le", MIPS3_TYPE_R4600, ENDIANNESS_LITTLE)
+		: mips3_device(mconfig, R4600LE, tag, owner, clock, MIPS3_TYPE_R4600, ENDIANNESS_LITTLE)
 	{ }
 };
 
@@ -637,7 +637,7 @@ class r4650be_device : public mips3_device
 public:
 	// construction/destruction
 	r4650be_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mips3_device(mconfig, R4650BE, "IDT R4650 (big)", tag, owner, clock, "r4650be", MIPS3_TYPE_R4650, ENDIANNESS_BIG)
+		: mips3_device(mconfig, R4650BE, tag, owner, clock, MIPS3_TYPE_R4650, ENDIANNESS_BIG)
 	{ }
 };
 
@@ -646,7 +646,7 @@ class r4650le_device : public mips3_device
 public:
 	// construction/destruction
 	r4650le_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mips3_device(mconfig, R4650LE, "IDT R4650 (little)", tag, owner, clock, "r4650le", MIPS3_TYPE_R4650, ENDIANNESS_LITTLE)
+		: mips3_device(mconfig, R4650LE, tag, owner, clock, MIPS3_TYPE_R4650, ENDIANNESS_LITTLE)
 	{ }
 };
 
@@ -655,7 +655,7 @@ class r4700be_device : public mips3_device
 public:
 	// construction/destruction
 	r4700be_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mips3_device(mconfig, R4700BE, "R4700 (big)", tag, owner, clock, "r4700be", MIPS3_TYPE_R4700, ENDIANNESS_BIG)
+		: mips3_device(mconfig, R4700BE, tag, owner, clock, MIPS3_TYPE_R4700, ENDIANNESS_BIG)
 	{ }
 };
 
@@ -664,7 +664,7 @@ class r4700le_device : public mips3_device
 public:
 	// construction/destruction
 	r4700le_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mips3_device(mconfig, R4700LE, "R4700 (little)", tag, owner, clock, "r4700le", MIPS3_TYPE_R4700, ENDIANNESS_LITTLE)
+		: mips3_device(mconfig, R4700LE, tag, owner, clock, MIPS3_TYPE_R4700, ENDIANNESS_LITTLE)
 	{ }
 };
 
@@ -673,7 +673,7 @@ class tx4925be_device : public mips3_device
 public:
 	// construction/destruction
 	tx4925be_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mips3_device(mconfig, TX4925BE, "TX4925 (big)", tag, owner, clock, "tx4925be", MIPS3_TYPE_TX4925, ENDIANNESS_BIG)
+		: mips3_device(mconfig, TX4925BE, tag, owner, clock, MIPS3_TYPE_TX4925, ENDIANNESS_BIG)
 	{ }
 };
 
@@ -682,7 +682,7 @@ class tx4925le_device : public mips3_device
 public:
 	// construction/destruction
 	tx4925le_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mips3_device(mconfig, TX4925LE, "TX4925 (little)", tag, owner, clock, "tx4925le", MIPS3_TYPE_TX4925, ENDIANNESS_LITTLE)
+		: mips3_device(mconfig, TX4925LE, tag, owner, clock, MIPS3_TYPE_TX4925, ENDIANNESS_LITTLE)
 	{ }
 };
 
@@ -691,7 +691,7 @@ class r5000be_device : public mips3_device
 public:
 	// construction/destruction
 	r5000be_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mips3_device(mconfig, R5000BE, "R5000 (big)", tag, owner, clock, "r5000be", MIPS3_TYPE_R5000, ENDIANNESS_BIG)
+		: mips3_device(mconfig, R5000BE, tag, owner, clock, MIPS3_TYPE_R5000, ENDIANNESS_BIG)
 	{ }
 };
 
@@ -700,7 +700,7 @@ class r5000le_device : public mips3_device
 public:
 	// construction/destruction
 	r5000le_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mips3_device(mconfig, R5000LE, "R5000 (little)", tag, owner, clock, "r5000le", MIPS3_TYPE_R5000, ENDIANNESS_LITTLE)
+		: mips3_device(mconfig, R5000LE, tag, owner, clock, MIPS3_TYPE_R5000, ENDIANNESS_LITTLE)
 	{ }
 };
 
@@ -709,7 +709,7 @@ class vr5500be_device : public mips3_device
 public:
 	// construction/destruction
 	vr5500be_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mips3_device(mconfig, VR5500BE, "VR5500 (big)", tag, owner, clock, "vr5500be", MIPS3_TYPE_R5000, ENDIANNESS_BIG)
+		: mips3_device(mconfig, VR5500BE, tag, owner, clock, MIPS3_TYPE_R5000, ENDIANNESS_BIG)
 	{ }
 };
 
@@ -718,7 +718,7 @@ class vr5500le_device : public mips3_device
 public:
 	// construction/destruction
 	vr5500le_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mips3_device(mconfig, VR5500LE, "VR5500 (little)", tag, owner, clock, "r5500le", MIPS3_TYPE_R5000, ENDIANNESS_LITTLE)
+		: mips3_device(mconfig, VR5500LE, tag, owner, clock, MIPS3_TYPE_R5000, ENDIANNESS_LITTLE)
 	{ }
 };
 
@@ -727,7 +727,7 @@ class qed5271be_device : public mips3_device
 public:
 	// construction/destruction
 	qed5271be_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mips3_device(mconfig, QED5271BE, "QED5271 (big)", tag, owner, clock, "qed5271be", MIPS3_TYPE_QED5271, ENDIANNESS_BIG)
+		: mips3_device(mconfig, QED5271BE, tag, owner, clock, MIPS3_TYPE_QED5271, ENDIANNESS_BIG)
 	{ }
 };
 
@@ -736,7 +736,7 @@ class qed5271le_device : public mips3_device
 public:
 	// construction/destruction
 	qed5271le_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mips3_device(mconfig, QED5271LE, "QED5271 (little)", tag, owner, clock, "qed5271le", MIPS3_TYPE_QED5271, ENDIANNESS_LITTLE)
+		: mips3_device(mconfig, QED5271LE, tag, owner, clock, MIPS3_TYPE_QED5271, ENDIANNESS_LITTLE)
 	{ }
 };
 
@@ -745,7 +745,7 @@ class rm7000be_device : public mips3_device
 public:
 	// construction/destruction
 	rm7000be_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mips3_device(mconfig, RM7000BE, "RM7000 (big)", tag, owner, clock, "rm7000be", MIPS3_TYPE_RM7000, ENDIANNESS_BIG)
+		: mips3_device(mconfig, RM7000BE, tag, owner, clock, MIPS3_TYPE_RM7000, ENDIANNESS_BIG)
 	{ }
 };
 
@@ -754,7 +754,7 @@ class rm7000le_device : public mips3_device
 public:
 	// construction/destruction
 	rm7000le_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mips3_device(mconfig, RM7000LE, "RM7000 (little)", tag, owner, clock, "rm7000le", MIPS3_TYPE_RM7000, ENDIANNESS_LITTLE)
+		: mips3_device(mconfig, RM7000LE, tag, owner, clock, MIPS3_TYPE_RM7000, ENDIANNESS_LITTLE)
 	{ }
 };
 
@@ -809,4 +809,4 @@ private:
 unsigned dasmmips3(std::ostream &stream, unsigned pc, uint32_t op);
 
 
-#endif /* __MIPS3_H__ */
+#endif // MAME_CPU_MIPS_MIPS3_H

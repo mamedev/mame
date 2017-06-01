@@ -286,7 +286,7 @@ INPUT_PORTS_END
 
 
 
-static MACHINE_CONFIG_START( ssystem3, ssystem3_state )
+static MACHINE_CONFIG_START( ssystem3 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 1000000)
 	MCFG_CPU_PROGRAM_MAP(ssystem3_map)
@@ -327,6 +327,6 @@ ROM_END
 
 ***************************************************************************/
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT        COMPANY     FULLNAME */
+//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     STATE           INIT        COMPANY            FULLNAME                           FLAGS
 CONS( 1979, ssystem3, 0,        0,      ssystem3, ssystem3, ssystem3_state, ssystem3,   "SciSys / Novag",  "Chess Champion Super System III", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 //chess champion MK III in germany

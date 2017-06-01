@@ -296,7 +296,7 @@ WRITE8_MEMBER(paso1600_state::pc_dma_write_byte)
 	space.write_byte(offset, data);
 }
 
-static MACHINE_CONFIG_START( paso1600, paso1600_state )
+static MACHINE_CONFIG_START( paso1600 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8086, 16000000/2)
 	MCFG_CPU_PROGRAM_MAP(paso1600_map)
@@ -343,5 +343,5 @@ ROM_START( paso1600 )
 ROM_END
 
 
-/*    YEAR  NAME        PARENT  COMPAT   MACHINE    INPUT      INIT    COMPANY       FULLNAME       FLAGS */
-COMP ( 198?,paso1600,   0,      0,       paso1600,  paso1600, driver_device,  0,     "Toshiba",  "Pasopia 1600" , MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+//    YEAR  NAME        PARENT  COMPAT   MACHINE    INPUT     STATE           INIT   COMPANY     FULLNAME        FLAGS
+COMP ( 198?,paso1600,   0,      0,       paso1600,  paso1600, paso1600_state, 0,     "Toshiba",  "Pasopia 1600", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

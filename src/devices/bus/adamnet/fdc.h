@@ -6,13 +6,13 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_ADAMNET_FDC_H
+#define MAME_BUS_ADAMNET_FDC_H
+
 #pragma once
 
-#ifndef __ADAM_FDC__
-#define __ADAM_FDC__
-
 #include "adamnet.h"
-#include "cpu/m6800/m6800.h"
+#include "cpu/m6800/m6801.h"
 #include "formats/adam_dsk.h"
 #include "machine/wd_fdc.h"
 
@@ -53,7 +53,7 @@ protected:
 	virtual void adamnet_reset_w(int state) override;
 
 	required_device<cpu_device> m_maincpu;
-	required_device<wd2793_t> m_fdc;
+	required_device<wd2793_device> m_fdc;
 	required_device<floppy_image_device> m_floppy0;
 	floppy_image_device *m_floppy;
 	required_shared_ptr<uint8_t> m_ram;
@@ -62,7 +62,7 @@ protected:
 
 
 // device type definition
-extern const device_type ADAM_FDC;
+DECLARE_DEVICE_TYPE(ADAM_FDC, adam_fdc_device)
 
 
-#endif
+#endif // MAME_BUS_ADAMNET_FDC_H

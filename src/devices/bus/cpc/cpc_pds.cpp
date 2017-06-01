@@ -14,10 +14,10 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CPC_PDS = device_creator<cpc_pds_device>;
+DEFINE_DEVICE_TYPE(CPC_PDS, cpc_pds_device, "cpc_pds", "Programmers Development System (CPC Target)")
 
 
-static MACHINE_CONFIG_FRAGMENT( cpc_pds )
+static MACHINE_CONFIG_START( cpc_pds )
 	MCFG_DEVICE_ADD("pio", Z80PIO, XTAL_4MHz)   // no clock on the PCB, so will presume that it uses the CPC's clock
 
 	// no pass-through seen on remake PCBs, unknown if actual hardware had a pass-through port or not
@@ -35,8 +35,9 @@ machine_config_constructor cpc_pds_device::device_mconfig_additions() const
 //**************************************************************************
 
 cpc_pds_device::cpc_pds_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, CPC_PDS, "Programmers Development System (CPC Target)", tag, owner, clock, "cpc_pds", __FILE__),
-	device_cpc_expansion_card_interface(mconfig, *this), m_slot(nullptr),
+	device_t(mconfig, CPC_PDS, tag, owner, clock),
+	device_cpc_expansion_card_interface(mconfig, *this),
+	m_slot(nullptr),
 	m_pio(*this,"pio")
 {
 }

@@ -12,6 +12,7 @@
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "machine/segaic16.h"
+#include "machine/upd4701.h"
 #include "machine/315_5296.h"
 #include "video/315_5313.h"
 #include "video/segaic16.h"
@@ -38,6 +39,7 @@ public:
 			m_segaic16vid(*this, "segaic16vid"),
 			m_gfxdecode(*this, "gfxdecode"),
 			m_soundlatch(*this, "soundlatch"),
+			m_upd4701(*this, {"upd1", "upd2", "upd3"}),
 			m_workram(*this, "workram"),
 			m_romboard(ROM_BOARD_INVALID),
 			m_grayscale_enable(false),
@@ -47,8 +49,6 @@ public:
 			m_lghost_value(0),
 			m_lghost_select(0)
 	{
-		memset(m_wwally_last_x, 0, sizeof(m_wwally_last_x));
-		memset(m_wwally_last_y, 0, sizeof(m_wwally_last_y));
 	}
 
 	// driver init
@@ -141,6 +141,7 @@ protected:
 	required_device<segaic16_video_device> m_segaic16vid;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<generic_latch_8_device> m_soundlatch;
+	optional_device_array<upd4701_device, 3> m_upd4701;
 
 	// memory pointers
 	required_shared_ptr<uint16_t> m_workram;
@@ -158,8 +159,6 @@ protected:
 	uint8_t               m_mcu_data;
 
 	// game-specific state
-	uint8_t               m_wwally_last_x[3];
-	uint8_t               m_wwally_last_y[3];
 	uint8_t               m_lghost_value;
 	uint8_t               m_lghost_select;
 };

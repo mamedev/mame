@@ -1,12 +1,15 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#ifndef __MIE_H__
-#define __MIE_H__
+#ifndef MAME_MACHINE_MIE_H
+#define MAME_MACHINE_MIE_H
+
+#pragma once
+
+#include "machine/mapledev.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
 #include "machine/jvshost.h"
-#include "machine/mapledev.h"
 
 #define MCFG_MIE_ADD(_tag, _clock, _host_tag, _host_port, g0, g1, g2, g3, g4, g5, g6, g7) \
 	MCFG_MAPLE_DEVICE_ADD(_tag "_maple", MIE, _clock, _host_tag, _host_port) \
@@ -32,10 +35,6 @@ public:
 
 	static void static_set_gpio_name(device_t &device, int entry, const char *name);
 	static void static_set_jvs_name(device_t &device, const char *name);
-
-	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	DECLARE_READ8_MEMBER(control_r);
 	DECLARE_WRITE8_MEMBER(control_w);
@@ -69,8 +68,6 @@ public:
 	DECLARE_READ8_MEMBER(read_00);
 	DECLARE_READ8_MEMBER(read_78xx);
 
-	IRQ_CALLBACK_MEMBER(irq_callback);
-
 	void maple_w(const uint32_t *data, uint32_t in_size) override;
 	virtual void maple_reset() override;
 
@@ -82,6 +79,10 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	enum { TBUF_SIZE = 8 };
@@ -114,6 +115,7 @@ private:
 
 	void raise_irq(int level);
 	void recalc_irq();
+	IRQ_CALLBACK_MEMBER(irq_callback);
 };
 
 // Trampoline class, required for device discovery
@@ -128,6 +130,7 @@ public:
 
 
 // device type definition
-extern const device_type MIE, MIE_JVS;
+DECLARE_DEVICE_TYPE(MIE,     mie_device)
+DECLARE_DEVICE_TYPE(MIE_JVS, mie_jvs_device)
 
-#endif /* __MIE_H__ */
+#endif // MAME_MACHINE_MIE_H

@@ -611,7 +611,7 @@ void ghosteo_state::machine_reset()
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4d000010, 0x4d000013,read32_delegate(FUNC(ghosteo_state::bballoon_speedup_r), this));
 }
 
-static MACHINE_CONFIG_START( ghosteo, ghosteo_state )
+static MACHINE_CONFIG_START( ghosteo )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM9, 200000000)
@@ -770,6 +770,6 @@ DRIVER_INIT_MEMBER(ghosteo_state,touryuu)
 	m_rom_pagesize = 0x210;
 }
 
-GAME( 2003, bballoon, 0, bballoon, bballoon, ghosteo_state, bballoon, ROT0, "Eolith", "BnB Arcade", MACHINE_IMPERFECT_SOUND )
-GAME( 2005, hapytour, 0, bballoon, bballoon, ghosteo_state, bballoon, ROT0, "GAV Company", "Happy Tour", MACHINE_IMPERFECT_SOUND )
-GAME( 2005, touryuu,  0, touryuu, touryuu, ghosteo_state, touryuu, ROT0, "Yuki Enterprise", "Touryuumon (V1.1)?", MACHINE_IMPERFECT_SOUND ) // On first boot inputs won't work, TODO: hook-up default eeprom
+GAME( 2003, bballoon, 0, bballoon, bballoon, ghosteo_state, bballoon, ROT0, "Eolith",          "BnB Arcade",         MACHINE_IMPERFECT_SOUND )
+GAME( 2005, hapytour, 0, bballoon, bballoon, ghosteo_state, bballoon, ROT0, "GAV Company",     "Happy Tour",         MACHINE_IMPERFECT_SOUND )
+GAME( 2005, touryuu,  0, touryuu,  touryuu,  ghosteo_state, touryuu,  ROT0, "Yuki Enterprise", "Touryuumon (V1.1)?", MACHINE_IMPERFECT_SOUND ) // On first boot inputs won't work, TODO: hook-up default eeprom

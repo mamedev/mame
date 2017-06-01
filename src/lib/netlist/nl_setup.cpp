@@ -413,7 +413,7 @@ devices::nld_base_proxy *setup_t::get_d_a_proxy(detail::core_terminal_t &out)
 
 devices::nld_base_proxy *setup_t::get_a_d_proxy(detail::core_terminal_t &inp)
 {
-	nl_assert(inp.is_analog());
+	nl_assert(inp.is_logic());
 
 	logic_input_t &incast = dynamic_cast<logic_input_t &>(inp);
 	devices::nld_base_proxy *proxy = incast.get_proxy();

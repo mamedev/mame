@@ -8,55 +8,24 @@
 
 **********************************************************************/
 
-#ifndef __MEA8000_H__
-#define __MEA8000_H__
+#ifndef MAME_SOUND_MEA8000_H
+#define MAME_SOUND_MEA8000_H
+
+#pragma once
 
 #define MCFG_MEA8000_REQ_CALLBACK(_write) \
 	devcb = &mea8000_device::set_reqwr_callback(*device, DEVCB_##_write);
 
-/* table amplitude [-QUANT,QUANT] */
-#define QUANT 512
-
-/* filter coefficients from frequencies */
-#define TABLE_LEN 3600
-
-/* noise generator table */
-#define NOISE_LEN 8192
+/* define to use double instead of int (slow but useful for debugging) */
+#undef MEA8000_FLOAT_MODE
 
 
-/* finite machine state controlling frames */
-enum mea8000_state
-{
-	MEA8000_STOPPED,    /* nothing to do, timer disabled */
-	MEA8000_WAIT_FIRST, /* received pitch, wait for first full trame, timer disabled */
-	MEA8000_STARTED,    /* playing a frame, timer on */
-	MEA8000_SLOWING     /* repeating last frame with decreasing amplitude, timer on */
-};
-
-ALLOW_SAVE_TYPE( mea8000_state );
-
-
-struct filter_t
-{
-#ifdef FLOAT_MODE
-	double fm, last_fm;         /* frequency, in Hz */
-	double bw, last_bw;         /* band-width, in Hz */
-	double output, last_output; /* filter state */
-#else
-	uint16_t fm, last_fm;
-	uint16_t bw, last_bw;
-	int32_t  output, last_output;
-#endif
-};
-
-class mea8000_device : public device_t,
-	public device_sound_interface
+class mea8000_device : public device_t, public device_sound_interface
 {
 public:
 	mea8000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~mea8000_device() {}
 
-	template<class _Object> static devcb_base &set_req_wr_callback(device_t &device, _Object object) { return downcast<mea8000_device &>(device).m_write_req.set_callback(object); }
+	template <class Object> static devcb_base &set_req_wr_callback(device_t &device, Object &&cb) { return downcast<mea8000_device &>(device).m_write_req.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
@@ -67,12 +36,38 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
-	// internal state
+	/* filter coefficients from frequencies */
+	static constexpr unsigned TABLE_LEN = 3600;
+
+	/* noise generator table */
+	static constexpr unsigned NOISE_LEN = 8192;
+
+	/* finite machine state controlling frames */
+	enum mea8000_state
+	{
+		MEA8000_STOPPED,    /* nothing to do, timer disabled */
+		MEA8000_WAIT_FIRST, /* received pitch, wait for first full trame, timer disabled */
+		MEA8000_STARTED,    /* playing a frame, timer on */
+		MEA8000_SLOWING     /* repeating last frame with decreasing amplitude, timer on */
+	};
+
+	struct filter_t
+	{
+#ifdef MEA8000_FLOAT_MODE
+		double fm, last_fm;         /* frequency, in Hz */
+		double bw, last_bw;         /* band-width, in Hz */
+		double output, last_output; /* filter state */
+#else
+		uint16_t fm, last_fm;
+		uint16_t bw, last_bw;
+		int32_t  output, last_output;
+#endif
+	};
 
 	int accept_byte();
 	void update_req();
 	void init_tables();
-#ifndef FLOAT_MODE /* uint16_t version */
+#ifndef MEA8000_FLOAT_MODE /* uint16_t version */
 	int interp(uint16_t org, uint16_t dst);
 	int filter_step(int i, int input);
 	int noise_gen();
@@ -129,7 +124,6 @@ private:
 
 };
 
-extern const device_type MEA8000;
+DECLARE_DEVICE_TYPE(MEA8000, mea8000_device)
 
-
-#endif
+#endif // MAME_SOUND_MEA8000_H

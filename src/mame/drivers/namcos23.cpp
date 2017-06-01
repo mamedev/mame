@@ -812,7 +812,7 @@ Notes:
       PIC16F84 - Microchip PIC16F84 PIC (SOIC20)
                   - For 500GP and Angler King stamped 'CAP10'
                   - For Ridge Racer V (on System 246) stamped 'CAP11'
-      MCU      - Fujitsu MB90F574 Microcontroller (QFP120)
+      MCU      - Fujitsu MB90F574 F2MC-16LX Family Microcontroller (QFP120)
                   - For 500 GP and Angler King stamped 'FCAF10'
                   - For Ridge Racer V (on System 246) stamped 'FCAF11'
       ADM485   - Analog Devices ADM485 +5V Low Power EIA RS-485 Transceiver (SOIC8)
@@ -3536,7 +3536,7 @@ static GFXDECODE_START( namcos23 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( gorgon, namcos23_state )
+static MACHINE_CONFIG_START( gorgon )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", R4650BE, BUSCLOCK*4)
@@ -3602,7 +3602,7 @@ static MACHINE_CONFIG_START( gorgon, namcos23_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( s23, namcos23_state )
+static MACHINE_CONFIG_START( s23 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", R4650BE, BUSCLOCK*4)
@@ -3688,7 +3688,7 @@ static MACHINE_CONFIG_DERIVED( gmen, s23 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( ss23, namcos23_state )
+static MACHINE_CONFIG_START( ss23 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", R4650BE, BUSCLOCK*5)

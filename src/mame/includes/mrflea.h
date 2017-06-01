@@ -5,6 +5,8 @@
     Mr. Flea
 
 *************************************************************************/
+
+#include "machine/pic8259.h"
 #include "screen.h"
 
 class mrflea_state : public driver_device
@@ -15,7 +17,8 @@ public:
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
-		m_subcpu(*this, "sub"),
+		m_subcpu(*this, "subcpu"),
+		m_pic(*this, "pic"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette") { }
@@ -27,28 +30,14 @@ public:
 	/* video-related */
 	int     m_gfx_bank;
 
-	/* misc */
-	int m_io;
-	int m_main;
-	int m_status;
-	int m_select1;
-
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
+	required_device<pic8259_device> m_pic;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	DECLARE_WRITE8_MEMBER(mrflea_main_w);
-	DECLARE_WRITE8_MEMBER(mrflea_io_w);
-	DECLARE_READ8_MEMBER(mrflea_main_r);
-	DECLARE_READ8_MEMBER(mrflea_io_r);
-	DECLARE_READ8_MEMBER(mrflea_main_status_r);
-	DECLARE_READ8_MEMBER(mrflea_io_status_r);
-	DECLARE_READ8_MEMBER(mrflea_interrupt_type_r);
-	DECLARE_WRITE8_MEMBER(mrflea_select1_w);
-	DECLARE_READ8_MEMBER(mrflea_input1_r);
 	DECLARE_WRITE8_MEMBER(mrflea_data1_w);
 	DECLARE_WRITE8_MEMBER(mrflea_gfx_bank_w);
 	DECLARE_WRITE8_MEMBER(mrflea_videoram_w);

@@ -541,7 +541,7 @@ INPUT_PORTS_END
 
 #define ATV_CPU_CLOCK XTAL_33MHz*6
 
-static MACHINE_CONFIG_START( atvtrack, atvtrack_state )
+static MACHINE_CONFIG_START( atvtrack )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH4LE, ATV_CPU_CLOCK)
 	MCFG_SH4_MD0(1)
@@ -582,7 +582,7 @@ static MACHINE_CONFIG_START( atvtrack, atvtrack_state )
 	MCFG_PALETTE_ADD("palette", 0x1000)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED_CLASS( smashdrv, atvtrack, smashdrv_state )
+static MACHINE_CONFIG_DERIVED( smashdrv, atvtrack )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(smashdrv_main_map)
 	MCFG_CPU_IO_MAP(smashdrv_main_port)
@@ -662,8 +662,8 @@ ROM_START( smashdrv )
 	// ic21 unpopulated
 ROM_END
 
-GAME( 2002, atvtrack,  0,          atvtrack,    atvtrack, driver_device,    0, ROT0, "Gaelco", "ATV Track (set 1)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2002, atvtracka, atvtrack,   atvtrack,    atvtrack, driver_device,    0, ROT0, "Gaelco", "ATV Track (set 2)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2002, atvtrack,  0,          atvtrack,    atvtrack, atvtrack_state,   0, ROT0, "Gaelco", "ATV Track (set 1)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2002, atvtracka, atvtrack,   atvtrack,    atvtrack, atvtrack_state,   0, ROT0, "Gaelco", "ATV Track (set 2)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 // almost identical PCB, FlashROM mapping and master registers addresses different
-GAME( 2000, smashdrv, 0,           smashdrv,    atvtrack, driver_device,    0, ROT0, "Gaelco", "Smashing Drive (UK)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2000, smashdrv, 0,           smashdrv,    atvtrack, smashdrv_state,   0, ROT0, "Gaelco", "Smashing Drive (UK)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

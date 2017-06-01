@@ -11,8 +11,10 @@ TODO:
     Add pci configuration write to PIF byte
 ***************************************************************************/
 
-#ifndef PCI_IDE_H
-#define PCI_IDE_H
+#ifndef MAME_MACHINE_PCI_IDE_H
+#define MAME_MACHINE_PCI_IDE_H
+
+#pragma once
 
 #include "pci.h"
 #include "idectrl.h"
@@ -27,6 +29,14 @@ TODO:
 #define MCFG_IDE_PCI_IRQ_HANDLER(_devcb) \
 	devcb = &ide_pci_device::set_irq_handler(*device, DEVCB_##_devcb);
 
+// This will set the top 12 bits for address decoding in legacy mode. Needed for seattle driver.
+#define MCFG_IDE_PCI_SET_LEGACY_TOP(_val) \
+	downcast<ide_pci_device *>(device)->set_legacy_top(_val);
+
+// Sets the default Programming Interface (PIF) register
+#define MCFG_IDE_PCI_SET_PIF(_val) \
+	downcast<ide_pci_device *>(device)->set_pif(_val);
+
 class ide_pci_device : public pci_device {
 public:
 	ide_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -39,7 +49,9 @@ public:
 	DECLARE_READ32_MEMBER(ide2_read_cs1);
 	DECLARE_WRITE32_MEMBER(ide2_write_cs1);
 	void set_irq_info(const char *tag, const int irq_num);
-	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<ide_pci_device &>(device).m_irq_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb) { return downcast<ide_pci_device &>(device).m_irq_handler.set_callback(std::forward<Object>(cb)); }
+	void set_legacy_top(int val) { m_legacy_top = val & 0xfff; };
+	void set_pif(int val) { m_pif = val & 0xff; };
 
 protected:
 	virtual void device_start() override;
@@ -54,6 +66,9 @@ private:
 	int m_irq_num;
 	devcb_write_line m_irq_handler;
 	uint32_t pci_bar[6];
+	// Bits 31-20 for legacy mode hack
+	uint32_t m_legacy_top;
+	uint32_t m_pif;
 
 	uint32_t m_config_data[0x10];
 	DECLARE_ADDRESS_MAP(chan1_data_command_map, 32);
@@ -64,9 +79,10 @@ private:
 	DECLARE_WRITE8_MEMBER(prog_if_w);
 	DECLARE_READ32_MEMBER(pcictrl_r);
 	DECLARE_WRITE32_MEMBER(pcictrl_w);
+	DECLARE_READ32_MEMBER(address_base_r);
 	DECLARE_WRITE32_MEMBER(address_base_w);
 };
 
-extern const device_type IDE_PCI;
+DECLARE_DEVICE_TYPE(IDE_PCI, ide_pci_device)
 
-#endif
+#endif // MAME_MACHINE_PCI_IDE_H

@@ -14,9 +14,9 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type APRICOT_256K_RAM = device_creator<apricot_256k_ram_device>;
-const device_type APRICOT_128K_RAM = device_creator<apricot_128k_ram_device>;
-const device_type APRICOT_512K_RAM = device_creator<apricot_512k_ram_device>;
+DEFINE_DEVICE_TYPE(APRICOT_256K_RAM, apricot_256k_ram_device, "apricot_256k_ram", "Apricot 256K RAM Expansion Board")
+DEFINE_DEVICE_TYPE(APRICOT_128K_RAM, apricot_128k_ram_device, "apricot_128k_ram", "Apricot 128K/512K RAM Expansion Board (128K)")
+DEFINE_DEVICE_TYPE(APRICOT_512K_RAM, apricot_512k_ram_device, "apricot_512k_ram", "Apricot 128K/512K RAM Expansion Board (512K)")
 
 
 //**************************************************************************
@@ -44,7 +44,7 @@ ioport_constructor apricot_256k_ram_device::device_input_ports() const
 //-------------------------------------------------
 
 apricot_256k_ram_device::apricot_256k_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, APRICOT_256K_RAM, "Apricot 256K RAM Expansion Board", tag, owner, clock, "apricot_256k_ram", __FILE__),
+	device_t(mconfig, APRICOT_256K_RAM, tag, owner, clock),
 	device_apricot_expansion_card_interface(mconfig, *this),
 	m_sw(*this, "sw")
 {
@@ -98,7 +98,7 @@ ioport_constructor apricot_128k_ram_device::device_input_ports() const
 //-------------------------------------------------
 
 apricot_128k_ram_device::apricot_128k_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, APRICOT_128K_RAM, "Apricot 128/512K RAM Expansion Board (128K)", tag, owner, clock, "apricot_128k_ram", __FILE__),
+	device_t(mconfig, APRICOT_128K_RAM, tag, owner, clock),
 	device_apricot_expansion_card_interface(mconfig, *this),
 	m_strap(*this, "strap")
 {
@@ -152,7 +152,7 @@ ioport_constructor apricot_512k_ram_device::device_input_ports() const
 //-------------------------------------------------
 
 apricot_512k_ram_device::apricot_512k_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, APRICOT_512K_RAM, "Apricot 128/512K RAM Expansion Board (512K)", tag, owner, clock, "apricot_512k_ram", __FILE__),
+	device_t(mconfig, APRICOT_512K_RAM, tag, owner, clock),
 	device_apricot_expansion_card_interface(mconfig, *this),
 	m_strap(*this, "strap")
 {

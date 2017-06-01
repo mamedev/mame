@@ -29,35 +29,6 @@ public:
 
 	optional_memory_region m_gfx1_rom;
 
-	int m_coin;
-	int m_do_vrom_bank;
-	int m_input_latch[4];
-	int m_sound_fix;
-	uint8_t m_last_bank;
-	std::unique_ptr<uint8_t[]> m_vram;
-	uint8_t* m_vrom[2];
-	std::unique_ptr<uint8_t[]> m_nt_ram[2];
-	uint8_t* m_nt_page[2][4];
-	uint32_t m_vrom_size[2];
-	int m_vrom_banks;
-	int m_zapstore;
-	int m_old_bank;
-	int m_drmario_shiftreg;
-	int m_drmario_shiftcount;
-	int m_size16k;
-	int m_switchlow;
-	int m_vrom4k;
-	int m_MMC3_cmd;
-	int m_MMC3_prg_bank[4];
-	int m_MMC3_chr_bank[6];
-	int m_MMC3_prg_mask;
-	int m_IRQ_enable;
-	int m_IRQ_count;
-	int m_IRQ_count_latch;
-	int m_VSindex;
-	int m_supxevs_prot_index;
-	int m_security_counter;
-	int m_ret;
 	DECLARE_WRITE8_MEMBER(sprite_dma_0_w);
 	DECLARE_WRITE8_MEMBER(sprite_dma_1_w);
 	DECLARE_WRITE8_MEMBER(vsnes_coin_counter_w);
@@ -129,7 +100,38 @@ public:
 	DECLARE_WRITE8_MEMBER(bootleg_sound_write);
 	DECLARE_READ8_MEMBER(vsnes_bootleg_z80_data_r);
 	DECLARE_READ8_MEMBER(vsnes_bootleg_z80_address_r);
+
+private:
+	int m_coin;
+	int m_do_vrom_bank;
+	int m_input_latch[4];
+	int m_sound_fix;
+	uint8_t m_last_bank;
+	std::unique_ptr<uint8_t[]> m_vram;
+	uint8_t* m_vrom[2];
+	std::unique_ptr<uint8_t[]> m_nt_ram[2];
+	uint8_t* m_nt_page[2][4];
+	uint32_t m_vrom_size[2];
+	int m_vrom_banks;
+	int m_zapstore;
+	int m_old_bank;
+	int m_drmario_shiftreg;
+	int m_drmario_shiftcount;
+	int m_size16k;
+	int m_switchlow;
+	int m_vrom4k;
+	int m_MMC3_cmd;
+	int m_MMC3_prg_bank[4];
+	int m_MMC3_chr_bank[6];
+	int m_MMC3_prg_mask;
+	int m_IRQ_enable;
+	int m_IRQ_count;
+	int m_IRQ_count_latch;
+	int m_VSindex;
+	int m_supxevs_prot_index;
+	int m_security_counter;
+	int m_ret;
+
 	uint8_t m_bootleg_sound_offset;
 	uint8_t m_bootleg_sound_data;
-
 };

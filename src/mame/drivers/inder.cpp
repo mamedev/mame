@@ -1302,7 +1302,7 @@ WRITE8_MEMBER( inder_state::ppic_w )
 {
 	// pc4 - READY line back to cpu board, but not used
 	if (BIT(data, 5) != BIT(m_portc, 5))
-		m_msm->set_prescaler_selector(*m_msm, BIT(data, 5) ? MSM5205_S48_4B : MSM5205_S96_4B); // S1 pin
+		m_msm->set_prescaler_selector(*m_msm, BIT(data, 5) ? msm5205_device::S48_4B : msm5205_device::S96_4B); // S1 pin
 	m_7a->clock_w(BIT(data, 6));
 	m_7a->preset_w(!BIT(data, 7));
 	m_9a->preset_w(!BIT(data, 7));
@@ -1346,7 +1346,7 @@ DRIVER_INIT_MEMBER( inder_state, inder1 )
 	m_game = 1;
 }
 
-static MACHINE_CONFIG_START( brvteam, inder_state )
+static MACHINE_CONFIG_START( brvteam )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_5MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(brvteam_map)
@@ -1364,7 +1364,7 @@ static MACHINE_CONFIG_START( brvteam, inder_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "snvol", 2.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( canasta, inder_state )
+static MACHINE_CONFIG_START( canasta )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_5MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(canasta_map)
@@ -1382,7 +1382,7 @@ static MACHINE_CONFIG_START( canasta, inder_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "ayvol", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( lapbylap, inder_state )
+static MACHINE_CONFIG_START( lapbylap )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_5MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(lapbylap_map)
@@ -1406,7 +1406,7 @@ static MACHINE_CONFIG_START( lapbylap, inder_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "ayvol", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( inder, inder_state )
+static MACHINE_CONFIG_START( inder )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_5MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(inder_map)
@@ -1425,7 +1425,7 @@ static MACHINE_CONFIG_START( inder, inder_state )
 	MCFG_SPEAKER_STANDARD_MONO("msmvol")
 	MCFG_SOUND_ADD("msm", MSM5205, XTAL_384kHz)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(inder_state, vck_w))
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 4KHz 4-bit */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 4KHz 4-bit */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "msmvol", 1.0)
 
 	/* Devices */
@@ -1640,13 +1640,13 @@ ROM_END
 
 
 // old cpu board, 6 digits, sn76489
-GAME(1985,  brvteam,    0,    brvteam,  brvteam,  driver_device, 0,    ROT0, "Inder", "Brave Team",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1985,  brvteam,    0,    brvteam,  brvteam,  inder_state, 0,      ROT0, "Inder", "Brave Team",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
 
 // old cpu board, 7 digits, ay8910
-GAME(1986,  canasta,    0,    canasta,  canasta,  driver_device, 0,    ROT0, "Inder", "Canasta '86'",       MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1986,  canasta,    0,    canasta,  canasta,  inder_state, 0,      ROT0, "Inder", "Canasta '86'",       MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
 
 // old cpu board, 7 digits, sound cpu with 2x ay8910
-GAME(1986,  lapbylap,   0,    lapbylap, lapbylap, driver_device, 0,    ROT0, "Inder", "Lap By Lap",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1986,  lapbylap,   0,    lapbylap, lapbylap, inder_state, 0,      ROT0, "Inder", "Lap By Lap",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
 
 // new cpu board, sound board with msm5205
 GAME(1987,  pinmoonl,   0,    inder,    pinmoonl, inder_state, inder,  ROT0, "Inder", "Moon Light (Inder)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )

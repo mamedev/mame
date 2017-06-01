@@ -434,10 +434,10 @@ void gdrom_device::WriteData( uint8_t *data, int dataLength )
 }
 
 // device type definition
-const device_type GDROM = device_creator<gdrom_device>;
+DEFINE_DEVICE_TYPE(GDROM, gdrom_device, "gdrom", "GD-ROM")
 
 gdrom_device::gdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	atapi_cdrom_device(mconfig, GDROM, "GDROM", tag, owner, clock, "gdrom", __FILE__)
+	atapi_cdrom_device(mconfig, GDROM, tag, owner, clock)
 {
 }
 

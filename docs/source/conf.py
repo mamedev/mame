@@ -34,8 +34,8 @@ extensions = [
 	'edit_on_github',
 ]
 
-edit_on_github_project = 'mamedev/docs'
-edit_on_github_branch = 'master/source'
+edit_on_github_project = 'mamedev/mame'
+edit_on_github_branch = 'master/docs/source'
 
 # Math
 mathjax_path = "http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"

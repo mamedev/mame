@@ -15,14 +15,14 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type VIC20_MEGACART = device_creator<vic20_megacart_device>;
+DEFINE_DEVICE_TYPE(VIC20_MEGACART, vic20_megacart_device, "vic20_megacart", "VIC-20 Mega-Cart")
 
 
 //-------------------------------------------------
 //  MACHINE_DRIVER( vic20_megacart )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( vic20_megacart )
+static MACHINE_CONFIG_START( vic20_megacart )
 
 MACHINE_CONFIG_END
 
@@ -48,10 +48,10 @@ machine_config_constructor vic20_megacart_device::device_mconfig_additions() con
 //-------------------------------------------------
 
 vic20_megacart_device::vic20_megacart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, VIC20_MEGACART, "Mega-Cart", tag, owner, clock, "megacart", __FILE__),
-		device_vic20_expansion_card_interface(mconfig, *this),
-		device_nvram_interface(mconfig, *this),
-		m_nvram_en(0)
+	: device_t(mconfig, VIC20_MEGACART, tag, owner, clock)
+	, device_vic20_expansion_card_interface(mconfig, *this)
+	, device_nvram_interface(mconfig, *this)
+	, m_nvram_en(0)
 {
 }
 

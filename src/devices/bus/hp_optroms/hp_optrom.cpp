@@ -13,21 +13,20 @@
 #include "softlist.h"
 #include "cpu/hphybrid/hphybrid.h"
 
-const device_type HP_OPTROM_CART = device_creator<hp_optrom_cart_device>;
-const device_type HP_OPTROM_SLOT = device_creator<hp_optrom_slot_device>;
+DEFINE_DEVICE_TYPE(HP_OPTROM_CART, hp_optrom_cart_device, "hp_optrom_cart", "HP9845 optional ROM cartridge")
+DEFINE_DEVICE_TYPE(HP_OPTROM_SLOT, hp_optrom_slot_device, "hp_optrom_slot", "HP9845 optional ROM slot")
 
 // +---------------------+
 // |hp_optrom_cart_device|
 // +---------------------+
-hp_optrom_cart_device::hp_optrom_cart_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+hp_optrom_cart_device::hp_optrom_cart_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+		device_t(mconfig, type, tag, owner, clock),
 		device_slot_card_interface(mconfig, *this)
 {
 }
 
 hp_optrom_cart_device::hp_optrom_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, HP_OPTROM_CART, "HP9845 optional ROM cartridge", tag, owner, clock, "hp_optrom_cart", __FILE__),
-		device_slot_card_interface(mconfig, *this)
+		hp_optrom_cart_device(mconfig, HP_OPTROM_CART, tag, owner, clock)
 {
 }
 
@@ -35,7 +34,7 @@ hp_optrom_cart_device::hp_optrom_cart_device(const machine_config &mconfig, cons
 // |hp_optrom_slot_device|
 // +---------------------+
 hp_optrom_slot_device::hp_optrom_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, HP_OPTROM_SLOT, "HP9845 optional ROM Slot", tag, owner, clock, "hp_optrom_slot", __FILE__),
+		device_t(mconfig, HP_OPTROM_SLOT, tag, owner, clock),
 		device_image_interface(mconfig, *this),
 		device_slot_interface(mconfig, *this),
 		m_cart(nullptr),

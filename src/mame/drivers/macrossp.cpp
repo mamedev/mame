@@ -539,7 +539,7 @@ void macrossp_state::machine_reset()
 	m_snd_toggle = 0;
 }
 
-static MACHINE_CONFIG_START( macrossp, macrossp_state )
+static MACHINE_CONFIG_START( macrossp )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, 50000000/2)   /* 25 MHz */

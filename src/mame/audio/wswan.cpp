@@ -18,7 +18,7 @@ The noise taps and behavior are the same as the Virtual Boy.
 
 
 // device type definition
-const device_type WSWAN_SND = device_creator<wswan_sound_device>;
+DEFINE_DEVICE_TYPE(WSWAN_SND, wswan_sound_device, "wswan_sound", "WonderSwan Audio Custom")
 
 
 //**************************************************************************
@@ -30,7 +30,7 @@ const device_type WSWAN_SND = device_creator<wswan_sound_device>;
 //-------------------------------------------------
 
 wswan_sound_device::wswan_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, WSWAN_SND, "WonderSwan Audio Custom", tag, owner, clock, "wswan_sound", __FILE__),
+	: device_t(mconfig, WSWAN_SND, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		m_channel(nullptr),
 		m_sweep_step(0),

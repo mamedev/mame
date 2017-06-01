@@ -11,10 +11,10 @@
 #include "emu.h"
 #include "m4510.h"
 
-const device_type M4510 = device_creator<m4510_device>;
+DEFINE_DEVICE_TYPE(M4510, m4510_device, "m4510", "M4510")
 
 m4510_device::m4510_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	m65ce02_device(mconfig, M4510, "M4510", tag, owner, clock, "m4510", __FILE__),
+	m65ce02_device(mconfig, M4510, tag, owner, clock),
 	map_enable(0),
 	nomap(false)
 {

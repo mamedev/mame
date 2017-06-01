@@ -14,13 +14,14 @@
     Defender and Stargate simply draw graphics to the framebuffer directly
     with no extra intervention.
 
-    Later games added a pair of "special chips" (SC-01) to the board which
+    Later games added a pair of "special chips" (Special Chip 1, and Special
+    Chip 2, abbreviated for clarity as SC1 and SC2) to the board which
     are special purpose blitters. During their operation they HALT the
     main CPU so that they can control the busses. The operation of the
     chips is described in detail below.
 
-    The original SC-01 had a bug that forced an XOR of the width and height
-    values with 4. This was fixed in the SC-02, which was used on  several
+    The original SC1 had a bug that forced an XOR of the width and height
+    values with 4. This was fixed in the SC2, which was used on several
     later games.
 
     Beginning with Sinistar, additional video tweaks were added.
@@ -57,7 +58,7 @@
     were added to the ROM boards of the later games. Splat!, Blaster, Mystic
     Marathon and Joust 2 used Special Chip 2s. The only difference that I've
     seen is that SC1s have a small bug. When you tell the SC1 the size of
-    the data to move, you have to exclusive-or the width and height with 2.
+    the data to move, you have to exclusive-or the width and height with 4.
     The SC2s eliminate this bug.
 
     The blitters were accessed at memory location $CA00-CA06.
@@ -91,7 +92,61 @@
     Bits 6 and 7 only blit every other pixel of the image. Bit 6 says even only,
     while bit 7 says odd only.
 
-***************************************************************************/
+******************************************************************************
+    Special Chip 1 and 2 aka VLSI VL2001/2001A Pinout:
+                               _______    _______
+                             _|*      \__/       |_
+                     /E <-  |_|1               40|_| ?-> /WINH
+                             _|                  |_
+                    TCF <-  |_|2               39|_|  -> A15
+                             _|                  |_
+                  /HTCF <-? |_|3               38|_|  -> A14
+                             _|                  |_
+                     D7 <>  |_|4               37|_|  -> A13
+                             _|                  |_
+                  /HALT ->  |_|5               36|_|  <- /RESET
+                             _|                  |_
+                  /BABS ->  |_|6               35|_|  == /4MHZ
+                             _|                  |_
+                     D6 <>  |_|7               34|_|  -> A12
+                             _|                  |_
+                     D5 <>  |_|8               33|_|  -> A11
+                             _|                  |_
+                     D4 <>  |_|9     5     V   32|_|  -> A10
+                             _|      4     T     |_
+ (not bonded, pcb GND) N/C  |_|10    1  V  I   31|_|  -> A9
+                             _|      0  L        |_
+                     D3 <>  |_|11    -  2      30|_|  -> A8
+                             _|      0  0  8     |_
+                     D2 <>  |_|12    9  0  2   29|_|  -- VCC(+5v)
+                             _|      8  1  2     |_
+                     D1 <>  |_|13    6     0   28|_|  <> A0
+                             _|      6           |_
+                    U/L ->  |_|14              27|_|  <> A1
+                             _|                  |_
+(not bonded, pcb +12v) N/C  |_|15              26|_|  <> A2
+                             _|                  |_
+                    GND --  |_|16              25|_|  <- /CS
+                             _|                  |_
+                     D0 <>  |_|17              24|_|  N/C (not bonded, pcb GND)
+                             _|                  |_
+                    R/W <>? |_|18              23|_|  -> A7
+                             _|                  |_
+                     A3 <-  |_|19              22|_|  -> A6
+                             _|                  |_
+                     A4 <-  |_|20              21|_|  -> A5
+                              |__________________|
+
+The full silkscreen markings of SC1 (under the "Special Chip 1" sticker, if it is present) are:
+          VTI  8220
+            VL2001
+          5410-09866
+
+The full silkscreen markings of SC2 (under the "Special Chip 2" sticker, if it is present) are:
+<VTi Logo> 242
+          VL2001A
+          5410-09958
+******************************************************************************/
 
 #include "emu.h"
 #include "video/resnet.h"
@@ -458,7 +513,7 @@ void williams_state::blitter_init(int blitter_config, const uint8_t *remap_prom)
 	m_blitter_window_enable = 0;
 
 	/* switch off the video config */
-	m_blitter_xor = (blitter_config == WILLIAMS_BLITTER_SC01) ? 4 : 0;
+	m_blitter_xor = (blitter_config == WILLIAMS_BLITTER_SC1) ? 4 : 0;
 
 	/* create the remap table; if no PROM, make an identity remap table */
 	m_blitter_remap_lookup = std::make_unique<uint8_t[]>(256 * 256);

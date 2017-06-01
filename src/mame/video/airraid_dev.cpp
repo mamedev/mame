@@ -9,10 +9,10 @@
 #include "emu.h"
 #include "airraid_dev.h"
 
-const device_type AIRRAID_VIDEO = device_creator<airraid_video_device>;
+DEFINE_DEVICE_TYPE(AIRRAID_VIDEO, airraid_video_device, "airraid_vid", "Seibu Air Raid Video")
 
 airraid_video_device::airraid_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, AIRRAID_VIDEO, "Seibu Air Raid Video", tag, owner, clock, "airraid_vid", __FILE__),
+	: device_t(mconfig, AIRRAID_VIDEO, tag, owner, clock),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "^palette"),
 		m_screen(*this, "screen"),
@@ -58,7 +58,7 @@ static GFXDECODE_START( cshooter )
 	GFXDECODE_ENTRY( "fg_gfx", 0,     char16layout, 0, 16  )
 GFXDECODE_END
 
-static MACHINE_CONFIG_FRAGMENT( airraid_vid )
+MACHINE_CONFIG_MEMBER( airraid_video_device::device_add_mconfig )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -73,10 +73,6 @@ static MACHINE_CONFIG_FRAGMENT( airraid_vid )
 
 MACHINE_CONFIG_END
 
-machine_config_constructor airraid_video_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( airraid_vid );
-}
 
 void airraid_video_device::device_start()
 {

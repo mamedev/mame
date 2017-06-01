@@ -679,6 +679,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/sdf_dsk.h,FORMATS["SDF_DSK"] = true
+--------------------------------------------------
+
+if (FORMATS["SDF_DSK"]~=null  or _OPTIONS["with-tools"]) then
+	files {
+		MAME_DIR.. "src/lib/formats/sdf_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/sdf_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/ep64_dsk.h,FORMATS["EP64_DSK"] = true
 --------------------------------------------------
 
@@ -890,6 +902,18 @@ if (FORMATS["HECT_TAP"]~=null  or _OPTIONS["with-tools"]) then
 	files {
 		MAME_DIR.. "src/lib/formats/hect_tap.cpp",
 		MAME_DIR.. "src/lib/formats/hect_tap.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/lib/formats/hpi_dsk.h,FORMATS["HPI_DSK"] = true
+--------------------------------------------------
+
+if (FORMATS["HPI_DSK"]~=null or _OPTIONS["with-tools"]) then
+	files {
+		MAME_DIR.. "src/lib/formats/hpi_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/hpi_dsk.h",
 	}
 end
 

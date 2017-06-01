@@ -6,10 +6,10 @@
 
 *********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_ABCBUS_LUX4105_H
+#define MAME_BUS_ABCBUS_LUX4105_H
 
-#ifndef __LUXOR_4105__
-#define __LUXOR_4105__
+#pragma once
 
 
 #include "abcbus.h"
@@ -66,7 +66,7 @@ protected:
 private:
 	inline void update_trrq_int();
 
-	required_device<SCSI_PORT_DEVICE> m_sasibus;
+	required_device<scsi_port_device> m_sasibus;
 	required_device<output_latch_device> m_sasi_data_out;
 	required_device<input_buffer_device> m_sasi_data_in;
 	required_ioport m_1e;
@@ -84,8 +84,7 @@ private:
 
 
 // device type definition
-extern const device_type LUXOR_4105;
+DECLARE_DEVICE_TYPE(LUXOR_4105, luxor_4105_device)
 
 
-
-#endif
+#endif // MAME_BUS_ABCBUS_LUX4105_H

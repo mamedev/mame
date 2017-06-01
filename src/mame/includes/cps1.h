@@ -184,7 +184,6 @@ public:
 	int          m_objram_bank;
 
 	/* misc */
-	int          m_dial[2];     // forgottn
 	int          m_readpaddle;  // pzloop2
 	int          m_cps2networkpresent;
 	int          m_cps2digitalvolumelevel;
@@ -247,10 +246,6 @@ public:
 	DECLARE_READ16_MEMBER(cps1_in1_r);
 	DECLARE_READ16_MEMBER(cps1_in2_r);
 	DECLARE_READ16_MEMBER(cps1_in3_r);
-	DECLARE_READ16_MEMBER(forgottn_dial_0_r);
-	DECLARE_READ16_MEMBER(forgottn_dial_1_r);
-	DECLARE_WRITE16_MEMBER(forgottn_dial_0_reset_w);
-	DECLARE_WRITE16_MEMBER(forgottn_dial_1_reset_w);
 	DECLARE_WRITE8_MEMBER(cps1_snd_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(cps1_soundlatch_w);
 	DECLARE_WRITE16_MEMBER(cps1_soundlatch2_w);
@@ -287,7 +282,6 @@ public:
 	DECLARE_DRIVER_INIT(sf2rb2);
 	DECLARE_DRIVER_INIT(sf2thndr);
 	DECLARE_DRIVER_INIT(dinohunt);
-	DECLARE_DRIVER_INIT(forgottn);
 	DECLARE_DRIVER_INIT(sf2hack);
 	DECLARE_DRIVER_INIT(slammast);
 	DECLARE_DRIVER_INIT(pang3b);

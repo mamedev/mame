@@ -6,10 +6,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_APRICOT_RAM_H
+#define MAME_BUS_APRICOT_RAM_H
 
-#ifndef __APRICOT_RAM__
-#define __APRICOT_RAM__
+#pragma once
 
 #include "expansion.h"
 
@@ -80,9 +80,9 @@ private:
 
 
 // device type definition
-extern const device_type APRICOT_256K_RAM;
-extern const device_type APRICOT_128K_RAM;
-extern const device_type APRICOT_512K_RAM;
+DECLARE_DEVICE_TYPE(APRICOT_256K_RAM, apricot_256k_ram_device)
+DECLARE_DEVICE_TYPE(APRICOT_128K_RAM, apricot_128k_ram_device)
+DECLARE_DEVICE_TYPE(APRICOT_512K_RAM, apricot_512k_ram_device)
 
 
-#endif // __APRICOT_RAM__
+#endif // MAME_BUS_APRICOT_RAM_H

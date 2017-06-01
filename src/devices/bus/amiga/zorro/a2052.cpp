@@ -23,7 +23,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type A2052 = device_creator<a2052_device>;
+DEFINE_DEVICE_TYPE(A2052, a2052_device, "a2052", "CBM A2052 Fast Memory")
 
 //-------------------------------------------------
 //  input_ports - device-specific input ports
@@ -52,7 +52,7 @@ ioport_constructor a2052_device::device_input_ports() const
 //-------------------------------------------------
 
 a2052_device::a2052_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, A2052, "CBM A2052 Fast Memory", tag, owner, clock, "a2052", __FILE__),
+	device_t(mconfig, A2052, tag, owner, clock),
 	device_zorro2_card_interface(mconfig, *this),
 	m_config(*this, "config")
 {

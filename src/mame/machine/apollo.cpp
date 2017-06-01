@@ -137,10 +137,10 @@ private:
 	// internal state
 };
 
-const device_type APOLLO_CONF = device_creator<apollo_config_device>;
+DEFINE_DEVICE_TYPE(APOLLO_CONF, apollo_config_device, "apollo_config", "Apollo Configuration")
 
 apollo_config_device::apollo_config_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, APOLLO_CONF, "Apollo Configuration", tag, owner, clock, "apollo_config", __FILE__)
+	: device_t(mconfig, APOLLO_CONF, tag, owner, clock)
 {
 }
 
@@ -712,9 +712,8 @@ TIMER_CALLBACK_MEMBER( apollo_state::apollo_rtc_timer )
 #undef VERBOSE
 #define VERBOSE 0
 
-apollo_sio::apollo_sio(const machine_config &mconfig, const char *tag,
-		device_t *owner, uint32_t clock) :
-	mc68681_base_device(mconfig, APOLLO_SIO, "DN3000/DS3500 SIO", tag, owner, clock, "apollo_sio", __FILE__),
+apollo_sio::apollo_sio(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	mc68681_base_device(mconfig, APOLLO_SIO, tag, owner, clock),
 	m_csrb(0),
 	m_ip6(0)
 {
@@ -809,7 +808,7 @@ WRITE8_MEMBER( apollo_sio::write )
 }
 
 // device type definition
-const device_type APOLLO_SIO = device_creator<apollo_sio>;
+DEFINE_DEVICE_TYPE(APOLLO_SIO, apollo_sio, "apollo_sio", "DN3000/DS3500 SIO")
 
 WRITE_LINE_MEMBER(apollo_state::sio_irq_handler)
 {
@@ -862,16 +861,15 @@ WRITE_LINE_MEMBER(apollo_state::sio2_irq_handler)
 /*** Apollo Node ID device ***/
 
 // device type definition
-const device_type APOLLO_NI = device_creator<apollo_ni> ;
+DEFINE_DEVICE_TYPE(APOLLO_NI, apollo_ni, "node_id", "Apollo Node ID")
 
 //-------------------------------------------------
 //  apollo_ni - constructor
 //-------------------------------------------------
 
-apollo_ni::apollo_ni(const machine_config &mconfig, const char *tag,
-		device_t *owner, uint32_t clock) :
-	device_t(mconfig, APOLLO_NI, "Node ID", tag, owner, clock, "node_id",
-			__FILE__), device_image_interface(mconfig, *this)
+apollo_ni::apollo_ni(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, APOLLO_NI, tag, owner, clock),
+	device_image_interface(mconfig, *this)
 {
 }
 
@@ -1064,7 +1062,7 @@ static SLOT_INTERFACE_START(apollo_isa_cards)
 	SLOT_INTERFACE("3c505", ISA16_3C505)   // 3Com 3C505 Ethernet card
 SLOT_INTERFACE_END
 
-MACHINE_CONFIG_FRAGMENT( common )
+MACHINE_CONFIG_START( common )
 	// configuration MUST be reset first !
 	MCFG_DEVICE_ADD(APOLLO_CONF_TAG, APOLLO_CONF, 0)
 
@@ -1152,7 +1150,7 @@ MACHINE_CONFIG_FRAGMENT( common )
 MACHINE_CONFIG_END
 
 // for machines with the keyboard and a graphics head
-MACHINE_CONFIG_FRAGMENT( apollo )
+MACHINE_CONFIG_START( apollo )
 	MCFG_FRAGMENT_ADD(common)
 	MCFG_APOLLO_SIO_ADD( APOLLO_SIO_TAG, XTAL_3_6864MHz )
 	MCFG_APOLLO_SIO_IRQ_CALLBACK(WRITELINE(apollo_state, sio_irq_handler))
@@ -1174,7 +1172,7 @@ static DEVICE_INPUT_DEFAULTS_START( apollo_terminal )
 DEVICE_INPUT_DEFAULTS_END
 
 // for headless machines using a serial console
-MACHINE_CONFIG_FRAGMENT( apollo_terminal )
+MACHINE_CONFIG_START( apollo_terminal )
 	MCFG_FRAGMENT_ADD(common)
 	MCFG_APOLLO_SIO_ADD( APOLLO_SIO_TAG, XTAL_3_6864MHz )
 	MCFG_APOLLO_SIO_IRQ_CALLBACK(WRITELINE(apollo_state, sio_irq_handler))
@@ -1263,17 +1261,16 @@ MACHINE_RESET_MEMBER(apollo_state,apollo)
  ***************************************************************************/
 
 // device type definition
-const device_type APOLLO_STDIO = device_creator<apollo_stdio_device> ;
+DEFINE_DEVICE_TYPE(APOLLO_STDIO, apollo_stdio_device, "apollo_stdio", "Apollo STDIO")
 
 //-------------------------------------------------
 // apollo_stdio_device - constructor
 //-------------------------------------------------
 
-apollo_stdio_device::apollo_stdio_device(const machine_config &mconfig,
-		const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, APOLLO_STDIO, "Apollo STDIO", tag, owner, clock,
-			"apollo_stdio", __FILE__), device_serial_interface(mconfig, *this),
-			m_tx_w(*this)
+apollo_stdio_device::apollo_stdio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, APOLLO_STDIO, tag, owner, clock),
+	device_serial_interface(mconfig, *this),
+	m_tx_w(*this)
 {
 }
 

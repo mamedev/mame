@@ -389,7 +389,7 @@ INPUT_PORTS_END
     Machine Drivers
 ******************************************************************************/
 
-static MACHINE_CONFIG_START( fexcel68k, fidel68k_state )
+static MACHINE_CONFIG_START( fexcel68k )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz) // HD68HC000P12
@@ -408,7 +408,7 @@ static MACHINE_CONFIG_START( fexcel68k, fidel68k_state )
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( eag, fidel68k_state )
+static MACHINE_CONFIG_START( eag )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
@@ -526,12 +526,12 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-/*    YEAR  NAME       PARENT   COMPAT  MACHINE    INPUT      INIT                 COMPANY, FULLNAME, FLAGS */
-CONS( 1987, fexcel68k, 0,       0,      fexcel68k, fexcel68k, driver_device,  0,   "Fidelity Electronics", "Excel 68000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME       PARENT  CMP MACHINE    INPUT      STATE           INIT  COMPANY, FULLNAME, FLAGS
+CONS( 1987, fexcel68k, 0,       0, fexcel68k, fexcel68k, fidel68k_state, 0,    "Fidelity Electronics", "Excel 68000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1989, feagv2,    0,       0,      eag,       eag,       fidel68k_state, eag, "Fidelity Electronics", "Elite Avant Garde (model 6114-2/3/4, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1989, feagv2a,   feagv2,  0,      eag,       eag,       fidel68k_state, eag, "Fidelity Electronics", "Elite Avant Garde (model 6114-2/3/4, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1990, feagv7,    feagv2,  0,      eagv7,     eag,       driver_device,  0,   "Fidelity Electronics", "Elite Avant Garde (model 6117-7)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1990, feagv9,    feagv2,  0,      eagv9,     eag,       driver_device,  0,   "Fidelity Electronics", "Elite Avant Garde (model 6117-9)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1990, feagv10,   feagv2,  0,      eagv10,    eag,       driver_device,  0,   "Fidelity Electronics", "Elite Avant Garde (model 6117-10)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 2002, feagv11,   feagv2,  0,      eagv11,    eag,       driver_device,  0,   "hack (Wilfried Bucke)", "Elite Avant Garde (model 6117-11)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1989, feagv2,    0,       0, eag,       eag,       fidel68k_state, eag,  "Fidelity Electronics", "Elite Avant Garde (model 6114-2/3/4, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1989, feagv2a,   feagv2,  0, eag,       eag,       fidel68k_state, eag,  "Fidelity Electronics", "Elite Avant Garde (model 6114-2/3/4, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, feagv7,    feagv2,  0, eagv7,     eag,       fidel68k_state, 0,    "Fidelity Electronics", "Elite Avant Garde (model 6117-7)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, feagv9,    feagv2,  0, eagv9,     eag,       fidel68k_state, 0,    "Fidelity Electronics", "Elite Avant Garde (model 6117-9)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, feagv10,   feagv2,  0, eagv10,    eag,       fidel68k_state, 0,    "Fidelity Electronics", "Elite Avant Garde (model 6117-10)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 2002, feagv11,   feagv2,  0, eagv11,    eag,       fidel68k_state, 0,    "hack (Wilfried Bucke)", "Elite Avant Garde (model 6117-11)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

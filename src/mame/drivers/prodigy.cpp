@@ -123,9 +123,9 @@ private:
 #if TTL74164DEV
 	required_device<ttl74164_device> m_shift;
 #else
-	required_device<netlist_mame_device_t> m_bcd;
-	required_device<netlist_mame_logic_input_t> m_cb1;
-	required_device<netlist_mame_logic_input_t> m_cb2;
+	required_device<netlist_mame_device> m_bcd;
+	required_device<netlist_mame_logic_input_device> m_cb1;
+	required_device<netlist_mame_logic_input_device> m_cb2;
 #endif
 	uint8_t m_digit;
 	void update_bcd();
@@ -218,7 +218,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( prodigy )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( prodigy, prodigy_state )
+static MACHINE_CONFIG_START( prodigy )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_2MHz)
 	MCFG_CPU_PROGRAM_MAP(maincpu_map)
@@ -293,5 +293,5 @@ ROM_START(prodigy)
 	ROM_LOAD("0x2000.bin",  0x0000, 0x02000, CRC(8d60345a) SHA1(fff18ff12e1b1be91f8eac1178605a682564eff2))
 ROM_END
 
-/*    YEAR  NAME        PARENT    COMPAT  MACHINE    INPUT      INIT,             COMPANY,                FULLNAME,              FLAGS */
-CONS( 1981, prodigy,    0,        0,      prodigy,   prodigy,   driver_device, 0, "Applied Concepts Inc", "ACI Destiny Prodigy", MACHINE_IS_SKELETON)
+//    YEAR  NAME        PARENT    COMPAT  MACHINE    INPUT      STATE          INIT  COMPANY,                FULLNAME,              FLAGS
+CONS( 1981, prodigy,    0,        0,      prodigy,   prodigy,   prodigy_state, 0,    "Applied Concepts Inc", "ACI Destiny Prodigy", MACHINE_IS_SKELETON )

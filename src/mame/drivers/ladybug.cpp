@@ -513,7 +513,7 @@ MACHINE_START_MEMBER(ladybug_state,ladybug)
 {
 }
 
-static MACHINE_CONFIG_START( ladybug, ladybug_state )
+static MACHINE_CONFIG_START( ladybug )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)   /* 4 MHz */
@@ -736,10 +736,10 @@ DRIVER_INIT_MEMBER(ladybug_state,dorodon)
 }
 
 
-GAME( 1981, cavenger,  0,       ladybug, cavenger, driver_device, 0,       ROT0,   "Universal", "Cosmic Avenger", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, ladybug,   0,       ladybug, ladybug, driver_device,  0,       ROT270, "Universal", "Lady Bug", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, ladybugb,  ladybug, ladybug, ladybug, driver_device,  0,       ROT270, "bootleg",   "Lady Bug (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, ladybugb2, ladybug, ladybug, ladybug, driver_device,  0,       ROT270, "bootleg (Model Racing)", "Coccinelle (bootleg of Lady Bug, set 2)", MACHINE_SUPPORTS_SAVE ) // title removed, but manual names it Coccinelle
-GAME( 1982, dorodon,   0,       dorodon, dorodon, ladybug_state,  dorodon, ROT270, "UPL (Falcon license?)", "Dorodon (set 1)", MACHINE_SUPPORTS_SAVE ) // license or bootleg?
-GAME( 1982, dorodon2,  dorodon, dorodon, dorodon, ladybug_state,  dorodon, ROT270, "UPL (Falcon license?)", "Dorodon (set 2)", MACHINE_SUPPORTS_SAVE ) // "
-GAME( 1982, snapjack,  0,       ladybug, snapjack, driver_device, 0,       ROT0,   "Universal", "Snap Jack", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, cavenger,  0,       ladybug, cavenger, ladybug_state, 0,       ROT0,   "Universal",              "Cosmic Avenger",                          MACHINE_SUPPORTS_SAVE )
+GAME( 1981, ladybug,   0,       ladybug, ladybug,  ladybug_state, 0,       ROT270, "Universal",              "Lady Bug",                                MACHINE_SUPPORTS_SAVE )
+GAME( 1981, ladybugb,  ladybug, ladybug, ladybug,  ladybug_state, 0,       ROT270, "bootleg",                "Lady Bug (bootleg set 1)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1981, ladybugb2, ladybug, ladybug, ladybug,  ladybug_state, 0,       ROT270, "bootleg (Model Racing)", "Coccinelle (bootleg of Lady Bug, set 2)", MACHINE_SUPPORTS_SAVE ) // title removed, but manual names it Coccinelle
+GAME( 1982, dorodon,   0,       dorodon, dorodon,  ladybug_state, dorodon, ROT270, "UPL (Falcon license?)",  "Dorodon (set 1)",                         MACHINE_SUPPORTS_SAVE ) // license or bootleg?
+GAME( 1982, dorodon2,  dorodon, dorodon, dorodon,  ladybug_state, dorodon, ROT270, "UPL (Falcon license?)",  "Dorodon (set 2)",                         MACHINE_SUPPORTS_SAVE ) // "
+GAME( 1982, snapjack,  0,       ladybug, snapjack, ladybug_state, 0,       ROT0,   "Universal",              "Snap Jack",                               MACHINE_SUPPORTS_SAVE )

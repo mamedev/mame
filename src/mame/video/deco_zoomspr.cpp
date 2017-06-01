@@ -13,10 +13,10 @@
 #include "emu.h"
 #include "deco_zoomspr.h"
 
-const device_type DECO_ZOOMSPR = device_creator<deco_zoomspr_device>;
+DEFINE_DEVICE_TYPE(DECO_ZOOMSPR, deco_zoomspr_device, "deco_zoomspr", "DECO Zooming Sprites")
 
 deco_zoomspr_device::deco_zoomspr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, DECO_ZOOMSPR, "DECO Zooming Sprites", tag, owner, clock, "deco_zoomspr", __FILE__)
+	: device_t(mconfig, DECO_ZOOMSPR, tag, owner, clock)
 	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
 {
 }

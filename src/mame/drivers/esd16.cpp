@@ -605,7 +605,7 @@ DECOSPR_PRIORITY_CB_MEMBER(esd16_state::hedpanic_pri_callback)
 		return 0; // above everything
 }
 
-static MACHINE_CONFIG_START( esd16, esd16_state )
+static MACHINE_CONFIG_START( esd16 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000, XTAL_16MHz)  /* 16MHz */
@@ -647,7 +647,7 @@ static MACHINE_CONFIG_START( esd16, esd16_state )
 	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_16MHz/4)   /* 4MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/16, OKIM6295_PIN7_HIGH) /* 1MHz */
+	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/16, PIN7_HIGH) /* 1MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
@@ -667,7 +667,7 @@ static MACHINE_CONFIG_DERIVED( jumppop, esd16 )
 	MCFG_SOUND_REPLACE("ymsnd", YM3812, XTAL_14MHz/4) /* 3.5MHz - Verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_OKIM6295_REPLACE("oki", XTAL_14MHz/16, OKIM6295_PIN7_HIGH) /* 875kHz - Verified */
+	MCFG_OKIM6295_REPLACE("oki", XTAL_14MHz/16, PIN7_HIGH) /* 875kHz - Verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
@@ -1618,31 +1618,31 @@ ROM_END
 ***************************************************************************/
 
 /* ESD 11-09-98 */
-GAME( 1999, multchmp, 0,        esd16,    multchmp, driver_device, 0, ROT0, "ESD",         "Multi Champ (World, ver. 2.5)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, multchmpk,multchmp, esd16,    multchmp, driver_device, 0, ROT0, "ESD",         "Multi Champ (Korea, older)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, multchmpa,multchmp, esd16,    multchmp, driver_device, 0, ROT0, "ESD",         "Multi Champ (World, older)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, multchmp,  0,        esd16,    multchmp, esd16_state, 0, ROT0, "ESD",         "Multi Champ (World, ver. 2.5)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1998, multchmpk, multchmp, esd16,    multchmp, esd16_state, 0, ROT0, "ESD",         "Multi Champ (Korea, older)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1998, multchmpa, multchmp, esd16,    multchmp, esd16_state, 0, ROT0, "ESD",         "Multi Champ (World, older)",                 MACHINE_SUPPORTS_SAVE )
 
-GAME( 2001, jumppop,  0,        jumppop,  jumppop, driver_device,  0, ROT0, "ESD",         "Jumping Pop (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 2001, jumppope, jumppop,  jumppop,  jumppop, driver_device,  0, ROT0, "Emag Soft",   "Jumping Pop (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 2001, jumppop,   0,        jumppop,  jumppop,  esd16_state, 0, ROT0, "ESD",         "Jumping Pop (set 1)",                        MACHINE_SUPPORTS_SAVE )
+GAME( 2001, jumppope,  jumppop,  jumppop,  jumppop,  esd16_state, 0, ROT0, "Emag Soft",   "Jumping Pop (set 2)",                        MACHINE_SUPPORTS_SAVE )
 
 /* ESD 05-28-99 */
-GAME( 1999, hedpanico,hedpanic, hedpanio, hedpanic, driver_device, 0, ROT0, "ESD",         "Head Panic (ver. 0615, 15/06/1999)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, hedpanico, hedpanic, hedpanio, hedpanic, esd16_state, 0, ROT0, "ESD",         "Head Panic (ver. 0615, 15/06/1999)",         MACHINE_SUPPORTS_SAVE )
 
 /* ESD 06-10-1999 */
-GAME( 1999, hedpanica,hedpanic, hedpanic, hedpanic, driver_device, 0, ROT0, "ESD",         "Head Panic (ver. 0702, 02/07/1999)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, hedpanica, hedpanic, hedpanic, hedpanic, esd16_state, 0, ROT0, "ESD",         "Head Panic (ver. 0702, 02/07/1999)",         MACHINE_SUPPORTS_SAVE )
 
 /* ESD 08-26-1999 */
-GAME( 2000, mchampdx, 0,        mchampdx, hedpanic, driver_device, 0, ROT0, "ESD",         "Multi Champ Deluxe (ver. 0106, 06/01/2000)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, mchampdxa,mchampdx, mchampdx, hedpanic, driver_device, 0, ROT0, "ESD",         "Multi Champ Deluxe (ver. 1126, 26/11/1999)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, mchampdxb,mchampdx, mchampdx, hedpanic, driver_device, 0, ROT0, "ESD",         "Multi Champ Deluxe (ver. 1114, 14/11/1999)", MACHINE_SUPPORTS_SAVE )
-GAME( 2000, hedpanic, 0,        hedpanic, hedpanic, driver_device, 0, ROT0, "ESD",         "Head Panic (ver. 0117, 17/01/2000)", MACHINE_SUPPORTS_SAVE )
-GAME( 2000, hedpanicf,hedpanic, hedpanic, hedpanic, driver_device, 0, ROT0, "ESD / Fuuki", "Head Panic (ver. 0315, 15/03/2000)", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, mchampdx,  0,        mchampdx, hedpanic, esd16_state, 0, ROT0, "ESD",         "Multi Champ Deluxe (ver. 0106, 06/01/2000)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, mchampdxa, mchampdx, mchampdx, hedpanic, esd16_state, 0, ROT0, "ESD",         "Multi Champ Deluxe (ver. 1126, 26/11/1999)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, mchampdxb, mchampdx, mchampdx, hedpanic, esd16_state, 0, ROT0, "ESD",         "Multi Champ Deluxe (ver. 1114, 14/11/1999)", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, hedpanic,  0,        hedpanic, hedpanic, esd16_state, 0, ROT0, "ESD",         "Head Panic (ver. 0117, 17/01/2000)",         MACHINE_SUPPORTS_SAVE )
+GAME( 2000, hedpanicf, hedpanic, hedpanic, hedpanic, esd16_state, 0, ROT0, "ESD / Fuuki", "Head Panic (ver. 0315, 15/03/2000)",         MACHINE_SUPPORTS_SAVE )
 
 /* ESD - This PCB looks identical to the ESD 08-26-1999 PCB */
-GAME( 2000, deluxe5,  0,        tangtang, hedpanic, driver_device, 0, ROT0, "ESD",         "Deluxe 5 (ver. 0107, 07/01/2000, set 1)", MACHINE_SUPPORTS_SAVE ) // all 4 sets report the same version number?
-GAME( 2000, deluxe5a, deluxe5,  tangtang, hedpanic, driver_device, 0, ROT0, "ESD",         "Deluxe 5 (ver. 0107, 07/01/2000, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 2000, deluxe5b, deluxe5,  tangtang, hedpanic, driver_device, 0, ROT0, "ESD",         "Deluxe 5 (ver. 0107, 07/01/2000, set 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 2000, deluxe4u, deluxe5,  tangtang, hedpanic, driver_device, 0, ROT0, "ESD",         "Deluxe 4 U (ver. 0107, 07/01/2000)", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, deluxe5,   0,        tangtang, hedpanic, esd16_state, 0, ROT0, "ESD",         "Deluxe 5 (ver. 0107, 07/01/2000, set 1)",    MACHINE_SUPPORTS_SAVE ) // all 4 sets report the same version number?
+GAME( 2000, deluxe5a,  deluxe5,  tangtang, hedpanic, esd16_state, 0, ROT0, "ESD",         "Deluxe 5 (ver. 0107, 07/01/2000, set 2)",    MACHINE_SUPPORTS_SAVE )
+GAME( 2000, deluxe5b,  deluxe5,  tangtang, hedpanic, esd16_state, 0, ROT0, "ESD",         "Deluxe 5 (ver. 0107, 07/01/2000, set 3)",    MACHINE_SUPPORTS_SAVE )
+GAME( 2000, deluxe4u,  deluxe5,  tangtang, hedpanic, esd16_state, 0, ROT0, "ESD",         "Deluxe 4 U (ver. 0107, 07/01/2000)",         MACHINE_SUPPORTS_SAVE )
 
-GAME( 2000, tangtang, 0,        tangtang, hedpanic, driver_device, 0, ROT0, "ESD",         "Tang Tang (ver. 0526, 26/05/2000)", MACHINE_SUPPORTS_SAVE )
-GAME( 2001, swatpolc, 0,        hedpanic, swatpolc, driver_device, 0, ROT0, "ESD",         "SWAT Police", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, tangtang,  0,        tangtang, hedpanic, esd16_state, 0, ROT0, "ESD",         "Tang Tang (ver. 0526, 26/05/2000)",          MACHINE_SUPPORTS_SAVE )
+GAME( 2001, swatpolc,  0,        hedpanic, swatpolc, esd16_state, 0, ROT0, "ESD",         "SWAT Police",                                MACHINE_SUPPORTS_SAVE )

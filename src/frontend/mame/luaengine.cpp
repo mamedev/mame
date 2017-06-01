@@ -719,7 +719,7 @@ void lua_engine::initialize()
 	sol::table emu = sol().create_named_table("emu");
 	emu["app_name"] = &emulator_info::get_appname_lower;
 	emu["app_version"] = &emulator_info::get_bare_build_version;
-	emu["gamename"] = [this](){ return machine().system().description; };
+	emu["gamename"] = [this](){ return machine().system().type.fullname(); };
 	emu["romname"] = [this](){ return machine().basename(); };
 	emu["softname"] = [this](){ return machine().options().software_name(); };
 	emu["keypost"] = [this](const char *keys){ machine().ioport().natkeyboard().post_utf8(keys); };
@@ -776,17 +776,111 @@ void lua_engine::initialize()
 			return lua_yield(L, 0);
 		});
 
-	emu.new_usertype<emu_file>("file", sol::call_constructor, sol::constructors<sol::types<const char *, uint32_t>>(),
+/*
+ * emu.file(opt searchpath, flags) - flags can be as in osdcore "OPEN_FLAG_*" or lua style with 'rwc' with addtional c for create *and truncate* (be careful)
+ *                                   support zipped files on the searchpath
+ * file:open(name) - open first file matching name in searchpath, supports read and write sockets as "socket.127.0.0.1:1234"
+ * file:open_next() - open next file matching name in searchpath
+ * file:read(len) - only reads len bytes, doen't do lua style formats
+ * file:write(data) - write data to file
+ * file:seek(offset, whence) - whence is as C "SEEK_*" int
+ * file:seek(opt whence, opt offset) - lua style "set"|"cur"|"end", returns cur offset
+ * file:size() -
+ * file:filename() - name of current file, container name if file is in zip
+ * file:fullpath() -
+*/
+
+	emu.new_usertype<emu_file>("file", sol::call_constructor, sol::initializers([](emu_file &file, u32 flags) { new (&file) emu_file(flags); },
+				[](emu_file &file, const char *path, u32 flags) { new (&file) emu_file(path, flags); },
+				[](emu_file &file, const char *mode) {
+					int flags = 0;
+					for(int i = 0; i < 2; i++) // limit to three chars
+					{
+						switch(mode[i])
+						{
+							case 'r':
+								flags |= OPEN_FLAG_READ;
+								break;
+							case 'w':
+								flags |= OPEN_FLAG_WRITE;
+								break;
+							case 'c':
+								flags |= OPEN_FLAG_CREATE;
+								break;
+						}
+					}
+					new (&file) emu_file(flags);
+				},
+				[](emu_file &file, const char *path, const char* mode) {
+					int flags = 0;
+					for(int i = 0; i < 2; i++) // limit to three chars
+					{
+						switch(mode[i])
+						{
+							case 'r':
+								flags |= OPEN_FLAG_READ;
+								break;
+							case 'w':
+								flags |= OPEN_FLAG_WRITE;
+								break;
+							case 'c':
+								flags |= OPEN_FLAG_CREATE;
+								break;
+						}
+					}
+					new (&file) emu_file(path, flags);
+				}),
 			"read", [](emu_file &file, sol::buffer *buff) { buff->set_len(file.read(buff->get_ptr(), buff->get_len())); return buff; },
 			"write", [](emu_file &file, const std::string &data) { return file.write(data.data(), data.size()); },
 			"open", static_cast<osd_file::error (emu_file::*)(const std::string &)>(&emu_file::open),
 			"open_next", &emu_file::open_next,
-			"seek", &emu_file::seek,
+			"seek", sol::overload([](emu_file &file) { return file.tell(); },
+				[this](emu_file &file, s64 offset, int whence) -> sol::object {
+					if(file.seek(offset, whence))
+						return sol::make_object(sol(), sol::nil);
+					else
+						return sol::make_object(sol(), file.tell());
+				},
+				[this](emu_file &file, const char* whence) -> sol::object {
+					int wval = -1;
+					const char *seekdirs[] = {"set", "cur", "end"};
+					for(int i = 0; i < 3; i++)
+					{
+						if(!strncmp(whence, seekdirs[i], 3))
+						{
+							wval = i;
+							break;
+						}
+					}
+					if(wval < 0 || wval >= 3)
+						return sol::make_object(sol(), sol::nil);
+					if(file.seek(0, wval))
+						return sol::make_object(sol(), sol::nil);
+					return sol::make_object(sol(), file.tell());
+				},
+				[this](emu_file &file, const char* whence, s64 offset) -> sol::object {
+					int wval = -1;
+					const char *seekdirs[] = {"set", "cur", "end"};
+					for(int i = 0; i < 3; i++)
+					{
+						if(!strncmp(whence, seekdirs[i], 3))
+						{
+							wval = i;
+							break;
+						}
+					}
+					if(wval < 0 || wval >= 3)
+						return sol::make_object(sol(), sol::nil);
+					if(file.seek(offset, wval))
+						return sol::make_object(sol(), sol::nil);
+					return sol::make_object(sol(), file.tell());
+				}),
 			"size", &emu_file::size,
 			"filename", &emu_file::filename,
 			"fullpath", &emu_file::fullpath);
 
 /*
+ * emu.thread()
  * thread.start(scr) - run scr (string not function) in a seperate thread in a new empty (other then modules) lua context
  * thread.continue(val) - resume thread and pass val to it
  * thread.result() - get thread result as string
@@ -1074,10 +1168,10 @@ void lua_engine::initialize()
  */
 
 	sol().registry().new_usertype<game_driver>("game_driver", "new", sol::no_constructor,
-			"source_file", sol::readonly(&game_driver::source_file),
+			"source_file", sol::property([] (game_driver const &driver) { return &driver.type.source()[0]; }),
 			"parent", sol::readonly(&game_driver::parent),
 			"name", sol::property([] (game_driver const &driver) { return &driver.name[0]; }),
-			"description", sol::readonly(&game_driver::description),
+			"description", sol::property([] (game_driver const &driver) { return &driver.type.fullname()[0]; }),
 			"year", sol::readonly(&game_driver::year),
 			"manufacturer", sol::readonly(&game_driver::manufacturer),
 			"compatible_with", sol::readonly(&game_driver::compatible_with),

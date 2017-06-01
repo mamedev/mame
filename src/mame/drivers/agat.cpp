@@ -1004,7 +1004,7 @@ static SLOT_INTERFACE_START(agat7_cards)
 	// Nippel Co-processor (R65C02 clone + dual-ported RAM)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( agat7, agat7_state )
+static MACHINE_CONFIG_START( agat7 )
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_14_3MHz / 14)
 	MCFG_CPU_PROGRAM_MAP(agat7_map)
 
@@ -1110,6 +1110,6 @@ ROM_START( agat9 )
 	ROM_LOAD( "agathe9.fnt", 0x0000, 0x0800, CRC(8c55c984) SHA1(5a5a202000576b88b4ae2e180dd2d1b9b337b594))
 ROM_END
 
-/*    YEAR  NAME      PARENT    COMPAT    MACHINE      INPUT     INIT      COMPANY            FULLNAME */
-COMP( 1983, agat7,    apple2,   0,        agat7,       agat7,   driver_device,  0,        "Agat",              "Agat-7", MACHINE_NOT_WORKING)
-COMP( 1984, agat9,    apple2,   0,        agat7,       agat7,   driver_device,  0,        "Agat",              "Agat-9", MACHINE_NOT_WORKING)
+//    YEAR  NAME      PARENT    COMPAT    MACHINE      INPUT    STATE         INIT      COMPANY            FULLNAME  FLAGS
+COMP( 1983, agat7,    apple2,   0,        agat7,       agat7,   agat7_state,  0,        "Agat",            "Agat-7", MACHINE_NOT_WORKING)
+COMP( 1984, agat9,    apple2,   0,        agat7,       agat7,   agat7_state,  0,        "Agat",            "Agat-9", MACHINE_NOT_WORKING)

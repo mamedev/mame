@@ -407,7 +407,7 @@ void nsmpoker_state::machine_reset()
 *    Machine Drivers     *
 *************************/
 
-static MACHINE_CONFIG_START( nsmpoker, nsmpoker_state )
+static MACHINE_CONFIG_START( nsmpoker )
 
 	// CPU TMS9995, standard variant; no line connections
 	MCFG_TMS99xx_ADD("maincpu", TMS9995, MASTER_CLOCK/2, nsmpoker_map, nsmpoker_portmap)
@@ -457,5 +457,5 @@ ROM_END
 *      Game Drivers      *
 *************************/
 
-/*    YEAR  NAME      PARENT  MACHINE   INPUT     INIT  ROT    COMPANY   FULLNAME              FLAGS */
-GAME( 198?, nsmpoker, 0,      nsmpoker, nsmpoker, driver_device, 0,    ROT0, "NSM",    "NSM Poker (TMS9995)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT  ROT   COMPANY   FULLNAME               FLAGS
+GAME( 198?, nsmpoker, 0,      nsmpoker, nsmpoker, nsmpoker_state, 0,    ROT0, "NSM",    "NSM Poker (TMS9995)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

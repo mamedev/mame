@@ -29,10 +29,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_VIDEO_ZX8301_H
+#define MAME_VIDEO_ZX8301_H
 
-#ifndef __ZX8301__
-#define __ZX8301__
+#pragma once
 
 
 
@@ -63,7 +63,7 @@ public:
 	// construction/destruction
 	zx8301_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_vsync_wr_callback(device_t &device, _Object object) { return downcast<zx8301_device &>(device).m_write_vsync.set_callback(object); }
+	template <class Object> static devcb_base &set_vsync_wr_callback(device_t &device, Object &&cb) { return downcast<zx8301_device &>(device).m_write_vsync.set_callback(std::forward<Object>(cb)); }
 	static void static_set_cpu_tag(device_t &device, const char *tag) { downcast<zx8301_device &>(device).m_cpu.set_tag(tag); }
 
 	DECLARE_WRITE8_MEMBER( control_w );
@@ -115,8 +115,8 @@ private:
 
 
 // device type definition
-extern const device_type ZX8301;
+DECLARE_DEVICE_TYPE(ZX8301, zx8301_device)
 
 
 
-#endif
+#endif // MAME_VIDEO_ZX8301_H

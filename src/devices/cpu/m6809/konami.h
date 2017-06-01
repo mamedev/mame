@@ -8,10 +8,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_CPU_M6809_KONAMI_H
+#define MAME_CPU_M6809_KONAMI_H
 
-#ifndef __KONAMI_CPU_H__
-#define __KONAMI_CPU_H__
+#pragma once
 
 #include "m6809.h"
 
@@ -25,7 +25,7 @@
 
 
 // device type definition
-extern const device_type KONAMI;
+DECLARE_DEVICE_TYPE(KONAMI, konami_cpu_device)
 
 // ======================> konami_cpu_device
 
@@ -78,4 +78,4 @@ private:
 #define KONAMI_IRQ_LINE  M6809_IRQ_LINE   /* 0 - IRQ line number */
 #define KONAMI_FIRQ_LINE M6809_FIRQ_LINE  /* 1 - FIRQ line number */
 
-#endif /* __KONAMI_CPU_H__ */
+#endif // MAME_CPU_M6809_KONAMI_H

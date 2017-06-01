@@ -34,7 +34,7 @@ public:
 	DECLARE_READ_LINE_MEMBER(contacts_r);
 	DECLARE_WRITE_LINE_MEMBER(displays_w);
 	DECLARE_WRITE8_MEMBER(driver_clk_w);
-	DECLARE_READ8_MEMBER(phase_detect_r);
+	DECLARE_READ_LINE_MEMBER(phase_detect_r);
 	DECLARE_WRITE8_MEMBER(lights_a_w);
 	DECLARE_WRITE8_MEMBER(lights_b_w);
 
@@ -69,9 +69,6 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(sound_io_map, AS_IO, 8, supstarf_state)
 	AM_RANGE(0x00, 0xff) AM_READWRITE(psg_latch_r, psg_latch_w)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(port1_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(port2_w)
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(phase_detect_r)
 ADDRESS_MAP_END
 
 READ8_MEMBER(supstarf_state::psg_latch_r)
@@ -142,7 +139,7 @@ WRITE8_MEMBER(supstarf_state::driver_clk_w)
 {
 }
 
-READ8_MEMBER(supstarf_state::phase_detect_r)
+READ_LINE_MEMBER(supstarf_state::phase_detect_r)
 {
 	return 0;
 }
@@ -166,7 +163,7 @@ void supstarf_state::machine_start()
 	save_item(NAME(m_port1_data));
 }
 
-static MACHINE_CONFIG_START(supstarf, supstarf_state)
+static MACHINE_CONFIG_START(supstarf)
 	MCFG_CPU_ADD("maincpu", I8085A, XTAL_5_0688MHz)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_io_map)
@@ -176,6 +173,9 @@ static MACHINE_CONFIG_START(supstarf, supstarf_state)
 	MCFG_CPU_ADD("soundcpu", I8035, XTAL_5_0688MHz / 2) // from 8085 pin 37 (CLK OUT)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_io_map)
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(supstarf_state, port1_w))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(supstarf_state, port2_w))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(supstarf_state, phase_detect_r))
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("maincpu", I8085_RST55_LINE))
@@ -245,4 +245,4 @@ ROM_START(supstarf)
 	ROM_LOAD("2532.ic4", 0x0000, 0x1000, CRC(b6ef3c7a) SHA1(aabb6f8569685fc3a917a7bb5ebfcc4b20086b15) BAD_DUMP) // D6 stuck high and probably totally garbage
 ROM_END
 
-GAME( 1986, supstarf,   0,      supstarf,   supstarf,   driver_device,  0,      ROT0, "Recreativos Franco", "Super Star (Recreativos Franco)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1986, supstarf,   0,      supstarf,   supstarf,   supstarf_state,  0,      ROT0, "Recreativos Franco", "Super Star (Recreativos Franco)", MACHINE_IS_SKELETON_MECHANICAL )

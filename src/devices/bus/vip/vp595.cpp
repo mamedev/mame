@@ -26,14 +26,14 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type VP595 = device_creator<vp595_device>;
+DEFINE_DEVICE_TYPE(VP595, vp595_device, "vp595", "VP-595 Simple Sound")
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( vp595 )
+//  MACHINE_CONFIG_START( vp595 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( vp595 )
+static MACHINE_CONFIG_START( vp595 )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_CDP1863_ADD(CDP1863_TAG, 0, CDP1863_XTAL)
@@ -62,7 +62,7 @@ machine_config_constructor vp595_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 vp595_device::vp595_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, VP595, "VP595", tag, owner, clock, "vp595", __FILE__),
+	device_t(mconfig, VP595, tag, owner, clock),
 	device_vip_expansion_card_interface(mconfig, *this),
 	m_pfg(*this, CDP1863_TAG)
 {

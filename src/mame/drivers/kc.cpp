@@ -90,7 +90,7 @@ extern SLOT_INTERFACE_START(kc85_exp)
 SLOT_INTERFACE_END
 
 
-static MACHINE_CONFIG_START( kc85_3, kc_state )
+static MACHINE_CONFIG_START( kc85_3 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, KC85_3_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(kc85_3_mem)
@@ -174,7 +174,7 @@ static MACHINE_CONFIG_START( kc85_3, kc_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( kc85_4, kc85_4_state )
+static MACHINE_CONFIG_START( kc85_4 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, KC85_4_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(kc85_4_mem)
@@ -316,8 +316,8 @@ ROM_START(kc85_5)
 	ROMX_LOAD( "caos43e.855", 0x2000, 0x2000, CRC(b66fc6c3) SHA1(521ac2fbded4148220f8af2d5a5ab99634364079), ROM_BIOS(2))
 ROM_END
 
-/*     YEAR  NAME      PARENT   COMPAT  MACHINE  INPUT     INIT  COMPANY   FULLNAME */
-COMP( 1987, kc85_2,   0,       0,       kc85_3,  kc85, driver_device,     0,    "VEB Mikroelektronik", "HC900 / KC 85/2", MACHINE_NOT_WORKING)
-COMP( 1987, kc85_3,   kc85_2,  0,       kc85_3,  kc85, driver_device,     0,    "VEB Mikroelektronik", "KC 85/3", MACHINE_NOT_WORKING)
-COMP( 1989, kc85_4,   kc85_2,  0,       kc85_4,  kc85, driver_device,     0,    "VEB Mikroelektronik", "KC 85/4", MACHINE_NOT_WORKING)
-COMP( 1989, kc85_5,   kc85_2,  0,       kc85_5,  kc85, driver_device,     0,    "VEB Mikroelektronik", "KC 85/5", MACHINE_NOT_WORKING)
+//    YEAR  NAME      PARENT   COMPAT  MACHINE  INPUT  STATE         INIT  COMPANY                FULLNAME           FLAGS
+COMP( 1987, kc85_2,   0,       0,      kc85_3,  kc85,  kc_state,     0,    "VEB Mikroelektronik", "HC900 / KC 85/2", MACHINE_NOT_WORKING)
+COMP( 1987, kc85_3,   kc85_2,  0,      kc85_3,  kc85,  kc_state,     0,    "VEB Mikroelektronik", "KC 85/3",         MACHINE_NOT_WORKING)
+COMP( 1989, kc85_4,   kc85_2,  0,      kc85_4,  kc85,  kc85_4_state, 0,    "VEB Mikroelektronik", "KC 85/4",         MACHINE_NOT_WORKING)
+COMP( 1989, kc85_5,   kc85_2,  0,      kc85_5,  kc85,  kc85_4_state, 0,    "VEB Mikroelektronik", "KC 85/5",         MACHINE_NOT_WORKING)

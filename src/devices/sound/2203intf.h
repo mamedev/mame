@@ -1,16 +1,18 @@
 // license:BSD-3-Clause
 // copyright-holders:Ernesto Corvi
-#pragma once
+#ifndef MAME_SOUND_2203INTF_H
+#define MAME_SOUND_2203INTF_H
 
-#ifndef __2203INTF_H__
-#define __2203INTF_H__
+#pragma once
 
 #include "ay8910.h"
 
-void ym2203_update_request(void *param);
 
-#define MCFG_YM2203_IRQ_HANDLER(_devcb) \
-	devcb = &ym2203_device::set_irq_handler(*device, DEVCB_##_devcb);
+struct ssg_callbacks;
+
+
+#define MCFG_YM2203_IRQ_HANDLER(cb) \
+		devcb = &ym2203_device::set_irq_handler(*device, (DEVCB_##cb));
 
 class ym2203_device : public ay8910_device
 {
@@ -18,7 +20,7 @@ public:
 	ym2203_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<ym2203_device &>(device).m_irq_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb) { return downcast<ym2203_device &>(device).m_irq_handler.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -28,9 +30,8 @@ public:
 	DECLARE_WRITE8_MEMBER( control_port_w );
 	DECLARE_WRITE8_MEMBER( write_port_w );
 
-	void _IRQHandler(int irq);
-	void _timer_handler(int c,int count,int clock);
-	void _ym2203_update_request();
+	// update request from fm.cpp
+	static void update_request(device_t *param) { downcast<ym2203_device *>(param)->update_request(); }
 
 protected:
 	// device-level overrides
@@ -44,16 +45,24 @@ protected:
 	void stream_generate(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
 private:
+	void irq_handler(int irq);
+	void timer_handler(int c, int count, int clock);
+	void update_request() { m_stream->update(); }
+
 	void calculate_rates();
+
+	static void static_irq_handler(device_t *param, int irq) { downcast<ym2203_device *>(param)->irq_handler(irq); }
+	static void static_timer_handler(device_t *param, int c, int count, int clock) { downcast<ym2203_device *>(param)->timer_handler(c, count, clock); }
 
 	// internal state
 	sound_stream *  m_stream;
 	emu_timer *     m_timer[2];
 	void *          m_chip;
 	devcb_write_line m_irq_handler;
+
+	static const ssg_callbacks psgintf;
 };
 
-extern const device_type YM2203;
+DECLARE_DEVICE_TYPE(YM2203, ym2203_device)
 
-
-#endif /* __2203INTF_H__ */
+#endif // MAME_SOUND_2203INTF_H

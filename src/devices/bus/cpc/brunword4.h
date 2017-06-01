@@ -5,6 +5,10 @@
     Brunword MK4 - Word processor ROM / expansion
 
 */
+#ifndef MAME_BUS_CPC_BRUNWORD4_H
+#define MAME_BUS_CPC_BRUNWORD4_H
+
+#pragma once
 
 #include "cpcexp.h"
 
@@ -34,4 +38,6 @@ private:
 };
 
 // device type definition
-extern const device_type CPC_BRUNWORD_MK4;
+DECLARE_DEVICE_TYPE(CPC_BRUNWORD_MK4, cpc_brunword4_device)
+
+#endif // MAME_BUS_CPC_BRUNWORD4_H

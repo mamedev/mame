@@ -27,6 +27,7 @@
 #include "ui/mainmenu.h"
 #include "ui/filemngr.h"
 #include "ui/sliders.h"
+#include "ui/state.h"
 #include "ui/viewgfx.h"
 #include "imagedev/cassette.h"
 
@@ -183,8 +184,7 @@ mame_ui_manager::mame_ui_manager(running_machine &machine)
 	, m_show_profiler(false)
 	, m_popup_text_end(0)
 	, m_mouse_arrow_texture(nullptr)
-	, m_mouse_show(false)
-	, m_load_save_hold(false) {}
+	, m_mouse_show(false) {}
 
 mame_ui_manager::~mame_ui_manager()
 {
@@ -402,7 +402,7 @@ void mame_ui_manager::update_and_render(render_container &container)
 	container.empty();
 
 	// if we're paused, dim the whole screen
-	if (machine().phase() >= MACHINE_PHASE_RESET && (single_step() || machine().paused()))
+	if (machine().phase() >= machine_phase::RESET && (single_step() || machine().paused()))
 	{
 		int alpha = (1.0f - machine().options().pause_brightness()) * 255.0f;
 		if (ui::menu::stack_has_special_main_menu(machine()))
@@ -414,7 +414,7 @@ void mame_ui_manager::update_and_render(render_container &container)
 	}
 
 	// render any cheat stuff at the bottom
-	if (machine().phase() >= MACHINE_PHASE_RESET)
+	if (machine().phase() >= machine_phase::RESET)
 		mame_machine_manager::instance()->cheat().render_text(*this, container);
 
 	// call the current UI handler
@@ -988,10 +988,8 @@ void mame_ui_manager::draw_profiler(render_container &container)
 
 void mame_ui_manager::start_save_state()
 {
-	machine().pause();
-	m_load_save_hold = true;
-	using namespace std::placeholders;
-	set_handler(ui_callback_type::GENERAL, std::bind(&mame_ui_manager::handler_load_save, this, _1, uint32_t(LOADSAVE_SAVE)));
+	show_menu();
+	ui::menu::stack_push<ui::menu_save_state>(*this, machine().render().ui_container());
 }
 
 
@@ -1001,10 +999,8 @@ void mame_ui_manager::start_save_state()
 
 void mame_ui_manager::start_load_state()
 {
-	machine().pause();
-	m_load_save_hold = true;
-	using namespace std::placeholders;
-	set_handler(ui_callback_type::GENERAL, std::bind(&mame_ui_manager::handler_load_save, this, _1, uint32_t(LOADSAVE_LOAD)));
+	show_menu();
+	ui::menu::stack_push<ui::menu_load_state>(*this, machine().render().ui_container());
 }
 
 
@@ -1016,7 +1012,7 @@ void mame_ui_manager::start_load_state()
 void mame_ui_manager::image_handler_ingame()
 {
 	// run display routine for devices
-	if (machine().phase() == MACHINE_PHASE_RUNNING)
+	if (machine().phase() == machine_phase::RUNNING)
 	{
 		auto layout = create_layout(machine().render().ui_container());
 
@@ -1111,7 +1107,7 @@ uint32_t mame_ui_manager::handler_ingame(render_container &container)
 	}
 
 	// is the natural keyboard enabled?
-	if (machine().ioport().natkeyboard().in_use() && (machine().phase() == MACHINE_PHASE_RUNNING))
+	if (machine().ioport().natkeyboard().in_use() && (machine().phase() == machine_phase::RUNNING))
 		process_natural_keyboard();
 
 	if (!ui_disabled)
@@ -1266,111 +1262,6 @@ uint32_t mame_ui_manager::handler_ingame(render_container &container)
 		machine().video().set_fastforward(false);
 
 	return 0;
-}
-
-
-//-------------------------------------------------
-//  handler_load_save - leads the user through
-//  specifying a game to save or load
-//-------------------------------------------------
-
-uint32_t mame_ui_manager::handler_load_save(render_container &container, uint32_t state)
-{
-	char filename[20];
-	char file = 0;
-
-	// if we're not in the middle of anything, skip
-	if (state == LOADSAVE_NONE)
-		return 0;
-
-	// okay, we're waiting for a key to select a slot; display a message
-	if (state == LOADSAVE_SAVE)
-		draw_message_window(container, _("Select position to save to"));
-	else
-		draw_message_window(container, _("Select position to load from"));
-
-	// if load/save state sequence is still being pressed, do not read the filename yet
-	if (m_load_save_hold) {
-		bool seq_in_progress = false;
-		const input_seq &load_save_seq = state == LOADSAVE_SAVE ?
-			machine().ioport().type_seq(IPT_UI_SAVE_STATE) :
-			machine().ioport().type_seq(IPT_UI_LOAD_STATE);
-
-		for (int i = 0; i < load_save_seq.length(); i++)
-			if (machine().input().code_pressed_once(load_save_seq[i]))
-				seq_in_progress = true;
-
-		if (seq_in_progress)
-			return state;
-		else
-			m_load_save_hold = false;
-	}
-
-	// check for cancel key
-	if (machine().ui_input().pressed(IPT_UI_CANCEL))
-	{
-		// display a popup indicating things were cancelled
-		if (state == LOADSAVE_SAVE)
-			machine().popmessage(_("Save cancelled"));
-		else
-			machine().popmessage(_("Load cancelled"));
-
-		// reset the state
-		machine().resume();
-		return UI_HANDLER_CANCEL;
-	}
-
-	// check for A-Z or 0-9
-	for (input_item_id id = ITEM_ID_A; id <= ITEM_ID_Z; ++id)
-		if (machine().input().code_pressed_once(input_code(DEVICE_CLASS_KEYBOARD, 0, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, id)))
-			file = id - ITEM_ID_A + 'a';
-	if (file == 0)
-		for (input_item_id id = ITEM_ID_0; id <= ITEM_ID_9; ++id)
-			if (machine().input().code_pressed_once(input_code(DEVICE_CLASS_KEYBOARD, 0, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, id)))
-				file = id - ITEM_ID_0 + '0';
-	if (file == 0)
-		for (input_item_id id = ITEM_ID_0_PAD; id <= ITEM_ID_9_PAD; ++id)
-			if (machine().input().code_pressed_once(input_code(DEVICE_CLASS_KEYBOARD, 0, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, id)))
-				file = id - ITEM_ID_0_PAD + '0';
-	if (file == 0)
-	{
-		bool found = false;
-
-		for (int joy_index = 0; joy_index <= MAX_SAVED_STATE_JOYSTICK; joy_index++)
-			for (input_item_id id = ITEM_ID_BUTTON1; id <= ITEM_ID_BUTTON32; ++id)
-				if (machine().input().code_pressed_once(input_code(DEVICE_CLASS_JOYSTICK, joy_index, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, id)))
-				{
-					snprintf(filename, sizeof(filename), "joy%i-%i", joy_index, id - ITEM_ID_BUTTON1 + 1);
-					found = true;
-					break;
-				}
-
-		if (!found)
-			return state;
-	}
-	else
-	{
-		sprintf(filename, "%c", file);
-	}
-
-	// display a popup indicating that the save will proceed
-	if (state == LOADSAVE_SAVE)
-	{
-		machine().popmessage(_("Save to position %s"), filename);
-		machine().schedule_save(filename);
-	}
-	else
-	{
-		machine().popmessage(_("Load from position %s"), filename);
-		machine().schedule_load(filename);
-	}
-
-	// avoid handling the name of the save state slot as a seperate input
-	machine().ui_input().mark_all_as_pressed();
-
-	// remove the pause and reset the state
-	machine().resume();
-	return UI_HANDLER_CANCEL;
 }
 
 
@@ -2233,9 +2124,9 @@ void mame_ui_manager::load_ui_options()
 	emu_file file(machine().options().ini_path(), OPEN_FLAG_READ);
 	if (file.open("ui.ini") == osd_file::error::NONE)
 	{
-		bool result = options().parse_ini_file((util::core_file&)file, OPTION_PRIORITY_MAME_INI, OPTION_PRIORITY_DRIVER_INI, error);
+		bool result = options().parse_ini_file((util::core_file&)file, OPTION_PRIORITY_MAME_INI, OPTION_PRIORITY_MAME_INI < OPTION_PRIORITY_DRIVER_INI, error);
 		if (!result)
-			osd_printf_error("**Error loading ui.ini**");
+			osd_printf_error("**Error loading ui.ini**\n");
 	}
 }
 
@@ -2274,10 +2165,10 @@ void mame_ui_manager::save_main_option()
 		emu_file file(machine().options().ini_path(), OPEN_FLAG_READ);
 		if (file.open(emulator_info::get_configname(), ".ini") == osd_file::error::NONE)
 		{
-			bool result = options.parse_ini_file((util::core_file&)file, OPTION_PRIORITY_MAME_INI, OPTION_PRIORITY_DRIVER_INI, error);
+			bool result = options.parse_ini_file((util::core_file&)file, OPTION_PRIORITY_MAME_INI, OPTION_PRIORITY_MAME_INI < OPTION_PRIORITY_DRIVER_INI, error);
 			if (!result)
 			{
-				osd_printf_error("**Error loading %s.ini**", emulator_info::get_configname());
+				osd_printf_error("**Error loading %s.ini**\n", emulator_info::get_configname());
 				return;
 			}
 		}

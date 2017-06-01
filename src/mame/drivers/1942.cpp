@@ -560,7 +560,7 @@ void _1942_state::machine_reset()
 	m_scroll[1] = 0;
 }
 
-static MACHINE_CONFIG_START( 1942, _1942_state )
+static MACHINE_CONFIG_START( 1942 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_CPU_CLOCK)    /* 4 MHz ??? */
@@ -628,7 +628,7 @@ static MACHINE_CONFIG_START( 1942, _1942_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( 1942p, _1942_state )
+static MACHINE_CONFIG_START( 1942p )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_CPU_CLOCK_1942P)    /* 4 MHz - verified on PCB */

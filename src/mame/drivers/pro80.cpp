@@ -164,7 +164,7 @@ void pro80_state::machine_reset()
 	m_cass_in = 0;
 }
 
-static MACHINE_CONFIG_START( pro80, pro80_state )
+static MACHINE_CONFIG_START( pro80 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(pro80_mem)
@@ -193,5 +193,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   CLASS         INIT    COMPANY     FULLNAME       FLAGS */
-COMP( 1981, pro80,  0,      0,       pro80,     pro80, driver_device,   0,   "Protec",   "Pro-80", MACHINE_NOT_WORKING )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE   INPUT  CLASS        INIT  COMPANY   FULLNAME  FLAGS
+COMP( 1981, pro80,  0,      0,      pro80,    pro80, pro80_state, 0,    "Protec", "Pro-80", MACHINE_NOT_WORKING )

@@ -86,18 +86,18 @@ FEATURES
 //  DEVICE DEFINITIONS
 //**************************************************************************
 // device type definition
-const device_type MPCC       = device_creator<mpcc_device>;
-const device_type MPCC68560  = device_creator<mpcc68560_device>;
-const device_type MPCC68560A = device_creator<mpcc68560A_device>;
-const device_type MPCC68561  = device_creator<mpcc68561_device>;
-const device_type MPCC68561A = device_creator<mpcc68561A_device>;
+DEFINE_DEVICE_TYPE(MPCC,       mpcc_device,       "mpcc",       "Rockwell MPCC")
+DEFINE_DEVICE_TYPE(MPCC68560,  mpcc68560_device,  "mpcc68560",  "MPCC 68560")
+DEFINE_DEVICE_TYPE(MPCC68560A, mpcc68560a_device, "mpcc68560a", "MPCC 68560A")
+DEFINE_DEVICE_TYPE(MPCC68561,  mpcc68561_device,  "mpcc68561",  "MPCC 68561")
+DEFINE_DEVICE_TYPE(MPCC68561A, mpcc68561a_device, "mpcc68561a", "MPCC 68561A")
 
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
 
-mpcc_device::mpcc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, uint32_t variant, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+mpcc_device::mpcc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant)
+	: device_t(mconfig, type, tag, owner, clock),
 	  device_serial_interface(mconfig, *this),
 	  m_irq(CLEAR_LINE),
 	  m_variant(variant),
@@ -141,27 +141,27 @@ mpcc_device::mpcc_device(const machine_config &mconfig, device_type type, const 
 }
 
 mpcc_device::mpcc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mpcc_device(mconfig, MPCC, "Rockwell MPCC", tag, owner, clock, TYPE_MPCC, "mpcc", __FILE__)
+	: mpcc_device(mconfig, MPCC, tag, owner, clock, TYPE_MPCC)
 {
 }
 
 mpcc68560_device::mpcc68560_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mpcc_device(mconfig, MPCC68560, "MPCC 68560", tag, owner, clock, TYPE_MPCC68560, "mpcc68560", __FILE__)
+	: mpcc_device(mconfig, MPCC68560, tag, owner, clock, TYPE_MPCC68560)
 {
 }
 
-mpcc68560A_device::mpcc68560A_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mpcc_device(mconfig, MPCC68560A, "MPCC 68560A", tag, owner, clock, TYPE_MPCC68560A, "mpcc68560a", __FILE__)
+mpcc68560a_device::mpcc68560a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: mpcc_device(mconfig, MPCC68560A, tag, owner, clock, TYPE_MPCC68560A)
 {
 }
 
 mpcc68561_device::mpcc68561_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mpcc_device(mconfig, MPCC68561, "MPCC 68561", tag, owner, clock, TYPE_MPCC68561, "mpcc68561", __FILE__)
+	: mpcc_device(mconfig, MPCC68561, tag, owner, clock, TYPE_MPCC68561)
 {
 }
 
-mpcc68561A_device::mpcc68561A_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mpcc_device(mconfig, MPCC68561A, "MPCC 68561A", tag, owner, clock, TYPE_MPCC68561A, "mpcc68561a", __FILE__)
+mpcc68561a_device::mpcc68561a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: mpcc_device(mconfig, MPCC68561A, tag, owner, clock, TYPE_MPCC68561A)
 {
 }
 
@@ -471,7 +471,7 @@ void mpcc_device::update_serial()
 	stop_bits_t stop_bits = get_stop_bits();
 	parity_t    parity    = get_parity();
 
-	LOGSETUP(" %s() %s Setting data frame %d+%d%c%s\n", FUNCNAME, m_owner->tag(), 1,
+	LOGSETUP(" %s() %s Setting data frame %d+%d%c%s\n", FUNCNAME, owner()->tag(), 1,
 		 data_bits, parity == PARITY_NONE ? 'N' : parity == PARITY_EVEN ? 'E' : 'O',
 		stop_bits == STOP_BITS_1 ? "1" : (stop_bits == STOP_BITS_2 ? "2" : "1.5"));
 
@@ -554,7 +554,7 @@ void mpcc_device::tra_callback()
 	// Otherwise we don't know why we are called...
 	else
 	{
-		logerror("%s %s Failed to transmit\n", FUNCNAME, m_owner->tag());
+		logerror("%s %s Failed to transmit\n", FUNCNAME, owner()->tag());
 	}
 }
 
@@ -834,7 +834,7 @@ READ8_MEMBER( mpcc_device::read )
 	case 0x1d: data = do_brdr2(); break;
 	case 0x1e: data = do_ccr(); break;
 	case 0x1f: data = do_ecr(); break;
-	default: logerror("%s:%s invalid register accessed: %02x\n", m_owner->tag(), tag(), offset);
+	default: logerror("%s:%s invalid register accessed: %02x\n", owner()->tag(), tag(), offset);
 	}
 	LOGR(" * %s Reg %02x -> %02x  \n", tag(), offset, data);
 	return data;
@@ -870,7 +870,7 @@ WRITE8_MEMBER( mpcc_device::write )
 	case 0x1d: do_brdr2(data); break;
 	case 0x1e: do_ccr(data); break;
 	case 0x1f: do_ecr(data); break;
-	default: logerror("%s:%s invalid register accessed: %02x\n", m_owner->tag(), tag(), offset);
+	default: logerror("%s:%s invalid register accessed: %02x\n", owner()->tag(), tag(), offset);
 	}
 }
 

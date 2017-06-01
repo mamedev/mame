@@ -26,14 +26,14 @@
 
 
 /* step size index shift table */
-static const int index_shift[8] = { -1, -1, -1, -1, 2, 4, 6, 8 };
+static constexpr int index_shift[8] = { -1, -1, -1, -1, 2, 4, 6, 8 };
 
 /* lookup table for the precomputed difference */
 static int diff_lookup[49*16];
 
 
 // device type definition
-const device_type ES8712 = device_creator<es8712_device>;
+DEFINE_DEVICE_TYPE(ES8712, es8712_device, "es8712", "Excellent Systems ES8712 ADPCM")
 
 
 //**************************************************************************
@@ -45,7 +45,7 @@ const device_type ES8712 = device_creator<es8712_device>;
 //-------------------------------------------------
 
 es8712_device::es8712_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ES8712, "ES8712", tag, owner, clock, "es8712", __FILE__),
+	: device_t(mconfig, ES8712, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		m_rom(*this, DEVICE_SELF),
 		m_reset_handler(*this),

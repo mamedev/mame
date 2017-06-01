@@ -175,7 +175,7 @@ void srmp6_state::video_start()
 	m_sprram_old = make_unique_clear<uint16_t[]>(0x80000/2);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(0, std::make_unique<gfx_element>(*m_palette, tiles8x8_layout, (uint8_t*)m_tileram.get(), 0, m_palette->entries() / 256, 0));
+	m_gfxdecode->set_gfx(0, std::make_unique<gfx_element>(m_palette, tiles8x8_layout, (uint8_t*)m_tileram.get(), 0, m_palette->entries() / 256, 0));
 	m_gfxdecode->gfx(0)->set_granularity(256);
 
 	m_brightness = 0x60;
@@ -676,7 +676,7 @@ INPUT_PORTS_END
     Machine driver
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( srmp6, srmp6_state )
+static MACHINE_CONFIG_START( srmp6 )
 
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)
 	MCFG_CPU_PROGRAM_MAP(srmp6_map)
@@ -733,4 +733,4 @@ ROM_END
     Game driver(s)
 ***************************************************************************/
 
-GAME( 1995, srmp6, 0, srmp6, srmp6, driver_device, 0, ROT0, "Seta", "Super Real Mahjong P6 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)
+GAME( 1995, srmp6, 0, srmp6, srmp6, srmp6_state, 0, ROT0, "Seta", "Super Real Mahjong P6 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)

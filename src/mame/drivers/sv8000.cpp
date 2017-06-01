@@ -368,7 +368,7 @@ READ8_MEMBER( sv8000_state::mc6847_videoram_r )
 	return data;
 }
 
-static MACHINE_CONFIG_START( sv8000, sv8000_state )
+static MACHINE_CONFIG_START( sv8000 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_10_738635MHz/3)  /* Not verified */
 	MCFG_CPU_PROGRAM_MAP(sv8000_mem)
@@ -415,5 +415,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT   INIT                  COMPANY   FULLNAME                            FLAGS */
-CONS( 1979, sv8000, 0,      0,       sv8000,  sv8000, driver_device,   0,   "Bandai", "Super Vision 8000 (TV Jack 8000)", 0 )
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT   STATE          INIT  COMPANY   FULLNAME                            FLAGS */
+CONS( 1979, sv8000, 0,      0,       sv8000,  sv8000, sv8000_state,  0,    "Bandai", "Super Vision 8000 (TV Jack 8000)", 0 )

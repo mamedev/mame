@@ -13,7 +13,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SATURN_ANALOG = device_creator<saturn_analog_device>;
+DEFINE_DEVICE_TYPE(SATURN_ANALOG, saturn_analog_device, "saturn_analog", "Sega Saturn Analog Controller")
 
 
 static INPUT_PORTS_START( saturn_analog )
@@ -64,12 +64,12 @@ ioport_constructor saturn_analog_device::device_input_ports() const
 //-------------------------------------------------
 
 saturn_analog_device::saturn_analog_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-					device_t(mconfig, SATURN_ANALOG, "Sega Saturn Analog Controller", tag, owner, clock, "saturn_analog", __FILE__),
-					device_saturn_control_port_interface(mconfig, *this),
-					m_joy(*this, "JOY"),
-					m_anx(*this, "ANALOG_X"),
-					m_any(*this, "ANALOG_Y"),
-					m_anz(*this, "ANALOG_Z")
+	device_t(mconfig, SATURN_ANALOG, tag, owner, clock),
+	device_saturn_control_port_interface(mconfig, *this),
+	m_joy(*this, "JOY"),
+	m_anx(*this, "ANALOG_X"),
+	m_any(*this, "ANALOG_Y"),
+	m_anz(*this, "ANALOG_Z")
 {
 	m_ctrl_id = 0x15;
 }

@@ -17,7 +17,7 @@
 
 
 igs025_device::igs025_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, IGS025, "IGS025", tag, owner, clock, "igs_025_022", __FILE__)
+	: device_t(mconfig, IGS025, tag, owner, clock)
 {
 	m_execute_external =  igs025_execute_external(FUNC(igs025_device::no_callback_setup), this);
 }
@@ -352,8 +352,4 @@ void igs025_device::killbld_protection_calculate_hilo()
 }
 
 
-
-
-
-
-const device_type IGS025 = device_creator<igs025_device>;
+DEFINE_DEVICE_TYPE(IGS025, igs025_device, "igs025", "IGS025")

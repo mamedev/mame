@@ -874,7 +874,7 @@ static SLOT_INTERFACE_START( dw_floppies )
 	SLOT_INTERFACE( "8sssd", IBM_6360 )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( ibm6580, ibm6580_state )
+static MACHINE_CONFIG_START( ibm6580 )
 	MCFG_CPU_ADD("maincpu", I8086, XTAL_14_7456MHz/3)
 	MCFG_CPU_PROGRAM_MAP(ibm6580_mem)
 	MCFG_CPU_IO_MAP(ibm6580_io)
@@ -971,5 +971,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME     PARENT  COMPAT   MACHINE   INPUT    CLASS          INIT  COMPANY            FULLNAME       FLAGS */
-COMP( 1980, ibm6580, 0,      0,       ibm6580,  ibm6580, driver_device,  0,  "IBM", "IBM 6580 Displaywriter", MACHINE_IS_SKELETON)
+/*    YEAR  NAME     PARENT  COMPAT   MACHINE   INPUT    CLASS           INIT  COMPANY  FULLNAME       FLAGS */
+COMP( 1980, ibm6580, 0,      0,       ibm6580,  ibm6580, ibm6580_state,  0,    "IBM",   "IBM 6580 Displaywriter", MACHINE_IS_SKELETON)

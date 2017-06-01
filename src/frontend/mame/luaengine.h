@@ -17,6 +17,10 @@
 #ifndef __LUA_ENGINE_H__
 #define __LUA_ENGINE_H__
 
+#if defined(__GNUC__) && (__GNUC__ > 6)
+#pragma GCC diagnostic ignored "-Wnoexcept-type"
+#endif
+
 #include <map>
 #include <condition_variable>
 #define SOL_SAFE_USERTYPE

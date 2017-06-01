@@ -94,10 +94,10 @@ There are more!
 #include "emu.h"
 #include "kaneko_tmap.h"
 
-const device_type KANEKO_TMAP = device_creator<kaneko_view2_tilemap_device>;
+DEFINE_DEVICE_TYPE(KANEKO_TMAP, kaneko_view2_tilemap_device, "kaneko_view2", "Kaneko VIEW2 Tilemaps")
 
 kaneko_view2_tilemap_device::kaneko_view2_tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, KANEKO_TMAP, "Kaneko VIEW2 Tilemaps", tag, owner, clock, "kaneko_view2_tilemap", __FILE__)
+	: device_t(mconfig, KANEKO_TMAP, tag, owner, clock)
 	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
 {
 	m_invert_flip = 0;

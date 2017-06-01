@@ -5,13 +5,14 @@
 #include "prot_sma.h"
 
 
-const device_type SMA_PROT = device_creator<sma_prot_device>;
+DEFINE_DEVICE_TYPE(NG_SMA_PROT, sma_prot_device, "ng_sma_prot", "Neo Geo SMA Protection")
 
 
 sma_prot_device::sma_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, SMA_PROT, "Neo Geo SMA Protection", tag, owner, clock, "sma_prot", __FILE__),
+	device_t(mconfig, NG_SMA_PROT, tag, owner, clock),
 	m_sma_rng(0)
-{}
+{
+}
 
 
 void sma_prot_device::device_start()

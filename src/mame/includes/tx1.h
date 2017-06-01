@@ -5,6 +5,10 @@
     TX-1/Buggy Boy hardware
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_TX1_H
+#define MAME_INCLUDES_TX1_H
+
+#pragma once
 
 #include "screen.h"
 
@@ -258,7 +262,6 @@ class tx1_sound_device : public device_t,
 {
 public:
 	tx1_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	tx1_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	~tx1_sound_device() {}
 
 	DECLARE_READ8_MEMBER( pit8253_r );
@@ -267,6 +270,8 @@ public:
 	DECLARE_WRITE8_MEMBER( ay8910_b_w );
 
 protected:
+	tx1_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -308,7 +313,7 @@ protected:
 	uint16_t m_eng_voltages[16];
 };
 
-extern const device_type TX1;
+DECLARE_DEVICE_TYPE(TX1, tx1_sound_device)
 
 class buggyboy_sound_device : public tx1_sound_device
 {
@@ -331,4 +336,6 @@ private:
 	// internal state
 };
 
-extern const device_type BUGGYBOY;
+DECLARE_DEVICE_TYPE(BUGGYBOY, buggyboy_sound_device)
+
+#endif // MAME_INCLUDES_TX1_H

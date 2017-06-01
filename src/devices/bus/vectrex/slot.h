@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli
-#ifndef __VECTREX_SLOT_H
-#define __VECTREX_SLOT_H
+#ifndef MAME_BUS_VECTREX_SLOT_H
+#define MAME_BUS_VECTREX_SLOT_H
+
+#pragma once
 
 #include "softlist_dev.h"
 
@@ -34,19 +36,20 @@ class device_vectrex_cart_interface : public device_slot_card_interface
 {
 public:
 	// construction/destruction
-	device_vectrex_cart_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_vectrex_cart_interface();
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_rom) { return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER(write_ram) {}
-	virtual DECLARE_WRITE8_MEMBER(write_bank) {}
+	virtual DECLARE_WRITE8_MEMBER(write_ram) { }
+	virtual DECLARE_WRITE8_MEMBER(write_bank) { }
 
 	void rom_alloc(uint32_t size, const char *tag);
 	uint8_t* get_rom_base() { return m_rom; }
 	uint32_t get_rom_size() { return m_rom_size; }
 
 protected:
+	device_vectrex_cart_interface(const machine_config &mconfig, device_t &device);
+
 	// internal state
 	uint8_t *m_rom;
 	uint32_t m_rom_size;
@@ -64,12 +67,9 @@ public:
 	vectrex_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~vectrex_cart_slot_device();
 
-	// device-level overrides
-	virtual void device_start() override;
-
 	// image-level overrides
 	virtual image_init_result call_load() override;
-	virtual void call_unload() override {}
+	virtual void call_unload() override { }
 	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
 	int get_type() { return m_type; }
@@ -93,6 +93,8 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(write_bank);
 
 protected:
+	// device-level overrides
+	virtual void device_start() override;
 
 	int m_type, m_vec3d;
 	device_vectrex_cart_interface*       m_cart;
@@ -101,7 +103,7 @@ protected:
 
 
 // device type definition
-extern const device_type VECTREX_CART_SLOT;
+DECLARE_DEVICE_TYPE(VECTREX_CART_SLOT, vectrex_cart_slot_device)
 
 
 /***************************************************************************
@@ -113,4 +115,5 @@ extern const device_type VECTREX_CART_SLOT;
 #define MCFG_VECTREX_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
 	MCFG_DEVICE_ADD(_tag, VECTREX_CART_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
-#endif
+
+#endif // MAME_BUS_VECTREX_SLOT_H

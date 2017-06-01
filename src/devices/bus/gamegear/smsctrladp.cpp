@@ -16,7 +16,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SMS_CTRL_ADAPTOR = device_creator<sms_ctrl_adaptor_device>;
+DEFINE_DEVICE_TYPE(SMS_CTRL_ADAPTOR, sms_ctrl_adaptor_device, "sms_ctrl_adaptor", "SMS Controller Adaptor")
 
 
 //**************************************************************************
@@ -28,7 +28,7 @@ const device_type SMS_CTRL_ADAPTOR = device_creator<sms_ctrl_adaptor_device>;
 //-------------------------------------------------
 
 sms_ctrl_adaptor_device::sms_ctrl_adaptor_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, SMS_CTRL_ADAPTOR, "SMS Controller Adaptor", tag, owner, clock, "sms_ctrl_adaptor", __FILE__),
+	device_t(mconfig, SMS_CTRL_ADAPTOR, tag, owner, clock),
 	device_gg_ext_port_interface(mconfig, *this),
 	m_subctrl_port(*this, "ctrl")
 {
@@ -41,7 +41,6 @@ sms_ctrl_adaptor_device::sms_ctrl_adaptor_device(const machine_config &mconfig, 
 
 void sms_ctrl_adaptor_device::device_start()
 {
-	m_subctrl_port->device_start();
 }
 
 
@@ -82,7 +81,7 @@ READ32_MEMBER( sms_ctrl_adaptor_device::pixel_r )
 }
 
 
-static MACHINE_CONFIG_FRAGMENT( sms_adp_slot )
+static MACHINE_CONFIG_START( sms_adp_slot )
 	MCFG_SMS_CONTROL_PORT_ADD("ctrl", sms_control_port_devices, "joypad")
 	MCFG_SMS_CONTROL_PORT_TH_INPUT_HANDLER(WRITELINE(sms_ctrl_adaptor_device, th_pin_w))
 	MCFG_SMS_CONTROL_PORT_PIXEL_HANDLER(READ32(sms_ctrl_adaptor_device, pixel_r))

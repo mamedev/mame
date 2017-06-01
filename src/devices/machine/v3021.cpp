@@ -22,7 +22,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type v3021 = device_creator<v3021_device>;
+DEFINE_DEVICE_TYPE(V3021, v3021_device, "v3021", "V3021 RTC")
 
 
 //**************************************************************************
@@ -34,13 +34,13 @@ const device_type v3021 = device_creator<v3021_device>;
 //-------------------------------------------------
 
 v3021_device::v3021_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, v3021, "V3021 RTC", tag, owner, clock, "v3021", __FILE__), m_cal_mask(0), m_cal_com(0), m_cal_cnt(0), m_cal_val(0)
+	: device_t(mconfig, V3021, tag, owner, clock), m_cal_mask(0), m_cal_com(0), m_cal_cnt(0), m_cal_val(0)
 {
 }
 
 TIMER_CALLBACK_MEMBER(v3021_device::timer_callback)
 {
-	static const uint8_t dpm[12] = { 0x31, 0x28, 0x31, 0x30, 0x31, 0x30, 0x31, 0x31, 0x30, 0x31, 0x30, 0x31 };
+	static constexpr uint8_t dpm[12] = { 0x31, 0x28, 0x31, 0x30, 0x31, 0x30, 0x31, 0x31, 0x30, 0x31, 0x30, 0x31 };
 	int dpm_count;
 
 	m_rtc.sec++;
@@ -85,7 +85,8 @@ void v3021_device::device_validity_check(validity_checker &valid) const
 void v3021_device::device_start()
 {
 	/* let's call the timer callback every second */
-	machine().scheduler().timer_pulse(attotime::from_hz(clock() / XTAL_32_768kHz), timer_expired_delegate(FUNC(v3021_device::timer_callback),this));
+	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(v3021_device::timer_callback), this));
+	m_timer->adjust(attotime::from_hz(clock() / XTAL_32_768kHz), 0, attotime::from_hz(clock() / XTAL_32_768kHz));
 
 	system_time systime;
 	machine().base_datetime(systime);

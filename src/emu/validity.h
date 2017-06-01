@@ -21,10 +21,6 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// forward declarations
-class machine_config;
-
-
 // core validity checker class
 class validity_checker : public osd_output
 {

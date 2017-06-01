@@ -34,7 +34,7 @@ ROM_END
 //**************************************************************************
 
 // device type definition
-const device_type SONY_LDP1450 = device_creator<sony_ldp1450_device>;
+DEFINE_DEVICE_TYPE(SONY_LDP1450, sony_ldp1450_device, "ldp1450", "Sony LDP-1450")
 
 
 //**************************************************************************
@@ -42,11 +42,11 @@ const device_type SONY_LDP1450 = device_creator<sony_ldp1450_device>;
 //**************************************************************************
 
 //-------------------------------------------------
-//  ldp1450_device - constructor
+//  sony_ldp1450_device - constructor
 //-------------------------------------------------
 
 sony_ldp1450_device::sony_ldp1450_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: laserdisc_device(mconfig, SONY_LDP1450, "Sony LDP-1450", tag, owner, clock, "ldp1450", __FILE__)
+	: laserdisc_device(mconfig, SONY_LDP1450, tag, owner, clock)
 {
 }
 

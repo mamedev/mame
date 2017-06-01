@@ -332,7 +332,7 @@ PALETTE_INIT_MEMBER(sm7238_state, sm7238)
 	palette.set_pen_color(2, 0x00, 0xff, 0x00); // highlight
 }
 
-static MACHINE_CONFIG_START( sm7238, sm7238_state )
+static MACHINE_CONFIG_START( sm7238 )
 	MCFG_CPU_ADD("maincpu", I8080, XTAL_16_5888MHz/9)
 	MCFG_CPU_PROGRAM_MAP(sm7238_mem)
 	MCFG_CPU_IO_MAP(sm7238_io)
@@ -422,5 +422,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    INIT                      COMPANY     FULLNAME       FLAGS */
-COMP( 1989, sm7238,   0,      0,       sm7238,    0,       driver_device,     0,     "USSR",     "SM 7238",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_KEYBOARD)
+//    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    STATE             INIT   COMPANY     FULLNAME       FLAGS
+COMP( 1989, sm7238,   0,      0,       sm7238,    0,       sm7238_state,     0,     "USSR",     "SM 7238",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_KEYBOARD)

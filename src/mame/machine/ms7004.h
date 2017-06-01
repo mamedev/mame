@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Sergey Svishchev
-#pragma once
+#ifndef MAME_MACHINE_MS7004_H
+#define MAME_MACHINE_MS7004_H
 
-#ifndef __MS7004_H__
-#define __MS7004_H__
+#pragma once
 
 #include "cpu/mcs48/mcs48.h"
 #include "machine/i8243.h"
@@ -37,19 +37,14 @@ public:
 	// construction/destruction
 	ms7004_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_tx_handler(device_t &device, _Object wr) { return downcast<ms7004_device &>(device).m_tx_handler.set_callback(wr); }
-	template<class _Object> static devcb_base &set_rts_handler(device_t &device, _Object wr) { return downcast<ms7004_device &>(device).m_rts_handler.set_callback(wr); }
-
-	DECLARE_WRITE8_MEMBER( p1_w );
-	DECLARE_WRITE8_MEMBER( p2_w );
-	DECLARE_READ8_MEMBER( t1_r );
-	DECLARE_WRITE8_MEMBER( i8243_port_w );
+	template <class Object> static devcb_base &set_tx_handler(device_t &device, Object &&wr) { return downcast<ms7004_device &>(device).m_tx_handler.set_callback(std::forward<Object>(wr)); }
+	template <class Object> static devcb_base &set_rts_handler(device_t &device, Object &&wr) { return downcast<ms7004_device &>(device).m_rts_handler.set_callback(std::forward<Object>(wr)); }
 
 	DECLARE_WRITE_LINE_MEMBER( write_rxd );
 
 protected:
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;
@@ -68,9 +63,14 @@ private:
 
 	devcb_write_line m_tx_handler;
 	devcb_write_line m_rts_handler;
+
+	DECLARE_WRITE8_MEMBER( p1_w );
+	DECLARE_WRITE8_MEMBER( p2_w );
+	DECLARE_READ_LINE_MEMBER( t1_r );
+	DECLARE_WRITE8_MEMBER( i8243_port_w );
 };
 
 // device type definition
-extern const device_type MS7004;
+DECLARE_DEVICE_TYPE(MS7004, ms7004_device)
 
-#endif
+#endif // MAME_MACHINE_MS7004_H

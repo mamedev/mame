@@ -70,7 +70,7 @@ static ADDRESS_MAP_START( mpu401_io_map, AS_IO, 8, mpu401_device )
 	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READWRITE(port2_r, port2_w)
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_FRAGMENT( mpu401 )
+MACHINE_CONFIG_START( mpu401 )
 	MCFG_CPU_ADD(M6801_TAG, M6801, 4000000) /* 4 MHz as per schematics */
 	MCFG_CPU_PROGRAM_MAP(mpu401_map)
 	MCFG_CPU_IO_MAP(mpu401_io_map)
@@ -91,7 +91,7 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type MPU401 = device_creator<mpu401_device>;
+DEFINE_DEVICE_TYPE(MPU401, mpu401_device, "mpu401", "Roland MPU-401 I/O box")
 
 //-------------------------------------------------
 //  machine_config_additions - device-specific
@@ -121,7 +121,7 @@ const tiny_rom_entry *mpu401_device::device_rom_region() const
 //-------------------------------------------------
 
 mpu401_device::mpu401_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, MPU401, "Roland MPU-401 I/O box", tag, owner, clock, "mpu401", __FILE__),
+	device_t(mconfig, MPU401, tag, owner, clock),
 	m_ourcpu(*this, M6801_TAG),
 	write_irq(*this)
 {

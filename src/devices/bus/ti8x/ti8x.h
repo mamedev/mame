@@ -39,7 +39,7 @@
 
 
 
-extern device_type const TI8X_LINK_PORT;
+DECLARE_DEVICE_TYPE(TI8X_LINK_PORT, ti8x_link_port_device)
 
 
 #define MCFG_TI8X_LINK_PORT_ADD(tag, slot_intf, def_slot) \
@@ -77,12 +77,9 @@ protected:
 	ti8x_link_port_device(
 			machine_config const &mconfig,
 			device_type type,
-			char const *name,
 			char const *tag,
 			device_t *owner,
-			u32 clock,
-			char const *shortname,
-			char const *source);
+			u32 clock);
 
 	virtual void device_start() override;
 	virtual void device_config_complete() override;

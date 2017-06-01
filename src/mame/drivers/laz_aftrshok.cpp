@@ -62,7 +62,7 @@ void aftrshok_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( aftrshok, aftrshok_state )
+static MACHINE_CONFIG_START( aftrshok )
 
 	/* basic machine hardware */
 //  MCFG_CPU_ADD("maincpu", ??, 8000000) // unknown
@@ -73,7 +73,7 @@ static MACHINE_CONFIG_START( aftrshok, aftrshok_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH) // maybe
+	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH) // maybe
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -100,5 +100,5 @@ ROM_START( aftrshoka )
 ROM_END
 
 
-GAME( 19??, aftrshok,  0,           aftrshok, aftrshok, driver_device,  0, ROT0, "Lazer-tron", "After Shock (Lazer-tron, set 1)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 19??, aftrshoka, aftrshok,    aftrshok, aftrshok, driver_device,  0, ROT0, "Lazer-tron", "After Shock (Lazer-tron, set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 19??, aftrshok,  0,           aftrshok, aftrshok, aftrshok_state,  0, ROT0, "Lazer-tron", "After Shock (Lazer-tron, set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 19??, aftrshoka, aftrshok,    aftrshok, aftrshok, aftrshok_state,  0, ROT0, "Lazer-tron", "After Shock (Lazer-tron, set 2)", MACHINE_IS_SKELETON_MECHANICAL )

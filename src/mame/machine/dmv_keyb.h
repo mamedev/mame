@@ -6,10 +6,10 @@
 
 *********************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_DMV_KEYB_H
+#define MAME_MACHINE_DMV_KEYB_H
 
-#ifndef __DMV_KEYBOARD__
-#define __DMV_KEYBOARD__
+#pragma once
 
 
 #include "cpu/mcs48/mcs48.h"
@@ -35,23 +35,18 @@ public:
 	// construction/destruction
 	dmv_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual ioport_constructor device_input_ports() const override;
-
 	DECLARE_WRITE_LINE_MEMBER(sd_poll_w);
 	DECLARE_READ_LINE_MEMBER(sd_poll_r);
 
-	DECLARE_READ8_MEMBER( port1_r );
-	DECLARE_READ8_MEMBER( port2_r );
-	DECLARE_WRITE8_MEMBER( port2_w );
-
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override { m_shortname = "dmv_keyb"; }
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
 
 private:
 	required_device<upi41_cpu_device> m_maincpu;
@@ -60,11 +55,15 @@ private:
 	uint8_t   m_col;
 	int     m_sd_data_state;
 	int     m_sd_poll_state;
+
+	DECLARE_READ8_MEMBER( port1_r );
+	DECLARE_READ8_MEMBER( port2_r );
+	DECLARE_WRITE8_MEMBER( port2_w );
 };
 
 
 // device type definition
-extern const device_type DMV_KEYBOARD;
+DECLARE_DEVICE_TYPE(DMV_KEYBOARD, dmv_keyboard_device)
 
 
-#endif
+#endif // MAME_MACHINE_DMV_KEYB_H

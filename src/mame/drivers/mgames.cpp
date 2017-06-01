@@ -632,7 +632,7 @@ static GFXDECODE_START( mgames )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( mgames, mgames_state )
+static MACHINE_CONFIG_START( mgames )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,MASTER_CLOCK/6)      /* 3 MHz? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
@@ -680,5 +680,5 @@ ROM_END
 *      Game Drivers      *
 *************************/
 
-/*     YEAR  NAME      PARENT  MACHINE   INPUT   STATE          INIT   ROT    COMPANY  FULLNAME      FLAGS...                                 LAYOUT  */
-GAMEL( 1981, mgames,   0,      mgames,   mgames, driver_device, 0,     ROT0, "Merit", "Match Games", MACHINE_WRONG_COLORS | MACHINE_NO_SOUND, layout_mgames )
+/*     YEAR  NAME      PARENT  MACHINE   INPUT   STATE         INIT   ROT    COMPANY  FULLNAME      FLAGS...                                 LAYOUT  */
+GAMEL( 1981, mgames,   0,      mgames,   mgames, mgames_state, 0,     ROT0, "Merit", "Match Games", MACHINE_WRONG_COLORS | MACHINE_NO_SOUND, layout_mgames )

@@ -21,7 +21,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type BML3BUS_MP1805 = device_creator<bml3bus_mp1805_device>;
+DEFINE_DEVICE_TYPE(BML3BUS_MP1805, bml3bus_mp1805_device, "bml3mp1805", "Hitachi MP-1805 Floppy Controller Card")
 
 static const floppy_interface bml3_mp1805_floppy_interface =
 {
@@ -45,7 +45,7 @@ ROM_START( mp1805 )
 	ROM_LOAD( "mp1805.rom", 0xf800, 0x0800, BAD_DUMP CRC(b532d8d9) SHA1(6f1160356d5bf64b5926b1fdb60db414edf65f22))
 ROM_END
 
-MACHINE_CONFIG_FRAGMENT( mp1805 )
+MACHINE_CONFIG_START( mp1805 )
 	MCFG_DEVICE_ADD( "mc6843", MC6843, 0 )
 	MCFG_MC6843_IRQ_CALLBACK(WRITELINE(bml3bus_mp1805_device, bml3_mc6843_intrq_w))
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(bml3_mp1805_floppy_interface)
@@ -138,7 +138,7 @@ WRITE8_MEMBER( bml3bus_mp1805_device::bml3_mp1805_w)
 //**************************************************************************
 
 bml3bus_mp1805_device::bml3bus_mp1805_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, BML3BUS_MP1805, "Hitachi MP-1805 Floppy Controller Card", tag, owner, clock, "bml3mp1805", __FILE__),
+	device_t(mconfig, BML3BUS_MP1805, tag, owner, clock),
 	device_bml3bus_card_interface(mconfig, *this),
 	m_mc6843(*this, "mc6843"), m_rom(nullptr)
 {

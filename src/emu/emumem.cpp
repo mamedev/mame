@@ -2581,7 +2581,7 @@ void address_space::install_ram_generic(offs_t addrstart, offs_t addrend, offs_t
 		// if we still don't have a pointer, and we're past the initialization phase, allocate a new block
 		if (bank.base() == nullptr && manager().m_initialized)
 		{
-			if (machine().phase() >= MACHINE_PHASE_RESET)
+			if (machine().phase() >= machine_phase::RESET)
 				fatalerror("Attempted to call install_ram_generic() after initialization time without a baseptr!\n");
 			auto block = std::make_unique<memory_block>(*this, address_to_byte(addrstart), address_to_byte_end(addrend));
 			bank.set_base(block.get()->data());
@@ -2611,7 +2611,7 @@ void address_space::install_ram_generic(offs_t addrstart, offs_t addrend, offs_t
 		// if we still don't have a pointer, and we're past the initialization phase, allocate a new block
 		if (bank.base() == nullptr && manager().m_initialized)
 		{
-			if (machine().phase() >= MACHINE_PHASE_RESET)
+			if (machine().phase() >= machine_phase::RESET)
 				fatalerror("Attempted to call install_ram_generic() after initialization time without a baseptr!\n");
 			auto block = std::make_unique<memory_block>(*this, address_to_byte(addrstart), address_to_byte_end(addrend));
 			bank.set_base(block.get()->data());
@@ -4337,7 +4337,8 @@ void handler_entry::configure_subunits(u64 handlermask, int handlerbits, int &st
 		if ((scanmask & unitmask) != 0)
 			count++;
 	}
-	assert(count > 0 && count <= maxunits);
+	if (count == 0 || count > maxunits)
+		throw emu_fatalerror("Invalid subunit mask %s for %d-bit space", core_i64_hex_format(handlermask, m_datawidth / 4), m_datawidth);
 
 	// make sure that the multiplier is a power of 2
 	int multiplier = count;

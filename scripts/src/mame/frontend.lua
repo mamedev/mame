@@ -43,10 +43,6 @@ includedirs {
 	MAME_DIR .. "3rdparty/asio/include",
 }
 
-configuration { "vs*" }
-	buildoptions {
-		"/bigobj",
-	}
 configuration { }
 if (_OPTIONS["targetos"] == "windows") then
 	defines {
@@ -163,6 +159,8 @@ files {
 	MAME_DIR .. "src/frontend/mame/ui/sndmenu.cpp",
 	MAME_DIR .. "src/frontend/mame/ui/sndmenu.h",
 	MAME_DIR .. "src/frontend/mame/ui/starimg.ipp",
+	MAME_DIR .. "src/frontend/mame/ui/state.cpp",
+	MAME_DIR .. "src/frontend/mame/ui/state.h",
 	MAME_DIR .. "src/frontend/mame/ui/toolbar.ipp",
 	MAME_DIR .. "src/frontend/mame/ui/utils.cpp",
 	MAME_DIR .. "src/frontend/mame/ui/utils.h",

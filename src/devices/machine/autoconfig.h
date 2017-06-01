@@ -6,10 +6,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_AUTOCONFIG_H
+#define MAME_MACHINE_AUTOCONFIG_H
 
-#ifndef __AUTOCONFIG_H__
-#define __AUTOCONFIG_H__
+#pragma once
 
 
 class amiga_autoconfig
@@ -70,4 +70,4 @@ private:
 	uint16_t m_cfg[0x40];
 };
 
-#endif // __AUTOCONFIG_H__
+#endif // MAME_MACHINE_AUTOCONFIG_H

@@ -205,16 +205,16 @@ void exidy_sound_device::common_sh_start()
 	sh6840_register_state_globals();
 }
 
-const device_type EXIDY = device_creator<exidy_sound_device>;
+DEFINE_DEVICE_TYPE(EXIDY, exidy_sound_device, "exidy_sfx", "Exidy SFX")
 
 exidy_sound_device::exidy_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, EXIDY, "Exidy SFX", tag, owner, clock, "exidy_sfx", __FILE__),
-		device_sound_interface(mconfig, *this)
+	: device_t(mconfig, EXIDY, tag, owner, clock)
+	, device_sound_interface(mconfig, *this)
 {
 }
 
-exidy_sound_device::exidy_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+exidy_sound_device::exidy_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		m_riot_irq_state(0),
 		m_stream(nullptr),
@@ -659,10 +659,10 @@ WRITE8_MEMBER( venture_sound_device::filter_w )
  *************************************/
 
 
-const device_type EXIDY_VENTURE = device_creator<venture_sound_device>;
+DEFINE_DEVICE_TYPE(EXIDY_VENTURE, venture_sound_device, "venture_sound", "Exidy SFX+PSG")
 
 venture_sound_device::venture_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: exidy_sound_device(mconfig, EXIDY_VENTURE, "Exidy SFX+PSG", tag, owner, clock, "venture_sound", __FILE__)
+	: exidy_sound_device(mconfig, EXIDY_VENTURE, tag, owner, clock)
 {
 }
 
@@ -737,7 +737,7 @@ static ADDRESS_MAP_START( venture_audio_map, AS_PROGRAM, 8, venture_sound_device
 ADDRESS_MAP_END
 
 
-MACHINE_CONFIG_FRAGMENT( venture_audio )
+MACHINE_CONFIG_START( venture_audio )
 
 	MCFG_CPU_ADD("audiocpu", M6502, 3579545/4)
 	MCFG_CPU_PROGRAM_MAP(venture_audio_map)
@@ -816,7 +816,7 @@ static ADDRESS_MAP_START( cvsd_iomap, AS_IO, 8, venture_sound_device )
 ADDRESS_MAP_END
 
 
-MACHINE_CONFIG_FRAGMENT( mtrap_cvsd_audio )
+MACHINE_CONFIG_START( mtrap_cvsd_audio )
 
 	MCFG_CPU_ADD("cvsdcpu", Z80, CVSD_Z80_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(cvsd_map)
@@ -904,11 +904,11 @@ WRITE_LINE_MEMBER( victory_sound_device::main_ack_w )
 }
 
 
-const device_type EXIDY_VICTORY = device_creator<victory_sound_device>;
+DEFINE_DEVICE_TYPE(EXIDY_VICTORY, victory_sound_device, "victory_sound", "Exidy SFX+PSG+Speech")
 
 victory_sound_device::victory_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: exidy_sound_device(mconfig, EXIDY_VICTORY, "Exidy SFX+PSG+Speech", tag, owner, clock, "victory_sound", __FILE__),
-	m_victory_sound_response_ack_clk(0)
+	: exidy_sound_device(mconfig, EXIDY_VICTORY, tag, owner, clock)
+	, m_victory_sound_response_ack_clk(0)
 {
 }
 
@@ -991,7 +991,7 @@ static ADDRESS_MAP_START( victory_audio_map, AS_PROGRAM, 8, venture_sound_device
 ADDRESS_MAP_END
 
 
-MACHINE_CONFIG_FRAGMENT( victory_audio )
+MACHINE_CONFIG_START( victory_audio )
 
 	MCFG_CPU_ADD("audiocpu", M6502, VICTORY_AUDIO_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(victory_audio_map)

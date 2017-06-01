@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli
-#ifndef __A800_SLOT_H
-#define __A800_SLOT_H
+#ifndef MAME_BUS_A800_A800_SLOT_H
+#define MAME_BUS_A800_A800_SLOT_H
+
+#pragma once
 
 #include "softlist_dev.h"
 
@@ -49,7 +51,6 @@ class device_a800_cart_interface : public device_slot_card_interface
 {
 public:
 	// construction/destruction
-	device_a800_cart_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_a800_cart_interface();
 
 	// memory accessor
@@ -69,6 +70,8 @@ public:
 	uint32_t get_nvram_size() { return m_nvram.size(); }
 
 protected:
+	device_a800_cart_interface(const machine_config &mconfig, device_t &device);
+
 	// internal state
 	uint8_t *m_rom;
 	uint32_t m_rom_size;
@@ -87,12 +90,8 @@ class a800_cart_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	a800_cart_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	a800_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~a800_cart_slot_device();
-
-	// device-level overrides
-	virtual void device_start() override;
 
 	// image-level overrides
 	virtual image_init_result call_load() override;
@@ -120,6 +119,12 @@ public:
 	virtual DECLARE_READ8_MEMBER(read_d5xx);
 	virtual DECLARE_WRITE8_MEMBER(write_80xx);
 	virtual DECLARE_WRITE8_MEMBER(write_d5xx);
+
+protected:
+	a800_cart_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	// device-level overrides
+	virtual void device_start() override;
 
 private:
 	device_a800_cart_interface*       m_cart;
@@ -161,9 +166,9 @@ public:
 };
 
 // device type definition
-extern const device_type A800_CART_SLOT;
-extern const device_type A5200_CART_SLOT;
-extern const device_type XEGS_CART_SLOT;
+DECLARE_DEVICE_TYPE(A800_CART_SLOT,  a800_cart_slot_device)
+DECLARE_DEVICE_TYPE(A5200_CART_SLOT, a5200_cart_slot_device)
+DECLARE_DEVICE_TYPE(XEGS_CART_SLOT,  xegs_cart_slot_device)
 
 
 /***************************************************************************
@@ -185,4 +190,4 @@ extern const device_type XEGS_CART_SLOT;
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
 
-#endif
+#endif // MAME_BUS_A800_A800_SLOT_H

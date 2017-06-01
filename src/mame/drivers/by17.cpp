@@ -973,7 +973,7 @@ MACHINE_RESET_MEMBER( by17_state, by17 )
 
 
 
-static MACHINE_CONFIG_START( by17, by17_state )
+static MACHINE_CONFIG_START( by17 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, 530000)  // No xtal, just 2 chips forming a multivibrator oscillator around 530KHz
 	MCFG_CPU_PROGRAM_MAP(by17_map)
@@ -1119,12 +1119,12 @@ ROM_END
 
 
 GAME(  1976, bowarrow, 0,        by17, by17,     by17_state, by17,     ROT0, "Bally", "Bow & Arrow (Prototype)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(  1977, freedom,  0,        by17, by17,     by17_state, by17,     ROT0, "Bally", "Freedom", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(  1977, nightrdr, 0,        by17, by17,     by17_state, by17,     ROT0, "Bally", "Night Rider (rev. 21)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(  1977, nightr20, nightrdr, by17, by17,     by17_state, by17,     ROT0, "Bally", "Night Rider (rev. 20)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(  1978, blackjck, 0,        by17, by17,     by17_state, by17,     ROT0, "Bally", "Black Jack (Pinball)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(  1977, evelknie, 0,        by17, by17,     by17_state, by17,     ROT0, "Bally", "Evel Knievel", MACHINE_IS_SKELETON_MECHANICAL)
-GAMEL( 1978, matahari, 0,        by17, matahari, by17_state, matahari, ROT0, "Bally", "Mata Hari", MACHINE_MECHANICAL | MACHINE_NOT_WORKING, layout_by17_matahari)
-GAME(  1977, eightbll, 0,        by17, by17,     by17_state, by17,     ROT0, "Bally", "Eight Ball", MACHINE_IS_SKELETON_MECHANICAL)
-GAMEL( 1978, pwerplay, 0,        by17, pwerplay, by17_state, pwerplay, ROT0, "Bally", "Power Play (Pinball)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING, layout_by17_pwerplay)
-GAME(  1978, stk_sprs, 0,        by17, by17,     by17_state, by17,     ROT0, "Bally", "Strikes and Spares", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(  1977, freedom,  0,        by17, by17,     by17_state, by17,     ROT0, "Bally", "Freedom",                 MACHINE_IS_SKELETON_MECHANICAL)
+GAME(  1977, nightrdr, 0,        by17, by17,     by17_state, by17,     ROT0, "Bally", "Night Rider (rev. 21)",   MACHINE_IS_SKELETON_MECHANICAL)
+GAME(  1977, nightr20, nightrdr, by17, by17,     by17_state, by17,     ROT0, "Bally", "Night Rider (rev. 20)",   MACHINE_IS_SKELETON_MECHANICAL)
+GAME(  1978, blackjck, 0,        by17, by17,     by17_state, by17,     ROT0, "Bally", "Black Jack (Pinball)",    MACHINE_IS_SKELETON_MECHANICAL)
+GAME(  1977, evelknie, 0,        by17, by17,     by17_state, by17,     ROT0, "Bally", "Evel Knievel",            MACHINE_IS_SKELETON_MECHANICAL)
+GAMEL( 1978, matahari, 0,        by17, matahari, by17_state, matahari, ROT0, "Bally", "Mata Hari",               MACHINE_MECHANICAL | MACHINE_NOT_WORKING, layout_by17_matahari)
+GAME(  1977, eightbll, 0,        by17, by17,     by17_state, by17,     ROT0, "Bally", "Eight Ball",              MACHINE_IS_SKELETON_MECHANICAL)
+GAMEL( 1978, pwerplay, 0,        by17, pwerplay, by17_state, pwerplay, ROT0, "Bally", "Power Play (Pinball)",    MACHINE_MECHANICAL | MACHINE_NOT_WORKING, layout_by17_pwerplay)
+GAME(  1978, stk_sprs, 0,        by17, by17,     by17_state, by17,     ROT0, "Bally", "Strikes and Spares",      MACHINE_IS_SKELETON_MECHANICAL)

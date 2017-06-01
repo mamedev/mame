@@ -21,8 +21,10 @@
  *  running the target side
  */
 
-#ifndef CPC_PDS_H_
-#define CPC_PDS_H_
+#ifndef MAME_BUS_CPC_CPC_PDS_H
+#define MAME_BUS_CPC_CPC_PDS_H
+
+#pragma once
 
 #include "cpcexp.h"
 #include "machine/z80pio.h"
@@ -52,6 +54,6 @@ private:
 };
 
 // device type definition
-extern const device_type CPC_PDS;
+DECLARE_DEVICE_TYPE(CPC_PDS, cpc_pds_device)
 
-#endif /* CPC_PDS_H_ */
+#endif // MAME_BUS_CPC_CPC_PDS_H

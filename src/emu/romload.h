@@ -24,12 +24,6 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-class machine_config;
-class emu_options;
-class chd_file;
-class software_list_device;
-
-
 
 /***************************************************************************
     MACROS

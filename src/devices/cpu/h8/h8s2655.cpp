@@ -3,11 +3,11 @@
 #include "emu.h"
 #include "h8s2655.h"
 
-const device_type H8S2655 = device_creator<h8s2655_device>;
-const device_type H8S2653 = device_creator<h8s2653_device>;
+DEFINE_DEVICE_TYPE(H8S2655, h8s2655_device, "h8s2655", "H8S/2655")
+DEFINE_DEVICE_TYPE(H8S2653, h8s2653_device, "h8s2653", "H8S/2653")
 
-h8s2655_device::h8s2655_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	h8s2600_device(mconfig, type, name, tag, owner, clock, shortname, source, address_map_delegate(FUNC(h8s2655_device::map), this)),
+h8s2655_device::h8s2655_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	h8s2600_device(mconfig, type, tag, owner, clock, address_map_delegate(FUNC(h8s2655_device::map), this)),
 	intc(*this, "intc"),
 	adc(*this, "adc"),
 	port1(*this, "port1"),
@@ -35,133 +35,22 @@ h8s2655_device::h8s2655_device(const machine_config &mconfig, device_type type, 
 	sci0(*this, "sci0"),
 	sci1(*this, "sci1"),
 	sci2(*this, "sci2"),
-	watchdog(*this, "watchdog")
+	watchdog(*this, "watchdog"),
+	syscr(0)
 {
 	has_trace = true;
-	syscr = 0;
 }
 
 h8s2655_device::h8s2655_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	h8s2600_device(mconfig, H8S2655, "H8S/2655", tag, owner, clock, "h8s2655", __FILE__, address_map_delegate(FUNC(h8s2655_device::map), this)),
-	intc(*this, "intc"),
-	adc(*this, "adc"),
-	port1(*this, "port1"),
-	port2(*this, "port2"),
-	port3(*this, "port3"),
-	port4(*this, "port4"),
-	port5(*this, "port5"),
-	port6(*this, "port6"),
-	porta(*this, "porta"),
-	portb(*this, "portb"),
-	portc(*this, "portc"),
-	portd(*this, "portd"),
-	porte(*this, "porte"),
-	portf(*this, "portf"),
-	portg(*this, "portg"),
-	timer8_0(*this, "timer8_0"),
-	timer8_1(*this, "timer8_1"),
-	timer16(*this, "timer16"),
-	timer16_0(*this, "timer16:0"),
-	timer16_1(*this, "timer16:1"),
-	timer16_2(*this, "timer16:2"),
-	timer16_3(*this, "timer16:3"),
-	timer16_4(*this, "timer16:4"),
-	timer16_5(*this, "timer16:5"),
-	sci0(*this, "sci0"),
-	sci1(*this, "sci1"),
-	sci2(*this, "sci2"),
-	watchdog(*this, "watchdog")
+	h8s2655_device(mconfig, H8S2655, tag, owner, clock)
 
 {
-	has_trace = true;
-	syscr = 0;
 }
 
 h8s2653_device::h8s2653_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	h8s2655_device(mconfig, H8S2653, "H8S/2653", tag, owner, clock, "h8s2653", __FILE__)
+	h8s2655_device(mconfig, H8S2653, tag, owner, clock)
 {
 }
-
-static MACHINE_CONFIG_FRAGMENT(h8s2655)
-	MCFG_H8S_INTC_ADD("intc")
-	MCFG_H8_ADC_2655_ADD("adc", "intc", 28)
-	MCFG_H8_PORT_ADD("port1", h8_device::PORT_1, 0x00, 0x00)
-	MCFG_H8_PORT_ADD("port2", h8_device::PORT_2, 0x00, 0x00)
-	MCFG_H8_PORT_ADD("port3", h8_device::PORT_3, 0xc0, 0xc0)
-	MCFG_H8_PORT_ADD("port4", h8_device::PORT_4, 0x00, 0x00)
-	MCFG_H8_PORT_ADD("port5", h8_device::PORT_5, 0xf0, 0xf0)
-	MCFG_H8_PORT_ADD("port6", h8_device::PORT_6, 0x00, 0x00)
-	MCFG_H8_PORT_ADD("porta", h8_device::PORT_A, 0x00, 0x00)
-	MCFG_H8_PORT_ADD("portb", h8_device::PORT_B, 0x00, 0x00)
-	MCFG_H8_PORT_ADD("portc", h8_device::PORT_C, 0x00, 0x00)
-	MCFG_H8_PORT_ADD("portd", h8_device::PORT_D, 0x00, 0x00)
-	MCFG_H8_PORT_ADD("porte", h8_device::PORT_E, 0x00, 0x00)
-	MCFG_H8_PORT_ADD("portf", h8_device::PORT_F, 0x00, 0x00)
-	MCFG_H8_PORT_ADD("portg", h8_device::PORT_G, 0xe0, 0xe0)
-	MCFG_H8H_TIMER8_CHANNEL_ADD("timer8_0", "intc", 64, 65, 66, "timer8_1", h8_timer8_channel_device::CHAIN_OVERFLOW, true,  false)
-	MCFG_H8H_TIMER8_CHANNEL_ADD("timer8_1", "intc", 68, 69, 70, "timer8_0", h8_timer8_channel_device::CHAIN_A,        false, false)
-	MCFG_H8_TIMER16_ADD("timer16", 6, 0x00)
-	MCFG_H8S_TIMER16_CHANNEL_ADD("timer16:0", 4, 0x60, "intc", 32,
-									h8_timer16_channel_device::DIV_1,
-									h8_timer16_channel_device::DIV_4,
-									h8_timer16_channel_device::DIV_16,
-									h8_timer16_channel_device::DIV_64,
-									h8_timer16_channel_device::INPUT_A,
-									h8_timer16_channel_device::INPUT_B,
-									h8_timer16_channel_device::INPUT_C,
-									h8_timer16_channel_device::INPUT_D)
-	MCFG_H8S_TIMER16_CHANNEL_ADD("timer16:1", 2, 0x4c, "intc", 40,
-									h8_timer16_channel_device::DIV_1,
-									h8_timer16_channel_device::DIV_4,
-									h8_timer16_channel_device::DIV_16,
-									h8_timer16_channel_device::DIV_64,
-									h8_timer16_channel_device::INPUT_A,
-									h8_timer16_channel_device::INPUT_B,
-									h8_timer16_channel_device::DIV_256,
-									h8_timer16_channel_device::CHAIN)
-	MCFG_H8S_TIMER16_CHANNEL_SET_CHAIN("timer16:2")
-	MCFG_H8S_TIMER16_CHANNEL_ADD("timer16:2", 2, 0x4c, "intc", 44,
-									h8_timer16_channel_device::DIV_1,
-									h8_timer16_channel_device::DIV_4,
-									h8_timer16_channel_device::DIV_16,
-									h8_timer16_channel_device::DIV_64,
-									h8_timer16_channel_device::INPUT_A,
-									h8_timer16_channel_device::INPUT_B,
-									h8_timer16_channel_device::INPUT_C,
-									h8_timer16_channel_device::DIV_1024)
-	MCFG_H8S_TIMER16_CHANNEL_ADD("timer16:3", 4, 0x60, "intc", 48,
-									h8_timer16_channel_device::DIV_1,
-									h8_timer16_channel_device::DIV_4,
-									h8_timer16_channel_device::DIV_16,
-									h8_timer16_channel_device::DIV_64,
-									h8_timer16_channel_device::INPUT_A,
-									h8_timer16_channel_device::DIV_1024,
-									h8_timer16_channel_device::DIV_256,
-									h8_timer16_channel_device::DIV_4096)
-	MCFG_H8S_TIMER16_CHANNEL_ADD("timer16:4", 2, 0x4c, "intc", 56,
-									h8_timer16_channel_device::DIV_1,
-									h8_timer16_channel_device::DIV_4,
-									h8_timer16_channel_device::DIV_16,
-									h8_timer16_channel_device::DIV_64,
-									h8_timer16_channel_device::INPUT_A,
-									h8_timer16_channel_device::INPUT_C,
-									h8_timer16_channel_device::DIV_1024,
-									h8_timer16_channel_device::CHAIN)
-	MCFG_H8S_TIMER16_CHANNEL_SET_CHAIN("timer16:5")
-	MCFG_H8S_TIMER16_CHANNEL_ADD("timer16:5", 2, 0x4c, "intc", 60,
-									h8_timer16_channel_device::DIV_1,
-									h8_timer16_channel_device::DIV_4,
-									h8_timer16_channel_device::DIV_16,
-									h8_timer16_channel_device::DIV_64,
-									h8_timer16_channel_device::INPUT_A,
-									h8_timer16_channel_device::INPUT_C,
-									h8_timer16_channel_device::DIV_256,
-									h8_timer16_channel_device::INPUT_D)
-	MCFG_H8_SCI_ADD("sci0", "intc", 80, 81, 82, 83)
-	MCFG_H8_SCI_ADD("sci1", "intc", 84, 85, 86, 87)
-	MCFG_H8_SCI_ADD("sci2", "intc", 88, 89, 90, 91)
-	MCFG_H8_WATCHDOG_ADD("watchdog", "intc", 25, h8_watchdog_device::S)
-MACHINE_CONFIG_END
 
 DEVICE_ADDRESS_MAP_START(map, 16, h8s2655_device)
 	AM_RANGE(0xffec00, 0xfffbff) AM_RAM
@@ -298,10 +187,86 @@ DEVICE_ADDRESS_MAP_START(map, 16, h8s2655_device)
 	AM_RANGE(0xfffff8, 0xfffffb) AM_DEVREADWRITE( "timer16:2", h8_timer16_channel_device, tgr_r,   tgr_w          )
 ADDRESS_MAP_END
 
-machine_config_constructor h8s2655_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME(h8s2655);
-}
+MACHINE_CONFIG_MEMBER(h8s2655_device::device_add_mconfig)
+	MCFG_H8S_INTC_ADD("intc")
+	MCFG_H8_ADC_2655_ADD("adc", "intc", 28)
+	MCFG_H8_PORT_ADD("port1", h8_device::PORT_1, 0x00, 0x00)
+	MCFG_H8_PORT_ADD("port2", h8_device::PORT_2, 0x00, 0x00)
+	MCFG_H8_PORT_ADD("port3", h8_device::PORT_3, 0xc0, 0xc0)
+	MCFG_H8_PORT_ADD("port4", h8_device::PORT_4, 0x00, 0x00)
+	MCFG_H8_PORT_ADD("port5", h8_device::PORT_5, 0xf0, 0xf0)
+	MCFG_H8_PORT_ADD("port6", h8_device::PORT_6, 0x00, 0x00)
+	MCFG_H8_PORT_ADD("porta", h8_device::PORT_A, 0x00, 0x00)
+	MCFG_H8_PORT_ADD("portb", h8_device::PORT_B, 0x00, 0x00)
+	MCFG_H8_PORT_ADD("portc", h8_device::PORT_C, 0x00, 0x00)
+	MCFG_H8_PORT_ADD("portd", h8_device::PORT_D, 0x00, 0x00)
+	MCFG_H8_PORT_ADD("porte", h8_device::PORT_E, 0x00, 0x00)
+	MCFG_H8_PORT_ADD("portf", h8_device::PORT_F, 0x00, 0x00)
+	MCFG_H8_PORT_ADD("portg", h8_device::PORT_G, 0xe0, 0xe0)
+	MCFG_H8H_TIMER8_CHANNEL_ADD("timer8_0", "intc", 64, 65, 66, "timer8_1", h8_timer8_channel_device::CHAIN_OVERFLOW, true,  false)
+	MCFG_H8H_TIMER8_CHANNEL_ADD("timer8_1", "intc", 68, 69, 70, "timer8_0", h8_timer8_channel_device::CHAIN_A,        false, false)
+	MCFG_H8_TIMER16_ADD("timer16", 6, 0x00)
+	MCFG_H8S_TIMER16_CHANNEL_ADD("timer16:0", 4, 0x60, "intc", 32,
+									h8_timer16_channel_device::DIV_1,
+									h8_timer16_channel_device::DIV_4,
+									h8_timer16_channel_device::DIV_16,
+									h8_timer16_channel_device::DIV_64,
+									h8_timer16_channel_device::INPUT_A,
+									h8_timer16_channel_device::INPUT_B,
+									h8_timer16_channel_device::INPUT_C,
+									h8_timer16_channel_device::INPUT_D)
+	MCFG_H8S_TIMER16_CHANNEL_ADD("timer16:1", 2, 0x4c, "intc", 40,
+									h8_timer16_channel_device::DIV_1,
+									h8_timer16_channel_device::DIV_4,
+									h8_timer16_channel_device::DIV_16,
+									h8_timer16_channel_device::DIV_64,
+									h8_timer16_channel_device::INPUT_A,
+									h8_timer16_channel_device::INPUT_B,
+									h8_timer16_channel_device::DIV_256,
+									h8_timer16_channel_device::CHAIN)
+	MCFG_H8S_TIMER16_CHANNEL_SET_CHAIN("timer16:2")
+	MCFG_H8S_TIMER16_CHANNEL_ADD("timer16:2", 2, 0x4c, "intc", 44,
+									h8_timer16_channel_device::DIV_1,
+									h8_timer16_channel_device::DIV_4,
+									h8_timer16_channel_device::DIV_16,
+									h8_timer16_channel_device::DIV_64,
+									h8_timer16_channel_device::INPUT_A,
+									h8_timer16_channel_device::INPUT_B,
+									h8_timer16_channel_device::INPUT_C,
+									h8_timer16_channel_device::DIV_1024)
+	MCFG_H8S_TIMER16_CHANNEL_ADD("timer16:3", 4, 0x60, "intc", 48,
+									h8_timer16_channel_device::DIV_1,
+									h8_timer16_channel_device::DIV_4,
+									h8_timer16_channel_device::DIV_16,
+									h8_timer16_channel_device::DIV_64,
+									h8_timer16_channel_device::INPUT_A,
+									h8_timer16_channel_device::DIV_1024,
+									h8_timer16_channel_device::DIV_256,
+									h8_timer16_channel_device::DIV_4096)
+	MCFG_H8S_TIMER16_CHANNEL_ADD("timer16:4", 2, 0x4c, "intc", 56,
+									h8_timer16_channel_device::DIV_1,
+									h8_timer16_channel_device::DIV_4,
+									h8_timer16_channel_device::DIV_16,
+									h8_timer16_channel_device::DIV_64,
+									h8_timer16_channel_device::INPUT_A,
+									h8_timer16_channel_device::INPUT_C,
+									h8_timer16_channel_device::DIV_1024,
+									h8_timer16_channel_device::CHAIN)
+	MCFG_H8S_TIMER16_CHANNEL_SET_CHAIN("timer16:5")
+	MCFG_H8S_TIMER16_CHANNEL_ADD("timer16:5", 2, 0x4c, "intc", 60,
+									h8_timer16_channel_device::DIV_1,
+									h8_timer16_channel_device::DIV_4,
+									h8_timer16_channel_device::DIV_16,
+									h8_timer16_channel_device::DIV_64,
+									h8_timer16_channel_device::INPUT_A,
+									h8_timer16_channel_device::INPUT_C,
+									h8_timer16_channel_device::DIV_256,
+									h8_timer16_channel_device::INPUT_D)
+	MCFG_H8_SCI_ADD("sci0", "intc", 80, 81, 82, 83)
+	MCFG_H8_SCI_ADD("sci1", "intc", 84, 85, 86, 87)
+	MCFG_H8_SCI_ADD("sci2", "intc", 88, 89, 90, 91)
+	MCFG_H8_WATCHDOG_ADD("watchdog", "intc", 25, h8_watchdog_device::S)
+MACHINE_CONFIG_END
 
 void h8s2655_device::execute_set_input(int inputnum, int state)
 {

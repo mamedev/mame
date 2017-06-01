@@ -33,7 +33,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type S100_DJ2DB = device_creator<s100_dj2db_device>;
+DEFINE_DEVICE_TYPE(S100_DJ2DB, s100_dj2db_device, "s100_sj2db", "Morrow Disk Jockey 2D/B")
 
 
 //-------------------------------------------------
@@ -98,10 +98,10 @@ WRITE_LINE_MEMBER( s100_dj2db_device::fdc_drq_w )
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( s100_dj2db )
+//  MACHINE_CONFIG_START( s100_dj2db )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( s100_dj2db )
+static MACHINE_CONFIG_START( s100_dj2db )
 	MCFG_DEVICE_ADD(BR1941_TAG, COM8116, XTAL_5_0688MHz)
 	MCFG_COM8116_FR_HANDLER(WRITELINE(s100_dj2db_device, fr_w))
 
@@ -252,7 +252,7 @@ ioport_constructor s100_dj2db_device::device_input_ports() const
 //-------------------------------------------------
 
 s100_dj2db_device::s100_dj2db_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, S100_DJ2DB, "DJ2DB", tag, owner, clock, "dj2db", __FILE__),
+	device_t(mconfig, S100_DJ2DB, tag, owner, clock),
 	device_s100_card_interface(mconfig, *this),
 	m_fdc(*this, MB8866_TAG),
 	m_dbrg(*this, BR1941_TAG),

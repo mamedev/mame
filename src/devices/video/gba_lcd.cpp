@@ -140,10 +140,10 @@ private:
 	uint16_t m_attr2;
 };
 
-const device_type GBA_LCD = device_creator<gba_lcd_device>;
+DEFINE_DEVICE_TYPE(GBA_LCD, gba_lcd_device, "gba_lcd", "GBA LCD")
 
 gba_lcd_device::gba_lcd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, GBA_LCD, "GBA LCD", tag, owner, clock, "gba_lcd", __FILE__)
+	: device_t(mconfig, GBA_LCD, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, m_int_hblank_cb(*this)
 	, m_int_vblank_cb(*this)
@@ -1832,7 +1832,7 @@ void gba_lcd_device::device_reset()
 	m_hbl_timer->adjust(attotime::never);
 }
 
-static MACHINE_CONFIG_FRAGMENT(gba_lcd)
+MACHINE_CONFIG_MEMBER(gba_lcd_device::device_add_mconfig)
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_16_777216MHz / 4, 308, 0, 240, 228, 0, 160)
 	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, gba_lcd_device, screen_update)
@@ -1842,8 +1842,3 @@ static MACHINE_CONFIG_FRAGMENT(gba_lcd)
 	MCFG_PALETTE_ADD("palette", 32768)
 	MCFG_PALETTE_INIT_OWNER(gba_lcd_device, gba)
 MACHINE_CONFIG_END
-
-machine_config_constructor gba_lcd_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME(gba_lcd);
-}

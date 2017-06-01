@@ -752,7 +752,7 @@ INPUT_PORTS_END
 *           Machine Driver            *
 **************************************/
 
-static MACHINE_CONFIG_START( kas89, kas89_state )
+static MACHINE_CONFIG_START( kas89 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)    /* Confirmed */
@@ -857,5 +857,5 @@ DRIVER_INIT_MEMBER(kas89_state,kas89)
 *           Game Driver(s)            *
 **************************************/
 
-/*     YEAR  NAME    PARENT  MACHINE  INPUT  STATE        INIT   ROT     COMPANY       FULLNAME     FLAGS                 LAYOUT */
+//     YEAR  NAME    PARENT  MACHINE  INPUT  STATE        INIT   ROT    COMPANY       FULLNAME      FLAGS                    LAYOUT
 GAMEL( 1989, kas89,  0,      kas89,   kas89, kas89_state, kas89, ROT90, "SFC S.R.L.", "Kasino '89", MACHINE_IMPERFECT_SOUND, layout_kas89 )

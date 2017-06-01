@@ -206,7 +206,7 @@ INTERRUPT_GEN_MEMBER(solomon_state::vblank_irq)
 
 
 
-static MACHINE_CONFIG_START( solomon, solomon_state )
+static MACHINE_CONFIG_START( solomon )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)   /* 4.0 MHz (?????) */
@@ -307,5 +307,5 @@ ROM_END
 
 
 
-GAME( 1986, solomon,  0,       solomon, solomon, driver_device, 0, ROT0, "Tecmo", "Solomon's Key (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, solomonj, solomon, solomon, solomon, driver_device, 0, ROT0, "Tecmo", "Solomon no Kagi (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, solomon,  0,       solomon, solomon, solomon_state, 0, ROT0, "Tecmo", "Solomon's Key (US)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1986, solomonj, solomon, solomon, solomon, solomon_state, 0, ROT0, "Tecmo", "Solomon no Kagi (Japan)", MACHINE_SUPPORTS_SAVE )

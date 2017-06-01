@@ -32,12 +32,12 @@
 //  constructor
 //-------------------------------------------------
 
-const device_type NES_BANDAI_PT554 = device_creator<nes_bandai_pt554_device>;
+DEFINE_DEVICE_TYPE(NES_BANDAI_PT554, nes_bandai_pt554_device, "nes_bandai_pt554", "NES Cart Bandai BT-554 PCB")
 
 
 nes_bandai_pt554_device::nes_bandai_pt554_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_cnrom_device(mconfig, NES_BANDAI_PT554, "NES Cart Bandai PT-554 PCB", tag, owner, clock, "nes_bandai_pt554", __FILE__),
-						m_samples(*this, "samples")
+	: nes_cnrom_device(mconfig, NES_BANDAI_PT554, tag, owner, clock)
+	, m_samples(*this, "samples")
 {
 }
 
@@ -87,7 +87,7 @@ static const char *const pt554_sample_names[] =
 //  MACHINE_DRIVER
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( pt554 )
+static MACHINE_CONFIG_START( pt554 )
 
 	// additional sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("addon")

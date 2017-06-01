@@ -132,12 +132,12 @@ DEVICE_ADDRESS_MAP_START( map, 8, janshi_vdp_device )
 	AM_RANGE(0xff6000, 0xff601f) AM_RAM AM_SHARE("crtc_regs")
 ADDRESS_MAP_END
 
-const device_type JANSHIVDP = device_creator<janshi_vdp_device>;
+DEFINE_DEVICE_TYPE(JANSHIVDP, janshi_vdp_device, "janshi_vdp", "Janshi VDP")
 
 janshi_vdp_device::janshi_vdp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, JANSHIVDP, "Janshi VDP", tag, owner, clock, "janshi_vdp", __FILE__),
-		device_memory_interface(mconfig, *this),
-		m_space_config("janshi_vdp", ENDIANNESS_LITTLE, 8,24, 0, address_map_delegate(FUNC(janshi_vdp_device::map), this))
+	: device_t(mconfig, JANSHIVDP, tag, owner, clock)
+	, device_memory_interface(mconfig, *this)
+	, m_space_config("janshi_vdp", ENDIANNESS_LITTLE, 8,24, 0, address_map_delegate(FUNC(janshi_vdp_device::map), this))
 {
 }
 
@@ -1085,7 +1085,7 @@ static GFXDECODE_START( pinkiri8 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 0x100 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( pinkiri8, pinkiri8_state )
+static MACHINE_CONFIG_START( pinkiri8 )
 	MCFG_CPU_ADD("maincpu",Z180,XTAL_32MHz/2)
 	MCFG_CPU_PROGRAM_MAP(pinkiri8_map)
 	MCFG_CPU_IO_MAP(pinkiri8_io)
@@ -1108,7 +1108,7 @@ static MACHINE_CONFIG_START( pinkiri8, pinkiri8_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
@@ -1229,7 +1229,7 @@ DRIVER_INIT_MEMBER(pinkiri8_state,ronjan)
 	m_maincpu->space(AS_IO).install_read_handler(0x9f, 0x9f, read8_delegate(FUNC(pinkiri8_state::ronjan_patched_prot_r), this));
 }
 
-GAME( 1992,  janshi,   0,       pinkiri8, janshi,   driver_device,  0,      ROT0, "Eagle",         "Janshi",        MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1992,  janshi,   0,       pinkiri8, janshi,   pinkiri8_state, 0,      ROT0, "Eagle",         "Janshi",        MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 GAME( 1991,  ronjan,   ronjans, pinkiri8, ronjan,   pinkiri8_state, ronjan, ROT0, "Wing Co., Ltd", "Ron Jan",       MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 GAME( 1994,  ronjans,  0,       pinkiri8, ronjan,   pinkiri8_state, ronjan, ROT0, "Wing Co., Ltd", "Ron Jan Super", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // 'SUPER' flashes in the middle of the screen
-GAME( 1994,  pinkiri8, 0,       pinkiri8, pinkiri8, driver_device,  0,      ROT0, "Alta",          "Pinkiri 8",     MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1994,  pinkiri8, 0,       pinkiri8, pinkiri8, pinkiri8_state, 0,      ROT0, "Alta",          "Pinkiri 8",     MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )

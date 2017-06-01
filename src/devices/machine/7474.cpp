@@ -49,14 +49,14 @@
 //**************************************************************************
 
 // device type definition
-const device_type TTL7474 = device_creator<ttl7474_device>;
+DEFINE_DEVICE_TYPE(TTL7474, ttl7474_device, "7474", "7474 TTL")
 
 //-------------------------------------------------
 //  ttl7474_device - constructor
 //-------------------------------------------------
 
 ttl7474_device::ttl7474_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TTL7474, "7474 TTL", tag, owner, clock, "7474", __FILE__),
+	: device_t(mconfig, TTL7474, tag, owner, clock),
 		m_output_func(*this),
 		m_comp_output_func(*this)
 {

@@ -198,7 +198,7 @@ READ_LINE_MEMBER( bob85_state::sid_r )
 	return m_cass->input() > 0.0;
 }
 
-static MACHINE_CONFIG_START( bob85, bob85_state )
+static MACHINE_CONFIG_START( bob85 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8085A, XTAL_5MHz)
 	MCFG_CPU_PROGRAM_MAP(bob85_mem)
@@ -222,5 +222,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS           INIT COMPANY             FULLNAME       FLAGS */
-COMP( 1984, bob85,  0,       0,     bob85,   bob85, driver_device,    0, "Josef Kratochvil", "BOB-85", MACHINE_NO_SOUND_HW)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS         INIT  COMPANY             FULLNAME  FLAGS
+COMP( 1984, bob85,  0,      0,      bob85,   bob85, bob85_state,  0,    "Josef Kratochvil", "BOB-85", MACHINE_NO_SOUND_HW)

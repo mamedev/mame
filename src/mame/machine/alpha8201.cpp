@@ -277,15 +277,15 @@ Notes:
 
 /**************************************************************************/
 
-const device_type ALPHA_8201 = device_creator<alpha_8201_device>;
+DEFINE_DEVICE_TYPE(ALPHA_8201, alpha_8201_device, "alpha8201", "ALPHA-8201")
 
 //-------------------------------------------------
 //  alpha_8201_device - constructor
 //-------------------------------------------------
 
 alpha_8201_device::alpha_8201_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, ALPHA_8201, "ALPHA-8201", tag, owner, clock, "alpha8201", __FILE__),
-	m_mcu(*this, "mcu")
+	: device_t(mconfig, ALPHA_8201, tag, owner, clock)
+	, m_mcu(*this, "mcu")
 {
 }
 
@@ -312,8 +312,11 @@ void alpha_8201_device::device_start()
 	save_item(NAME(m_mcu_r));
 }
 
-// machine config additions
-static MACHINE_CONFIG_FRAGMENT(alpha8201)
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER(alpha_8201_device::device_add_mconfig)
 
 	MCFG_CPU_ADD("mcu", HD44801, DERIVED_CLOCK(1,1)) // 8H
 	MCFG_HMCS40_READ_R_CB(0, READ8(alpha_8201_device, mcu_data_r))
@@ -324,12 +327,6 @@ static MACHINE_CONFIG_FRAGMENT(alpha8201)
 	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(alpha_8201_device, mcu_data_w))
 	MCFG_HMCS40_WRITE_D_CB(WRITE16(alpha_8201_device, mcu_d_w))
 MACHINE_CONFIG_END
-
-machine_config_constructor alpha_8201_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME(alpha8201);
-}
-
 
 //-------------------------------------------------
 //  device_reset - device-specific reset
@@ -372,7 +369,7 @@ READ8_MEMBER(alpha_8201_device::mcu_data_r)
 	else
 		logerror("%s: MCU side invalid read\n", tag());
 
-	if (offset == HMCS40_PORT_R0X)
+	if (offset == hmcs40_cpu_device::PORT_R0X)
 		ret >>= 4;
 	return ret & 0xf;
 }

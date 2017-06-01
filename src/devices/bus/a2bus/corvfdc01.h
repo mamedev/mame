@@ -8,8 +8,10 @@
 
 *********************************************************************/
 
-#ifndef __A2BUS_CORVFDC01__
-#define __A2BUS_CORVFDC01__
+#ifndef MAME_BUS_A2BUS_CORVFDC01_H
+#define MAME_BUS_A2BUS_CORVFDC01_H
+
+#pragma once
 
 #include "a2bus.h"
 #include "machine/wd_fdc.h"
@@ -25,7 +27,6 @@ class a2bus_corvfdc01_device:
 {
 public:
 	// construction/destruction
-	a2bus_corvfdc01_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	a2bus_corvfdc01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
@@ -38,6 +39,8 @@ public:
 	DECLARE_FLOPPY_FORMATS(corv_floppy_formats);
 
 protected:
+	a2bus_corvfdc01_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -46,7 +49,7 @@ protected:
 	virtual void write_c0nx(address_space &space, uint8_t offset, uint8_t data) override;
 	virtual uint8_t read_cnxx(address_space &space, uint8_t offset) override;
 
-	required_device<fd1793_t> m_wdfdc;
+	required_device<fd1793_device> m_wdfdc;
 	required_device<floppy_connector> m_con1;
 	required_device<floppy_connector> m_con2;
 	required_device<floppy_connector> m_con3;
@@ -59,6 +62,6 @@ private:
 };
 
 // device type definition
-extern const device_type A2BUS_CORVFDC01;
+DECLARE_DEVICE_TYPE(A2BUS_CORVFDC01, a2bus_corvfdc01_device)
 
-#endif /* __A2BUS_CORVFDC01__ */
+#endif // MAME_BUS_A2BUS_CORVFDC01_H

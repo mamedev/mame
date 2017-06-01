@@ -12,7 +12,7 @@
 
 
 // MCU types
-const device_type SM510 = device_creator<sm510_device>;
+DEFINE_DEVICE_TYPE(SM510, sm510_device, "sm510", "SM510")
 
 
 // internal memory maps
@@ -32,8 +32,9 @@ ADDRESS_MAP_END
 
 // device definitions
 sm510_device::sm510_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: sm510_base_device(mconfig, SM510, "SM510", tag, owner, clock, 2 /* stack levels */, 12 /* prg width */, ADDRESS_MAP_NAME(program_2_7k), 7 /* data width */, ADDRESS_MAP_NAME(data_96_32x4), "sm510", __FILE__)
-{ }
+	: sm510_base_device(mconfig, SM510, tag, owner, clock, 2 /* stack levels */, 12 /* prg width */, ADDRESS_MAP_NAME(program_2_7k), 7 /* data width */, ADDRESS_MAP_NAME(data_96_32x4))
+{
+}
 
 
 // disasm
@@ -55,7 +56,7 @@ void sm510_device::clock_melody()
 	u8 out = m_div >> 2 & 1;
 	out |= (out << 1 ^ 2);
 	out &= m_r;
-	
+
 	// output to R pin
 	if (out != m_r_out)
 	{

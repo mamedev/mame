@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "sg1000exp.h"
+
 // slot devices
 #include "sk1100.h"
 #include "fm_unit.h"
@@ -18,7 +19,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type SG1000_EXPANSION_SLOT = device_creator<sg1000_expansion_slot_device>;
+DEFINE_DEVICE_TYPE(SG1000_EXPANSION_SLOT, sg1000_expansion_slot_device, "sg1000_expansion_slot", "Sega SG-1000 expansion slot")
 
 
 
@@ -55,8 +56,9 @@ device_sg1000_expansion_slot_interface::~device_sg1000_expansion_slot_interface(
 //-------------------------------------------------
 
 sg1000_expansion_slot_device::sg1000_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-						device_t(mconfig, SG1000_EXPANSION_SLOT, "Sega SG-1000 expansion slot", tag, owner, clock, "sg1000_expansion_slot", __FILE__),
-						device_slot_interface(mconfig, *this), m_device(nullptr)
+	device_t(mconfig, SG1000_EXPANSION_SLOT, tag, owner, clock),
+	device_slot_interface(mconfig, *this),
+	m_device(nullptr)
 {
 }
 

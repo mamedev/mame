@@ -14,18 +14,18 @@
 
 #define LOG_WPCSND (0)
 
-const device_type WPCSND = device_creator<wpcsnd_device>;
+DEFINE_DEVICE_TYPE(WPCSND, wpcsnd_device, "wpcsnd", "Williams WPC Sound")
 
 wpcsnd_device::wpcsnd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig,WPCSND,"Williams WPC Sound",tag,owner,clock, "wpcsnd", __FILE__),
-	device_mixer_interface(mconfig, *this),
-	m_cpu(*this, "bgcpu"),
-	m_ym2151(*this, "ym2151"),
-	m_hc55516(*this, "hc55516"),
-	m_cpubank(*this, "rombank"),
-	m_fixedbank(*this, "fixed"),
-	m_rom(*this, finder_base::DUMMY_TAG),
-	m_reply_cb(*this)
+	: device_t(mconfig, WPCSND, tag, owner, clock)
+	, device_mixer_interface(mconfig, *this)
+	, m_cpu(*this, "bgcpu")
+	, m_ym2151(*this, "ym2151")
+	, m_hc55516(*this, "hc55516")
+	, m_cpubank(*this, "rombank")
+	, m_fixedbank(*this, "fixed")
+	, m_rom(*this, finder_base::DUMMY_TAG)
+	, m_reply_cb(*this)
 {
 }
 
@@ -66,7 +66,7 @@ uint8_t wpcsnd_device::data_r()
 	return m_reply;
 }
 
-MACHINE_CONFIG_FRAGMENT( wpcsnd )
+MACHINE_CONFIG_MEMBER( wpcsnd_device::device_add_mconfig )
 	MCFG_CPU_ADD("bgcpu", M6809E, XTAL_8MHz) // MC68B09E
 	MCFG_CPU_PROGRAM_MAP(wpcsnd_map)
 	MCFG_QUANTUM_TIME(attotime::from_hz(50))
@@ -83,10 +83,6 @@ MACHINE_CONFIG_FRAGMENT( wpcsnd )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.5)
 MACHINE_CONFIG_END
 
-machine_config_constructor wpcsnd_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( wpcsnd );
-}
 
 void wpcsnd_device::device_start()
 {

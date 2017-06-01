@@ -35,6 +35,7 @@
 #include "sound/spkrdev.h"
 #include "video/cgapal.h"
 
+#include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
 
@@ -630,7 +631,7 @@ static INPUT_PORTS_START( poisk1 )
 	PORT_INCLUDE( poisk1_keyboard_v91 )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( poisk1, p1_state )
+static MACHINE_CONFIG_START( poisk1 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8088, 5000000)
 	MCFG_CPU_PROGRAM_MAP(poisk1_map)
@@ -736,5 +737,5 @@ ROM_END
 
 ***************************************************************************/
 
-/*     YEAR     NAME        PARENT      COMPAT  MACHINE     INPUT       INIT                COMPANY       FULLNAME */
-COMP ( 1989,    poisk1,    ibm5150,    0,      poisk1,    poisk1,    p1_state, poisk1,   "Electronmash",  "Poisk-1", 0)
+//     YEAR     NAME       PARENT      COMPAT  MACHINE   INPUT    STATE     INIT    COMPANY          FULLNAME   FLAGS
+COMP ( 1989,    poisk1,    ibm5150,    0,      poisk1,   poisk1,  p1_state, poisk1, "Electronmash",  "Poisk-1", 0 )

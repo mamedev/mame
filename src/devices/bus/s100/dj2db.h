@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_S100_DJ2DB_H
+#define MAME_BUS_S100_DJ2DB_H
 
-#ifndef __S100_DJ2DB__
-#define __S100_DJ2DB__
+#pragma once
 
 #include "s100.h"
 #include "machine/com8116.h"
@@ -54,7 +54,7 @@ protected:
 
 private:
 	// internal state
-	required_device<mb8866_t> m_fdc;
+	required_device<mb8866_device> m_fdc;
 	required_device<com8116_device> m_dbrg;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
@@ -81,7 +81,6 @@ private:
 
 
 // device type definition
-extern const device_type S100_DJ2DB;
+DECLARE_DEVICE_TYPE(S100_DJ2DB, s100_dj2db_device)
 
-
-#endif
+#endif // MAME_BUS_S100_DJ2DB_H

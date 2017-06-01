@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco
-#pragma once
+#ifndef MAME_BUS_IQ151_ROM_H
+#define MAME_BUS_IQ151_ROM_H
 
-#ifndef __IQ151_ROM_H__
-#define __IQ151_ROM_H__
+#pragma once
 
 #include "iq151.h"
 #include "machine/i8255.h"
@@ -19,20 +19,20 @@ class iq151_rom_device :
 		public device_iq151cart_interface
 {
 public:
-	// construction/destruction
-	iq151_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
-
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 protected:
+	// construction/destruction
+	iq151_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 
 	// iq151cart_interface overrides
 	virtual uint8_t* get_cart_base() override;
 
-	uint8_t * m_rom;
+	required_region_ptr<uint8_t> m_rom;
 };
 
 
@@ -120,10 +120,10 @@ protected:
 
 
 // device type definition
-extern const device_type IQ151_BASIC6;
-extern const device_type IQ151_BASICG;
-extern const device_type IQ151_AMOS1;
-extern const device_type IQ151_AMOS2;
-extern const device_type IQ151_AMOS3;
+DECLARE_DEVICE_TYPE(IQ151_BASIC6, iq151_basic6_device)
+DECLARE_DEVICE_TYPE(IQ151_BASICG, iq151_basicg_device)
+DECLARE_DEVICE_TYPE(IQ151_AMOS1,  iq151_amos1_device)
+DECLARE_DEVICE_TYPE(IQ151_AMOS2,  iq151_amos2_device)
+DECLARE_DEVICE_TYPE(IQ151_AMOS3,  iq151_amos3_device)
 
-#endif  /* __IQ151_ROM_H__ */
+#endif  // MAME_BUS_IQ151_ROM_H
