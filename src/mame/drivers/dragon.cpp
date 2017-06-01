@@ -14,12 +14,6 @@
 #include "imagedev/cassette.h"
 #include "formats/coco_cas.h"
 #include "cpu/m6809/m6809.h"
-#include "bus/coco/coco_232.h"
-#include "bus/coco/coco_orch90.h"
-#include "bus/coco/coco_gmc.h"
-#include "bus/coco/coco_pak.h"
-#include "bus/coco/coco_fdc.h"
-#include "bus/coco/coco_multi.h"
 #include "formats/vdk_dsk.h"
 #include "formats/dmk_dsk.h"
 #include "formats/sdf_dsk.h"
@@ -195,6 +189,9 @@ static MACHINE_CONFIG_START( dragon_base )
 
 	// sound hardware
 	MCFG_FRAGMENT_ADD( coco_sound )
+
+	// floating space
+	MCFG_FRAGMENT_ADD( coco_floating )
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("dragon_cart_list", "dragon_cart")

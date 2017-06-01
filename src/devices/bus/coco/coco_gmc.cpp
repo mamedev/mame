@@ -17,16 +17,44 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "coco_gmc.h"
+#include "coco_pak.h"
+#include "sound/sn76496.h"
 #include "speaker.h"
 
 #define SN76489AN_TAG   "gmc_psg"
 
-static MACHINE_CONFIG_START(cocopak_gmc)
+//**************************************************************************
+//  TYPE DECLARATIONS
+//**************************************************************************
+
+namespace
+{
+	// ======================> coco_pak_banked_device
+
+	class coco_pak_gmc_device :
+		public coco_pak_banked_device
+	{
+	public:
+		// construction/destruction
+		coco_pak_gmc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+		virtual void device_add_mconfig(machine_config &config) override;
+
+	protected:
+		// device-level overrides
+		virtual DECLARE_WRITE8_MEMBER(scs_write) override;
+
+	private:
+		required_device<sn76489a_device> m_psg;
+	};
+};
+
+
+MACHINE_CONFIG_MEMBER(coco_pak_gmc_device::device_add_mconfig)
 	MCFG_SPEAKER_STANDARD_MONO("gmc_speaker")
 	MCFG_SOUND_ADD(SN76489AN_TAG, SN76489A, XTAL_4MHz)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "gmc_speaker", 1.0)
 MACHINE_CONFIG_END
+
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -44,27 +72,18 @@ coco_pak_gmc_device::coco_pak_gmc_device(const machine_config &mconfig, const ch
 {
 }
 
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor coco_pak_gmc_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( cocopak_gmc );
-}
 
 //-------------------------------------------------
-//    write
+//    scs_write
 //-------------------------------------------------
 
-WRITE8_MEMBER(coco_pak_gmc_device::write)
+WRITE8_MEMBER(coco_pak_gmc_device::scs_write)
 {
 	switch(offset)
 	{
 		case 0:
 			/* set the bank */
-			coco_pak_banked_device::write(space,offset,data,mem_mask);
+			coco_pak_banked_device::scs_write(space, offset, data, mem_mask);
 			break;
 		case 1:
 			m_psg->write(data);
