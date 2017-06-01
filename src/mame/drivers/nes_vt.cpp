@@ -844,6 +844,11 @@ INPUT_PORTS_END
 
 
 
+ROM_START( vdogdeme )
+	ROM_REGION( 0x100000, "mainrom", 0 )
+	ROM_LOAD( "vdog.bin", 0x00000, 0x100000, CRC(29dae36d) SHA1(e7192c5b16f3e658b0802e5c50fab244e974d9c2) )
+ROM_END
+
 ROM_START( vdogdemo )
 	ROM_REGION( 0x80000, "mainrom", 0 )
 	ROM_LOAD( "rom.bin", 0x00000, 0x80000, CRC(054af705) SHA1(e730aeaa94b9cc28aa8b512a5bf411ec45226831) )
@@ -884,6 +889,9 @@ ROM_START( ii32in1 )
 	ROM_LOAD( "ii32in1.bin", 0x00000, 0x2000000, CRC(ddee4eac) SHA1(828c0c18a66bb4872299f9a43d5e3647482c5925) )
 ROM_END
 
+// earlier version of vdogdemo
+CONS( 200?, vdogdeme,  0,  0,  nes_vt,    nes_vt, nes_vt_state,  0, "VRT", "V-Dog (prototype, earlier)", MACHINE_NOT_WORKING )
+
 // this is glitchy even in other emulators, might just be entirely unfinished, it selects banks but they don't contain the required gfx?
 CONS( 200?, vdogdemo,  0,  0,  nes_vt,    nes_vt, nes_vt_state,  0, "VRT", "V-Dog (prototype)", MACHINE_NOT_WORKING )
 
@@ -893,7 +901,7 @@ CONS( 200?, mc_dgear,  0,  0,  nes_vt,    nes_vt, nes_vt_state,  0, "dreamGEAR",
 
 // this is VT09 based, and needs 8bpp modes at least
 // it boots, but gfx look wrong due to unsupported mode
-CONS( 2009, cybar120,  0,  0,  nes_vt_xx, nes_vt, nes_vt_state,  0, "<unknown>", "Cyber Arcade 120-in-1", MACHINE_NOT_WORKING )
+CONS( 2009, cybar120,  0,  0,  nes_vt_xx, nes_vt, nes_vt_state,  0, "Defender", "Defender M2500P 120-in-1", MACHINE_NOT_WORKING )
 
 // these are NOT VT03, but something newer but based around the same basic designs
 CONS( 200?, dgun2500,  0,  0,  nes_vt,    nes_vt, nes_vt_state,  0, "dreamGEAR", "dreamGEAR Wireless Motion Control with 130 games (DGUN-2500)", MACHINE_NOT_WORKING )

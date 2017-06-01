@@ -29304,6 +29304,7 @@ nes                             // Nintendo Entertainment System
 nespal                          // Nintendo Entertainment System PAL
 
 @source:nes_vt.cpp
+vdogdeme
 vdogdemo
 mc_dgear
 dgun2500
