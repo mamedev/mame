@@ -123,7 +123,7 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(ISA8_MDA, isa8_mda_device, "isa_ibm_mda", "IBM Monochrome Display adn Printer Adapter")
+DEFINE_DEVICE_TYPE(ISA8_MDA, isa8_mda_device, "isa_ibm_mda", "IBM Monochrome Display and Printer Adapter")
 
 
 //-------------------------------------------------
