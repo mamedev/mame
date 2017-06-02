@@ -248,10 +248,10 @@ FLOPPY_FORMATS_MEMBER( pdc_device::floppy_formats )
 FLOPPY_FORMATS_END
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( pdc )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( pdc )
+MACHINE_CONFIG_MEMBER( pdc_device::device_add_mconfig )
 	/* CPU - Zilog Z0840006PSC */
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_10MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(pdc_mem)
@@ -283,16 +283,6 @@ static MACHINE_CONFIG_START( pdc )
 	MCFG_DEVICE_ADD(HDC_TAG, HDC9224, 0)
 	MCFG_MFM_HARDDISK_CONN_ADD("h1", pdc_harddisks, nullptr, MFM_BYTE, 3000, 20, MFMHD_GEN_FORMAT)
 MACHINE_CONFIG_END
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor pdc_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( pdc );
-}
 
 ioport_constructor pdc_device::device_input_ports() const
 {

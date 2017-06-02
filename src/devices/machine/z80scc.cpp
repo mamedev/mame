@@ -146,17 +146,13 @@ DEFINE_DEVICE_TYPE(SCC85233,       scc85233_device, "scc85233",       "Zilog Z85
 DEFINE_DEVICE_TYPE(SCC8523L,       scc8523l_device, "scc8523l",       "Zilog Z8523L SCC")
 
 //-------------------------------------------------
-//  device_mconfig_additions -
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
-MACHINE_CONFIG_START( z80scc )
+MACHINE_CONFIG_MEMBER( z80scc_device::device_add_mconfig )
 	MCFG_DEVICE_ADD(CHANA_TAG, Z80SCC_CHANNEL, 0)
 	MCFG_DEVICE_ADD(CHANB_TAG, Z80SCC_CHANNEL, 0)
 MACHINE_CONFIG_END
 
-machine_config_constructor z80scc_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( z80scc );
-}
 
 //**************************************************************************
 //  LIVE DEVICE
