@@ -2755,7 +2755,7 @@ void device_debug::breakpoint_check(offs_t pc)
 
 			// if we hit, evaluate the action
 			if (!bp->m_action.empty())
-				m_device.machine().debugger().console().execute_command(bp->m_action.c_str(), false);
+				m_device.machine().debugger().console().execute_command(bp->m_action, false);
 
 			// print a notification, unless the action made us go again
 			if (debugcpu.execution_state() == EXECUTION_STATE_STOPPED)
@@ -2774,7 +2774,7 @@ void device_debug::breakpoint_check(offs_t pc)
 			// if we hit, evaluate the action
 			if (!rp->m_action.empty())
 			{
-				m_device.machine().debugger().console().execute_command(rp->m_action.c_str(), false);
+				m_device.machine().debugger().console().execute_command(rp->m_action, false);
 			}
 
 			// print a notification, unless the action made us go again
@@ -2887,7 +2887,7 @@ void debugger_cpu::watchpoint_check(address_space& space, int type, offs_t addre
 			m_execution_state = EXECUTION_STATE_STOPPED;
 
 			// if we hit, evaluate the action
-			if (strlen(wp->action()) > 0)
+			if (!wp->action().empty())
 				m_machine.debugger().console().execute_command(wp->action(), false);
 
 			// print a notification, unless the action made us go again
@@ -3336,7 +3336,7 @@ void device_debug::tracer::update(offs_t pc)
 
 	// execute any trace actions first
 	if (!m_action.empty())
-		m_debug.m_device.machine().debugger().console().execute_command(m_action.c_str(), false);
+		m_debug.m_device.machine().debugger().console().execute_command(m_action, false);
 
 	// print the address
 	std::string buffer;
