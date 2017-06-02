@@ -1,15 +1,22 @@
 local simple = {}
 
+simple.romset = "????"
+
+function simple.filename(name)
+	simple.romset = name
+	return "cheat.simple"
+end
+
 -- converter for simple cheats
 -- simple cheats are single address every frame ram cheats in one file called cheat.simple
 -- format:  <set name>,<cputag>,<hex offset>,<b|w|d|q - size>,<hex value>,<desc>
 -- only program address space is supported, comments are prepended with ;
 -- size is b - u8, w - u16, d - u32, q - u64
-function simple.conv_cheat(romset, data)
+function simple.conv_cheat(data)
 	local cheats = {}
 	for line in data:gmatch('([^\n;]+)') do
 		local set, cputag, offset, size, val, name = line:match('([^,]+),([^,]+),([^,]+),([^,]+),([^,]+),(.+)')
-		if set == romset then
+		if set == simple.romset then
 			local cheat = {}
 			cheat.desc = name
 			cheat.space = { cpup = { tag = cputag, type = "program" } }
