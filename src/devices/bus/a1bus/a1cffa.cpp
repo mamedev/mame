@@ -24,24 +24,18 @@
 
 DEFINE_DEVICE_TYPE(A1BUS_CFFA, a1bus_cffa_device, "cffa1", "CFFA Compact Flash for Apple I")
 
-MACHINE_CONFIG_START( cffa )
-	MCFG_ATA_INTERFACE_ADD(CFFA_ATA_TAG, ata_devices, "hdd", nullptr, false)
-MACHINE_CONFIG_END
-
 ROM_START( cffa )
 	ROM_REGION(0x2000, CFFA_ROM_REGION, 0)
 	ROM_LOAD ("cffaromv1.1.bin", 0x0000, 0x1fe0, CRC(bf6b55ad) SHA1(6a290be18485a06f243a3561c4e01be5aafa4bfe) )
 ROM_END
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor a1bus_cffa_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( cffa );
-}
+MACHINE_CONFIG_MEMBER( a1bus_cffa_device::device_add_mconfig )
+	MCFG_ATA_INTERFACE_ADD(CFFA_ATA_TAG, ata_devices, "hdd", nullptr, false)
+MACHINE_CONFIG_END
 
 const tiny_rom_entry *a1bus_cffa_device::device_rom_region() const
 {

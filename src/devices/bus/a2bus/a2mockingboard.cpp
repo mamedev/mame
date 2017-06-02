@@ -34,7 +34,11 @@ DEFINE_DEVICE_TYPE(A2BUS_MOCKINGBOARD, a2bus_mockingboard_device, "a2mockbd", "S
 DEFINE_DEVICE_TYPE(A2BUS_PHASOR,       a2bus_phasor_device,       "a2phasor", "Applied Engineering Phasor")
 DEFINE_DEVICE_TYPE(A2BUS_ECHOPLUS,     a2bus_echoplus_device,     "a2echop",  "Street Electronics Echo Plus")
 
-MACHINE_CONFIG_START( mockingboard )
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( a2bus_ayboard_device::device_add_mconfig )
 	MCFG_DEVICE_ADD(VIA1_TAG, VIA6522, 1022727)
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(a2bus_ayboard_device, via1_out_a))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(a2bus_ayboard_device, via1_out_b))
@@ -52,7 +56,7 @@ MACHINE_CONFIG_START( mockingboard )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START( phasor )
+MACHINE_CONFIG_MEMBER( a2bus_phasor_device::device_add_mconfig )
 	MCFG_DEVICE_ADD(VIA1_TAG, VIA6522, 1022727)
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(a2bus_ayboard_device, via1_out_a))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(a2bus_ayboard_device, via1_out_b))
@@ -75,7 +79,7 @@ MACHINE_CONFIG_START( phasor )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker2", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START( echoplus )
+MACHINE_CONFIG_MEMBER( a2bus_echoplus_device::device_add_mconfig )
 	MCFG_DEVICE_ADD(VIA1_TAG, VIA6522, 1022727)
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(a2bus_ayboard_device, via1_out_a))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(a2bus_ayboard_device, via1_out_b))
@@ -96,26 +100,6 @@ MACHINE_CONFIG_START( echoplus )
 	MCFG_SOUND_ADD(E2P_TMS_TAG, TMS5220, 640000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "echosp", 1.0)
 MACHINE_CONFIG_END
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor a2bus_ayboard_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( mockingboard );
-}
-
-machine_config_constructor a2bus_phasor_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( phasor );
-}
-
-machine_config_constructor a2bus_echoplus_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( echoplus );
-}
 
 //**************************************************************************
 //  LIVE DEVICE

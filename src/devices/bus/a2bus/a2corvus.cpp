@@ -57,17 +57,6 @@ DEFINE_DEVICE_TYPE(A2BUS_CORVUS, a2bus_corvus_device, "a2corvus", "Corvus Flat C
 #define CORVUS_ROM_REGION  "corvus_rom"
 #define CORVUS_HD_TAG      "corvushd"
 
-static MACHINE_CONFIG_START(corvus)
-	MCFG_DEVICE_ADD(CORVUS_HD_TAG, CORVUS_HDC, 0)
-	MCFG_HARDDISK_ADD("harddisk1")
-	MCFG_HARDDISK_INTERFACE("corvus_hdd")
-	MCFG_HARDDISK_ADD("harddisk2")
-	MCFG_HARDDISK_INTERFACE("corvus_hdd")
-	MCFG_HARDDISK_ADD("harddisk3")
-	MCFG_HARDDISK_INTERFACE("corvus_hdd")
-	MCFG_HARDDISK_ADD("harddisk4")
-	MCFG_HARDDISK_INTERFACE("corvus_hdd")
-MACHINE_CONFIG_END
 
 ROM_START( corvus )
 	ROM_REGION(0x800, CORVUS_ROM_REGION, 0)
@@ -79,14 +68,20 @@ ROM_END
 ***************************************************************************/
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor a2bus_corvus_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( corvus );
-}
+MACHINE_CONFIG_MEMBER(a2bus_corvus_device::device_add_mconfig)
+	MCFG_DEVICE_ADD(CORVUS_HD_TAG, CORVUS_HDC, 0)
+	MCFG_HARDDISK_ADD("harddisk1")
+	MCFG_HARDDISK_INTERFACE("corvus_hdd")
+	MCFG_HARDDISK_ADD("harddisk2")
+	MCFG_HARDDISK_INTERFACE("corvus_hdd")
+	MCFG_HARDDISK_ADD("harddisk3")
+	MCFG_HARDDISK_INTERFACE("corvus_hdd")
+	MCFG_HARDDISK_ADD("harddisk4")
+	MCFG_HARDDISK_INTERFACE("corvus_hdd")
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region

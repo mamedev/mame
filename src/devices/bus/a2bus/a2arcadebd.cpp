@@ -32,7 +32,11 @@
 
 DEFINE_DEVICE_TYPE(A2BUS_ARCADEBOARD, a2bus_arcboard_device, "a2arcbd", "Third Millenium Engineering Arcade Board")
 
-MACHINE_CONFIG_START( arcadeboard )
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( a2bus_arcboard_device::device_add_mconfig )
 	MCFG_DEVICE_ADD( TMS_TAG, TMS9918A, XTAL_10_738635MHz / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000) // 16k of VRAM
 	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(a2bus_arcboard_device, tms_irq_w))
@@ -43,16 +47,6 @@ MACHINE_CONFIG_START( arcadeboard )
 	MCFG_SOUND_ADD(AY_TAG, AY8910, 1022727)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor a2bus_arcboard_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( arcadeboard );
-}
 
 //**************************************************************************
 //  LIVE DEVICE

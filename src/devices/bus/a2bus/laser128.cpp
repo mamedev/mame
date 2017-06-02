@@ -21,22 +21,16 @@
 
 DEFINE_DEVICE_TYPE(A2BUS_LASER128, a2bus_laser128_device, "a2laser128", "VTech Laser 128 Internal Device")
 
-MACHINE_CONFIG_START( a2laser128 )
-MACHINE_CONFIG_END
-
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor a2bus_laser128_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( a2laser128 );
-}
+MACHINE_CONFIG_MEMBER( a2bus_laser128_device::device_add_mconfig )
+MACHINE_CONFIG_END
 
 //**************************************************************************
 //  LIVE DEVICE

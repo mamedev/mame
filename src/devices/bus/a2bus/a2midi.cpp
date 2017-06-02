@@ -27,7 +27,12 @@ DEFINE_DEVICE_TYPE(A2BUS_MIDI, a2bus_midi_device, "a2midi", "6850 MIDI card")
 #define MIDI_PTM_TAG     "midi_ptm"
 #define MIDI_ACIA_TAG    "midi_acia"
 
-MACHINE_CONFIG_START( midi )
+
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( a2bus_midi_device::device_add_mconfig )
 	MCFG_DEVICE_ADD(MIDI_PTM_TAG, PTM6840, 1021800)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(1021800.0f, 1021800.0f, 1021800.0f)
 	MCFG_PTM6840_IRQ_CB(WRITELINE(a2bus_midi_device, ptm_irq_w))
@@ -44,16 +49,6 @@ MACHINE_CONFIG_START( midi )
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, 31250*16)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(a2bus_midi_device, write_acia_clock))
 MACHINE_CONFIG_END
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor a2bus_midi_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( midi );
-}
 
 //**************************************************************************
 //  LIVE DEVICE

@@ -24,10 +24,6 @@ class a2bus_memexp_device:
 	public device_a2bus_card_interface
 {
 public:
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-
 	bool m_isramfactor;
 	uint8_t m_bankhior;
 	int m_addrmask;
@@ -38,6 +34,8 @@ protected:
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	// overrides of standard a2bus slot functions
 	virtual uint8_t read_c0nx(address_space &space, uint8_t offset) override;

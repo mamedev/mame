@@ -68,7 +68,20 @@ static SLOT_INTERFACE_START( hsscsi_devices )
 	SLOT_INTERFACE_INTERNAL("ncr5380", NCR5380N)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( hsscsi )
+ROM_START( hsscsi )
+	ROM_REGION(0x8000, SCSI_ROM_REGION, 0)
+	ROM_LOAD( "341-0803.bin", 0x0000, 0x8000, CRC(2c15618b) SHA1(7d32227299933bfc1b7f8bc2062906fdfe530674) )
+ROM_END
+
+/***************************************************************************
+    FUNCTION PROTOTYPES
+***************************************************************************/
+
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( a2bus_hsscsi_device::device_add_mconfig )
 	MCFG_NSCSI_BUS_ADD(SCSI_BUS_TAG)
 	MCFG_NSCSI_ADD("scsibus:0", hsscsi_devices, nullptr, false)
 	MCFG_NSCSI_ADD("scsibus:1", hsscsi_devices, nullptr, false)
@@ -80,25 +93,6 @@ static MACHINE_CONFIG_START( hsscsi )
 	MCFG_NSCSI_ADD("scsibus:7", hsscsi_devices, "ncr5380", true)
 	MCFG_DEVICE_CARD_MACHINE_CONFIG("ncr5380", ncr5380)
 MACHINE_CONFIG_END
-
-ROM_START( hsscsi )
-	ROM_REGION(0x8000, SCSI_ROM_REGION, 0)
-	ROM_LOAD( "341-0803.bin", 0x0000, 0x8000, CRC(2c15618b) SHA1(7d32227299933bfc1b7f8bc2062906fdfe530674) )
-ROM_END
-
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor a2bus_hsscsi_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( hsscsi );
-}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
