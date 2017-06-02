@@ -13,7 +13,7 @@
   24-function board "EVA-24"
   - COP420 MCU (custom label)
   - TMS5110A, TMS6100 CM63002
-  - VFD panel
+  - monitor board (unknown MCU, no dump), VFD panel
 
   TODO:
   - add eva11/eva24 sensors
