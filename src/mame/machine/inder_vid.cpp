@@ -2,9 +2,6 @@
 // copyright-holders:David Haywood
 /* Inder / Dinamic Video */
 
-/* Inder / Dinamic Sound Board */
-
-
 #include "emu.h"
 #include "machine/inder_vid.h"
 

@@ -103,6 +103,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(littlerb_sound_step_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(littlerb_sound_cb);
 
+	DECLARE_DRIVER_INIT(littlerb);
 };
 
 
@@ -249,14 +250,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(littlerb_state::littlerb_sound_step_cb)
 }
 
 static MACHINE_CONFIG_START( littlerb )
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2) // 10MHz rated part, near 16Mhz XTAL
 	MCFG_CPU_PROGRAM_MAP(littlerb_main)
 
-	MCFG_INDER_VIDEO_ADD("inder_vid")
+	MCFG_INDER_VIDEO_ADD("inder_vid") // XTAL_40MHz
 
-	// should probably be done with a timer rather than relying on screen(!)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("step_timer", littlerb_state, littlerb_sound_step_cb,  attotime::from_hz(7500/150)) // TODO: not accurate
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("sound_timer", littlerb_state, littlerb_sound_cb,  attotime::from_hz(7500)) // TODO: not accurate
+	// TODO: not accurate - driven by XTAL_6MHz?
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("step_timer", littlerb_state, littlerb_sound_step_cb,  attotime::from_hz(7500/150))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("sound_timer", littlerb_state, littlerb_sound_cb,  attotime::from_hz(7500))
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
 
@@ -277,5 +278,11 @@ ROM_START( littlerb )
 	ROM_LOAD( "romd.u32", 0x00000, 0x40000, CRC(d6b81583) SHA1(b7a63d18a41ccac4d3db9211de0b0cdbc914317a) )
 ROM_END
 
+DRIVER_INIT_MEMBER(littlerb_state,littlerb)
+{
+	/* various scenes flicker to the point of graphics being invisible (eg. the map screen at the very start of a game)
+	   unless you overclock the TMS34010 to 120%, possible timing bug in the core? this is a hack */
+	m_indervid->subdevice<cpu_device>("tms")->set_clock_scale(1.2f);
+}
 
-GAME( 1994, littlerb, 0, littlerb, littlerb, littlerb_state, 0, ROT0, "TCH", "Little Robin", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND )
+GAME( 1994, littlerb, 0, littlerb, littlerb, littlerb_state, littlerb, ROT0, "TCH", "Little Robin", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND )
