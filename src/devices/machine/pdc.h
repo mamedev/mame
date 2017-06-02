@@ -99,7 +99,7 @@ private:
 	//required_device<floppy_connector> m_floppy;
 	//required_device<floppy_image_device> m_floppy;
 	optional_device<hdc9224_device> m_hdc9224;
-	mfm_harddisk_device*    m_harddisk;
+	//mfm_harddisk_device*    m_harddisk;
 	required_shared_ptr<uint8_t> m_pdc_ram;
 
 	/* Callbacks */
