@@ -466,7 +466,13 @@ YM2203: 2 I/O ports
     The 'F' revision only appears during the first year of production.
 YM3439: limited info: CMOS version of YM2149?
 YMZ284: limited info: 0 I/O port, different clock divider
+  The chip selection logic is again simplified here: pin 1 is /WR, pin 2 is
+    /CS and pin 3 is A0.
+  D0-D7 are conveniently all on one side of the 16-pin package.
+  Pin 8 is /IC (initial clear), with an internal pullup.
 YMZ294: limited info: 0 I/O port
+  Pinout is identical to YMZ284 except for two additions: pin 8 selects
+    between 4MHz (H) and 6MHz (L), while pin 10 is /TEST.
 OKI M5255, Winbond WF19054, JFC 95101, File KC89C72, Toshiba T7766A : differences to be listed
 
 Decaps:
