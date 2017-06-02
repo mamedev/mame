@@ -14,20 +14,20 @@
 
 /*
  * The following is used by all drivers not reviewed yet.
- * This will like the old behaviour, output between
+ * This will like the old behavior, output between
  * 0 and 7FFF
  */
 #define AY8910_LEGACY_OUTPUT        (0x01)
 
 /*
- * Specifing the next define will simulate the special
+ * Specifying the next define will simulate the special
  * cross channel mixing if outputs are tied together.
  * The driver will only provide one stream in this case.
  */
 #define AY8910_SINGLE_OUTPUT        (0x02)
 
 /*
- * The following define is the default behaviour.
+ * The following define is the default behavior.
  * Output level 0 is 0V and 7ffff corresponds to 5V.
  * Use this to specify that a discrete mixing stage
  * follows.
