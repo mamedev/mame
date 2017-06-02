@@ -280,6 +280,8 @@ ROM_END
 
 DRIVER_INIT_MEMBER(littlerb_state,littlerb)
 {
+	/* various scenes flicker to the point of graphics being invisible (eg. the map screen at the very start of a game)
+	   unless you overclock the TMS34010 to 120%, possible timing bug in the core? this is a hack */
 	m_indervid->subdevice<cpu_device>("tms")->set_clock_scale(1.2f);
 }
 
