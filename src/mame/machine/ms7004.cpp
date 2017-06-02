@@ -51,11 +51,12 @@ static ADDRESS_MAP_START( ms7004_map, AS_PROGRAM, 8, ms7004_device )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 ADDRESS_MAP_END
 
+
 //-------------------------------------------------
-//  MACHINE_CONFIG
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( ms7004 )
+MACHINE_CONFIG_MEMBER( ms7004_device::device_add_mconfig )
 	MCFG_CPU_ADD(MS7004_CPU_TAG, I8035, XTAL_4_608MHz)
 	MCFG_CPU_PROGRAM_MAP(ms7004_map)
 	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(ms7004_device, p1_w))
@@ -69,17 +70,6 @@ static MACHINE_CONFIG_START( ms7004 )
 	MCFG_SOUND_ADD(MS7004_SPK_TAG, BEEP, 3250)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor ms7004_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( ms7004 );
-}
 
 const tiny_rom_entry *ms7004_device::device_rom_region() const
 {

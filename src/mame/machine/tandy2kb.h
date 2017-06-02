@@ -50,25 +50,19 @@ public:
 	template <class Object> static devcb_base &set_clock_wr_callback(device_t &device, Object &&cb) { return downcast<tandy2k_keyboard_device &>(device).m_write_clock.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_data_wr_callback(device_t &device, Object &&cb) { return downcast<tandy2k_keyboard_device &>(device).m_write_data.set_callback(std::forward<Object>(cb)); }
 
-	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual ioport_constructor device_input_ports() const override;
-
 	DECLARE_WRITE_LINE_MEMBER( power_w );
 	DECLARE_WRITE_LINE_MEMBER( reset_w );
 	DECLARE_WRITE_LINE_MEMBER( busy_w );
 	DECLARE_READ_LINE_MEMBER( data_r );
 
-	// not really public
-	DECLARE_READ8_MEMBER( kb_p1_r );
-	DECLARE_WRITE8_MEMBER( kb_p1_w );
-	DECLARE_WRITE8_MEMBER( kb_p2_w );
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
 
 private:
 	enum
@@ -87,6 +81,10 @@ private:
 
 	int m_clock;
 	int m_data;
+
+	DECLARE_READ8_MEMBER( kb_p1_r );
+	DECLARE_WRITE8_MEMBER( kb_p1_w );
+	DECLARE_WRITE8_MEMBER( kb_p2_w );
 };
 
 

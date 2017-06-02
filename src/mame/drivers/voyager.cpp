@@ -13,8 +13,8 @@ Motherboard is FIC AZIIEA with AMD Duron processor of unknown speed
 Chipset: VIA KT133a with VT8363A Northbridge and VT82C686B Southbridge
 Video: Jaton 3DForce2MX-32, based on Nvidia GeForce 2MX chipset w/32 MB of VRAM
 I/O: JAMMA adapter board connects to parallel port, VGA out, audio out.
-	Labelled "MEGAJAMMA 101 REV A2" for the stand-up Voyager
-	
+    Labelled "MEGAJAMMA 101 REV A2" for the stand-up Voyager
+
 HDD for stand-up Voyager is a Maxtor D740X-6L 20 GB model.
 
 Upright Voyager runs at 15 kHz standard res, sit-down at 24 kHz medium res.

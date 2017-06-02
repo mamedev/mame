@@ -52,6 +52,7 @@
 #include "formats/dmk_dsk.h"
 #include "formats/jvc_dsk.h"
 #include "formats/vdk_dsk.h"
+#include "formats/sdf_dsk.h"
 
 
 /***************************************************************************
@@ -83,9 +84,9 @@ protected:
 	};
 
 	// device-level overrides
-	virtual DECLARE_READ8_MEMBER(read) override;
-	virtual DECLARE_WRITE8_MEMBER(write) override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual DECLARE_READ8_MEMBER(scs_read) override;
+	virtual DECLARE_WRITE8_MEMBER(scs_write) override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	// methods
 	virtual void update_lines() override;
@@ -112,14 +113,15 @@ protected:
 FLOPPY_FORMATS_MEMBER( coco_family_fdc_device_base::floppy_formats )
 	FLOPPY_DMK_FORMAT,
 	FLOPPY_JVC_FORMAT,
-	FLOPPY_VDK_FORMAT
+	FLOPPY_VDK_FORMAT,
+	FLOPPY_SDF_FORMAT
 FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START( coco_fdc_floppies )
 	SLOT_INTERFACE("qd", FLOPPY_525_QD)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START(coco_fdc)
+MACHINE_CONFIG_MEMBER(coco_fdc_device_base::device_add_mconfig )
 	MCFG_WD1773_ADD(WD_TAG, XTAL_8MHz)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(coco_fdc_device_base, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(coco_fdc_device_base, fdc_drq_w))
@@ -215,17 +217,6 @@ coco_fdc_device_base::rtc_type coco_fdc_device_base::real_time_clock()
 
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor coco_fdc_device_base::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME(coco_fdc);
-}
-
-
-//-------------------------------------------------
 //  update_lines - CoCo specific disk
 //  controller lines
 //-------------------------------------------------
@@ -267,12 +258,11 @@ void coco_fdc_device_base::dskreg_w(uint8_t data)
 			data);
 	}
 
-	/* An email from John Kowalski informed me that if the DS3 is
-	 * high, and one of the other drive bits is selected (DS0-DS2), then the
-	 * second side of DS0, DS1, or DS2 is selected.  If multiple bits are
-	 * selected in other situations, then both drives are selected, and any
-	 * read signals get yucky.
-	 */
+	// An email from John Kowalski informed me that if the DS3 is
+	// high, and one of the other drive bits is selected (DS0-DS2), then the
+	// second side of DS0, DS1, or DS2 is selected.  If multiple bits are
+	// selected in other situations, then both drives are selected, and any
+	// read signals get yucky.
 
 	if (data & 0x04)
 		drive = 2;
@@ -287,7 +277,7 @@ void coco_fdc_device_base::dskreg_w(uint8_t data)
 	{
 		floppy_image_device *floppy = m_floppies[i]->get_device();
 		if (floppy)
-			floppy->mon_w(i == drive ? CLEAR_LINE : ASSERT_LINE);
+			floppy->mon_w(((i == drive) && (data & 0x08)) ? CLEAR_LINE : ASSERT_LINE);
 	}
 
 	head = ((data & 0x40) && (drive != 3)) ? 1 : 0;
@@ -307,14 +297,14 @@ void coco_fdc_device_base::dskreg_w(uint8_t data)
 
 
 //-------------------------------------------------
-//  read
+//  scs_read
 //-------------------------------------------------
 
-READ8_MEMBER(coco_fdc_device_base::read)
+READ8_MEMBER(coco_fdc_device_base::scs_read)
 {
 	uint8_t result = 0;
 
-	switch(offset & 0xEF)
+	switch(offset & 0x1F)
 	{
 		case 8:
 			result = m_wd17xx->status_r(space, 0);
@@ -331,38 +321,37 @@ READ8_MEMBER(coco_fdc_device_base::read)
 	}
 
 	/* other stuff for RTCs */
-	switch(offset)
+	switch (offset)
 	{
-		case 0x10:  /* FF50 */
-			if (real_time_clock() == rtc_type::DISTO)
-				result = m_disto_msm6242->read(space,m_msm6242_rtc_address);
-			break;
+	case 0x10:  /* FF50 */
+		if (real_time_clock() == rtc_type::DISTO)
+			result = m_disto_msm6242->read(space, m_msm6242_rtc_address);
+		break;
 
-		case 0x38:  /* FF78 */
-			if (real_time_clock() == rtc_type::CLOUD9)
-				m_ds1315->read_0(space, offset);
-			break;
+	case 0x38:  /* FF78 */
+		if (real_time_clock() == rtc_type::CLOUD9)
+			m_ds1315->read_0(space, offset);
+		break;
 
-		case 0x39:  /* FF79 */
-			if (real_time_clock() == rtc_type::CLOUD9)
-				m_ds1315->read_1(space, offset);
-			break;
+	case 0x39:  /* FF79 */
+		if (real_time_clock() == rtc_type::CLOUD9)
+			m_ds1315->read_1(space, offset);
+		break;
 
-		case 0x3C:  /* FF7C */
-			if (real_time_clock() == rtc_type::CLOUD9)
-				result = m_ds1315->read_data(space, offset);
-			break;
+	case 0x3C:  /* FF7C */
+		if (real_time_clock() == rtc_type::CLOUD9)
+			result = m_ds1315->read_data(space, offset);
+		break;
 	}
 	return result;
 }
 
 
-
 //-------------------------------------------------
-//  write
+//  scs_write
 //-------------------------------------------------
 
-WRITE8_MEMBER(coco_fdc_device_base::write)
+WRITE8_MEMBER(coco_fdc_device_base::scs_write)
 {
 	switch(offset & 0x1F)
 	{
@@ -380,7 +369,6 @@ WRITE8_MEMBER(coco_fdc_device_base::write)
 			m_wd17xx->sector_w(space, 0, data);
 			break;
 		case 11:
-			//printf("data w %02x\n", data);
 			m_wd17xx->data_w(space, 0, data);
 			break;
 	};

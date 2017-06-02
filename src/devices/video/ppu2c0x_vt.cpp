@@ -3,9 +3,9 @@
 /******************************************************************************
 
     VT video emulation
-	
-	The VT video is based on the ppu2c0x but with enhanced capabilities such
-	as 16 colour sprites.
+
+    The VT video is based on the ppu2c0x but with enhanced capabilities such
+    as 16 colour sprites.
 
 ******************************************************************************/
 
@@ -41,7 +41,7 @@ READ8_MEMBER(ppu_vt03_device::palette_read)
 void ppu_vt03_device::set_new_pen(int i)
 {
 	uint16_t palval = (m_newpal[i&0x7f] & 0x3f) | ((m_newpal[(i&0x7f)+0x80] & 0x3f)<<6);
-	
+
 	// &0x3f so we don't attempt to use any of the extended colours right now because
 	// I haven't managed to work out the format
 	m_palette->set_pen_indirect(i&0x7f,palval&0x3f);
@@ -130,7 +130,7 @@ void ppu_vt03_device::read_sprite_plane_data(int address)
 	m_planebuf[1] = m_read_sp((address + 8) & 0x1fff);
 
 	int is4bpp = get_201x_reg(0x0) & 0x04;
-	
+
 	if (is4bpp)
 	{
 		m_va34 = 1;
@@ -150,7 +150,7 @@ void ppu_vt03_device::make_sprite_pixel_data(uint8_t &pixel_data, int flipx)
 		if (flipx)
 		{
 			// yes, shift by 5 and 6 because of the way the palette is arranged in RAM
-			pixel_data |= (((m_extplanebuf[0] & 1) << 5) | ((m_extplanebuf[1] & 1) << 6)); 
+			pixel_data |= (((m_extplanebuf[0] & 1) << 5) | ((m_extplanebuf[1] & 1) << 6));
 			m_extplanebuf[0] = m_extplanebuf[0] >> 1;
 			m_extplanebuf[1] = m_extplanebuf[1] >> 1;
 		}
@@ -275,13 +275,13 @@ uint8_t ppu_vt03_device::get_speva2_speva0()
 void ppu_vt03_device::set_2010_reg(uint8_t data)
 {
 	/*  7   : COLCOMP
-		6   : UNUSED (8bpp enable on VT09?)
-		5   : UNUSED
-		4   : BKEXTEN
-		3   : SPEXTEN
-		2   : SP16EN
-		1   : BK16EN
-		0   : PIX16EN */
+	    6   : UNUSED (8bpp enable on VT09?)
+	    5   : UNUSED
+	    4   : BKEXTEN
+	    3   : SPEXTEN
+	    2   : SP16EN
+	    1   : BK16EN
+	    0   : PIX16EN */
 
 	if ((m_201x_regs[0x0] & 0x80) != (data & 0x80))
 	{

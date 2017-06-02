@@ -222,34 +222,15 @@ public:
 
 	static void set_channel_number(device_t &device, int channel) { dynamic_cast<cmi01a_device&>(device).m_channel = channel; }
 
-	DECLARE_WRITE_LINE_MEMBER( ptm_out0 );
-
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_READ8_MEMBER( read );
-
-	DECLARE_WRITE8_MEMBER( rp_w );
-	DECLARE_WRITE8_MEMBER( ws_dir_w );
-	DECLARE_READ_LINE_MEMBER( tri_r );
-	DECLARE_WRITE_LINE_MEMBER( pia_0_ca2_w );
-	DECLARE_WRITE_LINE_MEMBER( pia_0_cb2_w );
-	DECLARE_WRITE_LINE_MEMBER( pia_0_irqa );
-	DECLARE_WRITE_LINE_MEMBER( pia_0_irqb );
-
-	DECLARE_READ_LINE_MEMBER( eosi_r );
-	DECLARE_READ_LINE_MEMBER( zx_r );
-	DECLARE_WRITE8_MEMBER( pia_1_a_w );
-	DECLARE_WRITE8_MEMBER( pia_1_b_w );
-	DECLARE_WRITE_LINE_MEMBER( pia_1_irqa );
-	DECLARE_WRITE_LINE_MEMBER( pia_1_irqb );
-
-	DECLARE_WRITE_LINE_MEMBER( ptm_irq );
 
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	static const device_timer_id TIMER_ZX = 0;
@@ -295,6 +276,24 @@ private:
 	int     m_pia_1_irqb;
 	int     m_ptm_irq;
 	int     m_irq_state;
+
+	DECLARE_WRITE8_MEMBER( rp_w );
+	DECLARE_WRITE8_MEMBER( ws_dir_w );
+	DECLARE_READ_LINE_MEMBER( tri_r );
+	DECLARE_WRITE_LINE_MEMBER( pia_0_ca2_w );
+	DECLARE_WRITE_LINE_MEMBER( pia_0_cb2_w );
+	DECLARE_WRITE_LINE_MEMBER( pia_0_irqa );
+	DECLARE_WRITE_LINE_MEMBER( pia_0_irqb );
+
+	DECLARE_READ_LINE_MEMBER( eosi_r );
+	DECLARE_READ_LINE_MEMBER( zx_r );
+	DECLARE_WRITE8_MEMBER( pia_1_a_w );
+	DECLARE_WRITE8_MEMBER( pia_1_b_w );
+	DECLARE_WRITE_LINE_MEMBER( pia_1_irqa );
+	DECLARE_WRITE_LINE_MEMBER( pia_1_irqb );
+
+	DECLARE_WRITE_LINE_MEMBER( ptm_irq );
+	DECLARE_WRITE_LINE_MEMBER( ptm_out0 );
 };
 
 DEFINE_DEVICE_TYPE(CMI01A_CHANNEL_CARD, cmi01a_device, "cmi_01a", "Fairlight CMI-01A Channel Card")
@@ -311,7 +310,7 @@ cmi01a_device::cmi01a_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
-MACHINE_CONFIG_START( cmi01a_device )
+MACHINE_CONFIG_MEMBER( cmi01a_device::device_add_mconfig )
 	MCFG_DEVICE_ADD("cmi01a_pia_0", PIA6821, 0) // pia_cmi01a_1_config
 	MCFG_PIA_READCB1_HANDLER(READLINE(cmi01a_device, tri_r))
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(cmi01a_device, ws_dir_w))
@@ -335,10 +334,6 @@ MACHINE_CONFIG_START( cmi01a_device )
 	MCFG_PTM6840_IRQ_CB(WRITELINE(cmi01a_device, ptm_irq))
 MACHINE_CONFIG_END
 
-machine_config_constructor cmi01a_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME(cmi01a_device);
-}
 
 void cmi01a_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {

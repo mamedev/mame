@@ -19,7 +19,7 @@
 #include "screen.h"
 #include "speaker.h"
 
-#include "hh_sm510_test.lh" // common test-layout - use external artwork
+//#include "hh_sm510_test.lh" // common test-layout - use external artwork
 
 
 class hh_sm510_state : public driver_device

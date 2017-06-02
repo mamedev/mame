@@ -159,9 +159,9 @@ favorite_manager::favorite_manager(running_machine &machine, ui_options &moption
 
 void favorite_manager::add_favorite_game(const game_driver *driver)
 {
-    m_list.emplace(driver->type.fullname(),
-                   ui_software_info{driver->name, driver->type.fullname(), "", "", "", 0, "", driver, "", "", "",
-                                    1, "", "", "", true});
+	m_list.emplace(driver->type.fullname(),
+				   ui_software_info{driver->name, driver->type.fullname(), "", "", "", 0, "", driver, "", "", "",
+									1, "", "", "", true});
 	save_favorite_games();
 }
 

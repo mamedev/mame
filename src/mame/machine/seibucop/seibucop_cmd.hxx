@@ -161,7 +161,7 @@ void raiden2cop_device::execute_338e(int offset, uint16_t data, bool is_yflip)
 {
 	int dx = m_host_space->read_dword(cop_regs[1] + 4) - m_host_space->read_dword(cop_regs[0] + 4);
 	int dy = m_host_space->read_dword(cop_regs[1] + 8) - m_host_space->read_dword(cop_regs[0] + 8);
-	
+
 	cop_status = 7;
 
 	if (!dy) {

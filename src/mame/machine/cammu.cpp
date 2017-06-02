@@ -77,7 +77,7 @@ ADDRESS_MAP_END
 DEVICE_ADDRESS_MAP_START(map, 32, cammu_c3_device)
 	// the first AM_NOP in each range is in fact the TLB in the C3 CAMMU
 
-	AM_RANGE(0x800, 0x8ff) AM_NOP 
+	AM_RANGE(0x800, 0x8ff) AM_NOP
 	AM_RANGE(0x904, 0x907) AM_READWRITE(d_s_pdo_r, d_s_pdo_w)
 	AM_RANGE(0x908, 0x90b) AM_READWRITE(d_u_pdo_r, d_u_pdo_w)
 	AM_RANGE(0x910, 0x913) AM_READWRITE(d_fault_r, d_fault_w)
@@ -281,7 +281,7 @@ READ32_MEMBER(cammu_device::data_r)
 	case 3:
 		return m_main_space->read_dword(ra, mem_mask);
 
-	case 4: 
+	case 4:
 		return m_io_space->read_dword(ra, mem_mask);
 
 	case 5:

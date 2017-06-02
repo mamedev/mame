@@ -57,25 +57,13 @@ const tiny_rom_entry *k7659_keyboard_device::device_rom_region() const
 //-------------------------------------------------
 
 
-
 //-------------------------------------------------
-//  MACHINE_DRIVER( k7659_keyboard )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( k7659_keyboard )
+MACHINE_CONFIG_MEMBER( k7659_keyboard_device::device_add_mconfig )
 
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor k7659_keyboard_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( k7659_keyboard );
-}
 
 
 //-------------------------------------------------

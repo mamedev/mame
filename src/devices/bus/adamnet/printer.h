@@ -12,7 +12,7 @@
 #pragma once
 
 #include "adamnet.h"
-#include "cpu/m6800/m6800.h"
+#include "cpu/m6800/m6801.h"
 
 
 

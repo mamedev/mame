@@ -19,8 +19,6 @@ class n2a03_device : public m6502_device {
 public:
 	n2a03_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	required_device<nesapu_device> m_apu;
-
 	static const disasm_entry disasm_entries[0x100];
 
 	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
@@ -33,8 +31,7 @@ public:
 	WRITE8_MEMBER(psg1_4015_w);
 	WRITE8_MEMBER(psg1_4017_w);
 
-	DECLARE_WRITE_LINE_MEMBER(apu_irq);
-	DECLARE_READ8_MEMBER(apu_read_mem);
+	required_device<nesapu_device> m_apu; // public for vgmplay
 
 protected:
 	class mi_2a03_normal : public memory_interface {
@@ -68,11 +65,14 @@ protected:
 
 #undef O
 
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 
 private:
 	address_space_config m_program_config;
+
+	DECLARE_WRITE_LINE_MEMBER(apu_irq);
+	DECLARE_READ8_MEMBER(apu_read_mem);
 
 };
 

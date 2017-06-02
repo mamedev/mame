@@ -312,8 +312,11 @@ void alpha_8201_device::device_start()
 	save_item(NAME(m_mcu_r));
 }
 
-// machine config additions
-static MACHINE_CONFIG_START(alpha8201)
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER(alpha_8201_device::device_add_mconfig)
 
 	MCFG_CPU_ADD("mcu", HD44801, DERIVED_CLOCK(1,1)) // 8H
 	MCFG_HMCS40_READ_R_CB(0, READ8(alpha_8201_device, mcu_data_r))
@@ -324,12 +327,6 @@ static MACHINE_CONFIG_START(alpha8201)
 	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(alpha_8201_device, mcu_data_w))
 	MCFG_HMCS40_WRITE_D_CB(WRITE16(alpha_8201_device, mcu_d_w))
 MACHINE_CONFIG_END
-
-machine_config_constructor alpha_8201_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME(alpha8201);
-}
-
 
 //-------------------------------------------------
 //  device_reset - device-specific reset

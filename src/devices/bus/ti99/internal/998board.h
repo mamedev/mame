@@ -19,7 +19,7 @@
 #pragma once
 
 #include "bus/ti99/ti99defs.h"
-#include "gromport.h"
+#include "bus/ti99/gromport/gromport.h"
 
 #include "bus/ti99/internal/ioport.h"
 #include "machine/ram.h"
@@ -442,9 +442,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( speech_ready );
 	DECLARE_WRITE_LINE_MEMBER( pbox_ready );
 
-	// Emulation
-	// void set_gromport(gromport_device* dev) { m_gromport = dev; }
-
 protected:
 	void device_start() override;
 	void device_reset() override;
@@ -509,7 +506,7 @@ private:
 	required_device<tms9928a_device>        m_video;
 	required_device<sn76496_base_device>    m_sound;
 	required_device<cd2501ecd_device>       m_speech;
-	required_device<bus::ti99::internal::gromport_device>   m_gromport;
+	required_device<bus::ti99::gromport::gromport_device>   m_gromport;
 	required_device<bus::ti99::internal::ioport_device>     m_ioport;
 
 	required_device<ram_device>             m_sram;

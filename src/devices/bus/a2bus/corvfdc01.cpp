@@ -35,16 +35,6 @@ static SLOT_INTERFACE_START( corv_floppies )
 	SLOT_INTERFACE( "8sssd", FLOPPY_8_SSSD )
 SLOT_INTERFACE_END
 
-MACHINE_CONFIG_START( fdc01 )
-	MCFG_FD1793_ADD(FDC01_FDC_TAG, XTAL_16MHz / 8)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(a2bus_corvfdc01_device, intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(a2bus_corvfdc01_device, drq_w))
-	MCFG_FLOPPY_DRIVE_ADD(FDC01_FDC_TAG":0", corv_floppies, "8sssd", a2bus_corvfdc01_device::corv_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FDC01_FDC_TAG":1", corv_floppies, "8sssd", a2bus_corvfdc01_device::corv_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FDC01_FDC_TAG":2", corv_floppies, "8sssd", a2bus_corvfdc01_device::corv_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FDC01_FDC_TAG":3", corv_floppies, "8sssd", a2bus_corvfdc01_device::corv_floppy_formats)
-MACHINE_CONFIG_END
-
 ROM_START( fdc01 )
 	ROM_REGION(0x20, FDC01_ROM_REGION, 0)
 	ROM_LOAD( "ff01.bin",     0x000000, 0x000020, CRC(ad3c1136) SHA1(b1e1e8a10618588b1b44b3be5d88857497f30b33) )
@@ -89,14 +79,18 @@ enum
 ***************************************************************************/
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor a2bus_corvfdc01_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( fdc01 );
-}
+MACHINE_CONFIG_MEMBER( a2bus_corvfdc01_device::device_add_mconfig )
+	MCFG_FD1793_ADD(FDC01_FDC_TAG, XTAL_16MHz / 8)
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(a2bus_corvfdc01_device, intrq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(a2bus_corvfdc01_device, drq_w))
+	MCFG_FLOPPY_DRIVE_ADD(FDC01_FDC_TAG":0", corv_floppies, "8sssd", a2bus_corvfdc01_device::corv_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FDC01_FDC_TAG":1", corv_floppies, "8sssd", a2bus_corvfdc01_device::corv_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FDC01_FDC_TAG":2", corv_floppies, "8sssd", a2bus_corvfdc01_device::corv_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FDC01_FDC_TAG":3", corv_floppies, "8sssd", a2bus_corvfdc01_device::corv_floppy_formats)
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region

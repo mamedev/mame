@@ -527,6 +527,8 @@ orunners:  Interleaved with the dj and << >> buttons is the data the drives the 
 #include "emu.h"
 #include "includes/segas32.h"
 
+#include "bus/scsi/scsi.h"
+#include "bus/scsi/scsicd.h"
 #include "cpu/z80/z80.h"
 #include "cpu/v60/v60.h"
 #include "cpu/nec/v25.h"
@@ -535,7 +537,7 @@ orunners:  Interleaved with the dj and << >> buttons is the data the drives the 
 #include "machine/eepromser.h"
 #include "machine/i8255.h"
 #include "machine/mb8421.h"
-//#include "machine/mb89352.h"
+#include "machine/mb89352.h"
 #include "machine/msm6253.h"
 #include "machine/upd4701.h"
 #include "machine/315_5296.h"
@@ -547,6 +549,11 @@ orunners:  Interleaved with the dj and << >> buttons is the data the drives the 
 
 #include "radr.lh"
 
+/*
+ * TODO: Kokoroji hangs if CD comms are handled with current mb89352 core.
+ * We currently hide this behind a compile switch to aid development
+ */
+#define S32_KOKOROJI_TEST_CD 0
 
 DEFINE_DEVICE_TYPE(SEGA_S32_PCB, segas32_state, "segas32_pcb", "Sega System 32 PCB")
 
@@ -2479,9 +2486,24 @@ WRITE8_MEMBER(segas32_cd_state::lamps2_w)
 		machine().output().set_lamp_value(8 + i, BIT(data, i));
 }
 
+WRITE_LINE_MEMBER(segas32_cd_state::scsi_irq_w)
+{
+	printf("%02x IRQ\n",state);
+	// TODO: sent!
+}
+
+WRITE_LINE_MEMBER(segas32_cd_state::scsi_drq_w)
+{
+	printf("%02x DRQ\n",state);
+}
+
 static ADDRESS_MAP_START( system32_cd_map, AS_PROGRAM, 16, segas32_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xc00040, 0xc0005f) AM_MIRROR(0x0fff80) AM_NOP //AM_DEVREADWRITE8("mb89352", mb89352_device, mb89352_r, mb89352_w, 0x00ff)
+	#if S32_KOKOROJI_TEST_CD
+	AM_RANGE(0xc00040, 0xc0005f) AM_MIRROR(0x0fff80) AM_DEVREADWRITE8("mb89352", mb89352_device, mb89352_r, mb89352_w, 0x00ff)
+	#else
+	AM_RANGE(0xc00040, 0xc0005f) AM_MIRROR(0x0fff80) AM_NOP
+	#endif
 	AM_RANGE(0xc00060, 0xc0006f) AM_MIRROR(0x0fff80) AM_DEVREADWRITE8("cxdio", cxd1095_device, read, write, 0x00ff)
 	AM_IMPORT_FROM(system32_map)
 ADDRESS_MAP_END
@@ -2492,7 +2514,13 @@ MACHINE_CONFIG_MEMBER(segas32_cd_state::device_add_mconfig)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(system32_cd_map)
 
-	//MCFG_DEVICE_ADD("mb89352", MB89352A, 8000000)
+	MCFG_DEVICE_ADD("mb89352", MB89352A, 8000000)
+	MCFG_LEGACY_SCSI_PORT("scsi")
+	MCFG_MB89352A_IRQ_CB(WRITELINE(segas32_cd_state, scsi_irq_w))
+	MCFG_MB89352A_DRQ_CB(WRITELINE(segas32_cd_state, scsi_drq_w))
+
+	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
+	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "cdrom", SCSICD, SCSI_ID_0)
 
 	MCFG_DEVICE_ADD("cxdio", CXD1095, 0)
 	MCFG_CXD1095_OUT_PORTA_CB(WRITE8(segas32_cd_state, lamps1_w))
@@ -4056,7 +4084,7 @@ ROM_START( kokoroj2 )
 	ROMX_LOAD( "mpr-16196.ic25", 0x800006, 0x200000, CRC(b8e22e05) SHA1(dd667e2c5d421cba356421825e6aca9b5ca0af45) , ROM_SKIP(6)|ROM_GROUPWORD )
 
 	/* AUDIO CD */
-	DISK_REGION( "cdrom" )
+	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
 	DISK_IMAGE_READONLY( "cdp-00146", 0, SHA1(0b37e0ea2380ecd9abef2ccd6a8096d76d2ba344) )
 ROM_END
 

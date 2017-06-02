@@ -171,8 +171,6 @@ Sega PC BD MODEL2 C-CRX COMMUNICATION 837-12839
 #define VERBOSE 0
 #include "logmacro.h"
 
-MACHINE_CONFIG_START( m2comm )
-MACHINE_CONFIG_END
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -181,14 +179,11 @@ MACHINE_CONFIG_END
 DEFINE_DEVICE_TYPE(M2COMM, m2comm_device, "m2comm", "Model 2 Communication Board")
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor m2comm_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( m2comm );
-}
+MACHINE_CONFIG_MEMBER( m2comm_device::device_add_mconfig )
+MACHINE_CONFIG_END
 
 //**************************************************************************
 //  LIVE DEVICE

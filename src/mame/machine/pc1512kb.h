@@ -52,28 +52,21 @@ public:
 	template <class Object> static devcb_base &set_clock_wr_callback(device_t &device, Object &&cb) { return downcast<pc1512_keyboard_device &>(device).m_write_clock.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_data_wr_callback(device_t &device, Object &&cb) { return downcast<pc1512_keyboard_device &>(device).m_write_data.set_callback(std::forward<Object>(cb)); }
 
-	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual ioport_constructor device_input_ports() const override;
-
 	DECLARE_WRITE_LINE_MEMBER( data_w );
 	DECLARE_WRITE_LINE_MEMBER( clock_w );
 	DECLARE_WRITE_LINE_MEMBER( m1_w );
 	DECLARE_WRITE_LINE_MEMBER( m2_w );
-
-	DECLARE_READ8_MEMBER( kb_bus_r );
-	DECLARE_WRITE8_MEMBER( kb_p1_w );
-	DECLARE_READ8_MEMBER( kb_p2_r );
-	DECLARE_WRITE8_MEMBER( kb_p2_w );
-	DECLARE_READ_LINE_MEMBER( kb_t0_r );
-	DECLARE_READ_LINE_MEMBER( kb_t1_r );
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
 
 private:
 	enum
@@ -98,6 +91,13 @@ private:
 	int m_m2;
 
 	emu_timer *m_reset_timer;
+
+	DECLARE_READ8_MEMBER( kb_bus_r );
+	DECLARE_WRITE8_MEMBER( kb_p1_w );
+	DECLARE_READ8_MEMBER( kb_p2_r );
+	DECLARE_WRITE8_MEMBER( kb_p2_w );
+	DECLARE_READ_LINE_MEMBER( kb_t0_r );
+	DECLARE_READ_LINE_MEMBER( kb_t1_r );
 };
 
 

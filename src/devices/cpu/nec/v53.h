@@ -185,23 +185,6 @@ public:
 	template<class Object> static devcb_base &set_out_dack_1_callback(device_t &device, Object &&cb) { return downcast<v53_base_device &>(device).m_out_dack_1_cb.set_callback(std::forward<Object>(cb)); }
 	template<class Object> static devcb_base &set_out_dack_2_callback(device_t &device, Object &&cb) { return downcast<v53_base_device &>(device).m_out_dack_2_cb.set_callback(std::forward<Object>(cb)); }
 	template<class Object> static devcb_base &set_out_dack_3_callback(device_t &device, Object &&cb) { return downcast<v53_base_device &>(device).m_out_dack_3_cb.set_callback(std::forward<Object>(cb)); }
-	DECLARE_WRITE_LINE_MEMBER(hreq_trampoline_cb) { m_out_hreq_cb(state); }
-	DECLARE_WRITE_LINE_MEMBER(eop_trampoline_cb) { m_out_eop_cb(state); }
-	DECLARE_READ8_MEMBER(dma_memr_trampoline_r) { return m_in_memr_cb(space, offset); }
-	DECLARE_WRITE8_MEMBER(dma_memw_trampoline_w) {  m_out_memw_cb(space, offset, data); }
-	DECLARE_READ8_MEMBER(dma_io_0_trampoline_r) { return m_in_ior_0_cb(space, offset); }
-	DECLARE_READ8_MEMBER(dma_io_1_trampoline_r) { return m_in_ior_1_cb(space, offset); }
-	DECLARE_READ8_MEMBER(dma_io_2_trampoline_r) { return m_in_ior_2_cb(space, offset); }
-	DECLARE_READ8_MEMBER(dma_io_3_trampoline_r) { return m_in_ior_3_cb(space, offset); }
-	DECLARE_WRITE8_MEMBER(dma_io_0_trampoline_w) { m_out_iow_0_cb(space, offset, data); }
-	DECLARE_WRITE8_MEMBER(dma_io_1_trampoline_w) { m_out_iow_1_cb(space, offset, data); }
-	DECLARE_WRITE8_MEMBER(dma_io_2_trampoline_w) { m_out_iow_2_cb(space, offset, data); }
-	DECLARE_WRITE8_MEMBER(dma_io_3_trampoline_w) { m_out_iow_3_cb(space, offset, data); }
-	DECLARE_WRITE_LINE_MEMBER(dma_dack0_trampoline_w) { m_out_dack_0_cb(state); }
-	DECLARE_WRITE_LINE_MEMBER(dma_dack1_trampoline_w) { m_out_dack_1_cb(state); }
-	DECLARE_WRITE_LINE_MEMBER(dma_dack2_trampoline_w) { m_out_dack_2_cb(state); }
-	DECLARE_WRITE_LINE_MEMBER(dma_dack3_trampoline_w) { m_out_dack_3_cb(state); }
-
 
 	DECLARE_WRITE_LINE_MEMBER(dreq0_w);
 	DECLARE_WRITE_LINE_MEMBER(dreq1_w);
@@ -209,16 +192,11 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(dreq3_w);
 	DECLARE_WRITE_LINE_MEMBER(hack_w);
 
-
-	DECLARE_READ8_MEMBER(get_pic_ack);
-	DECLARE_WRITE_LINE_MEMBER(internal_irq_w);
-
-
 protected:
 	v53_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, offs_t fetch_xor, uint8_t prefetch_size, uint8_t prefetch_cycles, uint32_t chip_type);
 
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void execute_set_input(int inputnum, int state) override;
@@ -288,6 +266,25 @@ protected:
 	devcb_write_line   m_out_dack_1_cb;
 	devcb_write_line   m_out_dack_2_cb;
 	devcb_write_line   m_out_dack_3_cb;
+
+	DECLARE_WRITE_LINE_MEMBER(hreq_trampoline_cb) { m_out_hreq_cb(state); }
+	DECLARE_WRITE_LINE_MEMBER(eop_trampoline_cb) { m_out_eop_cb(state); }
+	DECLARE_READ8_MEMBER(dma_memr_trampoline_r) { return m_in_memr_cb(space, offset); }
+	DECLARE_WRITE8_MEMBER(dma_memw_trampoline_w) {  m_out_memw_cb(space, offset, data); }
+	DECLARE_READ8_MEMBER(dma_io_0_trampoline_r) { return m_in_ior_0_cb(space, offset); }
+	DECLARE_READ8_MEMBER(dma_io_1_trampoline_r) { return m_in_ior_1_cb(space, offset); }
+	DECLARE_READ8_MEMBER(dma_io_2_trampoline_r) { return m_in_ior_2_cb(space, offset); }
+	DECLARE_READ8_MEMBER(dma_io_3_trampoline_r) { return m_in_ior_3_cb(space, offset); }
+	DECLARE_WRITE8_MEMBER(dma_io_0_trampoline_w) { m_out_iow_0_cb(space, offset, data); }
+	DECLARE_WRITE8_MEMBER(dma_io_1_trampoline_w) { m_out_iow_1_cb(space, offset, data); }
+	DECLARE_WRITE8_MEMBER(dma_io_2_trampoline_w) { m_out_iow_2_cb(space, offset, data); }
+	DECLARE_WRITE8_MEMBER(dma_io_3_trampoline_w) { m_out_iow_3_cb(space, offset, data); }
+	DECLARE_WRITE_LINE_MEMBER(dma_dack0_trampoline_w) { m_out_dack_0_cb(state); }
+	DECLARE_WRITE_LINE_MEMBER(dma_dack1_trampoline_w) { m_out_dack_1_cb(state); }
+	DECLARE_WRITE_LINE_MEMBER(dma_dack2_trampoline_w) { m_out_dack_2_cb(state); }
+	DECLARE_WRITE_LINE_MEMBER(dma_dack3_trampoline_w) { m_out_dack_3_cb(state); }
+	DECLARE_READ8_MEMBER(get_pic_ack);
+	DECLARE_WRITE_LINE_MEMBER(internal_irq_w);
 };
 
 

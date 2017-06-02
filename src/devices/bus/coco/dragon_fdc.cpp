@@ -73,6 +73,7 @@
 #include "formats/dmk_dsk.h"
 #include "formats/jvc_dsk.h"
 #include "formats/vdk_dsk.h"
+#include "formats/sdf_dsk.h"
 
 
 /***************************************************************************
@@ -96,9 +97,9 @@ namespace
 		dragon_fdc_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 		// device-level overrides
-		virtual DECLARE_READ8_MEMBER(read) override;
-		virtual DECLARE_WRITE8_MEMBER(write) override;
-		virtual machine_config_constructor device_mconfig_additions() const override;
+		virtual DECLARE_READ8_MEMBER(scs_read) override;
+		virtual DECLARE_WRITE8_MEMBER(scs_write) override;
+		virtual void device_add_mconfig(machine_config &config) override;
 		virtual void update_lines() override;
 
 	private:
@@ -120,7 +121,7 @@ static SLOT_INTERFACE_START(dragon_fdc_device_base)
 SLOT_INTERFACE_END
 
 
-static MACHINE_CONFIG_START(dragon_fdc)
+MACHINE_CONFIG_MEMBER(dragon_fdc_device_base::device_add_mconfig)
 	MCFG_WD2797_ADD(WD2797_TAG, XTAL_1MHz)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(dragon_fdc_device_base, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(dragon_fdc_device_base, fdc_drq_w))
@@ -148,17 +149,6 @@ dragon_fdc_device_base::dragon_fdc_device_base(const machine_config &mconfig, de
 	, m_wd2797(*this, WD2797_TAG)
 	, m_floppies(*this, WD2797_TAG ":%u", 0)
 {
-}
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor dragon_fdc_device_base::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME(dragon_fdc);
 }
 
 
@@ -215,10 +205,10 @@ void dragon_fdc_device_base::dskreg_w(uint8_t data)
 
 
 //-------------------------------------------------
-//  read
+//  scs_read
 //-------------------------------------------------
 
-READ8_MEMBER(dragon_fdc_device_base::read)
+READ8_MEMBER(dragon_fdc_device_base::scs_read)
 {
 	uint8_t result = 0;
 	switch (offset & 0xEF)
@@ -242,10 +232,10 @@ READ8_MEMBER(dragon_fdc_device_base::read)
 
 
 //-------------------------------------------------
-//  write
+//  scs_write
 //-------------------------------------------------
 
-WRITE8_MEMBER(dragon_fdc_device_base::write)
+WRITE8_MEMBER(dragon_fdc_device_base::scs_write)
 {
 	switch (offset & 0xEF)
 	{

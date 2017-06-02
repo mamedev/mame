@@ -29,18 +29,12 @@ public:
 	// construction/destruction
 	a2bus_midi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
-	DECLARE_WRITE_LINE_MEMBER( acia_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( ptm_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( write_acia_clock );
-
 protected:
 	a2bus_midi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	virtual uint8_t read_c0nx(address_space &space, uint8_t offset) override;
 	virtual void write_c0nx(address_space &space, uint8_t offset, uint8_t data) override;
@@ -49,6 +43,10 @@ protected:
 	required_device<acia6850_device> m_acia;
 
 private:
+	DECLARE_WRITE_LINE_MEMBER( acia_irq_w );
+	DECLARE_WRITE_LINE_MEMBER( ptm_irq_w );
+	DECLARE_WRITE_LINE_MEMBER( write_acia_clock );
+
 	bool m_acia_irq, m_ptm_irq;
 };
 

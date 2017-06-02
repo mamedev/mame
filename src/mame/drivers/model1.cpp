@@ -633,6 +633,7 @@ Notes:
 #include "emu.h"
 #include "includes/model1.h"
 
+#include "cpu/i386/i386.h"
 #include "machine/clock.h"
 #include "machine/nvram.h"
 #include "speaker.h"
@@ -784,11 +785,24 @@ READ16_MEMBER(model1_state::network_ctl_r)
 	if(offset)
 		return 0x40;
 	else
-		return 0x00;
+		return m_io_command;
 }
 
 WRITE16_MEMBER(model1_state::network_ctl_w)
 {
+	if (offset == 0)
+	{
+		m_io_command = data & 0xff;
+
+		// totally made up; proper emulation of I/O board needed
+		// (command 3 is EEPROM write, so should take a lot longer)
+		m_io_timer->adjust(data == 3 ? attotime::from_msec(100) : attotime::from_usec(10));
+	}
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(model1_state::io_command_acknowledge)
+{
+	m_io_command = 0;
 }
 
 WRITE16_MEMBER(model1_state::md1_w)
@@ -1590,12 +1604,14 @@ ROM_START( netmerc )
 	ROM_LOAD32_WORD( "mpr-18132.ic30", 0x800000, 0x200000, CRC(a17e3ac2) SHA1(19827c06ebc3e9de63668ef07675224e169d853e) )
 	ROM_LOAD32_WORD( "mpr-18133.ic31", 0x800002, 0x200000, CRC(f56354dd) SHA1(2ef1fe8b4995a67b70b565adf8f0ea0ad6e10094) )
 
-	ROM_REGION( 0x10000, "user2", 0 ) /* IO board */
+	ROM_REGION32_LE( 0x200000, "user2", ROMREGION_ERASE00 ) // IC39-IC42 unpopulated
+
+	ROM_REGION( 0x10000, "ioboard", 0 ) /* IO board */
 	ROM_LOAD( "epr-18021.ic6", 0x00000, 0x10000, CRC(5551837e) SHA1(bf5b9aad99c0f8f5e262e0855796f39119d11a97) )
 
-	ROM_REGION( 0x8000, "user3", 0 ) /* POLHEMUS board - temporary holding place */
-	ROM_LOAD( "u1", 0x0000, 0x4000, CRC(7073a312) SHA1(d2582f9520b8c8c051708dd372633112af59206e) )  // Actually interleaved
-	ROM_LOAD( "u2", 0x4000, 0x4000, CRC(c589f428) SHA1(98dc0114a5f89636b4e237ed954e19f1cfd186ab) )
+	ROM_REGION( 0x8000, "polhemus", 0 ) /* POLHEMUS board */
+	ROM_LOAD16_BYTE( "u1", 0x0000, 0x4000, CRC(7073a312) SHA1(d2582f9520b8c8c051708dd372633112af59206e) )
+	ROM_LOAD16_BYTE( "u2", 0x0001, 0x4000, CRC(c589f428) SHA1(98dc0114a5f89636b4e237ed954e19f1cfd186ab) )
 ROM_END
 
 static MACHINE_CONFIG_START( model1 )
@@ -1605,6 +1621,7 @@ static MACHINE_CONFIG_START( model1 )
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(model1_state,irq_callback)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", model1_state, model1_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD("iotimer", model1_state, io_command_acknowledge)
 
 	MCFG_MACHINE_START_OVERRIDE(model1_state,model1)
 	MCFG_MACHINE_RESET_OVERRIDE(model1_state,model1)
@@ -1649,12 +1666,25 @@ static MACHINE_CONFIG_DERIVED(swa, model1)
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE(DSBZ80_TAG, dsbz80_device, write_txd))
 MACHINE_CONFIG_END
 
+static ADDRESS_MAP_START( polhemus_map, AS_PROGRAM, 16, model1_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
+	AM_RANGE(0x00000, 0x03fff) AM_RAM
+	AM_RANGE(0xf8000, 0xfffff) AM_ROM AM_REGION("polhemus", 0)
+ADDRESS_MAP_END
+
+static MACHINE_CONFIG_DERIVED( netmerc, model1 )
+	MCFG_CPU_ADD("polhemus", I386SX, 16000000)
+	MCFG_CPU_PROGRAM_MAP(polhemus_map)
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_START( model1_vr )
 	MCFG_CPU_ADD("maincpu", V60, 16000000)
 	MCFG_CPU_PROGRAM_MAP(model1_vr_mem)
 	MCFG_CPU_IO_MAP(model1_vr_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(model1_state,irq_callback)
+
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", model1_state, model1_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD("iotimer", model1_state, io_command_acknowledge)
 
 	MCFG_CPU_ADD("tgp", MB86233, 16000000)
 	MCFG_CPU_PROGRAM_MAP(model1_vr_tgp_map)
@@ -1766,4 +1796,4 @@ GAME( 1994, wingwar,    0,       model1,    wingwar, model1_state,  0,          
 GAME( 1994, wingwaru,   wingwar, model1,    wingwar, model1_state,  0,          ROT0, "Sega", "Wing War (US)", MACHINE_NOT_WORKING )
 GAME( 1994, wingwarj,   wingwar, model1,    wingwar, model1_state,  0,          ROT0, "Sega", "Wing War (Japan)", MACHINE_NOT_WORKING )
 GAME( 1994, wingwar360, wingwar, model1,    wingwar, model1_state,  wingwar360, ROT0, "Sega", "Wing War R360 (US)", MACHINE_NOT_WORKING )
-GAME( 1993, netmerc,    0,       model1,    vf,      model1_state,  0,          ROT0, "Sega", "NetMerc?", MACHINE_NOT_WORKING )
+GAME( 1993, netmerc,    0,       netmerc,   vf,      model1_state,  0,          ROT0, "Sega", "Sega NetMerc", MACHINE_NOT_WORKING )

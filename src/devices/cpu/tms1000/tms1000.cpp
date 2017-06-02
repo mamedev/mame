@@ -102,7 +102,7 @@ mc141200_cpu_device::mc141200_cpu_device(const machine_config &mconfig, const ch
 
 
 // machine configs
-static MACHINE_CONFIG_START(tms1000)
+ MACHINE_CONFIG_MEMBER(tms1000_cpu_device::device_add_mconfig)
 
 	// microinstructions PLA, output PLA
 	MCFG_PLA_ADD("mpla", 8, 16, 30)
@@ -110,12 +110,6 @@ static MACHINE_CONFIG_START(tms1000)
 	MCFG_PLA_ADD("opla", 5, 8, 20)
 	MCFG_PLA_FILEFORMAT(BERKELEY)
 MACHINE_CONFIG_END
-
-machine_config_constructor tms1000_cpu_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME(tms1000);
-}
-
 
 // disasm
 offs_t tms1000_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options)

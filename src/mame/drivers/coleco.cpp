@@ -222,7 +222,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(coleco_state::paddle_update_callback)
 
 			// change pulse intervals relative to spinner/trackball speed
 			m_joy_pulse_reload[port] = freq;
-			m_joy_pulse_timer[port]->adjust(min(freq, m_joy_pulse_timer[port]->remaining()), port);
+			m_joy_pulse_timer[port]->adjust(std::min(freq, m_joy_pulse_timer[port]->remaining()), port);
 		}
 	}
 }

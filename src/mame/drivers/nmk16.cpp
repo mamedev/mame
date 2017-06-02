@@ -7954,9 +7954,9 @@ GAME( 1990, vandykeb,   vandyke,  vandykeb,     vandykeb,     nmk16_state, vandy
 
 GAME( 1991, blkheart,   0,        blkheart,     blkheart,     nmk16_state, 0,                ROT0,   "UPL",                          "Black Heart", 0 )
 GAME( 1991, blkheartj,  blkheart, blkheart,     blkheart,     nmk16_state, 0,                ROT0,   "UPL",                          "Black Heart (Japan)", 0 )
-                                                              
+
 GAME( 1991, acrobatm,   0,        acrobatm,     acrobatm,     nmk16_state, 0,                ROT270, "UPL (Taito license)",          "Acrobat Mission", 0 )
-                                                              
+
 GAME( 1992, strahl,     0,        strahl,       strahl,       nmk16_state, 0,                ROT0,   "UPL",                          "Koutetsu Yousai Strahl (Japan set 1)", 0 )
 GAME( 1992, strahla,    strahl,   strahl,       strahl,       nmk16_state, 0,                ROT0,   "UPL",                          "Koutetsu Yousai Strahl (Japan set 2)", 0 )
 

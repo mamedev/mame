@@ -208,14 +208,10 @@ kbdc8042_device::kbdc8042_device(const machine_config &mconfig, const char *tag,
 {
 }
 
-static MACHINE_CONFIG_START( keyboard )
+MACHINE_CONFIG_MEMBER( kbdc8042_device::device_add_mconfig )
 	MCFG_AT_KEYB_ADD("at_keyboard", 1, WRITELINE(kbdc8042_device, keyboard_w))
 MACHINE_CONFIG_END
 
-machine_config_constructor kbdc8042_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( keyboard );
-}
 
 /*-------------------------------------------------
     device_start - device-specific startup

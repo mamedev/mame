@@ -41,15 +41,11 @@ void nscsi_harddisk_device::device_reset()
 	cur_lba = -1;
 }
 
-static MACHINE_CONFIG_START(scsi_harddisk)
+MACHINE_CONFIG_MEMBER(nscsi_harddisk_device::device_add_mconfig)
 	MCFG_HARDDISK_ADD("image")
 	MCFG_HARDDISK_INTERFACE("scsi_hdd")
 MACHINE_CONFIG_END
 
-machine_config_constructor nscsi_harddisk_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME(scsi_harddisk);
-}
 
 uint8_t nscsi_harddisk_device::scsi_get_data(int id, int pos)
 {

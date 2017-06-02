@@ -26,7 +26,15 @@
 // timed queue
 // ----------------------------------------------------------------------------------------
 
+/*
+ * Use -DUSE_HEAP=1 to use stdc++ heap functions instead of linear processing.
+ *
+ * This slows down processing by about 25% on a Kaby Lake.
+ */
+
+#ifndef USE_HEAP
 #define USE_HEAP    (0)
+#endif
 
 namespace netlist
 {
@@ -92,7 +100,8 @@ namespace netlist
 	};
 
 #if !USE_HEAP
-	template <class T, class QueueOp = typename T::QueueOp>
+	/* Use TS = true for a threadsafe queue */
+	template <class T, bool TS, class QueueOp = typename T::QueueOp>
 	class timed_queue : plib::nocopyassignmove
 	{
 	public:
@@ -183,11 +192,7 @@ namespace netlist
 		constexpr std::size_t size() const noexcept { return static_cast<std::size_t>(m_end - &m_list[1]); }
 		constexpr const T & operator[](const std::size_t index) const noexcept { return m_list[ 1 + index]; }
 	private:
-	#if HAS_OPENMP && USE_OPENMP
-		using tqmutex = pspin_mutex<true>;
-	#else
-		using tqmutex = pspin_mutex<false>;
-	#endif
+		using tqmutex = pspin_mutex<TS>;
 		using tqlock = std::lock_guard<tqmutex>;
 
 		tqmutex m_lock;
@@ -200,7 +205,7 @@ namespace netlist
 		nperfcount_t m_prof_call;
 	};
 #else
-	template <class T, class QueueOp = typename T::QueueOp>
+	template <class T, bool TS, class QueueOp = typename T::QueueOp>
 	class timed_queue : plib::nocopyassignmove
 	{
 	public:
@@ -282,11 +287,7 @@ namespace netlist
 		constexpr std::size_t size() const noexcept { return m_list.size(); }
 		constexpr const T & operator[](const std::size_t index) const { return m_list[ 0 + index]; }
 	private:
-	#if HAS_OPENMP && USE_OPENMP
-		using tqmutex = pspin_mutex<true>;
-	#else
-		using tqmutex = pspin_mutex<false>;
-	#endif
+		using tqmutex = pspin_mutex<TS>;
 		using tqlock = std::lock_guard<tqmutex>;
 
 		tqmutex m_lock;

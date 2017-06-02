@@ -48,7 +48,7 @@
 
 #include "bus/ti99/ti99defs.h"
 #include "bus/ti99/internal/datamux.h"
-#include "bus/ti99/internal/gromport.h"
+#include "bus/ti99/gromport/gromport.h"
 #include "bus/ti99/internal/evpcconn.h"
 
 #include "bus/ti99/joyport/joyport.h"
@@ -166,7 +166,7 @@ private:
 	// Connected devices
 	required_device<tms9900_device>     m_cpu;
 	required_device<tms9901_device>     m_tms9901;
-	required_device<bus::ti99::internal::gromport_device>   m_gromport;
+	required_device<bus::ti99::gromport::gromport_device>   m_gromport;
 	required_device<bus::ti99::internal::ioport_device>     m_ioport;
 	required_device<bus::ti99::joyport::joyport_device>     m_joyport;
 	required_device<bus::ti99::internal::datamux_device>    m_datamux;
@@ -1150,7 +1150,7 @@ static MACHINE_CONFIG_START( ti99_4ev_60hz )
 	MCFG_SOFTWARE_LIST_ADD("cart_list_ti99", "ti99_cart")
 
 	// Input/output port
-	MCFG_IOPORT_ADD( TI99_IOPORT_TAG )
+	MCFG_IOPORT_ADD_WITH_PEB( TI99_IOPORT_TAG )
 	MCFG_IOPORT_EXTINT_HANDLER( WRITELINE(ti99_4x_state, extint) )
 	MCFG_IOPORT_READY_HANDLER( DEVWRITELINE(DATAMUX_TAG, bus::ti99::internal::datamux_device, ready_line) )
 

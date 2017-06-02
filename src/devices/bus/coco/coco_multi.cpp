@@ -54,12 +54,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "coco_multi.h"
-#include "coco_232.h"
-#include "coco_orch90.h"
-#include "coco_gmc.h"
-#include "coco_pak.h"
-#include "coco_fdc.h"
+#include "cococart.h"
 
 #define SLOT1_TAG           "slot1"
 #define SLOT2_TAG           "slot2"
@@ -67,14 +62,85 @@
 #define SLOT4_TAG           "slot4"
 
 
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+// ======================> coco_multipak_device
+
+namespace
+{
+	class coco_multipak_device
+		: public device_t
+		, public device_cococart_interface
+		, public device_cococart_host_interface
+	{
+	public:
+		// construction/destruction
+		coco_multipak_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+		// optional information overrides
+		virtual void device_add_mconfig(machine_config &config) override;
+
+		virtual uint8_t* get_cart_base() override;
+
+		// these are only public so they can be in a MACHINE_CONFIG_START
+		// declaration; don't think about them as publically accessable
+		DECLARE_WRITE_LINE_MEMBER(multi_slot1_cart_w);
+		DECLARE_WRITE_LINE_MEMBER(multi_slot1_nmi_w);
+		DECLARE_WRITE_LINE_MEMBER(multi_slot1_halt_w);
+		DECLARE_WRITE_LINE_MEMBER(multi_slot2_cart_w);
+		DECLARE_WRITE_LINE_MEMBER(multi_slot2_nmi_w);
+		DECLARE_WRITE_LINE_MEMBER(multi_slot2_halt_w);
+		DECLARE_WRITE_LINE_MEMBER(multi_slot3_cart_w);
+		DECLARE_WRITE_LINE_MEMBER(multi_slot3_nmi_w);
+		DECLARE_WRITE_LINE_MEMBER(multi_slot3_halt_w);
+		DECLARE_WRITE_LINE_MEMBER(multi_slot4_cart_w);
+		DECLARE_WRITE_LINE_MEMBER(multi_slot4_nmi_w);
+		DECLARE_WRITE_LINE_MEMBER(multi_slot4_halt_w);
+
+		virtual address_space &cartridge_space() override;
+
+	protected:
+		// device-level overrides
+		virtual void device_start() override;
+		virtual void device_reset() override;
+		virtual READ8_MEMBER(scs_read) override;
+		virtual WRITE8_MEMBER(scs_write) override;
+		virtual void set_sound_enable(bool sound_enable) override;
+
+	private:
+		// device references
+		required_device_array<cococart_slot_device, 4> m_slots;
+
+		// internal state
+		uint8_t m_select;
+
+		// internal accessors
+		cococart_slot_device &owning_slot();
+		int active_scs_slot_number() const;
+		int active_cts_slot_number() const;
+		cococart_slot_device &slot(int slot_number);
+		cococart_slot_device &active_scs_slot();
+		cococart_slot_device &active_cts_slot();
+
+		// methods
+		void set_select(uint8_t new_select);
+		DECLARE_WRITE8_MEMBER(ff7f_write);
+		void update_line(int slot_number, cococart_slot_device::line line);
+	};
+};
+
 
 /***************************************************************************
     IMPLEMENTATION
 ***************************************************************************/
 
 static SLOT_INTERFACE_START(coco_cart_slot1_3)
-	SLOT_INTERFACE("rs232", COCO_232)
+	SLOT_INTERFACE("rs232", COCO_RS232)
+	SLOT_INTERFACE("dcmodem", COCO_DCMODEM)
 	SLOT_INTERFACE("orch90", COCO_ORCH90)
+	SLOT_INTERFACE("ssc", COCO_SSC)					MCFG_SLOT_OPTION_CLOCK("ssc", DERIVED_CLOCK(1, 1))
 	SLOT_INTERFACE("games_master", COCO_PAK_GMC)
 	SLOT_INTERFACE("banked_16k", COCO_PAK_BANKED)
 	SLOT_INTERFACE("pak", COCO_PAK)
@@ -82,15 +148,17 @@ SLOT_INTERFACE_END
 static SLOT_INTERFACE_START(coco_cart_slot4)
 	SLOT_INTERFACE("cc3hdb1", COCO3_HDB1)
 	SLOT_INTERFACE("fdcv11", COCO_FDC_V11)
-	SLOT_INTERFACE("rs232", COCO_232)
+	SLOT_INTERFACE("rs232", COCO_RS232)
+	SLOT_INTERFACE("dcmodem", COCO_DCMODEM)
 	SLOT_INTERFACE("orch90", COCO_ORCH90)
+	SLOT_INTERFACE("ssc", COCO_SSC)					MCFG_SLOT_OPTION_CLOCK("ssc", DERIVED_CLOCK(1, 1))
 	SLOT_INTERFACE("games_master", COCO_PAK_GMC)
 	SLOT_INTERFACE("banked_16k", COCO_PAK_BANKED)
 	SLOT_INTERFACE("pak", COCO_PAK)
 SLOT_INTERFACE_END
 
 
-static MACHINE_CONFIG_START(coco_multi)
+MACHINE_CONFIG_MEMBER(coco_multipak_device::device_add_mconfig)
 	MCFG_COCO_CARTRIDGE_ADD(SLOT1_TAG, coco_cart_slot1_3, nullptr)
 	MCFG_COCO_CARTRIDGE_CART_CB(DEVWRITELINE(DEVICE_SELF, coco_multipak_device, multi_slot1_cart_w))
 	MCFG_COCO_CARTRIDGE_NMI_CB(DEVWRITELINE(DEVICE_SELF, coco_multipak_device, multi_slot1_nmi_w))
@@ -141,8 +209,7 @@ coco_multipak_device::coco_multipak_device(const machine_config &mconfig, const 
 void coco_multipak_device::device_start()
 {
 	// install $FF7F handler
-	write8_delegate wh = write8_delegate(FUNC(coco_multipak_device::ff7f_write), this);
-	machine().device(":maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xFF7F, 0xFF7F, wh);
+	install_write_handler(0xFF7F, 0xFF7F, write8_delegate(FUNC(coco_multipak_device::ff7f_write), this));
 
 	// initial state
 	m_select = 0xFF;
@@ -159,17 +226,6 @@ void coco_multipak_device::device_start()
 void coco_multipak_device::device_reset()
 {
 	m_select = 0xFF;
-}
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor coco_multipak_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( coco_multi );
 }
 
 
@@ -330,22 +386,22 @@ uint8_t* coco_multipak_device::get_cart_base()
 
 
 //-------------------------------------------------
-//  read
+//  scs_read
 //-------------------------------------------------
 
-READ8_MEMBER(coco_multipak_device::read)
+READ8_MEMBER(coco_multipak_device::scs_read)
 {
-	return active_scs_slot().read(space, offset);
+	return active_scs_slot().scs_read(space, offset);
 }
 
 
 //-------------------------------------------------
-//  write
+//  scs_write
 //-------------------------------------------------
 
-WRITE8_MEMBER(coco_multipak_device::write)
+WRITE8_MEMBER(coco_multipak_device::scs_write)
 {
-	active_scs_slot().write(space, offset, data);
+	active_scs_slot().scs_write(space, offset, data);
 }
 
 
@@ -365,3 +421,13 @@ WRITE_LINE_MEMBER(coco_multipak_device::multi_slot3_halt_w) { update_line(3, coc
 WRITE_LINE_MEMBER(coco_multipak_device::multi_slot4_cart_w) { update_line(4, cococart_slot_device::line::CART); }
 WRITE_LINE_MEMBER(coco_multipak_device::multi_slot4_nmi_w)  { update_line(4, cococart_slot_device::line::NMI); }
 WRITE_LINE_MEMBER(coco_multipak_device::multi_slot4_halt_w) { update_line(4, cococart_slot_device::line::HALT); }
+
+
+//-------------------------------------------------
+//  cartridge_space
+//-------------------------------------------------
+
+address_space &coco_multipak_device::cartridge_space()
+{
+	return device_cococart_interface::cartridge_space();
+}

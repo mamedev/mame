@@ -288,7 +288,7 @@ uint8_t common_state::read_key(required_ioport_array<8> & key, uint8_t mask)
 
 void common_state::debug_out()
 {
-//	popmessage("OUT: %04X | %04X | %02X--", m_out1 >> 16, m_out2 >> 16, m_out3 >> 24);
+//  popmessage("OUT: %04X | %04X | %02X--", m_out1 >> 16, m_out2 >> 16, m_out3 >> 24);
 }
 
 /***************************************************************************
@@ -346,18 +346,18 @@ void darkhors_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 	for ( ; s < end; s += 8/4 )
 	{
-		int sx		=	(s[ 0 ] >> 16);
-		int sy		=	(s[ 0 ] & 0xffff);
-		int attr	=	(s[ 1 ] >> 16);
-		int code	=	(s[ 1 ] & 0xffff);
+		int sx      =   (s[ 0 ] >> 16);
+		int sy      =   (s[ 0 ] & 0xffff);
+		int attr    =   (s[ 1 ] >> 16);
+		int code    =   (s[ 1 ] & 0xffff);
 
 		// List end
 		if (sx & 0x8000)
 			break;
 
-		int flipx	=	0;
-		int flipy	=	0;
-		int color	=	(attr & 0x0200) ? (attr & 0x1ff) : (attr & 0x1ff) * 4;
+		int flipx   =   0;
+		int flipy   =   0;
+		int color   =   (attr & 0x0200) ? (attr & 0x1ff) : (attr & 0x1ff) * 4;
 
 		// Sign extend the position
 		sx  =   (sx & 0x1ff) - (sx & 0x200);
@@ -570,9 +570,9 @@ static ADDRESS_MAP_START( jclub2o_map, AS_PROGRAM, 32, jclub2o_state )
 	AM_RANGE(0x490000, 0x490003) AM_WRITE(eeprom_s29290_w)
 
 	AM_RANGE(0x4a0000, 0x4a0003) AM_WRITE(out2_w)
-//	AM_RANGE(0x4a0010, 0x4a0013) AM_WRITE
-//	AM_RANGE(0x4a0020, 0x4a0023) AM_WRITE
-//	AM_RANGE(0x4a0030, 0x4a0033) AM_WRITE
+//  AM_RANGE(0x4a0010, 0x4a0013) AM_WRITE
+//  AM_RANGE(0x4a0020, 0x4a0023) AM_WRITE
+//  AM_RANGE(0x4a0030, 0x4a0033) AM_WRITE
 
 	// ST-0016
 	AM_RANGE(0x4b0000, 0x4b0003) AM_READWRITE(cmd1_word_r, cmd1_word_w)
@@ -591,14 +591,14 @@ static ADDRESS_MAP_START( jclub2o_map, AS_PROGRAM, 32, jclub2o_state )
 	AM_RANGE(0x580008, 0x58000b) AM_READ_PORT("COIN")
 	AM_RANGE(0x58000c, 0x58000f) AM_WRITE(input_sel1_out3_w)
 	AM_RANGE(0x580010, 0x580013) AM_WRITE(out1_w)
-//	AM_RANGE(0x580018, 0x58001b) AM_WRITE
-//	AM_RANGE(0x58001c, 0x58001f) AM_WRITE
+//  AM_RANGE(0x580018, 0x58001b) AM_WRITE
+//  AM_RANGE(0x58001c, 0x58001f) AM_WRITE
 
 	AM_RANGE(0x580200, 0x580203) AM_DEVREAD16("watchdog", watchdog_timer_device, reset16_r, 0xffff0000)
 
 	AM_RANGE(0x580400, 0x580403) AM_READWRITE8(console_r, console_w, 0x00ff0000)
 	AM_RANGE(0x580420, 0x580423) AM_READ8(console_status_r, 0x00ff0000) //AM_WRITE
-//	AM_RANGE(0x580440, 0x580443) AM_WRITE
+//  AM_RANGE(0x580440, 0x580443) AM_WRITE
 
 	// ST-0020
 	AM_RANGE(0x600000, 0x67ffff) AM_DEVREADWRITE16( "st0020", st0020_device, sprram_r, sprram_w, 0xffffffff );
@@ -706,14 +706,14 @@ static ADDRESS_MAP_START( jclub2_map, AS_PROGRAM, 32, jclub2_state )
 	AM_RANGE(0x580008, 0x58000b) AM_READ_PORT("COIN")
 	AM_RANGE(0x58000c, 0x58000f) AM_WRITE(input_sel1_out3_w)
 	AM_RANGE(0x580010, 0x580013) AM_WRITE(out1_w)
-//	AM_RANGE(0x580018, 0x58001b) AM_WRITE
-//	AM_RANGE(0x58001c, 0x58001f) AM_WRITE
+//  AM_RANGE(0x580018, 0x58001b) AM_WRITE
+//  AM_RANGE(0x58001c, 0x58001f) AM_WRITE
 
 	AM_RANGE(0x580200, 0x580203) AM_DEVREAD16("watchdog", watchdog_timer_device, reset16_r, 0xffff0000)
 
 	AM_RANGE(0x580400, 0x580403) AM_READWRITE8(console_r, console_w, 0x00ff0000)
 	AM_RANGE(0x580420, 0x580423) AM_READ8(console_status_r, 0x00ff0000) //AM_WRITE
-//	AM_RANGE(0x580440, 0x580443) AM_WRITE
+//  AM_RANGE(0x580440, 0x580443) AM_WRITE
 
 	// ST-0032
 	AM_RANGE(0x800000, 0x87ffff) AM_DEVREADWRITE16( "st0020", st0020_device, sprram_r, sprram_w, 0xffffffff );
@@ -786,11 +786,11 @@ static ADDRESS_MAP_START( darkhors_map, AS_PROGRAM, 32, darkhors_state )
 	AM_RANGE(0x580004, 0x580007) AM_READ_PORT("COIN")
 	AM_RANGE(0x580008, 0x58000b) AM_READ(input_r)
 	AM_RANGE(0x58000c, 0x58000f) AM_WRITE(input_sel_w)
-//	AM_RANGE(0x580010, 0x580013) AM_WRITE
-//	AM_RANGE(0x580018, 0x58001b) AM_WRITE
-//	AM_RANGE(0x58001c, 0x58001f) AM_WRITE
+//  AM_RANGE(0x580010, 0x580013) AM_WRITE
+//  AM_RANGE(0x580018, 0x58001b) AM_WRITE
+//  AM_RANGE(0x58001c, 0x58001f) AM_WRITE
 	AM_RANGE(0x580084, 0x580087) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0xff000000)
-//	AM_RANGE(0x58008c, 0x58008f) AM_WRITE
+//  AM_RANGE(0x58008c, 0x58008f) AM_WRITE
 	AM_RANGE(0x580200, 0x580203) AM_DEVREAD16("watchdog", watchdog_timer_device, reset16_r, 0xffff0000)
 
 	AM_RANGE(0x580400, 0x580403) AM_READWRITE8(console_r, console_w, 0x00ff0000)
@@ -1318,7 +1318,7 @@ ROM_START( jclub2v203 )
 
 	ROM_REGION16_BE( 0x100, "eeprom", 0 )
 	// 2.03X (JC26203 :00020400C5IK)
-//	ROM_LOAD16_WORD_SWAP( "eeprom-jclub2o.bin", 0x000, 0x100, CRC(dd1c88ec) SHA1(acb67e41e832f203361e0f93afcd4eaf963fd13e) ) // dump      (SETA1997JC26203 )
+//  ROM_LOAD16_WORD_SWAP( "eeprom-jclub2o.bin", 0x000, 0x100, CRC(dd1c88ec) SHA1(acb67e41e832f203361e0f93afcd4eaf963fd13e) ) // dump      (SETA1997JC26203 )
 	ROM_LOAD16_WORD_SWAP( "eeprom_jc2v203",     0x000, 0x100, CRC(c1bc58e7) SHA1(4670c94fd655d223f21254167e4334b81affdf8d) ) // from MAME (SETA1997JC26203 )
 ROM_END
 

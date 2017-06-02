@@ -33,13 +33,6 @@ DEFINE_DEVICE_TYPE(A2BUS_CFFA2_6502, a2bus_cffa2_6502_device, "a2cffa02", "CFFA2
 #define CFFA2_ROM_REGION  "cffa2_rom"
 #define CFFA2_ATA_TAG     "cffa2_ata"
 
-MACHINE_CONFIG_START( cffa2 )
-	MCFG_ATA_INTERFACE_ADD(CFFA2_ATA_TAG, ata_devices, "hdd", nullptr, false)
-
-// not yet, the core explodes
-//  MCFG_SOFTWARE_LIST_ADD("hdd_list", "apple2gs_hdd")
-MACHINE_CONFIG_END
-
 ROM_START( cffa2 )
 	ROM_REGION(0x1000, CFFA2_ROM_REGION, 0)
 	ROM_LOAD( "cffa20eec02.bin", 0x000000, 0x001000, CRC(fb3726f8) SHA1(080ff88f19de22328e162954ee2b51ee65f9d5cd) )
@@ -55,14 +48,15 @@ ROM_END
 ***************************************************************************/
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor a2bus_cffa2000_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( cffa2 );
-}
+MACHINE_CONFIG_MEMBER( a2bus_cffa2000_device::device_add_mconfig )
+	MCFG_ATA_INTERFACE_ADD(CFFA2_ATA_TAG, ata_devices, "hdd", nullptr, false)
+
+// not yet, the core explodes
+//  MCFG_SOFTWARE_LIST_ADD("hdd_list", "apple2gs_hdd")
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region

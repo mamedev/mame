@@ -876,4 +876,31 @@
 		</part>
 	</software>
 
+	<software name="bioteror">
+		<description>BioTerror!</description>
+		<year>2011</year>
+		<publisher>Jason Grow</publisher>
+		<!-- PET 2001-8 -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="bioterror.d64" size="174848" crc="67dc1f22" sha1="b3a39eea1ae1a274f6a011c26172a7d123d761c6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- https://www.youtube.com/watch?v=X0SOP56wPNI -->
+	<software name="bumblebe">
+		<description>Bumblebee PET</description>
+		<year>2012</year>
+		<publisher>Cosine</publisher>
+		<!-- pet80 -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="bumblebee.d64" size="174848" crc="a4656e08" sha1="f914aa058458bed3c319e6b297f7af7b4d788a05" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

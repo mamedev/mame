@@ -18,7 +18,7 @@
 <!-- build screen -->
 
 	<view name="Internal Layout">
-		<bounds left="0" right="111" top="0" bottom="19" />
+		<bounds left="0" right="109" top="0" bottom="19" />
 
 	<!-- 10 digits (snread doesn't use the last digit) -->
 

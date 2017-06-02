@@ -77,22 +77,6 @@ public:
 	template <class Object> void set_lamp_write_callback(Object &&cb) { m_write_lamp.set_callback(std::forward<Object>(cb)); }
 	template <class Object> void set_solenoid_write_callback(Object &&cb) { m_write_solenoid.set_callback(std::forward<Object>(cb)); }
 
-	DECLARE_WRITE_LINE_MEMBER(cpu_pia_irq);
-	DECLARE_WRITE_LINE_MEMBER(pia21_ca2_w);
-	DECLARE_WRITE8_MEMBER(lamp0_w);
-	DECLARE_WRITE8_MEMBER(lamp1_w);
-	DECLARE_READ8_MEMBER(display_strobe_r);
-	DECLARE_WRITE8_MEMBER(display_strobe_w);
-	DECLARE_WRITE8_MEMBER(display_out1_w);
-	DECLARE_WRITE8_MEMBER(display_out2_w);
-	DECLARE_WRITE8_MEMBER(display_out3_w);
-	DECLARE_WRITE8_MEMBER(display_out4_w);
-	DECLARE_READ8_MEMBER(display_in3_r);
-	DECLARE_WRITE8_MEMBER(switch_w);
-	DECLARE_READ8_MEMBER(switch_r);
-	DECLARE_READ8_MEMBER(dmdstatus_r);
-	DECLARE_WRITE8_MEMBER(sound_w);
-	DECLARE_WRITE8_MEMBER(solenoid1_w);
 	DECLARE_WRITE8_MEMBER(solenoid2_w);
 	INPUT_CHANGED_MEMBER(main_nmi);
 	INPUT_CHANGED_MEMBER(audio_nmi);
@@ -105,7 +89,7 @@ protected:
 	decocpu_type1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -133,6 +117,23 @@ private:
 	devcb_write8 m_write_switch;
 	devcb_write8 m_write_lamp;
 	devcb_write8 m_write_solenoid;
+
+	DECLARE_WRITE_LINE_MEMBER(cpu_pia_irq);
+	DECLARE_WRITE_LINE_MEMBER(pia21_ca2_w);
+	DECLARE_WRITE8_MEMBER(lamp0_w);
+	DECLARE_WRITE8_MEMBER(lamp1_w);
+	DECLARE_READ8_MEMBER(display_strobe_r);
+	DECLARE_WRITE8_MEMBER(display_strobe_w);
+	DECLARE_WRITE8_MEMBER(display_out1_w);
+	DECLARE_WRITE8_MEMBER(display_out2_w);
+	DECLARE_WRITE8_MEMBER(display_out3_w);
+	DECLARE_WRITE8_MEMBER(display_out4_w);
+	DECLARE_READ8_MEMBER(display_in3_r);
+	DECLARE_WRITE8_MEMBER(switch_w);
+	DECLARE_READ8_MEMBER(switch_r);
+	DECLARE_READ8_MEMBER(dmdstatus_r);
+	DECLARE_WRITE8_MEMBER(sound_w);
+	DECLARE_WRITE8_MEMBER(solenoid1_w);
 };
 
 class decocpu_type2_device : public decocpu_type1_device
@@ -144,7 +145,7 @@ protected:
 	decocpu_type2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 };
 

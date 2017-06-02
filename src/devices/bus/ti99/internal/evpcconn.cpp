@@ -2,8 +2,8 @@
 // copyright-holders:Michael Zapf
 /****************************************************************************
 
-	Connector from EVPC
-	
+    Connector from EVPC
+
     We need this for the TI-99/4A console; the SGCPU uses a separate line
     in the PEB.
 
@@ -16,7 +16,7 @@
     with a special firmware (DSR).
 
     May 2017, Michael Zapf
-    
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -32,9 +32,9 @@ evpc_clock_connector::evpc_clock_connector(const machine_config &mconfig, const 
 {
 }
 
-WRITE_LINE_MEMBER( evpc_clock_connector::vclock_line ) 
-{ 
-	m_vdpint(state); 
+WRITE_LINE_MEMBER( evpc_clock_connector::vclock_line )
+{
+	m_vdpint(state);
 }
 
 void evpc_clock_connector::device_start()

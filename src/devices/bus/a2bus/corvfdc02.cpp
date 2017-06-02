@@ -38,17 +38,6 @@ static SLOT_INTERFACE_START( corv_floppies )
 	SLOT_INTERFACE( "525dsqd", FLOPPY_525_QD )
 SLOT_INTERFACE_END
 
-
-MACHINE_CONFIG_START( fdc02 )
-	MCFG_UPD765A_ADD(FDC02_FDC_TAG, true, false)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(a2bus_corvfdc02_device, intrq_w))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(a2bus_corvfdc02_device, drq_w))
-	MCFG_FLOPPY_DRIVE_ADD(FDC02_FDC_TAG":0", corv_floppies, "525dsqd", a2bus_corvfdc02_device::corv_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FDC02_FDC_TAG":1", corv_floppies, "525dsqd", a2bus_corvfdc02_device::corv_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FDC02_FDC_TAG":2", corv_floppies, "525dsqd", a2bus_corvfdc02_device::corv_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FDC02_FDC_TAG":3", corv_floppies, "525dsqd", a2bus_corvfdc02_device::corv_floppy_formats)
-MACHINE_CONFIG_END
-
 ROM_START( fdc02 )
 	ROM_REGION(0x20, FDC02_ROM_REGION, 0)
 	ROM_LOAD( "bfc00.bin", 0x000000, 0x000020, CRC(98d1a765) SHA1(d27c3c6921e1bb3778a3f78decf106275bc0add1) )
@@ -59,14 +48,18 @@ ROM_END
 ***************************************************************************/
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor a2bus_corvfdc02_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( fdc02 );
-}
+MACHINE_CONFIG_MEMBER( a2bus_corvfdc02_device::device_add_mconfig )
+	MCFG_UPD765A_ADD(FDC02_FDC_TAG, true, false)
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(a2bus_corvfdc02_device, intrq_w))
+	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(a2bus_corvfdc02_device, drq_w))
+	MCFG_FLOPPY_DRIVE_ADD(FDC02_FDC_TAG":0", corv_floppies, "525dsqd", a2bus_corvfdc02_device::corv_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FDC02_FDC_TAG":1", corv_floppies, "525dsqd", a2bus_corvfdc02_device::corv_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FDC02_FDC_TAG":2", corv_floppies, "525dsqd", a2bus_corvfdc02_device::corv_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FDC02_FDC_TAG":3", corv_floppies, "525dsqd", a2bus_corvfdc02_device::corv_floppy_formats)
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region

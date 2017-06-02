@@ -137,7 +137,7 @@ namespace netlist
 		{
 			m_vals[i] = (*m_I[i])();
 		}
-		m_Q.push(m_precompiled.evaluate(m_vals));
+		m_Q.push(m_compiled.evaluate(m_vals));
 	}
 
 

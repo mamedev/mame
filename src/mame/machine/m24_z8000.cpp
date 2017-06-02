@@ -63,7 +63,7 @@ static ADDRESS_MAP_START(z8000_io, AS_IO, 16, m24_z8000_device)
 	AM_RANGE(0x8000, 0x83ff) AM_READWRITE(i86_io_r, i86_io_w)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( m24_z8000 )
+MACHINE_CONFIG_MEMBER( m24_z8000_device::device_add_mconfig )
 	MCFG_CPU_ADD("z8000", Z8001, XTAL_8MHz/2)
 	MCFG_CPU_PROGRAM_MAP(z8000_prog)
 	MCFG_CPU_DATA_MAP(z8000_data)
@@ -81,11 +81,6 @@ static MACHINE_CONFIG_START( m24_z8000 )
 
 	MCFG_DEVICE_ADD("i8251", I8251, 0)
 MACHINE_CONFIG_END
-
-machine_config_constructor m24_z8000_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( m24_z8000 );
-}
 
 const uint8_t m24_z8000_device::pmem_table[16][4] =
 	{{0, 1, 2, 3}, {1, 2, 3, 255}, {4, 5, 6, 7}, {46, 40, 41, 42},

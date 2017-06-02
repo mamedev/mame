@@ -195,6 +195,8 @@ public:
 	static void static_set_info(device_t &device, const gfx_decode_entry *gfxinfo);
 	static void static_set_palette(device_t &device, const char *tag);
 
+	void set_palette_disable(bool disable);
+
 	// getters
 	device_palette_interface &palette() const { assert(m_palette != nullptr); return *m_palette; }
 	gfx_element *gfx(u8 index) const { assert(index < MAX_GFX_ELEMENTS); return m_gfx[index].get(); }
@@ -219,6 +221,7 @@ private:
 	const gfx_decode_entry *    m_gfxdecodeinfo;        // pointer to array of gfx decode information
 	const char *                m_palette_tag;          // configured tag for palette device
 	bool                        m_palette_is_sibling;   // is palette a sibling or a subdevice?
+	bool                        m_palette_is_disabled;  // no palette associated with this gfx decode
 
 	// internal state
 	bool                        m_decoded;                  // have we processed our decode info yet?

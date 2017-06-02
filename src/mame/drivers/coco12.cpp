@@ -2,7 +2,7 @@
 // copyright-holders:Nathan Woods
 /***************************************************************************
 
-    coco12.c
+    coco12.cpp
 
     TRS-80 Radio Shack Color Computer 1/2
 
@@ -26,14 +26,7 @@
 #include "emu.h"
 #include "includes/coco12.h"
 
-#include "bus/coco/coco_232.h"
 #include "bus/coco/coco_dwsock.h"
-#include "bus/coco/coco_fdc.h"
-#include "bus/coco/coco_multi.h"
-#include "bus/coco/coco_orch90.h"
-#include "bus/coco/coco_gmc.h"
-#include "bus/coco/coco_pak.h"
-#include "bus/coco/coco_t4426.h"
 
 #include "cpu/m6809/m6809.h"
 #include "imagedev/cassette.h"
@@ -251,12 +244,14 @@ SLOT_INTERFACE_START( coco_cart )
 	SLOT_INTERFACE("fdcv11", COCO_FDC_V11)
 	SLOT_INTERFACE("cc3hdb1", COCO3_HDB1)
 	SLOT_INTERFACE("cp400_fdc", CP400_FDC)
-	SLOT_INTERFACE("rs232", COCO_232)
+	SLOT_INTERFACE("rs232", COCO_RS232)
+	SLOT_INTERFACE("dcmodem", COCO_DCMODEM)
 	SLOT_INTERFACE("orch90", COCO_ORCH90)
+	SLOT_INTERFACE("ssc", COCO_SSC)					MCFG_SLOT_OPTION_CLOCK("ssc", DERIVED_CLOCK(1, 1))
 	SLOT_INTERFACE("games_master", COCO_PAK_GMC)
 	SLOT_INTERFACE("banked_16k", COCO_PAK_BANKED)
 	SLOT_INTERFACE("pak", COCO_PAK)
-	SLOT_INTERFACE("multi", COCO_MULTIPAK) MCFG_SLOT_OPTION_CLOCK("multi", DERIVED_CLOCK(1, 1))
+	SLOT_INTERFACE("multi", COCO_MULTIPAK)			MCFG_SLOT_OPTION_CLOCK("multi", DERIVED_CLOCK(1, 1))
 SLOT_INTERFACE_END
 
 //-------------------------------------------------
@@ -287,6 +282,28 @@ MACHINE_CONFIG_START( coco_sound )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 MACHINE_CONFIG_END
 
+
+//-------------------------------------------------
+//  MACHINE_CONFIG ( coco_floating )
+//-------------------------------------------------
+
+static ADDRESS_MAP_START(coco_floating_map, AS_PROGRAM, 8, coco_state)
+	AM_RANGE(0x0000, 0xFFFF) AM_READ(floating_bus_read)
+ADDRESS_MAP_END
+
+
+MACHINE_CONFIG_START( coco_floating )
+	MCFG_DEVICE_ADD(FLOATING_TAG, ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(coco_floating_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(16)
+MACHINE_CONFIG_END
+
+
+//-------------------------------------------------
+//  DEVICE_INPUT_DEFAULTS_START( printer )
+//-------------------------------------------------
 
 static DEVICE_INPUT_DEFAULTS_START( printer )
 	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_600 )
@@ -362,6 +379,9 @@ static MACHINE_CONFIG_START( coco )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 	MCFG_RAM_EXTRA_OPTIONS("4K,16K,32K")
+
+	// floating space
+	MCFG_FRAGMENT_ADD( coco_floating )
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("coco_cart_list", "coco_cart")

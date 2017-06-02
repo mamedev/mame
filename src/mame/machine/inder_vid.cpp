@@ -88,7 +88,7 @@ static ADDRESS_MAP_START( ramdac_map, AS_0, 8, inder_vid_device )
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb888_w)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( inder_vid )
+MACHINE_CONFIG_MEMBER( inder_vid_device::device_add_mconfig )
 	MCFG_CPU_ADD("tms", TMS34010, XTAL_40MHz)
 	MCFG_CPU_PROGRAM_MAP(megaphx_tms_map)
 	MCFG_TMS340X0_HALT_ON_RESET(true) /* halt on reset */
@@ -103,7 +103,6 @@ static MACHINE_CONFIG_START( inder_vid )
 	MCFG_SCREEN_RAW_PARAMS(XTAL_40MHz/12, 424, 0, 338-1, 262, 0, 246-1)
 	MCFG_SCREEN_UPDATE_DEVICE("tms", tms34010_device, tms340x0_rgb32)
 
-
 	MCFG_PALETTE_ADD("palette", 256)
 
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
@@ -111,10 +110,6 @@ static MACHINE_CONFIG_START( inder_vid )
 
 MACHINE_CONFIG_END
 
-machine_config_constructor inder_vid_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( inder_vid );
-}
 
 void inder_vid_device::device_start()
 {

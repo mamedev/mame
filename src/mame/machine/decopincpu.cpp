@@ -197,7 +197,7 @@ WRITE8_MEMBER( decocpu_type1_device::solenoid2_w )
 	// todo
 }
 
-static MACHINE_CONFIG_START( decocpu1 )
+MACHINE_CONFIG_MEMBER( decocpu_type1_device::device_add_mconfig )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6808, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(decocpu1_map)
@@ -244,19 +244,6 @@ static MACHINE_CONFIG_START( decocpu1 )
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_START( decocpu2 )
-	MCFG_FRAGMENT_ADD(decocpu1)
-
-	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(decocpu2_map)
-MACHINE_CONFIG_END
-
-machine_config_constructor decocpu_type1_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( decocpu1 );
-}
 
 ioport_constructor decocpu_type1_device::device_input_ports() const
 {
@@ -321,10 +308,13 @@ decocpu_type2_device::decocpu_type2_device(const machine_config &mconfig, device
 	: decocpu_type1_device(mconfig, type, tag, owner, clock)
 {}
 
-machine_config_constructor decocpu_type2_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( decocpu2 );
-}
+MACHINE_CONFIG_MEMBER( decocpu_type2_device::device_add_mconfig )
+	decocpu_type1_device::device_add_mconfig(config);
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(decocpu2_map)
+MACHINE_CONFIG_END
 
 void decocpu_type2_device::device_start()
 {

@@ -251,6 +251,98 @@ has twice the steps, happening twice as fast.
 
 ***************************************************************************/
 
+/**
+AY-3-8910/8914/YM2149 (YM3439? others?)
+                               _______    _______
+                             _|*      \__/       |_
+          [4] VSS (GND) --  |_|1               40|_|  -- VCC (+5v)
+                             _|                  |_
+                    [5] NC  |_|2               39|_|  <- TEST 1 [1]
+                             _|                  |_
+       ANALOG CHANNEL B <-  |_|3               38|_|  -> ANALOG CHANNEL C
+                             _|                  |_
+       ANALOG CHANNEL A <-  |_|4               37|_|  <> DA0
+                             _|                  |_
+                    [5] NC  |_|5               36|_|  <> DA1
+                             _|                  |_
+                   IOB7 <>  |_|6               35|_|  <> DA2
+                             _|                  |_
+                   IOB6 <>  |_|7               34|_|  <> DA3
+                             _|   /---\          |_
+                   IOB5 <>  |_|8  \-/ |   A    33|_|  <> DA4
+                             _|   .   .   Y      |_
+                   IOB4 <>  |_|9  |---|   - S  32|_|  <> DA5
+                             _|   '   '   3 O    |_
+                   IOB3 <>  |_|10   8     - U  31|_|  <> DA6
+                             _|     3     8 N    |_
+                   IOB2 <>  |_|11   0     9 D  30|_|  <> DA7
+                             _|     8     1      |_
+                   IOB1 <>  |_|12         0    29|_|  <- BC1
+                             _|     P            |_
+                   IOB0 <>  |_|13              28|_|  <- BC2
+                             _|                  |_
+                   IOA7 <>  |_|14              27|_|  <- BDIR
+                             _|                  |_
+                   IOA6 <>  |_|15              26|_|  <- TEST 2 [2]
+                             _|                  |_
+                   IOA5 <>  |_|16              25|_|  <- A8 [3]
+                             _|                  |_
+                   IOA4 <>  |_|17              24|_|  <- /A9 [3]
+                             _|                  |_
+                   IOA3 <>  |_|18              23|_|  <- /RESET
+                             _|                  |_
+                   IOA2 <>  |_|19              22|_|  == CLOCK
+                             _|                  |_
+                   IOA1 <>  |_|20              21|_|  <> IOA0
+                              |__________________|
+
+[1] Based on the decap, TEST 1 affects the Envelope Generator and/or the
+    frequency divider somehow.
+[2] The TEST 2 input connects to the same selector as A8 and /A9 do on the 8910
+    and appears to act as just another active high enable like A8(pin 25) and
+    has an internal pull-up so if left NC the chip remains enabled.
+    On the 8914, it performs the same above function but additionally ?disables?
+    the DA0-7 bus if pulled low/active. This additional function was removed
+    on the 8910.
+    on YM2149 and YM3439 this pin is /SEL, if low, clock input is /2
+[3] It is possible for A8 and /A9 pins to be mask programmed to have different
+    active polarities. This might be true on the AY-3-8916/17 parts used on the
+    Intellivision ECS module? (not the Keyboard module?)
+[4] The bond wire for the VSS pin goes to the substrate frame, and then a
+    separate bond wire connects it to a pad between pins 21 and 22
+[5] These pins lack internal bond wires entirely.
+
+AY-3-8910/A: 2 I/O ports
+AY-3-8912/A: 1 I/O port; /A9 doesn't exist and is considered pulled low.
+AY-3-8913/A: 0 I/O port; BC2 pin doesn't exist and is considered pulled high.
+  Factory default for these three types when writing address data to them is:
+  /A9 must be low, A8 must be high, A7 thru A4 must be low.
+  A7 thru A4 enable state can be changed with a factory mask adjustment but
+  default was 0000 for the "common" part shipped.
+  The 'A' version of the 3 above have a re-laid out die, unclear if there are
+  any behavior changes vs the non-'A' version.
+AY-3-8914:  same as 8910 except for different register mapping and two bit
+  envelope enable / volume field.
+  Factory default for these three types when writing address data to them is:
+  /A9 must be low, A8 must be high, A7 thru A4 must be low.
+  A7 thru A4 enable state can be changed with a factory mask adjustment but
+  are unknown for the one known part shipped, used in the Intellivision.
+AY8930: mostly backwards compatible with 8910, except like the AY-3-8913, the
+  BC2 pin is considered tied high/permanently '1'.
+  If the AY8930's extended mode is enabled, it gains higher resolution
+  frequency and volume control, separate volume per-channel, and the duty
+  cycle can be adjusted for the 3 channels. If the mode is not enabled, it
+  behaves exactly(?) like an AY-3-8910.
+YM2149: The envelope register has 5 bits of resolution internally, allowing for
+  smoother volume ramping, though the register for setting its direct value
+  remains 4 bits wide. The chip also has a selectable clock divider on pin 26
+  (/SEL), which was /TEST2 on the AY-3-8910. If low, the input clock is halved.
+YM3439: limited info: CMOS version of YM2149?
+YMZ284: limited info: 0 I/O port, different clock divider
+YMZ294: limited info: 0 I/O port
+OKI M5255, Winbond WF19054, JFC 95101, File KC89C72, Toshiba T7766A : differences to be listed
+*/
+
 #include "emu.h"
 #include "ay8910.h"
 

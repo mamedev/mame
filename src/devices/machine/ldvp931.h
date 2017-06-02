@@ -77,7 +77,7 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	// subclass overrides
 	virtual void player_vsync(const vbi_metadata &vbi, int fieldnum, const attotime &curtime) override;
@@ -94,6 +94,9 @@ public:
 	DECLARE_READ8_MEMBER( i8049_datic_r );
 	DECLARE_READ8_MEMBER( i8049_from_controller_r );
 	DECLARE_WRITE8_MEMBER( i8049_to_controller_w );
+
+private:
+	// internal read/write handlers
 	DECLARE_READ8_MEMBER( i8049_port1_r );
 	DECLARE_WRITE8_MEMBER( i8049_port1_w );
 	DECLARE_READ8_MEMBER( i8049_port2_r );
@@ -101,7 +104,6 @@ public:
 	DECLARE_READ_LINE_MEMBER( i8049_t0_r );
 	DECLARE_READ_LINE_MEMBER( i8049_t1_r );
 
-protected:
 	// internal state
 	required_device<i8049_device> m_i8049_cpu;      // CPU index of the 8049
 	emu_timer *         m_tracktimer;               // timer device

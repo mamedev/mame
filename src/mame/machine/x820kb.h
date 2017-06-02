@@ -38,25 +38,18 @@ public:
 
 	template <class Object> static devcb_base &set_kbstb_wr_callback(device_t &device, Object &&cb) { return downcast<xerox_820_keyboard_device &>(device).m_kbstb_cb.set_callback(std::forward<Object>(cb)); }
 
-	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual ioport_constructor device_input_ports() const override;
-
 	uint8_t read() { return m_bus; }
-
-	DECLARE_READ8_MEMBER( kb_p1_r );
-	DECLARE_WRITE8_MEMBER( kb_p1_w );
-	DECLARE_READ8_MEMBER( kb_p2_r );
-	DECLARE_READ_LINE_MEMBER( kb_t0_r );
-	DECLARE_READ_LINE_MEMBER( kb_t1_r );
-	DECLARE_WRITE8_MEMBER( kb_bus_w );
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_reset_after_children() override;
+
+	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -66,6 +59,13 @@ private:
 
 	uint8_t m_p1;
 	uint8_t m_bus;
+
+	DECLARE_READ8_MEMBER( kb_p1_r );
+	DECLARE_WRITE8_MEMBER( kb_p1_w );
+	DECLARE_READ8_MEMBER( kb_p2_r );
+	DECLARE_READ_LINE_MEMBER( kb_t0_r );
+	DECLARE_READ_LINE_MEMBER( kb_t1_r );
+	DECLARE_WRITE8_MEMBER( kb_bus_w );
 };
 
 

@@ -325,6 +325,9 @@ static MACHINE_CONFIG_START( coco3 )
 	MCFG_RAM_DEFAULT_SIZE("512K")
 	MCFG_RAM_EXTRA_OPTIONS("128K,2M,8M")
 
+	// floating space
+	MCFG_FRAGMENT_ADD(coco_floating)
+
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("cart_list","coco_cart")
 

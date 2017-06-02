@@ -49,11 +49,12 @@ static ADDRESS_MAP_START( km035_map, AS_PROGRAM, 8, km035_device )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 ADDRESS_MAP_END
 
+
 //-------------------------------------------------
-//  MACHINE_CONFIG
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( km035 )
+MACHINE_CONFIG_MEMBER( km035_device::device_add_mconfig )
 	MCFG_CPU_ADD(KM035_CPU_TAG, I8035, XTAL_4_608MHz)
 	MCFG_CPU_PROGRAM_MAP(km035_map)
 	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(km035_device, bus_w))
@@ -68,17 +69,6 @@ static MACHINE_CONFIG_START( km035 )
 	MCFG_SOUND_ADD(KM035_SPK_TAG, BEEP, 3250)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor km035_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( km035 );
-}
 
 const tiny_rom_entry *km035_device::device_rom_region() const
 {

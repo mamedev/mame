@@ -32,7 +32,7 @@ const tiny_rom_entry *dw_fdc_device::device_rom_region() const
 	return ROM_NAME( dw_fdc );
 }
 
-static MACHINE_CONFIG_START( dw_fdc )
+MACHINE_CONFIG_MEMBER( dw_fdc_device::device_add_mconfig )
 	MCFG_CPU_ADD("mcu", I8048, XTAL_24MHz/4)    // divisor is unverified
 //  MCFG_MCS48_PORT_BUS_IN_CB(READ8(dw_fdc_device, bus_r))
 //  MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(dw_fdc_device, bus_w))
@@ -50,10 +50,6 @@ static MACHINE_CONFIG_START( dw_fdc )
 //  MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", wangpc_floppies, "525dd", wangpc_state::floppy_formats)
 MACHINE_CONFIG_END
 
-machine_config_constructor dw_fdc_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( dw_fdc );
-}
 
 dw_fdc_device::dw_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, DW_FDC, tag, owner, clock)

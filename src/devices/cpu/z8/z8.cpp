@@ -361,7 +361,7 @@ void z8_device::register_write(uint8_t offset, uint8_t data)
 		if (data & Z8_TMR_LOAD_T0)
 		{
 			m_t0 = T0;
-			m_t0_timer->adjust(attotime::zero, 0, attotime::from_hz(m_clock / 2 / 4 / ((PRE0 >> 2) + 1)));
+			m_t0_timer->adjust(attotime::zero, 0, cycles_to_attotime(4 * ((PRE0 >> 2) + 1)));
 		}
 
 		m_t0_timer->enable(data & Z8_TMR_ENABLE_T0);
@@ -369,7 +369,7 @@ void z8_device::register_write(uint8_t offset, uint8_t data)
 		if (data & Z8_TMR_LOAD_T1)
 		{
 			m_t1 = T1;
-			m_t1_timer->adjust(attotime::zero, 0, attotime::from_hz(m_clock / 2 / 4 / ((PRE1 >> 2) + 1)));
+			m_t1_timer->adjust(attotime::zero, 0, cycles_to_attotime(4 * ((PRE1 >> 2) + 1)));
 		}
 
 		m_t1_timer->enable(data & Z8_TMR_ENABLE_T1);
@@ -641,7 +641,7 @@ TIMER_CALLBACK_MEMBER( z8_device::t0_tick )
 	if (m_t0 == 0)
 	{
 		m_t0 = T0;
-		m_t0_timer->adjust(attotime::zero, 0, attotime::from_hz(m_clock / 2 / 4 / ((PRE0 >> 2) + 1)));
+		m_t0_timer->adjust(attotime::zero, 0, cycles_to_attotime(4 * ((PRE0 >> 2) + 1)));
 		m_t0_timer->enable(PRE0 & Z8_PRE0_COUNT_MODULO_N);
 		m_irq[4] = ASSERT_LINE;
 	}
@@ -654,7 +654,7 @@ TIMER_CALLBACK_MEMBER( z8_device::t1_tick )
 	if (m_t1 == 0)
 	{
 		m_t1 = T1;
-		m_t1_timer->adjust(attotime::zero, 0, attotime::from_hz(m_clock / 2 / 4 / ((PRE1 >> 2) + 1)));
+		m_t1_timer->adjust(attotime::zero, 0, cycles_to_attotime(4 * ((PRE1 >> 2) + 1)));
 		m_t1_timer->enable(PRE1 & Z8_PRE0_COUNT_MODULO_N);
 		m_irq[5] = ASSERT_LINE;
 	}

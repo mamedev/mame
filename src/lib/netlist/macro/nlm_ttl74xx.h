@@ -85,11 +85,25 @@
 		NET_REGISTER_DEV(TTL_7411_DIP, name)
 
 
+#define TTL_7414_GATE(name)                                                   \
+		NET_REGISTER_DEV(TTL_7414_GATE, name)
+
+#define TTL_7414_DIP(name)                                                    \
+		NET_REGISTER_DEV(TTL_7414_DIP, name)
+
+
+#define TTL_74LS14_GATE(name)                                                 \
+		NET_REGISTER_DEV(TTL_74LS14_GATE, name)
+
+#define TTL_74LS14_DIP(name)                                                  \
+		NET_REGISTER_DEV(TTL_74LS14_DIP, name)
+
+
 #define TTL_7416_GATE(name)                                                   \
 		NET_REGISTER_DEV(TTL_7416_GATE, name)
 
 #define TTL_7416_DIP(name)                                                    \
-		NET_REGISTER_DEV(TTL7416_DIP, name)
+		NET_REGISTER_DEV(TTL_7416_DIP, name)
 
 
 #define TTL_7420_GATE(name)                                                   \
@@ -185,6 +199,12 @@
 
 #define TTL_7486_DIP(name)                                                     \
 		NET_REGISTER_DEV(TTL_7486_DIP, name)
+
+#define TTL_74155_DIP(name)                                                    \
+		NET_REGISTER_DEV(TTL_74155_DIP, name)
+
+#define TTL_74156_DIP(name)                                                    \
+		NET_REGISTER_DEV(TTL_74156_DIP, name)
 
 
 #define TTL_74260_GATE(name)                                                   \

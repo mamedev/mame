@@ -626,7 +626,7 @@ WRITE8_MEMBER( tm990189_state::video_joy_w )
 // user tms9901 setup
 static const tms9901_interface usr9901reset_param =
 {
-	tms9901_device::INT1 | tms9901_device::INT2 | tms9901_device::INT3 | tms9901_device::INT4 | tms9901_device::INT5 | tms9901_device::INT6,    // only input pins whose state is always known
+    tms9901_device::INT1 | tms9901_device::INT2 | tms9901_device::INT3 | tms9901_device::INT4 | tms9901_device::INT5 | tms9901_device::INT6,    // only input pins whose state is always known
 
     // Read handler. Covers all input lines (see tms9901.h)
     DEVCB_NOOP,

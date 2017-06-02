@@ -125,8 +125,6 @@ private:
 	devcb_write_line   m_zc3_cb;               // channel 3 zero crossing callbacks = nullptr ?
 
 	uint8_t               m_vector;               // interrupt vector
-	attotime            m_period16;             // 16/system clock
-	attotime            m_period256;            // 256/system clock
 	ctc_channel         m_channel[4];           // data for each channel
 };
 
