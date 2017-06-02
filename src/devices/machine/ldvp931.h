@@ -120,7 +120,7 @@ private:
 	uint8_t               m_datastrobe;               // DATA STROBE line from DATIC
 
 	// communication status
-	uint8_t               m_reset_state;              // state of the reset input
+	//uint8_t               m_reset_state;              // state of the reset input
 	uint8_t               m_fromcontroller;           // command byte from the controller
 	bool                m_fromcontroller_pending;   // true if data is pending
 	uint8_t               m_tocontroller;             // command byte to the controller
