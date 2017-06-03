@@ -451,11 +451,22 @@ device_cococart_interface::~device_cococart_interface()
 void device_cococart_interface::interface_config_complete()
 {
 	m_owning_slot = dynamic_cast<cococart_slot_device *>(device().owner());
+	m_host = m_owning_slot
+		? dynamic_cast<device_cococart_host_interface *>(m_owning_slot->owner())
+		: nullptr;
+}
+
+
+//-------------------------------------------------
+//  interface_pre_start
+//-------------------------------------------------
+
+void device_cococart_interface::interface_pre_start()
+{
 	if (!m_owning_slot)
-		throw new emu_fatalerror("Expected device().owner() to be of type cococart_slot_device");
-	m_host = dynamic_cast<device_cococart_host_interface *>(m_owning_slot->owner());
+		throw emu_fatalerror("Expected device().owner() to be of type cococart_slot_device");
 	if (!m_host)
-		throw new emu_fatalerror("Expected m_owning_slot->owner() to be of type device_cococart_host_interface");
+		throw emu_fatalerror("Expected m_owning_slot->owner() to be of type device_cococart_host_interface");
 }
 
 

@@ -193,6 +193,7 @@ public:
 	void set_cart_base_update(cococart_base_update_delegate update);
 
 	virtual void interface_config_complete() override;
+	virtual void interface_pre_start() override;
 
 protected:
 	device_cococart_interface(const machine_config &mconfig, device_t &device);
