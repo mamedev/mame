@@ -43,8 +43,6 @@ enum
 	LOADSAVE_SAVE
 };
 
-#define MAX_SAVED_STATE_JOYSTICK   4
-
 
 /***************************************************************************
     LOCAL VARIABLES

@@ -58,9 +58,11 @@ private:
 
 	static void *itemref_from_file_entry(const file_entry &entry);
 	static const file_entry &file_entry_from_itemref(void *itemref);
+	void try_select_slot(std::string &&name);
 	void slot_selected(std::string &&name);
 	std::string state_directory() const;
 	bool is_present(const std::string &name) const;
+	std::string poll_joystick();
 };
 
 // ======================> menu_load_state

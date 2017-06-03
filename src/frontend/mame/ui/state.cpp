@@ -20,6 +20,8 @@
 
 namespace {
 
+const int MAX_SAVED_STATE_JOYSTICK = 4;
+
 //-------------------------------------------------
 //  is_valid_state_char - is the specified character
 //  a valid state filename character?
@@ -164,21 +166,54 @@ void menu_load_save_state_base::handle()
 	const event *event = process(0);
 
 	// process the event
-	if ((event != nullptr) && (event->iptkey == IPT_UI_SELECT))
+	if (event && (event->iptkey == IPT_UI_SELECT))
 	{
 		// user selected one of the entries
 		const file_entry &entry = file_entry_from_itemref(event->itemref);
 		slot_selected(std::string(entry.name()));
 	}
-	else if ((event != nullptr) && (event->iptkey == IPT_SPECIAL) && is_valid_state_char(event->unichar))
+	else if (event && (event->iptkey == IPT_SPECIAL) && is_valid_state_char(event->unichar))
 	{
+		// user pressed a shortcut key
 		std::string name = utf8_from_uchar(event->unichar);
-		if (!m_must_exist || is_present(name))
+		try_select_slot(std::move(name));
+	}
+	else if (!event)
+	{
+		// null event - poll the joystick
+		std::string name = poll_joystick();
+		if (!name.empty())
+			try_select_slot(std::move(name));
+	}
+}
+
+
+//-------------------------------------------------
+//  poll_joystick
+//-------------------------------------------------
+
+std::string menu_load_save_state_base::poll_joystick()
+{
+	for (int joy_index = 0; joy_index <= MAX_SAVED_STATE_JOYSTICK; joy_index++)
+	{
+		for (input_item_id id = ITEM_ID_BUTTON1; id <= ITEM_ID_BUTTON32; ++id)
 		{
-			// user pressed a shortcut key
-			slot_selected(std::move(name));
+			if (machine().input().code_pressed_once(input_code(DEVICE_CLASS_JOYSTICK, joy_index, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, id)))
+				return util::string_format("joy%i-%i", joy_index, id - ITEM_ID_BUTTON1 + 1);
 		}
 	}
+	return "";
+}
+
+
+//-------------------------------------------------
+//  try_select_slot
+//-------------------------------------------------
+
+void menu_load_save_state_base::try_select_slot(std::string &&name)
+{
+	if (!m_must_exist || is_present(name))
+		slot_selected(std::move(name));
 }
 
 
