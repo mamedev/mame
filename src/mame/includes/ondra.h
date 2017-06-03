@@ -61,7 +61,7 @@ protected:
 	required_memory_bank m_bank1;
 	required_memory_bank m_bank2;
 	required_memory_bank m_bank3;
-	required_ioport<10> m_lines;
+	required_ioport_array<10> m_lines;
 	required_ioport m_nmi;
 };
 
