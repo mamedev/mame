@@ -91,7 +91,7 @@ DONE (x) (p=partly)         NMOS         CMOS       ESCC      EMSCC
 #define LOG_DCD     (1U <<  9)
 #define LOG_SYNC    (1U << 10)
 
-//#define VERBOSE (LOG_CMD|LOG_INT|LOG_SETUP|LOG_TX|LOG_READ|LOG_CTS|LOG_DCD)
+//#define VERBOSE (LOG_CMD|LOG_INT|LOG_SETUP|LOG_TX|LOG_RCV|LOG_READ|LOG_CTS|LOG_DCD)
 //#define LOG_OUTPUT_FUNC printf
 #include "logmacro.h"
 
@@ -1997,13 +1997,13 @@ void z80scc_channel::do_sccreg_wr11(uint8_t data)
 	  /SYNC pin is unavailable for other use. The /SYNC signal is forced to zero internally. A hardware
 	  reset forces /NO XTAL. (At least 20 ms should be allowed after this bit is set to allow the oscillator
 	  to stabilize.)*/
-	LOG("  Clock type %s\n", data & WR11_RCVCLK_TYPE ? "Crystal oscillator between RTxC and /SYNC pins" : "TTL level on RTxC pin and /SYNC can be used");
+	LOG("- Clock type %s\n", data & WR11_RCVCLK_TYPE ? "Crystal oscillator between RTxC and /SYNC pins" : "TTL level on RTxC pin and /SYNC can be used");
 	/*Bits 6 and 5: Receiver Clock select bits 1 and 0
 	  These bits determine the source of the receive clock as listed below. They do not
 	  interfere with any of the modes of operation in the SCC, but simply control a multiplexer just
 	  before the internal receive clock input. A hardware reset forces the receive clock to come from the
 	  /RTxC pin.*/
-	LOG("  Receive clock source is: ");
+	LOG("- Receive clock source is: ");
 	switch (data & WR11_RCVCLK_SRC_MASK)
 	{
 	case WR11_RCVCLK_SRC_RTXC: LOG("RTxC - not implemented\n"); break;
@@ -2019,7 +2019,7 @@ void z80scc_channel::do_sccreg_wr11(uint8_t data)
 	  degrees the output of the DPLL used by the receiver. This makes the received and transmitted bit
 	  cells occur simultaneously, neglecting delays. A hardware reset selects the /TRxC pin as the
 	  source of the transmit clocks.*/
-	LOG("  Transmit clock source is: ");
+	LOG("- Transmit clock source is: ");
 	switch (data & WR11_TRACLK_SRC_MASK)
 	{
 	case WR11_TRACLK_SRC_RTXC: LOG("RTxC - not implemented\n"); break;
@@ -2034,7 +2034,7 @@ void z80scc_channel::do_sccreg_wr11(uint8_t data)
 	   transmit clock is programmed to come from the /TRxC pin, /TRxC is an input, regardless of the
 	   state of this bit. The /TRxC pin is also an input if this bit is set to 0. A hardware reset forces this bit
 	   to 0.*/
-	LOG("  TRxC pin is %s\n", data & WR11_TRXC_DIRECTION ? "Output" : "Input");
+	LOG("- TRxC pin is %s\n", data & WR11_TRXC_DIRECTION ? "Output" : "Input");
 	/*Bits 1 and 0: /TRxC Output Source select bits 1 and 0
 	  These bits determine the signal to be echoed out of the SCC via the /TRxC pin as listed in Table
 	  on page 167. No signal is produced if /TRxC has been programmed as the source of either the
@@ -2044,7 +2044,7 @@ void z80scc_channel::do_sccreg_wr11(uint8_t data)
 	  Hardware reset selects the XTAL oscillator as the output source*/
 	if (data & WR11_TRXC_DIRECTION)
 	{
-	LOG("  TRxC pin output is: ");
+	LOG("- TRxC pin output is: ");
 		switch (data & WR11_TRXSRC_SRC_MASK)
 		{
 		case WR11_TRXSRC_SRC_XTAL: LOG("the Oscillator - not implemented\n"); break;
@@ -2278,7 +2278,7 @@ uint8_t z80scc_channel::data_read()
 {
 	uint8_t data = 0;
 
-	LOG("%s \"%s\": %c : Data Register Read: ", FUNCNAME, owner()->tag(), 'A' + m_index);
+	LOGRCV("%s \"%s\": %c : Data Register Read: ", FUNCNAME, owner()->tag(), 'A' + m_index);
 
 	if (m_rx_fifo_wp != m_rx_fifo_rp)
 	{
@@ -2310,8 +2310,16 @@ uint8_t z80scc_channel::data_read()
 		}
 		else
 		{
-			// decrease FIFO pointer
+			// decrease RX FIFO pointer
 			m_rx_fifo_rp_step();
+
+			// if RX FIFO empty reset RX interrupt status
+			if (m_rx_fifo_wp == m_rx_fifo_rp)
+			{
+				LOGRCV("Rx FIFO empty, resetting status and interrupt state");
+				m_uart->m_int_state[INT_RECEIVE_PRIO + (m_index == z80scc_device::CHANNEL_A ? 0 : 3 )] = 0;
+				m_uart->m_chanA->m_rr3 &=  ~((1 << INT_RECEIVE_PRIO) + (m_index == z80scc_device::CHANNEL_A ? 3 : 0 ));
+			}
 		}
 	}
 	else
@@ -2452,7 +2460,7 @@ void z80scc_channel::data_write(uint8_t data)
 
 void z80scc_channel::receive_data(uint8_t data)
 {
-	LOG("\"%s\": %c : Received Data Byte '%c'/%02x put into FIFO\n", owner()->tag(), 'A' + m_index, isprint(data) ? data : ' ', data);
+	LOGRCV("\"%s\": %c : Received Data Byte '%c'/%02x put into FIFO\n", owner()->tag(), 'A' + m_index, isprint(data) ? data : ' ', data);
 
 	if (m_rx_fifo_wp + 1 == m_rx_fifo_rp || ( (m_rx_fifo_wp + 1 == m_rx_fifo_sz) && (m_rx_fifo_rp == 0) ))
 	{
