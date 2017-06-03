@@ -2,9 +2,9 @@
 // copyright-holders:Nathan Woods
 /***************************************************************************
 
-	ui/state.cpp
+    ui/state.cpp
 
-	Menus for saving and loading state
+    Menus for saving and loading state
 
 ***************************************************************************/
 
@@ -15,14 +15,14 @@
 
 
 /***************************************************************************
-	ANONYMOUS NAMESPACE
+    ANONYMOUS NAMESPACE
 ***************************************************************************/
 
 namespace {
 
 //-------------------------------------------------
 //  is_valid_state_char - is the specified character
-//	a valid state filename character?
+//  a valid state filename character?
 //-------------------------------------------------
 
 bool is_valid_state_char(char32_t ch)
@@ -30,53 +30,29 @@ bool is_valid_state_char(char32_t ch)
 	return uchar_is_printable(ch) && osd_is_valid_filename_char(ch);
 }
 
-
-//-------------------------------------------------
-//  get_entry_char
-//-------------------------------------------------
-
-char32_t get_entry_char(const osd::directory::entry &entry)
-{
-	char32_t result = 0;
-
-	// first, is this a file that ends with *.sta?
-	if (entry.type == osd::directory::entry::entry_type::FILE
-		&& core_filename_ends_with(entry.name, ".sta"))
-	{
-		std::string basename = core_filename_extract_base(entry.name);
-
-
-		char32_t ch;
-		if (uchar_from_utf8(&ch, basename.c_str(), basename.length() == basename.length()) && is_valid_state_char(ch))			
-			result = ch;
-	}
-	return result;
-}
-
-
 };
 
 namespace ui {
 
 /***************************************************************************
-	FILE ENTRY
+    FILE ENTRY
 ***************************************************************************/
 
-char32_t menu_load_save_state_base::s_last_file_selected;
+std::string menu_load_save_state_base::s_last_file_selected;
 
 //-------------------------------------------------
 //  file_entry ctor
 //-------------------------------------------------
 
-menu_load_save_state_base::file_entry::file_entry(char32_t entry_char, const std::chrono::system_clock::time_point &last_modified)
-	: m_entry_char(entry_char)
+menu_load_save_state_base::file_entry::file_entry(std::string &&name, const std::chrono::system_clock::time_point &last_modified)
+	: m_name(std::move(name))
 	, m_last_modified(last_modified)
 {
 }
 
 
 /***************************************************************************
-	BASE CLASS FOR LOAD AND SAVE
+    BASE CLASS FOR LOAD AND SAVE
 ***************************************************************************/
 
 //-------------------------------------------------
@@ -126,15 +102,12 @@ void menu_load_save_state_base::populate(float &customtop, float &custombottom)
 		const osd::directory::entry *entry;
 		while ((entry = dir->read()) != nullptr)
 		{
-			char32_t entry_char = get_entry_char(*entry);
-			if (entry_char)
+			if (core_filename_ends_with(entry->name, ".sta"))
 			{
-				if (core_filename_ends_with(entry->name, ".sta"))
-				{
-					file_entry fileent(entry_char, entry->last_modified);
-					auto iter = m_file_entries.emplace(std::make_pair(entry_char, std::move(fileent))).first;
-					m_entries_vec.push_back(&iter->second);
-				}
+				std::string basename = core_filename_extract_base(entry->name, true);
+				file_entry fileent(std::string(basename), entry->last_modified);
+				auto iter = m_file_entries.emplace(std::make_pair(std::move(basename), std::move(fileent))).first;
+				m_entries_vec.push_back(&iter->second);
 			}
 		}
 	}
@@ -154,11 +127,11 @@ void menu_load_save_state_base::populate(float &customtop, float &custombottom)
 		// get the time as a local time string
 		char time_string[128];
 		auto last_modified_time_t = std::chrono::system_clock::to_time_t(entry->last_modified());
-		std::strftime(time_string, sizeof(time_string), "%#c", std::localtime(&last_modified_time_t));
+		std::strftime(time_string, sizeof(time_string), "%c", std::localtime(&last_modified_time_t));
 
 		// format the text
 		std::string text = util::string_format("%s: %s",
-			utf8_from_uchar(entry->entry_char()),
+			entry->name(),
 			time_string);
 
 		// append the menu item
@@ -166,7 +139,7 @@ void menu_load_save_state_base::populate(float &customtop, float &custombottom)
 		item_append(std::move(text), std::string(), 0, itemref);
 
 		// is this item selected?
-		if (entry->entry_char() == s_last_file_selected)
+		if (entry->name() == s_last_file_selected)
 			set_selection(itemref);
 	}
 
@@ -195,14 +168,16 @@ void menu_load_save_state_base::handle()
 	{
 		// user selected one of the entries
 		const file_entry &entry = file_entry_from_itemref(event->itemref);
-		slot_selected(entry.entry_char());
+		slot_selected(std::string(entry.name()));
 	}
-	else if ((event != nullptr) && (event->iptkey == IPT_SPECIAL)
-		&& is_valid_state_char(event->unichar)
-		&& (!m_must_exist || is_present(event->unichar)))
+	else if ((event != nullptr) && (event->iptkey == IPT_SPECIAL) && is_valid_state_char(event->unichar))
 	{
-		// user pressed a shortcut key
-		slot_selected(event->unichar);
+		std::string name = utf8_from_uchar(event->unichar);
+		if (!m_must_exist || is_present(name))
+		{
+			// user pressed a shortcut key
+			slot_selected(std::move(name));
+		}
 	}
 }
 
@@ -211,13 +186,13 @@ void menu_load_save_state_base::handle()
 //  slot_selected
 //-------------------------------------------------
 
-void menu_load_save_state_base::slot_selected(char32_t entry_char)
+void menu_load_save_state_base::slot_selected(std::string &&name)
 {
 	// handle it
-	process_file(utf8_from_uchar(entry_char));
+	process_file(std::string(name));
 
 	// record the last slot touched
-	s_last_file_selected = entry_char;
+	s_last_file_selected = std::move(name);
 
 	// no matter what, pop out
 	menu::stack_pop(machine());
@@ -273,14 +248,14 @@ std::string menu_load_save_state_base::state_directory() const
 //  is_present
 //-------------------------------------------------
 
-bool menu_load_save_state_base::is_present(char32_t entry_char) const
+bool menu_load_save_state_base::is_present(const std::string &name) const
 {
-	return m_file_entries.find(entry_char) != m_file_entries.end();
+	return m_file_entries.find(name) != m_file_entries.end();
 }
 
 
 /***************************************************************************
-	LOAD STATE
+    LOAD STATE
 ***************************************************************************/
 
 //-------------------------------------------------
@@ -304,7 +279,7 @@ void menu_load_state::process_file(std::string &&file_name)
 
 
 /***************************************************************************
-	SAVE STATE
+    SAVE STATE
 ***************************************************************************/
 
 //-------------------------------------------------

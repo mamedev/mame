@@ -38,19 +38,19 @@ private:
 		file_entry() = delete;
 		file_entry(const file_entry &) = delete;
 		file_entry(file_entry &&) = default;
-		file_entry(char32_t entry_char, const std::chrono::system_clock::time_point &last_modified);
+		file_entry(std::string &&name, const std::chrono::system_clock::time_point &last_modified);
 
-		char32_t entry_char() const { return m_entry_char; }
+		const std::string &name() const { return m_name; }
 		const std::chrono::system_clock::time_point &last_modified() const { return m_last_modified; }
 
 	private:
-		char32_t								m_entry_char;
+		std::string								m_name;
 		std::chrono::system_clock::time_point   m_last_modified;
 	};
 
-	static char32_t								s_last_file_selected;
+	static std::string							s_last_file_selected;
 
-	std::unordered_map<char32_t, file_entry>	m_file_entries;
+	std::unordered_map<std::string, file_entry>	m_file_entries;
 	const char *								m_header;
 	const char *								m_footer;
 	bool										m_must_exist;
@@ -58,9 +58,9 @@ private:
 
 	static void *itemref_from_file_entry(const file_entry &entry);
 	static const file_entry &file_entry_from_itemref(void *itemref);
-	void slot_selected(char32_t entry_char);
+	void slot_selected(std::string &&name);
 	std::string state_directory() const;
-	bool is_present(char32_t entry_char) const;
+	bool is_present(const std::string &name) const;
 };
 
 // ======================> menu_load_state
