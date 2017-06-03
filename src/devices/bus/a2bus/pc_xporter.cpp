@@ -121,11 +121,11 @@ MACHINE_CONFIG_MEMBER( a2bus_pcxporter_device::device_add_mconfig )
 	MCFG_DEVICE_DISABLE()
 
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL_14_31818MHz/12) /* heartbeat IRQ */
+	MCFG_PIT8253_CLK0(XTAL_14_31818MHz/12.0) // heartbeat IRQ
 	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir0_w))
-	MCFG_PIT8253_CLK1(XTAL_14_31818MHz/12) /* dram refresh */
+	MCFG_PIT8253_CLK1(XTAL_14_31818MHz/12.0) // dram refresh
 	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(a2bus_pcxporter_device, pc_pit8253_out1_changed))
-	MCFG_PIT8253_CLK2(XTAL_14_31818MHz/12) /* pio port c pin 4, and speaker polling enough */
+	MCFG_PIT8253_CLK2(XTAL_14_31818MHz/12.0) // pio port c pin 4, and speaker polling enough
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(a2bus_pcxporter_device, pc_pit8253_out2_changed))
 
 	MCFG_DEVICE_ADD( "dma8237", PCXPORT_DMAC, XTAL_14_31818MHz/2 )
