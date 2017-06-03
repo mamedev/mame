@@ -113,7 +113,11 @@ function cheat.startplugin()
 
 	local function load_hotkeys()
 		local json = require("json")
-		local hotkeys = json.parse(io.open(manager:machine():options().entries.cheatpath:value():match("([^;]+)") .. "/" .. cheatname .. "_hotkeys.json", "r"):read("a"))
+		local file = io.open(manager:machine():options().entries.cheatpath:value():match("([^;]+)") .. "/" .. cheatname .. "_hotkeys.json", "r")
+		if not file then
+			return
+		end
+		local hotkeys = json.parse(file:read("a"))
 		for num, val in ipairs(hotkeys) do
 			for num, cheat in pairs(cheats) do
 				if val.desc == cheat.desc then
