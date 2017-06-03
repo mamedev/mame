@@ -599,7 +599,7 @@ private:
 	device_t *  m_visiblecpu;
 	device_t *  m_breakcpu;
 
-	FILE *      m_source_file;          // script source file
+	std::unique_ptr<std::istream> m_source_file;        // script source file
 
 	std::unique_ptr<symbol_table> m_symtable;           // global symbol table
 

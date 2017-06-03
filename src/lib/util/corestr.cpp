@@ -171,15 +171,18 @@ void strreplacechr(std::string& str, char ch, char newch)
 	}
 }
 
-std::string strtrimspace(std::string& str)
+static std::string internal_strtrimspace(std::string& str, bool right_only)
 {
-	int start = 0;
-	for (auto & elem : str)
+	size_t start = 0;
+	if (!right_only)
 	{
-		if (!isspace(uint8_t(elem)))  break;
-		start++;
+		for (auto & elem : str)
+		{
+			if (!isspace(uint8_t(elem)))  break;
+			start++;
+		}
 	}
-	int end = str.length();
+	size_t end = str.length();
 	if (end > 0)
 	{
 		for (size_t i = str.length() - 1; i > 0; i--)
@@ -190,6 +193,16 @@ std::string strtrimspace(std::string& str)
 	}
 	str = str.substr(start, end-start);
 	return str;
+}
+
+std::string strtrimspace(std::string& str)
+{
+	return internal_strtrimspace(str, false);
+}
+
+std::string strtrimrightspace(std::string& str)
+{
+	return internal_strtrimspace(str, true);
 }
 
 std::string strmakeupper(std::string& str)

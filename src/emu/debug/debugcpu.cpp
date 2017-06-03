@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /*********************************************************************
 
-    debugcpu.c
+    debugcpu.cpp
 
     Debugger CPU/memory interface engine.
 
@@ -25,6 +25,7 @@
 #include "xmlfile.h"
 
 #include <ctype.h>
+#include <fstream>
 
 
 enum
@@ -45,7 +46,6 @@ debugger_cpu::debugger_cpu(running_machine &machine)
 	, m_livecpu(nullptr)
 	, m_visiblecpu(nullptr)
 	, m_breakcpu(nullptr)
-	, m_source_file(nullptr)
 	, m_symtable(nullptr)
 	, m_execution_state(EXECUTION_STATE_STOPPED)
 	, m_bpindex(1)
@@ -189,23 +189,23 @@ symbol_table* debugger_cpu::get_visible_symtable()
 
 void debugger_cpu::source_script(const char *file)
 {
-	/* close any existing source file */
-	if (m_source_file != nullptr)
-	{
-		fclose(m_source_file);
-		m_source_file = nullptr;
-	}
+	// close any existing source file
+	m_source_file.reset();
 
-	/* open a new one if requested */
+	// open a new one if requested 
 	if (file != nullptr)
 	{
-		m_source_file = fopen(file, "r");
-		if (!m_source_file)
+		auto source_file = std::make_unique<std::ifstream>(file, std::ifstream::in);
+		if (source_file->fail())
 		{
 			if (m_machine.phase() == machine_phase::RUNNING)
 				m_machine.debugger().console().printf("Cannot open command file '%s'\n", file);
 			else
 				fatalerror("Cannot open command file '%s'\n", file);
+		}
+		else
+		{
+			m_source_file = std::move(source_file);
 		}
 	}
 }
@@ -871,34 +871,31 @@ void debugger_cpu::reset_transient_flags()
 
 void debugger_cpu::process_source_file()
 {
-	/* loop until the file is exhausted or until we are executing again */
-	while (m_source_file != nullptr && m_execution_state == EXECUTION_STATE_STOPPED)
+	std::string buf;
+
+	// loop until the file is exhausted or until we are executing again
+	while (m_source_file && m_execution_state == EXECUTION_STATE_STOPPED)
 	{
-		/* stop at the end of file */
-		if (feof(m_source_file))
+		// stop at the end of file
+		if (m_source_file->eof())
 		{
-			fclose(m_source_file);
-			m_source_file = nullptr;
+			m_source_file.reset();
 			return;
 		}
 
-		/* fetch the next line */
-		char buf[512];
-		memset(buf, 0, sizeof(buf));
-		fgets(buf, sizeof(buf), m_source_file);
+		// fetch the next line
+		std::getline(*m_source_file, buf);
 
-		/* strip out comments (text after '//') */
-		char *s = strstr(buf, "//");
-		if (s)
-			*s = '\0';
+		// strip out comments (text after '//')
+		size_t pos = buf.find("//");
+		if (pos != std::string::npos)
+			buf.resize(pos);
 
-		/* strip whitespace */
-		int i = (int)strlen(buf);
-		while((i > 0) && (isspace(u8(buf[i-1]))))
-			buf[--i] = '\0';
+		// strip whitespace
+		strtrimrightspace(buf);
 
-		/* execute the command */
-		if (buf[0])
+		// execute the command
+		if (!buf.empty())
 			m_machine.debugger().console().execute_command(buf, true);
 	}
 }
