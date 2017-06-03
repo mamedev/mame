@@ -111,7 +111,6 @@ namespace
 
 		// internal state
 		device_image_interface *m_cart;
-		cococart_slot_device *m_owner;
 		uint8_t m_select;
 
 		optional_ioport m_autostart;
@@ -189,7 +188,6 @@ coco_t4426_device::coco_t4426_device(const machine_config &mconfig, device_type 
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_cococart_interface(mconfig, *this)
 	, m_cart(nullptr)
-	, m_owner(nullptr)
 	, m_select(0)
 	, m_autostart(*this, CART_AUTOSTART_TAG)
 	, m_uart(*this, UART_TAG)
@@ -210,7 +208,6 @@ void coco_t4426_device::device_start()
 {
 	LOG("%s()\n", FUNCNAME );
 	m_cart = dynamic_cast<device_image_interface *>(owner());
-	m_owner = dynamic_cast<cococart_slot_device *>(owner());
 }
 
 
@@ -242,7 +239,7 @@ void coco_t4426_device::device_reset()
 {
 	LOG("%s()\n", FUNCNAME );
 	auto cart_line = cococart_slot_device::line_value::Q;
-	m_owner->set_line_value(cococart_slot_device::line::CART, cart_line);
+	set_line_value(cococart_slot_device::line::CART, cart_line);
 }
 
 /*-------------------------------------------------

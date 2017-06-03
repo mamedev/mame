@@ -429,6 +429,8 @@ std::string cococart_slot_device::get_default_card_software(get_default_card_sof
 
 device_cococart_interface::device_cococart_interface(const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device)
+	, m_owning_slot(nullptr)
+	, m_host(nullptr)
 {
 }
 
@@ -439,6 +441,21 @@ device_cococart_interface::device_cococart_interface(const machine_config &mconf
 
 device_cococart_interface::~device_cococart_interface()
 {
+}
+
+
+//-------------------------------------------------
+//  interface_config_complete
+//-------------------------------------------------
+
+void device_cococart_interface::interface_config_complete()
+{
+	m_owning_slot = dynamic_cast<cococart_slot_device *>(device().owner());
+	if (!m_owning_slot)
+		throw new emu_fatalerror("Expected device().owner() to be of type cococart_slot_device");
+	m_host = dynamic_cast<device_cococart_host_interface *>(m_owning_slot->owner());
+	if (!m_host)
+		throw new emu_fatalerror("Expected m_owning_slot->owner() to be of type device_cococart_host_interface");
 }
 
 
@@ -509,13 +526,7 @@ void device_cococart_interface::cart_base_changed(void)
 
 address_space &device_cococart_interface::cartridge_space()
 {
-	// sanity check - our parent should always be a cococart_slot_device
-	assert(dynamic_cast<cococart_slot_device *>(device().owner()));
-
-	// get my owner's owner - it had better implement device_cococart_host_interface
-	device_cococart_host_interface *host = dynamic_cast<device_cococart_host_interface *>(device().owner()->owner());
-	assert(host);
-	return host->cartridge_space();
+	return host().cartridge_space();
 }
 
 
