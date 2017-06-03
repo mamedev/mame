@@ -29,6 +29,7 @@
 #include "sound/sp0256.h"
 #include "sound/sn76496.h"
 #include "formats/dmk_dsk.h"
+#include "formats/sdf_dsk.h"
 #include "formats/jvc_dsk.h"
 #include "formats/vdk_dsk.h"
 
