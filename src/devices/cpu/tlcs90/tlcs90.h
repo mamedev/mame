@@ -80,6 +80,9 @@ DECLARE_ENUM_OPERATORS(tlcs90_e_irq)
 
 class tlcs90_device : public cpu_device
 {
+	static constexpr int MAX_PORTS = 9;
+	//static constexpr int MAX_ANALOG_INPUTS = 16;
+
 public:
 	DECLARE_READ8_MEMBER( t90_internal_registers_r );
 	DECLARE_WRITE8_MEMBER( t90_internal_registers_w );
@@ -93,8 +96,16 @@ protected:
 
 public:
 	// static configuration
-	template<class Object> static devcb_base &set_port_read_cb(device_t &device, int port, Object object) { return downcast<tlcs90_device &>(device).m_port_read_cb[port].set_callback(object); }
-	template<class Object> static devcb_base &set_port_write_cb(device_t &device, int port, Object object) { return downcast<tlcs90_device &>(device).m_port_write_cb[port].set_callback(object); }
+	template<class Object> static devcb_base &set_port_read_cb(device_t &device, int port, Object &&object)
+	{
+		assert(port >= 0 && port < MAX_PORTS);
+		return downcast<tlcs90_device &>(device).m_port_read_cb[port].set_callback(std::forward<Object>(object));
+	}
+	template<class Object> static devcb_base &set_port_write_cb(device_t &device, int port, Object &&object)
+	{
+		assert(port >= 0 && port < MAX_PORTS);
+		return downcast<tlcs90_device &>(device).m_port_write_cb[port].set_callback(std::forward<Object>(object));
+	}
 
 protected:
 	// construction/destruction
@@ -135,8 +146,8 @@ private:
 
 	address_space_config m_program_config;
 
-	devcb_read8 m_port_read_cb[9];
-	devcb_write8 m_port_write_cb[9];
+	devcb_read8 m_port_read_cb[MAX_PORTS];
+	devcb_write8 m_port_write_cb[MAX_PORTS];
 
 	PAIR        m_prvpc,m_pc,m_sp,m_af,m_bc,m_de,m_hl,m_ix,m_iy;
 	PAIR        m_af2,m_bc2,m_de2,m_hl2;
