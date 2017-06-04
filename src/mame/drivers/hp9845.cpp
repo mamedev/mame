@@ -790,13 +790,25 @@ INPUT_CHANGED_MEMBER(hp9845_base_state::togglekey_changed)
 	uintptr_t togglekey = (uintptr_t)param;
 	switch (togglekey) {
 	case 0:	// Shift lock
-		popmessage("SHIFT LOCK %s", m_io_shiftlock->read() ? "ON" : "OFF");
+		{
+			bool state = m_io_shiftlock->read();
+			popmessage("SHIFT LOCK %s", state ? "ON" : "OFF");
+			output().set_value("shift_lock_led" , state);
+		}
 		break;
 	case 1:	// Prt all
-		popmessage("PRT ALL %s", BIT(m_io_key0->read(), 1) ? "ON" : "OFF");
+		{
+			bool state = BIT(m_io_key0->read(), 1);
+			popmessage("PRT ALL %s", state ? "ON" : "OFF");
+			output().set_value("prt_all_led" , state);
+		}
 		break;
 	case 2:	// Auto st
-		popmessage("AUTO ST %s", BIT(m_io_key0->read(), 17) ? "ON" : "OFF");
+		{
+			bool state = BIT(m_io_key0->read(), 17);
+			popmessage("AUTO ST %s", state ? "ON" : "OFF");
+			output().set_value("auto_st_led" , state);
+		}
 		break;
 	}
 }
