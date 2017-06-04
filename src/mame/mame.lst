@@ -32152,6 +32152,9 @@ rollace2                        // (c) 1983 Williams
 @source:rotaryf.cpp
 rotaryf                         //
 
+@source:ron.cpp
+ron2							// (c) 1981 Sanritsu
+
 @source:roul.cpp
 roul                            // (c) 1990
 
