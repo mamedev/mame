@@ -4794,8 +4794,8 @@ ROM_START( mvsc2 )
 
 	ROM_COPY( "rom_board", 0x1200000, 0x400000, 0x400000 )
 
-	ROM_REGION(0x74, "some_eeprom", 0)
-	ROM_LOAD("sflash.ic13s", 0x000000, 0x000074, CRC(5fbc2d5e) SHA1(fd762b81d1bbb65d28ad223874db198918fb0853))
+	ROM_REGION(0x200, "some_eeprom", 0)
+	ROM_LOAD( "25lc040.ic13s", 0x000000, 0x200, CRC(dc449637) SHA1(6cab09f61be1498271a36bff6a114a4eeeb00e1a) )
 
 	// 841-0007-02 2000     317-5058-COM   Naomi
 	ROM_PARAMETER( ":rom_board:key", "c18b6e7c" )
@@ -8626,8 +8626,8 @@ ROM_START( hopper )
 	ROM_LOAD( "315-6358a.ic2", 0x000000, 0x020008, CRC(ef442e67) SHA1(70ac91e2ca1ff2dfba48d566e4de68bd8b82f282) )
 
 	// actual ROM board doesnt have X76F100 EEPROM, it seems simulated by Actel FPGA
-	ROM_REGION(0x84, "some_eeprom", 0)
-	ROM_LOAD( "sflash.bin",   0x000000, 0x000084, CRC(ddedf494) SHA1(f1529615711a9871051cd09c2a9b95c90d356874) )
+	ROM_REGION(0x200, "some_eeprom", 0)
+	ROM_LOAD( "25lc040.ic13s", 0x000000, 0x200, CRC(908d4a14) SHA1(d43868fdb4a315a19fefcf822f324f2c5594b01b) )
 
 	// 840-0130    2002     317-0339-COM   Naomi
 	ROM_PARAMETER( ":rom_board:key", "1e5bb0cd" )
@@ -8725,8 +8725,8 @@ ROM_START( clubkprz )
 	ROM_COPY( "rom_board", 0x1000000, 0x400000, 0xc00000 )
 
 	// actual ROM board doesnt have X76F100 EEPROM, it seems simulated by Actel FPGA
-	ROM_REGION(0x84, "some_eeprom", 0)
-	ROM_LOAD( "at25010.ic3s", 0x000000, 0x000084, CRC(0142d8be) SHA1(5922b6c47b12b19e1fa7bbe9aae391905038a7ff) )
+	ROM_REGION(0x200, "some_eeprom", 0)
+	ROM_LOAD( "25lc040.ic13s", 0x000000, 0x200, CRC(3dcd86c4) SHA1(2a203b11c4c38e05a2ab23b6322471b11f07857d) )
 
 	// 840-0129    2003     317-0368-COM   Naomi 2
 	ROM_PARAMETER( ":rom_board:key", "997681fe" )
@@ -8758,8 +8758,8 @@ ROM_START( clubkpzb )
 	ROM_COPY( "rom_board", 0x1000000, 0x400000, 0xc00000 )
 
 	// actual ROM board doesnt have X76F100 EEPROM, it seems simulated by Actel FPGA
-	ROM_REGION(0x84, "some_eeprom", 0)
-	ROM_LOAD( "sflash.bin",   0x000000, 0x000084, CRC(afff6471) SHA1(c1e1d349ff25191eba09cd7d7186fbe2c6565b81) )
+	ROM_REGION(0x200, "some_eeprom", 0)
+	ROM_LOAD( "25lc040.ic13s", 0x000000, 0x200, CRC(377d1805) SHA1(6f77fcb2cc54e8500f5cc1046de453f1184ab216) )
 
 	// 840-0137    2004     317-0368-COM   Naomi 2
 	ROM_PARAMETER( ":rom_board:key", "997681fe")
