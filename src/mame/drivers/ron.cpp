@@ -14,9 +14,12 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "cpu/mcs48/mcs48.h"
 #include "sound/ay8910.h"
 #include "screen.h"
 #include "speaker.h"
+#include "machine/gen_latch.h"
+#include "debugger.h"
 
 // TBD
 #define MAIN_CLOCK XTAL_4MHz
@@ -28,10 +31,13 @@ public:
 	ron_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag), 
 		  m_maincpu(*this, "maincpu"),
+		  m_audiocpu(*this, "audiocpu"),
+  		  m_ay(*this, "aysnd"),
 		  m_gfxdecode(*this, "gfxdecode"),
   		  m_vram(*this, "vram"),
 		  m_cram(*this, "cram"),
-		  m_mj_ports(*this, { "PL1_1", "PL1_2", "PL1_3", "PL1_4","PL2_1", "PL2_2", "PL2_3", "PL2_4" })
+		  m_mj_ports(*this, { "PL1_1", "PL1_2", "PL1_3", "PL1_4","PL2_1", "PL2_2", "PL2_3", "PL2_4" }),
+		  m_soundlatch(*this, "soundlatch")
 	{
 	}
 
@@ -44,6 +50,12 @@ public:
 	DECLARE_READ8_MEMBER(p1_mux_r);
 	DECLARE_READ8_MEMBER(p2_mux_r);
 	DECLARE_WRITE8_MEMBER(mux_w);
+	DECLARE_WRITE8_MEMBER(sound_cmd_w);
+	DECLARE_READ8_MEMBER(audio_cmd_r);
+	DECLARE_WRITE8_MEMBER(audio_p1_w);
+	DECLARE_WRITE8_MEMBER(audio_p2_w);
+	DECLARE_READ_LINE_MEMBER(audio_T1_r);
+	//DECLARE_WRITE8_MEMBER(audio_T0_w);
 
 protected:
 	// driver_device overrides
@@ -54,14 +66,19 @@ protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<ay8910_device> m_ay;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_shared_ptr<uint8_t> m_vram;
 	required_shared_ptr<uint8_t> m_cram;
 	required_ioport_array<8> m_mj_ports;
+	required_device<generic_latch_8_device> m_soundlatch;
 private:
 	bool m_nmi_enable;
 	uint8_t m_mux_data;
 	uint8_t read_mux(bool which);
+	uint8_t m_prev_p2;
+	bool m_ay_address_sel;
 };
 
 void ron_state::video_start()
@@ -146,6 +163,11 @@ WRITE8_MEMBER(ron_state::mux_w)
 	m_mux_data = data;
 }
 
+WRITE8_MEMBER(ron_state::sound_cmd_w)
+{
+	m_soundlatch->write(space, 0, data);
+	//m_audiocpu->set_input_line(0, HOLD_LINE);
+}
 
 static ADDRESS_MAP_START( ron_map, AS_PROGRAM, 8, ron_state )
 	AM_RANGE(0x0000, 0x4fff) AM_ROM
@@ -162,7 +184,16 @@ static ADDRESS_MAP_START( ron_io, AS_IO, 8, ron_state )
 	AM_RANGE(0x01, 0x01) AM_READ(p2_mux_r)
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("DSW")
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("SYSTEM") AM_WRITE(mux_w)
+	AM_RANGE(0x07, 0x07) AM_WRITE(sound_cmd_w)
 	AM_RANGE(0x0a, 0x0a) AM_WRITE(output_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( ron_audio_map, AS_PROGRAM, 8, ron_state)
+	AM_RANGE(0x0000,0x0fff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( ron_audio_io, AS_IO, 8, ron_state)
+	
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( ron )
@@ -333,6 +364,56 @@ INTERRUPT_GEN_MEMBER( ron_state::vblank_irq )
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
+#if 0
+WRITE8_MEMBER(ron_state::audio_T0_w )
+{
+	printf("audio\n");
+}
+#endif
+
+READ8_MEMBER(ron_state::audio_cmd_r)
+{
+	return m_soundlatch->read(space,0);
+}
+
+WRITE8_MEMBER(ron_state::audio_p1_w)
+{
+	//address_space &space = m_audiocpu->space(AS_PROGRAM);
+
+	//printf("p1 %02x %d\n",data,m_ay_address_sel);
+	//machine().debug_break();
+	
+	if(m_ay_address_sel == true)
+		m_ay->address_w(space, 0, data);
+	else
+		m_ay->data_w(space, 0, data);
+}
+
+WRITE8_MEMBER(ron_state::audio_p2_w)
+{
+	// TODO: guesswork, presumably f/f based
+	// p2 ff
+	// p2 3f
+	if(data == 0xff)
+		m_ay_address_sel = false;
+	
+	// p2 5f
+	// p2 3f
+	// p2 3f
+	if(data == 0x5f)
+		m_ay_address_sel = true;
+
+	m_prev_p2 = data;
+	
+	//printf("p2 %02x\n",data);
+//	machine().debug_break();
+}
+
+READ_LINE_MEMBER(ron_state::audio_T1_r )
+{
+	// TODO: what controls this?
+	return machine().rand() & 1;
+}
 
 static MACHINE_CONFIG_START( ron )
 
@@ -341,6 +422,15 @@ static MACHINE_CONFIG_START( ron )
 	MCFG_CPU_PROGRAM_MAP(ron_map)
 	MCFG_CPU_IO_MAP(ron_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", ron_state, vblank_irq)
+
+	MCFG_CPU_ADD("audiocpu",I8035,MAIN_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(ron_audio_map)
+	MCFG_CPU_IO_MAP(ron_audio_io)
+	//MCFG_MCS48_PORT_T0_CLK_CUSTOM(ron_state, audio_T0_w)
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(ron_state, audio_cmd_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(ron_state, audio_p1_w))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(ron_state, audio_p2_w))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(ron_state, audio_T1_r))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -353,8 +443,10 @@ static MACHINE_CONFIG_START( ron )
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(ron_state, ron)
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")	
 	MCFG_SOUND_ADD("aysnd", AY8910, MAIN_CLOCK/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
@@ -374,16 +466,16 @@ ROM_START( ron2 )
     ROM_LOAD( "r0__4.9n",     0x003000, 0x001000, CRC(86340522) SHA1(0175dda90e9e4798e9f2ab7a0ab97aa397ca18b8) )
     ROM_LOAD( "r0__5.8h",     0x004000, 0x001000, CRC(3a28ad40) SHA1(872ced2d7515850cd86b84c81b14f200093746ad) )
 	
+	ROM_REGION( 0x10000, "audiocpu", ROMREGION_ERASE00 )
+    ROM_LOAD( "r0_mu.4a",     0x0000, 0x000800, CRC(3491d8d5) SHA1(0aa0581350f4b3b81f3fa1f7c55a9bfb1f2c5f3b) )
+    ROM_LOAD( "r0_v0.4c",     0x0800, 0x000800, CRC(4160eb7f) SHA1(1756937378cbabb2229129b794d8c5d955252ed4) )
+	
 	ROM_REGION( 0x0800, "gfx1", ROMREGION_ERASE00 )
     ROM_LOAD( "r0__b.4k",     0x0000, 0x0800, CRC(8a61cdde) SHA1(0a38573ed644f1ed897443187f5cb61a6eb499b2) )
 
 	ROM_REGION( 0x1000, "gfx2", ROMREGION_ERASE00 )
     ROM_LOAD( "r0_a1.4n",     0x0000, 0x0800, CRC(2d6276f4) SHA1(432b7fe0a1f1e9fdc9e276bcf27f74a5aec6c940) )
     ROM_LOAD( "r0_a2.4l",     0x0800, 0x0800, CRC(2fe4a54f) SHA1(bb1d109851677ede58f875eff2588f60f979864e) )
-
-	ROM_REGION( 0x10000, "mcu", ROMREGION_ERASE00 )
-    ROM_LOAD( "r0_mu.4a",     0x0000, 0x000800, CRC(3491d8d5) SHA1(0aa0581350f4b3b81f3fa1f7c55a9bfb1f2c5f3b) )
-    ROM_LOAD( "r0_v0.4c",     0x0800, 0x000800, CRC(4160eb7f) SHA1(1756937378cbabb2229129b794d8c5d955252ed4) )
 
 	ROM_REGION( 0x500, "proms", ROMREGION_ERASE00 )
     ROM_LOAD( "82s123_1.6b",  0x000000, 0x000020, CRC(bd9bb647) SHA1(aad83eb295107cdc7ee96d78e81b0621ac351398) )
