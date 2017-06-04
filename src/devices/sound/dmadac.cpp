@@ -130,7 +130,8 @@ void dmadac_enable(dmadac_sound_device **devlist, uint8_t num_channels, uint8_t 
 	/* flush out as much data as we can */
 	for (i = 0; i < num_channels; i++)
 	{
-		devlist[i]->enable(enable);
+		if (devlist[i])
+			devlist[i]->enable(enable);
 	}
 }
 
