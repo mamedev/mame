@@ -1520,19 +1520,20 @@ READ16_MEMBER( segas16b_state::aceattac_custom_io_r )
 			break;
 
 		case 0x3000/2:
+			if (BIT(offset, 4))
+				return m_cxdio->read(space, offset & 0x0f);
+			else // TODO: use uPD4701A device
 			switch (offset & 0x1b)
 			{
 				case 0x00: return ioport("TRACKX1")->read() & 0xff;
 				case 0x01: return (ioport("TRACKX1")->read() >> 8 & 0x0f) | (ioport("HANDY1")->read() << 4 & 0xf0);
 				case 0x02: return ioport("TRACKY1")->read();
 				case 0x03: return ioport("TRACKY1")->read() >> 8 & 0x0f;
-				case 0x10: return ioport("HANDX1")->read();
 
 				case 0x08: return ioport("TRACKX2")->read() & 0xff;
 				case 0x09: return (ioport("TRACKX2")->read() >> 8 & 0x0f) | (ioport("HANDY2")->read() << 4 & 0xf0);
 				case 0x0a: return ioport("TRACKY2")->read();
 				case 0x0b: return ioport("TRACKY2")->read() >> 8 & 0xff;
-				case 0x11: return ioport("HANDX2")->read();
 			}
 			break;
 	}
@@ -1540,6 +1541,20 @@ READ16_MEMBER( segas16b_state::aceattac_custom_io_r )
 	return standard_io_r(space, offset, mem_mask);
 }
 
+WRITE16_MEMBER( segas16b_state::aceattac_custom_io_w )
+{
+	switch (offset & (0x3000/2))
+	{
+		case 0x3000/2:
+			if (BIT(offset, 4))
+			{
+				m_cxdio->write(space, offset & 0x0f, data);
+				return;
+			}
+			break;
+	}
+	standard_io_w(space, offset, data, mem_mask);
+}
 
 
 //-------------------------------------------------
@@ -3661,6 +3676,15 @@ static MACHINE_CONFIG_DERIVED( system16b_fd1094, system16b )
 	MCFG_CPU_PROGRAM_MAP(system16b_map)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", segas16b_state, irq4_line_hold)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( aceattacb_fd1094, system16b_fd1094 )
+	// 834-6602 I/O board
+	MCFG_DEVICE_ADD("upd4701a1", UPD4701A, 0)
+	MCFG_DEVICE_ADD("upd4701a2", UPD4701A, 0)
+	MCFG_DEVICE_ADD("cxdio", CXD1095, 0)
+	MCFG_CXD1095_IN_PORTA_CB(IOPORT("HANDX1"))
+	MCFG_CXD1095_IN_PORTB_CB(IOPORT("HANDX2"))
 MACHINE_CONFIG_END
 
 
@@ -8666,6 +8690,7 @@ DRIVER_INIT_MEMBER(segas16b_state,aceattac_5358)
 {
 	DRIVER_INIT_CALL(generic_5358);
 	m_custom_io_r = read16_delegate(FUNC(segas16b_state::aceattac_custom_io_r), this);
+	m_custom_io_w = write16_delegate(FUNC(segas16b_state::aceattac_custom_io_w), this);
 }
 
 DRIVER_INIT_MEMBER(segas16b_state,aliensyn7_5358_small)
@@ -8812,7 +8837,7 @@ DRIVER_INIT_MEMBER(segas16b_state,snapper)
 //**************************************************************************
 
 //    YEAR, NAME,       PARENT,   MACHINE,             INPUT,    INIT,               MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1988, aceattac,   0,        system16b_fd1094,    aceattac, segas16b_state,aceattac_5358,      ROT270,   "Sega", "Ace Attacker (FD1094 317-0059)", 0 )
+GAME( 1988, aceattac,   0,        aceattacb_fd1094,    aceattac, segas16b_state,aceattac_5358,      ROT270,   "Sega", "Ace Attacker (FD1094 317-0059)", 0 )
 
 GAME( 1987, aliensyn,   0,        system16b,           aliensyn, segas16b_state,generic_5358_small, ROT0,   "Sega", "Alien Syndrome (set 4, System 16B, unprotected)", 0 )
 GAME( 1987, aliensyn7,  aliensyn, system16b_mc8123,    aliensyn, segas16b_state,aliensyn7_5358_small, ROT0,  "Sega", "Alien Syndrome (set 7, System 16B, MC-8123B 317-00xx)", 0 )
