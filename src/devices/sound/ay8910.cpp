@@ -398,8 +398,8 @@ AY-3-8914/A: 2 I/O ports
   AY-3-8914A die is unknown.
 AY-3-8916: 2 I/O ports
   A7 thru A4 enable state for selecting a register can be changed with a
-    factory mask adjustment but was 1111 for the part shipped with the
-    Intellivision ECS module.
+    factory mask adjustment; its mask is unknown. This chip was shipped
+    with certain later Intellivision II systems.
   Pins 24, 25, and 26 are /A9, /A8(!), and TEST2, which are an active low,
     low(!) and high chip enable, respectively.
     NOTE: the /A8 enable polarity may be mixed up with AY-3-8917 below.
