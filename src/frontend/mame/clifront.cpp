@@ -412,7 +412,7 @@ void cli_frontend::listclones(const std::vector<std::string> &args)
 	{
 		int clone_of = drivlist.clone();
 		if (clone_of != -1 && (drivlist.driver(clone_of).flags & MACHINE_IS_BIOS_ROOT) == 0)
-			osd_printf_info("%-16s %-8s\n", drivlist.driver().name, drivlist.driver(clone_of).name);
+			osd_printf_info("%-16s %s\n", drivlist.driver().name, drivlist.driver(clone_of).name);
 	}
 }
 
@@ -458,7 +458,10 @@ void cli_frontend::listbrothers(const std::vector<std::string> &args)
 	while (drivlist.next())
 	{
 		int clone_of = drivlist.clone();
-		osd_printf_info("%-20s %-16s %-16s\n", core_filename_extract_base(drivlist.driver().type.source()).c_str(), drivlist.driver().name, (clone_of == -1 ? "" : drivlist.driver(clone_of).name));
+		if (clone_of != -1)
+			osd_printf_info("%-20s %-16s %s\n", core_filename_extract_base(drivlist.driver().type.source()).c_str(), drivlist.driver().name, (clone_of == -1 ? "" : drivlist.driver(clone_of).name));
+		else
+			osd_printf_info("%-20s %s\n", core_filename_extract_base(drivlist.driver().type.source()).c_str(), drivlist.driver().name);
 	}
 }
 
@@ -819,7 +822,7 @@ void cli_frontend::listmedia(const std::vector<std::string> &args)
 
 	// print header
 	printf("%-16s %-16s %-10s %s\n", "SYSTEM", "MEDIA NAME", "(brief)", "IMAGE FILE EXTENSIONS SUPPORTED");
-	printf("%s %s-%s %s\n", std::string(16,'-').c_str(), std::string(16,'-').c_str(), std::string(10,'-').c_str(), std::string(34,'-').c_str());
+	printf("%s %s-%s %s\n", std::string(16,'-').c_str(), std::string(16,'-').c_str(), std::string(10,'-').c_str(), std::string(31,'-').c_str());
 
 	// iterate over drivers
 	while (drivlist.next())
