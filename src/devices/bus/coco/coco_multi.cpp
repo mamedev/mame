@@ -117,7 +117,6 @@ namespace
 		uint8_t m_select;
 
 		// internal accessors
-		cococart_slot_device &owning_slot();
 		int active_scs_slot_number() const;
 		int active_cts_slot_number() const;
 		cococart_slot_device &slot(int slot_number);
@@ -232,12 +231,6 @@ void coco_multipak_device::device_reset()
 //**************************************************************************
 //  INTERNAL ACCESSORS
 //**************************************************************************
-
-cococart_slot_device &coco_multipak_device::owning_slot()
-{
-	return *dynamic_cast<cococart_slot_device *>(owner());
-}
-
 
 //-------------------------------------------------
 //  active_scs_slot_number

@@ -69,7 +69,6 @@ coco_pak_device::coco_pak_device(const machine_config &mconfig, const char *tag,
 void coco_pak_device::device_start()
 {
 	m_cart = dynamic_cast<device_image_interface *>(owner());
-	m_owner = dynamic_cast<cococart_slot_device *>(owner());
 }
 
 

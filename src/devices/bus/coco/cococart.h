@@ -193,10 +193,17 @@ public:
 	virtual uint8_t* get_cart_base();
 	void set_cart_base_update(cococart_base_update_delegate update);
 
+	virtual void interface_config_complete() override;
+	virtual void interface_pre_start() override;
+
 protected:
 	device_cococart_interface(const machine_config &mconfig, device_t &device);
 
 	void cart_base_changed(void);
+
+	// accessors for containers
+	cococart_slot_device &owning_slot()		{ assert(m_owning_slot); return *m_owning_slot; }
+	device_cococart_host_interface &host()	{ assert(m_host); return *m_host; }
 
 	// CoCo cartridges can read directly from the address bus.  This is used by a number of
 	// cartridges (e.g. - Orch-90, Multi-Pak interface) for their control registers, independently
@@ -210,7 +217,9 @@ protected:
 	void set_line_value(cococart_slot_device::line line, cococart_slot_device::line_value value);
 
 private:
-	cococart_base_update_delegate m_update;
+	cococart_base_update_delegate		m_update;
+	cococart_slot_device *				m_owning_slot;
+	device_cococart_host_interface *	m_host;
 };
 
 
