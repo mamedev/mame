@@ -211,6 +211,8 @@ public:
 
 	// public interfaces
 	void load_boot_data(uint8_t *srcdata, uint32_t *dstdata);
+	// Returns base address for circular dag
+	uint32_t get_ibase(int index) { return m_base[index]; };
 
 protected:
 	enum
