@@ -377,8 +377,46 @@ ROM_START( vulgusj )
 	ROM_LOAD( "82s129.8n",    0x0700, 0x0100, CRC(4921635c) SHA1(aee37d6cdc36acf0f11ff5f93e7b16e4b12f6c39) )    /* video timing? (not used) */
 ROM_END
 
+ROM_START( mach9 )
+	ROM_REGION( 0x1c000, "maincpu", 0 )
+	ROM_LOAD( "02_4n.bin",   0x0000, 0x2000, CRC(b3310b0c) SHA1(f083d8633da69acaa03e7566f28e87ef0482927d) )
+	ROM_LOAD( "03_5n.bin",   0x2000, 0x2000, CRC(51acef76) SHA1(14dda82b90f9c3a309561a73c300cb54b5fca77d) )
+	ROM_LOAD( "04_6n.bin",   0x4000, 0x2000, CRC(489e7f60) SHA1(f3f685955fc42f238909dcdb5edc4c117e5543db) )
+	ROM_LOAD( "05_7n.bin",   0x6000, 0x2000, CRC(ef3e4278) SHA1(eb3433827a53b2e9c2b09add7376982e84b29558) )
+	ROM_LOAD( "06_8n.bin",   0x8000, 0x2000, CRC(6ca5ca41) SHA1(6f28d143e984d3d6af3114702ec27d6e878cc35f) )
 
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "07_11c.bin",  0x0000, 0x2000, CRC(3bd2acf4) SHA1(b58fb1ea7e30018102ee420d52a1597615412eb1) )
+
+	ROM_REGION( 0x02000, "gfx1", 0 )
+	ROM_LOAD( "01_3d.bin",   0x00000, 0x2000, CRC(be556775) SHA1(16a4e746ea2462689b7a0e9f01c88d7edf06092d) )   /* characters */
+
+	ROM_REGION( 0x0c000, "gfx2", 0 )
+	ROM_LOAD( "08_2a.bin",   0x00000, 0x2000, CRC(e10aaca1) SHA1(f9f0d05475ae4c554552a71bc2f60e02b1442eb1) )   /* tiles */
+	ROM_LOAD( "09_3a.bin",   0x02000, 0x2000, CRC(9193f2f1) SHA1(de1ee725627baeabec6823f6ecc4e7f6df152ce3) )
+	ROM_LOAD( "10_4a.bin",   0x04000, 0x2000, CRC(206a13f1) SHA1(645666895127aededfa7872b20b7725948a9c462) )
+	ROM_LOAD( "11_5a.bin",   0x06000, 0x2000, CRC(d729b5b7) SHA1(e9af9bc7f627e313ec070dc9e41ce6f2cddc5b38) )
+	ROM_LOAD( "12_6a.bin",   0x08000, 0x2000, CRC(5a26b38f) SHA1(987a4844c4568a088932f43a3aff847e6d6b4860) )
+	ROM_LOAD( "13_7a.bin",   0x0a000, 0x2000, CRC(8033cd4f) SHA1(5eb2e5931e44ca6bf64117dd34e9b6072e6b0ffc) )
+
+	ROM_REGION( 0x08000, "gfx3", 0 )
+	ROM_LOAD( "14_2n.bin",   0x00000, 0x2000, CRC(6db1b10d) SHA1(85bf67ce4d60b260767ba5fe9b9777f857937fe3) )   /* sprites */
+	ROM_LOAD( "15_3n.bin",   0x02000, 0x2000, CRC(5d8c34ec) SHA1(7b7df89398bf83ace1a8c216ca8526beae90972d) )
+	ROM_LOAD( "16_4n.bin",   0x04000, 0x2000, CRC(0071a2e3) SHA1(3f7bb4658d2126576a0f8f46f2c947eec1cd231a) )
+	ROM_LOAD( "17_5n.bin",   0x06000, 0x2000, CRC(4023a1ec) SHA1(8b69b9cd6db37db94a00da8712413055a631186a) )
+
+	ROM_REGION( 0x0800, "proms", 0 )
+	ROM_LOAD( "82s129_8e.bin",    0x0000, 0x0100, CRC(06a83606) SHA1(218c1b404b4b5b06f06e04143872f6758f83f266) )    /* red component */
+	ROM_LOAD( "82s129_9e.bin",    0x0100, 0x0100, CRC(beacf13c) SHA1(d597097afc53fef752b2530d2de04e5aabb664b4) )    /* green component */
+	ROM_LOAD( "82s129_10e.bin",   0x0200, 0x0100, CRC(8404067c) SHA1(6e8826f56267007e2adf02dc03dd96bd40e64935) )    /* blue component, only PROM slightly different from original? */
+	ROM_LOAD( "82s129_1d.bin",    0x0300, 0x0100, CRC(7179080d) SHA1(6c1e8572a4c7b4825b89fc9549265be7c8f17788) )    /* char lookup table */
+	ROM_LOAD( "82s129_2j.bin",    0x0400, 0x0100, CRC(d0842029) SHA1(7d76e1ff75466e190bc2e07ff3ffb45034f838cd) )    /* sprite lookup table */
+	ROM_LOAD( "82s129_9c.bin",    0x0500, 0x0100, CRC(7a1f0bd6) SHA1(5a2110e97e82c087999ee4e5adf32d7fa06a3dfb) )    /* tile lookup table */
+	ROM_LOAD( "82s129_9k.bin",    0x0600, 0x0100, CRC(32b10521) SHA1(10b258e32813cfa3a853cbd146657b11c08cb770) )    /* interrupt timing? (not used) */
+	ROM_LOAD( "82s129_8n.bin",    0x0700, 0x0100, CRC(4921635c) SHA1(aee37d6cdc36acf0f11ff5f93e7b16e4b12f6c39) )    /* video timing? (not used) */
+ROM_END
 
 GAME( 1984, vulgus,  0,      vulgus, vulgus, vulgus_state, 0, ROT270, "Capcom", "Vulgus (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, vulgusa, vulgus, vulgus, vulgus, vulgus_state, 0, ROT90,  "Capcom", "Vulgus (set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, vulgusj, vulgus, vulgus, vulgus, vulgus_state, 0, ROT270, "Capcom", "Vulgus (Japan?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, mach9,   vulgus, vulgus, vulgus, vulgus_state, 0, ROT270,  "bootleg (ITISA)", "Mach-9 (bootleg of Vulgus)", MACHINE_SUPPORTS_SAVE )
