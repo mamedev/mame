@@ -6,8 +6,13 @@
 
 	TODO:
 	- colors;
-	- finish inputs;
+	- dip switches;
 	
+============================================================================
+Debug cheats:
+0x8580-d player-1 tiles	
+0x8680-d player-2 tiles	
+
 ***************************************************************************/
 
 
@@ -35,8 +40,13 @@ public:
 		  m_gfxdecode(*this, "gfxdecode"),
   		  m_vram(*this, "vram"),
 		  m_cram(*this, "cram"),
-		  m_mj_ports(*this, { "PL1_1", "PL1_2", "PL1_3", "PL1_4","PL2_1", "PL2_2", "PL2_3", "PL2_4" })
-	{
+		  m_mj_ports1(*this, { "PL1_1", "PL1_2", "PL1_3", "PL1_4","PL1_5", "PL1_6", "PL1_7", "PL1_8" }),
+		  m_mj_ports2(*this, { "PL2_1", "PL2_2", "PL2_3", "PL2_4","PL2_5", "PL2_6", "PL2_7", "PL2_8" }),
+		  m_in0(*this, "IN0"),
+		  m_in1(*this, "IN1"),
+		  m_in2(*this, "IN2"),
+		  m_in3(*this, "IN3")
+    {
 	}
 
 	// screen updates
@@ -69,11 +79,16 @@ protected:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_shared_ptr<uint8_t> m_vram;
 	required_shared_ptr<uint8_t> m_cram;
-	required_ioport_array<8> m_mj_ports;
+	required_ioport_array<8> m_mj_ports1;
+	required_ioport_array<8> m_mj_ports2;
+	required_ioport m_in0;
+	required_ioport m_in1;
+	required_ioport m_in2;
+	required_ioport m_in3;
 private:
 	bool m_nmi_enable;
 	uint8_t m_mux_data;
-	uint8_t read_mux(bool which);
+	uint8_t read_mux(bool which,bool side);
 	uint8_t m_prev_p2;
 	uint8_t m_sound_command;
 	bool m_ay_address_sel;
@@ -127,9 +142,10 @@ WRITE8_MEMBER(ron_state::output_w)
 		printf("%02x\n",data);
 }
 
-uint8_t ron_state::read_mux(bool which)
+uint8_t ron_state::read_mux(bool which,bool side)
 {
 	uint8_t base_port = which == true ? 4 : 0;
+	
 	//uint8_t i,res;
 
 	//  printf("%02x\n", m_mux_data);
@@ -138,7 +154,7 @@ uint8_t ron_state::read_mux(bool which)
 	for(uint8_t i=0;i<4;i++)
 	{
 		if((~m_mux_data) & (1 << i))
-			return (m_mj_ports[i+base_port])->read(); 
+			return (side == true ? m_mj_ports2[i+base_port] : m_mj_ports1[i+base_port])->read(); 
 	}
 
 	// TODO: check me
@@ -147,12 +163,18 @@ uint8_t ron_state::read_mux(bool which)
 
 READ8_MEMBER(ron_state::p1_mux_r)
 {
-	return read_mux(false);
+	uint8_t res = offset == 0 ? (m_in0->read() & 0xcc) : (m_in1->read() & 0xfc);
+
+	return read_mux(offset,false) | res;
 }
 
 READ8_MEMBER(ron_state::p2_mux_r)
 {
-	return read_mux(true);
+	uint8_t res = (offset == 0 ? m_in2 : m_in3)->read();
+	
+	res &= 0xec;
+	
+	return (read_mux(offset,true) & 0x13) | res;
 }
 
 
@@ -178,10 +200,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( ron_io, AS_IO, 8, ron_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x00) AM_READ(p1_mux_r)
-	AM_RANGE(0x01, 0x01) AM_READ(p2_mux_r)
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("DSW")
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("SYSTEM") AM_WRITE(mux_w)
+	AM_RANGE(0x00, 0x01) AM_READ(p1_mux_r)
+	AM_RANGE(0x02, 0x03) AM_READ(p2_mux_r)
+	AM_RANGE(0x03, 0x03) AM_WRITE(mux_w)
 	AM_RANGE(0x07, 0x07) AM_WRITE(sound_cmd_w)
 	AM_RANGE(0x0a, 0x0a) AM_WRITE(output_w)
 ADDRESS_MAP_END
@@ -195,17 +216,27 @@ static ADDRESS_MAP_START( ron_audio_io, AS_IO, 8, ron_state)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( ron )
-	PORT_START("SYSTEM")
-	PORT_DIPNAME( 0x01, 0x01, "SYSTEM" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_START("IN0")
+	PORT_DIPNAME( 0x04, 0x04, "2-Players Mode" )
+	PORT_DIPSETTING(    0x04, "Versus" )
+	PORT_DIPSETTING(    0x00, "Alternates" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	
+	PORT_START("IN1")
+	PORT_DIPNAME( 0x04, 0x04, "IN1" )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -219,89 +250,117 @@ static INPUT_PORTS_START( ron )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	
-	PORT_START("DSW")
-	PORT_DIPNAME( 0x01, 0x00, "DIPS" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
+	PORT_START("IN2")
+	PORT_DIPNAME( 0x04, 0x04, "2P Coinage" ) // how many credits per 2p mode
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN3")
+	PORT_DIPNAME( 0x04, 0x04, "IN3" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	
+
 	PORT_START("PL1_1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_I )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_M )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A ) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E ) PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_I ) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_M ) PORT_PLAYER(1)
 
 	PORT_START("PL1_2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_J )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_N )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B ) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F ) PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_J ) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_N ) PORT_PLAYER(1)
 
 	PORT_START("PL1_3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_K )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C ) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G ) PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_K ) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_CHI ) PORT_PLAYER(1)
 
 	PORT_START("PL1_4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_L )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D ) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H ) PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_L ) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_PON ) PORT_PLAYER(1)
 
-	PORT_START("PL2_1")
-	PORT_DIPNAME( 0x01, 0x01, "DSWA" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_START("PL1_5")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_KAN ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )
 
+	PORT_START("PL1_6")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_REACH ) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
+
+	PORT_START("PL1_7")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_RON ) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	
+	PORT_START("PL1_8")
+	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	
+	PORT_START("PL2_1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_I ) PORT_PLAYER(2)
+
 	PORT_START("PL2_2")
-	PORT_DIPNAME( 0x01, 0x01, "DSWA" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_J ) PORT_PLAYER(2)
 
 	PORT_START("PL2_3")
-	PORT_DIPNAME( 0x01, 0x01, "DSWA" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_K ) PORT_PLAYER(2)
+	
 	PORT_START("PL2_4")
-	PORT_DIPNAME( 0x01, 0x01, "DSWA" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_L ) PORT_PLAYER(2)
+	
+	PORT_START("PL2_5")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_M ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN ) PORT_PLAYER(2)
+	
+	PORT_START("PL2_6")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_N ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH ) PORT_PLAYER(2)
+	
+	PORT_START("PL2_7")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_CHI ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON ) PORT_PLAYER(2)
+
+	PORT_START("PL2_8")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_PON ) PORT_PLAYER(2)
+	PORT_BIT( 0x12, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 static const gfx_layout charlayout_1bpp =
