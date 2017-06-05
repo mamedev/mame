@@ -1149,6 +1149,9 @@ void z80scc_channel::tra_complete()
 				m_uart->trigger_interrupt(m_index, INT_TRANSMIT); // Set TXIP bit
 			}
 		}
+		/* Arm interrupts since we completed another data byte, however it may be set by the reset tx int pending
+		command before the shifter is done and the disarm flag is evaluated again in tra_complete()  */
+		m_tx_int_disarm = 0;
 	}
 	else if (m_wr5 & WR5_SEND_BREAK)
 	{
@@ -2435,9 +2438,6 @@ void z80scc_channel::data_write(uint8_t data)
 	// check if to fire interrupt
 	LOG("- TX interrupt are %s\n", (m_wr1 & WR1_TX_INT_ENABLE) ? "enabled" : "disabled" );
 
-	/* Arm interrupts since we wrote another data byte, however it may be set by the reset tx int pending
-	   command before the shifter is done and the disarm flag is evaluated again in tra_complete()  */
-	m_tx_int_disarm = 0;
 	if (m_wr1 & WR1_TX_INT_ENABLE)
 	{
 		if ((m_uart->m_variant & z80scc_device::SET_ESCC) &&
