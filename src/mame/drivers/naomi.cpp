@@ -521,6 +521,10 @@ Notes:
 IC17S-IC38S - MaskROM (SOP44), either 32Mb or 64Mb. Not all positions are populated
    CN1/2/3  - connectors joining to main board
 
+Despite the fact this ROM board have SPI-type EEPROM, containing cartridge serial number,
+from NAOMI side it read as X76F100-type, probably simulated by ACTEL FPGA.
+Actual data is shuffled, address bits 3 to 6 have reversed order, i.e. 8 7 3 4 5 6 2 1 0.
+
 Games known to use this PCB include....
                                                              Sticker      EPROM   MASKROMs    25LC040  A54SX32
 Game                                                         on cart      IC11#   # of SOP44  IC13S#   IC1#          Notes
@@ -4308,6 +4312,9 @@ ROM_START( gram2000 )
 
 	ROM_COPY( "rom_board", 0x1000000, 0x400000, 0xc00000 )
 
+	ROM_REGION(0x200, "some_eeprom", 0)
+	ROM_LOAD( "25lc040.ic13s", 0, 0x200, CRC(28d2a967) SHA1(8cdb146f42562811b5ce8a3ea3c9f91818ef4536) )
+
 	// 840-0039    2000     317-0296-COM   Naomi
 	ROM_PARAMETER( ":rom_board:key", "7f805c3f" )
 ROM_END
@@ -4350,6 +4357,9 @@ ROM_START( tduno2 )
 
 	ROM_COPY( "rom_board", 0x1000000, 0x400000, 0xc00000 )
 
+	ROM_REGION(0x200, "some_eeprom", 0)
+	ROM_LOAD( "25lc040.ic13s", 0, 0x200, CRC(6291605c) SHA1(44f757da4814b08108d1a4f431c9a39c38acecb2) )
+
 	// 840-0022    2000     317-0276-COM   Naomi
 	ROM_PARAMETER( ":rom_board:key", "2f6f0f8d" )
 ROM_END
@@ -4369,6 +4379,8 @@ ROM_START( mtkob2 )
 
 	ROM_COPY( "rom_board", 0x1000000, 0x400000, 0xc00000 )
 
+	ROM_REGION(0x200, "some_eeprom", 0)
+	ROM_LOAD( "25lc040.ic13s", 0, 0x200, CRC(9adb86c2) SHA1(682d06b2004809c3c7ff2f4f9bc0bde0e51885c0) )
 
 	// MUSHIKING
 	// The King of Beetle
@@ -4782,8 +4794,8 @@ ROM_START( mvsc2 )
 
 	ROM_COPY( "rom_board", 0x1200000, 0x400000, 0x400000 )
 
-	ROM_REGION(0x74, "some_eeprom", 0)
-	ROM_LOAD("sflash.ic13s", 0x000000, 0x000074, CRC(5fbc2d5e) SHA1(fd762b81d1bbb65d28ad223874db198918fb0853))
+	ROM_REGION(0x200, "some_eeprom", 0)
+	ROM_LOAD( "25lc040.ic13s", 0x000000, 0x200, CRC(dc449637) SHA1(6cab09f61be1498271a36bff6a114a4eeeb00e1a) )
 
 	// 841-0007-02 2000     317-5058-COM   Naomi
 	ROM_PARAMETER( ":rom_board:key", "c18b6e7c" )
@@ -5578,6 +5590,9 @@ ROM_START( shootpl )
 	ROM_LOAD32_WORD("opr-24063.ic20",  0x2000002, 0x0800000, CRC(683fdcff) SHA1(890816ef1b3e604e16289998cf66e221ef75a0fe) )
 
 	ROM_COPY( "rom_board", 0x1000000, 0x400000, 0xc00000 )
+
+	ROM_REGION(0x200, "some_eeprom", 0)
+	ROM_LOAD( "25lc040.ic13s", 0, 0x200, CRC(d11312d3) SHA1(c444012954f58a9af283ab8439f31cb89de9c14d) )
 
 	// 840-0128    2002     317-0367-COM   Naomi
 	ROM_PARAMETER( ":rom_board:key", "9dbde9cd" )
@@ -6679,8 +6694,8 @@ ROM_START( kick4csh )
 	ROM_LOAD32_WORD( "opr-24235a.ic32s", 0x8000002, 0x800000, CRC(a2bb0d26) SHA1(bafd66250f8ad472eaa179bd73edc0dc22b681f5) )
 	ROM_COPY( "rom_board", 0x1000000, 0x400000, 0xc00000 )
 
-	ROM_REGION(0x84, "some_eeprom", 0)
-	ROM_LOAD( "25lc040.ic13s", 0, 0x84, CRC(19d77c96) SHA1(1d82af6b11f7fde93a3c4dd3561f1f2ab74c8d65) )
+	ROM_REGION(0x200, "some_eeprom", 0)
+	ROM_LOAD( "25lc040.ic13s", 0, 0x200, CRC(1576366a) SHA1(3e8bf3dbc8a248a6863242b78d5c6e53a869e951) )
 
 	// 837-14438 SH I/O BD
 	// IC1    - Hitachi/Renesas SH4 SoC
@@ -8611,8 +8626,8 @@ ROM_START( hopper )
 	ROM_LOAD( "315-6358a.ic2", 0x000000, 0x020008, CRC(ef442e67) SHA1(70ac91e2ca1ff2dfba48d566e4de68bd8b82f282) )
 
 	// actual ROM board doesnt have X76F100 EEPROM, it seems simulated by Actel FPGA
-	ROM_REGION(0x84, "some_eeprom", 0)
-	ROM_LOAD( "sflash.bin",   0x000000, 0x000084, CRC(ddedf494) SHA1(f1529615711a9871051cd09c2a9b95c90d356874) )
+	ROM_REGION(0x200, "some_eeprom", 0)
+	ROM_LOAD( "25lc040.ic13s", 0x000000, 0x200, CRC(908d4a14) SHA1(d43868fdb4a315a19fefcf822f324f2c5594b01b) )
 
 	// 840-0130    2002     317-0339-COM   Naomi
 	ROM_PARAMETER( ":rom_board:key", "1e5bb0cd" )
@@ -8710,8 +8725,8 @@ ROM_START( clubkprz )
 	ROM_COPY( "rom_board", 0x1000000, 0x400000, 0xc00000 )
 
 	// actual ROM board doesnt have X76F100 EEPROM, it seems simulated by Actel FPGA
-	ROM_REGION(0x84, "some_eeprom", 0)
-	ROM_LOAD( "at25010.ic3s", 0x000000, 0x000084, CRC(0142d8be) SHA1(5922b6c47b12b19e1fa7bbe9aae391905038a7ff) )
+	ROM_REGION(0x200, "some_eeprom", 0)
+	ROM_LOAD( "25lc040.ic13s", 0x000000, 0x200, CRC(3dcd86c4) SHA1(2a203b11c4c38e05a2ab23b6322471b11f07857d) )
 
 	// 840-0129    2003     317-0368-COM   Naomi 2
 	ROM_PARAMETER( ":rom_board:key", "997681fe" )
@@ -8743,8 +8758,8 @@ ROM_START( clubkpzb )
 	ROM_COPY( "rom_board", 0x1000000, 0x400000, 0xc00000 )
 
 	// actual ROM board doesnt have X76F100 EEPROM, it seems simulated by Actel FPGA
-	ROM_REGION(0x84, "some_eeprom", 0)
-	ROM_LOAD( "sflash.bin",   0x000000, 0x000084, CRC(afff6471) SHA1(c1e1d349ff25191eba09cd7d7186fbe2c6565b81) )
+	ROM_REGION(0x200, "some_eeprom", 0)
+	ROM_LOAD( "25lc040.ic13s", 0x000000, 0x200, CRC(377d1805) SHA1(6f77fcb2cc54e8500f5cc1046de453f1184ab216) )
 
 	// 840-0137    2004     317-0368-COM   Naomi 2
 	ROM_PARAMETER( ":rom_board:key", "997681fe")
@@ -10114,6 +10129,7 @@ ROM_END
 // 0024  Virtua Fighter 4 Evolution (GDS-0024)
 /* 0024A */ GAME( 2002, vf4evoa,  vf4evo,  naomi2gd, naomi,   naomi2_state, naomi2,  ROT0, "Sega", "Virtua Fighter 4 Evolution (Japan) (GDS-0024A)", GAME_FLAGS )
 /* 0024B */ GAME( 2002, vf4evo,   naomi2,  naomi2gd, naomi,   naomi2_state, naomi2,  ROT0, "Sega", "Virtua Fighter 4 Evolution (Version B) (Japan) (GDS-0024B)", GAME_FLAGS )
+// 0024C Virtua Fighter 4 Evolution (Version B) (Japan) (GDS-0024C)
 /* 0025  */ GAME( 2002, initdexpo,initdexp,naomi2gd, naomi,   naomi2_state, naomi2,  ROT0, "Sega", "Initial D Arcade Stage (Export) (GDS-0025)", GAME_FLAGS )
 /* 0025A */ GAME( 2002, initdexp, naomi2,  naomi2gd, naomi,   naomi2_state, naomi2,  ROT0, "Sega", "Initial D Arcade Stage (Export) (Rev A) (GDS-0025A)", GAME_FLAGS )
 /* 0026  */ GAME( 2002, initdv2jo,initdv2j,naomi2gd, naomi,   naomi2_state, naomi2,  ROT0, "Sega", "Initial D Arcade Stage Ver. 2 (Japan) (GDS-0026)", GAME_FLAGS )

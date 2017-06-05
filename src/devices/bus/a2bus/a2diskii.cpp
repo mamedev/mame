@@ -47,16 +47,6 @@ static const floppy_interface floppy_interface =
 	"floppy_5_25"
 };
 
-MACHINE_CONFIG_START( diskii )
-	MCFG_APPLEFDC_ADD(FDC_TAG, fdc_interface)
-	MCFG_LEGACY_FLOPPY_APPLE_2_DRIVES_ADD(floppy_interface,15,16)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START( iwmflop )
-	MCFG_IWM_ADD(FDC_TAG, fdc_interface)
-	MCFG_LEGACY_FLOPPY_APPLE_2_DRIVES_ADD(floppy_interface,15,16)
-MACHINE_CONFIG_END
-
 ROM_START( diskii )
 	ROM_REGION(0x100, DISKII_ROM_REGION, 0)
 	ROM_LOAD( "341-0027-a.p5", 0x000000, 0x000100, CRC(ce7144f6) SHA1(d4181c9f046aafc3fb326b381baac809d9e38d16) )
@@ -68,19 +58,18 @@ ROM_START( agat7 )
 ROM_END
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor a2bus_floppy_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( diskii );
-}
+MACHINE_CONFIG_MEMBER( a2bus_floppy_device::device_add_mconfig )
+	MCFG_APPLEFDC_ADD(FDC_TAG, fdc_interface)
+	MCFG_LEGACY_FLOPPY_APPLE_2_DRIVES_ADD(floppy_interface,15,16)
+MACHINE_CONFIG_END
 
-machine_config_constructor a2bus_iwmflop_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( iwmflop );
-}
+MACHINE_CONFIG_MEMBER( a2bus_iwmflop_device::device_add_mconfig )
+	MCFG_IWM_ADD(FDC_TAG, fdc_interface)
+	MCFG_LEGACY_FLOPPY_APPLE_2_DRIVES_ADD(floppy_interface,15,16)
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region

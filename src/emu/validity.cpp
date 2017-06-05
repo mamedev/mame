@@ -1424,8 +1424,16 @@ void validity_checker::validate_driver()
 
 	// make sure sound-less drivers are flagged
 	sound_interface_iterator iter(m_current_config->root_device());
-	if ((m_current_driver->flags & MACHINE_IS_BIOS_ROOT) == 0 && iter.first() == nullptr && (m_current_driver->flags & MACHINE_NO_SOUND) == 0 && (m_current_driver->flags & MACHINE_NO_SOUND_HW) == 0)
+	if ((m_current_driver->flags & MACHINE_IS_BIOS_ROOT) == 0 && !iter.first() && (m_current_driver->flags & (MACHINE_NO_SOUND | MACHINE_NO_SOUND_HW)) == 0)
 		osd_printf_error("Driver is missing MACHINE_NO_SOUND flag\n");
+
+	// catch invalid flag combinations
+	if ((m_current_driver->flags & MACHINE_WRONG_COLORS) && (m_current_driver->flags & MACHINE_IMPERFECT_COLORS))
+		osd_printf_error("Driver cannot have colours that are both completely wrong and imperfect\n");
+	if ((m_current_driver->flags & MACHINE_NO_SOUND_HW) && (m_current_driver->flags & (MACHINE_NO_SOUND | MACHINE_IMPERFECT_SOUND)))
+		osd_printf_error("Machine without sound hardware cannot have unemulated sound\n");
+	if ((m_current_driver->flags & MACHINE_NO_SOUND) && (m_current_driver->flags & MACHINE_IMPERFECT_SOUND))
+		osd_printf_error("Driver cannot have sound emulation that's both imperfect and not present\n");
 }
 
 

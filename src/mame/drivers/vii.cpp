@@ -1298,12 +1298,22 @@ ROM_END
 
 ROM_START( vsmile )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )      /* dummy region for u'nSP */
+	ROM_LOAD( "vsmilebios.bin", 0x000000, 0x200000, CRC(11f1b416) SHA1(11f77c4973d29c962567390e41879c86a759c93b) )
+ROM_END
+
+ROM_START( vsmileg )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )      /* dummy region for u'nSP */
 	ROM_LOAD16_WORD_SWAP( "bios german.bin", 0x000000, 0x200000, CRC(205c5296) SHA1(7fbcf761b5885c8b1524607aabaf364b4559c8cc) )
 ROM_END
 
 ROM_START( vsmilef )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )      /* dummy region for u'nSP */
 	ROM_LOAD16_WORD_SWAP( "sysrom_france", 0x000000, 0x200000, CRC(0cd0bdf5) SHA1(5c8d1eada1b6b545555b8d2b09325d7127681af8) )
+ROM_END
+
+ROM_START( vsmileb )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )      /* dummy region for u'nSP */
+	ROM_LOAD( "vbabybios.bin", 0x000000, 0x800000, CRC(ddc7f845) SHA1(2c17d0f54200070176d03d44a40c7923636e596a) )
 ROM_END
 
 ROM_START( walle )
@@ -1329,8 +1339,10 @@ ROM_END
 
 //    YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     STATE      INIT      COMPANY                                              FULLNAME             FLAGS
 CONS( 2004, batmantv, vii,      0,        batman,   batman,   vii_state, batman,   "JAKKS Pacific Inc / HotGen Ltd",                    "The Batman",        MACHINE_NO_SOUND )
-CONS( 2005, vsmile,   0,        0,        vsmile,   vsmile,   vii_state, vsmile,   "V-Tech",                                            "V-Smile (Germany)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2005, vsmile,   0,        0,        vsmile,   vsmile,   vii_state, vsmile,   "V-Tech",                                            "V-Smile (US)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2005, vsmileg,  vsmile,   0,        vsmile,   vsmile,   vii_state, vsmile,   "V-Tech",                                            "V-Smile (Germany)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 CONS( 2005, vsmilef,  vsmile,   0,        vsmile,   vsmile,   vii_state, vsmile,   "V-Tech",                                            "V-Smile (France)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2005, vsmileb,  0,        0,        vsmile,   vsmile,   vii_state, vsmile,   "V-Tech",                                            "V-Smile Baby (US)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 CONS( 2007, vii,      0,        0,        vii,      vii,      vii_state, vii,      "Jungle Soft / KenSingTon / Chintendo / Siatronics", "Vii",               MACHINE_NO_SOUND )
 CONS( 2008, walle,    vii,      0,        batman,   walle,    vii_state, walle,    "JAKKS Pacific Inc",                                 "Wall-E",            MACHINE_NO_SOUND )
 CONS( 2010, zone60,   0,        0,        wirels60, wirels60, vii_state, wirels60, "Jungle Soft / Ultimate Products (HK) Ltd",          "Zone 60",           MACHINE_NO_SOUND )

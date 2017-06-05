@@ -79,7 +79,7 @@ void st0020_device::device_start()
 		{ STEP8(0,16*8) },
 		16*8*8
 	};
-	set_gfx(0, std::make_unique<gfx_element>(palette(), layout_16x8x8,  (uint8_t *)m_gfxram.get(), 0, palette().entries() / granularity, 0));
+	set_gfx(0, std::make_unique<gfx_element>(&palette(), layout_16x8x8,  (uint8_t *)m_gfxram.get(), 0, palette().entries() / granularity, 0));
 	gfx(0)->set_granularity(granularity); /* 256 colour sprites with palette selectable on 64 colour boundaries */
 
 	// Tilemaps

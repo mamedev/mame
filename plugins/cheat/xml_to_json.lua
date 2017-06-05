@@ -1,4 +1,4 @@
-xml = require("xml_conv")
+xml = require("cheat_xml")
 json = dofile("../json/init.lua")
 
 function readAll(file)

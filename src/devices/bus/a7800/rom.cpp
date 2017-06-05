@@ -195,31 +195,6 @@ void a78_rom_act_device::device_reset()
 	m_bank = 0;
 }
 
-// TO DO: do we need a PAL variant?!?
-static MACHINE_CONFIG_START( a78_pokey )
-	MCFG_SPEAKER_STANDARD_MONO("addon")
-
-	MCFG_SOUND_ADD("pokey", POKEY, XTAL_14_31818MHz/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 1.00)
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_START( a78_pokey450 )
-	MCFG_SPEAKER_STANDARD_MONO("pokey_450")
-
-	MCFG_SOUND_ADD("pokey450", POKEY, XTAL_14_31818MHz/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "pokey_450", 1.00)
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_START( a78_2pokeys )
-	MCFG_SPEAKER_STANDARD_MONO("addon")
-
-	MCFG_SOUND_ADD("pokey", POKEY, XTAL_14_31818MHz/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 1.00)
-
-	MCFG_SOUND_ADD("pokey450", POKEY, XTAL_14_31818MHz/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 1.00)
-MACHINE_CONFIG_END
-
 
 /*-------------------------------------------------
  mapper specific handlers
@@ -268,10 +243,13 @@ WRITE8_MEMBER(a78_rom_pokey_device::write_40xx)
 		m_pokey->write(space, offset & 0x0f, data);
 }
 
-machine_config_constructor a78_rom_pokey_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( a78_pokey );
-}
+// TO DO: do we need a PAL variant?!?
+MACHINE_CONFIG_MEMBER( a78_rom_pokey_device::device_add_mconfig )
+	MCFG_SPEAKER_STANDARD_MONO("addon")
+
+	MCFG_SOUND_ADD("pokey", POKEY, XTAL_14_31818MHz/8)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 1.00)
+MACHINE_CONFIG_END
 
 /*-------------------------------------------------
 
@@ -364,10 +342,12 @@ WRITE8_MEMBER(a78_rom_sg_pokey_device::write_40xx)
 		m_bank = data & m_bank_mask;
 }
 
-machine_config_constructor a78_rom_sg_pokey_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( a78_pokey );
-}
+MACHINE_CONFIG_MEMBER( a78_rom_sg_pokey_device::device_add_mconfig )
+	MCFG_SPEAKER_STANDARD_MONO("addon")
+
+	MCFG_SOUND_ADD("pokey", POKEY, XTAL_14_31818MHz/8)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 1.00)
+MACHINE_CONFIG_END
 
 
 /*-------------------------------------------------
@@ -517,22 +497,34 @@ WRITE8_MEMBER(a78_rom_act_device::write_40xx)
 
 // Machine configs for PCB variants with a POKEY at $0450
 
-machine_config_constructor a78_rom_p450_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( a78_pokey450 );
-}
+MACHINE_CONFIG_MEMBER( a78_rom_p450_device::device_add_mconfig )
+	MCFG_SPEAKER_STANDARD_MONO("pokey_450")
 
-machine_config_constructor a78_rom_p450_pokey_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( a78_2pokeys );
-}
+	MCFG_SOUND_ADD("pokey450", POKEY, XTAL_14_31818MHz/8)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "pokey_450", 1.00)
+MACHINE_CONFIG_END
 
-machine_config_constructor a78_rom_p450_sg_ram_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( a78_pokey450 );
-}
+MACHINE_CONFIG_MEMBER( a78_rom_p450_pokey_device::device_add_mconfig )
+	MCFG_SPEAKER_STANDARD_MONO("addon")
 
-machine_config_constructor a78_rom_p450_sg9_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( a78_pokey450 );
-}
+	MCFG_SOUND_ADD("pokey", POKEY, XTAL_14_31818MHz/8)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 1.00)
+
+	MCFG_SOUND_ADD("pokey450", POKEY, XTAL_14_31818MHz/8)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 1.00)
+MACHINE_CONFIG_END
+
+
+MACHINE_CONFIG_MEMBER( a78_rom_p450_sg_ram_device::device_add_mconfig )
+	MCFG_SPEAKER_STANDARD_MONO("pokey_450")
+
+	MCFG_SOUND_ADD("pokey450", POKEY, XTAL_14_31818MHz/8)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "pokey_450", 1.00)
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_MEMBER( a78_rom_p450_sg9_device::device_add_mconfig )
+	MCFG_SPEAKER_STANDARD_MONO("pokey_450")
+
+	MCFG_SOUND_ADD("pokey450", POKEY, XTAL_14_31818MHz/8)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "pokey_450", 1.00)
+MACHINE_CONFIG_END

@@ -17,6 +17,83 @@
 #include <algorithm>
 
 
+namespace {
+
+//-------------------------------------------------
+//  parse_string - convert a ram string to an
+//  integer value
+//-------------------------------------------------
+
+uint32_t parse_string(const char *s)
+{
+	static const struct
+	{
+		const char *suffix;
+		unsigned multiple;
+	} s_suffixes[] =
+	{
+		{ "",		1 },
+		{ "k",		1024 },
+		{ "kb",		1024 },
+		{ "kib",	1024 },
+		{ "m",		1024 * 1024 },
+		{ "mb",		1024 * 1024 },
+		{ "mib",	1024 * 1024 }
+	};
+
+	// parse the string
+	unsigned ram = 0;
+	char suffix[8] = { 0, };
+	sscanf(s, "%u%7s", &ram, suffix);
+
+	// perform the lookup
+	auto iter = std::find_if(
+		std::begin(s_suffixes),
+		std::end(s_suffixes),
+		[&suffix](const auto &potential_suffix) { return !core_stricmp(suffix, potential_suffix.suffix); });
+
+	// identify the multiplier (or 0 if not recognized, signalling a parse failure)
+	unsigned multiple = iter != std::end(s_suffixes)
+		? iter->multiple
+		: 0;
+
+	// return the result
+	return ram * multiple;
+}
+
+
+//-------------------------------------------------
+//  calculate_extra_options
+//-------------------------------------------------
+
+std::vector<uint32_t> calculate_extra_options(const char *extra_options_string, std::string *bad_option)
+{
+	std::vector<uint32_t> result;
+	std::string options(extra_options_string);
+
+	bool done = false;
+	for (std::string::size_type start = 0, end = options.find_first_of(','); !done; start = end + 1, end = options.find_first_of(',', start))
+	{
+		// parse the option
+		const std::string ram_option_string = options.substr(start, (end == -1) ? -1 : end - start);
+		const uint32_t ram_option = parse_string(ram_option_string.c_str());
+		if (ram_option == 0)
+		{
+			if (bad_option)
+				*bad_option = std::move(ram_option_string);
+			return result;
+		}
+
+		// and add it to the results
+		result.push_back(ram_option);
+		done = end == std::string::npos;
+	}
+	return result;
+}
+
+};
+
+
 /*****************************************************************************
     LIVE DEVICE
 *****************************************************************************/
@@ -122,44 +199,6 @@ bool ram_device::is_valid_size(uint32_t size) const
 
 
 //-------------------------------------------------
-//  parse_string - convert a ram string to an
-//  integer value
-//-------------------------------------------------
-
-uint32_t ram_device::parse_string(const char *s)
-{
-	uint32_t ram;
-	char suffix = '\0';
-
-	sscanf(s, "%u%c", &ram, &suffix);
-
-	switch(tolower(suffix))
-	{
-		case 'k':
-			/* kilobytes */
-			ram *= 1024;
-			break;
-
-		case 'm':
-			/* megabytes */
-			ram *= 1024*1024;
-			break;
-
-		case '\0':
-			/* no suffix */
-			break;
-
-		default:
-			/* parse failure */
-			ram = 0;
-			break;
-	}
-
-	return ram;
-}
-
-
-//-------------------------------------------------
 //  default_size
 //-------------------------------------------------
 
@@ -178,34 +217,4 @@ const std::vector<uint32_t> &ram_device::extra_options(void) const
 	if (m_extra_options_string && m_extra_options.empty())
 		m_extra_options = calculate_extra_options(m_extra_options_string, nullptr);
 	return m_extra_options;
-}
-
-
-//-------------------------------------------------
-//  calculate_extra_options
-//-------------------------------------------------
-
-std::vector<uint32_t> ram_device::calculate_extra_options(const char *extra_options_string, std::string *bad_option)
-{
-	std::vector<uint32_t> result;
-	std::string options(extra_options_string);
-
-	bool done = false;
-	for (std::string::size_type start = 0, end = options.find_first_of(','); !done; start = end + 1, end = options.find_first_of(',', start))
-	{
-		// parse the option
-		const std::string ram_option_string = options.substr(start, (end == -1) ? -1 : end - start);
-		const uint32_t ram_option = parse_string(ram_option_string.c_str());
-		if (ram_option == 0)
-		{
-			if (bad_option)
-				*bad_option = std::move(ram_option_string);
-			return result;
-		}
-
-		// and add it to the results
-		result.push_back(ram_option);
-		done = end == std::string::npos;
-	}
-	return result;
 }

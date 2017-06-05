@@ -237,7 +237,7 @@ void taitopjc_state::video_start()
 	m_tilemap[0]->set_transparent_pen(0);
 	m_tilemap[1]->set_transparent_pen(1);
 
-	m_gfxdecode->set_gfx(0, std::make_unique<gfx_element>(*m_palette, char_layout, (uint8_t*)m_screen_ram.get(), 0, m_palette->entries() / 256, 0));
+	m_gfxdecode->set_gfx(0, std::make_unique<gfx_element>(m_palette, char_layout, (uint8_t*)m_screen_ram.get(), 0, m_palette->entries() / 256, 0));
 
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&taitopjc_state::video_exit, this));
 }

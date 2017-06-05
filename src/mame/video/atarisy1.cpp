@@ -617,15 +617,15 @@ int atarisy1_state::get_bank(uint8_t prom1, uint8_t prom2, int bpp)
 	switch (bpp)
 	{
 	case 4:
-		m_gfxdecode->set_gfx(gfx_index,std::make_unique<gfx_element>(*m_palette, objlayout_4bpp, srcdata, 0, 0x40, 256));
+		m_gfxdecode->set_gfx(gfx_index,std::make_unique<gfx_element>(m_palette, objlayout_4bpp, srcdata, 0, 0x40, 256));
 		break;
 
 	case 5:
-		m_gfxdecode->set_gfx(gfx_index,std::make_unique<gfx_element>(*m_palette, objlayout_5bpp, srcdata, 0, 0x40, 256));
+		m_gfxdecode->set_gfx(gfx_index,std::make_unique<gfx_element>(m_palette, objlayout_5bpp, srcdata, 0, 0x40, 256));
 		break;
 
 	case 6:
-		m_gfxdecode->set_gfx(gfx_index,std::make_unique<gfx_element>(*m_palette, objlayout_6bpp, srcdata, 0, 0x40, 256));
+		m_gfxdecode->set_gfx(gfx_index,std::make_unique<gfx_element>(m_palette, objlayout_6bpp, srcdata, 0, 0x40, 256));
 		break;
 
 	default:

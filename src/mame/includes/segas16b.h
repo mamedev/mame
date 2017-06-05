@@ -9,9 +9,11 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"
 #include "cpu/z80/z80.h"
+#include "machine/cxd1095.h"
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "machine/segaic16.h"
+#include "machine/upd4701.h"
 #include "sound/ym2151.h"
 #include "sound/ym2413.h"
 #include "sound/upd7759.h"
@@ -41,6 +43,8 @@ public:
 			m_sprites(*this, "sprites"),
 			m_segaic16vid(*this, "segaic16vid"),
 			m_soundlatch(*this, "soundlatch"),
+			m_cxdio(*this, "cxdio"),
+			m_upd4701a(*this, {"upd4701a1", "upd4701a2"}),
 			m_workram(*this, "workram"),
 			m_romboard(ROM_BOARD_INVALID),
 			m_tilemap_type(segaic16_video_device::TILEMAP_16B),
@@ -177,6 +181,7 @@ protected:
 
 	// custom I/O handlers
 	DECLARE_READ16_MEMBER( aceattac_custom_io_r );
+	DECLARE_WRITE16_MEMBER( aceattac_custom_io_w );
 	DECLARE_READ16_MEMBER( dunkshot_custom_io_r );
 	DECLARE_READ16_MEMBER( hwchamp_custom_io_r );
 	DECLARE_WRITE16_MEMBER( hwchamp_custom_io_w );
@@ -201,6 +206,8 @@ protected:
 	optional_device<sega_sys16b_sprite_device> m_sprites;
 	required_device<segaic16_video_device> m_segaic16vid;
 	optional_device<generic_latch_8_device> m_soundlatch; // not for atomicp
+	optional_device<cxd1095_device> m_cxdio; // for aceattac
+	optional_device_array<upd4701_device, 2> m_upd4701a; // for aceattac
 
 	// memory pointers
 	required_shared_ptr<uint16_t> m_workram;

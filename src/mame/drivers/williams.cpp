@@ -3175,7 +3175,7 @@ GAME( 1980, defender,   0,        defender,       defender, williams_state, defe
 GAME( 1980, defenderg,  defender, defender,       defender, williams_state, defender, ROT0,   "Williams", "Defender (Green label)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, defenderb,  defender, defender,       defender, williams_state, defender, ROT0,   "Williams", "Defender (Blue label)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, defenderw,  defender, defender,       defender, williams_state, defender, ROT0,   "Williams", "Defender (White label)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, defenderj,  defender, defender,       defender, williams_state, defender, ROT0,   "Taito Corporation", "T.T. Defender", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, defenderj,  defender, defender,       defender, williams_state, defender, ROT0,   "Williams (Taito Corporation license)", "T.T Defender", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, defndjeu,   defender, defender,       defender, williams_state, defndjeu, ROT0,   "bootleg (Jeutel)", "Defender (bootleg)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, tornado1,   defender, defender,       defender, williams_state, defndjeu, ROT0,   "bootleg (Jeutel)", "Tornado (set 1, Defender bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, tornado2,   defender, defender,       defender, williams_state, defndjeu, ROT0,   "bootleg (Jeutel)", "Tornado (set 2, Defender bootleg)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // bad dump?
@@ -3203,9 +3203,9 @@ GAME( 1981, stargate,   0,        williams,       stargate, williams_state, star
 GAME( 1982, robotron,   0,        williams,       robotron, williams_state, robotron, ROT0,   "Williams / Vid Kidz", "Robotron: 2084 (Solid Blue label)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, robotronyo, robotron, williams,       robotron, williams_state, robotron, ROT0,   "Williams / Vid Kidz", "Robotron: 2084 (Yellow/Orange label)", MACHINE_SUPPORTS_SAVE )
 // the 3 below are all noteworthy hacks of the Solid BLue set
-GAME( 1987, robotron87, robotron, williams,       robotron, williams_state, robotron, ROT0,   "hack",                "Robotron: 2084 (1987 'shot-in-the-corner' bugfix)", MACHINE_SUPPORTS_SAVE ) // fixes a reset bug.
-GAME( 2012, robotron12, robotron, williams,       robotron, williams_state, robotron, ROT0,   "hack",                "Robotron: 2084 (2012 'wave 201 start' hack)", MACHINE_SUPPORTS_SAVE ) // includes sitc bug fix, used for competitive play.
-GAME( 2015, robotrontd, robotron, williams,       robotron, williams_state, robotron, ROT0,   "hack",                "Robotron: 2084 (2015 'tie-die V2' hack)", MACHINE_SUPPORTS_SAVE ) // inc. sitc fix, mods by some of the original developers, see backstory here http://www.robotron2084guidebook.com/gameplay/raceto100million/robo2k14_tie-die-romset/  (I guess there's a tie-die V1 before it was released to the public?)
+GAME( 1987, robotron87, robotron, williams,       robotron, williams_state, robotron, ROT0,   "hack", "Robotron: 2084 (1987 'shot-in-the-corner' bugfix)", MACHINE_SUPPORTS_SAVE ) // fixes a reset bug.
+GAME( 2012, robotron12, robotron, williams,       robotron, williams_state, robotron, ROT0,   "hack", "Robotron: 2084 (2012 'wave 201 start' hack)", MACHINE_SUPPORTS_SAVE ) // includes sitc bug fix, used for competitive play.
+GAME( 2015, robotrontd, robotron, williams,       robotron, williams_state, robotron, ROT0,   "hack", "Robotron: 2084 (2015 'tie-die V2' hack)", MACHINE_SUPPORTS_SAVE ) // inc. sitc fix, mods by some of the original developers, see backstory here http://www.robotron2084guidebook.com/gameplay/raceto100million/robo2k14_tie-die-romset/  (I guess there's a tie-die V1 before it was released to the public?)
 
 GAME( 1982, joust,      0,        williams_muxed, joust,    williams_state, joust,    ROT0,   "Williams", "Joust (White/Green label)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, joustr,     joust,    williams_muxed, joust,    williams_state, joust,    ROT0,   "Williams", "Joust (Solid Red label)", MACHINE_SUPPORTS_SAVE )

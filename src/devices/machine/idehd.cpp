@@ -854,14 +854,9 @@ uint8_t ide_hdd_device::calculate_status()
 }
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
-static MACHINE_CONFIG_START( hdd_image )
+
+MACHINE_CONFIG_MEMBER( ide_hdd_device::device_add_mconfig )
 	MCFG_HARDDISK_ADD( "image" )
 MACHINE_CONFIG_END
-
-machine_config_constructor ide_hdd_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( hdd_image );
-}

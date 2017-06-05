@@ -296,7 +296,7 @@ void igs017_igs031_device::draw_sprite(bitmap_ind16 &bitmap,const rectangle &cli
 	if ( addr + dimx * dimy >= m_sprites_gfx_size )
 		return;
 
-	gfx_element gfx(*m_palette, m_sprites_gfx.get() + addr, dimx, dimy, dimx, m_palette->entries(), 0x100, 32);
+	gfx_element gfx(m_palette, m_sprites_gfx.get() + addr, dimx, dimy, dimx, m_palette->entries(), 0x100, 32);
 
 	gfx.transpen(bitmap,cliprect,
 				0, color,

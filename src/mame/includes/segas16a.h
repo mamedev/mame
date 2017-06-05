@@ -10,6 +10,7 @@
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/mcs51/mcs51.h"
 #include "cpu/z80/z80.h"
+#include "machine/cxd1095.h"
 #include "machine/gen_latch.h"
 #include "machine/i8255.h"
 #include "machine/i8243.h"
@@ -41,6 +42,7 @@ public:
 			m_segaic16vid(*this, "segaic16vid"),
 			m_soundlatch(*this, "soundlatch"),
 			m_sprites(*this, "sprites"),
+			m_cxdio(*this, "cxdio"),
 			m_workram(*this, "nvram"),
 			m_sound_decrypted_opcodes(*this, "sound_decrypted_opcodes"),
 			m_video_control(0),
@@ -121,6 +123,7 @@ protected:
 
 	// custom I/O handlers
 	DECLARE_READ16_MEMBER( aceattaca_custom_io_r );
+	DECLARE_WRITE16_MEMBER( aceattaca_custom_io_w );
 	DECLARE_READ16_MEMBER( mjleague_custom_io_r );
 	DECLARE_READ16_MEMBER( passsht16a_custom_io_r );
 	DECLARE_READ16_MEMBER( sdi_custom_io_r );
@@ -140,6 +143,7 @@ protected:
 	required_device<segaic16_video_device> m_segaic16vid;
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<sega_sys16a_sprite_device> m_sprites;
+	optional_device<cxd1095_device> m_cxdio;
 
 	// memory pointers
 	required_shared_ptr<uint16_t> m_workram;

@@ -2,6 +2,7 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="abc80_cass" description="Luxor ABC 80 cassettes">
 
+	<!-- https://www.youtube.com/watch?v=5IVFEVL4oAg -->
 	<software name="abcdemo">
 		<description>ABCDemo</description>
 		<year>2015</year>
@@ -11,6 +12,19 @@
 		<part name="cass1" interface="abc80_cass">
 			<dataarea name="cass" size="10793090">
 				<rom name="genesisproject_abcdemo.wav" size="10793090" crc="7642349f" sha1="a0a808e9c9c5f3ca162ef22869600e1c735846c2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="abcstack">
+		<description>ABCStacker</description>
+		<year>2016</year>
+		<publisher>Andreas Gustafsson</publisher>
+		<info name="usage" value="RUN CAS:" />
+
+		<part name="cass1" interface="abc80_cass">
+			<dataarea name="cass" size="755244">
+				<rom name="abcstacker.wav" size="755244" crc="6fdc6043" sha1="2a8290f260e94bb5904733255aa0e0188a2168b8" offset="0" />
 			</dataarea>
 		</part>
 	</software>

@@ -67,7 +67,7 @@ iq151_video32_device::iq151_video32_device(const machine_config &mconfig, const 
 
 void iq151_video32_device::device_start()
 {
-	set_gfx(0, std::make_unique<gfx_element>(palette(), iq151_video32_charlayout, m_chargen, 0, 1, 0));
+	set_gfx(0, std::make_unique<gfx_element>(&palette(), iq151_video32_charlayout, m_chargen, 0, 1, 0));
 }
 
 //-------------------------------------------------

@@ -68,10 +68,6 @@ DEFINE_DEVICE_TYPE(A2BUS_VULCANGOLD, a2bus_vulcangold_device, "a2vulgld", "Appli
 #define VULCAN_ROM_REGION  "vulcan_rom"
 #define VULCAN_ATA_TAG     "vulcan_ata"
 
-static MACHINE_CONFIG_START( vulcan )
-	MCFG_ATA_INTERFACE_ADD(VULCAN_ATA_TAG, ata_devices, "hdd", nullptr, false)
-MACHINE_CONFIG_END
-
 ROM_START( vulcan )
 	ROM_REGION(0x4000, VULCAN_ROM_REGION, 0)
 	ROM_LOAD( "ae vulcan rom v1.4.bin", 0x000000, 0x004000, CRC(798d5825) SHA1(1d668e856e33c6eeb10fe26975341afa8acb81f5) )
@@ -87,14 +83,12 @@ ROM_END
 ***************************************************************************/
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor a2bus_vulcanbase_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( vulcan );
-}
+MACHINE_CONFIG_MEMBER( a2bus_vulcanbase_device::device_add_mconfig )
+	MCFG_ATA_INTERFACE_ADD(VULCAN_ATA_TAG, ata_devices, "hdd", nullptr, false)
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region

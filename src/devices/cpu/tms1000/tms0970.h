@@ -24,7 +24,7 @@ protected:
 
 	// overrides
 	virtual void device_reset() override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	virtual void write_o_output(u8 index) override;
 
@@ -40,7 +40,7 @@ public:
 protected:
 	// overrides
 	virtual void device_reset() override { tms1000_cpu_device::device_reset(); }
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	virtual void op_rstr() override { } // assume it has no RSTR or CLO
 	virtual void op_clo() override { } // "

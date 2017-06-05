@@ -21,9 +21,9 @@
 *       286 based w/240 pin tech adapter integrated as a "mezzanine board", expandable ram:
 *           BP-1400/240 - uses a 30 OR 72 pin SIMM (some programmers may have
               the 30 pin SIMM socket populated) for up to 8MB? of ram
-*           BP-1400/84 - more or less a 1200/84 with expandable ram, very rare.
 *           Silicon Sculptor - custom firmware locked to Actel fpga/pld [1400?]
-              devices, may have a custom MB
+              devices, may have a custom MB; drives 84 pins (no third connector)
+              so probably "BP1400/84" based, i.e. a neutered BP-1400/240.
 *           Silicon Sculptor 6X - as above but 6 programmers ganged together
 *       486 based:
 *           BP-1600 - 486DX4 100Mhz based, uses a 72 pin SIMM for up to 16MB of
@@ -414,4 +414,4 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT     STATE           INIT         COMPANY              FULLNAME      FLAGS
-COMP( 1992, bp1200,     0,          0,      bpmmicro,   bpmmicro, bpmmicro_state, bp1200,      "BP Microsystems",   "BP-1200",    MACHINE_IS_SKELETON | MACHINE_NO_SOUND_HW )
+COMP( 1992, bp1200,     0,          0,      bpmmicro,   bpmmicro, bpmmicro_state, bp1200,      "BP Microsystems",   "BP-1200",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

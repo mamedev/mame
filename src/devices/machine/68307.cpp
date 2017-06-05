@@ -43,8 +43,7 @@ static ADDRESS_MAP_START( m68307_internal_map, AS_PROGRAM, 16, m68307_cpu_device
 ADDRESS_MAP_END
 
 
-
-static MACHINE_CONFIG_START( 68307fragment )
+MACHINE_CONFIG_MEMBER( m68307_cpu_device::device_add_mconfig )
 	MCFG_MC68681_ADD("internal68681", 16000000/4) // ?? Mhz - should be specified in inline config
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(m68307_cpu_device, m68307_duart_irq_handler))
 	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(m68307_cpu_device, m68307_duart_txa))
@@ -52,11 +51,6 @@ static MACHINE_CONFIG_START( 68307fragment )
 	MCFG_MC68681_INPORT_CALLBACK(READ8(m68307_cpu_device, m68307_duart_input_r))
 	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(m68307_cpu_device, m68307_duart_output_w))
 MACHINE_CONFIG_END
-
-machine_config_constructor m68307_cpu_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( 68307fragment );
-}
 
 
 m68307_cpu_device::m68307_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

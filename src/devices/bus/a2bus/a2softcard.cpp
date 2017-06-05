@@ -28,24 +28,18 @@ static ADDRESS_MAP_START( z80_mem, AS_PROGRAM, 8, a2bus_softcard_device )
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(dma_r, dma_w)
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_START( a2softcard )
-	MCFG_CPU_ADD(Z80_TAG, Z80, 1021800*2)   // Z80 runs on double the Apple II's clock
-	MCFG_CPU_PROGRAM_MAP(z80_mem)
-MACHINE_CONFIG_END
-
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor a2bus_softcard_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( a2softcard );
-}
+MACHINE_CONFIG_MEMBER( a2bus_softcard_device::device_add_mconfig )
+	MCFG_CPU_ADD(Z80_TAG, Z80, 1021800*2)   // Z80 runs on double the Apple II's clock
+	MCFG_CPU_PROGRAM_MAP(z80_mem)
+MACHINE_CONFIG_END
 
 //**************************************************************************
 //  LIVE DEVICE

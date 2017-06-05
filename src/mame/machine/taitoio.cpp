@@ -56,8 +56,10 @@ Newer version of the I/O chip ?
 
 DEFINE_DEVICE_TYPE(TC0220IOC, tc0220ioc_device, "tc0220ioc", "Taito TC0220IOC")
 
-tc0220ioc_device::tc0220ioc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TC0220IOC, tag, owner, clock),
+tc0220ioc_device::tc0220ioc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, TC0220IOC, tag, owner, clock),
+	m_regs{ 0, 0, 0, 0, 0, 0, 0, 0 },
+	m_port(0),
 	m_watchdog(*this, "watchdog"),
 	m_read_0_cb(*this),
 	m_read_1_cb(*this),

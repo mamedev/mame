@@ -4,7 +4,7 @@
 
     coco_fdc.h
 
-    CoCo/Dragon Floppy Disk Controller
+    CoCo/Dragon Floppy Disk Controller base classes
 
 *********************************************************************/
 
@@ -37,7 +37,6 @@ protected:
 		: device_t(mconfig, type, tag, owner, clock)
 		, device_cococart_interface(mconfig, *this)
 	{
-		m_owner = dynamic_cast<cococart_slot_device *>(owner);
 	};
 
 	// device-level overrides
@@ -51,7 +50,7 @@ protected:
 	// wrapper for setting the cart line
 	void cart_set_line(cococart_slot_device::line which, cococart_slot_device::line_value value)
 	{
-		m_owner->set_line_value(which, value);
+		owning_slot().set_line_value(which, value);
 	}
 	void cart_set_line(cococart_slot_device::line which, bool value)
 	{
@@ -65,23 +64,10 @@ protected:
 	void set_dskreg(uint8_t data) { m_dskreg = data; }
 
 private:
-	// internal state
-	cococart_slot_device *m_owner;
-
 	// registers
 	uint8_t m_dskreg;
 	bool m_intrq;
 	bool m_drq;
 };
-
-// device type definitions - CoCo FDC
-extern const device_type COCO_FDC;
-extern const device_type COCO_FDC_V11;
-extern const device_type COCO3_HDB1;
-extern const device_type CP400_FDC;
-
-// device type definitions - Dragon FDC
-extern const device_type DRAGON_FDC;
-extern const device_type SDTANDY_FDC;
 
 #endif // MAME_BUS_COCO_COCO_FDC_H

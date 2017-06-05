@@ -59,11 +59,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(clock_w);
 	DECLARE_WRITE_LINE_MEMBER(shift_load_w);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(qh_output);
-
 protected:
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -79,6 +77,8 @@ private:
 	int m_ser;
 	int m_clk;
 	int m_shld;
+
+	TIMER_DEVICE_CALLBACK_MEMBER(qh_output);
 };
 
 

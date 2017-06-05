@@ -463,7 +463,6 @@ protected:
 	optional_device<rs232_port_device> m_rs232;
 
 protected:
-	//virtual machine_config_constructor device_mconfig_additions() const;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 };

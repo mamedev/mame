@@ -17,9 +17,6 @@ public:
 	// construction/destruction
 	a78_hiscore_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_04xx) override;
 	virtual DECLARE_WRITE8_MEMBER(write_04xx) override;
@@ -30,6 +27,8 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(write_40xx) override;
 
 protected:
+	virtual void device_add_mconfig(machine_config &config) override;
+
 	required_device<a78_cart_slot_device> m_hscslot;
 };
 

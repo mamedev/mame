@@ -30,12 +30,6 @@ static SLOT_INTERFACE_START( a2_floppies )
 	SLOT_INTERFACE( "525", FLOPPY_525_SD )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( diskiing )
-	MCFG_DEVICE_ADD(WOZFDC_TAG, DISKII_FDC, 1021800*2)
-	MCFG_FLOPPY_DRIVE_ADD("0", a2_floppies, "525", a2bus_diskiing_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("1", a2_floppies, "525", a2bus_diskiing_device::floppy_formats)
-MACHINE_CONFIG_END
-
 ROM_START( diskiing )
 	ROM_REGION(0x100, DISKII_ROM_REGION, 0)
 	ROM_LOAD( "341-0027-a.p5",  0x0000, 0x0100, CRC(ce7144f6) SHA1(d4181c9f046aafc3fb326b381baac809d9e38d16) ) /* 341-0027-a: 16-sector disk drive (older version), PROM P5 */
@@ -46,14 +40,14 @@ FLOPPY_FORMATS_MEMBER( a2bus_diskiing_device::floppy_formats )
 FLOPPY_FORMATS_END
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor a2bus_diskiing_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( diskiing );
-}
+MACHINE_CONFIG_MEMBER( a2bus_diskiing_device::device_add_mconfig )
+	MCFG_DEVICE_ADD(WOZFDC_TAG, DISKII_FDC, 1021800*2)
+	MCFG_FLOPPY_DRIVE_ADD("0", a2_floppies, "525", a2bus_diskiing_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("1", a2_floppies, "525", a2bus_diskiing_device::floppy_formats)
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region

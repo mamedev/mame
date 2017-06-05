@@ -37,17 +37,16 @@ public:
 	DECLARE_READ8_MEMBER( control_r );
 	DECLARE_WRITE8_MEMBER( control_w );
 
-	DECLARE_WRITE_LINE_MEMBER( write_irq_enabled );
-	DECLARE_WRITE_LINE_MEMBER( write_centronics_ack );
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	void update_irq();
+	DECLARE_WRITE_LINE_MEMBER( write_irq_enabled );
+	DECLARE_WRITE_LINE_MEMBER( write_centronics_ack );
 
 	enum
 	{

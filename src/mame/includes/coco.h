@@ -21,6 +21,7 @@
 #include "machine/coco_vhd.h"
 #include "bus/coco/coco_dwsock.h"
 #include "machine/ram.h"
+#include "machine/bankdev.h"
 #include "sound/dac.h"
 #include "sound/wave.h"
 
@@ -53,6 +54,7 @@ SLOT_INTERFACE_EXTERN( coco_cart );
 #define DWSOCK_TAG                  "dwsock"
 #define VHD0_TAG                    "vhd0"
 #define VHD1_TAG                    "vhd1"
+#define FLOATING_TAG				"floating"
 
 // inputs
 #define CTRL_SEL_TAG                "ctrl_sel"
@@ -75,6 +77,7 @@ SLOT_INTERFACE_EXTERN( coco_cart );
 #define DIECOM_LIGHTGUN_BUTTONS_TAG "dclg_triggers"
 
 MACHINE_CONFIG_EXTERN( coco_sound );
+MACHINE_CONFIG_EXTERN( coco_floating );
 
 
 
@@ -82,7 +85,7 @@ MACHINE_CONFIG_EXTERN( coco_sound );
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-class coco_state : public driver_device
+class coco_state : public driver_device, public device_cococart_host_interface
 {
 public:
 	coco_state(const machine_config &mconfig, device_type type, const char *tag);
@@ -96,6 +99,7 @@ public:
 	required_device<cococart_slot_device> m_cococart;
 	required_device<ram_device> m_ram;
 	required_device<cassette_image_device> m_cassette;
+	required_device<address_map_bank_device> m_floating;
 	optional_device<rs232_port_device> m_rs232;
 	optional_device<coco_vhd_image_device> m_vhd_0;
 	optional_device<coco_vhd_image_device> m_vhd_1;
@@ -134,10 +138,14 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( pia1_firq_a );
 	DECLARE_WRITE_LINE_MEMBER( pia1_firq_b );
 
-	// floating bus
+	// floating bus & "space"
 	DECLARE_READ8_MEMBER( floating_bus_read )   { return floating_bus_read(); }
+	uint8_t floating_space_read(offs_t offset);
+	void floating_space_write(offs_t offset, uint8_t data);
 
+	// cartridge stuff
 	DECLARE_WRITE_LINE_MEMBER( cart_w ) { cart_w((bool) state); }
+	virtual address_space &cartridge_space() override;
 
 	// disassembly override
 	static offs_t os9_dasm_override(device_t &device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options);
@@ -260,6 +268,9 @@ private:
 
 	// VHD selection
 	uint8_t m_vhd_select;
+
+	// address space for "floating access"
+	//address_space m_floating_space;
 
 	// safety to prevent stack overflow when reading floating bus
 	bool m_in_floating_bus_read;

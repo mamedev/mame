@@ -23,14 +23,6 @@
 
 DEFINE_DEVICE_TYPE(A1BUS_CASSETTE, a1bus_cassette_device, "a1cass", "Apple I cassette board")
 
-/* sound output */
-
-MACHINE_CONFIG_START( cassette )
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED)
-	MCFG_CASSETTE_INTERFACE("apple1_cass")
-MACHINE_CONFIG_END
-
 ROM_START( cassette )
 	/* 256-byte cassette interface ROM, in two 82s129 or mmi6301 256x4 proms at locations 3 and 4 on the cassette interface daughtercard (they are labeled "MMI 6301-IJ // 7623L // APPLE-A3" and "MMI 6301-IJ // 7623L // APPLE-A4") */
 	ROM_REGION(0x100, CASSETTE_ROM_REGION, 0)
@@ -39,14 +31,16 @@ ROM_START( cassette )
 ROM_END
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor a1bus_cassette_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( cassette );
-}
+/* sound output */
+
+MACHINE_CONFIG_MEMBER( a1bus_cassette_device::device_add_mconfig )
+	MCFG_CASSETTE_ADD("cassette")
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED)
+	MCFG_CASSETTE_INTERFACE("apple1_cass")
+MACHINE_CONFIG_END
 
 const tiny_rom_entry *a1bus_cassette_device::device_rom_region() const
 {

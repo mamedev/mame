@@ -400,6 +400,17 @@ static INPUT_PORTS_START( spectar )
 	PORT_BIT( 0x1c, IP_ACTIVE_HIGH, IPT_SPECIAL )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( spectarrf ) // default to Spanish since it's a Spanish bootleg
+	PORT_INCLUDE(spectar)
+
+	PORT_MODIFY("INTSOURCE")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Language ) ) PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( French ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( German ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( Spanish ) )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( rallys )
 	PORT_INCLUDE(spectar)
 
@@ -982,6 +993,11 @@ ROM_START( spectar )
 	ROM_REGION( 0x0400, "gfx1", 0 )
 	ROM_LOAD( "hrl11d-2", 0x0000, 0x0400, CRC(c55b645d) SHA1(0c18277939d74e3e1281a7f114a34781d30c2baf) )  /* this is actually not used (all FF) */
 	ROM_CONTINUE(         0x0000, 0x0400 )  /* overwrite with the real one */
+
+	ROM_REGION( 0x0140, "proms", 0 ) // were dumped from a bootleg, very probably they are the same, but marked as bad dump for precaution. The 2 6331 match the Targ ones.
+	ROM_LOAD( "prom.5c",  0x0000, 0x0100, BAD_DUMP CRC(9ca2e061) SHA1(4111325b00a1017042d55c59308d41e8333ba627) ) // 6301 according to the Spectar manual
+	ROM_LOAD( "prom.6d",  0x0100, 0x0020, BAD_DUMP CRC(e26f9053) SHA1(eec35b6aa2c2d305418306bf4a1754a0583f109f) ) // 6331 according to the Spectar manual
+	ROM_LOAD( "hrl14h-1", 0x0120, 0x0020, BAD_DUMP CRC(f76b4fcf) SHA1(197e0cc508ffeb5cefa4046bdfb158939d598225) ) // 6331 according to the Spectar manual
 ROM_END
 
 
@@ -998,8 +1014,31 @@ ROM_START( spectar1 )
 	ROM_REGION( 0x0400, "gfx1", 0 )
 	ROM_LOAD( "hrl11d-2", 0x0000, 0x0400, CRC(c55b645d) SHA1(0c18277939d74e3e1281a7f114a34781d30c2baf) )  /* this is actually not used (all FF) */
 	ROM_CONTINUE(         0x0000, 0x0400 )  /* overwrite with the real one */
+
+	ROM_REGION( 0x0140, "proms", 0 ) // were dumped from a bootleg, very probably they are the same, but marked as bad dump for precaution. The 2 6331 match the Targ ones.
+	ROM_LOAD( "prom.5c",  0x0000, 0x0100, BAD_DUMP CRC(9ca2e061) SHA1(4111325b00a1017042d55c59308d41e8333ba627) ) // 6301 according to the Spectar manual
+	ROM_LOAD( "prom.6d",  0x0100, 0x0020, BAD_DUMP CRC(e26f9053) SHA1(eec35b6aa2c2d305418306bf4a1754a0583f109f) ) // 6331 according to the Spectar manual
+	ROM_LOAD( "hrl14h-1", 0x0120, 0x0020, BAD_DUMP CRC(f76b4fcf) SHA1(197e0cc508ffeb5cefa4046bdfb158939d598225) ) // 6331 according to the Spectar manual
 ROM_END
 
+ROM_START( spectarrf )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "spl11a-2", 0x1000, 0x0800, CRC(0a0ea985) SHA1(e080eddb9094ce1a487022c670d283e71e744f51) )
+	ROM_LOAD( "spl10a-2", 0x1800, 0x0800, CRC(fca667c1) SHA1(168426f9e87c002d2673c0230fceac4d0831d594) )
+	ROM_LOAD( "spl9a-3",  0x2000, 0x0800, CRC(9d4ce8ba) SHA1(2ef45c225fe704e49d10247c3eba1ef14141b3b7) )
+	ROM_LOAD( "spl8a-2",  0x2800, 0x0800, CRC(cfacbadf) SHA1(77b27cf6f35e8e8dd2fd4f31bba2a96f3076163e) )
+	ROM_LOAD( "spl7a-2",  0x3000, 0x0800, CRC(4c4741ff) SHA1(8de72613a385095253bb9e6da76493caec3115e4) )
+	ROM_LOAD( "sp26a-2",  0x3800, 0x0800, CRC(559ab427) SHA1(4c38417042be6032377dfb1e70aa814bf2395e55) )
+
+	ROM_REGION( 0x0400, "gfx1", 0 )
+	ROM_LOAD( "hrl11d-2", 0x0000, 0x0400, CRC(c55b645d) SHA1(0c18277939d74e3e1281a7f114a34781d30c2baf) )  /* this is actually not used (all FF) */
+	ROM_CONTINUE(         0x0000, 0x0400 )  /* overwrite with the real one */
+
+	ROM_REGION( 0x0140, "proms", 0 )
+	ROM_LOAD( "prom.5c",  0x0000, 0x0100, CRC(9ca2e061) SHA1(4111325b00a1017042d55c59308d41e8333ba627) )
+	ROM_LOAD( "prom.6d",  0x0100, 0x0020, CRC(e26f9053) SHA1(eec35b6aa2c2d305418306bf4a1754a0583f109f) )
+	ROM_LOAD( "hrl14h-1", 0x0120, 0x0020, CRC(f76b4fcf) SHA1(197e0cc508ffeb5cefa4046bdfb158939d598225) )
+ROM_END
 
 ROM_START( rallys )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -1647,6 +1686,7 @@ GAME( 1980, targc,    targ,    targ,     targ,     exidy_state, targ,     ROT0, 
 
 GAME( 1980, spectar,  0,       spectar,  spectar,  exidy_state, spectar,  ROT0, "Exidy",   "Spectar (revision 3)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, spectar1, spectar, spectar,  spectar,  exidy_state, spectar,  ROT0, "Exidy",   "Spectar (revision 1?)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, spectarrf,spectar, spectar,  spectarrf,exidy_state, spectar,  ROT0, "bootleg (Recreativos Franco)", "Spectar (revision 2, bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, rallys,   spectar, rallys,   rallys,   exidy_state, rallys,   ROT0, "bootleg (Novar)", "Rallys (bootleg of Spectar, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, rallysa,  spectar, rallys,   rallys,   exidy_state, rallys,   ROT0, "bootleg (Musik Box Brescia)", "Rallys (bootleg of Spectar, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, panzer,   spectar, rallys,   rallys,   exidy_state, rallys,   ROT0, "bootleg (Proel)", "Panzer (bootleg of Spectar)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

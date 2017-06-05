@@ -52,16 +52,6 @@ DEFINE_DEVICE_TYPE(A2BUS_TIMEMASTERHO, a2bus_timemasterho_device, "a2tmstho", "A
 #define TIMEMASTER_PIA_TAG      "timemst_pia"
 #define TIMEMASTER_M5832_TAG    "timemst_msm"
 
-MACHINE_CONFIG_START( timemaster )
-	MCFG_DEVICE_ADD(TIMEMASTER_PIA_TAG, PIA6821, 1021800)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(a2bus_timemasterho_device, pia_out_a))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(a2bus_timemasterho_device, pia_out_b))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(a2bus_timemasterho_device, pia_irqa_w))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(a2bus_timemasterho_device, pia_irqb_w))
-
-	MCFG_DEVICE_ADD(TIMEMASTER_M5832_TAG, MSM5832, 32768)
-MACHINE_CONFIG_END
-
 ROM_START( timemaster )
 	ROM_REGION(0x1000, TIMEMASTER_ROM_REGION, 0)
 	ROM_LOAD( "ae timemaster ii h.o. rom rev. 5.bin", 0x000000, 0x001000, CRC(ff5bd644) SHA1(ae0173da61581a06188c1bee89e95a0aa536c411) )
@@ -100,14 +90,18 @@ ioport_constructor a2bus_timemasterho_device::device_input_ports() const
 }
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor a2bus_timemasterho_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( timemaster );
-}
+MACHINE_CONFIG_MEMBER( a2bus_timemasterho_device::device_add_mconfig )
+	MCFG_DEVICE_ADD(TIMEMASTER_PIA_TAG, PIA6821, 1021800)
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(a2bus_timemasterho_device, pia_out_a))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(a2bus_timemasterho_device, pia_out_b))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(a2bus_timemasterho_device, pia_irqa_w))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(a2bus_timemasterho_device, pia_irqb_w))
+
+	MCFG_DEVICE_ADD(TIMEMASTER_M5832_TAG, MSM5832, 32768)
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region

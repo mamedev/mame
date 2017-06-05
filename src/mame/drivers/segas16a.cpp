@@ -258,7 +258,7 @@ READ16_MEMBER( segas16a_state::standard_io_r )
 		case 0x2000/2:
 			return ioport((offset & 1) ? "DSW2" : "DSW1")->read();
 	}
-	//logerror("%06X:standard_io_r - unknown read access to address %04X\n", m_maincpu->pc(), offset * 2);
+	//logerror("%06X:standard_io_r - unknown read access to address %04X\n", m_maincpu->state_int(STATE_GENPC), offset * 2);
 	return 0xffff;
 }
 
@@ -279,7 +279,7 @@ WRITE16_MEMBER( segas16a_state::standard_io_w )
 				synchronize(TID_PPI_WRITE, ((offset & 3) << 8) | (data & 0xff));
 			return;
 	}
-	//logerror("%06X:standard_io_w - unknown write access to address %04X = %04X & %04X\n", m_maincpu->pc(), offset * 2, data, mem_mask);
+	//logerror("%06X:standard_io_w - unknown write access to address %04X = %04X & %04X\n", m_maincpu->state_int(STATE_GENPC), offset * 2, data, mem_mask);
 }
 
 
@@ -763,8 +763,28 @@ READ16_MEMBER( segas16a_state::aceattaca_custom_io_r )
 				}
 			}
 			break;
+
+		case 0x3000/2:
+			if (BIT(offset, 4))
+				return m_cxdio->read(space, offset & 0x0f);
+			break;
 	}
 	return standard_io_r(space, offset, mem_mask);
+}
+
+WRITE16_MEMBER( segas16a_state::aceattaca_custom_io_w )
+{
+	switch (offset & (0x3000/2))
+	{
+		case 0x3000/2:
+			if (BIT(offset, 4))
+			{
+				m_cxdio->write(space, offset & 0x0f, data);
+				return;
+			}
+			break;
+	}
+	standard_io_w(space, offset, data, mem_mask);
 }
 
 
@@ -1945,6 +1965,10 @@ static MACHINE_CONFIG_DERIVED( system16a_fd1094, system16a )
 	MCFG_CPU_PROGRAM_MAP(system16a_map)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", segas16a_state, irq4_line_hold)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( aceattaca_fd1094, system16a_fd1094 )
+	MCFG_DEVICE_ADD("cxdio", CXD1095, 0)
 MACHINE_CONFIG_END
 
 
@@ -3644,6 +3668,7 @@ DRIVER_INIT_MEMBER(segas16a_state,aceattaca)
 {
 	DRIVER_INIT_CALL(generic);
 	m_custom_io_r = read16_delegate(FUNC(segas16a_state::aceattaca_custom_io_r), this);
+	m_custom_io_w = write16_delegate(FUNC(segas16a_state::aceattaca_custom_io_w), this);
 }
 
 DRIVER_INIT_MEMBER(segas16a_state,dumpmtmt)
@@ -3708,7 +3733,7 @@ GAME( 1987, aliensyn5,  aliensyn, system16a_fd1089b,        aliensyn,   segas16a
 GAME( 1987, aliensyn2,  aliensyn, system16a_fd1089a,        aliensyn,   segas16a_state,generic,     ROT0,   "Sega", "Alien Syndrome (set 2, System 16A, FD1089A 317-0033)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, aliensynjo, aliensyn, system16a_fd1089a,        aliensynj,  segas16a_state,generic,     ROT0,   "Sega", "Alien Syndrome (set 1, Japan, old, System 16A, FD1089A 317-0033)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, aceattaca,  aceattac, system16a_fd1094,         aceattaca,  segas16a_state,aceattaca,   ROT270, "Sega", "Ace Attacker (Japan, System 16A, FD1094 317-0060)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, aceattaca,  aceattac, aceattaca_fd1094,         aceattaca,  segas16a_state,aceattaca,   ROT270, "Sega", "Ace Attacker (Japan, System 16A, FD1094 317-0060)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1986, afighter,   0,        system16a_fd1089a_no7751, afighter,   segas16a_state,generic,     ROT270, "Sega", "Action Fighter (FD1089A 317-0018)", MACHINE_SUPPORTS_SAVE )
 

@@ -9,7 +9,7 @@
     Golden Tee variants & World Class Bowling Deluxe additions by Brian A. Troha
 
     Games supported:
-        * Time Killers (3 sets)
+        * Time Killers (4 sets)
         * Bloodstorm (5 sets)
         * Hard Yardage (2 sets)
         * Pairs (4 sets)
@@ -1829,6 +1829,33 @@ ROM_START( timekill )
 	ROM_LOAD16_BYTE( "tksrom02_u26.u26", 0x200000, 0x80000, CRC(051ced3e) SHA1(6b63c4837e709806ffea9a37d93933635d356a6e) ) /* Labeled TKSROM02 (U26) */
 ROM_END
 
+ROM_START( timekill132i ) /* Additional Violence Level:  Level 4 - Limbs, Decapitations, No Blood */
+	ROM_REGION16_BE( 0x80000, "user1", 0 )
+	ROM_LOAD16_BYTE( "tk00_v1.32i_u54.u54", 0x00000, 0x40000, CRC(6cef5e8c) SHA1(43cd3e704567be7a60558e12c43f0bb4456ec96d) ) /* Labeled TK00 V1.32I (U54) */
+	ROM_LOAD16_BYTE( "tk01_v1.32i_u53.u53", 0x00001, 0x40000, CRC(3360f6a3) SHA1(37b49928db6d672a2bc9ddf4d35d649655450c08) ) /* Labeled TK01 V1.32I (U53) */
+
+	ROM_REGION( 0x28000, "soundcpu", 0 ) /* At 0x18002 in rom: ITSOUND Ver 4.1 OTTO Sound Board 6255 I/O 6/3/92 */
+	ROM_LOAD( "tk_snd_v_4.1_u17.u17", 0x10000, 0x18000, CRC(c699af7b) SHA1(55863513a1c27dcb257dbc20e522cfafa9b92c9d) ) /* labeled TK SND V 4.1 (U17) */
+	ROM_CONTINUE(                     0x08000, 0x08000 )
+
+	ROM_REGION( 0x880000, "gfx1", 0 ) /* Rom board P/N 1051 REV0 */
+	ROM_LOAD32_BYTE( "time_killers_0.rom0",   0x000000, 0x200000, CRC(94cbf6f8) SHA1(dac5c4d9c8e42336c236ecc3c72b3b1f8282dc2f) ) /* 42 pin MASK ROM */
+	ROM_LOAD32_BYTE( "time_killers_1.rom1",   0x000001, 0x200000, CRC(c07dea98) SHA1(dd8b88beb9781579eb0a17231ad2a274b70ae1bc) ) /* 42 pin MASK ROM */
+	ROM_LOAD32_BYTE( "time_killers_2.rom2",   0x000002, 0x200000, CRC(183eed2a) SHA1(3905268fe45ecc47cd4d349666b4d33efda2140b) ) /* 42 pin MASK ROM */
+	ROM_LOAD32_BYTE( "time_killers_3.rom3",   0x000003, 0x200000, CRC(b1da1058) SHA1(a1d483701c661d69cecc9d073b23683b119f5ef1) ) /* 42 pin MASK ROM */
+
+	/* NOTE: Rom boards are known to exist and have been verified to list (silkscreen) the above locations as ROM1, ROM2, ROM3 & ROM4 */
+
+	ROM_LOAD32_BYTE( "timekill_grom01.grom1", 0x800000, 0x020000, CRC(b030c3d9) SHA1(f5c21285ec8ff4f74205e0cf18da67e733e31183) )
+	ROM_LOAD32_BYTE( "timekill_grom02.grom2", 0x800001, 0x020000, CRC(e98492a4) SHA1(fe8fb4bd3900109f3872f2930e8ddc9d19f599fd) )
+	ROM_LOAD32_BYTE( "timekill_grom03.grom3", 0x800002, 0x020000, CRC(6088fa64) SHA1(a3eee10bdef48fefec3836f551172dbe0819acf6) )
+	ROM_LOAD32_BYTE( "timekill_grom04.grom4", 0x800003, 0x020000, CRC(95be2318) SHA1(60580c87d63a114df44e2580e138128388ff447b) )
+
+	ROM_REGION16_BE( 0x400000, "ensoniq.2", ROMREGION_ERASE00 ) /* Sound board P/N 1052 REV 4 */
+	ROM_LOAD16_BYTE( "tksrom00_u18.u18", 0x000000, 0x80000, CRC(79d8b83a) SHA1(78934b4d0ccca8fefcf8277e4296eb1d59cd575b) ) /* Labeled TKSROM00 (U18) */
+	ROM_LOAD16_BYTE( "tksrom01_u20.u20", 0x100000, 0x80000, CRC(ec01648c) SHA1(b83c66cf22db5d89b9ed79b79861b79429d8380c) ) /* Labeled TKSROM01 (U20) */
+	ROM_LOAD16_BYTE( "tksrom02_u26.u26", 0x200000, 0x80000, CRC(051ced3e) SHA1(6b63c4837e709806ffea9a37d93933635d356a6e) ) /* Labeled TKSROM02 (U26) */
+ROM_END
 
 ROM_START( timekill131 )
 	ROM_REGION16_BE( 0x80000, "user1", 0 )
@@ -4506,41 +4533,42 @@ Label1  bne.s       Label1          ; Infinite loop if result isn't 0x80
  *
  *************************************/
 
-GAME( 1992, timekill,    0,        timekill, timekill, itech32_state, timekill, ROT0, "Strata/Incredible Technologies",   "Time Killers (v1.32)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, timekill131, timekill, timekill, timekill, itech32_state, timekill, ROT0, "Strata/Incredible Technologies",   "Time Killers (v1.31)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, timekill121, timekill, timekill, timekill, itech32_state, timekill, ROT0, "Strata/Incredible Technologies",   "Time Killers (v1.21)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, hardyard,    0,        bloodstm, hardyard, itech32_state, hardyard, ROT0, "Strata/Incredible Technologies",   "Hard Yardage (v1.20)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, hardyard10,  hardyard, bloodstm, hardyard, itech32_state, hardyard, ROT0, "Strata/Incredible Technologies",   "Hard Yardage (v1.00)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, bloodstm,    0,        bloodstm, bloodstm, itech32_state, bloodstm, ROT0, "Strata/Incredible Technologies",   "Blood Storm (v2.22)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, bloodstm22,  bloodstm, bloodstm, bloodstm, itech32_state, bloodstm, ROT0, "Strata/Incredible Technologies",   "Blood Storm (v2.20)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, bloodstm21,  bloodstm, bloodstm, bloodstm, itech32_state, bloodstm, ROT0, "Strata/Incredible Technologies",   "Blood Storm (v2.10)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, bloodstm11,  bloodstm, bloodstm, bloodstm, itech32_state, bloodstm, ROT0, "Strata/Incredible Technologies",   "Blood Storm (v1.10)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, bloodstm10,  bloodstm, bloodstm, bloodstm, itech32_state, bloodstm, ROT0, "Strata/Incredible Technologies",   "Blood Storm (v1.04)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, pairsred,    0,        bloodstm, pairs,    itech32_state, bloodstm, ROT0, "Strata/Incredible Technologies",   "Pairs Redemption (V1.0, 10/25/94)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, pairs,       0,        bloodstm, pairs,    itech32_state, bloodstm, ROT0, "Strata/Incredible Technologies",   "Pairs (V1.2, 09/30/94)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, pairsa,      pairs,    bloodstm, pairs,    itech32_state, bloodstm, ROT0, "Strata/Incredible Technologies",   "Pairs (V1, 09/07/94)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, hotmemry,    pairs,    bloodstm, pairs,    itech32_state, bloodstm, ROT0, "Incredible Technologies (Tuning license)", "Hot Memory (V1.2, Germany, 12/28/94)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, hotmemry11,  pairs,    bloodstm, pairs,    itech32_state, bloodstm, ROT0, "Incredible Technologies (Tuning license)", "Hot Memory (V1.1, Germany, 11/30/94)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, drivedge,    0,        drivedge, drivedge, itech32_state, drivedge, ROT0, "Strata/Incredible Technologies",   "Driver's Edge", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, wcbowl,      0,        sftm,     wcbowln,  itech32_state, wcbowln,  ROT0, "Incredible Technologies",          "World Class Bowling (v1.66)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITBWL-3 */
-GAME( 1995, wcbowl165,   wcbowl,   sftm,     wcbowlo,  itech32_state, wcbowln,  ROT0, "Incredible Technologies",          "World Class Bowling (v1.65)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITBWL-3 */
-GAME( 1995, wcbowl161,   wcbowl,   sftm,     wcbowlo,  itech32_state, wcbowln,  ROT0, "Incredible Technologies",          "World Class Bowling (v1.61)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITBWL-3 */
-GAME( 1995, wcbowl16,    wcbowl,   sftm,     wcbowlo,  itech32_state, wcbowln,  ROT0, "Incredible Technologies",          "World Class Bowling (v1.6)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITBWL-3 */
-GAME( 1995, wcbowl15,    wcbowl,   bloodstm, wcbowl,   itech32_state, wcbowl,   ROT0, "Incredible Technologies",          "World Class Bowling (v1.5)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITBWL-1 */
-GAME( 1995, wcbowl14,    wcbowl,   bloodstm, wcbowl,   itech32_state, wcbowl,   ROT0, "Incredible Technologies",          "World Class Bowling (v1.4)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITBWL-1 */
-GAME( 1995, wcbowl13,    wcbowl,   bloodstm, wcbowl,   itech32_state, wcbowl,   ROT0, "Incredible Technologies",          "World Class Bowling (v1.3)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITBWL-1 */
-GAME( 1995, wcbowl13j,   wcbowl,   bloodstm, wcbowlj,  itech32_state, wcbowlj,  ROT0, "Incredible Technologies",          "World Class Bowling (v1.3J, Japan)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITBWL-1 */
-GAME( 1995, wcbowl12,    wcbowl,   bloodstm, wcbowl,   itech32_state, wcbowl,   ROT0, "Incredible Technologies",          "World Class Bowling (v1.2)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITBWL-1 */
-GAME( 1995, wcbowl11,    wcbowl,   bloodstm, wcbowl,   itech32_state, wcbowl,   ROT0, "Incredible Technologies",          "World Class Bowling (v1.1)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITBWL-1 */
-GAME( 1995, sftm,        0,        sftm,     sftm,     itech32_state, sftm,     ROT0, "Capcom / Incredible Technologies", "Street Fighter: The Movie (v1.12)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITSF-1 */
-GAME( 1995, sftm111,     sftm,     sftm,     sftm,     itech32_state, sftm110,  ROT0, "Capcom / Incredible Technologies", "Street Fighter: The Movie (v1.11)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITSF-1 */
-GAME( 1995, sftm110,     sftm,     sftm,     sftm,     itech32_state, sftm110,  ROT0, "Capcom / Incredible Technologies", "Street Fighter: The Movie (v1.10)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITSF-1 */
-GAME( 1995, sftmj,       sftm,     sftm,     sftm,     itech32_state, sftm,     ROT0, "Capcom / Incredible Technologies", "Street Fighter: The Movie (v1.12N, Japan)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITSF-1 */
-GAME( 1997, shufshot,    0,        sftm,     shufshot, itech32_state, shufshot, ROT0, "Strata/Incredible Technologies",   "Shuffleshot (v1.40)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITSHF-1 */
-GAME( 1997, shufshot139, shufshot, sftm,     shufshot, itech32_state, shufshot, ROT0, "Strata/Incredible Technologies",   "Shuffleshot (v1.39)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITSHF-1 */
-GAME( 1997, shufshot137, shufshot, sftm,     shufshto, itech32_state, shufshot, ROT0, "Strata/Incredible Technologies",   "Shuffleshot (v1.37)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITSHF-1 */
-GAME( 1997, wcbowl140,   wcbowldx, tourny,   wcbowldx, itech32_state, wcbowlt,  ROT0, "Incredible Technologies",          "World Class Bowling Tournament (v1.40)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITBWL-3 */
-GAME( 1999, wcbowldx,    0,        sftm,     wcbowldx, itech32_state, shufshot, ROT0, "Incredible Technologies",          "World Class Bowling Deluxe (v2.00)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITBWL-4 */
+GAME( 1992, timekill,     0,        timekill, timekill, itech32_state, timekill, ROT0, "Strata/Incredible Technologies",   "Time Killers (v1.32)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, timekill132i, timekill, timekill, timekill, itech32_state, timekill, ROT0, "Strata/Incredible Technologies",   "Time Killers (v1.32I)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, timekill131,  timekill, timekill, timekill, itech32_state, timekill, ROT0, "Strata/Incredible Technologies",   "Time Killers (v1.31)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, timekill121,  timekill, timekill, timekill, itech32_state, timekill, ROT0, "Strata/Incredible Technologies",   "Time Killers (v1.21)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, hardyard,     0,        bloodstm, hardyard, itech32_state, hardyard, ROT0, "Strata/Incredible Technologies",   "Hard Yardage (v1.20)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, hardyard10,   hardyard, bloodstm, hardyard, itech32_state, hardyard, ROT0, "Strata/Incredible Technologies",   "Hard Yardage (v1.00)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, bloodstm,     0,        bloodstm, bloodstm, itech32_state, bloodstm, ROT0, "Strata/Incredible Technologies",   "Blood Storm (v2.22)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, bloodstm22,   bloodstm, bloodstm, bloodstm, itech32_state, bloodstm, ROT0, "Strata/Incredible Technologies",   "Blood Storm (v2.20)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, bloodstm21,   bloodstm, bloodstm, bloodstm, itech32_state, bloodstm, ROT0, "Strata/Incredible Technologies",   "Blood Storm (v2.10)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, bloodstm11,   bloodstm, bloodstm, bloodstm, itech32_state, bloodstm, ROT0, "Strata/Incredible Technologies",   "Blood Storm (v1.10)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, bloodstm10,   bloodstm, bloodstm, bloodstm, itech32_state, bloodstm, ROT0, "Strata/Incredible Technologies",   "Blood Storm (v1.04)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, pairsred,     0,        bloodstm, pairs,    itech32_state, bloodstm, ROT0, "Strata/Incredible Technologies",   "Pairs Redemption (V1.0, 10/25/94)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, pairs,        0,        bloodstm, pairs,    itech32_state, bloodstm, ROT0, "Strata/Incredible Technologies",   "Pairs (V1.2, 09/30/94)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, pairsa,       pairs,    bloodstm, pairs,    itech32_state, bloodstm, ROT0, "Strata/Incredible Technologies",   "Pairs (V1, 09/07/94)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, hotmemry,     pairs,    bloodstm, pairs,    itech32_state, bloodstm, ROT0, "Incredible Technologies (Tuning license)", "Hot Memory (V1.2, Germany, 12/28/94)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, hotmemry11,   pairs,    bloodstm, pairs,    itech32_state, bloodstm, ROT0, "Incredible Technologies (Tuning license)", "Hot Memory (V1.1, Germany, 11/30/94)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, drivedge,     0,        drivedge, drivedge, itech32_state, drivedge, ROT0, "Strata/Incredible Technologies",   "Driver's Edge", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, wcbowl,       0,        sftm,     wcbowln,  itech32_state, wcbowln,  ROT0, "Incredible Technologies",          "World Class Bowling (v1.66)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITBWL-3 */
+GAME( 1995, wcbowl165,    wcbowl,   sftm,     wcbowlo,  itech32_state, wcbowln,  ROT0, "Incredible Technologies",          "World Class Bowling (v1.65)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITBWL-3 */
+GAME( 1995, wcbowl161,    wcbowl,   sftm,     wcbowlo,  itech32_state, wcbowln,  ROT0, "Incredible Technologies",          "World Class Bowling (v1.61)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITBWL-3 */
+GAME( 1995, wcbowl16,     wcbowl,   sftm,     wcbowlo,  itech32_state, wcbowln,  ROT0, "Incredible Technologies",          "World Class Bowling (v1.6)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITBWL-3 */
+GAME( 1995, wcbowl15,     wcbowl,   bloodstm, wcbowl,   itech32_state, wcbowl,   ROT0, "Incredible Technologies",          "World Class Bowling (v1.5)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITBWL-1 */
+GAME( 1995, wcbowl14,     wcbowl,   bloodstm, wcbowl,   itech32_state, wcbowl,   ROT0, "Incredible Technologies",          "World Class Bowling (v1.4)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITBWL-1 */
+GAME( 1995, wcbowl13,     wcbowl,   bloodstm, wcbowl,   itech32_state, wcbowl,   ROT0, "Incredible Technologies",          "World Class Bowling (v1.3)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITBWL-1 */
+GAME( 1995, wcbowl13j,    wcbowl,   bloodstm, wcbowlj,  itech32_state, wcbowlj,  ROT0, "Incredible Technologies",          "World Class Bowling (v1.3J, Japan)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITBWL-1 */
+GAME( 1995, wcbowl12,     wcbowl,   bloodstm, wcbowl,   itech32_state, wcbowl,   ROT0, "Incredible Technologies",          "World Class Bowling (v1.2)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITBWL-1 */
+GAME( 1995, wcbowl11,     wcbowl,   bloodstm, wcbowl,   itech32_state, wcbowl,   ROT0, "Incredible Technologies",          "World Class Bowling (v1.1)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITBWL-1 */
+GAME( 1995, sftm,         0,        sftm,     sftm,     itech32_state, sftm,     ROT0, "Capcom / Incredible Technologies", "Street Fighter: The Movie (v1.12)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITSF-1 */
+GAME( 1995, sftm111,      sftm,     sftm,     sftm,     itech32_state, sftm110,  ROT0, "Capcom / Incredible Technologies", "Street Fighter: The Movie (v1.11)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITSF-1 */
+GAME( 1995, sftm110,      sftm,     sftm,     sftm,     itech32_state, sftm110,  ROT0, "Capcom / Incredible Technologies", "Street Fighter: The Movie (v1.10)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITSF-1 */
+GAME( 1995, sftmj,        sftm,     sftm,     sftm,     itech32_state, sftm,     ROT0, "Capcom / Incredible Technologies", "Street Fighter: The Movie (v1.12N, Japan)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITSF-1 */
+GAME( 1997, shufshot,     0,        sftm,     shufshot, itech32_state, shufshot, ROT0, "Strata/Incredible Technologies",   "Shuffleshot (v1.40)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITSHF-1 */
+GAME( 1997, shufshot139,  shufshot, sftm,     shufshot, itech32_state, shufshot, ROT0, "Strata/Incredible Technologies",   "Shuffleshot (v1.39)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITSHF-1 */
+GAME( 1997, shufshot137,  shufshot, sftm,     shufshto, itech32_state, shufshot, ROT0, "Strata/Incredible Technologies",   "Shuffleshot (v1.37)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITSHF-1 */
+GAME( 1997, wcbowl140,    wcbowldx, tourny,   wcbowldx, itech32_state, wcbowlt,  ROT0, "Incredible Technologies",          "World Class Bowling Tournament (v1.40)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITBWL-3 */
+GAME( 1999, wcbowldx,     0,        sftm,     wcbowldx, itech32_state, shufshot, ROT0, "Incredible Technologies",          "World Class Bowling Deluxe (v2.00)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITBWL-4 */
 
 /*
     The following naming conventions are used:

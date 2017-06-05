@@ -40,18 +40,16 @@ public:
 
 	DECLARE_WRITE8_MEMBER(write) { term_write(data); }
 
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-
 protected:
 	ie15_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	virtual void rcv_complete() override;
 	virtual void tra_callback() override;
@@ -91,6 +89,7 @@ private:
 	void scanline_callback();
 	void update_leds();
 	void draw_scanline(uint32_t *p, uint16_t offset, uint8_t scanline);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	std::unique_ptr<uint32_t[]> m_tmpbmp;
 
 	emu_timer *m_hblank_timer;

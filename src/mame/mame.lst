@@ -10691,6 +10691,9 @@ dblcrown                        // (c) 1994 Excellent System
 @source:dblewing.cpp
 dblewing                        // MBE (c) 1993 Mitchell
 
+@source:dbox.cpp
+dbox							// (c) 1996 Nokia Multimedia
+
 @source:dbz.cpp
 dbz                             // (c) 1993 Banpresto
 dbz2                            // (c) 1994 Banpresto
@@ -12180,6 +12183,7 @@ europc                          // 1988 Schneider Euro PC (CGA or Hercules)
 
 @source:eva.cpp
 eva11                           //
+eva24                           //
 
 @source:evmbug.cpp
 evmbug                          //
@@ -12220,6 +12224,7 @@ rallysa                         // (c) 1980 Musik Box Brescia (bootleg)
 sidetrac                        // (c) 1979
 spectar                         // (c) 1980
 spectar1                        // (c) 1980
+spectarrf                       // (c) 1984 Recreativos Franco (bootleg)
 targ                            // (c) 1980
 targc                           // (c) 1980
 teetert                         // (c) 1981
@@ -12452,6 +12457,7 @@ fexcelv                         //
 fphantom                        //
 fscc9                           //
 fscc9b                          //
+fscc9c                          //
 fscc9ps                         //
 fscc12                          //
 granits                         // RCS
@@ -13005,6 +13011,7 @@ mshuttle                        // (c) 1981 Nichibutsu
 mshuttle2                       // (c) 1981 Nichibutsu
 mshuttlej                       // (c) 1981 Nichibutsu
 mshuttlej2                      // (c) 1981 Nichibutsu
+offensiv                        // bootleg (Video Dens)
 omegab                          // bootleg
 omni                            // bootleg
 orbitron                        // (c) 1982 Signatron USA (Arcade Tv Game List - P.160, Left, 22 from top)
@@ -13034,9 +13041,9 @@ scrambles                       // GX387 (c) 1981 Stern
 scrambles2                      // GX387 (c) 1981 Stern
 scrambp                         // bootleg (Billport S.A.)
 scramce                         // bootleg (Centromatic S.A.)
+scrammr                         // bootleg (Model Racing)
 scrampt                         // bootleg (Petaco S.A.)
 scramrf                         // bootleg (Recreativos Franco)
-scrammr                         // bootleg (Model Racing)
 sfx                             // (c) 1983 Nichibutsu
 skelagon                        // (c) 1983 Nichibutsu USA
 skybase                         // (c) 1982 Omori Electric Co., Ltd.
@@ -15179,6 +15186,7 @@ shufshot139                     // (c) Strata/Incredible Technologies
 timekill                        // (c) 1992 Strata/Incredible Technologies
 timekill121                     // (c) 1992 Strata/Incredible Technologies
 timekill131                     // (c) 1992 Strata/Incredible Technologies
+timekill132i                    // (c) 1992 Strata/Incredible Technologies
 wcbowl                          // (c) 1995 Incredible Technologies
 wcbowl11                        // (c) 1995 Incredible Technologies
 wcbowl12                        // (c) 1995 Incredible Technologies
@@ -20845,7 +20853,8 @@ lastbrnxj                       // 1996.06 Last Bronx (Japan, Revision A)
 lastbrnxu                       // 1996.06 Last Bronx (USA, Revision A)
 manxtt                          // 1995.11 Manx T.T. DX (Revision D)
 manxttc                         // 1995.11 Manx T.T. (Revision C)
-motoraid                        // 1997.10 Motor Raid
+motoraid                        // 1997.10 Motor Raid Twin
+motoraiddx                      // 1997.10 Motor Raid DX
 overrev                         // 1997.09 Over Rev (Revision A)
 overrevb                        // 1997.09 Over Rev (Revision B)
 pltkids                         // 1999.03 Pilot Kids (Revision A)
@@ -29300,6 +29309,7 @@ nes                             // Nintendo Entertainment System
 nespal                          // Nintendo Entertainment System PAL
 
 @source:nes_vt.cpp
+vdogdeme
 vdogdemo
 mc_dgear
 dgun2500
@@ -31931,6 +31941,7 @@ rainbow190                      // 1985 DEC Rainbow 190
 @source:rallyx.cpp
 commsega                        // (c) 1983 Sega
 cottong                         // bootleg
+dngrtrck                        // Petaco bootleg
 gutangtn                        // GX359 (c) 1982 Konami + Sega license
 jackler                         // 1 9 8 2 (Jungler Bootleg)
 jungler                         // GX327 (c) 1981 Konami
@@ -32140,6 +32151,9 @@ rollace2                        // (c) 1983 Williams
 
 @source:rotaryf.cpp
 rotaryf                         //
+
+@source:ron.cpp
+ron2							// (c) 1981 Sanritsu
 
 @source:roul.cpp
 roul                            // (c) 1990
@@ -33187,6 +33201,7 @@ timescan                        // (c) 1987 (Unprotected)
 toryumon                        // (c) 1995 (Unprotected)
 tturf                           // (c) 1989 Sega / Sunsoft (8751)
 tturfu                          // (c) 1989 Sega / Sunsoft (8751)
+ultracin                        // (c) 1996 Sega (Unprotected)
 wb3                             // (c) 1988 Sega / Westone (8751)
 wb32                            // (c) 1988 Sega / Westone (FD1094)
 wb32d                           //
@@ -37041,7 +37056,9 @@ vigilanto                       // (c) 1988 (US)
 batmantv                        // The Batman, 2004
 vii                             // Chintendo / KenSingTon / Jungle Soft / Siatronics Vii
 vsmile                          //
+vsmileb                         //
 vsmilef                         //
+vsmileg                         //
 walle                           //
 wirels60                        // Wireless 60
 zone60                          // Zone 60

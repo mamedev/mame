@@ -278,7 +278,7 @@ void tc0091lvc_device::device_start()
 	//printf("m_gfx_index %d\n", m_gfx_index);
 
 	device_palette_interface &palette = m_gfxdecode->palette();
-	m_gfxdecode->set_gfx(m_gfx_index, std::make_unique<gfx_element>(palette, char_layout, (uint8_t *)m_pcg_ram, 0, palette.entries() / 16, 0));
+	m_gfxdecode->set_gfx(m_gfx_index, std::make_unique<gfx_element>(&palette, char_layout, (uint8_t *)m_pcg_ram, 0, palette.entries() / 16, 0));
 }
 
 const address_space_config *tc0091lvc_device::memory_space_config(address_spacenum spacenum) const

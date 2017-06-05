@@ -336,13 +336,14 @@ inline uint32_t voodoo_device::raster_info::compute_hash() const
 	const uint8_t *dither = nullptr
 #define DECLARE_DITHER_POINTERS_NO_DITHER_VAR                                               \
 	const uint8_t *dither_lookup = nullptr;
-#define COMPUTE_DITHER_POINTERS(FBZMODE, YY)                                    \
+#define COMPUTE_DITHER_POINTERS(FBZMODE, YY, FOGMODE)                           \
 do                                                                              \
 {                                                                               \
+	if (FBZMODE_ENABLE_DITHERING(FBZMODE) || FOGMODE_FOG_DITHER(FOGMODE))        \
+		dither4 = &dither_matrix_4x4[((YY) & 3) * 4];                           \
 	/* compute the dithering pointers */                                        \
 	if (FBZMODE_ENABLE_DITHERING(FBZMODE))                                      \
 	{                                                                           \
-		dither4 = &dither_matrix_4x4[((YY) & 3) * 4];                           \
 		if (FBZMODE_DITHER_TYPE(FBZMODE) == 0)                                  \
 		{                                                                       \
 			dither = dither4;                                                   \
@@ -2653,7 +2654,7 @@ void voodoo_device::raster_##name(void *destbase, int32_t y, const poly_extent *
 		scry = (vd->fbi.yorigin - y) & 0x3ff;                                    \
 																				\
 	/* compute dithering */                                                     \
-	COMPUTE_DITHER_POINTERS(FBZMODE, y);                                        \
+	COMPUTE_DITHER_POINTERS(FBZMODE, y, FOGMODE);                               \
 																				\
 	/* apply clipping */                                                        \
 	if (FBZMODE_ENABLE_CLIPPING(FBZMODE))                                       \

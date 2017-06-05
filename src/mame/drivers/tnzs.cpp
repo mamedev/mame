@@ -1720,7 +1720,7 @@ P0-056A     K1100476A J1100201A 3xZ80B  EMPTY*3 27c1000 NONE    1x6164      No  
     PCB, but with a daughterboard which converts four of the 23c1000 gfx ROM
     sockets into 8 27c1000 eprom sockets, and DOES use color PROMs!
     The other pcb set uses P0-028-A pcb and 23c1000 mask roms and color RAM,
-    but has lower rom id numbers. The higher numbered set  was likely created
+    but has lower rom id numbers. The higher numbered set was likely created
     by Taito to 'use up' a stock of older P0-025-A pcbs.
 (C) This is a development/prototype PCB, hence it has 32 pin sockets for the
     gfx ROMs as 27c1000 eproms, instead of 28 pin sockets for 23c1000 mask

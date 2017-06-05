@@ -172,7 +172,7 @@ WRITE8_MEMBER(tmpz84c015_device::irq_priority_w)
 	}
 }
 
-static MACHINE_CONFIG_START( tmpz84c015 )
+MACHINE_CONFIG_MEMBER( tmpz84c015_device::device_add_mconfig )
 
 	/* basic machine hardware */
 	MCFG_Z80SIO0_ADD("tmpz84c015_sio", DERIVED_CLOCK(1,1), 0, 0, 0, 0)
@@ -213,8 +213,3 @@ static MACHINE_CONFIG_START( tmpz84c015 )
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8(tmpz84c015_device, out_pb_cb_trampoline_w))
 	MCFG_Z80PIO_OUT_BRDY_CB(WRITELINE(tmpz84c015_device, out_brdy_cb_trampoline_w))
 MACHINE_CONFIG_END
-
-machine_config_constructor tmpz84c015_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( tmpz84c015 );
-}

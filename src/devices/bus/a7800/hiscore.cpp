@@ -27,14 +27,9 @@ a78_hiscore_device::a78_hiscore_device(const machine_config &mconfig, const char
 }
 
 
-static MACHINE_CONFIG_START( a78_highscore )
+MACHINE_CONFIG_MEMBER( a78_hiscore_device::device_add_mconfig )
 	MCFG_A78_CARTRIDGE_ADD("hsc_slot", a7800_cart, nullptr)
 MACHINE_CONFIG_END
-
-machine_config_constructor a78_hiscore_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( a78_highscore );
-}
 
 
 /*-------------------------------------------------
