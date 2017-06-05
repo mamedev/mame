@@ -738,7 +738,7 @@ uint32_t floppy_image_device::find_position(attotime &base, const attotime &when
 	}
 
 	uint32_t res = (delta*floppy_ratio_1).as_ticks(1000000000/1000);
-	if (res > 200000000) {
+	if (res >= 200000000) {
 		// Due to rounding errors in the previous operation,
 		// 'res' sometimes overflows 2E+8
 		res -= 200000000;
