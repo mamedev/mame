@@ -14769,6 +14769,9 @@ hp9845b                         //
 hp9845c                         //
 hp9845s                         //
 hp9845t                         //
+hp9845b_de                      //
+hp9845c_de                      //
+hp9845t_de                      //
 
 @source:hp9k.cpp
 hp9816                          //
@@ -37266,6 +37269,7 @@ laser500                        // 1984? Laser 500
 laser700                        // 1984? Laser 700
 
 @source:vulgus.cpp
+mach9                           // bootleg (ITISA)
 vulgus                          // 5/1984 (c) 1984
 vulgusa                         // 5/1984 (c) 1984
 vulgusj                         // 5/1984 (c) 1984
