@@ -345,6 +345,13 @@ project ("qtdbg_" .. _OPTIONS["osd"])
 		buildoptions {
 			"-fPIC",
 		}
+
+if _OPTIONS["targetos"]=="linux" then
+	configuration { "cmake" }
+	buildoptions {
+		"-fPIC",
+	}
+end
 	configuration { }
 
 	qtdebuggerbuild()
