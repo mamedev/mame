@@ -11853,7 +11853,7 @@ GAME( 19??, tst_galx,    galaxian, galaxian,   galaxian,   galaxian_state, galax
 
 /* other games on basic galaxian hardware */
 GAME( 1981, blkhole,     0,        galaxian,   blkhole,    galaxian_state, galaxian,   ROT90,  "TDS & MINTS", "Black Hole", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, orbitron,    0,        galaxian,   orbitron,   galaxian_state, galaxian,   ROT270, "Signatron USA", "Orbitron", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, orbitron,    0,        galaxian,   orbitron,   galaxian_state, galaxian,   ROT270, "Comsoft (Signatron USA license)", "Orbitron", MACHINE_SUPPORTS_SAVE ) // there's a Comsoft copyright in one of the roms, and the gameplay is the same as Victory below
 GAME( 1980, luctoday,    0,        galaxian,   luctoday,   galaxian_state, galaxian,   ROT270, "Sigma", "Lucky Today",MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
 GAME( 19??, chewing,     luctoday, galaxian,   luctoday,   galaxian_state, galaxian,   ROT90,  "<unknown>", "Chewing Gum", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, catacomb,    0,        galaxian,   catacomb,   galaxian_state, galaxian,   ROT90,  "MTM Games", "Catacomb", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
