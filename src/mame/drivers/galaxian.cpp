@@ -2713,7 +2713,7 @@ static INPUT_PORTS_START( piscesb )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( gteikokb )
+static INPUT_PORTS_START( gteikokub )
 	PORT_INCLUDE(galaxian)
 
 	PORT_MODIFY("IN0")
@@ -2743,8 +2743,8 @@ static INPUT_PORTS_START( gteikokb )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( gteikob2 )
-	PORT_INCLUDE(gteikokb)
+static INPUT_PORTS_START( gteikokub2 )
+	PORT_INCLUDE(gteikokub)
 
 	PORT_MODIFY("IN2")
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Cabinet ) )
@@ -8265,7 +8265,7 @@ ROM_START( gteikoku )
 	ROM_LOAD( "l06_prom.bin", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
 ROM_END
 
-ROM_START( gteikokb )
+ROM_START( gteikokub )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD( "1.bin",        0x0000, 0x0800, CRC(bf00252f) SHA1(a4ec48c6b9468f52bcf8b01d1bdb908dcf81d42d) )
 	ROM_LOAD( "2.bin",        0x0800, 0x0800, CRC(f712b7d5) SHA1(c269db2e9984a3fbd33888bd426c53d319cad36f) )
@@ -8286,7 +8286,7 @@ ROM_START( gteikokb )
 	ROM_LOAD( "l06_prom.bin", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
 ROM_END
 
-ROM_START( gteikob2 )
+ROM_START( gteikokub2 )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD( "94gnog.bin",   0x0000, 0x0800, CRC(67ec3235) SHA1(f250db867257f474f693012c11008bf92f038cc7) )
 	ROM_LOAD( "92gnog.bin",   0x0800, 0x0800, CRC(813c41f2) SHA1(bd92e0b53e3c8874d63f3444bca02246cd74b1c6) )
@@ -8305,6 +8305,27 @@ ROM_START( gteikob2 )
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "l06_prom.bin", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
+ROM_END
+
+ROM_START( gteikokub3 )  // still has the IREM copyright, but the PCB is a bootleg with ROMs labeled "Honly Electronics"
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_LOAD( "G1.A3",  0x0000, 0x0800, CRC(d975af10) SHA1(a2e2a36a75db8fd09441308b08b6ae073c68b8cf) )
+	ROM_LOAD( "G0.A2",  0x0800, 0x0800, CRC(378aba50) SHA1(713c98e76e386fe47adde79955ab15f04c1a0ab5) )
+	ROM_LOAD( "XX.A1",  0x1000, 0x0800, CRC(945f4160) SHA1(5fbe879f51e14c4c7ae551e5b3089f8e148770a4) )
+	ROM_LOAD( "G2.A4",  0x1800, 0x0800, CRC(ddc80bc5) SHA1(18c3920198baf87267bc7f12db6b23b090d3577a) )
+	ROM_LOAD( "G5.B1",  0x2000, 0x0800, CRC(62354351) SHA1(85bf18942f73023b8be0c3659a0dcd3dfcccfc2c) )
+	ROM_LOAD( "G6.B2",  0x2800, 0x0800, CRC(d915a389) SHA1(0e2ff6eec9453856a1276889946b463cfae58eba) )
+	ROM_LOAD( "G7.B3",  0x3000, 0x0800, CRC(c9245346) SHA1(239bad3fe64eaab2dfc3febd06d1124103a10504) )
+	ROM_LOAD( "XX.B4",  0x3800, 0x0800, CRC(797d45c7) SHA1(76fb8b45fcce3622c59c04af32cfa001ef7bf71d) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "G10.2",  0x0000, 0x0800, CRC(8313c959) SHA1(b09157c6f824d6e94647728cbb329877fcb4e502) )
+	ROM_LOAD( "G12.4",  0x0800, 0x0800, CRC(c26132af) SHA1(7ae125a911dfd47aeca4f129f580762ce4d8d91a) )
+	ROM_LOAD( "G9.1",   0x1000, 0x0800, CRC(c9d4537e) SHA1(65d27066ffec04b755d2f5d3f36f5ec6792e8d6c) )
+	ROM_LOAD( "G11.3",  0x1800, 0x0800, CRC(dcc2b33b) SHA1(c3a5ac935c519400dfabb28909f7e460769d1837) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "COLPROM.6L", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
 ROM_END
 
 ROM_START( galemp )
@@ -11770,8 +11791,9 @@ GAME( 1980, uniwars,     0,        galaxian,   superg,     galaxian_state, pisce
 GAME( 1980, uniwarsa,    uniwars,  galaxian,   superg,     galaxian_state, pisces,     ROT90,  "bootleg (Karateco)", "UniWar S (bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, mltiwars,    uniwars,  galaxian,   superg,     galaxian_state, pisces,     ROT90,  "bootleg (Gayton Games)", "Multi Wars (bootleg of UniWar S)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, gteikoku,    uniwars,  galaxian,   superg,     galaxian_state, pisces,     ROT90,  "Irem", "Gingateikoku No Gyakushu", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, gteikokb,    uniwars,  galaxian,   gteikokb,   galaxian_state, pisces,     ROT270, "bootleg", "Gingateikoku No Gyakushu (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, gteikob2,    uniwars,  galaxian,   gteikob2,   galaxian_state, pisces,     ROT90,  "bootleg", "Gingateikoku No Gyakushu (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, gteikokub,   uniwars,  galaxian,   gteikokub,  galaxian_state, pisces,     ROT270, "bootleg", "Gingateikoku No Gyakushu (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, gteikokub2,  uniwars,  galaxian,   gteikokub2, galaxian_state, pisces,     ROT90,  "bootleg", "Gingateikoku No Gyakushu (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, gteikokub3,  uniwars,  galaxian,   superg,     galaxian_state, pisces,     ROT90,  "bootleg (Honly)", "Gingateikoku No Gyakushu (bootleg set 3)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, spacbatt,    uniwars,  galaxian,   spacbatt,   galaxian_state, pisces,     ROT90,  "bootleg", "Space Battle (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, spacbat2,    uniwars,  galaxian,   spacbatt,   galaxian_state, pisces,     ROT90,  "bootleg", "Space Battle (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, spacempr,    uniwars,  galaxian,   spacbatt,   galaxian_state, pisces,     ROT90,  "bootleg", "Space Empire (bootleg)", MACHINE_SUPPORTS_SAVE )

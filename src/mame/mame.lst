@@ -12966,9 +12966,10 @@ galemp                          // (c) Taito do Brasil
 galturbo                        // hack
 ghostmun                        //
 gmgalax                         // bootleg
-gteikob2                        // bootleg
-gteikokb                        // bootleg
 gteikoku                        // (c) Irem
+gteikokub                       // bootleg
+gteikokub2                      // bootleg
+gteikokub3                      // bootleg (Honly Enterprises)
 jumpbug                         // (c) 1981 Rock-ola
 jumpbugb                        // (c) 1981 Sega
 jungsub                         // bootleg
@@ -38319,6 +38320,7 @@ jackrabt                        // (c) 1984
 jackrabt2                       // (c) 1984
 jackrabts                       // (c) 1984
 monymony                        // (c) 1983
+monymony2                       // (c) 1983
 
 @source:zapcomputer.cpp
 zapcomp                         // (1981) ZAP computer - Z80 Applications Processor
