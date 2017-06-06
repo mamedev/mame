@@ -344,7 +344,7 @@ void device_t::calculate_derived_clock()
 {
 	if ((m_configured_clock & 0xff000000) == 0xff000000)
 	{
-		assert(m_owner != nullptr);
+		assert(m_owner && m_owner->m_clock > 0);
 		set_unscaled_clock(m_owner->m_clock * ((m_configured_clock >> 12) & 0xfff) / ((m_configured_clock >> 0) & 0xfff));
 	}
 }
