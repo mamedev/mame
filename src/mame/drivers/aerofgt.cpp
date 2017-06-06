@@ -107,6 +107,11 @@ WRITE8_MEMBER(aerofgt_state::aerofgt_sh_bankswitch_w)
 	m_soundbank->set_entry(data & 0x03);
 }
 
+WRITE8_MEMBER(aerofgt_state::spinlbrk_sh_bankswitch_w)
+{
+	m_soundbank->set_entry(data & 0x01);
+}
+
 WRITE16_MEMBER(aerofgt_state::pspikesb_oki_banking_w)
 {
 	m_oki->set_rom_bank(data & 3);
@@ -220,7 +225,7 @@ static ADDRESS_MAP_START( karatblz_map, AS_PROGRAM, 16, aerofgt_state )
 	AM_RANGE(0x0f8000, 0x0fbfff) AM_RAM /* work RAM */
 	AM_RANGE(0x0fc000, 0x0fc7ff) AM_RAM AM_SHARE("spriteram3")
 	AM_RANGE(0x0fe000, 0x0fe7ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x0ff000, 0x0ff001) AM_READ_PORT("IN0")
+	AM_RANGE(0x0ff000, 0x0ff001) AM_READ_PORT("IN0") AM_WRITE8(spinlbrk_flip_screen_w, 0xff00)
 	AM_RANGE(0x0ff002, 0x0ff003) AM_READ_PORT("IN1") AM_WRITE8(karatblz_gfxbank_w, 0xff00)
 	AM_RANGE(0x0ff004, 0x0ff005) AM_READ_PORT("IN2")
 	AM_RANGE(0x0ff006, 0x0ff007) AM_READ_PORT("IN3") AM_WRITE8(sound_command_w, 0x00ff)
@@ -239,7 +244,8 @@ static ADDRESS_MAP_START( spinlbrk_map, AS_PROGRAM, 16, aerofgt_state )
 	AM_RANGE(0xffc000, 0xffc7ff) AM_RAM AM_SHARE("spriteram3")
 	AM_RANGE(0xffd000, 0xffd1ff) AM_RAM AM_SHARE("rasterram")   /* bg1 scroll registers */
 	AM_RANGE(0xffe000, 0xffe7ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("IN0") AM_WRITE8(spinlbrk_gfxbank_w, 0x00ff)
+	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("IN0") AM_WRITE8(spinlbrk_flip_screen_w, 0xff00)
+	AM_RANGE(0xfff000, 0xfff001) AM_WRITE8(spinlbrk_gfxbank_w, 0x00ff)
 	AM_RANGE(0xfff002, 0xfff003) AM_READ_PORT("IN1") AM_WRITE(aerofgt_bg2scrollx_w)
 	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("DSW")
 	AM_RANGE(0xfff006, 0xfff007) AM_WRITE8(sound_command_w, 0x00ff)
@@ -260,7 +266,7 @@ static ADDRESS_MAP_START( turbofrc_map, AS_PROGRAM, 16, aerofgt_state )
 	AM_RANGE(0x0fc000, 0x0fc7ff) AM_RAM AM_SHARE("spriteram3")
 	AM_RANGE(0x0fd000, 0x0fdfff) AM_RAM AM_SHARE("rasterram")   /* bg1 scroll registers */
 	AM_RANGE(0x0fe000, 0x0fe7ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x0ff000, 0x0ff001) AM_READ_PORT("IN0")
+	AM_RANGE(0x0ff000, 0x0ff001) AM_READ_PORT("IN0") AM_WRITE8(turbofrc_flip_screen_w, 0x00ff)
 	AM_RANGE(0x0ff002, 0x0ff003) AM_READ_PORT("IN1") AM_WRITE(aerofgt_bg1scrolly_w)
 	AM_RANGE(0x0ff004, 0x0ff005) AM_READ_PORT("DSW") AM_WRITE(aerofgt_bg2scrollx_w)
 	AM_RANGE(0x0ff006, 0x0ff007) AM_READ8(pending_command_r, 0x00ff) AM_WRITE(aerofgt_bg2scrolly_w)
@@ -281,7 +287,7 @@ static ADDRESS_MAP_START( aerofgtb_map, AS_PROGRAM, 16, aerofgt_state )
 	AM_RANGE(0x0f8000, 0x0fbfff) AM_RAM /* work RAM */
 	AM_RANGE(0x0fc000, 0x0fc7ff) AM_RAM AM_SHARE("spriteram3")
 	AM_RANGE(0x0fd000, 0x0fd7ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x0fe000, 0x0fe001) AM_READ_PORT("IN0")
+	AM_RANGE(0x0fe000, 0x0fe001) AM_READ_PORT("IN0") AM_WRITE8(turbofrc_flip_screen_w, 0x00ff)
 	AM_RANGE(0x0fe002, 0x0fe003) AM_READ_PORT("IN1") AM_WRITE(aerofgt_bg1scrolly_w)
 	AM_RANGE(0x0fe004, 0x0fe005) AM_READ_PORT("DSW1") AM_WRITE(aerofgt_bg2scrollx_w)
 	AM_RANGE(0x0fe006, 0x0fe007) AM_READ8(pending_command_r, 0x00ff) AM_WRITE(aerofgt_bg2scrolly_w)
@@ -386,6 +392,13 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, aerofgt_state )
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("soundbank")
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( spinlbrk_sound_portmap, AS_IO, 8, aerofgt_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x00) AM_WRITE(spinlbrk_sh_bankswitch_w)
+	AM_RANGE(0x14, 0x14) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(pending_command_clear_w)
+	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( turbofrc_sound_portmap, AS_IO, 8, aerofgt_state )
@@ -1320,6 +1333,13 @@ MACHINE_START_MEMBER(aerofgt_state,aerofgt)
 	MACHINE_START_CALL_MEMBER(common);
 }
 
+MACHINE_START_MEMBER(aerofgt_state,spinlbrk)
+{
+	m_soundbank->configure_entries(0, 2, memregion("audiocpu")->base()+0x8000, 0x8000);
+
+	MACHINE_START_CALL_MEMBER(common);
+}
+
 MACHINE_RESET_MEMBER(aerofgt_state,common)
 {
 	m_pending_command = 0;
@@ -1613,10 +1633,10 @@ static MACHINE_CONFIG_START( spinlbrk )
 
 	MCFG_CPU_ADD("audiocpu",Z80,XTAL_20MHz/4)   /* 5mhz verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(turbofrc_sound_portmap)
+	MCFG_CPU_IO_MAP(spinlbrk_sound_portmap)
 								/* IRQs are triggered by the YM2610 */
 
-	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,aerofgt)
+	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,spinlbrk)
 	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,aerofgt)
 
 	/* video hardware */
@@ -2265,9 +2285,9 @@ ROM_START( spinlbrk )
 	ROM_LOAD16_BYTE( "ic93",    0x20000, 0x10000, CRC(726f4683) SHA1(65aff0548333571d47a96d4bf5a7857f12399cc7) )
 	ROM_LOAD16_BYTE( "ic94",    0x20001, 0x10000, CRC(c4385e03) SHA1(6683eed812fa8a5430125b14e8647f8e9024bbdd) )
 
-	ROM_REGION( 0x30000, "audiocpu", 0 )    /* 64k for the audio CPU + banks */
+	ROM_REGION( 0x18000, "audiocpu", 0 )    /* 64k for the audio CPU + banks */
 	ROM_LOAD( "ic117",        0x00000, 0x08000, CRC(625ada41) SHA1(2dd0674c68ea382431115c155afbf880f5b9deb2) )
-	ROM_LOAD( "ic118",        0x10000, 0x10000, CRC(1025f024) SHA1(3e497c74c950d2cd2a0931cf2ae9b0124d11ca6a) )
+	ROM_LOAD( "ic118",        0x08000, 0x10000, CRC(1025f024) SHA1(3e497c74c950d2cd2a0931cf2ae9b0124d11ca6a) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD( "ic15",         0x000000, 0x80000, CRC(e318cf3a) SHA1(d634001a0029566ce7b8fa30075970919eb5f44e) )
@@ -2315,9 +2335,9 @@ ROM_START( spinlbrku )
 	ROM_LOAD16_BYTE( "ic93.u4", 0x20000, 0x10000, CRC(0cf73029) SHA1(e1346b759a41f9eec9536dc90671778582e595b4) )
 	ROM_LOAD16_BYTE( "ic94.u3", 0x20001, 0x10000, CRC(5cf7c426) SHA1(b201da40c4511d2845004dff72d36adbb8a4fab9) )
 
-	ROM_REGION( 0x30000, "audiocpu", 0 )    /* 64k for the audio CPU + banks */
+	ROM_REGION( 0x18000, "audiocpu", 0 )    /* 64k for the audio CPU + banks */
 	ROM_LOAD( "ic117",        0x00000, 0x08000, CRC(625ada41) SHA1(2dd0674c68ea382431115c155afbf880f5b9deb2) )
-	ROM_LOAD( "ic118",        0x10000, 0x10000, CRC(1025f024) SHA1(3e497c74c950d2cd2a0931cf2ae9b0124d11ca6a) )
+	ROM_LOAD( "ic118",        0x08000, 0x10000, CRC(1025f024) SHA1(3e497c74c950d2cd2a0931cf2ae9b0124d11ca6a) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD( "ic15",         0x000000, 0x80000, CRC(e318cf3a) SHA1(d634001a0029566ce7b8fa30075970919eb5f44e) )
@@ -2365,9 +2385,9 @@ ROM_START( spinlbrkj )
 	ROM_LOAD16_BYTE( "j4",      0x20000, 0x10000, CRC(33e33912) SHA1(d6d052cd8dbedfd254bdf5e82ad770e4bf241777) )
 	ROM_LOAD16_BYTE( "j3",      0x20001, 0x10000, CRC(16ca61d0) SHA1(5d99a1261251412c3c758af751997fe31026c0d6) )
 
-	ROM_REGION( 0x30000, "audiocpu", 0 )    /* 64k for the audio CPU + banks */
+	ROM_REGION( 0x18000, "audiocpu", 0 )    /* 64k for the audio CPU + banks */
 	ROM_LOAD( "ic117",        0x00000, 0x08000, CRC(625ada41) SHA1(2dd0674c68ea382431115c155afbf880f5b9deb2) )
-	ROM_LOAD( "ic118",        0x10000, 0x10000, CRC(1025f024) SHA1(3e497c74c950d2cd2a0931cf2ae9b0124d11ca6a) )
+	ROM_LOAD( "ic118",        0x08000, 0x10000, CRC(1025f024) SHA1(3e497c74c950d2cd2a0931cf2ae9b0124d11ca6a) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD( "ic15",         0x000000, 0x80000, CRC(e318cf3a) SHA1(d634001a0029566ce7b8fa30075970919eb5f44e) )
@@ -2882,8 +2902,8 @@ GAME( 1991, turbofrcu, turbofrc, turbofrc, turbofrc, aerofgt_state, 0, ROT270, "
 
 // the tiles on these also contain an alt title 'The Final War' for both the title screen and attract logo was it ever used?
 GAME( 1992, aerofgt,  0,        aerofgt,  aerofgt,  aerofgt_state, 0,          ROT270, "Video System Co.", "Aero Fighters (World / USA + Canada / Korea / Hong Kong / Taiwan) (newer hardware)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // this has the newer sprite chip etc. unlike all other games in this driver..
-GAME( 1992, aerofgtb, aerofgt,  aerofgtb, aerofgtb, aerofgt_state, 0,          ROT270, "Video System Co.", "Aero Fighters (Taiwan / Japan, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // probably intended for Taiwan because the Japanese name is Sonic Wings (below)
-GAME( 1992, aerofgtc, aerofgt,  aerofgtb, aerofgtb, aerofgt_state, 0,          ROT270, "Video System Co.", "Aero Fighters (Taiwan / Japan, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1992, sonicwi,  aerofgt,  aerofgtb, aerofgtb, aerofgt_state, 0,          ROT270, "Video System Co.", "Sonic Wings (Japan)",                   MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1992, aerofgtb, aerofgt,  aerofgtb, aerofgtb, aerofgt_state, 0,          ROT270, "Video System Co.", "Aero Fighters (Taiwan / Japan, set 1)", MACHINE_SUPPORTS_SAVE ) // probably intended for Taiwan because the Japanese name is Sonic Wings (below)
+GAME( 1992, aerofgtc, aerofgt,  aerofgtb, aerofgtb, aerofgt_state, 0,          ROT270, "Video System Co.", "Aero Fighters (Taiwan / Japan, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, sonicwi,  aerofgt,  aerofgtb, aerofgtb, aerofgt_state, 0,          ROT270, "Video System Co.", "Sonic Wings (Japan)",                   MACHINE_SUPPORTS_SAVE )
 GAME( 1992, aerfboot, aerofgt,  aerfboot, aerofgtb, aerofgt_state, banked_oki, ROT270, "bootleg",          "Aero Fighters (bootleg set 1)",         MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND )
 GAME( 1992, aerfboo2, aerofgt,  aerfboo2, aerofgtb, aerofgt_state, 0,          ROT270, "bootleg",          "Aero Fighters (bootleg set 2)",         MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND )

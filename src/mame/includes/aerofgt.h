@@ -67,6 +67,7 @@ public:
 	uint16_t    m_bg1scrolly;
 	uint16_t    m_bg2scrollx;
 	uint16_t    m_bg2scrolly;
+	bool        m_flip_screen;
 	uint16_t    m_wbbc97_bitmap_enable;
 	int       m_charpalettebank;
 	int       m_spritepalettebank;
@@ -87,6 +88,7 @@ public:
 	DECLARE_WRITE8_MEMBER(pending_command_clear_w);
 	DECLARE_WRITE8_MEMBER(aerofgt_unknown_output_w);
 	DECLARE_WRITE8_MEMBER(aerofgt_sh_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(spinlbrk_sh_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(aerfboot_okim6295_banking_w);
 	DECLARE_WRITE16_MEMBER(aerofgt_bg1videoram_w);
 	DECLARE_WRITE16_MEMBER(aerofgt_bg2videoram_w);
@@ -102,6 +104,8 @@ public:
 	DECLARE_WRITE16_MEMBER(aerofgt_bg2scrollx_w);
 	DECLARE_WRITE16_MEMBER(aerofgt_bg2scrolly_w);
 	DECLARE_WRITE8_MEMBER(pspikes_palette_bank_w);
+	DECLARE_WRITE8_MEMBER(spinlbrk_flip_screen_w);
+	DECLARE_WRITE8_MEMBER(turbofrc_flip_screen_w);
 	DECLARE_WRITE16_MEMBER(wbbc97_bitmap_enable_w);
 	DECLARE_WRITE16_MEMBER(pspikesb_oki_banking_w);
 	DECLARE_WRITE16_MEMBER(aerfboo2_okim6295_banking_w);
@@ -114,6 +118,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
 	DECLARE_MACHINE_START(aerofgt);
+	DECLARE_MACHINE_START(spinlbrk);
 	DECLARE_MACHINE_RESET(aerofgt);
 	DECLARE_VIDEO_START(pspikes);
 	DECLARE_MACHINE_START(common);
