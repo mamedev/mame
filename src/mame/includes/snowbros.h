@@ -36,7 +36,8 @@ public:
 	int m_sb3_music;
 	uint8_t m_semicom_prot_offset;
 
-	DECLARE_WRITE16_MEMBER(snowbros_flipscreen_w);
+	DECLARE_WRITE8_MEMBER(snowbros_flipscreen_w);
+	DECLARE_WRITE8_MEMBER(bootleg_flipscreen_w);
 	DECLARE_WRITE16_MEMBER(snowbros_irq4_ack_w);
 	DECLARE_WRITE16_MEMBER(snowbros_irq3_ack_w);
 	DECLARE_WRITE16_MEMBER(snowbros_irq2_ack_w);

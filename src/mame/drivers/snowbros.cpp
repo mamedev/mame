@@ -88,10 +88,15 @@ a joystick.  This is not an emulation bug.
 #include "speaker.h"
 
 
-WRITE16_MEMBER(snowbros_state::snowbros_flipscreen_w)
+WRITE8_MEMBER(snowbros_state::snowbros_flipscreen_w)
 {
-	if (ACCESSING_BITS_8_15)
-		flip_screen_set(~data & 0x8000);
+	m_pandora->flip_screen_set(!BIT(data, 7));
+}
+
+
+WRITE8_MEMBER(snowbros_state::bootleg_flipscreen_w)
+{
+	flip_screen_set(~data & 0x80);
 }
 
 
@@ -214,7 +219,7 @@ static ADDRESS_MAP_START( snowbros_map, AS_PROGRAM, 16, snowbros_state )
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
 	AM_RANGE(0x200000, 0x200001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0x300000, 0x300001) AM_READWRITE(snowbros_68000_sound_r,snowbros_68000_sound_w)
-	AM_RANGE(0x400000, 0x400001) AM_WRITE(snowbros_flipscreen_w)
+	AM_RANGE(0x400000, 0x400001) AM_WRITE8(snowbros_flipscreen_w, 0xff00)
 	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x500004, 0x500005) AM_READ_PORT("SYSTEM")
@@ -296,7 +301,7 @@ static ADDRESS_MAP_START( wintbob_map, AS_PROGRAM, 16, snowbros_state )
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
 	AM_RANGE(0x200000, 0x200001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0x300000, 0x300001) AM_READWRITE(snowbros_68000_sound_r,snowbros_68000_sound_w)
-	AM_RANGE(0x400000, 0x400001) AM_WRITE(snowbros_flipscreen_w)
+	AM_RANGE(0x400000, 0x400001) AM_WRITE8(bootleg_flipscreen_w, 0xff00)
 	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x500004, 0x500005) AM_READ_PORT("SYSTEM")
@@ -353,7 +358,7 @@ static ADDRESS_MAP_START( twinadv_map, AS_PROGRAM, 16, snowbros_state )
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x200000, 0x200001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0x300000, 0x300001) AM_READWRITE(snowbros_68000_sound_r,twinadv_68000_sound_w)
-	AM_RANGE(0x400000, 0x400001) AM_WRITE(snowbros_flipscreen_w)
+	AM_RANGE(0x400000, 0x400001) AM_WRITE8(bootleg_flipscreen_w, 0xff00)
 
 	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("DSW2")
@@ -530,7 +535,7 @@ static ADDRESS_MAP_START( snowbros3_map, AS_PROGRAM, 16, snowbros_state )
 	AM_RANGE( 0x200000, 0x200001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE( 0x300000, 0x300001) AM_READ(sb3_sound_r) // ?
 	AM_RANGE( 0x300000, 0x300001) AM_WRITE(sb3_sound_w)  // ?
-	AM_RANGE( 0x400000, 0x400001) AM_WRITE(snowbros_flipscreen_w)
+	AM_RANGE( 0x400000, 0x400001) AM_WRITE8(bootleg_flipscreen_w, 0xff00)
 	AM_RANGE( 0x500000, 0x500001) AM_READ_PORT("DSW1")
 	AM_RANGE( 0x500002, 0x500003) AM_READ_PORT("DSW2")
 	AM_RANGE( 0x500004, 0x500005) AM_READ_PORT("SYSTEM")
