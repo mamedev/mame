@@ -26,6 +26,9 @@
 
 ***************************************************************************/
 
+// use under construction modern PCI SiS 85c496/497 chipset
+//#define REAL_PCI_CHIPSET
+
 #include "emu.h"
 #include "bus/isa/isa_cards.h"
 #include "cpu/i386/i386.h"
@@ -39,8 +42,10 @@
 #include "machine/bankdev.h"
 #include "machine/intelfsh.h"
 #include "machine/ds128x.h"
-#include "machine/ds2401.h"
 #include "machine/ds1205.h"
+#ifdef REAL_PCI_CHIPSET
+#include "machine/sis85c496.h"
+#endif
 #include "sound/ad1848.h"
 #include "speaker.h"
 
@@ -50,17 +55,19 @@ public:
 	mtxl_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+#ifndef REAL_PCI_CHIPSET
 		m_mb(*this, "mb"),
+#endif
 		m_ram(*this, RAM_TAG),
 		m_iocard(*this, "dbank"),
-		//m_ibutton(*this, "ibutton"),
 		m_multikey(*this, "multikey")
-	{ }
+		{ }
 	required_device<cpu_device> m_maincpu;
+#ifndef REAL_PCI_CHIPSET
 	required_device<at_mb_device> m_mb;
+#endif
 	required_device<ram_device> m_ram;
 	required_device<address_map_bank_device> m_iocard;
-	//optional_device<ds2401_device> m_ibutton;
 	optional_device<ds1205_device> m_multikey;
 	void machine_start() override;
 	void machine_reset() override;
@@ -94,15 +101,18 @@ WRITE8_MEMBER(mtxl_state::key_w)
 
 static ADDRESS_MAP_START( at32_map, AS_PROGRAM, 32, mtxl_state )
 	ADDRESS_MAP_UNMAP_HIGH
+	#ifndef REAL_PCI_CHIPSET
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAMBANK("bank10")
 	AM_RANGE(0x000c8000, 0x000cffff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x000d0000, 0x000dffff) AM_DEVICE("dbank", address_map_bank_device, amap32)
 	AM_RANGE(0x000e0000, 0x000fffff) AM_ROM AM_REGION("bios", 0)
 	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)
+	#endif
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( at32_io, AS_IO, 32, mtxl_state )
 	ADDRESS_MAP_UNMAP_HIGH
+	#ifndef REAL_PCI_CHIPSET
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("mb:dma8237_1", am9517a_device, read, write, 0xffffffff)
 	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("mb:pic8259_master", pic8259_device, read, write, 0xffffffff)
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8("mb:pit8254", pit8254_device, read, write, 0xffffffff)
@@ -113,11 +123,14 @@ static ADDRESS_MAP_START( at32_io, AS_IO, 32, mtxl_state )
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("mb:pic8259_slave", pic8259_device, read, write, 0xffffffff)
 	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE8("mb:dma8237_2", am9517a_device, read, write, 0x00ff00ff)
 	AM_RANGE(0x0224, 0x0227) AM_DEVREADWRITE8("cs4231", ad1848_device, read, write, 0xffffffff)
+	#endif
 	AM_RANGE(0x0228, 0x022b) AM_READ_PORT("Unknown")
 	AM_RANGE(0x022c, 0x022f) AM_WRITE8(bank_w, 0xff000000)
 	AM_RANGE(0x022c, 0x022f) AM_READWRITE8(key_r, key_w, 0x0000ff00)
 	AM_RANGE(0x022c, 0x022f) AM_READ8(coin_r, 0x000000ff)
+	#ifndef REAL_PCI_CHIPSET
 	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8("ns16550", ns16550_device, ins8250_r, ins8250_w, 0xffffffff)
+	#endif
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dbank_map, AS_PROGRAM, 32, mtxl_state )
@@ -146,6 +159,7 @@ INPUT_PORTS_END
 
 void mtxl_state::machine_start()
 {
+#ifndef REAL_PCI_CHIPSET
 	address_space& space = m_maincpu->space(AS_PROGRAM);
 
 	/* MESS managed RAM */
@@ -158,6 +172,7 @@ void mtxl_state::machine_start()
 		space.install_write_bank(0x100000,  ram_limit - 1, "bank1");
 		membank("bank1")->set_base(m_ram->pointer() + 0xa0000);
 	}
+#endif
 }
 
 void mtxl_state::machine_reset()
@@ -165,6 +180,7 @@ void mtxl_state::machine_reset()
 	m_iocard->set_bank(0);
 }
 
+#ifndef REAL_PCI_CHIPSET
 static SLOT_INTERFACE_START(mt6k_ata_devices)
 	SLOT_INTERFACE("cdrom", ATAPI_FIXED_CDROM)
 SLOT_INTERFACE_END
@@ -176,11 +192,13 @@ static MACHINE_CONFIG_START(cdrom)
 	MCFG_SLOT_DEFAULT_OPTION("")
 	MCFG_SLOT_FIXED(true)
 MACHINE_CONFIG_END
+#endif
 
 static MACHINE_CONFIG_START( at486 )
 	MCFG_CPU_ADD("maincpu", I486DX4, 33000000)
 	MCFG_CPU_PROGRAM_MAP(at32_map)
 	MCFG_CPU_IO_MAP(at32_io)
+#ifndef REAL_PCI_CHIPSET
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259_master", pic8259_device, inta_cb)
 
 	MCFG_DEVICE_ADD("mb", AT_MB, 0)
@@ -215,7 +233,7 @@ static MACHINE_CONFIG_START( at486 )
 	MCFG_DS12885_ADD("mb:rtc")
 	MCFG_MC146818_IRQ_HANDLER(DEVWRITELINE("pic8259_slave", pic8259_device, ir0_w))
 	MCFG_MC146818_CENTURY_INDEX(0x32)
-
+#endif
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("32M")    // Early XL games had 8 MB RAM, 6000 and later require 32MB
@@ -232,13 +250,25 @@ static MACHINE_CONFIG_START( at486 )
 
 	/* Security key */
 	MCFG_DS1205_ADD("multikey")
+	
+#ifdef REAL_PCI_CHIPSET
+	/* PCI root */
+	MCFG_PCI_ROOT_ADD( ":pci")
+	MCFG_SIS85C496_ADD(":pci:05.0", ":maincpu", 32*1024*1024)
+#endif
 MACHINE_CONFIG_END
 
+#ifdef REAL_PCI_CHIPSET
+#define MOTHERBOARD_ROMS \
+	ROM_REGION(0x20000, ":pci:05.0", 0) \
+	ROM_LOAD( "094572516 bios - 486.bin", 0x000000, 0x020000, CRC(1c0b3ba0) SHA1(ff86dd6e476405e716ac7a4de4a216d2d2b49f15))
+#else
 #define MOTHERBOARD_ROMS \
 	ROM_REGION(0x20000, "bios", 0) \
 	ROM_LOAD("prom.mb", 0x10000, 0x10000, BAD_DUMP CRC(e44bfd3c) SHA1(c07ec94e11efa30e001f39560010112f73cc0016) ) \
 	ROM_REGION(0x80, "mb:rtc", 0) \
 	ROM_LOAD("mb_rtc", 0, 0x80, BAD_DUMP CRC(b724e5d3) SHA1(45a19ec4201d2933d033689b7a01a0260962fb0b))
+#endif
 
 ROM_START( mtouchxl )
 	MOTHERBOARD_ROMS
@@ -369,7 +399,7 @@ ROM_END
 
 ***************************************************************************/
 
-//     YEAR  NAME        PARENT     COMPAT  MACHINE  INPUT         STATE        INIT  COMPANY              FULLNAME                                 FLAGS
+/*     YEAR  NAME      PARENT   COMPAT   MACHINE      INPUT           DEVICE              INIT    COMPANY              FULLNAME */
 // Any indicates this is from a CD-R at a trade show that was claimed to be a prototype, but R1 is several versions in?
 COMP ( 1997, mtouchxl,   0,         0,      at486,   mtouchxl,     mtxl_state,  0,    "Merit Industries",  "MegaTouch XL (Version R1, prototype?)", 0 )
 COMP ( 1998, mtchxl5k,   0,         0,      at486,   mtouchxl,     mtxl_state,  0,    "Merit Industries",  "MegaTouch XL Super 5000 (Version R5I)", MACHINE_NOT_WORKING )

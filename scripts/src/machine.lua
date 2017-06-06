@@ -2008,6 +2008,8 @@ if (MACHINES["PCI"]~=null) then
 		MAME_DIR .. "src/devices/machine/vrc5074.h",
 		MAME_DIR .. "src/devices/machine/gt64xxx.cpp",
 		MAME_DIR .. "src/devices/machine/gt64xxx.h",
+		MAME_DIR .. "src/devices/machine/sis85c496.cpp",
+		MAME_DIR .. "src/devices/machine/sis85c496.h",
 	}
 end
 
