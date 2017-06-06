@@ -11779,8 +11779,8 @@ ROM_START( victoryc )
 	// ROM_LOAD( "5.5",    0x2000, 0x0800, NO_DUMP ) // wasn't populated, not used?
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
-	ROM_LOAD( "A4.1H",       0x0000, 0x0800, CRC(cd35a7e2) SHA1(deeb853f924dd964a254bcdb6924cd2fd71aabdc) )
-	ROM_LOAD( "DF.1K",       0x0800, 0x0800, CRC(15e98c93) SHA1(af273ec2df93b78b439d4aff649eb4b6c6d05ee3) )
+	ROM_LOAD( "DF.1K",       0x0000, 0x0800, CRC(15e98c93) SHA1(af273ec2df93b78b439d4aff649eb4b6c6d05ee3) )
+	ROM_LOAD( "A4.1H",       0x0800, 0x0800, CRC(cd35a7e2) SHA1(deeb853f924dd964a254bcdb6924cd2fd71aabdc) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "PROM.6L",       0x0000, 0x0020, CRC(25329e5a) SHA1(aff60d02aa4d1d5f16e2d32155c315deee8b4089) )
@@ -11797,8 +11797,8 @@ ROM_START( victorycb )
 	ROM_LOAD( "v5.bin",    0x2000, 0x0800, BAD_DUMP CRC(f60be3be) SHA1(ef45bec22db10c485ae2ddf5723c5cf241edb823) ) // bad? unused? there was no rom here on the original tho
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
-	ROM_LOAD( "v7.bin",       0x0000, 0x0800, CRC(cd35a7e2) SHA1(deeb853f924dd964a254bcdb6924cd2fd71aabdc) )
-	ROM_LOAD( "v6.bin",       0x0800, 0x0800, CRC(15e98c93) SHA1(af273ec2df93b78b439d4aff649eb4b6c6d05ee3) )
+	ROM_LOAD( "v6.bin",       0x0000, 0x0800, CRC(15e98c93) SHA1(af273ec2df93b78b439d4aff649eb4b6c6d05ee3) )
+	ROM_LOAD( "v7.bin",       0x0800, 0x0800, CRC(cd35a7e2) SHA1(deeb853f924dd964a254bcdb6924cd2fd71aabdc) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "PROM.6L",       0x0000, 0x0020, CRC(25329e5a) SHA1(aff60d02aa4d1d5f16e2d32155c315deee8b4089) )
