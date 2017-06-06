@@ -114,8 +114,10 @@ private:
 	uint32_t fdd_dest_address; // 5FF080B0
 	uint32_t fdd_cmd_complete;
 	uint32_t smioc_out_addr;
+	uint32_t smioc_in_addr;
 	uint32_t smioc_dma_bank;
-	uint32_t smioc_dma_length;
+	uint32_t smioc_dma_w_length;
+	uint32_t smioc_dma_r_length;
 	uint32_t fdd_dma_bank;
 	attotime timer_32khz_last;
 	uint8_t m_term_data;
@@ -184,7 +186,7 @@ DRIVER_INIT_MEMBER(r9751_state,r9751)
 	fdd_dma_bank = 0;
 	smioc_out_addr = 0;
 	smioc_dma_bank = 0;
-	smioc_dma_length = 0;
+	smioc_dma_w_length = 0;
 
 	m_mem = &m_maincpu->space(AS_PROGRAM);
 
@@ -250,7 +252,7 @@ READ32_MEMBER( r9751_state::r9751_mmio_5ff_r )
 			if(TRACE_FDC && data != 0) logerror("--- SCSI FDD command completion status - Read: %08X, From: %08X, Register: %08X\n", data, space.machine().firstcpu->pc(), offset << 2 | 0x5FF00000);
 			return data;
 		default:
-			if(TRACE_FDC || TRACE_HDC || TRACE_SMIOC) logerror("Instruction: %08x READ MMIO(%08x): %08x & %08x\n", space.machine().firstcpu->pc(), offset << 2 | 0x5FF00000, 0, mem_mask);
+			if(TRACE_FDC || TRACE_HDC || TRACE_SMIOC) logerror("Unknown read address: %08X PC: %08X\n", offset << 2 | 0x5FF00000, space.machine().firstcpu->pc());
 			return 0;
 	}
 }
@@ -281,20 +283,25 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_5ff_w )
 		case 0xC024: /* HDD SCSI read command */
 			if(TRACE_HDC) logerror("@@@ HDD Command: %08X, From: %08X, Register: %08X\n", data, space.machine().firstcpu->pc(), offset << 2 | 0x5FF00000);
 			break;
-		/* SMIOC region (0x98, device 26) */
+		/* SMIOC region (0x98, device 26) - Output */
 		case 0x0298:
 			m_serial_status = data;
+			if(TRACE_SMIOC) logerror("Serial status: %08X PC: %08X\n", data, space.machine().firstcpu->pc());
 			break;
 		case 0x4098: /* Serial DMA Command */
 			m_serial_status = 0x40;
 			switch(data)
 			{
 				case 0x4100: /* Send byte to serial */
-					for(int i = 0; i < smioc_dma_length; i++)
+					for(int i = 0; i < smioc_dma_w_length; i++)
 					{
 						if(TRACE_SMIOC) logerror("Serial byte: %02X PC: %08X\n", m_mem->read_dword(smioc_out_addr+i*2), space.machine().firstcpu->pc());
 						m_terminal->write(space,0,m_mem->read_dword(smioc_out_addr+i*2));
 					}
+					break;
+				case 0x4200: /* Write XON into serial DMA input register (0x5FF0809C) memory location */
+					m_maincpu->space(AS_PROGRAM).write_byte(smioc_in_addr,0x11);
+					if(TRACE_SMIOC) logerror("Serial DMA command 0x4200 (XON) PC: %08X\n", space.machine().firstcpu->pc());
 					break;
 				default:
 					if(TRACE_SMIOC) logerror("Unknown serial DMA command: %X\n", data);
@@ -305,11 +312,20 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_5ff_w )
 			smioc_out_addr = (smioc_dma_bank & 0x7FFFF800) | ((data&0x3FF)<<1);
 			if(TRACE_SMIOC) logerror("Serial output address: %08X PC: %08X\n", smioc_out_addr, space.machine().firstcpu->pc());
 			break;
-		/* SMIOC region (0x9C, device 27) */
-		case 0x409C: /* Serial DMA length */
-			smioc_dma_length = (~data+1) & 0xFFFF;
-			if(TRACE_SMIOC) logerror("Serial DMA length: %08X PC: %08X\n", smioc_dma_length, space.machine().firstcpu->pc());
-			if(smioc_dma_length > 0x400) smioc_dma_length = 0x400;
+		/* SMIOC region (0x9C, device 27) - Input */
+		case 0x409C: /* Serial DMA write length */
+			smioc_dma_w_length = (~data+1) & 0xFFFF;
+			if(TRACE_SMIOC) logerror("Serial DMA write length: %08X PC: %08X\n", smioc_dma_w_length, space.machine().firstcpu->pc());
+			if(smioc_dma_w_length > 0x400) smioc_dma_w_length = 0x400;
+			break;
+		case 0x809C: /* Serial DMA input address */
+			smioc_in_addr = (smioc_dma_bank & 0x7FFFF800) | ((data&0x3FF)<<1);
+			if(TRACE_SMIOC) logerror("Serial input address: %08X PC: %08X\n", smioc_out_addr, space.machine().firstcpu->pc());
+			break;
+		case 0xC09C: /* Serial DMA read length */
+			smioc_dma_r_length = (~data+1) & 0xFFFF;
+			if(TRACE_SMIOC) logerror("Serial DMA read length: %08X PC: %08X\n", smioc_dma_r_length, space.machine().firstcpu->pc());
+			if(smioc_dma_r_length > 0x400) smioc_dma_r_length = 0x400;
 			break;
 		/* PDC FDD region (0xB0, device 44 */
 		case 0x01B0: /* FDD SCSI read command */
@@ -387,7 +403,7 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_5ff_w )
 			break;
 
 		default:
-			if(TRACE_FDC || TRACE_HDC || TRACE_SMIOC) logerror("Instruction: %08x WRITE MMIO(%08x): %08x & %08x (A6+4): %08X\n", space.machine().firstcpu->pc(), offset << 2 | 0x5FF00000, data, mem_mask, debug_a6());
+			if(TRACE_FDC || TRACE_HDC || TRACE_SMIOC) logerror("Unknown write address: %08X Data: %08X PC: %08X\n", offset << 2 | 0x5FF00000, data, space.machine().firstcpu->pc());
 	}
 }
 
