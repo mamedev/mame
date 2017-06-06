@@ -11786,13 +11786,15 @@ ROM_START( victoryc )
 	ROM_LOAD( "PROM.6L",       0x0000, 0x0020, CRC(25329e5a) SHA1(aff60d02aa4d1d5f16e2d32155c315deee8b4089) )
 ROM_END
 
+/* Despite having an extra rom, which appears bad, it looks like the code here is simply a decrypted version of the above.
+   The game doesn't run the same as the parent due to what looks like bitrot.  */
 ROM_START( victorycb )
 	ROM_REGION( 0x4000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "v1.bin",    0x0000, 0x0800, CRC(de985696) SHA1(20f5cb7b9efd9f1a2896eb65fe5c54e0ffb1f61f) )
 	ROM_LOAD( "v2.bin",    0x0800, 0x0800, CRC(59042c1e) SHA1(94498ca14f66c8f5ae9a08b0d7c057f033ccfb3b) )
-	ROM_LOAD( "v3.bin",    0x1000, 0x0800, CRC(7d97ba95) SHA1(e8eded12e746555d4e054962987f34d9472e4357) )
-	ROM_LOAD( "v4.bin",    0x1800, 0x0800, CRC(5d6ecd2b) SHA1(b9ae9414410eb83875707265e866375b9316f79c) )
-	ROM_LOAD( "v5.bin",    0x2000, 0x0800, BAD_DUMP CRC(f60be3be) SHA1(ef45bec22db10c485ae2ddf5723c5cf241edb823) ) // bad? needed by bootleg
+	ROM_LOAD( "v3.bin",    0x1000, 0x0800, BAD_DUMP CRC(7d97ba95) SHA1(e8eded12e746555d4e054962987f34d9472e4357) ) // 1552 - bit 0 bitrot (1->0)?
+	ROM_LOAD( "v4.bin",    0x1800, 0x0800, BAD_DUMP CRC(5d6ecd2b) SHA1(b9ae9414410eb83875707265e866375b9316f79c) ) // 1dd4, 1e7b, 1f1c - bit 7 bitrot (1->0)?
+	ROM_LOAD( "v5.bin",    0x2000, 0x0800, BAD_DUMP CRC(f60be3be) SHA1(ef45bec22db10c485ae2ddf5723c5cf241edb823) ) // bad? unused? there was no rom here on the original tho
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
 	ROM_LOAD( "v7.bin",       0x0000, 0x0800, CRC(cd35a7e2) SHA1(deeb853f924dd964a254bcdb6924cd2fd71aabdc) )
