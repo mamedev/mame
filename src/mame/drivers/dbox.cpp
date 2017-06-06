@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Joakim Larsson Edstrom
 /*
  * The Dbox-1 CPU board.
  *__________________________________________________________________________________________________________
