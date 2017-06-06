@@ -128,6 +128,7 @@
 #include "bus/x68k/x68k_scsiext.h"
 #include "bus/scsi/scsi.h"
 #include "bus/scsi/scsihd.h"
+#include "bus/scsi/scsicd.h"
 
 #include "softlist.h"
 #include "speaker.h"
@@ -1751,7 +1752,7 @@ static MACHINE_CONFIG_DERIVED( x68ksupr, x68000 )
 	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE4, "harddisk", SCSIHD, SCSI_ID_3)
 	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE5, "harddisk", SCSIHD, SCSI_ID_4)
 	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE6, "harddisk", SCSIHD, SCSI_ID_5)
-	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE7, "harddisk", SCSIHD, SCSI_ID_6)
+	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE7, "cdrom", SCSICD, SCSI_ID_6)
 
 	MCFG_DEVICE_ADD("mb89352", MB89352A, 0)
 	MCFG_LEGACY_SCSI_PORT("scsi")
