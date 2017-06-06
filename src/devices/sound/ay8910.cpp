@@ -346,6 +346,40 @@ ANALOG CHANNEL A <-  |_|5   \-/ |   A   24|_|  <> DA4
                        |__________________|
 
 
+AY-3-8913:
+                        _______    _______
+                      _|       \__/       |_
+   [1] VSS (GND) --  |_|1  *            24|_|  <- /CHIP SELECT [2]
+                      _|                  |_
+            BDIR ->  |_|2               23|_|  <- A8
+                      _|                  |_
+             BC1 ->  |_|3               22|_|  <- /A9
+                      _|    /---\         |_
+             DA7 <>  |_|4   \-/ |   A   21|_|  <- /RESET
+                      _|    .   .   Y     |_
+             DA6 <>  |_|5   |---|   -   20|_|  == CLOCK
+                      _|    '   '   3     |_
+             DA5 <>  |_|6    T 8    -   19|_|  -- VSS (GND) [1]
+                      _|     A 3    8     |_
+             DA5 <>  |_|7    I 3    9   18|_|  -> ANALOG CHANNEL C
+                      _|     W 2    1     |_
+             DA5 <>  |_|8    A      3   17|_|  -> ANALOG CHANNEL A
+                      _|     N C          |_
+             DA5 <>  |_|9      -        16|_|  NC?
+                      _|       A          |_
+             DA5 <>  |_|10              15|_|  -> ANALOG CHANNEL B
+                      _|                  |_
+             DA5 <>  |_|11              14|_|  ?? TEST IN [3]
+                      _|                  |_
+    [4] TEST OUT ??  |_|12              13|_|  -- VCC (+5V)
+                       |__________________|
+
+[1] Both of these are ground, they are probably connected together internally. Grounding either one should work.
+[2] This is effectively another enable, much like TEST 2 is on the AY-3-8910 and 8914, but active low
+[3] This is claimed to be equivalent to TEST 1 on the datasheet
+[4] This is claimed to be equivalent to TEST 2 on the datasheet
+
+
 AY-3-8910/A: 2 I/O ports
   A7 thru A4 enable state for selecting a register can be changed with a
     factory mask adjustment but default was 0000 for the "common" part shipped
