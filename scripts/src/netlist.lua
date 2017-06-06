@@ -30,6 +30,11 @@ project "netlist"
 		"__STDC_CONSTANT_MACROS",
 	}
 
+	configuration { "linux-gcc" }
+		buildoptions {
+			"-Wno-maybe-uninitialized",
+		}
+
 	includedirs {
 		MAME_DIR .. "src/lib",
 	}
