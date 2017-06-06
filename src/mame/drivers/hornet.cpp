@@ -1591,7 +1591,7 @@ ROM_END
 
 /*************************************************************************/
 
-GAME(  1998, gradius4,  0,        hornet,           hornet,  hornet_state, gradius4,      ROT0, "Konami", "Gradius IV: Fukkatsu", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, gradius4,  0,        hornet,           hornet,  hornet_state, gradius4,      ROT0, "Konami", "Gradius IV: Fukkatsu (ver JAC)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME(  1998, nbapbp,    0,        hornet,           hornet,  hornet_state, nbapbp,        ROT0, "Konami", "NBA Play By Play (ver JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME(  1998, nbapbpa,   nbapbp,   hornet,           hornet,  hornet_state, nbapbp,        ROT0, "Konami", "NBA Play By Play (ver AAB)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME(  1998, terabrst,  0,        terabrst,         hornet,  hornet_state, terabrst,      ROT0, "Konami", "Teraburst (1998/07/17 ver UEL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
@@ -1605,4 +1605,4 @@ GAMEL( 2000, sscopec,   sscope,   hornet_2board,    sscope,  hornet_state, horne
 GAMEL( 2000, sscopeb,   sscope,   hornet_2board,    sscope,  hornet_state, hornet_2board, ROT0, "Konami", "Silent Scope (ver xxB, Ver 1.20)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_dualhsxs )
 GAMEL( 2000, sscopea,   sscope,   hornet_2board,    sscope,  hornet_state, hornet_2board, ROT0, "Konami", "Silent Scope (ver xxA, Ver 1.00)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_dualhsxs )
 
-GAMEL( 2000, sscope2,   0,        sscope2,          sscope2, hornet_state, hornet_2board, ROT0, "Konami", "Silent Scope 2", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_dualhsxs )
+GAMEL( 2000, sscope2,   0,        sscope2,          sscope2, hornet_state, hornet_2board, ROT0, "Konami", "Silent Scope 2 : Dark Silhouette (ver UAD)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_dualhsxs )
