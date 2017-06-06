@@ -43,6 +43,7 @@
 #define MAPPER_TAG      "mapper"
 #define MAINBOARD8_TAG  "mainboard8"
 #define SPEECHSYN_TAG     "speech"
+#define TI_HEXBUS_TAG   "hexbus"
 
 #define ROM0_REG        "rom0_region"
 #define ROM1_REG        "rom1_region"

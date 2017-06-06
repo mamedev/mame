@@ -2232,8 +2232,12 @@ enum
 	SHSK = 0x01
 };
 
-oso_device::oso_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TI99_OSO, tag, owner, clock), m_data(0), m_status(0), m_control(0), m_xmit(0)
+oso_device::oso_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	bus::ti99::hexbus::hexbus_attached_device(mconfig, TI99_OSO, tag, owner, clock),
+	m_data(0),
+	m_status(0),
+	m_control(0),
+	m_xmit(0)
 {
 }
 
@@ -2296,6 +2300,10 @@ void oso_device::device_start()
 {
 	logerror("Starting\n");
 	m_status = m_xmit = m_control = m_data = 0;
+
+	m_hexbus = downcast<bus::ti99::hexbus::hexbus_device*>(machine().device(TI_HEXBUS_TAG));
+	m_hexbus->connect_master(this);
+
 	save_item(NAME(m_data));
 	save_item(NAME(m_status));
 	save_item(NAME(m_control));

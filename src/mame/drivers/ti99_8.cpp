@@ -183,6 +183,7 @@ Known Issues (MZ, 2010-11-07)
 
 #include "bus/ti99/internal/998board.h"
 #include "bus/ti99/gromport/gromport.h"
+#include "bus/ti99/hexbus/hexbus.h"
 
 #include "bus/ti99/joyport/joyport.h"
 #include "bus/ti99/internal/ioport.h"
@@ -762,6 +763,9 @@ static MACHINE_CONFIG_START( ti99_8 )
 	MCFG_IOPORT_ADD( TI99_IOPORT_TAG )
 	MCFG_IOPORT_EXTINT_HANDLER( WRITELINE(ti99_8_state, extint) )
 	MCFG_IOPORT_READY_HANDLER( DEVWRITELINE(MAINBOARD8_TAG, bus::ti99::internal::mainboard8_device, pbox_ready) )
+
+	// Hexbus
+	MCFG_HEXBUS_ADD( TI_HEXBUS_TAG )
 
 	// Sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("sound_out")
