@@ -340,7 +340,7 @@ void sothello_state::machine_reset()
 {
 }
 
-static MACHINE_CONFIG_START( sothello, sothello_state )
+static MACHINE_CONFIG_START( sothello )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, MAINCPU_CLOCK)
@@ -379,7 +379,7 @@ static MACHINE_CONFIG_START( sothello, sothello_state )
 
 	MCFG_SOUND_ADD("msm", MSM5205, MSM_CLOCK)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(sothello_state, adpcm_int))      /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)  /* changed on the fly */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)  /* changed on the fly */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -403,4 +403,4 @@ ROM_START( sothello )
 	ROM_LOAD( "6.7f",   0x8000, 0x8000, CRC(ee80fc78) SHA1(9a9d7925847d7a36930f0761c70f67a9affc5e7c) )
 ROM_END
 
-GAME( 1986, sothello,  0,       sothello,  sothello, driver_device,  0, ROT0, "Success / Fujiwara", "Super Othello", 0 )
+GAME( 1986, sothello,  0,       sothello,  sothello, sothello_state,  0, ROT0, "Success / Fujiwara", "Super Othello", 0 )

@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_CBMIEC_C1626_H
+#define MAME_BUS_CBMIEC_C1626_H
 
-#ifndef __C1526__
-#define __C1526__
+#pragma once
 
 #include "cbmiec.h"
 #include "bus/ieee488/ieee488.h"
@@ -21,29 +21,27 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> c1526_base_t
+// ======================> c1526_device_base
 
-class c1526_base_t :  public device_t
+class c1526_device_base : public device_t
 {
-public:
-	// construction/destruction
-	c1526_base_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
-
 protected:
+	// construction/destruction
+	c1526_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 };
 
 
-// ======================> c1526_t
+// ======================> c1526_device
 
-class c1526_t :  public c1526_base_t,
-					public device_cbm_iec_interface
+class c1526_device : public c1526_device_base, public device_cbm_iec_interface
 {
 public:
 	// construction/destruction
-	c1526_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	c1526_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -58,14 +56,13 @@ protected:
 };
 
 
-// ======================> c4023_t
+// ======================> c4023_device
 
-class c4023_t :  public c1526_base_t,
-					public device_ieee488_interface
+class c4023_device : public c1526_device_base, public device_ieee488_interface
 {
 public:
 	// construction/destruction
-	c4023_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	c4023_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -80,10 +77,9 @@ protected:
 
 
 // device type definition
-extern const device_type C1526;
+DECLARE_DEVICE_TYPE(C1526, c1526_device)
+DECLARE_DEVICE_TYPE(C4023, c4023_device)
 extern const device_type MPS802;
-extern const device_type C4023;
 
 
-
-#endif
+#endif // MAME_BUS_CBMIEC_C1626_H

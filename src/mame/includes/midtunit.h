@@ -92,6 +92,8 @@ public:
 	void init_tunit_generic(int sound);
 	void init_nbajam_common(int te_protection);
 
+	emu_timer *m_dma_timer;
+
 	/* CMOS-related variables */
 	uint8_t    m_cmos_write_enable;
 

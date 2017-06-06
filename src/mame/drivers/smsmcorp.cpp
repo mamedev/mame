@@ -533,7 +533,7 @@ void smsmfg_state::machine_reset()
 	m_communication_port_status = 0;
 }
 
-static MACHINE_CONFIG_START( sms, smsmfg_state )
+static MACHINE_CONFIG_START( sms )
 	MCFG_CPU_ADD("maincpu", I8088, XTAL_24MHz/8)
 	MCFG_CPU_PROGRAM_MAP(sms_map)
 
@@ -909,7 +909,7 @@ ROM_START( secondch )
 	ROM_RELOAD(           0x1000, 0x1000 )
 ROM_END
 
-GAME( 1984, trvhang,  0, sms,      sms, driver_device, 0, ROT0, "SMS Manufacturing Corp.", "Trivia Hangup (question set 1)", MACHINE_SUPPORTS_SAVE ) /* Version Trivia-1-050185 */
-GAME( 1984, trvhanga, 0, sms,      sms, driver_device, 0, ROT0, "SMS Manufacturing Corp.", "Trivia Hangup (question set 2)", MACHINE_NOT_WORKING ) /* Version Trivia-2-011586 */
-GAME( 1985, sureshot, 0, sureshot, sms, driver_device, 0, ROT0, "SMS Manufacturing Corp.", "Sure Shot", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, secondch, 0, sureshot, sms, driver_device, 0, ROT0, "SMS Manufacturing Corp.", "Second Chance", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, trvhang,  0, sms,      sms, smsmfg_state, 0, ROT0, "SMS Manufacturing Corp.", "Trivia Hangup (question set 1)", MACHINE_SUPPORTS_SAVE ) /* Version Trivia-1-050185 */
+GAME( 1984, trvhanga, 0, sms,      sms, smsmfg_state, 0, ROT0, "SMS Manufacturing Corp.", "Trivia Hangup (question set 2)", MACHINE_NOT_WORKING ) /* Version Trivia-2-011586 */
+GAME( 1985, sureshot, 0, sureshot, sms, smsmfg_state, 0, ROT0, "SMS Manufacturing Corp.", "Sure Shot",                      MACHINE_SUPPORTS_SAVE )
+GAME( 1985, secondch, 0, sureshot, sms, smsmfg_state, 0, ROT0, "SMS Manufacturing Corp.", "Second Chance",                  MACHINE_SUPPORTS_SAVE )

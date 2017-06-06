@@ -31,6 +31,9 @@
 *   external hardware. It is expressly forbidden to change register bits, except those defined for the user.
 *
 */
+#include "emu.h"
+#include "fga002.h"
+
 //#define LOG_GENERAL (1U <<  0)
 #define LOG_SETUP   (1U <<  1)
 #define LOG_READ    (1U <<  2)
@@ -41,8 +44,6 @@
 
 //#define VERBOSE (LOG_GENERAL | LOG_SETUP)
 //#define LOG_OUTPUT_FUNC printf
-
-#include "emu.h"
 #include "logmacro.h"
 
 #define LOGSETUP(...) LOGMASKED(LOG_SETUP,   __VA_ARGS__)
@@ -58,13 +59,12 @@
 #define FUNCNAME __PRETTY_FUNCTION__
 #endif
 
-#include "fga002.h"
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 // device type definition
-const device_type FGA002   = device_creator<fga002_device>;
+DEFINE_DEVICE_TYPE(FGA002, fga002_device, "fga002", "Force FGA-002")
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -74,30 +74,22 @@ const device_type FGA002   = device_creator<fga002_device>;
 //  fga002_device - constructor
 //-------------------------------------------------
 
-fga002_device::fga002_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, uint32_t variant, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+fga002_device::fga002_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, m_out_int_cb(*this)
 	, m_liack4_cb(*this)
 	, m_liack5_cb(*this)
 	, m_liack6_cb(*this)
 	, m_liack7_cb(*this)
-	, m_irq_level((uint8_t)0)
+	, m_irq_level(uint8_t(0))
 {
 	for (auto & elem : m_int_state)
 		elem = 0;
 }
 
 fga002_device::fga002_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, FGA002, "FGA-002", tag, owner, clock, "fga002", __FILE__)
-	, m_out_int_cb(*this)
-	, m_liack4_cb(*this)
-	, m_liack5_cb(*this)
-	, m_liack6_cb(*this)
-	, m_liack7_cb(*this)
-	, m_irq_level((uint8_t)0)
+	: fga002_device(mconfig, FGA002, tag, owner, clock)
 {
-	for (auto & elem : m_int_state)
-		elem = 0;
 }
 
 void fga002_device::device_start()
@@ -217,7 +209,7 @@ void fga002_device::device_timer (emu_timer &timer, device_timer_id id, int32_t 
 */
 
 // TODO: Add more intrrupts sources in priority order, 18 in total.
-const fga_irq_t fga002_device::m_irq_sources[] = {
+const fga002_device::fga_irq_t fga002_device::s_irq_sources[] = {
 		{INT_LOCAL0, FGA_ISLOCAL0, FGA_ICRLOCAL0 },
 		{INT_LOCAL1, FGA_ISLOCAL1, FGA_ICRLOCAL1 },
 		{INT_LOCAL2, FGA_ISLOCAL2, FGA_ICRLOCAL2 },
@@ -273,7 +265,7 @@ IRQ_CALLBACK_MEMBER(fga002_device::iack)
 		LOGLVL("\n LEVEL %d\n", level);
 		// Find first interrupt on this level to acknowledge
 		LOGLVL("Vec Status[val] Control[val]\n");
-		for (auto & elem : m_irq_sources)
+		for (auto & elem : s_irq_sources)
 		{
 			LOGLVL(" %02x    %02x[%02x]      %02x[%02x]\n",
 					elem.vector,

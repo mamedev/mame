@@ -15,14 +15,14 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_DELA_EP7X8 = device_creator<c64_dela_ep7x8_cartridge_device>;
+DEFINE_DEVICE_TYPE(C64_DELA_EP7X8, c64_dela_ep7x8_cartridge_device, "c64_dela_ep7x8", "C64 Dela 7x8KB EPROM cartridge")
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( c64_dela_ep7x8 )
+//  MACHINE_CONFIG_START( c64_dela_ep7x8 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( c64_dela_ep7x8 )
+static MACHINE_CONFIG_START( c64_dela_ep7x8 )
 	MCFG_GENERIC_SOCKET_ADD("rom1", generic_linear_slot, nullptr)
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 	MCFG_GENERIC_SOCKET_ADD("rom2", generic_linear_slot, nullptr)
@@ -60,7 +60,7 @@ machine_config_constructor c64_dela_ep7x8_cartridge_device::device_mconfig_addit
 //-------------------------------------------------
 
 c64_dela_ep7x8_cartridge_device::c64_dela_ep7x8_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, C64_DELA_EP7X8, "C64 Dela 7x8KB EPROM cartridge", tag, owner, clock, "ep7x8", __FILE__),
+	device_t(mconfig, C64_DELA_EP7X8, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_eprom1(*this, "rom1"),
 	m_eprom2(*this, "rom2"),

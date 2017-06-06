@@ -83,10 +83,10 @@ AC RETURNS (pins 3,4) - adaptor. A total of 6W may be drawn from these lines as 
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_ELECTRON_EXP_H
+#define MAME_BUS_ELECTRON_EXP_H
 
-#ifndef __ELECTRON_EXPANSION_SLOT__
-#define __ELECTRON_EXPANSION_SLOT__
+#pragma once
 
 
 
@@ -133,11 +133,11 @@ public:
 	virtual ~electron_expansion_slot_device();
 
 	// callbacks
-	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object)
-		{ return downcast<electron_expansion_slot_device &>(device).m_irq_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb)
+	{ return downcast<electron_expansion_slot_device &>(device).m_irq_handler.set_callback(std::forward<Object>(cb)); }
 
-	template<class _Object> static devcb_base &set_nmi_handler(device_t &device, _Object object)
-		{ return downcast<electron_expansion_slot_device &>(device).m_nmi_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_nmi_handler(device_t &device, Object &&cb)
+	{ return downcast<electron_expansion_slot_device &>(device).m_nmi_handler.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_irq_handler(state); }
 	DECLARE_WRITE_LINE_MEMBER( nmi_w ) { m_nmi_handler(state); }
@@ -161,18 +161,20 @@ class device_electron_expansion_interface : public device_slot_card_interface
 {
 public:
 	// construction/destruction
-	device_electron_expansion_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_electron_expansion_interface();
 
 protected:
+	device_electron_expansion_interface(const machine_config &mconfig, device_t &device);
+
 	electron_expansion_slot_device *m_slot;
 };
 
 
 // device type definition
 extern const device_type ELECTRON_EXPANSION_SLOT;
+DECLARE_DEVICE_TYPE(ELECTRON_EXPANSION_SLOT, electron_expansion_slot_device)
 
 SLOT_INTERFACE_EXTERN( electron_expansion_devices );
 
 
-#endif
+#endif // MAME_BUS_ELECTRON_EXP_H

@@ -590,7 +590,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( tunit_core, midtunit_state )
+static MACHINE_CONFIG_START( tunit_core )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS34010, CPU_CLOCK)

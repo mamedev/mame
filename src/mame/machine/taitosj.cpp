@@ -83,7 +83,7 @@ WRITE8_MEMBER(taitosj_state::taitosj_bankswitch_w)
  Some of the games running on this hardware are protected with a 68705 mcu.
  It can either be on a daughter board containing Z80+68705+one ROM, which
  replaces the Z80 on an unprotected main board; or it can be built-in on the
- main board. The two are fucntionally equivalent.
+ main board. The two are functionally equivalent.
 
  The 68705 can read commands from the Z80, send back result codes, and has
  direct access to the Z80 memory space. It can also trigger IRQs on the Z80.

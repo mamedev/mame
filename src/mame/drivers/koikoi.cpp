@@ -347,7 +347,7 @@ void koikoi_state::machine_reset()
 		m_ioram[i] = 0;
 }
 
-static MACHINE_CONFIG_START( koikoi, koikoi_state )
+static MACHINE_CONFIG_START( koikoi )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,KOIKOI_CRYSTAL/4)   /* ?? */
@@ -432,4 +432,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1982, koikoi,   0,      koikoi, koikoi, driver_device, 0, ROT270, "Kiwako", "Koi Koi Part 2", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, koikoi,   0,      koikoi, koikoi, koikoi_state, 0, ROT270, "Kiwako", "Koi Koi Part 2", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )

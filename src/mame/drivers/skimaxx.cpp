@@ -493,7 +493,7 @@ void skimaxx_state::machine_reset()
  *
  *************************************/
 
-static MACHINE_CONFIG_START( skimaxx, skimaxx_state )
+static MACHINE_CONFIG_START( skimaxx )
 	MCFG_CPU_ADD("maincpu", M68EC030, XTAL_40MHz)
 	MCFG_CPU_PROGRAM_MAP(68030_1_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", skimaxx_state,  irq3_line_hold)    // 1,3,7 are identical, rest is RTE
@@ -529,16 +529,16 @@ static MACHINE_CONFIG_START( skimaxx, skimaxx_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki1", XTAL_4MHz, OKIM6295_PIN7_LOW)     // ?
+	MCFG_OKIM6295_ADD("oki1", XTAL_4MHz, PIN7_LOW)     // ?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL_4MHz/2, OKIM6295_PIN7_HIGH)  // ?
+	MCFG_OKIM6295_ADD("oki2", XTAL_4MHz/2, PIN7_HIGH)  // ?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki3", XTAL_4MHz, OKIM6295_PIN7_LOW)     // ?
+	MCFG_OKIM6295_ADD("oki3", XTAL_4MHz, PIN7_LOW)     // ?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki4", XTAL_4MHz/2, OKIM6295_PIN7_HIGH)  // ?
+	MCFG_OKIM6295_ADD("oki4", XTAL_4MHz/2, PIN7_HIGH)  // ?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
@@ -598,4 +598,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1996, skimaxx, 0, skimaxx, skimaxx, driver_device, 0, ROT0, "Kyle Hodgetts / ICE", "Skimaxx", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, skimaxx, 0, skimaxx, skimaxx, skimaxx_state, 0, ROT0, "Kyle Hodgetts / ICE", "Skimaxx", MACHINE_IMPERFECT_GRAPHICS )

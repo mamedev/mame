@@ -554,7 +554,7 @@ static GFXDECODE_START( elwro800 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( elwro800, elwro800_state )
+static MACHINE_CONFIG_START( elwro800 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, 3500000)    /* 3.5 MHz */
@@ -648,5 +648,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1986, elwro800,  0,       0,  elwro800,   elwro800, driver_device,     0,  "Elwro",   "800 Junior",       0)
+//    YEAR  NAME       PARENT  COMPAT  MACHINE    INPUT     STATE           INIT  COMPANY   FULLNAME       FLAGS
+COMP( 1986, elwro800,  0,      0,      elwro800,  elwro800, elwro800_state, 0,    "Elwro",  "800 Junior",  0 )

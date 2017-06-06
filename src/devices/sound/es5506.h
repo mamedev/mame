@@ -7,12 +7,12 @@
  *
  **********************************************************************************************/
 
+#ifndef MAME_SOUND_ES5506_H
+#define MAME_SOUND_ES5506_H
+
 #pragma once
 
-#ifndef __ES5506_H__
-#define __ES5506_H__
-
-#define MAKE_WAVS               0
+#define ES5506_MAKE_WAVS 0
 
 #define MCFG_ES5506_REGION0(_region) \
 	es5506_device::set_region0(*device, _region);
@@ -52,82 +52,54 @@
 	devcb = &es5505_device::set_read_port_callback(*device, DEVCB_##_devcb);
 
 
-/* struct describing a single playing voice */
-
-struct es550x_voice
-{
-		es550x_voice():
-		control(0),
-		freqcount(0),
-		start(0),
-		lvol(0),
-		end(0),
-		lvramp(0),
-		accum(0),
-		rvol(0),
-		rvramp(0),
-		ecount(0),
-		k2(0),
-		k2ramp(0),
-		k1(0),
-		k1ramp(0),
-		o4n1(0),
-		o3n1(0),
-		o3n2(0),
-		o2n1(0),
-		o2n2(0),
-		o1n1(0),
-		exbank(0),
-		index(0),
-		filtcount(0),
-		accum_mask(0) {}
-
-	/* external state */
-	uint32_t      control;                /* control register */
-	uint32_t      freqcount;              /* frequency count register */
-	uint32_t      start;                  /* start register */
-	uint32_t      lvol;                   /* left volume register */
-	uint32_t      end;                    /* end register */
-	uint32_t      lvramp;                 /* left volume ramp register */
-	uint32_t      accum;                  /* accumulator register */
-	uint32_t      rvol;                   /* right volume register */
-	uint32_t      rvramp;                 /* right volume ramp register */
-	uint32_t      ecount;                 /* envelope count register */
-	uint32_t      k2;                     /* k2 register */
-	uint32_t      k2ramp;                 /* k2 ramp register */
-	uint32_t      k1;                     /* k1 register */
-	uint32_t      k1ramp;                 /* k1 ramp register */
-	int32_t       o4n1;                   /* filter storage O4(n-1) */
-	int32_t       o3n1;                   /* filter storage O3(n-1) */
-	int32_t       o3n2;                   /* filter storage O3(n-2) */
-	int32_t       o2n1;                   /* filter storage O2(n-1) */
-	int32_t       o2n2;                   /* filter storage O2(n-2) */
-	int32_t       o1n1;                   /* filter storage O1(n-1) */
-	uint32_t      exbank;                 /* external address bank */
-
-	/* internal state */
-	uint8_t       index;                  /* index of this voice */
-	uint8_t       filtcount;              /* filter count */
-	uint32_t      accum_mask;
-};
-
-class es550x_device : public device_t,
-									public device_sound_interface
+class es550x_device : public device_t, public device_sound_interface
 {
 public:
-	es550x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
-	~es550x_device() {}
-
 	static void set_region0(device_t &device, const char *region0) { downcast<es550x_device &>(device).m_region0 = region0; }
 	static void set_region1(device_t &device, const char *region1) { downcast<es550x_device &>(device).m_region1 = region1; }
 	static void set_region2(device_t &device, const char *region2) { downcast<es550x_device &>(device).m_region2 = region2; }
 	static void set_region3(device_t &device, const char *region3) { downcast<es550x_device &>(device).m_region3 = region3; }
 	static void set_channels(device_t &device, int channels) { downcast<es550x_device &>(device).m_channels = channels; }
-	template<class _Object> static devcb_base &set_irq_callback(device_t &device, _Object object) { return downcast<es550x_device &>(device).m_irq_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_read_port_callback(device_t &device, _Object object) { return downcast<es550x_device &>(device).m_read_port_cb.set_callback(object); }
-
+	template <class Object> static devcb_base &set_irq_callback(device_t &device, Object &&cb) { return downcast<es550x_device &>(device).m_irq_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_read_port_callback(device_t &device, Object &&cb) { return downcast<es550x_device &>(device).m_read_port_cb.set_callback(std::forward<Object>(cb)); }
 
 protected:
+	// struct describing a single playing voice
+	struct es550x_voice
+	{
+		es550x_voice() { }
+
+		// external state
+		uint32_t      control   = 0;          // control register
+		uint32_t      freqcount = 0;          // frequency count register
+		uint32_t      start     = 0;          // start register
+		uint32_t      lvol      = 0;          // left volume register
+		uint32_t      end       = 0;          // end register
+		uint32_t      lvramp    = 0;          // left volume ramp register
+		uint32_t      accum     = 0;          // accumulator register
+		uint32_t      rvol      = 0;          // right volume register
+		uint32_t      rvramp    = 0;          // right volume ramp register
+		uint32_t      ecount    = 0;          // envelope count register
+		uint32_t      k2        = 0;          // k2 register
+		uint32_t      k2ramp    = 0;          // k2 ramp register
+		uint32_t      k1        = 0;          // k1 register
+		uint32_t      k1ramp    = 0;          // k1 ramp register
+		int32_t       o4n1      = 0;          // filter storage O4(n-1)
+		int32_t       o3n1      = 0;          // filter storage O3(n-1)
+		int32_t       o3n2      = 0;          // filter storage O3(n-2)
+		int32_t       o2n1      = 0;          // filter storage O2(n-1)
+		int32_t       o2n2      = 0;          // filter storage O2(n-2)
+		int32_t       o1n1      = 0;          // filter storage O1(n-1)
+		uint32_t      exbank    = 0;          // external address bank
+
+		// internal state
+		uint8_t       index      = 0;         // index of this voice
+		uint8_t       filtcount  = 0;         // filter count
+		uint32_t      accum_mask = 0;
+	};
+
+	es550x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_stop() override;
@@ -135,6 +107,14 @@ protected:
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+
+	void update_irq_state();
+	void update_internal_irq_state();
+	void compute_tables();
+
+	void generate_dummy(es550x_voice *voice, uint16_t *base, int32_t *lbuffer, int32_t *rbuffer, int samples);
+	void generate_ulaw(es550x_voice *voice, uint16_t *base, int32_t *lbuffer, int32_t *rbuffer, int samples);
+	void generate_pcm(es550x_voice *voice, uint16_t *base, int32_t *lbuffer, int32_t *rbuffer, int samples);
 
 	// internal state
 	sound_stream *m_stream;               /* which stream are we using */
@@ -159,9 +139,9 @@ protected:
 	std::unique_ptr<int16_t[]>     m_ulaw_lookup;
 	std::unique_ptr<uint16_t[]>    m_volume_lookup;
 
-	#if MAKE_WAVS
+#if ES5506_MAKE_WAVS
 	void *      m_wavraw;                 /* raw waveform */
-	#endif
+#endif
 
 	FILE *m_eslog;
 
@@ -172,14 +152,6 @@ protected:
 	int m_channels;                               /* number of output channels: 1 .. 6 */
 	devcb_write_line m_irq_cb;  /* irq callback */
 	devcb_read16 m_read_port_cb;          /* input port read */
-
-	void update_irq_state();
-	void update_internal_irq_state();
-	void compute_tables();
-
-	void generate_dummy(es550x_voice *voice, uint16_t *base, int32_t *lbuffer, int32_t *rbuffer, int samples);
-	void generate_ulaw(es550x_voice *voice, uint16_t *base, int32_t *lbuffer, int32_t *rbuffer, int samples);
-	void generate_pcm(es550x_voice *voice, uint16_t *base, int32_t *lbuffer, int32_t *rbuffer, int samples);
 };
 
 
@@ -212,7 +184,7 @@ private:
 	inline uint32_t reg_read_test(es550x_voice *voice, offs_t offset);
 };
 
-extern const device_type ES5506;
+DECLARE_DEVICE_TYPE(ES5506, es5506_device)
 
 
 class es5505_device : public es550x_device
@@ -242,7 +214,7 @@ private:
 	inline uint16_t reg_read_test(es550x_voice *voice, offs_t offset);
 };
 
-extern const device_type ES5505;
+DECLARE_DEVICE_TYPE(ES5505, es5505_device)
 
 
-#endif /* __ES5506_H__ */
+#endif // MAME_SOUND_ES5506_H

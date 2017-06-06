@@ -12,27 +12,27 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "asap.h"
+#include "debugger.h"
 
 
 //**************************************************************************
 //  CONSTANTS
 //**************************************************************************
 
-const uint32_t PS_CFLAG           = 0x00000001;
-const uint32_t PS_VFLAG           = 0x00000002;
-const uint32_t PS_ZFLAG           = 0x00000004;
-const uint32_t PS_NFLAG           = 0x00000008;
-const uint32_t PS_IFLAG           = 0x00000010;
-const uint32_t PS_PFLAG           = 0x00000020;
+constexpr uint32_t PS_CFLAG           = 0x00000001;
+constexpr uint32_t PS_VFLAG           = 0x00000002;
+constexpr uint32_t PS_ZFLAG           = 0x00000004;
+constexpr uint32_t PS_NFLAG           = 0x00000008;
+constexpr uint32_t PS_IFLAG           = 0x00000010;
+constexpr uint32_t PS_PFLAG           = 0x00000020;
 
-//const int EXCEPTION_RESET       = 0;
-const int EXCEPTION_TRAP0       = 1;
-const int EXCEPTION_TRAPF       = 2;
-const int EXCEPTION_INTERRUPT   = 3;
+//constexpr int EXCEPTION_RESET       = 0;
+constexpr int EXCEPTION_TRAP0       = 1;
+constexpr int EXCEPTION_TRAPF       = 2;
+constexpr int EXCEPTION_INTERRUPT   = 3;
 
-const int REGBASE               = 0xffe0;
+constexpr int REGBASE               = 0xffe0;
 
 
 
@@ -130,14 +130,14 @@ const asap_device::ophandler asap_device::s_conditiontable[16] =
 //**************************************************************************
 
 // device type definition
-const device_type ASAP = device_creator<asap_device>;
+DEFINE_DEVICE_TYPE(ASAP, asap_device, "asap", "ASAP")
 
 //-------------------------------------------------
 //  asap_device - constructor
 //-------------------------------------------------
 
 asap_device::asap_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, ASAP, "ASAP", tag, owner, clock, "asap", __FILE__),
+	: cpu_device(mconfig, ASAP, tag, owner, clock),
 		m_program_config("program", ENDIANNESS_LITTLE, 32, 32),
 		m_pc(0),
 		m_pflag(0),

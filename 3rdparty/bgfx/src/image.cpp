@@ -263,7 +263,7 @@ namespace bgfx
 		return uint8_t(numMips);
 	}
 
-	uint32_t imageGetSize(TextureFormat::Enum _format, uint16_t _width, uint16_t _height, uint16_t _depth, uint16_t _numLayers, bool _cubeMap, uint8_t _numMips)
+	uint32_t imageGetSize(TextureInfo* _info, uint16_t _width, uint16_t _height, uint16_t _depth, bool _cubeMap, bool _hasMips, uint16_t _numLayers, TextureFormat::Enum _format)
 	{
 		const ImageBlockInfo& blockInfo = getBlockInfo(_format);
 		const uint8_t  bpp         = blockInfo.bitsPerPixel;
@@ -272,17 +272,18 @@ namespace bgfx
 		const uint16_t minBlockX   = blockInfo.minBlockX;
 		const uint16_t minBlockY   = blockInfo.minBlockY;
 
-		_width   = bx::uint16_max(blockWidth  * minBlockX, ( (_width  + blockWidth  - 1) / blockWidth)*blockWidth);
-		_height  = bx::uint16_max(blockHeight * minBlockY, ( (_height + blockHeight - 1) / blockHeight)*blockHeight);
-		_depth   = bx::uint16_max(1, _depth);
+		_width  = bx::uint16_max(blockWidth  * minBlockX, ( (_width  + blockWidth  - 1) / blockWidth)*blockWidth);
+		_height = bx::uint16_max(blockHeight * minBlockY, ( (_height + blockHeight - 1) / blockHeight)*blockHeight);
+		_depth  = bx::uint16_max(1, _depth);
+		const uint8_t  numMips = calcNumMips(_hasMips, _width, _height, _depth);
+		const uint32_t sides   = _cubeMap ? 6 : 1;
 
 		uint32_t width  = _width;
 		uint32_t height = _height;
 		uint32_t depth  = _depth;
-		uint32_t sides  = _cubeMap ? 6 : 1;
 		uint32_t size   = 0;
 
-		for (uint32_t lod = 0; lod < _numMips; ++lod)
+		for (uint32_t lod = 0; lod < numMips; ++lod)
 		{
 			width  = bx::uint32_max(blockWidth  * minBlockX, ( (width  + blockWidth  - 1) / blockWidth )*blockWidth);
 			height = bx::uint32_max(blockHeight * minBlockY, ( (height + blockHeight - 1) / blockHeight)*blockHeight);
@@ -295,7 +296,22 @@ namespace bgfx
 			depth  >>= 1;
 		}
 
-		return size * _numLayers;
+		size *= _numLayers;
+
+		if (NULL != _info)
+		{
+			_info->format  = _format;
+			_info->width   = _width;
+			_info->height  = _height;
+			_info->depth   = _depth;
+			_info->numMips = numMips;
+			_info->numLayers = _numLayers;
+			_info->cubeMap   = _cubeMap;
+			_info->storageSize  = size;
+			_info->bitsPerPixel = bpp;
+		}
+
+		return size;
 	}
 
 	void imageSolid(void* _dst, uint32_t _width, uint32_t _height, uint32_t _solid)
@@ -661,7 +677,7 @@ namespace bgfx
 
 		for (uint32_t yy = 0; yy < _height; ++yy, src += _srcPitch, dst += _dstPitch)
 		{
-			memcpy(dst, src, pitch);
+			bx::memCopy(dst, src, pitch);
 		}
 	}
 
@@ -820,7 +836,95 @@ namespace bgfx
 	bool imageConvert(void* _dst, TextureFormat::Enum _dstFormat, const void* _src, TextureFormat::Enum _srcFormat, uint32_t _width, uint32_t _height)
 	{
 		const uint32_t srcBpp = s_imageBlockInfo[_srcFormat].bitsPerPixel;
+
+		if (_dstFormat == _srcFormat)
+		{
+			bx::memCopy(_dst, _src, _width*_height*srcBpp/8);
+			return true;
+		}
+
 		return imageConvert(_dst, _dstFormat, _src, _srcFormat, _width, _height, _width*srcBpp/8);
+	}
+
+	ImageContainer* imageConvert(bx::AllocatorI* _allocator, TextureFormat::Enum _dstFormat, const ImageContainer& _input)
+	{
+		ImageContainer* output = imageAlloc(_allocator
+			, _dstFormat
+			, uint16_t(_input.m_width)
+			, uint16_t(_input.m_height)
+			, uint16_t(_input.m_depth)
+			, _input.m_numLayers
+			, _input.m_cubeMap
+			, 1 < _input.m_numMips
+			);
+
+		const uint8_t  bpp = getBitsPerPixel(_dstFormat);
+		const uint16_t numSides = _input.m_numLayers * (_input.m_cubeMap ? 6 : 1);
+
+		uint8_t* dst = (uint8_t*)output->m_data	;
+		for (uint16_t side = 0; side < numSides; ++side)
+		{
+			for (uint8_t lod = 0, num = _input.m_numMips; lod < num; ++lod)
+			{
+				ImageMip mip;
+				if (imageGetRawData(_input, side, lod, _input.m_data, _input.m_size, mip) )
+				{
+					bool ok = imageConvert(dst
+							, _dstFormat
+							, mip.m_data
+							, mip.m_format
+							, mip.m_width
+							, mip.m_height
+							);
+					BX_CHECK(ok, "Conversion from %s to %s failed!"
+							, getName(_input.m_format)
+							, getName(output->m_format)
+							);
+					BX_UNUSED(ok);
+
+					dst += mip.m_width*mip.m_height*bpp/8;
+				}
+			}
+		}
+
+		return output;
+	}
+
+	ImageContainer* imageParseBgfx(bx::AllocatorI* _allocator, const void* _src, uint32_t _size)
+	{
+		ImageContainer imageContainer;
+		if (!imageParse(imageContainer, _src, _size) )
+		{
+			return NULL;
+		}
+
+		ImageContainer* output = imageAlloc(_allocator
+			, imageContainer.m_format
+			, uint16_t(imageContainer.m_width)
+			, uint16_t(imageContainer.m_height)
+			, uint16_t(imageContainer.m_depth)
+			, imageContainer.m_numLayers
+			, imageContainer.m_cubeMap
+			, 1 < imageContainer.m_numMips
+			);
+
+		const uint16_t numSides = imageContainer.m_numLayers * (imageContainer.m_cubeMap ? 6 : 1);
+		uint8_t* dst = (uint8_t*)output->m_data;
+
+		for (uint16_t side = 0; side < numSides; ++side)
+		{
+			for (uint8_t lod = 0, num = imageContainer.m_numMips; lod < num; ++lod)
+			{
+				ImageMip mip;
+				if (imageGetRawData(imageContainer, side, lod, _src, _size, mip) )
+				{
+					bx::memCopy(dst, mip.m_data, mip.m_size);
+					dst += mip.m_size;
+				}
+			}
+		}
+
+		return output;
 	}
 
 	uint8_t bitRangeConvert(uint32_t _in, uint32_t _from, uint32_t _to)
@@ -1607,7 +1711,7 @@ namespace bgfx
 		}
 	}
 
-	const Memory* imageAlloc(ImageContainer& _imageContainer, TextureFormat::Enum _format, uint16_t _width, uint16_t _height, uint16_t _depth, uint16_t _numLayers, bool _cubeMap, bool _generateMips)
+	ImageContainer* imageAlloc(bx::AllocatorI* _allocator, TextureFormat::Enum _format, uint16_t _width, uint16_t _height, uint16_t _depth, uint16_t _numLayers, bool _cubeMap, bool _hasMips, const void* _data)
 	{
 		const ImageBlockInfo& blockInfo = getBlockInfo(_format);
 		const uint16_t blockWidth  = blockInfo.blockWidth;
@@ -1620,31 +1724,38 @@ namespace bgfx
 		_depth     = bx::uint16_max(1, _depth);
 		_numLayers = bx::uint16_max(1, _numLayers);
 
-		const uint8_t numMips = _generateMips ? imageGetNumMips(_format, _width, _height) : 1;
-		uint32_t size = imageGetSize(_format, _width, _height, _depth, _numLayers, _cubeMap, numMips);
-		const Memory* image = alloc(size);
+		const uint8_t numMips = _hasMips ? imageGetNumMips(_format, _width, _height) : 1;
+		uint32_t size = imageGetSize(NULL, _width, _height, _depth, _cubeMap, _hasMips, _numLayers, _format);
 
-		_imageContainer.m_data      = image->data;
-		_imageContainer.m_format    = _format;
-		_imageContainer.m_size      = image->size;
-		_imageContainer.m_offset    = 0;
-		_imageContainer.m_width     = _width;
-		_imageContainer.m_height    = _height;
-		_imageContainer.m_depth     = _depth;
-		_imageContainer.m_numLayers = _numLayers;
-		_imageContainer.m_numMips   = numMips;
-		_imageContainer.m_hasAlpha  = false;
-		_imageContainer.m_cubeMap   = _cubeMap;
-		_imageContainer.m_ktx       = false;
-		_imageContainer.m_ktxLE     = false;
-		_imageContainer.m_srgb      = false;
+		ImageContainer* imageContainer = (ImageContainer*)BX_ALLOC(_allocator, size + sizeof(ImageContainer) );
 
-		return image;
+		imageContainer->m_allocator = _allocator;
+		imageContainer->m_data      = imageContainer + 1;
+		imageContainer->m_format    = _format;
+		imageContainer->m_size      = size;
+		imageContainer->m_offset    = 0;
+		imageContainer->m_width     = _width;
+		imageContainer->m_height    = _height;
+		imageContainer->m_depth     = _depth;
+		imageContainer->m_numLayers = _numLayers;
+		imageContainer->m_numMips   = numMips;
+		imageContainer->m_hasAlpha  = false;
+		imageContainer->m_cubeMap   = _cubeMap;
+		imageContainer->m_ktx       = false;
+		imageContainer->m_ktxLE     = false;
+		imageContainer->m_srgb      = false;
+
+		if (NULL != _data)
+		{
+			bx::memCopy(imageContainer->m_data, _data, imageContainer->m_size);
+		}
+
+		return imageContainer;
 	}
 
-	void imageFree(const Memory* _memory)
+	void imageFree(ImageContainer* _imageContainer)
 	{
-		release(_memory);
+		BX_FREE(_imageContainer->m_allocator, _imageContainer);
 	}
 
 // DDS
@@ -1988,6 +2099,7 @@ namespace bgfx
 			}
 		}
 
+		_imageContainer.m_allocator = NULL;
 		_imageContainer.m_data      = NULL;
 		_imageContainer.m_size      = 0;
 		_imageContainer.m_offset    = (uint32_t)bx::seek(_reader);
@@ -2297,6 +2409,7 @@ namespace bgfx
 			}
 		}
 
+		_imageContainer.m_allocator = NULL;
 		_imageContainer.m_data      = NULL;
 		_imageContainer.m_size      = 0;
 		_imageContainer.m_offset    = (uint32_t)offset;
@@ -2447,6 +2560,7 @@ namespace bgfx
 			}
 		}
 
+		_imageContainer.m_allocator = NULL;
 		_imageContainer.m_data      = NULL;
 		_imageContainer.m_size      = 0;
 		_imageContainer.m_offset    = (uint32_t)offset;
@@ -2489,6 +2603,7 @@ namespace bgfx
 
 			_imageContainer.m_format = tc.m_format;
 			_imageContainer.m_offset = UINT32_MAX;
+			_imageContainer.m_allocator = NULL;
 			if (NULL == tc.m_mem)
 			{
 				_imageContainer.m_data = NULL;
@@ -2544,10 +2659,10 @@ namespace bgfx
 					src += 8;
 
 					uint8_t* block = &dst[(yy*_pitch+xx*4)*4];
-					memcpy(&block[0*_pitch], &temp[ 0], 16);
-					memcpy(&block[1*_pitch], &temp[16], 16);
-					memcpy(&block[2*_pitch], &temp[32], 16);
-					memcpy(&block[3*_pitch], &temp[48], 16);
+					bx::memCopy(&block[0*_pitch], &temp[ 0], 16);
+					bx::memCopy(&block[1*_pitch], &temp[16], 16);
+					bx::memCopy(&block[2*_pitch], &temp[32], 16);
+					bx::memCopy(&block[3*_pitch], &temp[48], 16);
 				}
 			}
 			break;
@@ -2563,10 +2678,10 @@ namespace bgfx
 					src += 8;
 
 					uint8_t* block = &dst[(yy*_pitch+xx*4)*4];
-					memcpy(&block[0*_pitch], &temp[ 0], 16);
-					memcpy(&block[1*_pitch], &temp[16], 16);
-					memcpy(&block[2*_pitch], &temp[32], 16);
-					memcpy(&block[3*_pitch], &temp[48], 16);
+					bx::memCopy(&block[0*_pitch], &temp[ 0], 16);
+					bx::memCopy(&block[1*_pitch], &temp[16], 16);
+					bx::memCopy(&block[2*_pitch], &temp[32], 16);
+					bx::memCopy(&block[3*_pitch], &temp[48], 16);
 				}
 			}
 			break;
@@ -2582,10 +2697,10 @@ namespace bgfx
 					src += 8;
 
 					uint8_t* block = &dst[(yy*_pitch+xx*4)*4];
-					memcpy(&block[0*_pitch], &temp[ 0], 16);
-					memcpy(&block[1*_pitch], &temp[16], 16);
-					memcpy(&block[2*_pitch], &temp[32], 16);
-					memcpy(&block[3*_pitch], &temp[48], 16);
+					bx::memCopy(&block[0*_pitch], &temp[ 0], 16);
+					bx::memCopy(&block[1*_pitch], &temp[16], 16);
+					bx::memCopy(&block[2*_pitch], &temp[32], 16);
+					bx::memCopy(&block[3*_pitch], &temp[48], 16);
 				}
 			}
 			break;
@@ -2599,10 +2714,10 @@ namespace bgfx
 					src += 8;
 
 					uint8_t* block = &dst[(yy*_pitch+xx*4)*4];
-					memcpy(&block[0*_pitch], &temp[ 0], 16);
-					memcpy(&block[1*_pitch], &temp[16], 16);
-					memcpy(&block[2*_pitch], &temp[32], 16);
-					memcpy(&block[3*_pitch], &temp[48], 16);
+					bx::memCopy(&block[0*_pitch], &temp[ 0], 16);
+					bx::memCopy(&block[1*_pitch], &temp[16], 16);
+					bx::memCopy(&block[2*_pitch], &temp[32], 16);
+					bx::memCopy(&block[3*_pitch], &temp[48], 16);
 				}
 			}
 			break;
@@ -2627,10 +2742,10 @@ namespace bgfx
 					}
 
 					uint8_t* block = &dst[(yy*_pitch+xx*4)*4];
-					memcpy(&block[0*_pitch], &temp[ 0], 16);
-					memcpy(&block[1*_pitch], &temp[16], 16);
-					memcpy(&block[2*_pitch], &temp[32], 16);
-					memcpy(&block[3*_pitch], &temp[48], 16);
+					bx::memCopy(&block[0*_pitch], &temp[ 0], 16);
+					bx::memCopy(&block[1*_pitch], &temp[16], 16);
+					bx::memCopy(&block[2*_pitch], &temp[32], 16);
+					bx::memCopy(&block[3*_pitch], &temp[48], 16);
 				}
 			}
 			break;
@@ -2645,10 +2760,10 @@ namespace bgfx
 					src += 8;
 
 					uint8_t* block = &dst[(yy*_pitch+xx*4)*4];
-					memcpy(&block[0*_pitch], &temp[ 0], 16);
-					memcpy(&block[1*_pitch], &temp[16], 16);
-					memcpy(&block[2*_pitch], &temp[32], 16);
-					memcpy(&block[3*_pitch], &temp[48], 16);
+					bx::memCopy(&block[0*_pitch], &temp[ 0], 16);
+					bx::memCopy(&block[1*_pitch], &temp[16], 16);
+					bx::memCopy(&block[2*_pitch], &temp[32], 16);
+					bx::memCopy(&block[3*_pitch], &temp[48], 16);
 				}
 			}
 			break;
@@ -2681,10 +2796,10 @@ namespace bgfx
 					decodeBlockPtc14(temp, src, xx, yy, width, height);
 
 					uint8_t* block = &dst[(yy*_pitch+xx*4)*4];
-					memcpy(&block[0*_pitch], &temp[ 0], 16);
-					memcpy(&block[1*_pitch], &temp[16], 16);
-					memcpy(&block[2*_pitch], &temp[32], 16);
-					memcpy(&block[3*_pitch], &temp[48], 16);
+					bx::memCopy(&block[0*_pitch], &temp[ 0], 16);
+					bx::memCopy(&block[1*_pitch], &temp[16], 16);
+					bx::memCopy(&block[2*_pitch], &temp[32], 16);
+					bx::memCopy(&block[3*_pitch], &temp[48], 16);
 				}
 			}
 			break;
@@ -2697,10 +2812,10 @@ namespace bgfx
 					decodeBlockPtc14A(temp, src, xx, yy, width, height);
 
 					uint8_t* block = &dst[(yy*_pitch+xx*4)*4];
-					memcpy(&block[0*_pitch], &temp[ 0], 16);
-					memcpy(&block[1*_pitch], &temp[16], 16);
-					memcpy(&block[2*_pitch], &temp[32], 16);
-					memcpy(&block[3*_pitch], &temp[48], 16);
+					bx::memCopy(&block[0*_pitch], &temp[ 0], 16);
+					bx::memCopy(&block[1*_pitch], &temp[16], 16);
+					bx::memCopy(&block[2*_pitch], &temp[32], 16);
+					bx::memCopy(&block[3*_pitch], &temp[48], 16);
 				}
 			}
 			break;
@@ -2720,7 +2835,7 @@ namespace bgfx
 			break;
 
 		case TextureFormat::BGRA8:
-			memcpy(_dst, _src, _pitch*_height);
+			bx::memCopy(_dst, _src, _pitch*_height);
 			break;
 
 		default:
@@ -2742,7 +2857,7 @@ namespace bgfx
 		switch (_format)
 		{
 		case TextureFormat::RGBA8:
-			memcpy(_dst, _src, _pitch*_height);
+			bx::memCopy(_dst, _src, _pitch*_height);
 			break;
 
 		case TextureFormat::BGRA8:
@@ -2862,7 +2977,7 @@ namespace bgfx
 			break;
 
 		case TextureFormat::RGBA32F:
-			memcpy(_dst, _src, _pitch*_height);
+			bx::memCopy(_dst, _src, _pitch*_height);
 			break;
 
 		case TextureFormat::RGBA8:
@@ -2872,7 +2987,8 @@ namespace bgfx
 		default:
 			if (isCompressed(_format) )
 			{
-				void* temp = BX_ALLOC(_allocator, imageGetSize(_format, uint16_t(_pitch/4), uint16_t(_height) ) );
+				uint32_t size = imageGetSize(NULL, uint16_t(_pitch/4), uint16_t(_height), 0, false, false, 1, _format);
+				void* temp = BX_ALLOC(_allocator, size);
 				imageDecodeToRgba8(temp, _src, _width, _height, _pitch, _format);
 				imageRgba8ToRgba32f(_dst, _width, _height, _pitch, temp);
 				BX_FREE(_allocator, temp);

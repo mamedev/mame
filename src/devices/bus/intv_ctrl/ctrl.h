@@ -6,11 +6,10 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_INTV_CTRL_CTRL_H
+#define MAME_BUS_INTV_CTRL_CTRL_H
 
 #pragma once
-
-#ifndef __INTV_CONTROL_PORT__
-#define __INTV_CONTROL_PORT__
 
 
 //**************************************************************************
@@ -25,12 +24,13 @@ class device_intv_control_port_interface : public device_slot_card_interface
 {
 public:
 	// construction/destruction
-	device_intv_control_port_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_intv_control_port_interface();
 
 	virtual uint8_t read_ctrl() { return 0; };
 
 protected:
+	device_intv_control_port_interface(const machine_config &mconfig, device_t &device);
+
 	intv_control_port_device *m_port;
 };
 
@@ -56,7 +56,7 @@ protected:
 
 
 // device type definition
-extern const device_type INTV_CONTROL_PORT;
+DECLARE_DEVICE_TYPE(INTV_CONTROL_PORT, intv_control_port_device)
 
 
 //**************************************************************************
@@ -72,4 +72,4 @@ extern const device_type INTV_CONTROL_PORT;
 SLOT_INTERFACE_EXTERN( intv_control_port_devices );
 
 
-#endif
+#endif // MAME_BUS_INTV_CTRL_CTRL_H

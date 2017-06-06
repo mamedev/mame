@@ -9,10 +9,10 @@
 #define TC0180VCU_SCROLLRAM_SIZE    0x0800
 
 
-const device_type TC0180VCU = device_creator<tc0180vcu_device>;
+DEFINE_DEVICE_TYPE(TC0180VCU, tc0180vcu_device, "tc0180vcu", "Taito TC0180VCU")
 
 tc0180vcu_device::tc0180vcu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TC0180VCU, "Taito TC0180VCU", tag, owner, clock, "tc0180vcu", __FILE__),
+	: device_t(mconfig, TC0180VCU, tag, owner, clock),
 	m_ram(nullptr),
 	//m_scrollram(nullptr),
 	//m_bg_rambank(0),

@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_CBMIEC_VIC1520_H
+#define MAME_BUS_CBMIEC_VIC1520_H
 
-#ifndef __VIC1520__
-#define __VIC1520__
+#pragma once
 
 #include "cbmiec.h"
 #include "cpu/m6502/m6502.h"
@@ -20,14 +20,13 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> vic1520_t
+// ======================> vic1520_device
 
-class vic1520_t :  public device_t,
-					public device_cbm_iec_interface
+class vic1520_device : public device_t, public device_cbm_iec_interface
 {
 public:
 	// construction/destruction
-	vic1520_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vic1520_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -50,5 +49,4 @@ protected:
 extern const device_type VIC1520;
 
 
-
-#endif
+#endif // MAME_BUS_CBMIEC_VIC1520_H

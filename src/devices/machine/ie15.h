@@ -1,10 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Sergey Svishchev
 
-#ifndef MAME_MACHINE_IE15_H_
-#define MAME_MACHINE_IE15_H_
+#ifndef MAME_MACHINE_IE15_H
+#define MAME_MACHINE_IE15_H
 
-#include "emu.h"
+#pragma once
 
 #include "bus/rs232/rs232.h"
 #include "cpu/ie15/ie15.h"
@@ -36,21 +36,20 @@ INPUT_PORTS_EXTERN(ie15);
 class ie15_device : public device_t, public device_serial_interface
 {
 public:
-	ie15_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	ie15_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_WRITE8_MEMBER(write) { term_write(data); }
 
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-
 protected:
+	ie15_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	virtual void rcv_complete() override;
 	virtual void tra_callback() override;
@@ -90,6 +89,7 @@ private:
 	void scanline_callback();
 	void update_leds();
 	void draw_scanline(uint32_t *p, uint16_t offset, uint8_t scanline);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	std::unique_ptr<uint32_t[]> m_tmpbmp;
 
 	emu_timer *m_hblank_timer;
@@ -128,6 +128,6 @@ private:
 	required_ioport m_io_keyboard;
 };
 
-extern const device_type IE15;
+DECLARE_DEVICE_TYPE(IE15, ie15_device)
 
-#endif /* MAME_MACHINE_IE15_H_ */
+#endif // MAME_MACHINE_IE15_H

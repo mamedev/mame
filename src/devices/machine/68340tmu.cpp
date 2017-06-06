@@ -6,34 +6,26 @@
 #include "68340.h"
 
 
-READ32_MEMBER( m68340cpu_device::m68340_internal_timer_r )
+READ32_MEMBER( m68340_cpu_device::m68340_internal_timer_r )
 {
-	m68340cpu_device *m68k = this;
-	m68340_timer* timer = m68k->m68340TIMER;
-	assert(timer != nullptr);
+	assert(m68340TIMER);
+	//m68340_timer &timer = *m68340TIMER;
 
-	if (timer)
-	{
-		int pc = space.device().safe_pc();
-		logerror("%08x m68340_internal_timer_r %08x, (%08x)\n", pc, offset*4,mem_mask);
-	}
+	int pc = space.device().safe_pc();
+	logerror("%08x m68340_internal_timer_r %08x, (%08x)\n", pc, offset*4,mem_mask);
 
 	return 0x00000000;
 }
 
-WRITE32_MEMBER( m68340cpu_device::m68340_internal_timer_w )
+WRITE32_MEMBER( m68340_cpu_device::m68340_internal_timer_w )
 {
-	m68340cpu_device *m68k = this;
-	m68340_timer* timer = m68k->m68340TIMER;
-	assert(timer != nullptr);
+	assert(m68340TIMER);
+	//m68340_timer &timer = *m68340TIMER;
 
-	if (timer)
-	{
-		int pc = space.device().safe_pc();
-		logerror("%08x m68340_internal_timer_w %08x, %08x (%08x)\n", pc, offset*4,data,mem_mask);
-	}
+	int pc = space.device().safe_pc();
+	logerror("%08x m68340_internal_timer_w %08x, %08x (%08x)\n", pc, offset*4,data,mem_mask);
 }
 
-void m68340_timer::reset(void)
+void m68340_timer::reset()
 {
 }

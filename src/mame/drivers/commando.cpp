@@ -248,7 +248,7 @@ void commando_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( commando, commando_state )
+static MACHINE_CONFIG_START( commando )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, PHI_MAIN)  // ???
@@ -272,7 +272,7 @@ static MACHINE_CONFIG_START( commando, commando_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", commando)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 256)
+	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
 

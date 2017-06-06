@@ -447,177 +447,6 @@ ADDRESS_MAP_END
 
 /*************************************
  *
- *  Original DCS Machine Drivers
- *
- *************************************/
-
-/* Basic DCS system with ADSP-2105 and 2k of SRAM (T-unit, V-unit, Killer Instinct) */
-MACHINE_CONFIG_FRAGMENT( dcs_audio_2k )
-	MCFG_CPU_ADD("dcs", ADSP2105, XTAL_10MHz)
-	MCFG_ADSP21XX_SPORT_TX_CB(WRITE32(dcs_audio_device, sound_tx_callback))      /* callback for serial transmit */
-	MCFG_ADSP21XX_TIMER_FIRED_CB(WRITELINE(dcs_audio_device,timer_enable_callback))   /* callback for timer fired */
-	MCFG_CPU_PROGRAM_MAP(dcs_2k_program_map)
-	MCFG_CPU_DATA_MAP(dcs_2k_data_map)
-
-	MCFG_TIMER_DEVICE_ADD("dcs_reg_timer", DEVICE_SELF, dcs_audio_device, dcs_irq)
-	MCFG_TIMER_DEVICE_ADD("dcs_int_timer", DEVICE_SELF, dcs_audio_device, internal_timer_callback)
-
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_SOUND_ADD("dac", DMADAC, 0) // AD-1851 16bit mono
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
-
-
-/* Basic DCS system with ADSP-2105 and 2k of SRAM, using a UART for communications (X-unit) */
-MACHINE_CONFIG_DERIVED( dcs_audio_2k_uart, dcs_audio_2k )
-
-	MCFG_CPU_MODIFY("dcs")
-	MCFG_CPU_DATA_MAP(dcs_2k_uart_data_map)
-MACHINE_CONFIG_END
-
-
-/* Basic DCS system with ADSP-2105 and 8k of SRAM (Wolf-unit) */
-MACHINE_CONFIG_DERIVED( dcs_audio_8k, dcs_audio_2k )
-
-	MCFG_CPU_MODIFY("dcs")
-	MCFG_CPU_PROGRAM_MAP(dcs_8k_program_map)
-	MCFG_CPU_DATA_MAP(dcs_8k_data_map)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_DERIVED( dcs_audio_wpc, dcs_audio_2k )
-	MCFG_CPU_MODIFY("dcs")
-	MCFG_CPU_PROGRAM_MAP(dcs_wpc_program_map)
-	MCFG_CPU_DATA_MAP(dcs_wpc_data_map)
-MACHINE_CONFIG_END
-
-
-/*************************************
- *
- *  DCS2 Machine Drivers
- *
- *************************************/
-
-MACHINE_CONFIG_FRAGMENT( dcs2_audio_2115 )
-	MCFG_CPU_ADD("dcs2", ADSP2115, XTAL_16MHz)
-	MCFG_ADSP21XX_SPORT_TX_CB(WRITE32(dcs_audio_device, sound_tx_callback))      /* callback for serial transmit */
-	MCFG_ADSP21XX_TIMER_FIRED_CB(WRITELINE(dcs_audio_device,timer_enable_callback))   /* callback for timer fired */
-	MCFG_CPU_PROGRAM_MAP(dcs2_2115_program_map)
-	MCFG_CPU_DATA_MAP(dcs2_2115_data_map)
-
-	MCFG_TIMER_DEVICE_ADD("dcs_reg_timer", DEVICE_SELF, dcs_audio_device, dcs_irq)
-	MCFG_TIMER_DEVICE_ADD("dcs_sport_timer", DEVICE_SELF, dcs_audio_device, sport0_irq)
-	MCFG_TIMER_DEVICE_ADD("dcs_int_timer", DEVICE_SELF, dcs_audio_device, internal_timer_callback)
-	MCFG_TIMER_DEVICE_ADD("dcs_hle_timer", DEVICE_SELF, dcs_audio_device, transfer_watchdog_callback)
-
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-
-	MCFG_SOUND_ADD("dac1", DMADAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-
-	MCFG_SOUND_ADD("dac2", DMADAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_DERIVED( dcs2_audio_2104, dcs2_audio_2115 )
-	MCFG_CPU_REPLACE("dcs2", ADSP2104, XTAL_16MHz)
-	MCFG_ADSP21XX_SPORT_TX_CB(WRITE32(dcs_audio_device, sound_tx_callback))      /* callback for serial transmit */
-	MCFG_ADSP21XX_TIMER_FIRED_CB(WRITELINE(dcs_audio_device,timer_enable_callback))   /* callback for timer fired */
-	MCFG_CPU_PROGRAM_MAP(dcs2_2104_program_map)
-	MCFG_CPU_DATA_MAP(dcs2_2104_data_map)
-MACHINE_CONFIG_END
-
-
-
-/*************************************
- *
- *  DSIO Machine Drivers
- *
- *************************************/
-
-MACHINE_CONFIG_FRAGMENT( dcs2_audio_dsio )
-	MCFG_CPU_ADD("dsio", ADSP2181, XTAL_32MHz)
-	MCFG_ADSP21XX_SPORT_TX_CB(WRITE32(dcs_audio_device, sound_tx_callback))      /* callback for serial transmit */
-	MCFG_ADSP21XX_TIMER_FIRED_CB(WRITELINE(dcs_audio_device,timer_enable_callback))   /* callback for timer fired */
-	MCFG_ADSP21XX_DMOVLAY_CB(WRITE32(dcs_audio_device, dmovlay_callback)) // callback for adsp 2181 dmovlay instruction
-	MCFG_CPU_PROGRAM_MAP(dsio_program_map)
-	MCFG_CPU_DATA_MAP(dsio_data_map)
-	MCFG_CPU_IO_MAP(dsio_io_map)
-
-	MCFG_DEVICE_ADD("data_map_bank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(dsio_rambank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(14)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
-
-	MCFG_TIMER_DEVICE_ADD("dcs_reg_timer", DEVICE_SELF, dcs_audio_device, dcs_irq)
-	MCFG_TIMER_DEVICE_ADD("dcs_int_timer", DEVICE_SELF, dcs_audio_device, internal_timer_callback)
-	MCFG_TIMER_DEVICE_ADD("dcs_sport_timer", DEVICE_SELF, dcs_audio_device, sport0_irq) // roadburn needs this to pass harware test
-
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-
-	MCFG_SOUND_ADD("dac1", DMADAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-
-	MCFG_SOUND_ADD("dac2", DMADAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-MACHINE_CONFIG_END
-
-
-
-/*************************************
- *
- *  Denver Machine Drivers
- *
- *************************************/
-
-MACHINE_CONFIG_FRAGMENT( dcs2_audio_denver )
-	MCFG_CPU_ADD("denver", ADSP2181, XTAL_33_333MHz)
-	MCFG_ADSP21XX_SPORT_TX_CB(WRITE32(dcs_audio_device, sound_tx_callback))      /* callback for serial transmit */
-	MCFG_ADSP21XX_TIMER_FIRED_CB(WRITELINE(dcs_audio_device,timer_enable_callback))   /* callback for timer fired */
-	MCFG_ADSP21XX_DMOVLAY_CB(WRITE32(dcs_audio_device, dmovlay_callback)) // callback for adsp 2181 dmovlay instruction
-	MCFG_CPU_PROGRAM_MAP(denver_program_map)
-	MCFG_CPU_DATA_MAP(denver_data_map)
-	MCFG_CPU_IO_MAP(denver_io_map)
-
-	MCFG_DEVICE_ADD("data_map_bank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(denver_rambank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(14)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
-
-	MCFG_TIMER_DEVICE_ADD("dcs_reg_timer", DEVICE_SELF, dcs_audio_device, dcs_irq)
-	MCFG_TIMER_DEVICE_ADD("dcs_int_timer", DEVICE_SELF, dcs_audio_device, internal_timer_callback)
-	MCFG_TIMER_DEVICE_ADD("dcs_sport_timer", DEVICE_SELF, dcs_audio_device, sport0_irq) // Atlantis driver waits for sport0 rx interrupts
-
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-
-	MCFG_SOUND_ADD("dac1", DMADAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-
-	MCFG_SOUND_ADD("dac2", DMADAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-
-	MCFG_SOUND_ADD("dac3", DMADAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-
-	MCFG_SOUND_ADD("dac4", DMADAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-
-	MCFG_SOUND_ADD("dac5", DMADAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-
-	MCFG_SOUND_ADD("dac6", DMADAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-MACHINE_CONFIG_END
-
-
-
-/*************************************
- *
  *  ADSP booting
  *
  *************************************/
@@ -825,8 +654,8 @@ void dcs_audio_device::dcs_register_state()
 //  dcs_audio_device - constructor
 //-------------------------------------------------
 
-dcs_audio_device::dcs_audio_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, int rev) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+dcs_audio_device::dcs_audio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int rev) :
+	device_t(mconfig, type, tag, owner, clock),
 	m_cpu(nullptr),
 	m_program(nullptr),
 	m_data(nullptr),
@@ -2488,143 +2317,261 @@ int dcs_audio_device::preprocess_write(uint16_t data)
 	return result;
 }
 
-const device_type DCS_AUDIO_2K = device_creator<dcs_audio_2k_device>;
+/* Basic DCS system with ADSP-2105 and 2k of SRAM (T-unit, V-unit, Killer Instinct) */
+
+MACHINE_CONFIG_MEMBER( dcs_audio_device::add_mconfig_dcs )
+	MCFG_CPU_ADD("dcs", ADSP2105, XTAL_10MHz)
+	MCFG_ADSP21XX_SPORT_TX_CB(WRITE32(dcs_audio_device, sound_tx_callback))      /* callback for serial transmit */
+	MCFG_ADSP21XX_TIMER_FIRED_CB(WRITELINE(dcs_audio_device, timer_enable_callback))   /* callback for timer fired */
+	MCFG_CPU_PROGRAM_MAP(dcs_2k_program_map)
+	MCFG_CPU_DATA_MAP(dcs_2k_data_map)
+
+	MCFG_TIMER_DEVICE_ADD("dcs_reg_timer", DEVICE_SELF, dcs_audio_device, dcs_irq)
+	MCFG_TIMER_DEVICE_ADD("dcs_int_timer", DEVICE_SELF, dcs_audio_device, internal_timer_callback)
+
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SOUND_ADD("dac", DMADAC, 0) // AD-1851 16bit mono
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
+
+DEFINE_DEVICE_TYPE(DCS_AUDIO_2K, dcs_audio_2k_device, "dcs_audio_2k", "DCS Audio 2K")
 
 //-------------------------------------------------
 //  dcs_audio_2k_device - constructor
 //-------------------------------------------------
 
 dcs_audio_2k_device::dcs_audio_2k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	dcs_audio_device(mconfig, DCS_AUDIO_2K, "DCS Audio 2K", tag, owner, clock, "dcs_audio_2k", __FILE__)
+	dcs_audio_device(mconfig, DCS_AUDIO_2K, tag, owner, clock, 1)
 {
 }
 
-machine_config_constructor dcs_audio_2k_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( dcs_audio_2k );
-}
+MACHINE_CONFIG_MEMBER( dcs_audio_2k_device::device_add_mconfig )
 
-const device_type DCS_AUDIO_2K_UART = device_creator<dcs_audio_2k_uart_device>;
+	dcs_audio_device::add_mconfig_dcs(config);
+MACHINE_CONFIG_END
+
+DEFINE_DEVICE_TYPE(DCS_AUDIO_2K_UART, dcs_audio_2k_uart_device, "dcs_audio_2k_uart", "DCS Audio 2K UART")
 
 //-------------------------------------------------
 //  dcs_audio_2k_uart_device - constructor
 //-------------------------------------------------
 
 dcs_audio_2k_uart_device::dcs_audio_2k_uart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	dcs_audio_device(mconfig, DCS_AUDIO_2K_UART, "DCS Audio 2K UART", tag, owner, clock, "dcs_audio_2k_uart", __FILE__)
+	dcs_audio_device(mconfig, DCS_AUDIO_2K_UART, tag, owner, clock, 1)
 {
 }
 
-machine_config_constructor dcs_audio_2k_uart_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( dcs_audio_2k_uart );
-}
+/* Basic DCS system with ADSP-2105 and 2k of SRAM, using a UART for communications (X-unit) */
+MACHINE_CONFIG_MEMBER( dcs_audio_2k_uart_device::device_add_mconfig )
 
-const device_type DCS_AUDIO_8K = device_creator<dcs_audio_8k_device>;
+	dcs_audio_device::add_mconfig_dcs(config);
+
+	MCFG_CPU_MODIFY("dcs")
+	MCFG_CPU_DATA_MAP(dcs_2k_uart_data_map)
+MACHINE_CONFIG_END
+
+DEFINE_DEVICE_TYPE(DCS_AUDIO_8K, dcs_audio_8k_device, "dcs_audio_8k", "DCS Audio 8K")
 
 //-------------------------------------------------
 //  dcs_audio_8k_device - constructor
 //-------------------------------------------------
 
 dcs_audio_8k_device::dcs_audio_8k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	dcs_audio_device(mconfig, DCS_AUDIO_8K, "DCS Audio 8K", tag, owner, clock, "dcs_audio_8k", __FILE__)
+	dcs_audio_device(mconfig, DCS_AUDIO_8K, tag, owner, clock, 1)
 {
 }
 
-machine_config_constructor dcs_audio_8k_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( dcs_audio_8k );
-}
+/* Basic DCS system with ADSP-2105 and 8k of SRAM (Wolf-unit) */
+MACHINE_CONFIG_MEMBER( dcs_audio_8k_device::device_add_mconfig )
 
-const device_type DCS_AUDIO_WPC = device_creator<dcs_audio_wpc_device>;
+	dcs_audio_device::add_mconfig_dcs(config);
+
+	MCFG_CPU_MODIFY("dcs")
+	MCFG_CPU_PROGRAM_MAP(dcs_8k_program_map)
+	MCFG_CPU_DATA_MAP(dcs_8k_data_map)
+MACHINE_CONFIG_END
+
+DEFINE_DEVICE_TYPE(DCS_AUDIO_WPC, dcs_audio_wpc_device, "dcs_audio_wpc", "DCS Audio WPC")
 
 //-------------------------------------------------
 //  dcs_audio_wpc_device - constructor
 //-------------------------------------------------
 
 dcs_audio_wpc_device::dcs_audio_wpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	dcs_audio_device(mconfig, DCS_AUDIO_WPC, "DCS Audio WPC", tag, owner, clock, "dcs_audio_wpc", __FILE__, 15)
+	dcs_audio_device(mconfig, DCS_AUDIO_WPC, tag, owner, clock, 15)
 {
 }
 
-machine_config_constructor dcs_audio_wpc_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( dcs_audio_wpc );
-}
+MACHINE_CONFIG_MEMBER( dcs_audio_wpc_device::device_add_mconfig )
 
+	dcs_audio_device::add_mconfig_dcs(config);
+
+	MCFG_CPU_MODIFY("dcs")
+	MCFG_CPU_PROGRAM_MAP(dcs_wpc_program_map)
+	MCFG_CPU_DATA_MAP(dcs_wpc_data_map)
+MACHINE_CONFIG_END
 
 
 //-------------------------------------------------
 //  dcs2_audio_device - constructor
 //-------------------------------------------------
 
-dcs2_audio_device::dcs2_audio_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	dcs_audio_device(mconfig, type, name, tag, owner, clock, shortname, source)
+dcs2_audio_device::dcs2_audio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	dcs_audio_device(mconfig, type, tag, owner, clock, 1)
 {
 }
 
+MACHINE_CONFIG_MEMBER( dcs2_audio_device::add_mconfig_dcs2 )
+	MCFG_CPU_ADD("dcs2", ADSP2115, XTAL_16MHz)
+	MCFG_ADSP21XX_SPORT_TX_CB(WRITE32(dcs_audio_device, sound_tx_callback))      /* callback for serial transmit */
+	MCFG_ADSP21XX_TIMER_FIRED_CB(WRITELINE(dcs_audio_device, timer_enable_callback))   /* callback for timer fired */
+	MCFG_CPU_PROGRAM_MAP(dcs2_2115_program_map)
+	MCFG_CPU_DATA_MAP(dcs2_2115_data_map)
 
-const device_type DCS2_AUDIO_2115 = device_creator<dcs2_audio_2115_device>;
+	MCFG_TIMER_DEVICE_ADD("dcs_reg_timer", DEVICE_SELF, dcs_audio_device, dcs_irq)
+	MCFG_TIMER_DEVICE_ADD("dcs_sport_timer", DEVICE_SELF, dcs_audio_device, sport0_irq)
+	MCFG_TIMER_DEVICE_ADD("dcs_int_timer", DEVICE_SELF, dcs_audio_device, internal_timer_callback)
+	MCFG_TIMER_DEVICE_ADD("dcs_hle_timer", DEVICE_SELF, dcs_audio_device, transfer_watchdog_callback)
+
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_SOUND_ADD("dac1", DMADAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+
+	MCFG_SOUND_ADD("dac2", DMADAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+MACHINE_CONFIG_END
+
+DEFINE_DEVICE_TYPE(DCS2_AUDIO_2115, dcs2_audio_2115_device, "dcs2_audio_2115", "DCS2 Audio 2115")
 
 //-------------------------------------------------
 //  dcs2_audio_2115_device - constructor
 //-------------------------------------------------
 
 dcs2_audio_2115_device::dcs2_audio_2115_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	dcs2_audio_device(mconfig, DCS2_AUDIO_2115, "DCS2 Audio 2115", tag, owner, clock, "dcs2_audio_2115", __FILE__)
+	dcs2_audio_device(mconfig, DCS2_AUDIO_2115, tag, owner, clock)
 {
 }
 
-machine_config_constructor dcs2_audio_2115_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( dcs2_audio_2115 );
-}
+MACHINE_CONFIG_MEMBER( dcs2_audio_2115_device::device_add_mconfig )
 
-const device_type DCS2_AUDIO_2104 = device_creator<dcs2_audio_2104_device>;
+	dcs2_audio_device::add_mconfig_dcs2(config);
+
+MACHINE_CONFIG_END
+
+DEFINE_DEVICE_TYPE(DCS2_AUDIO_2104, dcs2_audio_2104_device, "dcs2_audio_2104", "DCS2 Audio 2104")
 
 //-------------------------------------------------
 //  dcs2_audio_2104_device - constructor
 //-------------------------------------------------
 
+
 dcs2_audio_2104_device::dcs2_audio_2104_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	dcs2_audio_device(mconfig, DCS2_AUDIO_2104, "DCS2 Audio 2104", tag, owner, clock, "dcs2_audio_2104", __FILE__)
+	dcs2_audio_device(mconfig, DCS2_AUDIO_2104, tag, owner, clock)
 {
 }
 
-machine_config_constructor dcs2_audio_2104_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( dcs2_audio_2104 );
-}
+MACHINE_CONFIG_MEMBER( dcs2_audio_2104_device::device_add_mconfig )
 
+	dcs2_audio_device::add_mconfig_dcs2(config);
 
-const device_type DCS2_AUDIO_DSIO = device_creator<dcs2_audio_dsio_device>;
+	MCFG_CPU_REPLACE("dcs2", ADSP2104, XTAL_16MHz)
+	MCFG_ADSP21XX_SPORT_TX_CB(WRITE32(dcs_audio_device, sound_tx_callback))      /* callback for serial transmit */
+	MCFG_ADSP21XX_TIMER_FIRED_CB(WRITELINE(dcs_audio_device,timer_enable_callback))   /* callback for timer fired */
+	MCFG_CPU_PROGRAM_MAP(dcs2_2104_program_map)
+	MCFG_CPU_DATA_MAP(dcs2_2104_data_map)
+MACHINE_CONFIG_END
+
+DEFINE_DEVICE_TYPE(DCS2_AUDIO_DSIO, dcs2_audio_dsio_device, "dcs2_audio_dsio", "DCS2 Audio DSIO")
 
 //-------------------------------------------------
 //  dcs2_audio_dsio_device - constructor
 //-------------------------------------------------
 
 dcs2_audio_dsio_device::dcs2_audio_dsio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	dcs2_audio_device(mconfig, DCS2_AUDIO_DSIO, "DCS2 Audio DSIO", tag, owner, clock, "dcs2_audio_dsio", __FILE__)
+	dcs2_audio_device(mconfig, DCS2_AUDIO_DSIO, tag, owner, clock)
 {
 }
 
-machine_config_constructor dcs2_audio_dsio_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( dcs2_audio_dsio );
-}
+MACHINE_CONFIG_MEMBER( dcs2_audio_dsio_device::device_add_mconfig )
+	MCFG_CPU_ADD("dsio", ADSP2181, XTAL_32MHz)
+	MCFG_ADSP21XX_SPORT_TX_CB(WRITE32(dcs_audio_device, sound_tx_callback))      /* callback for serial transmit */
+	MCFG_ADSP21XX_TIMER_FIRED_CB(WRITELINE(dcs_audio_device, timer_enable_callback))   /* callback for timer fired */
+	MCFG_ADSP21XX_DMOVLAY_CB(WRITE32(dcs_audio_device, dmovlay_callback)) // callback for adsp 2181 dmovlay instruction
+	MCFG_CPU_PROGRAM_MAP(dsio_program_map)
+	MCFG_CPU_DATA_MAP(dsio_data_map)
+	MCFG_CPU_IO_MAP(dsio_io_map)
 
-const device_type DCS2_AUDIO_DENVER = device_creator<dcs2_audio_denver_device>;
+	MCFG_DEVICE_ADD("data_map_bank", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(dsio_rambank_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(16)
+	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(14)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
+
+	MCFG_TIMER_DEVICE_ADD("dcs_reg_timer", DEVICE_SELF, dcs_audio_device, dcs_irq)
+	MCFG_TIMER_DEVICE_ADD("dcs_int_timer", DEVICE_SELF, dcs_audio_device, internal_timer_callback)
+	MCFG_TIMER_DEVICE_ADD("dcs_sport_timer", DEVICE_SELF, dcs_audio_device, sport0_irq) // roadburn needs this to pass harware test
+
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_SOUND_ADD("dac1", DMADAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+
+	MCFG_SOUND_ADD("dac2", DMADAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+MACHINE_CONFIG_END
+
+
+DEFINE_DEVICE_TYPE(DCS2_AUDIO_DENVER, dcs2_audio_denver_device, "dcs2_audio_denver", "DCS2 Audio Denver")
 
 //-------------------------------------------------
 //  dcs2_audio_denver_device - constructor
 //-------------------------------------------------
 
 dcs2_audio_denver_device::dcs2_audio_denver_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	dcs2_audio_device(mconfig, DCS2_AUDIO_DENVER, "DCS2 Audio Denver", tag, owner, clock, "dcs2_audio_denver", __FILE__)
+	dcs2_audio_device(mconfig, DCS2_AUDIO_DENVER, tag, owner, clock)
 {
 }
 
-machine_config_constructor dcs2_audio_denver_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( dcs2_audio_denver );
-}
+MACHINE_CONFIG_MEMBER( dcs2_audio_denver_device::device_add_mconfig )
+	MCFG_CPU_ADD("denver", ADSP2181, XTAL_33_333MHz)
+	MCFG_ADSP21XX_SPORT_TX_CB(WRITE32(dcs_audio_device, sound_tx_callback))      /* callback for serial transmit */
+	MCFG_ADSP21XX_TIMER_FIRED_CB(WRITELINE(dcs_audio_device, timer_enable_callback))   /* callback for timer fired */
+	MCFG_ADSP21XX_DMOVLAY_CB(WRITE32(dcs_audio_device, dmovlay_callback)) // callback for adsp 2181 dmovlay instruction
+	MCFG_CPU_PROGRAM_MAP(denver_program_map)
+	MCFG_CPU_DATA_MAP(denver_data_map)
+	MCFG_CPU_IO_MAP(denver_io_map)
+
+	MCFG_DEVICE_ADD("data_map_bank", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(denver_rambank_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(16)
+	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(14)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
+
+	MCFG_TIMER_DEVICE_ADD("dcs_reg_timer", DEVICE_SELF, dcs_audio_device, dcs_irq)
+	MCFG_TIMER_DEVICE_ADD("dcs_int_timer", DEVICE_SELF, dcs_audio_device, internal_timer_callback)
+	MCFG_TIMER_DEVICE_ADD("dcs_sport_timer", DEVICE_SELF, dcs_audio_device, sport0_irq) // Atlantis driver waits for sport0 rx interrupts
+
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_SOUND_ADD("dac1", DMADAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+
+	MCFG_SOUND_ADD("dac2", DMADAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+
+	MCFG_SOUND_ADD("dac3", DMADAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+
+	MCFG_SOUND_ADD("dac4", DMADAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+
+	MCFG_SOUND_ADD("dac5", DMADAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+
+	MCFG_SOUND_ADD("dac6", DMADAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+MACHINE_CONFIG_END

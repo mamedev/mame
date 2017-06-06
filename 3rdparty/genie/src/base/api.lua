@@ -72,6 +72,12 @@
 			scope = "config",
 		},
 
+		buildoptions_vala =
+		{
+			kind  = "list",
+			scope = "config",
+		},
+
 		clrreferences =
 		{
 			kind = "list",
@@ -124,6 +130,12 @@
 		dependency =
 		{
 			kind  = "table",
+			scope = "config",
+		},
+
+		deploymode =
+		{
+			kind = "string",
 			scope = "config",
 		},
 
@@ -329,6 +341,13 @@
 			usagecopy = true,
 		},
 
+		usingdirs =
+		{
+			kind  = "dirlist",
+			scope = "config",
+			usagecopy = true,
+		},
+
 		kind =
 		{
 			kind  = "string",
@@ -380,6 +399,7 @@
 				return value
 			end,
 			linkagecopy = true,
+			--mergecopiestotail = true,
 		},
 
 		location =
@@ -527,6 +547,18 @@
 			scope = "config",
 		},
 
+		propertysheets =
+		{
+			kind  = "dirlist",
+			scope = "config",
+		},
+
+		pullmappingfile =
+		{
+			kind  = "path",
+			scope = "config",
+		},
+
 		resdefines =
 		{
 			kind  = "list",
@@ -540,6 +572,12 @@
 		},
 
 		resoptions =
+		{
+			kind  = "list",
+			scope = "config",
+		},
+
+		sdkreferences =
 		{
 			kind  = "list",
 			scope = "config",
@@ -618,6 +656,12 @@
 		uses =
 		{
 			kind  = "list",
+			scope = "config",
+		},
+
+		vapidirs =
+		{
+			kind  = "dirlist",
 			scope = "config",
 		},
 

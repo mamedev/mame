@@ -403,7 +403,7 @@ int _main_(int _argc, char** _argv)
 		float view[16];
 		float proj[16];
 		bx::mtxLookAt(view, eye, at);
-		bx::mtxProj(proj, 60.0f, float(width)/float(height), 0.1f, 100.0f);
+		bx::mtxProj(proj, 60.0f, float(width)/float(height), 0.1f, 100.0f, bgfx::getCaps()->homogeneousDepth);
 
 		// Set view and projection matrix for view 0.
 		bgfx::setViewTransform(0, view, proj);
@@ -439,7 +439,8 @@ int _main_(int _argc, char** _argv)
 		// Take screen shot at frame 150.
 		if (150 == frame)
 		{
-			bgfx::saveScreenShot("temp/frame150");
+			bgfx::FrameBufferHandle fbh = BGFX_INVALID_HANDLE;
+			bgfx::requestScreenShot(fbh, "temp/frame150");
 		}
 
 		// Advance to next frame. Rendering thread will be kicked to

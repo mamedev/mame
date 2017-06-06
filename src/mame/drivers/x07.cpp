@@ -1477,7 +1477,7 @@ void x07_state::machine_reset()
 	m_maincpu->set_state_int(Z80_PC, 0xc3c3);
 }
 
-static MACHINE_CONFIG_START( x07, x07_state )
+static MACHINE_CONFIG_START( x07 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NSC800, XTAL_15_36MHz / 4)

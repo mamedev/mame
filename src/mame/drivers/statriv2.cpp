@@ -570,7 +570,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( statriv2, statriv2_state )
+static MACHINE_CONFIG_START( statriv2 )
 	/* basic machine hardware */
 	/* FIXME: The 8085A had a max clock of 6MHz, internally divided by 2! */
 	MCFG_CPU_ADD("maincpu", I8085A, MASTER_CLOCK)
@@ -1168,18 +1168,18 @@ DRIVER_INIT_MEMBER(statriv2_state,laserdisc)
  *
  *************************************/
 
-GAME( 1981, statusbj, 0,        statriv2,  statusbj, driver_device, 0,          ROT0, "Status Games", "Status Black Jack (V1.0c)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, funcsino, 0,        funcsino,  funcsino, driver_device, 0,          ROT0, "Status Games", "Status Fun Casino (V1.3s)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, tripdraw, 0,        statriv2,  funcsino, driver_device, 0,          ROT0, "Status Games", "Tripple Draw (V3.1 s)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1984, bigcsino, 0,        funcsino,  funcsino, driver_device, 0,          ROT0, "Status Games", "Big Casino", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) //needs correct inputs
-GAME( 1984, hangman,  0,        statriv2,  hangman, statriv2_state,  addr_lmh,  ROT0, "Status Games", "Hangman", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, trivquiz, 0,        statriv2,  statriv2, statriv2_state, addr_lhx,  ROT0, "Status Games", "Triv Quiz", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, statriv2, 0,        statriv2,  statriv2, statriv2_state, addr_xlh,  ROT0, "Status Games", "Triv Two", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, statriv2v,statriv2, statriv2v, statriv2, statriv2_state, addr_xlh,  ROT90,"Status Games", "Triv Two (Vertical)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, statriv4, 0,        statriv2,  statriv4, statriv2_state, addr_xhl,  ROT0, "Status Games", "Triv Four", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, sextriv,  0,        statriv2,  sextriv, statriv2_state,  addr_lhx,  ROT0, "Status Games", "Sex Triv", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, quaquiz2, 0,        statriv2,  quaquiz2, statriv2_state, addr_lmh,  ROT0, "Status Games", "Quadro Quiz II", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1985, supertr,  0,        statriv2,  supertr2, statriv2_state, addr_lhx,  ROT0, "Status Games", "Super Triv Quiz I", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING) // missing questions' ROMs
-GAME( 1986, supertr2, 0,        statriv2,  supertr2, statriv2_state, addr_lmhe, ROT0, "Status Games", "Super Triv II", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, supertr3, 0,        statriv2,  supertr2, statriv2_state, addr_lmh,  ROT0, "Status Games", "Super Triv III", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, cstripxi, 0,        statriv2,  funcsino, statriv2_state, laserdisc, ROT0, "Status Games", "Casino Strip XI", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1981, statusbj,  0,        statriv2,  statusbj, statriv2_state, 0,         ROT0,  "Status Games", "Status Black Jack (V1.0c)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, funcsino,  0,        funcsino,  funcsino, statriv2_state, 0,         ROT0,  "Status Games", "Status Fun Casino (V1.3s)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, tripdraw,  0,        statriv2,  funcsino, statriv2_state, 0,         ROT0,  "Status Games", "Tripple Draw (V3.1 s)",     MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1984, bigcsino,  0,        funcsino,  funcsino, statriv2_state, 0,         ROT0,  "Status Games", "Big Casino",                MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) //needs correct inputs
+GAME( 1984, hangman,   0,        statriv2,  hangman,  statriv2_state, addr_lmh,  ROT0,  "Status Games", "Hangman",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1984, trivquiz,  0,        statriv2,  statriv2, statriv2_state, addr_lhx,  ROT0,  "Status Games", "Triv Quiz",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1984, statriv2,  0,        statriv2,  statriv2, statriv2_state, addr_xlh,  ROT0,  "Status Games", "Triv Two",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1985, statriv2v, statriv2, statriv2v, statriv2, statriv2_state, addr_xlh,  ROT90, "Status Games", "Triv Two (Vertical)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1985, statriv4,  0,        statriv2,  statriv4, statriv2_state, addr_xhl,  ROT0,  "Status Games", "Triv Four",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1985, sextriv,   0,        statriv2,  sextriv,  statriv2_state, addr_lhx,  ROT0,  "Status Games", "Sex Triv",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1985, quaquiz2,  0,        statriv2,  quaquiz2, statriv2_state, addr_lmh,  ROT0,  "Status Games", "Quadro Quiz II",            MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1985, supertr,   0,        statriv2,  supertr2, statriv2_state, addr_lhx,  ROT0,  "Status Games", "Super Triv Quiz I",         MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING) // missing questions' ROMs
+GAME( 1986, supertr2,  0,        statriv2,  supertr2, statriv2_state, addr_lmhe, ROT0,  "Status Games", "Super Triv II",             MACHINE_SUPPORTS_SAVE )
+GAME( 1988, supertr3,  0,        statriv2,  supertr2, statriv2_state, addr_lmh,  ROT0,  "Status Games", "Super Triv III",            MACHINE_SUPPORTS_SAVE )
+GAME( 1990, cstripxi,  0,        statriv2,  funcsino, statriv2_state, laserdisc, ROT0,  "Status Games", "Casino Strip XI",           MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )

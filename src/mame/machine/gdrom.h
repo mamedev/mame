@@ -6,8 +6,10 @@
 
 ***************************************************************************/
 
-#ifndef _GDROM_H_
-#define _GDROM_H_
+#ifndef MAME_MACHINE_GDROM_H
+#define MAME_MACHINE_GDROM_H
+
+#pragma once
 
 #include "machine/atapicdr.h"
 
@@ -36,7 +38,6 @@ private:
 	uint32_t transferOffset;
 };
 
-// device type definition
-extern const device_type GDROM;
+DECLARE_DEVICE_TYPE(GDROM, gdrom_device)
 
-#endif
+#endif // MAME_MACHINE_GDROM_H

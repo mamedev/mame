@@ -244,7 +244,7 @@ void bsktball_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( bsktball, bsktball_state )
+static MACHINE_CONFIG_START( bsktball )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502,750000)
@@ -302,4 +302,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1979, bsktball, 0, bsktball, bsktball, driver_device, 0, ROT0, "Atari", "Basketball", MACHINE_SUPPORTS_SAVE )
+GAME( 1979, bsktball, 0, bsktball, bsktball, bsktball_state, 0, ROT0, "Atari", "Basketball", MACHINE_SUPPORTS_SAVE )

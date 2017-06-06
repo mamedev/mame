@@ -14,7 +14,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A1BUS_SLOT = device_creator<a1bus_slot_device>;
+DEFINE_DEVICE_TYPE(A1BUS_SLOT, a1bus_slot_device, "a1bus_slot", "Apple I Slot")
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -23,17 +23,16 @@ const device_type A1BUS_SLOT = device_creator<a1bus_slot_device>;
 //-------------------------------------------------
 //  a1bus_slot_device - constructor
 //-------------------------------------------------
-a1bus_slot_device::a1bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, A1BUS_SLOT, "Apple I Slot", tag, owner, clock, "a1bus_slot", __FILE__),
-		device_slot_interface(mconfig, *this),
-	m_a1bus_tag(nullptr),
-	m_a1bus_slottag(nullptr)
+a1bus_slot_device::a1bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: a1bus_slot_device(mconfig, A1BUS_SLOT, tag, owner, clock)
 {
 }
 
-a1bus_slot_device::a1bus_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_slot_interface(mconfig, *this), m_a1bus_tag(nullptr), m_a1bus_slottag(nullptr)
+a1bus_slot_device::a1bus_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_slot_interface(mconfig, *this)
+	, m_a1bus_tag(nullptr)
+	, m_a1bus_slottag(nullptr)
 {
 }
 
@@ -59,7 +58,7 @@ void a1bus_slot_device::device_start()
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A1BUS = device_creator<a1bus_device>;
+DEFINE_DEVICE_TYPE(A1BUS, a1bus_device, "a1bus", "Apple I Bus")
 
 void a1bus_device::static_set_cputag(device_t &device, const char *tag)
 {
@@ -75,17 +74,18 @@ void a1bus_device::static_set_cputag(device_t &device, const char *tag)
 //  a1bus_device - constructor
 //-------------------------------------------------
 
-a1bus_device::a1bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, A1BUS, "Apple I Bus", tag, owner, clock, "a1bus", __FILE__), m_maincpu(nullptr),
-		m_out_irq_cb(*this),
-		m_out_nmi_cb(*this), m_device(nullptr), m_cputag(nullptr)
+a1bus_device::a1bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: a1bus_device(mconfig, A1BUS, tag, owner, clock)
 {
 }
 
-a1bus_device::a1bus_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-		device_t(mconfig, type, name, tag, owner, clock, shortname, source), m_maincpu(nullptr),
-		m_out_irq_cb(*this),
-		m_out_nmi_cb(*this), m_device(nullptr), m_cputag(nullptr)
+a1bus_device::a1bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, m_maincpu(nullptr)
+	, m_out_irq_cb(*this)
+	, m_out_nmi_cb(*this)
+	, m_device(nullptr)
+	, m_cputag(nullptr)
 {
 }
 //-------------------------------------------------

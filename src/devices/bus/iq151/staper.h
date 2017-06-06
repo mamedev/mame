@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco
-#pragma once
+#ifndef MAME_BUS_IQ151_STAPER_H
+#define MAME_BUS_IQ151_STAPER_H
 
-#ifndef __IQ151_STAPER_H__
-#define __IQ151_STAPER_H__
+#pragma once
 
 #include "iq151.h"
 #include "machine/i8255.h"
@@ -53,6 +53,6 @@ private:
 
 
 // device type definition
-extern const device_type IQ151_STAPER;
+DECLARE_DEVICE_TYPE(IQ151_STAPER, iq151_staper_device)
 
-#endif  /* __IQ151_STAPER_H__ */
+#endif // MAME_BUS_IQ151_STAPER_H

@@ -38,7 +38,7 @@ public:
 	{
 	public:
 
-		static const std::size_t npos = static_cast<std::size_t>(-1);
+		static constexpr std::size_t npos = static_cast<std::size_t>(-1);
 
 		token_id_t() : m_id(npos) {}
 		explicit token_id_t(const std::size_t id) : m_id(id) {}
@@ -127,7 +127,7 @@ private:
 
 	int m_lineno;
 	pstring m_cur_line;
-	pstring::iterator m_px;
+	pstring::const_iterator m_px;
 	pstring::code_t m_unget;
 
 	/* tokenizer stuff follows ... */

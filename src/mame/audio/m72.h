@@ -5,12 +5,15 @@
     M72 audio interface
 
 ****************************************************************************/
+#ifndef MAME_AUDIO_M72_H
+#define MAME_AUDIO_M72_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "sound/dac.h"
 
-class m72_audio_device : public device_t,
-									public device_sound_interface
+class m72_audio_device : public device_t, public device_sound_interface
 {
 public:
 	m72_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -59,4 +62,6 @@ private:
 	TIMER_CALLBACK_MEMBER( setvector_callback );
 };
 
-extern const device_type M72;
+DECLARE_DEVICE_TYPE(IREM_M72_AUDIO, m72_audio_device)
+
+#endif // MAME_AUDIO_M72_H

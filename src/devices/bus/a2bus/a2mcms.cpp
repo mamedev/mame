@@ -23,7 +23,7 @@ enum
 };
 
 
-const device_type MCMS = device_creator<mcms_device>;
+DEFINE_DEVICE_TYPE(MCMS, mcms_device, "mcmseng", "Mountain Computer Music System engine")
 
 /***************************************************************************
     PARAMETERS
@@ -33,15 +33,23 @@ const device_type MCMS = device_creator<mcms_device>;
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_MCMS1 = device_creator<a2bus_mcms1_device>;
-const device_type A2BUS_MCMS2 = device_creator<a2bus_mcms2_device>;
+DEFINE_DEVICE_TYPE(A2BUS_MCMS1, a2bus_mcms1_device, "a2mcms1", "Mountain Computer Music System (card 1)")
+DEFINE_DEVICE_TYPE(A2BUS_MCMS2, a2bus_mcms2_device, "a2mcms2", "Mountain Computer Music System (card 2)")
 
 #define ENGINE_TAG  "engine"
 
 #define MCFG_MCMS_IRQ_CALLBACK(_cb) \
 	devcb = &mcms_device::set_irq_cb(*device, DEVCB_##_cb);
 
-MACHINE_CONFIG_FRAGMENT( a2mcms )
+/***************************************************************************
+    FUNCTION PROTOTYPES
+***************************************************************************/
+
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( a2bus_mcms1_device::device_add_mconfig )
 	MCFG_SPEAKER_STANDARD_STEREO("mcms_l", "mcms_r")
 
 	MCFG_DEVICE_ADD(ENGINE_TAG, MCMS, 1000000)
@@ -51,35 +59,19 @@ MACHINE_CONFIG_FRAGMENT( a2mcms )
 	MCFG_SOUND_ROUTE(1, "mcms_r", 1.0)
 MACHINE_CONFIG_END
 
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor a2bus_mcms1_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( a2mcms );
-}
-
 //**************************************************************************
 //  LIVE DEVICE - Card 1
 //**************************************************************************
 
-a2bus_mcms1_device::a2bus_mcms1_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+a2bus_mcms1_device::a2bus_mcms1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this),
 	m_mcms(*this, ENGINE_TAG)
 {
 }
 
 a2bus_mcms1_device::a2bus_mcms1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, A2BUS_MCMS1, "Mountain Computer Music System (card 1)", tag, owner, clock, "a2mcms1", __FILE__),
-	device_a2bus_card_interface(mconfig, *this),
-	m_mcms(*this, ENGINE_TAG)
+	a2bus_mcms1_device(mconfig, A2BUS_MCMS1, tag, owner, clock)
 {
 }
 
@@ -150,15 +142,14 @@ WRITE_LINE_MEMBER(a2bus_mcms1_device::irq_w)
 //  LIVE DEVICE - Card 2
 //**************************************************************************
 
-a2bus_mcms2_device::a2bus_mcms2_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+a2bus_mcms2_device::a2bus_mcms2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this), m_card1(nullptr), m_engine(nullptr)
 {
 }
 
 a2bus_mcms2_device::a2bus_mcms2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, A2BUS_MCMS2, "Mountain Computer Music System (card 2)", tag, owner, clock, "a2mcms2", __FILE__),
-	device_a2bus_card_interface(mconfig, *this), m_card1(nullptr), m_engine(nullptr)
+	a2bus_mcms2_device(mconfig, A2BUS_MCMS2, tag, owner, clock)
 {
 }
 
@@ -214,7 +205,7 @@ void a2bus_mcms2_device::write_cnxx(address_space &space, uint8_t offset, uint8_
 */
 
 mcms_device::mcms_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MCMS, "Mountain Computer Music System engine", tag, owner, clock, "msmseng", __FILE__),
+	: device_t(mconfig, MCMS, tag, owner, clock),
 	device_sound_interface(mconfig, *this),
 	m_write_irq(*this), m_stream(nullptr), m_timer(nullptr), m_clrtimer(nullptr), m_pBusDevice(nullptr), m_enabled(false), m_mastervol(0), m_rand(0)
 {

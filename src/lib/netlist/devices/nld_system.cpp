@@ -46,8 +46,9 @@ namespace netlist
 	NETLIB_UPDATE(extclock)
 	{
 		m_Q.push((m_cnt & 1) ^ 1, m_inc[m_cnt] + m_off);
-		m_cnt = (m_cnt + 1) % m_size;
 		m_off = netlist_time::zero();
+		if (++m_cnt >= m_size)
+			m_cnt = 0;
 	}
 
 	// ----------------------------------------------------------------------------------------
@@ -136,7 +137,7 @@ namespace netlist
 		{
 			m_vals[i] = (*m_I[i])();
 		}
-		m_Q.push(m_precompiled.evaluate(m_vals));
+		m_Q.push(m_compiled.evaluate(m_vals));
 	}
 
 

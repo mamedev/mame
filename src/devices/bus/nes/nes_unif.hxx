@@ -555,7 +555,7 @@ void nes_cart_slot_device::call_load_unif()
 	logerror("UNIF support is only very preliminary.\n");
 }
 
-const char * nes_cart_slot_device::get_default_card_unif(uint8_t *ROM, uint32_t len)
+const char * nes_cart_slot_device::get_default_card_unif(const uint8_t *ROM, uint32_t len)
 {
 	uint32_t chunk_length = 0, read_length = 0x20;
 	int pcb_id = 0, battery = 0, prgram = 0, vram_chunks = 0;

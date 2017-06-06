@@ -226,11 +226,11 @@ private:
 	void recalc_filter(filter &f);
 };
 
-static const device_type ESQ1_FILTERS = device_creator<esq1_filters>;
+DEFINE_DEVICE_TYPE(ESQ1_FILTERS, esq1_filters, "esq1_filters", "ESQ1 Filters stage")
 
 esq1_filters::esq1_filters(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ESQ1_FILTERS, "ESQ1 Filters stage", tag, owner, clock, "esq1_filters", __FILE__),
-		device_sound_interface(mconfig, *this)
+	: device_t(mconfig, ESQ1_FILTERS, tag, owner, clock)
+	, device_sound_interface(mconfig, *this)
 {
 }
 
@@ -398,7 +398,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<mc68681_device> m_duart;
 	required_device<esq1_filters> m_filters;
-	optional_device<wd1772_t> m_fdc;
+	optional_device<wd1772_device> m_fdc;
 	optional_device<esqpanel2x40_device> m_panel;
 	optional_device<midi_port_device> m_mdout;
 
@@ -584,7 +584,7 @@ INPUT_CHANGED_MEMBER(esq1_state::key_stroke)
 	}
 }
 
-static MACHINE_CONFIG_START( esq1, esq1_state )
+static MACHINE_CONFIG_START( esq1 )
 	MCFG_CPU_ADD("maincpu", M6809E, 4000000)    // how fast is it?
 	MCFG_CPU_PROGRAM_MAP(esq1_map)
 
@@ -595,7 +595,7 @@ static MACHINE_CONFIG_START( esq1, esq1_state )
 	MCFG_MC68681_B_TX_CALLBACK(WRITELINE(esq1_state, duart_tx_b))
 	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(esq1_state, duart_output))
 
-	MCFG_ESQPANEL2x40_ADD("panel")
+	MCFG_ESQPANEL2X40_ADD("panel")
 	MCFG_ESQPANEL_TX_CALLBACK(DEVWRITELINE("duart", mc68681_device, rx_b_w))
 
 	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
@@ -696,6 +696,6 @@ ROM_START( esqm )
 ROM_END
 
 
-CONS( 1986, esq1, 0   , 0, esq1, esq1, driver_device, 0, "Ensoniq", "ESQ-1", MACHINE_NOT_WORKING )
-CONS( 1986, esqm, esq1, 0, esq1, esq1, driver_device, 0, "Ensoniq", "ESQ-M", MACHINE_NOT_WORKING )
-CONS( 1988, sq80, 0,    0, sq80, esq1, driver_device, 0, "Ensoniq", "SQ-80", MACHINE_NOT_WORKING )
+CONS( 1986, esq1, 0   , 0, esq1, esq1, esq1_state, 0, "Ensoniq", "ESQ-1", MACHINE_NOT_WORKING )
+CONS( 1986, esqm, esq1, 0, esq1, esq1, esq1_state, 0, "Ensoniq", "ESQ-M", MACHINE_NOT_WORKING )
+CONS( 1988, sq80, 0,    0, sq80, esq1, esq1_state, 0, "Ensoniq", "SQ-80", MACHINE_NOT_WORKING )

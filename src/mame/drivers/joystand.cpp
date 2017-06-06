@@ -579,7 +579,7 @@ INTERRUPT_GEN_MEMBER(joystand_state::joystand_interrupt)
 	m_tmp68301->external_interrupt_1();
 }
 
-static MACHINE_CONFIG_START( joystand, joystand_state )
+static MACHINE_CONFIG_START( joystand )
 
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz) // !! TMP68301 !!
@@ -610,7 +610,7 @@ static MACHINE_CONFIG_START( joystand, joystand_state )
 	MCFG_SOUND_ADD("ym2413", YM2413, XTAL_3_579545MHz)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_16MHz / 16, OKIM6295_PIN7_HIGH) // pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL_16MHz / 16, PIN7_HIGH) // pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	// cart
@@ -686,4 +686,4 @@ ROM_START( joystand )
 	ROM_LOAD( "jsp-xct.ic5",   0x000, 0x117, NO_DUMP )
 ROM_END
 
-GAME( 1997, joystand, 0, joystand, joystand, driver_device, 0, ROT0, "Yuvo", "Joy Stand Private", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, joystand, 0, joystand, joystand, joystand_state, 0, ROT0, "Yuvo", "Joy Stand Private", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

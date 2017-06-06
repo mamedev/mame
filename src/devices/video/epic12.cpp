@@ -6,13 +6,13 @@
 #include "epic12.h"
 
 
-
-const device_type EPIC12 = device_creator<epic12_device>;
+DEFINE_DEVICE_TYPE(EPIC12, epic12_device, "epic12", "EPIC12 Blitter")
 
 epic12_device::epic12_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, EPIC12, "EP1C12 Blitter", tag, owner, clock, "epic12", __FILE__),
-		device_video_interface(mconfig, *this), m_ram16(nullptr), m_gfx_size(0), m_bitmaps(nullptr), m_use_ram(nullptr),
-	m_main_ramsize(0), m_main_rammask(0), m_maincpu(nullptr), m_ram16_copy(nullptr), m_work_queue(nullptr)
+	: device_t(mconfig, EPIC12, tag, owner, clock)
+	, device_video_interface(mconfig, *this)
+	, m_ram16(nullptr), m_gfx_size(0), m_bitmaps(nullptr), m_use_ram(nullptr)
+	, m_main_ramsize(0), m_main_rammask(0), m_maincpu(nullptr), m_ram16_copy(nullptr), m_work_queue(nullptr)
 {
 	m_is_unsafe = 0;
 	m_delay_scale = 0;
@@ -29,7 +29,7 @@ epic12_device::epic12_device(const machine_config &mconfig, const char *tag, dev
 	m_gfx_scroll_0_y_shadowcopy = 0;
 	m_gfx_scroll_1_x_shadowcopy = 0;
 	m_gfx_scroll_1_y_shadowcopy = 0;
-	epic12_device_blit_delay = 0;
+	blit_delay = 0;
 }
 
 TIMER_CALLBACK_MEMBER( epic12_device::blitter_delay_callback )
@@ -84,11 +84,11 @@ void epic12_device::device_reset()
 	{
 		for (x=0;x<0x20;x++)
 		{
-			epic12_device_colrtable[x][y] = (x*y) / 0x1f;
-			if (epic12_device_colrtable[x][y]>0x1f) epic12_device_colrtable[x][y] = 0x1f;
+			colrtable[x][y] = (x*y) / 0x1f;
+			if (colrtable[x][y]>0x1f) colrtable[x][y] = 0x1f;
 
-			epic12_device_colrtable_rev[x^0x1f][y] = (x*y) / 0x1f;
-			if (epic12_device_colrtable_rev[x^0x1f][y]>0x1f) epic12_device_colrtable_rev[x^0x1f][y] = 0x1f;
+			colrtable_rev[x^0x1f][y] = (x*y) / 0x1f;
+			if (colrtable_rev[x^0x1f][y]>0x1f) colrtable_rev[x^0x1f][y] = 0x1f;
 		}
 	}
 
@@ -97,8 +97,8 @@ void epic12_device::device_reset()
 	{
 		for (x=0;x<0x20;x++)
 		{
-			epic12_device_colrtable_add[x][y] = (x+y);
-			if (epic12_device_colrtable_add[x][y]>0x1f) epic12_device_colrtable_add[x][y] = 0x1f;
+			colrtable_add[x][y] = (x+y);
+			if (colrtable_add[x][y]>0x1f) colrtable_add[x][y] = 0x1f;
 		}
 	}
 
@@ -106,10 +106,10 @@ void epic12_device::device_reset()
 }
 
 // todo, get these into the device class without ruining performance
-uint8_t epic12_device_colrtable[0x20][0x40];
-uint8_t epic12_device_colrtable_rev[0x20][0x40];
-uint8_t epic12_device_colrtable_add[0x20][0x20];
-uint64_t epic12_device_blit_delay;
+uint8_t epic12_device::colrtable[0x20][0x40];
+uint8_t epic12_device::colrtable_rev[0x20][0x40];
+uint8_t epic12_device::colrtable_add[0x20][0x20];
+uint64_t epic12_device::blit_delay;
 
 inline uint16_t epic12_device::READ_NEXT_WORD(offs_t *addr)
 {
@@ -204,7 +204,7 @@ inline void epic12_device::gfx_upload(offs_t *addr)
 
 
 
-epic12_device_blitfunction epic12_device_f0_ti1_tr1_blit_funcs[] =
+const epic12_device::blitfunction epic12_device::f0_ti1_tr1_blit_funcs[64] =
 {
 	epic12_device::draw_sprite_f0_ti1_tr1_s0_d0, epic12_device::draw_sprite_f0_ti1_tr1_s1_d0, epic12_device::draw_sprite_f0_ti1_tr1_s2_d0, epic12_device::draw_sprite_f0_ti1_tr1_s3_d0, epic12_device::draw_sprite_f0_ti1_tr1_s4_d0, epic12_device::draw_sprite_f0_ti1_tr1_s5_d0, epic12_device::draw_sprite_f0_ti1_tr1_s6_d0, epic12_device::draw_sprite_f0_ti1_tr1_s7_d0,
 	epic12_device::draw_sprite_f0_ti1_tr1_s0_d1, epic12_device::draw_sprite_f0_ti1_tr1_s1_d1, epic12_device::draw_sprite_f0_ti1_tr1_s2_d1, epic12_device::draw_sprite_f0_ti1_tr1_s3_d1, epic12_device::draw_sprite_f0_ti1_tr1_s4_d1, epic12_device::draw_sprite_f0_ti1_tr1_s5_d1, epic12_device::draw_sprite_f0_ti1_tr1_s6_d1, epic12_device::draw_sprite_f0_ti1_tr1_s7_d1,
@@ -216,7 +216,7 @@ epic12_device_blitfunction epic12_device_f0_ti1_tr1_blit_funcs[] =
 	epic12_device::draw_sprite_f0_ti1_tr1_s0_d7, epic12_device::draw_sprite_f0_ti1_tr1_s1_d7, epic12_device::draw_sprite_f0_ti1_tr1_s2_d7, epic12_device::draw_sprite_f0_ti1_tr1_s3_d7, epic12_device::draw_sprite_f0_ti1_tr1_s4_d7, epic12_device::draw_sprite_f0_ti1_tr1_s5_d7, epic12_device::draw_sprite_f0_ti1_tr1_s6_d7, epic12_device::draw_sprite_f0_ti1_tr1_s7_d7,
 };
 
-epic12_device_blitfunction epic12_device_f0_ti1_tr0_blit_funcs[] =
+const epic12_device::blitfunction epic12_device::f0_ti1_tr0_blit_funcs[64] =
 {
 	epic12_device::draw_sprite_f0_ti1_tr0_s0_d0, epic12_device::draw_sprite_f0_ti1_tr0_s1_d0, epic12_device::draw_sprite_f0_ti1_tr0_s2_d0, epic12_device::draw_sprite_f0_ti1_tr0_s3_d0, epic12_device::draw_sprite_f0_ti1_tr0_s4_d0, epic12_device::draw_sprite_f0_ti1_tr0_s5_d0, epic12_device::draw_sprite_f0_ti1_tr0_s6_d0, epic12_device::draw_sprite_f0_ti1_tr0_s7_d0,
 	epic12_device::draw_sprite_f0_ti1_tr0_s0_d1, epic12_device::draw_sprite_f0_ti1_tr0_s1_d1, epic12_device::draw_sprite_f0_ti1_tr0_s2_d1, epic12_device::draw_sprite_f0_ti1_tr0_s3_d1, epic12_device::draw_sprite_f0_ti1_tr0_s4_d1, epic12_device::draw_sprite_f0_ti1_tr0_s5_d1, epic12_device::draw_sprite_f0_ti1_tr0_s6_d1, epic12_device::draw_sprite_f0_ti1_tr0_s7_d1,
@@ -228,7 +228,7 @@ epic12_device_blitfunction epic12_device_f0_ti1_tr0_blit_funcs[] =
 	epic12_device::draw_sprite_f0_ti1_tr0_s0_d7, epic12_device::draw_sprite_f0_ti1_tr0_s1_d7, epic12_device::draw_sprite_f0_ti1_tr0_s2_d7, epic12_device::draw_sprite_f0_ti1_tr0_s3_d7, epic12_device::draw_sprite_f0_ti1_tr0_s4_d7, epic12_device::draw_sprite_f0_ti1_tr0_s5_d7, epic12_device::draw_sprite_f0_ti1_tr0_s6_d7, epic12_device::draw_sprite_f0_ti1_tr0_s7_d7,
 };
 
-epic12_device_blitfunction epic12_device_f1_ti1_tr1_blit_funcs[] =
+const epic12_device::blitfunction epic12_device::f1_ti1_tr1_blit_funcs[64] =
 {
 	epic12_device::draw_sprite_f1_ti1_tr1_s0_d0, epic12_device::draw_sprite_f1_ti1_tr1_s1_d0, epic12_device::draw_sprite_f1_ti1_tr1_s2_d0, epic12_device::draw_sprite_f1_ti1_tr1_s3_d0, epic12_device::draw_sprite_f1_ti1_tr1_s4_d0, epic12_device::draw_sprite_f1_ti1_tr1_s5_d0, epic12_device::draw_sprite_f1_ti1_tr1_s6_d0, epic12_device::draw_sprite_f1_ti1_tr1_s7_d0,
 	epic12_device::draw_sprite_f1_ti1_tr1_s0_d1, epic12_device::draw_sprite_f1_ti1_tr1_s1_d1, epic12_device::draw_sprite_f1_ti1_tr1_s2_d1, epic12_device::draw_sprite_f1_ti1_tr1_s3_d1, epic12_device::draw_sprite_f1_ti1_tr1_s4_d1, epic12_device::draw_sprite_f1_ti1_tr1_s5_d1, epic12_device::draw_sprite_f1_ti1_tr1_s6_d1, epic12_device::draw_sprite_f1_ti1_tr1_s7_d1,
@@ -240,7 +240,7 @@ epic12_device_blitfunction epic12_device_f1_ti1_tr1_blit_funcs[] =
 	epic12_device::draw_sprite_f1_ti1_tr1_s0_d7, epic12_device::draw_sprite_f1_ti1_tr1_s1_d7, epic12_device::draw_sprite_f1_ti1_tr1_s2_d7, epic12_device::draw_sprite_f1_ti1_tr1_s3_d7, epic12_device::draw_sprite_f1_ti1_tr1_s4_d7, epic12_device::draw_sprite_f1_ti1_tr1_s5_d7, epic12_device::draw_sprite_f1_ti1_tr1_s6_d7, epic12_device::draw_sprite_f1_ti1_tr1_s7_d7,
 };
 
-epic12_device_blitfunction epic12_device_f1_ti1_tr0_blit_funcs[] =
+const epic12_device::blitfunction epic12_device::f1_ti1_tr0_blit_funcs[64] =
 {
 	epic12_device::draw_sprite_f1_ti1_tr0_s0_d0, epic12_device::draw_sprite_f1_ti1_tr0_s1_d0, epic12_device::draw_sprite_f1_ti1_tr0_s2_d0, epic12_device::draw_sprite_f1_ti1_tr0_s3_d0, epic12_device::draw_sprite_f1_ti1_tr0_s4_d0, epic12_device::draw_sprite_f1_ti1_tr0_s5_d0, epic12_device::draw_sprite_f1_ti1_tr0_s6_d0, epic12_device::draw_sprite_f1_ti1_tr0_s7_d0,
 	epic12_device::draw_sprite_f1_ti1_tr0_s0_d1, epic12_device::draw_sprite_f1_ti1_tr0_s1_d1, epic12_device::draw_sprite_f1_ti1_tr0_s2_d1, epic12_device::draw_sprite_f1_ti1_tr0_s3_d1, epic12_device::draw_sprite_f1_ti1_tr0_s4_d1, epic12_device::draw_sprite_f1_ti1_tr0_s5_d1, epic12_device::draw_sprite_f1_ti1_tr0_s6_d1, epic12_device::draw_sprite_f1_ti1_tr0_s7_d1,
@@ -254,7 +254,7 @@ epic12_device_blitfunction epic12_device_f1_ti1_tr0_blit_funcs[] =
 
 
 
-epic12_device_blitfunction epic12_device_f0_ti0_tr1_blit_funcs[] =
+const epic12_device::blitfunction epic12_device::f0_ti0_tr1_blit_funcs[64] =
 {
 	epic12_device::draw_sprite_f0_ti0_tr1_s0_d0, epic12_device::draw_sprite_f0_ti0_tr1_s1_d0, epic12_device::draw_sprite_f0_ti0_tr1_s2_d0, epic12_device::draw_sprite_f0_ti0_tr1_s3_d0, epic12_device::draw_sprite_f0_ti0_tr1_s4_d0, epic12_device::draw_sprite_f0_ti0_tr1_s5_d0, epic12_device::draw_sprite_f0_ti0_tr1_s6_d0, epic12_device::draw_sprite_f0_ti0_tr1_s7_d0,
 	epic12_device::draw_sprite_f0_ti0_tr1_s0_d1, epic12_device::draw_sprite_f0_ti0_tr1_s1_d1, epic12_device::draw_sprite_f0_ti0_tr1_s2_d1, epic12_device::draw_sprite_f0_ti0_tr1_s3_d1, epic12_device::draw_sprite_f0_ti0_tr1_s4_d1, epic12_device::draw_sprite_f0_ti0_tr1_s5_d1, epic12_device::draw_sprite_f0_ti0_tr1_s6_d1, epic12_device::draw_sprite_f0_ti0_tr1_s7_d1,
@@ -266,7 +266,7 @@ epic12_device_blitfunction epic12_device_f0_ti0_tr1_blit_funcs[] =
 	epic12_device::draw_sprite_f0_ti0_tr1_s0_d7, epic12_device::draw_sprite_f0_ti0_tr1_s1_d7, epic12_device::draw_sprite_f0_ti0_tr1_s2_d7, epic12_device::draw_sprite_f0_ti0_tr1_s3_d7, epic12_device::draw_sprite_f0_ti0_tr1_s4_d7, epic12_device::draw_sprite_f0_ti0_tr1_s5_d7, epic12_device::draw_sprite_f0_ti0_tr1_s6_d7, epic12_device::draw_sprite_f0_ti0_tr1_s7_d7,
 };
 
-epic12_device_blitfunction epic12_device_f0_ti0_tr0_blit_funcs[] =
+const epic12_device::blitfunction epic12_device::f0_ti0_tr0_blit_funcs[64] =
 {
 	epic12_device::draw_sprite_f0_ti0_tr0_s0_d0, epic12_device::draw_sprite_f0_ti0_tr0_s1_d0, epic12_device::draw_sprite_f0_ti0_tr0_s2_d0, epic12_device::draw_sprite_f0_ti0_tr0_s3_d0, epic12_device::draw_sprite_f0_ti0_tr0_s4_d0, epic12_device::draw_sprite_f0_ti0_tr0_s5_d0, epic12_device::draw_sprite_f0_ti0_tr0_s6_d0, epic12_device::draw_sprite_f0_ti0_tr0_s7_d0,
 	epic12_device::draw_sprite_f0_ti0_tr0_s0_d1, epic12_device::draw_sprite_f0_ti0_tr0_s1_d1, epic12_device::draw_sprite_f0_ti0_tr0_s2_d1, epic12_device::draw_sprite_f0_ti0_tr0_s3_d1, epic12_device::draw_sprite_f0_ti0_tr0_s4_d1, epic12_device::draw_sprite_f0_ti0_tr0_s5_d1, epic12_device::draw_sprite_f0_ti0_tr0_s6_d1, epic12_device::draw_sprite_f0_ti0_tr0_s7_d1,
@@ -278,7 +278,7 @@ epic12_device_blitfunction epic12_device_f0_ti0_tr0_blit_funcs[] =
 	epic12_device::draw_sprite_f0_ti0_tr0_s0_d7, epic12_device::draw_sprite_f0_ti0_tr0_s1_d7, epic12_device::draw_sprite_f0_ti0_tr0_s2_d7, epic12_device::draw_sprite_f0_ti0_tr0_s3_d7, epic12_device::draw_sprite_f0_ti0_tr0_s4_d7, epic12_device::draw_sprite_f0_ti0_tr0_s5_d7, epic12_device::draw_sprite_f0_ti0_tr0_s6_d7, epic12_device::draw_sprite_f0_ti0_tr0_s7_d7,
 };
 
-epic12_device_blitfunction epic12_device_f1_ti0_tr1_blit_funcs[] =
+const epic12_device::blitfunction epic12_device::f1_ti0_tr1_blit_funcs[64] =
 {
 	epic12_device::draw_sprite_f1_ti0_tr1_s0_d0, epic12_device::draw_sprite_f1_ti0_tr1_s1_d0, epic12_device::draw_sprite_f1_ti0_tr1_s2_d0, epic12_device::draw_sprite_f1_ti0_tr1_s3_d0, epic12_device::draw_sprite_f1_ti0_tr1_s4_d0, epic12_device::draw_sprite_f1_ti0_tr1_s5_d0, epic12_device::draw_sprite_f1_ti0_tr1_s6_d0, epic12_device::draw_sprite_f1_ti0_tr1_s7_d0,
 	epic12_device::draw_sprite_f1_ti0_tr1_s0_d1, epic12_device::draw_sprite_f1_ti0_tr1_s1_d1, epic12_device::draw_sprite_f1_ti0_tr1_s2_d1, epic12_device::draw_sprite_f1_ti0_tr1_s3_d1, epic12_device::draw_sprite_f1_ti0_tr1_s4_d1, epic12_device::draw_sprite_f1_ti0_tr1_s5_d1, epic12_device::draw_sprite_f1_ti0_tr1_s6_d1, epic12_device::draw_sprite_f1_ti0_tr1_s7_d1,
@@ -290,7 +290,7 @@ epic12_device_blitfunction epic12_device_f1_ti0_tr1_blit_funcs[] =
 	epic12_device::draw_sprite_f1_ti0_tr1_s0_d7, epic12_device::draw_sprite_f1_ti0_tr1_s1_d7, epic12_device::draw_sprite_f1_ti0_tr1_s2_d7, epic12_device::draw_sprite_f1_ti0_tr1_s3_d7, epic12_device::draw_sprite_f1_ti0_tr1_s4_d7, epic12_device::draw_sprite_f1_ti0_tr1_s5_d7, epic12_device::draw_sprite_f1_ti0_tr1_s6_d7, epic12_device::draw_sprite_f1_ti0_tr1_s7_d7,
 };
 
-epic12_device_blitfunction epic12_device_f1_ti0_tr0_blit_funcs[] =
+const epic12_device::blitfunction epic12_device::f1_ti0_tr0_blit_funcs[64] =
 {
 	epic12_device::draw_sprite_f1_ti0_tr0_s0_d0, epic12_device::draw_sprite_f1_ti0_tr0_s1_d0, epic12_device::draw_sprite_f1_ti0_tr0_s2_d0, epic12_device::draw_sprite_f1_ti0_tr0_s3_d0, epic12_device::draw_sprite_f1_ti0_tr0_s4_d0, epic12_device::draw_sprite_f1_ti0_tr0_s5_d0, epic12_device::draw_sprite_f1_ti0_tr0_s6_d0, epic12_device::draw_sprite_f1_ti0_tr0_s7_d0,
 	epic12_device::draw_sprite_f1_ti0_tr0_s0_d1, epic12_device::draw_sprite_f1_ti0_tr0_s1_d1, epic12_device::draw_sprite_f1_ti0_tr0_s2_d1, epic12_device::draw_sprite_f1_ti0_tr0_s3_d1, epic12_device::draw_sprite_f1_ti0_tr0_s4_d1, epic12_device::draw_sprite_f1_ti0_tr0_s5_d1, epic12_device::draw_sprite_f1_ti0_tr0_s6_d1, epic12_device::draw_sprite_f1_ti0_tr0_s7_d1,
@@ -320,7 +320,7 @@ inline void epic12_device::gfx_draw_shadow_copy(address_space &space, offs_t *ad
 
 
 	// todo, calcualte clipping.
-	epic12_device_blit_delay += w*h;
+	blit_delay += w*h;
 
 }
 
@@ -409,7 +409,7 @@ inline void epic12_device::gfx_draw(offs_t *addr)
 				}
 				else
 				{
-					epic12_device_f0_ti1_tr1_blit_funcs[s_mode | (d_mode<<3)](draw_params);
+					f0_ti1_tr1_blit_funcs[s_mode | (d_mode<<3)](draw_params);
 				}
 			}
 			else
@@ -420,7 +420,7 @@ inline void epic12_device::gfx_draw(offs_t *addr)
 				}
 				else
 				{
-					epic12_device_f0_ti1_tr0_blit_funcs[s_mode | (d_mode<<3)](draw_params);
+					f0_ti1_tr0_blit_funcs[s_mode | (d_mode<<3)](draw_params);
 				}
 			}
 		}
@@ -434,7 +434,7 @@ inline void epic12_device::gfx_draw(offs_t *addr)
 				}
 				else
 				{
-					epic12_device_f1_ti1_tr1_blit_funcs[s_mode | (d_mode<<3)](draw_params);
+					f1_ti1_tr1_blit_funcs[s_mode | (d_mode<<3)](draw_params);
 				}
 			}
 			else
@@ -445,7 +445,7 @@ inline void epic12_device::gfx_draw(offs_t *addr)
 				}
 				else
 				{
-					epic12_device_f1_ti1_tr0_blit_funcs[s_mode | (d_mode<<3)](draw_params);
+					f1_ti1_tr0_blit_funcs[s_mode | (d_mode<<3)](draw_params);
 				}
 			}
 		}
@@ -495,7 +495,7 @@ inline void epic12_device::gfx_draw(offs_t *addr)
 				}
 				else
 				{
-					epic12_device_f0_ti0_tr1_blit_funcs[s_mode | (d_mode<<3)](draw_params);
+					f0_ti0_tr1_blit_funcs[s_mode | (d_mode<<3)](draw_params);
 				}
 			}
 			else
@@ -506,7 +506,7 @@ inline void epic12_device::gfx_draw(offs_t *addr)
 				}
 				else
 				{
-					epic12_device_f0_ti0_tr0_blit_funcs[s_mode | (d_mode<<3)](draw_params);
+					f0_ti0_tr0_blit_funcs[s_mode | (d_mode<<3)](draw_params);
 				}
 			}
 		}
@@ -520,7 +520,7 @@ inline void epic12_device::gfx_draw(offs_t *addr)
 				}
 				else
 				{
-					epic12_device_f1_ti0_tr1_blit_funcs[s_mode | (d_mode<<3)](draw_params);
+					f1_ti0_tr1_blit_funcs[s_mode | (d_mode<<3)](draw_params);
 				}
 			}
 			else
@@ -531,7 +531,7 @@ inline void epic12_device::gfx_draw(offs_t *addr)
 				}
 				else
 				{
-					epic12_device_f1_ti0_tr0_blit_funcs[s_mode | (d_mode<<3)](draw_params);
+					f1_ti0_tr0_blit_funcs[s_mode | (d_mode<<3)](draw_params);
 				}
 			}
 		}
@@ -681,7 +681,7 @@ void *epic12_device::blit_request_callback_unsafe(void *param, int threadid)
 {
 	epic12_device *object = reinterpret_cast<epic12_device *>(param);
 
-	epic12_device_blit_delay = 0;
+	blit_delay = 0;
 	object->gfx_exec_unsafe();
 	return nullptr;
 }
@@ -721,13 +721,13 @@ WRITE32_MEMBER( epic12_device::gfx_exec_w )
 				osd_work_item_release(m_blitter_request);
 			}
 
-			epic12_device_blit_delay = 0;
+			blit_delay = 0;
 			gfx_create_shadow_copy(space); // create a copy of the blit list so we can safely thread it.
 
-			if (epic12_device_blit_delay)
+			if (blit_delay)
 			{
 				m_blitter_busy = 1;
-				m_blitter_delay_timer->adjust(attotime::from_nsec(epic12_device_blit_delay*8)); // NOT accurate timing (currently ignored anyway)
+				m_blitter_delay_timer->adjust(attotime::from_nsec(blit_delay*8)); // NOT accurate timing (currently ignored anyway)
 			}
 
 			m_gfx_addr_shadowcopy = m_gfx_addr;
@@ -760,10 +760,10 @@ WRITE32_MEMBER( epic12_device::gfx_exec_w_unsafe )
 				osd_work_item_release(m_blitter_request);
 			}
 
-			if (epic12_device_blit_delay)
+			if (blit_delay)
 			{
 				m_blitter_busy = 1;
-				int delay = epic12_device_blit_delay*(15 * m_delay_scale / 50);
+				int delay = blit_delay*(15 * m_delay_scale / 50);
 				//printf("delay %d\n", delay);
 				m_blitter_delay_timer->adjust(attotime::from_nsec(delay));
 			}

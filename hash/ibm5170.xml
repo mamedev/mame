@@ -1154,10 +1154,11 @@ Missing files come here
 	</software>
 
 	<software name="pcdos4">
-		<description>IBM Personal Computer DOS (Version 4.00)</description>
+		<!-- the 4.01 bugfix release changed the printed disk label but not the version number reported by the software -->
+		<description>IBM Personal Computer DOS (Version 4.01, 1988-08-03)</description>
 		<year>1988</year>
 		<publisher>IBM</publisher>
-		<info name="version" value="4.00" />
+		<info name="version" value="4.01" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="install.img" size="737280" crc="edcb2ea3" sha1="352dffca01bd72349503024d0b9d16c4b684f791" offset="0" />
@@ -1170,25 +1171,19 @@ Missing files come here
 		</part>
 	</software>
 
-	<software name="pcdos5g">
-		<!-- KryoFlux dump from original disks, shows as unmodified -->
-		<description>IBM DOS 5.02 "for preload" (German)</description>
-		<year>1992</year>
+	<software name="pcdos4a" cloneof="pcdos4">
+		<description>IBM Personal Computer DOS (Version 4.00, 1988-06-17)</description>
+		<year>1988</year>
 		<publisher>IBM</publisher>
-		<info name="version" value="5.02" />
+		<info name="version" value="4.00" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="IBM_DOS_5.02_for_preload_German_disk1.img" size="737280" crc="e76398bc" sha1="2eeb89aff04aa28fa040d57e8f0b0ee899025a99" offset="0" />
+			<dataarea name="flop" size = "737280">
+				<rom name="install 1988-06-17.img" size="737280" crc="23cdec58" sha1="d287ed7a4555751472e106d47de25aa36f930df8" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="IBM_DOS_5.02_for_preload_German_disk2.img" size="737280" crc="484aa5a6" sha1="1b2741a4d20614ec744ed987c004269830cde6bd" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="IBM_DOS_5.02_for_preload_German_disk3.img" size="737280" crc="05cf4590" sha1="dcc750a969acc502629098cbc70552d939d98d90" offset="0" />
+			<dataarea name="flop" size = "737280">
+				<rom name="operating 1988-06-17.img" size="737280" crc="57956fab" sha1="589121b24790c749535e3af80b329724af5fbbb4" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1224,11 +1219,38 @@ Missing files come here
 		</part>
 	</software>
 
+	<software name="pcdos61a" cloneof="pcdos61">
+		<description>IBM DOS (Version 6.1, Alt)</description>
+		<year>1993</year>
+		<publisher>IBM</publisher>
+		<info name="version" value="6.1" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="IBM PC-DOS 6.1 Disk 1.img" size="1474560" crc="64f234c4" sha1="efdbe24f889f0685c209150d082c0faf2bf6e798" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="IBM PC-DOS 6.1 Disk 2.img" size="1474560" crc="5a955057" sha1="5c7b4c5f7592957f0c56f06e1098ab2dc3866f8f" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="IBM PC-DOS 6.1 Disk 3.img" size="1474560" crc="43b95074" sha1="419322c71f12cca2de47e516a64248cfc8fab81d" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="IBM PC-DOS 6.1 Disk 4.img" size="1474560" crc="36fc5a86" sha1="a74fe031f617a216ba0636ec56ec29c0d2a1aeb5" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pcdos63">
 		<description>PC DOS (Version 6.3)</description>
 		<year>1993</year>
 		<publisher>IBM</publisher>
-		<info name="version" value="6.3" />
+		<info name="version" value="6.3, Revision 0" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="disk1.img" size="1474560" crc="0fc87254" sha1="2b4166557ea8eba7d6b0f3a4d9376896bf5a217c" offset="0" />
@@ -1252,6 +1274,70 @@ Missing files come here
 		<part name="flop5" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="disk5.img" size="1474560" crc="49128f94" sha1="1c8d991d3adffa28b24e09e6c4ee4a0843d9eca1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcdos63a" cloneof="pcdos63">
+		<description>PC DOS (Version 6.3, Alt)</description>
+		<year>1993</year>
+		<publisher>IBM</publisher>
+		<info name="version" value="6.3, Revision 0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="dos63_1b.img" size="1474560" crc="26da6101" sha1="61e6c1a644db69a1e9cf27c098248c30354c9ae6" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="dos63_2.img" size="1474560" crc="f556052a" sha1="185ce4945c20cb2fc8aad11a4cf85342fb521d09" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="dos63_3.img" size="1474560" crc="ac9d67c0" sha1="f6cd2cb173d88bb16e476530f5420d6c750a39e6" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="dos63_4.img" size="1474560" crc="d1e7db52" sha1="dcf61faaf4fdceac5a7691842a35421039de2ca9" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="dos63_5.img" size="1474560" crc="eaac0e2b" sha1="5b35648f848fa62012538eedaec670a6d0491235" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcdos63u" cloneof="pcdos63">
+		<description>PC DOS (Version 6.3, Upgrade)</description>
+		<year>1993</year>
+		<publisher>IBM</publisher>
+		<info name="version" value="6.3, Revision 0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="dos63_1u.img" size="1474560" crc="6274feca" sha1="498bfccc5f0aeb73fe487591b760be44d62af048" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="dos63_2.img" size="1474560" crc="f556052a" sha1="185ce4945c20cb2fc8aad11a4cf85342fb521d09" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="dos63_3.img" size="1474560" crc="ac9d67c0" sha1="f6cd2cb173d88bb16e476530f5420d6c750a39e6" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="dos63_4.img" size="1474560" crc="d1e7db52" sha1="dcf61faaf4fdceac5a7691842a35421039de2ca9" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="dos63_5.img" size="1474560" crc="eaac0e2b" sha1="5b35648f848fa62012538eedaec670a6d0491235" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1288,6 +1374,241 @@ Missing files come here
 		<part name="flop6" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="disk6.img" size="1474560" crc="cba1f9e0" sha1="83851f0fd38aec897f6c4378a8598e17c4b17702" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcdos2k">
+		<description>IBM PC DOS 2000</description>
+		<year>1998</year>
+		<publisher>IBM</publisher>
+		<info name="version" value="7.0, Revision 1" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk01.img" size="1474560" crc="69909031" sha1="1fa1e65320ad3a5287746aca9c40fb9671f9cdc6" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk02.img" size="1474560" crc="553d1cae" sha1="75fd11da9b6567fd362c432c81accccd22e7d4ae" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk03.img" size="1474560" crc="49e9fa80" sha1="77704444d8afd756840bd7484c5d727b3eb8b555" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk04.img" size="1474560" crc="b38cd931" sha1="14b4b23bef5cf60a8151ac95f62b91bfd9a6f1ca" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk05.img" size="1474560" crc="5cfbfef6" sha1="5de6e9c19ccf270edecfaefaceffb3259be90565" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk06.img" size="1474560" crc="8f37413c" sha1="ac9a0208ef5019b68ff8879a80a6e1efa29fcc4c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcdos2kde" cloneof="pcdos2k">
+		<description>IBM PC DOS 2000 (German)</description>
+		<year>1998</year>
+		<publisher>IBM</publisher>
+		<info name="version" value="7.00, Revision 1" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk01de.img" size="1474560" crc="bb6f41f4" sha1="7e7d35214a7b842f44e8008a07a8b3939f1631a7" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk02de.img" size="1474560" crc="b1f175a6" sha1="d2472c360e28b7f484d44fad26f535b7d6c9059b" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk03de.img" size="1474560" crc="7aa1167b" sha1="b030a7c581b76c484d322512908ed1b60e8ee3a5" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk04de.img" size="1474560" crc="c71c10de" sha1="8e4fbdb034688b61370027db3fedcb0b8e6fa7bb" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk05de.img" size="1474560" crc="d104efc4" sha1="a79c462316cffe06543863bb3d97a8e35fe6033d" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk06de.img" size="1474560" crc="5837ea02" sha1="ca2f14279f17c58e836044987690d7d42f902d9c" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk07de.img" size="1474560" crc="6af1cf71" sha1="42f8deb978b1c131ff2ad9f289c7d7693d3f1300" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcdos2kja" cloneof="pcdos2k">
+		<description>IBM PC DOS 2000 (Japanese)</description>
+		<year>1998</year>
+		<publisher>IBM</publisher>
+		<info name="version" value="J7.0/V, Revision 1" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk01ja.img" size="1474560" crc="1558d677" sha1="ed5a2c5b115b8a79e99245e89ad4e16a5a387ab9" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk02ja.img" size="1474560" crc="108cbc5a" sha1="74e6423ae2af5e001c91d2213f7746c11300f878" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk03ja.img" size="1474560" crc="fef08581" sha1="8ea514805e59f8ecd4443c1b9145929be48739b8" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk04ja.img" size="1474560" crc="f7b52e6d" sha1="ec4a96303d8dd40f16cb4d141a92895765226925" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk05ja.img" size="1474560" crc="438612b1" sha1="1633d6cf7d475130cbc84e2f9b9f31784decd77f" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk06ja.img" size="1474560" crc="0bf79c9b" sha1="e55e55d471cb6f3ec039c8080550f2b7e30a23cf" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk07ja.img" size="1474560" crc="47e61ddf" sha1="206e8c8a94d3200f0c8f1337c26593507f5d9144" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk08ja.img" size="1474560" crc="6dc379cb" sha1="fb316aad3e82941a0a4f63a0ebb19b3a911f8855" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk09ja.img" size="1474560" crc="7f056f5e" sha1="c92d3ed7199838c06e0b142818dd265feb7a9ab1" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk10ja.img" size="1474560" crc="d4bb7852" sha1="cbbcd6e7be7ae4d3c9defb31e49b0569e881fee9" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop11" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk11ja.img" size="1474560" crc="da7cc371" sha1="a4ec62e9f9f621f12d29b262523c2eddbd86bbee" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcdos2kko" cloneof="pcdos2k">
+		<description>IBM PC DOS 2000 (Korean)</description>
+		<year>1998</year>
+		<publisher>IBM</publisher>
+		<info name="version" value="H7.00, Revision 1" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk01ko.img" size="1474560" crc="42d3890c" sha1="6583e0196aaeac9b8d10f69aef9e8d4fcf80c508" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk02ko.img" size="1474560" crc="2680e6af" sha1="8e4f0bd991cf93ac28873a626104dca796149c72" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk03ko.img" size="1474560" crc="ef33a9b0" sha1="b0aba99156c540f5854abddc99ee79f2b3261b0c" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk04ko.img" size="1474560" crc="6fcac5bf" sha1="371b50aa063abec45fffcfb694c4f2b14be66e21" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk05ko.img" size="1474560" crc="1145d7ca" sha1="c595aa2980dd673b0b34df152b37244ef8224c34" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk06ko.img" size="1474560" crc="519365f2" sha1="63b28d6200012689a0233739b7bafef824921b5d" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk07ko.img" size="1474560" crc="130f1d6c" sha1="c74f40d65a50cc51c575471c12399feb449f4b9c" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk08ko.img" size="1474560" crc="7c3c1eb8" sha1="3f4deb0fa2db31b8a16fc265cf117aa35e2fb094" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk09ko.img" size="1474560" crc="c1a4f40d" sha1="00973e43d6141ea6e3e0d3bf3eb50408b3ac89f8" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk10ko.img" size="1474560" crc="4d016845" sha1="a3f861b5a5a7bc9799f25a58c06ef1879e87a6ce" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcdos2ksv" cloneof="pcdos2k">
+		<description>IBM PC DOS 2000 (Swedish)</description>
+		<year>1998</year>
+		<publisher>IBM</publisher>
+		<info name="version" value="7.00, Revision 1" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk01sv.img" size="1474560" crc="3697cca7" sha1="abdcb520e564ee5730b6c111ed1f220e01df5f79" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk02sv.img" size="1474560" crc="f28bccc7" sha1="52312f95ec638e39a778c1694635fecd11a540a7" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk03sv.img" size="1474560" crc="3a8187be" sha1="429422e67e2500bee60a69ca1c14078a3220ef5b" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk04sv.img" size="1474560" crc="a8ef91be" sha1="2fb62678f21b02b4bb8c6f59a5c7aff7a582e9c5" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk05sv.img" size="1474560" crc="e9ea2ac3" sha1="97ba0fc4201f32f07a4e5490bc4f346dcc1b51df" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk06sv.img" size="1474560" crc="e8132cd8" sha1="bf196ba8a29c1a56abe04b8d60dec45c4ef50fbf" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3915,6 +4236,57 @@ Missing files come here
 		</part>
 	</software>
 
+	<software name="btbas1g">
+		<!-- dumped via KryoFlux from original floppies, all tracks show as unmodified -->
+		<description>Borland Turbo Basic 1.0 (German)</description>
+		<year>1987</year>
+		<publisher>Borland</publisher>
+		<info name="version" value="1.0" />
+		<info name="serial" value="5141124" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk1.img" size="368640" crc="9c44f003" sha1="ba37e292571e7f73b1a45d08a6708eff24d4d1c7" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk2.img" size="368640" crc="503b568f" sha1="373df232d6538efebc1930a1db45db5bd770d233" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk3.img" size="368640" crc="8737aed8" sha1="65da51e627b37c01d2d4edeb591f07c1a5249b16" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="btpascl40">
+		<!-- dumped via KryoFlux from original floppies, multiple tracks are modified though -->
+		<description>Borland Turbo Pascal 4.0</description>
+		<year>1987</year>
+		<publisher>Borland</publisher>
+		<info name="version" value="4.0" />
+		<info name="serial" value="A4C0500544" />
+		<part name="flop1_compiler" interface="floppy_5_25">
+			<feature name="part_id" value="Compiler" />
+			<dataarea name="flop" size="368640">
+				<rom name="disk1_compiler.img" size="368640" crc="c87ab989" sha1="d5a65adc300a310fcbe3497f3fd153ca65db5c69" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2_examples" interface="floppy_5_25">
+			<feature name="part_id" value="Examples" />
+			<dataarea name="flop" size="368640">
+				<rom name="disk2_examples.img" size="368640" crc="5ad8ca41" sha1="191fd4517ba208e5615c52269f12a251fdfffc57" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3_graphics" interface="floppy_5_25">
+			<feature name="part_id" value="Graphics" />
+			<dataarea name="flop" size="368640">
+				<rom name="disk3_graphics.img" size="368640" crc="286bd4e6" sha1="95aff9eea8ac0ef3e9356ef322751e8ba764bf23" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="btpscl55">
 		<description>Borland Turbo Pascal 5.5</description>
 		<year>1989</year>
@@ -3927,6 +4299,98 @@ Missing files come here
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="disk2 - oop demos.img" size="737280" crc="a18c3bab" sha1="4ce0876c0943e7de4d6524c52ef4ffb6259ec4dd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="btp601g">
+		<!-- dumped via KryoFlux from original floppies. Disks 2 and 3 partially modified -->
+		<description>Borland Turbo Pascal 6.01 (German)</description>
+		<year>1991</year>
+		<publisher>Borland</publisher>
+		<info name="version" value="6.01" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="disk1.img" size="737280" crc="c09c7f23" sha1="630cde83828053de14f622fab89e3e6e1602b6dc" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_%">
+			<dataarea name="flop" size="737280">
+				<rom name="disk2.img" size="737280" crc="94ea897b" sha1="ce9e331ebfb1aac40ae1e422cbbd68ce341f48db" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="disk3.img" size="737280" crc="86b13b21" sha1="4b4182380cdeaf8a327fa9c46263b0c911c814cd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bqpro3g">
+		<!-- dumped via KryoFlux from original floppies -->
+		<!-- Disks 1, 3, 5, 6 and 8 show up as modified, all others are unmodified -->
+		<description>Borland Quattro Pro 3.0 (German)</description>
+		<year>1991</year>
+		<publisher>Borland</publisher>
+		<info name="version" value="3.0" />
+		<info name="serial" value="GS246A10075408" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk1.img" size="368640" crc="906d8656" sha1="674710ea98aea152ea064484599ce463f66470f7" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk2.img" size="368640" crc="63c74e76" sha1="ce6da37c7a28d647269484c596db2da1c7d9a327" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk3.img" size="368640" crc="3891f951" sha1="525b40f0e59efc740938726943d11641f11b2a4f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk4.img" size="368640" crc="db0ac862" sha1="8132792047b87c17bfc2be8f418313c7f942e6ab" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk5.img" size="368640" crc="2296194c" sha1="d76251f57eb3c2d2d93e10aedc158f884224dd96" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk6.img" size="368640" crc="d1632f0c" sha1="90f8533a4df6de936b4973ef537c11dc5864d9cd" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk7.img" size="368640" crc="b0b1f6ba" sha1="d1a7ad90665f73d6d1ebad7600a626fed450d055" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk8.img" size="368640" crc="9b20182f" sha1="e994aa19a0d96edf3df3c851520923938d129747" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bqpro5g">
+		<!-- dumped via KryoFlux from original floppies, all tracks show as unmodified -->
+		<description>Borland Quattro Pro 5.0 (German)</description>
+		<year>1993</year>
+		<publisher>Borland</publisher>
+		<info name="version" value="5.0" />
+		<info name="serial" value="IC935A10106185" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk1.img" size="1474560" crc="bcaa0dbd" sha1="e555d5526b51383e5826254ed1e5f06b28af32b4" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk2.img" size="1474560" crc="7f476a84" sha1="c5a5935edcffbda38697081d1347304be81597f7" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4653,17 +5117,6 @@ Missing files come here
 		</part>
 	</software>
 
-	<software name="chipdale">
-		<description>Chip 'N Dale Rescue Rangers - The Adventure in Nimnul's Castle</description>
-		<year>1990</year>
-		<publisher>Hi-Tech Expressions, Inc.</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="368640">
-				<rom name="chip and dale.img" size="368640" crc="5393ba1b" sha1="775683872ea2ef6a81fde73e4d9737f204636362" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="keen45">
 		<description>Commander Keen in Goodbye, Galaxy! (v1.4, EGA, 3.5")</description>
 		<year>1992</year>
@@ -4899,6 +5352,39 @@ Missing files come here
 		</part>
 	</software>
 
+	<software name="darkseed">
+		<description>Dark Seed</description>
+		<year>1992</year>
+		<publisher>Dro Soft</publisher>
+		<info name="version" value="1.5" />
+		<info name="developer" value="Cyberdreams, Inc." />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Dark Seed [Dro Soft] [1992] [3.5DD] [Disk 1 of 5].img" size="737280" crc="06f697be" sha1="11e8b1fdc50916bc81f25e925b4050408b7031a3" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Dark Seed [Dro Soft] [1992] [3.5HD] [Disk 2 of 5].img" size="1474560" crc="d4d69fd4" sha1="5ea3bc34d513233b2ec15576a2a73415ad85f231" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Dark Seed [Dro Soft] [1992] [3.5HD] [Disk 3 of 5].img" size="1474560" crc="53bc2c6e" sha1="9e6a36d08d5d4731f3091e65da7decf17e4e3c2e" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Dark Seed [Dro Soft] [1992] [3.5HD] [Disk 4 of 5].img" size="1474560" crc="8c5fb082" sha1="04927d147fc8de30f3c9d8c8e1754e0cfcdbaf52" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Dark Seed [Dro Soft] [1992] [3.5HD] [Disk 5 of 5].img" size="1474560" crc="b777d050" sha1="59e6a93fc0a4044e84dc5f950d1dae0b64a1a28b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="descsw">
 		<!-- from Acer CPR 1.2 recovery CD-ROM -->
 		<description>Descent (Shareware, 1.0)</description>
@@ -4913,6 +5399,23 @@ Missing files come here
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="descent disk2.img" size="1474560" crc="07674313" sha1="59bdf205c6b3e3b2de5a08daaa3b67004618baa7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aladdin">
+		<description>Disney's Aladdin</description>
+		<year>1994</year>
+		<publisher>Virgin Interactive Entertainment, Inc.</publisher>
+		<info name="developer" value="Virgin Interactive Entertainment, Inc." />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Disney's Aladdin [Virgin] [1994] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="ceaca4d7" sha1="068e75e0e5432eb337b468e647135f085ff3166e" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Disney's Aladdin [Virgin] [1994] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="5115f916" sha1="2745fbbe403911e5beceb983cbf86ee501cd69e7" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5333,6 +5836,87 @@ Missing files come here
 		</part>
 	</software>
 
+	<software name="goblins">
+		<description>Gobliiins (US - VGA release)</description>
+		<year>1992</year>
+		<publisher>Sierra On-Line, Inc.</publisher>
+		<info name="version" value="1.000 09/11/92" />
+		<info name="developer" value="Coktel Vision, M.D.O." />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Gobliiins [Sierra] [1992] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="65c9ed7a" sha1="02402420e3f334cb0c7f00a47499b3fd0939d29e" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Gobliiins [Sierra] [1992] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="56127b39" sha1="483b12b314a8e4200f2b32e7cbcc46efa02a92da" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="goblins2">
+		<description>Gobliins 2: The Prince Buffoon</description>
+		<year>1993</year>
+		<publisher>Sierra On-Line, Inc.</publisher>
+		<info name="version" value="1.000.000 02/10/93" />
+		<info name="developer" value="Coktel Vision, M.D.O." />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Gobliins 2 [Sierra] [1993] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="8b4ebf44" sha1="295d025ddb3953289aee6c96d69d3276111f8ea8" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Gobliins 2 [Sierra] [1993] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="38d1082b" sha1="c1eb84fa8e701a3ff8dd6464e3b96492d59d9de6" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="goblins3">
+		<description>Goblins Quest 3</description>
+		<year>1993</year>
+		<publisher>Sierra On-Line, Inc.</publisher>
+		<info name="version" value="1.00" />
+		<info name="developer" value="Coktel Vision" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Goblins 3 [Sierra] [1993] [3.5HD] [Disk 1 of 5].img" size="1474560" crc="6a1ad2ee" sha1="3f019ff748edc68d455d4606f42b0425135ccb3a" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Goblins 3 [Sierra] [1993] [3.5HD] [Disk 2 of 5].img" size="1474560" crc="06fd5e22" sha1="5983857f151513af6be873bb4fb3d24f18e4bade" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Goblins 3 [Sierra] [1993] [3.5HD] [Disk 3 of 5].img" size="1474560" crc="6241a908" sha1="71a2ba8183c6acb2211ef16ece4ee3ee5cc13516" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Goblins 3 [Sierra] [1993] [3.5HD] [Disk 4 of 5].img" size="1474560" crc="6f96ad1c" sha1="18ec37853726f72994b2cb3ca386f180b5510c56" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Goblins 3 [Sierra] [1993] [3.5HD] [Disk 5 of 5].img" size="1474560" crc="9c5f6d67" sha1="e0f87c8dcc57a07e6c653aef3bc671f06da791d3" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gods">
+		<description>Gods</description>
+		<year>1991</year>
+		<publisher>Renegade Software</publisher>
+		<info name="developer" value="The Bitmap Brothers" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Gods [Renegade Software] [1991] [3.5HD].img" size="1474560" crc="ac47d483" sha1="8c1767c96fc5b881a7145d6bcf68a75bf4281e66" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="heretic">
 		<description>Heretic</description>
 		<year>1994</year>
@@ -5401,6 +5985,107 @@ Missing files come here
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="incredible machine.img" size="1474560" crc="64f15085" sha1="f0ed16b665ad2378c59c1d1d9370479ca2eb494e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="indyfate">
+		<description>Indiana Jones and the Fate of Atlantis (3.5")</description>
+		<year>1992</year>
+		<publisher>LucasArts</publisher>
+		<info name="developer" value="LucasArts" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Indiana Jones and the Fate of Atlantis [LucasArts] [1992] [3.5HD] [1 of 5].img" size="1474560" crc="c7b85652" sha1="0cfae4a55ff62ac0f946e83d205fabff23624c8c" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Indiana Jones and the Fate of Atlantis [LucasArts] [1992] [3.5HD] [2 of 5].img" size="1474560" crc="384ea34a" sha1="a62688cda8409c0ff4efb7d8d7dfd123320cb141" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Indiana Jones and the Fate of Atlantis [LucasArts] [1992] [3.5HD] [3 of 5].img" size="1474560" crc="cf95f639" sha1="584f7d322910aa546b0394528e083fec33155946" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Indiana Jones and the Fate of Atlantis [LucasArts] [1992] [3.5HD] [4 of 5].img" size="1474560" crc="63f369d6" sha1="0202d7c9895be1c0a15879bf2ce829fabd2476f7" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Indiana Jones and the Fate of Atlantis [LucasArts] [1992] [3.5HD] [5 of 5].img" size="1474560" crc="9cb01ed4" sha1="489b0f78e0097cbd970ad2fd1429ebf0f77539d4" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="indyfate525" cloneof="indyfate">
+		<description>Indiana Jones and the Fate of Atlantis (5.25")</description>
+		<year>1992</year>
+		<publisher>LucasArts</publisher>
+		<info name="developer" value="LucasArts" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Indiana Jones and the Fate of Atlantis (World) (5.25'') (Disk 1).img" size="1228800" crc="714d59f3" sha1="7bf719dc41a9465dcac8373c42202042fe361e9e" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Indiana Jones and the Fate of Atlantis (World) (5.25'') (Disk 2).img" size="1228800" crc="25c43e77" sha1="99a541d9b7039ba7368c4289484412ed5caf40cf" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Indiana Jones and the Fate of Atlantis (World) (5.25'') (Disk 3).img" size="1228800" crc="434c7489" sha1="9dca1b7d25d3c120e807c240833a78cfed2c2b3d" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Indiana Jones and the Fate of Atlantis (World) (5.25'') (Disk 4).img" size="1228800" crc="da2e4a89" sha1="67e9e63ee8bb597e195c5775c964f0436da93853" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Indiana Jones and the Fate of Atlantis (World) (5.25'') (Disk 5).img" size="1228800" crc="29c579ac" sha1="a2675731979ab25aa1485a94518c29e6dd2c6bf6" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Indiana Jones and the Fate of Atlantis (World) (5.25'') (Disk 6).img" size="1228800" crc="a7f950bb" sha1="0997fced33a08161ce2457f88c77eb07b58deaee" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="indyfatede" cloneof="indyfate">
+		<description>Indiana Jones and the Fate of Atlantis (3.5", German)</description>
+		<year>1992</year>
+		<publisher>LucasArts</publisher>
+		<info name="developer" value="LucasArts" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Indiana Jones and the Fate of Atlantis (Germany) (Disk 1).img" size="1474560" crc="9fda8591" sha1="4fe99915770ea6a6dadaf02e81d68a831016cda9" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Indiana Jones and the Fate of Atlantis (Germany) (Disk 2).img" size="1474560" crc="0f7f0190" sha1="8c28200ed535dd5f497468b014bbaa0e564c1722" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Indiana Jones and the Fate of Atlantis (Germany) (Disk 3).img" size="1474560" crc="d1222750" sha1="8b11e4b271d27b42944ce0d03e261e2adba4b251" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Indiana Jones and the Fate of Atlantis (Germany) (Disk 4).img" size="1474560" crc="40cfc149" sha1="17eb93dd2ddb59321e0d7c8fb981d97e8e570dce" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Indiana Jones and the Fate of Atlantis (Germany) (Disk 5).img" size="1474560" crc="c96b1787" sha1="8b973d3b406197db7b3fed70c010285ea14bcb40" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5496,6 +6181,62 @@ Missing files come here
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="king's bounty.img" size="737280" crc="267624e2" sha1="763a5014008f46f93a13c822377c41965c09a1f8" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kyrandia">
+		<description>The Legend of Kyrandia Book One - Fables &amp; Fiends</description>
+		<year>1992</year>
+		<publisher>Virgin Games</publisher>
+		<info name="version" value="1.3" />
+		<info name="developer" value="Westwood Studios" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Legend of Kyrandia [Virgin] [1992] [3.5HD] [1 of 4].img" size="1474560" crc="88c6742b" sha1="dcd249c0c721612a020e309e044a1be620a72237" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Legend of Kyrandia [Virgin] [1992] [3.5HD] [2 of 4].img" size="1474560" crc="ab4f5e1d" sha1="42625e4285b28f0901f60c2976222d05bf083cef" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Legend of Kyrandia [Virgin] [1992] [3.5HD] [3 of 4].img" size="1474560" crc="5c483502" sha1="d5bfed28919ab68c0f23bb85b6be8ed17c5baa06" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Legend of Kyrandia [Virgin] [1992] [3.5HD] [4 of 4].img" size="1474560" crc="6fb0f878" sha1="f51fc0625a1328a089b735c3d1b99d357b99d492" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kyrandiafr" cloneof="kyrandia">
+		<description>The Legend of Kyrandia Book One - Fables &amp; Fiends (French)</description>
+		<year>1992</year>
+		<publisher>Virgin Games</publisher>
+		<info name="version" value="1.7" />
+		<info name="developer" value="Westwood Studios" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Legend of Kyrandia, The - Book One (France) (v1.7) (Disk 1).img" size="1474560" crc="9df53388" sha1="96df77412dfe2a0c80bca51e72cabf3058ba1d26" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Legend of Kyrandia, The - Book One (France) (v1.7) (Disk 2).img" size="1474560" crc="c6731e11" sha1="961d4389b73a64952177dbf4734b9223cf0f76a1" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Legend of Kyrandia, The - Book One (France) (v1.7) (Disk 3).img" size="1474560" crc="99fb7189" sha1="956b45a92c9fa534c705c63487b772ed58f7da43" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Legend of Kyrandia, The - Book One (France) (v1.7) (Disk 4).img" size="1474560" crc="3de1063c" sha1="722230054057db52b1809ce9db7c4eca8d71c65f" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5599,6 +6340,140 @@ Missing files come here
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="1720320">
 				<rom name="disk3.img" size="1720320" crc="9ad15a6c" sha1="3eeb07612f20bbfccca4343ed213d3c8f1371450" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="monkey2">
+		<description>Monkey Island 2: LeChuck's Revenge (3.5")</description>
+		<year>1991</year>
+		<publisher>LucasArts</publisher>
+		<info name="version" value="1.0 (11/21/91)" />
+		<info name="developer" value="LucasArts" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Monkey Island 2 - LeChuck's Revenge [LucasArts] [1991] [3.5HD] [1 of 5].img" size="1474560" crc="351a3104" sha1="cce3e02f81cd9234fadf34a58930e1cfc4326d4b" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Monkey Island 2 - LeChuck's Revenge [LucasArts] [1991] [3.5HD] [2 of 5].img" size="1474560" crc="141b315e" sha1="4af90abedff5c660a64ebe48755e147883fdb911" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Monkey Island 2 - LeChuck's Revenge [LucasArts] [1991] [3.5HD] [3 of 5].img" size="1474560" crc="fdf75bc5" sha1="4296937f48bc5fc8e32afa95f0bbc1b8e2f6f4f6" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Monkey Island 2 - LeChuck's Revenge [LucasArts] [1991] [3.5HD] [4 of 5].img" size="1474560" crc="65fb2338" sha1="408c76c8957fda999f795d9fd1db18b4b6b0bbdc" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Monkey Island 2 - LeChuck's Revenge [LucasArts] [1991] [3.5HD] [5 of 5].img" size="1474560" crc="56984413" sha1="e9ca6b21c6384fcde7f2b358cf775487c1fc7791" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="monkey2a" cloneof="monkey2">
+		<description>Monkey Island 2: LeChuck's Revenge (3.5", Alt)</description>
+		<year>1991</year>
+		<publisher>LucasArts</publisher>
+		<info name="developer" value="LucasArts" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Monkey Island 2 - LeChuck's Revenge (World) (3.5'') (Disk 1).img" size="1474560" crc="590637cc" sha1="9f6c1dff38aabdf81301d4f552ad8902832f971a" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Monkey Island 2 - LeChuck's Revenge (World) (3.5'') (Disk 2).img" size="1474560" crc="164b0750" sha1="cb3740196c2d55405120114c7f172cf2033bf33a" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Monkey Island 2 - LeChuck's Revenge (World) (3.5'') (Disk 3).img" size="1474560" crc="53311b2e" sha1="57a7d1fc2bebdcfc29ca15c8301a3eb1b24f25a4" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Monkey Island 2 - LeChuck's Revenge (World) (3.5'') (Disk 4).img" size="1474560" crc="3a3c2fea" sha1="70d892ada2b70baeb7626c8859faaf871459616a" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Monkey Island 2 - LeChuck's Revenge (World) (3.5'') (Disk 5).img" size="1474560" crc="a5c93e24" sha1="53cdfdd93ffed32d0eb3f6673a7ccedbbd2f77e2" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="monkey2k" cloneof="monkey2">
+		<description>Monkey Island 2: LeChuck's Revenge (3.5", Kixx re-release)</description>
+		<year>1991</year>
+		<publisher>Kixx</publisher>
+		<info name="developer" value="LucasArts" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Monkey Island 2 - LeChuck's Revenge (Europe) (Kixx) (Disk 1).img" size="1474560" crc="9d270c19" sha1="c080eafb38b74e2f8537916fb372ce96e9422929" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Monkey Island 2 - LeChuck's Revenge (Europe) (Kixx) (Disk 2).img" size="1474560" crc="e9d8b35b" sha1="089bb418cd5d02ce3c29a85600101676cb5c148a" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Monkey Island 2 - LeChuck's Revenge (Europe) (Kixx) (Disk 3).img" size="1474560" crc="5428f375" sha1="8ee403283bfdb3f979ad95a3dc52abda485ff219" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Monkey Island 2 - LeChuck's Revenge (Europe) (Kixx) (Disk 4).img" size="1474560" crc="3b76e77b" sha1="f5fe47feea550cd8a9b66124256c4743fa88c3c4" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Monkey Island 2 - LeChuck's Revenge (Europe) (Kixx) (Disk 5).img" size="1474560" crc="9ea6c170" sha1="2240e907bd1600f60233a8ae85183e86cfe4645e" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="monkey2_525" cloneof="monkey2">
+		<description>Monkey Island 2: LeChuck's Revenge (5.25")</description>
+		<year>1991</year>
+		<publisher>LucasArts</publisher>
+		<info name="developer" value="LucasArts" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Monkey Island 2 - LeChuck's Revenge (World) (5.25'') (Disk 1).img" size="1228800" crc="5bed8d73" sha1="899bdabc87584c3f4ec7b95b5614e5ef4b456080" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Monkey Island 2 - LeChuck's Revenge (World) (5.25'') (Disk 2).img" size="1228800" crc="800230eb" sha1="7c633a0658b6eb8a37953d7f4ecd3e81a63e50a9" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Monkey Island 2 - LeChuck's Revenge (World) (5.25'') (Disk 3).img" size="1228800" crc="8faa7816" sha1="23c578cc4eeb1adee5dd7906f9e1bc9071bfbd1e" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Monkey Island 2 - LeChuck's Revenge (World) (5.25'') (Disk 4).img" size="1228800" crc="9a6437b4" sha1="d7f0d7cc99c7cd64d4f45685e8fa5da5ad85a5fa" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Monkey Island 2 - LeChuck's Revenge (World) (5.25'') (Disk 5).img" size="1228800" crc="b0eee99e" sha1="0f265f0c68c8512adb19215de9a6b3e6e131e8b9" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Monkey Island 2 - LeChuck's Revenge (World) (5.25'') (Disk 6).img" size="1228800" crc="00b5dfb9" sha1="c4dd7be4f0f1da5c7aa59bd9dabebea13d95c812" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5788,6 +6663,29 @@ Missing files come here
 		</part>
 	</software>
 
+	<software name="monkeyk">
+		<description>The Secret of Monkey Island (3.5", Kixx XL release)</description>
+		<year>1993</year>
+		<publisher>Kixx</publisher>
+		<info name="developer" value="Lucasfilm Games" />
+		<info name="version" value="(VGA) 1.1 (2-15-91)" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="The Secret of Monkey Island [Kixx] [1993] [3.5DD] [Disk 1 of 3].img" size="737280" crc="6e2a88e9" sha1="fb9c3ab1e392292eb40209db9ce840e5689c88d4" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Secret of Monkey Island [Kixx] [1993] [3.5HD] [Disk 2 of 3].img" size="1474560" crc="b480b9cc" sha1="a8d94121f86289ece8708c00618296716be3292f" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Secret of Monkey Island [Kixx] [1993] [3.5HD] [Disk 3 of 3].img" size="1474560" crc="aa3cc8ba" sha1="d8f774bd3be4a85ac4d02e7f6c13ecee254aa560" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sserv2">
 		<!-- Dumped via Kryoflux, shows as good and unmodified -->
 		<description>Silent Service II (Version 457.01)</description>
@@ -5907,6 +6805,72 @@ Missing files come here
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="scenario vol 1.img" size="1474560" crc="0eacae3e" sha1="398bfef77a18ac6650be433b0988b9620442d9d8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sq5">
+		<description>Space Quest V: The Next Mutation (3.5", v1.04)</description>
+		<year>1993</year>
+		<publisher>Sierra</publisher>
+		<info name="version" value="1.04" />
+		<info name="developer" value="Sierra" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Space Quest V - The Next Mutation (USA, Europe) (v1.04) (Disk 1).img" size="1474560" crc="482d85e8" sha1="b2ceda676dfef8f6351ec1f56cb02cdd994ae2d3" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Space Quest V - The Next Mutation (USA, Europe) (v1.04) (Disk 2).img" size="1474560" crc="9660391f" sha1="147ede32350d21b2db86f44cfbe64018b2b19b01" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Space Quest V - The Next Mutation (USA, Europe) (v1.04) (Disk 3).img" size="1474560" crc="f5648e09" sha1="d7f71fcd94fa335cbfa793c45ffbc0e74121b342" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Space Quest V - The Next Mutation (USA, Europe) (v1.04) (Disk 4).img" size="1474560" crc="be6eccb0" sha1="5d1b70724883a082865a47bd265c00f863cbbd05" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Space Quest V - The Next Mutation (USA, Europe) (v1.04) (Disk 5).img" size="1474560" crc="24d6fd91" sha1="99340e173cdb6dd127da3bda7b2f323af7919361" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sq5a" cloneof="sq5">
+		<description>Space Quest V: The Next Mutation (3.5", v1.03)</description>
+		<year>1993</year>
+		<publisher>Sierra</publisher>
+		<info name="version" value="1.03" />
+		<info name="developer" value="Sierra" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Space Quest V [Sierra] [1993] [3.5HD] [disk 1 of 5].img" size="1474560" crc="93cb8f7a" sha1="0815e9a29edf443a6fab39a33b710f59ad865e2a" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Space Quest V [Sierra] [1993] [3.5HD] [disk 2 of 5].img" size="1474560" crc="c57469a9" sha1="08cb6ce1d518c464a08655241f817432dd58a58f" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Space Quest V [Sierra] [1993] [3.5HD] [disk 3 of 5].img" size="1474560" crc="a8220c1a" sha1="5dc9c41659e1d0115b3098833f7172c482a664f7" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Space Quest V [Sierra] [1993] [3.5HD] [disk 4 of 5].img" size="1474560" crc="72464de6" sha1="ba023be73b689cdf03454fab8db8241fbe428dee" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Space Quest V [Sierra] [1993] [3.5HD] [disk 5 of 5].img" size="1474560" crc="6566eb60" sha1="08c2caf27885398c6c68ca34f35afb05192cecac" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

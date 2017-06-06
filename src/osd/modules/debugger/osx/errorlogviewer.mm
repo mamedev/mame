@@ -19,7 +19,7 @@
 	NSString        *title;
 
 	title = [NSString stringWithFormat:@"Error Log: %@ [%@]",
-									   [NSString stringWithUTF8String:m.system().description],
+									   [NSString stringWithUTF8String:m.system().type.fullname()],
 									   [NSString stringWithUTF8String:m.system().name]];
 	if (!(self = [super initWithMachine:m title:title console:c]))
 		return nil;

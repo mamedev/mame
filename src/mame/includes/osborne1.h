@@ -47,14 +47,7 @@ public:
 		m_ieee(*this, IEEE488_TAG),
 		m_floppy0(*this, "mb8877:0"),
 		m_floppy1(*this, "mb8877:1"),
-		m_keyb_row0(*this, "ROW0"),
-		m_keyb_row1(*this, "ROW1"),
-		m_keyb_row2(*this, "ROW2"),
-		m_keyb_row3(*this, "ROW3"),
-		m_keyb_row4(*this, "ROW4"),
-		m_keyb_row5(*this, "ROW5"),
-		m_keyb_row6(*this, "ROW6"),
-		m_keyb_row7(*this, "ROW7"),
+		m_keyb_row(*this, "ROW%u", 0),
 		m_btn_reset(*this, "RESET"),
 		m_cnf(*this, "CNF"),
 		m_region_maincpu(*this, "maincpu"),
@@ -102,7 +95,7 @@ public:
 	required_device<pia6821_device>         m_pia0;
 	required_device<pia6821_device>         m_pia1;
 	required_device<acia6850_device>        m_acia;
-	required_device<mb8877_t>               m_fdc;
+	required_device<mb8877_device>          m_fdc;
 	required_device<ram_device>             m_ram;
 	required_device<ieee488_device>         m_ieee;
 	required_device<floppy_connector>       m_floppy0;
@@ -120,18 +113,11 @@ protected:
 	void update_acia_rxc_txc();
 
 	// user inputs
-	required_ioport         m_keyb_row0;
-	required_ioport         m_keyb_row1;
-	required_ioport         m_keyb_row2;
-	required_ioport         m_keyb_row3;
-	required_ioport         m_keyb_row4;
-	required_ioport         m_keyb_row5;
-	required_ioport         m_keyb_row6;
-	required_ioport         m_keyb_row7;
-	required_ioport         m_btn_reset;
+	required_ioport_array<8>    m_keyb_row;
+	required_ioport             m_btn_reset;
 
 	// fake inputs for hardware configuration and things that need rewiring
-	required_ioport         m_cnf;
+	required_ioport             m_cnf;
 
 	// pieces of memory
 	required_memory_region  m_region_maincpu;

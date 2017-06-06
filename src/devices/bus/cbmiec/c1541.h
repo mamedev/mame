@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_CBMIEC_C1541_H
+#define MAME_BUS_CBMIEC_C1541_H
 
-#ifndef __C1541__
-#define __C1541__
+#pragma once
 
 #include "cbmiec.h"
 #include "bus/c64/bn1541.h"
@@ -33,16 +33,13 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> c1541_base_t
+// ======================> c1541_device_base
 
-class c1541_base_t :  public device_t,
+class c1541_device_base :  public device_t,
 						public device_cbm_iec_interface,
 						public device_c64_floppy_parallel_interface
 {
 public:
-	// construction/destruction
-	c1541_base_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
-
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual ioport_constructor device_input_ports() const override;
@@ -62,6 +59,9 @@ public:
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 protected:
+	// construction/destruction
+	c1541_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -98,39 +98,39 @@ protected:
 };
 
 
-// ======================> c1540_t
+// ======================> c1540_device
 
-class c1540_t :  public c1541_base_t
+class c1540_device :  public c1541_device_base
 {
 public:
 	// construction/destruction
-	c1540_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	c1540_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
 
-// ======================> c1541_t
+// ======================> c1541_device
 
-class c1541_t :  public c1541_base_t
+class c1541_device :  public c1541_device_base
 {
 public:
 	// construction/destruction
-	c1541_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	c1541_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
 
-// ======================> c1541c_t
+// ======================> c1541c_device
 
-class c1541c_t :  public c1541_base_t
+class c1541c_device :  public c1541_device_base
 {
 public:
 	// construction/destruction
-	c1541c_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	c1541c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -141,52 +141,52 @@ public:
 };
 
 
-// ======================> c1541ii_t
+// ======================> c1541ii_device
 
-class c1541ii_t :  public c1541_base_t
+class c1541ii_device :  public c1541_device_base
 {
 public:
 	// construction/destruction
-	c1541ii_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	c1541ii_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
 
-// ======================> sx1541_t
+// ======================> sx1541_device
 
-class sx1541_t :  public c1541_base_t
+class sx1541_device :  public c1541_device_base
 {
 public:
 	// construction/destruction
-	sx1541_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sx1541_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
 
-// ======================> fsd1_t
+// ======================> fsd1_device
 
-class fsd1_t :  public c1541_base_t
+class fsd1_device :  public c1541_device_base
 {
 public:
 	// construction/destruction
-	fsd1_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	fsd1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
 
-// ======================> fsd2_t
+// ======================> fsd2_device
 
-class fsd2_t :  public c1541_base_t
+class fsd2_device :  public c1541_device_base
 {
 public:
 	// construction/destruction
-	fsd2_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	fsd2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -196,40 +196,26 @@ public:
 };
 
 
-// ======================> csd1_t
+// ======================> csd1_device
 
-class csd1_t :  public c1541_base_t
+class csd1_device :  public c1541_device_base
 {
 public:
 	// construction/destruction
-	csd1_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	csd1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
 
-// ======================> c1541_dolphin_dos_t
+// ======================> c1541_dolphin_dos_device
 
-class c1541_dolphin_dos_t :  public c1541_base_t
+class c1541_dolphin_dos_device :  public c1541_device_base
 {
 public:
 	// construction/destruction
-	c1541_dolphin_dos_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
-};
-
-
-// ======================> c1541_professional_dos_v1_t
-
-class c1541_professional_dos_v1_t :  public c1541_base_t
-{
-public:
-	// construction/destruction
-	c1541_professional_dos_v1_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	c1541_dolphin_dos_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -237,13 +223,27 @@ public:
 };
 
 
-// ======================> c1541_prologic_dos_classic_t
+// ======================> c1541_professional_dos_v1_device
 
-class c1541_prologic_dos_classic_t :  public c1541_base_t
+class c1541_professional_dos_v1_device :  public c1541_device_base
 {
 public:
 	// construction/destruction
-	c1541_prologic_dos_classic_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	c1541_professional_dos_v1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+};
+
+
+// ======================> c1541_prologic_dos_classic_device
+
+class c1541_prologic_dos_classic_device :  public c1541_device_base
+{
+public:
+	// construction/destruction
+	c1541_prologic_dos_classic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -267,13 +267,13 @@ protected:
 };
 
 
-// ======================> indus_gt_t
+// ======================> indus_gt_device
 
-class indus_gt_t :  public c1541_base_t
+class indus_gt_device :  public c1541_device_base
 {
 public:
 	// construction/destruction
-	indus_gt_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	indus_gt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -281,19 +281,19 @@ public:
 
 
 // device type definition
-extern const device_type C1540;
-extern const device_type C1541;
-extern const device_type C1541C;
-extern const device_type C1541II;
-extern const device_type SX1541;
-extern const device_type FSD1;
-extern const device_type FSD2;
-extern const device_type CSD1;
-extern const device_type C1541_DOLPHIN_DOS;
-extern const device_type C1541_PROFESSIONAL_DOS_V1;
-extern const device_type C1541_PROLOGIC_DOS_CLASSIC;
-extern const device_type INDUS_GT;
+DECLARE_DEVICE_TYPE(C1540,                      c1540_device)
+DECLARE_DEVICE_TYPE(C1541,                      c1541_device)
+DECLARE_DEVICE_TYPE(C1541C,                     c1541c_device)
+DECLARE_DEVICE_TYPE(C1541II,                    c1541ii_device)
+DECLARE_DEVICE_TYPE(SX1541,                     sx1541_device)
+DECLARE_DEVICE_TYPE(FSD1,                       fsd1_device)
+DECLARE_DEVICE_TYPE(FSD2,                       fsd2_device)
+DECLARE_DEVICE_TYPE(CSD1,                       csd1_device)
+DECLARE_DEVICE_TYPE(C1541_DOLPHIN_DOS,          c1541_dolphin_dos_device)
+DECLARE_DEVICE_TYPE(C1541_PROFESSIONAL_DOS_V1,  c1541_professional_dos_v1_device)
+DECLARE_DEVICE_TYPE(C1541_PROLOGIC_DOS_CLASSIC, c1541_prologic_dos_classic_device)
+DECLARE_DEVICE_TYPE(INDUS_GT,                   indus_gt_device)
 
 
 
-#endif
+#endif // MAME_BUS_CBMIEC_C1541_H

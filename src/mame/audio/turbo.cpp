@@ -183,7 +183,7 @@ static const char *const turbo_sample_names[] =
 };
 
 
-MACHINE_CONFIG_FRAGMENT( turbo_samples )
+MACHINE_CONFIG_START( turbo_samples )
 
 	/* this is the cockpit speaker configuration */
 	MCFG_SPEAKER_ADD("fspeaker", 0.0, 0.0, 1.0)     /* front */
@@ -429,7 +429,7 @@ static const char *const subroc3d_sample_names[] =
 	nullptr
 };
 
-MACHINE_CONFIG_FRAGMENT( subroc3d_samples )
+MACHINE_CONFIG_START( subroc3d_samples )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("samples", SAMPLES, 0)
@@ -574,7 +574,7 @@ static const char *const buckrog_sample_names[]=
 };
 
 
-MACHINE_CONFIG_FRAGMENT( buckrog_samples )
+MACHINE_CONFIG_START( buckrog_samples )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("samples", SAMPLES, 0)
 	MCFG_SAMPLES_CHANNELS(6)

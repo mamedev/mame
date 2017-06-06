@@ -2,7 +2,7 @@
 // copyright-holders:Nathan Woods
 /***************************************************************************
 
-    coco_pak.c
+    coco_pak.cpp
 
     Code for emulating standard CoCo cartridges
 
@@ -14,12 +14,10 @@
 #define CARTSLOT_TAG            "cart"
 #define CART_AUTOSTART_TAG      "cart_autostart"
 
+
 /***************************************************************************
     IMPLEMENTATION
 ***************************************************************************/
-
-static MACHINE_CONFIG_FRAGMENT(coco_pak)
-MACHINE_CONFIG_END
 
 ROM_START( coco_pak )
 	ROM_REGION(0x8000, CARTSLOT_TAG, ROMREGION_ERASE00)
@@ -43,7 +41,7 @@ INPUT_PORTS_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type COCO_PAK = device_creator<coco_pak_device>;
+DEFINE_DEVICE_TYPE(COCO_PAK, coco_pak_device, "cocopak", "CoCo Program PAK")
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -52,18 +50,16 @@ const device_type COCO_PAK = device_creator<coco_pak_device>;
 //-------------------------------------------------
 //  coco_pak_device - constructor
 //-------------------------------------------------
-coco_pak_device::coco_pak_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_cococart_interface( mconfig, *this ), m_cart(nullptr), m_owner(nullptr),
-		m_autostart(*this, CART_AUTOSTART_TAG)
+coco_pak_device::coco_pak_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_cococart_interface(mconfig, *this)
+	, m_cart(nullptr), m_autostart(*this, CART_AUTOSTART_TAG)
 {
 }
 
 coco_pak_device::coco_pak_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: device_t(mconfig, COCO_PAK, "CoCo Program PAK", tag, owner, clock, "cocopak", __FILE__),
-		device_cococart_interface( mconfig, *this ), m_cart(nullptr), m_owner(nullptr),
-		m_autostart(*this, CART_AUTOSTART_TAG)
-	{
+	: coco_pak_device(mconfig, COCO_PAK, tag, owner, clock)
+{
 }
 
 //-------------------------------------------------
@@ -73,18 +69,8 @@ coco_pak_device::coco_pak_device(const machine_config &mconfig, const char *tag,
 void coco_pak_device::device_start()
 {
 	m_cart = dynamic_cast<device_image_interface *>(owner());
-	m_owner = dynamic_cast<cococart_slot_device *>(owner());
 }
 
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor coco_pak_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( coco_pak );
-}
 
 //-------------------------------------------------
 //  input_ports - device-specific input ports
@@ -117,7 +103,7 @@ void coco_pak_device::device_reset()
 			: cococart_slot_device::line_value::CLEAR;
 
 		// normal CoCo PAKs tie their CART line to Q - the system clock
-		m_owner->cart_set_line(cococart_slot_device::line::CART, cart_line);
+		set_line_value(cococart_slot_device::line::CART, cart_line);
 	}
 }
 
@@ -138,7 +124,7 @@ uint8_t* coco_pak_device::get_cart_base()
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type COCO_PAK_BANKED = device_creator<coco_pak_banked_device>;
+DEFINE_DEVICE_TYPE(COCO_PAK_BANKED, coco_pak_banked_device, "cocopak_banked", "CoCo Program PAK (Banked)")
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -148,8 +134,12 @@ const device_type COCO_PAK_BANKED = device_creator<coco_pak_banked_device>;
 //  coco_pak_device - constructor
 //-------------------------------------------------
 
+coco_pak_banked_device::coco_pak_banked_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: coco_pak_device(mconfig, type, tag, owner, clock)
+{
+}
 coco_pak_banked_device::coco_pak_banked_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: coco_pak_device(mconfig, COCO_PAK_BANKED, "CoCo Program PAK (Banked)", tag, owner, clock, "cocopak_banked", __FILE__)
+	: coco_pak_banked_device(mconfig, COCO_PAK_BANKED, tag, owner, clock)
 {
 }
 
@@ -186,16 +176,17 @@ void coco_pak_banked_device::banked_pak_set_bank(uint32_t bank)
 	}
 }
 
-/*-------------------------------------------------
-    write
--------------------------------------------------*/
 
-WRITE8_MEMBER(coco_pak_banked_device::write)
+//-------------------------------------------------
+//  scs_write
+//-------------------------------------------------
+
+WRITE8_MEMBER(coco_pak_banked_device::scs_write)
 {
 	switch(offset)
 	{
 		case 0:
-			/* set the bank */
+			// set the bank
 			banked_pak_set_bank(data);
 			break;
 	}

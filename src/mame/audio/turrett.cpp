@@ -9,7 +9,7 @@
 #include "emu.h"
 #include "includes/turrett.h"
 
-const device_type TURRETT = device_creator<turrett_device>;
+DEFINE_DEVICE_TYPE(TURRETT, turrett_device, "ttsnd", "Turret Tower Sound")
 
 
 //-------------------------------------------------
@@ -17,10 +17,10 @@ const device_type TURRETT = device_creator<turrett_device>;
 //-------------------------------------------------
 
 turrett_device::turrett_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TURRETT, "Turret Tower Sound", tag, owner, clock, "ttsnd", __FILE__),
-		device_sound_interface(mconfig, *this),
-		device_memory_interface(mconfig, *this),
-		m_space_config("ttsound", ENDIANNESS_LITTLE, 16, 28, 0, nullptr)
+	: device_t(mconfig, TURRETT, tag, owner, clock)
+	, device_sound_interface(mconfig, *this)
+	, device_memory_interface(mconfig, *this)
+	, m_space_config("ttsound", ENDIANNESS_LITTLE, 16, 28, 0, nullptr)
 {
 }
 

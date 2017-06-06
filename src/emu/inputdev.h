@@ -8,21 +8,15 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_EMU_INPUTDEV_H
+#define MAME_EMU_INPUTDEV_H
 
-#ifndef EMU_INPUTDEV_H
-#define EMU_INPUTDEV_H
+#pragma once
 
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
-
-// forward declarations
-class input_device;
-class input_class;
-class input_manager;
-
 
 // callback for getting the value of an item on a device
 typedef s32 (*item_get_state_func)(void *device_internal, void *item_internal);
@@ -395,6 +389,4 @@ inline running_machine &input_device_item::machine() const { return m_device.mac
 inline input_code input_device_item::code() const { return input_code(m_device.devclass(), m_device.devindex(), m_itemclass, ITEM_MODIFIER_NONE, m_itemid); }
 inline s32 input_device_item::update_value() { return m_current = (*m_getstate)(m_device.internal(), m_internal); }
 
-
-
-#endif  // EMU_INPUTDEV_H
+#endif  // MAME_EMU_INPUTDEV_H

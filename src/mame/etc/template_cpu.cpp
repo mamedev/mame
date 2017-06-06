@@ -7,11 +7,11 @@
  *****************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "xxx.h"
+#include "debugger.h"
 
 
-const device_type XXX = &device_creator<xxx_cpu_device>;
+DEFINE_DEVICE_TYPE(XXX, xxx_cpu_device, "xxx", "XXX")
 
 
 /* FLAGS */
@@ -82,26 +82,26 @@ void xxx_cpu_device::execute_set_input(int irqline, int state)
 {
 	switch(irqline)
 	{
-		case XXX_INT_INTRM:
-			m_intrm_pending = (state == ASSERT_LINE);
-			m_intrm_state = state;
+		case XXX_INT_INTRM: // level-sensitive
+			m_intrm_pending = ((ASSERT_LINE == state) || (HOLD_LINE == state));
+			m_intrm_state = (ASSERT_LINE == state);
 			break;
-		case XXX_RESET:
-			if (state == ASSERT_LINE)
+		case XXX_RESET: // edge-sensitive
+			if (CLEAR_LINE != state)
 				m_reset_pending = 1;
-			m_reset_state = state;
+			m_reset_state = (ASSERT_LINE == state);
 			break;
-		case XXX_INT_INTR:
-			if (state == ASSERT_LINE)
+		case XXX_INT_INTR: // edge-sensitive
+			if (CLEAR_LINE != state)
 				m_intr_pending = 1;
-			m_intr_state = state;
+			m_intr_state = (ASSERT_LINE == state);
 			break;
 	}
 }
 #endif
 
 xxx_cpu_device::xxx_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, XXX, "XXX", tag, owner, clock, "xxx", __FILE__)
+	: cpu_device(mconfig, XXX, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 8, 32, -1)
 	, m_data_config("data", ENDIANNESS_BIG, 8, 32, 0)
 {
@@ -113,11 +113,11 @@ void xxx_cpu_device::state_string_export(const device_state_entry &entry, std::s
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%c%c%c%c",
-				m_flags & 0x80 ? 'S':'.',
-				m_flags & 0x40 ? 'Z':'.',
-				m_flags & 0x20 ? 'V':'.',
-				m_flags & 0x10 ? 'C':'.');
+			str = util::string_format("%c%c%c%c",
+					m_flags & 0x80 ? 'S':'.',
+					m_flags & 0x40 ? 'Z':'.',
+					m_flags & 0x20 ? 'V':'.',
+					m_flags & 0x10 ? 'C':'.');
 			break;
 	}
 }
@@ -125,6 +125,5 @@ void xxx_cpu_device::state_string_export(const device_state_entry &entry, std::s
 
 offs_t xxx_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint32_t *oprom, const uint32_t *opram, uint32_t options)
 {
-	extern CPU_DISASSEMBLE( xxx );
 	return CPU_DISASSEMBLE_NAME(xxx)(this, buffer, pc, oprom, opram, options);
 }

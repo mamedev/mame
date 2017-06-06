@@ -18,7 +18,8 @@ class gaplus_state : public driver_device
 public:
 	enum
 	{
-		TIMER_NAMCOIO_RUN
+		TIMER_NAMCOIO0_RUN,
+		TIMER_NAMCOIO1_RUN
 	};
 
 	enum
@@ -66,6 +67,8 @@ public:
 	uint8_t m_main_irq_mask;
 	uint8_t m_sub_irq_mask;
 	uint8_t m_sub2_irq_mask;
+	emu_timer *m_namcoio0_run_timer;
+	emu_timer *m_namcoio1_run_timer;
 
 	DECLARE_WRITE8_MEMBER(irq_1_ctrl_w);
 	DECLARE_WRITE8_MEMBER(irq_2_ctrl_w);
@@ -94,7 +97,8 @@ public:
 	INTERRUPT_GEN_MEMBER(gapluso_vblank_main_irq);
 	INTERRUPT_GEN_MEMBER(vblank_sub_irq);
 	INTERRUPT_GEN_MEMBER(vblank_sub2_irq);
-	TIMER_CALLBACK_MEMBER(namcoio_run);
+	TIMER_CALLBACK_MEMBER(namcoio0_run);
+	TIMER_CALLBACK_MEMBER(namcoio1_run);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);

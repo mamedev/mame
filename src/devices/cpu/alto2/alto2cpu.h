@@ -8,6 +8,8 @@
 #ifndef MAME_DEVICES_CPU_ALTO2_H
 #define MAME_DEVICES_CPU_ALTO2_H
 
+#pragma once
+
 #include "machine/diablo_hd.h"
 #include "sound/spkrdev.h"
 
@@ -937,6 +939,6 @@ private:
 #include "a2kwd.h"
 };
 
-extern const device_type ALTO2;
+DECLARE_DEVICE_TYPE(ALTO2, alto2_cpu_device)
 
 #endif // MAME_DEVICES_CPU_ALTO2_H

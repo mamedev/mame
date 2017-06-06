@@ -12,6 +12,7 @@
 #include "video/k054156_k054157_k056832.h"
 #include "video/k053244_k053245.h"
 #include "video/k054000.h"
+#include "machine/k054321.h"
 
 class lethal_state : public driver_device
 {
@@ -23,6 +24,7 @@ public:
 		m_bank4000(*this, "bank4000"),
 		m_k056832(*this, "k056832"),
 		m_k053244(*this, "k053244"),
+		m_k054321(*this, "k054321"),
 		m_palette(*this, "palette") { }
 
 	/* video-related */
@@ -39,11 +41,12 @@ public:
 	required_device<address_map_bank_device> m_bank4000;
 	required_device<k056832_device> m_k056832;
 	required_device<k05324x_device> m_k053244;
+	required_device<k054321_device> m_k054321;
 	required_device<palette_device> m_palette;
 
 	DECLARE_WRITE8_MEMBER(control2_w);
+	DECLARE_READ8_MEMBER(sound_irq_r);
 	DECLARE_WRITE8_MEMBER(sound_irq_w);
-	DECLARE_READ8_MEMBER(sound_status_r);
 	DECLARE_WRITE8_MEMBER(le_bankswitch_w);
 	DECLARE_READ8_MEMBER(guns_r);
 	DECLARE_READ8_MEMBER(gunsaux_r);

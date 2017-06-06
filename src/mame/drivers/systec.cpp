@@ -53,7 +53,7 @@ public:
 	required_device<generic_terminal_device> m_terminal;
 	DECLARE_READ8_MEMBER(systec_c4_r);
 	DECLARE_READ8_MEMBER(systec_c6_r);
-	DECLARE_WRITE8_MEMBER( kbd_put );
+	void kbd_put(u8 data);
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
 };
@@ -70,7 +70,7 @@ READ8_MEMBER( systec_state::systec_c6_r )
 	return 0x04 | (m_term_data ? 1 : 0);
 }
 
-WRITE8_MEMBER( systec_state::kbd_put )
+void systec_state::kbd_put(u8 data)
 {
 	m_term_data = data;
 }
@@ -97,7 +97,7 @@ void systec_state::machine_reset()
 	memcpy(m_p_maincpu, m_p_roms, 0x2000);
 }
 
-static MACHINE_CONFIG_START( systec, systec_state )
+static MACHINE_CONFIG_START( systec )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(systec_mem)
@@ -106,7 +106,7 @@ static MACHINE_CONFIG_START( systec, systec_state )
 
 	/* video hardware */
 	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(systec_state, kbd_put))
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(systec_state, kbd_put))
 MACHINE_CONFIG_END
 
 
@@ -119,5 +119,5 @@ ROM_END
 
 /* Driver */
 
-/*   YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT    INIT   COMPANY    FULLNAME       FLAGS */
-COMP(19??, systec, 0,      0,       systec,  systec, driver_device,  0,    "Systec", "Systec Z80", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//   YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT   STATE         INIT  COMPANY   FULLNAME      FLAGS
+COMP(19??, systec, 0,      0,       systec,  systec, systec_state, 0,    "Systec", "Systec Z80", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

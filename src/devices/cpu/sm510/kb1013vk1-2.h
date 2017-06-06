@@ -6,8 +6,10 @@
 
 */
 
-#ifndef _KB1013VK12_H_
-#define _KB1013VK12_H_
+#ifndef MAME_CPU_SM510_KB1013VK1_2_H
+#define MAME_CPU_SM510_KB1013VK1_2_H
+
+#pragma once
 
 #include "sm500.h"
 
@@ -15,10 +17,6 @@
 // I/O ports setup
 
 // ..
-
-
-
-
 
 class kb1013vk12_device : public sm500_device
 {
@@ -35,7 +33,6 @@ protected:
 };
 
 
-extern const device_type KB1013VK12;
+DECLARE_DEVICE_TYPE(KB1013VK12, kb1013vk12_device)
 
-
-#endif /* _KB1013VK12_H_ */
+#endif // MAME_CPU_SM510_KB1013VK1_2_H

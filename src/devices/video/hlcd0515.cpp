@@ -2,10 +2,11 @@
 // copyright-holders:hap
 /*
 
-  Hughes HLCD 0515/0569 LCD Driver
+  Hughes HLCD 0515 family LCD Driver
 
   0515: 25 columns(also size of buffer/ram)
   0569: 24 columns, no DATA OUT pin, display blank has no effect
+  0530: specifications unknown, pinout seems similar to 0569
 
   TODO:
   - read mode is untested
@@ -17,26 +18,33 @@
 #include "video/hlcd0515.h"
 
 
-const device_type HLCD0515 = device_creator<hlcd0515_device>;
-const device_type HLCD0569 = device_creator<hlcd0569_device>;
+DEFINE_DEVICE_TYPE(HLCD0515, hlcd0515_device, "hlcd0515", "Hughes HLCD 0515 LCD Driver")
+DEFINE_DEVICE_TYPE(HLCD0569, hlcd0569_device, "hlcd0569", "Hughes HLCD 0569 LCD Driver")
+DEFINE_DEVICE_TYPE(HLCD0530, hlcd0530_device, "hlcd0530", "Hughes HLCD 0530 LCD Driver")
 
 //-------------------------------------------------
 //  constructor
 //-------------------------------------------------
 
-hlcd0515_device::hlcd0515_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, u8 colmax, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-	m_colmax(colmax), m_write_cols(*this), m_write_data(*this)
+hlcd0515_device::hlcd0515_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 colmax)
+	: device_t(mconfig, type, tag, owner, clock)
+	, m_colmax(colmax)
+	, m_write_cols(*this), m_write_data(*this)
 {
 }
 
 hlcd0515_device::hlcd0515_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: hlcd0515_device(mconfig, HLCD0515, "HLCD 0515 LCD Driver", tag, owner, clock, 25, "hlcd0515", __FILE__)
+	: hlcd0515_device(mconfig, HLCD0515, tag, owner, clock, 25)
 {
 }
 
 hlcd0569_device::hlcd0569_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: hlcd0515_device(mconfig, HLCD0569, "HLCD 0569 LCD Driver", tag, owner, clock, 24, "hlcd0569", __FILE__)
+	: hlcd0515_device(mconfig, HLCD0569, tag, owner, clock, 24)
+{
+}
+
+hlcd0530_device::hlcd0530_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: hlcd0515_device(mconfig, HLCD0530, tag, owner, clock, 24)
 {
 }
 

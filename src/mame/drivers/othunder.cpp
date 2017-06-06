@@ -423,7 +423,7 @@ WRITE16_MEMBER(othunder_state::othunder_lightgun_w)
 	   The ADC60808 clock is 512kHz. Conversion takes between 0 and 8 clock
 	   cycles, so would end in a maximum of 15.625us. We'll use 10. */
 
-	timer_set(attotime::from_usec(10), TIMER_AD_INTERRUPT);
+	m_ad_interrupt_timer->adjust(attotime::from_usec(10));
 }
 
 
@@ -662,6 +662,8 @@ void othunder_state::machine_start()
 {
 	membank("z80bank")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
 
+	m_ad_interrupt_timer = timer_alloc(TIMER_AD_INTERRUPT);
+
 	save_item(NAME(m_vblank_irq));
 	save_item(NAME(m_ad_irq));
 	save_item(NAME(m_pan));
@@ -673,7 +675,7 @@ void othunder_state::machine_reset()
 	m_ad_irq = 0;
 }
 
-static MACHINE_CONFIG_START( othunder, othunder_state )
+static MACHINE_CONFIG_START( othunder )
 
 	/* basic machine hardware */
 //  MCFG_CPU_ADD("maincpu", M68000, 24000000/2 )   /* 12 MHz */
@@ -944,8 +946,8 @@ ROM_END
 
 
 
-GAME( 1988, othunder,   0,        othunder, othunder, driver_device, 0, ORIENTATION_FLIP_X, "Taito Corporation Japan",   "Operation Thunderbolt (World, rev 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, othundero,  othunder, othunder, othunder, driver_device, 0, ORIENTATION_FLIP_X, "Taito Corporation Japan",   "Operation Thunderbolt (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, othunderu,  othunder, othunder, othundu,  driver_device, 0, ORIENTATION_FLIP_X, "Taito America Corporation", "Operation Thunderbolt (US, rev 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, othunderuo, othunder, othunder, othundu,  driver_device, 0, ORIENTATION_FLIP_X, "Taito America Corporation", "Operation Thunderbolt (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, othunderj,  othunder, othunder, othundrj, driver_device, 0, ORIENTATION_FLIP_X, "Taito Corporation",         "Operation Thunderbolt (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, othunder,   0,        othunder, othunder, othunder_state, 0, ORIENTATION_FLIP_X, "Taito Corporation Japan",   "Operation Thunderbolt (World, rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, othundero,  othunder, othunder, othunder, othunder_state, 0, ORIENTATION_FLIP_X, "Taito Corporation Japan",   "Operation Thunderbolt (World)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1988, othunderu,  othunder, othunder, othundu,  othunder_state, 0, ORIENTATION_FLIP_X, "Taito America Corporation", "Operation Thunderbolt (US, rev 1)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1988, othunderuo, othunder, othunder, othundu,  othunder_state, 0, ORIENTATION_FLIP_X, "Taito America Corporation", "Operation Thunderbolt (US)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1988, othunderj,  othunder, othunder, othundrj, othunder_state, 0, ORIENTATION_FLIP_X, "Taito Corporation",         "Operation Thunderbolt (Japan)",        MACHINE_SUPPORTS_SAVE )

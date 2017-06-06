@@ -307,8 +307,8 @@ std::string mfm_harddisk_device::tts(const attotime &t)
 	return buf;
 }
 
-mfm_harddisk_device::mfm_harddisk_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: harddisk_image_device(mconfig, type, name, tag, owner, clock, shortname, source),
+mfm_harddisk_device::mfm_harddisk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: harddisk_image_device(mconfig, type, tag, owner, clock),
 		device_slot_card_interface(mconfig, *this),
 		m_index_timer(nullptr),
 		m_spinup_timer(nullptr),
@@ -935,17 +935,17 @@ int mfm_harddisk_device::get_actual_heads()
     The generic HD takes any kind of CHD HD image and magically creates enough heads and cylinders.
 */
 mfm_hd_generic_device::mfm_hd_generic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-: mfm_harddisk_device(mconfig, MFMHD_GENERIC, "Generic MFM hard disk", tag, owner, clock, "mfm_harddisk", __FILE__)
+: mfm_harddisk_device(mconfig, MFMHD_GENERIC, tag, owner, clock)
 {
 }
 
-const device_type MFMHD_GENERIC = device_creator<mfm_hd_generic_device>;
+DEFINE_DEVICE_TYPE(MFMHD_GENERIC, mfm_hd_generic_device, "mfm_harddisk", "Generic MFM hard disk")
 
 /*
     Various models.
 */
 mfm_hd_st213_device::mfm_hd_st213_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-: mfm_harddisk_device(mconfig, MFMHD_ST213, "Seagate ST-213 MFM hard disk", tag, owner, clock, "mfm_hd_st213", __FILE__)
+: mfm_harddisk_device(mconfig, MFMHD_ST213, tag, owner, clock)
 {
 	m_phys_cylinders = 670;
 	m_max_cylinders = 615;      // 0..614
@@ -955,10 +955,10 @@ mfm_hd_st213_device::mfm_hd_st213_device(const machine_config &mconfig, const ch
 	m_maxseek_time = 150;
 }
 
-const device_type MFMHD_ST213 = device_creator<mfm_hd_st213_device>;
+DEFINE_DEVICE_TYPE(MFMHD_ST213, mfm_hd_st213_device, "mfm_hd_st213", "Seagate ST-213 MFM hard disk")
 
 mfm_hd_st225_device::mfm_hd_st225_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-: mfm_harddisk_device(mconfig, MFMHD_ST225, "Seagate ST-225 MFM hard disk", tag, owner, clock, "mfm_hd_st225", __FILE__)
+: mfm_harddisk_device(mconfig, MFMHD_ST225, tag, owner, clock)
 {
 	m_phys_cylinders = 670;
 	m_max_cylinders = 615;
@@ -968,10 +968,10 @@ mfm_hd_st225_device::mfm_hd_st225_device(const machine_config &mconfig, const ch
 	m_maxseek_time = 150;
 }
 
-const device_type MFMHD_ST225 = device_creator<mfm_hd_st225_device>;
+DEFINE_DEVICE_TYPE(MFMHD_ST225, mfm_hd_st225_device, "mfm_hd_st225", "Seagate ST-225 MFM hard disk")
 
 mfm_hd_st251_device::mfm_hd_st251_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-: mfm_harddisk_device(mconfig, MFMHD_ST251, "Seagate ST-251 MFM hard disk", tag, owner, clock, "mfm_hd_st251", __FILE__)
+: mfm_harddisk_device(mconfig, MFMHD_ST251, tag, owner, clock)
 {
 	m_phys_cylinders = 821;
 	m_max_cylinders = 820;
@@ -981,7 +981,7 @@ mfm_hd_st251_device::mfm_hd_st251_device(const machine_config &mconfig, const ch
 	m_maxseek_time = 70;
 }
 
-const device_type MFMHD_ST251 = device_creator<mfm_hd_st251_device>;
+DEFINE_DEVICE_TYPE(MFMHD_ST251, mfm_hd_st251_device, "mfm_hd_st251", "Seagate ST-251 MFM hard disk")
 
 // ===========================================================
 //   Track cache
@@ -1178,7 +1178,7 @@ uint16_t* mfmhd_trackimage_cache::get_trackimage(int cylinder, int head)
 // ================================================================
 
 mfm_harddisk_connector::mfm_harddisk_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock):
-	device_t(mconfig, MFM_HD_CONNECTOR, "MFM hard disk connector", tag, owner, clock, "mfm_hd_connector", __FILE__),
+	device_t(mconfig, MFM_HD_CONNECTOR, tag, owner, clock),
 	device_slot_interface(mconfig, *this),
 	m_encoding(),
 	m_spinupms(0),
@@ -1222,4 +1222,4 @@ void mfm_harddisk_connector::device_config_complete()
 	}
 }
 
-const device_type MFM_HD_CONNECTOR = device_creator<mfm_harddisk_connector>;
+DEFINE_DEVICE_TYPE(MFM_HD_CONNECTOR, mfm_harddisk_connector, "mfm_hd_connector", "MFM hard disk connector")

@@ -176,3 +176,15 @@ pongf                           // (c) 1972 Atari
 //missilex                      // (c) 1977 Taito
 //ttblock                       // (c) 1977 Taito
 //zzblock                       // (c) 1979 Taito
+
+// usbilliards.cpp
+//sharkusb                      // (c) 1975 US Billiards
+
+@source:cheekyms.cpp
+cheekyms                        // 8004 (c) [1980?]
+
+@source:zaccaria.cpp
+jackrabt                        // (c) 1984
+jackrabt2                       // (c) 1984
+jackrabts                       // (c) 1984
+monymony                        // (c) 1983

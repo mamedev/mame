@@ -7,10 +7,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_MB8421_H
+#define MAME_MACHINE_MB8421_H
 
-#ifndef _MB8421_H
-#define _MB8421_H
+#pragma once
 
 
 
@@ -40,8 +40,8 @@ public:
 	mb8421_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_intl_handler(device_t &device, _Object object) { return downcast<mb8421_device &>(device).m_intl_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_intr_handler(device_t &device, _Object object) { return downcast<mb8421_device &>(device).m_intr_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_intl_handler(device_t &device, Object &&cb) { return downcast<mb8421_device &>(device).m_intl_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_intr_handler(device_t &device, Object &&cb) { return downcast<mb8421_device &>(device).m_intr_handler.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ_LINE_MEMBER( busy_r ) { return 0; } // _BUSY pin - not emulated
 	uint8_t peek(offs_t offset) { return m_ram[offset & 0x7ff]; }
@@ -65,6 +65,6 @@ private:
 
 // device type definition
 extern const device_type MB8421;
+DECLARE_DEVICE_TYPE(MB8421, mb8421_device)
 
-
-#endif /* _MB8421_H */
+#endif // MAME_MACHINE_MB8421_H

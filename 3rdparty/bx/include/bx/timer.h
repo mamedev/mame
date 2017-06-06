@@ -18,6 +18,4 @@ namespace bx
 
 } // namespace bx
 
-#include "timer.inl"
-
 #endif // BX_TIMER_H_HEADER_GUARD

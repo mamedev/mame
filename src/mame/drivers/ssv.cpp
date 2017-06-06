@@ -484,9 +484,9 @@ static ADDRESS_MAP_START( gdfs_map, AS_PROGRAM, 16, ssv_state )
 	AM_RANGE(0x500000, 0x500001) AM_WRITE(gdfs_eeprom_w)
 	AM_RANGE(0x540000, 0x540001) AM_READ(gdfs_eeprom_r)
 	AM_RANGE(0x600000, 0x600fff) AM_RAM
-	AM_RANGE(0x800000, 0x87ffff) AM_DEVREADWRITE( "st0020_spr", st0020_device, st0020_sprram_r, st0020_sprram_w );
-	AM_RANGE(0x8c0000, 0x8c00ff) AM_DEVREADWRITE( "st0020_spr", st0020_device, st0020_blitram_r, st0020_blitram_w );
-	AM_RANGE(0x900000, 0x9fffff) AM_DEVREADWRITE( "st0020_spr", st0020_device, st0020_gfxram_r, st0020_gfxram_w );
+	AM_RANGE(0x800000, 0x87ffff) AM_DEVREADWRITE( "st0020_spr", st0020_device, sprram_r, sprram_w );
+	AM_RANGE(0x8c0000, 0x8c00ff) AM_DEVREADWRITE( "st0020_spr", st0020_device, regs_r,   regs_w   );
+	AM_RANGE(0x900000, 0x9fffff) AM_DEVREADWRITE( "st0020_spr", st0020_device, gfxram_r, gfxram_w );
 	SSV_MAP( 0xc00000 )
 ADDRESS_MAP_END
 
@@ -850,33 +850,19 @@ ADDRESS_MAP_END
   Eagle Shot Golf
 ***************************************************************************/
 
-WRITE16_MEMBER(ssv_state::eaglshot_gfxrom_bank_w)
+WRITE8_MEMBER(ssv_state::eaglshot_gfxrom_bank_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		membank("gfxrom")->set_entry(data < 6 ? data : 6);
-	}
+	membank("gfxrom")->set_entry(data < 6 ? data : 6);
 }
 
-READ16_MEMBER(ssv_state::eaglshot_trackball_r)
+WRITE8_MEMBER(ssv_state::eaglshot_trackball_w)
 {
-	switch(m_trackball_select)
-	{
-		case 0x60:  return (m_io_trackx->read() >> 8) & 0xff;
-		case 0x40:  return (m_io_trackx->read() >> 0) & 0xff;
-
-		case 0x70:  return (m_io_tracky->read() >> 8) & 0xff;
-		case 0x50:  return (m_io_tracky->read() >> 0) & 0xff;
-	}
-	return 0;
-}
-
-WRITE16_MEMBER(ssv_state::eaglshot_trackball_w)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		m_trackball_select = data;
-	}
+	// All these get toggled during trackball reads; the precise arrangement is uncertain
+	m_upd4701->cs_w(!BIT(data, 6));
+	m_upd4701->ul_w(BIT(data, 5));
+	m_upd4701->xy_w(BIT(data, 4));
+	m_upd4701->resetx_w(BIT(data, 3));
+	m_upd4701->resety_w(BIT(data, 2));
 }
 
 
@@ -900,11 +886,11 @@ static ADDRESS_MAP_START( eaglshot_map, AS_PROGRAM, 16, ssv_state )
 	AM_RANGE(0x210000, 0x210001) AM_READNOP /*AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)*/                 // Watchdog
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                                      // ? 0,4 at the start
 	AM_RANGE(0x21000e, 0x21000f) AM_WRITE(lockout_inv_w)                            // Inverted lockout lines
-	AM_RANGE(0x800000, 0x800001) AM_WRITE(eaglshot_gfxrom_bank_w)
-	AM_RANGE(0x900000, 0x900001) AM_WRITE(eaglshot_trackball_w)
+	AM_RANGE(0x800000, 0x800001) AM_WRITE8(eaglshot_gfxrom_bank_w, 0x00ff)
+	AM_RANGE(0x900000, 0x900001) AM_WRITE8(eaglshot_trackball_w, 0x00ff)
 	AM_RANGE(0xa00000, 0xbfffff) AM_ROMBANK("gfxrom")
 	AM_RANGE(0xc00000, 0xc007ff) AM_RAM AM_SHARE("nvram")   // NVRAM
-	AM_RANGE(0xd00000, 0xd00001) AM_READ(eaglshot_trackball_r)
+	AM_RANGE(0xd00000, 0xd00001) AM_DEVREAD8("upd4701", upd4701_device, d_r, 0x00ff)
 	SSV_MAP( 0xf00000 )
 ADDRESS_MAP_END
 
@@ -2567,7 +2553,7 @@ DRIVER_INIT_MEMBER(ssv_state,jsk)          {    init(0); save_item(NAME(m_latche
 #define SSV_VBEND 0
 #define SSV_VBSTART 0xf0
 
-static MACHINE_CONFIG_START( ssv, ssv_state )
+static MACHINE_CONFIG_START( ssv )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V60, SSV_MASTER_CLOCK) /* Based on STA-0001 & STA-0001B System boards */
@@ -2826,6 +2812,10 @@ static MACHINE_CONFIG_DERIVED( eaglshot, ssv )
 	MCFG_CPU_PROGRAM_MAP(eaglshot_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
+
+	MCFG_DEVICE_ADD("upd4701", UPD4701A, 0)
+	MCFG_UPD4701_PORTX("TRACKX")
+	MCFG_UPD4701_PORTY("TRACKY")
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

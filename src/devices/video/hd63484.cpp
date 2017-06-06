@@ -25,7 +25,7 @@
 //-------------------------------------------------
 
 hd63484_device::hd63484_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, HD63484, "HD63484 CRTC", tag, owner, clock, "hd63484", __FILE__),
+	: device_t(mconfig, HD63484, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
 	m_auto_configure_screen(true),
@@ -331,7 +331,7 @@ enum
 -------------------------------------------------*/
 
 // devices
-const device_type HD63484 = device_creator<hd63484_device>;
+DEFINE_DEVICE_TYPE(HD63484, hd63484_device, "hd63484", "Hitachi HD63484 ACRTC")
 
 
 ROM_START( hd63484 )

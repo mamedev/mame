@@ -53,10 +53,10 @@
 #include "video/kan_pand.h"
 #include "screen.h"
 
-const device_type KANEKO_PANDORA = device_creator<kaneko_pandora_device>;
+DEFINE_DEVICE_TYPE(KANEKO_PANDORA, kaneko_pandora_device, "kaneko_pandora", "Kaneko PANDORA GFX")
 
 kaneko_pandora_device::kaneko_pandora_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, KANEKO_PANDORA, "Kaneko PANDORA GFX", tag, owner, clock, "kaneko_pandora", __FILE__)
+	: device_t(mconfig, KANEKO_PANDORA, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, m_gfx_region(0)
 	, m_xoffset(0)
@@ -82,6 +82,7 @@ void kaneko_pandora_device::static_set_gfxdecode_tag(device_t &device, const cha
 void kaneko_pandora_device::device_start()
 {
 	m_bg_pen = 0;
+	m_flip_screen = false;
 
 	m_spriteram = std::make_unique<uint8_t[]>(0x1000);
 
@@ -89,6 +90,7 @@ void kaneko_pandora_device::device_start()
 
 	save_item(NAME(m_clear_bitmap));
 	save_item(NAME(m_bg_pen));
+	save_item(NAME(m_flip_screen));
 	save_pointer(NAME(m_spriteram.get()), 0x1000);
 	save_item(NAME(*m_sprites_bitmap));
 }
@@ -181,7 +183,7 @@ void kaneko_pandora_device::draw( bitmap_ind16 &bitmap, const rectangle &cliprec
 			y = dy;
 		}
 
-		if (machine().driver_data()->flip_screen())
+		if (m_flip_screen)
 		{
 			sx = 240 - x;
 			sy = 240 - y;

@@ -15,8 +15,8 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type BBC_ACORN8271 = device_creator<bbc_acorn8271_device>;
-const device_type BBC_ACORN1770 = device_creator<bbc_acorn1770_device>;
+DEFINE_DEVICE_TYPE(BBC_ACORN8271, bbc_acorn8271_device, "bbc_acorn8271", "Acorn 8721 FDC")
+DEFINE_DEVICE_TYPE(BBC_ACORN1770, bbc_acorn1770_device, "bbc_acorn1770", "Acorn 1770 FDC")
 
 
 //-------------------------------------------------
@@ -39,7 +39,7 @@ static SLOT_INTERFACE_START( bbc_floppies_525 )
 	SLOT_INTERFACE("525qd",   FLOPPY_525_QD)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_FRAGMENT( acorn8271 )
+static MACHINE_CONFIG_START( acorn8271 )
 	MCFG_DEVICE_ADD("i8271", I8271, 0)
 	MCFG_I8271_IRQ_CALLBACK(WRITELINE(bbc_acorn8271_device, fdc_intrq_w))
 	MCFG_I8271_HDL_CALLBACK(WRITELINE(bbc_acorn8271_device, motor_w))
@@ -50,7 +50,7 @@ static MACHINE_CONFIG_FRAGMENT( acorn8271 )
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( acorn1770 )
+static MACHINE_CONFIG_START( acorn1770 )
 	MCFG_WD1770_ADD("wd1770", XTAL_16MHz / 2)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(bbc_acorn1770_device, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(bbc_acorn1770_device, fdc_drq_w))
@@ -171,7 +171,7 @@ const tiny_rom_entry *bbc_acorn1770_device::device_rom_region() const
 //-------------------------------------------------
 
 bbc_acorn8271_device::bbc_acorn8271_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, BBC_ACORN8271, "Acorn 8271 FDC", tag, owner, clock, "bbc_acorn8271", __FILE__),
+	: device_t(mconfig, BBC_ACORN8271, tag, owner, clock),
 	device_bbc_fdc_interface(mconfig, *this),
 	m_dfs_rom(*this, "dfs_rom"),
 	m_fdc(*this, "i8271"),
@@ -181,7 +181,7 @@ bbc_acorn8271_device::bbc_acorn8271_device(const machine_config &mconfig, const 
 }
 
 bbc_acorn1770_device::bbc_acorn1770_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, BBC_ACORN1770, "Acorn 1770 FDC", tag, owner, clock, "bbc_acorn1770", __FILE__),
+	: device_t(mconfig, BBC_ACORN1770, tag, owner, clock),
 	device_bbc_fdc_interface(mconfig, *this),
 	m_dfs_rom(*this, "dfs_rom"),
 	m_fdc(*this, "wd1770"),
@@ -212,7 +212,7 @@ void bbc_acorn1770_device::device_start()
 	m_slot = dynamic_cast<bbc_fdc_slot_device *>(owner());
 
 	space.install_readwrite_handler(0xfe80, 0xfe83, READ8_DELEGATE(bbc_acorn1770_device, wd1770l_read), WRITE8_DELEGATE(bbc_acorn1770_device, wd1770l_write));
-	space.install_readwrite_handler(0xfe84, 0xfe9f, READ8_DEVICE_DELEGATE(m_fdc, wd1770_t, read), WRITE8_DEVICE_DELEGATE(m_fdc, wd1770_t, write));
+	space.install_readwrite_handler(0xfe84, 0xfe9f, READ8_DEVICE_DELEGATE(m_fdc, wd1770_device, read), WRITE8_DEVICE_DELEGATE(m_fdc, wd1770_device, write));
 
 	m_drive_control = 0xfe;
 }

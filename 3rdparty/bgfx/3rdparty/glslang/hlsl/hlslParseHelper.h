@@ -54,7 +54,12 @@ public:
 
     void setLimits(const TBuiltInResource&) override;
     bool parseShaderStrings(TPpContext&, TInputScanner& input, bool versionWillBeError = false) override;
-    virtual const char* getGlobalUniformBlockName() override { return "$Global"; }
+    virtual const char* getGlobalUniformBlockName() const override { return "$Global"; }
+    virtual void setUniformBlockDefaults(TType& block) const override
+    {
+        block.getQualifier().layoutPacking = ElpStd140;
+        block.getQualifier().layoutMatrix = ElmRowMajor;
+    }
 
     void reservedPpErrorCheck(const TSourceLoc&, const char* /*name*/, const char* /*op*/) override { }
     bool lineContinuationCheck(const TSourceLoc&, bool /*endOfComment*/) override { return true; }
@@ -62,7 +67,7 @@ public:
     bool builtInName(const TString&);
 
     void handlePragma(const TSourceLoc&, const TVector<TString>&) override;
-    TIntermTyped* handleVariable(const TSourceLoc&, TSymbol* symbol,  const TString* string);
+    TIntermTyped* handleVariable(const TSourceLoc&, const TString* string);
     TIntermTyped* handleBracketDereference(const TSourceLoc&, TIntermTyped* base, TIntermTyped* index);
     TIntermTyped* handleBracketOperator(const TSourceLoc&, TIntermTyped* base, TIntermTyped* index);
     void checkIndex(const TSourceLoc&, const TType&, int& index);
@@ -70,12 +75,13 @@ public:
     TIntermTyped* handleBinaryMath(const TSourceLoc&, const char* str, TOperator op, TIntermTyped* left, TIntermTyped* right);
     TIntermTyped* handleUnaryMath(const TSourceLoc&, const char* str, TOperator op, TIntermTyped* childNode);
     TIntermTyped* handleDotDereference(const TSourceLoc&, TIntermTyped* base, const TString& field);
+    bool isBuiltInMethod(const TSourceLoc&, TIntermTyped* base, const TString& field);
     void assignLocations(TVariable& variable);
-    TFunction& handleFunctionDeclarator(const TSourceLoc&, TFunction& function, bool prototype);
-    TIntermAggregate* handleFunctionDefinition(const TSourceLoc&, TFunction&, const TAttributeMap&);
-    void transformEntryPoint(const TSourceLoc&, TFunction&, const TAttributeMap&);
+    void handleFunctionDeclarator(const TSourceLoc&, TFunction& function, bool prototype);
+    TIntermAggregate* handleFunctionDefinition(const TSourceLoc&, TFunction&, const TAttributeMap&, TIntermNode*& entryPointTree);
+    TIntermNode* transformEntryPoint(const TSourceLoc&, TFunction&, const TAttributeMap&);
     void handleFunctionBody(const TSourceLoc&, TFunction&, TIntermNode* functionBody, TIntermNode*& node);
-    void remapEntryPointIO(TFunction& function);
+    void remapEntryPointIO(TFunction& function, TVariable*& returnValue, TVector<TVariable*>& inputs, TVector<TVariable*>& outputs);
     void remapNonEntryPointIO(TFunction& function);
     TIntermNode* handleReturnValue(const TSourceLoc&, TIntermTyped*);
     void handleFunctionArgument(TFunction*, TIntermTyped*& arguments, TIntermTyped* newArg);
@@ -84,13 +90,13 @@ public:
     TIntermTyped* handleFunctionCall(const TSourceLoc&, TFunction*, TIntermTyped*);
     void decomposeIntrinsic(const TSourceLoc&, TIntermTyped*& node, TIntermNode* arguments);
     void decomposeSampleMethods(const TSourceLoc&, TIntermTyped*& node, TIntermNode* arguments);
+    void decomposeStructBufferMethods(const TSourceLoc&, TIntermTyped*& node, TIntermNode* arguments);
     void decomposeGeometryMethods(const TSourceLoc&, TIntermTyped*& node, TIntermNode* arguments);
-    TIntermTyped* handleLengthMethod(const TSourceLoc&, TFunction*, TIntermNode*);
     void addInputArgumentConversions(const TFunction&, TIntermTyped*&);
     TIntermTyped* addOutputArgumentConversions(const TFunction&, TIntermOperator&);
     void builtInOpCheck(const TSourceLoc&, const TFunction&, TIntermOperator&);
     TFunction* handleConstructorCall(const TSourceLoc&, const TType&);
-    void handleSemantic(TSourceLoc, TQualifier&, const TString& semantic);
+    void handleSemantic(TSourceLoc, TQualifier&, TBuiltInVariable, const TString& upperCase);
     void handlePackOffset(const TSourceLoc&, TQualifier&, const glslang::TString& location,
                           const glslang::TString* component);
     void handleRegister(const TSourceLoc&, TQualifier&, const glslang::TString* profile, const glslang::TString& desc,
@@ -130,14 +136,15 @@ public:
     void checkNoShaderLayouts(const TSourceLoc&, const TShaderQualifiers&);
 
     const TFunction* findFunction(const TSourceLoc& loc, TFunction& call, bool& builtIn, TIntermTyped*& args);
-    void declareTypedef(const TSourceLoc&, TString& identifier, const TType&, TArraySizes* typeArray = 0);
+    void declareTypedef(const TSourceLoc&, TString& identifier, const TType&);
+    void declareStruct(const TSourceLoc&, TString& structName, TType&);
+    TSymbol* lookupUserType(const TString&, TType&);
     TIntermNode* declareVariable(const TSourceLoc&, TString& identifier, TType&, TIntermTyped* initializer = 0);
     void lengthenList(const TSourceLoc&, TIntermSequence& list, int size);
     TIntermTyped* addConstructor(const TSourceLoc&, TIntermNode*, const TType&);
     TIntermTyped* constructAggregate(TIntermNode*, const TType&, int, const TSourceLoc&);
     TIntermTyped* constructBuiltIn(const TType&, TOperator, TIntermTyped*, const TSourceLoc&, bool subset);
     void declareBlock(const TSourceLoc&, TType&, const TString* instanceName = 0, TArraySizes* arraySizes = 0);
-    void finalizeGlobalUniformBlockLayout(TVariable& block) override;
     void fixBlockLocations(const TSourceLoc&, TQualifier&, TTypeList&, bool memberWithLocation, bool memberWithoutLocation);
     void fixBlockXfbOffsets(TQualifier&, TTypeList&);
     void fixBlockUniformOffsets(const TQualifier&, TTypeList&);
@@ -157,8 +164,22 @@ public:
     void pushScope()         { symbolTable.push(); }
     void popScope()          { symbolTable.pop(0); }
 
+    void pushThisScope(const TType&);
+    void popThisScope()      { symbolTable.pop(0); }
+
+    void pushImplicitThis(TVariable* thisParameter) { implicitThisStack.push_back(thisParameter); }
+    void popImplicitThis() { implicitThisStack.pop_back(); }
+    TVariable* getImplicitThis(int thisDepth) const { return implicitThisStack[implicitThisStack.size() - thisDepth]; }
+
+    void pushNamespace(const TString& name);
+    void popNamespace();
+    TString* getFullNamespaceName(const TString& localName) const;
+    void addScopeMangler(TString&);
+
     void pushSwitchSequence(TIntermSequence* sequence) { switchSequenceStack.push_back(sequence); }
     void popSwitchSequence() { switchSequenceStack.pop_back(); }
+
+    virtual void growGlobalUniformBlock(TSourceLoc&, TType&, TString& memberName, TTypeList* typeList = nullptr) override;
 
     // Apply L-value conversions.  E.g, turning a write to a RWTexture into an ImageStore.
     TIntermTyped* handleLvalue(const TSourceLoc&, const char* op, TIntermTyped* node);
@@ -175,6 +196,9 @@ public:
     // Reset data for incrementally built referencing of flattened composite structures
     void initFlattening() { flattenLevel.push_back(0); flattenOffset.push_back(0); }
     void finalizeFlattening() { flattenLevel.pop_back(); flattenOffset.pop_back(); }
+
+    // Share struct buffer deep types
+    void shareStructBufferType(TType&);
 
 protected:
     struct TFlattenData {
@@ -203,9 +227,7 @@ protected:
     bool shouldConvertLValue(const TIntermNode*) const;
 
     // Array and struct flattening
-    bool shouldFlatten(const TType& type) const;
     TIntermTyped* flattenAccess(TIntermTyped* base, int member);
-    bool shouldFlattenIO(const TType&) const;
     bool shouldFlattenUniform(const TType&) const;
     bool wasFlattened(const TIntermTyped* node) const;
     bool wasFlattened(int id) const { return flattenMap.find(id) != flattenMap.end(); }
@@ -213,7 +235,6 @@ protected:
     bool isFinalFlattening(const TType& type) const { return !(type.isStruct() || type.isArray()); }
 
     // Structure splitting (splits interstage builtin types into its own struct)
-    bool shouldSplit(const TType&);
     TIntermTyped* splitAccessStruct(const TSourceLoc& loc, TIntermTyped*& base, int& member);
     void splitAccessArray(const TSourceLoc& loc, TIntermTyped* base, TIntermTyped* index);
     TType& split(TType& type, TString name, const TType* outerStructType = nullptr);
@@ -225,14 +246,38 @@ protected:
     TVariable* getSplitIoVar(const TVariable* var) const;
     TVariable* getSplitIoVar(int id) const;
     void addInterstageIoToLinkage();
+    void addPatchConstantInvocation();
 
     void flatten(const TSourceLoc& loc, const TVariable& variable);
     int flatten(const TSourceLoc& loc, const TVariable& variable, const TType&, TFlattenData&, TString name);
     int flattenStruct(const TSourceLoc& loc, const TVariable& variable, const TType&, TFlattenData&, TString name);
     int flattenArray(const TSourceLoc& loc, const TVariable& variable, const TType&, TFlattenData&, TString name);
 
-    // Type sanitization: return existing sanitized (temporary) type if there is one, else make new one.
-    TType* sanitizeType(TType*);
+    bool hasUniform(const TQualifier& qualifier) const;
+    void clearUniform(TQualifier& qualifier);
+    bool isInputBuiltIn(const TQualifier& qualifier) const;
+    bool hasInput(const TQualifier& qualifier) const;
+    void correctOutput(TQualifier& qualifier);
+    bool isOutputBuiltIn(const TQualifier& qualifier) const;
+    bool hasOutput(const TQualifier& qualifier) const;
+    void correctInput(TQualifier& qualifier);
+    void correctUniform(TQualifier& qualifier);
+    void clearUniformInputOutput(TQualifier& qualifier);
+
+    // Test method names
+    bool isStructBufferMethod(const TString& name) const;
+
+    TType* getStructBufferContentType(const TType& type) const;
+    bool isStructBufferType(const TType& type) const { return getStructBufferContentType(type) != nullptr; }
+    TIntermTyped* indexStructBufferContent(const TSourceLoc& loc, TIntermTyped* buffer) const;
+
+    // Return true if this type is a reference.  This is not currently a type method in case that's
+    // a language specific answer.
+    bool isReference(const TType& type) const { return isStructBufferType(type); }
+
+    // Pass through to base class after remembering builtin mappings.
+    using TParseContextBase::trackLinkage;
+    void trackLinkage(TSymbol& variable) override;
 
     void finish() override; // post-processing
 
@@ -243,7 +288,6 @@ protected:
     int structNestingLevel;      // 0 if outside blocks and structures
     int controlFlowNestingLevel; // 0 if outside all flow control
     TList<TIntermSequence*> switchSequenceStack;  // case, node, case, case, node, ...; ensure only one node between cases;   stack of them for nesting
-    bool inEntryPoint;           // if inside a function, true if the function is the entry point
     bool postEntryPointReturn;         // if inside a function, true if the function is the entry point and this is after a return statement
     const TType* currentFunctionType;  // the return type of the function that's currently being parsed
     bool functionReturnsValue;   // true if a non-void function has a return
@@ -261,7 +305,6 @@ protected:
     TString currentCaller;        // name of last function body entered (not valid when at global scope)
     TIdSetType inductiveLoopIds;
     TVector<TIntermTyped*> needsIndexLimitationChecking;
-    TVariable* entryPointOutput;
 
     //
     // Geometry shader input arrays:
@@ -301,17 +344,29 @@ protected:
     TVector<int> flattenLevel;  // nested postfix operator level for flattening
     TVector<int> flattenOffset; // cumulative offset for flattening
 
-    // Sanitized type map.  During declarations we use the sanitized form of the type
-    // if it exists.
-    TMap<const TTypeList*, TType*> sanitizedTypeMap;
+    // IO-type map. Maps a pure symbol-table form of a structure-member list into
+    // each of the (up to) three kinds of IO, as each as different allowed decorations,
+    // but HLSL allows mixing all in the same structure.
+    struct tIoKinds {
+        TTypeList* input;
+        TTypeList* output;
+        TTypeList* uniform;
+    };
+    TMap<const TTypeList*, tIoKinds> ioTypeMap;
 
     // Structure splitting data:
     TMap<int, TVariable*>              splitIoVars;  // variables with the builtin interstage IO removed, indexed by unique ID.
+
+    // Structuredbuffer shared types.  Typically there are only a few.
+    TVector<TType*> structBufferTypes;
 
     // The builtin interstage IO map considers e.g, EvqPosition on input and output separately, so that we
     // can build the linkage correctly if position appears on both sides.  Otherwise, multiple positions
     // are considered identical.
     struct tInterstageIoData {
+        tInterstageIoData(TBuiltInVariable bi, TStorageQualifier q) :
+            builtIn(bi), storage(q) { }
+
         tInterstageIoData(const TType& memberType, const TType& storageType) :
             builtIn(memberType.getQualifier().builtIn),
             storage(storageType.getQualifier().storage) { }
@@ -325,7 +380,7 @@ protected:
         }
     };
 
-    TMap<tInterstageIoData, TVariable*> interstageBuiltInIo; // individual builtin interstage IO vars, inxed by builtin type.
+    TMap<tInterstageIoData, TVariable*> interstageBuiltInIo; // individual builtin interstage IO vars, indexed by builtin type.
 
     // We have to move array references to structs containing builtin interstage IO to the split variables.
     // This is only handled for one level.  This stores the index, because we'll need it in the future, since
@@ -336,8 +391,22 @@ protected:
     unsigned int nextInLocation;
     unsigned int nextOutLocation;
 
-    TString sourceEntryPointName;
+    TString    sourceEntryPointName;
+    TFunction* entryPointFunction;
+    TIntermNode* entryPointFunctionBody;
+
+    TString patchConstantFunctionName; // hull shader patch constant function name, from function level attribute.
+    TMap<TBuiltInVariable, TSymbol*> builtInLinkageSymbols; // used for tessellation, finding declared builtins
+
+    TVector<TString> currentTypePrefix;      // current scoping prefix for nested structures
+    TVector<TVariable*> implicitThisStack;   // currently active 'this' variables for nested structures
 };
+
+// This is the prefix we use for builtin methods to avoid namespace collisions with
+// global scope user functions.
+// TODO: this would be better as a nonparseable character, but that would
+// require changing the scanner.
+#define BUILTIN_PREFIX "__BI_"
 
 } // end namespace glslang
 

@@ -102,7 +102,7 @@ Notes:
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type S1410 = device_creator<s1410_device>;
+DEFINE_DEVICE_TYPE(S1410, s1410_device, "s1410", "Xebec S1410")
 
 //-------------------------------------------------
 //  ROM( s1410 )
@@ -163,7 +163,7 @@ ADDRESS_MAP_END
 //  MACHINE_DRIVER( s1410 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( s1410 )
+static MACHINE_CONFIG_START( s1410 )
 	MCFG_CPU_ADD(Z8400A_TAG, Z80, XTAL_16MHz/4)
 	MCFG_CPU_PROGRAM_MAP(s1410_mem)
 	MCFG_CPU_IO_MAP(s1410_io)
@@ -194,7 +194,7 @@ machine_config_constructor s1410_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 s1410_device::s1410_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: scsihd_device(mconfig, S1410, "Xebec S1410", tag, owner, clock, "s1410", __FILE__)
+	: scsihd_device(mconfig, S1410, tag, owner, clock)
 {
 }
 

@@ -273,7 +273,7 @@ DEVICE_IMAGE_LOAD_MEMBER(uzebox_state, uzebox_cart)
 * Machine definition                                 *
 \****************************************************/
 
-static MACHINE_CONFIG_START( uzebox, uzebox_state )
+static MACHINE_CONFIG_START( uzebox )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ATMEGA644, MASTER_CLOCK)
@@ -312,5 +312,5 @@ ROM_START( uzebox )
 	ROM_REGION( 0x800, "eeprom", ROMREGION_ERASE00 )  /* on-die eeprom */
 ROM_END
 
-/*   YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     INIT      COMPANY   FULLNAME */
-CONS(2010, uzebox,   0,        0,        uzebox,   uzebox, driver_device,   0,  "Belogic", "Uzebox", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING)
+/*   YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT   STATE          INIT  COMPANY    FULLNAME */
+CONS(2010, uzebox,   0,        0,        uzebox,   uzebox, uzebox_state,  0,    "Belogic", "Uzebox", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING)

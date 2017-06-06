@@ -1,6 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
+#ifndef MAME_VIDEO_KANEKO_GRAP2_H
+#define MAME_VIDEO_KANEKO_GRAP2_H
 
+#pragma once
 
 
 #define GRAP2_AREA( _BASE, name ) \
@@ -91,7 +94,10 @@ private:
 };
 
 
-extern const device_type KANEKO_GRAP2;
+DECLARE_DEVICE_TYPE(KANEKO_GRAP2, kaneko_grap2_device)
 
 #define MCFG_KANEKO_GRAP2_PALETTE(_palette_tag) \
 	kaneko_grap2_device::static_set_palette_tag(*device, "^" _palette_tag);
+
+
+#endif // MAME_VIDEO_KANEKO_GRAP2_H

@@ -118,11 +118,11 @@ const uint8_t i80186_cpu_device::m_i80186_timing[] =
 	33,             /* (80186) BOUND */
 };
 
-const device_type I80186 = device_creator<i80186_cpu_device>;
-const device_type I80188 = device_creator<i80188_cpu_device>;
+DEFINE_DEVICE_TYPE(I80186, i80186_cpu_device, "i80186", "I80186")
+DEFINE_DEVICE_TYPE(I80188, i80188_cpu_device, "i80188", "I80188")
 
 i80188_cpu_device::i80188_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: i80186_cpu_device(mconfig, I80188, "I80188", tag, owner, clock, "i80188", __FILE__, 8)
+	: i80186_cpu_device(mconfig, I80188, tag, owner, clock, 8)
 {
 	memcpy(m_timing, m_i80186_timing, sizeof(m_i80186_timing));
 	m_fetch_xor = 0;
@@ -130,22 +130,17 @@ i80188_cpu_device::i80188_cpu_device(const machine_config &mconfig, const char *
 }
 
 i80186_cpu_device::i80186_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: i8086_common_cpu_device(mconfig, I80186, "I80186", tag, owner, clock, "i80186", __FILE__)
-	, m_program_config("program", ENDIANNESS_LITTLE, 16, 20, 0)
-	, m_io_config("io", ENDIANNESS_LITTLE, 16, 16, 0)
-	, m_read_slave_ack_func(*this)
-	, m_out_chip_select_func(*this)
-	, m_out_tmrout0_func(*this)
-	, m_out_tmrout1_func(*this)
+	: i80186_cpu_device(mconfig, I80186, tag, owner, clock, 16)
 {
 	memcpy(m_timing, m_i80186_timing, sizeof(m_i80186_timing));
 	m_fetch_xor = BYTE_XOR_LE(0);
 	static_set_irq_acknowledge_callback(*this, device_irq_acknowledge_delegate(FUNC(i80186_cpu_device::int_callback), this));
 }
 
-i80186_cpu_device::i80186_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, int data_bus_size)
-	: i8086_common_cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
+i80186_cpu_device::i80186_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int data_bus_size)
+	: i8086_common_cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, data_bus_size, 20, 0)
+	, m_opcodes_config("opcodes", ENDIANNESS_LITTLE, data_bus_size, 20, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, data_bus_size, 16, 0)
 	, m_read_slave_ack_func(*this)
 	, m_out_chip_select_func(*this)
@@ -154,16 +149,28 @@ i80186_cpu_device::i80186_cpu_device(const machine_config &mconfig, device_type 
 {
 }
 
+
+const address_space_config *i80186_cpu_device::memory_space_config(address_spacenum spacenum) const
+{
+	switch(spacenum)
+	{
+	case AS_PROGRAM:           return &m_program_config;
+	case AS_IO:                return &m_io_config;
+	case AS_DECRYPTED_OPCODES: return has_configured_map(AS_DECRYPTED_OPCODES) ? &m_opcodes_config : nullptr;
+	default:                   return nullptr;
+	}
+}
+
 uint8_t i80186_cpu_device::fetch_op()
 {
-	uint8_t data = m_direct->read_byte(pc(), m_fetch_xor);
+	uint8_t data = m_direct_opcodes->read_byte(pc(), m_fetch_xor);
 	m_ip++;
 	return data;
 }
 
 uint8_t i80186_cpu_device::fetch()
 {
-	uint8_t data = m_direct->read_byte(pc(), m_fetch_xor);
+	uint8_t data = m_direct_opcodes->read_byte(pc(), m_fetch_xor);
 	m_ip++;
 	return data;
 }

@@ -8,8 +8,10 @@
 
 *********************************************************************/
 
-#ifndef __A2BUS_DISKIING__
-#define __A2BUS_DISKIING__
+#ifndef MAME_BUS_A2BUS_A2DISKIING_H
+#define MAME_BUS_A2BUS_A2DISKIING_H
+
+#pragma once
 
 #include "a2bus.h"
 #include "imagedev/floppy.h"
@@ -29,15 +31,11 @@ public:
 	// construction/destruction
 	a2bus_diskiing_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
-
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	// overrides of standard a2bus slot functions
 	virtual uint8_t read_c0nx(address_space &space, uint8_t offset) override;
@@ -45,14 +43,16 @@ protected:
 	virtual uint8_t read_cnxx(address_space &space, uint8_t offset) override;
 
 private:
-	required_device<diskii_fdc> m_wozfdc;
+	required_device<diskii_fdc_device> m_wozfdc;
 	required_device<floppy_connector> floppy0;
 	required_device<floppy_connector> floppy1;
 
 	const uint8_t *m_rom;
+
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
 };
 
 // device type definition
-extern const device_type A2BUS_DISKIING;
+DECLARE_DEVICE_TYPE(A2BUS_DISKIING, a2bus_diskiing_device)
 
-#endif  /* __A2BUS_DISKIING__ */
+#endif  // MAME_BUS_A2BUS_A2DISKIING_H

@@ -47,7 +47,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( vsmilpro )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( vsmilpro, vsmilpro_state )
+static MACHINE_CONFIG_START( vsmilpro )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM9, 150000000)
 	MCFG_CPU_PROGRAM_MAP(vsmilpro_map)
@@ -66,5 +66,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    CLASS         INIT    COMPANY                FULLNAME               FLAGS */
-COMP( 2007, vsmilpro,   0,       0,    vsmilpro,   vsmilpro, driver_device,  0,  "V-Tech", "V-Smile Pro", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT  COMPANY   FULLNAME       FLAGS
+COMP( 2007, vsmilpro, 0,      0,      vsmilpro, vsmilpro, vsmilpro_state, 0,    "V-Tech", "V-Smile Pro", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

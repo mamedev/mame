@@ -409,7 +409,7 @@ void spdodgeb_state::machine_reset()
 	m_last_dash[0] = m_last_dash[1] = 0;
 }
 
-static MACHINE_CONFIG_START( spdodgeb, spdodgeb_state )
+static MACHINE_CONFIG_START( spdodgeb )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_12MHz/6)   /* 2MHz ? */
@@ -441,13 +441,13 @@ static MACHINE_CONFIG_START( spdodgeb, spdodgeb_state )
 
 	MCFG_SOUND_ADD("msm1", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(spdodgeb_state, spd_adpcm_int_1))  /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)  /* 8kHz? */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)  /* 8kHz? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
 	MCFG_SOUND_ADD("msm2", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(spdodgeb_state, spd_adpcm_int_2))  /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)  /* 8kHz? */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)  /* 8kHz? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END
@@ -576,6 +576,6 @@ ROM_END
 
 
 
-GAME( 1987, spdodgeb, 0,        spdodgeb, spdodgeb, driver_device, 0, ROT0, "Technos Japan", "Super Dodge Ball (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, nkdodge,  spdodgeb, spdodgeb, spdodgeb, driver_device, 0, ROT0, "Technos Japan", "Nekketsu Koukou Dodgeball Bu (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, nkdodgeb, spdodgeb, spdodgeb, spdodgeb, driver_device, 0, ROT0, "bootleg", "Nekketsu Koukou Dodgeball Bu (Japan, bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, spdodgeb, 0,        spdodgeb, spdodgeb, spdodgeb_state, 0, ROT0, "Technos Japan", "Super Dodge Ball (US)",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1987, nkdodge,  spdodgeb, spdodgeb, spdodgeb, spdodgeb_state, 0, ROT0, "Technos Japan", "Nekketsu Koukou Dodgeball Bu (Japan)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1987, nkdodgeb, spdodgeb, spdodgeb, spdodgeb, spdodgeb_state, 0, ROT0, "bootleg",       "Nekketsu Koukou Dodgeball Bu (Japan, bootleg)", MACHINE_SUPPORTS_SAVE )

@@ -16,11 +16,11 @@
 #include "emu.h"
 #include "kl5c80a12.h"
 
-const device_type KL5C80A12 = device_creator<kl5c80a12_device>;
+DEFINE_DEVICE_TYPE(KL5C80A12, kl5c80a12_device, "kl5c80a12", "KL5C80A12")
 
 
 kl5c80a12_device::kl5c80a12_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: z80_device(mconfig, KL5C80A12, "KL5C80A12", tag, owner, clock, "kl5c80a12", __FILE__)
+	: z80_device(mconfig, KL5C80A12, tag, owner, clock)
 {
 }
 
@@ -46,10 +46,5 @@ void kl5c80a12_device::device_reset()
 
 
 /* CPU interface */
-static MACHINE_CONFIG_FRAGMENT( kl5c80a12 )
+MACHINE_CONFIG_MEMBER( kl5c80a12_device::device_add_mconfig )
 MACHINE_CONFIG_END
-
-machine_config_constructor kl5c80a12_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( kl5c80a12 );
-}

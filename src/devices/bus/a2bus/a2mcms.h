@@ -10,8 +10,8 @@
 
 *********************************************************************/
 
-#ifndef __A2BUS_MCMS__
-#define __A2BUS_MCMS__
+#ifndef MAME_BUS_A2BUS_A2MCMS_H
+#define MAME_BUS_A2BUS_A2MCMS_H
 
 #include "a2bus.h"
 
@@ -64,28 +64,28 @@ class a2bus_mcms1_device:
 {
 public:
 	// construction/destruction
-	a2bus_mcms1_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	a2bus_mcms1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// comms from card 2 (oscillator parameter writes)
 	mcms_device *get_engine(void);
 
-	DECLARE_WRITE_LINE_MEMBER(irq_w);
-
 	required_device<mcms_device> m_mcms;
 
 protected:
+	a2bus_mcms1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	// overrides of standard a2bus slot functions
 	virtual uint8_t read_c0nx(address_space &space, uint8_t offset) override;
 	virtual uint8_t read_cnxx(address_space &space, uint8_t offset) override;
 	virtual void write_cnxx(address_space &space, uint8_t offset, uint8_t data) override;
 	virtual bool take_c800() override { return false; }
+
+private:
+	DECLARE_WRITE_LINE_MEMBER(irq_w);
 };
 
 // card 2
@@ -95,10 +95,11 @@ class a2bus_mcms2_device:
 {
 public:
 	// construction/destruction
-	a2bus_mcms2_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	a2bus_mcms2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
+	a2bus_mcms2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -114,7 +115,7 @@ private:
 };
 
 // device type definition
-extern const device_type A2BUS_MCMS1;
-extern const device_type A2BUS_MCMS2;
+DECLARE_DEVICE_TYPE(A2BUS_MCMS1, a2bus_mcms1_device)
+DECLARE_DEVICE_TYPE(A2BUS_MCMS2, a2bus_mcms2_device)
 
-#endif /* __A2BUS_MCMS__ */
+#endif // MAME_BUS_A2BUS_A2MCMS_H

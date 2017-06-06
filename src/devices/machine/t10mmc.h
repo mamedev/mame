@@ -6,8 +6,10 @@ t10mmc.h
 
 ***************************************************************************/
 
-#ifndef _T10MMC_H_
-#define _T10MMC_H_
+#ifndef MAME_MACHINE_T10MMC_H
+#define MAME_MACHINE_T10MMC_H
+
+#pragma once
 
 #include "t10spc.h"
 #include "imagedev/chd_cd.h"
@@ -68,4 +70,4 @@ protected:
 	device_t *m_device;
 };
 
-#endif
+#endif // MAME_MACHINE_T10MMC_H

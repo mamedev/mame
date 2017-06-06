@@ -18,18 +18,21 @@
 
 #include "screen.h"
 
+//#define VERBOSE 1
+#include "logmacro.h"
 
-#define LOG 0
 
 #define HUC6261_HSYNC_LENGTH    237
-#define HUC6261_HSYNC_START     ( HUC6261_WPF - HUC6261_HSYNC_LENGTH )
+#define HUC6261_HSYNC_START     ( huc6261_device::WPF - HUC6261_HSYNC_LENGTH )
 
+constexpr unsigned huc6261_device::WPF;
+constexpr unsigned huc6261_device::LPF;
 
-const device_type HUC6261 = device_creator<huc6261_device>;
+DEFINE_DEVICE_TYPE(HUC6261, huc6261_device, "huc6261", "Hudson HuC6261 VCE")
 
 
 huc6261_device::huc6261_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	:   device_t(mconfig, HUC6261, "HuC6261", tag, owner, clock, "huc6261", __FILE__),
+	:   device_t(mconfig, HUC6261, tag, owner, clock),
 		device_video_interface(mconfig, *this),
 		m_huc6270_a_tag(nullptr), m_huc6270_b_tag(nullptr), m_huc6272_tag(nullptr),
 		m_huc6270_a(nullptr), m_huc6270_b(nullptr), m_huc6272(nullptr),
@@ -118,7 +121,7 @@ void huc6261_device::device_timer(emu_timer &timer, device_timer_id id, int para
 			bitmap_line[ h ] = yuv2rgb( m_palette[ m_pixel_data_b ] );
 
 		m_pixel_clock = ( m_pixel_clock + 1 ) % m_pixels_per_clock;
-		h = ( h + 1 ) % HUC6261_WPF;
+		h = ( h + 1 ) % WPF;
 
 		switch( h )
 		{
@@ -128,7 +131,7 @@ void huc6261_device::device_timer(emu_timer &timer, device_timer_id id, int para
 //          if ( v == 0 )
 //          {
 //              /* Check if the screen should be resized */
-//              m_height = HUC6261_LPF - ( m_blur ? 1 : 0 );
+//              m_height = LPF - ( m_blur ? 1 : 0 );
 //              if ( m_height != video_screen_get_height( m_screen ) )
 //              {
 //                  rectangle visible_area;
@@ -139,7 +142,7 @@ void huc6261_device::device_timer(emu_timer &timer, device_timer_id id, int para
 //                  visible_area.max_x = 64 + 1024 + 64 - 1;
 //                  visible_area.max_y = 18 + 242 - 1;
 //
-//                  video_screen_configure( m_screen, HUC6261_WPF, m_height, &visible_area, HZ_TO_ATTOSECONDS( device->clock / ( HUC6261_WPF * m_height ) ) );
+//                  video_screen_configure( m_screen, WPF, m_height, &visible_area, HZ_TO_ATTOSECONDS( device->clock / ( WPF * m_height ) ) );
 //              }
 //          }
 			break;
@@ -189,7 +192,7 @@ void huc6261_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 	/* Ask our slave device for time until next possible event */
 	{
-		uint16_t next_event_clocks = HUC6261_WPF; //m_get_time_til_next_event( 0, 0xffff );
+		uint16_t next_event_clocks = WPF; //m_get_time_til_next_event( 0, 0xffff );
 		int event_hpos, event_vpos;
 
 		/* Adjust for pixel clocks per pixel */
@@ -200,10 +203,10 @@ void huc6261_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 		event_hpos = hpos + next_event_clocks;
 		event_vpos = vpos;
-		while ( event_hpos > HUC6261_WPF )
+		while ( event_hpos > WPF )
 		{
 			event_vpos += 1;
-			event_hpos -= HUC6261_WPF;
+			event_hpos -= WPF;
 		}
 
 		if ( event_vpos < v || ( event_vpos == v && event_hpos <= h ) )
@@ -420,7 +423,7 @@ void huc6261_device::device_start()
 	m_huc6270_b = machine().device<huc6270_device>(m_huc6270_b_tag);
 	m_huc6272 = machine().device<huc6272_device>(m_huc6272_tag);
 
-	m_bmp = std::make_unique<bitmap_rgb32>(HUC6261_WPF, HUC6261_LPF );
+	m_bmp = std::make_unique<bitmap_rgb32>(WPF, LPF);
 
 	/* We want to have valid devices */
 	assert( m_huc6270_a != nullptr );

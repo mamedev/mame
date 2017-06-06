@@ -154,7 +154,7 @@ QUICKLOAD_LOAD_MEMBER( pipbug_state, pipbug )
 	return result;
 }
 
-static MACHINE_CONFIG_START( pipbug, pipbug_state )
+static MACHINE_CONFIG_START( pipbug )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",S2650, XTAL_1MHz)
 	MCFG_CPU_PROGRAM_MAP(pipbug_mem)
@@ -179,5 +179,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1979, pipbug,  0,       0,     pipbug,    pipbug, driver_device,    0,  "Signetics", "PIPBUG", MACHINE_NO_SOUND_HW )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE   INPUT   STATE         INIT  COMPANY      FULLNAME  FLAGS
+COMP( 1979, pipbug, 0,      0,      pipbug,   pipbug, pipbug_state, 0,    "Signetics", "PIPBUG", MACHINE_NO_SOUND_HW )

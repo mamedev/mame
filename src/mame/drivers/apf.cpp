@@ -138,7 +138,7 @@ private:
 	optional_device<pia6821_device> m_pia1;
 	optional_device<cassette_image_device> m_cass;
 	required_device<apf_cart_slot_device> m_cart;
-	optional_device<fd1771_t> m_fdc;
+	optional_device<fd1771_device> m_fdc;
 	optional_device<floppy_connector> m_floppy0;
 	optional_device<floppy_connector> m_floppy1;
 	required_ioport_array<4> m_joy;
@@ -324,7 +324,7 @@ static ADDRESS_MAP_START( apfimag_map, AS_PROGRAM, 8, apf_state )
 	AM_RANGE(0x6000, 0x6003) AM_MIRROR(0x03fc) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
 	// These need to be confirmed, disk does not work
 	AM_RANGE(0x6400, 0x64ff) AM_READWRITE(serial_r, serial_w)
-	AM_RANGE(0x6500, 0x6503) AM_DEVREADWRITE("fdc", fd1771_t, read, write)
+	AM_RANGE(0x6500, 0x6503) AM_DEVREADWRITE("fdc", fd1771_device, read, write)
 	AM_RANGE(0x6600, 0x6600) AM_WRITE(apf_dischw_w)
 	AM_RANGE(0xa000, 0xbfff) AM_RAM // standard
 	AM_RANGE(0xc000, 0xdfff) AM_RAM // expansion
@@ -508,7 +508,7 @@ static SLOT_INTERFACE_START(apf_cart)
 SLOT_INTERFACE_END
 
 
-static MACHINE_CONFIG_START( apfm1000, apf_state )
+static MACHINE_CONFIG_START( apfm1000 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, XTAL_3_579545MHz / 4 )  // divided by 4 in external clock circuit
@@ -520,7 +520,7 @@ static MACHINE_CONFIG_START( apfm1000, apf_state )
 	MCFG_DEVICE_ADD("mc6847", MC6847_NTSC, XTAL_3_579545MHz)
 	MCFG_MC6847_FSYNC_CALLBACK(DEVWRITELINE("pia0", pia6821_device, cb1_w))
 	MCFG_MC6847_INPUT_CALLBACK(READ8(apf_state, videoram_r))
-	MCFG_MC6847_FIXED_MODE(MC6847_MODE_GM2 | MC6847_MODE_GM1)
+	MCFG_MC6847_FIXED_MODE(mc6847_ntsc_device::MODE_GM2 | mc6847_ntsc_device::MODE_GM1)
 	// INTEXT = GND
 	// other lines not connected
 
@@ -606,6 +606,6 @@ ROM_END
 
 ***************************************************************************/
 
-/*    YEAR  NAME     PARENT     COMPAT  MACHINE     INPUT      CLASS          INIT         COMPANY               FULLNAME */
-COMP( 1979, apfimag,  apfm1000,  0,      apfimag,    apfimag,   driver_device,  0,   "APF Electronics Inc.", "APF Imagination Machine", 0 )
-CONS( 1978, apfm1000, 0,         0,      apfm1000,   apfm1000,  driver_device,  0,   "APF Electronics Inc.", "APF M-1000", 0 )
+/*    YEAR  NAME      PARENT     COMPAT  MACHINE     INPUT      CLASS       INIT  COMPANY                 FULLNAME */
+COMP( 1979, apfimag,  apfm1000,  0,      apfimag,    apfimag,   apf_state,  0,    "APF Electronics Inc.", "APF Imagination Machine", 0 )
+CONS( 1978, apfm1000, 0,         0,      apfm1000,   apfm1000,  apf_state,  0,    "APF Electronics Inc.", "APF M-1000", 0 )

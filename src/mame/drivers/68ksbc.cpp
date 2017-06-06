@@ -70,7 +70,7 @@ WRITE_LINE_MEMBER(c68ksbc_state::write_acia_clock)
 	m_acia->write_rxc(state);
 }
 
-static MACHINE_CONFIG_START( c68ksbc, c68ksbc_state )
+static MACHINE_CONFIG_START( c68ksbc )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000) // text says 8MHz, schematic says 10MHz
 	MCFG_CPU_PROGRAM_MAP(c68ksbc_mem)
@@ -95,5 +95,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    CLASS         INIT    COMPANY                FULLNAME               FLAGS */
-COMP( 2002, 68ksbc,   0,       0,    c68ksbc,   c68ksbc, driver_device,  0,  "Wichit Sirichote", "68k Single Board Computer", MACHINE_NO_SOUND_HW)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    CLASS           INIT  COMPANY             FULLNAME                     FLAGS */
+COMP( 2002, 68ksbc,   0,       0,    c68ksbc,   c68ksbc, c68ksbc_state,  0,    "Wichit Sirichote", "68k Single Board Computer", MACHINE_NO_SOUND_HW)

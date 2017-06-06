@@ -554,11 +554,6 @@ WRITE8_MEMBER(dmv_state::kb_mcu_port2_w)
 	m_slot7->keyint_w(BIT(data, 4));
 }
 
-static ADDRESS_MAP_START( dmv_kb_ctrl_io, AS_IO, 8, dmv_state )
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(kb_mcu_port1_r, kb_mcu_port1_w) // bit 0 data from kb, bit 1 data to kb
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(kb_mcu_port2_w)
-ADDRESS_MAP_END
-
 static ADDRESS_MAP_START( upd7220_map, AS_0, 16, dmv_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x1ffff)
 	AM_RANGE(0x00000, 0x1ffff) AM_RAM  AM_SHARE("video_ram")
@@ -717,14 +712,16 @@ static SLOT_INTERFACE_START(dmv_slot7a)
 	SLOT_INTERFACE("k235", DMV_K235)            // K235 Internal 8088 module with interrupt controller
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( dmv, dmv_state )
+static MACHINE_CONFIG_START( dmv )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_24MHz / 6)
 	MCFG_CPU_PROGRAM_MAP(dmv_mem)
 	MCFG_CPU_IO_MAP(dmv_io)
 
 	MCFG_CPU_ADD("kb_ctrl_mcu", I8741, XTAL_6MHz)
-	MCFG_CPU_IO_MAP(dmv_kb_ctrl_io)
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(dmv_state, kb_mcu_port1_r)) // bit 0 data from kb
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(dmv_state, kb_mcu_port1_w)) // bit 1 data to kb
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(dmv_state, kb_mcu_port2_w))
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
@@ -853,5 +850,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME             FLAGS */
-COMP( 1984, dmv,    0,       0,         dmv,    dmv, driver_device,  0,      "NCR",   "Decision Mate V",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT  STATE      INIT   COMPANY  FULLNAME             FLAGS
+COMP( 1984, dmv,    0,      0,       dmv,     dmv,   dmv_state, 0,     "NCR",   "Decision Mate V",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

@@ -31,7 +31,7 @@
 //  CONSTANTS
 //**************************************************************************
 
-const device_type LC8670 = device_creator<lc8670_cpu_device>;
+DEFINE_DEVICE_TYPE(LC8670, lc8670_cpu_device, "lc8670", "Sanyo LC8670")
 
 
 //**************************************************************************
@@ -171,13 +171,13 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 lc8670_cpu_device::lc8670_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, LC8670, "Sanyo LC8670", tag, owner, clock, "lc8670", __FILE__),
-		m_program_config("program", ENDIANNESS_BIG, 8, 16, 0),
-		m_data_config("data", ENDIANNESS_BIG, 8, 9, 0, ADDRESS_MAP_NAME(lc8670_internal_map)),
-		m_io_config("io", ENDIANNESS_BIG, 8, 8, 0),
-		m_pc(0),
-		m_ppc(0),
-		m_bankswitch_func(*this)
+	: cpu_device(mconfig, LC8670, tag, owner, clock)
+	, m_program_config("program", ENDIANNESS_BIG, 8, 16, 0)
+	, m_data_config("data", ENDIANNESS_BIG, 8, 9, 0, ADDRESS_MAP_NAME(lc8670_internal_map))
+	, m_io_config("io", ENDIANNESS_BIG, 8, 8, 0)
+	, m_pc(0)
+	, m_ppc(0)
+	, m_bankswitch_func(*this)
 {
 	memset(m_sfr, 0x00, sizeof(m_sfr));
 	memset(m_timer0, 0x00, sizeof(m_timer0));
@@ -204,7 +204,7 @@ void lc8670_cpu_device::device_start()
 
 	// setup timers
 	m_basetimer = timer_alloc(BASE_TIMER);
-	m_basetimer->adjust(attotime::from_hz(m_clocks[LC8670_SUB_CLOCK]), 0, attotime::from_hz(m_clocks[LC8670_SUB_CLOCK]));
+	m_basetimer->adjust(attotime::from_hz(m_clocks[unsigned(clock_source::SUB)]), 0, attotime::from_hz(m_clocks[unsigned(clock_source::SUB)]));
 	m_clocktimer = timer_alloc(CLOCK_TIMER);
 
 	// register state for debugger
@@ -1168,14 +1168,14 @@ inline void lc8670_cpu_device::change_clock_source()
 	switch(REG_OCR & 0x30)
 	{
 		case 0x00:
-			new_clock = m_clocks[LC8670_RC_CLOCK];
+			new_clock = m_clocks[unsigned(clock_source::RC)];
 			break;
 		case 0x20:
-			new_clock = m_clocks[LC8670_SUB_CLOCK];
+			new_clock = m_clocks[unsigned(clock_source::SUB)];
 			break;
 		case 0x10:
 		case 0x30:
-			new_clock = m_clocks[LC8670_CF_CLOCK];
+			new_clock = m_clocks[unsigned(clock_source::CF)];
 			break;
 	}
 

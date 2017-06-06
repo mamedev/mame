@@ -7,7 +7,10 @@
 #include <bx/uint32_t.h>
 #include <bx/string.h>
 
+#if !BX_PLATFORM_NONE
+
 #include <stdio.h>
+#include <sys/stat.h>
 
 #if BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT
 #	include <windows.h>
@@ -237,7 +240,7 @@ namespace bx
 			result = len != 0 && len < *_inOutSize;
 			if (len < *_inOutSize)
 			{
-				strcpy(_out, ptr);
+				strlncpy(_out, len, ptr);
 			}
 		}
 
@@ -406,11 +409,11 @@ namespace bx
 		return (void*)uintptr_t(pid);
 #elif BX_PLATFORM_WINDOWS
 		STARTUPINFO si;
-		memset(&si, 0, sizeof(STARTUPINFO) );
+		memSet(&si, 0, sizeof(STARTUPINFO) );
 		si.cb = sizeof(STARTUPINFO);
 
 		PROCESS_INFORMATION pi;
-		memset(&pi, 0, sizeof(PROCESS_INFORMATION) );
+		memSet(&pi, 0, sizeof(PROCESS_INFORMATION) );
 
 		int32_t total = 0;
 		for (uint32_t ii = 0; NULL != _argv[ii]; ++ii)
@@ -452,3 +455,5 @@ namespace bx
 	}
 
 } // namespace bx
+
+#endif // !BX_PLATFORM_NONE

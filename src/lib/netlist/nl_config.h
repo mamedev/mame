@@ -77,7 +77,9 @@
 //  General
 //============================================================
 
-// The following adds about 10% performance ...
+/* The following adds about 10% to 20% performance for analog
+ * netlists like kidniki.
+ */
 
 #if !defined(USE_OPENMP)
 #define USE_OPENMP              (0)
@@ -85,9 +87,10 @@
 
 // Use nano-second resolution - Sufficient for now
 #define NETLIST_INTERNAL_RES        (UINT64_C(1000000000))
-//#define NETLIST_INTERNAL_RES      (UINT64_C(1000000000000))
-
 #define NETLIST_CLOCK               (NETLIST_INTERNAL_RES)
+//#define NETLIST_INTERNAL_RES      (UINT64_C(1000000000000))
+//#define NETLIST_CLOCK               (UINT64_C(1000000000))
+
 
 //#define nl_double float
 //#define NL_FCONST(x) (x ## f)

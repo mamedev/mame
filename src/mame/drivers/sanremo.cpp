@@ -342,7 +342,7 @@ GFXDECODE_END
 *              Machine Drivers               *
 *********************************************/
 
-static MACHINE_CONFIG_START( sanremo, sanremo_state )
+static MACHINE_CONFIG_START( sanremo )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -409,5 +409,5 @@ ROM_END
 *                Game Drivers                *
 *********************************************/
 
-/*     YEAR  NAME     PARENT  MACHINE  INPUT    STATE          INIT   ROT    COMPANY           FULLNAME      FLAGS  LAYOUT  */
-GAMEL( 1996, number1, 0,      sanremo, number1, driver_device, 0,     ROT0, "San Remo Games", "Number One",  0,     layout_sanremo )
+//     YEAR  NAME     PARENT  MACHINE  INPUT    STATE          INIT   ROT   COMPANY           FULLNAME       FLAGS  LAYOUT
+GAMEL( 1996, number1, 0,      sanremo, number1, sanremo_state, 0,     ROT0, "San Remo Games", "Number One",  0,     layout_sanremo )

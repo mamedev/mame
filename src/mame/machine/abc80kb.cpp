@@ -74,6 +74,8 @@ Notes:
 #include "emu.h"
 #include "abc80kb.h"
 
+#include "cpu/mcs48/mcs48.h"
+
 
 
 //**************************************************************************
@@ -88,7 +90,7 @@ Notes:
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ABC80_KEYBOARD = device_creator<abc80_keyboard_device>;
+DEFINE_DEVICE_TYPE(ABC80_KEYBOARD, abc80_keyboard_device, "abc80kb", "ABC-80 Keyboard")
 
 
 //-------------------------------------------------
@@ -120,25 +122,14 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( abc80_keyboard )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( abc80_keyboard )
+MACHINE_CONFIG_MEMBER( abc80_keyboard_device::device_add_mconfig )
 	MCFG_CPU_ADD(I8048_TAG, I8048, 4000000)
 	MCFG_CPU_IO_MAP(abc80_keyboard_io)
 	MCFG_DEVICE_DISABLE()
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor abc80_keyboard_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( abc80_keyboard );
-}
 
 
 //-------------------------------------------------
@@ -169,9 +160,9 @@ ioport_constructor abc80_keyboard_device::device_input_ports() const
 //-------------------------------------------------
 
 abc80_keyboard_device::abc80_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ABC80_KEYBOARD, "ABC-80 Keyboard", tag, owner, clock, "abc80kb", __FILE__),
-		m_write_keydown(*this),
-		m_maincpu(*this, I8048_TAG)
+	: device_t(mconfig, ABC80_KEYBOARD, tag, owner, clock)
+	, m_write_keydown(*this)
+	, m_maincpu(*this, I8048_TAG)
 {
 }
 

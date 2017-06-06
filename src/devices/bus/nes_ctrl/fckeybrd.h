@@ -6,14 +6,14 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_NES_CTRL_FCKEYBOARD_H
+#define MAME_BUS_NES_CTRL_FCKEYBOARD_H
+
 #pragma once
-
-#ifndef __NES_FCKEYBRD__
-#define __NES_FCKEYBRD__
-
 
 #include "ctrl.h"
 #include "imagedev/cassette.h"
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -47,7 +47,7 @@ private:
 
 
 // device type definition
-extern const device_type NES_FCKEYBOARD;
+DECLARE_DEVICE_TYPE(NES_FCKEYBOARD, nes_fckeybrd_device)
 
 
-#endif
+#endif // MAME_BUS_NES_CTRL_FCKEYBOARD_H

@@ -33,24 +33,24 @@
 //  constructor
 //-------------------------------------------------
 
-const device_type NES_NINA001 = device_creator<nes_nina001_device>;
-const device_type NES_NINA006 = device_creator<nes_nina006_device>;
-const device_type NES_MAXI15 = device_creator<nes_maxi15_device>;
+DEFINE_DEVICE_TYPE(NES_NINA001, nes_nina001_device, "nes_nina001", "NES Cart AVE Nina-001 PCB")
+DEFINE_DEVICE_TYPE(NES_NINA006, nes_nina006_device, "nes_nina006", "NES Cart AVE Nina-006 PCB")
+DEFINE_DEVICE_TYPE(NES_MAXI15,  nes_maxi15_device,  "nes_maxi15",  "NES Cart AVE Maxi 15 PCB")
 
 
 nes_nina001_device::nes_nina001_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_NINA001, "NES Cart AVE Nina-001 PCB", tag, owner, clock, "nes_nina001", __FILE__)
+	: nes_nrom_device(mconfig, NES_NINA001, tag, owner, clock)
 {
 }
 
 nes_nina006_device::nes_nina006_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_NINA006, "NES Cart AVE Nina-006 PCB", tag, owner, clock, "nes_nina006", __FILE__)
+	: nes_nrom_device(mconfig, NES_NINA006, tag, owner, clock)
 {
 }
 
 nes_maxi15_device::nes_maxi15_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_MAXI15, "NES Cart AVE Maxi 15 PCB", tag, owner, clock, "nes_maxi15", __FILE__), m_reg(0), m_bank(0)
-				{
+	: nes_nrom_device(mconfig, NES_MAXI15, tag, owner, clock), m_reg(0), m_bank(0)
+{
 }
 
 

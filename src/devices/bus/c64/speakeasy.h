@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_C64_SPEAKEASY_H
+#define MAME_BUS_C64_SPEAKEASY_H
 
-#ifndef __C64_SPEAKEASY__
-#define __C64_SPEAKEASY__
+#pragma once
 
 #include "exp.h"
 #include "sound/votrax.h"
@@ -20,14 +20,13 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> c64_speakeasy_t
+// ======================> c64_speakeasy_cartridge_device
 
-class c64_speakeasy_t :  public device_t,
-						 public device_c64_expansion_card_interface
+class c64_speakeasy_cartridge_device : public device_t, public device_c64_expansion_card_interface
 {
 public:
 	// construction/destruction
-	c64_speakeasy_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	c64_speakeasy_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -46,8 +45,7 @@ private:
 
 
 // device type definition
-extern const device_type C64_SPEAKEASY;
+DECLARE_DEVICE_TYPE(C64_SPEAKEASY, c64_speakeasy_cartridge_device)
 
 
-
-#endif
+#endif // MAME_BUS_C64_SPEAKEASY_H

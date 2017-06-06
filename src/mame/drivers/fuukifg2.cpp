@@ -438,7 +438,7 @@ void fuuki16_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( fuuki16, fuuki16_state )
+static MACHINE_CONFIG_START( fuuki16 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz / 2) /* 16 MHz */
@@ -478,7 +478,7 @@ static MACHINE_CONFIG_START( fuuki16, fuuki16_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_32MHz / 32, OKIM6295_PIN7_HIGH) /* 1 Mhz */
+	MCFG_OKIM6295_ADD("oki", XTAL_32MHz / 32, PIN7_HIGH) /* 1 Mhz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.85)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.85)
 MACHINE_CONFIG_END
@@ -665,6 +665,6 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1995, gogomile,  0,        fuuki16, gogomile,  driver_device, 0, ROT0, "Fuuki", "Susume! Mile Smile / Go Go! Mile Smile (newer)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, gogomileo, gogomile, fuuki16, gogomileo, driver_device, 0, ROT0, "Fuuki", "Susume! Mile Smile / Go Go! Mile Smile (older)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, pbancho,   0,        fuuki16, pbancho,   driver_device, 0, ROT0, "Fuuki", "Gyakuten!! Puzzle Bancho (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, gogomile,  0,        fuuki16, gogomile,  fuuki16_state, 0, ROT0, "Fuuki", "Susume! Mile Smile / Go Go! Mile Smile (newer)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, gogomileo, gogomile, fuuki16, gogomileo, fuuki16_state, 0, ROT0, "Fuuki", "Susume! Mile Smile / Go Go! Mile Smile (older)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, pbancho,   0,        fuuki16, pbancho,   fuuki16_state, 0, ROT0, "Fuuki", "Gyakuten!! Puzzle Bancho (Japan)",               MACHINE_SUPPORTS_SAVE )

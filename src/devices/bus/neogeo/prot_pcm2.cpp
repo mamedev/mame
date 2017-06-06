@@ -6,11 +6,11 @@
 #include "prot_pcm2.h"
 
 
-const device_type PCM2_PROT = device_creator<pcm2_prot_device>;
+DEFINE_DEVICE_TYPE(NG_PCM2_PROT, pcm2_prot_device, "ng_pcm2_prot", "Neo Geo NEOPCM2 Protection")
 
 
 pcm2_prot_device::pcm2_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, PCM2_PROT, "Neo Geo NEOPCM2 Protection", tag, owner, clock, "pcm2_prot", __FILE__)
+	: device_t(mconfig, NG_PCM2_PROT, tag, owner, clock)
 {
 }
 

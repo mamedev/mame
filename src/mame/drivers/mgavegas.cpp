@@ -59,9 +59,9 @@ public:
 		m_ticket(*this, "hopper"),
 		m_filter1(*this, "filter1"),
 		m_filter2(*this, "filter2")
-
-
 	{ }
+
+
 	uint8_t m_int;
 
 	//OUT1
@@ -546,8 +546,8 @@ void mgavegas_state::machine_reset()
 	m_mc=0;
 	m_mr=0;
 
-	m_filter1->filter_rc_set_RC(FLT_RC_LOWPASS, 1000, 0, 0, CAP_N(1) );     /* RC out of MSM5205 R=1K C=1nF */
-	m_filter2->filter_rc_set_RC(FLT_RC_HIGHPASS, 3846, 0, 0, CAP_N(100 ));  /*ALP3B active-hybrid filter fc=2.6Khz 2poles???*/
+	m_filter1->filter_rc_set_RC(filter_rc_device::LOWPASS, 1000, 0, 0, CAP_N(1) );     /* RC out of MSM5205 R=1K C=1nF */
+	m_filter2->filter_rc_set_RC(filter_rc_device::HIGHPASS, 3846, 0, 0, CAP_N(100 ));  /*ALP3B active-hybrid filter fc=2.6Khz 2poles???*/
 }
 
 
@@ -587,7 +587,7 @@ DRIVER_INIT_MEMBER(mgavegas_state,mgavegas133)
 *************************/
 
 
-static MACHINE_CONFIG_START( mgavegas, mgavegas_state )
+static MACHINE_CONFIG_START( mgavegas )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLK)
 	MCFG_CPU_PROGRAM_MAP(mgavegas_map)
@@ -607,7 +607,7 @@ static MACHINE_CONFIG_START( mgavegas, mgavegas_state )
 	MCFG_AY8910_PORT_B_READ_CB(READ8(mgavegas_state, ay8910_b_r))
 
 	MCFG_SOUND_ADD("5205", MSM5205, MSM_CLK)
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S64_4B)
+	MCFG_MSM5205_PRESCALER_SELECTOR(S64_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter1", 2.0)
 
 
@@ -656,7 +656,7 @@ ROM_END
 /*************************
 *      Game Drivers      *
 *************************/
-/*    YEAR  NAME            PARENT      MACHINE   INPUT     STATE          INIT         ROT     COMPANY     FULLNAME    FLAGS*/
+//    YEAR  NAME            PARENT      MACHINE   INPUT     STATE           INIT        ROT     COMPANY   FULLNAME                                      FLAGS
 GAME( 1985, mgavegas,       0,          mgavegas, mgavegas, mgavegas_state, mgavegas,   ROT0,   "MGA",    "Vegas 1 (Ver 2.3 dual coin pulse, shorter)", MACHINE_MECHANICAL )
-GAME( 1985, mgavegas21,     mgavegas,   mgavegas, mgavegas, mgavegas_state, mgavegas21, ROT0,   "MGA",    "Vegas 1 (Ver 2.1 dual coin pulse, longer)", MACHINE_MECHANICAL )
-GAME( 1985, mgavegas133,    mgavegas,   mgavegas, mgavegas, mgavegas_state, mgavegas133,ROT0,   "MGA",    "Vegas 1 (Ver 1.33 single coin pulse)", MACHINE_MECHANICAL )
+GAME( 1985, mgavegas21,     mgavegas,   mgavegas, mgavegas, mgavegas_state, mgavegas21, ROT0,   "MGA",    "Vegas 1 (Ver 2.1 dual coin pulse, longer)",  MACHINE_MECHANICAL )
+GAME( 1985, mgavegas133,    mgavegas,   mgavegas, mgavegas, mgavegas_state, mgavegas133,ROT0,   "MGA",    "Vegas 1 (Ver 1.33 single coin pulse)",       MACHINE_MECHANICAL )

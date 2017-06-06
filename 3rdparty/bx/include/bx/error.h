@@ -6,7 +6,6 @@
 #ifndef BX_ERROR_H_HEADER_GUARD
 #define BX_ERROR_H_HEADER_GUARD
 
-#include "bx.h"
 #include "string.h"
 
 #define BX_ERROR_SET(_ptr, _result, _msg) \
@@ -94,6 +93,6 @@ namespace bx
 
 } // namespace bx
 
-#include "error.inl"
+#include "inline/error.inl"
 
 #endif // BX_ERROR_H_HEADER_GUARD

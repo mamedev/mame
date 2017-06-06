@@ -7,10 +7,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_RTC4543_H
+#define MAME_MACHINE_RTC4543_H
 
-#ifndef __RTC4543_H__
-#define __RTC4543_H__
+#pragma once
 
 #include "dirtc.h"
 
@@ -20,14 +20,14 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_RTC4543_ADD(_tag, _clock) \
-	MCFG_DEVICE_ADD(_tag, RTC4543, _clock)
+#define MCFG_RTC4543_ADD(tag, clock) \
+		MCFG_DEVICE_ADD((tag), RTC4543, (clock))
 
-#define MCFG_RTC4543_DATA_CALLBACK(_devcb) \
-	devcb = &rtc4543_device::set_data_cb(*device, DEVCB_##_devcb);
+#define MCFG_RTC4543_DATA_CALLBACK(cb) \
+		devcb = &rtc4543_device::set_data_cb(*device, DEVCB_##cb);
 
-#define MCFG_JRC6355E_ADD(_tag, _clock) \
-	MCFG_DEVICE_ADD(_tag, JRC6355E, _clock)
+#define MCFG_JRC6355E_ADD(tag, clock) \
+		MCFG_DEVICE_ADD((tag), JRC6355E, (clock))
 
 
 
@@ -45,7 +45,6 @@ class rtc4543_device :  public device_t,
 public:
 	// construction/destruction
 	rtc4543_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	rtc4543_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *filename);
 
 	DECLARE_WRITE_LINE_MEMBER( ce_w );
 	DECLARE_WRITE_LINE_MEMBER( wr_w );
@@ -53,9 +52,11 @@ public:
 	DECLARE_READ_LINE_MEMBER( data_r );
 	DECLARE_WRITE_LINE_MEMBER( data_w );
 
-	template<class _Object> static devcb_base &set_data_cb(device_t &device, _Object object) { return downcast<rtc4543_device &>(device).data_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_data_cb(device_t &device, Object &&cb) { return downcast<rtc4543_device &>(device).data_cb.set_callback(std::forward<Object>(cb)); }
 
 protected:
+	rtc4543_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -108,7 +109,7 @@ protected:
 
 
 // device type definition
-extern const device_type RTC4543;
-extern const device_type JRC6355E;
+DECLARE_DEVICE_TYPE(RTC4543,  rtc4543_device)
+DECLARE_DEVICE_TYPE(JRC6355E, jrc6355e_device)
 
-#endif
+#endif // MAME_MACHINE_RTC4543_H

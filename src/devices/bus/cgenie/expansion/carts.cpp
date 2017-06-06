@@ -8,7 +8,9 @@
 
 #include "emu.h"
 #include "carts.h"
+#include "floppy.h"
 
-SLOT_INTERFACE_START( expansion_slot_carts )
+
+SLOT_INTERFACE_START( cg_exp_slot_carts )
 	SLOT_INTERFACE("floppy", CGENIE_FDC)
 SLOT_INTERFACE_END

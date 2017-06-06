@@ -41,26 +41,26 @@
 
 #define TEXT_COPY_9COLUMN(ch) (((ch & 0xe0) == 0xc0)&&(vga.attribute.data[0x10]&4))
 
-const device_type CIRRUS_GD5428 = device_creator<cirrus_gd5428_device>;
-const device_type CIRRUS_GD5430 = device_creator<cirrus_gd5430_device>;
+DEFINE_DEVICE_TYPE(CIRRUS_GD5428, cirrus_gd5428_device, "clgd5428", "Cirrus Logic GD5428")
+DEFINE_DEVICE_TYPE(CIRRUS_GD5430, cirrus_gd5430_device, "clgd5430", "Cirrus Logic GD5430")
 
 
 cirrus_gd5428_device::cirrus_gd5428_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cirrus_gd5428_device(mconfig, CIRRUS_GD5428, "Cirrus Logic GD5428", tag, owner, clock, "clgd5428", __FILE__)
+	: cirrus_gd5428_device(mconfig, CIRRUS_GD5428, tag, owner, clock)
 {
 }
 
-cirrus_gd5428_device::cirrus_gd5428_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: svga_device(mconfig, type, name, tag, owner, clock, shortname, source)
+cirrus_gd5428_device::cirrus_gd5428_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: svga_device(mconfig, type, tag, owner, clock)
 {
 }
 
 cirrus_gd5430_device::cirrus_gd5430_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cirrus_gd5428_device(mconfig, CIRRUS_GD5430, "Cirrus Logic GD5430", tag, owner, clock, "clgd5430", __FILE__)
+	: cirrus_gd5428_device(mconfig, CIRRUS_GD5430, tag, owner, clock)
 {
 }
 
-MACHINE_CONFIG_FRAGMENT( pcvideo_cirrus_gd5428 )
+MACHINE_CONFIG_START( pcvideo_cirrus_gd5428 )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
 	MCFG_SCREEN_UPDATE_DEVICE("vga", cirrus_gd5428_device, screen_update)
@@ -69,7 +69,7 @@ MACHINE_CONFIG_FRAGMENT( pcvideo_cirrus_gd5428 )
 	MCFG_DEVICE_ADD("vga", CIRRUS_GD5428, 0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_FRAGMENT( pcvideo_cirrus_gd5430 )
+MACHINE_CONFIG_START( pcvideo_cirrus_gd5430 )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
 	MCFG_SCREEN_UPDATE_DEVICE("vga", cirrus_gd5430_device, screen_update)

@@ -13,6 +13,7 @@ abc1600.cpp
 abc80.cpp
 abc80x.cpp
 ac1.cpp
+accomm.cpp
 aceex.cpp
 acrnsys1.cpp
 adam.cpp
@@ -85,6 +86,7 @@ bk.cpp
 bmjr.cpp
 bml3.cpp
 bob85.cpp
+bpmmicro.cpp
 br8641.cpp
 bullet.cpp
 busicom.cpp
@@ -182,6 +184,7 @@ et3400.cpp
 eti660.cpp
 eurocom2.cpp
 europc.cpp
+eva.cpp
 evmbug.cpp
 excali64.cpp
 exelv.cpp
@@ -194,6 +197,7 @@ fccpu20.cpp
 fccpu30.cpp
 fidel6502.cpp
 fidel68k.cpp
+fidelmcs48.cpp
 fidelz80.cpp
 fk1.cpp
 fm7.cpp
@@ -233,6 +237,7 @@ hh_cop400.cpp
 hh_hmcs40.cpp
 hh_melps4.cpp
 hh_pic16.cpp
+hh_sm500.cpp
 hh_sm510.cpp
 hh_tms1k.cpp
 hh_ucom4.cpp
@@ -352,6 +357,7 @@ mikrosha.cpp
 mini2440.cpp
 minicom.cpp
 miniforce.cpp
+minitel_2_rpic.cpp
 mits680b.cpp
 mk1.cpp
 mk14.cpp
@@ -396,6 +402,7 @@ nascom1.cpp
 nc.cpp
 neogeocd.cpp
 nes.cpp
+nes_vt.cpp
 newbrain.cpp
 next.cpp
 ngen.cpp
@@ -404,6 +411,7 @@ nokia_3310.cpp
 notetaker.cpp
 novag6502.cpp
 novag68k.cpp
+novagmcs48.cpp
 ob68k1a.cpp
 octopus.cpp
 odyssey2.cpp

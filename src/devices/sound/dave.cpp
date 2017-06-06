@@ -9,13 +9,13 @@
 #include "emu.h"
 #include "dave.h"
 
+//#define VERBOSE 1
+#include "logmacro.h"
 
 
 //**************************************************************************
 //  MACROS / CONSTANTS
 //**************************************************************************
-
-#define LOG 0
 
 #define STEP 0x08000
 
@@ -25,7 +25,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type DAVE = device_creator<dave_device>;
+DEFINE_DEVICE_TYPE(DAVE, dave_device, "dave", "Inteligent Designs DAVE")
 
 
 DEVICE_ADDRESS_MAP_START( z80_program_map, 8, dave_device )
@@ -54,7 +54,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 dave_device::dave_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, DAVE, "DAVE", tag, owner, clock, "dave", __FILE__),
+	: device_t(mconfig, DAVE, tag, owner, clock),
 		device_memory_interface(mconfig, *this),
 		device_sound_interface(mconfig, *this),
 		m_program_space_config("program", ENDIANNESS_LITTLE, 8, 22, 0, *ADDRESS_MAP_NAME(program_map)),

@@ -21,7 +21,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type NES_ZEMINA = device_creator<nes_zemina_device>;
+DEFINE_DEVICE_TYPE(NES_ZEMINA, nes_zemina_device, "nes_zemina", "NES Cart Zemina PCB")
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -32,7 +32,7 @@ const device_type NES_ZEMINA = device_creator<nes_zemina_device>;
 //-------------------------------------------------
 
 nes_zemina_device::nes_zemina_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_nrom_device(mconfig, NES_ZEMINA, "NES Cart Zemina PCB", tag, owner, clock, "nes_zemina", __FILE__)
+	: nes_nrom_device(mconfig, NES_ZEMINA, tag, owner, clock)
 {
 }
 

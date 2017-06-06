@@ -1,10 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Sergey Svishchev
 
-#pragma once
+#ifndef MAME_BUS_ISA_PGC_H
+#define MAME_BUS_ISA_PGC_H
 
-#ifndef __ISA_PGC_H__
-#define __ISA_PGC_H__
+#pragma once
 
 
 #include "cpu/i86/i86.h"
@@ -23,7 +23,6 @@ class isa8_pgc_device :
 public:
 	// construction/destruction
 	isa8_pgc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	isa8_pgc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -44,6 +43,8 @@ public:
 	void reset_common();
 
 protected:
+	isa8_pgc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -63,6 +64,6 @@ private:
 
 
 // device type definition
-extern const device_type ISA8_PGC;
+DECLARE_DEVICE_TYPE(ISA8_PGC, isa8_pgc_device)
 
-#endif  /* __ISA_PGC_H__ */
+#endif // MAME_BUS_ISA_PGC_H

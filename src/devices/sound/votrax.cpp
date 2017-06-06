@@ -26,7 +26,7 @@ tp1 = phi clock (tied to f2q rom access)
 #include "votrax.h"
 
 
-const device_type VOTRAX_SC01 = device_creator<votrax_sc01_device>;
+DEFINE_DEVICE_TYPE(VOTRAX_SC01, votrax_sc01_device, "votrax", "Votrax SC-01")
 
 // ROM definition for the Votrax phone ROM
 ROM_START( votrax_sc01 )
@@ -76,7 +76,7 @@ const double votrax_sc01_device::s_glottal_wave[9] =
 
 
 votrax_sc01_device::votrax_sc01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, VOTRAX_SC01, "Votrax SC-01", tag, owner, clock, "votrax", __FILE__),
+	: device_t(mconfig, VOTRAX_SC01, tag, owner, clock),
 	  device_sound_interface(mconfig, *this),
 	  m_stream(nullptr),
 	  m_rom(*this, "internal"),

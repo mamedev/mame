@@ -56,7 +56,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<z80dart_device> m_dart;
 	required_device<z80ctc_device> m_ctc;
-	required_device<wd1772_t> m_fdc;
+	required_device<wd1772_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 };
 
@@ -110,8 +110,8 @@ static ADDRESS_MAP_START(ampro_io, AS_IO, 8, ampro_state)
 	//AM_RANGE(0x28, 0x28) AM_WRITE(port28_w) // scsi control
 	//AM_RANGE(0x29, 0x29) AM_READ(port29_r) // ID port
 	AM_RANGE(0x40, 0x8f) AM_READWRITE(io_r,io_w)
-	AM_RANGE(0xc0, 0xc3) AM_DEVWRITE("fdc", wd1772_t, write)
-	AM_RANGE(0xc4, 0xc7) AM_DEVREAD("fdc", wd1772_t, read)
+	AM_RANGE(0xc0, 0xc3) AM_DEVWRITE("fdc", wd1772_device, write)
+	AM_RANGE(0xc4, 0xc7) AM_DEVREAD("fdc", wd1772_device, read)
 ADDRESS_MAP_END
 
 static const z80_daisy_config daisy_chain_intf[] =
@@ -157,7 +157,7 @@ DRIVER_INIT_MEMBER( ampro_state, ampro )
 	membank("bankw0")->configure_entry(0, &main[0x0000]);
 }
 
-static MACHINE_CONFIG_START( ampro, ampro_state )
+static MACHINE_CONFIG_START( ampro )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_16MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(ampro_mem)
@@ -202,5 +202,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    CLASS          INIT     COMPANY       FULLNAME       FLAGS */
+//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    CLASS          INIT    COMPANY      FULLNAME            FLAGS
 COMP( 1980, ampro,  0,      0,       ampro,     ampro,   ampro_state,   ampro,  "Ampro",     "Little Z80 Board", 0 )

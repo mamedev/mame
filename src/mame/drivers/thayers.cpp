@@ -786,7 +786,7 @@ void thayers_state::machine_reset()
 
 /* Machine Driver */
 
-static MACHINE_CONFIG_START( thayers, thayers_state )
+static MACHINE_CONFIG_START( thayers )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz)
@@ -847,6 +847,6 @@ ROM_END
 
 /* Game Drivers */
 
-/*     YEAR  NAME      PARENT   MACHINE  INPUT    INIT  MONITOR  COMPANY               FULLNAME                   FLAGS                             LAYOUT */
-GAMEL( 1984, thayers,  0,       thayers, thayers, driver_device, 0, ROT0,    "RDI Video Systems",  "Thayer's Quest (set 1)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_thayers)
-GAMEL( 1984, thayersa, thayers, thayers, thayers, driver_device, 0, ROT0,    "RDI Video Systems",  "Thayer's Quest (set 2)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_thayers)
+//     YEAR  NAME      PARENT   MACHINE  INPUT    STATE          INIT  MONITOR  COMPANY               FULLNAME                   FLAGS                                   LAYOUT
+GAMEL( 1984, thayers,  0,       thayers, thayers, thayers_state, 0,    ROT0,    "RDI Video Systems",  "Thayer's Quest (set 1)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_thayers)
+GAMEL( 1984, thayersa, thayers, thayers, thayers, thayers_state, 0,    ROT0,    "RDI Video Systems",  "Thayer's Quest (set 2)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_thayers)

@@ -5,10 +5,10 @@
 #include "jasmin.h"
 #include "microdisc.h"
 
-const device_type ORICEXT_CONNECTOR = device_creator<oricext_connector>;
+DEFINE_DEVICE_TYPE(ORICEXT_CONNECTOR, oricext_connector, "oricext_connector", "ORIC extension connector")
 
 oricext_connector::oricext_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, ORICEXT_CONNECTOR, "ORIC extension connector", tag, owner, clock, "oricext_connector", __FILE__),
+	device_t(mconfig, ORICEXT_CONNECTOR, tag, owner, clock),
 	device_slot_interface(mconfig, *this),
 	irq_handler(*this),
 	cputag(nullptr)
@@ -41,8 +41,8 @@ void oricext_connector::device_config_complete()
 		dev->set_cputag(cputag);
 }
 
-oricext_device::oricext_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+oricext_device::oricext_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_slot_card_interface(mconfig, *this),
 	cputag(nullptr),
 	cpu(nullptr),

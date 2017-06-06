@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_EP64_EXDOS_H
+#define MAME_BUS_EP64_EXDOS_H
 
-#ifndef __EP64_EXDOS__
-#define __EP64_EXDOS__
+#pragma once
 
 #include "exp.h"
 #include "formats/ep64_dsk.h"
@@ -45,7 +45,7 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	required_device<wd1770_t> m_fdc;
+	required_device<wd1770_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	required_device<floppy_connector> m_floppy2;
@@ -56,8 +56,7 @@ private:
 
 
 // device type definition
-extern const device_type EP64_EXDOS;
+DECLARE_DEVICE_TYPE(EP64_EXDOS, ep64_exdos_device)
 
 
-
-#endif
+#endif // MAME_BUS_EP64_EXDOS_H

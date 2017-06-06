@@ -22,8 +22,10 @@
  *
  */
 
-#ifndef MAGICSOUND_H_
-#define MAGICSOUND_H_
+#ifndef MAME_BUS_CPC_MAGICSOUND_H
+#define MAME_BUS_CPC_MAGICSOUND_H
+
+#pragma once
 
 #include "cpcexp.h"
 #include "sound/dmadac.h"
@@ -84,7 +86,7 @@ private:
 };
 
 // device type definition
-extern const device_type AL_MAGICSOUND;
+DECLARE_DEVICE_TYPE(AL_MAGICSOUND, al_magicsound_device)
 
 
-#endif /* MAGICSOUND_H_ */
+#endif // MAME_BUS_CPC_MAGICSOUND_H

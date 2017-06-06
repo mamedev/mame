@@ -245,7 +245,7 @@ void rockrage_state::machine_reset()
 	m_vreg = 0;
 }
 
-static MACHINE_CONFIG_START( rockrage, rockrage_state )
+static MACHINE_CONFIG_START( rockrage )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309, 3000000*4)      /* 24MHz/8 */
@@ -391,6 +391,6 @@ ROM_END
 ***************************************************************************/
 
 //    YEAR, NAME,      PARENT,   MACHINE,  INPUT,    INIT,MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1986, rockrage,  0,        rockrage, rockrage, driver_device, 0,   ROT0,   "Konami", "Rock'n Rage (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, rockragea, rockrage, rockrage, rockrage, driver_device, 0,   ROT0,   "Konami", "Rock'n Rage (prototype?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, rockragej, rockrage, rockrage, rockrage, driver_device, 0,   ROT0,   "Konami", "Koi no Hotrock (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, rockrage,  0,        rockrage, rockrage, rockrage_state, 0,   ROT0,   "Konami", "Rock'n Rage (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, rockragea, rockrage, rockrage, rockrage, rockrage_state, 0,   ROT0,   "Konami", "Rock'n Rage (prototype?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, rockragej, rockrage, rockrage, rockrage, rockrage_state, 0,   ROT0,   "Konami", "Koi no Hotrock (Japan)", MACHINE_SUPPORTS_SAVE )

@@ -551,7 +551,7 @@ static GFXDECODE_START( srmp5 )
 	//GFXDECODE_ENTRY( "gfx1", 0, tile_16x16x8_layout, 0x0, 0x800  )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( srmp5, srmp5_state )
+static MACHINE_CONFIG_START( srmp5 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",ST0016_CPU,8000000)

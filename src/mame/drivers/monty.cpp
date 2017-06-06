@@ -237,7 +237,7 @@ SED1520_UPDATE_CB(monty_screen_update)
 
 
 // TODO: Additional machine definition - Master Monty has a different memory layout
-static MACHINE_CONFIG_START( monty, monty_state )
+static MACHINE_CONFIG_START( monty )
 	// Basic machine hardware
 	MCFG_CPU_ADD("maincpu", Z80, 3580000)       // Ceramic resonator labeled 3.58MT
 	MCFG_CPU_PROGRAM_MAP(monty_mem)
@@ -285,6 +285,6 @@ ROM_END
 
 
 // Drivers
-//    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT   STATE           INIT  COMPANY   FULLNAME                 FLAGS
-COMP( 1980, monty,   0,      0,       monty,     monty,  driver_device,  0,    "Ritam",  "Monty Plays Scrabble",  MACHINE_NOT_WORKING )
-COMP( 1982, mmonty,  0,      0,       mmonty,    monty,  driver_device,  0,    "Ritam",  "Master Monty",          MACHINE_NOT_WORKING )
+//    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT   STATE         INIT  COMPANY   FULLNAME                 FLAGS
+COMP( 1980, monty,   0,      0,       monty,     monty,  monty_state,  0,    "Ritam",  "Monty Plays Scrabble",  MACHINE_NOT_WORKING )
+COMP( 1982, mmonty,  0,      0,       mmonty,    monty,  monty_state,  0,    "Ritam",  "Master Monty",          MACHINE_NOT_WORKING )

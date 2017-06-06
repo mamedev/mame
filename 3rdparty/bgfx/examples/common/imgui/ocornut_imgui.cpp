@@ -97,10 +97,10 @@ struct OcornutImguiContext
 			bgfx::allocTransientIndexBuffer(&tib, numIndices);
 
 			ImDrawVert* verts = (ImDrawVert*)tvb.data;
-			memcpy(verts, drawList->VtxBuffer.begin(), numVertices * sizeof(ImDrawVert) );
+			bx::memCopy(verts, drawList->VtxBuffer.begin(), numVertices * sizeof(ImDrawVert) );
 
 			ImDrawIdx* indices = (ImDrawIdx*)tib.data;
-			memcpy(indices, drawList->IdxBuffer.begin(), numIndices * sizeof(ImDrawIdx) );
+			bx::memCopy(indices, drawList->IdxBuffer.begin(), numIndices * sizeof(ImDrawIdx) );
 
 			uint32_t offset = 0;
 			for (const ImDrawCmd* cmd = drawList->CmdBuffer.begin(), *cmdEnd = drawList->CmdBuffer.end(); cmd != cmdEnd; ++cmd)
@@ -378,8 +378,9 @@ struct OcornutImguiContext
 #endif // defined(SCI_NAMESPACE)
 
 		ImGui::NewFrame();
-		ImGuizmo::BeginFrame();
 		ImGui::PushStyleVar(ImGuiStyleVar_ViewId, (float)_viewId);
+
+		ImGuizmo::BeginFrame();
 	}
 
 	void endFrame()

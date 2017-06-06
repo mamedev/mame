@@ -492,7 +492,7 @@ uint64_t imgtool::stream::fill(unsigned char b, uint64_t sz)
 //  is_read_only
 //-------------------------------------------------
 
-int imgtool::stream::is_read_only()
+bool imgtool::stream::is_read_only()
 {
 	return write_protect;
 }

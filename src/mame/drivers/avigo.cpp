@@ -746,7 +746,7 @@ void avigo_state::nvram_init(nvram_device &nvram, void *base, size_t size)
 	memset(base, 0x00, size);
 }
 
-static MACHINE_CONFIG_START( avigo, avigo_state )
+static MACHINE_CONFIG_START( avigo )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(avigo_mem)
@@ -904,9 +904,9 @@ ROM_START(avigo_it)
 	ROMX_LOAD("italian_100.rom",  0x000000, 0x050000, CRC(de359218) SHA1(6185727aba8ffc98723f2df74dda388fd0d70cc9), ROM_BIOS(3))
 ROM_END
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY   FULLNAME */
-COMP(1997,  avigo,      0,          0,      avigo,  avigo, driver_device,   0,      "Texas Instruments", "TI Avigo 10 PDA",             MACHINE_SUPPORTS_SAVE)
-COMP(1997,  avigo_de,   avigo,      0,      avigo,  avigo, driver_device,   0,      "Texas Instruments", "TI Avigo 10 PDA (German)",    MACHINE_SUPPORTS_SAVE)
-COMP(1997,  avigo_fr,   avigo,      0,      avigo,  avigo, driver_device,   0,      "Texas Instruments", "TI Avigo 10 PDA (French)",    MACHINE_SUPPORTS_SAVE)
-COMP(1997,  avigo_es,   avigo,      0,      avigo,  avigo, driver_device,   0,      "Texas Instruments", "TI Avigo 10 PDA (Spanish)",   MACHINE_SUPPORTS_SAVE)
-COMP(1997,  avigo_it,   avigo,      0,      avigo,  avigo, driver_device,   0,      "Texas Instruments", "TI Avigo 10 PDA (Italian)",   MACHINE_SUPPORTS_SAVE)
+//    YEAR  NAME       PARENT   COMPAT  MACHINE  INPUT  STATE        INIT    COMPANY              FULLNAME                       FLAGS
+COMP(1997,  avigo,     0,       0,      avigo,   avigo, avigo_state, 0,      "Texas Instruments", "TI Avigo 10 PDA",             MACHINE_SUPPORTS_SAVE)
+COMP(1997,  avigo_de,  avigo,   0,      avigo,   avigo, avigo_state, 0,      "Texas Instruments", "TI Avigo 10 PDA (German)",    MACHINE_SUPPORTS_SAVE)
+COMP(1997,  avigo_fr,  avigo,   0,      avigo,   avigo, avigo_state, 0,      "Texas Instruments", "TI Avigo 10 PDA (French)",    MACHINE_SUPPORTS_SAVE)
+COMP(1997,  avigo_es,  avigo,   0,      avigo,   avigo, avigo_state, 0,      "Texas Instruments", "TI Avigo 10 PDA (Spanish)",   MACHINE_SUPPORTS_SAVE)
+COMP(1997,  avigo_it,  avigo,   0,      avigo,   avigo, avigo_state, 0,      "Texas Instruments", "TI Avigo 10 PDA (Italian)",   MACHINE_SUPPORTS_SAVE)

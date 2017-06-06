@@ -3,11 +3,11 @@
 #include "emu.h"
 #include "crossblaim.h"
 
-const device_type MSX_CART_CROSSBLAIM = device_creator<msx_cart_crossblaim>;
+DEFINE_DEVICE_TYPE(MSX_CART_CROSSBLAIM, msx_cart_crossblaim_device, "msx_cart_crossblaim", "MSX Cartridge Cross Blaim")
 
 
-msx_cart_crossblaim::msx_cart_crossblaim(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MSX_CART_CROSSBLAIM, "MSX Cartridge - Cross Blaim", tag, owner, clock, "msx_cart_crossblaim", __FILE__)
+msx_cart_crossblaim_device::msx_cart_crossblaim_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, MSX_CART_CROSSBLAIM, tag, owner, clock)
 	, msx_cart_interface(mconfig, *this)
 	, m_selected_bank(1)
 {
@@ -18,15 +18,15 @@ msx_cart_crossblaim::msx_cart_crossblaim(const machine_config &mconfig, const ch
 }
 
 
-void msx_cart_crossblaim::device_start()
+void msx_cart_crossblaim_device::device_start()
 {
 	save_item(NAME(m_selected_bank));
 
-	machine().save().register_postload(save_prepost_delegate(FUNC(msx_cart_crossblaim::restore_banks), this));
+	machine().save().register_postload(save_prepost_delegate(FUNC(msx_cart_crossblaim_device::restore_banks), this));
 }
 
 
-void msx_cart_crossblaim::setup_bank()
+void msx_cart_crossblaim_device::setup_bank()
 {
 	m_bank_base[0] = ( m_selected_bank & 2 ) ? nullptr : get_rom_base() + ( m_selected_bank & 0x03 ) * 0x4000;
 	m_bank_base[2] = get_rom_base() + ( m_selected_bank & 0x03 ) * 0x4000;
@@ -34,20 +34,20 @@ void msx_cart_crossblaim::setup_bank()
 }
 
 
-void msx_cart_crossblaim::restore_banks()
+void msx_cart_crossblaim_device::restore_banks()
 {
 	m_bank_base[1] = get_rom_base();
 	setup_bank();
 }
 
 
-void msx_cart_crossblaim::device_reset()
+void msx_cart_crossblaim_device::device_reset()
 {
 	m_selected_bank = 1;
 }
 
 
-void msx_cart_crossblaim::initialize_cartridge()
+void msx_cart_crossblaim_device::initialize_cartridge()
 {
 	if (get_rom_size() != 0x10000)
 	{
@@ -58,7 +58,7 @@ void msx_cart_crossblaim::initialize_cartridge()
 }
 
 
-READ8_MEMBER(msx_cart_crossblaim::read_cart)
+READ8_MEMBER(msx_cart_crossblaim_device::read_cart)
 {
 	uint8_t *bank_base = m_bank_base[offset >> 14];
 
@@ -71,7 +71,7 @@ READ8_MEMBER(msx_cart_crossblaim::read_cart)
 }
 
 
-WRITE8_MEMBER(msx_cart_crossblaim::write_cart)
+WRITE8_MEMBER(msx_cart_crossblaim_device::write_cart)
 {
 	m_selected_bank = data & 3;
 	if (m_selected_bank == 0)

@@ -454,7 +454,7 @@ void xain_state::machine_start()
 	save_item(NAME(m_vblank));
 }
 
-static MACHINE_CONFIG_START( xsleena, xain_state )
+static MACHINE_CONFIG_START( xsleena )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, CPU_CLOCK)
@@ -780,8 +780,8 @@ ROM_START( xsleenaba )
 ROM_END
 
 
-GAME( 1986, xsleena,  0,       xsleena,  xsleena, driver_device, 0, ROT0, "Technos Japan (Taito license)", "Xain'd Sleena (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, xsleenaj, xsleena, xsleena,  xsleena, driver_device, 0, ROT0, "Technos Japan", "Xain'd Sleena (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, solrwarr, xsleena, xsleena,  xsleena, driver_device, 0, ROT0, "Technos Japan (Taito / Memetron license)", "Solar-Warrior (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, xsleenab, xsleena, xsleenab, xsleena, driver_device, 0, ROT0, "bootleg", "Xain'd Sleena (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, xsleenaba,xsleena, xsleenab, xsleena, driver_device, 0, ROT0, "bootleg", "Xain'd Sleena (bootleg, bugfixed)", MACHINE_SUPPORTS_SAVE ) // newer bootleg, fixes some of the issues with the other one
+GAME( 1986, xsleena,   0,       xsleena,  xsleena, xain_state, 0, ROT0, "Technos Japan (Taito license)",            "Xain'd Sleena (World)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1986, xsleenaj,  xsleena, xsleena,  xsleena, xain_state, 0, ROT0, "Technos Japan",                            "Xain'd Sleena (Japan)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1986, solrwarr,  xsleena, xsleena,  xsleena, xain_state, 0, ROT0, "Technos Japan (Taito / Memetron license)", "Solar-Warrior (US)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1986, xsleenab,  xsleena, xsleenab, xsleena, xain_state, 0, ROT0, "bootleg",                                  "Xain'd Sleena (bootleg)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1987, xsleenaba, xsleena, xsleenab, xsleena, xain_state, 0, ROT0, "bootleg",                                  "Xain'd Sleena (bootleg, bugfixed)", MACHINE_SUPPORTS_SAVE ) // newer bootleg, fixes some of the issues with the other one

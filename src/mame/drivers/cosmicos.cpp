@@ -499,7 +499,7 @@ QUICKLOAD_LOAD_MEMBER( cosmicos_state, cosmicos )
 
 /* Machine Driver */
 
-static MACHINE_CONFIG_START( cosmicos, cosmicos_state )
+static MACHINE_CONFIG_START( cosmicos )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_1_75MHz)
 	MCFG_CPU_PROGRAM_MAP(cosmicos_mem)
@@ -558,5 +558,5 @@ ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        COMPANY             FULLNAME    FLAGS */
-COMP( 1979, cosmicos,   0,      0,      cosmicos,   cosmicos, driver_device,   0,   "Radio Bulletin",   "Cosmicos", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+//    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT     STATE           INIT  COMPANY           FULLNAME    FLAGS
+COMP( 1979, cosmicos,   0,      0,      cosmicos,   cosmicos, cosmicos_state, 0,    "Radio Bulletin", "Cosmicos", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )

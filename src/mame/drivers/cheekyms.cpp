@@ -10,8 +10,6 @@
 #include "includes/cheekyms.h"
 
 #include "cpu/z80/z80.h"
-#include "sound/volt_reg.h"
-#include "speaker.h"
 
 
 INPUT_CHANGED_MEMBER(cheekyms_state::coin_inserted)
@@ -121,7 +119,7 @@ INTERRUPT_GEN_MEMBER(cheekyms_state::vblank_irq)
 }
 
 
-static MACHINE_CONFIG_START( cheekyms, cheekyms_state )
+static MACHINE_CONFIG_START( cheekyms )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,5000000/2)  /* 2.5 MHz */
@@ -144,6 +142,8 @@ static MACHINE_CONFIG_START( cheekyms, cheekyms_state )
 	MCFG_PALETTE_INIT_OWNER(cheekyms_state, cheekyms)
 
 	/* audio hardware */
+	MCFG_DEVICE_ADD("soundboard", CHEEKY_MOUSE_AUDIO, 0)
+#if 0
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_SOUND_ADD("dac0", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
@@ -163,6 +163,7 @@ static MACHINE_CONFIG_START( cheekyms, cheekyms_state )
 	MCFG_SOUND_ROUTE_EX(0, "dac5", 1.0, DAC_VREF_POS_INPUT)
 	MCFG_SOUND_ROUTE_EX(0, "dac6", 1.0, DAC_VREF_POS_INPUT)
 	MCFG_SOUND_ROUTE_EX(0, "dac7", 1.0, DAC_VREF_POS_INPUT)
+#endif
 MACHINE_CONFIG_END
 
 
@@ -197,4 +198,4 @@ ROM_END
 
 
 
-GAME( 1980, cheekyms, 0, cheekyms, cheekyms, driver_device, 0, ROT270, "Universal", "Cheeky Mouse", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, cheekyms, 0, cheekyms, cheekyms, cheekyms_state, 0, ROT270, "Universal", "Cheeky Mouse", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

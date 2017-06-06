@@ -926,7 +926,7 @@ PALETTE_INIT_MEMBER(kingdrby_state,kingdrbb)
 	}
 }
 
-static MACHINE_CONFIG_START( kingdrby, kingdrby_state )
+static MACHINE_CONFIG_START( kingdrby )
 	MCFG_CPU_ADD("master", Z80, CLK_2)
 	MCFG_CPU_PROGRAM_MAP(master_map)
 	MCFG_CPU_IO_MAP(master_io_map)
@@ -1012,7 +1012,7 @@ static MACHINE_CONFIG_DERIVED( cowrace, kingdrbb )
 	MCFG_GFXDECODE_MODIFY("gfxdecode", cowrace)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(kingdrby_state,kingdrby)
-	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MCFG_SOUND_REPLACE("aysnd", YM2203, 3000000)
@@ -1192,7 +1192,7 @@ ROM_START( kingdrbb2 )
 ROM_END
 
 
-GAMEL( 1981, kingdrby,  0,        kingdrby, kingdrby, driver_device, 0, ROT0, "Tazmi",                        "King Derby (1981)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND, layout_kingdrby )
-GAME ( 1986, kingdrbb,  kingdrby, kingdrbb, kingdrbb, driver_device, 0, ROT0, "bootleg (Casino Electronics)", "King Derby (Taiwan bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS )
-GAMEL( 198?, kingdrbb2, kingdrby, kingdrby, kingdrby, driver_device, 0, ROT0, "bootleg",                      "King Derby (bootleg set 2)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND, layout_kingdrby )
-GAME ( 2000, cowrace,   kingdrby, cowrace,  kingdrbb, driver_device, 0, ROT0, "bootleg (Gate In)",            "Cow Race (King Derby hack)",  MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS )
+GAMEL( 1981, kingdrby,  0,        kingdrby, kingdrby, kingdrby_state, 0, ROT0, "Tazmi",                        "King Derby (1981)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND, layout_kingdrby )
+GAME ( 1986, kingdrbb,  kingdrby, kingdrbb, kingdrbb, kingdrby_state, 0, ROT0, "bootleg (Casino Electronics)", "King Derby (Taiwan bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS )
+GAMEL( 198?, kingdrbb2, kingdrby, kingdrby, kingdrby, kingdrby_state, 0, ROT0, "bootleg",                      "King Derby (bootleg set 2)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND, layout_kingdrby )
+GAME ( 2000, cowrace,   kingdrby, cowrace,  kingdrbb, kingdrby_state, 0, ROT0, "bootleg (Gate In)",            "Cow Race (King Derby hack)",  MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS )

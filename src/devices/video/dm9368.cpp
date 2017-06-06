@@ -9,13 +9,15 @@
 #include "emu.h"
 #include "dm9368.h"
 
+//#define VERBOSE 1
+#include "logmacro.h"
 
 
 //**************************************************************************
 //  DEVICE DEFINITION
 //**************************************************************************
 
-const device_type DM9368 = device_creator<dm9368_device>;
+DEFINE_DEVICE_TYPE(DM9368, dm9368_device, "dm9368", "Fairchild DM9368 7-Segment Decoder")
 
 
 
@@ -23,10 +25,7 @@ const device_type DM9368 = device_creator<dm9368_device>;
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define LOG 0
-
-
-const uint8_t dm9368_device::m_segment_data[16] =
+const uint8_t dm9368_device::s_segment_data[16] =
 {
 	0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x67, 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71
 };
@@ -42,7 +41,7 @@ const uint8_t dm9368_device::m_segment_data[16] =
 //-------------------------------------------------
 
 dm9368_device::dm9368_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, DM9368, "DM9368 7-Segment Decoder", tag, owner, clock, "dm9368", __FILE__),
+	device_t(mconfig, DM9368, tag, owner, clock),
 	device_output_interface(mconfig, *this),
 	m_write_rbo(*this),
 	m_rbi(1),
@@ -72,21 +71,21 @@ void dm9368_device::device_start()
 
 void dm9368_device::a_w(uint8_t data)
 {
-	int a = data & 0x0f;
+	int const a = data & 0x0f;
 	uint8_t value = 0;
 
 	if (!m_rbi && !a)
 	{
-		if (LOG) logerror("DM9368 '%s' Blanked Rippling Zero\n", tag());
+		LOG("DM9368 Blanked Rippling Zero\n");
 
 		// blank rippling 0
 		m_rbo = 0;
 	}
 	else
 	{
-		if (LOG) logerror("DM9368 '%s' Output Data: %u = %02x\n", tag(), a, m_segment_data[a]);
+		LOG("DM9368 Output Data: %u = %02x\n", a, s_segment_data[a]);
 
-		value = m_segment_data[a];
+		value = s_segment_data[a];
 
 		m_rbo = 1;
 	}

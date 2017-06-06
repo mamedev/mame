@@ -5,7 +5,7 @@
 #include "ie15.h"
 
 ie15_terminal_device::ie15_terminal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ie15_device(mconfig, SERIAL_TERMINAL_IE15, "IE15 Terminal", tag, owner, clock, "ie15_terminal", __FILE__)
+	: ie15_device(mconfig, SERIAL_TERMINAL_IE15, tag, owner, clock)
 	, device_rs232_port_interface(mconfig, *this)
 	, m_rs232_txbaud(*this, "RS232_TXBAUD")
 	, m_rs232_rxbaud(*this, "RS232_RXBAUD")
@@ -87,5 +87,4 @@ void ie15_terminal_device::device_timer(emu_timer &timer, device_timer_id id, in
 	ie15_device::device_timer(timer, id, param, ptr);
 }
 
-const device_type SERIAL_TERMINAL_IE15 = device_creator<ie15_terminal_device>;
-
+DEFINE_DEVICE_TYPE(SERIAL_TERMINAL_IE15, ie15_terminal_device, "ie15_terminal", "IE15 Terminal")

@@ -295,7 +295,7 @@ MACHINE_START_MEMBER(powerins_state, powerinsa)
 	membank("okibank")->configure_entries(0, 5, memregion("oki1")->base() + 0x30000, 0x10000);
 }
 
-static MACHINE_CONFIG_START( powerins, powerins_state )
+static MACHINE_CONFIG_START( powerins )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12MHz */
@@ -326,10 +326,10 @@ static MACHINE_CONFIG_START( powerins, powerins_state )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki1", 4000000, OKIM6295_PIN7_LOW)
+	MCFG_OKIM6295_ADD("oki1", 4000000, PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_OKIM6295_ADD("oki2", 4000000, OKIM6295_PIN7_LOW)
+	MCFG_OKIM6295_ADD("oki2", 4000000, PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
 	MCFG_SOUND_ADD("ym2203", YM2203, 12000000 / 8)
@@ -355,7 +355,7 @@ static MACHINE_CONFIG_DERIVED( powerinsa, powerins )
 
 	MCFG_MACHINE_START_OVERRIDE(powerins_state, powerinsa)
 
-	MCFG_OKIM6295_REPLACE("oki1", 990000, OKIM6295_PIN7_LOW) // pin7 not verified
+	MCFG_OKIM6295_REPLACE("oki1", 990000, PIN7_LOW) // pin7 not verified
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, powerinsa_oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
@@ -679,7 +679,7 @@ ROM_END
 
 
 /* all supported sets give a 93.10.20 date */
-GAME( 1993, powerins,  0,        powerins,  powerins, driver_device, 0, ROT0, "Atlus", "Power Instinct (USA)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, powerinsj, powerins, powerins,  powerinj, driver_device, 0, ROT0, "Atlus", "Gouketsuji Ichizoku (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, powerinsa, powerins, powerinsa, powerins, driver_device, 0, ROT0, "bootleg", "Power Instinct (USA, bootleg set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, powerinsb, powerins, powerinsb, powerins, driver_device, 0, ROT0, "bootleg", "Power Instinct (USA, bootleg set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, powerins,  0,        powerins,  powerins, powerins_state, 0, ROT0, "Atlus", "Power Instinct (USA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, powerinsj, powerins, powerins,  powerinj, powerins_state, 0, ROT0, "Atlus", "Gouketsuji Ichizoku (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, powerinsa, powerins, powerinsa, powerins, powerins_state, 0, ROT0, "bootleg", "Power Instinct (USA, bootleg set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, powerinsb, powerins, powerinsb, powerins, powerins_state, 0, ROT0, "bootleg", "Power Instinct (USA, bootleg set 2)", MACHINE_SUPPORTS_SAVE )

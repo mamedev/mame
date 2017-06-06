@@ -12,13 +12,14 @@
 #include "emu.h"
 #include "k054539.h"
 
-const device_type K054539 = device_creator<k054539_device>;
+//#define VERBOSE 1
+#include "logmacro.h"
 
-#define VERBOSE 0
-#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
+
+DEFINE_DEVICE_TYPE(K054539, k054539_device, "k054539", "K054539 ADPCM")
 
 k054539_device::k054539_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, K054539, "K054539 ADPCM", tag, owner, clock, "k054539", __FILE__),
+	: device_t(mconfig, K054539, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		flags(0),
 		ram(nullptr),
@@ -278,7 +279,7 @@ void k054539_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 					break;
 				}
 				default:
-					LOG(("Unknown sample type %x for channel %d\n", base2[0] & 0xc, ch));
+					LOG("Unknown sample type %x for channel %d\n", base2[0] & 0xc, ch);
 					break;
 				}
 				lval += cur_val * lvol;
@@ -501,7 +502,7 @@ READ8_MEMBER(k054539_device::read)
 	case 0x22c:
 		break;
 	default:
-		LOG(("K054539 read %03x\n", offset));
+		LOG("K054539 read %03x\n", offset);
 		break;
 	}
 	return regs[offset];

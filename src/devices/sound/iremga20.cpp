@@ -35,7 +35,7 @@ Revisions:
 
 
 // device type definition
-const device_type IREMGA20 = device_creator<iremga20_device>;
+DEFINE_DEVICE_TYPE(IREMGA20, iremga20_device, "iremga20", "Irem GA20")
 
 
 //**************************************************************************
@@ -47,7 +47,7 @@ const device_type IREMGA20 = device_creator<iremga20_device>;
 //-------------------------------------------------
 
 iremga20_device::iremga20_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, IREMGA20, "Irem GA20", tag, owner, clock, "iremga20", __FILE__),
+	: device_t(mconfig, IREMGA20, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		m_rom(*this, DEVICE_SELF),
 		m_stream(nullptr)

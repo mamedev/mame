@@ -30,7 +30,7 @@ TODO:
 //**************************************************************************
 
 // device type definition
-const device_type MB_VCU = device_creator<mb_vcu_device>;
+DEFINE_DEVICE_TYPE(MB_VCU, mb_vcu_device, "mb_vcu", "Mazer Blazer custom VCU")
 
 //-------------------------------------------------
 //  static_set_palette_tag: Set the tag of the
@@ -151,7 +151,7 @@ inline void mb_vcu_device::write_io(offs_t address, uint8_t data)
 //-------------------------------------------------
 
 mb_vcu_device::mb_vcu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MB_VCU, "Mazer Blazer custom VCU", tag, owner, clock, "mb_vcu", __FILE__)
+	: device_t(mconfig, MB_VCU, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
 	, device_video_interface(mconfig, *this)
 	, m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 19, 0, nullptr, *ADDRESS_MAP_NAME(mb_vcu_vram))

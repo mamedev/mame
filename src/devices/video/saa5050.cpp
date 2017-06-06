@@ -26,14 +26,14 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SAA5050 = device_creator<saa5050_device>;
-const device_type SAA5051 = device_creator<saa5051_device>;
-const device_type SAA5052 = device_creator<saa5052_device>;
-const device_type SAA5053 = device_creator<saa5053_device>;
-const device_type SAA5054 = device_creator<saa5054_device>;
-const device_type SAA5055 = device_creator<saa5055_device>;
-const device_type SAA5056 = device_creator<saa5056_device>;
-const device_type SAA5057 = device_creator<saa5057_device>;
+DEFINE_DEVICE_TYPE(SAA5050, saa5050_device, "saa5050", "Mullard SA5050")
+DEFINE_DEVICE_TYPE(SAA5051, saa5051_device, "saa5051", "Mullard SA5051")
+DEFINE_DEVICE_TYPE(SAA5052, saa5052_device, "saa5052", "Mullard SA5052")
+DEFINE_DEVICE_TYPE(SAA5053, saa5053_device, "saa5053", "Mullard SA5053")
+DEFINE_DEVICE_TYPE(SAA5054, saa5054_device, "saa5054", "Mullard SA5054")
+DEFINE_DEVICE_TYPE(SAA5055, saa5055_device, "saa5055", "Mullard SA5055")
+DEFINE_DEVICE_TYPE(SAA5056, saa5056_device, "saa5056", "Mullard SA5056")
+DEFINE_DEVICE_TYPE(SAA5057, saa5057_device, "saa5057", "Mullard SA5057")
 
 
 //-------------------------------------------------
@@ -174,8 +174,8 @@ const tiny_rom_entry *saa5057_device::device_rom_region() const
 //  saa5050_device - constructor
 //-------------------------------------------------
 
-saa5050_device::saa5050_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+saa5050_device::saa5050_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	m_char_rom(*this, "chargen"),
 	m_read_d(*this),
 	m_frame_count(0),
@@ -186,36 +186,44 @@ saa5050_device::saa5050_device(const machine_config &mconfig, device_type type, 
 }
 
 saa5050_device::saa5050_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, SAA5050, "SAA5050 Video", tag, owner, clock, "saa5050", __FILE__),
-	m_char_rom(*this, "chargen"),
-	m_read_d(*this),
-	m_frame_count(0),
-	m_cols(0),
-	m_rows(0),
-	m_size(0)
+	saa5050_device(mconfig, SAA5050, tag, owner, clock)
 {
 }
 
 saa5051_device::saa5051_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: saa5050_device(mconfig, SAA5051, "SAA5051", tag, owner, clock, "saa5051", __FILE__) { }
+	: saa5050_device(mconfig, SAA5051, tag, owner, clock)
+{
+}
 
 saa5052_device::saa5052_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: saa5050_device(mconfig, SAA5052, "SAA5052", tag, owner, clock, "saa5052", __FILE__) { }
+	: saa5050_device(mconfig, SAA5052, tag, owner, clock)
+{
+}
 
 saa5053_device::saa5053_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: saa5050_device(mconfig, SAA5053, "SAA5053", tag, owner, clock, "saa5053", __FILE__) { }
+	: saa5050_device(mconfig, SAA5053, tag, owner, clock)
+{
+}
 
 saa5054_device::saa5054_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: saa5050_device(mconfig, SAA5054, "SAA5054", tag, owner, clock, "saa5054", __FILE__) { }
+	: saa5050_device(mconfig, SAA5054, tag, owner, clock)
+{
+}
 
 saa5055_device::saa5055_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: saa5050_device(mconfig, SAA5055, "SAA5055", tag, owner, clock, "saa5055", __FILE__) { }
+	: saa5050_device(mconfig, SAA5055, tag, owner, clock)
+{
+}
 
 saa5056_device::saa5056_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: saa5050_device(mconfig, SAA5056, "SAA5056", tag, owner, clock, "saa5056", __FILE__) { }
+	: saa5050_device(mconfig, SAA5056, tag, owner, clock)
+{
+}
 
 saa5057_device::saa5057_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: saa5050_device(mconfig, SAA5057, "SAA5057", tag, owner, clock, "saa5057", __FILE__) { }
+	: saa5050_device(mconfig, SAA5057, tag, owner, clock)
+{
+}
 
 
 

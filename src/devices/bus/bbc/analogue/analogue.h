@@ -26,10 +26,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_BBC_ANALOGUE_ANALOGUE_H
+#define MAME_BUS_BBC_ANALOGUE_ANALOGUE_H
 
-#ifndef __BBC_ANALOGUE_SLOT__
-#define __BBC_ANALOGUE_SLOT__
+#pragma once
 
 
 
@@ -61,7 +61,6 @@ class bbc_analogue_slot_device : public device_t, public device_slot_interface
 public:
 	// construction/destruction
 	bbc_analogue_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual ~bbc_analogue_slot_device() {}
 
 	uint8_t ch_r(int channel);
 	uint8_t pb_r();
@@ -81,21 +80,21 @@ class device_bbc_analogue_interface : public device_slot_card_interface
 {
 public:
 	// construction/destruction
-	device_bbc_analogue_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_bbc_analogue_interface();
 
 	virtual uint8_t ch_r(int channel) { return 0x00; };
 	virtual uint8_t pb_r() { return 0x30; };
 
 protected:
+	device_bbc_analogue_interface(const machine_config &mconfig, device_t &device);
+
 	bbc_analogue_slot_device *m_slot;
 };
 
 
 // device type definition
-extern const device_type BBC_ANALOGUE_SLOT;
+DECLARE_DEVICE_TYPE(BBC_ANALOGUE_SLOT, bbc_analogue_slot_device)
 
 SLOT_INTERFACE_EXTERN( bbc_analogue_devices );
 
-
-#endif
+#endif // MAME_BUS_BBC_ANALOGUE_ANALOGUE_H

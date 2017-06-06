@@ -678,12 +678,10 @@ void vsnes_state::mapper4_set_chr(  )
 	v_set_videorom_bank(chr_page ^ 7, 1, m_MMC3_chr_bank[5]);
 }
 
-#define BOTTOM_VISIBLE_SCANLINE 239     /* The bottommost visible scanline */
-#define NUM_SCANLINE 262
 
 void vsnes_state::mapper4_irq( int scanline, int vblank, int blanked )
 {
-	if (scanline < PPU_BOTTOM_VISIBLE_SCANLINE)
+	if (scanline < ppu2c0x_device::BOTTOM_VISIBLE_SCANLINE)
 	{
 		int priorCount = m_IRQ_count;
 		if (m_IRQ_count == 0)
@@ -763,12 +761,12 @@ WRITE8_MEMBER(vsnes_state::mapper4_w)
 		case 0x6000: /* $e000 - Disable IRQs */
 			m_IRQ_enable = 0;
 			m_IRQ_count = m_IRQ_count_latch;
-			m_ppu1->set_scanline_callback(ppu2c0x_scanline_delegate());
+			m_ppu1->set_scanline_callback(ppu2c0x_device::scanline_delegate());
 			break;
 
 		case 0x6001: /* $e001 - Enable IRQs */
 			m_IRQ_enable = 1;
-			m_ppu1->set_scanline_callback(ppu2c0x_scanline_delegate(FUNC(vsnes_state::mapper4_irq), this));
+			m_ppu1->set_scanline_callback(ppu2c0x_device::scanline_delegate(FUNC(vsnes_state::mapper4_irq), this));
 			break;
 
 		default:

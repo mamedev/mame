@@ -17,46 +17,16 @@
 #include "2608intf.h"
 #include "fm.h"
 
-static void psg_set_clock(void *param, int clock)
+const ssg_callbacks ym2608_device::psgintf =
 {
-	ym2608_device *ym2608 = (ym2608_device *) param;
-	ym2608->ay_set_clock(clock);
-}
-
-static void psg_write(void *param, int address, int data)
-{
-	ym2608_device *ym2608 = (ym2608_device *) param;
-	ym2608->ay8910_write_ym(address, data);
-}
-
-static int psg_read(void *param)
-{
-	ym2608_device *ym2608 = (ym2608_device *) param;
-	return ym2608->ay8910_read_ym();
-}
-
-static void psg_reset(void *param)
-{
-	ym2608_device *ym2608 = (ym2608_device *) param;
-	ym2608->ay8910_reset_ym();
-}
-
-static const ssg_callbacks psgintf =
-{
-	psg_set_clock,
-	psg_write,
-	psg_read,
-	psg_reset
+	&ym2608_device::psg_set_clock,
+	&ym2608_device::psg_write,
+	&ym2608_device::psg_read,
+	&ym2608_device::psg_reset
 };
 
 /* IRQ Handler */
-static void IRQHandler(void *param,int irq)
-{
-	ym2608_device *ym2608 = (ym2608_device *) param;
-	ym2608->_IRQHandler(irq);
-}
-
-void ym2608_device::_IRQHandler(int irq)
+void ym2608_device::irq_handler(int irq)
 {
 	if (!m_irq_handler.isnull())
 		m_irq_handler(irq);
@@ -77,13 +47,7 @@ void ym2608_device::device_timer(emu_timer &timer, device_timer_id id, int param
 	}
 }
 
-static void timer_handler(void *param,int c,int count,int clock)
-{
-	ym2608_device *ym2608 = (ym2608_device *) param;
-	ym2608->_timer_handler(c, count, clock);
-}
-
-void ym2608_device::_timer_handler(int c,int count,int clock)
+void ym2608_device::timer_handler(int c,int count,int clock)
 {
 	if( count == 0 )
 	{   /* Reset FM Timer */
@@ -96,18 +60,6 @@ void ym2608_device::_timer_handler(int c,int count,int clock)
 		if (!m_timer[c]->enable(true))
 			m_timer[c]->adjust(period);
 	}
-}
-
-/* update request from fm.c */
-void ym2608_update_request(void *param)
-{
-	ym2608_device *ym2608 = (ym2608_device *) param;
-	ym2608->_ym2608_update_request();
-}
-
-void ym2608_device::_ym2608_update_request()
-{
-	m_stream->update();
 }
 
 //-------------------------------------------------
@@ -149,9 +101,9 @@ void ym2608_device::device_start()
 	pcmsizea = m_region->bytes();
 
 	/* initialize YM2608 */
-	m_chip = ym2608_init(this,this,clock(),rate,
+	m_chip = ym2608_init(this,clock(),rate,
 					pcmbufa,pcmsizea,
-					timer_handler,IRQHandler,&psgintf);
+					&ym2608_device::static_timer_handler,&ym2608_device::static_irq_handler,&psgintf);
 	assert_always(m_chip != nullptr, "Error creating YM2608 chip");
 }
 
@@ -184,12 +136,15 @@ WRITE8_MEMBER( ym2608_device::write )
 	ym2608_write(m_chip, offset & 3, data);
 }
 
-const device_type YM2608 = device_creator<ym2608_device>;
+DEFINE_DEVICE_TYPE(YM2608, ym2608_device, "ym2608", "YM2608 OPNA")
 
 ym2608_device::ym2608_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ay8910_device(mconfig, YM2608, "YM2608", tag, owner, clock, PSG_TYPE_YM, 1, 2, "ym2608", __FILE__),
-		m_irq_handler(*this),
-		m_region(*this, DEVICE_SELF)
+	: ay8910_device(mconfig, YM2608, tag, owner, clock, PSG_TYPE_YM, 1, 2)
+	, m_stream(nullptr)
+	, m_timer{ nullptr, nullptr }
+	, m_chip(nullptr)
+	, m_irq_handler(*this)
+	, m_region(*this, DEVICE_SELF)
 {
 }
 

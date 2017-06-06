@@ -440,7 +440,7 @@ ADDRESS_MAP_END
 *    Machine Drivers     *
 *************************/
 
-static MACHINE_CONFIG_START( wildpkr, wildpkr_state )
+static MACHINE_CONFIG_START( wildpkr )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, MAIN_CLOCK)
@@ -471,7 +471,7 @@ static MACHINE_CONFIG_START( wildpkr, wildpkr_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( tabpkr, wildpkr_state )
+static MACHINE_CONFIG_START( tabpkr )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2)
@@ -579,6 +579,6 @@ DRIVER_INIT_MEMBER(wildpkr_state,wildpkr)
 *      Game Drivers      *
 *************************/
 
-/*    YEAR  NAME       PARENT    MACHINE   INPUT     INIT      ROT    COMPANY        FULLNAME                   FLAGS */
+//    YEAR  NAME       PARENT    MACHINE   INPUT    STATE           INIT      ROT   COMPANY        FULLNAME                    FLAGS
 GAME( 199?, wildpkr,   0,        wildpkr,  wildpkr, wildpkr_state,  wildpkr,  ROT0, "TAB Austria", "Wild Poker (ver. D 1.01)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1996, tabpkr,    0,        tabpkr,   tabpkr,  wildpkr_state,  wildpkr,  ROT0, "TAB Austria", "Royal Poker V 1.85", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1996, tabpkr,    0,        tabpkr,   tabpkr,  wildpkr_state,  wildpkr,  ROT0, "TAB Austria", "Royal Poker V 1.85",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )

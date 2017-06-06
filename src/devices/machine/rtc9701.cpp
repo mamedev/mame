@@ -15,7 +15,7 @@
 #include "machine/rtc9701.h"
 
 
-ALLOW_SAVE_TYPE(rtc9701_state_t);
+ALLOW_SAVE_TYPE(rtc9701_device::state_t);
 
 
 //**************************************************************************
@@ -23,7 +23,7 @@ ALLOW_SAVE_TYPE(rtc9701_state_t);
 //**************************************************************************
 
 // device type definition
-const device_type rtc9701 = device_creator<rtc9701_device>;
+DEFINE_DEVICE_TYPE(RTC9701, rtc9701_device, "rtc9701", "Epson RTC-9701-JE RTC/EEPROM")
 
 
 //**************************************************************************
@@ -35,17 +35,19 @@ const device_type rtc9701 = device_creator<rtc9701_device>;
 //-------------------------------------------------
 
 rtc9701_device::rtc9701_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, rtc9701, "RTC-9701", tag, owner, clock, "rtc9701", __FILE__),
-		device_nvram_interface(mconfig, *this),
-		m_latch(0),
-		m_reset_line(CLEAR_LINE),
-		m_clock_line(CLEAR_LINE), rtc_state(), cmd_stream_pos(0), current_cmd(0), rtc9701_address_pos(0), rtc9701_current_address(0), rtc9701_current_data(0), rtc9701_data_pos(0)
+	: device_t(mconfig, RTC9701, tag, owner, clock)
+	, device_nvram_interface(mconfig, *this)
+	, m_latch(0)
+	, m_reset_line(CLEAR_LINE)
+	, m_clock_line(CLEAR_LINE)
+	, rtc_state()
+	, cmd_stream_pos(0), current_cmd(0), rtc9701_address_pos(0), rtc9701_current_address(0), rtc9701_current_data(0), rtc9701_data_pos(0)
 {
 }
 
 TIMER_CALLBACK_MEMBER(rtc9701_device::timer_callback)
 {
-	static const uint8_t dpm[12] = { 0x31, 0x28, 0x31, 0x30, 0x31, 0x30, 0x31, 0x31, 0x30, 0x31, 0x30, 0x31 };
+	static constexpr uint8_t dpm[12] = { 0x31, 0x28, 0x31, 0x30, 0x31, 0x30, 0x31, 0x31, 0x30, 0x31, 0x30, 0x31 };
 	int dpm_count;
 
 	m_rtc.sec++;
@@ -90,7 +92,8 @@ void rtc9701_device::device_validity_check(validity_checker &valid) const
 void rtc9701_device::device_start()
 {
 	/* let's call the timer callback every second */
-	machine().scheduler().timer_pulse(attotime::from_hz(clock() / XTAL_32_768kHz), timer_expired_delegate(FUNC(rtc9701_device::timer_callback), this));
+	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(rtc9701_device::timer_callback), this));
+	m_timer->adjust(attotime::from_hz(clock() / XTAL_32_768kHz), 0, attotime::from_hz(clock() / XTAL_32_768kHz));
 
 	system_time systime;
 	machine().base_datetime(systime);

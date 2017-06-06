@@ -42,7 +42,8 @@ public:
 	std::unique_ptr<uint16_t[]> m_spriteram2_older;
 
 	DECLARE_READ16_MEMBER(pending_command_r);
-	DECLARE_WRITE16_MEMBER(sound_command_w);
+	DECLARE_WRITE8_MEMBER(sound_command_w);
+	DECLARE_WRITE8_MEMBER(unknown_output_w);
 	DECLARE_WRITE8_MEMBER(pending_command_clear_w);
 	DECLARE_WRITE8_MEMBER(sh_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(sprite_character_bank_select_w);

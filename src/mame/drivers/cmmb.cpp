@@ -381,7 +381,7 @@ void cmmb_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( cmmb, cmmb_state )
+static MACHINE_CONFIG_START( cmmb )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M65SC02, MAIN_CLOCK/5) // Unknown clock, but chip rated for 14MHz
@@ -423,4 +423,4 @@ ROM_START( cmmb162 )
 	ROM_REGION( 0x1000, "gfx", ROMREGION_ERASE00 )
 ROM_END
 
-GAME( 2002, cmmb162,  0,       cmmb,  cmmb, driver_device,  0, ROT270, "Cosmodog / Team Play (Licensed from Infogrames via Midway Games West)", "Centipede / Millipede / Missile Command / Let's Go Bowling (rev 1.62)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+GAME( 2002, cmmb162,  0,       cmmb,  cmmb, cmmb_state,  0, ROT270, "Cosmodog / Team Play (Licensed from Infogrames via Midway Games West)", "Centipede / Millipede / Missile Command / Let's Go Bowling (rev 1.62)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )

@@ -1609,7 +1609,7 @@ WRITE_LINE_MEMBER(konamigx_state::hblank_irq_ack_w)
 	m_gx_syncen |= 0x40;
 }
 
-static MACHINE_CONFIG_START( konamigx, konamigx_state )
+static MACHINE_CONFIG_START( konamigx )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, MASTER_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(gx_type2_map)

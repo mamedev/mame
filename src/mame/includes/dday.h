@@ -6,6 +6,7 @@
 
 *************************************************************************/
 #include "screen.h"
+#include "sound/ay8910.h"
 
 
 class dday_state : public driver_device
@@ -20,7 +21,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_ay1(*this, "ay1") { }
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_textvideoram;
@@ -38,9 +40,9 @@ public:
 	int            m_sl_image;
 	int            m_sl_enable;
 	int            m_timer_value;
+	emu_timer *m_countdown_timer;
 
 	/* devices */
-	device_t *m_ay1;
 	DECLARE_READ8_MEMBER(dday_countdown_timer_r);
 	DECLARE_WRITE8_MEMBER(dday_bgvideoram_w);
 	DECLARE_WRITE8_MEMBER(dday_fgvideoram_w);
@@ -64,4 +66,5 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device<ay8910_device> m_ay1;
 };

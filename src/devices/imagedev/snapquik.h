@@ -8,8 +8,8 @@
 
 *********************************************************************/
 
-#ifndef __SNAPQUIK_H__
-#define __SNAPQUIK_H__
+#ifndef MAME_DEVICES_IMAGEDEV_SNAPQUIK_H
+#define MAME_DEVICES_IMAGEDEV_SNAPQUIK_H
 
 #include "softlist_dev.h"
 
@@ -22,7 +22,6 @@ class snapshot_image_device :   public device_t,
 public:
 	// construction/destruction
 	snapshot_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	snapshot_image_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	virtual ~snapshot_image_device();
 
 	static void static_set_interface(device_t &device, const char *_interface) { downcast<snapshot_image_device &>(device).m_interface = _interface; }
@@ -42,7 +41,10 @@ public:
 
 	TIMER_CALLBACK_MEMBER(process_snapshot_or_quickload);
 	void set_handler(snapquick_load_delegate load, const char *ext, seconds_t sec) { m_load = load; m_file_extensions = ext; m_delay_seconds = sec; };
+
 protected:
+	snapshot_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 
@@ -55,7 +57,7 @@ protected:
 };
 
 // device type definition
-extern const device_type SNAPSHOT;
+DECLARE_DEVICE_TYPE(SNAPSHOT, snapshot_image_device)
 
 // ======================> quickload_image_device
 
@@ -69,7 +71,7 @@ public:
 };
 
 // device type definition
-extern const device_type QUICKLOAD;
+DECLARE_DEVICE_TYPE(QUICKLOAD, quickload_image_device)
 
 /***************************************************************************
     DEVICE CONFIGURATION MACROS
@@ -100,4 +102,4 @@ extern const device_type QUICKLOAD;
 #define MCFG_QUICKLOAD_INTERFACE(_interface)                         \
 	quickload_image_device::static_set_interface(*device, _interface);
 
-#endif /* __SNAPQUIK_H__ */
+#endif // MAME_DEVICES_IMAGEDEV_SNAPQUIK_H

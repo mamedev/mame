@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_WANGPC_RTC_H
+#define MAME_BUS_WANGPC_RTC_H
 
-#ifndef __WANGPC_RTC__
-#define __WANGPC_RTC__
+#pragma once
 
 #include "wangpc.h"
 #include "cpu/z80/z80.h"
@@ -59,7 +59,6 @@ private:
 
 
 // device type definition
-extern const device_type WANGPC_RTC;
+DECLARE_DEVICE_TYPE(WANGPC_RTC, wangpc_rtc_device)
 
-
-#endif
+#endif // MAME_BUS_WANGPC_RTC_H

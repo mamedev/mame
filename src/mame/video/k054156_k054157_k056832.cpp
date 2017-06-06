@@ -168,6 +168,11 @@ ones.  The other 7 words are ignored.  Global scrollx is ignored.
 #include "k054156_k054157_k056832.h"
 #include "konami_helper.h"
 
+#include "video/k055555.h" // still needs k055555_get_palette_index
+
+#define VERBOSE 0
+#include "logmacro.h"
+
 
 /* end common functions */
 
@@ -179,10 +184,10 @@ ones.  The other 7 words are ignored.  Global scrollx is ignored.
 
 
 
-const device_type K056832 = device_creator<k056832_device>;
+DEFINE_DEVICE_TYPE(K056832, k056832_device, "k056832", "K056832 Tilemap Generator")
 
 k056832_device::k056832_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, K056832, "K056832 Tilemap Generator", tag, owner, clock, "k056832", __FILE__),
+	: device_t(mconfig, K056832, tag, owner, clock),
 	device_gfx_interface(mconfig, *this),
 	//m_tilemap[K056832_PAGE_COUNT],
 	//*m_pixmap[K056832_PAGE_COUNT],
@@ -333,6 +338,9 @@ void k056832_device::finalize_init()
 
 void k056832_device::device_start()
 {
+	if (!palette().device().started())
+		throw device_missing_dependencies();
+
 	memset(m_regs,     0x00, sizeof(m_regs) );
 	memset(m_regsb,    0x00, sizeof(m_regsb) );
 
@@ -640,9 +648,7 @@ READ16_MEMBER( k056832_device::k_5bpp_rom_word_r )
 	else if (mem_mask == 0x00ff)
 		return rom_read_b(offset * 2 + 1, 4, 5, 0)<<16;
 	else
-	{
-		//LOG(("Non-byte read of tilemap ROM, PC=%x (mask=%x)\n", space.device().safe_pc(), mem_mask));
-	}
+		LOG("Non-byte read of tilemap ROM, PC=%x (mask=%x)\n", space.device().safe_pc(), mem_mask);
 	return 0;
 }
 
@@ -657,9 +663,7 @@ READ32_MEMBER( k056832_device::k_5bpp_rom_long_r )
 	else if (mem_mask == 0x000000ff)
 		return rom_read_b(offset * 4 + 3, 4, 5, 1);
 	else
-	{
-		//LOG(("Non-byte read of tilemap ROM, PC=%x (mask=%x)\n", space.device().safe_pc(), mem_mask));
-	}
+		LOG("Non-byte read of tilemap ROM, PC=%x (mask=%x)\n", space.device().safe_pc(), mem_mask);
 	return 0;
 }
 
@@ -674,9 +678,7 @@ READ32_MEMBER( k056832_device::k_6bpp_rom_long_r )
 	else if (mem_mask == 0x000000ff)
 		return rom_read_b(offset * 4 + 3, 4, 6, 0);
 	else
-	{
-		//LOG(("Non-byte read of tilemap ROM, PC=%x (mask=%x)\n", space.device().safe_pc(), mem_mask));
-	}
+		LOG("Non-byte read of tilemap ROM, PC=%x (mask=%x)\n", space.device().safe_pc(), mem_mask);
 	return 0;
 }
 

@@ -44,21 +44,21 @@ namespace plib
 	{
 		std::vector<pstring> ret;
 
-		pstring::iterator p = str.begin();
-		pstring::iterator pn = str.find(onstr, p);
+		pstring::size_type p = 0;
+		pstring::size_type pn = str.find(onstr, p);
 
-		while (pn != str.end())
+		while (pn != pstring::npos)
 		{
-			pstring t = str.substr(p, pn);
-			if (!ignore_empty || t.len() != 0)
+			pstring t = str.substr(p, pn - p);
+			if (!ignore_empty || t.length() != 0)
 				ret.push_back(t);
-			p = pn + onstr.len();
+			p = pn + onstr.length();
 			pn = str.find(onstr, p);
 		}
-		if (p != str.end())
+		if (p < str.length())
 		{
-			pstring t = str.substr(p, str.end());
-			if (!ignore_empty || t.len() != 0)
+			pstring t = str.substr(p);
+			if (!ignore_empty || t.length() != 0)
 				ret.push_back(t);
 		}
 		return ret;
@@ -69,13 +69,13 @@ namespace plib
 		pstring col = "";
 		std::vector<pstring> ret;
 
-		unsigned i = 0;
-		while (i<str.blen())
+		auto i = str.begin();
+		while (i != str.end())
 		{
 			std::size_t p = static_cast<std::size_t>(-1);
 			for (std::size_t j=0; j < onstrl.size(); j++)
 			{
-				if (std::equal(onstrl[j].c_str(), onstrl[j].c_str() + onstrl[j].blen(), &(str.c_str()[i])))
+				if (std::equal(onstrl[j].begin(), onstrl[j].end(), i))
 				{
 					p = j;
 					break;
@@ -88,13 +88,13 @@ namespace plib
 
 				col = "";
 				ret.push_back(onstrl[p]);
-				i += onstrl[p].blen();
+				i = std::next(i, static_cast<pstring::difference_type>(onstrl[p].length()));
 			}
 			else
 			{
-				pstring::traits::code_t c = pstring::traits::code(str.c_str() + i);
+				pstring::code_t c = *i;
 				col += c;
-				i+=pstring::traits::codelen(c);
+				i++;
 			}
 		}
 		if (col != "")

@@ -1,23 +1,22 @@
 // license:BSD-3-Clause
 // copyright-holders:S. Smith,David Haywood,Fabio Priuli
-#ifndef __NEOGEO_KOF10TH_H
-#define __NEOGEO_KOF10TH_H
+#ifndef MAME_BUS_NEOGEO_BOOT_KOF10TH_H
+#define MAME_BUS_NEOGEO_BOOT_KOF10TH_H
+
+#pragma once
 
 #include "slot.h"
 #include "boot_misc.h"
 #include "prot_misc.h"
 
-// ======================> neogeo_kof10th_cart
+// ======================> neogeo_kof10th_cart_device
 
-class neogeo_kof10th_cart : public neogeo_bootleg_cart
+class neogeo_kof10th_cart_device : public neogeo_bootleg_cart_device
 {
 public:
 	// construction/destruction
-	neogeo_kof10th_cart(const machine_config &mconfig, const char *tag, device_t *owner, uint16_t clock);
+	neogeo_kof10th_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint16_t clock);
 
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// reading and writing
@@ -29,7 +28,12 @@ public:
 	virtual DECLARE_WRITE16_MEMBER(protection_w) override;
 
 	virtual void decrypt_all(DECRYPT_ALL_PARAMS) override;
-	virtual int get_fixed_bank_type(void) override { return 0; }
+	virtual int get_fixed_bank_type() override { return 0; }
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	uint8_t* m_fixed;
@@ -39,8 +43,6 @@ private:
 };
 
 // device type definition
-extern const device_type NEOGEO_KOF10TH_CART;
+DECLARE_DEVICE_TYPE(NEOGEO_KOF10TH_CART, neogeo_kof10th_cart_device)
 
-
-
-#endif
+#endif // MAME_BUS_NEOGEO_BOOT_KOF10TH_H

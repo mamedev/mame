@@ -55,7 +55,7 @@ public:
 	}
 
 	// devices
-	required_device<netlist_mame_device_t> m_maincpu;
+	required_device<netlist_mame_device> m_maincpu;
 	required_device<fixedfreq_device> m_video;
 
 protected:
@@ -98,7 +98,7 @@ void pse_state::video_start()
 {
 }
 
-static MACHINE_CONFIG_START( pse, pse_state )
+static MACHINE_CONFIG_START( pse )
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, NETLIST_CLOCK)
@@ -152,7 +152,7 @@ ROM_START( dpatrol )
 	ROM_LOAD( "bd1.e2", 0x0400, 0x0400, CRC(256b3320) SHA1(712573e3d9625a84c54bbe2e3edafb8879a14b2e)) // Computer program game code. 6341-1 or 82S181 according to Desert Patrol schematics
 
 	ROM_LOAD( "bd2.l4", 0x0800, 0x0200, CRC(bc87c648) SHA1(c4709d155aa50cc87146abd152a11de618cfd64c)) // PROM 1 contains aircraft target images and explosion image. PCB has 82S141; schematics show 6341-1
-	ROM_LOAD( "bd2.l1", 0x0A00, 0x0200, CRC(4ddcc237) SHA1(6bfad6a8bf8387e93c0bb1a04b647690b3701d54)) // PROM 2 contains parachute and man, falling man. PCB has 82S141; schematics show 6341-1
+	ROM_LOAD( "bd2.l1", 0x0A00, 0x0200, CRC(4ddcc237) SHA1(6bfad6a8bf8387e93c0bb1a04b647690b3701d54)) // PROM 2 contains parachute and man, falling man. PCB has 82S141; schematics show 6341-1 (from dpatrola, but expected to match)
 
 	ROM_LOAD( "bd2.h7", 0x0C00, 0x0020, NO_DUMP) // Contains PROM address codes and image speeds. Each image has its own speed and address block in the image PROM. Chip is 82S123
 
@@ -204,9 +204,9 @@ ROM_START( gametree )
 ROM_END
 
 
-GAME( 1976, bazooka,    0,       pse, 0, driver_device,  0, ROT0, "Project Support Engineering", "Bazooka [TTL]", MACHINE_IS_SKELETON )
-GAME( 1977, bazookabr,  bazooka, pse, 0, driver_device,  0, ROT0, "Taito do Brasil", "Bazooka (Brazil) [TTL]", MACHINE_IS_SKELETON )
-GAME( 1977, dpatrol,    0,       pse, 0, driver_device,  0, ROT0, "Project Support Engineering", "Desert Patrol [TTL]", MACHINE_IS_SKELETON )
-GAME( 1977, dpatrola,   dpatrol, pse, 0, driver_device,  0, ROT0, "Project Support Engineering (Telegames license)", "Desert Patrol (set 2) [TTL]", MACHINE_IS_SKELETON )
-GAME( 1978, gametree, 0,       pse, 0, driver_device,  0, ROT0, "Project Support Engineering", "Game Tree [TTL]", MACHINE_IS_SKELETON )
-//GAME( 1976, knightar, 0,       pse, 0, driver_device,  0, ROT0, "Project Support Engineering", "Knights in Armor [TTL]", MACHINE_IS_SKELETON )
+GAME( 1976, bazooka,    0,       pse, 0, pse_state,  0, ROT0, "Project Support Engineering", "Bazooka [TTL]", MACHINE_IS_SKELETON )
+GAME( 1977, bazookabr,  bazooka, pse, 0, pse_state,  0, ROT0, "Taito do Brasil", "Bazooka (Brazil) [TTL]", MACHINE_IS_SKELETON )
+GAME( 1977, dpatrol,    0,       pse, 0, pse_state,  0, ROT0, "Project Support Engineering", "Desert Patrol [TTL]", MACHINE_IS_SKELETON )
+GAME( 1977, dpatrola,   dpatrol, pse, 0, pse_state,  0, ROT0, "Project Support Engineering (Telegames license)", "Desert Patrol (set 2) [TTL]", MACHINE_IS_SKELETON )
+GAME( 1978, gametree,   0,       pse, 0, pse_state,  0, ROT0, "Project Support Engineering", "Game Tree [TTL]", MACHINE_IS_SKELETON )
+//GAME( 1976, knightar, 0,       pse, 0, pse_state,  0, ROT0, "Project Support Engineering", "Knights in Armor [TTL]", MACHINE_IS_SKELETON )

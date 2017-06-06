@@ -14,18 +14,19 @@
 #include "arc.h"
 
 
-const device_type ARC = device_creator<arc_device>;
+DEFINE_DEVICE_TYPE(ARC, arc_cpu_device, "arc_a4", "ARCtangent A4")
 
 
-arc_device::arc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, ARC, "ARCtangent A4", tag, owner, clock, "arc", __FILE__)
-	, m_program_config("program", ENDIANNESS_BIG, 32, 24, 0), m_pc(0), m_program(nullptr), m_icount(0), m_debugger_temp(0)
+arc_cpu_device::arc_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: cpu_device(mconfig, ARC, tag, owner, clock)
+	, m_program_config("program", ENDIANNESS_BIG, 32, 24, 0)
+	, m_pc(0), m_program(nullptr), m_icount(0), m_debugger_temp(0)
 // some docs describe these as 'middle endian'?!
 {
 }
 
 
-offs_t arc_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t arc_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( arc );
 	return CPU_DISASSEMBLE_NAME(arc)(this, stream, pc, oprom, opram, options);
@@ -36,26 +37,26 @@ offs_t arc_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uin
 
 /*****************************************************************************/
 
-void arc_device::unimplemented_opcode(uint16_t op)
+void arc_cpu_device::unimplemented_opcode(uint16_t op)
 {
 	fatalerror("arc: unknown opcode %04x at %04x\n", op, m_pc << 2);
 }
 
 /*****************************************************************************/
 
-uint32_t arc_device::READ32(uint32_t address)
+uint32_t arc_cpu_device::READ32(uint32_t address)
 {
 	return m_program->read_dword(address << 2);
 }
 
-void arc_device::WRITE32(uint32_t address, uint32_t data)
+void arc_cpu_device::WRITE32(uint32_t address, uint32_t data)
 {
 	m_program->write_dword(address << 2, data);
 }
 
 /*****************************************************************************/
 
-void arc_device::device_start()
+void arc_cpu_device::device_start()
 {
 	m_pc = 0;
 
@@ -75,7 +76,7 @@ void arc_device::device_start()
 //  to a known location where it can be read
 //-------------------------------------------------
 
-void arc_device::state_export(const device_state_entry &entry)
+void arc_cpu_device::state_export(const device_state_entry &entry)
 {
 	switch (entry.index())
 	{
@@ -92,7 +93,7 @@ void arc_device::state_export(const device_state_entry &entry)
 //  after it has been set
 //-------------------------------------------------
 
-void arc_device::state_import(const device_state_entry &entry)
+void arc_cpu_device::state_import(const device_state_entry &entry)
 {
 	switch (entry.index())
 	{
@@ -103,19 +104,19 @@ void arc_device::state_import(const device_state_entry &entry)
 	}
 }
 
-void arc_device::device_reset()
+void arc_cpu_device::device_reset()
 {
 	m_pc = 0x00000000;
 }
 
 /*****************************************************************************/
 
-void arc_device::execute_set_input(int irqline, int state)
+void arc_cpu_device::execute_set_input(int irqline, int state)
 {
 }
 
 
-void arc_device::execute_run()
+void arc_cpu_device::execute_run()
 {
 	//uint32_t lres;
 	//lres = 0;

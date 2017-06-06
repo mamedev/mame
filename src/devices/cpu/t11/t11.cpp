@@ -12,8 +12,8 @@
 *****************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "t11.h"
+#include "debugger.h"
 
 
 /*************************************
@@ -35,17 +35,17 @@
 #define PSW     m_psw.b.l
 
 
-const device_type T11 = device_creator<t11_device>;
-const device_type K1801VM2 = device_creator<k1801vm2_device>;
+DEFINE_DEVICE_TYPE(T11,      t11_device,      "t11",      "T11")
+DEFINE_DEVICE_TYPE(K1801VM2, k1801vm2_device, "k1801vm2", "K1801VM2")
 
 
 k1801vm2_device::k1801vm2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: t11_device(mconfig, K1801VM2, "K1801VM2", tag, owner, clock, "k1801vm2", __FILE__)
+	: t11_device(mconfig, K1801VM2, tag, owner, clock)
 {
 }
 
-t11_device::t11_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
+t11_device::t11_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, 16, 0)
 	, c_initial_mode(0)
 	, m_out_reset_func(*this)
@@ -56,14 +56,8 @@ t11_device::t11_device(const machine_config &mconfig, device_type type, const ch
 }
 
 t11_device::t11_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, T11, "T11", tag, owner, clock, "t11", __FILE__)
-	, m_program_config("program", ENDIANNESS_LITTLE, 16, 16, 0)
-	, c_initial_mode(0)
-	, m_out_reset_func(*this)
+	: t11_device(mconfig, T11, tag, owner, clock)
 {
-	m_program_config.m_is_octal = true;
-	memset(m_reg, 0x00, sizeof(m_reg));
-	memset(&m_psw, 0x00, sizeof(m_psw));
 }
 
 

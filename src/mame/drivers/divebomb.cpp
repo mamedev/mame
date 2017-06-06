@@ -445,7 +445,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( divebomb, divebomb_state )
+static MACHINE_CONFIG_START( divebomb )
 
 	MCFG_CPU_ADD("fgcpu", Z80,XTAL1/4) // ?
 	MCFG_CPU_PROGRAM_MAP(divebomb_fgcpu_map)
@@ -630,4 +630,4 @@ MACHINE_RESET_MEMBER(divebomb_state, divebomb)
  *************************************/
 
 // According to a flyer, the world release was to be called 'Gaia'. The Gaia title graphics are present in the ROMs.
-GAME( 1989, divebomb, 0, divebomb, divebomb, driver_device, 0, ROT270, "Konami", "Kyuukoukabakugekitai - Dive Bomber Squad (Japan, prototype)", MACHINE_IS_INCOMPLETE | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, divebomb, 0, divebomb, divebomb, divebomb_state, 0, ROT270, "Konami", "Kyuukoukabakugekitai - Dive Bomber Squad (Japan, prototype)", MACHINE_IS_INCOMPLETE | MACHINE_SUPPORTS_SAVE )

@@ -51,13 +51,13 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_HSSCSI = device_creator<a2bus_hsscsi_device>;
+DEFINE_DEVICE_TYPE(A2BUS_HSSCSI, a2bus_hsscsi_device, "a2hsscsi", "Apple II High-Speed SCSI Card")
 
 #define SCSI_ROM_REGION  "scsi_rom"
 #define SCSI_BUS_TAG     "scsibus"
 #define SCSI_5380_TAG    "scsibus:7:ncr5380"
 
-static MACHINE_CONFIG_FRAGMENT( ncr5380 )
+static MACHINE_CONFIG_START( ncr5380 )
 	MCFG_DEVICE_CLOCK(10000000)
 	MCFG_NCR5380N_DRQ_HANDLER(DEVWRITELINE("^^", a2bus_hsscsi_device, drq_w))
 MACHINE_CONFIG_END
@@ -67,19 +67,6 @@ static SLOT_INTERFACE_START( hsscsi_devices )
 	SLOT_INTERFACE("harddisk", NSCSI_HARDDISK)
 	SLOT_INTERFACE_INTERNAL("ncr5380", NCR5380N)
 SLOT_INTERFACE_END
-
-static MACHINE_CONFIG_FRAGMENT( hsscsi )
-	MCFG_NSCSI_BUS_ADD(SCSI_BUS_TAG)
-	MCFG_NSCSI_ADD("scsibus:0", hsscsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:1", hsscsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:2", hsscsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:3", hsscsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:4", hsscsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:5", hsscsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:6", hsscsi_devices, "harddisk", false)
-	MCFG_NSCSI_ADD("scsibus:7", hsscsi_devices, "ncr5380", true)
-	MCFG_DEVICE_CARD_MACHINE_CONFIG("ncr5380", ncr5380)
-MACHINE_CONFIG_END
 
 ROM_START( hsscsi )
 	ROM_REGION(0x8000, SCSI_ROM_REGION, 0)
@@ -91,14 +78,21 @@ ROM_END
 ***************************************************************************/
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor a2bus_hsscsi_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( hsscsi );
-}
+MACHINE_CONFIG_MEMBER( a2bus_hsscsi_device::device_add_mconfig )
+	MCFG_NSCSI_BUS_ADD(SCSI_BUS_TAG)
+	MCFG_NSCSI_ADD("scsibus:0", hsscsi_devices, nullptr, false)
+	MCFG_NSCSI_ADD("scsibus:1", hsscsi_devices, nullptr, false)
+	MCFG_NSCSI_ADD("scsibus:2", hsscsi_devices, nullptr, false)
+	MCFG_NSCSI_ADD("scsibus:3", hsscsi_devices, nullptr, false)
+	MCFG_NSCSI_ADD("scsibus:4", hsscsi_devices, nullptr, false)
+	MCFG_NSCSI_ADD("scsibus:5", hsscsi_devices, nullptr, false)
+	MCFG_NSCSI_ADD("scsibus:6", hsscsi_devices, "harddisk", false)
+	MCFG_NSCSI_ADD("scsibus:7", hsscsi_devices, "ncr5380", true)
+	MCFG_DEVICE_CARD_MACHINE_CONFIG("ncr5380", ncr5380)
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -113,8 +107,8 @@ const tiny_rom_entry *a2bus_hsscsi_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_hsscsi_device::a2bus_hsscsi_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+a2bus_hsscsi_device::a2bus_hsscsi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this),
 	m_ncr5380(*this, SCSI_5380_TAG),
 	m_scsibus(*this, SCSI_BUS_TAG), m_rom(nullptr), m_rambank(0), m_rombank(0), m_drq(0), m_bank(0), m_816block(false), m_c0ne(0), m_c0nf(0)
@@ -122,10 +116,7 @@ a2bus_hsscsi_device::a2bus_hsscsi_device(const machine_config &mconfig, device_t
 }
 
 a2bus_hsscsi_device::a2bus_hsscsi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, A2BUS_HSSCSI, "Apple II High-Speed SCSI Card", tag, owner, clock, "a2hsscsi", __FILE__),
-	device_a2bus_card_interface(mconfig, *this),
-	m_ncr5380(*this, SCSI_5380_TAG),
-	m_scsibus(*this, SCSI_BUS_TAG), m_rom(nullptr), m_rambank(0), m_rombank(0), m_drq(0), m_bank(0), m_816block(false), m_c0ne(0), m_c0nf(0)
+	a2bus_hsscsi_device(mconfig, A2BUS_HSSCSI, tag, owner, clock)
 {
 }
 

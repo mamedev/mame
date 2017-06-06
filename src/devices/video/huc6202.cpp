@@ -7,27 +7,29 @@
 **********************************************************************/
 
 #include "emu.h"
-#include "huc6270.h"
 #include "huc6202.h"
 
+#include "huc6270.h"
 
-const device_type HUC6202 = device_creator<huc6202_device>;
+
+DEFINE_DEVICE_TYPE(HUC6202, huc6202_device, "huc6202", "Hudson HuC6202 VPC")
 
 
 huc6202_device::huc6202_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, HUC6202, "HuC6202 VPC", tag, owner, clock, "huc6202", __FILE__),
-		m_next_pixel_0_cb(*this),
-		m_time_til_next_event_0_cb(*this),
-		m_vsync_changed_0_cb(*this),
-		m_hsync_changed_0_cb(*this),
-		m_read_0_cb(*this),
-		m_write_0_cb(*this),
-		m_next_pixel_1_cb(*this),
-		m_time_til_next_event_1_cb(*this),
-		m_vsync_changed_1_cb(*this),
-		m_hsync_changed_1_cb(*this),
-		m_read_1_cb(*this),
-		m_write_1_cb(*this), m_window1(0), m_window2(0), m_io_device(0), m_map_index(0), m_map_dirty(0)
+	: device_t(mconfig, HUC6202, tag, owner, clock)
+	, m_next_pixel_0_cb(*this)
+	, m_time_til_next_event_0_cb(*this)
+	, m_vsync_changed_0_cb(*this)
+	, m_hsync_changed_0_cb(*this)
+	, m_read_0_cb(*this)
+	, m_write_0_cb(*this)
+	, m_next_pixel_1_cb(*this)
+	, m_time_til_next_event_1_cb(*this)
+	, m_vsync_changed_1_cb(*this)
+	, m_hsync_changed_1_cb(*this)
+	, m_read_1_cb(*this)
+	, m_write_1_cb(*this)
+	, m_window1(0), m_window2(0), m_io_device(0), m_map_index(0), m_map_dirty(0)
 {
 }
 

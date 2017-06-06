@@ -14,9 +14,10 @@
     IMPLEMENTATION
 ***************************************************************************/
 
+DEFINE_DEVICE_TYPE(IE15_KEYBOARD, ie15_keyboard_device, "ie15kbd", "15WWW-97-006 Keyboard")
 
-ie15_keyboard_device::ie15_keyboard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+ie15_keyboard_device::ie15_keyboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, m_io_kbd(*this, "TERM_LINE%u", 0)
 	, m_io_kbdc(*this, "TERM_LINEC")
 	, m_keyboard_cb(*this)
@@ -24,10 +25,7 @@ ie15_keyboard_device::ie15_keyboard_device(const machine_config &mconfig, device
 }
 
 ie15_keyboard_device::ie15_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, IE15_KEYBOARD, "15WWW-97-006 Keyboard", tag, owner, clock, "ie15_keyboard", __FILE__)
-	, m_io_kbd(*this, "TERM_LINE%u", 0)
-	, m_io_kbdc(*this, "TERM_LINEC")
-	, m_keyboard_cb(*this)
+	: ie15_keyboard_device(mconfig, IE15_KEYBOARD, tag, owner, clock)
 {
 }
 
@@ -124,13 +122,9 @@ const tiny_rom_entry *ie15_keyboard_device::device_rom_region() const
 	return ROM_NAME( ie15_keyboard );
 }
 
-static MACHINE_CONFIG_FRAGMENT( ie15_keyboard )
+MACHINE_CONFIG_MEMBER( ie15_keyboard_device::device_add_mconfig )
 MACHINE_CONFIG_END
 
-machine_config_constructor ie15_keyboard_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME(ie15_keyboard);
-}
 
 void ie15_keyboard_device::device_start()
 {
@@ -299,5 +293,3 @@ ioport_constructor ie15_keyboard_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(ie15_keyboard);
 }
-
-const device_type IE15_KEYBOARD = device_creator<ie15_keyboard_device>;

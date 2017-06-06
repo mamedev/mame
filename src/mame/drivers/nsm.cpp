@@ -119,7 +119,7 @@ void nsm_state::machine_reset()
 	static_cast<tms9995_device*>(machine().device("maincpu"))->ready_line(ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( nsm, nsm_state )
+static MACHINE_CONFIG_START( nsm )
 	// CPU TMS9995, standard variant; no line connection
 	MCFG_TMS99xx_ADD("maincpu", TMS9995, 11052000, nsm_map, nsm_io_map)
 
@@ -156,4 +156,4 @@ ROM_END
 / The Games (1985)
 /-------------------------------------------------------------------*/
 
-GAME(1985,  firebird,  0,  nsm,  nsm, driver_device, 0,  ROT0, "NSM", "Hot Fire Birds", MACHINE_NOT_WORKING | MACHINE_MECHANICAL)
+GAME(1985,  firebird,  0,  nsm,  nsm, nsm_state, 0,  ROT0, "NSM", "Hot Fire Birds", MACHINE_NOT_WORKING | MACHINE_MECHANICAL)

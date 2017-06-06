@@ -333,7 +333,7 @@ INTERRUPT_GEN_MEMBER(igs_m027_state::igs_majhong_interrupt)
 }
 
 
-static MACHINE_CONFIG_START( igs_majhong, igs_m027_state )
+static MACHINE_CONFIG_START( igs_majhong )
 	MCFG_CPU_ADD("maincpu",ARM7, 20000000)
 
 	MCFG_CPU_PROGRAM_MAP(igs_majhong_map)
@@ -367,7 +367,7 @@ MACHINE_CONFIG_END
 
 
 
-static MACHINE_CONFIG_START( amazonia, igs_m027_state )
+static MACHINE_CONFIG_START( amazonia )
 	MCFG_CPU_ADD("maincpu",ARM7, 20000000)
 
 	MCFG_CPU_PROGRAM_MAP(igs_majhong_map)

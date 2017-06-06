@@ -52,22 +52,11 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_CORVUS = device_creator<a2bus_corvus_device>;
+DEFINE_DEVICE_TYPE(A2BUS_CORVUS, a2bus_corvus_device, "a2corvus", "Corvus Flat Cable interface")
 
 #define CORVUS_ROM_REGION  "corvus_rom"
 #define CORVUS_HD_TAG      "corvushd"
 
-static MACHINE_CONFIG_FRAGMENT(corvus)
-	MCFG_DEVICE_ADD(CORVUS_HD_TAG, CORVUS_HDC, 0)
-	MCFG_HARDDISK_ADD("harddisk1")
-	MCFG_HARDDISK_INTERFACE("corvus_hdd")
-	MCFG_HARDDISK_ADD("harddisk2")
-	MCFG_HARDDISK_INTERFACE("corvus_hdd")
-	MCFG_HARDDISK_ADD("harddisk3")
-	MCFG_HARDDISK_INTERFACE("corvus_hdd")
-	MCFG_HARDDISK_ADD("harddisk4")
-	MCFG_HARDDISK_INTERFACE("corvus_hdd")
-MACHINE_CONFIG_END
 
 ROM_START( corvus )
 	ROM_REGION(0x800, CORVUS_ROM_REGION, 0)
@@ -79,14 +68,20 @@ ROM_END
 ***************************************************************************/
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor a2bus_corvus_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( corvus );
-}
+MACHINE_CONFIG_MEMBER(a2bus_corvus_device::device_add_mconfig)
+	MCFG_DEVICE_ADD(CORVUS_HD_TAG, CORVUS_HDC, 0)
+	MCFG_HARDDISK_ADD("harddisk1")
+	MCFG_HARDDISK_INTERFACE("corvus_hdd")
+	MCFG_HARDDISK_ADD("harddisk2")
+	MCFG_HARDDISK_INTERFACE("corvus_hdd")
+	MCFG_HARDDISK_ADD("harddisk3")
+	MCFG_HARDDISK_INTERFACE("corvus_hdd")
+	MCFG_HARDDISK_ADD("harddisk4")
+	MCFG_HARDDISK_INTERFACE("corvus_hdd")
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -101,17 +96,15 @@ const tiny_rom_entry *a2bus_corvus_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_corvus_device::a2bus_corvus_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+a2bus_corvus_device::a2bus_corvus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this),
 	m_corvushd(*this, CORVUS_HD_TAG), m_rom(nullptr)
 {
 }
 
 a2bus_corvus_device::a2bus_corvus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, A2BUS_CORVUS, "Corvus Flat Cable interface", tag, owner, clock, "a2corvus", __FILE__),
-	device_a2bus_card_interface(mconfig, *this),
-	m_corvushd(*this, CORVUS_HD_TAG), m_rom(nullptr)
+	a2bus_corvus_device(mconfig, A2BUS_CORVUS, tag, owner, clock)
 {
 }
 

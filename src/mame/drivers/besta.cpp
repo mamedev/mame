@@ -42,14 +42,17 @@ public:
 
 	DECLARE_READ8_MEMBER( mpcc_reg_r );
 	DECLARE_WRITE8_MEMBER( mpcc_reg_w );
-	DECLARE_WRITE8_MEMBER( kbd_put );
+	void kbd_put(u8 data);
+
+protected:
+	virtual void machine_reset() override;
+
 	uint8_t m_term_data;
 	uint8_t m_mpcc_regs[32];
 
 	required_device<cpu_device> m_maincpu;
 	required_device<pit68230_device> m_pit1;
 	required_device<pit68230_device> m_pit2;
-	virtual void machine_reset() override;
 
 	required_device<generic_terminal_device> m_terminal;
 	required_shared_ptr<uint32_t> m_p_ram;
@@ -78,25 +81,23 @@ READ8_MEMBER( besta_state::mpcc_reg_r )
 
 WRITE8_MEMBER( besta_state::mpcc_reg_w )
 {
-	device_t *devconf = machine().device(TERMINAL_TAG);
-
 	DBG_LOG(1,"mpcc_reg_w",("(%d) <- %02X at %s\n", offset, data, machine().describe_context()));
 
 	switch (offset) {
 		case 2:
-			m_term_data = data;
+			kbd_put(data);
 			break;
 		case 10:
-			dynamic_cast<generic_terminal_device *>(devconf)->write(generic_space(), 0, data);
+			m_terminal->write(generic_space(), 0, data);
 		default:
 			m_mpcc_regs[offset] = data;
 			break;
 	}
 }
 
-WRITE8_MEMBER( besta_state::kbd_put )
+void besta_state::kbd_put(u8 data)
 {
-	mpcc_reg_w(space, (offs_t)2, data, mem_mask);
+	m_term_data = data;
 }
 
 static ADDRESS_MAP_START(besta_mem, AS_PROGRAM, 32, besta_state)
@@ -132,7 +133,7 @@ void besta_state::machine_reset()
 }
 
 /* CP31 processor board */
-static MACHINE_CONFIG_START( besta, besta_state )
+static MACHINE_CONFIG_START( besta )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68030, 2*16670000)
 	MCFG_CPU_PROGRAM_MAP(besta_mem)
@@ -142,7 +143,7 @@ static MACHINE_CONFIG_START( besta, besta_state )
 	MCFG_DEVICE_ADD ("pit2", PIT68230, 16670000 / 2)    // XXX verify clock
 
 	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(besta_state, kbd_put))
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(besta_state, kbd_put))
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -160,5 +161,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT                 INIT    COMPANY         FULLNAME       FLAGS */
-COMP( 1988, besta88,  0,      0,     besta,     besta,   driver_device,  0,  "Sapsan", "Besta-88", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    STATE         INIT  COMPANY   FULLNAME    FLAGS
+COMP( 1988, besta88,  0,      0,     besta,     besta,   besta_state,  0,    "Sapsan", "Besta-88", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

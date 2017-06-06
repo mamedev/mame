@@ -575,7 +575,7 @@ void sigmab52_state::machine_reset()
 *    Machine Drivers     *
 *************************/
 
-static MACHINE_CONFIG_START( jwildb52, sigmab52_state )
+static MACHINE_CONFIG_START( jwildb52 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, MAIN_CLOCK/9)    /* 2 MHz */

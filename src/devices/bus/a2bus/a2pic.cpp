@@ -19,19 +19,10 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_PIC = device_creator<a2bus_pic_device>;
+DEFINE_DEVICE_TYPE(A2BUS_PIC, a2bus_pic_device, "a2pic", "Apple Parallel Interface Card")
 
 #define PIC_ROM_REGION  "pic_rom"
 #define PIC_CENTRONICS_TAG "pic_ctx"
-
-MACHINE_CONFIG_FRAGMENT( pic )
-	MCFG_CENTRONICS_ADD(PIC_CENTRONICS_TAG, centronics_devices, "printer")
-	MCFG_CENTRONICS_DATA_INPUT_BUFFER("ctx_data_in")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(a2bus_pic_device, ack_w))
-
-	MCFG_DEVICE_ADD("ctx_data_in", INPUT_BUFFER, 0)
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("ctx_data_out", PIC_CENTRONICS_TAG)
-MACHINE_CONFIG_END
 
 ROM_START( pic )
 	ROM_REGION(0x000200, PIC_ROM_REGION, 0)
@@ -77,14 +68,17 @@ ioport_constructor a2bus_pic_device::device_input_ports() const
 }
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor a2bus_pic_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( pic );
-}
+MACHINE_CONFIG_MEMBER( a2bus_pic_device::device_add_mconfig )
+	MCFG_CENTRONICS_ADD(PIC_CENTRONICS_TAG, centronics_devices, "printer")
+	MCFG_CENTRONICS_DATA_INPUT_BUFFER("ctx_data_in")
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(a2bus_pic_device, ack_w))
+
+	MCFG_DEVICE_ADD("ctx_data_in", INPUT_BUFFER, 0)
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("ctx_data_out", PIC_CENTRONICS_TAG)
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -100,18 +94,12 @@ const tiny_rom_entry *a2bus_pic_device::device_rom_region() const
 //**************************************************************************
 
 a2bus_pic_device::a2bus_pic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, A2BUS_PIC, "Apple Parallel Interface Card", tag, owner, clock, "a2pic", __FILE__),
-		device_a2bus_card_interface(mconfig, *this),
-		m_dsw1(*this, "DSW1"),
-		m_ctx(*this, PIC_CENTRONICS_TAG),
-		m_ctx_data_in(*this, "ctx_data_in"),
-		m_ctx_data_out(*this, "ctx_data_out"), m_rom(nullptr),
-		m_started(false), m_ack(0), m_irqenable(false), m_autostrobe(false), m_timer(nullptr)
+		a2bus_pic_device(mconfig, A2BUS_PIC, tag, owner, clock)
 {
 }
 
-a2bus_pic_device::a2bus_pic_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+a2bus_pic_device::a2bus_pic_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+		device_t(mconfig, type, tag, owner, clock),
 		device_a2bus_card_interface(mconfig, *this),
 		m_dsw1(*this, "DSW1"),
 		m_ctx(*this, PIC_CENTRONICS_TAG),

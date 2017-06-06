@@ -29,10 +29,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_CDP1871_H
+#define MAME_MACHINE_CDP1871_H
 
-#ifndef __CDP1871__
-#define __CDP1871__
+#pragma once
 
 
 
@@ -94,19 +94,19 @@ public:
 	// construction/destruction
 	cdp1871_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_d1_rd_callback(device_t &device, _Object object) { return downcast<cdp1871_device &>(device).m_read_d1.set_callback(object); }
-	template<class _Object> static devcb_base &set_d2_rd_callback(device_t &device, _Object object) { return downcast<cdp1871_device &>(device).m_read_d2.set_callback(object); }
-	template<class _Object> static devcb_base &set_d3_rd_callback(device_t &device, _Object object) { return downcast<cdp1871_device &>(device).m_read_d3.set_callback(object); }
-	template<class _Object> static devcb_base &set_d4_rd_callback(device_t &device, _Object object) { return downcast<cdp1871_device &>(device).m_read_d4.set_callback(object); }
-	template<class _Object> static devcb_base &set_d5_rd_callback(device_t &device, _Object object) { return downcast<cdp1871_device &>(device).m_read_d5.set_callback(object); }
-	template<class _Object> static devcb_base &set_d6_rd_callback(device_t &device, _Object object) { return downcast<cdp1871_device &>(device).m_read_d6.set_callback(object); }
-	template<class _Object> static devcb_base &set_d7_rd_callback(device_t &device, _Object object) { return downcast<cdp1871_device &>(device).m_read_d7.set_callback(object); }
-	template<class _Object> static devcb_base &set_d8_rd_callback(device_t &device, _Object object) { return downcast<cdp1871_device &>(device).m_read_d8.set_callback(object); }
-	template<class _Object> static devcb_base &set_d9_rd_callback(device_t &device, _Object object) { return downcast<cdp1871_device &>(device).m_read_d9.set_callback(object); }
-	template<class _Object> static devcb_base &set_d10_rd_callback(device_t &device, _Object object) { return downcast<cdp1871_device &>(device).m_read_d10.set_callback(object); }
-	template<class _Object> static devcb_base &set_d11_rd_callback(device_t &device, _Object object) { return downcast<cdp1871_device &>(device).m_read_d11.set_callback(object); }
-	template<class _Object> static devcb_base &set_da_wr_callback(device_t &device, _Object object) { return downcast<cdp1871_device &>(device).m_write_da.set_callback(object); }
-	template<class _Object> static devcb_base &set_rpt_wr_callback(device_t &device, _Object object) { return downcast<cdp1871_device &>(device).m_write_rpt.set_callback(object); }
+	template <class Object> static devcb_base &set_d1_rd_callback(device_t &device, Object &&cb) { return downcast<cdp1871_device &>(device).m_read_d1.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_d2_rd_callback(device_t &device, Object &&cb) { return downcast<cdp1871_device &>(device).m_read_d2.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_d3_rd_callback(device_t &device, Object &&cb) { return downcast<cdp1871_device &>(device).m_read_d3.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_d4_rd_callback(device_t &device, Object &&cb) { return downcast<cdp1871_device &>(device).m_read_d4.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_d5_rd_callback(device_t &device, Object &&cb) { return downcast<cdp1871_device &>(device).m_read_d5.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_d6_rd_callback(device_t &device, Object &&cb) { return downcast<cdp1871_device &>(device).m_read_d6.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_d7_rd_callback(device_t &device, Object &&cb) { return downcast<cdp1871_device &>(device).m_read_d7.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_d8_rd_callback(device_t &device, Object &&cb) { return downcast<cdp1871_device &>(device).m_read_d8.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_d9_rd_callback(device_t &device, Object &&cb) { return downcast<cdp1871_device &>(device).m_read_d9.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_d10_rd_callback(device_t &device, Object &&cb) { return downcast<cdp1871_device &>(device).m_read_d10.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_d11_rd_callback(device_t &device, Object &&cb) { return downcast<cdp1871_device &>(device).m_read_d11.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_da_wr_callback(device_t &device, Object &&cb) { return downcast<cdp1871_device &>(device).m_write_da.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_rpt_wr_callback(device_t &device, Object &&cb) { return downcast<cdp1871_device &>(device).m_write_rpt.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( read );
 
@@ -164,8 +164,6 @@ private:
 
 
 // device type definition
-extern const device_type CDP1871;
+DECLARE_DEVICE_TYPE(CDP1871, cdp1871_device)
 
-
-
-#endif
+#endif // MAME_MACHINE_CDP1871_H

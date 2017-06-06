@@ -1616,7 +1616,7 @@ INTERRUPT_GEN_MEMBER(skylncr_state::skylncr_vblank_interrupt)
 *           Machine Driver           *
 *************************************/
 
-static MACHINE_CONFIG_START( skylncr, skylncr_state )
+static MACHINE_CONFIG_START( skylncr )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)
@@ -2012,14 +2012,14 @@ DRIVER_INIT_MEMBER(skylncr_state, sonikfig)
 *                  Game Drivers                     *
 ****************************************************/
 
-/*    YEAR  NAME      PARENT   MACHINE   INPUT     STATE           INIT      ROT    COMPANY                 FULLNAME                                         FLAGS  */
-GAME( 1995, skylncr,  0,       skylncr,  skylncr,  driver_device,  0,        ROT0, "Bordun International", "Sky Lancer (Bordun, version U450C)",             0 )
-GAME( 1995, butrfly,  0,       skylncr,  skylncr,  driver_device,  0,        ROT0, "Bordun International", "Butterfly Video Game (version U350C)",           0 )
-GAME( 1999, mbutrfly, 0,       mbutrfly, mbutrfly, driver_device,  0,        ROT0, "Bordun International", "Magical Butterfly (version U350C, protected)",   0 )
-GAME( 1995, madzoo,   0,       skylncr,  skylncr,  driver_device,  0,        ROT0, "Bordun International", "Mad Zoo (version U450C)",                        0 )
-GAME( 1995, leader,   0,       skylncr,  leader,   driver_device,  0,        ROT0, "bootleg",              "Leader (version Z 2E, Greece)",                  0 )
-GAME( 199?, gallag50, 0,       skylncr,  gallag50, driver_device,  0,        ROT0, "bootleg",              "Gallag Video Game / Petalouda (Butterfly, x50)", 0 )
-GAME( 199?, neraidou, 0,       neraidou, neraidou, driver_device,  0,        ROT0, "bootleg",              "Neraidoula (Fairy Butterfly)",                   0 )
-GAME( 199?, sstar97,  0,       sstar97,  sstar97,  driver_device,  0,        ROT0, "Bordun International", "Super Star 97 / Ming Xing 97 (version V153B)",   0 )
-GAME( 1995, bdream97, 0,       bdream97, skylncr,  driver_device,  0,        ROT0, "bootleg (KKK)",        "Butterfly Dream 97 / Hudie Meng 97",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT   MACHINE   INPUT     STATE           INIT      ROT   COMPANY                 FULLNAME                                          FLAGS
+GAME( 1995, skylncr,  0,       skylncr,  skylncr,  skylncr_state,  0,        ROT0, "Bordun International", "Sky Lancer (Bordun, version U450C)",             0 )
+GAME( 1995, butrfly,  0,       skylncr,  skylncr,  skylncr_state,  0,        ROT0, "Bordun International", "Butterfly Video Game (version U350C)",           0 )
+GAME( 1999, mbutrfly, 0,       mbutrfly, mbutrfly, skylncr_state,  0,        ROT0, "Bordun International", "Magical Butterfly (version U350C, protected)",   0 )
+GAME( 1995, madzoo,   0,       skylncr,  skylncr,  skylncr_state,  0,        ROT0, "Bordun International", "Mad Zoo (version U450C)",                        0 )
+GAME( 1995, leader,   0,       skylncr,  leader,   skylncr_state,  0,        ROT0, "bootleg",              "Leader (version Z 2E, Greece)",                  0 )
+GAME( 199?, gallag50, 0,       skylncr,  gallag50, skylncr_state,  0,        ROT0, "bootleg",              "Gallag Video Game / Petalouda (Butterfly, x50)", 0 )
+GAME( 199?, neraidou, 0,       neraidou, neraidou, skylncr_state,  0,        ROT0, "bootleg",              "Neraidoula (Fairy Butterfly)",                   0 )
+GAME( 199?, sstar97,  0,       sstar97,  sstar97,  skylncr_state,  0,        ROT0, "Bordun International", "Super Star 97 / Ming Xing 97 (version V153B)",   0 )
+GAME( 1995, bdream97, 0,       bdream97, skylncr,  skylncr_state,  0,        ROT0, "bootleg (KKK)",        "Butterfly Dream 97 / Hudie Meng 97",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 GAME( 2000, sonikfig, 0,       skylncr,  sonikfig, skylncr_state,  sonikfig, ROT0, "Z Games",              "Sonik Fighter (version 02, encrypted)",          MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING )

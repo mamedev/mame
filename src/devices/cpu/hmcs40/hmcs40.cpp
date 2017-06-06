@@ -11,47 +11,47 @@
 
 */
 
-#define IS_PMOS 0
-#define IS_CMOS ~0
-
 #include "emu.h"
 #include "hmcs40.h"
 #include "debugger.h"
+
+#define IS_PMOS 0
+#define IS_CMOS ~0
 
 
 // MCU types
 
 // HMCS42/C/CL
-//const device_type HD38702 = device_creator<hd38702_device>; // PMOS, 28 pins, 22 I/O lines, (512+32)x10 ROM, 32x4 RAM, no B or SPY register
-//const device_type HD44700 = device_creator<hd44700_device>; // CMOS version
-//const device_type HD44708 = device_creator<hd44708_device>; // CMOS version, low-power
+//DEFINE_DEVICE_TYPE(HD38702, hd38702_device, "hd38702", "HD38702") // PMOS, 28 pins, 22 I/O lines, (512+32)x10 ROM, 32x4 RAM, no B or SPY register
+//DEFINE_DEVICE_TYPE(HD44700, hd44700_device, "hd44700", "HD44700") // CMOS version
+//DEFINE_DEVICE_TYPE(HD44708, hd44708_device, "hd44708", "HD44708") // CMOS version, low-power
 
 // HMCS43/C/CL
-const device_type HD38750 = device_creator<hd38750_device>; // PMOS, 42 pins, 32 I/O lines, (1024+64)x10 ROM, 80x4 RAM
-const device_type HD38755 = device_creator<hd38755_device>; // ceramic filter oscillator type
-const device_type HD44750 = device_creator<hd44750_device>; // CMOS version
-const device_type HD44758 = device_creator<hd44758_device>; // CMOS version, low-power
+DEFINE_DEVICE_TYPE(HD38750, hd38750_device, "hd38750", "HD38750") // PMOS, 42 pins, 32 I/O lines, (1024+64)x10 ROM, 80x4 RAM
+DEFINE_DEVICE_TYPE(HD38755, hd38755_device, "hd38755", "HD38755") // ceramic filter oscillator type
+DEFINE_DEVICE_TYPE(HD44750, hd44750_device, "hd44750", "HD44750") // CMOS version
+DEFINE_DEVICE_TYPE(HD44758, hd44758_device, "hd44758", "HD44758") // CMOS version, low-power
 
 // HMCS44A/C/CL
-const device_type HD38800 = device_creator<hd38800_device>; // PMOS, 42 pins, 32 I/O lines, (2048+128)x10 ROM, 160x4 RAM
-const device_type HD38805 = device_creator<hd38805_device>; // ceramic filter oscillator type
-const device_type HD44801 = device_creator<hd44801_device>; // CMOS version
-const device_type HD44808 = device_creator<hd44808_device>; // CMOS version, low-power
+DEFINE_DEVICE_TYPE(HD38800, hd38800_device, "hd38800", "HD38800") // PMOS, 42 pins, 32 I/O lines, (2048+128)x10 ROM, 160x4 RAM
+DEFINE_DEVICE_TYPE(HD38805, hd38805_device, "hd38805", "HD38805") // ceramic filter oscillator type
+DEFINE_DEVICE_TYPE(HD44801, hd44801_device, "hd44801", "HD44801") // CMOS version
+DEFINE_DEVICE_TYPE(HD44808, hd44808_device, "hd44808", "HD44808") // CMOS version, low-power
 
 // HMCS45A/C/CL
-const device_type HD38820 = device_creator<hd38820_device>; // PMOS, 54 pins(QFP) or 64 pins(DIP), 44 I/O lines, (2048+128)x10 ROM, 160x4 RAM
-const device_type HD38825 = device_creator<hd38825_device>; // ceramic filter oscillator type
-const device_type HD44820 = device_creator<hd44820_device>; // CMOS version
-const device_type HD44828 = device_creator<hd44828_device>; // CMOS version, low-power
+DEFINE_DEVICE_TYPE(HD38820, hd38820_device, "hd38820", "HD38820") // PMOS, 54 pins(QFP) or 64 pins(DIP), 44 I/O lines, (2048+128)x10 ROM, 160x4 RAM
+DEFINE_DEVICE_TYPE(HD38825, hd38825_device, "hd38825", "HD38825") // ceramic filter oscillator type
+DEFINE_DEVICE_TYPE(HD44820, hd44820_device, "hd44820", "HD44820") // CMOS version
+DEFINE_DEVICE_TYPE(HD44828, hd44828_device, "hd44828", "HD44828") // CMOS version, low-power
 
 // HMCS46C/CL (no PMOS version exists)
-//const device_type HD44840 = device_creator<hd44840_device>; // CMOS, 42 pins, 32 I/O lines, 4096x10 ROM, 256x4 RAM
-//const device_type HD44848 = device_creator<hd44848_device>; // CMOS, low-power
+//DEFINE_DEVICE_TYPE(HD44840, hd44840_device, "hd44840", "HD44840") // CMOS, 42 pins, 32 I/O lines, 4096x10 ROM, 256x4 RAM
+//DEFINE_DEVICE_TYPE(HD44848, hd44848_device, "hd44848", "HD44848") // CMOS, low-power
 
 // HMCS47A/C/CL
-//const device_type HD38870 = device_creator<hd38870_device>; // PMOS, 54 pins(QFP) or 64 pins(DIP), 44 I/O lines, 4096x10 ROM, 256x4 RAM
-//const device_type HD44860 = device_creator<hd44860_device>; // CMOS version
-//const device_type HD44868 = device_creator<hd44868_device>; // CMOS version, low-power
+//DEFINE_DEVICE_TYPE(HD38870, hd38870_device, "hd38870", "HD38870") // PMOS, 54 pins(QFP) or 64 pins(DIP), 44 I/O lines, 4096x10 ROM, 256x4 RAM
+//DEFINE_DEVICE_TYPE(HD44860, hd44860_device, "hd44860", "HD44860") // CMOS version
+//DEFINE_DEVICE_TYPE(HD44868, hd44868_device, "hd44868", "HD44868") // CMOS version, low-power
 
 
 // internal memory maps
@@ -79,57 +79,74 @@ ADDRESS_MAP_END
 
 
 // device definitions
-hmcs43_cpu_device::hmcs43_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, u16 polarity, const char *shortname)
-	: hmcs40_cpu_device(mconfig, type, name, tag, owner, clock, HMCS40_FAMILY_HMCS43, polarity, 3 /* stack levels */, 10 /* pc width */, 11 /* prg width */, ADDRESS_MAP_NAME(program_1k), 7 /* data width */, ADDRESS_MAP_NAME(data_80x4), shortname, __FILE__)
+hmcs40_cpu_device::hmcs40_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int family, u16 polarity, int stack_levels, int pcwidth, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data)
+	: cpu_device(mconfig, type, tag, owner, clock)
+	, m_program_config("program", ENDIANNESS_LITTLE, 16, prgwidth, -1, program)
+	, m_data_config("data", ENDIANNESS_LITTLE, 8, datawidth, 0, data)
+	, m_pcwidth(pcwidth)
+	, m_prgwidth(prgwidth)
+	, m_datawidth(datawidth)
+	, m_family(family)
+	, m_polarity(polarity)
+	, m_stack_levels(stack_levels)
+	, m_read_r0(*this), m_read_r1(*this), m_read_r2(*this), m_read_r3(*this), m_read_r4(*this), m_read_r5(*this), m_read_r6(*this), m_read_r7(*this)
+	, m_write_r0(*this), m_write_r1(*this), m_write_r2(*this), m_write_r3(*this), m_write_r4(*this), m_write_r5(*this), m_write_r6(*this), m_write_r7(*this)
+	, m_read_d(*this)
+	, m_write_d(*this)
+{
+}
+
+hmcs43_cpu_device::hmcs43_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u16 polarity)
+	: hmcs40_cpu_device(mconfig, type, tag, owner, clock, HMCS40_FAMILY_HMCS43, polarity, 3 /* stack levels */, 10 /* pc width */, 11 /* prg width */, ADDRESS_MAP_NAME(program_1k), 7 /* data width */, ADDRESS_MAP_NAME(data_80x4))
 { }
 
 hd38750_device::hd38750_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: hmcs43_cpu_device(mconfig, HD38750, "HD38750", tag, owner, clock, IS_PMOS, "hd38750")
+	: hmcs43_cpu_device(mconfig, HD38750, tag, owner, clock, IS_PMOS)
 { }
 hd38755_device::hd38755_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: hmcs43_cpu_device(mconfig, HD38755, "HD38755", tag, owner, clock, IS_PMOS, "hd38755")
+	: hmcs43_cpu_device(mconfig, HD38755, tag, owner, clock, IS_PMOS)
 { }
 hd44750_device::hd44750_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: hmcs43_cpu_device(mconfig, HD44750, "HD44750", tag, owner, clock, IS_CMOS, "hd44750")
+	: hmcs43_cpu_device(mconfig, HD44750, tag, owner, clock, IS_CMOS)
 { }
 hd44758_device::hd44758_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: hmcs43_cpu_device(mconfig, HD44758, "HD44758", tag, owner, clock, IS_CMOS, "hd44758")
+	: hmcs43_cpu_device(mconfig, HD44758, tag, owner, clock, IS_CMOS)
 { }
 
 
-hmcs44_cpu_device::hmcs44_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, u16 polarity, const char *shortname)
-	: hmcs40_cpu_device(mconfig, type, name, tag, owner, clock, HMCS40_FAMILY_HMCS44, polarity, 4, 11, 12, ADDRESS_MAP_NAME(program_2k), 8, ADDRESS_MAP_NAME(data_160x4), shortname, __FILE__)
+hmcs44_cpu_device::hmcs44_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u16 polarity)
+	: hmcs40_cpu_device(mconfig, type, tag, owner, clock, HMCS40_FAMILY_HMCS44, polarity, 4, 11, 12, ADDRESS_MAP_NAME(program_2k), 8, ADDRESS_MAP_NAME(data_160x4))
 { }
 
 hd38800_device::hd38800_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: hmcs44_cpu_device(mconfig, HD38800, "HD38800", tag, owner, clock, IS_PMOS, "hd38800")
+	: hmcs44_cpu_device(mconfig, HD38800, tag, owner, clock, IS_PMOS)
 { }
 hd38805_device::hd38805_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: hmcs44_cpu_device(mconfig, HD38805, "HD38805", tag, owner, clock, IS_PMOS, "hd38805")
+	: hmcs44_cpu_device(mconfig, HD38805, tag, owner, clock, IS_PMOS)
 { }
 hd44801_device::hd44801_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: hmcs44_cpu_device(mconfig, HD44801, "HD44801", tag, owner, clock, IS_CMOS, "hd44801")
+	: hmcs44_cpu_device(mconfig, HD44801, tag, owner, clock, IS_CMOS)
 { }
 hd44808_device::hd44808_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: hmcs44_cpu_device(mconfig, HD44808, "HD44808", tag, owner, clock, IS_CMOS, "hd44808")
+	: hmcs44_cpu_device(mconfig, HD44808, tag, owner, clock, IS_CMOS)
 { }
 
 
-hmcs45_cpu_device::hmcs45_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, u16 polarity, const char *shortname)
-	: hmcs40_cpu_device(mconfig, type, name, tag, owner, clock, HMCS40_FAMILY_HMCS45, polarity, 4, 11, 12, ADDRESS_MAP_NAME(program_2k), 8, ADDRESS_MAP_NAME(data_160x4), shortname, __FILE__)
+hmcs45_cpu_device::hmcs45_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u16 polarity)
+	: hmcs40_cpu_device(mconfig, type, tag, owner, clock, HMCS40_FAMILY_HMCS45, polarity, 4, 11, 12, ADDRESS_MAP_NAME(program_2k), 8, ADDRESS_MAP_NAME(data_160x4))
 { }
 
 hd38820_device::hd38820_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: hmcs45_cpu_device(mconfig, HD38820, "HD38820", tag, owner, clock, IS_PMOS, "hd38820")
+	: hmcs45_cpu_device(mconfig, HD38820, tag, owner, clock, IS_PMOS)
 { }
 hd38825_device::hd38825_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: hmcs45_cpu_device(mconfig, HD38825, "HD38825", tag, owner, clock, IS_PMOS, "hd38825")
+	: hmcs45_cpu_device(mconfig, HD38825, tag, owner, clock, IS_PMOS)
 { }
 hd44820_device::hd44820_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: hmcs45_cpu_device(mconfig, HD44820, "HD44820", tag, owner, clock, IS_CMOS, "hd44820")
+	: hmcs45_cpu_device(mconfig, HD44820, tag, owner, clock, IS_CMOS)
 { }
 hd44828_device::hd44828_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: hmcs45_cpu_device(mconfig, HD44828, "HD44828", tag, owner, clock, IS_CMOS, "hd44828")
+	: hmcs45_cpu_device(mconfig, HD44828, tag, owner, clock, IS_CMOS)
 { }
 
 
@@ -578,7 +595,7 @@ void hmcs40_cpu_device::execute_run()
 	while (m_icount > 0)
 	{
 		// LPU is handled 1 cycle later
-		if ((m_prev_op & 0x3e0) == 0x340)
+		if ((m_prev_op & 0x7e0) == 0x340)
 			m_pc = ((m_page << 6) | (m_pc & 0x3f)) & m_pcmask;
 
 		// remember previous state

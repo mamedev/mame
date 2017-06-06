@@ -1004,7 +1004,7 @@ ADC12138_IPT_CONVERT_CB(hornet_state::adc12138_input_callback)
 	return (double)(value) / 2047.0;
 }
 
-static MACHINE_CONFIG_START( hornet, hornet_state )
+static MACHINE_CONFIG_START( hornet )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PPC403GA, XTAL_64MHz/2)   /* PowerPC 403GA 32MHz */
@@ -1063,7 +1063,7 @@ static MACHINE_CONFIG_START( hornet, hornet_state )
 
 	MCFG_DEVICE_ADD("konppc", KONPPC, 0)
 	MCFG_KONPPC_CGBOARD_NUMBER(1)
-	MCFG_KONPPC_CGBOARD_TYPE(CGBOARD_TYPE_HORNET)
+	MCFG_KONPPC_CGBOARD_TYPE(HORNET)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( hornet_2board, hornet )
@@ -1120,7 +1120,7 @@ static MACHINE_CONFIG_DERIVED( hornet_2board, hornet )
 	MCFG_DEVICE_REMOVE("konppc")
 	MCFG_DEVICE_ADD("konppc", KONPPC, 0)
 	MCFG_KONPPC_CGBOARD_NUMBER(2)
-	MCFG_KONPPC_CGBOARD_TYPE(CGBOARD_TYPE_HORNET)
+	MCFG_KONPPC_CGBOARD_TYPE(HORNET)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( terabrst, hornet )
@@ -1591,7 +1591,7 @@ ROM_END
 
 /*************************************************************************/
 
-GAME(  1998, gradius4,  0,        hornet,           hornet,  hornet_state, gradius4,      ROT0, "Konami", "Gradius 4: Fukkatsu", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, gradius4,  0,        hornet,           hornet,  hornet_state, gradius4,      ROT0, "Konami", "Gradius IV: Fukkatsu (ver JAC)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME(  1998, nbapbp,    0,        hornet,           hornet,  hornet_state, nbapbp,        ROT0, "Konami", "NBA Play By Play (ver JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME(  1998, nbapbpa,   nbapbp,   hornet,           hornet,  hornet_state, nbapbp,        ROT0, "Konami", "NBA Play By Play (ver AAB)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME(  1998, terabrst,  0,        terabrst,         hornet,  hornet_state, terabrst,      ROT0, "Konami", "Teraburst (1998/07/17 ver UEL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
@@ -1605,4 +1605,4 @@ GAMEL( 2000, sscopec,   sscope,   hornet_2board,    sscope,  hornet_state, horne
 GAMEL( 2000, sscopeb,   sscope,   hornet_2board,    sscope,  hornet_state, hornet_2board, ROT0, "Konami", "Silent Scope (ver xxB, Ver 1.20)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_dualhsxs )
 GAMEL( 2000, sscopea,   sscope,   hornet_2board,    sscope,  hornet_state, hornet_2board, ROT0, "Konami", "Silent Scope (ver xxA, Ver 1.00)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_dualhsxs )
 
-GAMEL( 2000, sscope2,   0,        sscope2,          sscope2, hornet_state, hornet_2board, ROT0, "Konami", "Silent Scope 2", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_dualhsxs )
+GAMEL( 2000, sscope2,   0,        sscope2,          sscope2, hornet_state, hornet_2board, ROT0, "Konami", "Silent Scope 2 : Dark Silhouette (ver UAD)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_dualhsxs )

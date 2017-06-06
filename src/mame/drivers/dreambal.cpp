@@ -304,7 +304,7 @@ void dreambal_state::machine_reset()
 }
 
 // xtals = 28.000, 9.8304
-static MACHINE_CONFIG_START( dreambal, dreambal_state )
+static MACHINE_CONFIG_START( dreambal )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 28000000/2)
@@ -346,7 +346,7 @@ static MACHINE_CONFIG_START( dreambal, dreambal_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 9830400/8, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", 9830400/8, PIN7_HIGH)
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END

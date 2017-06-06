@@ -66,7 +66,7 @@ protected:
 	input_item_data *   pollingitem;
 
 private:
-	uint16_t              last_sortorder;
+	uint32_t            last_sortorder;
 	bool                record_next;
 	input_seq           starting_seq;
 

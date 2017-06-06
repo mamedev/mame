@@ -5,8 +5,8 @@
 
 */
 
-#ifndef _ATARIFDC_H
-#define _ATARIFDC_H
+#ifndef MAME_MACHINE_ATARIFDC_H
+#define MAME_MACHINE_ATARIFDC_H
 
 #include "imagedev/flopdrv.h"
 
@@ -23,7 +23,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	void clr_serout(int expect_data);
@@ -64,6 +64,6 @@ private:
 	atari_drive m_drv[4];
 };
 
-extern const device_type ATARI_FDC;
+DECLARE_DEVICE_TYPE(ATARI_FDC, atari_fdc_device)
 
-#endif /* _ATARIFDC_H */
+#endif // MAME_MACHINE_ATARIFDC_H

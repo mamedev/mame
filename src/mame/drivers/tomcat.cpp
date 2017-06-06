@@ -370,7 +370,7 @@ void tomcat_state::machine_start()
 	m_dsp_BIO = 0;
 }
 
-static MACHINE_CONFIG_START( tomcat, tomcat_state )
+static MACHINE_CONFIG_START( tomcat )
 	MCFG_CPU_ADD("maincpu", M68010, XTAL_12MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(tomcat_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(tomcat_state, irq1_line_assert,  5*60)
@@ -444,4 +444,4 @@ ROM_START( tomcat )
 	ROM_LOAD( "136021-105.1l",   0x0000, 0x0100, CRC(82fc3eb2) SHA1(184231c7baef598294860a7d2b8a23798c5c7da6) ) /* AVG PROM */
 ROM_END
 
-GAME( 1985, tomcat, 0,        tomcat, tomcat, driver_device, 0, ROT0, "Atari", "TomCat (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, tomcat, 0,        tomcat, tomcat, tomcat_state, 0, ROT0, "Atari", "TomCat (prototype)", MACHINE_SUPPORTS_SAVE )

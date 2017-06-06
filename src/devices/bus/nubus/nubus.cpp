@@ -16,7 +16,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type NUBUS_SLOT = device_creator<nubus_slot_device>;
+DEFINE_DEVICE_TYPE(NUBUS_SLOT, nubus_slot_device, "nubus_slot", "NuBus slot")
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -26,16 +26,15 @@ const device_type NUBUS_SLOT = device_creator<nubus_slot_device>;
 //  nubus_slot_device - constructor
 //-------------------------------------------------
 nubus_slot_device::nubus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, NUBUS_SLOT, "NUBUS_SLOT", tag, owner, clock, "nubus_slot", __FILE__),
-		device_slot_interface(mconfig, *this),
-	m_nubus_tag(nullptr),
-	m_nubus_slottag(nullptr)
+	nubus_slot_device(mconfig, NUBUS_SLOT, tag, owner, clock)
 {
 }
 
-nubus_slot_device::nubus_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_slot_interface(mconfig, *this), m_nubus_tag(nullptr), m_nubus_slottag(nullptr)
+nubus_slot_device::nubus_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	device_slot_interface(mconfig, *this),
+	m_nubus_tag(nullptr),
+	m_nubus_slottag(nullptr)
 {
 }
 
@@ -61,7 +60,7 @@ void nubus_slot_device::device_start()
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type NUBUS = device_creator<nubus_device>;
+DEFINE_DEVICE_TYPE(NUBUS, nubus_device, "nubus", "NuBus")
 
 void nubus_device::static_set_cputag(device_t &device, const char *tag)
 {
@@ -78,24 +77,20 @@ void nubus_device::static_set_cputag(device_t &device, const char *tag)
 //-------------------------------------------------
 
 nubus_device::nubus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, NUBUS, "NUBUS", tag, owner, clock, "nubus", __FILE__), m_maincpu(nullptr),
-		m_out_irq9_cb(*this),
-		m_out_irqa_cb(*this),
-		m_out_irqb_cb(*this),
-		m_out_irqc_cb(*this),
-		m_out_irqd_cb(*this),
-		m_out_irqe_cb(*this), m_cputag(nullptr)
+	nubus_device(mconfig, NUBUS, tag, owner, clock)
 {
 }
 
-nubus_device::nubus_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-		device_t(mconfig, type, name, tag, owner, clock, shortname, source), m_maincpu(nullptr),
-		m_out_irq9_cb(*this),
-		m_out_irqa_cb(*this),
-		m_out_irqb_cb(*this),
-		m_out_irqc_cb(*this),
-		m_out_irqd_cb(*this),
-		m_out_irqe_cb(*this), m_cputag(nullptr)
+nubus_device::nubus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	m_maincpu(nullptr),
+	m_out_irq9_cb(*this),
+	m_out_irqa_cb(*this),
+	m_out_irqb_cb(*this),
+	m_out_irqc_cb(*this),
+	m_out_irqd_cb(*this),
+	m_out_irqe_cb(*this),
+	m_cputag(nullptr)
 {
 }
 //-------------------------------------------------

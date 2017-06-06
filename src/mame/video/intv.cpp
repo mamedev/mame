@@ -23,8 +23,8 @@ uint32_t intv_state::screen_update_intvkbd(screen_device &screen, bitmap_ind16 &
 	if (!m_intvkbd_text_blanked)
 	{
 		uint8_t *videoram = m_videoram;
-		int xoffset = STIC_OVERSCAN_LEFT_WIDTH*STIC_X_SCALE*INTVKBD_X_SCALE;
-		int yoffset = STIC_OVERSCAN_TOP_HEIGHT*STIC_Y_SCALE*INTVKBD_Y_SCALE;
+		int xoffset = stic_device::OVERSCAN_LEFT_WIDTH*stic_device::X_SCALE*INTVKBD_X_SCALE;
+		int yoffset = stic_device::OVERSCAN_TOP_HEIGHT*stic_device::Y_SCALE*INTVKBD_Y_SCALE;
 
 		rectangle cursor_rect;
 		m_crtc->cursor_bounds(cursor_rect);

@@ -376,7 +376,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-MACHINE_CONFIG_FRAGMENT( qix_video )
+MACHINE_CONFIG_START( qix_video )
 	MCFG_CPU_ADD("videocpu", M6809, MAIN_CLOCK_OSC/4/4) /* 1.25 MHz */
 	MCFG_CPU_PROGRAM_MAP(qix_video_map)
 
@@ -396,20 +396,20 @@ MACHINE_CONFIG_FRAGMENT( qix_video )
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_FRAGMENT( kram3_video )
+MACHINE_CONFIG_START( kram3_video )
 	MCFG_CPU_REPLACE("videocpu", M6809E, MAIN_CLOCK_OSC/4) /* 1.25 MHz */
 	MCFG_CPU_PROGRAM_MAP(kram3_video_map)
 	MCFG_M6809E_LIC_CB(WRITELINE(qix_state,kram3_lic_videocpu_changed))
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_FRAGMENT( zookeep_video )
+MACHINE_CONFIG_START( zookeep_video )
 	MCFG_CPU_MODIFY("videocpu")
 	MCFG_CPU_PROGRAM_MAP(zookeep_video_map)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_FRAGMENT( slither_video )
+MACHINE_CONFIG_START( slither_video )
 	MCFG_CPU_MODIFY("videocpu")
 	MCFG_CPU_CLOCK(SLITHER_CLOCK_OSC/4/4)   /* 1.34 MHz */
 	MCFG_CPU_PROGRAM_MAP(slither_video_map)

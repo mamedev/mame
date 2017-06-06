@@ -29,8 +29,8 @@
 
     Later boardset: (1984 onward, schematic is dated October 1983)
     One DE-0097C-0 RMS-8 pcb with a 6502 processor, two ay-3-8910s, two eproms (2716 and 2732) plus one prom, and 48k worth of 4116 16kx1 DRAMs; the 6502 processor has its own 4K of SRAM. (audio processor and RAM, Main processor's dram, dipswitches)
-    One DE-0096C-0 DSP-8 board with a 'DECO 222' custom on it (labeled '8049 // C10707-2') which appears to really be a 'cleverly' disguised 6502, and two proms, plus 4K of sram, and three hm2511-1 1kx1 srams. (main processor and graphics)
-    One DE-0098C-0 B10-8 (BIO-8 on schematics) board with an 8041, an analog devices ADC0908 8-bit adc, and 4K of SRAM on it. (DECO Cassette control, inputs)
+    One DE-0096C-0 DSP-8 board with a 'DECO 222' custom on it (labeled '8049 // C10707-2') which appears to really be a 'cleverly' disguised 6502, and two proms, plus 4K of sram, and three hm2511-1 1kx1 srams. (main processor, sprites, missiles, palette)
+    One DE-0098C-0 B10-8 (BIO-8 on schematics) board with an 8041, an analog devices ADC0908 8-bit adc, and 4K of SRAM on it. (DECO Cassette control, inputs, tilemaps, headlights)
     One DE-0109C-0 card rack board that the other three boards plug into. (fourth connector for DE-109C-0 is shorter than in earlier versions)
 
     The actual cassettes use a custom player hooked to the BIO board, and are roughly microcassette form factor, but are larger and will not fit in a conventional microcassette player.
@@ -134,11 +134,6 @@ static ADDRESS_MAP_START( decocass_sound_map, AS_PROGRAM, 8, decocass_state )
 	AM_RANGE(0xf800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-
-static ADDRESS_MAP_START( decocass_mcu_portmap, AS_IO, 8, decocass_state )
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(i8041_p1_r, i8041_p1_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(i8041_p2_r, i8041_p2_w)
-ADDRESS_MAP_END
 
 static INPUT_PORTS_START( decocass )
 	PORT_START("IN0")
@@ -778,7 +773,7 @@ PALETTE_INIT_MEMBER(decocass_state, decocass)
 }
 
 
-static MACHINE_CONFIG_START( decocass, decocass_state )
+static MACHINE_CONFIG_START( decocass )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", DECO_222, HCLK4) /* the earlier revision board doesn't have the 222 but must have the same thing implemented in logic for the M6502 */
@@ -789,7 +784,10 @@ static MACHINE_CONFIG_START( decocass, decocass_state )
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("audionmi", decocass_state, decocass_audio_nmi_gen, "screen", 0, 8)
 
 	MCFG_CPU_ADD("mcu", I8041, HCLK)
-	MCFG_CPU_IO_MAP(decocass_mcu_portmap)
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(decocass_state, i8041_p1_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(decocass_state, i8041_p1_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(decocass_state, i8041_p2_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(decocass_state, i8041_p2_w))
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(4200))              /* interleave CPUs */
 

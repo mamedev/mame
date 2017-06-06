@@ -15,7 +15,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type WS_CART_SLOT = device_creator<ws_cart_slot_device>;
+DEFINE_DEVICE_TYPE(WS_CART_SLOT, ws_cart_slot_device, "ws_cart_slot", "Wonderswan Cartridge Slot")
 
 //**************************************************************************
 //    Wonderswan Cartridges Interface
@@ -77,10 +77,11 @@ void device_ws_cart_interface::nvram_alloc(uint32_t size)
 //  ws_cart_slot_device - constructor
 //-------------------------------------------------
 ws_cart_slot_device::ws_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-						device_t(mconfig, WS_CART_SLOT, "Wonderswan Cartridge Slot", tag, owner, clock, "ws_cart_slot", __FILE__),
-						device_image_interface(mconfig, *this),
-						device_slot_interface(mconfig, *this),
-						m_type(WS_STD), m_cart(nullptr)
+	device_t(mconfig, WS_CART_SLOT, tag, owner, clock),
+	device_image_interface(mconfig, *this),
+	device_slot_interface(mconfig, *this),
+	m_type(WS_STD),
+	m_cart(nullptr)
 {
 }
 
@@ -229,7 +230,7 @@ void ws_cart_slot_device::call_unload()
  get cart type from cart file
  -------------------------------------------------*/
 
-int ws_cart_slot_device::get_cart_type(uint8_t *ROM, uint32_t len, uint32_t &nvram_len)
+int ws_cart_slot_device::get_cart_type(const uint8_t *ROM, uint32_t len, uint32_t &nvram_len) const
 {
 	int chunks = len / 0x10000;
 	int type = WS_STD;
@@ -283,24 +284,23 @@ int ws_cart_slot_device::get_cart_type(uint8_t *ROM, uint32_t len, uint32_t &nvr
  get default card software
  -------------------------------------------------*/
 
-std::string ws_cart_slot_device::get_default_card_software()
+std::string ws_cart_slot_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
-	if (open_image_file(mconfig().options()))
+	if (hook.image_file())
 	{
 		const char *slot_string;
-		uint32_t size = m_file->size();
+		uint32_t size = hook.image_file()->size();
 		std::vector<uint8_t> rom(size);
 		int type;
 		uint32_t nvram;
 
-		m_file->read(&rom[0], size);
+		hook.image_file()->read(&rom[0], size);
 
 		// nvram size is not really used here, but we set it up nevertheless
 		type = get_cart_type(&rom[0], size, nvram);
 		slot_string = ws_get_slot(type);
 
 		//printf("type: %s\n", slot_string);
-		clear();
 
 		return std::string(slot_string);
 	}

@@ -177,7 +177,7 @@ static DEVICE_INPUT_DEFAULTS_START( terminal )
 DEVICE_INPUT_DEFAULTS_END
 
 
-static MACHINE_CONFIG_START( h89, h89_state )
+static MACHINE_CONFIG_START( h89 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_12_288MHz / 6)
 	MCFG_CPU_PROGRAM_MAP(h89_mem)
@@ -206,5 +206,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1979, h89,    0,      0,       h89,       h89, driver_device,     0,    "Heath Inc", "Heathkit H89", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE       INIT     COMPANY      FULLNAME        FLAGS */
+COMP( 1979, h89,    0,      0,       h89,       h89,   h89_state,  0,       "Heath Inc", "Heathkit H89", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

@@ -70,7 +70,7 @@ private:
 	required_device<z80sio0_device> m_sio;
 	required_device<z80dma_device> m_dma;
 	required_device<z80ctc_device> m_ctc;
-	required_device<fd1797_t> m_fdc;
+	required_device<fd1797_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 };
@@ -98,7 +98,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(altos5_io, AS_IO, 8, altos5_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("dma", z80dma_device, read, write)
-	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("fdc", fd1797_t, read, write)
+	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("fdc", fd1797_device, read, write)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("pio0", z80pio_device, read, write)
 	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("pio1", z80pio_device, read, write)
@@ -369,7 +369,7 @@ DRIVER_INIT_MEMBER( altos5_state, altos5 )
 	membank("bankwf")->configure_entries(0, 50, &RAM[0], 0x1000);
 }
 
-static MACHINE_CONFIG_START( altos5, altos5_state )
+static MACHINE_CONFIG_START( altos5 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(altos5_mem)
@@ -448,5 +448,5 @@ ROM_END
 
 /* Driver */
 
-/*   YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT   CLASS           INIT    COMPANY    FULLNAME       FLAGS */
-COMP(1982, altos5, 0,      0,       altos5,  altos5, altos5_state,  altos5, "Altos", "Altos 5-15", MACHINE_NOT_WORKING )
+/*   YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT   CLASS         INIT    COMPANY  FULLNAME      FLAGS */
+COMP(1982, altos5, 0,      0,       altos5,  altos5, altos5_state, altos5, "Altos", "Altos 5-15", MACHINE_NOT_WORKING )

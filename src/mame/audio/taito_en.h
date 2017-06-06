@@ -5,6 +5,10 @@
     Taito Ensoniq ES5505-based sound hardware
 
 ****************************************************************************/
+#ifndef MAME_AUDIO_TAITO_EN_H
+#define MAME_AUDIO_TAITO_EN_H
+
+#pragma once
 
 #include "cpu/m68000/m68000.h"
 #include "sound/es5506.h"
@@ -16,7 +20,6 @@ class taito_en_device : public device_t
 {
 public:
 	taito_en_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~taito_en_device() {}
 
 	DECLARE_READ8_MEMBER( en_68000_share_r );
 	DECLARE_WRITE8_MEMBER( en_68000_share_w );
@@ -27,15 +30,11 @@ public:
 	DECLARE_READ16_MEMBER( es5510_dsp_r );
 	DECLARE_WRITE16_MEMBER( es5510_dsp_w );
 
-	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
-
-	DECLARE_WRITE8_MEMBER(mb87078_gain_changed);
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	// inherited devices/pointers
@@ -54,6 +53,12 @@ private:
 	uint32_t   m_es5510_dadr_latch;
 	uint32_t   m_es5510_gpr_latch;
 	uint8_t    m_es5510_ram_sel;
+
+	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
+
+	DECLARE_WRITE8_MEMBER(mb87078_gain_changed);
 };
 
-extern const device_type TAITO_EN;
+DECLARE_DEVICE_TYPE(TAITO_EN, taito_en_device)
+
+#endif // MAME_AUDIO_TAITO_EN_H

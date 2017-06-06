@@ -14,14 +14,14 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SV601 = device_creator<sv601_device>;
+DEFINE_DEVICE_TYPE(SV601, sv601_device, "sv601", "SV-601 Super Expander")
 
 //-------------------------------------------------
 //  machine_config_additions - device-specific
 //  machine configurations
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( sv601 )
+static MACHINE_CONFIG_START( sv601 )
 	MCFG_SVI_SLOT_BUS_ADD
 	MCFG_SVI_SLOT_INT_HANDLER(WRITELINE(sv601_device, int_w))
 	MCFG_SVI_SLOT_ROMDIS_HANDLER(WRITELINE(sv601_device, romdis_w))
@@ -50,7 +50,7 @@ machine_config_constructor sv601_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 sv601_device::sv601_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, SV601, "SV-601 Super Expander", tag, owner, clock, "sv601", __FILE__),
+	device_t(mconfig, SV601, tag, owner, clock),
 	device_svi_expander_interface(mconfig, *this),
 	m_slotbus(*this, "slotbus")
 {

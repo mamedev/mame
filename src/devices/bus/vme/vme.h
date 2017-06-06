@@ -45,8 +45,8 @@
 
  */
 
-#ifndef VME_H_
-#define VME_H_
+#ifndef MAME_BUS_VME_VME_H
+#define MAME_BUS_VME_VME_H
 
 #pragma once
 
@@ -91,30 +91,30 @@ public:
 	// construction/destruction
 	vme_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	vme_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+	template <class Object> static devcb_base &static_set_vme_j1_callback(device_t &device, Object &&cb)  { return downcast<vme_slot_device &>(device).m_vme_j1_callback.set_callback(std::forward<Object>(cb)); }
 
-	template<class _Object> static devcb_base &static_set_vme_j1_callback(device_t &device, _Object object)  { return downcast<vme_slot_device &>(device).m_vme_j1_callback.set_callback(object); }
+	static void static_set_vme_slot(device_t &device, const char *tag, const char *slottag);
+	static void static_update_vme_chains(device_t &device, uint32_t slot_nbr);
+
+	virtual DECLARE_READ8_MEMBER(read8);
+	virtual DECLARE_WRITE8_MEMBER(write8);
+
+protected:
+	vme_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_config_complete() override;
 
-	static void static_set_vme_slot(device_t &device, const char *tag, const char *slottag);
-	static void static_update_vme_chains(device_t &device, uint32_t slot_nbr);
-
 	// configuration
 	const char *m_vme_tag, *m_vme_slottag;
-
-	virtual DECLARE_READ8_MEMBER(read8);
-	virtual DECLARE_WRITE8_MEMBER(write8);
 
 	// callbacks
 	devcb_write_line        m_vme_j1_callback;
 	device_vme_card_interface *m_card;
-private:
 };
 
-extern const device_type VME;
+DECLARE_DEVICE_TYPE(VME, vme_device)
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
@@ -136,7 +136,6 @@ class vme_device : public device_t,
 {
 public:
 	vme_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	vme_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	~vme_device();
 
 	// inline configuration
@@ -197,6 +196,8 @@ public:
 	void install_device(vme_amod_t amod, offs_t start, offs_t end, read32_delegate rhandler, write32_delegate whandler, uint32_t mask);
 
 protected:
+	vme_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -217,25 +218,32 @@ protected:
 
 
 // device type definition
-extern const device_type VME_SLOT;
+DECLARE_DEVICE_TYPE(VME_SLOT, vme_slot_device)
 
 class device_vme_card_interface : public device_slot_card_interface
 {
+	template <class ElementType> friend class simple_list;
 public:
+	// inline configuration
+	static void static_set_vme_tag(device_t &device, const char *tag, const char *slottag);
+
 	// construction/destruction
-	device_vme_card_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_vme_card_interface();
 	void set_vme_device();
 
 	virtual DECLARE_READ8_MEMBER(read8);
 	virtual DECLARE_WRITE8_MEMBER(write8);
+
+	device_vme_card_interface(const machine_config &mconfig, device_t &device);
+
+protected:
 	device_t *m_device;
 
-	// inline configuration
-	static void static_set_vme_tag(device_t &device, const char *tag, const char *slottag);
 	vme_device  *m_vme;
 	const char *m_vme_tag, *m_vme_slottag;
 	int m_slot;
+
+private:
 	device_vme_card_interface *m_next;
 };
 
@@ -250,4 +258,4 @@ public:
 #define MCFG_VME_SLOT_REMOVE(_tag)        \
 	MCFG_DEVICE_REMOVE(_tag)
 
-#endif /* VME_H_ */
+#endif // MAME_BUS_VME_VME_H

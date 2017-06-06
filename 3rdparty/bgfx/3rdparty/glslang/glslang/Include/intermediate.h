@@ -183,6 +183,7 @@ enum TOperator {
     EOpVectorSwizzle,
 
     EOpMethod,
+    EOpScoping,
 
     //
     // Built-in functions mapped to operators
@@ -623,6 +624,15 @@ enum TOperator {
     EOpMethodGather,                     // ...
     EOpMethodCalculateLevelOfDetail,     // ...
     EOpMethodCalculateLevelOfDetailUnclamped,     // ...
+
+    // Load already defined above for textures
+    EOpMethodLoad2,                      // Structure buffer object methods.  These are translated to existing
+    EOpMethodLoad3,                      // AST methods, and exist to represent HLSL semantics until that
+    EOpMethodLoad4,                      // translation is performed.  See HlslParseContext::decomposeSampleMethods().
+    EOpMethodStore,                      // ...
+    EOpMethodStore2,                     // ...
+    EOpMethodStore3,                     // ...
+    EOpMethodStore4,                     // ...
 
     // SM5 texture methods
     EOpMethodGatherRed,                  // These are covered under the above EOpMethodSample comment about

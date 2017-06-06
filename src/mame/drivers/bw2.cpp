@@ -222,7 +222,7 @@ static ADDRESS_MAP_START( bw2_io, AS_IO, 8, bw2_state )
 	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE(I8251_TAG, i8251_device, data_r, data_w)
 	AM_RANGE(0x41, 0x41) AM_DEVREADWRITE(I8251_TAG, i8251_device, status_r, control_w)
 	AM_RANGE(0x50, 0x50) AM_DEVWRITE("cent_data_out", output_latch_device, write)
-	AM_RANGE(0x60, 0x63) AM_DEVREADWRITE(WD2797_TAG, wd2797_t, read, write)
+	AM_RANGE(0x60, 0x63) AM_DEVREADWRITE(WD2797_TAG, wd2797_device, read, write)
 	AM_RANGE(0x70, 0x7f) AM_DEVREADWRITE(BW2_EXPANSION_SLOT_TAG, bw2_expansion_slot_device, modsel_r, modsel_w)
 ADDRESS_MAP_END
 
@@ -575,7 +575,7 @@ void bw2_state::machine_start()
 //  MACHINE_CONFIG( bw2 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( bw2, bw2_state )
+static MACHINE_CONFIG_START( bw2 )
 	// basic machine hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/4)
 	MCFG_CPU_PROGRAM_MAP(bw2_mem)
@@ -667,5 +667,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   INIT                        COMPANY             FULLNAME            FLAGS
-COMP( 1985, bw2,    0,      0,      bw2,        bw2,    driver_device,      0,      "Bondwell Holding", "Bondwell Model 2", MACHINE_NO_SOUND_HW )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   STATE       INIT    COMPANY             FULLNAME            FLAGS
+COMP( 1985, bw2,    0,      0,      bw2,        bw2,    bw2_state,  0,      "Bondwell Holding", "Bondwell Model 2", MACHINE_NO_SOUND_HW )

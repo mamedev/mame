@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_C64_REX_H
+#define MAME_BUS_C64_REX_H
 
-#ifndef __REX__
-#define __REX__
+#pragma once
 
 
 #include "exp.h"
@@ -40,7 +40,7 @@ protected:
 
 
 // device type definition
-extern const device_type C64_REX;
+DECLARE_DEVICE_TYPE(C64_REX, c64_rex_cartridge_device)
 
 
-#endif
+#endif // MAME_BUS_C64_REX_H

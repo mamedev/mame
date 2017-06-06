@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_CPU_HD61700_HD61700_H
+#define MAME_CPU_HD61700_HD61700_H
 
-#ifndef __HD61700_H__
-#define __HD61700_H__
+#pragma once
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
@@ -40,14 +40,6 @@
 //**************************************************************************
 //  DEFINITIONS
 //**************************************************************************
-
-// registers
-enum
-{
-	HD61700_PC=1, HD61700_F, HD61700_SX, HD61700_SY, HD61700_SZ, HD61700_PE, HD61700_PD,
-	HD61700_IB,  HD61700_UA, HD61700_IA, HD61700_IE, HD61700_TM, HD61700_IX,
-	HD61700_IY,  HD61700_IZ, HD61700_US, HD61700_SS, HD61700_KY, HD61700_MAINREG
-};
 
 // input lines
 enum
@@ -103,7 +95,7 @@ protected:
 	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	// interrupts
-	bool check_irqs(void);
+	bool check_irqs();
 
 	// inline helpers
 	inline void  set_pc(int32_t new_pc);
@@ -124,11 +116,18 @@ protected:
 	inline uint16_t make_bcd_sub(uint8_t arg1, uint8_t arg2);
 	inline uint16_t make_bcd_add(uint8_t arg1, uint8_t arg2);
 
-protected:
+	// registers
+	enum
+	{
+		HD61700_PC=1, HD61700_F, HD61700_SX, HD61700_SY, HD61700_SZ, HD61700_PE, HD61700_PD,
+		HD61700_IB,  HD61700_UA, HD61700_IA, HD61700_IE, HD61700_TM, HD61700_IX,
+		HD61700_IY,  HD61700_IZ, HD61700_US, HD61700_SS, HD61700_KY, HD61700_MAINREG
+	};
+
+	static constexpr device_timer_id SEC_TIMER = 1;
 
 	// internal state
 	address_space_config m_program_config;
-	static const device_timer_id SEC_TIMER = 1;
 	emu_timer *m_sec_timer;
 
 	offs_t         m_ppc;
@@ -157,15 +156,14 @@ protected:
 	devcb_write8    m_port_write_cb;    //8 bit port write
 
 	// flag definitions
-	static const int FLAG_Z     = 0x80;
-	static const int FLAG_C     = 0x40;
-	static const int FLAG_LZ    = 0x20;
-	static const int FLAG_UZ    = 0x10;
-	static const int FLAG_SW    = 0x08;
-	static const int FLAG_APO   = 0x04;
+	static constexpr int FLAG_Z     = 0x80;
+	static constexpr int FLAG_C     = 0x40;
+	static constexpr int FLAG_LZ    = 0x20;
+	static constexpr int FLAG_UZ    = 0x10;
+	static constexpr int FLAG_SW    = 0x08;
+	static constexpr int FLAG_APO   = 0x04;
 };
 
-extern const device_type HD61700;
+DECLARE_DEVICE_TYPE(HD61700, hd61700_cpu_device)
 
-
-#endif /* __HD61700_H__ */
+#endif // MAME_CPU_HD61700_HD61700_H

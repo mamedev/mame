@@ -41,7 +41,7 @@ public:
 	{
 	}
 
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	void kbd_put(u8 data);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
 private:
@@ -90,18 +90,18 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( ec65 )
 INPUT_PORTS_END
 
-WRITE8_MEMBER( ec65_state::kbd_put )
+void ec65_state::kbd_put(u8 data)
 {
 	if (data)
 	{
-		m_via_0->write_pa0((data>>0)&1);
-		m_via_0->write_pa1((data>>1)&1);
-		m_via_0->write_pa2((data>>2)&1);
-		m_via_0->write_pa3((data>>3)&1);
-		m_via_0->write_pa4((data>>4)&1);
-		m_via_0->write_pa5((data>>5)&1);
-		m_via_0->write_pa6((data>>6)&1);
-		m_via_0->write_pa7((data>>7)&1);
+		m_via_0->write_pa0(BIT(data, 0));
+		m_via_0->write_pa1(BIT(data, 1));
+		m_via_0->write_pa2(BIT(data, 2));
+		m_via_0->write_pa3(BIT(data, 3));
+		m_via_0->write_pa4(BIT(data, 4));
+		m_via_0->write_pa5(BIT(data, 5));
+		m_via_0->write_pa6(BIT(data, 6));
+		m_via_0->write_pa7(BIT(data, 7));
 		m_via_0->write_ca1(1);
 		m_via_0->write_ca1(0);
 	}
@@ -165,7 +165,7 @@ static GFXDECODE_START( ec65 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, ec65_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( ec65, ec65_state )
+static MACHINE_CONFIG_START( ec65 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M6502, XTAL_4MHz / 4)
@@ -200,10 +200,10 @@ static MACHINE_CONFIG_START( ec65, ec65_state )
 	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
 
 	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(WRITE8(ec65_state, kbd_put))
+	MCFG_GENERIC_KEYBOARD_CB(PUT(ec65_state, kbd_put))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ec65k, ec65k_state )
+static MACHINE_CONFIG_START( ec65k )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",G65816, XTAL_4MHz) // can use 4,2 or 1 MHz
@@ -243,6 +243,6 @@ ROM_START( ec65k )
 ROM_END
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1985, ec65,   0,       0,      ec65,      ec65, driver_device,    0,    "Elektor Electronics", "EC-65", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1985, ec65k,  ec65,    0,      ec65k,     ec65, driver_device,    0,    "Elektor Electronics", "EC-65K", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE         INIT  COMPANY                FULLNAME  FLAGS */
+COMP( 1985, ec65,   0,      0,      ec65,    ec65,  ec65_state,   0,    "Elektor Electronics", "EC-65",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1985, ec65k,  ec65,   0,      ec65k,   ec65,  ec65k_state,  0,    "Elektor Electronics", "EC-65K", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

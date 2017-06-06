@@ -273,7 +273,7 @@ static GFXDECODE_START( silkroad )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles16x16x6_layout,  0x0000, 256 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( silkroad, silkroad_state )
+static MACHINE_CONFIG_START( silkroad )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, XTAL_32MHz/2) /* 16MHz */
@@ -300,11 +300,11 @@ static MACHINE_CONFIG_START( silkroad, silkroad_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki1", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki1", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.45)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.45)
 
-	MCFG_OKIM6295_ADD("oki2", 2112000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki2", 2112000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.45)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.45)
 MACHINE_CONFIG_END
@@ -393,5 +393,5 @@ ROM_START( silkroada )
 ROM_END
 
 
-GAME( 1999, silkroad,         0, silkroad, silkroad, driver_device, 0, ROT0, "Unico", "The Legend of Silkroad", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, silkroada, silkroad, silkroad, silkroad, driver_device, 0, ROT0, "Unico", "The Legend of Silkroad (larger ROMs)", MACHINE_SUPPORTS_SAVE ) // same content but fewer GFX roms of a larger size
+GAME( 1999, silkroad,  0,        silkroad, silkroad, silkroad_state, 0, ROT0, "Unico", "The Legend of Silkroad",               MACHINE_SUPPORTS_SAVE )
+GAME( 1999, silkroada, silkroad, silkroad, silkroad, silkroad_state, 0, ROT0, "Unico", "The Legend of Silkroad (larger ROMs)", MACHINE_SUPPORTS_SAVE ) // same content but fewer GFX roms of a larger size

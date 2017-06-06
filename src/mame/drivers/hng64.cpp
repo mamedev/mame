@@ -1516,6 +1516,8 @@ void hng64_state::machine_start()
 	{
 		m_videoregs[i] = 0xdeadbeef;
 	}
+
+	m_3dfifo_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hng64_state::hng64_3dfifo_processed), this));
 }
 
 void hng64_state::machine_reset()
@@ -1530,7 +1532,7 @@ void hng64_state::machine_reset()
 
 MACHINE_CONFIG_EXTERN(hng64_audio);
 
-static MACHINE_CONFIG_START(hng64, hng64_state)
+static MACHINE_CONFIG_START(hng64)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", VR4300BE, HNG64_MASTER_CLOCK)     // actually R4300
 	MCFG_MIPS3_ICACHE_SIZE(16384)

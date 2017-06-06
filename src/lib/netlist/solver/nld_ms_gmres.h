@@ -49,7 +49,7 @@ private:
 	//typedef typename mat_cr_t<storage_N>::type mattype;
 	typedef typename mat_cr_t<storage_N>::index_type mattype;
 
-	unsigned solve_ilu_gmres(nl_double (& RESTRICT x)[storage_N], const nl_double * RESTRICT rhs, const unsigned restart_max, const std::size_t mr, nl_double accuracy);
+	unsigned solve_ilu_gmres(nl_double (& RESTRICT x)[storage_N], const nl_double (& RESTRICT rhs)[storage_N], const unsigned restart_max, std::size_t mr, nl_double accuracy);
 
 	std::vector<unsigned> m_term_cr[storage_N];
 
@@ -144,8 +144,6 @@ unsigned matrix_solver_GMRES_t<m_N, storage_N>::vsolve_non_dynamic(const bool ne
 		const nl_double * const RESTRICT Idr = this->m_terms[k]->Idr();
 		const nl_double * const * RESTRICT other_cur_analog = this->m_terms[k]->connected_net_V();
 
-		new_V[k] = this->m_nets[k]->Q_Analog();
-
 		for (std::size_t i = 0; i < term_count; i++)
 		{
 			gtot_t = gtot_t + gt[i];
@@ -165,17 +163,20 @@ unsigned matrix_solver_GMRES_t<m_N, storage_N>::vsolve_non_dynamic(const bool ne
 			const std::size_t pi = m_term_cr[k][i];
 			mat.A[pi] -= go[i];
 		}
+
+		new_V[k] = this->m_nets[k]->Q_Analog();
+
 	}
 	mat.ia[iN] = static_cast<mattype>(mat.nz_num);
 
 	const nl_double accuracy = this->m_params.m_accuracy;
 
-	std::size_t mr = iN;
+	unsigned mr = iN;
 	if (iN > 3 )
 		mr = static_cast<unsigned>(std::sqrt(iN) * 2.0);
 	unsigned iter = std::max(1u, this->m_params.m_gs_loops);
-	unsigned gsl = solve_ilu_gmres(new_V, RHS, iter, static_cast<unsigned>(mr), accuracy);
-	unsigned failed = static_cast<unsigned>(mr) * iter;
+	unsigned gsl = solve_ilu_gmres(new_V, RHS, iter, mr, accuracy);
+	unsigned failed = mr * iter;
 
 	this->m_iterative_total += gsl;
 	this->m_stat_calculations++;
@@ -186,19 +187,9 @@ unsigned matrix_solver_GMRES_t<m_N, storage_N>::vsolve_non_dynamic(const bool ne
 		return matrix_solver_direct_t<m_N, storage_N>::vsolve_non_dynamic(newton_raphson);
 	}
 
-	if (newton_raphson)
-	{
-		nl_double err = this->delta(new_V);
-
-		this->store(new_V);
-
-		return (err > this->m_params.m_accuracy) ? 2 : 1;
-	}
-	else
-	{
-		this->store(new_V);
-		return 1;
-	}
+	const nl_double err = (newton_raphson ? this->delta(new_V) : 0.0);
+	this->store(new_V);
+	return (err > this->m_params.m_accuracy) ? 2 : 1;
 }
 
 template <typename T>
@@ -212,7 +203,7 @@ inline static void givens_mult( const T c, const T s, T & g0, T & g1 )
 }
 
 template <std::size_t m_N, std::size_t storage_N>
-unsigned matrix_solver_GMRES_t<m_N, storage_N>::solve_ilu_gmres (nl_double (& RESTRICT x)[storage_N], const nl_double * RESTRICT rhs, const unsigned restart_max, const std::size_t mr, nl_double accuracy)
+unsigned matrix_solver_GMRES_t<m_N, storage_N>::solve_ilu_gmres (nl_double (& RESTRICT x)[storage_N], const nl_double (& RESTRICT rhs)[storage_N], const unsigned restart_max, std::size_t mr, nl_double accuracy)
 {
 	/*-------------------------------------------------------------------------
 	 * The code below was inspired by code published by John Burkardt under
@@ -241,6 +232,8 @@ unsigned matrix_solver_GMRES_t<m_N, storage_N>::solve_ilu_gmres (nl_double (& RE
 
 	const    std::size_t n = this->N();
 
+	if (mr > n) mr = n;
+
 	if (m_use_iLU_preconditioning)
 		mat.incomplete_LU_factorization(m_LU);
 
@@ -264,7 +257,7 @@ unsigned matrix_solver_GMRES_t<m_N, storage_N>::solve_ilu_gmres (nl_double (& RE
 
 		mat.solveLUx(m_LU, Ax);
 
-		const nl_double rho_to_accuracy = std::sqrt(vecmult2(n, Ax)) / accuracy;
+		const nl_double rho_to_accuracy = std::sqrt(vec_mult2(n, Ax)) / accuracy;
 
 		rho_delta = accuracy * rho_to_accuracy;
 	}
@@ -288,7 +281,7 @@ unsigned matrix_solver_GMRES_t<m_N, storage_N>::solve_ilu_gmres (nl_double (& RE
 			mat.solveLUx(m_LU, residual);
 		}
 
-		rho = std::sqrt(vecmult2(n, residual));
+		rho = std::sqrt(vec_mult2(n, residual));
 
 		if (rho < rho_delta)
 			return itr_used + 1;
@@ -312,10 +305,10 @@ unsigned matrix_solver_GMRES_t<m_N, storage_N>::solve_ilu_gmres (nl_double (& RE
 
 			for (std::size_t j = 0; j <= k; j++)
 			{
-				m_ht[j][k] = vecmult(n, m_v[k1], m_v[j]);
+				m_ht[j][k] = vec_mult(n, m_v[k1], m_v[j]);
 				vec_add_mult_scalar(n, m_v[j], -m_ht[j][k], m_v[k1]);
 			}
-			m_ht[k1][k] = std::sqrt(vecmult2(n, m_v[k1]));
+			m_ht[k1][k] = std::sqrt(vec_mult2(n, m_v[k1]));
 
 			if (m_ht[k1][k] != 0.0)
 				vec_scale(n, m_v[k1], NL_FCONST(1.0) / m_ht[k1][k]);

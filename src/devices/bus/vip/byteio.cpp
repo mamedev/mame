@@ -15,7 +15,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type VIP_BYTEIO_PORT = device_creator<vip_byteio_port_device>;
+DEFINE_DEVICE_TYPE(VIP_BYTEIO_PORT, vip_byteio_port_device, "vip_byteio_port", "VIP byte I/O port")
 
 
 
@@ -44,9 +44,10 @@ device_vip_byteio_port_interface::device_vip_byteio_port_interface(const machine
 //-------------------------------------------------
 
 vip_byteio_port_device::vip_byteio_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, VIP_BYTEIO_PORT, "VIP byte I/O port", tag, owner, clock, "vip_byteio_port", __FILE__),
-		device_slot_interface(mconfig, *this),
-		m_write_inst(*this), m_cart(nullptr)
+	device_t(mconfig, VIP_BYTEIO_PORT, tag, owner, clock),
+	device_slot_interface(mconfig, *this),
+	m_write_inst(*this),
+	m_cart(nullptr)
 {
 }
 

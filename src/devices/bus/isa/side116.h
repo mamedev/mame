@@ -8,10 +8,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_ISA_SIDE116_H
+#define MAME_BUS_ISA_SIDE116_H
 
-#ifndef __ISA_SIDE116_H__
-#define __ISA_SIDE116_H__
+#pragma once
 
 #include "machine/ataintf.h"
 #include "isa.h"
@@ -23,8 +23,7 @@
 
 // ======================> side116_device
 
-class side116_device : public device_t,
-						public device_isa8_card_interface
+class side116_device : public device_t, public device_isa8_card_interface
 {
 public:
 	// construction/destruction
@@ -43,7 +42,6 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_config_complete() override { m_shortname = "side116"; }
 
 private:
 	required_device<ata_interface_device> m_ata;
@@ -53,6 +51,6 @@ private:
 
 
 // device type definition
-extern const device_type ISA8_SIDE116;
+DECLARE_DEVICE_TYPE(ISA8_SIDE116, side116_device)
 
-#endif
+#endif // MAME_BUS_ISA_SIDE116_H

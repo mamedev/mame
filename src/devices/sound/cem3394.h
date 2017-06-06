@@ -1,26 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles
+#ifndef MAME_SOUND_CEM3394_H
+#define MAME_SOUND_CEM3394_H
+
 #pragma once
-
-#ifndef __CEM3394_H__
-#define __CEM3394_H__
-
-#define CEM3394_SAMPLE_RATE     (44100*4)
-
-// inputs
-enum
-{
-	CEM3394_VCO_FREQUENCY = 0,
-	CEM3394_MODULATION_AMOUNT,
-	CEM3394_WAVE_SELECT,
-	CEM3394_PULSE_WIDTH,
-	CEM3394_MIXER_BALANCE,
-	CEM3394_FILTER_RESONANCE,
-	CEM3394_FILTER_FREQENCY,
-	CEM3394_FINAL_GAIN
-};
-
-typedef device_delegate<void (int count, short *buffer)> cem3394_ext_input_delegate;
 
 #define CEM3394_EXT_INPUT(_name) void _name(int count, short *buffer)
 
@@ -34,7 +17,7 @@ typedef device_delegate<void (int count, short *buffer)> cem3394_ext_input_deleg
 	MCFG_DEVICE_REPLACE(_tag, CEM3394, _clock)
 
 #define MCFG_CEM3394_EXT_INPUT_CB(_class, _method) \
-	cem3394_device::set_ext_input_callback(*device, cem3394_ext_input_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	cem3394_device::set_ext_input_callback(*device, cem3394_device::ext_input_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
 #define MCFG_CEM3394_VCO_ZERO(_freq) \
 	cem3394_device::set_vco_zero_freq(*device, _freq);
@@ -43,14 +26,29 @@ typedef device_delegate<void (int count, short *buffer)> cem3394_ext_input_deleg
 	cem3394_device::set_filter_zero_freq(*device, _freq);
 
 
-class cem3394_device : public device_t,
-						public device_sound_interface
+class cem3394_device : public device_t, public device_sound_interface
 {
 public:
-	cem3394_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~cem3394_device() { }
+	static constexpr unsigned SAMPLE_RATE = 44100*4;
 
-	static void set_ext_input_callback(device_t &device, cem3394_ext_input_delegate callback) { downcast<cem3394_device &>(device).m_ext_cb = callback; }
+	// inputs
+	enum
+	{
+		VCO_FREQUENCY = 0,
+		MODULATION_AMOUNT,
+		WAVE_SELECT,
+		PULSE_WIDTH,
+		MIXER_BALANCE,
+		FILTER_RESONANCE,
+		FILTER_FREQENCY,
+		FINAL_GAIN
+	};
+
+	typedef device_delegate<void (int count, short *buffer)> ext_input_delegate;
+
+	cem3394_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	static void set_ext_input_callback(device_t &device, ext_input_delegate &&callback) { downcast<cem3394_device &>(device).m_ext_cb = std::move(callback); }
 	static void set_vco_zero_freq(device_t &device, double freq) { downcast<cem3394_device &>(device).m_vco_zero_freq = freq; }
 	static void set_filter_zero_freq(device_t &device, double freq) { downcast<cem3394_device &>(device).m_filter_zero_freq = freq; }
 
@@ -66,14 +64,14 @@ public:
 	void set_voltage(int input, double voltage);
 
 	// Get the translated parameter associated with the given input as follows:
-	//    CEM3394_VCO_FREQUENCY:      frequency in Hz
-	//    CEM3394_MODULATION_AMOUNT:  scale factor, 0.0 to 2.0
-	//    CEM3394_WAVE_SELECT:        voltage from this line
-	//    CEM3394_PULSE_WIDTH:        width fraction, from 0.0 to 1.0
-	//    CEM3394_MIXER_BALANCE:      balance, from -1.0 to 1.0
-	//    CEM3394_FILTER_RESONANCE:   resonance, from 0.0 to 1.0
-	//    CEM3394_FILTER_FREQENCY:    frequency, in Hz
-	//    CEM3394_FINAL_GAIN:         gain, in dB
+	//    VCO_FREQUENCY:      frequency in Hz
+	//    MODULATION_AMOUNT:  scale factor, 0.0 to 2.0
+	//    WAVE_SELECT:        voltage from this line
+	//    PULSE_WIDTH:        width fraction, from 0.0 to 1.0
+	//    MIXER_BALANCE:      balance, from -1.0 to 1.0
+	//    FILTER_RESONANCE:   resonance, from 0.0 to 1.0
+	//    FILTER_FREQENCY:    frequency, in Hz
+	//    FINAL_GAIN:         gain, in dB
 	double get_parameter(int input);
 
 private:
@@ -81,7 +79,7 @@ private:
 	uint32_t compute_db_volume(double voltage);
 
 private:
-	cem3394_ext_input_delegate m_ext_cb; /* callback to generate external samples */
+	ext_input_delegate m_ext_cb; /* callback to generate external samples */
 
 	sound_stream *m_stream;           /* our stream */
 	double m_vco_zero_freq;           /* frequency of VCO at 0.0V */
@@ -111,7 +109,6 @@ private:
 	std::unique_ptr<int16_t[]> m_external_buffer;
 };
 
-extern const device_type CEM3394;
+DECLARE_DEVICE_TYPE(CEM3394, cem3394_device)
 
-
-#endif /* __CEM3394_H__ */
+#endif // MAME_SOUND_CEM3394_H

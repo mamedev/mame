@@ -16,7 +16,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type INTV_CONTROL_PORT = device_creator<intv_control_port_device>;
+DEFINE_DEVICE_TYPE(INTV_CONTROL_PORT, intv_control_port_device, "intv_control_port", "Mattel Intellivision control port")
 
 
 //**************************************************************************
@@ -52,8 +52,9 @@ device_intv_control_port_interface::~device_intv_control_port_interface()
 //-------------------------------------------------
 
 intv_control_port_device::intv_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-						device_t(mconfig, INTV_CONTROL_PORT, "Mattel Intellivision control port", tag, owner, clock, "intv_control_port", __FILE__),
-						device_slot_interface(mconfig, *this), m_device(nullptr)
+	device_t(mconfig, INTV_CONTROL_PORT, tag, owner, clock),
+	device_slot_interface(mconfig, *this),
+	m_device(nullptr)
 {
 }
 

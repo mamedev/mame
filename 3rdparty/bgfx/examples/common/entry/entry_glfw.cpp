@@ -158,8 +158,8 @@ namespace entry
 		GamepadGLFW()
 			: m_connected(false)
 		{
-			memset(m_axes, 0, sizeof(m_axes));
-			memset(m_buttons, 0, sizeof(m_buttons));
+			bx::memSet(m_axes, 0, sizeof(m_axes));
+			bx::memSet(m_buttons, 0, sizeof(m_buttons));
 		}
 
 		void update(EventQueue& _eventQueue)
@@ -310,7 +310,7 @@ namespace entry
 		Context()
 			: m_scrollPos(0.0)
 		{
-			memset(s_translateKey, 0, sizeof(s_translateKey));
+			bx::memSet(s_translateKey, 0, sizeof(s_translateKey));
 			s_translateKey[GLFW_KEY_ESCAPE]		  = Key::Esc;
 			s_translateKey[GLFW_KEY_ENTER]		  = Key::Return;
 			s_translateKey[GLFW_KEY_TAB]		  = Key::Tab;
@@ -589,7 +589,7 @@ namespace entry
 
 		WindowHandle findHandle(GLFWwindow* _window)
 		{
-			bx::LwMutexScope scope(m_lock);
+			bx::MutexScope scope(m_lock);
 			for (uint32_t ii = 0, num = m_windowAlloc.getNumHandles(); ii < num; ++ii)
 			{
 				uint16_t idx = m_windowAlloc.getHandleAt(ii);
@@ -615,14 +615,14 @@ namespace entry
 		bx::Thread m_thread;
 
 		EventQueue m_eventQueue;
-		bx::LwMutex m_lock;
+		bx::Mutex m_lock;
 
 		GLFWwindow* m_windows[ENTRY_CONFIG_MAX_WINDOWS];
 		bx::HandleAllocT<ENTRY_CONFIG_MAX_WINDOWS> m_windowAlloc;
 
 		GamepadGLFW m_gamepad[ENTRY_CONFIG_MAX_GAMEPADS];
 
-		bx::SpScUnboundedQueueLf<Msg> m_msgs;
+		bx::SpScUnboundedQueueT<Msg> m_msgs;
 
 		double m_scrollPos;
 	};

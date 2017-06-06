@@ -960,7 +960,7 @@ PALETTE_INIT_MEMBER(laser3k_state, laser3k)
 	palette.set_pen_colors(0, laser3k_palette, ARRAY_LENGTH(laser3k_palette));
 }
 
-static MACHINE_CONFIG_START( laser3k, laser3k_state )
+static MACHINE_CONFIG_START( laser3k )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 1021800)
 	MCFG_CPU_PROGRAM_MAP(laser3k_map)
@@ -1035,5 +1035,5 @@ ROM_START(las3000)
 	ROM_LOAD ( "l3kdisk.rom", 0x0000, 0x0100, CRC(2d4b1584) SHA1(989780b77e100598124df7b72663e5a31a3339c0))
 ROM_END
 
-/*    YEAR  NAME      PARENT    COMPAT    MACHINE      INPUT     INIT      COMPANY          FULLNAME */
-COMP( 1983, las3000,  0,        0,        laser3k,     laser3k, driver_device,  0,        "Video Technology",  "Laser 3000",    MACHINE_NOT_WORKING )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    STATE           INIT  COMPANY             FULLNAME      FLAGS
+COMP( 1983, las3000, 0,      0,      laser3k, laser3k, laser3k_state,  0,    "Video Technology", "Laser 3000", MACHINE_NOT_WORKING )

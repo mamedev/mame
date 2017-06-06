@@ -53,27 +53,13 @@ WRITE16_MEMBER(xmen_state::eeprom_w)
 		/* bit 8 = enable sprite ROM reading */
 		m_k053246->k053246_set_objcha_line( (data & 0x0100) ? ASSERT_LINE : CLEAR_LINE);
 		/* bit 9 = enable char ROM reading through the video RAM */
+		/* bit 10 = sound irq, but with some kind of hold */
 		m_k052109->set_rmrd_line((data & 0x0200) ? ASSERT_LINE : CLEAR_LINE);
+		if(data & 0x4) {
+			logerror("tick!\n");
+			m_audiocpu->set_input_line(0, HOLD_LINE);
+		}
 	}
-}
-
-READ16_MEMBER(xmen_state::sound_status_r)
-{
-	return m_soundlatch2->read(space, 0);
-}
-
-WRITE16_MEMBER(xmen_state::sound_cmd_w)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		data &= 0xff;
-		m_soundlatch->write(space, 0, data);
-	}
-}
-
-WRITE16_MEMBER(xmen_state::sound_irq_w)
-{
-	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
 WRITE16_MEMBER(xmen_state::xmen_18fa00_w)
@@ -99,9 +85,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, xmen_state )
 	AM_RANGE(0x104000, 0x104fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x108000, 0x108001) AM_WRITE(eeprom_w)
 	AM_RANGE(0x108020, 0x108027) AM_DEVWRITE("k053246", k053247_device, k053246_word_w)
-	AM_RANGE(0x10804c, 0x10804d) AM_WRITE(sound_cmd_w)
-	AM_RANGE(0x10804e, 0x10804f) AM_WRITE(sound_irq_w)
-	AM_RANGE(0x108054, 0x108055) AM_READ(sound_status_r)
+	AM_RANGE(0x108040, 0x10805f) AM_DEVICE8("k054321", k054321_device, main_map, 0x00ff)
 	AM_RANGE(0x108060, 0x10807f) AM_DEVWRITE("k053251", k053251_device, lsb_w)
 	AM_RANGE(0x10a000, 0x10a001) AM_READ_PORT("P2_P4") AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0x10a002, 0x10a003) AM_READ_PORT("P1_P3")
@@ -118,8 +102,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, xmen_state )
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe22f) AM_DEVREADWRITE("k054539", k054539_device, read, write)
 	AM_RANGE(0xe800, 0xe801) AM_MIRROR(0x0400) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0xf000, 0xf000) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
-	AM_RANGE(0xf002, 0xf002) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
+	AM_RANGE(0xf000, 0xf003) AM_DEVICE("k054321", k054321_device, sound_map)
 	AM_RANGE(0xf800, 0xf800) AM_WRITE(sound_bankswitch_w)
 ADDRESS_MAP_END
 
@@ -134,9 +117,7 @@ static ADDRESS_MAP_START( 6p_main_map, AS_PROGRAM, 16, xmen_state )
 	AM_RANGE(0x104000, 0x104fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x108000, 0x108001) AM_WRITE(eeprom_w)
 	AM_RANGE(0x108020, 0x108027) AM_DEVWRITE("k053246", k053247_device, k053246_word_w) /* sprites */
-	AM_RANGE(0x10804c, 0x10804d) AM_WRITE(sound_cmd_w)
-	AM_RANGE(0x10804e, 0x10804f) AM_WRITE(sound_irq_w)
-	AM_RANGE(0x108054, 0x108055) AM_READ(sound_status_r)
+	AM_RANGE(0x108040, 0x10805f) AM_DEVICE8("k054321", k054321_device, main_map, 0x00ff)
 	AM_RANGE(0x108060, 0x10807f) AM_DEVWRITE("k053251", k053251_device, lsb_w)
 	AM_RANGE(0x10a000, 0x10a001) AM_READ_PORT("P2_P4") AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0x10a002, 0x10a003) AM_READ_PORT("P1_P3")
@@ -313,7 +294,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(xmen_state::xmen_scanline)
 
 }
 
-static MACHINE_CONFIG_START( xmen, xmen_state )
+static MACHINE_CONFIG_START( xmen )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz) /* verified on pcb */
@@ -354,8 +335,7 @@ static MACHINE_CONFIG_START( xmen, xmen_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	MCFG_K054321_ADD("k054321", ":lspeaker", ":rspeaker")
 
 	MCFG_YM2151_ADD("ymsnd", XTAL_16MHz/4)  /* verified on pcb */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.20)
@@ -366,7 +346,7 @@ static MACHINE_CONFIG_START( xmen, xmen_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( xmen6p, xmen_state )
+static MACHINE_CONFIG_START( xmen6p )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
@@ -417,11 +397,10 @@ static MACHINE_CONFIG_START( xmen6p, xmen_state )
 
 	MCFG_K053251_ADD("k053251")
 
+	MCFG_K054321_ADD("k054321", ":lspeaker", ":rspeaker")
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
 	MCFG_YM2151_ADD("ymsnd", XTAL_16MHz/4)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.20)
@@ -842,15 +821,15 @@ ROM_END
 
 /* Second "version" letter denotes players, A=2 players, B=4 players, C=6 players ??? - For the Asia versions both D & E are 4 players */
 
-GAME( 1992, xmen,    0,    xmen,   xmen,   driver_device,  0,   ROT0, "Konami", "X-Men (4 Players ver UBB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, xmenj,   xmen, xmen,   xmen,   driver_device,  0,   ROT0, "Konami", "X-Men (4 Players ver JBA)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, xmene,   xmen, xmen,   xmen,   driver_device,  0,   ROT0, "Konami", "X-Men (4 Players ver EBA)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, xmena,   xmen, xmen,   xmen,   driver_device,  0,   ROT0, "Konami", "X-Men (4 Players ver AEA)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, xmenaa,  xmen, xmen,   xmen,   driver_device,  0,   ROT0, "Konami", "X-Men (4 Players ver ADA)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, xmen2pe, xmen, xmen,   xmen2p, driver_device,  0,   ROT0, "Konami", "X-Men (2 Players ver EAA)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, xmen2pu, xmen, xmen,   xmen2p, driver_device,  0,   ROT0, "Konami", "X-Men (2 Players ver UAB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, xmen2pa, xmen, xmen,   xmen2p, driver_device,  0,   ROT0, "Konami", "X-Men (2 Players ver AAA)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, xmen2pj, xmen, xmen,   xmen2p, driver_device,  0,   ROT0, "Konami", "X-Men (2 Players ver JAA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, xmen,    0,    xmen,   xmen,   xmen_state,  0,   ROT0, "Konami", "X-Men (4 Players ver UBB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, xmenj,   xmen, xmen,   xmen,   xmen_state,  0,   ROT0, "Konami", "X-Men (4 Players ver JBA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, xmene,   xmen, xmen,   xmen,   xmen_state,  0,   ROT0, "Konami", "X-Men (4 Players ver EBA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, xmena,   xmen, xmen,   xmen,   xmen_state,  0,   ROT0, "Konami", "X-Men (4 Players ver AEA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, xmenaa,  xmen, xmen,   xmen,   xmen_state,  0,   ROT0, "Konami", "X-Men (4 Players ver ADA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, xmen2pe, xmen, xmen,   xmen2p, xmen_state,  0,   ROT0, "Konami", "X-Men (2 Players ver EAA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, xmen2pu, xmen, xmen,   xmen2p, xmen_state,  0,   ROT0, "Konami", "X-Men (2 Players ver UAB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, xmen2pa, xmen, xmen,   xmen2p, xmen_state,  0,   ROT0, "Konami", "X-Men (2 Players ver AAA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, xmen2pj, xmen, xmen,   xmen2p, xmen_state,  0,   ROT0, "Konami", "X-Men (2 Players ver JAA)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1992, xmen6p,  xmen, xmen6p, xmen6p, driver_device,  0,   ROT0, "Konami", "X-Men (6 Players ver ECB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, xmen6pu, xmen, xmen6p, xmen6p, driver_device,  0,   ROT0, "Konami", "X-Men (6 Players ver UCB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, xmen6p,  xmen, xmen6p, xmen6p, xmen_state,  0,   ROT0, "Konami", "X-Men (6 Players ver ECB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, xmen6pu, xmen, xmen6p, xmen6p, xmen_state,  0,   ROT0, "Konami", "X-Men (6 Players ver UCB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

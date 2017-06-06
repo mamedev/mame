@@ -26,7 +26,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type VP590 = device_creator<vp590_device>;
+DEFINE_DEVICE_TYPE(VP590, vp590_device, "vp590", "VP-590 Color Board + VP-580 16-key keypad")
 
 
 //-------------------------------------------------
@@ -50,10 +50,10 @@ READ_LINE_MEMBER( vp590_device::gd_r )
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( vp590 )
+//  MACHINE_CONFIG_START( vp590 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( vp590 )
+static MACHINE_CONFIG_START( vp590 )
 	MCFG_DEVICE_ADD(CDP1862_TAG, CDP1862, CPD1862_CLOCK)
 	MCFG_CDP1861_RD_CALLBACK(DEVREADLINE(DEVICE_SELF, vp590_device, rd_r))
 	MCFG_CDP1861_BD_CALLBACK(DEVREADLINE(DEVICE_SELF, vp590_device, bd_r))
@@ -138,12 +138,13 @@ ioport_constructor vp590_device::device_input_ports() const
 //-------------------------------------------------
 
 vp590_device::vp590_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, VP590, "VP590", tag, owner, clock, "vp590", __FILE__),
+	device_t(mconfig, VP590, tag, owner, clock),
 	device_vip_expansion_card_interface(mconfig, *this),
 	m_cgc(*this, CDP1862_TAG),
 	m_color_ram(*this, "color_ram"),
 	m_j1(*this, "J1"),
-	m_j2(*this, "J2"), m_a12(0), m_color(0), m_keylatch(0)
+	m_j2(*this, "J2"),
+	m_a12(0), m_color(0), m_keylatch(0)
 {
 }
 

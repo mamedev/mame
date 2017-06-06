@@ -334,6 +334,7 @@ Notes:
 
 #include "emu.h"
 #include "includes/jaguar.h"
+
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "cpu/m68000/m68000.h"
@@ -342,6 +343,7 @@ Notes:
 #include "imagedev/chd_cd.h"
 #include "imagedev/snapquik.h"
 #include "machine/eepromser.h"
+#include "machine/idehd.h"
 #include "machine/watchdog.h"
 #include "machine/vt83c461.h"
 #include "sound/cdda.h"
@@ -370,15 +372,13 @@ IRQ_CALLBACK_MEMBER(jaguar_state::jaguar_irq_callback)
 /// HACK: Maximum force requests data but doesn't transfer it all before issuing another command.
 /// According to the ATA specification this is not allowed, more investigation is required.
 
-#include "machine/idehd.h"
-
-extern const device_type COJAG_HARDDISK;
+DECLARE_DEVICE_TYPE(COJAG_HARDDISK, cojag_hdd)
 
 class cojag_hdd : public ide_hdd_device
 {
 public:
 	cojag_hdd(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: ide_hdd_device(mconfig, COJAG_HARDDISK, "HDD CoJag", tag, owner, clock, "cojag_hdd", __FILE__)
+		: ide_hdd_device(mconfig, COJAG_HARDDISK, tag, owner, clock)
 	{
 	}
 
@@ -394,7 +394,7 @@ public:
 	}
 };
 
-const device_type COJAG_HARDDISK = device_creator<cojag_hdd>;
+DEFINE_DEVICE_TYPE(COJAG_HARDDISK, cojag_hdd, "cojag_hdd", "HDD CoJag")
 
 SLOT_INTERFACE_START(cojag_devices)
 	SLOT_INTERFACE("hdd", COJAG_HARDDISK)
@@ -1801,7 +1801,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( cojagr3k, jaguar_state )
+static MACHINE_CONFIG_START( cojagr3k )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", R3041, R3000_CLOCK)
@@ -1851,7 +1851,7 @@ static MACHINE_CONFIG_DERIVED( cojag68k, cojagr3k )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( jaguar, jaguar_state )
+static MACHINE_CONFIG_START( jaguar )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, JAGUAR_CLOCK/2)

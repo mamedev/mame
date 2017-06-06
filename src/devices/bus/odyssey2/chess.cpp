@@ -19,18 +19,18 @@
 //  o2_chess_device - constructor
 //-------------------------------------------------
 
-const device_type O2_ROM_CHESS = device_creator<o2_chess_device>;
+DEFINE_DEVICE_TYPE(O2_ROM_CHESS, o2_chess_device, "o2_chess", "Odyssey 2 Videopac Chess Module")
 
 
 o2_chess_device::o2_chess_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: o2_rom_device(mconfig, O2_ROM_CHESS, "Odyssey 2 BASIC Carts", tag, owner, clock, "o2_chess", __FILE__),
-					m_cpu(*this, "subcpu")
+	: o2_rom_device(mconfig, O2_ROM_CHESS, tag, owner, clock)
+	, m_cpu(*this, "subcpu")
 {
 }
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( o2chess )
+//  MACHINE_CONFIG_START( o2chess )
 //-------------------------------------------------
 
 static ADDRESS_MAP_START(chess_mem, AS_PROGRAM, 8, o2_chess_device)
@@ -42,7 +42,7 @@ static ADDRESS_MAP_START(chess_io, AS_IO, 8, o2_chess_device)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_FRAGMENT( o2chess )
+static MACHINE_CONFIG_START( o2chess )
 	MCFG_CPU_ADD("subcpu", NSC800, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(chess_mem)
 	MCFG_CPU_IO_MAP(chess_io)

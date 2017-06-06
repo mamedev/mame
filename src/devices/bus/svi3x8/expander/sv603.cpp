@@ -17,7 +17,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SV603 = device_creator<sv603_device>;
+DEFINE_DEVICE_TYPE(SV603, sv603_device, "sv603", "SV-603 Coleco Game Adapter")
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -38,7 +38,7 @@ const tiny_rom_entry *sv603_device::device_rom_region() const
 //  machine configurations
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( sv603 )
+static MACHINE_CONFIG_START( sv603 )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("snd", SN76489A, XTAL_10_738635MHz / 3)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
@@ -80,7 +80,7 @@ DEVICE_IMAGE_LOAD_MEMBER( sv603_device, cartridge )
 //-------------------------------------------------
 
 sv603_device::sv603_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, SV603, "SV-603 Coleco Game Adapter", tag, owner, clock, "sv603", __FILE__),
+	device_t(mconfig, SV603, tag, owner, clock),
 	device_svi_expander_interface(mconfig, *this),
 	m_bios(*this, "bios"),
 	m_snd(*this, "snd"),

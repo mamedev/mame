@@ -4,6 +4,8 @@
 #ifndef MAME_BUS_RS232_IE15_H
 #define MAME_BUS_RS232_IE15_H
 
+#pragma once
+
 #include "rs232.h"
 #include "machine/ie15.h"
 
@@ -37,6 +39,6 @@ private:
 	required_ioport m_rs232_stopbits;
 };
 
-extern const device_type SERIAL_TERMINAL_IE15;
+DECLARE_DEVICE_TYPE(SERIAL_TERMINAL_IE15, ie15_terminal_device)
 
 #endif // MAME_BUS_RS232_IE15_H

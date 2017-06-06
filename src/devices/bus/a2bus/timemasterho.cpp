@@ -46,21 +46,11 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_TIMEMASTERHO = device_creator<a2bus_timemasterho_device>;
+DEFINE_DEVICE_TYPE(A2BUS_TIMEMASTERHO, a2bus_timemasterho_device, "a2tmstho", "Applied Engineering TimeMaster H.O.")
 
 #define TIMEMASTER_ROM_REGION   "timemst_rom"
 #define TIMEMASTER_PIA_TAG      "timemst_pia"
 #define TIMEMASTER_M5832_TAG    "timemst_msm"
-
-MACHINE_CONFIG_FRAGMENT( timemaster )
-	MCFG_DEVICE_ADD(TIMEMASTER_PIA_TAG, PIA6821, 1021800)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(a2bus_timemasterho_device, pia_out_a))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(a2bus_timemasterho_device, pia_out_b))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(a2bus_timemasterho_device, pia_irqa_w))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(a2bus_timemasterho_device, pia_irqb_w))
-
-	MCFG_DEVICE_ADD(TIMEMASTER_M5832_TAG, MSM5832, 32768)
-MACHINE_CONFIG_END
 
 ROM_START( timemaster )
 	ROM_REGION(0x1000, TIMEMASTER_ROM_REGION, 0)
@@ -100,14 +90,18 @@ ioport_constructor a2bus_timemasterho_device::device_input_ports() const
 }
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor a2bus_timemasterho_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( timemaster );
-}
+MACHINE_CONFIG_MEMBER( a2bus_timemasterho_device::device_add_mconfig )
+	MCFG_DEVICE_ADD(TIMEMASTER_PIA_TAG, PIA6821, 1021800)
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(a2bus_timemasterho_device, pia_out_a))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(a2bus_timemasterho_device, pia_out_b))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(a2bus_timemasterho_device, pia_irqa_w))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(a2bus_timemasterho_device, pia_irqb_w))
+
+	MCFG_DEVICE_ADD(TIMEMASTER_M5832_TAG, MSM5832, 32768)
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -122,8 +116,8 @@ const tiny_rom_entry *a2bus_timemasterho_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_timemasterho_device::a2bus_timemasterho_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+a2bus_timemasterho_device::a2bus_timemasterho_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this),
 	m_pia(*this, TIMEMASTER_PIA_TAG),
 	m_msm5832(*this, TIMEMASTER_M5832_TAG),
@@ -133,11 +127,7 @@ a2bus_timemasterho_device::a2bus_timemasterho_device(const machine_config &mconf
 }
 
 a2bus_timemasterho_device::a2bus_timemasterho_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, A2BUS_TIMEMASTERHO, "Applied Engineering TimeMaster H.O.", tag, owner, clock, "a2tmstho", __FILE__),
-	device_a2bus_card_interface(mconfig, *this),
-	m_pia(*this, TIMEMASTER_PIA_TAG),
-	m_msm5832(*this, TIMEMASTER_M5832_TAG),
-	m_dsw1(*this, "DSW1"), m_rom(nullptr), m_irqa(false), m_irqb(false)
+	a2bus_timemasterho_device(mconfig, A2BUS_TIMEMASTERHO, tag, owner, clock)
 {
 	m_started = false;
 }

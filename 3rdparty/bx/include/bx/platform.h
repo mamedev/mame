@@ -29,12 +29,20 @@
 #define BX_CPU_X86   0
 
 // C Runtime
-#define BX_CRT_MSVC   0
+#define BX_CRT_BIONIC 0
 #define BX_CRT_GLIBC  0
 #define BX_CRT_LIBCXX 0
-#define BX_CRT_NEWLIB 0
 #define BX_CRT_MINGW  0
-#define BX_CRT_MUSL   0
+#define BX_CRT_MSVC   0
+#define BX_CRT_NEWLIB 0
+
+#ifndef BX_CRT_MUSL
+#	define BX_CRT_MUSL 0
+#endif // BX_CRT_MUSL
+
+#ifndef BX_CRT_NONE
+#	define BX_CRT_NONE 0
+#endif // BX_CRT_NONE
 
 // Platform
 #define BX_PLATFORM_ANDROID    0
@@ -63,34 +71,12 @@
 #		undef  BX_COMPILER_CLANG_ANALYZER
 #		define BX_COMPILER_CLANG_ANALYZER 1
 #	endif // defined(__clang_analyzer__)
-#	if defined(_MSC_VER)
-#		undef  BX_CRT_MSVC
-#		define BX_CRT_MSVC 1
-#	elif defined(__GLIBC__)
-#		undef  BX_CRT_GLIBC
-#		define BX_CRT_GLIBC (__GLIBC__ * 10000 + __GLIBC_MINOR__ * 100)
-#	elif defined(__MINGW32__) || defined(__MINGW64__)
-#		undef  BX_CRT_MINGW
-#		define BX_CRT_MINGW 1
-#	elif defined(__apple_build_version__) || defined(__ANDROID__)
-#		undef  BX_CRT_LIBCXX
-#		define BX_CRT_LIBCXX 1
-#	endif //
 #elif defined(_MSC_VER)
 #	undef  BX_COMPILER_MSVC
 #	define BX_COMPILER_MSVC _MSC_VER
-#	undef  BX_CRT_MSVC
-#	define BX_CRT_MSVC 1
 #elif defined(__GNUC__)
 #	undef  BX_COMPILER_GCC
 #	define BX_COMPILER_GCC (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
-#	if defined(__GLIBC__)
-#		undef  BX_CRT_GLIBC
-#		define BX_CRT_GLIBC (__GLIBC__ * 10000 + __GLIBC_MINOR__ * 100)
-#	elif defined(__MINGW32__) || defined(__MINGW64__)
-#		undef  BX_CRT_MINGW
-#		define BX_CRT_MINGW 1
-#	endif //
 #else
 #	error "BX_COMPILER_* is not defined!"
 #endif //
@@ -192,7 +178,7 @@
 #	endif
 #elif defined(__ANDROID__)
 // Android compiler defines __linux__
-#	include <android/api-level.h>
+#	include <sys/cdefs.h> // Defines __BIONIC__ and includes android/api-level.h
 #	undef  BX_PLATFORM_ANDROID
 #	define BX_PLATFORM_ANDROID __ANDROID_API__
 #elif defined(__native_client__)
@@ -217,11 +203,7 @@
 #	define BX_PLATFORM_IOS 1
 #elif defined(__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__)
 #	undef  BX_PLATFORM_OSX
-#	if defined(__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__)
-#		define BX_PLATFORM_OSX __ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__
-#	else
-#		define BX_PLATFORM_OSX 1
-#	endif // defined(__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__)
+#	define BX_PLATFORM_OSX __ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__
 #elif defined(__EMSCRIPTEN__)
 #	undef  BX_PLATFORM_EMSCRIPTEN
 #	define BX_PLATFORM_EMSCRIPTEN 1
@@ -231,13 +213,48 @@
 #elif defined(__QNX__)
 #	undef  BX_PLATFORM_QNX
 #	define BX_PLATFORM_QNX 1
-#elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__DragonFly__)
+#elif  defined(__FreeBSD__)        \
+	|| defined(__FreeBSD_kernel__) \
+	|| defined(__NetBSD__)         \
+	|| defined(__OpenBSD__)        \
+	|| defined(__DragonFly__)
 #	undef  BX_PLATFORM_BSD
 #	define BX_PLATFORM_BSD 1
 #elif defined(__GNU__)
 #	undef  BX_PLATFORM_HURD
 #	define BX_PLATFORM_HURD 1
 #endif //
+
+#if !BX_CRT_NONE
+// https://sourceforge.net/p/predef/wiki/Libraries/
+#	if defined(__BIONIC__)
+#		undef  BX_CRT_BIONIC
+#		define BX_CRT_BIONIC 1
+#	elif defined(_MSC_VER)
+#		undef  BX_CRT_MSVC
+#		define BX_CRT_MSVC 1
+#	elif defined(__GLIBC__)
+#		undef  BX_CRT_GLIBC
+#		define BX_CRT_GLIBC (__GLIBC__ * 10000 + __GLIBC_MINOR__ * 100)
+#	elif defined(__MINGW32__) || defined(__MINGW64__)
+#		undef  BX_CRT_MINGW
+#		define BX_CRT_MINGW 1
+#	elif defined(__apple_build_version__) || defined(__ORBIS__) || defined(__EMSCRIPTEN__) || defined(__llvm__)
+#		undef  BX_CRT_LIBCXX
+#		define BX_CRT_LIBCXX 1
+#	endif //
+
+#	if !BX_CRT_BIONIC \
+	&& !BX_CRT_GLIBC  \
+	&& !BX_CRT_LIBCXX \
+	&& !BX_CRT_MINGW  \
+	&& !BX_CRT_MSVC   \
+	&& !BX_CRT_MUSL   \
+	&& !BX_CRT_NEWLIB
+#		undef  BX_CRT_NONE
+#		define BX_CRT_NONE 1
+#	endif // BX_CRT_*
+#endif // !BX_CRT_NONE
 
 #define BX_PLATFORM_POSIX (0      \
 		|| BX_PLATFORM_ANDROID    \
@@ -254,18 +271,24 @@
 		|| BX_PLATFORM_RPI        \
 		)
 
-#define BX_CRT_NONE !(0  \
-		|| BX_CRT_MSVC   \
-		|| BX_CRT_GLIBC  \
-		|| BX_CRT_LIBCXX \
-		|| BX_CRT_NEWLIB \
-		|| BX_CRT_MINGW  \
-		|| BX_CRT_MUSL   \
+#define BX_PLATFORM_NONE !(0      \
+		|| BX_PLATFORM_ANDROID    \
+		|| BX_PLATFORM_EMSCRIPTEN \
+		|| BX_PLATFORM_BSD        \
+		|| BX_PLATFORM_HURD       \
+		|| BX_PLATFORM_IOS        \
+		|| BX_PLATFORM_LINUX      \
+		|| BX_PLATFORM_NACL       \
+		|| BX_PLATFORM_OSX        \
+		|| BX_PLATFORM_PS4        \
+		|| BX_PLATFORM_QNX        \
+		|| BX_PLATFORM_RPI        \
+		|| BX_PLATFORM_STEAMLINK  \
+		|| BX_PLATFORM_WINDOWS    \
+		|| BX_PLATFORM_WINRT      \
+		|| BX_PLATFORM_XBOX360    \
+		|| BX_PLATFORM_XBOXONE    \
 		)
-
-#ifndef  BX_CONFIG_ENABLE_MSVC_LEVEL4_WARNINGS
-#	define BX_CONFIG_ENABLE_MSVC_LEVEL4_WARNINGS 0
-#endif // BX_CONFIG_ENABLE_MSVC_LEVEL4_WARNINGS
 
 #if BX_COMPILER_GCC
 #	define BX_COMPILER_NAME "GCC " \
@@ -332,8 +355,10 @@
 #	define BX_PLATFORM_NAME "Xbox 360"
 #elif BX_PLATFORM_XBOXONE
 #	define BX_PLATFORM_NAME "Xbox One"
-#else
+#elif BX_PLATFORM_NONE
 #	define BX_PLATFORM_NAME "None"
+#else
+#	error "Unknown BX_PLATFORM!"
 #endif // BX_PLATFORM_
 
 #if BX_CPU_ARM
@@ -350,18 +375,24 @@
 #	define BX_CPU_NAME "x86"
 #endif // BX_CPU_
 
-#if BX_CRT_MSVC
-#	define BX_CRT_NAME "MSVC C Runtime"
+#if BX_CRT_BIONIC
+#	define BX_CRT_NAME "Bionic libc"
 #elif BX_CRT_GLIBC
 #	define BX_CRT_NAME "GNU C Library"
-#elif BX_CRT_NEWLIB
-#	define BX_CRT_NAME "Newlib"
+#elif BX_CRT_MSVC
+#	define BX_CRT_NAME "MSVC C Runtime"
 #elif BX_CRT_MINGW
 #	define BX_CRT_NAME "MinGW C Runtime"
+#elif BX_CRT_LIBCXX
+#	define BX_CRT_NAME "Clang C Library"
+#elif BX_CRT_NEWLIB
+#	define BX_CRT_NAME "Newlib"
 #elif BX_CRT_MUSL
 #	define BX_CRT_NAME "musl libc"
-#else
+#elif BX_CRT_NONE
 #	define BX_CRT_NAME "None"
+#else
+#	error "Unknown BX_CRT!"
 #endif // BX_CRT_
 
 #if BX_ARCH_32BIT
@@ -369,26 +400,5 @@
 #elif BX_ARCH_64BIT
 #	define BX_ARCH_NAME "64-bit"
 #endif // BX_ARCH_
-
-#if BX_CONFIG_ENABLE_MSVC_LEVEL4_WARNINGS && BX_COMPILER_MSVC
-#	pragma warning(error:4062) // ENABLE warning C4062: enumerator'...' in switch of enum '...' is not handled
-#	pragma warning(error:4100) // ENABLE warning C4100: '' : unreferenced formal parameter
-#	pragma warning(error:4189) // ENABLE warning C4189: '' : local variable is initialized but not referenced
-#	pragma warning(error:4121) // ENABLE warning C4121: 'symbol' : alignment of a member was sensitive to packing
-//#	pragma warning(error:4127) // ENABLE warning C4127: conditional expression is constant
-#	pragma warning(error:4130) // ENABLE warning C4130: 'operator' : logical operation on address of string constant
-#	pragma warning(error:4239) // ENABLE warning C4239: nonstandard extension used : 'argument' : conversion from '*' to '* &' A non-const reference may only be bound to an lvalue
-//#	pragma warning(error:4244) // ENABLE warning C4244: 'argument' : conversion from 'type1' to 'type2', possible loss of data
-#	pragma warning(error:4245) // ENABLE warning C4245: 'conversion' : conversion from 'type1' to 'type2', signed/unsigned mismatch
-#	pragma warning(error:4263) // ENABLE warning C4263: 'function' : member function does not override any base class virtual member function
-#	pragma warning(error:4265) // ENABLE warning C4265: class has virtual functions, but destructor is not virtual
-#	pragma warning(error:4431) // ENABLE warning C4431: missing type specifier - int assumed. Note: C no longer supports default-int
-#	pragma warning(error:4505) // ENABLE warning C4505: '' : unreferenced local function has been removed
-#	pragma warning(error:4545) // ENABLE warning C4545: expression before comma evaluates to a function which is missing an argument list
-#	pragma warning(error:4549) // ENABLE warning C4549: 'operator' : operator before comma has no effect; did you intend 'operator'?
-#	pragma warning(error:4701) // ENABLE warning C4701: potentially uninitialized local variable 'name' used
-#	pragma warning(error:4706) // ENABLE warning C4706: assignment within conditional expression
-#	pragma warning(error:4800) // ENABLE warning C4800: '': forcing value to bool 'true' or 'false' (performance warning)
-#endif // BX_CONFIG_ENABLE_MSVC_LEVEL4_WARNINGS && BX_COMPILER_MSVC
 
 #endif // BX_PLATFORM_H_HEADER_GUARD

@@ -113,7 +113,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type PDC = device_creator<pdc_device>;
+DEFINE_DEVICE_TYPE(PDC, pdc_device, "rolm_pdc", "ROLM PDC")
 
 //-------------------------------------------------
 //  ROM( PDC )
@@ -248,10 +248,10 @@ FLOPPY_FORMATS_MEMBER( pdc_device::floppy_formats )
 FLOPPY_FORMATS_END
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( pdc )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( pdc )
+MACHINE_CONFIG_MEMBER( pdc_device::device_add_mconfig )
 	/* CPU - Zilog Z0840006PSC */
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_10MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(pdc_mem)
@@ -284,16 +284,6 @@ static MACHINE_CONFIG_FRAGMENT( pdc )
 	MCFG_MFM_HARDDISK_CONN_ADD("h1", pdc_harddisks, nullptr, MFM_BYTE, 3000, 20, MFMHD_GEN_FORMAT)
 MACHINE_CONFIG_END
 
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor pdc_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( pdc );
-}
-
 ioport_constructor pdc_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( pdc_ports );
@@ -308,7 +298,7 @@ ioport_constructor pdc_device::device_input_ports() const
 //-------------------------------------------------
 
 pdc_device::pdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, PDC, "ROLM PDC", tag, owner, clock, "pdc", __FILE__),
+	device_t(mconfig, PDC, tag, owner, clock),
 	m_pdccpu(*this, Z80_TAG),
 	m_dma8237(*this, FDCDMA_TAG),
 	m_fdc(*this, FDC_TAG),

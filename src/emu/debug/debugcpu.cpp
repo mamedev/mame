@@ -202,7 +202,7 @@ void debugger_cpu::source_script(const char *file)
 		m_source_file = fopen(file, "r");
 		if (!m_source_file)
 		{
-			if (m_machine.phase() == MACHINE_PHASE_RUNNING)
+			if (m_machine.phase() == machine_phase::RUNNING)
 				m_machine.debugger().console().printf("Cannot open command file '%s'\n", file);
 			else
 				fatalerror("Cannot open command file '%s'\n", file);
@@ -1013,7 +1013,7 @@ u64 debugger_cpu::expression_read_memory(void *param, const char *name, expressi
 			auto dis = m_machine.disable_side_effect(disable_se);
 			return expression_read_program_direct(memory->space(AS_DECRYPTED_OPCODES), (spacenum == EXPSPACE_OPCODE), address, size);
 			break;
-		}	
+		}
 
 		case EXPSPACE_REGION:
 			if (name == nullptr)

@@ -293,7 +293,7 @@ INPUT_PORTS_START( segasp )
 
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_DERIVED_CLASS( segasp, naomi_aw_base, segasp_state )
+static MACHINE_CONFIG_DERIVED( segasp, naomi_aw_base )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(segasp_map)
 	MCFG_CPU_IO_MAP(onchip_port)
@@ -452,7 +452,7 @@ ROM_START( lovebero )
 	SEGASP_MISC
 
 	ROM_REGION( 0x08000000, "rom_board", ROMREGION_ERASE)
-	ROM_LOAD( "ic62",  0x00000000, 0x4000000, CRC(0a23cea3) SHA1(1780d935b0d641769859b2022df8e4262e7bafd8) )
+	ROM_LOAD( "ic62",  0x00000000, 0x4000000, CRC(0a23cea3) SHA1(1780d935b0d641769859b2022df8e4262e7bafd8) ) // sldh
 	ROM_LOAD( "ic63",  0x04000000, 0x4000000, CRC(d3870287) SHA1(efd3630d54068f5a8caf242a48db410bedf48e7a) )
 
 	ROM_PARAMETER( ":rom_board:id", "5508" )  // 8x 512Mbit FlashROMs
@@ -539,24 +539,24 @@ ROM_END
 
 #define GAME_FLAGS (MACHINE_NO_SOUND|MACHINE_NOT_WORKING)
 
-GAME( 2004, segasp,  0,          segasp,    segasp, driver_device,    0, ROT0, "Sega", "Sega System SP (Spider) BIOS", GAME_FLAGS | MACHINE_IS_BIOS_ROOT )
+GAME( 2004, segasp,  0,          segasp,    segasp, segasp_state,    0, ROT0, "Sega", "Sega System SP (Spider) BIOS", GAME_FLAGS | MACHINE_IS_BIOS_ROOT )
 
 // These use ROMs
-GAME( 2009, brickppl,segasp,     segasp,    segasp, driver_device,    0, ROT0, "Sega", "Brick People / Block PeePoo (Ver 1.002)", GAME_FLAGS )
+GAME( 2009, brickppl,segasp,     segasp,    segasp, segasp_state,    0, ROT0, "Sega", "Brick People / Block PeePoo (Ver 1.002)", GAME_FLAGS )
 
-GAME( 2005, dinoking,segasp,     segasp,    segasp, driver_device,    0, ROT0, "Sega", "Dinosaur King (USA)", GAME_FLAGS )
+GAME( 2005, dinoking,segasp,     segasp,    segasp, segasp_state,    0, ROT0, "Sega", "Dinosaur King (USA)", GAME_FLAGS )
 
-GAME( 2006, dinokior,segasp,     segasp,    segasp, driver_device,    0, ROT0, "Sega", "Dinosaur King - Operation: Dinosaur Rescue (USA, Export)", GAME_FLAGS )
+GAME( 2006, dinokior,segasp,     segasp,    segasp, segasp_state,    0, ROT0, "Sega", "Dinosaur King - Operation: Dinosaur Rescue (USA, Export)", GAME_FLAGS )
 
-GAME( 2006, lovebery,segasp,     segasp,    segasp, driver_device,    0, ROT0, "Sega", "Love And Berry - 1st-2nd Collection (Export, Ver 2.000)", GAME_FLAGS )
-GAME( 2006, lovebero,lovebery,   segasp,    segasp, driver_device,    0, ROT0, "Sega", "Love And Berry - 1st-2nd Collection (Export, Ver 1.003)", GAME_FLAGS )
+GAME( 2006, lovebery,segasp,     segasp,    segasp, segasp_state,    0, ROT0, "Sega", "Love And Berry - 1st-2nd Collection (Export, Ver 2.000)", GAME_FLAGS )
+GAME( 2006, lovebero,lovebery,   segasp,    segasp, segasp_state,    0, ROT0, "Sega", "Love And Berry - 1st-2nd Collection (Export, Ver 1.003)", GAME_FLAGS )
 
-GAME( 2009, tetgiant,segasp,     segasp,    segasp, driver_device,    0, ROT0, "Sega", "Tetris Giant / Tetris Dekaris (Ver.2.000)", GAME_FLAGS )
+GAME( 2009, tetgiant,segasp,     segasp,    segasp, segasp_state,    0, ROT0, "Sega", "Tetris Giant / Tetris Dekaris (Ver.2.000)", GAME_FLAGS )
 
 // These use a CF card
 
-GAME( 2008, dinoki25,segasp,     segasp,    segasp, driver_device,    0, ROT0, "Sega", "Dinosaur King - D-Team VS. the Alpha Fortress (Export, Ver 2.500) (MDA-C0047)", GAME_FLAGS )
+GAME( 2008, dinoki25,segasp,     segasp,    segasp, segasp_state,    0, ROT0, "Sega", "Dinosaur King - D-Team VS. the Alpha Fortress (Export, Ver 2.500) (MDA-C0047)", GAME_FLAGS )
 
-GAME( 2007, loveber3,segasp,     segasp,    segasp, driver_device,    0, ROT0, "Sega", "Love And Berry - 3rd-5th Collection (USA, Export, Ver 1.002) (MDA-C0042)", GAME_FLAGS )
+GAME( 2007, loveber3,segasp,     segasp,    segasp, segasp_state,    0, ROT0, "Sega", "Love And Berry - 3rd-5th Collection (USA, Export, Ver 1.002) (MDA-C0042)", GAME_FLAGS )
 
-GAME( 2009, tetgiano,tetgiant,   segasp,    segasp, driver_device,    0, ROT0, "Sega", "Tetris Giant / Tetris Dekaris (MDA-C0076)", GAME_FLAGS )
+GAME( 2009, tetgiano,tetgiant,   segasp,    segasp, segasp_state,    0, ROT0, "Sega", "Tetris Giant / Tetris Dekaris (MDA-C0076)", GAME_FLAGS )

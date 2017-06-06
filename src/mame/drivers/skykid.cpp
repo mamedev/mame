@@ -19,7 +19,7 @@ Notes:
 #include "includes/skykid.h"
 
 #include "cpu/m6809/m6809.h"
-#include "cpu/m6800/m6800.h"
+#include "cpu/m6800/m6801.h"
 #include "machine/watchdog.h"
 #include "sound/namco.h"
 #include "screen.h"
@@ -435,7 +435,7 @@ INTERRUPT_GEN_MEMBER(skykid_state::mcu_vblank_irq)
 }
 
 
-static MACHINE_CONFIG_START( skykid, skykid_state )
+static MACHINE_CONFIG_START( skykid )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809,49152000/32)

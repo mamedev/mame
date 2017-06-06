@@ -94,7 +94,7 @@ WRITE8_MEMBER( vicdual_state::invinco_audio_w )
 }
 
 
-MACHINE_CONFIG_FRAGMENT( invinco_audio )
+MACHINE_CONFIG_START( invinco_audio )
 
 	/* samples */
 	MCFG_SOUND_ADD("samples", SAMPLES, 0)

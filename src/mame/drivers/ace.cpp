@@ -316,7 +316,7 @@ void aceal_state::machine_reset()
 		elem = 0;
 }
 
-static MACHINE_CONFIG_START( ace, aceal_state )
+static MACHINE_CONFIG_START( ace )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, MASTER_CLOCK/9) /* 2 MHz ? */
@@ -358,4 +358,4 @@ ROM_START( ace )
 ROM_END
 
 
-GAMEL(1976, ace, 0, ace, ace, driver_device, 0, ROT0, "Allied Leisure", "Ace", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND, layout_ace )
+GAMEL(1976, ace, 0, ace, ace, aceal_state, 0, ROT0, "Allied Leisure", "Ace", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND, layout_ace )

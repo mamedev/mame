@@ -1,18 +1,20 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
-#ifndef TMP68301_H
-#define TMP68301_H
+#ifndef MAME_MACHINE_TMP68301_H
+#define MAME_MACHINE_TMP68301_H
+
+#pragma once
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
 /* TODO: serial ports, frequency & hook it up with m68k */
-#define MCFG_TMP68301_IN_PARALLEL_CB(_devcb) \
-	devcb = &tmp68301_device::set_in_parallel_callback(*device, DEVCB_##_devcb);
+#define MCFG_TMP68301_IN_PARALLEL_CB(cb) \
+		devcb = &tmp68301_device::set_in_parallel_callback(*device, (DEVCB_##cb));
 
-#define MCFG_TMP68301_OUT_PARALLEL_CB(_devcb) \
-	devcb = &tmp68301_device::set_out_parallel_callback(*device, DEVCB_##_devcb);
+#define MCFG_TMP68301_OUT_PARALLEL_CB(cb) \
+		devcb = &tmp68301_device::set_out_parallel_callback(*device, (DEVCB_##cb));
 
 
 //**************************************************************************
@@ -26,10 +28,9 @@ class tmp68301_device : public device_t,
 {
 public:
 	tmp68301_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~tmp68301_device() {}
 
-	template<class _Object> static devcb_base &set_in_parallel_callback(device_t &device, _Object object) { return downcast<tmp68301_device &>(device).m_in_parallel_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_parallel_callback(device_t &device, _Object object) { return downcast<tmp68301_device &>(device).m_out_parallel_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_in_parallel_callback(device_t &device, Object &&cb) { return downcast<tmp68301_device &>(device).m_in_parallel_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_parallel_callback(device_t &device, Object &&cb) { return downcast<tmp68301_device &>(device).m_out_parallel_cb.set_callback(std::forward<Object>(cb)); }
 
 	// Hardware Registers
 	DECLARE_READ16_MEMBER( regs_r );
@@ -52,13 +53,21 @@ public:
 	DECLARE_WRITE16_MEMBER(pdir_w);
 
 	IRQ_CALLBACK_MEMBER(irq_callback);
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const override;
 
 private:
+	TIMER_CALLBACK_MEMBER( timer_callback );
+	void update_timer( int i );
+	void update_irq_state();
+
+	inline uint16_t read_word(offs_t address);
+	inline void write_word(offs_t address, uint16_t data);
+
 	devcb_read16         m_in_parallel_cb;
 	devcb_write16        m_out_parallel_cb;
 
@@ -70,21 +79,15 @@ private:
 
 	uint16_t m_irq_vector[8];
 
-	TIMER_CALLBACK_MEMBER( timer_callback );
-	void update_timer( int i );
-	void update_irq_state();
-
 	uint16_t m_imr;
 	uint16_t m_iisr;
 	uint16_t m_scr;
 	uint16_t m_pdir;
 	uint16_t m_pdr;
 
-	inline uint16_t read_word(offs_t address);
-	inline void write_word(offs_t address, uint16_t data);
 	const address_space_config      m_space_config;
 };
 
-extern const device_type TMP68301;
+DECLARE_DEVICE_TYPE(TMP68301, tmp68301_device)
 
-#endif
+#endif // MAME_MACHINE_TMP68301_H

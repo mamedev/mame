@@ -162,7 +162,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type DMVCART_SLOT = device_creator<dmvcart_slot_device>;
+DEFINE_DEVICE_TYPE(DMVCART_SLOT, dmvcart_slot_device, "dmvcart_slot", "Decision Mate V cartridge slot")
 
 //**************************************************************************
 //    DMV cartridge interface
@@ -195,13 +195,13 @@ device_dmvslot_interface::~device_dmvslot_interface()
 //  dmvcart_slot_device - constructor
 //-------------------------------------------------
 dmvcart_slot_device::dmvcart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, DMVCART_SLOT, "Decision Mate V cartridge slot", tag, owner, clock, "dmvcart_slot", __FILE__),
-		device_slot_interface(mconfig, *this),
-		m_prog_read_cb(*this),
-		m_prog_write_cb(*this),
-		m_out_int_cb(*this),
-		m_out_irq_cb(*this),
-		m_out_thold_cb(*this), m_cart(nullptr)
+	device_t(mconfig, DMVCART_SLOT, tag, owner, clock),
+	device_slot_interface(mconfig, *this),
+	m_prog_read_cb(*this),
+	m_prog_write_cb(*this),
+	m_out_int_cb(*this),
+	m_out_irq_cb(*this),
+	m_out_thold_cb(*this), m_cart(nullptr)
 {
 }
 

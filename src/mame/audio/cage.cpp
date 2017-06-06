@@ -106,7 +106,7 @@ static const char *const register_names[] =
  *
  *************************************/
 
-const device_type ATARI_CAGE = device_creator<atari_cage_device>;
+DEFINE_DEVICE_TYPE(ATARI_CAGE, atari_cage_device, "atari_cage", "Atari CAGE")
 
 
 //-------------------------------------------------
@@ -114,15 +114,12 @@ const device_type ATARI_CAGE = device_creator<atari_cage_device>;
 //-------------------------------------------------
 
 atari_cage_device::atari_cage_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, ATARI_CAGE, "Atari CAGE", tag, owner, clock, "atari_cage", __FILE__),
-	m_cageram(*this, "cageram"),
-	m_soundlatch(*this, "soundlatch"),
-	m_irqhandler(*this)
+	atari_cage_device(mconfig, ATARI_CAGE, tag, owner, clock)
 {
 }
 
-atari_cage_device::atari_cage_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+atari_cage_device::atari_cage_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	m_cageram(*this, "cageram"),
 	m_soundlatch(*this, "soundlatch"),
 	m_irqhandler(*this)
@@ -622,14 +619,11 @@ static ADDRESS_MAP_START( cage_map_seattle, AS_PROGRAM, 32, atari_cage_seattle_d
 ADDRESS_MAP_END
 
 
+//-------------------------------------------------
+//  machine_add_config - add device configuration
+//-------------------------------------------------
 
-/*************************************
- *
- *  CAGE machine driver
- *
- *************************************/
-
-MACHINE_CONFIG_FRAGMENT( cage )
+MACHINE_CONFIG_MEMBER( atari_cage_device::device_add_mconfig )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("cage", TMS32031, 33868800)
@@ -667,24 +661,7 @@ MACHINE_CONFIG_FRAGMENT( cage )
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED( cage_seattle, cage )
-
-	MCFG_CPU_MODIFY("cage")
-	MCFG_CPU_PROGRAM_MAP(cage_map_seattle)
-MACHINE_CONFIG_END
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor atari_cage_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( cage );
-}
-
-
-const device_type ATARI_CAGE_SEATTLE = device_creator<atari_cage_seattle_device>;
+DEFINE_DEVICE_TYPE(ATARI_CAGE_SEATTLE, atari_cage_seattle_device, "atari_cage_seattle", "Atari CAGE Seattle")
 
 
 //-------------------------------------------------
@@ -692,11 +669,20 @@ const device_type ATARI_CAGE_SEATTLE = device_creator<atari_cage_seattle_device>
 //-------------------------------------------------
 
 atari_cage_seattle_device::atari_cage_seattle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	atari_cage_device(mconfig, ATARI_CAGE_SEATTLE, "Atari CAGE Seattle", tag, owner, clock, "atari_cage_seattle", __FILE__)
+	atari_cage_device(mconfig, ATARI_CAGE_SEATTLE, tag, owner, clock)
 {
 }
 
-machine_config_constructor atari_cage_seattle_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( cage_seattle );
-}
+
+//-------------------------------------------------
+//  machine_add_config - add device configuration
+//-------------------------------------------------
+
+
+MACHINE_CONFIG_MEMBER( atari_cage_seattle_device::device_add_mconfig )
+
+	atari_cage_device::device_add_mconfig(config);
+
+	MCFG_CPU_MODIFY("cage")
+	MCFG_CPU_PROGRAM_MAP(cage_map_seattle)
+MACHINE_CONFIG_END

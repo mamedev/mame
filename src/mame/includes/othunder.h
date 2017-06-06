@@ -62,6 +62,7 @@ public:
 	int        m_vblank_irq;
 	int        m_ad_irq;
 	int        m_pan[4];
+	emu_timer  *m_ad_interrupt_timer;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

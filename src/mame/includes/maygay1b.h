@@ -55,7 +55,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<i80c51_device> m_mcu;
-	optional_device<s16lf01_t> m_vfd;
+	optional_device<s16lf01_device> m_vfd;
 	required_device<ay8910_device> m_ay;
 	optional_device<okim6376_device> m_msm6376;
 	optional_device<upd7759_device> m_upd7759;

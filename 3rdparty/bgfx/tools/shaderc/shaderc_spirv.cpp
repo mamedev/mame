@@ -8,6 +8,7 @@
 BX_PRAGMA_DIAGNOSTIC_PUSH()
 BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(4100) // error C4100: 'inclusionDepth' : unreferenced formal parameter
 BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(4265) // error C4265: 'spv::spirvbin_t': class has virtual functions, but destructor is not virtual
+BX_PRAGMA_DIAGNOSTIC_IGNORED_CLANG_GCC("-Wshadow") // warning: declaration of 'userData' shadows a member of 'glslang::TShader::Includer::IncludeResult'
 #include <ShaderLang.h>
 #include <ResourceLimits.h>
 #include <SPIRV/SPVRemapper.h>
@@ -538,10 +539,9 @@ namespace bgfx { namespace spirv
 		{
 		case 'c': return EShLangCompute;
 		case 'f': return EShLangFragment;
-		default:  break;
+		case 'v': return EShLangVertex;
+		default:  return EShLangCount;
 		}
-
-		return EShLangVertex;
 	}
 
 //	static void printError(spv_message_level_t, const char*, const spv_position_t&, const char* _message)
@@ -553,10 +553,10 @@ namespace bgfx { namespace spirv
 	{
 		BX_UNUSED(_cmdLine, _version, _code, _writer);
 
-		const char* profile = _cmdLine.findOption('p', "profile");
-		if (NULL == profile)
+		const char* type = _cmdLine.findOption('\0', "type");
+		if (NULL == type)
 		{
-			fprintf(stderr, "Error: Shader profile must be specified.\n");
+			fprintf(stderr, "Error: Shader type must be specified.\n");
 			return false;
 		}
 
@@ -564,7 +564,12 @@ namespace bgfx { namespace spirv
 
 		glslang::TProgram* program = new glslang::TProgram;
 
-		EShLanguage stage = getLang(profile[0]);
+		EShLanguage stage = getLang(type[0]);
+		if (EShLangCount == stage)
+		{
+			fprintf(stderr, "Error: Unknown shader type %s.\n", type);
+			return false;
+		}
 		glslang::TShader* shader = new glslang::TShader(stage);
 
 		EShMessages messages = EShMessages(0
@@ -574,14 +579,12 @@ namespace bgfx { namespace spirv
 			| EShMsgSpvRules
 			);
 
-		const char* shaderStrings[] = { _code.c_str() };
-		const char* shaderNames[]   = { "" };
+		shader->setEntryPoint("main");
 
-		shader->setStringsWithLengthsAndNames(
+		const char* shaderStrings[] = { _code.c_str() };
+		shader->setStrings(
 			  shaderStrings
-			, NULL
-			, shaderNames
-			, BX_COUNTOF(shaderNames)
+			, BX_COUNTOF(shaderStrings)
 			);
 		bool compiled = shader->parse(&resourceLimits
 			, 110
@@ -645,12 +648,59 @@ namespace bgfx { namespace spirv
 			}
 			else
 			{
-//				program->buildReflection();
-//				fprintf(stderr, "attributes %d, uniforms %d\n"
-//					, program->getNumLiveAttributes()
-//					, program->getNumLiveUniformVariables()
-//					);
-//				program->dumpReflection();
+				program->buildReflection();
+				{
+					uint16_t count = (uint16_t)program->getNumLiveUniformVariables();
+					bx::write(_writer, count);
+
+					uint32_t fragmentBit = type[0] == 'f' ? BGFX_UNIFORM_FRAGMENTBIT : 0;
+					for (uint16_t ii = 0; ii < count; ++ii)
+					{
+						Uniform un;
+						un.name = program->getUniformName(ii);
+						switch (program->getUniformType(ii))
+						{
+						case 0x1404: // GL_INT:
+							un.type = UniformType::Int1;
+							break;
+						case 0x8B52: // GL_FLOAT_VEC4:
+							un.type = UniformType::Vec4;
+							break;
+						case 0x8B5B: // GL_FLOAT_MAT3:
+							un.type = UniformType::Mat3;
+							break;
+						case 0x8B5C: // GL_FLOAT_MAT4:
+							un.type = UniformType::Mat4;
+							break;
+						default:
+							un.type = UniformType::End;
+							break;
+						}
+						un.num = uint8_t(program->getUniformArraySize(ii) );
+						un.regIndex = 0;
+						un.regCount = un.num;
+
+						uint8_t nameSize = (uint8_t)un.name.size();
+						bx::write(_writer, nameSize);
+						bx::write(_writer, un.name.c_str(), nameSize);
+						bx::write(_writer, uint8_t(un.type | fragmentBit));
+						bx::write(_writer, un.num);
+						bx::write(_writer, un.regIndex);
+						bx::write(_writer, un.regCount);
+
+						BX_TRACE("%s, %s, %d, %d, %d"
+							, un.name.c_str()
+							, getUniformTypeName(un.type)
+							, un.num
+							, un.regIndex
+							, un.regCount
+						);
+					}
+				}
+				if (g_verbose)
+				{
+					program->dumpReflection();
+				}
 
 				BX_UNUSED(spv::MemorySemanticsAllMemory);
 

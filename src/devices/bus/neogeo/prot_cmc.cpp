@@ -4,11 +4,11 @@
 #include "emu.h"
 #include "prot_cmc.h"
 
-const device_type CMC_PROT = device_creator<cmc_prot_device>;
+DEFINE_DEVICE_TYPE(NG_CMC_PROT, cmc_prot_device, "ng_cmc_prot", "Neo Geo CMC42/CMC40 Protection")
 
 
 cmc_prot_device::cmc_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, CMC_PROT, "Neo Geo CMC42 & CMC50 Protection", tag, owner, clock, "cmc_prot", __FILE__),
+	device_t(mconfig, NG_CMC_PROT, tag, owner, clock),
 	type0_t03(nullptr),
 	type0_t12(nullptr),
 	type1_t03(nullptr),

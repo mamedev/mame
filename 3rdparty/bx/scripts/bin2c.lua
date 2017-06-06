@@ -4,7 +4,6 @@
 --
 
 project "bin2c"
-	uuid "60eaa654-7d06-11e4-be8e-880965202986"
 	kind "ConsoleApp"
 
 	includedirs {
@@ -22,6 +21,11 @@ project "bin2c"
 
 	configuration { "mingw-*" }
 		targetextension ".exe"
+
+	configuration { "linux-*" }
+		links {
+			"pthread",
+		}
 
 	configuration {}
 

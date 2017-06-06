@@ -7,7 +7,8 @@
  TODO:
  - Implement Type 2 variant for Subor Karaoke.
    (Subor Karaoke updates banks differently.)
- - Check and verify CHR banking in Type 2 boards
+ - Type 2 boards work correct with the current CHR banking scheme, but proper emulation for this
+ (and Oeka Kids) will require aditional PPU code
  - Investigate connection with DANCE 2000 board; likely made by ex-Subor staff!
 
  ***********************************************************************************************************/
@@ -27,9 +28,9 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type NES_SUBOR0 = device_creator<nes_subor0_device>;
-const device_type NES_SUBOR1 = device_creator<nes_subor1_device>;
-const device_type NES_SUBOR2 = device_creator<nes_subor2_device>;
+DEFINE_DEVICE_TYPE(NES_SUBOR0, nes_subor0_device, "nes_subor0", "NES Cart Subor Type 0 PCB")
+DEFINE_DEVICE_TYPE(NES_SUBOR1, nes_subor1_device, "nes_subor1", "NES Cart Subor Type 1 PCB")
+DEFINE_DEVICE_TYPE(NES_SUBOR2, nes_subor2_device, "nes_subor2", "NES Cart Subor Type 2 PCB")
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -40,7 +41,7 @@ const device_type NES_SUBOR2 = device_creator<nes_subor2_device>;
 //-------------------------------------------------
 
 nes_subor0_device::nes_subor0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_SUBOR0, "NES Cart Subor Type 0 PCB", tag, owner, clock, "nes_subor0", __FILE__)
+	: nes_nrom_device(mconfig, NES_SUBOR0, tag, owner, clock)
 {
 }
 
@@ -49,7 +50,7 @@ nes_subor0_device::nes_subor0_device(const machine_config &mconfig, const char *
 //-------------------------------------------------
 
 nes_subor1_device::nes_subor1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_SUBOR1, "NES Cart Subor Type 1 PCB", tag, owner, clock, "nes_subor1", __FILE__)
+	: nes_nrom_device(mconfig, NES_SUBOR1, tag, owner, clock)
 {
 }
 
@@ -58,11 +59,11 @@ nes_subor1_device::nes_subor1_device(const machine_config &mconfig, const char *
 //-------------------------------------------------
 
 nes_subor2_device::nes_subor2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_nrom_device(mconfig, NES_SUBOR2, "NES Cart Subor Type 2 PCB", tag, owner, clock, "nes_subor2", __FILE__),
-	m_switch_reg(0),
-	m_bank_reg(0),
-	m_chr_banking(0),
-	m_page(0)
+	: nes_nrom_device(mconfig, NES_SUBOR2, tag, owner, clock)
+	, m_switch_reg(0)
+	, m_bank_reg(0)
+	, m_chr_banking(0)
+	, m_page(0)
 {
 }
 
@@ -163,7 +164,8 @@ void nes_subor2_device::pcb_reset()
 void nes_subor2_device::ppu_latch(offs_t offset)
 {
 	/* CHR banks are conditionally changed midframe */
-	/* If this is split off onto the external PPU latch, every edge case works */
+	/* This is not the correct way to do it... But if this is split
+	off onto the external PPU latch, every edge case works */
 	if (m_chr_banking)
 	{
 		if ( (m_page == 2) || (m_page == 1 && m_switch_reg == 2) )

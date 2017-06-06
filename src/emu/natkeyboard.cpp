@@ -796,35 +796,35 @@ void natural_keyboard::timer(void *ptr, int param)
 //  logging and debugging
 //-------------------------------------------------
 
-std::string natural_keyboard::unicode_to_string(char32_t ch)
+std::string natural_keyboard::unicode_to_string(char32_t ch) const
 {
 	std::string buffer;
 	switch (ch)
 	{
-		// check some magic values
-		case '\0':  buffer.assign("\\0");      break;
-		case '\r':  buffer.assign("\\r");      break;
-		case '\n':  buffer.assign("\\n");      break;
-		case '\t':  buffer.assign("\\t");      break;
+	// check some magic values
+	case '\0':  buffer.assign("\\0");      break;
+	case '\r':  buffer.assign("\\r");      break;
+	case '\n':  buffer.assign("\\n");      break;
+	case '\t':  buffer.assign("\\t");      break;
 
-		default:
-			// seven bit ASCII is easy
-			if (ch >= 32 && ch < 128)
-			{
-				char temp[2] = { char(ch), 0 };
-				buffer.assign(temp);
-			}
-			else if (ch >= UCHAR_MAMEKEY_BEGIN)
-			{
-				// try to obtain a codename with code_name(); this can result in an empty string
-				input_code code(DEVICE_CLASS_KEYBOARD, 0, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, input_item_id(ch - UCHAR_MAMEKEY_BEGIN));
-				buffer = machine().input().code_name(code);
-			}
+	default:
+		// seven bit ASCII is easy
+		if (ch >= 32 && ch < 128)
+		{
+			char temp[2] = { char(ch), 0 };
+			buffer.assign(temp);
+		}
+		else if (ch >= UCHAR_MAMEKEY_BEGIN)
+		{
+			// try to obtain a codename with code_name(); this can result in an empty string
+			input_code code(DEVICE_CLASS_KEYBOARD, 0, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, input_item_id(ch - UCHAR_MAMEKEY_BEGIN));
+			buffer = machine().input().code_name(code);
+		}
 
-			// did we fail to resolve? if so, we have a last resort
-			if (buffer.empty())
-				buffer = string_format("U+%04X", unsigned(ch));
-			break;
+		// did we fail to resolve? if so, we have a last resort
+		if (buffer.empty())
+			buffer = string_format("U+%04X", unsigned(ch));
+		break;
 	}
 	return buffer;
 }
@@ -846,31 +846,40 @@ const natural_keyboard::keycode_map_entry *natural_keyboard::find_code(char32_t 
 
 
 //-------------------------------------------------
-//  dump - dumps info to string
+//  dump - dumps info to stream
 //-------------------------------------------------
 
-std::string natural_keyboard::dump()
+void natural_keyboard::dump(std::ostream &str) const
 {
-	std::ostringstream buffer;
-	const size_t left_column_width = 24;
+	constexpr size_t left_column_width = 24;
 
 	// loop through all codes
-	for (auto & code : m_keycode_map)
+	for (auto &code : m_keycode_map)
 	{
 		// describe the character code
 		std::string description = string_format("%08X (%s) ", code.ch, unicode_to_string(code.ch).c_str());
 
 		// pad with spaces
-		util::stream_format(buffer, "%-*s", left_column_width, description);
+		util::stream_format(str, "%-*s", left_column_width, description);
 
 		// identify the keys used
 		for (int field = 0; field < ARRAY_LENGTH(code.field) && code.field[field] != nullptr; field++)
-			util::stream_format(buffer, "%s'%s'", (field > 0) ? ", " : "", code.field[field]->name());
+			util::stream_format(str, "%s'%s'", (field > 0) ? ", " : "", code.field[field]->name());
 
 		// carriage return
-		buffer << '\n';
+		str << '\n';
 	}
+}
 
+
+//-------------------------------------------------
+//  dump - dumps info to string
+//-------------------------------------------------
+
+std::string natural_keyboard::dump() const
+{
+	std::ostringstream buffer;
+	dump(buffer);
 	return buffer.str();
 }
 

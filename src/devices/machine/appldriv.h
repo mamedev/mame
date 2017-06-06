@@ -8,21 +8,23 @@
 
 *********************************************************************/
 
-#ifndef APPLDRIV_H
-#define APPLDRIV_H
+#ifndef MAME_MACHINE_APPLDRIV_H
+#define MAME_MACHINE_APPLDRIV_H
+
+#pragma once
 
 #include "imagedev/flopdrv.h"
 #include "formats/ap2_dsk.h"
 
-void apple525_set_lines(device_t *device,uint8_t lines);
-void apple525_set_enable_lines(device_t *device,int enable_mask);
+void apple525_set_lines(device_t *device, uint8_t lines);
+void apple525_set_enable_lines(device_t *device, int enable_mask);
 
 uint8_t apple525_read_data(device_t *device);
-void apple525_write_data(device_t *device,uint8_t data);
+void apple525_write_data(device_t *device, uint8_t data);
 int apple525_read_status(device_t *device);
 int apple525_get_count(running_machine &machine);
 
-class apple525_floppy_image_device :    public legacy_floppy_image_device
+class apple525_floppy_image_device : public legacy_floppy_image_device
 {
 public:
 	// construction/destruction
@@ -30,7 +32,7 @@ public:
 
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
-	void set_params(int dividend, int divisor) { m_dividend = dividend; m_divisor = divisor;}
+	void set_params(int dividend, int divisor) { m_dividend = dividend; m_divisor = divisor; }
 
 	int get_dividend() { return m_dividend; }
 	int get_divisor() { return m_divisor; }
@@ -53,7 +55,7 @@ private:
 };
 
 // device type definition
-extern const device_type FLOPPY_APPLE;
+DECLARE_DEVICE_TYPE(FLOPPY_APPLE, apple525_floppy_image_device)
 
 #define MCFG_LEGACY_FLOPPY_APPLE_PARAMS(_dividend,_divisor) \
 	downcast<apple525_floppy_image_device *>(device)->set_params(_dividend,_divisor);
@@ -84,4 +86,4 @@ extern const device_type FLOPPY_APPLE;
 	MCFG_DEVICE_REMOVE(FLOPPY_0)        \
 	MCFG_DEVICE_REMOVE(FLOPPY_1)
 
-#endif /* APPLDRIV_H */
+#endif // MAME_MACHINE_APPLDRIV_H

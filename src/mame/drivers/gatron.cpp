@@ -563,7 +563,7 @@ GFXDECODE_END
 *    Machine Drivers     *
 *************************/
 
-static MACHINE_CONFIG_START( gat, gatron_state )
+static MACHINE_CONFIG_START( gat )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/24)   /* 666.66 kHz, guess */
@@ -638,7 +638,7 @@ ROM_END
 *      Game Drivers      *
 *************************/
 
-/*     YEAR  NAME      PARENT  MACHINE  INPUT      STATE           INIT  ROT    COMPANY         FULLNAME             FLAGS  LAYOUT   */
-GAMEL( 1983, poker41,  0,      gat,     poker41,   driver_device,  0,    ROT0, "Game-A-Tron",  "Four In One Poker",  0,     layout_poker41  )
-GAMEL( 1983, pulltabs, 0,      gat,     pulltabs,  driver_device,  0,    ROT0, "Game-A-Tron",  "Pull Tabs",          0,     layout_pulltabs )
-GAMEL( 1983, bingo,    0,      gat,     bingo,     driver_device,  0,    ROT0, "Game-A-Tron",  "Bingo",              0,     layout_bingo  )
+/*     YEAR  NAME      PARENT  MACHINE  INPUT      STATE          INIT  ROT   COMPANY         FULLNAME              FLAGS  LAYOUT   */
+GAMEL( 1983, poker41,  0,      gat,     poker41,   gatron_state,  0,    ROT0, "Game-A-Tron",  "Four In One Poker",  0,     layout_poker41  )
+GAMEL( 1983, pulltabs, 0,      gat,     pulltabs,  gatron_state,  0,    ROT0, "Game-A-Tron",  "Pull Tabs",          0,     layout_pulltabs )
+GAMEL( 1983, bingo,    0,      gat,     bingo,     gatron_state,  0,    ROT0, "Game-A-Tron",  "Bingo",              0,     layout_bingo  )

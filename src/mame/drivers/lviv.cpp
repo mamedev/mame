@@ -420,7 +420,7 @@ INPUT_PORTS_END
 
 
 /* machine definition */
-static MACHINE_CONFIG_START( lviv, lviv_state )
+static MACHINE_CONFIG_START( lviv )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, 2500000)
 	MCFG_CPU_PROGRAM_MAP(lviv_mem)
@@ -489,5 +489,5 @@ ROM_START(lviv)
 	ROMX_LOAD("lvivp.bin", 0x10000, 0x4000, CRC(f171c282) SHA1(c7dc2bdb02400e6b5cdcc50040eb06f506a7ed84), ROM_BIOS(3))
 ROM_END
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY         FULLNAME    FLAGS */
-COMP( 1989, lviv,   0,      0,      lviv,   lviv, driver_device,   0,      "V. I. Lenin",  "PK-01 Lviv" ,    0 )
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE       INIT    COMPANY         FULLNAME      FLAGS */
+COMP( 1989, lviv,   0,      0,      lviv,    lviv,  lviv_state, 0,      "V. I. Lenin",  "PK-01 Lviv", 0 )

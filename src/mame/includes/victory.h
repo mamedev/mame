@@ -68,6 +68,7 @@ public:
 	uint8_t m_scrolly;
 	uint8_t m_video_control;
 	struct micro_t m_micro;
+	emu_timer *m_bgcoll_irq_timer;
 
 	DECLARE_WRITE8_MEMBER(lamp_control_w);
 	DECLARE_WRITE8_MEMBER(paletteram_w);

@@ -8,55 +8,13 @@
 
 *********************************************************************/
 
-#ifndef _NCR53C7XX_H_
-#define _NCR53C7XX_H_
+#ifndef MAME_MACHINE_53C7XX_H
+#define MAME_MACHINE_53C7XX_H
+
+#pragma once
 
 #include "machine/nscsi_bus.h"
 
-
-//**************************************************************************
-//  REGISTER DEFINES (INCOMPLETE)
-//**************************************************************************
-
-#define SCNTL0_TRG          0x01
-#define SCNTL0_AAP          0x02
-#define SCNTL0_EPG          0x04
-#define SCNTL0_EPC          0x08
-#define SCNTL0_WATN         0x10
-#define SCNTL0_START        0x20
-#define SCNTL0_ARB_MASK     3
-#define SCNTL0_ARB_SHIFT    6
-
-#define SSTAT0_PAR          0x01
-#define SSTAT0_RST          0x02
-#define SSTAT0_UDC          0x04
-#define SSTAT0_SGE          0x08
-#define SSTAT0_SEL          0x10
-#define SSTAT0_STO          0x20
-#define SSTAT0_CMP          0x40
-#define SSTAT0_MA           0x80
-
-#define SSTAT1_SDP          0x01
-#define SSTAT1_RST          0x02
-#define SSTAT1_WOA          0x04
-#define SSTAT1_LOA          0x08
-#define SSTAT1_AIP          0x10
-#define SSTAT1_ORF          0x20
-#define SSTAT1_OLF          0x40
-#define SSTAT1_ILF          0x80
-
-#define ISTAT_DIP           0x01
-#define ISTAT_SIP           0x02
-#define ISTAT_PRE           0x04
-#define ISTAT_CON           0x08
-#define ISTAT_ABRT          0x80
-
-#define DSTAT_OPC           0x01
-#define DSTAT_WTD           0x02
-#define DSTAT_SIR           0x04
-#define DSTAT_SSI           0x08
-#define DSTAT_ABRT          0x10
-#define DSTAT_DFE           0x80
 
 #define MCFG_NCR53C7XX_IRQ_HANDLER(_devcb) \
 	devcb = &ncr53c7xx_device::set_irq_handler(*device, DEVCB_##_devcb);
@@ -67,17 +25,16 @@
 #define MCFG_NCR53C7XX_HOST_READ(_devcb) \
 	devcb = &ncr53c7xx_device::set_host_read(*device, DEVCB_##_devcb);
 
-class ncr53c7xx_device : public nscsi_device,
-							public device_execute_interface
+class ncr53c7xx_device : public nscsi_device, public device_execute_interface
 {
 public:
 	// construction/destruction
 	ncr53c7xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<ncr53c7xx_device &>(device).m_irq_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_host_write(device_t &device, _Object object) { return downcast<ncr53c7xx_device &>(device).m_host_write.set_callback(object); }
-	template<class _Object> static devcb_base &set_host_read(device_t &device, _Object object) { return downcast<ncr53c7xx_device &>(device).m_host_read.set_callback(object); }
+	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb) { return downcast<ncr53c7xx_device &>(device).m_irq_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_host_write(device_t &device, Object &&cb) { return downcast<ncr53c7xx_device &>(device).m_host_write.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_host_read(device_t &device, Object &&cb) { return downcast<ncr53c7xx_device &>(device).m_host_read.set_callback(std::forward<Object>(cb)); }
 
 	// our API
 	DECLARE_READ32_MEMBER(read);
@@ -225,5 +182,6 @@ private:
 };
 
 // device type definition
-extern const device_type NCR53C7XX;
-#endif
+DECLARE_DEVICE_TYPE(NCR53C7XX, ncr53c7xx_device)
+
+#endif // MAME_MACHINE_53C7XX_H

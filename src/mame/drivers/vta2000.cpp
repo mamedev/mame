@@ -154,7 +154,7 @@ PALETTE_INIT_MEMBER(vta2000_state, vta2000)
 	palette.set_pen_color(2, 0x00, 0xff, 0x00); // highlight
 }
 
-static MACHINE_CONFIG_START( vta2000, vta2000_state )
+static MACHINE_CONFIG_START( vta2000 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8080, XTAL_4MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(vta2000_mem)
@@ -188,5 +188,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    INIT   COMPANY     FULLNAME       FLAGS */
-COMP( 19??, vta2000,  0,      0,       vta2000,   vta2000, driver_device, 0,   "<unknown>", "VTA-2000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+/*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    STATE          INIT  COMPANY      FULLNAME    FLAGS */
+COMP( 19??, vta2000,  0,      0,       vta2000,   vta2000, vta2000_state, 0,    "<unknown>", "VTA-2000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

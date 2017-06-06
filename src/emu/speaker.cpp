@@ -28,10 +28,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type SPEAKER = device_creator<speaker_device>;
-
-template class device_finder<speaker_device, false>;
-template class device_finder<speaker_device, true>;
+DEFINE_DEVICE_TYPE(SPEAKER, speaker_device, "speaker", "Speaker")
 
 
 
@@ -44,16 +41,15 @@ template class device_finder<speaker_device, true>;
 //-------------------------------------------------
 
 speaker_device::speaker_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, SPEAKER, "Speaker", tag, owner, clock, "speaker", __FILE__),
-		device_mixer_interface(mconfig, *this),
-		m_x(0.0),
-		m_y(0.0),
-		m_z(0.0)
+	: device_t(mconfig, SPEAKER, tag, owner, clock)
+	, device_mixer_interface(mconfig, *this)
+	, m_x(0.0)
+	, m_y(0.0)
+	, m_z(0.0)
 #ifdef MAME_DEBUG
-	,
-		m_max_sample(0),
-		m_clipped_samples(0),
-		m_total_samples(0)
+	, m_max_sample(0)
+	, m_clipped_samples(0)
+	, m_total_samples(0)
 #endif
 {
 }

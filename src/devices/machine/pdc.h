@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_PDC_H
+#define MAME_MACHINE_PDC_H
 
-#ifndef __R9751_PDC_H__
-#define __R9751_PDC_H__
+#pragma once
 
 #include "cpu/z80/z80.h"
 #include "machine/upd765.h"
@@ -30,29 +30,17 @@
 
 // ======================> pdc_device
 
-class pdc_device :  public device_t
+class pdc_device : public device_t
 {
 public:
 	/* Constructor and Destructor */
 	pdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	/* Optional information overrides */
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-
 	/* Callbacks */
-	template<class _Object> static devcb_base &m68k_r_callback(device_t &device, _Object object) { return downcast<pdc_device &>(device).m_m68k_r_cb.set_callback(object); }
-	template<class _Object> static devcb_base &m68k_w_callback(device_t &device, _Object object) { return downcast<pdc_device &>(device).m_m68k_w_cb.set_callback(object); }
+	template <class Object> static devcb_base &m68k_r_callback(device_t &device, Object &&cb) { return downcast<pdc_device &>(device).m_m68k_r_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &m68k_w_callback(device_t &device, Object &&cb) { return downcast<pdc_device &>(device).m_m68k_w_cb.set_callback(std::forward<Object>(cb)); }
 
 	/* Read and Write members */
-	DECLARE_WRITE_LINE_MEMBER(i8237_hreq_w);
-	DECLARE_WRITE_LINE_MEMBER(i8237_eop_w);
-	DECLARE_READ8_MEMBER(i8237_dma_mem_r);
-	DECLARE_WRITE8_MEMBER(i8237_dma_mem_w);
-	DECLARE_READ8_MEMBER(i8237_fdc_dma_r);
-	DECLARE_WRITE8_MEMBER(i8237_fdc_dma_w);
-
 	DECLARE_WRITE_LINE_MEMBER(hdd_irq);
 
 	DECLARE_READ8_MEMBER(p0_7_r);
@@ -63,12 +51,6 @@ public:
 	DECLARE_READ8_MEMBER(p38_r);
 	DECLARE_READ8_MEMBER(p39_r);
 	DECLARE_WRITE8_MEMBER(p50_5f_w);
-
-	DECLARE_READ8_MEMBER(m68k_dma_r);
-	DECLARE_WRITE8_MEMBER(m68k_dma_w);
-
-	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 	/* Main CPU accessible registers */
 	uint8_t reg_p0;
@@ -82,10 +64,29 @@ public:
 	uint8_t reg_p21;
 	uint8_t reg_p38;
 	uint32_t fdd_68k_dma_address; /* FDD <-> m68k DMA read/write address */
+
 protected:
 	/* Device-level overrides */
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	/* Optional information overrides */
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+
+private:
+	DECLARE_WRITE_LINE_MEMBER(i8237_hreq_w);
+	DECLARE_WRITE_LINE_MEMBER(i8237_eop_w);
+	DECLARE_READ8_MEMBER(i8237_dma_mem_r);
+	DECLARE_WRITE8_MEMBER(i8237_dma_mem_w);
+	DECLARE_READ8_MEMBER(i8237_fdc_dma_r);
+	DECLARE_WRITE8_MEMBER(i8237_fdc_dma_w);
+
+	DECLARE_READ8_MEMBER(m68k_dma_r);
+	DECLARE_WRITE8_MEMBER(m68k_dma_w);
+
+	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 	/* Protected variables */
 	//uint32_t fdd_68k_dma_address;
@@ -98,7 +99,7 @@ protected:
 	//required_device<floppy_connector> m_floppy;
 	//required_device<floppy_image_device> m_floppy;
 	optional_device<hdc9224_device> m_hdc9224;
-	mfm_harddisk_device*    m_harddisk;
+	//mfm_harddisk_device*    m_harddisk;
 	required_shared_ptr<uint8_t> m_pdc_ram;
 
 	/* Callbacks */
@@ -108,10 +109,12 @@ protected:
 
 /* Device type */
 extern const device_type PDC;
+DECLARE_DEVICE_TYPE(PDC, pdc_device)
 
 /* MCFG defines */
 #define MCFG_PDC_R_CB(_devcb) \
 	devcb = &pdc_device::m68k_r_callback(*device, DEVCB_##_devcb);
 #define MCFG_PDC_W_CB(_devcb) \
 	devcb = &pdc_device::m68k_w_callback(*device, DEVCB_##_devcb);
-#endif
+
+#endif // MAME_MACHINE_PDC_H

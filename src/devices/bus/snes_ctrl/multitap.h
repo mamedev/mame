@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_SNES_CTRL_MULTITAP_H
+#define MAME_BUS_SNES_CTRL_MULTITAP_H
 
-#ifndef __SNES_MULTITAP__
-#define __SNES_MULTITAP__
+#pragma once
 
 
 #include "ctrl.h"
@@ -54,7 +54,6 @@ private:
 
 
 // device type definition
-extern const device_type SNES_MULTITAP;
+DECLARE_DEVICE_TYPE(SNES_MULTITAP, snes_multitap_device)
 
-
-#endif
+#endif // MAME_BUS_SNES_CTRL_MULTITAP_H

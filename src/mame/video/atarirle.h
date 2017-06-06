@@ -9,8 +9,8 @@
 
 ***************************************************************************/
 
-#ifndef __ATARIRLE__
-#define __ATARIRLE__
+#ifndef MAME_VIDEO_ATARIRLE_H
+#define MAME_VIDEO_ATARIRLE_H
 
 
 //**************************************************************************
@@ -70,7 +70,7 @@ struct atari_rle_objects_config
 // ======================> atari_rle_objects_device
 
 // device type definition
-extern const device_type ATARI_RLE_OBJECTS;
+DECLARE_DEVICE_TYPE(ATARI_RLE_OBJECTS, atari_rle_objects_device)
 
 class atari_rle_objects_device : public device_t,
 									public device_video_interface,
@@ -179,6 +179,4 @@ private:
 	uint16_t              m_rle_table_data[0x500];
 };
 
-
-
-#endif
+#endif // MAME_VIDEO_ATARIRLE_H

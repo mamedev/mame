@@ -147,10 +147,10 @@ the wide tilemap mode)
 #define TC0100SCN_RAM_SIZE        0x14000   /* enough for double-width tilemaps */
 #define TC0100SCN_TOTAL_CHARS     256
 
-const device_type TC0100SCN = device_creator<tc0100scn_device>;
+DEFINE_DEVICE_TYPE(TC0100SCN, tc0100scn_device, "tc0100scn", "Taito TC0100SCN")
 
 tc0100scn_device::tc0100scn_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TC0100SCN, "Taito TC0100SCN", tag, owner, clock, "tc0100scn", __FILE__),
+	: device_t(mconfig, TC0100SCN, tag, owner, clock),
 	m_ram(nullptr),
 	m_bg_ram(nullptr),
 	m_fg_ram(nullptr),
@@ -290,7 +290,7 @@ void tc0100scn_device::device_start()
 	set_layer_ptrs();
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(m_txnum, std::make_unique<gfx_element>(*m_palette, tc0100scn_charlayout, (uint8_t *)m_char_ram, NATIVE_ENDIAN_VALUE_LE_BE(8,0), 256, 0));
+	m_gfxdecode->set_gfx(m_txnum, std::make_unique<gfx_element>(m_palette, tc0100scn_charlayout, (uint8_t *)m_char_ram, NATIVE_ENDIAN_VALUE_LE_BE(8,0), 256, 0));
 
 	gfx_element *gfx = m_gfxdecode->gfx(m_gfxnum);
 	gfx_element *txt = m_gfxdecode->gfx(m_txnum);

@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Juergen Buchmueller,Ernesto Corvi
-#pragma once
+#ifndef MAME_CPU_Z8000_Z8000_H
+#define MAME_CPU_Z8000_Z8000_H
 
-#ifndef __Z8000_H__
-#define __Z8000_H__
+#pragma once
 
 #include "cpu/z80/z80daisy.h"
 
@@ -38,13 +38,20 @@ class z8002_device : public cpu_device, public z80_daisy_chain_interface
 public:
 	// construction/destruction
 	z8002_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	z8002_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	~z8002_device();
 
-	template<class _Object> static devcb_base &set_mo_callback(device_t &device, _Object object) { return downcast<z8002_device &>(device).m_mo_out.set_callback(object); }
+	template <class Object> static devcb_base &set_mo_callback(device_t &device, Object &&cb) { return downcast<z8002_device &>(device).m_mo_out.set_callback(std::forward<Object>(cb)); }
 	DECLARE_WRITE_LINE_MEMBER(mi_w) { m_mi = state; } // XXX: this has to apply in the middle of an insn for now
 
+	struct Z8000_dasm { char const *dasm; uint32_t flags; int size; };
+
+	static void init_tables();
+	static void deinit_tables();
+	static Z8000_dasm dasm(unsigned w);
+
 protected:
+	z8002_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int addrbits, int iobits, int vecmult);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -211,7 +218,6 @@ protected:
 	virtual uint32_t PSA_ADDR();
 	virtual uint32_t read_irq_vector();
 
-public:
 	void zinvalid();
 	void Z00_0000_dddd_imm8();
 	void Z00_ssN0_dddd();
@@ -623,6 +629,31 @@ public:
 	void ZE_cccc_dsp8();
 	void ZF_dddd_0dsp7();
 	void ZF_dddd_1dsp7();
+
+private:
+	// structure for the opcode definition table
+	typedef void (z8002_device::*opcode_func)();
+
+	struct Z8000_init {
+		int     beg, end, step;
+		int     size, cycles;
+		opcode_func opcode;
+		const char  *dasm;
+		uint32_t dasmflags;
+	};
+
+	/* structure for the opcode execution table / disassembler */
+	struct Z8000_exec {
+		opcode_func opcode;
+		int     cycles;
+		int     size;
+		const char    *dasm;
+		uint32_t dasmflags;
+	};
+
+	/* opcode execution table */
+	static const Z8000_init table[];
+	static std::unique_ptr<Z8000_exec const []> z8000_exec;
 };
 
 
@@ -638,7 +669,7 @@ protected:
 	virtual void device_reset() override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const override
 	{
 		switch (spacenum)
 		{
@@ -671,8 +702,8 @@ private:
 };
 
 
-extern const device_type Z8001;
-extern const device_type Z8002;
+DECLARE_DEVICE_TYPE(Z8001, z8001_device)
+DECLARE_DEVICE_TYPE(Z8002, z8002_device)
 
 
 /* possible values for z8k_segm_mode */
@@ -680,4 +711,4 @@ extern const device_type Z8002;
 #define Z8K_SEGM_MODE_SEG    1
 #define Z8K_SEGM_MODE_AUTO   2
 
-#endif /* __Z8000_H__ */
+#endif // MAME_CPU_Z8000_Z8000_H

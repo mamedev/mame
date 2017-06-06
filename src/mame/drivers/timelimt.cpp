@@ -221,7 +221,7 @@ INTERRUPT_GEN_MEMBER(timelimt_state::irq)
 
 /***************************************************************************/
 
-static MACHINE_CONFIG_START( timelimt, timelimt_state )
+static MACHINE_CONFIG_START( timelimt )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 5000000)   /* 5.000 MHz */
@@ -329,5 +329,5 @@ ROM_START( progress )
 	ROM_LOAD( "57.bin", 0x0040, 0x0020, CRC(18455a79) SHA1(e4d64368560e3116a922588129f5f91a4c520f7d) )
 ROM_END
 
-GAME( 1983, timelimt, 0, timelimt, timelimt, driver_device, 0, ROT90, "Chuo Co. Ltd", "Time Limit", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, progress, 0, timelimt, progress, driver_device, 0, ROT90, "Chuo Co. Ltd", "Progress", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, timelimt, 0, timelimt, timelimt, timelimt_state, 0, ROT90, "Chuo Co. Ltd", "Time Limit", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, progress, 0, timelimt, progress, timelimt_state, 0, ROT90, "Chuo Co. Ltd", "Progress",   MACHINE_SUPPORTS_SAVE )

@@ -321,7 +321,7 @@ PALETTE_INIT_MEMBER(caswin_state, caswin)
 }
 
 
-static MACHINE_CONFIG_START( vvillage, caswin_state )
+static MACHINE_CONFIG_START( vvillage )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,4000000)         /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(vvillage_mem)
@@ -416,7 +416,7 @@ ROM_START( rcasinoo )
 	ROM_LOAD( "prom1.e8",  0x0020, 0x0020, CRC(2b5c7826) SHA1(c0de392aebd6982e5846c12aeb2e871358be60d7) ) /* MB7051 */
 ROM_END
 
-GAME( 1984, rcasino,  0,       vvillage, vvillage, driver_device, 0, ROT270, "Dyna Electronics", "Royal Casino (D-2608208A1-2)",                MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1984, rcasino1, rcasino, vvillage, vvillage, driver_device, 0, ROT270, "Dyna Electronics", "Royal Casino (D-2608208A1-1, Larger Board)",  MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1984, rcasinoo, rcasino, vvillage, vvillage, driver_device, 0, ROT270, "Dyna Electronics", "Royal Casino (D-2608208A1-1, Smaller Board)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1985, caswin,   rcasino, vvillage, vvillage, driver_device, 0, ROT270, "Aristocrat",       "Casino Winner",                               MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1984, rcasino,  0,       vvillage, vvillage, caswin_state, 0, ROT270, "Dyna Electronics", "Royal Casino (D-2608208A1-2)",                MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1984, rcasino1, rcasino, vvillage, vvillage, caswin_state, 0, ROT270, "Dyna Electronics", "Royal Casino (D-2608208A1-1, Larger Board)",  MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1984, rcasinoo, rcasino, vvillage, vvillage, caswin_state, 0, ROT270, "Dyna Electronics", "Royal Casino (D-2608208A1-1, Smaller Board)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1985, caswin,   rcasino, vvillage, vvillage, caswin_state, 0, ROT270, "Aristocrat",       "Casino Winner",                               MACHINE_IMPERFECT_GRAPHICS )

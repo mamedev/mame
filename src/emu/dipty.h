@@ -8,12 +8,6 @@
 
 ***************************************************************************/
 
-#pragma once
-
-#ifndef __EMU_H__
-#error Dont include this file directly; include emu.h instead.
-#endif
-
 #ifndef MAME_EMU_DIPTY_H
 #define MAME_EMU_DIPTY_H
 
@@ -45,4 +39,4 @@ protected:
 // iterator
 typedef device_interface_iterator<device_pty_interface> pty_interface_iterator;
 
-#endif  /* MAME_EMU_DIPTY_H */
+#endif // MAME_EMU_DIPTY_H

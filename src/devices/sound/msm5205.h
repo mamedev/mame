@@ -1,54 +1,43 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles
-#pragma once
+#ifndef MAME_SOUND_MSM5205_H
+#define MAME_SOUND_MSM5205_H
 
-#ifndef __MSM5205_H__
-#define __MSM5205_H__
+#pragma once
 
 /* an interface for the MSM5205 and similar chips */
 
-/* prescaler selector defines   */
-/* MSM5205 default master clock is 384KHz */
-#define MSM5205_S96_3B 0     /* prescaler 1/96(4KHz) , data 3bit */
-#define MSM5205_S48_3B 1     /* prescaler 1/48(8KHz) , data 3bit */
-#define MSM5205_S64_3B 2     /* prescaler 1/64(6KHz) , data 3bit */
-#define MSM5205_SEX_3B 3     /* VCLK slave mode      , data 3bit */
-#define MSM5205_S96_4B 4     /* prescaler 1/96(4KHz) , data 4bit */
-#define MSM5205_S48_4B 5     /* prescaler 1/48(8KHz) , data 4bit */
-#define MSM5205_S64_4B 6     /* prescaler 1/64(6KHz) , data 4bit */
-#define MSM5205_SEX_4B 7     /* VCLK slave mode      , data 4bit */
+#define MCFG_MSM5205_PRESCALER_SELECTOR(select) \
+		msm5205_device::set_prescaler_selector(*device, (msm5205_device::select));
 
-/* MSM6585 default master clock is 640KHz */
-#define MSM6585_S160  (4+8)  /* prescaler 1/160(4KHz), data 4bit */
-#define MSM6585_S40   (5+8)  /* prescaler 1/40(16KHz), data 4bit */
-#define MSM6585_S80   (6+8)  /* prescaler 1/80 (8KHz), data 4bit */
-#define MSM6585_S20   (7+8)  /* prescaler 1/20(32KHz), data 4bit */
+#define MCFG_MSM5205_VCLK_CB(cb) \
+		devcb = &msm5205_device::set_vclk_callback(*device, (DEVCB_##cb));
 
 
-#define MCFG_MSM5205_PRESCALER_SELECTOR(_select) \
-	msm5205_device::set_prescaler_selector(*device, _select);
+#define MCFG_MSM6585_PRESCALER_SELECTOR(select) \
+		msm6585_device::set_prescaler_selector(*device, (msm6585_device::select));
 
-#define MCFG_MSM5205_VCLK_CB(_devcb) \
-	devcb = &msm5205_device::set_vclk_callback(*device, DEVCB_##_devcb);
-
-
-#define MCFG_MSM6585_PRESCALER_SELECTOR(_select) \
-	msm6585_device::set_prescaler_selector(*device, _select);
-
-#define MCFG_MSM6585_VCLK_CB(_devcb) \
-	devcb = &msm6585_device::set_vclk_callback(*device, DEVCB_##_devcb);
+#define MCFG_MSM6585_VCLK_CB(cb) \
+		devcb = &msm6585_device::set_vclk_callback(*device, (DEVCB_##cb));
 
 
-class msm5205_device : public device_t,
-							public device_sound_interface
+class msm5205_device : public device_t, public device_sound_interface
 {
 public:
+	/* MSM5205 default master clock is 384KHz */
+	static constexpr int S96_3B = 0;     /* prescaler 1/96(4KHz) , data 3bit */
+	static constexpr int S48_3B = 1;     /* prescaler 1/48(8KHz) , data 3bit */
+	static constexpr int S64_3B = 2;     /* prescaler 1/64(6KHz) , data 3bit */
+	static constexpr int SEX_3B = 3;     /* VCLK slave mode      , data 3bit */
+	static constexpr int S96_4B = 4;     /* prescaler 1/96(4KHz) , data 4bit */
+	static constexpr int S48_4B = 5;     /* prescaler 1/48(8KHz) , data 4bit */
+	static constexpr int S64_4B = 6;     /* prescaler 1/64(6KHz) , data 4bit */
+	static constexpr int SEX_4B = 7;     /* VCLK slave mode      , data 4bit */
+
 	msm5205_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-	msm5205_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, const char *shortname, const char *source);
-	~msm5205_device() {}
 
 	static void set_prescaler_selector(device_t &device, int select);
-	template<class _Object> static devcb_base &set_vclk_callback(device_t &device, _Object object) { return downcast<msm5205_device &>(device).m_vclk_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_vclk_callback(device_t &device, Object &&cb) { return downcast<msm5205_device &>(device).m_vclk_cb.set_callback(std::forward<Object>(cb)); }
 
 	// reset signal should keep for 2cycle of VCLK
 	DECLARE_WRITE_LINE_MEMBER(reset_w);
@@ -68,6 +57,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(s2_w);
 
 protected:
+	msm5205_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -96,11 +87,16 @@ protected:
 	devcb_write_line m_vclk_cb;
 };
 
-extern const device_type MSM5205;
 
 class msm6585_device : public msm5205_device
 {
 public:
+	/* MSM6585 default master clock is 640KHz */
+	static constexpr int S160  = 4 + 8;  /* prescaler 1/160(4KHz), data 4bit */
+	static constexpr int S40   = 5 + 8;  /* prescaler 1/40(16KHz), data 4bit */
+	static constexpr int S80   = 6 + 8;  /* prescaler 1/80 (8KHz), data 4bit */
+	static constexpr int S20   = 7 + 8;  /* prescaler 1/20(32KHz), data 4bit */
+
 	msm6585_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
@@ -110,7 +106,8 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 };
 
-extern const device_type MSM6585;
 
+DECLARE_DEVICE_TYPE(MSM5205, msm5205_device)
+DECLARE_DEVICE_TYPE(MSM6585, msm6585_device)
 
-#endif /* __MSM5205_H__ */
+#endif // MAME_SOUND_MSM5205_H

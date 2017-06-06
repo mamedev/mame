@@ -38,24 +38,24 @@
 //  constructor
 //-------------------------------------------------
 
-const device_type NES_HENGG_SRICH = device_creator<nes_hengg_srich_device>;
-const device_type NES_HENGG_XHZS = device_creator<nes_hengg_xhzs_device>;
-const device_type NES_HENGG_SHJY3 = device_creator<nes_hengg_shjy3_device>;
+DEFINE_DEVICE_TYPE(NES_HENGG_SRICH, nes_hengg_srich_device, "nes_hengg_srich", "NES Cart Henggedianzi Super Rich PCB")
+DEFINE_DEVICE_TYPE(NES_HENGG_XHZS,  nes_hengg_xhzs_device,  "nes_hengg_xhzs",  "NES Cart Henggedianzi Xing He Zhan Shi PCB")
+DEFINE_DEVICE_TYPE(NES_HENGG_SHJY3, nes_hengg_shjy3_device, "nes_hengg_shjy3", "NES Cart Henggedianzi Shen Hua Jian Yun III PCB")
 
 
 nes_hengg_srich_device::nes_hengg_srich_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_HENGG_SRICH, "NES Cart Henggedianzi Super Rich PCB", tag, owner, clock, "nes_hengg_srich", __FILE__)
+	: nes_nrom_device(mconfig, NES_HENGG_SRICH, tag, owner, clock)
 {
 }
 
 nes_hengg_xhzs_device::nes_hengg_xhzs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_HENGG_XHZS, "NES Cart Henggedianzi Xing He Zhan Shi PCB", tag, owner, clock, "nes_hengg_xhzs", __FILE__)
+	: nes_nrom_device(mconfig, NES_HENGG_XHZS, tag, owner, clock)
 {
 }
 
 nes_hengg_shjy3_device::nes_hengg_shjy3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_nrom_device(mconfig, NES_HENGG_SHJY3, "NES Cart Henggedianzi Shen Hua Jian Yun III PCB", tag, owner, clock, "nes_hengg_shjy3", __FILE__), m_irq_count(0), m_irq_count_latch(0), m_irq_enable(0), m_chr_mode(0)
-				{
+	: nes_nrom_device(mconfig, NES_HENGG_SHJY3, tag, owner, clock), m_irq_count(0), m_irq_count_latch(0), m_irq_enable(0), m_chr_mode(0)
+{
 }
 
 

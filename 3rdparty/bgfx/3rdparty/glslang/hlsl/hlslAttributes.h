@@ -60,6 +60,7 @@ namespace glslang {
         EatOutputTopology,
         EatPartitioning,
         EatPatchConstantFunc,
+        EatPatchSize,
         EatUnroll,
     };
 }
@@ -91,6 +92,16 @@ namespace glslang {
 
         std::unordered_map<TAttributeType, TIntermAggregate*> attributes;
     };
+
+    class TFunctionDeclarator {
+    public:
+        TFunctionDeclarator() : function(nullptr), body(nullptr) { }
+        TSourceLoc loc;
+        TFunction* function;
+        TAttributeMap attributes;
+        TVector<HlslToken>* body;
+    };
+
 } // end namespace glslang
 
 

@@ -278,7 +278,7 @@ INTERRUPT_GEN_MEMBER(homez80_state::homez80_interrupt)
 	m_irq ^= 1;
 }
 
-static MACHINE_CONFIG_START( homez80, homez80_state )
+static MACHINE_CONFIG_START( homez80 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_8MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(homez80_mem)
@@ -309,5 +309,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 2008, homez80,  0,     0,      homez80,   homez80, driver_device, 0,    "Kun-Szabo Marton", "Homebrew Z80 Computer", MACHINE_NO_SOUND_HW)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    STATE          INIT  COMPANY             FULLNAME                 FLAGS */
+COMP( 2008, homez80,  0,     0,      homez80,   homez80, homez80_state, 0,    "Kun-Szabo Marton", "Homebrew Z80 Computer", MACHINE_NO_SOUND_HW)

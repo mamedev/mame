@@ -242,8 +242,8 @@ WRITE8_MEMBER(discoboy_state::port_01_w)
 
 WRITE8_MEMBER(discoboy_state::port_06_w)
 {
-    //printf("unk discoboy_port_06_w %02x\n",data);
-    if (data != 0) logerror("port 06!!!! %02x\n",data);
+	//printf("unk discoboy_port_06_w %02x\n",data);
+	if (data != 0) logerror("port 06!!!! %02x\n",data);
 }
 
 READ8_MEMBER(discoboy_state::rambank2_r)
@@ -443,7 +443,7 @@ WRITE_LINE_MEMBER(discoboy_state::yunsung8_adpcm_int)
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, m_toggle);
 }
 
-static MACHINE_CONFIG_START( discoboy, discoboy_state )
+static MACHINE_CONFIG_START( discoboy )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)  /* 6 MHz? */
@@ -489,7 +489,7 @@ static MACHINE_CONFIG_START( discoboy, discoboy_state )
 
 	MCFG_SOUND_ADD("msm", MSM5205, XTAL_400kHz)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(discoboy_state, yunsung8_adpcm_int)) /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S96_4B)      /* 4KHz, 4 Bits */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)      /* 4KHz, 4 Bits */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
 MACHINE_CONFIG_END

@@ -12,7 +12,7 @@
 #include "speaker.h"
 
 
-const device_type ISA8_STEREO_FX = device_creator<stereo_fx_device>;
+DEFINE_DEVICE_TYPE(ISA8_STEREO_FX, stereo_fx_device, "stereo_fx", "ATi Stereo F/X Audio Adapter")
 
 READ8_MEMBER( stereo_fx_device::dev_dsp_data_r )
 {
@@ -109,7 +109,7 @@ static ADDRESS_MAP_START(stereo_fx_rom, AS_PROGRAM, 8, stereo_fx_device)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_FRAGMENT( stereo_fx )
+static MACHINE_CONFIG_START( stereo_fx )
 	MCFG_CPU_ADD("stereo_fx_cpu", I80C31, XTAL_30MHz)
 	MCFG_CPU_IO_MAP(stereo_fx_io)
 	MCFG_CPU_PROGRAM_MAP(stereo_fx_rom)
@@ -194,7 +194,7 @@ READ8_MEMBER( stereo_fx_device::invalid_r )
 }
 
 stereo_fx_device::stereo_fx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, ISA8_STEREO_FX, "ATI Stereo F/X Audio Adapter", tag, owner, clock, "stereo_fx", __FILE__),
+	device_t(mconfig, ISA8_STEREO_FX, tag, owner, clock),
 	device_isa8_card_interface(mconfig, *this),
 	m_joy(*this, "pc_joy"),
 	m_cpu(*this, "stereo_fx_cpu"), m_data_in(false), m_in_byte(0), m_data_out(false), m_out_byte(0), m_port20(0), m_port00(0), m_timer(nullptr), m_t0(0)

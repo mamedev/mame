@@ -16,9 +16,9 @@
 //**************************************************************************
 
 // device type definition
-const device_type CENTRONICS_COVOX = device_creator<centronics_covox_device>;
+DEFINE_DEVICE_TYPE(CENTRONICS_COVOX, centronics_covox_device, "covox", "Covox Speech Thing")
 
-static MACHINE_CONFIG_FRAGMENT( covox )
+static MACHINE_CONFIG_START( covox )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
@@ -35,7 +35,7 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 centronics_covox_device::centronics_covox_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, CENTRONICS_COVOX, "Covox Speech Thing", tag, owner, clock, "covox", __FILE__),
+	: device_t(mconfig, CENTRONICS_COVOX, tag, owner, clock),
 	device_centronics_peripheral_interface( mconfig, *this ),
 	m_dac(*this, "dac"),
 	m_data(0)
@@ -68,9 +68,9 @@ void centronics_covox_device::update_dac()
 //**************************************************************************
 
 // device type definition
-const device_type CENTRONICS_COVOX_STEREO = device_creator<centronics_covox_stereo_device>;
+DEFINE_DEVICE_TYPE(CENTRONICS_COVOX_STEREO, centronics_covox_stereo_device, "covox_stereo", "Covox (Stereo-in-1)")
 
-static MACHINE_CONFIG_FRAGMENT( covox_stereo )
+static MACHINE_CONFIG_START( covox_stereo )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("ldac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) // unknown DAC
@@ -89,7 +89,7 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 centronics_covox_stereo_device::centronics_covox_stereo_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, CENTRONICS_COVOX_STEREO, "Covox (Stereo-in-1)", tag, owner, clock, "covox_stereo", __FILE__),
+	: device_t(mconfig, CENTRONICS_COVOX_STEREO, tag, owner, clock),
 	device_centronics_peripheral_interface( mconfig, *this ),
 	m_ldac(*this, "ldac"),
 	m_rdac(*this, "rdac"),

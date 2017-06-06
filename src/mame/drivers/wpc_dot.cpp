@@ -301,7 +301,7 @@ uint32_t wpc_dot_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	return 0;
 }
 
-static MACHINE_CONFIG_START( wpc_dot, wpc_dot_state )
+static MACHINE_CONFIG_START( wpc_dot )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 2000000)
 	MCFG_CPU_PROGRAM_MAP(wpc_dot_map)

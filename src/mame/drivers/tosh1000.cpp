@@ -131,7 +131,7 @@ static ADDRESS_MAP_START( tosh1000_io, AS_IO, 8, tosh1000_state )
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_FRAGMENT( cfg_fdc_35 )
+static MACHINE_CONFIG_START( cfg_fdc_35 )
 	MCFG_DEVICE_MODIFY("fdc:0")
 	MCFG_SLOT_DEFAULT_OPTION("35dd")
 	MCFG_SLOT_FIXED(true)
@@ -139,7 +139,7 @@ static MACHINE_CONFIG_FRAGMENT( cfg_fdc_35 )
 	MCFG_DEVICE_REMOVE("fdc:1")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( tosh1000, tosh1000_state )
+static MACHINE_CONFIG_START( tosh1000 )
 	MCFG_CPU_ADD("maincpu", I8088, XTAL_5MHz)
 	MCFG_CPU_PROGRAM_MAP(tosh1000_map)
 	MCFG_CPU_IO_MAP(tosh1000_io)
@@ -190,5 +190,5 @@ ROM_START( tosh1000 )
 ROM_END
 
 
-/*     YEAR     ROM NAME    PARENT      COMPAT  MACHINE     INPUT                       INIT        COMPANY     FULLNAME */
-COMP ( 1987,    tosh1000,   ibm5150,    0,      tosh1000,   0,        tosh1000_state,   tosh1000,   "Toshiba",  "Toshiba T1000", MACHINE_IS_SKELETON)
+//     YEAR     ROM NAME    PARENT      COMPAT  MACHINE     INPUT     STATE             INIT        COMPANY     FULLNAME         FLAGS
+COMP ( 1987,    tosh1000,   ibm5150,    0,      tosh1000,   0,        tosh1000_state,   tosh1000,   "Toshiba",  "Toshiba T1000", MACHINE_IS_SKELETON )

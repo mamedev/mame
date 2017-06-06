@@ -1,11 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Patrick Mackinlay
 
+#ifndef MAME_INCLUDES_INTERPRO_H
+#define MAME_INCLUDES_INTERPRO_H
+
 #pragma once
-
-#ifndef INTERPRO_H_
-#define INTERPRO_H_
-
 
 #include "cpu/clipper/clipper.h"
 #include "machine/cammu.h"
@@ -13,15 +12,24 @@
 #include "machine/interpro_ioga.h"
 #include "machine/interpro_mcga.h"
 #include "machine/interpro_sga.h"
+#include "machine/interpro_srarb.h"
 
 #include "machine/z80scc.h"
 #include "machine/mc146818.h"
 #include "machine/upd765.h"
+#if NEW_SCSI
+#include "machine/ncr5390.h"
+
+#include "machine/nscsi_bus.h"
+#include "machine/nscsi_cd.h"
+#include "machine/nscsi_hd.h"
+#else
 #include "machine/ncr539x.h"
 
 #include "bus/scsi/scsi.h"
 #include "bus/scsi/scsicd.h"
 #include "bus/scsi/scsihd.h"
+#endif
 #include "bus/rs232/rs232.h"
 
 #include "formats/pc_dsk.h"
@@ -32,15 +40,17 @@
 #define INTERPRO_RTC_TAG        "rtc"
 #define INTERPRO_SCC1_TAG       "scc1"
 #define INTERPRO_SCC2_TAG       "scc2"
-#define INTERPRO_ROM_TAG        "rom"
-#define INTERPRO_EEPROM_TAG     "eeprom"
+#define INTERPRO_EPROM_TAG      "eprom"
+#define INTERPRO_FLASH_TAG      "flash"
 #define INTERPRO_TERMINAL_TAG   "terminal"
 #define INTERPRO_FDC_TAG        "fdc"
 #define INTERPRO_SCSI_TAG       "scsi"
+#define INTERPRO_SCSI_ADAPTER_TAG    "adapter"
+
 #define INTERPRO_IOGA_TAG       "ioga"
 #define INTERPRO_MCGA_TAG       "mcga"
 #define INTERPRO_SGA_TAG        "sga"
-#define INTERPRO_SCSI_ADAPTER_TAG  "adapter"
+#define INTERPRO_SRARB_TAG      "srarb"
 
 // system board register offsets
 #define SREG_LED    0
@@ -83,10 +93,16 @@ public:
 		m_scc2(*this, INTERPRO_SCC2_TAG),
 		m_rtc(*this, INTERPRO_RTC_TAG),
 		m_fdc(*this, INTERPRO_FDC_TAG),
+#if NEW_SCSI
+		m_scsibus(*this, INTERPRO_SCSI_TAG),
+		m_scsi(*this, INTERPRO_SCSI_TAG ":7:" INTERPRO_SCSI_ADAPTER_TAG),
+#else
 		m_scsi(*this, INTERPRO_SCSI_ADAPTER_TAG),
+#endif
 		m_ioga(*this, INTERPRO_IOGA_TAG),
 		m_mcga(*this, INTERPRO_MCGA_TAG),
-		m_sga(*this, INTERPRO_SGA_TAG)
+		m_sga(*this, INTERPRO_SGA_TAG),
+		m_srarb(*this, INTERPRO_SRARB_TAG)
 		{ }
 
 	required_device<clipper_device> m_maincpu;
@@ -97,11 +113,17 @@ public:
 	required_device<z80scc_device> m_scc2;
 	required_device<mc146818_device> m_rtc;
 	required_device<n82077aa_device> m_fdc;
+#if NEW_SCSI
+	required_device<nscsi_bus_device> m_scsibus;
+	required_device<ncr53c94_device> m_scsi;
+#else
 	required_device<ncr539x_device> m_scsi;
+#endif
 
 	required_device<interpro_ioga_device> m_ioga;
-	required_device<interpro_mcga_device> m_mcga;
+	required_device<interpro_fmcc_device> m_mcga;
 	required_device<interpro_sga_device> m_sga;
+	required_device<interpro_srarb_device> m_srarb;
 
 	DECLARE_DRIVER_INIT(ip2800);
 
@@ -116,6 +138,8 @@ public:
 
 	DECLARE_READ8_MEMBER(scsi_r);
 	DECLARE_WRITE8_MEMBER(scsi_w);
+	DECLARE_READ8_MEMBER(scsi_dma_r);
+	DECLARE_WRITE8_MEMBER(scsi_dma_w);
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
@@ -124,7 +148,7 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	uint16_t m_system_reg[4];
+	u16 m_system_reg[4];
 };
 
-#endif
+#endif // MAME_INCLUDES_INTERPRO_H

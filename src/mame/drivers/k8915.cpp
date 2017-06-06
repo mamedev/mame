@@ -29,7 +29,7 @@ public:
 	DECLARE_READ8_MEMBER(k8915_52_r);
 	DECLARE_READ8_MEMBER(k8915_53_r);
 	DECLARE_WRITE8_MEMBER(k8915_a8_w);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	void kbd_put(u8 data);
 	DECLARE_DRIVER_INIT(k8915);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -140,12 +140,12 @@ uint32_t k8915_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	return 0;
 }
 
-WRITE8_MEMBER( k8915_state::kbd_put )
+void k8915_state::kbd_put(u8 data)
 {
 	m_term_data = data;
 }
 
-static MACHINE_CONFIG_START( k8915, k8915_state )
+static MACHINE_CONFIG_START( k8915 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(k8915_mem)
@@ -163,7 +163,7 @@ static MACHINE_CONFIG_START( k8915, k8915_state )
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(WRITE8(k8915_state, kbd_put))
+	MCFG_GENERIC_KEYBOARD_CB(PUT(k8915_state, kbd_put))
 MACHINE_CONFIG_END
 
 
@@ -179,5 +179,5 @@ ROM_END
 
 /* Driver */
 
-/*   YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT  INIT        COMPANY   FULLNAME       FLAGS */
-COMP( 1982, k8915,  0,       0,     k8915,  k8915, k8915_state,  k8915, "Robotron",   "K8915", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE        INIT   COMPANY     FULLNAME  FLAGS
+COMP( 1982, k8915,  0,      0,      k8915,   k8915, k8915_state, k8915, "Robotron", "K8915",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

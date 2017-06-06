@@ -8,8 +8,10 @@
 
 *********************************************************************/
 
-#ifndef __A2BUS_VULCAN__
-#define __A2BUS_VULCAN__
+#ifndef MAME_BUS_A2BUS_VULCAN_H
+#define MAME_BUS_A2BUS_VULCAN_H
+
+#pragma once
 
 #include "a2bus.h"
 #include "machine/ataintf.h"
@@ -22,16 +24,13 @@ class a2bus_vulcanbase_device:
 	public device_t,
 	public device_a2bus_card_interface
 {
-public:
-	// construction/destruction
-	a2bus_vulcanbase_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
-
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
 protected:
+	// construction/destruction
+	a2bus_vulcanbase_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	// overrides of standard a2bus slot functions
 	virtual uint8_t read_c0nx(address_space &space, uint8_t offset) override;
@@ -71,7 +70,7 @@ public:
 };
 
 // device type definition
-extern const device_type A2BUS_VULCAN;
-extern const device_type A2BUS_VULCANGOLD;
+DECLARE_DEVICE_TYPE(A2BUS_VULCAN,     a2bus_vulcan_device)
+DECLARE_DEVICE_TYPE(A2BUS_VULCANGOLD, a2bus_vulcangold_device)
 
-#endif /* __A2BUS_VULCAN__ */
+#endif // MAME_BUS_A2BUS_VULCAN_H

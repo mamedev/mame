@@ -6,8 +6,10 @@
 
 ***************************************************************************/
 
-#ifndef __MPEG_AUDIO_H__
-#define __MPEG_AUDIO_H__
+#ifndef MAME_SOUND_MPEG_AUDIO_H
+#define MAME_SOUND_MPEG_AUDIO_H
+
+#pragma once
 
 class mpeg_audio {
 public:
@@ -125,4 +127,4 @@ private:
 	}
 };
 
-#endif
+#endif // MAME_SOUND_MPEG_AUDIO_H

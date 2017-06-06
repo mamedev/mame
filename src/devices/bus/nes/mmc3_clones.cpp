@@ -28,221 +28,221 @@
 //  constructor
 //-------------------------------------------------
 
-const device_type NES_NITRA = device_creator<nes_nitra_device>;
-const device_type NES_KS7057 = device_creator<nes_ks7057_device>;
-const device_type NES_SBROS11 = device_creator<nes_sbros11_device>;
-const device_type NES_MALISB = device_creator<nes_malisb_device>;
-const device_type NES_FAMILY4646 = device_creator<nes_family4646_device>;
-const device_type NES_PIKAY2K = device_creator<nes_pikay2k_device>;
-const device_type NES_8237 = device_creator<nes_8237_device>;
-const device_type NES_SG_LIONK = device_creator<nes_sglionk_device>;
-const device_type NES_SG_BOOG = device_creator<nes_sgboog_device>;
-const device_type NES_KASING = device_creator<nes_kasing_device>;
-const device_type NES_KAY = device_creator<nes_kay_device>;
-const device_type NES_H2288 = device_creator<nes_h2288_device>;
-const device_type NES_6035052 = device_creator<nes_6035052_device>;
-const device_type NES_TXC_TW = device_creator<nes_txc_tw_device>;
-const device_type NES_KOF97 = device_creator<nes_kof97_device>;
-const device_type NES_KOF96 = device_creator<nes_kof96_device>;
-const device_type NES_SF3 = device_creator<nes_sf3_device>;
-const device_type NES_GOUDER = device_creator<nes_gouder_device>;
-const device_type NES_SA9602B = device_creator<nes_sa9602b_device>;
-const device_type NES_SACHEN_SHERO = device_creator<nes_sachen_shero_device>;
-//const device_type NES_A9746 = device_creator<nes_a9746_device>;
+DEFINE_DEVICE_TYPE(NES_NITRA,         nes_nitra_device,         "nes_nitra",         "NES Cart Nitra PCB")
+DEFINE_DEVICE_TYPE(NES_KS7057,        nes_ks7057_device,        "nes_ks7057",        "NES Cart KS-7057 PCB")
+DEFINE_DEVICE_TYPE(NES_SBROS11,       nes_sbros11_device,       "nes_smb11",         "NES Cart SMB 11 PCB")
+DEFINE_DEVICE_TYPE(NES_MALISB,        nes_malisb_device,        "nes_malisb",        "NES Cart Mali Spash Bomb PCB")
+DEFINE_DEVICE_TYPE(NES_FAMILY4646,    nes_family4646_device,    "nes_family4646",    "NES Cart BMC-FAMILY04646 PCB")
+DEFINE_DEVICE_TYPE(NES_PIKAY2K,       nes_pikay2k_device,       "nes_pikay2k",       "NES Cart PIKACHU Y2K PCB")
+DEFINE_DEVICE_TYPE(NES_8237,          nes_8237_device,          "nes_8237",          "NES Cart UNL-8237 PCB")
+DEFINE_DEVICE_TYPE(NES_SG_LIONK,      nes_sglionk_device,       "nes_sglionk",       "NES Cart SuperGame Lion King PCB")
+DEFINE_DEVICE_TYPE(NES_SG_BOOG,       nes_sgboog_device,        "nes_sgbooger",      "NES Cart SuperGame BoogerMan PCB")
+DEFINE_DEVICE_TYPE(NES_KASING,        nes_kasing_device,        "nes_kasing",        "NES Cart Kasing PCB")
+DEFINE_DEVICE_TYPE(NES_KAY,           nes_kay_device,           "nes_kay",           "NES Cart KAY PCB")
+DEFINE_DEVICE_TYPE(NES_H2288,         nes_h2288_device,         "nes_h2288",         "NES Cart H-2288 PCB")
+DEFINE_DEVICE_TYPE(NES_6035052,       nes_6035052_device,       "nes_6035052",       "NES Cart UNL-603-5052 PCB")
+DEFINE_DEVICE_TYPE(NES_TXC_TW,        nes_txc_tw_device,        "nes_txc_tw",        "NES Cart TXC Thunder Warrior PCB")
+DEFINE_DEVICE_TYPE(NES_KOF97,         nes_kof97_device,         "nes_kof97",         "NES Cart KoF 97 PCB")
+DEFINE_DEVICE_TYPE(NES_KOF96,         nes_kof96_device,         "nes_kof96",         "NES Cart KoF 96 PCB")
+DEFINE_DEVICE_TYPE(NES_SF3,           nes_sf3_device,           "nes_sf3",           "NES Cart Super Fighter III PCB")
+DEFINE_DEVICE_TYPE(NES_GOUDER,        nes_gouder_device,        "nes_gouder",        "NES Cart Gouder PCB")
+DEFINE_DEVICE_TYPE(NES_SA9602B,       nes_sa9602b_device,       "nes_sa9602b",       "NES Cart SA-9602B PCB")
+DEFINE_DEVICE_TYPE(NES_SACHEN_SHERO,  nes_sachen_shero_device,  "nes_shero",         "NES Cart Street Hero PCB")
+//DEFINE_DEVICE_TYPE(NES_A9746,         nes_a9746_device,         "nes_bmc_a9746",     "NES Cart A-9746 PCB")
 
-const device_type NES_FK23C = device_creator<nes_fk23c_device>;
-const device_type NES_FK23CA = device_creator<nes_fk23ca_device>;
-const device_type NES_S24IN1SC03 = device_creator<nes_s24in1sc03_device>;
-const device_type NES_BMC_15IN1 = device_creator<nes_bmc_15in1_device>;
-const device_type NES_BMC_SBIG7 = device_creator<nes_bmc_sbig7_device>;
-const device_type NES_BMC_HIK8 = device_creator<nes_bmc_hik8_device>;
-const device_type NES_BMC_HIK4 = device_creator<nes_bmc_hik4_device>;
-const device_type NES_BMC_MARIO7IN1 = device_creator<nes_bmc_mario7in1_device>;
-const device_type NES_BMC_GOLD7IN1 = device_creator<nes_bmc_gold7in1_device>;
-const device_type NES_BMC_GC6IN1 = device_creator<nes_bmc_gc6in1_device>;
-const device_type NES_BMC_411120C = device_creator<nes_bmc_411120c_device>;
-const device_type NES_BMC_830118C = device_creator<nes_bmc_830118c_device>;
-const device_type NES_PJOY84 = device_creator<nes_pjoy84_device>;
-const device_type NES_COOLBOY = device_creator<nes_coolboy_device>;
+DEFINE_DEVICE_TYPE(NES_FK23C,         nes_fk23c_device,         "nes_kf23c",         "NES Cart KF23C PCB")
+DEFINE_DEVICE_TYPE(NES_FK23CA,        nes_fk23ca_device,        "nes_kf23ca",        "NES Cart KF23CA PCB")
+DEFINE_DEVICE_TYPE(NES_S24IN1SC03,    nes_s24in1sc03_device,    "nes_s24in1c03",     "NES Cart Super 24 in 1 SC-03 PCB")
+DEFINE_DEVICE_TYPE(NES_BMC_15IN1,     nes_bmc_15in1_device,     "nes_bmc_15in1",     "NES Cart BMC 15 in 1 PCB")
+DEFINE_DEVICE_TYPE(NES_BMC_SBIG7,     nes_bmc_sbig7_device,     "nes_bmc_sbig7",     "NES Cart BMC Super BIG 7 in 1 PCB")
+DEFINE_DEVICE_TYPE(NES_BMC_HIK8,      nes_bmc_hik8_device,      "nes_bmc_hik8",      "NES Cart BMC HIK 8 in 1 PCB")
+DEFINE_DEVICE_TYPE(NES_BMC_HIK4,      nes_bmc_hik4_device,      "nes_bmc_hik4",      "NES Cart BMC HIK 4 in 1 PCB")
+DEFINE_DEVICE_TYPE(NES_BMC_MARIO7IN1, nes_bmc_mario7in1_device, "nes_bmc_mario7in1", "NES Cart BMC Mario 7 in 1 PCB")
+DEFINE_DEVICE_TYPE(NES_BMC_GOLD7IN1,  nes_bmc_gold7in1_device,  "nes_bmc_gold7in1",  "NES Cart BMC Golden 7 in 1 PCB")
+DEFINE_DEVICE_TYPE(NES_BMC_GC6IN1,    nes_bmc_gc6in1_device,    "nes_bmc_gc6in1",    "NES Cart BMC Golden Card 6 in 1 PCB")
+DEFINE_DEVICE_TYPE(NES_BMC_411120C,   nes_bmc_411120c_device,   "nes_bmc_411120c",   "NES Cart BMC 411120C PCB")
+DEFINE_DEVICE_TYPE(NES_BMC_830118C,   nes_bmc_830118c_device,   "nes_bmc_830118c",   "NES Cart BMC 830118C PCB")
+DEFINE_DEVICE_TYPE(NES_PJOY84,        nes_pjoy84_device,        "nes_pjoy84",        "NES Cart Powerjoy 84 PCB")
+DEFINE_DEVICE_TYPE(NES_COOLBOY,       nes_coolboy_device,       "nes_coolboy",       "NES Cart CoolBoy PCB")
 
 
 nes_nitra_device::nes_nitra_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_txrom_device(mconfig, NES_NITRA, "NES Cart Nitra PCB", tag, owner, clock, "nes_nitra", __FILE__)
+	: nes_txrom_device(mconfig, NES_NITRA, tag, owner, clock)
 {
 }
 
 nes_ks7057_device::nes_ks7057_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_txrom_device(mconfig, NES_KS7057, "NES Cart KS-7057 PCB", tag, owner, clock, "nes_ks7057", __FILE__)
+	: nes_txrom_device(mconfig, NES_KS7057, tag, owner, clock)
 {
 }
 
 nes_sbros11_device::nes_sbros11_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_txrom_device(mconfig, NES_SBROS11, "NES Cart SMB 11 PCB", tag, owner, clock, "nes_smb11", __FILE__)
+	: nes_txrom_device(mconfig, NES_SBROS11, tag, owner, clock)
 {
 }
 
 nes_malisb_device::nes_malisb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_txrom_device(mconfig, NES_MALISB, "NES Cart Mali Spash Bomb PCB", tag, owner, clock, "nes_malisb", __FILE__)
+	: nes_txrom_device(mconfig, NES_MALISB, tag, owner, clock)
 {
 }
 
 nes_family4646_device::nes_family4646_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_txrom_device(mconfig, NES_FAMILY4646, "NES Cart BMC-FAMILY-4646 PCB", tag, owner, clock, "nes_family4646", __FILE__)
+	: nes_txrom_device(mconfig, NES_FAMILY4646, tag, owner, clock)
 {
 }
 
 nes_pikay2k_device::nes_pikay2k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_txrom_device(mconfig, NES_PIKAY2K, "NES Cart PIKACHU Y2K PCB", tag, owner, clock, "nes_pikay2k", __FILE__)
+	: nes_txrom_device(mconfig, NES_PIKAY2K, tag, owner, clock)
 {
 }
 
 nes_8237_device::nes_8237_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_txrom_device(mconfig, NES_8237, "NES Cart UNL-8237 PCB", tag, owner, clock, "nes_8237", __FILE__), m_cd_enable(0)
-				{
+	: nes_txrom_device(mconfig, NES_8237, tag, owner, clock), m_cd_enable(0)
+{
 }
 
 nes_sglionk_device::nes_sglionk_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_txrom_device(mconfig, NES_SG_LIONK, "NES Cart SuperGame Lion King PCB", tag, owner, clock, "nes_sglionk", __FILE__), m_reg(0), m_reg_enabled(0)
-				{
+	: nes_txrom_device(mconfig, NES_SG_LIONK, tag, owner, clock), m_reg(0), m_reg_enabled(0)
+{
 }
 
 nes_sgboog_device::nes_sgboog_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_txrom_device(mconfig, NES_SG_BOOG, "NES Cart SuperGame BoogerMan PCB", tag, owner, clock, "nes_sgbooger", __FILE__), m_mode(0)
-				{
+	: nes_txrom_device(mconfig, NES_SG_BOOG, tag, owner, clock), m_mode(0)
+{
 }
 
 nes_kasing_device::nes_kasing_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_txrom_device(mconfig, NES_KASING, "NES Cart Kasing PCB", tag, owner, clock, "nes_kasing", __FILE__), m_reg(0)
-				{
+	: nes_txrom_device(mconfig, NES_KASING, tag, owner, clock), m_reg(0)
+{
 }
 
 nes_kay_device::nes_kay_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_txrom_device(mconfig, NES_KAY, "NES Cart KAY PCB", tag, owner, clock, "nes_kay", __FILE__), m_low_reg(0)
-				{
+	: nes_txrom_device(mconfig, NES_KAY, tag, owner, clock), m_low_reg(0)
+{
 }
 
 nes_h2288_device::nes_h2288_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_txrom_device(mconfig, NES_H2288, "NES Cart H-2288 PCB", tag, owner, clock, "nes_h2288", __FILE__)
+	: nes_txrom_device(mconfig, NES_H2288, tag, owner, clock)
 {
 }
 
 nes_6035052_device::nes_6035052_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_txrom_device(mconfig, NES_6035052, "NES Cart UNL-603-5052 PCB", tag, owner, clock, "nes_6035052", __FILE__), m_prot(0)
-				{
+	: nes_txrom_device(mconfig, NES_6035052, tag, owner, clock), m_prot(0)
+{
 }
 
 nes_txc_tw_device::nes_txc_tw_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_txrom_device(mconfig, NES_TXC_TW, "NES Cart TXC Thunder Warrior PCB", tag, owner, clock, "nes_txc_tw", __FILE__)
+	: nes_txrom_device(mconfig, NES_TXC_TW, tag, owner, clock)
 {
 }
 
 nes_kof97_device::nes_kof97_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_txrom_device(mconfig, NES_KOF97, "NES Cart KOF 97 PCB", tag, owner, clock, "nes_kof97", __FILE__)
+	: nes_txrom_device(mconfig, NES_KOF97, tag, owner, clock)
 {
 }
 
 nes_kof96_device::nes_kof96_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_txrom_device(mconfig, NES_KOF96, "NES Cart KOF 96 PCB", tag, owner, clock, "nes_kof96", __FILE__)
+	: nes_txrom_device(mconfig, NES_KOF96, tag, owner, clock)
 {
 }
 
 nes_sf3_device::nes_sf3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_txrom_device(mconfig, NES_SF3, "NES Cart Super Fighter III PCB", tag, owner, clock, "nes_sf3", __FILE__)
+	: nes_txrom_device(mconfig, NES_SF3, tag, owner, clock)
 {
 }
 
 nes_gouder_device::nes_gouder_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_txrom_device(mconfig, NES_GOUDER, "NES Cart Gouder PCB", tag, owner, clock, "nes_gouder", __FILE__)
+	: nes_txrom_device(mconfig, NES_GOUDER, tag, owner, clock)
 {
 }
 
 nes_sa9602b_device::nes_sa9602b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_txrom_device(mconfig, NES_SA9602B, "NES Cart SA-9602B PCB", tag, owner, clock, "nes_sa9602b", __FILE__), m_reg(0), m_prg_chip(0)
-				{
+	: nes_txrom_device(mconfig, NES_SA9602B, tag, owner, clock), m_reg(0), m_prg_chip(0)
+{
 }
 
 nes_sachen_shero_device::nes_sachen_shero_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_txrom_device(mconfig, NES_SACHEN_SHERO, "NES Cart Street Hero PCB", tag, owner, clock, "nes_shero", __FILE__), m_reg(0)
-				{
+	: nes_txrom_device(mconfig, NES_SACHEN_SHERO, tag, owner, clock), m_reg(0)
+{
 }
 
 //nes_a9746_device::nes_a9746_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-//                  : nes_txrom_device(mconfig, NES_A9746, "NES Cart A-9746 PCB", tag, owner, clock, "nes_bmc_a9746", __FILE__)
+//    : nes_txrom_device(mconfig, NES_A9746, tag, owner, clock)
 //{
 //}
 
-nes_fk23c_device::nes_fk23c_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-					: nes_txrom_device(mconfig, type, name, tag, owner, clock, shortname, source), m_mmc_cmd1(0)
-				{
+nes_fk23c_device::nes_fk23c_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: nes_txrom_device(mconfig, type, tag, owner, clock), m_mmc_cmd1(0)
+{
 }
 
 nes_fk23c_device::nes_fk23c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_txrom_device(mconfig, NES_FK23C, "NES Cart FK23C PCB", tag, owner, clock, "nes_fk23c", __FILE__), m_mmc_cmd1(0)
-				{
+	: nes_fk23c_device(mconfig, NES_FK23C, tag, owner, clock)
+{
 }
 
 nes_fk23ca_device::nes_fk23ca_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_fk23c_device(mconfig, NES_FK23CA, "NES Cart FK23CA PCB", tag, owner, clock, "nes_fk23ca", __FILE__)
+	: nes_fk23c_device(mconfig, NES_FK23CA, tag, owner, clock)
 {
 }
 
 nes_s24in1sc03_device::nes_s24in1sc03_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_txrom_device(mconfig, NES_S24IN1SC03, "NES Cart Super 24 in 1 SC-03 PCB", tag, owner, clock, "nes_s24in1c03", __FILE__)
+	: nes_txrom_device(mconfig, NES_S24IN1SC03, tag, owner, clock)
 {
 }
 
 nes_bmc_15in1_device::nes_bmc_15in1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_txrom_device(mconfig, NES_BMC_15IN1, "NES Cart BMC 15 in 1 PCB", tag, owner, clock, "nes_bmc_15in1", __FILE__)
+	: nes_txrom_device(mconfig, NES_BMC_15IN1, tag, owner, clock)
 {
 }
 
 nes_bmc_sbig7_device::nes_bmc_sbig7_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_txrom_device(mconfig, NES_BMC_SBIG7, "NES Cart BMC Super BIG 7 in 1 PCB", tag, owner, clock, "nes_bmc_sbit7", __FILE__)
+	: nes_txrom_device(mconfig, NES_BMC_SBIG7, tag, owner, clock)
 {
 }
 
 nes_bmc_hik8_device::nes_bmc_hik8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_txrom_device(mconfig, NES_BMC_HIK8, "NES Cart BMC Super HIK 8 in 1 PCB", tag, owner, clock, "nes_bmc_hik8", __FILE__), m_count(0)
-				{
+	: nes_txrom_device(mconfig, NES_BMC_HIK8, tag, owner, clock), m_count(0)
+{
 }
 
 nes_bmc_hik4_device::nes_bmc_hik4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_txrom_device(mconfig, NES_BMC_HIK4, "NES Cart BMC Super HIK 4 in 1 PCB", tag, owner, clock, "nes_bmc_hik4", __FILE__)
+	: nes_txrom_device(mconfig, NES_BMC_HIK4, tag, owner, clock)
 {
 }
 
 nes_bmc_mario7in1_device::nes_bmc_mario7in1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_txrom_device(mconfig, NES_BMC_MARIO7IN1, "NES Cart BMC Mario 7 in 1 PCB", tag, owner, clock, "nes_bmc_mario7in1", __FILE__), m_reg_written(0)
-				{
+	: nes_txrom_device(mconfig, NES_BMC_MARIO7IN1, tag, owner, clock), m_reg_written(0)
+{
 }
 
 nes_bmc_gold7in1_device::nes_bmc_gold7in1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_txrom_device(mconfig, NES_BMC_GOLD7IN1, "NES Cart BMC Golden 7 in 1 PCB", tag, owner, clock, "nes_bmc_gold7in1", __FILE__), m_reg_written(0)
-				{
+	: nes_txrom_device(mconfig, NES_BMC_GOLD7IN1, tag, owner, clock), m_reg_written(0)
+{
 }
 
 nes_bmc_gc6in1_device::nes_bmc_gc6in1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_txrom_device(mconfig, NES_BMC_GC6IN1, "NES Cart BMC Golden Card 6 in 1 PCB", tag, owner, clock, "nes_bmc_gc6in1", __FILE__)
+	: nes_txrom_device(mconfig, NES_BMC_GC6IN1, tag, owner, clock)
 {
 }
 
 nes_bmc_411120c_device::nes_bmc_411120c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_txrom_device(mconfig, NES_BMC_411120C, "NES Cart BMC 411120C PCB", tag, owner, clock, "nes_bmc_411120c", __FILE__), m_reg(0)
-				{
+	: nes_txrom_device(mconfig, NES_BMC_411120C, tag, owner, clock), m_reg(0)
+{
 }
 
 nes_bmc_830118c_device::nes_bmc_830118c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_txrom_device(mconfig, NES_BMC_830118C, "NES Cart BMC 830118C PCB", tag, owner, clock, "nes_bmc_830118c", __FILE__), m_reg(0)
-				{
+	: nes_txrom_device(mconfig, NES_BMC_830118C, tag, owner, clock), m_reg(0)
+{
 }
 
 nes_pjoy84_device::nes_pjoy84_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_txrom_device(mconfig, NES_PJOY84, "NES Cart Powerjoy 84 PCB", tag, owner, clock, "nes_pjoy84", __FILE__)
+	: nes_txrom_device(mconfig, NES_PJOY84, tag, owner, clock)
 {
 }
 
 nes_coolboy_device::nes_coolboy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-					: nes_txrom_device(mconfig, NES_COOLBOY, "NES Cart CoolBoy PCB", tag, owner, clock, "nes_coolboy", __FILE__)
+	: nes_txrom_device(mconfig, NES_COOLBOY, tag, owner, clock)
 {
 }
 

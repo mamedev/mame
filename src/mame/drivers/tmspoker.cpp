@@ -552,7 +552,7 @@ GFXDECODE_END
 *    Machine Drivers     *
 *************************/
 
-static MACHINE_CONFIG_START( tmspoker, tmspoker_state )
+static MACHINE_CONFIG_START( tmspoker )
 
 	// CPU TMS9980A; no line connections
 	MCFG_TMS99xx_ADD("maincpu", TMS9980A, MASTER_CLOCK/4, tmspoker_map, tmspoker_cru_map)
@@ -642,5 +642,5 @@ DRIVER_INIT_MEMBER(tmspoker_state,bus)
 *      Game Drivers      *
 *************************/
 
-/*    YEAR  NAME      PARENT  MACHINE   INPUT     INIT  ROT    COMPANY      FULLNAME                     FLAGS */
+//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT  ROT   COMPANY      FULLNAME                      FLAGS
 GAME( 198?, tmspoker, 0,      tmspoker, tmspoker, tmspoker_state, bus,  ROT0, "<unknown>", "unknown TMS9980 Poker Game", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

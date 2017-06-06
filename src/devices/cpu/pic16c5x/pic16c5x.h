@@ -11,10 +11,10 @@
 	*                                                                          *
 	\**************************************************************************/
 
-#pragma once
+#ifndef MAME_CPU_PIC16C5X_PIC16C5X_H
+#define MAME_CPU_PIC16C5X_PIC16C5X_H
 
-#ifndef __PIC16C5X_H__
-#define __PIC16C5X_H__
+#pragma once
 
 // input lines
 enum
@@ -65,32 +65,29 @@ enum
 
 
 
-extern const device_type PIC16C54;
-extern const device_type PIC16C55;
-extern const device_type PIC16C56;
-extern const device_type PIC16C57;
-extern const device_type PIC16C58;
+DECLARE_DEVICE_TYPE(PIC16C54, pic16c54_device)
+DECLARE_DEVICE_TYPE(PIC16C55, pic16c55_device)
+DECLARE_DEVICE_TYPE(PIC16C56, pic16c56_device)
+DECLARE_DEVICE_TYPE(PIC16C57, pic16c57_device)
+DECLARE_DEVICE_TYPE(PIC16C58, pic16c58_device)
 
-extern const device_type PIC1650;
-extern const device_type PIC1655;
+DECLARE_DEVICE_TYPE(PIC1650,  pic1650_device)
+DECLARE_DEVICE_TYPE(PIC1655,  pic1655_device)
 
 
 class pic16c5x_device : public cpu_device
 {
 public:
-	// construction/destruction
-	pic16c5x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, int program_width, int data_width, int picmodel);
-
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_read_a_callback(device_t &device, _Object object) { return downcast<pic16c5x_device &>(device).m_read_a.set_callback(object); }
-	template<class _Object> static devcb_base &set_read_b_callback(device_t &device, _Object object) { return downcast<pic16c5x_device &>(device).m_read_b.set_callback(object); }
-	template<class _Object> static devcb_base &set_read_c_callback(device_t &device, _Object object) { return downcast<pic16c5x_device &>(device).m_read_c.set_callback(object); }
-	template<class _Object> static devcb_base &set_read_d_callback(device_t &device, _Object object) { return downcast<pic16c5x_device &>(device).m_read_d.set_callback(object); }
+	template <class Object> static devcb_base &set_read_a_callback(device_t &device, Object &&cb) { return downcast<pic16c5x_device &>(device).m_read_a.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_read_b_callback(device_t &device, Object &&cb) { return downcast<pic16c5x_device &>(device).m_read_b.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_read_c_callback(device_t &device, Object &&cb) { return downcast<pic16c5x_device &>(device).m_read_c.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_read_d_callback(device_t &device, Object &&cb) { return downcast<pic16c5x_device &>(device).m_read_d.set_callback(std::forward<Object>(cb)); }
 
-	template<class _Object> static devcb_base &set_write_a_callback(device_t &device, _Object object) { return downcast<pic16c5x_device &>(device).m_write_a.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_b_callback(device_t &device, _Object object) { return downcast<pic16c5x_device &>(device).m_write_b.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_c_callback(device_t &device, _Object object) { return downcast<pic16c5x_device &>(device).m_write_c.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_d_callback(device_t &device, _Object object) { return downcast<pic16c5x_device &>(device).m_write_d.set_callback(object); }
+	template <class Object> static devcb_base &set_write_a_callback(device_t &device, Object &&cb) { return downcast<pic16c5x_device &>(device).m_write_a.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_write_b_callback(device_t &device, Object &&cb) { return downcast<pic16c5x_device &>(device).m_write_b.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_write_c_callback(device_t &device, Object &&cb) { return downcast<pic16c5x_device &>(device).m_write_c.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_write_d_callback(device_t &device, Object &&cb) { return downcast<pic16c5x_device &>(device).m_write_d.set_callback(std::forward<Object>(cb)); }
 
 	/****************************************************************************
 	 *  Function to configure the CONFIG register. This is actually hard-wired
@@ -103,6 +100,9 @@ public:
 	static void set_config_static(device_t &device, uint16_t data) { downcast<pic16c5x_device &>(device).m_temp_config = data; }
 
 protected:
+	// construction/destruction
+	pic16c5x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int data_width, int picmodel);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -125,7 +125,7 @@ protected:
 	virtual void execute_set_input(int line, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const override
 	{
 		return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_DATA) ? &m_data_config : nullptr );
 	}
@@ -305,4 +305,4 @@ public:
 	pic1655_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
-#endif  /* __PIC16C5X_H__ */
+#endif  // MAME_CPU_PIC16C5X_PIC16C5X_H

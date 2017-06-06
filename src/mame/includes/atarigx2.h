@@ -16,14 +16,14 @@ class atarigx2_state : public atarigen_state
 {
 public:
 	atarigx2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: atarigen_state(mconfig, type, tag),
-			m_jsa(*this, "jsa"),
-			m_xga(*this, "xga"),
-			m_mo_command(*this, "mo_command"),
-			m_playfield_tilemap(*this, "playfield"),
-			m_alpha_tilemap(*this, "alpha"),
-			m_rle(*this, "rle")
-			{ }
+		: atarigen_state(mconfig, type, tag)
+		, m_jsa(*this, "jsa")
+		, m_xga(*this, "xga")
+		, m_mo_command(*this, "mo_command")
+		, m_playfield_tilemap(*this, "playfield")
+		, m_alpha_tilemap(*this, "alpha")
+		, m_rle(*this, "rle")
+	{ }
 
 	uint16_t          m_playfield_base;
 

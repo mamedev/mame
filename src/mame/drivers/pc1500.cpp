@@ -262,7 +262,7 @@ PALETTE_INIT_MEMBER(pc1500_state, pc1500)
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
 }
 
-static MACHINE_CONFIG_START( pc1500, pc1500_state )
+static MACHINE_CONFIG_START( pc1500 )
 	MCFG_CPU_ADD("maincpu", LH5801, 1300000)            //1.3 MHz
 	MCFG_CPU_PROGRAM_MAP( pc1500_mem )
 	MCFG_CPU_IO_MAP( pc1500_mem_io )
@@ -298,5 +298,5 @@ ROM_START( pc1500 )
 	ROM_LOAD( "ce-150.rom", 0x0000, 0x2000, CRC(8fa1df6d) SHA1(a3aa02a641a46c27c0d4c0dc025b0dbe9b5b79c8))
 ROM_END
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE INPUT   INIT         COMPANY     FULLNAME */
-COMP( 198?, pc1500, 0,  0,  pc1500, pc1500, driver_device,  0,   "Sharp", "Pocket Computer 1500", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME    PARENT  COMPAT   MACHINE INPUT   STATE          INIT  COMPANY  FULLNAME                FLAGS
+COMP( 198?, pc1500, 0,      0,       pc1500, pc1500, pc1500_state,  0,    "Sharp", "Pocket Computer 1500", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

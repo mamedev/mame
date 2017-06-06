@@ -173,7 +173,10 @@ void consolewin_info::update_menu()
 			if (img.is_readonly())
 				flags_for_writing |= MF_GRAYED;
 
-			AppendMenu(devicesubmenu, MF_STRING, new_item + DEVOPTION_OPEN, TEXT("Mount..."));
+			if (get_softlist_info(&img))
+				AppendMenu(devicesubmenu, MF_STRING, new_item + DEVOPTION_ITEM, TEXT("Mount Item..."));
+
+			AppendMenu(devicesubmenu, MF_STRING, new_item + DEVOPTION_OPEN, TEXT("Mount File..."));
 
 			if (img.is_creatable())
 				AppendMenu(devicesubmenu, MF_STRING, new_item + DEVOPTION_CREATE, TEXT("Create..."));
@@ -190,7 +193,35 @@ void consolewin_info::update_menu()
 				AppendMenu(devicesubmenu, flags_for_exists, new_item + DEVOPTION_CASSETTE_FASTFORWARD, TEXT("Fast Forward"));
 			}
 
-			osd::text::tstring tc_buf = osd::text::to_tstring(string_format("%s :%s", img.device().name(), img.exists() ? img.filename() : "[empty slot]"));
+			std::string filename;
+			if (img.basename())
+			{
+				filename.assign(img.basename());
+
+				// if the image has been loaded through softlist, also show the loaded part
+				if (img.loaded_through_softlist())
+				{
+					const software_part *tmp = img.part_entry();
+					if (!tmp->name().empty())
+					{
+						filename.append(" (");
+						filename.append(tmp->name());
+						// also check if this part has a specific part_id (e.g. "Map Disc", "Bonus Disc", etc.), and in case display it
+						if (img.get_feature("part_id") != nullptr)
+						{
+							filename.append(": ");
+							filename.append(img.get_feature("part_id"));
+						}
+						filename.append(")");
+					}
+				}
+			}
+			else
+				filename.assign("---");
+
+			// Get instance names like the File Manager
+			osd::text::tstring tc_buf = osd::text::to_tstring(string_format("%s (%s): %s", img.instance_name(), img.brief_instance_name(), filename.c_str()));
+			std::transform(tc_buf.begin(), tc_buf.begin()+1, tc_buf.begin(), ::toupper); // turn first char to uppercase
 			ModifyMenu(m_devices_menu, cnt, MF_BYPOSITION | MF_POPUP, (UINT_PTR)devicesubmenu, tc_buf.c_str());
 
 			cnt++;
@@ -210,6 +241,69 @@ bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 		{
 			switch ((LOWORD(wparam) - ID_DEVICE_OPTIONS) % DEVOPTION_MAX)
 			{
+			case DEVOPTION_ITEM :
+				{
+					std::string filter;
+					build_generic_filter(nullptr, false, filter);
+					{
+						osd::text::tstring t_filter = osd::text::to_tstring(filter);
+
+						// convert a pipe-char delimited string into a NUL delimited string
+						for (int i = 0; t_filter[i] != '\0'; i++)
+						{
+							if (t_filter[i] == '|')
+								t_filter[i] = '\0';
+						}
+
+						std::string opt_name = img->instance_name();
+						std::string as = slmap.find(opt_name)->second;
+
+						/* Make sure a folder was specified, and that it exists */
+						if ((!osd::directory::open(as.c_str())) || (as.find(':') == std::string::npos))
+						{
+							/* Default to emu directory */
+							osd_get_full_path(as, ".");
+						}
+						osd::text::tstring t_dir = osd::text::to_tstring(as);
+
+						// display the dialog
+						TCHAR selectedFilename[MAX_PATH];
+						selectedFilename[0] = '\0';
+						OPENFILENAME ofn;
+						memset(&ofn, 0, sizeof(ofn));
+						ofn.lStructSize = sizeof(ofn);
+						ofn.hwndOwner = nullptr;
+						ofn.lpstrFile = selectedFilename;
+						ofn.lpstrFile[0] = '\0';
+						ofn.nMaxFile = MAX_PATH;
+						ofn.lpstrFilter = t_filter.c_str();
+						ofn.nFilterIndex = 1;
+						ofn.lpstrFileTitle = nullptr;
+						ofn.nMaxFileTitle = 0;
+						ofn.lpstrInitialDir = t_dir.c_str();
+						ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+
+						if (GetOpenFileName(&ofn))
+						{
+							std::string buf = std::string(osd::text::from_tstring(selectedFilename));
+							// Get the Item name out of the full path
+							size_t t1 = buf.find(".zip"); // get rid of zip name and anything after
+							if (t1 != std::string::npos)
+								buf.erase(t1);
+							t1 = buf.find(".7z"); // get rid of 7zip name and anything after
+							if (t1 != std::string::npos)
+								buf.erase(t1);
+							t1 = buf.find_last_of("\\");   // put the swlist name in
+							buf[t1] = ':';
+							t1 = buf.find_last_of("\\"); // get rid of path; we only want the item name
+							buf.erase(0, t1+1);
+
+							// load software
+							img->load_software( buf.c_str());
+						}
+					}
+				}
+				return true;
 			case DEVOPTION_OPEN :
 				{
 					std::string filter;
@@ -224,6 +318,24 @@ bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 								t_filter[i] = '\0';
 						}
 
+						char buf[400];
+						std::string as;
+						strcpy(buf, machine().options().emu_options::sw_path());
+						// This pulls out the first path from a multipath field
+						const char* t1 = strtok(buf, ";");
+						if (t1)
+							as = t1; // the first path of many
+						else
+							as = buf; // the only path
+
+						/* Make sure a folder was specified, and that it exists */
+						if ((!osd::directory::open(as.c_str())) || (as.find(':') == std::string::npos))
+						{
+							/* Default to emu directory */
+							osd_get_full_path(as, ".");
+						}
+						osd::text::tstring t_dir = osd::text::to_tstring(as);
+
 						TCHAR selectedFilename[MAX_PATH];
 						selectedFilename[0] = '\0';
 						OPENFILENAME ofn;
@@ -237,7 +349,7 @@ bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 						ofn.nFilterIndex = 1;
 						ofn.lpstrFileTitle = nullptr;
 						ofn.nMaxFileTitle = 0;
-						ofn.lpstrInitialDir = nullptr;
+						ofn.lpstrInitialDir = t_dir.c_str();
 						ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
 
 						if (GetOpenFileName(&ofn))
@@ -261,6 +373,24 @@ bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 								t_filter[i] = '\0';
 						}
 
+						char buf[400];
+						std::string as;
+						strcpy(buf, machine().options().emu_options::sw_path());
+						// This pulls out the first path from a multipath field
+						const char* t1 = strtok(buf, ";");
+						if (t1)
+							as = t1; // the first path of many
+						else
+							as = buf; // the only path
+
+						/* Make sure a folder was specified, and that it exists */
+						if ((!osd::directory::open(as.c_str())) || (as.find(':') == std::string::npos))
+						{
+							/* Default to emu directory */
+							osd_get_full_path(as, ".");
+						}
+						osd::text::tstring t_dir = osd::text::to_tstring(as);
+
 						TCHAR selectedFilename[MAX_PATH];
 						selectedFilename[0] = '\0';
 						OPENFILENAME ofn;
@@ -274,7 +404,7 @@ bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 						ofn.nFilterIndex = 1;
 						ofn.lpstrFileTitle = nullptr;
 						ofn.nMaxFileTitle = 0;
-						ofn.lpstrInitialDir = nullptr;
+						ofn.lpstrInitialDir = t_dir.c_str();
 						ofn.Flags = OFN_PATHMUSTEXIST;
 
 						if (GetSaveFileName(&ofn))
@@ -331,7 +461,10 @@ void consolewin_info::process_string(char const *string)
 
 void consolewin_info::build_generic_filter(device_image_interface *img, bool is_save, std::string &filter)
 {
-	std::string file_extension = img->file_extensions();
+	std::string file_extension;
+
+	if (img)
+		file_extension = img->file_extensions();
 
 	if (!is_save)
 		file_extension.append(",zip,7z");
@@ -387,4 +520,59 @@ void consolewin_info::copy_extension_list(std::string &dest, const char *extensi
 		while(*s == ',')
 			s++;
 	}
+}
+
+//============================================================
+//  get_softlist_info
+//============================================================
+bool consolewin_info::get_softlist_info(device_image_interface *img)
+{
+	bool has_software = false;
+	bool passes_tests = false;
+	std::string sl_dir, opt_name = img->instance_name();
+
+	// Get the path to suitable software
+	for (software_list_device &swlist : software_list_device_iterator(machine().root_device()))
+	{
+		for (const software_info &swinfo : swlist.get_info())
+		{
+			const software_part &part = swinfo.parts().front();
+			if (swlist.is_compatible(part) == SOFTWARE_IS_COMPATIBLE)
+			{
+				for (device_image_interface &image : image_interface_iterator(machine().root_device()))
+				{
+					if (!has_software && (opt_name == image.instance_name()))
+					{
+						const char *interface = image.image_interface();
+						if (interface && part.matches_interface(interface))
+						{
+							sl_dir = "\\" + swlist.list_name();
+							has_software = true;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	if (has_software)
+	{
+		/* Get the media_path */
+		char rompath[400];
+		strcpy(rompath, machine().options().emu_options::media_path());
+		// Now, scan through the media_path looking for the required folder
+		char* sl_root = strtok(rompath, ";");
+		while (sl_root && !passes_tests)
+		{
+			std::string test_path = sl_root + sl_dir;
+			if (osd::directory::open(test_path.c_str()))
+			{
+				passes_tests = true;
+				slmap[opt_name] = test_path;
+			}
+			sl_root = strtok(NULL, ";");
+		}
+	}
+
+	return passes_tests;
 }

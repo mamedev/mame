@@ -108,10 +108,10 @@ public:
 	required_device<i8272a_device> m_fdc;
 	required_device<pic8259_device> m_pic0;
 	required_device<pic8259_device> m_pic1;
-	required_device<crt9007_t> m_vpac;
-	required_device<crt9212_t> m_drb0;
-	required_device<crt9212_t> m_drb1;
-	required_device<crt9021_t> m_vac;
+	required_device<crt9007_device> m_vpac;
+	required_device<crt9212_device> m_drb0;
+	required_device<crt9212_device> m_drb1;
+	required_device<crt9021_device> m_vac;
 	required_device<palette_device> m_palette;
 	required_device<timer_device> m_timer_vidldsh;
 	required_device<centronics_device> m_centronics;

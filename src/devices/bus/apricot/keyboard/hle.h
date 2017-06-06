@@ -6,10 +6,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_APRICOT_KEYBOARD_HLE_H
+#define MAME_BUS_APRICOT_KEYBOARD_HLE_H
 
-#ifndef __APRICOT_KEYBOARD_HLE_H__
-#define __APRICOT_KEYBOARD_HLE_H__
+#pragma once
 
 #include "keyboard.h"
 #include "machine/keyboard.h"
@@ -52,8 +52,6 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
-	required_device<msm5832_device> m_rtc;
-
 	enum {
 		CMD_REQ_TIME_AND_DATE = 0xe1,
 		CMD_SET_TIME_AND_DATE = 0xe4,
@@ -64,12 +62,14 @@ private:
 		ACK_DIAGNOSTICS = 0xfb
 	};
 
+	required_device<msm5832_device> m_rtc;
+
 	int m_rtc_index;
 };
 
 
 // device type definition
-extern const device_type APRICOT_KEYBOARD_HLE;
+DECLARE_DEVICE_TYPE(APRICOT_KEYBOARD_HLE, apricot_keyboard_hle_device)
 
 
-#endif // __APRICOT_KEYBOARD_HLE_H__
+#endif // MAME_BUS_APRICOT_KEYBOARD_HLE_H

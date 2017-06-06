@@ -22,7 +22,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_CORVFDC01 = device_creator<a2bus_corvfdc01_device>;
+DEFINE_DEVICE_TYPE(A2BUS_CORVFDC01, a2bus_corvfdc01_device, "crvfdc01", "Corvus Systems Floppy Controller")
 
 #define FDC01_ROM_REGION    "fdc01_rom"
 #define FDC01_FDC_TAG       "fdc01_fdc"
@@ -34,16 +34,6 @@ FLOPPY_FORMATS_END
 static SLOT_INTERFACE_START( corv_floppies )
 	SLOT_INTERFACE( "8sssd", FLOPPY_8_SSSD )
 SLOT_INTERFACE_END
-
-MACHINE_CONFIG_FRAGMENT( fdc01 )
-	MCFG_FD1793_ADD(FDC01_FDC_TAG, XTAL_16MHz / 8)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(a2bus_corvfdc01_device, intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(a2bus_corvfdc01_device, drq_w))
-	MCFG_FLOPPY_DRIVE_ADD(FDC01_FDC_TAG":0", corv_floppies, "8sssd", a2bus_corvfdc01_device::corv_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FDC01_FDC_TAG":1", corv_floppies, "8sssd", a2bus_corvfdc01_device::corv_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FDC01_FDC_TAG":2", corv_floppies, "8sssd", a2bus_corvfdc01_device::corv_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FDC01_FDC_TAG":3", corv_floppies, "8sssd", a2bus_corvfdc01_device::corv_floppy_formats)
-MACHINE_CONFIG_END
 
 ROM_START( fdc01 )
 	ROM_REGION(0x20, FDC01_ROM_REGION, 0)
@@ -89,14 +79,18 @@ enum
 ***************************************************************************/
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor a2bus_corvfdc01_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( fdc01 );
-}
+MACHINE_CONFIG_MEMBER( a2bus_corvfdc01_device::device_add_mconfig )
+	MCFG_FD1793_ADD(FDC01_FDC_TAG, XTAL_16MHz / 8)
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(a2bus_corvfdc01_device, intrq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(a2bus_corvfdc01_device, drq_w))
+	MCFG_FLOPPY_DRIVE_ADD(FDC01_FDC_TAG":0", corv_floppies, "8sssd", a2bus_corvfdc01_device::corv_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FDC01_FDC_TAG":1", corv_floppies, "8sssd", a2bus_corvfdc01_device::corv_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FDC01_FDC_TAG":2", corv_floppies, "8sssd", a2bus_corvfdc01_device::corv_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FDC01_FDC_TAG":3", corv_floppies, "8sssd", a2bus_corvfdc01_device::corv_floppy_formats)
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -111,25 +105,20 @@ const tiny_rom_entry *a2bus_corvfdc01_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_corvfdc01_device::a2bus_corvfdc01_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+a2bus_corvfdc01_device::a2bus_corvfdc01_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this),
 	m_wdfdc(*this, FDC01_FDC_TAG),
 	m_con1(*this, FDC01_FDC_TAG":0"),
 	m_con2(*this, FDC01_FDC_TAG":1"),
 	m_con3(*this, FDC01_FDC_TAG":2"),
-	m_con4(*this, FDC01_FDC_TAG":3"), m_rom(nullptr), m_fdc_local_status(0), m_fdc_local_command(0), m_curfloppy(nullptr)
+	m_con4(*this, FDC01_FDC_TAG":3"),
+	m_rom(nullptr), m_fdc_local_status(0), m_fdc_local_command(0), m_curfloppy(nullptr)
 {
 }
 
 a2bus_corvfdc01_device::a2bus_corvfdc01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, A2BUS_CORVFDC01, "Corvus Systems Floppy Controller", tag, owner, clock, "crvfdc01", __FILE__),
-	device_a2bus_card_interface(mconfig, *this),
-	m_wdfdc(*this, FDC01_FDC_TAG),
-	m_con1(*this, FDC01_FDC_TAG":0"),
-	m_con2(*this, FDC01_FDC_TAG":1"),
-	m_con3(*this, FDC01_FDC_TAG":2"),
-	m_con4(*this, FDC01_FDC_TAG":3"), m_rom(nullptr), m_fdc_local_status(0), m_fdc_local_command(0), m_curfloppy(nullptr)
+	a2bus_corvfdc01_device(mconfig, A2BUS_CORVFDC01, tag, owner, clock)
 {
 }
 

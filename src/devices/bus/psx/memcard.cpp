@@ -21,10 +21,10 @@
 //
 //
 
-static const int block_size = 128;
-static const int card_size = block_size * 1024;
+static constexpr int block_size = 128;
+static constexpr int card_size = block_size * 1024;
 
-const device_type PSXCARD = device_creator<psxcard_device>;
+DEFINE_DEVICE_TYPE(PSXCARD, psxcard_device, "psxcard", "Sony PSX Memory Card")
 
 enum transfer_states
 {
@@ -42,7 +42,7 @@ enum transfer_states
 };
 
 psxcard_device::psxcard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, PSXCARD, "Sony PSX Memory Card", tag, owner, clock, "psxcard", __FILE__),
+	: device_t(mconfig, PSXCARD, tag, owner, clock),
 	device_image_interface(mconfig, *this),
 	pkt_ptr(0),
 	pkt_sz(0),

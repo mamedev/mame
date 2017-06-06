@@ -19,10 +19,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_DEVICES_MACHINE_6821PIA_H
+#define MAME_DEVICES_MACHINE_6821PIA_H
 
-#ifndef __6821PIA_H__
-#define __6821PIA_H__
+#pragma once
 
 
 
@@ -241,10 +241,7 @@ private:
 
 
 // device type definition
-extern const device_type PIA6821;
-
-extern template class device_finder<pia6821_device, false>;
-extern template class device_finder<pia6821_device, true>;
+DECLARE_DEVICE_TYPE(PIA6821, pia6821_device)
 
 
-#endif /* __6821PIA_H__ */
+#endif // MAME_DEVICES_MACHINE_6821PIA_H

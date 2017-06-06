@@ -2,6 +2,7 @@
 // copyright-holders:Fabio Priuli,Acho A. Tang, R. Belmont
 #ifndef MAME_VIDEO_K052109_H
 #define MAME_VIDEO_K052109_H
+
 #pragma once
 
 #include "screen.h"
@@ -33,8 +34,8 @@ public:
 	k052109_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~k052109_device() {}
 
-	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object)
-			{ return downcast<k052109_device &>(device).m_irq_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb)
+	{ return downcast<k052109_device &>(device).m_irq_handler.set_callback(std::forward<Object>(cb)); }
 
 	static void set_k052109_callback(device_t &device, k052109_cb_delegate callback) { downcast<k052109_device &>(device).m_k052109_cb = callback; }
 	static void set_ram(device_t &device, bool ram);
@@ -116,6 +117,6 @@ private:
 	void tileflip_reset();
 };
 
-extern const device_type K052109;
+DECLARE_DEVICE_TYPE(K052109, k052109_device)
 
 #endif // MAME_VIDEO_K052109_H

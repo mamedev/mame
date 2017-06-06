@@ -27,7 +27,7 @@ public:
 	virtual ~menu_select_software() override;
 
 protected:
-	virtual bool menu_has_search_active() override { return (m_search[0] != 0); }
+	virtual bool menu_has_search_active() override { return !m_search.empty(); }
 
 private:
 	enum { VISIBLE_GAMES_IN_SEARCH = 200 };

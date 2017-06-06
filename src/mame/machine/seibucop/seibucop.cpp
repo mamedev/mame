@@ -33,17 +33,18 @@
     per-game TODO:
     Legionnaire
     - (fixed) player walks on spot on stage clear;
-    - several if not all enemies definitely wants some sort of "axis aligned bounding box" in order to stop from going out of range
+    - (fixed) several if not all enemies definitely wants some sort of "axis aligned bounding box" in order to stop from going out of range
         (when i.e. first boss goes to bottom of the screen and become unreachable)
     - (btanb) Throw is made by quickly double jumping (!)
     Heated Barrel
+    - (btanb) if player moves in diagonal a bogus projectile is fired.
     - gives random value to hi-score if you continue (only the first time, not a bug?);
     - (fixed) throws random address exceptions at level 3 and above, a RAM address arrives corrupt in the snippet at 0x136a;
     - (fixed) some corrupt sprites, probably a non-fatal version of the one above;
-    - stage 2 boss attacks only in vertical (regressed with the 130e / 3b30 / 42c2 command merge);
+    - (fixed) stage 2 boss attacks only in vertical (regressed with the 130e / 3b30 / 42c2 command merge);
     - (fixed) level 3+ boss movements looks wrong;
     - stage 3 "homing" missiles doesn't seem to like our 6200 hookup here, except it's NOT 6200!?
-    - barrels seen in later levels seems to fail an axis aligned bounding box, not unlike Legionnaire.
+    - (fixed) barrels seen in later levels seems to fail an axis aligned bounding box, not unlike Legionnaire.
     SD Gundam
     - stage 3 mid-boss still has the sprite garbage bug;
     - stage 4: has sprite stuck on bottom-left of screen;
@@ -110,10 +111,10 @@
 	if (LOG_Commands) logerror
 
 
-const device_type RAIDEN2COP = device_creator<raiden2cop_device>;
+DEFINE_DEVICE_TYPE(RAIDEN2COP, raiden2cop_device, "raiden2cop", "Seibu COP (Raiden 2)")
 
 raiden2cop_device::raiden2cop_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, RAIDEN2COP, "Seibu COP (Raiden 2)", tag, owner, clock, "raiden2cop", __FILE__),
+	: device_t(mconfig, RAIDEN2COP, tag, owner, clock),
 	cop_latch_addr(0),
 	cop_latch_trigger(0),
 	cop_latch_value(0),
@@ -1071,11 +1072,11 @@ WRITE16_MEMBER( raiden2cop_device::cop_cmd_w)
 
 	case 0x130e:   // 130e 0005 bf7f 0010 - 0984 0aa4 0d82 0aa2 039b 0b9a 0b9a 0a9a
 	case 0x138e:
-		execute_130e(offset, data); // angle from dx/dy
+		execute_130e(offset, data, false); // angle from dx/dy
 		break;
 
 	case 0x338e: { // 338e 0005 bf7f 0030 - 0984 0aa4 0d82 0aa2 039c 0b9c 0b9c 0a9a
-		execute_338e(offset, data); // angle from dx/dy
+		execute_338e(offset, data, false); // angle from dx/dy
 		break;
 	}
 
@@ -1434,6 +1435,7 @@ WRITE16_MEMBER(raiden2cop_device::LEGACY_cop_cmd_w)
 	if (check_command_matches(command, 0x984, 0xaa4, 0xd82, 0xaa2, 0x39b, 0xb9a, 0xb9a, 0xa9a, 5, 0xbf7f))
 	{
 		executed = 1;
+		// TODO: is it actually called by SD Gundam in any way?
 		LEGACY_execute_130e_cupsoc(offset, data);
 		return;
 	}
@@ -1443,7 +1445,7 @@ WRITE16_MEMBER(raiden2cop_device::LEGACY_cop_cmd_w)
 	if (check_command_matches(command, 0x984, 0xaa4, 0xd82, 0xaa2, 0x39b, 0xb9a, 0xb9a, 0xb9a, 5, 0xbf7f))
 	{
 		executed = 1;
-		execute_130e(offset, data);
+		execute_130e(offset, data, true);
 		return;
 	}
 

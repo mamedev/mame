@@ -6,14 +6,14 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_C64_MAGIC_VOICE_H
+#define MAME_BUS_C64_MAGIC_VOICE_H
+
 #pragma once
 
-#ifndef __MAGIC_VOICE__
-#define __MAGIC_VOICE__
-
+#include "exp.h"
 #include "machine/40105.h"
 #include "machine/6525tpi.h"
-#include "exp.h"
 #include "sound/t6721a.h"
 
 
@@ -72,8 +72,7 @@ private:
 
 
 // device type definition
-extern const device_type C64_MAGIC_VOICE;
+DECLARE_DEVICE_TYPE(C64_MAGIC_VOICE, c64_magic_voice_cartridge_device)
 
 
-
-#endif
+#endif // MAME_BUS_C64_MAGIC_VOICE_H

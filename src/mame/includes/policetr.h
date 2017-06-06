@@ -44,6 +44,7 @@ public:
 	uint16_t m_dst_yoffs;
 	uint8_t m_video_latch;
 	uint32_t m_srcbitmap_height_mask;
+	emu_timer *m_irq5_gen_timer;
 	DECLARE_WRITE32_MEMBER(control_w);
 	DECLARE_WRITE32_MEMBER(policetr_bsmt2000_reg_w);
 	DECLARE_WRITE32_MEMBER(policetr_bsmt2000_data_w);
@@ -58,6 +59,7 @@ public:
 	DECLARE_DRIVER_INIT(policetr);
 	DECLARE_DRIVER_INIT(sshooter);
 	DECLARE_DRIVER_INIT(plctr13b);
+	virtual void machine_start() override;
 	virtual void video_start() override;
 	uint32_t screen_update_policetr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(irq4_gen);

@@ -22,29 +22,29 @@
 
 // TMS7000 is the most basic one, 128 bytes internal RAM and no internal ROM.
 // TMS7020 and TMS7040 are same, but with 2KB and 4KB internal ROM respectively.
-const device_type TMS7000 = device_creator<tms7000_device>;
-const device_type TMS7020 = device_creator<tms7020_device>;
-const device_type TMS7040 = device_creator<tms7040_device>;
+DEFINE_DEVICE_TYPE(TMS7000, tms7000_device, "tms7000", "TMS7000")
+DEFINE_DEVICE_TYPE(TMS7020, tms7020_device, "tms7020", "TMS7020")
+DEFINE_DEVICE_TYPE(TMS7040, tms7040_device, "tms7040", "TMS7040")
 
 // Exelvision (spinoff of TI) TMS7020 added one custom opcode.
-const device_type TMS7020_EXL = device_creator<tms7020_exl_device>;
+DEFINE_DEVICE_TYPE(TMS7020_EXL, tms7020_exl_device, "tms7020_exl", "TMS7020 (Exelvision)")
 
 // CMOS devices biggest difference in a 'real world' setting is that the power
 // requirements are much lower. This obviously has no use in software emulation.
-const device_type TMS70C00 = device_creator<tms70c00_device>;
-const device_type TMS70C20 = device_creator<tms70c20_device>;
-const device_type TMS70C40 = device_creator<tms70c40_device>;
+DEFINE_DEVICE_TYPE(TMS70C00, tms70c00_device, "tms70c00", "TMS70C00")
+DEFINE_DEVICE_TYPE(TMS70C20, tms70c20_device, "tms70c20", "TMS70C20")
+DEFINE_DEVICE_TYPE(TMS70C40, tms70c40_device, "tms70c40", "TMS70C40")
 
 // TMS70x1 features more peripheral I/O, the main addition being a serial port.
 // TMS70x2 is the same, just with twice more RAM (256 bytes)
-const device_type TMS7001 = device_creator<tms7001_device>;
-const device_type TMS7041 = device_creator<tms7041_device>;
-const device_type TMS7002 = device_creator<tms7002_device>;
-const device_type TMS7042 = device_creator<tms7042_device>;
+DEFINE_DEVICE_TYPE(TMS7001, tms7001_device, "tms7001", "TMS7001")
+DEFINE_DEVICE_TYPE(TMS7041, tms7041_device, "tms7041", "TMS7041")
+DEFINE_DEVICE_TYPE(TMS7002, tms7002_device, "tms7002", "TMS7002")
+DEFINE_DEVICE_TYPE(TMS7042, tms7042_device, "tms7042", "TMS7042")
 
 // TMS70C46 is literally a shell around a TMS70C40, with support for external
 // memory bus, auto external clock divider on slow memory, and wake-up on keypress.
-const device_type TMS70C46 = device_creator<tms70c46_device>;
+DEFINE_DEVICE_TYPE(TMS70C46, tms70c46_device, "tms70c46", "TMC70C46")
 
 // TMS70Cx2 is an update to TMS70x2 with some extra features. Due to some changes
 // in peripheral file I/O, it is not backward compatible to TMS70x2.
@@ -107,15 +107,12 @@ ADDRESS_MAP_END
 
 // device definitions
 tms7000_device::tms7000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, TMS7000, "TMS7000", tag, owner, clock, "tms7000", __FILE__),
-	m_program_config("program", ENDIANNESS_BIG, 8, 16, 0, ADDRESS_MAP_NAME(tms7000_mem)),
-	m_io_config("io", ENDIANNESS_BIG, 8, 8, 0, ADDRESS_MAP_NAME(tms7000_io)),
-	m_info_flags(0)
+	: tms7000_device(mconfig, TMS7000, tag, owner, clock, ADDRESS_MAP_NAME(tms7000_mem), 0)
 {
 }
 
-tms7000_device::tms7000_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal, uint32_t info_flags, const char *shortname, const char *source)
-	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
+tms7000_device::tms7000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal, uint32_t info_flags)
+	: cpu_device(mconfig, type, tag, owner, clock),
 	m_program_config("program", ENDIANNESS_BIG, 8, 16, 0, internal),
 	m_io_config("io", ENDIANNESS_BIG, 8, 8, 0, ADDRESS_MAP_NAME(tms7000_io)),
 	m_info_flags(info_flags)
@@ -123,57 +120,57 @@ tms7000_device::tms7000_device(const machine_config &mconfig, device_type type, 
 }
 
 tms7020_device::tms7020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms7000_device(mconfig, TMS7020, "TMS7020", tag, owner, clock, ADDRESS_MAP_NAME(tms7020_mem), 0, "tms7020", __FILE__)
+	: tms7000_device(mconfig, TMS7020, tag, owner, clock, ADDRESS_MAP_NAME(tms7020_mem), 0)
 {
 }
 
 tms7020_exl_device::tms7020_exl_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms7000_device(mconfig, TMS7020_EXL, "TMS7020 (Exelvision)", tag, owner, clock, ADDRESS_MAP_NAME(tms7020_mem), 0, "tms7020_exl", __FILE__)
+	: tms7000_device(mconfig, TMS7020_EXL, tag, owner, clock, ADDRESS_MAP_NAME(tms7020_mem), 0)
 {
 }
 
 tms7040_device::tms7040_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms7000_device(mconfig, TMS7040, "TMS7040", tag, owner, clock, ADDRESS_MAP_NAME(tms7040_mem), 0, "tms7040", __FILE__)
+	: tms7000_device(mconfig, TMS7040, tag, owner, clock, ADDRESS_MAP_NAME(tms7040_mem), 0)
 {
 }
 
 tms70c00_device::tms70c00_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms7000_device(mconfig, TMS70C00, "TMS70C00", tag, owner, clock, ADDRESS_MAP_NAME(tms7000_mem), TMS7000_CHIP_IS_CMOS, "tms70c00", __FILE__)
+	: tms7000_device(mconfig, TMS70C00, tag, owner, clock, ADDRESS_MAP_NAME(tms7000_mem), CHIP_IS_CMOS)
 {
 }
 
 tms70c20_device::tms70c20_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms7000_device(mconfig, TMS70C20, "TMS70C20", tag, owner, clock, ADDRESS_MAP_NAME(tms7020_mem), TMS7000_CHIP_IS_CMOS, "tms70c20", __FILE__)
+	: tms7000_device(mconfig, TMS70C20, tag, owner, clock, ADDRESS_MAP_NAME(tms7020_mem), CHIP_IS_CMOS)
 {
 }
 
 tms70c40_device::tms70c40_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms7000_device(mconfig, TMS70C40, "TMS70C40", tag, owner, clock, ADDRESS_MAP_NAME(tms7040_mem), TMS7000_CHIP_IS_CMOS, "tms70c40", __FILE__)
+	: tms7000_device(mconfig, TMS70C40, tag, owner, clock, ADDRESS_MAP_NAME(tms7040_mem), CHIP_IS_CMOS)
 {
 }
 
 tms7001_device::tms7001_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms7000_device(mconfig, TMS7001, "TMS7001", tag, owner, clock, ADDRESS_MAP_NAME(tms7001_mem), TMS7000_CHIP_FAMILY_70X2, "tms7001", __FILE__)
+	: tms7000_device(mconfig, TMS7001, tag, owner, clock, ADDRESS_MAP_NAME(tms7001_mem), CHIP_FAMILY_70X2)
 {
 }
 
 tms7041_device::tms7041_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms7000_device(mconfig, TMS7041, "TMS7041", tag, owner, clock, ADDRESS_MAP_NAME(tms7041_mem), TMS7000_CHIP_FAMILY_70X2, "tms7041", __FILE__)
+	: tms7000_device(mconfig, TMS7041, tag, owner, clock, ADDRESS_MAP_NAME(tms7041_mem), CHIP_FAMILY_70X2)
 {
 }
 
 tms7002_device::tms7002_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms7000_device(mconfig, TMS7002, "TMS7002", tag, owner, clock, ADDRESS_MAP_NAME(tms7002_mem), TMS7000_CHIP_FAMILY_70X2, "tms7002", __FILE__)
+	: tms7000_device(mconfig, TMS7002, tag, owner, clock, ADDRESS_MAP_NAME(tms7002_mem), CHIP_FAMILY_70X2)
 {
 }
 
 tms7042_device::tms7042_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms7000_device(mconfig, TMS7042, "TMS7042", tag, owner, clock, ADDRESS_MAP_NAME(tms7042_mem), TMS7000_CHIP_FAMILY_70X2, "tms7042", __FILE__)
+	: tms7000_device(mconfig, TMS7042, tag, owner, clock, ADDRESS_MAP_NAME(tms7042_mem), CHIP_FAMILY_70X2)
 {
 }
 
 tms70c46_device::tms70c46_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms7000_device(mconfig, TMS70C46, "TMS70C46", tag, owner, clock, ADDRESS_MAP_NAME(tms70c46_mem), TMS7000_CHIP_IS_CMOS, "tms70c46", __FILE__)
+	: tms7000_device(mconfig, TMS70C46, tag, owner, clock, ADDRESS_MAP_NAME(tms70c46_mem), CHIP_IS_CMOS)
 {
 }
 

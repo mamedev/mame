@@ -309,7 +309,7 @@ void _1943_state::machine_reset()
 	m_prot_value = 0;
 }
 
-static MACHINE_CONFIG_START( 1943, _1943_state )
+static MACHINE_CONFIG_START( 1943 )
 
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz/4) /* verified on pcb */

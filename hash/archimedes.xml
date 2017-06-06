@@ -490,8 +490,8 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
-	<software name="bobbie">
-		<description>Bobbie Blockhead vs The Dark Planet</description>
+	<software name="bobbyblk">
+		<description>Bobby Blockhead vs The Dark Planet</description>
 		<year>1991</year>
 		<publisher>Atomic Software</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -1551,7 +1551,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	<software name="kaptkonf">
 		<description>Kaptain Konflict</description>
 		<year>1990</year>
-		<publisher>Caldergen Computers</publisher>
+		<publisher>Calderglen Computers</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
 				<rom name="kaptain konflict.adf" size="819200" crc="a0deed65" sha1="b5423e587b8560b67120cf4e666a3c9c5c7655a4" offset="0" />
@@ -1792,7 +1792,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
-	<software name="mastbrek">
+	<software name="mastrbrk">
 		<description>Master Break</description>
 		<year>1990</year>
 		<publisher>Superior Software/Acornsoft</publisher>
@@ -2421,7 +2421,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	<software name="starf3k">
 		<description>Star Fighter 3000</description>
 		<year>1994</year>
-		<publisher>Fednet Software</publisher>
+		<publisher>Fednet</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disc One"/>
 			<dataarea name="flop" size="741791">

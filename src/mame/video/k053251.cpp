@@ -122,12 +122,13 @@ actually used, since the priority is taken from the external ports.
 #include "konami_helper.h"
 
 #define VERBOSE 0
-#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
+#include "logmacro.h"
 
-const device_type K053251 = device_creator<k053251_device>;
+
+DEFINE_DEVICE_TYPE(K053251, k053251_device, "k053251", "K053251 Priority Encoder")
 
 k053251_device::k053251_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, K053251, "K053251 Priority Encoder", tag, owner, clock, "k053251", __FILE__),
+	: device_t(mconfig, K053251, tag, owner, clock),
 	//m_dirty_tmap[5],
 	//m_ram[16],
 	m_tilemaps_set(0)

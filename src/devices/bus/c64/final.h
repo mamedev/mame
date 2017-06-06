@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_C64_FINAL_H
+#define MAME_BUS_C64_FINAL_H
 
-#ifndef __FINAL__
-#define __FINAL__
+#pragma once
 
 
 #include "exp.h"
@@ -46,7 +46,7 @@ protected:
 
 
 // device type definition
-extern const device_type C64_FINAL;
+DECLARE_DEVICE_TYPE(C64_FINAL, c64_final_cartridge_device)
 
 
-#endif
+#endif // MAME_BUS_C64_FINAL_H

@@ -642,10 +642,10 @@ WRITE8_MEMBER(wecleman_state::wecleman_K00723216_bank_w)
 static ADDRESS_MAP_START( wecleman_sound_map, AS_PROGRAM, 8, wecleman_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
-	AM_RANGE(0x8500, 0x8500) AM_WRITENOP    // incresed with speed (global volume)?
-	AM_RANGE(0x9000, 0x9000) AM_READ(multiply_r)    // Protection
-	AM_RANGE(0x9000, 0x9001) AM_WRITE(multiply_w)   // Protection
-	AM_RANGE(0x9006, 0x9006) AM_WRITENOP    // ?
+	AM_RANGE(0x8500, 0x8500) AM_WRITENOP            // increased with speed (global volume)?
+	AM_RANGE(0x9000, 0x9000) AM_READ(multiply_r)    // 007452: Protection
+	AM_RANGE(0x9000, 0x9001) AM_WRITE(multiply_w)   // 007452: Protection
+	AM_RANGE(0x9006, 0x9006) AM_WRITENOP            // 007452: ?
 	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) // From main CPU
 	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("k007232", k007232_device, read, write) // K007232 (Reading offset 5/b triggers the sample)
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
@@ -1069,7 +1069,7 @@ MACHINE_RESET_MEMBER(wecleman_state,wecleman)
 	m_k007232->set_bank( 0, 1 );
 }
 
-static MACHINE_CONFIG_START( wecleman, wecleman_state )
+static MACHINE_CONFIG_START( wecleman )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)   /* Schems show 10MHz */
@@ -1140,7 +1140,7 @@ MACHINE_RESET_MEMBER(wecleman_state,hotchase)
 }
 
 
-static MACHINE_CONFIG_START( hotchase, wecleman_state )
+static MACHINE_CONFIG_START( hotchase )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)   /* 10 MHz - PCB is drawn in one set's readme */
@@ -1260,9 +1260,9 @@ ROM_END
 
 ROM_START( weclemana )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* Main CPU Code */
-	// I doubt these labels are correct, or one set of roms is bad.
-	ROM_LOAD16_BYTE( "602f08.17h", 0x00000, 0x10000, CRC(43241265) SHA1(3da1ed0d15b03845c07f07ec6838ce160d81633d) ) // only 17h and 23h differ slightly from parent
-	ROM_LOAD16_BYTE( "602f11.23h", 0x00001, 0x10000, CRC(3ea7dae0) SHA1(d33d67f4cc65a7680e5f43407136b75512a10230) ) // "
+	// I doubt these labels are correct, or one set of roms is bad (17h and 23h differ slightly from parent)
+	ROM_LOAD16_BYTE( "602f08.17h", 0x00000, 0x10000, CRC(43241265) SHA1(3da1ed0d15b03845c07f07ec6838ce160d81633d) ) // sldh
+	ROM_LOAD16_BYTE( "602f11.23h", 0x00001, 0x10000, CRC(3ea7dae0) SHA1(d33d67f4cc65a7680e5f43407136b75512a10230) ) // sldh
 	ROM_LOAD16_BYTE( "602a09.18h", 0x20000, 0x10000, CRC(8a9d756f) SHA1(12605e86ce29e6300b5400720baac7b0293d9e66) )
 	ROM_LOAD16_BYTE( "602a10.22h", 0x20001, 0x10000, CRC(569f5001) SHA1(ec2dd331a279083cf847fbbe71c017038a1d562a) )
 
