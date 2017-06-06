@@ -324,6 +324,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_cps1);
 	INTERRUPT_GEN_MEMBER(cps1_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(ganbare_interrupt);
+	IRQ_CALLBACK_MEMBER(cps1_int_ack);
 	TIMER_DEVICE_CALLBACK_MEMBER(cps2_interrupt);
 	TIMER_CALLBACK_MEMBER(cps2_update_digital_volume);
 
