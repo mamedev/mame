@@ -20,6 +20,7 @@
 
 #include "bus/ti99/ti99defs.h"
 #include "bus/ti99/gromport/gromport.h"
+#include "bus/ti99/hexbus/hexbus.h"
 
 #include "bus/ti99/internal/ioport.h"
 #include "machine/ram.h"
@@ -371,7 +372,7 @@ private:
 /*
     Custom chip: OSO
 */
-class oso_device : public device_t
+class oso_device : public bus::ti99::hexbus::hexbus_attached_device
 {
 public:
 	oso_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -384,6 +385,8 @@ private:
 	uint8_t m_status;
 	uint8_t m_control;
 	uint8_t m_xmit;
+
+	bus::ti99::hexbus::hexbus_device* m_hexbus;
 };
 
 class mainboard8_device : public device_t
