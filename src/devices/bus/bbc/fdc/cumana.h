@@ -59,7 +59,8 @@ class bbc_cumana1_device : public bbc_cumanafdc_device
 public:
 	bbc_cumana1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual machine_config_constructor device_mconfig_additions() const override;
+protected:
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
@@ -68,7 +69,8 @@ class bbc_cumana2_device : public bbc_cumanafdc_device
 public:
 	bbc_cumana2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual machine_config_constructor device_mconfig_additions() const override;
+protected:
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 

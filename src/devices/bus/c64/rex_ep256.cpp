@@ -19,10 +19,10 @@ DEFINE_DEVICE_TYPE(C64_REX_EP256, c64_rex_ep256_cartridge_device, "rexexp256", "
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_START( c64_rex_ep256 )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( c64_rex_ep256 )
+MACHINE_CONFIG_MEMBER( c64_rex_ep256_cartridge_device::device_add_mconfig )
 	MCFG_GENERIC_SOCKET_ADD("rom1", generic_linear_slot, nullptr)
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 	MCFG_GENERIC_SOCKET_ADD("rom2", generic_linear_slot, nullptr)
@@ -40,17 +40,6 @@ static MACHINE_CONFIG_START( c64_rex_ep256 )
 	MCFG_GENERIC_SOCKET_ADD("rom8", generic_linear_slot, nullptr)
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor c64_rex_ep256_cartridge_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( c64_rex_ep256 );
-}
 
 
 

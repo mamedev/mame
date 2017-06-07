@@ -27,24 +27,13 @@ DEFINE_DEVICE_TYPE(C64_EASYFLASH, c64_easyflash_cartridge_device, "c64_easyflash
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_START( c64_easyflash )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( c64_easyflash )
+MACHINE_CONFIG_MEMBER( c64_easyflash_cartridge_device::device_add_mconfig )
 	MCFG_AMD_29F040_ADD(AM29F040_0_TAG)
 	MCFG_AMD_29F040_ADD(AM29F040_1_TAG)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor c64_easyflash_cartridge_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( c64_easyflash );
-}
 
 
 //-------------------------------------------------

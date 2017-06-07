@@ -111,11 +111,10 @@ ioport_constructor a2091_device::device_input_ports() const
 }
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( dmac_hdc )
+MACHINE_CONFIG_MEMBER( dmac_hdc_device::device_add_mconfig )
 	MCFG_DMAC_ADD("dmac", 0)
 	MCFG_DMAC_SCSI_READ_HANDLER(READ8(dmac_hdc_device, dmac_scsi_r))
 	MCFG_DMAC_SCSI_WRITE_HANDLER(WRITE8(dmac_hdc_device, dmac_scsi_w))
@@ -127,11 +126,6 @@ static MACHINE_CONFIG_START( dmac_hdc )
 	MCFG_LEGACY_SCSI_PORT("scsi")
 	MCFG_WD33C93_IRQ_CB(WRITELINE(dmac_hdc_device, scsi_irq_w))
 MACHINE_CONFIG_END
-
-machine_config_constructor dmac_hdc_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( dmac_hdc );
-}
 
 
 //-------------------------------------------------

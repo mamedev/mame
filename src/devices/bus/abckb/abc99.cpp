@@ -146,10 +146,10 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( abc99 )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( abc99 )
+MACHINE_CONFIG_MEMBER( abc99_device::device_add_mconfig )
 	// keyboard CPU
 	MCFG_CPU_ADD(I8035_Z2_TAG, I8035, XTAL_6MHz/3) // from Z5 T0 output
 	MCFG_CPU_PROGRAM_MAP(abc99_z2_mem)
@@ -173,17 +173,6 @@ static MACHINE_CONFIG_START( abc99 )
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor abc99_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( abc99 );
-}
 
 
 //-------------------------------------------------

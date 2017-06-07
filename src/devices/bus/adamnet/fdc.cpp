@@ -121,10 +121,10 @@ SLOT_INTERFACE_END
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( adam_fdc )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( adam_fdc )
+MACHINE_CONFIG_MEMBER( adam_fdc_device::device_add_mconfig )
 	MCFG_CPU_ADD(M6801_TAG, M6801, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(adam_fdc_mem)
 	MCFG_CPU_IO_MAP(adam_fdc_io)
@@ -134,17 +134,6 @@ static MACHINE_CONFIG_START( adam_fdc )
 
 	MCFG_FLOPPY_DRIVE_ADD(WD2793_TAG":0", adam_fdc_floppies, "525ssdd", adam_fdc_device::floppy_formats)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor adam_fdc_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( adam_fdc );
-}
 
 
 //-------------------------------------------------

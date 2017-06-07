@@ -27,24 +27,13 @@ DEFINE_DEVICE_TYPE(C64_GEOCABLE, c64_geocable_device, "c64_geocable", "C64 geoCa
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_START( c64_geocable )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( c64_geocable )
+MACHINE_CONFIG_MEMBER( c64_geocable_device::device_add_mconfig )
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(c64_geocable_device, output_b))
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor c64_geocable_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( c64_geocable );
-}
 
 
 

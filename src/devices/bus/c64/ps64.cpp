@@ -70,26 +70,16 @@ static struct votrax_sc02_interface votrax_intf =
 };
 */
 
+
 //-------------------------------------------------
-//  MACHINE_CONFIG_START( c64_ps64 )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( c64_ps64 )
+MACHINE_CONFIG_MEMBER( c64_ps64_cartridge_device::device_add_mconfig )
 	//MCFG_SPEAKER_STANDARD_MONO("mono")
 	//MCFG_VOTRAX_SC02_ADD(SSI263_TAG, 2000000, votrax_intf)
 	//MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor c64_ps64_cartridge_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( c64_ps64 );
-}
 
 
 

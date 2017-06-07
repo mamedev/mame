@@ -216,10 +216,10 @@ WRITE_LINE_MEMBER( c64_magic_voice_cartridge_device::apd_w )
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_START( c64_magic_voice )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( c64_magic_voice )
+MACHINE_CONFIG_MEMBER( c64_magic_voice_cartridge_device::device_add_mconfig )
 	MCFG_DEVICE_ADD(MOS6525_TAG, TPI6525, 0)
 	MCFG_TPI6525_OUT_IRQ_CB(WRITELINE(c64_magic_voice_cartridge_device, tpi_irq_w))
 	MCFG_TPI6525_IN_PA_CB(READ8(c64_magic_voice_cartridge_device, tpi_pa_r))
@@ -242,17 +242,6 @@ static MACHINE_CONFIG_START( c64_magic_voice )
 
 	MCFG_C64_PASSTHRU_EXPANSION_SLOT_ADD()
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor c64_magic_voice_cartridge_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( c64_magic_voice );
-}
 
 
 
