@@ -103,10 +103,10 @@ READ8_MEMBER(jack_state::timer_r)
 	return m_audiocpu->total_cycles() / m_timer_rate;
 }
 
-WRITE8_MEMBER(jack_state::jack_sh_command_w)
+IRQ_CALLBACK_MEMBER(jack_state::jack_sh_irq_ack)
 {
-	m_soundlatch->write(space, 0, data);
-	m_audiocpu->set_input_line(0, HOLD_LINE);
+	m_audiocpu->set_input_line(0, CLEAR_LINE);
+	return 0xff;
 }
 
 
@@ -181,7 +181,7 @@ static ADDRESS_MAP_START( jack_map, AS_PROGRAM, 8, jack_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x5fff) AM_RAM
 	AM_RANGE(0xb000, 0xb07f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xb400, 0xb400) AM_WRITE(jack_sh_command_w)
+	AM_RANGE(0xb400, 0xb400) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xb500, 0xb500) AM_READ_PORT("DSW1")
 	AM_RANGE(0xb501, 0xb501) AM_READ_PORT("DSW2")
 	AM_RANGE(0xb502, 0xb502) AM_READ_PORT("IN0")
@@ -211,7 +211,7 @@ static ADDRESS_MAP_START( joinem_map, AS_PROGRAM, 8, jack_state )
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0xb000, 0xb07f) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xb080, 0xb0ff) AM_RAM_WRITE(joinem_scroll_w) AM_SHARE("scrollram")
-	AM_RANGE(0xb400, 0xb400) AM_WRITE(jack_sh_command_w)
+	AM_RANGE(0xb400, 0xb400) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xb500, 0xb500) AM_READ_PORT("DSW1")
 	AM_RANGE(0xb501, 0xb501) AM_READ_PORT("DSW2")
 	AM_RANGE(0xb502, 0xb502) AM_READ_PORT("IN0")
@@ -866,6 +866,7 @@ void jack_state::machine_start()
 
 void jack_state::machine_reset()
 {
+	m_audiocpu->set_input_line(0, CLEAR_LINE);
 }
 
 
@@ -912,6 +913,7 @@ static MACHINE_CONFIG_START( jack )
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_18MHz/6)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_io_map)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(jack_state, jack_sh_irq_ack)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -931,6 +933,7 @@ static MACHINE_CONFIG_START( jack )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(ASSERTLINE("audiocpu", 0))
 
 	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_18MHz/12)
 	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device,read))
