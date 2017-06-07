@@ -50,6 +50,7 @@ public:
 	// I/O operations
 	DECLARE_READ8_MEMBER( index_r );
 	DECLARE_READ8_MEMBER( pal_r );
+	DECLARE_READ8_MEMBER( mask_r );
 	DECLARE_WRITE8_MEMBER( index_w );
 	DECLARE_WRITE8_MEMBER( index_r_w );
 	DECLARE_WRITE8_MEMBER( pal_w );
