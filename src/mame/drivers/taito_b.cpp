@@ -431,18 +431,6 @@ WRITE16_MEMBER(taitob_state::player_34_coin_ctrl_w)
 	machine().bookkeeping().coin_counter_w(3,  data & 0x0800);
 }
 
-READ16_MEMBER(taitob_state::pbobble_input_bypass_r)
-{
-	switch (offset)
-	{
-		case 0x01:
-			return ioport("COIN")->read() << 8;
-
-		default:
-			return m_tc0640fio->read(space, offset) << 8;
-	}
-}
-
 WRITE16_MEMBER(taitob_state::spacedxo_tc0220ioc_w)
 {
 	if (ACCESSING_BITS_0_7)
@@ -555,7 +543,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( pbobble_map, AS_PROGRAM, 16, taitob_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	TC0180VCU_MEMRW( 0x400000 )
-	AM_RANGE(0x500000, 0x50000f) AM_READ(pbobble_input_bypass_r) AM_DEVWRITE("tc0640fio", tc0640fio_device, halfword_byteswap_w)
+	AM_RANGE(0x500000, 0x50000f) AM_DEVREADWRITE("tc0640fio", tc0640fio_device, halfword_byteswap_r, halfword_byteswap_w)
 	AM_RANGE(0x500024, 0x500025) AM_READ_PORT("P3_P4_A")        /* shown in service mode, game omits to read it */
 	AM_RANGE(0x500026, 0x500027) AM_READWRITE(eep_latch_r, eeprom_w)
 	AM_RANGE(0x500028, 0x500029) AM_WRITE(player_34_coin_ctrl_w)    /* simply locks coins 3&4 out */
@@ -571,7 +559,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( spacedx_map, AS_PROGRAM, 16, taitob_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	TC0180VCU_MEMRW( 0x400000 )
-	AM_RANGE(0x500000, 0x50000f) AM_READ(pbobble_input_bypass_r) AM_DEVWRITE("tc0640fio", tc0640fio_device, halfword_byteswap_w)
+	AM_RANGE(0x500000, 0x50000f) AM_DEVREADWRITE("tc0640fio", tc0640fio_device, halfword_byteswap_r, halfword_byteswap_w)
 	AM_RANGE(0x500024, 0x500025) AM_READ_PORT("P3_P4_A")
 	AM_RANGE(0x500026, 0x500027) AM_READWRITE(eep_latch_r, eeprom_w)
 	AM_RANGE(0x500028, 0x500029) AM_WRITE(player_34_coin_ctrl_w)    /* simply locks coins 3&4 out */
@@ -600,7 +588,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( qzshowby_map, AS_PROGRAM, 16, taitob_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x200000, 0x20000f) AM_READ(pbobble_input_bypass_r) AM_DEVWRITE("tc0640fio", tc0640fio_device, halfword_byteswap_w)
+	AM_RANGE(0x200000, 0x20000f) AM_DEVREADWRITE("tc0640fio", tc0640fio_device, halfword_byteswap_r, halfword_byteswap_w)
 	AM_RANGE(0x200024, 0x200025) AM_READ_PORT("P3_P4_A")    /* player 3,4 start */
 	AM_RANGE(0x200026, 0x200027) AM_WRITE(eeprom_w)
 	AM_RANGE(0x200028, 0x200029) AM_READWRITE(player_34_coin_ctrl_r, player_34_coin_ctrl_w)
