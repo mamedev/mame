@@ -5446,6 +5446,47 @@ static INPUT_PORTS_START( superbon )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( victoryc )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x00, "A: 2C/1C B: 1C/3C" )
+	PORT_DIPSETTING(    0x40, "A: 1C/1C B: 1C/6C" )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN2")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x04, "2" )
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Cocktail ) )
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
 
 /*************************************
  *
@@ -6470,6 +6511,24 @@ void galaxian_state::decode_superbon()
 }
 
 
+void galaxian_state::decode_victoryc()
+{
+	uint8_t *src = memregion("maincpu")->base();
+	size_t length = memregion("maincpu")->bytes();
+
+	for (int i = 0;i < length;i++)
+	{
+		if (i & 0x80) src[i] ^= 0x80;
+		if (i & 0x20) src[i] ^= 0x04;
+		if (i & 0x04) src[i] ^= 0x40;
+		if (i & 0x01) src[i] ^= 0x08;
+
+		src[i] = BITSWAP8(src[i], 6, 3, 5, 4, 2, 7, 1, 0);
+	}
+}
+
+
+
 /*************************************
  *
  *  Driver configuration
@@ -6597,7 +6656,25 @@ DRIVER_INIT_MEMBER(galaxian_state,frogg)
 	space.install_ram(0x4000, 0x47ff);
 }
 
+DRIVER_INIT_MEMBER(galaxian_state, victoryc)
+{
+	DRIVER_INIT_CALL(victorycb);
 
+	decode_victoryc();
+}
+
+DRIVER_INIT_MEMBER(galaxian_state, victorycb)
+{
+	DRIVER_INIT_CALL(galaxian);
+
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+
+	/* needs a full 2k of RAM */
+	space.install_ram(0x8000, 0x87ff);
+
+	/* disable the stars */
+	space.unmap_write(0x7004, 0x7004, 0x7f8);
+}
 
 /*************************************
  *
@@ -11714,6 +11791,44 @@ ROM_START( jungsub )
 	ROM_LOAD( "PROM.6E",      0x0000, 0x0020, CRC(2430f47c) SHA1(f7725f4768cb57717feb18891766642f6d7cbcde) )
 ROM_END
 
+ROM_START( victoryc )
+	ROM_REGION( 0x4000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "1.1",    0x0000, 0x0800, CRC(8a590687) SHA1(71558a9eb8020f3769f07089d5704317f6018d9a) )
+	ROM_LOAD( "2.2",    0x0800, 0x0800, CRC(575ac583) SHA1(352cb6c5cdc898ef2935aaae582455dc0237ac49) )
+	ROM_LOAD( "3.3",    0x1000, 0x0800, CRC(cbe67cfb) SHA1(80b42e2443ba36f2a4b2b27f22be7292d6bc9689) )
+	ROM_LOAD( "4.4",    0x1800, 0x0800, CRC(025b6626) SHA1(b6b80c2a9aa991cd0c5ff7127f4495dcd8c2fbe5) )
+	// ROM_LOAD( "5.5",    0x2000, 0x0800, NO_DUMP ) // wasn't populated, not used?
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "DF.1K",       0x0000, 0x0800, CRC(15e98c93) SHA1(af273ec2df93b78b439d4aff649eb4b6c6d05ee3) )
+	ROM_LOAD( "A4.1H",       0x0800, 0x0800, CRC(cd35a7e2) SHA1(deeb853f924dd964a254bcdb6924cd2fd71aabdc) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "PROM.6L",       0x0000, 0x0020, CRC(25329e5a) SHA1(aff60d02aa4d1d5f16e2d32155c315deee8b4089) )
+ROM_END
+
+/* The bootleg is just a decrypted version of the above, although there was an additional rom '5' on the bootleg PCB
+   The extra rom contains a repeating pattern and looks like it might be a bad dump, but doesn't even seem to be used
+   by the game.  It is not the result of applying the decryption process to blank data either.
+
+   The PCB had a Laboratorios F.A.R. sticker on it, this might have been a distributor rather than the manufacturer tho.
+*/
+ROM_START( victorycb )
+	ROM_REGION( 0x4000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "v1.bin",    0x0000, 0x0800, CRC(de985696) SHA1(20f5cb7b9efd9f1a2896eb65fe5c54e0ffb1f61f) )
+	ROM_LOAD( "v2.bin",    0x0800, 0x0800, CRC(59042c1e) SHA1(94498ca14f66c8f5ae9a08b0d7c057f033ccfb3b) )
+	ROM_LOAD( "v3.bin",    0x1000, 0x0800, CRC(ca3a6965) SHA1(36ba8659a1fb616f2247eb1b50c67c2c45723a68) )
+	ROM_LOAD( "v4.bin",    0x1800, 0x0800, CRC(16b47fad) SHA1(8af840f3fd523283a605005f6a91ad2ea10be04b) )
+	ROM_LOAD( "v5.bin",    0x2000, 0x0800, BAD_DUMP CRC(f60be3be) SHA1(ef45bec22db10c485ae2ddf5723c5cf241edb823) ) // unused? there was no rom5 on the original
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "v6.bin",       0x0000, 0x0800, CRC(15e98c93) SHA1(af273ec2df93b78b439d4aff649eb4b6c6d05ee3) )
+	ROM_LOAD( "v7.bin",       0x0800, 0x0800, CRC(cd35a7e2) SHA1(deeb853f924dd964a254bcdb6924cd2fd71aabdc) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "PROM.6L",       0x0000, 0x0020, CRC(25329e5a) SHA1(aff60d02aa4d1d5f16e2d32155c315deee8b4089) )
+ROM_END
+
 
 /*************************************
  *
@@ -11763,11 +11878,15 @@ GAME( 19??, tst_galx,    galaxian, galaxian,   galaxian,   galaxian_state, galax
 
 /* other games on basic galaxian hardware */
 GAME( 1981, blkhole,     0,        galaxian,   blkhole,    galaxian_state, galaxian,   ROT90,  "TDS & MINTS", "Black Hole", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, orbitron,    0,        galaxian,   orbitron,   galaxian_state, galaxian,   ROT270, "Signatron USA", "Orbitron", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, orbitron,    0,        galaxian,   orbitron,   galaxian_state, galaxian,   ROT270, "Comsoft (Signatron USA license)", "Orbitron", MACHINE_SUPPORTS_SAVE ) // there's a Comsoft copyright in one of the roms, and the gameplay is the same as Victory below
 GAME( 1980, luctoday,    0,        galaxian,   luctoday,   galaxian_state, galaxian,   ROT270, "Sigma", "Lucky Today",MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
 GAME( 19??, chewing,     luctoday, galaxian,   luctoday,   galaxian_state, galaxian,   ROT90,  "<unknown>", "Chewing Gum", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, catacomb,    0,        galaxian,   catacomb,   galaxian_state, galaxian,   ROT90,  "MTM Games", "Catacomb", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
 GAME( 19??, omegab,      theend,   galaxian,   omegab,     galaxian_state, galaxian,   ROT270, "bootleg?", "Omega (bootleg?)", MACHINE_SUPPORTS_SAVE )
+
+/* basic hardware + extra RAM */
+GAME( 1982, victoryc,    0,        galaxian,   victoryc,   galaxian_state, victoryc,   ROT270, "Comsoft", "Victory (Comsoft)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, victorycb,   victoryc, galaxian,   victoryc,   galaxian_state, victorycb,  ROT270, "bootleg", "Victory (Comsoft) (bootleg)", MACHINE_SUPPORTS_SAVE )
 
 /* these games require the coin lockout mechanism to be disabled */
 GAME( 1981, warofbug,    0,        galaxian,   warofbug,   galaxian_state, nolock,     ROT90,  "Armenia / Food and Fun Corp", "War of the Bugs or Monsterous Manouvers in a Mushroom Maze", MACHINE_SUPPORTS_SAVE )
