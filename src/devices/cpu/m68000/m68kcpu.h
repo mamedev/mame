@@ -737,6 +737,7 @@ static inline uint32_t m68ki_read_imm_16(m68000_base_device *m68k)
 
 	m68k->mmu_tmp_fc = m68k->s_flag | FUNCTION_CODE_USER_PROGRAM;
 	m68k->mmu_tmp_rw = 1;
+	m68k->m_fc_cb(m68k->mmu_tmp_fc);
 
 	m68ki_check_address_error(m68k, REG_PC(m68k), MODE_READ, m68k->s_flag | FUNCTION_CODE_USER_PROGRAM); /* auto-disable (see m68kcpu.h) */
 
@@ -764,6 +765,7 @@ static inline uint32_t m68ki_read_imm_32(m68000_base_device *m68k)
 
 	m68k->mmu_tmp_fc = m68k->s_flag | FUNCTION_CODE_USER_PROGRAM;
 	m68k->mmu_tmp_rw = 1;
+	m68k->m_fc_cb(m68k->mmu_tmp_fc);
 
 	m68ki_check_address_error(m68k, REG_PC(m68k), MODE_READ, m68k->s_flag | FUNCTION_CODE_USER_PROGRAM); /* auto-disable (see m68kcpu.h) */
 
@@ -799,6 +801,7 @@ static inline uint32_t m68ki_read_8_fc(m68000_base_device *m68k, uint32_t addres
 {
 	m68k->mmu_tmp_fc = fc;
 	m68k->mmu_tmp_rw = 1;
+	m68k->m_fc_cb(m68k->mmu_tmp_fc);
 	return m68k->/*memory.*/read8(address);
 }
 static inline uint32_t m68ki_read_16_fc(m68000_base_device *m68k, uint32_t address, uint32_t fc)
@@ -809,6 +812,7 @@ static inline uint32_t m68ki_read_16_fc(m68000_base_device *m68k, uint32_t addre
 	}
 	m68k->mmu_tmp_fc = fc;
 	m68k->mmu_tmp_rw = 1;
+	m68k->m_fc_cb(m68k->mmu_tmp_fc);
 	return m68k->/*memory.*/read16(address);
 }
 static inline uint32_t m68ki_read_32_fc(m68000_base_device *m68k, uint32_t address, uint32_t fc)
@@ -819,6 +823,7 @@ static inline uint32_t m68ki_read_32_fc(m68000_base_device *m68k, uint32_t addre
 	}
 	m68k->mmu_tmp_fc = fc;
 	m68k->mmu_tmp_rw = 1;
+	m68k->m_fc_cb(m68k->mmu_tmp_fc);
 	return m68k->/*memory.*/read32(address);
 }
 
@@ -826,6 +831,7 @@ static inline void m68ki_write_8_fc(m68000_base_device *m68k, uint32_t address, 
 {
 	m68k->mmu_tmp_fc = fc;
 	m68k->mmu_tmp_rw = 0;
+	m68k->m_fc_cb(m68k->mmu_tmp_fc);
 	m68k->/*memory.*/write8(address, value);
 }
 static inline void m68ki_write_16_fc(m68000_base_device *m68k, uint32_t address, uint32_t fc, uint32_t value)
@@ -836,6 +842,7 @@ static inline void m68ki_write_16_fc(m68000_base_device *m68k, uint32_t address,
 	}
 	m68k->mmu_tmp_fc = fc;
 	m68k->mmu_tmp_rw = 0;
+	m68k->m_fc_cb(m68k->mmu_tmp_fc);
 	m68k->/*memory.*/write16(address, value);
 }
 static inline void m68ki_write_32_fc(m68000_base_device *m68k, uint32_t address, uint32_t fc, uint32_t value)
@@ -846,6 +853,7 @@ static inline void m68ki_write_32_fc(m68000_base_device *m68k, uint32_t address,
 	}
 	m68k->mmu_tmp_fc = fc;
 	m68k->mmu_tmp_rw = 0;
+	m68k->m_fc_cb(m68k->mmu_tmp_fc);
 	m68k->/*memory.*/write32(address, value);
 }
 
@@ -862,6 +870,7 @@ static inline void m68ki_write_32_pd_fc(m68000_base_device *m68k, uint32_t addre
 	}
 	m68k->mmu_tmp_fc = fc;
 	m68k->mmu_tmp_rw = 0;
+	m68k->m_fc_cb(m68k->mmu_tmp_fc);
 	m68k->/*memory.*/write16(address+2, value>>16);
 	m68k->/*memory.*/write16(address, value&0xffff);
 }

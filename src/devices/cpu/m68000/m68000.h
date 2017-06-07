@@ -99,6 +99,9 @@ enum
  */
 #define M68K_INT_ACK_SPURIOUS      0xfffffffe
 
+#define MCFG_M68K_FC_CB(_devcb) \
+	m68000_base_device::set_fc_cb_func(*device, DEVCB_##_devcb);
+
 enum
 {
 	/* NOTE: M68K_SP fetches the current SP, be it USP, ISP, or MSP */
@@ -123,6 +126,9 @@ public:
 
 	// construction/destruction
 	m68000_base_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	// static configuration helpers
+	template<class _Object> static devcb_base &set_fc_cb_func(device_t &device, _Object object) { return downcast<m68000_base_device &>(device).m_fc_cb.set_callback(object); }
 
 	void presave();
 	void postload();
@@ -160,6 +166,7 @@ public:
 	void set_cmpild_callback(write32_delegate callback);
 	void set_rte_callback(write_line_delegate callback);
 	void set_tas_write_callback(write8_delegate callback);
+	devcb_write16 m_fc_cb;
 	uint16_t get_fc();
 	void set_hmmu_enable(int enable);
 	void set_fpu_enable(int enable);
