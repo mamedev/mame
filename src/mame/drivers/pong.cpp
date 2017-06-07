@@ -150,7 +150,7 @@ public:
 
 	NETDEV_ANALOG_CALLBACK_MEMBER(sound_cb)
 	{
-		m_dac->write(std::round(16384 * data));
+		m_dac->write(::round(16384 * data));
 	}
 
 protected:
