@@ -428,7 +428,7 @@ void ef9365_device::set_busy_flag(int period)
 //  get_x_reg: Get the X register value
 //-------------------------------------------------
 
-unsigned short ef9365_device::get_x_reg()
+uint16_t ef9365_device::get_x_reg()
 {
 	return ((m_registers[EF936X_REG_X_MSB] & 0x0F)<<8) | m_registers[EF936X_REG_X_LSB];
 }
@@ -437,7 +437,7 @@ unsigned short ef9365_device::get_x_reg()
 //  get_y_reg: Get the Y register value
 //-------------------------------------------------
 
-unsigned short ef9365_device::get_y_reg()
+uint16_t ef9365_device::get_y_reg()
 {
 	return ((m_registers[EF936X_REG_Y_MSB] & 0x0F)<<8) | m_registers[EF936X_REG_Y_LSB];
 }
@@ -446,7 +446,7 @@ unsigned short ef9365_device::get_y_reg()
 //  set_x_reg: Set the X register value
 //-------------------------------------------------
 
-void ef9365_device::set_x_reg(unsigned short x)
+void ef9365_device::set_x_reg(uint16_t x)
 {
 	m_registers[EF936X_REG_X_MSB] = ( x >> 8 ) & 0x0F;
 	m_registers[EF936X_REG_X_LSB] = x & 0xFF;
@@ -456,7 +456,7 @@ void ef9365_device::set_x_reg(unsigned short x)
 //  set_y_reg: Set the Y register value
 //-------------------------------------------------
 
-void ef9365_device::set_y_reg(unsigned short y)
+void ef9365_device::set_y_reg(uint16_t y)
 {
 	m_registers[EF936X_REG_Y_MSB] = ( y >> 8 ) & 0x0F;
 	m_registers[EF936X_REG_Y_LSB] = y & 0xFF;
@@ -565,7 +565,7 @@ const static unsigned int vectortype_code[][8] =
 //  (Bresenham's line algorithm)
 //-------------------------------------------------
 
-int ef9365_device::draw_vector(unsigned short start_x,unsigned short start_y,short delta_x,short delta_y)
+int ef9365_device::draw_vector(uint16_t start_x,uint16_t start_y,short delta_x,short delta_y)
 {
 	int dx;
 	int dy,t;
@@ -656,7 +656,7 @@ int ef9365_device::draw_vector(unsigned short start_x,unsigned short start_y,sho
 		do
 		{
 			if(pen_state)
-				plot(y%bitplane_xres,x%bitplane_yres);
+				plot(y % bitplane_xres, x % bitplane_yres);
 
 			compute_cycles++;
 
@@ -701,14 +701,14 @@ int ef9365_device::draw_vector(unsigned short start_x,unsigned short start_y,sho
 
 			x++;
 
-		}while( x <= dest_x );
+		} while (x <= dest_x);
 	}
 	else
 	{
 		do
 		{
 			if(pen_state)
-				plot(x%bitplane_xres,y%bitplane_yres);
+				plot(x % bitplane_xres, y % bitplane_yres);
 
 			compute_cycles++;
 
@@ -753,7 +753,7 @@ int ef9365_device::draw_vector(unsigned short start_x,unsigned short start_y,sho
 
 			x++;
 
-		}while( x <= dest_x );
+		} while (x <= dest_x);
 	}
 
 	set_x_reg(end_x);
