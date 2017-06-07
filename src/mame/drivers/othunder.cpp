@@ -352,13 +352,8 @@ The eeprom unlock command is different, and the write/clock/reset
 bits are different.
 ******************************************************************/
 
-WRITE16_MEMBER(othunder_state::tc0220ioc_w)
+WRITE8_MEMBER(othunder_state::eeprom_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		switch (offset)
-		{
-			case 0x03:
 
 /*              0000000x    SOL-1 (gun solenoid)
                 000000x0    SOL-2 (gun solenoid)
@@ -369,40 +364,22 @@ WRITE16_MEMBER(othunder_state::tc0220ioc_w)
                 0x000000    eeprom in data
                 x0000000    eeprom out data  */
 
-				/* Recoil Piston Motor Status */
-				output().set_value("Player1_Recoil_Piston", data & 0x1 );
-				output().set_value("Player2_Recoil_Piston", (data & 0x2) >>1 );
+	/* Recoil Piston Motor Status */
+	output().set_value("Player1_Recoil_Piston", data & 0x1 );
+	output().set_value("Player2_Recoil_Piston", (data & 0x2) >>1 );
 
-				if (data & 4)
-					popmessage("OBPRI SET!");
+	if (data & 4)
+		popmessage("OBPRI SET!");
 
-				m_eeprom->di_write((data & 0x40) >> 6);
-				m_eeprom->clk_write((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
-				m_eeprom->cs_write((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
-				break;
-
-			default:
-				m_tc0220ioc->write(space, offset, data & 0xff);
-		}
-	}
+	m_eeprom->di_write((data & 0x40) >> 6);
+	m_eeprom->clk_write((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->cs_write((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 /**********************************************************
             GAME INPUTS
 **********************************************************/
-
-READ16_MEMBER(othunder_state::tc0220ioc_r)
-{
-	switch (offset)
-	{
-		case 0x03:
-			return (m_eeprom->do_read() & 1) << 7;
-
-		default:
-			return m_tc0220ioc->read(space, offset);
-	}
-}
 
 #define P1X_PORT_TAG     "P1X"
 #define P1Y_PORT_TAG     "P1Y"
@@ -488,8 +465,7 @@ WRITE8_MEMBER(othunder_state::tc0310fam_w)
 static ADDRESS_MAP_START( othunder_map, AS_PROGRAM, 16, othunder_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08ffff) AM_RAM
-	AM_RANGE(0x090000, 0x09000f) AM_READWRITE(tc0220ioc_r, tc0220ioc_w)
-//  AM_RANGE(0x090006, 0x090007) AM_WRITE(eeprom_w)
+	AM_RANGE(0x090000, 0x09000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, read, write, 0x00ff)
 //  AM_RANGE(0x09000c, 0x09000d) AM_WRITENOP   /* ?? (keeps writing 0x77) */
 	AM_RANGE(0x100000, 0x100007) AM_DEVREADWRITE("tc0110pcr", tc0110pcr_device, word_r, step1_rbswap_word_w)   /* palette */
 	AM_RANGE(0x200000, 0x20ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, word_r, word_w)    /* tilemaps */
@@ -696,7 +672,8 @@ static MACHINE_CONFIG_START( othunder )
 	MCFG_TC0220IOC_READ_0_CB(IOPORT("DSWA"))
 	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
 	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
-	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0220IOC_READ_3_CB(DEVREADLINE("eeprom", eeprom_serial_93cxx_device, do_read)) MCFG_DEVCB_BIT(7)
+	MCFG_TC0220IOC_WRITE_3_CB(WRITE8(othunder_state, eeprom_w))
 	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */

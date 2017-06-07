@@ -1079,25 +1079,16 @@ READ16_MEMBER(taitoz_state::eep_latch_r)
 }
 #endif
 
-WRITE16_MEMBER(taitoz_state::spacegun_output_bypass_w)
+WRITE8_MEMBER(taitoz_state::spacegun_eeprom_w)
 {
-	switch (offset)
-	{
-		case 0x03:
-
 /*          0000xxxx    (unused)
             000x0000    eeprom reset (active low)
             00x00000    eeprom clock
             0x000000    eeprom data
             x0000000    (unused)                  */
 
-			COMBINE_DATA(&m_eep_latch);
-			ioport("EEPROMOUT")->write(data, 0xff);
-			break;
-
-		default:
-			m_tc0510nio->write(space, offset, data);
-	}
+	COMBINE_DATA(&m_eep_latch);
+	ioport("EEPROMOUT")->write(data, 0xff);
 }
 
 
@@ -1242,18 +1233,6 @@ READ16_MEMBER(taitoz_state::sci_steer_input_r)
 	return 0xff;
 }
 
-
-READ16_MEMBER(taitoz_state::spacegun_input_bypass_r)
-{
-	switch (offset)
-	{
-		case 0x03:
-			return m_eeprom->do_read() << 7;
-
-		default:
-			return m_tc0510nio->read(space, offset);
-	}
-}
 
 READ16_MEMBER(taitoz_state::spacegun_lightgun_r)
 {
@@ -1662,7 +1641,7 @@ static ADDRESS_MAP_START( spacegun_cpub_map, AS_PROGRAM, 16, taitoz_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x20c000, 0x20ffff) AM_RAM
 	AM_RANGE(0x210000, 0x21ffff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x800000, 0x80000f) AM_READWRITE(spacegun_input_bypass_r, spacegun_output_bypass_w)
+	AM_RANGE(0x800000, 0x80000f) AM_DEVREADWRITE("tc0510nio", tc0510nio_device, halfword_r, halfword_w)
 	AM_RANGE(0xc00000, 0xc00007) AM_DEVREADWRITE8("ymsnd", ym2610_device, read, write, 0x00ff)
 	AM_RANGE(0xc0000c, 0xc0000d) AM_NOP // interrupt controller?
 	AM_RANGE(0xc0000e, 0xc0000f) AM_NOP
@@ -3528,7 +3507,8 @@ static MACHINE_CONFIG_START( spacegun )
 	MCFG_TC0510NIO_READ_0_CB(IOPORT("DSWA"))
 	MCFG_TC0510NIO_READ_1_CB(IOPORT("DSWB"))
 	MCFG_TC0510NIO_READ_2_CB(IOPORT("IN0"))
-	MCFG_TC0510NIO_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0510NIO_READ_3_CB(DEVREADLINE("eeprom", eeprom_serial_93cxx_device, do_read)) MCFG_DEVCB_BIT(7)
+	MCFG_TC0510NIO_WRITE_3_CB(WRITE8(taitoz_state, spacegun_eeprom_w))
 	MCFG_TC0510NIO_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */

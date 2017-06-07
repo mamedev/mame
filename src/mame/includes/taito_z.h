@@ -74,14 +74,13 @@ public:
 	DECLARE_WRITE16_MEMBER(bshark_cpua_ctrl_w);
 	DECLARE_WRITE16_MEMBER(chasehq_cpua_ctrl_w);
 	DECLARE_WRITE16_MEMBER(dblaxle_cpua_ctrl_w);
-	DECLARE_WRITE16_MEMBER(spacegun_output_bypass_w);
+	DECLARE_WRITE8_MEMBER(spacegun_eeprom_w);
 	DECLARE_READ8_MEMBER(contcirc_input_bypass_r);
 	DECLARE_READ8_MEMBER(chasehq_input_bypass_r);
 	DECLARE_READ16_MEMBER(bshark_stick_r);
 	DECLARE_READ16_MEMBER(nightstr_stick_r);
 	DECLARE_WRITE16_MEMBER(bshark_stick_w);
 	DECLARE_READ16_MEMBER(sci_steer_input_r);
-	DECLARE_READ16_MEMBER(spacegun_input_bypass_r);
 	DECLARE_READ16_MEMBER(spacegun_lightgun_r);
 	DECLARE_WRITE16_MEMBER(spacegun_lightgun_w);
 	DECLARE_WRITE16_MEMBER(spacegun_gun_output_w);

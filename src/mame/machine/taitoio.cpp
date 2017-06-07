@@ -65,6 +65,7 @@ tc0220ioc_device::tc0220ioc_device(const machine_config &mconfig, const char *ta
 	m_read_1_cb(*this),
 	m_read_2_cb(*this),
 	m_read_3_cb(*this),
+	m_write_3_cb(*this),
 	m_read_7_cb(*this)
 {
 }
@@ -79,6 +80,7 @@ void tc0220ioc_device::device_start()
 	m_read_1_cb.resolve_safe(0);
 	m_read_2_cb.resolve_safe(0);
 	m_read_3_cb.resolve_safe(0);
+	m_write_3_cb.resolve_safe();
 	m_read_7_cb.resolve_safe(0);
 
 	save_item(NAME(m_regs));
@@ -146,6 +148,10 @@ WRITE8_MEMBER( tc0220ioc_device::write )
 			m_watchdog->watchdog_reset();
 			break;
 
+		case 0x03:
+			m_write_3_cb(data);
+			break;
+
 		case 0x04:  /* coin counters and lockout, hi nibble irrelevant */
 
 			machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
@@ -200,6 +206,7 @@ tc0510nio_device::tc0510nio_device(const machine_config &mconfig, const char *ta
 	m_read_1_cb(*this),
 	m_read_2_cb(*this),
 	m_read_3_cb(*this),
+	m_write_3_cb(*this),
 	m_read_7_cb(*this)
 {
 }
@@ -214,6 +221,7 @@ void tc0510nio_device::device_start()
 	m_read_1_cb.resolve_safe(0);
 	m_read_2_cb.resolve_safe(0);
 	m_read_3_cb.resolve_safe(0);
+	m_write_3_cb.resolve_safe();
 	m_read_7_cb.resolve_safe(0);
 
 	save_item(NAME(m_regs));
@@ -277,6 +285,10 @@ WRITE8_MEMBER( tc0510nio_device::write )
 	{
 		case 0x00:
 			m_watchdog->watchdog_reset();
+			break;
+
+		case 0x03:
+			m_write_3_cb(data);
 			break;
 
 		case 0x04:  /* coin counters and lockout */
