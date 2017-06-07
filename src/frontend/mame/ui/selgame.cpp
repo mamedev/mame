@@ -184,7 +184,9 @@ void menu_select_game::handle()
 	// if i have to reselect a software, force software list submenu
 	if (reselect_last::get())
 	{
-		const game_driver *const driver = reinterpret_cast<const game_driver *>(get_selection_ref());
+		const game_driver *driver;
+		const ui_software_info *software;
+		get_selection(software, driver);
 		menu::stack_push<menu_select_software>(ui(), container(), driver);
 		return;
 	}
