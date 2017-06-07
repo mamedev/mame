@@ -116,6 +116,7 @@
 *****************************************************************************/
 
 #include "emu.h"
+#include "bus/ti99/ti99defs.h"
 #include "bus/ti99/joyport/joyport.h"
 #include "bus/ti99/peb/peribox.h"
 #include "cpu/tms9900/tms9900.h"
@@ -125,9 +126,8 @@
 #include "sound/wave.h"
 #include "speaker.h"
 
-#define TMS9901_TAG "tms9901"
-#define SGCPU_TAG "sgcpu"
-#define AMSRAM_TAG "amsram1meg"
+#define TI99_SGCPU_TAG "sgcpu"
+#define TI99_AMSRAM_TAG "amsram1meg"
 
 #define TRACE_ILLWRITE 0
 #define TRACE_READY 0
@@ -142,12 +142,12 @@ public:
 	ti99_4p_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_cpu(*this, "maincpu"),
-		m_tms9901(*this, TMS9901_TAG),
+		m_tms9901(*this, TI_TMS9901_TAG),
 		m_cassette(*this, "cassette"),
-		m_peribox(*this, PERIBOX_TAG),
-		m_joyport(*this, JOYPORT_TAG),
-		m_scratchpad(*this, PADRAM_TAG),
-		m_amsram(*this, AMSRAM_TAG)
+		m_peribox(*this, TI_PERIBOX_TAG),
+		m_joyport(*this, TI_JOYPORT_TAG),
+		m_scratchpad(*this, TI99_PADRAM_TAG),
+		m_amsram(*this, TI99_AMSRAM_TAG)
 	{ }
 
 	DECLARE_WRITE_LINE_MEMBER( ready_line );
@@ -286,10 +286,10 @@ static ADDRESS_MAP_START(memmap, AS_PROGRAM, 16, ti99_4p_state)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(cru_map, AS_IO, 8, ti99_4p_state)
-	AM_RANGE(0x0000, 0x003f) AM_DEVREAD(TMS9901_TAG, tms9901_device, read)
+	AM_RANGE(0x0000, 0x003f) AM_DEVREAD(TI_TMS9901_TAG, tms9901_device, read)
 	AM_RANGE(0x0000, 0x01ff) AM_READ( cruread )
 
-	AM_RANGE(0x0000, 0x01ff) AM_DEVWRITE(TMS9901_TAG, tms9901_device, write)
+	AM_RANGE(0x0000, 0x01ff) AM_DEVWRITE(TI_TMS9901_TAG, tms9901_device, write)
 	AM_RANGE(0x0000, 0x0fff) AM_WRITE( cruwrite )
 ADDRESS_MAP_END
 
@@ -999,7 +999,7 @@ static MACHINE_CONFIG_START( ti99_4p_60hz )
 	MCFG_TMS99xx_DBIN_HANDLER( WRITELINE(ti99_4p_state, dbin_line) )
 
 	// tms9901
-	MCFG_DEVICE_ADD(TMS9901_TAG, TMS9901, 3000000)
+	MCFG_DEVICE_ADD(TI_TMS9901_TAG, TMS9901, 3000000)
 	MCFG_TMS9901_READBLOCK_HANDLER( READ8(ti99_4p_state, read_by_9901) )
 	MCFG_TMS9901_P2_HANDLER( WRITELINE( ti99_4p_state, keyC0) )
 	MCFG_TMS9901_P3_HANDLER( WRITELINE( ti99_4p_state, keyC1) )
@@ -1011,7 +1011,7 @@ static MACHINE_CONFIG_START( ti99_4p_60hz )
 	MCFG_TMS9901_INTLEVEL_HANDLER( WRITE8( ti99_4p_state, tms9901_interrupt) )
 
 	// Peripheral expansion box (SGCPU composition)
-	MCFG_DEVICE_ADD( PERIBOX_TAG, TI99_PERIBOX_SG, 0)
+	MCFG_DEVICE_ADD( TI_PERIBOX_TAG, TI99_PERIBOX_SG, 0)
 	MCFG_PERIBOX_INTA_HANDLER( WRITELINE(ti99_4p_state, extint) )
 	MCFG_PERIBOX_INTB_HANDLER( WRITELINE(ti99_4p_state, notconnected) )
 	MCFG_PERIBOX_READY_HANDLER( WRITELINE(ti99_4p_state, ready_line) )
@@ -1020,12 +1020,12 @@ static MACHINE_CONFIG_START( ti99_4p_60hz )
 	MCFG_PERIBOX_LCP_HANDLER( WRITELINE(ti99_4p_state, video_interrupt_in) )
 
 	// Scratch pad RAM 1024 bytes (4 times the size of the TI-99/4A)
-	MCFG_RAM_ADD(PADRAM_TAG)
+	MCFG_RAM_ADD(TI99_PADRAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1k")
 	MCFG_RAM_DEFAULT_VALUE(0)
 
 	// AMS RAM 1 MiB
-	MCFG_RAM_ADD(AMSRAM_TAG)
+	MCFG_RAM_ADD(TI99_AMSRAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1M")
 	MCFG_RAM_DEFAULT_VALUE(0)
 
@@ -1037,7 +1037,7 @@ static MACHINE_CONFIG_START( ti99_4p_60hz )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "cass_out", 0.25)
 
 	// Joystick port
-	MCFG_TI_JOYPORT4A_ADD( JOYPORT_TAG )
+	MCFG_TI_JOYPORT4A_ADD( TI_JOYPORT_TAG )
 
 MACHINE_CONFIG_END
 

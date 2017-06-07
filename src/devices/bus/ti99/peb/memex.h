@@ -21,7 +21,7 @@
 namespace bus { namespace ti99 { namespace peb {
 
 
-class geneve_memex_device : public ti_expansion_card_device
+class geneve_memex_device : public device_t, public device_ti99_peribox_card_interface
 {
 public:
 	geneve_memex_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);

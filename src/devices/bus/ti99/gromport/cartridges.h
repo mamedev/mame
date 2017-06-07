@@ -60,13 +60,13 @@ const char *const error_text[16] =
 	"Unknown pcb type"
 };
 
-class ti99_cartridge_device : public bus8z_device, public device_image_interface
+class ti99_cartridge_device : public device_t, public device_image_interface
 {
 public:
 	ti99_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8Z_MEMBER(readz) override;
-	DECLARE_WRITE8_MEMBER(write) override;
+	DECLARE_READ8Z_MEMBER(readz);
+	DECLARE_WRITE8_MEMBER(write);
 	DECLARE_READ8Z_MEMBER(crureadz);
 	DECLARE_WRITE8_MEMBER(cruwrite);
 

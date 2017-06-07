@@ -38,8 +38,9 @@ namespace bus { namespace ti99 { namespace peb {
 
 /****************************************************************************/
 
-ti_speech_synthesizer_device::ti_speech_synthesizer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ti_expansion_card_device(mconfig, TI99_SPEECH, tag, owner, clock),
+ti_speech_synthesizer_device::ti_speech_synthesizer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, TI99_SPEECH, tag, owner, clock),
+	device_ti99_peribox_card_interface(mconfig, *this),
 	m_vsp(nullptr), m_reading(false), m_sbe(false)
 {
 }

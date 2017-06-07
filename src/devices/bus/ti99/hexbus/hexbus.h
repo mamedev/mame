@@ -8,8 +8,6 @@
     Michael Zapf
     June 2017
 
-    -hexbus:1 hx5102 -hexbus:2 ...
-
 *****************************************************************************/
 
 #ifndef MAME_BUS_TI99_HEXBUS_HEXBUS_H
@@ -26,60 +24,60 @@ enum
 	MAX_DEVICES = 4
 };
 
-class hexbus_attached_device;
-class hexbus_slot_device;
+class hexbus_device;
 
-class hexbus_device : public device_t, public device_slot_interface
+/********************************************************************
+    Common parent class of all devices attached to the hexbus port
+********************************************************************/
+class device_ti_hexbus_interface : public device_slot_card_interface
 {
-	friend class hexbus_attached_device;
-
-public:
-	hexbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	void connect_master(hexbus_attached_device *masterdev) { m_master = masterdev; }
-
-protected:
-	void device_start() override;
-	void device_config_complete() override;
-
-private:
-	hexbus_attached_device *m_master;
-	hexbus_attached_device *m_slave;
-
-	// Called from a slot, samples all values from the devices, and propagates
-	// the logical product to all connected devices
-	void send();
-};
-
-/*****************************************************************************
-    The parent class for all Hexbus devices
-******************************************************************************/
-
-class hexbus_attached_device : public device_t, public device_slot_card_interface
-{
-	friend class hexbus_slot_device;
 	friend class hexbus_device;
+	friend class hexbus_slot_device;
 
 protected:
-	hexbus_attached_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-	void device_start() override;
-
+	using device_slot_card_interface::device_slot_card_interface;
 	void hexbus_send(uint8_t value);
 	uint8_t hexbus_receive() { return m_busvalue; }
 
 	virtual void receive(uint8_t value) { m_busvalue = value; }
 	virtual uint8_t get_value() { return m_value; }
 
+	virtual void interface_config_complete() override;
+	hexbus_device *m_hexbus;        // Link to the Hexbus
+
 private:
 	void set_hexbus(hexbus_device* hexbus) { m_hexbus = hexbus; }
-
 	uint8_t m_value;
 	uint8_t m_busvalue;
-	hexbus_device *m_hexbus;        // Link to the Hexbus
 };
 
 // ------------------------------------------------------------------------
 
-class hexbus_chain_device : public hexbus_attached_device
+class hexbus_device : public device_t, public device_slot_interface
+{
+	friend class device_ti_hexbus_interface;
+
+public:
+	hexbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	void connect_master(device_ti_hexbus_interface *masterdev) { m_master = masterdev; }
+
+protected:
+	void device_start() override;
+	void device_config_complete() override;
+
+private:
+	device_ti_hexbus_interface *m_master;
+	device_ti_hexbus_interface *m_slave;
+
+	// Called from a slot, samples all values from the devices, and propagates
+	// the logical product to all connected devices
+	void send();
+};
+
+
+// ------------------------------------------------------------------------
+
+class hexbus_chain_device : public device_t, public device_ti_hexbus_interface
 {
 public:
 	hexbus_chain_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -117,7 +115,7 @@ protected:
 private:
 	int get_index_from_tagname();
 
-	hexbus_attached_device* m_hexbdev;
+	device_ti_hexbus_interface* m_hexbdev;
 	hexbus_device* m_hexbus;
 };
 

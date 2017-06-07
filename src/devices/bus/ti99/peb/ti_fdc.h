@@ -22,7 +22,7 @@
 
 namespace bus { namespace ti99 { namespace peb {
 
-class ti_fdc_device : public ti_expansion_card_device
+class ti_fdc_device : public device_t, public device_ti99_peribox_card_interface
 {
 public:
 	ti_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);

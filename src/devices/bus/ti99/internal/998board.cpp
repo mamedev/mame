@@ -149,17 +149,17 @@ mainboard8_device::mainboard8_device(const machine_config &mconfig, const char *
 	m_ready(*this),
 	m_console_reset(*this),
 	m_hold_line(*this),
-	m_vaquerro(*this, VAQUERRO_TAG),
-	m_mofetta(*this, MOFETTA_TAG),
-	m_amigo(*this, AMIGO_TAG),
-	m_oso(*this, OSO_TAG),
-	m_video(*owner, VDP_TAG),               // subdevice of main class
-	m_sound(*owner, TISOUNDCHIP_TAG),
-	m_speech(*owner, SPEECHSYN_TAG),
-	m_gromport(*owner, GROMPORT_TAG),
+	m_vaquerro(*this, TI998_VAQUERRO_TAG),
+	m_mofetta(*this, TI998_MOFETTA_TAG),
+	m_amigo(*this, TI998_AMIGO_TAG),
+	m_oso(*this, TI998_OSO_TAG),
+	m_video(*owner, TI_VDP_TAG),               // subdevice of main class
+	m_sound(*owner, TI_SOUNDCHIP_TAG),
+	m_speech(*owner, TI998_SPEECHSYN_TAG),
+	m_gromport(*owner, TI99_GROMPORT_TAG),
 	m_ioport(*owner, TI99_IOPORT_TAG),
-	m_sram(*owner, SRAM_TAG),
-	m_dram(*owner, DRAM_TAG),
+	m_sram(*owner, TI998_SRAM_TAG),
+	m_dram(*owner, TI998_DRAM_TAG),
 	m_sgrom_idle(true),
 	m_tsgrom_idle(true),
 	m_p8grom_idle(true),
@@ -942,10 +942,10 @@ WRITE_LINE_MEMBER( mainboard8_device::ggrdy_in )
 	m_amigo->srdy_in((state==ASSERT_LINE && m_speech_ready && m_sound_ready && m_pbox_ready)? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const char *const glib0[] = { SYSGROM0_TAG, SYSGROM1_TAG, SYSGROM2_TAG };
-static const char *const glib1[] = { GLIB10_TAG, GLIB11_TAG, GLIB12_TAG, GLIB13_TAG, GLIB14_TAG, GLIB15_TAG, GLIB16_TAG, GLIB17_TAG };
-static const char *const glib2[] = { GLIB20_TAG, GLIB21_TAG, GLIB22_TAG, GLIB23_TAG, GLIB24_TAG, GLIB25_TAG, GLIB26_TAG, GLIB27_TAG };
-static const char *const glib3[] = { GLIB30_TAG, GLIB31_TAG, GLIB32_TAG };
+static const char *const glib0[] = { TI998_SYSGROM0_TAG, TI998_SYSGROM1_TAG, TI998_SYSGROM2_TAG };
+static const char *const glib1[] = { TI998_GLIB10_TAG, TI998_GLIB11_TAG, TI998_GLIB12_TAG, TI998_GLIB13_TAG, TI998_GLIB14_TAG, TI998_GLIB15_TAG, TI998_GLIB16_TAG, TI998_GLIB17_TAG };
+static const char *const glib2[] = { TI998_GLIB20_TAG, TI998_GLIB21_TAG, TI998_GLIB22_TAG, TI998_GLIB23_TAG, TI998_GLIB24_TAG, TI998_GLIB25_TAG, TI998_GLIB26_TAG, TI998_GLIB27_TAG };
+static const char *const glib3[] = { TI998_GLIB30_TAG, TI998_GLIB31_TAG, TI998_GLIB32_TAG };
 
 void mainboard8_device::device_start()
 {
@@ -967,9 +967,9 @@ void mainboard8_device::device_start()
 		m_p8grom[i] = downcast<tmc0430_device*>(machine().device(glib2[i]));
 	}
 
-	m_rom0  = machine().root_device().memregion(ROM0_REG)->base();
-	m_rom1  = machine().root_device().memregion(ROM1_REG)->base();
-	m_pascalrom  = machine().root_device().memregion(PASCAL_REG)->base();
+	m_rom0  = machine().root_device().memregion(TI998_ROM0_REG)->base();
+	m_rom1  = machine().root_device().memregion(TI998_ROM1_REG)->base();
+	m_pascalrom  = machine().root_device().memregion(TI998_PASCAL_REG)->base();
 
 	// Register state variables
 	save_item(NAME(m_A14_set));
@@ -1010,10 +1010,10 @@ void mainboard8_device::device_reset()
 }
 
 MACHINE_CONFIG_START( ti998_mainboard )
-	MCFG_DEVICE_ADD(VAQUERRO_TAG, TI99_VAQUERRO, 0)
-	MCFG_DEVICE_ADD(MOFETTA_TAG, TI99_MOFETTA, 0)
-	MCFG_DEVICE_ADD(AMIGO_TAG, TI99_AMIGO, 0)
-	MCFG_DEVICE_ADD(OSO_TAG, TI99_OSO, 0)
+	MCFG_DEVICE_ADD(TI998_VAQUERRO_TAG, TI99_VAQUERRO, 0)
+	MCFG_DEVICE_ADD(TI998_MOFETTA_TAG, TI99_MOFETTA, 0)
+	MCFG_DEVICE_ADD(TI998_AMIGO_TAG, TI99_AMIGO, 0)
+	MCFG_DEVICE_ADD(TI998_OSO_TAG, TI99_OSO, 0)
 MACHINE_CONFIG_END
 
 machine_config_constructor mainboard8_device::device_mconfig_additions() const
@@ -2233,7 +2233,8 @@ enum
 };
 
 oso_device::oso_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	bus::ti99::hexbus::hexbus_attached_device(mconfig, TI99_OSO, tag, owner, clock),
+	device_t(mconfig, TI99_OSO, tag, owner, clock),
+	bus::ti99::hexbus::device_ti_hexbus_interface(mconfig, *this),
 	m_data(0),
 	m_status(0),
 	m_control(0),

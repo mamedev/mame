@@ -145,7 +145,7 @@ void hexbus_device::device_start()
 
 void hexbus_device::device_config_complete()
 {
-	m_slave = static_cast<hexbus_attached_device*>(subdevices().first());
+	m_slave = dynamic_cast<device_ti_hexbus_interface*>(subdevices().first());
 	if (m_slave != nullptr)
 		m_slave->set_hexbus(this);
 }
@@ -164,7 +164,8 @@ void hexbus_device::send()
 // ------------------------------------------------------------------------
 
 hexbus_chain_device::hexbus_chain_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	hexbus_attached_device(mconfig, TI_HEXBUS_CHAIN, tag, owner, clock)
+	device_t(mconfig, TI_HEXBUS_CHAIN, tag, owner, clock),
+	device_ti_hexbus_interface(mconfig, *this)
 {
 }
 
@@ -252,26 +253,23 @@ void hexbus_slot_device::device_start()
 void hexbus_slot_device::device_config_complete()
 {
 	m_hexbus = dynamic_cast<hexbus_device*>(owner());
-	m_hexbdev = downcast<hexbus_attached_device *>(subdevices().first());
+	m_hexbdev = dynamic_cast<device_ti_hexbus_interface *>(subdevices().first());
 }
 
 // ------------------------------------------------------------------------
 
-hexbus_attached_device::hexbus_attached_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, type, tag, owner, clock),
-	device_slot_card_interface(mconfig, *this)
+void device_ti_hexbus_interface::interface_config_complete()
 {
+	m_hexbus = dynamic_cast<hexbus_device*>(device().owner());
 }
 
-void hexbus_attached_device::device_start()
-{
-}
-
-void hexbus_attached_device::hexbus_send(uint8_t value)
+void device_ti_hexbus_interface::hexbus_send(uint8_t value)
 {
 	m_value = value;
 	m_hexbus->send();
 }
+
+// ------------------------------------------------------------------------
 
 }   }   }  // end namespace bus::ti99::hexbus
 

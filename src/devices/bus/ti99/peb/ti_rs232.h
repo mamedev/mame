@@ -23,7 +23,7 @@ namespace bus { namespace ti99 { namespace peb {
 class ti_pio_attached_device;
 class ti_rs232_attached_device;
 
-class ti_rs232_pio_device : public ti_expansion_card_device
+class ti_rs232_pio_device : public device_t, public device_ti99_peribox_card_interface
 {
 	friend class ti_pio_attached_device;
 	friend class ti_rs232_attached_device;

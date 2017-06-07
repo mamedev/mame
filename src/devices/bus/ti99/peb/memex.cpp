@@ -34,8 +34,9 @@ enum
 	MDIP8 = 0x80
 };
 
-geneve_memex_device::geneve_memex_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ti_expansion_card_device(mconfig, TI99_MEMEX, tag, owner, clock),
+geneve_memex_device::geneve_memex_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, TI99_MEMEX, tag, owner, clock),
+	device_ti99_peribox_card_interface(mconfig, *this),
 	m_ram(*this, RAMREGION)
 {
 }

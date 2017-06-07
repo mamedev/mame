@@ -21,10 +21,12 @@
 
 namespace bus { namespace ti99 { namespace hexbus {
 
-class hx5102_device : public hexbus_attached_device
+class hx5102_device : public device_t, public device_ti_hexbus_interface
 {
 public:
 	hx5102_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	void device_start() override;
 };
 
 }   }   }  // end namespace bus::ti99::hexbus

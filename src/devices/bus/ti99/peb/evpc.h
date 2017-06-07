@@ -26,7 +26,7 @@
 
 namespace bus { namespace ti99 { namespace peb {
 
-class snug_enhanced_video_device : public ti_expansion_card_device, public device_nvram_interface
+class snug_enhanced_video_device : public device_t, public device_ti99_peribox_card_interface, public device_nvram_interface
 {
 public:
 	snug_enhanced_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);

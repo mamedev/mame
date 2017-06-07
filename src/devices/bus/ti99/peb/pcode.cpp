@@ -99,8 +99,9 @@ namespace bus { namespace ti99 { namespace peb {
 #define TRACE_CRU 0
 #define TRACE_SWITCH 0
 
-ti_pcode_card_device::ti_pcode_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ti_expansion_card_device(mconfig, TI99_P_CODE, tag, owner, clock),
+ti_pcode_card_device::ti_pcode_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, TI99_P_CODE, tag, owner, clock),
+	device_ti99_peribox_card_interface(mconfig, *this),
 	m_rom(nullptr),
 	m_bank_select(0),
 	m_active(false),

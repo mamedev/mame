@@ -128,8 +128,24 @@ namespace bus { namespace ti99 { namespace peb {
 
 #define ESC 0x1b
 
-ti_rs232_pio_device::ti_rs232_pio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ti_expansion_card_device(mconfig, TI99_RS232, tag, owner, clock), m_piodev(nullptr), m_dsrrom(nullptr), m_pio_direction_in(false), m_pio_handshakeout(false), m_pio_handshakein(false), m_pio_spareout(false), m_pio_sparein(false), m_flag0(false), m_led(false), m_pio_out_buffer(0), m_pio_in_buffer(0), m_pio_readable(false), m_pio_writable(false), m_pio_write(false), m_ila(0)
+ti_rs232_pio_device::ti_rs232_pio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, TI99_RS232, tag, owner, clock),
+	device_ti99_peribox_card_interface(mconfig, *this),
+	m_piodev(nullptr),
+	m_dsrrom(nullptr),
+	m_pio_direction_in(false),
+	m_pio_handshakeout(false),
+	m_pio_handshakein(false),
+	m_pio_spareout(false),
+	m_pio_sparein(false),
+	m_flag0(false),
+	m_led(false),
+	m_pio_out_buffer(0),
+	m_pio_in_buffer(0),
+	m_pio_readable(false),
+	m_pio_writable(false),
+	m_pio_write(false),
+	m_ila(0)
 {
 }
 
@@ -1026,7 +1042,7 @@ WRITE8_MEMBER( ti_rs232_pio_device::ctrl1_callback )
 
 void ti_rs232_pio_device::device_start()
 {
-	m_dsrrom = memregion(DSRROM)->base();
+	m_dsrrom = memregion(TI99_DSRROM)->base();
 	m_uart[0] = subdevice<tms9902_device>("tms9902_0");
 	m_uart[1] = subdevice<tms9902_device>("tms9902_1");
 	m_serdev[0] = subdevice<ti_rs232_attached_device>("serdev0");
@@ -1119,7 +1135,7 @@ static MACHINE_CONFIG_START( ti_rs232 )
 MACHINE_CONFIG_END
 
 ROM_START( ti_rs232 )
-	ROM_REGION(0x1000, DSRROM, 0)
+	ROM_REGION(0x1000, TI99_DSRROM, 0)
 	ROM_LOAD("rs232pio_dsr.u1", 0x0000, 0x1000, CRC(eab382fb) SHA1(ee609a18a21f1a3ddab334e8798d5f2a0fcefa91)) /* TI rs232 DSR ROM */
 ROM_END
 

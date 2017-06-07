@@ -23,7 +23,7 @@
 
 namespace bus { namespace ti99 { namespace peb {
 
-class nouspikel_ide_interface_device : public ti_expansion_card_device
+class nouspikel_ide_interface_device : public device_t, public device_ti99_peribox_card_interface
 {
 public:
 	nouspikel_ide_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);

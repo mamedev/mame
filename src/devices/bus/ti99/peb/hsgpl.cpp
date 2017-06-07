@@ -145,31 +145,32 @@ namespace bus { namespace ti99 { namespace peb {
 #define GROM_A_EEPROM "u1_grom"
 #define ROM6_EEPROM "u6_rom6"
 
-snug_high_speed_gpl_device::snug_high_speed_gpl_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ti_expansion_card_device(mconfig, TI99_HSGPL, tag, owner, clock),
-	  m_dsr_eeprom(*this, DSR_EEPROM),
-	  m_rom6_eeprom(*this, ROM6_EEPROM),
-	  m_grom_a_eeprom(*this, GROM_A_EEPROM),
-	  m_grom_b_eeprom(*this, GROM_B_EEPROM),
-	  m_ram6_memory(*this, RAM6_TAG),
-	  m_gram_memory(*this, GRAM_TAG),
-	  m_dsr_enabled(false),
-	  m_gram_enabled(false),
-	  m_bank_inhibit(false),
-	  m_dsr_page(0),
-	  m_card_enabled(false),
-	  m_write_enabled(false),
-	  m_supercart_enabled(false),
-	  m_led_on(false),
-	  m_mbx_enabled(false),
-	  m_ram_enabled(false),
-	  m_flash_mode(false),
-	  m_current_grom_port(0),
-	  m_current_bank(0),
-	  m_module_bank(0),
-	  m_waddr_LSB(false),
-	  m_raddr_LSB(false),
-	  m_grom_address(0)
+snug_high_speed_gpl_device::snug_high_speed_gpl_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, TI99_HSGPL, tag, owner, clock),
+	device_ti99_peribox_card_interface(mconfig, *this),
+	m_dsr_eeprom(*this, DSR_EEPROM),
+	m_rom6_eeprom(*this, ROM6_EEPROM),
+	m_grom_a_eeprom(*this, GROM_A_EEPROM),
+	m_grom_b_eeprom(*this, GROM_B_EEPROM),
+	m_ram6_memory(*this, RAM6_TAG),
+	m_gram_memory(*this, GRAM_TAG),
+	m_dsr_enabled(false),
+	m_gram_enabled(false),
+	m_bank_inhibit(false),
+	m_dsr_page(0),
+	m_card_enabled(false),
+	m_write_enabled(false),
+	m_supercart_enabled(false),
+	m_led_on(false),
+	m_mbx_enabled(false),
+	m_ram_enabled(false),
+	m_flash_mode(false),
+	m_current_grom_port(0),
+	m_current_bank(0),
+	m_module_bank(0),
+	m_waddr_LSB(false),
+	m_raddr_LSB(false),
+	m_grom_address(0)
 {
 }
 

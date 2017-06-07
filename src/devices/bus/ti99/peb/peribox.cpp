@@ -51,8 +51,7 @@
     This is emulation in exactly the same way. The data coming from the
     console is propagated to all slots, and each card decides whether to
     react or not. Similarly, for read operations, all cards are checked,
-    and only the active cards actually put a value on the data bus
-    (we do this using the bus8z_device; see ti99defs.h).
+    and only the active cards actually put a value on the data bus.
 
     Slot 1 is usually reserved for the "Flex cable interface" when connecting
     a TI-99/4(A)/8 console. Also, the Geneve is put into slot 1. We therefore
@@ -168,7 +167,6 @@ CRUCLK*  51||52  DBIN
     Each slot may host one of several cards (ti_expansion_card_device),
     which are subclassed from device_slot_card_interface.
 
-    For bus8z_device consult ti99defs.h
     ---------------------
 
     June 2010: Reimplemented using device structure (MZ)
@@ -224,8 +222,8 @@ namespace bus { namespace ti99 { namespace peb {
 // Show ready line activity
 #define TRACE_READY 0
 
-// Show emulation details
-#define TRACE_EMU 1
+// Show configuration details
+#define TRACE_CONFIG 0
 
 #define PEBSLOT2 "slot2"
 #define PEBSLOT3 "slot3"
@@ -455,8 +453,6 @@ void peribox_device::set_slot_loaded(int slot, peribox_slot_device* slotdev)
 
 void peribox_device::device_start()
 {
-	if (TRACE_EMU) logerror("%s: started\n", tag());
-
 	// Resolve the callback lines to the console
 	m_slot1_inta.resolve();
 	m_slot1_intb.resolve();
@@ -465,12 +461,12 @@ void peribox_device::device_start()
 
 	m_ioport_connected = (m_slot1_inta.isnull()); // TODO: init
 
-	if (TRACE_EMU)
+	if (TRACE_CONFIG)
 	{
 		logerror("%s: AMA/B/C address prefix set to %05x\n", tag(), m_address_prefix);
 		for (int i=2; i < 9; i++)
 		{
-			logerror("%s: Slot %d = %s\n", tag(), i, (m_slot[i] != nullptr)? m_slot[i]->m_card->tag() : "EMPTY");
+			logerror("%s: Slot %d = %s\n", tag(), i, (m_slot[i] != nullptr)? m_slot[i]->card_name() : "empty");
 		}
 	}
 
@@ -641,8 +637,11 @@ int peribox_slot_device::get_index_from_tagname()
 	return atoi(mytag+i+1);
 }
 
-peribox_slot_device::peribox_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: bus8z_device(mconfig, TI99_PERIBOX_SLOT, tag, owner, clock), device_slot_interface(mconfig, *this), m_card(nullptr), m_slotnumber(0)
+peribox_slot_device::peribox_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, TI99_PERIBOX_SLOT, tag, owner, clock),
+	device_slot_interface(mconfig, *this),
+	m_card(nullptr),
+	m_slotnumber(0)
 {
 }
 
@@ -701,7 +700,7 @@ void peribox_slot_device::device_start()
 void peribox_slot_device::device_config_complete()
 {
 	m_slotnumber = get_index_from_tagname();
-	m_card = downcast<ti_expansion_card_device *>(subdevices().first());
+	m_card = dynamic_cast<device_ti99_peribox_card_interface *>(subdevices().first());
 	peribox_device *peb = dynamic_cast<peribox_device*>(owner());
 	if (peb)
 		peb->set_slot_loaded(m_slotnumber, m_card ? this : nullptr);
@@ -736,4 +735,22 @@ WRITE_LINE_MEMBER( peribox_slot_device::set_ready )
 }
 
 /***************************************************************************/
+
+device_ti99_peribox_card_interface::device_ti99_peribox_card_interface(const machine_config &mconfig, device_t &device):
+	device_slot_card_interface(mconfig, device),
+	m_selected(false),
+	m_cru_base(0),
+	m_select_mask(0),
+	m_select_value(0)
+{
+	m_senila = CLEAR_LINE;
+	m_senilb = CLEAR_LINE;
+	m_genmod = false;
+}
+
+void device_ti99_peribox_card_interface::interface_config_complete()
+{
+	m_slot = dynamic_cast<peribox_slot_device*>(device().owner());
+}
+
 } } } // end namespace bus::ti99::peb

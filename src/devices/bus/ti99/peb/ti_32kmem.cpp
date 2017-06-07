@@ -37,8 +37,9 @@ namespace bus { namespace ti99 { namespace peb {
 
 #define RAMREGION "ram32k"
 
-ti_32k_expcard_device::ti_32k_expcard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ti_expansion_card_device(mconfig, TI99_32KMEM, tag, owner, clock),
+ti_32k_expcard_device::ti_32k_expcard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, TI99_32KMEM, tag, owner, clock),
+	device_ti99_peribox_card_interface(mconfig, *this),
 	m_ram(*this, RAMREGION)
 {
 }

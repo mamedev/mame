@@ -21,7 +21,7 @@
 
 namespace bus { namespace ti99 { namespace peb {
 
-class horizon_ramdisk_device : public ti_expansion_card_device, public device_nvram_interface
+class horizon_ramdisk_device : public device_t, public device_ti99_peribox_card_interface, public device_nvram_interface
 {
 public:
 	horizon_ramdisk_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);

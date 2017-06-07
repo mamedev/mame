@@ -69,8 +69,9 @@ namespace bus { namespace ti99 { namespace peb {
 #define TRACE_WRITE 0
 #define TRACE_CRU 0
 
-horizon_ramdisk_device::horizon_ramdisk_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-: ti_expansion_card_device(mconfig, TI99_HORIZON, tag, owner, clock),
+horizon_ramdisk_device::horizon_ramdisk_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock):
+	device_t(mconfig, TI99_HORIZON, tag, owner, clock),
+	device_ti99_peribox_card_interface(mconfig, *this),
 	device_nvram_interface(mconfig, *this),
 	m_ram(*this, RAMREGION),
 	m_nvram(*this, NVRAMREGION),

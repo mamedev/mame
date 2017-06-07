@@ -32,7 +32,7 @@ namespace bus { namespace ti99 { namespace peb {
 /*
     Implementation for modern floppy system.
 */
-class myarc_hfdc_device : public ti_expansion_card_device
+class myarc_hfdc_device : public device_t, public device_ti99_peribox_card_interface
 {
 public:
 	myarc_hfdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);

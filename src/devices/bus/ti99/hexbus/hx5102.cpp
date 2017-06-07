@@ -20,7 +20,12 @@ DEFINE_DEVICE_TYPE_NS(TI_HX5102, bus::ti99::hexbus, hx5102_device, "ti_hx5102", 
 namespace bus { namespace ti99 { namespace hexbus {
 
 hx5102_device::hx5102_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock):
-	hexbus_attached_device(mconfig, TI_HX5102, tag, owner, clock)
+	device_t(mconfig, TI_HX5102, tag, owner, clock),
+	device_ti_hexbus_interface(mconfig, *this)
+{
+}
+
+void hx5102_device::device_start()
 {
 }
 

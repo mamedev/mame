@@ -51,8 +51,9 @@ enum
 	cru_reg_reset = 0x80
 };
 
-nouspikel_ide_interface_device::nouspikel_ide_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ti_expansion_card_device(mconfig, TI99_IDE, tag, owner, clock), m_ata_irq(false),
+nouspikel_ide_interface_device::nouspikel_ide_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, TI99_IDE, tag, owner, clock),
+	device_ti99_peribox_card_interface(mconfig, *this),
 	m_cru_register(0), m_rtc(nullptr),
 	m_ata(*this, "ata"), m_clk_irq(false), m_sram_enable(false),
 	m_sram_enable_dip(false), m_cur_page(0), m_tms9995_mode(false),
