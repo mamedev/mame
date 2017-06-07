@@ -64,7 +64,7 @@ namespace
 			install_write_handler(0xFF7B, 0xFF7B, write8_delegate(FUNC(coco_orch90_device::write_right), this));
 
 			// Orch-90 ties CART to Q
-			set_line_value(cococart_slot_device::line::CART, cococart_slot_device::line_value::Q);
+			set_line_value(line::CART, line_value::Q);
 		}
 
 		virtual const tiny_rom_entry *device_rom_region() const override

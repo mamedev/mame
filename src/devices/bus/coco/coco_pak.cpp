@@ -99,11 +99,11 @@ void coco_pak_device::device_reset()
 	if (m_cart->exists())
 	{
 		auto cart_line = m_autostart.read_safe(0x01)
-			? cococart_slot_device::line_value::Q
-			: cococart_slot_device::line_value::CLEAR;
+			? line_value::Q
+			: line_value::CLEAR;
 
 		// normal CoCo PAKs tie their CART line to Q - the system clock
-		set_line_value(cococart_slot_device::line::CART, cart_line);
+		set_line_value(line::CART, cart_line);
 	}
 }
 

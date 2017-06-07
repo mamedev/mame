@@ -160,10 +160,10 @@ dragon_fdc_device_base::dragon_fdc_device_base(const machine_config &mconfig, de
 void dragon_fdc_device_base::update_lines()
 {
 	// set the NMI line
-	cart_set_line(cococart_slot_device::line::NMI, intrq() && (dskreg() & 0x20));
+	set_line_value(line::NMI, intrq() && (dskreg() & 0x20));
 
 	// set the CART line
-	cart_set_line(cococart_slot_device::line::CART, drq());
+	set_line_value(line::CART, drq());
 }
 
 
