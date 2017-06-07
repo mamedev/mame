@@ -141,13 +141,13 @@ NETLIST_START(zac1b11142_schematics)
 	CAP(C43, CAP_U(0.01))
 	RES(R47, RES_K(1))
 	RES(R48, RES_K(10))
-	RES(R80, RES_K(10))
+	//RES(R80, RES_K(10))
 	RES(R81, RES_K(10))
 
 	NET_C(ANAL6, R47.1, R48.1)
 	NET_C(R48.2, C42.1)
 	NET_C(C42.2, R81.1)
-	NET_C(R81.2, C43.1, R80.1)
+	NET_C(R81.2, C43.1/*, R80.1*/)
 	NET_C(GND, R47.2, C43.2)
 
 
@@ -243,11 +243,11 @@ NETLIST_START(zac1b11142_schematics)
 	LM3900(U5B3)
 
 #if 0
-	NET_C(RULLANTE, CASSA, BASSO, R82.2, R80.2, PIANO, C40.1, R77.1)
+	NET_C(RULLANTE, CASSA, BASSO, R82.2, /*R80.2,*/ PIANO, C40.1, R77.1)
 #else
 	// cassa swamps the other instruments if it's connected - just ground it for now
 	NET_C(GND, CASSA)
-	NET_C(RULLANTE, BASSO, R82.2, R80.2, PIANO, C40.1, R77.1)
+	NET_C(RULLANTE, BASSO, R82.2, /*R80.2,*/ PIANO, C40.1, R77.1)
 #endif
 	NET_C(C40.2, R97.1)
 	NET_C(TROMBA, R97.2, R41.2, R42.2, R43.2, R44.2, R73.2, R74.2, R75.2, R76.2)
