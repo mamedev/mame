@@ -71,6 +71,7 @@ enum
 	XTAL_3_6864MHz      = 3686400,      /* Baud rate clock for MC68681 and similar UARTs */
 	XTAL_4MHz           = 4000000,
 	XTAL_4_028MHz       = 4028000,      /* Sony SMC-777 */
+	XTAL_4_032MHz       = 4032000,      /* GRiD Compass modem board */
 	XTAL_4_096MHz       = 4096000,      /* Used to drive OKI M9810 chips */
 	XTAL_4_194304Mhz    = 4194304,      /* Used to drive MC146818 / Nintendo Game Boy */
 	XTAL_4_224MHz       = 4224000,      /* Used to drive OKI M6295 chips, usually with /4 divider */
