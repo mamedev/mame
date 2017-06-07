@@ -44,6 +44,7 @@ TODO: Superpong is believed to use the Pong (Rev E) PCB with some minor modifica
 
 ***************************************************************************/
 
+#include <cmath>
 #include "emu.h"
 
 #include "machine/netlist.h"
