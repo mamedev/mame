@@ -20,7 +20,8 @@ TODO:
 - rambo3u: has a lot of unmapped writes in the VCU area (log up to end of
   round 2) [viofight also does a few]
 - The eprom games could have a single io handler if it's confirmed all
-  3 use a special 4 player I/O chip. Puzzle Bobble and qzshowby use TC0640FIO
+  3 use a special 4 player I/O chip. Puzzle Bobble and qzshowby use TC0640FIO, as do the
+  more common sets of Space Invaders DX (i.e. not spacedxo).
 - can the text layer scroll? (hitice: glass walls at beginning of match, also check when the
   screen wiggles after the puck hits the wall shortly into the first round of attract mode)
 - sprites are not in perfect sync with the background. Check ashura, they are almost
@@ -407,13 +408,17 @@ WRITE16_MEMBER(taitob_state::eeprom_w)
 /*************************************************************************
    The input area for the three eprom games ($500000-2f) may well be
    addressing a single i/o chip with 4 player and coin inputs as
-   standard.
-
-   Does anyone have custom chip numbers from the Space Invaders DX ?
-   (qzshowby and pbobble do use TC0640FIO).
-
+   standard. It's confirmed that all of these use TC0640FIO.
 *************************************************************************/
 
+
+WRITE8_MEMBER(taitob_state::player_12_coin_ctrl_w)
+{
+	machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
+	machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
+	machine().bookkeeping().coin_counter_w(0, data & 0x04);
+	machine().bookkeeping().coin_counter_w(1, data & 0x08);
+}
 
 READ16_MEMBER(taitob_state::player_34_coin_ctrl_r)
 {
@@ -1919,6 +1924,7 @@ static MACHINE_CONFIG_START( rastsag2 )
 	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
 	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
 	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(taitob_state, player_12_coin_ctrl_w))
 	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
@@ -1975,6 +1981,7 @@ static MACHINE_CONFIG_START( masterw )
 	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
 	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
 	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(taitob_state, player_12_coin_ctrl_w))
 	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
@@ -2050,6 +2057,7 @@ static MACHINE_CONFIG_START( ashura )
 	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
 	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
 	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(taitob_state, player_12_coin_ctrl_w))
 	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
@@ -2106,6 +2114,7 @@ static MACHINE_CONFIG_START( crimec )
 	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
 	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
 	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(taitob_state, player_12_coin_ctrl_w))
 	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
@@ -2163,6 +2172,7 @@ static MACHINE_CONFIG_START( hitice )
 	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
 	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
 	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(taitob_state, player_12_coin_ctrl_w))
 	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
@@ -2225,6 +2235,7 @@ static MACHINE_CONFIG_START( rambo3p )
 	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
 	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
 	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(taitob_state, player_12_coin_ctrl_w))
 	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
@@ -2282,6 +2293,7 @@ static MACHINE_CONFIG_START( rambo3 )
 	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
 	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
 	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(taitob_state, player_12_coin_ctrl_w))
 	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
@@ -2341,6 +2353,7 @@ static MACHINE_CONFIG_START( pbobble )
 	MCFG_TC0640FIO_READ_1_CB(IOPORT("COIN"))
 	MCFG_TC0640FIO_READ_2_CB(IOPORT("START"))
 	MCFG_TC0640FIO_READ_3_CB(IOPORT("P1_P2_A"))
+	MCFG_TC0640FIO_WRITE_4_CB(WRITE8(taitob_state, player_12_coin_ctrl_w))
 	MCFG_TC0640FIO_READ_7_CB(IOPORT("P1_P2_B"))
 
 	MCFG_DEVICE_ADD("mb87078", MB87078, 0)
@@ -2403,6 +2416,7 @@ static MACHINE_CONFIG_START( spacedx )
 	MCFG_TC0640FIO_READ_1_CB(IOPORT("COIN"))
 	MCFG_TC0640FIO_READ_2_CB(IOPORT("START"))
 	MCFG_TC0640FIO_READ_3_CB(IOPORT("P1_P2_A"))
+	MCFG_TC0640FIO_WRITE_4_CB(WRITE8(taitob_state, player_12_coin_ctrl_w))
 	MCFG_TC0640FIO_READ_7_CB(IOPORT("P1_P2_B"))
 
 	MCFG_DEVICE_ADD("mb87078", MB87078, 0)
@@ -2462,6 +2476,7 @@ static MACHINE_CONFIG_START( spacedxo )
 	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
 	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
 	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(taitob_state, player_12_coin_ctrl_w))
 	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
@@ -2521,6 +2536,7 @@ static MACHINE_CONFIG_START( qzshowby )
 	MCFG_TC0640FIO_READ_1_CB(IOPORT("COIN"))
 	MCFG_TC0640FIO_READ_2_CB(IOPORT("START"))
 	MCFG_TC0640FIO_READ_3_CB(IOPORT("P1_P2_A"))
+	MCFG_TC0640FIO_WRITE_4_CB(WRITE8(taitob_state, player_12_coin_ctrl_w))
 	MCFG_TC0640FIO_READ_7_CB(IOPORT("P1_P2_B"))
 
 	MCFG_DEVICE_ADD("mb87078", MB87078, 0)
@@ -2580,6 +2596,7 @@ static MACHINE_CONFIG_START( viofight )
 	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
 	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
 	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(taitob_state, player_12_coin_ctrl_w))
 	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
@@ -2641,6 +2658,7 @@ static MACHINE_CONFIG_START( silentd )
 	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
 	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
 	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(taitob_state, player_12_coin_ctrl_w))
 	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
@@ -2697,6 +2715,7 @@ static MACHINE_CONFIG_START( selfeena )
 	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
 	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
 	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(taitob_state, player_12_coin_ctrl_w))
 	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
@@ -2762,6 +2781,7 @@ static MACHINE_CONFIG_START( ryujin )
 	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
 	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
 	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(taitob_state, player_12_coin_ctrl_w))
 	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
@@ -2825,6 +2845,7 @@ static MACHINE_CONFIG_START( sbm )
 	MCFG_TC0510NIO_READ_1_CB(IOPORT("DSWB"))
 	MCFG_TC0510NIO_READ_2_CB(IOPORT("JOY"))
 	MCFG_TC0510NIO_READ_3_CB(IOPORT("START"))
+	MCFG_TC0510NIO_WRITE_4_CB(WRITE8(taitob_state, player_12_coin_ctrl_w))
 	MCFG_TC0510NIO_READ_7_CB(IOPORT("PHOTOSENSOR"))
 
 	/* video hardware */
@@ -2880,6 +2901,7 @@ static MACHINE_CONFIG_START( realpunc )
 	MCFG_TC0510NIO_READ_1_CB(IOPORT("DSWB"))
 	MCFG_TC0510NIO_READ_2_CB(IOPORT("IN0"))
 	MCFG_TC0510NIO_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0510NIO_WRITE_4_CB(WRITE8(taitob_state, player_12_coin_ctrl_w))
 	MCFG_TC0510NIO_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
@@ -3376,7 +3398,7 @@ ROM_START( spacedxj )
 	ROM_LOAD( "pal20l8b-d89-04.ic40",  0x0a00, 0x0144, NO_DUMP ) /* PAL is read protected */
 ROM_END
 
-ROM_START( spacedxo )
+ROM_START( spacedxo ) // different PCB type, similar to Silent Dragon
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 256k for 68000 code */
 	ROM_LOAD16_BYTE( "d89-08.bin",  0x00000, 0x20000, CRC(0c2fe7f9) SHA1(a0773c059c8ff2c9e367e0fb460d7e5f9a762ab1) )
 	ROM_LOAD16_BYTE( "d89-09.bin",  0x00001, 0x20000, CRC(7f0a0ba4) SHA1(479df027929201997aeebbea5901a0a494f2dd61) )

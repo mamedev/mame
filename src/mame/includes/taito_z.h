@@ -88,6 +88,7 @@ public:
 	DECLARE_READ16_MEMBER(chasehq_motor_r);
 	DECLARE_WRITE16_MEMBER(chasehq_motor_w);
 	DECLARE_WRITE16_MEMBER(nightstr_motor_w);
+	DECLARE_WRITE8_MEMBER(coin_control_w);
 	DECLARE_READ16_MEMBER(aquajack_unknown_r);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(taitoz_sound_w);

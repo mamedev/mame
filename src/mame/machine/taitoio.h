@@ -26,6 +26,7 @@ public:
 	template <class Object> static devcb_base &set_read_2_callback(device_t &device, Object &&cb) { return downcast<tc0220ioc_device &>(device).m_read_2_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_read_3_callback(device_t &device, Object &&cb) { return downcast<tc0220ioc_device &>(device).m_read_3_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_write_3_callback(device_t &device, Object &&cb) { return downcast<tc0220ioc_device &>(device).m_write_3_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_write_4_callback(device_t &device, Object &&cb) { return downcast<tc0220ioc_device &>(device).m_write_4_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_read_7_callback(device_t &device, Object &&cb) { return downcast<tc0220ioc_device &>(device).m_read_7_cb.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( read );
@@ -53,6 +54,7 @@ private:
 	devcb_read8 m_read_2_cb;
 	devcb_read8 m_read_3_cb;
 	devcb_write8 m_write_3_cb;
+	devcb_write8 m_write_4_cb;
 	devcb_read8 m_read_7_cb;
 };
 
@@ -68,6 +70,7 @@ public:
 	template <class Object> static devcb_base &set_read_2_callback(device_t &device, Object &&cb) { return downcast<tc0510nio_device &>(device).m_read_2_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_read_3_callback(device_t &device, Object &&cb) { return downcast<tc0510nio_device &>(device).m_read_3_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_write_3_callback(device_t &device, Object &&cb) { return downcast<tc0510nio_device &>(device).m_write_3_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_write_4_callback(device_t &device, Object &&cb) { return downcast<tc0510nio_device &>(device).m_write_4_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_read_7_callback(device_t &device, Object &&cb) { return downcast<tc0510nio_device &>(device).m_read_7_cb.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( read );
@@ -94,6 +97,7 @@ private:
 	devcb_read8 m_read_2_cb;
 	devcb_read8 m_read_3_cb;
 	devcb_write8 m_write_3_cb;
+	devcb_write8 m_write_4_cb;
 	devcb_read8 m_read_7_cb;
 };
 
@@ -108,6 +112,7 @@ public:
 	template <class Object> static devcb_base &set_read_1_callback(device_t &device, Object &&cb) { return downcast<tc0640fio_device &>(device).m_read_1_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_read_2_callback(device_t &device, Object &&cb) { return downcast<tc0640fio_device &>(device).m_read_2_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_read_3_callback(device_t &device, Object &&cb) { return downcast<tc0640fio_device &>(device).m_read_3_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_write_4_callback(device_t &device, Object &&cb) { return downcast<tc0640fio_device &>(device).m_write_4_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_read_7_callback(device_t &device, Object &&cb) { return downcast<tc0640fio_device &>(device).m_read_7_cb.set_callback(std::forward<Object>(cb)); }
 
 
@@ -134,6 +139,7 @@ protected:
 	devcb_read8 m_read_1_cb;
 	devcb_read8 m_read_2_cb;
 	devcb_read8 m_read_3_cb;
+	devcb_write8 m_write_4_cb;
 	devcb_read8 m_read_7_cb;
 };
 
@@ -159,6 +165,9 @@ DECLARE_DEVICE_TYPE(TC0640FIO, tc0640fio_device)
 #define MCFG_TC0220IOC_WRITE_3_CB(_devcb) \
 	devcb = &tc0220ioc_device::set_write_3_callback(*device, DEVCB_##_devcb);
 
+#define MCFG_TC0220IOC_WRITE_4_CB(_devcb) \
+	devcb = &tc0220ioc_device::set_write_4_callback(*device, DEVCB_##_devcb);
+
 #define MCFG_TC0220IOC_READ_7_CB(_devcb) \
 	devcb = &tc0220ioc_device::set_read_7_callback(*device, DEVCB_##_devcb);
 
@@ -178,6 +187,9 @@ DECLARE_DEVICE_TYPE(TC0640FIO, tc0640fio_device)
 #define MCFG_TC0510NIO_WRITE_3_CB(_devcb) \
 	devcb = &tc0510nio_device::set_write_3_callback(*device, DEVCB_##_devcb);
 
+#define MCFG_TC0510NIO_WRITE_4_CB(_devcb) \
+	devcb = &tc0510nio_device::set_write_4_callback(*device, DEVCB_##_devcb);
+
 #define MCFG_TC0510NIO_READ_7_CB(_devcb) \
 	devcb = &tc0510nio_device::set_read_7_callback(*device, DEVCB_##_devcb);
 
@@ -193,6 +205,9 @@ DECLARE_DEVICE_TYPE(TC0640FIO, tc0640fio_device)
 
 #define MCFG_TC0640FIO_READ_3_CB(_devcb) \
 	devcb = &tc0640fio_device::set_read_3_callback(*device, DEVCB_##_devcb);
+
+#define MCFG_TC0640FIO_WRITE_4_CB(_devcb) \
+	devcb = &tc0640fio_device::set_write_4_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_TC0640FIO_READ_7_CB(_devcb) \
 	devcb = &tc0640fio_device::set_read_7_callback(*device, DEVCB_##_devcb);

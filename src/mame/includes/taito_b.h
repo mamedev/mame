@@ -87,6 +87,7 @@ public:
 	DECLARE_WRITE16_MEMBER(gain_control_w);
 	DECLARE_READ16_MEMBER(eep_latch_r);
 	DECLARE_WRITE16_MEMBER(eeprom_w);
+	DECLARE_WRITE8_MEMBER(player_12_coin_ctrl_w);
 	DECLARE_READ16_MEMBER(player_34_coin_ctrl_r);
 	DECLARE_WRITE16_MEMBER(player_34_coin_ctrl_w);
 	DECLARE_WRITE16_MEMBER(spacedxo_tc0220ioc_w);

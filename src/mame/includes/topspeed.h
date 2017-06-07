@@ -82,6 +82,7 @@ public:
 	DECLARE_READ16_MEMBER(motor_r);
 	DECLARE_WRITE16_MEMBER(motor_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(pedal_r);
+	DECLARE_WRITE8_MEMBER(coins_w);
 
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(msm5205_command_w);

@@ -219,6 +219,14 @@ WRITE16_MEMBER(slapshot_state::opwolf3_adc_req_w)
 	m_maincpu->set_input_line(3, HOLD_LINE);
 }
 
+WRITE8_MEMBER(slapshot_state::coin_control_w)
+{
+	machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
+	machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
+	machine().bookkeeping().coin_counter_w(0, data & 0x04);
+	machine().bookkeeping().coin_counter_w(1, data & 0x08);
+}
+
 /*****************************************************
                 SOUND
 *****************************************************/
@@ -477,6 +485,7 @@ static MACHINE_CONFIG_START( slapshot )
 	MCFG_TC0640FIO_READ_1_CB(IOPORT("COINS"))
 	MCFG_TC0640FIO_READ_2_CB(IOPORT("BUTTONS"))
 	MCFG_TC0640FIO_READ_3_CB(IOPORT("SYSTEM"))
+	MCFG_TC0640FIO_WRITE_4_CB(WRITE8(slapshot_state, coin_control_w))
 	MCFG_TC0640FIO_READ_7_CB(IOPORT("JOY"))
 
 	/* video hardware */
@@ -537,6 +546,7 @@ static MACHINE_CONFIG_START( opwolf3 )
 	MCFG_TC0640FIO_READ_1_CB(IOPORT("COINS"))
 	MCFG_TC0640FIO_READ_2_CB(IOPORT("BUTTONS"))
 	MCFG_TC0640FIO_READ_3_CB(IOPORT("SYSTEM"))
+	MCFG_TC0640FIO_WRITE_4_CB(WRITE8(slapshot_state, coin_control_w))
 	MCFG_TC0640FIO_READ_7_CB(IOPORT("JOY"))
 
 	/* video hardware */

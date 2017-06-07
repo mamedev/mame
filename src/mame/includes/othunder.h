@@ -43,6 +43,7 @@ public:
 
 	DECLARE_WRITE16_MEMBER(irq_ack_w);
 	DECLARE_WRITE8_MEMBER(eeprom_w);
+	DECLARE_WRITE8_MEMBER(coins_w);
 	DECLARE_READ16_MEMBER(lightgun_r);
 	DECLARE_WRITE16_MEMBER(lightgun_w);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);

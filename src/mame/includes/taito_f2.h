@@ -113,6 +113,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
+	DECLARE_WRITE8_MEMBER(coin_nibble_w);
 	DECLARE_WRITE16_MEMBER(growl_coin_word_w);
 	DECLARE_WRITE16_MEMBER(taitof2_4p_coin_word_w);
 	DECLARE_WRITE16_MEMBER(ninjak_coin_word_w);

@@ -454,6 +454,15 @@ static const int dendego_pressure_table[0x100] =
 #define DSP_IDLESKIP        1 /* dsp idle skipping speedup hack */
 
 
+WRITE8_MEMBER(taitojc_state::coin_control_w)
+{
+	machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
+	machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
+	machine().bookkeeping().coin_counter_w(0, data & 0x04);
+	machine().bookkeeping().coin_counter_w(1, data & 0x08);
+}
+
+
 /***************************************************************************
 
   Interrupts
@@ -1111,6 +1120,7 @@ static MACHINE_CONFIG_START( taitojc )
 	MCFG_TC0640FIO_READ_1_CB(IOPORT("COINS"))
 	MCFG_TC0640FIO_READ_2_CB(IOPORT("START"))
 	MCFG_TC0640FIO_READ_3_CB(IOPORT("UNUSED"))
+	MCFG_TC0640FIO_WRITE_4_CB(WRITE8(taitojc_state, coin_control_w))
 	MCFG_TC0640FIO_READ_7_CB(IOPORT("BUTTONS"))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)

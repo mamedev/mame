@@ -80,6 +80,8 @@ public:
 	int m_speed_meter;
 	int m_brake_meter;
 
+	DECLARE_WRITE8_MEMBER(coin_control_w);
+
 	DECLARE_READ8_MEMBER(mcu_comm_r);
 	DECLARE_WRITE8_MEMBER(mcu_comm_w);
 	DECLARE_READ32_MEMBER(snd_share_r);

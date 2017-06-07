@@ -61,6 +61,7 @@ public:
 	uint16_t     m_cpua_ctrl;
 	int        m_pandata[4];
 
+	DECLARE_WRITE8_MEMBER(coin_control_w);
 	DECLARE_WRITE16_MEMBER(cpua_ctrl_w);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(sound_w);

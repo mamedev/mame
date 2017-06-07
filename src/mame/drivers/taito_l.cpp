@@ -452,7 +452,7 @@ WRITE8_MEMBER(taitol_state::bank3_w)
 	bank_w(space, offset, data, 3);
 }
 
-WRITE8_MEMBER(taitol_2cpu_state::control2_w)
+WRITE8_MEMBER(taitol_state::coin_control_w)
 {
 	machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
 	machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
@@ -519,7 +519,7 @@ WRITE8_MEMBER(taitol_2cpu_state::mux_w)
 	switch (m_mux_ctrl)
 	{
 	case 4:
-		control2_w(space, 0, data);
+		coin_control_w(space, 0, data);
 		break;
 	default:
 		logerror("Mux write to unknown port %d, %02x (%04x)\n", m_mux_ctrl, data, space.device().safe_pc());
@@ -1671,6 +1671,7 @@ static MACHINE_CONFIG_START( fhawk )
 	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
 	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
 	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(taitol_state, coin_control_w))
 	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
 
 	MCFG_MACHINE_START_OVERRIDE(taitol_state, taito_l)
@@ -1927,6 +1928,7 @@ static MACHINE_CONFIG_START( evilston )
 	MCFG_TC0510NIO_READ_1_CB(IOPORT("DSWB"))
 	MCFG_TC0510NIO_READ_2_CB(IOPORT("IN0"))
 	MCFG_TC0510NIO_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0510NIO_WRITE_4_CB(WRITE8(taitol_state, coin_control_w))
 	MCFG_TC0510NIO_READ_7_CB(IOPORT("IN2"))
 
 	MCFG_DEVICE_ADD("dpram", MB8421, 0)

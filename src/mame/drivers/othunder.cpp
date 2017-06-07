@@ -376,6 +376,14 @@ WRITE8_MEMBER(othunder_state::eeprom_w)
 	m_eeprom->cs_write((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 }
 
+WRITE8_MEMBER(othunder_state::coins_w)
+{
+	machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
+	machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
+	machine().bookkeeping().coin_counter_w(0, data & 0x04);
+	machine().bookkeeping().coin_counter_w(1, data & 0x08);
+}
+
 
 /**********************************************************
             GAME INPUTS
@@ -674,6 +682,7 @@ static MACHINE_CONFIG_START( othunder )
 	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
 	MCFG_TC0220IOC_READ_3_CB(DEVREADLINE("eeprom", eeprom_serial_93cxx_device, do_read)) MCFG_DEVCB_BIT(7)
 	MCFG_TC0220IOC_WRITE_3_CB(WRITE8(othunder_state, eeprom_w))
+	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(othunder_state, coins_w))
 	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */

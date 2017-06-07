@@ -61,6 +61,7 @@ public:
 	DECLARE_WRITE8_MEMBER(bank1_w);
 	DECLARE_WRITE8_MEMBER(bank2_w);
 	DECLARE_WRITE8_MEMBER(bank3_w);
+	DECLARE_WRITE8_MEMBER(coin_control_w);
 	DECLARE_WRITE8_MEMBER(mcu_control_w);
 	DECLARE_READ8_MEMBER(mcu_control_r);
 	DECLARE_WRITE8_MEMBER(taitol_bankc_w);
@@ -123,7 +124,6 @@ public:
 	{
 	}
 
-	DECLARE_WRITE8_MEMBER(control2_w);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	DECLARE_READ8_MEMBER(mux_r);
 	DECLARE_WRITE8_MEMBER(mux_w);

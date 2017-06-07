@@ -66,6 +66,7 @@ tc0220ioc_device::tc0220ioc_device(const machine_config &mconfig, const char *ta
 	m_read_2_cb(*this),
 	m_read_3_cb(*this),
 	m_write_3_cb(*this),
+	m_write_4_cb(*this),
 	m_read_7_cb(*this)
 {
 }
@@ -81,6 +82,7 @@ void tc0220ioc_device::device_start()
 	m_read_2_cb.resolve_safe(0);
 	m_read_3_cb.resolve_safe(0);
 	m_write_3_cb.resolve_safe();
+	m_write_4_cb.resolve_safe();
 	m_read_7_cb.resolve_safe(0);
 
 	save_item(NAME(m_regs));
@@ -153,11 +155,7 @@ WRITE8_MEMBER( tc0220ioc_device::write )
 			break;
 
 		case 0x04:  /* coin counters and lockout, hi nibble irrelevant */
-
-			machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
-			machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
-			machine().bookkeeping().coin_counter_w(0, data & 0x04);
-			machine().bookkeeping().coin_counter_w(1, data & 0x08);
+			m_write_4_cb(data & 0x0f);
 
 //if (data & 0xf0)
 //logerror("PC %06x: warning - write %02x to TC0220IOC address %02x\n",space.device().safe_pc(),data,offset);
@@ -207,6 +205,7 @@ tc0510nio_device::tc0510nio_device(const machine_config &mconfig, const char *ta
 	m_read_2_cb(*this),
 	m_read_3_cb(*this),
 	m_write_3_cb(*this),
+	m_write_4_cb(*this),
 	m_read_7_cb(*this)
 {
 }
@@ -222,6 +221,7 @@ void tc0510nio_device::device_start()
 	m_read_2_cb.resolve_safe(0);
 	m_read_3_cb.resolve_safe(0);
 	m_write_3_cb.resolve_safe();
+	m_write_4_cb.resolve_safe();
 	m_read_7_cb.resolve_safe(0);
 
 	save_item(NAME(m_regs));
@@ -292,10 +292,7 @@ WRITE8_MEMBER( tc0510nio_device::write )
 			break;
 
 		case 0x04:  /* coin counters and lockout */
-			machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
-			machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
-			machine().bookkeeping().coin_counter_w(0, data & 0x04);
-			machine().bookkeeping().coin_counter_w(1, data & 0x08);
+			m_write_4_cb(data & 0x0f);
 			break;
 
 		default:
@@ -348,6 +345,7 @@ tc0640fio_device::tc0640fio_device(const machine_config &mconfig, const char *ta
 	m_read_1_cb(*this),
 	m_read_2_cb(*this),
 	m_read_3_cb(*this),
+	m_write_4_cb(*this),
 	m_read_7_cb(*this)
 {
 }
@@ -362,6 +360,7 @@ void tc0640fio_device::device_start()
 	m_read_1_cb.resolve_safe(0);
 	m_read_2_cb.resolve_safe(0);
 	m_read_3_cb.resolve_safe(0);
+	m_write_4_cb.resolve_safe();
 	m_read_7_cb.resolve_safe(0);
 
 	save_item(NAME(m_regs));
@@ -428,10 +427,7 @@ WRITE8_MEMBER( tc0640fio_device::write )
 			break;
 
 		case 0x04:  /* coin counters and lockout */
-			machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
-			machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
-			machine().bookkeeping().coin_counter_w(0, data & 0x04);
-			machine().bookkeeping().coin_counter_w(1, data & 0x08);
+			m_write_4_cb(data & 0x0f);
 			break;
 
 		default:
