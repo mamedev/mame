@@ -1096,7 +1096,7 @@ WRITE16_MEMBER(taitoz_state::spacegun_output_bypass_w)
 			break;
 
 		default:
-			m_tc0220ioc->write(space, offset, data);  /* might be a 510NIO ! */
+			m_tc0510nio->write(space, offset, data);
 	}
 }
 
@@ -1251,7 +1251,7 @@ READ16_MEMBER(taitoz_state::spacegun_input_bypass_r)
 			return m_eeprom->do_read() << 7;
 
 		default:
-			return m_tc0220ioc->read(space, offset); /* might be a 510NIO ! */
+			return m_tc0510nio->read(space, offset);
 	}
 }
 
@@ -3524,12 +3524,12 @@ static MACHINE_CONFIG_START( spacegun )
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_EEPROM_SERIAL_DATA(spacegun_default_eeprom, 128)
 
-	MCFG_DEVICE_ADD("tc0220ioc", TC0220IOC, 0)
-	MCFG_TC0220IOC_READ_0_CB(IOPORT("DSWA"))
-	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
-	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
-	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
-	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
+	MCFG_DEVICE_ADD("tc0510nio", TC0510NIO, 0)
+	MCFG_TC0510NIO_READ_0_CB(IOPORT("DSWA"))
+	MCFG_TC0510NIO_READ_1_CB(IOPORT("DSWB"))
+	MCFG_TC0510NIO_READ_2_CB(IOPORT("IN0"))
+	MCFG_TC0510NIO_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0510NIO_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

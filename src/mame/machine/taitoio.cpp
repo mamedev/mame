@@ -4,7 +4,7 @@
 
 TC0220IOC
 ---------
-A simple I/O interface with integrated watchdog.
+A simple I/O interface with integrated watchdog in a 80-pin flat package.
 It has four address inputs, which would suggest 16 bytes of addressing space,
 but only the first 8 seem to be used.
 
@@ -22,7 +22,7 @@ but only the first 8 seem to be used.
 
 TC0510NIO
 ---------
-Newer version of the I/O chip
+Newer QFP100 version of the I/O chip
 
 000 R  DSWA
 000  W watchdog reset
