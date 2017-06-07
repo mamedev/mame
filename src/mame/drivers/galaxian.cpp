@@ -11786,15 +11786,19 @@ ROM_START( victoryc )
 	ROM_LOAD( "PROM.6L",       0x0000, 0x0020, CRC(25329e5a) SHA1(aff60d02aa4d1d5f16e2d32155c315deee8b4089) )
 ROM_END
 
-/* Despite having an extra rom, which appears bad, it looks like the code here is simply a decrypted version of the above.
-   The game doesn't run the same as the parent due to what looks like bitrot.  */
+/* The bootleg is just a decrypted version of the above, although there was an additional rom '5' on the bootleg PCB
+   The extra rom contains a repeating pattern and looks like it might be a bad dump, but doesn't even seem to be used
+   by the game.  It is not the result of applying the decryption process to blank data either.
+
+   The PCB had a Laboratorios F.A.R. sticker on it, this might have been a distributor rather than the manufacturer tho.
+*/
 ROM_START( victorycb )
 	ROM_REGION( 0x4000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "v1.bin",    0x0000, 0x0800, CRC(de985696) SHA1(20f5cb7b9efd9f1a2896eb65fe5c54e0ffb1f61f) )
 	ROM_LOAD( "v2.bin",    0x0800, 0x0800, CRC(59042c1e) SHA1(94498ca14f66c8f5ae9a08b0d7c057f033ccfb3b) )
-	ROM_LOAD( "v3.bin",    0x1000, 0x0800, BAD_DUMP CRC(7d97ba95) SHA1(e8eded12e746555d4e054962987f34d9472e4357) ) // 1552 - bit 0 bitrot (1->0)?
-	ROM_LOAD( "v4.bin",    0x1800, 0x0800, BAD_DUMP CRC(5d6ecd2b) SHA1(b9ae9414410eb83875707265e866375b9316f79c) ) // 1dd4, 1e7b, 1f1c - bit 7 bitrot (1->0)?
-	ROM_LOAD( "v5.bin",    0x2000, 0x0800, BAD_DUMP CRC(f60be3be) SHA1(ef45bec22db10c485ae2ddf5723c5cf241edb823) ) // bad? unused? there was no rom here on the original tho
+	ROM_LOAD( "v3.bin",    0x1000, 0x0800, CRC(ca3a6965) SHA1(36ba8659a1fb616f2247eb1b50c67c2c45723a68) )
+	ROM_LOAD( "v4.bin",    0x1800, 0x0800, CRC(16b47fad) SHA1(8af840f3fd523283a605005f6a91ad2ea10be04b) )
+	ROM_LOAD( "v5.bin",    0x2000, 0x0800, BAD_DUMP CRC(f60be3be) SHA1(ef45bec22db10c485ae2ddf5723c5cf241edb823) ) // unused? there was no rom5 on the original
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
 	ROM_LOAD( "v6.bin",       0x0000, 0x0800, CRC(15e98c93) SHA1(af273ec2df93b78b439d4aff649eb4b6c6d05ee3) )
@@ -11861,7 +11865,7 @@ GAME( 19??, omegab,      theend,   galaxian,   omegab,     galaxian_state, galax
 
 /* basic hardware + extra RAM */
 GAME( 1982, victoryc,    0,        galaxian,   victoryc,   galaxian_state, victoryc,   ROT270, "Comsoft", "Victory (Comsoft)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, victorycb,   victoryc, galaxian,   victoryc,   galaxian_state, victorycb,  ROT270, "bootleg", "Victory (Comsoft) (bootleg)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1982, victorycb,   victoryc, galaxian,   victoryc,   galaxian_state, victorycb,  ROT270, "bootleg", "Victory (Comsoft) (bootleg)", MACHINE_SUPPORTS_SAVE )
 
 /* these games require the coin lockout mechanism to be disabled */
 GAME( 1981, warofbug,    0,        galaxian,   warofbug,   galaxian_state, nolock,     ROT90,  "Armenia / Food and Fun Corp", "War of the Bugs or Monsterous Manouvers in a Mushroom Maze", MACHINE_SUPPORTS_SAVE )
