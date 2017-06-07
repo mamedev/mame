@@ -715,7 +715,7 @@ void t10mmc::ReadData( uint8_t *data, int dataLength )
 			case 0xe:   // CD Audio control page
 				data[0] = 0x8e; // page E, parameter is savable
 				data[1] = 0x0e; // page length
-				data[2] = (1 << 2) || (m_sotc << 1); // IMMED = 1
+				data[2] = (1 << 2) | (m_sotc << 1); // IMMED = 1
 				data[3] = data[4] = data[5] = data[6] = data[7] = 0; // reserved
 
 				// connect each audio channel to 1 output port
