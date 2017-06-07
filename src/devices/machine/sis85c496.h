@@ -40,15 +40,17 @@ public:
 	void set_ram_size(int ram_size);
 
 	DECLARE_READ8_MEMBER (dram_config_r) { return m_dram_config; }
-	DECLARE_WRITE8_MEMBER(dram_config_w) { m_dram_config = data; reset_all_mappings(); }
+	DECLARE_WRITE8_MEMBER(dram_config_w) { m_dram_config = data; remap_cb(); }
 	DECLARE_READ8_MEMBER (bios_config_r) { return m_bios_config; }
-	DECLARE_WRITE8_MEMBER(bios_config_w) { m_bios_config = data; reset_all_mappings(); }
+	DECLARE_WRITE8_MEMBER(bios_config_w) { m_bios_config = data; remap_cb(); }
 	DECLARE_READ32_MEMBER(mailbox_r)     { return m_mailbox; }
 	DECLARE_WRITE32_MEMBER(mailbox_w)    { COMBINE_DATA(&m_mailbox); }
 	DECLARE_READ8_MEMBER (isa_decoder_r) { return m_isa_decoder; }
-	DECLARE_WRITE8_MEMBER(isa_decoder_w) { m_isa_decoder = data; reset_all_mappings(); }
+	DECLARE_WRITE8_MEMBER(isa_decoder_w) { m_isa_decoder = data; remap_cb(); }
 	DECLARE_READ16_MEMBER(shadow_config_r) { return m_shadctrl; }
-	DECLARE_WRITE16_MEMBER(shadow_config_w) { COMBINE_DATA(&m_shadctrl); printf("Shadow RAM control now %04x\n", m_shadctrl); reset_all_mappings(); }
+	DECLARE_WRITE16_MEMBER(shadow_config_w) { COMBINE_DATA(&m_shadctrl); logerror("SiS496: %04x to shadow control\n", m_shadctrl); remap_cb(); }
+	DECLARE_READ8_MEMBER (smram_ctrl_r) { return m_smramctrl; }
+	DECLARE_WRITE8_MEMBER(smram_ctrl_w) { m_smramctrl = data; remap_cb(); }
 	
 	virtual void reset_all_mappings() override;
 
@@ -111,7 +113,7 @@ protected:
 	virtual void device_reset() override;
 	
 	void map_bios(address_space *memory_space, uint32_t start, uint32_t end);
-
+	void map_shadowram(address_space *memory_space, offs_t addrstart, offs_t addrend, void *baseptr);
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -146,6 +148,7 @@ private:
 	uint32_t m_mailbox;
 	uint8_t m_bios_config, m_dram_config, m_isa_decoder;
 	uint16_t m_shadctrl;
+	uint8_t m_smramctrl;
 };
 
 DECLARE_DEVICE_TYPE(SIS85C496, sis85c496_host_device)
