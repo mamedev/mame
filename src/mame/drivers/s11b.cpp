@@ -14,6 +14,7 @@
       nvram is cleared beforehand or not, and whether the last reset was soft or hard.
     - Black Knight 2000 LG-1 set reports U26 ROM FAILURE. Bad/hacked dump or original bug?
     - Advance button doesn't seem to work well (TODO: check if this may have been fixed with the irq and diagnostic button masking changes)
+    - Jokerz has an entirely different "Pin Sound '88" stereo audio board (D-12338-567)
 
     Known keys necessary to get games to start (so the proper number of balls are detected):
     - Black Knight 2000: Hold "D" "F" "Y" and press "1" after inserting 1 or more credits. press 'x' to get the main music started.
