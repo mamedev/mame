@@ -126,7 +126,7 @@ namespace
 		// methods
 		void set_select(uint8_t new_select);
 		DECLARE_WRITE8_MEMBER(ff7f_write);
-		void update_line(int slot_number, line line);
+		void update_line(int slot_number, line ln);
 	};
 };
 
