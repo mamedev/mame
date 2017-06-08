@@ -680,7 +680,6 @@ static ADDRESS_MAP_START( magicard_mem, AS_PROGRAM, 16, magicard_state )
 	AM_RANGE(0x001ffd00, 0x001ffd01) AM_MIRROR(0x7fe00000) AM_DEVWRITE8("ramdac", ramdac_device, index_w, 0x00ff)
 	AM_RANGE(0x001ffd02, 0x001ffd03) AM_MIRROR(0x7fe00000) AM_DEVWRITE8("ramdac", ramdac_device, pal_w, 0x00ff)
 	AM_RANGE(0x001ffd04, 0x001ffd05) AM_MIRROR(0x7fe00000) AM_DEVWRITE8("ramdac", ramdac_device, mask_w, 0x00ff)
-	/*not the right sound chip,unknown type,it should be an ADPCM with 8 channels.*/
 	AM_RANGE(0x001ffd40, 0x001ffd43) AM_MIRROR(0x7fe00000) AM_DEVWRITE8("saa", saa1099_device, write, 0x00ff)
 	AM_RANGE(0x001ffd80, 0x001ffd81) AM_MIRROR(0x7fe00000) AM_READ(test_r)
 	AM_RANGE(0x001ffd80, 0x001ffd81) AM_MIRROR(0x7fe00000) AM_WRITENOP //?
@@ -695,7 +694,6 @@ static ADDRESS_MAP_START( hotslots_mem, AS_PROGRAM, 16, magicard_state )
 	AM_RANGE(0x00600000, 0x007ffbff) AM_RAM AM_SHARE("magicramb")
 	AM_RANGE(0x001ffc00, 0x001ffc01) AM_MIRROR(0x7fe00000) AM_READ(test_r)
 	AM_RANGE(0x001ffc40, 0x001ffc41) AM_MIRROR(0x7fe00000) AM_READ(test_r)
-	/*not the right sound chip,unknown type,it should be an ADPCM with 8 channels.*/
 	AM_RANGE(0x001ffd40, 0x001ffd43) AM_MIRROR(0x7fe00000) AM_DEVWRITE8("saa", saa1099_device, write, 0x00ff)
 	AM_RANGE(0x001ffd80, 0x001ffd81) AM_MIRROR(0x7fe00000) AM_READ(test_r)
 	AM_RANGE(0x001ffd80, 0x001ffd81) AM_MIRROR(0x7fe00000) AM_WRITENOP //?

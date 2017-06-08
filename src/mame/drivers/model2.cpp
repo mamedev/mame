@@ -13,7 +13,6 @@
     - all Model 2B games: FIFO comms looks way wrong, and 3d is mostly missing/incomplete. Games also tends to stalls at some point, culprit might be when i960 tries
       to use a burst type opcode read;
     - Inputs needs device-ification and clean-ups;
-    - Sound comms actually passes thru a 8251-compatible device, hook it up;
     - daytona: runs at half speed in gameplay;
     - desert: several 3d bugs, presumably down to FIFO;
     - dynamcop: stalls at stage select screen;
