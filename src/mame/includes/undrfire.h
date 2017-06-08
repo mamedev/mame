@@ -43,7 +43,6 @@ public:
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	optional_shared_ptr<uint32_t> m_ram;
 	optional_shared_ptr<uint32_t> m_shared_ram;
-	uint16_t m_coin_word;
 	uint16_t m_port_sel;
 	int m_frame_counter;
 	std::unique_ptr<uf_tempsprite[]> m_spritelist;
