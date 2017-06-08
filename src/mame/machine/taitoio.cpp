@@ -183,7 +183,8 @@ READ8_MEMBER( tc0040ioc_device::portreg_r )
 
 WRITE8_MEMBER( tc0040ioc_device::portreg_w )
 {
-	m_regs[m_port] = data;
+	if (m_port < ARRAY_LENGTH(m_regs))
+		m_regs[m_port] = data;
 	switch (m_port)
 	{
 		case 0x04:  /* coin counters and lockout, hi nibble irrelevant */
