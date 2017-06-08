@@ -103,7 +103,7 @@ namespace
 		uint8_t                                 m_tms7000_portb;
 		uint8_t                                 m_tms7000_portc;
 		uint8_t                                 m_tms7000_portd;
-		emu_timer								*m_timer;
+		emu_timer                               *m_timer;
 		required_device<cpu_device>             m_tms7040;
 		required_device<ram_device>             m_staticram;
 		required_device<ay8910_device>          m_ay;
