@@ -350,7 +350,7 @@ namespace
 		}
 
 		template<typename TStr>
-		void remove(TStr str)
+		void remove(const TStr &str)
 		{
 			auto iter = std::find_if(
 				m_vec.begin(),

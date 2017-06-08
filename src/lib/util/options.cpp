@@ -112,10 +112,7 @@ core_options::entry::entry(std::vector<std::string> &&names, core_options::optio
 	, m_type(type)
 	, m_description(description)
 {
-	if (type == option_type::HEADER)
-		assert(m_names.size() == 0);
-	else
-		assert(m_names.size() > 0);
+	assert(m_names.empty() == (m_type == option_type::HEADER));
 }
 
 core_options::entry::entry(std::string &&name, core_options::option_type type, const char *description)
@@ -186,8 +183,6 @@ void core_options::entry::validate(const std::string &data)
 {
 	float fval;
 	int ival;
-	int minimum_integer, maximum_integer;
-	float minimum_float, maximum_float;
 
 	switch (type())
 	{
@@ -205,8 +200,8 @@ void core_options::entry::validate(const std::string &data)
 		// range checking
 		if (has_range())
 		{
-			minimum_integer = atoi(minimum());
-			maximum_integer = atoi(maximum());
+			int minimum_integer = atoi(minimum());
+			int maximum_integer = atoi(maximum());
 			if (ival < minimum_integer || ival > maximum_integer)
 				throw options_warning_exception("Out-of-range integer value for %s: \"%s\" (must be between %d and %d); reverting to %s\n", name(), data, minimum_integer, maximum_integer, value());
 		}
@@ -219,8 +214,8 @@ void core_options::entry::validate(const std::string &data)
 		// range checking
 		if (has_range())
 		{
-			minimum_float = atof(minimum());
-			maximum_float = atof(maximum());
+			float minimum_float = atof(minimum());
+			float maximum_float = atof(maximum());
 			if (fval < minimum_float || fval > maximum_float)
 				throw options_warning_exception("Out-of-range float value for %s: \"%s\" (must be between %f and %f); reverting to %s\n", name(), data, minimum_float, maximum_float, value());
 		}
@@ -1024,8 +1019,8 @@ bool core_options::header_exists(const char *description) const
 		[description](const auto &entry)
 		{
 			return entry->type() == option_type::HEADER
-				&& entry->description()
-				&& !strcmp(entry->description(), description);
+					&& entry->description()
+					&& !strcmp(entry->description(), description);
 		});
 
 	return iter != m_entries.end();
