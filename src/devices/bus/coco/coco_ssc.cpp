@@ -40,7 +40,7 @@
 #include "cococart.h"
 #include "machine/ram.h"
 
-#define LOG_SSC 1
+#define LOG_SSC 0
 #define PIC_TAG "pic7040"
 #define AY_TAG "cocossc_ay"
 #define SP0256_TAG "sp0256"
