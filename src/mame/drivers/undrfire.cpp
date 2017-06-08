@@ -194,6 +194,7 @@ Board contains only 29 ROMs and not much else.
 
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"
+#include "machine/taitoio.h"
 #include "machine/watchdog.h"
 #include "sound/es5506.h"
 #include "screen.h"
