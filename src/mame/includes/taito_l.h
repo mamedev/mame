@@ -115,19 +115,10 @@ public:
 		, m_audio_cpu(*this, "audiocpu")
 		, m_audio_prg(*this, "audiocpu")
 		, m_audio_bnk(*this, "bank7")
-		, m_dswa(*this, "DSWA")
-		, m_dswb(*this, "DSWB")
-		, m_in0(*this, "IN0")
-		, m_in1(*this, "IN1")
-		, m_in2(*this, "IN2")
-		, m_mux_ctrl(0)
 	{
 	}
 
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
-	DECLARE_READ8_MEMBER(mux_r);
-	DECLARE_WRITE8_MEMBER(mux_w);
-	DECLARE_WRITE8_MEMBER(mux_ctrl_w);
 
 protected:
 	virtual void state_register() override;
@@ -136,14 +127,6 @@ protected:
 	required_device<cpu_device> m_audio_cpu;
 	required_region_ptr<u8>     m_audio_prg;
 	optional_memory_bank        m_audio_bnk;
-
-	required_ioport             m_dswa;
-	required_ioport             m_dswb;
-	required_ioport             m_in0;
-	required_ioport             m_in1;
-	required_ioport             m_in2;
-
-	u8  m_mux_ctrl;
 };
 
 

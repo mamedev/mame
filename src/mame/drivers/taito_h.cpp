@@ -167,9 +167,9 @@ some kind of zoom table?
 
 READ8_MEMBER(taitoh_state::syvalion_input_bypass_r)
 {
-	/* Bypass TC0220IOC controller for analog input */
+	/* Bypass TC0040IOC controller for analog input */
 
-	uint8_t   port = m_tc0220ioc->port_r(space, 0); /* read port number */
+	uint8_t   port = m_tc0040ioc->port_r(space, 0); /* read port number */
 
 	switch( port )
 	{
@@ -210,7 +210,7 @@ READ8_MEMBER(taitoh_state::syvalion_input_bypass_r)
 				return 0x00;
 
 		default:
-			return m_tc0220ioc->portreg_r(space, offset);
+			return m_tc0040ioc->portreg_r(space, offset);
 	}
 }
 
@@ -237,8 +237,8 @@ WRITE8_MEMBER(taitoh_state::coin_control_w)
 static ADDRESS_MAP_START( syvalion_map, AS_PROGRAM, 16, taitoh_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_MIRROR(0x010000) AM_RAM AM_SHARE("m68000_mainram")
-	AM_RANGE(0x200000, 0x200001) AM_READ8(syvalion_input_bypass_r, 0x00ff) AM_DEVWRITE8("tc0220ioc", tc0220ioc_device, portreg_w, 0x00ff)
-	AM_RANGE(0x200002, 0x200003) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, port_r, port_w, 0x00ff)
+	AM_RANGE(0x200000, 0x200001) AM_READ8(syvalion_input_bypass_r, 0x00ff) AM_DEVWRITE8("tc0040ioc", tc0040ioc_device, portreg_w, 0x00ff)
+	AM_RANGE(0x200002, 0x200003) AM_DEVREADWRITE8("tc0040ioc", tc0040ioc_device, port_r, port_w, 0x00ff)
 	AM_RANGE(0x300000, 0x300001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0x00ff)
 	AM_RANGE(0x300002, 0x300003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0x00ff)
 	AM_RANGE(0x400000, 0x420fff) AM_DEVREADWRITE("tc0080vco", tc0080vco_device, word_r, word_w)
@@ -248,8 +248,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( recordbr_map, AS_PROGRAM, 16, taitoh_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_MIRROR(0x010000) AM_RAM AM_SHARE("m68000_mainram")
-	AM_RANGE(0x200000, 0x200001) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, portreg_r, portreg_w, 0x00ff)
-	AM_RANGE(0x200002, 0x200003) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, port_r, port_w, 0x00ff)
+	AM_RANGE(0x200000, 0x200003) AM_DEVREADWRITE8("tc0040ioc", tc0040ioc_device, read, write, 0x00ff)
 	AM_RANGE(0x300000, 0x300001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0x00ff)
 	AM_RANGE(0x300002, 0x300003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0x00ff)
 	AM_RANGE(0x400000, 0x420fff) AM_DEVREADWRITE("tc0080vco", tc0080vco_device, word_r, word_w)
@@ -261,8 +260,7 @@ static ADDRESS_MAP_START( tetristh_map, AS_PROGRAM, 16, taitoh_state )
 	AM_RANGE(0x100000, 0x10ffff) AM_MIRROR(0x010000) AM_RAM AM_SHARE("m68000_mainram")
 	AM_RANGE(0x200000, 0x200001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0x00ff)
 	AM_RANGE(0x200002, 0x200003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0x00ff)
-	AM_RANGE(0x300000, 0x300001) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, portreg_r, portreg_w, 0x00ff)
-	AM_RANGE(0x300002, 0x300003) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, port_r, port_w, 0x00ff)
+	AM_RANGE(0x300000, 0x300003) AM_DEVREADWRITE8("tc0040ioc", tc0040ioc_device, read, write, 0x00ff)
 	AM_RANGE(0x400000, 0x420fff) AM_DEVREADWRITE("tc0080vco", tc0080vco_device, word_r, word_w)
 	AM_RANGE(0x500800, 0x500fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 ADDRESS_MAP_END
@@ -649,13 +647,13 @@ static MACHINE_CONFIG_START( syvalion )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_DEVICE_ADD("tc0220ioc", TC0220IOC, 0)
-	MCFG_TC0220IOC_READ_0_CB(IOPORT("DSWA"))
-	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
-	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
-	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
-	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(taitoh_state, coin_control_w))
-	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
+	MCFG_DEVICE_ADD("tc0040ioc", TC0040IOC, 0)
+	MCFG_TC0040IOC_READ_0_CB(IOPORT("DSWA"))
+	MCFG_TC0040IOC_READ_1_CB(IOPORT("DSWB"))
+	MCFG_TC0040IOC_READ_2_CB(IOPORT("IN0"))
+	MCFG_TC0040IOC_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0040IOC_WRITE_4_CB(WRITE8(taitoh_state, coin_control_w))
+	MCFG_TC0040IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -705,13 +703,13 @@ static MACHINE_CONFIG_START( recordbr )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_DEVICE_ADD("tc0220ioc", TC0220IOC, 0)
-	MCFG_TC0220IOC_READ_0_CB(IOPORT("DSWA"))
-	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
-	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
-	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
-	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(taitoh_state, coin_control_w))
-	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
+	MCFG_DEVICE_ADD("tc0040ioc", TC0040IOC, 0)
+	MCFG_TC0040IOC_READ_0_CB(IOPORT("DSWA"))
+	MCFG_TC0040IOC_READ_1_CB(IOPORT("DSWB"))
+	MCFG_TC0040IOC_READ_2_CB(IOPORT("IN0"))
+	MCFG_TC0040IOC_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0040IOC_WRITE_4_CB(WRITE8(taitoh_state, coin_control_w))
+	MCFG_TC0040IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

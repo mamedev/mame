@@ -1106,9 +1106,9 @@ CUSTOM_INPUT_MEMBER(taitoz_state::taitoz_pedal_r)
 
 READ8_MEMBER(taitoz_state::contcirc_input_bypass_r)
 {
-	/* Bypass TC0220IOC controller for analog input */
+	/* Bypass TC0040IOC controller for analog input */
 
-	uint8_t port = m_tc0220ioc->port_r(space, 0);   /* read port number */
+	uint8_t port = m_tc0040ioc->port_r(space, 0);   /* read port number */
 	uint16_t steer = 0xff80 + m_steer.read_safe(0x80);
 
 	switch (port)
@@ -1120,16 +1120,16 @@ READ8_MEMBER(taitoz_state::contcirc_input_bypass_r)
 			return steer >> 8;
 
 		default:
-			return m_tc0220ioc->portreg_r(space, offset);
+			return m_tc0040ioc->portreg_r(space, offset);
 	}
 }
 
 
 READ8_MEMBER(taitoz_state::chasehq_input_bypass_r)
 {
-	/* Bypass TC0220IOC controller for extra inputs */
+	/* Bypass TC0040IOC controller for extra inputs */
 
-	uint8_t port = m_tc0220ioc->port_r(space, 0);   /* read port number */
+	uint8_t port = m_tc0040ioc->port_r(space, 0);   /* read port number */
 	uint16_t steer = 0xff80 + m_steer.read_safe(0x80);
 
 	switch (port)
@@ -1153,7 +1153,7 @@ READ8_MEMBER(taitoz_state::chasehq_input_bypass_r)
 			return steer >> 8;
 
 		default:
-			return m_tc0220ioc->portreg_r(space, offset);
+			return m_tc0040ioc->portreg_r(space, offset);
 	}
 }
 
@@ -1472,8 +1472,8 @@ static ADDRESS_MAP_START( contcirc_cpub_map, AS_PROGRAM, 16, taitoz_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x083fff) AM_RAM
 	AM_RANGE(0x084000, 0x087fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x100000, 0x100001) AM_READ8(contcirc_input_bypass_r, 0x00ff) AM_DEVWRITE8("tc0220ioc", tc0220ioc_device, portreg_w, 0x00ff)
-	AM_RANGE(0x100002, 0x100003) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, port_r, port_w, 0x00ff) /* (actually game uses TC040IOC) */
+	AM_RANGE(0x100000, 0x100001) AM_READ8(contcirc_input_bypass_r, 0x00ff) AM_DEVWRITE8("tc0040ioc", tc0040ioc_device, portreg_w, 0x00ff)
+	AM_RANGE(0x100002, 0x100003) AM_DEVREADWRITE8("tc0040ioc", tc0040ioc_device, watchdog_r, port_w, 0x00ff)
 	AM_RANGE(0x200000, 0x200003) AM_READWRITE(taitoz_sound_r, taitoz_sound_w)
 ADDRESS_MAP_END
 
@@ -1483,8 +1483,8 @@ static ADDRESS_MAP_START( chasehq_map, AS_PROGRAM, 16, taitoz_state )
 	AM_RANGE(0x100000, 0x107fff) AM_RAM
 	AM_RANGE(0x108000, 0x10bfff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x10c000, 0x10ffff) AM_RAM
-	AM_RANGE(0x400000, 0x400001) AM_READ8(chasehq_input_bypass_r, 0x00ff) AM_DEVWRITE8("tc0220ioc", tc0220ioc_device, portreg_w, 0x00ff)
-	AM_RANGE(0x400002, 0x400003) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, port_r, port_w, 0x00ff)
+	AM_RANGE(0x400000, 0x400001) AM_READ8(chasehq_input_bypass_r, 0x00ff) AM_DEVWRITE8("tc0040ioc", tc0040ioc_device, portreg_w, 0x00ff)
+	AM_RANGE(0x400002, 0x400003) AM_DEVREADWRITE8("tc0040ioc", tc0040ioc_device, watchdog_r, port_w, 0x00ff)
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(chasehq_cpua_ctrl_w)
 	AM_RANGE(0x820000, 0x820003) AM_READWRITE(taitoz_sound_r, taitoz_sound_w)
 	AM_RANGE(0xa00000, 0xa00007) AM_DEVREADWRITE("tc0110pcr", tc0110pcr_device, word_r, step1_word_w)  /* palette */
@@ -1519,8 +1519,7 @@ static ADDRESS_MAP_START( enforce_cpub_map, AS_PROGRAM, 16, taitoz_state )
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
 	AM_RANGE(0x104000, 0x107fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x200000, 0x200003) AM_READWRITE(taitoz_sound_r, taitoz_sound_w)
-	AM_RANGE(0x300000, 0x300001) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, portreg_r, portreg_w, 0x00ff)
-	AM_RANGE(0x300002, 0x300003) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, port_r, port_w, 0x00ff)
+	AM_RANGE(0x300000, 0x300003) AM_DEVREADWRITE8("tc0040ioc", tc0040ioc_device, read, write, 0x00ff)
 ADDRESS_MAP_END
 
 
@@ -2962,13 +2961,13 @@ static MACHINE_CONFIG_START( contcirc )
 	MCFG_MACHINE_START_OVERRIDE(taitoz_state,taitoz)
 	MCFG_MACHINE_RESET_OVERRIDE(taitoz_state,taitoz)
 
-	MCFG_DEVICE_ADD("tc0220ioc", TC0220IOC, 0)
-	MCFG_TC0220IOC_READ_0_CB(IOPORT("DSWA"))
-	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
-	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
-	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
-	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(taitoz_state, coin_control_w))
-	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
+	MCFG_DEVICE_ADD("tc0040ioc", TC0040IOC, 0)
+	MCFG_TC0040IOC_READ_0_CB(IOPORT("DSWA"))
+	MCFG_TC0040IOC_READ_1_CB(IOPORT("DSWB"))
+	MCFG_TC0040IOC_READ_2_CB(IOPORT("IN0"))
+	MCFG_TC0040IOC_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0040IOC_WRITE_4_CB(WRITE8(taitoz_state, coin_control_w))
+	MCFG_TC0040IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3041,13 +3040,13 @@ static MACHINE_CONFIG_START( chasehq )
 	MCFG_MACHINE_START_OVERRIDE(taitoz_state,taitoz)
 	MCFG_MACHINE_RESET_OVERRIDE(taitoz_state,taitoz)
 
-	MCFG_DEVICE_ADD("tc0220ioc", TC0220IOC, 0)
-	MCFG_TC0220IOC_READ_0_CB(IOPORT("DSWA"))
-	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
-	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
-	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
-	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(taitoz_state, coin_control_w))
-	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
+	MCFG_DEVICE_ADD("tc0040ioc", TC0040IOC, 0)
+	MCFG_TC0040IOC_READ_0_CB(IOPORT("DSWA"))
+	MCFG_TC0040IOC_READ_1_CB(IOPORT("DSWB"))
+	MCFG_TC0040IOC_READ_2_CB(IOPORT("IN0"))
+	MCFG_TC0040IOC_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0040IOC_WRITE_4_CB(WRITE8(taitoz_state, coin_control_w))
+	MCFG_TC0040IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3122,13 +3121,13 @@ static MACHINE_CONFIG_START( enforce )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_DEVICE_ADD("tc0220ioc", TC0220IOC, 0)
-	MCFG_TC0220IOC_READ_0_CB(IOPORT("DSWA"))
-	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
-	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
-	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
-	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(taitoz_state, coin_control_w))
-	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
+	MCFG_DEVICE_ADD("tc0040ioc", TC0040IOC, 0)
+	MCFG_TC0040IOC_READ_0_CB(IOPORT("DSWA"))
+	MCFG_TC0040IOC_READ_1_CB(IOPORT("DSWB"))
+	MCFG_TC0040IOC_READ_2_CB(IOPORT("IN0"))
+	MCFG_TC0040IOC_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0040IOC_WRITE_4_CB(WRITE8(taitoz_state, coin_control_w))
+	MCFG_TC0040IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

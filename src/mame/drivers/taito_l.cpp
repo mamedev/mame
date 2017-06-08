@@ -134,8 +134,6 @@ void taitol_state::state_register()
 void taitol_2cpu_state::state_register()
 {
 	taitol_state::state_register();
-
-	save_item(NAME(m_mux_ctrl));
 }
 
 void fhawk_state::state_register()
@@ -205,8 +203,6 @@ void taitol_state::taito_machine_reset()
 void taitol_2cpu_state::taito_machine_reset()
 {
 	taitol_state::taito_machine_reset();
-
-	m_mux_ctrl = 0;
 }
 
 void fhawk_state::taito_machine_reset()
@@ -494,43 +490,6 @@ WRITE8_MEMBER(taitol_state::sound_w)
 }
 #endif
 
-READ8_MEMBER(taitol_2cpu_state::mux_r)
-{
-	switch (m_mux_ctrl)
-	{
-	case 0:
-		return m_dswa->read();
-	case 1:
-		return m_dswb->read();
-	case 2:
-		return m_in0->read();
-	case 3:
-		return m_in1->read();
-	case 7:
-		return m_in2->read();
-	default:
-		logerror("Mux read from unknown port %d (%04x)\n", m_mux_ctrl, space.device().safe_pc());
-		return 0xff;
-	}
-}
-
-WRITE8_MEMBER(taitol_2cpu_state::mux_w)
-{
-	switch (m_mux_ctrl)
-	{
-	case 4:
-		coin_control_w(space, 0, data);
-		break;
-	default:
-		logerror("Mux write to unknown port %d, %02x (%04x)\n", m_mux_ctrl, data, space.device().safe_pc());
-	}
-}
-
-WRITE8_MEMBER(taitol_2cpu_state::mux_ctrl_w)
-{
-	m_mux_ctrl = data;
-}
-
 
 WRITE_LINE_MEMBER(champwr_state::msm5205_vck)
 {
@@ -644,8 +603,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( raimais_map, AS_PROGRAM, 8, taitol_2cpu_state )
 	COMMON_BANKS_MAP
 	AM_RANGE(0x8000, 0x87ff) AM_DEVREADWRITE("dpram", mb8421_device, right_r, right_w)
-	AM_RANGE(0x8800, 0x8800) AM_READWRITE(mux_r, mux_w)
-	AM_RANGE(0x8801, 0x8801) AM_WRITE(mux_ctrl_w) AM_READNOP    // Watchdog or interrupt ack (value ignored)
+	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE("tc0040ioc", tc0040ioc_device, read, write)
 	AM_RANGE(0x8c00, 0x8c00) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_device, master_port_w)
 	AM_RANGE(0x8c01, 0x8c01) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w)
 	AM_RANGE(0xa000, 0xbfff) AM_RAM
@@ -714,8 +672,7 @@ static ADDRESS_MAP_START( kurikint_map, AS_PROGRAM, 8, taitol_2cpu_state )
 	COMMON_BANKS_MAP
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xa7ff) AM_DEVREADWRITE("dpram", mb8421_device, right_r, right_w)
-	AM_RANGE(0xa800, 0xa800) AM_READWRITE(mux_r, mux_w)
-	AM_RANGE(0xa801, 0xa801) AM_WRITE(mux_ctrl_w) AM_READNOP    // Watchdog or interrupt ack (value ignored)
+	AM_RANGE(0xa800, 0xa801) AM_DEVREADWRITE("tc0040ioc", tc0040ioc_device, read, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kurikint_2_map, AS_PROGRAM, 8, taitol_2cpu_state )
@@ -1747,7 +1704,14 @@ static MACHINE_CONFIG_DERIVED( raimais, fhawk )
 	MCFG_CPU_MODIFY("slave")
 	MCFG_CPU_PROGRAM_MAP(raimais_2_map)
 
-	MCFG_DEVICE_REMOVE("tc0220ioc") // I/O chip is a TC0040IOC
+	MCFG_DEVICE_REMOVE("tc0220ioc")
+	MCFG_DEVICE_ADD("tc0040ioc", TC0040IOC, 0)
+	MCFG_TC0040IOC_READ_0_CB(IOPORT("DSWA"))
+	MCFG_TC0040IOC_READ_1_CB(IOPORT("DSWB"))
+	MCFG_TC0040IOC_READ_2_CB(IOPORT("IN0"))
+	MCFG_TC0040IOC_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0040IOC_WRITE_4_CB(WRITE8(taitol_state, coin_control_w))
+	MCFG_TC0040IOC_READ_7_CB(IOPORT("IN2"))
 
 	MCFG_DEVICE_ADD("dpram", MB8421, 0)
 
@@ -1776,6 +1740,14 @@ static MACHINE_CONFIG_START( kurikint )
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_DEVICE_ADD("dpram", MB8421, 0)
+
+	MCFG_DEVICE_ADD("tc0040ioc", TC0040IOC, 0)
+	MCFG_TC0040IOC_READ_0_CB(IOPORT("DSWA"))
+	MCFG_TC0040IOC_READ_1_CB(IOPORT("DSWB"))
+	MCFG_TC0040IOC_READ_2_CB(IOPORT("IN0"))
+	MCFG_TC0040IOC_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0040IOC_WRITE_4_CB(WRITE8(taitol_state, coin_control_w))
+	MCFG_TC0040IOC_READ_7_CB(IOPORT("IN2"))
 
 	MCFG_MACHINE_START_OVERRIDE(taitol_state, taito_l)
 	MCFG_MACHINE_RESET_OVERRIDE(taitol_state, taito_l)

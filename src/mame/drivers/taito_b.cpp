@@ -502,8 +502,7 @@ static ADDRESS_MAP_START( tetrista_map, AS_PROGRAM, 16, taitob_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x200000, 0x201fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	TC0180VCU_MEMRW( 0x400000 )
-	AM_RANGE(0x600000, 0x600001) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, portreg_r, portreg_w, 0xff00)
-	AM_RANGE(0x600002, 0x600003) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, port_r, port_w, 0xff00)
+	AM_RANGE(0x600000, 0x600003) AM_DEVREADWRITE8("tc0040ioc", tc0040ioc_device, read, write, 0xff00)
 	AM_RANGE(0x800000, 0x803fff) AM_RAM /* Main RAM */
 	AM_RANGE(0xa00000, 0xa00001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0xff00)
 	AM_RANGE(0xa00002, 0xa00003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0xff00)
@@ -623,8 +622,7 @@ static ADDRESS_MAP_START( masterw_map, AS_PROGRAM, 16, taitob_state )
 	AM_RANGE(0x200000, 0x203fff) AM_RAM /* Main RAM */
 	TC0180VCU_MEMRW( 0x400000 )
 	AM_RANGE(0x600000, 0x601fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, portreg_r, portreg_w, 0xff00)
-	AM_RANGE(0x800002, 0x800003) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, port_r, port_w, 0xff00)
+	AM_RANGE(0x800000, 0x800003) AM_DEVREADWRITE8("tc0040ioc", tc0040ioc_device, read, write, 0xff00)
 	AM_RANGE(0xa00000, 0xa00001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0xff00)
 	AM_RANGE(0xa00002, 0xa00003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0xff00)
 ADDRESS_MAP_END
@@ -1976,13 +1974,13 @@ static MACHINE_CONFIG_START( masterw )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_DEVICE_ADD("tc0220ioc", TC0220IOC, 0)
-	MCFG_TC0220IOC_READ_0_CB(IOPORT("DSWA"))
-	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
-	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
-	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
-	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(taitob_state, player_12_coin_ctrl_w))
-	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
+	MCFG_DEVICE_ADD("tc0040ioc", TC0040IOC, 0)
+	MCFG_TC0040IOC_READ_0_CB(IOPORT("DSWA"))
+	MCFG_TC0040IOC_READ_1_CB(IOPORT("DSWB"))
+	MCFG_TC0040IOC_READ_2_CB(IOPORT("IN0"))
+	MCFG_TC0040IOC_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0040IOC_WRITE_4_CB(WRITE8(taitob_state, player_12_coin_ctrl_w))
+	MCFG_TC0040IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
