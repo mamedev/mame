@@ -56,7 +56,7 @@ typedef delegate<void (uint8_t *)> cococart_base_update_delegate;
 // ======================> cococart_slot_device
 class device_cococart_interface;
 
-class cococart_slot_device : public device_t,
+class cococart_slot_device final : public device_t,
 								public device_slot_interface,
 								public device_image_interface
 {
