@@ -445,3 +445,11 @@ WRITE8_MEMBER( saa1099_device::data_w )
 		logerror("%s: (SAA1099 '%s') Unknown operation (reg:%02x, data:%02x)\n", machine().describe_context(), tag(), reg, data);
 	}
 }
+
+WRITE8_MEMBER(saa1099_device::write)
+{
+	if (offset & 1)
+		control_w(space, 0, data);
+	else
+		data_w(space, 0, data);
+}

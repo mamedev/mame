@@ -150,8 +150,6 @@
 
   - Inputs;
 
-  - Unknown sound chip (it's an ADPCM with eight channels);
-
   - Many unknown memory maps;
 
   - Proper memory map and machine driver for magicardj & magicle.
@@ -162,7 +160,7 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "sound/ym2413.h"
+#include "sound/saa1099.h"
 #include "video/ramdac.h"
 #include "screen.h"
 #include "speaker.h"
@@ -683,7 +681,7 @@ static ADDRESS_MAP_START( magicard_mem, AS_PROGRAM, 16, magicard_state )
 	AM_RANGE(0x001ffd02, 0x001ffd03) AM_MIRROR(0x7fe00000) AM_DEVWRITE8("ramdac", ramdac_device, pal_w, 0x00ff)
 	AM_RANGE(0x001ffd04, 0x001ffd05) AM_MIRROR(0x7fe00000) AM_DEVWRITE8("ramdac", ramdac_device, mask_w, 0x00ff)
 	/*not the right sound chip,unknown type,it should be an ADPCM with 8 channels.*/
-	AM_RANGE(0x001ffd40, 0x001ffd43) AM_MIRROR(0x7fe00000) AM_DEVWRITE8("ymsnd", ym2413_device, write, 0x00ff)
+	AM_RANGE(0x001ffd40, 0x001ffd43) AM_MIRROR(0x7fe00000) AM_DEVWRITE8("saa", saa1099_device, write, 0x00ff)
 	AM_RANGE(0x001ffd80, 0x001ffd81) AM_MIRROR(0x7fe00000) AM_READ(test_r)
 	AM_RANGE(0x001ffd80, 0x001ffd81) AM_MIRROR(0x7fe00000) AM_WRITENOP //?
 	AM_RANGE(0x001fff80, 0x001fffbf) AM_MIRROR(0x7fe00000) AM_RAM //DRAM I/O, not accessed by this game, CD buffer?
@@ -698,7 +696,7 @@ static ADDRESS_MAP_START( hotslots_mem, AS_PROGRAM, 16, magicard_state )
 	AM_RANGE(0x001ffc00, 0x001ffc01) AM_MIRROR(0x7fe00000) AM_READ(test_r)
 	AM_RANGE(0x001ffc40, 0x001ffc41) AM_MIRROR(0x7fe00000) AM_READ(test_r)
 	/*not the right sound chip,unknown type,it should be an ADPCM with 8 channels.*/
-	AM_RANGE(0x001ffd40, 0x001ffd43) AM_MIRROR(0x7fe00000) AM_DEVWRITE8("ymsnd", ym2413_device, write, 0x00ff)
+	AM_RANGE(0x001ffd40, 0x001ffd43) AM_MIRROR(0x7fe00000) AM_DEVWRITE8("saa", saa1099_device, write, 0x00ff)
 	AM_RANGE(0x001ffd80, 0x001ffd81) AM_MIRROR(0x7fe00000) AM_READ(test_r)
 	AM_RANGE(0x001ffd80, 0x001ffd81) AM_MIRROR(0x7fe00000) AM_WRITENOP //?
 	AM_RANGE(0x001fff80, 0x001fffbf) AM_MIRROR(0x7fe00000) AM_RAM //DRAM I/O, not accessed by this game, CD buffer?
@@ -767,7 +765,7 @@ static MACHINE_CONFIG_START( magicard )
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ymsnd", YM2413, CLOCK_A / 12)
+	MCFG_SOUND_ADD("saa", SAA1099, CLOCK_B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
