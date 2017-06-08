@@ -965,7 +965,7 @@ ROM_START( mc_8x6ss )
 	ROM_LOAD( "888888-in-1 (8 bit slim station, newpxp-dvt22-a pcb)(unl)[u][!].bin", 0x00000, 0x100ce1, CRC(47149d0b) SHA1(5a8733886b550e3235dd90fb415b5a602e967f91) )
 ROM_END
 
-// <!-- PXP2 8Bit Slim Station -->
+// PXP2 8Bit Slim Station
 ROM_START( mc_9x6ss )
 	ROM_REGION( 0x400000, "mainrom", 0 )
 	ROM_LOAD( "s29gl032.u3", 0x00000, 0x400000, CRC(9f4194e8) SHA1(bd2a356aea56188ea78169095cbbe603d00e0063) )
