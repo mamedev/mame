@@ -63,6 +63,8 @@
     0x1c | ---- ---x | All channels enable (0 = off, 1 = on)
     0x1c | ---- --x- | Synch & Reset generators
 
+    Unspecified bits should be written as zero.
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -442,7 +444,8 @@ WRITE8_MEMBER( saa1099_device::data_w )
 		}
 		break;
 	default:    /* Error! */
-		logerror("%s: (SAA1099 '%s') Unknown operation (reg:%02x, data:%02x)\n", machine().describe_context(), tag(), reg, data);
+		if (data != 0)
+			logerror("%s: (SAA1099 '%s') Unknown operation (reg:%02x, data:%02x)\n", machine().describe_context(), tag(), reg, data);
 	}
 }
 
