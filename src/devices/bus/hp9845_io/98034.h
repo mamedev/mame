@@ -24,16 +24,8 @@ public:
 	hp98034_io_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~hp98034_io_card_device();
 
-	// device-level overrides
-	virtual ioport_constructor device_input_ports() const override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
 	virtual DECLARE_READ16_MEMBER(reg_r) override;
 	virtual DECLARE_WRITE16_MEMBER(reg_w) override;
-
-	DECLARE_WRITE8_MEMBER(dc_w);
-	DECLARE_READ8_MEMBER(dc_r);
 
 	DECLARE_WRITE8_MEMBER(hpib_data_w);
 	DECLARE_WRITE8_MEMBER(hpib_ctrl_w);
@@ -45,15 +37,23 @@ public:
 	DECLARE_WRITE8_MEMBER(mode_reg_clear_w);
 	DECLARE_READ8_MEMBER(switch_r);
 
-	IRQ_CALLBACK_MEMBER(irq_callback);
-
-	DECLARE_WRITE_LINE_MEMBER(ieee488_ctrl_w);
-
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	// device-level overrides
+	virtual ioport_constructor device_input_ports() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
 private:
+	DECLARE_WRITE8_MEMBER(dc_w);
+	DECLARE_READ8_MEMBER(dc_r);
+
+	IRQ_CALLBACK_MEMBER(irq_callback);
+
+	DECLARE_WRITE_LINE_MEMBER(ieee488_ctrl_w);
+
 	required_device<hp_nanoprocessor_device> m_cpu;
 	required_ioport m_sw1;
 	required_device<ieee488_device> m_ieee488;

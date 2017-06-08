@@ -262,10 +262,10 @@ FLOPPY_FORMATS_END
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( c1581 )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( c1581 )
+MACHINE_CONFIG_MEMBER( c1581_device::device_add_mconfig )
 	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/8)
 	MCFG_CPU_PROGRAM_MAP(c1581_mem)
 
@@ -281,17 +281,6 @@ static MACHINE_CONFIG_START( c1581 )
 	MCFG_WD1772_ADD(WD1772_TAG, XTAL_16MHz/2)
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG":0", c1581_floppies, "35dd", c1581_device::floppy_formats)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor c1581_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( c1581 );
-}
 
 
 //-------------------------------------------------

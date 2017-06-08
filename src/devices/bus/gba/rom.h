@@ -175,10 +175,7 @@ public:
 	// construction/destruction
 	gba_rom_flash_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
-	// reading and writing
+// reading and writing
 	virtual DECLARE_READ32_MEMBER(read_ram) override;
 	virtual DECLARE_WRITE32_MEMBER(write_ram) override;
 
@@ -186,6 +183,9 @@ protected:
 	gba_rom_flash_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_reset() override;
+
+	// device-level overrides
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	//uint32_t m_flash_size;
 	uint32_t m_flash_mask;
@@ -221,9 +221,6 @@ public:
 	// construction/destruction
 	gba_rom_flash1m_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
 	// reading and writing
 	virtual DECLARE_READ32_MEMBER(read_ram) override;
 	virtual DECLARE_WRITE32_MEMBER(write_ram) override;
@@ -232,6 +229,9 @@ protected:
 	gba_rom_flash1m_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_reset() override;
+
+	// device-level overrides
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	//uint32_t m_flash_size;
 	uint32_t m_flash_mask;

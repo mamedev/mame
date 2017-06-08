@@ -749,22 +749,17 @@ static ADDRESS_MAP_START(np_io_map , AS_IO , 8 , hp98035_io_card_device)
 	AM_RANGE(0xe , 0xe) AM_READWRITE(clr_inten_r , clr_inten_w)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START(hp98035)
-	MCFG_CPU_ADD("np" , HP_NANOPROCESSOR , XTAL_1MHz)
-	MCFG_CPU_PROGRAM_MAP(np_program_map)
-	MCFG_CPU_IO_MAP(np_io_map)
-	MCFG_HP_NANO_DC_CHANGED(WRITE8(hp98035_io_card_device , dc_w))
-MACHINE_CONFIG_END
-
 const tiny_rom_entry *hp98035_io_card_device::device_rom_region() const
 {
 	return ROM_NAME(hp98035);
 }
 
-machine_config_constructor hp98035_io_card_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME(hp98035);
-}
+MACHINE_CONFIG_MEMBER(hp98035_io_card_device::device_add_mconfig)
+	MCFG_CPU_ADD("np" , HP_NANOPROCESSOR , XTAL_1MHz)
+	MCFG_CPU_PROGRAM_MAP(np_program_map)
+	MCFG_CPU_IO_MAP(np_io_map)
+	MCFG_HP_NANO_DC_CHANGED(WRITE8(hp98035_io_card_device , dc_w))
+MACHINE_CONFIG_END
 
 // device type definition
 DEFINE_DEVICE_TYPE(HP98035_IO_CARD, hp98035_io_card_device, "hp98035", "HP98035 card")

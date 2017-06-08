@@ -51,10 +51,10 @@ ROM_END
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( m2105 )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( m2105 )
+MACHINE_CONFIG_MEMBER( electron_m2105_device::device_add_mconfig )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -97,17 +97,6 @@ static MACHINE_CONFIG_START( m2105 )
 	MCFG_TMS52XX_SPEECHROM("vsm")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor electron_m2105_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( m2105 );
-}
 
 const tiny_rom_entry *electron_m2105_device::device_rom_region() const
 {

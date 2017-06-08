@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Barry Rodewald
 /*
- * magicsound.c
+ * magicsound.cpp
  *
  *  Magic Sound Board for the Aleste 520EX
  *
@@ -20,18 +20,18 @@
 DEFINE_DEVICE_TYPE(AL_MAGICSOUND, al_magicsound_device, "al_magicsound", "Aleste Magic Sound Board")
 
 
-static MACHINE_CONFIG_START( al_magicsound )
+MACHINE_CONFIG_MEMBER( al_magicsound_device::device_add_mconfig )
 	MCFG_DEVICE_ADD( "dmac", AM9517A, XTAL_4MHz )  // CLK from expansion port
 	// According to the schematics, the TC pin (EOP on western chips) is connected to NMI on the expansion port.
 	// NMIs seem to occur too quickly when this is active, so either EOP is not triggered at the correct time, or
 	// the K1810WT37 is different to the i8237/AM9517A
 	//MCFG_I8237_OUT_EOP_CB(DEVWRITELINE("^", cpc_expansion_slot_device, nmi_w)) // MCFG_DEVCB_INVERT
 	MCFG_I8237_OUT_HREQ_CB(DEVWRITELINE("dmac", am9517a_device, hack_w))
-	MCFG_I8237_IN_MEMR_CB(READ8(al_magicsound_device,dma_read_byte))
-	MCFG_I8237_OUT_IOW_0_CB(WRITE8(al_magicsound_device,dma_write_byte))
-	MCFG_I8237_OUT_IOW_1_CB(WRITE8(al_magicsound_device,dma_write_byte))
-	MCFG_I8237_OUT_IOW_2_CB(WRITE8(al_magicsound_device,dma_write_byte))
-	MCFG_I8237_OUT_IOW_3_CB(WRITE8(al_magicsound_device,dma_write_byte))
+	MCFG_I8237_IN_MEMR_CB(READ8(al_magicsound_device, dma_read_byte))
+	MCFG_I8237_OUT_IOW_0_CB(WRITE8(al_magicsound_device, dma_write_byte))
+	MCFG_I8237_OUT_IOW_1_CB(WRITE8(al_magicsound_device, dma_write_byte))
+	MCFG_I8237_OUT_IOW_2_CB(WRITE8(al_magicsound_device, dma_write_byte))
+	MCFG_I8237_OUT_IOW_3_CB(WRITE8(al_magicsound_device, dma_write_byte))
 	MCFG_I8237_OUT_DACK_0_CB(WRITELINE(al_magicsound_device, dack0_w))
 	MCFG_I8237_OUT_DACK_1_CB(WRITELINE(al_magicsound_device, dack1_w))
 	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(al_magicsound_device, dack2_w))
@@ -43,17 +43,17 @@ static MACHINE_CONFIG_START( al_magicsound )
 	// Timer outputs to SAM0/1/2/3 are sample clocks for each sound channel, D/A0 is the low bit of the channel select.
 	MCFG_DEVICE_ADD("timer1", PIT8254, 0)
 	MCFG_PIT8253_CLK0(XTAL_4MHz)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(al_magicsound_device,sam0_w))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(al_magicsound_device, sam0_w))
 	MCFG_PIT8253_CLK1(XTAL_4MHz)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(al_magicsound_device,sam1_w))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(al_magicsound_device, sam1_w))
 	MCFG_PIT8253_CLK2(XTAL_4MHz)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(al_magicsound_device,sam2_w))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(al_magicsound_device, sam2_w))
 
 	MCFG_DEVICE_ADD("timer2", PIT8254, 0)
 	MCFG_PIT8253_CLK0(XTAL_4MHz)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(al_magicsound_device,sam3_w))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(al_magicsound_device, sam3_w))
 	MCFG_PIT8253_CLK1(XTAL_4MHz)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(al_magicsound_device,da0_w))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(al_magicsound_device, da0_w))
 	MCFG_PIT8253_CLK2(XTAL_4MHz)
 
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
@@ -63,10 +63,6 @@ static MACHINE_CONFIG_START( al_magicsound )
 	// no pass-through(?)
 MACHINE_CONFIG_END
 
-machine_config_constructor al_magicsound_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( al_magicsound );
-}
 
 //**************************************************************************
 //  LIVE DEVICE

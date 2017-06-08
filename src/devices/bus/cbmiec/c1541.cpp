@@ -808,10 +808,10 @@ WRITE8_MEMBER( c1541_prologic_dos_classic_device::pia_pb_w )
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( c1541 )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( c1541 )
+MACHINE_CONFIG_MEMBER( c1541_device_base::device_add_mconfig )
 	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
 	MCFG_CPU_PROGRAM_MAP(c1541_mem)
 	MCFG_QUANTUM_PERFECT_CPU(M6502_TAG)
@@ -840,89 +840,29 @@ static MACHINE_CONFIG_START( c1541 )
 MACHINE_CONFIG_END
 
 
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor c1541_device_base::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( c1541 );
-}
-
-
-//-------------------------------------------------
-//  MACHINE_DRIVER( c1541c )
-//-------------------------------------------------
-
-static MACHINE_CONFIG_START( c1541c )
-	MCFG_FRAGMENT_ADD(c1541)
+MACHINE_CONFIG_MEMBER( c1541c_device::device_add_mconfig )
+	c1541_device_base::device_add_mconfig(config);
 MACHINE_CONFIG_END
 
 
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor c1541c_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( c1541c );
-}
-
-
-//-------------------------------------------------
-//  MACHINE_DRIVER( c1541dd )
-//-------------------------------------------------
-
-static MACHINE_CONFIG_START( c1541dd )
-	MCFG_FRAGMENT_ADD(c1541)
+MACHINE_CONFIG_MEMBER( c1541_dolphin_dos_device::device_add_mconfig )
+	c1541_device_base::device_add_mconfig(config);
 
 	MCFG_CPU_MODIFY(M6502_TAG)
 	MCFG_CPU_PROGRAM_MAP(c1541dd_mem)
 MACHINE_CONFIG_END
 
 
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor c1541_dolphin_dos_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( c1541dd );
-}
-
-
-//-------------------------------------------------
-//  MACHINE_DRIVER( c1541pd )
-//-------------------------------------------------
-
-static MACHINE_CONFIG_START( c1541pd )
-	MCFG_FRAGMENT_ADD(c1541)
+MACHINE_CONFIG_MEMBER( c1541_professional_dos_v1_device::device_add_mconfig )
+	c1541_device_base::device_add_mconfig(config);
 
 	MCFG_CPU_MODIFY(M6502_TAG)
 	MCFG_CPU_PROGRAM_MAP(c1541pd_mem)
 MACHINE_CONFIG_END
 
 
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor c1541_professional_dos_v1_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( c1541pd );
-}
-
-
-//-------------------------------------------------
-//  MACHINE_DRIVER( c1541pdc )
-//-------------------------------------------------
-
-static MACHINE_CONFIG_START( c1541pdc )
-	MCFG_FRAGMENT_ADD(c1541)
+MACHINE_CONFIG_MEMBER( c1541_prologic_dos_classic_device::device_add_mconfig )
+	c1541_device_base::device_add_mconfig(config);
 
 	MCFG_CPU_MODIFY(M6502_TAG)
 	MCFG_CPU_PROGRAM_MAP(c1541pdc_mem)
@@ -937,17 +877,6 @@ static MACHINE_CONFIG_START( c1541pdc )
 	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE(MC6821_TAG, pia6821_device, ca1_w))
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor c1541_prologic_dos_classic_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( c1541pdc );
-}
 
 
 //-------------------------------------------------
@@ -1004,11 +933,11 @@ c1541_device_base::c1541_device_base(const machine_config &mconfig, device_type 
 	device_t(mconfig, type, tag, owner, clock),
 	device_cbm_iec_interface(mconfig, *this),
 	device_c64_floppy_parallel_interface(mconfig, *this),
+	m_floppy(*this, C64H156_TAG":0:525ssqd"),
 	m_maincpu(*this, M6502_TAG),
 	m_via0(*this, M6522_0_TAG),
 	m_via1(*this, M6522_1_TAG),
 	m_ga(*this, C64H156_TAG),
-	m_floppy(*this, C64H156_TAG":0:525ssqd"),
 	m_address(*this, "ADDRESS"),
 	m_data_out(1),
 	m_via0_irq(CLEAR_LINE),

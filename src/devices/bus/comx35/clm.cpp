@@ -133,10 +133,10 @@ GFXDECODE_END
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_START( comx_clm )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( comx_clm )
+MACHINE_CONFIG_MEMBER( comx_clm_device::device_add_mconfig )
 	MCFG_SCREEN_ADD_MONOCHROME(MC6845_SCREEN_TAG, RASTER, rgb_t::white())
 	MCFG_SCREEN_UPDATE_DEVICE(MC6845_TAG, mc6845_device, screen_update)
 	MCFG_SCREEN_SIZE(80*8, 24*8)
@@ -152,18 +152,6 @@ static MACHINE_CONFIG_START( comx_clm )
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(comx_clm_device, crtc_update_row)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor comx_clm_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( comx_clm );
-}
-
 
 
 //**************************************************************************

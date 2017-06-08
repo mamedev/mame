@@ -31,15 +31,27 @@ public:
 	// construction/destruction
 	epson_tf20_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual ioport_constructor device_input_ports() const override;
-
 	// not really public
 	DECLARE_READ8_MEMBER( rom_disable_r );
 	DECLARE_READ8_MEMBER( upd765_tc_r );
 	DECLARE_WRITE8_MEMBER( fdc_control_w );
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
+
+	// device_epson_sio_interface overrides
+	virtual void tx_w(int level) override;
+	virtual void pout_w(int level) override;
+
+private:
 	IRQ_CALLBACK_MEMBER( irq_callback );
 	DECLARE_WRITE_LINE_MEMBER( txda_w );
 	DECLARE_WRITE_LINE_MEMBER( dtra_w );
@@ -48,17 +60,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( rxc_w );
 	DECLARE_WRITE_LINE_MEMBER( pinc_w );
 
-protected:
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-
-	// device_epson_sio_interface overrides
-	virtual void tx_w(int level) override;
-	virtual void pout_w(int level) override;
-
-private:
 	required_device<cpu_device> m_cpu;
 	required_device<ram_device> m_ram;
 	required_device<upd765a_device> m_fdc;
