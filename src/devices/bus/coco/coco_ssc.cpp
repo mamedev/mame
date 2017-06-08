@@ -40,7 +40,7 @@
 #include "cococart.h"
 #include "machine/ram.h"
 
-#define LOG_SSC 0
+#define LOG_SSC 1
 #define PIC_TAG "pic7040"
 #define AY_TAG "cocossc_ay"
 #define SP0256_TAG "sp0256"
@@ -92,6 +92,7 @@ namespace
 	protected:
 		// device-level overrides
 		virtual void device_start() override;
+		virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 		virtual DECLARE_READ8_MEMBER(ff7d_read);
 		virtual DECLARE_WRITE8_MEMBER(ff7d_write);
 		virtual void set_sound_enable(bool sound_enable) override;
@@ -102,6 +103,7 @@ namespace
 		uint8_t                                 m_tms7000_portb;
 		uint8_t                                 m_tms7000_portc;
 		uint8_t                                 m_tms7000_portd;
+		emu_timer								*m_timer;
 		required_device<cpu_device>             m_tms7040;
 		required_device<ram_device>             m_staticram;
 		required_device<ay8910_device>          m_ay;
@@ -223,6 +225,9 @@ void coco_ssc_device::device_start()
 	save_item(NAME(m_tms7000_portb));
 	save_item(NAME(m_tms7000_portc));
 	save_item(NAME(m_tms7000_portd));
+	
+	m_timer = timer_alloc(0);
+	
 }
 
 
@@ -234,6 +239,26 @@ void coco_ssc_device::device_reset()
 {
 	m_reset_line = 0;
 	m_host_busy = false;
+}
+
+
+//-------------------------------------------------
+//  device_timer - handle timer callbacks
+//-------------------------------------------------
+
+void coco_ssc_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch(id)
+	{
+		case 0:
+			m_host_busy = false;
+ 			m_timer->adjust(attotime::never);
+			break;
+
+		default:
+			break;
+
+	}
 }
 
 
@@ -431,9 +456,9 @@ WRITE8_MEMBER(coco_ssc_device::ssc_port_c_w)
 		m_spo->ald_w(space, 0, m_tms7000_portd);
 	}
 
-	if( (data & C_BSY) == 0 )
+if( ((m_tms7000_portc & C_BSY) == 0) && ((data & C_BSY) == C_BSY) )
 	{
-		m_host_busy = false;
+		m_timer->adjust(attotime::from_usec(1800));
 	}
 
 	if (LOG_SSC)
