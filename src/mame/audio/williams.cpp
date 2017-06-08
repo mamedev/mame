@@ -156,39 +156,6 @@ WRITE8_MEMBER(williams_cvsd_sound_device::cvsd_clock_set_w)
 
 
 //-------------------------------------------------
-//  ym2151_irq_w - process IRQ signal changes from
-//  the YM2151
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER(williams_cvsd_sound_device::ym2151_irq_w)
-{
-	m_pia->ca1_w(!state);
-}
-
-
-//-------------------------------------------------
-//  pia_irqa - process IRQ A signal changes from
-//  the 6821
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER(williams_cvsd_sound_device::pia_irqa)
-{
-	m_cpu->set_input_line(M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
-//-------------------------------------------------
-//  pia_irqb - process IRQ B signal changes from
-//  the 6821
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER(williams_cvsd_sound_device::pia_irqb)
-{
-	m_cpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
-//-------------------------------------------------
 //  audio CPU map
 //-------------------------------------------------
 
@@ -214,11 +181,11 @@ MACHINE_CONFIG_MEMBER( williams_cvsd_sound_device::device_add_mconfig )
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)
 	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8("dac", dac_byte_interface, write))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(williams_cvsd_sound_device, talkback_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(williams_cvsd_sound_device, pia_irqa))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(williams_cvsd_sound_device, pia_irqb))
+	MCFG_PIA_IRQA_HANDLER(INPUTLINE("cpu", M6809_FIRQ_LINE))
+	MCFG_PIA_IRQB_HANDLER(INPUTLINE("cpu", INPUT_LINE_NMI))
 
 	MCFG_YM2151_ADD("ym2151", CVSD_FM_CLOCK)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(williams_cvsd_sound_device, ym2151_irq_w))
+	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("pia", pia6821_device, ca1_w)) MCFG_DEVCB_INVERT // IRQ is not true state
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.10)
 
 	MCFG_SOUND_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.25)
@@ -485,17 +452,6 @@ WRITE8_MEMBER(williams_narc_sound_device::cvsd_clock_set_w)
 
 
 //-------------------------------------------------
-//  ym2151_irq_w - handle line changes on the
-//  YM2151 IRQ line
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER(williams_narc_sound_device::ym2151_irq_w)
-{
-	m_cpu0->set_input_line(M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
-//-------------------------------------------------
 //  master CPU map
 //-------------------------------------------------
 
@@ -544,7 +500,7 @@ MACHINE_CONFIG_MEMBER( williams_narc_sound_device::device_add_mconfig )
 	MCFG_CPU_PROGRAM_MAP(williams_narc_slave_map)
 
 	MCFG_YM2151_ADD("ym2151", NARC_FM_CLOCK)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(williams_narc_sound_device, ym2151_irq_w))
+	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("cpu0", M6809_FIRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.10)
 
 	MCFG_SOUND_ADD("dac1", AD7224, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.25)
@@ -758,16 +714,6 @@ WRITE8_MEMBER(williams_adpcm_sound_device::talkback_w)
 
 
 //-------------------------------------------------
-//  talkback_w - write to the talkback latch
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER(williams_adpcm_sound_device::ym2151_irq_w)
-{
-	m_cpu->set_input_line(M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
-//-------------------------------------------------
 //  audio CPU map
 //-------------------------------------------------
 
@@ -804,7 +750,7 @@ MACHINE_CONFIG_MEMBER( williams_adpcm_sound_device::device_add_mconfig )
 	MCFG_CPU_PROGRAM_MAP(williams_adpcm_map)
 
 	MCFG_YM2151_ADD("ym2151", ADPCM_FM_CLOCK)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(williams_adpcm_sound_device, ym2151_irq_w))
+	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("cpu", M6809_FIRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.10)
 
 	MCFG_SOUND_ADD("dac", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.5)
