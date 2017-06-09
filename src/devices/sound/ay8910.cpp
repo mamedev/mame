@@ -361,15 +361,15 @@ AY-3-8913:
                       _|    '   '   3     |_
              DA5 <>  |_|6    T 8    -   19|_|  -- VSS (GND) [1]
                       _|     A 3    8     |_
-             DA5 <>  |_|7    I 3    9   18|_|  -> ANALOG CHANNEL C
+             DA4 <>  |_|7    I 3    9   18|_|  -> ANALOG CHANNEL C
                       _|     W 2    1     |_
-             DA5 <>  |_|8    A      3   17|_|  -> ANALOG CHANNEL A
+             DA3 <>  |_|8    A      3   17|_|  -> ANALOG CHANNEL A
                       _|     N C          |_
-             DA5 <>  |_|9      -        16|_|  NC?
+             DA2 <>  |_|9      -        16|_|  NC(?)
                       _|       A          |_
-             DA5 <>  |_|10              15|_|  -> ANALOG CHANNEL B
+             DA1 <>  |_|10              15|_|  -> ANALOG CHANNEL B
                       _|                  |_
-             DA5 <>  |_|11              14|_|  ?? TEST IN [3]
+             DA0 <>  |_|11              14|_|  ?? TEST IN [3]
                       _|                  |_
     [4] TEST OUT ??  |_|12              13|_|  -- VCC (+5V)
                        |__________________|
