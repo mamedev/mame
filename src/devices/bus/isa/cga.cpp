@@ -244,7 +244,24 @@ MC6845_UPDATE_ROW( isa8_cga_pc1512_device::crtc_update_row )
 #define CGA_LCLK (XTAL_14_31818MHz/16)
 
 
-static MACHINE_CONFIG_START( cga )
+ROM_START( cga )
+	/* IBM 1501981(CGA) and 1501985(MDA) Character rom */
+	ROM_REGION(0x2000,"gfx1", 0)
+	ROM_LOAD("5788005.u33", 0x00000, 0x2000, CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f)) /* "AMI 8412PI // 5788005 // (C) IBM CORP. 1981 // KOREA" */
+ROM_END
+
+
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE(ISA8_CGA, isa8_cga_device, "cga", "IBM Color/Graphics Monitor Adapter")
+
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( isa8_cga_device::device_add_mconfig )
 	MCFG_SCREEN_ADD(CGA_SCREEN_NAME, RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_14_31818MHz,912,0,640,262,0,200)
 	MCFG_SCREEN_UPDATE_DEVICE( DEVICE_SELF, isa8_cga_device, screen_update )
@@ -260,30 +277,6 @@ static MACHINE_CONFIG_START( cga )
 	MCFG_MC6845_RECONFIGURE_CB(isa8_cga_device, reconfigure)
 	MCFG_VIDEO_SET_SCREEN(nullptr)
 MACHINE_CONFIG_END
-
-
-ROM_START( cga )
-	/* IBM 1501981(CGA) and 1501985(MDA) Character rom */
-	ROM_REGION(0x2000,"gfx1", 0)
-	ROM_LOAD("5788005.u33", 0x00000, 0x2000, CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f)) /* "AMI 8412PI // 5788005 // (C) IBM CORP. 1981 // KOREA" */
-ROM_END
-
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-DEFINE_DEVICE_TYPE(ISA8_CGA, isa8_cga_device, "cga", "IBM Color/Graphics Monitor Adapter")
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor isa8_cga_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( cga );
-}
 
 ioport_constructor isa8_cga_device::device_input_ports() const
 {
@@ -1916,17 +1909,15 @@ const tiny_rom_entry *isa8_cga_mc1502_device::device_rom_region() const
 
 DEFINE_DEVICE_TYPE(ISA8_CGA_M24, isa8_cga_m24_device, "cga_m24", "Olivetti M24 CGA")
 
-static MACHINE_CONFIG_DERIVED( m24, cga )
+MACHINE_CONFIG_MEMBER( isa8_cga_m24_device::device_add_mconfig )
+	isa8_cga_device::device_add_mconfig(config);
+
 	MCFG_DEVICE_MODIFY(CGA_SCREEN_NAME)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_14_31818MHz,912,0,640,462,0,400)
 	MCFG_DEVICE_MODIFY(CGA_MC6845_NAME)
 	MCFG_MC6845_RECONFIGURE_CB(isa8_cga_m24_device, reconfigure)
 MACHINE_CONFIG_END
 
-machine_config_constructor isa8_cga_m24_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( m24 );
-}
 isa8_cga_m24_device::isa8_cga_m24_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	isa8_cga_device(mconfig, ISA8_CGA_M24, tag, owner, clock), m_mode2(0), m_index(0)
 {

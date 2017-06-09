@@ -25,7 +25,11 @@ ROM_END
 DEFINE_DEVICE_TYPE(ISA8_SVGA_ET4K, isa8_svga_et4k_device, "et4000", "SVGA Tseng ET4000 Graphics Card")
 
 
-static MACHINE_CONFIG_START( vga_tseng )
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( isa8_svga_et4k_device::device_add_mconfig )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
 	MCFG_SCREEN_UPDATE_DEVICE("vga", tseng_vga_device, screen_update)
@@ -34,16 +38,6 @@ static MACHINE_CONFIG_START( vga_tseng )
 
 	MCFG_DEVICE_ADD("vga", TSENG_VGA, 0)
 MACHINE_CONFIG_END
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor isa8_svga_et4k_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( vga_tseng );
-}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region

@@ -26,7 +26,11 @@ ROM_END
 DEFINE_DEVICE_TYPE(ISA16_SVGA_TGUI9680, isa16_svga_tgui9680_device, "igui9680", "Trident TGUI9680 Graphics Card (BIOS X5.5 (02) 02/13/96)")
 
 
-static MACHINE_CONFIG_START( vga_trident )
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( isa16_svga_tgui9680_device::device_add_mconfig )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
 	MCFG_SCREEN_UPDATE_DEVICE("vga", trident_vga_device, screen_update)
@@ -35,16 +39,6 @@ static MACHINE_CONFIG_START( vga_trident )
 
 	MCFG_DEVICE_ADD("vga", TRIDENT_VGA, 0)
 MACHINE_CONFIG_END
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor isa16_svga_tgui9680_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( vga_trident );
-}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region

@@ -25,7 +25,12 @@ ROM_END
 DEFINE_DEVICE_TYPE(ISA16_SVGA_CIRRUS,        isa16_svga_cirrus_device,        "dm_clgd5430", "Diamond Speedstar Pro SE ISA Graphics Card (BIOS v1.00)")
 DEFINE_DEVICE_TYPE(ISA16_SVGA_CIRRUS_GD542X, isa16_svga_cirrus_gd542x_device, "clgd542x",    "Generic Cirrus Logic CD542 Graphics Card (BIOS v1.20)")
 
-static MACHINE_CONFIG_START( vga_cirrus )
+
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( isa16_svga_cirrus_device::device_add_mconfig )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
 	MCFG_SCREEN_UPDATE_DEVICE("vga", cirrus_gd5430_device, screen_update)
@@ -34,16 +39,6 @@ static MACHINE_CONFIG_START( vga_cirrus )
 
 	MCFG_DEVICE_ADD("vga", CIRRUS_GD5430, 0)
 MACHINE_CONFIG_END
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor isa16_svga_cirrus_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( vga_cirrus );
-}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -112,7 +107,11 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-static MACHINE_CONFIG_START( vga_cirrus_gd542x )
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( isa16_svga_cirrus_gd542x_device::device_add_mconfig )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
 	MCFG_SCREEN_UPDATE_DEVICE("vga", cirrus_gd5428_device, screen_update)
@@ -121,16 +120,6 @@ static MACHINE_CONFIG_START( vga_cirrus_gd542x )
 
 	MCFG_DEVICE_ADD("vga", CIRRUS_GD5428, 0)
 MACHINE_CONFIG_END
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor isa16_svga_cirrus_gd542x_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( vga_cirrus_gd542x );
-}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region

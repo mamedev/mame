@@ -52,16 +52,6 @@ static MACHINE_CONFIG_START(cdrom_headphones)
 	MCFG_SPEAKER_STANDARD_STEREO("lheadphone", "rheadphone")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ide )
-	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", nullptr, false)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(isa16_ide_device, ide_interrupt))
-
-	MCFG_DEVICE_MODIFY("ide:0")
-	MCFG_SLOT_OPTION_MACHINE_CONFIG("cdrom", cdrom_headphones)
-	MCFG_DEVICE_MODIFY("ide:1")
-	MCFG_SLOT_OPTION_MACHINE_CONFIG("cdrom", cdrom_headphones)
-MACHINE_CONFIG_END
-
 static INPUT_PORTS_START( ide )
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x01, 0x00, "IDE Configuration")
@@ -76,14 +66,18 @@ INPUT_PORTS_END
 DEFINE_DEVICE_TYPE(ISA16_IDE, isa16_ide_device, "isa_ide", "IDE Fixed Drive Adapter")
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor isa16_ide_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( ide );
-}
+MACHINE_CONFIG_MEMBER( isa16_ide_device::device_add_mconfig )
+	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", nullptr, false)
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(isa16_ide_device, ide_interrupt))
+
+	MCFG_DEVICE_MODIFY("ide:0")
+	MCFG_SLOT_OPTION_MACHINE_CONFIG("cdrom", cdrom_headphones)
+	MCFG_DEVICE_MODIFY("ide:1")
+	MCFG_SLOT_OPTION_MACHINE_CONFIG("cdrom", cdrom_headphones)
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  input_ports - device-specific input ports

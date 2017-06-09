@@ -22,11 +22,6 @@ public:
 	// construction/destruction
 	isa8_ega_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual ioport_constructor device_input_ports() const override;
-
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
 	DECLARE_READ8_MEMBER(pc_ega8_3b0_r);
@@ -35,12 +30,7 @@ public:
 	DECLARE_WRITE8_MEMBER(pc_ega8_3c0_w);
 	DECLARE_READ8_MEMBER(pc_ega8_3d0_r);
 	DECLARE_WRITE8_MEMBER(pc_ega8_3d0_w);
-	DECLARE_WRITE_LINE_MEMBER(de_changed);
-	DECLARE_WRITE_LINE_MEMBER(hsync_changed);
-	DECLARE_WRITE_LINE_MEMBER(vsync_changed);
-	DECLARE_WRITE_LINE_MEMBER(vblank_changed);
 
-	CRTC_EGA_ROW_UPDATE(ega_update_row);
 	CRTC_EGA_ROW_UPDATE(pc_ega_graphics);
 	CRTC_EGA_ROW_UPDATE(pc_ega_text);
 
@@ -51,7 +41,20 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual ioport_constructor device_input_ports() const override;
+
 	uint8_t alu_op( uint8_t data, uint8_t latch_data );
+
+private:
+	DECLARE_WRITE_LINE_MEMBER(de_changed);
+	DECLARE_WRITE_LINE_MEMBER(hsync_changed);
+	DECLARE_WRITE_LINE_MEMBER(vsync_changed);
+	DECLARE_WRITE_LINE_MEMBER(vblank_changed);
+
+	CRTC_EGA_ROW_UPDATE(ega_update_row);
 
 public:
 	crtc_ega_device *m_crtc_ega;

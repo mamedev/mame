@@ -72,7 +72,11 @@ DEFINE_DEVICE_TYPE(ISA16_VGA_GFXULTRA,     isa16_vga_gfxultra_device,    "gfxulr
 DEFINE_DEVICE_TYPE(ISA16_SVGA_GFXULTRAPRO, isa16_vga_gfxultrapro_device, "gfxxultrp", "ATi Graphics Ultra Pro Card")
 DEFINE_DEVICE_TYPE(ISA16_SVGA_MACH64,      isa16_vga_mach64_device,      "mach64isa", "ATi mach64 Card")
 
-static MACHINE_CONFIG_START( vga_ati )
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( isa16_vga_gfxultra_device::device_add_mconfig )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
 	MCFG_SCREEN_UPDATE_DEVICE("vga", ati_vga_device, screen_update)
@@ -82,7 +86,7 @@ static MACHINE_CONFIG_START( vga_ati )
 	MCFG_DEVICE_ADD("vga", ATI_VGA, 0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( vga_mach32 )
+MACHINE_CONFIG_MEMBER( isa16_vga_gfxultrapro_device::device_add_mconfig )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
 	MCFG_SCREEN_UPDATE_DEVICE("vga", mach32_device, screen_update)
@@ -92,7 +96,7 @@ static MACHINE_CONFIG_START( vga_mach32 )
 	MCFG_DEVICE_ADD("vga", ATIMACH32, 0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( vga_mach64 )
+MACHINE_CONFIG_MEMBER( isa16_vga_mach64_device::device_add_mconfig )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
 	MCFG_SCREEN_UPDATE_DEVICE("vga", mach64_device, screen_update)
@@ -101,26 +105,6 @@ static MACHINE_CONFIG_START( vga_mach64 )
 
 	MCFG_DEVICE_ADD("vga", ATIMACH64, 0)
 MACHINE_CONFIG_END
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor isa16_vga_gfxultra_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( vga_ati );
-}
-
-machine_config_constructor isa16_vga_gfxultrapro_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( vga_mach32 );
-}
-
-machine_config_constructor isa16_vga_mach64_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( vga_mach64 );
-}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region

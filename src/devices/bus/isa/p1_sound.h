@@ -33,9 +33,6 @@ public:
 	// construction/destruction
 	p1_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// Optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
 	DECLARE_READ8_MEMBER(d14_r);
 	DECLARE_READ8_MEMBER(d16_r);
 	DECLARE_READ8_MEMBER(d17_r);
@@ -43,7 +40,6 @@ public:
 	DECLARE_WRITE8_MEMBER(d16_w);
 	DECLARE_WRITE8_MEMBER(d17_w);
 
-	DECLARE_WRITE_LINE_MEMBER(sampler_sync);
 	DECLARE_READ8_MEMBER(adc_r);
 	DECLARE_WRITE8_MEMBER(dac_w);
 
@@ -52,7 +48,12 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	// Optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+
 private:
+	DECLARE_WRITE_LINE_MEMBER(sampler_sync);
+
 	uint8_t m_dac_data[16];
 	int m_dac_ptr;
 

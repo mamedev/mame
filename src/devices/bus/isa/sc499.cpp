@@ -177,14 +177,10 @@ static INPUT_PORTS_START( sc499_port )
 
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START( sc499_ctape )
+MACHINE_CONFIG_MEMBER( sc499_device::device_add_mconfig )
 	MCFG_DEVICE_ADD(SC499_CTAPE_TAG, SC499_CTAPE, 0)
 MACHINE_CONFIG_END
 
-machine_config_constructor sc499_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( sc499_ctape );
-}
 
 //**************************************************************************
 //  DEVICE DEFINITIONS

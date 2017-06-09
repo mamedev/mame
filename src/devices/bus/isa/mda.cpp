@@ -93,7 +93,24 @@ WRITE_LINE_MEMBER(isa8_mda_device::pc_cpu_line)
 }
 
 
-MACHINE_CONFIG_START( pcvideo_mda )
+ROM_START( mda )
+	/* IBM 1501981(CGA) and 1501985(MDA) Character rom */
+	ROM_REGION(0x08100,"gfx1", 0)
+	ROM_LOAD("5788005.u33", 0x00000, 0x02000, CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f)) /* "AMI 8412PI // 5788005 // (C) IBM CORP. 1981 // KOREA" */
+ROM_END
+
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE(ISA8_MDA, isa8_mda_device, "isa_ibm_mda", "IBM Monochrome Display and Printer Adapter")
+
+
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( isa8_mda_device::device_add_mconfig )
 	MCFG_SCREEN_ADD( MDA_SCREEN_NAME, RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MDA_CLOCK, 882, 0, 720, 370, 0, 350 )
 	MCFG_SCREEN_UPDATE_DEVICE( MDA_MC6845_NAME, mc6845_device, screen_update )
@@ -112,29 +129,6 @@ MACHINE_CONFIG_START( pcvideo_mda )
 	MCFG_DEVICE_ADD("lpt", PC_LPT, 0)
 	MCFG_PC_LPT_IRQ_HANDLER(WRITELINE(isa8_mda_device, pc_cpu_line))
 MACHINE_CONFIG_END
-
-ROM_START( mda )
-	/* IBM 1501981(CGA) and 1501985(MDA) Character rom */
-	ROM_REGION(0x08100,"gfx1", 0)
-	ROM_LOAD("5788005.u33", 0x00000, 0x02000, CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f)) /* "AMI 8412PI // 5788005 // (C) IBM CORP. 1981 // KOREA" */
-ROM_END
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-DEFINE_DEVICE_TYPE(ISA8_MDA, isa8_mda_device, "isa_ibm_mda", "IBM Monochrome Display and Printer Adapter")
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor isa8_mda_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( pcvideo_mda );
-}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -529,7 +523,22 @@ static GFXDECODE_START( pcherc )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, pc_16_charlayout, 1, 1 )
 GFXDECODE_END
 
-MACHINE_CONFIG_START( pcvideo_hercules )
+ROM_START( hercules )
+	ROM_REGION(0x1000,"gfx1", 0)
+	ROM_LOAD("um2301.bin",  0x00000, 0x1000, CRC(0827bdac) SHA1(15f1aceeee8b31f0d860ff420643e3c7f29b5ffc))
+ROM_END
+
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE(ISA8_HERCULES, isa8_hercules_device, "isa_hercules", "Hercules Graphics Card")
+
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( isa8_hercules_device::device_add_mconfig )
 	MCFG_SCREEN_ADD( HERCULES_SCREEN_NAME, RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MDA_CLOCK, 882, 0, 720, 370, 0, 350 )
 	MCFG_SCREEN_UPDATE_DEVICE( HERCULES_MC6845_NAME, mc6845_device, screen_update )
@@ -548,27 +557,6 @@ MACHINE_CONFIG_START( pcvideo_hercules )
 	MCFG_DEVICE_ADD("lpt", PC_LPT, 0)
 	MCFG_PC_LPT_IRQ_HANDLER(WRITELINE(isa8_mda_device, pc_cpu_line))
 MACHINE_CONFIG_END
-
-ROM_START( hercules )
-	ROM_REGION(0x1000,"gfx1", 0)
-	ROM_LOAD("um2301.bin",  0x00000, 0x1000, CRC(0827bdac) SHA1(15f1aceeee8b31f0d860ff420643e3c7f29b5ffc))
-ROM_END
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-DEFINE_DEVICE_TYPE(ISA8_HERCULES, isa8_hercules_device, "isa_hercules", "Hercules Graphics Card")
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor isa8_hercules_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( pcvideo_hercules );
-}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -760,8 +748,15 @@ READ8_MEMBER( isa8_hercules_device::io_read )
 	return data;
 }
 
+DEFINE_DEVICE_TYPE(ISA8_EC1840_0002, isa8_ec1840_0002_device, "ec1840_0002", "EC1840.0002 (MDA)")
+
+
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
 // XXX
-MACHINE_CONFIG_START( pcvideo_ec1840_0002 )
+MACHINE_CONFIG_MEMBER( isa8_ec1840_0002_device::device_add_mconfig )
 	MCFG_SCREEN_ADD( MDA_SCREEN_NAME, RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MDA_CLOCK, 792, 0, 640, 370, 0, 350 )
 	MCFG_SCREEN_UPDATE_DEVICE( MDA_MC6845_NAME, mc6845_device, screen_update )
@@ -775,19 +770,6 @@ MACHINE_CONFIG_START( pcvideo_ec1840_0002 )
 	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(isa8_mda_device, hsync_changed))
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(isa8_mda_device, vsync_changed))
 MACHINE_CONFIG_END
-
-DEFINE_DEVICE_TYPE(ISA8_EC1840_0002, isa8_ec1840_0002_device, "ec1840_0002", "EC1840.0002 (MDA)")
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor isa8_ec1840_0002_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( pcvideo_ec1840_0002 );
-}
 
 //-------------------------------------------------
 //  isa8_ec1840_0002_device - constructor

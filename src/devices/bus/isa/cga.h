@@ -41,11 +41,6 @@ public:
 	MC6845_UPDATE_ROW( cga_gfx_2bpp_update_row );
 	MC6845_UPDATE_ROW( cga_gfx_1bpp_update_row );
 
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-
 protected:
 	isa8_cga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -54,16 +49,21 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+
+	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
 public:
 	void mode_control_w(uint8_t data);
 	void set_palette_luts();
 	void plantronics_w(uint8_t data);
 	virtual DECLARE_READ8_MEMBER( io_read );
 	virtual DECLARE_WRITE8_MEMBER( io_write );
-	DECLARE_WRITE_LINE_MEMBER( hsync_changed );
-	DECLARE_WRITE_LINE_MEMBER( vsync_changed );
-	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	MC6845_RECONFIGURE(reconfigure);
+
 public:
 	int     m_framecnt;
 
@@ -86,6 +86,11 @@ public:
 	offs_t  m_start_offset;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
+
+private:
+	DECLARE_WRITE_LINE_MEMBER( hsync_changed );
+	DECLARE_WRITE_LINE_MEMBER( vsync_changed );
+	MC6845_RECONFIGURE(reconfigure);
 };
 
 // device type definition
@@ -272,16 +277,17 @@ class isa8_cga_m24_device :
 public:
 	// construction/destruction
 	isa8_cga_m24_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	// optional information overrides
-	//virtual const rom_entry *device_rom_region() const;
 	virtual DECLARE_READ8_MEMBER( io_read ) override;
 	virtual DECLARE_WRITE8_MEMBER( io_write ) override;
 	virtual MC6845_UPDATE_ROW( crtc_update_row ) override;
 	MC6845_UPDATE_ROW( m24_gfx_1bpp_m24_update_row );
 	MC6845_RECONFIGURE(reconfigure);
+
 protected:
 	virtual void device_reset() override;
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+
 private:
 	uint8_t m_mode2, m_index;
 };

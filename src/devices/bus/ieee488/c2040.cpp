@@ -445,10 +445,10 @@ FLOPPY_FORMATS_END
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_START( c2040 )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( c2040 )
+MACHINE_CONFIG_MEMBER( c2040_device::device_add_mconfig )
 	// DOS
 	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
 	MCFG_CPU_PROGRAM_MAP(c2040_main_mem)
@@ -491,22 +491,7 @@ static MACHINE_CONFIG_START( c2040 )
 MACHINE_CONFIG_END
 
 
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor c2040_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( c2040 );
-}
-
-
-//-------------------------------------------------
-//  MACHINE_CONFIG_START( c3040 )
-//-------------------------------------------------
-
-static MACHINE_CONFIG_START( c3040 )
+MACHINE_CONFIG_MEMBER( c3040_device::device_add_mconfig )
 	// DOS
 	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
 	MCFG_CPU_PROGRAM_MAP(c2040_main_mem)
@@ -549,22 +534,7 @@ static MACHINE_CONFIG_START( c3040 )
 MACHINE_CONFIG_END
 
 
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor c3040_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( c3040 );
-}
-
-
-//-------------------------------------------------
-//  MACHINE_CONFIG_START( c4040 )
-//-------------------------------------------------
-
-static MACHINE_CONFIG_START( c4040 )
+MACHINE_CONFIG_MEMBER( c4040_device::device_add_mconfig )
 	// DOS
 	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
 	MCFG_CPU_PROGRAM_MAP(c2040_main_mem)
@@ -605,17 +575,6 @@ static MACHINE_CONFIG_START( c4040 )
 	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG":0", c2040_floppies, "525ssqd", c4040_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG":1", c2040_floppies, "525ssqd", c4040_device::floppy_formats)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor c4040_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( c4040 );
-}
 
 
 //-------------------------------------------------

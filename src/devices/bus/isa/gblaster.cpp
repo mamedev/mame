@@ -20,15 +20,7 @@
 
   jumperable? normally 0x220
 */
-static MACHINE_CONFIG_START( game_blaster_config )
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SAA1099_ADD("saa1099.1", 7159090)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
-	MCFG_SAA1099_ADD("saa1099.2", 7159090)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
-MACHINE_CONFIG_END
+
 
 READ8_MEMBER( isa8_gblaster_device::saa1099_16_r )
 {
@@ -73,14 +65,18 @@ WRITE8_MEMBER( isa8_gblaster_device::detect_w )
 DEFINE_DEVICE_TYPE(ISA8_GAME_BLASTER, isa8_gblaster_device, "isa_gblaster", "Game Blaster Sound Card")
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor isa8_gblaster_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( game_blaster_config );
-}
+MACHINE_CONFIG_MEMBER( isa8_gblaster_device::device_add_mconfig )
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SAA1099_ADD("saa1099.1", 7159090)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	MCFG_SAA1099_ADD("saa1099.2", 7159090)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+MACHINE_CONFIG_END
 
 //**************************************************************************
 //  LIVE DEVICE

@@ -365,10 +365,10 @@ WRITE8_MEMBER( d9060_device_base::scsi_data_w )
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_START( d9060 )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( d9060 )
+MACHINE_CONFIG_MEMBER( d9060_device_base::device_add_mconfig )
 	// DOS
 	MCFG_CPU_ADD(M6502_DOS_TAG, M6502, XTAL_4MHz/4)
 	MCFG_CPU_PROGRAM_MAP(d9060_main_mem)
@@ -414,17 +414,6 @@ static MACHINE_CONFIG_START( d9060 )
 
 	MCFG_SCSIDEV_ADD(SASIBUS_TAG ":" SCSI_PORT_DEVICE1, "harddisk", D9060HD, SCSI_ID_0)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor d9060_device_base::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( d9060 );
-}
 
 
 //-------------------------------------------------
