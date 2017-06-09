@@ -552,6 +552,7 @@ int gb_cart_slot_device_base::get_cart_type(const uint8_t *ROM, uint32_t len)
 
 	// Check for some unlicensed games
 	//if (type == GB_MBC_MBC5)
+	if (len >= 0x184 + 0x30)
 	{
 		int count = 0;
 		for (int i = 0x0184; i < 0x0184 + 0x30; i++)
