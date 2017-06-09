@@ -520,20 +520,20 @@ READ8_MEMBER( mos6530_device_base::pb_data_r )
 {
 	uint8_t in = 0;
 
-	if (m_in8_pa_cb.isnull())
+	if (m_in8_pb_cb.isnull())
 	{
-		in |= (m_in_pa_cb[0].isnull() ? BIT(m_pa_in, 0) : m_in_pa_cb[0]());
-		in |= (m_in_pa_cb[1].isnull() ? BIT(m_pa_in, 1) : m_in_pa_cb[1]()) << 1;
-		in |= (m_in_pa_cb[2].isnull() ? BIT(m_pa_in, 2) : m_in_pa_cb[2]()) << 2;
-		in |= (m_in_pa_cb[3].isnull() ? BIT(m_pa_in, 3) : m_in_pa_cb[3]()) << 3;
-		in |= (m_in_pa_cb[4].isnull() ? BIT(m_pa_in, 4) : m_in_pa_cb[4]()) << 4;
-		in |= (m_in_pa_cb[5].isnull() ? BIT(m_pa_in, 5) : m_in_pa_cb[5]()) << 5;
-		in |= (m_in_pa_cb[6].isnull() ? BIT(m_pa_in, 6) : m_in_pa_cb[6]()) << 6;
-		in |= (m_in_pa_cb[7].isnull() ? BIT(m_pa_in, 7) : m_in_pa_cb[7]()) << 7;
+		in |= (m_in_pb_cb[0].isnull() ? BIT(m_pb_in, 0) : m_in_pb_cb[0]());
+		in |= (m_in_pb_cb[1].isnull() ? BIT(m_pb_in, 1) : m_in_pb_cb[1]()) << 1;
+		in |= (m_in_pb_cb[2].isnull() ? BIT(m_pb_in, 2) : m_in_pb_cb[2]()) << 2;
+		in |= (m_in_pb_cb[3].isnull() ? BIT(m_pb_in, 3) : m_in_pb_cb[3]()) << 3;
+		in |= (m_in_pb_cb[4].isnull() ? BIT(m_pb_in, 4) : m_in_pb_cb[4]()) << 4;
+		in |= (m_in_pb_cb[5].isnull() ? BIT(m_pb_in, 5) : m_in_pb_cb[5]()) << 5;
+		in |= (m_in_pb_cb[6].isnull() ? BIT(m_pb_in, 6) : m_in_pb_cb[6]()) << 6;
+		in |= (m_in_pb_cb[7].isnull() ? BIT(m_pb_in, 7) : m_in_pb_cb[7]()) << 7;
 	}
 	else
 	{
-		in = m_in8_pa_cb();
+		in = m_in8_pb_cb();
 	}
 
 	uint8_t out = m_pb_out;
