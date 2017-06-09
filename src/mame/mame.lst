@@ -1248,6 +1248,7 @@ apple2c4                        // ??? 198? Apple //c (rev 4)
 apple2cp                        // Sep 1988 Apple //c+
 apple2e                         // Jan 1983 Apple //e
 apple2ee                        // Mar 1985 Apple //e Enhanced
+apple2ees                       // ??? 1983 Apple //e (Spain)
 apple2eeuk                      // Mar 1985 Apple //e Enhanced (UK)
 apple2eefr                      // Mar 1985 Apple //e Enhanced (France)
 apple2ep                        // Jan 1987 Apple //e Platinum
@@ -36200,8 +36201,10 @@ tm8k902                         // (c) 2000 Midway Games
 tmdo                            // (c) 1996 Midway Games
 
 @source:tmc1800.cpp
-nano                            //
-tmc2000                         //
+osc1000b                        // (c) 1977 Telercas
+tmc1800                         // (c) 1977 OSCOM
+nano                            // (c) 1980 Telercas
+tmc2000                         // (c) 1980 OSCOM
 
 @source:tmc2000e.cpp
 tmc2000e                        //

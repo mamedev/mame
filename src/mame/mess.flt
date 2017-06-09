@@ -144,6 +144,7 @@ d6809.cpp
 dai.cpp
 daruma.cpp
 datum.cpp
+dbox.cp
 dccons.cpp
 dct11em.cpp
 dectalk.cpp
@@ -512,6 +513,7 @@ pwrview.cpp
 px4.cpp
 px8.cpp
 pyl601.cpp
+pyson.cpp
 ql.cpp
 qtsbc.cpp
 qx10.cpp
