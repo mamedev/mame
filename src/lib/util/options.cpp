@@ -501,12 +501,12 @@ void core_options::add_entry(const options_entry &opt, bool override_existing)
 
 	// create and add the entry
 	add_entry(
-		std::move(names),
-		opt.description,
-		opt.type,
-		std::move(defdata),
-		std::move(minimum),
-		std::move(maximum));
+			std::move(names),
+			opt.description,
+			opt.type,
+			std::move(defdata),
+			std::move(minimum),
+			std::move(maximum));
 }
 
 
@@ -518,12 +518,12 @@ void core_options::add_entry(std::vector<std::string> &&names, const char *descr
 {
 	// create the entry
 	entry::shared_ptr new_entry = std::make_shared<simple_entry>(
-		std::move(names),
-		description,
-		type,
-		std::move(default_value),
-		std::move(minimum),
-		std::move(maximum));
+			std::move(names),
+			description,
+			type,
+			std::move(default_value),
+			std::move(minimum),
+			std::move(maximum));
 
 	// and add it
 	add_entry(std::move(new_entry));
@@ -939,9 +939,9 @@ void core_options::remove_entry(core_options::entry &delentry)
 {
 	// find this in m_entries
 	auto iter = std::find_if(
-		m_entries.begin(),
-		m_entries.end(),
-		[&delentry](const auto &x) { return &*x == &delentry; });
+			m_entries.begin(),
+			m_entries.end(),
+			[&delentry](const auto &x) { return &*x == &delentry; });
 	assert(iter != m_entries.end());
 
 	// erase each of the items out of the entry map
