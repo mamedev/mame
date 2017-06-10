@@ -23,14 +23,51 @@ namespace {
 const int MAX_SAVED_STATE_JOYSTICK = 4;
 
 //-------------------------------------------------
-//  is_valid_state_char - is the specified character
-//  a valid state filename character?
+//  keyboard_code
 //-------------------------------------------------
 
-bool is_valid_state_char(char32_t ch)
+input_code keyboard_code(input_item_id id)
 {
-	return uchar_is_printable(ch) && osd_is_valid_filename_char(ch);
+	// only supported for A-Z|0-9
+	assert((id >= ITEM_ID_A && id <= ITEM_ID_Z) || (id >= ITEM_ID_0 && id <= ITEM_ID_9));
+	return input_code(DEVICE_CLASS_KEYBOARD, 0, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, id);
 }
+
+
+//-------------------------------------------------
+//  keyboard_input_item_name
+//-------------------------------------------------
+
+std::string keyboard_input_item_name(input_item_id id)
+{
+	if (id >= ITEM_ID_A && id <= ITEM_ID_Z)
+		return std::string(1, (char)(id - ITEM_ID_A + 'a'));
+	if (id >= ITEM_ID_0 && id <= ITEM_ID_9)
+		return std::string(1, (char)(id - ITEM_ID_0 + '0'));
+
+	// only supported for A-Z/0-9
+	throw false;
+}
+
+
+//-------------------------------------------------
+//  code_item_pair
+//-------------------------------------------------
+
+std::pair<std::string, std::string> code_item_pair(const running_machine &machine, input_item_id id)
+{
+	// identify the input code name (translated appropriately)
+	input_code code = keyboard_code(id);
+	std::string code_name = machine.input().code_name(code);
+	strmakelower(code_name);
+
+	// identify the keyboard item name
+	std::string input_item_name = keyboard_input_item_name(id);
+
+	// return them
+	return std::make_pair(code_name, input_item_name);
+}
+
 
 };
 
@@ -42,12 +79,14 @@ namespace ui {
 
 std::string menu_load_save_state_base::s_last_file_selected;
 
+
 //-------------------------------------------------
 //  file_entry ctor
 //-------------------------------------------------
 
-menu_load_save_state_base::file_entry::file_entry(std::string &&name, const std::chrono::system_clock::time_point &last_modified)
-	: m_name(std::move(name))
+menu_load_save_state_base::file_entry::file_entry(std::string &&file_name, std::string &&visible_name, const std::chrono::system_clock::time_point &last_modified)
+	: m_file_name(std::move(file_name))
+	, m_visible_name(std::move(visible_name))
 	, m_last_modified(last_modified)
 {
 }
@@ -90,6 +129,18 @@ menu_load_save_state_base::~menu_load_save_state_base()
 
 void menu_load_save_state_base::populate(float &customtop, float &custombottom)
 {
+	// build the "filename to code" map, if we have not already (if it were not for the
+	// possibility that the system keyboard can be changed at runtime, I would put this
+	// into a static)
+	if (m_filename_to_code_map.empty())
+	{
+		// loop through A-Z/0-9
+		for (input_item_id id = ITEM_ID_A; id <= ITEM_ID_Z; id++)
+			m_filename_to_code_map.emplace(code_item_pair(machine(), id));
+		for (input_item_id id = ITEM_ID_0; id <= ITEM_ID_9; id++)
+			m_filename_to_code_map.emplace(code_item_pair(machine(), id));
+	}
+
 	// open the state directory
 	std::string statedir = state_directory();
 	osd::directory::ptr dir = osd::directory::open(statedir);
@@ -106,9 +157,15 @@ void menu_load_save_state_base::populate(float &customtop, float &custombottom)
 		{
 			if (core_filename_ends_with(entry->name, ".sta"))
 			{
-				std::string basename = core_filename_extract_base(entry->name, true);
-				file_entry fileent(std::string(basename), entry->last_modified);
-				auto iter = m_file_entries.emplace(std::make_pair(std::move(basename), std::move(fileent))).first;
+				// get the file name of the entry
+				std::string file_name = core_filename_extract_base(entry->name, true);
+
+				// try translating it
+				std::string visible_name = get_visible_name(file_name);
+
+				// and proceed
+				file_entry fileent(std::string(file_name), std::move(visible_name), entry->last_modified);
+				auto iter = m_file_entries.emplace(std::make_pair(std::move(file_name), std::move(fileent))).first;
 				m_entries_vec.push_back(&iter->second);
 			}
 		}
@@ -133,7 +190,7 @@ void menu_load_save_state_base::populate(float &customtop, float &custombottom)
 
 		// format the text
 		std::string text = util::string_format("%s: %s",
-			entry->name(),
+			entry->visible_name(),
 			time_string);
 
 		// append the menu item
@@ -141,7 +198,7 @@ void menu_load_save_state_base::populate(float &customtop, float &custombottom)
 		item_append(std::move(text), std::string(), 0, itemref);
 
 		// is this item selected?
-		if (entry->name() == s_last_file_selected)
+		if (entry->file_name() == s_last_file_selected)
 			set_selection(itemref);
 	}
 
@@ -170,18 +227,12 @@ void menu_load_save_state_base::handle()
 	{
 		// user selected one of the entries
 		const file_entry &entry = file_entry_from_itemref(event->itemref);
-		slot_selected(std::string(entry.name()));
+		slot_selected(std::string(entry.file_name()));
 	}
-	else if (event && (event->iptkey == IPT_SPECIAL) && is_valid_state_char(event->unichar))
+	else
 	{
-		// user pressed a shortcut key
-		std::string name = utf8_from_uchar(event->unichar);
-		try_select_slot(std::move(name));
-	}
-	else if (!event)
-	{
-		// null event - poll the joystick
-		std::string name = poll_joystick();
+		// poll inputs
+		std::string name = poll_inputs();
 		if (!name.empty())
 			try_select_slot(std::move(name));
 	}
@@ -189,11 +240,44 @@ void menu_load_save_state_base::handle()
 
 
 //-------------------------------------------------
-//  poll_joystick
+//  get_visible_name
 //-------------------------------------------------
 
-std::string menu_load_save_state_base::poll_joystick()
+std::string menu_load_save_state_base::get_visible_name(const std::string &file_name)
 {
+	if (file_name.size() == 1)
+	{
+		auto iter = m_filename_to_code_map.find(file_name);
+		if (iter != m_filename_to_code_map.end())
+			return iter->second;
+	}
+
+	// otherwise these are the same
+	return file_name;
+}
+
+
+//-------------------------------------------------
+//  poll_inputs
+//-------------------------------------------------
+
+std::string menu_load_save_state_base::poll_inputs()
+{
+	// poll A-Z
+	for (input_item_id id = ITEM_ID_A; id <= ITEM_ID_Z; id++)
+	{
+		if (machine().input().code_pressed_once(keyboard_code(id)))
+			return keyboard_input_item_name(id);
+	}
+
+	// poll 0-9
+	for (input_item_id id = ITEM_ID_0; id <= ITEM_ID_9; id++)
+	{
+		if (machine().input().code_pressed_once(keyboard_code(id)))
+			return keyboard_input_item_name(id);
+	}
+
+	// poll joysticks
 	for (int joy_index = 0; joy_index <= MAX_SAVED_STATE_JOYSTICK; joy_index++)
 	{
 		for (input_item_id id = ITEM_ID_BUTTON1; id <= ITEM_ID_BUTTON32; ++id)
