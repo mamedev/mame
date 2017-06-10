@@ -114,7 +114,7 @@ private:
 
 	// current state
 	const game_driver *     m_current_driver;
-	const machine_config *  m_current_config;
+	machine_config *        m_current_config;
 	const device_t *        m_current_device;
 	const char *            m_current_ioport;
 	int_map                 m_region_map;

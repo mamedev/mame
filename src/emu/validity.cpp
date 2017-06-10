@@ -1831,6 +1831,27 @@ void validity_checker::validate_devices()
 
 		// done with this device
 		m_current_device = nullptr;
+
+		// if it's a slot, iterate over possible cards (don't recurse, or you'll stack infinite tee connectors)
+		device_slot_interface *const slot = dynamic_cast<device_slot_interface *>(&device);
+		if (slot && !slot->fixed())
+		{
+			for (auto &option : slot->option_list())
+			{
+				if (option.second->selectable())
+				{
+					device_t *const card = m_current_config->device_add(&slot->device(), "_dummy", option.second->devtype(), 0);
+					for (device_t &card_dev : device_iterator(*card))
+					{
+						m_current_device = &card_dev;
+						card_dev.findit(true);
+						card_dev.validity_check(*this);
+						m_current_device = nullptr;
+					}
+					m_current_config->device_remove(&slot->device(), "_dummy");
+				}
+			}
+		}
 	}
 }
 
