@@ -1841,14 +1841,33 @@ void validity_checker::validate_devices()
 				if (option.second->selectable())
 				{
 					std::string const card_tag(util::string_format("_%s", option.second->name()));
-					device_t *const card = m_current_config->device_add(&slot->device(), card_tag.c_str(), option.second->devtype(), 0);
+					device_t *const card = m_current_config->device_add(&slot->device(), card_tag.c_str(), option.second->devtype(), option.second->clock());
 
 					const char *const def_bios = option.second->default_bios();
 					if (def_bios)
 						device_t::static_set_default_bios_tag(*card, def_bios);
 					machine_config_constructor const additions = option.second->machine_config();
-					if (additions != nullptr)
+					if (additions)
 						(*additions)(*m_current_config, card, card);
+
+					for (device_slot_interface &subslot : slot_interface_iterator(*card))
+					{
+						if (subslot.default_option() && *subslot.default_option())
+						{
+							device_slot_option const *const suboption = subslot.option(subslot.default_option());
+							if (suboption)
+							{
+								device_t *const sub_card = m_current_config->device_add(&subslot.device(), suboption->name(), suboption->devtype(), suboption->clock());
+								const char *const sub_bios = suboption->default_bios();
+								if (sub_bios)
+									device_t::static_set_default_bios_tag(*sub_card, sub_bios);
+								machine_config_constructor const sub_additions = suboption->machine_config();
+								if (sub_additions)
+									(*sub_additions)(*m_current_config, sub_card, sub_card);
+							}
+						}
+					}
+
 					for (device_t &card_dev : device_iterator(*card))
 						card_dev.config_complete();
 					validate_roms(*card);

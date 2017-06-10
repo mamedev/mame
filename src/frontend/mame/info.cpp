@@ -1630,7 +1630,7 @@ void info_xml_creator::output_slots(machine_config &config, device_t &device, co
 			{
 				if (devtypes || (listed && option.second->selectable()))
 				{
-					device_t *const dev = config.device_add(&slot.device(), "_dummy", option.second->devtype(), 0);
+					device_t *const dev = config.device_add(&slot.device(), "_dummy", option.second->devtype(), option.second->clock());
 					if (!dev->configured())
 						dev->config_complete();
 
