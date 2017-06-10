@@ -301,7 +301,7 @@ void validity_checker::validate_one(const game_driver &driver)
 		machine_config config(driver, m_blank_options);
 		m_current_config = &config;
 		validate_driver();
-		validate_roms();
+		validate_roms(m_current_config->root_device());
 		validate_inputs();
 		validate_devices();
 		m_current_config = nullptr;
@@ -1441,10 +1441,10 @@ void validity_checker::validate_driver()
 //  validate_roms - validate ROM definitions
 //-------------------------------------------------
 
-void validity_checker::validate_roms()
+void validity_checker::validate_roms(device_t &root)
 {
 	// iterate, starting with the driver's ROMs and continuing with device ROMs
-	for (device_t &device : device_iterator(m_current_config->root_device()))
+	for (device_t &device : device_iterator(root))
 	{
 		// track the current device
 		m_current_device = &device;
@@ -1851,6 +1851,7 @@ void validity_checker::validate_devices()
 						(*additions)(*m_current_config, card, card);
 					for (device_t &card_dev : device_iterator(*card))
 						card_dev.config_complete();
+					validate_roms(*card);
 
 					for (device_t &card_dev : device_iterator(*card))
 					{

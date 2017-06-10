@@ -73,7 +73,7 @@ private:
 	void validate_inlines();
 	void validate_rgb();
 	void validate_driver();
-	void validate_roms();
+	void validate_roms(device_t &root);
 	void validate_analog_input_field(ioport_field &field);
 	void validate_dip_settings(ioport_field &field);
 	void validate_condition(ioport_condition &condition, device_t &device, std::unordered_set<std::string> &port_map);
