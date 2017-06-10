@@ -793,12 +793,10 @@ void cli_frontend::listslots(const std::vector<std::string> &args)
 			// get the options and print them
 			for (device_slot_option *opt : option_list)
 			{
-				std::unique_ptr<device_t> dev = opt->devtype()(*drivlist.config(), "dummy", &drivlist.config()->root_device(), 0);
-				dev->config_complete();
 				if (first_option)
-					printf("%-16s %s\n", opt->name(),dev->name());
+					printf("%-16s %s\n", opt->name(), opt->devtype().fullname());
 				else
-					printf("%-34s%-16s %s\n", "", opt->name(),dev->name());
+					printf("%-34s%-16s %s\n", "", opt->name(), opt->devtype().fullname());
 
 				first_option = false;
 			}
