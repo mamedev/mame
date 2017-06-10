@@ -1840,7 +1840,18 @@ void validity_checker::validate_devices()
 			{
 				if (option.second->selectable())
 				{
-					device_t *const card = m_current_config->device_add(&slot->device(), "_dummy", option.second->devtype(), 0);
+					std::string const card_tag(util::string_format("_%s", option.second->name()));
+					device_t *const card = m_current_config->device_add(&slot->device(), card_tag.c_str(), option.second->devtype(), 0);
+
+					const char *const def_bios = option.second->default_bios();
+					if (def_bios)
+						device_t::static_set_default_bios_tag(*card, def_bios);
+					machine_config_constructor const additions = option.second->machine_config();
+					if (additions != nullptr)
+						(*additions)(*m_current_config, card, card);
+					for (device_t &card_dev : device_iterator(*card))
+						card_dev.config_complete();
+
 					for (device_t &card_dev : device_iterator(*card))
 					{
 						m_current_device = &card_dev;
@@ -1848,7 +1859,8 @@ void validity_checker::validate_devices()
 						card_dev.validity_check(*this);
 						m_current_device = nullptr;
 					}
-					m_current_config->device_remove(&slot->device(), "_dummy");
+
+					m_current_config->device_remove(&slot->device(), card_tag.c_str());
 				}
 			}
 		}
