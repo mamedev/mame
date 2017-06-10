@@ -836,7 +836,7 @@ MACHINE_CONFIG_MEMBER( c1541_device_base::device_add_mconfig )
 	MCFG_DEVICE_ADD(C64H156_TAG, C64H156, XTAL_16MHz)
 	MCFG_64H156_ATN_CALLBACK(WRITELINE(c1541_device_base, atn_w))
 	MCFG_64H156_BYTE_CALLBACK(WRITELINE(c1541_device_base, byte_w))
-	MCFG_FLOPPY_DRIVE_ADD(C64H156_TAG":0", c1540_floppies, "525ssqd", c1541_device_base::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD_FIXED(C64H156_TAG":0", c1540_floppies, "525ssqd", c1541_device_base::floppy_formats)
 MACHINE_CONFIG_END
 
 

@@ -486,8 +486,8 @@ MACHINE_CONFIG_MEMBER( c2040_device::device_add_mconfig )
 	MCFG_C2040_SYNC_CALLBACK(DEVWRITELINE(M6530_TAG, mos6530_new_device, pb6_w))
 	MCFG_C2040_READY_CALLBACK(DEVWRITELINE(M6522_TAG, via6522_device, write_ca1))
 	MCFG_C2040_ERROR_CALLBACK(DEVWRITELINE(M6522_TAG, via6522_device, write_cb1))
-	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG":0", c2040_floppies, "525ssqd", c2040_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG":1", c2040_floppies, "525ssqd", c2040_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD_FIXED(FDC_TAG":0", c2040_floppies, "525ssqd", c2040_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD_FIXED(FDC_TAG":1", c2040_floppies, "525ssqd", c2040_device::floppy_formats)
 MACHINE_CONFIG_END
 
 
@@ -529,8 +529,8 @@ MACHINE_CONFIG_MEMBER( c3040_device::device_add_mconfig )
 	MCFG_C2040_SYNC_CALLBACK(DEVWRITELINE(M6530_TAG, mos6530_new_device, pb6_w))
 	MCFG_C2040_READY_CALLBACK(DEVWRITELINE(M6522_TAG, via6522_device, write_ca1))
 	MCFG_C2040_ERROR_CALLBACK(DEVWRITELINE(M6522_TAG, via6522_device, write_cb1))
-	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG":0", c2040_floppies, "525ssqd", c3040_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG":1", c2040_floppies, "525ssqd", c3040_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD_FIXED(FDC_TAG":0", c2040_floppies, "525ssqd", c3040_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD_FIXED(FDC_TAG":1", c2040_floppies, "525ssqd", c3040_device::floppy_formats)
 MACHINE_CONFIG_END
 
 
@@ -572,8 +572,8 @@ MACHINE_CONFIG_MEMBER( c4040_device::device_add_mconfig )
 	MCFG_C2040_SYNC_CALLBACK(DEVWRITELINE(M6530_TAG, mos6530_new_device, pb6_w))
 	MCFG_C2040_READY_CALLBACK(DEVWRITELINE(M6522_TAG, via6522_device, write_ca1))
 	MCFG_C2040_ERROR_CALLBACK(DEVWRITELINE(M6522_TAG, via6522_device, write_cb1))
-	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG":0", c2040_floppies, "525ssqd", c4040_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG":1", c2040_floppies, "525ssqd", c4040_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD_FIXED(FDC_TAG":0", c2040_floppies, "525ssqd", c4040_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD_FIXED(FDC_TAG":1", c2040_floppies, "525ssqd", c4040_device::floppy_formats)
 MACHINE_CONFIG_END
 
 

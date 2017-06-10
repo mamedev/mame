@@ -325,7 +325,7 @@ MACHINE_CONFIG_MEMBER( c2031_device::device_add_mconfig )
 
 	MCFG_DEVICE_ADD(C64H156_TAG, C64H156, XTAL_16MHz)
 	MCFG_64H156_BYTE_CALLBACK(WRITELINE(c2031_device, byte_w))
-	MCFG_FLOPPY_DRIVE_ADD(C64H156_TAG":0", c2031_floppies, "525ssqd", c2031_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD_FIXED(C64H156_TAG":0", c2031_floppies, "525ssqd", c2031_device::floppy_formats)
 MACHINE_CONFIG_END
 
 

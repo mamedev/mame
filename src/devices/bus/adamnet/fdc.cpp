@@ -172,7 +172,7 @@ adam_fdc_device::adam_fdc_device(const machine_config &mconfig, const char *tag,
 		device_adamnet_card_interface(mconfig, *this),
 		m_maincpu(*this, M6801_TAG),
 		m_fdc(*this, WD2793_TAG),
-		m_floppy0(*this, WD2793_TAG":0:525ssdd"),
+		m_connector(*this, WD2793_TAG":0"),
 		m_floppy(nullptr),
 		m_ram(*this, "ram"),
 		m_sw3(*this, "SW3")
@@ -239,7 +239,8 @@ READ8_MEMBER( adam_fdc_device::p1_r )
 	uint8_t data = 0x00;
 
 	// disk in place
-	data |= m_floppy0->exists() ? 0x00 : 0x01;
+	floppy_image_device *floppy0 = m_connector->get_device();
+	data |= (floppy0 != nullptr && floppy0->exists()) ? 0x00 : 0x01;
 
 	// floppy data request
 	data |= m_fdc->drq_r() ? 0x04 : 0x00;
@@ -283,7 +284,7 @@ WRITE8_MEMBER( adam_fdc_device::p1_w )
 
 	if (BIT(data, 5))
 	{
-		m_floppy = m_floppy0;
+		m_floppy = m_connector->get_device();
 	}
 
 	m_fdc->set_floppy(m_floppy);

@@ -279,7 +279,7 @@ MACHINE_CONFIG_MEMBER( c1581_device::device_add_mconfig )
 	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(c1581_device, cia_pb_w))
 
 	MCFG_WD1772_ADD(WD1772_TAG, XTAL_16MHz/2)
-	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG":0", c1581_floppies, "35dd", c1581_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD_FIXED(WD1772_TAG":0", c1581_floppies, "35dd", c1581_device::floppy_formats)
 MACHINE_CONFIG_END
 
 

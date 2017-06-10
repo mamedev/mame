@@ -126,6 +126,17 @@ READ8_MEMBER(msx_cart_msx_audio_hxmu900_device::read_cart)
 }
 
 
+ROM_START( msx_hxmu )
+	ROM_REGION(0x8000, "y8950", ROMREGION_ERASE00)
+ROM_END
+
+
+const tiny_rom_entry *msx_cart_msx_audio_hxmu900_device::device_rom_region() const
+{
+	return ROM_NAME( msx_hxmu );
+}
+
+
 
 
 

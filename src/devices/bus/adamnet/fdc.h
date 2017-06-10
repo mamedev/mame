@@ -52,7 +52,7 @@ protected:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<wd2793_device> m_fdc;
-	required_device<floppy_image_device> m_floppy0;
+	required_device<floppy_connector> m_connector;
 	floppy_image_device *m_floppy;
 	required_shared_ptr<uint8_t> m_ram;
 	required_ioport m_sw3;
