@@ -580,21 +580,21 @@ MACHINE_CONFIG_END
   ROM loading
 */
 ROM_START(exl100)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("exl100in.bin", 0xf800, 0x0800, CRC(049109a3) SHA1(98a07297dcdacef41c793c197b6496dac1e8e744))      /* TMS7020 ROM, correct */
+	ROM_REGION(0x800, "maincpu", 0)
+	ROM_LOAD("exl100in.bin", 0x000, 0x800, CRC(049109a3) SHA1(98a07297dcdacef41c793c197b6496dac1e8e744))      /* TMS7020 ROM, correct */
 
-	ROM_REGION(0x10000, "tms7041", 0)
-	ROM_LOAD("exl100_7041.bin", 0xf000, 0x1000, CRC(38f6fc7a) SHA1(b71d545664a974d8ad39bdf600c5b9884c3efab6))           /* TMS7041 internal ROM, correct  */
+	ROM_REGION(0x1000, "tms7041", 0)
+	ROM_LOAD("exl100_7041.bin", 0x0000, 0x1000, CRC(38f6fc7a) SHA1(b71d545664a974d8ad39bdf600c5b9884c3efab6))           /* TMS7041 internal ROM, correct  */
 //  ROM_REGION(0x8000, "vsm", 0)
 ROM_END
 
 
 ROM_START(exeltel)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("exeltel_7040.bin", 0xf000, 0x1000, CRC(2792f02f) SHA1(442a852eb68ef78974733d169084752a131de23d))      /* TMS7040 internal ROM */
+	ROM_REGION(0x1000, "maincpu", 0)
+	ROM_LOAD("exeltel_7040.bin", 0x0000, 0x1000, CRC(2792f02f) SHA1(442a852eb68ef78974733d169084752a131de23d))      /* TMS7040 internal ROM */
 
-	ROM_REGION(0x10000, "tms7042", 0)
-	ROM_LOAD("exeltel_7042.bin", 0xf000, 0x1000, BAD_DUMP CRC(a0163507) SHA1(8452849df7eac8a89cf03ee98e2306047c1c4c38))         /* TMS7042 internal ROM, needs redump */
+	ROM_REGION(0x1000, "tms7042", 0)
+	ROM_LOAD("exeltel_7042.bin", 0x0000, 0x1000, BAD_DUMP CRC(a0163507) SHA1(8452849df7eac8a89cf03ee98e2306047c1c4c38))         /* TMS7042 internal ROM, needs redump */
 
 	ROM_REGION(0x10000,"user1",0)
 	ROM_SYSTEM_BIOS( 0, "french", "French v1.4" )
