@@ -1834,12 +1834,15 @@ void validity_checker::validate_devices()
 
 		// if it's a slot, iterate over possible cards (don't recurse, or you'll stack infinite tee connectors)
 		device_slot_interface *const slot = dynamic_cast<device_slot_interface *>(&device);
-		if (slot != nullptr)
+		if (slot != nullptr && !slot->fixed())
 		{
 			for (auto &option : slot->option_list())
 			{
-				std::string const card_tag(util::string_format("_%s", option.second->name()));
-				device_t *const card = m_current_config->device_add(&slot->device(), card_tag.c_str(), option.second->devtype(), option.second->clock());
+				// the default option is already instantiated here, so don't try adding it again
+				if (slot->default_option() != nullptr && option.first == slot->default_option())
+					continue;
+
+				device_t *const card = m_current_config->device_add(&slot->device(), option.second->name(), option.second->devtype(), option.second->clock());
 
 				const char *const def_bios = option.second->default_bios();
 				if (def_bios)
@@ -1878,7 +1881,7 @@ void validity_checker::validate_devices()
 					m_current_device = nullptr;
 				}
 
-				m_current_config->device_remove(&slot->device(), card_tag.c_str());
+				m_current_config->device_remove(&slot->device(), option.second->name());
 			}
 		}
 	}
