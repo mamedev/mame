@@ -153,13 +153,8 @@ static ADDRESS_MAP_START(ssc_io_map, AS_IO, 8, coco_ssc_device)
 	AM_RANGE(TMS7000_PORTD, TMS7000_PORTD) AM_READWRITE(ssc_port_d_r, ssc_port_d_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(ssc_rom, AS_PROGRAM, 8, coco_ssc_device)
-	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION(PIC_TAG, 0)
-ADDRESS_MAP_END
-
 MACHINE_CONFIG_MEMBER(coco_ssc_device::device_add_mconfig)
 	MCFG_CPU_ADD(PIC_TAG, TMS7040, DERIVED_CLOCK(1, 2))
-	MCFG_CPU_PROGRAM_MAP(ssc_rom)
 	MCFG_CPU_IO_MAP(ssc_io_map)
 
 	MCFG_RAM_ADD("staticram")
