@@ -383,7 +383,7 @@ void cli_frontend::listclones(const std::vector<std::string> &args)
 	driver_enumerator drivlist(m_options, gamename);
 
 	// return an error if none found
-	if (drivlist.count()== 0)
+	if (drivlist.count() == 0)
 		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching games found for '%s'", gamename);
 
 	// exclude all if gamename is empty
@@ -398,12 +398,8 @@ void cli_frontend::listclones(const std::vector<std::string> &args)
 		if (clone_of != -1 && (drivlist.driver(clone_of).flags & MACHINE_IS_BIOS_ROOT) == 0)
 			if (drivlist.matches(gamename, drivlist.driver(clone_of).name))
 			{
-				if (isfirst)
-				{
-					// print the header
-					osd_printf_info("Name:            Clone of:\n");
-					isfirst = false;
-				}
+				// print the header
+				if (isfirst) { osd_printf_info("Name:            Clone of:\n"); isfirst = false; }
 
 				// output the entries found
 				osd_printf_info("%-16s %s\n", drivlist.driver().name, drivlist.driver(clone_of).name);
