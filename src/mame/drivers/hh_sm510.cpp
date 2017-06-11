@@ -5,6 +5,7 @@
   Sharp SM510/SM511 handhelds.
 
   TODO:
+  - svg layout for mw56
   - svg lcd screen background/foreground (not supported in core),
     or should it be for external artwork only?
   - flickering segments, lcd physics? or screen update timing?
@@ -24,7 +25,7 @@
 
 // internal artwork
 #include "gnw_dualv.lh"
-//#include "hh_sm510_test.lh" // common test-layout - use external artwork
+#include "hh_sm510_test.lh" // common test-layout - use external artwork
 
 
 class hh_sm510_state : public driver_device
@@ -660,6 +661,65 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
+  Nintendo Game & Watch: Mario Bros. (model MW-56)
+  * PCB label MW-56-M
+  * Sharp SM510 label MW-56 533C (no decap)
+
+***************************************************************************/
+
+class mw56_state : public hh_sm510_state
+{
+public:
+	mw56_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_sm510_state(mconfig, type, tag)
+	{
+		m_inp_lines = 2;
+	}
+};
+
+// config
+
+static INPUT_PORTS_START( mw56 )
+	PORT_START("IN.0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
+
+	PORT_START("IN.1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Game B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Game A")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Alarm")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
+INPUT_PORTS_END
+
+static MACHINE_CONFIG_START( mw56 )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
+	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, lcd_segment_w))
+	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
+	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
+	MCFG_SM510_WRITE_R_CB(WRITE8(hh_sm510_state, piezo_r1_w))
+
+	/* video hardware */
+	MCFG_DEFAULT_LAYOUT(layout_hh_sm510_test)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
   Nintendo Game & Watch: Donkey Kong Jr. (model DJ-101)
   * Sharp SM510 label DJ-101 52ZA (no decap)
   
@@ -942,7 +1002,7 @@ ROM_END
 
 ROM_START( gnw_dm53 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "dm53_cms54c_cms565", 0x0000, 0x1000, CRC(e21fc0f5) SHA1(3b65ccf9f98813319410414e11a3231b787cdee6) )
+	ROM_LOAD( "dm-53_cms54c_cms565", 0x0000, 0x1000, CRC(e21fc0f5) SHA1(3b65ccf9f98813319410414e11a3231b787cdee6) )
 
 	ROM_REGION( 124249, "svg_top", 0)
 	ROM_LOAD( "gnw_dm53_top.svg", 0, 124249, CRC(d85ec1cc) SHA1(19828945c09defa3efc47eea8fa6128a0e5e9a2a) ) // by Sean/RColtrane/hap, ver. 6 jun 2017
@@ -954,7 +1014,7 @@ ROM_END
 
 ROM_START( gnw_jr55 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "jr55_cms54c_kms560", 0x0000, 0x1000, CRC(46aed0ae) SHA1(72f75ccbd84aea094148c872fc7cc1683619a18a) )
+	ROM_LOAD( "jr-55_cms54c_kms560", 0x0000, 0x1000, CRC(46aed0ae) SHA1(72f75ccbd84aea094148c872fc7cc1683619a18a) )
 
 	ROM_REGION( 207510, "svg_top", 0)
 	ROM_LOAD( "gnw_jr55_top.svg", 0, 207510, CRC(598cc4b1) SHA1(ec485b73b8dcd521c236803d50c80203e0f29330) ) // by Reinier/hap, ver. 6 jun 2017
@@ -964,9 +1024,21 @@ ROM_START( gnw_jr55 )
 ROM_END
 
 
+ROM_START( gnw_mw56 )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "mw-56", 0x0000, 0x1000, CRC(385e59da) SHA1(2f79281bdf2f2afca2fb5bd7b9a3beeffc9c4eb7) )
+
+	ROM_REGION( 100000, "svg_top", 0)
+	ROM_LOAD( "gnw_mw56_left.svg", 0, 100000, NO_DUMP )
+
+	ROM_REGION( 100000, "svg_bottom", 0)
+	ROM_LOAD( "gnw_mw56_right.svg", 0, 100000, NO_DUMP )
+ROM_END
+
+
 ROM_START( gnw_dj101 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "dj101", 0x0000, 0x1000, CRC(8dcfb5d1) SHA1(e0ef578e9362eb9a3cab631376df3cf55978f2de) )
+	ROM_LOAD( "dj-101", 0x0000, 0x1000, CRC(8dcfb5d1) SHA1(e0ef578e9362eb9a3cab631376df3cf55978f2de) )
 
 	ROM_REGION( 277252, "svg", 0)
 	ROM_LOAD( "gnw_dj101.svg", 0, 277252, CRC(d7a3832d) SHA1(59e603d9a3ba503ebbf94574d6544cb5095a0df4) ) // by Sean/RColtrane, ver. 6 jun 2017
@@ -975,7 +1047,7 @@ ROM_END
 
 ROM_START( gnw_ml102 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "ml102_cms54c_kms577", 0x0000, 0x1000, CRC(c1128dea) SHA1(8647e36f43a0e37756a3c7b6a3f08d4c8243f1cc) )
+	ROM_LOAD( "ml-102_cms54c_kms577", 0x0000, 0x1000, CRC(c1128dea) SHA1(8647e36f43a0e37756a3c7b6a3f08d4c8243f1cc) )
 
 	ROM_REGION( 300571, "svg", 0)
 	ROM_LOAD( "gnw_ml102.svg", 0, 300571, CRC(8d8be5a9) SHA1(ee3a761ee956b86c064c83a15e4b833f83c23520) ) // by Sean/hap/JonasP, ver. 17 may 2017
@@ -984,10 +1056,10 @@ ROM_END
 
 ROM_START( gnw_bx301 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "bx301_kms73b_kms744.program", 0x0000, 0x1000, CRC(0fdf0303) SHA1(0b791c9d4874e9534d0a9b7a8968ce02fe4bee96) )
+	ROM_LOAD( "bx-301_kms73b_kms744.program", 0x0000, 0x1000, CRC(0fdf0303) SHA1(0b791c9d4874e9534d0a9b7a8968ce02fe4bee96) )
 
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
-	ROM_LOAD( "bx301_kms73b_kms744.melody", 0x000, 0x100, CRC(439d943d) SHA1(52880df15ec7513f96482f455ef3d9778aa24750) )
+	ROM_LOAD( "bx-301_kms73b_kms744.melody", 0x000, 0x100, CRC(439d943d) SHA1(52880df15ec7513f96482f455ef3d9778aa24750) )
 
 	ROM_REGION( 258514, "svg", 0)
 	ROM_LOAD( "gnw_bx301.svg", 0, 258514, CRC(7b251101) SHA1(002e41374517f1fd8cecd66a2b2338aac736f319) ) // by Sean, ver. 11 apr 2017
@@ -1004,6 +1076,7 @@ CONS( 1989, kloneran,  0,      0, kloneran,  kloneran,  kloneran_state, 0, "Kona
 
 CONS( 1982, gnw_dm53,  0,      0, dm53,      dm53,      dm53_state,     0, "Nintendo", "Game & Watch: Mickey & Donald", MACHINE_SUPPORTS_SAVE )
 CONS( 1983, gnw_jr55,  0,      0, jr55,      jr55,      jr55_state,     0, "Nintendo", "Game & Watch: Donkey Kong II", MACHINE_SUPPORTS_SAVE )
+CONS( 1983, gnw_mw56,  0,      0, mw56,      mw56,      mw56_state,     0, "Nintendo", "Game & Watch: Mario Bros.", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 CONS( 1982, gnw_dj101, 0,      0, dj101,     dj101,     dj101_state,    0, "Nintendo", "Game & Watch: Donkey Kong Jr. (new wide screen)", MACHINE_SUPPORTS_SAVE )
 CONS( 1983, gnw_ml102, 0,      0, ml102,     ml102,     ml102_state,    0, "Nintendo", "Game & Watch: Mario's Cement Factory (new wide screen)", MACHINE_SUPPORTS_SAVE )
 CONS( 1984, gnw_bx301, 0,      0, bx301,     bx301,     bx301_state,    0, "Nintendo", "Game & Watch: Boxing", MACHINE_SUPPORTS_SAVE )
