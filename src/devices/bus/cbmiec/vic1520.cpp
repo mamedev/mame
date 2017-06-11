@@ -52,7 +52,7 @@ PD7 Y MOTOR COM D
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(VIC1520, vic1520_device, "vic1520", "VIC-1520")
+DEFINE_DEVICE_TYPE(VIC1520, vic1520_device, "vic1520", "VIC-1520 Color Printer Plotter")
 
 
 //-------------------------------------------------

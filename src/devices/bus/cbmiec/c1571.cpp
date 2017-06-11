@@ -44,10 +44,10 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(C1570,      c1570_device,      "c1570",    "C1570")
-DEFINE_DEVICE_TYPE(C1571,      c1571_device,      "c1571",    "C1571")
-DEFINE_DEVICE_TYPE(C1571CR,    c1571cr_device,    "c1571cr",  "C1571CR")
-DEFINE_DEVICE_TYPE(MINI_CHIEF, mini_chief_device, "minichif", "ICT Mini Chief")
+DEFINE_DEVICE_TYPE(C1570,      c1570_device,      "c1570",    "C1570 Disk Drive")
+DEFINE_DEVICE_TYPE(C1571,      c1571_device,      "c1571",    "C1571 Disk Drive")
+DEFINE_DEVICE_TYPE(C1571CR,    c1571cr_device,    "c1571cr",  "C1571CR Disk Drive")
+DEFINE_DEVICE_TYPE(MINI_CHIEF, mini_chief_device, "minichif", "ICT Mini Chief Disk Drive")
 
 
 //-------------------------------------------------

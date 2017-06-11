@@ -39,8 +39,8 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(FD2000, fd2000_device, "fd2000", "FD-2000")
-DEFINE_DEVICE_TYPE(FD4000, fd4000_device, "fd4000", "FD-4000")
+DEFINE_DEVICE_TYPE(FD2000, fd2000_device, "fd2000", "FD-2000 Disk Drive")
+DEFINE_DEVICE_TYPE(FD4000, fd4000_device, "fd4000", "FD-4000 Disk Drive")
 
 
 //-------------------------------------------------
