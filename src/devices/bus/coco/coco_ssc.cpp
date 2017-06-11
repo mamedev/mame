@@ -1,4 +1,4 @@
-// license:BSD-3-Clause
+﻿// license:BSD-3-Clause
 // copyright-holders:tim lindner
 /***************************************************************************
 
@@ -96,7 +96,7 @@ namespace
 		virtual DECLARE_READ8_MEMBER(ff7d_read);
 		virtual DECLARE_WRITE8_MEMBER(ff7d_write);
 		virtual void set_sound_enable(bool sound_enable) override;
-        static constexpr int BUSY_TIMER_ID  = 0;
+		static constexpr device_timer_id BUSY_TIMER_ID  = 0;
 
 	private:
 		uint8_t                                 m_reset_line;
