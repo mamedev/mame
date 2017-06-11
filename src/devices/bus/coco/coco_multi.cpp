@@ -126,7 +126,7 @@ namespace
 		// methods
 		void set_select(uint8_t new_select);
 		DECLARE_WRITE8_MEMBER(ff7f_write);
-		void update_line(int slot_number, cococart_slot_device::line line);
+		void update_line(int slot_number, line ln);
 	};
 };
 
@@ -296,7 +296,7 @@ cococart_slot_device &coco_multipak_device::active_cts_slot()
 void coco_multipak_device::set_select(uint8_t new_select)
 {
 	// identify old value for CART, in case this needs to change
-	cococart_slot_device::line_value old_cart = active_cts_slot().get_line_value(cococart_slot_device::line::CART);
+	cococart_slot_device::line_value old_cart = active_cts_slot().get_line_value(line::CART);
 
 	// change value
 	uint8_t xorval = m_select ^ new_select;
@@ -307,9 +307,9 @@ void coco_multipak_device::set_select(uint8_t new_select)
 		cart_base_changed();
 
 	// did the CART line change?
-	cococart_slot_device::line_value new_cart = active_cts_slot().get_line_value(cococart_slot_device::line::CART);
+	line_value new_cart = active_cts_slot().get_line_value(line::CART);
 	if (new_cart != old_cart)
-		update_line(active_cts_slot_number(), cococart_slot_device::line::CART);
+		update_line(active_cts_slot_number(), line::CART);
 }
 
 
@@ -327,20 +327,20 @@ WRITE8_MEMBER(coco_multipak_device::ff7f_write)
 //  update_line
 //-------------------------------------------------
 
-void coco_multipak_device::update_line(int slot_number, cococart_slot_device::line line)
+void coco_multipak_device::update_line(int slot_number, line ln)
 {
 	bool propagate;
 
 	// one of our child devices set a line; we may need to propagate it upwards
-	switch (line)
+	switch (ln)
 	{
-	case cococart_slot_device::line::CART:
+	case line::CART:
 		// only propagate if this is coming from the slot specified
 		propagate = slot_number == active_cts_slot_number();
 		break;
 
-	case cococart_slot_device::line::NMI:
-	case cococart_slot_device::line::HALT:
+	case line::NMI:
+	case line::HALT:
 		// always propagate these
 		propagate = true;
 		break;
@@ -352,7 +352,7 @@ void coco_multipak_device::update_line(int slot_number, cococart_slot_device::li
 	}
 
 	if (propagate)
-		owning_slot().set_line_value(line, slot(slot_number).get_line_value(line));
+		owning_slot().set_line_value(ln, slot(slot_number).get_line_value(ln));
 }
 
 
@@ -364,7 +364,7 @@ void coco_multipak_device::set_sound_enable(bool sound_enable)
 {
 	// the SOUND_ENABLE (SNDEN) line is different; it is controlled by the CPU
 	for (cococart_slot_device *slot : m_slots)
-		slot->set_line_value(cococart_slot_device::line::SOUND_ENABLE, sound_enable ? cococart_slot_device::line_value::ASSERT : cococart_slot_device::line_value::CLEAR);
+		slot->set_line_value(line::SOUND_ENABLE, sound_enable ? line_value::ASSERT : line_value::CLEAR);
 }
 
 
@@ -402,18 +402,18 @@ WRITE8_MEMBER(coco_multipak_device::scs_write)
 //  multiX_slotX_[cart|nmi|halt] trampolines
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(coco_multipak_device::multi_slot1_cart_w) { update_line(1, cococart_slot_device::line::CART); }
-WRITE_LINE_MEMBER(coco_multipak_device::multi_slot1_nmi_w)  { update_line(1, cococart_slot_device::line::NMI); }
-WRITE_LINE_MEMBER(coco_multipak_device::multi_slot1_halt_w) { update_line(1, cococart_slot_device::line::HALT); }
-WRITE_LINE_MEMBER(coco_multipak_device::multi_slot2_cart_w) { update_line(2, cococart_slot_device::line::CART); }
-WRITE_LINE_MEMBER(coco_multipak_device::multi_slot2_nmi_w)  { update_line(2, cococart_slot_device::line::NMI); }
-WRITE_LINE_MEMBER(coco_multipak_device::multi_slot2_halt_w) { update_line(2, cococart_slot_device::line::HALT); }
-WRITE_LINE_MEMBER(coco_multipak_device::multi_slot3_cart_w) { update_line(3, cococart_slot_device::line::CART); }
-WRITE_LINE_MEMBER(coco_multipak_device::multi_slot3_nmi_w)  { update_line(3, cococart_slot_device::line::NMI); }
-WRITE_LINE_MEMBER(coco_multipak_device::multi_slot3_halt_w) { update_line(3, cococart_slot_device::line::HALT); }
-WRITE_LINE_MEMBER(coco_multipak_device::multi_slot4_cart_w) { update_line(4, cococart_slot_device::line::CART); }
-WRITE_LINE_MEMBER(coco_multipak_device::multi_slot4_nmi_w)  { update_line(4, cococart_slot_device::line::NMI); }
-WRITE_LINE_MEMBER(coco_multipak_device::multi_slot4_halt_w) { update_line(4, cococart_slot_device::line::HALT); }
+WRITE_LINE_MEMBER(coco_multipak_device::multi_slot1_cart_w) { update_line(1, line::CART); }
+WRITE_LINE_MEMBER(coco_multipak_device::multi_slot1_nmi_w)  { update_line(1, line::NMI); }
+WRITE_LINE_MEMBER(coco_multipak_device::multi_slot1_halt_w) { update_line(1, line::HALT); }
+WRITE_LINE_MEMBER(coco_multipak_device::multi_slot2_cart_w) { update_line(2, line::CART); }
+WRITE_LINE_MEMBER(coco_multipak_device::multi_slot2_nmi_w)  { update_line(2, line::NMI); }
+WRITE_LINE_MEMBER(coco_multipak_device::multi_slot2_halt_w) { update_line(2, line::HALT); }
+WRITE_LINE_MEMBER(coco_multipak_device::multi_slot3_cart_w) { update_line(3, line::CART); }
+WRITE_LINE_MEMBER(coco_multipak_device::multi_slot3_nmi_w)  { update_line(3, line::NMI); }
+WRITE_LINE_MEMBER(coco_multipak_device::multi_slot3_halt_w) { update_line(3, line::HALT); }
+WRITE_LINE_MEMBER(coco_multipak_device::multi_slot4_cart_w) { update_line(4, line::CART); }
+WRITE_LINE_MEMBER(coco_multipak_device::multi_slot4_nmi_w)  { update_line(4, line::NMI); }
+WRITE_LINE_MEMBER(coco_multipak_device::multi_slot4_halt_w) { update_line(4, line::HALT); }
 
 
 //-------------------------------------------------

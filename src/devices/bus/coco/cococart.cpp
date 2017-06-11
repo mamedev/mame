@@ -48,6 +48,18 @@
 #define LOG_LINE                0
 
 
+/***************************************************************************
+	CONSTANTS
+***************************************************************************/
+
+enum
+{
+	TIMER_CART,
+	TIMER_NMI,
+	TIMER_HALT
+};
+
+
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
@@ -581,5 +593,5 @@ void device_cococart_interface::install_readwrite_handler(uint16_t addrstart, ui
 
 void device_cococart_interface::set_line_value(cococart_slot_device::line line, cococart_slot_device::line_value value)
 {
-	dynamic_cast<cococart_slot_device *>(device().owner())->set_line_value(line, value);
+	owning_slot().set_line_value(line, value);
 }

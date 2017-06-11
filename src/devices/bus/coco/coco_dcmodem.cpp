@@ -50,9 +50,7 @@ namespace
 		// callbacks
 		WRITE_LINE_MEMBER(uart_irq_w)
 		{
-			set_line_value(cococart_slot_device::line::CART, state
-				? cococart_slot_device::line_value::ASSERT
-				: cococart_slot_device::line_value::CLEAR);
+			set_line_value(line::CART, state != 0);
 		}
 
 	protected:

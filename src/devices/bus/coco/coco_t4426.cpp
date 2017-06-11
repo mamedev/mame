@@ -238,8 +238,8 @@ ioport_constructor coco_t4426_device::device_input_ports() const
 void coco_t4426_device::device_reset()
 {
 	LOG("%s()\n", FUNCNAME );
-	auto cart_line = cococart_slot_device::line_value::Q;
-	set_line_value(cococart_slot_device::line::CART, cart_line);
+	auto cart_line = line_value::Q;
+	set_line_value(line::CART, cart_line);
 }
 
 /*-------------------------------------------------

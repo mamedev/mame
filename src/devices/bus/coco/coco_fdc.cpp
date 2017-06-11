@@ -228,10 +228,10 @@ void coco_fdc_device_base::update_lines()
 		set_dskreg(dskreg() & ~0x80);  // clear halt enable
 
 	// set the NMI line
-	cart_set_line(cococart_slot_device::line::NMI, intrq() && (dskreg() & 0x20));
+	set_line_value(line::NMI, intrq() && (dskreg() & 0x20));
 
 	// set the HALT line
-	cart_set_line(cococart_slot_device::line::HALT, !drq() && (dskreg() & 0x80));
+	set_line_value(line::HALT, !drq() && (dskreg() & 0x80));
 }
 
 
