@@ -377,10 +377,18 @@ void cli_frontend::listsource(const std::vector<std::string> &args)
 void cli_frontend::listclones(const std::vector<std::string> &args)
 {
 	const char *gamename = args.empty() ? nullptr : args[0].c_str();
+	bool isfirst = true;
 
 	// start with a filtered list of drivers
 	driver_enumerator drivlist(m_options, gamename);
-	int original_count = drivlist.count();
+
+	// return an error if none found
+	if (drivlist.count()== 0)
+		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching games found for '%s'", gamename);
+
+	// exclude all if gamename is empty
+	if (gamename == nullptr)
+		drivlist.exclude_all();
 
 	// iterate through the remaining ones to see if their parent matches
 	while (drivlist.next_excluded())
@@ -389,31 +397,23 @@ void cli_frontend::listclones(const std::vector<std::string> &args)
 		int clone_of = drivlist.clone();
 		if (clone_of != -1 && (drivlist.driver(clone_of).flags & MACHINE_IS_BIOS_ROOT) == 0)
 			if (drivlist.matches(gamename, drivlist.driver(clone_of).name))
+			{
+				if (isfirst)
+				{
+					// print the header
+					osd_printf_info("Name:            Clone of:\n");
+					isfirst = false;
+				}
+
+				// output the entries found
+				osd_printf_info("%-16s %s\n", drivlist.driver().name, drivlist.driver(clone_of).name);
 				drivlist.include();
+			}
 	}
 
 	// return an error if none found
-	if (drivlist.count() == 0)
-	{
-		// see if we match but just weren't a clone
-		if (original_count == 0)
-			throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching games found for '%s'", gamename);
-		else
-			osd_printf_info("Found %lu matches for '%s' but none were clones\n", (unsigned long)drivlist.count(), gamename);
-		return;
-	}
-
-	// print the header
-	osd_printf_info("Name:            Clone of:\n");
-
-	// iterate through drivers and output the info
-	drivlist.reset();
-	while (drivlist.next())
-	{
-		int clone_of = drivlist.clone();
-		if (clone_of != -1 && (drivlist.driver(clone_of).flags & MACHINE_IS_BIOS_ROOT) == 0)
-			osd_printf_info("%-16s %s\n", drivlist.driver().name, drivlist.driver(clone_of).name);
-	}
+	if (drivlist.count() == 1)
+		osd_printf_info("No clones found for '%s' game\n", gamename);
 }
 
 
