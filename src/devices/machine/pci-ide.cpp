@@ -19,6 +19,7 @@ ide_pci_device::ide_pci_device(const machine_config &mconfig, const char *tag, d
 DEVICE_ADDRESS_MAP_START(config_map, 32, ide_pci_device)
 	AM_RANGE(0x08, 0x0b) AM_WRITE8(prog_if_w, 0x0000ff00)
 	AM_RANGE(0x10, 0x1f) AM_READWRITE(address_base_r, address_base_w)
+	AM_RANGE(0x2c, 0x2f) AM_WRITE(subsystem_id_w);
 	AM_RANGE(0x40, 0x5f) AM_READWRITE(pcictrl_r, pcictrl_w)
 	AM_RANGE(0x70, 0x77) AM_DEVREADWRITE("ide", bus_master_ide_controller_device, bmdma_r, bmdma_w) // PCI646
 	AM_RANGE(0x78, 0x7f) AM_DEVREADWRITE("ide2", bus_master_ide_controller_device, bmdma_r, bmdma_w) // PCI646
@@ -241,4 +242,11 @@ WRITE32_MEMBER(ide_pci_device::address_base_w)
 		pci_device::address_base_w(space, offset, data);
 	}
 	logerror("Mapping bar[%i] = %08x\n", offset, data);
+}
+
+WRITE32_MEMBER(ide_pci_device::subsystem_id_w)
+{
+	// Config register 0x4f enables subsystem id writing for CMD646
+	if (m_config_data[0xc / 4] & 0x01000000)
+		subsystem_id = (data << 16) | (data >> 16);
 }
