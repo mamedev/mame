@@ -5,12 +5,13 @@
   Sharp SM510/SM511 handhelds.
 
   TODO:
-  - svg layout for mw56
+  - improve svg layout for gnw_jr55, gnw_mw56
   - svg lcd screen background/foreground (not supported in core),
     or should it be for external artwork only?
   - flickering segments, lcd physics? or screen update timing?
     * ktmnt: "LIMIT" segment when going underwater on level 1
     * gnw_dj101: cage and clock before you start the game
+    * gnw_mw56: truck boxes while playing
 
 ***************************************************************************/
 
@@ -25,7 +26,8 @@
 
 // internal artwork
 #include "gnw_dualv.lh"
-#include "hh_sm510_test.lh" // common test-layout - use external artwork
+#include "gnw_dualh.lh"
+//#include "hh_sm510_test.lh" // common test-layout - use external artwork
 
 
 class hh_sm510_state : public driver_device
@@ -564,15 +566,15 @@ static MACHINE_CONFIG_START( dm53 )
 	MCFG_SM510_WRITE_R_CB(WRITE8(hh_sm510_state, piezo_r2_w))
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("top", "svg_top")
+	MCFG_SCREEN_SVG_ADD("screen_top", "svg_top")
 	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1000, 645)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1000-1, 0, 645-1)
+	MCFG_SCREEN_SIZE(1920/2, 1238/2)
+	MCFG_SCREEN_VISIBLE_AREA(0, 1920/2-1, 0, 1238/2-1)
 
-	MCFG_SCREEN_SVG_ADD("bottom", "svg_bottom")
+	MCFG_SCREEN_SVG_ADD("screen_bottom", "svg_bottom")
 	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1000, 635)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1000-1, 0, 635-1)
+	MCFG_SCREEN_SIZE(1920/2, 1219/2)
+	MCFG_SCREEN_VISIBLE_AREA(0, 1920/2-1, 0, 1219/2-1)
 
 	MCFG_DEFAULT_LAYOUT(layout_gnw_dualv)
 
@@ -637,15 +639,15 @@ static MACHINE_CONFIG_START( jr55 )
 	MCFG_SM510_WRITE_R_CB(WRITE8(hh_sm510_state, piezo_r1_w))
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("top", "svg_top")
+	MCFG_SCREEN_SVG_ADD("screen_top", "svg_top")
 	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1000, 638)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1000-1, 0, 638-1)
+	MCFG_SCREEN_SIZE(1920/2, 1225/2)
+	MCFG_SCREEN_VISIBLE_AREA(0, 1920/2-1, 0, 1225/2-1)
 
-	MCFG_SCREEN_SVG_ADD("bottom", "svg_bottom")
+	MCFG_SCREEN_SVG_ADD("screen_bottom", "svg_bottom")
 	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1000, 657)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1000-1, 0, 657-1)
+	MCFG_SCREEN_SIZE(1920/2, 1261/2)
+	MCFG_SCREEN_VISIBLE_AREA(0, 1920/2-1, 0, 1261/2-1)
 
 	MCFG_DEFAULT_LAYOUT(layout_gnw_dualv)
 
@@ -706,7 +708,17 @@ static MACHINE_CONFIG_START( mw56 )
 	MCFG_SM510_WRITE_R_CB(WRITE8(hh_sm510_state, piezo_r1_w))
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_hh_sm510_test)
+	MCFG_SCREEN_SVG_ADD("screen_left", "svg_left")
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE(2087/2, 1440/2)
+	MCFG_SCREEN_VISIBLE_AREA(0, 2087/2-1, 0, 1440/2-1)
+
+	MCFG_SCREEN_SVG_ADD("screen_right", "svg_right")
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE(2079/2, 1440/2)
+	MCFG_SCREEN_VISIBLE_AREA(0, 2079/2-1, 0, 1440/2-1)
+
+	MCFG_DEFAULT_LAYOUT(layout_gnw_dualh)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1028,11 +1040,11 @@ ROM_START( gnw_mw56 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "mw-56", 0x0000, 0x1000, CRC(385e59da) SHA1(2f79281bdf2f2afca2fb5bd7b9a3beeffc9c4eb7) )
 
-	ROM_REGION( 100000, "svg_top", 0)
-	ROM_LOAD( "gnw_mw56_left.svg", 0, 100000, NO_DUMP )
+	ROM_REGION( 100251, "svg_left", 0)
+	ROM_LOAD( "gnw_mw56_left.svg", 0, 100251, CRC(316b2516) SHA1(41b5a1e9ceb919bc8b0b1dfb0f8f21cda6fee665) ) // by hap, ver. 11 jun 2017
 
-	ROM_REGION( 100000, "svg_bottom", 0)
-	ROM_LOAD( "gnw_mw56_right.svg", 0, 100000, NO_DUMP )
+	ROM_REGION( 85767, "svg_right", 0)
+	ROM_LOAD( "gnw_mw56_right.svg", 0, 85767, CRC(8210e6e0) SHA1(d42d47cea5a5a4d6c979ba7b06b646320a458290) ) // "
 ROM_END
 
 
@@ -1076,7 +1088,7 @@ CONS( 1989, kloneran,  0,      0, kloneran,  kloneran,  kloneran_state, 0, "Kona
 
 CONS( 1982, gnw_dm53,  0,      0, dm53,      dm53,      dm53_state,     0, "Nintendo", "Game & Watch: Mickey & Donald", MACHINE_SUPPORTS_SAVE )
 CONS( 1983, gnw_jr55,  0,      0, jr55,      jr55,      jr55_state,     0, "Nintendo", "Game & Watch: Donkey Kong II", MACHINE_SUPPORTS_SAVE )
-CONS( 1983, gnw_mw56,  0,      0, mw56,      mw56,      mw56_state,     0, "Nintendo", "Game & Watch: Mario Bros.", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1983, gnw_mw56,  0,      0, mw56,      mw56,      mw56_state,     0, "Nintendo", "Game & Watch: Mario Bros.", MACHINE_SUPPORTS_SAVE )
 CONS( 1982, gnw_dj101, 0,      0, dj101,     dj101,     dj101_state,    0, "Nintendo", "Game & Watch: Donkey Kong Jr. (new wide screen)", MACHINE_SUPPORTS_SAVE )
 CONS( 1983, gnw_ml102, 0,      0, ml102,     ml102,     ml102_state,    0, "Nintendo", "Game & Watch: Mario's Cement Factory (new wide screen)", MACHINE_SUPPORTS_SAVE )
 CONS( 1984, gnw_bx301, 0,      0, bx301,     bx301,     bx301_state,    0, "Nintendo", "Game & Watch: Boxing", MACHINE_SUPPORTS_SAVE )
