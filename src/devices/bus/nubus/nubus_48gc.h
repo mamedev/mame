@@ -18,13 +18,6 @@ class jmfb_device :
 		public device_video_interface,
 		public device_nubus_card_interface
 {
-public:
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
 protected:
 	// construction/destruction
 	jmfb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool is824);
@@ -34,8 +27,15 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+
+private:
 	DECLARE_READ32_MEMBER(mac_48gc_r);
 	DECLARE_WRITE32_MEMBER(mac_48gc_w);
+
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	screen_device *m_screen;
 	emu_timer *m_timer;

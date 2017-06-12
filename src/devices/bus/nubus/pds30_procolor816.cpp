@@ -21,13 +21,6 @@
 
 #define VRAM_SIZE   (0x200000)  // 2 megs?
 
-MACHINE_CONFIG_START( procolor816 )
-	MCFG_SCREEN_ADD( PROCOLOR816_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, nubus_procolor816_device, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(25175000, 800, 0, 640, 525, 0, 480)
-	MCFG_SCREEN_SIZE(1024,768)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-MACHINE_CONFIG_END
 
 ROM_START( procolor816 )
 	ROM_REGION(0x8000, PROCOLOR816_ROM_REGION, 0)
@@ -42,14 +35,16 @@ DEFINE_DEVICE_TYPE(PDS030_PROCOLOR816, nubus_procolor816_device, "pd3_pc16", "La
 
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor nubus_procolor816_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( procolor816 );
-}
+MACHINE_CONFIG_MEMBER( nubus_procolor816_device::device_add_mconfig )
+	MCFG_SCREEN_ADD( PROCOLOR816_SCREEN_NAME, RASTER)
+	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, nubus_procolor816_device, screen_update)
+	MCFG_SCREEN_RAW_PARAMS(25175000, 800, 0, 640, 525, 0, 480)
+	MCFG_SCREEN_SIZE(1024,768)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region

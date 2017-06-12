@@ -17,16 +17,6 @@
 #define GC48_SCREEN_NAME    "48gc_screen"
 #define GC48_ROM_REGION     "48gc_rom"
 
-MACHINE_CONFIG_START( macvideo_48gc )
-	MCFG_SCREEN_ADD( GC48_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, jmfb_device, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(25175000, 800, 0, 640, 525, 0, 480)
-//  MCFG_SCREEN_SIZE(1152, 870)
-//  MCFG_SCREEN_VISIBLE_AREA(0, 1152-1, 0, 870-1)
-//  MCFG_SCREEN_REFRESH_RATE(75)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1260))
-MACHINE_CONFIG_END
-
 ROM_START( gc48 )
 	ROM_REGION(0x8000, GC48_ROM_REGION, 0)
 	ROM_LOAD( "3410801.bin",  0x0000, 0x8000, CRC(e283da91) SHA1(4ae21d6d7bbaa6fc7aa301bee2b791ed33b1dcf9) )
@@ -46,14 +36,18 @@ DEFINE_DEVICE_TYPE(NUBUS_824GC, nubus_824gc_device, "nb_824gc", "Apple 8*24 vide
 
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor jmfb_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( macvideo_48gc );
-}
+MACHINE_CONFIG_MEMBER( jmfb_device::device_add_mconfig )
+	MCFG_SCREEN_ADD( GC48_SCREEN_NAME, RASTER)
+	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, jmfb_device, screen_update)
+	MCFG_SCREEN_RAW_PARAMS(25175000, 800, 0, 640, 525, 0, 480)
+//  MCFG_SCREEN_SIZE(1152, 870)
+//  MCFG_SCREEN_VISIBLE_AREA(0, 1152-1, 0, 870-1)
+//  MCFG_SCREEN_REFRESH_RATE(75)
+//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1260))
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region

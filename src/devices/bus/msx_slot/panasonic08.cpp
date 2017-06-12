@@ -33,15 +33,9 @@ msx_slot_panasonic08_device::msx_slot_panasonic08_device(const machine_config &m
 }
 
 
-static MACHINE_CONFIG_START( panasonic08 )
+MACHINE_CONFIG_MEMBER( msx_slot_panasonic08_device::device_add_mconfig )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
-
-
-machine_config_constructor msx_slot_panasonic08_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( panasonic08 );
-}
 
 
 void msx_slot_panasonic08_device::set_rom_start(device_t &device, const char *region, uint32_t offset)

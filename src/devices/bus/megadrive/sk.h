@@ -17,16 +17,17 @@ public:
 	// construction/destruction
 	md_rom_sk_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
+	md_rom_sk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void device_start() override;
+
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read) override;
 	virtual DECLARE_WRITE16_MEMBER(write) override;
-
-protected:
-	md_rom_sk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-	virtual void device_start() override;
 
 private:
 	required_device<md_cart_slot_device> m_exp;

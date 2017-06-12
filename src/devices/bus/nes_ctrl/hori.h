@@ -27,11 +27,11 @@ public:
 	// construction/destruction
 	nes_horitwin_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
 protected:
 	// device-level overrides
 	virtual void device_start() override { }
+
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	virtual uint8_t read_exp(offs_t offset) override;
 	virtual void write(uint8_t data) override;
@@ -50,12 +50,12 @@ public:
 	// construction/destruction
 	nes_hori4p_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual ioport_constructor device_input_ports() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
 protected:
 	// device-level overrides
 	virtual void device_start() override { }
+
+	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	virtual uint8_t read_exp(offs_t offset) override;
 	virtual void write(uint8_t data) override;

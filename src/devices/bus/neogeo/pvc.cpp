@@ -50,18 +50,11 @@ void neogeo_pvc_cart_device::device_reset()
  mapper specific handlers
  -------------------------------------------------*/
 
-static MACHINE_CONFIG_START( pvc_cart )
+MACHINE_CONFIG_MEMBER( neogeo_pvc_cart_device::device_add_mconfig )
 	MCFG_CMC_PROT_ADD("cmc_prot")
 	MCFG_PCM2_PROT_ADD("pcm2_prot")
 	MCFG_PVC_PROT_ADD("pvc_prot")
 MACHINE_CONFIG_END
-
-machine_config_constructor neogeo_pvc_cart_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( pvc_cart );
-}
-
-
 
 
 /*************************************************

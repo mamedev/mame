@@ -124,8 +124,9 @@ public:
 	// construction/destruction
 	nes_datach_24c01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 // device type definition
@@ -147,10 +148,6 @@ public:
 	// construction/destruction
 	nes_datach_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual DECLARE_READ8_MEMBER(read_m) override;
 	virtual DECLARE_READ8_MEMBER(read_h) override;
 	virtual DECLARE_WRITE8_MEMBER(write_h) override;
@@ -158,6 +155,11 @@ public:
 	virtual void pcb_reset() override;
 
 protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
 	uint8_t m_datach_latch;
 	required_device<i2cmem_device> m_i2cmem;
 	required_device<barcode_reader_device> m_reader;

@@ -22,13 +22,6 @@
 
 #define VRAM_SIZE   (0xc0000)   // 768k of VRAM for 1024x768 @ 8 bit
 
-MACHINE_CONFIG_START( spec8s3 )
-	MCFG_SCREEN_ADD( SPEC8S3_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, nubus_spec8s3_device, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(25175000, 800, 0, 640, 525, 0, 480)
-	MCFG_SCREEN_SIZE(1024,768)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 768-1)
-MACHINE_CONFIG_END
 
 ROM_START( spec8s3 )
 	ROM_REGION(0x8000, SPEC8S3_ROM_REGION, 0)
@@ -44,14 +37,16 @@ DEFINE_DEVICE_TYPE(NUBUS_SPEC8S3, nubus_spec8s3_device, "nb_sp8s3", "SuperMac Sp
 
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor nubus_spec8s3_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( spec8s3 );
-}
+MACHINE_CONFIG_MEMBER( nubus_spec8s3_device::device_add_mconfig )
+	MCFG_SCREEN_ADD( SPEC8S3_SCREEN_NAME, RASTER)
+	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, nubus_spec8s3_device, screen_update)
+	MCFG_SCREEN_RAW_PARAMS(25175000, 800, 0, 640, 525, 0, 480)
+	MCFG_SCREEN_SIZE(1024,768)
+	MCFG_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 768-1)
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region

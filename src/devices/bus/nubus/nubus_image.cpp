@@ -114,10 +114,6 @@ void nubus_image_device::messimg_disk_image_device::device_reset()
 {
 }
 
-MACHINE_CONFIG_START( image )
-	MCFG_DEVICE_ADD(IMAGE_DISK0_TAG, MESSIMG_DISK, 0)
-MACHINE_CONFIG_END
-
 ROM_START( image )
 	ROM_REGION(0x2000, IMAGE_ROM_REGION, 0)
 	ROM_LOAD( "nb_fake.bin",  0x000000, 0x002000, CRC(9264bac5) SHA1(540c2ce3c90382b2da6e1e21182cdf8fc3f0c930) )
@@ -131,14 +127,12 @@ DEFINE_DEVICE_TYPE(NUBUS_IMAGE, nubus_image_device, "nb_image", "NuBus Disk Imag
 
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor nubus_image_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( image );
-}
+MACHINE_CONFIG_MEMBER( nubus_image_device::device_add_mconfig )
+	MCFG_DEVICE_ADD(IMAGE_DISK0_TAG, MESSIMG_DISK, 0)
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region

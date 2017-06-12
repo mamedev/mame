@@ -80,7 +80,7 @@ msx_cart_msx_audio_hxmu900_device::msx_cart_msx_audio_hxmu900_device(const machi
 }
 
 
-static MACHINE_CONFIG_START( msx_audio_hxmu900 )
+MACHINE_CONFIG_MEMBER( msx_cart_msx_audio_hxmu900_device::device_add_mconfig )
 	// This is actually incorrect. The sound output is passed back into the MSX machine where it is mixed internally and output through the system 'speaker'.
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("y8950", Y8950, XTAL_3_579545MHz)    // Not verified
@@ -90,12 +90,6 @@ static MACHINE_CONFIG_START( msx_audio_hxmu900 )
 
 	MCFG_MSX_AUDIO_KBDC_PORT_ADD("kbdc", msx_audio_keyboards, nullptr)
 MACHINE_CONFIG_END
-
-
-machine_config_constructor msx_cart_msx_audio_hxmu900_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( msx_audio_hxmu900 );
-}
 
 
 void msx_cart_msx_audio_hxmu900_device::device_start()
@@ -151,7 +145,7 @@ msx_cart_msx_audio_nms1205_device::msx_cart_msx_audio_nms1205_device(const machi
 }
 
 
-static MACHINE_CONFIG_START( msx_audio_nms1205 )
+MACHINE_CONFIG_MEMBER( msx_cart_msx_audio_nms1205_device::device_add_mconfig )
 	// This is actually incorrect. The sound output is passed back into the MSX machine where it is mixed internally and output through the system 'speaker'.
 	// At the same time the sound is also output on two output on the nms1205 cartridge itself
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -174,12 +168,6 @@ static MACHINE_CONFIG_START( msx_audio_nms1205 )
 
 	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
 MACHINE_CONFIG_END
-
-
-machine_config_constructor msx_cart_msx_audio_nms1205_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( msx_audio_nms1205 );
-}
 
 
 ROM_START( msx_nms1205 )
@@ -260,7 +248,7 @@ msx_cart_msx_audio_fsca1_device::msx_cart_msx_audio_fsca1_device(const machine_c
 }
 
 
-static MACHINE_CONFIG_START( msx_audio_fsca1 )
+MACHINE_CONFIG_MEMBER( msx_cart_msx_audio_fsca1_device::device_add_mconfig )
 	// This is actually incorrect. The sound output is passed back into the MSX machine where it is mixed internally and output through the system 'speaker'.
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("y8950", Y8950, XTAL_3_579545MHz)
@@ -272,12 +260,6 @@ static MACHINE_CONFIG_START( msx_audio_fsca1 )
 
 	MCFG_MSX_AUDIO_KBDC_PORT_ADD("kbdc", msx_audio_keyboards, nullptr)
 MACHINE_CONFIG_END
-
-
-machine_config_constructor msx_cart_msx_audio_fsca1_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( msx_audio_fsca1 );
-}
 
 
 static INPUT_PORTS_START( msx_audio_fsca1 )

@@ -17,8 +17,6 @@ public:
 	// construction/destruction
 	neogeo_cmc_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint16_t clock);
 
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
 	// reading and writing
 	virtual void decrypt_all(DECRYPT_ALL_PARAMS) override { }
 	virtual int get_fixed_bank_type() override { return 0; }
@@ -29,6 +27,8 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	required_device<cmc_prot_device> m_prot;
 };
