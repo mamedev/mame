@@ -32343,6 +32343,7 @@ bk2k_lg1                        //
 bk2k_lg3                        //
 bk2k_pa5                        //
 bk2k_pa7                        //
+bk2k_pf1                        //
 bk2k_pu1                        //
 bnzai_g3                        //
 bnzai_l1                        //
@@ -34495,6 +34496,9 @@ bushidoa                        //
 jolypark                        //
 mach2                           //
 vrnwrld                         //
+
+@source:spirit76.cpp
+spirit76                        //
 
 @source:splash.cpp
 funystrp                        // not a gaelco game but on similar hw to splash

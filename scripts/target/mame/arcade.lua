@@ -4323,6 +4323,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/sleic.cpp",
 	MAME_DIR .. "src/mame/drivers/spectra.cpp",
 	MAME_DIR .. "src/mame/drivers/spinb.cpp",
+	MAME_DIR .. "src/mame/drivers/spirit76.cpp",
 	MAME_DIR .. "src/mame/drivers/st_mp100.cpp",
 	MAME_DIR .. "src/mame/drivers/st_mp200.cpp",
 	MAME_DIR .. "src/mame/drivers/stargame.cpp",
