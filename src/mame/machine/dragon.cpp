@@ -57,7 +57,7 @@ void dragon_state::pia1_pa_changed(uint8_t data)
 	/* if strobe bit is high send data from pia0 port b to dragon parallel printer */
 	if (data & 0x02)
 	{
-		uint8_t output = m_pia_1->b_output();
+		uint8_t output = pia_1().b_output();
 		m_printer->output(output);
 	}
 }
@@ -118,7 +118,7 @@ void dragon64_state::pia1_pb_changed(uint8_t data)
 {
 	dragon_state::pia1_pb_changed(data);
 
-	uint8_t ddr = ~m_pia_1->port_b_z_mask();
+	uint8_t ddr = ~pia_1().port_b_z_mask();
 
 	/* If bit 2 of the pia1 ddrb is 1 then this pin is an output so use it */
 	/* to control the paging of the 32k and 64k basic roms */

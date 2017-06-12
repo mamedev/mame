@@ -251,7 +251,7 @@ void coco_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 // CoCo 1/2 you should get $F627 instead.
 //-------------------------------------------------
 
-uint8_t coco_state::floating_bus_read(void)
+uint8_t coco_state::floating_bus_read()
 {
 	uint8_t result;
 
@@ -1133,7 +1133,7 @@ void coco_state::poll_hires_joystick(void)
 //  current_vhd
 //-------------------------------------------------
 
-coco_vhd_image_device *coco_state::current_vhd(void)
+coco_vhd_image_device *coco_state::current_vhd()
 {
 	switch(m_vhd_select)
 	{
