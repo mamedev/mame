@@ -2,7 +2,7 @@
 // copyright-holders:Nathan Woods
 /***************************************************************************
 
-    coco12.c
+    coco12.cpp
 
     TRS-80 Radio Shack Color Computer 1/2 Family
 
