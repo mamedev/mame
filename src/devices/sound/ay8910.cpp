@@ -1200,12 +1200,6 @@ void ay8910_device::device_start()
 		m_streams = 1;
 	}
 
-	// FIXME: this doesn't belong here, it should be an input pin exposed via devcb
-	if (type() == YM2149 && (m_flags & YM2149_PIN26_LOW))
-	{
-		master_clock /= 2;
-	}
-
 	build_mixer_table();
 
 	/* The envelope is pacing twice as fast for the YM2149 as for the AY-3-8910,    */
@@ -1267,6 +1261,11 @@ void ay8910_device::set_volume(int channel,int volume)
 
 void ay8910_device::ay_set_clock(int clock)
 {
+	// FIXME: this doesn't belong here, it should be an input pin exposed via devcb
+	if (type() == YM2149 && (m_flags & YM2149_PIN26_LOW))
+	{
+		clock /= 2;
+	}
 	m_channel->set_sample_rate( clock / 8 );
 }
 
