@@ -120,7 +120,7 @@ static ADDRESS_MAP_START( gunbustr_map, AS_PROGRAM, 32, gunbustr_state )
 	AM_RANGE(0x200000, 0x21ffff) AM_RAM AM_SHARE("ram")                                     /* main CPUA ram */
 	AM_RANGE(0x300000, 0x301fff) AM_RAM AM_SHARE("spriteram")               /* Sprite ram */
 	AM_RANGE(0x380000, 0x380003) AM_WRITE(motor_control_w)                                          /* motor, lamps etc. */
-	AM_RANGE(0x390000, 0x3907ff) AM_RAM AM_SHARE("snd_shared")                                      /* Sound shared ram */
+	AM_RANGE(0x390000, 0x3907ff) AM_DEVREADWRITE8("taito_en:dpram", mb8421_device, left_r, left_w, 0xffffffff) /* Sound shared ram */
 	AM_RANGE(0x400000, 0x400007) AM_DEVREADWRITE8("tc0510nio", tc0510nio_device, read, write, 0xffffffff)
 	AM_RANGE(0x500000, 0x500003) AM_READWRITE(gunbustr_gun_r, gunbustr_gun_w)                       /* gun coord read */
 	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, long_r, long_w)

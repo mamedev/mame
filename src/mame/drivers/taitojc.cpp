@@ -587,33 +587,6 @@ WRITE8_MEMBER(taitojc_state::mcu_comm_w)
 	}
 }
 
-READ32_MEMBER(taitojc_state::snd_share_r)
-{
-	switch (offset & 3)
-	{
-		case 0: return (m_snd_shared_ram[(offset/4)] <<  0) & 0xff000000;
-		case 1: return (m_snd_shared_ram[(offset/4)] <<  8) & 0xff000000;
-		case 2: return (m_snd_shared_ram[(offset/4)] << 16) & 0xff000000;
-		case 3: return (m_snd_shared_ram[(offset/4)] << 24) & 0xff000000;
-	}
-
-	return 0;
-}
-
-WRITE32_MEMBER(taitojc_state::snd_share_w)
-{
-	if (ACCESSING_BITS_24_31)
-	{
-		switch (offset & 3)
-		{
-			case 0: m_snd_shared_ram[(offset/4)] &= ~0xff000000; m_snd_shared_ram[(offset/4)] |= (data >>  0 & 0xff000000); break;
-			case 1: m_snd_shared_ram[(offset/4)] &= ~0x00ff0000; m_snd_shared_ram[(offset/4)] |= (data >>  8 & 0x00ff0000); break;
-			case 2: m_snd_shared_ram[(offset/4)] &= ~0x0000ff00; m_snd_shared_ram[(offset/4)] |= (data >> 16 & 0x0000ff00); break;
-			case 3: m_snd_shared_ram[(offset/4)] &= ~0x000000ff; m_snd_shared_ram[(offset/4)] |= (data >> 24 & 0x000000ff); break;
-		}
-	}
-}
-
 
 READ8_MEMBER(taitojc_state::jc_pcbid_r)
 {
@@ -658,7 +631,7 @@ static ADDRESS_MAP_START( taitojc_map, AS_PROGRAM, 32, taitojc_state )
 	AM_RANGE(0x06600000, 0x0660001f) AM_DEVREADWRITE8("tc0640fio", tc0640fio_device, read, write, 0xff000000)
 	AM_RANGE(0x0660004c, 0x0660004f) AM_WRITE_PORT("EEPROMOUT")
 	AM_RANGE(0x06800000, 0x06800003) AM_WRITE8(jc_irq_unk_w, 0x00ff0000)
-	AM_RANGE(0x06a00000, 0x06a01fff) AM_READWRITE(snd_share_r, snd_share_w) AM_SHARE("snd_shared")
+	AM_RANGE(0x06a00000, 0x06a01fff) AM_DEVREADWRITE8("taito_en:dpram", mb8421_device, left_r, left_w, 0xff000000)
 	AM_RANGE(0x06c00000, 0x06c0001f) AM_READWRITE8(jc_lan_r, jc_lan_w, 0x00ff0000)
 	AM_RANGE(0x08000000, 0x080fffff) AM_RAM AM_SHARE("main_ram")
 	AM_RANGE(0x10001ff8, 0x10001ffb) AM_READ16(dsp_to_main_7fe_r, 0xffff0000)
