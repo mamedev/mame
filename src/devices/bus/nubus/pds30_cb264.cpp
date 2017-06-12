@@ -60,6 +60,7 @@ const tiny_rom_entry *nubus_cb264se30_device::device_rom_region() const
 nubus_cb264se30_device::nubus_cb264se30_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	nubus_cb264se30_device(mconfig, PDS030_CB264SE30, tag, owner, clock)
 {
+	(void)m_toggle;
 }
 
 nubus_cb264se30_device::nubus_cb264se30_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :

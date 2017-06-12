@@ -60,6 +60,7 @@ const tiny_rom_entry *nubus_lview_device::device_rom_region() const
 nubus_lview_device::nubus_lview_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	nubus_lview_device(mconfig, PDS030_LVIEW, tag, owner, clock)
 {
+	(void)m_toggle;
 }
 
 nubus_lview_device::nubus_lview_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
