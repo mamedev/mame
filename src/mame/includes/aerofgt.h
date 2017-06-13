@@ -78,14 +78,9 @@ public:
 	uint32_t aerofgt_old_tile_callback( uint32_t code );
 	uint32_t aerofgt_ol2_tile_callback( uint32_t code );
 
-	/* misc */
-	int       m_pending_command;
-
 	/* handlers */
-	DECLARE_WRITE8_MEMBER(sound_command_w);
 	DECLARE_WRITE8_MEMBER(aerfboot_soundlatch_w);
 	DECLARE_READ8_MEMBER(pending_command_r);
-	DECLARE_WRITE8_MEMBER(pending_command_clear_w);
 	DECLARE_WRITE8_MEMBER(aerofgt_unknown_output_w);
 	DECLARE_WRITE8_MEMBER(aerofgt_sh_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(spinlbrk_sh_bankswitch_w);

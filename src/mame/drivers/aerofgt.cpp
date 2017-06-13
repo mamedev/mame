@@ -73,13 +73,6 @@ Verification still needed for the other PCBs.
 #include "speaker.h"
 
 
-WRITE8_MEMBER(aerofgt_state::sound_command_w)
-{
-	m_pending_command = 1;
-	m_soundlatch->write(space, 0, data);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-}
-
 WRITE8_MEMBER(aerofgt_state::aerfboot_soundlatch_w)
 {
 	m_soundlatch->write(space, 0, data);
@@ -88,12 +81,7 @@ WRITE8_MEMBER(aerofgt_state::aerfboot_soundlatch_w)
 
 READ8_MEMBER(aerofgt_state::pending_command_r)
 {
-	return m_pending_command;
-}
-
-WRITE8_MEMBER(aerofgt_state::pending_command_clear_w)
-{
-	m_pending_command = 0;
+	return m_soundlatch->pending_r();
 }
 
 WRITE8_MEMBER(aerofgt_state::aerofgt_unknown_output_w)
@@ -156,7 +144,7 @@ static ADDRESS_MAP_START( pspikes_map, AS_PROGRAM, 16, aerofgt_state )
 	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("IN0") AM_WRITE8(pspikes_palette_bank_w, 0x00ff)
 	AM_RANGE(0xfff002, 0xfff003) AM_READ_PORT("IN1") AM_WRITE8(pspikes_gfxbank_w, 0x00ff)
 	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("DSW") AM_WRITE(aerofgt_bg1scrolly_w)
-	AM_RANGE(0xfff006, 0xfff007) AM_READWRITE8(pending_command_r, sound_command_w, 0x00ff)
+	AM_RANGE(0xfff006, 0xfff007) AM_READ8(pending_command_r, 0x00ff) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0xfff400, 0xfff403) AM_DEVWRITE8("gga", vsystem_gga_device, write, 0x00ff)
 ADDRESS_MAP_END
 
@@ -228,7 +216,7 @@ static ADDRESS_MAP_START( karatblz_map, AS_PROGRAM, 16, aerofgt_state )
 	AM_RANGE(0x0ff000, 0x0ff001) AM_READ_PORT("IN0") AM_WRITE8(spinlbrk_flip_screen_w, 0xff00)
 	AM_RANGE(0x0ff002, 0x0ff003) AM_READ_PORT("IN1") AM_WRITE8(karatblz_gfxbank_w, 0xff00)
 	AM_RANGE(0x0ff004, 0x0ff005) AM_READ_PORT("IN2")
-	AM_RANGE(0x0ff006, 0x0ff007) AM_READ_PORT("IN3") AM_WRITE8(sound_command_w, 0x00ff)
+	AM_RANGE(0x0ff006, 0x0ff007) AM_READ_PORT("IN3") AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x0ff008, 0x0ff009) AM_READ_PORT("DSW") AM_WRITE(aerofgt_bg1scrollx_w)
 	AM_RANGE(0x0ff00a, 0x0ff00b) AM_READ8(pending_command_r, 0x00ff) AM_WRITE(aerofgt_bg1scrolly_w)
 	AM_RANGE(0x0ff00c, 0x0ff00d) AM_WRITE(aerofgt_bg2scrollx_w)
@@ -248,7 +236,7 @@ static ADDRESS_MAP_START( spinlbrk_map, AS_PROGRAM, 16, aerofgt_state )
 	AM_RANGE(0xfff000, 0xfff001) AM_WRITE8(spinlbrk_gfxbank_w, 0x00ff)
 	AM_RANGE(0xfff002, 0xfff003) AM_READ_PORT("IN1") AM_WRITE(aerofgt_bg2scrollx_w)
 	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("DSW")
-	AM_RANGE(0xfff006, 0xfff007) AM_WRITE8(sound_command_w, 0x00ff)
+	AM_RANGE(0xfff006, 0xfff007) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 //  AM_RANGE(0xfff008, 0xfff009) - read when analog inputs are enabled
 //  AM_RANGE(0xfff00a, 0xfff00b) /
 	AM_RANGE(0xfff400, 0xfff403) AM_DEVWRITE8("gga", vsystem_gga_device, write, 0x00ff)
@@ -273,7 +261,7 @@ static ADDRESS_MAP_START( turbofrc_map, AS_PROGRAM, 16, aerofgt_state )
 	AM_RANGE(0x0ff008, 0x0ff009) AM_READ_PORT("IN2")
 	AM_RANGE(0x0ff008, 0x0ff00b) AM_WRITE(turbofrc_gfxbank_w)
 	AM_RANGE(0x0ff00c, 0x0ff00d) AM_WRITENOP    /* related to bg2 (written together with the scroll registers) */
-	AM_RANGE(0x0ff00e, 0x0ff00f) AM_WRITE8(sound_command_w, 0xff00)
+	AM_RANGE(0x0ff00e, 0x0ff00f) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0xff00)
 	AM_RANGE(0x0ff400, 0x0ff403) AM_DEVWRITE8("gga", vsystem_gga_device, write, 0x00ff)
 ADDRESS_MAP_END
 
@@ -293,7 +281,7 @@ static ADDRESS_MAP_START( aerofgtb_map, AS_PROGRAM, 16, aerofgt_state )
 	AM_RANGE(0x0fe006, 0x0fe007) AM_READ8(pending_command_r, 0x00ff) AM_WRITE(aerofgt_bg2scrolly_w)
 	AM_RANGE(0x0fe008, 0x0fe009) AM_READ_PORT("DSW2")
 	AM_RANGE(0x0fe008, 0x0fe00b) AM_WRITE(turbofrc_gfxbank_w)
-	AM_RANGE(0x0fe00e, 0x0fe00f) AM_WRITE8(sound_command_w, 0xff00)
+	AM_RANGE(0x0fe00e, 0x0fe00f) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0xff00)
 	AM_RANGE(0x0fe400, 0x0fe403) AM_DEVWRITE8("gga", vsystem_gga_device, write, 0x00ff)
 	AM_RANGE(0x0ff000, 0x0fffff) AM_RAM AM_SHARE("rasterram")   /* used only for the scroll registers */
 ADDRESS_MAP_END
@@ -313,7 +301,7 @@ static ADDRESS_MAP_START( aerofgt_map, AS_PROGRAM, 16, aerofgt_state )
 	AM_RANGE(0xffff88, 0xffff89) AM_WRITE(aerofgt_bg1scrolly_w) /* + something else in the top byte */
 	AM_RANGE(0xffff90, 0xffff91) AM_WRITE(aerofgt_bg2scrolly_w) /* + something else in the top byte */
 	AM_RANGE(0xffffa0, 0xffffbf) AM_DEVREADWRITE8("io", vs9209_device, read, write, 0x00ff)
-	AM_RANGE(0xffffc0, 0xffffc1) AM_WRITE8(sound_command_w, 0x00ff)
+	AM_RANGE(0xffffc0, 0xffffc1) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( aerfboot_map, AS_PROGRAM, 16, aerofgt_state )
@@ -383,7 +371,7 @@ static ADDRESS_MAP_START( wbbc97_map, AS_PROGRAM, 16, aerofgt_state )
 	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("IN0") AM_WRITE8(pspikes_palette_bank_w, 0x00ff)
 	AM_RANGE(0xfff002, 0xfff003) AM_READ_PORT("IN1") AM_WRITE8(pspikes_gfxbank_w, 0x00ff)
 	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("DSW") AM_WRITE(aerofgt_bg1scrolly_w)
-	AM_RANGE(0xfff006, 0xfff007) AM_READNOP AM_WRITE8(sound_command_w, 0x00ff)
+	AM_RANGE(0xfff006, 0xfff007) AM_READNOP AM_WRITE8(aerfboot_soundlatch_w, 0x00ff)
 	AM_RANGE(0xfff00e, 0xfff00f) AM_WRITE(wbbc97_bitmap_enable_w)
 	AM_RANGE(0xfff400, 0xfff403) AM_DEVWRITE8("gga", vsystem_gga_device, write, 0x00ff)
 ADDRESS_MAP_END
@@ -397,14 +385,14 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( spinlbrk_sound_portmap, AS_IO, 8, aerofgt_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(spinlbrk_sh_bankswitch_w)
-	AM_RANGE(0x14, 0x14) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(pending_command_clear_w)
+	AM_RANGE(0x14, 0x14) AM_DEVREADWRITE("soundlatch", generic_latch_8_device, read, acknowledge_w)
 	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( turbofrc_sound_portmap, AS_IO, 8, aerofgt_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(aerofgt_sh_bankswitch_w)
-	AM_RANGE(0x14, 0x14) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(pending_command_clear_w)
+	AM_RANGE(0x14, 0x14) AM_DEVREADWRITE("soundlatch", generic_latch_8_device, read, acknowledge_w)
 	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
 ADDRESS_MAP_END
 
@@ -412,7 +400,7 @@ static ADDRESS_MAP_START( aerofgt_sound_portmap, AS_IO, 8, aerofgt_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
 	AM_RANGE(0x04, 0x04) AM_WRITE(aerofgt_sh_bankswitch_w)
-	AM_RANGE(0x08, 0x08) AM_WRITE(pending_command_clear_w)
+	AM_RANGE(0x08, 0x08) AM_DEVWRITE("soundlatch", generic_latch_8_device, acknowledge_w)
 	AM_RANGE(0x0c, 0x0c) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
@@ -1323,7 +1311,6 @@ GFXDECODE_END
 
 MACHINE_START_MEMBER(aerofgt_state,common)
 {
-	save_item(NAME(m_pending_command));
 }
 
 MACHINE_START_MEMBER(aerofgt_state,aerofgt)
@@ -1342,7 +1329,6 @@ MACHINE_START_MEMBER(aerofgt_state,spinlbrk)
 
 MACHINE_RESET_MEMBER(aerofgt_state,common)
 {
-	m_pending_command = 0;
 }
 
 MACHINE_RESET_MEMBER(aerofgt_state,aerofgt)
@@ -1393,6 +1379,8 @@ static MACHINE_CONFIG_START( pspikes )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -1559,6 +1547,8 @@ static MACHINE_CONFIG_START( karatblz )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_8MHz ) /* verified on pcb */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -1671,6 +1661,8 @@ static MACHINE_CONFIG_START( spinlbrk )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_8MHz)  /* verified on pcb */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -1726,6 +1718,8 @@ static MACHINE_CONFIG_START( turbofrc )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_8MHz)  /* verified on pcb */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -1782,6 +1776,8 @@ static MACHINE_CONFIG_START( aerofgtb )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -1841,6 +1837,8 @@ static MACHINE_CONFIG_START( aerofgt )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_8MHz)  /* verified on pcb */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
