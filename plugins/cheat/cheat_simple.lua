@@ -168,7 +168,7 @@ function simple.conv_cheat(data)
 			elseif size and val then
 				cheat = { desc = desc, space = { cpup = { tag = cputag, type = "program" } } }
 				if size == "w" then
-					size  "u16"
+					size = "u16"
 				elseif size == "d" then
 					size = "u32"
 				elseif size == "q" then
