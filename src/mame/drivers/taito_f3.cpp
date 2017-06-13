@@ -223,8 +223,6 @@ static ADDRESS_MAP_START( bubsympb_map, AS_PROGRAM, 32, taito_f3_state )
 	AM_RANGE(0x660000, 0x66000f) AM_WRITE16(f3_control_0_w,0xffffffff)
 	AM_RANGE(0x660010, 0x66001f) AM_WRITE16(f3_control_1_w,0xffffffff)
 	AM_RANGE(0xc00000, 0xc007ff) AM_RAM
-	AM_RANGE(0xc80000, 0xc80003) AM_WRITE(f3_sound_reset_0_w)
-	AM_RANGE(0xc80100, 0xc80103) AM_WRITE(f3_sound_reset_1_w)
 ADDRESS_MAP_END
 
 
