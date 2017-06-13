@@ -86,10 +86,10 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_START( cbm8000_hsg_a )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( cbm8000_hsg_a )
+MACHINE_CONFIG_MEMBER( cbm8000_hsg_a_device::device_add_mconfig )
 	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
 	MCFG_SCREEN_UPDATE_DEVICE(EF9365_TAG, ef9365_device, screen_update)
 	MCFG_SCREEN_SIZE(512, 512)
@@ -105,12 +105,7 @@ static MACHINE_CONFIG_START( cbm8000_hsg_a )
 	MCFG_EF936X_DISPLAYMODE(DISPLAY_MODE_512x512);
 MACHINE_CONFIG_END
 
-
-//-------------------------------------------------
-//  MACHINE_CONFIG_START( cbm8000_hsg_b )
-//-------------------------------------------------
-
-static MACHINE_CONFIG_START( cbm8000_hsg_b )
+MACHINE_CONFIG_MEMBER( cbm8000_hsg_b_device::device_add_mconfig )
 	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
 	MCFG_SCREEN_UPDATE_DEVICE(EF9366_TAG, ef9365_device, screen_update)
 	MCFG_SCREEN_SIZE(512, 256)
@@ -125,22 +120,6 @@ static MACHINE_CONFIG_START( cbm8000_hsg_b )
 	MCFG_EF936X_BITPLANES_CNT(1);
 	MCFG_EF936X_DISPLAYMODE(DISPLAY_MODE_512x256);
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor cbm8000_hsg_a_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( cbm8000_hsg_a );
-}
-
-machine_config_constructor cbm8000_hsg_b_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( cbm8000_hsg_b );
-}
 
 
 
