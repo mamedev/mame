@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
+#include "machine/74157.h"
 #include "machine/upd4701.h"
 #include "sound/msm5205.h"
 #include "sound/2203intf.h"
@@ -198,16 +199,10 @@ public:
 	taitol_1cpu_state(const machine_config &mconfig, device_type type, const char *tag)
 		: taitol_state(mconfig, type, tag)
 		, m_ymsnd(*this, "ymsnd")
-		, m_porte0_tag(nullptr)
-		, m_porte1_tag(nullptr)
-		, m_portf0_tag(nullptr)
-		, m_portf1_tag(nullptr)
-		, m_extport(0)
+		, m_mux(*this, {"dswmuxl", "dswmuxh", "inmuxl", "inmuxh"})
 	{
 	}
 
-	DECLARE_READ8_MEMBER(portA_r);
-	DECLARE_READ8_MEMBER(portB_r);
 	DECLARE_READ8_MEMBER(extport_select_and_ym2203_r);
 
 	DECLARE_DRIVER_INIT(plottinga);
@@ -222,13 +217,7 @@ protected:
 	virtual void taito_machine_reset() override;
 
 	required_device<ym2203_device>  m_ymsnd;
-
-	char const *m_porte0_tag;
-	char const *m_porte1_tag;
-	char const *m_portf0_tag;
-	char const *m_portf1_tag;
-
-	int         m_extport;
+	optional_device_array<ls157_device, 4> m_mux;
 };
 
 
