@@ -102,9 +102,7 @@ public:
 	DECLARE_READ8_MEMBER(fixeight_region_r);
 	DECLARE_WRITE8_MEMBER(raizing_z80_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(raizing_oki_bankswitch_w);
-	DECLARE_WRITE16_MEMBER(bgaregga_soundlatch_w);
 	DECLARE_READ8_MEMBER(bgaregga_E01D_r);
-	DECLARE_WRITE8_MEMBER(bgaregga_E00C_w);
 	DECLARE_READ16_MEMBER(batrider_z80_busack_r);
 	DECLARE_WRITE16_MEMBER(batrider_z80_busreq_w);
 	DECLARE_READ16_MEMBER(batrider_z80rom_r);

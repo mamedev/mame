@@ -850,30 +850,11 @@ WRITE8_MEMBER(toaplan2_state::raizing_oki_bankswitch_w)
 }
 
 
-WRITE16_MEMBER(toaplan2_state::bgaregga_soundlatch_w)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		m_soundlatch->write(space, offset, data & 0xff);
-		m_audiocpu->set_input_line(0, HOLD_LINE);
-	}
-}
-
-
 READ8_MEMBER(toaplan2_state::bgaregga_E01D_r)
 {
 	// the Z80 reads this address during its IRQ routine,
 	// and reads the soundlatch only if the lowest bit is clear.
-	return 0;
-}
-
-
-WRITE8_MEMBER(toaplan2_state::bgaregga_E00C_w)
-{
-	// the Z80 writes here after reading the soundlatch.
-	// I would think that this was an acknowledge latch like
-	// batrider and bbakraid have, except that on the 68000 side
-	// there's no corresponding read...
+	return m_soundlatch->pending_r() ? 0 : 1;
 }
 
 
@@ -1371,7 +1352,7 @@ static ADDRESS_MAP_START( bgaregga_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 	AM_RANGE(0x502000, 0x502fff) AM_RAM AM_SHARE("tx_lineselect")
 	AM_RANGE(0x503000, 0x5031ff) AM_RAM_WRITE(toaplan2_tx_linescroll_w) AM_SHARE("tx_linescroll")
 	AM_RANGE(0x503200, 0x503fff) AM_RAM
-	AM_RANGE(0x600000, 0x600001) AM_WRITE(bgaregga_soundlatch_w)
+	AM_RANGE(0x600000, 0x600001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 ADDRESS_MAP_END
 
 
@@ -1460,7 +1441,7 @@ static ADDRESS_MAP_START( bgaregga_sound_z80_mem, AS_PROGRAM, 8, toaplan2_state 
 	AM_RANGE(0xe004, 0xe004) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0xe006, 0xe008) AM_WRITE(raizing_oki_bankswitch_w)
 	AM_RANGE(0xe00a, 0xe00a) AM_WRITE(raizing_z80_bankswitch_w)
-	AM_RANGE(0xe00c, 0xe00c) AM_WRITE(bgaregga_E00C_w)
+	AM_RANGE(0xe00c, 0xe00c) AM_DEVWRITE("soundlatch", generic_latch_8_device, acknowledge_w)
 	AM_RANGE(0xe01c, 0xe01c) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xe01d, 0xe01d) AM_READ(bgaregga_E01D_r)
 ADDRESS_MAP_END
@@ -4176,6 +4157,8 @@ static MACHINE_CONFIG_START( bgaregga )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
+	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
 	MCFG_YM2151_ADD("ymsnd", XTAL_32MHz/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

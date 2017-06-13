@@ -34,6 +34,9 @@ DECLARE_DEVICE_TYPE(GENERIC_LATCH_16, generic_latch_16_device)
 #define MCFG_GENERIC_LATCH_DATA_PENDING_CB(_devcb) \
 	devcb = &generic_latch_base_device::set_data_pending_callback(*device, DEVCB_##_devcb);
 
+#define MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(_ack) \
+	generic_latch_base_device::set_separate_acknowledge(*device, _ack);
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -51,6 +54,7 @@ public:
 	// static configuration
 	template <class Object> static devcb_base &set_data_pending_callback(device_t &device, Object &&cb)
 	{ return downcast<generic_latch_base_device &>(device).m_data_pending_cb.set_callback(std::forward<Object>(cb)); }
+	static void set_separate_acknowledge(device_t &device, bool ack) { downcast<generic_latch_base_device &>(device).m_separate_acknowledge = ack; }
 
 	DECLARE_READ_LINE_MEMBER(pending_r);
 
@@ -58,10 +62,12 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	bool has_separate_acknowledge() const { return m_separate_acknowledge; }
 	bool is_latch_written() const { return m_latch_written; }
 	void set_latch_written(bool latch_written);
 
 private:
+	bool                    m_separate_acknowledge;
 	bool                    m_latch_written;
 	devcb_write_line        m_data_pending_cb;
 };
@@ -82,6 +88,9 @@ public:
 	DECLARE_WRITE8_MEMBER( clear_w );
 	DECLARE_WRITE_LINE_MEMBER( preset_w );
 	DECLARE_WRITE_LINE_MEMBER( clear_w );
+
+	DECLARE_READ8_MEMBER( acknowledge_r );
+	DECLARE_WRITE8_MEMBER( acknowledge_w );
 
 	void preset_w(u8 value) { m_latched_value = value; }
 
