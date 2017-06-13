@@ -54,7 +54,7 @@ void ls157_device::device_start()
 	// resolve callbacks
 	m_a_in_cb.resolve();
 	m_b_in_cb.resolve();
-	m_out_cb.resolve_safe();
+	m_out_cb.resolve();
 
 	// register items for save state
 	save_item(NAME(m_a));
@@ -178,7 +178,7 @@ void ls157_device::write_a_bit(int bit, bool state)
 		else
 			m_a &= ~(1 << bit);
 
-		if (!m_strobe && !m_select)
+		if (!m_strobe && !m_select && !m_out_cb.isnull())
 			m_out_cb(m_a);
 	}
 }
@@ -202,7 +202,7 @@ void ls157_device::write_b_bit(int bit, bool state)
 		else
 			m_b &= ~(1 << bit);
 
-		if (!m_strobe && m_select)
+		if (!m_strobe && m_select && !m_out_cb.isnull())
 			m_out_cb(m_b);
 	}
 }
@@ -237,7 +237,7 @@ WRITE_LINE_MEMBER(ls157_device::strobe_w)
 		m_strobe = bool(state);
 
 		// Clear output when strobe goes high
-		if (m_strobe)
+		if (m_strobe && !m_out_cb.isnull())
 			m_out_cb(0);
 		else
 			update_output();
@@ -254,7 +254,7 @@ void ls157_device::update_output()
 {
 	// S high, strobe low: Y1-Y4 = B1-B4
 	// S low, strobe low:  Y1-Y4 = A1-A4
-	if (!m_strobe)
+	if (!m_strobe && !m_out_cb.isnull())
 	{
 		if (m_select)
 			m_out_cb(m_b_in_cb.isnull() ? m_b : (m_b_in_cb() & 0xf));
