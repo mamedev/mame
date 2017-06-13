@@ -56,12 +56,6 @@ READ8_MEMBER(actfancr_state::triothep_control_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(actfancr_state::actfancr_sound_w)
-{
-	m_soundlatch->write(space, 0, data & 0xff);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-}
-
 /******************************************************************************/
 
 WRITE8_MEMBER(actfancr_state::actfancr_buffer_spriteram_w)
@@ -90,7 +84,7 @@ static ADDRESS_MAP_START( actfan_map, AS_PROGRAM, 8, actfancr_state )
 	AM_RANGE(0x130002, 0x130002) AM_READ_PORT("DSW1")
 	AM_RANGE(0x130003, 0x130003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x140000, 0x140001) AM_READ_PORT("SYSTEM") /* VBL */
-	AM_RANGE(0x150000, 0x150001) AM_WRITE(actfancr_sound_w)
+	AM_RANGE(0x150000, 0x150000) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x1f0000, 0x1f3fff) AM_RAM AM_SHARE("main_ram") /* Main ram */
 ADDRESS_MAP_END
 
@@ -104,7 +98,7 @@ static ADDRESS_MAP_START( triothep_map, AS_PROGRAM, 8, actfancr_state )
 	AM_RANGE(0x060010, 0x06001f) AM_DEVWRITE("tilegen1", deco_bac06_device, pf_control1_8bit_swap_w)
 	AM_RANGE(0x064000, 0x0647ff) AM_DEVREADWRITE("tilegen1", deco_bac06_device, pf_data_8bit_swap_r, pf_data_8bit_swap_w)
 	AM_RANGE(0x066400, 0x0667ff) AM_DEVREADWRITE("tilegen1", deco_bac06_device, pf_rowscroll_8bit_swap_r, pf_rowscroll_8bit_swap_w)
-	AM_RANGE(0x100000, 0x100001) AM_WRITE(actfancr_sound_w)
+	AM_RANGE(0x100000, 0x100000) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x110000, 0x110001) AM_WRITE(actfancr_buffer_spriteram_w)
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x130000, 0x1305ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
@@ -329,6 +323,7 @@ static MACHINE_CONFIG_START( actfancr )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_SOUND_ADD("ym1", YM2203, 1500000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.90)
@@ -386,6 +381,7 @@ static MACHINE_CONFIG_START( triothep )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_SOUND_ADD("ym1", YM2203, XTAL_12MHz/8) /* verified on pcb */
 	MCFG_SOUND_ROUTE(0, "mono", 0.90)
