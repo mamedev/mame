@@ -343,10 +343,12 @@ void konamigx_state::sexyparo_esc(address_space &space, uint32_t p1, uint32_t p2
 {
 	// The d20000 should probably be p3
 	// TODO: debugging bootcamp, remove once finished
+	#if UNUSED_FUNCTION
 	if (p1 != 0)
 	{
 		logerror("sexyparo_esc P1 param: %02x\n", p1);
 	}
+	#endif
 	generate_sprites(space, 0xc00604, 0xd20000, 0xfc);
 }
 
