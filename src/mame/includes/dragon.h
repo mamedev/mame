@@ -10,8 +10,8 @@
 
 #pragma once
 
-#ifndef __DRAGON__
-#define __DRAGON__
+#ifndef MAME_INCLUDES_DRAGON_H
+#define MAME_INCLUDES_DRAGON_H
 
 
 #include "includes/coco12.h"
@@ -37,29 +37,28 @@ class dragon_state : public coco12_state
 {
 public:
 	dragon_state(const machine_config &mconfig, device_type type, const char *tag)
-	: coco12_state(mconfig, type, tag),
-		m_printer(*this, PRINTER_TAG)
+		: coco12_state(mconfig, type, tag)
+		, m_printer(*this, PRINTER_TAG)
 	{
 	}
 
-	required_device<printer_image_device> m_printer;
-
 protected:
 	virtual void pia1_pa_changed(uint8_t data) override;
+
+private:
+	required_device<printer_image_device> m_printer;
 };
 
 
-/* dragon64 has an ACIA chip */
+// dragon64 has an ACIA chip
 class dragon64_state : public dragon_state
 {
 public:
 	dragon64_state(const machine_config &mconfig, device_type type, const char *tag)
-	: dragon_state(mconfig, type, tag),
-		m_acia(*this, ACIA_TAG)
+		: dragon_state(mconfig, type, tag)
+		, m_acia(*this, ACIA_TAG)
 	{
 	}
-
-	required_device<mos6551_device> m_acia;
 
 protected:
 	virtual DECLARE_READ8_MEMBER( ff00_read ) override;
@@ -67,16 +66,19 @@ protected:
 
 	virtual void pia1_pb_changed(uint8_t data) override;
 	void page_rom(bool romswitch);
+
+private:
+	required_device<mos6551_device> m_acia;
 };
 
 
-/* dragon200e has a character generator */
+// dragon200e has a character generator
 class dragon200e_state : public dragon64_state
 {
 public:
 	dragon200e_state(const machine_config &mconfig, device_type type, const char *tag)
-		: dragon64_state(mconfig, type, tag),
-		m_char_rom(*this, "chargen")
+		: dragon64_state(mconfig, type, tag)
+		, m_char_rom(*this, "chargen")
 	{
 	}
 
@@ -87,15 +89,15 @@ private:
 };
 
 
-/* d64plus has a HD6845 and character generator */
+// d64plus has a HD6845 and character generator
 class d64plus_state : public dragon64_state
 {
 public:
 	d64plus_state(const machine_config &mconfig, device_type type, const char *tag)
-		: dragon64_state(mconfig, type, tag),
-		m_hd6845(*this, "hd6845"),
-		m_videoram(*this, "videoram"),
-		m_char_rom(*this, "chargen")
+		: dragon64_state(mconfig, type, tag)
+		, m_hd6845(*this, "hd6845")
+		, m_videoram(*this, "videoram")
+		, m_char_rom(*this, "chargen")
 	{
 	}
 
@@ -107,4 +109,4 @@ private:
 	required_memory_region m_char_rom;
 };
 
-#endif /* __DRAGON__ */
+#endif // MAME_INCLUDES_DRAGON_H
