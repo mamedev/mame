@@ -30,7 +30,6 @@ public:
 	required_shared_ptr<uint16_t> m_charvideoram;
 
 	tilemap_t *m_char_tilemap;
-	int m_pending_command;
 	uint8_t m_gfxbank[2];
 	uint16_t m_charpalettebank;
 	uint16_t m_spritepalettebank;
@@ -39,14 +38,10 @@ public:
 	int m_scrolly;
 
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
-	DECLARE_WRITE16_MEMBER(sound_command_w);
-	DECLARE_WRITE8_MEMBER(pending_command_clear_w);
 	DECLARE_WRITE16_MEMBER(palette_bank_w);
 	DECLARE_WRITE16_MEMBER(gfxbank_w);
 	DECLARE_WRITE16_MEMBER(scrollreg_w);
 	DECLARE_WRITE16_MEMBER(charvideoram_w);
-
-	DECLARE_CUSTOM_INPUT_MEMBER(pending_sound_r);
 
 	DECLARE_DRIVER_INIT(quiz18k);
 	DECLARE_DRIVER_INIT(welltris);
