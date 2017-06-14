@@ -45,9 +45,6 @@ public:
 	uint32_t  suprslam_tile_callback( uint32_t code );
 	uint8_t       m_spr_ctrl;
 
-	/* misc */
-	int         m_pending_command;
-
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -57,8 +54,6 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_WRITE16_MEMBER(sound_command_w);
-	DECLARE_WRITE8_MEMBER(pending_command_clear_w);
 	DECLARE_WRITE8_MEMBER(suprslam_sh_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(suprslam_screen_videoram_w);
 	DECLARE_WRITE16_MEMBER(suprslam_bg_videoram_w);
