@@ -2439,16 +2439,16 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( astormb2 )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 10000000)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2) /* 12MHz */
 	MCFG_CPU_PROGRAM_MAP(astormbl_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", segas1x_bootleg_state,  irq4_line_hold)
 
-	MCFG_CPU_ADD("soundcpu", Z80, 8000000)
+	MCFG_CPU_ADD("soundcpu", Z80, XTAL_8MHz/2) /* 4MHz */
 	MCFG_CPU_PROGRAM_MAP(sys18bl_sound_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_REFRESH_RATE(58.271) /* V-Sync is 58.271Hz & H-Sync is ~ 14.48KHz measured */
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(40*8, 28*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
@@ -2469,7 +2469,7 @@ static MACHINE_CONFIG_START( astormb2 )
 	// 1 OKI M6295 instead of original sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 8000000/8, PIN7_LOW) // clock and pin not verified
+	MCFG_OKIM6295_ADD("oki", XTAL_8MHz/8, PIN7_HIGH) // 1MHz clock and pin verified
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, sys18bl_oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
