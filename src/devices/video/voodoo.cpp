@@ -2185,6 +2185,7 @@ int32_t voodoo_device::register_w(voodoo_device *vd, offs_t offset, uint32_t dat
 	switch (regnum)
 	{
 		case intrCtrl:
+			vd->reg[regnum].u = data;
 			// Setting bit 31 clears the PCI interrupts
 			if (data & 0x80000000) {
 				// Clear pci interrupt
