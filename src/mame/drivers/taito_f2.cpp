@@ -207,8 +207,6 @@ input. With the value currently returned, it sounds an alarm and says
 Update (2008.10.09) Printer shall now be correct but it's still not clear
 how the inputs are physically connected and what the are supposed to do.
 
-The timer stays at 00:00. Missing RTC emulation?
-
 [Coin lockout/ctr?]
 
 Calendar / Time in "test mode" always reset to default settings.
