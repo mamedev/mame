@@ -170,6 +170,25 @@ static ADDRESS_MAP_START( audio_io_map, AS_IO, 8, cop01_state )
 ADDRESS_MAP_END
 
 
+/*
+ * sound "protection" uses address/data to ports 2/3 (R/W)
+ * Register map:
+ * 0x32: always 5, dac transfer trigger?
+ * 0x33: - address 1 (source?)
+ * 0x34: /
+ * 0x35: - address 2 (size?)
+ * 0x36: / 
+ * 0x37: R reused for ym3526 register set
+ *
+ * 0x40: counter set, always 1?
+ * 0x41: R bit 0 pulse timer? W oneshot timer?
+ * 0x42: counter set, always 3?
+ * 0x43: counter set, always 3?
+ *
+ * 0x92: data in/out (for dac?)
+ * 0x94: test register? (W 0xaa, checks if R 0xaa)
+ */
+
 /* this just gets some garbage out of the YM3526 */
 READ8_MEMBER(cop01_state::kludge)
 {
@@ -179,8 +198,8 @@ READ8_MEMBER(cop01_state::kludge)
 static ADDRESS_MAP_START( mightguy_audio_io_map, AS_IO, 8, cop01_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ymsnd", ym3526_device, write)
-	AM_RANGE(0x02, 0x02) AM_WRITENOP    /* 1412M2? */
-	AM_RANGE(0x03, 0x03) AM_WRITENOP    /* 1412M2? */
+	AM_RANGE(0x02, 0x02) AM_WRITENOP    /* 1412M2 address? */
+	AM_RANGE(0x03, 0x03) AM_WRITENOP    /* 1412M2 data? */
 	AM_RANGE(0x03, 0x03) AM_READ(kludge)    /* 1412M2? */
 	AM_RANGE(0x06, 0x06) AM_READ(cop01_sound_command_r)
 ADDRESS_MAP_END
