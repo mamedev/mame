@@ -224,6 +224,28 @@ static ADDRESS_MAP_START( karatblz_map, AS_PROGRAM, 16, aerofgt_state )
 	AM_RANGE(0x0ff400, 0x0ff403) AM_DEVWRITE8("gga", vsystem_gga_device, write, 0x00ff)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( karatblzbl_map, AS_PROGRAM, 16, aerofgt_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM
+	AM_RANGE(0x080000, 0x081fff) AM_RAM_WRITE(aerofgt_bg1videoram_w) AM_SHARE("bg1videoram")
+	AM_RANGE(0x082000, 0x083fff) AM_RAM_WRITE(aerofgt_bg2videoram_w) AM_SHARE("bg2videoram")
+	AM_RANGE(0x0a0000, 0x0affff) AM_RAM AM_SHARE("spriteram1")
+	AM_RANGE(0x0b0000, 0x0bffff) AM_RAM AM_SHARE("spriteram2")
+	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM /* work RAM */
+	AM_RANGE(0x0f8000, 0x0fbfff) AM_RAM /* work RAM */
+	AM_RANGE(0x0fc000, 0x0fc7ff) AM_RAM AM_SHARE("spriteram3")
+	AM_RANGE(0x0fe000, 0x0fe7ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x0ff000, 0x0ff001) AM_READ_PORT("IN0") AM_WRITE8(spinlbrk_flip_screen_w, 0xff00)
+	AM_RANGE(0x0ff002, 0x0ff003) AM_READ_PORT("IN1") AM_WRITE8(karatblz_gfxbank_w, 0xff00)
+	AM_RANGE(0x0ff004, 0x0ff005) AM_READ_PORT("IN2")
+	AM_RANGE(0x0ff006, 0x0ff007) AM_READ_PORT("IN3") AM_WRITE8(aerfboot_soundlatch_w, 0x00ff)
+	AM_RANGE(0x0ff008, 0x0ff009) AM_READ_PORT("DSW") AM_WRITE(aerofgt_bg1scrollx_w)
+	AM_RANGE(0x0ff00a, 0x0ff00b) AM_READ8(pending_command_r, 0x00ff) AM_WRITE(aerofgt_bg1scrolly_w)
+	AM_RANGE(0x0ff00c, 0x0ff00d) AM_WRITE(aerofgt_bg2scrollx_w)
+	AM_RANGE(0x0ff00e, 0x0ff00f) AM_WRITE(aerofgt_bg2scrolly_w)
+	AM_RANGE(0x0ff400, 0x0ff403) AM_DEVWRITE8("gga", vsystem_gga_device, write, 0x00ff)
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( spinlbrk_map, AS_PROGRAM, 16, aerofgt_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(aerofgt_bg1videoram_w) AM_SHARE("bg1videoram")
@@ -1562,7 +1584,7 @@ static MACHINE_CONFIG_START( karatblzbl )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000,20000000/2)   /* 10 MHz (?) */
-	MCFG_CPU_PROGRAM_MAP(karatblz_map)
+	MCFG_CPU_PROGRAM_MAP(karatblzbl_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", aerofgt_state,  irq1_line_hold)
 
 	MCFG_CPU_ADD("audiocpu",Z80,8000000/2) /* 4 MHz ??? */
