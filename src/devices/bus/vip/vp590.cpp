@@ -53,7 +53,7 @@ READ_LINE_MEMBER( vp590_device::gd_r )
 //  MACHINE_CONFIG_START( vp590 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( vp590 )
+MACHINE_CONFIG_MEMBER( vp590_device::device_add_mconfig )
 	MCFG_DEVICE_ADD(CDP1862_TAG, CDP1862, CPD1862_CLOCK)
 	MCFG_CDP1861_RD_CALLBACK(DEVREADLINE(DEVICE_SELF, vp590_device, rd_r))
 	MCFG_CDP1861_BD_CALLBACK(DEVREADLINE(DEVICE_SELF, vp590_device, bd_r))
@@ -62,17 +62,6 @@ static MACHINE_CONFIG_START( vp590 )
 	MCFG_CDP1862_CHROMINANCE(RES_K(3.9), RES_K(10), RES_K(2), RES_K(3.3)) // R7, R8, R9, R10
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor vp590_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( vp590 );
-}
 
 
 //-------------------------------------------------

@@ -28,10 +28,29 @@ public:
 	// construction/destruction
 	vp575_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
-	// not really public
+	// device_vip_expansion_card_interface overrides
+	virtual uint8_t vip_program_r(address_space &space, offs_t offset, int cs, int cdef, int *minh) override;
+	virtual void vip_program_w(address_space &space, offs_t offset, uint8_t data, int cdef, int *minh) override;
+	virtual uint8_t vip_io_r(address_space &space, offs_t offset) override;
+	virtual void vip_io_w(address_space &space, offs_t offset, uint8_t data) override;
+	virtual uint8_t vip_dma_r(address_space &space, offs_t offset) override;
+	virtual void vip_dma_w(address_space &space, offs_t offset, uint8_t data) override;
+	virtual uint32_t vip_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
+	virtual int vip_ef1_r() override;
+	virtual int vip_ef3_r() override;
+	virtual int vip_ef4_r() override;
+	virtual void vip_sc_w(int data) override;
+	virtual void vip_q_w(int state) override;
+	virtual void vip_run_w(int state) override;
+
+private:
+	static constexpr unsigned MAX_SLOTS = 5;
+
 	DECLARE_WRITE_LINE_MEMBER( exp1_int_w ) { m_int[0] = state; update_interrupts(); }
 	DECLARE_WRITE_LINE_MEMBER( exp2_int_w ) { m_int[1] = state; update_interrupts(); }
 	DECLARE_WRITE_LINE_MEMBER( exp3_int_w ) { m_int[2] = state; update_interrupts(); }
@@ -51,28 +70,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( exp5_dma_in_w ) { m_dma_in[4] = state; update_interrupts(); }
 
 	void update_interrupts();
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
-
-	// device_vip_expansion_card_interface overrides
-	virtual uint8_t vip_program_r(address_space &space, offs_t offset, int cs, int cdef, int *minh) override;
-	virtual void vip_program_w(address_space &space, offs_t offset, uint8_t data, int cdef, int *minh) override;
-	virtual uint8_t vip_io_r(address_space &space, offs_t offset) override;
-	virtual void vip_io_w(address_space &space, offs_t offset, uint8_t data) override;
-	virtual uint8_t vip_dma_r(address_space &space, offs_t offset) override;
-	virtual void vip_dma_w(address_space &space, offs_t offset, uint8_t data) override;
-	virtual uint32_t vip_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
-	virtual int vip_ef1_r() override;
-	virtual int vip_ef3_r() override;
-	virtual int vip_ef4_r() override;
-	virtual void vip_sc_w(int data) override;
-	virtual void vip_q_w(int state) override;
-	virtual void vip_run_w(int state) override;
-
-private:
-	static constexpr unsigned MAX_SLOTS = 5;
 
 	required_device_array<vip_expansion_slot_device, MAX_SLOTS> m_expansion_slot;
 

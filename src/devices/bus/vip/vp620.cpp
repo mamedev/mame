@@ -36,21 +36,10 @@ void vp620_device::kb_w(uint8_t data)
 //  MACHINE_CONFIG_START( vp620 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( vp620 )
+MACHINE_CONFIG_MEMBER( vp620_device::device_add_mconfig )
 	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(PUT(vp620_device, kb_w))
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor vp620_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( vp620 );
-}
 
 
 
