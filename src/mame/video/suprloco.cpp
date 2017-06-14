@@ -128,6 +128,9 @@ WRITE8_MEMBER(suprloco_state::scrollram_w)
 
 WRITE8_MEMBER(suprloco_state::control_w)
 {
+	if (data == 0xff)
+		return;
+
 	/* There is probably a palette select in here */
 
 	/* Bit 0   - coin counter A */
@@ -149,12 +152,6 @@ WRITE8_MEMBER(suprloco_state::control_w)
 	flip_screen_set(data & 0x80);
 
 	m_control = data;
-}
-
-
-READ8_MEMBER(suprloco_state::control_r)
-{
-	return m_control;
 }
 
 
