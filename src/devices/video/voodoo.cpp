@@ -937,8 +937,8 @@ TIMER_CALLBACK_MEMBER( voodoo_device::vblank_off_callback )
 	/* set internal state and call the client */
 	fbi.vblank = false;
 
-	// TODO: Vblank IRQ enable is VOODOO3 only?
-	if (vd_type >= TYPE_VOODOO_3)
+	// PCI Vblank IRQ enable is VOODOO2 and up
+	if (vd_type >= TYPE_VOODOO_2)
 	{
 		if (reg[intrCtrl].u & 0x8)       // call IRQ handler if VSYNC interrupt (falling) is enabled
 		{
@@ -948,15 +948,10 @@ TIMER_CALLBACK_MEMBER( voodoo_device::vblank_off_callback )
 				m_pciint(true);
 
 		}
-		// External vblank handler
-		if (!m_vblank.isnull())
-			m_vblank(false);
 	}
-	else
-	{
-		if (!m_vblank.isnull())
-			m_vblank(false);
-	}
+	// External vblank handler
+	if (!m_vblank.isnull())
+		m_vblank(false);
 
 	/* go to the end of the next frame */
 	adjust_vblank_timer(this);
@@ -996,8 +991,8 @@ TIMER_CALLBACK_MEMBER( voodoo_device::vblank_callback )
 	/* set internal state and call the client */
 	fbi.vblank = true;
 
-	// TODO: Vblank IRQ enable is VOODOO3 only?
-	if (vd_type >= TYPE_VOODOO_3)
+	// PCI Vblank IRQ enable is VOODOO2 and up
+	if (vd_type >= TYPE_VOODOO_2)
 	{
 		if (reg[intrCtrl].u & 0x4)       // call IRQ handler if VSYNC interrupt (rising) is enabled
 		{
@@ -1006,15 +1001,10 @@ TIMER_CALLBACK_MEMBER( voodoo_device::vblank_callback )
 			if (!m_pciint.isnull())
 				m_pciint(true);
 		}
-		// External vblank handler
-		if (!m_vblank.isnull())
-			m_vblank(true);
 	}
-	else
-	{
-		if (!m_vblank.isnull())
-			m_vblank(true);
-	}
+	// External vblank handler
+	if (!m_vblank.isnull())
+		m_vblank(true);
 }
 
 
