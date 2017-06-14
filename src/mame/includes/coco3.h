@@ -61,7 +61,7 @@ protected:
 	virtual void cart_w(bool line) override;
 
 private:
-	required_device<gime_base_device> m_gime;
+	required_device<gime_device> m_gime;
 };
 
 #endif // MAME_INCLUDES_COCO3_H

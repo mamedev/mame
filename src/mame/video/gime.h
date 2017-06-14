@@ -28,22 +28,22 @@
 #define MCFG_GIME_FSYNC_CALLBACK    MCFG_MC6847_FSYNC_CALLBACK
 
 #define MCFG_GIME_IRQ_CALLBACK(_write) \
-	devcb = &gime_base_device::set_irq_wr_callback(*device, DEVCB_##_write);
+	devcb = &gime_device::set_irq_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_GIME_FIRQ_CALLBACK(_write) \
-	devcb = &gime_base_device::set_firq_wr_callback(*device, DEVCB_##_write);
+	devcb = &gime_device::set_firq_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_GIME_FLOATING_BUS_CALLBACK(_read) \
-	devcb = &gime_base_device::set_floating_bus_rd_callback(*device, DEVCB_##_read);
+	devcb = &gime_device::set_floating_bus_rd_callback(*device, DEVCB_##_read);
 
 #define MCFG_GIME_MAINCPU(_tag) \
-	gime_base_device::set_maincpu_tag(*device, _tag);
+	gime_device::set_maincpu_tag(*device, _tag);
 
 #define MCFG_GIME_RAM(_tag) \
-	gime_base_device::set_ram_tag(*device, _tag);
+	gime_device::set_ram_tag(*device, _tag);
 
 #define MCFG_GIME_EXT(_tag) \
-	gime_base_device::set_ext_tag(*device, _tag);
+	gime_device::set_ext_tag(*device, _tag);
 
 
 //**************************************************************************
@@ -52,15 +52,15 @@
 
 class cococart_slot_device;
 
-class gime_base_device : public mc6847_friend_device, public sam6883_friend_device
+class gime_device : public mc6847_friend_device, public sam6883_friend_device
 {
 public:
-	template <class Object> static devcb_base &set_irq_wr_callback(device_t &device, Object &&cb) { return downcast<gime_base_device &>(device).m_write_irq.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_firq_wr_callback(device_t &device, Object &&cb) { return downcast<gime_base_device &>(device).m_write_firq.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_floating_bus_rd_callback(device_t &device, Object &&cb) { return downcast<gime_base_device &>(device).m_read_floating_bus.set_callback(std::forward<Object>(cb)); }
-	static void set_maincpu_tag(device_t &device, const char *tag) { downcast<gime_base_device &>(device).m_maincpu_tag = tag; }
-	static void set_ram_tag(device_t &device, const char *tag) { downcast<gime_base_device &>(device).m_ram_tag = tag; }
-	static void set_ext_tag(device_t &device, const char *tag) { downcast<gime_base_device &>(device).m_ext_tag = tag; }
+	template <class Object> static devcb_base &set_irq_wr_callback(device_t &device, Object &&cb) { return downcast<gime_device &>(device).m_write_irq.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_firq_wr_callback(device_t &device, Object &&cb) { return downcast<gime_device &>(device).m_write_firq.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_floating_bus_rd_callback(device_t &device, Object &&cb) { return downcast<gime_device &>(device).m_read_floating_bus.set_callback(std::forward<Object>(cb)); }
+	static void set_maincpu_tag(device_t &device, const char *tag) { downcast<gime_device &>(device).m_maincpu_tag = tag; }
+	static void set_ram_tag(device_t &device, const char *tag) { downcast<gime_device &>(device).m_ram_tag = tag; }
+	static void set_ext_tag(device_t &device, const char *tag) { downcast<gime_device &>(device).m_ext_tag = tag; }
 
 	// read/write
 	DECLARE_READ8_MEMBER( read ) { return read(offset); }
@@ -91,7 +91,7 @@ public:
 	void set_il2(bool value) { set_interrupt_value(INTERRUPT_EI2, value); }
 
 protected:
-	gime_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const uint8_t *fontdata);
+	gime_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const uint8_t *fontdata);
 
 	// device-level overrides
 	virtual void device_start(void) override;
@@ -124,17 +124,17 @@ private:
 		uint16_t m_palette[160];
 	};
 
-	typedef uint32_t (gime_base_device::*get_data_func)(uint32_t, uint8_t *, uint8_t *);
+	typedef uint32_t (gime_device::*get_data_func)(uint32_t, uint8_t *, uint8_t *);
 
 	class palette_resolver
 	{
 	public:
-		palette_resolver(gime_base_device *gime, const pixel_t *palette);
+		palette_resolver(gime_device &gime, const pixel_t *palette);
 		const pixel_t *get_palette(uint16_t palette_rotation);
 		pixel_t lookup(uint8_t color);
 
 	private:
-		gime_base_device *m_gime;
+		gime_device &m_gime;
 		const pixel_t *m_palette;
 		pixel_t m_resolved_palette[16];
 		int m_current_resolved_palette;
@@ -279,7 +279,7 @@ private:
 	uint32_t record_scanline_res(int scanline);
 
 	// rendering sampled graphics
-	typedef uint32_t (gime_base_device::*emit_samples_proc)(const scanline_record *scanline, int sample_start, int sample_count, pixel_t *pixels, const pixel_t *palette);
+	typedef uint32_t (gime_device::*emit_samples_proc)(const scanline_record *scanline, int sample_start, int sample_count, pixel_t *pixels, const pixel_t *palette);
 	uint32_t emit_dummy_samples(const scanline_record *scanline, int sample_start, int sample_count, pixel_t *pixels, const pixel_t *palette);
 	uint32_t emit_mc6847_samples(const scanline_record *scanline, int sample_start, int sample_count, pixel_t *pixels, const pixel_t *palette);
 	template<int xscale>
@@ -295,19 +295,7 @@ private:
 //  VARIATIONS
 //**************************************************************************
 
-class gime_ntsc_device : public gime_base_device
-{
-public:
-	gime_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-};
-
-class gime_pal_device : public gime_base_device
-{
-public:
-	gime_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-};
-
-DECLARE_DEVICE_TYPE(GIME_NTSC, gime_ntsc_device)
-DECLARE_DEVICE_TYPE(GIME_PAL,  gime_pal_device)
+extern const device_type GIME_NTSC;
+extern const device_type GIME_PAL;
 
 #endif //MAME_VIDEO_GIME_H
