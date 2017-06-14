@@ -271,6 +271,7 @@ Notes:
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
+#include "machine/rp5c01.h"
 #include "machine/watchdog.h"
 #include "sound/2203intf.h"
 #include "sound/2610intf.h"
@@ -1039,7 +1040,7 @@ static ADDRESS_MAP_START( yesnoj_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x500000, 0x50ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, word_r, word_w)    /* tilemaps */
 	AM_RANGE(0x520000, 0x52000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, ctrl_word_r, ctrl_word_w)
 	AM_RANGE(0x600000, 0x601fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-//  AM_RANGE(0x700000, 0x70000b) AM_READ(yesnoj_unknown_r)   /* what's this? */
+	AM_RANGE(0x700000, 0x70001f) AM_DEVREADWRITE8("rtc", tc8521_device, read, write, 0x00ff)
 	AM_RANGE(0x800000, 0x800001) AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0xff00)
 	AM_RANGE(0x800002, 0x800003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0xff00)
 	AM_RANGE(0x900002, 0x900003) AM_WRITENOP   /* lots of similar writes */
@@ -3516,6 +3517,8 @@ static MACHINE_CONFIG_DERIVED( yesnoj, taito_f2 )
 	MCFG_TC0100SCN_OFFSETS(3, 0)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
+
+	MCFG_DEVICE_ADD("rtc", TC8521, XTAL_32_768kHz)
 MACHINE_CONFIG_END
 
 
