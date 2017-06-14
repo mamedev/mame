@@ -80,22 +80,13 @@ zooming might be wrong
 void taotaido_state::machine_start()
 {
 	membank("soundbank")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x8000);
-
-	save_item(NAME(m_pending_command));
 }
 
 
 READ16_MEMBER(taotaido_state::pending_command_r)
 {
 	/* Only bit 0 is tested */
-	return m_pending_command;
-}
-
-WRITE8_MEMBER(taotaido_state::sound_command_w)
-{
-	m_pending_command = 1;
-	m_soundlatch->write(space, offset, data);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	return m_soundlatch->pending_r();
 }
 
 WRITE8_MEMBER(taotaido_state::unknown_output_w)
@@ -117,17 +108,12 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, taotaido_state )
 	AM_RANGE(0xffff10, 0xffff11) AM_WRITENOP                        // unknown
 	AM_RANGE(0xffff20, 0xffff21) AM_WRITENOP                        // unknown - flip screen related
 	AM_RANGE(0xffff40, 0xffff47) AM_WRITE(sprite_character_bank_select_w)
-	AM_RANGE(0xffffc0, 0xffffc1) AM_WRITE8(sound_command_w, 0x00ff)         // seems right
+	AM_RANGE(0xffffc0, 0xffffc1) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)        // seems right
 	AM_RANGE(0xffffe0, 0xffffe1) AM_READ(pending_command_r) // guess - seems to be needed for all the sounds to work
 ADDRESS_MAP_END
 
 /* sound cpu - same as aerofgt */
 
-
-WRITE8_MEMBER(taotaido_state::pending_command_clear_w)
-{
-	m_pending_command = 0;
-}
 
 WRITE8_MEMBER(taotaido_state::sh_bankswitch_w)
 {
@@ -144,7 +130,7 @@ static ADDRESS_MAP_START( sound_port_map, AS_IO, 8, taotaido_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
 	AM_RANGE(0x04, 0x04) AM_WRITE(sh_bankswitch_w)
-	AM_RANGE(0x08, 0x08) AM_WRITE(pending_command_clear_w)
+	AM_RANGE(0x08, 0x08) AM_DEVWRITE("soundlatch", generic_latch_8_device, acknowledge_w)
 	AM_RANGE(0x0c, 0x0c) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
@@ -403,6 +389,8 @@ static MACHINE_CONFIG_START( taotaido )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

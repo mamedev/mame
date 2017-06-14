@@ -32,7 +32,6 @@ public:
 	required_shared_ptr<uint16_t> m_scrollram;
 	required_shared_ptr<uint16_t> m_bgram;
 
-	int m_pending_command;
 	uint16_t m_sprite_character_bank_select[8];
 	uint16_t m_video_bank_select[8];
 	tilemap_t *m_bg_tilemap;
@@ -42,9 +41,7 @@ public:
 	std::unique_ptr<uint16_t[]> m_spriteram2_older;
 
 	DECLARE_READ16_MEMBER(pending_command_r);
-	DECLARE_WRITE8_MEMBER(sound_command_w);
 	DECLARE_WRITE8_MEMBER(unknown_output_w);
-	DECLARE_WRITE8_MEMBER(pending_command_clear_w);
 	DECLARE_WRITE8_MEMBER(sh_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(sprite_character_bank_select_w);
 	DECLARE_WRITE16_MEMBER(tileregs_w);
