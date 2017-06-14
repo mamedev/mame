@@ -2281,13 +2281,13 @@ INPUT_PORTS_END
 
 WRITE_LINE_MEMBER(viper_state::voodoo_vblank)
 {
-	mpc8240_interrupt(MPC8240_IRQ0);
+	mpc8240_interrupt(MPC8240_IRQ4);
 	//mpc8240_interrupt(MPC8240_IRQ3);
 }
 
 WRITE_LINE_MEMBER(viper_state::voodoo_pciint)
 {
-	mpc8240_interrupt(MPC8240_IRQ4);
+	mpc8240_interrupt(MPC8240_IRQ0);
 }
 
 void viper_state::machine_start()
