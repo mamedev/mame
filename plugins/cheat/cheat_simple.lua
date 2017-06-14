@@ -1,11 +1,15 @@
 -- converter for simple cheats
 -- simple cheats are single address every frame ram or gg,ar cheats in one file called cheat.simple
+--
 -- ram cheat format:  <set name>,<cputag>,<hex offset>,<b|w|d|q - size>,<hex value>,<desc>
--- gg,ar cheat format: <set name>,<gg|ar - type>,<code>,<desc> like "nes/smb,gg,SXIOPO,Infinite Lives"
--- gg for game genie -- nes, snes, megadriv
--- set name is <softlist>/<entry> like "nes/smb" for softlist items
 -- only program address space is supported, comments are prepended with ;
 -- size is b - u8, w - u16, d - u32, q - u64
+--
+-- gg,ar cheat format: <set name>,<gg|ar - type>,<code>,<desc> like "nes/smb,gg,SXIOPO,Infinite Lives"
+-- gg for game genie -- nes, snes, megadriv, gamegear, gameboy
+-- ar for action replay -- nes
+--
+-- set name is <softlist>/<entry> like "nes/smb" for softlist items
 -- Don't use commas in the description
 
 local simple = {}
@@ -59,6 +63,21 @@ function codefuncs.nes_gg(desc, code)
 	else
 		error("error game genie cheat incorrect length " .. desc)
 	end
+	return cheat
+end
+
+function codefuncs.nes_ar(desc, code)
+	local cheat = { desc = desc, space = { cpup = { tag = ":maincpu", type = "program" } } }
+	code = code:gsub("[: %-]", "")
+	if #code ~= 8 then
+		error("error action replay cheat incorrect length " .. desc)
+	end
+	local newval = tonumber(code:sub(7, 8), 16)
+	local addr = tonumber(code:sub(3, 6), 16)
+	if not newval or not addr then
+		error("error parsing action replay cheat " .. desc)
+	end
+	cheat.script = { run = "cpup:write_u8(" .. addr .. "," .. newval .. ", true)" }
 	return cheat
 end
 
@@ -137,6 +156,9 @@ function codefuncs.megadriv_gg(desc, code)
 			count = count + 1
 			value = (value << 5) | xlate[s]
 		end)
+	if count ~= 8 then
+		error("error game genie cheat incorrect length " .. desc)
+	end
 	local newval = ((value >> 32) & 0xff) | ((value >> 3) & 0x1f00) | ((value << 5) & 0xe000)
 	local addr = (value & 0xff00ff) | ((value >> 16) & 0xff00)
 	cheat.script.on = string.format([[
@@ -146,6 +168,60 @@ function codefuncs.megadriv_gg(desc, code)
 				rom:write_u16(addr, %d)
 				]], addr, newval)
 	return cheat
+end
+
+local function gbgg_ggcodes(desc, code, region)
+	local cheat = { desc = desc, region = { rom = region } } 
+	cheat.script = { off = "if on then rom:write_u16(addr, save) end" }
+	code = code:gsub("%-", "")
+	local comp
+	if #code == 6 then
+		comp = -1
+	elseif #code == 9 then
+		comp = ~tonumber(code:sub(7, 7) .. code:sub(9, 9), 16) & 0xff
+		comp = ((comp >> 2) | ((comp << 6) & 0xc0)) ~ 0x45
+	else
+		error("error game genie cheat incorrect length " .. desc)
+	end
+	local newval = tonumber(code:sub(1, 2), 16)
+	local addr = tonumber(code:sub(6, 6) .. code:sub(3, 5), 16)
+	if not newval or not addr or not comp then
+		error("error parsing game genie cheat " .. desc)
+	end
+	addr = (~addr & 0xf000) | (addr & 0xfff)
+	if addr > 0x7fff then
+		error("error game genie cheat bad addr " .. desc)
+	end
+	if comp == -1 then
+		cheat.script.on = string.format([[
+					addr = %d
+					save = rom:read_u8(addr)
+					on = true
+					rom:write_u8(addr, %d)
+					]], addr, newval)
+	else
+		-- assume 8K banks
+		cheat.script.on = string.format([[
+				addr = %d
+				save = %d
+				for i = 0, rom.size, 8192 do
+					if rom:read_u8(i + addr) == save then
+						on = true
+						addr = i + addr
+						rom:write_u8(addr, %d)
+						break
+					end
+				end]], addr & 0x3fff, comp, newval)
+	end
+	return cheat
+end
+
+function codefuncs.gameboy_gg(desc, code)
+	return gbgg_ggcodes(desc, code, ":gbslot:cart:rom")
+end
+
+function codefuncs.gamegear_gg(desc, code)
+	return gbgg_ggcodes(desc, code, ":slot:cart:rom")
 end
 
 function simple.conv_cheat(data)
