@@ -50,19 +50,12 @@ SMS version is not playing PSG sound on his Mark III with the FM unit.
 DEFINE_DEVICE_TYPE(SEGA_FM_UNIT, sega_fm_unit_device, "sega_fm_unit", "SG-1000 FM Sound Unit")
 
 
-static MACHINE_CONFIG_START( fm_config )
+MACHINE_CONFIG_MEMBER( sega_fm_unit_device::device_add_mconfig )
 	MCFG_SOUND_ADD("ym2413", YM2413, XTAL_10_738635MHz/3)
 	// if this output gain is changed, the gain set when unmute the output need
 	// to be changed too, probably along the gain set for SMSJ/SMSKRFM drivers.
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, ":mono", 1.00)
 MACHINE_CONFIG_END
-
-
-machine_config_constructor sega_fm_unit_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( fm_config );
-}
-
 
 
 //**************************************************************************

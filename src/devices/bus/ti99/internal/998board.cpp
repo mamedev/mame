@@ -1009,17 +1009,12 @@ void mainboard8_device::device_reset()
 	m_space = &cpu->space(AS_PROGRAM);
 }
 
-MACHINE_CONFIG_START( ti998_mainboard )
+MACHINE_CONFIG_MEMBER( mainboard8_device::device_add_mconfig )
 	MCFG_DEVICE_ADD(TI998_VAQUERRO_TAG, TI99_VAQUERRO, 0)
 	MCFG_DEVICE_ADD(TI998_MOFETTA_TAG, TI99_MOFETTA, 0)
 	MCFG_DEVICE_ADD(TI998_AMIGO_TAG, TI99_AMIGO, 0)
 	MCFG_DEVICE_ADD(TI998_OSO_TAG, TI99_OSO, 0)
 MACHINE_CONFIG_END
-
-machine_config_constructor mainboard8_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( ti998_mainboard );
-}
 
 /***************************************************************************
   ===== VAQUERRO: Logical Address Space decoder =====

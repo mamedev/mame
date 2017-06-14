@@ -35,7 +35,7 @@ protected:
 	void device_reset() override;
 	const tiny_rom_entry *device_rom_region() const override;
 	ioport_constructor device_input_ports() const override;
-	machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	int     get_base(int offset);

@@ -696,7 +696,7 @@ INPUT_PORTS_START( ti99_hsgpl)
 		PORT_DIPSETTING(    0x01, "Normal" )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START( ti99_hsgpl )
+MACHINE_CONFIG_MEMBER( snug_high_speed_gpl_device::device_add_mconfig )
 	MCFG_AT29C040A_ADD( DSR_EEPROM )
 	MCFG_AT29C040A_ADD( GROM_B_EEPROM )
 	MCFG_AT29C040A_ADD( GROM_A_EEPROM )
@@ -708,11 +708,6 @@ MACHINE_CONFIG_START( ti99_hsgpl )
 	MCFG_RAM_DEFAULT_SIZE("128k")
 	MCFG_RAM_DEFAULT_VALUE(0)
 MACHINE_CONFIG_END
-
-machine_config_constructor snug_high_speed_gpl_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( ti99_hsgpl );
-}
 
 ioport_constructor snug_high_speed_gpl_device::device_input_ports() const
 {

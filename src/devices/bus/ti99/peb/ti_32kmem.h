@@ -33,7 +33,7 @@ public:
 
 protected:
 	void device_start() override;
-	machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	required_device<ram_device> m_ram;

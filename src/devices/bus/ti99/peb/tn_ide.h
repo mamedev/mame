@@ -37,16 +37,16 @@ public:
 	bool    m_ata_irq;
 	int     m_cru_register;
 
-	DECLARE_WRITE_LINE_MEMBER(clock_interrupt_callback);
-	DECLARE_WRITE_LINE_MEMBER(ide_interrupt_callback);
-
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 
 private:
+	DECLARE_WRITE_LINE_MEMBER(clock_interrupt_callback);
+	DECLARE_WRITE_LINE_MEMBER(ide_interrupt_callback);
+
 	rtc65271_device*    m_rtc;
 	required_device<ata_interface_device> m_ata;
 

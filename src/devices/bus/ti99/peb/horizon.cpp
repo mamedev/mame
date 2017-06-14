@@ -474,7 +474,7 @@ INPUT_PORTS_START( horizon )
 
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START( horizon )
+MACHINE_CONFIG_MEMBER( horizon_ramdisk_device::device_add_mconfig )
 	MCFG_RAM_ADD(NVRAMREGION)
 	MCFG_RAM_DEFAULT_SIZE("16M")
 
@@ -485,11 +485,6 @@ MACHINE_CONFIG_START( horizon )
 	MCFG_RAM_DEFAULT_SIZE("32k")
 	MCFG_RAM_DEFAULT_VALUE(0)
 MACHINE_CONFIG_END
-
-machine_config_constructor horizon_ramdisk_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( horizon );
-}
 
 ioport_constructor horizon_ramdisk_device::device_input_ports() const
 {

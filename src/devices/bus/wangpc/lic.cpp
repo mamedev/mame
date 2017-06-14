@@ -47,8 +47,7 @@ const tiny_rom_entry *wangpc_lic_device::device_rom_region() const
 
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
 MACHINE_CONFIG_MEMBER( wangpc_lic_device::device_add_mconfig )

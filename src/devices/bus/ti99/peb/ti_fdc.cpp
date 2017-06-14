@@ -455,7 +455,13 @@ static SLOT_INTERFACE_START( tifdc_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
 
-MACHINE_CONFIG_START( ti_fdc )
+ROM_START( ti_fdc )
+	ROM_REGION(0x2000, TI99_DSRROM, 0)
+	ROM_LOAD("fdc_dsr.u26", 0x0000, 0x1000, CRC(693c6b6e) SHA1(0c24fb4944843ad3f08b0b139244a6bb05e1c6c2)) /* TI disk DSR ROM first 4K */
+	ROM_LOAD("fdc_dsr.u27", 0x1000, 0x1000, CRC(2c921087) SHA1(3646c3bcd2dce16b918ee01ea65312f36ae811d2)) /* TI disk DSR ROM second 4K */
+ROM_END
+
+MACHINE_CONFIG_MEMBER( ti_fdc_device::device_add_mconfig )
 	MCFG_FD1771_ADD(FDC_TAG, XTAL_1MHz)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(ti_fdc_device, fdc_irq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(ti_fdc_device, fdc_drq_w))
@@ -466,17 +472,6 @@ MACHINE_CONFIG_START( ti_fdc )
 	MCFG_FLOPPY_DRIVE_ADD("2", tifdc_floppies, nullptr, ti_fdc_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END
-
-ROM_START( ti_fdc )
-	ROM_REGION(0x2000, TI99_DSRROM, 0)
-	ROM_LOAD("fdc_dsr.u26", 0x0000, 0x1000, CRC(693c6b6e) SHA1(0c24fb4944843ad3f08b0b139244a6bb05e1c6c2)) /* TI disk DSR ROM first 4K */
-	ROM_LOAD("fdc_dsr.u27", 0x1000, 0x1000, CRC(2c921087) SHA1(3646c3bcd2dce16b918ee01ea65312f36ae811d2)) /* TI disk DSR ROM second 4K */
-ROM_END
-
-machine_config_constructor ti_fdc_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( ti_fdc );
-}
 
 const tiny_rom_entry *ti_fdc_device::device_rom_region() const
 {

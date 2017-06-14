@@ -345,17 +345,6 @@ void nouspikel_ide_interface_device::device_reset()
 	m_tms9995_mode =  false; // (device->type()==TMS9995);
 }
 
-MACHINE_CONFIG_START( tn_ide )
-	MCFG_DEVICE_ADD( "ide_rtc", RTC65271, 0 )
-	MCFG_RTC65271_INTERRUPT_CB(WRITELINE(nouspikel_ide_interface_device, clock_interrupt_callback))
-	MCFG_ATA_INTERFACE_ADD( "ata", ata_devices, "hdd", nullptr, false)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(nouspikel_ide_interface_device, ide_interrupt_callback))
-
-	MCFG_RAM_ADD(RAMREGION)
-	MCFG_RAM_DEFAULT_SIZE("512K")
-	MCFG_RAM_DEFAULT_VALUE(0)
-MACHINE_CONFIG_END
-
 INPUT_PORTS_START( tn_ide )
 	PORT_START( "CRUIDE" )
 	PORT_DIPNAME( 0x1f00, 0x1000, "IDE CRU base" )
@@ -377,10 +366,16 @@ INPUT_PORTS_START( tn_ide )
 		PORT_DIPSETTING( 0x1f00, "1F00" )
 INPUT_PORTS_END
 
-machine_config_constructor nouspikel_ide_interface_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( tn_ide );
-}
+MACHINE_CONFIG_MEMBER( nouspikel_ide_interface_device::device_add_mconfig )
+	MCFG_DEVICE_ADD( "ide_rtc", RTC65271, 0 )
+	MCFG_RTC65271_INTERRUPT_CB(WRITELINE(nouspikel_ide_interface_device, clock_interrupt_callback))
+	MCFG_ATA_INTERFACE_ADD( "ata", ata_devices, "hdd", nullptr, false)
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(nouspikel_ide_interface_device, ide_interrupt_callback))
+
+	MCFG_RAM_ADD(RAMREGION)
+	MCFG_RAM_DEFAULT_SIZE("512K")
+	MCFG_RAM_DEFAULT_VALUE(0)
+MACHINE_CONFIG_END
 
 ioport_constructor nouspikel_ide_interface_device::device_input_ports() const
 {

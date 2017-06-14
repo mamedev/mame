@@ -40,7 +40,7 @@ protected:
 	virtual void device_stop() override;
 	virtual ioport_constructor device_input_ports() const override;
 
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	required_device<at29c040a_device> m_dsr_eeprom;

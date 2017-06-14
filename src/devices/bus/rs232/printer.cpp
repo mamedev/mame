@@ -16,15 +16,10 @@ serial_printer_device::serial_printer_device(const machine_config &mconfig, cons
 {
 }
 
-static MACHINE_CONFIG_START(serial_printer)
+MACHINE_CONFIG_MEMBER(serial_printer_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("printer", PRINTER, 0)
 	MCFG_PRINTER_ONLINE_CB(WRITELINE(serial_printer_device, printer_online))
 MACHINE_CONFIG_END
-
-machine_config_constructor serial_printer_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME(serial_printer);
-}
 
 static INPUT_PORTS_START(serial_printer)
 	MCFG_RS232_BAUD("RS232_RXBAUD", RS232_BAUD_9600, "RX Baud", serial_printer_device, update_serial)

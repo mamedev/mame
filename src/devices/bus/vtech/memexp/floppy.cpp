@@ -41,8 +41,7 @@ const tiny_rom_entry *vtech_floppy_controller_device::device_rom_region() const
 }
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
 static SLOT_INTERFACE_START( laser_floppies )

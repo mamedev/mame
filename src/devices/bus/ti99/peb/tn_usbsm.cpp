@@ -360,7 +360,7 @@ INPUT_PORTS_START( tn_usbsm )
 		PORT_DIPSETTING( 0x01, "Geneve mode")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START( tn_usbsm )
+MACHINE_CONFIG_MEMBER( nouspikel_usb_smartmedia_device::device_add_mconfig )
 	MCFG_DEVICE_ADD("smartmedia", SMARTMEDIA, 0)
 	MCFG_STRATAFLASH_ADD(STRATA_TAG)
 	MCFG_RAM_ADD(RAM1_TAG)
@@ -370,11 +370,6 @@ MACHINE_CONFIG_START( tn_usbsm )
 	MCFG_RAM_DEFAULT_SIZE("512k")
 	MCFG_RAM_DEFAULT_VALUE(0)
 MACHINE_CONFIG_END
-
-machine_config_constructor nouspikel_usb_smartmedia_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( tn_usbsm );
-}
 
 ioport_constructor nouspikel_usb_smartmedia_device::device_input_ports() const
 {

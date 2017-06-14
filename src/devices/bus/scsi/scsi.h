@@ -139,7 +139,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	void update_bsy();
 	void update_sel();

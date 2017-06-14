@@ -31,18 +31,14 @@ public:
 	// construction/destruction
 	s100_wunderbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual ioport_constructor device_input_ports() const override;
-
-	// not really public
-	DECLARE_WRITE_LINE_MEMBER( pic_int_w );
-	DECLARE_WRITE_LINE_MEMBER( rtc_tp_w );
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	// device_s100_card_interface overrides
 	virtual void s100_vi0_w(int state) override;
@@ -52,6 +48,9 @@ protected:
 	virtual void s100_sout_w(address_space &space, offs_t offset, uint8_t data) override;
 
 private:
+	DECLARE_WRITE_LINE_MEMBER( pic_int_w );
+	DECLARE_WRITE_LINE_MEMBER( rtc_tp_w );
+
 	required_device<pic8259_device> m_pic;
 	required_device<ins8250_device> m_ace1;
 	required_device<ins8250_device> m_ace2;

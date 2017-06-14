@@ -32,11 +32,11 @@ public:
 	DECLARE_READ8Z_MEMBER(crureadz) override;
 	DECLARE_WRITE8_MEMBER(cruwrite) override;
 
-	machine_config_constructor device_mconfig_additions() const override;
-
 protected:
 	void device_start() override;
 	void device_reset() override;
+
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	// Console RAM

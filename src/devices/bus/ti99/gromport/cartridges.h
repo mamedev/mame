@@ -83,7 +83,7 @@ public:
 protected:
 	virtual void device_start() override { }
 	virtual void device_config_complete() override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry* device_rom_region() const override;
 
 	// Image handling: implementation of methods which are abstract in the parent

@@ -45,29 +45,20 @@ void sns_rom_strom_device::device_start()
 {
 }
 
-//-------------------------------------------------
-//  MACHINE_CONFIG_START( st_slot )
-//-------------------------------------------------
 
 static SLOT_INTERFACE_START(sufamiturbo_cart)
 	SLOT_INTERFACE_INTERNAL("strom",  SNS_STROM)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( st_slot )
+
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( sns_rom_sufami_device::device_add_mconfig )
 	MCFG_SNS_SUFAMI_CARTRIDGE_ADD("st_slot1", sufamiturbo_cart, nullptr)
 	MCFG_SNS_SUFAMI_CARTRIDGE_ADD("st_slot2", sufamiturbo_cart, nullptr)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor sns_rom_sufami_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( st_slot );
-}
 
 /*-------------------------------------------------
  mapper specific handlers

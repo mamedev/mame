@@ -19,10 +19,10 @@ DEFINE_DEVICE_TYPE(VIC1010, vic1010_device, "vic1010", "VIC-1010 Expansion Modul
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( vic1010 )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( vic1010 )
+MACHINE_CONFIG_MEMBER( vic1010_device::device_add_mconfig )
 	MCFG_VIC20_PASSTHRU_EXPANSION_SLOT_ADD("slot1")
 	MCFG_VIC20_PASSTHRU_EXPANSION_SLOT_ADD("slot2")
 	MCFG_VIC20_PASSTHRU_EXPANSION_SLOT_ADD("slot3")
@@ -30,18 +30,6 @@ static MACHINE_CONFIG_START( vic1010 )
 	MCFG_VIC20_PASSTHRU_EXPANSION_SLOT_ADD("slot5")
 	MCFG_VIC20_PASSTHRU_EXPANSION_SLOT_ADD("slot6")
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor vic1010_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( vic1010 );
-}
-
 
 
 //**************************************************************************

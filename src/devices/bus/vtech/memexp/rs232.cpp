@@ -31,8 +31,7 @@ const tiny_rom_entry *vtech_rs232_interface_device::device_rom_region() const
 }
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
 MACHINE_CONFIG_MEMBER( vtech_rs232_interface_device::device_add_mconfig )

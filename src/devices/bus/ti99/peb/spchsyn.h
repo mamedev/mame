@@ -31,15 +31,15 @@ public:
 	DECLARE_READ8Z_MEMBER(crureadz) override { }
 	DECLARE_WRITE8_MEMBER(cruwrite) override { }
 
-	DECLARE_WRITE_LINE_MEMBER( speech_ready );
-
 protected:
 	virtual void            device_start() override;
 	virtual void            device_reset() override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
+	DECLARE_WRITE_LINE_MEMBER( speech_ready );
+
 	address_space*  m_space;
 	cd2501e_device* m_vsp;
 	bool            m_reading;

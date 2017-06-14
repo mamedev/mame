@@ -92,16 +92,9 @@ WRITE8_MEMBER(sms_gender_adapter_device::write_ram)
 }
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( genderadp_slot )
+MACHINE_CONFIG_MEMBER( sms_gender_adapter_device::device_add_mconfig )
 	MCFG_SMS_CARTRIDGE_ADD("subslot", sms_cart, nullptr)
 MACHINE_CONFIG_END
-
-
-machine_config_constructor sms_gender_adapter_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( genderadp_slot );
-}

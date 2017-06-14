@@ -18,13 +18,13 @@ public:
 	sun_keyboard_adaptor_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
 	virtual ~sun_keyboard_adaptor_device() override;
 
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
 	virtual DECLARE_WRITE_LINE_MEMBER( input_txd ) override;
 
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	required_device<sun_keyboard_port_device> m_keyboard_port;

@@ -43,15 +43,6 @@ public:
 	DECLARE_READ8Z_MEMBER(crureadz) override;
 	DECLARE_WRITE8_MEMBER(cruwrite) override;
 
-	DECLARE_WRITE_LINE_MEMBER( dmarq_w );
-	DECLARE_WRITE_LINE_MEMBER( intrq_w );
-	DECLARE_WRITE_LINE_MEMBER( dip_w );
-	DECLARE_WRITE8_MEMBER( auxbus_out );
-	DECLARE_READ8_MEMBER( read_buffer );
-	DECLARE_WRITE8_MEMBER( write_buffer );
-
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
-
 protected:
 	void device_config_complete() override;
 
@@ -61,8 +52,17 @@ private:
 	void device_reset() override;
 
 	const tiny_rom_entry *device_rom_region() const override;
-	machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	ioport_constructor device_input_ports() const override;
+
+	DECLARE_WRITE_LINE_MEMBER( dmarq_w );
+	DECLARE_WRITE_LINE_MEMBER( intrq_w );
+	DECLARE_WRITE_LINE_MEMBER( dip_w );
+	DECLARE_WRITE8_MEMBER( auxbus_out );
+	DECLARE_READ8_MEMBER( read_buffer );
+	DECLARE_WRITE8_MEMBER( write_buffer );
+
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 	// Debug accessors
 	void debug_read(offs_t offset, uint8_t* value);

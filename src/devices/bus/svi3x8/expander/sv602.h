@@ -27,11 +27,6 @@ public:
 	// construction/destruction
 	sv602_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// from slots
-	WRITE_LINE_MEMBER( int_w );
-	WRITE_LINE_MEMBER( romdis_w );
-	WRITE_LINE_MEMBER( ramdis_w );
-
 	// from host
 	virtual DECLARE_READ8_MEMBER( mreq_r ) override;
 	virtual DECLARE_WRITE8_MEMBER( mreq_w ) override;
@@ -44,10 +39,15 @@ public:
 	virtual void bk32_w(int state) override;
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 
 private:
+	// from slots
+	WRITE_LINE_MEMBER( int_w );
+	WRITE_LINE_MEMBER( romdis_w );
+	WRITE_LINE_MEMBER( ramdis_w );
+
 	required_device<svi_slot_bus_device> m_slotbus;
 };
 

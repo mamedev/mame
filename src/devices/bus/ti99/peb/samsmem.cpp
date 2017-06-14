@@ -112,16 +112,11 @@ WRITE8_MEMBER(sams_memory_expansion_device::cruwrite)
 	}
 }
 
-MACHINE_CONFIG_START( sams_mem )
+MACHINE_CONFIG_MEMBER( sams_memory_expansion_device::device_add_mconfig )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1M")
 	MCFG_RAM_DEFAULT_VALUE(0)
 MACHINE_CONFIG_END
-
-machine_config_constructor sams_memory_expansion_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( sams_mem );
-}
 
 void sams_memory_expansion_device::device_start()
 {
