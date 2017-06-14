@@ -666,9 +666,6 @@ WRITE8_MEMBER(subsino_state::subsino_out_a_w)
 
 */
 
-	if (data == 0xff)
-		return;
-
 	output().set_lamp_value(8, (data) & 1);       /* Lamp 8 */
 	output().set_lamp_value(9, (data >> 1) & 1);  /* Lamp 9 */
 	output().set_lamp_value(10, (data >> 2) & 1); /* Lamp 10 */
@@ -2759,7 +2756,9 @@ static MACHINE_CONFIG_START( victor21 )
 
 	MCFG_DEVICE_ADD("ppi", I8255A, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(subsino_state, subsino_out_a_w))
+	MCFG_I8255_TRISTATE_PORTA_CB(CONSTANT(0))
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(subsino_state, subsino_out_b_w))
+	MCFG_I8255_TRISTATE_PORTB_CB(CONSTANT(0))
 	MCFG_I8255_IN_PORTC_CB(IOPORT("INC"))
 
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
