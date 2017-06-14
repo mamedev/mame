@@ -265,7 +265,9 @@ i8255_device::i8255_device(const machine_config &mconfig, const char *tag, devic
 		m_in_pc_cb(*this),
 		m_out_pa_cb(*this),
 		m_out_pb_cb(*this),
-		m_out_pc_cb(*this)
+		m_out_pc_cb(*this),
+		m_tri_pa_cb(*this),
+		m_tri_pb_cb(*this)
 {
 	m_intr[PORT_A] = m_intr[PORT_B] = 0;
 	m_control = 0;
@@ -284,6 +286,8 @@ void i8255_device::device_start()
 	m_out_pa_cb.resolve_safe();
 	m_out_pb_cb.resolve_safe();
 	m_out_pc_cb.resolve_safe();
+	m_tri_pa_cb.resolve_safe(0xff);
+	m_tri_pb_cb.resolve_safe(0xff);
 
 	// register for state saving
 	save_item(NAME(m_control));
@@ -655,8 +659,8 @@ void i8255_device::set_mode(uint8_t data)
 	}
 	else
 	{
-		// TTL inputs float high
-		m_out_pa_cb((offs_t)0, 0xff);
+		// TTL inputs floating
+		m_out_pa_cb((offs_t)0, m_tri_pa_cb(0));
 	}
 
 	LOG("I8255 Group A Mode: %u\n", group_mode(GROUP_A));
@@ -679,8 +683,8 @@ void i8255_device::set_mode(uint8_t data)
 	}
 	else
 	{
-		// TTL inputs float high
-		m_out_pb_cb((offs_t)0, 0xff);
+		// TTL inputs floating
+		m_out_pb_cb((offs_t)0, m_tri_pb_cb(0));
 	}
 
 	m_output[PORT_C] = 0;
