@@ -45,9 +45,31 @@
 		</part>
 	</software>
 
-	<software name="os9dplus">
-		<description>OS-9 Drivers for DragonPlus</description>
-		<year>1986</year>
+	<software name="cashvat">
+		<description>Cash &amp; VAT</description>
+		<year>198?</year>
+		<publisher>Dragon Data</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="184332">
+				<rom name="Cash &amp; Vat (198x)(Dragon Data Ltd)[!][OS9].vdk" size="184332" crc="007bbda9" sha1="527a2ef2a02b8b064820ed1b30a755b9392c84e6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dplusos9">
+		<description>DragonPlus OS9 Drivers</description>
+		<year>1985</year>
+		<publisher>Compusense</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="184332">
+				<rom name="DragonPlus OS9 Drivers (1985)(Compusense Ltd)[!][OS9].vdk" size="184332" crc="9d62cb3c" sha1="bb8df0703865fa4f3be048e7ae03cd165ad07adf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dplusupdt">
+		<description>DragonPlus Update</description>
+		<year>1983</year>
 		<publisher>Compusense</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184339">
@@ -152,6 +174,17 @@
 			<feature name="part_id" value="Disk 1 of 1"/>
 			<dataarea name="flop" size="184339">
 				<rom name="RMS (1983)(Dragon Data Ltd)[OS-9][!].vdk" size="184339" crc="ce069e1f" sha1="7df31a6c66447dbde7b00a40c4e9ab8ac2492c0a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stockctrl">
+		<description>Stock Control</description>
+		<year>198?</year>
+		<publisher>Dragon Data</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="184332">
+				<rom name="Stock Control (198x)(Dragon Data Ltd)[!][OS9].vdk" size="184332" crc="ae34cfd3" sha1="9149fc20a25435492dd3c68307020cee228b6693" offset="0" />
 			</dataarea>
 		</part>
 	</software>
