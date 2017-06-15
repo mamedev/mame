@@ -2332,13 +2332,22 @@ ROM_START( horshoes )
 
 ROM_END
 
-ROM_START( palamed )
+ROM_START( palamed ) /* Prototype or location test?? - Line 5 of notice screen says "Territory" later sets say "Territories" */
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "c63.02", 0x00000, 0x20000, CRC(55a82bb2) SHA1(f157ad770351d4b8d8f8c061c4e330d6391fc624) )
+	ROM_LOAD( "palamedes_prg_ic6.ic6", 0x00000, 0x20000, CRC(ee957b0e) SHA1(cca9db673026f769776cb86734a6503692676fbe) ) /* hand labeled as PALAMEDEStm [PRG] IC6 */
 
 	ROM_REGION( 0x40000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "c63.04", 0x00000, 0x20000, CRC(c7bbe460) SHA1(1c1f186d0b0b2e383f82c53ae93b975a75f50f9c) )
-	ROM_LOAD16_BYTE( "c63.03", 0x00001, 0x20000, CRC(fcd86e44) SHA1(bdd0750ed6e93cc49f09f4ccb05b0c4a44cb9c23) )
+	ROM_LOAD16_BYTE( "chr-l_ic9.ic9", 0x00000, 0x20000, CRC(c7bbe460) SHA1(1c1f186d0b0b2e383f82c53ae93b975a75f50f9c) ) /* hand labeled as CHR-L IC9 */
+	ROM_LOAD16_BYTE( "chr-h_ic7.ic7", 0x00001, 0x20000, CRC(fcd86e44) SHA1(bdd0750ed6e93cc49f09f4ccb05b0c4a44cb9c23) ) /* hand labeled as CHR-H IC7 */
+ROM_END
+
+ROM_START( palamedj )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "c63-02.ic6", 0x00000, 0x20000, CRC(55a82bb2) SHA1(f157ad770351d4b8d8f8c061c4e330d6391fc624) )
+
+	ROM_REGION( 0x40000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "c63-04.ic9", 0x00000, 0x20000, CRC(c7bbe460) SHA1(1c1f186d0b0b2e383f82c53ae93b975a75f50f9c) )
+	ROM_LOAD16_BYTE( "c63-03.ic7", 0x00001, 0x20000, CRC(fcd86e44) SHA1(bdd0750ed6e93cc49f09f4ccb05b0c4a44cb9c23) )
 ROM_END
 
 ROM_START( cachat )
@@ -2514,17 +2523,18 @@ GAME( 1989, puzznicba, puzznic,  puzznici,  puzznic,   taitol_1cpu_state, 0,    
 
 GAME( 1990, horshoes,  0,        horshoes,  horshoes,  horshoes_state,    0,         ROT270, "Taito America Corporation", "American Horseshoes (US)", 0 )
 
-GAME( 1990, palamed,   0,        palamed,   palamed,   taitol_1cpu_state, 0,         ROT0,   "Taito Corporation", "Palamedes (Japan)", 0 )
+GAME( 1990, palamed,   0,        palamed,   palamed,   taitol_1cpu_state, 0,         ROT0,   "Hot-B Co., Ltd.", "Palamedes (US)", 0 ) // Prototype or location test
+GAME( 1990, palamedj,  palamed,  palamed,   palamed,   taitol_1cpu_state, 0,         ROT0,   "Taito Corporation", "Palamedes (Japan)", 0 )
 
 GAME( 1993, cachat,    0,        cachat,    cachat,    taitol_1cpu_state, 0,         ROT0,   "Taito Corporation", "Cachat (Japan)", 0 )
 GAME( 1993, tubeit,    cachat,   cachat,    tubeit,    taitol_1cpu_state, 0,         ROT0,   "bootleg", "Tube-It", 0 ) // No (c) message
 
-GAME( 199?, cubybop,   0,        cachat,    cubybop,   taitol_1cpu_state, 0,         ROT0,   "Hot-B", "Cuby Bop (location test)", 0 ) // No (c) message, but Hot-B company logo in tile gfx
+GAME( 199?, cubybop,   0,        cachat,    cubybop,   taitol_1cpu_state, 0,         ROT0,   "Hot-B Co., Ltd.", "Cuby Bop (location test)", 0 ) // No (c) message, but Hot-B company logo in tile gfx
 
-GAME( 1992, plgirls,   0,        cachat,    plgirls,   taitol_1cpu_state, 0,         ROT270, "Hot-B", "Play Girls", 0 )
+GAME( 1992, plgirls,   0,        cachat,    plgirls,   taitol_1cpu_state, 0,         ROT270, "Hot-B Co., Ltd.", "Play Girls", 0 )
 GAME( 1992, lagirl,    plgirls,  cachat,    plgirls,   taitol_1cpu_state, 0,         ROT270, "bootleg", "LA Girl", 0 ) // bootleg hardware with changed title & backgrounds
 
-GAME( 1993, plgirls2,  0,        cachat,    plgirls2,  taitol_1cpu_state, 0,         ROT270, "Hot-B", "Play Girls 2", 0 )
+GAME( 1993, plgirls2,  0,        cachat,    plgirls2,  taitol_1cpu_state, 0,         ROT270, "Hot-B Co., Ltd.", "Play Girls 2", 0 )
 GAME( 1993, plgirls2b, plgirls2, cachat,    plgirls2,  taitol_1cpu_state, 0,         ROT270, "bootleg", "Play Girls 2 (bootleg)", MACHINE_IMPERFECT_GRAPHICS ) // bootleg hardware (regular Z80 etc. instead of TC0090LVC, but acts almost the same - scroll offset problems)
 
 GAME( 1990, evilston,  0,        evilston,  evilston,  taitol_2cpu_state, 0,         ROT270, "Spacy Industrial, Ltd.", "Evil Stone", 0 )
