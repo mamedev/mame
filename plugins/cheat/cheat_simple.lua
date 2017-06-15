@@ -1,13 +1,13 @@
 -- converter for simple cheats
--- simple cheats are single address every frame ram or gg,ar cheats in one file called cheat.simple
+-- simple cheats are single address every frame ram, rom or gg,ar cheats in one file called cheat.simple
 --
--- ram cheat format:  <set name>,<cputag>,<hex offset>,<b|w|d|q - size>,<hex value>,<desc>
+-- ram/rom cheat format:  <set name>,<cputag|regiontag>,<hex offset>,<b|w|d|q - size>,<hex value>,<desc>
 -- only program address space is supported, comments are prepended with ;
 -- size is b - u8, w - u16, d - u32, q - u64
 --
 -- gg,ar cheat format: <set name>,<gg|ar - type>,<code>,<desc> like "nes/smb,gg,SXIOPO,Infinite Lives"
 -- gg for game genie -- nes, snes, megadriv, gamegear, gameboy
--- ar for action replay -- nes
+-- ar for action replay -- nes, snes, megadriv, gamegear, sms
 --
 -- set name is <softlist>/<entry> like "nes/smb" for softlist items
 -- Don't use commas in the description
@@ -23,10 +23,43 @@ end
 
 local codefuncs = {}
 
+local function prepare_rom_cheat(desc, region, addr, val, size, banksize, comp)
+	local cheat = { desc = desc, region = { rom = region } }
+	cheat.script = { off = "if on then rom:write_u8(addr, save) end" }
+	if banksize and comp then
+		local rom = manager:machine():memory().regions[region]
+		local bankaddr = addr & (banksize - 1)
+		addr = nil
+		if not rom then
+			error("rom cheat invalid region " .. desc)
+		end
+		for i = 0, rom.size, banksize do
+			if rom:read_u8(i + bankaddr) == comp then
+				addr = i + bankaddr
+				break
+			end
+		end
+		if not addr then
+			error("rom cheat compare value not found " .. desc)
+		end
+	end
+	cheat.script.on = string.format([[
+				on = true
+				addr = %d
+				save = rom:read_u%d(addr)
+				rom:write_u8(addr, %d)]], addr, size, val)
+	return cheat
+end
+
+local function prepare_ram_cheat(desc, tag, addr, val, size)
+	local cheat = { desc = desc, space = { cpup = { tag = tag, type = "program" } } }
+	cheat.script = { run = "cpup:write_u" .. size .. "(" .. addr .. "," .. val .. ", true)" }
+	return cheat
+end
+
 function codefuncs.nes_gg(desc, code)
 	local xlate = { A = 0, P = 1, Z = 2, L = 3, G = 4, I = 5, T = 6, Y = 7, E = 8,
 			O = 9, X = 10, U = 11, K = 12, S = 13, V = 14, N = 15 }
-	local cheat = { desc = desc, region = { rom = ":nes_slot:cart:prg_rom" } }
 	local value = 0
 	code:upper():gsub("(.)", function(s)
 			if not xlate[s] then
@@ -35,39 +68,22 @@ function codefuncs.nes_gg(desc, code)
 			value = (value << 4) | xlate[s]
 		end)
 	local addr, newval, comp
-	cheat.script = { off = "if on then rom:write_u8(addr, save) end" }
 	if #code == 6 then
 		addr = ((value >> 4) & 7) | ((value >> 8) & 0x78) | ((value >> 12) & 0x80) | ((value << 8) & 0x700) | ((value << 4) & 0x7800)
 		newval = ((value >> 20) & 7) | (value & 8) | ((value >> 12) & 0x70) | ((value >> 16) & 0x80)
-		cheat.script.on = string.format([[
-					on = true
-					addr = %d
-					save = rom:read_u8(addr)
-					rom:write_u8(addr, %d)]], addr, newval)
+		return prepare_rom_cheat(desc, ":nes_slot:cart:prg_rom", addr, newval, 8) 
 	elseif #code == 8 then
 		addr = ((value >> 12) & 7) | ((value >> 16) & 0x78) | ((value >> 20) & 0x80) | (value & 0x700) | ((value >> 4) & 0x7800)
 		newval = ((value >> 28) & 7) | (value & 8) | ((value >> 20) & 0x70) | ((value >> 24) & 0x80)
 		comp = ((value >> 4) & 7) | ((value >> 8) & 8) | ((value << 4) & 0x70) | ((value << 1) & 0x80)
 		-- assume 8K banks, 32K also common but is an easy multiple of 8K
-		cheat.script.on = string.format([[
-				addr = %d
-				save = %d
-				for i = 0, rom.size, 8192 do
-					if rom:read_u8(i + addr) == save then
-						on = true
-						addr = i + addr
-						rom:write_u8(addr, %d)
-						break
-					end
-				end]], addr & 0x3fff, comp, newval)
+		return prepare_rom_cheat(desc, ":nes_slot:cart:prg_rom", addr, newval, 8, 8192, comp) 
 	else
 		error("error game genie cheat incorrect length " .. desc)
 	end
-	return cheat
 end
 
 function codefuncs.nes_ar(desc, code)
-	local cheat = { desc = desc, space = { cpup = { tag = ":maincpu", type = "program" } } }
 	code = code:gsub("[: %-]", "")
 	if #code ~= 8 then
 		error("error action replay cheat incorrect length " .. desc)
@@ -77,8 +93,39 @@ function codefuncs.nes_ar(desc, code)
 	if not newval or not addr then
 		error("error parsing action replay cheat " .. desc)
 	end
-	cheat.script = { run = "cpup:write_u8(" .. addr .. "," .. newval .. ", true)" }
-	return cheat
+	return prepare_ram_cheat(desc, ":maincpu", addr, newval, 8)
+end
+
+local function snes_prepare_cheat(desc, addr, val)
+	local bank = addr >> 16
+	local offset = addr & 0xffff
+	if ((bank <= 0x3f) and (offset < 0x2000)) or ((bank & 0xfe) == 0x7e) then
+		return prepare_ram_cheat(desc, ":maincpu", addr, val, 8) 
+	end
+	if (manager:machine().devices[":maincpu"].spaces["program"]:read_u8(0xffd5) & 1) == 1 then --hirom
+		if (bank & 0x7f) <= 0x3f and offset >= 0x8000 then
+			-- direct map
+		elseif (bank & 0x7f) >= 0x40 and (bank & 0x7f) <= 0x7d then
+			addr = addr & 0x3fffff
+		elseif bank >= 0xfe then
+			addr = addr & 0x3fffff
+		else
+			error("error cheat not rom or ram addr " .. desc)
+		end
+	else --lorom
+		if (bank & 0x7f) <= 0x3f and offset >= 0x8000 then
+			addr = ((addr >> 1) & 0x3f8000) | (addr & 0x7fff)
+		elseif (bank & 0x7f) >= 0x40 and (bank & 0x7f) <= 0x6f then
+			addr = ((addr >> 1) & 0x3f8000) | (addr & 0x7fff)
+		elseif (bank & 0x7f) >= 0x70 and (bank & 0x7f) <= 0x7d and offset >= 0x8000 then
+			addr = ((addr >> 1) & 0x3f8000) | (addr & 0x7fff)
+		elseif bank >= 0xfe and offset >= 0x8000 then
+			addr = ((addr >> 1) & 0x3f8000) | (addr & 0x7fff)
+		else
+			error("error cheat not rom or ram addr " .. desc)
+		end
+	end
+	return prepare_rom_cheat(desc, ":snsslot:cart:rom", addr, val, 8) 
 end
 
 function codefuncs.snes_gg(desc, code)
@@ -86,8 +133,6 @@ function codefuncs.snes_gg(desc, code)
 			["6"] = 8, B = 9, C = 10, ["8"] = 11, A = 12, ["2"] = 13, ["3"] = 14, E = 15 }
 	local value = 0
 	local count = 0
-	local cheat = { desc = desc, region = { rom = ":snsslot:cart:rom" } } 
-	cheat.script = { off = "if on then rom:write_u8(addr, save) end" }
 	code:upper():gsub("(.)", function(s)
 			if s == "-" then
 				return
@@ -103,40 +148,20 @@ function codefuncs.snes_gg(desc, code)
 	local newval = (value >> 24) & 0xff
 	local addr = ((value >> 6) & 0xf) | ((value >> 12) & 0xf0) | ((value >> 6) & 0x300) | ((value << 10) & 0xc00) |
 			((value >> 8) & 0xf000) | ((value << 14) & 0xf0000) | ((value << 10) & 0xf00000)
-	if (manager:machine().devices[":maincpu"].spaces["program"]:read_u8(0xffd5) & 1) == 1 then --hirom
-		local bank = addr >> 16
-		local offset = addr & 0xffff
-		if (bank & 0x7f) <= 0x3f and offset >= 0x8000 then
-			-- direct map
-		elseif (bank & 0x7f) >= 0x40 and (bank & 0x7f) <= 0x7d then
-			addr = addr & 0x3fffff
-		elseif bank >= 0xfe then
-			addr = addr & 0x3fffff
-		else
-			error("error game genie cheat not rom addr " .. desc)
-		end
-	else --lorom
-		local bank = addr >> 16
-		local offset = addr & 0xffff
-		if (bank & 0x7f) <= 0x3f and offset >= 0x8000 then
-			addr = ((addr >> 1) & 0x78000) | (addr & 0x7fff)
-		elseif (bank & 0x7f) >= 0x40 and (bank & 0x7f) <= 0x6f then
-			addr = ((addr >> 1) & 0x78000) | (addr & 0x7fff)
-		elseif (bank & 0x7f) >= 0x70 and (bank & 0x7f) <= 0x7d and offset >= 0x8000 then
-			addr = ((addr >> 1) & 0x78000) | (addr & 0x7fff)
-		elseif bank >= 0xfe and offset >= 0x8000 then
-			addr = ((addr >> 1) & 0x78000) | (addr & 0x7fff)
-		else
-			error("error game genie cheat not rom addr " .. desc)
-		end
+	return snes_prepare_cheat(desc, addr, newval)
+end
+
+function codefuncs.snes_ar(desc, code)
+	code = code:gsub("[: %-]", "")
+	if #code ~= 8 then
+		error("error action replay cheat incorrect length " .. desc)
 	end
-	cheat.script.on = string.format([[
-				addr = %d
-				save = rom:read_u8(addr)
-				on = true
-				rom:write_u8(addr, %d)
-				]], addr, newval)
-	return cheat
+	local addr = tonumber(code:sub(1, 6), 16)
+	local val = tonumber(code:sub(7, 8), 16)
+	if not addr or not val then
+		error("error parsing action replay cheat " .. desc)
+	end
+	return snes_prepare_cheat(desc, addr, val)
 end
 
 function codefuncs.megadriv_gg(desc, code)
@@ -145,8 +170,6 @@ function codefuncs.megadriv_gg(desc, code)
 			["2"] = 24, ["3"] = 25, ["4"] = 26, ["5"] = 27, ["6"] = 28, ["7"] = 29, ["8"] = 30, ["9"] = 31 }
 	local value = 0
 	local count = 0
-	local cheat = { desc = desc, region = { rom = ":mdslot:cart:rom" } } 
-	cheat.script = { off = "if on then rom:write_u16(addr, save) end" }
 	code:upper():gsub("(.)", function(s)
 			if s == "-" then
 				return
@@ -161,18 +184,23 @@ function codefuncs.megadriv_gg(desc, code)
 	end
 	local newval = ((value >> 32) & 0xff) | ((value >> 3) & 0x1f00) | ((value << 5) & 0xe000)
 	local addr = (value & 0xff00ff) | ((value >> 16) & 0xff00)
-	cheat.script.on = string.format([[
-				addr = %d
-				save = rom:read_u16(addr)
-				on = true
-				rom:write_u16(addr, %d)
-				]], addr, newval)
-	return cheat
+	return prepare_rom_cheat(desc, ":mdslot:cart:rom", addr, newval, 16) 
+end
+
+function codefuncs.megadriv_ar(desc, code)
+	code = code:gsub("[: %-]", "")
+	if #code ~= 10 then
+		error("error action replay cheat incorrect length " .. desc)
+	end
+	local addr = tonumber(code:sub(1, 7), 16)
+	local val = tonumber(code:sub(7, 10), 16)
+	if addr < 0xff0000 then
+		error("error action replay cheat not ram addr " .. desc)
+	end
+	return prepare_ram_cheat(desc, ":maincpu", addr, val, 16)
 end
 
 local function gbgg_ggcodes(desc, code, region)
-	local cheat = { desc = desc, region = { rom = region } } 
-	cheat.script = { off = "if on then rom:write_u16(addr, save) end" }
 	code = code:gsub("%-", "")
 	local comp
 	if #code == 6 then
@@ -193,25 +221,10 @@ local function gbgg_ggcodes(desc, code, region)
 		error("error game genie cheat bad addr " .. desc)
 	end
 	if comp == -1 then
-		cheat.script.on = string.format([[
-					addr = %d
-					save = rom:read_u8(addr)
-					on = true
-					rom:write_u8(addr, %d)
-					]], addr, newval)
+		return prepare_rom_cheat(desc, region, addr, newval, 8) 
 	else
 		-- assume 8K banks
-		cheat.script.on = string.format([[
-				addr = %d
-				save = %d
-				for i = 0, rom.size, 8192 do
-					if rom:read_u8(i + addr) == save then
-						on = true
-						addr = i + addr
-						rom:write_u8(addr, %d)
-						break
-					end
-				end]], addr & 0x3fff, comp, newval)
+		return prepare_rom_cheat(desc, region, addr, newval, 8, 8192, comp) 
 	end
 	return cheat
 end
@@ -223,6 +236,21 @@ end
 function codefuncs.gamegear_gg(desc, code)
 	return gbgg_ggcodes(desc, code, ":slot:cart:rom")
 end
+
+function codefuncs.gamegear_ar(desc, code)
+	code = code:gsub("[: %-]", "")
+	if #code ~= 8 then
+		error("error action replay cheat incorrect length " .. desc)
+	end
+	local addr = tonumber(code:sub(1, 6), 16)
+	local val = tonumber(code:sub(7, 8), 16)
+	if addr < 0xc000 or addr >= 0xe000 then
+		error("error action replay cheat not ram addr " .. desc)
+	end
+	return prepare_ram_cheat(desc, ":maincpu", addr, val, 8)
+end
+
+codefuncs.sms_ar = codefuncs.gamegear_ar
 
 function simple.conv_cheat(data)
 	local cheats = {}
@@ -242,17 +270,22 @@ function simple.conv_cheat(data)
 					end
 				end
 			elseif size and val then
-				cheat = { desc = desc, space = { cpup = { tag = cputag, type = "program" } } }
 				if size == "w" then
-					size = "u16"
+					size = 16
 				elseif size == "d" then
-					size = "u32"
+					size = 32
 				elseif size == "q" then
-					size = "u64"
+					size = 64
 				else
-					size = "u8"
+					size = 8
 				end
-				cheat.script = { run = "cpup:write_" .. size .. "(0x" .. offset .. ",0x" .. val .. ", true)" }
+				addr = tonumber(addr, 16)
+				val = tonumber(val, 16)
+				if manager:machine().devices[cputag] then
+					cheat = prepare_ram_cheat(desc, cputag, addr, val, size)
+				else
+					cheat = prepare_rom_cheat(desc, cputag, addr, val, size)
+				end
 			end
 			if cheat then
 				cheats[#cheats + 1] = cheat
