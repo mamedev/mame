@@ -396,6 +396,7 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "sound/ay8910.h"
 #include "sound/saa1099.h"
 #include "video/ramdac.h"
 #include "screen.h"
@@ -928,16 +929,15 @@ static ADDRESS_MAP_START( hotslots_mem, AS_PROGRAM, 16, magicard_state )
 	AM_IMPORT_FROM(scc68070_mem)
 	AM_RANGE(0x00000000, 0x001ffbff) AM_MIRROR(0x00200000) AM_RAM AM_SHARE("magicram")
 	AM_RANGE(0x00600000, 0x007ffbff) AM_RAM AM_SHARE("magicramb")
-	AM_RANGE(0x001ffc00, 0x001ffc01) AM_MIRROR(0x7fe00000) AM_READ(test_r)
-	AM_RANGE(0x001ffc40, 0x001ffc41) AM_MIRROR(0x7fe00000) AM_READ(test_r)
-	AM_RANGE(0x001ffd40, 0x001ffd43) AM_MIRROR(0x7fe00000) AM_DEVWRITE8("saa", saa1099_device, write, 0x00ff)
-	AM_RANGE(0x001ffd80, 0x001ffd81) AM_MIRROR(0x7fe00000) AM_READ(test_r)
-	AM_RANGE(0x001ffd80, 0x001ffd81) AM_MIRROR(0x7fe00000) AM_WRITENOP //?
 	AM_RANGE(0x001fff80, 0x001fffbf) AM_MIRROR(0x7fe00000) AM_RAM //DRAM I/O, not accessed by this game, CD buffer?
 	AM_RANGE(0x001fffe0, 0x001fffff) AM_MIRROR(0x7fe00000) AM_READWRITE(philips_66470_r,philips_66470_w) AM_SHARE("pcab_vregs") //video registers
 	AM_RANGE(0x00414000, 0x00414001) AM_DEVWRITE8("ramdac", ramdac_device, index_w, 0x00ff)
 	AM_RANGE(0x00414002, 0x00414003) AM_DEVWRITE8("ramdac", ramdac_device, pal_w, 0x00ff)
 	AM_RANGE(0x00414004, 0x00414005) AM_DEVWRITE8("ramdac", ramdac_device, mask_w, 0x00ff)
+	AM_RANGE(0x00414006, 0x00414007) AM_DEVWRITE8("ramdac", ramdac_device, index_w, 0x00ff)
+	AM_RANGE(0x00415002, 0x00415003) AM_DEVREAD8("ramdac", ramdac_device, pal_r, 0x00ff)
+	AM_RANGE(0x00416000, 0x00416001) AM_DEVWRITE8("ssg", ymz284_device, data_w, 0x00ff)
+	AM_RANGE(0x00417000, 0x00417001) AM_DEVWRITE8("ssg", ymz284_device, address_w, 0x00ff)
 ADDRESS_MAP_END
 
 /*************************
@@ -1006,6 +1006,10 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( hotslots, magicard )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(hotslots_mem)
+
+	MCFG_DEVICE_REMOVE("saa")
+	MCFG_SOUND_ADD("ssg", YMZ284, 4000000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 /*************************
