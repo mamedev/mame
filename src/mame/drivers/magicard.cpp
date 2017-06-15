@@ -1000,6 +1000,6 @@ GAME( 199?, magicarda, magicard, magicard, magicard, magicard_state, magicard, R
 GAME( 199?, magicardb, magicard, magicard, magicard, magicard_state, magicard, ROT0, "Impera", "Magic Card (set 3)",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 1994, magicarde, magicard, magicard, magicard, magicard_state, magicard, ROT0, "Impera", "Magic Card Export 94",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 1998, magicardj, magicard, magicard, magicard, magicard_state, magicard, ROT0, "Impera", "Magic Card Jackpot (4.01)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1999, quingo,    0,        magicard, magicard, magicard_state, magicard, ROT0, "Impera", "Quingo Export (5.00)",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2001, magicle,   0,        magicard, magicard, magicard_state, magicard, ROT0, "Impera", "Magic Lotto Export (5.03)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2002, hotslots,  0,        hotslots, magicard, magicard_state, magicard, ROT0, "Impera", "Hot Slots (6.00)",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1999, quingo,    0,        hotslots, magicard, magicard_state, magicard, ROT0, "Impera", "Quingo Export (5.00)",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
