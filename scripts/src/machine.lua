@@ -2381,6 +2381,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/te7750.h,MACHINES["TE7750"] = true
+---------------------------------------------------
+
+if (MACHINES["TE7750"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/te7750.cpp",
+		MAME_DIR .. "src/devices/machine/te7750.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/timekpr.h,MACHINES["TIMEKPR"] = true
 ---------------------------------------------------
 

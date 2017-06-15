@@ -115,9 +115,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER(coin_nibble_w);
 	DECLARE_WRITE16_MEMBER(growl_coin_word_w);
-	DECLARE_WRITE16_MEMBER(taitof2_4p_coin_word_w);
-	DECLARE_WRITE16_MEMBER(ninjak_coin_word_w);
-	DECLARE_READ16_MEMBER(ninjak_input_r);
+	DECLARE_WRITE8_MEMBER(taitof2_4p_coin_word_w);
 	DECLARE_READ16_MEMBER(cameltry_paddle_r);
 	DECLARE_READ16_MEMBER(mjnquest_dsw_r);
 	DECLARE_READ16_MEMBER(mjnquest_input_r);
