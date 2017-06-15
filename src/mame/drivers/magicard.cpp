@@ -972,10 +972,32 @@ ROM_END
 */
 ROM_START( quingo )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68070 Code & GFX */
-	ROM_LOAD16_WORD_SWAP( "quingo_export_v500_27.07.99.bin", 0x000000, 0x80000, CRC(2cd89fe3) SHA1(bdd256d5114227166aff1c9f84b573e5f00530fd) )
+	ROM_LOAD16_WORD_SWAP( "quingo_export_v500_27.07.99.bin", 0x00000, 0x80000, CRC(2cd89fe3) SHA1(bdd256d5114227166aff1c9f84b573e5f00530fd) )
 
 	ROM_REGION( 0x0200, "sereeprom", 0 ) /* Serial EPROM */
 	ROM_LOAD16_WORD_SWAP("quingo_24c04a.bin", 0x0000, 0x0200, BAD_DUMP CRC(d5e82b49) SHA1(7dbdf7d539cbd59a3ac546b6f50861c4958abb3a) ) // all AA & 55
+ROM_END
+
+
+/*
+
+  BIG DEAL BELGIEN Version 5.04
+
+  Hardware PCB informations : E179465--A/02 LPL-CPU V4.0/MULTI GAME 8603186
+  Eprom type ST M27c4002
+  Version 5.04
+  vnr 21.05.01 Cksum (provided) C4B7
+
+
+  Eeprom : 24c04A
+
+*/
+ROM_START( bigdeal0 )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68070 Code & GFX */
+	ROM_LOAD16_WORD_SWAP( "big_deal_belgien_v504_21.05.01.bin", 0x00000, 0x80000, CRC(3e3484db) SHA1(78bb655deacc57ad041a46de7ef153ce25922a8a) )
+
+	ROM_REGION( 0x0200, "sereeprom", 0 ) /* Serial EPROM */
+	ROM_LOAD16_WORD_SWAP("big_deal_24c04a.bin", 0x0000, 0x0200, BAD_DUMP CRC(d5e82b49) SHA1(7dbdf7d539cbd59a3ac546b6f50861c4958abb3a) ) // all AA & 55
 ROM_END
 
 
@@ -1003,3 +1025,4 @@ GAME( 1998, magicardj, magicard, magicard, magicard, magicard_state, magicard, R
 GAME( 2001, magicle,   0,        magicard, magicard, magicard_state, magicard, ROT0, "Impera", "Magic Lotto Export (5.03)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2002, hotslots,  0,        hotslots, magicard, magicard_state, magicard, ROT0, "Impera", "Hot Slots (6.00)",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 1999, quingo,    0,        hotslots, magicard, magicard_state, magicard, ROT0, "Impera", "Quingo Export (5.00)",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2001, bigdeal0,  0,        hotslots, magicard, magicard_state, magicard, ROT0, "Impera", "Big Deal Belgien (5.04)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
