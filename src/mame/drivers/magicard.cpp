@@ -15,10 +15,11 @@
   * Magic Card (set 3),        Impera, 199?.
   * Magic Card Export 94,      Impera, 1994.
   * Magic Card Jackpot (4.01), Impera, 1998.
-  * Quingo Export (5.00),      Impera, 1999.
   * Magic Lotto Export (5.03), Impera, 2001.
   * Hot Slots (6.00),          Impera, 2002.
-
+  * Quingo Export (5.00),      Impera, 1999.
+  * Bel Slots Export (5.01),   Impera, 1999.
+  * Big Deal Belgien (5.04),   Impera, 2001.
 
 *******************************************************************************
 
