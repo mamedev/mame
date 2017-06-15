@@ -95,17 +95,27 @@ class d64plus_state : public dragon64_state
 public:
 	d64plus_state(const machine_config &mconfig, device_type type, const char *tag)
 		: dragon64_state(mconfig, type, tag)
-		, m_hd6845(*this, "hd6845")
-		, m_videoram(*this, "videoram")
+		, m_crtc(*this, "crtc")
+		, m_palette(*this, "palette")
+		, m_plus_ram(*this, "plus_ram")
+		, m_video_ram(*this, "video_ram")
 		, m_char_rom(*this, "chargen")
 	{
 	}
 
-	MC6847_GET_CHARROM_MEMBER(char_rom_r);
+	DECLARE_READ8_MEMBER(d64plus_6845_disp_r);
+	DECLARE_WRITE8_MEMBER(d64plus_bank_w);
+	MC6845_UPDATE_ROW(crtc_update_row);
+
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
-	required_device<hd6845_device> m_hd6845;
-	required_memory_region m_videoram;
+	required_device<hd6845_device> m_crtc;
+	required_device<palette_device> m_palette;
+	optional_shared_ptr<uint8_t> m_plus_ram;
+	optional_shared_ptr<uint8_t> m_video_ram;
 	required_memory_region m_char_rom;
 };
 

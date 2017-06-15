@@ -121,7 +121,7 @@ public:
 	// cart base
 	uint8_t* get_cart_base();
 	void set_cart_base_update(cococart_base_update_delegate update);
-		
+
 private:
 	// TIMER_POOL: Must be power of two
 	static constexpr int TIMER_POOL = 2;
@@ -214,9 +214,9 @@ protected:
 	typedef cococart_slot_device::line_value line_value;
 
 private:
-	cococart_base_update_delegate		m_update;
-	cococart_slot_device *				m_owning_slot;
-	device_cococart_host_interface *	m_host;
+	cococart_base_update_delegate    m_update;
+	cococart_slot_device *           m_owning_slot;
+	device_cococart_host_interface * m_host;
 };
 
 
@@ -256,5 +256,6 @@ extern const device_type COCO_PAK;
 extern const device_type COCO_PAK_BANKED;
 extern const device_type COCO_PAK_GMC;
 extern const device_type COCO_T4426;
+extern const device_type DRAGON_JCBSND;
 
 #endif // MAME_BUS_COCO_COCOCART_H

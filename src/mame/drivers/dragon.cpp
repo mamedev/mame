@@ -38,14 +38,14 @@ ADDRESS_MAP_END
 
 /* Dragon keyboard
 
-       PB0 PB1 PB2 PB3 PB4 PB5 PB6 PB7
-  PA6: Ent Clr Brk N/c N/c N/c N/c Shift
-  PA5: X   Y   Z   Up  Dwn Lft Rgt Space
-  PA4: P   Q   R   S   T   U   V   W
-  PA3: H   I   J   K   L   M   N   O
-  PA2: @   A   B   C   D   E   F   G
-  PA1: 8   9   :   ;   ,   -   .   /
-  PA0: 0   1   2   3   4   5   6   7
+			 PB0 PB1 PB2 PB3 PB4 PB5 PB6 PB7
+	PA6: Ent Clr Brk N/c N/c N/c N/c Shift
+	PA5: X   Y   Z   Up  Dwn Lft Rgt Space
+	PA4: P   Q   R   S   T   U   V   W
+	PA3: H   I   J   K   L   M   N   O
+	PA2: @   A   B   C   D   E   F   G
+	PA1: 8   9   :   ;   ,   -   .   /
+	PA0: 0   1   2   3   4   5   6   7
  */
 static INPUT_PORTS_START( dragon_keyboard )
 	PORT_START("row0")
@@ -61,15 +61,15 @@ static INPUT_PORTS_START( dragon_keyboard )
 	PORT_START("row1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('(')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR(')')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_CODE(KEYCODE_COLON) PORT_CHAR(':') PORT_CHAR('*')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(';') PORT_CHAR('+')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_CODE(KEYCODE_MINUS) PORT_CHAR(':') PORT_CHAR('*')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR('+')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_CHAR('=')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('-') PORT_CHAR('=')
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')
 
 	PORT_START("row2")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_CODE(KEYCODE_ASTERISK) PORT_CHAR('@')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('@')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_CODE(KEYCODE_A) PORT_CHAR('A')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_CODE(KEYCODE_B) PORT_CHAR('B')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_CODE(KEYCODE_C) PORT_CHAR('C')
@@ -116,8 +116,36 @@ static INPUT_PORTS_START( dragon_keyboard )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( dragon200e_keyboard )
+	PORT_INCLUDE(dragon_keyboard)
+
+	PORT_MODIFY("row0")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_NAME("0 \xC3\x87") PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR('\xC7')
+
+	PORT_MODIFY("row1")
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_NAME("\xC3\x91") PORT_CODE(KEYCODE_COLON) PORT_CHAR('\xD1')
+
+	PORT_MODIFY("row2")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR(';') PORT_CHAR('+')
+
+	PORT_MODIFY("row5")
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_NAME("DOWN \xC2\xA1") PORT_CODE(KEYCODE_DOWN) PORT_CHAR(10) PORT_CHAR('\xA1')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_NAME("RIGHT \xC2\xBF") PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(9) PORT_CHAR('\xBF')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_NAME("SPACE") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ') PORT_CHAR('\xA7')
+
+	PORT_MODIFY("row6")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_NAME("CLEAR @") PORT_CODE(KEYCODE_HOME) PORT_CHAR(12) PORT_CHAR('@')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, dragon_state, keyboard_changed, nullptr) PORT_NAME("BREAK \xC3\xBC") PORT_CODE(KEYCODE_END) PORT_CODE(KEYCODE_ESC) PORT_CHAR(27) PORT_CHAR('\xFC')
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( dragon )
 	PORT_INCLUDE(dragon_keyboard)
+	PORT_INCLUDE(coco_joystick)
+	PORT_INCLUDE(coco_analog_control)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( dragon200e )
+	PORT_INCLUDE(dragon200e_keyboard)
 	PORT_INCLUDE(coco_joystick)
 	PORT_INCLUDE(coco_analog_control)
 INPUT_PORTS_END
@@ -130,6 +158,8 @@ MC6847_GET_CHARROM_MEMBER( dragon200e_state::char_rom_r )
 SLOT_INTERFACE_START( dragon_cart )
 	SLOT_INTERFACE("dragon_fdc", DRAGON_FDC)
 	SLOT_INTERFACE("sdtandy_fdc", SDTANDY_FDC)
+	SLOT_INTERFACE("jcbsnd", DRAGON_JCBSND)     MCFG_SLOT_OPTION_CLOCK("jcbsnd", DERIVED_CLOCK(1, 1))
+	SLOT_INTERFACE("ssc", COCO_SSC)             MCFG_SLOT_OPTION_CLOCK("ssc", DERIVED_CLOCK(1, 1))
 	SLOT_INTERFACE("pak", COCO_PAK)
 SLOT_INTERFACE_END
 
@@ -240,33 +270,20 @@ static MACHINE_CONFIG_DERIVED( dragon200e, dragon64 )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( d64plus, dragon64 )
-	// internal ram
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
-
 	// video hardware
 	MCFG_SCREEN_ADD("plus_screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(640, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DEVICE("hd6845", hd6845_device, screen_update)
+	MCFG_SCREEN_SIZE(640, 264)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 264-1)
+	MCFG_SCREEN_UPDATE_DEVICE("crtc", hd6845_device, screen_update)
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	// crtc
-	MCFG_MC6845_ADD("hd6845", HD6845, "plus_screen", 1000000)
+	MCFG_MC6845_ADD("crtc", HD6845, "plus_screen", 14218000 / 8) /* unknown clock, hand tuned to get ~50 fps */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
-
-	// TODO:
-	//    $FFE0  6845 control register
-	//    $FFE1  6845 data register
-	//    $FFE2  memory bank register - swaps lower memory banks between the standard dragon memory and the
-	//                                  three additional memory banks (A, B, C):
-	//    0x00 standard Dragon 32 bank
-	//    0x01 Bank C - 2k RAM (videoram)
-	//    0x02 Bank A - 32k RAM (ram offset 0x10000)
-	//    0x06 Bank B - 32k RAM (ram offset 0x18000)
-	//
+	MCFG_MC6845_UPDATE_ROW_CB(d64plus_state, crtc_update_row)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( dgnalpha, dragon_base )
@@ -317,6 +334,9 @@ static MACHINE_CONFIG_DERIVED( dgnalpha, dragon_base )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( tanodr64, dragon64 )
+	MCFG_DEVICE_MODIFY(":")
+	MCFG_DEVICE_CLOCK(XTAL_14_31818MHz / 4)
+
 	// video hardware
 	MCFG_SCREEN_MODIFY(SCREEN_TAG)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -367,7 +387,6 @@ ROM_START(d64plus)
 	ROM_LOAD("n82s147an.ic12", 0x0000, 0x0200, CRC(92b6728d) SHA1(bcf7c60c4e5608a58587044458d9cacaca4568aa))
 	ROM_REGION(0x2000, "chargen", 0)
 	ROM_LOAD("chargen.ic22",   0x0000, 0x2000, CRC(514f1450) SHA1(956c99fcca1b52e79bb5d91dbafc817c992e324a))
-	ROM_REGION(0x0800, "videoram", ROMREGION_ERASE)
 ROM_END
 
 ROM_START(tanodr64)
@@ -386,11 +405,11 @@ ROM_START(dgnalpha)
 	ROM_LOAD("alpha_ba.rom",    0x8000,  0x4000, CRC(84f68bf9) SHA1(1983b4fb398e3dd9668d424c666c5a0b3f1e2b69))
 ROM_END
 
-//    YEAR     NAME        PARENT    COMPAT  MACHINE     INPUT   CLASS               INIT    COMPANY                          FULLNAME                       FLAGS
-COMP( 1982,    dragon32,   0,        0,      dragon32,   dragon, dragon_state,       0,      "Dragon Data Ltd",               "Dragon 32",                   0 )
-COMP( 1983,    dragon64,   dragon32, 0,      dragon64,   dragon, dragon64_state,     0,      "Dragon Data Ltd",               "Dragon 64",                   0 )
-COMP( 1985,    dragon200,  dragon32, 0,      dragon64,   dragon, dragon64_state,     0,      "Eurohard S.A.",                 "Dragon 200",                  0 )
-COMP( 1985,    dragon200e, dragon32, 0,      dragon200e, dragon, dragon200e_state,   0,      "Eurohard S.A.",                 "Dragon 200-E",                MACHINE_NOT_WORKING )
-COMP( 1985,    d64plus,    dragon32, 0,      d64plus,    dragon, d64plus_state,      0,      "Dragon Data Ltd / Compusense",  "Dragon 64 Plus",              MACHINE_NOT_WORKING )
-COMP( 1983,    tanodr64,   dragon32, 0,      tanodr64,   dragon, dragon64_state,     0,      "Dragon Data Ltd / Tano Ltd",    "Tano Dragon 64 (NTSC)",       0 )
-COMP( 1984,    dgnalpha,   dragon32, 0,      dgnalpha,   dragon, dragon_alpha_state, 0,      "Dragon Data Ltd",               "Dragon Professional (Alpha)", 0 )
+//    YEAR     NAME        PARENT    COMPAT  MACHINE     INPUT       CLASS               INIT    COMPANY                          FULLNAME                       FLAGS
+COMP( 1982,    dragon32,   0,        0,      dragon32,   dragon,     dragon_state,       0,      "Dragon Data Ltd",               "Dragon 32",                   0 )
+COMP( 1983,    dragon64,   dragon32, 0,      dragon64,   dragon,     dragon64_state,     0,      "Dragon Data Ltd",               "Dragon 64",                   0 )
+COMP( 1985,    dragon200,  dragon32, 0,      dragon64,   dragon,     dragon64_state,     0,      "Eurohard S.A.",                 "Dragon 200",                  0 )
+COMP( 1985,    dragon200e, dragon32, 0,      dragon200e, dragon200e, dragon200e_state,   0,      "Eurohard S.A.",                 "Dragon 200-E",                MACHINE_NOT_WORKING )
+COMP( 1985,    d64plus,    dragon32, 0,      d64plus,    dragon,     d64plus_state,      0,      "Dragon Data Ltd / Compusense",  "Dragon 64 Plus",              0 )
+COMP( 1983,    tanodr64,   dragon32, 0,      tanodr64,   dragon,     dragon64_state,     0,      "Dragon Data Ltd / Tano Ltd",    "Tano Dragon 64 (NTSC)",       0 )
+COMP( 1984,    dgnalpha,   dragon32, 0,      dgnalpha,   dragon,     dragon_alpha_state, 0,      "Dragon Data Ltd",               "Dragon Professional (Alpha)", 0 )
