@@ -346,4 +346,4 @@ ROM_START( dbox )
 	ROM_LOAD16_WORD( "nokboot.bin", 0x000000, 0x20000, CRC(0ff53e1f) SHA1(52002ee22c032775dac383d408c44abe9244724f) )
 ROM_END
 
-COMP( 1996, dbox,	0, 0, dbox, dbox, dbox_state, dbox, "Nokia Multimedia", "D-box 1, Kirsch gruppe", MACHINE_IS_SKELETON )
+COMP( 1996, dbox, 0, 0, dbox, dbox, dbox_state, dbox, "Nokia Multimedia", "D-box 1, Kirsch gruppe", MACHINE_IS_SKELETON )

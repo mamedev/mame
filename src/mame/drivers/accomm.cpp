@@ -727,4 +727,4 @@ ROM_START(accomm)
 	ROM_LOAD( "romv100-0.rom", 0x030000, 0x010000, CRC(6d22950d) SHA1(d4cbdccf8d2bc836fb81182b2ed344d7134fe5c9) )
 ROM_END
 
-GAME( 1986,  accomm,  0,  accomm,  accomm, accomm_state,  0,  ROT0,  "Acorn", "Acorn Communicator", MACHINE_NOT_WORKING )
+COMP( 1986,  accomm,  0, 0, accomm,  accomm, accomm_state,  0,  "Acorn", "Acorn Communicator", MACHINE_NOT_WORKING )
