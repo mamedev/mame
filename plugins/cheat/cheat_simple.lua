@@ -192,7 +192,7 @@ function codefuncs.megadriv_ar(desc, code)
 	if #code ~= 10 then
 		error("error action replay cheat incorrect length " .. desc)
 	end
-	local addr = tonumber(code:sub(1, 7), 16)
+	local addr = tonumber(code:sub(1, 6), 16)
 	local val = tonumber(code:sub(7, 10), 16)
 	if addr < 0xff0000 then
 		error("error action replay cheat not ram addr " .. desc)
