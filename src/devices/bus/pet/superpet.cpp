@@ -66,10 +66,10 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_START( superpet )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( superpet )
+MACHINE_CONFIG_MEMBER( superpet_device::device_add_mconfig )
 	MCFG_CPU_ADD(M6809_TAG, M6809, XTAL_16MHz/16)
 	MCFG_CPU_PROGRAM_MAP(superpet_mem)
 
@@ -86,17 +86,6 @@ static MACHINE_CONFIG_START( superpet )
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(MOS6551_TAG, mos6551_device, write_dsr))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(MOS6551_TAG, mos6551_device, write_cts))
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor superpet_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( superpet );
-}
 
 
 //-------------------------------------------------

@@ -1635,7 +1635,7 @@ ROM_START(metalman)
 
 	ROM_REGION(0x80000, "user2", 0)
 	ROM_LOAD("sound_m2.bin", 0x00000, 0x20000, CRC(349df1fe) SHA1(47e7ddbdc398396e40bb5340e5edcb8baf06c255))
-	ROM_LOAD("sound_m3.bin", 0x40000, 0x20000, CRC(4d9f5ed2) SHA1(bc6b7c70369c25eddddac5304497f30cee7675d4))
+	ROM_LOAD("sound_m3.bin", 0x40000, 0x20000, CRC(15ef1866) SHA1(4ffa3b29bf3c30a9a5bc622adde16a1a13833b22))
 ROM_END
 
 

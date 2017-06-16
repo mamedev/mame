@@ -54,7 +54,8 @@ class bbc_opus2791_device : public bbc_opusfdc_device
 public:
 	bbc_opus2791_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual machine_config_constructor device_mconfig_additions() const override;
+protected:
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
@@ -63,7 +64,8 @@ class bbc_opus2793_device : public bbc_opusfdc_device
 public:
 	bbc_opus2793_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual machine_config_constructor device_mconfig_additions() const override;
+protected:
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
@@ -72,7 +74,8 @@ class bbc_opus1770_device : public bbc_opusfdc_device
 public:
 	bbc_opus1770_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual machine_config_constructor device_mconfig_additions() const override;
+protected:
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 

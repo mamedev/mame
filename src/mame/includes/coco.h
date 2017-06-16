@@ -10,8 +10,8 @@
 
 #pragma once
 
-#ifndef __COCO__
-#define __COCO__
+#ifndef MAME_INCLUDES_COCO_H
+#define MAME_INCLUDES_COCO_H
 
 
 #include "imagedev/cassette.h"
@@ -90,22 +90,6 @@ class coco_state : public driver_device, public device_cococart_host_interface
 public:
 	coco_state(const machine_config &mconfig, device_type type, const char *tag);
 
-	required_device<cpu_device> m_maincpu;
-	required_device<pia6821_device> m_pia_0;
-	required_device<pia6821_device> m_pia_1;
-	required_device<dac_byte_interface> m_dac;
-	required_device<dac_1bit_device> m_sbs;
-	required_device<wave_device> m_wave;
-	required_device<cococart_slot_device> m_cococart;
-	required_device<ram_device> m_ram;
-	required_device<cassette_image_device> m_cassette;
-	required_device<address_map_bank_device> m_floating;
-	optional_device<rs232_port_device> m_rs232;
-	optional_device<coco_vhd_image_device> m_vhd_0;
-	optional_device<coco_vhd_image_device> m_vhd_1;
-	optional_device<beckerport_device> m_beckerport;
-	optional_ioport                    m_beckerportconfig;
-
 	// driver update handlers
 	DECLARE_INPUT_CHANGED_MEMBER(keyboard_changed);
 	DECLARE_INPUT_CHANGED_MEMBER(joystick_mode_changed);
@@ -166,6 +150,13 @@ protected:
 	// changed handlers
 	virtual void pia1_pa_changed(uint8_t data);
 	virtual void pia1_pb_changed(uint8_t data);
+
+	// accessors
+	cpu_device &maincpu() { return *m_maincpu; }
+	pia6821_device &pia_0() { return *m_pia_0; }
+	pia6821_device &pia_1() { return *m_pia_1; }
+	cococart_slot_device &cococart() { return *m_cococart; }
+	ram_device &ram() { return *m_ram; }
 
 	// miscellaneous
 	virtual void update_keyboard_input(uint8_t value, uint8_t z);
@@ -234,10 +225,27 @@ private:
 	bool snden(void)        { return m_pia_1->cb2_output() ? true : false; }
 
 	// VHD selection
-	coco_vhd_image_device *current_vhd(void);
+	coco_vhd_image_device *current_vhd();
 
 	// floating bus
-	uint8_t floating_bus_read(void);
+	uint8_t floating_bus_read();
+
+	// devices
+	required_device<cpu_device> m_maincpu;
+	required_device<pia6821_device> m_pia_0;
+	required_device<pia6821_device> m_pia_1;
+	required_device<dac_byte_interface> m_dac;
+	required_device<dac_1bit_device> m_sbs;
+	required_device<wave_device> m_wave;
+	required_device<cococart_slot_device> m_cococart;
+	required_device<ram_device> m_ram;
+	required_device<cassette_image_device> m_cassette;
+	required_device<address_map_bank_device> m_floating;
+	optional_device<rs232_port_device> m_rs232;
+	optional_device<coco_vhd_image_device> m_vhd_0;
+	optional_device<coco_vhd_image_device> m_vhd_1;
+	optional_device<beckerport_device> m_beckerport;
+	optional_ioport                    m_beckerportconfig;
 
 	// input ports
 	required_ioport_array<7> m_keyboard;
@@ -276,4 +284,4 @@ private:
 	bool m_in_floating_bus_read;
 };
 
-#endif // __COCO__
+#endif // MAME_INCLUDES_COCO_H

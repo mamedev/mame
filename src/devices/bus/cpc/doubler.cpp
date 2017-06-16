@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Barry Rodewald
 /*
- * doubler.c  --  Draysoft Doubler - external cassette interface for the 464 (works on 664/6128 with external cassette?),
+ * doubler.cpp  --  Draysoft Doubler - external cassette interface for the 464 (works on 664/6128 with external cassette?),
  *                intended for use in duplicating cassette software
  *
  */
@@ -16,7 +16,7 @@
 DEFINE_DEVICE_TYPE(CPC_DOUBLER, cpc_doubler_device, "cpc_doubler", "Draysoft Doubler")
 
 
-static MACHINE_CONFIG_START( cpc_doubler )
+MACHINE_CONFIG_MEMBER( cpc_doubler_device::device_add_mconfig )
 	MCFG_CASSETTE_ADD( "doubler_tape" )
 	MCFG_CASSETTE_FORMATS(cdt_cassette_formats)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED)
@@ -24,12 +24,6 @@ static MACHINE_CONFIG_START( cpc_doubler )
 
 	// no pass-through seen on remake PCBs, unknown if actual hardware had a pass-through port or not
 MACHINE_CONFIG_END
-
-
-machine_config_constructor cpc_doubler_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( cpc_doubler );
-}
 
 
 //**************************************************************************

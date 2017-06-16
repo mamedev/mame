@@ -24,6 +24,32 @@
 #include "machine/at29x.h"
 #include "machine/ram.h"
 
+enum
+{
+	GENEVE_GM_TURBO = 1,
+	GENEVE_GM_TIM = 2
+};
+
+enum
+{
+	GENEVE_098 = 0,
+	GENEVE_100,
+	GENEVE_PFM512,
+	GENEVE_PFM512A
+};
+
+#define GENEVE_KEYBOARD_TAG   "gkeyboard"
+#define GENEVE_MAPPER_TAG     "gmapper"
+#define GENEVE_MOUSE_TAG      "gmouse"
+#define GENEVE_CLOCK_TAG      "mm58274c"
+#define GENEVE_PFM512_TAG      "pfm512"
+#define GENEVE_PFM512A_TAG     "pfm512a"
+
+#define GENEVE_SRAM_TAG  "sram"
+#define GENEVE_DRAM_TAG  "dram"
+#define GENEVE_SRAM_PAR_TAG  ":sram"
+#define GENEVE_DRAM_PAR_TAG  ":dram"
+
 namespace bus { namespace ti99 { namespace internal {
 
 /*****************************************************************************/

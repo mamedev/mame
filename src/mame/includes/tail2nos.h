@@ -35,7 +35,6 @@ public:
 	int         m_txpalette;
 	bool        m_video_enable;
 	bool        m_flip_screen;
-	uint8_t     m_pending_command;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -49,9 +48,7 @@ public:
 	DECLARE_WRITE16_MEMBER(tail2nos_txvideoram_w);
 	DECLARE_WRITE16_MEMBER(tail2nos_zoomdata_w);
 	DECLARE_WRITE8_MEMBER(tail2nos_gfxbank_w);
-	DECLARE_WRITE8_MEMBER(sound_command_w);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(sound_semaphore_w);
 	DECLARE_READ8_MEMBER(sound_semaphore_r);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void machine_start() override;

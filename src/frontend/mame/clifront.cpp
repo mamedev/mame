@@ -782,25 +782,33 @@ void cli_frontend::listslots(const std::vector<std::string> &args)
 		for (const device_slot_interface &slot : slot_interface_iterator(drivlist.config()->root_device()))
 		{
 			if (slot.fixed()) continue;
+
+			// build a list of user-selectable options
+			std::vector<device_slot_option *> option_list;
+			for (auto &option : slot.option_list())
+				if (option.second->selectable())
+					option_list.push_back(option.second.get());
+
+			// sort them by name
+			std::sort(option_list.begin(), option_list.end(), [](device_slot_option *opt1, device_slot_option *opt2) {
+				return strcmp(opt1->name(), opt2->name()) < 0;
+			});
+
+
 			// output the line, up to the list of extensions
 			printf("%-16s %-16s ", first ? drivlist.driver().name : "", slot.device().tag()+1);
 
 			bool first_option = true;
 
 			// get the options and print them
-			for (auto &option : slot.option_list())
+			for (device_slot_option *opt : option_list)
 			{
-				if (option.second->selectable())
-				{
-					std::unique_ptr<device_t> dev = option.second->devtype()(*drivlist.config(), "dummy", &drivlist.config()->root_device(), 0);
-					dev->config_complete();
-					if (first_option)
-						printf("%-16s %s\n", option.second->name(),dev->name());
-					else
-						printf("%-34s%-16s %s\n", "", option.second->name(),dev->name());
+				if (first_option)
+					printf("%-16s %s\n", opt->name(), opt->devtype().fullname());
+				else
+					printf("%-34s%-16s %s\n", "", opt->name(), opt->devtype().fullname());
 
-					first_option = false;
-				}
+				first_option = false;
 			}
 			if (first_option)
 				printf("%-16s %s\n", "[none]","No options available");

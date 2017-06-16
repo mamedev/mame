@@ -43,11 +43,6 @@ public:
 	// construction/destruction
 	c1571_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual ioport_constructor device_input_ports() const override;
-
 	DECLARE_WRITE_LINE_MEMBER( via0_irq_w );
 	DECLARE_READ8_MEMBER( via0_pa_r );
 	DECLARE_WRITE8_MEMBER( via0_pa_w );
@@ -79,6 +74,11 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	// device_cbm_iec_interface overrides
 	virtual void cbm_iec_srq(int state) override;
@@ -131,9 +131,10 @@ public:
 	// construction/destruction
 	c1570_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 
@@ -145,10 +146,12 @@ public:
 	// construction/destruction
 	c1571cr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
+private:
 	DECLARE_WRITE8_MEMBER( via0_pa_w );
 	DECLARE_WRITE8_MEMBER( via0_pb_w );
 };
@@ -162,10 +165,12 @@ public:
 	// construction/destruction
 	mini_chief_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
+private:
 	DECLARE_READ8_MEMBER( cia_pa_r );
 	DECLARE_WRITE8_MEMBER( cia_pa_w );
 	DECLARE_WRITE8_MEMBER( cia_pb_w );

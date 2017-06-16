@@ -29,16 +29,16 @@ public:
 	// construction/destruction
 	vtech_printer_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE_LINE_MEMBER( busy_w );
-	DECLARE_READ8_MEMBER( busy_r );
-	DECLARE_WRITE8_MEMBER( strobe_w );
-
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 private:
+	DECLARE_WRITE_LINE_MEMBER( busy_w );
+	DECLARE_READ8_MEMBER( busy_r );
+	DECLARE_WRITE8_MEMBER( strobe_w );
+
 	required_device<centronics_device> m_centronics;
 	required_device<output_latch_device> m_latch;
 

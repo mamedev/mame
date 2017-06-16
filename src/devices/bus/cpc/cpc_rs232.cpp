@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Barry Rodewald
 /*
- * cpc_rs232.c
+ * cpc_rs232.cpp
  *
  *  Created on: 22/04/2014
  */
@@ -18,8 +18,22 @@ SLOT_INTERFACE_EXTERN(cpc_exp_cards);
 DEFINE_DEVICE_TYPE(CPC_RS232,     cpc_rs232_device,     "cpc_ser",    "Pace RS232C interface")
 DEFINE_DEVICE_TYPE(CPC_RS232_AMS, cpc_ams_rs232_device, "cpc_serams", "Amstrad RS232C interface")
 
+ROM_START( cpc_rs232 )
+	ROM_REGION( 0x8000, "exp_rom", 0 )
+	ROM_LOAD( "comstar1.rom",   0x0000, 0x4000, CRC(ddcade50) SHA1(d09ee0bd51a8e1cafc5107a75fed839dda3d21e5) )
+	ROM_LOAD( "comstar2.rom",   0x4000, 0x4000, CRC(664e788c) SHA1(13d033f2d1cad70140deb903d787ba514f236a59) )
+ROM_END
+
+ROM_START( cpc_rs232_ams )
+	ROM_REGION( 0x4000, "exp_rom", 0 )
+	ROM_SYSTEM_BIOS( 0, "amstrad", "Amstrad RS232C interface (v1)" )
+	ROMX_LOAD( "rs232101.rom",   0x0000, 0x2000, CRC(c6eb52b2) SHA1(8a7e0a1183fdde8d07bc8827a3e159ca3022f93b), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "mercitel", "Amstrad RS232C interface (v1) + Mercitel (v1.4)" )
+	ROMX_LOAD( "rs232mercitel14.rom",   0x0000, 0x4000, CRC(8ffb114b) SHA1(145233fe8d4db9f5265eeac767d8ee8d45d14755), ROM_BIOS(2) )
+ROM_END
+
 // device machine config
-static MACHINE_CONFIG_START( cpc_rs232 )
+MACHINE_CONFIG_MEMBER( cpc_rs232_device::device_add_mconfig )
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
 	MCFG_PIT8253_CLK0(2000000)
 	MCFG_PIT8253_CLK1(2000000)
@@ -47,25 +61,6 @@ static MACHINE_CONFIG_START( cpc_rs232 )
 	MCFG_CPC_EXPANSION_SLOT_OUT_ROMDIS_CB(DEVWRITELINE("^", cpc_expansion_slot_device, romdis_w))  // ROMDIS
 
 MACHINE_CONFIG_END
-
-ROM_START( cpc_rs232 )
-	ROM_REGION( 0x8000, "exp_rom", 0 )
-	ROM_LOAD( "comstar1.rom",   0x0000, 0x4000, CRC(ddcade50) SHA1(d09ee0bd51a8e1cafc5107a75fed839dda3d21e5) )
-	ROM_LOAD( "comstar2.rom",   0x4000, 0x4000, CRC(664e788c) SHA1(13d033f2d1cad70140deb903d787ba514f236a59) )
-ROM_END
-
-ROM_START( cpc_rs232_ams )
-	ROM_REGION( 0x4000, "exp_rom", 0 )
-	ROM_SYSTEM_BIOS( 0, "amstrad", "Amstrad RS232C interface (v1)" )
-	ROMX_LOAD( "rs232101.rom",   0x0000, 0x2000, CRC(c6eb52b2) SHA1(8a7e0a1183fdde8d07bc8827a3e159ca3022f93b), ROM_BIOS(1) )
-	ROM_SYSTEM_BIOS( 1, "mercitel", "Amstrad RS232C interface (v1) + Mercitel (v1.4)" )
-	ROMX_LOAD( "rs232mercitel14.rom",   0x0000, 0x4000, CRC(8ffb114b) SHA1(145233fe8d4db9f5265eeac767d8ee8d45d14755), ROM_BIOS(2) )
-ROM_END
-
-machine_config_constructor cpc_rs232_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( cpc_rs232 );
-}
 
 const tiny_rom_entry *cpc_rs232_device::device_rom_region() const
 {

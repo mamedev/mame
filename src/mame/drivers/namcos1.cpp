@@ -1910,6 +1910,46 @@ ROM_START( mmaze )
 	ROM_LOAD( "mm_obj-3.bin",       0x60000, 0x20000, CRC(dac57358) SHA1(5175b66d3622cb56ed7be3568b247195d1485579) )
 ROM_END
 
+ROM_START( mmaze2 )
+	ROM_REGION( 0x20000, "audiocpu", 0 )
+	ROM_LOAD( "mm_snd-0.bin",       0x00000, 0x10000, CRC(25d25e07) SHA1(b2293bfc380fd767ac2a51e8b32e24bbea866be2) )
+	ROM_LOAD( "mm_snd-1.bin",       0x10000, 0x10000, CRC(2c5849c8) SHA1(1073719c9f4d4e41cbfd7c749bff42a0be460baf) )
+
+	ROM_REGION( 0x400000, "user1", 0 ) /* 4M for ROMs */
+	ROM_LOAD_1024( "mm_prg-0.bin",    0x000000, CRC(e169a911) SHA1(0537536f5278a9e7ebad03b55d9904ccbac7b3b6) )
+	ROM_LOAD_1024( "mm_prg-1.bin",    0x080000, CRC(6ba14e41) SHA1(54d53a5653eb943210f519c85d190482957b3533) )
+	ROM_LOAD_1024( "mm_prg-2.bin",    0x100000, CRC(91bde09f) SHA1(d7f6f644f526e36b6fd930d80f78ad1aa646fdfb) )
+	/* 180000-1fffff empty */
+	/* 200000-27ffff empty */
+	/* 280000-2fffff empty */
+	ROM_LOAD_512 ( "mm1_p6.bin",      0x300000, CRC(eaf530d8) SHA1(4c62f86b58ff2c62b269f2cef7982a3d49490ffa) )
+	ROM_LOAD_512 ( "prg7.bin",        0x380000, CRC(463d8c95) SHA1(74896bcf818f1efc4758688c93158f9b74d2701d) ) // only this ROM differs, removed copyright screen
+
+	ROM_REGION( 0x1000, "mcu", 0 )  /* MCU internal ROM */
+	ROM_LOAD( "cus64-64a1.mcu",     0x0000, 0x1000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
+
+	ROM_REGION( 0xc0000, "voice", 0 )  /* MCU external ROM */
+	ROM_LOAD( "mm_voi-0.bin",       0x00000, 0x20000, CRC(ee974cff) SHA1(f211c461a36dae9ce5ee614aaaabf92556181a85) )
+	ROM_LOAD( "mm_voi-1.bin",       0x20000, 0x20000, CRC(d09b5830) SHA1(954be797e30f7d126b4fc2b04f190bfd7dc23bff) )
+
+	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
+	ROM_LOAD( "mm_chr-8.bin",       0x00000, 0x20000, CRC(a3784dfe) SHA1(7bcd71e0c675cd16587b61c23b470abb8ba434d3) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 ) /* characters */
+	ROM_LOAD( "mm_chr-0.bin",       0x00000, 0x20000, CRC(43ff2dfc) SHA1(4cf6834071f408eac5a7a67570bd11cb61a83b54) )
+	ROM_LOAD( "mm_chr-1.bin",       0x20000, 0x20000, CRC(b9b4b72d) SHA1(cc11496a27cd94503eb3a16c95c49d60ed092e62) )
+	ROM_LOAD( "mm_chr-2.bin",       0x40000, 0x20000, CRC(bee28425) SHA1(90e8aaf4bcb1af6239404bc05b9e6a1b25f61754) )
+	ROM_LOAD( "mm_chr-3.bin",       0x60000, 0x20000, CRC(d9f41e5c) SHA1(c4fd2245ee02d8479209e07b8fe32d46b66de6ee) )
+	ROM_LOAD( "mm_chr-4.bin",       0x80000, 0x20000, CRC(3484f4ae) SHA1(0cc177637e3fc8ef26bcde0f15ab507143745ff9) )
+	ROM_LOAD( "mm_chr-5.bin",       0xa0000, 0x20000, CRC(c863deba) SHA1(cc2b8cd156cf11ee289c68b0a583e7bb4250414b) )
+
+	ROM_REGION( 0x100000, "gfx3", 0 ) /* sprites */
+	ROM_LOAD( "mm_obj-0.bin",       0x00000, 0x20000, CRC(d4b7e698) SHA1(c73ef73574a52d06e12e21047529b09854e1ba21) )
+	ROM_LOAD( "mm_obj-1.bin",       0x20000, 0x20000, CRC(1ce49e04) SHA1(fc30a03e443bece11bd86771ebd1fcb40d15b0b9) )
+	ROM_LOAD( "mm_obj-2.bin",       0x40000, 0x20000, CRC(3d3d5de3) SHA1(aa8032f1d99af1d92b0afaa11933548e0d39f03b) )
+	ROM_LOAD( "mm_obj-3.bin",       0x60000, 0x20000, CRC(dac57358) SHA1(5175b66d3622cb56ed7be3568b247195d1485579) )
+ROM_END
+
 /* Bakutotsu Kijuutei */
 ROM_START( bakutotu )
 	ROM_REGION( 0x20000, "audiocpu", 0 )
@@ -2820,6 +2860,7 @@ GAME( 1988, ws,        0,        ns1,     ns1,      namcos1_state, ws,       ROT
 GAME( 1988, berabohm,  0,        ns1,     berabohm, namcos1_state, berabohm, ROT180, "Namco", "Beraboh Man (Japan, Rev C)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, berabohmb, berabohm, ns1,     berabohm, namcos1_state, berabohm, ROT180, "Namco", "Beraboh Man (Japan, Rev B)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, mmaze,     0,        ns1,     mmaze,    namcos1_state, alice,    ROT180, "Namco", "Marchen Maze (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, mmaze2,    mmaze,    ns1,     mmaze,    namcos1_state, alice,    ROT180, "Namco", "Marchen Maze (Japan, hack?)", MACHINE_SUPPORTS_SAVE ) // removed copyright screen, hacked for export? But still has and requires MCU
 GAME( 1988, bakutotu,  0,        ns1,     bakutotu, namcos1_state, bakutotu, ROT180, "Namco", "Bakutotsu Kijuutei", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, wldcourt,  0,        ns1,     wldcourt, namcos1_state, wldcourt, ROT180, "Namco", "World Court (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, splatter,  0,        ns1,     splatter3,namcos1_state, splatter, ROT180, "Namco", "Splatter House (World, new version (SH3))", MACHINE_SUPPORTS_SAVE )

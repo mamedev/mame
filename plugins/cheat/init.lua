@@ -340,7 +340,7 @@ function cheat.startplugin()
 	local hotmod = 1
 	local hotkeylist = {}
 	local function run_if(func) if func then func() end return func or false end
-	local function is_oneshot(cheat) return cheat.script and not cheat.script.run and not cheat.script.on end
+	local function is_oneshot(cheat) return cheat.script and not cheat.script.run and not cheat.script.off end
 
 	local function menu_populate()
 		local menu = {}

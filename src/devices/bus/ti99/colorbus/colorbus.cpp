@@ -30,7 +30,7 @@ ti99_colorbus_device::ti99_colorbus_device(const machine_config &mconfig, const 
 	:   device_t(mconfig, TI99_COLORBUS, tag, owner, clock),
 		device_slot_interface(mconfig, *this),
 		m_connected(nullptr),
-		m_v9938(*owner, VDP_TAG),
+		m_v9938(*owner, TI_VDP_TAG),
 		m_left_button_pressed(false)
 {
 }

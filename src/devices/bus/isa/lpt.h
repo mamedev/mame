@@ -27,20 +27,19 @@ public:
 	// construction/destruction
 	isa8_lpt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual ioport_constructor device_input_ports() const override;
-
 	bool is_primary() { return m_is_primary; }
-
-	WRITE_LINE_MEMBER(pc_cpu_line);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
+
 private:
+	WRITE_LINE_MEMBER(pc_cpu_line);
 
 	// internal state
 	bool m_is_primary;

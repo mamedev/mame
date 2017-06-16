@@ -208,10 +208,25 @@ static SLOT_INTERFACE_START( fcscsi_floppies )
 	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
 SLOT_INTERFACE_END
 
-/*
- * Machine configuration
- */
-static MACHINE_CONFIG_START (fcscsi1)
+
+/* ROM definitions */
+ROM_START (fcscsi1)
+	ROM_REGION (0x1000000, "maincpu", 0)
+
+	/* Besta ROM:s - apparantly patched Force ROM:s */
+	ROM_SYSTEM_BIOS(0, "Besta 88", "Besta 88")
+	ROMX_LOAD ("besta88_scsi_lower.ROM", 0xe00001, 0x4000, CRC (fb3ab364) SHA1 (d79112100f1c4beaf358e006efd4dde5e300b0ba), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD ("besta88_scsi_upper.ROM", 0xe00000, 0x4000, CRC (41f9cdf4) SHA1 (66b998bbf9459f0a613718260e05e97749532073), ROM_SKIP(1) | ROM_BIOS(1))
+
+	/* Force ROM:s  */
+	ROM_SYSTEM_BIOS(1, "ISCSI-1 v3.7", "Force Computer SYS68K/ISCSI-1 firmware v3.7")
+	ROMX_LOAD ("ISCSI-1_V3.7_L.BIN", 0xe00001, 0x4000, CRC (83d95ab7) SHA1 (bf249910bcb6cb0b04dda2a95a38a0f90b553352), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD ("ISCSI-1_V3.7_U.BIN", 0xe00000, 0x4000, CRC (58815831) SHA1 (074085ef96e1fe2a551938bdeee6a9cab40ff09c), ROM_SKIP(1) | ROM_BIOS(2))
+
+ROM_END
+
+
+MACHINE_CONFIG_MEMBER(vme_fcscsi1_card_device::device_add_mconfig)
 	/* basic machine hardware */
 	MCFG_CPU_ADD ("maincpu", M68010, CPU_CRYSTAL / 2) /* 7474 based frequency divide by 2 */
 	MCFG_CPU_PROGRAM_MAP (fcscsi1_mem)
@@ -242,29 +257,6 @@ static MACHINE_CONFIG_START (fcscsi1)
 	MCFG_HD63450_DMA_READ_1_CB(READ8(vme_fcscsi1_card_device, fdc_read_byte))  // ch 1 = fdc
 	MCFG_HD63450_DMA_WRITE_1_CB(WRITE8(vme_fcscsi1_card_device, fdc_write_byte))
 MACHINE_CONFIG_END
-
-/* ROM definitions */
-ROM_START (fcscsi1)
-	ROM_REGION (0x1000000, "maincpu", 0)
-
-	/* Besta ROM:s - apparantly patched Force ROM:s */
-	ROM_SYSTEM_BIOS(0, "Besta 88", "Besta 88")
-	ROMX_LOAD ("besta88_scsi_lower.ROM", 0xe00001, 0x4000, CRC (fb3ab364) SHA1 (d79112100f1c4beaf358e006efd4dde5e300b0ba), ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD ("besta88_scsi_upper.ROM", 0xe00000, 0x4000, CRC (41f9cdf4) SHA1 (66b998bbf9459f0a613718260e05e97749532073), ROM_SKIP(1) | ROM_BIOS(1))
-
-	/* Force ROM:s  */
-	ROM_SYSTEM_BIOS(1, "ISCSI-1 v3.7", "Force Computer SYS68K/ISCSI-1 firmware v3.7")
-	ROMX_LOAD ("ISCSI-1_V3.7_L.BIN", 0xe00001, 0x4000, CRC (83d95ab7) SHA1 (bf249910bcb6cb0b04dda2a95a38a0f90b553352), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD ("ISCSI-1_V3.7_U.BIN", 0xe00000, 0x4000, CRC (58815831) SHA1 (074085ef96e1fe2a551938bdeee6a9cab40ff09c), ROM_SKIP(1) | ROM_BIOS(2))
-
-ROM_END
-
-
-machine_config_constructor vme_fcscsi1_card_device::device_mconfig_additions() const
-{
-	LOG("%s %s\n", tag(), FUNCNAME);
-	return MACHINE_CONFIG_NAME( fcscsi1 );
-}
 
 const tiny_rom_entry *vme_fcscsi1_card_device::device_rom_region() const
 {

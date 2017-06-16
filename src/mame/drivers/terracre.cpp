@@ -10,7 +10,7 @@ driver by Carlos A. Lozano (calb@gsyc.inf.uc3m.es)
 TODO:
 
   - I'm playing samples with a DAC, but they could be ADPCM
-  - find correct high-scores table for 'amazon'
+  - find correct high-scores table for 'amazon' (update: uses same protection data as amatelas hence same data)
 
 
 Stephh's notes (based on the games M68000 code and some tests) :
@@ -92,7 +92,17 @@ AT-2
 #include "screen.h"
 #include "speaker.h"
 
+/*
+0000 5000 5341 4b45 5349 4755 5245
+0000 4000 0e4b 4154 5544 4f4e 0e0e
+0000 3000 414e 4b41 4b45 5544 4f4e
+0000 2000 0e0e 4b49 5455 4e45 0e0e
+0000 1000 0e4b 414b 4553 4f42 410e
+2079 0001 0004 4ed0 2079 0001 0008 
+4ed0 7c
+*/
 
+// protection data left for reference, aren't actually used
 static const uint16_t mAmazonProtData[] =
 {
 	/* default high scores (0x40db4) - wrong data ? */
@@ -107,6 +117,16 @@ static const uint16_t mAmazonProtData[] =
 	0xc800 /* checksum */
 };
 
+/*
+0000 5000 5341 4b45 5349 4755 5245 
+0000 4000 0e4b 4154 5544 4f4e 0e0e
+0000 3000 414e 4b41 4b45 5544 4f4e
+0000 2000 0e0e 4b49 5455 4e45 0e0e
+0000 1000 0e4b 414b 4553 4f42 410e
+2079 0001 0004 4ed0 2079 0001 0008
+4ed0 7c
+ */
+
 static const uint16_t mAmatelasProtData[] =
 {
 	/* default high scores (0x40db4) */
@@ -120,6 +140,13 @@ static const uint16_t mAmatelasProtData[] =
 	0x4ef9,0x0000,0x632e,0x0000,0x4ef9,0x0000,0x80C2,0x0000,
 	0x6100 /* checksum */
 };
+
+/*
+2079 0001 0004 4ed0 2079 0001 0008
+4ed0 7c
+
+It actually never jumps to 0x40dba?
+*/
 
 static const uint16_t mHoreKidProtData[] =
 {
@@ -146,16 +173,22 @@ READ8_MEMBER(terracre_state::soundlatch_clear_r)
 	return 0;
 }
 
+// 1412M2 
 READ16_MEMBER(terracre_state::amazon_protection_r)
 {
-	offset = m_mAmazonProtReg[2];
-	if( offset<=0x56 )
+	if(m_mAmazonProtCmd == 0x37)
 	{
-		uint16_t data;
-		data = m_mpProtData[offset/2];
-		if( offset&1 ) return data&0xff;
-		return data>>8;
+		//m_mAmazonProtReg[4] bit 0 used on hiscore data (clear on code)
+		uint16_t prot_offset = (m_mAmazonProtReg[1]<<8)|(m_mAmazonProtReg[2]);
+		uint8_t *prot_rom = memregion("prot_data")->base();
+		
+		//printf("%02x",(prot_rom[prot_offset] - 0x44) & 0xff);
+		
+		return prot_rom[prot_offset & 0x1fff] - 0x44;
 	}
+
+	popmessage("unknown prot cmd R %02x",m_mAmazonProtCmd);
+	
 	return 0;
 }
 
@@ -169,9 +202,19 @@ WRITE16_MEMBER(terracre_state::amazon_protection_w)
 		}
 		else
 		{
-			if( m_mAmazonProtCmd>=32 && m_mAmazonProtCmd<=0x37 )
+			if( m_mAmazonProtCmd>=0x32 && m_mAmazonProtCmd<=0x37 )
 			{
 				m_mAmazonProtReg[m_mAmazonProtCmd-0x32] = data;
+				
+				#if 0
+				if(m_mAmazonProtCmd == 0x32)
+				{
+					for(int i=0;i<6;i++)
+						printf("%02x ",m_mAmazonProtReg[i]);
+					
+					printf("\n");
+				}
+				#endif
 			}
 		}
 	}
@@ -555,7 +598,7 @@ static MACHINE_CONFIG_START( ym3526 )
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE_EX(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
 	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
-	MACHINE_CONFIG_END
+MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ym2203, ym3526 )
 	MCFG_CPU_MODIFY("audiocpu")
@@ -777,7 +820,7 @@ ROM_START( amazon )
 	ROM_REGION( 0x0100, "user1", 0 )
 	ROM_LOAD( "4e",      0x000, 0x100, CRC(035f2c7b) SHA1(36e32a50146631e763711b586936b2815600f52d) ) /* ctable */
 
-	ROM_REGION( 0x2000, "user2", 0 ) /* unknown, mostly text */
+	ROM_REGION( 0x2000, "prot_data", 0 ) /* unknown, mostly text */
 	ROM_LOAD( "16.18g", 0x0000, 0x2000, CRC(1d8d592b) SHA1(be8d6df8b5926069ae2cbc1dc26e1fa92d63f297) )
 ROM_END
 
@@ -816,7 +859,7 @@ ROM_START( amatelas )
 	ROM_REGION( 0x0100, "user1", 0 )
 	ROM_LOAD( "4e",      0x000, 0x100, CRC(035f2c7b) SHA1(36e32a50146631e763711b586936b2815600f52d) ) /* ctable */
 
-	ROM_REGION( 0x2000, "user2", 0 ) /* unknown, mostly text */
+	ROM_REGION( 0x2000, "prot_data", 0 ) /* unknown, mostly text */
 	ROM_LOAD( "16.18g", 0x0000, 0x2000, CRC(1d8d592b) SHA1(be8d6df8b5926069ae2cbc1dc26e1fa92d63f297) )
 ROM_END
 
@@ -856,7 +899,7 @@ ROM_START( horekid )
 	ROM_REGION( 0x0100, "user1", 0 )
 	ROM_LOAD( "kid_prom.4e",  0x000, 0x100, CRC(e4fb54ee) SHA1(aba89d347b24dc6680e6f25b4a6c0d6657bb6a83) ) /* ctable */
 
-	ROM_REGION( 0x2000, "user2", 0 ) /* unknown, mostly text */
+	ROM_REGION( 0x2000, "prot_data", 0 ) /* unknown, mostly text */
 	ROM_LOAD( "horekid.17", 0x0000, 0x2000, CRC(1d8d592b) SHA1(be8d6df8b5926069ae2cbc1dc26e1fa92d63f297) )
 ROM_END
 
@@ -896,7 +939,7 @@ ROM_START( horekidb )
 	ROM_REGION( 0x0100, "user1", 0 )
 	ROM_LOAD( "kid_prom.4e",  0x000, 0x100, CRC(e4fb54ee) SHA1(aba89d347b24dc6680e6f25b4a6c0d6657bb6a83) ) /* ctable */
 
-	ROM_REGION( 0x2000, "user2", 0 ) /* unknown, mostly text */
+	ROM_REGION( 0x2000, "prot_data", 0 ) /* unknown, mostly text */
 	ROM_LOAD( "horekid.17", 0x0000, 0x2000, CRC(1d8d592b) SHA1(be8d6df8b5926069ae2cbc1dc26e1fa92d63f297) )
 ROM_END
 

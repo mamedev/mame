@@ -12,27 +12,26 @@
 #include "boot_kof2k3.h"
 
 
-static MACHINE_CONFIG_START( kof2k3bl_cart )
+MACHINE_CONFIG_MEMBER( neogeo_kf2k3bl_cart_device::device_add_mconfig )
 	MCFG_NEOBOOT_PROT_ADD("bootleg_prot")
 	MCFG_CMC_PROT_ADD("cmc_prot")
 	MCFG_PCM2_PROT_ADD("pcm2_prot")
 	MCFG_KOF2K3BL_PROT_ADD("kof2k3bl_prot")
 MACHINE_CONFIG_END
 
-machine_config_constructor neogeo_kf2k3bl_cart_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( kof2k3bl_cart );
-}
+MACHINE_CONFIG_MEMBER( neogeo_kf2k3pl_cart_device::device_add_mconfig )
+	MCFG_NEOBOOT_PROT_ADD("bootleg_prot")
+	MCFG_CMC_PROT_ADD("cmc_prot")
+	MCFG_PCM2_PROT_ADD("pcm2_prot")
+	MCFG_KOF2K3BL_PROT_ADD("kof2k3bl_prot")
+MACHINE_CONFIG_END
 
-machine_config_constructor neogeo_kf2k3pl_cart_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( kof2k3bl_cart );
-}
-
-machine_config_constructor neogeo_kf2k3upl_cart_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( kof2k3bl_cart );
-}
+MACHINE_CONFIG_MEMBER( neogeo_kf2k3upl_cart_device::device_add_mconfig )
+	MCFG_NEOBOOT_PROT_ADD("bootleg_prot")
+	MCFG_CMC_PROT_ADD("cmc_prot")
+	MCFG_PCM2_PROT_ADD("pcm2_prot")
+	MCFG_KOF2K3BL_PROT_ADD("kof2k3bl_prot")
+MACHINE_CONFIG_END
 
 /*************************************************
  kf2k3bl

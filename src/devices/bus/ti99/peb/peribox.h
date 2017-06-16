@@ -21,12 +21,11 @@
 
 namespace bus { namespace ti99 { namespace peb {
 
-class ti_expansion_card_device;
 class peribox_slot_device;
+class device_ti99_peribox_card_interface;
 
 /*****************************************************************************
     The overall Peripheral Expansion Box.
-    See ti99defs.h for bus8z_device
 ******************************************************************************/
 
 class peribox_device : public bus::ti99::internal::ioport_attached_device
@@ -147,19 +146,61 @@ protected:
 };
 
 /*****************************************************************************
+    The parent class for all expansion cards.
+******************************************************************************/
+
+class device_ti99_peribox_card_interface : public device_slot_card_interface
+{
+	friend class peribox_slot_device;
+
+public:
+	virtual DECLARE_READ8Z_MEMBER(readz) = 0;
+	virtual DECLARE_WRITE8_MEMBER(write) = 0;
+	virtual DECLARE_READ8Z_MEMBER(crureadz) = 0;
+	virtual DECLARE_WRITE8_MEMBER(cruwrite) = 0;
+	virtual DECLARE_SETADDRESS_DBIN_MEMBER(setaddress_dbin) { };
+
+	virtual DECLARE_WRITE_LINE_MEMBER(clock_in) { }
+	void    set_senila(int state) { m_senila = state; }
+	void    set_senilb(int state) { m_senilb = state; }
+
+protected:
+	using device_slot_card_interface::device_slot_card_interface;
+	device_ti99_peribox_card_interface(const machine_config &mconfig, device_t &device);
+	virtual void interface_config_complete() override;
+
+	peribox_slot_device *m_slot;        // using a link to the slot for callbacks
+	int m_senila;
+	int m_senilb;
+
+	// When true, card is accessible. Indicated by a LED.
+	bool    m_selected;
+
+	// When true, GenMod is selected. Modified by peribox_slot_device.
+	bool    m_genmod;
+
+	// CRU base. Used to configure the address by which a card is selected.
+	int     m_cru_base;
+
+	// Used to decide whether this card has been selected.
+	int     m_select_mask;
+	int     m_select_value;
+};
+
+/*****************************************************************************
     A single slot in the box.
 ******************************************************************************/
 
-class peribox_slot_device : public bus8z_device, public device_slot_interface
+class peribox_slot_device : public device_t, public device_slot_interface
 {
 	friend class peribox_device;
 public:
 	peribox_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// Called from the box (direction to card)
-	DECLARE_READ8Z_MEMBER(readz) override;
-	DECLARE_WRITE8_MEMBER(write) override;
-	DECLARE_SETADDRESS_DBIN_MEMBER(setaddress_dbin) override;
+	DECLARE_READ8Z_MEMBER(readz);
+	DECLARE_WRITE8_MEMBER(write);
+	DECLARE_SETADDRESS_DBIN_MEMBER(setaddress_dbin);
 
 	DECLARE_WRITE_LINE_MEMBER(senila);
 	DECLARE_WRITE_LINE_MEMBER(senilb);
@@ -183,56 +224,9 @@ protected:
 
 private:
 	int get_index_from_tagname();
-	ti_expansion_card_device *m_card;
+	device_ti99_peribox_card_interface *m_card;
 	int m_slotnumber;
-};
-
-
-/*****************************************************************************
-    The parent class for all expansion cards.
-******************************************************************************/
-
-class ti_expansion_card_device : public bus8z_device, public device_slot_card_interface
-{
-	friend class peribox_slot_device;
-
-public:
-	virtual DECLARE_READ8Z_MEMBER(crureadz) = 0;
-	virtual DECLARE_WRITE8_MEMBER(cruwrite) = 0;
-
-	void    set_senila(int state) { m_senila = state; }
-	void    set_senilb(int state) { m_senilb = state; }
-
-	virtual DECLARE_WRITE_LINE_MEMBER(clock_in) { }
-
-protected:
-	ti_expansion_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-		: bus8z_device(mconfig, type, tag, owner, clock)
-		, device_slot_card_interface(mconfig, *this)
-		, m_selected(false), m_cru_base(0), m_select_mask(0), m_select_value(0)
-	{
-		m_slot = static_cast<peribox_slot_device*>(owner);
-		m_senila = CLEAR_LINE;
-		m_senilb = CLEAR_LINE;
-		m_genmod = false;
-	}
-
-	peribox_slot_device *m_slot;        // using a link to the slot for callbacks
-	int m_senila;
-	int m_senilb;
-
-	// When true, card is accessible. Indicated by a LED.
-	bool    m_selected;
-
-	// When true, GenMod is selected. Modified by peribox_slot_device.
-	bool    m_genmod;
-
-	// CRU base. Used to configure the address by which a card is selected.
-	int     m_cru_base;
-
-	// Used to decide whether this card has been selected.
-	int     m_select_mask;
-	int     m_select_value;
+	const char* card_name() { return m_card->device().tag(); }
 };
 
 #define MCFG_PERIBOX_SLOT_ADD(_tag, _slot_intf) \

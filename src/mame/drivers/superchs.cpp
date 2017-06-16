@@ -43,6 +43,7 @@
 #include "emu.h"
 #include "includes/superchs.h"
 #include "audio/taito_en.h"
+#include "machine/taitoio.h"
 
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"
@@ -98,65 +99,12 @@ WRITE32_MEMBER(superchs_state::cpua_ctrl_w)
 	}
 }
 
-READ32_MEMBER(superchs_state::superchs_input_r)
+WRITE8_MEMBER(superchs_state::coin_word_w)
 {
-	switch (offset)
-	{
-		case 0x00:
-			return ioport("INPUTS")->read();
-
-		case 0x01:
-			return m_coin_word<<16;
-	}
-
-	return 0xffffffff;
-}
-
-WRITE32_MEMBER(superchs_state::superchs_input_w)
-{
-	#if 0
-	{
-	char t[64];
-	COMBINE_DATA(&m_mem[offset]);
-	sprintf(t,"%08x %08x",m_mem[0],m_mem[1]);
-	//popmessage(t);
-	}
-	#endif
-
-	switch (offset)
-	{
-		case 0x00:
-		{
-			if (ACCESSING_BITS_24_31)   /* $300000 is watchdog */
-			{
-				m_watchdog->watchdog_reset();
-			}
-
-			if (ACCESSING_BITS_0_7)
-			{
-				m_eeprom->clk_write((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
-				m_eeprom->di_write((data & 0x40) >> 6);
-				m_eeprom->cs_write((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
-				return;
-			}
-
-			return;
-		}
-
-		/* there are 'vibration' control bits somewhere! */
-
-		case 0x01:
-		{
-			if (ACCESSING_BITS_24_31)
-			{
-				machine().bookkeeping().coin_lockout_w(0,~data & 0x01000000);
-				machine().bookkeeping().coin_lockout_w(1,~data & 0x02000000);
-				machine().bookkeeping().coin_counter_w(0, data & 0x04000000);
-				machine().bookkeeping().coin_counter_w(1, data & 0x08000000);
-				m_coin_word=(data >> 16) &0xffff;
-			}
-		}
-	}
+	machine().bookkeeping().coin_lockout_w(0,~data & 0x01);
+	machine().bookkeeping().coin_lockout_w(1,~data & 0x02);
+	machine().bookkeeping().coin_counter_w(0, data & 0x04);
+	machine().bookkeeping().coin_counter_w(1, data & 0x08);
 }
 
 READ32_MEMBER(superchs_state::superchs_stick_r)
@@ -191,8 +139,8 @@ static ADDRESS_MAP_START( superchs_map, AS_PROGRAM, 32, superchs_state )
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_SHARE("shared_ram")
 	AM_RANGE(0x240000, 0x240003) AM_WRITE(cpua_ctrl_w)
 	AM_RANGE(0x280000, 0x287fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x2c0000, 0x2c07ff) AM_RAM AM_SHARE("snd_shared")
-	AM_RANGE(0x300000, 0x300007) AM_READWRITE(superchs_input_r, superchs_input_w)   /* eerom etc. */
+	AM_RANGE(0x2c0000, 0x2c07ff) AM_DEVREADWRITE8("taito_en:dpram", mb8421_device, left_r, left_w, 0xffffffff)
+	AM_RANGE(0x300000, 0x300007) AM_DEVREADWRITE8("tc0510nio", tc0510nio_device, read, write, 0xffffffff)
 	AM_RANGE(0x340000, 0x340003) AM_READWRITE(superchs_stick_r, superchs_stick_w)   /* stick int request */
 ADDRESS_MAP_END
 
@@ -216,42 +164,27 @@ ADDRESS_MAP_END
 /***********************************************************/
 
 static INPUT_PORTS_START( superchs )
-	PORT_START("INPUTS")
-	PORT_BIT( 0x00000001, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x00000002, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x00000004, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x00000020, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x00000040, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read) /* reserved for EEROM */
-	PORT_BIT( 0x00000100, IP_ACTIVE_LOW,  IPT_SERVICE2 ) PORT_NAME("Seat Center")   /* seat center (cockpit only) */
-	PORT_BIT( 0x00000200, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x00000400, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x00000800, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x00001000, IP_ACTIVE_LOW,  IPT_BUTTON3 ) PORT_NAME("Nitro")
-	PORT_BIT( 0x00002000, IP_ACTIVE_LOW,  IPT_BUTTON4 ) PORT_NAME("Shifter") PORT_TOGGLE
-	PORT_BIT( 0x00004000, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_NAME("Brake Switch")   /* upright doesn't have brake? */
-	PORT_BIT( 0x00008000, IP_ACTIVE_LOW,  IPT_START1 )
-
-	PORT_BIT( 0x00010000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x00020000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x00040000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_DIPNAME( 0x00080000, 0x00, "Freeze Screen" )
+	PORT_START("COINS")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_DIPNAME( 0x08, 0x00, "Freeze Screen" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00080000, DEF_STR( On ) )
-	PORT_SERVICE_NO_TOGGLE( 0x00100000, IP_ACTIVE_LOW )
-	PORT_BIT( 0x00200000, IP_ACTIVE_LOW,  IPT_SERVICE1 )
-	PORT_BIT( 0x00400000, IP_ACTIVE_LOW,  IPT_COIN2 )
-	PORT_BIT( 0x00800000, IP_ACTIVE_LOW,  IPT_COIN1 )
-	PORT_BIT( 0x01000000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x02000000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x04000000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x08000000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x10000000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x20000000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x40000000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x80000000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_SERVICE_NO_TOGGLE( 0x10, IP_ACTIVE_LOW )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_SERVICE1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_COIN2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_COIN1 )
+
+	PORT_START("SWITCHES")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_SERVICE2 ) PORT_NAME("Seat Center")   /* seat center (cockpit only) */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_BUTTON3 ) PORT_NAME("Nitro")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_BUTTON4 ) PORT_NAME("Shifter") PORT_TOGGLE
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_NAME("Brake Switch")   /* upright doesn't have brake? */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_START1 )
 
 	// 4 analog ports
 	PORT_START("WHEEL")
@@ -319,7 +252,15 @@ static MACHINE_CONFIG_START( superchs )
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	MCFG_DEVICE_ADD("tc0510nio", TC0510NIO, 0)
+	MCFG_TC0510NIO_READ_1_CB(IOPORT("COINS"))
+	MCFG_TC0510NIO_READ_2_CB(IOPORT("SWITCHES"))
+	MCFG_TC0510NIO_READ_3_CB(DEVREADLINE("eeprom", eeprom_serial_93cxx_device, do_read)) MCFG_DEVCB_BIT(7)
+	MCFG_TC0510NIO_WRITE_3_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write)) MCFG_DEVCB_BIT(5)
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, di_write)) MCFG_DEVCB_BIT(6)
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write)) MCFG_DEVCB_BIT(4)
+	MCFG_TC0510NIO_WRITE_4_CB(WRITE8(superchs_state, coin_word_w))
+	// there are 'vibration' control bits somewhere!
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

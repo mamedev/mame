@@ -14,17 +14,6 @@
 #include "video/tc0110pcr.h"
 
 
-struct othunder_tempsprite
-{
-	int gfx;
-	int code,color;
-	int flipx,flipy;
-	int x,y;
-	int zoomx,zoomy;
-	int primask;
-};
-
-
 class othunder_state : public driver_device
 {
 public:
@@ -52,11 +41,43 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
+	DECLARE_WRITE16_MEMBER(irq_ack_w);
+	DECLARE_WRITE8_MEMBER(eeprom_w);
+	DECLARE_WRITE8_MEMBER(coins_w);
+	DECLARE_READ16_MEMBER(lightgun_r);
+	DECLARE_WRITE16_MEMBER(lightgun_w);
+	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
+	DECLARE_WRITE16_MEMBER(sound_w);
+	DECLARE_READ16_MEMBER(sound_r);
+	DECLARE_WRITE8_MEMBER(tc0310fam_w);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(vblank_interrupt);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+private:
+	void update_irq();
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, const int *primasks, int y_offs);
+
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_spriteram;
 
 	/* video-related */
-	std::unique_ptr<othunder_tempsprite[]> m_spritelist;
+	struct tempsprite
+	{
+		int gfx;
+		int code,color;
+		int flipx,flipy;
+		int x,y;
+		int zoomx,zoomy;
+		int primask;
+	};
+
+	std::unique_ptr<tempsprite[]> m_spritelist;
 
 	/* misc */
 	int        m_vblank_irq;
@@ -80,24 +101,4 @@ public:
 	required_device<filter_volume_device> m_2610_2r;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-
-	DECLARE_WRITE16_MEMBER(irq_ack_w);
-	DECLARE_WRITE16_MEMBER(othunder_tc0220ioc_w);
-	DECLARE_READ16_MEMBER(othunder_tc0220ioc_r);
-	DECLARE_READ16_MEMBER(othunder_lightgun_r);
-	DECLARE_WRITE16_MEMBER(othunder_lightgun_w);
-	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
-	DECLARE_WRITE16_MEMBER(othunder_sound_w);
-	DECLARE_READ16_MEMBER(othunder_sound_r);
-	DECLARE_WRITE8_MEMBER(othunder_TC0310FAM_w);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	uint32_t screen_update_othunder(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vblank_interrupt);
-	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, const int *primasks, int y_offs );
-	void update_irq();
-
-protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

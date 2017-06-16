@@ -567,6 +567,31 @@ ROM_START( pengo4 )
 	ROM_LOAD( "pr1636.70",    0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) ) /* timing - not used */
 ROM_END
 
+ROM_START( pengo5 ) // PCB has an additional label Bally N.E.
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "0_OCT6-82.bin",   0x0000, 0x1000, CRC(43e45441) SHA1(e94a9f9971e57cd53fe425059a6cb7cadbd206f1) )
+	ROM_LOAD( "1_OCT11-82.bin",  0x1000, 0x1000, CRC(30a52a90) SHA1(e5ff7e16f40b42e56847d63ecbf4a0793f510c42) )
+	ROM_LOAD( "2_OCT11-82.bin",  0x2000, 0x1000, CRC(09783cc2) SHA1(793559c86c690837041e611107589b94ed5831ed) )
+	ROM_LOAD( "3_OCT6-82.bin",   0x3000, 0x1000, CRC(452c80c9) SHA1(2432930b88b9b5e7acc19cdcac7262199545ac2a) )
+	ROM_LOAD( "4_OCT6-82.bin",   0x4000, 0x1000, CRC(b72084ec) SHA1(c0508951c2ad8dc31481be8b3bfee2063e3fb0d7) )
+	ROM_LOAD( "5_OCT11-82.bin",  0x5000, 0x1000, CRC(770570cf) SHA1(43ead8236f53d39041ffc21bdeef10b3a77ce7f2) )
+	ROM_LOAD( "6_OCT11-82.bin",  0x6000, 0x1000, CRC(af7b12c4) SHA1(207ed466546f40ca60a38031b83aef61446902e2) )
+	ROM_LOAD( "7_OCT11-82.bin",  0x7000, 0x1000, CRC(1350ca0e) SHA1(40619973d69176b05fa160372306ad50693db021) )
+
+	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_LOAD( "ep1640.92",    0x0000, 0x1000, CRC(d7eec6cd) SHA1(e542bcc28f292be9a0a29d949de726e0b55e654a) ) /* tiles (bank 1), not dumped for this set but same label */
+	ROM_CONTINUE(             0x2000, 0x1000 ) /* sprites (bank 1)*/
+	ROM_LOAD( "ep1695.105",   0x1000, 0x1000, CRC(5bfd26e9) SHA1(bdec535e486b43a8f5550334beff423eeace10b2) ) /* tiles (bank 2), not dumped for this set but same label */
+	ROM_CONTINUE(             0x3000, 0x1000 ) /* sprites (bank 2) */
+
+	ROM_REGION( 0x0420, "proms", 0 )
+	ROM_LOAD( "pr1633.78",    0x0000, 0x0020, CRC(3a5844ec) SHA1(680eab0e1204c9b74adc11588461651b474021bb) ) /* color palette */
+	ROM_LOAD( "pr1634.88",    0x0020, 0x0400, CRC(766b139b) SHA1(3fcd66610fcaee814953a115bf5e04788923181f) ) /* color lookup */
+
+	ROM_REGION( 0x0200, "namco", 0 )
+	ROM_LOAD( "pr1635.51",    0x0000, 0x0100, CRC(c29dea27) SHA1(563c9770028fe39188e62630711589d6ed242a66) ) /* waveform */
+	ROM_LOAD( "pr1636.70",    0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) ) /* timing - not used */
+ROM_END
 
 ROM_START( pengob )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -738,6 +763,7 @@ GAME( 1982, pengo2,   pengo,    pengoe,   pengo,    pengo_state, 0,     ROT90, "
 GAME( 1982, pengo2u,  pengo,    pengou,   pengo,    pengo_state, 0,     ROT90, "Sega",                     "Pengo (set 2 not encrypted)",  MACHINE_SUPPORTS_SAVE )
 GAME( 1982, pengo3u,  pengo,    pengou,   pengo,    pengo_state, 0,     ROT90, "Sega",                     "Pengo (set 3 not encrypted)",  MACHINE_SUPPORTS_SAVE )
 GAME( 1982, pengo4,   pengo,    pengoe,   pengo,    pengo_state, 0,     ROT90, "Sega",                     "Pengo (set 4)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1982, pengo5,   pengo,    pengoe,   pengo,    pengo_state, 0,     ROT90, "Sega",                     "Pengo (set 5)",                MACHINE_SUPPORTS_SAVE )
 GAME( 1982, pengob,   pengo,    pengo,    pengo,    pengo_state, penta, ROT90, "bootleg",                  "Pengo (bootleg)",              MACHINE_SUPPORTS_SAVE )
 GAME( 1982, penta,    pengo,    pengo,    pengo,    pengo_state, penta, ROT90, "bootleg (Grinbee Shouji)", "Penta",                        MACHINE_SUPPORTS_SAVE ) // Grinbee Shouji was a subsidiary of Orca
 GAME( 1983, jrpacmbl, jrpacman, jrpacmbl, jrpacmbl, pengo_state, 0,     ROT90, "bootleg",                  "Jr. Pac-Man (Pengo hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

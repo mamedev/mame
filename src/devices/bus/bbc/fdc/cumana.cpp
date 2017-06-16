@@ -25,7 +25,7 @@ DEFINE_DEVICE_TYPE(BBC_CUMANA2, bbc_cumana2_device, "bbc_cumana2", "Cumana QFS I
 //  MACHINE_DRIVER( cumana )
 //-------------------------------------------------
 
-FLOPPY_FORMATS_MEMBER( floppy_formats )
+FLOPPY_FORMATS_MEMBER( bbc_cumanafdc_device::floppy_formats )
 	FLOPPY_ACORN_SSD_FORMAT,
 	FLOPPY_ACORN_DSD_FORMAT,
 	FLOPPY_FSD_FORMAT
@@ -38,17 +38,6 @@ static SLOT_INTERFACE_START( bbc_floppies_525 )
 	SLOT_INTERFACE("525dd",   FLOPPY_525_DD)
 	SLOT_INTERFACE("525qd",   FLOPPY_525_QD)
 SLOT_INTERFACE_END
-
-static MACHINE_CONFIG_START( cumana )
-	MCFG_MB8877_ADD("mb8877a", XTAL_16MHz / 16)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(bbc_cumanafdc_device, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(bbc_cumanafdc_device, fdc_drq_w))
-	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(bbc_cumanafdc_device, motor_w))
-	MCFG_FLOPPY_DRIVE_ADD("mb8877a:0", bbc_floppies_525, "525qd", floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("mb8877a:1", bbc_floppies_525, "525qd", floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-MACHINE_CONFIG_END
 
 ROM_START( cumana1 )
 	ROM_REGION(0x4000, "dfs_rom", 0)
@@ -66,19 +55,30 @@ ROM_END
 
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor bbc_cumana1_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( cumana );
-}
+MACHINE_CONFIG_MEMBER( bbc_cumana1_device::device_add_mconfig )
+	MCFG_MB8877_ADD("mb8877a", XTAL_16MHz / 16)
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(bbc_cumanafdc_device, fdc_intrq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(bbc_cumanafdc_device, fdc_drq_w))
+	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(bbc_cumanafdc_device, motor_w))
+	MCFG_FLOPPY_DRIVE_ADD("mb8877a:0", bbc_floppies_525, "525qd", floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+	MCFG_FLOPPY_DRIVE_ADD("mb8877a:1", bbc_floppies_525, "525qd", floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+MACHINE_CONFIG_END
 
-machine_config_constructor bbc_cumana2_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( cumana );
-}
+MACHINE_CONFIG_MEMBER( bbc_cumana2_device::device_add_mconfig )
+	MCFG_MB8877_ADD("mb8877a", XTAL_16MHz / 16)
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(bbc_cumanafdc_device, fdc_intrq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(bbc_cumanafdc_device, fdc_drq_w))
+	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(bbc_cumanafdc_device, motor_w))
+	MCFG_FLOPPY_DRIVE_ADD("mb8877a:0", bbc_floppies_525, "525qd", floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+	MCFG_FLOPPY_DRIVE_ADD("mb8877a:1", bbc_floppies_525, "525qd", floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+MACHINE_CONFIG_END
 
 const tiny_rom_entry *bbc_cumana1_device::device_rom_region() const
 {

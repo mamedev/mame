@@ -73,10 +73,10 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( cmd_hd )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( cmd_hd )
+MACHINE_CONFIG_MEMBER( cmd_hd_device::device_add_mconfig )
 	MCFG_CPU_ADD(M6502_TAG, M6502, 2000000)
 	MCFG_CPU_PROGRAM_MAP(cmd_hd_mem)
 
@@ -88,17 +88,6 @@ static MACHINE_CONFIG_START( cmd_hd )
 	MCFG_DEVICE_ADD(SCSIBUS_TAG, SCSI_PORT, 0)
 	MCFG_SCSIDEV_ADD(SCSIBUS_TAG ":" SCSI_PORT_DEVICE1, "harddisk", SCSIHD, SCSI_ID_0)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor cmd_hd_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( cmd_hd );
-}
 
 
 

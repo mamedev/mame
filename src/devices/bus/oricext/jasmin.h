@@ -17,7 +17,6 @@ public:
 	jasmin_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~jasmin_device();
 
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
 	DECLARE_ADDRESS_MAP(map, 8);
 	DECLARE_INPUT_CHANGED_MEMBER(boot_pressed);
 	DECLARE_WRITE8_MEMBER(side_sel_w);
@@ -30,10 +29,12 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	const tiny_rom_entry *device_rom_region() const override;
-	machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 
 	void remap();
+
+	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 	required_device<wd1770_device> fdc;
 

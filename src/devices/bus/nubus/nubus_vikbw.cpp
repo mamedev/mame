@@ -19,13 +19,6 @@
 
 #define VRAM_SIZE   (0x18000)  // 1024x768 @ 1bpp is 98,304 bytes (0x18000)
 
-MACHINE_CONFIG_START( vikbw )
-	MCFG_SCREEN_ADD( VIKBW_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, nubus_vikbw_device, screen_update)
-	MCFG_SCREEN_SIZE(1024,768)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 768-1)
-	MCFG_SCREEN_REFRESH_RATE(70)
-MACHINE_CONFIG_END
 
 ROM_START( vikbw )
 	ROM_REGION(0x2000, VIKBW_ROM_REGION, 0)
@@ -40,14 +33,16 @@ DEFINE_DEVICE_TYPE(NUBUS_VIKBW, nubus_vikbw_device, "nb_vikbw", "Moniterm Viking
 
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor nubus_vikbw_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( vikbw );
-}
+MACHINE_CONFIG_MEMBER( nubus_vikbw_device::device_add_mconfig )
+	MCFG_SCREEN_ADD( VIKBW_SCREEN_NAME, RASTER)
+	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, nubus_vikbw_device, screen_update)
+	MCFG_SCREEN_SIZE(1024,768)
+	MCFG_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 768-1)
+	MCFG_SCREEN_REFRESH_RATE(70)
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region

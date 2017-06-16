@@ -633,29 +633,13 @@ const tiny_rom_entry *device_t::device_rom_region() const
 
 
 //-------------------------------------------------
-//  machine_config - return a pointer to a machine
-//  config constructor describing sub-devices for
-//  this device
-//-------------------------------------------------
-
-machine_config_constructor device_t::device_mconfig_additions() const
-{
-	// none by default
-	return nullptr;
-}
-
-
-//-------------------------------------------------
 //  device_add_mconfig - add device-specific
 //  machine configuration
 //-------------------------------------------------
 
 void device_t::device_add_mconfig(machine_config &config)
 {
-	// backwards-compatibility for devices using free functions
-	machine_config_constructor const additions(device_mconfig_additions());
-	if (additions)
-		additions(config, this, nullptr);
+	// do nothing by default
 }
 
 

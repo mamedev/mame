@@ -2943,6 +2943,218 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
+	<software name="pct103">
+		<description>PC-Tools R1.03</description>
+		<year>1985</year>
+		<publisher>Central Point Software, Inc.</publisher>
+		<info name="version" value="R1.03" />
+		<info name="developer" value="Central Point Software, Inc." />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="PC-Tools 1.03 [Central Point Software] [1985] [5.25DD] [Disk 1 of 1].img" size="368640" crc="1235cd53" sha1="2663dc67f7c989252b757342ed0278a579d5f006" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pctd430">
+		<description>PC Tools Deluxe R4.30</description>
+		<year>1988</year>
+		<publisher>Central Point Software, Inc.</publisher>
+		<info name="version" value="R4.30" />
+		<info name="developer" value="Central Point Software, Inc." />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="PC Tools Deluxe 4.30 [Central Point Software] [1988] [5.25DD] [Disk 1 of 1].img" size="368640" crc="98d1b893" sha1="939b310ce2901947c3435a5106c4e233087e1ac2" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pctd51">
+		<description>PC Tools Deluxe 5.1</description>
+		<year>1989</year>
+		<publisher>Central Point Software, Inc.</publisher>
+		<info name="version" value="5.1" />
+		<info name="developer" value="Central Point Software, Inc." />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="PC Tools Deluxe 5.1 [Central Point Software] [1989] [5.25DD] [Disk 1 of 4].img" size="368640" crc="117740cb" sha1="53ab2c343f7dc03605881311040b4faab4017c9d" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="PC Tools Deluxe 5.1 [Central Point Software] [1989] [5.25DD] [Disk 2 of 4].img" size="368640" crc="28ef0f84" sha1="bc21da985257b959cd053cea8ab3e54f42d91264" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="PC Tools Deluxe 5.1 [Central Point Software] [1989] [5.25DD] [Disk 3 of 4].img" size="368640" crc="f88094c1" sha1="a2d5a639d955682e5463d456fb19cbab19ec9f51" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="PC Tools Deluxe 5.1 [Central Point Software] [1989] [5.25DD] [Disk 4 of 4].img" size="368640" crc="3b5d6ed1" sha1="0418dbd29e035b20c7e1c6e8743df361c61796a9" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pctd6">
+		<description>PC Tools Deluxe 6 (5.25")</description>
+		<year>1990</year>
+		<publisher>Central Point Software, Inc.</publisher>
+		<info name="version" value="6" />
+		<info name="developer" value="Central Point Software, Inc." />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="PC Tools Deluxe 6 [Central Point Software] [1990] [5.25DD] [Disk 1 of 6].img" size="368640" crc="db137567" sha1="9a844d416b7c4bcf57b7d4232886350fc92b427a" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="PC Tools Deluxe 6 [Central Point Software] [1990] [5.25DD] [Disk 2 of 6].img" size="368640" crc="ccebdc20" sha1="50fc1cb8e112819391a5a5f3dd61ab2cbe5670dc" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="PC Tools Deluxe 6 [Central Point Software] [1990] [5.25DD] [Disk 3 of 6].img" size="368640" crc="7e98f005" sha1="42d8358f308cd021358ba99554bc483efacfff73" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="PC Tools Deluxe 6 [Central Point Software] [1990] [5.25DD] [Disk 4 of 6].img" size="368640" crc="17fb3120" sha1="233d1ad321bb1f39bc49d19f774d1d1209341b4f" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="PC Tools Deluxe 6 [Central Point Software] [1990] [5.25DD] [Disk 5 of 6].img" size="368640" crc="df6468e8" sha1="6e0664204b74b763f15132b1cdf04a20da6f77d7" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="PC Tools Deluxe 6 [Central Point Software] [1990] [5.25DD] [Disk 6 of 6].img" size="368640" crc="46f94ac1" sha1="349cb49d20bb2224a264e939c205c6afa2af6335" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pctd6_35" cloneof="pctd6">
+		<description>PC Tools Deluxe 6 (3.5")</description>
+		<year>1990</year>
+		<publisher>Central Point Software, Inc.</publisher>
+		<info name="version" value="6" />
+		<info name="developer" value="Central Point Software, Inc." />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="PC Tools Deluxe 6 [Central Point Software] [1990] [3.5DD] [Disk 1 of 3].img" size="737280" crc="1fdc81ba" sha1="40b744ae3e7ac7e5e0e9839ea6d906f5607efa92" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="PC Tools Deluxe 6 [Central Point Software] [1990] [3.5DD] [Disk 2 of 3].img" size="737280" crc="a62d6f51" sha1="89b071c32a80bc8c7daa5fa5ac3b35d016ab9720" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="PC Tools Deluxe 6 [Central Point Software] [1990] [3.5DD] [Disk 3 of 3].img" size="737280" crc="38bd39c0" sha1="e55158fe1e43ece69189fa8e36987a199e744ad6" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pctd604">
+		<description>PC Tools Deluxe 6.0.4</description>
+		<year>1990</year>
+		<publisher>Central Point Software, Inc.</publisher>
+		<info name="version" value="6.0.4" />
+		<info name="developer" value="Central Point Software, Inc." />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="PC Tools Deluxe 6.0.4 [Central Point Software] [1990] [3.5DD] [Disk 1 of 3].img" size="737280" crc="085783ea" sha1="249f8ed8623b5ee26c5ce4c2df60cbfa1ca94202" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="PC Tools Deluxe 6.0.4 [Central Point Software] [1990] [3.5DD] [Disk 2 of 3].img" size="737280" crc="4be30fbc" sha1="bcea2feda666c8078cc2f06bcd0d7760d4b60187" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="PC Tools Deluxe 6.0.4 [Central Point Software] [1990] [3.5DD] [Disk 3 of 3].img" size="737280" crc="5b1ce8d1" sha1="480b68e0643e76a32352b782b66d0cbd5ca146a9" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pct71dd">
+		<description>PC Tools 7.1 (3.5" DD)</description>
+		<year>1991</year>
+		<publisher>Central Point Software, Inc.</publisher>
+		<info name="version" value="7.1" />
+		<info name="developer" value="Central Point Software, Inc." />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="PC Tools 7.1 [Central Point Software] [1991] [3.5DD] [Disk 1 of 8].img" size="737280" crc="83c1fed3" sha1="b3e70c1fd76ded9864489d85014e855744d78176" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="PC Tools 7.1 [Central Point Software] [1991] [3.5DD] [Disk 2 of 8].img" size="737280" crc="b3e85ed8" sha1="3fe019b18304f76afead8a271547bd0d751bfafe" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="PC Tools 7.1 [Central Point Software] [1991] [3.5DD] [Disk 3 of 8].img" size="737280" crc="6859a114" sha1="9c6087e9ddc943d444da8197887f20477e280f4d" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="PC Tools 7.1 [Central Point Software] [1991] [3.5DD] [Disk 4 of 8].img" size="737280" crc="c097fae5" sha1="82e4656f2ac43937adf173d26302a9e8960b4806" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="PC Tools 7.1 [Central Point Software] [1991] [3.5DD] [Disk 5 of 8].img" size="737280" crc="2a0106a3" sha1="6c15b42090e35761e03701ad527768440a235f69" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="PC Tools 7.1 [Central Point Software] [1991] [3.5DD] [Disk 6 of 8].img" size="737280" crc="368858e5" sha1="c01de9894ac681b712fc166ca7109685b726ae45" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="PC Tools 7.1 [Central Point Software] [1991] [3.5DD] [Disk 7 of 8].img" size="737280" crc="fb227324" sha1="348790291604a89d9d94e146c36422788fff37c5" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="PC Tools 7.1 [Central Point Software] [1991] [3.5DD] [Disk 8 of 8].img" size="737280" crc="368f34d4" sha1="6567d78b4a3528c90a6cb16faec5a76c02506f5e" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pkz204g">
+		<description>PKZip 2.04g (5.25")</description>
+		<year>1993</year>
+		<publisher>PKWARE, Inc.</publisher>
+		<info name="version" value="2.04g" />
+		<info name="developer" value="PKWARE, Inc." />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="PKZip 2.04g [PKWARE, Inc.] [1993] [5.25DD] [Disk 1 of 1].img" size="368640" crc="9b7ec86b" sha1="53fda4993db1ccbbc24541e7c8aa31c963369f14" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pkz204g35" cloneof="pkz204g">
+		<description>PKZip 2.04g (3.5")</description>
+		<year>1993</year>
+		<publisher>PKWARE, Inc.</publisher>
+		<info name="version" value="2.04g" />
+		<info name="developer" value="PKWARE, Inc." />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="PKZip 2.04g [PKWARE, Inc.] [1993] [3.5DD] [Disk 1 of 1].img" size="737280" crc="53ecf1f8" sha1="efdc23826a8ae027f3b6033e75aeb2b51a248db0" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pmasterp">
 		<description>PrintMaster Plus</description>
 		<year>1988</year>
@@ -5570,6 +5782,18 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="gunboat">
+		<description>Gunboat: River Combat Simulation</description>
+		<year>1990</year>
+		<publisher>Accolade</publisher>
+		<info name="developer" value="Accolade" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Gunboat [Accolade] [1990] [3.5DD] [Disk 1 of 1].img" size="737280" crc="5c82a583" sha1="1f627bce038f342ae5554d18718f8e9e4428c4c9" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="armorik">
 		<description>Les 8 Conquêtes d'Armorik le Viking</description>
 		<year>1988</year>
@@ -5936,6 +6160,23 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="menace">
+		<description>Menace</description>
+		<year>1989</year>
+		<publisher>Psygnosis</publisher>
+		<info name="developer" value="DMA Design Limited" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Menace [Psygnosis] [1989] [5.25DD] [Disk 1 of 2].img" size="368640" crc="7746a156" sha1="cd0d944da7486d141922357b09cc22a2809cfd64" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Menace [Psygnosis] [1989] [5.25DD] [Disk 2 of 2].img" size="368640" crc="634084e8" sha1="b0a103cb6dcc30486f3e585b1accbe1393afbada" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mgear">
 		<description>Metal Gear</description>
 		<year>1990</year>
@@ -6116,6 +6357,23 @@ has been replaced with an all-zero block. -->
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "339570">
 				<rom name="Purple Saturn Day [1989] [5.25] [2 of 2].td0" size="339570" crc="c9170d4c" sha1="158295366af0822a741fb1ebd34c0a52eced5825" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="riskywd">
+		<description>Risky Woods</description>
+		<year>1992</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="developer" value="Dinamic Software, Zeus Software" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Risky Woods [Electronic Arts] [1992] [5.25DD] [Disk 1 of 2].ima" size="368640" crc="3d1ee514" sha1="9ee5930d182b38cfb6104b43f4ed685af4188910" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Risky Woods [Electronic Arts] [1992] [5.25DD] [Disk 2 of 2].ima" size="368640" crc="911c6137" sha1="75ec08599bda5dbe5233d211b4b930b598618f11" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6425,6 +6683,23 @@ has been replaced with an all-zero block. -->
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Wrath of the Demon [ReadySoft] [1991] [3.5DD] [Disk 3 of 3].img" size="737280" crc="94bf555d" sha1="d7840469273ff4e1be35ac5449a7b90f844e7fb4" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xenon">
+		<description>Xenon</description>
+		<year>1988</year>
+		<publisher>Melbourne House</publisher>
+		<info name="developer" value="The Bitmap Brothers" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Xenon [Melbourne House] [1988] [5.25DD] [Disk 1 of 2].img" size="368640" crc="4fdbb490" sha1="e2b174953e254c5bd77a7ee816748ca19d417c41" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Xenon [Melbourne House] [1988] [5.25DD] [Disk 2 of 2].img" size="368640" crc="7b4c8346" sha1="050e699aa3babb52b84cfa9dfe7530859a9d7c14" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

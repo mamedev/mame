@@ -21,14 +21,6 @@
     IMPLEMENTATION
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( iq151_staper )
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(iq151_staper_device, ppi_porta_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(iq151_staper_device, ppi_portb_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(iq151_staper_device, ppi_portc_w))
-
-	MCFG_DEVICE_ADD("printer", PRINTER, 0)
-MACHINE_CONFIG_END
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -65,13 +57,17 @@ void iq151_staper_device::device_start()
 }
 
 //-------------------------------------------------
-//  device_mconfig_additions
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor iq151_staper_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( iq151_staper );
-}
+MACHINE_CONFIG_MEMBER( iq151_staper_device::device_add_mconfig )
+	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(iq151_staper_device, ppi_porta_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(iq151_staper_device, ppi_portb_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(iq151_staper_device, ppi_portc_w))
+
+	MCFG_DEVICE_ADD("printer", PRINTER, 0)
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  device_timer - handler timer events

@@ -41,10 +41,10 @@ WRITE_LINE_MEMBER( c64_siel_midi_cartridge_device::write_acia_clock )
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_START( c64_siel_midi )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( c64_siel_midi )
+MACHINE_CONFIG_MEMBER( c64_siel_midi_cartridge_device::device_add_mconfig )
 	MCFG_DEVICE_ADD(MC6850_TAG, ACIA6850, 0)
 	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("mdout", midi_port_device, write_txd))
 	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(c64_siel_midi_cartridge_device, acia_irq_w))
@@ -57,17 +57,6 @@ static MACHINE_CONFIG_START( c64_siel_midi )
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, 31250*16)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(c64_siel_midi_cartridge_device, write_acia_clock))
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor c64_siel_midi_cartridge_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( c64_siel_midi );
-}
 
 
 

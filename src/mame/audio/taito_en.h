@@ -14,6 +14,7 @@
 #include "sound/es5506.h"
 #include "machine/mc68681.h"
 #include "machine/mb87078.h"
+#include "machine/mb8421.h"
 
 class taito_en_device : public device_t
 
@@ -21,8 +22,6 @@ class taito_en_device : public device_t
 public:
 	taito_en_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER( en_68000_share_r );
-	DECLARE_WRITE8_MEMBER( en_68000_share_w );
 	DECLARE_WRITE16_MEMBER( en_es5505_bank_w );
 	DECLARE_WRITE8_MEMBER( en_volume_w );
 
@@ -42,7 +41,6 @@ private:
 	required_device<es5505_device> m_ensoniq;
 	required_device<mc68681_device> m_duart68681;
 	required_device<mb87078_device> m_mb87078;
-	required_shared_ptr<uint32_t> m_snd_shared_ram;
 
 	//todo: hook up cpu/es5510
 	uint16_t   m_es5510_dsp_ram[0x200];

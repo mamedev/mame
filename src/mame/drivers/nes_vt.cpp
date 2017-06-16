@@ -46,6 +46,11 @@
   Add more Famiclone roms here, there should be plenty more dumps of VTxx
   based systems floating about.
 
+
+  NON-bugs (same happens on real hardware)
+
+  Pause screen has corrupt GFX on enhanced version of Octopus
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -889,6 +894,115 @@ ROM_START( ii32in1 )
 	ROM_LOAD( "ii32in1.bin", 0x00000, 0x2000000, CRC(ddee4eac) SHA1(828c0c18a66bb4872299f9a43d5e3647482c5925) )
 ROM_END
 
+ROM_START( mc_dg101 )
+	ROM_REGION( 0x400000, "mainrom", 0 )
+	ROM_LOAD( "dreamgear 101-in-1(unl)[u][!].prg", 0x00000, 0x400000, CRC(6a7cd8f4) SHA1(9a5ceb8e5e38eb93699dbb14c2c36f3a501d9c45) )
+ROM_END
+
+ROM_START( mc_aa2 )
+	ROM_REGION( 0x400000, "mainrom", 0 )
+	ROM_LOAD( "100 in 1 arcade action ii (at-103)(unl)[!].prg", 0x00000, 0x400000, CRC(33923995) SHA1(a206e8c0ee6e86adb800cf66697defabcbd01902) )
+ROM_END
+
+ROM_START( mc_105te )
+	ROM_REGION( 0x800000, "mainrom", 0 )
+	ROM_LOAD( "2011 super hik 105-in-1 turbo edition.prg", 0x00000, 0x800000, CRC(c0f85771) SHA1(8c4182b1de3be10dd895089823cc67a9d12589ef) )
+ROM_END
+
+ROM_START( mc_sp69 )
+	ROM_REGION( 0x400000, "mainrom", 0 )
+	ROM_LOAD( "sports game 69-in-1 (unl)[u][!].prg", 0x00000, 0x400000, CRC(1242da7f) SHA1(bb8f99b1f4a4783b3f7e54d74f1f2a6a628da154) )
+ROM_END
+
+ROM_START( pjoyn50 )
+	ROM_REGION( 0x400000, "mainrom", 0 )
+	ROM_LOAD( "power joy navigator 50-in-1 (unl)[u][!].prg", 0x00000, 0x400000, CRC(d1bbadd4) SHA1(2186c71bcedf6c2eedf58233faa26fca9586aa40) )
+ROM_END
+
+ROM_START( pjoys30 )
+	ROM_REGION( 0x400000, "mainrom", 0 )
+	ROM_LOAD( "power joy supermax 30-in-1 (unl)[u][!].prg", 0x00000, 0x400000, CRC(947ac898) SHA1(08bb99a8ad39c56780bc66f4e0a9830fba7372dc) )
+ROM_END
+
+ROM_START( pjoys60 )
+	ROM_REGION( 0x400000, "mainrom", 0 )
+	ROM_LOAD( "power joy supermax 60-in-1 (unl)[u][!].prg", 0x00000, 0x400000, CRC(1ab45228) SHA1(d148924afc39fc588235331a1a30df6e0d8e1e18) )
+ROM_END
+
+ROM_START( sarc110 )
+	ROM_REGION( 0x400000, "mainrom", 0 )
+	ROM_LOAD( "ic1.prg", 0x00000, 0x400000, CRC(de76f71f) SHA1(ff6b37a76c6463af7ae901918fc008b4a2863951) )
+ROM_END
+
+ROM_START( sarc110a )
+	ROM_REGION( 0x400000, "mainrom", 0 )
+	ROM_LOAD( "ic1_ver2.prg", 0x00000, 0x400000, CRC(b97a0dc7) SHA1(bace32d73184df914113de5336e29a7a6f4c03fa) )
+ROM_END
+
+// CoolBoy AEF-390 8bit Console, B8VPCBVer03 20130703 0401E2015897A
+ROM_START( mc_8x6cb )
+	ROM_REGION( 0x400000, "mainrom", 0 )
+	ROM_LOAD( "888888-in-1 (coolboy aef-390 8bit console, b8vpcbver03 20130703 0401e2015897a)(unl)[u][!].prg", 0x00000, 0x400000, CRC(ca4bd948) SHA1(cfd6c0b03bb432de43d070100031b223c9ee7496) )
+ROM_END
+
+ROM_START( mc_110cb )
+	ROM_REGION( 0x400000, "mainrom", 0 )
+	ROM_LOAD( "29w320dt.bin", 0x00000, 0x400000, CRC(a4bed7eb) SHA1(f1aa89916264ba781d3f1390a2336ef42129b607) )
+ROM_END
+
+ROM_START( mc_138cb )
+	ROM_REGION( 0x400000, "mainrom", 0 )
+	ROM_LOAD( "138-in-1 coolbaby (coolboy rs-5, pcb060-10009011v1.3)(unl)[u][!].bin", 0x00000, 0x400000, CRC(6b5b1a1a) SHA1(2df0cd717bd0de0b0c973ac356426ddbb0d736fa) )
+ROM_END
+
+ROM_START( mc_7x6ss )
+	ROM_REGION( 0x100000, "mainrom", 0 )
+	ROM_LOAD( "777777-in-1 (8 bit slim station, newpxp-dvt22-a pcb)(unl)[u][!].bin", 0x00000, 0x100000, CRC(7790c21a) SHA1(f320f3dd18b88ae5f65bb51f58d4cb869997bab3) )
+ROM_END
+
+ROM_START( mc_8x6ss )
+	ROM_REGION( 0x200000, "mainrom", 0 ) // odd size rom, does it need stripping?
+	ROM_LOAD( "888888-in-1 (8 bit slim station, newpxp-dvt22-a pcb)(unl)[u][!].bin", 0x00000, 0x100ce1, CRC(47149d0b) SHA1(5a8733886b550e3235dd90fb415b5a602e967f91) )
+ROM_END
+
+// PXP2 8Bit Slim Station
+ROM_START( mc_9x6ss )
+	ROM_REGION( 0x400000, "mainrom", 0 )
+	ROM_LOAD( "s29gl032.u3", 0x00000, 0x400000, CRC(9f4194e8) SHA1(bd2a356aea56188ea78169095cbbe603d00e0063) )
+ROM_END
+
+// same machine as above? is one of these bad?
+ROM_START( mc_9x6sa )
+	ROM_REGION( 0x200000, "mainrom", 0 )
+	ROM_LOAD( "999999-in-1 (8 bit slim station, newpxp-dvt22-a pcb)(unl)[u][!].bin", 0x00000, 0x200000, CRC(6a47c6a0) SHA1(b4dd376167a57dbee3dea70eb16f1a38e16bcdaa) )
+ROM_END
+
+ROM_START( mc_sam60 )
+	ROM_REGION( 0x200000, "mainrom", 0 )
+	ROM_LOAD( "29lv160b.bin", 0x00000, 0x200000, CRC(7dac8efe) SHA1(ffb27ebb4299d5b9a4b976c418fcc7695200060c) )
+ROM_END
+
+ROM_START( mc_dcat8 )
+	ROM_REGION( 0x800000, "mainrom", 0 )
+	ROM_LOAD( "100-in-1 (d-cat8 8bit console, v5.01.11-frd, bl 20041217)(unl)[u][!].prg", 0x00000, 0x800000, CRC(97d20611) SHA1(d49796e66d7b1dff0ee2781cb0e48b777969d83f) )
+ROM_END
+
+ROM_START( mc_dcat8a )
+	ROM_REGION( 0x800000, "mainrom", 0 )
+	ROM_LOAD( "s29gl064.u6", 0x00000, 0x800000, CRC(e28b1ef8) SHA1(4a6f107d2189cbe1bb0b86b3738d0af58e24e0f7) )
+ROM_END
+
+ROM_START( vgtablet )
+	ROM_REGION( 0x400000, "mainrom", 0 )
+	ROM_LOAD( "vgtablet.bin", 0x00000, 0x400000, CRC(99ef3978) SHA1(0074445708d66a04ab02b4993069ce1ae0514c2f) )
+ROM_END
+
+ROM_START( gprnrs1 )
+	ROM_REGION( 0x800000, "mainrom", 0 )
+	ROM_LOAD( "gprnrs1.bin", 0x00000, 0x800000, CRC(c3ffcec8) SHA1(313a790fb51d0b155257f9de84726ed67da43a8f) )
+ROM_END
+
+
 // earlier version of vdogdemo
 CONS( 200?, vdogdeme,  0,  0,  nes_vt,    nes_vt, nes_vt_state,  0, "VRT", "V-Dog (prototype, earlier)", MACHINE_NOT_WORKING )
 
@@ -898,16 +1012,54 @@ CONS( 200?, vdogdemo,  0,  0,  nes_vt,    nes_vt, nes_vt_state,  0, "VRT", "V-Do
 // should be VT03 based
 // for testing 'Shark', 'Octopus', 'Harbor', and 'Earth Fighter' use the extended colour modes, other games just seem to use standard NES modes
 CONS( 200?, mc_dgear,  0,  0,  nes_vt,    nes_vt, nes_vt_state,  0, "dreamGEAR", "dreamGEAR 75-in-1", MACHINE_NOT_WORKING )
+// all software in this runs in the VT03 enhanced mode, it also includes an actual licensed VT03 port of Frogger.  If running on EmuVT set to PAL or the colours are broken
+CONS( 200?, vgtablet,   0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown> / Konami", "VG Pocket Tablet", MACHINE_NOT_WORKING )
 
 // this is VT09 based, and needs 8bpp modes at least
 // it boots, but gfx look wrong due to unsupported mode
 CONS( 2009, cybar120,  0,  0,  nes_vt_xx, nes_vt, nes_vt_state,  0, "Defender", "Defender M2500P 120-in-1", MACHINE_NOT_WORKING )
 
 // these are NOT VT03, but something newer but based around the same basic designs
+// (no visible tiles in ROM using standard decodes tho, might need moving out of here)
 CONS( 200?, dgun2500,  0,  0,  nes_vt,    nes_vt, nes_vt_state,  0, "dreamGEAR", "dreamGEAR Wireless Motion Control with 130 games (DGUN-2500)", MACHINE_NOT_WORKING )
 CONS( 2012, dgun2561,  0,  0,  nes_vt,    nes_vt, nes_vt_state,  0, "dreamGEAR", "dreamGEAR My Arcade Portable Gaming System (DGUN-2561)", MACHINE_NOT_WORKING )
 CONS( 200?, lexcyber,  0,  0,  nes_vt_xx, nes_vt, nes_vt_state,  0, "Lexibook", "Lexibook Compact Cyber Arcade", MACHINE_NOT_WORKING )
 
-// these seem to have custom CPU opcodes? looks similar, has many of the same games, but isn't 100% valid 6502
+// these seem to have custom CPU opcodes? looks similar to the above, has many of the same games, but isn't 100% valid 6502 
+// (no visible tiles in ROM using standard decodes tho, might need moving out of here)
 CONS( 200?, ii8in1,    0,  0,  nes_vt,    nes_vt, nes_vt_state,  0, "Intec", "InterAct 8-in-1", MACHINE_NOT_WORKING )
 CONS( 200?, ii32in1,   0,  0,  nes_vt,    nes_vt, nes_vt_state,  0, "Intec", "InterAct 32-in-1", MACHINE_NOT_WORKING )
+
+// this has 'Shark' and 'Octopus' etc. like mc_dgear but the graphics are entirely corrupt for any game using the extended modes, bad dump or different banking?
+CONS( 200?, mc_sp69,    0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown>", "Sports Game 69 in 1", MACHINE_NOT_WORKING )
+
+// doesn't boot
+CONS( 200?, mc_sam60,   0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "Hummer Team", "Samuri (60 in 1)", MACHINE_NOT_WORKING )
+
+// titles below don't seem to use the enhanced modes, so probably VT01 / VT02 or plain standalone famiclones?
+
+// very plain menus
+CONS( 200?, pjoyn50,    0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown>", "PowerJoy Navigator 50 in 1", MACHINE_NOT_WORKING )
+CONS( 200?, pjoys30,    0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown>", "PowerJoy Supermax 30 in 1", MACHINE_NOT_WORKING )
+CONS( 200?, pjoys60,    0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown>", "PowerJoy Supermax 60 in 1", MACHINE_NOT_WORKING )
+// has a non-enhanced version of 'Octopus' as game 30
+CONS( 200?, sarc110,    0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown>", "Super Arcade 110 (set 1)", MACHINE_NOT_WORKING )
+CONS( 200?, sarc110a,   sarc110,  0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown>", "Super Arcade 110 (set 2)", MACHINE_NOT_WORKING )
+// both offer chinese or english menus
+CONS( 200?, mc_110cb,   0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "CoolBoy", "110 in 1 CoolBaby (CoolBoy RS-1S)", MACHINE_NOT_WORKING )
+CONS( 200?, mc_138cb,   0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "CoolBoy", "138 in 1 CoolBaby (CoolBoy RS-5, PCB060-10009011V1.3)", MACHINE_NOT_WORKING )
+
+CONS( 200?, gprnrs1,   0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown>", "Game Prince RS-1", MACHINE_NOT_WORKING )
+// unsorted, these were all in nes.xml listed as ONE BUS systems
+CONS( 200?, mc_dg101,   0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "dreamGEAR", "dreamGEAR 101 in 1", MACHINE_NOT_WORKING ) // dreamGear, but no enhanced games?
+CONS( 200?, mc_aa2,     0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown>", "100 in 1 Arcade Action II (AT-103)", MACHINE_NOT_WORKING )
+CONS( 200?, mc_105te,   0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown>", "2011 Super HiK 105 in 1 Turbo Edition", MACHINE_NOT_WORKING )
+CONS( 200?, mc_8x6cb,   0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "CoolBoy",   "888888 in 1 (Coolboy AEF-390)", MACHINE_NOT_WORKING )
+CONS( 200?, mc_9x6ss,   0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown>", "999999 in 1 (PXP2 Slim Station)", MACHINE_NOT_WORKING )
+CONS( 200?, mc_9x6sa,   mc_9x6ss, 0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown>", "999999 in 1 (8 bit Slim Station, NEWPXP-DVT22-A PCB)", MACHINE_NOT_WORKING )
+CONS( 200?, mc_7x6ss,   0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown>", "777777 in 1 (8 bit Slim Station, NEWPXP-DVT22-A PCB)", MACHINE_NOT_WORKING )
+CONS( 200?, mc_8x6ss,   0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown>", "888888 in 1 (8 bit Slim Station, NEWPXP-DVT22-A PCB)", MACHINE_NOT_WORKING )
+CONS( 2004, mc_dcat8,   0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown>", "100 in 1 (D-CAT8 8bit Console, set 1) (v5.01.11-frd, BL 20041217)", MACHINE_NOT_WORKING )
+CONS( 2004, mc_dcat8a,  mc_dcat8, 0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown>", "100 in 1 (D-CAT8 8bit Console, set 2)", MACHINE_NOT_WORKING )
+
+

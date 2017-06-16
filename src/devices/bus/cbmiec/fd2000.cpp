@@ -39,8 +39,8 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(FD2000, fd2000_device, "fd2000", "FD-2000")
-DEFINE_DEVICE_TYPE(FD4000, fd4000_device, "fd4000", "FD-4000")
+DEFINE_DEVICE_TYPE(FD2000, fd2000_device, "fd2000", "FD-2000 Disk Drive")
+DEFINE_DEVICE_TYPE(FD4000, fd4000_device, "fd4000", "FD-4000 Disk Drive")
 
 
 //-------------------------------------------------
@@ -77,16 +77,13 @@ ROM_END
 
 const tiny_rom_entry *fd2000_device::device_rom_region() const
 {
-	switch (m_variant)
-	{
-	default:
-		return ROM_NAME( fd2000 );
-
-	case TYPE_FD4000:
-		return ROM_NAME( fd4000 );
-	}
+	return ROM_NAME( fd2000 );
 }
 
+const tiny_rom_entry *fd4000_device::device_rom_region() const
+{
+	return ROM_NAME( fd4000 );
+}
 
 //-------------------------------------------------
 //  ADDRESS_MAP( fd2000_mem )
@@ -209,11 +206,12 @@ FLOPPY_FORMATS_MEMBER( fd2000_device::floppy_formats )
 FLOPPY_FORMATS_END
 */
 
+
 //-------------------------------------------------
-//  MACHINE_DRIVER( fd2000 )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( fd2000 )
+MACHINE_CONFIG_MEMBER( fd2000_device::device_add_mconfig )
 	MCFG_CPU_ADD(G65SC02PI2_TAG, M65C02, XTAL_24MHz/12)
 	MCFG_CPU_PROGRAM_MAP(fd2000_mem)
 
@@ -225,15 +223,11 @@ static MACHINE_CONFIG_START( fd2000 )
 
 	MCFG_DP8473_ADD(DP8473V_TAG)
 
-	MCFG_FLOPPY_DRIVE_ADD(DP8473V_TAG":0", fd2000_floppies, "35hd", floppy_image_device::default_floppy_formats)//fd2000_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD_FIXED(DP8473V_TAG":0", fd2000_floppies, "35hd", floppy_image_device::default_floppy_formats)//fd2000_device::floppy_formats)
 MACHINE_CONFIG_END
 
 
-//-------------------------------------------------
-//  MACHINE_DRIVER( fd4000 )
-//-------------------------------------------------
-
-static MACHINE_CONFIG_START( fd4000 )
+MACHINE_CONFIG_MEMBER( fd4000_device::device_add_mconfig )
 	MCFG_CPU_ADD(R65C02P4_TAG, M65C02, XTAL_24MHz/6)
 	MCFG_CPU_PROGRAM_MAP(fd4000_mem)
 
@@ -245,26 +239,8 @@ static MACHINE_CONFIG_START( fd4000 )
 
 	MCFG_PC8477A_ADD(PC8477AV1_TAG)
 
-	MCFG_FLOPPY_DRIVE_ADD(PC8477AV1_TAG":0", fd4000_floppies, "35ed", floppy_image_device::default_floppy_formats)//fd2000_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD_FIXED(PC8477AV1_TAG":0", fd4000_floppies, "35ed", floppy_image_device::default_floppy_formats)//fd2000_device::floppy_formats)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor fd2000_device::device_mconfig_additions() const
-{
-	switch (m_variant)
-	{
-	default:
-		return MACHINE_CONFIG_NAME( fd2000 );
-
-	case TYPE_FD4000:
-		return MACHINE_CONFIG_NAME( fd4000 );
-	}
-}
 
 
 //**************************************************************************
@@ -276,17 +252,16 @@ machine_config_constructor fd2000_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 fd2000_device::fd2000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: fd2000_device(mconfig, FD2000, tag, owner, clock, TYPE_FD2000)
+	: fd2000_device(mconfig, FD2000, tag, owner, clock)
 {
 }
 
-fd2000_device::fd2000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant)
+fd2000_device::fd2000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_cbm_iec_interface(mconfig, *this)
-	, m_maincpu(*this, R65C02P4_TAG)
-	, m_fdc(*this, PC8477AV1_TAG)
-	, m_floppy0(*this, PC8477AV1_TAG":0")
-	, m_variant(variant)
+	, m_maincpu(*this, G65SC02PI2_TAG)
+	, m_fdc(*this, DP8473V_TAG)
+	, m_floppy0(*this, DP8473V_TAG":0")
 {
 }
 
@@ -296,8 +271,11 @@ fd2000_device::fd2000_device(const machine_config &mconfig, device_type type, co
 //-------------------------------------------------
 
 fd4000_device::fd4000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: fd2000_device(mconfig, FD4000, tag, owner, clock, TYPE_FD4000)
+	: fd2000_device(mconfig, FD4000, tag, owner, clock)
 {
+	m_maincpu.set_tag(R65C02P4_TAG);
+	m_fdc.set_tag(PC8477AV1_TAG);
+	m_floppy0.set_tag(PC8477AV1_TAG":0");
 }
 
 

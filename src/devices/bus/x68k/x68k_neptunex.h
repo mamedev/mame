@@ -27,22 +27,20 @@ public:
 	// construction/destruction
 	x68k_neptune_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
-	DECLARE_READ8_MEMBER(x68k_neptune_mem_read);
-	DECLARE_WRITE8_MEMBER(x68k_neptune_mem_write);
 	DECLARE_READ16_MEMBER(x68k_neptune_port_r);
 	DECLARE_WRITE16_MEMBER(x68k_neptune_port_w);
 
-	void x68k_neptune_irq_w(int state);
-
 protected:
 	// device-level overrides
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 private:
+	DECLARE_READ8_MEMBER(x68k_neptune_mem_read);
+	DECLARE_WRITE8_MEMBER(x68k_neptune_mem_write);
+	void x68k_neptune_irq_w(int state);
+
 	x68k_expansion_slot_device *m_slot;
 
 	required_device<dp8390d_device> m_dp8390;

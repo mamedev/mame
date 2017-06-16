@@ -20,13 +20,6 @@
 
 #define VRAM_SIZE   (0x40000)   // 256k.  1152x880 1 bit per pixel fits nicely.
 
-MACHINE_CONFIG_START( radiustpd )
-	MCFG_SCREEN_ADD( RADIUSTPD_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, nubus_radiustpd_device, screen_update)
-	MCFG_SCREEN_SIZE(1280, 960)
-	MCFG_SCREEN_REFRESH_RATE(70)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1152-1, 0, 880-1)
-MACHINE_CONFIG_END
 
 ROM_START( radiustpd )
 	ROM_REGION(0x8000, RADIUSTPD_ROM_REGION, 0)
@@ -41,14 +34,16 @@ DEFINE_DEVICE_TYPE(NUBUS_RADIUSTPD, nubus_radiustpd_device, "nb_rtpd", "Radius T
 
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor nubus_radiustpd_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( radiustpd );
-}
+MACHINE_CONFIG_MEMBER( nubus_radiustpd_device::device_add_mconfig )
+	MCFG_SCREEN_ADD( RADIUSTPD_SCREEN_NAME, RASTER)
+	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, nubus_radiustpd_device, screen_update)
+	MCFG_SCREEN_SIZE(1280, 960)
+	MCFG_SCREEN_REFRESH_RATE(70)
+	MCFG_SCREEN_VISIBLE_AREA(0, 1152-1, 0, 880-1)
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -70,6 +65,8 @@ const tiny_rom_entry *nubus_radiustpd_device::device_rom_region() const
 nubus_radiustpd_device::nubus_radiustpd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	nubus_radiustpd_device(mconfig, NUBUS_RADIUSTPD, tag, owner, clock)
 {
+	(void)m_toggle;
+	(void)&m_colors[0];
 }
 
 nubus_radiustpd_device::nubus_radiustpd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :

@@ -71,24 +71,13 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_START( c64_fcc )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( c64_fcc )
+MACHINE_CONFIG_MEMBER( c64_final_chesscard_device::device_add_mconfig )
 	MCFG_CPU_ADD(G65SC02P4_TAG, M65SC02, XTAL_5MHz)
 	MCFG_CPU_PROGRAM_MAP(c64_fcc_map)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor c64_final_chesscard_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( c64_fcc );
-}
 
 
 //-------------------------------------------------

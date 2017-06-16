@@ -35,16 +35,6 @@
 
 #define VRAM_SIZE   (0x400000)
 
-MACHINE_CONFIG_START( specpdq )
-	MCFG_SCREEN_ADD( SPECPDQ_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, nubus_specpdq_device, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(25175000, 800, 0, 640, 525, 0, 480)
-	MCFG_SCREEN_SIZE(1280,1024)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1152-1, 0, 844-1)
-
-	MCFG_PALETTE_ADD("palette", 256)
-MACHINE_CONFIG_END
-
 ROM_START( specpdq )
 	ROM_REGION(0x10000, SPECPDQ_ROM_REGION, 0)
 	ROM_LOAD( "specpdq.bin",  0x000000, 0x010000, CRC(82a35f78) SHA1(9511c2df47140f4279196d3b8836b53429879dd9) )
@@ -58,14 +48,18 @@ DEFINE_DEVICE_TYPE(NUBUS_SPECPDQ, nubus_specpdq_device, "nb_spdq", "SuperMac Spe
 
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor nubus_specpdq_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( specpdq );
-}
+MACHINE_CONFIG_MEMBER( nubus_specpdq_device::device_add_mconfig )
+	MCFG_SCREEN_ADD( SPECPDQ_SCREEN_NAME, RASTER)
+	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, nubus_specpdq_device, screen_update)
+	MCFG_SCREEN_RAW_PARAMS(25175000, 800, 0, 640, 525, 0, 480)
+	MCFG_SCREEN_SIZE(1280,1024)
+	MCFG_SCREEN_VISIBLE_AREA(0, 1152-1, 0, 844-1)
+
+	MCFG_PALETTE_ADD("palette", 256)
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region

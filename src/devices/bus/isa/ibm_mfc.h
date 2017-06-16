@@ -31,6 +31,20 @@ public:
 	// Construction/destruction
 	isa8_ibm_mfc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	DECLARE_READ8_MEMBER( ibm_mfc_r );
+	DECLARE_WRITE8_MEMBER( ibm_mfc_w );
+
+protected:
+	// Device-level overrides
+	virtual void                    device_start() override;
+	virtual void                    device_reset() override;
+
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor          device_input_ports() const override;
+
+	virtual const tiny_rom_entry*        device_rom_region() const override;
+
+private:
 	DECLARE_READ8_MEMBER( ppi0_i_a );
 	DECLARE_WRITE8_MEMBER( ppi0_o_b );
 	DECLARE_READ8_MEMBER( ppi0_i_c );
@@ -41,9 +55,6 @@ public:
 
 	DECLARE_WRITE8_MEMBER( ppi1_o_c );
 
-	DECLARE_READ8_MEMBER( ibm_mfc_r );
-	DECLARE_WRITE8_MEMBER( ibm_mfc_w );
-
 	DECLARE_WRITE_LINE_MEMBER( d8253_out0 );
 	DECLARE_WRITE_LINE_MEMBER( d8253_out1 );
 
@@ -51,17 +62,6 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( ibm_mfc_ym_irq );
 
-protected:
-	// Device-level overrides
-	virtual void                    device_start() override;
-	virtual void                    device_reset() override;
-
-	virtual machine_config_constructor  device_mconfig_additions() const override;
-	virtual ioport_constructor          device_input_ports() const override;
-
-	virtual const tiny_rom_entry*        device_rom_region() const override;
-
-private:
 	void                            set_z80_interrupt(int src, int state);
 	void                            set_pc_interrupt(int src, int state);
 	void                            update_pc_interrupts(void);

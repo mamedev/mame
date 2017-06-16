@@ -75,10 +75,10 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_START( mshark )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( mshark )
+MACHINE_CONFIG_MEMBER( mshark_device::device_add_mconfig )
 	// basic machine hardware
 	MCFG_CPU_ADD(I8085_TAG, I8085A, 1000000)
 	MCFG_CPU_PROGRAM_MAP(mshark_mem)
@@ -88,17 +88,6 @@ static MACHINE_CONFIG_START( mshark )
 	MCFG_HARDDISK_ADD("harddisk1")
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor mshark_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( mshark );
-}
 
 
 //-------------------------------------------------

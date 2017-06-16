@@ -4044,6 +4044,138 @@ Missing files come here
 		</part>
 	</software>
 
+	<software name="pct71">
+		<description>PC Tools 7.1 (3.5" HD)</description>
+		<year>1991</year>
+		<publisher>Central Point Software, Inc.</publisher>
+		<info name="version" value="7.1" />
+		<info name="developer" value="Central Point Software, Inc." />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="PC Tools 7.1 [Central Point Software] [1991] [3.5HD] [Disk 1 of 4].img" size="1474560" crc="7e8f7399" sha1="1377f238ca940a0eebf4b55a9cf8700c57e5ba3b" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="PC Tools 7.1 [Central Point Software] [1991] [3.5HD] [Disk 2 of 4].img" size="1474560" crc="31af7146" sha1="2204f7d1c9c71371188694e8b6dbeefb98dd3262" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="PC Tools 7.1 [Central Point Software] [1991] [3.5HD] [Disk 3 of 4].img" size="1474560" crc="1159604a" sha1="db5b665f84a584d8f23885a2b81010072dba54be" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="PC Tools 7.1 [Central Point Software] [1991] [3.5HD] [Disk 4 of 4].img" size="1474560" crc="1983e32c" sha1="809f5a1108f36da214bad7242a058b27e3fcf374" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pct8">
+		<description>PC Tools 8 (5.25" HD)</description>
+		<year>1992</year>
+		<publisher>Central Point Software, Inc.</publisher>
+		<info name="version" value="8" />
+		<info name="developer" value="Central Point Software, Inc." />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="PC Tools 8 [Central Point Software] [1992] [3.5DD] [Disk 1 of 6].img" size="1228800" crc="9e32b700" sha1="e3448a677db9da18f3933dcad536b712883276a5" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="PC Tools 8 [Central Point Software] [1992] [3.5DD] [Disk 2 of 6].img" size="1228800" crc="58e67911" sha1="bb2b9b4447fbc3e469caa0d2ea651162e15a62da" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="PC Tools 8 [Central Point Software] [1992] [3.5DD] [Disk 3 of 6].img" size="1228800" crc="8950b0bb" sha1="ab3c91b07df198168d259643d05df123a67cebb9" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="PC Tools 8 [Central Point Software] [1992] [3.5DD] [Disk 4 of 6].img" size="1228800" crc="0fb54af3" sha1="909de4592581fcc56a47452a13f32c7f3455fdc7" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="PC Tools 8 [Central Point Software] [1992] [3.5DD] [Disk 5 of 6].img" size="1228800" crc="be00b76b" sha1="012617155cbcbb2ee1fbd3227ddfc585197f751d" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="PC Tools 8 [Central Point Software] [1992] [3.5DD] [Disk 6 of 6].img" size="1228800" crc="25def657" sha1="ef253ae828ddd915c4e67a121b257368a21f7d2e" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pct9">
+		<description>PC Tools Gold V9</description>
+		<year>1993</year>
+		<publisher>Central Point Software, Inc.</publisher>
+		<info name="version" value="V9" />
+		<info name="developer" value="Central Point Software, Inc." />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="PC Tools Gold 9 [Central Point Software] [1993] [3.5HD] [Disk 1 of 5].img" size="1474560" crc="a7e2b1a5" sha1="85c3196b9aec2a58200d10ac6acd1d77655920d1" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="PC Tools Gold 9 [Central Point Software] [1993] [3.5HD] [Disk 2 of 5].img" size="1474560" crc="0b78eb9a" sha1="f486320b54eaaa590c0ea259180b7d338de5d091" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="PC Tools Gold 9 [Central Point Software] [1993] [3.5HD] [Disk 3 of 5].img" size="1474560" crc="bf0054b1" sha1="9795e47ce307fb4c4daf1d28a804651f69409e3a" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="PC Tools Gold 9 [Central Point Software] [1993] [3.5HD] [Disk 4 of 5].img" size="1474560" crc="d824c738" sha1="25acb867fc0bff46a5d9c6e41f5bc3be8e6d0a65" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="PC Tools Gold 9 [Central Point Software] [1993] [3.5HD] [Disk 5 of 5].img" size="1474560" crc="efb3b46c" sha1="6875770964eaca3786c1480aa2a33b8a23922a20" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pct904">
+		<description>PC Tools Gold V9.0.4</description>
+		<year>1993</year>
+		<publisher>Central Point Software, Inc.</publisher>
+		<info name="version" value="V9" />
+		<info name="developer" value="Central Point Software, Inc." />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="PC Tools Gold 9.0.4 [Central Point Software] [1993] [3.5HD] [Disk 1 of 5].img" size="1474560" crc="85195517" sha1="98d46c43764e552dda361845a0bd38c659d08a23" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="PC Tools Gold 9.0.4 [Central Point Software] [1993] [3.5HD] [Disk 2 of 5].img" size="1474560" crc="aa6dea57" sha1="327152d2a6ca23478235176320db62c6f87ec5e6" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="PC Tools Gold 9.0.4 [Central Point Software] [1993] [3.5HD] [Disk 3 of 5].img" size="1474560" crc="7e78e4a0" sha1="dc6b680c2a7b9c69a4eba8265c42f2d987dbbca2" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="PC Tools Gold 9.0.4 [Central Point Software] [1993] [3.5HD] [Disk 4 of 5].img" size="1474560" crc="6ab851b7" sha1="fd67cc806e868e9cb7416a1b5d5d52d4a94d74f8" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="PC Tools Gold 9.0.4 [Central Point Software] [1993] [3.5HD] [Disk 5 of 5].img" size="1474560" crc="39b3d819" sha1="30c656d02a7453b4d373c2b7a768a0f1afeb67f4" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="prodigy">
 		<!-- from Acer CPR 1.2 recovery CD-ROM -->
 		<description>Prodigy Service</description>

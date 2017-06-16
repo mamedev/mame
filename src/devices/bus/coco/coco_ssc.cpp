@@ -1,4 +1,4 @@
-// license:BSD-3-Clause
+﻿// license:BSD-3-Clause
 // copyright-holders:tim lindner
 /***************************************************************************
 
@@ -92,16 +92,20 @@ namespace
 	protected:
 		// device-level overrides
 		virtual void device_start() override;
+		virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 		virtual DECLARE_READ8_MEMBER(ff7d_read);
 		virtual DECLARE_WRITE8_MEMBER(ff7d_write);
 		virtual void set_sound_enable(bool sound_enable) override;
+		static constexpr device_timer_id BUSY_TIMER_ID  = 0;
+
 	private:
 		uint8_t                                 m_reset_line;
-		bool                                    m_host_busy;
+		bool                                    m_tms7000_busy;
 		uint8_t                                 m_tms7000_porta;
 		uint8_t                                 m_tms7000_portb;
 		uint8_t                                 m_tms7000_portc;
 		uint8_t                                 m_tms7000_portd;
+		emu_timer                               *m_tms7000_busy_timer;
 		required_device<cpu_device>             m_tms7040;
 		required_device<ram_device>             m_staticram;
 		required_device<ay8910_device>          m_ay;
@@ -153,13 +157,8 @@ static ADDRESS_MAP_START(ssc_io_map, AS_IO, 8, coco_ssc_device)
 	AM_RANGE(TMS7000_PORTD, TMS7000_PORTD) AM_READWRITE(ssc_port_d_r, ssc_port_d_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(ssc_rom, AS_PROGRAM, 8, coco_ssc_device)
-	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION(PIC_TAG, 0)
-ADDRESS_MAP_END
-
 MACHINE_CONFIG_MEMBER(coco_ssc_device::device_add_mconfig)
 	MCFG_CPU_ADD(PIC_TAG, TMS7040, DERIVED_CLOCK(1, 2))
-	MCFG_CPU_PROGRAM_MAP(ssc_rom)
 	MCFG_CPU_IO_MAP(ssc_io_map)
 
 	MCFG_RAM_ADD("staticram")
@@ -218,11 +217,14 @@ void coco_ssc_device::device_start()
 	install_readwrite_handler(0xFF7D, 0xFF7E, rh, wh);
 
 	save_item(NAME(m_reset_line));
-	save_item(NAME(m_host_busy));
+	save_item(NAME(m_tms7000_busy));
 	save_item(NAME(m_tms7000_porta));
 	save_item(NAME(m_tms7000_portb));
 	save_item(NAME(m_tms7000_portc));
 	save_item(NAME(m_tms7000_portd));
+	
+	m_tms7000_busy_timer = timer_alloc(BUSY_TIMER_ID);
+	
 }
 
 
@@ -233,7 +235,27 @@ void coco_ssc_device::device_start()
 void coco_ssc_device::device_reset()
 {
 	m_reset_line = 0;
-	m_host_busy = false;
+	m_tms7000_busy = false;
+}
+
+
+//-------------------------------------------------
+//  device_timer - handle timer callbacks
+//-------------------------------------------------
+
+void coco_ssc_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch(id)
+	{
+		case BUSY_TIMER_ID:
+			m_tms7000_busy = false;
+ 			m_tms7000_busy_timer->adjust(attotime::never);
+			break;
+
+		default:
+			break;
+
+	}
 }
 
 
@@ -287,7 +309,7 @@ READ8_MEMBER(coco_ssc_device::ff7d_read)
 		case 0x01:
 			data = 0x1f;
 
-			if( m_host_busy == false )
+			if( m_tms7000_busy == false )
 			{
 				data |= 0x80;
 			}
@@ -344,7 +366,7 @@ WRITE8_MEMBER(coco_ssc_device::ff7d_write)
 					m_tms7040->reset();
 					m_ay->reset();
 					m_spo->reset();
-					m_host_busy = false;
+					m_tms7000_busy = false;
 				}
 			}
 
@@ -359,7 +381,7 @@ WRITE8_MEMBER(coco_ssc_device::ff7d_write)
 			}
 
 			m_tms7000_porta = data;
-			m_host_busy = true;
+			m_tms7000_busy = true;
 			m_tms7040->set_input_line(TMS7000_INT3_LINE, ASSERT_LINE);
 			break;
 	}
@@ -431,9 +453,9 @@ WRITE8_MEMBER(coco_ssc_device::ssc_port_c_w)
 		m_spo->ald_w(space, 0, m_tms7000_portd);
 	}
 
-	if( (data & C_BSY) == 0 )
+    if( ((m_tms7000_portc & C_BSY) == 0) && ((data & C_BSY) == C_BSY) )
 	{
-		m_host_busy = false;
+		m_tms7000_busy_timer->adjust(attotime::from_usec(1800));
 	}
 
 	if (LOG_SSC)

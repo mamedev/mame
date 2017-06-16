@@ -19,10 +19,10 @@ DEFINE_DEVICE_TYPE(C64_DELA_EP7X8, c64_dela_ep7x8_cartridge_device, "c64_dela_ep
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_START( c64_dela_ep7x8 )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( c64_dela_ep7x8 )
+MACHINE_CONFIG_MEMBER( c64_dela_ep7x8_cartridge_device::device_add_mconfig )
 	MCFG_GENERIC_SOCKET_ADD("rom1", generic_linear_slot, nullptr)
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 	MCFG_GENERIC_SOCKET_ADD("rom2", generic_linear_slot, nullptr)
@@ -38,17 +38,6 @@ static MACHINE_CONFIG_START( c64_dela_ep7x8 )
 	MCFG_GENERIC_SOCKET_ADD("rom7", generic_linear_slot, nullptr)
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor c64_dela_ep7x8_cartridge_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( c64_dela_ep7x8 );
-}
 
 
 //**************************************************************************

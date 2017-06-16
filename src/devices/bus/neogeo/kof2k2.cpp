@@ -50,16 +50,11 @@ void neogeo_kof2k2type_cart_device::device_reset()
  mapper specific handlers
  -------------------------------------------------*/
 
-static MACHINE_CONFIG_START( kof2002_cart )
+MACHINE_CONFIG_MEMBER( neogeo_kof2k2type_cart_device::device_add_mconfig )
 	MCFG_CMC_PROT_ADD("cmc_prot")
 	MCFG_PCM2_PROT_ADD("pcm2_prot")
 	MCFG_KOF2002_PROT_ADD("kof2002_prot")
 MACHINE_CONFIG_END
-
-machine_config_constructor neogeo_kof2k2type_cart_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( kof2002_cart );
-}
 
 
 /*************************************************

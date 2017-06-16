@@ -270,6 +270,8 @@ public:
 	DECLARE_DRIVER_INIT(froggrs);
 	DECLARE_DRIVER_INIT(warofbugg);
 	DECLARE_DRIVER_INIT(jungsub);
+	DECLARE_DRIVER_INIT(victoryc);
+	DECLARE_DRIVER_INIT(victorycb);
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(galaxian);
@@ -329,6 +331,7 @@ public:
 	void decode_anteater_gfx();
 	void decode_losttomb_gfx();
 	void decode_superbon();
+	void decode_victoryc();
 	void mshuttle_decode(const uint8_t convtable[8][16]);
 	void common_init(galaxian_draw_bullet_func draw_bullet,galaxian_draw_background_func draw_background,
 		galaxian_extend_tile_info_func extend_tile_info,galaxian_extend_sprite_info_func extend_sprite_info);

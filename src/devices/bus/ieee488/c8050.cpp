@@ -521,10 +521,10 @@ FLOPPY_FORMATS_END
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_START( c8050 )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( c8050 )
+MACHINE_CONFIG_MEMBER( c8050_device::device_add_mconfig )
 	// DOS
 	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_12MHz/12)
 	MCFG_CPU_PROGRAM_MAP(c8050_main_mem)
@@ -569,22 +569,7 @@ static MACHINE_CONFIG_START( c8050 )
 MACHINE_CONFIG_END
 
 
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor c8050_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( c8050 );
-}
-
-
-//-------------------------------------------------
-//  MACHINE_CONFIG_START( c8250 )
-//-------------------------------------------------
-
-static MACHINE_CONFIG_START( c8250 )
+MACHINE_CONFIG_MEMBER( c8250_device::device_add_mconfig )
 	// DOS
 	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_12MHz/12)
 	MCFG_CPU_PROGRAM_MAP(c8050_main_mem)
@@ -630,22 +615,7 @@ static MACHINE_CONFIG_START( c8250 )
 MACHINE_CONFIG_END
 
 
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor c8250_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( c8250 );
-}
-
-
-//-------------------------------------------------
-//  MACHINE_CONFIG_START( c8250lp )
-//-------------------------------------------------
-
-static MACHINE_CONFIG_START( c8250lp )
+MACHINE_CONFIG_MEMBER( c8250lp_device::device_add_mconfig )
 	// DOS
 	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_12MHz/12)
 	MCFG_CPU_PROGRAM_MAP(c8050_main_mem)
@@ -691,22 +661,7 @@ static MACHINE_CONFIG_START( c8250lp )
 MACHINE_CONFIG_END
 
 
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor c8250lp_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( c8250lp );
-}
-
-
-//-------------------------------------------------
-//  MACHINE_CONFIG_START( sfd1001 )
-//-------------------------------------------------
-
-static MACHINE_CONFIG_START( sfd1001 )
+MACHINE_CONFIG_MEMBER( sfd1001_device::device_add_mconfig )
 	// DOS
 	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_12MHz/12)
 	MCFG_CPU_PROGRAM_MAP(c8050_main_mem)
@@ -748,17 +703,6 @@ static MACHINE_CONFIG_START( sfd1001 )
 	MCFG_C8050_ERROR_CALLBACK(DEVWRITELINE(M6522_TAG, via6522_device, write_cb1))
 	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG ":0", sfd1001_floppies, "525qd", sfd1001_device::floppy_formats)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor sfd1001_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( sfd1001 );
-}
 
 
 //-------------------------------------------------

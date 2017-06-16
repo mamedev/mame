@@ -108,28 +108,16 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_START( c64_multiscreen )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( c64_multiscreen )
+MACHINE_CONFIG_MEMBER( c64_multiscreen_cartridge_device::device_add_mconfig )
 	MCFG_CPU_ADD(MC6802P_TAG, M6802, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(multiscreen_mem)
 
 	MCFG_DEVICE_ADD(MC6821P_0_TAG, PIA6821, 0)
 	MCFG_DEVICE_ADD(MC6821P_1_TAG, PIA6821, 0)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor c64_multiscreen_cartridge_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( c64_multiscreen );
-}
-
 
 
 //**************************************************************************

@@ -51,8 +51,9 @@ namespace bus { namespace ti99 { namespace peb {
 
 #define NOVRAM_SIZE 256
 
-snug_enhanced_video_device::snug_enhanced_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ti_expansion_card_device(mconfig, TI99_EVPC, tag, owner, clock),
+snug_enhanced_video_device::snug_enhanced_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock):
+	device_t(mconfig, TI99_EVPC, tag, owner, clock),
+	device_ti99_peribox_card_interface(mconfig, *this),
 	device_nvram_interface(mconfig, *this),
 	m_dsr_page(0),
 	m_inDsrArea(false),
@@ -64,8 +65,8 @@ snug_enhanced_video_device::snug_enhanced_video_device(const machine_config &mco
 	m_intlevel(0),
 	m_dsrrom(nullptr),
 	m_novram(nullptr),
-	m_video(*this, VDP_TAG),
-	m_sound(*this, TISOUNDCHIP_TAG),
+	m_video(*this, TI_VDP_TAG),
+	m_sound(*this, TI_SOUNDCHIP_TAG),
 	m_colorbus(*this, COLORBUS_TAG)
 {
 }
@@ -389,9 +390,9 @@ WRITE_LINE_MEMBER( snug_enhanced_video_device::ready_line )
 
 void snug_enhanced_video_device::device_start()
 {
-	m_dsrrom = memregion(DSRROM)->base();
+	m_dsrrom = memregion(TI99_DSRROM)->base();
 	m_novram = std::make_unique<uint8_t[]>(NOVRAM_SIZE);
-	m_console_conn = downcast<bus::ti99::internal::evpc_clock_connector*>(machine().device(EVPC_CONN_TAG));
+	m_console_conn = downcast<bus::ti99::internal::evpc_clock_connector*>(machine().device(TI99_EVPC_CONN_TAG));
 	save_item(NAME(m_address));
 	save_item(NAME(m_dsr_page));
 	save_item(NAME(m_inDsrArea));
@@ -438,26 +439,9 @@ WRITE_LINE_MEMBER( snug_enhanced_video_device::video_interrupt_in )
 }
 
 ROM_START( ti99_evpc )
-	ROM_REGION(0x10000, DSRROM, 0)
+	ROM_REGION(0x10000, TI99_DSRROM, 0)
 	ROM_LOAD("evpc_dsr.u21", 0, 0x10000, CRC(a062b75d) SHA1(6e8060f86e3bb9c36f244d88825e3fe237bfe9a9)) /* evpc DSR ROM */
 ROM_END
-
-MACHINE_CONFIG_START( ti99_evpc )
-	// video hardware
-	MCFG_V9938_ADD(VDP_TAG, SCREEN_TAG, 0x20000, XTAL_21_4772MHz)  /* typical 9938 clock, not verified */
-	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(snug_enhanced_video_device, video_interrupt_in))
-	MCFG_V99X8_SCREEN_ADD_NTSC(SCREEN_TAG, VDP_TAG, XTAL_21_4772MHz)
-
-	// Sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("sound_out")
-	MCFG_SOUND_ADD(TISOUNDCHIP_TAG, SN94624, 3579545/8) /* 3.579545 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "sound_out", 0.75)
-	MCFG_SN76496_READY_HANDLER( WRITELINE(snug_enhanced_video_device, ready_line) )
-
-	// Mouse connected to the color bus of the v9938
-	MCFG_COLORBUS_MOUSE_ADD( COLORBUS_TAG )
-
-MACHINE_CONFIG_END
 
 /*
     Input ports for the EPVC
@@ -494,9 +478,21 @@ ioport_constructor snug_enhanced_video_device::device_input_ports() const
 	return INPUT_PORTS_NAME(ti99_evpc);
 }
 
-machine_config_constructor snug_enhanced_video_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( ti99_evpc );
-}
+MACHINE_CONFIG_MEMBER( snug_enhanced_video_device::device_add_mconfig )
+	// video hardware
+	MCFG_V9938_ADD(TI_VDP_TAG, TI_SCREEN_TAG, 0x20000, XTAL_21_4772MHz)  /* typical 9938 clock, not verified */
+	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(snug_enhanced_video_device, video_interrupt_in))
+	MCFG_V99X8_SCREEN_ADD_NTSC(TI_SCREEN_TAG, TI_VDP_TAG, XTAL_21_4772MHz)
+
+	// Sound hardware
+	MCFG_SPEAKER_STANDARD_MONO("sound_out")
+	MCFG_SOUND_ADD(TI_SOUNDCHIP_TAG, SN94624, 3579545/8) /* 3.579545 MHz */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "sound_out", 0.75)
+	MCFG_SN76496_READY_HANDLER( WRITELINE(snug_enhanced_video_device, ready_line) )
+
+	// Mouse connected to the color bus of the v9938
+	MCFG_COLORBUS_MOUSE_ADD( COLORBUS_TAG )
+
+MACHINE_CONFIG_END
 
 } } } // end namespace bus::ti99::peb

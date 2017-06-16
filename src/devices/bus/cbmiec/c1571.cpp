@@ -44,10 +44,10 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(C1570,      c1570_device,      "c1570",    "C1570")
-DEFINE_DEVICE_TYPE(C1571,      c1571_device,      "c1571",    "C1571")
-DEFINE_DEVICE_TYPE(C1571CR,    c1571cr_device,    "c1571cr",  "C1571CR")
-DEFINE_DEVICE_TYPE(MINI_CHIEF, mini_chief_device, "minichif", "ICT Mini Chief")
+DEFINE_DEVICE_TYPE(C1570,      c1570_device,      "c1570",    "C1570 Disk Drive")
+DEFINE_DEVICE_TYPE(C1571,      c1571_device,      "c1571",    "C1571 Disk Drive")
+DEFINE_DEVICE_TYPE(C1571CR,    c1571cr_device,    "c1571cr",  "C1571CR Disk Drive")
+DEFINE_DEVICE_TYPE(MINI_CHIEF, mini_chief_device, "minichif", "ICT Mini Chief Disk Drive")
 
 
 //-------------------------------------------------
@@ -597,10 +597,10 @@ static SLOT_INTERFACE_START( mini_chief_isa8_cards )
 SLOT_INTERFACE_END
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( c1570 )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( c1570 )
+MACHINE_CONFIG_MEMBER( c1570_device::device_add_mconfig )
 	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
 	MCFG_CPU_PROGRAM_MAP(c1571_mem)
 	MCFG_QUANTUM_PERFECT_CPU(M6502_TAG)
@@ -632,26 +632,11 @@ static MACHINE_CONFIG_START( c1570 )
 	MCFG_WD1770_ADD(WD1770_TAG, XTAL_16MHz/2)
 	MCFG_DEVICE_ADD(C64H156_TAG, C64H156, XTAL_16MHz)
 	MCFG_64H156_BYTE_CALLBACK(WRITELINE(c1571_device, byte_w))
-	MCFG_FLOPPY_DRIVE_ADD(C64H156_TAG":0", c1571_floppies, "525qd", c1571_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD_FIXED(C64H156_TAG":0", c1571_floppies, "525qd", c1571_device::floppy_formats)
 MACHINE_CONFIG_END
 
 
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor c1570_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( c1570 );
-}
-
-
-//-------------------------------------------------
-//  MACHINE_DRIVER( c1571 )
-//-------------------------------------------------
-
-static MACHINE_CONFIG_START( c1571 )
+MACHINE_CONFIG_MEMBER( c1571_device::device_add_mconfig )
 	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
 	MCFG_CPU_PROGRAM_MAP(c1571_mem)
 	MCFG_QUANTUM_PERFECT_CPU(M6502_TAG)
@@ -683,26 +668,11 @@ static MACHINE_CONFIG_START( c1571 )
 	MCFG_WD1770_ADD(WD1770_TAG, XTAL_16MHz/2)
 	MCFG_DEVICE_ADD(C64H156_TAG, C64H156, XTAL_16MHz)
 	MCFG_64H156_BYTE_CALLBACK(WRITELINE(c1571_device, byte_w))
-	MCFG_FLOPPY_DRIVE_ADD(C64H156_TAG":0", c1571_floppies, "525qd", c1571_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD_FIXED(C64H156_TAG":0", c1571_floppies, "525qd", c1571_device::floppy_formats)
 MACHINE_CONFIG_END
 
 
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor c1571_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( c1571 );
-}
-
-
-//-------------------------------------------------
-//  MACHINE_DRIVER( c1571cr )
-//-------------------------------------------------
-
-static MACHINE_CONFIG_START( c1571cr )
+MACHINE_CONFIG_MEMBER( c1571cr_device::device_add_mconfig )
 	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
 	MCFG_CPU_PROGRAM_MAP(c1571_mem)
 	MCFG_QUANTUM_PERFECT_CPU(M6502_TAG)
@@ -728,26 +698,11 @@ static MACHINE_CONFIG_START( c1571cr )
 	MCFG_WD1770_ADD(WD1770_TAG, XTAL_16MHz/2)
 	MCFG_DEVICE_ADD(C64H156_TAG, C64H156, XTAL_16MHz)
 	MCFG_64H156_BYTE_CALLBACK(WRITELINE(c1571_device, byte_w))
-	MCFG_FLOPPY_DRIVE_ADD(C64H156_TAG":0", c1571_floppies, "525qd", c1571_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD_FIXED(C64H156_TAG":0", c1571_floppies, "525qd", c1571_device::floppy_formats)
 MACHINE_CONFIG_END
 
 
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor c1571cr_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( c1571cr );
-}
-
-
-//-------------------------------------------------
-//  MACHINE_DRIVER( mini_chief )
-//-------------------------------------------------
-
-static MACHINE_CONFIG_START( mini_chief )
+MACHINE_CONFIG_MEMBER( mini_chief_device::device_add_mconfig )
 	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
 	MCFG_CPU_PROGRAM_MAP(mini_chief_mem)
 	MCFG_QUANTUM_PERFECT_CPU(M6502_TAG)
@@ -779,23 +734,12 @@ static MACHINE_CONFIG_START( mini_chief )
 	MCFG_WD1770_ADD(WD1770_TAG, XTAL_16MHz/2)
 	MCFG_DEVICE_ADD(C64H156_TAG, C64H156, XTAL_16MHz)
 	MCFG_64H156_BYTE_CALLBACK(WRITELINE(c1571_device, byte_w))
-	MCFG_FLOPPY_DRIVE_ADD(C64H156_TAG":0", c1571_floppies, "525qd", c1571_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD_FIXED(C64H156_TAG":0", c1571_floppies, "525qd", c1571_device::floppy_formats)
 
 	MCFG_DEVICE_ADD(ISA_BUS_TAG, ISA8, 0)
 	MCFG_ISA8_CPU(M6502_TAG)
 	MCFG_ISA8_SLOT_ADD(ISA_BUS_TAG, "isa1", mini_chief_isa8_cards, "wd1002a_wx1", false)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor mini_chief_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( mini_chief );
-}
 
 
 //-------------------------------------------------

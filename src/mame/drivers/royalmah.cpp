@@ -102,6 +102,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "video/mc6845.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -595,6 +596,12 @@ static ADDRESS_MAP_START( ippatsu_iomap, AS_IO, 8, royalmah_state )
 	AM_RANGE( 0x11, 0x11 ) AM_READ_PORT("SYSTEM") AM_WRITE(input_port_select_w )
 	AM_RANGE( 0x12, 0x12 ) AM_READ_PORT("DSW2")
 	AM_RANGE( 0x13, 0x13 ) AM_READ_PORT("DSW3")
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( janyoup2_iomap, AS_IO, 8, royalmah_state )
+	AM_IMPORT_FROM( ippatsu_iomap )
+	AM_RANGE(0x20, 0x20) AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0x21, 0x21) AM_DEVWRITE("crtc", mc6845_device, register_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tahjong_iomap, AS_IO, 8, royalmah_state )
@@ -3410,6 +3417,16 @@ static MACHINE_CONFIG_DERIVED( ippatsu, dondenmj )
 	MCFG_CPU_IO_MAP(ippatsu_iomap)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( janyoup2, ippatsu )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_CLOCK(XTAL_18_432MHz/4) // unknown divider
+	MCFG_CPU_IO_MAP(janyoup2_iomap)
+	
+	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_18_432MHz/12) // unknown divider
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(4)
+MACHINE_CONFIG_END
+
 INTERRUPT_GEN_MEMBER(royalmah_state::suzume_irq)
 {
 	if ( m_suzume_bank & 0x40 )
@@ -5046,7 +5063,7 @@ DRIVER_INIT_MEMBER(royalmah_state, janptr96)
 GAME( 1981,  royalmj,  0,        royalmah, royalmah, royalmah_state, 0,        ROT0,   "Nichibutsu",                 "Royal Mahjong (Japan, v1.13)",          0 )
 GAME( 1981?, openmj,   royalmj,  royalmah, royalmah, royalmah_state, 0,        ROT0,   "Sapporo Mechanic",           "Open Mahjong [BET] (Japan)",            0 )
 GAME( 1982,  royalmah, royalmj,  royalmah, royalmah, royalmah_state, 0,        ROT0,   "bootleg",                    "Royal Mahjong (Falcon bootleg, v1.01)", 0 )
-GAME( 1983,  janyoup2, royalmj,  ippatsu,  janyoup2, royalmah_state, 0,        ROT0,   "Cosmo Denshi",               "Janyou Part II (ver 7.03, July 1 1983)",0 )
+GAME( 1983,  janyoup2, royalmj,  janyoup2, janyoup2, royalmah_state, 0,        ROT0,   "Cosmo Denshi",               "Janyou Part II (ver 7.03, July 1 1983)",0 )
 GAME( 1985,  tahjong,  royalmj,  tahjong,  tahjong,  royalmah_state, tahjong,  ROT0,   "Bally Pond / Nasco",         "Tahjong Yakitori (ver. 2-1)",           0 ) // 1985 Jun. 17
 GAME( 1981,  janputer, 0,        royalmah, royalmah, royalmah_state, 0,        ROT0,   "bootleg (Paradise Denshi Ltd. / Mes)", "New Double Bet Mahjong (bootleg of Royal Mahjong) [BET]", 0 ) // MT #05392
 GAME( 1984,  rkjanoh2, 0,        royalmah, royalmah, royalmah_state, 0,        ROT0,   "SNK / Dyna",                 "Royal King Jang Oh 2 (v4.00 1984 Jun 10th)", MACHINE_NOT_WORKING )

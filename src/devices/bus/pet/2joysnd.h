@@ -28,11 +28,6 @@ public:
 	// construction/destruction
 	pet_userport_joystick_and_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual ioport_constructor device_input_ports() const override;
-
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
 	virtual DECLARE_WRITE_LINE_MEMBER( input_m ) override;
 
 	// device_pet_user_port_interface overrides
@@ -46,6 +41,10 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+
+	// optional information overrides
+	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	void update_port1();
 	void update_port2();

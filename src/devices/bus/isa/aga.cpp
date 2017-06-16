@@ -273,7 +273,7 @@ MC6845_UPDATE_ROW( isa8_aga_device::aga_update_row )
 }
 
 
-MACHINE_CONFIG_START( pcvideo_aga )
+MACHINE_CONFIG_MEMBER( isa8_aga_device::device_add_mconfig )
 	MCFG_SCREEN_ADD( AGA_SCREEN_NAME, RASTER )
 	MCFG_SCREEN_RAW_PARAMS( XTAL_14_31818MHz,912,0,640,262,0,200 )
 	MCFG_SCREEN_UPDATE_DEVICE( AGA_MC6845_NAME, mc6845_device, screen_update )
@@ -288,10 +288,6 @@ MACHINE_CONFIG_START( pcvideo_aga )
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(isa8_aga_device, vsync_changed))
 MACHINE_CONFIG_END
 
-machine_config_constructor isa8_aga_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( pcvideo_aga );
-}
 
 /*************************************
  *

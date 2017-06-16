@@ -29,21 +29,18 @@ public:
 	// construction/destruction
 	vp620_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
-	// not really public
-	void kb_w(uint8_t data);
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	// device_vip_byteio_port_interface overrides
 	virtual uint8_t vip_in_r() override;
 	virtual int vip_ef4_r() override;
 
 private:
+	void kb_w(uint8_t data);
+
 	uint8_t m_keydata;
 	int m_keystb;
 };

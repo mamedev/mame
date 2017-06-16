@@ -394,7 +394,7 @@ MACHINES["COM8116"] = true
 MACHINES["CR589"] = true
 MACHINES["CS4031"] = true
 MACHINES["CS8221"] = true
---MACHINES["CXD1095"] = true
+MACHINES["CXD1095"] = true
 MACHINES["DM9334"] = true
 MACHINES["DP8390"] = true
 --MACHINES["DS1204"] = true
@@ -415,6 +415,7 @@ MACHINES["HD63450"] = true
 MACHINES["HD64610"] = true
 MACHINES["HP_TACO"] = true
 MACHINES["I2CMEM"] = true
+MACHINES["I7220"] = true
 MACHINES["I80130"] = true
 MACHINES["I8089"] = true
 MACHINES["I8155"] = true
@@ -536,6 +537,7 @@ MACHINES["SMC91C9X"] = true
 MACHINES["SMPC"] = true
 MACHINES["STVCD"] = true
 MACHINES["TC0091LVC"] = true
+--MACHINES["TE7750"] = true
 MACHINES["TIMEKPR"] = true
 MACHINES["TMC0430"] = true
 MACHINES["TMP68301"] = true
@@ -955,6 +957,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"galaxy",
 		"gamepark",
 		"gi",
+		"gridcomp",
 		"grundy",
 		"hartung",
 		"heathkit",
@@ -1996,6 +1999,13 @@ files {
 createMESSProjects(_target, _subtarget, "gi")
 files {
 	MAME_DIR .. "src/mame/drivers/hh_pic16.cpp",
+}
+
+createMESSProjects(_target, _subtarget, "gridcomp")
+files {
+	MAME_DIR .. "src/mame/drivers/gridcomp.cpp",
+	MAME_DIR .. "src/mame/machine/gridkeyb.cpp",
+	MAME_DIR .. "src/mame/machine/gridkeyb.h",
 }
 
 createMESSProjects(_target, _subtarget, "grundy")

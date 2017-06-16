@@ -154,7 +154,7 @@ ioport_constructor sega_sk1100_device::device_input_ports() const
 }
 
 
-static MACHINE_CONFIG_START( sk1100_config )
+MACHINE_CONFIG_MEMBER( sega_sk1100_device::device_add_mconfig )
 	/* devices */
 	MCFG_DEVICE_ADD(UPD9255_0_TAG, I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(sega_sk1100_device, ppi_pa_r))
@@ -172,12 +172,6 @@ static MACHINE_CONFIG_START( sk1100_config )
 	MCFG_SOFTWARE_LIST_ADD("sc3k_cart_list","sc3000_cart")
 	MCFG_SOFTWARE_LIST_ADD("cass_list","sc3000_cass")
 MACHINE_CONFIG_END
-
-
-machine_config_constructor sega_sk1100_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( sk1100_config );
-}
 
 //**************************************************************************
 //  LIVE DEVICE

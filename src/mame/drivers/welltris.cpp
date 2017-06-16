@@ -332,27 +332,6 @@ WRITE8_MEMBER(welltris_state::sound_bankswitch_w)
 }
 
 
-WRITE16_MEMBER(welltris_state::sound_command_w)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		m_pending_command = 1;
-		m_soundlatch->write(space, 0, data & 0xff);
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-	}
-}
-
-CUSTOM_INPUT_MEMBER(welltris_state::pending_sound_r)
-{
-	return m_pending_command ? 1 : 0;
-}
-
-WRITE8_MEMBER(welltris_state::pending_command_clear_w)
-{
-	m_pending_command = 0;
-}
-
-
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, welltris_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x17ffff) AM_ROM
@@ -369,7 +348,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, welltris_state )
 	AM_RANGE(0xfff004, 0xfff007) AM_WRITE(scrollreg_w)
 	AM_RANGE(0xfff006, 0xfff007) AM_READ_PORT("P4")                 /* Right Side Ctrls */
 	AM_RANGE(0xfff008, 0xfff009) AM_READ_PORT("SYSTEM")             /* Bit 5 Tested at start of irq 1 */
-	AM_RANGE(0xfff008, 0xfff009) AM_WRITE(sound_command_w)
+	AM_RANGE(0xfff008, 0xfff009) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0xfff00a, 0xfff00b) AM_READ_PORT("EXTRA")              /* P3+P4 Coin + Start Buttons */
 	AM_RANGE(0xfff00c, 0xfff00d) AM_READ_PORT("DSW1")
 	AM_RANGE(0xfff00e, 0xfff00f) AM_READ_PORT("DSW2")
@@ -387,7 +366,7 @@ static ADDRESS_MAP_START( sound_port_map, AS_IO, 8, welltris_state )
 	AM_RANGE(0x00, 0x00) AM_WRITE(sound_bankswitch_w)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
 	AM_RANGE(0x10, 0x10) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x18, 0x18) AM_WRITE(pending_command_clear_w)
+	AM_RANGE(0x18, 0x18) AM_DEVWRITE("soundlatch", generic_latch_8_device, acknowledge_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( welltris )
@@ -399,7 +378,7 @@ static INPUT_PORTS_START( welltris )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE2 )   /* Test (used to go through tests in service mode) */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_TILT )       /* Tested at start of irq 1 */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )   /* Service (adds a coin) */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, welltris_state,pending_sound_r, nullptr) /* pending sound command */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", generic_latch_8_device, pending_r) /* pending sound command */
 
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
@@ -686,8 +665,6 @@ DRIVER_INIT_MEMBER(welltris_state,welltris)
 void welltris_state::machine_start()
 {
 	membank("soundbank")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x8000);
-
-	save_item(NAME(m_pending_command));
 }
 
 static MACHINE_CONFIG_START( welltris )
@@ -725,6 +702,8 @@ static MACHINE_CONFIG_START( welltris )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

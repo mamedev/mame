@@ -32,23 +32,23 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_callback);
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(socket_load);
-
-	DECLARE_WRITE_LINE_MEMBER(intrq_w);
 	DECLARE_READ8_MEMBER(irq_r);
 	DECLARE_WRITE8_MEMBER(select_w);
 	DECLARE_WRITE8_MEMBER(command_w);
 
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
-
-
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 private:
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(socket_load);
+
+	DECLARE_WRITE_LINE_MEMBER(intrq_w);
+
+	DECLARE_FLOPPY_FORMATS(floppy_formats);
+
 	required_device<fd1793_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;

@@ -38,7 +38,7 @@ static ADDRESS_MAP_START( bm_012_memory_map, AS_PROGRAM, 8, msx_cart_bm_012_devi
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_START( msx_cart_bm_012 )
+MACHINE_CONFIG_MEMBER( msx_cart_bm_012_device::device_add_mconfig )
 	// 12MHz XTAL @ X1
 	// Toshiba TMPZ84C015AF-6 (@U5) components:
 	// - Z80
@@ -75,12 +75,6 @@ static MACHINE_CONFIG_START( msx_cart_bm_012 )
 
 	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
 MACHINE_CONFIG_END
-
-
-machine_config_constructor msx_cart_bm_012_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( msx_cart_bm_012 );
-}
 
 
 ROM_START( msx_cart_bm_012 )

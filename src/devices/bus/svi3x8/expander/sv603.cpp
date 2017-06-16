@@ -34,11 +34,10 @@ const tiny_rom_entry *sv603_device::device_rom_region() const
 }
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( sv603 )
+MACHINE_CONFIG_MEMBER( sv603_device::device_add_mconfig )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("snd", SN76489A, XTAL_10_738635MHz / 3)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
@@ -49,11 +48,6 @@ static MACHINE_CONFIG_START( sv603 )
 	MCFG_GENERIC_LOAD(sv603_device, cartridge)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "coleco")
 MACHINE_CONFIG_END
-
-machine_config_constructor sv603_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( sv603 );
-}
 
 
 //**************************************************************************

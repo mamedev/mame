@@ -11,10 +11,6 @@
     such as Arena(in editmode).
 
     TODO:
-    - Our i8255 device emulation writes $FF to ports A/B on reset, causing a bug
-      with speech at boot for EAS and EAG. The core problem is lack of tri-state
-      pins emulation(with pullup/pulldown), for now there's a workaround which
-      can be removed together with this note when we implement it across MAME.
     - verify cpu speed and rom labels where unknown
     - EAG missing bankswitch? where is the 2nd half of the 32KB ROM used, if at all?
     - granits gives error beeps at start, need to press clear to play
@@ -675,10 +671,6 @@ READ8_MEMBER(fidel6502_state::eas_input_r)
 
 WRITE8_MEMBER(fidel6502_state::eas_ppi_porta_w)
 {
-	// pull output low during reset (see TODO)
-	if (machine().phase() == machine_phase::RESET)
-		data = 0;
-
 	// d0-d5: TSI C0-C5
 	// d6: TSI START line
 	m_speech->data_w(space, 0, data & 0x3f);
@@ -1556,6 +1548,7 @@ static MACHINE_CONFIG_START( eas )
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0) // port B: input, port A & C: output
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(fidel6502_state, eas_ppi_porta_w))
+	MCFG_I8255_TRISTATE_PORTA_CB(CONSTANT(0))
 	MCFG_I8255_IN_PORTB_CB(READ8(fidel6502_state, eas_ppi_portb_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(fidel6502_state, eas_ppi_portc_w))
 

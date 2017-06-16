@@ -82,6 +82,7 @@ void kaneko_pandora_device::static_set_gfxdecode_tag(device_t &device, const cha
 void kaneko_pandora_device::device_start()
 {
 	m_bg_pen = 0;
+	m_flip_screen = false;
 
 	m_spriteram = std::make_unique<uint8_t[]>(0x1000);
 
@@ -89,6 +90,7 @@ void kaneko_pandora_device::device_start()
 
 	save_item(NAME(m_clear_bitmap));
 	save_item(NAME(m_bg_pen));
+	save_item(NAME(m_flip_screen));
 	save_pointer(NAME(m_spriteram.get()), 0x1000);
 	save_item(NAME(*m_sprites_bitmap));
 }
@@ -181,7 +183,7 @@ void kaneko_pandora_device::draw( bitmap_ind16 &bitmap, const rectangle &cliprec
 			y = dy;
 		}
 
-		if (machine().driver_data()->flip_screen())
+		if (m_flip_screen)
 		{
 			sx = 240 - x;
 			sy = 240 - y;

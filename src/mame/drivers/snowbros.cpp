@@ -88,10 +88,15 @@ a joystick.  This is not an emulation bug.
 #include "speaker.h"
 
 
-WRITE16_MEMBER(snowbros_state::snowbros_flipscreen_w)
+WRITE8_MEMBER(snowbros_state::snowbros_flipscreen_w)
 {
-	if (ACCESSING_BITS_8_15)
-		flip_screen_set(~data & 0x8000);
+	m_pandora->flip_screen_set(!BIT(data, 7));
+}
+
+
+WRITE8_MEMBER(snowbros_state::bootleg_flipscreen_w)
+{
+	flip_screen_set(~data & 0x80);
 }
 
 
@@ -214,7 +219,7 @@ static ADDRESS_MAP_START( snowbros_map, AS_PROGRAM, 16, snowbros_state )
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
 	AM_RANGE(0x200000, 0x200001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0x300000, 0x300001) AM_READWRITE(snowbros_68000_sound_r,snowbros_68000_sound_w)
-	AM_RANGE(0x400000, 0x400001) AM_WRITE(snowbros_flipscreen_w)
+	AM_RANGE(0x400000, 0x400001) AM_WRITE8(snowbros_flipscreen_w, 0xff00)
 	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x500004, 0x500005) AM_READ_PORT("SYSTEM")
@@ -296,7 +301,7 @@ static ADDRESS_MAP_START( wintbob_map, AS_PROGRAM, 16, snowbros_state )
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
 	AM_RANGE(0x200000, 0x200001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0x300000, 0x300001) AM_READWRITE(snowbros_68000_sound_r,snowbros_68000_sound_w)
-	AM_RANGE(0x400000, 0x400001) AM_WRITE(snowbros_flipscreen_w)
+	AM_RANGE(0x400000, 0x400001) AM_WRITE8(bootleg_flipscreen_w, 0xff00)
 	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x500004, 0x500005) AM_READ_PORT("SYSTEM")
@@ -353,7 +358,7 @@ static ADDRESS_MAP_START( twinadv_map, AS_PROGRAM, 16, snowbros_state )
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x200000, 0x200001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0x300000, 0x300001) AM_READWRITE(snowbros_68000_sound_r,twinadv_68000_sound_w)
-	AM_RANGE(0x400000, 0x400001) AM_WRITE(snowbros_flipscreen_w)
+	AM_RANGE(0x400000, 0x400001) AM_WRITE8(bootleg_flipscreen_w, 0xff00)
 
 	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("DSW2")
@@ -530,7 +535,7 @@ static ADDRESS_MAP_START( snowbros3_map, AS_PROGRAM, 16, snowbros_state )
 	AM_RANGE( 0x200000, 0x200001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE( 0x300000, 0x300001) AM_READ(sb3_sound_r) // ?
 	AM_RANGE( 0x300000, 0x300001) AM_WRITE(sb3_sound_w)  // ?
-	AM_RANGE( 0x400000, 0x400001) AM_WRITE(snowbros_flipscreen_w)
+	AM_RANGE( 0x400000, 0x400001) AM_WRITE8(bootleg_flipscreen_w, 0xff00)
 	AM_RANGE( 0x500000, 0x500001) AM_READ_PORT("DSW1")
 	AM_RANGE( 0x500002, 0x500003) AM_READ_PORT("DSW2")
 	AM_RANGE( 0x500004, 0x500005) AM_READ_PORT("SYSTEM")
@@ -2320,16 +2325,16 @@ ROM_END
 
 ROM_START( multi96 )
 	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "uh12",  0x00001, 0x20000, CRC(e912ea4e) SHA1(cf0b37d6b6fbdd311ef7b404c4ba2c6a7e1f8486) )
-	ROM_LOAD16_BYTE( "ui12",  0x00000, 0x20000, CRC(ac99e837) SHA1(20bc1599f78a4eac65cae54350872fa292daa807) )
+	ROM_LOAD16_BYTE( "uh12",  0x00001, 0x20000, CRC(e912ea4e) SHA1(cf0b37d6b6fbdd311ef7b404c4ba2c6a7e1f8486) ) // sldh
+	ROM_LOAD16_BYTE( "ui12",  0x00000, 0x20000, CRC(ac99e837) SHA1(20bc1599f78a4eac65cae54350872fa292daa807) ) // sldh
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )    /* 64k for z80 sound code */
 	ROM_LOAD( "uh15.bin", 0x0000, 0x8000, CRC(3d5acd08) SHA1(c19f686862dfc12d2fa91c2dd3d3b75d9cb410c3) )
 
 	ROM_REGION( 0x180000, "gfx1", 0 ) /* 4bpp gfx */
-	ROM_LOAD( "ua4", 0x000000, 0x80000, CRC(66cae586) SHA1(22af524b26241a6456b777a847db73ff8d3db11f) )
-	ROM_LOAD( "ua5", 0x080000, 0x80000, CRC(0bd9f6bb) SHA1(400ddff7a76860caacfe8bfd803f9ccd2dba3356) )
-	ROM_LOAD( "ua6", 0x100000, 0x80000, CRC(0e90b26c) SHA1(fd9b40988d03db8ed797abf859a8828bb65db8d5) )
+	ROM_LOAD( "ua4", 0x000000, 0x80000, CRC(66cae586) SHA1(22af524b26241a6456b777a847db73ff8d3db11f) ) // sldh
+	ROM_LOAD( "ua5", 0x080000, 0x80000, CRC(0bd9f6bb) SHA1(400ddff7a76860caacfe8bfd803f9ccd2dba3356) ) // sldh
+	ROM_LOAD( "ua6", 0x100000, 0x80000, CRC(0e90b26c) SHA1(fd9b40988d03db8ed797abf859a8828bb65db8d5) ) // sldh
 
 	ROM_REGION( 0x080000, "oki", 0 ) /* Samples - both banks are almost the same */
 	/* todo, check bank ordering .. */

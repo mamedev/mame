@@ -53,33 +53,22 @@ static SLOT_INTERFACE_START( hori_adapter )
 	SLOT_INTERFACE("joypad", NES_JOYPAD)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( horitwin )
+
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( nes_horitwin_device::device_add_mconfig )
 	MCFG_FC_EXPANSION_PORT_ADD("port1", hori_adapter, "joypad")
 	MCFG_FC_EXPANSION_PORT_ADD("port2", hori_adapter, "joypad")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( hori4p )
+MACHINE_CONFIG_MEMBER( nes_hori4p_device::device_add_mconfig )
 	MCFG_FC_EXPANSION_PORT_ADD("port1", hori_adapter, "joypad")
 	MCFG_FC_EXPANSION_PORT_ADD("port2", hori_adapter, "joypad")
 	MCFG_FC_EXPANSION_PORT_ADD("port3", hori_adapter, "joypad")
 	MCFG_FC_EXPANSION_PORT_ADD("port4", hori_adapter, "joypad")
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor nes_horitwin_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( horitwin );
-}
-
-machine_config_constructor nes_hori4p_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( hori4p );
-}
 
 
 //**************************************************************************

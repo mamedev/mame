@@ -48,6 +48,7 @@
 #include "bus/rs232/rs232.h" /* actually meant to be RS422 ports */
 #include "cpu/mb88xx/mb88xx.h"
 #include "cpu/z80/tmpz84c015.h"
+#include "machine/cxd1095.h"
 #include "machine/eepromser.h"
 #include "machine/mb8421.h"
 #include "sound/beep.h"
@@ -77,8 +78,11 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(GPI_w);
 	DECLARE_WRITE_LINE_MEMBER(external_monitor_w);
 
-	DECLARE_WRITE8_MEMBER(io_expander_w);
-	DECLARE_READ8_MEMBER(io_expander_r);
+	DECLARE_READ8_MEMBER(io_ky_r);
+	DECLARE_WRITE8_MEMBER(io_sc_w);
+	DECLARE_WRITE8_MEMBER(io_le_w);
+	DECLARE_WRITE8_MEMBER(io_ld_w);
+	DECLARE_WRITE8_MEMBER(io_sel_w);
 	DECLARE_WRITE8_MEMBER(eeprom_w);
 	DECLARE_READ8_MEMBER(eeprom_r);
 	DECLARE_DRIVER_INIT(pve500);
@@ -90,6 +94,7 @@ private:
 	required_device<eeprom_serial_er5911_device> m_eeprom;
 	required_device<beep_device> m_buzzer;
 	uint8_t io_SEL, io_LD, io_LE, io_SC, io_KY;
+	int LD_data[4];
 };
 
 WRITE_LINE_MEMBER( pve500_state::GPI_w )
@@ -116,18 +121,18 @@ static ADDRESS_MAP_START(maincpu_io, AS_IO, 8, pve500_state)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(maincpu_prg, AS_PROGRAM, 8, pve500_state)
-	AM_RANGE (0x0000, 0xBFFF) AM_ROM // ICB7: 48kbytes EPROM
-	AM_RANGE (0xC000, 0xDFFF) AM_RAM // ICD6: 8kbytes of RAM
-	AM_RANGE (0xE000, 0xE7FF) AM_MIRROR(0x1800) AM_DEVREADWRITE("mb8421", mb8421_device, left_r, left_w)
+	AM_RANGE(0x0000, 0xbfff) AM_ROM // ICB7: 48kbytes EPROM
+	AM_RANGE(0xc000, 0xdfff) AM_RAM // ICD6: 8kbytes of RAM
+	AM_RANGE(0xe000, 0xe7ff) AM_MIRROR(0x1800) AM_DEVREADWRITE("mb8421", mb8421_device, left_r, left_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(subcpu_io, AS_IO, 8, pve500_state)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(subcpu_prg, AS_PROGRAM, 8, pve500_state)
-	AM_RANGE (0x0000, 0x7FFF) AM_ROM // ICG5: 32kbytes EPROM
-	AM_RANGE (0x8000, 0x8007) AM_MIRROR(0x3FF8) AM_READWRITE(io_expander_r, io_expander_w) // ICG3: I/O Expander
-	AM_RANGE (0xC000, 0xC7FF) AM_MIRROR(0x3800) AM_DEVREADWRITE("mb8421", mb8421_device, right_r, right_w)
+	AM_RANGE(0x0000, 0x7fff) AM_ROM // ICG5: 32kbytes EPROM
+	AM_RANGE(0x8000, 0x8007) AM_MIRROR(0x3ff8) AM_DEVREADWRITE("cxdio", cxd1095_device, read, write)
+	AM_RANGE(0xc000, 0xc7ff) AM_MIRROR(0x3800) AM_DEVREADWRITE("mb8421", mb8421_device, right_r, right_w)
 ADDRESS_MAP_END
 
 DRIVER_INIT_MEMBER( pve500_state, pve500 )
@@ -262,86 +267,66 @@ WRITE8_MEMBER(pve500_state::eeprom_w)
 	m_eeprom->cs_write( (data & (1 << 4)) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ8_MEMBER(pve500_state::io_expander_r)
+READ8_MEMBER(pve500_state::io_ky_r)
 {
-//  printf("READ IO_EXPANDER_PORT%c\n", 'A'+offset);
-	switch (offset){
-		case IO_EXPANDER_PORTA:
-			return io_SC;
-		case IO_EXPANDER_PORTB:
-			return io_LE;
-		case IO_EXPANDER_PORTC:
-			io_KY = 0x00;
-			if (!BIT(io_SC, 0)) io_KY |= ioport("SCAN0")->read();
-			if (!BIT(io_SC, 1)) io_KY |= ioport("SCAN1")->read();
-			if (!BIT(io_SC, 2)) io_KY |= ioport("SCAN2")->read();
-			if (!BIT(io_SC, 3)) io_KY |= ioport("SCAN3")->read();
-			if (!BIT(io_SC, 4)) io_KY |= ioport("SCAN4")->read();
-			if (!BIT(io_SC, 5)) io_KY |= ioport("SCAN5")->read();
-			if (!BIT(io_SC, 6)) io_KY |= ioport("SCAN6")->read();
-			if (!BIT(io_SC, 7)) io_KY |= ioport("SCAN7")->read();
+	io_KY = 0x00;
+	if (!BIT(io_SC, 0)) io_KY |= ioport("SCAN0")->read();
+	if (!BIT(io_SC, 1)) io_KY |= ioport("SCAN1")->read();
+	if (!BIT(io_SC, 2)) io_KY |= ioport("SCAN2")->read();
+	if (!BIT(io_SC, 3)) io_KY |= ioport("SCAN3")->read();
+	if (!BIT(io_SC, 4)) io_KY |= ioport("SCAN4")->read();
+	if (!BIT(io_SC, 5)) io_KY |= ioport("SCAN5")->read();
+	if (!BIT(io_SC, 6)) io_KY |= ioport("SCAN6")->read();
+	if (!BIT(io_SC, 7)) io_KY |= ioport("SCAN7")->read();
 #if DEBUGGING_INDUCE_SELFDIAGNOSE
-			io_KY = 0x42; //according to procedure described in the service manual
+	io_KY = 0x42; //according to procedure described in the service manual
 #endif
-			return io_KY;
-		case IO_EXPANDER_PORTD:
-			return io_LD;
-		case IO_EXPANDER_PORTE:
-			return io_SEL & 0x0F; //This is a 4bit port.
-		default:
-			return 0;
+	return io_KY;
+}
+
+WRITE8_MEMBER(pve500_state::io_sc_w)
+{
+	int swap[4] = {2,1,0,3};
+
+#if LOG_7SEG_DISPLAY_SIGNALS
+	printf("CXD1095 PORTA (io_SC=%02X)\n", data);
+#endif
+	io_SC = data;
+
+	for (int j=0; j<8; j++){
+		if (!BIT(io_SC,j)){
+			for (int i=0; i<4; i++)
+				output().set_digit_value(8*swap[i] + j, LD_data[i]);
+		}
 	}
 }
 
-WRITE8_MEMBER(pve500_state::io_expander_w)
+WRITE8_MEMBER(pve500_state::io_le_w)
 {
-	static int LD_data[4];
-	int swap[4] = {2,1,0,3};
-	switch (offset){
-		case IO_EXPANDER_PORTA:
 #if LOG_7SEG_DISPLAY_SIGNALS
-printf("io_expander_w: PORTA (io_SC=%02X)\n", data);
+	printf("CXD1095 PORTB (io_LE=%02X)\n", data);
 #endif
-			io_SC = data;
+	io_LE = data;
+}
 
-			for (int j=0; j<8; j++){
-				if (!BIT(io_SC,j)){
-					for (int i=0; i<4; i++)
-						output().set_digit_value(8*swap[i] + j, LD_data[i]);
-				}
-			}
-			break;
-		case IO_EXPANDER_PORTB:
+WRITE8_MEMBER(pve500_state::io_ld_w)
+{
 #if LOG_7SEG_DISPLAY_SIGNALS
-			printf("io_expander_w: PORTB (io_LE=%02X)\n", data);
+	printf("CXD1095 PORTD (io_LD=%02X)\n", data);
 #endif
-			io_LE = data;
-			break;
-		case IO_EXPANDER_PORTC:
+	io_LD = data;
+}
+
+WRITE8_MEMBER(pve500_state::io_sel_w)
+{
 #if LOG_7SEG_DISPLAY_SIGNALS
-			printf("io_expander_w: PORTC (io_KY=%02X)\n", data);
+	printf("CXD1095 PORTE (io_SEL=%02X)\n", data);
 #endif
-			io_KY = data;
-			break;
-		case IO_EXPANDER_PORTD:
-#if LOG_7SEG_DISPLAY_SIGNALS
-			printf("io_expander_w: PORTD (io_LD=%02X)\n", data);
-#endif
-			io_LD = data;
-			break;
-		case IO_EXPANDER_PORTE:
-#if LOG_7SEG_DISPLAY_SIGNALS
-			printf("io_expander_w PORTE (io_SEL=%02X)\n", data);
-#endif
-			io_SEL = data;
-			for (int i=0; i<4; i++){
-				if (BIT(io_SEL, i)){
-					LD_data[i] = 0x7F & BITSWAP8(io_LD ^ 0xFF, 7, 0, 1, 2, 3, 4, 5, 6);
-				}
-			}
-			break;
-		default:
-			break;
+	io_SEL = data;
+	for (int i=0; i<4; i++){
+		if (BIT(io_SEL, i)){
+			LD_data[i] = 0x7F & BITSWAP8(io_LD ^ 0xFF, 7, 0, 1, 2, 3, 4, 5, 6);
+		}
 	}
 }
 
@@ -375,6 +360,14 @@ static MACHINE_CONFIG_START( pve500 )
 	// PIO callbacks
 	MCFG_TMPZ84C015_IN_PA_CB(READ8(pve500_state, eeprom_r))
 	MCFG_TMPZ84C015_OUT_PA_CB(WRITE8(pve500_state, eeprom_w))
+
+	// ICG3: I/O Expander
+	MCFG_DEVICE_ADD("cxdio", CXD1095, 0)
+	MCFG_CXD1095_OUT_PORTA_CB(WRITE8(pve500_state, io_sc_w))
+	MCFG_CXD1095_OUT_PORTB_CB(WRITE8(pve500_state, io_le_w))
+	MCFG_CXD1095_IN_PORTC_CB(READ8(pve500_state, io_ky_r))
+	MCFG_CXD1095_OUT_PORTD_CB(WRITE8(pve500_state, io_ld_w))
+	MCFG_CXD1095_OUT_PORTE_CB(WRITE8(pve500_state, io_sel_w))
 
 	/* Search Dial MCUs */
 	MCFG_CPU_ADD("dial_mcu_left", MB88201, XTAL_4MHz) /* PLAYER DIAL MCU */

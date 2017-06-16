@@ -66,6 +66,7 @@ private:
 	DECLARE_WRITE32_MEMBER(pcictrl_w);
 	DECLARE_READ32_MEMBER(address_base_r);
 	DECLARE_WRITE32_MEMBER(address_base_w);
+	DECLARE_WRITE32_MEMBER(subsystem_id_w);
 
 	const char *m_cpu_tag;
 	cpu_device *m_cpu;

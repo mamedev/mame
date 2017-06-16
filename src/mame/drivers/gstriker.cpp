@@ -185,49 +185,18 @@ Frequencies: 68k is XTAL_32MHZ/2
 void gstriker_state::machine_start()
 {
 	membank("soundbank")->configure_entries(0, 8, memregion("audiocpu")->base(), 0x8000);
-
-	save_item(NAME(m_dmmy_8f_ret));
-	save_item(NAME(m_pending_command));
 }
 
 /*** MISC READ / WRITE HANDLERS **********************************************/
 
-READ8_MEMBER(gstriker_state::dmmy_8f)
+WRITE8_MEMBER(gstriker_state::porth_w)
 {
-	m_dmmy_8f_ret = ~m_dmmy_8f_ret;
-	return m_dmmy_8f_ret;
-}
-
-WRITE8_MEMBER(gstriker_state::unknown_output_w)
-{
-	if (data != 0)
-		logerror("Unknown output write: %02X\n", data);
+	// bit 3 changes very frequently
+	// bits 1 and 2 also output by vgoalsoc
 }
 
 /*** SOUND RELATED ***********************************************************/
 
-
-WRITE16_MEMBER(gstriker_state::sound_command_w)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		m_pending_command = 1;
-		m_soundlatch->write(space, offset, data & 0xff);
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-	}
-}
-
-#if 0
-READ16_MEMBER(gstriker_state::pending_command_r)
-{
-	return m_pending_command;
-}
-#endif
-
-WRITE8_MEMBER(gstriker_state::sh_pending_command_clear_w)
-{
-	m_pending_command = 0;
-}
 
 WRITE8_MEMBER(gstriker_state::sh_bankswitch_w)
 {
@@ -288,7 +257,7 @@ static ADDRESS_MAP_START( gstriker_map, AS_PROGRAM, 16, gstriker_state )
 	AM_RANGE(0x200040, 0x20005f) AM_RAM AM_SHARE("mixerregs1")
 	AM_RANGE(0x200060, 0x20007f) AM_RAM AM_SHARE("mixerregs2")
 	AM_RANGE(0x200080, 0x20009f) AM_DEVREADWRITE8("io", vs9209_device, read, write, 0x00ff)
-	AM_RANGE(0x2000a0, 0x2000a1) AM_WRITE(sound_command_w)
+	AM_RANGE(0x2000a0, 0x2000a1) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_SHARE("work_ram")
 ADDRESS_MAP_END
@@ -303,7 +272,7 @@ static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, gstriker_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
 	AM_RANGE(0x04, 0x04) AM_WRITE(sh_bankswitch_w)
-	AM_RANGE(0x08, 0x08) AM_WRITE(sh_pending_command_clear_w)
+	AM_RANGE(0x08, 0x08) AM_DEVWRITE("soundlatch", generic_latch_8_device, acknowledge_w)
 	AM_RANGE(0x0c, 0x0c) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
@@ -520,7 +489,8 @@ static MACHINE_CONFIG_START( gstriker )
 	MCFG_VS9209_IN_PORTC_CB(IOPORT("SYSTEM"))
 	MCFG_VS9209_IN_PORTD_CB(IOPORT("DSW1"))
 	MCFG_VS9209_IN_PORTE_CB(IOPORT("DSW2"))
-	MCFG_VS9209_IN_PORTH_CB(READ8(gstriker_state, dmmy_8f))
+	MCFG_VS9209_IN_PORTH_CB(DEVREADLINE("soundlatch", generic_latch_8_device, pending_r)) MCFG_DEVCB_BIT(0)
+	MCFG_VS9209_OUT_PORTH_CB(WRITE8(gstriker_state, porth_w))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 //  MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
@@ -554,6 +524,8 @@ static MACHINE_CONFIG_START( gstriker )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -1007,8 +979,6 @@ WRITE16_MEMBER(gstriker_state::vbl_toggle_w)
 
 void gstriker_state::mcu_init()
 {
-	m_dmmy_8f_ret = 0xff;
-	m_pending_command = 0;
 	m_mcu_data = 0;
 
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x20008a, 0x20008b, write16_delegate(FUNC(gstriker_state::twrldc94_mcu_w),this));
@@ -1044,9 +1014,9 @@ DRIVER_INIT_MEMBER(gstriker_state,vgoalsoc)
 
 /*** GAME DRIVERS ************************************************************/
 
-GAME( 1993, gstriker, 0,         gstriker, gstriker, gstriker_state, 0,        ROT0, "Human", "Grand Striker",            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, gstrikera, gstriker, gstriker, gstriker, gstriker_state, 0,        ROT0, "Human", "Grand Striker (Americas)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, gstrikerj, gstriker, gstriker, gstriker, gstriker_state, 0,        ROT0, "Human", "Grand Striker (Japan)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, gstriker, 0,         gstriker, gstriker, gstriker_state, 0,        ROT0, "Human", "Grand Striker",            MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, gstrikera, gstriker, gstriker, gstriker, gstriker_state, 0,        ROT0, "Human", "Grand Striker (Americas)", MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, gstrikerj, gstriker, gstriker, gstriker, gstriker_state, 0,        ROT0, "Human", "Grand Striker (Japan)",    MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 
 /* Similar, but not identical hardware, appear to be protected by an MCU :-( */

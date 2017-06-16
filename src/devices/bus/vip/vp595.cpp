@@ -33,23 +33,12 @@ DEFINE_DEVICE_TYPE(VP595, vp595_device, "vp595", "VP-595 Simple Sound")
 //  MACHINE_CONFIG_START( vp595 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( vp595 )
+MACHINE_CONFIG_MEMBER( vp595_device::device_add_mconfig )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_CDP1863_ADD(CDP1863_TAG, 0, CDP1863_XTAL)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor vp595_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( vp595 );
-}
 
 
 

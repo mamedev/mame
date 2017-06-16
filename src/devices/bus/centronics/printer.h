@@ -28,16 +28,15 @@ public:
 	virtual DECLARE_WRITE_LINE_MEMBER( input_data7 ) override { if (state) m_data |= 0x80; else m_data &= ~0x80; }
 	virtual DECLARE_WRITE_LINE_MEMBER( input_init ) override;
 
-	DECLARE_WRITE_LINE_MEMBER( printer_online );
-
 protected:
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
+	DECLARE_WRITE_LINE_MEMBER( printer_online );
 
 	enum
 	{

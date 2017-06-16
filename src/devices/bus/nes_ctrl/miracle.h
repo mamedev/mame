@@ -29,9 +29,6 @@ public:
 	// construction/destruction
 	nes_miracle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
 	required_device<midi_port_device> m_midiin, m_midiout;
 
 protected:
@@ -43,6 +40,10 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
+private:
 	// serial overrides
 	virtual void rcv_complete() override;    // Rx completed receiving byte
 	virtual void tra_complete() override;    // Tx completed sending byte

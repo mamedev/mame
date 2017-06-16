@@ -76,6 +76,7 @@ public:
 	optional_ioport m_unknown;
 	optional_ioport m_fake;
 
+	DECLARE_WRITE8_MEMBER(coins_w);
 	DECLARE_WRITE16_MEMBER(cpua_ctrl_w);
 	DECLARE_READ16_MEMBER(lan_status_r);
 	DECLARE_WRITE16_MEMBER(rotate_port_w);

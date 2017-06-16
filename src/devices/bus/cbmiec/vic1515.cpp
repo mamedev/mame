@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(VIC1515, vic1515_device, "vic1515", "VIC-1515")
+DEFINE_DEVICE_TYPE(VIC1515, vic1515_device, "vic1515", "VIC-1515 Graphic Printer")
 
 
 //-------------------------------------------------
@@ -56,25 +56,14 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( vic1515 )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( vic1515 )
+MACHINE_CONFIG_MEMBER( vic1515_device::device_add_mconfig )
 	MCFG_CPU_ADD("maincpu", I8039, XTAL_6MHz)
 	MCFG_CPU_PROGRAM_MAP(vic1515_mem)
 	MCFG_CPU_IO_MAP(vic1515_io)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor vic1515_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( vic1515 );
-}
 
 
 //-------------------------------------------------

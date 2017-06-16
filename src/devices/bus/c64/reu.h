@@ -28,10 +28,6 @@
 class c64_reu_cartridge_device : public device_t,
 									public device_c64_expansion_card_interface
 {
-public:
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
 protected:
 	enum
 	{
@@ -46,6 +42,9 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	// device_c64_expansion_card_interface overrides
 	virtual uint8_t c64_cd_r(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2) override;

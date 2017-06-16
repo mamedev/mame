@@ -633,7 +633,12 @@ WRITE8_MEMBER(nes_konami_vrc6_device::write_h)
 	}
 }
 
-static MACHINE_CONFIG_START( vrc6 )
+
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( nes_konami_vrc6_device::device_add_mconfig )
 
 	// additional sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("addon")
@@ -643,16 +648,6 @@ static MACHINE_CONFIG_START( vrc6 )
 	MCFG_SOUND_ADD("vrc6snd", VRC6, XTAL_21_4772MHz/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 0.5)
 MACHINE_CONFIG_END
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor nes_konami_vrc6_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( vrc6 );
-}
 
 /*-------------------------------------------------
 
@@ -767,7 +762,7 @@ WRITE8_MEMBER(nes_konami_vrc7_device::write_h)
 
 // FIXME: we currently emulate this as a base YM2413!
 
-static MACHINE_CONFIG_START( vrc7 )
+MACHINE_CONFIG_MEMBER( nes_konami_vrc7_device::device_add_mconfig )
 
 	// additional sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("addon")
@@ -777,13 +772,3 @@ static MACHINE_CONFIG_START( vrc7 )
 	MCFG_SOUND_ADD("ym", YM2413, XTAL_21_4772MHz/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 0.5)
 MACHINE_CONFIG_END
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor nes_konami_vrc7_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( vrc7 );
-}

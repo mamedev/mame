@@ -90,17 +90,19 @@ namespace bus { namespace ti99 { namespace peb {
 /*
    Constructor for the HFDC card.
 */
-myarc_hfdc_device::myarc_hfdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ti_expansion_card_device(mconfig, TI99_HFDC, tag, owner, clock), m_motor_on_timer(nullptr),
-		m_hdc9234(*this, FDC_TAG),
-		m_clock(*this, CLOCK_TAG), m_current_floppy(nullptr),
-		m_current_harddisk(nullptr), m_see_switches(false),
-		m_irq(), m_dip(), m_motor_running(false),
-		m_inDsrArea(false), m_HDCsel(false), m_RTCsel(false),
-		m_tapesel(false), m_RAMsel(false), m_ROMsel(false), m_address(0),
-		m_wait_for_hd1(false), m_dsrrom(nullptr), m_rom_page(0),
-		m_buffer_ram(*this, BUFFER), m_status_latch(0), m_dma_address(0),
-		m_output1_latch(0), m_output2_latch(0), m_lastval(0), m_MOTOR_ON(), m_readyflags(0)
+myarc_hfdc_device::myarc_hfdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock):
+	device_t(mconfig, TI99_HFDC, tag, owner, clock),
+	device_ti99_peribox_card_interface(mconfig, *this),
+	m_motor_on_timer(nullptr),
+	m_hdc9234(*this, FDC_TAG),
+	m_clock(*this, CLOCK_TAG), m_current_floppy(nullptr),
+	m_current_harddisk(nullptr), m_see_switches(false),
+	m_irq(), m_dip(), m_motor_running(false),
+	m_inDsrArea(false), m_HDCsel(false), m_RTCsel(false),
+	m_tapesel(false), m_RAMsel(false), m_ROMsel(false), m_address(0),
+	m_wait_for_hd1(false), m_dsrrom(nullptr), m_rom_page(0),
+	m_buffer_ram(*this, BUFFER), m_status_latch(0), m_dma_address(0),
+	m_output1_latch(0), m_output2_latch(0), m_lastval(0), m_MOTOR_ON(), m_readyflags(0)
 {
 }
 
@@ -874,7 +876,7 @@ WRITE8_MEMBER( myarc_hfdc_device::write_buffer )
 
 void myarc_hfdc_device::device_start()
 {
-	m_dsrrom = memregion(DSRROM)->base();
+	m_dsrrom = memregion(TI99_DSRROM)->base();
 	m_motor_on_timer = timer_alloc(MOTOR_TIMER);
 	// The HFDC does not use READY; it has on-board RAM for DMA
 	m_current_floppy = nullptr;
@@ -1063,7 +1065,13 @@ static SLOT_INTERFACE_START( hfdc_harddisks )
 	SLOT_INTERFACE( "st251", MFMHD_ST251 )        // Seagate ST-251 (40 MB)
 SLOT_INTERFACE_END
 
-MACHINE_CONFIG_START( ti99_hfdc )
+ROM_START( ti99_hfdc )
+	ROM_REGION(0x4000, TI99_DSRROM, 0)
+	ROM_LOAD("hfdc_dsr.u34", 0x0000, 0x4000, CRC(66fbe0ed) SHA1(11df2ecef51de6f543e4eaf8b2529d3e65d0bd59)) /* HFDC disk DSR ROM */
+ROM_END
+
+
+MACHINE_CONFIG_MEMBER( myarc_hfdc_device::device_add_mconfig )
 	MCFG_DEVICE_ADD(FDC_TAG, HDC9234, 0)
 	MCFG_HDC92X4_INTRQ_CALLBACK(WRITELINE(myarc_hfdc_device, intrq_w))
 	MCFG_HDC92X4_DIP_CALLBACK(WRITELINE(myarc_hfdc_device, dip_w))
@@ -1094,17 +1102,6 @@ MACHINE_CONFIG_START( ti99_hfdc )
 	MCFG_RAM_DEFAULT_SIZE("32K")
 	MCFG_RAM_DEFAULT_VALUE(0)
 MACHINE_CONFIG_END
-
-ROM_START( ti99_hfdc )
-	ROM_REGION(0x4000, DSRROM, 0)
-	ROM_LOAD("hfdc_dsr.u34", 0x0000, 0x4000, CRC(66fbe0ed) SHA1(11df2ecef51de6f543e4eaf8b2529d3e65d0bd59)) /* HFDC disk DSR ROM */
-ROM_END
-
-
-machine_config_constructor myarc_hfdc_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( ti99_hfdc );
-}
 
 const tiny_rom_entry *myarc_hfdc_device::device_rom_region() const
 {

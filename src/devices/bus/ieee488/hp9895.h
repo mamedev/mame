@@ -26,11 +26,6 @@ public:
 	// construction/destruction
 	hp9895_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual ioport_constructor device_input_ports() const override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
 	// device_ieee488_interface overrides
 	virtual void ieee488_eoi(int state) override;
 	virtual void ieee488_dav(int state) override;
@@ -41,6 +36,37 @@ public:
 	virtual void ieee488_atn(int state) override;
 	virtual void ieee488_ren(int state) override;
 
+	// Floppy interface
+	DECLARE_WRITE8_MEMBER(data_w);
+	DECLARE_WRITE8_MEMBER(clock_w);
+	DECLARE_WRITE8_MEMBER(reset_w);
+	DECLARE_WRITE8_MEMBER(leds_w);
+	DECLARE_WRITE8_MEMBER(cntl_w);
+	DECLARE_WRITE8_MEMBER(drv_w);
+	DECLARE_WRITE8_MEMBER(xv_w);
+	DECLARE_READ8_MEMBER(data_r);
+	DECLARE_READ8_MEMBER(clock_r);
+	DECLARE_READ8_MEMBER(drivstat_r);
+	DECLARE_READ8_MEMBER(switches_r);
+	DECLARE_READ8_MEMBER(switches2_r);
+
+	// PHI register read 
+	DECLARE_READ8_MEMBER(phi_reg_r);
+
+	// Floppy drive interface
+	void floppy_ready_cb(floppy_image_device *floppy , int state);
+
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	// device-level overrides
+	virtual ioport_constructor device_input_ports() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
+private:
 	// PHI write CBs
 	DECLARE_WRITE_LINE_MEMBER(phi_eoi_w);
 	DECLARE_WRITE_LINE_MEMBER(phi_dav_w);
@@ -58,33 +84,9 @@ public:
 	// PHI IRQ/Z80 NMI
 	DECLARE_WRITE_LINE_MEMBER(phi_int_w);
 
-	// PHI register read & Z80 IRQ
-	DECLARE_READ8_MEMBER(phi_reg_r);
+	// Z80 IRQ
 	DECLARE_WRITE16_MEMBER(z80_m1_w);
 
-	// Floppy interface
-	DECLARE_WRITE8_MEMBER(data_w);
-	DECLARE_WRITE8_MEMBER(clock_w);
-	DECLARE_WRITE8_MEMBER(reset_w);
-	DECLARE_WRITE8_MEMBER(leds_w);
-	DECLARE_WRITE8_MEMBER(cntl_w);
-	DECLARE_WRITE8_MEMBER(drv_w);
-	DECLARE_WRITE8_MEMBER(xv_w);
-	DECLARE_READ8_MEMBER(data_r);
-	DECLARE_READ8_MEMBER(clock_r);
-	DECLARE_READ8_MEMBER(drivstat_r);
-	DECLARE_READ8_MEMBER(switches_r);
-	DECLARE_READ8_MEMBER(switches2_r);
-
-	// Floppy drive interface
-	void floppy_ready_cb(floppy_image_device *floppy , int state);
-
-protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-
-private:
 	required_device<z80_device> m_cpu;
 	required_device<phi_device> m_phi;
 	required_device<floppy_connector> m_drives[ 2 ];

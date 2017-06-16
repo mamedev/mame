@@ -31,19 +31,8 @@ public:
 	// construction/destruction
 	abc800_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual ioport_constructor device_input_ports() const override;
-
 	// abc_keyboard_interface overrides
 	virtual void txd_w(int state) override;
-
-	// not really public
-	DECLARE_READ8_MEMBER( kb_p1_r );
-	DECLARE_WRITE8_MEMBER( kb_p1_w );
-	DECLARE_WRITE8_MEMBER( kb_p2_w );
-	DECLARE_READ_LINE_MEMBER( kb_t1_r );
 
 protected:
 	// device-level overrides
@@ -51,10 +40,20 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
+	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
+
 private:
 	inline void serial_output(int state);
 	inline void serial_clock();
 	inline void key_down(int state);
+
+	DECLARE_READ8_MEMBER( kb_p1_r );
+	DECLARE_WRITE8_MEMBER( kb_p1_w );
+	DECLARE_WRITE8_MEMBER( kb_p2_w );
+	DECLARE_READ_LINE_MEMBER( kb_t1_r );
 
 	required_device<cpu_device> m_maincpu;
 	required_ioport_array<12> m_x;

@@ -1268,7 +1268,7 @@ static ADDRESS_MAP_START( mwalkbl_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 
 	AM_RANGE(0xc40000, 0xc40001) AM_READ_PORT("COINAGE")
 	AM_RANGE(0xc40002, 0xc40003) AM_READ_PORT("DSW1")
-	AM_RANGE(0xc40006, 0xc40007) AM_WRITE(sound_command_nmi_w)
+	AM_RANGE(0xc40006, 0xc40007) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0xc41000, 0xc41001) AM_READ_PORT("SERVICE")
 	AM_RANGE(0xc41002, 0xc41003) AM_READ_PORT("P1")
 	AM_RANGE(0xc41004, 0xc41005) AM_READ_PORT("P2")
@@ -1287,6 +1287,12 @@ ADDRESS_MAP_END
     Alien Storm (Bootleg)
 
 ***************************************************************************/
+
+WRITE8_MEMBER(segas1x_bootleg_state::sys18bl_okibank_w) // TODO: verify correctness
+{
+	//popmessage("okibank: %02x\n", data);
+	membank("okibank")->set_entry(data & 0x07);
+}
 
 /* bootleg doesn't have real vdp or i/o */
 static ADDRESS_MAP_START( astormbl_map, AS_PROGRAM, 16, segas1x_bootleg_state )
@@ -1321,6 +1327,19 @@ static ADDRESS_MAP_START( astormbl_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0xc46600, 0xc46601) AM_WRITE(sys18_refreshenable_w)
 	AM_RANGE(0xfe0020, 0xfe003f) AM_WRITENOP
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(sys18bl_sound_map, AS_PROGRAM, 8, segas1x_bootleg_state )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x9000, 0x9000) AM_WRITE(sys18bl_okibank_w)
+	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( sys18bl_oki_map, AS_0, 8, segas1x_bootleg_state )
+	AM_RANGE(0x00000, 0x2ffff) AM_ROM
+	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("okibank")
 ADDRESS_MAP_END
 
 WRITE16_MEMBER(segas1x_bootleg_state::ddcrewbl_spritebank_w)
@@ -2111,6 +2130,7 @@ static MACHINE_CONFIG_START( datsu_2x_ym2203_msm5205 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
+
 /*************************************
  *
  *  Machine driver
@@ -2416,8 +2436,45 @@ static MACHINE_CONFIG_DERIVED( astormbl, system18 )
 	MCFG_CPU_PROGRAM_MAP(astormbl_map)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_START( astormb2 )
 
-static MACHINE_CONFIG_DERIVED( mwalkbl, system18 )
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2) /* 12MHz */
+	MCFG_CPU_PROGRAM_MAP(astormbl_map)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", segas1x_bootleg_state,  irq4_line_hold)
+
+	MCFG_CPU_ADD("soundcpu", Z80, XTAL_8MHz/2) /* 4MHz */
+	MCFG_CPU_PROGRAM_MAP(sys18bl_sound_map)
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(58.271) /* V-Sync is 58.271Hz & H-Sync is ~ 14.48KHz measured */
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(40*8, 28*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(segas1x_bootleg_state, screen_update_system18old)
+	MCFG_SCREEN_PALETTE("palette")
+
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sys16)
+	MCFG_PALETTE_ADD("palette", (2048+2048)*SHADOW_COLORS_MULTIPLIER) // 64 extra colours for vdp (but we use 2048 so shadow mask works)
+
+	MCFG_VIDEO_START_OVERRIDE(segas1x_bootleg_state,system18old)
+
+	MCFG_BOOTLEG_SYS16B_SPRITES_ADD("sprites")
+	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(189-107)
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", 0))
+
+	// 1 OKI M6295 instead of original sound hardware
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_OKIM6295_ADD("oki", XTAL_8MHz/8, PIN7_HIGH) // 1MHz clock and pin verified
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, sys18bl_oki_map)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( mwalkbl, astormb2 )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3331,19 +3388,17 @@ ROM_START( astormb2 )
 	ROM_LOAD16_BYTE( "26.021", 0x1c0000, 0x20000, CRC(c67fc986) SHA1(5fac826f9dde45201e3b93582dbe29c584a10229) ) // epr13086.bin [2/2]      99.987030%
 
 	/* Sound HW is very different to the originals */
-	ROM_REGION( 0x210000, "soundcpu", ROMREGION_ERASEFF ) /* Z80 sound CPU */
-	ROM_LOAD( "9.a5", 0x10000, 0x08000, CRC(0a4638e9) SHA1(0470e03a194464ff53c7583637193b585f5fd79f) )
+	ROM_REGION( 0x08000, "soundcpu", 0 ) /* Z80 sound CPU */
+	ROM_LOAD( "9.a5", 0x00000, 0x08000, CRC(0a4638e9) SHA1(0470e03a194464ff53c7583637193b585f5fd79f) )
 
-	ROM_REGION( 0x40000, "oki1", ROMREGION_ERASEFF ) /* Oki6295 Samples - fixed? samples */
+	ROM_REGION( 0xb0000, "oki", 0 ) /* Oki6295 Samples */
 	ROM_LOAD( "11.a10", 0x00000, 0x20000, CRC(7e0f752c) SHA1(a4070c3fa4848b5be223f9b927de4b6926dbb4e6) ) // contains sample table
-	ROM_LOAD( "10.a11", 0x20000, 0x10000, CRC(722e5969) SHA1(9cf891c6533b2e2a5c4741aa4e405038a7bf4e97) )
-	/* 0x30000- 0x3ffff banked? (guess) */
-
-	ROM_REGION( 0xc0000, "oki2", ROMREGION_ERASEFF ) /* Oki6295 Samples - banked? samples*/
-	ROM_LOAD( "12.a15", 0x00000, 0x20000, CRC(cb4517db) SHA1(4c93376c2b3e70001bbc283d4485bb55514f6ef9) )
-	ROM_LOAD( "13.a14", 0x20000, 0x20000, CRC(c60d6f18) SHA1(c9610729f19ae8414efd785948a1e6fb079bfe8d) )
-	ROM_LOAD( "14.a13", 0x40000, 0x20000, CRC(07e6b3a5) SHA1(32da2a9aeb840b76e6f0117ac342ff5d612762b4) )
-	ROM_LOAD( "15.a12", 0x60000, 0x20000, CRC(dffde929) SHA1(037b32470747d155385e532ee574b1234b3c2b26) )
+	ROM_LOAD( "10.a11", 0x20000, 0x10000, CRC(722e5969) SHA1(9cf891c6533b2e2a5c4741aa4e405038a7bf4e97) ) // sound effects
+	// BGM (banked 0x30000-0x3ffff)
+	ROM_LOAD( "12.a15", 0x30000, 0x20000, CRC(cb4517db) SHA1(4c93376c2b3e70001bbc283d4485bb55514f6ef9) )
+	ROM_LOAD( "13.a14", 0x50000, 0x20000, CRC(c60d6f18) SHA1(c9610729f19ae8414efd785948a1e6fb079bfe8d) )
+	ROM_LOAD( "14.a13", 0x70000, 0x20000, CRC(07e6b3a5) SHA1(32da2a9aeb840b76e6f0117ac342ff5d612762b4) )
+	ROM_LOAD( "15.a12", 0x90000, 0x20000, CRC(dffde929) SHA1(037b32470747d155385e532ee574b1234b3c2b26) )
 
 	ROM_REGION( 0x0120, "proms", 0 )
 	ROM_LOAD( "n82s129n.129",  0x0000, 0x0100, CRC(a7c22d96) SHA1(160deae8053b09c09328325246598b3518c7e20b) )
@@ -3405,25 +3460,18 @@ ROM_START( mwalkbl )
 	ROM_LOAD16_BYTE( "mwb17obj.bin",  0x1c0001, 0x20000, CRC(97353bad) SHA1(ea830478c96237a95382367bf60c765f4f6bb67e) )
 	ROM_LOAD16_BYTE( "mwb24obj.bin",  0x1c0000, 0x20000, CRC(a0ec7855) SHA1(f4e69eccfc3f93bd1531c4674afb1eade6ddc08c) )
 
-	ROM_REGION( 0xc0000, "bootz80", 0 ) /* new z80 program */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* new z80 program */
 	ROM_LOAD( "mwb5snd.bin", 0x00000, 0x08000, CRC(f8f9817e) SHA1(e23595891cee84c5bce15021ce0643acb4520da9) )
 	ROM_CONTINUE(0x0000, 0x8000) // first half is empty
 
-	ROM_REGION( 0xc0000, "bootoki", 0 ) /* 6295 samples */
+	ROM_REGION( 0xb0000, "oki", 0 ) /* 6295 samples */
 	ROM_LOAD( "mwb10snd.bin", 0x00000, 0x20000, CRC(5325c4e6) SHA1(d6e3e6a34f5b8a63eece877dc8fe03f534f74cff) ) // sample table in here
-	ROM_LOAD( "mwb11snd.bin", 0x20000, 0x10000, CRC(6f2b6250) SHA1(de3b0a553a195ef9b120b768a98628837f0d0a2d) ) // why is this smaller? is it correct?
-	ROM_LOAD( "mwb12snd.bin", 0x40000, 0x20000, CRC(239a4c59) SHA1(323ded2fe7c50f400c21332b1adefe2df7ba7fad) )
-	ROM_LOAD( "mwb13snd.bin", 0x60000, 0x20000, CRC(9af67cc4) SHA1(bc9fbbea63b0c15c0f47e12c83a5aba35c6897c5) )
-	ROM_LOAD( "mwb14snd.bin", 0x80000, 0x20000, CRC(9d8f84ad) SHA1(1e1e645dcf974edb58adc58f0ead9041bb0af0a7) )
-	ROM_LOAD( "mwb15snd.bin", 0xa0000, 0x20000, CRC(05d5abcb) SHA1(c8ac197a655c8f8fa0f4a38cbc4b7adbf256cd48) )
-
-
-// original sound roms, SHOULD NOT BE LOADING THESE BUT EMULATION IS STILL USING THEM
-	ROM_REGION( 0x100000, "soundcpu", 0 ) /* sound CPU */
-	ROM_LOAD( "epr13225.a4", 0x10000, 0x20000, CRC(56c2e82b) SHA1(d5755a1bb6e889d274dc60e883d4d65f12fdc877) )
-	ROM_LOAD( "mpr13219.b4", 0x30000, 0x40000, CRC(19e2061f) SHA1(2dcf1718a43dab4da53b4f67722664e70ddd2169) )
-	ROM_LOAD( "mpr13220.b5", 0x70000, 0x40000, CRC(58d4d9ce) SHA1(725e73a656845b02702ef131b4c0aa2a73cdd02e) )
-	ROM_LOAD( "mpr13249.b6", 0xb0000, 0x40000, CRC(623edc5d) SHA1(c32d9f818d40f311877fbe6532d9e95b6045c3c4) )
+	ROM_LOAD( "mwb11snd.bin", 0x20000, 0x10000, CRC(6f2b6250) SHA1(de3b0a553a195ef9b120b768a98628837f0d0a2d) ) // sound effects
+	// BGM (banked 0x30000-0x3ffff)
+	ROM_LOAD( "mwb12snd.bin", 0x30000, 0x20000, CRC(239a4c59) SHA1(323ded2fe7c50f400c21332b1adefe2df7ba7fad) )
+	ROM_LOAD( "mwb13snd.bin", 0x50000, 0x20000, CRC(9af67cc4) SHA1(bc9fbbea63b0c15c0f47e12c83a5aba35c6897c5) )
+	ROM_LOAD( "mwb14snd.bin", 0x70000, 0x20000, CRC(9d8f84ad) SHA1(1e1e645dcf974edb58adc58f0ead9041bb0af0a7) )
+	ROM_LOAD( "mwb15snd.bin", 0x90000, 0x20000, CRC(05d5abcb) SHA1(c8ac197a655c8f8fa0f4a38cbc4b7adbf256cd48) )
 ROM_END
 
 
@@ -3832,27 +3880,6 @@ DRIVER_INIT_MEMBER(segas1x_bootleg_state,shdancbl)
 	m_splittab_bg_x = &m_textram[0x0fc0/2];
 }
 
-DRIVER_INIT_MEMBER(segas1x_bootleg_state,mwalkbl)
-{
-	uint8_t *RAM =  memregion("soundcpu")->base();
-	static const int mwalk_sound_info[]  =
-	{
-		0x0f, 0x00000, // ROM #1 = 128K
-		0x1f, 0x20000, // ROM #2 = 256K
-		0x1f, 0x60000, // ROM #3 = 256K
-		0x1f, 0xA0000  // ROM #4 = 256K
-	};
-
-	memcpy(m_sound_info, mwalk_sound_info, sizeof(m_sound_info));
-	memcpy(RAM, &RAM[0x10000], 0xa000);
-
-	DRIVER_INIT_CALL(common);
-
-	m_spritebank_type = 1;
-	m_splittab_fg_x = &m_textram[0x0f80/2];
-	m_splittab_bg_x = &m_textram[0x0fc0/2];
-}
-
 DRIVER_INIT_MEMBER(segas1x_bootleg_state,astormbl)
 {
 	uint8_t *RAM =  memregion("soundcpu")->base();
@@ -3872,6 +3899,25 @@ DRIVER_INIT_MEMBER(segas1x_bootleg_state,astormbl)
 	m_spritebank_type = 1;
 	m_splittab_fg_x = &m_textram[0x0f80/2];
 	m_splittab_bg_x = &m_textram[0x0fc0/2];
+}
+
+DRIVER_INIT_MEMBER(segas1x_bootleg_state, sys18bl_oki)
+{
+	DRIVER_INIT_CALL(common);
+
+	m_spritebank_type = 1;
+	m_splittab_fg_x = &m_textram[0x0f80/2];
+	m_splittab_bg_x = &m_textram[0x0fc0/2];
+
+	membank("okibank")->configure_entries(0, 8, memregion("oki")->base() + 0x30000, 0x10000);
+}
+
+DRIVER_INIT_MEMBER(segas1x_bootleg_state, astormb2)
+{
+	DRIVER_INIT_CALL(sys18bl_oki);
+
+	m_maincpu->space(AS_PROGRAM).unmap_write(0xa00006, 0xa00007);
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa00006, 0xa00007, write8_delegate(FUNC(generic_latch_8_device::write), (generic_latch_8_device*)m_soundlatch), 0x00ff);
 }
 
 /*************************************
@@ -3906,8 +3952,8 @@ GAME( 1991, iqpipe,      0,         beautyb,       tetris,   segas1x_bootleg_sta
 
 /* System 18 bootlegs */
 GAME( 1990, astormbl,    astorm,    astormbl,      astormbl, segas1x_bootleg_state,  astormbl,   ROT0,   "bootleg", "Alien Storm (bootleg, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1990, astormb2,    astorm,    astormbl,      astormbl, segas1x_bootleg_state,  astormbl,   ROT0,   "bootleg", "Alien Storm (bootleg, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
-GAME( 1990, mwalkbl,     mwalk,     mwalkbl,       mwalkbl,  segas1x_bootleg_state,  mwalkbl,    ROT0,   "bootleg", "Michael Jackson's Moonwalker (bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1990, astormb2,    astorm,    astormb2,      astormbl, segas1x_bootleg_state,  astormb2,   ROT0,   "bootleg", "Alien Storm (bootleg, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1990, mwalkbl,     mwalk,     mwalkbl,       mwalkbl,  segas1x_bootleg_state,  sys18bl_oki,ROT0,   "bootleg", "Michael Jackson's Moonwalker (bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1989, shdancbl,    shdancer,  shdancbl,      shdancbl, segas1x_bootleg_state,  shdancbl,   ROT0,   "bootleg", "Shadow Dancer (bootleg, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1989, shdancbla,   shdancer,  shdancbla,     shdancbl, segas1x_bootleg_state,  shdancbl,   ROT0,   "bootleg", "Shadow Dancer (bootleg, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME( 1990, ddcrewbl,    ddcrew,    ddcrewbl,      ddcrewbl, segas1x_bootleg_state,  ddcrewbl,   ROT0,   "bootleg", "D. D. Crew (bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )

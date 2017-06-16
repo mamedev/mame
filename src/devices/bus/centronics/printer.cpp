@@ -11,12 +11,6 @@
 DEFINE_DEVICE_TYPE(CENTRONICS_PRINTER, centronics_printer_device, "centronics_printer", "Centronics Printer")
 
 
-static MACHINE_CONFIG_START( centronics_printer )
-	MCFG_DEVICE_ADD("printer", PRINTER, 0)
-	MCFG_PRINTER_ONLINE_CB(WRITELINE(centronics_printer_device, printer_online))
-MACHINE_CONFIG_END
-
-
 /***************************************************************************
     IMPLEMENTATION
 ***************************************************************************/
@@ -34,14 +28,14 @@ centronics_printer_device::centronics_printer_device(const machine_config &mconf
 {
 }
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor centronics_printer_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( centronics_printer );
-}
+
+MACHINE_CONFIG_MEMBER( centronics_printer_device::device_add_mconfig )
+	MCFG_DEVICE_ADD("printer", PRINTER, 0)
+	MCFG_PRINTER_ONLINE_CB(WRITELINE(centronics_printer_device, printer_online))
+MACHINE_CONFIG_END
 
 /*-------------------------------------------------
     printer_online - callback that

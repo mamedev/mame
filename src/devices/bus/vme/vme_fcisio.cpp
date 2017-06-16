@@ -174,102 +174,6 @@ static ADDRESS_MAP_START (fcisio1_mem, AS_PROGRAM, 16, vme_fcisio1_card_device)
 //  AM_RANGE (0xc40000, 0xc800ff) AM_READWRITE8 (not_implemented_r, not_implemented_w, 0xffff)  /* Dummy mapping af address area to display message */
 ADDRESS_MAP_END
 
-/*
- * Machine configuration
- */
-static MACHINE_CONFIG_START (fcisio1)
-	/* basic machine hardware */
-	MCFG_CPU_ADD ("maincpu", M68010, CPU_CLOCK / 2)
-	MCFG_CPU_PROGRAM_MAP (fcisio1_mem)
-
-	/* DUSCC channels */
-#define RS232P1_TAG      "rs232p1"
-#define RS232P2_TAG      "rs232p2"
-#define RS232P3_TAG      "rs232p3"
-#define RS232P4_TAG      "rs232p4"
-#define RS232P5_TAG      "rs232p5"
-#define RS232P6_TAG      "rs232p6"
-#define RS232P7_TAG      "rs232p7"
-#define RS232P8_TAG      "rs232p8"
-
-	MCFG_DUSCC68562_ADD("duscc0", DUSCC_CLOCK, 0, 0, 0, 0 )
-	/* Port 1 on DUSCC 0 Port A */
-	MCFG_DUSCC_OUT_TXDA_CB(DEVWRITELINE(RS232P1_TAG, rs232_port_device, write_txd))
-	MCFG_DUSCC_OUT_DTRA_CB(DEVWRITELINE(RS232P1_TAG, rs232_port_device, write_dtr))
-	MCFG_DUSCC_OUT_RTSA_CB(DEVWRITELINE(RS232P1_TAG, rs232_port_device, write_rts))
-	/* Port 2 on DUSCC 0 Port B */
-	MCFG_DUSCC_OUT_TXDB_CB(DEVWRITELINE(RS232P2_TAG, rs232_port_device, write_txd))
-	MCFG_DUSCC_OUT_DTRB_CB(DEVWRITELINE(RS232P2_TAG, rs232_port_device, write_dtr))
-	MCFG_DUSCC_OUT_RTSB_CB(DEVWRITELINE(RS232P2_TAG, rs232_port_device, write_rts))
-	/* RS232 for DUSCC 0 */
-	MCFG_RS232_PORT_ADD (RS232P1_TAG, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("duscc0", duscc68562_device, rxa_w))
-	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("duscc0", duscc68562_device, ctsa_w))
-
-	MCFG_RS232_PORT_ADD (RS232P2_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("duscc0", duscc68562_device, rxb_w))
-	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("duscc0", duscc68562_device, ctsb_w))
-
-	MCFG_DUSCC68562_ADD("duscc1", DUSCC_CLOCK, 0, 0, 0, 0 )
-	/* Port 3 on DUSCC 1 Port A */
-	MCFG_DUSCC_OUT_TXDA_CB(DEVWRITELINE(RS232P3_TAG, rs232_port_device, write_txd))
-	MCFG_DUSCC_OUT_DTRA_CB(DEVWRITELINE(RS232P3_TAG, rs232_port_device, write_dtr))
-	MCFG_DUSCC_OUT_RTSA_CB(DEVWRITELINE(RS232P3_TAG, rs232_port_device, write_rts))
-	/* Port 4 on DUSCC 1 Port B */
-	MCFG_DUSCC_OUT_TXDB_CB(DEVWRITELINE(RS232P4_TAG, rs232_port_device, write_txd))
-	MCFG_DUSCC_OUT_DTRB_CB(DEVWRITELINE(RS232P4_TAG, rs232_port_device, write_dtr))
-	MCFG_DUSCC_OUT_RTSB_CB(DEVWRITELINE(RS232P4_TAG, rs232_port_device, write_rts))
-	/* RS232 for DUSCC 1 */
-	MCFG_RS232_PORT_ADD (RS232P3_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("duscc1", duscc68562_device, rxa_w))
-	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("duscc1", duscc68562_device, ctsa_w))
-
-	MCFG_RS232_PORT_ADD (RS232P4_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("duscc1", duscc68562_device, rxb_w))
-	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("duscc1", duscc68562_device, ctsb_w))
-
-	MCFG_DUSCC68562_ADD("duscc2", DUSCC_CLOCK, 0, 0, 0, 0 )
-	/* Port 5 on DUSCC 2 Port A */
-	MCFG_DUSCC_OUT_TXDA_CB(DEVWRITELINE(RS232P5_TAG, rs232_port_device, write_txd))
-	MCFG_DUSCC_OUT_DTRA_CB(DEVWRITELINE(RS232P5_TAG, rs232_port_device, write_dtr))
-	MCFG_DUSCC_OUT_RTSA_CB(DEVWRITELINE(RS232P5_TAG, rs232_port_device, write_rts))
-	/* Port 6 on DUSCC 2 Port B */
-	MCFG_DUSCC_OUT_TXDB_CB(DEVWRITELINE(RS232P6_TAG, rs232_port_device, write_txd))
-	MCFG_DUSCC_OUT_DTRB_CB(DEVWRITELINE(RS232P6_TAG, rs232_port_device, write_dtr))
-	MCFG_DUSCC_OUT_RTSB_CB(DEVWRITELINE(RS232P6_TAG, rs232_port_device, write_rts))
-	/* RS232 for DUSCC 2 */
-	MCFG_RS232_PORT_ADD (RS232P5_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("duscc2", duscc68562_device, rxa_w))
-	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("duscc2", duscc68562_device, ctsa_w))
-
-	MCFG_RS232_PORT_ADD (RS232P6_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("duscc2", duscc68562_device, rxb_w))
-	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("duscc2", duscc68562_device, ctsb_w))
-
-	MCFG_DUSCC68562_ADD("duscc3", DUSCC_CLOCK, 0, 0, 0, 0 )
-	/* Port 7 on DUSCC 3 Port A */
-	MCFG_DUSCC_OUT_TXDA_CB(DEVWRITELINE(RS232P7_TAG, rs232_port_device, write_txd))
-	MCFG_DUSCC_OUT_DTRA_CB(DEVWRITELINE(RS232P7_TAG, rs232_port_device, write_dtr))
-	MCFG_DUSCC_OUT_RTSA_CB(DEVWRITELINE(RS232P7_TAG, rs232_port_device, write_rts))
-	/* Port 8 on DUSCC 3 Port B */
-	MCFG_DUSCC_OUT_TXDB_CB(DEVWRITELINE(RS232P8_TAG, rs232_port_device, write_txd))
-	MCFG_DUSCC_OUT_DTRB_CB(DEVWRITELINE(RS232P8_TAG, rs232_port_device, write_dtr))
-	MCFG_DUSCC_OUT_RTSB_CB(DEVWRITELINE(RS232P8_TAG, rs232_port_device, write_rts))
-	/* RS232 for DUSCC 4 */
-	MCFG_RS232_PORT_ADD (RS232P7_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("duscc3", duscc68562_device, rxa_w))
-	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("duscc3", duscc68562_device, ctsa_w))
-
-	MCFG_RS232_PORT_ADD (RS232P8_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("duscc3", duscc68562_device, rxb_w))
-	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("duscc3", duscc68562_device, ctsb_w))
-
-	MCFG_DEVICE_ADD ("pit", PIT68230, XTAL_20MHz / 2)
-	MCFG_PIT68230_PB_INPUT_CB(READ8(vme_fcisio1_card_device, config_rd))
-
-	MCFG_MC68153_ADD("bim", XTAL_20MHz / 2)
-MACHINE_CONFIG_END
-
 /* ROM definitions */
 ROM_START (fcisio1)
 	ROM_REGION (0x1000000, "maincpu", 0)
@@ -370,11 +274,98 @@ ROM_START (fcisio1)
 	ROM_LOAD16_BYTE ("ISIO-1_V2.1_U.BIN", 0xf00000, 0x4000, CRC (67986768) SHA1 (215f7ff90d9dbe2bea54510e3722fb33d4e54193))
 ROM_END
 
-machine_config_constructor vme_fcisio1_card_device::device_mconfig_additions() const
-{
-	LOG("%s %s\n", tag(), FUNCNAME);
-	return MACHINE_CONFIG_NAME( fcisio1 );
-}
+MACHINE_CONFIG_MEMBER (vme_fcisio1_card_device::device_add_mconfig)
+	/* basic machine hardware */
+	MCFG_CPU_ADD ("maincpu", M68010, CPU_CLOCK / 2)
+	MCFG_CPU_PROGRAM_MAP (fcisio1_mem)
+
+	/* DUSCC channels */
+#define RS232P1_TAG      "rs232p1"
+#define RS232P2_TAG      "rs232p2"
+#define RS232P3_TAG      "rs232p3"
+#define RS232P4_TAG      "rs232p4"
+#define RS232P5_TAG      "rs232p5"
+#define RS232P6_TAG      "rs232p6"
+#define RS232P7_TAG      "rs232p7"
+#define RS232P8_TAG      "rs232p8"
+
+	MCFG_DUSCC68562_ADD("duscc0", DUSCC_CLOCK, 0, 0, 0, 0 )
+	/* Port 1 on DUSCC 0 Port A */
+	MCFG_DUSCC_OUT_TXDA_CB(DEVWRITELINE(RS232P1_TAG, rs232_port_device, write_txd))
+	MCFG_DUSCC_OUT_DTRA_CB(DEVWRITELINE(RS232P1_TAG, rs232_port_device, write_dtr))
+	MCFG_DUSCC_OUT_RTSA_CB(DEVWRITELINE(RS232P1_TAG, rs232_port_device, write_rts))
+	/* Port 2 on DUSCC 0 Port B */
+	MCFG_DUSCC_OUT_TXDB_CB(DEVWRITELINE(RS232P2_TAG, rs232_port_device, write_txd))
+	MCFG_DUSCC_OUT_DTRB_CB(DEVWRITELINE(RS232P2_TAG, rs232_port_device, write_dtr))
+	MCFG_DUSCC_OUT_RTSB_CB(DEVWRITELINE(RS232P2_TAG, rs232_port_device, write_rts))
+	/* RS232 for DUSCC 0 */
+	MCFG_RS232_PORT_ADD (RS232P1_TAG, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("duscc0", duscc68562_device, rxa_w))
+	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("duscc0", duscc68562_device, ctsa_w))
+
+	MCFG_RS232_PORT_ADD (RS232P2_TAG, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("duscc0", duscc68562_device, rxb_w))
+	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("duscc0", duscc68562_device, ctsb_w))
+
+	MCFG_DUSCC68562_ADD("duscc1", DUSCC_CLOCK, 0, 0, 0, 0 )
+	/* Port 3 on DUSCC 1 Port A */
+	MCFG_DUSCC_OUT_TXDA_CB(DEVWRITELINE(RS232P3_TAG, rs232_port_device, write_txd))
+	MCFG_DUSCC_OUT_DTRA_CB(DEVWRITELINE(RS232P3_TAG, rs232_port_device, write_dtr))
+	MCFG_DUSCC_OUT_RTSA_CB(DEVWRITELINE(RS232P3_TAG, rs232_port_device, write_rts))
+	/* Port 4 on DUSCC 1 Port B */
+	MCFG_DUSCC_OUT_TXDB_CB(DEVWRITELINE(RS232P4_TAG, rs232_port_device, write_txd))
+	MCFG_DUSCC_OUT_DTRB_CB(DEVWRITELINE(RS232P4_TAG, rs232_port_device, write_dtr))
+	MCFG_DUSCC_OUT_RTSB_CB(DEVWRITELINE(RS232P4_TAG, rs232_port_device, write_rts))
+	/* RS232 for DUSCC 1 */
+	MCFG_RS232_PORT_ADD (RS232P3_TAG, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("duscc1", duscc68562_device, rxa_w))
+	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("duscc1", duscc68562_device, ctsa_w))
+
+	MCFG_RS232_PORT_ADD (RS232P4_TAG, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("duscc1", duscc68562_device, rxb_w))
+	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("duscc1", duscc68562_device, ctsb_w))
+
+	MCFG_DUSCC68562_ADD("duscc2", DUSCC_CLOCK, 0, 0, 0, 0 )
+	/* Port 5 on DUSCC 2 Port A */
+	MCFG_DUSCC_OUT_TXDA_CB(DEVWRITELINE(RS232P5_TAG, rs232_port_device, write_txd))
+	MCFG_DUSCC_OUT_DTRA_CB(DEVWRITELINE(RS232P5_TAG, rs232_port_device, write_dtr))
+	MCFG_DUSCC_OUT_RTSA_CB(DEVWRITELINE(RS232P5_TAG, rs232_port_device, write_rts))
+	/* Port 6 on DUSCC 2 Port B */
+	MCFG_DUSCC_OUT_TXDB_CB(DEVWRITELINE(RS232P6_TAG, rs232_port_device, write_txd))
+	MCFG_DUSCC_OUT_DTRB_CB(DEVWRITELINE(RS232P6_TAG, rs232_port_device, write_dtr))
+	MCFG_DUSCC_OUT_RTSB_CB(DEVWRITELINE(RS232P6_TAG, rs232_port_device, write_rts))
+	/* RS232 for DUSCC 2 */
+	MCFG_RS232_PORT_ADD (RS232P5_TAG, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("duscc2", duscc68562_device, rxa_w))
+	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("duscc2", duscc68562_device, ctsa_w))
+
+	MCFG_RS232_PORT_ADD (RS232P6_TAG, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("duscc2", duscc68562_device, rxb_w))
+	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("duscc2", duscc68562_device, ctsb_w))
+
+	MCFG_DUSCC68562_ADD("duscc3", DUSCC_CLOCK, 0, 0, 0, 0 )
+	/* Port 7 on DUSCC 3 Port A */
+	MCFG_DUSCC_OUT_TXDA_CB(DEVWRITELINE(RS232P7_TAG, rs232_port_device, write_txd))
+	MCFG_DUSCC_OUT_DTRA_CB(DEVWRITELINE(RS232P7_TAG, rs232_port_device, write_dtr))
+	MCFG_DUSCC_OUT_RTSA_CB(DEVWRITELINE(RS232P7_TAG, rs232_port_device, write_rts))
+	/* Port 8 on DUSCC 3 Port B */
+	MCFG_DUSCC_OUT_TXDB_CB(DEVWRITELINE(RS232P8_TAG, rs232_port_device, write_txd))
+	MCFG_DUSCC_OUT_DTRB_CB(DEVWRITELINE(RS232P8_TAG, rs232_port_device, write_dtr))
+	MCFG_DUSCC_OUT_RTSB_CB(DEVWRITELINE(RS232P8_TAG, rs232_port_device, write_rts))
+	/* RS232 for DUSCC 4 */
+	MCFG_RS232_PORT_ADD (RS232P7_TAG, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("duscc3", duscc68562_device, rxa_w))
+	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("duscc3", duscc68562_device, ctsa_w))
+
+	MCFG_RS232_PORT_ADD (RS232P8_TAG, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("duscc3", duscc68562_device, rxb_w))
+	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("duscc3", duscc68562_device, ctsb_w))
+
+	MCFG_DEVICE_ADD ("pit", PIT68230, XTAL_20MHz / 2)
+	MCFG_PIT68230_PB_INPUT_CB(READ8(vme_fcisio1_card_device, config_rd))
+
+	MCFG_MC68153_ADD("bim", XTAL_20MHz / 2)
+MACHINE_CONFIG_END
 
 const tiny_rom_entry *vme_fcisio1_card_device::device_rom_region() const
 {

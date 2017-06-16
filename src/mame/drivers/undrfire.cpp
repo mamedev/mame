@@ -194,6 +194,7 @@ Board contains only 29 ROMs and not much else.
 
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"
+#include "machine/taitoio.h"
 #include "machine/watchdog.h"
 #include "sound/es5506.h"
 #include "screen.h"
@@ -222,63 +223,17 @@ void undrfire_state::device_timer(emu_timer &timer, device_timer_id id, int para
             GAME INPUTS
 **********************************************************/
 
-CUSTOM_INPUT_MEMBER(undrfire_state::frame_counter_r)
+READ_LINE_MEMBER(undrfire_state::frame_counter_r)
 {
 	return m_frame_counter;
 }
 
-READ32_MEMBER(undrfire_state::undrfire_input_r)
+WRITE8_MEMBER(undrfire_state::coin_word_w)
 {
-	switch (offset)
-	{
-		case 0x00:
-		{
-			return ioport("INPUTS")->read();
-		}
-
-		case 0x01:
-		{
-			return ioport("SYSTEM")->read() | (m_coin_word << 16);
-		}
-	}
-
-	return 0xffffffff;
-}
-
-WRITE32_MEMBER(undrfire_state::undrfire_input_w)
-{
-	switch (offset)
-	{
-		case 0x00:
-		{
-			if (ACCESSING_BITS_24_31)   /* $500000 is watchdog */
-			{
-				m_watchdog->watchdog_reset();
-			}
-
-			if (ACCESSING_BITS_0_7)
-			{
-				m_eeprom->clk_write((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
-				m_eeprom->di_write((data & 0x40) >> 6);
-				m_eeprom->cs_write((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
-				return;
-			}
-
-			return;
-		}
-
-		case 0x01:
-		{
-			if (ACCESSING_BITS_24_31)
-			{
-				machine().bookkeeping().coin_lockout_w(0,~data & 0x01000000);
-				machine().bookkeeping().coin_lockout_w(1,~data & 0x02000000);
-				machine().bookkeeping().coin_counter_w(0, data & 0x04000000);
-				machine().bookkeeping().coin_counter_w(1, data & 0x08000000);
-				m_coin_word = (data >> 16) &0xffff;
-			}
-		}
-	}
+	machine().bookkeeping().coin_lockout_w(0,~data & 0x01);
+	machine().bookkeeping().coin_lockout_w(1,~data & 0x02);
+	machine().bookkeeping().coin_counter_w(0, data & 0x04);
+	machine().bookkeeping().coin_counter_w(1, data & 0x08);
 }
 
 
@@ -451,9 +406,9 @@ static ADDRESS_MAP_START( undrfire_map, AS_PROGRAM, 32, undrfire_state )
 //  AM_RANGE(0x304000, 0x304003) AM_RAM // debugging - doesn't change ???
 //  AM_RANGE(0x304400, 0x304403) AM_RAM // debugging - doesn't change ???
 	AM_RANGE(0x400000, 0x400003) AM_WRITE(motor_control_w)      /* gun vibration */
-	AM_RANGE(0x500000, 0x500007) AM_READWRITE(undrfire_input_r, undrfire_input_w)       /* eerom etc. */
+	AM_RANGE(0x500000, 0x500007) AM_DEVREADWRITE8("tc0510nio", tc0510nio_device, read, write, 0xffffffff)
 	AM_RANGE(0x600000, 0x600007) AM_READWRITE(unknown_hardware_r, unknown_int_req_w)    /* int request for unknown hardware */
-	AM_RANGE(0x700000, 0x7007ff) AM_RAM AM_SHARE("snd_shared")
+	AM_RANGE(0x700000, 0x7007ff) AM_DEVREADWRITE8("taito_en:dpram", mb8421_device, left_r, left_w, 0xffffffff)
 	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, long_r, long_w)        /* tilemaps */
 	AM_RANGE(0x830000, 0x83002f) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, ctrl_long_r, ctrl_long_w)
 	AM_RANGE(0x900000, 0x90ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, long_r, long_w)        /* 6bpp tilemaps */
@@ -470,9 +425,9 @@ static ADDRESS_MAP_START( cbombers_cpua_map, AS_PROGRAM, 32, undrfire_state )
 	AM_RANGE(0x200000, 0x21ffff) AM_RAM
 	AM_RANGE(0x300000, 0x303fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x400000, 0x400003) AM_WRITE(cbombers_cpua_ctrl_w)
-	AM_RANGE(0x500000, 0x500007) AM_READWRITE(undrfire_input_r, undrfire_input_w)
+	AM_RANGE(0x500000, 0x500007) AM_DEVREADWRITE8("tc0510nio", tc0510nio_device, read, write, 0xffffffff)
 	AM_RANGE(0x600000, 0x600007) AM_READ(cbombers_adc_r) AM_WRITE8(cbombers_adc_w,0xffffffff)
-	AM_RANGE(0x700000, 0x7007ff) AM_RAM AM_SHARE("snd_shared")
+	AM_RANGE(0x700000, 0x7007ff) AM_DEVREADWRITE8("taito_en:dpram", mb8421_device, left_r, left_w, 0xffffffff)
 	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, long_r, long_w)        /* tilemaps */
 	AM_RANGE(0x830000, 0x83002f) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, ctrl_long_r, ctrl_long_w)
 	AM_RANGE(0x900000, 0x90ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, long_r, long_w)        /* 6bpp tilemaps */
@@ -498,40 +453,35 @@ ADDRESS_MAP_END
 ***********************************************************/
 
 static INPUT_PORTS_START( undrfire )
-	PORT_START("INPUTS")
-	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, undrfire_state,frame_counter_r, nullptr)   /* Frame counter */
-	PORT_BIT( 0x00000002, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x00000004, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x00000020, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x00000040, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read) /* reserved for EEROM */
-	PORT_BIT( 0x00000100, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x00000200, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x00000400, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x00000800, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x00001000, IP_ACTIVE_LOW,  IPT_START1 )
-	PORT_BIT( 0x00002000, IP_ACTIVE_LOW,  IPT_START2 )
-	PORT_BIT( 0x00004000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x00008000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_START("INPUTS0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
-	PORT_BIT( 0x00010000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x00020000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x00040000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x00080000, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1)  /* ? where is freeze input */
-	PORT_BIT( 0x00100000, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x00200000, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x00400000, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x00800000, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x01000000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x02000000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x04000000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x08000000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x10000000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x20000000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x40000000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x80000000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_START("INPUTS1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1)  /* ? where is freeze input */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_PLAYER(2)
+
+	PORT_START("INPUTS2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_START1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_START2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
 	PORT_START("SYSTEM")
 	PORT_SERVICE_NO_TOGGLE(0x01, IP_ACTIVE_LOW)
@@ -566,40 +516,35 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( cbombers )
-	PORT_START("INPUTS")
-	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, undrfire_state,frame_counter_r, nullptr)   /* Frame counter */
-	PORT_BIT( 0x00000002, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x00000004, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x00000020, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x00000040, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read) /* reserved for EEROM */
-	PORT_BIT( 0x00000100, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x00000200, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x00000400, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x00000800, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x00001000, IP_ACTIVE_LOW,  IPT_START1 )
-	PORT_BIT( 0x00002000, IP_ACTIVE_LOW,  IPT_START2 )
-	PORT_BIT( 0x00004000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x00008000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_START("INPUTS0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_BUTTON4 ) PORT_NAME("Gear Shift") PORT_TOGGLE
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_BUTTON3 ) PORT_NAME("Nitro")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_NAME("Accelerator")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_NAME("Brake")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
-	PORT_BIT( 0x00010000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x00020000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x00040000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x00080000, IP_ACTIVE_HIGH, IPT_BUTTON5 ) /* ? where is freeze input */
-	PORT_BIT( 0x00100000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x00200000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x00400000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x00800000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x01000000, IP_ACTIVE_LOW,  IPT_BUTTON4 ) PORT_NAME("Gear Shift") PORT_TOGGLE
-	PORT_BIT( 0x02000000, IP_ACTIVE_LOW,  IPT_BUTTON3 ) PORT_NAME("Nitro")
-	PORT_BIT( 0x04000000, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_NAME("Accelerator")
-	PORT_BIT( 0x08000000, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_NAME("Brake")
-	PORT_BIT( 0x10000000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x20000000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x40000000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x80000000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_START("INPUTS1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON5 ) /* ? where is freeze input */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+
+	PORT_START("INPUTS2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_START1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_START2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
 	PORT_START("SYSTEM")
 	PORT_SERVICE_NO_TOGGLE(0x01, IP_ACTIVE_LOW)
@@ -685,7 +630,17 @@ static MACHINE_CONFIG_START( undrfire )
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	MCFG_DEVICE_ADD("tc0510nio", TC0510NIO, 0)
+	MCFG_TC0510NIO_READ_0_CB(IOPORT("INPUTS0"))
+	MCFG_TC0510NIO_READ_1_CB(IOPORT("INPUTS1"))
+	MCFG_TC0510NIO_READ_2_CB(IOPORT("INPUTS2"))
+	MCFG_TC0510NIO_READ_3_CB(DEVREADLINE("eeprom", eeprom_serial_93cxx_device, do_read)) MCFG_DEVCB_BIT(7)
+	MCFG_DEVCB_CHAIN_INPUT(READLINE(undrfire_state, frame_counter_r)) MCFG_DEVCB_BIT(0)
+	MCFG_TC0510NIO_WRITE_3_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write)) MCFG_DEVCB_BIT(5)
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, di_write)) MCFG_DEVCB_BIT(6)
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write)) MCFG_DEVCB_BIT(4)
+	MCFG_TC0510NIO_WRITE_4_CB(WRITE8(undrfire_state, coin_word_w))
+	MCFG_TC0510NIO_READ_7_CB(IOPORT("SYSTEM"))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -734,7 +689,17 @@ static MACHINE_CONFIG_START( cbombers )
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	MCFG_DEVICE_ADD("tc0510nio", TC0510NIO, 0)
+	MCFG_TC0510NIO_READ_0_CB(IOPORT("INPUTS0"))
+	MCFG_TC0510NIO_READ_1_CB(IOPORT("INPUTS1"))
+	MCFG_TC0510NIO_READ_2_CB(IOPORT("INPUTS2"))
+	MCFG_TC0510NIO_READ_3_CB(DEVREADLINE("eeprom", eeprom_serial_93cxx_device, do_read)) MCFG_DEVCB_BIT(7)
+	MCFG_DEVCB_CHAIN_INPUT(READLINE(undrfire_state, frame_counter_r)) MCFG_DEVCB_BIT(0)
+	MCFG_TC0510NIO_WRITE_3_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write)) MCFG_DEVCB_BIT(5)
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, di_write)) MCFG_DEVCB_BIT(6)
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write)) MCFG_DEVCB_BIT(4)
+	MCFG_TC0510NIO_WRITE_4_CB(WRITE8(undrfire_state, coin_word_w))
+	MCFG_TC0510NIO_READ_7_CB(IOPORT("SYSTEM"))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1161,6 +1126,6 @@ DRIVER_INIT_MEMBER(undrfire_state,cbombers)
 GAME( 1993, undrfire,  0,        undrfire, undrfire, undrfire_state, undrfire, ROT0, "Taito Corporation Japan",   "Under Fire (World)",              0 )
 GAME( 1993, undrfireu, undrfire, undrfire, undrfire, undrfire_state, undrfire, ROT0, "Taito America Corporation", "Under Fire (US)",                 0 )
 GAME( 1993, undrfirej, undrfire, undrfire, undrfire, undrfire_state, undrfire, ROT0, "Taito Corporation",         "Under Fire (Japan)",              0 )
-GAMEL(1994, cbombers,  0,        cbombers, cbombers, undrfire_state, cbombers, ROT0, "Taito Corporation Japan",   "Chase Bombers (World)",           MACHINE_IMPERFECT_GRAPHICS, layout_cbombers )
-GAMEL(1994, cbombersj, cbombers, cbombers, cbombers, undrfire_state, cbombers, ROT0, "Taito Corporation",         "Chase Bombers (Japan)",           MACHINE_IMPERFECT_GRAPHICS, layout_cbombers )
-GAMEL(1994, cbombersp, cbombers, cbombers, cbombers, undrfire_state, cbombers, ROT0, "Taito Corporation",         "Chase Bombers (Japan Prototype)", MACHINE_IMPERFECT_GRAPHICS, layout_cbombers )
+GAMEL(1994, cbombers,  0,        cbombers, cbombers, undrfire_state, cbombers, ROT0, "Taito Corporation Japan",   "Chase Bombers (World)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_cbombers )
+GAMEL(1994, cbombersj, cbombers, cbombers, cbombers, undrfire_state, cbombers, ROT0, "Taito Corporation",         "Chase Bombers (Japan)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_cbombers )
+GAMEL(1994, cbombersp, cbombers, cbombers, cbombers, undrfire_state, cbombers, ROT0, "Taito Corporation",         "Chase Bombers (Japan Prototype)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_cbombers )

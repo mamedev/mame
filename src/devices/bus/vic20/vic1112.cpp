@@ -94,10 +94,10 @@ WRITE_LINE_MEMBER( vic1112_device::via1_irq_w )
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( vic1112 )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( vic1112 )
+MACHINE_CONFIG_MEMBER( vic1112_device::device_add_mconfig )
 	MCFG_DEVICE_ADD(M6522_0_TAG, VIA6522, 0)
 	MCFG_VIA6522_READPB_HANDLER(READ8(vic1112_device, via0_pb_r))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(vic1112_device, via0_pb_w))
@@ -113,17 +113,6 @@ static MACHINE_CONFIG_START( vic1112 )
 	MCFG_CBM_IEEE488_ADD(nullptr)
 	MCFG_IEEE488_SRQ_CALLBACK(DEVWRITELINE(M6522_1_TAG, via6522_device, write_cb1))
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor vic1112_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( vic1112 );
-}
 
 
 

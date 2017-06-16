@@ -3889,7 +3889,7 @@ GAME( 1996, myangel,   0,        myangel,  myangel,  seta2_state, 0,        ROT0
 GAME( 1997, myangel2,  0,        myangel2, myangel2, seta2_state, 0,        ROT0, "MOSS / Namco",          "Kosodate Quiz My Angel 2 (Japan)",             MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, reelquak,  0,        reelquak, reelquak, seta2_state, 0,        ROT0, "<unknown>",             "Reel'N Quake! (Version 1.05)",                 MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 199?, endrichs,  0,        reelquak, endrichs, seta2_state, 0,        ROT0, "E.N.Tiger",             "Endless Riches (Ver 1.20)",                    MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, staraudi,  0,        staraudi, staraudi, seta2_state, staraudi, ROT0, "Namco",                 "Star Audition",                                MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, staraudi,  0,        staraudi, staraudi, seta2_state, staraudi, ROT0, "Namco",                 "Star Audition",                                MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_CAMERA | MACHINE_NODEVICE_PRINTER )
 GAME( 1999, pzlbowl,   0,        pzlbowl,  pzlbowl,  seta2_state, 0,        ROT0, "MOSS / Nihon System",   "Puzzle De Bowling (Japan)",                    MACHINE_NO_COCKTAIL )
 GAME( 2000, penbros,   0,        penbros,  penbros,  seta2_state, 0,        ROT0, "Subsino",               "Penguin Brothers (Japan)",                     MACHINE_NO_COCKTAIL )
 GAME( 2000, penbrosk,  penbros,  penbrosk, penbros,  seta2_state, 0,        ROT0, "bootleg",               "Penguin Brothers (Japan, bootleg)",            MACHINE_NO_COCKTAIL | MACHINE_NOT_WORKING )

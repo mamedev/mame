@@ -22,7 +22,7 @@
 
 namespace bus { namespace ti99 { namespace peb {
 
-class sams_memory_expansion_device : public ti_expansion_card_device
+class sams_memory_expansion_device : public device_t, public device_ti99_peribox_card_interface
 {
 public:
 	sams_memory_expansion_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -32,11 +32,11 @@ public:
 	DECLARE_READ8Z_MEMBER(crureadz) override;
 	DECLARE_WRITE8_MEMBER(cruwrite) override;
 
-	machine_config_constructor device_mconfig_additions() const override;
-
 protected:
 	void device_start() override;
 	void device_reset() override;
+
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	// Console RAM

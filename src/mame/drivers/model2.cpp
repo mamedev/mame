@@ -13,7 +13,6 @@
     - all Model 2B games: FIFO comms looks way wrong, and 3d is mostly missing/incomplete. Games also tends to stalls at some point, culprit might be when i960 tries
       to use a burst type opcode read;
     - Inputs needs device-ification and clean-ups;
-    - Sound comms actually passes thru a 8251-compatible device, hook it up;
     - daytona: runs at half speed in gameplay;
     - desert: several 3d bugs, presumably down to FIFO;
     - dynamcop: stalls at stage select screen;
@@ -584,8 +583,7 @@ CUSTOM_INPUT_MEMBER(model2_state::srallyc_gearbox_r)
 /*
     Rail Chase 2 "Drive I/O BD" documentation
 
-    Controlled by a CPU with undumped program code.
-    Aux board 837-11694, Z80 (4Mhz) with program rom EPR-17895 (undumped)
+    Aux board 837-11694, Z80 (4Mhz) with program rom EPR-17895
 
     commands 0x2* are for device status bits (all of them active low)
 
@@ -4792,7 +4790,7 @@ ROM_START( rchase2 ) /* Rail Chase 2 Revision A, Model 2B. Sega game ID# 833-118
 	ROM_LOAD("mpr-18029.32", 0x0000000, 0x200000, CRC(f6804150) SHA1(ef40c11008c75d04159772ad30f02cdb8c5464f3) )
 	ROM_LOAD("mpr-18030.34", 0x0400000, 0x200000, CRC(1167615d) SHA1(bae0060aec3c15f08342f11df665c05c5703523d) )
 
-	/* Z80 code located on the I/O board type 837-11694. Z80 @ 4Mhz with 8-way DSW & unknown SONY CXD10950 QFP64 chip */
+	/* Z80 code located on the I/O board type 837-11694. Z80 @ 4Mhz with 8-way DSW & SONY CXD1095Q QFP64 chip */
 	ROM_REGION( 0x8000, "iocpu", 0 )
 	ROM_LOAD("epr-17895.ic8", 0x0000, 0x8000, CRC(8fd7003d) SHA1(b8b16e20e3ed07326330ba335ea1e701cc0bec17) )
 ROM_END

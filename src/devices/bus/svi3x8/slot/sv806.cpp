@@ -36,11 +36,10 @@ const tiny_rom_entry *sv806_device::device_rom_region() const
 }
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( sv806 )
+MACHINE_CONFIG_MEMBER( sv806_device::device_add_mconfig )
 	MCFG_SCREEN_ADD_MONOCHROME("80col", RASTER, rgb_t::green())
 	MCFG_SCREEN_RAW_PARAMS((XTAL_12MHz / 6) * 8, 864, 0, 640, 317, 0, 192)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", hd6845_device, screen_update)
@@ -52,11 +51,6 @@ static MACHINE_CONFIG_START( sv806 )
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(sv806_device, crtc_update_row)
 MACHINE_CONFIG_END
-
-machine_config_constructor sv806_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( sv806 );
-}
 
 
 //**************************************************************************

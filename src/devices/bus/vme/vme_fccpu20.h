@@ -24,20 +24,9 @@ DECLARE_DEVICE_TYPE(VME_FCCPU21YB, vme_fccpu21yb_card_device)
 class vme_fccpu20_device :  public device_t, public device_vme_card_interface
 {
 public:
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-
 	// Below are duplicated declarations from src/mame/drivers/fccpu20.cpp
 	DECLARE_READ32_MEMBER (bootvect_r);
 	DECLARE_WRITE32_MEMBER (bootvect_w);
-
-	DECLARE_WRITE_LINE_MEMBER(bim_irq_callback);
-
-	/* PIT callbacks */
-	DECLARE_READ8_MEMBER (pita_r);
-	DECLARE_READ8_MEMBER (pitb_r);
-	DECLARE_READ8_MEMBER (pitc_r);
 
 protected:
 	// PIT port C Board ID bits
@@ -61,12 +50,23 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+
 	uint8_t bim_irq_state;
 	int bim_irq_level;
 
 	emu_timer *m_arbiter_start; // Need a startup delay because it is hooked up to the sense inputs of the PIT
 
 private:
+	DECLARE_WRITE_LINE_MEMBER(bim_irq_callback);
+
+	/* PIT callbacks */
+	DECLARE_READ8_MEMBER (pita_r);
+	DECLARE_READ8_MEMBER (pitb_r);
+	DECLARE_READ8_MEMBER (pitc_r);
+
 	required_device<cpu_device> m_maincpu;
 	required_device<pit68230_device> m_pit;
 	required_device<bim68153_device> m_bim;
@@ -94,6 +94,9 @@ protected:
 	vme_fccpu20_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 		: vme_fccpu20_device(mconfig, type, tag, owner, clock, cpu20)
 	{ }
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 class vme_fccpu21s_card_device : public vme_fccpu20_device
@@ -105,6 +108,9 @@ protected:
 	vme_fccpu21s_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 		: vme_fccpu20_device(mconfig, type, tag, owner, clock, cpu21s)
 	{ }
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 class vme_fccpu21_card_device : public vme_fccpu20_device
@@ -116,6 +122,9 @@ protected:
 	vme_fccpu21_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 		: vme_fccpu20_device(mconfig, type, tag, owner, clock, cpu21)
 	{ }
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 class vme_fccpu21a_card_device : public vme_fccpu20_device
@@ -127,6 +136,9 @@ protected:
 	vme_fccpu21a_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 		: vme_fccpu20_device(mconfig, type, tag, owner, clock, cpu21a)
 	{ }
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 class vme_fccpu21ya_card_device : public vme_fccpu20_device
@@ -138,6 +150,9 @@ protected:
 	vme_fccpu21ya_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 		: vme_fccpu20_device(mconfig, type, tag, owner, clock, cpu21ya)
 	{ }
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 class vme_fccpu21b_card_device : public vme_fccpu20_device
@@ -149,6 +164,9 @@ protected:
 	vme_fccpu21b_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 		: vme_fccpu20_device(mconfig, type, tag, owner, clock, cpu21b)
 	{ }
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 class vme_fccpu21yb_card_device : public vme_fccpu20_device
@@ -160,6 +178,9 @@ protected:
 	vme_fccpu21yb_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 		: vme_fccpu20_device(mconfig, type, tag, owner, clock, cpu21yb)
 	{ }
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 

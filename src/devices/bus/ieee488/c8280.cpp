@@ -286,10 +286,10 @@ FLOPPY_FORMATS_END
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_START( c8280 )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( c8280 )
+MACHINE_CONFIG_MEMBER( c8280_device::device_add_mconfig )
 	MCFG_CPU_ADD(M6502_DOS_TAG, M6502, XTAL_12MHz/8)
 	MCFG_CPU_PROGRAM_MAP(c8280_main_mem)
 
@@ -313,17 +313,6 @@ static MACHINE_CONFIG_START( c8280 )
 	MCFG_FLOPPY_DRIVE_ADD(WD1797_TAG ":0", c8280_floppies, "8dsdd", c8280_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD1797_TAG ":1", c8280_floppies, "8dsdd", c8280_device::floppy_formats)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor c8280_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( c8280 );
-}
 
 
 //-------------------------------------------------

@@ -110,8 +110,7 @@ ADDRESS_MAP_END
 DEFINE_DEVICE_TYPE(M3COMM, m3comm_device, "m3comm", "Model 3 Communication Board")
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
 MACHINE_CONFIG_MEMBER( m3comm_device::device_add_mconfig )

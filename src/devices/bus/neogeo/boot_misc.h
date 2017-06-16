@@ -17,8 +17,6 @@ public:
 	// construction/destruction
 	neogeo_bootleg_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint16_t clock);
 
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
 	// reading and writing
 	virtual void decrypt_all(DECRYPT_ALL_PARAMS) override { }
 	virtual int get_fixed_bank_type() override { return 0; }
@@ -29,6 +27,8 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	required_device<neoboot_prot_device> m_prot;
 };
@@ -152,7 +152,8 @@ public:
 	virtual void decrypt_all(DECRYPT_ALL_PARAMS) override;
 	virtual int get_fixed_bank_type() override { return 0; }
 
-	virtual machine_config_constructor device_mconfig_additions() const override;
+protected:
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	required_device<cmc_prot_device> m_cmc_prot;
@@ -171,10 +172,11 @@ public:
 	virtual void decrypt_all(DECRYPT_ALL_PARAMS) override;
 	virtual int get_fixed_bank_type() override { return 1; }
 
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
 	virtual DECLARE_READ16_MEMBER(protection_r) override { return m_prot->mslug5p_prot_r(space, offset, mem_mask); }
 	virtual uint32_t get_bank_base(uint16_t sel) override { return m_prot->mslug5p_bank_base(sel); }
+
+protected:
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	required_device<cmc_prot_device> m_cmc_prot;

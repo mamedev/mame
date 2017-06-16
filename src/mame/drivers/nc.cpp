@@ -874,7 +874,7 @@ static ADDRESS_MAP_START(nc100_io, AS_IO, 8, nc_state )
 	AM_RANGE(0xb0, 0xb9) AM_READ(nc_key_data_in_r)
 	AM_RANGE(0xc0, 0xc0) AM_DEVREADWRITE("uart",i8251_device, data_r, data_w)
 	AM_RANGE(0xc1, 0xc1) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
-	AM_RANGE(0xd0, 0xdf) AM_DEVREADWRITE("rtc", rp5c01_device, read, write)
+	AM_RANGE(0xd0, 0xdf) AM_DEVREADWRITE("rtc", tc8521_device, read, write)
 ADDRESS_MAP_END
 
 
@@ -1440,7 +1440,7 @@ static MACHINE_CONFIG_START( nc100 )
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(nc_state, write_uart_clock))
 
 	/* rtc */
-	MCFG_DEVICE_ADD("rtc", RP5C01, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD("rtc", TC8521, XTAL_32_768kHz)
 	MCFG_RP5C01_OUT_ALARM_CB(WRITELINE(nc_state, nc100_tc8521_alarm_callback))
 
 	/* cartridge */

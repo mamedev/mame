@@ -40,10 +40,6 @@ public:
 	// construction/destruction
 	fd2000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
 	DECLARE_READ8_MEMBER( via_pa_r );
 	DECLARE_WRITE8_MEMBER( via_pa_w );
 	DECLARE_READ8_MEMBER( via_pb_r );
@@ -52,17 +48,15 @@ public:
 	//DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 protected:
-	enum
-	{
-		TYPE_FD2000,
-		TYPE_FD4000
-	};
-
-	fd2000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant);
+	fd2000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	// device_cbm_iec_interface overrides
 	void cbm_iec_srq(int state) override;
@@ -73,8 +67,6 @@ protected:
 	required_device<m65c02_device> m_maincpu;
 	required_device<upd765_family_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
-
-	int m_variant;
 };
 
 
@@ -85,6 +77,10 @@ class fd4000_device :  public fd2000_device
 public:
 	// construction/destruction
 	fd4000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 

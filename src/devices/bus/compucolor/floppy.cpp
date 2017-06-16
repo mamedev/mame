@@ -47,23 +47,12 @@ SLOT_INTERFACE_END
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( compucolor_floppy )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( compucolor_floppy )
-	MCFG_FLOPPY_DRIVE_ADD("floppy", compucolor_floppies, "525sssd", compucolor_floppy_device::floppy_formats)
+MACHINE_CONFIG_MEMBER( compucolor_floppy_device::device_add_mconfig )
+	MCFG_FLOPPY_DRIVE_ADD_FIXED("floppy", compucolor_floppies, "525sssd", compucolor_floppy_device::floppy_formats)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor compucolor_floppy_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( compucolor_floppy );
-}
 
 
 

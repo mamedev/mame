@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Barry Rodewald
 /*
- * amdrum.c
+ * amdrum.cpp
  *
  *  Created on: 23/08/2014
  */
@@ -20,7 +20,7 @@
 DEFINE_DEVICE_TYPE(CPC_AMDRUM, cpc_amdrum_device, "cpc_amdrum", "Amdrum")
 
 
-static MACHINE_CONFIG_START( cpc_amdrum )
+MACHINE_CONFIG_MEMBER( cpc_amdrum_device::device_add_mconfig )
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
@@ -28,10 +28,6 @@ static MACHINE_CONFIG_START( cpc_amdrum )
 	// no pass-through
 MACHINE_CONFIG_END
 
-machine_config_constructor cpc_amdrum_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( cpc_amdrum );
-}
 
 //**************************************************************************
 //  LIVE DEVICE
