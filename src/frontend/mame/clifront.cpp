@@ -284,7 +284,7 @@ int cli_frontend::execute(std::vector<std::string> &args)
 			// get the top 16 approximate matches
 			driver_enumerator drivlist(m_options);
 			int matches[16];
-			drivlist.find_approximate_matches(m_options.system_name(), ARRAY_LENGTH(matches), matches);
+			drivlist.find_approximate_matches(m_options.attempted_system_name().c_str(), ARRAY_LENGTH(matches), matches);
 
 			// print them out
 			osd_printf_error("\n\"%s\" approximately matches the following\n"
