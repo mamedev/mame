@@ -50,7 +50,7 @@
      1  0  0  1   CR0        W   W   W   W   W   W   W   W
      1  0  1  0   CR1                    W*  W*      W*  W*
      1  0  1  1   CR2                    W*  W*      W*  W*
-     1  1  0  0   CR3                    W*  W*      W*  W*
+     1  1  0  0   CR3                    W*          W*
 
     * CR1-CR3 are only writable in soft mode.
 
@@ -178,7 +178,7 @@ te7750_device::te7750_device(const machine_config &mconfig, const char *tag, dev
 	: device_t(mconfig, TE7750, tag, owner, clock),
 		m_input_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}},
 		m_output_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}},
-		m_ios(*this)
+		m_ios_cb(*this)
 {
 	std::fill(std::begin(m_data_dir), std::end(m_data_dir), 0xff);
 }
@@ -196,7 +196,7 @@ void te7750_device::device_start()
 		cb.resolve_safe();
 
 	// resolve IOS (assume soft mode unless specified)
-	m_ios.resolve_safe(0);
+	m_ios_cb.resolve_safe(0);
 
 	// save state
 	save_item(NAME(m_data_latch));
@@ -241,7 +241,7 @@ void te7750_device::set_port_dir(int port, u8 dir)
 void te7750_device::set_ios()
 {
 	// get state of IOS pins (0 for soft mode, 1-7 for hard mode)
-	u8 ios = m_ios() & 7;
+	u8 ios = m_ios_cb() & 7;
 
 	// P1: always input in hard mode; reset to input in soft mode
 	set_port_dir(0, 0xff);
@@ -305,7 +305,7 @@ WRITE8_MEMBER(te7750_device::write)
 	}
 	else if (offset == 10)
 	{
-		if ((m_ios() & 7) != 0)
+		if ((m_ios_cb() & 7) != 0)
 			logerror("Attempt to write %02X to CR1 in hard mode\n", data);
 		else
 		{
@@ -317,7 +317,7 @@ WRITE8_MEMBER(te7750_device::write)
 	}
 	else if (offset == 11)
 	{
-		if ((m_ios() & 7) != 0)
+		if ((m_ios_cb() & 7) != 0)
 			logerror("Attempt to write %02X to CR2 in hard mode\n", data);
 		else
 		{
@@ -329,7 +329,7 @@ WRITE8_MEMBER(te7750_device::write)
 	}
 	else if (offset == 12)
 	{
-		if ((m_ios() & 7) != 0)
+		if ((m_ios_cb() & 7) != 0)
 			logerror("Attempt to write %02X to CR3 in hard mode\n", data);
 		else
 		{

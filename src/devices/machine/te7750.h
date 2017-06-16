@@ -53,6 +53,9 @@
 #define MCFG_TE7750_OUT_PORT9_CB(_devcb) \
 	devcb = &te7750_device::set_output_cb(*device, 8, DEVCB_##_devcb);
 
+#define MCFG_TE7750_IOS_CB(_devcb) \
+	devcb = &te7750_device::set_ios_cb(*device, DEVCB_##_devcb);
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -67,16 +70,21 @@ public:
 
 	// static configuration
 	template<class Object>
-	static devcb_base &set_input_cb(device_t &device, int p, Object &&obj)
+	static devcb_base &set_input_cb(device_t &device, int port, Object &&obj)
 	{
-		assert(p >= 0 && p < 9);
-		return downcast<te7750_device &>(device).m_input_cb[p].set_callback(std::forward<Object>(obj));
+		assert(port >= 0 && port < 9);
+		return downcast<te7750_device &>(device).m_input_cb[port].set_callback(std::forward<Object>(obj));
 	}
 	template<class Object>
-	static devcb_base &set_output_cb(device_t &device, int p, Object &&obj)
+	static devcb_base &set_output_cb(device_t &device, int port, Object &&obj)
 	{
-		assert(p >= 0 && p < 9);
-		return downcast<te7750_device &>(device).m_output_cb[p].set_callback(std::forward<Object>(obj));
+		assert(port >= 0 && port < 9);
+		return downcast<te7750_device &>(device).m_output_cb[port].set_callback(std::forward<Object>(obj));
+	}
+	template<class Object>
+	static devcb_base &set_ios_cb(device_t &device, Object &&obj)
+	{
+		return downcast<te7750_device &>(device).m_ios_cb.set_callback(std::forward<Object>(obj));
 	}
 
 	// bus-compatible interface
@@ -98,7 +106,7 @@ private:
 	devcb_write8        m_output_cb[9];
 
 	// mode callback
-	devcb_read8         m_ios;
+	devcb_read8         m_ios_cb;
 
 	// internal state
 	u8                  m_data_latch[9];
