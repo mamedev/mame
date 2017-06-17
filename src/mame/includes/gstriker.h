@@ -55,14 +55,10 @@ public:
 	uint16_t m_prot_reg[2];
 
 	// common
-	DECLARE_WRITE8_MEMBER(porth_w);
 	DECLARE_WRITE8_MEMBER(sh_bankswitch_w);
 
 	// vgoalsoc and twrldc
-	DECLARE_WRITE16_MEMBER(twrldc94_mcu_w);
-	DECLARE_READ16_MEMBER(twrldc94_mcu_r);
-	DECLARE_WRITE16_MEMBER(twrldc94_prot_reg_w);
-	DECLARE_READ16_MEMBER(twrldc94_prot_reg_r);
+	DECLARE_WRITE8_MEMBER(twrldc94_prot_reg_w);
 
 	// vgoalsoc only
 	DECLARE_READ16_MEMBER(vbl_toggle_r);

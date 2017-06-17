@@ -187,15 +187,6 @@ void gstriker_state::machine_start()
 	membank("soundbank")->configure_entries(0, 8, memregion("audiocpu")->base(), 0x8000);
 }
 
-/*** MISC READ / WRITE HANDLERS **********************************************/
-
-WRITE8_MEMBER(gstriker_state::porth_w)
-{
-	m_watchdog->write_line_ck(BIT(data, 3));
-
-	// bits 1 and 2 also output by vgoalsoc
-}
-
 /*** SOUND RELATED ***********************************************************/
 
 
@@ -491,7 +482,7 @@ static MACHINE_CONFIG_START( gstriker )
 	MCFG_VS9209_IN_PORTD_CB(IOPORT("DSW1"))
 	MCFG_VS9209_IN_PORTE_CB(IOPORT("DSW2"))
 	MCFG_VS9209_IN_PORTH_CB(DEVREADLINE("soundlatch", generic_latch_8_device, pending_r)) MCFG_DEVCB_BIT(0)
-	MCFG_VS9209_OUT_PORTH_CB(WRITE8(gstriker_state, porth_w))
+	MCFG_VS9209_OUT_PORTH_CB(DEVWRITELINE("watchdog", mb3773_device, write_line_ck)) MCFG_DEVCB_BIT(3)
 
 	MCFG_DEVICE_ADD("watchdog", MB3773, 0)
 
@@ -542,14 +533,14 @@ static MACHINE_CONFIG_DERIVED( twc94, gstriker )
 	MCFG_CPU_REPLACE("maincpu", M68000, 16000000)
 	MCFG_CPU_PROGRAM_MAP(gstriker_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gstriker_state,  irq1_line_hold)
+
+	MCFG_DEVICE_MODIFY("io")
+	MCFG_VS9209_OUT_PORTH_CB(WRITE8(gstriker_state, twrldc94_prot_reg_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("watchdog", mb3773_device, write_line_ck)) MCFG_DEVCB_BIT(3)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( vgoal, gstriker )
-	MCFG_CPU_REPLACE("maincpu", M68000, 16000000)
-	MCFG_CPU_PROGRAM_MAP(gstriker_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gstriker_state,  irq1_line_hold)
-
+static MACHINE_CONFIG_DERIVED( vgoal, twc94 )
 	MCFG_DEVICE_MODIFY("vsystem_spr")
 	MCFG_VSYSTEM_SPR_SET_TRANSPEN(0xf) // different vs. the other games, find register
 MACHINE_CONFIG_END
@@ -801,27 +792,21 @@ m_work_ram[0x000/2] = (_num_ & 0xffff0000) >> 16;\
 m_work_ram[0x002/2] = (_num_ & 0x0000ffff) >> 0;
 
 
-WRITE16_MEMBER(gstriker_state::twrldc94_mcu_w)
-{
-	m_mcu_data = data & 0xff;
-}
-
-READ16_MEMBER(gstriker_state::twrldc94_mcu_r)
-{
-	return m_mcu_data;
-}
-
-WRITE16_MEMBER(gstriker_state::twrldc94_prot_reg_w)
+WRITE8_MEMBER(gstriker_state::twrldc94_prot_reg_w)
 {
 	m_prot_reg[1] = m_prot_reg[0];
-	m_prot_reg[0] = data & 0xff;
+	m_prot_reg[0] = data;
 
-	if( ((m_prot_reg[1] & 2) == 2) && ((m_prot_reg[0] & 2) == 0) )
+	// Command byte is also written to VS9209 port F, which is set for input only.
+	// Does the MCU somehow strobe it out of there?
+	uint8_t mcu_data = m_work_ram[0x00f/2] & 0x00ff;
+
+	if( ((m_prot_reg[1] & 4) == 0) && ((m_prot_reg[0] & 4) == 4) )
 	{
 		switch( m_gametype )
 		{
 			case 1:
-				switch(m_mcu_data)
+				switch (mcu_data)
 				{
 					#define NULL_SUB 0x0000828E
 					case 0x53: PC(0x0000a4c); break; // boot -> main loop
@@ -888,7 +873,7 @@ WRITE16_MEMBER(gstriker_state::twrldc94_prot_reg_w)
 				break;
 
 			case 2:
-				switch(m_mcu_data)
+				switch (mcu_data)
 				{
 					case 0x53: PC(0x00000a5c); break; // POST
 
@@ -901,7 +886,7 @@ WRITE16_MEMBER(gstriker_state::twrldc94_prot_reg_w)
 
 
 			case 3:
-				switch(m_mcu_data)
+				switch (mcu_data)
 				{
 					case 0x33: PC(0x00063416); break; // *after game over, is this right?
 					case 0x3d: PC(0x0006275C); break; // after sprite ram init, team select
@@ -923,15 +908,6 @@ WRITE16_MEMBER(gstriker_state::twrldc94_prot_reg_w)
 	}
 }
 
-READ16_MEMBER(gstriker_state::twrldc94_prot_reg_r)
-{
-	// bit 0 is for debugging vgoalsoc?
-	// Setting it results in a hang with a digit displayed on screen
-	// For twrldc94, it just disables sound.
-
-	return m_prot_reg[0];
-}
-
 /*
     vgoalsoc uses a set of programmable timers.
     There is a code implementation for at 00065F00 that appears to have
@@ -942,6 +918,7 @@ READ16_MEMBER(gstriker_state::twrldc94_prot_reg_r)
     other more complicated functions.
 
     The tick count is usually set to 0x3c => it's driven off vblank?
+    More likely these timers are driven entirely by the MCU.
 */
 //m_work_ram[ (0xffe900 - 0xffc00) ]
 #define COUNTER1_ENABLE m_work_ram[0x2900/2] >> 8
@@ -983,12 +960,6 @@ WRITE16_MEMBER(gstriker_state::vbl_toggle_w)
 void gstriker_state::mcu_init()
 {
 	m_mcu_data = 0;
-
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x20008a, 0x20008b, write16_delegate(FUNC(gstriker_state::twrldc94_mcu_w),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20008a, 0x20008b, read16_delegate(FUNC(gstriker_state::twrldc94_mcu_r),this));
-
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x20008e, 0x20008f, write16_delegate(FUNC(gstriker_state::twrldc94_prot_reg_w),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20008e, 0x20008f, read16_delegate(FUNC(gstriker_state::twrldc94_prot_reg_r),this));
 
 	save_item(NAME(m_mcu_data));
 	save_item(NAME(m_prot_reg));
