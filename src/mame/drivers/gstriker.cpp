@@ -191,7 +191,8 @@ void gstriker_state::machine_start()
 
 WRITE8_MEMBER(gstriker_state::porth_w)
 {
-	// bit 3 changes very frequently
+	m_watchdog->write_line_ck(BIT(data, 3));
+
 	// bits 1 and 2 also output by vgoalsoc
 }
 
@@ -491,6 +492,8 @@ static MACHINE_CONFIG_START( gstriker )
 	MCFG_VS9209_IN_PORTE_CB(IOPORT("DSW2"))
 	MCFG_VS9209_IN_PORTH_CB(DEVREADLINE("soundlatch", generic_latch_8_device, pending_r)) MCFG_DEVCB_BIT(0)
 	MCFG_VS9209_OUT_PORTH_CB(WRITE8(gstriker_state, porth_w))
+
+	MCFG_DEVICE_ADD("watchdog", MB3773, 0)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 //  MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
