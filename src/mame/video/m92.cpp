@@ -52,8 +52,7 @@ void m92_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 	{
 	case TIMER_SPRITEBUFFER:
 		m_sprite_buffer_busy = 1;
-		if (m_game_kludge!=2) /* Major Title 2 doesn't like this interrupt!? */
-			m92_sprite_interrupt();
+		m_upd71059c->ir1_w(1);
 		break;
 	default:
 		assert_always(false, "Unknown id in m92_state::device_timer");
