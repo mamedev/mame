@@ -376,8 +376,8 @@ Game                                            on cart      IC22#   # of SOP44 
 18 Wheeler (deluxe) (Rev A)                     840-0023C    22185A  20 (64Mb)   present     315-6213  317-0273-COM
 18 Wheeler (standard)                           840-0036C    23298   20 (64Mb)   present     315-6213  317-0273-COM
 18 Wheeler (upright)                            840-0037C    23299   20 (64Mb)   present     315-6213  317-0273-COM
-Airline Pilots (deluxe) (Rev B)                 ?            21787B  11 (64Mb)   present     315-6213  317-0251-COM   2 known BIOS 21801 (USA), 21802 (EXP)
-Airline Pilots (Rev A)                          840-0005C    21739A  11 (64Mb)   present     315-6213  317-0251-COM
+Airline Pilots (World, Rev B)                   ?            21787B  11 (64Mb)   present     315-6213  317-0251-COM   2 known BIOS 21801 (USA), 21802 (EXP)
+Airline Pilots (Japan, Rev A)                   840-0005C    21739A  11 (64Mb)   present     315-6213  317-0251-COM
 Cosmic Smash                                    840-0044C    23428    8 (64Mb)   ?           315-6213  317-0289-COM   joystick + 2 buttons
 Cosmic Smash (Rev A)                            840-0044C    23428A   8 (64Mb)   present     315-6213  317-0289-COM   joystick + 2 buttons
 Crazy Taxi                                      840-0002C    21684   13 (64Mb)*  present     315-6213  317-0248-COM   * ic8 and ic9 are not present
@@ -4061,7 +4061,8 @@ ROM_START( f355twn2 )
 	ROM_PARAMETER( ":rom_board:segam2crypt:key", "281666c6" )
 ROM_END
 
-ROM_START( alpiltdx )
+// World version, "Japan Airlines" texts and JAL logos was replaced with fictional "Sega Airlines"
+ROM_START( alpilot )
 	AIRLINE_BIOS
 	NAOMI_DEFAULT_EEPROM_NO_BD
 
@@ -4087,7 +4088,8 @@ ROM_START( alpiltdx )
 	ROM_PARAMETER( ":rom_board:segam2crypt:key", "28070e41" )
 ROM_END
 
-ROM_START( alpilota )
+// original Japan version, shows "in cooperation with JAL" screen, airplanes have Japan Airlines (JAL) texts and specific logos
+ROM_START( alpilotj )
 	NAOMI_BIOS
 	NAOMI_DEFAULT_EEPROM
 
@@ -5699,14 +5701,14 @@ ROM_START( totdo )
 	ROM_LOAD("mpr-23003.ic3",   0x1800000, 0x0800000, CRC(37d6d9f8) SHA1(3ad3fa65f33d250eb8a620e7dc7c6b1209794a80) )
 	ROM_LOAD("mpr-23004.ic4",   0x2000000, 0x0800000, CRC(e41186f2) SHA1(2f4b26d8dba1629db539736cf88ec85c21820aeb) )
 	ROM_LOAD("mpr-23005.ic5",   0x2800000, 0x0800000, CRC(2b8e1fc6) SHA1(a5cd8c5840dd316dd1ad9500804b459476ca8ba0) )
-	ROM_LOAD("mpr-23006.ic6",   0x3000000, 0x0800000, CRC(3de23e27) SHA1(d3aae2a7e5c78fc3bf8e296392d8f893961d946f) ) //on board but actually 0xff filled
+	// IC6 not populated
 	ROM_LOAD("mpr-23007.ic7",   0x3800000, 0x0800000, CRC(ca16cfdf) SHA1(6279bc9bd661bde2d3e36ca52625f9b91867c4b4) )
 	ROM_LOAD("mpr-23008.ic8",   0x4000000, 0x0800000, CRC(8c33191c) SHA1(6227fbb3d51c4301dd1fc60ec43df7c18eef06fa) )
 	ROM_LOAD("mpr-23009.ic9",   0x4800000, 0x0800000, CRC(c982d24d) SHA1(d5a15d04f19f5569709b0b1cde64814230f4f0bb) )
 	ROM_LOAD("mpr-23010.ic10",  0x5000000, 0x0800000, CRC(c6e129b4) SHA1(642a9e1052efcb43d2b809f13d10617b43bd38f3) )
 	ROM_LOAD("mpr-23011.ic11",  0x5800000, 0x0800000, CRC(9e6942ff) SHA1(8c657d7d74c4c9106756a9934bc3c850f5069e29) )
 	ROM_LOAD("mpr-23012.ic12s", 0x6000000, 0x0800000, CRC(20e1ebe8) SHA1(e24cb5f48101e665c90af9be333e54ec274004fb) )
-	ROM_LOAD("mpr-23013.ic13s", 0x6800000, 0x0800000, CRC(3de23e27) SHA1(d3aae2a7e5c78fc3bf8e296392d8f893961d946f) ) //on board but actually 0xff filled
+	// IC13S not populated
 	ROM_LOAD("mpr-23014.ic14s", 0x7000000, 0x0800000, CRC(c4f95fdb) SHA1(8c0e806e27d7bed274dcb20b932897ea8b8bbf86) )
 	ROM_LOAD("mpr-23015.ic15s", 0x7800000, 0x0800000, CRC(5360c49d) SHA1(dbdf955d9bb9a387ded8ada18d26d222d73514d7) )
 	ROM_LOAD("mpr-23016.ic16s", 0x8000000, 0x0800000, CRC(fae2958b) SHA1(2bfe164723b7b2f57ae0c6e2fe348459f00dc460) )
@@ -5714,7 +5716,7 @@ ROM_START( totdo )
 	ROM_LOAD("mpr-23018.ic18s", 0x9000000, 0x0800000, CRC(5a608e74) SHA1(4f2ec47dad71d77ad1b8c640db236332c06d7ab7) )
 	ROM_LOAD("mpr-23019.ic19s", 0x9800000, 0x0800000, CRC(5cc91cc4) SHA1(66a68991f716ec23555784163aa5140b4e44c7ab) )
 	ROM_LOAD("mpr-23020.ic20s", 0xa000000, 0x0800000, CRC(b5943007) SHA1(d0e95084aec5e05027c21a6b4a3331408853781b) )
-	//ic21 not populated
+	// IC21S not populated
 
 	ROM_PARAMETER( ":rom_board:segam2crypt:key", "-1") // 315-5881 not populated
 ROM_END
@@ -5731,14 +5733,14 @@ ROM_START( totd )
 	ROM_LOAD("mpr-23003.ic3",   0x1800000, 0x0800000, CRC(37d6d9f8) SHA1(3ad3fa65f33d250eb8a620e7dc7c6b1209794a80) )
 	ROM_LOAD("mpr-23004.ic4",   0x2000000, 0x0800000, CRC(e41186f2) SHA1(2f4b26d8dba1629db539736cf88ec85c21820aeb) )
 	ROM_LOAD("mpr-23005.ic5",   0x2800000, 0x0800000, CRC(2b8e1fc6) SHA1(a5cd8c5840dd316dd1ad9500804b459476ca8ba0) )
-	ROM_LOAD("mpr-23006.ic6",   0x3000000, 0x0800000, CRC(3de23e27) SHA1(d3aae2a7e5c78fc3bf8e296392d8f893961d946f) ) //on board but actually 0xff filled
+	// IC6 not populated
 	ROM_LOAD("mpr-23007.ic7",   0x3800000, 0x0800000, CRC(ca16cfdf) SHA1(6279bc9bd661bde2d3e36ca52625f9b91867c4b4) )
 	ROM_LOAD("mpr-23008.ic8",   0x4000000, 0x0800000, CRC(8c33191c) SHA1(6227fbb3d51c4301dd1fc60ec43df7c18eef06fa) )
 	ROM_LOAD("mpr-23009.ic9",   0x4800000, 0x0800000, CRC(c982d24d) SHA1(d5a15d04f19f5569709b0b1cde64814230f4f0bb) )
 	ROM_LOAD("mpr-23010.ic10",  0x5000000, 0x0800000, CRC(c6e129b4) SHA1(642a9e1052efcb43d2b809f13d10617b43bd38f3) )
 	ROM_LOAD("mpr-23011.ic11",  0x5800000, 0x0800000, CRC(9e6942ff) SHA1(8c657d7d74c4c9106756a9934bc3c850f5069e29) )
 	ROM_LOAD("mpr-23012.ic12s", 0x6000000, 0x0800000, CRC(20e1ebe8) SHA1(e24cb5f48101e665c90af9be333e54ec274004fb) )
-	ROM_LOAD("mpr-23013.ic13s", 0x6800000, 0x0800000, CRC(3de23e27) SHA1(d3aae2a7e5c78fc3bf8e296392d8f893961d946f) ) //on board but actually 0xff filled
+	// IC13S not populated
 	ROM_LOAD("mpr-23014.ic14s", 0x7000000, 0x0800000, CRC(c4f95fdb) SHA1(8c0e806e27d7bed274dcb20b932897ea8b8bbf86) )
 	ROM_LOAD("mpr-23015.ic15s", 0x7800000, 0x0800000, CRC(5360c49d) SHA1(dbdf955d9bb9a387ded8ada18d26d222d73514d7) )
 	ROM_LOAD("mpr-23016.ic16s", 0x8000000, 0x0800000, CRC(fae2958b) SHA1(2bfe164723b7b2f57ae0c6e2fe348459f00dc460) )
@@ -5746,7 +5748,7 @@ ROM_START( totd )
 	ROM_LOAD("mpr-23018.ic18s", 0x9000000, 0x0800000, CRC(5a608e74) SHA1(4f2ec47dad71d77ad1b8c640db236332c06d7ab7) )
 	ROM_LOAD("mpr-23019.ic19s", 0x9800000, 0x0800000, CRC(5cc91cc4) SHA1(66a68991f716ec23555784163aa5140b4e44c7ab) )
 	ROM_LOAD("mpr-23020.ic20s", 0xa000000, 0x0800000, CRC(b5943007) SHA1(d0e95084aec5e05027c21a6b4a3331408853781b) )
-	//ic21 not populated
+	// IC21s not populated
 
 	ROM_PARAMETER( ":rom_board:segam2crypt:key", "-1") // 315-5881 not populated
 ROM_END
@@ -9940,7 +9942,7 @@ ROM_END
 /* 13842    */ GAME( 1999, f355,     f355dlx,  naomim2, naomi, naomi_state,   0,     ROT0, "Sega", "Ferrari F355 Challenge (deluxe, no link)", GAME_FLAGS ) /* specific BIOS "f355dlx" needed */
 /* 13950    */ GAME( 1999, f355twin, f355bios, naomim2, naomi, naomi_state,   0,     ROT0, "Sega", "Ferrari F355 Challenge (twin/deluxe)", GAME_FLAGS ) /* specific BIOS "f355bios" needed */
 /* none     */ GAME( 2001, f355twn2, f355bios, naomim2, naomi, naomi_state,   0,     ROT0, "Sega", "Ferrari F355 Challenge 2 - International Course Edition (twin/deluxe)", GAME_FLAGS ) /* specific BIOS "f355bios" needed */
-/* ?????    */ GAME( 1999, alpiltdx, airlbios, naomim2, naomi, naomi_state,   0,     ROT0, "Sega", "Airline Pilots (deluxe) (Rev B)", GAME_FLAGS ) /* specific BIOS "airlbios" needed */
+/* ?????    */ GAME( 1999, alpilot,  airlbios, naomim2, naomi, naomi_state,   0,     ROT0, "Sega", "Airline Pilots (World, Rev B)", GAME_FLAGS ) // have "Sega Airlines" texts on airplanes, deluxe/multiboard setup uses specific BIOS "airlbios"
 
 /* 840-xxxxx (Sega Naomi cart games)*/
 /* 0001    */ GAME( 1998, dybbnao,   naomi,    naomim2, dybbnao, naomi_state, naomi,   ROT0, "Sega", "Dynamite Baseball NAOMI (Japan)", GAME_FLAGS )
@@ -9948,7 +9950,7 @@ ROM_END
 /* 0003    */ GAME( 1999, zombrvno,  zombrvn,  naomim2, zombrvn, naomi_state, naomi,   ROT0, "Sega", "Zombie Revenge", GAME_FLAGS )
 /* 0003    */ GAME( 1999, zombrvn,   naomi,    naomim2, zombrvn, naomi_state, naomi,   ROT0, "Sega", "Zombie Revenge (Rev A)", GAME_FLAGS )
 /* 0004    */ GAME( 1999, ringout,   naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Ring Out 4x4", GAME_FLAGS )
-/* 0005    */ GAME( 1999, alpilota,  naomi,    naomim2, alpilota,naomi_state, naomi,   ROT0, "Sega", "Airline Pilots (Rev A)", GAME_FLAGS ) /* specific BIOS "airlbios" needed */
+/* 0005    */ GAME( 1999, alpilotj,  naomi,    naomim2, alpilota,naomi_state, naomi,   ROT0, "Sega", "Airline Pilots (Japan, Rev A)", GAME_FLAGS ) // have "Japan Airlines" (JAL) logos and texts on airplanes, deluxe/multiboard setup uses specific BIOS "airlbios"
 /* 0007    */ GAME( 1999, ggram2,    naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Giant Gram: All Japan Pro Wrestling 2 (Japan)", GAME_FLAGS )
 /* 0008    */ GAME( 1999, tduno,     naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Touch de Uno! / Unou Nouryoku Check Machine (Japan)", GAME_FLAGS )
 /* 0010    */ GAME( 1999, vs2_2k,    naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Virtua Striker 2 Ver. 2000 (Rev C)", GAME_FLAGS )

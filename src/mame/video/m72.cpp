@@ -341,8 +341,12 @@ WRITE16_MEMBER(m72_state::videoram2_w)
 
 WRITE16_MEMBER(m72_state::irq_line_w)
 {
-	COMBINE_DATA(&m_raster_irq_position);
+	// KNA70H015(11): ISET
+	m_raster_irq_position = data & 0x1ff;
 //  printf("m_raster_irq_position %04x\n", m_raster_irq_position);
+
+	// bchopper title screen jumps around, as does ingame at times, if this isn't done here
+	m_upd71059c->ir2_w(0);
 }
 
 WRITE16_MEMBER(m72_state::scrollx1_w)
