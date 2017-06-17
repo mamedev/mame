@@ -102,6 +102,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "video/mc6845.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -117,7 +118,7 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_rtc(*this, "rtc"),
 		m_soundlatch(*this, "soundlatch") { }
-		
+
 
 	DECLARE_READ8_MEMBER(player_1_port_r);
 	DECLARE_READ8_MEMBER(player_2_port_r);
@@ -597,6 +598,12 @@ static ADDRESS_MAP_START( ippatsu_iomap, AS_IO, 8, royalmah_state )
 	AM_RANGE( 0x13, 0x13 ) AM_READ_PORT("DSW3")
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( janyoup2_iomap, AS_IO, 8, royalmah_state )
+	AM_IMPORT_FROM( ippatsu_iomap )
+	AM_RANGE(0x20, 0x20) AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0x21, 0x21) AM_DEVWRITE("crtc", mc6845_device, register_w)
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( tahjong_iomap, AS_IO, 8, royalmah_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x01, 0x01 ) AM_DEVREAD("aysnd", ay8910_device, data_r)
@@ -1030,15 +1037,6 @@ WRITE8_MEMBER(royalmah_state::mjifb_p8_w)
 	m_mjifb_rom_enable = (data & 0x08);
 }
 
-static ADDRESS_MAP_START( mjifb_iomap, AS_IO, 8, royalmah_state )
-	AM_RANGE( T90_P3, T90_P3 ) AM_READWRITE(mjifb_p3_r, mjifb_p3_w )
-	AM_RANGE( T90_P4, T90_P4 ) AM_WRITE(mjifb_p4_w )
-	AM_RANGE( T90_P5, T90_P5 ) AM_READ(mjifb_p5_r )
-	AM_RANGE( T90_P6, T90_P6 ) AM_READ(mjifb_p6_r )
-	AM_RANGE( T90_P7, T90_P7 ) AM_READ(mjifb_p7_r )
-	AM_RANGE( T90_P8, T90_P8 ) AM_READWRITE(mjifb_p8_r, mjifb_p8_w )
-ADDRESS_MAP_END
-
 
 /****************************************************************************
                            Mahjong Shinkirou Deja Vu
@@ -1135,11 +1133,6 @@ static ADDRESS_MAP_START( mjtensin_map, AS_PROGRAM, 8, royalmah_state )
 	AM_RANGE( 0x8000, 0xffff ) AM_WRITEONLY AM_SHARE("videoram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mjtensin_iomap, AS_IO, 8, royalmah_state )
-	AM_RANGE( T90_P3, T90_P3 ) AM_READ(mjtensin_p3_r )
-	AM_RANGE( T90_P4, T90_P4 ) AM_WRITE(mjtensin_p4_w )
-ADDRESS_MAP_END
-
 
 /****************************************************************************
                                 Mahjong Cafe Time
@@ -1203,12 +1196,6 @@ static ADDRESS_MAP_START( cafetime_map, AS_PROGRAM, 8, royalmah_state )
 	AM_RANGE( 0x7ff0, 0x7fff ) AM_DEVREADWRITE("rtc", msm6242_device, read, write)
 	AM_RANGE( 0x8000, 0xffff ) AM_ROMBANK( "mainbank" )
 	AM_RANGE( 0x8000, 0xffff ) AM_WRITEONLY AM_SHARE("videoram")
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( cafetime_iomap, AS_IO, 8, royalmah_state )
-	AM_RANGE( T90_P3, T90_P3 ) AM_WRITE(cafetime_p3_w )
-	AM_RANGE( T90_P4, T90_P4 ) AM_WRITE(cafetime_p4_w )
 ADDRESS_MAP_END
 
 
@@ -1302,11 +1289,6 @@ static ADDRESS_MAP_START( mjvegasa_map, AS_PROGRAM, 8, royalmah_state )
 	AM_RANGE( 0x12400, 0x12400 ) AM_WRITE(mjvegasa_12400_w )
 	AM_RANGE( 0x12500, 0x12500 ) AM_READ(mjvegasa_12500_r )
 
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( mjvegasa_iomap, AS_IO, 8, royalmah_state )
-	AM_RANGE( T90_P3, T90_P3 ) AM_READWRITE(mjtensin_p3_r, mjvegasa_p3_w )
-	AM_RANGE( T90_P4, T90_P4 ) AM_WRITE(mjvegasa_p4_w )
 ADDRESS_MAP_END
 
 
@@ -3435,6 +3417,16 @@ static MACHINE_CONFIG_DERIVED( ippatsu, dondenmj )
 	MCFG_CPU_IO_MAP(ippatsu_iomap)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( janyoup2, ippatsu )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_CLOCK(XTAL_18_432MHz/4) // unknown divider
+	MCFG_CPU_IO_MAP(janyoup2_iomap)
+	
+	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_18_432MHz/12) // unknown divider
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(4)
+MACHINE_CONFIG_END
+
 INTERRUPT_GEN_MEMBER(royalmah_state::suzume_irq)
 {
 	if ( m_suzume_bank & 0x40 )
@@ -3515,7 +3507,14 @@ static MACHINE_CONFIG_DERIVED( janptr96, mjderngr )
 static MACHINE_CONFIG_DERIVED( mjifb, mjderngr )
 	MCFG_CPU_REPLACE("maincpu",TMP90841, 8000000)   /* ? */
 	MCFG_CPU_PROGRAM_MAP(mjifb_map)
-	MCFG_CPU_IO_MAP(mjifb_iomap)
+	MCFG_TLCS90_PORT_P3_READ_CB(READ8(royalmah_state, mjifb_p3_r))
+	MCFG_TLCS90_PORT_P3_WRITE_CB(WRITE8(royalmah_state, mjifb_p3_w))
+	MCFG_TLCS90_PORT_P4_WRITE_CB(WRITE8(royalmah_state, mjifb_p4_w))
+	MCFG_TLCS90_PORT_P5_READ_CB(READ8(royalmah_state, mjifb_p5_r))
+	MCFG_TLCS90_PORT_P6_READ_CB(READ8(royalmah_state, mjifb_p6_r))
+	MCFG_TLCS90_PORT_P7_READ_CB(READ8(royalmah_state, mjifb_p7_r))
+	MCFG_TLCS90_PORT_P8_READ_CB(READ8(royalmah_state, mjifb_p8_r))
+	MCFG_TLCS90_PORT_P8_WRITE_CB(WRITE8(royalmah_state, mjifb_p8_w))
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", royalmah_state,  irq0_line_hold)
 
 	MCFG_SCREEN_MODIFY("screen")
@@ -3526,7 +3525,14 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( mjdejavu, mjderngr )
 	MCFG_CPU_REPLACE("maincpu",TMP90841, 8000000)   /* ? */
 	MCFG_CPU_PROGRAM_MAP(mjdejavu_map)
-	MCFG_CPU_IO_MAP(mjifb_iomap)
+	MCFG_TLCS90_PORT_P3_READ_CB(READ8(royalmah_state, mjifb_p3_r))
+	MCFG_TLCS90_PORT_P3_WRITE_CB(WRITE8(royalmah_state, mjifb_p3_w))
+	MCFG_TLCS90_PORT_P4_WRITE_CB(WRITE8(royalmah_state, mjifb_p4_w))
+	MCFG_TLCS90_PORT_P5_READ_CB(READ8(royalmah_state, mjifb_p5_r))
+	MCFG_TLCS90_PORT_P6_READ_CB(READ8(royalmah_state, mjifb_p6_r))
+	MCFG_TLCS90_PORT_P7_READ_CB(READ8(royalmah_state, mjifb_p7_r))
+	MCFG_TLCS90_PORT_P8_READ_CB(READ8(royalmah_state, mjifb_p8_r))
+	MCFG_TLCS90_PORT_P8_WRITE_CB(WRITE8(royalmah_state, mjifb_p8_w))
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", royalmah_state,  irq0_line_hold)
 
 	MCFG_SCREEN_MODIFY("screen")
@@ -3548,7 +3554,8 @@ WRITE_LINE_MEMBER(royalmah_state::mjtensin_rtc_irq)
 static MACHINE_CONFIG_DERIVED( mjtensin, mjderngr )
 	MCFG_CPU_REPLACE("maincpu",TMP90841, 12000000)  /* ? */
 	MCFG_CPU_PROGRAM_MAP(mjtensin_map)
-	MCFG_CPU_IO_MAP(mjtensin_iomap)
+	MCFG_TLCS90_PORT_P3_READ_CB(READ8(royalmah_state, mjtensin_p3_r))
+	MCFG_TLCS90_PORT_P4_WRITE_CB(WRITE8(royalmah_state, mjtensin_p4_w))
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", royalmah_state,  mjtensin_interrupt)
 
 	MCFG_SCREEN_MODIFY("screen")
@@ -3562,7 +3569,8 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( cafetime, mjderngr )
 	MCFG_CPU_REPLACE("maincpu",TMP90841, 12000000)  /* ? */
 	MCFG_CPU_PROGRAM_MAP(cafetime_map)
-	MCFG_CPU_IO_MAP(cafetime_iomap)
+	MCFG_TLCS90_PORT_P3_WRITE_CB(WRITE8(royalmah_state, cafetime_p3_w))
+	MCFG_TLCS90_PORT_P4_WRITE_CB(WRITE8(royalmah_state, cafetime_p4_w))
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", royalmah_state,  mjtensin_interrupt)
 
 	MCFG_SCREEN_MODIFY("screen")
@@ -3576,7 +3584,9 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( mjvegasa, mjderngr )
 	MCFG_CPU_REPLACE("maincpu",TMP90841, XTAL_8MHz) /* ? */
 	MCFG_CPU_PROGRAM_MAP(mjvegasa_map)
-	MCFG_CPU_IO_MAP(mjvegasa_iomap)
+	MCFG_TLCS90_PORT_P3_READ_CB(READ8(royalmah_state, mjtensin_p3_r))
+	MCFG_TLCS90_PORT_P3_WRITE_CB(WRITE8(royalmah_state, mjvegasa_p3_w))
+	MCFG_TLCS90_PORT_P4_WRITE_CB(WRITE8(royalmah_state, mjvegasa_p4_w))
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", royalmah_state,  mjtensin_interrupt)
 
 	MCFG_SCREEN_MODIFY("screen")
@@ -4969,7 +4979,7 @@ ROM_START( jangtaku )
 	/*this is just a z80 Voice Player (and latches port I/O $00 with the main CPU)*/
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "1.a3",  0x00000, 0x8000, CRC(745162d3) SHA1(145269c60c87e772e6cbca40213d286ec05c9134) )
-	// THE Jantaku Voice   Ver 1.0     (C) Copy Right 1986             DYNA Computer Service CO.,LTD.  By Satoshi Kato  
+	// THE Jantaku Voice   Ver 1.0     (C) Copy Right 1986             DYNA Computer Service CO.,LTD.  By Satoshi Kato
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "82s123a.6k", 0x0000, 0x0020, CRC(e9598146) SHA1(619e7eb76cc3e882b5b3e55cdd23fe00b0a1fe45) )
@@ -4977,8 +4987,8 @@ ROM_END
 
 ROM_START( rkjanoh2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-    ROM_LOAD( "pf_1",         0x000000, 0x001000, CRC(582e7eda) SHA1(96578b6142051d9452f23c8c1b674e2d8a4c3b62) )
-    ROM_LOAD( "pf_2",         0x001000, 0x001000, CRC(49e7dc40) SHA1(d6232a82b6927c79dd47884e5e2a6589c5524424) )
+	ROM_LOAD( "pf_1",         0x000000, 0x001000, CRC(582e7eda) SHA1(96578b6142051d9452f23c8c1b674e2d8a4c3b62) )
+	ROM_LOAD( "pf_2",         0x001000, 0x001000, CRC(49e7dc40) SHA1(d6232a82b6927c79dd47884e5e2a6589c5524424) )
 	ROM_LOAD( "pf_3_1",       0x002000, 0x001000, CRC(a1fdc929) SHA1(27cab4da2365bcf311d7f00d75e8db150183b108) )
 	ROM_LOAD( "pf_4l",        0x003000, 0x001000, CRC(c9ccdfa0) SHA1(ce6f2df7fb6739ddf0529bcae0596e4593ecc3e0) )
 	//ROM_LOAD( "pf_4_fewest",  0x003000, 0x001000, CRC(9a1650a0) SHA1(2da5957879d9f207721fc2f0d63dccc32850cbe2) )
@@ -4986,12 +4996,12 @@ ROM_START( rkjanoh2 )
 	ROM_LOAD( "pf_5",         0x004000, 0x001000, CRC(8a858464) SHA1(55c71ce1c30e908dfc8c21237256dfbb75c55363) )
 	ROM_LOAD( "pf_6",         0x005000, 0x001000, CRC(5b649918) SHA1(191a221a515c261d90d7432443a7fbc8da71e7ac) )
 	ROM_LOAD( "pf_7",         0x006000, 0x001000, CRC(c4fdd2ac) SHA1(76c5645534b87dde87acfb4140d0f3ba18c95cd2) )
-	
+
 	ROM_REGION( 0x002000, "gfx", 0 )
 	ROM_LOAD( "pf_8",         0x000000, 0x002000, CRC(c789e2b3) SHA1(33b5c8f22a1e337816a61fd2c91bc175a412d10e) )
-	
+
 	ROM_REGION( 0x0020, "proms", 0 )
-    ROM_LOAD( "82s123",       0x000, 0x020, CRC(74a53e94) SHA1(ca9114bd9b2b07f5abe82616b41ae9fdb9537a4f) )
+	ROM_LOAD( "82s123",       0x000, 0x020, CRC(74a53e94) SHA1(ca9114bd9b2b07f5abe82616b41ae9fdb9537a4f) )
 ROM_END
 
 DRIVER_INIT_MEMBER(royalmah_state, tahjong)
@@ -5053,7 +5063,7 @@ DRIVER_INIT_MEMBER(royalmah_state, janptr96)
 GAME( 1981,  royalmj,  0,        royalmah, royalmah, royalmah_state, 0,        ROT0,   "Nichibutsu",                 "Royal Mahjong (Japan, v1.13)",          0 )
 GAME( 1981?, openmj,   royalmj,  royalmah, royalmah, royalmah_state, 0,        ROT0,   "Sapporo Mechanic",           "Open Mahjong [BET] (Japan)",            0 )
 GAME( 1982,  royalmah, royalmj,  royalmah, royalmah, royalmah_state, 0,        ROT0,   "bootleg",                    "Royal Mahjong (Falcon bootleg, v1.01)", 0 )
-GAME( 1983,  janyoup2, royalmj,  ippatsu,  janyoup2, royalmah_state, 0,        ROT0,   "Cosmo Denshi",               "Janyou Part II (ver 7.03, July 1 1983)",0 )
+GAME( 1983,  janyoup2, royalmj,  janyoup2, janyoup2, royalmah_state, 0,        ROT0,   "Cosmo Denshi",               "Janyou Part II (ver 7.03, July 1 1983)",0 )
 GAME( 1985,  tahjong,  royalmj,  tahjong,  tahjong,  royalmah_state, tahjong,  ROT0,   "Bally Pond / Nasco",         "Tahjong Yakitori (ver. 2-1)",           0 ) // 1985 Jun. 17
 GAME( 1981,  janputer, 0,        royalmah, royalmah, royalmah_state, 0,        ROT0,   "bootleg (Paradise Denshi Ltd. / Mes)", "New Double Bet Mahjong (bootleg of Royal Mahjong) [BET]", 0 ) // MT #05392
 GAME( 1984,  rkjanoh2, 0,        royalmah, royalmah, royalmah_state, 0,        ROT0,   "SNK / Dyna",                 "Royal King Jang Oh 2 (v4.00 1984 Jun 10th)", MACHINE_NOT_WORKING )
@@ -5068,7 +5078,7 @@ GAME( 1986,  suzume,   0,        suzume,   suzume,   royalmah_state, suzume,   R
 GAME( 1986,  mjsiyoub, 0,        royalmah, royalmah, royalmah_state, 0,        ROT0,   "Visco",                      "Mahjong Shiyou (Japan)",                MACHINE_NOT_WORKING )
 GAME( 1986,  mjsenka,  0,        royalmah, royalmah, royalmah_state, 0,        ROT0,   "Visco",                      "Mahjong Senka (Japan)",                 MACHINE_NOT_WORKING )
 GAME( 1986,  mjyarou,  0,        mjyarou,  mjyarou,  royalmah_state, 0,        ROT0,   "Visco / Video System",       "Mahjong Yarou [BET] (Japan, set 1)",    MACHINE_IMPERFECT_GRAPHICS ) // girls aren't shown
-GAME( 1986,  mjyarou2, mjyarou,  mjyarou,  mjyarou,  royalmah_state, 0,        ROT0,   "Visco / Video System",       "Mahjong Yarou [BET] (Japan, set 2)",    MACHINE_IMPERFECT_GRAPHICS ) // girls aren't shown 
+GAME( 1986,  mjyarou2, mjyarou,  mjyarou,  mjyarou,  royalmah_state, 0,        ROT0,   "Visco / Video System",       "Mahjong Yarou [BET] (Japan, set 2)",    MACHINE_IMPERFECT_GRAPHICS ) // girls aren't shown
 GAME( 1986?, mjclub,   0,        mjclub,   mjclub,   royalmah_state, tontonb,  ROT0,   "Xex",                        "Mahjong Club [BET] (Japan)",            0 )
 GAME( 1987,  mjdiplob, 0,        mjdiplob, mjdiplob, royalmah_state, tontonb,  ROT0,   "Dynax",                      "Mahjong Diplomat [BET] (Japan)",        0 )
 GAME( 1987,  tontonb,  0,        tontonb,  tontonb,  royalmah_state, tontonb,  ROT0,   "Dynax",                      "Tonton [BET] (Japan, set 1)",           0 )

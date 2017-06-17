@@ -23,27 +23,27 @@ public:
 	// construction/destruction
 	dmv_k220_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual ioport_constructor device_input_ports() const override;
-
-	DECLARE_WRITE8_MEMBER(porta_w);
-	DECLARE_WRITE8_MEMBER(portc_w);
-	DECLARE_WRITE_LINE_MEMBER(write_out0);
-	DECLARE_WRITE_LINE_MEMBER(write_out1);
-	DECLARE_WRITE_LINE_MEMBER(write_out2);
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	// dmvcart_interface overrides
 	virtual bool read(offs_t offset, uint8_t &data) override;
 	virtual bool write(offs_t offset, uint8_t data) override;
 
 private:
+	DECLARE_WRITE8_MEMBER(porta_w);
+	DECLARE_WRITE8_MEMBER(portc_w);
+	DECLARE_WRITE_LINE_MEMBER(write_out0);
+	DECLARE_WRITE_LINE_MEMBER(write_out1);
+	DECLARE_WRITE_LINE_MEMBER(write_out2);
+
 	required_device<pit8253_device> m_pit;
 	required_device<i8255_device> m_ppi;
 	required_memory_region m_ram;

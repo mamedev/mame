@@ -582,7 +582,7 @@ void st0016_cpu_device::startup()
 	assert(gfx_index != MAX_GFX_ELEMENTS);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	set_gfx(gfx_index, std::make_unique<gfx_element>(palette(), charlayout, m_charram.get(), 0, 0x40, 0));
+	set_gfx(gfx_index, std::make_unique<gfx_element>(&palette(), charlayout, m_charram.get(), 0, 0x40, 0));
 	st0016_ramgfx = gfx_index;
 
 	spr_dx=0;

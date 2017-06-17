@@ -30,7 +30,16 @@ DEFINE_DEVICE_TYPE(A2BUS_AESMS,  a2bus_aesms_device,  "a2aesms",  "Applied Engin
 #define SN3_TAG         "sn76489_3" // right
 #define SN4_TAG         "sn76489_4" // center?
 
-MACHINE_CONFIG_START( a2alfam2 )
+
+/***************************************************************************
+    FUNCTION PROTOTYPES
+***************************************************************************/
+
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( a2bus_sn76489_device::device_add_mconfig )
 	MCFG_SPEAKER_STANDARD_STEREO("alf_l", "alf_r")
 
 	MCFG_SOUND_ADD(SN1_TAG, SN76489, 1020484)
@@ -42,7 +51,7 @@ MACHINE_CONFIG_START( a2alfam2 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "alf_r", 0.50)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START( a2aesms )
+MACHINE_CONFIG_MEMBER( a2bus_aesms_device::device_add_mconfig )
 	MCFG_SPEAKER_STANDARD_STEREO("alf_l", "alf_r")
 
 	MCFG_SOUND_ADD(SN1_TAG, SN76489, 1020484)
@@ -59,25 +68,6 @@ MACHINE_CONFIG_START( a2aesms )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "alf_l", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "alf_r", 0.50)
 MACHINE_CONFIG_END
-
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor a2bus_sn76489_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( a2alfam2 );
-}
-
-machine_config_constructor a2bus_aesms_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( a2aesms );
-}
 
 //**************************************************************************
 //  LIVE DEVICE

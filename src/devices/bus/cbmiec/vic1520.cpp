@@ -52,7 +52,7 @@ PD7 Y MOTOR COM D
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(VIC1520, vic1520_device, "vic1520", "VIC-1520")
+DEFINE_DEVICE_TYPE(VIC1520, vic1520_device, "vic1520", "VIC-1520 Color Printer Plotter")
 
 
 //-------------------------------------------------
@@ -90,24 +90,13 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( vic1520 )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( vic1520 )
+MACHINE_CONFIG_MEMBER( vic1520_device::device_add_mconfig )
 	MCFG_CPU_ADD(M6500_1_TAG, M6502, XTAL_2MHz) // M6500/1
 	MCFG_CPU_PROGRAM_MAP(vic1520_mem)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor vic1520_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( vic1520 );
-}
 
 
 //-------------------------------------------------

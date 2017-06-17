@@ -76,10 +76,6 @@ static ADDRESS_MAP_START( nmk004_sound_mem_map, AS_PROGRAM, 8, nmk004_device )
 	AM_RANGE(0xfc02, 0xfc02) AM_WRITE(nmk004_oki1_bankswitch_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( nmk004_sound_io_map, AS_IO, 8, nmk004_device )
-	AM_RANGE(0xFFC8, 0xFFC8) AM_WRITE(nmk004_port4_w)
-ADDRESS_MAP_END
-
 
 ROM_START( nmk004 )
 	ROM_REGION( 0x2000, "mcu", 0 )
@@ -116,7 +112,7 @@ void nmk004_device::device_start()
 MACHINE_CONFIG_MEMBER( nmk004_device::device_add_mconfig )
 	MCFG_CPU_ADD("mcu",TMP90840, DERIVED_CLOCK(1,1)) // Toshiba TMP90C840AF in QFP64 package with 8Kbyte internal ROM
 	MCFG_CPU_PROGRAM_MAP(nmk004_sound_mem_map)
-	MCFG_CPU_IO_MAP(nmk004_sound_io_map)
+	MCFG_TLCS90_PORT_P4_WRITE_CB(WRITE8(nmk004_device, nmk004_port4_w))
 MACHINE_CONFIG_END
 
 //-------------------------------------------------

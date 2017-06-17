@@ -19,9 +19,6 @@ public:
 	// construction/destruction
 	a78_xboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_04xx) override;
 	virtual DECLARE_WRITE8_MEMBER(write_04xx) override;
@@ -33,6 +30,7 @@ protected:
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	required_device<a78_cart_slot_device> m_xbslot;
 	required_device<pokey_device> m_pokey;
@@ -48,9 +46,6 @@ public:
 	// construction/destruction
 	a78_xm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_04xx) override;
 	virtual DECLARE_WRITE8_MEMBER(write_04xx) override;
@@ -61,6 +56,7 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	required_device<ym2151_device> m_ym;
 	int m_ym_enabled;

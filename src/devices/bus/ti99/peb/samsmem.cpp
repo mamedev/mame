@@ -32,8 +32,9 @@ namespace bus { namespace ti99 { namespace peb {
 
 #define SAMS_CRU_BASE 0x1e00
 
-sams_memory_expansion_device::sams_memory_expansion_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ti_expansion_card_device(mconfig, TI99_SAMSMEM, tag, owner, clock),
+sams_memory_expansion_device::sams_memory_expansion_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, TI99_SAMSMEM, tag, owner, clock),
+	device_ti99_peribox_card_interface(mconfig, *this),
 	m_ram(*this, RAM_TAG),
 	m_map_mode(false), m_access_mapper(false)
 {
@@ -111,16 +112,11 @@ WRITE8_MEMBER(sams_memory_expansion_device::cruwrite)
 	}
 }
 
-MACHINE_CONFIG_START( sams_mem )
+MACHINE_CONFIG_MEMBER( sams_memory_expansion_device::device_add_mconfig )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1M")
 	MCFG_RAM_DEFAULT_VALUE(0)
 MACHINE_CONFIG_END
-
-machine_config_constructor sams_memory_expansion_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( sams_mem );
-}
 
 void sams_memory_expansion_device::device_start()
 {

@@ -284,12 +284,12 @@ void okim6295_device::write_command(uint8_t command)
 					// invalid samples go here
 					else
 					{
-						logerror("OKIM6295:'%s' requested to play invalid sample %02x\n",tag(),m_command);
+						logerror("Requested to play invalid sample %02x\n", m_command);
 					}
 				}
 				else
 				{
-					logerror("OKIM6295:'%s' requested to play sample %02x on non-stopped voice\n",tag(),m_command);
+					logerror("Requested to play sample %02x on non-stopped voice\n", m_command);
 				}
 			}
 

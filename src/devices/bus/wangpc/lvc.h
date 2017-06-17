@@ -29,17 +29,11 @@ public:
 	// construction/destruction
 	wangpc_lvc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
-	// not really public
-	MC6845_UPDATE_ROW( crtc_update_row );
-	DECLARE_WRITE_LINE_MEMBER( vsync_w );
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	// device_wangpcbus_card_interface overrides
 	virtual uint16_t wangpcbus_mrdc_r(address_space &space, offs_t offset, uint16_t mem_mask) override;
@@ -48,6 +42,9 @@ protected:
 	virtual void wangpcbus_aiowc_w(address_space &space, offs_t offset, uint16_t mem_mask, uint16_t data) override;
 
 private:
+	MC6845_UPDATE_ROW( crtc_update_row );
+	DECLARE_WRITE_LINE_MEMBER( vsync_w );
+
 	inline void set_irq(int state);
 
 	required_device<mc6845_device> m_crtc;

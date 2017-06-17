@@ -873,7 +873,12 @@ static const floppy_format_type hp9895_floppy_formats[] = {
 	nullptr
 };
 
-static MACHINE_CONFIG_START(hp9895)
+const tiny_rom_entry *hp9895_device::device_rom_region() const
+{
+	return ROM_NAME(hp9895);
+}
+
+MACHINE_CONFIG_MEMBER(hp9895_device::device_add_mconfig)
 	MCFG_CPU_ADD("cpu" , Z80 , 4000000)
 	MCFG_CPU_PROGRAM_MAP(z80_program_map)
 	MCFG_CPU_IO_MAP(z80_io_map)
@@ -896,13 +901,3 @@ static MACHINE_CONFIG_START(hp9895)
 	MCFG_FLOPPY_DRIVE_ADD("floppy1" , hp9895_floppies , "8dsdd" , hp9895_floppy_formats)
 	MCFG_SLOT_FIXED(true)
 MACHINE_CONFIG_END
-
-const tiny_rom_entry *hp9895_device::device_rom_region() const
-{
-	return ROM_NAME(hp9895);
-}
-
-machine_config_constructor hp9895_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME(hp9895);
-}

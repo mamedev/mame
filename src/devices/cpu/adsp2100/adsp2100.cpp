@@ -1175,6 +1175,12 @@ void adsp21xx_device::execute_set_input(int inputnum, int state)
 
 void adsp21xx_device::execute_run()
 {
+	// Return if CPU is halted
+	if (m_input[INPUT_LINE_HALT].m_curstate) {
+		m_icount = 0;
+		return;
+	}
+
 	bool check_debugger = ((device_t::machine().debug_flags & DEBUG_FLAG_ENABLED) != 0);
 
 	check_irqs();

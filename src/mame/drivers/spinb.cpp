@@ -129,8 +129,8 @@ private:
 	required_device<msm5205_device> m_msm_m;
 	required_device<ttl7474_device> m_ic5a;
 	required_device<ttl7474_device> m_ic5m;
-	required_device<hct157_device> m_ic14a;
-	required_device<hct157_device> m_ic14m;
+	required_device<hc157_device> m_ic14a;
+	required_device<hc157_device> m_ic14m;
 	required_ioport_array<11> m_switches;
 };
 
@@ -724,13 +724,13 @@ static MACHINE_CONFIG_START( spinb )
 	MCFG_DEVICE_ADD("ic5a", TTL7474, 0)
 	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(spinb_state, ic5a_w))
 
-	MCFG_DEVICE_ADD("ic14a", HCT157, 0)
+	MCFG_DEVICE_ADD("ic14a", HC157, 0)
 	MCFG_74157_OUT_CB(DEVWRITE8("msm_a", msm5205_device, data_w))
 
 	MCFG_DEVICE_ADD("ic5m", TTL7474, 0)
 	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(spinb_state, ic5m_w))
 
-	MCFG_DEVICE_ADD("ic14m", HCT157, 0)
+	MCFG_DEVICE_ADD("ic14m", HC157, 0)
 	MCFG_74157_OUT_CB(DEVWRITE8("msm_m", msm5205_device, data_w))
 MACHINE_CONFIG_END
 

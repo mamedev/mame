@@ -40,11 +40,20 @@ public:
 	// construction/destruction
 	wdxt_gen_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
-	// not really public
+	// device_isa8_card_interface
+	virtual uint8_t dack_r(int line) override;
+	virtual void dack_w(int line, uint8_t data) override;
+
+private:
 	DECLARE_WRITE_LINE_MEMBER( irq5_w );
 	DECLARE_WRITE_LINE_MEMBER( drq3_w );
 	DECLARE_WRITE_LINE_MEMBER( mr_w );
@@ -57,16 +66,6 @@ public:
 	DECLARE_READ8_MEMBER( wd1015_p2_r );
 	DECLARE_WRITE8_MEMBER( wd1015_p2_w );
 
-protected:
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-
-	// device_isa8_card_interface
-	virtual uint8_t dack_r(int line) override;
-	virtual void dack_w(int line, uint8_t data) override;
-
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<wd11c00_17_device> m_host;
 	required_device<wd2010_device> m_hdc;

@@ -18,7 +18,6 @@ class neogeo_kof2k2type_cart_device : public neogeo_rom_device
 public:
 	// construction/destruction
 	neogeo_kof2k2type_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint16_t clock);
-	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// reading and writing
 	virtual void decrypt_all(DECRYPT_ALL_PARAMS) override { }
@@ -30,6 +29,8 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	required_device<cmc_prot_device> m_cmc_prot;
 	required_device<pcm2_prot_device> m_pcm2_prot;

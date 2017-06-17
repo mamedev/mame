@@ -19,23 +19,12 @@ DEFINE_DEVICE_TYPE(VIC20_MEGACART, vic20_megacart_device, "vic20_megacart", "VIC
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( vic20_megacart )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( vic20_megacart )
+MACHINE_CONFIG_MEMBER( vic20_megacart_device::device_add_mconfig )
 
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor vic20_megacart_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( vic20_megacart );
-}
 
 
 

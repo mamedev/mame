@@ -39,7 +39,7 @@ enum e_mnemonics
 	mAM, mAC, mA10, mAS, mCLL, mCOM, mCLC, mSTC, mSCO, mSAO, mINC, mDEC, mSAM, mSAL, mNOP,
 	mICD, mOAR, mOA0, mOA1, mDAF, mDAS, mABS, mABF, mCTB, mLD0, mEN,
 	mBR, mLP, mCBR, mCMS, mRT, mRTS, mSI1, mSI0, mSYN, mTIM, mHLT,
-	
+
 	// SM590 aliases
 	mCCTRL, mINBL, mDEBL, mXBLA, mADCS, mTR7,
 	// SM590 uniques
@@ -139,7 +139,7 @@ static const u32 s_flags[] =
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, _OVER, 0, _OUT, _OUT, 0, 0, 0, 0, _OVER,
-	
+
 	//
 	0, 0, 0, 0, 0, _OVER,
 	//

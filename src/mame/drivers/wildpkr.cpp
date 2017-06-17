@@ -184,6 +184,7 @@ public:
 	wildpkr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_duart(*this, "duart"),
 		m_id(*this, "id"),
 		m_dac(*this, "dac"),
 		m_dac_clock(*this, "dacclock"),
@@ -191,6 +192,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
+	required_device<mc68681_device> m_duart;
 	optional_device<ds2401_device> m_id;
 	optional_device<dac_byte_interface> m_dac;
 	optional_device<clock_device> m_dac_clock;
@@ -214,6 +216,7 @@ public:
 	DECLARE_WRITE16_MEMBER(clock_start_w);
 	DECLARE_WRITE16_MEMBER(clock_rate_w);
 	DECLARE_WRITE16_MEMBER(unknown_trigger_w);
+	IRQ_CALLBACK_MEMBER(tabpkr_irq_ack);
 };
 
 
@@ -274,7 +277,6 @@ WRITE16_MEMBER(wildpkr_state::out1_w)
 WRITE8_MEMBER(wildpkr_state::dac_w)
 {
 	m_dac->write(space, 0, data);
-	m_maincpu->set_input_line(M68K_IRQ_5, CLEAR_LINE);
 }
 
 WRITE16_MEMBER(wildpkr_state::clock_start_w)
@@ -283,8 +285,6 @@ WRITE16_MEMBER(wildpkr_state::clock_start_w)
 		m_dac_clock->set_clock_scale(1.0 / m_clock_rate);
 	else
 		m_dac_clock->set_clock_scale(0.0);
-
-	m_maincpu->set_input_line(M68K_IRQ_5, CLEAR_LINE);
 }
 
 WRITE16_MEMBER(wildpkr_state::clock_rate_w)
@@ -323,9 +323,9 @@ static ADDRESS_MAP_START( tabpkr_map, AS_PROGRAM, 16, wildpkr_state )
 	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(nvram_w) AM_SHARE("nvram")
 	AM_RANGE(0x500000, 0x500001) AM_DEVREADWRITE("acrtc", hd63484_device, status_r, address_w)
 	AM_RANGE(0x500002, 0x500003) AM_DEVREADWRITE("acrtc", hd63484_device, data_r, data_w)
-	AM_RANGE(0x500020, 0x500021) AM_DEVWRITE8("ramdac", ramdac_device, index_w, 0x00ff)
-	AM_RANGE(0x500022, 0x500023) AM_DEVWRITE8("ramdac", ramdac_device, pal_w, 0x00ff)
-	AM_RANGE(0x500024, 0x500025) AM_DEVWRITE8("ramdac", ramdac_device, mask_w, 0x00ff)
+	AM_RANGE(0x500020, 0x500021) AM_DEVREADWRITE8("ramdac", ramdac_device, index_r, index_w, 0x00ff)
+	AM_RANGE(0x500022, 0x500023) AM_DEVREADWRITE8("ramdac", ramdac_device, pal_r, pal_w, 0x00ff)
+	AM_RANGE(0x500024, 0x500025) AM_DEVREADWRITE8("ramdac", ramdac_device, mask_r, mask_w, 0x00ff)
 	AM_RANGE(0x500040, 0x50005f) AM_DEVREADWRITE8("duart", mc68681_device, read, write, 0x00ff)
 	AM_RANGE(0x500060, 0x500061) AM_READWRITE(id_serial_r, id_serial_w)
 	AM_RANGE(0x600000, 0x600001) AM_READ_PORT("IN0") AM_WRITE(out0_w)
@@ -435,6 +435,15 @@ static ADDRESS_MAP_START( ramdac_map, AS_0, 8, wildpkr_state )
 ADDRESS_MAP_END
 
 
+IRQ_CALLBACK_MEMBER(wildpkr_state::tabpkr_irq_ack)
+{
+	m_maincpu->set_input_line(irqline, CLEAR_LINE);
+	if (irqline == M68K_IRQ_2)
+		return m_duart->get_irq_vector();
+	else
+		return M68K_INT_ACK_AUTOVECTOR;
+}
+
 
 /*************************
 *    Machine Drivers     *
@@ -476,11 +485,13 @@ static MACHINE_CONFIG_START( tabpkr )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(tabpkr_map)
-	//MCFG_CPU_VBLANK_INT_DRIVER("screen", wildpkr_state, irq2_line_hold) // 2 / 5 are valid
+	MCFG_CPU_PERIODIC_INT_DRIVER(wildpkr_state, irq3_line_assert, 60*256)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(wildpkr_state, tabpkr_irq_ack)
 
 	MCFG_NVRAM_ADD_1FILL("nvram") // DS1220Y
 
 	MCFG_MC68681_ADD("duart", 3686400)
+	MCFG_MC68681_IRQ_CALLBACK(ASSERTLINE("maincpu", M68K_IRQ_2))
 
 	MCFG_DEVICE_ADD("id", DS2401, 0)
 
@@ -494,6 +505,7 @@ static MACHINE_CONFIG_START( tabpkr )
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 280-1)
 	MCFG_SCREEN_UPDATE_DEVICE("acrtc", hd63484_device, update_screen)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(ASSERTLINE("maincpu", M68K_IRQ_4))
 
 	MCFG_HD63484_ADD("acrtc", 0, hd63484_map)
 

@@ -54,19 +54,19 @@ liquidk  TC0220IOC TC0360PRI TC0260DAR
 quizhq   TMP82C265 TC0110PCR TC0070RGB
 ssi      TC0510NIO           TC0260DAR
 gunfront TC0510NIO TC0360PRI TC0260DAR
-growl    TMP82C265 TC0360PRI TC0260DAR                         TC0190FMC(4 players input?sprite banking?)
+growl    TMP82C265 TC0360PRI TC0260DAR                         TC0190FMC(sprite banking?)
 mjnquest           TC0110PCR TC0070RGB
-footchmp TE7750    TC0360PRI TC0260DAR TC0480SCP(tilemaps)     TC0190FMC(4 players input?sprite banking?)
+footchmp TE7750    TC0360PRI TC0260DAR TC0480SCP(tilemaps)     TC0190FMC(sprite banking?)
 koshien  TC0510NIO TC0360PRI TC0260DAR
 yuyugogo TC0510NIO           TC0260DAR
-ninjak   TE7750    TC0360PRI TC0260DAR                         TC0190FMC(4 players input?sprite banking?)
-solfigtr ?         TC0360PRI TC0260DAR ?
+ninjak   TE7750    TC0360PRI TC0260DAR                         TC0190FMC(sprite banking?)
+solfigtr TMP82C265 TC0360PRI TC0260DAR                         TC0190FMC(sprite banking?)
 qzquest  TC0510NIO           TC0260DAR
 pulirula TC0510NIO TC0360PRI TC0260DAR TC0430GRW(zoom/rot)
 metalb   TC0510NIO TC0360PRI TC0260DAR TC0480SCP(tilemaps)
 qzchikyu TC0510NIO           TC0260DAR
-yesnoj   TMP82C265           TC0260DAR                         TC8521AP(RTC?)
-deadconx           TC0360PRI TC0260DAR TC0480SCP(tilemaps)     TC0190FMC(4 players input?sprite banking?)
+yesnoj   TMP82C265           TC0260DAR                         TC8521AP(RTC)
+deadconx TE7750    TC0360PRI TC0260DAR TC0480SCP(tilemaps)     TC0190FMC(sprite banking?)
 dinorex  TC0510NIO TC0360PRI TC0260DAR
 qjinsei  TC0510NIO TC0360PRI TC0260DAR
 qcrayon  TC0510NIO TC0360PRI TC0260DAR
@@ -207,8 +207,6 @@ input. With the value currently returned, it sounds an alarm and says
 Update (2008.10.09) Printer shall now be correct but it's still not clear
 how the inputs are physically connected and what the are supposed to do.
 
-The timer stays at 00:00. Missing RTC emulation?
-
 [Coin lockout/ctr?]
 
 Calendar / Time in "test mode" always reset to default settings.
@@ -271,6 +269,8 @@ Notes:
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
+#include "machine/rp5c01.h"
+#include "machine/te7750.h"
 #include "machine/watchdog.h"
 #include "sound/2203intf.h"
 #include "sound/2610intf.h"
@@ -283,6 +283,14 @@ Notes:
                         GAME INPUTS
 **********************************************************/
 
+WRITE8_MEMBER(taitof2_state::coin_nibble_w)
+{
+	machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
+	machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
+	machine().bookkeeping().coin_counter_w(0,  data & 0x04);
+	machine().bookkeeping().coin_counter_w(1,  data & 0x08);
+}
+
 WRITE16_MEMBER(taitof2_state::growl_coin_word_w)/* what about coins 3&4 ?? */
 {
 	if (ACCESSING_BITS_0_7)
@@ -294,68 +302,16 @@ WRITE16_MEMBER(taitof2_state::growl_coin_word_w)/* what about coins 3&4 ?? */
 	}
 }
 
-WRITE16_MEMBER(taitof2_state::taitof2_4p_coin_word_w)
+WRITE8_MEMBER(taitof2_state::taitof2_4p_coin_word_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
-		machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
-		machine().bookkeeping().coin_lockout_w(2, ~data & 0x04);
-		machine().bookkeeping().coin_lockout_w(3, ~data & 0x08);
-		machine().bookkeeping().coin_counter_w(0,  data & 0x10);
-		machine().bookkeeping().coin_counter_w(1,  data & 0x20);
-		machine().bookkeeping().coin_counter_w(2,  data & 0x40);
-		machine().bookkeeping().coin_counter_w(3,  data & 0x80);
-	}
-}
-
-WRITE16_MEMBER(taitof2_state::ninjak_coin_word_w)
-{
-	if (ACCESSING_BITS_8_15)
-	{
-		machine().bookkeeping().coin_lockout_w(0, ~data & 0x0100);
-		machine().bookkeeping().coin_lockout_w(1, ~data & 0x0200);
-		machine().bookkeeping().coin_lockout_w(2, ~data & 0x0400);
-		machine().bookkeeping().coin_lockout_w(3, ~data & 0x0800);
-		machine().bookkeeping().coin_counter_w(0,  data & 0x1000);
-		machine().bookkeeping().coin_counter_w(1,  data & 0x2000);
-		machine().bookkeeping().coin_counter_w(2,  data & 0x4000);
-		machine().bookkeeping().coin_counter_w(3,  data & 0x8000);
-	}
-}
-
-READ16_MEMBER(taitof2_state::ninjak_input_r)
-{
-	switch (offset)
-	{
-		case 0x00:
-			return (ioport("DSWA")->read() << 8);
-
-		case 0x01:
-			return (ioport("DSWB")->read() << 8);
-
-		case 0x02:
-			return (ioport("IN0")->read() << 8);
-
-		case 0x03:
-			return (ioport("IN1")->read() << 8);
-
-		case 0x04:
-			return (ioport("IN3")->read() << 8);
-
-		case 0x05:
-			return (ioport("IN4")->read() << 8);
-
-		case 0x06:
-			return (ioport("IN2")->read() << 8);
-
-//      case 0x07:
-//          return (coin_word & mem_mask);
-	}
-
-	logerror("CPU #0 PC %06x: warning - read unmapped input offset %06x\n", space.device().safe_pc(), offset);
-
-	return 0xff;
+	machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
+	machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
+	machine().bookkeeping().coin_lockout_w(2, ~data & 0x04);
+	machine().bookkeeping().coin_lockout_w(3, ~data & 0x08);
+	machine().bookkeeping().coin_counter_w(0,  data & 0x10);
+	machine().bookkeeping().coin_counter_w(1,  data & 0x20);
+	machine().bookkeeping().coin_counter_w(2,  data & 0x40);
+	machine().bookkeeping().coin_counter_w(3,  data & 0x80);
 }
 
 READ16_MEMBER(taitof2_state::cameltry_paddle_r)
@@ -890,15 +846,8 @@ static ADDRESS_MAP_START( footchmp_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x430000, 0x43002f) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, ctrl_word_r, ctrl_word_w)
 	AM_RANGE(0x500000, 0x50001f) AM_DEVWRITE8("tc0360pri", tc0360pri_device, write, 0x00ff)  /* 500002 written like a watchdog?! */
 	AM_RANGE(0x600000, 0x601fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x700006, 0x700007) AM_WRITE(taitof2_4p_coin_word_w)
-	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSWA")
-	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("DSWB")
-	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("IN2")
-	AM_RANGE(0x70000a, 0x70000b) AM_READ_PORT("IN0")
-	AM_RANGE(0x70000c, 0x70000d) AM_READ_PORT("IN1")
-	AM_RANGE(0x70000e, 0x70000f) AM_READ_PORT("IN3")
-	AM_RANGE(0x700010, 0x700011) AM_READ_PORT("IN4")
-	AM_RANGE(0x800000, 0x800001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)   /* ??? */
+	AM_RANGE(0x700000, 0x70001f) AM_DEVREADWRITE8("te7750", te7750_device, read, write, 0x00ff)
+	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE("watchdog", watchdog_timer_device, reset16_r, reset16_w)   /* ??? */
 	AM_RANGE(0xa00000, 0xa00001) AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0x00ff)
 	AM_RANGE(0xa00002, 0xa00003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0x00ff)
 ADDRESS_MAP_END
@@ -935,8 +884,7 @@ static ADDRESS_MAP_START( ninjak_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x200000, 0x201fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x300000, 0x30000f) AM_READ(ninjak_input_r)
-	AM_RANGE(0x30000e, 0x30000f) AM_WRITE(ninjak_coin_word_w)
+	AM_RANGE(0x300000, 0x30001f) AM_DEVREADWRITE8("te7750", te7750_device, read, write, 0xff00)
 	AM_RANGE(0x380000, 0x380001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)   /* ??? */
 	AM_RANGE(0x400000, 0x400001) AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0xff00)
 	AM_RANGE(0x400002, 0x400003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0xff00)
@@ -1031,7 +979,7 @@ static ADDRESS_MAP_START( yesnoj_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x500000, 0x50ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, word_r, word_w)    /* tilemaps */
 	AM_RANGE(0x520000, 0x52000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, ctrl_word_r, ctrl_word_w)
 	AM_RANGE(0x600000, 0x601fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-//  AM_RANGE(0x700000, 0x70000b) AM_READ(yesnoj_unknown_r)   /* what's this? */
+	AM_RANGE(0x700000, 0x70001f) AM_DEVREADWRITE8("rtc", tc8521_device, read, write, 0x00ff)
 	AM_RANGE(0x800000, 0x800001) AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0xff00)
 	AM_RANGE(0x800002, 0x800003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0xff00)
 	AM_RANGE(0x900002, 0x900003) AM_WRITENOP   /* lots of similar writes */
@@ -1053,12 +1001,7 @@ static ADDRESS_MAP_START( deadconx_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x430000, 0x43002f) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, ctrl_word_r, ctrl_word_w)
 	AM_RANGE(0x500000, 0x50001f) AM_DEVWRITE8("tc0360pri", tc0360pri_device, write, 0x00ff)  /* uses 500002 like a watchdog !? */
 	AM_RANGE(0x600000, 0x601fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSWA")
-	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("DSWB")
-	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("IN2")
-	AM_RANGE(0x700006, 0x700007) AM_WRITE(taitof2_4p_coin_word_w)
-	AM_RANGE(0x70000a, 0x70000b) AM_READ_PORT("IN0")
-	AM_RANGE(0x70000c, 0x70000d) AM_READ_PORT("IN1")
+	AM_RANGE(0x700000, 0x70001f) AM_DEVREADWRITE8("te7750", te7750_device, read, write, 0x00ff)
 	AM_RANGE(0x800000, 0x800001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)   /* ??? */
 	AM_RANGE(0xa00000, 0xa00001) AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0xff00)
 	AM_RANGE(0xa00002, 0xa00003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0xff00)
@@ -2142,10 +2085,32 @@ static INPUT_PORTS_START( deadconx )
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_OPTIONAL // input test only
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_OPTIONAL // input test only
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service A") PORT_CODE(KEYCODE_9)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service B") PORT_CODE(KEYCODE_0)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service C") PORT_CODE(KEYCODE_MINUS)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_TILT )
+
+	PORT_START("IN3") // all input test only
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(3) PORT_OPTIONAL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(3) PORT_OPTIONAL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3) PORT_OPTIONAL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(3) PORT_OPTIONAL
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3) PORT_OPTIONAL
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3) PORT_OPTIONAL
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START3 ) PORT_OPTIONAL
+
+	PORT_START("IN4") // all input test only
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(4) PORT_OPTIONAL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(4) PORT_OPTIONAL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(4) PORT_OPTIONAL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(4) PORT_OPTIONAL
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4) PORT_OPTIONAL
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4) PORT_OPTIONAL
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START4 ) PORT_OPTIONAL
 
 	PORT_START("DSWA")
 	TAITO_MACHINE_NO_COCKTAIL_LOC(SW1)
@@ -2903,6 +2868,7 @@ static MACHINE_CONFIG_DERIVED( taito_f2_tc0220ioc, taito_f2 )
 	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
 	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
 	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(taitof2_state, coin_nibble_w))
 	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
 MACHINE_CONFIG_END
 
@@ -2915,9 +2881,22 @@ static MACHINE_CONFIG_DERIVED( taito_f2_tc0510nio, taito_f2 )
 	MCFG_TC0510NIO_READ_1_CB(IOPORT("DSWB"))
 	MCFG_TC0510NIO_READ_2_CB(IOPORT("IN0"))
 	MCFG_TC0510NIO_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0510NIO_WRITE_4_CB(WRITE8(taitof2_state, coin_nibble_w))
 	MCFG_TC0510NIO_READ_7_CB(IOPORT("IN2"))
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( taito_f2_te7750, taito_f2 )
+	MCFG_DEVICE_ADD("te7750", TE7750, 0)
+	MCFG_TE7750_IN_PORT1_CB(IOPORT("DSWA"))
+	MCFG_TE7750_IN_PORT2_CB(IOPORT("DSWB"))
+	MCFG_TE7750_IN_PORT3_CB(IOPORT("IN2"))
+	MCFG_TE7750_OUT_PORT4_CB(WRITE8(taitof2_state, taitof2_4p_coin_word_w))
+	MCFG_TE7750_IN_PORT6_CB(IOPORT("IN0"))
+	MCFG_TE7750_IN_PORT7_CB(IOPORT("IN1"))
+	MCFG_TE7750_IN_PORT8_CB(IOPORT("IN3"))
+	MCFG_TE7750_IN_PORT9_CB(IOPORT("IN4"))
 MACHINE_CONFIG_END
 
 
@@ -3218,7 +3197,7 @@ static MACHINE_CONFIG_DERIVED( mjnquest, taito_f2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( footchmp, taito_f2 )
+static MACHINE_CONFIG_DERIVED( footchmp, taito_f2_te7750 )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3249,7 +3228,7 @@ static MACHINE_CONFIG_DERIVED( footchmpbl, footchmp )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( hthero, taito_f2 )
+static MACHINE_CONFIG_DERIVED( hthero, taito_f2_te7750 )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3328,6 +3307,16 @@ static MACHINE_CONFIG_DERIVED( ninjak, taito_f2 )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(ninjak_map)
+
+	MCFG_DEVICE_ADD("te7750", TE7750, 0)
+	MCFG_TE7750_IN_PORT1_CB(IOPORT("DSWA"))
+	MCFG_TE7750_IN_PORT2_CB(IOPORT("DSWB"))
+	MCFG_TE7750_IN_PORT3_CB(IOPORT("IN0"))
+	MCFG_TE7750_IN_PORT4_CB(IOPORT("IN1"))
+	MCFG_TE7750_IN_PORT5_CB(IOPORT("IN3"))
+	MCFG_TE7750_IN_PORT6_CB(IOPORT("IN4"))
+	MCFG_TE7750_IN_PORT7_CB(IOPORT("IN2"))
+	MCFG_TE7750_OUT_PORT8_CB(WRITE8(taitof2_state, taitof2_4p_coin_word_w))
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_ninjak)
@@ -3482,10 +3471,12 @@ static MACHINE_CONFIG_DERIVED( yesnoj, taito_f2 )
 	MCFG_TC0100SCN_OFFSETS(3, 0)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
+
+	MCFG_DEVICE_ADD("rtc", TC8521, XTAL_32_768kHz)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( deadconx, taito_f2 )
+static MACHINE_CONFIG_DERIVED( deadconx, taito_f2_te7750 )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3509,7 +3500,7 @@ static MACHINE_CONFIG_DERIVED( deadconx, taito_f2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( deadconxj, taito_f2 )
+static MACHINE_CONFIG_DERIVED( deadconxj, taito_f2_te7750 )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3677,6 +3668,7 @@ static MACHINE_CONFIG_START( cameltrya )
 	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
 	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
 	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(taitof2_state, coin_nibble_w))
 	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
@@ -3745,6 +3737,7 @@ static MACHINE_CONFIG_START( driveout )
 	MCFG_TC0510NIO_READ_1_CB(IOPORT("DSWB"))
 	MCFG_TC0510NIO_READ_2_CB(IOPORT("IN0"))
 	MCFG_TC0510NIO_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0510NIO_WRITE_4_CB(WRITE8(taitof2_state, coin_nibble_w))
 	MCFG_TC0510NIO_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */

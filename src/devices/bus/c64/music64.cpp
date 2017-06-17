@@ -41,23 +41,12 @@ DEFINE_DEVICE_TYPE(C64_MUSIC64, c64_music64_cartridge_device, "c64_music64", "C6
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_START( c64_music64 )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( c64_music64 )
+MACHINE_CONFIG_MEMBER( c64_music64_cartridge_device::device_add_mconfig )
 	MCFG_C64_PASSTHRU_EXPANSION_SLOT_ADD()
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor c64_music64_cartridge_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( c64_music64 );
-}
 
 
 //-------------------------------------------------

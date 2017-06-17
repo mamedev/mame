@@ -705,6 +705,26 @@ ROM_START( bounty )
 	ROM_LOAD( "mb7051.2b",   0x0020, 0x0020, CRC(465e31d4) SHA1(d47a4aa0e8931dcd8f85017ef04c2f6ad79f5725) )
 ROM_END
 
+ROM_START( bounty2 ) // The PCB uses a large CPU epoxy module marked "CPU PACKII". A battery can be spotted through the epoxy.
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.4f",      0x0000, 0x1000, CRC(edc26413) SHA1(c5ac7362a0e0d98eca53b3cd76d28a705c7d6917) )
+	ROM_LOAD( "3.4k",      0x1000, 0x1000, CRC(fa3086c3) SHA1(b8bab26a4e68e6d2e5b899e900c9affd297c22de) )
+	ROM_LOAD( "2.4h",      0x2000, 0x1000, CRC(52ab5314) SHA1(ba399f8b86cc64d1dd585dde79d8036d24296475) )
+	ROM_LOAD( "4.4m",      0x3000, 0x1000, CRC(c0afb93c) SHA1(f1bbcdf849fce464c897fbe3d96a77cb5fcb51fd) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "7.4n",      0x0000, 0x1000, CRC(45e369b8) SHA1(9799b2ece5e3b92da435255e1b49f5097d3f7972) )
+	ROM_LOAD( "8.4r",      0x1000, 0x1000, CRC(4f52c87d) SHA1(1738d798c341a54d293c70da7b6e4a3dfb00de38) )
+
+	ROM_REGION( 0x2800, "gfx1", 0 )
+	ROM_LOAD( "9.4r",      0x0000, 0x0800, CRC(4b4acde5) SHA1(5ed60fe50a9ab0b8d433ee9ae5787b936ddbfbdd) )
+	ROM_LOAD( "5.7m",      0x0800, 0x1000, CRC(a5ce2a24) SHA1(b5469d31bda52a61cdc46349c139a7eb339ac8a7) )
+	ROM_LOAD( "6.7p",      0x1800, 0x1000, CRC(43183301) SHA1(9df89479396d7847ee3325649d7264e75d413add) )
+
+	ROM_REGION( 0x0040, "proms", 0 )
+	ROM_LOAD( "mb7051.2a",   0x0000, 0x0020, CRC(0de11a46) SHA1(3bc81571832dd78b29654e86479815ee5f97a4d3) )
+	ROM_LOAD( "mb7051.2b",   0x0020, 0x0020, CRC(465e31d4) SHA1(d47a4aa0e8931dcd8f85017ef04c2f6ad79f5725) )
+ROM_END
 
 DRIVER_INIT_MEMBER(zodiack_state,zodiack)
 {
@@ -716,8 +736,9 @@ DRIVER_INIT_MEMBER(zodiack_state,percuss)
 	m_percuss_hardware = true;
 }
 
-GAME( 1983, zodiack,  0, zodiack, zodiack,  zodiack_state, zodiack, ROT270, "Orca (Esco Trading Co., Inc. license)", "Zodiack",                 MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) /* bullet color needs to be verified */
-GAME( 1983, dogfight, 0, zodiack, dogfight, zodiack_state, zodiack, ROT270, "Orca / Thunderbolt",                    "Dog Fight (Thunderbolt)", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) /* bullet color needs to be verified */
-GAME( 1982, moguchan, 0, zodiack, moguchan, zodiack_state, percuss, ROT270, "Orca (Eastern Commerce Inc. license)",  "Mogu Chan (bootleg?)",    MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) /* license copyright taken from ROM string at $0b5c */
-GAME( 1981, percuss,  0, zodiack, percuss,  zodiack_state, percuss, ROT270, "Orca",                                  "The Percussor",           MACHINE_SUPPORTS_SAVE )
-GAME( 1982, bounty,   0, zodiack, bounty,   zodiack_state, percuss, ROT180, "Orca",                                  "The Bounty",              MACHINE_SUPPORTS_SAVE )
+GAME( 1983, zodiack,  0,      zodiack, zodiack,  zodiack_state, zodiack, ROT270, "Orca (Esco Trading Co., Inc. license)", "Zodiack",                 MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) /* bullet color needs to be verified */
+GAME( 1983, dogfight, 0,      zodiack, dogfight, zodiack_state, zodiack, ROT270, "Orca / Thunderbolt",                    "Dog Fight (Thunderbolt)", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) /* bullet color needs to be verified */
+GAME( 1982, moguchan, 0,      zodiack, moguchan, zodiack_state, percuss, ROT270, "Orca (Eastern Commerce Inc. license)",  "Mogu Chan (bootleg?)",    MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) /* license copyright taken from ROM string at $0b5c */
+GAME( 1981, percuss,  0,      zodiack, percuss,  zodiack_state, percuss, ROT270, "Orca",                                  "The Percussor",           MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bounty,   0,      zodiack, bounty,   zodiack_state, percuss, ROT180, "Orca",                                  "The Bounty (set 1)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bounty2,  bounty, zodiack, bounty,   zodiack_state, percuss, ROT180, "Orca",                                  "The Bounty (set 2)",      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // seems to use a different memory map

@@ -39,12 +39,33 @@ public:
 	// construction/destruction
 	c1581_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
+	c1581_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 
-	// not really public
+	// device_cbm_iec_interface overrides
+	virtual void cbm_iec_srq(int state) override;
+	virtual void cbm_iec_atn(int state) override;
+	virtual void cbm_iec_data(int state) override;
+	virtual void cbm_iec_reset(int state) override;
+
+private:
+	enum
+	{
+		LED_POWER = 0,
+		LED_ACT
+	};
+
+	void update_iec();
+
 	DECLARE_WRITE_LINE_MEMBER( cnt_w );
 	DECLARE_WRITE_LINE_MEMBER( sp_w );
 	DECLARE_READ8_MEMBER( cia_pa_r );
@@ -53,27 +74,6 @@ public:
 	DECLARE_WRITE8_MEMBER( cia_pb_w );
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
-
-protected:
-	c1581_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-
-	// device_cbm_iec_interface overrides
-	virtual void cbm_iec_srq(int state) override;
-	virtual void cbm_iec_atn(int state) override;
-	virtual void cbm_iec_data(int state) override;
-	virtual void cbm_iec_reset(int state) override;
-
-	enum
-	{
-		LED_POWER = 0,
-		LED_ACT
-	};
-
-	void update_iec();
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mos6526_device> m_cia;

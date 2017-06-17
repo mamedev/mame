@@ -32,8 +32,8 @@
       halves of the palette are identical, this is not an issue.  See $039c.
       The other games have a different color test, not using the busy loop.
 
-	- dealer/beastf/revngr84: "PSG registers not OK" in service mode thru 
-	  sound menu, internal ay8910 not right?
+    - dealer/beastf/revngr84: "PSG registers not OK" in service mode thru
+      sound menu, internal ay8910 not right?
 
 ***************************************************************************/
 
@@ -494,13 +494,13 @@ static MACHINE_CONFIG_START( dealer ) /* EPOS TRISTAR 9000 PCB */
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(epos_state, i8255_portc_w))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
-	
+
 	MCFG_MACHINE_START_OVERRIDE(epos_state,dealer)
-	
+
 	// RAM-based palette instead of prom
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 32)
-//	MCFG_PALETTE_INIT_OWNER(epos_state, epos)
-	
+//  MCFG_PALETTE_INIT_OWNER(epos_state, epos)
+
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
@@ -526,7 +526,7 @@ MACHINE_CONFIG_END
  *  ROM definitions
  *
  *************************************/
- 
+
 // Tristar 8000 boards:
 ROM_START( megadon )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -647,7 +647,7 @@ ROM_START( dealer )
 	ROM_LOAD( "u2.bin",         0x2000, 0x2000, CRC(726bbbd6) SHA1(3538f3d655899c2a0f984c43fb7545ea4be1b231) )
 	ROM_LOAD( "u3.bin",         0x4000, 0x2000, CRC(ab721455) SHA1(a477da0590e0431172baae972e765473e19dcbff) )
 	ROM_LOAD( "u4.bin",         0x6000, 0x2000, CRC(ddb903e4) SHA1(4c06a2048b1c6989c363b110a17c33180025b9c8) )
-	
+
 	ROM_REGION( 0x1000, "nvram", 0)
 	ROM_LOAD( "dealer.nv", 0, 0x1000, CRC(a6f88459) SHA1(1deda2a71433c97fe3e5cb39defc285f4fa9c9b8) )
 ROM_END
@@ -717,7 +717,7 @@ ROM_START( revenger )
 
 	ROM_REGION( 0x0020, "proms", 0 ) /* this PROM not included in this dump, but assumed to be the same as above set */
 	ROM_LOAD( "dm74s288n.u60", 0x0000, 0x0020, CRC(be2b0641) SHA1(26982903b6d942af8e0a526412d8e01978d76420) ) // unknown purpose
-	
+
 	ROM_REGION( 0x1000, "nvram", 0)
 	ROM_LOAD( "revngr84.nv", 0, 0x1000, CRC(a4417770) SHA1(92eded82db0810e7818d2f52a0497032f390fcc1) )
 ROM_END
@@ -728,7 +728,7 @@ ROM_START( beastf )
 	ROM_LOAD( "u_2__beastie__feastie__b09084.m5l2764k.u2",  0x2000, 0x2000, CRC(967405d8) SHA1(dd763be909e6966521b01ee878df9cef865c3b30) ) /* labeled as "U 2 // BEASTIE // FEASTIE // B09084" */
 	ROM_LOAD( "u_3__beastie__feastie__b09084.m5l2764k.u3",  0x4000, 0x2000, CRC(3edb5381) SHA1(14c236045e6df7a475c32222652860689d4f68ce) ) /* labeled as "U 3 // BEASTIE // FEASTIE // B09084" */
 	ROM_LOAD( "u_4__beastie__feastie__b09084.m5l2764k.u4",  0x6000, 0x2000, CRC(c8cd9640) SHA1(72da881b903ead873cc3f4df27646d1ffdd63c1c) ) /* labeled as "U 4 // BEASTIE // FEASTIE // B09084" */
-	
+
 	ROM_REGION( 0x1000, "nvram", 0)
 	ROM_LOAD( "beastf.nv", 0, 0x1000, CRC(98017b09) SHA1(0e2b2071bb47fc179d5bc36ef9431a9d2727d36a) )
 ROM_END

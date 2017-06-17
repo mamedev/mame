@@ -1428,6 +1428,8 @@ enum
 #define MCFG_VOODOO_STALL_CB(_devcb) \
 	devcb = &voodoo_device::static_set_stall_callback(*device, DEVCB_##_devcb);
 
+#define MCFG_VOODOO_PCIINT_CB(_devcb) \
+	devcb = &voodoo_device::static_set_pciint_callback(*device, DEVCB_##_devcb);
 
 /***************************************************************************
     FUNCTION PROTOTYPES
@@ -1446,6 +1448,7 @@ public:
 	static void static_set_cpu_tag(device_t &device, const char *tag) { downcast<voodoo_device &>(device).m_cputag = tag; }
 	template <class Object> static devcb_base &static_set_vblank_callback(device_t &device, Object &&cb) { return downcast<voodoo_device &>(device).m_vblank.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &static_set_stall_callback(device_t &device, Object &&cb)  { return downcast<voodoo_device &>(device).m_stall.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &static_set_pciint_callback(device_t &device, Object &&cb) { return downcast<voodoo_device &>(device).m_pciint.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ32_MEMBER( voodoo_r );
 	DECLARE_WRITE32_MEMBER( voodoo_w );
@@ -1457,6 +1460,8 @@ public:
 	const char *        m_cputag;
 	devcb_write_line   m_vblank;
 	devcb_write_line   m_stall;
+	// This is for internally generated PCI interrupts in Voodoo3
+	devcb_write_line   m_pciint;
 
 	TIMER_CALLBACK_MEMBER( vblank_off_callback );
 	TIMER_CALLBACK_MEMBER( stall_cpu_callback );

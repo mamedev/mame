@@ -506,7 +506,7 @@ static ADDRESS_MAP_START( dunhuang_io_map, AS_IO, 8, dunhuang_state )
 	AM_RANGE( 0x0081, 0x0081 ) AM_DEVWRITE("ymsnd", ym2413_device, register_port_w)
 	AM_RANGE( 0x0089, 0x0089 ) AM_DEVWRITE("ymsnd", ym2413_device, data_port_w)
 
-    AM_RANGE( 0x0082, 0x0082 ) AM_DEVWRITE("oki", okim6295_device, write)
+	AM_RANGE( 0x0082, 0x0082 ) AM_DEVWRITE("oki", okim6295_device, write)
 
 	AM_RANGE( 0x0083, 0x0083 ) AM_DEVWRITE("ramdac", ramdac_device, index_w)
 	AM_RANGE( 0x008b, 0x008b ) AM_DEVWRITE("ramdac", ramdac_device, pal_w)

@@ -2251,26 +2251,26 @@ ROM_START( qbertqub )
 ROM_END
 
 
-ROM_START( curvebal )
+ROM_START( curvebal ) /* Rom labels have the following conventions:  GV-134  ROM 3, (c)1984, Mylstar Electronics, Inc., ALL RIGHTS RSV'D   etc... */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "cb-rom-3.chp", 0x8000, 0x2000, CRC(72ad4d45) SHA1(9537eb360ed1d33d399cc2d8761c36b7d25fdae0) )
-	ROM_LOAD( "cb-rom-2.chp", 0xa000, 0x2000, CRC(d46c3db5) SHA1(d4f464a6ebc090d100e890303557f0d05214033b) )
-	ROM_LOAD( "cb-rom-1.chp", 0xc000, 0x2000, CRC(eb1e08bd) SHA1(f558664df12e4e15ef2779a0bdf99538f8c43ca3) )
-	ROM_LOAD( "cb-rom-0.chp", 0xe000, 0x2000, CRC(401fc7e3) SHA1(86ca53cb6f1d88d5a95baa9524c6b42a1f7fc9c2) )
+	ROM_LOAD( "gv-134_rom_3.rom3_c14-15", 0x8000, 0x2000, CRC(72ad4d45) SHA1(9537eb360ed1d33d399cc2d8761c36b7d25fdae0) ) /* PCB silkscreened with both ROM 3 and C14-15 PCB locations */
+	ROM_LOAD( "gv-134_rom_2.rom2_c13-14", 0xa000, 0x2000, CRC(d46c3db5) SHA1(d4f464a6ebc090d100e890303557f0d05214033b) ) /* PCB silkscreened with both ROM 2 and C13-14 PCB locations */
+	ROM_LOAD( "gv-134_rom_1.rom1_c12-13", 0xc000, 0x2000, CRC(eb1e08bd) SHA1(f558664df12e4e15ef2779a0bdf99538f8c43ca3) ) /* PCB silkscreened with both ROM 1 and C12-13 PCB locations */
+	ROM_LOAD( "gv-134_rom_0.rom0_c11-12", 0xe000, 0x2000, CRC(401fc7e3) SHA1(86ca53cb6f1d88d5a95baa9524c6b42a1f7fc9c2) ) /* PCB silkscreened with both ROM 0 and C11-12 PCB locations */
 
 	ROM_REGION( 0x10000, "r1sound:audiocpu", 0 )
 	ROM_LOAD( "yrom.sbd",     0x6000, 0x1000, CRC(4c313d9b) SHA1(c61a8c827f4b199fdfb6ffc0bc6cca396c73625e) )
 	ROM_LOAD( "drom.sbd",     0x7000, 0x1000, CRC(cecece88) SHA1(4c6639f6f89f80b04b6ffbb5004ea2121e71f504) )
 
 	ROM_REGION( 0x2000, "bgtiles", 0 )
-	ROM_LOAD( "cb-bg-0.chp",  0x0000, 0x1000, CRC(d666a179) SHA1(3b9aca5272ae3f3d99ba55f5dc2db4eac82896bc) )
-	ROM_LOAD( "cb-bg-1.chp",  0x1000, 0x1000, CRC(5e34ff4e) SHA1(f88234c0f46533540815e05479938810ea4fb4f8) )
+	ROM_LOAD( "gv-134_bg_0.bg0_e11-12", 0x0000, 0x1000, CRC(d666a179) SHA1(3b9aca5272ae3f3d99ba55f5dc2db4eac82896bc) ) /* PCB silkscreened with both BG 0 and E11-12 PCB locations */
+	ROM_LOAD( "gv-134_bg_1.bg1_e13",    0x1000, 0x1000, CRC(5e34ff4e) SHA1(f88234c0f46533540815e05479938810ea4fb4f8) ) /* PCB silkscreened with both BG 1 and E13 PCB locations */
 
 	ROM_REGION( 0x8000, "sprites", 0 )
-	ROM_LOAD( "cb-fg-3.chp",  0x0000, 0x2000, CRC(9c9452fe) SHA1(4cf5ee2efa5734849781aa57c2b92ed542d5cb4e) )
-	ROM_LOAD( "cb-fg-2.chp",  0x2000, 0x2000, CRC(065131af) SHA1(fe78ee907f1d0e9f6fc3c96e4fa4aff390115147) )
-	ROM_LOAD( "cb-fg-1.chp",  0x4000, 0x2000, CRC(1b7b7f94) SHA1(ffb0f163531c2f9d184d8733466d23ab9d48ea2e) )
-	ROM_LOAD( "cb-fg-0.chp",  0x6000, 0x2000, CRC(e3a8230e) SHA1(c256b5ca25dc15c11d574d0ad823b34093933802) )
+	ROM_LOAD( "gv-134_fg_3.fg3_k7-8", 0x0000, 0x2000, CRC(9c9452fe) SHA1(4cf5ee2efa5734849781aa57c2b92ed542d5cb4e) ) /* PCB silkscreened with both FG 3 and K7-8 PCB locations */
+	ROM_LOAD( "gv-134_fg_2.fg2_k6",   0x2000, 0x2000, CRC(065131af) SHA1(fe78ee907f1d0e9f6fc3c96e4fa4aff390115147) ) /* PCB silkscreened with both FG 2 and K6 PCB locations */
+	ROM_LOAD( "gv-134_fg_1.fg1_k5",   0x4000, 0x2000, CRC(1b7b7f94) SHA1(ffb0f163531c2f9d184d8733466d23ab9d48ea2e) ) /* PCB silkscreened with both FG 1 and K5 PCB locations */
+	ROM_LOAD( "gv-134_fg_0.fg0_k4",   0x6000, 0x2000, CRC(e3a8230e) SHA1(c256b5ca25dc15c11d574d0ad823b34093933802) ) /* PCB silkscreened with both FG 0 and K4 PCB locations */
 ROM_END
 
 

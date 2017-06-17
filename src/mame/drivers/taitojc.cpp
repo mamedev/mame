@@ -454,6 +454,15 @@ static const int dendego_pressure_table[0x100] =
 #define DSP_IDLESKIP        1 /* dsp idle skipping speedup hack */
 
 
+WRITE8_MEMBER(taitojc_state::coin_control_w)
+{
+	machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
+	machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
+	machine().bookkeeping().coin_counter_w(0, data & 0x04);
+	machine().bookkeeping().coin_counter_w(1, data & 0x08);
+}
+
+
 /***************************************************************************
 
   Interrupts
@@ -578,33 +587,6 @@ WRITE8_MEMBER(taitojc_state::mcu_comm_w)
 	}
 }
 
-READ32_MEMBER(taitojc_state::snd_share_r)
-{
-	switch (offset & 3)
-	{
-		case 0: return (m_snd_shared_ram[(offset/4)] <<  0) & 0xff000000;
-		case 1: return (m_snd_shared_ram[(offset/4)] <<  8) & 0xff000000;
-		case 2: return (m_snd_shared_ram[(offset/4)] << 16) & 0xff000000;
-		case 3: return (m_snd_shared_ram[(offset/4)] << 24) & 0xff000000;
-	}
-
-	return 0;
-}
-
-WRITE32_MEMBER(taitojc_state::snd_share_w)
-{
-	if (ACCESSING_BITS_24_31)
-	{
-		switch (offset & 3)
-		{
-			case 0: m_snd_shared_ram[(offset/4)] &= ~0xff000000; m_snd_shared_ram[(offset/4)] |= (data >>  0 & 0xff000000); break;
-			case 1: m_snd_shared_ram[(offset/4)] &= ~0x00ff0000; m_snd_shared_ram[(offset/4)] |= (data >>  8 & 0x00ff0000); break;
-			case 2: m_snd_shared_ram[(offset/4)] &= ~0x0000ff00; m_snd_shared_ram[(offset/4)] |= (data >> 16 & 0x0000ff00); break;
-			case 3: m_snd_shared_ram[(offset/4)] &= ~0x000000ff; m_snd_shared_ram[(offset/4)] |= (data >> 24 & 0x000000ff); break;
-		}
-	}
-}
-
 
 READ8_MEMBER(taitojc_state::jc_pcbid_r)
 {
@@ -649,7 +631,7 @@ static ADDRESS_MAP_START( taitojc_map, AS_PROGRAM, 32, taitojc_state )
 	AM_RANGE(0x06600000, 0x0660001f) AM_DEVREADWRITE8("tc0640fio", tc0640fio_device, read, write, 0xff000000)
 	AM_RANGE(0x0660004c, 0x0660004f) AM_WRITE_PORT("EEPROMOUT")
 	AM_RANGE(0x06800000, 0x06800003) AM_WRITE8(jc_irq_unk_w, 0x00ff0000)
-	AM_RANGE(0x06a00000, 0x06a01fff) AM_READWRITE(snd_share_r, snd_share_w) AM_SHARE("snd_shared")
+	AM_RANGE(0x06a00000, 0x06a01fff) AM_DEVREADWRITE8("taito_en:dpram", mb8421_device, left_r, left_w, 0xff000000)
 	AM_RANGE(0x06c00000, 0x06c0001f) AM_READWRITE8(jc_lan_r, jc_lan_w, 0x00ff0000)
 	AM_RANGE(0x08000000, 0x080fffff) AM_RAM AM_SHARE("main_ram")
 	AM_RANGE(0x10001ff8, 0x10001ffb) AM_READ16(dsp_to_main_7fe_r, 0xffff0000)
@@ -1111,6 +1093,7 @@ static MACHINE_CONFIG_START( taitojc )
 	MCFG_TC0640FIO_READ_1_CB(IOPORT("COINS"))
 	MCFG_TC0640FIO_READ_2_CB(IOPORT("START"))
 	MCFG_TC0640FIO_READ_3_CB(IOPORT("UNUSED"))
+	MCFG_TC0640FIO_WRITE_4_CB(WRITE8(taitojc_state, coin_control_w))
 	MCFG_TC0640FIO_READ_7_CB(IOPORT("BUTTONS"))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
@@ -1219,6 +1202,7 @@ ROM_START( sidebs ) /* Side by Side ver 2.7 J */
 	ROM_LOAD32_WORD( "e23-12.ic22",  0x0800000, 0x200000, CRC(7365333c) SHA1(4f7b75088799ea37f714bc7e5c5b276a7e5d933f) )
 	ROM_LOAD32_WORD( "e23-06.ic10",  0x0c00002, 0x200000, CRC(ffcfd153) SHA1(65fa486cf0156e2988bd6e7060d66f87f765a123) )
 	ROM_LOAD32_WORD( "e23-13.ic23",  0x0c00000, 0x200000, CRC(16982d37) SHA1(134370f7dfadb1886f1e5e5dd16f8b72ad08fc68) )
+	ROM_FILL(                        0x1000000, 0x400000, 0 )
 	ROM_LOAD32_WORD( "e23-07.ic12",  0x1400002, 0x200000, CRC(90f2a87c) SHA1(770bb89fa42cb2a1d5a58525b8d72ed7df3f93ed) )
 	ROM_LOAD32_WORD( "e23-14.ic25",  0x1400000, 0x200000, CRC(1bc5a914) SHA1(92f82a4e2fbac73dbb3293726fc09022bd11a8fe) )
 
@@ -1261,6 +1245,7 @@ ROM_START( sidebsja ) /* Side by Side ver 2.6 J */
 	ROM_LOAD32_WORD( "e23-12.ic22",  0x0800000, 0x200000, CRC(7365333c) SHA1(4f7b75088799ea37f714bc7e5c5b276a7e5d933f) )
 	ROM_LOAD32_WORD( "e23-06.ic10",  0x0c00002, 0x200000, CRC(ffcfd153) SHA1(65fa486cf0156e2988bd6e7060d66f87f765a123) )
 	ROM_LOAD32_WORD( "e23-13.ic23",  0x0c00000, 0x200000, CRC(16982d37) SHA1(134370f7dfadb1886f1e5e5dd16f8b72ad08fc68) )
+	ROM_FILL(                        0x1000000, 0x400000, 0 )
 	ROM_LOAD32_WORD( "e23-07.ic12",  0x1400002, 0x200000, CRC(90f2a87c) SHA1(770bb89fa42cb2a1d5a58525b8d72ed7df3f93ed) )
 	ROM_LOAD32_WORD( "e23-14.ic25",  0x1400000, 0x200000, CRC(1bc5a914) SHA1(92f82a4e2fbac73dbb3293726fc09022bd11a8fe) )
 
@@ -1303,6 +1288,7 @@ ROM_START( sidebsjb ) /* Side by Side ver 2.5 J */
 	ROM_LOAD32_WORD( "e23-12.ic22",  0x0800000, 0x200000, CRC(7365333c) SHA1(4f7b75088799ea37f714bc7e5c5b276a7e5d933f) )
 	ROM_LOAD32_WORD( "e23-06.ic10",  0x0c00002, 0x200000, CRC(ffcfd153) SHA1(65fa486cf0156e2988bd6e7060d66f87f765a123) )
 	ROM_LOAD32_WORD( "e23-13.ic23",  0x0c00000, 0x200000, CRC(16982d37) SHA1(134370f7dfadb1886f1e5e5dd16f8b72ad08fc68) )
+	ROM_FILL(                        0x1000000, 0x400000, 0 )
 	ROM_LOAD32_WORD( "e23-07.ic12",  0x1400002, 0x200000, CRC(90f2a87c) SHA1(770bb89fa42cb2a1d5a58525b8d72ed7df3f93ed) )
 	ROM_LOAD32_WORD( "e23-14.ic25",  0x1400000, 0x200000, CRC(1bc5a914) SHA1(92f82a4e2fbac73dbb3293726fc09022bd11a8fe) )
 

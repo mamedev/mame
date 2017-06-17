@@ -99,10 +99,10 @@ WRITE_LINE_MEMBER( sandy_superqboard_device::busy_w )
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_START( sandy_superqboard )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( sandy_superqboard )
+MACHINE_CONFIG_MEMBER( sandy_superqboard_device::device_add_mconfig )
 	MCFG_DEVICE_ADD(WD1772_TAG, WD1772, XTAL_16MHz/2)
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG":0", sandy_superqboard_floppies, "35hd", sandy_superqboard_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG":1", sandy_superqboard_floppies, nullptr, sandy_superqboard_device::floppy_formats)
@@ -111,17 +111,6 @@ static MACHINE_CONFIG_START( sandy_superqboard )
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(sandy_superqboard_device, busy_w))
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD(TTL74273_TAG, CENTRONICS_TAG)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor sandy_superqboard_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( sandy_superqboard );
-}
 
 
 //-------------------------------------------------

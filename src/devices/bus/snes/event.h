@@ -18,10 +18,6 @@ public:
 	// construction/destruction
 	sns_pfest94_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual ioport_constructor device_input_ports() const override;
-
 	virtual void speedup_addon_bios_access() override;
 
 	// reading and writing
@@ -39,6 +35,10 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	required_device<upd7725_device> m_upd7725;
 	required_ioport m_dsw;

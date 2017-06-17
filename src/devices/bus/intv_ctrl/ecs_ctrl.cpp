@@ -143,16 +143,11 @@ static SLOT_INTERFACE_START( intvecs_controller )
 	SLOT_INTERFACE("handctrl", INTV_HANDCTRL)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( intvecs_ctrls )
+MACHINE_CONFIG_MEMBER( intvecs_ctrls_device::device_add_mconfig )
 	MCFG_INTV_CONTROL_PORT_ADD("port1", intvecs_controller, "handctrl")
 	MCFG_INTV_CONTROL_PORT_ADD("port2", intvecs_controller, "handctrl")
 MACHINE_CONFIG_END
 
-
-machine_config_constructor intvecs_ctrls_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( intvecs_ctrls );
-}
 
 intvecs_ctrls_device::intvecs_ctrls_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, ECS_CTRLS, tag, owner, clock),

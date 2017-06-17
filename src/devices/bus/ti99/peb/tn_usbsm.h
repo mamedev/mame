@@ -23,7 +23,7 @@
 
 namespace bus { namespace ti99 { namespace peb {
 
-class nouspikel_usb_smartmedia_device : public ti_expansion_card_device
+class nouspikel_usb_smartmedia_device : public device_t, public device_ti99_peribox_card_interface
 {
 public:
 	nouspikel_usb_smartmedia_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -36,7 +36,7 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 
 private:

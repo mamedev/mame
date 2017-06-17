@@ -184,9 +184,6 @@ public:
 	// construction/destruction
 	sega8_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
 	virtual void late_bank_setup() override;
 
 	// reading and writing
@@ -197,6 +194,9 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	// device-level overrides
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	uint8_t m_rom_bank_base[3];
 

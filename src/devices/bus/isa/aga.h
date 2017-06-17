@@ -37,13 +37,6 @@ class isa8_aga_device :
 public:
 	// construction/destruction
 	isa8_aga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual ioport_constructor device_input_ports() const override;
-
-	DECLARE_WRITE_LINE_MEMBER( hsync_changed );
-	DECLARE_WRITE_LINE_MEMBER( vsync_changed );
 
 	DECLARE_READ8_MEMBER( pc_aga_mda_r );
 	DECLARE_WRITE8_MEMBER( pc_aga_mda_w );
@@ -54,7 +47,6 @@ public:
 	DECLARE_WRITE8_MEMBER( pc_aga_videoram_w );
 	DECLARE_READ8_MEMBER( pc_aga_videoram_r );
 
-	MC6845_UPDATE_ROW( aga_update_row );
 	MC6845_UPDATE_ROW( mda_text_inten_update_row );
 	MC6845_UPDATE_ROW( mda_text_blink_update_row );
 	MC6845_UPDATE_ROW( cga_text_inten_update_row );
@@ -71,8 +63,14 @@ public:
 
 protected:
 	isa8_aga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	required_ioport m_cga_config;
 
@@ -95,6 +93,11 @@ protected:
 	uint8_t   m_cga_palette_lut_2bpp[4];
 
 	std::unique_ptr<uint8_t[]>  m_videoram;
+
+private:
+	MC6845_UPDATE_ROW( aga_update_row );
+	DECLARE_WRITE_LINE_MEMBER( hsync_changed );
+	DECLARE_WRITE_LINE_MEMBER( vsync_changed );
 };
 
 // device type definition

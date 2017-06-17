@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Barry Rodewald
 /*
- * ddi1.c  --  Amstrad DDI-1 Floppy Disk Drive interface
+ * ddi1.cpp  --  Amstrad DDI-1 Floppy Disk Drive interface
  */
 
 #include "emu.h"
@@ -39,7 +39,7 @@ const tiny_rom_entry *cpc_ddi1_device::device_rom_region() const
 }
 
 // device machine config
-static MACHINE_CONFIG_START( cpc_ddi1 )
+MACHINE_CONFIG_MEMBER( cpc_ddi1_device::device_add_mconfig )
 	MCFG_UPD765A_ADD("upd765", true, true)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", ddi1_floppies, "3ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","cpc_flop")
@@ -53,10 +53,6 @@ static MACHINE_CONFIG_START( cpc_ddi1 )
 
 MACHINE_CONFIG_END
 
-machine_config_constructor cpc_ddi1_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( cpc_ddi1 );
-}
 
 //**************************************************************************
 //  LIVE DEVICE

@@ -10,7 +10,7 @@ void othunder_state::video_start()
 	/* Up to $800/8 big sprites, requires 0x100 * sizeof(*spritelist)
 	   Multiply this by 32 to give room for the number of small sprites,
 	   which are what actually get put in the structure. */
-	m_spritelist = std::make_unique<othunder_tempsprite[]>(0x2000);
+	m_spritelist = std::make_unique<tempsprite[]>(0x2000);
 }
 
 
@@ -64,7 +64,7 @@ spriteram is being tested, take no notice of that.]
 ********************************************************/
 
 
-void othunder_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, const int *primasks, int y_offs )
+void othunder_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, const int *primasks, int y_offs)
 {
 	uint16_t *spritemap = (uint16_t *)memregion("user1")->base();
 	uint16_t tile_mask = (m_gfxdecode->gfx(0)->elements()) - 1;
@@ -78,7 +78,7 @@ void othunder_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, 
 
 	/* pdrawgfx() needs us to draw sprites front to back, so we have to build a list
 	   while processing sprite ram and then draw them all at the end */
-	struct othunder_tempsprite *sprite_ptr = m_spritelist.get();
+	struct tempsprite *sprite_ptr = m_spritelist.get();
 
 	for (offs = (m_spriteram.bytes() / 2) - 4; offs >= 0; offs -= 4)
 	{
@@ -200,7 +200,7 @@ logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
                 SCREEN REFRESH
 **************************************************************/
 
-uint32_t othunder_state::screen_update_othunder(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t othunder_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int layer[3];
 

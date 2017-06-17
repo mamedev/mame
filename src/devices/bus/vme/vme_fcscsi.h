@@ -19,26 +19,10 @@ class vme_fcscsi1_card_device :
 public:
 	vme_fcscsi1_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-
 	DECLARE_READ16_MEMBER (bootvect_r);
 	DECLARE_READ8_MEMBER (tcr_r);
 	DECLARE_WRITE8_MEMBER (tcr_w);
 	DECLARE_WRITE8_MEMBER (led_w);
-
-	IRQ_CALLBACK_MEMBER(maincpu_irq_acknowledge_callback);
-
-	//dmac
-	DECLARE_WRITE8_MEMBER(dma_end);
-	DECLARE_WRITE8_MEMBER(dma_error);
-
-	//fdc
-	DECLARE_WRITE8_MEMBER(fdc_irq);
-	DECLARE_READ8_MEMBER(fdc_read_byte);
-	DECLARE_WRITE8_MEMBER(fdc_write_byte);
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 	/* Dummy driver routines */
 	DECLARE_READ8_MEMBER(not_implemented_r);
@@ -53,6 +37,10 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+
 	void update_irq_to_maincpu();
 
 	uint8_t fdc_irq_state;
@@ -60,6 +48,18 @@ protected:
 	int dmac_irq_vector;
 
 private:
+	IRQ_CALLBACK_MEMBER(maincpu_irq_acknowledge_callback);
+
+	//dmac
+	DECLARE_WRITE8_MEMBER(dma_end);
+	DECLARE_WRITE8_MEMBER(dma_error);
+
+	//fdc
+	DECLARE_WRITE8_MEMBER(fdc_irq);
+	DECLARE_READ8_MEMBER(fdc_read_byte);
+	DECLARE_WRITE8_MEMBER(fdc_write_byte);
+	DECLARE_FLOPPY_FORMATS(floppy_formats);
+
 	required_device<cpu_device> m_maincpu;
 	required_device<wd1772_device> m_fdc;
 	required_device<pit68230_device> m_pit;

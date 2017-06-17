@@ -2362,7 +2362,7 @@ end
 --@src/devices/bus/ti99/joyport/joyport.h,BUSES["TI99"] = true
 --@src/devices/bus/ti99/peb/peribox.h,BUSES["TI99"] = true
 --@src/devices/bus/ti99/internal/genboard.h,BUSES["TI99"] = true
-
+--@src/devices/bus/ti99/hexbus/hexbus.h,BUSES["TI99"] = true
 ---------------------------------------------------
 
 if (BUSES["TI99"]~=null) then
@@ -2392,6 +2392,10 @@ if (BUSES["TI99"]~=null) then
 		MAME_DIR .. "src/devices/bus/ti99/gromport/multiconn.h",
 		MAME_DIR .. "src/devices/bus/ti99/gromport/singleconn.cpp",
 		MAME_DIR .. "src/devices/bus/ti99/gromport/singleconn.h",
+		MAME_DIR .. "src/devices/bus/ti99/hexbus/hexbus.cpp",
+		MAME_DIR .. "src/devices/bus/ti99/hexbus/hexbus.h",
+		MAME_DIR .. "src/devices/bus/ti99/hexbus/hx5102.cpp",
+		MAME_DIR .. "src/devices/bus/ti99/hexbus/hx5102.h",
 		MAME_DIR .. "src/devices/bus/ti99/joyport/handset.cpp",
 		MAME_DIR .. "src/devices/bus/ti99/joyport/handset.h",
 		MAME_DIR .. "src/devices/bus/ti99/joyport/joyport.cpp",
@@ -2502,22 +2506,21 @@ if (BUSES["COCO"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/coco/cococart.cpp",
 		MAME_DIR .. "src/devices/bus/coco/cococart.h",
-		MAME_DIR .. "src/devices/bus/coco/coco_232.cpp",
-		MAME_DIR .. "src/devices/bus/coco/coco_232.h",
+		MAME_DIR .. "src/devices/bus/coco/coco_rs232.cpp",
+		MAME_DIR .. "src/devices/bus/coco/coco_dcmodem.cpp",
 		MAME_DIR .. "src/devices/bus/coco/coco_orch90.cpp",
-		MAME_DIR .. "src/devices/bus/coco/coco_orch90.h",
+		MAME_DIR .. "src/devices/bus/coco/coco_ssc.cpp",
 		MAME_DIR .. "src/devices/bus/coco/coco_pak.cpp",
 		MAME_DIR .. "src/devices/bus/coco/coco_pak.h",
 		MAME_DIR .. "src/devices/bus/coco/coco_fdc.cpp",
 		MAME_DIR .. "src/devices/bus/coco/coco_fdc.h",
 		MAME_DIR .. "src/devices/bus/coco/coco_gmc.cpp",
-		MAME_DIR .. "src/devices/bus/coco/coco_gmc.h",
 		MAME_DIR .. "src/devices/bus/coco/coco_multi.cpp",
-		MAME_DIR .. "src/devices/bus/coco/coco_multi.h",
 		MAME_DIR .. "src/devices/bus/coco/coco_dwsock.cpp",
 		MAME_DIR .. "src/devices/bus/coco/coco_dwsock.h",
-		MAME_DIR .. "src/devices/bus/coco/dragon_fdc.cpp",
 		MAME_DIR .. "src/devices/bus/coco/coco_t4426.cpp",
+		MAME_DIR .. "src/devices/bus/coco/dragon_fdc.cpp",
+		MAME_DIR .. "src/devices/bus/coco/dragon_jcbsnd.cpp",
 	}
 end
 

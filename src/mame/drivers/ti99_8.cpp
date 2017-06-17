@@ -183,6 +183,7 @@ Known Issues (MZ, 2010-11-07)
 
 #include "bus/ti99/internal/998board.h"
 #include "bus/ti99/gromport/gromport.h"
+#include "bus/ti99/hexbus/hexbus.h"
 
 #include "bus/ti99/joyport/joyport.h"
 #include "bus/ti99/internal/ioport.h"
@@ -216,11 +217,11 @@ public:
 	ti99_8_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_cpu(*this, "maincpu"),
-		m_tms9901(*this, TMS9901_TAG),
-		m_gromport(*this, GROMPORT_TAG),
+		m_tms9901(*this, TI_TMS9901_TAG),
+		m_gromport(*this, TI99_GROMPORT_TAG),
 		m_ioport(*this, TI99_IOPORT_TAG),
-		m_mainboard(*this, MAINBOARD8_TAG),
-		m_joyport(*this, JOYPORT_TAG),
+		m_mainboard(*this, TI998_MAINBOARD_TAG),
+		m_joyport(*this, TI_JOYPORT_TAG),
 		m_cassette(*this, "cassette")
 	{
 	}
@@ -287,7 +288,7 @@ private:
     job to the mapper completely.
 */
 static ADDRESS_MAP_START(memmap, AS_PROGRAM, 8, ti99_8_state)
-	AM_RANGE(0x0000, 0xffff) AM_DEVREADWRITE(MAINBOARD8_TAG, bus::ti99::internal::mainboard8_device, read, write) AM_DEVSETOFFSET(MAINBOARD8_TAG, bus::ti99::internal::mainboard8_device, setoffset)
+	AM_RANGE(0x0000, 0xffff) AM_DEVREADWRITE(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, read, write) AM_DEVSETOFFSET(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, setoffset)
 ADDRESS_MAP_END
 
 /*
@@ -298,10 +299,10 @@ ADDRESS_MAP_END
 */
 
 static ADDRESS_MAP_START(crumap, AS_IO, 8, ti99_8_state)
-	AM_RANGE(0x0000, 0x0003) AM_DEVREAD(TMS9901_TAG, tms9901_device, read)
+	AM_RANGE(0x0000, 0x0003) AM_DEVREAD(TI_TMS9901_TAG, tms9901_device, read)
 	AM_RANGE(0x0000, 0x02ff) AM_READ(cruread)
 
-	AM_RANGE(0x0000, 0x001f) AM_DEVWRITE(TMS9901_TAG, tms9901_device, write)
+	AM_RANGE(0x0000, 0x001f) AM_DEVWRITE(TI_TMS9901_TAG, tms9901_device, write)
 	AM_RANGE(0x0000, 0x17ff) AM_WRITE(cruwrite)
 ADDRESS_MAP_END
 
@@ -413,8 +414,8 @@ READ8_MEMBER( ti99_8_state::cruread )
 //  if (VERBOSE>6) logerror("read access to CRU address %04x\n", offset << 4);
 	uint8_t value = 0;
 
-	// Similar to the bus8z_devices, just let the mapper, the gromport, and the p-box
-	// decide whether they want to change the value at the CRU address
+	// Let the mapper, the gromport, and the p-box decide whether they want
+	// to change the value at the CRU address
 	// Also, we translate the bit addresses to base addresses
 	m_mainboard->crureadz(space, offset<<4, &value);
 	m_gromport->crureadz(space, offset<<4, &value);
@@ -686,7 +687,7 @@ WRITE_LINE_MEMBER( ti99_8_state::dbin_line )
 MACHINE_START_MEMBER(ti99_8_state,ti99_8)
 {
 	// Need to configure the speech ROM for inverse bit order
-	speechrom_device* mem = subdevice<speechrom_device>(SPEECHROM_REG);
+	speechrom_device* mem = subdevice<speechrom_device>(TI998_SPEECHROM_REG);
 	mem->set_reverse_bit_order(true);
 
 	save_item(NAME(m_keyboard_column));
@@ -718,40 +719,40 @@ static MACHINE_CONFIG_START( ti99_8 )
 	MCFG_TMS9995_EXTOP_HANDLER( WRITE8(ti99_8_state, external_operation) )
 	MCFG_TMS9995_CLKOUT_HANDLER( WRITELINE(ti99_8_state, clock_out) )
 	MCFG_TMS9995_DBIN_HANDLER( WRITELINE(ti99_8_state, dbin_line) )
-	MCFG_TMS9995_HOLDA_HANDLER( DEVWRITELINE(MAINBOARD8_TAG, bus::ti99::internal::mainboard8_device, holda_line) )
+	MCFG_TMS9995_HOLDA_HANDLER( DEVWRITELINE(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, holda_line) )
 
 	MCFG_MACHINE_START_OVERRIDE(ti99_8_state, ti99_8 )
 	MCFG_MACHINE_RESET_OVERRIDE(ti99_8_state, ti99_8 )
 
 	// 9901 configuration
-	MCFG_DEVICE_ADD(TMS9901_TAG, TMS9901, XTAL_10_738635MHz/4.0)
+	MCFG_DEVICE_ADD(TI_TMS9901_TAG, TMS9901, XTAL_10_738635MHz/4.0)
 	MCFG_TMS9901_READBLOCK_HANDLER( READ8(ti99_8_state, read_by_9901) )
 	MCFG_TMS9901_P0_HANDLER( WRITELINE( ti99_8_state, keyC0) )
 	MCFG_TMS9901_P1_HANDLER( WRITELINE( ti99_8_state, keyC1) )
 	MCFG_TMS9901_P2_HANDLER( WRITELINE( ti99_8_state, keyC2) )
 	MCFG_TMS9901_P3_HANDLER( WRITELINE( ti99_8_state, keyC3) )
-	MCFG_TMS9901_P4_HANDLER( DEVWRITELINE( MAINBOARD8_TAG, bus::ti99::internal::mainboard8_device, crus_in) )
-	MCFG_TMS9901_P5_HANDLER( DEVWRITELINE( MAINBOARD8_TAG, bus::ti99::internal::mainboard8_device, ptgen_in) )
+	MCFG_TMS9901_P4_HANDLER( DEVWRITELINE( TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, crus_in) )
+	MCFG_TMS9901_P5_HANDLER( DEVWRITELINE( TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, ptgen_in) )
 	MCFG_TMS9901_P6_HANDLER( WRITELINE( ti99_8_state, cassette_motor) )
 	MCFG_TMS9901_P8_HANDLER( WRITELINE( ti99_8_state, audio_gate) )
 	MCFG_TMS9901_P9_HANDLER( WRITELINE( ti99_8_state, cassette_output) )
 	MCFG_TMS9901_INTLEVEL_HANDLER( WRITE8( ti99_8_state, tms9901_interrupt) )
 
 	// Mainboard with custom chips
-	MCFG_DEVICE_ADD(MAINBOARD8_TAG, TI99_MAINBOARD8, 0)
+	MCFG_DEVICE_ADD(TI998_MAINBOARD_TAG, TI99_MAINBOARD8, 0)
 	MCFG_MAINBOARD8_READY_CALLBACK(WRITELINE(ti99_8_state, console_ready))
 	MCFG_MAINBOARD8_RESET_CALLBACK(WRITELINE(ti99_8_state, console_reset))
 	MCFG_MAINBOARD8_HOLD_CALLBACK(WRITELINE(ti99_8_state, cpu_hold))
 
-	MCFG_GROMPORT8_ADD( GROMPORT_TAG )
-	MCFG_GROMPORT_READY_HANDLER( DEVWRITELINE(MAINBOARD8_TAG, bus::ti99::internal::mainboard8_device, system_grom_ready) )
+	MCFG_GROMPORT8_ADD( TI99_GROMPORT_TAG )
+	MCFG_GROMPORT_READY_HANDLER( DEVWRITELINE(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, system_grom_ready) )
 	MCFG_GROMPORT_RESET_HANDLER( WRITELINE(ti99_8_state, console_reset) )
 
 	// RAM
-	MCFG_RAM_ADD(SRAM_TAG)
+	MCFG_RAM_ADD(TI998_SRAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("2K")
 	MCFG_RAM_DEFAULT_VALUE(0)
-	MCFG_RAM_ADD(DRAM_TAG)
+	MCFG_RAM_ADD(TI998_DRAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 	MCFG_RAM_DEFAULT_VALUE(0)
 
@@ -761,21 +762,24 @@ static MACHINE_CONFIG_START( ti99_8 )
 	// I/O port
 	MCFG_IOPORT_ADD( TI99_IOPORT_TAG )
 	MCFG_IOPORT_EXTINT_HANDLER( WRITELINE(ti99_8_state, extint) )
-	MCFG_IOPORT_READY_HANDLER( DEVWRITELINE(MAINBOARD8_TAG, bus::ti99::internal::mainboard8_device, pbox_ready) )
+	MCFG_IOPORT_READY_HANDLER( DEVWRITELINE(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, pbox_ready) )
+
+	// Hexbus
+	MCFG_HEXBUS_ADD( TI_HEXBUS_TAG )
 
 	// Sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("sound_out")
-	MCFG_SOUND_ADD(TISOUNDCHIP_TAG, SN76496, 3579545)   /* 3.579545 MHz */
+	MCFG_SOUND_ADD(TI_SOUNDCHIP_TAG, SN76496, 3579545)   /* 3.579545 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "sound_out", 0.75)
-	MCFG_SN76496_READY_HANDLER(DEVWRITELINE(MAINBOARD8_TAG, bus::ti99::internal::mainboard8_device, sound_ready))
+	MCFG_SN76496_READY_HANDLER(DEVWRITELINE(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, sound_ready))
 
 	// Speech hardware
 	// Note: SPEECHROM uses its tag for referencing the region
-	MCFG_DEVICE_ADD(SPEECHROM_REG, SPEECHROM, 0)
+	MCFG_DEVICE_ADD(TI998_SPEECHROM_REG, SPEECHROM, 0)
 	MCFG_SPEAKER_STANDARD_MONO("speech_out")
-	MCFG_SOUND_ADD(SPEECHSYN_TAG, CD2501ECD, 640000L)
-	MCFG_TMS52XX_READYQ_HANDLER(DEVWRITELINE(MAINBOARD8_TAG, bus::ti99::internal::mainboard8_device, speech_ready))
-	MCFG_TMS52XX_SPEECHROM(SPEECHROM_REG)
+	MCFG_SOUND_ADD(TI998_SPEECHSYN_TAG, CD2501ECD, 640000L)
+	MCFG_TMS52XX_READYQ_HANDLER(DEVWRITELINE(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, speech_ready))
+	MCFG_TMS52XX_SPEECHROM(TI998_SPEECHROM_REG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speech_out", 0.50)
 
 	// Cassette drive
@@ -785,34 +789,34 @@ static MACHINE_CONFIG_START( ti99_8 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "cass_out", 0.25)
 
 	// GROM library
-	MCFG_GROM_ADD( SYSGROM0_TAG, 0, SYSGROM_REG, 0x0000, DEVWRITELINE(MAINBOARD8_TAG, bus::ti99::internal::mainboard8_device, system_grom_ready))
-	MCFG_GROM_ADD( SYSGROM1_TAG, 1, SYSGROM_REG, 0x2000, DEVWRITELINE(MAINBOARD8_TAG, bus::ti99::internal::mainboard8_device, system_grom_ready))
-	MCFG_GROM_ADD( SYSGROM2_TAG, 2, SYSGROM_REG, 0x4000, DEVWRITELINE(MAINBOARD8_TAG, bus::ti99::internal::mainboard8_device, system_grom_ready))
+	MCFG_GROM_ADD( TI998_SYSGROM0_TAG, 0, TI998_SYSGROM_REG, 0x0000, DEVWRITELINE(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, system_grom_ready))
+	MCFG_GROM_ADD( TI998_SYSGROM1_TAG, 1, TI998_SYSGROM_REG, 0x2000, DEVWRITELINE(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, system_grom_ready))
+	MCFG_GROM_ADD( TI998_SYSGROM2_TAG, 2, TI998_SYSGROM_REG, 0x4000, DEVWRITELINE(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, system_grom_ready))
 
-	MCFG_GROM_ADD( GLIB10_TAG, 0, GROMLIB1_REG, 0x0000, DEVWRITELINE(MAINBOARD8_TAG, bus::ti99::internal::mainboard8_device, ptts_grom_ready))
-	MCFG_GROM_ADD( GLIB11_TAG, 1, GROMLIB1_REG, 0x2000, DEVWRITELINE(MAINBOARD8_TAG, bus::ti99::internal::mainboard8_device, ptts_grom_ready))
-	MCFG_GROM_ADD( GLIB12_TAG, 2, GROMLIB1_REG, 0x4000, DEVWRITELINE(MAINBOARD8_TAG, bus::ti99::internal::mainboard8_device, ptts_grom_ready))
-	MCFG_GROM_ADD( GLIB13_TAG, 3, GROMLIB1_REG, 0x6000, DEVWRITELINE(MAINBOARD8_TAG, bus::ti99::internal::mainboard8_device, ptts_grom_ready))
-	MCFG_GROM_ADD( GLIB14_TAG, 4, GROMLIB1_REG, 0x8000, DEVWRITELINE(MAINBOARD8_TAG, bus::ti99::internal::mainboard8_device, ptts_grom_ready))
-	MCFG_GROM_ADD( GLIB15_TAG, 5, GROMLIB1_REG, 0xa000, DEVWRITELINE(MAINBOARD8_TAG, bus::ti99::internal::mainboard8_device, ptts_grom_ready))
-	MCFG_GROM_ADD( GLIB16_TAG, 6, GROMLIB1_REG, 0xc000, DEVWRITELINE(MAINBOARD8_TAG, bus::ti99::internal::mainboard8_device, ptts_grom_ready))
-	MCFG_GROM_ADD( GLIB17_TAG, 7, GROMLIB1_REG, 0xe000, DEVWRITELINE(MAINBOARD8_TAG, bus::ti99::internal::mainboard8_device, ptts_grom_ready))
+	MCFG_GROM_ADD( TI998_GLIB10_TAG, 0, TI998_GROMLIB1_REG, 0x0000, DEVWRITELINE(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, ptts_grom_ready))
+	MCFG_GROM_ADD( TI998_GLIB11_TAG, 1, TI998_GROMLIB1_REG, 0x2000, DEVWRITELINE(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, ptts_grom_ready))
+	MCFG_GROM_ADD( TI998_GLIB12_TAG, 2, TI998_GROMLIB1_REG, 0x4000, DEVWRITELINE(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, ptts_grom_ready))
+	MCFG_GROM_ADD( TI998_GLIB13_TAG, 3, TI998_GROMLIB1_REG, 0x6000, DEVWRITELINE(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, ptts_grom_ready))
+	MCFG_GROM_ADD( TI998_GLIB14_TAG, 4, TI998_GROMLIB1_REG, 0x8000, DEVWRITELINE(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, ptts_grom_ready))
+	MCFG_GROM_ADD( TI998_GLIB15_TAG, 5, TI998_GROMLIB1_REG, 0xa000, DEVWRITELINE(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, ptts_grom_ready))
+	MCFG_GROM_ADD( TI998_GLIB16_TAG, 6, TI998_GROMLIB1_REG, 0xc000, DEVWRITELINE(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, ptts_grom_ready))
+	MCFG_GROM_ADD( TI998_GLIB17_TAG, 7, TI998_GROMLIB1_REG, 0xe000, DEVWRITELINE(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, ptts_grom_ready))
 
-	MCFG_GROM_ADD( GLIB20_TAG, 0, GROMLIB2_REG, 0x0000, DEVWRITELINE(MAINBOARD8_TAG, bus::ti99::internal::mainboard8_device, p8_grom_ready))
-	MCFG_GROM_ADD( GLIB21_TAG, 1, GROMLIB2_REG, 0x2000, DEVWRITELINE(MAINBOARD8_TAG, bus::ti99::internal::mainboard8_device, p8_grom_ready))
-	MCFG_GROM_ADD( GLIB22_TAG, 2, GROMLIB2_REG, 0x4000, DEVWRITELINE(MAINBOARD8_TAG, bus::ti99::internal::mainboard8_device, p8_grom_ready))
-	MCFG_GROM_ADD( GLIB23_TAG, 3, GROMLIB2_REG, 0x6000, DEVWRITELINE(MAINBOARD8_TAG, bus::ti99::internal::mainboard8_device, p8_grom_ready))
-	MCFG_GROM_ADD( GLIB24_TAG, 4, GROMLIB2_REG, 0x8000, DEVWRITELINE(MAINBOARD8_TAG, bus::ti99::internal::mainboard8_device, p8_grom_ready))
-	MCFG_GROM_ADD( GLIB25_TAG, 5, GROMLIB2_REG, 0xa000, DEVWRITELINE(MAINBOARD8_TAG, bus::ti99::internal::mainboard8_device, p8_grom_ready))
-	MCFG_GROM_ADD( GLIB26_TAG, 6, GROMLIB2_REG, 0xc000, DEVWRITELINE(MAINBOARD8_TAG, bus::ti99::internal::mainboard8_device, p8_grom_ready))
-	MCFG_GROM_ADD( GLIB27_TAG, 7, GROMLIB2_REG, 0xe000, DEVWRITELINE(MAINBOARD8_TAG, bus::ti99::internal::mainboard8_device, p8_grom_ready))
+	MCFG_GROM_ADD( TI998_GLIB20_TAG, 0, TI998_GROMLIB2_REG, 0x0000, DEVWRITELINE(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, p8_grom_ready))
+	MCFG_GROM_ADD( TI998_GLIB21_TAG, 1, TI998_GROMLIB2_REG, 0x2000, DEVWRITELINE(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, p8_grom_ready))
+	MCFG_GROM_ADD( TI998_GLIB22_TAG, 2, TI998_GROMLIB2_REG, 0x4000, DEVWRITELINE(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, p8_grom_ready))
+	MCFG_GROM_ADD( TI998_GLIB23_TAG, 3, TI998_GROMLIB2_REG, 0x6000, DEVWRITELINE(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, p8_grom_ready))
+	MCFG_GROM_ADD( TI998_GLIB24_TAG, 4, TI998_GROMLIB2_REG, 0x8000, DEVWRITELINE(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, p8_grom_ready))
+	MCFG_GROM_ADD( TI998_GLIB25_TAG, 5, TI998_GROMLIB2_REG, 0xa000, DEVWRITELINE(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, p8_grom_ready))
+	MCFG_GROM_ADD( TI998_GLIB26_TAG, 6, TI998_GROMLIB2_REG, 0xc000, DEVWRITELINE(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, p8_grom_ready))
+	MCFG_GROM_ADD( TI998_GLIB27_TAG, 7, TI998_GROMLIB2_REG, 0xe000, DEVWRITELINE(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, p8_grom_ready))
 
-	MCFG_GROM_ADD( GLIB30_TAG, 0, GROMLIB3_REG, 0x0000, DEVWRITELINE(MAINBOARD8_TAG, bus::ti99::internal::mainboard8_device, p3_grom_ready))
-	MCFG_GROM_ADD( GLIB31_TAG, 1, GROMLIB3_REG, 0x2000, DEVWRITELINE(MAINBOARD8_TAG, bus::ti99::internal::mainboard8_device, p3_grom_ready))
-	MCFG_GROM_ADD( GLIB32_TAG, 2, GROMLIB3_REG, 0x4000, DEVWRITELINE(MAINBOARD8_TAG, bus::ti99::internal::mainboard8_device, p3_grom_ready))
+	MCFG_GROM_ADD( TI998_GLIB30_TAG, 0, TI998_GROMLIB3_REG, 0x0000, DEVWRITELINE(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, p3_grom_ready))
+	MCFG_GROM_ADD( TI998_GLIB31_TAG, 1, TI998_GROMLIB3_REG, 0x2000, DEVWRITELINE(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, p3_grom_ready))
+	MCFG_GROM_ADD( TI998_GLIB32_TAG, 2, TI998_GROMLIB3_REG, 0x4000, DEVWRITELINE(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, p3_grom_ready))
 
 	// Joystick port
-	MCFG_TI_JOYPORT4A_ADD( JOYPORT_TAG )
+	MCFG_TI_JOYPORT4A_ADD( TI_JOYPORT_TAG )
 MACHINE_CONFIG_END
 
 /*
@@ -820,11 +824,11 @@ MACHINE_CONFIG_END
 */
 static MACHINE_CONFIG_DERIVED( ti99_8_60hz, ti99_8 )
 	// Video hardware
-	MCFG_DEVICE_ADD( VDP_TAG, TMS9118, XTAL_10_738635MHz / 2 )
+	MCFG_DEVICE_ADD( TI_VDP_TAG, TMS9118, XTAL_10_738635MHz / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
 	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(ti99_8_state, video_interrupt))
-	MCFG_TMS9928A_SCREEN_ADD_NTSC( SCREEN_TAG )
-	MCFG_SCREEN_UPDATE_DEVICE( VDP_TAG, tms9928a_device, screen_update )
+	MCFG_TMS9928A_SCREEN_ADD_NTSC( TI_SCREEN_TAG )
+	MCFG_SCREEN_UPDATE_DEVICE( TI_VDP_TAG, tms9928a_device, screen_update )
 MACHINE_CONFIG_END
 
 /*
@@ -832,11 +836,11 @@ MACHINE_CONFIG_END
 */
 static MACHINE_CONFIG_DERIVED( ti99_8_50hz, ti99_8 )
 	// Video hardware
-	MCFG_DEVICE_ADD( VDP_TAG, TMS9129, XTAL_10_738635MHz / 2 )
+	MCFG_DEVICE_ADD( TI_VDP_TAG, TMS9129, XTAL_10_738635MHz / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
 	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(ti99_8_state,video_interrupt))
-	MCFG_TMS9928A_SCREEN_ADD_PAL( SCREEN_TAG )
-	MCFG_SCREEN_UPDATE_DEVICE( VDP_TAG, tms9928a_device, screen_update )
+	MCFG_TMS9928A_SCREEN_ADD_PAL( TI_SCREEN_TAG )
+	MCFG_SCREEN_UPDATE_DEVICE( TI_VDP_TAG, tms9928a_device, screen_update )
 MACHINE_CONFIG_END
 
 /*
@@ -847,11 +851,11 @@ MACHINE_CONFIG_END
 */
 ROM_START(ti99_8)
 	// Logical (CPU) memory space: ROM0
-	ROM_REGION(0x2000, ROM0_REG, 0)
+	ROM_REGION(0x2000, TI998_ROM0_REG, 0)
 	ROM_LOAD("rom0.u4", 0x0000, 0x2000, CRC(901eb8d6) SHA1(13190c5e834baa9c0a70066b566cfcef438ed88a))
 
 	// Physical memory space (mapped): ROM1
-	ROM_REGION(0x8000, ROM1_REG, 0)
+	ROM_REGION(0x8000, TI998_ROM1_REG, 0)
 	ROM_LOAD("rom1.u25", 0x0000, 0x8000, CRC(b574461a) SHA1(42c6aed44802cfabdd26b565d6e5ddfcd689f11e))
 
 	// Physical memory space (mapped): P-Code ROM
@@ -861,20 +865,20 @@ ROM_START(ti99_8)
 	// the required select line for this ROM on the available schematics, so
 	// they seem to be from the earlier version. The location in the address
 	// space was determined by ROM disassembly.
-	ROM_REGION(0x8000, PASCAL_REG, 0)
+	ROM_REGION(0x8000, TI998_PASCAL_REG, 0)
 	ROM_LOAD("pascal.u25a", 0x0000, 0x4000, CRC(d7ed6dd6) SHA1(32212ce6426ceccbff73d342d4a3ef699c0ae1e4))
 
 	// System GROMs. 3 chips @ f830
 	// The schematics do not enumerate the circuits but only say
 	// "circuits on board" (COB) so we name the GROMs as gM_N.bin where M is the
 	// ID (0-7) and N is the access port in the logical address space.
-	ROM_REGION(0x6000, SYSGROM_REG, 0)
+	ROM_REGION(0x6000, TI998_SYSGROM_REG, 0)
 	ROM_LOAD("g0_f830.bin", 0x0000, 0x1800, CRC(1026db60) SHA1(7327095bf4f390476e69d9fd8424e98ea1f2325a))
 	ROM_LOAD("g1_f830.bin", 0x2000, 0x1800, CRC(93a43d65) SHA1(19be8a07d674bc7554c2bc9c7a5725d81e888e6e))
 	ROM_LOAD("g2_f830.bin", 0x4000, 0x1800, CRC(06f2b901) SHA1(f65e0fcb2c63e230b4a9563c72f91259b94ce955))
 
 	// TTS & Pascal library. 8 chips @ f840
-	ROM_REGION(0x10000, GROMLIB1_REG, 0)
+	ROM_REGION(0x10000, TI998_GROMLIB1_REG, 0)
 	ROM_LOAD("g0_f840.bin", 0x0000, 0x1800, CRC(44501071) SHA1(4b5ef7f1aa43a87e7ae4f02090944be5c39b1f26))
 	ROM_LOAD("g1_f840.bin", 0x2000, 0x1800, CRC(5a271d9e) SHA1(bb95befa2ffba2cc17ac437386e069e8ff621248))
 	ROM_LOAD("g2_f840.bin", 0x4000, 0x1800, CRC(d52502df) SHA1(17063e33ee8709d0df8030f38bb92c4322d55e1e))
@@ -885,7 +889,7 @@ ROM_START(ti99_8)
 	ROM_LOAD("g7_f840.bin", 0xE000, 0x1800, CRC(3a9d20df) SHA1(1e6f9f8ec7df4b997a7579be742d0a7d54bc8763))
 
 	// Pascal library. 8 chips @ f850
-	ROM_REGION(0x10000, GROMLIB2_REG, 0)
+	ROM_REGION(0x10000, TI998_GROMLIB2_REG, 0)
 	ROM_LOAD("g0_f850.bin", 0x0000, 0x1800, CRC(2d948672) SHA1(cf15912d6dae5a450e0cfd796aa36ea5e521dc56))
 	ROM_LOAD("g1_f850.bin", 0x2000, 0x1800, CRC(7d64a842) SHA1(d5884bb2af21c8027311478ee506beac6f46203d))
 	ROM_LOAD("g2_f850.bin", 0x4000, 0x1800, CRC(e5ed8900) SHA1(03826882ce10fb5a6b3a9ccc85d3d1fe51979d0b))
@@ -896,13 +900,13 @@ ROM_START(ti99_8)
 	ROM_LOAD("g7_f850.bin", 0xE000, 0x1800, CRC(71534098) SHA1(75e87123efde885e27dd749e07cb189eb2cc45a8))
 
 	// Pascal library. 3 chips @ f860
-	ROM_REGION(0x6000, GROMLIB3_REG, 0)
+	ROM_REGION(0x6000, TI998_GROMLIB3_REG, 0)
 	ROM_LOAD("g0_f860.bin", 0x0000, 0x1800, CRC(0ceef210) SHA1(b89957fbff094b758746391a69dea6907c66b950))
 	ROM_LOAD("g1_f860.bin", 0x2000, 0x1800, CRC(fc87de25) SHA1(4695b7f979f59a01ec16c55e4587c3379482b658))
 	ROM_LOAD("g2_f860.bin", 0x4000, 0x1800, CRC(e833e350) SHA1(6ffe501981a1112be1af596a489d96e287fc6be5))
 
 	// Speech ROM
-	ROM_REGION(0x8000, SPEECHROM_REG, 0)
+	ROM_REGION(0x8000, TI998_SPEECHROM_REG, 0)
 	ROM_LOAD("cd2325a.vsm", 0x0000, 0x4000, CRC(1f58b571) SHA1(0ef4f178716b575a1c0c970c56af8a8d97561ffe))
 	ROM_LOAD("cd2326a.vsm", 0x4000, 0x4000, CRC(65d00401) SHA1(a367242c2c96cebf0e2bf21862f3f6734b2b3020))
 ROM_END

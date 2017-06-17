@@ -4699,9 +4699,12 @@ void harddriv_state::init_ds3()
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x823000, 0x8237ff, write16_delegate(FUNC(harddriv_state::hd68k_ds3_sirq_clear_w), this));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x823800, 0x823fff, write16_delegate(FUNC(harddriv_state::hd68k_ds3_control_w), this));
 
-	/* predetermine memory regions, can't use a region_ptr because strtdriv expects uint8_t while hdrivair expects uint16_t */
-	m_ds3_sdata_memory = (uint16_t*)memregion("ds3sdsp_data")->base();
-	m_ds3_sdata_memory_size = memregion("ds3sdsp_data")->bytes() / 2;
+	/* predetermine memory regions, can't use a region_ptr because strtdriv expects uint8_t while hdrivair expects uint16_t, also need to check if region exists for steeltal*/
+	if (memregion("ds3sdsp_data") != nullptr)
+	{
+		m_ds3_sdata_memory = (uint16_t *)memregion("ds3sdsp_data")->base();
+		m_ds3_sdata_memory_size = memregion("ds3sdsp_data")->bytes() / 2;
+	}
 /*
 
 
@@ -5034,7 +5037,7 @@ READ32_MEMBER(harddriv_state::rddsp_unmap_r)
 
 READ16_MEMBER(harddriv_state::steeltal_dummy_r)
 {
-	/* this is required so that INT 4 is recongized as a sound INT */
+	/* this is required so that INT 4 is recognized as a sound INT */
 	return ~0;
 }
 

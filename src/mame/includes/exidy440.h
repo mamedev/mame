@@ -48,7 +48,6 @@ public:
 	uint8_t m_firq_select;
 	uint8_t m_palettebank_io;
 	uint8_t m_palettebank_vis;
-	emu_timer *m_beam_firq_timer;
 	emu_timer *m_collide_firq_timer;
 	DECLARE_WRITE8_MEMBER(bankram_w);
 	DECLARE_READ8_MEMBER(exidy440_input_port_3_r);

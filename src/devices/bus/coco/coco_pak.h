@@ -22,7 +22,6 @@ public:
 	coco_pak_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual ioport_constructor device_input_ports() const override;
 
@@ -37,14 +36,10 @@ protected:
 
 	// internal state
 	device_image_interface *m_cart;
-	cococart_slot_device *m_owner;
 
 	optional_ioport m_autostart;
 };
 
-
-// device type definition
-DECLARE_DEVICE_TYPE(COCO_PAK, coco_pak_device)
 
 // ======================> coco_pak_banked_device
 
@@ -59,13 +54,10 @@ protected:
 
 	// device-level overrides
 	virtual void device_reset() override;
-	virtual DECLARE_WRITE8_MEMBER(write) override;
+	virtual DECLARE_WRITE8_MEMBER(scs_write) override;
+
 private:
 	void banked_pak_set_bank(uint32_t bank);
 };
-
-
-// device type definition
-DECLARE_DEVICE_TYPE(COCO_PAK_BANKED, coco_pak_banked_device)
 
 #endif // MAME_BUS_COCO_COCO_PAK_H

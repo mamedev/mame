@@ -39,15 +39,15 @@ DEFINE_DEVICE_TYPE(CDP1861, cdp1861_device, "cdp1861", "RCA CDP1861")
 //-------------------------------------------------
 
 cdp1861_device::cdp1861_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, CDP1861, tag, owner, clock),
-		device_video_interface(mconfig, *this),
-		m_write_irq(*this),
-		m_write_dma_out(*this),
-		m_write_efx(*this),
-		m_disp(0),
-		m_dispon(0),
-		m_dispoff(0),
-		m_dmaout(CLEAR_LINE)
+	: device_t(mconfig, CDP1861, tag, owner, clock)
+	, device_video_interface(mconfig, *this)
+	, m_write_irq(*this)
+	, m_write_dma_out(*this)
+	, m_write_efx(*this)
+	, m_disp(0)
+	, m_dispon(0), m_dispoff(0)
+	, m_dmaout(CLEAR_LINE)
+	, m_int_timer(nullptr), m_efx_timer(nullptr), m_dma_timer(nullptr)
 {
 }
 

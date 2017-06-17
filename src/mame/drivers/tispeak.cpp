@@ -423,7 +423,7 @@ K28 modules:
 // The typical osc freq curve for TMS5100 is unknown. Let's assume it is set to the default frequency,
 // which is 640kHz for 8KHz according to the TMS5100 documentation.
 
-#define MASTER_CLOCK (640000)
+#define MASTER_CLOCK (XTAL_640kHz)
 
 
 class tispeak_state : public hh_tms1k_state
@@ -625,7 +625,7 @@ WRITE16_MEMBER(tispeak_state::lantutor_write_r)
 WRITE16_MEMBER(tispeak_state::snspellc_write_r)
 {
 	// R10: TMS5100 PDC pin
-	m_tms5100->pdc_w(data >> 10);
+	m_tms5100->pdc_w(data >> 10 & 1);
 
 	// R9: power-off request, on falling edge
 	if (~data & m_r & 0x200)

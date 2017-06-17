@@ -155,7 +155,6 @@ public:
 	// construction/destruction
 	nes_aladdin_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual DECLARE_READ8_MEMBER(read_h) override;
 	virtual DECLARE_WRITE8_MEMBER(write_h) override;
 
@@ -164,6 +163,8 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	required_device<nes_aladdin_slot_device> m_subslot;
 };

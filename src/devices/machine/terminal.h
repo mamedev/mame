@@ -29,20 +29,14 @@ INPUT_PORTS_EXTERN( generic_terminal );
 class generic_terminal_device : public device_t
 {
 public:
-	static constexpr unsigned TERMINAL_WIDTH = 80;
-	static constexpr unsigned TERMINAL_HEIGHT = 24;
-
 	generic_terminal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template <class Object> static void set_keyboard_callback(device_t &device, Object &&cb)
 	{ downcast<generic_terminal_device &>(device).m_keyboard_cb = std::forward<Object>(cb); }
 
 	DECLARE_WRITE8_MEMBER(write) { term_write(data); }
-	void kbd_put(u8 data);
-	uint32_t update(screen_device &device, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	virtual ioport_constructor device_input_ports() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	void kbd_put(u8 data);
 
 protected:
 	enum { BELL_TIMER_ID = 20'000 };
@@ -53,10 +47,15 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void send_key(uint8_t code) { if (!m_keyboard_cb.isnull()) m_keyboard_cb(code); }
 
 	optional_device<palette_device> m_palette;
 	required_ioport m_io_term_conf;
+
+	static constexpr unsigned TERMINAL_WIDTH = 80;
+	static constexpr unsigned TERMINAL_HEIGHT = 24;
 
 	unsigned const m_width;
 	unsigned const m_height;
@@ -67,6 +66,7 @@ private:
 	void scroll_line();
 	void write_char(uint8_t data);
 	void clear();
+	uint32_t update(screen_device &device, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	uint8_t m_framecnt;
 	uint8_t m_y_pos;

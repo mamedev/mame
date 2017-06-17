@@ -70,14 +70,12 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_dsr);
 	DECLARE_WRITE_LINE_MEMBER(write_dcd);
 
-	DECLARE_WRITE_LINE_MEMBER(internal_clock);
-
 	void set_xtal(uint32_t clock);
 
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	enum
@@ -145,6 +143,7 @@ private:
 
 	int stoplength();
 
+	DECLARE_WRITE_LINE_MEMBER(internal_clock);
 	DECLARE_WRITE_LINE_MEMBER(receiver_clock);
 	DECLARE_WRITE_LINE_MEMBER(transmitter_clock);
 

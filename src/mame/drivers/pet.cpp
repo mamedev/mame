@@ -1795,11 +1795,13 @@ static MACHINE_CONFIG_START( pet )
 	MCFG_PET_USER_PORT_M_HANDLER(DEVWRITELINE(M6522_TAG, via6522_device, write_cb2))
 
 	MCFG_QUICKLOAD_ADD("quickload", pet_state, cbm_pet, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
+	MCFG_QUICKLOAD_INTERFACE("cbm_quik")
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "pet_cass")
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "pet_flop")
 	MCFG_SOFTWARE_LIST_ADD("hdd_list", "pet_hdd")
+	MCFG_SOFTWARE_LIST_ADD("quik_list", "pet_quik")
 MACHINE_CONFIG_END
 
 
@@ -2229,6 +2231,7 @@ static MACHINE_CONFIG_START( pet80 )
 	MCFG_PET_USER_PORT_M_HANDLER(DEVWRITELINE(M6522_TAG, via6522_device, write_cb2))
 
 	MCFG_QUICKLOAD_ADD("quickload", pet_state, cbm_pet, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
+	MCFG_QUICKLOAD_INTERFACE("cbm_quik")
 
 	MCFG_GENERIC_CARTSLOT_ADD("cart_9000", generic_linear_slot, "pet_9000_rom")
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
@@ -2241,6 +2244,7 @@ static MACHINE_CONFIG_START( pet80 )
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "pet_flop")
 	MCFG_SOFTWARE_LIST_ADD("hdd_list", "pet_hdd")
 	MCFG_SOFTWARE_LIST_ADD("rom_list", "pet_rom")
+	MCFG_SOFTWARE_LIST_ADD("quik_list", "pet_quik")
 MACHINE_CONFIG_END
 
 

@@ -24,13 +24,13 @@ public:
 	// static configuration helpers
 	static void set_rom_start(device_t &device, const char *region, uint32_t offset);
 
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
 	virtual DECLARE_READ8_MEMBER(read) override;
 	virtual DECLARE_WRITE8_MEMBER(write) override;
 
 protected:
 	virtual void device_start() override;
+
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	void restore_banks();

@@ -29,21 +29,22 @@ public:
 	// construction/destruction
 	side116_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_WRITE_LINE_MEMBER( ide_interrupt );
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+
 private:
+	DECLARE_WRITE_LINE_MEMBER( ide_interrupt );
+
 	required_device<ata_interface_device> m_ata;
 	required_ioport m_config;
 	uint8_t m_latch;

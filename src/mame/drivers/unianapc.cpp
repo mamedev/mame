@@ -113,5 +113,5 @@ ROM_START( hogwild )
 	DISK_IMAGE( "hog wild", 0, SHA1(f05b7f64830d995db2e2a2f7f95ae0100de5dab1) )
 ROM_END
 
-GAME( 2002, dhunting,  0,   unianapc, unianapc, unianapc_state,  0, ROT0, "Game Box Entertainment", "Dream Hunting (US)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Ver 1007?
-GAME( 2003, hogwild,   0,   unianapc, unianapc, unianapc_state,  0, ROT0, "Uniana",                 "Hog Wild (US)",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Ver.00.26.b?
+GAME( 2002, dhunting,  0,   unianapc, unianapc, unianapc_state,  0, ROT0, "Game Box Entertainment", "Dream Hunting (US)",  MACHINE_IS_SKELETON ) // Ver 1007?
+GAME( 2003, hogwild,   0,   unianapc, unianapc, unianapc_state,  0, ROT0, "Uniana",                 "Hog Wild (US)",       MACHINE_IS_SKELETON ) // Ver.00.26.b?

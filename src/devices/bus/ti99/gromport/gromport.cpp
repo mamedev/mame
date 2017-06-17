@@ -122,7 +122,7 @@ namespace bus { namespace ti99 { namespace gromport {
 #define TRACE_WRITE 0
 
 gromport_device::gromport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	:   bus8z_device(mconfig, TI99_GROMPORT, tag, owner, clock),
+	:   device_t(mconfig, TI99_GROMPORT, tag, owner, clock),
 		device_slot_interface(mconfig, *this),
 		m_connector(nullptr),
 		m_reset_on_insert(true),
@@ -267,8 +267,8 @@ ioport_constructor gromport_device::device_input_ports() const
 
 ***************************************************************************/
 
-cartridge_connector_device::cartridge_connector_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: bus8z_device(mconfig, type, tag, owner, clock),
+cartridge_connector_device::cartridge_connector_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	m_gromport(nullptr)
 {
 }

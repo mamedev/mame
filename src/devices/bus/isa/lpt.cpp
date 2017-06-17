@@ -19,15 +19,10 @@ isa8_lpt_device::isa8_lpt_device(const machine_config &mconfig, const char *tag,
 {
 }
 
-static MACHINE_CONFIG_START( lpt_config )
+MACHINE_CONFIG_MEMBER( isa8_lpt_device::device_add_mconfig )
 	MCFG_DEVICE_ADD("lpt", PC_LPT, 0)
 	MCFG_PC_LPT_IRQ_HANDLER(WRITELINE(isa8_lpt_device, pc_cpu_line))
 MACHINE_CONFIG_END
-
-machine_config_constructor isa8_lpt_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( lpt_config );
-}
 
 static INPUT_PORTS_START( lpt_dsw )
 	PORT_START("DSW")

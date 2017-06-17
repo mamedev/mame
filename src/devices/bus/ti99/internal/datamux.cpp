@@ -80,12 +80,12 @@ namespace bus { namespace ti99 { namespace internal {
 */
 datamux_device::datamux_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TI99_DATAMUX, tag, owner, clock),
-	m_video(*owner, VDP_TAG),
-	m_sound(*owner, TISOUNDCHIP_TAG),
+	m_video(*owner, TI_VDP_TAG),
+	m_sound(*owner, TI_SOUNDCHIP_TAG),
 	m_ioport(*owner, TI99_IOPORT_TAG),
-	m_gromport(*owner, GROMPORT_TAG),
-	m_ram16b(*owner, EXPRAM_TAG),
-	m_padram(*owner, PADRAM_TAG),
+	m_gromport(*owner, TI99_GROMPORT_TAG),
+	m_ram16b(*owner, TI99_EXPRAM_TAG),
+	m_padram(*owner, TI99_PADRAM_TAG),
 	m_spacep(nullptr),
 	m_ready(*this),
 	m_addr_buf(0),
@@ -596,7 +596,7 @@ void datamux_device::device_stop(void)
 
 void datamux_device::device_reset(void)
 {
-	m_consolerom = (uint16_t*)owner()->memregion(CONSOLEROM)->base();
+	m_consolerom = (uint16_t*)owner()->memregion(TI99_CONSOLEROM)->base();
 	m_use32k = (ioport("RAM")->read()==1);
 	m_console_groms_present = (ioport("GROMENA")->read()==1);
 
@@ -617,9 +617,9 @@ void datamux_device::device_reset(void)
 
 void datamux_device::device_config_complete()
 {
-	m_grom[0] = downcast<tmc0430_device*>(owner()->subdevice(GROM0_TAG));
-	m_grom[1] = downcast<tmc0430_device*>(owner()->subdevice(GROM1_TAG));
-	m_grom[2] = downcast<tmc0430_device*>(owner()->subdevice(GROM2_TAG));
+	m_grom[0] = downcast<tmc0430_device*>(owner()->subdevice(TI99_GROM0_TAG));
+	m_grom[1] = downcast<tmc0430_device*>(owner()->subdevice(TI99_GROM1_TAG));
+	m_grom[2] = downcast<tmc0430_device*>(owner()->subdevice(TI99_GROM2_TAG));
 }
 
 

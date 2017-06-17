@@ -73,6 +73,7 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(msb_sound_w);
 	DECLARE_READ16_MEMBER(msb_sound_r);
+	DECLARE_WRITE8_MEMBER(coin_control_w);
 
 	// opwolf specific
 	DECLARE_READ16_MEMBER(opwolf3_adc_r);

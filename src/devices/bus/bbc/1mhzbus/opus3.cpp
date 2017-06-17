@@ -52,7 +52,7 @@ DEFINE_DEVICE_TYPE(BBC_OPUS3, bbc_opus3_device, "bbc_opus3", "Opus Challenger 3-
 //  MACHINE_DRIVER( opus3 )
 //-------------------------------------------------
 
-FLOPPY_FORMATS_MEMBER(floppy_formats)
+FLOPPY_FORMATS_MEMBER(bbc_opus3_device::floppy_formats)
 	FLOPPY_ACORN_SSD_FORMAT,
 	FLOPPY_ACORN_DSD_FORMAT,
 	FLOPPY_ACORN_CPM_FORMAT,
@@ -63,23 +63,6 @@ FLOPPY_FORMATS_END0
 SLOT_INTERFACE_START(bbc_floppies)
 	SLOT_INTERFACE("525qd", FLOPPY_525_QD)
 SLOT_INTERFACE_END
-
-
-MACHINE_CONFIG_START( opus3 )
-	/* fdc */
-	MCFG_WD1770_ADD("wd1770", XTAL_16MHz / 2)
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(bbc_opus3_device, fdc_drq_w))
-	MCFG_FLOPPY_DRIVE_ADD("wd1770:0", bbc_floppies, "525qd", floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("wd1770:1", bbc_floppies, nullptr, floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-
-	/* ram disk */
-	MCFG_RAM_ADD("ramdisk")
-	MCFG_RAM_DEFAULT_SIZE("512K")
-	MCFG_RAM_EXTRA_OPTIONS("256K")
-	MCFG_RAM_DEFAULT_VALUE(0x00)
-MACHINE_CONFIG_END
 
 
 ROM_START( opus3 )
@@ -94,14 +77,24 @@ ROM_START( opus3 )
 ROM_END
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor bbc_opus3_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( opus3 );
-}
+MACHINE_CONFIG_MEMBER( bbc_opus3_device::device_add_mconfig )
+	/* fdc */
+	MCFG_WD1770_ADD("wd1770", XTAL_16MHz / 2)
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(bbc_opus3_device, fdc_drq_w))
+	MCFG_FLOPPY_DRIVE_ADD("wd1770:0", bbc_floppies, "525qd", floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+	MCFG_FLOPPY_DRIVE_ADD("wd1770:1", bbc_floppies, nullptr, floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+
+	/* ram disk */
+	MCFG_RAM_ADD("ramdisk")
+	MCFG_RAM_DEFAULT_SIZE("512K")
+	MCFG_RAM_EXTRA_OPTIONS("256K")
+	MCFG_RAM_DEFAULT_VALUE(0x00)
+MACHINE_CONFIG_END
 
 const tiny_rom_entry *bbc_opus3_device::device_rom_region() const
 {

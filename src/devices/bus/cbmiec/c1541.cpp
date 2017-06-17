@@ -161,18 +161,18 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(C1540,                      c1540_device,                      "c1540",    "C1540")
-DEFINE_DEVICE_TYPE(C1541,                      c1541_device,                      "c1541",    "C1541")
-DEFINE_DEVICE_TYPE(C1541C,                     c1541c_device,                     "c1541c",   "C1541C")
-DEFINE_DEVICE_TYPE(C1541II,                    c1541ii_device,                    "c1541ii",  "C1541-II")
-DEFINE_DEVICE_TYPE(SX1541,                     sx1541_device,                     "sx1541",   "SX1541")
-DEFINE_DEVICE_TYPE(FSD1,                       fsd1_device,                       "fsd1",     "FSD-1")
-DEFINE_DEVICE_TYPE(FSD2,                       fsd2_device,                       "fsd2",     "FSD-2")
-DEFINE_DEVICE_TYPE(CSD1,                       csd1_device,                       "csd1",     "CSD-1")
-DEFINE_DEVICE_TYPE(C1541_DOLPHIN_DOS,          c1541_dolphin_dos_device,          "c1541dd",  "C1541 Dolphin-DOS 2.0")
-DEFINE_DEVICE_TYPE(C1541_PROFESSIONAL_DOS_V1,  c1541_professional_dos_v1_device,  "c1541pd",  "C1541 Professional-DOS v1")
-DEFINE_DEVICE_TYPE(C1541_PROLOGIC_DOS_CLASSIC, c1541_prologic_dos_classic_device, "c1541pdc", "C1541 ProLogic-DOS Classic")
-DEFINE_DEVICE_TYPE(INDUS_GT,                   indus_gt_device,                   "indusgt",  "Indus GT")
+DEFINE_DEVICE_TYPE(C1540,                      c1540_device,                      "c1540",    "C1540 Disk Drive")
+DEFINE_DEVICE_TYPE(C1541,                      c1541_device,                      "c1541",    "C1541 Disk Drive")
+DEFINE_DEVICE_TYPE(C1541C,                     c1541c_device,                     "c1541c",   "C1541C Disk Drive")
+DEFINE_DEVICE_TYPE(C1541II,                    c1541ii_device,                    "c1541ii",  "C1541-II Disk Drive")
+DEFINE_DEVICE_TYPE(SX1541,                     sx1541_device,                     "sx1541",   "SX1541 Disk Drive")
+DEFINE_DEVICE_TYPE(FSD1,                       fsd1_device,                       "fsd1",     "FSD-1 Disk Drive")
+DEFINE_DEVICE_TYPE(FSD2,                       fsd2_device,                       "fsd2",     "FSD-2 Disk Drive")
+DEFINE_DEVICE_TYPE(CSD1,                       csd1_device,                       "csd1",     "CSD-1 Disk Drive")
+DEFINE_DEVICE_TYPE(C1541_DOLPHIN_DOS,          c1541_dolphin_dos_device,          "c1541dd",  "C1541 Dolphin-DOS 2.0 Disk Drive")
+DEFINE_DEVICE_TYPE(C1541_PROFESSIONAL_DOS_V1,  c1541_professional_dos_v1_device,  "c1541pd",  "C1541 Professional-DOS v1 Disk Drive")
+DEFINE_DEVICE_TYPE(C1541_PROLOGIC_DOS_CLASSIC, c1541_prologic_dos_classic_device, "c1541pdc", "C1541 ProLogic-DOS Classic Disk Drive")
+DEFINE_DEVICE_TYPE(INDUS_GT,                   indus_gt_device,                   "indusgt",  "Indus GT Disk Drive")
 
 
 //-------------------------------------------------
@@ -808,10 +808,10 @@ WRITE8_MEMBER( c1541_prologic_dos_classic_device::pia_pb_w )
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( c1541 )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( c1541 )
+MACHINE_CONFIG_MEMBER( c1541_device_base::device_add_mconfig )
 	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
 	MCFG_CPU_PROGRAM_MAP(c1541_mem)
 	MCFG_QUANTUM_PERFECT_CPU(M6502_TAG)
@@ -836,93 +836,33 @@ static MACHINE_CONFIG_START( c1541 )
 	MCFG_DEVICE_ADD(C64H156_TAG, C64H156, XTAL_16MHz)
 	MCFG_64H156_ATN_CALLBACK(WRITELINE(c1541_device_base, atn_w))
 	MCFG_64H156_BYTE_CALLBACK(WRITELINE(c1541_device_base, byte_w))
-	MCFG_FLOPPY_DRIVE_ADD(C64H156_TAG":0", c1540_floppies, "525ssqd", c1541_device_base::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD_FIXED(C64H156_TAG":0", c1540_floppies, "525ssqd", c1541_device_base::floppy_formats)
 MACHINE_CONFIG_END
 
 
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor c1541_device_base::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( c1541 );
-}
-
-
-//-------------------------------------------------
-//  MACHINE_DRIVER( c1541c )
-//-------------------------------------------------
-
-static MACHINE_CONFIG_START( c1541c )
-	MCFG_FRAGMENT_ADD(c1541)
+MACHINE_CONFIG_MEMBER( c1541c_device::device_add_mconfig )
+	c1541_device_base::device_add_mconfig(config);
 MACHINE_CONFIG_END
 
 
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor c1541c_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( c1541c );
-}
-
-
-//-------------------------------------------------
-//  MACHINE_DRIVER( c1541dd )
-//-------------------------------------------------
-
-static MACHINE_CONFIG_START( c1541dd )
-	MCFG_FRAGMENT_ADD(c1541)
+MACHINE_CONFIG_MEMBER( c1541_dolphin_dos_device::device_add_mconfig )
+	c1541_device_base::device_add_mconfig(config);
 
 	MCFG_CPU_MODIFY(M6502_TAG)
 	MCFG_CPU_PROGRAM_MAP(c1541dd_mem)
 MACHINE_CONFIG_END
 
 
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor c1541_dolphin_dos_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( c1541dd );
-}
-
-
-//-------------------------------------------------
-//  MACHINE_DRIVER( c1541pd )
-//-------------------------------------------------
-
-static MACHINE_CONFIG_START( c1541pd )
-	MCFG_FRAGMENT_ADD(c1541)
+MACHINE_CONFIG_MEMBER( c1541_professional_dos_v1_device::device_add_mconfig )
+	c1541_device_base::device_add_mconfig(config);
 
 	MCFG_CPU_MODIFY(M6502_TAG)
 	MCFG_CPU_PROGRAM_MAP(c1541pd_mem)
 MACHINE_CONFIG_END
 
 
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor c1541_professional_dos_v1_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( c1541pd );
-}
-
-
-//-------------------------------------------------
-//  MACHINE_DRIVER( c1541pdc )
-//-------------------------------------------------
-
-static MACHINE_CONFIG_START( c1541pdc )
-	MCFG_FRAGMENT_ADD(c1541)
+MACHINE_CONFIG_MEMBER( c1541_prologic_dos_classic_device::device_add_mconfig )
+	c1541_device_base::device_add_mconfig(config);
 
 	MCFG_CPU_MODIFY(M6502_TAG)
 	MCFG_CPU_PROGRAM_MAP(c1541pdc_mem)
@@ -937,17 +877,6 @@ static MACHINE_CONFIG_START( c1541pdc )
 	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE(MC6821_TAG, pia6821_device, ca1_w))
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor c1541_prologic_dos_classic_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( c1541pdc );
-}
 
 
 //-------------------------------------------------
@@ -1004,11 +933,11 @@ c1541_device_base::c1541_device_base(const machine_config &mconfig, device_type 
 	device_t(mconfig, type, tag, owner, clock),
 	device_cbm_iec_interface(mconfig, *this),
 	device_c64_floppy_parallel_interface(mconfig, *this),
+	m_floppy(*this, C64H156_TAG":0:525ssqd"),
 	m_maincpu(*this, M6502_TAG),
 	m_via0(*this, M6522_0_TAG),
 	m_via1(*this, M6522_1_TAG),
 	m_ga(*this, C64H156_TAG),
-	m_floppy(*this, C64H156_TAG":0:525ssqd"),
 	m_address(*this, "ADDRESS"),
 	m_data_out(1),
 	m_via0_irq(CLEAR_LINE),

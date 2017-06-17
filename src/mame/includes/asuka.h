@@ -64,6 +64,7 @@ public:
 	required_device<tc0100scn_device> m_tc0100scn;
 	required_device<tc0110pcr_device> m_tc0110pcr;
 	optional_device<tc0220ioc_device> m_tc0220ioc;
+	DECLARE_WRITE8_MEMBER(coin_control_w);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(asuka_msm5205_address_w);
 	DECLARE_READ16_MEMBER(cadash_share_r);

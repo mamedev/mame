@@ -434,7 +434,7 @@ WRITE8_MEMBER(flstory_state::sound_control_3_w)/* unknown */
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, flstory_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xc801) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
+	AM_RANGE(0xc800, 0xc801) AM_DEVWRITE("aysnd", ym2149_device, address_data_w)
 	AM_RANGE(0xca00, 0xca0d) AM_DEVWRITE("msm", msm5232_device, write)
 	AM_RANGE(0xcc00, 0xcc00) AM_WRITE(sound_control_0_w)
 	AM_RANGE(0xce00, 0xce00) AM_WRITE(sound_control_1_w)
@@ -1051,7 +1051,7 @@ static MACHINE_CONFIG_START( flstory )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_8MHz/4) /* verified on pcb */
+	MCFG_SOUND_ADD("aysnd", YM2149, XTAL_8MHz/4) /* verified on pcb */
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(flstory_state, sound_control_2_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(flstory_state, sound_control_3_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1)
@@ -1114,7 +1114,7 @@ static MACHINE_CONFIG_START( onna34ro )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 8000000/4)
+	MCFG_SOUND_ADD("aysnd", YM2149, 8000000/4)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(flstory_state, sound_control_2_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(flstory_state, sound_control_3_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1)
@@ -1177,7 +1177,7 @@ static MACHINE_CONFIG_START( victnine )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 8000000/4)
+	MCFG_SOUND_ADD("aysnd", YM2149, 8000000/4)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(flstory_state, sound_control_2_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(flstory_state, sound_control_3_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
@@ -1246,7 +1246,7 @@ static MACHINE_CONFIG_START( rumba )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_8MHz/4) /* verified on pcb */
+	MCFG_SOUND_ADD("aysnd", YM2149, XTAL_8MHz/4) /* verified on pcb */
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(flstory_state, sound_control_2_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(flstory_state, sound_control_3_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)

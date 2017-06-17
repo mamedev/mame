@@ -12,7 +12,7 @@ void konami_decode_gfx(device_gfx_interface &gfxdecode, int gfx_index, uint8_t *
 
 	memcpy(&gl, layout, sizeof(gl));
 	gl.total = total;
-	gfxdecode.set_gfx(gfx_index, std::make_unique<gfx_element>(palette, gl, data, 0, palette.entries() >> bpp, 0));
+	gfxdecode.set_gfx(gfx_index, std::make_unique<gfx_element>(&palette, gl, data, 0, palette.entries() >> bpp, 0));
 }
 
 

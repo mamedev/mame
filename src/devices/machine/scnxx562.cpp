@@ -100,7 +100,7 @@ DONE (x) (p=partly)         NMOS         CMOS
 #define LOGR(...)       LOGMASKED(LOG_R, __VA_ARGS__)
 #define LOGTX(...)      LOGMASKED(LOG_TX, __VA_ARGS__)
 #define LOGRX(...)      LOGMASKED(LOG_RX, __VA_ARGS__)
-#define LOGSETUP(...)	LOGMASKED(LOG_SETUP, __VA_ARGS__)
+#define LOGSETUP(...)   LOGMASKED(LOG_SETUP, __VA_ARGS__)
 #define LOGINT(...)     LOGMASKED(LOG_INT, __VA_ARGS__)
 
 #ifdef _MSC_VER
@@ -126,17 +126,12 @@ DEFINE_DEVICE_TYPE(DUSCC68562,    duscc68562_device,  "duscc68562",    "Philips 
 DEFINE_DEVICE_TYPE(DUSCC68C562,   duscc68c562_device, "duscc68c562",   "Philips SCN68C562 Dual SCC")
 
 //-------------------------------------------------
-//  device_mconfig_additions -
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
-MACHINE_CONFIG_START( duscc )
+MACHINE_CONFIG_MEMBER( duscc_device::device_add_mconfig )
 	MCFG_DEVICE_ADD(CHANA_TAG, DUSCC_CHANNEL, 0)
 	MCFG_DEVICE_ADD(CHANB_TAG, DUSCC_CHANNEL, 0)
 MACHINE_CONFIG_END
-
-machine_config_constructor duscc_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( duscc );
-}
 
 //**************************************************************************
 //  LIVE DEVICE

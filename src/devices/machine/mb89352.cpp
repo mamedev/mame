@@ -6,6 +6,7 @@
  *  Should be compatible with the MB87030/31, and MB89351
  *
  *  Used on the Sharp X68000 Super, X68000 XVI and X68030 (internal), and on SCSI expansion cards for any X680x0 (external)
+ *  Also used in Sega's Soreike Kokology 1/2 (drives CD-ROM)
  *
  *  Registers (based on datasheet):
  *
@@ -490,6 +491,7 @@ WRITE8_MEMBER( mb89352_device::mb89352_w )
 			if(m_phase == SCSI_PHASE_DATAIN)  // if we are reading data...
 			{
 				m_spc_status &= ~SSTS_DREG_EMPTY;  // DREG is no longer empty
+				logerror("data-in\n");
 				read_data(m_buffer, 512);
 			}
 			if(m_phase == SCSI_PHASE_MESSAGE_IN)
@@ -498,10 +500,16 @@ WRITE8_MEMBER( mb89352_device::mb89352_w )
 				m_data = 0;
 				m_temp = 0x00;
 				set_phase(SCSI_PHASE_BUS_FREE);
+				logerror("message-in\n");
 				m_spc_status &= ~SSTS_XFER_IN_PROGRESS;
 				m_command_index = 0;
 			}
-			logerror("mb89352: SCMD: Start Transfer\n");
+			if(m_phase == SCSI_PHASE_COMMAND)
+			{
+				logerror("command-in\n");
+				m_spc_status |= SSTS_SPC_BSY;
+			}
+			logerror("mb89352: SCMD: Start Transfer %02x\n",m_phase);
 			break;
 		case 0x05:  // Transfer pause
 			logerror("mb89352: SCMD: Pause Transfer\n");
@@ -539,6 +547,9 @@ WRITE8_MEMBER( mb89352_device::mb89352_w )
 					else
 						set_phase(phase);
 					logerror("Command executed: ");
+					//m_spc_status &= ~SSTS_SPC_BSY;
+					//m_ints |= INTS_COMMAND_COMPLETE;
+
 					for(x=0;x<m_command_index;x++)
 						logerror(" %02x",m_command[x]);
 					logerror("\n");
@@ -598,6 +609,8 @@ WRITE8_MEMBER( mb89352_device::mb89352_w )
 				else
 					set_phase(phase);
 				logerror("Command executed: ");
+				//m_ints |= INTS_COMMAND_COMPLETE;
+
 				for(x=0;x<m_command_index;x++)
 					logerror(" %02x",m_command[x]);
 				logerror("\n");

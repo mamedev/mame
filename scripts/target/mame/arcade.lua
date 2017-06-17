@@ -549,6 +549,7 @@ MACHINES["SMC91C9X"] = true
 MACHINES["SMPC"] = true
 MACHINES["STVCD"] = true
 MACHINES["TC0091LVC"] = true
+MACHINES["TE7750"] = true
 MACHINES["TIMEKPR"] = true
 MACHINES["TMP68301"] = true
 --MACHINES["TMS5501"] = true
@@ -3120,6 +3121,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/mjkjidai.cpp",
 	MAME_DIR .. "src/mame/includes/mjkjidai.h",
 	MAME_DIR .. "src/mame/video/mjkjidai.cpp",
+	MAME_DIR .. "src/mame/drivers/ron.cpp",
 }
 
 createMAMEProjects(_target, _subtarget, "sega")
@@ -4222,7 +4224,7 @@ files {
 createMAMEProjects(_target, _subtarget, "zaccaria")
 files {
 	MAME_DIR .. "src/mame/audio/nl_zac1b11142.cpp",
-	MAME_DIR .. "src/mame/audio/nl_zacc1b11142.h",
+	MAME_DIR .. "src/mame/audio/nl_zac1b11142.h",
 	MAME_DIR .. "src/mame/audio/zaccaria.cpp",
 	MAME_DIR .. "src/mame/audio/zaccaria.h",
 	MAME_DIR .. "src/mame/drivers/laserbat.cpp",
@@ -4322,6 +4324,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/sleic.cpp",
 	MAME_DIR .. "src/mame/drivers/spectra.cpp",
 	MAME_DIR .. "src/mame/drivers/spinb.cpp",
+	MAME_DIR .. "src/mame/drivers/spirit76.cpp",
 	MAME_DIR .. "src/mame/drivers/st_mp100.cpp",
 	MAME_DIR .. "src/mame/drivers/st_mp200.cpp",
 	MAME_DIR .. "src/mame/drivers/stargame.cpp",

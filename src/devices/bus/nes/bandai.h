@@ -90,7 +90,6 @@ public:
 	// construction/destruction
 	nes_lz93d50_24c01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual DECLARE_READ8_MEMBER(read_m) override;
 	virtual DECLARE_WRITE8_MEMBER(write_h) override;
 
@@ -101,6 +100,8 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override;
+
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	// TODO: fix EEPROM I/O emulation
 	required_device<i2cmem_device> m_i2cmem;
@@ -116,8 +117,9 @@ public:
 	// construction/destruction
 	nes_lz93d50_24c02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 

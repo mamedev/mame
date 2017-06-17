@@ -204,38 +204,6 @@ other supported games as well.
 
 /***************************************************************************/
 
-// bchopper doesn't like the proper IRQ controller hookup, title screen jumps around, as does ingame at times
-// like m92.c I think this is because we don't clear things at the right time.
-#define USE_HACKED_IRQS
-
-#ifdef USE_HACKED_IRQS
-
-#define M72_TRIGGER_IRQ0 m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_upd71059c->HACK_get_base_vector()+0 ); /* VBL interrupt */
-#define M72_TRIGGER_IRQ1 m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_upd71059c->HACK_get_base_vector()+1 ); /* Sprite buffer complete interrupt */
-#define M72_TRIGGER_IRQ2 m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_upd71059c->HACK_get_base_vector()+2 ); /* Raster interrupt */
-#define M72_TRIGGER_IRQ3 m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_upd71059c->HACK_get_base_vector()+3 ); /* Sound cpu->Main cpu interrupt */
-// not used due to HOLD LINE logic
-#define M72_CLEAR_IRQ0 ;
-#define M72_CLEAR_IRQ1 ;
-#define M72_CLEAR_IRQ2 ;
-#define M72_CLEAR_IRQ3 ;
-
-#else
-
-#define M72_TRIGGER_IRQ0 m_upd71059c->ir0_w(1);
-#define M72_TRIGGER_IRQ1 m_upd71059c->ir1_w(1);
-#define M72_TRIGGER_IRQ2 m_upd71059c->ir2_w(1);
-#define M72_TRIGGER_IRQ3 m_upd71059c->ir3_w(1);
-// not sure when these should happen, probably the source of our issues
-#define M72_CLEAR_IRQ0 m_upd71059c->ir0_w(0);
-#define M72_CLEAR_IRQ1 m_upd71059c->ir1_w(0);
-#define M72_CLEAR_IRQ2 m_upd71059c->ir2_w(0);
-#define M72_CLEAR_IRQ3 m_upd71059c->ir3_w(0);
-
-#endif
-
-
-
 void m72_state::machine_start()
 {
 	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(m72_state::scanline_interrupt),this));
@@ -273,21 +241,17 @@ TIMER_CALLBACK_MEMBER(m72_state::scanline_interrupt)
 	/* raster interrupt - visible area only? */
 	if (scanline < 256 && scanline == m_raster_irq_position - 128)
 	{
-		M72_TRIGGER_IRQ2
-	}
-	else
-	{
-		M72_CLEAR_IRQ2
+		m_upd71059c->ir2_w(1);
 	}
 
 	/* VBLANK interrupt */
 	if (scanline == 256)
 	{
-		M72_TRIGGER_IRQ0
+		m_upd71059c->ir0_w(1);
 	}
 	else
 	{
-		M72_CLEAR_IRQ0
+		m_upd71059c->ir0_w(0);
 	}
 
 	/* adjust for next scanline */
@@ -1861,9 +1825,7 @@ static MACHINE_CONFIG_START( m72_base )
 	MCFG_CPU_ADD("maincpu",V30,MASTER_CLOCK/2/2)    /* 16 MHz external freq (8MHz internal) */
 	MCFG_CPU_PROGRAM_MAP(m72_map)
 	MCFG_CPU_IO_MAP(m72_portmap)
-#ifndef USE_HACKED_IRQS
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("upd71059c", pic8259_device, inta_cb)
-#endif
 	MCFG_CPU_ADD("soundcpu",Z80, SOUND_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(sound_ram_map)
 	MCFG_CPU_IO_MAP(sound_portmap)
@@ -1973,9 +1935,7 @@ static MACHINE_CONFIG_START( rtype2 )
 	MCFG_CPU_ADD("maincpu", V30,MASTER_CLOCK/2/2)   /* 16 MHz external freq (8MHz internal) */
 	MCFG_CPU_PROGRAM_MAP(rtype2_map)
 	MCFG_CPU_IO_MAP(m84_portmap)
-#ifndef USE_HACKED_IRQS
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("upd71059c", pic8259_device, inta_cb)
-#endif
 
 	MCFG_CPU_ADD("soundcpu", Z80, SOUND_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(sound_rom_map)
@@ -2018,9 +1978,7 @@ static MACHINE_CONFIG_START( cosmccop )
 	MCFG_CPU_ADD("maincpu", V35,MASTER_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(kengo_map)
 	MCFG_CPU_IO_MAP(m84_v33_portmap)
-//#ifndef USE_HACKED_IRQS
 //  MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("upd71059c", pic8259_device, inta_cb)
-//#endif
 
 	MCFG_CPU_ADD("soundcpu", Z80, SOUND_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(sound_rom_map)
@@ -2067,9 +2025,7 @@ static MACHINE_CONFIG_START( m82 )
 	MCFG_CPU_ADD("maincpu", V30,MASTER_CLOCK/2/2)   /* 16 MHz external freq (8MHz internal) */
 	MCFG_CPU_PROGRAM_MAP(m82_map)
 	MCFG_CPU_IO_MAP(m82_portmap)
-#ifndef USE_HACKED_IRQS
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("upd71059c", pic8259_device, inta_cb)
-#endif
 	MCFG_CPU_ADD("soundcpu", Z80, SOUND_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(sound_rom_map)
 	MCFG_CPU_IO_MAP(rtype2_sound_portmap)
@@ -2103,9 +2059,7 @@ static MACHINE_CONFIG_START( poundfor )
 	MCFG_CPU_ADD("maincpu", V30,MASTER_CLOCK/2/2)   /* 16 MHz external freq (8MHz internal) */
 	MCFG_CPU_PROGRAM_MAP(rtype2_map)
 	MCFG_CPU_IO_MAP(poundfor_portmap)
-#ifndef USE_HACKED_IRQS
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("upd71059c", pic8259_device, inta_cb)
-#endif
 	MCFG_CPU_ADD("soundcpu", Z80, SOUND_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(sound_rom_map)
 	MCFG_CPU_IO_MAP(poundfor_sound_portmap)

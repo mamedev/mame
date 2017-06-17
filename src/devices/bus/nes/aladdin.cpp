@@ -324,11 +324,6 @@ static SLOT_INTERFACE_START(ade_cart)
 SLOT_INTERFACE_END
 
 
-MACHINE_CONFIG_START( camerica_aladdin )
+MACHINE_CONFIG_MEMBER( nes_aladdin_device::device_add_mconfig )
 	MCFG_ALADDIN_MINICART_ADD("ade_slot", ade_cart)
 MACHINE_CONFIG_END
-
-machine_config_constructor nes_aladdin_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( camerica_aladdin );
-}

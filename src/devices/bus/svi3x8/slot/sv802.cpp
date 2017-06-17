@@ -17,21 +17,15 @@
 DEFINE_DEVICE_TYPE(SV802, sv802_device, "sv802", "SV-802 Centronics Printer Interface")
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( sv802 )
+MACHINE_CONFIG_MEMBER( sv802_device::device_add_mconfig )
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(sv802_device, busy_w))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 MACHINE_CONFIG_END
-
-machine_config_constructor sv802_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( sv802 );
-}
 
 
 //**************************************************************************

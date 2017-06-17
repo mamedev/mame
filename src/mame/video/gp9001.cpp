@@ -223,7 +223,8 @@ gp9001vdp_device::gp9001vdp_device(const machine_config &mconfig, const char *ta
 		m_vram_bg(*this, "vram_bg"),
 		m_vram_fg(*this, "vram_fg"),
 		m_vram_top(*this, "vram_top"),
-		m_spriteram(*this, "spriteram")
+		m_spriteram(*this, "spriteram"),
+		m_vint_out_cb(*this)
 {
 }
 
@@ -297,6 +298,10 @@ void gp9001vdp_device::device_start()
 
 	create_tilemaps();
 
+	m_vint_out_cb.resolve();
+
+	m_raise_irq_timer = timer_alloc(TIMER_RAISE_IRQ);
+
 	save_pointer(NAME(sp.vram16_buffer.get()), SPRITERAM_SIZE/2);
 
 	save_item(NAME(gp9001_scroll_reg));
@@ -357,6 +362,10 @@ void gp9001vdp_device::device_reset()
 	sp.flip = 0;
 
 	init_scroll_regs();
+
+	if (!m_vint_out_cb.isnull())
+		m_vint_out_cb(0);
+	m_raise_irq_timer->adjust(attotime::never);
 }
 
 
@@ -503,7 +512,7 @@ void gp9001vdp_device::gp9001_scroll_reg_data_w(uint16_t data, uint16_t mem_mask
 
 		case 0x0e:  /******* Initialise video controller register ? *******/
 
-		case 0x0f:  break;
+		case 0x0f: if (!m_vint_out_cb.isnull()) m_vint_out_cb(0); break;
 
 
 		default:    logerror("Hmmm, writing %08x to unknown video control register (%08x) !!!\n",data,gp9001_scroll_reg);
@@ -922,4 +931,21 @@ void gp9001vdp_device::gp9001_screen_eof(void)
 {
 	/** Shift sprite RAM buffers  ***  Used to fix sprite lag **/
 	if (sp.use_sprite_buffer) memcpy(sp.vram16_buffer.get(),m_spriteram,SPRITERAM_SIZE);
+
+	// the IRQ appears to fire at line 0xe6
+	if (!m_vint_out_cb.isnull())
+		m_raise_irq_timer->adjust(screen().time_until_pos(0xe6));
+}
+
+
+void gp9001vdp_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_RAISE_IRQ:
+		m_vint_out_cb(1);
+		break;
+	default:
+		assert_always(false, "Unknown id in gp9001vdp_device::device_timer");
+	}
 }

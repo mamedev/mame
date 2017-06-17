@@ -25,9 +25,6 @@ DEFINE_DEVICE_TYPE(A2BUS_RAMFACTOR, a2bus_ramfactor_device,   "a2ramfac", "Appli
 
 #define MEMEXP_ROM_REGION  "memexp_rom"
 
-MACHINE_CONFIG_START( memexp )
-MACHINE_CONFIG_END
-
 ROM_START( memexp )
 	ROM_REGION(0x1000, MEMEXP_ROM_REGION, 0)
 	ROM_LOAD( "341-0344a.bin", 0x0000, 0x1000, CRC(1e994e17) SHA1(6e823a1fa40ed37eeddcef23f5df24da2ea1463e) )
@@ -46,14 +43,11 @@ ROM_END
 ***************************************************************************/
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor a2bus_memexp_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( memexp );
-}
+MACHINE_CONFIG_MEMBER( a2bus_memexp_device::device_add_mconfig )
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region

@@ -112,7 +112,7 @@ UPD7220_DISPLAY_PIXELS_MEMBER( wangpc_tig_device::hgdc_display_pixels )
 //  MACHINE_CONFIG_START( wangpc_tig )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( wangpc_tig )
+MACHINE_CONFIG_MEMBER( wangpc_tig_device::device_add_mconfig )
 	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
 	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, wangpc_tig_device, screen_update)
 	MCFG_SCREEN_SIZE(80*10, 25*12)
@@ -132,17 +132,6 @@ static MACHINE_CONFIG_START( wangpc_tig )
 	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(wangpc_tig_device, hgdc_display_pixels)
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor wangpc_tig_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( wangpc_tig );
-}
 
 
 //**************************************************************************

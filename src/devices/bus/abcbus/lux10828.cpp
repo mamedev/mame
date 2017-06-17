@@ -323,10 +323,10 @@ WRITE_LINE_MEMBER( luxor_55_10828_device::fdc_drq_w )
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( luxor_55_10828 )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( luxor_55_10828 )
+MACHINE_CONFIG_MEMBER( luxor_55_10828_device::device_add_mconfig )
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_4MHz/2)
 	MCFG_CPU_PROGRAM_MAP(luxor_55_10828_mem)
 	MCFG_CPU_IO_MAP(luxor_55_10828_io)
@@ -346,17 +346,6 @@ static MACHINE_CONFIG_START( luxor_55_10828 )
 	MCFG_FLOPPY_DRIVE_ADD(MB8876_TAG":0", abc_floppies, "525dd", luxor_55_10828_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(MB8876_TAG":1", abc_floppies, "525dd", luxor_55_10828_device::floppy_formats)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor luxor_55_10828_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( luxor_55_10828 );
-}
 
 
 //-------------------------------------------------

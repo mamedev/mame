@@ -50,18 +50,6 @@ DEFINE_DEVICE_TYPE(A2BUS_AEVIEWMASTER80, a2bus_aevm80_device,    "a2aevm80", "Ap
 
 #define MDA_CLOCK   16257000
 
-MACHINE_CONFIG_START( a2videoterm )
-	MCFG_SCREEN_ADD( VIDEOTERM_SCREEN_NAME, RASTER) // 560x216?  (80x24 7x9 characters)
-	MCFG_SCREEN_RAW_PARAMS(MDA_CLOCK, 882, 0, 720, 370, 0, 350 )
-	MCFG_SCREEN_UPDATE_DEVICE( VIDEOTERM_MC6845_NAME, mc6845_device, screen_update )
-
-	MCFG_MC6845_ADD(VIDEOTERM_MC6845_NAME, MC6845, VIDEOTERM_SCREEN_NAME, MDA_CLOCK/9)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(a2bus_videx80_device, crtc_update_row)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(a2bus_videx80_device, vsync_changed))
-MACHINE_CONFIG_END
-
 ROM_START( a2videoterm )
 	ROM_REGION(0x400, VIDEOTERM_ROM_REGION, 0)
 	ROM_LOAD( "videx videoterm rom 2.4.bin", 0x000000, 0x000400, CRC(bbe3bb28) SHA1(bb653836e84850ce3197f461d4e19355f738cfbf) )
@@ -126,14 +114,20 @@ ROM_END
 ***************************************************************************/
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor a2bus_videx80_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( a2videoterm );
-}
+MACHINE_CONFIG_MEMBER( a2bus_videx80_device::device_add_mconfig )
+	MCFG_SCREEN_ADD( VIDEOTERM_SCREEN_NAME, RASTER) // 560x216?  (80x24 7x9 characters)
+	MCFG_SCREEN_RAW_PARAMS(MDA_CLOCK, 882, 0, 720, 370, 0, 350 )
+	MCFG_SCREEN_UPDATE_DEVICE( VIDEOTERM_MC6845_NAME, mc6845_device, screen_update )
+
+	MCFG_MC6845_ADD(VIDEOTERM_MC6845_NAME, MC6845, VIDEOTERM_SCREEN_NAME, MDA_CLOCK/9)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_UPDATE_ROW_CB(a2bus_videx80_device, crtc_update_row)
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(a2bus_videx80_device, vsync_changed))
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region

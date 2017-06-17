@@ -121,10 +121,10 @@ SLOT_INTERFACE_END
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( adam_fdc )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( adam_fdc )
+MACHINE_CONFIG_MEMBER( adam_fdc_device::device_add_mconfig )
 	MCFG_CPU_ADD(M6801_TAG, M6801, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(adam_fdc_mem)
 	MCFG_CPU_IO_MAP(adam_fdc_io)
@@ -134,17 +134,6 @@ static MACHINE_CONFIG_START( adam_fdc )
 
 	MCFG_FLOPPY_DRIVE_ADD(WD2793_TAG":0", adam_fdc_floppies, "525ssdd", adam_fdc_device::floppy_formats)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor adam_fdc_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( adam_fdc );
-}
 
 
 //-------------------------------------------------
@@ -183,7 +172,7 @@ adam_fdc_device::adam_fdc_device(const machine_config &mconfig, const char *tag,
 		device_adamnet_card_interface(mconfig, *this),
 		m_maincpu(*this, M6801_TAG),
 		m_fdc(*this, WD2793_TAG),
-		m_floppy0(*this, WD2793_TAG":0:525ssdd"),
+		m_connector(*this, WD2793_TAG":0"),
 		m_floppy(nullptr),
 		m_ram(*this, "ram"),
 		m_sw3(*this, "SW3")
@@ -250,7 +239,8 @@ READ8_MEMBER( adam_fdc_device::p1_r )
 	uint8_t data = 0x00;
 
 	// disk in place
-	data |= m_floppy0->exists() ? 0x00 : 0x01;
+	floppy_image_device *floppy0 = m_connector->get_device();
+	data |= (floppy0 != nullptr && floppy0->exists()) ? 0x00 : 0x01;
 
 	// floppy data request
 	data |= m_fdc->drq_r() ? 0x04 : 0x00;
@@ -294,7 +284,7 @@ WRITE8_MEMBER( adam_fdc_device::p1_w )
 
 	if (BIT(data, 5))
 	{
-		m_floppy = m_floppy0;
+		m_floppy = m_connector->get_device();
 	}
 
 	m_fdc->set_floppy(m_floppy);

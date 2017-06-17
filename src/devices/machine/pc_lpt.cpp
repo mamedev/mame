@@ -46,7 +46,7 @@ void pc_lpt_device::device_reset()
 	m_cent_ctrl_out->write(m_control);
 }
 
-static MACHINE_CONFIG_START( pc_lpt )
+MACHINE_CONFIG_MEMBER( pc_lpt_device::device_add_mconfig )
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
 	MCFG_CENTRONICS_DATA_INPUT_BUFFER("cent_data_in")
 	MCFG_CENTRONICS_FAULT_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit3))
@@ -74,10 +74,6 @@ static MACHINE_CONFIG_START( pc_lpt )
 	MCFG_OUTPUT_LATCH_BIT4_HANDLER(WRITELINE(pc_lpt_device, write_irq_enabled))
 MACHINE_CONFIG_END
 
-machine_config_constructor pc_lpt_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( pc_lpt  );
-}
 
 READ8_MEMBER( pc_lpt_device::data_r )
 {

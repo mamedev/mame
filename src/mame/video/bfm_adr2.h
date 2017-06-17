@@ -42,7 +42,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
-	
+
 private:
 	int m_adder2_screen_page_reg;        // access/display select
 	int m_adder2_c101;

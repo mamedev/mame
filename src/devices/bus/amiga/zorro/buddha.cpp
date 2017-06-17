@@ -54,21 +54,15 @@ DEVICE_ADDRESS_MAP_START( mmio_map, 16, buddha_device )
 ADDRESS_MAP_END
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( buddha )
+MACHINE_CONFIG_MEMBER( buddha_device::device_add_mconfig )
 	MCFG_ATA_INTERFACE_ADD("ata_0", ata_devices, nullptr, nullptr, false)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(buddha_device, ide_0_interrupt_w))
 	MCFG_ATA_INTERFACE_ADD("ata_1", ata_devices, nullptr, nullptr, false)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(buddha_device, ide_1_interrupt_w))
 MACHINE_CONFIG_END
-
-machine_config_constructor buddha_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( buddha );
-}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region

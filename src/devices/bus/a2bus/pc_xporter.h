@@ -38,9 +38,6 @@ public:
 	// construction/destruction
 	a2bus_pcxporter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
 	DECLARE_READ16_MEMBER(pc_bios_r);
 
 	// overrides of standard a2bus slot functions
@@ -51,6 +48,40 @@ public:
 	virtual uint8_t read_c800(address_space &space, uint16_t offset) override;
 	virtual void write_c800(address_space &space, uint16_t offset, uint8_t data) override;
 
+	DECLARE_READ8_MEMBER( kbd_6502_r );
+	DECLARE_WRITE8_MEMBER( kbd_6502_w );
+
+	DECLARE_WRITE_LINE_MEMBER( pc_speaker_set_spkrdata );
+
+	DECLARE_WRITE8_MEMBER(pc_page_w);
+	DECLARE_WRITE8_MEMBER(nmi_enable_w);
+
+protected:
+	a2bus_pcxporter_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
+	required_device<v30_device> m_v30;
+	required_device<pic8259_device>  m_pic8259;
+	required_device<am9517a_device>  m_dma8237;
+	required_device<pit8253_device>  m_pit8253;
+	required_device<speaker_sound_device>  m_speaker;
+	required_device<isa8_device>  m_isabus;
+	optional_device<pc_kbdc_device>  m_pc_kbdc;
+
+	uint8_t   m_u73_q2;
+	uint8_t   m_out1;
+	int m_dma_channel;
+	uint8_t m_dma_offset[4];
+	uint8_t m_pc_spkrdata;
+	uint8_t m_pit_out2;
+	bool m_cur_eop;
+
+	uint8_t m_nmi_enabled;
+
+private:
 	// interface to the keyboard
 	DECLARE_WRITE_LINE_MEMBER( keyboard_clock_w );
 	DECLARE_WRITE_LINE_MEMBER( keyboard_data_w );
@@ -73,39 +104,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( pc_dack1_w );
 	DECLARE_WRITE_LINE_MEMBER( pc_dack2_w );
 	DECLARE_WRITE_LINE_MEMBER( pc_dack3_w );
-	DECLARE_READ8_MEMBER( kbd_6502_r );
-	DECLARE_WRITE8_MEMBER( kbd_6502_w );
 
-	DECLARE_WRITE_LINE_MEMBER( pc_speaker_set_spkrdata );
-
-	DECLARE_WRITE8_MEMBER(pc_page_w);
-	DECLARE_WRITE8_MEMBER(nmi_enable_w);
-
-protected:
-	a2bus_pcxporter_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-
-	virtual void device_start() override;
-	virtual void device_reset() override;
-
-	required_device<v30_device> m_v30;
-	required_device<pic8259_device>  m_pic8259;
-	required_device<am9517a_device>  m_dma8237;
-	required_device<pit8253_device>  m_pit8253;
-	required_device<speaker_sound_device>  m_speaker;
-	required_device<isa8_device>  m_isabus;
-	optional_device<pc_kbdc_device>  m_pc_kbdc;
-
-	uint8_t   m_u73_q2;
-	uint8_t   m_out1;
-	int m_dma_channel;
-	uint8_t m_dma_offset[4];
-	uint8_t m_pc_spkrdata;
-	uint8_t m_pit_out2;
-	bool m_cur_eop;
-
-	uint8_t m_nmi_enabled;
-
-private:
 	uint8_t m_ram[768*1024];
 	uint8_t m_c800_ram[0x400];
 	uint8_t m_regs[0x400];

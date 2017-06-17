@@ -41,6 +41,7 @@ public:
 	void set_clear_bitmap( int clear );
 	void eof();
 	void set_bg_pen( int pen );
+	void flip_screen_set(bool flip) { m_flip_screen = flip; }
 
 protected:
 	// device-level overrides
@@ -58,6 +59,7 @@ private:
 	uint8_t           m_gfx_region;
 	int             m_xoffset;
 	int             m_yoffset;
+	bool            m_flip_screen;
 	required_device<gfxdecode_device> m_gfxdecode;
 };
 

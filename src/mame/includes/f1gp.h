@@ -63,9 +63,6 @@ public:
 	uint32_t f1gp_old_tile_callback( uint32_t code );
 	uint32_t f1gp_ol2_tile_callback( uint32_t code );
 
-	/* misc */
-	int       m_pending_command;
-
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	optional_device<vsystem_spr2_device> m_spr_old; // f1gp
@@ -78,9 +75,7 @@ public:
 	optional_device<generic_latch_8_device> m_soundlatch; // not f1gpb
 
 	DECLARE_WRITE8_MEMBER(f1gp_sh_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(sound_command_w);
 	DECLARE_READ8_MEMBER(command_pending_r);
-	DECLARE_WRITE8_MEMBER(pending_command_clear_w);
 	DECLARE_WRITE16_MEMBER(f1gpb_misc_w);
 	DECLARE_READ16_MEMBER(f1gp_zoomdata_r);
 	DECLARE_WRITE16_MEMBER(f1gp_zoomdata_w);

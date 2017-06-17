@@ -78,7 +78,7 @@ static floppy_format_type floppy_formats[] = {
 
 	FLOPPY_APPLIX_FORMAT,
 
-        FLOPPY_HPI_FORMAT
+	FLOPPY_HPI_FORMAT
 };
 
 void CLIB_DECL ATTR_PRINTF(1,2) logerror(const char *format, ...)

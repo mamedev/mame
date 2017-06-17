@@ -63,9 +63,6 @@ WRITE16_MEMBER(md_rom_sk_device::write)
 // should there be anything here?
 }
 
-//-------------------------------------------------
-//  MACHINE_CONFIG_START( sk_slot )
-//-------------------------------------------------
 
 static SLOT_INTERFACE_START(sk_sub_cart)
 	SLOT_INTERFACE_INTERNAL("rom",  MD_STD_ROM)
@@ -76,18 +73,12 @@ static SLOT_INTERFACE_START(sk_sub_cart)
 // add all types??
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( sk_slot )
+
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( md_rom_sk_device::device_add_mconfig )
 	MCFG_MD_CARTRIDGE_ADD("subslot", sk_sub_cart, nullptr)
 	MCFG_MD_CARTRIDGE_NOT_MANDATORY
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor md_rom_sk_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( sk_slot );
-}

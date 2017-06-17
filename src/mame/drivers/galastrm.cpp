@@ -42,6 +42,7 @@ $305.b invincibility
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"
+#include "machine/taitoio.h"
 #include "sound/es5506.h"
 #include "audio/taito_en.h"
 #include "includes/galastrm.h"
@@ -104,55 +105,12 @@ CUSTOM_INPUT_MEMBER(galastrm_state::frame_counter_r)
 	return m_frame_counter;
 }
 
-CUSTOM_INPUT_MEMBER(galastrm_state::coin_word_r)
+WRITE8_MEMBER(galastrm_state::coin_word_w)
 {
-	return m_coin_word;
-}
-
-WRITE32_MEMBER(galastrm_state::galastrm_input_w)
-{
-#if 0
-{
-char t[64];
-COMBINE_DATA(&m_mem[offset]);
-
-sprintf(t,"%08x %08x",m_mem[0],m_mem[1]);
-popmessage(t);
-}
-#endif
-
-	switch (offset)
-	{
-		case 0x00:
-		{
-			if (ACCESSING_BITS_24_31)   /* $400000 is watchdog */
-			{
-				m_watchdog->watchdog_reset();
-			}
-
-			if (ACCESSING_BITS_0_7)
-			{
-				m_eeprom->clk_write((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
-				m_eeprom->di_write((data & 0x40) >> 6);
-				m_eeprom->cs_write((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
-				return;
-			}
-			return;
-		}
-
-		case 0x01:
-		{
-			if (ACCESSING_BITS_24_31)
-			{
-				machine().bookkeeping().coin_lockout_w(0, ~data & 0x01000000);
-				machine().bookkeeping().coin_lockout_w(1, ~data & 0x02000000);
-				machine().bookkeeping().coin_counter_w(0, data & 0x04000000);
-				machine().bookkeeping().coin_counter_w(1, data & 0x04000000);
-				m_coin_word = (data >> 16) &0xffff;
-			}
-//logerror("CPU #0 PC %06x: write input %06x\n",device->safe_pc(),offset);
-		}
-	}
+	machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
+	machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
+	machine().bookkeeping().coin_counter_w(0, data & 0x04);
+	machine().bookkeeping().coin_counter_w(1, data & 0x04);
 }
 
 READ32_MEMBER(galastrm_state::galastrm_adstick_ctrl_r)
@@ -180,12 +138,10 @@ static ADDRESS_MAP_START( galastrm_map, AS_PROGRAM, 32, galastrm_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x21ffff) AM_RAM AM_SHARE("ram")                             /* main CPUA ram */
 	AM_RANGE(0x300000, 0x303fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x400000, 0x400003) AM_READ_PORT("IN0")
-	AM_RANGE(0x400004, 0x400007) AM_READ_PORT("IN1")
-	AM_RANGE(0x400000, 0x400007) AM_WRITE(galastrm_input_w)                                 /* eerom etc. */
+	AM_RANGE(0x400000, 0x400007) AM_DEVREADWRITE8("tc0510nio", tc0510nio_device, read, write, 0xffffffff)
 	AM_RANGE(0x40fff0, 0x40fff3) AM_WRITENOP
 	AM_RANGE(0x500000, 0x500007) AM_READWRITE(galastrm_adstick_ctrl_r, galastrm_adstick_ctrl_w)
-	AM_RANGE(0x600000, 0x6007ff) AM_RAM AM_SHARE("snd_shared")                              /* Sound shared ram */
+	AM_RANGE(0x600000, 0x6007ff) AM_DEVREADWRITE8("taito_en:dpram", mb8421_device, left_r, left_w, 0xffffffff) /* Sound shared ram */
 	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, long_r, long_w)        /* tilemaps */
 	AM_RANGE(0x830000, 0x83002f) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, ctrl_long_r, ctrl_long_w)
 	AM_RANGE(0x900000, 0x900003) AM_WRITE(galastrm_palette_w)                               /* TC0110PCR */
@@ -201,42 +157,34 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( galastrm )
 	PORT_START("IN0")
-//  PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1)  /* Freeze input */
-	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
-	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x00000200, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galastrm_state,frame_counter_r, nullptr)
-	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galastrm_state,frame_counter_r, nullptr)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
-	PORT_SERVICE_NO_TOGGLE( 0x00000001, IP_ACTIVE_LOW )
-	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
-	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galastrm_state,coin_word_r, nullptr)
+//  PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1)  /* Freeze input */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+
+	PORT_START("IN2")
+	PORT_SERVICE_NO_TOGGLE( 0x01, IP_ACTIVE_LOW )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
 
 	PORT_START("STICKX")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(60) PORT_KEYDELTA(15) PORT_PLAYER(1)
@@ -293,7 +241,14 @@ static MACHINE_CONFIG_START( galastrm )
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	MCFG_DEVICE_ADD("tc0510nio", TC0510NIO, 0)
+	MCFG_TC0510NIO_READ_2_CB(IOPORT("IN0"))
+	MCFG_TC0510NIO_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0510NIO_WRITE_3_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write)) MCFG_DEVCB_BIT(5)
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, di_write)) MCFG_DEVCB_BIT(6)
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write)) MCFG_DEVCB_BIT(4)
+	MCFG_TC0510NIO_WRITE_4_CB(WRITE8(galastrm_state, coin_word_w))
+	MCFG_TC0510NIO_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

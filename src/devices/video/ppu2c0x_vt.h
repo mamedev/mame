@@ -3,9 +3,9 @@
 /******************************************************************************
 
     VT video emulation
-	
-	The VT video is based on the ppu2c0x but with enhanced capabilities such
-	as 16 colour sprites.
+
+    The VT video is based on the ppu2c0x but with enhanced capabilities such
+    as 16 colour sprites.
 
 ******************************************************************************/
 

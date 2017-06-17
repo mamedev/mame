@@ -30,10 +30,10 @@ DEFINE_DEVICE_TYPE(POFO_HPC102, pofo_hpc102_device, "pofo_hpc102", "Atari Portfo
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_START( hpc102 )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( hpc102 )
+MACHINE_CONFIG_MEMBER( pofo_hpc102_device::device_add_mconfig )
 	MCFG_DEVICE_ADD(M82C50A_TAG, INS8250, XTAL_1_8432MHz) // should be INS8250A
 	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
 	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE(RS232_TAG, rs232_port_device, write_dtr))
@@ -47,17 +47,6 @@ static MACHINE_CONFIG_START( hpc102 )
 	MCFG_RS232_RI_HANDLER(DEVWRITELINE(M82C50A_TAG, ins8250_uart_device, ri_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(M82C50A_TAG, ins8250_uart_device, cts_w))
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor pofo_hpc102_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( hpc102 );
-}
 
 
 //**************************************************************************

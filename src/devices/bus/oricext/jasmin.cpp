@@ -19,16 +19,6 @@ static SLOT_INTERFACE_START( jasmin_floppies )
 	SLOT_INTERFACE( "3dsdd", FLOPPY_3_DSDD )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( jasmin )
-	MCFG_WD1770_ADD("fdc", XTAL_8MHz)
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(oricext_device, irq_w))
-
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", jasmin_floppies, "3dsdd", jasmin_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", jasmin_floppies, nullptr,    jasmin_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:2", jasmin_floppies, nullptr,    jasmin_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:3", jasmin_floppies, nullptr,    jasmin_device::floppy_formats)
-MACHINE_CONFIG_END
-
 INPUT_PORTS_START( jasmin )
 	PORT_START("JASMIN")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Boot") PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(F1)) PORT_CHANGED_MEMBER(DEVICE_SELF, jasmin_device, boot_pressed, nullptr)
@@ -80,10 +70,15 @@ const tiny_rom_entry *jasmin_device::device_rom_region() const
 	return ROM_NAME( jasmin );
 }
 
-machine_config_constructor jasmin_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( jasmin );
-}
+MACHINE_CONFIG_MEMBER( jasmin_device::device_add_mconfig )
+	MCFG_WD1770_ADD("fdc", XTAL_8MHz)
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(oricext_device, irq_w))
+
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", jasmin_floppies, "3dsdd", jasmin_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", jasmin_floppies, nullptr,    jasmin_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:2", jasmin_floppies, nullptr,    jasmin_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:3", jasmin_floppies, nullptr,    jasmin_device::floppy_formats)
+MACHINE_CONFIG_END
 
 ioport_constructor jasmin_device::device_input_ports() const
 {

@@ -78,10 +78,10 @@ WRITE_LINE_MEMBER( sandy_super_disk_device::busy_w )
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_START( sandy_super_disk )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( sandy_super_disk )
+MACHINE_CONFIG_MEMBER( sandy_super_disk_device::device_add_mconfig )
 	MCFG_DEVICE_ADD(WD1772_TAG, WD1772, 8000000)
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG":0", sandy_super_disk_floppies, "35dd", sandy_super_disk_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG":1", sandy_super_disk_floppies, nullptr, sandy_super_disk_device::floppy_formats)
@@ -90,17 +90,6 @@ static MACHINE_CONFIG_START( sandy_super_disk )
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(sandy_super_disk_device, busy_w))
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD(TTL74273_TAG, CENTRONICS_TAG)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor sandy_super_disk_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( sandy_super_disk );
-}
 
 
 

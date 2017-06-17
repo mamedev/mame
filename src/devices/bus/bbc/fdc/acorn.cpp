@@ -23,7 +23,15 @@ DEFINE_DEVICE_TYPE(BBC_ACORN1770, bbc_acorn1770_device, "bbc_acorn1770", "Acorn 
 //  MACHINE_DRIVER( acorn )
 //-------------------------------------------------
 
-FLOPPY_FORMATS_MEMBER( floppy_formats )
+FLOPPY_FORMATS_MEMBER( bbc_acorn8271_device::floppy_formats )
+	FLOPPY_ACORN_SSD_FORMAT,
+	FLOPPY_ACORN_DSD_FORMAT,
+	FLOPPY_ACORN_CPM_FORMAT,
+	FLOPPY_TORCH_CPN_FORMAT,
+	FLOPPY_FSD_FORMAT
+FLOPPY_FORMATS_END0
+
+FLOPPY_FORMATS_MEMBER( bbc_acorn1770_device::floppy_formats )
 	FLOPPY_ACORN_SSD_FORMAT,
 	FLOPPY_ACORN_DSD_FORMAT,
 	FLOPPY_ACORN_CPM_FORMAT,
@@ -38,27 +46,6 @@ static SLOT_INTERFACE_START( bbc_floppies_525 )
 	SLOT_INTERFACE("525dd",   FLOPPY_525_DD)
 	SLOT_INTERFACE("525qd",   FLOPPY_525_QD)
 SLOT_INTERFACE_END
-
-static MACHINE_CONFIG_START( acorn8271 )
-	MCFG_DEVICE_ADD("i8271", I8271, 0)
-	MCFG_I8271_IRQ_CALLBACK(WRITELINE(bbc_acorn8271_device, fdc_intrq_w))
-	MCFG_I8271_HDL_CALLBACK(WRITELINE(bbc_acorn8271_device, motor_w))
-	MCFG_I8271_OPT_CALLBACK(WRITELINE(bbc_acorn8271_device, side_w))
-	MCFG_FLOPPY_DRIVE_ADD("i8271:0", bbc_floppies_525, "525qd", floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("i8271:1", bbc_floppies_525, "525qd", floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_START( acorn1770 )
-	MCFG_WD1770_ADD("wd1770", XTAL_16MHz / 2)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(bbc_acorn1770_device, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(bbc_acorn1770_device, fdc_drq_w))
-	MCFG_FLOPPY_DRIVE_ADD("wd1770:0", bbc_floppies_525, "525qd", floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("wd1770:1", bbc_floppies_525, "525qd", floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-MACHINE_CONFIG_END
 
 ROM_START( acorn8271 )
 	ROM_REGION(0x4000, "dfs_rom", 0)
@@ -137,19 +124,29 @@ ROM_END
 
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor bbc_acorn8271_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( acorn8271 );
-}
+MACHINE_CONFIG_MEMBER( bbc_acorn8271_device::device_add_mconfig )
+	MCFG_DEVICE_ADD("i8271", I8271, 0)
+	MCFG_I8271_IRQ_CALLBACK(WRITELINE(bbc_acorn8271_device, fdc_intrq_w))
+	MCFG_I8271_HDL_CALLBACK(WRITELINE(bbc_acorn8271_device, motor_w))
+	MCFG_I8271_OPT_CALLBACK(WRITELINE(bbc_acorn8271_device, side_w))
+	MCFG_FLOPPY_DRIVE_ADD("i8271:0", bbc_floppies_525, "525qd", floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+	MCFG_FLOPPY_DRIVE_ADD("i8271:1", bbc_floppies_525, "525qd", floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+MACHINE_CONFIG_END
 
-machine_config_constructor bbc_acorn1770_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( acorn1770 );
-}
+MACHINE_CONFIG_MEMBER( bbc_acorn1770_device::device_add_mconfig )
+	MCFG_WD1770_ADD("wd1770", XTAL_16MHz / 2)
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(bbc_acorn1770_device, fdc_intrq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(bbc_acorn1770_device, fdc_drq_w))
+	MCFG_FLOPPY_DRIVE_ADD("wd1770:0", bbc_floppies_525, "525qd", floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+	MCFG_FLOPPY_DRIVE_ADD("wd1770:1", bbc_floppies_525, "525qd", floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+MACHINE_CONFIG_END
 
 
 const tiny_rom_entry *bbc_acorn8271_device::device_rom_region() const

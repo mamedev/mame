@@ -90,11 +90,11 @@ void intv_ecs_device::late_subslot_setup()
 }
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_START( sub_slot )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
 
-static MACHINE_CONFIG_START( sub_slot )
+MACHINE_CONFIG_MEMBER( intv_ecs_device::device_add_mconfig )
 	MCFG_SPEAKER_STANDARD_MONO("mono_ecs")
 
 	MCFG_SOUND_ADD("ay8914", AY8914, XTAL_3_579545MHz/2)
@@ -106,12 +106,6 @@ static MACHINE_CONFIG_START( sub_slot )
 	MCFG_INTVECS_CONTROL_PORT_ADD("ctrl_port", intvecs_control_port_devices, "keybd")
 	MCFG_INTV_CARTRIDGE_ADD("subslot", intv_cart, nullptr)
 MACHINE_CONFIG_END
-
-
-machine_config_constructor intv_ecs_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( sub_slot );
-}
 
 
 ROM_START( ecs )

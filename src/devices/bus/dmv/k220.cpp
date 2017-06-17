@@ -77,19 +77,6 @@ ROM_START( dmv_k220 )
 	ROM_REGION(0x0800, "ram", ROMREGION_ERASE)
 ROM_END
 
-static MACHINE_CONFIG_START( dmv_k220 )
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(dmv_k220_device, porta_w))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("SWITCH"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(dmv_k220_device, portc_w))
-
-	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL_1MHz)  // CLK1
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(dmv_k220_device, write_out0))
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(dmv_k220_device, write_out1))
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(dmv_k220_device, write_out2))
-MACHINE_CONFIG_END
-
 static INPUT_PORTS_START( dmv_k220 )
 	PORT_START("SWITCH")
 	PORT_DIPNAME( 0x01, 0x00, "Select 1" )
@@ -165,14 +152,21 @@ void dmv_k220_device::device_reset()
 }
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor dmv_k220_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( dmv_k220 );
-}
+MACHINE_CONFIG_MEMBER( dmv_k220_device::device_add_mconfig )
+	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(dmv_k220_device, porta_w))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("SWITCH"))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(dmv_k220_device, portc_w))
+
+	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
+	MCFG_PIT8253_CLK0(XTAL_1MHz)  // CLK1
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(dmv_k220_device, write_out0))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(dmv_k220_device, write_out1))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(dmv_k220_device, write_out2))
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  input_ports - device-specific input ports

@@ -362,79 +362,79 @@ void via6522_device::clear_int(int data)
 
 void via6522_device::shift_out()
 {
-    // Only shift out msb on falling flank
-    if (m_shift_counter & 1)
-    {
-        LOGSHIFT(" %s shift Out SR: %02x->", tag(), m_sr);
-        m_out_cb2 = (m_sr >> 7) & 1;
-        m_sr =  (m_sr << 1) | m_out_cb2;
-        LOGSHIFT("%02x CB2: %d\n", m_sr, m_out_cb2);
+	// Only shift out msb on falling flank
+	if (m_shift_counter & 1)
+	{
+		LOGSHIFT(" %s shift Out SR: %02x->", tag(), m_sr);
+		m_out_cb2 = (m_sr >> 7) & 1;
+		m_sr =  (m_sr << 1) | m_out_cb2;
+		LOGSHIFT("%02x CB2: %d\n", m_sr, m_out_cb2);
 
-        m_cb2_handler(m_out_cb2);
+		m_cb2_handler(m_out_cb2);
 
-        if (m_shift_counter == 1 && SO_EXT_CONTROL(m_acr))
-        {
-            LOGINT("SHIFT EXT out INT request ");
-            set_int(INT_SR); // IRQ on last falling flank for external clock (mode 7)
-        }
-    }
-    else // Check for INT condition, eg the last and raising flank of the 15-0 falling/raising flanks
-    {
-        if (!SO_T2_RATE(m_acr)) // The T2 continous shifter doesn't do interrupts (mode 4)
-        {
-            if (m_shift_counter == 0 && (SO_O2_CONTROL(m_acr) || SO_T2_CONTROL(m_acr)))
-            {
-                LOGINT("SHIFT O2/T2 out INT request ");
-                set_int(INT_SR); // IRQ on last raising flank for internal clock (mode 5-6)
-            }
-        }
-    }
-    m_shift_counter = (m_shift_counter - 1) & 0x0f; // Count all flanks
+		if (m_shift_counter == 1 && SO_EXT_CONTROL(m_acr))
+		{
+			LOGINT("SHIFT EXT out INT request ");
+			set_int(INT_SR); // IRQ on last falling flank for external clock (mode 7)
+		}
+	}
+	else // Check for INT condition, eg the last and raising flank of the 15-0 falling/raising flanks
+	{
+		if (!SO_T2_RATE(m_acr)) // The T2 continous shifter doesn't do interrupts (mode 4)
+		{
+			if (m_shift_counter == 0 && (SO_O2_CONTROL(m_acr) || SO_T2_CONTROL(m_acr)))
+			{
+				LOGINT("SHIFT O2/T2 out INT request ");
+				set_int(INT_SR); // IRQ on last raising flank for internal clock (mode 5-6)
+			}
+		}
+	}
+	m_shift_counter = (m_shift_counter - 1) & 0x0f; // Count all flanks
 }
 
 void via6522_device::shift_in()
 {
-    // Only shift in data on raising flank
-    if ( !(m_shift_counter & 1) )
-    {
-        LOGSHIFT("%s shift In SR: %02x->", tag(), m_sr);
-        m_sr =  (m_sr << 1) | (m_in_cb2 & 1);
-        LOGSHIFT("%02x\n", m_sr);
+	// Only shift in data on raising flank
+	if ( !(m_shift_counter & 1) )
+	{
+		LOGSHIFT("%s shift In SR: %02x->", tag(), m_sr);
+		m_sr =  (m_sr << 1) | (m_in_cb2 & 1);
+		LOGSHIFT("%02x\n", m_sr);
 
-        if (m_shift_counter == 0)
-        {
-            LOGINT("SHIFT in INT request ");
+		if (m_shift_counter == 0)
+		{
+			LOGINT("SHIFT in INT request ");
 //            set_int(INT_SR);// TODO: this interrupt is 1-2 clock cycles too early
-            m_shift_irq_timer->adjust(clocks_to_attotime(2)/2); // Delay IRQ 2 flanks for all shift INs (mode 1-3)
-        }
-    }
-    m_shift_counter = (m_shift_counter - 1) & 0x0f; // Count all flanks
+			m_shift_irq_timer->adjust(clocks_to_attotime(2)/2); // Delay IRQ 2 flanks for all shift INs (mode 1-3)
+		}
+	}
+	m_shift_counter = (m_shift_counter - 1) & 0x0f; // Count all flanks
 }
 
 void via6522_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{
-    	case TIMER_SHIFT_IRQ: // This timer event is a delayed IRQ for improved cycle accuracy
-            set_int(INT_SR);  // triggered from shift_in or shift_out on the last rising flank
+		case TIMER_SHIFT_IRQ: // This timer event is a delayed IRQ for improved cycle accuracy
+			set_int(INT_SR);  // triggered from shift_in or shift_out on the last rising flank
 			m_shift_irq_timer->adjust(attotime::never); // Not needed really...
-            break;
+			break;
 		case TIMER_SHIFT:
 			LOGSHIFT("SHIFT timer event CB1 %s edge, %d\n", m_out_cb1 & 1 ? "falling" : "raising", m_shift_counter);
 			m_out_cb1 ^= 1;
 			m_cb1_handler(m_out_cb1);
 
-            // we call shift methods for all flanks
-            if (SO_T2_RATE(m_acr) || SO_T2_CONTROL(m_acr) || SO_O2_CONTROL(m_acr))
-            {
-                shift_out();
-            }
-            else if (SI_T2_CONTROL(m_acr) || SI_O2_CONTROL(m_acr))
-            {
-                shift_in();
-            }
+			// we call shift methods for all flanks
+			if (SO_T2_RATE(m_acr) || SO_T2_CONTROL(m_acr) || SO_O2_CONTROL(m_acr))
+			{
+				shift_out();
+			}
+			else if (SI_T2_CONTROL(m_acr) || SI_O2_CONTROL(m_acr))
+			{
+				shift_in();
+			}
 
-            // If in continous mode or the shifter is still shifting we re-arm the timer
+			// If in continous mode or the shifter is still shifting we re-arm the timer
 			if (SO_T2_RATE(m_acr) || (m_shift_counter != 0x0f))
 			{
 				if (SI_O2_CONTROL(m_acr) || SO_O2_CONTROL(m_acr))
@@ -445,11 +445,11 @@ void via6522_device::device_timer(emu_timer &timer, device_timer_id id, int para
 				{
 					m_shift_timer->adjust(clocks_to_attotime(m_t2ll + 2) / 2);
 				}
-                else // otherwise we stop it
-                {
-                    m_shift_timer->adjust(attotime::never);
-                }
-            }
+				else // otherwise we stop it
+				{
+					m_shift_timer->adjust(attotime::never);
+				}
+			}
 			break;
 		case TIMER_T1:
 			if (T1_CONTINUOUS (m_acr))
@@ -485,7 +485,7 @@ void via6522_device::device_timer(emu_timer &timer, device_timer_id id, int para
 			m_out_ca2 = 1;
 			m_ca2_handler(m_out_ca2);
 			break;
-    }
+	}
 }
 
 uint8_t via6522_device::input_pa()
@@ -1051,16 +1051,16 @@ WRITE_LINE_MEMBER( via6522_device::write_cb1 )
 		}
 
 		// The shifter shift is not controlled by PCR
-        if (SO_EXT_CONTROL(m_acr))
-        {
-            LOGSHIFT("SHIFT OUT EXT/CB1 falling edge, %d\n",  m_shift_counter);
-            shift_out();
-        }
-        else if (SI_EXT_CONTROL(m_acr))
-        {
-            LOGSHIFT("SHIFT IN EXT/CB1 raising edge, %d\n", m_shift_counter);
-            shift_in();
-        }
+		if (SO_EXT_CONTROL(m_acr))
+		{
+			LOGSHIFT("SHIFT OUT EXT/CB1 falling edge, %d\n",  m_shift_counter);
+			shift_out();
+		}
+		else if (SI_EXT_CONTROL(m_acr))
+		{
+			LOGSHIFT("SHIFT IN EXT/CB1 raising edge, %d\n", m_shift_counter);
+			shift_in();
+		}
 	}
 }
 

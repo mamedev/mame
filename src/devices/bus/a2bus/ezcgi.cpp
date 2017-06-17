@@ -29,14 +29,6 @@ DEFINE_DEVICE_TYPE(A2BUS_EZCGI,      a2bus_ezcgi_device,      "a2ezcgi",  "E-Z C
 DEFINE_DEVICE_TYPE(A2BUS_EZCGI_9938, a2bus_ezcgi_9938_device, "a2ezcgi3", "E-Z Color Graphics Interface (TMS9938)")
 DEFINE_DEVICE_TYPE(A2BUS_EZCGI_9958, a2bus_ezcgi_9958_device, "a2ezcgi5", "E-Z Color Graphics Interface (TMS9958)")
 
-MACHINE_CONFIG_START( ezcgi )
-	MCFG_DEVICE_ADD( TMS_TAG, TMS9918A, XTAL_10_738635MHz / 2 )
-	MCFG_TMS9928A_VRAM_SIZE(0x4000) // 16k of VRAM
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(a2bus_ezcgi_device, tms_irq_w))
-	MCFG_TMS9928A_SCREEN_ADD_NTSC( SCREEN_TAG )
-	MCFG_SCREEN_UPDATE_DEVICE( TMS_TAG, tms9918a_device, screen_update )
-MACHINE_CONFIG_END
-
 #define MSX2_XBORDER_PIXELS     16
 #define MSX2_YBORDER_PIXELS     28
 #define MSX2_TOTAL_XRES_PIXELS      256 * 2 + (MSX2_XBORDER_PIXELS * 2)
@@ -44,7 +36,19 @@ MACHINE_CONFIG_END
 #define MSX2_VISIBLE_XBORDER_PIXELS 8 * 2
 #define MSX2_VISIBLE_YBORDER_PIXELS 14 * 2
 
-MACHINE_CONFIG_START( ezcgi9938 )
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( a2bus_ezcgi_device::device_add_mconfig )
+	MCFG_DEVICE_ADD( TMS_TAG, TMS9918A, XTAL_10_738635MHz / 2 )
+	MCFG_TMS9928A_VRAM_SIZE(0x4000) // 16k of VRAM
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(a2bus_ezcgi_device, tms_irq_w))
+	MCFG_TMS9928A_SCREEN_ADD_NTSC( SCREEN_TAG )
+	MCFG_SCREEN_UPDATE_DEVICE( TMS_TAG, tms9918a_device, screen_update )
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_MEMBER( a2bus_ezcgi_9938_device::device_add_mconfig )
 	MCFG_V9938_ADD(TMS_TAG, SCREEN_TAG, 0x30000, XTAL_21_4772MHz)    // 192K of VRAM / typical 9938 clock, not verified
 	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(a2bus_ezcgi_9938_device, tms_irq_w))
 
@@ -58,7 +62,7 @@ MACHINE_CONFIG_START( ezcgi9938 )
 	MCFG_SCREEN_PALETTE(TMS_TAG)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START( ezcgi9958 )
+MACHINE_CONFIG_MEMBER( a2bus_ezcgi_9958_device::device_add_mconfig )
 	MCFG_V9958_ADD(TMS_TAG, SCREEN_TAG, 0x30000, XTAL_21_4772MHz)    // 192K of VRAM / typcial 9938/9958 clock, not verified
 	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(a2bus_ezcgi_9958_device, tms_irq_w))
 
@@ -71,26 +75,6 @@ MACHINE_CONFIG_START( ezcgi9958 )
 	MCFG_SCREEN_VISIBLE_AREA(MSX2_XBORDER_PIXELS - MSX2_VISIBLE_XBORDER_PIXELS, MSX2_TOTAL_XRES_PIXELS - MSX2_XBORDER_PIXELS + MSX2_VISIBLE_XBORDER_PIXELS - 1, MSX2_YBORDER_PIXELS - MSX2_VISIBLE_YBORDER_PIXELS, MSX2_TOTAL_YRES_PIXELS - MSX2_YBORDER_PIXELS + MSX2_VISIBLE_YBORDER_PIXELS - 1)
 	MCFG_SCREEN_PALETTE(TMS_TAG)
 MACHINE_CONFIG_END
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor a2bus_ezcgi_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( ezcgi );
-}
-
-machine_config_constructor a2bus_ezcgi_9938_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( ezcgi9938 );
-}
-
-machine_config_constructor a2bus_ezcgi_9958_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( ezcgi9958 );
-}
 
 //**************************************************************************
 //  LIVE DEVICE

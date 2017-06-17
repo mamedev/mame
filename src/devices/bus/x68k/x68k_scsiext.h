@@ -21,12 +21,6 @@ public:
 	// construction/destruction
 	x68k_scsiext_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-
-	void irq_w(int state);
-	void drq_w(int state);
 	DECLARE_READ8_MEMBER(register_r);
 	DECLARE_WRITE8_MEMBER(register_w);
 
@@ -34,8 +28,13 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 
 private:
+	void irq_w(int state);
+	void drq_w(int state);
+
 	x68k_expansion_slot_device *m_slot;
 
 	required_device<mb89352_device> m_spc;

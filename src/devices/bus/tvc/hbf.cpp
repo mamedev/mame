@@ -22,12 +22,6 @@ static SLOT_INTERFACE_START( tvc_hbf_floppies )
 	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START(tvc_hbf)
-	MCFG_FD1793_ADD("fdc", XTAL_16MHz / 16)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", tvc_hbf_floppies, "525qd", tvc_hbf_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", tvc_hbf_floppies, "525qd", tvc_hbf_device::floppy_formats)
-MACHINE_CONFIG_END
-
 ROM_START( tvc_hbf )
 	ROM_REGION(0x4000, "hbf", 0)
 	ROM_DEFAULT_BIOS("basic")
@@ -86,13 +80,15 @@ void tvc_hbf_device::device_reset()
 }
 
 //-------------------------------------------------
-//  device_mconfig_additions
+//  device_add_mconfig
 //-------------------------------------------------
 
-machine_config_constructor tvc_hbf_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( tvc_hbf );
-}
+MACHINE_CONFIG_MEMBER(tvc_hbf_device::device_add_mconfig)
+	MCFG_FD1793_ADD("fdc", XTAL_16MHz / 16)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", tvc_hbf_floppies, "525qd", tvc_hbf_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", tvc_hbf_floppies, "525qd", tvc_hbf_device::floppy_formats)
+MACHINE_CONFIG_END
+
 
 //-------------------------------------------------
 //  device_rom_region

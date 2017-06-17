@@ -616,7 +616,7 @@ MACHINE_CONFIG_END
 
 iteagle_eeprom_device::iteagle_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, ITEAGLE_EEPROM, tag, owner, clock),
-		m_sw_version(0), m_hw_version(0), m_eeprom(*this, "eeprom") 
+		m_sw_version(0), m_hw_version(0), m_eeprom(*this, "eeprom")
 {
 	// When corrupt writes 0x3=2, 0x3e=2, 0xa=0, 0x30=0
 	// 0x4 = HW Version - 6-8 is GREEN board PCB, 9 is RED board PCB

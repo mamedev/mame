@@ -43,7 +43,6 @@ public:
 	required_device<bus_master_ide_controller_device> m_ide;
 	required_device<bus_master_ide_controller_device> m_ide2;
 	virtual DECLARE_ADDRESS_MAP(config_map, 32) override;
-	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
 	DECLARE_READ32_MEMBER(ide_read_cs1);
 	DECLARE_WRITE32_MEMBER(ide_write_cs1);
 	DECLARE_READ32_MEMBER(ide2_read_cs1);
@@ -58,9 +57,17 @@ protected:
 	virtual void device_reset() override;
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
+	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
+	DECLARE_WRITE8_MEMBER(prog_if_w);
+	DECLARE_READ32_MEMBER(pcictrl_r);
+	DECLARE_WRITE32_MEMBER(pcictrl_w);
+	DECLARE_READ32_MEMBER(address_base_r);
+	DECLARE_WRITE32_MEMBER(address_base_w);
+	DECLARE_WRITE32_MEMBER(subsystem_id_w);
+
 	const char *m_cpu_tag;
 	cpu_device *m_cpu;
 	int m_irq_num;
@@ -76,11 +83,6 @@ private:
 	DECLARE_ADDRESS_MAP(chan2_data_command_map, 32);
 	DECLARE_ADDRESS_MAP(chan2_control_map, 32);
 	DECLARE_ADDRESS_MAP(bus_master_map, 32);
-	DECLARE_WRITE8_MEMBER(prog_if_w);
-	DECLARE_READ32_MEMBER(pcictrl_r);
-	DECLARE_WRITE32_MEMBER(pcictrl_w);
-	DECLARE_READ32_MEMBER(address_base_r);
-	DECLARE_WRITE32_MEMBER(address_base_w);
 };
 
 DECLARE_DEVICE_TYPE(IDE_PCI, ide_pci_device)

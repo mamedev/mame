@@ -394,7 +394,7 @@ MACHINES["COM8116"] = true
 MACHINES["CR589"] = true
 MACHINES["CS4031"] = true
 MACHINES["CS8221"] = true
---MACHINES["CXD1095"] = true
+MACHINES["CXD1095"] = true
 MACHINES["DM9334"] = true
 MACHINES["DP8390"] = true
 --MACHINES["DS1204"] = true
@@ -415,6 +415,7 @@ MACHINES["HD63450"] = true
 MACHINES["HD64610"] = true
 MACHINES["HP_TACO"] = true
 MACHINES["I2CMEM"] = true
+MACHINES["I7220"] = true
 MACHINES["I80130"] = true
 MACHINES["I8089"] = true
 MACHINES["I8155"] = true
@@ -536,6 +537,7 @@ MACHINES["SMC91C9X"] = true
 MACHINES["SMPC"] = true
 MACHINES["STVCD"] = true
 MACHINES["TC0091LVC"] = true
+--MACHINES["TE7750"] = true
 MACHINES["TIMEKPR"] = true
 MACHINES["TMC0430"] = true
 MACHINES["TMP68301"] = true
@@ -783,6 +785,7 @@ FORMATS["DCP_DSK"] = true
 FORMATS["DIM_DSK"] = true
 FORMATS["DIP_DSK"] = true
 FORMATS["DMK_DSK"] = true
+FORMATS["SDF_DSK"] = true
 FORMATS["EP64_DSK"] = true
 FORMATS["DMV_DSK"] = true
 FORMATS["ESQ16_DSK"] = true
@@ -918,6 +921,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"cce",
 		"ccs",
 		"chromatics",
+		"chrysler",
 		"coleco",
 		"compugraphic",
 		"cromemco",
@@ -953,6 +957,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"galaxy",
 		"gamepark",
 		"gi",
+		"gridcomp",
 		"grundy",
 		"hartung",
 		"heathkit",
@@ -1317,7 +1322,7 @@ files {
 	MAME_DIR .. "src/mame/machine/apricotkb.cpp",
 	MAME_DIR .. "src/mame/machine/apricotkb.h",
 	MAME_DIR .. "src/mame/drivers/victor9k.cpp",
---	MAME_DIR .. "src/mame/includes/victor9k.h",
+--  MAME_DIR .. "src/mame/includes/victor9k.h",
 	MAME_DIR .. "src/mame/machine/victor9k_kb.cpp",
 	MAME_DIR .. "src/mame/machine/victor9k_kb.h",
 	MAME_DIR .. "src/mame/machine/victor9k_fdc.cpp",
@@ -1677,6 +1682,11 @@ files {
 	MAME_DIR .. "src/mame/video/cgc7900.cpp",
 }
 
+createMESSProjects(_target, _subtarget, "chrysler")
+files {
+	MAME_DIR .. "src/mame/drivers/eva.cpp",
+}
+
 createMESSProjects(_target, _subtarget, "coleco")
 files {
 	MAME_DIR .. "src/mame/drivers/adam.cpp",
@@ -1989,6 +1999,13 @@ files {
 createMESSProjects(_target, _subtarget, "gi")
 files {
 	MAME_DIR .. "src/mame/drivers/hh_pic16.cpp",
+}
+
+createMESSProjects(_target, _subtarget, "gridcomp")
+files {
+	MAME_DIR .. "src/mame/drivers/gridcomp.cpp",
+	MAME_DIR .. "src/mame/machine/gridkeyb.cpp",
+	MAME_DIR .. "src/mame/machine/gridkeyb.h",
 }
 
 createMESSProjects(_target, _subtarget, "grundy")
@@ -2428,6 +2445,7 @@ files {
 
 createMESSProjects(_target, _subtarget, "nokia")
 files {
+	MAME_DIR .. "src/mame/drivers/dbox.cpp",
 	MAME_DIR .. "src/mame/drivers/mikromik.cpp",
 	MAME_DIR .. "src/mame/includes/mikromik.h",
 	MAME_DIR .. "src/mame/machine/mm1kb.cpp",

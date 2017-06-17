@@ -18,11 +18,6 @@
 
 DEFINE_DEVICE_TYPE(SV801, sv801_device, "sv801", "SV-801 Disk Controller")
 
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
 FLOPPY_FORMATS_MEMBER( sv801_device::floppy_formats )
 	FLOPPY_SVI_FORMAT
 FLOPPY_FORMATS_END
@@ -31,7 +26,11 @@ static SLOT_INTERFACE_START( svi_floppies )
 	SLOT_INTERFACE("dd", FLOPPY_525_DD)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( sv801 )
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( sv801_device::device_add_mconfig )
 	MCFG_FD1793_ADD("fdc", XTAL_8MHz / 8)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(sv801_device, intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(sv801_device, drq_w))
@@ -41,11 +40,6 @@ static MACHINE_CONFIG_START( sv801 )
 
 	MCFG_SOFTWARE_LIST_ADD("disk_list", "svi318_flop")
 MACHINE_CONFIG_END
-
-machine_config_constructor sv801_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( sv801 );
-}
 
 
 //**************************************************************************

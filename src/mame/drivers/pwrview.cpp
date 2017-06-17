@@ -319,7 +319,7 @@ static ADDRESS_MAP_START(pwrview_fetch_map, AS_DECRYPTED_OPCODES, 16, pwrview_st
 	AM_RANGE(0x00000, 0x003ff) AM_READ(bank0_r)
 	AM_RANGE(0x00000, 0xf7fff) AM_RAM AM_SHARE("ram")
 	AM_RANGE(0xf8000, 0xfffff) AM_READ(fbios_r)
-ADDRESS_MAP_END	
+ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(pwrview_io, AS_IO, 16, pwrview_state)
 	ADDRESS_MAP_UNMAP_HIGH

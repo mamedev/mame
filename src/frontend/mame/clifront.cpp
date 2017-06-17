@@ -412,7 +412,7 @@ void cli_frontend::listclones(const std::vector<std::string> &args)
 	{
 		int clone_of = drivlist.clone();
 		if (clone_of != -1 && (drivlist.driver(clone_of).flags & MACHINE_IS_BIOS_ROOT) == 0)
-			osd_printf_info("%-16s %-8s\n", drivlist.driver().name, drivlist.driver(clone_of).name);
+			osd_printf_info("%-16s %s\n", drivlist.driver().name, drivlist.driver(clone_of).name);
 	}
 }
 
@@ -458,7 +458,10 @@ void cli_frontend::listbrothers(const std::vector<std::string> &args)
 	while (drivlist.next())
 	{
 		int clone_of = drivlist.clone();
-		osd_printf_info("%-20s %-16s %-16s\n", core_filename_extract_base(drivlist.driver().type.source()).c_str(), drivlist.driver().name, (clone_of == -1 ? "" : drivlist.driver(clone_of).name));
+		if (clone_of != -1)
+			osd_printf_info("%-20s %-16s %s\n", core_filename_extract_base(drivlist.driver().type.source()).c_str(), drivlist.driver().name, (clone_of == -1 ? "" : drivlist.driver(clone_of).name));
+		else
+			osd_printf_info("%-20s %s\n", core_filename_extract_base(drivlist.driver().type.source()).c_str(), drivlist.driver().name);
 	}
 }
 
@@ -769,25 +772,33 @@ void cli_frontend::listslots(const std::vector<std::string> &args)
 		for (const device_slot_interface &slot : slot_interface_iterator(drivlist.config()->root_device()))
 		{
 			if (slot.fixed()) continue;
+
+			// build a list of user-selectable options
+			std::vector<device_slot_option *> option_list;
+			for (auto &option : slot.option_list())
+				if (option.second->selectable())
+					option_list.push_back(option.second.get());
+
+			// sort them by name
+			std::sort(option_list.begin(), option_list.end(), [](device_slot_option *opt1, device_slot_option *opt2) {
+				return strcmp(opt1->name(), opt2->name()) < 0;
+			});
+
+
 			// output the line, up to the list of extensions
 			printf("%-16s %-16s ", first ? drivlist.driver().name : "", slot.device().tag()+1);
 
 			bool first_option = true;
 
 			// get the options and print them
-			for (auto &option : slot.option_list())
+			for (device_slot_option *opt : option_list)
 			{
-				if (option.second->selectable())
-				{
-					std::unique_ptr<device_t> dev = option.second->devtype()(*drivlist.config(), "dummy", &drivlist.config()->root_device(), 0);
-					dev->config_complete();
-					if (first_option)
-						printf("%-16s %s\n", option.second->name(),dev->name());
-					else
-						printf("%-34s%-16s %s\n", "", option.second->name(),dev->name());
+				if (first_option)
+					printf("%-16s %s\n", opt->name(), opt->devtype().fullname());
+				else
+					printf("%-34s%-16s %s\n", "", opt->name(), opt->devtype().fullname());
 
-					first_option = false;
-				}
+				first_option = false;
 			}
 			if (first_option)
 				printf("%-16s %s\n", "[none]","No options available");
@@ -819,7 +830,7 @@ void cli_frontend::listmedia(const std::vector<std::string> &args)
 
 	// print header
 	printf("%-16s %-16s %-10s %s\n", "SYSTEM", "MEDIA NAME", "(brief)", "IMAGE FILE EXTENSIONS SUPPORTED");
-	printf("%s %s-%s %s\n", std::string(16,'-').c_str(), std::string(16,'-').c_str(), std::string(10,'-').c_str(), std::string(34,'-').c_str());
+	printf("%s %s-%s %s\n", std::string(16,'-').c_str(), std::string(16,'-').c_str(), std::string(10,'-').c_str(), std::string(31,'-').c_str());
 
 	// iterate over drivers
 	while (drivlist.next())
@@ -1452,31 +1463,31 @@ void cli_frontend::romident(const std::vector<std::string> &args)
 
 
 //-------------------------------------------------
-//	find_command
+//  find_command
 //-------------------------------------------------
 
 const cli_frontend::info_command_struct *cli_frontend::find_command(const std::string &s)
 {
 	static const info_command_struct s_info_commands[] =
 	{
-		{ CLICOMMAND_LISTXML,           0, -1, false,	&cli_frontend::listxml,          "[pattern] ..." },
-		{ CLICOMMAND_LISTFULL,          0,  1, false,	&cli_frontend::listfull,         "[system name]" },
-		{ CLICOMMAND_LISTSOURCE,        0,  1, false,	&cli_frontend::listsource,       "[system name]" },
-		{ CLICOMMAND_LISTCLONES,        0,  1, false,	&cli_frontend::listclones,       "[system name]" },
-		{ CLICOMMAND_LISTBROTHERS,      0,  1, false,	&cli_frontend::listbrothers,     "[system name]" },
-		{ CLICOMMAND_LISTCRC,           0,  1, false,	&cli_frontend::listcrc,          "[system name]" },
-		{ CLICOMMAND_LISTDEVICES,       0,  1, true,	&cli_frontend::listdevices,      "[system name]" },
-		{ CLICOMMAND_LISTSLOTS,         0,  1, true,	&cli_frontend::listslots,        "[system name]" },
-		{ CLICOMMAND_LISTROMS,          0, -1, false,	&cli_frontend::listroms,         "[pattern] ..." },
-		{ CLICOMMAND_LISTSAMPLES,       0,  1, false,	&cli_frontend::listsamples,      "[system name]" },
-		{ CLICOMMAND_VERIFYROMS,        0, -1, false,	&cli_frontend::verifyroms,       "[pattern] ..." },
-		{ CLICOMMAND_VERIFYSAMPLES,     0,  1, false,	&cli_frontend::verifysamples,    "[system name|*]" },
-		{ CLICOMMAND_LISTMEDIA,         0,  1, true,	&cli_frontend::listmedia,        "[system name]" },
-		{ CLICOMMAND_LISTSOFTWARE,      0,  1, false,	&cli_frontend::listsoftware,     "[system name]" },
-		{ CLICOMMAND_VERIFYSOFTWARE,    0,  1, false,	&cli_frontend::verifysoftware,   "[system name|*]" },
-		{ CLICOMMAND_ROMIDENT,          1,  1, false,	&cli_frontend::romident,         "(file or directory path)" },
-		{ CLICOMMAND_GETSOFTLIST,       0,  1, false,	&cli_frontend::getsoftlist,      "[system name|*]" },
-		{ CLICOMMAND_VERIFYSOFTLIST,    0,  1, false,	&cli_frontend::verifysoftlist,   "[system name|*]" }
+		{ CLICOMMAND_LISTXML,           0, -1, false,   &cli_frontend::listxml,          "[pattern] ..." },
+		{ CLICOMMAND_LISTFULL,          0,  1, false,   &cli_frontend::listfull,         "[system name]" },
+		{ CLICOMMAND_LISTSOURCE,        0,  1, false,   &cli_frontend::listsource,       "[system name]" },
+		{ CLICOMMAND_LISTCLONES,        0,  1, false,   &cli_frontend::listclones,       "[system name]" },
+		{ CLICOMMAND_LISTBROTHERS,      0,  1, false,   &cli_frontend::listbrothers,     "[system name]" },
+		{ CLICOMMAND_LISTCRC,           0,  1, false,   &cli_frontend::listcrc,          "[system name]" },
+		{ CLICOMMAND_LISTDEVICES,       0,  1, true,    &cli_frontend::listdevices,      "[system name]" },
+		{ CLICOMMAND_LISTSLOTS,         0,  1, true,    &cli_frontend::listslots,        "[system name]" },
+		{ CLICOMMAND_LISTROMS,          0, -1, false,   &cli_frontend::listroms,         "[pattern] ..." },
+		{ CLICOMMAND_LISTSAMPLES,       0,  1, false,   &cli_frontend::listsamples,      "[system name]" },
+		{ CLICOMMAND_VERIFYROMS,        0, -1, false,   &cli_frontend::verifyroms,       "[pattern] ..." },
+		{ CLICOMMAND_VERIFYSAMPLES,     0,  1, false,   &cli_frontend::verifysamples,    "[system name|*]" },
+		{ CLICOMMAND_LISTMEDIA,         0,  1, true,    &cli_frontend::listmedia,        "[system name]" },
+		{ CLICOMMAND_LISTSOFTWARE,      0,  1, false,   &cli_frontend::listsoftware,     "[system name]" },
+		{ CLICOMMAND_VERIFYSOFTWARE,    0,  1, false,   &cli_frontend::verifysoftware,   "[system name|*]" },
+		{ CLICOMMAND_ROMIDENT,          1,  1, false,   &cli_frontend::romident,         "(file or directory path)" },
+		{ CLICOMMAND_GETSOFTLIST,       0,  1, false,   &cli_frontend::getsoftlist,      "[system name|*]" },
+		{ CLICOMMAND_VERIFYSOFTLIST,    0,  1, false,   &cli_frontend::verifysoftlist,   "[system name|*]" }
 	};
 
 	for (const auto &info_command : s_info_commands)
@@ -1489,7 +1500,7 @@ const cli_frontend::info_command_struct *cli_frontend::find_command(const std::s
 
 
 //-------------------------------------------------
-//	parse_slot_options_for_auxverb
+//  parse_slot_options_for_auxverb
 //-------------------------------------------------
 
 bool cli_frontend::parse_slot_options_for_auxverb(const std::string &auxverb)

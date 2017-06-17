@@ -1,5 +1,9 @@
 local xml = {}
 
+function xml.filename(name)
+	return name .. ".xml"
+end
+
 -- basic xml parser for mamecheat only
 local function xml_parse(data)
 	local function fix_gt(str)

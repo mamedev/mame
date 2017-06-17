@@ -21,9 +21,9 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(write_cart) override;
 	virtual DECLARE_WRITE8_MEMBER(write_mapper) override {}
 
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
 protected:
+	virtual void device_add_mconfig(machine_config &config) override;
+
 	required_device<sega8_card_slot_device> m_card;
 };
 

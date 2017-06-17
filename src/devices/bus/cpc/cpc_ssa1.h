@@ -56,10 +56,6 @@ public:
 	// construction/destruction
 	cpc_ssa1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
 	void set_lrq(uint8_t state) { m_lrq = state; }
 	uint8_t get_lrq() { return m_lrq; }
 	void set_sby(uint8_t state) { m_sby = state; }
@@ -67,15 +63,20 @@ public:
 
 	DECLARE_READ8_MEMBER(ssa1_r);
 	DECLARE_WRITE8_MEMBER(ssa1_w);
-	DECLARE_WRITE_LINE_MEMBER(lrq_cb);
-	DECLARE_WRITE_LINE_MEMBER(sby_cb);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
 private:
+	DECLARE_WRITE_LINE_MEMBER(lrq_cb);
+	DECLARE_WRITE_LINE_MEMBER(sby_cb);
+
 	cpc_expansion_slot_device *m_slot;
 
 	uint8_t *m_rom;
@@ -92,10 +93,6 @@ public:
 	// construction/destruction
 	cpc_dkspeech_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
 	void set_lrq(uint8_t state) { m_lrq = state; }
 	uint8_t get_lrq() { return m_lrq; }
 	void set_sby(uint8_t state) { m_sby = state; }
@@ -103,15 +100,20 @@ public:
 
 	DECLARE_READ8_MEMBER(dkspeech_r);
 	DECLARE_WRITE8_MEMBER(dkspeech_w);
-	DECLARE_WRITE_LINE_MEMBER(lrq_cb);
-	DECLARE_WRITE_LINE_MEMBER(sby_cb);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
 private:
+	DECLARE_WRITE_LINE_MEMBER(lrq_cb);
+	DECLARE_WRITE_LINE_MEMBER(sby_cb);
+
 	cpc_expansion_slot_device *m_slot;
 
 	uint8_t *m_rom;

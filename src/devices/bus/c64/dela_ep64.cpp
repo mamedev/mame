@@ -19,26 +19,15 @@ DEFINE_DEVICE_TYPE(C64_DELA_EP64, c64_dela_ep64_cartridge_device, "c64_dela_ep64
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_START( c64_dela_ep64 )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( c64_dela_ep64 )
+MACHINE_CONFIG_MEMBER( c64_dela_ep64_cartridge_device::device_add_mconfig )
 	MCFG_GENERIC_SOCKET_ADD("eprom1", generic_linear_slot, nullptr)
 	MCFG_GENERIC_EXTENSIONS("rom,bin")
 	MCFG_GENERIC_SOCKET_ADD("eprom2", generic_linear_slot, nullptr)
 	MCFG_GENERIC_EXTENSIONS("rom,bin")
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor c64_dela_ep64_cartridge_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( c64_dela_ep64 );
-}
 
 
 //**************************************************************************

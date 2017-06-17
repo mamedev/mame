@@ -43,9 +43,6 @@ public:
 	std::unique_ptr<uint16_t[]>     m_spriteram1_old;
 	uint32_t  inufuku_tile_callback( uint32_t code );
 
-	/* misc */
-	uint16_t    m_pending_command;
-
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -54,8 +51,6 @@ public:
 	required_device<vsystem_spr_device> m_spr;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_WRITE16_MEMBER(inufuku_soundcommand_w);
-	DECLARE_WRITE8_MEMBER(pending_command_clear_w);
 	DECLARE_WRITE8_MEMBER(inufuku_soundrombank_w);
 	DECLARE_WRITE16_MEMBER(inufuku_palettereg_w);
 	DECLARE_WRITE16_MEMBER(inufuku_scrollreg_w);

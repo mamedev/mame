@@ -127,7 +127,7 @@ static ADDRESS_MAP_START( tosh1000_io, AS_IO, 8, tosh1000_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", ibm5160_mb_device, map)
 	AM_RANGE(0x00c8, 0x00c8) AM_WRITE(romdos_bank_w)    // ROM-DOS page select [p. B-15]
-	AM_RANGE(0x02c0, 0x02df) AM_DEVREADWRITE("rtc", rp5c01_device, read, write)
+	AM_RANGE(0x02c0, 0x02df) AM_DEVREADWRITE("rtc", tc8521_device, read, write)
 ADDRESS_MAP_END
 
 
@@ -156,7 +156,7 @@ static MACHINE_CONFIG_START( tosh1000 )
 
 	MCFG_IBM5160_MOTHERBOARD_ADD("mb", "maincpu")
 
-	MCFG_DEVICE_ADD("rtc", RP5C01, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD("rtc", TC8521, XTAL_32_768kHz)
 
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", pc_isa8_cards, "cga", false)
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", pc_isa8_cards, "fdc_xt", false)

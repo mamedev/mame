@@ -27,19 +27,6 @@ DEFINE_DEVICE_TYPE(A2BUS_SSC, a2bus_ssc_device, "a2ssc", "Apple Super Serial Car
 #define SSC_ACIA_TAG    "ssc_acia"
 #define SSC_RS232_TAG   "ssc_rs232"
 
-MACHINE_CONFIG_START( ssc )
-	MCFG_DEVICE_ADD(SSC_ACIA_TAG, MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
-	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(a2bus_ssc_device, acia_irq_w))
-	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE(SSC_RS232_TAG, rs232_port_device, write_txd))
-
-	MCFG_RS232_PORT_ADD(SSC_RS232_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(SSC_ACIA_TAG, mos6551_device, write_rxd))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(SSC_ACIA_TAG, mos6551_device, write_dcd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(SSC_ACIA_TAG, mos6551_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(SSC_ACIA_TAG, mos6551_device, write_cts))
-MACHINE_CONFIG_END
-
 ROM_START( ssc )
 	ROM_REGION(0x000800, SSC_ROM_REGION, 0)
 	ROM_LOAD( "341-0065-a.bin", 0x000000, 0x000800, CRC(b7539d4c) SHA1(6dab633470c6bc4cb3e81d09fda46597caf8ee57) )
@@ -106,14 +93,21 @@ ioport_constructor a2bus_ssc_device::device_input_ports() const
 }
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor a2bus_ssc_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( ssc );
-}
+MACHINE_CONFIG_MEMBER( a2bus_ssc_device::device_add_mconfig )
+	MCFG_DEVICE_ADD(SSC_ACIA_TAG, MOS6551, 0)
+	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
+	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(a2bus_ssc_device, acia_irq_w))
+	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE(SSC_RS232_TAG, rs232_port_device, write_txd))
+
+	MCFG_RS232_PORT_ADD(SSC_RS232_TAG, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(SSC_ACIA_TAG, mos6551_device, write_rxd))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(SSC_ACIA_TAG, mos6551_device, write_dcd))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(SSC_ACIA_TAG, mos6551_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(SSC_ACIA_TAG, mos6551_device, write_cts))
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region

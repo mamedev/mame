@@ -58,7 +58,7 @@ public:
 
 	// overscan sizes in intv pixels
 	// these values are approximate.
-	static constexpr unsigned   OVERSCAN_LEFT_WIDTH	    = 13;
+	static constexpr unsigned   OVERSCAN_LEFT_WIDTH     = 13;
 	static constexpr unsigned   OVERSCAN_RIGHT_WIDTH    = 17;
 	static constexpr unsigned   OVERSCAN_TOP_HEIGHT     = 12;
 	static constexpr unsigned   OVERSCAN_BOTTOM_HEIGHT  = 12;

@@ -8,12 +8,13 @@
     - Black Knight 2000 randomly goes nuts or resets
       (some bug possibly relating to the 'lighting draws the "Ball 1"' animation???);
       if you insert 2 or more credits and hit start 2 times quickly so it doesn't
-      play the animation, the game seems more stable afterward; original
+      play the animation, the game seems more stable afterwards; original
       game bug or 6802 core bug or something else?
       This bug behaves slightly differently in the different sets, depending on whether
       nvram is cleared beforehand or not, and whether the last reset was soft or hard.
     - Black Knight 2000 LG-1 set reports U26 ROM FAILURE. Bad/hacked dump or original bug?
     - Advance button doesn't seem to work well (TODO: check if this may have been fixed with the irq and diagnostic button masking changes)
+    - Jokerz has an entirely different "Pin Sound '88" stereo audio board (D-12338-567)
 
     Known keys necessary to get games to start (so the proper number of balls are detected):
     - Black Knight 2000: Hold "D" "F" "Y" and press "1" after inserting 1 or more credits. press 'x' to get the main music started.
@@ -544,9 +545,21 @@ ROM_START(bk2k_pu1)
 	ROM_LOAD("bk2k_u19.l1", 0x18000, 0x8000, CRC(58e162b2) SHA1(891f810ae18b46593f570d719f0290a1d08a1a10))
 ROM_END
 
+ROM_START(bk2k_pf1)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("bk2k_u26.pf7", 0x4000, 0x4000, CRC(79a77d26) SHA1(dfecd3f1fa80f0e7a84cafe7f45a96dd1c847090))
+	ROM_LOAD("bk2k_u27.pf1", 0x8000, 0x8000, CRC(2a84db98) SHA1(58438763ec702c1a1e73ab853c58352fe97c27e7))
+	ROM_REGION(0x20000, "audiocpu", ROMREGION_ERASEFF)
+	ROM_LOAD("bk2k_u21.l1", 0x18000, 0x8000, CRC(08be36ad) SHA1(0f4c448e003df54ed8ccf0e0c57f6123ce1e2027))
+	ROM_LOAD("bk2k_u22.l1", 0x10000, 0x8000, CRC(9c8becd8) SHA1(9090e8104dad63f14246caabafec428d94d5e18d))
+	ROM_REGION(0x30000, "bgcpu", ROMREGION_ERASEFF)
+	ROM_LOAD("bk2k_u4.l2", 0x10000, 0x8000, CRC(1d87281b) SHA1(609288b017aac6ce6da8717a35fdf87013adeb3c))
+	ROM_LOAD("bk2k_u19.l1", 0x18000, 0x8000, CRC(58e162b2) SHA1(891f810ae18b46593f570d719f0290a1d08a1a10))
+ROM_END
+
 ROM_START(bk2k_la2)
 	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("bk2k_u26.la2", 0x4000, 0x4000, CRC(2da07403) SHA1(4b48c5d7b0a03aa4593dc6053dc5e94df22d2a64))
+	ROM_LOAD("u26-pu1.rom",  0x4000, 0x4000, CRC(2da07403) SHA1(4b48c5d7b0a03aa4593dc6053dc5e94df22d2a64))
 	ROM_LOAD("bk2k_u27.la2", 0x8000, 0x8000, CRC(531e7752) SHA1(e51a93d40bc316876488ae0a7691ff5fd514472d))
 	ROM_REGION(0x20000, "audiocpu", ROMREGION_ERASEFF)
 	ROM_LOAD("bk2k_u21.l1", 0x18000, 0x8000, CRC(08be36ad) SHA1(0f4c448e003df54ed8ccf0e0c57f6123ce1e2027))
@@ -1081,6 +1094,7 @@ GAME(1989,  bk2k_l4,        0,          s11b,   s11b, s11b_state,   s11b_invert,
 GAME(1989,  bk2k_lg1,       bk2k_l4,    s11b,   s11b, s11b_state,   s11b_invert,    ROT0,   "Williams",             "Black Knight 2000 (LG-1)",              MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1989,  bk2k_lg3,       bk2k_l4,    s11b,   s11b, s11b_state,   s11b_invert,    ROT0,   "Williams",             "Black Knight 2000 (LG-3)",              MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1989,  bk2k_pu1,       bk2k_l4,    s11b,   s11b, s11b_state,   s11b_invert,    ROT0,   "Williams",             "Black Knight 2000 (PU-1)",              MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1989,  bk2k_pf1,       bk2k_l4,    s11b,   s11b, s11b_state,   s11b_invert,    ROT0,   "Williams",             "Black Knight 2000 (PF-1)",              MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1989,  bk2k_la2,       bk2k_l4,    s11b,   s11b, s11b_state,   s11b_invert,    ROT0,   "Williams",             "Black Knight 2000 (LA-2)",              MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1989,  bk2k_pa7,       bk2k_l4,    s11b,   s11b, s11b_state,   s11b_invert,    ROT0,   "Williams",             "Black Knight 2000 (PA-7)",              MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1989,  bk2k_pa5,       bk2k_l4,    s11b,   s11b, s11b_state,   s11b_invert,    ROT0,   "Williams",             "Black Knight 2000 (PA-5)",              MACHINE_IS_SKELETON_MECHANICAL)

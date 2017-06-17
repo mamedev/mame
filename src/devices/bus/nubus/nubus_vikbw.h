@@ -21,12 +21,6 @@ public:
 	// construction/destruction
 	nubus_vikbw_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
 protected:
 	nubus_vikbw_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -34,10 +28,17 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+
+private:
 	DECLARE_READ32_MEMBER(viking_ack_r);
 	DECLARE_WRITE32_MEMBER(viking_ack_w);
 	DECLARE_READ32_MEMBER(viking_enable_r);
 	DECLARE_WRITE32_MEMBER(viking_disable_w);
+
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	std::vector<uint8_t> m_vram;
 	uint32_t m_vbl_disable, m_palette[2];

@@ -123,13 +123,9 @@ public:
 	DECLARE_WRITE8_MEMBER( tmpz84c011_dir_pd_w ) { m_pio_dir[3] = data; }
 	DECLARE_WRITE8_MEMBER( tmpz84c011_dir_pe_w ) { m_pio_dir[4] = data; }
 
-	DECLARE_WRITE_LINE_MEMBER( zc0_cb_trampoline_w ) { m_zc0_cb(state); }
-	DECLARE_WRITE_LINE_MEMBER( zc1_cb_trampoline_w ) { m_zc1_cb(state); }
-	DECLARE_WRITE_LINE_MEMBER( zc2_cb_trampoline_w ) { m_zc2_cb(state); }
-
 protected:
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -168,6 +164,10 @@ private:
 	devcb_write_line m_zc0_cb;
 	devcb_write_line m_zc1_cb;
 	devcb_write_line m_zc2_cb;
+
+	DECLARE_WRITE_LINE_MEMBER( zc0_cb_trampoline_w ) { m_zc0_cb(state); }
+	DECLARE_WRITE_LINE_MEMBER( zc1_cb_trampoline_w ) { m_zc1_cb(state); }
+	DECLARE_WRITE_LINE_MEMBER( zc2_cb_trampoline_w ) { m_zc2_cb(state); }
 };
 
 

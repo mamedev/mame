@@ -13305,56 +13305,6 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 		<info name="release" value="19940930" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System Disk" />
-			<dataarea name="flop" size="1261568">
-				<rom name="s_sf2_sys.hdm" size="1261568" crc="5eacf67f" sha1="c1088bf10968aee8d611235f6d035b0c45dfc634" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1" />
-			<dataarea name="flop" size="1261568">
-				<rom name="s_sf2_1.hdm" size="1261568" crc="6bb3366b" sha1="a73a23a83182547945f3a6059b81660b1803b229" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2" />
-			<dataarea name="flop" size="1261568">
-				<rom name="s_sf2_2.hdm" size="1261568" crc="2fca1bb9" sha1="ca6cb84c5ca25ede85845d3dea17a3b4a0230149" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 3" />
-			<dataarea name="flop" size="1261568">
-				<rom name="s_sf2_3.hdm" size="1261568" crc="94e2b40a" sha1="2bf2717ccca22897fc713fadb94333f56907eedb" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop5" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 4" />
-			<dataarea name="flop" size="1261568">
-				<rom name="s_sf2_4.hdm" size="1261568" crc="ebf009ca" sha1="c80783e6f9c2a06b9c0f0d185724865b8841bf23" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop6" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 5" />
-			<dataarea name="flop" size="1261568">
-				<rom name="s_sf2_5.hdm" size="1261568" crc="5880bfc2" sha1="990a1404eabf4cd8c750cffe449037c9d20846f1" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop7" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 6" />
-			<dataarea name="flop" size="1261568">
-				<rom name="s_sf2_6.hdm" size="1261568" crc="28530991" sha1="8cc2bbeb5668090f3c82633befd9e0bf9ec217cb" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ssf2a" cloneof="ssf2">
-		<description>Super Street Fighter II - The New Challengers (Alt)</description>
-		<year>1994</year>
-		<publisher>カプコン (Capcom)</publisher>
-		<info name="alt_title" value="スーパーストリートファイター2" />
-		<info name="release" value="19940930" />
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="System Disk" />
 			<dataarea name="flop" size="1261824">
 				<rom name="super street fighter ii - the new challengers [system].dim" size="1261824" crc="cd4358eb" sha1="4e8bdef49f4e003dcb84e675ce97be9cd1aba7c7" offset="000000" />
 			</dataarea>
@@ -19711,6 +19661,18 @@ a bootable disk out of that? -->
 		</part>
 	</software>
 
+	<software name="dennoc90sp">
+		<description>Dennou Club Vol. 90 Tokubetsu Henshuu-ban</description>
+		<year>1995</year>
+		<publisher>満開製作所 (Mankai Seisakujo)</publisher>
+		<info name="alt_title" value="電脳倶楽部 VOL.90 特別編集版" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "1261824">
+				<rom name="090spa.dim" size="1261824" crc="5e620085" sha1="e795441f262e9e0bbe187ab28e7f33682135fec2" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dennoc91">
 		<description>Dennou Club Vol. 91</description>
 		<year>1995</year>
@@ -19771,6 +19733,25 @@ a bootable disk out of that? -->
 		</part>
 	</software>
 
+	<software name="dennoc94">
+		<description>Dennou Club Vol. 94</description>
+		<year>1996</year>
+		<publisher>満開製作所 (Mankai Seisakujo)</publisher>
+		<info name="alt_title" value="電脳倶楽部 VOL.94" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="094a.dim" size="1261824" crc="ec41b990" sha1="fc65c6760da29ce5f98dcf2b0311cbc778bee537" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="094b.dim" size="1261824" crc="22d5a7b5" sha1="94ff4c7fd103b6595690da489b029b568ccfb206" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dennoc95">
 		<description>Dennou Club Vol. 95</description>
 		<year>1996</year>
@@ -19787,6 +19768,842 @@ a bootable disk out of that? -->
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1261824">
 				<rom name="dennou club vol. 95 (1996)(mankai seisakujo)(disk 2 of 2)(disk b).dim" size="1261824" crc="9702f180" sha1="b11d6461db4befb3e599c7587f3f9007efb5594b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dennoc96">
+		<description>Dennou Club Vol. 96</description>
+		<year>1996</year>
+		<publisher>満開製作所 (Mankai Seisakujo)</publisher>
+		<info name="alt_title" value="電脳倶楽部 VOL.96" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="096a.dim" size="1261824" crc="16573eb8" sha1="98bec043f06de43444144a607d257606441ce3e4" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="096b.dim" size="1261824" crc="642308c4" sha1="bc0eeee81e20f090a7199559a1445b3403cd9915" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dennoc97">
+		<description>Dennou Club Vol. 97</description>
+		<year>1996</year>
+		<publisher>満開製作所 (Mankai Seisakujo)</publisher>
+		<info name="alt_title" value="電脳倶楽部 VOL.97" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="097a.dim" size="1261824" crc="b44507ad" sha1="693fb501cc8a7db67514d4bc79f9db729a77e7d3" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="097b.dim" size="1261824" crc="ee4c7968" sha1="12fbe9c64f69dea07b60654a24686f22f69eee32" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dennoc98">
+		<description>Dennou Club Vol. 98</description>
+		<year>1996</year>
+		<publisher>満開製作所 (Mankai Seisakujo)</publisher>
+		<info name="alt_title" value="電脳倶楽部 VOL.98" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="098a.dim" size="1261824" crc="6f9be466" sha1="eefe3bde858c202aec7f0b7fa51bcda9933855bf" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="098b.dim" size="1261824" crc="485fbf0e" sha1="0aeaa1d127c7c3109ede9a706ba7bd6278ebed15" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dennoc99">
+		<description>Dennou Club Vol. 99</description>
+		<year>1996</year>
+		<publisher>満開製作所 (Mankai Seisakujo)</publisher>
+		<info name="alt_title" value="電脳倶楽部 VOL.99" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="099a.dim" size="1261824" crc="967ec550" sha1="041d0b2d66c109e7c9adc1dd155c7a54f844f507" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="099b.dim" size="1261824" crc="7542e5f4" sha1="0a9cb91f4b48d92c3f953f7eaf80deafe258f6fb" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dennoc100">
+		<description>Dennou Club Vol. 100</description>
+		<year>1996</year>
+		<publisher>満開製作所 (Mankai Seisakujo)</publisher>
+		<info name="alt_title" value="電脳倶楽部 VOL.100" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="100a.dim" size="1261824" crc="382df56b" sha1="80d9684ed66016780b8ecdd97ec876f517093f95" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="100b.dim" size="1261824" crc="b5cb0411" sha1="12e0d4601d73cf6d9608af0d7a07cc34eb03e9e3" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dennoc101">
+		<description>Dennou Club Vol. 101</description>
+		<year>1996</year>
+		<publisher>満開製作所 (Mankai Seisakujo)</publisher>
+		<info name="alt_title" value="電脳倶楽部 VOL.101" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_101_a.dim" size="1261824" crc="5bbc4734" sha1="4c10e748c3d1b8d83506675b789b0016b631b9c7" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_101_b.dim" size="1261824" crc="cdcb6d70" sha1="d76fcef758626092294d29afc49025eaa9ed3aff" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dennoc102">
+		<description>Dennou Club Vol. 102</description>
+		<year>1996</year>
+		<publisher>満開製作所 (Mankai Seisakujo)</publisher>
+		<info name="alt_title" value="電脳倶楽部 VOL.102" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_102_a.dim" size="1261824" crc="827d3c3f" sha1="825efeb556a9fc8a5e2151f91c41eee65f5ff140" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_102_b.dim" size="1261824" crc="b8b825e7" sha1="29055bf668dcda021e0ba1d42f35c1eed84950f8" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dennoc103">
+		<description>Dennou Club Vol. 103</description>
+		<year>1996</year>
+		<publisher>満開製作所 (Mankai Seisakujo)</publisher>
+		<info name="alt_title" value="電脳倶楽部 VOL.103" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_103_a.dim" size="1261824" crc="4ac3c68b" sha1="5a04efa4386e2a1c8bf5d7c18287eda7fe35cf8d" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_103_b.dim" size="1261824" crc="79df3732" sha1="ac119586daf4fd0797b70f2279621dae02642a5c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dennoc104">
+		<description>Dennou Club Vol. 104</description>
+		<year>1997</year>
+		<publisher>満開製作所 (Mankai Seisakujo)</publisher>
+		<info name="alt_title" value="電脳倶楽部 VOL.104" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_104_a.dim" size="1261824" crc="435e94c7" sha1="42218725997ad8adcbef4494855d3f15da75f550" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_104_b.dim" size="1261824" crc="9364c143" sha1="23743bdd4868085aa09c0eb9c1463b27f4dedd92" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dennoc105">
+		<description>Dennou Club Vol. 105</description>
+		<year>1997</year>
+		<publisher>満開製作所 (Mankai Seisakujo)</publisher>
+		<info name="alt_title" value="電脳倶楽部 VOL.105" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_105_a.dim" size="1261824" crc="dfc5ed6c" sha1="be64447204823bb934c23b8259b72f69646dbb6b" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_105_b.dim" size="1261824" crc="ee2ea11c" sha1="420d345439172a72a36bada68020ca54e41018b5" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dennoc106">
+		<description>Dennou Club Vol. 106</description>
+		<year>1997</year>
+		<publisher>満開製作所 (Mankai Seisakujo)</publisher>
+		<info name="alt_title" value="電脳倶楽部 VOL.106" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_106_a.dim" size="1261824" crc="5504bd7c" sha1="02d06115873e2f151359d2333b9c5a023cc3f045" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_106_b.dim" size="1261824" crc="e2e3ae32" sha1="33229908fb9a1a0de34c00ab6d998c0f8d0e0a72" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dennoc107">
+		<description>Dennou Club Vol. 107</description>
+		<year>1997</year>
+		<publisher>満開製作所 (Mankai Seisakujo)</publisher>
+		<info name="alt_title" value="電脳倶楽部 VOL.107" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_107_a.dim" size="1261824" crc="562146b0" sha1="29c9a0ab2f50e68b050b207c4d328dda66f03121" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_107_b.dim" size="1261824" crc="e3ad4933" sha1="3af64a71951b25b2088eb7d87f82e5d51ae0d690" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dennoc108">
+		<description>Dennou Club Vol. 108</description>
+		<year>1997</year>
+		<publisher>満開製作所 (Mankai Seisakujo)</publisher>
+		<info name="alt_title" value="電脳倶楽部 VOL.108" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_108_a.dim" size="1261824" crc="2bddd29c" sha1="d2f0023021f65bce41062d743a138fd343baeaa8" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_108_b.dim" size="1261824" crc="c41a545d" sha1="d55a65b3bd70fd20b0e17d6cb426530771616227" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dennoc109">
+		<description>Dennou Club Vol. 109</description>
+		<year>1997</year>
+		<publisher>満開製作所 (Mankai Seisakujo)</publisher>
+		<info name="alt_title" value="電脳倶楽部 VOL.109" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_109_a.dim" size="1261824" crc="e21998fb" sha1="2d0384041f5e318f495053ad08b65a2c6a4f91e5" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_109_b.dim" size="1261824" crc="e850afea" sha1="c296824ece648c15fe5340bb09812c7d2e4f75dd" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dennoc110">
+		<description>Dennou Club Vol. 110</description>
+		<year>1997</year>
+		<publisher>満開製作所 (Mankai Seisakujo)</publisher>
+		<info name="alt_title" value="電脳倶楽部 VOL.110" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_110_a.dim" size="1261824" crc="f165eea2" sha1="70ec95f3c1d1249c875a3d3768ffe051fce1fdf9" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_110_b.dim" size="1261824" crc="ed17563b" sha1="ba162d8189b4f14d0fe6e660e19c54cea9e9d7cc" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dennoc111">
+		<description>Dennou Club Vol. 111</description>
+		<year>1997</year>
+		<publisher>満開製作所 (Mankai Seisakujo)</publisher>
+		<info name="alt_title" value="電脳倶楽部 VOL.111" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_111_a.dim" size="1261824" crc="8478ad21" sha1="59f1f1b7a1be34481970b39baf46b3024bc763e7" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_111_b.dim" size="1261824" crc="b3cefb43" sha1="6b77cc1f7c1d4c82ef547130810dc6eac9ffd5af" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dennoc112">
+		<description>Dennou Club Vol. 112</description>
+		<year>1997</year>
+		<publisher>満開製作所 (Mankai Seisakujo)</publisher>
+		<info name="alt_title" value="電脳倶楽部 VOL.112" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_112_a.dim" size="1261824" crc="254d73ab" sha1="29f93a955c786c2f76b795068a6c8a02f035e34e" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_112_b.dim" size="1261824" crc="35e6cba6" sha1="1514c40c74bc74c314c2110bb0a3b35ceeac498c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dennoc113">
+		<description>Dennou Club Vol. 113</description>
+		<year>1997</year>
+		<publisher>満開製作所 (Mankai Seisakujo)</publisher>
+		<info name="alt_title" value="電脳倶楽部 VOL.113" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_113_a.dim" size="1261824" crc="aca75c4c" sha1="70145b2fce393df6f777caa76e10432deed67217" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_113_b.dim" size="1261824" crc="1ed44704" sha1="f6d508f349568340dc468701e97c9c5daa1e6790" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dennoc114">
+		<description>Dennou Club Vol. 114</description>
+		<year>1997</year>
+		<publisher>満開製作所 (Mankai Seisakujo)</publisher>
+		<info name="alt_title" value="電脳倶楽部 VOL.114" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_114_a.dim" size="1261824" crc="f590c898" sha1="d52a4265a517311074897ac6bfbf3837496ecdb7" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_114_b.dim" size="1261824" crc="41f431ff" sha1="40d833f9a931586694edfb08e25c989483e27017" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dennoc115">
+		<description>Dennou Club Vol. 115</description>
+		<year>1997</year>
+		<publisher>満開製作所 (Mankai Seisakujo)</publisher>
+		<info name="alt_title" value="電脳倶楽部 VOL.115" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_115_a.dim" size="1261824" crc="61ade39b" sha1="e4fab7455c157577bb8fd4496eacb40d32fd0a33" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_115_b.dim" size="1261824" crc="7829aabe" sha1="d11187fe5a818d27d158a2ac39cbb0df5b418b07" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dennoc116">
+		<description>Dennou Club Vol. 116</description>
+		<year>1998</year>
+		<publisher>満開製作所 (Mankai Seisakujo)</publisher>
+		<info name="alt_title" value="電脳倶楽部 VOL.116" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_116_a.dim" size="1261824" crc="f7e754a0" sha1="cfbd5db76d68a5a5b8f754136d7b0b6a08b51b8f" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_116_b.dim" size="1261824" crc="9f1150f0" sha1="34e9908b9bba63c34c397194744bd1bcc44df187" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dennoc117">
+		<description>Dennou Club Vol. 117</description>
+		<year>1998</year>
+		<publisher>満開製作所 (Mankai Seisakujo)</publisher>
+		<info name="alt_title" value="電脳倶楽部 VOL.117" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_117_a.dim" size="1261824" crc="ad8027ad" sha1="28ad0729ea17dcc21882f3220a76e0d090ce253d" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_117_b.dim" size="1261824" crc="4b28cb6d" sha1="be19afe0028feab990132ea43d012cd8eb12772a" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dennoc118">
+		<description>Dennou Club Vol. 118</description>
+		<year>1998</year>
+		<publisher>満開製作所 (Mankai Seisakujo)</publisher>
+		<info name="alt_title" value="電脳倶楽部 VOL.118" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_118_a.dim" size="1261824" crc="43b2149b" sha1="5bd1e27fac2d907e663cbfc06283f4783abfde1d" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_118_b.dim" size="1261824" crc="08d6f425" sha1="0dd41397b114d1d00b8cec665fc6f2521d122f15" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dennoc119">
+		<description>Dennou Club Vol. 119</description>
+		<year>1998</year>
+		<publisher>満開製作所 (Mankai Seisakujo)</publisher>
+		<info name="alt_title" value="電脳倶楽部 VOL.119" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_119_a.dim" size="1261824" crc="2cbcad41" sha1="decda33d72d196acd665a33042534b0a02dd0b5f" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_119_b.dim" size="1261824" crc="c33f38db" sha1="d61cda65304a92797180a3720422cc2416583668" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dennoc120">
+		<description>Dennou Club Vol. 120</description>
+		<year>1998</year>
+		<publisher>満開製作所 (Mankai Seisakujo)</publisher>
+		<info name="alt_title" value="電脳倶楽部 VOL.120" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_120_a.dim" size="1261824" crc="8c2036fd" sha1="4565ba3a7107dd27a061ecda5cb27ee6e35842e8" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_120_b.dim" size="1261824" crc="168890b7" sha1="b16c66b2fc4447c7cecb14024597119a88aa5bc6" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dennoc121">
+		<description>Dennou Club Vol. 121</description>
+		<year>1998</year>
+		<publisher>満開製作所 (Mankai Seisakujo)</publisher>
+		<info name="alt_title" value="電脳倶楽部 VOL.121" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_121_a.dim" size="1261824" crc="57eeedc9" sha1="f540e69420f0789620c87388fd5533b15f56d6b9" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_121_b.dim" size="1261824" crc="c4c5a9c0" sha1="65407a11227d31820f19f4f37992e9f3c7be0ed7" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dennoc122">
+		<description>Dennou Club Vol. 122</description>
+		<year>1998</year>
+		<publisher>満開製作所 (Mankai Seisakujo)</publisher>
+		<info name="alt_title" value="電脳倶楽部 VOL.122" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_122_a.dim" size="1261824" crc="728b6b8f" sha1="522b8db6d26fdf94652800ef38e0b74316a129cf" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_122_b.dim" size="1261824" crc="2658b206" sha1="2d49c894f0d4e690f2a356bbd9c70953f6911bbf" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dennoc123">
+		<description>Dennou Club Vol. 123</description>
+		<year>1998</year>
+		<publisher>満開製作所 (Mankai Seisakujo)</publisher>
+		<info name="alt_title" value="電脳倶楽部 VOL.123" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_123_a.dim" size="1261824" crc="1e9f992c" sha1="55fc5cb95098dddbf29f63ccc5054e17f384cd49" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_123_b.dim" size="1261824" crc="bdfb5731" sha1="600ee682ffd5e9b24811312beca26aebbe0b82f1" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dennoc124">
+		<description>Dennou Club Vol. 124</description>
+		<year>1998</year>
+		<publisher>満開製作所 (Mankai Seisakujo)</publisher>
+		<info name="alt_title" value="電脳倶楽部 VOL.124" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_124_a.dim" size="1261824" crc="9e5f7460" sha1="7611a8347d850a8a5fbd576a1821314d6838dcac" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_124_b.dim" size="1261824" crc="d4ccd100" sha1="b7adcf8ba6cdf0cc85e5308f592f59344ee35693" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dennoc125">
+		<description>Dennou Club Vol. 125</description>
+		<year>1998</year>
+		<publisher>満開製作所 (Mankai Seisakujo)</publisher>
+		<info name="alt_title" value="電脳倶楽部 VOL.125" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_125_a.dim" size="1261824" crc="afd0c1ff" sha1="fe16b7038bafa5d7fb881646e0981d3107fae9dd" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_125_b.dim" size="1261824" crc="6b9faad3" sha1="3e426d858e73d60a87716e98969f040063aa691b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dennoc126">
+		<description>Dennou Club Vol. 126</description>
+		<year>1998</year>
+		<publisher>満開製作所 (Mankai Seisakujo)</publisher>
+		<info name="alt_title" value="電脳倶楽部 VOL.126" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_126_a.dim" size="1261824" crc="fc696d6c" sha1="fa21b62928e8c70a4dd4ae951c022cb956dfbfa4" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_126_b.dim" size="1261824" crc="52338f2b" sha1="09db9e234f1d2dc189ee5c4cc694361b1e550ee0" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dennoc127">
+		<description>Dennou Club Vol. 127</description>
+		<year>1998</year>
+		<publisher>満開製作所 (Mankai Seisakujo)</publisher>
+		<info name="alt_title" value="電脳倶楽部 VOL.127" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_127_a.dim" size="1261824" crc="1e416d3e" sha1="4b2d95ea2b97f39ef6041b82865facc9d32be66b" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_127_b.dim" size="1261824" crc="847a7912" sha1="1636a4c45308afd7f2e24da40f3b962e9422b82f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dennoc128">
+		<description>Dennou Club Vol. 128</description>
+		<year>1999</year>
+		<publisher>満開製作所 (Mankai Seisakujo)</publisher>
+		<info name="alt_title" value="電脳倶楽部 VOL.128" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_128_a.dim" size="1261824" crc="c14ea1dd" sha1="dad6c025c8caf5461b149d45281116f4390c078c" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_128_b.dim" size="1261824" crc="efa685f7" sha1="f8859da8c9e1ea558f00d4c8c012a884c6dcca38" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dennoc129">
+		<description>Dennou Club Vol. 129</description>
+		<year>1999</year>
+		<publisher>満開製作所 (Mankai Seisakujo)</publisher>
+		<info name="alt_title" value="電脳倶楽部 VOL.129" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_129_a.dim" size="1261824" crc="c83e2ab8" sha1="1a6a4fca007aab9c79f294150178eef7ee669e68" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_129_b.dim" size="1261824" crc="c1668760" sha1="3daef70adb0df67455f353d027442b0c3d45a06b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dennoc130">
+		<description>Dennou Club Vol. 130</description>
+		<year>1999</year>
+		<publisher>満開製作所 (Mankai Seisakujo)</publisher>
+		<info name="alt_title" value="電脳倶楽部 VOL.130" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_130_a.dim" size="1261824" crc="fb784829" sha1="c7d7160e4b2c36b8f893db8dd89c1b37372f3af3" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_130_b.dim" size="1261824" crc="e5522c98" sha1="d4f4cca7019ab891a6166d2ccc8931c8f47edbee" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dennoc131">
+		<description>Dennou Club Vol. 131</description>
+		<year>1999</year>
+		<publisher>満開製作所 (Mankai Seisakujo)</publisher>
+		<info name="alt_title" value="電脳倶楽部 VOL.131" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_131_a.dim" size="1261824" crc="a37bf54c" sha1="2a3dadc8ac2360d79fe9d07d7fc3f57e3f23a11f" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_131_b.dim" size="1261824" crc="31a64c89" sha1="dd937bc20b09ca7c99e50f00bcdf5347342fff42" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dennoc132">
+		<description>Dennou Club Vol. 132</description>
+		<year>1999</year>
+		<publisher>満開製作所 (Mankai Seisakujo)</publisher>
+		<info name="alt_title" value="電脳倶楽部 VOL.132" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_132_a.dim" size="1261824" crc="ab94df32" sha1="73b01911d91229cb0d4c788cc9ce740a3b9af3cf" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_132_b.dim" size="1261824" crc="c34a77ad" sha1="3f9a30c6344dd14aa54562433d21782e3cb5a343" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dennoc133">
+		<description>Dennou Club Vol. 133</description>
+		<year>1999</year>
+		<publisher>満開製作所 (Mankai Seisakujo)</publisher>
+		<info name="alt_title" value="電脳倶楽部 VOL.133" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_133_a.dim" size="1261824" crc="b9e8c229" sha1="76274149bf2df67826f24b5565485e1695ccf35f" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_133_b.dim" size="1261824" crc="3aa19006" sha1="d8f7fe32b330fc7921acee1398923603069da659" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dennoc134">
+		<description>Dennou Club Vol. 134</description>
+		<year>1999</year>
+		<publisher>満開製作所 (Mankai Seisakujo)</publisher>
+		<info name="alt_title" value="電脳倶楽部 VOL.134" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_134_a.dim" size="1261824" crc="4568910f" sha1="88661f98b7beab90cf6b54415f7722e3147147ee" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_134_b.dim" size="1261824" crc="10495fd5" sha1="4ddb2ebf5aee4e5084dcd909df660d17a4c087ec" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dennoc135">
+		<description>Dennou Club Vol. 135</description>
+		<year>1999</year>
+		<publisher>満開製作所 (Mankai Seisakujo)</publisher>
+		<info name="alt_title" value="電脳倶楽部 VOL.135" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_135_a.dim" size="1261824" crc="3dc1ae68" sha1="4ff76b0ff4eb313f334970612811d29a30734a6b" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_135_b.dim" size="1261824" crc="4abf8b16" sha1="9d49241d7a1a1d600e32622fada428a059f08569" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dennoc136">
+		<description>Dennou Club Vol. 136</description>
+		<year>1999</year>
+		<publisher>満開製作所 (Mankai Seisakujo)</publisher>
+		<info name="alt_title" value="電脳倶楽部 VOL.136" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_136_a.dim" size="1261824" crc="0c21187f" sha1="1c2ebd9fc75ce442f8771fde77b165afd65005ab" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_136_b.dim" size="1261824" crc="74b34879" sha1="eca75694dd8c07d45eb3c788be3883f09b463f25" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dennoc137">
+		<description>Dennou Club Vol. 137</description>
+		<year>1999</year>
+		<publisher>満開製作所 (Mankai Seisakujo)</publisher>
+		<info name="alt_title" value="電脳倶楽部 VOL.137" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_137_a.dim" size="1261824" crc="45e0dd97" sha1="ed7d9875da9d68406a1419f9bb8f46c998ad49d9" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_137_b.dim" size="1261824" crc="30b13859" sha1="8f1223c2d8820b1fcaf4f39422bb845847c4d2f7" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dennoc138">
+		<description>Dennou Club Vol. 138</description>
+		<year>1999</year>
+		<publisher>満開製作所 (Mankai Seisakujo)</publisher>
+		<info name="alt_title" value="電脳倶楽部 VOL.138" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_138_a.dim" size="1261824" crc="2b539d7c" sha1="c50f133b9043e5aae22e44c9444ea3ff66eff3c3" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_138_b.dim" size="1261824" crc="cc68464b" sha1="e0f856a1292e7b7aa867e892ebe8487d80bc59e9" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dennoc139">
+		<description>Dennou Club Vol. 139</description>
+		<year>1999</year>
+		<publisher>満開製作所 (Mankai Seisakujo)</publisher>
+		<info name="alt_title" value="電脳倶楽部 VOL.139" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_139_a.dim" size="1261824" crc="3d3ec411" sha1="84f4a627b4efac5b8589c8a8445a3e6fd5975f9e" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size = "1261824">
+				<rom name="den_club_139_b.dim" size="1261824" crc="93573a75" sha1="effe2c2f0df82012f17a1303eac7aba4e6289bb3" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -21723,6 +22540,17 @@ a contest among doujin programmers...  -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1474816">
 				<rom name="boyoyon v3.31 (1996)(noz).dim" size="1474816" crc="d8be3893" sha1="449e665c22a1e029afabd63d9d36aaa955593027" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bradion">
+		<description>Bradion</description>
+		<year>????</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "1261824">
+				<rom name="bradion.dim" size="1261824" crc="e8d744d4" sha1="ad3d21dc5fa263aeeda7e09fe05de519d6225d52" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -23985,6 +24813,17 @@ a contest among doujin programmers...  -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="giga fight 68k (1992)(gainen shuppon).dim" size="1261824" crc="4ea5dbe9" sha1="d54b4fe306c57bbbe433a8f1cc3107e3e898c825" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gj">
+		<description>GJ</description>
+		<year>????</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "1261824">
+				<rom name="gj.dim" size="1261824" crc="ef80c1ba" sha1="8fb6f7d78d17e6077199d0557d0cb360afe598af" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -26534,6 +27373,18 @@ a contest among doujin programmers...  -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="nemesis '94 gradius 2 (1994)(gra2 project team).dim" size="1261824" crc="b08f6f5b" sha1="5ff7021edb3884ab4c041bf3560c74b1fe85989f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nemes95">
+		<description>Nemesis '95 Gradius 2</description>
+		<year>1995</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="Gra2 Project Team" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "1261824">
+				<rom name="msx_gradius2.dim" size="1261824" crc="8e5e3062" sha1="a2f45cdef087bb2e330781ee90f83fba64fd734b" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

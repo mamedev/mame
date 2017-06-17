@@ -41,7 +41,7 @@
  * there is nothing to amplify currently.
  */
 
-NETLIST_START(cheekyms_schematics)
+static NETLIST_START(cheekyms_schematics)
 
 	// Shared chips
 	TTL_7404_DIP(IC1)
@@ -239,7 +239,7 @@ NETLIST_END()
  *
  */
 
-NETLIST_START(NOISE)
+static NETLIST_START(NOISE)
 	CS(FC, 0)
 	PARAM(FC.FUNC, "0.0000001 rand *")
 

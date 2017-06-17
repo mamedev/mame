@@ -604,8 +604,7 @@ static ADDRESS_MAP_START( bingor2_map, AS_PROGRAM, 16, bingor_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bingor_io, AS_IO, 16, bingor_state )
-	AM_RANGE(0x0100, 0x0101) AM_DEVWRITE8("saa", saa1099_device, data_w, 0x00ff)
-	AM_RANGE(0x0102, 0x0103) AM_DEVWRITE8("saa", saa1099_device, control_w, 0x00ff)
+	AM_RANGE(0x0100, 0x0103) AM_DEVWRITE8("saa", saa1099_device, write, 0x00ff)
 ADDRESS_MAP_END
 
 

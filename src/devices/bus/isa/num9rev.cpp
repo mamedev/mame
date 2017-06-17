@@ -47,7 +47,12 @@ UPD7220_DISPLAY_PIXELS_MEMBER( isa8_number_9_rev_device::hgdc_display_pixels )
 	}
 }
 
-static MACHINE_CONFIG_START( num_9_rev )
+
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( isa8_number_9_rev_device::device_add_mconfig )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_SIZE(512, 448)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 448-1)
@@ -60,16 +65,6 @@ static MACHINE_CONFIG_START( num_9_rev )
 	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(isa8_number_9_rev_device, hgdc_display_pixels)
 	MCFG_VIDEO_SET_SCREEN("screen")
 MACHINE_CONFIG_END
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor isa8_number_9_rev_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( num_9_rev );
-}
 
 //**************************************************************************
 //  LIVE DEVICE

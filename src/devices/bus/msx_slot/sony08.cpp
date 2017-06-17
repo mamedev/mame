@@ -30,15 +30,9 @@ msx_slot_sony08_device::msx_slot_sony08_device(const machine_config &mconfig, co
 }
 
 
-static MACHINE_CONFIG_START( sony08 )
+MACHINE_CONFIG_MEMBER( msx_slot_sony08_device::device_add_mconfig )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
-
-
-machine_config_constructor msx_slot_sony08_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( sony08 );
-}
 
 
 void msx_slot_sony08_device::set_rom_start(device_t &device, const char *region, uint32_t offset)

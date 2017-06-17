@@ -10557,18 +10557,18 @@ ROM_START( cmast99b )
 ROM_END
 
 /*
-	A-Plan
-	(C) 1993 WeaShing H.K.
+    A-Plan
+    (C) 1993 WeaShing H.K.
 
-	TMP91P640 @ 5MHz or 10MHz (or SDIP64 gfx chip of some kind?)
-	Z80 [clock probably 12/4]
-	8255 x2
-	YM2149 [clock probably 12/8]
-	12MHz and 10MHz XTALs
-	6116 2kx8 SRAM x4
-	BPROM 82S129 x2
-	8-position DIPSW x5
-	PCB number only says 'WEASHING'
+    TMP91P640 @ 5MHz or 10MHz (or SDIP64 gfx chip of some kind?)
+    Z80 [clock probably 12/4]
+    8255 x2
+    YM2149 [clock probably 12/8]
+    12MHz and 10MHz XTALs
+    6116 2kx8 SRAM x4
+    BPROM 82S129 x2
+    8-position DIPSW x5
+    PCB number only says 'WEASHING'
 */
 
 ROM_START( aplan ) // Has "DYNA QL-1  V1.01" string.

@@ -49,16 +49,15 @@ public:
 
 	template <class Object> static devcb_base &set_keyboard_callback(device_t &device, Object &&cb) { return downcast<ie15_keyboard_device &>(device).m_keyboard_cb.set_callback(std::forward<Object>(cb)); }
 
-	virtual ioport_constructor device_input_ports() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-
 protected:
 	ie15_keyboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void send_key(uint16_t code) { m_keyboard_cb(offs_t(0), code); }
 
 	required_ioport_array<4> m_io_kbd;

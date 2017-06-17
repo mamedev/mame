@@ -78,7 +78,7 @@
 #define IOGA_DMA_CTRL_Y       0x01000000  // turned off if either of two above are found
 #define IOGA_DMA_CTRL_TCZERO  0x00000001
 
-// DMA_ENABLE, INT_ENABLE, 
+// DMA_ENABLE, INT_ENABLE,
 
 //#define IOGA_DMA_CTRL_START   0x63000800 // perhaps start a transfer? - maybe the 8 is the channel?
 #define IOGA_DMA_CTRL_UNK1    0x60000000 // don't know yet

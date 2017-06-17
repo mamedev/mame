@@ -76,8 +76,6 @@ protected:
 	virtual void device_validity_check(validity_checker &valid) const override;
 
 private:
-	static std::vector<uint32_t> calculate_extra_options(const char *extra_options_string, std::string *bad_option);
-	static uint32_t parse_string(const char *s);
 	bool is_valid_size(uint32_t size) const;
 
 	// device state

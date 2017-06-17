@@ -144,6 +144,7 @@ d6809.cpp
 dai.cpp
 daruma.cpp
 datum.cpp
+dbox.cpp
 dccons.cpp
 dct11em.cpp
 dectalk.cpp
@@ -184,6 +185,7 @@ et3400.cpp
 eti660.cpp
 eurocom2.cpp
 europc.cpp
+eva.cpp
 evmbug.cpp
 excali64.cpp
 exelv.cpp
@@ -225,6 +227,7 @@ goupil.cpp
 gp2x.cpp
 gp32.cpp
 grfd2301.cpp
+gridcomp.cpp
 h19.cpp
 h8.cpp
 h89.cpp

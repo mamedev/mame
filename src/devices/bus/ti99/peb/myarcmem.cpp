@@ -44,8 +44,9 @@ enum
 	SIZE_512
 };
 
-myarc_memory_expansion_device::myarc_memory_expansion_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ti_expansion_card_device(mconfig, TI99_MYARCMEM, tag, owner, clock),
+myarc_memory_expansion_device::myarc_memory_expansion_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock):
+	device_t(mconfig, TI99_MYARCMEM, tag, owner, clock),
+	device_ti99_peribox_card_interface(mconfig, *this),
 	m_ram(*this, RAM_TAG),
 	m_dsrrom(nullptr), m_bank(0), m_size(0)
 {
@@ -168,7 +169,7 @@ WRITE8_MEMBER(myarc_memory_expansion_device::cruwrite)
 
 void myarc_memory_expansion_device::device_start()
 {
-	m_dsrrom = memregion(DSRROM)->base();
+	m_dsrrom = memregion(TI99_DSRROM)->base();
 	save_item(NAME(m_bank));
 	save_item(NAME(m_size));
 }
@@ -190,20 +191,16 @@ INPUT_PORTS_START( myarc_exp )
 INPUT_PORTS_END
 
 ROM_START( myarc_exp )
-	ROM_REGION(0x2000, DSRROM, 0)
+	ROM_REGION(0x2000, TI99_DSRROM, 0)
 	ROM_LOAD("myarc512k_xb2_dsr.bin", 0x0000, 0x2000, CRC(41fbb96d) SHA1(4dc7fdfa46842957bcbb0cf2c37764e4bb6d877a)) /* DSR for Ramdisk etc. */
 ROM_END
 
-MACHINE_CONFIG_START( myarc_exp )
+MACHINE_CONFIG_MEMBER( myarc_memory_expansion_device::device_add_mconfig )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("512k")
 	MCFG_RAM_DEFAULT_VALUE(0)
 MACHINE_CONFIG_END
 
-machine_config_constructor myarc_memory_expansion_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( myarc_exp );
-}
 
 const tiny_rom_entry *myarc_memory_expansion_device::device_rom_region() const
 {

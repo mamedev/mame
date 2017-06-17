@@ -216,13 +216,11 @@
 
 #include "speaker.h"
 
-
 #define TRACE_READY 0
 #define TRACE_LINES 0
 #define TRACE_CRU 0
 
-#define SRAM_GEN_TAG  "sram"
-#define DRAM_GEN_TAG  "dram"
+#define GENMOD 0x01
 
 class geneve_state : public driver_device
 {
@@ -230,11 +228,11 @@ public:
 	geneve_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_cpu(*this, "maincpu"),
-		m_tms9901(*this, TMS9901_TAG),
-		m_keyboard(*this, GKEYBOARD_TAG),
-		m_mapper(*this, GMAPPER_TAG),
-		m_peribox(*this, PERIBOX_TAG),
-		m_joyport(*this, JOYPORT_TAG),
+		m_tms9901(*this, TI_TMS9901_TAG),
+		m_keyboard(*this, GENEVE_KEYBOARD_TAG),
+		m_mapper(*this, GENEVE_MAPPER_TAG),
+		m_peribox(*this, TI_PERIBOX_TAG),
+		m_joyport(*this, TI_JOYPORT_TAG),
 		m_colorbus(*this, COLORBUS_TAG)
 	{
 	}
@@ -294,7 +292,7 @@ public:
 */
 
 static ADDRESS_MAP_START(memmap, AS_PROGRAM, 8, geneve_state)
-	AM_RANGE(0x0000, 0xffff) AM_DEVREADWRITE(GMAPPER_TAG, bus::ti99::internal::geneve_mapper_device, readm, writem) AM_DEVSETOFFSET(GMAPPER_TAG, bus::ti99::internal::geneve_mapper_device, setoffset)
+	AM_RANGE(0x0000, 0xffff) AM_DEVREADWRITE(GENEVE_MAPPER_TAG, bus::ti99::internal::geneve_mapper_device, readm, writem) AM_DEVSETOFFSET(GENEVE_MAPPER_TAG, bus::ti99::internal::geneve_mapper_device, setoffset)
 ADDRESS_MAP_END
 
 /*
@@ -306,10 +304,10 @@ ADDRESS_MAP_END
     bits are usually routed through the mapper first.
 */
 static ADDRESS_MAP_START(crumap, AS_IO, 8, geneve_state)
-	AM_RANGE(0x0000, 0x0003) AM_DEVREAD(TMS9901_TAG, tms9901_device, read)
+	AM_RANGE(0x0000, 0x0003) AM_DEVREAD(TI_TMS9901_TAG, tms9901_device, read)
 	AM_RANGE(0x0000, 0x0fff) AM_READ( cruread )
 
-	AM_RANGE(0x0000, 0x001f) AM_DEVWRITE(TMS9901_TAG, tms9901_device, write)
+	AM_RANGE(0x0000, 0x001f) AM_DEVWRITE(TI_TMS9901_TAG, tms9901_device, write)
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE( cruwrite )
 ADDRESS_MAP_END
 
@@ -317,12 +315,12 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START(geneve)
 
 	PORT_START( "MODE" )
-	PORT_CONFNAME( 0x01, 0x00, "Operating mode" ) PORT_CHANGED_MEMBER(PERIBOX_TAG, bus::ti99::peb::peribox_device, genmod_changed, 0)
+	PORT_CONFNAME( 0x01, 0x00, "Operating mode" ) PORT_CHANGED_MEMBER(TI_PERIBOX_TAG, bus::ti99::peb::peribox_device, genmod_changed, 0)
 		PORT_CONFSETTING(    0x00, "Standard" )
 		PORT_CONFSETTING(    GENMOD, "GenMod" )
 
 	PORT_START( "BOOTROM" )
-	PORT_CONFNAME( 0x03, GENEVE_098, "Boot ROM" ) PORT_CHANGED_MEMBER(GMAPPER_TAG, bus::ti99::internal::geneve_mapper_device, settings_changed, 3)
+	PORT_CONFNAME( 0x03, GENEVE_098, "Boot ROM" ) PORT_CHANGED_MEMBER(GENEVE_MAPPER_TAG, bus::ti99::internal::geneve_mapper_device, settings_changed, 3)
 		PORT_CONFSETTING( GENEVE_098, "Version 0.98" )
 		PORT_CONFSETTING( GENEVE_100, "Version 1.00" )
 		PORT_CONFSETTING( GENEVE_PFM512, "PFM 512" )
@@ -335,12 +333,12 @@ static INPUT_PORTS_START(geneve)
 		PORT_CONFSETTING( 0x02, "384 KiB" )
 
 	PORT_START( "GENMODDIPS" )
-	PORT_DIPNAME( GM_TURBO, 0x00, "Genmod Turbo mode") PORT_CONDITION( "MODE", 0x01, EQUALS, GENMOD ) PORT_CHANGED_MEMBER(GMAPPER_TAG, bus::ti99::internal::geneve_mapper_device, settings_changed, 1)
+	PORT_DIPNAME( GENEVE_GM_TURBO, 0x00, "Genmod Turbo mode") PORT_CONDITION( "MODE", 0x01, EQUALS, GENMOD ) PORT_CHANGED_MEMBER(GENEVE_MAPPER_TAG, bus::ti99::internal::geneve_mapper_device, settings_changed, 1)
 		PORT_CONFSETTING( 0x00, DEF_STR( Off ))
-		PORT_CONFSETTING( GM_TURBO, DEF_STR( On ))
-	PORT_DIPNAME( GM_TIM, GM_TIM, "Genmod TI mode") PORT_CONDITION( "MODE", 0x01, EQUALS, GENMOD ) PORT_CHANGED_MEMBER(GMAPPER_TAG, bus::ti99::internal::geneve_mapper_device, settings_changed, 2)
+		PORT_CONFSETTING( GENEVE_GM_TURBO, DEF_STR( On ))
+	PORT_DIPNAME( GENEVE_GM_TIM, GENEVE_GM_TIM, "Genmod TI mode") PORT_CONDITION( "MODE", 0x01, EQUALS, GENMOD ) PORT_CHANGED_MEMBER(GENEVE_MAPPER_TAG, bus::ti99::internal::geneve_mapper_device, settings_changed, 2)
 		PORT_CONFSETTING( 0x00, DEF_STR( Off ))
-		PORT_CONFSETTING( GM_TIM, DEF_STR( On ))
+		PORT_CONFSETTING( GENEVE_GM_TIM, DEF_STR( On ))
 
 INPUT_PORTS_END
 
@@ -692,62 +690,62 @@ static MACHINE_CONFIG_START( geneve_60hz )
 	MCFG_TMS9995_DBIN_HANDLER( WRITELINE(geneve_state, dbin_line) )
 
 	// Video hardware
-	MCFG_V9938_ADD(VDP_TAG, SCREEN_TAG, 0x20000, XTAL_21_4772MHz)  /* typical 9938 clock, not verified */
+	MCFG_V9938_ADD(TI_VDP_TAG, TI_SCREEN_TAG, 0x20000, XTAL_21_4772MHz)  /* typical 9938 clock, not verified */
 	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(geneve_state, set_tms9901_INT2_from_v9938))
-	MCFG_V99X8_SCREEN_ADD_NTSC(SCREEN_TAG, VDP_TAG, XTAL_21_4772MHz)
+	MCFG_V99X8_SCREEN_ADD_NTSC(TI_SCREEN_TAG, TI_VDP_TAG, XTAL_21_4772MHz)
 
 	// Main board components
-	MCFG_DEVICE_ADD(TMS9901_TAG, TMS9901, 3000000)
+	MCFG_DEVICE_ADD(TI_TMS9901_TAG, TMS9901, 3000000)
 	MCFG_TMS9901_READBLOCK_HANDLER( READ8(geneve_state, read_by_9901) )
 	MCFG_TMS9901_P0_HANDLER( WRITELINE( geneve_state, peripheral_bus_reset) )
 	MCFG_TMS9901_P1_HANDLER( WRITELINE( geneve_state, VDP_reset) )
 	MCFG_TMS9901_P2_HANDLER( WRITELINE( geneve_state, joystick_select) )
-	MCFG_TMS9901_P4_HANDLER( DEVWRITELINE( GMAPPER_TAG, bus::ti99::internal::geneve_mapper_device, pfm_select_lsb) )  // new for PFM
-	MCFG_TMS9901_P5_HANDLER( DEVWRITELINE( GMAPPER_TAG, bus::ti99::internal::geneve_mapper_device, pfm_output_enable) )  // new for PFM
-	MCFG_TMS9901_P6_HANDLER( DEVWRITELINE( GKEYBOARD_TAG, bus::ti99::internal::geneve_keyboard_device, reset_line) )
+	MCFG_TMS9901_P4_HANDLER( DEVWRITELINE( GENEVE_MAPPER_TAG, bus::ti99::internal::geneve_mapper_device, pfm_select_lsb) )  // new for PFM
+	MCFG_TMS9901_P5_HANDLER( DEVWRITELINE( GENEVE_MAPPER_TAG, bus::ti99::internal::geneve_mapper_device, pfm_output_enable) )  // new for PFM
+	MCFG_TMS9901_P6_HANDLER( DEVWRITELINE( GENEVE_KEYBOARD_TAG, bus::ti99::internal::geneve_keyboard_device, reset_line) )
 	MCFG_TMS9901_P7_HANDLER( WRITELINE( geneve_state, extbus_wait_states) )
 	MCFG_TMS9901_P9_HANDLER( WRITELINE( geneve_state, video_wait_states) )
-	MCFG_TMS9901_P13_HANDLER( DEVWRITELINE( GMAPPER_TAG, bus::ti99::internal::geneve_mapper_device, pfm_select_msb) )   // new for PFM
+	MCFG_TMS9901_P13_HANDLER( DEVWRITELINE( GENEVE_MAPPER_TAG, bus::ti99::internal::geneve_mapper_device, pfm_select_msb) )   // new for PFM
 	MCFG_TMS9901_INTLEVEL_HANDLER( WRITE8( geneve_state, tms9901_interrupt) )
 
 	// Mapper
-	MCFG_DEVICE_ADD(GMAPPER_TAG, GENEVE_MAPPER, 0)
+	MCFG_DEVICE_ADD(GENEVE_MAPPER_TAG, GENEVE_MAPPER, 0)
 	MCFG_GENEVE_READY_HANDLER( WRITELINE(geneve_state, mapper_ready) )
 
 	// Clock
-	MCFG_DEVICE_ADD(GCLOCK_TAG, MM58274C, 0)
+	MCFG_DEVICE_ADD(GENEVE_CLOCK_TAG, MM58274C, 0)
 	MCFG_MM58274C_MODE24(1) // 24 hour
 	MCFG_MM58274C_DAY1(0)   // sunday
 
 	// Peripheral expansion box (Geneve composition)
-	MCFG_DEVICE_ADD( PERIBOX_TAG, TI99_PERIBOX_GEN, 0)
+	MCFG_DEVICE_ADD( TI_PERIBOX_TAG, TI99_PERIBOX_GEN, 0)
 	MCFG_PERIBOX_INTA_HANDLER( WRITELINE(geneve_state, inta) )
 	MCFG_PERIBOX_INTB_HANDLER( WRITELINE(geneve_state, intb) )
 	MCFG_PERIBOX_READY_HANDLER( WRITELINE(geneve_state, ext_ready) )
 
 	// Sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("sound_out")
-	MCFG_SOUND_ADD(TISOUNDCHIP_TAG, SN76496, 3579545) /* 3.579545 MHz */
+	MCFG_SOUND_ADD(TI_SOUNDCHIP_TAG, SN76496, 3579545) /* 3.579545 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "sound_out", 0.75)
 	MCFG_SN76496_READY_HANDLER( WRITELINE(geneve_state, ext_ready) )
 
 	// User interface devices
-	MCFG_DEVICE_ADD( GKEYBOARD_TAG, GENEVE_KEYBOARD, 0 )
+	MCFG_DEVICE_ADD( GENEVE_KEYBOARD_TAG, GENEVE_KEYBOARD, 0 )
 	MCFG_GENEVE_KBINT_HANDLER( WRITELINE(geneve_state, keyboard_interrupt) )
-	MCFG_GENEVE_JOYPORT_ADD( JOYPORT_TAG )
+	MCFG_GENEVE_JOYPORT_ADD( TI_JOYPORT_TAG )
 	MCFG_COLORBUS_MOUSE_ADD( COLORBUS_TAG )
 
 	// PFM expansion
-	MCFG_AT29C040_ADD( PFM512_TAG )
-	MCFG_AT29C040A_ADD( PFM512A_TAG )
+	MCFG_AT29C040_ADD( GENEVE_PFM512_TAG )
+	MCFG_AT29C040A_ADD( GENEVE_PFM512A_TAG )
 
 	// DRAM 512K
-	MCFG_RAM_ADD(DRAM_GEN_TAG)
+	MCFG_RAM_ADD(GENEVE_DRAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("512K")
 	MCFG_RAM_DEFAULT_VALUE(0)
 
 	// SRAM 384K (max; stock Geneve: 32K)
-	MCFG_RAM_ADD(SRAM_GEN_TAG)
+	MCFG_RAM_ADD(GENEVE_SRAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("384K")
 	MCFG_RAM_DEFAULT_VALUE(0)
 

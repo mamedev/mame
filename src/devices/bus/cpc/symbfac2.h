@@ -23,10 +23,6 @@ public:
 	// construction/destruction
 	cpc_symbiface2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual ioport_constructor device_input_ports() const override;
-
 	DECLARE_READ8_MEMBER(ide_cs0_r);
 	DECLARE_WRITE8_MEMBER(ide_cs0_w);
 	DECLARE_READ8_MEMBER(ide_cs1_r);
@@ -53,6 +49,10 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
 
 private:
 	cpc_expansion_slot_device *m_slot;

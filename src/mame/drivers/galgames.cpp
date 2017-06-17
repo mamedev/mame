@@ -106,7 +106,6 @@ protected:
 
 	bool is_selected();
 
-	machine_config_constructor m_mconfig_additions;
 	uint8_t m_cart;
 
 	// SLOT
@@ -317,7 +316,6 @@ galgames_cart_device::galgames_cart_device(
 		uint32_t clock):
 	device_t(mconfig, type, tag, owner, clock),
 	device_rom_interface(mconfig, *this, 21, ENDIANNESS_BIG, 16),
-	m_mconfig_additions(nullptr),
 	m_cart(0),
 	m_slot(*this, "^slot"),
 	m_eeprom(*this, "eeprom"),

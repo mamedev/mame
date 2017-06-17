@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Kevin Thacker, Barry Rodewald
 /*
- * mface2.c  --  Romantic Robot Multiface II expansion device for the Amstrad CPC/CPC+
+ * mface2.cpp  --  Romantic Robot Multiface II expansion device for the Amstrad CPC/CPC+
  *
  *  Created on: 31/07/2011
  */
@@ -17,15 +17,6 @@ SLOT_INTERFACE_EXTERN(cpc_exp_cards);
 
 DEFINE_DEVICE_TYPE(CPC_MFACE2, cpc_multiface2_device, "cpc_mface2", "Multiface II")
 
-// device machine config
-static MACHINE_CONFIG_START( cpc_mface2 )
-	// pass-through
-	MCFG_DEVICE_ADD("exp", CPC_EXPANSION_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(cpc_exp_cards, nullptr, false)
-	MCFG_CPC_EXPANSION_SLOT_OUT_IRQ_CB(DEVWRITELINE("^", cpc_expansion_slot_device, irq_w))
-	MCFG_CPC_EXPANSION_SLOT_OUT_NMI_CB(DEVWRITELINE("^", cpc_expansion_slot_device, nmi_w))
-	MCFG_CPC_EXPANSION_SLOT_OUT_ROMDIS_CB(DEVWRITELINE("^", cpc_expansion_slot_device, romdis_w))  // ROMDIS
-MACHINE_CONFIG_END
 
 #if 0
 DIRECT_UPDATE_MEMBER( cpc_multiface2_device::amstrad_default )
@@ -116,10 +107,15 @@ void cpc_multiface2_device::multiface_rethink_memory()
 	}
 }
 
-machine_config_constructor cpc_multiface2_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( cpc_mface2 );
-}
+// device machine config
+MACHINE_CONFIG_MEMBER( cpc_multiface2_device::device_add_mconfig )
+	// pass-through
+	MCFG_DEVICE_ADD("exp", CPC_EXPANSION_SLOT, 0)
+	MCFG_DEVICE_SLOT_INTERFACE(cpc_exp_cards, nullptr, false)
+	MCFG_CPC_EXPANSION_SLOT_OUT_IRQ_CB(DEVWRITELINE("^", cpc_expansion_slot_device, irq_w))
+	MCFG_CPC_EXPANSION_SLOT_OUT_NMI_CB(DEVWRITELINE("^", cpc_expansion_slot_device, nmi_w))
+	MCFG_CPC_EXPANSION_SLOT_OUT_ROMDIS_CB(DEVWRITELINE("^", cpc_expansion_slot_device, romdis_w))  // ROMDIS
+MACHINE_CONFIG_END
 
 void cpc_multiface2_device::check_button_state()
 {

@@ -16,7 +16,7 @@ Sega PCB 834-5137
  Sega 315-5011
  Sega 315-5012
  Z80
- 8255
+ M5L8255AP
  8 switch Dipswitch x 2
 
 ******************************************************************************/
@@ -30,24 +30,30 @@ Sega PCB 834-5137
 #include "screen.h"
 #include "speaker.h"
 
-WRITE8_MEMBER(suprloco_state::soundport_w)
+READ8_MEMBER(suprloco_state::soundport_r)
 {
-	m_soundlatch->write(space, 0, data);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-	/* spin for a while to let the Z80 read the command (fixes hanging sound in Regulus) */
-	space.device().execute().spin_until_time(attotime::from_usec(50));
+	m_ppi->pc6_w(0); // ACK signal
+	uint8_t data = m_ppi->pa_r(space, 0);
+	m_ppi->pc6_w(1);
+	return data;
+}
+
+WRITE_LINE_MEMBER(suprloco_state::pc0_w)
+{
+	// set by 8255 bit mode when no credits inserted
+	machine().output().set_lamp_value(0, state); // ???
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, suprloco_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc1ff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0xc200, 0xc7ff) AM_WRITENOP
 	AM_RANGE(0xc800, 0xc800) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xd000, 0xd000) AM_READ_PORT("P1")
 	AM_RANGE(0xd800, 0xd800) AM_READ_PORT("P2")
 	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("DSW1")
 	AM_RANGE(0xe001, 0xe001) AM_READ_PORT("DSW2")
-	AM_RANGE(0xe800, 0xe800) AM_WRITE(soundport_w)
-	AM_RANGE(0xe801, 0xe801) AM_READWRITE(control_r, control_w)
+	AM_RANGE(0xe800, 0xe803) AM_DEVREADWRITE("ppi", i8255_device, read, write)
 	AM_RANGE(0xf000, 0xf6ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xf700, 0xf7df) AM_RAM /* unused */
 	AM_RANGE(0xf7e0, 0xf7ff) AM_RAM_WRITE(scrollram_w) AM_SHARE("scrollram")
@@ -64,7 +70,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, suprloco_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa003) AM_DEVWRITE("sn1", sn76496_device, write)
 	AM_RANGE(0xc000, 0xc003) AM_DEVWRITE("sn2", sn76496_device, write)
-	AM_RANGE(0xe000, 0xe000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
+	AM_RANGE(0xe000, 0xe000) AM_READ(soundport_r)
 ADDRESS_MAP_END
 
 
@@ -180,6 +186,12 @@ static MACHINE_CONFIG_START( suprloco )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(suprloco_state, irq0_line_hold, 4*60)          /* NMIs are caused by the main CPU */
 
+	MCFG_DEVICE_ADD("ppi", I8255A, 0)
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(suprloco_state, control_w))
+	MCFG_I8255_TRISTATE_PORTB_CB(CONSTANT(0))
+	MCFG_I8255_OUT_PORTC_CB(WRITELINE(suprloco_state, pc0_w)) MCFG_DEVCB_BIT(0)
+	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("audiocpu", INPUT_LINE_NMI)) MCFG_DEVCB_BIT(7) MCFG_DEVCB_INVERT
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -195,8 +207,6 @@ static MACHINE_CONFIG_START( suprloco )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("sn1", SN76496, 4000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
