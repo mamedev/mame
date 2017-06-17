@@ -5,6 +5,7 @@
 
 #include "video/vsystem_spr.h"
 #include "machine/gen_latch.h"
+#include "machine/mb3773.h"
 
 class taotaido_state : public driver_device
 {
@@ -16,6 +17,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_spr(*this, "vsystem_spr"),
 		m_soundlatch(*this, "soundlatch"),
+		m_watchdog(*this, "watchdog"),
 		m_spriteram(*this, "spriteram"),
 		m_spriteram2(*this, "spriteram2"),
 		m_scrollram(*this, "scrollram"),
@@ -26,6 +28,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<vsystem_spr_device> m_spr;
 	required_device<generic_latch_8_device> m_soundlatch;
+	required_device<mb3773_device> m_watchdog;
 
 	required_shared_ptr<uint16_t> m_spriteram;
 	required_shared_ptr<uint16_t> m_spriteram2;

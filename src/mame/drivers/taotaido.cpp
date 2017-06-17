@@ -91,7 +91,9 @@ READ16_MEMBER(taotaido_state::pending_command_r)
 
 WRITE8_MEMBER(taotaido_state::unknown_output_w)
 {
-	// Bits 7, 5, 4 used?
+	m_watchdog->write_line_ck(BIT(data, 7));
+
+	// Bits 5, 4 also used?
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, taotaido_state )
@@ -365,6 +367,8 @@ static MACHINE_CONFIG_START( taotaido )
 	MCFG_DEVICE_ADD("io2", VS9209, 0)
 	MCFG_VS9209_IN_PORTA_CB(IOPORT("P3"))                   // used only by taotaida
 	MCFG_VS9209_IN_PORTB_CB(IOPORT("P4"))                   // used only by taotaida
+
+	MCFG_DEVICE_ADD("watchdog", MB3773, 0)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taotaido)
 
