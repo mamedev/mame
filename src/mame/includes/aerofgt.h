@@ -81,7 +81,6 @@ public:
 	/* handlers */
 	DECLARE_WRITE8_MEMBER(aerfboot_soundlatch_w);
 	DECLARE_READ8_MEMBER(pending_command_r);
-	DECLARE_WRITE8_MEMBER(aerofgt_unknown_output_w);
 	DECLARE_WRITE8_MEMBER(aerofgt_sh_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(spinlbrk_sh_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(aerfboot_okim6295_banking_w);

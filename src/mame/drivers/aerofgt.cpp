@@ -65,6 +65,7 @@ Verification still needed for the other PCBs.
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
+#include "machine/mb3773.h"
 #include "machine/vs9209.h"
 #include "sound/2610intf.h"
 #include "sound/3812intf.h"
@@ -82,12 +83,6 @@ WRITE8_MEMBER(aerofgt_state::aerfboot_soundlatch_w)
 READ8_MEMBER(aerofgt_state::pending_command_r)
 {
 	return m_soundlatch->pending_r();
-}
-
-WRITE8_MEMBER(aerofgt_state::aerofgt_unknown_output_w)
-{
-	if (data != 0)
-		logerror("Writing %02X to unknown output port\n", data);
 }
 
 WRITE8_MEMBER(aerofgt_state::aerofgt_sh_bankswitch_w)
@@ -312,7 +307,7 @@ static ADDRESS_MAP_START( aerofgt_map, AS_PROGRAM, 16, aerofgt_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x1a0000, 0x1a07ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x1b0000, 0x1b07ff) AM_RAM AM_SHARE("rasterram")   /* used only for the scroll registers */
-	AM_RANGE(0x1b0800, 0x1b0801) AM_NOP /* ??? */
+	AM_RANGE(0x1b0800, 0x1b0801) AM_RAM /* tracks watchdog state */
 	AM_RANGE(0x1b0ff0, 0x1b0fff) AM_RAM /* stack area during boot */
 	AM_RANGE(0x1b2000, 0x1b3fff) AM_RAM_WRITE(aerofgt_bg1videoram_w) AM_SHARE("bg1videoram")
 	AM_RANGE(0x1b4000, 0x1b5fff) AM_RAM_WRITE(aerofgt_bg2videoram_w) AM_SHARE("bg2videoram")
@@ -1830,9 +1825,11 @@ static MACHINE_CONFIG_START( aerofgt )
 	MCFG_VS9209_IN_PORTC_CB(IOPORT("SYSTEM"))
 	MCFG_VS9209_IN_PORTD_CB(IOPORT("DSW1"))
 	MCFG_VS9209_IN_PORTE_CB(IOPORT("DSW2"))
-	MCFG_VS9209_IN_PORTG_CB(READ8(aerofgt_state, pending_command_r))
-	MCFG_VS9209_OUT_PORTG_CB(WRITE8(aerofgt_state, aerofgt_unknown_output_w))
+	MCFG_VS9209_IN_PORTG_CB(DEVREADLINE("soundlatch", generic_latch_8_device, pending_r)) MCFG_DEVCB_BIT(0)
+	MCFG_VS9209_OUT_PORTG_CB(DEVWRITELINE("watchdog", mb3773_device, write_line_ck)) MCFG_DEVCB_BIT(7)
 	MCFG_VS9209_IN_PORTH_CB(IOPORT("JP1"))
+
+	MCFG_DEVICE_ADD("watchdog", MB3773, 0)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
