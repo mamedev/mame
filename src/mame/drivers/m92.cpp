@@ -927,12 +927,6 @@ GFXDECODE_END
 
 /***************************************************************************/
 
-void m92_state::m92_sprite_interrupt()
-{
-	m_upd71059c->ir1_w(1);
-}
-
-
 static MACHINE_CONFIG_START( m92 )
 
 	/* basic machine hardware */
@@ -2213,14 +2207,11 @@ DRIVER_INIT_MEMBER(m92_state,m92)
 	uint8_t *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->set_base(&ROM[0xa0000]);
-
-	m_game_kludge = 0;
 }
 
 /* different address map (no bank1) */
 DRIVER_INIT_MEMBER(m92_state,lethalth)
 {
-	m_game_kludge = 0;
 }
 
 /* has bankswitching */
@@ -2230,8 +2221,6 @@ DRIVER_INIT_MEMBER(m92_state,m92_bank)
 
 	membank("bank1")->configure_entries(0, 4, &ROM[0x80000], 0x20000);
 	m_maincpu->space(AS_IO).install_write_handler(0x20, 0x21, write16_delegate(FUNC(m92_state::m92_bankswitch_w),this));
-
-	m_game_kludge = 0;
 }
 
 /* has bankswitching, has eeprom, needs sprite kludge */
@@ -2244,8 +2233,6 @@ DRIVER_INIT_MEMBER(m92_state,majtitl2)
 
 	/* This game has an eeprom on the game board */
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf0000, 0xf3fff, read16_delegate(FUNC(m92_state::m92_eeprom_r),this), write16_delegate(FUNC(m92_state::m92_eeprom_w),this));
-
-	m_game_kludge = 2;
 }
 
 /* TODO: figure out actual address map and other differences from real Irem h/w */
@@ -2253,8 +2240,6 @@ DRIVER_INIT_MEMBER(m92_state,ppan)
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->set_base(&ROM[0xa0000]);
-
-	m_game_kludge = 0;
 }
 
 /***************************************************************************/

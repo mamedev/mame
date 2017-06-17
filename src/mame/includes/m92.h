@@ -60,7 +60,6 @@ public:
 	uint32_t m_raster_irq_position;
 	uint16_t m_videocontrol;
 	uint8_t m_sprite_buffer_busy;
-	uint8_t m_game_kludge;
 	M92_pf_layer_info m_pf_layer[3];
 	uint16_t m_pf_master_control[4];
 	int32_t m_sprite_list;
@@ -105,7 +104,6 @@ public:
 	void ppan_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void m92_update_scroll_positions();
 	void m92_draw_tiles(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect);
-	void m92_sprite_interrupt();
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
