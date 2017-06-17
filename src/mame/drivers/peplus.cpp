@@ -2099,7 +2099,7 @@ PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
 	ROM_LOAD( "cap435.u37", 0x0000, 0x0100, CRC(038cabc6) SHA1(c6514b4f9dbed6ab2631f563f7e00648661ebdbb) )
 ROM_END
 
-ROM_START( pepk1002 ) /* Normal (non-plus) board : Jake's Jacks (Gold River Gaming Hall & Resort) (PK1002) */
+ROM_START( pepk1002 ) /* Normal (non-plus) board : Jake's Jacks - Gold River Gaming Hall & Resort - (PK1002) */
 /*
                                      2-T  Q-A
 PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4J  SF  RF  (Bonus)
