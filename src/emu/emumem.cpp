@@ -906,7 +906,7 @@ public:
 		u8 buffer[16];
 		for (int index = 0; index < 16; index++)
 			buffer[index ^ ((_Endian == ENDIANNESS_NATIVE) ? 0 : (data_width()/8 - 1))] = index * 0x11;
-		install_ram_generic(0x00, 0x0f, 0x0f, 0, ROW_READWRITE, buffer);
+		install_ram_generic(0x00, 0x0f, 0x0f, 0, read_or_write::READWRITE, buffer);
 		printf("\n\naddress_space(%d, %s, %s)\n", NATIVE_BITS, (_Endian == ENDIANNESS_LITTLE) ? "little" : "big", _Large ? "large" : "small");
 
 		// walk through the first 8 addresses
@@ -1633,13 +1633,13 @@ void memory_manager::dump(FILE *file)
 						"====================================================\n"
 						"Device '%s' %s address space read handler dump\n"
 						"====================================================\n", space->device().tag(), space->name());
-		space->dump_map(file, ROW_READ);
+		space->dump_map(file, read_or_write::READ);
 
 		fprintf(file, "\n\n"
 						"====================================================\n"
 						"Device '%s' %s address space write handler dump\n"
 						"====================================================\n", space->device().tag(), space->name());
-		space->dump_map(file, ROW_WRITE);
+		space->dump_map(file, read_or_write::WRITE);
 	}
 }
 
@@ -2109,8 +2109,8 @@ void address_space::populate_from_map(address_map *map)
 		last_entry = entry;
 
 		// map both read and write halves
-		populate_map_entry(*entry, ROW_READ);
-		populate_map_entry(*entry, ROW_WRITE);
+		populate_map_entry(*entry, read_or_write::READ);
+		populate_map_entry(*entry, read_or_write::WRITE);
 		populate_map_entry_setoffset(*entry);
 	}
 }
@@ -2124,7 +2124,7 @@ void address_space::populate_from_map(address_map *map)
 
 void address_space::populate_map_entry(const address_map_entry &entry, read_or_write readorwrite)
 {
-	const map_handler_data &data = (readorwrite == ROW_READ) ? entry.m_read : entry.m_write;
+	const map_handler_data &data = (readorwrite == read_or_write::READ) ? entry.m_read : entry.m_write;
 	// based on the handler type, alter the bits, name, funcptr, and object
 	switch (data.m_type)
 	{
@@ -2133,7 +2133,7 @@ void address_space::populate_map_entry(const address_map_entry &entry, read_or_w
 
 		case AMH_ROM:
 			// writes to ROM are no-ops
-			if (readorwrite == ROW_WRITE)
+			if (readorwrite == read_or_write::WRITE)
 				return;
 			// fall through to the RAM case otherwise
 
@@ -2150,7 +2150,7 @@ void address_space::populate_map_entry(const address_map_entry &entry, read_or_w
 			break;
 
 		case AMH_DEVICE_DELEGATE:
-			if (readorwrite == ROW_READ)
+			if (readorwrite == read_or_write::READ)
 				switch (data.m_bits)
 				{
 					case 8:     install_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, read8_delegate(entry.m_rproto8, entry.m_devbase), data.m_mask); break;
@@ -2170,14 +2170,14 @@ void address_space::populate_map_entry(const address_map_entry &entry, read_or_w
 
 		case AMH_PORT:
 			install_readwrite_port(entry.m_addrstart, entry.m_addrend, entry.m_addrmirror,
-							(readorwrite == ROW_READ) ? data.m_tag : nullptr,
-							(readorwrite == ROW_WRITE) ? data.m_tag : nullptr);
+							(readorwrite == read_or_write::READ) ? data.m_tag : nullptr,
+							(readorwrite == read_or_write::WRITE) ? data.m_tag : nullptr);
 			break;
 
 		case AMH_BANK:
 			install_bank_generic(entry.m_addrstart, entry.m_addrend, entry.m_addrmirror,
-							(readorwrite == ROW_READ) ? data.m_tag : nullptr,
-							(readorwrite == ROW_WRITE) ? data.m_tag : nullptr);
+							(readorwrite == read_or_write::READ) ? data.m_tag : nullptr,
+							(readorwrite == read_or_write::WRITE) ? data.m_tag : nullptr);
 			break;
 
 		case AMH_DEVICE_SUBMAP:
@@ -2275,7 +2275,7 @@ void address_space::locate_memory()
 {
 	// once this is done, find the starting bases for the banks
 	for (auto &bank : manager().banks())
-		if (bank.second->base() == nullptr && bank.second->references_space(*this, ROW_READWRITE))
+		if (bank.second->base() == nullptr && bank.second->references_space(*this, read_or_write::READWRITE))
 		{
 			// set the initial bank pointer
 			for (address_map_entry &entry : m_map->m_entrylist)
@@ -2358,7 +2358,7 @@ address_map_entry *address_space::block_assign_intersecting(offs_t bytestart, of
 
 const char *address_space::get_handler_string(read_or_write readorwrite, offs_t byteaddress)
 {
-	if (readorwrite == ROW_READ)
+	if (readorwrite == read_or_write::READ)
 		return read().handler_name(read().lookup(byteaddress));
 	else
 		return write().handler_name(write().lookup(byteaddress));
@@ -2372,7 +2372,7 @@ const char *address_space::get_handler_string(read_or_write readorwrite, offs_t 
 
 void address_space::dump_map(FILE *file, read_or_write readorwrite)
 {
-	const address_table &table = (readorwrite == ROW_READ) ? static_cast<address_table &>(read()) : static_cast<address_table &>(write());
+	const address_table &table = (readorwrite == read_or_write::READ) ? static_cast<address_table &>(read()) : static_cast<address_table &>(write());
 
 	// dump generic information
 	fprintf(file, "  Address bits = %d\n", m_config.m_addrbus_width);
@@ -2406,18 +2406,18 @@ void address_space::unmap_generic(offs_t addrstart, offs_t addrend, offs_t addrm
 	VPRINTF(("address_space::unmap(%s-%s mirror=%s, %s, %s)\n",
 				core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
 				core_i64_hex_format(addrmirror, m_addrchars),
-				(readorwrite == ROW_READ) ? "read" : (readorwrite == ROW_WRITE) ? "write" : (readorwrite == ROW_READWRITE) ? "read/write" : "??",
+				(readorwrite == read_or_write::READ) ? "read" : (readorwrite == read_or_write::WRITE) ? "write" : (readorwrite == read_or_write::READWRITE) ? "read/write" : "??",
 				quiet ? "quiet" : "normal"));
 
 	offs_t nstart, nend, nmask, nmirror;
 	check_optimize_mirror("unmap_generic", addrstart, addrend, addrmirror, nstart, nend, nmask, nmirror);
 
 	// read space
-	if (readorwrite == ROW_READ || readorwrite == ROW_READWRITE)
+	if (readorwrite == read_or_write::READ || readorwrite == read_or_write::READWRITE)
 		read().map_range(nstart, nend, nmask, nmirror, quiet ? STATIC_NOP : STATIC_UNMAP);
 
 	// write space
-	if (readorwrite == ROW_WRITE || readorwrite == ROW_READWRITE)
+	if (readorwrite == read_or_write::WRITE || readorwrite == read_or_write::READWRITE)
 		write().map_range(nstart, nend, nmask, nmirror, quiet ? STATIC_NOP : STATIC_UNMAP);
 }
 
@@ -2499,7 +2499,7 @@ void address_space::install_bank_generic(offs_t addrstart, offs_t addrend, offs_
 	if (rtag != nullptr)
 	{
 		std::string fulltag = device().siblingtag(rtag);
-		memory_bank &bank = bank_find_or_allocate(fulltag.c_str(), addrstart, addrend, addrmirror, ROW_READ);
+		memory_bank &bank = bank_find_or_allocate(fulltag.c_str(), addrstart, addrend, addrmirror, read_or_write::READ);
 		read().map_range(nstart, nend, nmask, nmirror, bank.index());
 	}
 
@@ -2507,7 +2507,7 @@ void address_space::install_bank_generic(offs_t addrstart, offs_t addrend, offs_
 	if (wtag != nullptr)
 	{
 		std::string fulltag = device().siblingtag(wtag);
-		memory_bank &bank = bank_find_or_allocate(fulltag.c_str(), addrstart, addrend, addrmirror, ROW_WRITE);
+		memory_bank &bank = bank_find_or_allocate(fulltag.c_str(), addrstart, addrend, addrmirror, read_or_write::WRITE);
 		write().map_range(nstart, nend, nmask, nmirror, bank.index());
 	}
 
@@ -2553,17 +2553,17 @@ void address_space::install_ram_generic(offs_t addrstart, offs_t addrend, offs_t
 	VPRINTF(("address_space::install_ram_generic(%s-%s mirror=%s, %s, %p)\n",
 				core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
 				core_i64_hex_format(addrmirror, m_addrchars),
-				(readorwrite == ROW_READ) ? "read" : (readorwrite == ROW_WRITE) ? "write" : (readorwrite == ROW_READWRITE) ? "read/write" : "??",
+				(readorwrite == read_or_write::READ) ? "read" : (readorwrite == read_or_write::WRITE) ? "write" : (readorwrite == read_or_write::READWRITE) ? "read/write" : "??",
 				baseptr));
 
 	offs_t nstart, nend, nmask, nmirror;
 	check_optimize_mirror("install_ram_generic", addrstart, addrend, addrmirror, nstart, nend, nmask, nmirror);
 
 	// map for read
-	if (readorwrite == ROW_READ || readorwrite == ROW_READWRITE)
+	if (readorwrite == read_or_write::READ || readorwrite == read_or_write::READWRITE)
 	{
 		// find a bank and map it
-		memory_bank &bank = bank_find_or_allocate(nullptr, addrstart, addrend, addrmirror, ROW_READ);
+		memory_bank &bank = bank_find_or_allocate(nullptr, addrstart, addrend, addrmirror, read_or_write::READ);
 		read().map_range(nstart, nend, nmask, nmirror, bank.index());
 
 		// if we are provided a pointer, set it
@@ -2590,10 +2590,10 @@ void address_space::install_ram_generic(offs_t addrstart, offs_t addrend, offs_t
 	}
 
 	// map for write
-	if (readorwrite == ROW_WRITE || readorwrite == ROW_READWRITE)
+	if (readorwrite == read_or_write::WRITE || readorwrite == read_or_write::READWRITE)
 	{
 		// find a bank and map it
-		memory_bank &bank = bank_find_or_allocate(nullptr, addrstart, addrend, addrmirror, ROW_WRITE);
+		memory_bank &bank = bank_find_or_allocate(nullptr, addrstart, addrend, addrmirror, read_or_write::WRITE);
 		write().map_range(nstart, nend, nmask, nmirror, bank.index());
 
 		// if we are provided a pointer, set it
@@ -2907,7 +2907,7 @@ memory_bank *address_space::bank_find_anonymous(offs_t bytestart, offs_t byteend
 {
 	// try to find an exact match
 	for (auto &bank : manager().banks())
-		if (bank.second->anonymous() && bank.second->references_space(*this, ROW_READWRITE) && bank.second->matches_exactly(bytestart, byteend))
+		if (bank.second->anonymous() && bank.second->references_space(*this, read_or_write::READWRITE) && bank.second->matches_exactly(bytestart, byteend))
 			return bank.second.get();
 
 	// not found
