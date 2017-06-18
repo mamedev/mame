@@ -98,11 +98,6 @@ private:
 	floppy_image_device *m_floppy;
 };
 
-ROM_START( visu_24x80 )
-	ROM_REGION( 0x800, "visu_24x80", 0 )
-	ROM_LOAD( "SMT_Goupil_G2_Charset_24x80.bin", 0x0000, 0x0800, CRC(F0F83B99) SHA1(75A7730AEC30280EE4CCF3DCAF587EEA4F861196) )
-ROM_END
-
 class goupil_g2_state : public goupil_g1_state
 {
 public:
