@@ -13,7 +13,6 @@ TODO:
 - first byte meaning is completely unknown;
 - Ninja Emaki triggers unknown commands 0x8000 & 0xff20;
 - Ninja Emaki continue screen is corrupt;
-- How to NOT draw the params?
 
 Notes:
 - Just before any string in the "MCU" rom, there's a control byte, this meaning is as follows:

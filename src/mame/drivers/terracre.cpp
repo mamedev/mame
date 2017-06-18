@@ -181,11 +181,12 @@ READ16_MEMBER(terracre_state::amazon_protection_r)
 {
 	if(m_mAmazonProtCmd == 0x37)
 	{
-		//m_mAmazonProtReg[4] bit 0 used on hiscore data (clear on code)
+		//m_mAmazonProtReg[4] bit 0 used on hiscore data (clear on code), 0x29f vs 0x29e (not an offset?)
+		//its usage is more variable in mightguy for whatever reason.
 		uint16_t prot_offset = (m_mAmazonProtReg[1]<<8)|(m_mAmazonProtReg[2]);
 		uint8_t *prot_rom = memregion("prot_data")->base();
 		
-		//printf("%02x",(prot_rom[prot_offset] - 0x44) & 0xff);
+		//printf("Mode %02x:%04x %04x R -> %02x (fixed %02x)\n",m_mAmazonProtReg[0],prot_offset,(m_mAmazonProtReg[3]<<8)|(m_mAmazonProtReg[4]),prot_rom[prot_offset],(prot_rom[prot_offset] - 0x44) & 0xff);
 		
 		return prot_rom[prot_offset & 0x1fff] - 0x44;
 	}
