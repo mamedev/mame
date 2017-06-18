@@ -121,6 +121,8 @@ public:
 	DECLARE_READ8_MEMBER(visu24x80_ram_r);
 	DECLARE_WRITE8_MEMBER(visu24x80_ram_w);
 
+protected:
+
 	required_device<palette_device> m_palette;
 	required_device<ram_device>     m_visu24x80_ram;
 	required_region_ptr<uint8_t>    m_visu24x80_rom;
@@ -696,5 +698,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR   NAME   PARENT  COMPAT   MACHINE    INPUT  CLASS           INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1979, goupilg1,   0,   0,      goupil_g1,  goupil_g1,goupil_g1_state,   0,     "SMT", "Goupil G1",    MACHINE_TYPE_COMPUTER | MACHINE_IS_INCOMPLETE | MACHINE_NO_SOUND )
-COMP( 1981, goupilg2,   0,   0,      goupil_g2,  goupil_g1,goupil_g2_state,   0,     "SMT", "Goupil G2",    MACHINE_TYPE_COMPUTER | MACHINE_IS_INCOMPLETE | MACHINE_NO_SOUND )
+COMP( 1979, goupilg1,   0,   0,      goupil_g1,  goupil_g1,goupil_g1_state,   0,     "SMT", "Goupil G1", MACHINE_NO_SOUND )
+COMP( 1981, goupilg2,   0,   0,      goupil_g2,  goupil_g1,goupil_g2_state,   0,     "SMT", "Goupil G2", MACHINE_NO_SOUND )
