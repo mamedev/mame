@@ -4,28 +4,28 @@
 
     Game Driver for Video System Mahjong series.
 
-    Idol-Mahjong Final Romance (Japan)
+    Idol-Mahjong Final Romance (アイドル麻雀ファイナルロマンス)
     (c)1991 Video System Co.,Ltd.
 
-    Nekketsu Mahjong Sengen! AFTER 5 (Japan)
+    Nekketsu Mahjong Sengen! AFTER 5 (熱血麻雀宣言! AFTER 5)
     (c)1991 Video System Co.,Ltd.
 
-    Mahjong Daiyogen (Japan)
+    Mahjong Daiyogen (麻雀大予言)
     (c)1990 Video System Co.,Ltd.
 
-    Mahjong Fun Club - Idol Saizensen (Japan)
+    Mahjong Fun Club - Idol Saizensen (麻雀ファンクラブ アイドル最前線)
     (c)1989 Video System Co.,Ltd.
 
-    Mahjong Natsu Monogatari (Mahjong Summer Story) (Japan)
+    Mahjong Natsu Monogatari (Mahjong Summer Story) (麻雀夏物語)
     (c)1989 Video System Co.,Ltd.
 
-    Natsuiro Mahjong (Mahjong Summer Story) (Japan)
+    Natsuiro Mahjong (Mahjong Summer Color) (夏色麻雀)
     (c)1989 Video System Co.,Ltd.
 
-    Idol-Mahjong Housoukyoku (Japan)
+    Idol-Mahjong Housoukyoku (アイドル麻雀放送局)
     (c)1988 System Service Co.,Ltd.
 
-    Rettou Juudan Nekkyoku Janshi - Higashi Nippon Hen (Japan)
+    Rettou Juudan Nekkyoku Janshi - Higashi Nippon Hen (列島縦断熱局雀士 東日本編)
     (c)1988 Video System Co.,Ltd.
 
     Driver by Takahiro Nogi <nogi@kt.rim.or.jp> 2001/02/04 -
@@ -329,7 +329,7 @@ static ADDRESS_MAP_START( idolmj_sub_io_map, AS_IO, 8, fromance_state )
 	AM_RANGE(0x26, 0x26) AM_READWRITE(fromance_commanddata_r, fromance_busycheck_sub_w)
 	AM_RANGE(0x27, 0x27) AM_WRITE(fromance_adpcm_reset_w)
 	AM_RANGE(0x28, 0x28) AM_WRITE(fromance_adpcm_w)
-	AM_RANGE(0x29, 0x2a) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
+	AM_RANGE(0x29, 0x2a) AM_DEVWRITE("aysnd", ym2149_device, data_address_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fromance_sub_io_map, AS_IO, 8, fromance_state )
@@ -956,7 +956,7 @@ static MACHINE_CONFIG_START( nekkyoku )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 12000000/6)
+	MCFG_SOUND_ADD("aysnd", AY8910, 12000000/6) // type not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
@@ -999,7 +999,7 @@ static MACHINE_CONFIG_START( idolmj )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 12000000/6)
+	MCFG_SOUND_ADD("aysnd", YM2149, 12000000/6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
