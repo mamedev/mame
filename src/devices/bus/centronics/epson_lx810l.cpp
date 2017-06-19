@@ -313,6 +313,8 @@ epson_ap2000_device::epson_ap2000_device(const machine_config &mconfig, const ch
 
 void epson_lx810l_device::device_start()
 {
+	m_cr_timer = timer_alloc(TIMER_CR);
+
 	machine().first_screen()->register_screen_bitmap(m_bitmap);
 	m_bitmap.fill(0xffffff); /* Start with a clean white piece of paper */
 }
@@ -344,7 +346,7 @@ void epson_lx810l_device::device_timer(emu_timer &timer, device_timer_id id, int
 		m_real_cr_pos += param;
 		m_real_cr_steps--;
 		if (m_real_cr_steps)
-			timer_set(attotime::from_usec(400), TIMER_CR, m_real_cr_dir);
+			m_cr_timer->adjust(attotime::from_usec(400), m_real_cr_dir);
 		break;
 	}
 }
@@ -516,7 +518,7 @@ WRITE8_MEMBER( epson_lx810l_device::cr_stepper )
 	}
 
 	if (!m_real_cr_steps)
-		timer_set(attotime::from_usec(400), TIMER_CR, m_real_cr_dir);
+		m_cr_timer->adjust(attotime::from_usec(400), m_real_cr_dir);
 	m_real_cr_steps++;
 
 	LX810LLOG("%s: %s(%02x); abs %d\n", machine().describe_context(), __func__, data, m_cr_pos_abs);

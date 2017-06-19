@@ -134,6 +134,8 @@ private:
 	enum {
 		TIMER_CR
 	};
+
+	emu_timer *m_cr_timer;
 };
 
 // ======================> epson_ap2000_t
