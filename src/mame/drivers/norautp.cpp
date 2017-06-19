@@ -1249,6 +1249,7 @@ static MACHINE_CONFIG_START( noraut_base )
 	MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
 	/* (c0-c3) Group A Mode 2 (5-lines handshacked bidirectional port)
 	 Group B Mode 0, output;  (see below for lines PC0-PC2) */
+	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
 	MCFG_I8255_OUT_PORTC_CB(WRITELINE(norautp_state, ppi2_obf_w)) MCFG_DEVCB_BIT(7)
 	/*  PPI-2 is configured as mixed mode2 and mode0 output.
 	 It means that port A should be bidirectional and port B just as output.
