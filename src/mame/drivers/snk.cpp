@@ -3,7 +3,7 @@
 // thanks-to:Marco Cassili
 /*
 
-snk.c
+snk.cpp
 
 various SNK triple Z80 games
 
@@ -255,7 +255,7 @@ TODO:
 
 - tdfever/fsoccer: the dots in the radar flicker. In fsoccer, this is greatly
   improved by forcing partial screen updates when the sprite RAM is changed (see
-  snk68.c for another game that needs this). tdfever dots still flicker a lot,
+  snk68.cpp for another game that needs this). tdfever dots still flicker a lot,
   however I'm not sure if this is an emulation bug or the real game behaviour.
 
 - psychos: the pcb has glitches (colored lines of length up to 16 pixels) during
@@ -4161,8 +4161,8 @@ ROM_START( madcrush )
 	ROM_LOAD( "p9.bin",   0x8000, 0x2000, CRC(e3c8c2cb) SHA1(b3e39eacd2609ff0fa0f511bff0fc83e6b3970d4) ) /* Same as Mad Crasher, but different label */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound code */
-	ROM_LOAD( "p1.a6",   0x0000, 0x2000, CRC(2dcd036d) SHA1(4da42ab1e502fff57f5d5787df406289538fa484) ) /* Located on the A2003UP03-01 duaghtercard PCB */
-	ROM_LOAD( "p2.a8",   0x2000, 0x2000, CRC(cc30ae8b) SHA1(ffedc747b9e0b616a163ff8bb1def318e522585b) ) /* Located on the A2003UP03-01 duaghtercard PCB */
+	ROM_LOAD( "p1.a6",   0x0000, 0x2000, CRC(2dcd036d) SHA1(4da42ab1e502fff57f5d5787df406289538fa484) ) /* Located on the A2003UP03-01 daughtercard PCB */
+	ROM_LOAD( "p2.a8",   0x2000, 0x2000, CRC(cc30ae8b) SHA1(ffedc747b9e0b616a163ff8bb1def318e522585b) ) /* Located on the A2003UP03-01 daughtercard PCB */
 
 	ROM_REGION( 0x2000, "tx_tiles", 0 )
 	ROM_LOAD( "p13.e2",    0x0000, 0x2000, CRC(fcdd36ca) SHA1(bb9408e1feaa15949f11d797e3eb91d37c3e0add) ) /* Located on the A2003 UP01-04 PCB */
@@ -5836,6 +5836,53 @@ ROM_START( gwara )
 	ROM_LOAD( "gv1.g5", 0x00000, 0x10000, CRC(2255f8dd) SHA1(fac31b617762d0fa39cf82a658be250b91ab73ce) )
 ROM_END
 
+ROM_START( gwarab )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "gv3 ver 1.bin", 0x00000, 0x10000, CRC(abec5eeb) SHA1(6a6b7f588d6d72a6ee6828e20798fbcc11924e3d) ) // only different ROM from gwara, ver 1 hand-written on label
+
+	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_LOAD( "gv4.p8", 0x00000, 0x10000, CRC(26335a55) SHA1(de3e7d9e204a969745367aa37326d7b3e28c7424) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "gv2.k7", 0x00000, 0x10000, CRC(896682dd) SHA1(dc2125c2378a01291197b2798a5eef6459cf5b99) )
+
+	ROM_REGION( 0x2400, "proms", 0 )
+	ROM_LOAD( "1.k1",        0x0000, 0x0400, CRC(090236a3) SHA1(40d066e34291492c6baf8c120657e3d547274b59) ) /* MB7122, red */
+	ROM_LOAD( "3.l2",        0x0400, 0x0400, CRC(9147de69) SHA1(e4b3b546e429c195e82f97322e2a295882e38a58) ) /* MB7122, green */
+	ROM_LOAD( "2.l1",        0x0800, 0x0400, CRC(7f9c839e) SHA1(2fa60fa335f76891d961c9bd0066fa7f82f76779) ) /* MB7122, blue */
+	ROM_LOAD( "horizon.j8",  0x0c00, 0x0400, CRC(c20b197b) SHA1(504cb28d652029fe87a5411d6239e78d93c83e91) ) /* MB7122E, h-decode */
+	ROM_LOAD( "vertical.k8", 0x1000, 0x0400, CRC(5d0c617f) SHA1(845e52173c33500227cabe1e21b34919d2856215) ) /* MB7122E, v-decode */
+	ROM_LOAD( "ls.bin",      0x1400, 0x1000, CRC(73df921d) SHA1(c0f765da3e0e80d104b0baaa7a83bdcc399254b3) ) /* ls-joystick encoder */
+
+	ROM_REGION( 0x8000, "tx_tiles", 0 )
+	ROM_LOAD( "gv5.a3", 0x0000, 0x08000, CRC(80f73e2e) SHA1(820824fb10f7dfec6247b46dde8ff7124bde3734) )
+
+	ROM_REGION( 0x40000, "bg_tiles", 0 )
+	ROM_LOAD( "gv13.ef1", 0x00000, 0x10000, CRC(f1dcdaef) SHA1(d9b65e7f4025787037628528d3bef699be2eb874) )
+	ROM_LOAD( "gv12.d1",  0x10000, 0x10000, CRC(326e4e5e) SHA1(6935429925d748bb43072429db0d3b08ffdbc95d) )
+	ROM_LOAD( "gv11.c1",  0x20000, 0x10000, CRC(0aa70967) SHA1(a6cbadbb960280b5e79660c0bbd43089ced39a44) )
+	ROM_LOAD( "gv10.a1",  0x30000, 0x10000, CRC(b7686336) SHA1(d654d282862ff00488be38fb9c1302c8bb6f7e7c) )
+
+	ROM_REGION( 0x40000, "sp16_tiles", 0 )
+	ROM_LOAD( "gv9.g3",  0x00000, 0x10000, CRC(58600f7d) SHA1(3dcd25d1ed07e6f74f3316ebe41768eb155f4c45) )
+	ROM_LOAD( "gv8.e3",  0x10000, 0x10000, CRC(a3f9b463) SHA1(ee83d18cf08972c792b05c277b1ca25d732e294d) )
+	ROM_LOAD( "gv7.cd3", 0x20000, 0x10000, CRC(092501be) SHA1(85d9a8922dde6824805a4b8e6c52b2a9ad092df9) )
+	ROM_LOAD( "gv6.b3",  0x30000, 0x10000, CRC(25801ea6) SHA1(1aa61716d6be399a1eee2ee5079f13da0f1bd4e8) )
+
+	ROM_REGION( 0x80000, "sp32_tiles", 0 )
+	ROM_LOAD( "gv14.f10",  0x00000, 0x10000, CRC(2b46edff) SHA1(db97e042621dcbedfeed71937ead6d715899d4f7) )
+	ROM_LOAD( "gv15.h10",  0x10000, 0x10000, CRC(be19888d) SHA1(bc7b1b6236d41685faacc2008d51ae2da9a82909) )
+	ROM_LOAD( "gv16.j10",  0x20000, 0x10000, CRC(2d653f0c) SHA1(99eb7883822b10f61b6e922c0d0519aacac83732) )
+	ROM_LOAD( "gv17.l10",  0x30000, 0x10000, CRC(ebbf3ba2) SHA1(bc3631c43058faf1ec6b21ed8017b744afee6f5d) )
+	ROM_LOAD( "gv18.m10",  0x40000, 0x10000, CRC(aeb3707f) SHA1(58d1a71cf83ab0f5f0dd67d441edbc8ece8c2ba5) )
+	ROM_LOAD( "gv19.pn10", 0x50000, 0x10000, CRC(0808f95f) SHA1(f67763cceb287a02e3b946ade52105a72161e540) )
+	ROM_LOAD( "gv20.r10",  0x60000, 0x10000, CRC(8dfc7b87) SHA1(e3d75020aa1b90f12633f6515a0386f87441b225) )
+	ROM_LOAD( "gv21.s10",  0x70000, 0x10000, CRC(06822aac) SHA1(630d438cbebe0b5af571948d0d3f4996f52aae1d) )
+
+	ROM_REGION( 0x10000, "ym2", 0 )
+	ROM_LOAD( "gv1.g5", 0x00000, 0x10000, CRC(2255f8dd) SHA1(fac31b617762d0fa39cf82a658be250b91ab73ce) )
+ROM_END
+
 ROM_START( gwarj )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "7y3047",  0x00000, 0x10000, CRC(7f8a880c) SHA1(1eb1c3eb45aa933118e5bd116eb3f81f39063ae3) )
@@ -6435,7 +6482,8 @@ GAME( 1987, psychos,   0,        psychos,   psychos,   snk_state, 0,        ROT0
 GAME( 1987, psychosj,  psychos,  psychos,   psychos,   snk_state, 0,        ROT0,   "SNK",     "Psycho Soldier (Japan)", 0 )
 GAME( 1987, gwar,      0,        gwar,      gwar,      snk_state, 0,        ROT270, "SNK",     "Guerrilla War (US)", 0 )
 GAME( 1987, gwarj,     gwar,     gwar,      gwar,      snk_state, 0,        ROT270, "SNK",     "Guevara (Japan)", 0 )
-GAME( 1987, gwara,     gwar,     gwara,     gwar,      snk_state, 0,        ROT270, "SNK",     "Guerrilla War (Version 1)", 0 )
+GAME( 1987, gwara,     gwar,     gwara,     gwar,      snk_state, 0,        ROT270, "SNK",     "Guerrilla War (Version 1, set 1)", 0 )
+GAME( 1987, gwarab,    gwar,     gwara,     gwar,      snk_state, 0,        ROT270, "SNK",     "Guerrilla War (Version 1, set 2)", 0 )
 GAME( 1987, gwarb,     gwar,     gwar,      gwarb,     snk_state, 0,        ROT270, "bootleg", "Guerrilla War (Joystick hack bootleg)", 0 )
 GAME( 1988, chopper,   0,        chopper1,  chopper,   snk_state, 0,        ROT270, "SNK",     "Chopper I (US set 1)", 0 )
 GAME( 1988, choppera,  chopper,  choppera,  choppera,  snk_state, 0,        ROT270, "SNK",     "Chopper I (US set 2)", 0 )
