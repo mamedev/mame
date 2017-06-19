@@ -173,25 +173,26 @@ void strreplacechr(std::string& str, char ch, char newch)
 
 static std::string internal_strtrimspace(std::string& str, bool right_only)
 {
-	size_t start = 0;
+	// identify the start
+	std::string::iterator start = str.begin();
 	if (!right_only)
 	{
-		for (auto & elem : str)
-		{
-			if (!isspace(uint8_t(elem)))  break;
-			start++;
-		}
+		start = std::find_if(
+			str.begin(),
+			str.end(),
+			[](char c) { return !isspace(c); });
 	}
-	size_t end = str.length();
-	if (end > 0)
-	{
-		for (size_t i = str.length() - 1; i > 0; i--)
-		{
-			if (!isspace(uint8_t(str[i]))) break;
-			end--;
-		}
-	}
-	str = str.substr(start, end-start);
+
+	// identify the end
+	std::string::iterator end = std::find_if(
+		str.rbegin(),
+		str.rend(),
+		[](char c) { return !isspace(c); }).base();
+
+	// extract the string
+	str = end > start
+		? str.substr(start - str.begin(), end - start)
+		: "";
 	return str;
 }
 
