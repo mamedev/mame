@@ -31,7 +31,7 @@
     Bomberman (71)
     Bull Fight (185)
     Burning Angels (49)
-    Cadash (243)
+    Cadash (203)
     Chozetsurinjin Beraboh Man (Super Foolish Man) (27)
     Chuka Taisen (37)
     Columns (90)
