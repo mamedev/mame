@@ -248,6 +248,7 @@ TIMER_CALLBACK_MEMBER(m72_state::scanline_interrupt)
 	if (scanline == 256)
 	{
 		m_upd71059c->ir0_w(1);
+		m_upd71059c->ir2_w(0);
 	}
 	else
 	{
