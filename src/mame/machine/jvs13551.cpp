@@ -25,10 +25,6 @@ static INPUT_PORTS_START(sega_837_13551_coins)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_COIN2) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, sega_837_13551_device, jvs13551_coin_2_w)
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(sega_837_13551)
-	MCFG_CPU_ADD("iomcu", TMP90PH44, 10000000) // unknown clock
-MACHINE_CONFIG_END
-
 ROM_START( jvs13551 )
 	// TMP90PH44N firmwares
 	ROM_REGION( 0x4000, "iomcu", ROMREGION_ERASE )
@@ -53,10 +49,9 @@ void sega_837_13551_device::static_set_port_tag(device_t &device, int port, cons
 	ctrl.port_tag[port] = tag;
 }
 
-machine_config_constructor sega_837_13551_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME(sega_837_13551);
-}
+MACHINE_CONFIG_MEMBER(sega_837_13551_device::device_add_mconfig)
+	MCFG_CPU_ADD("iomcu", TMP90PH44, 10000000) // unknown clock
+MACHINE_CONFIG_END
 
 ioport_constructor sega_837_13551_device::device_input_ports() const
 {

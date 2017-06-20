@@ -35,7 +35,11 @@
 
 DEFINE_DEVICE_TYPE(AGAT7VIDEO, agat7video_device, "agat7video", "Agat-7 Video")
 
-MACHINE_CONFIG_START(agat7video)
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER(agat7video_device::device_add_mconfig)
 	MCFG_SCREEN_ADD("a7screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_10_5MHz, 672, 0, 512, 312, 0, 256)
 	MCFG_SCREEN_UPDATE_DRIVER(agat7video_device, screen_update)
@@ -45,19 +49,6 @@ MACHINE_CONFIG_START(agat7video)
 	MCFG_PALETTE_INIT_OWNER(agat7video_device, agat7)
 MACHINE_CONFIG_END
 
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor agat7video_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( agat7video );
-}
 
 //**************************************************************************
 //  LIVE DEVICE

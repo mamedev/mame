@@ -54,53 +54,25 @@ public:
 	// acia
 	DECLARE_READ8_MEMBER( acia_0_r );
 	DECLARE_WRITE8_MEMBER( acia_0_w );
-	DECLARE_WRITE_LINE_MEMBER( acia_0_irq_w );
 	DECLARE_READ8_MEMBER( acia_1_r );
 	DECLARE_WRITE8_MEMBER( acia_1_w );
-	DECLARE_WRITE_LINE_MEMBER( acia_1_irq_w );
 	DECLARE_READ8_MEMBER( acia_2_r );
 	DECLARE_WRITE8_MEMBER( acia_2_w );
-	DECLARE_WRITE_LINE_MEMBER( acia_2_irq_w );
 	DECLARE_READ8_MEMBER( acia_3_r );
 	DECLARE_WRITE8_MEMBER( acia_3_w );
-	DECLARE_WRITE_LINE_MEMBER( acia_3_irq_w );
 	DECLARE_READ8_MEMBER( acia_4_r );
 	DECLARE_WRITE8_MEMBER( acia_4_w );
-	DECLARE_WRITE_LINE_MEMBER( acia_4_irq_w );
 	DECLARE_READ8_MEMBER( acia_5_r );
 	DECLARE_WRITE8_MEMBER( acia_5_w );
-	DECLARE_WRITE_LINE_MEMBER( acia_5_irq_w );
 	DECLARE_READ8_MEMBER( acia_6_r );
 	DECLARE_WRITE8_MEMBER( acia_6_w );
-	DECLARE_WRITE_LINE_MEMBER( acia_6_irq_w );
 
 	// cia
 	DECLARE_READ8_MEMBER( cia_r );
 	DECLARE_WRITE8_MEMBER( cia_w );
-	DECLARE_WRITE_LINE_MEMBER( cia_irq_w );
-	DECLARE_READ8_MEMBER( cia_port_a_r );
-	DECLARE_READ8_MEMBER( cia_port_b_r );
-	DECLARE_WRITE8_MEMBER( cia_port_b_w );
-
-	// rs232
-	DECLARE_WRITE_LINE_MEMBER( rs232_1_rxd_w );
-	DECLARE_WRITE_LINE_MEMBER( rs232_1_dcd_w );
-	DECLARE_WRITE_LINE_MEMBER( rs232_1_cts_w );
-	DECLARE_WRITE_LINE_MEMBER( rs232_2_dcd_w );
-	DECLARE_WRITE_LINE_MEMBER( rs232_2_cts_w );
-	DECLARE_WRITE_LINE_MEMBER( rs232_3_dcd_w );
-	DECLARE_WRITE_LINE_MEMBER( rs232_3_cts_w );
-	DECLARE_WRITE_LINE_MEMBER( rs232_4_dcd_w );
-	DECLARE_WRITE_LINE_MEMBER( rs232_4_cts_w );
-	DECLARE_WRITE_LINE_MEMBER( rs232_5_dcd_w );
-	DECLARE_WRITE_LINE_MEMBER( rs232_5_cts_w );
-	DECLARE_WRITE_LINE_MEMBER( rs232_6_dcd_w );
-	DECLARE_WRITE_LINE_MEMBER( rs232_6_cts_w );
-	DECLARE_WRITE_LINE_MEMBER( rs232_7_dcd_w );
-	DECLARE_WRITE_LINE_MEMBER( rs232_7_cts_w );
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset_after_children() override;
 
@@ -126,6 +98,38 @@ private:
 	};
 
 	void update_irqs();
+
+	// acia
+	DECLARE_WRITE_LINE_MEMBER( acia_0_irq_w );
+	DECLARE_WRITE_LINE_MEMBER( acia_1_irq_w );
+	DECLARE_WRITE_LINE_MEMBER( acia_2_irq_w );
+	DECLARE_WRITE_LINE_MEMBER( acia_3_irq_w );
+	DECLARE_WRITE_LINE_MEMBER( acia_4_irq_w );
+	DECLARE_WRITE_LINE_MEMBER( acia_5_irq_w );
+	DECLARE_WRITE_LINE_MEMBER( acia_6_irq_w );
+
+	// cia
+	DECLARE_WRITE_LINE_MEMBER( cia_irq_w );
+	DECLARE_READ8_MEMBER( cia_port_a_r );
+	DECLARE_READ8_MEMBER( cia_port_b_r );
+	DECLARE_WRITE8_MEMBER( cia_port_b_w );
+
+	// rs232
+	DECLARE_WRITE_LINE_MEMBER( rs232_1_rxd_w );
+	DECLARE_WRITE_LINE_MEMBER( rs232_1_dcd_w );
+	DECLARE_WRITE_LINE_MEMBER( rs232_1_cts_w );
+	DECLARE_WRITE_LINE_MEMBER( rs232_2_dcd_w );
+	DECLARE_WRITE_LINE_MEMBER( rs232_2_cts_w );
+	DECLARE_WRITE_LINE_MEMBER( rs232_3_dcd_w );
+	DECLARE_WRITE_LINE_MEMBER( rs232_3_cts_w );
+	DECLARE_WRITE_LINE_MEMBER( rs232_4_dcd_w );
+	DECLARE_WRITE_LINE_MEMBER( rs232_4_cts_w );
+	DECLARE_WRITE_LINE_MEMBER( rs232_5_dcd_w );
+	DECLARE_WRITE_LINE_MEMBER( rs232_5_cts_w );
+	DECLARE_WRITE_LINE_MEMBER( rs232_6_dcd_w );
+	DECLARE_WRITE_LINE_MEMBER( rs232_6_cts_w );
+	DECLARE_WRITE_LINE_MEMBER( rs232_7_dcd_w );
+	DECLARE_WRITE_LINE_MEMBER( rs232_7_cts_w );
 
 	required_device<m65ce02_device> m_iocpu;
 	required_device<mos6551_device> m_acia_0;

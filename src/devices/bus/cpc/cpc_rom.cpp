@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Barry Rodewald
 /*
- * cpc_rom.c
+ * cpc_rom.cpp
  * Amstrad CPC mountable ROM image device
  *
  */
@@ -18,7 +18,7 @@ SLOT_INTERFACE_EXTERN(cpc_exp_cards);
 //**************************************************************************
 
 // device machine config
-static MACHINE_CONFIG_START( cpc_rom )
+MACHINE_CONFIG_MEMBER( cpc_rom_device::device_add_mconfig )
 	MCFG_CPC_ROMSLOT_ADD("rom1")
 	MCFG_CPC_ROMSLOT_ADD("rom2")
 	MCFG_CPC_ROMSLOT_ADD("rom3")
@@ -37,11 +37,6 @@ static MACHINE_CONFIG_START( cpc_rom )
 
 MACHINE_CONFIG_END
 
-
-machine_config_constructor cpc_rom_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( cpc_rom );
-}
 
 //**************************************************************************
 //  LIVE DEVICE

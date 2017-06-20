@@ -6,14 +6,23 @@
 
 #pragma once
 
+#define MCFG_GP9001_VINT_CALLBACK(_devcb) \
+	devcb = &gp9001vdp_device::set_vint_out_cb(*device, DEVCB_##_devcb);
+
 class gp9001vdp_device : public device_t,
 							public device_gfx_interface,
 							public device_video_interface,
 							public device_memory_interface
 {
+	enum
+	{
+		TIMER_RAISE_IRQ
+	};
+
 public:
 	gp9001vdp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	template<class Object> static devcb_base &set_vint_out_cb(device_t &device, Object &&obj) { return downcast<gp9001vdp_device &>(device).m_vint_out_cb.set_callback(std::forward<Object>(obj)); }
 
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, const uint8_t* primap );
 	void gp9001_draw_custom_tilemap( bitmap_ind16 &bitmap, tilemap_t* tilemap, const uint8_t* priremap, const uint8_t* pri_enable );
@@ -65,6 +74,7 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 
@@ -159,6 +169,9 @@ private:
 	required_shared_ptr<uint16_t> m_vram_fg;
 	required_shared_ptr<uint16_t> m_vram_top;
 	required_shared_ptr<uint16_t> m_spriteram;
+
+	devcb_write_line m_vint_out_cb;
+	emu_timer *m_raise_irq_timer;
 };
 
 DECLARE_DEVICE_TYPE(GP9001_VDP, gp9001vdp_device)

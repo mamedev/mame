@@ -14,10 +14,6 @@ class vme_mvme350_card_device : public device_t, public device_vme_card_interfac
 public:
 	vme_mvme350_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-
 	// Shared memory methods to be exported to the VME bus
 //  virtual DECLARE_READ16_MEMBER (read16) override;
 //  virtual DECLARE_WRITE16_MEMBER (write16) override;
@@ -27,6 +23,10 @@ protected:
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
 #endif // MAME_BUS_VME_VME_MVME350_H

@@ -23,7 +23,12 @@ static SLOT_INTERFACE_START(pc_isa_onboard)
 	SLOT_INTERFACE("fdcsmc", ISA8_FDC_SMC)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( southbridge )
+
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( southbridge_device::device_add_mconfig )
 	MCFG_DEVICE_ADD("pit8254", PIT8254, 0)
 	MCFG_PIT8253_CLK0(4772720/4) /* heartbeat IRQ */
 	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(southbridge_device, at_pit8254_out0_changed))
@@ -121,16 +126,6 @@ static MACHINE_CONFIG_START( southbridge )
 	MCFG_ISA16_SLOT_ADD("isabus","board2", pc_isa_onboard, "comat", true)
 	MCFG_ISA16_SLOT_ADD("isabus","board3", pc_isa_onboard, "lpt", true)
 MACHINE_CONFIG_END
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor southbridge_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( southbridge );
-}
 
 southbridge_device::southbridge_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock),

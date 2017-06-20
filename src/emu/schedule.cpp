@@ -506,7 +506,7 @@ void device_scheduler::timeslice()
 					// if the new local CPU time is less than our target, move the target up, but not before the base
 					if (exec->m_localtime < target)
 					{
-						target = max(exec->m_localtime, m_basetime);
+						target = std::max(exec->m_localtime, m_basetime);
 						LOG(("         (new target)\n"));
 					}
 				}
@@ -758,11 +758,11 @@ void device_scheduler::rebuild_execute_list()
 			if (!device->interface(exec))
 				fatalerror("Device '%s' specified for perfect interleave is not an executing device!\n", machine().config().m_perfect_cpu_quantum.c_str());
 
-			min_quantum = min(attotime(0, exec->minimum_quantum()), min_quantum);
+			min_quantum = std::min(attotime(0, exec->minimum_quantum()), min_quantum);
 		}
 
 		// make sure it's no higher than 60Hz
-		min_quantum = min(min_quantum, attotime::from_hz(60));
+		min_quantum = std::min(min_quantum, attotime::from_hz(60));
 
 		// inform the timer system of our decision
 		add_scheduling_quantum(min_quantum, attotime::never);
@@ -951,7 +951,7 @@ void device_scheduler::add_scheduling_quantum(const attotime &quantum, const att
 
 	// if we found an exact match, just take the maximum expiry time
 	if (insert_after != nullptr && insert_after->m_requested == quantum_attos)
-		insert_after->m_expire = max(insert_after->m_expire, expire);
+		insert_after->m_expire = std::max(insert_after->m_expire, expire);
 
 	// otherwise, allocate a new quantum and insert it after the one we picked
 	else

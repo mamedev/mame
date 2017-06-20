@@ -18,7 +18,8 @@ public:
 	// construction/destruction
 	o2_chess_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual machine_config_constructor device_mconfig_additions() const override;
+protected:
+	virtual void device_add_mconfig(machine_config &config) override;
 //  virtual const rom_entry *device_rom_region() const;
 
 private:

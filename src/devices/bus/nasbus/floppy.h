@@ -31,16 +31,16 @@ public:
 	DECLARE_WRITE8_MEMBER(select_w);
 	DECLARE_READ8_MEMBER(status_r);
 
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
-
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_reset_after_children() override;
 
 private:
 	TIMER_CALLBACK_MEMBER(motor_off);
+
+	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 	required_device<fd1793_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;

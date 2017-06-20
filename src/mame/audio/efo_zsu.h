@@ -37,6 +37,14 @@ public:
 
 	DECLARE_WRITE8_MEMBER(sound_command_w);
 	DECLARE_WRITE8_MEMBER(adpcm_fifo_w);
+
+protected:
+	efo_zsu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override;
+
+private:
 	DECLARE_WRITE8_MEMBER(ay1_porta_w);
 
 	DECLARE_WRITE_LINE_MEMBER(ctc1_z0_w);
@@ -46,12 +54,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ctc0_z1_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc0_z2_w);
 	DECLARE_WRITE_LINE_MEMBER(fifo_dor_w);
-
-protected:
-	efo_zsu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
-
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual void device_start() override;
 };
 
 
@@ -72,13 +74,14 @@ public:
 	// construction/destruction
 	cedar_magnet_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	DECLARE_WRITE8_MEMBER(ay0_porta_w);
-
 	TIMER_CALLBACK_MEMBER(reset_assert_callback) override;
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
+
+private:
+	DECLARE_WRITE8_MEMBER(ay0_porta_w);
 };
 
 #endif // MAME_AUDIO_EFO_ZSU_H

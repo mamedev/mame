@@ -18,12 +18,12 @@
 #include "peribox.h"
 #include "machine/tms9902.h"
 
-DECLARE_DEVICE_TYPE(TI99_RS232,     ti_rs232_pio_device)
-DECLARE_DEVICE_TYPE(TI99_RS232_DEV, ti_rs232_attached_device)
-DECLARE_DEVICE_TYPE(TI99_PIO_DEV,   ti_pio_attached_device)
+namespace bus { namespace ti99 { namespace peb {
 
+class ti_pio_attached_device;
+class ti_rs232_attached_device;
 
-class ti_rs232_pio_device : public ti_expansion_card_device
+class ti_rs232_pio_device : public device_t, public device_ti99_peribox_card_interface
 {
 	friend class ti_pio_attached_device;
 	friend class ti_rs232_attached_device;
@@ -36,6 +36,15 @@ public:
 	DECLARE_READ8Z_MEMBER(crureadz) override;
 	DECLARE_WRITE8_MEMBER(cruwrite) override;
 
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_stop() override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
+
+private:
 	DECLARE_WRITE_LINE_MEMBER( int0_callback );
 	DECLARE_WRITE_LINE_MEMBER( int1_callback );
 	DECLARE_WRITE_LINE_MEMBER( rcv0_callback );
@@ -45,15 +54,6 @@ public:
 	DECLARE_WRITE8_MEMBER( ctrl0_callback );
 	DECLARE_WRITE8_MEMBER( ctrl1_callback );
 
-protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_stop() override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual ioport_constructor device_input_ports() const override;
-
-private:
 	void        incoming_dtr(int uartind, line_state value);
 	void        transmit_data(int uartind, uint8_t value);
 	uint8_t       map_lines_out(int uartind, uint8_t value);
@@ -158,5 +158,11 @@ protected:
 	image_init_result    call_load() override;
 	void    call_unload() override;
 };
+
+} } } // end namespace bus::ti99::peb
+
+DECLARE_DEVICE_TYPE_NS(TI99_RS232,     bus::ti99::peb, ti_rs232_pio_device)
+DECLARE_DEVICE_TYPE_NS(TI99_RS232_DEV, bus::ti99::peb, ti_rs232_attached_device)
+DECLARE_DEVICE_TYPE_NS(TI99_PIO_DEV,   bus::ti99::peb, ti_pio_attached_device)
 
 #endif // MAME_BUS_TI99_PEB_TI_RS232_H

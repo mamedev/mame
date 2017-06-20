@@ -28,6 +28,9 @@
 #include "sound/wave.h"
 #include "speaker.h"
 
+DEFINE_DEVICE_TYPE_NS(TI99_SPEECH, bus::ti99::peb, ti_speech_synthesizer_device, "ti99_speech", "TI-99 Speech synthesizer (on adapter card)")
+
+namespace bus { namespace ti99 { namespace peb {
 
 #define TRACE_MEM 0
 #define TRACE_ADDR 0
@@ -35,8 +38,9 @@
 
 /****************************************************************************/
 
-ti_speech_synthesizer_device::ti_speech_synthesizer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ti_expansion_card_device(mconfig, TI99_SPEECH, tag, owner, clock),
+ti_speech_synthesizer_device::ti_speech_synthesizer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, TI99_SPEECH, tag, owner, clock),
+	device_ti99_peribox_card_interface(mconfig, *this),
 	m_vsp(nullptr), m_reading(false), m_sbe(false)
 {
 }
@@ -149,7 +153,13 @@ void ti_speech_synthesizer_device::device_reset()
 	m_sbe = false;
 }
 
-MACHINE_CONFIG_START( ti99_speech )
+ROM_START( ti99_speech )
+	ROM_REGION(0x8000, "vsm", 0)
+	ROM_LOAD("cd2325a.u2a", 0x0000, 0x4000, CRC(1f58b571) SHA1(0ef4f178716b575a1c0c970c56af8a8d97561ffe)) // at location u2, bottom of stack
+	ROM_LOAD("cd2326a.u2b", 0x4000, 0x4000, CRC(65d00401) SHA1(a367242c2c96cebf0e2bf21862f3f6734b2b3020)) // at location u2, top of stack
+ROM_END
+
+MACHINE_CONFIG_MEMBER( ti_speech_synthesizer_device::device_add_mconfig )
 	MCFG_DEVICE_ADD("vsm", SPEECHROM, 0)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -159,20 +169,10 @@ MACHINE_CONFIG_START( ti99_speech )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-ROM_START( ti99_speech )
-	ROM_REGION(0x8000, "vsm", 0)
-	ROM_LOAD("cd2325a.u2a", 0x0000, 0x4000, CRC(1f58b571) SHA1(0ef4f178716b575a1c0c970c56af8a8d97561ffe)) // at location u2, bottom of stack
-	ROM_LOAD("cd2326a.u2b", 0x4000, 0x4000, CRC(65d00401) SHA1(a367242c2c96cebf0e2bf21862f3f6734b2b3020)) // at location u2, top of stack
-ROM_END
-
-machine_config_constructor ti_speech_synthesizer_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( ti99_speech );
-}
-
 const tiny_rom_entry *ti_speech_synthesizer_device::device_rom_region() const
 {
 	return ROM_NAME( ti99_speech );
 }
 
-DEFINE_DEVICE_TYPE(TI99_SPEECH, ti_speech_synthesizer_device, "ti99_speech", "TI-99 Speech synthesizer (on adapter card)")
+} } } // end namespace bus::ti99::peb
+

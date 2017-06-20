@@ -624,11 +624,6 @@ static ADDRESS_MAP_START( hcrash_map, AS_PROGRAM, 16, nemesis_state )
 	AM_RANGE(0x190f80, 0x190fff) AM_SHARE("yscroll2")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hcrash_vlm_map, AS_0, 8, nemesis_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("vlm", 0x4000)
-ADDRESS_MAP_END
-
 /******************************************************************************/
 
 static INPUT_PORTS_START( nemesis )
@@ -1949,9 +1944,9 @@ static MACHINE_CONFIG_START( hcrash )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("vlm", VLM5030, 3579545)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, hcrash_vlm_map)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, salamand_vlm_map)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
 
 	MCFG_SOUND_ADD("k007232", K007232, 3579545)
 	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(nemesis_state, volume_callback))
@@ -2355,7 +2350,7 @@ ROM_START( hcrash )
 	ROM_LOAD( "790-c08.j4",   0x04000, 0x04000, CRC(cfb844bc) SHA1(43b7adb6093e707212204118087ef4f79b0dbc1f) )
 	ROM_CONTINUE(             0x00000, 0x04000 ) /* Board is wired for 27C128, top half of EPROM is blank */
 
-	ROM_REGION( 0x80000, "k007232", 0 )  /* 007232 data */
+	ROM_REGION( 0x20000, "k007232", 0 )  /* 007232 data */
 	ROM_LOAD( "790-c01.m10",  0x00000, 0x20000, CRC(07976bc3) SHA1(9341ac6084fbbe17c4e7bbefade9a3f1dec3f132) )
 ROM_END
 
@@ -2373,7 +2368,7 @@ ROM_START( hcrashc )
 	ROM_LOAD( "790-c08.j4",   0x04000, 0x04000, CRC(cfb844bc) SHA1(43b7adb6093e707212204118087ef4f79b0dbc1f) )
 	ROM_CONTINUE(             0x00000, 0x04000 ) /* Board is wired for 27C128, top half of EPROM is blank */
 
-	ROM_REGION( 0x80000, "k007232", 0 )  /* 007232 data */
+	ROM_REGION( 0x20000, "k007232", 0 )  /* 007232 data */
 	ROM_LOAD( "790-c01.m10",  0x00000, 0x20000, CRC(07976bc3) SHA1(9341ac6084fbbe17c4e7bbefade9a3f1dec3f132) )
 ROM_END
 

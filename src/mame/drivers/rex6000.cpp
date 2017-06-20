@@ -397,7 +397,7 @@ static ADDRESS_MAP_START( rex6000_io, AS_IO, 8, rex6000_state)
 	AM_RANGE( 0x10, 0x10 ) AM_READ_PORT("INPUT")
 	AM_RANGE( 0x15, 0x19 ) AM_READWRITE(beep_r, beep_w)
 	AM_RANGE( 0x22, 0x23 ) AM_READWRITE(lcd_base_r, lcd_base_w)
-	AM_RANGE( 0x30, 0x3f ) AM_DEVREADWRITE(TC8521_TAG, rp5c01_device, read, write)
+	AM_RANGE( 0x30, 0x3f ) AM_DEVREADWRITE(TC8521_TAG, tc8521_device, read, write)
 	AM_RANGE( 0x40, 0x47 ) AM_MIRROR(0x08)  AM_DEVREADWRITE("ns16550", ns16550_device, ins8250_r, ins8250_w )
 	AM_RANGE( 0x50, 0x51 ) AM_READWRITE(lcd_io_r, lcd_io_w)
 	AM_RANGE( 0x60, 0x6f ) AM_READWRITE(touchscreen_r, touchscreen_w)
@@ -412,7 +412,7 @@ static ADDRESS_MAP_START( oz750_io, AS_IO, 8, oz750_state)
 	AM_RANGE( 0x11, 0x12 ) AM_READWRITE(kb_status_r, kb_mask_w)
 	AM_RANGE( 0x15, 0x19 ) AM_READWRITE(beep_r, beep_w)
 	AM_RANGE( 0x22, 0x23 ) AM_READWRITE(lcd_base_r, lcd_base_w)
-	AM_RANGE( 0x30, 0x3f ) AM_DEVREADWRITE(TC8521_TAG, rp5c01_device, read, write)
+	AM_RANGE( 0x30, 0x3f ) AM_DEVREADWRITE(TC8521_TAG, tc8521_device, read, write)
 	AM_RANGE( 0x40, 0x47 ) AM_MIRROR(0x08)  AM_DEVREADWRITE("ns16550", ns16550_device, ins8250_r, ins8250_w )
 ADDRESS_MAP_END
 
@@ -922,7 +922,7 @@ static MACHINE_CONFIG_START( rex6000 )
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", rex6000_state, rex6000, "rex,ds2", 0)
 
-	MCFG_DEVICE_ADD(TC8521_TAG, RP5C01, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD(TC8521_TAG, TC8521, XTAL_32_768kHz)
 	MCFG_RP5C01_OUT_ALARM_CB(WRITELINE(rex6000_state, alarm_irq))
 
 	/*
@@ -998,7 +998,7 @@ static MACHINE_CONFIG_START( oz750 )
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", oz750_state, oz750, "wzd", 0)
 
-	MCFG_DEVICE_ADD(TC8521_TAG, RP5C01, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD(TC8521_TAG, TC8521, XTAL_32_768kHz)
 	MCFG_RP5C01_OUT_ALARM_CB(WRITELINE(rex6000_state, alarm_irq))
 
 	MCFG_SHARP_LH28F016S_ADD("flash0a")

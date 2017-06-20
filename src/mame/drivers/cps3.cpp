@@ -912,12 +912,12 @@ void cps3_state::video_start()
 	save_pointer(NAME(m_char_ram.get()), 0x800000 /4);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(0, std::make_unique<gfx_element>(*m_palette, cps3_tiles8x8_layout, (uint8_t *)m_ss_ram.get(), 0, m_palette->entries() / 16, 0));
+	m_gfxdecode->set_gfx(0, std::make_unique<gfx_element>(m_palette, cps3_tiles8x8_layout, (uint8_t *)m_ss_ram.get(), 0, m_palette->entries() / 16, 0));
 
 	//decode_ssram();
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(1, std::make_unique<gfx_element>(*m_palette, cps3_tiles16x16_layout, (uint8_t *)m_char_ram.get(), 0, m_palette->entries() / 64, 0));
+	m_gfxdecode->set_gfx(1, std::make_unique<gfx_element>(m_palette, cps3_tiles16x16_layout, (uint8_t *)m_char_ram.get(), 0, m_palette->entries() / 64, 0));
 	m_gfxdecode->gfx(1)->set_granularity(64);
 
 	//decode_charram();

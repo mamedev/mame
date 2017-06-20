@@ -30,19 +30,13 @@ public:
 	// construction/destruction
 	c64_ieee488_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
-	// not really public
-	DECLARE_READ8_MEMBER( tpi_pa_r );
-	DECLARE_WRITE8_MEMBER( tpi_pa_w );
-	DECLARE_READ8_MEMBER( tpi_pc_r );
-	DECLARE_WRITE8_MEMBER( tpi_pc_w );
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	// device_c64_expansion_card_interface overrides
 	virtual uint8_t c64_cd_r(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2) override;
@@ -50,6 +44,11 @@ protected:
 	virtual int c64_game_r(offs_t offset, int sphi2, int ba, int rw) override;
 
 private:
+	DECLARE_READ8_MEMBER( tpi_pa_r );
+	DECLARE_WRITE8_MEMBER( tpi_pa_w );
+	DECLARE_READ8_MEMBER( tpi_pc_r );
+	DECLARE_WRITE8_MEMBER( tpi_pc_w );
+
 	required_device<tpi6525_device> m_tpi;
 	required_device<ieee488_device> m_bus;
 	required_device<c64_expansion_slot_device> m_exp;

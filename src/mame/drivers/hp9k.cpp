@@ -14,7 +14,7 @@ Driver started on 10/01/2012
 Memory map:
 
 000000-00ffff - system rom
-428000-428fff - keyboard
+428000-428fff - keyboard 8042 host status / data ports (8042 undumped)
 510000-51ffff - videoram
 530000-53ffff - graphic memory
 5f0000-5f3fff - system PROM

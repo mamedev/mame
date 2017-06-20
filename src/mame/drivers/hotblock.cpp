@@ -141,8 +141,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( hotblock_io, AS_IO, 8, hotblock_state )
 	AM_RANGE(0x0000, 0x0000) AM_WRITE(port0_w)
 	AM_RANGE(0x0004, 0x0004) AM_READWRITE(port4_r, port4_w)
-	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0x8001, 0x8001) AM_DEVREAD("aysnd", ay8910_device, data_r)
+	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE("aysnd", ym2149_device, address_data_w)
+	AM_RANGE(0x8001, 0x8001) AM_DEVREAD("aysnd", ym2149_device, data_r)
 ADDRESS_MAP_END
 
 
@@ -229,7 +229,7 @@ static MACHINE_CONFIG_START( hotblock )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 1000000)
+	MCFG_SOUND_ADD("aysnd", YM2149, 1000000)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("P1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("P2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)

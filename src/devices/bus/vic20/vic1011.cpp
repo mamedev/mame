@@ -27,28 +27,16 @@ DEFINE_DEVICE_TYPE(VIC1011, vic1011_device, "vic1011", "VIC-1011 RS-232C")
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( vic1011 )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( vic1011 )
+MACHINE_CONFIG_MEMBER( vic1011_device::device_add_mconfig )
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(DEVICE_SELF, vic1011_device, output_rxd))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(DEVICE_SELF, vic1011_device, output_h)) MCFG_DEVCB_XOR(1)
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(DEVICE_SELF, vic1011_device, output_k)) MCFG_DEVCB_XOR(1)
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(DEVICE_SELF, vic1011_device, output_l)) MCFG_DEVCB_XOR(1)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor vic1011_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( vic1011 );
-}
-
 
 
 //**************************************************************************

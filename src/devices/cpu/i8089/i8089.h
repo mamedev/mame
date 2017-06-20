@@ -64,10 +64,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( ext1_w );
 	DECLARE_WRITE_LINE_MEMBER( ext2_w );
 
-	// internal communication
-	DECLARE_WRITE_LINE_MEMBER( ch1_sintr_w ) { m_write_sintr1(state); }
-	DECLARE_WRITE_LINE_MEMBER( ch2_sintr_w ) { m_write_sintr2(state); }
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -94,12 +90,16 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	bool sysbus_width() const { return BIT(m_sysbus, 0); }
 	bool remotebus_width() const { return BIT(m_soc, 0); }
 	bool request_grant() const { return BIT(m_soc, 1); }
+
+	// internal communication
+	DECLARE_WRITE_LINE_MEMBER( ch1_sintr_w ) { m_write_sintr1(state); }
+	DECLARE_WRITE_LINE_MEMBER( ch2_sintr_w ) { m_write_sintr2(state); }
 
 	uint8_t read_byte(bool space, offs_t address);
 	uint16_t read_word(bool space, offs_t address);

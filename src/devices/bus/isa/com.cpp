@@ -21,7 +21,18 @@ static SLOT_INTERFACE_START(isa_com)
 	SLOT_INTERFACE("null_modem", NULL_MODEM)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( com_config )
+
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE(ISA8_COM, isa8_com_device, "isa_com", "Communications Adapter PC/XT")
+
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( isa8_com_device::device_add_mconfig )
 	MCFG_DEVICE_ADD( "uart_0", INS8250, XTAL_1_8432MHz )
 	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("serport0", rs232_port_device, write_txd))
 	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE("serport0", rs232_port_device, write_dtr))
@@ -73,22 +84,6 @@ static MACHINE_CONFIG_START( com_config )
 MACHINE_CONFIG_END
 
 //**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-DEFINE_DEVICE_TYPE(ISA8_COM, isa8_com_device, "isa_com", "Communications Adapter PC/XT")
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor isa8_com_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( com_config );
-}
-
-//**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
 
@@ -129,7 +124,17 @@ void isa8_com_device::device_reset()
 {
 }
 
-static MACHINE_CONFIG_START( com_at_config )
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE(ISA8_COM_AT, isa8_com_at_device, "isa_com_at", "Communications Adapter")
+
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( isa8_com_at_device::device_add_mconfig )
 	MCFG_DEVICE_ADD( "uart_0", NS16450, XTAL_1_8432MHz ) /* Verified: IBM P/N 6320947 Serial/Parallel card uses an NS16450N */
 	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("serport0", rs232_port_device, write_txd))
 	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE("serport0", rs232_port_device, write_dtr))
@@ -167,22 +172,6 @@ static MACHINE_CONFIG_START( com_at_config )
 //  MCFG_RS232_PORT_ADD( "serport2", isa_com, nullptr )
 //  MCFG_RS232_PORT_ADD( "serport3", isa_com, nullptr )
 MACHINE_CONFIG_END
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-DEFINE_DEVICE_TYPE(ISA8_COM_AT, isa8_com_at_device, "isa_com_at", "Communications Adapter")
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor isa8_com_at_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( com_at_config );
-}
 
 //-------------------------------------------------
 //  isa8_com_device - constructor

@@ -17,8 +17,6 @@ public:
 	// construction/destruction
 	a26_rom_harmony_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_rom) override;
 	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
@@ -29,6 +27,8 @@ private:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	void check_bankswitch(offs_t offset);
 

@@ -54,23 +54,12 @@ const tiny_rom_entry *sa1403d_device::device_rom_region() const
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( sa1403d )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( sa1403d )
+MACHINE_CONFIG_MEMBER( sa1403d_device::device_add_mconfig )
 	MCFG_HARDDISK_ADD("image")
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor sa1403d_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( sa1403d );
-}
 
 
 //-------------------------------------------------

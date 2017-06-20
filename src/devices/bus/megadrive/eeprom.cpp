@@ -104,71 +104,36 @@ md_eeprom_blara_device::md_eeprom_blara_device(const machine_config &mconfig, co
 
 
 //-------------------------------------------------
-//  SERIAL I2C DEVICE
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-
-// MD_STD_EEPROM & MD_EEPROM_NHLPA
-MACHINE_CONFIG_START( md_i2c_24c01 )
+MACHINE_CONFIG_MEMBER( md_std_eeprom_device::device_add_mconfig )
 	MCFG_24C01_ADD("i2cmem")
 MACHINE_CONFIG_END
 
-// MD_EEPROM_NBAJAM & MD_EEPROM_NBAJAMTE
-MACHINE_CONFIG_START( md_i2c_24c02 )
+MACHINE_CONFIG_MEMBER( md_eeprom_nbajam_device::device_add_mconfig )
 	MCFG_24C02_ADD("i2cmem")
 MACHINE_CONFIG_END
 
-// MD_EEPROM_NFLQB
-MACHINE_CONFIG_START( md_i2c_24c16 )
-	MCFG_24C16_ADD("i2cmem")
+MACHINE_CONFIG_MEMBER( md_eeprom_nbajamte_device::device_add_mconfig )
+	MCFG_24C02_ADD("i2cmem")
 MACHINE_CONFIG_END
 
-// MD_EEPROM_CSLAM & MD_EEPROM_BLARA
-MACHINE_CONFIG_START( md_i2c_24c64 )
+MACHINE_CONFIG_MEMBER( md_eeprom_cslam_device::device_add_mconfig )
 	MCFG_24C64_ADD("i2cmem")
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_MEMBER( md_eeprom_nflqb_device::device_add_mconfig )
+	MCFG_24C16_ADD("i2cmem")
+MACHINE_CONFIG_END
 
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
+MACHINE_CONFIG_MEMBER( md_eeprom_nhlpa_device::device_add_mconfig )
+	MCFG_24C01_ADD("i2cmem")
+MACHINE_CONFIG_END
 
-machine_config_constructor md_std_eeprom_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( md_i2c_24c01 );
-}
-
-machine_config_constructor md_eeprom_nbajam_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( md_i2c_24c02 );
-}
-
-machine_config_constructor md_eeprom_nbajamte_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( md_i2c_24c02 );
-}
-
-machine_config_constructor md_eeprom_cslam_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( md_i2c_24c64 );
-}
-
-machine_config_constructor md_eeprom_nflqb_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( md_i2c_24c16 );
-}
-
-machine_config_constructor md_eeprom_nhlpa_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( md_i2c_24c01 );
-}
-
-machine_config_constructor md_eeprom_blara_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( md_i2c_24c64 );
-}
-
+MACHINE_CONFIG_MEMBER( md_eeprom_blara_device::device_add_mconfig )
+	MCFG_24C64_ADD("i2cmem")
+MACHINE_CONFIG_END
 
 void md_std_eeprom_device::device_start()
 {

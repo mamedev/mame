@@ -44,7 +44,7 @@ static ADDRESS_MAP_START( coco3_mem, AS_PROGRAM, 8, coco3_state )
 	AM_RANGE(0xFF20, 0xFF3F) AM_READWRITE(ff20_read, ff20_write)
 	AM_RANGE(0xFF40, 0xFF5F) AM_READWRITE(ff40_read, ff40_write)
 	AM_RANGE(0xFF60, 0xFF8F) AM_READWRITE(ff60_read, ff60_write)
-	AM_RANGE(0xFF90, 0xFFDF) AM_DEVREADWRITE(GIME_TAG, gime_base_device, read, write)
+	AM_RANGE(0xFF90, 0xFFDF) AM_DEVREADWRITE(GIME_TAG, gime_device, read, write)
 
 	// While Tepolt and other sources say that the interrupt vectors are mapped to
 	// the same memory accessed at $BFFx, William Astle offered evidence that this
@@ -324,6 +324,9 @@ static MACHINE_CONFIG_START( coco3 )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("512K")
 	MCFG_RAM_EXTRA_OPTIONS("128K,2M,8M")
+
+	// floating space
+	MCFG_FRAGMENT_ADD(coco_floating)
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("cart_list","coco_cart")

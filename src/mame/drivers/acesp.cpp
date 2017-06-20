@@ -17,7 +17,7 @@
 
 
 #include "emu.h"
-#include "cpu/m6800/m6800.h"
+#include "cpu/m6800/m6801.h"
 #include "machine/6821pia.h"
 
 class ace_sp_state : public driver_device

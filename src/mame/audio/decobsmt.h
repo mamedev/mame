@@ -32,15 +32,11 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(bsmt_reset_line);
 
-	INTERRUPT_GEN_MEMBER(decobsmt_firq_interrupt);
-
-	void bsmt_ready_callback();
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	required_device<cpu_device> m_ourcpu;
@@ -49,6 +45,10 @@ private:
 	uint8_t m_bsmt_latch;
 	uint8_t m_bsmt_reset;
 	uint8_t m_bsmt_comms;
+
+	INTERRUPT_GEN_MEMBER(decobsmt_firq_interrupt);
+
+	void bsmt_ready_callback();
 };
 
 

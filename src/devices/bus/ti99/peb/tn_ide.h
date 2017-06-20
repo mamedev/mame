@@ -21,9 +21,9 @@
 #include "machine/ram.h"
 #include "machine/rtc65271.h"
 
-DECLARE_DEVICE_TYPE(TI99_IDE, nouspikel_ide_interface_device)
+namespace bus { namespace ti99 { namespace peb {
 
-class nouspikel_ide_interface_device : public ti_expansion_card_device
+class nouspikel_ide_interface_device : public device_t, public device_ti99_peribox_card_interface
 {
 public:
 	nouspikel_ide_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -37,16 +37,16 @@ public:
 	bool    m_ata_irq;
 	int     m_cru_register;
 
-	DECLARE_WRITE_LINE_MEMBER(clock_interrupt_callback);
-	DECLARE_WRITE_LINE_MEMBER(ide_interrupt_callback);
-
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 
 private:
+	DECLARE_WRITE_LINE_MEMBER(clock_interrupt_callback);
+	DECLARE_WRITE_LINE_MEMBER(ide_interrupt_callback);
+
 	rtc65271_device*    m_rtc;
 	required_device<ata_interface_device> m_ata;
 
@@ -62,5 +62,9 @@ private:
 
 	required_device<ram_device> m_ram;
 };
+
+} } } // end namespace bus::ti99::peb
+
+DECLARE_DEVICE_TYPE_NS(TI99_IDE, bus::ti99::peb, nouspikel_ide_interface_device)
 
 #endif // MAME_BUS_TI99_PEB_TN_IDE_H

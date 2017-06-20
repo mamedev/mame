@@ -614,8 +614,8 @@ protected:
 	int m_tx_fifo_wp;           // FIFO write pointer
 	int m_tx_fifo_sz;           // FIFO size
 	uint8_t m_tx_error;         // current error
-	int m_tx_clock;     		// transmit clock pulse count
-	int	m_tx_int_disarm;		// temp Tx int disarm until next byte written
+	int m_tx_clock;             // transmit clock pulse count
+	int m_tx_int_disarm;        // temp Tx int disarm until next byte written
 
 
 	int m_dtr;      // data terminal ready
@@ -722,7 +722,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	// device_z80daisy_interface overrides
 	virtual int z80daisy_irq_state() override;

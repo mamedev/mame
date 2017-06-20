@@ -340,10 +340,10 @@ FLOPPY_FORMATS_END
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( c1551 )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( c1551 )
+MACHINE_CONFIG_MEMBER( c1551_device::device_add_mconfig )
 	MCFG_CPU_ADD(M6510T_TAG, M6510T, XTAL_16MHz/8)
 	MCFG_CPU_PROGRAM_MAP(c1551_mem)
 	MCFG_M6510T_PORT_CALLBACKS(READ8(c1551_device, port_r), WRITE8(c1551_device, port_w))
@@ -366,21 +366,10 @@ static MACHINE_CONFIG_START( c1551 )
 
 	MCFG_DEVICE_ADD(C64H156_TAG, C64H156, XTAL_16MHz)
 	MCFG_64H156_BYTE_CALLBACK(DEVWRITELINE(C64H156_TAG, c64h156_device, atni_w))
-	MCFG_FLOPPY_DRIVE_ADD(C64H156_TAG":0", c1551_floppies, "525ssqd", c1551_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD_FIXED(C64H156_TAG":0", c1551_floppies, "525ssqd", c1551_device::floppy_formats)
 
 	MCFG_PLUS4_PASSTHRU_EXPANSION_SLOT_ADD()
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor c1551_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( c1551 );
-}
 
 
 //-------------------------------------------------

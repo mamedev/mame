@@ -194,7 +194,7 @@ void msx_cart_disk_device::initialize_cartridge()
 }
 
 
-static MACHINE_CONFIG_START( vy0010 )
+MACHINE_CONFIG_MEMBER( msx_cart_vy0010_device::device_add_mconfig )
 	// From VY-0010 schematic:
 	// HLT pulled high
 	// SSO/-ENMF + -DDEN + ENP + -5/8 - pulled low
@@ -213,14 +213,7 @@ static MACHINE_CONFIG_START( vy0010 )
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("msx1_flop_list","msx1_flop")
 MACHINE_CONFIG_END
 
-
-machine_config_constructor msx_cart_vy0010_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( vy0010 );
-}
-
-
-static MACHINE_CONFIG_START( fsfd1 )
+MACHINE_CONFIG_MEMBER( msx_cart_fsfd1_device::device_add_mconfig )
 	MCFG_WD2793_ADD("fdc", XTAL_4MHz / 4)
 
 	// Double sided 3.5" floppy drive
@@ -235,13 +228,7 @@ static MACHINE_CONFIG_START( fsfd1 )
 MACHINE_CONFIG_END
 
 
-machine_config_constructor msx_cart_fsfd1_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( fsfd1 );
-}
-
-
-static MACHINE_CONFIG_START( fsfd1a )
+MACHINE_CONFIG_MEMBER( msx_cart_fsfd1a_device::device_add_mconfig )
 	MCFG_TC8566AF_ADD("fdc")
 
 	// Double sided 3.5" floppy drive
@@ -256,13 +243,7 @@ static MACHINE_CONFIG_START( fsfd1a )
 MACHINE_CONFIG_END
 
 
-machine_config_constructor msx_cart_fsfd1a_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( fsfd1a );
-}
-
-
-static MACHINE_CONFIG_START( fscf351 )
+MACHINE_CONFIG_MEMBER( msx_cart_fscf351_device::device_add_mconfig )
 	MCFG_MB8877_ADD("fdc", XTAL_4MHz / 4)
 	MCFG_WD_FDC_FORCE_READY
 
@@ -276,12 +257,6 @@ static MACHINE_CONFIG_START( fscf351 )
 	MCFG_SOFTWARE_LIST_ADD("flop_list","msx2_flop")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("msx1_flop_list","msx1_flop")
 MACHINE_CONFIG_END
-
-
-machine_config_constructor msx_cart_fscf351_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( fscf351 );
-}
 
 
 void msx_cart_disk_type1_device::device_start()

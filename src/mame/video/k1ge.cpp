@@ -877,20 +877,15 @@ k1ge_device::k1ge_device(const machine_config &mconfig, device_type type, const 
 {
 }
 
-static MACHINE_CONFIG_START( k1ge )
+
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( k1ge_device::device_add_mconfig )
 	MCFG_PALETTE_ADD("palette", 8 )
 	MCFG_PALETTE_INIT_OWNER(k1ge_device, k1ge)
 MACHINE_CONFIG_END
-
-//-------------------------------------------------
-//  machine_config_additions - return a pointer to
-//  the device's machine fragment
-//-------------------------------------------------
-
-machine_config_constructor k1ge_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( k1ge );
-}
 
 
 DEFINE_DEVICE_TYPE(K2GE, k2ge_device, "k2ge", "K2GE Color Graphics + LCD")
@@ -900,17 +895,11 @@ k2ge_device::k2ge_device(const machine_config &mconfig, const char *tag, device_
 {
 }
 
-static MACHINE_CONFIG_START( k2ge )
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( k2ge_device::device_add_mconfig )
 	MCFG_PALETTE_ADD("palette", 4096 )
 	MCFG_PALETTE_INIT_OWNER(k2ge_device, k2ge)
 MACHINE_CONFIG_END
-
-//-------------------------------------------------
-//  machine_config_additions - return a pointer to
-//  the device's machine fragment
-//-------------------------------------------------
-
-machine_config_constructor k2ge_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( k2ge );
-}

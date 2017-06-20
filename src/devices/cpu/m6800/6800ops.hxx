@@ -41,7 +41,7 @@ OP_HANDLER( illegl3 )
 OP_HANDLER( trap )
 {
 	logerror("m6800: illegal opcode: address %04X, op %02X\n",PC-1,(int) M_RDOP_ARG(PC-1)&0xFF);
-	TAKE_TRAP;
+	TAKE_TRAP();
 }
 
 /* $00 ILLEGAL */
@@ -219,7 +219,7 @@ OP_HANDLER( slp )
 {
 	/* wait for next IRQ (same as waiting of wai) */
 	m_wai_state |= M6800_SLP;
-	EAT_CYCLES;
+	EAT_CYCLES();
 }
 
 /* $1b ABA inherent ***** */
@@ -459,7 +459,7 @@ OP_HANDLER( wai )
 	PUSHBYTE(B);
 	PUSHBYTE(CC);
 	CHECK_IRQ_LINES();
-	if (m_wai_state & M6800_WAI) EAT_CYCLES;
+	if (m_wai_state & M6800_WAI) EAT_CYCLES();
 }
 
 /* $3f SWI absolute indirect ----- */

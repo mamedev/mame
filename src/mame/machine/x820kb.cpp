@@ -81,10 +81,10 @@ const tiny_rom_entry *xerox_820_keyboard_device::device_rom_region() const
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( xerox_820_keyboard )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( xerox_820_keyboard )
+MACHINE_CONFIG_MEMBER( xerox_820_keyboard_device::device_add_mconfig )
 	MCFG_CPU_ADD(I8748_TAG, I8048, XTAL_6MHz)
 	MCFG_MCS48_PORT_P1_IN_CB(READ8(xerox_820_keyboard_device, kb_p1_r))
 	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(xerox_820_keyboard_device, kb_p1_w))
@@ -93,17 +93,6 @@ static MACHINE_CONFIG_START( xerox_820_keyboard )
 	MCFG_MCS48_PORT_T1_IN_CB(READLINE(xerox_820_keyboard_device, kb_t1_r))
 	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(xerox_820_keyboard_device, kb_bus_w))
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor xerox_820_keyboard_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( xerox_820_keyboard );
-}
 
 
 //-------------------------------------------------

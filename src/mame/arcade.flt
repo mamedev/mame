@@ -950,6 +950,7 @@ rohga.cpp
 rollerg.cpp
 rollext.cpp
 rollrace.cpp
+ron.cpp
 rotaryf.cpp
 roul.cpp
 route16.cpp
@@ -1030,6 +1031,7 @@ shanghai.cpp
 shangkid.cpp
 shaolins.cpp
 shisen.cpp
+shootaway2.cpp
 shootout.cpp
 shougi.cpp
 shtzone.cpp
@@ -1081,6 +1083,7 @@ speedspn.cpp
 speglsht.cpp
 spiders.cpp
 spinb.cpp
+spirit76.cpp
 splash.cpp
 splus.cpp
 spoker.cpp
@@ -1253,6 +1256,7 @@ ultratnk.cpp
 ultrsprt.cpp
 umipoker.cpp
 undrfire.cpp
+unianapc.cpp
 unico.cpp
 unkhorse.cpp
 upscope.cpp

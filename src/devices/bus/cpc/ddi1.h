@@ -22,20 +22,21 @@ public:
 	// construction/destruction
 	cpc_ddi1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual void set_mapping(uint8_t type) override;
-	virtual WRITE_LINE_MEMBER( romen_w ) override { m_romen = state; }
-
 	DECLARE_WRITE8_MEMBER(motor_w);
 	DECLARE_WRITE8_MEMBER(fdc_w);
 	DECLARE_READ8_MEMBER(fdc_r);
 	DECLARE_WRITE8_MEMBER(rombank_w);
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void set_mapping(uint8_t type) override;
+	virtual WRITE_LINE_MEMBER( romen_w ) override { m_romen = state; }
 
 private:
 	cpc_expansion_slot_device *m_slot;

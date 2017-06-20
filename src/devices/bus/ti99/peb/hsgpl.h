@@ -22,9 +22,9 @@
 #include "machine/at29x.h"
 #include "machine/ram.h"
 
-DECLARE_DEVICE_TYPE(TI99_HSGPL, snug_high_speed_gpl_device)
+namespace bus { namespace ti99 { namespace peb {
 
-class snug_high_speed_gpl_device : public ti_expansion_card_device
+class snug_high_speed_gpl_device : public device_t, public device_ti99_peribox_card_interface
 {
 public:
 	snug_high_speed_gpl_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -40,7 +40,7 @@ protected:
 	virtual void device_stop() override;
 	virtual ioport_constructor device_input_ports() const override;
 
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	required_device<at29c040a_device> m_dsr_eeprom;
@@ -80,5 +80,9 @@ private:
 	bool            m_raddr_LSB;
 	int             m_grom_address;
 };
+
+} } } // end namespace bus::ti99::peb
+
+DECLARE_DEVICE_TYPE_NS(TI99_HSGPL, bus::ti99::peb, snug_high_speed_gpl_device)
 
 #endif // MAME_BUS_TI99_PEB_HSGPL_H

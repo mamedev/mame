@@ -109,27 +109,16 @@ const tiny_rom_entry *abc800_keyboard_device::device_rom_region() const
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( abc800_keyboard )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( abc800_keyboard )
+MACHINE_CONFIG_MEMBER( abc800_keyboard_device::device_add_mconfig )
 	MCFG_CPU_ADD(I8048_TAG, I8048, XTAL_5_9904MHz)
 	MCFG_MCS48_PORT_P1_IN_CB(READ8(abc800_keyboard_device, kb_p1_r))
 	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(abc800_keyboard_device, kb_p1_w))
 	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(abc800_keyboard_device, kb_p2_w))
 	MCFG_MCS48_PORT_T1_IN_CB(READLINE(abc800_keyboard_device, kb_t1_r))
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor abc800_keyboard_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( abc800_keyboard );
-}
 
 
 //-------------------------------------------------

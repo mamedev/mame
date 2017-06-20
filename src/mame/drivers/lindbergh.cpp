@@ -99,16 +99,16 @@ Ghost Squad Evolution                         ?                 ?              ^
 Harley Davidson: King of the Road             ?                 ?               ?
 Hummer                                        ?                 ?               DVP-0057B
 Hummer Extreme                                253-5508-????    ^317-????-COM    DVP-0079 ???
-Initial D Arcade Stage 4                      253-5508-0620     317-0620-COM    DVP-0019
-Initial D Arcade Stage 4 (rev A)              253-5508-0620     317-0620-COM    DVP-0019A
-Initial D Arcade Stage 4 (rev B)              253-5508-0620     317-0620-COM    DVP-0019B
-Initial D Arcade Stage 4 (rev C)              253-5508-0620     317-0620-COM   ^DVP-0019C
-Initial D Arcade Stage 4 (rev D)              253-5508-0620     317-0620-COM    DVP-0019D
-Initial D Arcade Stage 4 (rev G)              253-5508-0620     317-0620-COM    DVP-0019G
-Initial D4                                    253-5508-0486E    317-0486-COM    DVP-0030
-Initial D4 (rev B)                            253-5508-0486E    317-0486-COM    DVP-0030B
-Initial D4 (rev C)                            253-5508-0486E    317-0486-COM   ^DVP-0030C
-Initial D4 (rev D)                            253-5508-0486E    317-0486-COM   ^DVP-0030D
+Initial D Arcade Stage 4                      253-5508-0486J    317-0486-JPN    DVP-0019
+Initial D Arcade Stage 4 (rev A)              253-5508-0486J    317-0486-JPN    DVP-0019A
+Initial D Arcade Stage 4 (rev B)              253-5508-0486J    317-0486-JPN    DVP-0019B
+Initial D Arcade Stage 4 (rev C)              253-5508-0486J    317-0486-JPN   ^DVP-0019C
+Initial D Arcade Stage 4 (rev D)              253-5508-0486J    317-0486-JPN    DVP-0019D
+Initial D Arcade Stage 4 (rev G)              253-5508-0486J    317-0486-JPN    DVP-0019G
+Initial D4                                    253-5508-0486E    317-0486-EXP    DVP-0030
+Initial D4 (rev B)                            253-5508-0486E    317-0486-EXP    DVP-0030B
+Initial D4 (rev C)                            253-5508-0486E    317-0486-EXP   ^DVP-0030C
+Initial D4 (rev D)                            253-5508-0486E    317-0486-EXP   ^DVP-0030D
 Initial D Arcade Stage 5 (rev A)              ?                 ?               DVP-0070A
 Initial D Arcade Stage 5 EXP 2.0              ?                 ?               DVP-0075
 INFO STATION 2 (rev C)                        ?                 ?               DVP-0050C

@@ -51,20 +51,15 @@ DECLARE_DEVICE_TYPE(CXD8654Q,  cxd8654q_device)
 class psxgpu_device : public device_t
 {
 public:
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
 	// static configuration helpers
 	template <class Object> static devcb_base &set_vblank_handler(device_t &device, Object &&cb) { return downcast<psxgpu_device &>(device).m_vblank_handler.set_callback(std::forward<Object>(cb)); }
 	static void set_vram_size(device_t &device, int size) { downcast<psxgpu_device &>(device).vramSize = size; }
 
-	uint32_t update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE32_MEMBER( write );
 	DECLARE_READ32_MEMBER( read );
 	void dma_read( uint32_t *ram, uint32_t n_address, int32_t n_size );
 	void dma_write( uint32_t *ram, uint32_t n_address, int32_t n_size );
 	void lightgun_set( int, int );
-	void vblank(screen_device &screen, bool vblank_state);
-	DECLARE_PALETTE_INIT( psx );
 
 protected:
 	static constexpr unsigned MAX_LEVEL = 32;
@@ -77,6 +72,7 @@ protected:
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	int vramSize;
 
@@ -304,6 +300,10 @@ private:
 	uint16_t p_n_b1g1[ 0x10000 ];
 
 	devcb_write_line m_vblank_handler;
+
+	void vblank(screen_device &screen, bool vblank_state);
+	DECLARE_PALETTE_INIT( psx );
+	uint32_t update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 #if defined(PSXGPU_DEBUG_VIEWER) && PSXGPU_DEBUG_VIEWER
 	required_device<screen_device> m_screen;

@@ -95,19 +95,12 @@ public:
 	READ8_MEMBER( font_color_r );
 	WRITE8_MEMBER( font_color_w );
 	READ16_MEMBER( font_converted_r );
-	TIMER_DEVICE_CALLBACK_MEMBER( dma_timer_callback );
-	IRQ_CALLBACK_MEMBER(segacd_sub_int_callback);
-
-	TIMER_DEVICE_CALLBACK_MEMBER( irq3_timer_callback );
-	TIMER_DEVICE_CALLBACK_MEMBER( stamp_timer_callback );
-
-	void SegaCD_CDC_Do_DMA( int &dmacount, uint8_t *CDC_BUFFER, uint16_t &dma_addrc, uint16_t &destination );
 
 protected:
 	sega_segacd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	required_device<cpu_device> m_scdcpu;
 	required_device<rf5c68_device> m_rfsnd;
@@ -188,6 +181,14 @@ protected:
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	TIMER_DEVICE_CALLBACK_MEMBER( dma_timer_callback );
+	IRQ_CALLBACK_MEMBER(segacd_sub_int_callback);
+
+	TIMER_DEVICE_CALLBACK_MEMBER( irq3_timer_callback );
+	TIMER_DEVICE_CALLBACK_MEMBER( stamp_timer_callback );
+
+	void SegaCD_CDC_Do_DMA( int &dmacount, uint8_t *CDC_BUFFER, uint16_t &dma_addrc, uint16_t &destination );
 };
 
 

@@ -124,10 +124,10 @@ DISCRETE_SOUND_END
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( abc77 )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( abc77 )
+MACHINE_CONFIG_MEMBER( abc77_device::device_add_mconfig )
 	// keyboard cpu
 	MCFG_CPU_ADD(I8035_TAG, I8035, XTAL_4_608MHz)
 	MCFG_CPU_PROGRAM_MAP(abc77_map)
@@ -147,17 +147,6 @@ static MACHINE_CONFIG_START( abc77 )
 	MCFG_DISCRETE_INTF(abc77)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor abc77_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( abc77 );
-}
 
 
 //-------------------------------------------------

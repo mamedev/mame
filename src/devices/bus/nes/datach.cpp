@@ -202,14 +202,9 @@ uint8_t *nes_datach_rom_device::get_cart_base()
 }
 
 
-MACHINE_CONFIG_START( subcart_i2c_24c01 )
+MACHINE_CONFIG_MEMBER( nes_datach_24c01_device::device_add_mconfig )
 	MCFG_24C01_ADD("i2cmem")
 MACHINE_CONFIG_END
-
-machine_config_constructor nes_datach_24c01_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( subcart_i2c_24c01 );
-}
 
 
 //---------------------------------
@@ -373,16 +368,11 @@ static SLOT_INTERFACE_START(datach_cart)
 SLOT_INTERFACE_END
 
 
-MACHINE_CONFIG_START( bandai_datach )
+MACHINE_CONFIG_MEMBER( nes_datach_device::device_add_mconfig )
 	MCFG_BARCODE_READER_ADD("datach")
 	MCFG_DATACH_MINICART_ADD("datach_slot", datach_cart)
 	MCFG_24C02_ADD("i2cmem")
 MACHINE_CONFIG_END
-
-machine_config_constructor nes_datach_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( bandai_datach );
-}
 
 
 //-------------------------------------------------

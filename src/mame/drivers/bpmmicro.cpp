@@ -21,9 +21,9 @@
 *       286 based w/240 pin tech adapter integrated as a "mezzanine board", expandable ram:
 *           BP-1400/240 - uses a 30 OR 72 pin SIMM (some programmers may have
               the 30 pin SIMM socket populated) for up to 8MB? of ram
-*           BP-1400/84 - more or less a 1200/84 with expandable ram, very rare.
 *           Silicon Sculptor - custom firmware locked to Actel fpga/pld [1400?]
-              devices, may have a custom MB
+              devices, may have a custom MB; drives 84 pins (no third connector)
+              so probably "BP1400/84" based, i.e. a neutered BP-1400/240.
 *           Silicon Sculptor 6X - as above but 6 programmers ganged together
 *       486 based:
 *           BP-1600 - 486DX4 100Mhz based, uses a 72 pin SIMM for up to 16MB of
@@ -112,18 +112,18 @@
           the lower rightmost ic, from left to right then top to bottom
           and ic4 being the 93c46;
           The 74hct164s are chained in this order and drive the following pins:
-		  IC3: TODO: ADD ME
-		  IC2: "
-		  IC7: "
-		  IC5: "
-		  IC6: "
-		  IC1: "
-          
+          IC3: TODO: ADD ME
+          IC2: "
+          IC7: "
+          IC5: "
+          IC6: "
+          IC1: "
+
 *       Looking "through" the pcb from the top, the connectors are arranged
           as such:
 (note: J3 may be the wrong label, it could be J5)
 
-           ___J3___                                             ___J4___ 
+           ___J3___                                             ___J4___
    GND -- |A32  C32|                                           |A32  C32| -- GND
    VCC -- |A31  C31|                                           |A31  C31| <> J3 A03
 J4 C30 <> |A30  C30|                           ?Relay control? |A30  C30| <> J3 A30
@@ -333,10 +333,10 @@ static ADDRESS_MAP_START(i286_mem, AS_PROGRAM, 16, bpmmicro_state)
 	AM_RANGE(0x082200, 0x82201) AM_WRITE(unknown_82200_w)
 	AM_RANGE(0x084000, 0x84001) AM_READ(latch_84000_r) // GUESS: this is reading the octal latch
 	AM_RANGE(0x084002, 0x84003) AM_WRITE(latch_84002_w) // GUESS: this is clocking the CK pin on the octal latch from bit 0, dumping the contents of a serial in parallel out shifter into said latch
-	AM_RANGE(0x08400e, 0x8400f) AM_WRITE(unknown_8400e_w) 
-	AM_RANGE(0x084018, 0x84019) AM_WRITE(unknown_84018_w) 
+	AM_RANGE(0x08400e, 0x8400f) AM_WRITE(unknown_8400e_w)
+	AM_RANGE(0x084018, 0x84019) AM_WRITE(unknown_84018_w)
 	AM_RANGE(0x08401a, 0x8401b) AM_WRITE(unknown_8401a_w)
-	AM_RANGE(0x08401c, 0x8401d) AM_WRITE(eeprom_8401c_w) 
+	AM_RANGE(0x08401c, 0x8401d) AM_WRITE(eeprom_8401c_w)
 	AM_RANGE(0x0f0000, 0x0fffff) AM_ROM AM_REGION("bios", 0x10000)
 	//AM_RANGE(0xfe0000, 0xffffff) AM_ROM AM_REGION("bios", 0) //?
 	AM_RANGE(0xfffff0, 0xffffff) AM_ROM AM_REGION("bios", 0x1fff0) //?
@@ -414,4 +414,4 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT     STATE           INIT         COMPANY              FULLNAME      FLAGS
-COMP( 1992, bp1200,     0,          0,      bpmmicro,   bpmmicro, bpmmicro_state, bp1200,      "BP Microsystems",   "BP-1200",    MACHINE_IS_SKELETON | MACHINE_NO_SOUND_HW )
+COMP( 1992, bp1200,     0,          0,      bpmmicro,   bpmmicro, bpmmicro_state, bp1200,      "BP Microsystems",   "BP-1200",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

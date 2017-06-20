@@ -30,26 +30,15 @@ DEFINE_DEVICE_TYPE(VIC20_SPEAKEASY, vic20_speakeasy_device, "vic20_speakeasy", "
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( speakeasy )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( speakeasy )
+MACHINE_CONFIG_MEMBER( vic20_speakeasy_device::device_add_mconfig )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD(SC01A_TAG, VOTRAX_SC01, 720000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.85)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor vic20_speakeasy_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( speakeasy );
-}
 
 
 

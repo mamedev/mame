@@ -121,6 +121,10 @@
 #include "emu.h"
 #include "hsgpl.h"
 
+DEFINE_DEVICE_TYPE_NS(TI99_HSGPL, bus::ti99::peb, snug_high_speed_gpl_device, "ti99_hsgpl", "SNUG High-speed GPL card")
+
+namespace bus { namespace ti99 { namespace peb {
+
 #define CRU_BASE 0x1B00
 #define SUPERCART_BASE 0x0800
 
@@ -141,31 +145,32 @@
 #define GROM_A_EEPROM "u1_grom"
 #define ROM6_EEPROM "u6_rom6"
 
-snug_high_speed_gpl_device::snug_high_speed_gpl_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ti_expansion_card_device(mconfig, TI99_HSGPL, tag, owner, clock),
-	  m_dsr_eeprom(*this, DSR_EEPROM),
-	  m_rom6_eeprom(*this, ROM6_EEPROM),
-	  m_grom_a_eeprom(*this, GROM_A_EEPROM),
-	  m_grom_b_eeprom(*this, GROM_B_EEPROM),
-	  m_ram6_memory(*this, RAM6_TAG),
-	  m_gram_memory(*this, GRAM_TAG),
-	  m_dsr_enabled(false),
-	  m_gram_enabled(false),
-	  m_bank_inhibit(false),
-	  m_dsr_page(0),
-	  m_card_enabled(false),
-	  m_write_enabled(false),
-	  m_supercart_enabled(false),
-	  m_led_on(false),
-	  m_mbx_enabled(false),
-	  m_ram_enabled(false),
-	  m_flash_mode(false),
-	  m_current_grom_port(0),
-	  m_current_bank(0),
-	  m_module_bank(0),
-	  m_waddr_LSB(false),
-	  m_raddr_LSB(false),
-	  m_grom_address(0)
+snug_high_speed_gpl_device::snug_high_speed_gpl_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, TI99_HSGPL, tag, owner, clock),
+	device_ti99_peribox_card_interface(mconfig, *this),
+	m_dsr_eeprom(*this, DSR_EEPROM),
+	m_rom6_eeprom(*this, ROM6_EEPROM),
+	m_grom_a_eeprom(*this, GROM_A_EEPROM),
+	m_grom_b_eeprom(*this, GROM_B_EEPROM),
+	m_ram6_memory(*this, RAM6_TAG),
+	m_gram_memory(*this, GRAM_TAG),
+	m_dsr_enabled(false),
+	m_gram_enabled(false),
+	m_bank_inhibit(false),
+	m_dsr_page(0),
+	m_card_enabled(false),
+	m_write_enabled(false),
+	m_supercart_enabled(false),
+	m_led_on(false),
+	m_mbx_enabled(false),
+	m_ram_enabled(false),
+	m_flash_mode(false),
+	m_current_grom_port(0),
+	m_current_bank(0),
+	m_module_bank(0),
+	m_waddr_LSB(false),
+	m_raddr_LSB(false),
+	m_grom_address(0)
 {
 }
 
@@ -691,7 +696,7 @@ INPUT_PORTS_START( ti99_hsgpl)
 		PORT_DIPSETTING(    0x01, "Normal" )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START( ti99_hsgpl )
+MACHINE_CONFIG_MEMBER( snug_high_speed_gpl_device::device_add_mconfig )
 	MCFG_AT29C040A_ADD( DSR_EEPROM )
 	MCFG_AT29C040A_ADD( GROM_B_EEPROM )
 	MCFG_AT29C040A_ADD( GROM_A_EEPROM )
@@ -704,14 +709,9 @@ MACHINE_CONFIG_START( ti99_hsgpl )
 	MCFG_RAM_DEFAULT_VALUE(0)
 MACHINE_CONFIG_END
 
-machine_config_constructor snug_high_speed_gpl_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( ti99_hsgpl );
-}
-
 ioport_constructor snug_high_speed_gpl_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(ti99_hsgpl);
 }
 
-DEFINE_DEVICE_TYPE(TI99_HSGPL, snug_high_speed_gpl_device, "ti99_hsgpl", "SNUG High-speed GPL card")
+} } } // end namespace bus::ti99::peb

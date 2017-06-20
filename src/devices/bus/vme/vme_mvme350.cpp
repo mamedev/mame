@@ -178,30 +178,23 @@ static ADDRESS_MAP_START( mvme350_mem, AS_PROGRAM, 16, vme_mvme350_card_device )
 //AM_RANGE(0xff0000, 0xffffff)  AM_READWRITE(vme_a16_r, vme_a16_w) /* VMEbus Rev B addresses (16 bits) - not verified */
 ADDRESS_MAP_END
 
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-MACHINE_CONFIG_START( mvme350 )
-	/* basic machine hardware */
-	MCFG_CPU_ADD (MVME350_CPU_TAG, M68010, XTAL_10MHz)
-	MCFG_CPU_PROGRAM_MAP (mvme350_mem)
-	/* PIT Parallel Interface and Timer device, assuming strapped for on board clock */
-	MCFG_DEVICE_ADD("pit", PIT68230, XTAL_16MHz / 2)
-MACHINE_CONFIG_END
-
 ROM_START( mvme350 )
 	ROM_REGION (0x20000, MVME350_ROM, 0)
 	ROM_LOAD16_BYTE ("mvme350U40v2.3.bin", 0x0001, 0x4000, CRC (bcef82ef) SHA1 (e6fdf26e4714cbaeb3e97d7b5acf02d64d8ad744))
 	ROM_LOAD16_BYTE ("mvme350U47v2.3.bin", 0x0000, 0x4000, CRC (582ce095) SHA1 (d0929dbfeb0cfda63df6b5bc29ee27fbf665def7))
 ROM_END
 
-machine_config_constructor vme_mvme350_card_device::device_mconfig_additions() const
-{
-	LOG("%s %s\n", tag(), FUNCNAME);
-	return MACHINE_CONFIG_NAME( mvme350 );
-}
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( vme_mvme350_card_device::device_add_mconfig )
+	/* basic machine hardware */
+	MCFG_CPU_ADD (MVME350_CPU_TAG, M68010, XTAL_10MHz)
+	MCFG_CPU_PROGRAM_MAP (mvme350_mem)
+	/* PIT Parallel Interface and Timer device, assuming strapped for on board clock */
+	MCFG_DEVICE_ADD("pit", PIT68230, XTAL_16MHz / 2)
+MACHINE_CONFIG_END
 
 const tiny_rom_entry *vme_mvme350_card_device::device_rom_region() const
 {

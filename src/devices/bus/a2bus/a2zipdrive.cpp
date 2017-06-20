@@ -33,10 +33,6 @@ DEFINE_DEVICE_TYPE(A2BUS_ZIPDRIVE, a2bus_zipdrive_device, "a2zipdrv", "Zip Techn
 #define ZIPDRIVE_ROM_REGION  "zipdrive_rom"
 #define ZIPDRIVE_ATA_TAG     "zipdrive_ata"
 
-static MACHINE_CONFIG_START( zipdrive )
-	MCFG_ATA_INTERFACE_ADD(ZIPDRIVE_ATA_TAG, ata_devices, "hdd", nullptr, false)
-MACHINE_CONFIG_END
-
 ROM_START( zipdrive )
 	ROM_REGION(0x2000, ZIPDRIVE_ROM_REGION, 0)
 	ROM_LOAD( "zip drive - rom.bin", 0x000000, 0x002000, CRC(fd800a40) SHA1(46636bfed88c864139e3d2826661908a8c07c459) )
@@ -47,14 +43,12 @@ ROM_END
 ***************************************************************************/
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor a2bus_zipdrivebase_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( zipdrive );
-}
+MACHINE_CONFIG_MEMBER( a2bus_zipdrivebase_device::device_add_mconfig )
+	MCFG_ATA_INTERFACE_ADD(ZIPDRIVE_ATA_TAG, ata_devices, "hdd", nullptr, false)
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region

@@ -89,8 +89,13 @@ image_manager::image_manager(running_machine &machine)
 				// retrieve image error message
 				std::string image_err = std::string(image.error());
 
-				// unload all images
-				unload_all();
+				// unload the bad image
+				image.unload();
+
+				// make sure it is removed from the ini file too
+				machine.options().image_options()[image.instance_name()] = "";
+				if (machine.options().write_config())
+					write_config(machine.options(), nullptr, &machine.system());
 
 				fatalerror_exitcode(machine, EMU_ERR_DEVICE, "Device %s load (%s) failed: %s",
 					image.device().name(),
@@ -212,7 +217,7 @@ void image_manager::options_extract()
 			if (image.exists())
 			{
 				if (image.loaded_through_softlist())
-					image_opt = util::string_format("%s:%s:%s", image.software_list_name(), image.full_software_name(), image.brief_instance_name());
+					image_opt = util::string_format("%s:%s", image.software_list_name(), image.full_software_name());
 				else
 					image_opt = image.filename();
 			}

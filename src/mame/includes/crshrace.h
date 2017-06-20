@@ -49,18 +49,12 @@ public:
 	int       m_flipscreen;
 	uint32_t crshrace_tile_callback( uint32_t code );
 
-	/* misc */
-	int m_pending_command;
-
 	/* devices */
 	DECLARE_WRITE8_MEMBER(crshrace_sh_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(sound_command_w);
-	DECLARE_WRITE8_MEMBER(pending_command_clear_w);
 	DECLARE_WRITE16_MEMBER(crshrace_videoram1_w);
 	DECLARE_WRITE16_MEMBER(crshrace_videoram2_w);
 	DECLARE_WRITE16_MEMBER(crshrace_roz_bank_w);
 	DECLARE_WRITE16_MEMBER(crshrace_gfxctrl_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(country_sndpending_r);
 	DECLARE_DRIVER_INIT(crshrace2);
 	DECLARE_DRIVER_INIT(crshrace);
 	TILE_GET_INFO_MEMBER(get_tile_info1);

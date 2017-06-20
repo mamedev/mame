@@ -269,20 +269,15 @@ void ata_interface_device::device_start()
 	}
 }
 
-static MACHINE_CONFIG_START( ata_interface )
+
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( ata_interface_device::device_add_mconfig )
 	MCFG_DEVICE_ADD( "0", ATA_SLOT, 0 )
 	MCFG_DEVICE_ADD( "1", ATA_SLOT, 0 )
 MACHINE_CONFIG_END
-
-//-------------------------------------------------
-//  machine_config_additions - return a pointer to
-//  the device's machine fragment
-//-------------------------------------------------
-
-machine_config_constructor ata_interface_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( ata_interface );
-}
 
 
 //**************************************************************************

@@ -45,25 +45,20 @@ ROM_START( mp1805 )
 	ROM_LOAD( "mp1805.rom", 0xf800, 0x0800, BAD_DUMP CRC(b532d8d9) SHA1(6f1160356d5bf64b5926b1fdb60db414edf65f22))
 ROM_END
 
-MACHINE_CONFIG_START( mp1805 )
-	MCFG_DEVICE_ADD( "mc6843", MC6843, 0 )
-	MCFG_MC6843_IRQ_CALLBACK(WRITELINE(bml3bus_mp1805_device, bml3_mc6843_intrq_w))
-	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(bml3_mp1805_floppy_interface)
-MACHINE_CONFIG_END
 
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor bml3bus_mp1805_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( mp1805 );
-}
+MACHINE_CONFIG_MEMBER( bml3bus_mp1805_device::device_add_mconfig )
+	MCFG_DEVICE_ADD( "mc6843", MC6843, 0 )
+	MCFG_MC6843_IRQ_CALLBACK(WRITELINE(bml3bus_mp1805_device, bml3_mc6843_intrq_w))
+	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(bml3_mp1805_floppy_interface)
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region

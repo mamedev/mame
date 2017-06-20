@@ -19,15 +19,6 @@ ROM_START( dmv_k806 )
 	ROM_LOAD( "dmv_mouse_8741a.bin", 0x0000, 0x0400, CRC(2163737a) SHA1(b82c14dba6c25cb1f60cf623989ca8c0c1ee4cc3))
 ROM_END
 
-static MACHINE_CONFIG_START( dmv_k806 )
-	MCFG_CPU_ADD("mcu", I8741, XTAL_6MHz)
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(dmv_k806_device, port1_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(dmv_k806_device, port2_w))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(dmv_k806_device, portt1_r))
-
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("mouse_timer", dmv_k806_device, mouse_timer, attotime::from_hz(1000))
-MACHINE_CONFIG_END
-
 static INPUT_PORTS_START( dmv_k806 )
 	PORT_START("JUMPERS")
 	PORT_DIPNAME( 0x7f, 0x24, "K806 IFSEL" )  PORT_DIPLOCATION("J:!1,J:!2,J:!3,J:!4,J:!5,J:!6,J:!7")
@@ -106,14 +97,17 @@ void dmv_k806_device::device_reset()
 }
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor dmv_k806_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( dmv_k806 );
-}
+MACHINE_CONFIG_MEMBER( dmv_k806_device::device_add_mconfig )
+	MCFG_CPU_ADD("mcu", I8741, XTAL_6MHz)
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(dmv_k806_device, port1_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(dmv_k806_device, port2_w))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(dmv_k806_device, portt1_r))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("mouse_timer", dmv_k806_device, mouse_timer, attotime::from_hz(1000))
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  input_ports - device-specific input ports

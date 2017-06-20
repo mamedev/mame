@@ -531,13 +531,15 @@ public:
 	READ8_MEMBER(ati_port_ext_r);
 	WRITE8_MEMBER(ati_port_ext_w);
 
-	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual uint16_t offset() override;
 
 	mach8_device* get_8514() { return m_8514; }
 protected:
 	ati_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
 private:
 	void ati_define_video_mode();
 	struct
@@ -572,7 +574,6 @@ public:
 
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 
-	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual TIMER_CALLBACK_MEMBER(vblank_timer_cb) override;
 
 	ibm8514a_device* get_8514() { return m_8514; }
@@ -583,6 +584,8 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
 	struct
 	{
 		uint8_t memory_config;

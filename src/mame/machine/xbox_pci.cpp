@@ -682,12 +682,6 @@ DEVICE_ADDRESS_MAP_START(mcpx_ide_io, 32, mcpx_ide_device)
 	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE("ide", bus_master_ide_controller_device, bmdma_r, bmdma_w)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START(mcpx_ide)
-	MCFG_DEVICE_ADD("ide", BUS_MASTER_IDE_CONTROLLER, 0)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(mcpx_ide_device, ide_interrupt))
-	MCFG_BUS_MASTER_IDE_CONTROLLER_SPACE("maincpu", AS_PROGRAM)
-MACHINE_CONFIG_END
-
 mcpx_ide_device::mcpx_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, MCPX_IDE, tag, owner, clock),
 	m_interrupt_handler(*this)
@@ -707,10 +701,11 @@ void mcpx_ide_device::device_reset()
 	pci_device::device_reset();
 }
 
-machine_config_constructor mcpx_ide_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME(mcpx_ide);
-}
+MACHINE_CONFIG_MEMBER(mcpx_ide_device::device_add_mconfig)
+	MCFG_DEVICE_ADD("ide", BUS_MASTER_IDE_CONTROLLER, 0)
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(mcpx_ide_device, ide_interrupt))
+	MCFG_BUS_MASTER_IDE_CONTROLLER_SPACE("maincpu", AS_PROGRAM)
+MACHINE_CONFIG_END
 
 WRITE_LINE_MEMBER(mcpx_ide_device::ide_interrupt)
 {

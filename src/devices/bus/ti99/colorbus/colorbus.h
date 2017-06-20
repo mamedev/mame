@@ -18,7 +18,9 @@
 
 #include "video/v9938.h"
 
-DECLARE_DEVICE_TYPE(TI99_COLORBUS, ti99_colorbus_device)
+namespace bus { namespace ti99 { namespace colorbus {
+
+class ti99_colorbus_device;
 
 /********************************************************************
     Common parent class of all devices attached to the color bus
@@ -55,10 +57,14 @@ private:
 	bool m_left_button_pressed;
 };
 
+} } } // end namespace bus::ti99::colorbus
+
 SLOT_INTERFACE_EXTERN(ti99_colorbus_port);
 
 #define MCFG_COLORBUS_MOUSE_ADD( _tag )  \
 	MCFG_DEVICE_ADD(_tag, TI99_COLORBUS, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(ti99_colorbus_port, "busmouse", false)
+
+DECLARE_DEVICE_TYPE_NS(TI99_COLORBUS, bus::ti99::colorbus, ti99_colorbus_device)
 
 #endif // MAME_BUS_TI99_COLORBUS_COLORBUS_H

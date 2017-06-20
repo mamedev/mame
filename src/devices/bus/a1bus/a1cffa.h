@@ -28,10 +28,6 @@ public:
 	// construction/destruction
 	a1bus_cffa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-
 	DECLARE_READ8_MEMBER(cffa_r);
 	DECLARE_WRITE8_MEMBER(cffa_w);
 
@@ -40,6 +36,9 @@ protected:
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	required_device<ata_interface_device> m_ata;
 

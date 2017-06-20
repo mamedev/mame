@@ -77,9 +77,7 @@ md_seprom_mm96_device::md_seprom_mm96_device(const machine_config &mconfig, cons
 //-------------------------------------------------
 
 // MD_SEPROM_CODEMAST
-MACHINE_CONFIG_START( md_i2c_24c08 )
-	MCFG_24C08_ADD("i2cmem")
-MACHINE_CONFIG_END
+
 
 // MD_SEPROM_MM96
 MACHINE_CONFIG_START( md_i2c_24c16a )
@@ -88,19 +86,16 @@ MACHINE_CONFIG_END
 
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor md_seprom_codemast_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( md_i2c_24c08 );
-}
+MACHINE_CONFIG_MEMBER( md_seprom_codemast_device::device_add_mconfig )
+	MCFG_24C08_ADD("i2cmem")
+MACHINE_CONFIG_END
 
-machine_config_constructor md_seprom_mm96_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( md_i2c_24c16a );
-}
+MACHINE_CONFIG_MEMBER( md_seprom_mm96_device::device_add_mconfig )
+	MCFG_24C16A_ADD("i2cmem")
+MACHINE_CONFIG_END
 
 
 static INPUT_PORTS_START( jcart_ipt )

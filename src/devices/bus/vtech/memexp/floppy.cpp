@@ -41,24 +41,19 @@ const tiny_rom_entry *vtech_floppy_controller_device::device_rom_region() const
 }
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
 static SLOT_INTERFACE_START( laser_floppies )
 	SLOT_INTERFACE("525", FLOPPY_525_SSSD)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( floppy_controller )
+MACHINE_CONFIG_MEMBER( vtech_floppy_controller_device::device_add_mconfig )
 	MCFG_MEMEXP_SLOT_ADD("mem")
 	MCFG_FLOPPY_DRIVE_ADD("0", laser_floppies, "525", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("1", laser_floppies, "525", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
 
-machine_config_constructor vtech_floppy_controller_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( floppy_controller );
-}
 
 //**************************************************************************
 //  LIVE DEVICE

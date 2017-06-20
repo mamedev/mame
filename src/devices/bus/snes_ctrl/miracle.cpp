@@ -23,17 +23,12 @@
 DEFINE_DEVICE_TYPE(SNES_MIRACLE, snes_miracle_device, "snes_miracle", "Miracle Piano SNES Cable")
 
 
-MACHINE_CONFIG_START( snes_miracle )
+MACHINE_CONFIG_MEMBER( snes_miracle_device::device_add_mconfig )
 	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
 	MCFG_MIDI_RX_HANDLER(WRITELINE(snes_miracle_device, rx_w))
 
 	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
 MACHINE_CONFIG_END
-
-machine_config_constructor snes_miracle_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( snes_miracle );
-}
 
 
 //-------------------------------------------------

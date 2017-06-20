@@ -301,7 +301,7 @@ void validity_checker::validate_one(const game_driver &driver)
 		machine_config config(driver, m_blank_options);
 		m_current_config = &config;
 		validate_driver();
-		validate_roms();
+		validate_roms(m_current_config->root_device());
 		validate_inputs();
 		validate_devices();
 		m_current_config = nullptr;
@@ -1424,8 +1424,16 @@ void validity_checker::validate_driver()
 
 	// make sure sound-less drivers are flagged
 	sound_interface_iterator iter(m_current_config->root_device());
-	if ((m_current_driver->flags & MACHINE_IS_BIOS_ROOT) == 0 && iter.first() == nullptr && (m_current_driver->flags & MACHINE_NO_SOUND) == 0 && (m_current_driver->flags & MACHINE_NO_SOUND_HW) == 0)
+	if ((m_current_driver->flags & MACHINE_IS_BIOS_ROOT) == 0 && !iter.first() && (m_current_driver->flags & (MACHINE_NO_SOUND | MACHINE_NO_SOUND_HW)) == 0)
 		osd_printf_error("Driver is missing MACHINE_NO_SOUND flag\n");
+
+	// catch invalid flag combinations
+	if ((m_current_driver->flags & MACHINE_WRONG_COLORS) && (m_current_driver->flags & MACHINE_IMPERFECT_COLORS))
+		osd_printf_error("Driver cannot have colours that are both completely wrong and imperfect\n");
+	if ((m_current_driver->flags & MACHINE_NO_SOUND_HW) && (m_current_driver->flags & (MACHINE_NO_SOUND | MACHINE_IMPERFECT_SOUND)))
+		osd_printf_error("Machine without sound hardware cannot have unemulated sound\n");
+	if ((m_current_driver->flags & MACHINE_NO_SOUND) && (m_current_driver->flags & MACHINE_IMPERFECT_SOUND))
+		osd_printf_error("Driver cannot have sound emulation that's both imperfect and not present\n");
 }
 
 
@@ -1433,10 +1441,10 @@ void validity_checker::validate_driver()
 //  validate_roms - validate ROM definitions
 //-------------------------------------------------
 
-void validity_checker::validate_roms()
+void validity_checker::validate_roms(device_t &root)
 {
 	// iterate, starting with the driver's ROMs and continuing with device ROMs
-	for (device_t &device : device_iterator(m_current_config->root_device()))
+	for (device_t &device : device_iterator(root))
 	{
 		// track the current device
 		m_current_device = &device;
@@ -1823,6 +1831,59 @@ void validity_checker::validate_devices()
 
 		// done with this device
 		m_current_device = nullptr;
+
+		// if it's a slot, iterate over possible cards (don't recurse, or you'll stack infinite tee connectors)
+		device_slot_interface *const slot = dynamic_cast<device_slot_interface *>(&device);
+		if (slot != nullptr && !slot->fixed())
+		{
+			for (auto &option : slot->option_list())
+			{
+				// the default option is already instantiated here, so don't try adding it again
+				if (slot->default_option() != nullptr && option.first == slot->default_option())
+					continue;
+
+				device_t *const card = m_current_config->device_add(&slot->device(), option.second->name(), option.second->devtype(), option.second->clock());
+
+				const char *const def_bios = option.second->default_bios();
+				if (def_bios)
+					device_t::static_set_default_bios_tag(*card, def_bios);
+				machine_config_constructor const additions = option.second->machine_config();
+				if (additions)
+					(*additions)(*m_current_config, card, card);
+
+				for (device_slot_interface &subslot : slot_interface_iterator(*card))
+				{
+					if (subslot.fixed())
+					{
+						device_slot_option const *const suboption = subslot.option(subslot.default_option());
+						if (suboption)
+						{
+							device_t *const sub_card = m_current_config->device_add(&subslot.device(), suboption->name(), suboption->devtype(), suboption->clock());
+							const char *const sub_bios = suboption->default_bios();
+							if (sub_bios)
+								device_t::static_set_default_bios_tag(*sub_card, sub_bios);
+							machine_config_constructor const sub_additions = suboption->machine_config();
+							if (sub_additions)
+								(*sub_additions)(*m_current_config, sub_card, sub_card);
+						}
+					}
+				}
+
+				for (device_t &card_dev : device_iterator(*card))
+					card_dev.config_complete();
+				validate_roms(*card);
+
+				for (device_t &card_dev : device_iterator(*card))
+				{
+					m_current_device = &card_dev;
+					card_dev.findit(true);
+					card_dev.validity_check(*this);
+					m_current_device = nullptr;
+				}
+
+				m_current_config->device_remove(&slot->device(), option.second->name());
+			}
+		}
 	}
 }
 

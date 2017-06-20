@@ -46,6 +46,10 @@
 #include "bwg.h"
 #include "formats/ti99_dsk.h"
 
+DEFINE_DEVICE_TYPE_NS(TI99_BWG, bus::ti99::peb, snug_bwg_device, "ti99_bwg", "SNUG BwG Floppy Controller")
+
+namespace bus { namespace ti99 { namespace peb {
+
 // ----------------------------------
 // Flags for debugging
 
@@ -82,8 +86,9 @@
     Modern implementation
 */
 
-snug_bwg_device::snug_bwg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ti_expansion_card_device(mconfig, TI99_BWG, tag, owner, clock),
+snug_bwg_device::snug_bwg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock):
+	  device_t(mconfig, TI99_BWG, tag, owner, clock),
+	  device_ti99_peribox_card_interface(mconfig, *this),
 	  m_DRQ(), m_IRQ(), m_dip1(0), m_dip2(0), m_dip34(0), m_ram_page(0),
 	  m_rom_page(0), m_WAITena(false), m_inDsrArea(false), m_WDsel(false),
 	  m_WDsel0(false), m_RTCsel(false), m_lastK(false), m_dataregLB(false),
@@ -560,7 +565,7 @@ void snug_bwg_device::set_floppy_motors_running(bool run)
 void snug_bwg_device::device_start()
 {
 	logerror("bwg: BWG start\n");
-	m_dsrrom = memregion(DSRROM)->base();
+	m_dsrrom = memregion(TI99_DSRROM)->base();
 	m_motor_on_timer = timer_alloc(MOTOR_TIMER);
 	m_cru_base = 0x1100;
 
@@ -683,7 +688,12 @@ static SLOT_INTERFACE_START( bwg_floppies )
 	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )          // 80 tracks
 SLOT_INTERFACE_END
 
-MACHINE_CONFIG_START( bwg_fdc )
+ROM_START( bwg_fdc )
+	ROM_REGION(0x8000, TI99_DSRROM, 0)
+	ROM_LOAD("bwg_dsr.u15", 0x0000, 0x8000, CRC(06f1ec89) SHA1(6ad77033ed268f986d9a5439e65f7d391c4b7651)) /* BwG disk DSR ROM */
+ROM_END
+
+MACHINE_CONFIG_MEMBER( snug_bwg_device::device_add_mconfig )
 	MCFG_WD1773_ADD(FDC_TAG, XTAL_8MHz)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(snug_bwg_device, fdc_irq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(snug_bwg_device, fdc_drq_w))
@@ -706,16 +716,6 @@ MACHINE_CONFIG_START( bwg_fdc )
 	MCFG_RAM_DEFAULT_VALUE(0)
 MACHINE_CONFIG_END
 
-ROM_START( bwg_fdc )
-	ROM_REGION(0x8000, DSRROM, 0)
-	ROM_LOAD("bwg_dsr.u15", 0x0000, 0x8000, CRC(06f1ec89) SHA1(6ad77033ed268f986d9a5439e65f7d391c4b7651)) /* BwG disk DSR ROM */
-ROM_END
-
-machine_config_constructor snug_bwg_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( bwg_fdc );
-}
-
 ioport_constructor snug_bwg_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( bwg_fdc );
@@ -726,4 +726,4 @@ const tiny_rom_entry *snug_bwg_device::device_rom_region() const
 	return ROM_NAME( bwg_fdc );
 }
 
-DEFINE_DEVICE_TYPE(TI99_BWG, snug_bwg_device, "ti99_bwg", "SNUG BwG Floppy Controller")
+} } } // end namespace bus::ti99::peb

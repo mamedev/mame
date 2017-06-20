@@ -1015,17 +1015,3 @@ WRITE8_MEMBER(nes_cart_slot_device::write_ex)
 		m_cart->set_open_bus(((offset + 0x4020) & 0xff00) >> 8);
 	}
 }
-
-
-//-------------------------------------------------
-//  partial hash function to be used by
-//  device_image_partialhash_func
-//-------------------------------------------------
-
-void nes_partialhash(util::hash_collection &dest, const unsigned char *data,
-						unsigned long length, const char *functions)
-{
-	if (length <= 16)
-		return;
-	dest.compute(&data[16], length - 16, functions);
-}

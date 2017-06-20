@@ -22,18 +22,20 @@ public:
 	// construction/destruction
 	isa8_gblaster_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
 	DECLARE_READ8_MEMBER(saa1099_16_r);
 	DECLARE_WRITE8_MEMBER(saa1099_1_16_w);
 	DECLARE_WRITE8_MEMBER(saa1099_2_16_w);
 	DECLARE_READ8_MEMBER(detect_r);
 	DECLARE_WRITE8_MEMBER(detect_w);
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+
 private:
 	// internal state
 	required_device<saa1099_device> m_saa1099_1;

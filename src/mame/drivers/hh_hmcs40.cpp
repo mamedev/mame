@@ -1763,8 +1763,6 @@ MACHINE_CONFIG_END
   shaped like a glossy black pyramid. Star Trek fans will recognize it as
   a prop used in TNG Ten Forward.
 
-  note: MAME external artwork is not needed for this game
-
 ***************************************************************************/
 
 class pairmtch_state : public hh_hmcs40_state

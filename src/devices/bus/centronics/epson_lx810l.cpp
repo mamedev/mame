@@ -106,10 +106,10 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( epson_lx810l )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( epson_lx810l )
+MACHINE_CONFIG_MEMBER( epson_lx810l_device::device_add_mconfig )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", UPD7810, XTAL_14_7456MHz)
 	MCFG_CPU_PROGRAM_MAP(lx810l_mem)
@@ -171,16 +171,6 @@ static MACHINE_CONFIG_START( epson_lx810l )
 	MCFG_STEPPER_INIT_PHASE(2)
 
 MACHINE_CONFIG_END
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor epson_lx810l_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( epson_lx810l );
-}
 
 
 /***************************************************************************
@@ -323,6 +313,8 @@ epson_ap2000_device::epson_ap2000_device(const machine_config &mconfig, const ch
 
 void epson_lx810l_device::device_start()
 {
+	m_cr_timer = timer_alloc(TIMER_CR);
+
 	machine().first_screen()->register_screen_bitmap(m_bitmap);
 	m_bitmap.fill(0xffffff); /* Start with a clean white piece of paper */
 }
@@ -354,7 +346,7 @@ void epson_lx810l_device::device_timer(emu_timer &timer, device_timer_id id, int
 		m_real_cr_pos += param;
 		m_real_cr_steps--;
 		if (m_real_cr_steps)
-			timer_set(attotime::from_usec(400), TIMER_CR, m_real_cr_dir);
+			m_cr_timer->adjust(attotime::from_usec(400), m_real_cr_dir);
 		break;
 	}
 }
@@ -526,7 +518,7 @@ WRITE8_MEMBER( epson_lx810l_device::cr_stepper )
 	}
 
 	if (!m_real_cr_steps)
-		timer_set(attotime::from_usec(400), TIMER_CR, m_real_cr_dir);
+		m_cr_timer->adjust(attotime::from_usec(400), m_real_cr_dir);
 	m_real_cr_steps++;
 
 	LX810LLOG("%s: %s(%02x); abs %d\n", machine().describe_context(), __func__, data, m_cr_pos_abs);

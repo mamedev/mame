@@ -22,9 +22,9 @@
 #include "machine/wd_fdc.h"
 #include "machine/ram.h"
 
-DECLARE_DEVICE_TYPE(TI99_BWG, snug_bwg_device)
+namespace bus { namespace ti99 { namespace peb {
 
-class snug_bwg_device : public ti_expansion_card_device
+class snug_bwg_device : public device_t, public device_ti99_peribox_card_interface
 {
 public:
 	snug_bwg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -36,22 +36,22 @@ public:
 	DECLARE_READ8Z_MEMBER(crureadz) override;
 	DECLARE_WRITE8_MEMBER(cruwrite) override;
 
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
-
-	DECLARE_WRITE_LINE_MEMBER( fdc_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
-
 protected:
 	void device_start() override;
 	void device_reset() override;
 	void device_config_complete() override;
 
 	const tiny_rom_entry *device_rom_region() const override;
-	machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	ioport_constructor device_input_ports() const override;
 
 private:
 	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
+
+	DECLARE_WRITE_LINE_MEMBER( fdc_irq_w );
+	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
 
 	// Debugger accessors
 	void debug_read(offs_t offset, uint8_t* value);
@@ -138,5 +138,9 @@ private:
 	// Link to the real-time clock on the board.
 	required_device<mm58274c_device> m_clock;
 };
+
+} } } // end namespace bus::ti99::peb
+
+DECLARE_DEVICE_TYPE_NS(TI99_BWG, bus::ti99::peb, snug_bwg_device)
 
 #endif // MAME_BUS_TI99_PED_BWG_H

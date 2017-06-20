@@ -527,14 +527,14 @@ ROM_START( gtrak10 )  // Unknown size, assumed 2K Bytes
     ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 
     ROM_REGION( 0x0800, "racetrack", ROMREGION_ERASE00 )
-    ROM_LOAD( "74168.k5",     0x0000, 0x0800, NO_DUMP) // Racetrack
+    ROM_LOAD( "74186.k5",     0x0000, 0x0800, NO_DUMP) // Racetrack, not actually a SN74186 but an Electronic Arrays, Inc. EA4800 16K (2048 x 8) ROM. TI TMS4800 clone (EA4800). Intentionally mislabeled by Atari.
 ROM_END
 
 ROM_START( gtrak20 )  // Unknown size, assumed 2K Bytes
     ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 
     ROM_REGION( 0x0800, "racetrack", ROMREGION_ERASE00 )
-    ROM_LOAD( "74168.k5",     0x0000, 0x0800, NO_DUMP) // Racetrack
+    ROM_LOAD( "74186.k5",     0x0000, 0x0800, NO_DUMP) // Racetrack, not actually a SN74186 but an Electronic Arrays, Inc. EA4800 16K (2048 x 8) ROM. TI TMS4800 clone (EA4800). Intentionally mislabeled by Atari.
 ROM_END
 
 ROM_START( lemans )

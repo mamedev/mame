@@ -24,16 +24,6 @@ static INPUT_PORTS_START( at_keybc )
 	PORT_DIPSETTING(    0x00, "Color/Graphics adapter" )
 INPUT_PORTS_END
 
-// machine fragment
-static MACHINE_CONFIG_START( at_keybc )
-	MCFG_CPU_ADD("at_keybc", I8042, DERIVED_CLOCK(1,1))
-	MCFG_MCS48_PORT_T0_IN_CB(READLINE(at_keyboard_controller_device, t0_r))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(at_keyboard_controller_device, t1_r))
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(at_keyboard_controller_device, p1_r))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(at_keyboard_controller_device, p2_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(at_keyboard_controller_device, p2_w))
-MACHINE_CONFIG_END
-
 // rom definition for the 8042 internal rom
 ROM_START( at_keybc )
 	ROM_REGION(0x800, "at_keybc", 0)
@@ -85,14 +75,17 @@ ioport_constructor at_keyboard_controller_device::device_input_ports() const
 }
 
 //-------------------------------------------------
-//  machine_config_additions - return a pointer to
-//  the device's machine fragment
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor at_keyboard_controller_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME(at_keybc);
-}
+MACHINE_CONFIG_MEMBER( at_keyboard_controller_device::device_add_mconfig )
+	MCFG_CPU_ADD("at_keybc", I8042, DERIVED_CLOCK(1,1))
+	MCFG_MCS48_PORT_T0_IN_CB(READLINE(at_keyboard_controller_device, t0_r))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(at_keyboard_controller_device, t1_r))
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(at_keyboard_controller_device, p1_r))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(at_keyboard_controller_device, p2_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(at_keyboard_controller_device, p2_w))
+MACHINE_CONFIG_END
 
 /*-------------------------------------------------
     device_start - device-specific startup

@@ -31,18 +31,30 @@ public:
 	// construction/destruction
 	c1551_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	DECLARE_READ8_MEMBER( tpi0_r );
+	DECLARE_WRITE8_MEMBER( tpi0_w );
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 
+	// device_plus4_expansion_card_interface overrides
+	virtual uint8_t plus4_cd_r(address_space &space, offs_t offset, uint8_t data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h) override;
+	virtual void plus4_cd_w(address_space &space, offs_t offset, uint8_t data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h) override;
+
+private:
 	DECLARE_READ8_MEMBER( port_r );
 	DECLARE_WRITE8_MEMBER( port_w );
 
 	DECLARE_READ8_MEMBER( tcbm_data_r );
 	DECLARE_WRITE8_MEMBER( tcbm_data_w );
-	DECLARE_READ8_MEMBER( tpi0_r );
-	DECLARE_WRITE8_MEMBER( tpi0_w );
 	DECLARE_READ8_MEMBER( tpi0_pc_r );
 	DECLARE_WRITE8_MEMBER( tpi0_pc_w );
 
@@ -52,17 +64,6 @@ public:
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
-protected:
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-
-	// device_plus4_expansion_card_interface overrides
-	virtual uint8_t plus4_cd_r(address_space &space, offs_t offset, uint8_t data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h) override;
-	virtual void plus4_cd_w(address_space &space, offs_t offset, uint8_t data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h) override;
-
-private:
 	enum
 	{
 		LED_POWER = 0,

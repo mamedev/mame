@@ -31,15 +31,11 @@ void nscsi_cdrom_device::device_reset()
 	cur_lba = -1;
 }
 
-static MACHINE_CONFIG_START(scsi_cdrom)
+MACHINE_CONFIG_MEMBER(nscsi_cdrom_device::device_add_mconfig)
 	MCFG_CDROM_ADD("image")
 	MCFG_CDROM_INTERFACE("cdrom")
 MACHINE_CONFIG_END
 
-machine_config_constructor nscsi_cdrom_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME(scsi_cdrom);
-}
 
 uint8_t nscsi_cdrom_device::scsi_get_data(int id, int pos)
 {

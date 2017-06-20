@@ -15,12 +15,6 @@
 
 #define ym3812_StdClock 3579545
 
-static MACHINE_CONFIG_START( adlib_config )
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ym3812", YM3812, ym3812_StdClock)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 3.00)
-MACHINE_CONFIG_END
-
 READ8_MEMBER( isa8_adlib_device::ym3812_16_r )
 {
 	uint8_t retVal = 0xff;
@@ -47,14 +41,14 @@ WRITE8_MEMBER( isa8_adlib_device::ym3812_16_w )
 DEFINE_DEVICE_TYPE(ISA8_ADLIB, isa8_adlib_device, "isa_adlib", "Ad Lib Sound Card")
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor isa8_adlib_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( adlib_config );
-}
+MACHINE_CONFIG_MEMBER( isa8_adlib_device::device_add_mconfig )
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("ym3812", YM3812, ym3812_StdClock)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 3.00)
+MACHINE_CONFIG_END
 
 //**************************************************************************
 //  LIVE DEVICE

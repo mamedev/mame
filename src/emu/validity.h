@@ -44,7 +44,7 @@ public:
 
 	// helpers for devices
 	void validate_tag(const char *tag);
-	int region_length(const char *tag) { return m_region_map.find(tag)->second; }
+	int region_length(const char *tag) { auto i = m_region_map.find(tag); return i == m_region_map.end() ? 0 : i->second; }
 
 	// generic registry of already-checked stuff
 	bool already_checked(const char *string) { return !m_already_checked.insert(string).second; }
@@ -73,7 +73,7 @@ private:
 	void validate_inlines();
 	void validate_rgb();
 	void validate_driver();
-	void validate_roms();
+	void validate_roms(device_t &root);
 	void validate_analog_input_field(ioport_field &field);
 	void validate_dip_settings(ioport_field &field);
 	void validate_condition(ioport_condition &condition, device_t &device, std::unordered_set<std::string> &port_map);
@@ -114,7 +114,7 @@ private:
 
 	// current state
 	const game_driver *     m_current_driver;
-	const machine_config *  m_current_config;
+	machine_config *        m_current_config;
 	const device_t *        m_current_device;
 	const char *            m_current_ioport;
 	int_map                 m_region_map;

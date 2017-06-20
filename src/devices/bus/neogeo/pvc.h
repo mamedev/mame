@@ -19,8 +19,6 @@ public:
 	// construction/destruction
 	neogeo_pvc_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint16_t clock);
 
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
 	// reading and writing
 	virtual uint32_t get_bank_base(uint16_t sel) override { return m_pvc_prot->get_bank_base(); }
 	virtual DECLARE_READ16_MEMBER(protection_r) override { return m_pvc_prot->protection_r(space, offset, mem_mask); }
@@ -35,6 +33,8 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	required_device<cmc_prot_device> m_cmc_prot;
 	required_device<pcm2_prot_device> m_pcm2_prot;

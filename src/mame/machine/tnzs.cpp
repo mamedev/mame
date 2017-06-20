@@ -67,15 +67,12 @@ WRITE8_MEMBER(tnzs_mcu_state::mcu_port2_w)
 	m_input_select = data & 0xf;
 }
 
-// TODO: Eliminate this once arknoid2 MCU is dumped
-READ8_MEMBER(tnzs_base_state::analog_r)
+READ8_MEMBER(tnzs_mcu_state::analog_r)
 {
-	uint16_t val = ((offset & 2) ? m_an2 : m_an1).read_safe(0);
+	if (m_upd4701.found())
+		return m_upd4701->read_xy(space, offset);
 
-	if (offset & 1)
-		return val >> 8;
-
-	return val;
+	return 0;
 }
 
 void arknoid2_state::mcu_reset()
@@ -378,6 +375,10 @@ void arknoid2_state::machine_start()
 	save_item(NAME(m_mcu_credits));
 	save_item(NAME(m_mcu_reportcoin));
 	save_item(NAME(m_mcu_command));
+
+	// kludge to make device work with active-high coin inputs
+	m_upd4701->left_w(0);
+	m_upd4701->middle_w(0);
 }
 
 void kageki_state::machine_start()
@@ -412,6 +413,10 @@ WRITE8_MEMBER(arknoid2_state::bankswitch1_w)
 	tnzs_base_state::bankswitch1_w(space, offset, data, mem_mask);
 	if (data & 0x04)
 		mcu_reset();
+
+	// never actually written by arknoid2 (though code exists to do it)
+	m_upd4701->resetx_w(BIT(data, 5));
+	m_upd4701->resety_w(BIT(data, 5));
 }
 
 WRITE8_MEMBER(insectx_state::bankswitch1_w)
@@ -445,6 +450,13 @@ WRITE8_MEMBER(tnzs_mcu_state::bankswitch1_w)
 	tnzs_base_state::bankswitch1_w(space, offset, data, mem_mask);
 	if ((data & 0x04) != 0 && m_mcu != nullptr)
 		m_mcu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+
+	// written only at startup by plumppop?
+	if (m_upd4701.found())
+	{
+		m_upd4701->resetx_w(BIT(data, 5));
+		m_upd4701->resety_w(BIT(data, 5));
+	}
 }
 
 WRITE8_MEMBER(tnzs_base_state::bankswitch1_w)
@@ -463,8 +475,12 @@ void jpopnics_state::machine_reset()
 
 WRITE8_MEMBER(jpopnics_state::subbankswitch_w)
 {
-	/* bits 0-1 select ROM bank */
+	// bits 0-1 select ROM bank
 	m_subbank->set_entry(data & 0x03);
+
+	// written once at startup
+	m_upd4701->resetx_w(BIT(data, 5));
+	m_upd4701->resety_w(BIT(data, 5));
 }
 
 WRITE8_MEMBER(tnzsb_state::sound_command_w)

@@ -679,6 +679,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/sdf_dsk.h,FORMATS["SDF_DSK"] = true
+--------------------------------------------------
+
+if (FORMATS["SDF_DSK"]~=null  or _OPTIONS["with-tools"]) then
+	files {
+		MAME_DIR.. "src/lib/formats/sdf_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/sdf_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/ep64_dsk.h,FORMATS["EP64_DSK"] = true
 --------------------------------------------------
 

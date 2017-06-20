@@ -58,7 +58,7 @@ linear_flash_pccard_16mb_device::linear_flash_pccard_16mb_device(const machine_c
 	m_space_config = address_space_config("memory", ENDIANNESS_LITTLE, 16,  26, 0, *ADDRESS_MAP_NAME( linear_flash_pccard_16mb ) );
 }
 
-static MACHINE_CONFIG_START( linear_flash_pccard_16mb )
+MACHINE_CONFIG_MEMBER( linear_flash_pccard_16mb_device::device_add_mconfig )
 	MCFG_FUJITSU_29F016A_ADD("1l")
 	MCFG_FUJITSU_29F016A_ADD("1u")
 	MCFG_FUJITSU_29F016A_ADD("2l")
@@ -68,11 +68,6 @@ static MACHINE_CONFIG_START( linear_flash_pccard_16mb )
 	MCFG_FUJITSU_29F016A_ADD("4l")
 	MCFG_FUJITSU_29F016A_ADD("4u")
 MACHINE_CONFIG_END
-
-machine_config_constructor linear_flash_pccard_16mb_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( linear_flash_pccard_16mb );
-}
 
 
 static ADDRESS_MAP_START(linear_flash_pccard_32mb, AS_0, 16, linear_flash_pccard_32mb_device)
@@ -101,7 +96,7 @@ linear_flash_pccard_32mb_device::linear_flash_pccard_32mb_device(const machine_c
 	m_space_config = address_space_config("memory", ENDIANNESS_LITTLE, 16,  26, 0, *ADDRESS_MAP_NAME( linear_flash_pccard_32mb ) );
 }
 
-static MACHINE_CONFIG_START( linear_flash_pccard_32mb )
+MACHINE_CONFIG_MEMBER( linear_flash_pccard_32mb_device::device_add_mconfig )
 	MCFG_FUJITSU_29F016A_ADD("1l")
 	MCFG_FUJITSU_29F016A_ADD("1u")
 	MCFG_FUJITSU_29F016A_ADD("2l")
@@ -119,11 +114,6 @@ static MACHINE_CONFIG_START( linear_flash_pccard_32mb )
 	MCFG_FUJITSU_29F016A_ADD("8l")
 	MCFG_FUJITSU_29F016A_ADD("8u")
 MACHINE_CONFIG_END
-
-machine_config_constructor linear_flash_pccard_32mb_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( linear_flash_pccard_32mb );
-}
 
 
 static ADDRESS_MAP_START(linear_flash_pccard_64mb, AS_0, 16, linear_flash_pccard_64mb_device)
@@ -168,7 +158,7 @@ linear_flash_pccard_64mb_device::linear_flash_pccard_64mb_device(const machine_c
 	m_space_config = address_space_config("memory", ENDIANNESS_LITTLE, 16,  26, 0, *ADDRESS_MAP_NAME( linear_flash_pccard_64mb ) );
 }
 
-static MACHINE_CONFIG_START( linear_flash_pccard_64mb )
+MACHINE_CONFIG_MEMBER( linear_flash_pccard_64mb_device::device_add_mconfig )
 	MCFG_FUJITSU_29F016A_ADD("1l")
 	MCFG_FUJITSU_29F016A_ADD("1u")
 	MCFG_FUJITSU_29F016A_ADD("2l")
@@ -202,8 +192,3 @@ static MACHINE_CONFIG_START( linear_flash_pccard_64mb )
 	MCFG_FUJITSU_29F016A_ADD("16l")
 	MCFG_FUJITSU_29F016A_ADD("16u")
 MACHINE_CONFIG_END
-
-machine_config_constructor linear_flash_pccard_64mb_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( linear_flash_pccard_64mb );
-}

@@ -42,14 +42,14 @@ READ8_MEMBER( osborne1_state::bank_2xxx_3xxx_r )
 		data &= m_pia0->read(space, offset & 0x03);
 	if ((offset & 0xA00) == 0x200) // Keyboard
 	{
-		if (offset & 0x01) data &= m_keyb_row0->read();
-		if (offset & 0x02) data &= m_keyb_row1->read();
-		if (offset & 0x04) data &= m_keyb_row3->read();
-		if (offset & 0x08) data &= m_keyb_row4->read();
-		if (offset & 0x10) data &= m_keyb_row5->read();
-		if (offset & 0x20) data &= m_keyb_row2->read();
-		if (offset & 0x40) data &= m_keyb_row6->read();
-		if (offset & 0x80) data &= m_keyb_row7->read();
+		if (offset & 0x01) data &= m_keyb_row[0]->read();
+		if (offset & 0x02) data &= m_keyb_row[1]->read();
+		if (offset & 0x04) data &= m_keyb_row[3]->read();
+		if (offset & 0x08) data &= m_keyb_row[4]->read();
+		if (offset & 0x10) data &= m_keyb_row[5]->read();
+		if (offset & 0x20) data &= m_keyb_row[2]->read();
+		if (offset & 0x40) data &= m_keyb_row[6]->read();
+		if (offset & 0x80) data &= m_keyb_row[7]->read();
 	}
 	if ((offset & 0xA00) == 0xA00) // Serial
 	{

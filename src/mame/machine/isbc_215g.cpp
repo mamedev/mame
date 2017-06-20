@@ -350,7 +350,7 @@ WRITE_LINE_MEMBER(isbc_215g_device::isbx_irq_11_w)
 	m_isbx_irq[3] = state ? true : false;
 }
 
-static MACHINE_CONFIG_START( isbc_215g )
+MACHINE_CONFIG_MEMBER( isbc_215g_device::device_add_mconfig )
 	MCFG_CPU_ADD("u84", I8089, XTAL_15MHz / 3)
 	MCFG_CPU_PROGRAM_MAP(isbc_215g_mem)
 	MCFG_CPU_IO_MAP(isbc_215g_io)
@@ -367,10 +367,6 @@ static MACHINE_CONFIG_START( isbc_215g )
 	MCFG_ISBX_SLOT_MINTR1_CALLBACK(WRITELINE(isbc_215g_device, isbx_irq_11_w))
 MACHINE_CONFIG_END
 
-machine_config_constructor isbc_215g_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( isbc_215g );
-}
 
 ROM_START( isbc_215g )
 	ROM_REGION( 0x4000, "i8089", ROMREGION_ERASEFF )

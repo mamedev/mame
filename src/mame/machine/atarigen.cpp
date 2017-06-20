@@ -900,18 +900,12 @@ atari_eeprom_2804_device::atari_eeprom_2804_device(const machine_config &mconfig
 
 
 //-------------------------------------------------
-//  device_mconfig_additions - return machine
-//  config fragment
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(atari_eeprom_2804_config)
+MACHINE_CONFIG_MEMBER(atari_eeprom_2804_device::device_add_mconfig)
 	MCFG_EEPROM_2804_ADD("eeprom")
 MACHINE_CONFIG_END
-
-machine_config_constructor atari_eeprom_2804_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME(atari_eeprom_2804_config);
-}
 
 
 //-------------------------------------------------
@@ -925,19 +919,12 @@ atari_eeprom_2816_device::atari_eeprom_2816_device(const machine_config &mconfig
 
 
 //-------------------------------------------------
-//  device_mconfig_additions - return machine
-//  config fragment
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(atari_eeprom_2816_config)
+MACHINE_CONFIG_MEMBER(atari_eeprom_2816_device::device_add_mconfig)
 	MCFG_EEPROM_2816_ADD("eeprom")
 MACHINE_CONFIG_END
-
-machine_config_constructor atari_eeprom_2816_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME(atari_eeprom_2816_config);
-}
-
 
 
 /***************************************************************************

@@ -43,7 +43,7 @@ tms0270_cpu_device::tms0270_cpu_device(const machine_config &mconfig, const char
 
 
 // machine configs
-static MACHINE_CONFIG_START(tms0270)
+MACHINE_CONFIG_MEMBER(tms0270_cpu_device::device_add_mconfig)
 
 	// main opcodes PLA, microinstructions PLA, output PLA
 	MCFG_PLA_ADD("ipla", 9, 22, 24)
@@ -53,11 +53,6 @@ static MACHINE_CONFIG_START(tms0270)
 	MCFG_PLA_ADD("opla", 6, 16, 48)
 	MCFG_PLA_FILEFORMAT(BERKELEY)
 MACHINE_CONFIG_END
-
-machine_config_constructor tms0270_cpu_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME(tms0270);
-}
 
 
 // device_start/reset

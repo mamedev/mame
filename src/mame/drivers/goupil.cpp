@@ -1,29 +1,30 @@
 // license:BSD-3-Clause
-// copyright-holders:Jean-Francois DEL NERO
+// copyright-holders:Jean-François DEL NERO
 /***************************************************************************
 
-    SMT Goupil G1 driver
+    SMT Goupil G1 & G2 driver
 
     Current state :
 
     -> CPU / ROM / RAM working
-    -> Video output working
+    -> Video output working (G1: ef9364, G2: Visu 24x80 MC6845)
     -> Keyboard support working (need to be polished... )
     -> Floppy FDC not fully implemented.
     -> Sound support missing.
 
     Software :
     -> The Monitor is working
-    -> The internal Basic is working (-> 6800 0xC3 illegal opcode emulation needed).
+    -> The internal G1 Basic is working (-> 6800 0xC3 illegal opcode emulation needed).
 
     02/04/2016
-    Jean-Francois DEL NERO
+    Jean-François DEL NERO
 
 ****************************************************************************/
 
 #include "emu.h"
 
 #include "cpu/m6800/m6800.h"
+#include "machine/ram.h"
 #include "machine/6522via.h"
 #include "machine/6850acia.h"
 #include "machine/i8279.h"
@@ -34,6 +35,7 @@
 #include "screen.h"
 #include "softlist.h"
 
+#include "logmacro.h"
 
 #define MAIN_CLOCK           XTAL_4MHz
 #define VIDEO_CLOCK          MAIN_CLOCK / 8     /* 1.75 Mhz */
@@ -85,7 +87,7 @@ public:
 
 private:
 	required_device<acia6850_device> m_acia;
-	required_device<ef9364_device> m_ef9364;
+	optional_device<ef9364_device> m_ef9364;
 	required_device<cpu_device> m_maincpu;
 	required_device<via6522_device> m_via_video;
 	required_device<via6522_device> m_via_keyb;
@@ -94,6 +96,31 @@ private:
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	floppy_image_device *m_floppy;
+};
+
+class goupil_g2_state : public goupil_g1_state
+{
+public:
+
+	goupil_g2_state(const machine_config &mconfig, device_type type, const char *tag)
+		: goupil_g1_state(mconfig, type, tag),
+		m_palette(*this, "palette"),
+		m_visu24x80_ram(*this, RAM_TAG),
+		m_visu24x80_rom(*this, "visu_24x80")
+	{
+	}
+
+	MC6845_UPDATE_ROW(crtc_update_row);
+	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_update_addr_changed);
+
+	DECLARE_READ8_MEMBER(visu24x80_ram_r);
+	DECLARE_WRITE8_MEMBER(visu24x80_ram_w);
+
+protected:
+
+	required_device<palette_device> m_palette;
+	required_device<ram_device>     m_visu24x80_ram;
+	required_region_ptr<uint8_t>    m_visu24x80_rom;
 };
 
 /**********************************
@@ -112,30 +139,66 @@ TIMER_DEVICE_CALLBACK_MEMBER( goupil_g1_state::goupil_scanline )
 
 static ADDRESS_MAP_START(goupil_mem, AS_PROGRAM, 8, goupil_g1_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000,0x3fff) AM_RAM
-	AM_RANGE(0x4000,0x7fff) AM_RAM
-	AM_RANGE(0xC000,0xE3FF) AM_ROM AM_REGION("maincpu", 0x1000) // Basic ROM (BASIC 1 up to BASIC 9).
+	AM_RANGE(0x0000,0x3FFF) AM_RAM
+	AM_RANGE(0x4000,0x7FFF) AM_RAM
+	AM_RANGE(0xC000,0xE3FF) AM_ROM AM_REGION("maincpu", 0xC000) // Basic ROM (BASIC 1 up to BASIC 9).
 
-	AM_RANGE(0xe400,0xe7ff) AM_RAM
+	AM_RANGE(0xE400,0xE7FF) AM_RAM
 	AM_RANGE(0xE800,0xE80F) AM_DEVREADWRITE("ef6850", acia6850_device, data_r, data_w)
 	AM_RANGE(0xE810,0xE81F) AM_DEVREADWRITE("m_via_video", via6522_device, read, write)
 
-	AM_RANGE(0xe820, 0xe821) AM_DEVREADWRITE("i8279_kb1", i8279_device, read, write)
-	AM_RANGE(0xe830, 0xe831) AM_DEVREADWRITE("i8279_kb2", i8279_device, read, write)
+	AM_RANGE(0xE820,0xE820) AM_DEVREADWRITE("i8279_kb1", i8279_device, data_r, data_w )
+	AM_RANGE(0xE821,0xE821) AM_DEVREADWRITE("i8279_kb1", i8279_device, status_r, cmd_w )
+
+	AM_RANGE(0xE830,0xE830) AM_DEVREADWRITE("i8279_kb2", i8279_device, data_r, data_w )
+	AM_RANGE(0xE831,0xE831) AM_DEVREADWRITE("i8279_kb2", i8279_device, status_r, cmd_w )
 
 	AM_RANGE(0xE840,0xE84F) AM_DEVREADWRITE("m_via_keyb", via6522_device, read, write)
 
 	AM_RANGE(0xE860,0xE86F) AM_DEVREADWRITE("m_via_modem", via6522_device, read, write)
 
-	AM_RANGE(0xe8f0,0xe8ff) AM_DEVREADWRITE("fd1791", fd1791_device, read, write)
-	//AM_RANGE(0xf08a,0xf08a) AM_READWRITE( fdc_sel0_r, fdc_sel0_w )
-	//AM_RANGE(0xf08b,0xf08b) AM_READWRITE( fdc_sel1_r, fdc_sel1_w )
+	AM_RANGE(0xE8F0,0xE8FF) AM_DEVREADWRITE("fd1791", fd1791_device, read, write)
 
-	AM_RANGE(0xf400,0xf7ff) AM_ROM AM_REGION("maincpu", 0x0800) // Modem (MOD 3)
-	AM_RANGE(0xf800,0xffff) AM_ROM AM_REGION("maincpu", 0x0000) // Monitor (MON 1 + MON 2)
+	AM_RANGE(0xF000,0xF3FF) AM_ROM AM_REGION("maincpu", 0xF000)
+	AM_RANGE(0xF400,0xF7FF) AM_ROM AM_REGION("maincpu", 0xF400) // Modem (MOD 3)
+	AM_RANGE(0xF800,0xFFFF) AM_ROM AM_REGION("maincpu", 0xF800) // Monitor (MON 1 + MON 2)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( goupil_io, AS_IO, 8, goupil_g1_state)
+	ADDRESS_MAP_UNMAP_HIGH
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(goupil_g2_mem, AS_PROGRAM, 8, goupil_g2_state)
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000,0x3FFF) AM_RAM
+	AM_RANGE(0x4000,0x7FFF) AM_RAM
+	AM_RANGE(0x8000,0xE3FF) AM_RAM
+
+	AM_RANGE(0xE400,0xE7FF) AM_RAM
+
+	AM_RANGE(0xE800,0xE80F) AM_DEVREADWRITE("ef6850", acia6850_device, data_r, data_w)
+	AM_RANGE(0xE810,0xE81F) AM_DEVREADWRITE("m_via_video", via6522_device, read, write)
+
+	AM_RANGE(0xE820,0xE820) AM_DEVREADWRITE("i8279_kb1", i8279_device, data_r, data_w )
+	AM_RANGE(0xE821,0xE821) AM_DEVREADWRITE("i8279_kb1", i8279_device, status_r, cmd_w )
+
+	AM_RANGE(0xE830,0xE830) AM_DEVREADWRITE("i8279_kb2", i8279_device, data_r, data_w )
+	AM_RANGE(0xE831,0xE831) AM_DEVREADWRITE("i8279_kb2", i8279_device, status_r, cmd_w )
+
+	AM_RANGE(0xE840,0xE84F) AM_DEVREADWRITE("m_via_keyb", via6522_device, read, write)
+
+	AM_RANGE(0xE860,0xE86F) AM_DEVREADWRITE("m_via_modem", via6522_device, read, write)
+
+	AM_RANGE(0xE870,0xE870) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
+	AM_RANGE(0xE871,0xE871) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
+
+	AM_RANGE(0xE8F0,0xE8FF) AM_DEVREADWRITE("fd1791", fd1791_device, read, write)
+	AM_RANGE(0xEC00,0xF3FF) AM_READWRITE(visu24x80_ram_r, visu24x80_ram_w)
+	AM_RANGE(0xF000,0xF7FF) AM_ROM AM_REGION("maincpu", 0xF000) // Monitor (MON 1)
+	AM_RANGE(0xF800,0xFFFF) AM_ROM AM_REGION("maincpu", 0xF800) // Monitor (MON 2)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( goupil_g2_io, AS_IO, 8, goupil_g2_state)
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
 
@@ -401,27 +464,66 @@ void goupil_g1_state::machine_reset()
 
 WRITE8_MEMBER(goupil_g1_state::via_video_pba_w)
 {
-	#ifdef DBGMODE
-	printf("%s: write via_video_pba_w reg : 0x%X\n",machine().describe_context(),data);
-	#endif
-	m_ef9364->char_latch_w(data);
+	LOG("%s: write via_video_pba_w reg : 0x%X\n",machine().describe_context(),data);
+
+	if(m_ef9364)
+		m_ef9364->char_latch_w(data);
 }
 
 WRITE8_MEMBER(goupil_g1_state::via_video_pbb_w)
 {
-	#ifdef DBGMODE
-	printf("%s: write via_video_pbb_w reg : 0x%X\n",machine().describe_context(),data);
-	#endif
+	LOG("%s: write via_video_pbb_w reg : 0x%X\n",machine().describe_context(),data);
+
 	via_video_pbb_data = data;
 }
 
 WRITE_LINE_MEMBER( goupil_g1_state::via_video_ca2_w )
 {
-	if(old_state_ca2==0 && state==1)
+	if(old_state_ca2==0 && state==1 && m_ef9364)
 	{
 		m_ef9364->command_w(via_video_pbb_data&0xF);
 	}
 	old_state_ca2 = state;
+}
+
+// Visu 24x80 video card update row.
+MC6845_UPDATE_ROW(goupil_g2_state::crtc_update_row)
+{
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	uint32_t *p = &bitmap.pix32(y);
+	for (uint8_t x = 0; x < x_count; ++x)
+	{
+		uint16_t const offset = ( 0x400 + ( ma + x ) ) & 0x7FF;
+		uint8_t const chr = m_visu24x80_ram->pointer()[offset];
+		uint8_t const gfx = m_visu24x80_rom[ ( ( chr & 0x7F ) << 4 ) + ra ];
+
+		for (unsigned bit = 0; 8 > bit; ++bit)
+		{
+			*p++ = palette[BIT(gfx, 7 - bit)];
+		}
+	}
+}
+
+MC6845_ON_UPDATE_ADDR_CHANGED(goupil_g2_state::crtc_update_addr_changed)
+{
+}
+
+WRITE8_MEMBER( goupil_g2_state::visu24x80_ram_w )
+{
+	LOG("%s: write visu24x80_ram_w mem : 0x%.4X <- 0x%X\n",machine().describe_context(),offset,data);
+
+	m_visu24x80_ram->pointer()[offset] = data;
+}
+
+READ8_MEMBER( goupil_g2_state::visu24x80_ram_r )
+{
+	uint8_t data;
+
+	data = m_visu24x80_ram->pointer()[offset];
+
+	LOG("%s: read visu24x80_ram_r 0x%.4X = 0x%.2X\n",machine().describe_context(),offset,data);
+
+	return data;
 }
 
 static MACHINE_CONFIG_START( goupil_g1 )
@@ -480,32 +582,116 @@ static MACHINE_CONFIG_START( goupil_g1 )
 
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_START( goupil_g2 )
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu",M6808, CPU_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(goupil_g2_mem)
+	MCFG_CPU_IO_MAP(goupil_g2_io)
+
+	/* sound hardware */
+	// TODO !
+
+	MCFG_DEVICE_ADD ("ef6850", ACIA6850, 0)
+
+	/* screen */
+	// "visu 24x80" board
+
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("2K")    // visu24x80 2K ram
+	
+	MCFG_SCREEN_ADD("screen" ,RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_NO_PALETTE
+	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
+
+	MCFG_SCREEN_SIZE((80*8), (24*(8+4)))
+	MCFG_SCREEN_VISIBLE_AREA(0, (80*8)-1, 0, (24*(8+4))-1)
+	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
+
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL_14_31818MHz/8)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_UPDATE_ROW_CB(goupil_g2_state, crtc_update_row)
+	MCFG_MC6845_ADDR_CHANGED_CB(goupil_g2_state, crtc_update_addr_changed)
+
+	MCFG_DEVICE_ADD("m_via_video", VIA6522, 0)
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(goupil_g2_state, via_video_pba_w))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(goupil_g2_state, via_video_pbb_w))
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE(goupil_g2_state, via_video_ca2_w))
+
+	MCFG_DEVICE_ADD("m_via_keyb", VIA6522, 0)
+	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M6808_IRQ_LINE))
+
+	MCFG_DEVICE_ADD("m_via_modem", VIA6522, 0)
+	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M6808_IRQ_LINE))
+
+	/* Floppy */
+	MCFG_FD1791_ADD("fd1791", XTAL_8MHz )
+	MCFG_FLOPPY_DRIVE_ADD("fd1791:0", goupil_floppies, "525qd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd1791:1", goupil_floppies, "525qd", floppy_image_device::default_floppy_formats)
+
+	MCFG_DEVICE_ADD("i8279_kb1", I8279, CPU_CLOCK)
+	MCFG_I8279_OUT_SL_CB(WRITE8(goupil_g2_state, scanlines_kbd1_w))           // scan SL lines
+	MCFG_I8279_IN_RL_CB(READ8(goupil_g2_state, kbd1_r))                         // kbd RL lines
+	MCFG_I8279_IN_SHIFT_CB(READ8(goupil_g2_state, shift_kb1_r))
+	MCFG_I8279_IN_CTRL_CB(READ8(goupil_g2_state, ctrl_kb1_r))
+	MCFG_I8279_OUT_IRQ_CB(DEVWRITELINE("m_via_keyb", via6522_device, write_ca1))
+
+	MCFG_DEVICE_ADD("i8279_kb2", I8279, CPU_CLOCK)
+	MCFG_I8279_OUT_SL_CB(WRITE8(goupil_g2_state, scanlines_kbd2_w))           // scan SL lines
+	MCFG_I8279_IN_RL_CB(READ8(goupil_g2_state, kbd2_r))                       // kbd RL lines
+	MCFG_I8279_IN_SHIFT_CB(READ8(goupil_g2_state, shift_kb2_r))
+	MCFG_I8279_IN_CTRL_CB(READ8(goupil_g2_state, ctrl_kb2_r))
+
+MACHINE_CONFIG_END
+
 /* ROM definition */
 ROM_START( goupilg1 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_DEFAULT_BIOS("v1_0")
 
 	ROM_SYSTEM_BIOS(0, "v1_0", "Version 1.0")
-	ROMX_LOAD( "SMT_Goupil_G1_MON_1.bin", 0x0000, 0x0400, CRC(98b7be69) SHA1(69e83fe78a43fcf2b08fb0bcefb0d217a57b1ecb), ROM_BIOS(1) )
-	ROM_LOAD ( "SMT_Goupil_G1_MON_2.bin", 0x0400, 0x0400, CRC(19386b81) SHA1(e52f63fd29d374319781e9677de6d3fd61a3684c) )
+	ROMX_LOAD( "SMT_Goupil_G1_MON_1.bin", 0xF800, 0x0400, CRC(98b7be69) SHA1(69e83fe78a43fcf2b08fb0bcefb0d217a57b1ecb), ROM_BIOS(1) )
+	ROM_LOAD ( "SMT_Goupil_G1_MON_2.bin", 0xFC00, 0x0400, CRC(19386b81) SHA1(e52f63fd29d374319781e9677de6d3fd61a3684c) )
 
-	ROM_LOAD( "SMT_Goupil_G1_MOD_3.bin", 0x0800, 0x0400, CRC(e662f152) SHA1(11b91c5737e7572a2c18472b66bbd16b485132d5) )
+	ROM_LOAD( "SMT_Goupil_G1_MOD_3.bin", 0xF400, 0x0400, CRC(e662f152) SHA1(11b91c5737e7572a2c18472b66bbd16b485132d5) )
 
-	ROMX_LOAD( "SMT_Goupil_G1_Basic_1.bin", 0x1000, 0x0400, CRC(ad105b12) SHA1(631cd4b997f76b57bf2509e4bff30b1595c8bd13), ROM_BIOS(1) )
-	ROMX_LOAD( "SMT_Goupil_G1_Basic_2.bin", 0x1400, 0x0400, CRC(0c5c309c) SHA1(f1cab4b0f9191e53113790a95f1ab7108f9406a1), ROM_BIOS(1) )
-	ROMX_LOAD( "SMT_Goupil_G1_Basic_3.bin", 0x1800, 0x0400, CRC(1f1eb127) SHA1(dbbb880c79d515acbfcb2be9a4c96962f3e4edea), ROM_BIOS(1) )
-	ROMX_LOAD( "SMT_Goupil_G1_Basic_4.bin", 0x1C00, 0x0400, CRC(09be48e4) SHA1(86cae0d159583c1d572a5754f3bb6b4a2e479359), ROM_BIOS(1) )
-	ROMX_LOAD( "SMT_Goupil_G1_Basic_5.bin", 0x2000, 0x0400, CRC(bdeb395c) SHA1(32a50468f1ca772ee45a1f5c61c66f3ecc774074), ROM_BIOS(1) )
-	ROMX_LOAD( "SMT_Goupil_G1_Basic_6.bin", 0x2400, 0x0400, CRC(850a4000) SHA1(720f0bb3e45877835219b7e1d943ef4f19b9977d), ROM_BIOS(1) )
-	ROMX_LOAD( "SMT_Goupil_G1_Basic_7.bin", 0x2800, 0x0400, CRC(586c7670) SHA1(13e2e96b9f1a53555ce0d55f657cf3c6b96f10a0), ROM_BIOS(1) )
-	ROMX_LOAD( "SMT_Goupil_G1_Basic_8.bin", 0x2C00, 0x0400, CRC(33281300) SHA1(ce631fa8157a3f8869c5fefe24b7f40e06696df9), ROM_BIOS(1) )
-	ROMX_LOAD( "SMT_Goupil_G1_Basic_9.bin", 0x3000, 0x0400, CRC(a3911201) SHA1(8623a0a2d83eb3a27a795030643c5c05a4350a9f), ROM_BIOS(1) )
+	ROMX_LOAD( "SMT_Goupil_G1_Basic_1.bin", 0xC000, 0x0400, CRC(ad105b12) SHA1(631cd4b997f76b57bf2509e4bff30b1595c8bd13), ROM_BIOS(1) )
+	ROMX_LOAD( "SMT_Goupil_G1_Basic_2.bin", 0xC400, 0x0400, CRC(0c5c309c) SHA1(f1cab4b0f9191e53113790a95f1ab7108f9406a1), ROM_BIOS(1) )
+	ROMX_LOAD( "SMT_Goupil_G1_Basic_3.bin", 0xC800, 0x0400, CRC(1f1eb127) SHA1(dbbb880c79d515acbfcb2be9a4c96962f3e4edea), ROM_BIOS(1) )
+	ROMX_LOAD( "SMT_Goupil_G1_Basic_4.bin", 0xCC00, 0x0400, CRC(09be48e4) SHA1(86cae0d159583c1d572a5754f3bb6b4a2e479359), ROM_BIOS(1) )
+	ROMX_LOAD( "SMT_Goupil_G1_Basic_5.bin", 0xD000, 0x0400, CRC(bdeb395c) SHA1(32a50468f1ca772ee45a1f5c61c66f3ecc774074), ROM_BIOS(1) )
+	ROMX_LOAD( "SMT_Goupil_G1_Basic_6.bin", 0xD400, 0x0400, CRC(850a4000) SHA1(720f0bb3e45877835219b7e1d943ef4f19b9977d), ROM_BIOS(1) )
+	ROMX_LOAD( "SMT_Goupil_G1_Basic_7.bin", 0xD800, 0x0400, CRC(586c7670) SHA1(13e2e96b9f1a53555ce0d55f657cf3c6b96f10a0), ROM_BIOS(1) )
+	ROMX_LOAD( "SMT_Goupil_G1_Basic_8.bin", 0xDC00, 0x0400, CRC(33281300) SHA1(ce631fa8157a3f8869c5fefe24b7f40e06696df9), ROM_BIOS(1) )
+	ROMX_LOAD( "SMT_Goupil_G1_Basic_9.bin", 0xE000, 0x0400, CRC(a3911201) SHA1(8623a0a2d83eb3a27a795030643c5c05a4350a9f), ROM_BIOS(1) )
 
 	ROM_REGION( 0x400, "ef9364", 0 )
 	ROM_LOAD( "SMT_Goupil_G1_Charset.bin", 0x0000, 0x0400, CRC(8b6da54b) SHA1(ac2204600f45c6dd0df1e759b62ed25928f02a12) )
 ROM_END
 
+/* ROM definition */
+ROM_START( goupilg2 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_DEFAULT_BIOS("v1_4")
+
+	ROM_SYSTEM_BIOS(0, "v1_4", "Version 1.4")
+	ROMX_LOAD( "SMT_Goupil_G2_MON_1.bin", 0xF000, 0x0800, CRC(91A4F256) SHA1(ECE3B47A17E47FC87E2262BE806CE8015F5F5DB6), ROM_BIOS(1) )
+	ROM_LOAD ( "SMT_Goupil_G2_MON_2.bin", 0xF800, 0x0800, CRC(F7783A32) SHA1(7368FC0BD86B48E6727367BD7D1922F219741015) )
+
+	ROM_LOAD( "SMT_Goupil_G2_MOD_1.bin", 0xC000, 0x0400, CRC(4D585E40) SHA1(7558F89DB52299C4C305755259D5C908B3F66AC7) )
+	ROM_LOAD( "SMT_Goupil_G2_MOD_2.bin", 0xC400, 0x0400, CRC(C5531667) SHA1(24B0A1D3B812B95E68F4DC4323581B1FD14EB4FB) )
+
+	ROM_REGION( 0x400, "ef9364", 0 )
+	ROM_LOAD( "SMT_Goupil_G2_Charset.bin", 0x0000, 0x0400, CRC(D3930877) SHA1(7B790FB18F8893CFC753BF622C8B795075741D22) )
+
+	ROM_REGION( 0x800, "visu_24x80", 0 )
+	ROM_LOAD( "SMT_Goupil_G2_Charset_24x80.bin", 0x0000, 0x0800, CRC(F0F83B99) SHA1(75A7730AEC30280EE4CCF3DCAF587EEA4F861196) )
+
+ROM_END
+
 /* Driver */
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE    INPUT      CLASS            INIT  COMPANY  FULLNAME       FLAGS
-COMP( 1979, goupilg1, 0,      0,      goupil_g1, goupil_g1, goupil_g1_state, 0,    "SMT",   "Goupil G1",   MACHINE_IS_SKELETON )
+/*    YEAR   NAME   PARENT  COMPAT   MACHINE    INPUT  CLASS           INIT    COMPANY   FULLNAME       FLAGS */
+COMP( 1979, goupilg1,   0,   0,      goupil_g1,  goupil_g1,goupil_g1_state,   0,     "SMT", "Goupil G1", MACHINE_NO_SOUND )
+COMP( 1981, goupilg2,   0,   0,      goupil_g2,  goupil_g1,goupil_g2_state,   0,     "SMT", "Goupil G2", MACHINE_NO_SOUND )

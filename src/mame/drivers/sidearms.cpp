@@ -1051,15 +1051,15 @@ ROM_END
 
 ROM_START( turtshipkn )
 		ROM_REGION( 0x20000, "maincpu", 0 )     /* 64k for code + banked ROMs images */
-		ROM_LOAD( "T-3.G5",   0x00000, 0x08000, CRC(529b091c) SHA1(9a3a885dbf1f9d3c3c326418efdcb4f6f96eb4ae) )
-		ROM_LOAD( "T-2.G3",    0x08000, 0x08000, CRC(d2f30195) SHA1(d64f088ed776658563943e8cde086842d0d899f8) )
-		ROM_LOAD( "T-1.E3",   0x10000, 0x08000, CRC(2d02da90) SHA1(5cf059e04e145861f9877cefa2c7168e6ded19ac) )
+		ROM_LOAD( "T-3.G5",   0x00000, 0x08000, CRC(529b091c) SHA1(9a3a885dbf1f9d3c3c326418efdcb4f6f96eb4ae) ) // sldh
+		ROM_LOAD( "T-2.G3",   0x08000, 0x08000, CRC(d2f30195) SHA1(d64f088ed776658563943e8cde086842d0d899f8) ) // sldh
+		ROM_LOAD( "T-1.E3",   0x10000, 0x08000, CRC(2d02da90) SHA1(5cf059e04e145861f9877cefa2c7168e6ded19ac) ) // sldh
 
 		ROM_REGION( 0x10000, "audiocpu", 0 )
 		ROM_LOAD( "T-4.A8",    0x00000, 0x08000, CRC(1cbe48e8) SHA1(6ac5981d36a44595bb8dc847c54c7be7b374f82c) )
 
 		ROM_REGION( 0x04000, "gfx1", 0 )
-		ROM_LOAD( "T-5.K8",    0x00000, 0x04000, CRC(5c2ee02d) SHA1(c8d3dbdaab943c1639795915cf275951501a2a77) ) /* characters */
+		ROM_LOAD( "T-5.K8",    0x00000, 0x04000, CRC(5c2ee02d) SHA1(c8d3dbdaab943c1639795915cf275951501a2a77) ) // sldh
 		ROM_CONTINUE(          0x00000, 0x04000 )   /* A14 tied high, only upper half is used */
 
 		ROM_REGION( 0x80000, "gfx2", 0 )
@@ -1074,9 +1074,9 @@ ROM_START( turtshipkn )
 
 		ROM_REGION( 0x40000, "gfx3", 0 )
 		ROM_LOAD( "T-13.I1",       0x00000, 0x10000, CRC(1cc87f50) SHA1(d7d8a4376b556675dafa0a407bb34b6017f17e7d) ) /* sprites */
-		ROM_LOAD( "T-15.I3",       0x10000, 0x10000, CRC(3bf91fb8) SHA1(1c8368dc8d52c3c48a85391f00c91a80fa5d781d) )
+		ROM_LOAD( "T-15.I3",       0x10000, 0x10000, CRC(3bf91fb8) SHA1(1c8368dc8d52c3c48a85391f00c91a80fa5d781d) ) // sldh
 		ROM_LOAD( "T-12.G1",       0x20000, 0x10000, CRC(57783312) SHA1(57942e8c3b7be63ea62bae3c104cb2842eb6b755) )
-		ROM_LOAD( "T-14.G3",       0x30000, 0x10000, CRC(ee162dc0) SHA1(127b3cb3ddd47aa8ee70cad2d54b1306ad8f10e8) )
+		ROM_LOAD( "T-14.G3",       0x30000, 0x10000, CRC(ee162dc0) SHA1(127b3cb3ddd47aa8ee70cad2d54b1306ad8f10e8) ) // sldh
 
 		ROM_REGION( 0x08000, "gfx4", 0 )    /* background tilemaps */
 		ROM_LOAD( "T-16.F9",  0x00000, 0x08000, CRC(9b377277) SHA1(4858560e35144727aea958023f3df785baa994a8) )

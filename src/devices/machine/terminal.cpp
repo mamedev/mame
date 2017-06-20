@@ -328,7 +328,7 @@ void generic_terminal_device::kbd_put(u8 data)
     VIDEO HARDWARE
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( generic_terminal )
+MACHINE_CONFIG_MEMBER( generic_terminal_device::device_add_mconfig )
 	MCFG_SCREEN_ADD_MONOCHROME(TERMINAL_SCREEN_TAG, RASTER, rgb_t::white())
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
@@ -345,11 +345,6 @@ static MACHINE_CONFIG_START( generic_terminal )
 	MCFG_SOUND_ADD("beeper", BEEP, 2'000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bell", 0.50)
 MACHINE_CONFIG_END
-
-machine_config_constructor generic_terminal_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME(generic_terminal);
-}
 
 void generic_terminal_device::device_start()
 {

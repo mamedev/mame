@@ -151,8 +151,8 @@ public:
 #ifdef UNUSED_FUNCTION
 	gfx_element();
 #endif
-	gfx_element(device_palette_interface &palette, const gfx_layout &gl, const u8 *srcdata, u32 xormask, u32 total_colors, u32 color_base);
-	gfx_element(device_palette_interface &palette, u8 *base, u16 width, u16 height, u32 rowbytes, u32 total_colors, u32 color_base, u32 color_granularity);
+	gfx_element(device_palette_interface *palette, const gfx_layout &gl, const u8 *srcdata, u32 xormask, u32 total_colors, u32 color_base);
+	gfx_element(device_palette_interface *palette, u8 *base, u16 width, u16 height, u32 rowbytes, u32 total_colors, u32 color_base, u32 color_granularity);
 
 	// getters
 	device_palette_interface &palette() const { return *m_palette; }
@@ -165,6 +165,7 @@ public:
 	u32 colors() const { return m_total_colors; }
 	u32 rowbytes() const { return m_line_modulo; }
 	bool has_pen_usage() const { return !m_pen_usage.empty(); }
+	bool has_palette() const { return m_palette; }
 
 	// used by tilemaps
 	u32 dirtyseq() const { return m_dirtyseq; }
@@ -269,7 +270,7 @@ private:
 	void decode(u32 code);
 
 	// internal state
-	device_palette_interface *m_palette;    // palette used for drawing
+	device_palette_interface *m_palette;    // palette used for drawing (optional when used as a pure decoder)
 
 	u16             m_width;                // current pixel width of each element (changeable with source clipping)
 	u16             m_height;               // current pixel height of each element (changeable with source clipping)

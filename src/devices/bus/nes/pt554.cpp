@@ -83,11 +83,12 @@ static const char *const pt554_sample_names[] =
 	nullptr
 };
 
+
 //-------------------------------------------------
-//  MACHINE_DRIVER
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( pt554 )
+MACHINE_CONFIG_MEMBER( nes_bandai_pt554_device::device_add_mconfig )
 
 	// additional sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("addon")
@@ -97,12 +98,3 @@ static MACHINE_CONFIG_START( pt554 )
 	MCFG_SAMPLES_NAMES(pt554_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 0.50)
 MACHINE_CONFIG_END
-
-//-------------------------------------------------
-//  machine_config_additions
-//-------------------------------------------------
-
-machine_config_constructor nes_bandai_pt554_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( pt554 );
-}

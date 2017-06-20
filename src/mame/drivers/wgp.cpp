@@ -588,6 +588,14 @@ WRITE16_MEMBER(wgp_state::wgp_adinput_w)
 	timer_set(downcast<cpu_device *>(&space.device())->cycles_to_attotime(10000), TIMER_WGP_INTERRUPT6);
 }
 
+WRITE8_MEMBER(wgp_state::coins_w)
+{
+	machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
+	machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
+	machine().bookkeeping().coin_counter_w(0, data & 0x04);
+	machine().bookkeeping().coin_counter_w(1, data & 0x08);
+}
+
 
 /**********************************************************
                           SOUND
@@ -932,6 +940,7 @@ static MACHINE_CONFIG_START( wgp )
 	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
 	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
 	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(wgp_state, coins_w))
 	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */

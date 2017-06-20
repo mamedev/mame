@@ -29,9 +29,6 @@ public:
 	DECLARE_WRITE8_MEMBER(visible_page_w);
 	DECLARE_WRITE8_MEMBER(firq_scanline_w);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(scanline_timer);
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
 	template <class Object> static devcb_base &set_scanline_cb(device_t &device, Object &&cb) { return downcast<wpc_dmd_device &>(device).scanline_cb.set_callback(std::forward<Object>(cb)); }
 
 protected:
@@ -43,7 +40,11 @@ protected:
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
+private:
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline_timer);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 DECLARE_DEVICE_TYPE(WPC_DMD, wpc_dmd_device)

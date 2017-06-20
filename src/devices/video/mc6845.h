@@ -431,8 +431,6 @@ public:
 
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 
-	DECLARE_PALETTE_INIT(mos8563);
-
 	DECLARE_WRITE8_MEMBER( address_w );
 	DECLARE_READ8_MEMBER( status_r );
 	DECLARE_READ8_MEMBER( register_r );
@@ -447,7 +445,7 @@ protected:
 	mos8563_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -486,6 +484,8 @@ protected:
 	static const device_timer_id TIMER_BLOCK_COPY = 9;
 
 	emu_timer *m_block_copy_timer;
+
+	DECLARE_PALETTE_INIT(mos8563);
 };
 
 class mos8568_device : public mos8563_device

@@ -61,7 +61,7 @@ public:
 	virtual void write_char(int data) override;
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 };
@@ -73,7 +73,7 @@ public:
 	virtual void write_char(int data) override;
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 class esq2x40_sq1_device : public esqvfd_device {
@@ -83,7 +83,7 @@ public:
 	virtual void write_char(int data) override;
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	bool m_wait87shift, m_wait88shift;

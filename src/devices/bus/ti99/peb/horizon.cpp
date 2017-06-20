@@ -53,6 +53,10 @@
 #include "emu.h"
 #include "horizon.h"
 
+DEFINE_DEVICE_TYPE_NS(TI99_HORIZON, bus::ti99::peb, horizon_ramdisk_device, "ti99_horizon", "Horizon 4000 Ramdisk")
+
+namespace bus { namespace ti99 { namespace peb {
+
 #define RAMREGION "ram32k"
 #define ROSREGION "ros8k"
 #define NVRAMREGION "nvram"
@@ -65,8 +69,9 @@
 #define TRACE_WRITE 0
 #define TRACE_CRU 0
 
-horizon_ramdisk_device::horizon_ramdisk_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-: ti_expansion_card_device(mconfig, TI99_HORIZON, tag, owner, clock),
+horizon_ramdisk_device::horizon_ramdisk_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock):
+	device_t(mconfig, TI99_HORIZON, tag, owner, clock),
+	device_ti99_peribox_card_interface(mconfig, *this),
 	device_nvram_interface(mconfig, *this),
 	m_ram(*this, RAMREGION),
 	m_nvram(*this, NVRAMREGION),
@@ -469,7 +474,7 @@ INPUT_PORTS_START( horizon )
 
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START( horizon )
+MACHINE_CONFIG_MEMBER( horizon_ramdisk_device::device_add_mconfig )
 	MCFG_RAM_ADD(NVRAMREGION)
 	MCFG_RAM_DEFAULT_SIZE("16M")
 
@@ -481,14 +486,9 @@ MACHINE_CONFIG_START( horizon )
 	MCFG_RAM_DEFAULT_VALUE(0)
 MACHINE_CONFIG_END
 
-machine_config_constructor horizon_ramdisk_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( horizon );
-}
-
 ioport_constructor horizon_ramdisk_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(horizon);
 }
 
-DEFINE_DEVICE_TYPE(TI99_HORIZON, horizon_ramdisk_device, "ti99_horizon", "Horizon 4000 Ramdisk")
+} } } // end namespace bus::ti99::peb

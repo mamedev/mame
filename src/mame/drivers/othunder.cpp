@@ -114,7 +114,7 @@ Notes:
 
 Operation Thunderbolt operates on hardware very similar to the Taito Z
 system, in particular the game Spacegun. The lightgun hardware in these
-two (as well as the eerom and calibration process) looks identical.
+two (as well as the eeprom and calibration process) looks identical.
 
 The game has 4 separate layers of graphics - one 64x64 tiled scrolling
 background plane of 8x8 tiles, a similar foreground plane, a sprite plane,
@@ -280,7 +280,7 @@ TODO:
   made by 16x8 tiles loses precision due to limitations of drawgfxzoom().
 
 - Schematics show a OBPRI output to control sprite priority. This doesn't seem
-  to be used however, and isn't hooked up. See othunder_TC0220IOC_w().
+  to be used however, and isn't hooked up. See tc0220ioc_w().
 
 ***************************************************************************/
 
@@ -302,7 +302,7 @@ TODO:
                 INTERRUPTS
 ***********************************************************/
 
-void othunder_state::update_irq(  )
+void othunder_state::update_irq()
 {
 	m_maincpu->set_input_line(6, m_ad_irq ? ASSERT_LINE : CLEAR_LINE);
 	m_maincpu->set_input_line(5, m_vblank_irq ? ASSERT_LINE : CLEAR_LINE);
@@ -352,13 +352,8 @@ The eeprom unlock command is different, and the write/clock/reset
 bits are different.
 ******************************************************************/
 
-WRITE16_MEMBER(othunder_state::othunder_tc0220ioc_w)
+WRITE8_MEMBER(othunder_state::eeprom_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		switch (offset)
-		{
-			case 0x03:
 
 /*              0000000x    SOL-1 (gun solenoid)
                 000000x0    SOL-2 (gun solenoid)
@@ -369,22 +364,24 @@ WRITE16_MEMBER(othunder_state::othunder_tc0220ioc_w)
                 0x000000    eeprom in data
                 x0000000    eeprom out data  */
 
-				/* Recoil Piston Motor Status */
-				output().set_value("Player1_Recoil_Piston", data & 0x1 );
-				output().set_value("Player2_Recoil_Piston", (data & 0x2) >>1 );
+	/* Recoil Piston Motor Status */
+	output().set_value("Player1_Recoil_Piston", data & 0x1 );
+	output().set_value("Player2_Recoil_Piston", (data & 0x2) >>1 );
 
-				if (data & 4)
-					popmessage("OBPRI SET!");
+	if (data & 4)
+		popmessage("OBPRI SET!");
 
-				m_eeprom->di_write((data & 0x40) >> 6);
-				m_eeprom->clk_write((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
-				m_eeprom->cs_write((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
-				break;
+	m_eeprom->di_write((data & 0x40) >> 6);
+	m_eeprom->clk_write((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->cs_write((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
+}
 
-			default:
-				m_tc0220ioc->write(space, offset, data & 0xff);
-		}
-	}
+WRITE8_MEMBER(othunder_state::coins_w)
+{
+	machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
+	machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
+	machine().bookkeeping().coin_counter_w(0, data & 0x04);
+	machine().bookkeeping().coin_counter_w(1, data & 0x08);
 }
 
 
@@ -392,31 +389,19 @@ WRITE16_MEMBER(othunder_state::othunder_tc0220ioc_w)
             GAME INPUTS
 **********************************************************/
 
-READ16_MEMBER(othunder_state::othunder_tc0220ioc_r)
-{
-	switch (offset)
-	{
-		case 0x03:
-			return (m_eeprom->do_read() & 1) << 7;
-
-		default:
-			return m_tc0220ioc->read(space, offset);
-	}
-}
-
 #define P1X_PORT_TAG     "P1X"
 #define P1Y_PORT_TAG     "P1Y"
 #define P2X_PORT_TAG     "P2X"
 #define P2Y_PORT_TAG     "P2Y"
 #define ROTARY_PORT_TAG  "ROTARY"
 
-READ16_MEMBER(othunder_state::othunder_lightgun_r)
+READ16_MEMBER(othunder_state::lightgun_r)
 {
 	static const char *const portname[4] = { P1X_PORT_TAG, P1Y_PORT_TAG, P2X_PORT_TAG, P2Y_PORT_TAG };
 	return ioport(portname[offset])->read();
 }
 
-WRITE16_MEMBER(othunder_state::othunder_lightgun_w)
+WRITE16_MEMBER(othunder_state::lightgun_w)
 {
 	/* A write starts the A/D conversion. An interrupt will be triggered when
 	   the conversion is complete.
@@ -436,7 +421,7 @@ WRITE8_MEMBER(othunder_state::sound_bankswitch_w)
 	membank("z80bank")->set_entry(data & 3);
 }
 
-WRITE16_MEMBER(othunder_state::othunder_sound_w)
+WRITE16_MEMBER(othunder_state::sound_w)
 {
 	if (offset == 0)
 		m_tc0140syt->master_port_w(space, 0, data & 0xff);
@@ -444,7 +429,7 @@ WRITE16_MEMBER(othunder_state::othunder_sound_w)
 		m_tc0140syt->master_comm_w(space, 0, data & 0xff);
 }
 
-READ16_MEMBER(othunder_state::othunder_sound_r)
+READ16_MEMBER(othunder_state::sound_r)
 {
 	if (offset == 1)
 		return ((m_tc0140syt->master_comm_r(space, 0) & 0xff));
@@ -452,7 +437,7 @@ READ16_MEMBER(othunder_state::othunder_sound_r)
 		return 0;
 }
 
-WRITE8_MEMBER(othunder_state::othunder_TC0310FAM_w)
+WRITE8_MEMBER(othunder_state::tc0310fam_w)
 {
 	/* there are two TC0310FAM, one for CH1 and one for CH2 from the YM2610. The
 	   PSG output is routed to both chips. */
@@ -488,15 +473,14 @@ WRITE8_MEMBER(othunder_state::othunder_TC0310FAM_w)
 static ADDRESS_MAP_START( othunder_map, AS_PROGRAM, 16, othunder_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08ffff) AM_RAM
-	AM_RANGE(0x090000, 0x09000f) AM_READWRITE(othunder_tc0220ioc_r, othunder_tc0220ioc_w)
-//  AM_RANGE(0x090006, 0x090007) AM_WRITE(eeprom_w)
+	AM_RANGE(0x090000, 0x09000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, read, write, 0x00ff)
 //  AM_RANGE(0x09000c, 0x09000d) AM_WRITENOP   /* ?? (keeps writing 0x77) */
 	AM_RANGE(0x100000, 0x100007) AM_DEVREADWRITE("tc0110pcr", tc0110pcr_device, word_r, step1_rbswap_word_w)   /* palette */
 	AM_RANGE(0x200000, 0x20ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, word_r, word_w)    /* tilemaps */
 	AM_RANGE(0x220000, 0x22000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, ctrl_word_r, ctrl_word_w)
-	AM_RANGE(0x300000, 0x300003) AM_READWRITE(othunder_sound_r, othunder_sound_w)
+	AM_RANGE(0x300000, 0x300003) AM_READWRITE(sound_r, sound_w)
 	AM_RANGE(0x400000, 0x4005ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x500000, 0x500007) AM_READWRITE(othunder_lightgun_r, othunder_lightgun_w)
+	AM_RANGE(0x500000, 0x500007) AM_READWRITE(lightgun_r, lightgun_w)
 	AM_RANGE(0x600000, 0x600003) AM_WRITE(irq_ack_w)
 ADDRESS_MAP_END
 
@@ -510,7 +494,7 @@ static ADDRESS_MAP_START( z80_sound_map, AS_PROGRAM, 8, othunder_state )
 	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
 	AM_RANGE(0xe200, 0xe200) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_device, slave_port_w)
 	AM_RANGE(0xe201, 0xe201) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, slave_comm_r, slave_comm_w)
-	AM_RANGE(0xe400, 0xe403) AM_WRITE(othunder_TC0310FAM_w) /* pan */
+	AM_RANGE(0xe400, 0xe403) AM_WRITE(tc0310fam_w) /* pan */
 	AM_RANGE(0xe600, 0xe600) AM_WRITENOP /* ? */
 	AM_RANGE(0xea00, 0xea00) AM_READ_PORT(ROTARY_PORT_TAG)  /* rotary input */
 	AM_RANGE(0xee00, 0xee00) AM_WRITENOP /* ? */
@@ -618,6 +602,9 @@ static INPUT_PORTS_START( othundu )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Continue_Price ) )        /* see notes */
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x40, "Same as Start" )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Language ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Japanese ) )
 INPUT_PORTS_END
 
 
@@ -681,7 +668,7 @@ static MACHINE_CONFIG_START( othunder )
 //  MCFG_CPU_ADD("maincpu", M68000, 24000000/2 )   /* 12 MHz */
 	MCFG_CPU_ADD("maincpu", M68000, 13000000 )  /* fixes garbage graphics on startup */
 	MCFG_CPU_PROGRAM_MAP(othunder_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", othunder_state,  vblank_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", othunder_state, vblank_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80,16000000/4 )   /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(z80_sound_map)
@@ -693,7 +680,9 @@ static MACHINE_CONFIG_START( othunder )
 	MCFG_TC0220IOC_READ_0_CB(IOPORT("DSWA"))
 	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
 	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
-	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0220IOC_READ_3_CB(DEVREADLINE("eeprom", eeprom_serial_93cxx_device, do_read)) MCFG_DEVCB_BIT(7)
+	MCFG_TC0220IOC_WRITE_3_CB(WRITE8(othunder_state, eeprom_w))
+	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(othunder_state, coins_w))
 	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
@@ -702,7 +691,7 @@ static MACHINE_CONFIG_START( othunder )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(othunder_state, screen_update_othunder)
+	MCFG_SCREEN_UPDATE_DRIVER(othunder_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", othunder)
@@ -944,10 +933,47 @@ ROM_START( othunderj )
 	ROM_LOAD16_WORD( "93c46_eeprom-othunder.ic86", 0x0000, 0x0080, CRC(3729b844) SHA1(f6bb41d293d1e47214f8b2d147991404f3278ebf) )
 ROM_END
 
+ROM_START( othunderjsc ) // SC stands for Shopping Center. It was put in a smaller, single player cabinet aimed at children
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 512K for 68000 code */
+	ROM_LOAD16_BYTE( "b67-24.ic63",   0x00000, 0x20000, CRC(18670e0b) SHA1(d848623046905471e3f859db6f179e1e4b3e4d51) ) // 27C1001
+	ROM_LOAD16_BYTE( "b67-25.ic64",   0x00001, 0x20000, CRC(3d422991) SHA1(22d18fdd9c4511774e0a4b246a293d27f7498735) ) // 27C1001
+	ROM_LOAD16_BYTE( "b67-14.ic61",   0x40000, 0x20000, CRC(7f3dd724) SHA1(2f2eeae0ee31e20082237b9a947c6848771eb73c) )
+	ROM_LOAD16_BYTE( "b67-15.ic62",   0x40001, 0x20000, CRC(e84f62d0) SHA1(3b4a55a14dee7d592467fde9a75bde64deabd27d) )
 
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound cpu */
+	ROM_LOAD( "b67-13.ic40",   0x00000, 0x10000, CRC(2936b4b1) SHA1(39b41643464dd89e456ab6eb15a0ff0aef30afde) )
 
-GAME( 1988, othunder,   0,        othunder, othunder, othunder_state, 0, ORIENTATION_FLIP_X, "Taito Corporation Japan",   "Operation Thunderbolt (World, rev 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, othundero,  othunder, othunder, othunder, othunder_state, 0, ORIENTATION_FLIP_X, "Taito Corporation Japan",   "Operation Thunderbolt (World)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1988, othunderu,  othunder, othunder, othundu,  othunder_state, 0, ORIENTATION_FLIP_X, "Taito America Corporation", "Operation Thunderbolt (US, rev 1)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1988, othunderuo, othunder, othunder, othundu,  othunder_state, 0, ORIENTATION_FLIP_X, "Taito America Corporation", "Operation Thunderbolt (US)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1988, othunderj,  othunder, othunder, othundrj, othunder_state, 0, ORIENTATION_FLIP_X, "Taito Corporation",         "Operation Thunderbolt (Japan)",        MACHINE_SUPPORTS_SAVE )
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD( "b67-06.ic66", 0x00000, 0x80000, CRC(b9a38d64) SHA1(7ae8165b444d9da6ccdbc4a769535bcbb6738aaa) )     /* SCN */
+
+	ROM_REGION( 0x200000, "gfx2", 0 )
+	ROM_LOAD32_BYTE( "b67-01.ic1", 0x00000, 0x80000, CRC(81ad9acb) SHA1(d9ad3f6332c6ca6b9872da57526a8158a3cf5b2f) ) /* OBJ: each rom has 1 bitplane, forming 16x8 tiles */
+	ROM_LOAD32_BYTE( "b67-02.ic2", 0x00001, 0x80000, CRC(c20cd2fb) SHA1(b015e1fe167e19826aa451b45cd143d66a6db83c) )
+	ROM_LOAD32_BYTE( "b67-03.ic3", 0x00002, 0x80000, CRC(bc9019ed) SHA1(7eddc83d71be97ce6637e6b35c226d58e6c39c3f) )
+	ROM_LOAD32_BYTE( "b67-04.ic4", 0x00003, 0x80000, CRC(2af4c8af) SHA1(b2ae7aad0c59ffc368811f4bd5546dbb6860f9a9) )
+
+	ROM_REGION16_LE( 0x80000, "user1", 0 )
+	ROM_LOAD16_WORD( "b67-05.ic43", 0x00000, 0x80000, CRC(9593e42b) SHA1(54b5538c302a1734ff4b752ab87a8c45d5c6b23d) )  /* index used to create 64x64 sprites on the fly */
+
+	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_LOAD( "b67-08.ic67", 0x00000, 0x80000, CRC(458f41fb) SHA1(acca7c95acd1ae7a1cc51fb7fe644ad6d00ff5ac) )
+
+	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
+	ROM_LOAD( "b67-07.ic44", 0x00000, 0x80000, CRC(4f834357) SHA1(f34705ce64870a8b24ec2639505079cc031fb719) )
+
+	ROM_REGION( 0x0800, "plds", 0 )
+	ROM_LOAD( "plhs18p8b-b67-09.ic15", 0x0000, 0x0149, CRC(62035487) SHA1(5d9538ea9eabff324d274772b1e1fc9a9aec9100) )
+	ROM_LOAD( "pal16l8a-b67-11.ic36",  0x0200, 0x0104, CRC(3177fb06) SHA1(c128277fe03342d9ec8da3c6e08a404a3f010547) )
+	ROM_LOAD( "pal20l8b-b67-12.ic37",  0x0400, 0x0144, CRC(a47c2798) SHA1(8c963efd416b3f6586cb12afb9417dc95c2bc574) )
+	ROM_LOAD( "pal20l8b-b67-10.ic33",  0x0600, 0x0144, CRC(4ced09c7) SHA1(519e6152cc5e4cb3ec24c4dc09101dddf22988aa) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "93c46_eeprom-othunder.ic86", 0x0000, 0x0080, CRC(3729b844) SHA1(f6bb41d293d1e47214f8b2d147991404f3278ebf) )
+ROM_END
+
+GAME( 1988, othunder,    0,        othunder, othunder, othunder_state, 0, ORIENTATION_FLIP_X, "Taito Corporation Japan",   "Operation Thunderbolt (World, rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, othundero,   othunder, othunder, othunder, othunder_state, 0, ORIENTATION_FLIP_X, "Taito Corporation Japan",   "Operation Thunderbolt (World)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1988, othunderu,   othunder, othunder, othundu,  othunder_state, 0, ORIENTATION_FLIP_X, "Taito America Corporation", "Operation Thunderbolt (US, rev 1)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1988, othunderuo,  othunder, othunder, othundu,  othunder_state, 0, ORIENTATION_FLIP_X, "Taito America Corporation", "Operation Thunderbolt (US)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1988, othunderj,   othunder, othunder, othundrj, othunder_state, 0, ORIENTATION_FLIP_X, "Taito Corporation",         "Operation Thunderbolt (Japan)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1988, othunderjsc, othunder, othunder, othundrj, othunder_state, 0, ORIENTATION_FLIP_X, "Taito Corporation",         "Operation Thunderbolt (Japan, SC)",     MACHINE_SUPPORTS_SAVE )

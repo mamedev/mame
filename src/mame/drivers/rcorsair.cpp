@@ -56,7 +56,8 @@ Notes added 2014-09-10:
 
 
 #include "emu.h"
-#include "cpu/i8085/i8085.h"
+#include "cpu/mcs48/mcs48.h"
+#include "cpu/z80/z80.h"
 #include "screen.h"
 
 
@@ -65,7 +66,8 @@ class rcorsair_state : public driver_device
 public:
 	rcorsair_state(const machine_config &mconfig, device_type type, const char *tag)
 	: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu")
+	m_maincpu(*this, "maincpu"),
+	m_subcpu(*this, "subcpu")
 	{ }
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -74,14 +76,23 @@ protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_subcpu;
 
 	// driver_device overrides
 	virtual void video_start() override;
 };
 
 
-static ADDRESS_MAP_START( rcorsair_map, AS_PROGRAM, 8, rcorsair_state )
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
+static ADDRESS_MAP_START( rcorsair_main_map, AS_PROGRAM, 8, rcorsair_state )
+	AM_RANGE(0x0000, 0x5fff) AM_ROM
+	AM_RANGE(0xa000, 0xa03f) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( rcorsair_sub_map, AS_PROGRAM, 8, rcorsair_state )
+	AM_RANGE(0x0000, 0x0fff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( rcorsair_sub_io_map, AS_IO, 8, rcorsair_state )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( inports )
@@ -118,7 +129,7 @@ static const gfx_layout tiles8x8_layout =
 	RGN_FRAC(1,3),
 	3,
 	{ RGN_FRAC(0,3), RGN_FRAC(1,3), RGN_FRAC(2,3) },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ 2, 3, 0, 1, 6, 7, 4, 5 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
 	8*8
 };
@@ -141,9 +152,13 @@ static MACHINE_CONFIG_START( rcorsair )
 	/* Main CPU is probably inside Custom Block with
 	   program code, unknown type */
 
-	MCFG_CPU_ADD("maincpu", I8085A,8000000)      /* Sound CPU? */
-	MCFG_CPU_PROGRAM_MAP(rcorsair_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", rcorsair_state,  irq0_line_hold)
+	MCFG_CPU_ADD("maincpu", Z80, 8000000)
+	MCFG_CPU_PROGRAM_MAP(rcorsair_main_map)
+	//MCFG_CPU_VBLANK_INT_DRIVER("screen", rcorsair_state,  irq0_line_hold)
+
+	MCFG_CPU_ADD("subcpu", I8035, 8000000)
+	MCFG_CPU_PROGRAM_MAP(rcorsair_sub_map)
+	MCFG_CPU_IO_MAP(rcorsair_sub_io_map)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -158,19 +173,18 @@ static MACHINE_CONFIG_START( rcorsair )
 MACHINE_CONFIG_END
 
 ROM_START( rcorsair )
-	ROM_REGION( 0x2000, "maincpu", 0 )
-	ROM_LOAD( "rcs_6d.bin", 0x00000, 0x2000, CRC(b7f34f91) SHA1(16d5ed6a60db09f04727be8500c1c8c869281a8a) ) // sound code? (or part of the game code?)
+	ROM_REGION( 0x6000, "maincpu", 0 )
+	ROM_LOAD( "custom_block", 0x0000, 0x4000, NO_DUMP ) // assume it is CPU, could be wrong, it needs investigating anyway
+	ROM_FILL(                 0x0000, 0x4000, 0 )
+	ROM_LOAD( "red47_2r.bin", 0x4000, 0x2000, CRC(25ae59c2) SHA1(ee68faeba81e1c426184532bd736be574a08f7d4) ) // ? sound code/data? game data?
 
-	ROM_REGION( 0x2000, "cpu1", 0 )
-	ROM_LOAD( "custom_block", 0x00000, 0x2000, NO_DUMP ) // assume it is CPU, could be wrong, it needs investigating anyway
+	ROM_REGION( 0x2000, "subcpu", 0 )
+	ROM_LOAD( "rcs_6d.bin", 0x00000, 0x2000, CRC(b7f34f91) SHA1(16d5ed6a60db09f04727be8500c1c8c869281a8a) ) // sound code? (or part of the game code?)
 
 	ROM_REGION( 0x6000, "gfx1", 0 ) /* there looks to be a slight scramble per tile, probably simle address xor */
 	ROM_LOAD( "rcd2_2b.bin", 0x0000, 0x2000, CRC(d52b39f1) SHA1(20ce812fb4a9157d7c1d45902645695f0dd84add) )
 	ROM_LOAD( "rcd1_2c.bin", 0x2000, 0x2000, CRC(9ec5dd51) SHA1(84939799f64d9d3e9a67b51046dd0c3403904d97) )
 	ROM_LOAD( "rcd0_2d.bin", 0x4000, 0x2000, CRC(b86fe547) SHA1(30dc51f65d2bd807d2498829087ba1a8eaa2e146) )
-
-	ROM_REGION( 0x2000, "user1", 0 )
-	ROM_LOAD( "red47_2r.bin", 0x00000, 0x2000, CRC(25ae59c2) SHA1(ee68faeba81e1c426184532bd736be574a08f7d4) ) // ? sound code/data? game data?
 
 	ROM_REGION( 0x40000, "proms", 0 )
 	ROM_LOAD( "prom_3d.bin", 0x00000, 0x100, CRC(fd8bc85b) SHA1(79324a6cecea652bc920ec762e7a30044003ed3f) ) // ?

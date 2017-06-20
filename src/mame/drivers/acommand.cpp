@@ -91,13 +91,13 @@ public:
 	DECLARE_WRITE16_MEMBER(output_7seg0_w);
 	DECLARE_WRITE16_MEMBER(output_7seg1_w);
 	DECLARE_WRITE16_MEMBER(output_lamps_w);
-	
+
 	DECLARE_READ16_MEMBER(ext_devices_0_r);
 	DECLARE_WRITE16_MEMBER(ext_devices_0_w);
 	DECLARE_READ16_MEMBER(ext_devices_1_r);
 	DECLARE_WRITE16_MEMBER(ext_devices_1_w);
 	DECLARE_WRITE16_MEMBER(ext_devices_2_w);
-	
+
 	DECLARE_WRITE16_MEMBER(ac_unk2_w);
 	TILEMAP_MAPPER_MEMBER(bg_scan);
 	virtual void video_start() override;
@@ -237,40 +237,40 @@ WRITE16_MEMBER(acommand_state::output_7seg1_w)
 	// nybble 0,1: right 7seg 2nd,3rd digit
 	for (int i = 0; i < 2; i++)
 		output().set_digit_value(i+4, led_fill[m_7seg1 >> (i*4) & 0xf]);
-	
+
 	// other: ?
 }
 
 /*
-	"Upper switch / Under Switch"
-	xx-x ---- xx-x xx-x
-	-x-- ---- ---- ---- Catch Switch - 3
-	--x- ---- ---- ---- Lower Switch - 3
-	---x ---- ---- ---- Upper Switch - 3
-	---- -x-- ---- ---- Catch Switch - 2
-	---- --x- ---- ---- Lower Switch - 2
-	---- ---x ---- ---- Upper Switch - 2
-	---- ---- -x-- ---- Catch Switch - 1
-	---- ---- --x- ---- Lower Switch - 1 (active high)
-	---- ---- ---x ---- Upper Switch - 1 (active low)
-	---- ---- ---- --xx Boss Door - Motor
-	state of UFO lanes:
-	0x0
-	0x1
-	0x2
-	0x3
-	0x4
-	0x5 ufo lane limit switch
-	0x6
-	0x7 astronaut switch or jamming
-	0x8
-	0x9 ufo lane switch or motor
-	0xa astronaut switch or jamming
-	0xb ufo lane switch or motor
-	0xc ""
-	0xd ufo lane limit switch
-	0xe astronaut switch or jamming
-	0xf ""
+    "Upper switch / Under Switch"
+    xx-x ---- xx-x xx-x
+    -x-- ---- ---- ---- Catch Switch - 3
+    --x- ---- ---- ---- Lower Switch - 3
+    ---x ---- ---- ---- Upper Switch - 3
+    ---- -x-- ---- ---- Catch Switch - 2
+    ---- --x- ---- ---- Lower Switch - 2
+    ---- ---x ---- ---- Upper Switch - 2
+    ---- ---- -x-- ---- Catch Switch - 1
+    ---- ---- --x- ---- Lower Switch - 1 (active high)
+    ---- ---- ---x ---- Upper Switch - 1 (active low)
+    ---- ---- ---- --xx Boss Door - Motor
+    state of UFO lanes:
+    0x0
+    0x1
+    0x2
+    0x3
+    0x4
+    0x5 ufo lane limit switch
+    0x6
+    0x7 astronaut switch or jamming
+    0x8
+    0x9 ufo lane switch or motor
+    0xa astronaut switch or jamming
+    0xb ufo lane switch or motor
+    0xc ""
+    0xd ufo lane limit switch
+    0xe astronaut switch or jamming
+    0xf ""
 */
 READ16_MEMBER(acommand_state::ext_devices_0_r)
 {
@@ -278,20 +278,20 @@ READ16_MEMBER(acommand_state::ext_devices_0_r)
 }
 
 WRITE16_MEMBER(acommand_state::ext_devices_0_w)
-{	
+{
 	printf("%04x EXT 0\n",data);
 	m_boss_door = data & 3;
 	m_ufo_lane[0] = (data >> 8) & 0x1f;
 }
 
 /*
-	---- ---- --x- ---- Lower Switch - 5
-	---- ---- ---x ---- Upper Switch - 5
-	---- ---- ---- --x- Lower Switch - 4 (active high)
-	---- ---- ---- ---x Upper Switch - 4 (active low)
+    ---- ---- --x- ---- Lower Switch - 5
+    ---- ---- ---x ---- Upper Switch - 5
+    ---- ---- ---- --x- Lower Switch - 4 (active high)
+    ---- ---- ---- ---x Upper Switch - 4 (active low)
 */
 READ16_MEMBER(acommand_state::ext_devices_1_r)
-{	
+{
 	return 0xffff;
 }
 
@@ -328,16 +328,16 @@ static ADDRESS_MAP_START( acommand_map, AS_PROGRAM, 16, acommand_state )
 	AM_RANGE(0x0f0000, 0x0f7fff) AM_RAM
 	AM_RANGE(0x0f8000, 0x0f8fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x0f9000, 0x0fffff) AM_RAM
-	
+
 	AM_RANGE(0x100000, 0x100001) AM_WRITE8(oki_bank_w,0x00ff)
 	AM_RANGE(0x100008, 0x100009) AM_READ_PORT("IN0") AM_WRITE(output_lamps_w)
 	AM_RANGE(0x100014, 0x100017) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x100018, 0x10001b) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff)        
+	AM_RANGE(0x100018, 0x10001b) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff)
 
 	AM_RANGE(0x100040, 0x100041) AM_READWRITE(ext_devices_0_r,ext_devices_0_w)
 	AM_RANGE(0x100044, 0x100045) AM_READWRITE(ext_devices_1_r,ext_devices_1_w)
 	AM_RANGE(0x100048, 0x100049) AM_WRITE(ext_devices_2_w)
-	
+
 	AM_RANGE(0x100050, 0x100051) AM_WRITE(output_7seg0_w)
 	AM_RANGE(0x100054, 0x100055) AM_WRITE(output_7seg1_w)
 	AM_RANGE(0x10005c, 0x10005d) AM_READ_PORT("DSW")

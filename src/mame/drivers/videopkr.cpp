@@ -277,6 +277,7 @@
 
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/mcs51/mcs51.h"
+#include "machine/i8255.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
@@ -966,6 +967,21 @@ static ADDRESS_MAP_START( i8039_io_port, AS_IO, 8, videopkr_state )
 	AM_RANGE(0x00, 0xff) AM_READWRITE(videopkr_io_r, videopkr_io_w)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( i8751_map, AS_PROGRAM, 8, videopkr_state )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( i8751_io_port, AS_IO, 8, videopkr_state )
+	AM_RANGE(0x0000, 0x0fff) AM_RAM // NVRAM?
+	AM_RANGE(0x8000, 0x8000) AM_NOP // ???
+	AM_RANGE(0x9000, 0x9000) AM_WRITEONLY // ???
+	AM_RANGE(0xa000, 0xbfff) AM_RAM // video RAM?
+	AM_RANGE(0xc000, 0xc003) AM_DEVREADWRITE("ppi", i8255_device, read, write)
+	AM_RANGE(0xf000, 0xf000) AM_WRITEONLY // ???
+	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P0) AM_READONLY // ???
+	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_NOP // ???
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( i8039_sound_mem, AS_PROGRAM, 8, videopkr_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 ADDRESS_MAP_END
@@ -1333,6 +1349,18 @@ static MACHINE_CONFIG_DERIVED( fortune1, videopkr )
 	MCFG_PALETTE_INIT_OWNER(videopkr_state,fortune1)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( bpoker, babypkr )
+	MCFG_CPU_REPLACE("maincpu", I8751, XTAL_6MHz)
+	MCFG_CPU_PROGRAM_MAP(i8751_map)
+	MCFG_CPU_IO_MAP(i8751_io_port)
+
+	MCFG_DEVICE_ADD("ppi", I8255A, 0)
+	//MCFG_I8255_OUT_PORTA_CB()
+	//MCFG_I8255_IN_PORTB_CB()
+	//MCFG_I8255_OUT_PORTC_CB()
+	//MCFG_I8255_IN_PORTC_CB()
+MACHINE_CONFIG_END
+
 
 /*************************
 *        Rom Load        *
@@ -1561,4 +1589,4 @@ GAMEL( 1987, videodad, videopkr, videodad, videodad, videopkr_state, 0,    ROT0,
 GAMEL( 1987, videocba, videopkr, videodad, videocba, videopkr_state, 0,    ROT0, "InterFlip",                             "Video Cordoba",                      0,                   layout_videocba )
 GAMEL( 1987, babypkr,  videopkr, babypkr,  babypkr,  videopkr_state, 0,    ROT0, "Recreativos Franco",                    "Baby Poker",                         0,                   layout_babypkr  )
 GAMEL( 1987, babydad,  videopkr, babypkr,  babydad,  videopkr_state, 0,    ROT0, "Recreativos Franco",                    "Baby Dado",                          0,                   layout_babydad  )
-GAMEL( 198?, bpoker,   videopkr, babypkr,  babypkr,  videopkr_state, 0,    ROT0, "Recreativos Franco",                    "Video Poker (v1403)",                MACHINE_NOT_WORKING, layout_babypkr  )
+GAMEL( 198?, bpoker,   videopkr, bpoker,   babypkr,  videopkr_state, 0,    ROT0, "Recreativos Franco",                    "Video Poker (v1403)",                MACHINE_NOT_WORKING, layout_babypkr  )

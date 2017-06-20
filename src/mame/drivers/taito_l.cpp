@@ -134,8 +134,6 @@ void taitol_state::state_register()
 void taitol_2cpu_state::state_register()
 {
 	taitol_state::state_register();
-
-	save_item(NAME(m_mux_ctrl));
 }
 
 void fhawk_state::state_register()
@@ -158,8 +156,6 @@ void champwr_state::state_register()
 void taitol_1cpu_state::state_register()
 {
 	taitol_state::state_register();
-
-	save_item(NAME(m_extport));
 }
 
 
@@ -205,8 +201,6 @@ void taitol_state::taito_machine_reset()
 void taitol_2cpu_state::taito_machine_reset()
 {
 	taitol_state::taito_machine_reset();
-
-	m_mux_ctrl = 0;
 }
 
 void fhawk_state::taito_machine_reset()
@@ -229,59 +223,12 @@ void champwr_state::taito_machine_reset()
 void taitol_1cpu_state::taito_machine_reset()
 {
 	taitol_state::taito_machine_reset();
-
-	m_extport = 0;
 }
 
 
 MACHINE_RESET_MEMBER(taitol_state, taito_l)
 {
 	taito_machine_reset();
-}
-
-MACHINE_RESET_MEMBER(taitol_1cpu_state, puzznic)
-{
-	taito_machine_reset();
-	m_porte0_tag = "DSWA";
-	m_porte1_tag = "DSWB";
-	m_portf0_tag = "IN0";
-	m_portf1_tag = "IN1";
-}
-
-MACHINE_RESET_MEMBER(taitol_1cpu_state, plotting)
-{
-	taito_machine_reset();
-	m_porte0_tag = "DSWA";
-	m_porte1_tag = "DSWB";
-	m_portf0_tag = "IN0";
-	m_portf1_tag = "IN1";
-}
-
-MACHINE_RESET_MEMBER(taitol_1cpu_state, palamed)
-{
-	taito_machine_reset();
-	m_porte0_tag = "DSWA";
-	m_porte1_tag = nullptr;
-	m_portf0_tag = "DSWB";
-	m_portf1_tag = nullptr;
-}
-
-MACHINE_RESET_MEMBER(taitol_1cpu_state, cachat)
-{
-	taito_machine_reset();
-	m_porte0_tag = "DSWA";
-	m_porte1_tag = nullptr;
-	m_portf0_tag = "DSWB";
-	m_portf1_tag = nullptr;
-}
-
-MACHINE_RESET_MEMBER(horshoes_state, horshoes)
-{
-	taito_machine_reset();
-	m_porte0_tag = "DSWA";
-	m_porte1_tag = "DSWB";
-	m_portf0_tag = "IN0";
-	m_portf1_tag = "IN1";
 }
 
 
@@ -452,7 +399,7 @@ WRITE8_MEMBER(taitol_state::bank3_w)
 	bank_w(space, offset, data, 3);
 }
 
-WRITE8_MEMBER(taitol_2cpu_state::control2_w)
+WRITE8_MEMBER(taitol_state::coin_control_w)
 {
 	machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
 	machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
@@ -460,19 +407,10 @@ WRITE8_MEMBER(taitol_2cpu_state::control2_w)
 	machine().bookkeeping().coin_counter_w(1, data & 0x08);
 }
 
-READ8_MEMBER(taitol_1cpu_state::portA_r)
-{
-	return ioport((m_extport == 0) ? m_porte0_tag : m_porte1_tag)->read();
-}
-
-READ8_MEMBER(taitol_1cpu_state::portB_r)
-{
-	return ioport((m_extport == 0) ? m_portf0_tag : m_portf1_tag)->read();
-}
-
 READ8_MEMBER(taitol_1cpu_state::extport_select_and_ym2203_r)
 {
-	m_extport = (offset >> 1) & 1;
+	for (auto &mux : m_mux)
+		mux->select_w((offset >> 1) & 1);
 	return m_ymsnd->read(space, offset & 1);
 }
 
@@ -493,43 +431,6 @@ WRITE8_MEMBER(taitol_state::sound_w)
 	logerror("Sound_w %02x (%04x)\n", data, space.device().safe_pc());
 }
 #endif
-
-READ8_MEMBER(taitol_2cpu_state::mux_r)
-{
-	switch (m_mux_ctrl)
-	{
-	case 0:
-		return m_dswa->read();
-	case 1:
-		return m_dswb->read();
-	case 2:
-		return m_in0->read();
-	case 3:
-		return m_in1->read();
-	case 7:
-		return m_in2->read();
-	default:
-		logerror("Mux read from unknown port %d (%04x)\n", m_mux_ctrl, space.device().safe_pc());
-		return 0xff;
-	}
-}
-
-WRITE8_MEMBER(taitol_2cpu_state::mux_w)
-{
-	switch (m_mux_ctrl)
-	{
-	case 4:
-		control2_w(space, 0, data);
-		break;
-	default:
-		logerror("Mux write to unknown port %d, %02x (%04x)\n", m_mux_ctrl, data, space.device().safe_pc());
-	}
-}
-
-WRITE8_MEMBER(taitol_2cpu_state::mux_ctrl_w)
-{
-	m_mux_ctrl = data;
-}
 
 
 WRITE_LINE_MEMBER(champwr_state::msm5205_vck)
@@ -609,10 +510,6 @@ READ8_MEMBER(horshoes_state::trackball_r)
 	AM_RANGE(0xff04, 0xff07) AM_READWRITE(rambankswitch_r, rambankswitch_w) \
 	AM_RANGE(0xff08, 0xff08) AM_READWRITE(rombankswitch_r, rombankswitch_w)
 
-#define COMMON_SINGLE_MAP \
-	AM_RANGE(0xa000, 0xa003) AM_READ(extport_select_and_ym2203_r) AM_DEVWRITE("ymsnd", ym2203_device, write) \
-	AM_RANGE(0x8000, 0x9fff) AM_RAM
-
 
 
 static ADDRESS_MAP_START( fhawk_map, AS_PROGRAM, 8, fhawk_state )
@@ -644,8 +541,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( raimais_map, AS_PROGRAM, 8, taitol_2cpu_state )
 	COMMON_BANKS_MAP
 	AM_RANGE(0x8000, 0x87ff) AM_DEVREADWRITE("dpram", mb8421_device, right_r, right_w)
-	AM_RANGE(0x8800, 0x8800) AM_READWRITE(mux_r, mux_w)
-	AM_RANGE(0x8801, 0x8801) AM_WRITE(mux_ctrl_w) AM_READNOP    // Watchdog or interrupt ack (value ignored)
+	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE("tc0040ioc", tc0040ioc_device, read, write)
 	AM_RANGE(0x8c00, 0x8c00) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_device, master_port_w)
 	AM_RANGE(0x8c01, 0x8c01) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w)
 	AM_RANGE(0xa000, 0xbfff) AM_RAM
@@ -714,8 +610,7 @@ static ADDRESS_MAP_START( kurikint_map, AS_PROGRAM, 8, taitol_2cpu_state )
 	COMMON_BANKS_MAP
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xa7ff) AM_DEVREADWRITE("dpram", mb8421_device, right_r, right_w)
-	AM_RANGE(0xa800, 0xa800) AM_READWRITE(mux_r, mux_w)
-	AM_RANGE(0xa801, 0xa801) AM_WRITE(mux_ctrl_w) AM_READNOP    // Watchdog or interrupt ack (value ignored)
+	AM_RANGE(0xa800, 0xa801) AM_DEVREADWRITE("tc0040ioc", tc0040ioc_device, read, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kurikint_2_map, AS_PROGRAM, 8, taitol_2cpu_state )
@@ -729,7 +624,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( puzznic_map, AS_PROGRAM, 8, taitol_1cpu_state )
 	COMMON_BANKS_MAP
-	COMMON_SINGLE_MAP
+	AM_RANGE(0x8000, 0x9fff) AM_RAM
+	AM_RANGE(0xa000, 0xa003) AM_READ(extport_select_and_ym2203_r) AM_DEVWRITE("ymsnd", ym2203_device, write)
 	AM_RANGE(0xa800, 0xa800) AM_READNOP // Watchdog
 	AM_RANGE(0xb800, 0xb800) AM_DEVREADWRITE("mcu", arkanoid_68705p3_device, data_r, data_w)
 	AM_RANGE(0xb801, 0xb801) AM_READWRITE(mcu_control_r, mcu_control_w)
@@ -739,7 +635,8 @@ ADDRESS_MAP_END
 /* bootleg, doesn't have the MCU */
 static ADDRESS_MAP_START( puzznici_map, AS_PROGRAM, 8, taitol_1cpu_state )
 	COMMON_BANKS_MAP
-	COMMON_SINGLE_MAP
+	AM_RANGE(0x8000, 0x9fff) AM_RAM
+	AM_RANGE(0xa000, 0xa003) AM_READ(extport_select_and_ym2203_r) AM_DEVWRITE("ymsnd", ym2203_device, write)
 	AM_RANGE(0xa800, 0xa800) AM_READNOP // Watchdog
 	AM_RANGE(0xb801, 0xb801) AM_READ(mcu_control_r)
 //  AM_RANGE(0xb801, 0xb801) AM_WRITE(mcu_control_w)
@@ -749,7 +646,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( plotting_map, AS_PROGRAM, 8, taitol_1cpu_state )
 	COMMON_BANKS_MAP
-	COMMON_SINGLE_MAP
+	AM_RANGE(0x8000, 0x9fff) AM_RAM
+	AM_RANGE(0xa000, 0xa003) AM_READ(extport_select_and_ym2203_r) AM_DEVWRITE("ymsnd", ym2203_device, write)
 	AM_RANGE(0xa800, 0xa800) AM_WRITENOP    // Watchdog or interrupt ack
 	AM_RANGE(0xb800, 0xb800) AM_WRITENOP    // Control register, function unknown
 ADDRESS_MAP_END
@@ -757,7 +655,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( palamed_map, AS_PROGRAM, 8, taitol_1cpu_state )
 	COMMON_BANKS_MAP
-	COMMON_SINGLE_MAP
+	AM_RANGE(0x8000, 0x9fff) AM_RAM
+	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
 	AM_RANGE(0xa800, 0xa803) AM_DEVREADWRITE("ppi", i8255_device, read, write)
 	AM_RANGE(0xb000, 0xb000) AM_WRITENOP    // Control register, function unknown (copy of 8822)
 	AM_RANGE(0xb001, 0xb001) AM_READNOP // Watchdog or interrupt ack
@@ -766,7 +665,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cachat_map, AS_PROGRAM, 8, taitol_1cpu_state )
 	COMMON_BANKS_MAP
-	COMMON_SINGLE_MAP
+	AM_RANGE(0x8000, 0x9fff) AM_RAM
+	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
 	AM_RANGE(0xa800, 0xa803) AM_DEVREADWRITE("ppi", i8255_device, read, write)
 	AM_RANGE(0xb000, 0xb000) AM_WRITENOP    // Control register, function unknown
 	AM_RANGE(0xb001, 0xb001) AM_READNOP // Watchdog or interrupt ack (value ignored)
@@ -776,7 +676,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( horshoes_map, AS_PROGRAM, 8, horshoes_state )
 	COMMON_BANKS_MAP
-	COMMON_SINGLE_MAP
+	AM_RANGE(0x8000, 0x9fff) AM_RAM
+	AM_RANGE(0xa000, 0xa003) AM_READ(extport_select_and_ym2203_r) AM_DEVWRITE("ymsnd", ym2203_device, write)
 	AM_RANGE(0xa800, 0xa800) AM_SELECT(0x000c) AM_READ(trackball_r)
 	AM_RANGE(0xa802, 0xa802) AM_READ(tracky_reset_r)
 	AM_RANGE(0xa803, 0xa803) AM_READ(trackx_reset_r)
@@ -1671,6 +1572,7 @@ static MACHINE_CONFIG_START( fhawk )
 	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
 	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
 	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(taitol_state, coin_control_w))
 	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
 
 	MCFG_MACHINE_START_OVERRIDE(taitol_state, taito_l)
@@ -1746,7 +1648,14 @@ static MACHINE_CONFIG_DERIVED( raimais, fhawk )
 	MCFG_CPU_MODIFY("slave")
 	MCFG_CPU_PROGRAM_MAP(raimais_2_map)
 
-	MCFG_DEVICE_REMOVE("tc0220ioc") // I/O chip is a TC0040IOC
+	MCFG_DEVICE_REMOVE("tc0220ioc")
+	MCFG_DEVICE_ADD("tc0040ioc", TC0040IOC, 0)
+	MCFG_TC0040IOC_READ_0_CB(IOPORT("DSWA"))
+	MCFG_TC0040IOC_READ_1_CB(IOPORT("DSWB"))
+	MCFG_TC0040IOC_READ_2_CB(IOPORT("IN0"))
+	MCFG_TC0040IOC_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0040IOC_WRITE_4_CB(WRITE8(taitol_state, coin_control_w))
+	MCFG_TC0040IOC_READ_7_CB(IOPORT("IN2"))
 
 	MCFG_DEVICE_ADD("dpram", MB8421, 0)
 
@@ -1775,6 +1684,14 @@ static MACHINE_CONFIG_START( kurikint )
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_DEVICE_ADD("dpram", MB8421, 0)
+
+	MCFG_DEVICE_ADD("tc0040ioc", TC0040IOC, 0)
+	MCFG_TC0040IOC_READ_0_CB(IOPORT("DSWA"))
+	MCFG_TC0040IOC_READ_1_CB(IOPORT("DSWB"))
+	MCFG_TC0040IOC_READ_2_CB(IOPORT("IN0"))
+	MCFG_TC0040IOC_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0040IOC_WRITE_4_CB(WRITE8(taitol_state, coin_control_w))
+	MCFG_TC0040IOC_READ_7_CB(IOPORT("IN2"))
 
 	MCFG_MACHINE_START_OVERRIDE(taitol_state, taito_l)
 	MCFG_MACHINE_RESET_OVERRIDE(taitol_state, taito_l)
@@ -1814,7 +1731,7 @@ static MACHINE_CONFIG_START( plotting )
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", taitol_state, vbl_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_START_OVERRIDE(taitol_state, taito_l)
-	MCFG_MACHINE_RESET_OVERRIDE(taitol_1cpu_state, plotting)
+	MCFG_MACHINE_RESET_OVERRIDE(taitol_state, taito_l)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1835,12 +1752,30 @@ static MACHINE_CONFIG_START( plotting )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_13_33056MHz/4) /* verified on pcb */
-	MCFG_AY8910_PORT_A_READ_CB(READ8(taitol_1cpu_state, portA_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(taitol_1cpu_state, portB_r))
+	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("dswmuxl", ls157_device, output_r)) MCFG_DEVCB_MASK(0x0f)
+	MCFG_DEVCB_CHAIN_INPUT(DEVREAD8("dswmuxh", ls157_device, output_r)) MCFG_DEVCB_RSHIFT(-4) MCFG_DEVCB_MASK(0xf0)
+	MCFG_AY8910_PORT_B_READ_CB(DEVREAD8("inmuxl", ls157_device, output_r)) MCFG_DEVCB_MASK(0x0f)
+	MCFG_DEVCB_CHAIN_INPUT(DEVREAD8("inmuxh", ls157_device, output_r)) MCFG_DEVCB_RSHIFT(-4) MCFG_DEVCB_MASK(0xf0)
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)
 	MCFG_SOUND_ROUTE(2, "mono", 0.20)
 	MCFG_SOUND_ROUTE(3, "mono", 0.80)
+
+	MCFG_DEVICE_ADD("dswmuxl", LS157, 0)
+	MCFG_74157_A_IN_CB(IOPORT("DSWA"))
+	MCFG_74157_B_IN_CB(IOPORT("DSWB"))
+
+	MCFG_DEVICE_ADD("dswmuxh", LS157, 0)
+	MCFG_74157_A_IN_CB(IOPORT("DSWA")) MCFG_DEVCB_RSHIFT(4)
+	MCFG_74157_B_IN_CB(IOPORT("DSWB")) MCFG_DEVCB_RSHIFT(4)
+
+	MCFG_DEVICE_ADD("inmuxl", LS157, 0)
+	MCFG_74157_A_IN_CB(IOPORT("IN0"))
+	MCFG_74157_B_IN_CB(IOPORT("IN1"))
+
+	MCFG_DEVICE_ADD("inmuxh", LS157, 0)
+	MCFG_74157_A_IN_CB(IOPORT("IN0")) MCFG_DEVCB_RSHIFT(4)
+	MCFG_74157_B_IN_CB(IOPORT("IN1")) MCFG_DEVCB_RSHIFT(4)
 MACHINE_CONFIG_END
 
 
@@ -1851,8 +1786,6 @@ static MACHINE_CONFIG_DERIVED( puzznic, plotting )
 	MCFG_CPU_PROGRAM_MAP(puzznic_map)
 
 	MCFG_DEVICE_ADD("mcu", ARKANOID_68705P3, XTAL_3MHz)
-
-	MCFG_MACHINE_RESET_OVERRIDE(taitol_1cpu_state, puzznic)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( puzznici, plotting )
@@ -1860,8 +1793,6 @@ static MACHINE_CONFIG_DERIVED( puzznici, plotting )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(puzznici_map)
-
-	MCFG_MACHINE_RESET_OVERRIDE(taitol_1cpu_state, puzznic)
 MACHINE_CONFIG_END
 
 
@@ -1874,8 +1805,6 @@ static MACHINE_CONFIG_DERIVED( horshoes, plotting )
 	MCFG_DEVICE_ADD("upd4701", UPD4701A, 0)
 	MCFG_UPD4701_PORTX("AN0")
 	MCFG_UPD4701_PORTY("AN1")
-
-	MCFG_MACHINE_RESET_OVERRIDE(horshoes_state, horshoes)
 MACHINE_CONFIG_END
 
 
@@ -1890,7 +1819,14 @@ static MACHINE_CONFIG_DERIVED( palamed, plotting )
 	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
 	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
 
-	MCFG_MACHINE_RESET_OVERRIDE(taitol_1cpu_state, palamed)
+	MCFG_SOUND_MODIFY("ymsnd")
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWA"))
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWB"))
+
+	MCFG_DEVICE_REMOVE("dswmuxl")
+	MCFG_DEVICE_REMOVE("dswmuxh")
+	MCFG_DEVICE_REMOVE("inmuxl")
+	MCFG_DEVICE_REMOVE("inmuxh")
 MACHINE_CONFIG_END
 
 
@@ -1905,7 +1841,14 @@ static MACHINE_CONFIG_DERIVED( cachat, plotting )
 	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
 	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
 
-	MCFG_MACHINE_RESET_OVERRIDE(taitol_1cpu_state, cachat)
+	MCFG_SOUND_MODIFY("ymsnd")
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWA"))
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWB"))
+
+	MCFG_DEVICE_REMOVE("dswmuxl")
+	MCFG_DEVICE_REMOVE("dswmuxh")
+	MCFG_DEVICE_REMOVE("inmuxl")
+	MCFG_DEVICE_REMOVE("inmuxh")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( evilston )
@@ -1927,6 +1870,7 @@ static MACHINE_CONFIG_START( evilston )
 	MCFG_TC0510NIO_READ_1_CB(IOPORT("DSWB"))
 	MCFG_TC0510NIO_READ_2_CB(IOPORT("IN0"))
 	MCFG_TC0510NIO_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0510NIO_WRITE_4_CB(WRITE8(taitol_state, coin_control_w))
 	MCFG_TC0510NIO_READ_7_CB(IOPORT("IN2"))
 
 	MCFG_DEVICE_ADD("dpram", MB8421, 0)
@@ -2388,13 +2332,22 @@ ROM_START( horshoes )
 
 ROM_END
 
-ROM_START( palamed )
+ROM_START( palamed ) /* Prototype or location test?? - Line 5 of notice screen says "Territory" later sets say "Territories" */
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "c63.02", 0x00000, 0x20000, CRC(55a82bb2) SHA1(f157ad770351d4b8d8f8c061c4e330d6391fc624) )
+	ROM_LOAD( "palamedes_prg_ic6.ic6", 0x00000, 0x20000, CRC(ee957b0e) SHA1(cca9db673026f769776cb86734a6503692676fbe) ) /* hand labeled as PALAMEDEStm [PRG] IC6 */
 
 	ROM_REGION( 0x40000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "c63.04", 0x00000, 0x20000, CRC(c7bbe460) SHA1(1c1f186d0b0b2e383f82c53ae93b975a75f50f9c) )
-	ROM_LOAD16_BYTE( "c63.03", 0x00001, 0x20000, CRC(fcd86e44) SHA1(bdd0750ed6e93cc49f09f4ccb05b0c4a44cb9c23) )
+	ROM_LOAD16_BYTE( "chr-l_ic9.ic9", 0x00000, 0x20000, CRC(c7bbe460) SHA1(1c1f186d0b0b2e383f82c53ae93b975a75f50f9c) ) /* hand labeled as CHR-L IC9 */
+	ROM_LOAD16_BYTE( "chr-h_ic7.ic7", 0x00001, 0x20000, CRC(fcd86e44) SHA1(bdd0750ed6e93cc49f09f4ccb05b0c4a44cb9c23) ) /* hand labeled as CHR-H IC7 */
+ROM_END
+
+ROM_START( palamedj )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "c63-02.ic6", 0x00000, 0x20000, CRC(55a82bb2) SHA1(f157ad770351d4b8d8f8c061c4e330d6391fc624) )
+
+	ROM_REGION( 0x40000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "c63-04.ic9", 0x00000, 0x20000, CRC(c7bbe460) SHA1(1c1f186d0b0b2e383f82c53ae93b975a75f50f9c) )
+	ROM_LOAD16_BYTE( "c63-03.ic7", 0x00001, 0x20000, CRC(fcd86e44) SHA1(bdd0750ed6e93cc49f09f4ccb05b0c4a44cb9c23) )
 ROM_END
 
 ROM_START( cachat )
@@ -2570,17 +2523,18 @@ GAME( 1989, puzznicba, puzznic,  puzznici,  puzznic,   taitol_1cpu_state, 0,    
 
 GAME( 1990, horshoes,  0,        horshoes,  horshoes,  horshoes_state,    0,         ROT270, "Taito America Corporation", "American Horseshoes (US)", 0 )
 
-GAME( 1990, palamed,   0,        palamed,   palamed,   taitol_1cpu_state, 0,         ROT0,   "Taito Corporation", "Palamedes (Japan)", 0 )
+GAME( 1990, palamed,   0,        palamed,   palamed,   taitol_1cpu_state, 0,         ROT0,   "Hot-B Co., Ltd.", "Palamedes (US)", 0 ) // Prototype or location test
+GAME( 1990, palamedj,  palamed,  palamed,   palamed,   taitol_1cpu_state, 0,         ROT0,   "Taito Corporation", "Palamedes (Japan)", 0 )
 
 GAME( 1993, cachat,    0,        cachat,    cachat,    taitol_1cpu_state, 0,         ROT0,   "Taito Corporation", "Cachat (Japan)", 0 )
 GAME( 1993, tubeit,    cachat,   cachat,    tubeit,    taitol_1cpu_state, 0,         ROT0,   "bootleg", "Tube-It", 0 ) // No (c) message
 
-GAME( 199?, cubybop,   0,        cachat,    cubybop,   taitol_1cpu_state, 0,         ROT0,   "Hot-B", "Cuby Bop (location test)", 0 ) // No (c) message, but Hot-B company logo in tile gfx
+GAME( 199?, cubybop,   0,        cachat,    cubybop,   taitol_1cpu_state, 0,         ROT0,   "Hot-B Co., Ltd.", "Cuby Bop (location test)", 0 ) // No (c) message, but Hot-B company logo in tile gfx
 
-GAME( 1992, plgirls,   0,        cachat,    plgirls,   taitol_1cpu_state, 0,         ROT270, "Hot-B", "Play Girls", 0 )
+GAME( 1992, plgirls,   0,        cachat,    plgirls,   taitol_1cpu_state, 0,         ROT270, "Hot-B Co., Ltd.", "Play Girls", 0 )
 GAME( 1992, lagirl,    plgirls,  cachat,    plgirls,   taitol_1cpu_state, 0,         ROT270, "bootleg", "LA Girl", 0 ) // bootleg hardware with changed title & backgrounds
 
-GAME( 1993, plgirls2,  0,        cachat,    plgirls2,  taitol_1cpu_state, 0,         ROT270, "Hot-B", "Play Girls 2", 0 )
+GAME( 1993, plgirls2,  0,        cachat,    plgirls2,  taitol_1cpu_state, 0,         ROT270, "Hot-B Co., Ltd.", "Play Girls 2", 0 )
 GAME( 1993, plgirls2b, plgirls2, cachat,    plgirls2,  taitol_1cpu_state, 0,         ROT270, "bootleg", "Play Girls 2 (bootleg)", MACHINE_IMPERFECT_GRAPHICS ) // bootleg hardware (regular Z80 etc. instead of TC0090LVC, but acts almost the same - scroll offset problems)
 
 GAME( 1990, evilston,  0,        evilston,  evilston,  taitol_2cpu_state, 0,         ROT270, "Spacy Industrial, Ltd.", "Evil Stone", 0 )

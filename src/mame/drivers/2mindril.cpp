@@ -38,6 +38,7 @@ DAC               -26.6860Mhz
 #include "includes/taito_f3.h"
 
 #include "cpu/m68000/m68000.h"
+#include "machine/taitoio.h"
 #include "sound/2610intf.h"
 #include "speaker.h"
 
@@ -47,19 +48,18 @@ class _2mindril_state : public taito_f3_state
 public:
 	_2mindril_state(const machine_config &mconfig, device_type type, const char *tag)
 		: taito_f3_state(mconfig, type, tag),
-		m_iodata(*this, "iodata") { }
-
-	/* memory pointers */
-	required_shared_ptr<uint16_t> m_iodata;
+		m_in0(*this, "IN0") { }
 
 	/* input-related */
-	uint16_t        m_defender_sensor;
-	uint16_t        m_shutter_sensor;
+	required_ioport m_in0;
+	uint8_t         m_defender_sensor;
+	uint8_t         m_shutter_sensor;
 	uint16_t        m_irq_reg;
 
 	/* devices */
-	DECLARE_READ16_MEMBER(drill_io_r);
-	DECLARE_WRITE16_MEMBER(drill_io_w);
+	DECLARE_READ8_MEMBER(arm_pwr_r);
+	DECLARE_READ8_MEMBER(sensors_r);
+	DECLARE_WRITE8_MEMBER(coins_w);
 	DECLARE_WRITE16_MEMBER(sensors_w);
 	DECLARE_READ16_MEMBER(drill_irq_r);
 	DECLARE_WRITE16_MEMBER(drill_irq_w);
@@ -83,50 +83,29 @@ protected:
 };
 
 
-READ16_MEMBER(_2mindril_state::drill_io_r)
+READ8_MEMBER(_2mindril_state::arm_pwr_r)
 {
-//  if (offset * 2 == 0x4)
-	/*popmessage("PC=%08x %04x %04x %04x %04x %04x %04x %04x %04x", space.device().safe_pc(), m_iodata[0/2], m_iodata[2/2], m_iodata[4/2], m_iodata[6/2],
-	                                    m_iodata[8/2], m_iodata[0xa/2], m_iodata[0xc/2], m_iodata[0xe/2]);*/
+	int arm_pwr = m_in0->read();//throw
+	//popmessage("PC=%08x %02x",space.device().safe_pc(),arm_pwr);
 
-	switch(offset)
-	{
-		case 0x0/2: return ioport("DSW")->read();
-		case 0x2/2:
-		{
-			int arm_pwr = ioport("IN0")->read();//throw
-			//popmessage("PC=%08x %02x",space.device().safe_pc(),arm_pwr);
-
-			if(arm_pwr > 0xe0) return ~0x1800;
-			if(arm_pwr > 0xc0) return ~0x1400;
-			if(arm_pwr > 0x80) return ~0x1200;
-			if(arm_pwr > 0x40) return ~0x1000;
-			else return ~0x0000;
-		}
-		case 0x4/2: return (m_defender_sensor) | (m_shutter_sensor);
-		case 0xe/2: return ioport("IN2")->read();//coins
-//      default:  printf("PC=%08x [%04x] -> %04x R\n", space.device().safe_pc(), offset * 2, m_iodata[offset]);
-	}
-
-	return 0xffff;
+	if(arm_pwr > 0xe0) return ~0x18;
+	if(arm_pwr > 0xc0) return ~0x14;
+	if(arm_pwr > 0x80) return ~0x12;
+	if(arm_pwr > 0x40) return ~0x10;
+	else return ~0x00;
 }
 
-WRITE16_MEMBER(_2mindril_state::drill_io_w)
+READ8_MEMBER(_2mindril_state::sensors_r)
 {
-	COMBINE_DATA(&m_iodata[offset]);
+	return (m_defender_sensor) | (m_shutter_sensor);
+}
 
-	switch(offset)
-	{
-		case 0x8/2:
-			machine().bookkeeping().coin_counter_w(0, m_iodata[offset] & 0x0400);
-			machine().bookkeeping().coin_counter_w(1, m_iodata[offset] & 0x0800);
-			machine().bookkeeping().coin_lockout_w(0, ~m_iodata[offset] & 0x0100);
-			machine().bookkeeping().coin_lockout_w(1, ~m_iodata[offset] & 0x0200);
-			break;
-	}
-
-//  if(data != 0 && offset != 8)
-//  printf("PC=%08x [%04x] <- %04x W\n", space.device().safe_pc(), offset * 2, data);
+WRITE8_MEMBER(_2mindril_state::coins_w)
+{
+	machine().bookkeeping().coin_counter_w(0, data & 0x04);
+	machine().bookkeeping().coin_counter_w(1, data & 0x08);
+	machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
+	machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
 }
 
 /*
@@ -166,24 +145,24 @@ WRITE16_MEMBER(_2mindril_state::sensors_w)
 	/*---- ---- ---- -x-- lamp*/
 	if (data & 1)
 	{
-		//timer_set( attotime::from_seconds(2), TIMER_SHUTTER_REQ, 0x100);
-		m_shutter_sensor = 0x100;
+		//timer_set( attotime::from_seconds(2), TIMER_SHUTTER_REQ, 0x01);
+		m_shutter_sensor = 0x01;
 	}
 	else if (data & 2)
 	{
-		//timer_set( attotime::from_seconds(2), TIMER_SHUTTER_REQ, 0x200);
-		m_shutter_sensor = 0x200;
+		//timer_set( attotime::from_seconds(2), TIMER_SHUTTER_REQ, 0x02);
+		m_shutter_sensor = 0x02;
 	}
 
 	if (data & 0x1000 || data & 0x4000)
 	{
-		//timer_set( attotime::from_seconds(2), TIMER_DEFENDER_REQ, 0x800);
-		m_defender_sensor = 0x800;
+		//timer_set( attotime::from_seconds(2), TIMER_DEFENDER_REQ, 0x08);
+		m_defender_sensor = 0x08;
 	}
 	else if (data & 0x2000 || data & 0x8000)
 	{
-		//timer_set( attotime::from_seconds(2), TIMER_DEFENDER_REQ, 0x400);
-		m_defender_sensor = 0x400;
+		//timer_set( attotime::from_seconds(2), TIMER_DEFENDER_REQ, 0x04);
+		m_defender_sensor = 0x04;
 	}
 }
 
@@ -229,124 +208,49 @@ static ADDRESS_MAP_START( drill_map, AS_PROGRAM, 16, _2mindril_state )
 	AM_RANGE(0x600000, 0x600007) AM_DEVREADWRITE8("ymsnd", ym2610_device, read, write, 0x00ff)
 	AM_RANGE(0x60000c, 0x60000d) AM_READWRITE(drill_irq_r,drill_irq_w)
 	AM_RANGE(0x60000e, 0x60000f) AM_RAM // unknown purpose, zeroed at start-up and nothing else
-	AM_RANGE(0x700000, 0x70000f) AM_READWRITE(drill_io_r,drill_io_w) AM_SHARE("iodata") // i/o
+	AM_RANGE(0x700000, 0x70000f) AM_DEVREADWRITE8("tc0510nio", tc0510nio_device, read, write, 0xff00)
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(sensors_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( drill )
 	PORT_START("DSW")//Dip-Switches
-	PORT_DIPNAME( 0x0001, 0x0001, "DSW" )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x01, 0x01, "DSW" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("IN0")//sensors
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(20)
 
-	PORT_START("IN1")
-	PORT_DIPNAME( 0x0001, 0x0000, "IN1" )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0001, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0100, 0x0000, DEF_STR( Unknown ) )//up sensor
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0100, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0000, DEF_STR( Unknown ) )//down sensor
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0200, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0000, DEF_STR( Unknown ) )//left sensor
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0000, DEF_STR( Unknown ) )//right sensor
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0800, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x0000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x1000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x0000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x2000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x0000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x4000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x0000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x8000, DEF_STR( On ) )
-
-	PORT_START("IN2")//coins
-	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_SERVICE )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Select SW-1")
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Select SW-2")
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Select SW-3")
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Select SW-4")
+	PORT_START("COINS")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Select SW-1")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Select SW-2")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Select SW-3")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Select SW-4")
 INPUT_PORTS_END
 
 static const gfx_layout charlayout =
@@ -452,6 +356,13 @@ static MACHINE_CONFIG_START( drill )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", _2mindril_state,  drill_vblank_irq)
 	//MCFG_CPU_PERIODIC_INT_DRIVER(_2mindril_state, drill_device_irq, 60)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 2mindril)
+
+	MCFG_DEVICE_ADD("tc0510nio", TC0510NIO, 0)
+	MCFG_TC0510NIO_READ_0_CB(IOPORT("DSW"))
+	MCFG_TC0510NIO_READ_1_CB(READ8(_2mindril_state, arm_pwr_r))
+	MCFG_TC0510NIO_READ_2_CB(READ8(_2mindril_state, sensors_r))
+	MCFG_TC0510NIO_WRITE_4_CB(WRITE8(_2mindril_state, coins_w))
+	MCFG_TC0510NIO_READ_7_CB(IOPORT("COINS"))
 
 	MCFG_MACHINE_START_OVERRIDE(_2mindril_state,drill)
 	MCFG_MACHINE_RESET_OVERRIDE(_2mindril_state,drill)

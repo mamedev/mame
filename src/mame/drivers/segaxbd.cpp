@@ -1679,7 +1679,7 @@ GFXDECODE_END
 //  GENERIC MACHINE DRIVERS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( xboard )
+MACHINE_CONFIG_MEMBER( segaxbd_state::xboard_base_mconfig )
 
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK/4)
@@ -1753,6 +1753,7 @@ static MACHINE_CONFIG_START( xboard )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
+
 DEFINE_DEVICE_TYPE(SEGA_XBD_REGULAR, segaxbd_regular_state, "segaxbd_pcb_reg", "Sega X-Board PCB (regular)")
 
 segaxbd_regular_state::segaxbd_regular_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -1760,24 +1761,15 @@ segaxbd_regular_state::segaxbd_regular_state(const machine_config &mconfig, cons
 {
 }
 
-machine_config_constructor segaxbd_regular_state::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( xboard );
-}
+MACHINE_CONFIG_MEMBER( segaxbd_regular_state::device_add_mconfig )
+
+	segaxbd_state::xboard_base_mconfig(config);
+MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( sega_xboard )
 	MCFG_DEVICE_ADD("mainpcb", SEGA_XBD_REGULAR, 0)
 MACHINE_CONFIG_END
 
-
-static MACHINE_CONFIG_START( xboard_fd1094 )
-
-	MCFG_FRAGMENT_ADD( xboard )
-
-	MCFG_CPU_REPLACE("maincpu", FD1094, MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
-MACHINE_CONFIG_END
 
 DEFINE_DEVICE_TYPE(SEGA_XBD_FD1094, segaxbd_fd1094_state, "segaxbd_pcb_fd1094", "Sega X-Board PCB (FD1094)")
 
@@ -1786,10 +1778,15 @@ segaxbd_fd1094_state::segaxbd_fd1094_state(const machine_config &mconfig, const 
 {
 }
 
-machine_config_constructor segaxbd_fd1094_state::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( xboard_fd1094 );
-}
+MACHINE_CONFIG_MEMBER( segaxbd_fd1094_state::device_add_mconfig )
+
+	segaxbd_state::xboard_base_mconfig(config);
+
+	MCFG_CPU_REPLACE("maincpu", FD1094, MASTER_CLOCK/4)
+	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+MACHINE_CONFIG_END
+
 
 static MACHINE_CONFIG_START( sega_xboard_fd1094 )
 	MCFG_DEVICE_ADD("mainpcb", SEGA_XBD_FD1094, 0)
@@ -1807,15 +1804,6 @@ MACHINE_CONFIG_END
 //  GAME-SPECIFIC MACHINE DRIVERS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( aburner2 )
-	MCFG_FRAGMENT_ADD( xboard )
-
-	// basic machine hardware
-	MCFG_DEVICE_MODIFY("iochip_0")
-	MCFG_CXD1095_IN_PORTA_CB(READ8(segaxbd_state, aburner2_motor_r))
-	MCFG_CXD1095_OUT_PORTB_CB(WRITE8(segaxbd_state, aburner2_motor_w))
-MACHINE_CONFIG_END
-
 DEFINE_DEVICE_TYPE(SEGA_XBD_ABURNER2_DEVICE, segaxbd_aburner2_state, "segaxbd_pcb_aburner2", "Sega X-Board PCB (After Burner)")
 
 segaxbd_aburner2_state::segaxbd_aburner2_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -1823,35 +1811,19 @@ segaxbd_aburner2_state::segaxbd_aburner2_state(const machine_config &mconfig, co
 {
 }
 
-machine_config_constructor segaxbd_aburner2_state::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( aburner2 );
-}
+MACHINE_CONFIG_MEMBER( segaxbd_aburner2_state::device_add_mconfig )
+	segaxbd_state::xboard_base_mconfig(config);
+
+	// basic machine hardware
+	MCFG_DEVICE_MODIFY("iochip_0")
+	MCFG_CXD1095_IN_PORTA_CB(READ8(segaxbd_state, aburner2_motor_r))
+	MCFG_CXD1095_OUT_PORTB_CB(WRITE8(segaxbd_state, aburner2_motor_w))
+MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( sega_aburner2 )
 	MCFG_DEVICE_ADD("mainpcb", SEGA_XBD_ABURNER2_DEVICE, 0)
 MACHINE_CONFIG_END
 
-
-static MACHINE_CONFIG_START( lastsurv_fd1094 )
-
-	MCFG_FRAGMENT_ADD( xboard_fd1094 )
-
-	// basic machine hardware
-	// TODO: network board
-
-	MCFG_DEVICE_MODIFY("iochip_0")
-	MCFG_CXD1095_OUT_PORTD_CB(WRITE8(segaxbd_state, lastsurv_muxer_w))
-
-	MCFG_DEVICE_MODIFY("iochip_1")
-	MCFG_CXD1095_IN_PORTB_CB(READ8(segaxbd_state, lastsurv_port_r))
-
-	// sound hardware - ym2151 stereo is reversed
-	MCFG_SOUND_MODIFY("ymsnd")
-	MCFG_SOUND_ROUTES_RESET()
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.43)
-	MCFG_SOUND_ROUTE(1, "lspeaker", 0.43)
-MACHINE_CONFIG_END
 
 DEFINE_DEVICE_TYPE(SEGA_XBD_LASTSURV_FD1094, segaxbd_lastsurv_fd1094_state, "segaxbd_pcb_lastsurv_fd1094", "Sega X-Board PCB (Last Survivor, FD1094)")
 
@@ -1860,18 +1832,13 @@ segaxbd_lastsurv_fd1094_state::segaxbd_lastsurv_fd1094_state(const machine_confi
 {
 }
 
-machine_config_constructor segaxbd_lastsurv_fd1094_state::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( lastsurv_fd1094 );
-}
+MACHINE_CONFIG_MEMBER( segaxbd_lastsurv_fd1094_state::device_add_mconfig )
 
-static MACHINE_CONFIG_START( sega_lastsurv_fd1094 )
-	MCFG_DEVICE_ADD("mainpcb", SEGA_XBD_LASTSURV_FD1094, 0)
-MACHINE_CONFIG_END
+	segaxbd_state::xboard_base_mconfig(config);
 
-static MACHINE_CONFIG_START( lastsurv )
-
-	MCFG_FRAGMENT_ADD( xboard )
+	MCFG_CPU_REPLACE("maincpu", FD1094, MASTER_CLOCK/4)
+	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 
 	// basic machine hardware
 	// TODO: network board
@@ -1889,6 +1856,11 @@ static MACHINE_CONFIG_START( lastsurv )
 	MCFG_SOUND_ROUTE(1, "lspeaker", 0.43)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_START( sega_lastsurv_fd1094 )
+	MCFG_DEVICE_ADD("mainpcb", SEGA_XBD_LASTSURV_FD1094, 0)
+MACHINE_CONFIG_END
+
+
 DEFINE_DEVICE_TYPE(SEGA_XBD_LASTSURV, segaxbd_lastsurv_state, "segaxbd_pcb_lastsurv", "Sega X-Board PCB (Last Survivor)")
 
 segaxbd_lastsurv_state::segaxbd_lastsurv_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -1896,45 +1868,30 @@ segaxbd_lastsurv_state::segaxbd_lastsurv_state(const machine_config &mconfig, co
 {
 }
 
-machine_config_constructor segaxbd_lastsurv_state::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( lastsurv );
-}
+MACHINE_CONFIG_MEMBER( segaxbd_lastsurv_state::device_add_mconfig )
+
+	segaxbd_state::xboard_base_mconfig(config);
+
+	// basic machine hardware
+	// TODO: network board
+
+	MCFG_DEVICE_MODIFY("iochip_0")
+	MCFG_CXD1095_OUT_PORTD_CB(WRITE8(segaxbd_state, lastsurv_muxer_w))
+
+	MCFG_DEVICE_MODIFY("iochip_1")
+	MCFG_CXD1095_IN_PORTB_CB(READ8(segaxbd_state, lastsurv_port_r))
+
+	// sound hardware - ym2151 stereo is reversed
+	MCFG_SOUND_MODIFY("ymsnd")
+	MCFG_SOUND_ROUTES_RESET()
+	MCFG_SOUND_ROUTE(0, "rspeaker", 0.43)
+	MCFG_SOUND_ROUTE(1, "lspeaker", 0.43)
+MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( sega_lastsurv )
 	MCFG_DEVICE_ADD("mainpcb", SEGA_XBD_LASTSURV, 0)
 MACHINE_CONFIG_END
 
-
-
-static MACHINE_CONFIG_START( smgp_fd1094 )
-	MCFG_FRAGMENT_ADD( xboard_fd1094 )
-
-	// basic machine hardware
-	MCFG_CPU_ADD("soundcpu2", Z80, SOUND_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(smgp_sound2_map)
-	MCFG_CPU_IO_MAP(smgp_sound2_portmap)
-
-	MCFG_CPU_ADD("commcpu", Z80, XTAL_16MHz/2) // Z80E
-	MCFG_CPU_PROGRAM_MAP(smgp_comm_map)
-	MCFG_CPU_IO_MAP(smgp_comm_portmap)
-
-	MCFG_CPU_ADD("motorcpu", Z80, XTAL_16MHz/2) // not verified
-	MCFG_CPU_PROGRAM_MAP(smgp_airdrive_map)
-	MCFG_CPU_IO_MAP(smgp_airdrive_portmap)
-
-	MCFG_DEVICE_MODIFY("iochip_0")
-	MCFG_CXD1095_IN_PORTA_CB(READ8(segaxbd_state, smgp_motor_r))
-	MCFG_CXD1095_OUT_PORTB_CB(WRITE8(segaxbd_state, smgp_motor_w))
-
-	// sound hardware
-	MCFG_SPEAKER_STANDARD_STEREO("rearleft", "rearright")
-
-	MCFG_SEGAPCM_ADD("pcm2", SOUND_CLOCK/4)
-	MCFG_SEGAPCM_BANK(BANK_512)
-	MCFG_SOUND_ROUTE(0, "rearleft", 1.0)
-	MCFG_SOUND_ROUTE(1, "rearright", 1.0)
-MACHINE_CONFIG_END
 
 DEFINE_DEVICE_TYPE(SEGA_XBD_SMGP_FD1094, segaxbd_smgp_fd1094_state, "segaxbd_pcb_smgp_fd1094", "Sega X-Board PCB (SMGP, FD1094)")
 
@@ -1943,19 +1900,12 @@ segaxbd_smgp_fd1094_state::segaxbd_smgp_fd1094_state(const machine_config &mconf
 {
 }
 
-machine_config_constructor segaxbd_smgp_fd1094_state::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( smgp_fd1094 );
-}
+MACHINE_CONFIG_MEMBER( segaxbd_smgp_fd1094_state::device_add_mconfig )
+	segaxbd_state::xboard_base_mconfig(config);
 
-static MACHINE_CONFIG_START( sega_smgp_fd1094 )
-	MCFG_DEVICE_ADD("mainpcb", SEGA_XBD_SMGP_FD1094, 0)
-MACHINE_CONFIG_END
-
-
-
-static MACHINE_CONFIG_START( smgp )
-	MCFG_FRAGMENT_ADD( xboard )
+	MCFG_CPU_REPLACE("maincpu", FD1094, MASTER_CLOCK/4)
+	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 
 	// basic machine hardware
 	MCFG_CPU_ADD("soundcpu2", Z80, SOUND_CLOCK/4)
@@ -1983,6 +1933,11 @@ static MACHINE_CONFIG_START( smgp )
 	MCFG_SOUND_ROUTE(1, "rearright", 1.0)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_START( sega_smgp_fd1094 )
+	MCFG_DEVICE_ADD("mainpcb", SEGA_XBD_SMGP_FD1094, 0)
+MACHINE_CONFIG_END
+
+
 DEFINE_DEVICE_TYPE(SEGA_XBD_SMGP, segaxbd_smgp_state, "segaxbd_pcb_smgp", "Sega X-Board PCB (SMGP)")
 
 segaxbd_smgp_state::segaxbd_smgp_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -1990,24 +1945,39 @@ segaxbd_smgp_state::segaxbd_smgp_state(const machine_config &mconfig, const char
 {
 }
 
-machine_config_constructor segaxbd_smgp_state::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( smgp );
-}
+MACHINE_CONFIG_MEMBER( segaxbd_smgp_state::device_add_mconfig )
+	segaxbd_state::xboard_base_mconfig(config);
+
+	// basic machine hardware
+	MCFG_CPU_ADD("soundcpu2", Z80, SOUND_CLOCK/4)
+	MCFG_CPU_PROGRAM_MAP(smgp_sound2_map)
+	MCFG_CPU_IO_MAP(smgp_sound2_portmap)
+
+	MCFG_CPU_ADD("commcpu", Z80, XTAL_16MHz/2) // Z80E
+	MCFG_CPU_PROGRAM_MAP(smgp_comm_map)
+	MCFG_CPU_IO_MAP(smgp_comm_portmap)
+
+	MCFG_CPU_ADD("motorcpu", Z80, XTAL_16MHz/2) // not verified
+	MCFG_CPU_PROGRAM_MAP(smgp_airdrive_map)
+	MCFG_CPU_IO_MAP(smgp_airdrive_portmap)
+
+	MCFG_DEVICE_MODIFY("iochip_0")
+	MCFG_CXD1095_IN_PORTA_CB(READ8(segaxbd_state, smgp_motor_r))
+	MCFG_CXD1095_OUT_PORTB_CB(WRITE8(segaxbd_state, smgp_motor_w))
+
+	// sound hardware
+	MCFG_SPEAKER_STANDARD_STEREO("rearleft", "rearright")
+
+	MCFG_SEGAPCM_ADD("pcm2", SOUND_CLOCK/4)
+	MCFG_SEGAPCM_BANK(BANK_512)
+	MCFG_SOUND_ROUTE(0, "rearleft", 1.0)
+	MCFG_SOUND_ROUTE(1, "rearright", 1.0)
+MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( sega_smgp )
 	MCFG_DEVICE_ADD("mainpcb", SEGA_XBD_SMGP, 0)
 MACHINE_CONFIG_END
 
-
-static MACHINE_CONFIG_START( rascot  )
-	MCFG_FRAGMENT_ADD( xboard )
-
-	// basic machine hardware
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_PROGRAM_MAP(rascot_z80_map)
-	MCFG_CPU_IO_MAP(rascot_z80_portmap)
-MACHINE_CONFIG_END
 
 DEFINE_DEVICE_TYPE(SEGA_XBD_RASCOT, segaxbd_rascot_state, "segaxbd_pcb_rascot", "Sega X-Board PCB (Royal Ascot)")
 
@@ -2016,10 +1986,14 @@ segaxbd_rascot_state::segaxbd_rascot_state(const machine_config &mconfig, const 
 {
 }
 
-machine_config_constructor segaxbd_rascot_state::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( rascot );
-}
+MACHINE_CONFIG_MEMBER( segaxbd_rascot_state::device_add_mconfig )
+	segaxbd_state::xboard_base_mconfig(config);
+
+	// basic machine hardware
+	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_CPU_PROGRAM_MAP(rascot_z80_map)
+	MCFG_CPU_IO_MAP(rascot_z80_portmap)
+MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( sega_rascot )
 	MCFG_DEVICE_ADD("mainpcb", SEGA_XBD_RASCOT, 0)

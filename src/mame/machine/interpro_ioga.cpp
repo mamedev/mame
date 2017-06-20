@@ -85,7 +85,7 @@ interpro_ioga_device::interpro_ioga_device(const machine_config &mconfig, const 
 static const char *interrupt_source[IOGA_INTERRUPT_COUNT] = {
 	// internal
 	"timer 2",
-	"timer 3", 
+	"timer 3",
 	// external
 	"SCSI",
 	"floppy",
@@ -448,11 +448,11 @@ IRQ_CALLBACK_MEMBER(interpro_ioga_device::inta_cb)
 			vector = m_hwicr[m_active_interrupt_number] & 0xff;
 			break;
 
-		case IOGA_INTERRUPT_SOFT_LO: 
+		case IOGA_INTERRUPT_SOFT_LO:
 			vector = 0x8f + m_active_interrupt_number * 0x10;
 			break;
 
-		case IOGA_INTERRUPT_SOFT_HI: 
+		case IOGA_INTERRUPT_SOFT_HI:
 			vector = m_swicr[m_active_interrupt_number] & 0xff;
 			break;
 		}
@@ -607,7 +607,7 @@ WRITE8_MEMBER(interpro_ioga_device::softint_w)
 }
 
 WRITE8_MEMBER(interpro_ioga_device::nmictrl_w)
-{ 
+{
 	LOG_INTERRUPT("nmictrl = 0x%02x (%s)\n", data, machine().describe_context());
 
 #if 0

@@ -18,10 +18,9 @@ public:
 	virtual DECLARE_WRITE_LINE_MEMBER( input_txd ) override { device_serial_interface::rx_w(state); }
 
 	DECLARE_WRITE_LINE_MEMBER(update_serial);
-	DECLARE_WRITE_LINE_MEMBER(printer_online);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -30,6 +29,8 @@ protected:
 	virtual void rcv_complete() override;
 
 private:
+	DECLARE_WRITE_LINE_MEMBER(printer_online);
+
 	required_device<printer_image_device> m_printer;
 
 	required_ioport m_rs232_rxbaud;

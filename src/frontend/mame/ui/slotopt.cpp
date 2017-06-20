@@ -19,7 +19,7 @@
 
 
 /***************************************************************************
-	UTILITY
+    UTILITY
 ***************************************************************************/
 
 namespace {
@@ -30,7 +30,7 @@ char DIVIDER[] = "------";
 
 
 //-------------------------------------------------
-//	get_slot_length
+//  get_slot_length
 //-------------------------------------------------
 
 int get_slot_length(const device_slot_interface &slot)
@@ -45,7 +45,7 @@ int get_slot_length(const device_slot_interface &slot)
 
 
 //-------------------------------------------------
-//	get_slot_option
+//  get_slot_option
 //-------------------------------------------------
 
 const char *get_slot_option(device_slot_interface &slot, int index)
@@ -66,16 +66,16 @@ const char *get_slot_option(device_slot_interface &slot, int index)
 	return "";
 }
 
-	
+
 };
 /***************************************************************************
-	SLOT MENU
+    SLOT MENU
 ***************************************************************************/
 
 namespace ui {
 
 //-------------------------------------------------
-//	menu_slot_devices constructor
+//  menu_slot_devices constructor
 //-------------------------------------------------
 
 menu_slot_devices::menu_slot_devices(mame_ui_manager &mui, render_container &container) : menu(mui, container)
@@ -83,7 +83,7 @@ menu_slot_devices::menu_slot_devices(mame_ui_manager &mui, render_container &con
 }
 
 //-------------------------------------------------
-//	menu_slot_devices destructor
+//  menu_slot_devices destructor
 //-------------------------------------------------
 
 menu_slot_devices::~menu_slot_devices()
@@ -92,8 +92,8 @@ menu_slot_devices::~menu_slot_devices()
 
 
 //-------------------------------------------------
-//	get_current_option - returns the current
-//	slot option
+//  get_current_option - returns the current
+//  slot option
 //-------------------------------------------------
 
 device_slot_option *menu_slot_devices::get_current_option(device_slot_interface &slot) const
@@ -117,7 +117,7 @@ device_slot_option *menu_slot_devices::get_current_option(device_slot_interface 
 
 
 //-------------------------------------------------
-//	get_current_index
+//  get_current_index
 //-------------------------------------------------
 
 int menu_slot_devices::get_current_index(device_slot_interface &slot) const
@@ -142,7 +142,7 @@ int menu_slot_devices::get_current_index(device_slot_interface &slot) const
 
 
 //-------------------------------------------------
-//	get_next_slot
+//  get_next_slot
 //-------------------------------------------------
 
 const char *menu_slot_devices::get_next_slot(device_slot_interface &slot) const
@@ -161,7 +161,7 @@ const char *menu_slot_devices::get_next_slot(device_slot_interface &slot) const
 
 
 //-------------------------------------------------
-//	get_previous_slot
+//  get_previous_slot
 //-------------------------------------------------
 
 const char *menu_slot_devices::get_previous_slot(device_slot_interface &slot) const
@@ -180,7 +180,7 @@ const char *menu_slot_devices::get_previous_slot(device_slot_interface &slot) co
 
 
 //-------------------------------------------------
-//	set_slot_device
+//  set_slot_device
 //-------------------------------------------------
 
 void menu_slot_devices::set_slot_device(device_slot_interface &slot, const char *val)
@@ -192,7 +192,7 @@ void menu_slot_devices::set_slot_device(device_slot_interface &slot, const char 
 
 
 //-------------------------------------------------
-//	populate
+//  populate
 //-------------------------------------------------
 
 void menu_slot_devices::populate(float &customtop, float &custombottom)
@@ -226,7 +226,7 @@ void menu_slot_devices::populate(float &customtop, float &custombottom)
 
 
 //-------------------------------------------------
-//	handle
+//  handle
 //-------------------------------------------------
 
 void menu_slot_devices::handle()

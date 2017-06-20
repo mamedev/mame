@@ -24,11 +24,11 @@ SLOT_INTERFACE_EXTERN(cpc_exp_cards);
 DEFINE_DEVICE_TYPE(CPC_PLAYCITY, cpc_playcity_device, "cpc_playcity", "PlayCity")
 
 // device machine config
-static MACHINE_CONFIG_START( cpc_playcity )
+MACHINE_CONFIG_MEMBER( cpc_playcity_device::device_add_mconfig )
 	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL_4MHz)
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(cpc_playcity_device,ctc_zc1_cb))
-	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE("ctc",z80ctc_device,trg3))
-	MCFG_Z80CTC_INTR_CB(WRITELINE(cpc_playcity_device,ctc_intr_cb))
+	MCFG_Z80CTC_ZC1_CB(WRITELINE(cpc_playcity_device, ctc_zc1_cb))
+	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE("ctc",z80ctc_device, trg3))
+	MCFG_Z80CTC_INTR_CB(WRITELINE(cpc_playcity_device, ctc_intr_cb))
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
 	MCFG_SOUND_ADD("ymz_1",YMZ294,XTAL_4MHz)  // when timer is not set, operates at 4MHz (interally divided by 2, so equivalent to the ST)
@@ -44,12 +44,6 @@ static MACHINE_CONFIG_START( cpc_playcity )
 	MCFG_CPC_EXPANSION_SLOT_OUT_ROMDIS_CB(DEVWRITELINE("^", cpc_expansion_slot_device, romdis_w))  // ROMDIS
 
 MACHINE_CONFIG_END
-
-
-machine_config_constructor cpc_playcity_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( cpc_playcity );
-}
 
 
 //**************************************************************************

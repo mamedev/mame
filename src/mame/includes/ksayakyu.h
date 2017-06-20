@@ -37,6 +37,7 @@ public:
 	DECLARE_WRITE8_MEMBER(latch_w);
 	DECLARE_READ8_MEMBER(sound_status_r);
 	DECLARE_WRITE8_MEMBER(tomaincpu_w);
+	DECLARE_READ8_MEMBER(int_ack_r);
 	DECLARE_WRITE8_MEMBER(ksayakyu_videoram_w);
 	DECLARE_WRITE8_MEMBER(ksayakyu_videoctrl_w);
 	DECLARE_WRITE8_MEMBER(dummy1_w);

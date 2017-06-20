@@ -7,11 +7,9 @@
     preliminary driver by Angelo Salese
 
     TODO:
-    - fix h8 CPU core bugs, it trips various unhandled opcodes
     - Implement DVD routing and YUV decoding;
     - game timings seem busted, could be due of missing DVD hook-up
     - csplayh1: inputs doesn't work at all, slower than the others too
-    - h8 type is almost likely to be wrong;
 
     DVD Notes:
     - TMP68301 communicates with h8 via their respective internal serial comms
@@ -20,6 +18,13 @@
       http://www.pioneerelectronics.com/ephox/StaticFiles/Manuals/Business/Pio%20V5000-RS232%20-%20CPM.pdf
       After returning a correct status code, tmp68301 sends "FSDVD04.MPG00001<CR>" to serial, probably tries
       to playback the file ...
+	- h8 board components:
+	  H8/3002
+	  MN7100 8-bit channel data acquisition system
+	  Fujitsu MD0208 
+	  Heatsinked chip (TBD)
+	  IDE and RS232c ports
+	  xtal 27 MHz
 
 ***********************************************************************************************************/
 
@@ -30,12 +35,16 @@
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "machine/tmp68301.h"
+#include "machine/idectrl.h"
+#include "machine/idehd.h"
 #include "sound/dac.h"
 #include "sound/3812intf.h"
 #include "sound/volt_reg.h"
 #include "video/v9938.h"
 #include "speaker.h"
 
+#define USE_H8 0
+#define DVD_CLOCK XTAL_27MHz
 
 class csplayh5_state : public driver_device
 {
@@ -72,7 +81,11 @@ public:
 	DECLARE_READ8_MEMBER(soundcpu_portd_r);
 	DECLARE_WRITE8_MEMBER(soundcpu_porta_w);
 	DECLARE_WRITE8_MEMBER(soundcpu_porte_w);
-
+	#if USE_H8
+	DECLARE_READ16_MEMBER(test_r);
+	DECLARE_WRITE_LINE_MEMBER(ide_irq);
+	#endif
+	
 	DECLARE_DRIVER_INIT(mjmania);
 	DECLARE_DRIVER_INIT(csplayh5);
 	DECLARE_DRIVER_INIT(fuudol);
@@ -93,24 +106,17 @@ public:
 
 
 
-#define USE_H8 0
 
-WRITE_LINE_MEMBER(csplayh5_state::csplayh5_vdp0_interrupt)
-{
-	/* this is not used as the v9938 interrupt callbacks are broken
-	   interrupts seem to be fired quite randomly */
-}
 
 READ16_MEMBER(csplayh5_state::csplayh5_mux_r)
 {
-	switch(m_mux_data)
+	for(int i=0;i<5;i++)
 	{
-		case 0x01: return m_key[0]->read();
-		case 0x02: return m_key[1]->read();
-		case 0x04: return m_key[2]->read();
-		case 0x08: return m_key[3]->read();
-		case 0x10: return m_key[4]->read();
+		if(m_mux_data & 1 << i)
+			return m_key[i]->read();
 	}
+
+	popmessage("Multiple bytes used for mux %02x",m_mux_data);
 
 	return 0xffff;
 }
@@ -151,16 +157,19 @@ READ16_MEMBER(csplayh5_state::test_r)
 static ADDRESS_MAP_START( csplayh5_sub_map, AS_PROGRAM, 16, csplayh5_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 
-	AM_RANGE(0x04002a, 0x04002b) AM_READ(test_r)
+	AM_RANGE(0x02000a, 0x02000b) AM_READ(test_r)
+//	AM_RANGE(0x020008, 0x02000f) AM_DEVREADWRITE("ide", ide_controller_device, read_cs0, write_cs0)
+	
+	AM_RANGE(0x040018, 0x040019) AM_READ(test_r)
+	AM_RANGE(0x040028, 0x04002f) AM_DEVREADWRITE("ide", ide_controller_device, read_cs0, write_cs0) // correct?
 	AM_RANGE(0x040036, 0x040037) AM_READ(test_r)
 
-	AM_RANGE(0x078000, 0x07ffff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x080000, 0x0fffff) AM_RAM
+	AM_RANGE(0x078000, 0x07ffff) AM_MIRROR(0xf80000) AM_RAM //AM_SHARE("nvram")
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( csplayh5_sub_io_map, AS_IO, 16, csplayh5_state )
-
+	AM_RANGE(0x0a, 0x0b) AM_READ(test_r)
 ADDRESS_MAP_END
 #endif
 
@@ -362,54 +371,13 @@ static INPUT_PORTS_START( csplayh5 )
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )            // COIN1
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )            // COIN2
-	PORT_DIPNAME( 0x0004, 0x0004, "SYSA" )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0100, 0x0100, "SYSB" )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0100, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0200, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0800, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x1000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x2000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x4000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x8000, DEF_STR( On ) )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Credit Clear")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MEMORY_RESET )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SERVICE ) // labeled analyzer in self-test
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_CODE(KEYCODE_4) PORT_NAME("Out Coin")
+	PORT_BIT( 0xffc0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-#if 0
-static GFXDECODE_START( csplayh5 )
-GFXDECODE_END
-#endif
 
 void csplayh5_state::machine_reset()
 {
@@ -429,6 +397,20 @@ static const z80_daisy_config daisy_chain_sound[] =
 	{ nullptr }
 };
 
+WRITE_LINE_MEMBER(csplayh5_state::csplayh5_vdp0_interrupt)
+{
+	/* this is not used as the v9938 interrupt callbacks are broken
+	   interrupts seem to be fired quite randomly */
+}
+
+#if USE_H8
+WRITE_LINE_MEMBER(csplayh5_state::ide_irq)
+{
+	printf("h8 ide alive %d\n",state);
+}
+#endif
+
+
 static MACHINE_CONFIG_START( csplayh5 )
 
 	/* basic machine hardware */
@@ -441,9 +423,12 @@ static MACHINE_CONFIG_START( csplayh5 )
 	MCFG_DEVICE_ADD("tmp68301", TMP68301, 0)
 
 #if USE_H8
-	MCFG_CPU_ADD("subcpu", H83002, 16000000)    /* unknown clock */
+	MCFG_CPU_ADD("subcpu", H83002, DVD_CLOCK/2)    /* unknown divider */
 	MCFG_CPU_PROGRAM_MAP(csplayh5_sub_map)
 	MCFG_CPU_IO_MAP(csplayh5_sub_io_map)
+	
+	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", nullptr, true) // dvd
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(csplayh5_state, ide_irq))
 #endif
 
 	MCFG_CPU_ADD("audiocpu", TMPZ84C011, 8000000)  /* TMPZ84C011, unknown clock */
@@ -477,7 +462,7 @@ static MACHINE_CONFIG_START( csplayh5 )
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE_EX(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
 	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
-	MACHINE_CONFIG_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
 
@@ -487,14 +472,16 @@ static MACHINE_CONFIG_START( csplayh5 )
 
 void csplayh5_state::general_init(int patchaddress, int patchvalue)
 {
+	#if !USE_H8
 	uint16_t *MAINROM = (uint16_t *)m_region_maincpu->base();
-	uint8_t *SNDROM = m_region_audiocpu->base();
-
-	// initialize sound rom bank
-	soundbank_w(0);
-
 	/* patch DVD comms check */
 	MAINROM[patchaddress] = patchvalue;
+	#endif
+	
+	uint8_t *SNDROM = m_region_audiocpu->base();
+
+	/* initialize sound rom bank */
+	soundbank_w(0);
 
 	/* patch sound program */
 	SNDROM[0x0213] = 0x00;          // DI -> NOP
@@ -528,8 +515,8 @@ ROM_START( csplayh1 )
 	ROM_LOAD16_BYTE( "4.bin", 0x000000, 0x080000, CRC(2e63ee15) SHA1(78fefbc277234458212cded997d393bd8b82cf76) )
 	ROM_LOAD16_BYTE( "8.bin", 0x000001, 0x080000, CRC(a8567f1b) SHA1(2a854ef8b1988ad097bbcbeddc4b275ad738e1e1) )
 
-	DISK_REGION( "dvd" )
-	DISK_IMAGE( "csplayh1", 0, SHA1(d6514882c2626e62c5079df9ac68ecb70fc33209) )
+	DISK_REGION( "ide:0:hdd:image" )
+	DISK_IMAGE_READONLY( "csplayh1", 0, SHA1(d6514882c2626e62c5079df9ac68ecb70fc33209) )
 
 	ROM_REGION( 0x1000, "gal", ROMREGION_ERASE00 )
 	ROM_LOAD( "gal16v8b.ic8", 0x000000, 0x0008c1, NO_DUMP )
@@ -551,8 +538,8 @@ ROM_START( junai )
 	ROM_LOAD16_BYTE( "4.ic41",   0x00001, 0x80000, CRC(4182dc30) SHA1(89601c62b74aff3d65b075d4b5cd1eb2ccf4e386) )
 	// 0x100000 - 0x3fffff empty sockets
 
-	DISK_REGION( "dvd" )
-	DISK_IMAGE( "junai", 0, SHA1(0491533e0ce3e4d2af608ea0b9d9646316b512bd) )
+	DISK_REGION( "ide:0:hdd:image" )
+	DISK_IMAGE_READONLY( "junai", 0, SHA1(0491533e0ce3e4d2af608ea0b9d9646316b512bd) )
 ROM_END
 
 ROM_START( csplayh5 )
@@ -571,8 +558,8 @@ ROM_START( csplayh5 )
 	ROM_LOAD16_BYTE( "4.ic41",   0x00001, 0x80000, CRC(113d7e96) SHA1(f3fb9c719544417a6a018b82f07c65bf73de21ff) )
 	// 0x100000 - 0x3fffff empty sockets
 
-	DISK_REGION( "dvd" )
-	DISK_IMAGE( "csplayh5", 0, SHA1(ce4883ce1351ce5299e41bfbd9a5ae8078b82b8c) )
+	DISK_REGION( "ide:0:hdd:image" )
+	DISK_IMAGE_READONLY( "csplayh5", 0, SHA1(ce4883ce1351ce5299e41bfbd9a5ae8078b82b8c) )
 ROM_END
 
 ROM_START( junai2 )
@@ -591,8 +578,8 @@ ROM_START( junai2 )
 	ROM_LOAD16_BYTE( "4.ic41",   0x00001, 0x80000, CRC(5b37c8dd) SHA1(8de5e2f92721c6679c6506850a442cafff89653f) )
 	// 0x100000 - 0x3fffff empty sockets
 
-	DISK_REGION( "dvd" )
-	DISK_IMAGE( "junai2", 0, SHA1(dc9633a101f20f03fd9b4414c10274d2539fb7c2) )
+	DISK_REGION( "ide:0:hdd:image" )
+	DISK_IMAGE_READONLY( "junai2", 0, SHA1(dc9633a101f20f03fd9b4414c10274d2539fb7c2) )
 
 	ROM_REGION( 0x1000, "gal", ROMREGION_ERASE00 )
 	ROM_LOAD( "gal16v8b.ic8", 0x000000, 0x0008c1, BAD_DUMP CRC(01c2895a) SHA1(782166a60fa14d5faa5a92629f7ca65a878ad7fe) )
@@ -614,8 +601,8 @@ ROM_START( mjmania )
 	ROM_LOAD16_BYTE( "3.ic40", 0x000000, 0x080000, CRC(37dde764) SHA1(0530b63d8e682cdf01128057fdc3a8c23262afc9) )
 	ROM_LOAD16_BYTE( "4.ic41", 0x000001, 0x080000, CRC(dea4a2d2) SHA1(0118eb1330c9da8fead99f64fc015fd343fed79b) )
 
-	DISK_REGION( "dvd" )
-	DISK_IMAGE( "mjmania", 0, SHA1(7117f2045fd04a3d8f8e06a6a98e8f585c4da301) )
+	DISK_REGION( "ide:0:hdd:image" )
+	DISK_IMAGE_READONLY( "mjmania", 0, SHA1(7117f2045fd04a3d8f8e06a6a98e8f585c4da301) )
 
 	ROM_REGION( 0x1000, "gal", ROMREGION_ERASE00 )
 	ROM_LOAD( "gal16v8b.ic8", 0x000000, 0x0008c1, BAD_DUMP CRC(6a92b563) SHA1(a6c4305cf021f37845f99713427daa9394b6ec7d) )
@@ -637,8 +624,8 @@ ROM_START( bikiniko )
 	ROM_LOAD16_BYTE( "4.ic41",   0x00001, 0x80000, CRC(1e2e1cf3) SHA1(f71b5dedf4f897644d519e412651152d0d81edb8) )
 	// 0x100000 - 0x3fffff empty sockets
 
-	DISK_REGION( "dvd" )
-	DISK_IMAGE( "bikiniko", 0, SHA1(2189b676746dd848b9b5eb69f9663d6dccd63787) )
+	DISK_REGION( "ide:0:hdd:image" )
+	DISK_IMAGE_READONLY( "bikiniko", 0, SHA1(2189b676746dd848b9b5eb69f9663d6dccd63787) )
 ROM_END
 
 ROM_START( thenanpa )
@@ -656,8 +643,8 @@ ROM_START( thenanpa )
 	ROM_LOAD16_BYTE( "3.ic40", 0x000000, 0x080000, CRC(ee6b88c4) SHA1(64ae66a24f1639801c7bdda7faa0d604bb97ceb1) )
 	ROM_LOAD16_BYTE( "4.ic41", 0x000001, 0x080000, CRC(ce987845) SHA1(2f7dca32a79ad6afbc55ca1d492b582f952688ff) )
 
-	DISK_REGION( "dvd" )
-	DISK_IMAGE( "thenanpa", 0,  SHA1(72bf8c75189e877508c5a64d5591738d23ed7e96) )
+	DISK_REGION( "ide:0:hdd:image" )
+	DISK_IMAGE_READONLY( "thenanpa", 0,  SHA1(72bf8c75189e877508c5a64d5591738d23ed7e96) )
 
 	ROM_REGION( 0x1000, "gal", ROMREGION_ERASE00 )
 	ROM_LOAD( "gal16v8b.ic8", 0x000000, 0x0008c1, BAD_DUMP CRC(daffd0ac)SHA1(cbeff914163d425a9cb30fe8d62f91fca281b11f) )
@@ -678,8 +665,8 @@ ROM_START( csplayh7 )
 	ROM_LOAD16_BYTE( "3.ic40", 0x000000, 0x080000, CRC(1d67ca95) SHA1(9b45045b6fa67308bade324f91c21010aa8d121e) )
 	ROM_LOAD16_BYTE( "4.ic41", 0x000001, 0x080000, CRC(b4f5f990) SHA1(88cccae04f89fef43d88f4e82b65de3de946e9af) )
 
-	DISK_REGION( "dvd" )
-	DISK_IMAGE( "csplayh7", 0, SHA1(f81e772745b0c62b17d91bd294993e49fe8da4d9) )
+	DISK_REGION( "ide:0:hdd:image" )
+	DISK_IMAGE_READONLY( "csplayh7", 0, SHA1(f81e772745b0c62b17d91bd294993e49fe8da4d9) )
 
 	ROM_REGION( 0x1000, "gal", ROMREGION_ERASE00 )
 	ROM_LOAD( "mjdvd12.gal16v8b.ic8.bin", 0x000000, 0x0008c1, BAD_DUMP CRC(6a92b563)SHA1(a6c4305cf021f37845f99713427daa9394b6ec7d) )
@@ -700,8 +687,8 @@ ROM_START( fuudol )
 	ROM_LOAD16_BYTE( "3.ic40", 0x000000, 0x080000, CRC(5c9e8665) SHA1(2a1b040e5c72d4400d4b5c467c75ae99e9bb01e2) )
 	ROM_LOAD16_BYTE( "4.ic41", 0x000001, 0x080000, CRC(fdd79d8f) SHA1(f8bb82afaa28affb04b83270eb407129f1c7e611) )
 
-	DISK_REGION( "dvd" )
-	DISK_IMAGE( "fuudol", 0, SHA1(fabab43543ed14da4fe7c63a2a2cc4e68936938a) )
+	DISK_REGION( "ide:0:hdd:image" )
+	DISK_IMAGE_READONLY( "fuudol", 0, SHA1(fabab43543ed14da4fe7c63a2a2cc4e68936938a) )
 
 	ROM_REGION( 0x1000, "gal", ROMREGION_ERASE00 )
 	ROM_LOAD( "gal16v8b.ic8", 0x000000, 0x0008c1, CRC(30719630) SHA1(a8c7b6d0304c38691775c5af6c32fbeeefd9f9fa) )

@@ -30,7 +30,7 @@ void pitnrun_state::machine_reset()
 {
 	m_zaccept = 1;
 	m_zready = 0;
-	m_mcu->set_input_line(0, CLEAR_LINE);
+	if (m_mcu) m_mcu->set_input_line(0, CLEAR_LINE);
 }
 
 TIMER_CALLBACK_MEMBER(pitnrun_state::mcu_real_data_r)

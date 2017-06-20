@@ -21,37 +21,37 @@
 
     Notes from Tomasz Slanina:
 
-	Tile decoding:
+    Tile decoding:
 
-	Each 8x8 BG tile is defined by:
-	- 1 bit  8x8 mask  (one tile - 8 consecutive bytes - user2 region)
-	- 4+4  bits of color ( one tile - 8 consecutive bytes - user1 region) 
-	- bit 3 of color  = brightness ?
+    Each 8x8 BG tile is defined by:
+    - 1 bit  8x8 mask  (one tile - 8 consecutive bytes - user2 region)
+    - 4+4  bits of color ( one tile - 8 consecutive bytes - user1 region)
+    - bit 3 of color  = brightness ?
 
-	Single mask byte defines one row of tile pixels (FG or BG)
-	Single color byte defines color of FG (4 bits) and color of BG (4 bits)
-	of high (odd address in user1) or low (even address in user1) 
-	nibbles of two tile pixels rows.
+    Single mask byte defines one row of tile pixels (FG or BG)
+    Single color byte defines color of FG (4 bits) and color of BG (4 bits)
+    of high (odd address in user1) or low (even address in user1)
+    nibbles of two tile pixels rows.
 
-	Here's an example (single tile):
+    Here's an example (single tile):
 
      user2      user1   colors
     ----------------------------
-    00011100    0x32   33321144    
-	00111100    0x41   33221144 
+    00011100    0x32   33321144
+    00111100    0x41   33221144
 
-	00111100    0x32   33227744 
-	00011000    0x47   33327444
+    00111100    0x32   33227744
+    00011000    0x47   33327444
 
-	00011000    0x56   55566555
-	00011000    0x56   55566555
+    00011000    0x56   55566555
+    00011000    0x56   55566555
 
-	00011000    0x84   88844777
-	00011000    0x74   88844777
+    00011000    0x84   88844777
+    00011000    0x74   88844777
 
-	
 
-	
+
+
 
     TO DO :
 
@@ -60,9 +60,9 @@
     - game speed, its seems to be controlled by the IRQ's, how fast should it
       be? firing seems frustratingly inconsistant (better with PORT_IMPULSE)
 
-    - BG tilemap palette bits (in most cases paltte 0 is used, 
+    - BG tilemap palette bits (in most cases paltte 0 is used,
       only highlights ( battlex logo, hiscore table) uses different palettes(?).
-      Current implementation gives different highlight colors than on real 
+      Current implementation gives different highlight colors than on real
       hardware (i.e. battlex logo should have yellow highights)
 
 ****************************************************************************
@@ -402,7 +402,7 @@ DRIVER_INIT_MEMBER(battlex_state,battlex)
 		{
 			for (bit = 0; bit < 8 ; bit ++)
 			{
-				
+
 				int color = colormask[(tile << 3 )| ((line&0x6) + (bit>3?1:0))  ];
 				int data = (gfxdata[(tile << 3 )| line] >> bit) & 1;
 

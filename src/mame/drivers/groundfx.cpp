@@ -67,6 +67,7 @@
 #include "emu.h"
 #include "includes/groundfx.h"
 #include "audio/taito_en.h"
+#include "machine/taitoio.h"
 
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"
@@ -95,44 +96,17 @@ void groundfx_state::device_timer(emu_timer &timer, device_timer_id id, int para
             GAME INPUTS
 **********************************************************/
 
-CUSTOM_INPUT_MEMBER(groundfx_state::frame_counter_r)
+READ_LINE_MEMBER(groundfx_state::frame_counter_r)
 {
 	return m_frame_counter;
 }
 
-CUSTOM_INPUT_MEMBER(groundfx_state::coin_word_r)
+WRITE8_MEMBER(groundfx_state::coin_word_w)
 {
-	return m_coin_word;
-}
-
-WRITE32_MEMBER(groundfx_state::input_w)
-{
-	switch (offset)
-	{
-		case 0x00:
-			if (ACCESSING_BITS_24_31)   /* $500000 is watchdog */
-			{
-				m_watchdog->watchdog_reset();
-			}
-
-			if (ACCESSING_BITS_0_7)
-			{
-				ioport("EEPROMOUT")->write(data, 0xff);
-			}
-
-			break;
-
-		case 0x01:
-			if (ACCESSING_BITS_24_31)
-			{
-				machine().bookkeeping().coin_lockout_w(0,~data & 0x01000000);
-				machine().bookkeeping().coin_lockout_w(1,~data & 0x02000000);
-				machine().bookkeeping().coin_counter_w(0, data & 0x04000000);
-				machine().bookkeeping().coin_counter_w(1, data & 0x08000000);
-				m_coin_word = (data >> 16) &0xffff;
-			}
-			break;
-	}
+	machine().bookkeeping().coin_lockout_w(0,~data & 0x01);
+	machine().bookkeeping().coin_lockout_w(1,~data & 0x02);
+	machine().bookkeeping().coin_counter_w(0, data & 0x04);
+	machine().bookkeeping().coin_counter_w(1, data & 0x08);
 }
 
 READ32_MEMBER(groundfx_state::adc_r)
@@ -187,11 +161,9 @@ static ADDRESS_MAP_START( groundfx_map, AS_PROGRAM, 32, groundfx_state )
 	AM_RANGE(0x200000, 0x21ffff) AM_RAM AM_SHARE("ram") /* main CPUA ram */
 	AM_RANGE(0x300000, 0x303fff) AM_RAM AM_SHARE("spriteram") /* sprite ram */
 	AM_RANGE(0x400000, 0x400003) AM_WRITE(motor_control_w)  /* gun vibration */
-	AM_RANGE(0x500000, 0x500003) AM_READ_PORT("BUTTONS")
-	AM_RANGE(0x500004, 0x500007) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x500000, 0x500007) AM_WRITE(input_w) /* eeprom etc. */
+	AM_RANGE(0x500000, 0x500007) AM_DEVREADWRITE8("tc0510nio", tc0510nio_device, read, write, 0xffffffff)
 	AM_RANGE(0x600000, 0x600003) AM_READWRITE(adc_r, adc_w)
-	AM_RANGE(0x700000, 0x7007ff) AM_RAM AM_SHARE("snd_shared")
+	AM_RANGE(0x700000, 0x7007ff) AM_DEVREADWRITE8("taito_en:dpram", mb8421_device, left_r, left_w, 0xffffffff)
 	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, long_r, long_w)      /* tilemaps */
 	AM_RANGE(0x830000, 0x83002f) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, ctrl_long_r, ctrl_long_w)  // debugging
 	AM_RANGE(0x900000, 0x90ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, long_r, long_w)    /* 6bpp tilemaps */
@@ -209,39 +181,24 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( groundfx )
 	PORT_START("BUTTONS")
-	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, groundfx_state,frame_counter_r, nullptr)
-	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
-	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_BUTTON3 )      /* shift hi */
-	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_BUTTON1 )      /* brake */
-	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_BUTTON2 )      /* shift low */
-	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x00000010, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)
-	PORT_BIT( 0x00000020, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, clk_write)
-	PORT_BIT( 0x00000040, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, di_write)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 )      /* shift hi */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )      /* brake */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 )      /* shift low */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SYSTEM")
-	PORT_SERVICE_NO_TOGGLE( 0x00000001, IP_ACTIVE_LOW )
-	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, groundfx_state, coin_word_r, nullptr)
+	PORT_SERVICE_NO_TOGGLE( 0x01, IP_ACTIVE_LOW )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("AN0")   /* IN 2, steering wheel */
 	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_REVERSE PORT_PLAYER(1)
@@ -320,7 +277,15 @@ static MACHINE_CONFIG_START( groundfx )
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	MCFG_DEVICE_ADD("tc0510nio", TC0510NIO, 0)
+	MCFG_TC0510NIO_READ_2_CB(IOPORT("BUTTONS"))
+	MCFG_TC0510NIO_READ_3_CB(DEVREADLINE("eeprom", eeprom_serial_93cxx_device, do_read)) MCFG_DEVCB_BIT(7)
+	MCFG_DEVCB_CHAIN_INPUT(READLINE(groundfx_state, frame_counter_r)) MCFG_DEVCB_BIT(0)
+	MCFG_TC0510NIO_WRITE_3_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write)) MCFG_DEVCB_BIT(5)
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, di_write)) MCFG_DEVCB_BIT(6)
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write)) MCFG_DEVCB_BIT(4)
+	MCFG_TC0510NIO_WRITE_4_CB(WRITE8(groundfx_state, coin_word_w))
+	MCFG_TC0510NIO_READ_7_CB(IOPORT("SYSTEM"))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -442,4 +407,4 @@ DRIVER_INIT_MEMBER(groundfx_state,groundfx)
 }
 
 
-GAME( 1992, groundfx, 0, groundfx, groundfx, groundfx_state, groundfx, ROT0, "Taito Corporation", "Ground Effects / Super Ground Effects (Japan)", 0 )
+GAME( 1992, groundfx, 0, groundfx, groundfx, groundfx_state, groundfx, ROT0, "Taito Corporation", "Ground Effects / Super Ground Effects (Japan)", MACHINE_NODEVICE_LAN )

@@ -428,27 +428,27 @@ void ef9365_device::set_busy_flag(int period)
 //  get_x_reg: Get the X register value
 //-------------------------------------------------
 
-unsigned int ef9365_device::get_x_reg()
+uint16_t ef9365_device::get_x_reg()
 {
-	return (m_registers[EF936X_REG_X_MSB]<<8) | m_registers[EF936X_REG_X_LSB];
+	return ((m_registers[EF936X_REG_X_MSB] & 0x0F)<<8) | m_registers[EF936X_REG_X_LSB];
 }
 
 //-------------------------------------------------
 //  get_y_reg: Get the Y register value
 //-------------------------------------------------
 
-unsigned int ef9365_device::get_y_reg()
+uint16_t ef9365_device::get_y_reg()
 {
-	return (m_registers[EF936X_REG_Y_MSB]<<8) | m_registers[EF936X_REG_Y_LSB];
+	return ((m_registers[EF936X_REG_Y_MSB] & 0x0F)<<8) | m_registers[EF936X_REG_Y_LSB];
 }
 
 //-------------------------------------------------
 //  set_x_reg: Set the X register value
 //-------------------------------------------------
 
-void ef9365_device::set_x_reg(unsigned int x)
+void ef9365_device::set_x_reg(uint16_t x)
 {
-	m_registers[EF936X_REG_X_MSB] = x >> 8;
+	m_registers[EF936X_REG_X_MSB] = ( x >> 8 ) & 0x0F;
 	m_registers[EF936X_REG_X_LSB] = x & 0xFF;
 }
 
@@ -456,9 +456,9 @@ void ef9365_device::set_x_reg(unsigned int x)
 //  set_y_reg: Set the Y register value
 //-------------------------------------------------
 
-void ef9365_device::set_y_reg(unsigned int y)
+void ef9365_device::set_y_reg(uint16_t y)
 {
-	m_registers[EF936X_REG_Y_MSB] = y >> 8;
+	m_registers[EF936X_REG_Y_MSB] = ( y >> 8 ) & 0x0F;
 	m_registers[EF936X_REG_Y_LSB] = y & 0xFF;
 }
 
@@ -560,17 +560,17 @@ const static unsigned int vectortype_code[][8] =
 
 //-------------------------------------------------
 //  draw_vector: Vector drawing function
-//  from the x1 & y1 position to the x2 & y2 position
+//  from the start_x & start_y position to the start_x+delta_x & start_y+delta_y position
 //  with the m_current_color color
 //  (Bresenham's line algorithm)
 //-------------------------------------------------
 
-int ef9365_device::draw_vector(int x1,int y1,int x2,int y2)
+int ef9365_device::draw_vector(uint16_t start_x,uint16_t start_y,short delta_x,short delta_y)
 {
 	int dx;
 	int dy,t;
 	int e;
-	int x,y;
+	int x,y,dest_x,dest_y,end_x,end_y;
 	int incy;
 	int diago,horiz;
 	unsigned char c1;
@@ -580,7 +580,15 @@ int ef9365_device::draw_vector(int x1,int y1,int x2,int y2)
 	int dot_code_ptr;
 	int compute_cycles;
 
+	LOG("EF9365 draw_vector : Start=(%d,%d) End=(%d,%d)\n", start_x,start_y,start_x+delta_x,start_y+delta_y);
+
 	compute_cycles = 0;
+
+	dest_x = start_x + delta_x;
+	dest_y = start_y + delta_y;
+
+	end_x = dest_x;
+	end_y = dest_y;
 
 	c1=0;
 	incy=1;
@@ -593,25 +601,25 @@ int ef9365_device::draw_vector(int x1,int y1,int x2,int y2)
 		pen_state = 0;
 	state_counter &= ~0x80;
 
-	if(x2>x1)
-		dx = x2 - x1;
+	if( dest_x > start_x )
+		dx = dest_x - start_x;
 	else
-		dx = x1 - x2;
+		dx = start_x - dest_x;
 
-	if(y2>y1)
-		dy = y2 - y1;
+	if( dest_y > start_y )
+		dy = dest_y - start_y;
 	else
-		dy = y1 - y2;
+		dy = start_y - dest_y;
 
 	if( dy > dx )
 	{
-		t = y2;
-		y2 = x2;
-		x2 = t;
+		t = dest_y;
+		dest_y = dest_x;
+		dest_x = t;
 
-		t = y1;
-		y1 = x1;
-		x1 = t;
+		t = start_y;
+		start_y = start_x;
+		start_x = t;
 
 		t = dx;
 		dx = dy;
@@ -620,35 +628,35 @@ int ef9365_device::draw_vector(int x1,int y1,int x2,int y2)
 		c1 = 1;
 	}
 
-	if( x1 > x2 )
+	if( start_x > dest_x )
 	{
-		t = y2;
-		y2 = y1;
-		y1 = t;
+		t = dest_y;
+		dest_y = start_y;
+		start_y = t;
 
-		t = x1;
-		x1 = x2;
-		x2 = t;
+		t = start_x;
+		start_x = dest_x;
+		dest_x = t;
 	}
 
 	horiz = dy<<1;
 	diago = ( dy - dx )<<1;
 	e = ( dy<<1 ) - dx;
 
-	if( y1 <= y2 )
+	if( start_y <= dest_y )
 		incy = 1;
 	else
 		incy = -1;
 
-	x = x1;
-	y = y1;
+	x = start_x;
+	y = start_y;
 
 	if(c1)
 	{
 		do
 		{
 			if(pen_state)
-				plot(y,x);
+				plot(y % bitplane_xres, x % bitplane_yres);
 
 			compute_cycles++;
 
@@ -693,14 +701,14 @@ int ef9365_device::draw_vector(int x1,int y1,int x2,int y2)
 
 			x++;
 
-		}while( x <= x2 );
+		} while (x <= dest_x);
 	}
 	else
 	{
 		do
 		{
 			if(pen_state)
-				plot(x,y);
+				plot(x % bitplane_xres, y % bitplane_yres);
 
 			compute_cycles++;
 
@@ -745,8 +753,11 @@ int ef9365_device::draw_vector(int x1,int y1,int x2,int y2)
 
 			x++;
 
-		}while( x <= x2 );
+		} while (x <= dest_x);
 	}
+
+	set_x_reg(end_x);
+	set_y_reg(end_y);
 
 	return compute_cycles;
 }
@@ -1077,29 +1088,29 @@ void ef9365_device::ef9365_exec(uint8_t cmd)
 			switch ( cmd & 0x7 ) // Direction code
 			{
 				case 0x1:
-					busy_cycles = draw_vector   ( get_x_reg(), get_y_reg(), get_x_reg() + tmp_delta_x, get_y_reg() + tmp_delta_y);
+					busy_cycles = draw_vector   ( get_x_reg(), get_y_reg(),  tmp_delta_x,  tmp_delta_y );
 				break;
 				case 0x3:
-					busy_cycles = draw_vector   ( get_x_reg(), get_y_reg(), get_x_reg() - tmp_delta_x, get_y_reg() + tmp_delta_y);
+					busy_cycles = draw_vector   ( get_x_reg(), get_y_reg(), -tmp_delta_x,  tmp_delta_y );
 				break;
 				case 0x5:
-					busy_cycles = draw_vector   ( get_x_reg(), get_y_reg(), get_x_reg() + tmp_delta_x, get_y_reg() - tmp_delta_y);
+					busy_cycles = draw_vector   ( get_x_reg(), get_y_reg(),  tmp_delta_x, -tmp_delta_y );
 				break;
 				case 0x7:
-					busy_cycles = draw_vector   ( get_x_reg(), get_y_reg(), get_x_reg() - tmp_delta_x, get_y_reg() - tmp_delta_y);
+					busy_cycles = draw_vector   ( get_x_reg(), get_y_reg(), -tmp_delta_x, -tmp_delta_y );
 				break;
 
 				case 0x0:
-					busy_cycles = draw_vector   ( get_x_reg(), get_y_reg(), get_x_reg() + tmp_delta_x, get_y_reg() );
+					busy_cycles = draw_vector   ( get_x_reg(), get_y_reg(),  tmp_delta_x, 0 );
 				break;
 				case 0x2:
-					busy_cycles = draw_vector   ( get_x_reg(), get_y_reg(), get_x_reg(), get_y_reg() + tmp_delta_y);
+					busy_cycles = draw_vector   ( get_x_reg(), get_y_reg(), 0, tmp_delta_y );
 				break;
 				case 0x4:
-					busy_cycles = draw_vector   ( get_x_reg(), get_y_reg(), get_x_reg(), get_y_reg() - tmp_delta_y);
+					busy_cycles = draw_vector   ( get_x_reg(), get_y_reg(), 0, -tmp_delta_y );
 				break;
 				case 0x6:
-					busy_cycles = draw_vector   ( get_x_reg(), get_y_reg(), get_x_reg() - tmp_delta_x, get_y_reg() );
+					busy_cycles = draw_vector   ( get_x_reg(), get_y_reg(), -tmp_delta_x , 0 );
 				break;
 			}
 			set_busy_flag( cycles_to_us( busy_cycles ) );
@@ -1117,29 +1128,29 @@ void ef9365_device::ef9365_exec(uint8_t cmd)
 				switch ( cmd & 0x7 ) // Direction code
 				{
 					case 0x1:
-						busy_cycles = draw_vector   ( get_x_reg(), get_y_reg(), get_x_reg() + tmp_delta_x, get_y_reg() + tmp_delta_y);
+						busy_cycles = draw_vector   ( get_x_reg(), get_y_reg(),  tmp_delta_x,  tmp_delta_y );
 					break;
 					case 0x3:
-						busy_cycles = draw_vector   ( get_x_reg(), get_y_reg(), get_x_reg() - tmp_delta_x, get_y_reg() + tmp_delta_y);
+						busy_cycles = draw_vector   ( get_x_reg(), get_y_reg(), -tmp_delta_x,  tmp_delta_y );
 					break;
 					case 0x5:
-						busy_cycles = draw_vector   ( get_x_reg(), get_y_reg(), get_x_reg() + tmp_delta_x, get_y_reg() - tmp_delta_y);
+						busy_cycles = draw_vector   ( get_x_reg(), get_y_reg(),  tmp_delta_x, -tmp_delta_y );
 					break;
 					case 0x7:
-						busy_cycles = draw_vector   ( get_x_reg(), get_y_reg(), get_x_reg() - tmp_delta_x, get_y_reg() - tmp_delta_y);
+						busy_cycles = draw_vector   ( get_x_reg(), get_y_reg(), -tmp_delta_x, -tmp_delta_y );
 					break;
 
 					case 0x0:
-						busy_cycles = draw_vector   ( get_x_reg(), get_y_reg(), get_x_reg() + tmp_delta_x, get_y_reg() );
+						busy_cycles = draw_vector   ( get_x_reg(), get_y_reg(), tmp_delta_x, 0 );
 					break;
 					case 0x2:
-						busy_cycles = draw_vector   ( get_x_reg(), get_y_reg(), get_x_reg(), get_y_reg() + tmp_delta_y);
+						busy_cycles = draw_vector   ( get_x_reg(), get_y_reg(), 0,  tmp_delta_y );
 					break;
 					case 0x4:
-						busy_cycles = draw_vector   ( get_x_reg(), get_y_reg(), get_x_reg(), get_y_reg() - tmp_delta_y);
+						busy_cycles = draw_vector   ( get_x_reg(), get_y_reg(), 0, -tmp_delta_y );
 					break;
 					case 0x6:
-						busy_cycles = draw_vector   ( get_x_reg(), get_y_reg(), get_x_reg() - tmp_delta_x, get_y_reg() );
+						busy_cycles = draw_vector   ( get_x_reg(), get_y_reg(), -tmp_delta_x, 0 );
 					break;
 				}
 

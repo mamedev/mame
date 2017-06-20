@@ -44,6 +44,10 @@
     above $F000. For these addresses it is vital to read zero values, or else the
     player will die for no reason.
 
+    Some bootleg boards substitute an AY-3-8910A for the YM2149. Since the clock
+    divider of the GI PSG cannot be configured, this effectively doubles the
+    pitch of music and sound effects on actual hardware!
+
 Measured Clocks:
     Z80 - 5997077Hz (6Mhz)
 MC68705 - 2998533Hz (3Mhz)
@@ -1389,6 +1393,14 @@ static MACHINE_CONFIG_DERIVED( bootleg, arkanoid )
 	MCFG_DEVICE_REMOVE("mcu")
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( aysnd, bootleg )
+	MCFG_SOUND_REPLACE("aysnd", AY8910, XTAL_12MHz/4)
+	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("UNUSED"))
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW"))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.66)
+MACHINE_CONFIG_END
+
 
 static MACHINE_CONFIG_START( hexa )
 
@@ -2209,11 +2221,11 @@ GAME( 1986, arkblock,    arkanoid, bootleg,  arkangc,   arkanoid_state, arkblock
 GAME( 1986, arkbloc2,    arkanoid, bootleg,  arkangc,   arkanoid_state, arkbloc2, ROT90,  "bootleg (Game Corporation)",                  "Block (Game Corporation bootleg, set 2)",     MACHINE_SUPPORTS_SAVE )
 GAME( 1986, arkbloc3,    arkanoid, bootleg,  block2,    arkanoid_state, block2,   ROT90,  "bootleg (Game Corporation)",                  "Block (Game Corporation bootleg, set 3)",     MACHINE_SUPPORTS_SAVE ) // Both these sets (arkblock3, block2) have an extra unknown rom
 GAME( 1986, block2,      arkanoid, bootleg,  block2,    arkanoid_state, block2,   ROT90,  "bootleg (S.P.A. Co.)",                        "Block 2 (S.P.A. Co. bootleg)",                MACHINE_SUPPORTS_SAVE ) //  and scrambled gfx roms with 'space invader' themed gfx
-GAME( 1986, arkgcbl,     arkanoid, bootleg,  arkgcbl,   arkanoid_state, arkgcbl,  ROT90,  "bootleg",                                     "Arkanoid (bootleg on Block hardware, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, arkgcbla,    arkanoid, bootleg,  arkgcbl,   arkanoid_state, arkgcbl,  ROT90,  "bootleg",                                     "Arkanoid (bootleg on Block hardware, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, arkgcbl,     arkanoid, aysnd,    arkgcbl,   arkanoid_state, arkgcbl,  ROT90,  "bootleg",                                     "Arkanoid (bootleg on Block hardware, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, arkgcbla,    arkanoid, aysnd,    arkgcbl,   arkanoid_state, arkgcbl,  ROT90,  "bootleg",                                     "Arkanoid (bootleg on Block hardware, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, paddle2,     arkanoid, bootleg,  paddle2,   arkanoid_state, paddle2,  ROT90,  "bootleg",                                     "Paddle 2 (bootleg on Block hardware)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1986, arkatayt,    arkanoid, bootleg,  arkatayt,  arkanoid_state, 0,        ROT90,  "bootleg (Tayto)",                             "Arkanoid (Tayto bootleg)",                    MACHINE_SUPPORTS_SAVE )
-GAME( 1986, arktayt2,    arkanoid, bootleg,  arktayt2,  arkanoid_state, 0,        ROT90,  "bootleg (Tayto)",                             "Arkanoid (Tayto bootleg, harder)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1986, arkatayt,    arkanoid, aysnd,    arkatayt,  arkanoid_state, 0,        ROT90,  "bootleg (Tayto)",                             "Arkanoid (Tayto bootleg)",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1986, arktayt2,    arkanoid, aysnd,    arktayt2,  arkanoid_state, 0,        ROT90,  "bootleg (Tayto)",                             "Arkanoid (Tayto bootleg, harder)",            MACHINE_SUPPORTS_SAVE )
 // Other games
 GAME( 1987, arkatour,    0,        arkanoid, arkanoid,  arkanoid_state, 0,        ROT90,  "Taito America Corporation (Romstar license)", "Tournament Arkanoid (US)",                    MACHINE_SUPPORTS_SAVE )
 

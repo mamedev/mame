@@ -10,33 +10,23 @@
 
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "includes/ondra.h"
+
+#include "cpu/z80/z80.h"
 
 
 READ8_MEMBER(ondra_state::ondra_keyboard_r)
 {
 	uint8_t retVal = 0x00;
-	double valcas = m_cassette->input();
 
-	if ( valcas < 0.00) {
-		retVal = 0x80;
-	}
+	double const valcas = m_cassette->input();
+	if (valcas < 0.00)
+		retVal |= 0x80;
 
-	switch ( offset & 0x0f )
-	{
-		case 0: retVal |= m_line0->read(); break;
-		case 1: retVal |= m_line1->read(); break;
-		case 2: retVal |= m_line2->read(); break;
-		case 3: retVal |= m_line3->read(); break;
-		case 4: retVal |= m_line4->read(); break;
-		case 5: retVal |= m_line5->read(); break;
-		case 6: retVal |= m_line6->read(); break;
-		case 7: retVal |= m_line7->read(); break;
-		case 8: retVal |= m_line8->read(); break;
-		case 9: retVal |= m_line9->read(); break;
-		default: retVal |= 0x1f; break;
-	}
+	if ((offset & 0x0f) < m_lines.size())
+		retVal |= m_lines[offset & 0x0f]->read();
+	else
+		retVal |= 0x1f;
 
 	return retVal;
 }

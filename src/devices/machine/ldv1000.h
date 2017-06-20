@@ -76,7 +76,7 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	// subclass overrides
 	virtual void player_vsync(const vbi_metadata &vbi, int fieldnum, const attotime &curtime) override;
@@ -90,11 +90,14 @@ protected:
 
 public:
 	// internal read/write handlers
-	DECLARE_WRITE_LINE_MEMBER( ctc_interrupt );
 	DECLARE_WRITE8_MEMBER( z80_decoder_display_port_w );
 	DECLARE_READ8_MEMBER( z80_decoder_display_port_r );
 	DECLARE_READ8_MEMBER( z80_controller_r );
 	DECLARE_WRITE8_MEMBER( z80_controller_w );
+
+private:
+	// internal read/write handlers
+	DECLARE_WRITE_LINE_MEMBER( ctc_interrupt );
 	DECLARE_WRITE8_MEMBER( ppi0_porta_w );
 	DECLARE_READ8_MEMBER( ppi0_portb_r );
 	DECLARE_READ8_MEMBER( ppi0_portc_r );
@@ -103,7 +106,6 @@ public:
 	DECLARE_WRITE8_MEMBER( ppi1_portb_w );
 	DECLARE_WRITE8_MEMBER( ppi1_portc_w );
 
-protected:
 	// internal state
 	required_device<z80_device> m_z80_cpu;                  /* CPU index of the Z80 */
 	required_device<z80ctc_device> m_z80_ctc;                   /* CTC device */

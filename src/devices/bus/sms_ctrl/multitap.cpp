@@ -120,8 +120,7 @@ void sms_multitap_device::peripheral_w(uint8_t data)
 
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
 READ32_MEMBER( sms_multitap_device::pixel_r )
@@ -130,7 +129,7 @@ READ32_MEMBER( sms_multitap_device::pixel_r )
 }
 
 
-static MACHINE_CONFIG_START( multitap_slot )
+MACHINE_CONFIG_MEMBER( sms_multitap_device::device_add_mconfig )
 	// Controller subports setup, without the TH callback declaration,
 	// because the circuit scheme shows TH of subports without connection.
 	MCFG_SMS_CONTROL_PORT_ADD("ctrl1", sms_control_port_devices, "joypad")
@@ -142,9 +141,3 @@ static MACHINE_CONFIG_START( multitap_slot )
 	MCFG_SMS_CONTROL_PORT_ADD("ctrl4", sms_control_port_devices, "joypad")
 	MCFG_SMS_CONTROL_PORT_PIXEL_HANDLER(READ32(sms_multitap_device, pixel_r))
 MACHINE_CONFIG_END
-
-
-machine_config_constructor sms_multitap_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( multitap_slot );
-}

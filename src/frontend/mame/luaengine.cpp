@@ -776,17 +776,111 @@ void lua_engine::initialize()
 			return lua_yield(L, 0);
 		});
 
-	emu.new_usertype<emu_file>("file", sol::call_constructor, sol::constructors<sol::types<const char *, uint32_t>>(),
+/*
+ * emu.file([opt] searchpath, flags) - flags can be as in osdcore "OPEN_FLAG_*" or lua style with 'rwc' with addtional c for create *and truncate* (be careful)
+ *                                     support zipped files on the searchpath
+ * file:open(name) - open first file matching name in searchpath, supports read and write sockets as "socket.127.0.0.1:1234"
+ * file:open_next() - open next file matching name in searchpath
+ * file:read(len) - only reads len bytes, doen't do lua style formats
+ * file:write(data) - write data to file
+ * file:seek(offset, whence) - whence is as C "SEEK_*" int
+ * file:seek([opt] whence, [opt] offset) - lua style "set"|"cur"|"end", returns cur offset
+ * file:size() -
+ * file:filename() - name of current file, container name if file is in zip
+ * file:fullpath() -
+*/
+
+	emu.new_usertype<emu_file>("file", sol::call_constructor, sol::initializers([](emu_file &file, u32 flags) { new (&file) emu_file(flags); },
+				[](emu_file &file, const char *path, u32 flags) { new (&file) emu_file(path, flags); },
+				[](emu_file &file, const char *mode) {
+					int flags = 0;
+					for(int i = 0; i < 2; i++) // limit to three chars
+					{
+						switch(mode[i])
+						{
+							case 'r':
+								flags |= OPEN_FLAG_READ;
+								break;
+							case 'w':
+								flags |= OPEN_FLAG_WRITE;
+								break;
+							case 'c':
+								flags |= OPEN_FLAG_CREATE;
+								break;
+						}
+					}
+					new (&file) emu_file(flags);
+				},
+				[](emu_file &file, const char *path, const char* mode) {
+					int flags = 0;
+					for(int i = 0; i < 2; i++) // limit to three chars
+					{
+						switch(mode[i])
+						{
+							case 'r':
+								flags |= OPEN_FLAG_READ;
+								break;
+							case 'w':
+								flags |= OPEN_FLAG_WRITE;
+								break;
+							case 'c':
+								flags |= OPEN_FLAG_CREATE;
+								break;
+						}
+					}
+					new (&file) emu_file(path, flags);
+				}),
 			"read", [](emu_file &file, sol::buffer *buff) { buff->set_len(file.read(buff->get_ptr(), buff->get_len())); return buff; },
 			"write", [](emu_file &file, const std::string &data) { return file.write(data.data(), data.size()); },
 			"open", static_cast<osd_file::error (emu_file::*)(const std::string &)>(&emu_file::open),
 			"open_next", &emu_file::open_next,
-			"seek", &emu_file::seek,
+			"seek", sol::overload([](emu_file &file) { return file.tell(); },
+				[this](emu_file &file, s64 offset, int whence) -> sol::object {
+					if(file.seek(offset, whence))
+						return sol::make_object(sol(), sol::nil);
+					else
+						return sol::make_object(sol(), file.tell());
+				},
+				[this](emu_file &file, const char* whence) -> sol::object {
+					int wval = -1;
+					const char *seekdirs[] = {"set", "cur", "end"};
+					for(int i = 0; i < 3; i++)
+					{
+						if(!strncmp(whence, seekdirs[i], 3))
+						{
+							wval = i;
+							break;
+						}
+					}
+					if(wval < 0 || wval >= 3)
+						return sol::make_object(sol(), sol::nil);
+					if(file.seek(0, wval))
+						return sol::make_object(sol(), sol::nil);
+					return sol::make_object(sol(), file.tell());
+				},
+				[this](emu_file &file, const char* whence, s64 offset) -> sol::object {
+					int wval = -1;
+					const char *seekdirs[] = {"set", "cur", "end"};
+					for(int i = 0; i < 3; i++)
+					{
+						if(!strncmp(whence, seekdirs[i], 3))
+						{
+							wval = i;
+							break;
+						}
+					}
+					if(wval < 0 || wval >= 3)
+						return sol::make_object(sol(), sol::nil);
+					if(file.seek(offset, wval))
+						return sol::make_object(sol(), sol::nil);
+					return sol::make_object(sol(), file.tell());
+				}),
 			"size", &emu_file::size,
 			"filename", &emu_file::filename,
 			"fullpath", &emu_file::fullpath);
 
 /*
+ * emu.thread()
  * thread.start(scr) - run scr (string not function) in a seperate thread in a new empty (other then modules) lua context
  * thread.continue(val) - resume thread and pass val to it
  * thread.result() - get thread result as string
@@ -1006,7 +1100,8 @@ void lua_engine::initialize()
  * machine:parameters() - get parameter_manager
  * machine:options() - get machine core_options
  * machine:output() - get output_manager
- * machine:input() - get ui_input_manager
+ * machine:input() - get input_manager
+ * machine:uiinput() - get ui_input_manager
  * machine.paused - get paused state
  * machine.devices - get device table
  * machine.screens - get screens table
@@ -1029,7 +1124,8 @@ void lua_engine::initialize()
 			"memory", &running_machine::memory,
 			"options", [](running_machine &m) { return static_cast<core_options *>(&m.options()); },
 			"outputs", &running_machine::output,
-			"input", &running_machine::ui_input,
+			"input", &running_machine::input,
+			"uiinput", &running_machine::ui_input,
 			"paused", sol::property(&running_machine::paused),
 			"devices", sol::property([this](running_machine &m) {
 					std::function<void(device_t &, sol::table)> tree;
@@ -1324,11 +1420,24 @@ void lua_engine::initialize()
 			"throttle_rate", sol::property(&video_manager::throttle_rate, &video_manager::set_throttle_rate));
 
 /* machine:input()
- * input:find_mouse() - returns x, y, button state, ui render target
- * input:pressed(key) - get pressed state for key
+ * input:code_from_token(token) - get input_code for KEYCODE_* string token
+ * input:code_pressed(code) - get pressed state for input_code
+ * input:seq_from_tokens(tokens) - get input_seq for multiple space separated KEYCODE_* string tokens
+ * input:seq_pressed(seq) - get pressed state for input_seq
  */
 
-	sol().registry().new_usertype<ui_input_manager>("input", "new", sol::no_constructor,
+	sol().registry().new_usertype<input_manager>("input", "new", sol::no_constructor,
+			"code_from_token", [](input_manager &input, const char *token) { return sol::make_user(input.code_from_token(token)); },
+			"code_pressed", [](input_manager &input, sol::user<input_code> code) { return input.code_pressed(code); },
+			"seq_from_tokens", [](input_manager &input, const char *tokens) { input_seq seq; input.seq_from_tokens(seq, tokens); return sol::make_user(seq); },
+			"seq_pressed", [](input_manager &input, sol::user<input_seq> seq) { return input.seq_pressed(seq); });
+
+/* machine:uiinput()
+ * uiinput:find_mouse() - returns x, y, button state, ui render target
+ * uiinput:pressed(key) - get pressed state for ui key
+ */
+
+	sol().registry().new_usertype<ui_input_manager>("uiinput", "new", sol::no_constructor,
 			"find_mouse", [](ui_input_manager &ui) {
 					int32_t x, y;
 					bool button;

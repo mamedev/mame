@@ -26,8 +26,7 @@ public:
 	voodoo_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
+
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual DECLARE_ADDRESS_MAP(config_map, 32) override;
 
@@ -46,6 +45,7 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	required_device<voodoo_device> m_voodoo;

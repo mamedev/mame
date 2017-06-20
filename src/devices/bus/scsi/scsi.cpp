@@ -61,7 +61,7 @@ scsi_port_device::scsi_port_device(const machine_config &mconfig, const char *ta
 {
 }
 
-static MACHINE_CONFIG_START( scsi_port )
+MACHINE_CONFIG_MEMBER( scsi_port_device::device_add_mconfig )
 	MCFG_DEVICE_ADD( SCSI_PORT_DEVICE1, SCSI_PORT_SLOT, 0 )
 	MCFG_DEVICE_ADD( SCSI_PORT_DEVICE2, SCSI_PORT_SLOT, 0 )
 	MCFG_DEVICE_ADD( SCSI_PORT_DEVICE3, SCSI_PORT_SLOT, 0 )
@@ -70,11 +70,6 @@ static MACHINE_CONFIG_START( scsi_port )
 	MCFG_DEVICE_ADD( SCSI_PORT_DEVICE6, SCSI_PORT_SLOT, 0 )
 	MCFG_DEVICE_ADD( SCSI_PORT_DEVICE7, SCSI_PORT_SLOT, 0 )
 MACHINE_CONFIG_END
-
-machine_config_constructor scsi_port_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( scsi_port );
-}
 
 void scsi_port_device::device_start()
 {

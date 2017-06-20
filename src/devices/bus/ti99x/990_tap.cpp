@@ -960,13 +960,6 @@ void ti990_tape_image_device::call_unload()
 	MCFG_DEVICE_ADD((_tag),  TI990_TAPE, 0)
 
 
-static MACHINE_CONFIG_START( tap_990 )
-	MCFG_TI990_TAPE_ADD("tape0")
-	MCFG_TI990_TAPE_ADD("tape1")
-	MCFG_TI990_TAPE_ADD("tape2")
-	MCFG_TI990_TAPE_ADD("tape3")
-MACHINE_CONFIG_END
-
 DEFINE_DEVICE_TYPE(TI990_TAPE_CTRL, tap_990_device, "ti990_tap", "Generic TI-900 Tape Controller")
 
 tap_990_device::tap_990_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -991,11 +984,12 @@ void tap_990_device::device_start()
 }
 
 //-------------------------------------------------
-//  device_mconfig_additions - return a pointer to
-//  the device's machine fragment
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor tap_990_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( tap_990 );
-}
+MACHINE_CONFIG_MEMBER( tap_990_device::device_add_mconfig )
+	MCFG_TI990_TAPE_ADD("tape0")
+	MCFG_TI990_TAPE_ADD("tape1")
+	MCFG_TI990_TAPE_ADD("tape2")
+	MCFG_TI990_TAPE_ADD("tape3")
+MACHINE_CONFIG_END

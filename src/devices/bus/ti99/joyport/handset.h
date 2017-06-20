@@ -21,7 +21,7 @@
 
 #include "joyport.h"
 
-DECLARE_DEVICE_TYPE(TI99_HANDSET, ti99_handset_device)
+namespace bus { namespace ti99 { namespace joyport {
 
 class ti99_handset_device : public device_t, public device_ti99_joyport_interface
 {
@@ -61,8 +61,6 @@ private:
 
 /****************************************************************************/
 
-DECLARE_DEVICE_TYPE(TI99_JOYSTICK, ti99_twin_joystick_device)
-
 class ti99_twin_joystick_device : public device_t, public device_ti99_joyport_interface
 {
 public:
@@ -81,6 +79,9 @@ private:
 	// and then routed back to the port via the joystick
 	int m_joystick;
 };
+} } } // end namespace bus::ti99::joyport
 
+DECLARE_DEVICE_TYPE_NS(TI99_HANDSET, bus::ti99::joyport, ti99_handset_device)
+DECLARE_DEVICE_TYPE_NS(TI99_JOYSTICK, bus::ti99::joyport, ti99_twin_joystick_device)
 
 #endif // MAME_BUS_TI99_JOYPORT_HANDSET_H

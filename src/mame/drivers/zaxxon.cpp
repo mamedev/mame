@@ -303,10 +303,10 @@ INPUT_CHANGED_MEMBER(zaxxon_state::service_switch)
 }
 
 
-INTERRUPT_GEN_MEMBER(zaxxon_state::vblank_int)
+WRITE_LINE_MEMBER(zaxxon_state::vblank_int)
 {
-	if (m_int_enabled)
-		device.execute().set_input_line(0, ASSERT_LINE);
+	if (state && m_int_enabled)
+		m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
 
@@ -919,7 +919,6 @@ static MACHINE_CONFIG_START( root )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/16)
 	MCFG_CPU_PROGRAM_MAP(zaxxon_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", zaxxon_state,  vblank_int)
 
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(zaxxon_state, zaxxon_sound_a_w))
@@ -935,7 +934,7 @@ static MACHINE_CONFIG_START( root )
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(zaxxon_state, screen_update_zaxxon)
 	MCFG_SCREEN_PALETTE("palette")
-
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(zaxxon_state, vblank_int))
 MACHINE_CONFIG_END
 
 
@@ -957,7 +956,6 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( szaxxone, zaxxon )
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_5013, MASTER_CLOCK/16)
 	MCFG_CPU_PROGRAM_MAP(zaxxon_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", zaxxon_state,  vblank_int)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 	MCFG_SEGACRPT_SET_SIZE(0x6000)
@@ -968,7 +966,6 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( futspye, root )
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_5061, MASTER_CLOCK/16)
 	MCFG_CPU_PROGRAM_MAP(zaxxon_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", zaxxon_state,  vblank_int)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 	MCFG_SEGACRPT_SET_SIZE(0x6000)
@@ -990,7 +987,6 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( razmataze, root )
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_5098,  MASTER_CLOCK/16)
 	MCFG_CPU_PROGRAM_MAP(ixion_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", zaxxon_state,  vblank_int)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 	MCFG_SEGACRPT_SET_SIZE(0x6000)
@@ -1010,7 +1006,6 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( ixion, razmataze )
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_5013, MASTER_CLOCK/16)
 	MCFG_CPU_PROGRAM_MAP(ixion_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", zaxxon_state,  vblank_int)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 	MCFG_SEGACRPT_SET_SIZE(0x6000)

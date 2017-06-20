@@ -72,10 +72,10 @@ UPD7220_DISPLAY_PIXELS_MEMBER( compis_uhrg_device::display_pixels )
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_START( hrg )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( hrg )
+MACHINE_CONFIG_MEMBER( compis_hrg_device::device_add_mconfig )
 	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -93,22 +93,7 @@ static MACHINE_CONFIG_START( hrg )
 MACHINE_CONFIG_END
 
 
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor compis_hrg_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( hrg );
-}
-
-
-//-------------------------------------------------
-//  MACHINE_CONFIG_START( uhrg )
-//-------------------------------------------------
-
-static MACHINE_CONFIG_START( uhrg )
+MACHINE_CONFIG_MEMBER( compis_uhrg_device::device_add_mconfig )
 	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -124,18 +109,6 @@ static MACHINE_CONFIG_START( uhrg )
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor compis_uhrg_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( uhrg );
-}
-
 
 
 //**************************************************************************

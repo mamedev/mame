@@ -172,6 +172,7 @@ public:
 	DECLARE_WRITE8_MEMBER(shdancbl_msm5205_data_w);
 	DECLARE_READ8_MEMBER(shdancbl_soundbank_r);
 	DECLARE_WRITE8_MEMBER(shdancbl_bankctrl_w);
+	DECLARE_WRITE8_MEMBER(sys18bl_okibank_w);
 	DECLARE_WRITE16_MEMBER(sys16_tileram_w);
 	DECLARE_WRITE16_MEMBER(sys16_textram_w);
 	DECLARE_WRITE16_MEMBER(s16a_bootleg_bgscrolly_w);
@@ -185,13 +186,14 @@ public:
 	DECLARE_DRIVER_INIT(fpointbl);
 	DECLARE_DRIVER_INIT(eswatbl);
 	DECLARE_DRIVER_INIT(astormbl);
+	DECLARE_DRIVER_INIT(sys18bl_oki);
+	DECLARE_DRIVER_INIT(astormb2);
 	DECLARE_DRIVER_INIT(shdancbl);
 	DECLARE_DRIVER_INIT(dduxbl);
 	DECLARE_DRIVER_INIT(altbeastbl);
 	DECLARE_DRIVER_INIT(goldnaxeb2);
 	DECLARE_DRIVER_INIT(bayrouteb1);
 	DECLARE_DRIVER_INIT(beautyb);
-	DECLARE_DRIVER_INIT(mwalkbl);
 	DECLARE_DRIVER_INIT(bayrouteb2);
 	DECLARE_DRIVER_INIT(shinobl);
 	DECLARE_DRIVER_INIT(tturfbl);

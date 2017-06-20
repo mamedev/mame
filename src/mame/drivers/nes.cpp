@@ -352,7 +352,7 @@ CONS( 198?, m82,       nes,        0,      nes,       nes,     nes_state,     0,
 CONS( 198?, m82p,      nes,        0,      nespal,    nes,     nes_state,     0,       "Nintendo",      "M82 Display Unit (PAL)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
 // Famicom hardware
-CONS( 1983, famicom,   0,          0,      famicom,   famicom, nes_state,     famicom, "Nintendo",      "Famicom",                         MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+CONS( 1983, famicom,   0,          nes,    famicom,   famicom, nes_state,     famicom, "Nintendo",      "Famicom",                         MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 CONS( 1983, fds,       famicom,    0,      fds,       famicom, nes_state,     famicom, "Nintendo",      "Famicom (w/ Disk System add-on)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 CONS( 1986, famitwin,  famicom,    0,      famitwin,  famicom, nes_state,     famicom, "Sharp",         "Famicom Twin",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
@@ -361,18 +361,18 @@ CONS( 1986, famitwin,  famicom,    0,      famitwin,  famicom, nes_state,     fa
 
 // !! PAL clones documented here !!
 // Famicom-based
-CONS( 1992, iq501,     0,          0,      famipalc,  nes,     nes_state,     famicom, "Micro Genius",  "IQ-501",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-CONS( 1992, iq502,     0,          0,      famipalc,  nes,     nes_state,     famicom, "Micro Genius",  "IQ-502",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+CONS( 1992, iq501,     0,          nes,    famipalc,  nes,     nes_state,     famicom, "Micro Genius",  "IQ-501",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+CONS( 1992, iq502,     0,          nes,    famipalc,  nes,     nes_state,     famicom, "Micro Genius",  "IQ-502",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 CONS( 1992, dendy,     iq501,      0,      famipalc,  nes,     nes_state,     famicom, "Steepler",      "Dendy Classic 1",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 CONS( 1992, dendy2,    iq502,      0,      famipalc,  nes,     nes_state,     famicom, "Steepler",      "Dendy Classic 2",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-CONS( 198?, gchinatv,  0,          0,      famipalc,  nes,     nes_state,     famicom, "Golden China",  "Golden China TV Game", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+CONS( 198?, gchinatv,  0,          nes,    famipalc,  nes,     nes_state,     famicom, "Golden China",  "Golden China TV Game", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 // Subor/Xiao Ba Wang hardware and derivatives
 // These clones implement a keyboard and a parallel port for printing from a word processor. Later models have mice, PS/2 ports, serial ports and a floppy drive.
-CONS( 1993, sb486,     0,          0,      suborkbd,  nes,     nes_state,     famicom, "Subor",         "SB-486", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+CONS( 1993, sb486,     0,          nes,    suborkbd,  nes,     nes_state,     famicom, "Subor",         "SB-486", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
 // !! NTSC clones documented here !!
 // Famicom-based
 // Bung hardware
 // Mice, keyboard, etc, including a floppy drive that allows you to run games with a selection of 4 internal "mappers" available on the system.
-CONS( 1996, drpcjr,    0,          0,      famicom,   famicom, nes_state,     famicom, "Bung",          "Doctor PC Jr", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+CONS( 1996, drpcjr,    0,          nes,    famicom,   famicom, nes_state,     famicom, "Bung",          "Doctor PC Jr", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

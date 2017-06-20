@@ -2,11 +2,11 @@
 // copyright-holders: David Haywood, Uki, Dirk Best
 /***************************************************************************
 
-	Ganbare Chinsan Ooshoubu (がんばれ珍さん！大勝負)
-	© 1987 Sanritsu
+    Ganbare Chinsan Ooshoubu (がんばれ珍さん！大勝負)
+    © 1987 Sanritsu
 
-	Kiki-Ippatsu Mayumi-chan (危機一髪真由美ちゃん)
-	© 1988 Victory L.L.C. (developed by Sanritsu)
+    Kiki-Ippatsu Mayumi-chan (危機一髪真由美ちゃん)
+    © 1988 Victory L.L.C. (developed by Sanritsu)
 
     TODO:
     - Figure out the rest of the dip switches

@@ -33,15 +33,9 @@ public:
 	// construction/destruction
 	segaxbd_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// compare/timer chip callbacks
-	void timer_ack_callback();
-	void sound_data_w(uint8_t data);
-
 	// main CPU read/write handlers
 	DECLARE_READ16_MEMBER(adc_r);
 	DECLARE_WRITE16_MEMBER(adc_w);
-	DECLARE_WRITE8_MEMBER(pc_0_w);
-	DECLARE_WRITE8_MEMBER(pd_0_w);
 	DECLARE_WRITE16_MEMBER(iocontrol_w);
 
 	// game-specific main CPU read/write handlers
@@ -94,6 +88,13 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(m68k_reset_callback);
 	void generic_iochip0_lamps_w(uint8_t data);
 
+		// compare/timer chip callbacks
+	void timer_ack_callback();
+	void sound_data_w(uint8_t data);
+
+	DECLARE_WRITE8_MEMBER(pc_0_w);
+	DECLARE_WRITE8_MEMBER(pd_0_w);
+
 	// devices
 public:
 	required_device<m68000_device> m_maincpu;
@@ -143,6 +144,7 @@ protected:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	void xboard_base_mconfig(machine_config &config);
 };
 
 
@@ -152,7 +154,7 @@ public:
 	segaxbd_regular_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 
@@ -163,7 +165,7 @@ public:
 	segaxbd_fd1094_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 class segaxbd_aburner2_state :  public segaxbd_state
@@ -172,7 +174,7 @@ public:
 	segaxbd_aburner2_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 //  virtual void device_start();
 //  virtual void device_reset();
 };
@@ -183,7 +185,7 @@ public:
 	segaxbd_lastsurv_fd1094_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 class segaxbd_lastsurv_state :  public segaxbd_state
@@ -192,7 +194,7 @@ public:
 	segaxbd_lastsurv_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 
@@ -202,7 +204,7 @@ public:
 	segaxbd_smgp_fd1094_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 
@@ -212,7 +214,7 @@ public:
 	segaxbd_smgp_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 
@@ -222,7 +224,7 @@ public:
 	segaxbd_rascot_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 #endif // MAME_INCLUDES_SEGAXBD_H

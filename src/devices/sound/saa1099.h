@@ -35,6 +35,8 @@ public:
 	DECLARE_WRITE8_MEMBER( control_w );
 	DECLARE_WRITE8_MEMBER( data_w );
 
+	DECLARE_WRITE8_MEMBER( write );
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
