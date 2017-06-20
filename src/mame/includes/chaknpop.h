@@ -44,6 +44,7 @@ public:
 	DECLARE_WRITE8_MEMBER(attrram_w);
 	DECLARE_WRITE8_MEMBER(unknown_port_1_w);
 	DECLARE_WRITE8_MEMBER(unknown_port_2_w);
+	DECLARE_WRITE8_MEMBER(unknown_port_3_w);
 	DECLARE_READ8_MEMBER(mcu_status_r);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 

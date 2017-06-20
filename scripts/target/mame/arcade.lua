@@ -3638,7 +3638,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/cchance.cpp",
 	MAME_DIR .. "src/mame/drivers/chaknpop.cpp",
 	MAME_DIR .. "src/mame/includes/chaknpop.h",
-	MAME_DIR .. "src/mame/machine/chaknpop.cpp",
 	MAME_DIR .. "src/mame/video/chaknpop.cpp",
 	MAME_DIR .. "src/mame/drivers/champbwl.cpp",
 	MAME_DIR .. "src/mame/drivers/changela.cpp",
