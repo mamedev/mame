@@ -4,8 +4,8 @@
 
 Chack'n Pop driver by BUT
 
-Note: The 68705 MCU isn't dumped, because it's protected, however we simulate
-      it using data extracted with a trojan. See machine/chaknpop.c
+
+Modified by Hau, Chack'n
 
 Chack'n Pop
 Taito 1983
@@ -110,13 +110,10 @@ Notes:
 */
 
 #include "emu.h"
-#include "includes/chaknpop.h"
-
 #include "cpu/z80/z80.h"
+#include "cpu/m6805/m6805.h"
 #include "sound/ay8910.h"
-#include "screen.h"
-#include "speaker.h"
-
+#include "includes/chaknpop.h"
 
 /***************************************************************************
 
@@ -148,10 +145,10 @@ WRITE8_MEMBER(chaknpop_state::coinlock_w)
 
 static ADDRESS_MAP_START( chaknpop_map, AS_PROGRAM, 8, chaknpop_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("mcu_ram")
-	AM_RANGE(0x8800, 0x8800) AM_READWRITE(mcu_port_a_r, mcu_port_a_w)
-	AM_RANGE(0x8801, 0x8801) AM_READWRITE(mcu_port_b_r, mcu_port_b_w)
-	AM_RANGE(0x8802, 0x8802) AM_READWRITE(mcu_port_c_r, mcu_port_c_w)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM
+	AM_RANGE(0x8800, 0x8800) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, data_r, data_w)
+	AM_RANGE(0x8801, 0x8801) AM_READ(mcu_status_r)
+	AM_RANGE(0x8802, 0x8802) AM_NOP                                            // watchdog?
 	AM_RANGE(0x8804, 0x8805) AM_DEVREADWRITE("ay1", ay8910_device, data_r, address_data_w)
 	AM_RANGE(0x8806, 0x8807) AM_DEVREADWRITE("ay2", ay8910_device, data_r, address_data_w)
 	AM_RANGE(0x8808, 0x8808) AM_READ_PORT("DSWC")
@@ -337,10 +334,6 @@ void chaknpop_state::machine_start()
 	save_item(NAME(m_gfxmode));
 	save_item(NAME(m_flip_x));
 	save_item(NAME(m_flip_y));
-
-	save_item(NAME(m_mcu_seed));
-	save_item(NAME(m_mcu_result));
-	save_item(NAME(m_mcu_select));
 }
 
 void chaknpop_state::machine_reset()
@@ -348,19 +341,18 @@ void chaknpop_state::machine_reset()
 	m_gfxmode = 0;
 	m_flip_x = 0;
 	m_flip_y = 0;
-
-	m_mcu_seed = MCU_INITIAL_SEED;
-	m_mcu_result = 0;
-	m_mcu_select = 0;
 }
 
-static MACHINE_CONFIG_START( chaknpop )
+static MACHINE_CONFIG_START( chaknpop, chaknpop_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18MHz / 6)    /* Verified on PCB */
 	MCFG_CPU_PROGRAM_MAP(chaknpop_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", chaknpop_state,  irq0_line_hold)
 
+	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU, XTAL_18MHz / 6)    /* Verified on PCB */
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slices per frame - an high value to ensure proper */
+							/* synchronization of the CPUs */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -404,8 +396,8 @@ ROM_START( chaknpop )
 	ROM_LOAD( "ao4_04.ic25", 0x06000, 0x2000, CRC(5209c7d4) SHA1(dcba785a697df55d84d65735de38365869a1da9d) )
 	ROM_LOAD( "ao4_05.ic3",  0x0a000, 0x2000, CRC(8720e024) SHA1(99e445c117d1501a245f9eb8d014abc4712b4963) )
 
-	ROM_REGION( 0x0800, "mcu", 0 )  /* 2k for the Motorola MC68705P5 Micro-controller */
-	ROM_LOAD( "ao4_06.ic23", 0x0000, 0x0800, NO_DUMP )
+	ROM_REGION( 0x0800, "bmcu:mcu", 0 )  /* 2k for the Motorola MC68705P5 Micro-controller */
+	ROM_LOAD( "ao4_06.ic23", 0x0000, 0x0800, CRC(9c78c24c) SHA1(f74c7f3ee106e5c45c907e590ec09614a2bc6751) )
 
 	ROM_REGION( 0x4000, "gfx1", 0 ) /* Sprite */
 	ROM_LOAD( "ao4_08.ic14", 0x0000, 0x2000, CRC(5575a021) SHA1(c2fad53fe6a12c19cec69d27c13fce6aea2502f2) )
@@ -421,5 +413,5 @@ ROM_START( chaknpop )
 ROM_END
 
 
-/*  ( YEAR  NAME      PARENT    MACHINE   INPUT     STATE           INIT      MONITOR  COMPANY              FULLNAME       FLAGS ) */
-GAME( 1983, chaknpop, 0,        chaknpop, chaknpop, chaknpop_state, 0,        ROT0,    "Taito Corporation", "Chack'n Pop", MACHINE_SUPPORTS_SAVE )
+/*  ( YEAR  NAME      PARENT    MACHINE   INPUT     INIT      MONITOR  COMPANY              FULLNAME ) */
+GAME( 1983, chaknpop, 0,        chaknpop, chaknpop, driver_device, 0,        ROT0,    "Taito Corporation", "Chack'n Pop", MACHINE_SUPPORTS_SAVE )
