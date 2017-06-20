@@ -1100,7 +1100,7 @@ ROM_START( flstory )
 	ROM_LOAD( "snd.23",       0x2000, 0x2000, CRC(25e7fd9d) SHA1(b9237459e3d8acf8502a693914e50714a37d515e) )
 
 	ROM_REGION( 0x0800, "bmcu:mcu", 0 )  /* 2k for the microcontroller */
-	ROM_LOAD( "a45.mcu",      0x0000, 0x0800, CRC(5378253c) SHA1(e1ae1ab01e470b896c1d74ad4088928602a21a1b) )
+	ROM_LOAD( "a45-20.mcu",   0x0000, 0x0800, CRC(7d2cdd9b) SHA1(b9a7b4c7d9d58b4b7cab1304beaa9d17f9559419) )
 
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_INVERT )
 	ROM_LOAD( "vid-a45.18",   0x00000, 0x4000, CRC(6f08f69e) SHA1(8f1b7e63a38f855cf26d57aed678da7cf1378fdf) )
@@ -1124,7 +1124,7 @@ ROM_START( flstoryj )
 	ROM_LOAD( "a45_13.9",     0x2000, 0x2000, CRC(451f92f9) SHA1(f4196e6d3420983b74001303936d086a48b10827) )
 
 	ROM_REGION( 0x0800, "bmcu:mcu", 0 )  /* 2k for the microcontroller */
-	ROM_LOAD( "a45.mcu",      0x0000, 0x0800, CRC(5378253c) SHA1(e1ae1ab01e470b896c1d74ad4088928602a21a1b) )
+	ROM_LOAD( "a45-20.mcu",   0x0000, 0x0800, CRC(7d2cdd9b) SHA1(b9a7b4c7d9d58b4b7cab1304beaa9d17f9559419) )
 
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_INVERT )
 	ROM_LOAD( "vid-a45.18",   0x00000, 0x4000, CRC(6f08f69e) SHA1(8f1b7e63a38f855cf26d57aed678da7cf1378fdf) )
@@ -1156,7 +1156,7 @@ ROM_START( onna34ro )
 	ROM_LOAD( "a52-16.38s",   0x8000, 0x2000, CRC(ccf42aee) SHA1(a6eb01c5384724999631b55700dade430b71ca95) )
 
 	ROM_REGION( 0x0800, "bmcu:mcu", 0 )  /* 2k for the microcontroller */
-	ROM_LOAD( "a52_17.54c",      0x0000, 0x0800, CRC(0ab2612e) SHA1(2bc74e9ef5b9dd51d733dc62902d92c269f7d6a7) )
+	ROM_LOAD( "a52_17.54c",   0x0000, 0x0800, CRC(0ab2612e) SHA1(2bc74e9ef5b9dd51d733dc62902d92c269f7d6a7) )
 
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_INVERT )
 	ROM_LOAD( "a52-04.11v",   0x00000, 0x4000, CRC(5b126294) SHA1(fc31e062e665f7313f923e84d6497716f0658ac0) )
@@ -1355,17 +1355,17 @@ Dumped by Corrado Tomaselli on 9/12/2010
 
 ROM_START( rumba )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* 64k for the first CPU */
-	ROM_LOAD( "a23_01-1.bin",   0x0000, 0x4000, CRC(4bea6e18) SHA1(b9a85e65105773b5f93dcc5fc1e7c588b2d25056) )
-	ROM_LOAD( "a23_02-1.bin",   0x4000, 0x4000, CRC(08f98c6f) SHA1(f2a850b1138cfefab6ff1d1adcda9e084f52e9c2) )
-	ROM_LOAD( "a23_03-1.bin",   0x8000, 0x4000, CRC(ab595427) SHA1(1ff51740e1c7915e1f79a55801d11c8fdce764c8) )
+	ROM_LOAD( "a23_01-1.bin",  0x0000, 0x4000, CRC(4bea6e18) SHA1(b9a85e65105773b5f93dcc5fc1e7c588b2d25056) )
+	ROM_LOAD( "a23_02-1.bin",  0x4000, 0x4000, CRC(08f98c6f) SHA1(f2a850b1138cfefab6ff1d1adcda9e084f52e9c2) )
+	ROM_LOAD( "a23_03-1.bin",  0x8000, 0x4000, CRC(ab595427) SHA1(1ff51740e1c7915e1f79a55801d11c8fdce764c8) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for the second CPU */
-	ROM_LOAD( "a23_08-1.bin",     0x0000, 0x2000, CRC(a18eae00) SHA1(6ac1ad07bb5a97c6edaaf0e1fb842e1741f4cf1e) )
-	ROM_LOAD( "a23_09.bin",       0x2000, 0x2000, CRC(d0a101d3) SHA1(c92bb1ce67bec394fd8ce303d9e61eac12493b5d) )
-	ROM_LOAD( "a23_10.bin",       0x4000, 0x2000, CRC(f9447bd4) SHA1(68c02249ca0e5b923cddb4bff8d090963b9c78e4) )
+	ROM_LOAD( "a23_08-1.bin",  0x0000, 0x2000, CRC(a18eae00) SHA1(6ac1ad07bb5a97c6edaaf0e1fb842e1741f4cf1e) )
+	ROM_LOAD( "a23_09.bin",    0x2000, 0x2000, CRC(d0a101d3) SHA1(c92bb1ce67bec394fd8ce303d9e61eac12493b5d) )
+	ROM_LOAD( "a23_10.bin",    0x4000, 0x2000, CRC(f9447bd4) SHA1(68c02249ca0e5b923cddb4bff8d090963b9c78e4) )
 
 	ROM_REGION( 0x0800, "bmcu:mcu", 0 )  /* 2k for the microcontroller */
-	ROM_LOAD( "a23_11.bin",      0x0000, 0x0800, CRC(fddc99ce) SHA1(a9c7f76752ce74a780ca74004106c969d78ba931) )
+	ROM_LOAD( "a23_11.bin",    0x0000, 0x0800, CRC(fddc99ce) SHA1(a9c7f76752ce74a780ca74004106c969d78ba931) )
 
 	ROM_REGION( 0x8000, "gfx1", ROMREGION_INVERT )
 	ROM_LOAD( "a23_07.bin",   0x02000, 0x2000, CRC(c98fbea6) SHA1(edd1e0b2551f726018ca6e0b2cf629046a482711) )
@@ -1375,9 +1375,9 @@ ROM_START( rumba )
 ROM_END
 
 
-GAME( 1985, flstory,   0,        flstory,      flstory,  flstory_state, 0, ROT180, "Taito", "The FairyLand Story",                 MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, flstoryj,  flstory,  flstory,      flstory,  flstory_state, 0, ROT180, "Taito", "The FairyLand Story (Japan)",         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, onna34ro,  0,        onna34ro_mcu, onna34ro, flstory_state, 0, ROT0,   "Taito", "Onna Sanshirou - Typhoon Gal",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, flstory,   0,        flstory,      flstory,  flstory_state, 0, ROT180, "Taito", "The FairyLand Story",                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, flstoryj,  flstory,  flstory,      flstory,  flstory_state, 0, ROT180, "Taito", "The FairyLand Story (Japan)",            MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, onna34ro,  0,        onna34ro_mcu, onna34ro, flstory_state, 0, ROT0,   "Taito", "Onna Sanshirou - Typhoon Gal",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1985, onna34roa, onna34ro, onna34ro,     onna34ro, flstory_state, 0, ROT0,   "Taito", "Onna Sanshirou - Typhoon Gal (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, victnine,  0,        victnine,     victnine, flstory_state, 0, ROT0,   "Taito", "Victorious Nine",                     MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // MCU still simulated
-GAME( 1984, rumba,     0,        rumba,        rumba,    flstory_state, 0, ROT270, "Taito", "Rumba Lumber",                        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, victnine,  0,        victnine,     victnine, flstory_state, 0, ROT0,   "Taito", "Victorious Nine",                        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // MCU still simulated
+GAME( 1984, rumba,     0,        rumba,        rumba,    flstory_state, 0, ROT270, "Taito", "Rumba Lumber",                           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
