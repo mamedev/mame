@@ -25,6 +25,9 @@ DEVICE_ADDRESS_MAP_START(map, 32, interpro_srarb_device)
 	AM_RANGE(0x14, 0x17) AM_READWRITE(errdomhi_r, errdomhi_w)
 	AM_RANGE(0x18, 0x1b) AM_READWRITE(tmctrl_r, tmctrl_w)
 
+	AM_RANGE(0x1c, 0x1f) AM_READWRITE8(unknown0_r, unknown0_w, 0x0000ff00) // boot code writes 0x10
+	AM_RANGE(0x20, 0x23) AM_READWRITE8(unknown1_r, unknown1_w, 0x0000ff00) // boot code writes 0x07
+
 	AM_RANGE(0x24, 0x27) AM_READWRITE(tmsrnem_r, tmsrnem_w)
 	AM_RANGE(0x28, 0x2b) AM_READWRITE(tmsrhog_r, tmsrhog_w)
 	AM_RANGE(0x2c, 0x2f) AM_READWRITE(tmscale_r, tmscale_w)

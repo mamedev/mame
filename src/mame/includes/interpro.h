@@ -9,6 +9,8 @@
 #include "cpu/clipper/clipper.h"
 #include "machine/cammu.h"
 
+#include "machine/ram.h"
+
 #include "machine/interpro_ioga.h"
 #include "machine/interpro_mcga.h"
 #include "machine/interpro_sga.h"
@@ -39,7 +41,11 @@
 
 #define INTERPRO_RTC_TAG        "rtc"
 #define INTERPRO_SCC1_TAG       "scc1"
+#define INTERPRO_SERIAL1_TAG    "serial1"
+#define INTERPRO_SERIAL2_TAG    "serial2"
 #define INTERPRO_SCC2_TAG       "scc2"
+#define INTERPRO_SERIAL3_TAG    "serial3"
+#define INTERPRO_SERIAL4_TAG    "serial4"
 #define INTERPRO_EPROM_TAG      "eprom"
 #define INTERPRO_FLASH_TAG      "flash"
 #define INTERPRO_TERMINAL_TAG   "terminal"
@@ -52,36 +58,6 @@
 #define INTERPRO_SGA_TAG        "sga"
 #define INTERPRO_SRARB_TAG      "srarb"
 
-// system board register offsets
-#define SREG_LED    0
-#define SREG_ERROR  0
-#define SREG_STATUS 1
-#define SREG_CTRL1  2
-#define SREG_CTRL2  3
-
-// control register 1
-#define CTRL1_FLOPLOW    0x0001
-#define CTRL1_FLOPRDY    0x0002
-#define CTRL1_LEDENA     0x0004
-#define CTRL1_LEDDP      0x0008
-#define CTRL1_ETHLOOP    0x0010
-#define CTRL1_ETHDTR     0x0020
-#define CTRL1_ETHRMOD    0x0040
-#define CTRL1_CLIPRESET  0x0040
-#define CTRL1_FIFOACTIVE 0x0080
-
-// control register 2
-#define CTRL2_PWRUP     0x0001
-#define CTRL2_PWRENA    0x0002
-#define CTRL2_HOLDOFF   0x0004
-#define CTRL2_EXTNMIENA 0x0008
-#define CTRL2_COLDSTART 0x0010
-#define CTRL2_RESET     0x0020
-#define CTRL2_BUSENA    0x0040
-#define CTRL2_FRCPARITY 0x0080
-#define CTRL2_FLASHEN   0x0080
-#define CTRL2_WMASK     0x000f
-
 class interpro_state : public driver_device
 {
 public:
@@ -89,6 +65,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, INTERPRO_CPU_TAG),
 		m_mmu(*this, INTERPRO_MMU_TAG),
+		m_ram(*this, RAM_TAG),
 		m_scc1(*this, INTERPRO_SCC1_TAG),
 		m_scc2(*this, INTERPRO_SCC2_TAG),
 		m_rtc(*this, INTERPRO_RTC_TAG),
@@ -107,6 +84,8 @@ public:
 
 	required_device<clipper_device> m_maincpu;
 	required_device<cammu_device> m_mmu;
+
+	required_device<ram_device> m_ram;
 
 	// FIXME: not sure which one is the escc
 	required_device<z80scc_device> m_scc1;
@@ -127,14 +106,73 @@ public:
 
 	DECLARE_DRIVER_INIT(ip2800);
 
-	DECLARE_WRITE16_MEMBER(system_w);
-	DECLARE_READ16_MEMBER(system_r);
+	enum sreg_error_mask
+	{
+		ERROR_BPID4    = 0x0001,
+		ERROR_SRXMMBE  = 0x0002,
+		ERROR_SRXHOG   = 0x0004,
+		ERROR_SRXNEM   = 0x0008,
+		ERROR_SRXVALID = 0x0010,
+		ERROR_CBUSNMI  = 0x0020,
+		ERROR_CBUSBG   = 0x00c0,
+		ERROR_BG       = 0x0070,
+		ERROR_BUSHOG   = 0x0080
+	};
+	DECLARE_READ16_MEMBER(sreg_error_r);
+	DECLARE_WRITE16_MEMBER(sreg_led_w) { m_sreg_led = data; }
+
+	enum sreg_status_mask
+	{
+        STATUS_YELLOW_ZONE = 0x0001,
+		STATUS_SRNMI       = 0x0002,
+		STATUS_PWRLOSS     = 0x0004,
+		STATUS_RED_ZONE    = 0x0008,
+		STATUS_BP          = 0x00f0
+	};
+	DECLARE_READ16_MEMBER(sreg_status_r) { return m_sreg_status; }
+
+	enum sreg_ctrl1_mask
+	{
+		CTRL1_FLOPLOW    = 0x0001,
+		CTRL1_FLOPRDY    = 0x0002,
+		CTRL1_LEDENA     = 0x0004,
+		CTRL1_LEDDP      = 0x0008,
+		CTRL1_ETHLOOP    = 0x0010,
+		CTRL1_ETHDTR     = 0x0020,
+		CTRL1_ETHRMOD    = 0x0040,
+		CTRL1_CLIPRESET  = 0x0040,
+        CTRL1_FIFOACTIVE = 0x0080
+	};
+	DECLARE_READ16_MEMBER(sreg_ctrl1_r) { return m_sreg_ctrl1; }
+	DECLARE_WRITE16_MEMBER(sreg_ctrl1_w);
+	
+	enum sreg_ctrl2_mask
+	{
+		CTRL2_PWRUP     = 0x0001,
+		CTRL2_PWRENA    = 0x0002,
+		CTRL2_HOLDOFF   = 0x0004,
+		CTRL2_EXTNMIENA = 0x0008,
+		CTRL2_COLDSTART = 0x0010,
+		CTRL2_RESET     = 0x0020,
+		CTRL2_BUSENA    = 0x0040,
+		CTRL2_FRCPARITY = 0x0080,
+		CTRL2_FLASHEN   = 0x0080,
+
+		CTRL2_WMASK     = 0x000f
+	};
+	DECLARE_READ16_MEMBER(sreg_ctrl2_r) { return m_sreg_ctrl2; }
+	DECLARE_WRITE16_MEMBER(sreg_ctrl2_w);
+	DECLARE_READ16_MEMBER(sreg_ctrl3_r) { return m_sreg_ctrl3; }
+	DECLARE_WRITE16_MEMBER(sreg_ctrl3_w) { m_sreg_ctrl3 = data; }
 
 	DECLARE_WRITE8_MEMBER(rtc_w);
 	DECLARE_READ8_MEMBER(rtc_r);
 
-	DECLARE_READ32_MEMBER(idprom_r);
-	DECLARE_READ32_MEMBER(slot0_r);
+	DECLARE_READ8_MEMBER(idprom_r);
+	DECLARE_READ8_MEMBER(slot0_r);
+
+	DECLARE_READ32_MEMBER(unmapped_r);
+	DECLARE_WRITE32_MEMBER(unmapped_w);
 
 	DECLARE_READ8_MEMBER(scsi_r);
 	DECLARE_WRITE8_MEMBER(scsi_w);
@@ -148,7 +186,13 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	u16 m_system_reg[4];
+	u16 m_sreg_error;
+	u16 m_sreg_led;
+	u16 m_sreg_status;
+	u16 m_sreg_ctrl1;
+	u16 m_sreg_ctrl2;
+
+	u16 m_sreg_ctrl3;
 };
 
 #endif // MAME_INCLUDES_INTERPRO_H
