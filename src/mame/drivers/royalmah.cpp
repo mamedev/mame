@@ -3794,7 +3794,6 @@ ROM_END
 
 ROM_START( seljan ) // Z80A + HD46505SP + AY891X (a sticker covers the chip type)
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	// TODO: wrong order, only 2 is confirmed
 	ROM_LOAD( "2",       0x0000, 0x2000, CRC(8d26d334) SHA1(4ac0f0961f666954caf59336f8389312db9dc263) ) // ok
 	ROM_LOAD( "1",       0x2000, 0x2000, CRC(d670d7c3) SHA1(2106ecf6ad675b8fd167f1f21d615afdfb5bca6d) )
 	ROM_LOAD( "3",       0x4000, 0x2000, CRC(6c0dfd50) SHA1(1f91ff0ef2f24414888ae8e5ebac72a5bb48780b) )
