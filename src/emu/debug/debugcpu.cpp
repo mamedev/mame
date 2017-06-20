@@ -876,6 +876,7 @@ void debugger_cpu::process_source_file()
 	// loop until the file is exhausted or until we are executing again
 	while (m_execution_state == EXECUTION_STATE_STOPPED
 			&& m_source_file 
+			&& m_source_file->good()
 			&& std::getline(*m_source_file, buf))
 	{
 		// strip out comments (text after '//')
