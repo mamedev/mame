@@ -10705,6 +10705,7 @@ dc                              // 1999 Sega Dreamcast (USA)
 dcdev                           // 1998 Sega HKT-0120 Sega Dreamcast Development Box
 dceu                            // 1999 Sega Dreamcast (Europe)
 dcjp                            // 1998 Sega Dreamcast (Japan)
+dctream                         // 200? Treamcast
 
 @source:dcheese.cpp
 cecmatch                        // (c) 1993 Coastal Amusements
