@@ -51,7 +51,7 @@ READ8_MEMBER(slapfght_state::getstar_mcusim_status_r)
 
 READ8_MEMBER(slapfght_state::getstar_mcusim_r)
 {
-	uint8_t getstar_val = 0;
+	uint8_t getstar_val = 0;
 	uint8_t lives_lookup_table[] = {0x03, 0x05, 0x01, 0x02};                                     /* table at 0x0e62 in 'getstarb1' */
 	uint8_t lgsb2_lookup_table[] = {0x00, 0x03, 0x04, 0x05};                                     /* fake tanle for "test mode" in 'getstarb2' */
 
