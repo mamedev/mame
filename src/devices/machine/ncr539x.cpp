@@ -284,7 +284,7 @@ READ8_MEMBER( ncr539x_device::read )
 {
 	uint8_t rv = 0;
 
-	LOGREADS("539x: Read @ %s (%02x) (PC=%x) (status %02x irq_status %02x)\n", rdregs[offset], offset, space.device().safe_pc(), m_status, m_irq_status);
+	LOGREADS("539x: Read @ %s (%02x) (%s) (status %02x irq_status %02x)\n", rdregs[offset], offset, machine().describe_context(), m_status, m_irq_status);
 
 	switch (offset)
 	{
@@ -313,7 +313,7 @@ READ8_MEMBER( ncr539x_device::read )
 					m_xfer_count--;
 					update_fifo_internal_state(fifo_bytes);
 
-					LOG("Read %02x from FIFO[%d], FIFO now contains %d bytes (PC=%x, m_buffer_remaining %x)\n", rv, m_fifo_read_ptr-1, fifo_bytes, space.device().safe_pc(), m_buffer_remaining);
+					LOG("Read %02x from FIFO[%d], FIFO now contains %d bytes (%s) (m_buffer_remaining %x)\n", rv, m_fifo_read_ptr-1, fifo_bytes, machine().describe_context(), m_buffer_remaining);
 
 					if (fifo_bytes == 0)
 					{
@@ -415,7 +415,7 @@ READ8_MEMBER( ncr539x_device::read )
 WRITE8_MEMBER( ncr539x_device::write )
 {
 	//if (offset != 2)
-		LOG("539x: Write %02x @ %s (%02x) (PC=%x)\n", data, wrregs[offset], offset, space.device().safe_pc());
+		LOG("539x: Write %02x @ %s (%02x) (%s)\n", data, wrregs[offset], offset, machine().describe_context());
 
 	switch (offset)
 	{
