@@ -67,9 +67,6 @@ public:
 	DECLARE_WRITE8_MEMBER(nmi_disable_w);
 	DECLARE_WRITE8_MEMBER(nmi_enable_w);
 	DECLARE_READ8_MEMBER(flstory_mcu_status_r);
-	DECLARE_WRITE8_MEMBER(onna34ro_mcu_w);
-	DECLARE_READ8_MEMBER(onna34ro_mcu_r);
-	DECLARE_READ8_MEMBER(onna34ro_mcu_status_r);
 	DECLARE_WRITE8_MEMBER(victnine_mcu_w);
 	DECLARE_READ8_MEMBER(victnine_mcu_r);
 	DECLARE_READ8_MEMBER(victnine_mcu_status_r);
