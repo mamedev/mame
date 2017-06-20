@@ -82,8 +82,8 @@ WRITE16_MEMBER(interpro_mcga_device::control_w)
 	// HACK: set or clear error status depending on ENMMBE bit
 	if (data & CONTROL_ENMMBE)
 		m_error |= ERROR_VALID;
-	//		else
-	//			error &= ~ERROR_VALID;
+	//else
+	//	m_error &= ~ERROR_VALID;
 }
 
 WRITE16_MEMBER(interpro_fmcc_device::control_w)
@@ -93,6 +93,6 @@ WRITE16_MEMBER(interpro_fmcc_device::control_w)
 	// HACK: set or clear error status depending on ENMMBE bit
 	if (data & CONTROL_ENMMBE)
 		m_error |= ERROR_VALID;
-	//		else
-	//			error &= ~ERROR_VALID;
+	//else
+	//	m_error &= ~ERROR_VALID;
 }
