@@ -452,7 +452,7 @@ static MACHINE_CONFIG_START(ip2800)
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(INTERPRO_SCC1_TAG, z80scc_device, dcda_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(INTERPRO_SCC1_TAG, z80scc_device, ctsa_w))
 
-	// eprom uses this serial port for console (show_config calls "port 2")
+	// eprom uses this serial port for console (show_config calls it "port 2")
 	MCFG_RS232_PORT_ADD(INTERPRO_SERIAL2_TAG, default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(INTERPRO_SCC1_TAG, z80scc_device, rxb_w))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(INTERPRO_SCC1_TAG, z80scc_device, dcdb_w))

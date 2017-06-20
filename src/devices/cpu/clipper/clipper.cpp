@@ -1346,7 +1346,7 @@ u32 clipper_device::intrap(u32 vector, u32 pc, u32 cts, u32 mts)
 	m_rs[15] -= 24;
 
 	// load ssw from trap vector and set previous mode
-	set_ssw(m_data->read_dword(vector + 0) & ~(SSW(P)) | (SSW(U) << 1));
+	set_ssw((m_data->read_dword(vector + 0) & ~(SSW(P))) | (SSW(U) << 1));
 
 	// clear psw
 	m_psw = 0;
