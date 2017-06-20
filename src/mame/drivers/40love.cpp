@@ -934,6 +934,40 @@ ROM_START( 40love )
 
 ROM_END
 
+ROM_START( 40lovej )
+	ROM_REGION( 0x14000, "maincpu", 0 ) /* Z80 main CPU */
+    ROM_LOAD( "a30_01.70",    0x000000, 0x004000, CRC(1b89829e) SHA1(d875a4e3586fd9fb2e354e4353c9144ad68ce620) )
+    ROM_LOAD( "a30_02.71",    0x004000, 0x004000, CRC(1468e71e) SHA1(e251ddf42ab51e9c391c213f54b709b71a3f1519) )
+	ROM_LOAD( "a30_03.72",    0x010000, 0x004000, CRC(dbc0049d) SHA1(1fca22ca0794564bbd1f946afb644fef0342acca) )
+	
+	ROM_REGION( 0x10000, "audiocpu", ROMREGION_ERASEFF ) /* Z80 sound CPU */
+	// not in the provided set, identical?
+	ROM_LOAD( "a30-08.u08", 0x0000, 0x2000, BAD_DUMP CRC(2fc42ee1) SHA1(b56e5f9acbcdc476252e188f41ad7249dba6f8e1) )
+	ROM_LOAD( "a30-09.u09", 0x2000, 0x2000, BAD_DUMP CRC(3a75abce) SHA1(ad2df26789d38196c0677c22ab8f176e99604b18) )
+	ROM_LOAD( "a30-10.u10", 0x4000, 0x2000, BAD_DUMP CRC(393c4b5b) SHA1(a8e1dd5c33e929bc832cccc13b85ecd13fff1eb2) )
+	ROM_LOAD( "a30-11.u37", 0x6000, 0x2000, BAD_DUMP CRC(11b2c6d2) SHA1(d55690512a37c4df2386a845e0cfb14f8052295b) )
+	ROM_LOAD( "a30-12.u38", 0x8000, 0x2000, BAD_DUMP CRC(f7afd475) SHA1(dd09d5ca7fec5e0454f9efb8ebc722561010f124) )
+	ROM_LOAD( "a30-13.u39", 0xa000, 0x2000, BAD_DUMP CRC(e806630f) SHA1(09022aae88ea0171a0aacf3260fa3a95e8faeb21) )
+
+	ROM_REGION( 0x0800, "bmcu:mcu", 0 )  /* 2k for the microcontroller */
+    ROM_LOAD( "a30_14",       0x000000, 0x000800, CRC(a4f770ce) SHA1(868e98528e8824e7329e9a298603e456bbc1f1f0) )
+
+    ROM_REGION( 0x8000, "gfx1", 0 )
+    ROM_LOAD( "a30_04.18",    0x000000, 0x004000, CRC(529a7489) SHA1(cf3fa83f16e2e62c1a4aa74b00080f1e167865a6) )
+    ROM_LOAD( "a30_05.19",    0x004000, 0x004000, CRC(7017e5f1) SHA1(fc614fd41109a9a6236ed4a331eda74e5d49b946) )
+	
+    ROM_REGION( 0x8000, "gfx2", 0 )
+    ROM_LOAD( "a30_06.59",    0x000000, 0x004000, CRC(f744ea8e) SHA1(0bf6deabfac47237347af810332bc3716e3a26f0) )
+    ROM_LOAD( "a30_07.60",    0x004000, 0x004000, CRC(b2af1359) SHA1(6a21e38cfb65d52b7e1209101f0dd497f9a71f46) )
+
+	ROM_REGION( 0x1000, "proms", 0 )
+	// not provided
+	ROM_LOAD( "a30-15.u03", 0x0000, 0x0400, BAD_DUMP CRC(55e38cc7) SHA1(823a6d7f29eadf5d12702d782d4297b0d4c65a0e) )  /* red */
+	ROM_LOAD( "a30-16.u01", 0x0400, 0x0400, BAD_DUMP CRC(13997e20) SHA1(9fae1cf633409a88263dc66a17b1c2eeccd05f4f) )  /* green */
+	ROM_LOAD( "a30-17.u02", 0x0800, 0x0400, BAD_DUMP CRC(5031f2f3) SHA1(1836d82fdc9f39cb318a791af2a935c27baabfd7) )  /* blue */
+	ROM_LOAD( "a30-18.u13", 0x0c00, 0x0400, BAD_DUMP CRC(78697c0f) SHA1(31382ed4c0d44024f7f57a9de6407527f4d5b0d1) )  /* ??? */	
+ROM_END
+
 ROM_START( fieldday )
 	ROM_REGION( 0x14000, "maincpu", 0 ) /* Z80 main CPU  */
 	ROM_LOAD( "a17_44.bin", 0x00000, 0x2000, CRC(d59812e1) SHA1(f3e7e2f09fba5964c92813cd652aa093fe3e4415) )
@@ -1008,6 +1042,7 @@ ROM_START( undoukai )
 	ROM_LOAD( "a17-18.23v", 0x0c00, 0x0400, CRC(3023a1da) SHA1(08ce4c6e99d04b358d66f0588852311d07183619) )  /* ??? */
 ROM_END
 
-GAME( 1984, 40love,   0,        40love,   40love,   fortyl_state, 40love,   ROT0, "Taito Corporation", "Forty-Love",           MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1984, 40love,   0,        40love,   40love,   fortyl_state, 40love,   ROT0, "Taito Corporation", "Forty-Love (World)",           MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1984, 40lovej,  40love,   40love,   40love,   fortyl_state, 40love,   ROT0, "Taito Corporation", "Forty-Love (Japan)",           MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // bad HW
 GAME( 1984, fieldday, 0,        undoukai, undoukai, fortyl_state, undoukai, ROT0, "Taito Corporation", "Field Day",            MACHINE_SUPPORTS_SAVE )
 GAME( 1984, undoukai, fieldday, undoukai, undoukai, fortyl_state, undoukai, ROT0, "Taito Corporation", "The Undoukai (Japan)", MACHINE_SUPPORTS_SAVE )
