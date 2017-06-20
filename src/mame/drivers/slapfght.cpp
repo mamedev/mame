@@ -784,14 +784,6 @@ void slapfght_state::machine_reset()
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-MACHINE_RESET_MEMBER(slapfght_state,getstar)
-{
-	// don't boot the mcu since we don't have a dump yet
-//  m_mcu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-
-	machine_reset();
-}
-
 /**************************************************************************/
 
 void slapfght_state::init_banks()
@@ -804,18 +796,6 @@ void slapfght_state::init_banks()
 
 DRIVER_INIT_MEMBER(slapfght_state,slapfigh)
 {
-	init_banks();
-}
-
-DRIVER_INIT_MEMBER(slapfght_state,getstar)
-{
-	m_getstar_id = GETSTAR;
-	init_banks();
-}
-
-DRIVER_INIT_MEMBER(slapfght_state,getstarj)
-{
-	m_getstar_id = GETSTARJ;
 	init_banks();
 }
 
@@ -1096,19 +1076,6 @@ static MACHINE_CONFIG_DERIVED( slapfighb2, slapfighb1 )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(slapfighb2_map)
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_DERIVED( getstar, slapfigh )
-
-	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(getstar_map)
-	MCFG_CPU_IO_MAP(getstar_io_map)
-
-	MCFG_DEVICE_MODIFY("bmcu:mcu")
-	MCFG_DEVICE_DISABLE()
-
-	MCFG_MACHINE_RESET_OVERRIDE(slapfght_state, getstar)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( getstarb1, slapfighb1 )
@@ -1890,7 +1857,7 @@ ROM_START( grdian )
 	ROM_LOAD( "a68-03.12d",       0x0000,  0x2000, CRC(18daa44c) SHA1(1a3d22a186c591321d1b836ee30d89fba4771122) )
 
 	ROM_REGION( 0x0800, "bmcu:mcu", 0 )  /* 2k for the microcontroller */
-	ROM_LOAD( "a68_14.6a",       0x0000,  0x0800, NO_DUMP )
+	ROM_LOAD( "a68_14.6a",       0x0000,  0x0800, CRC(87c4ca48) SHA1(ae15dab7adde7ad2381ca3d70331891c8f3bcc42) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )    /* Region 1 - temporary for gfx */
 	ROM_LOAD( "a68_05-1.6f",     0x00000, 0x2000, CRC(06f60107) SHA1(c5dcf0c7a5863ea960ee747d2d7ec7ac8bb7d3af) )  /* Chars */
@@ -1924,7 +1891,7 @@ ROM_START( getstarj )
 	ROM_LOAD( "a68-03.12d",       0x00000, 0x2000, CRC(18daa44c) SHA1(1a3d22a186c591321d1b836ee30d89fba4771122) )
 
 	ROM_REGION( 0x0800, "bmcu:mcu", 0 )  /* 2k for the microcontroller */
-	ROM_LOAD( "68705.6a",    0x0000,  0x0800, NO_DUMP )
+	ROM_LOAD( "a68_14.6a",       0x0000,  0x0800, CRC(87c4ca48) SHA1(ae15dab7adde7ad2381ca3d70331891c8f3bcc42) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )    /* Region 1 - temporary for gfx */
 	ROM_LOAD( "a68_05.6f",   0x00000, 0x2000, CRC(e3d409e7) SHA1(0b6be4767f110729f4dd1a472ef8d9a0c718b684) )  /* Chars */
@@ -2033,7 +2000,7 @@ GAME( 1986, slapfighb1, alcon,    slapfighb1, slapfigh,  slapfght_state, slapfig
 GAME( 1986, slapfighb2, alcon,    slapfighb2, slapfigh,  slapfght_state, slapfigh,  ROT270, "bootleg", "Slap Fight (bootleg set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // England?
 GAME( 1986, slapfighb3, alcon,    slapfighb2, slapfigh,  slapfght_state, slapfigh,  ROT270, "bootleg", "Slap Fight (bootleg set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // PCB labeled 'slap fighter'
 
-GAME( 1986, grdian,     0,        getstar,    getstar,   slapfght_state, getstar,   ROT0,   "Toaplan / Taito America Corporation (Kitkorp license)", "Guardian (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, getstarj,   grdian,   getstar,    getstarj,  slapfght_state, getstarj,  ROT0,   "Toaplan / Taito", "Get Star (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, grdian,     0,        slapfigh,   getstar,   slapfght_state, slapfigh,  ROT0,   "Toaplan / Taito America Corporation (Kitkorp license)", "Guardian (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, getstarj,   grdian,   slapfigh,   getstarj,  slapfght_state, slapfigh,  ROT0,   "Toaplan / Taito", "Get Star (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, getstarb1,  grdian,   getstarb1,  getstarj,  slapfght_state, getstarb1, ROT0,   "bootleg", "Get Star (bootleg set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 GAME( 1986, getstarb2,  grdian,   getstarb2,  getstarb2, slapfght_state, getstarb2, ROT0,   "bootleg", "Get Star (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
