@@ -138,6 +138,7 @@
 
 #include "emu.h"
 #include "includes/liberatr.h"
+#include "speaker.h"
 
 #define MASTER_CLOCK 20000000 /* 20Mhz Main Clock Xtal */
 
@@ -414,7 +415,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( liberatr, liberatr_state )
+static MACHINE_CONFIG_START( liberatr )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK/16) /* 1.25Mhz divided from 20Mhz master clock */
@@ -531,5 +532,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1982, liberatr, 0,        liberatr, liberatr, driver_device, 0, ROT0, "Atari", "Liberator (set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, liberatr2,liberatr, liberat2, liberatr, driver_device, 0, ROT0, "Atari", "Liberator (set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, liberatr, 0,        liberatr, liberatr, liberatr_state, 0, ROT0, "Atari", "Liberator (set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, liberatr2,liberatr, liberat2, liberatr, liberatr_state, 0, ROT0, "Atari", "Liberator (set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

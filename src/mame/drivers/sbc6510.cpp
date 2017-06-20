@@ -51,11 +51,12 @@ ToDo:
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6502/m6510.h"
 #include "cpu/avr8/avr8.h"
+#include "cpu/m6502/m6510.h"
 #include "machine/mos6526.h"
-#include "sound/ay8910.h"
 #include "machine/terminal.h"
+#include "sound/ay8910.h"
+#include "speaker.h"
 
 #define TERMINAL_TAG "terminal"
 
@@ -277,7 +278,7 @@ static GFXDECODE_START( sbc6510 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( sbc6510, sbc6510_state )
+static MACHINE_CONFIG_START( sbc6510 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M6510, XTAL_1MHz)
 	MCFG_CPU_PROGRAM_MAP(sbc6510_mem)
@@ -322,5 +323,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    CLASS         INIT    COMPANY          FULLNAME       FLAGS */
-COMP( 2009, sbc6510,  0,      0,       sbc6510,   sbc6510, driver_device, 0,   "Josip Perusanec", "SBC6510", MACHINE_NOT_WORKING )
+/*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    CLASS          INIT  COMPANY            FULLNAME   FLAGS */
+COMP( 2009, sbc6510,  0,      0,       sbc6510,   sbc6510, sbc6510_state, 0,    "Josip Perusanec", "SBC6510", MACHINE_NOT_WORKING )

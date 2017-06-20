@@ -31,10 +31,14 @@ TODO:
 *****************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/m68000/m68000.h"
-#include "sound/2203intf.h"
 #include "includes/taito_o.h"
+
+#include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
+#include "sound/2203intf.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 static const int clear_hack = 1;
 
@@ -228,7 +232,7 @@ void taitoo_state::machine_start()
 {
 }
 
-static MACHINE_CONFIG_START( parentj, taitoo_state )
+static MACHINE_CONFIG_START( parentj )
 
 	MCFG_CPU_ADD("maincpu", M68000,12000000 )       /*?? MHz */
 	MCFG_CPU_PROGRAM_MAP(parentj_map)
@@ -285,4 +289,4 @@ ROM_START( parentj )
 	ROM_LOAD( "ampal22v10a-0233.c42", 0x000, 0x2dd, CRC(0c030a81) SHA1(0f8198df2cb046683d2db9ac8e609cdff53083ed) )
 ROM_END
 
-GAME( 1989, parentj,  0,        parentj,  parentj, driver_device,  0,        ROT0,    "Taito", "Parent Jack", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, parentj,  0,        parentj,  parentj, taitoo_state,  0,        ROT0,    "Taito", "Parent Jack", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

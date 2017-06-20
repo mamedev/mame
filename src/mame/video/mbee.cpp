@@ -43,6 +43,7 @@
 ****************************************************************************/
 
 
+#include "emu.h"
 #include "includes/mbee.h"
 
 WRITE_LINE_MEMBER( mbee_state::crtc_vs )

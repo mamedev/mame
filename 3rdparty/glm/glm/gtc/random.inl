@@ -154,7 +154,7 @@ namespace detail
 			return (compute_rand<uint32, P, vecType>::call() % (Max + static_cast<uint32>(1) - Min)) + Min;
 		}
 	};
-
+ 
 	template <precision P, template <class, precision> class vecType>
 	struct compute_linearRand<int64, P, vecType>
 	{

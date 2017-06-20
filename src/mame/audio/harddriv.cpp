@@ -8,9 +8,11 @@
 
 #include "emu.h"
 #include "includes/harddriv.h"
-#include "cpu/tms32010/tms32010.h"
 #include "machine/atarigen.h"
+
+#include "cpu/tms32010/tms32010.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
 
 
 #define BIO_FREQUENCY       (1000000 / 50)
@@ -25,10 +27,10 @@
 //  harddriv_sound_board_device - constructor
 //-------------------------------------------------
 
-const device_type HARDDRIV_SOUND_BOARD_DEVICE = &device_creator<harddriv_sound_board_device>;
+DEFINE_DEVICE_TYPE(HARDDRIV_SOUND_BOARD, harddriv_sound_board_device, "harddriv_sound", "Hard Drivin' Sound Board")
 
 harddriv_sound_board_device::harddriv_sound_board_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, HARDDRIV_SOUND_BOARD_DEVICE, "Hard Drivin' Sound Board", tag, owner, clock, "harddriv_sound", __FILE__),
+	device_t(mconfig, HARDDRIV_SOUND_BOARD, tag, owner, clock),
 	m_soundcpu(*this, "soundcpu"),
 	m_dac(*this, "dac"),
 	m_sounddsp(*this, "sounddsp"),
@@ -421,7 +423,11 @@ static ADDRESS_MAP_START( driversnd_dsp_io_map, AS_IO, 16, harddriv_sound_board_
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_FRAGMENT( harddriv_snd )
+//-------------------------------------------------
+// device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( harddriv_sound_board_device::device_add_mconfig )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("soundcpu", M68000, XTAL_16MHz/2)
@@ -440,13 +446,3 @@ static MACHINE_CONFIG_FRAGMENT( harddriv_snd )
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor harddriv_sound_board_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( harddriv_snd );
-}

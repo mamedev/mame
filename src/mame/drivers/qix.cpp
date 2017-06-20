@@ -230,10 +230,9 @@ Interrupts:
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6805/m6805.h"
-#include "rendlay.h"
 #include "includes/qix.h"
-#include "cpu/m6809/m6809.h"
+
+#include "rendlay.h"
 #include "machine/nvram.h"
 
 #include "elecyoyo.lh"
@@ -292,33 +291,15 @@ ADDRESS_MAP_END
 
 /*************************************
  *
- *  Coin CPU memory handlers
- *
- *************************************/
-
-static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, qix_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE(qix_68705_portA_r, qix_68705_portA_w) AM_SHARE("68705_port_out")
-	AM_RANGE(0x0001, 0x0001) AM_READWRITE(qix_68705_portB_r, qix_68705_portB_w)
-	AM_RANGE(0x0002, 0x0002) AM_READWRITE(qix_68705_portC_r, qix_68705_portC_w)
-	AM_RANGE(0x0004, 0x0007) AM_WRITEONLY AM_SHARE("68705_ddr")
-	AM_RANGE(0x0010, 0x007f) AM_RAM
-	AM_RANGE(0x0080, 0x07ff) AM_ROM
-ADDRESS_MAP_END
-
-
-
-/*************************************
- *
  *  Input port definitions
  *
  *************************************/
 
 #define COIN_PORT \
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Test Advance") PORT_CODE(KEYCODE_F1) \
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Test Next line") PORT_CODE(KEYCODE_F2) \
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Test Slew Up") PORT_CODE(KEYCODE_F5) \
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Test Slew Down") PORT_CODE(KEYCODE_F6) \
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Test Advance") \
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Test Next line") \
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Test Slew Up") \
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_SERVICE4 ) PORT_NAME("Test Slew Down") \
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 ) \
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 ) \
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN3 ) \
@@ -617,7 +598,7 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( qix_base, qix_state )
+static MACHINE_CONFIG_START( qix_base )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, MAIN_CLOCK_OSC/4/4)  /* 1.25 MHz */
@@ -669,8 +650,11 @@ static MACHINE_CONFIG_DERIVED( mcu, qix )
 
 	/* basic machine hardware */
 
-	MCFG_CPU_ADD("mcu", M68705, COIN_CLOCK_OSC) /* 1.00 MHz */
-	MCFG_CPU_PROGRAM_MAP(mcu_map)
+	MCFG_CPU_ADD("mcu", M68705P3, COIN_CLOCK_OSC) /* 1.00 MHz */
+	MCFG_M68705_PORTB_R_CB(READ8(qix_state, qix_68705_portB_r))
+	MCFG_M68705_PORTC_R_CB(READ8(qix_state, qix_68705_portC_r))
+	MCFG_M68705_PORTA_W_CB(WRITE8(qix_state, qix_68705_portA_w))
+	MCFG_M68705_PORTB_W_CB(WRITE8(qix_state, qix_68705_portB_w))
 
 	MCFG_MACHINE_START_OVERRIDE(qix_state,qixmcu)
 
@@ -1466,21 +1450,21 @@ DRIVER_INIT_MEMBER(qix_state,slither)
  *
  *************************************/
 
-GAME( 1981, qix,      0,        qix,      qix,      driver_device, 0,        ROT270, "Taito America Corporation", "Qix (Rev 2)", MACHINE_SUPPORTS_SAVE ) // newest set?  closest to 'qix2'
-GAME( 1981, qixa,     qix,      qix,      qix,      driver_device, 0,        ROT270, "Taito America Corporation", "Qix (set 2, smaller roms)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, qixb,     qix,      qix,      qix,      driver_device, 0,        ROT270, "Taito America Corporation", "Qix (set 2, larger roms)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, qixo,     qix,      qix,      qix,      driver_device, 0,        ROT270, "Taito America Corporation", "Qix (set 3, earlier)", MACHINE_SUPPORTS_SAVE ) // oldest set / prototype? has incorrect spelling 'deutch' and doesn't allow language selection to be changed
-GAME( 1981, qix2,     qix,      qix,      qix,      driver_device, 0,        ROT270, "Taito America Corporation", "Qix II (Tournament)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, sdungeon, 0,        mcu,      sdungeon, driver_device, 0,        ROT270, "Taito America Corporation", "Space Dungeon", MACHINE_SUPPORTS_SAVE ) // actually released July 1982
-GAME( 1981, sdungeona, sdungeon,mcu,      sdungeon, driver_device, 0,        ROT270, "Taito America Corporation", "Space Dungeon (larger roms)", MACHINE_SUPPORTS_SAVE ) // same as above but uses larger ROMs
-GAMEL(1982, elecyoyo, 0,        mcu,      elecyoyo, driver_device, 0,        ROT270, "Taito America Corporation", "The Electric Yo-Yo (set 1)", MACHINE_SUPPORTS_SAVE, layout_elecyoyo )
-GAMEL(1982, elecyoyo2,elecyoyo, mcu,      elecyoyo, driver_device, 0,        ROT270, "Taito America Corporation", "The Electric Yo-Yo (set 2)", MACHINE_SUPPORTS_SAVE, layout_elecyoyo )
-GAME( 1982, kram,     0,        mcu,      kram,     driver_device, 0,        ROT0,   "Taito America Corporation", "Kram (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, kram2,    kram,     mcu,      kram,     driver_device, 0,        ROT0,   "Taito America Corporation", "Kram (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, kram3,    kram,     kram3,    kram,     qix_state,     kram3,    ROT0,   "Taito America Corporation", "Kram (encrypted)", MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, zookeep,  0,        zookeep,  zookeep,  qix_state,     zookeep,  ROT0,   "Taito America Corporation", "Zoo Keeper (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, zookeep2, zookeep,  zookeep,  zookeep,  qix_state,     zookeep,  ROT0,   "Taito America Corporation", "Zoo Keeper (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, zookeep3, zookeep,  zookeep,  zookeep,  qix_state,     zookeep,  ROT0,   "Taito America Corporation", "Zoo Keeper (set 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, slither,  0,        slither,  slither,  qix_state,     slither,  ROT270, "Century II", "Slither (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, slithera, slither,  slither,  slither,  qix_state,     slither,  ROT270, "Century II", "Slither (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, complexx, 0,        qix,      complexx, driver_device, 0,        ROT270, "Taito America Corporation", "Complex X", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, qix,      0,        qix,      qix,      qix_state, 0,        ROT270, "Taito America Corporation", "Qix (Rev 2)", MACHINE_SUPPORTS_SAVE ) // newest set?  closest to 'qix2'
+GAME( 1981, qixa,     qix,      qix,      qix,      qix_state, 0,        ROT270, "Taito America Corporation", "Qix (set 2, smaller roms)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, qixb,     qix,      qix,      qix,      qix_state, 0,        ROT270, "Taito America Corporation", "Qix (set 2, larger roms)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, qixo,     qix,      qix,      qix,      qix_state, 0,        ROT270, "Taito America Corporation", "Qix (set 3, earlier)", MACHINE_SUPPORTS_SAVE ) // oldest set / prototype? has incorrect spelling 'deutch' and doesn't allow language selection to be changed
+GAME( 1981, qix2,     qix,      qix,      qix,      qix_state, 0,        ROT270, "Taito America Corporation", "Qix II (Tournament)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, sdungeon, 0,        mcu,      sdungeon, qix_state, 0,        ROT270, "Taito America Corporation", "Space Dungeon", MACHINE_SUPPORTS_SAVE ) // actually released July 1982
+GAME( 1981, sdungeona, sdungeon,mcu,      sdungeon, qix_state, 0,        ROT270, "Taito America Corporation", "Space Dungeon (larger roms)", MACHINE_SUPPORTS_SAVE ) // same as above but uses larger ROMs
+GAMEL(1982, elecyoyo, 0,        mcu,      elecyoyo, qix_state, 0,        ROT270, "Taito America Corporation", "The Electric Yo-Yo (set 1)", MACHINE_SUPPORTS_SAVE, layout_elecyoyo )
+GAMEL(1982, elecyoyo2,elecyoyo, mcu,      elecyoyo, qix_state, 0,        ROT270, "Taito America Corporation", "The Electric Yo-Yo (set 2)", MACHINE_SUPPORTS_SAVE, layout_elecyoyo )
+GAME( 1982, kram,     0,        mcu,      kram,     qix_state, 0,        ROT0,   "Taito America Corporation", "Kram (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, kram2,    kram,     mcu,      kram,     qix_state, 0,        ROT0,   "Taito America Corporation", "Kram (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, kram3,    kram,     kram3,    kram,     qix_state, kram3,    ROT0,   "Taito America Corporation", "Kram (encrypted)", MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, zookeep,  0,        zookeep,  zookeep,  qix_state, zookeep,  ROT0,   "Taito America Corporation", "Zoo Keeper (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, zookeep2, zookeep,  zookeep,  zookeep,  qix_state, zookeep,  ROT0,   "Taito America Corporation", "Zoo Keeper (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, zookeep3, zookeep,  zookeep,  zookeep,  qix_state, zookeep,  ROT0,   "Taito America Corporation", "Zoo Keeper (set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, slither,  0,        slither,  slither,  qix_state, slither,  ROT270, "Century II", "Slither (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, slithera, slither,  slither,  slither,  qix_state, slither,  ROT270, "Century II", "Slither (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, complexx, 0,        qix,      complexx, qix_state, 0,        ROT270, "Taito America Corporation", "Complex X", MACHINE_SUPPORTS_SAVE )

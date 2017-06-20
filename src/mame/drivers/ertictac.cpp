@@ -27,6 +27,7 @@ PCB has a single OSC at 24MHz
 #include "machine/aakart.h"
 #include "machine/i2cmem.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
 
 
 class ertictac_state : public archimedes_state
@@ -154,6 +155,7 @@ static INPUT_PORTS_START( poizone )
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 
+	// TODO: default settings
 	PORT_MODIFY("DSW1")
 	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "DSW1:3" )
 	PORT_DIPNAME( 0x30, 0x40, "Coinage 1" ) PORT_DIPLOCATION("DSW1:5,6")
@@ -171,7 +173,7 @@ static INPUT_PORTS_START( poizone )
 	PORT_DIPNAME( 0x01, 0x01, "Setting 1" ) PORT_DIPLOCATION("DSW2:2")
 	PORT_DIPSETTING(    0x01, "Manual" )
 	PORT_DIPSETTING(    0x00, "Automatic" )
-	PORT_DIPNAME( 0x1A, 0x00, "Setting 2" )  PORT_DIPLOCATION("DSW2:3,4,5")
+	PORT_DIPNAME( 0x1A, 0x1A, "Setting 2" )  PORT_DIPLOCATION("DSW2:3,4,5")
 	PORT_DIPSETTING(    0x00, "Extremely Easy - 2:00")  PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00)
 	PORT_DIPSETTING(    0x02, "Very Easy - 1:30")   PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00)
 	PORT_DIPSETTING(    0x08, "Easy - 2:00")    PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00)
@@ -216,7 +218,7 @@ INTERRUPT_GEN_MEMBER(ertictac_state::ertictac_podule_irq)
 #define NVRAM_SIZE 256
 #define NVRAM_PAGE_SIZE 0   /* max size of one write request */
 
-static MACHINE_CONFIG_START( ertictac, ertictac_state )
+static MACHINE_CONFIG_START( ertictac )
 
 	MCFG_CPU_ADD("maincpu", ARM, XTAL_24MHz/3) /* guess, 12MHz 8MHz or 6MHz, what's the correct divider 2, 3 or 4? */
 	MCFG_CPU_PROGRAM_MAP(ertictac_map)
@@ -344,7 +346,7 @@ ROM_START( poizone )
 	ROM_REGION(0x200000, "vram", ROMREGION_ERASE00)
 ROM_END
 
-GAME( 1990, ertictac,         0, ertictac, ertictac, ertictac_state, ertictac, ROT0, "Sisteme", "Erotictac/Tactic" ,MACHINE_IMPERFECT_SOUND)
-GAME( 1990, ertictaca, ertictac, ertictac, ertictac, ertictac_state, ertictac, ROT0, "Sisteme", "Erotictac/Tactic (ver 01)" ,MACHINE_IMPERFECT_SOUND)
-GAME( 1990, ertictacb, ertictac, ertictac, ertictac, ertictac_state, ertictac, ROT0, "Sisteme", "Erotictac/Tactic (set 2)" ,MACHINE_IMPERFECT_SOUND)
-GAME( 1991, poizone,          0, ertictac, poizone, ertictac_state, ertictac,  ROT0, "Eterna" ,"Poizone" ,MACHINE_IMPERFECT_SOUND|MACHINE_IMPERFECT_GRAPHICS)
+GAME( 1990, ertictac,         0, ertictac, ertictac, ertictac_state, ertictac, ROT0, "Sisteme", "Erotictac/Tactic",          MACHINE_IMPERFECT_SOUND)
+GAME( 1990, ertictaca, ertictac, ertictac, ertictac, ertictac_state, ertictac, ROT0, "Sisteme", "Erotictac/Tactic (ver 01)", MACHINE_IMPERFECT_SOUND)
+GAME( 1990, ertictacb, ertictac, ertictac, ertictac, ertictac_state, ertictac, ROT0, "Sisteme", "Erotictac/Tactic (set 2)",  MACHINE_IMPERFECT_SOUND)
+GAME( 1991, poizone,          0, ertictac, poizone,  ertictac_state, ertictac, ROT0, "Eterna",  "Poizone",                   MACHINE_IMPERFECT_SOUND|MACHINE_IMPERFECT_GRAPHICS)

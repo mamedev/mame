@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -52,7 +52,7 @@ namespace bgfx
 		virtual bool createSwapChain(const VRDesc& _desc, int _msaaSamples, int _mirrorWidth, int _mirrorHeight) BX_OVERRIDE = 0;
 		virtual void destroySwapChain() BX_OVERRIDE = 0;
 		virtual void destroyMirror() BX_OVERRIDE = 0;
-		virtual void renderEyeStart(const VRDesc& _desc, uint8_t _eye) BX_OVERRIDE = 0;
+		virtual void makeRenderTargetActive(const VRDesc& _desc) BX_OVERRIDE = 0;
 		virtual bool submitSwapChain(const VRDesc& _desc) BX_OVERRIDE = 0;
 
 	protected:

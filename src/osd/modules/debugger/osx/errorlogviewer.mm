@@ -6,6 +6,7 @@
 //
 //============================================================
 
+#include "emu.h"
 #import "errorlogviewer.h"
 
 #import "errorlogview.h"
@@ -18,7 +19,7 @@
 	NSString        *title;
 
 	title = [NSString stringWithFormat:@"Error Log: %@ [%@]",
-									   [NSString stringWithUTF8String:m.system().description],
+									   [NSString stringWithUTF8String:m.system().type.fullname()],
 									   [NSString stringWithUTF8String:m.system().name]];
 	if (!(self = [super initWithMachine:m title:title console:c]))
 		return nil;
@@ -31,6 +32,7 @@
 	[logScroll setHasVerticalScroller:YES];
 	[logScroll setAutohidesScrollers:YES];
 	[logScroll setBorderType:NSNoBorder];
+	[logScroll setDrawsBackground:NO];
 	[logScroll setDocumentView:logView];
 	[logView release];
 	[window setContentView:logScroll];

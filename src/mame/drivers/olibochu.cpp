@@ -57,6 +57,8 @@ $7004 writes, related to $7000 reads
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
 
 class olibochu_state : public driver_device
 {
@@ -454,7 +456,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(olibochu_state::olibochu_scanline)
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf);   /* RST 08h */
 }
 
-static MACHINE_CONFIG_START( olibochu, olibochu_state )
+static MACHINE_CONFIG_START( olibochu )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)   /* 4 MHz ?? */
@@ -535,4 +537,4 @@ ROM_END
 
 
 
-GAME( 1981, olibochu, 0, olibochu, olibochu, driver_device, 0, ROT270, "Irem / GDI", "Oli-Boo-Chu", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, olibochu, 0, olibochu, olibochu, olibochu_state, 0, ROT270, "Irem / GDI", "Oli-Boo-Chu", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

@@ -6,19 +6,23 @@
  *
  ****************************************************************************/
 
-#ifndef MC1502_H_
-#define MC1502_H_
+#ifndef MAME_INCLUDES_MC1502_H
+#define MAME_INCLUDES_MC1502_H
+
+#pragma once
 
 #include "imagedev/cassette.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
-#include "bus/isa/isa.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/ram.h"
-#include "bus/isa/xsu_cards.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
+
 #include "bus/centronics/ctronics.h"
+#include "bus/isa/isa.h"
+#include "bus/isa/xsu_cards.h"
+
 
 class mc1502_state : public driver_device
 {
@@ -81,4 +85,4 @@ private:
 	int m_pit_out2;
 };
 
-#endif /* MC1502_H_ */
+#endif // MAME_INCLUDES_MC1502_H

@@ -195,12 +195,15 @@ foreground and not behind the moving elevator layer.
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/bbusters.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/nvram.h"
 #include "sound/2608intf.h"
 #include "sound/2610intf.h"
-#include "includes/bbusters.h"
-#include "machine/nvram.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /******************************************************************************/
@@ -644,13 +647,7 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-void bbusters_state::screen_eof_bbuster(screen_device &screen, bool state)
-{
-	m_spriteram->vblank_copy_rising(screen, state);
-	m_spriteram2->vblank_copy_rising(screen, state);
-}
-
-static MACHINE_CONFIG_START( bbusters, bbusters_state )
+static MACHINE_CONFIG_START( bbusters )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
@@ -669,7 +666,8 @@ static MACHINE_CONFIG_START( bbusters, bbusters_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(bbusters_state, screen_update_bbuster)
-	MCFG_SCREEN_VBLANK_DRIVER(bbusters_state, screen_eof_bbuster)
+	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("spriteram2", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bbusters)
@@ -694,7 +692,7 @@ static MACHINE_CONFIG_START( bbusters, bbusters_state )
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( mechatt, bbusters_state )
+static MACHINE_CONFIG_START( mechatt )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
@@ -711,7 +709,7 @@ static MACHINE_CONFIG_START( mechatt, bbusters_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(bbusters_state, screen_update_mechatt)
-	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
+	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mechatt)
@@ -1116,12 +1114,12 @@ ROM_END
 /******************************************************************************/
 
 // as soon as you calibrate the guns in test mode the game refuses to boot
-GAME( 1989, bbusters,   0,        bbusters, bbusters, driver_device, 0, ROT0,  "SNK", "Beast Busters (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, bbustersu,  bbusters, bbusters, bbusters, driver_device, 0, ROT0,  "SNK", "Beast Busters (US, Version 3)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, bbustersua, bbusters, bbusters, bbusters, driver_device, 0, ROT0,  "SNK", "Beast Busters (US, Version 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, bbustersj,  bbusters, bbusters, bbusters, driver_device, 0, ROT0,  "SNK", "Beast Busters (Japan, Version 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bbusters,   0,        bbusters, bbusters, bbusters_state, 0, ROT0,  "SNK", "Beast Busters (World)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bbustersu,  bbusters, bbusters, bbusters, bbusters_state, 0, ROT0,  "SNK", "Beast Busters (US, Version 3)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bbustersua, bbusters, bbusters, bbusters, bbusters_state, 0, ROT0,  "SNK", "Beast Busters (US, Version 2)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bbustersj,  bbusters, bbusters, bbusters, bbusters_state, 0, ROT0,  "SNK", "Beast Busters (Japan, Version 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, mechatt,    0,        mechatt,  mechatt,  driver_device, 0, ROT0,  "SNK", "Mechanized Attack (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, mechattj,   mechatt,  mechatt,  mechattj, driver_device, 0, ROT0,  "SNK", "Mechanized Attack (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, mechattu,   mechatt,  mechatt,  mechattu, driver_device, 0, ROT0,  "SNK", "Mechanized Attack (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, mechattu1,  mechatt,  mechatt,  mechattu, driver_device, 0, ROT0,  "SNK", "Mechanized Attack (US, Version 1, Single Player)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mechatt,    0,        mechatt,  mechatt,  bbusters_state, 0, ROT0,  "SNK", "Mechanized Attack (World)",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mechattj,   mechatt,  mechatt,  mechattj, bbusters_state, 0, ROT0,  "SNK", "Mechanized Attack (Japan)",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mechattu,   mechatt,  mechatt,  mechattu, bbusters_state, 0, ROT0,  "SNK", "Mechanized Attack (US)",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mechattu1,  mechatt,  mechatt,  mechattu, bbusters_state, 0, ROT0,  "SNK", "Mechanized Attack (US, Version 1, Single Player)", MACHINE_SUPPORTS_SAVE )

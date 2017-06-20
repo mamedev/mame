@@ -17,6 +17,7 @@ TODO:
 
 **********************************************************************/
 
+#include "emu.h"
 #include "sk1100.h"
 #include "softlist.h"
 
@@ -26,7 +27,7 @@ TODO:
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SEGA_SK1100 = &device_creator<sega_sk1100_device>;
+DEFINE_DEVICE_TYPE(SEGA_SK1100, sega_sk1100_device, "sega_sk1100", "Sega SK-1100 Keyboard")
 
 
 /*-------------------------------------------------
@@ -153,7 +154,7 @@ ioport_constructor sega_sk1100_device::device_input_ports() const
 }
 
 
-static MACHINE_CONFIG_FRAGMENT( sk1100_config )
+MACHINE_CONFIG_MEMBER( sega_sk1100_device::device_add_mconfig )
 	/* devices */
 	MCFG_DEVICE_ADD(UPD9255_0_TAG, I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(sega_sk1100_device, ppi_pa_r))
@@ -172,12 +173,6 @@ static MACHINE_CONFIG_FRAGMENT( sk1100_config )
 	MCFG_SOFTWARE_LIST_ADD("cass_list","sc3000_cass")
 MACHINE_CONFIG_END
 
-
-machine_config_constructor sega_sk1100_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( sk1100_config );
-}
-
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -187,7 +182,7 @@ machine_config_constructor sega_sk1100_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 sega_sk1100_device::sega_sk1100_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, SEGA_SK1100, "Sega SK-1100 Keyboard", tag, owner, clock, "sega_sk1100", __FILE__),
+	device_t(mconfig, SEGA_SK1100, tag, owner, clock),
 	device_sg1000_expansion_slot_interface(mconfig, *this),
 	m_cassette(*this, "cassette"),
 	m_ppi(*this, UPD9255_0_TAG),

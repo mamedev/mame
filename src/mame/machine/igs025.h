@@ -1,8 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, ElSemi
 /* Common device stuff for IGS025 / IGS022, should be split into devices for each chip once we know where what part does what */
+#ifndef MAME_MACHINE_IGS025_H
+#define MAME_MACHINE_IGS025_H
 
-
+#pragma once
 
 // used to connect the 022
 typedef device_delegate<void (void)> igs025_execute_external;
@@ -31,8 +33,6 @@ public:
 
 
 protected:
-	virtual void device_config_complete() override;
-	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -58,5 +58,6 @@ protected:
 };
 
 
+DECLARE_DEVICE_TYPE(IGS025, igs025_device)
 
-extern const device_type IGS025;
+#endif // MAME_MACHINE_IGS025_H

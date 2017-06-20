@@ -23,8 +23,9 @@
 
 *********************************************************************/
 
+#include "emu.h"
 #include "a2videoterm.h"
-#include "includes/apple2.h"
+#include "screen.h"
 
 
 /***************************************************************************
@@ -35,12 +36,12 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_VIDEOTERM = &device_creator<a2bus_videoterm_device>;
-const device_type A2BUS_IBSAP16 = &device_creator<a2bus_ap16_device>;
-const device_type A2BUS_IBSAP16ALT = &device_creator<a2bus_ap16alt_device>;
-const device_type A2BUS_VTC1 = &device_creator<a2bus_vtc1_device>;
-const device_type A2BUS_VTC2 = &device_creator<a2bus_vtc2_device>;
-const device_type A2BUS_AEVIEWMASTER80 = &device_creator<a2bus_aevm80_device>;
+DEFINE_DEVICE_TYPE(A2BUS_VIDEOTERM,      a2bus_videoterm_device, "a2vidtrm", "Videx VideoTerm")
+DEFINE_DEVICE_TYPE(A2BUS_IBSAP16,        a2bus_ap16_device,      "a2ap16",   "IBS AP-16 80 column card")
+DEFINE_DEVICE_TYPE(A2BUS_IBSAP16ALT,     a2bus_ap16alt_device,   "a2ap16a",  "IBS AP-16 80 column card (alt. version)")
+DEFINE_DEVICE_TYPE(A2BUS_VTC1,           a2bus_vtc1_device,      "a2vtc1",   "Unknown VideoTerm clone #1")
+DEFINE_DEVICE_TYPE(A2BUS_VTC2,           a2bus_vtc2_device,      "a2vtc2",   "Unknown VideoTerm clone #2")
+DEFINE_DEVICE_TYPE(A2BUS_AEVIEWMASTER80, a2bus_aevm80_device,    "a2aevm80", "Applied Engineering Viewmaster 80")
 
 #define VIDEOTERM_ROM_REGION  "vterm_rom"
 #define VIDEOTERM_GFX_REGION  "vterm_gfx"
@@ -48,18 +49,6 @@ const device_type A2BUS_AEVIEWMASTER80 = &device_creator<a2bus_aevm80_device>;
 #define VIDEOTERM_MC6845_NAME "mc6845_vterm"
 
 #define MDA_CLOCK   16257000
-
-MACHINE_CONFIG_FRAGMENT( a2videoterm )
-	MCFG_SCREEN_ADD( VIDEOTERM_SCREEN_NAME, RASTER) // 560x216?  (80x24 7x9 characters)
-	MCFG_SCREEN_RAW_PARAMS(MDA_CLOCK, 882, 0, 720, 370, 0, 350 )
-	MCFG_SCREEN_UPDATE_DEVICE( VIDEOTERM_MC6845_NAME, mc6845_device, screen_update )
-
-	MCFG_MC6845_ADD(VIDEOTERM_MC6845_NAME, MC6845, VIDEOTERM_SCREEN_NAME, MDA_CLOCK/9)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(a2bus_videx80_device, crtc_update_row)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(a2bus_videx80_device, vsync_changed))
-MACHINE_CONFIG_END
 
 ROM_START( a2videoterm )
 	ROM_REGION(0x400, VIDEOTERM_ROM_REGION, 0)
@@ -125,14 +114,20 @@ ROM_END
 ***************************************************************************/
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor a2bus_videx80_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( a2videoterm );
-}
+MACHINE_CONFIG_MEMBER( a2bus_videx80_device::device_add_mconfig )
+	MCFG_SCREEN_ADD( VIDEOTERM_SCREEN_NAME, RASTER) // 560x216?  (80x24 7x9 characters)
+	MCFG_SCREEN_RAW_PARAMS(MDA_CLOCK, 882, 0, 720, 370, 0, 350 )
+	MCFG_SCREEN_UPDATE_DEVICE( VIDEOTERM_MC6845_NAME, mc6845_device, screen_update )
+
+	MCFG_MC6845_ADD(VIDEOTERM_MC6845_NAME, MC6845, VIDEOTERM_SCREEN_NAME, MDA_CLOCK/9)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_UPDATE_ROW_CB(a2bus_videx80_device, crtc_update_row)
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(a2bus_videx80_device, vsync_changed))
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -172,41 +167,41 @@ const tiny_rom_entry *a2bus_aevm80_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_videx80_device::a2bus_videx80_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+a2bus_videx80_device::a2bus_videx80_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this), m_rom(nullptr), m_chrrom(nullptr), m_framecnt(0),
-	m_crtc(*this, VIDEOTERM_MC6845_NAME), m_rambank(0),
-	m_palette(*this, ":palette")
+	m_crtc(*this, VIDEOTERM_MC6845_NAME), m_palette(*this, ":palette"),
+	m_rambank(0)
 {
 }
 
 a2bus_videoterm_device::a2bus_videoterm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	a2bus_videx80_device(mconfig, A2BUS_VIDEOTERM, "Videx VideoTerm", tag, owner, clock, "a2vidtrm", __FILE__)
+	a2bus_videx80_device(mconfig, A2BUS_VIDEOTERM, tag, owner, clock)
 {
 }
 
 a2bus_ap16_device::a2bus_ap16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	a2bus_videx80_device(mconfig, A2BUS_IBSAP16, "IBS AP-16 80 column card", tag, owner, clock, "a2ap16", __FILE__)
+	a2bus_videx80_device(mconfig, A2BUS_IBSAP16, tag, owner, clock)
 {
 }
 
 a2bus_ap16alt_device::a2bus_ap16alt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	a2bus_videx80_device(mconfig, A2BUS_IBSAP16ALT, "IBS AP-16 80 column card (alt. version)", tag, owner, clock, "a2ap16a", __FILE__)
+	a2bus_videx80_device(mconfig, A2BUS_IBSAP16ALT, tag, owner, clock)
 {
 }
 
 a2bus_vtc1_device::a2bus_vtc1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	a2bus_videx80_device(mconfig, A2BUS_VTC1, "Unknown VideoTerm clone #1", tag, owner, clock, "a2vtc1", __FILE__)
+	a2bus_videx80_device(mconfig, A2BUS_VTC1, tag, owner, clock)
 {
 }
 
 a2bus_vtc2_device::a2bus_vtc2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	a2bus_videx80_device(mconfig, A2BUS_VTC2, "Unknown VideoTerm clone #2", tag, owner, clock, "a2vtc2", __FILE__)
+	a2bus_videx80_device(mconfig, A2BUS_VTC2, tag, owner, clock)
 {
 }
 
 a2bus_aevm80_device::a2bus_aevm80_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	a2bus_videx80_device(mconfig, A2BUS_AEVIEWMASTER80, "Applied Engineering Viewmaster 80", tag, owner, clock, "a2aevm80", __FILE__)
+	a2bus_videx80_device(mconfig, A2BUS_AEVIEWMASTER80, tag, owner, clock)
 {
 }
 

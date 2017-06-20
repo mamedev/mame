@@ -8,16 +8,21 @@
 
 
 #include "emu.h"
-#include "cpu/m6800/m6800.h"
-#include "formats/coco_cas.h"
+
+#include "cpu/m6800/m6801.h"
 #include "imagedev/cassette.h"
 #include "imagedev/printer.h"
 #include "machine/ram.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
-#include "video/mc6847.h"
 #include "video/ef9345.h"
+#include "video/mc6847.h"
+
 #include "softlist.h"
+#include "speaker.h"
+
+#include "formats/coco_cas.h"
+
 
 //printer state
 enum
@@ -36,14 +41,14 @@ class mc10_state : public driver_device
 {
 public:
 	mc10_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_mc6847(*this, "mc6847"),
-	m_ef9345(*this, "ef9345"),
-	m_dac(*this, "dac"),
-	m_ram(*this, RAM_TAG),
-	m_cassette(*this, "cassette"),
-	m_printer(*this, "printer")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_mc6847(*this, "mc6847")
+		, m_ef9345(*this, "ef9345")
+		, m_dac(*this, "dac")
+		, m_ram(*this, RAM_TAG)
+		, m_cassette(*this, "cassette")
+		, m_printer(*this, "printer")
 	{ }
 
 	required_device<m6803_cpu_device> m_maincpu;
@@ -477,7 +482,7 @@ INPUT_PORTS_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( mc10, mc10_state )
+static MACHINE_CONFIG_START( mc10 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6803, XTAL_3_579545MHz)  /* 0,894886 MHz */
@@ -513,7 +518,7 @@ static MACHINE_CONFIG_START( mc10, mc10_state )
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "mc10")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( alice32, mc10_state )
+static MACHINE_CONFIG_START( alice32 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6803, XTAL_3_579545MHz)
@@ -604,8 +609,8 @@ ROM_END
     GAME DRIVERS
 ***************************************************************************/
 
-/*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  INIT  COMPANY              FULLNAME  FLAGS */
-COMP( 1983, mc10,  0,      0,      mc10,    mc10, mc10_state,  mc10, "Tandy Radio Shack", "MC-10",  MACHINE_SUPPORTS_SAVE )
-COMP( 1983, alice, mc10,   0,      mc10,    alice, mc10_state, mc10, "Matra & Hachette",  "Alice",  MACHINE_SUPPORTS_SAVE )
-COMP( 1984, alice32,       0, 0,   alice32, alice, mc10_state, mc10, "Matra & Hachette",  "Alice 32",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-COMP( 1985, alice90, alice32, 0,   alice90, alice, mc10_state, mc10, "Matra & Hachette",  "Alice 90",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT  STATE       INIT  COMPANY              FULLNAME     FLAGS
+COMP( 1983, mc10,    0,       0,      mc10,    mc10,  mc10_state, mc10, "Tandy Radio Shack", "MC-10",     MACHINE_SUPPORTS_SAVE )
+COMP( 1983, alice,   mc10,    0,      mc10,    alice, mc10_state, mc10, "Matra & Hachette",  "Alice",     MACHINE_SUPPORTS_SAVE )
+COMP( 1984, alice32, 0,       0,      alice32, alice, mc10_state, mc10, "Matra & Hachette",  "Alice 32",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+COMP( 1985, alice90, alice32, 0,      alice90, alice, mc10_state, mc10, "Matra & Hachette",  "Alice 90",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

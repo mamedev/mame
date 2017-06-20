@@ -7,12 +7,11 @@
 **********************************************************************/
 
 
+#ifndef MAME_BUS_SAT_CTRL_CTRL_H
+#define MAME_BUS_SAT_CTRL_CTRL_H
+
 #pragma once
 
-#ifndef __SATURN_CONTROL_PORT__
-#define __SATURN_CONTROL_PORT__
-
-#include "emu.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -26,15 +25,16 @@ class device_saturn_control_port_interface : public device_slot_card_interface
 {
 public:
 	// construction/destruction
-	device_saturn_control_port_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_saturn_control_port_interface();
 
-	virtual uint16_t read_direct() { return 0; };
-	virtual uint8_t read_ctrl(uint8_t offset) { return 0; };
-	virtual uint8_t read_status() { return 0xf0; };
-	virtual uint8_t read_id(int idx) { return 0xff; };
+	virtual uint16_t read_direct() { return 0; }
+	virtual uint8_t read_ctrl(uint8_t offset) { return 0; }
+	virtual uint8_t read_status() { return 0xf0; }
+	virtual uint8_t read_id(int idx) { return 0xff; }
 
 protected:
+	device_saturn_control_port_interface(const machine_config &mconfig, device_t &device);
+
 	uint8_t m_ctrl_id;
 	saturn_control_port_device *m_port;
 };
@@ -63,7 +63,7 @@ protected:
 
 
 // device type definition
-extern const device_type SATURN_CONTROL_PORT;
+DECLARE_DEVICE_TYPE(SATURN_CONTROL_PORT, saturn_control_port_device)
 
 
 //**************************************************************************
@@ -79,4 +79,4 @@ SLOT_INTERFACE_EXTERN( saturn_controls );
 SLOT_INTERFACE_EXTERN( saturn_joys );
 
 
-#endif
+#endif // MAME_BUS_SAT_CTRL_CTRL_H

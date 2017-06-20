@@ -17,11 +17,15 @@
 *******************************************************************************/
 
 #include "emu.h"
+#include "includes/liberate.h"
+
 #include "cpu/m6502/deco16.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/ay8910.h"
-#include "includes/liberate.h"
 #include "machine/deco222.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 /*************************************
  *
@@ -316,10 +320,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( prosoccr_sound_map, AS_PROGRAM, 8, liberate_state )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE("ay1", ay8910_device, data_w)
-	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("ay1", ay8910_device, address_w)
-	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE("ay2", ay8910_device, data_w)
-	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("ay2", ay8910_device, address_w)
+	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE("ay1", ay8912_device, data_w)
+	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("ay1", ay8912_device, address_w)
+	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE("ay2", ay8912_device, data_w)
+	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("ay2", ay8912_device, address_w)
 	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xc000, 0xc000) AM_WRITENOP //irq ack
 	AM_RANGE(0xe000, 0xffff) AM_ROM
@@ -328,10 +332,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( liberate_sound_map, AS_PROGRAM, 8, liberate_state )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x1000, 0x1000) AM_WRITENOP
-	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE("ay1", ay8910_device, data_w)
-	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("ay1", ay8910_device, address_w)
-	AM_RANGE(0x7000, 0x7000) AM_DEVWRITE("ay2", ay8910_device, data_w)
-	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("ay2", ay8910_device, address_w)
+	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE("ay1", ay8912_device, data_w)
+	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("ay1", ay8912_device, address_w)
+	AM_RANGE(0x7000, 0x7000) AM_DEVWRITE("ay2", ay8912_device, data_w)
+	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("ay2", ay8912_device, address_w)
 	AM_RANGE(0xb000, 0xb000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -724,7 +728,7 @@ MACHINE_RESET_MEMBER(liberate_state,liberate)
 	m_bank = 0;
 }
 
-static MACHINE_CONFIG_START( liberate_base, liberate_state )
+static MACHINE_CONFIG_START( liberate_base )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",DECO16, 2000000)
@@ -761,10 +765,10 @@ static MACHINE_CONFIG_START( liberate_base, liberate_state )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", AY8910, 1500000)
+	MCFG_SOUND_ADD("ay1", AY8912, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 1500000)
+	MCFG_SOUND_ADD("ay2", AY8912, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -811,7 +815,7 @@ static MACHINE_CONFIG_DERIVED( prosoccr, liberate_base )
 	MCFG_VIDEO_START_OVERRIDE(liberate_state,prosoccr)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( prosport, liberate_state )
+static MACHINE_CONFIG_START( prosport )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", DECO16, 2000000)
@@ -848,10 +852,10 @@ static MACHINE_CONFIG_START( prosport, liberate_state )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", AY8910, 1500000)
+	MCFG_SOUND_ADD("ay1", AY8912, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 1500000)
+	MCFG_SOUND_ADD("ay2", AY8912, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

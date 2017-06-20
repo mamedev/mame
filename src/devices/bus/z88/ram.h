@@ -1,11 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco
+#ifndef MAME_BUS_Z88_RAM_H
+#define MAME_BUS_Z88_RAM_H
+
 #pragma once
 
-#ifndef __Z88_RAM_H__
-#define __Z88_RAM_H__
-
-#include "emu.h"
 #include "z88.h"
 
 //**************************************************************************
@@ -20,9 +19,10 @@ class z88_32k_ram_device : public device_t,
 public:
 	// construction/destruction
 	z88_32k_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	z88_32k_ram_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 protected:
+	z88_32k_ram_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 
@@ -77,9 +77,9 @@ protected:
 };
 
 // device type definition
-extern const device_type Z88_32K_RAM;
-extern const device_type Z88_128K_RAM;
-extern const device_type Z88_512K_RAM;
-extern const device_type Z88_1024K_RAM;
+DECLARE_DEVICE_TYPE(Z88_32K_RAM,   z88_32k_ram_device)
+DECLARE_DEVICE_TYPE(Z88_128K_RAM,  z88_128k_ram_device)
+DECLARE_DEVICE_TYPE(Z88_512K_RAM,  z88_512k_ram_device)
+DECLARE_DEVICE_TYPE(Z88_1024K_RAM, z88_1024k_ram_device)
 
-#endif  /* __Z88_RAM_H__ */
+#endif // MAME_BUS_Z88_RAM_H

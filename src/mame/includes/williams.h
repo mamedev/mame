@@ -15,6 +15,7 @@
 #include "machine/6821pia.h"
 #include "machine/bankdev.h"
 #include "audio/williams.h"
+#include "screen.h"
 
 class williams_state : public driver_device
 {
@@ -29,7 +30,10 @@ public:
 		m_watchdog(*this, "watchdog"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_generic_paletteram_8(*this, "paletteram") { }
+		m_generic_paletteram_8(*this, "paletteram"),
+		m_pia_0(*this, "pia_0"),
+		m_pia_1(*this, "pia_1"),
+		m_pia_2(*this, "pia_2") { }
 
 	enum
 	{
@@ -119,6 +123,9 @@ public:
 	required_device<screen_device> m_screen;
 	optional_device<palette_device> m_palette;
 	optional_shared_ptr<uint8_t> m_generic_paletteram_8;
+	required_device<pia6821_device> m_pia_0;
+	required_device<pia6821_device> m_pia_1;
+	required_device<pia6821_device> m_pia_2;
 };
 
 
@@ -128,10 +135,12 @@ public:
 	blaster_state(const machine_config &mconfig, device_type type, const char *tag)
 		: williams_state(mconfig, type, tag),
 		m_soundcpu_b(*this, "soundcpu_b"),
+		m_pia_2b(*this, "pia_2b"),
 		m_blaster_palette_0(*this, "blaster_pal0"),
 		m_blaster_scanline_control(*this, "blaster_scan") { }
 
 	optional_device<cpu_device> m_soundcpu_b;
+	optional_device<pia6821_device> m_pia_2b;
 	required_shared_ptr<uint8_t> m_blaster_palette_0;
 	required_shared_ptr<uint8_t> m_blaster_scanline_control;
 
@@ -226,11 +235,11 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(joust2_pia_3_cb1_w);
 };
 
-/*----------- defined in video/williams.c -----------*/
+/*----------- defined in video/williams.cpp -----------*/
 
 #define WILLIAMS_BLITTER_NONE       0       /* no blitter */
-#define WILLIAMS_BLITTER_SC01       1       /* SC-01 blitter */
-#define WILLIAMS_BLITTER_SC02       2       /* SC-02 "fixed" blitter */
+#define WILLIAMS_BLITTER_SC1        1       /* Special Chip 1 blitter */
+#define WILLIAMS_BLITTER_SC2        2       /* Special Chip 2 "bugfixed" blitter */
 
 #define WILLIAMS_TILEMAP_MYSTICM    0       /* IC79 is a 74LS85 comparator */
 #define WILLIAMS_TILEMAP_TSHOOT     1       /* IC79 is a 74LS157 selector jumpered to be enabled */

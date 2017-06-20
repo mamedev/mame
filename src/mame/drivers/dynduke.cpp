@@ -68,11 +68,14 @@ Also, implemented conditional port for Coin Mode (SW1:1)
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/dynduke.h"
+
 #include "cpu/nec/nec.h"
 #include "cpu/z80/z80.h"
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
-#include "includes/dynduke.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /* Memory Maps */
@@ -301,7 +304,7 @@ INTERRUPT_GEN_MEMBER(dynduke_state::interrupt)
 
 /* Machine Driver */
 
-static MACHINE_CONFIG_START( dynduke, dynduke_state )
+static MACHINE_CONFIG_START( dynduke )
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", V30, 16000000/2) // NEC V30-8 CPU
 	MCFG_CPU_PROGRAM_MAP(master_map)
@@ -329,7 +332,7 @@ static MACHINE_CONFIG_START( dynduke, dynduke_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dynduke_state, screen_update)
-	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
+	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dynduke)
@@ -344,7 +347,7 @@ static MACHINE_CONFIG_START( dynduke, dynduke_state )
 	MCFG_YM3812_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", 1320000, OKIM6295_PIN7_LOW)
+	MCFG_OKIM6295_ADD("oki", 1320000, PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
@@ -408,6 +411,10 @@ ROM_START( dynduke )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "7.x10", 0x000000, 0x10000, CRC(9cbc7b41) SHA1(107c19d3d71ee6af63d03f7278310c5e3786f91d) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "26.n2", 0x0000, 0x0100, NO_DUMP ) // N82S135N
+	ROM_LOAD( "61-d.u3", 0x0100, 0x0100, NO_DUMP ) // N82S1??AN (part number obscured)
 ROM_END
 
 ROM_START( dyndukea )
@@ -456,6 +463,10 @@ ROM_START( dyndukea )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "7.x10", 0x000000, 0x10000, CRC(9cbc7b41) SHA1(107c19d3d71ee6af63d03f7278310c5e3786f91d) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "26.n2", 0x0000, 0x0100, NO_DUMP ) // N82S135N
+	ROM_LOAD( "61-d.u3", 0x0100, 0x0100, NO_DUMP ) // N82S1??AN (part number obscured)
 ROM_END
 
 ROM_START( dyndukej )
@@ -504,6 +515,10 @@ ROM_START( dyndukej )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "7.x10", 0x000000, 0x10000, CRC(9cbc7b41) SHA1(107c19d3d71ee6af63d03f7278310c5e3786f91d) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "26.n2", 0x0000, 0x0100, NO_DUMP ) // N82S135N
+	ROM_LOAD( "61-d.u3", 0x0100, 0x0100, NO_DUMP ) // N82S1??AN (part number obscured)
 ROM_END
 
 ROM_START( dyndukeja )
@@ -552,6 +567,10 @@ ROM_START( dyndukeja )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "7.x10", 0x000000, 0x10000, CRC(9cbc7b41) SHA1(107c19d3d71ee6af63d03f7278310c5e3786f91d) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "26.n2", 0x0000, 0x0100, NO_DUMP ) // N82S135N
+	ROM_LOAD( "61-d.u3", 0x0100, 0x0100, NO_DUMP ) // N82S1??AN (part number obscured)
 ROM_END
 
 ROM_START( dyndukeu )
@@ -600,6 +619,10 @@ ROM_START( dyndukeu )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "7.x10", 0x000000, 0x10000, CRC(9cbc7b41) SHA1(107c19d3d71ee6af63d03f7278310c5e3786f91d) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "26.n2", 0x0000, 0x0100, NO_DUMP ) // N82S135N
+	ROM_LOAD( "61-d.u3", 0x0100, 0x0100, NO_DUMP ) // N82S1??AN (part number obscured)
 ROM_END
 
 ROM_START( dbldynj )
@@ -648,6 +671,10 @@ ROM_START( dbldynj )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "7.x10", 0x000000, 0x10000, CRC(9cbc7b41) SHA1(107c19d3d71ee6af63d03f7278310c5e3786f91d) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "26.n2", 0x0000, 0x0100, NO_DUMP ) // N82S135N
+	ROM_LOAD( "61-d.u3", 0x0100, 0x0100, NO_DUMP ) // N82S1??AN (part number obscured)
 ROM_END
 
 ROM_START( dbldynu )
@@ -696,15 +723,19 @@ ROM_START( dbldynu )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "7.x10", 0x000000, 0x10000, CRC(9cbc7b41) SHA1(107c19d3d71ee6af63d03f7278310c5e3786f91d) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "26.n2", 0x0000, 0x0100, NO_DUMP ) // N82S135N
+	ROM_LOAD( "61-d.u3", 0x0100, 0x0100, NO_DUMP ) // N82S1??AN (part number obscured)
 ROM_END
 
 
 /* Game Drivers */
 
-GAME( 1989, dynduke,   0,       dynduke, dynduke, driver_device, 0, ROT0, "Seibu Kaihatsu",                  "Dynamite Duke (Europe, 03SEP89)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, dyndukea,  dynduke, dynduke, dynduke, driver_device, 0, ROT0, "Seibu Kaihatsu",                  "Dynamite Duke (Europe, 25JUL89)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, dyndukej,  dynduke, dynduke, dynduke, driver_device, 0, ROT0, "Seibu Kaihatsu",                  "Dynamite Duke (Japan, 03SEP89)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, dyndukeja, dynduke, dynduke, dynduke, driver_device, 0, ROT0, "Seibu Kaihatsu",                  "Dynamite Duke (Japan, 25JUL89)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, dyndukeu,  dynduke, dynduke, dynduke, driver_device, 0, ROT0, "Seibu Kaihatsu (Fabtek license)", "Dynamite Duke (US, 25JUL89)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, dbldynj,   0,       dbldyn,  dynduke, driver_device, 0, ROT0, "Seibu Kaihatsu",                  "The Double Dynamites (Japan, 13NOV89)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, dbldynu,   dbldynj, dynduke, dynduke, driver_device, 0, ROT0, "Seibu Kaihatsu (Fabtek license)", "The Double Dynamites (US, 13NOV89)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dynduke,   0,       dynduke, dynduke, dynduke_state, 0, ROT0, "Seibu Kaihatsu",                  "Dynamite Duke (Europe, 03SEP89)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dyndukea,  dynduke, dynduke, dynduke, dynduke_state, 0, ROT0, "Seibu Kaihatsu",                  "Dynamite Duke (Europe, 25JUL89)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dyndukej,  dynduke, dynduke, dynduke, dynduke_state, 0, ROT0, "Seibu Kaihatsu",                  "Dynamite Duke (Japan, 03SEP89)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dyndukeja, dynduke, dynduke, dynduke, dynduke_state, 0, ROT0, "Seibu Kaihatsu",                  "Dynamite Duke (Japan, 25JUL89)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dyndukeu,  dynduke, dynduke, dynduke, dynduke_state, 0, ROT0, "Seibu Kaihatsu (Fabtek license)", "Dynamite Duke (US, 25JUL89)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dbldynj,   0,       dbldyn,  dynduke, dynduke_state, 0, ROT0, "Seibu Kaihatsu",                  "The Double Dynamites (Japan, 13NOV89)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dbldynu,   dbldynj, dynduke, dynduke, dynduke_state, 0, ROT0, "Seibu Kaihatsu (Fabtek license)", "The Double Dynamites (US, 13NOV89)",    MACHINE_SUPPORTS_SAVE )

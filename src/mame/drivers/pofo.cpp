@@ -33,8 +33,7 @@
 */
 
 #include "emu.h"
-#include "rendlay.h"
-#include "softlist.h"
+
 #include "cpu/i86/i86.h"
 #include "bus/pofo/ccm.h"
 #include "bus/pofo/exp.h"
@@ -42,6 +41,11 @@
 #include "machine/ram.h"
 #include "sound/pcd3311.h"
 #include "video/hd61830.h"
+
+#include "rendlay.h"
+#include "screen.h"
+#include "softlist.h"
+#include "speaker.h"
 
 
 
@@ -87,9 +91,9 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<hd61830_device> m_lcdc;
-	required_device<pcd3311_t> m_dtmf;
-	required_device<portfolio_memory_card_slot_t> m_ccm;
-	required_device<portfolio_expansion_slot_t> m_exp;
+	required_device<pcd3311_device> m_dtmf;
+	required_device<portfolio_memory_card_slot_device> m_ccm;
+	required_device<portfolio_expansion_slot_device> m_exp;
 	required_device<timer_device> m_timer_tick;
 	required_device<nvram_device> m_nvram;
 	required_device<ram_device> m_ram;
@@ -1000,7 +1004,7 @@ void portfolio_state::machine_reset()
 //  MACHINE_CONFIG( portfolio )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( portfolio, portfolio_state )
+static MACHINE_CONFIG_START( portfolio )
 	// basic machine hardware
 	MCFG_CPU_ADD(M80C88A_TAG, I8088, XTAL_4_9152MHz)
 	MCFG_CPU_PROGRAM_MAP(portfolio_mem)
@@ -1082,5 +1086,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT       INIT    COMPANY     FULLNAME        FLAGS
-COMP( 1989, pofo,   0,      0,      portfolio,  portfolio, driver_device,   0,  "Atari",    "Portfolio",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT      STATE            INIT  COMPANY   FULLNAME      FLAGS
+COMP( 1989, pofo,   0,      0,      portfolio,  portfolio, portfolio_state, 0,    "Atari",  "Portfolio",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

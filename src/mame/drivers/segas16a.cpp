@@ -149,11 +149,14 @@ Tetris         -         -         -         -         EPR12169  EPR12170  -    
 #include "emu.h"
 #include "includes/segas16a.h"
 #include "includes/segaipt.h"
+
 #include "machine/fd1089.h"
 #include "machine/nvram.h"
 #include "machine/segacrp2_device.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
+
 
 //**************************************************************************
 //  PPI READ/WRITE CALLBACKS
@@ -255,7 +258,7 @@ READ16_MEMBER( segas16a_state::standard_io_r )
 		case 0x2000/2:
 			return ioport((offset & 1) ? "DSW2" : "DSW1")->read();
 	}
-	//logerror("%06X:standard_io_r - unknown read access to address %04X\n", m_maincpu->pc(), offset * 2);
+	//logerror("%06X:standard_io_r - unknown read access to address %04X\n", m_maincpu->state_int(STATE_GENPC), offset * 2);
 	return 0xffff;
 }
 
@@ -276,7 +279,7 @@ WRITE16_MEMBER( segas16a_state::standard_io_w )
 				synchronize(TID_PPI_WRITE, ((offset & 3) << 8) | (data & 0xff));
 			return;
 	}
-	//logerror("%06X:standard_io_w - unknown write access to address %04X = %04X & %04X\n", m_maincpu->pc(), offset * 2, data, mem_mask);
+	//logerror("%06X:standard_io_w - unknown write access to address %04X = %04X & %04X\n", m_maincpu->state_int(STATE_GENPC), offset * 2, data, mem_mask);
 }
 
 
@@ -402,7 +405,7 @@ READ8_MEMBER( segas16a_state::n7751_p2_r )
 {
 	// read from P2 - 8255's PC0-2 connects to 7751's S0-2 (P24-P26 on an 8048)
 	// bit 0x80 is an alternate way to control the sample on/off; doesn't appear to be used
-	return 0x80 | ((m_n7751_command & 0x07) << 4) | (m_n7751_i8243->i8243_p2_r(space, offset) & 0x0f);
+	return 0x80 | ((m_n7751_command & 0x07) << 4) | (m_n7751_i8243->p2_r(space, offset) & 0x0f);
 }
 
 
@@ -413,21 +416,10 @@ READ8_MEMBER( segas16a_state::n7751_p2_r )
 WRITE8_MEMBER( segas16a_state::n7751_p2_w )
 {
 	// write to P2; low 4 bits go to 8243
-	m_n7751_i8243->i8243_p2_w(space, offset, data & 0x0f);
+	m_n7751_i8243->p2_w(space, offset, data & 0x0f);
 
 	// output of bit $80 indicates we are ready (1) or busy (0)
 	// no other outputs are used
-}
-
-
-//-------------------------------------------------
-//  n7751_t1_r - MCU reads from the T1 line
-//-------------------------------------------------
-
-READ8_MEMBER( segas16a_state::n7751_t1_r )
-{
-	// T1 - labelled as "TEST", connected to ground
-	return 0;
 }
 
 
@@ -771,8 +763,28 @@ READ16_MEMBER( segas16a_state::aceattaca_custom_io_r )
 				}
 			}
 			break;
+
+		case 0x3000/2:
+			if (BIT(offset, 4))
+				return m_cxdio->read(space, offset & 0x0f);
+			break;
 	}
 	return standard_io_r(space, offset, mem_mask);
+}
+
+WRITE16_MEMBER( segas16a_state::aceattaca_custom_io_w )
+{
+	switch (offset & (0x3000/2))
+	{
+		case 0x3000/2:
+			if (BIT(offset, 4))
+			{
+				m_cxdio->write(space, offset & 0x0f, data);
+				return;
+			}
+			break;
+	}
+	standard_io_w(space, offset, data, mem_mask);
 }
 
 
@@ -993,19 +1005,6 @@ static ADDRESS_MAP_START( sound_no7751_portmap, AS_IO, 8, segas16a_state )
 	AM_RANGE(0x00, 0x01) AM_MIRROR(0x3e) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3f) AM_NOP
 	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x3f) AM_READ(sound_data_r)
-ADDRESS_MAP_END
-
-
-//**************************************************************************
-//  N7751 SOUND GENERATOR CPU ADDRESS MAPS
-//**************************************************************************
-
-static ADDRESS_MAP_START( n7751_portmap, AS_IO, 8, segas16a_state )
-	AM_RANGE(MCS48_PORT_BUS,  MCS48_PORT_BUS)  AM_READ(n7751_rom_r)
-	AM_RANGE(MCS48_PORT_T1,   MCS48_PORT_T1)   AM_READ(n7751_t1_r)
-	AM_RANGE(MCS48_PORT_P1,   MCS48_PORT_P1)   AM_DEVWRITE("dac", dac_byte_interface, write)
-	AM_RANGE(MCS48_PORT_P2,   MCS48_PORT_P2)   AM_READWRITE(n7751_p2_r, n7751_p2_w)
-	AM_RANGE(MCS48_PORT_PROG, MCS48_PORT_PROG) AM_DEVWRITE("n7751_8243", i8243_device, i8243_prog_w)
 ADDRESS_MAP_END
 
 
@@ -1889,7 +1888,7 @@ GFXDECODE_END
 //  GENERIC MACHINE DRIVERS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( system16a, segas16a_state )
+static MACHINE_CONFIG_START( system16a )
 
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)
@@ -1901,7 +1900,12 @@ static MACHINE_CONFIG_START( system16a, segas16a_state )
 	MCFG_CPU_IO_MAP(sound_portmap)
 
 	MCFG_CPU_ADD("n7751", N7751, 6000000)
-	MCFG_CPU_IO_MAP(n7751_portmap)
+	MCFG_MCS48_PORT_BUS_IN_CB(READ8(segas16a_state, n7751_rom_r))
+	MCFG_MCS48_PORT_T1_IN_CB(GND) // labelled as "TEST", connected to ground
+	MCFG_MCS48_PORT_P1_OUT_CB(DEVWRITE8("dac", dac_byte_interface, write))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(segas16a_state, n7751_p2_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(segas16a_state, n7751_p2_w))
+	MCFG_MCS48_PORT_PROG_OUT_CB(DEVWRITELINE("n7751_8243", i8243_device, prog_w))
 
 	MCFG_I8243_ADD("n7751_8243", NOOP, WRITE8(segas16a_state,n7751_rom_offset_w))
 
@@ -1961,6 +1965,10 @@ static MACHINE_CONFIG_DERIVED( system16a_fd1094, system16a )
 	MCFG_CPU_PROGRAM_MAP(system16a_map)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", segas16a_state, irq4_line_hold)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( aceattaca_fd1094, system16a_fd1094 )
+	MCFG_DEVICE_ADD("cxdio", CXD1095, 0)
 MACHINE_CONFIG_END
 
 
@@ -3660,6 +3668,7 @@ DRIVER_INIT_MEMBER(segas16a_state,aceattaca)
 {
 	DRIVER_INIT_CALL(generic);
 	m_custom_io_r = read16_delegate(FUNC(segas16a_state::aceattaca_custom_io_r), this);
+	m_custom_io_w = write16_delegate(FUNC(segas16a_state::aceattaca_custom_io_w), this);
 }
 
 DRIVER_INIT_MEMBER(segas16a_state,dumpmtmt)
@@ -3724,7 +3733,7 @@ GAME( 1987, aliensyn5,  aliensyn, system16a_fd1089b,        aliensyn,   segas16a
 GAME( 1987, aliensyn2,  aliensyn, system16a_fd1089a,        aliensyn,   segas16a_state,generic,     ROT0,   "Sega", "Alien Syndrome (set 2, System 16A, FD1089A 317-0033)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, aliensynjo, aliensyn, system16a_fd1089a,        aliensynj,  segas16a_state,generic,     ROT0,   "Sega", "Alien Syndrome (set 1, Japan, old, System 16A, FD1089A 317-0033)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, aceattaca,  aceattac, system16a_fd1094,         aceattaca,  segas16a_state,aceattaca,   ROT270, "Sega", "Ace Attacker (Japan, System 16A, FD1094 317-0060)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, aceattaca,  aceattac, aceattaca_fd1094,         aceattaca,  segas16a_state,aceattaca,   ROT270, "Sega", "Ace Attacker (Japan, System 16A, FD1094 317-0060)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1986, afighter,   0,        system16a_fd1089a_no7751, afighter,   segas16a_state,generic,     ROT270, "Sega", "Action Fighter (FD1089A 317-0018)", MACHINE_SUPPORTS_SAVE )
 

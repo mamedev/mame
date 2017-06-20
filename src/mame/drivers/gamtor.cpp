@@ -28,8 +28,10 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "video/pc_vga.h"
 #include "machine/mcf5206e.h"
+#include "video/pc_vga.h"
+#include "speaker.h"
+
 
 class gaminator_state : public driver_device
 {
@@ -75,7 +77,7 @@ INPUT_PORTS_END
 
 
 
-static MACHINE_CONFIG_START( gaminator, gaminator_state )
+static MACHINE_CONFIG_START( gaminator )
 	MCFG_CPU_ADD("maincpu", MCF5206E, 40000000) /* definitely Coldfire, model / clock uncertain */
 	MCFG_CPU_PROGRAM_MAP(gaminator_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaminator_state,  irq6_line_hold) // irq6 seems to be needed to get past the ROM checking

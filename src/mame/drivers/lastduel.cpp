@@ -121,11 +121,14 @@ Notes:
 **************************************************************************/
 
 #include "emu.h"
+#include "includes/lastduel.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/2203intf.h"
 #include "sound/okim6295.h"
-#include "includes/lastduel.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /******************************************************************************/
@@ -480,7 +483,7 @@ void lastduel_state::machine_reset()
 		m_scroll[i] = 0;
 }
 
-static MACHINE_CONFIG_START( lastduel, lastduel_state )
+static MACHINE_CONFIG_START( lastduel )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000) // Unconfirmed - could be 8MHz
@@ -501,7 +504,7 @@ static MACHINE_CONFIG_START( lastduel, lastduel_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(lastduel_state, screen_update_lastduel)
-	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
+	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
@@ -525,7 +528,7 @@ static MACHINE_CONFIG_START( lastduel, lastduel_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( madgear, lastduel_state )
+static MACHINE_CONFIG_START( madgear )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
@@ -546,7 +549,7 @@ static MACHINE_CONFIG_START( madgear, lastduel_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(lastduel_state, screen_update_madgear)
-	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
+	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
@@ -568,7 +571,7 @@ static MACHINE_CONFIG_START( madgear, lastduel_state )
 	MCFG_SOUND_ADD("ym2", YM2203, XTAL_3_579545MHz)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_10MHz/10, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL_10MHz/10, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.98)
 MACHINE_CONFIG_END
 
@@ -890,16 +893,16 @@ ROM_END
 
 /******************************************************************************/
 
-GAME( 1988, lastduel,  0,        lastduel, lastduel, driver_device, 0, ROT270, "Capcom",  "Last Duel (US New Ver.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, lastduelo, lastduel, lastduel, lastduel, driver_device, 0, ROT270, "Capcom",  "Last Duel (US Old Ver.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, lastduelj, lastduel, lastduel, lastduel, driver_device, 0, ROT270, "Capcom",  "Last Duel (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, lastduelb, lastduel, lastduel, lastduel, driver_device, 0, ROT270, "bootleg", "Last Duel (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, lastduel,  0,        lastduel, lastduel, lastduel_state, 0, ROT270, "Capcom",  "Last Duel (US New Ver.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, lastduelo, lastduel, lastduel, lastduel, lastduel_state, 0, ROT270, "Capcom",  "Last Duel (US Old Ver.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, lastduelj, lastduel, lastduel, lastduel, lastduel_state, 0, ROT270, "Capcom",  "Last Duel (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, lastduelb, lastduel, lastduel, lastduel, lastduel_state, 0, ROT270, "bootleg", "Last Duel (bootleg)", MACHINE_SUPPORTS_SAVE )
 
 // are both Mad Gear and Led Storm really US sets, both have a (c) Capcom USA, but so do several World sets from Capcom during this era, including Led Storm Rally 2011.  None of these display a region warning, 2011 does.
 // the region warning text is however still present in the ROM (albeit unused) and does appear to indicate both are US sets, so it's possible the title was revised to avoid confusion with the older Led Storm Rally 2011.
-GAME( 1989, madgear,   0,        madgear,  madgear, driver_device,  0, ROT270, "Capcom",  "Mad Gear (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, madgearj,  madgear,  madgear,  madgear, driver_device,  0, ROT270, "Capcom",  "Mad Gear (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, ledstorm,  madgear,  madgear,  madgear, driver_device,  0, ROT270, "Capcom",  "Led Storm (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, madgear,   0,        madgear,  madgear, lastduel_state,  0, ROT270, "Capcom",  "Mad Gear (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, madgearj,  madgear,  madgear,  madgear, lastduel_state,  0, ROT270, "Capcom",  "Mad Gear (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, ledstorm,  madgear,  madgear,  madgear, lastduel_state,  0, ROT270, "Capcom",  "Led Storm (US)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, leds2011,  0,        madgear,  madgear, driver_device,  0, ROT270, "Capcom",  "Led Storm Rally 2011 (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, leds2011u, leds2011, madgear,  madgear, driver_device,  0, ROT270, "Capcom",  "Led Storm Rally 2011 (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, leds2011,  0,        madgear,  madgear, lastduel_state,  0, ROT270, "Capcom",  "Led Storm Rally 2011 (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, leds2011u, leds2011, madgear,  madgear, lastduel_state,  0, ROT270, "Capcom",  "Led Storm Rally 2011 (US)", MACHINE_SUPPORTS_SAVE )

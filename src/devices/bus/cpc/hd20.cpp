@@ -8,26 +8,20 @@
 
 #include "emu.h"
 #include "hd20.h"
-#include "includes/amstrad.h"
-
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CPC_HD20 = &device_creator<cpc_hd20_device>;
+DEFINE_DEVICE_TYPE(CPC_HD20, cpc_hd20_device, "cpc_hd20", "Dobbertin HD20")
 
-static MACHINE_CONFIG_FRAGMENT( cpc_hd20 )
+MACHINE_CONFIG_MEMBER( cpc_hd20_device::device_add_mconfig )
 	MCFG_DEVICE_ADD("hdc",ST11M_HDC,0)
-	MCFG_XTHDC_IRQ_HANDLER(WRITELINE(cpc_hd20_device,irq_w))
+	MCFG_XTHDC_IRQ_HANDLER(WRITELINE(cpc_hd20_device, irq_w))
 	MCFG_HARDDISK_ADD("hdc:primary")
 	// no pass-through (?)
 MACHINE_CONFIG_END
 
-machine_config_constructor cpc_hd20_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( cpc_hd20 );
-}
 
 ROM_START( cpc_hd20 )
 	ROM_REGION( 0x4000, "exp_rom", 0 )
@@ -49,7 +43,7 @@ const tiny_rom_entry *cpc_hd20_device::device_rom_region() const
 //**************************************************************************
 
 cpc_hd20_device::cpc_hd20_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, CPC_HD20, "Dobbertin HD20", tag, owner, clock, "cpc_hd20", __FILE__),
+	device_t(mconfig, CPC_HD20, tag, owner, clock),
 	device_cpc_expansion_card_interface(mconfig, *this), m_slot(nullptr),
 	m_hdc(*this,"hdc")
 {

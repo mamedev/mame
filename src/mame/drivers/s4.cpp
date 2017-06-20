@@ -32,11 +32,14 @@ ToDo:
 ************************************************************************************/
 
 #include "emu.h"
+#include "machine/genpin.h"
+
 #include "cpu/m6800/m6800.h"
 #include "machine/6821pia.h"
-#include "machine/genpin.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
+
 #include "s4.lh"
 
 
@@ -414,7 +417,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( s4_state::irq )
 		m_t_c++;
 }
 
-static MACHINE_CONFIG_START( s4, s4_state )
+static MACHINE_CONFIG_START( s4 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, 3580000)
 	MCFG_CPU_PROGRAM_MAP(s4_main_map)
@@ -473,7 +476,7 @@ static MACHINE_CONFIG_DERIVED( s4a, s4 )
 	MCFG_MACHINE_RESET_OVERRIDE(s4_state, s4a)
 
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
+	MCFG_SOUND_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
@@ -680,20 +683,20 @@ ROM_START(tstrk_l1)
 ROM_END
 
 
-GAME( 1979, flash_l2, 0,        s4a, s4, driver_device, 0, ROT0, "Williams", "Flash (L-2)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1979, flash_l1, flash_l2, s4a, s4, driver_device, 0, ROT0, "Williams", "Flash (L-1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1979, flash_t1, flash_l2, s4a, s4, driver_device, 0, ROT0, "Williams", "Flash (T-1) Ted Estes", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1978, trizn_l1, 0,        s4a, s4, driver_device, 0, ROT0, "Williams", "Tri Zone (L-1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1978, trizn_t1, trizn_l1, s4a, s4, driver_device, 0, ROT0, "Williams", "Tri Zone (T-1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1979, tmwrp_l2, 0,        s4a, s4, driver_device, 0, ROT0, "Williams", "Time Warp (L-2)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1979, tmwrp_t2, tmwrp_l2, s4a, s4, driver_device, 0, ROT0, "Williams", "Time Warp (T-2)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1979, stlwr_l2, 0,        s4a, s4, driver_device, 0, ROT0, "Williams", "Stellar Wars (L-2)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1979, flash_l2, 0,        s4a, s4, s4_state, 0, ROT0, "Williams", "Flash (L-2)",                   MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1979, flash_l1, flash_l2, s4a, s4, s4_state, 0, ROT0, "Williams", "Flash (L-1)",                   MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1979, flash_t1, flash_l2, s4a, s4, s4_state, 0, ROT0, "Williams", "Flash (T-1) Ted Estes",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1978, trizn_l1, 0,        s4a, s4, s4_state, 0, ROT0, "Williams", "Tri Zone (L-1)",                MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1978, trizn_t1, trizn_l1, s4a, s4, s4_state, 0, ROT0, "Williams", "Tri Zone (T-1)",                MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1979, tmwrp_l2, 0,        s4a, s4, s4_state, 0, ROT0, "Williams", "Time Warp (L-2)",               MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1979, tmwrp_t2, tmwrp_l2, s4a, s4, s4_state, 0, ROT0, "Williams", "Time Warp (T-2)",               MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1979, stlwr_l2, 0,        s4a, s4, s4_state, 0, ROT0, "Williams", "Stellar Wars (L-2)",            MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
 
-GAME( 1978, pomp_l1,  0,        s4a, s4, driver_device, 0, ROT0, "Williams", "Pompeii (Shuffle) (L-1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1978, arist_l1, 0,        s4a, s4, driver_device, 0, ROT0, "Williams", "Aristocrat (Shuffle) (L-1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1978, topaz_l1, 0,        s4a, s4, driver_device, 0, ROT0, "Williams", "Topaz (Shuffle) (L-1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1979, taurs_l1, 0,        s4a, s4, driver_device, 0, ROT0, "Williams", "Taurus (Shuffle) (L-1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1979, kingt_l1, 0,        s4a, s4, driver_device, 0, ROT0, "Williams", "King Tut (Shuffle) (L-1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1980, omni_l1,  0,        s4a, s4, driver_device, 0, ROT0, "Williams", "Omni (Shuffle) (L-1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-GAME( 1983, bstrk_l1, 0,        s4,  s4, driver_device, 0, ROT0, "Williams", "Big Strike (Shuffle) (L-1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-GAME( 1983, tstrk_l1, 0,        s4,  s4, driver_device, 0, ROT0, "Williams", "Triple Strike (Shuffle) (L-1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME( 1978, pomp_l1,  0,        s4a, s4, s4_state, 0, ROT0, "Williams", "Pompeii (Shuffle) (L-1)",       MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1978, arist_l1, 0,        s4a, s4, s4_state, 0, ROT0, "Williams", "Aristocrat (Shuffle) (L-1)",    MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1978, topaz_l1, 0,        s4a, s4, s4_state, 0, ROT0, "Williams", "Topaz (Shuffle) (L-1)",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1979, taurs_l1, 0,        s4a, s4, s4_state, 0, ROT0, "Williams", "Taurus (Shuffle) (L-1)",        MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1979, kingt_l1, 0,        s4a, s4, s4_state, 0, ROT0, "Williams", "King Tut (Shuffle) (L-1)",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1980, omni_l1,  0,        s4a, s4, s4_state, 0, ROT0, "Williams", "Omni (Shuffle) (L-1)",          MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME( 1983, bstrk_l1, 0,        s4,  s4, s4_state, 0, ROT0, "Williams", "Big Strike (Shuffle) (L-1)",    MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME( 1983, tstrk_l1, 0,        s4,  s4, s4_state, 0, ROT0, "Williams", "Triple Strike (Shuffle) (L-1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

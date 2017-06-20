@@ -410,26 +410,30 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/sparc/sparc.h"
-#include "machine/timekpr.h"
-#include "machine/ram.h"
-#include "machine/z80scc.h"
-#include "machine/bankdev.h"
-#include "machine/nvram.h"
+
 #include "bus/rs232/rs232.h"
 #include "bus/sunkbd/sunkbd.h"
-#include "machine/timekpr.h"
+#include "cpu/sparc/sparc.h"
+#include "machine/bankdev.h"
+#include "machine/ncr5390.h"
 #include "machine/nscsi_bus.h"
 #include "machine/nscsi_cd.h"
 #include "machine/nscsi_hd.h"
-#include "machine/ncr5390.h"
+#include "machine/nvram.h"
+#include "machine/ram.h"
+#include "machine/timekpr.h"
+#include "machine/timekpr.h"
 #include "machine/upd765.h"
-#include "formats/pc_dsk.h"
-#include "formats/mfi_dsk.h"
+#include "machine/z80scc.h"
 
 #include "debug/debugcon.h"
 #include "debug/debugcmd.h"
 #include "debugger.h"
+#include "screen.h"
+
+#include "formats/mfi_dsk.h"
+#include "formats/pc_dsk.h"
+
 
 #define SUN4_LOG_FCODES (0)
 
@@ -643,8 +647,8 @@ private:
 
 	void start_timer(int num);
 
-	void l2p_command(int ref, int params, const char **param);
-	void fcodes_command(int ref, int params, const char **param);
+	void l2p_command(int ref, const std::vector<std::string> &params);
+	void fcodes_command(int ref, const std::vector<std::string> &params);
 };
 
 uint32_t sun4_state::bw2_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -712,7 +716,7 @@ uint32_t sun4_state::read_insn_data_4c(uint8_t asi, address_space &space, uint32
 	}
 	else
 	{
-		if (!space.debugger_access())
+		if (!machine().side_effect_disabled())
 		{
 			printf("sun4c: INVALID PTE entry %d %08x accessed!  vaddr=%x PC=%x\n", entry, m_pagemap[entry], offset <<2, m_maincpu->pc());
 			//m_maincpu->trap(SPARC_DATA_ACCESS_EXCEPTION);
@@ -779,7 +783,7 @@ READ32_MEMBER( sun4_state::sun4c_mmu_r )
 	uint32_t retval = 0;
 
 	// make debugger fetches emulate supervisor program for best compatibility with boot PROM execution
-	if (space.debugger_access()) asi = 9;
+	if (machine().side_effect_disabled()) asi = 9;
 
 	// supervisor program fetches in boot state are special
 	if ((!(m_system_enable & ENA_NOTBOOT)) && (asi == 9))
@@ -858,7 +862,7 @@ READ32_MEMBER( sun4_state::sun4c_mmu_r )
 		return read_insn_data_4c(asi, space, offset, mem_mask);
 
 	default:
-		if (!space.debugger_access()) printf("sun4c: ASI %d unhandled read @ %x (PC=%x)\n", asi, offset<<2, m_maincpu->pc());
+		if (!machine().side_effect_disabled()) printf("sun4c: ASI %d unhandled read @ %x (PC=%x)\n", asi, offset<<2, m_maincpu->pc());
 		return 0;
 	}
 
@@ -1003,7 +1007,7 @@ uint32_t sun4_state::read_insn_data(uint8_t asi, address_space &space, uint32_t 
 	}
 	else
 	{
-		if (!space.debugger_access())
+		if (!machine().side_effect_disabled())
 		{
 			printf("sun4: INVALID PTE entry %d %08x accessed!  vaddr=%x PC=%x\n", entry, m_pagemap[entry], offset <<2, m_maincpu->pc());
 			//m_maincpu->trap(SPARC_DATA_ACCESS_EXCEPTION);
@@ -1060,7 +1064,7 @@ READ32_MEMBER( sun4_state::sun4_mmu_r )
 	int page;
 
 	// make debugger fetches emulate supervisor program for best compatibility with boot PROM execution
-	if (space.debugger_access()) asi = 9;
+	if (machine().side_effect_disabled()) asi = 9;
 
 	// supervisor program fetches in boot state are special
 	if ((!(m_system_enable & ENA_NOTBOOT)) && (asi == 9))
@@ -1139,7 +1143,7 @@ READ32_MEMBER( sun4_state::sun4_mmu_r )
 		return read_insn_data(asi, space, offset, mem_mask);
 
 	default:
-		if (!space.debugger_access()) printf("sun4: ASI %d unhandled read @ %x (PC=%x)\n", asi, offset<<2, m_maincpu->pc());
+		if (!machine().side_effect_disabled()) printf("sun4: ASI %d unhandled read @ %x (PC=%x)\n", asi, offset<<2, m_maincpu->pc());
 		return 0;
 	}
 
@@ -1261,11 +1265,11 @@ WRITE32_MEMBER( sun4_state::sun4_mmu_w )
 	printf("sun4: %08x to asi %d byte offset %x, PC = %x, mask = %08x\n", data, asi, offset << 2, m_maincpu->pc(), mem_mask);
 }
 
-void sun4_state::l2p_command(int ref, int params, const char **param)
+void sun4_state::l2p_command(int ref, const std::vector<std::string> &params)
 {
 	uint64_t addr, offset;
 
-	if (!machine().debugger().commands().validate_number_parameter(param[0], &addr)) return;
+	if (!machine().debugger().commands().validate_number_parameter(params[0], addr)) return;
 
 	addr &= 0xffffffff;
 	offset = addr >> 2;
@@ -1298,14 +1302,14 @@ void sun4_state::l2p_command(int ref, int params, const char **param)
 	}
 }
 
-void sun4_state::fcodes_command(int ref, int params, const char **param)
+void sun4_state::fcodes_command(int ref, const std::vector<std::string> &params)
 {
 #if SUN4_LOG_FCODES
 	if (params < 1)
 		return;
 
-	bool is_on = strcmp(param[0], "on") == 0;
-	bool is_off = strcmp(param[0], "off") == 0;
+	bool is_on = (params[0] == "on");
+	bool is_off = (params[0] == "off");
 
 	if (!is_on && !is_off)
 	{
@@ -1356,9 +1360,9 @@ void sun4_state::machine_start()
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
 		using namespace std::placeholders;
-		machine().debugger().console().register_command("l2p", CMDFLAG_NONE, 0, 1, 1, std::bind(&sun4_state::l2p_command, this, _1, _2, _3));
+		machine().debugger().console().register_command("l2p", CMDFLAG_NONE, 0, 1, 1, std::bind(&sun4_state::l2p_command, this, _1, _2));
 		#if SUN4_LOG_FCODES
-		machine().debugger().console().register_command("fcodes", CMDFLAG_NONE, 0, 1, 1, std::bind(&sun4_state::fcodes_command, this, _1, _2, _3));
+		machine().debugger().console().register_command("fcodes", CMDFLAG_NONE, 0, 1, 1, std::bind(&sun4_state::fcodes_command, this, _1, _2));
 		#endif
 	}
 
@@ -1474,7 +1478,7 @@ ADDRESS_MAP_END
 
 READ8_MEMBER( sun4_state::fdc_r )
 {
-	if (space.debugger_access())
+	if (machine().side_effect_disabled())
 		return 0;
 
 	switch(offset)
@@ -1880,13 +1884,13 @@ static SLOT_INTERFACE_START( sun_scsi_devices )
 	SLOT_INTERFACE_INTERNAL("ncr5390", NCR5390)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_FRAGMENT( ncr5390 )
+static MACHINE_CONFIG_START( ncr5390 )
 	MCFG_DEVICE_CLOCK(10000000)
 	MCFG_NCR5390_IRQ_HANDLER(DEVWRITELINE(":", sun4_state, scsi_irq))
 	MCFG_NCR5390_DRQ_HANDLER(DEVWRITELINE(":", sun4_state, scsi_drq))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sun4, sun4_state )
+static MACHINE_CONFIG_START( sun4 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MB86901, 16670000)
 	MCFG_DEVICE_ADDRESS_MAP(AS_PROGRAM, sun4_mem)
@@ -1951,7 +1955,7 @@ static MACHINE_CONFIG_START( sun4, sun4_state )
 	MCFG_DEVICE_CARD_MACHINE_CONFIG("ncr5390", ncr5390)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sun4c, sun4_state )
+static MACHINE_CONFIG_START( sun4c )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MB86901, 16670000)
 	MCFG_DEVICE_ADDRESS_MAP(AS_PROGRAM, sun4c_mem)
@@ -2161,10 +2165,12 @@ ROM_END
 /* SCC init 1-2 for the keyboard is identical to Sun 4/75 init 1-2 */
 ROM_START( sun4_50 )
 	ROM_REGION32_BE( 0x80000, "user1", ROMREGION_ERASEFF )
-	ROM_SYSTEM_BIOS( 0, "v29", "V2.9")
+	ROM_SYSTEM_BIOS( 0, "v29", "V2.9" )
 	ROMX_LOAD( "ipx-29.h1.u0501", 0x0000, 0x40000, CRC(1910aa65) SHA1(7d8832fea8e299b89e6ec7137fcde497673c14f8), ROM_BIOS(1)) // 525-1177-06(?) Boot (Version 2.9 version 20, supposedly?)
-	ROM_SYSTEM_BIOS( 1, "v26", "V2.6")
+	ROM_SYSTEM_BIOS( 1, "v26", "V2.6" )
 	ROMX_LOAD( "525-1177-05__(c)_sun_1992.am27c020.h1.u0501", 0x0000, 0x40000, CRC(aad28dee) SHA1(18075afa479fdc8d318df9aef9847dfb20591d79), ROM_BIOS(2)) // 525-1177-05 Boot (Version 2.6 version 410, supposedly?)
+	ROM_SYSTEM_BIOS( 2, "v23", "V2.3" )
+	ROMX_LOAD( "525-1177-03.h1.u0501", 0x0000, 0x40000, CRC(dcc1e66c) SHA1(a4dc3d8631aaa8416e22de273707c4ed7a2fe561), ROM_BIOS(3)) // 525-1177-03 Boot (Version 2.3)
 ROM_END
 
 // SPARCstation SLC (Sun 4/20)
@@ -2243,7 +2249,10 @@ ROM_END
 */
 ROM_START( sun4_75 )
 	ROM_REGION32_BE( 0x80000, "user1", ROMREGION_ERASEFF )
-	ROM_LOAD( "ss2-29.rom", 0x0000, 0x40000, CRC(d04132b3) SHA1(ef26afafa2800b8e2e5e994b3a76ca17ce1314b1))
+	ROM_SYSTEM_BIOS( 0, "v29", "V2.9" )
+	ROMX_LOAD( "ss2-29.rom", 0x0000, 0x40000, CRC(d04132b3) SHA1(ef26afafa2800b8e2e5e994b3a76ca17ce1314b1), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "v22", "V2.2" )
+	ROMX_LOAD( "525-1107-06.rom", 0x0000, 0x40000, CRC(7f5b58b4) SHA1(10a3eb3ddee667e7cf3c04aef6f6549e1b7f8311), ROM_BIOS(2) )
 ROM_END
 
 // SPARCstation 10 (Sun S10)
@@ -2287,20 +2296,20 @@ DRIVER_INIT_MEMBER(sun4_state, ss2)
 
 /* Drivers */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY         FULLNAME       FLAGS */
+//    YEAR  NAME       PARENT    COMPAT   MACHINE    INPUT  STATE       INIT   COMPANY             FULLNAME                       FLAGS
 // sun4
-COMP( 198?, sun4_110,  0,       0,       sun4,      sun4, sun4_state,  sun4,  "Sun Microsystems", "Sun 4/110", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1987, sun4_300,  0,       0,       sun4,      sun4, sun4_state,  sun4,  "Sun Microsystems", "Sun 4/3x0", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 198?, sun4_400,  0,       0,       sun4,      sun4, sun4_state,  sun4,  "Sun Microsystems", "Sun 4/4x0", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 198?, sun4_110,  0,        0,       sun4,      sun4,  sun4_state, sun4,  "Sun Microsystems", "Sun 4/110",                   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1987, sun4_300,  0,        0,       sun4,      sun4,  sun4_state, sun4,  "Sun Microsystems", "Sun 4/3x0",                   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 198?, sun4_400,  0,        0,       sun4,      sun4,  sun4_state, sun4,  "Sun Microsystems", "Sun 4/4x0",                   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 // sun4c
-COMP( 1990, sun4_40,   sun4_300,0,       sun4c,      sun4, sun4_state,     sun4c,  "Sun Microsystems", "SPARCstation IPC (Sun 4/40)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1991, sun4_50,   sun4_300,0,       sun4c,      sun4, sun4_state,     ss2,    "Sun Microsystems", "SPARCstation IPX (Sun 4/50)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 199?, sun4_20,   sun4_300,0,       sun4c,      sun4, sun4_state,     sun4c,  "Sun Microsystems", "SPARCstation SLC (Sun 4/20)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1989, sun4_60,   sun4_300,0,       sun4c,      sun4, sun4_state,     sun4c,  "Sun Microsystems", "SPARCstation 1 (Sun 4/60)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1990, sun4_65,   sun4_300,0,       sun4c,      sun4, sun4_state,     sun4c,  "Sun Microsystems", "SPARCstation 1+ (Sun 4/65)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1990, sun4_75,   sun4_300,0,       sun4c,      sun4, sun4_state,     ss2,    "Sun Microsystems", "SPARCstation 2 (Sun 4/75)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1990, sun4_40,   sun4_300, 0,       sun4c,     sun4,  sun4_state, sun4c, "Sun Microsystems", "SPARCstation IPC (Sun 4/40)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1991, sun4_50,   sun4_300, 0,       sun4c,     sun4,  sun4_state, ss2,   "Sun Microsystems", "SPARCstation IPX (Sun 4/50)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 199?, sun4_20,   sun4_300, 0,       sun4c,     sun4,  sun4_state, sun4c, "Sun Microsystems", "SPARCstation SLC (Sun 4/20)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1989, sun4_60,   sun4_300, 0,       sun4c,     sun4,  sun4_state, sun4c, "Sun Microsystems", "SPARCstation 1 (Sun 4/60)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1990, sun4_65,   sun4_300, 0,       sun4c,     sun4,  sun4_state, sun4c, "Sun Microsystems", "SPARCstation 1+ (Sun 4/65)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1990, sun4_75,   sun4_300, 0,       sun4c,     sun4,  sun4_state, ss2,   "Sun Microsystems", "SPARCstation 2 (Sun 4/75)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 // sun4m (using the SPARC "reference MMU", probably will go to a separate driver)
-COMP( 1992, sun_s10,   sun4_300,0,       sun4c,      sun4, sun4_state,     sun4c,  "Sun Microsystems", "SPARCstation 10 (Sun S10)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1994, sun_s20,   sun4_300,0,       sun4c,      sun4, sun4_state,     sun4c,  "Sun Microsystems", "SPARCstation 20", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1992, sun_s10,   sun4_300, 0,       sun4c,     sun4,  sun4_state, sun4c, "Sun Microsystems", "SPARCstation 10 (Sun S10)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1994, sun_s20,   sun4_300, 0,       sun4c,     sun4,  sun4_state, sun4c, "Sun Microsystems", "SPARCstation 20",             MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

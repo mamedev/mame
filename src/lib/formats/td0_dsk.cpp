@@ -889,7 +889,9 @@ bool td0_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 				else
 					return false; // single side 3.5?
 				break;
-			}
+			} else
+				image->set_variant(floppy_image::SSDD);
+			break;
 			/* no break */
 		case 3:
 			if(head_count == 2)

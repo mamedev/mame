@@ -38,7 +38,28 @@
     256K DRAM
 
     Keyboard serial bit map:
-    Local (#x01), Caps Lock (LED) (#x02), Hyper (left) (#x03), Meta (left) (#x04), Control (right) (#x05), Super (right) (#x06), Scroll (#x07), Mode Lock (LED) (#x08), Select (#x0c), Symbol (left) (#x0d), Super (left) (#x0e), Control (left) (#x0f), Space (#x10), Meta (right) (#x11), Hyper (right) (#x12), End (#x13), Z (#x17), C (#x18), B (#x19), M (#x1a), . / > (#x1b), Shift (right) (#x1c), Repeat (#x1d), Abort (#x1e), Shift (left) (#x22), X (#x23), V (#x24), N (#x25), , / < (#x26), / / ? (#x27), Symbol (right) (#x28), Help (#x29), Rubout (#x2d), S (#x2e), F (#x2f), H (#x30), K (#x31), ; / : (#x32), Return (#x33), Complete (#x34), Network (#x38), A (#x39), D (#x3a), G (#x3b), J (#x3c), L (#x3d), ' / " (#x3e), Line (#x3f), Function (#x43), W (#x44), R (#x45), Y (#x46), I (#x47), P (#x48), ) / ] (#x49), Page (#x4a), Tab (#x4e), Q (#x4f), E (#x50), T (#x51), U (#x52), O (#x53), ( / [ (#x54), Back Space (#x55), : (#x59), 2 / @ (#x5a), 4 / $ (#x5b), 6 / ^ (#x5c), 8 / * (#x5d), 0 / ) (#x5e), = / + (#x5f), \ / { (#x60), 1 / ! (#x64), 3 / # (#x65), 5 / % (#x66), 7 / & (#x67), 9 / ( (#x68), - / _ (#x69), ` / ~ (#x6a), | / } (#x6b), Escape (#x6f), Refresh (#x70), Square (#x71), Circle (#x72), Triangle (#x73), Clear Input (#x74), Suspend (#x75), Resume (#x76)
+    Local (#x01), Caps Lock (LED) (#x02), Hyper (left) (#x03), Meta (left) (#x04),
+    Control (right) (#x05), Super (right) (#x06), Scroll (#x07), Mode Lock (LED) (#x08),
+    Select (#x0c), Symbol (left) (#x0d), Super (left) (#x0e), Control (left) (#x0f),
+    Space (#x10), Meta (right) (#x11), Hyper (right) (#x12), End (#x13),
+    Z (#x17), C (#x18), B (#x19), M (#x1a),
+    . / > (#x1b), Shift (right) (#x1c), Repeat (#x1d), Abort (#x1e),
+    Shift (left) (#x22), X (#x23), V (#x24), N (#x25),
+    , / < (#x26), / / ? (#x27), Symbol (right) (#x28), Help (#x29),
+    Rubout (#x2d), S (#x2e), F (#x2f), H (#x30),
+    K (#x31), ; / : (#x32), Return (#x33), Complete (#x34),
+    Network (#x38), A (#x39), D (#x3a), G (#x3b),
+    J (#x3c), L (#x3d), ' / " (#x3e), Line (#x3f),
+    Function (#x43), W (#x44), R (#x45), Y (#x46),
+    I (#x47), P (#x48), ) / ] (#x49), Page (#x4a),
+    Tab (#x4e), Q (#x4f), E (#x50), T (#x51),
+    U (#x52), O (#x53), ( / [ (#x54), Back Space (#x55),
+    : (#x59), 2 / @ (#x5a), 4 / $ (#x5b), 6 / ^ (#x5c),
+    8 / * (#x5d), 0 / ) (#x5e), = / + (#x5f), \ / { (#x60),
+    1 / ! (#x64), 3 / # (#x65), 5 / % (#x66), 7 / & (#x67),
+    9 / ( (#x68), - / _ (#x69), ` / ~ (#x6a), | / } (#x6b),
+    Escape (#x6f), Refresh (#x70), Square (#x71), Circle (#x72),
+    Triangle (#x73), Clear Input (#x74), Suspend (#x75), Resume (#x76)
 
 
     Notes from US Patent 4887235 which has some FEP source code and limited memory info:
@@ -90,7 +111,7 @@ public:
 
 READ16_MEMBER(symbolics_state::buserror_r)
 {
-	if(!space.debugger_access())
+	if(!machine().side_effect_disabled())
 	{
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
@@ -293,7 +314,7 @@ void symbolics_state::machine_reset()
 	*/
 }
 
-static MACHINE_CONFIG_START( symbolics, symbolics_state )
+static MACHINE_CONFIG_START( symbolics )
 	/* basic machine hardware */
 	// per page 159 of http://bitsavers.trailing-edge.com/pdf/symbolics/3600_series/Lisp_Machine_Hardware_Memos.pdf:
 	//XTALS: 16MHz @H11 (68k CPU clock)
@@ -370,5 +391,5 @@ ROM_END
  Drivers
 ******************************************************************************/
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       STATE            INIT        COMPANY      FULLNAME  FLAGS */
+//    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       STATE            INIT        COMPANY      FULLNAME  FLAGS
 COMP( 1984, s3670,      0,      0,      symbolics,  symbolics,  symbolics_state, symbolics,  "Symbolics", "3670",   MACHINE_IS_SKELETON | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

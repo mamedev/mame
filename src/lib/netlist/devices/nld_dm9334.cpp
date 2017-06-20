@@ -6,6 +6,7 @@
  */
 
 #include "nld_dm9334.h"
+#include "../nl_base.h"
 
 namespace netlist
 {
@@ -113,7 +114,7 @@ namespace netlist
 			}
 		}
 
-		uint_fast8_t q = m_last_Q;
+		unsigned q = m_last_Q;
 
 		if (!m_CQ())
 		{

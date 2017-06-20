@@ -1,31 +1,24 @@
 // license:BSD-3-Clause
 // copyright-holders:Kevin Thacker, Barry Rodewald
 /*
- * mface2.c  --  Romantic Robot Multiface II expansion device for the Amstrad CPC/CPC+
+ * mface2.cpp  --  Romantic Robot Multiface II expansion device for the Amstrad CPC/CPC+
  *
  *  Created on: 31/07/2011
  */
 
 #include "emu.h"
 #include "mface2.h"
-#include "includes/amstrad.h"
+
+SLOT_INTERFACE_EXTERN(cpc_exp_cards);
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CPC_MFACE2 = &device_creator<cpc_multiface2_device>;
+DEFINE_DEVICE_TYPE(CPC_MFACE2, cpc_multiface2_device, "cpc_mface2", "Multiface II")
 
-// device machine config
-static MACHINE_CONFIG_FRAGMENT( cpc_mface2 )
-	// pass-through
-	MCFG_DEVICE_ADD("exp", CPC_EXPANSION_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(cpc_exp_cards, nullptr, false)
-	MCFG_CPC_EXPANSION_SLOT_OUT_IRQ_CB(DEVWRITELINE("^", cpc_expansion_slot_device, irq_w))
-	MCFG_CPC_EXPANSION_SLOT_OUT_NMI_CB(DEVWRITELINE("^", cpc_expansion_slot_device, nmi_w))
-	MCFG_CPC_EXPANSION_SLOT_OUT_ROMDIS_CB(DEVWRITELINE("^", cpc_expansion_slot_device, romdis_w))  // ROMDIS
-MACHINE_CONFIG_END
 
+#if 0
 DIRECT_UPDATE_MEMBER( cpc_multiface2_device::amstrad_default )
 {
 	return address;
@@ -71,6 +64,7 @@ DIRECT_UPDATE_MEMBER( cpc_multiface2_device::amstrad_multiface_directoverride )
 
 		return pc;
 }
+#endif
 
 int cpc_multiface2_device::multiface_hardware_enabled()
 {
@@ -113,10 +107,15 @@ void cpc_multiface2_device::multiface_rethink_memory()
 	}
 }
 
-machine_config_constructor cpc_multiface2_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( cpc_mface2 );
-}
+// device machine config
+MACHINE_CONFIG_MEMBER( cpc_multiface2_device::device_add_mconfig )
+	// pass-through
+	MCFG_DEVICE_ADD("exp", CPC_EXPANSION_SLOT, 0)
+	MCFG_DEVICE_SLOT_INTERFACE(cpc_exp_cards, nullptr, false)
+	MCFG_CPC_EXPANSION_SLOT_OUT_IRQ_CB(DEVWRITELINE("^", cpc_expansion_slot_device, irq_w))
+	MCFG_CPC_EXPANSION_SLOT_OUT_NMI_CB(DEVWRITELINE("^", cpc_expansion_slot_device, nmi_w))
+	MCFG_CPC_EXPANSION_SLOT_OUT_ROMDIS_CB(DEVWRITELINE("^", cpc_expansion_slot_device, romdis_w))  // ROMDIS
+MACHINE_CONFIG_END
 
 void cpc_multiface2_device::check_button_state()
 {
@@ -158,7 +157,7 @@ void cpc_multiface2_device::multiface_stop()
 		m_slot->nmi_w(0);
 
 		/* initialise 0065 override to monitor calls to 0065 */
-		machine().device("maincpu")->memory().space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(&cpc_multiface2_device::amstrad_multiface_directoverride,this));
+		//      machine().device("maincpu")->memory().space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(&cpc_multiface2_device::amstrad_multiface_directoverride,this));
 	}
 }
 
@@ -309,8 +308,9 @@ ioport_constructor cpc_multiface2_device::device_input_ports() const
 //**************************************************************************
 
 cpc_multiface2_device::cpc_multiface2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, CPC_MFACE2, "Multiface II", tag, owner, clock, "cpc_mf2", __FILE__),
-	device_cpc_expansion_card_interface(mconfig, *this), m_slot(nullptr), m_multiface_ram(nullptr), m_multiface_flags(0), m_romdis(0)
+	device_t(mconfig, CPC_MFACE2, tag, owner, clock),
+	device_cpc_expansion_card_interface(mconfig, *this),
+	m_slot(nullptr), m_multiface_ram(nullptr), m_multiface_flags(0), m_romdis(0)
 {
 }
 

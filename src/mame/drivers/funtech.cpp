@@ -21,10 +21,14 @@ and an unpopulated position for a YM2413 or UM3567
 */
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
+#include "screen.h"
+#include "speaker.h"
+
 #include "fts2in1.lh"
 
 
@@ -480,7 +484,7 @@ void fun_tech_corp_state::machine_reset()
 {
 }
 
-static MACHINE_CONFIG_START( funtech, fun_tech_corp_state )
+static MACHINE_CONFIG_START( funtech )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,4000000)         /* ? MHz */
@@ -526,4 +530,4 @@ ROM_START( fts2in1 )
 	ROM_LOAD16_BYTE( "u30.bin", 0x00001, 0x20000, CRC(d572bddc) SHA1(06499aeb47085a02af9eb4987ed987f9a3a397f7) )
 ROM_END
 
-GAMEL( 1993, fts2in1,  0,    funtech, funtech, driver_device,  0, ROT0, "Fun Tech Corporation", "Super Two In One", 0, layout_fts2in1 )
+GAMEL( 1993, fts2in1,  0,    funtech, funtech, fun_tech_corp_state,  0, ROT0, "Fun Tech Corporation", "Super Two In One", 0, layout_fts2in1 )

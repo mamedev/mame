@@ -62,20 +62,22 @@
 */
 
 #include "emu.h"
-#include "cpu/i86/i186.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/i386/i386.h"
-#include "video/mc6845.h"
-#include "machine/i8251.h"
+#include "cpu/i86/i186.h"
+#include "imagedev/harddriv.h"
 #include "machine/am9517a.h"
+#include "machine/clock.h"
+#include "machine/i8251.h"
+#include "machine/ngen_kb.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
-#include "machine/z80dart.h"
-#include "machine/wd_fdc.h"
 #include "machine/wd2010.h"
-#include "bus/rs232/rs232.h"
-#include "machine/ngen_kb.h"
-#include "machine/clock.h"
-#include "imagedev/harddriv.h"
+#include "machine/wd_fdc.h"
+#include "machine/z80dart.h"
+#include "video/mc6845.h"
+#include "screen.h"
+
 
 class ngen_state : public driver_device
 {
@@ -159,7 +161,7 @@ private:
 	optional_memory_region m_disk_rom;
 	memory_array m_vram;
 	memory_array m_fontram;
-	optional_device<wd2797_t> m_fdc;
+	optional_device<wd2797_device> m_fdc;
 	optional_device<floppy_connector> m_fd0;
 	optional_device<pit8253_device> m_fdc_timer;
 	optional_device<wd2010_device> m_hdc;
@@ -909,7 +911,7 @@ static SLOT_INTERFACE_START( ngen_floppies )
 	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( ngen, ngen_state )
+static MACHINE_CONFIG_START( ngen )
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", I80186, XTAL_16MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(ngen_mem)
@@ -1022,7 +1024,7 @@ static MACHINE_CONFIG_START( ngen, ngen_state )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ngen386, ngen386_state )
+static MACHINE_CONFIG_START( ngen386 )
 	MCFG_CPU_ADD("i386cpu", I386, XTAL_50MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(ngen386_mem)
 	MCFG_CPU_IO_MAP(ngen386_io)
@@ -1174,6 +1176,6 @@ ROM_START( 386i )
 ROM_END
 
 
-COMP( 1983, ngen,    0,      0,      ngen,           ngen, driver_device, 0,      "Convergent Technologies",  "NGEN CP-001", MACHINE_IS_SKELETON | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1991, ngenb38, ngen,   0,      ngen386,        ngen, driver_device, 0,      "Financial Products Corp.", "B28/38",      MACHINE_IS_SKELETON | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1990, 386i,    ngen,   0,      386i,           ngen, driver_device, 0,      "Convergent Technologies",  "386i",        MACHINE_IS_SKELETON | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1983, ngen,    0,      0,      ngen,           ngen, ngen_state,    0,      "Convergent Technologies",  "NGEN CP-001", MACHINE_IS_SKELETON | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1991, ngenb38, ngen,   0,      ngen386,        ngen, ngen386_state, 0,      "Financial Products Corp.", "B28/38",      MACHINE_IS_SKELETON | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1990, 386i,    ngen,   0,      386i,           ngen, ngen386_state, 0,      "Convergent Technologies",  "386i",        MACHINE_IS_SKELETON | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

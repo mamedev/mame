@@ -4,22 +4,15 @@
 
     Motherboard is bare bones stuff, and does not contain any ROMs.
     The IGS036 used by the games is an ARM based CPU, like IGS027A used on PGM1 it has internal ROM.
-    Decryption should be correct in most cases, but the ARM mode code at the start of the external
-    ROMs is a bit weird, with many BNV instructions rather than jumps.  Maybe the ARM is customized,
-    the code has been 'NOPPED' out this way (BNV is Branch Never) or it's a different type of ARM?
-
-     - Some of the THUMB code looks like THUMB2 code
-      eg
-        f004 BL (HI) 00004000
-        e51f B #fffffa3e
-        0434 LSL R4, R6, 16
-        0000 LSL R0, R0, 0
-
-        should be a 32-bit branch instruction with the 2nd dword used as data.
-
+    Decryption should be correct in most cases.
+    The ARM appears to be ARMv5T, probably an ARM9.
 
     We need to determine where VRAM etc. map in order to attempt tests on the PCBs.
 
+    We will also need to try to attack the internal ROM, as there are many many calls made into it.
+    Chances are it'll be possible to get it to copy itself out, or black-box the behavior.
+    All calls to the IROM are done through small shims, so it should also be possible to hack around
+    the IROM if we can't get the dump out.
 
     PGM2 Motherboard Components:
 
@@ -60,6 +53,8 @@
 #include "cpu/arm7/arm7core.h"
 #include "sound/ymz770.h"
 #include "machine/igs036crypt.h"
+#include "screen.h"
+#include "speaker.h"
 
 class pgm2_state : public driver_device
 {
@@ -77,17 +72,19 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_pgm2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_pgm2(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_pgm2);
 	required_device<cpu_device> m_maincpu;
 
-	void pgm_create_dummy_internal_arm_region(int addr);
+	void pgm_create_dummy_internal_arm_region();
 };
 
 static ADDRESS_MAP_START( pgm2_map, AS_PROGRAM, 32, pgm2_state )
 	AM_RANGE(0x00000000, 0x00003fff) AM_ROM //AM_REGION("user1", 0x00000) // internal ROM
-	AM_RANGE(0x08000000, 0x087fffff) AM_ROM AM_REGION("user1", 0) // not 100% sure it maps here.
-	AM_RANGE(0xffff0000, 0xffffffff) AM_RAM
 
+	AM_RANGE(0x10000000, 0x107fffff) AM_ROM AM_MIRROR(0x0f800000) AM_REGION("user1", 0) // external ROM
+	AM_RANGE(0x20000000, 0x2007ffff) AM_RAM // main SRAM?
+	// This doesn't exist, it's just necessary because our stub IPL doesn't set SP
+	AM_RANGE(0xfff00000, 0xffffffff) AM_RAM
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( pgm2 )
@@ -98,7 +95,7 @@ uint32_t pgm2_state::screen_update_pgm2(screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
-void pgm2_state::screen_eof_pgm2(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(pgm2_state::screen_vblank_pgm2)
 {
 }
 
@@ -169,7 +166,7 @@ static GFXDECODE_START( pgm2 )
 GFXDECODE_END
 
 
-void pgm2_state::pgm_create_dummy_internal_arm_region(int addr)
+void pgm2_state::pgm_create_dummy_internal_arm_region()
 {
 	uint16_t *temp16 = (uint16_t *)memregion("maincpu")->base();
 	int i;
@@ -180,9 +177,11 @@ void pgm2_state::pgm_create_dummy_internal_arm_region(int addr)
 
 	}
 	int base = 0;
+	int addr = 0x10000000;
 
-	// just do a jump to 0x080003c9  because there is some valid thumb code there with the current hookup..
-	// i'd expect valid non-thumb code at 0x08000000 tho?
+	// just do a jump to 0x10000000 because that looks possibly correct.
+	// we probably should be setting up stack and other things too, but we
+	// don't really know that info yet.
 
 	temp16[(base) / 2] = 0x0004; base += 2;
 	temp16[(base) / 2] = 0xe59f; base += 2;
@@ -199,12 +198,11 @@ void pgm2_state::pgm_create_dummy_internal_arm_region(int addr)
 
 
 
-static MACHINE_CONFIG_START( pgm2, pgm2_state )
+static MACHINE_CONFIG_START( pgm2 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM9, 20000000) // ?? ARM baesd CPU, has internal ROM.
 	MCFG_CPU_PROGRAM_MAP(pgm2_map)
-//  MCFG_DEVICE_DISABLE()
 
 
 
@@ -215,7 +213,7 @@ static MACHINE_CONFIG_START( pgm2, pgm2_state )
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 56*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pgm2_state, screen_update_pgm2)
-	MCFG_SCREEN_VBLANK_DRIVER(pgm2_state, screen_eof_pgm2)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(pgm2_state, screen_vblank_pgm2))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pgm2)
@@ -503,7 +501,7 @@ DRIVER_INIT_MEMBER(pgm2_state,orleg2)
 	igs036_decryptor decrypter(orleg2_key);
 	decrypter.decrypter_rom(memregion("user1"));
 
-	pgm_create_dummy_internal_arm_region(0x80003c9);
+	pgm_create_dummy_internal_arm_region();
 }
 
 DRIVER_INIT_MEMBER(pgm2_state,kov2nl)
@@ -516,7 +514,7 @@ DRIVER_INIT_MEMBER(pgm2_state,kov2nl)
 	igs036_decryptor decrypter(kov2_key);
 	decrypter.decrypter_rom(memregion("user1"));
 
-	pgm_create_dummy_internal_arm_region(0x8000069);
+	pgm_create_dummy_internal_arm_region();
 }
 
 DRIVER_INIT_MEMBER(pgm2_state,ddpdojh)
@@ -529,7 +527,7 @@ DRIVER_INIT_MEMBER(pgm2_state,ddpdojh)
 	igs036_decryptor decrypter(ddpdoj_key);
 	decrypter.decrypter_rom(memregion("user1"));
 
-	pgm_create_dummy_internal_arm_region(0x80003c9);
+	pgm_create_dummy_internal_arm_region();
 }
 
 DRIVER_INIT_MEMBER(pgm2_state,kov3)
@@ -542,7 +540,7 @@ DRIVER_INIT_MEMBER(pgm2_state,kov3)
 	igs036_decryptor decrypter(kov3_key);
 	decrypter.decrypter_rom(memregion("user1"));
 
-	pgm_create_dummy_internal_arm_region(0x80003c9);
+	pgm_create_dummy_internal_arm_region();
 }
 
 

@@ -13,12 +13,11 @@
 
 **********************************************************************/
 
+#ifndef MAME_MACHINE_DS1302_H
+#define MAME_MACHINE_DS1302_H
+
 #pragma once
 
-#ifndef __DS1302_H__
-#define __DS1302_H__
-
-#include "emu.h"
 #include "dirtc.h"
 
 
@@ -90,8 +89,6 @@ private:
 
 
 // device type definition
-extern const device_type DS1302;
+DECLARE_DEVICE_TYPE(DS1302, ds1302_device)
 
-
-
-#endif
+#endif // MAME_MACHINE_DS1302_H

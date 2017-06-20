@@ -184,10 +184,12 @@ GUN_xP are 6 pin gun connectors (pins 1-4 match the UNICO sytle guns):
 
 #include "emu.h"
 #include "cpu/se3208/se3208.h"
-#include "video/vrender0.h"
 #include "machine/ds1302.h"
-#include "sound/vrender0.h"
 #include "machine/nvram.h"
+#include "sound/vrender0.h"
+#include "video/vrender0.h"
+#include "screen.h"
+#include "speaker.h"
 
 #define IDLE_LOOP_SPEEDUP
 
@@ -206,7 +208,7 @@ public:
 		m_vr0(*this, "vr0"),
 		m_ds1302(*this, "rtc"),
 		m_screen(*this, "screen")
-		{ }
+	{ }
 
 	/* memory pointers */
 	required_shared_ptr<uint32_t> m_sysregs;
@@ -277,7 +279,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_crystal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_crystal(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_crystal);
 	INTERRUPT_GEN_MEMBER(crystal_interrupt);
 	TIMER_CALLBACK_MEMBER(Timercb);
 	IRQ_CALLBACK_MEMBER(icallback);
@@ -693,6 +695,17 @@ static ADDRESS_MAP_START( trivrus_mem, AS_PROGRAM, 32, crystal_state )
 //  AM_RANGE(0x44414F4C, 0x44414F7F) AM_RAM AM_SHARE("reset_patch")
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( crospuzl_mem, AS_PROGRAM, 32, crystal_state )
+	AM_RANGE(0x01500000, 0x01500003) AM_READ(FlashCmd_r)
+	AM_RANGE(0x01500100, 0x01500103) AM_WRITE(FlashCmd_w)
+	AM_RANGE(0x01510000, 0x01510003) AM_READ_PORT("IN0")
+	AM_RANGE(0x01511000, 0x01511003) AM_READ_PORT("IN1")
+	AM_RANGE(0x01512000, 0x01512003) AM_READ_PORT("IN2")
+	AM_RANGE(0x01513000, 0x01513003) AM_READ_PORT("IN3")
+	AM_IMPORT_FROM( trivrus_mem )
+
+ADDRESS_MAP_END
+
 // Crazy Dou Di Zhu II
 // To do: HY04 (pic?) protection
 
@@ -978,7 +991,7 @@ uint32_t crystal_state::screen_update_crystal(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-void crystal_state::screen_eof_crystal(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(crystal_state::screen_vblank_crystal)
 {
 	// rising edge
 	if (state)
@@ -1240,6 +1253,113 @@ static INPUT_PORTS_START(trivrus)
 	PORT_BIT( 0xffffff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START(crospuzl)
+	PORT_START("IN0")
+	PORT_DIPNAME( 0x01, 0x01, "DSW1" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0xffffff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN1")
+	PORT_DIPNAME( 0x01, 0x01, "IN1" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0xffffff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN2")
+	PORT_DIPNAME( 0x01, 0x01, "IN2" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0xffffff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN3")
+	PORT_DIPNAME( 0x01, 0x01, "IN3" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("PCB-SW1")
+	PORT_BIT( 0xffffff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
 
 static INPUT_PORTS_START(crzyddz2)
 	PORT_START("P1_P2") // 1500002 & 1500000
@@ -1306,7 +1426,7 @@ static INPUT_PORTS_START(crzyddz2)
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( crystal, crystal_state )
+static MACHINE_CONFIG_START( crystal )
 
 	MCFG_CPU_ADD("maincpu", SE3208, 43000000)
 	MCFG_CPU_PROGRAM_MAP(crystal_mem)
@@ -1321,7 +1441,7 @@ static MACHINE_CONFIG_START( crystal, crystal_state )
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 	MCFG_SCREEN_UPDATE_DRIVER(crystal_state, screen_update_crystal)
-	MCFG_SCREEN_VBLANK_DRIVER(crystal_state, screen_eof_crystal)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(crystal_state, screen_vblank_crystal))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("vr0", VIDEO_VRENDER0, 0)
@@ -1345,6 +1465,10 @@ static MACHINE_CONFIG_DERIVED( trivrus, crystal )
 	MCFG_CPU_PROGRAM_MAP(trivrus_mem)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( crospuzl, crystal )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(crospuzl_mem)
+MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( crzyddz2, crystal )
 	MCFG_CPU_MODIFY("maincpu")
@@ -1434,6 +1558,21 @@ ROM_START( trivrus )
 
 	ROM_REGION32_LE( 0x3000000, "user1", ROMREGION_ERASEFF ) // Flash
 	ROM_LOAD( "u3", 0x000000, 0x1000010, CRC(ba901707) SHA1(e281ba07024cd19ef1ab72d2197014f7b1f4d30f) )
+
+	ROM_REGION( 0x1000000, "user2", ROMREGION_ERASEFF ) // Unmapped flash
+ROM_END
+
+/*
+  uses ADC 'Amazon-LF' SoC, EISC CPU core - similar to crystal system?
+*/
+
+ROM_START( crospuzl )
+	ROM_REGION( 0x80010, "maincpu", 0 )
+	ROM_LOAD("en29lv040a.u5",  0x000000, 0x80010, CRC(d50e8500) SHA1(d681cd18cd0e48854c24291d417d2d6d28fe35c1) )
+
+	ROM_REGION32_LE( 0x8400010, "user1", ROMREGION_ERASEFF ) // Flash
+	// mostly empty, but still looks good
+	ROM_LOAD("k9f1g08u0a.riser",  0x000000, 0x8400010, CRC(7f3c88c3) SHA1(db3169a7b4caab754e9d911998a2ece13c65ce5b) )
 
 	ROM_REGION( 0x1000000, "user2", ROMREGION_ERASEFF ) // Unmapped flash
 ROM_END
@@ -1671,16 +1810,17 @@ DRIVER_INIT_MEMBER(crystal_state,psattack)
 }
 
 
-GAME( 2001, crysbios, 0,        crystal,  crystal,  driver_device, 0,        ROT0, "BrezzaSoft",          "Crystal System BIOS",                  MACHINE_IS_BIOS_ROOT )
+GAME( 2001, crysbios, 0,        crystal,  crystal,  crystal_state, 0,        ROT0, "BrezzaSoft",          "Crystal System BIOS",                  MACHINE_IS_BIOS_ROOT )
 GAME( 2001, crysking, crysbios, crystal,  crystal,  crystal_state, crysking, ROT0, "BrezzaSoft",          "The Crystal of Kings",                 0 )
 GAME( 2001, evosocc,  crysbios, crystal,  crystal,  crystal_state, evosocc,  ROT0, "Evoga",               "Evolution Soccer",                     0 )
 GAME( 2003, topbladv, crysbios, crystal,  crystal,  crystal_state, topbladv, ROT0, "SonoKong / Expotato", "Top Blade V",                          0 )
 GAME( 2001, officeye, 0,        crystal,  officeye, crystal_state, officeye, ROT0, "Danbi",               "Office Yeo In Cheon Ha (version 1.2)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // still has some instability issues
 GAME( 2001, donghaer, 0,        crystal,  crystal,  crystal_state, donghaer, ROT0, "Danbi",               "Donggul Donggul Haerong",              MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 2004?,menghong, 0,        crzyddz2, crzyddz2, driver_device, 0,        ROT0, "Sealy",               "Meng Hong Lou",                        MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 2006, crzyddz2, 0,        crzyddz2, crzyddz2, driver_device, 0,        ROT0, "Sealy",               "Crazy Dou Di Zhu II",                  MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 2009, trivrus,  0,        trivrus,  trivrus,  driver_device, 0,        ROT0, "AGT",                 "Trivia R Us (v1.07)",                  0 )
-// has a CF card instead of flash roms
+GAME( 2004?,menghong, 0,        crzyddz2, crzyddz2, crystal_state, 0,        ROT0, "Sealy",               "Meng Hong Lou",                        MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2006, crzyddz2, 0,        crzyddz2, crzyddz2, crystal_state, 0,        ROT0, "Sealy",               "Crazy Dou Di Zhu II",                  MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2009, trivrus,  0,        trivrus,  trivrus,  crystal_state, 0,        ROT0, "AGT",                 "Trivia R Us (v1.07)",                  0 ) // has a CF card instead of flash roms
+GAME( 200?, crospuzl, 0,        crospuzl, crospuzl, crystal_state, 0,        ROT0, "<unknown>",           "Cross Puzzle",                         MACHINE_NOT_WORKING )
+
 GAME( 2004, psattack, 0,        crystal,  crystal,  crystal_state, psattack, ROT0, "Uniana",              "P's Attack",                           MACHINE_IS_SKELETON )
 // looks like the same kind of hw from strings in the ROM, but scrambled / encrypted?
-GAME( 200?, ddz,      0,        crystal,  crystal,  driver_device, 0,        ROT0, "IGS?",                "Dou Di Zhu",                           MACHINE_IS_SKELETON )
+GAME( 200?, ddz,      0,        crystal,  crystal,  crystal_state, 0,        ROT0, "IGS?",                "Dou Di Zhu",                           MACHINE_IS_SKELETON )

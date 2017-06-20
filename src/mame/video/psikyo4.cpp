@@ -28,6 +28,7 @@ HotGmck:  86010000 1f201918 a0000000 Large Screen
 HgKairak: 86010000 1f201918 a0000000 Large Screen
 */
 
+#include "emu.h"
 #include "includes/psikyo4.h"
 
 

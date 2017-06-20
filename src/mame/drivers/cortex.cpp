@@ -74,7 +74,7 @@ void cortex_state::machine_reset()
 	m_maincpu->ready_line(ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( cortex, cortex_state )
+static MACHINE_CONFIG_START( cortex )
 	/* basic machine hardware */
 	/* TMS9995 CPU @ 12.0 MHz */
 	// Standard variant, no overflow int
@@ -102,5 +102,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY                  FULLNAME       FLAGS */
-COMP( 1982, cortex, 0,      0,       cortex,    cortex, driver_device,  0,    "Powertran Cybernetics",   "Cortex", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   STATE         INIT  COMPANY                  FULLNAME  FLAGS
+COMP( 1982, cortex, 0,      0,       cortex,    cortex, cortex_state, 0,    "Powertran Cybernetics", "Cortex", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

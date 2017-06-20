@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -7,7 +7,7 @@
 
 #if ENTRY_CONFIG_USE_NATIVE && BX_PLATFORM_ANDROID
 
-#include <bgfx/bgfxplatform.h>
+#include <bgfx/platform.h>
 
 #include <stdio.h>
 #include <bx/thread.h>
@@ -96,7 +96,7 @@ namespace entry
 		Context()
 			: m_window(NULL)
 		{
-			memset(m_value, 0, sizeof(m_value) );
+			bx::memSet(m_value, 0, sizeof(m_value) );
 
 			// Deadzone values from xinput.h
 			m_deadzone[GamepadAxis::LeftX ] =

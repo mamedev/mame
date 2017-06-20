@@ -157,10 +157,12 @@ FG-3J ROM-J 507KA0301P04       Rev:1.3
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/fuukifg3.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/ymf278b.h"
-#include "includes/fuukifg3.h"
+#include "speaker.h"
 
 
 /***************************************************************************
@@ -544,7 +546,7 @@ void fuuki32_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START(fuuki32, fuuki32_state)
+static MACHINE_CONFIG_START(fuuki32)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, CPU_CLOCK) /* 20MHz verified */
@@ -560,7 +562,7 @@ static MACHINE_CONFIG_START(fuuki32, fuuki32_state)
 	MCFG_SCREEN_SIZE(64 * 8, 32 * 8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40 * 8 - 1, 0, 30 * 8 - 1)
 	MCFG_SCREEN_UPDATE_DRIVER(fuuki32_state, screen_update)
-	MCFG_SCREEN_VBLANK_DRIVER(fuuki32_state, screen_eof)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(fuuki32_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fuuki32)
@@ -723,7 +725,7 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1998, asurabld,   0, fuuki32, asurabld, driver_device, 0, ROT0, "Fuuki", "Asura Blade - Sword of Dynasty (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, asurabld,   0,        fuuki32, asurabld, fuuki32_state, 0, ROT0, "Fuuki", "Asura Blade - Sword of Dynasty (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 2000, asurabus,   0,        fuuki32, asurabus, driver_device, 0, ROT0, "Fuuki", "Asura Buster - Eternal Warriors (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2000, asurabusa,  asurabus, fuuki32, asurabusa,driver_device, 0, ROT0, "Fuuki", "Asura Buster - Eternal Warriors (Japan) (ARCADIA review build)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // has pause function on P1 button 4
+GAME( 2000, asurabus,   0,        fuuki32, asurabus, fuuki32_state, 0, ROT0, "Fuuki", "Asura Buster - Eternal Warriors (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2000, asurabusa,  asurabus, fuuki32, asurabusa,fuuki32_state, 0, ROT0, "Fuuki", "Asura Buster - Eternal Warriors (Japan) (ARCADIA review build)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // has pause function on P1 button 4

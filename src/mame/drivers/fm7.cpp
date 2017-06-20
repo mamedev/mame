@@ -38,20 +38,28 @@
 ************************************************************************************************/
 
 #include "emu.h"
+#include "includes/fm7.h"
+
 #include "cpu/m6809/m6809.h"
 #include "cpu/i86/i86.h"
 #include "cpu/z80/z80.h"
+
 #include "sound/ay8910.h"
 #include "sound/2203intf.h"
 #include "sound/wave.h"
 #include "sound/beep.h"
 
-#include "imagedev/cassette.h"
-#include "formats/fm7_cas.h"
-#include "imagedev/flopdrv.h"
 #include "bus/centronics/dsjoy.h"
-#include "includes/fm7.h"
+
+#include "imagedev/cassette.h"
+#include "imagedev/flopdrv.h"
+
+#include "formats/fm7_cas.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 
 /* key scancode conversion table
  * The FM-7 expects different scancodes when shift,ctrl or graph is held, or
@@ -366,7 +374,7 @@ READ8_MEMBER(fm7_state::fm7_fd04_r)
  */
 READ8_MEMBER(fm7_state::fm7_rom_en_r)
 {
-	if(!space.debugger_access())
+	if(!machine().side_effect_disabled())
 	{
 		uint8_t* RAM = memregion("maincpu")->base();
 
@@ -1159,7 +1167,7 @@ void fm7_state::fm7_mmr_refresh(address_space& space)
 	{
 		if (m_basic_ptr)
 		{
-			membank("fbasic_bank_r")->set_base(m_rom_ptr);
+			membank("fbasic_bank_r")->set_base(m_basic_ptr);
 		}
 	}
 	else
@@ -2047,7 +2055,7 @@ MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8) \
 MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000)
 
 
-static MACHINE_CONFIG_START( fm7, fm7_state )
+static MACHINE_CONFIG_START( fm7 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, XTAL_2MHz)
 	MCFG_CPU_PROGRAM_MAP(fm7_mem)
@@ -2105,7 +2113,7 @@ static MACHINE_CONFIG_START( fm7, fm7_state )
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( fm8, fm7_state )
+static MACHINE_CONFIG_START( fm8 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 1200000)  // 1.2MHz 68A09
 	MCFG_CPU_PROGRAM_MAP(fm8_mem)
@@ -2156,7 +2164,7 @@ static MACHINE_CONFIG_START( fm8, fm7_state )
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( fm77av, fm7_state )
+static MACHINE_CONFIG_START( fm77av )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, XTAL_2MHz)  // actually MB68B09E, but the 6809E core runs too slowly
 	MCFG_CPU_PROGRAM_MAP(fm77av_mem)
@@ -2235,7 +2243,7 @@ static MACHINE_CONFIG_START( fm77av, fm7_state )
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( fm11, fm7_state )
+static MACHINE_CONFIG_START( fm11 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, XTAL_2MHz)  // 2MHz 68B09E
 	MCFG_CPU_PROGRAM_MAP(fm11_mem)
@@ -2307,7 +2315,7 @@ static MACHINE_CONFIG_START( fm11, fm7_state )
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( fm16beta, fm7_state )
+static MACHINE_CONFIG_START( fm16beta )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8086, XTAL_8MHz)  // 8MHz i8086
 	MCFG_CPU_PROGRAM_MAP(fm16_mem)
@@ -2520,13 +2528,13 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT   INIT  COMPANY      FULLNAME        FLAGS */
-COMP( 1981, fm8,      0,      0,      fm8,     fm8, fm7_state,    fm7,  "Fujitsu",   "FM-8",         0)
-COMP( 1982, fm7,      0,      0,      fm7,     fm7, fm7_state,    fm7,  "Fujitsu",   "FM-7",         0)
-COMP( 1984, fmnew7,   fm7,    0,      fm7,     fm7, fm7_state,    fm7,  "Fujitsu",   "FM-NEW7",      0)
-COMP( 1985, fm77av,   fm7,    0,      fm77av,  fm7, fm7_state,    fm7,  "Fujitsu",   "FM-77AV",      MACHINE_IMPERFECT_GRAPHICS)
-COMP( 1985, fm7740sx, fm7,    0,      fm77av,  fm7, fm7_state,    fm7,  "Fujitsu",   "FM-77AV40SX",  MACHINE_NOT_WORKING)
+/*    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT  COMPANY      FULLNAME         FLAGS */
+COMP( 1981, fm8,      0,      0,      fm8,     fm8,   fm7_state,  fm7,  "Fujitsu",   "FM-8",          0)
+COMP( 1982, fm7,      0,      0,      fm7,     fm7,   fm7_state,  fm7,  "Fujitsu",   "FM-7",          0)
+COMP( 1984, fmnew7,   fm7,    0,      fm7,     fm7,   fm7_state,  fm7,  "Fujitsu",   "FM-NEW7",       0)
+COMP( 1985, fm77av,   fm7,    0,      fm77av,  fm7,   fm7_state,  fm7,  "Fujitsu",   "FM-77AV",       MACHINE_IMPERFECT_GRAPHICS)
+COMP( 1985, fm7740sx, fm7,    0,      fm77av,  fm7,   fm7_state,  fm7,  "Fujitsu",   "FM-77AV40SX",   MACHINE_NOT_WORKING)
 
 // These may be separated into a separate driver, depending on how different they are to the FM-8/FM-7
-COMP( 1982, fm11,     0,      0,      fm11,     fm7, fm7_state,    fm7,       "Fujitsu",   "FM-11 EX",      MACHINE_NOT_WORKING)
-COMP( 1982, fm16beta, 0,      0,      fm16beta, fm7, fm7_state,    fm7,       "Fujitsu",   "FM-16\xCE\xB2", MACHINE_NOT_WORKING)
+COMP( 1982, fm11,     0,      0,      fm11,     fm7,   fm7_state,  fm7, "Fujitsu",   "FM-11 EX",      MACHINE_NOT_WORKING)
+COMP( 1982, fm16beta, 0,      0,      fm16beta, fm7,   fm7_state,  fm7, "Fujitsu",   "FM-16\xCE\xB2", MACHINE_NOT_WORKING)

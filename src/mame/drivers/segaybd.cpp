@@ -58,11 +58,15 @@ MB89372 - Uses 3 serial data transfer protocols: ASYNC, COP & BOP. Has a built
 
 #include "emu.h"
 #include "includes/segaybd.h"
-#include "machine/mb8421.h"
-#include "machine/nvram.h"
-#include "sound/ym2151.h"
-#include "sound/segapcm.h"
 #include "includes/segaipt.h"
+
+#include "machine/mb8421.h"
+#include "machine/msm6253.h"
+#include "machine/nvram.h"
+#include "machine/315_5296.h"
+#include "sound/segapcm.h"
+#include "sound/ym2151.h"
+#include "speaker.h"
 
 #include "pdrift.lh"
 
@@ -84,146 +88,64 @@ const uint32_t SOUND_CLOCK = 32215900;
 //**************************************************************************
 
 //-------------------------------------------------
-//  analog_r - handle analog input reads
+//  analog_mux - handle multiplexed analog input
+//  (HC4052 at IC121)
 //-------------------------------------------------
 
-READ16_MEMBER( segaybd_state::analog_r )
+ioport_value segaybd_state::analog_mux()
 {
-	int result = 0xff;
-	if (ACCESSING_BITS_0_7)
-	{
-		result = m_analog_data[offset & 3] & 0x80;
-		m_analog_data[offset & 3] <<= 1;
-	}
-	return result;
+	return m_adc_ports[3 + (m_misc_io_data & 3)].read_safe(0x80);
 }
 
 
 //-------------------------------------------------
-//  analog_w - handle analog input control writes
+//  output1_w - handle writes to I/O port D
 //-------------------------------------------------
 
-WRITE16_MEMBER( segaybd_state::analog_w )
+WRITE8_MEMBER(segaybd_state::output1_w)
 {
-	int selected = ((offset & 3) == 3) ? (3 + (m_misc_io_data[0x08/2] & 3)) : (offset & 3);
-	m_analog_data[offset & 3] = m_adc_ports[selected].read_safe(0xff);
+	if (!m_output_cb1.isnull())
+		m_output_cb1(data);
 }
 
 
 //-------------------------------------------------
-//  io_chip_r - handle reads from the I/O chip
+//  misc_output_w - handle writes to I/O port E
 //-------------------------------------------------
 
-READ16_MEMBER( segaybd_state::io_chip_r )
+WRITE8_MEMBER(segaybd_state::misc_output_w)
 {
-	offset &= 0x1f/2;
+	//
+	//  D7 = /KILL
+	//  D6 = CONT
+	//  D5 = /WDCL
+	//  D4 = /SRES
+	//  D3 = XRES
+	//  D2 = YRES
+	//  D1-D0 = ADC0-1
+	//
+	m_segaic16vid->set_display_enable(data & 0x80);
+	m_watchdog->write_line_ck(BIT(data, 5));
+	m_soundcpu->set_input_line(INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+	m_subx->set_input_line(INPUT_LINE_RESET, (data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
+	m_suby->set_input_line(INPUT_LINE_RESET, (data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
 
-	switch (offset)
-	{
-		// I/O ports
-		case 0x00/2:
-		case 0x02/2:
-		case 0x04/2:
-		case 0x06/2:
-		case 0x08/2:
-		case 0x0a/2:
-		case 0x0c/2:
-		case 0x0e/2:
-			// if the port is configured as an output, return the last thing written
-			if (m_misc_io_data[0x1e/2] & (1 << offset))
-				return m_misc_io_data[offset];
-
-			// otherwise, return an input port
-			return m_digital_ports[offset]->read();
-
-		// 'SEGA' protection
-		case 0x10/2:
-			return 'S';
-		case 0x12/2:
-			return 'E';
-		case 0x14/2:
-			return 'G';
-		case 0x16/2:
-			return 'A';
-
-		// CNT register & mirror
-		case 0x18/2:
-		case 0x1c/2:
-			return m_misc_io_data[0x1c/2];
-
-		// port direction register & mirror
-		case 0x1a/2:
-		case 0x1e/2:
-			return m_misc_io_data[0x1e/2];
-	}
-	return 0xffff;
+	m_misc_io_data = data;
 }
 
 
 //-------------------------------------------------
-//  io_chip_w - handle writes to the I/O chip
+//  output2_w - handle writes to I/O port H
 //-------------------------------------------------
 
-WRITE16_MEMBER( segaybd_state::io_chip_w )
+WRITE8_MEMBER(segaybd_state::output2_w)
 {
-	uint8_t old;
+	if (!m_output_cb2.isnull())
+		m_output_cb2(data);
 
-	// generic implementation
-	offset &= 0x1f/2;
-	old = m_misc_io_data[offset];
-	m_misc_io_data[offset] = data;
-
-	switch (offset)
-	{
-		// I/O ports
-		case 0x00/2:
-			break;
-		case 0x02/2:
-			break;
-		case 0x04/2:
-			break;
-		case 0x06/2:
-			if (!m_output_cb1.isnull())
-				m_output_cb1(data);
-			break;
-		case 0x0a/2:
-		case 0x0c/2:
-			break;
-
-		// miscellaneous output
-		case 0x08/2:
-			//
-			//  D7 = /KILL
-			//  D6 = CONT
-			//  D5 = /WDCL
-			//  D4 = /SRES
-			//  D3 = XRES
-			//  D2 = YRES
-			//  D1-D0 = ADC0-1
-			//
-			m_segaic16vid->set_display_enable(data & 0x80);
-			if (((old ^ data) & 0x20) && !(data & 0x20))
-				m_watchdog->watchdog_reset();
-			m_soundcpu->set_input_line(INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
-			m_subx->set_input_line(INPUT_LINE_RESET, (data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
-			m_suby->set_input_line(INPUT_LINE_RESET, (data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
-			break;
-
-		// mute
-
-		case 0x0e/2:
-			if (!m_output_cb2.isnull())
-				m_output_cb2(data);
-
-			// D7 = /MUTE
-			// D6-D0 = FLT31-25
-			machine().sound().system_enable(data & 0x80);
-			break;
-
-		// CNT register
-		case 0x1c/2:
-			break;
-	}
+	// D7 = /MUTE
+	// D6-D0 = FLT31-25
+	machine().sound().system_enable(data & 0x80);
 }
 
 
@@ -232,7 +154,7 @@ WRITE16_MEMBER( segaybd_state::io_chip_w )
 //  port
 //-------------------------------------------------
 
-WRITE16_MEMBER( segaybd_state::sound_data_w )
+WRITE16_MEMBER(segaybd_state::sound_data_w)
 {
 	if (ACCESSING_BITS_0_7)
 		synchronize(TID_SOUND_WRITE, data & 0xff);
@@ -248,7 +170,7 @@ WRITE16_MEMBER( segaybd_state::sound_data_w )
 //  sound_data_r - read latched sound data
 //-------------------------------------------------
 
-READ8_MEMBER( segaybd_state::sound_data_r )
+READ8_MEMBER(segaybd_state::sound_data_r)
 {
 	m_soundcpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	return m_soundlatch->read(space, 0);
@@ -703,8 +625,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, segaybd_state )
 	AM_RANGE(0x084000, 0x08401f) AM_MIRROR(0x001fe0) AM_DEVREADWRITE("divider_main", sega_315_5249_divider_device, read, write)
 //  AM_RANGE(0x086000, 0x087fff) /DEA0
 	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM AM_SHARE("shareram")
-	AM_RANGE(0x100000, 0x10001f) AM_READWRITE(io_chip_r, io_chip_w)
-	AM_RANGE(0x100040, 0x100047) AM_READWRITE(analog_r, analog_w)
+	AM_RANGE(0x100000, 0x10001f) AM_DEVREADWRITE8("io", sega_315_5296_device, read, write, 0x00ff)
+	AM_RANGE(0x100040, 0x100047) AM_DEVREADWRITE8("adc", msm6253_device, d7_r, address_w, 0x00ff)
 	AM_RANGE(0x1f0000, 0x1fffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -778,7 +700,7 @@ WRITE_LINE_MEMBER(segaybd_state::mb8421_intr)
 
 READ16_MEMBER(segaybd_state::link_r)
 {
-	return rand();
+	return machine().rand();
 }
 
 READ16_MEMBER(segaybd_state::link2_r)
@@ -858,12 +780,6 @@ static INPUT_PORTS_START( yboard_generic )
 	PORT_START("LIMITSW")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("PORTD")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("PORTE")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
 	PORT_START("DSW")
 	PORT_DIPUNUSED_DIPLOC( 0x01, IP_ACTIVE_LOW, "SWB:1" )
 	PORT_DIPUNUSED_DIPLOC( 0x02, IP_ACTIVE_LOW, "SWB:2" )
@@ -876,9 +792,6 @@ static INPUT_PORTS_START( yboard_generic )
 
 	PORT_START("COINAGE")
 	SEGA_COINAGE_LOC(SWA)
-
-	PORT_START("PORTH")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -1390,7 +1303,7 @@ INPUT_PORTS_END
 //  GENERIC MACHINE DRIVERS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( yboard, segaybd_state )
+static MACHINE_CONFIG_START( yboard )
 
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK/4)
@@ -1409,7 +1322,24 @@ static MACHINE_CONFIG_START( yboard, segaybd_state )
 	MCFG_NVRAM_ADD_0FILL("backupram")
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	MCFG_MB3773_ADD("watchdog") // IC95
+
+	MCFG_DEVICE_ADD("io", SEGA_315_5296, MASTER_CLOCK/8)
+	MCFG_315_5296_IN_PORTA_CB(IOPORT("P1"))
+	MCFG_315_5296_IN_PORTB_CB(IOPORT("GENERAL"))
+	MCFG_315_5296_IN_PORTC_CB(IOPORT("LIMITSW"))
+	MCFG_315_5296_OUT_PORTD_CB(WRITE8(segaybd_state, output1_w))
+	MCFG_315_5296_OUT_PORTE_CB(WRITE8(segaybd_state, misc_output_w))
+	MCFG_315_5296_IN_PORTF_CB(IOPORT("DSW"))
+	MCFG_315_5296_IN_PORTG_CB(IOPORT("COINAGE"))
+	MCFG_315_5296_OUT_PORTH_CB(WRITE8(segaybd_state, output2_w))
+	// FMCS and CKOT connect to CS and OSC IN on MSM6253 below
+
+	MCFG_DEVICE_ADD("adc", MSM6253, 0)
+	MCFG_MSM6253_IN0_ANALOG_PORT("ADC.0")
+	MCFG_MSM6253_IN1_ANALOG_PORT("ADC.1")
+	MCFG_MSM6253_IN2_ANALOG_PORT("ADC.2")
+	MCFG_MSM6253_IN3_ANALOG_READ(segaybd_state, analog_mux)
 
 	MCFG_SEGA_315_5248_MULTIPLIER_ADD("multiplier_main")
 	MCFG_SEGA_315_5248_MULTIPLIER_ADD("multiplier_subx")
@@ -1446,7 +1376,7 @@ static MACHINE_CONFIG_START( yboard, segaybd_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.43)
 
 	MCFG_SEGAPCM_ADD("pcm", SOUND_CLOCK/8)
-	MCFG_SEGAPCM_BANK(BANK_12M | BANK_MASKF8)
+	MCFG_SEGAPCM_BANK_MASK(BANK_12M, BANK_MASKF8)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -2738,7 +2668,6 @@ DRIVER_INIT_MEMBER(segaybd_state,generic)
 
 	// save state
 	save_item(NAME(m_pdrift_bank));
-	save_item(NAME(m_analog_data));
 	save_item(NAME(m_irq2_scanline));
 	save_item(NAME(m_timer_irq_state));
 	save_item(NAME(m_vblank_irq_state));
@@ -2795,25 +2724,25 @@ DRIVER_INIT_MEMBER(segaybd_state,rchase)
 //  GAME DRIVERS
 //**************************************************************************
 
-//    YEAR, NAME,      PARENT,  MACHINE, INPUT,    INIT,                   MONITOR,COMPANY,FULLNAME,FLAGS,                                     LAYOUT
-GAME( 1988, gforce2,   0,        yboard,      gforce2,  segaybd_state, gforce2, ROT0,   "Sega", "Galaxy Force 2", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, gforce2sd, gforce2, yboard_deluxe,      gforce2,  segaybd_state, gforce2, ROT0,   "Sega", "Galaxy Force 2 (Super Deluxe unit)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, gforce2ja, gforce2,  yboard,      gforce2,  segaybd_state, gforce2, ROT0,   "Sega", "Galaxy Force 2 (Japan, Rev A)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, gforce2j,  gforce2,  yboard,      gforce2,  segaybd_state, gforce2, ROT0,   "Sega", "Galaxy Force 2 (Japan)", MACHINE_SUPPORTS_SAVE )
+//    YEAR, NAME,      PARENT,   MACHINE,       INPUT,    STATE,         INIT,    MONITOR,COMPANY,FULLNAME,FLAGS,                                     LAYOUT
+GAME( 1988, gforce2,   0,        yboard,        gforce2,  segaybd_state, gforce2, ROT0,   "Sega", "Galaxy Force 2", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, gforce2sd, gforce2,  yboard_deluxe, gforce2,  segaybd_state, gforce2, ROT0,   "Sega", "Galaxy Force 2 (Super Deluxe unit)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, gforce2ja, gforce2,  yboard,        gforce2,  segaybd_state, gforce2, ROT0,   "Sega", "Galaxy Force 2 (Japan, Rev A)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, gforce2j,  gforce2,  yboard,        gforce2,  segaybd_state, gforce2, ROT0,   "Sega", "Galaxy Force 2 (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, gloc,      0,        yboard,      gloc,     segaybd_state, gloc,    ROT0,   "Sega", "G-LOC Air Battle (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, glocu,     gloc,     yboard,      gloc,     segaybd_state, gloc,    ROT0,   "Sega", "G-LOC Air Battle (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, glocr360,  gloc,     yboard,      glocr360, segaybd_state, r360,    ROT0,   "Sega", "G-LOC R360", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, gloc,      0,        yboard,        gloc,     segaybd_state, gloc,    ROT0,   "Sega", "G-LOC Air Battle (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, glocu,     gloc,     yboard,        gloc,     segaybd_state, gloc,    ROT0,   "Sega", "G-LOC Air Battle (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, glocr360,  gloc,     yboard,        glocr360, segaybd_state, r360,    ROT0,   "Sega", "G-LOC R360", MACHINE_SUPPORTS_SAVE )
 
-GAMEL(1988, pdrift,    0,        yboard,      pdrift,   segaybd_state, pdrift,  ROT0,   "Sega", "Power Drift (World, Rev A)", MACHINE_SUPPORTS_SAVE,   layout_pdrift )
-GAMEL(1988, pdrifta,   pdrift,   yboard,      pdrift,   segaybd_state, pdrift,  ROT0,   "Sega", "Power Drift (World)", MACHINE_SUPPORTS_SAVE,          layout_pdrift )
-GAMEL(1988, pdrifte,   pdrift,   yboard,      pdrifte,  segaybd_state, pdrift,  ROT0,   "Sega", "Power Drift (World, Earlier)", MACHINE_SUPPORTS_SAVE, layout_pdrift )
-GAMEL(1988, pdriftj,   pdrift,   yboard,      pdriftj,  segaybd_state, pdrift,  ROT0,   "Sega", "Power Drift (Japan)", MACHINE_SUPPORTS_SAVE,          layout_pdrift )
+GAMEL(1988, pdrift,    0,        yboard,        pdrift,   segaybd_state, pdrift,  ROT0,   "Sega", "Power Drift (World, Rev A)", MACHINE_SUPPORTS_SAVE,   layout_pdrift )
+GAMEL(1988, pdrifta,   pdrift,   yboard,        pdrift,   segaybd_state, pdrift,  ROT0,   "Sega", "Power Drift (World)", MACHINE_SUPPORTS_SAVE,          layout_pdrift )
+GAMEL(1988, pdrifte,   pdrift,   yboard,        pdrifte,  segaybd_state, pdrift,  ROT0,   "Sega", "Power Drift (World, Earlier)", MACHINE_SUPPORTS_SAVE, layout_pdrift )
+GAMEL(1988, pdriftj,   pdrift,   yboard,        pdriftj,  segaybd_state, pdrift,  ROT0,   "Sega", "Power Drift (Japan)", MACHINE_SUPPORTS_SAVE,          layout_pdrift )
 
-GAMEL(1988, pdriftl,   0,        yboard_link, pdriftl,  segaybd_state, pdrift,  ROT0,   "Sega", "Power Drift - Link Version (Japan, Rev A)", MACHINE_SUPPORTS_SAVE, layout_pdrift)
+GAMEL(1988, pdriftl,   0,        yboard_link,   pdriftl,  segaybd_state, pdrift,  ROT0,   "Sega", "Power Drift - Link Version (Japan, Rev A)", MACHINE_SUPPORTS_SAVE, layout_pdrift)
 
-GAME( 1991, rchase,    0,        yboard,      rchase,   segaybd_state, rchase,  ROT0,   "Sega", "Rail Chase (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, rchasej,   rchase,   yboard,      rchase,   segaybd_state, rchase,  ROT0,   "Sega", "Rail Chase (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, rchase,    0,        yboard,        rchase,   segaybd_state, rchase,  ROT0,   "Sega", "Rail Chase (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, rchasej,   rchase,   yboard,        rchase,   segaybd_state, rchase,  ROT0,   "Sega", "Rail Chase (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, strkfgtr,  0,        yboard,      strkfgtr, segaybd_state, gloc,    ROT0,   "Sega", "Strike Fighter (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, strkfgtrj, strkfgtr, yboard,      strkfgtr, segaybd_state, gloc,    ROT0,   "Sega", "Strike Fighter (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, strkfgtr,  0,        yboard,        strkfgtr, segaybd_state, gloc,    ROT0,   "Sega", "Strike Fighter (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, strkfgtrj, strkfgtr, yboard,        strkfgtr, segaybd_state, gloc,    ROT0,   "Sega", "Strike Fighter (Japan)", MACHINE_SUPPORTS_SAVE )

@@ -3,7 +3,7 @@
 #include "machine/c117.h"
 #include "sound/dac.h"
 #include "sound/namco.h"
-#include "video/c116.h"
+#include "video/namco_c116.h"
 
 class namcos1_state : public driver_device
 {
@@ -133,7 +133,7 @@ public:
 
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 
 private:
 	inline void get_tile_info(tile_data &tileinfo,int tile_index,uint8_t *info_vram);

@@ -768,6 +768,13 @@ namespace bgfx { namespace mtl
 
 	struct TextureMtl
 	{
+		enum Enum
+		{
+			Texture2D,
+			Texture3D,
+			TextureCube,
+		};
+
 		TextureMtl()
 			: m_ptr(NULL)
 			, m_ptrMSAA(NULL)
@@ -795,11 +802,12 @@ namespace bgfx { namespace mtl
 		Texture m_ptrStencil; // for emulating packed depth/stencil formats - only for iOS8...
 		SamplerState m_sampler;
 		uint32_t m_flags;
-		uint8_t m_requestedFormat;
-		uint8_t m_textureFormat;
 		uint32_t m_width;
 		uint32_t m_height;
 		uint32_t m_depth;
+		uint8_t m_type;
+		uint8_t m_requestedFormat;
+		uint8_t m_textureFormat;
 		uint8_t m_numMips;
 	};
 
@@ -828,6 +836,31 @@ namespace bgfx { namespace mtl
 		TextureHandle m_colorHandle[BGFX_CONFIG_MAX_FRAME_BUFFER_ATTACHMENTS-1];
 		TextureHandle m_depthHandle;
 		uint8_t m_num; // number of color handles
+	};
+
+	struct CommandQueueMtl
+	{
+		CommandQueueMtl() : m_releaseWriteIndex(0), m_releaseReadIndex(0)
+		{
+		}
+
+		void init(Device _device);
+		void shutdown();
+		CommandBuffer alloc();
+		void kick(bool _endFrame, bool _waitForFinish = false);
+		void finish(bool _finishAll = false);
+		void release(NSObject* _ptr);
+		void consume();
+
+		bx::Semaphore m_framesSemaphore;
+
+		CommandQueue  m_commandQueue;
+		CommandBuffer m_activeCommandBuffer;
+
+		int m_releaseWriteIndex;
+		int m_releaseReadIndex;
+		typedef stl::vector<NSObject*> ResourceArray;
+		ResourceArray m_release[MTL_MAX_FRAMES_IN_FLIGHT];
 	};
 
 	struct TimerQueryMtl
@@ -863,6 +896,7 @@ namespace bgfx { namespace mtl
 		void begin(RenderCommandEncoder& _rce, Frame* _render, OcclusionQueryHandle _handle);
 		void end(RenderCommandEncoder& _rce);
 		void resolve(Frame* _render, bool _wait = false);
+		void invalidate(OcclusionQueryHandle _handle);
 
 		struct Query
 		{
@@ -870,7 +904,7 @@ namespace bgfx { namespace mtl
 		};
 
 		Buffer m_buffer;
-		Query m_query[BGFX_CONFIG_MAX_OCCUSION_QUERIES];
+		Query m_query[BGFX_CONFIG_MAX_OCCLUSION_QUERIES];
 		bx::RingBufferControl m_control;
 	};
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -26,7 +26,7 @@
 #endif //
 #include <GLFW/glfw3native.h>
 
-#include <bgfx/bgfxplatform.h>
+#include <bgfx/platform.h>
 
 #include <bx/thread.h>
 #include <bx/handlealloc.h>
@@ -36,21 +36,30 @@
 
 namespace entry
 {
-	inline void glfwSetWindow(GLFWwindow* _window)
+	static void* glfwNativeWindowHandle(GLFWwindow* _window)
+	{
+#	if BX_PLATFORM_LINUX || BX_PLATFORM_BSD
+		return (void*)(uintptr_t)glfwGetX11Window(_window);
+#	elif BX_PLATFORM_OSX
+		return glfwGetCocoaWindow(_window);
+#	elif BX_PLATFORM_WINDOWS
+		return glfwGetWin32Window(_window);
+#	endif // BX_PLATFORM_
+	}
+
+	static void glfwSetWindow(GLFWwindow* _window)
 	{
 		bgfx::PlatformData pd;
 #	if BX_PLATFORM_LINUX || BX_PLATFORM_BSD
-		pd.ndt		= glfwGetX11Display();
-		pd.nwh		= (void*)(uintptr_t)glfwGetX11Window(_window);
+		pd.ndt      = glfwGetX11Display();
 #	elif BX_PLATFORM_OSX
-		pd.ndt		= NULL;
-		pd.nwh		= glfwGetCocoaWindow(_window);
+		pd.ndt      = NULL;
 #	elif BX_PLATFORM_WINDOWS
-		pd.ndt		= NULL;
-		pd.nwh		= glfwGetWin32Window(_window);
-		pd.context	= NULL;
+		pd.ndt      = NULL;
 #	endif // BX_PLATFORM_WINDOWS
-		pd.backBuffer = NULL;
+		pd.nwh          = glfwNativeWindowHandle(_window);
+		pd.context      = NULL;
+		pd.backBuffer   = NULL;
 		pd.backBufferDS = NULL;
 		bgfx::setPlatformData(pd);
 	}
@@ -149,8 +158,8 @@ namespace entry
 		GamepadGLFW()
 			: m_connected(false)
 		{
-			memset(m_axes, 0, sizeof(m_axes));
-			memset(m_buttons, 0, sizeof(m_buttons));
+			bx::memSet(m_axes, 0, sizeof(m_axes));
+			bx::memSet(m_buttons, 0, sizeof(m_buttons));
 		}
 
 		void update(EventQueue& _eventQueue)
@@ -222,17 +231,6 @@ namespace entry
 
 		static int32_t threadFunc(void* _userData);
 	};
-
-	static void* glfwNativeWindowHandle(GLFWwindow* _window)
-	{
-#	if BX_PLATFORM_LINUX || BX_PLATFORM_BSD
-		return (void*)(uintptr_t)glfwGetX11Window(_window);
-#	elif BX_PLATFORM_OSX
-		return glfwGetCocoaWindow(_window);
-#	elif BX_PLATFORM_WINDOWS
-		return glfwGetWin32Window(_window);
-#	endif // BX_PLATFORM_
-	}
 
 	enum MsgType
 	{
@@ -312,7 +310,7 @@ namespace entry
 		Context()
 			: m_scrollPos(0.0)
 		{
-			memset(s_translateKey, 0, sizeof(s_translateKey));
+			bx::memSet(s_translateKey, 0, sizeof(s_translateKey));
 			s_translateKey[GLFW_KEY_ESCAPE]		  = Key::Esc;
 			s_translateKey[GLFW_KEY_ENTER]		  = Key::Return;
 			s_translateKey[GLFW_KEY_TAB]		  = Key::Tab;
@@ -395,13 +393,14 @@ namespace entry
 			m_mte.m_argv = _argv;
 
 			glfwSetErrorCallback(errorCb);
-			glfwSetJoystickCallback(joystickCb);
 
 			if (!glfwInit() )
 			{
 				DBG("glfwInit failed!");
 				return EXIT_FAILURE;
 			}
+
+			glfwSetJoystickCallback(joystickCb);
 
 			glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 
@@ -445,7 +444,7 @@ namespace entry
 			m_thread.init(MainThreadEntry::threadFunc, &m_mte);
 
 			while (NULL != m_windows[0]
-				&& !glfwWindowShouldClose(m_windows[0]))
+			&&     !glfwWindowShouldClose(m_windows[0]))
 			{
 				glfwWaitEvents();
 
@@ -590,7 +589,7 @@ namespace entry
 
 		WindowHandle findHandle(GLFWwindow* _window)
 		{
-			bx::LwMutexScope scope(m_lock);
+			bx::MutexScope scope(m_lock);
 			for (uint32_t ii = 0, num = m_windowAlloc.getNumHandles(); ii < num; ++ii)
 			{
 				uint16_t idx = m_windowAlloc.getHandleAt(ii);
@@ -616,14 +615,14 @@ namespace entry
 		bx::Thread m_thread;
 
 		EventQueue m_eventQueue;
-		bx::LwMutex m_lock;
+		bx::Mutex m_lock;
 
 		GLFWwindow* m_windows[ENTRY_CONFIG_MAX_WINDOWS];
 		bx::HandleAllocT<ENTRY_CONFIG_MAX_WINDOWS> m_windowAlloc;
 
 		GamepadGLFW m_gamepad[ENTRY_CONFIG_MAX_GAMEPADS];
 
-		bx::SpScUnboundedQueueLf<Msg> m_msgs;
+		bx::SpScUnboundedQueueT<Msg> m_msgs;
 
 		double m_scrollPos;
 	};

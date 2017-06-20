@@ -11,6 +11,8 @@
 #ifndef MAME_EMU_DEBUG_DVDISASM_H
 #define MAME_EMU_DEBUG_DVDISASM_H
 
+#pragma once
+
 #include "debugvw.h"
 
 #include "vecstream.h"
@@ -58,7 +60,6 @@ private:
 // debug view for disassembly
 class debug_view_disasm : public debug_view
 {
-	friend resource_pool_object<debug_view_disasm>::~resource_pool_object();
 	friend class debug_view_manager;
 
 	// construction/destruction
@@ -113,6 +114,5 @@ private:
 	static constexpr int DEFAULT_DASM_WIDTH = 50;
 	static constexpr int DASM_MAX_BYTES = 16;
 };
-
 
 #endif // MAME_EMU_DEBUG_DVDISASM_H

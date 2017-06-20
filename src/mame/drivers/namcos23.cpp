@@ -812,7 +812,7 @@ Notes:
       PIC16F84 - Microchip PIC16F84 PIC (SOIC20)
                   - For 500GP and Angler King stamped 'CAP10'
                   - For Ridge Racer V (on System 246) stamped 'CAP11'
-      MCU      - Fujitsu MB90F574 Microcontroller (QFP120)
+      MCU      - Fujitsu MB90F574 F2MC-16LX Family Microcontroller (QFP120)
                   - For 500 GP and Angler King stamped 'FCAF10'
                   - For Ridge Racer V (on System 246) stamped 'FCAF11'
       ADM485   - Analog Devices ADM485 +5V Low Power EIA RS-485 Transceiver (SOIC8)
@@ -1255,16 +1255,19 @@ Notes:
 */
 
 #include "emu.h"
-#include <float.h>
-#include "video/poly.h"
-#include "cpu/mips/mips3.h"
 #include "cpu/h8/h83002.h"
 #include "cpu/h8/h83337.h"
+#include "cpu/mips/mips3.h"
 #include "cpu/sh2/sh2.h"
-#include "sound/c352.h"
+#include "machine/namco_settings.h"
 #include "machine/nvram.h"
 #include "machine/rtc4543.h"
-#include "machine/namco_settings.h"
+#include "sound/c352.h"
+#include "video/poly.h"
+#include "speaker.h"
+
+#include <float.h>
+
 
 #define JVSCLOCK    (XTAL_14_7456MHz)
 
@@ -1562,7 +1565,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(interrupt);
 	TIMER_CALLBACK_MEMBER(c361_timer_cb);
-	void sub_irq(screen_device &screen, bool vblank_state);
+	DECLARE_WRITE_LINE_MEMBER(sub_irq);
 	uint8_t nthbyte(const uint32_t *pSource, int offs);
 	uint16_t nthword(const uint32_t *pSource, int offs);
 	inline int32_t u32_to_s24(uint32_t v);
@@ -2457,11 +2460,11 @@ INTERRUPT_GEN_MEMBER(namcos23_state::interrupt)
 	m_render.count[m_render.cur] = 0;
 }
 
-void namcos23_state::sub_irq(screen_device &screen, bool vblank_state)
+WRITE_LINE_MEMBER(namcos23_state::sub_irq)
 {
-	m_subcpu->set_input_line(1, vblank_state ? ASSERT_LINE : CLEAR_LINE);
-	m_adc->adtrg_w(vblank_state);
-	m_sub_portb = (m_sub_portb & 0x7f) | (vblank_state << 7);
+	m_subcpu->set_input_line(1, state ? ASSERT_LINE : CLEAR_LINE);
+	m_adc->adtrg_w(state);
+	m_sub_portb = (m_sub_portb & 0x7f) | (state << 7);
 }
 
 
@@ -3533,7 +3536,7 @@ static GFXDECODE_START( namcos23 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( gorgon, namcos23_state )
+static MACHINE_CONFIG_START( gorgon )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", R4650BE, BUSCLOCK*4)
@@ -3580,7 +3583,7 @@ static MACHINE_CONFIG_START( gorgon, namcos23_state )
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos23_state, screen_update)
-	MCFG_SCREEN_VBLANK_DRIVER(namcos23_state, sub_irq)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(namcos23_state, sub_irq))
 
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
@@ -3599,7 +3602,7 @@ static MACHINE_CONFIG_START( gorgon, namcos23_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( s23, namcos23_state )
+static MACHINE_CONFIG_START( s23 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", R4650BE, BUSCLOCK*4)
@@ -3646,7 +3649,7 @@ static MACHINE_CONFIG_START( s23, namcos23_state )
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos23_state, screen_update)
-	MCFG_SCREEN_VBLANK_DRIVER(namcos23_state, sub_irq)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(namcos23_state, sub_irq))
 
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
@@ -3685,7 +3688,7 @@ static MACHINE_CONFIG_DERIVED( gmen, s23 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( ss23, namcos23_state )
+static MACHINE_CONFIG_START( ss23 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", R4650BE, BUSCLOCK*5)
@@ -3723,7 +3726,7 @@ static MACHINE_CONFIG_START( ss23, namcos23_state )
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos23_state, screen_update)
-	MCFG_SCREEN_VBLANK_DRIVER(namcos23_state, sub_irq)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(namcos23_state, sub_irq))
 
 	MCFG_PALETTE_ADD("palette", 0x8000)
 

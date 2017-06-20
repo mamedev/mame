@@ -13,13 +13,17 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/asterix.h"
+#include "includes/konamipt.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
 #include "sound/ym2151.h"
 #include "sound/k053260.h"
-#include "includes/konamipt.h"
-#include "includes/asterix.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 #if 0
 READ16_MEMBER(asterix_state::control2_r)
@@ -253,7 +257,7 @@ void asterix_state::machine_reset()
 	}
 }
 
-static MACHINE_CONFIG_START( asterix, asterix_state )
+static MACHINE_CONFIG_START( asterix )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2) // 12MHz

@@ -173,7 +173,8 @@ int test_Snorm3x10_1x2()
 		glm::vec4 v0 = glm::unpackSnorm3x10_1x2(p0);
 		glm::uint32 p1 = glm::packSnorm3x10_1x2(v0);
 		glm::vec4 v1 = glm::unpackSnorm3x10_1x2(p1);
-		Error += glm::all(glm::equal(v0, v1)) ? 0 : 1;
+
+		Error += glm::all(glm::epsilonEqual(v0, v1, 0.01f)) ? 0 : 1;
 	}
 
 	return Error;
@@ -197,7 +198,8 @@ int test_Unorm3x10_1x2()
 		glm::vec4 v0 = glm::unpackUnorm3x10_1x2(p0);
 		glm::uint32 p1 = glm::packUnorm3x10_1x2(v0);
 		glm::vec4 v1 = glm::unpackUnorm3x10_1x2(p1);
-		Error += glm::all(glm::equal(v0, v1)) ? 0 : 1;
+
+		Error += glm::all(glm::epsilonEqual(v0, v1, 0.001f)) ? 0 : 1;
 	}
 
 	return Error;
@@ -673,6 +675,7 @@ int main()
 	Error += test_F3x9_E1x5();
 	Error += test_Snorm3x10_1x2();
 	Error += test_Unorm3x10_1x2();
+
 	Error += test_I3x10_1x2();
 	Error += test_U3x10_1x2();
 	Error += test_Half1x16();

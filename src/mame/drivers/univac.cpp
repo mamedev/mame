@@ -27,6 +27,7 @@
 #include "machine/nvram.h"
 #include "machine/z80ctc.h"
 #include "machine/z80dart.h"
+#include "screen.h"
 
 
 class univac_state : public driver_device
@@ -39,14 +40,15 @@ public:
 		, m_nvram(*this, "nvram")
 		, m_ctc(*this, "ctc")
 		, m_dart(*this, "dart")
+		, m_p_chargen(*this, "chargen")
 	{ }
 
 	DECLARE_READ8_MEMBER(vram_r);
 	DECLARE_WRITE8_MEMBER(vram_w);
 	DECLARE_WRITE8_MEMBER(port43_w);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 private:
-	const uint8_t *m_p_chargen;
 	bool m_screen_num;
 	uint8_t m_framecnt;
 	virtual void machine_start() override;
@@ -56,6 +58,7 @@ private:
 	required_device<nvram_device> m_nvram;
 	required_device<z80ctc_device> m_ctc;
 	required_device<z80dart_device> m_dart;
+	required_region_ptr<u8> m_p_chargen;
 };
 
 
@@ -108,7 +111,6 @@ void univac_state::machine_start()
 void univac_state::machine_reset()
 {
 	m_screen_num = 0;
-	m_p_chargen = memregion("chargen")->base();
 }
 
 uint32_t univac_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -165,7 +167,7 @@ static const z80_daisy_config daisy_chain[] =
 	{ nullptr }
 };
 
-static MACHINE_CONFIG_START( uts20, univac_state )
+static MACHINE_CONFIG_START( uts20 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz) // unknown clock
 	MCFG_CPU_PROGRAM_MAP(uts20_mem)
@@ -209,5 +211,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  CLASS           INIT     COMPANY            FULLNAME       FLAGS */
-COMP( 1980, uts20,  0,      0,       uts20,     uts20, driver_device,   0,      "Sperry Univac",   "UTS-20", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  CLASS           INIT    COMPANY            FULLNAME  FLAGS
+COMP( 1980, uts20,  0,      0,       uts20,     uts20, univac_state,   0,      "Sperry Univac",   "UTS-20", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

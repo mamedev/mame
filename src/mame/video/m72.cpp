@@ -2,6 +2,7 @@
 // copyright-holders:Nicola Salmoria
 #include "emu.h"
 #include "includes/m72.h"
+#include "cpu/nec/v25.h"
 
 /***************************************************************************
 
@@ -265,9 +266,6 @@ VIDEO_START_MEMBER(m72_state,poundfor)
 	m_bg_tilemap->set_scrolldx(6,0);
 	m_fg_tilemap->set_scrolldy(-128,-128);
 	m_bg_tilemap->set_scrolldy(-128,-128);
-
-	save_item(NAME(m_prev));
-	save_item(NAME(m_diff));
 }
 
 
@@ -344,8 +342,15 @@ WRITE16_MEMBER(m72_state::videoram2_w)
 
 WRITE16_MEMBER(m72_state::irq_line_w)
 {
-	COMBINE_DATA(&m_raster_irq_position);
+	// KNA70H015(11): ISET
+	m_raster_irq_position = data & 0x1ff;
 //  printf("m_raster_irq_position %04x\n", m_raster_irq_position);
+
+	// bchopper title screen jumps around, as does ingame at times, if this isn't done here
+	if (m_upd71059c.found())
+		m_upd71059c->ir2_w(0);
+	else
+		m_maincpu->set_input_line(NEC_INPUT_LINE_INTP2, CLEAR_LINE);
 }
 
 WRITE16_MEMBER(m72_state::scrollx1_w)
@@ -379,50 +384,55 @@ WRITE16_MEMBER(m72_state::dmaon_w)
 }
 
 
-WRITE16_MEMBER(m72_state::port02_w)
+WRITE8_MEMBER(m72_state::port02_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		if (data & 0xe0) logerror("write %02x to port 02\n",data);
+	if (data & 0xe0) logerror("write %02x to port 02\n",data);
 
-		/* bits 0/1 are coin counters */
-		machine().bookkeeping().coin_counter_w(0,data & 0x01);
-		machine().bookkeeping().coin_counter_w(1,data & 0x02);
+	/* bits 0/1 are coin counters */
+	machine().bookkeeping().coin_counter_w(0,data & 0x01);
+	machine().bookkeeping().coin_counter_w(1,data & 0x02);
 
-		/* bit 2 is flip screen (handled both by software and hardware) */
-		flip_screen_set(((data & 0x04) >> 2) ^ ((~ioport("DSW")->read() >> 8) & 1));
+	/* bit 2 is flip screen (handled both by software and hardware) */
+	flip_screen_set(((data & 0x04) >> 2) ^ ((~ioport("DSW")->read() >> 8) & 1));
 
-		/* bit 3 is display disable */
-		m_video_off = data & 0x08;
+	/* bit 3 is display disable */
+	m_video_off = data & 0x08;
 
-		/* bit 4 resets sound CPU (active low) */
-		if (data & 0x10)
-			m_soundcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-		else
-			m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	/* bit 4 resets sound CPU (active low) */
+	if (data & 0x10)
+		m_soundcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+	else
+		m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
-		/* bit 5 = "bank"? */
-	}
+	/* bit 5 = "bank"? */
 }
 
-WRITE16_MEMBER(m72_state::rtype2_port02_w)
+WRITE8_MEMBER(m72_state::rtype2_port02_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		if (data & 0xe0) logerror("write %02x to port 02\n",data);
+	if (data & 0xe0) logerror("write %02x to port 02\n",data);
 
-		/* bits 0/1 are coin counters */
-		machine().bookkeeping().coin_counter_w(0,data & 0x01);
-		machine().bookkeeping().coin_counter_w(1,data & 0x02);
+	/* bits 0/1 are coin counters */
+	machine().bookkeeping().coin_counter_w(0,data & 0x01);
+	machine().bookkeeping().coin_counter_w(1,data & 0x02);
 
-		/* bit 2 is flip screen (handled both by software and hardware) */
-		flip_screen_set(((data & 0x04) >> 2) ^ ((~ioport("DSW")->read() >> 8) & 1));
+	/* bit 2 is flip screen (handled both by software and hardware) */
+	flip_screen_set(((data & 0x04) >> 2) ^ ((~ioport("DSW")->read() >> 8) & 1));
 
-		/* bit 3 is display disable */
-		m_video_off = data & 0x08;
+	/* bit 3 is display disable */
+	m_video_off = data & 0x08;
 
-		/* other bits unknown */
-	}
+	/* other bits unknown */
+}
+
+WRITE8_MEMBER(m72_state::poundfor_port02_w)
+{
+	// bit 5 resets both uPD4701A?
+	m_upd4701[0]->resetx_w(BIT(data, 5));
+	m_upd4701[0]->resety_w(BIT(data, 5));
+	m_upd4701[1]->resetx_w(BIT(data, 5));
+	m_upd4701[1]->resety_w(BIT(data, 5));
+
+	rtype2_port02_w(space, 0, data & 0xbf);
 }
 
 

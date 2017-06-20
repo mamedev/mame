@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_QL_CST_QDISC_H
+#define MAME_BUS_QL_CST_QDISC_H
 
-#ifndef __CST_QL_DISC_INTERFACE__
-#define __CST_QL_DISC_INTERFACE__
+#pragma once
 
 #include "exp.h"
 
@@ -19,14 +19,14 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> cst_ql_disc_interface_t
+// ======================> cst_ql_disc_interface_device
 
-class cst_ql_disc_interface_t : public device_t,
+class cst_ql_disc_interface_device : public device_t,
 								public device_ql_expansion_card_interface
 {
 public:
 	// construction/destruction
-	cst_ql_disc_interface_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cst_ql_disc_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -44,7 +44,6 @@ protected:
 
 // device type definition
 extern const device_type CST_QL_DISC_INTERFACE;
+DECLARE_DEVICE_TYPE(CST_QL_DISC_INTERFACE, cst_ql_disc_interface_device)
 
-
-
-#endif
+#endif // MAME_BUS_QL_CST_QDISC_H

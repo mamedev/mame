@@ -107,17 +107,20 @@
 
 *******************************************************************************************/
 
-#define MAIN_CLOCK    XTAL_12MHz
-#define SEC_CLOCK     XTAL_14_31818MHz
-
-#define CPU_CLOCK     MAIN_CLOCK
-
-
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
 #include "machine/nvram.h"
+#include "screen.h"
+#include "speaker.h"
+
 #include "mil4000.lh"
+
+
+#define MAIN_CLOCK    XTAL_12MHz
+#define SEC_CLOCK     XTAL_14_31818MHz
+
+#define CPU_CLOCK     MAIN_CLOCK
 
 
 class mil4000_state : public driver_device
@@ -534,7 +537,7 @@ static GFXDECODE_START( mil4000 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( mil4000, mil4000_state )
+static MACHINE_CONFIG_START( mil4000 )
 	MCFG_CPU_ADD("maincpu", M68000, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(mil4000_map)
 	// irq 2/4/5 point to the same place, others invalid
@@ -556,7 +559,7 @@ static MACHINE_CONFIG_START( mil4000, mil4000_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mil4000)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH) // frequency from 1000 kHz resonator. pin 7 high not verified.
+	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH) // frequency from 1000 kHz resonator. pin 7 high not verified.
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -745,10 +748,10 @@ ROM_START( chewheel )
 ROM_END
 
 
-/*     YEAR  NAME      PARENT    MACHINE   INPUT    STATE          INIT    ROT     COMPANY              FULLNAME                              FLAGS                       LAYOUT  */
-GAMEL( 2000, mil4000,  0,        mil4000,  mil4000, driver_device, 0,      ROT0,  "Sure Milano",       "Millennium Nuovo 4000 (Version 2.0)", 0,                          layout_mil4000 )
-GAMEL( 2000, mil4000a, mil4000,  mil4000,  mil4000, driver_device, 0,      ROT0,  "Sure Milano",       "Millennium Nuovo 4000 (Version 1.8)", 0,                          layout_mil4000 )
-GAMEL( 2000, mil4000b, mil4000,  mil4000,  mil4000, driver_device, 0,      ROT0,  "Sure Milano",       "Millennium Nuovo 4000 (Version 1.5)", 0,                          layout_mil4000 )
-GAMEL( 2000, mil4000c, mil4000,  mil4000,  mil4000, driver_device, 0,      ROT0,  "Sure Milano",       "Millennium Nuovo 4000 (Version 1.6)", 0,                          layout_mil4000 )
-GAMEL( 200?, top21,    0,        mil4000,  mil4000, driver_device, 0,      ROT0,  "Assogiochi Assago", "Top XXI (Version 1.2)",               0,                          layout_mil4000 )
-GAMEL( 200?, chewheel, 0,        chewheel, mil4000, driver_device, 0,      ROT0,  "Assogiochi Assago", "Cherry Wheel (Version 1.7)",          MACHINE_UNEMULATED_PROTECTION, layout_mil4000 )
+//     YEAR  NAME      PARENT    MACHINE   INPUT    STATE          INIT    ROT     COMPANY              FULLNAME                              FLAGS                          LAYOUT
+GAMEL( 2000, mil4000,  0,        mil4000,  mil4000, mil4000_state, 0,      ROT0,  "Sure Milano",       "Millennium Nuovo 4000 (Version 2.0)", 0,                             layout_mil4000 )
+GAMEL( 2000, mil4000a, mil4000,  mil4000,  mil4000, mil4000_state, 0,      ROT0,  "Sure Milano",       "Millennium Nuovo 4000 (Version 1.8)", 0,                             layout_mil4000 )
+GAMEL( 2000, mil4000b, mil4000,  mil4000,  mil4000, mil4000_state, 0,      ROT0,  "Sure Milano",       "Millennium Nuovo 4000 (Version 1.5)", 0,                             layout_mil4000 )
+GAMEL( 2000, mil4000c, mil4000,  mil4000,  mil4000, mil4000_state, 0,      ROT0,  "Sure Milano",       "Millennium Nuovo 4000 (Version 1.6)", 0,                             layout_mil4000 )
+GAMEL( 200?, top21,    0,        mil4000,  mil4000, mil4000_state, 0,      ROT0,  "Assogiochi Assago", "Top XXI (Version 1.2)",               0,                             layout_mil4000 )
+GAMEL( 200?, chewheel, 0,        chewheel, mil4000, mil4000_state, 0,      ROT0,  "Assogiochi Assago", "Cherry Wheel (Version 1.7)",          MACHINE_UNEMULATED_PROTECTION, layout_mil4000 )

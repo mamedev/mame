@@ -12,19 +12,14 @@
 
 #include "emu.h"
 #include "nubus_radiustpd.h"
+#include "screen.h"
+
 
 #define RADIUSTPD_SCREEN_NAME "tpd_screen"
 #define RADIUSTPD_ROM_REGION  "tpd_rom"
 
 #define VRAM_SIZE   (0x40000)   // 256k.  1152x880 1 bit per pixel fits nicely.
 
-MACHINE_CONFIG_FRAGMENT( radiustpd )
-	MCFG_SCREEN_ADD( RADIUSTPD_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, nubus_radiustpd_device, screen_update)
-	MCFG_SCREEN_SIZE(1280, 960)
-	MCFG_SCREEN_REFRESH_RATE(70)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1152-1, 0, 880-1)
-MACHINE_CONFIG_END
 
 ROM_START( radiustpd )
 	ROM_REGION(0x8000, RADIUSTPD_ROM_REGION, 0)
@@ -35,18 +30,20 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type NUBUS_RADIUSTPD = &device_creator<nubus_radiustpd_device>;
+DEFINE_DEVICE_TYPE(NUBUS_RADIUSTPD, nubus_radiustpd_device, "nb_rtpd", "Radius Two Page Display video card")
 
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor nubus_radiustpd_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( radiustpd );
-}
+MACHINE_CONFIG_MEMBER( nubus_radiustpd_device::device_add_mconfig )
+	MCFG_SCREEN_ADD( RADIUSTPD_SCREEN_NAME, RASTER)
+	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, nubus_radiustpd_device, screen_update)
+	MCFG_SCREEN_SIZE(1280, 960)
+	MCFG_SCREEN_REFRESH_RATE(70)
+	MCFG_SCREEN_VISIBLE_AREA(0, 1152-1, 0, 880-1)
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -66,20 +63,19 @@ const tiny_rom_entry *nubus_radiustpd_device::device_rom_region() const
 //-------------------------------------------------
 
 nubus_radiustpd_device::nubus_radiustpd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, NUBUS_RADIUSTPD, "Radius Two Page Display video card", tag, owner, clock, "nb_rtpd", __FILE__),
-		device_video_interface(mconfig, *this),
-		device_nubus_card_interface(mconfig, *this), m_vram32(nullptr), m_mode(0), m_vbl_disable(0), m_toggle(0), m_count(0), m_clutoffs(0), m_timer(nullptr)
+	nubus_radiustpd_device(mconfig, NUBUS_RADIUSTPD, tag, owner, clock)
 {
-	m_assembled_tag = std::string(tag).append(":").append(RADIUSTPD_SCREEN_NAME);
-	m_screen_tag = m_assembled_tag.c_str();
+	(void)m_toggle;
+	(void)&m_colors[0];
 }
 
-nubus_radiustpd_device::nubus_radiustpd_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_video_interface(mconfig, *this),
-		device_nubus_card_interface(mconfig, *this), m_vram32(nullptr), m_mode(0), m_vbl_disable(0), m_toggle(0), m_count(0), m_clutoffs(0), m_timer(nullptr)
+nubus_radiustpd_device::nubus_radiustpd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	device_video_interface(mconfig, *this),
+	device_nubus_card_interface(mconfig, *this),
+	m_vram32(nullptr), m_mode(0), m_vbl_disable(0), m_toggle(0), m_count(0), m_clutoffs(0), m_timer(nullptr),
+	m_assembled_tag(util::string_format("%s:%s", tag, RADIUSTPD_SCREEN_NAME))
 {
-	m_assembled_tag = std::string(tag).append(":").append(RADIUSTPD_SCREEN_NAME);
 	m_screen_tag = m_assembled_tag.c_str();
 }
 

@@ -1,8 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
 #include "emu.h"
-#include "sound/ay8910.h"
 #include "audio/cclimber.h"
+
+#include "sound/ay8910.h"
 
 
 /* macro to convert 4-bit unsigned samples to 16-bit signed samples */
@@ -19,34 +20,19 @@ SAMPLES_START_CB_MEMBER( cclimber_audio_device::sh_start )
 	}
 }
 
-MACHINE_CONFIG_FRAGMENT( cclimber_audio )
-	MCFG_SOUND_ADD("aysnd", AY8910, SND_CLOCK/2)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(cclimber_audio_device, sample_select_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, ":speaker", 0.5)
-
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SAMPLES_CHANNELS(1)
-	MCFG_SAMPLES_START_CB(cclimber_audio_device, sh_start)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, ":speaker", 0.5)
-MACHINE_CONFIG_END
-
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CCLIMBER_AUDIO = &device_creator<cclimber_audio_device>;
+DEFINE_DEVICE_TYPE(CCLIMBER_AUDIO, cclimber_audio_device, "cclimber_audio", "Crazy Climber Sound Board")
 
-
-//**************************************************************************
-//  JSA IIIS-SPECIFIC IMPLEMENTATION
-//**************************************************************************
 
 //-------------------------------------------------
 //  cclimber_audio_device: Constructor
 //-------------------------------------------------
 
 cclimber_audio_device::cclimber_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, CCLIMBER_AUDIO, "Crazy Climber Sound Board", tag, owner, clock, "cclimber_audio", __FILE__),
+	: device_t(mconfig, CCLIMBER_AUDIO, tag, owner, clock),
 	m_sample_buf(nullptr),
 	m_sample_num(0),
 	m_sample_freq(0),
@@ -68,14 +54,20 @@ void cclimber_audio_device::device_start()
 }
 
 //-------------------------------------------------
-//  device_mconfig_additions - return a pointer to
-//  the device's machine fragment
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor cclimber_audio_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( cclimber_audio );
-}
+MACHINE_CONFIG_MEMBER( cclimber_audio_device::device_add_mconfig )
+	MCFG_SOUND_ADD("aysnd", AY8910, SND_CLOCK/2)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(cclimber_audio_device, sample_select_w))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, ":speaker", 0.5)
+
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(1)
+	MCFG_SAMPLES_START_CB(cclimber_audio_device, sh_start)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, ":speaker", 0.5)
+MACHINE_CONFIG_END
+
 
 WRITE8_MEMBER( cclimber_audio_device::sample_select_w )
 {

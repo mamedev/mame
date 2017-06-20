@@ -115,12 +115,15 @@ DIP locations verified for:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/punchout.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/m6502/n2a03.h"
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "rendlay.h"
-#include "includes/punchout.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /***************************************************************************
@@ -637,7 +640,7 @@ MACHINE_RESET_MEMBER(punchout_state, spnchout)
 }
 
 
-static MACHINE_CONFIG_START( punchout, punchout_state )
+static MACHINE_CONFIG_START( punchout )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz/2)
@@ -645,7 +648,7 @@ static MACHINE_CONFIG_START( punchout, punchout_state )
 	MCFG_CPU_IO_MAP(punchout_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("top", punchout_state, vblank_irq)
 
-	MCFG_CPU_ADD("audiocpu", N2A03, XTAL_21_4772MHz/12)
+	MCFG_CPU_ADD("audiocpu", N2A03, NTSC_APU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(punchout_sound_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("top", punchout_state, nmi_line_pulse)
 
@@ -678,7 +681,7 @@ static MACHINE_CONFIG_START( punchout, punchout_state )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("vlm", VLM5030, XTAL_21_4772MHz/6)
+	MCFG_SOUND_ADD("vlm", VLM5030, N2A03_NTSC_XTAL/6)
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, punchout_vlm_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 MACHINE_CONFIG_END
@@ -1339,11 +1342,11 @@ ROM_END
 
 
 
-GAME( 1984, punchout,  0,        punchout, punchout, driver_device, 0, ROT0, "Nintendo", "Punch-Out!! (Rev B)", 0 ) /* CHP1-02 boards */
-GAME( 1984, punchouta, punchout, punchout, punchout, driver_device, 0, ROT0, "Nintendo", "Punch-Out!! (Rev A)", 0 ) /* CHP1-01 boards */
-GAME( 1984, punchoutj, punchout, punchout, punchout, driver_device, 0, ROT0, "Nintendo", "Punch-Out!! (Japan)", 0 )
-GAME( 1984, punchita,  punchout, punchout, punchout, driver_device, 0, ROT0, "bootleg",  "Punch-Out!! (Italian bootleg)", 0 )
-GAME( 1984, spnchout,  0,        spnchout, spnchout, driver_device, 0, ROT0, "Nintendo", "Super Punch-Out!! (Rev B)", 0 ) /* CHP1-02 boards */
-GAME( 1984, spnchouta, spnchout, spnchout, spnchout, driver_device, 0, ROT0, "Nintendo", "Super Punch-Out!! (Rev A)", 0 ) /* CHP1-01 boards */
-GAME( 1984, spnchoutj, spnchout, spnchout, spnchout, driver_device, 0, ROT0, "Nintendo", "Super Punch-Out!! (Japan)", 0 )
-GAME( 1985, armwrest,  0,        armwrest, armwrest, driver_device, 0, ROT0, "Nintendo", "Arm Wrestling", 0 )
+GAME( 1984, punchout,  0,        punchout, punchout, punchout_state, 0, ROT0, "Nintendo", "Punch-Out!! (Rev B)", 0 ) /* CHP1-02 boards */
+GAME( 1984, punchouta, punchout, punchout, punchout, punchout_state, 0, ROT0, "Nintendo", "Punch-Out!! (Rev A)", 0 ) /* CHP1-01 boards */
+GAME( 1984, punchoutj, punchout, punchout, punchout, punchout_state, 0, ROT0, "Nintendo", "Punch-Out!! (Japan)", 0 )
+GAME( 1984, punchita,  punchout, punchout, punchout, punchout_state, 0, ROT0, "bootleg",  "Punch-Out!! (Italian bootleg)", 0 )
+GAME( 1984, spnchout,  0,        spnchout, spnchout, punchout_state, 0, ROT0, "Nintendo", "Super Punch-Out!! (Rev B)", 0 ) /* CHP1-02 boards */
+GAME( 1984, spnchouta, spnchout, spnchout, spnchout, punchout_state, 0, ROT0, "Nintendo", "Super Punch-Out!! (Rev A)", 0 ) /* CHP1-01 boards */
+GAME( 1984, spnchoutj, spnchout, spnchout, spnchout, punchout_state, 0, ROT0, "Nintendo", "Super Punch-Out!! (Japan)", 0 )
+GAME( 1985, armwrest,  0,        armwrest, armwrest, punchout_state, 0, ROT0, "Nintendo", "Arm Wrestling", 0 )

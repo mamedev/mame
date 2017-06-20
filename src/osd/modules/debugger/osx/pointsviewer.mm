@@ -6,6 +6,7 @@
 //
 //============================================================
 
+#include "emu.h"
 #import "pointsviewer.h"
 
 #import "breakpointsview.h"
@@ -72,6 +73,7 @@
 	[breakScroll setHasVerticalScroller:YES];
 	[breakScroll setAutohidesScrollers:YES];
 	[breakScroll setBorderType:NSNoBorder];
+	[breakScroll setDrawsBackground:NO];
 	[breakScroll setDocumentView:breakView];
 	[breakView release];
 	breakTab = [[NSTabViewItem alloc] initWithIdentifier:@""];
@@ -87,6 +89,7 @@
 	[watchScroll setHasVerticalScroller:YES];
 	[watchScroll setAutohidesScrollers:YES];
 	[watchScroll setBorderType:NSNoBorder];
+	[watchScroll setDrawsBackground:NO];
 	[watchScroll setDocumentView:watchView];
 	[watchView release];
 	watchTab = [[NSTabViewItem alloc] initWithIdentifier:@""];

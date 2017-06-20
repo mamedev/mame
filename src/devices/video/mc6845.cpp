@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Wilbert Pol
+// copyright-holders:Wilbert Pol, Bartman/Abyss (HD6345)
 /**********************************************************************
 
     Motorola MC6845 and compatible CRT controller emulation
@@ -41,23 +41,25 @@
 #include "emu.h"
 #include "mc6845.h"
 
+#include "screen.h"
 
-#define LOG     (0)
+//#define VERBOSE 1
+#include "logmacro.h"
 
 
-const device_type MC6845 = &device_creator<mc6845_device>;
-const device_type MC6845_1 = &device_creator<mc6845_1_device>;
-const device_type R6545_1 = &device_creator<r6545_1_device>;
-const device_type C6545_1 = &device_creator<c6545_1_device>;
-const device_type H46505 = &device_creator<h46505_device>;
-const device_type HD6845 = &device_creator<hd6845_device>;
-const device_type SY6545_1 = &device_creator<sy6545_1_device>;
-const device_type SY6845E = &device_creator<sy6845e_device>;
-const device_type HD6345 = &device_creator<hd6345_device>;
-const device_type AMS40041 = &device_creator<ams40041_device>;
-const device_type AMS40489 = &device_creator<ams40489_device>;
-const device_type MOS8563 = &device_creator<mos8563_device>;
-const device_type MOS8568 = &device_creator<mos8568_device>;
+DEFINE_DEVICE_TYPE(MC6845,   mc6845_device,   "mc6845",   "Motorola MC6845 CRTC")
+DEFINE_DEVICE_TYPE(MC6845_1, mc6845_1_device, "mc6845_1", "Motorola MC6845-1 CRTC")
+DEFINE_DEVICE_TYPE(R6545_1,  r6545_1_device,  "r6545_1",  "Rockwell R6545-1 CRTC")
+DEFINE_DEVICE_TYPE(C6545_1,  c6545_1_device,  "c6545_1",  "C6545-1 CRTC")
+DEFINE_DEVICE_TYPE(H46505,   h46505_device,   "h46505",   "Hitachi HD46505 CRTC")
+DEFINE_DEVICE_TYPE(HD6845,   hd6845_device,   "hd6845",   "Hitachi HD6845 CRTC")
+DEFINE_DEVICE_TYPE(SY6545_1, sy6545_1_device, "sy6545_1", "Synertek SY6545-1 CRTC")
+DEFINE_DEVICE_TYPE(SY6845E,  sy6845e_device,  "sy6845e",  "Synertek SY6845E CRTC")
+DEFINE_DEVICE_TYPE(HD6345,   hd6345_device,   "hd6345",   "Hitachi HD6345 CRTC")
+DEFINE_DEVICE_TYPE(AMS40041, ams40041_device, "ams40041", "AMS40041 CRTC")
+DEFINE_DEVICE_TYPE(AMS40489, ams40489_device, "ams40489", "AMS40489 ASIC (CRTC)")
+DEFINE_DEVICE_TYPE(MOS8563,  mos8563_device,  "mos8563",  "MOS 8563 VDC")
+DEFINE_DEVICE_TYPE(MOS8568,  mos8568_device,  "mos8568",  "MOS 8568 VDC")
 
 
 /* mode macros */
@@ -89,8 +91,8 @@ const device_type MOS8568 = &device_creator<mos8568_device>;
 #define ATTR_ALTERNATE_CHARSET      BIT(attr, 7)
 
 
-mc6845_device::mc6845_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+mc6845_device::mc6845_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock),
 		device_video_interface(mconfig, *this, false),
 		m_show_border_area(true),
 		m_interlace_adjust(0),
@@ -107,19 +109,7 @@ mc6845_device::mc6845_device(const machine_config &mconfig, device_type type, co
 }
 
 mc6845_device::mc6845_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MC6845, "MC6845 CRTC", tag, owner, clock, "mc6845", __FILE__),
-		device_video_interface(mconfig, *this, false),
-		m_show_border_area(true),
-		m_interlace_adjust(0),
-		m_visarea_adjust_min_x(0),
-		m_visarea_adjust_max_x(0),
-		m_visarea_adjust_min_y(0),
-		m_visarea_adjust_max_y(0),
-		m_hpixels_per_column(0),
-		m_out_de_cb(*this),
-		m_out_cur_cb(*this),
-		m_out_hsync_cb(*this),
-		m_out_vsync_cb(*this)
+	: mc6845_device(mconfig, MC6845, tag, owner, clock)
 {
 }
 
@@ -208,7 +198,7 @@ READ8_MEMBER( mc6845_device::register_r )
 
 WRITE8_MEMBER( mc6845_device::register_w )
 {
-	if (LOG)  logerror("%s:M6845 reg 0x%02x = 0x%02x\n", machine().describe_context(), m_register_address_latch, data);
+	LOG("%s:M6845 reg 0x%02x = 0x%02x\n", machine().describe_context(), m_register_address_latch, data);
 
 	switch (m_register_address_latch)
 	{
@@ -356,7 +346,7 @@ READ8_MEMBER( mos8563_device::register_r )
 
 WRITE8_MEMBER( mos8563_device::register_w )
 {
-	if (LOG)  logerror("%s:MOS8563 reg 0x%02x = 0x%02x\n", machine().describe_context(), m_register_address_latch, data);
+	LOG("%s:MOS8563 reg 0x%02x = 0x%02x\n", machine().describe_context(), m_register_address_latch, data);
 
 	switch (m_register_address_latch)
 	{
@@ -417,6 +407,60 @@ WRITE8_MEMBER( mos8563_device::register_w )
 	recompute_parameters(false);
 }
 
+WRITE8_MEMBER( hd6345_device::address_w )
+{
+	m_register_address_latch = data & 0x3f;
+}
+
+
+READ8_MEMBER( hd6345_device::register_r )
+{
+	uint8_t ret = 0xff;
+
+	switch (m_register_address_latch)
+	{
+		case 0x0c:  ret = m_supports_disp_start_addr_r ? (m_disp_start_addr >> 8) & 0xff : 0; break;
+		case 0x0d:  ret = m_supports_disp_start_addr_r ? (m_disp_start_addr >> 0) & 0xff : 0; break;
+		case 0x0e:  ret = (m_cursor_addr    >> 8) & 0xff; break;
+		case 0x0f:  ret = (m_cursor_addr    >> 0) & 0xff; break;
+		case 0x10:  ret = (m_light_pen_addr >> 8) & 0xff; m_light_pen_latched = false; break;
+		case 0x11:  ret = (m_light_pen_addr >> 0) & 0xff; m_light_pen_latched = false; break;
+		// TODO: REST
+	}
+
+	return ret;
+}
+
+WRITE8_MEMBER( hd6345_device::register_w )
+{
+	LOG("%s:HD6345 reg 0x%02x = 0x%02x\n", machine().describe_context(), m_register_address_latch, data);
+
+	switch (m_register_address_latch)
+	{
+		case 0x00:  m_horiz_char_total =   data & 0xff; break;
+		case 0x01:  m_horiz_disp       =   data & 0xff; break;
+		case 0x02:  m_horiz_sync_pos   =   data & 0xff; break;
+		case 0x03:  m_sync_width       =   data & 0xff; break;
+		case 0x04:  m_vert_char_total  =   data & 0xff; break;
+		case 0x05:  m_vert_total_adj   =   data & 0x1f; break;
+		case 0x06:  m_vert_disp        =   data & 0xff; break;
+		case 0x07:  m_vert_sync_pos    =   data & 0xff; break;
+		case 0x08:  m_mode_control     =   data & 0xff; break;
+		case 0x09:  m_max_ras_addr     =   data & 0x1f; break;
+		case 0x0a:  m_cursor_start_ras =   data & 0x7f; break;
+		case 0x0b:  m_cursor_end_ras   =   data & 0x1f; break;
+		case 0x0c:  m_disp_start_addr  = ((data & 0x3f) << 8) | (m_disp_start_addr & 0x00ff); break;
+		case 0x0d:  m_disp_start_addr  = ((data & 0xff) << 0) | (m_disp_start_addr & 0xff00); break;
+		case 0x0e:  m_cursor_addr      = ((data & 0x3f) << 8) | (m_cursor_addr & 0x00ff); break;
+		case 0x0f:  m_cursor_addr      = ((data & 0xff) << 0) | (m_cursor_addr & 0xff00); break;
+		case 0x10: /* read-only */ break;
+		case 0x11: /* read-only */ break;
+		// TODO: rest
+	}
+
+	recompute_parameters(false);
+}
+
 
 inline uint8_t mos8563_device::read_videoram(offs_t offset)
 {
@@ -438,12 +482,6 @@ READ_LINE_MEMBER( mc6845_device::de_r )
 READ_LINE_MEMBER( mc6845_device::cursor_r )
 {
 	return m_cur;
-}
-
-
-READ_LINE_MEMBER( mc6845_device::cursor_state_r )
-{
-	return m_cursor_state;
 }
 
 
@@ -537,7 +575,7 @@ void mc6845_device::recompute_parameters(bool postload)
 			else
 				visarea.set(0 + m_visarea_adjust_min_x, max_visible_x + m_visarea_adjust_max_x, 0 + m_visarea_adjust_min_y, max_visible_y + m_visarea_adjust_max_y);
 
-			if (LOG) logerror("M6845 config screen: HTOTAL: 0x%x  VTOTAL: 0x%x  MAX_X: 0x%x  MAX_Y: 0x%x  HSYNC: 0x%x-0x%x  VSYNC: 0x%x-0x%x  Freq: %ffps\n",
+			LOG("M6845 config screen: HTOTAL: %d  VTOTAL: %d  MAX_X: %d  MAX_Y: %d  HSYNC: %d-%d  VSYNC: %d-%d  Freq: %ffps\n",
 								horiz_pix_total, vert_pix_total, max_visible_x, max_visible_y, hsync_on_pos, hsync_off_pos - 1, vsync_on_pos, vsync_off_pos - 1, 1 / ATTOSECONDS_TO_DOUBLE(refresh));
 
 			if ( m_screen != nullptr )
@@ -954,7 +992,7 @@ uint8_t mc6845_device::draw_scanline(int y, bitmap_rgb32 &bitmap, const rectangl
 		uint8_t cr = y / (m_max_ras_addr + (MODE_INTERLACE_AND_VIDEO ? m_interlace_adjust : m_noninterlace_adjust));
 		uint16_t ma = (cr << 8) | cc;
 
-		m_update_row_cb(bitmap, cliprect, ma, ra, y, m_horiz_disp, cursor_x, de, hbp, vbp);
+		m_update_row_cb(bitmap, cliprect, ma + m_disp_start_addr, ra, y, m_horiz_disp, cursor_x, de, hbp, vbp);
 	}
 	else
 	{
@@ -988,7 +1026,7 @@ uint32_t mc6845_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 		}
 
 		/* for each row in the visible region */
-		for (uint16_t y = cliprect.min_y; y <= cliprect.max_y; y++)
+		for (uint16_t y = cliprect.min_y; y <= cliprect.max_y && y <= m_max_visible_y; y++)
 		{
 			this->draw_scanline(y, bitmap, cliprect);
 		}
@@ -999,7 +1037,7 @@ uint32_t mc6845_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	}
 	else
 	{
-		if (LOG)  logerror("M6845: Invalid screen parameters - display disabled!!!\n");
+		LOG("M6845: Invalid screen parameters - display disabled!!!\n");
 	}
 
 	return 0;
@@ -1226,7 +1264,7 @@ void hd6345_device::device_start()
 	m_supports_status_reg_d5 = true;
 	m_supports_status_reg_d6 = true;
 	m_supports_status_reg_d7 = true;
-	m_supports_transparent = true;
+	//m_supports_transparent = true;
 }
 
 
@@ -1278,7 +1316,7 @@ void mos8563_device::device_start()
 	m_update_ready_bit = 1;
 
 	// default update_row delegate
-	m_update_row_cb =  mc6845_update_row_delegate(FUNC(mos8563_device::vdc_update_row), this);
+	m_update_row_cb =  update_row_delegate(FUNC(mos8563_device::vdc_update_row), this);
 
 	m_char_blink_state = false;
 	m_char_blink_count = 0;
@@ -1391,8 +1429,8 @@ const address_space_config *mos8563_device::memory_space_config(address_spacenum
 {
 	switch (spacenum)
 	{
-		case AS_0: return &m_videoram_space_config;
-		default: return nullptr;
+	case AS_0: return &m_videoram_space_config;
+	default: return nullptr;
 	}
 }
 
@@ -1403,66 +1441,66 @@ ADDRESS_MAP_END
 
 
 r6545_1_device::r6545_1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mc6845_device(mconfig, R6545_1, "R6545-1 CRTC", tag, owner, clock, "r6545_1", __FILE__)
+	: mc6845_device(mconfig, R6545_1, tag, owner, clock)
 {
 }
 
 
 h46505_device::h46505_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mc6845_device(mconfig, H46505, "H46505 CRTC", tag, owner, clock, "h46505", __FILE__)
+	: mc6845_device(mconfig, H46505, tag, owner, clock)
 {
 }
 
 
 mc6845_1_device::mc6845_1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mc6845_device(mconfig, MC6845_1, "MC6845-1 CRTC", tag, owner, clock, "mc6845_1", __FILE__)
+	: mc6845_device(mconfig, MC6845_1, tag, owner, clock)
 {
 }
 
 
 hd6845_device::hd6845_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mc6845_device(mconfig, HD6845, "HD6845 CRTC", tag, owner, clock, "hd6845", __FILE__)
+	: mc6845_device(mconfig, HD6845, tag, owner, clock)
 {
 }
 
 
 c6545_1_device::c6545_1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mc6845_device(mconfig, C6545_1, "C6545-1 CRTC", tag, owner, clock, "c6545_1", __FILE__)
+	: mc6845_device(mconfig, C6545_1, tag, owner, clock)
 {
 }
 
 
 sy6545_1_device::sy6545_1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mc6845_device(mconfig, SY6545_1, "SY6545-1 CRTC", tag, owner, clock, "sy6545_1", __FILE__)
+	: mc6845_device(mconfig, SY6545_1, tag, owner, clock)
 {
 }
 
 
 sy6845e_device::sy6845e_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mc6845_device(mconfig, SY6845E, "SY6845E CRTC", tag, owner, clock, "sy6845e", __FILE__)
+	: mc6845_device(mconfig, SY6845E, tag, owner, clock)
 {
 }
 
 
 hd6345_device::hd6345_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mc6845_device(mconfig, HD6345, "HD6345 CRTC", tag, owner, clock, "hd6345", __FILE__)
+	: mc6845_device(mconfig, HD6345, tag, owner, clock)
 {
 }
 
 
 ams40041_device::ams40041_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mc6845_device(mconfig, AMS40041, "AMS40041 CRTC", tag, owner, clock, "ams40041", __FILE__)
+	: mc6845_device(mconfig, AMS40041, tag, owner, clock)
 {
 }
 
 ams40489_device::ams40489_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mc6845_device(mconfig, AMS40489, "AMS40489 ASIC (CRTC)", tag, owner, clock, "ams40489", __FILE__)
+	: mc6845_device(mconfig, AMS40489, tag, owner, clock)
 {
 }
 
 
-mos8563_device::mos8563_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: mc6845_device(mconfig, type, name, tag, owner, clock, shortname, source),
+mos8563_device::mos8563_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: mc6845_device(mconfig, type, tag, owner, clock),
 		device_memory_interface(mconfig, *this),
 		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, nullptr, *ADDRESS_MAP_NAME(mos8563_videoram_map)),
 		m_palette(*this, "palette")
@@ -1472,30 +1510,21 @@ mos8563_device::mos8563_device(const machine_config &mconfig, device_type type, 
 
 
 mos8563_device::mos8563_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mc6845_device(mconfig, MOS8563, "MOS8563", tag, owner, clock, "mos8563", __FILE__),
-		device_memory_interface(mconfig, *this),
-		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, nullptr, *ADDRESS_MAP_NAME(mos8563_videoram_map)),
-		m_palette(*this, "palette")
+	: mos8563_device(mconfig, MOS8563, tag, owner, clock)
 {
-	set_clock_scale(1.0/8);
 }
 
 
 mos8568_device::mos8568_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mos8563_device(mconfig, MOS8568, "MOS8568", tag, owner, clock, "mos8568", __FILE__)
+	: mos8563_device(mconfig, MOS8568, tag, owner, clock)
 {
 }
 
 
-static MACHINE_CONFIG_FRAGMENT(mos8563)
+MACHINE_CONFIG_MEMBER(mos8563_device::device_add_mconfig)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(mos8563_device, mos8563)
 MACHINE_CONFIG_END
-
-machine_config_constructor mos8563_device::device_mconfig_additions() const
-{
-		return MACHINE_CONFIG_NAME( mos8563 );
-}
 
 
 // VICE palette

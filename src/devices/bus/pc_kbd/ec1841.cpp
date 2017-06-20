@@ -11,6 +11,7 @@
 
 *********************************************************************/
 
+#include "emu.h"
 #include "ec1841.h"
 
 #define VERBOSE_DBG 0       /* general debug messages */
@@ -38,7 +39,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type PC_KBD_EC_1841 = &device_creator<ec_1841_keyboard_device>;
+DEFINE_DEVICE_TYPE(PC_KBD_EC_1841, ec_1841_keyboard_device, "kb_ec1841", "EC-1841 Keyboard")
 
 
 //-------------------------------------------------
@@ -62,36 +63,17 @@ const tiny_rom_entry *ec_1841_keyboard_device::device_rom_region() const
 
 
 //-------------------------------------------------
-//  ADDRESS_MAP( kb_io )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( ec_1841_keyboard_io, AS_IO, 8, ec_1841_keyboard_device )
-	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_WRITE(bus_w)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(p1_r, p1_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(p2_w)
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(t1_r)
-ADDRESS_MAP_END
-
-
-//-------------------------------------------------
-//  MACHINE_DRIVER( ec_1841_keyboard )
-//-------------------------------------------------
-
-static MACHINE_CONFIG_FRAGMENT( ec_1841_keyboard )
+MACHINE_CONFIG_MEMBER( ec_1841_keyboard_device::device_add_mconfig )
 	MCFG_CPU_ADD(I8048_TAG, I8048, XTAL_5_46MHz)
-	MCFG_CPU_IO_MAP(ec_1841_keyboard_io)
+	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(ec_1841_keyboard_device, bus_w))
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(ec_1841_keyboard_device, p1_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(ec_1841_keyboard_device, p1_w))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(ec_1841_keyboard_device, p2_w))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(ec_1841_keyboard_device, t1_r))
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor ec_1841_keyboard_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( ec_1841_keyboard );
-}
 
 
 //-------------------------------------------------
@@ -281,7 +263,7 @@ ioport_constructor ec_1841_keyboard_device::device_input_ports() const
 //-------------------------------------------------
 
 ec_1841_keyboard_device::ec_1841_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, PC_KBD_EC_1841, "EC-1841 Keyboard", tag, owner, clock, "kb_ec1841", __FILE__),
+	: device_t(mconfig, PC_KBD_EC_1841, tag, owner, clock),
 		device_pc_kbd_interface(mconfig, *this),
 		m_maincpu(*this, I8048_TAG),
 		m_kbd(*this, "MD%02u", 0),
@@ -437,7 +419,7 @@ WRITE8_MEMBER( ec_1841_keyboard_device::p2_w )
 //  t1_r -
 //-------------------------------------------------
 
-READ8_MEMBER( ec_1841_keyboard_device::t1_r )
+READ_LINE_MEMBER( ec_1841_keyboard_device::t1_r )
 {
 	if (BIT(m_p2,0)) {
 		m_q = 1;

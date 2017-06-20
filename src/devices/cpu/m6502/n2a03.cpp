@@ -2,7 +2,7 @@
 // copyright-holders:Olivier Galibert
 /***************************************************************************
 
-    m6502.c
+    n2a03.cpp
 
     6502, NES variant
 
@@ -11,7 +11,7 @@
 #include "emu.h"
 #include "n2a03.h"
 
-const device_type N2A03 = &device_creator<n2a03_device>;
+DEFINE_DEVICE_TYPE(N2A03, n2a03_device, "n2a03", "N2A03")
 
 READ8_MEMBER(n2a03_device::psg1_4014_r)
 {
@@ -50,7 +50,7 @@ ADDRESS_MAP_END
 
 
 n2a03_device::n2a03_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	m6502_device(mconfig, N2A03, "N2A03", tag, owner, clock, "n2a03", __FILE__),
+	m6502_device(mconfig, N2A03, tag, owner, clock),
 	m_apu(*this, "nesapu"),
 	m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0, ADDRESS_MAP_NAME(n2a03_map))
 {
@@ -129,17 +129,26 @@ const address_space_config *n2a03_device::memory_space_config(address_spacenum s
 	}
 }
 
-static MACHINE_CONFIG_FRAGMENT( n2a03_device )
+
+WRITE_LINE_MEMBER(n2a03_device::apu_irq)
+{
+	// games relying on the APU_IRQ don't seem to work anyway? (nes software list : timelord, mig29sf, firehawk)
+	set_input_line(N2A03_APU_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+READ8_MEMBER(n2a03_device::apu_read_mem)
+{
+	return mintf->program->read_byte(offset);
+}
+
+MACHINE_CONFIG_MEMBER( n2a03_device::device_add_mconfig )
 	MCFG_SOUND_ADD("nesapu", NES_APU, DERIVED_CLOCK(1,1) )
+	MCFG_NES_APU_IRQ_HANDLER(WRITELINE(n2a03_device, apu_irq))
+	MCFG_NES_APU_MEM_READ_CALLBACK(READ8(n2a03_device, apu_read_mem))
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, ":mono", 0.50)
 
 MACHINE_CONFIG_END
-
-machine_config_constructor n2a03_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( n2a03_device );
-}
 
 
 #include "cpu/m6502/n2a03.hxx"

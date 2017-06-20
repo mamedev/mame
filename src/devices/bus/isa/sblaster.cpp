@@ -11,11 +11,28 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "sblaster.h"
+
 #include "machine/pic8259.h"
-#include "sound/speaker.h"
 #include "sound/262intf.h"
+#include "sound/spkrdev.h"
 #include "sound/volt_reg.h"
+
+#include "speaker.h"
+
+#define SIXTEENBIT  0x01
+#define STEREO      0x02
+#define SIGNED      0x04
+#define ADPCM2      0x08
+#define ADPCM3      0x10
+#define ADPCM4      0x20
+
+#define IRQ_DMA8    0x01
+#define IRQ_DMA16   0x02
+#define IRQ_MPU     0x04
+#define IRQ_ALL     0xff
+
 
 /*
   adlib (YM3812/OPL2 chip), part of many many soundcards (soundblaster)
@@ -61,72 +78,6 @@ static const int m_cmd_fifo_length[256] =
 
 static const int protection_magic[4] = { 0x96, 0xa5, 0x69, 0x5a };
 
-static MACHINE_CONFIG_FRAGMENT( sblaster1_0_config )
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("ym3812", YM3812, ym3812_StdClock)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 3.00)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 3.00)
-	MCFG_SAA1099_ADD("saa1099.1", 7159090)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
-	MCFG_SAA1099_ADD("saa1099.2", 7159090)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
-
-	MCFG_SOUND_ADD("ldac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) // unknown DAC
-	MCFG_SOUND_ADD("rdac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
-
-	MCFG_PC_JOY_ADD("pc_joy")
-	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
-	MCFG_MIDI_RX_HANDLER(DEVWRITELINE(DEVICE_SELF, sb_device, midi_rx_w))
-
-	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_FRAGMENT( sblaster1_5_config )
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("ym3812", YM3812, ym3812_StdClock)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
-	/* no CM/S support (empty sockets) */
-
-	MCFG_SOUND_ADD("ldac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) // unknown DAC
-	MCFG_SOUND_ADD("rdac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
-
-	MCFG_PC_JOY_ADD("pc_joy")
-	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
-	MCFG_MIDI_RX_HANDLER(DEVWRITELINE(DEVICE_SELF, sb_device, midi_rx_w))
-
-	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_FRAGMENT( sblaster_16_config )
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("ymf262", YMF262, ymf262_StdClock)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
-	MCFG_SOUND_ROUTE(2, "lspeaker", 1.00)
-	MCFG_SOUND_ROUTE(3, "rspeaker", 1.00)
-
-	MCFG_SOUND_ADD("ldac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) // unknown DAC
-	MCFG_SOUND_ADD("rdac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
-
-	MCFG_PC_JOY_ADD("pc_joy")
-	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
-	MCFG_MIDI_RX_HANDLER(DEVWRITELINE(DEVICE_SELF, sb_device, midi_rx_w))
-
-	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
-MACHINE_CONFIG_END
-
 READ8_MEMBER( sb8_device::ym3812_16_r )
 {
 	uint8_t retVal = 0xff;
@@ -153,20 +104,12 @@ READ8_MEMBER( isa8_sblaster1_0_device::saa1099_16_r )
 
 WRITE8_MEMBER( isa8_sblaster1_0_device::saa1099_1_16_w )
 {
-	switch(offset)
-	{
-		case 0 : m_saa1099_1->data_w( space, offset, data ); break;
-		case 1 : m_saa1099_1->control_w( space, offset, data ); break;
-	}
+	m_saa1099_1->write(space, offset, data);
 }
 
 WRITE8_MEMBER( isa8_sblaster1_0_device::saa1099_2_16_w )
 {
-	switch(offset)
-	{
-		case 0 : m_saa1099_2->data_w( space, offset, data ); break;
-		case 1 : m_saa1099_2->control_w( space, offset, data ); break;
-	}
+	m_saa1099_2->write(space, offset, data);
 }
 
 void sb_device::queue(uint8_t data)
@@ -1189,36 +1132,86 @@ ioport_constructor sb16_device::device_input_ports() const
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ISA8_SOUND_BLASTER_1_0 = &device_creator<isa8_sblaster1_0_device>;
-const device_type ISA8_SOUND_BLASTER_1_5 = &device_creator<isa8_sblaster1_5_device>;
-const device_type ISA16_SOUND_BLASTER_16 = &device_creator<isa16_sblaster16_device>;
+DEFINE_DEVICE_TYPE(ISA8_SOUND_BLASTER_1_0, isa8_sblaster1_0_device, "isa_sblaster1_0", "Sound Blaster 1.0")
+DEFINE_DEVICE_TYPE(ISA8_SOUND_BLASTER_1_5, isa8_sblaster1_5_device, "isa_sblaster1_5", "Sound Blaster 1.5")
+DEFINE_DEVICE_TYPE(ISA16_SOUND_BLASTER_16, isa16_sblaster16_device, "isa_sblaster_16", "Sound Blaster 16")
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor isa8_sblaster1_0_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( sblaster1_0_config );
-}
+MACHINE_CONFIG_MEMBER( isa8_sblaster1_0_device::device_add_mconfig )
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SOUND_ADD("ym3812", YM3812, ym3812_StdClock)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 3.00)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 3.00)
+	MCFG_SAA1099_ADD("saa1099.1", 7159090)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	MCFG_SAA1099_ADD("saa1099.2", 7159090)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
-machine_config_constructor isa8_sblaster1_5_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( sblaster1_5_config );
-}
+	MCFG_SOUND_ADD("ldac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) // unknown DAC
+	MCFG_SOUND_ADD("rdac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
 
-machine_config_constructor isa16_sblaster16_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( sblaster_16_config );
-}
+	MCFG_PC_JOY_ADD("pc_joy")
+	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
+	MCFG_MIDI_RX_HANDLER(DEVWRITELINE(DEVICE_SELF, sb_device, midi_rx_w))
+
+	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_MEMBER( isa8_sblaster1_5_device::device_add_mconfig )
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SOUND_ADD("ym3812", YM3812, ym3812_StdClock)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
+	/* no CM/S support (empty sockets) */
+
+	MCFG_SOUND_ADD("ldac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) // unknown DAC
+	MCFG_SOUND_ADD("rdac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
+
+	MCFG_PC_JOY_ADD("pc_joy")
+	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
+	MCFG_MIDI_RX_HANDLER(DEVWRITELINE(DEVICE_SELF, sb_device, midi_rx_w))
+
+	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_MEMBER( isa16_sblaster16_device::device_add_mconfig )
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SOUND_ADD("ymf262", YMF262, ymf262_StdClock)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
+	MCFG_SOUND_ROUTE(2, "lspeaker", 1.00)
+	MCFG_SOUND_ROUTE(3, "rspeaker", 1.00)
+
+	MCFG_SOUND_ADD("ldac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) // unknown DAC
+	MCFG_SOUND_ADD("rdac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
+
+	MCFG_PC_JOY_ADD("pc_joy")
+	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
+	MCFG_MIDI_RX_HANDLER(DEVWRITELINE(DEVICE_SELF, sb_device, midi_rx_w))
+
+	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
+MACHINE_CONFIG_END
 
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
 
-sb_device::sb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const char *name, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+sb_device::sb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_serial_interface(mconfig, *this),
 	m_ldac(*this, "ldac"),
 	m_rdac(*this, "rdac"),
@@ -1228,15 +1221,15 @@ sb_device::sb_device(const machine_config &mconfig, device_type type, const char
 {
 }
 
-sb8_device::sb8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const char *name, const char *shortname, const char *source) :
-	sb_device(mconfig, type, tag, owner, clock, name, shortname, source),
+sb8_device::sb8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	sb_device(mconfig, type, tag, owner, clock),
 	device_isa8_card_interface(mconfig, *this),
 	m_ym3812(*this, "ym3812")
 {
 }
 
-sb16_device::sb16_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const char *name, const char *shortname, const char *source) :
-	sb_device(mconfig, type, tag, owner, clock, name, shortname, source),
+sb16_device::sb16_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	sb_device(mconfig, type, tag, owner, clock),
 	device_isa16_card_interface(mconfig, *this)
 {
 }
@@ -1246,19 +1239,19 @@ sb16_device::sb16_device(const machine_config &mconfig, device_type type, const 
 //-------------------------------------------------
 
 isa8_sblaster1_0_device::isa8_sblaster1_0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	sb8_device(mconfig, ISA8_SOUND_BLASTER_1_0, tag, owner, clock, "Sound Blaster 1.0", "isa_sblaster1_0", __FILE__),
+	sb8_device(mconfig, ISA8_SOUND_BLASTER_1_0, tag, owner, clock),
 	m_saa1099_1(*this, "saa1099.1"),
 	m_saa1099_2(*this, "saa1099.2")
 {
 }
 
 isa8_sblaster1_5_device::isa8_sblaster1_5_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	sb8_device(mconfig, ISA8_SOUND_BLASTER_1_5, tag, owner, clock, "Sound Blaster 1.5", "isa_sblaster1_5", __FILE__)
+	sb8_device(mconfig, ISA8_SOUND_BLASTER_1_5, tag, owner, clock)
 {
 }
 
 isa16_sblaster16_device::isa16_sblaster16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	sb16_device(mconfig, ISA16_SOUND_BLASTER_16, tag, owner, clock, "Sound Blaster 16", "isa_sblaster_16", __FILE__)
+	sb16_device(mconfig, ISA16_SOUND_BLASTER_16, tag, owner, clock)
 {
 }
 
@@ -1287,22 +1280,7 @@ void sb8_device::device_start()
 		m_isa->install_device(0x0228, 0x0229, read8_delegate( FUNC(sb8_device::ym3812_16_r), this ), write8_delegate( FUNC(sb8_device::ym3812_16_w), this ) );
 	}
 
-	m_timer = timer_alloc(0, nullptr);
-
-	save_item(NAME(m_dack_out));
-	save_item(NAME(m_onebyte_midi));
-	save_item(NAME(m_uart_midi));
-	save_item(NAME(m_uart_irq));
-	save_item(NAME(m_mpu_midi));
-	save_item(NAME(m_rx_waiting));
-	save_item(NAME(m_tx_waiting));
-	save_item(NAME(m_recvring));
-	save_item(NAME(m_xmitring));
-	save_item(NAME(m_xmit_read));
-	save_item(NAME(m_xmit_write));
-	save_item(NAME(m_recv_read));
-	save_item(NAME(m_recv_write));
-	save_item(NAME(m_tx_busy));
+	sb_device::device_start();
 }
 
 void isa8_sblaster1_0_device::device_start()
@@ -1328,19 +1306,16 @@ void isa8_sblaster1_5_device::device_start()
 void sb16_device::device_start()
 {
 	ymf262_device *ymf262 = subdevice<ymf262_device>("ymf262");
-
 	m_isa->install_device(0x0200, 0x0207, read8_delegate(FUNC(pc_joy_device::joy_port_r), subdevice<pc_joy_device>("pc_joy")), write8_delegate(FUNC(pc_joy_device::joy_port_w), subdevice<pc_joy_device>("pc_joy")));
-	m_isa->install_device(0x0224, 0x0225, read8_delegate(FUNC(sb16_device::mixer_r), this), write8_delegate(FUNC(sb16_device::mixer_w), this));
 	m_isa->install_device(0x0226, 0x0227, read8_delegate(FUNC(sb_device::dsp_reset_r), this), write8_delegate(FUNC(sb_device::dsp_reset_w), this));
 	m_isa->install_device(0x022a, 0x022b, read8_delegate(FUNC(sb_device::dsp_data_r), this), write8_delegate(FUNC(sb_device::dsp_data_w), this) );
 	m_isa->install_device(0x022c, 0x022d, read8_delegate(FUNC(sb_device::dsp_wbuf_status_r), this), write8_delegate(FUNC(sb_device::dsp_cmd_w), this) );
 	m_isa->install_device(0x022e, 0x022f, read8_delegate(FUNC(sb_device::dsp_rbuf_status_r), this), write8_delegate(FUNC(sb_device::dsp_rbuf_status_w), this) );
+	m_isa->install_device(0x0224, 0x0225, read8_delegate(FUNC(sb16_device::mixer_r), this), write8_delegate(FUNC(sb16_device::mixer_w), this));
 	m_isa->install_device(0x0330, 0x0331, read8_delegate(FUNC(sb16_device::mpu401_r), this), write8_delegate(FUNC(sb16_device::mpu401_w), this));
 	m_isa->install_device(0x0388, 0x038b, read8_delegate(FUNC(ymf262_device::read), ymf262), write8_delegate(FUNC(ymf262_device::write), ymf262));
 	m_isa->install_device(0x0220, 0x0223, read8_delegate(FUNC(ymf262_device::read), ymf262), write8_delegate(FUNC(ymf262_device::write), ymf262));
 	m_isa->install_device(0x0228, 0x0229, read8_delegate(FUNC(ymf262_device::read), ymf262), write8_delegate(FUNC(ymf262_device::write), ymf262));
-
-	m_timer = timer_alloc(0, nullptr);
 
 	save_item(NAME(m_mixer.data));
 	save_item(NAME(m_mixer.status));
@@ -1358,6 +1333,8 @@ void sb16_device::device_start()
 	save_item(NAME(m_mixer.agc));
 	save_item(NAME(m_mixer.treble));
 	save_item(NAME(m_mixer.bass));
+
+	sb_device::device_start();
 }
 
 void isa16_sblaster16_device::device_start()
@@ -1367,6 +1344,59 @@ void isa16_sblaster16_device::device_start()
 	m_isa->set_dma_channel(5, this, false);
 	m_dsp.version = 0x0405; // diagnose.exe rejects anything lower than 0x0402
 	sb16_device::device_start();
+}
+
+void sb_device::device_start()
+{
+	m_timer = timer_alloc(0, nullptr);
+
+	save_item(NAME(m_dack_out));
+	save_item(NAME(m_onebyte_midi));
+	save_item(NAME(m_uart_midi));
+	save_item(NAME(m_uart_irq));
+	save_item(NAME(m_mpu_midi));
+	save_item(NAME(m_rx_waiting));
+	save_item(NAME(m_tx_waiting));
+	save_item(NAME(m_recvring));
+	save_item(NAME(m_xmitring));
+	save_item(NAME(m_xmit_read));
+	save_item(NAME(m_xmit_write));
+	save_item(NAME(m_recv_read));
+	save_item(NAME(m_recv_write));
+	save_item(NAME(m_tx_busy));
+
+	save_item(NAME(m_dsp.reset_latch));
+	save_item(NAME(m_dsp.rbuf_status));
+	save_item(NAME(m_dsp.wbuf_status));
+	save_item(NAME(m_dsp.fifo));
+	save_item(NAME(m_dsp.fifo_ptr));
+	save_item(NAME(m_dsp.fifo_r));
+	save_item(NAME(m_dsp.fifo_r_ptr));
+
+	save_item(NAME(m_dsp.test_reg));
+	save_item(NAME(m_dsp.speaker_on));
+	save_item(NAME(m_dsp.dma_no_irq));
+	save_item(NAME(m_dsp.prot_count));
+	save_item(NAME(m_dsp.prot_value));
+	save_item(NAME(m_dsp.frequency));
+	save_item(NAME(m_dsp.adc_freq));
+	save_item(NAME(m_dsp.dma_length));
+	save_item(NAME(m_dsp.dma_transferred));
+	save_item(NAME(m_dsp.adc_length));
+	save_item(NAME(m_dsp.adc_transferred));
+	save_item(NAME(m_dsp.dma_autoinit));
+	save_item(NAME(m_dsp.data));
+	save_item(NAME(m_dsp.d_wptr));
+	save_item(NAME(m_dsp.d_rptr));
+	save_item(NAME(m_dsp.dma_timer_started));
+	save_item(NAME(m_dsp.dma_throttled));
+	save_item(NAME(m_dsp.flags));
+	save_item(NAME(m_dsp.irq_active));
+	save_item(NAME(m_dsp.adpcm_new_ref));
+	save_item(NAME(m_dsp.adpcm_ref));
+	save_item(NAME(m_dsp.adpcm_step));
+	save_item(NAME(m_dsp.adpcm_count));
+
 }
 
 //-------------------------------------------------
@@ -1383,9 +1413,13 @@ void sb_device::device_reset()
 	m_dsp.wbuf_status = 0;
 	m_dsp.rbuf_status = 0;
 	m_dsp.frequency = 8000; // per stereo-fx
+	m_dsp.flags = 0;
 	m_dsp.irq_active = 0;
 	m_dsp.dma_no_irq = false;
 	mixer_reset();
+
+	m_ldac->write(0x8000);
+	m_rdac->write(0x8000);
 
 	m_onebyte_midi = false;
 	m_uart_midi = false;

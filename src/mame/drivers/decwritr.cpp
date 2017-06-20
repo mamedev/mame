@@ -11,10 +11,12 @@
 // tech manual: http://manx.classiccmp.org/mirror/vt100.net/docs/la120-tm/la120tm1.pdf
 
 #include "emu.h"
-#include "render.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/i8251.h"
 #include "sound/beep.h"
+#include "render.h"
+#include "speaker.h"
+
 
 #define KBD_VERBOSE 1
 #define LED_VERBOSE 1
@@ -379,7 +381,7 @@ void decwriter_state::machine_reset()
 //  MACHINE DRIVERS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( la120, decwriter_state )
+static MACHINE_CONFIG_START( la120 )
 
 	MCFG_CPU_ADD("maincpu",I8080, XTAL_18MHz / 9) // 18Mhz xtal on schematics, using an i8224 clock divider/reset sanitizer IC
 	MCFG_CPU_PROGRAM_MAP(la120_mem)
@@ -436,5 +438,5 @@ ROM_END
 //**************************************************************************
 //  DRIVERS
 //**************************************************************************
-/*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS          INIT  COMPANY                          FULLNAME       FLAGS */
-COMP( 1978, la120, 0,      0,      la120,   la120, driver_device, 0,    "Digital Equipment Corporation", "DECwriter III (LA120)", MACHINE_NO_SOUND | MACHINE_IS_SKELETON | MACHINE_NOT_WORKING )
+/*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS            INIT  COMPANY                          FULLNAME       FLAGS */
+COMP( 1978, la120, 0,      0,      la120,   la120, decwriter_state, 0,    "Digital Equipment Corporation", "DECwriter III (LA120)", MACHINE_NO_SOUND | MACHINE_IS_SKELETON | MACHINE_NOT_WORKING )

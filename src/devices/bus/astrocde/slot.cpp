@@ -15,7 +15,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ASTROCADE_CART_SLOT = &device_creator<astrocade_cart_slot_device>;
+DEFINE_DEVICE_TYPE(ASTROCADE_CART_SLOT, astrocade_cart_slot_device, "astrocade_cart_slot", "Bally Astrocade Cartridge Slot")
 
 //**************************************************************************
 //    Astrocade Cartridges Interface
@@ -63,10 +63,10 @@ void device_astrocade_cart_interface::rom_alloc(uint32_t size, const char *tag)
 //  astrocade_cart_slot_device - constructor
 //-------------------------------------------------
 astrocade_cart_slot_device::astrocade_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-						device_t(mconfig, ASTROCADE_CART_SLOT, "Bally Astrocade Cartridge Slot", tag, owner, clock, "astrocade_cart_slot", __FILE__),
-						device_image_interface(mconfig, *this),
-						device_slot_interface(mconfig, *this),
-						m_type(ASTROCADE_STD), m_cart(nullptr)
+	device_t(mconfig, ASTROCADE_CART_SLOT, tag, owner, clock),
+	device_image_interface(mconfig, *this),
+	device_slot_interface(mconfig, *this),
+	m_type(ASTROCADE_STD), m_cart(nullptr)
 {
 }
 
@@ -86,18 +86,6 @@ astrocade_cart_slot_device::~astrocade_cart_slot_device()
 void astrocade_cart_slot_device::device_start()
 {
 	m_cart = dynamic_cast<device_astrocade_cart_interface *>(get_card_device());
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void astrocade_cart_slot_device::device_config_complete()
-{
-	// set brief and instance name
-	update_names();
 }
 
 
@@ -150,15 +138,15 @@ image_init_result astrocade_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		uint32_t size = (software_entry() == nullptr) ? length() : get_software_region_length("rom");
+		uint32_t size = !loaded_through_softlist() ? length() : get_software_region_length("rom");
 		m_cart->rom_alloc(size, tag());
 
-		if (software_entry() == nullptr)
+		if (!loaded_through_softlist())
 			fread(m_cart->get_rom_base(), size);
 		else
 			memcpy(m_cart->get_rom_base(), get_software_region("rom"), size);
 
-		if (software_entry() == nullptr)
+		if (!loaded_through_softlist())
 		{
 			m_type = ASTROCADE_STD;
 
@@ -187,12 +175,12 @@ image_init_result astrocade_cart_slot_device::call_load()
  get default card software
  -------------------------------------------------*/
 
-std::string astrocade_cart_slot_device::get_default_card_software()
+std::string astrocade_cart_slot_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
-	if (open_image_file(mconfig().options()))
+	if (hook.image_file())
 	{
 		const char *slot_string;
-		uint32_t size = m_file->size();
+		uint32_t size = hook.image_file()->size();
 		int type = ASTROCADE_STD;
 
 		if (size == 0x40000)
@@ -203,7 +191,6 @@ std::string astrocade_cart_slot_device::get_default_card_software()
 		slot_string = astrocade_get_slot(type);
 
 		//printf("type: %s\n", slot_string);
-		clear();
 
 		return std::string(slot_string);
 	}

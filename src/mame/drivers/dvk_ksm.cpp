@@ -68,6 +68,8 @@ ksm|DVK KSM,
 #include "machine/i8255.h"
 #include "machine/ms7004.h"
 #include "machine/pic8259.h"
+#include "screen.h"
+
 
 #define SCREEN_PAGE (80*48)
 
@@ -98,22 +100,24 @@ ksm|DVK KSM,
 class ksm_state : public driver_device
 {
 public:
-	ksm_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_p_videoram(*this, "videoram"),
-		m_maincpu(*this, "maincpu"),
-		m_pic8259(*this, "pic8259"),
-		m_i8251line(*this, "i8251line"),
-		m_rs232(*this, "rs232"),
-		m_i8251kbd(*this, "i8251kbd"),
-		m_ms7004(*this, "ms7004"),
-		m_screen(*this, "screen")
-	{ }
+	ksm_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_p_videoram(*this, "videoram")
+		, m_maincpu(*this, "maincpu")
+		, m_pic8259(*this, "pic8259")
+		, m_i8251line(*this, "i8251line")
+		, m_rs232(*this, "rs232")
+		, m_i8251kbd(*this, "i8251kbd")
+		, m_ms7004(*this, "ms7004")
+		, m_screen(*this, "screen")
+		, m_p_chargen(*this, "chargen")
+		{ }
+
+	TIMER_DEVICE_CALLBACK_MEMBER( scanline_callback );
 
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER( scanline_callback );
 
 	DECLARE_WRITE_LINE_MEMBER(write_keyboard_clock);
 	DECLARE_WRITE_LINE_MEMBER(write_line_clock);
@@ -126,21 +130,21 @@ private:
 	rectangle m_tmpclip;
 	bitmap_ind16 m_tmpbmp;
 
-	const uint8_t *m_p_chargen;
-	struct {
+	struct
+	{
 		uint8_t line;
 		uint16_t ptr;
 	} m_video;
 
-protected:
 	required_shared_ptr<uint8_t> m_p_videoram;
 	required_device<cpu_device> m_maincpu;
-	required_device<pic8259_device>  m_pic8259;
+	required_device<pic8259_device> m_pic8259;
 	required_device<i8251_device> m_i8251line;
 	required_device<rs232_port_device> m_rs232;
 	required_device<i8251_device> m_i8251kbd;
 	required_device<ms7004_device> m_ms7004;
 	required_device<screen_device> m_screen;
+	required_region_ptr<u8> m_p_chargen;
 };
 
 static ADDRESS_MAP_START( ksm_mem, AS_PROGRAM, 8, ksm_state )
@@ -209,21 +213,19 @@ void ksm_state::machine_reset()
 
 void ksm_state::video_start()
 {
-	m_p_chargen = memregion("chargen")->base();
-
-	m_tmpclip = rectangle(0, KSM_DISP_HORZ-1, 0, KSM_DISP_VERT-1);
+	m_tmpclip = rectangle(0, KSM_DISP_HORZ - 1, 0, KSM_DISP_VERT - 1);
 	m_tmpbmp.allocate(KSM_DISP_HORZ, KSM_DISP_VERT);
 }
 
 WRITE8_MEMBER(ksm_state::ksm_ppi_porta_w)
 {
-	DBG_LOG(1,"PPI port A", ("line %d\n", data));
+	DBG_LOG(1, "PPI port A", ("line %d\n", data));
 	m_video.line = data;
 }
 
 WRITE8_MEMBER(ksm_state::ksm_ppi_portc_w)
 {
-	DBG_LOG(1,"PPI port C", ("blink %d speed %d\n", BIT(data, 7), ((data >> 4) & 7) ));
+	DBG_LOG(1, "PPI port C", ("blink %d speed %d\n", BIT(data, 7), ((data >> 4) & 7)));
 }
 
 WRITE_LINE_MEMBER(ksm_state::write_keyboard_clock)
@@ -259,9 +261,12 @@ uint32_t ksm_state::draw_scanline(uint16_t *p, uint16_t offset, uint8_t scanline
 	uint8_t gfx, fg, bg, ra, blink;
 	uint16_t x, chr;
 
-	bg = 0; fg = 1; ra = scanline % 8;
+	bg = 0;
+	fg = 1;
+	ra = scanline % 8;
 	blink = (m_screen->frame_number() % 10) > 4;
-	if (scanline > 7) {
+	if (scanline > 7)
+	{
 		offset -= 0x2000;
 	}
 
@@ -270,8 +275,7 @@ uint32_t ksm_state::draw_scanline(uint16_t *p, uint16_t offset, uint8_t scanline
 		chr = m_p_videoram[x] << 3;
 		gfx = m_p_chargen[chr | ra];
 
-		if ((scanline > 7 && blink) || ((chr < (0x20<<3)) && !blink))
-			gfx = 0;
+		if ((scanline > 7 && blink) || ((chr < (0x20 << 3)) && !blink)) gfx = 0;
 
 		*p++ = BIT(gfx, 6) ? fg : bg;
 		*p++ = BIT(gfx, 5) ? fg : bg;
@@ -300,13 +304,16 @@ TIMER_DEVICE_CALLBACK_MEMBER(ksm_state::scanline_callback)
 	y -= KSM_VERT_START;
 	if (y >= KSM_DISP_VERT) return;
 
-	if (y < KSM_STATUSLINE_TOTAL) {
+	if (y < KSM_STATUSLINE_TOTAL)
+	{
 		offset = KSM_STATUSLINE_VRAM - 0xC000;
-	} else {
-		offset = 0x2000 + 0x30 + (((m_video.line + y/11 - 1) % 48) << 7);
+	}
+	else
+	{
+		offset = 0x2000 + 0x30 + (((m_video.line + y / 11 - 1) % 48) << 7);
 	}
 
-	draw_scanline(&m_tmpbmp.pix16(y), offset, y%11);
+	draw_scanline(&m_tmpbmp.pix16(y), offset, y % 11);
 }
 
 uint32_t ksm_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -334,7 +341,7 @@ static GFXDECODE_START( ksm )
 	GFXDECODE_ENTRY("chargen", 0x0000, ksm_charlayout, 0, 1)
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( ksm, ksm_state )
+static MACHINE_CONFIG_START( ksm )
 	MCFG_CPU_ADD("maincpu", I8080, XTAL_15_4MHz/10)
 	MCFG_CPU_PROGRAM_MAP(ksm_mem)
 	MCFG_CPU_IO_MAP(ksm_io)
@@ -398,5 +405,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    INIT                      COMPANY     FULLNAME       FLAGS */
-COMP( 1986, dvk_ksm,  0,      0,       ksm,       ksm,     driver_device,     0,     "USSR",     "DVK KSM",     0)
+/*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    STATE       INIT   COMPANY     FULLNAME       FLAGS */
+COMP( 1986, dvk_ksm,  0,      0,       ksm,       ksm,     ksm_state,  0,     "USSR",     "DVK KSM",     0)

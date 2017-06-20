@@ -18,6 +18,8 @@ TODO:
 #include "cpu/s2650/s2650.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "screen.h"
+#include "speaker.h"
 #include "quizshow.lh"
 
 
@@ -376,7 +378,7 @@ void quizshow_state::machine_reset()
 	m_tape_head_pos = 0;
 }
 
-static MACHINE_CONFIG_START( quizshow, quizshow_state )
+static MACHINE_CONFIG_START( quizshow )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", S2650, MASTER_CLOCK / 16) // divider guessed

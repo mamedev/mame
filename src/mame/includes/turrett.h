@@ -5,8 +5,13 @@
     Turret Tower hardware
 
 ****************************************************************************/
+#ifndef MAME_INCLUDES_TURRETT_H
+#define MAME_INCLUDES_TURRETT_H
+
+#pragma once
 
 #include "machine/ataintf.h"
+#include "screen.h"
 
 
 class turrett_state : public driver_device
@@ -127,4 +132,6 @@ private:
 };
 
 // device type definition
-const device_type TURRETT = &device_creator<turrett_device>;
+DECLARE_DEVICE_TYPE(TURRETT, turrett_device)
+
+#endif // MAME_INCLUDES_TURRETT_H

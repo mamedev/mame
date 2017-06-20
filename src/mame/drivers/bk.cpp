@@ -10,14 +10,18 @@
 
 
 #include "emu.h"
+#include "includes/bk.h"
+
 #include "cpu/t11/t11.h"
 #include "sound/wave.h"
-#include "includes/bk.h"
-#include "imagedev/cassette.h"
 #include "formats/rk_cas.h"
-#include "softlist.h"
 
-	/* Address maps */
+#include "screen.h"
+#include "softlist.h"
+#include "speaker.h"
+
+
+/* Address maps */
 static ADDRESS_MAP_START(bk0010_mem, AS_PROGRAM, 16, bk_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x3fff ) AM_RAM  // RAM
@@ -158,7 +162,7 @@ static INPUT_PORTS_START( bk0010 )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( bk0010, bk_state )
+static MACHINE_CONFIG_START( bk0010 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", T11, 3000000)
 	MCFG_T11_INITIAL_MODE(0x36ff)          /* initial mode word has DAL15,14,11,8 pulled low */
@@ -229,8 +233,8 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT       INIT    COMPANY                  FULLNAME   FLAGS */
-COMP( 1985, bk0010,     0,       0, bk0010,     bk0010, driver_device,  0,      "Elektronika",           "BK 0010",  0)
-COMP( 1986, bk001001,   bk0010,  0, bk0010,     bk0010, driver_device,  0,      "Elektronika",           "BK 0010-01",   0)
-COMP( 1986, bk0010fd,   bk0010,  0, bk0010fd,   bk0010, driver_device,  0,      "Elektronika",           "BK 0010 FDD",  MACHINE_NOT_WORKING)
-COMP( 1986, bk0011m,    bk0010,  0, bk0010fd,   bk0010, driver_device,  0,      "Elektronika",           "BK 0011M",     MACHINE_NOT_WORKING)
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   STATE      INIT    COMPANY        FULLNAME        FLAGS */
+COMP( 1985, bk0010,     0,       0, bk0010,     bk0010, bk_state,  0,      "Elektronika", "BK 0010",      0)
+COMP( 1986, bk001001,   bk0010,  0, bk0010,     bk0010, bk_state,  0,      "Elektronika", "BK 0010-01",   0)
+COMP( 1986, bk0010fd,   bk0010,  0, bk0010fd,   bk0010, bk_state,  0,      "Elektronika", "BK 0010 FDD",  MACHINE_NOT_WORKING)
+COMP( 1986, bk0011m,    bk0010,  0, bk0010fd,   bk0010, bk_state,  0,      "Elektronika", "BK 0011M",     MACHINE_NOT_WORKING)

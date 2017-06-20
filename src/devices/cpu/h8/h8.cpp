@@ -15,8 +15,8 @@
 #include "h8_dma.h"
 #include "h8_dtc.h"
 
-h8_device::h8_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, bool mode_a16, address_map_delegate map_delegate) :
-	cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
+h8_device::h8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool mode_a16, address_map_delegate map_delegate) :
+	cpu_device(mconfig, type, tag, owner, clock),
 	program_config("program", ENDIANNESS_BIG, 16, mode_a16 ? 16 : 24, 0, map_delegate),
 	io_config("io", ENDIANNESS_BIG, 16, 16, -1), program(nullptr), io(nullptr), direct(nullptr), PPC(0), NPC(0), PC(0), PIR(0), EXR(0), CCR(0), MAC(0), MACF(0),
 	TMP1(0), TMP2(0), TMPR(0), inst_state(0), inst_substate(0), icount(0), bcount(0), irq_vector(0), taken_irq_vector(0), irq_level(0), taken_irq_level(0), irq_required(false), irq_nmi(false)
@@ -145,9 +145,9 @@ void h8_device::set_current_dma(h8_dma_state *state)
 	if(!state)
 		logerror("DMA done\n");
 	else
-		logerror("New current dma s=%x d=%x is=%d id=%d count=%x m=%d\n",
+		logerror("New current dma s=%x d=%x is=%d id=%d count=%x m=%d autoreq=%d\n",
 					state->source, state->dest, state->incs, state->incd,
-					state->count, state->mode_16 ? 16 : 8);
+					state->count, state->mode_16 ? 16 : 8, state->autoreq);
 
 }
 
@@ -620,7 +620,7 @@ void h8_device::prefetch_done()
 	if(requested_state != -1) {
 		inst_state = requested_state;
 		requested_state = -1;
-	} else if(current_dma)
+	} else if(current_dma && !current_dma->suspended)
 		inst_state = STATE_DMA;
 	else if(current_dtc)
 		inst_state = STATE_DTC;

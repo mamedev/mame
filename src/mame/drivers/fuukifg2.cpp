@@ -46,11 +46,13 @@ To Do:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/fuukifg2.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/2203intf.h"
 #include "sound/3812intf.h"
-#include "includes/fuukifg2.h"
+#include "speaker.h"
 
 
 /***************************************************************************
@@ -73,15 +75,12 @@ WRITE16_MEMBER(fuuki16_state::vregs_w)
 	}
 }
 
-WRITE16_MEMBER(fuuki16_state::sound_command_w)
+WRITE8_MEMBER( fuuki16_state::sound_command_w )
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		m_soundlatch->write(space,0,data & 0xff);
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_soundlatch->write(space,0,data & 0xff);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 //      space.device().execute().spin_until_time(attotime::from_usec(50));   // Allow the other CPU to reply
-		machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(50)); // Fixes glitching in rasters
-	}
+	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(50)); // Fixes glitching in rasters
 }
 
 static ADDRESS_MAP_START( fuuki16_map, AS_PROGRAM, 16, fuuki16_state )
@@ -96,7 +95,7 @@ static ADDRESS_MAP_START( fuuki16_map, AS_PROGRAM, 16, fuuki16_state )
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x810000, 0x810001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x880000, 0x880001) AM_READ_PORT("DSW")
-	AM_RANGE(0x8a0000, 0x8a0001) AM_WRITE(sound_command_w)                                          // To Sound CPU
+	AM_RANGE(0x8a0000, 0x8a0001) AM_WRITE8(sound_command_w, 0x00ff)                                          // To Sound CPU
 	AM_RANGE(0x8c0000, 0x8c001f) AM_RAM_WRITE(vregs_w) AM_SHARE("vregs")                        // Video Registers
 	AM_RANGE(0x8d0000, 0x8d0003) AM_RAM AM_SHARE("unknown")                                         //
 	AM_RANGE(0x8e0000, 0x8e0001) AM_RAM AM_SHARE("priority")                                            //
@@ -439,7 +438,7 @@ void fuuki16_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( fuuki16, fuuki16_state )
+static MACHINE_CONFIG_START( fuuki16 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz / 2) /* 16 MHz */
@@ -479,7 +478,7 @@ static MACHINE_CONFIG_START( fuuki16, fuuki16_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_32MHz / 32, OKIM6295_PIN7_HIGH) /* 1 Mhz */
+	MCFG_OKIM6295_ADD("oki", XTAL_32MHz / 32, PIN7_HIGH) /* 1 Mhz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.85)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.85)
 MACHINE_CONFIG_END
@@ -666,6 +665,6 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1995, gogomile,  0,        fuuki16, gogomile,  driver_device, 0, ROT0, "Fuuki", "Susume! Mile Smile / Go Go! Mile Smile (newer)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, gogomileo, gogomile, fuuki16, gogomileo, driver_device, 0, ROT0, "Fuuki", "Susume! Mile Smile / Go Go! Mile Smile (older)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, pbancho,   0,        fuuki16, pbancho,   driver_device, 0, ROT0, "Fuuki", "Gyakuten!! Puzzle Bancho (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, gogomile,  0,        fuuki16, gogomile,  fuuki16_state, 0, ROT0, "Fuuki", "Susume! Mile Smile / Go Go! Mile Smile (newer)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, gogomileo, gogomile, fuuki16, gogomileo, fuuki16_state, 0, ROT0, "Fuuki", "Susume! Mile Smile / Go Go! Mile Smile (older)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, pbancho,   0,        fuuki16, pbancho,   fuuki16_state, 0, ROT0, "Fuuki", "Gyakuten!! Puzzle Bancho (Japan)",               MACHINE_SUPPORTS_SAVE )

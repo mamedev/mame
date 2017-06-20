@@ -22,7 +22,13 @@
 #ifndef SOL_VERSION_HPP
 #define SOL_VERSION_HPP
 
+#ifdef SOL_USING_CXX_LUA
+#include <lua.h>
+#include <lualib.h>
+#include <lauxlib.h>
+#else
 #include <lua.hpp>
+#endif // C++-compiler Lua
 
 #if defined(_WIN32) || defined(_MSC_VER)
 #ifndef SOL_CODECVT_SUPPORT

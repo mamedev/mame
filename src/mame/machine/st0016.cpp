@@ -2,9 +2,12 @@
 // copyright-holders:Tomasz Slanina, David Haywood
 /* ST0016 - CPU (z80) + Sound + Video */
 
+#include "emu.h"
 #include "st0016.h"
+#include "speaker.h"
 
-const device_type ST0016_CPU = &device_creator<st0016_cpu_device>;
+
+DEFINE_DEVICE_TYPE(ST0016_CPU, st0016_cpu_device, "st0016_cpu", "ST0016")
 
 static ADDRESS_MAP_START(st0016_cpu_internal_map, AS_PROGRAM, 8, st0016_cpu_device)
 	AM_RANGE(0xc000, 0xcfff) AM_READ(st0016_sprite_ram_r) AM_WRITE(st0016_sprite_ram_w)
@@ -27,7 +30,7 @@ ADDRESS_MAP_END
 // note: a lot of bits are left uninitialized by the games, the default values are uncertain
 
 st0016_cpu_device::st0016_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: z80_device(mconfig, ST0016_CPU, "ST0016", tag, owner, clock, "st0016_cpu", __FILE__),
+	: z80_device(mconfig, ST0016_CPU, tag, owner, clock),
 		device_gfx_interface(mconfig, *this, nullptr, "palette"),
 		st0016_spr_bank(0),
 		st0016_spr2_bank(0),
@@ -103,7 +106,7 @@ READ8_MEMBER(st0016_cpu_device::soundram_read)
 }
 
 /* CPU interface */
-static MACHINE_CONFIG_FRAGMENT( st0016_cpu )
+MACHINE_CONFIG_MEMBER( st0016_cpu_device::device_add_mconfig )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_PALETTE_ADD("palette", 16*16*4+1)
@@ -114,17 +117,6 @@ static MACHINE_CONFIG_FRAGMENT( st0016_cpu )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 MACHINE_CONFIG_END
-
-machine_config_constructor st0016_cpu_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( st0016_cpu );
-}
-
-
-
-
-
-
 
 
 static const gfx_layout charlayout =
@@ -145,8 +137,8 @@ WRITE8_MEMBER(st0016_cpu_device::st0016_sprite_bank_w)
         xxxx - spriteram  bank1
     xxxx     - spriteram  bank2
 */
-	st0016_spr_bank=data&ST0016_SPR_BANK_MASK;
-	st0016_spr2_bank=(data>>4)&ST0016_SPR_BANK_MASK;
+	st0016_spr_bank=data&SPR_BANK_MASK;
+	st0016_spr2_bank=(data>>4)&SPR_BANK_MASK;
 }
 
 WRITE8_MEMBER(st0016_cpu_device::st0016_palette_bank_w)
@@ -156,7 +148,7 @@ WRITE8_MEMBER(st0016_cpu_device::st0016_palette_bank_w)
           xx - palram  bank
     xxxxxx   - unknown/unused
 */
-	st0016_pal_bank=data&ST0016_PAL_BANK_MASK;
+	st0016_pal_bank=data&PAL_BANK_MASK;
 }
 
 WRITE8_MEMBER(st0016_cpu_device::st0016_character_bank_w)
@@ -171,40 +163,40 @@ WRITE8_MEMBER(st0016_cpu_device::st0016_character_bank_w)
 	else
 		st0016_char_bank=(st0016_char_bank&0xff00)|data;
 
-	st0016_char_bank&=ST0016_CHAR_BANK_MASK;
+	st0016_char_bank&=CHAR_BANK_MASK;
 }
 
 
 READ8_MEMBER(st0016_cpu_device::st0016_sprite_ram_r)
 {
-	return st0016_spriteram[ST0016_SPR_BANK_SIZE*st0016_spr_bank+offset];
+	return st0016_spriteram[SPR_BANK_SIZE*st0016_spr_bank+offset];
 }
 
 WRITE8_MEMBER(st0016_cpu_device::st0016_sprite_ram_w)
 {
-	st0016_spriteram[ST0016_SPR_BANK_SIZE*st0016_spr_bank+offset]=data;
+	st0016_spriteram[SPR_BANK_SIZE*st0016_spr_bank+offset]=data;
 }
 
 READ8_MEMBER(st0016_cpu_device::st0016_sprite2_ram_r)
 {
-	return st0016_spriteram[ST0016_SPR_BANK_SIZE*st0016_spr2_bank+offset];
+	return st0016_spriteram[SPR_BANK_SIZE*st0016_spr2_bank+offset];
 }
 
 WRITE8_MEMBER(st0016_cpu_device::st0016_sprite2_ram_w)
 {
-	st0016_spriteram[ST0016_SPR_BANK_SIZE*st0016_spr2_bank+offset]=data;
+	st0016_spriteram[SPR_BANK_SIZE*st0016_spr2_bank+offset]=data;
 }
 
 READ8_MEMBER(st0016_cpu_device::st0016_palette_ram_r)
 {
-	return st0016_paletteram[ST0016_PAL_BANK_SIZE*st0016_pal_bank+offset];
+	return st0016_paletteram[PAL_BANK_SIZE*st0016_pal_bank+offset];
 }
 
 WRITE8_MEMBER(st0016_cpu_device::st0016_palette_ram_w)
 {
-	int color=(ST0016_PAL_BANK_SIZE*st0016_pal_bank+offset)/2;
+	int color=(PAL_BANK_SIZE*st0016_pal_bank+offset)/2;
 	int val;
-	st0016_paletteram[ST0016_PAL_BANK_SIZE*st0016_pal_bank+offset]=data;
+	st0016_paletteram[PAL_BANK_SIZE*st0016_pal_bank+offset]=data;
 	val=st0016_paletteram[color*2]+(st0016_paletteram[color*2+1]<<8);
 	if(!color)
 		palette().set_pen_color(UNUSED_PEN,pal5bit(val >> 0),pal5bit(val >> 5),pal5bit(val >> 10)); /* same as color 0 - bg ? */
@@ -213,12 +205,12 @@ WRITE8_MEMBER(st0016_cpu_device::st0016_palette_ram_w)
 
 READ8_MEMBER(st0016_cpu_device::st0016_character_ram_r)
 {
-	return m_charram[ST0016_CHAR_BANK_SIZE*st0016_char_bank+offset];
+	return m_charram[CHAR_BANK_SIZE*st0016_char_bank+offset];
 }
 
 WRITE8_MEMBER(st0016_cpu_device::st0016_character_ram_w)
 {
-	m_charram[ST0016_CHAR_BANK_SIZE*st0016_char_bank+offset]=data;
+	m_charram[CHAR_BANK_SIZE*st0016_char_bank+offset]=data;
 	gfx(st0016_ramgfx)->mark_dirty(st0016_char_bank);
 }
 
@@ -255,7 +247,7 @@ READ8_MEMBER(st0016_cpu_device::st0016_vregs_r)
 READ8_MEMBER(st0016_cpu_device::st0016_dma_r)
 {
 	/* bits 0 and 1 = 0 -> DMA transfer complete */
-	if(ISMACS)
+	if(ismacs())
 		return 0;
 	else
 		return 0;
@@ -310,7 +302,7 @@ WRITE8_MEMBER(st0016_cpu_device::st0016_vregs_w)
 
 		while(length>0)
 		{
-			if( srcadr < srclen && (dstadr < ST0016_MAX_CHAR_BANK*ST0016_CHAR_BANK_SIZE))
+			if( srcadr < srclen && (dstadr < MAX_CHAR_BANK*CHAR_BANK_SIZE))
 			{
 				st0016_char_bank=dstadr>>5;
 				st0016_character_ram_w(space,dstadr&0x1f,mem[srcadr]);
@@ -383,7 +375,7 @@ void st0016_cpu_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip
 	int i, j, lx, ly, x, y, code, offset, length, sx, sy, color, flipx, flipy, scrollx, scrolly/*,plx,ply*/;
 
 
-	for (i = 0; i < ST0016_SPR_BANK_SIZE*ST0016_MAX_SPR_BANK; i += 8)
+	for (i = 0; i < SPR_BANK_SIZE*MAX_SPR_BANK; i += 8)
 	{
 		x = st0016_spriteram[i + 4] + ((st0016_spriteram[i + 5] & 3) << 8);
 		y = st0016_spriteram[i + 6] + ((st0016_spriteram[i + 7] & 3) << 8);
@@ -395,7 +387,7 @@ void st0016_cpu_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip
 		scrollx = (st0016_vregs[(((st0016_spriteram[i + 1] & 0x0f) >> 1) << 2) + 0x40] + 256 * st0016_vregs[(((st0016_spriteram[i + 1] & 0x0f) >> 1) << 2) + 1 + 0x40]) & 0x3ff;
 		scrolly = (st0016_vregs[(((st0016_spriteram[i + 1] & 0x0f) >> 1) << 2) + 2 + 0x40] + 256 * st0016_vregs[(((st0016_spriteram[i + 1] & 0x0f) >> 1) << 2) + 3 + 0x40]) & 0x3ff;
 
-		if (!ISMACS)
+		if (!ismacs())
 		{
 			if (x & 0x200) x -= 0x400; //sign
 			if (y & 0x200) y -= 0x400;
@@ -404,7 +396,7 @@ void st0016_cpu_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip
 			if (scrolly & 0x200) scrolly -= 0x400;
 		}
 
-		if (ISMACS1)
+		if (ismacs1())
 		{
 			if (x & 0x200) x -= 0x400; //sign
 			if (y & 0x200) y -= 0x2b0;//0x400;
@@ -416,7 +408,7 @@ void st0016_cpu_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip
 		x += scrollx;
 		y += scrolly;
 
-		if (ISMACS)
+		if (ismacs())
 		{
 			y += 0x20;
 		}
@@ -432,7 +424,7 @@ void st0016_cpu_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip
 		//plx=(st0016_spriteram[i+5]>>2)&0x3;
 		//ply=(st0016_spriteram[i+7]>>2)&0x3;
 
-		if (offset < ST0016_SPR_BANK_SIZE*ST0016_MAX_SPR_BANK)
+		if (offset < SPR_BANK_SIZE*MAX_SPR_BANK)
 		{
 			for (j = 0; j < length; j++)
 			{
@@ -440,12 +432,12 @@ void st0016_cpu_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip
 				sx = st0016_spriteram[offset + 4] + ((st0016_spriteram[offset + 5] & 1) << 8);
 				sy = st0016_spriteram[offset + 6] + ((st0016_spriteram[offset + 7] & 1) << 8);
 
-				if (ISMACS && !(ISMACS1))
+				if (ismacs() && !ismacs1())
 				{
 					if (sy & 0x100) sy -= 0x200; //yuka & yujan
 				}
 
-				if (ISMACS)
+				if (ismacs())
 				{
 					sy = 0xe0 - sy;
 				}
@@ -477,7 +469,7 @@ void st0016_cpu_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip
 				flipx = st0016_spriteram[offset + 3] & 0x80;
 				flipy = st0016_spriteram[offset + 3] & 0x40;
 
-				if (ISMACS)
+				if (ismacs())
 					sy -= (1 << ly) * 8;
 
 				{
@@ -494,7 +486,7 @@ void st0016_cpu_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip
 						int gfxoffs;
 						ypos = sy + y0 * 8 + spr_dy;
 						xpos = sx + x0 * 8 + spr_dx;
-						tileno = (code + i0++)&ST0016_CHAR_BANK_MASK;
+						tileno = (code + i0++)&CHAR_BANK_MASK;
 
 						gfxoffs = 0;
 						srcgfx = gfx->get_data(tileno);
@@ -527,7 +519,7 @@ void st0016_cpu_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip
 									}
 									else
 									{
-										if (ISMACS2)
+										if (ismacs2())
 										{
 											if (pixdata)//|| destline[drawxpos]==UNUSED_PEN)
 											{
@@ -550,7 +542,7 @@ void st0016_cpu_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip
 						}
 				}
 				offset += 8;
-				if (offset >= ST0016_SPR_BANK_SIZE*ST0016_MAX_SPR_BANK)
+				if (offset >= SPR_BANK_SIZE*MAX_SPR_BANK)
 					break;
 			}
 		}
@@ -567,9 +559,9 @@ void st0016_cpu_device::st0016_save_init()
 	save_item(NAME(m_dma_offset));
 	//save_item(NAME(st0016_rom_bank));
 	save_item(NAME(st0016_vregs));
-	save_pointer(NAME(m_charram.get()), ST0016_MAX_CHAR_BANK*ST0016_CHAR_BANK_SIZE);
-	save_pointer(NAME(st0016_paletteram.get()), ST0016_MAX_PAL_BANK*ST0016_PAL_BANK_SIZE);
-	save_pointer(NAME(st0016_spriteram.get()), ST0016_MAX_SPR_BANK*ST0016_SPR_BANK_SIZE);
+	save_pointer(NAME(m_charram.get()), MAX_CHAR_BANK*CHAR_BANK_SIZE);
+	save_pointer(NAME(st0016_paletteram.get()), MAX_PAL_BANK*PAL_BANK_SIZE);
+	save_pointer(NAME(st0016_spriteram.get()), MAX_SPR_BANK*SPR_BANK_SIZE);
 }
 
 
@@ -578,9 +570,9 @@ void st0016_cpu_device::startup()
 	int gfx_index=0;
 
 	m_dma_offset = 0;
-	m_charram=make_unique_clear<uint8_t[]>(ST0016_MAX_CHAR_BANK*ST0016_CHAR_BANK_SIZE);
-	st0016_spriteram=make_unique_clear<uint8_t[]>(ST0016_MAX_SPR_BANK*ST0016_SPR_BANK_SIZE);
-	st0016_paletteram=make_unique_clear<uint8_t[]>(ST0016_MAX_PAL_BANK*ST0016_PAL_BANK_SIZE);
+	m_charram=make_unique_clear<uint8_t[]>(MAX_CHAR_BANK*CHAR_BANK_SIZE);
+	st0016_spriteram=make_unique_clear<uint8_t[]>(MAX_SPR_BANK*SPR_BANK_SIZE);
+	st0016_paletteram=make_unique_clear<uint8_t[]>(MAX_PAL_BANK*PAL_BANK_SIZE);
 
 	/* find first empty slot to decode gfx */
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
@@ -590,7 +582,7 @@ void st0016_cpu_device::startup()
 	assert(gfx_index != MAX_GFX_ELEMENTS);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	set_gfx(gfx_index, std::make_unique<gfx_element>(palette(), charlayout, m_charram.get(), 0, 0x40, 0));
+	set_gfx(gfx_index, std::make_unique<gfx_element>(&palette(), charlayout, m_charram.get(), 0, 0x40, 0));
 	st0016_ramgfx = gfx_index;
 
 	spr_dx=0;
@@ -668,7 +660,7 @@ void st0016_cpu_device::draw_bgmap(bitmap_ind16 &bitmap, const rectangle &clipre
 										destline[drawxpos] = (destline[drawxpos] | (pixdata << 4)) & 0x3ff;
 									else
 									{
-										if (ISMACS2)
+										if (ismacs2())
 										{
 											if (pixdata)// || destline[drawxpos]==UNUSED_PEN)
 											{
@@ -713,13 +705,13 @@ uint32_t st0016_cpu_device::update(screen_device &screen, bitmap_ind16 &bitmap, 
 	{
 		int h,j;
 		FILE *p=fopen("vram.bin","wb");
-		fwrite(st0016_spriteram.get(),1,0x1000*ST0016_MAX_SPR_BANK,p);
+		fwrite(st0016_spriteram.get(),1,0x1000*MAX_SPR_BANK,p);
 		fclose(p);
 
 		p=fopen("vram.txt","wt");
 		for(h=0;h<0xc0;h++)
 			fprintf(p,"VREG %.4x - %.4x\n",h,st0016_vregs[h]);
-		for(h=0;h<0x1000*ST0016_MAX_SPR_BANK;h+=8)
+		for(h=0;h<0x1000*MAX_SPR_BANK;h+=8)
 		{
 			fprintf(p,"%.4x - %.4x - ",h,h>>3);
 			for(j=0;j<8;j++)

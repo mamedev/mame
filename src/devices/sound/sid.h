@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Peter Trauner
-#pragma once
+#ifndef MAME_SOUND_SID_H
+#define MAME_SOUND_SID_H
 
-#ifndef __SID_H__
-#define __SID_H__
+#pragma once
 
 /*
   approximation of the sid6581 chip
@@ -41,7 +41,6 @@ struct SID6581_t
 	uint8_t masterVolume;
 	uint16_t masterVolumeAmplIndex;
 
-
 	struct
 	{
 		int Enabled;
@@ -52,15 +51,18 @@ struct SID6581_t
 
 	sidOperator optr1, optr2, optr3;
 	int optr3_outputmask;
+
+	void init();
+
+	bool reset();
+
+	int port_r(running_machine &machine, int offset);
+	void port_w(int offset, int data);
+
+	void fill_buffer(stream_sample_t *buffer, uint32_t bufferLen);
+
+private:
+	void syncEm();
 };
 
-void sid6581_init (SID6581_t *This);
-
-int sidEmuReset(SID6581_t *This);
-
-int sid6581_port_r (running_machine &machine, SID6581_t *This, int offset);
-void sid6581_port_w (SID6581_t *This, int offset, int data);
-
-void sidEmuFillBuffer(SID6581_t *This, stream_sample_t *buffer, uint32_t bufferLen );
-
-#endif /* __SID_H__ */
+#endif // MAME_SOUND_SID_H

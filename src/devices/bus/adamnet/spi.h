@@ -6,16 +6,15 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_ADAMNET_SPI_H
+#define MAME_BUS_ADAMNET_SPI_H
+
 #pragma once
 
-#ifndef __ADAM_SPI__
-#define __ADAM_SPI__
-
-#include "emu.h"
 #include "adamnet.h"
 #include "bus/centronics/ctronics.h"
 #include "bus/rs232/rs232.h"
-#include "cpu/m6800/m6800.h"
+#include "cpu/m6800/m6801.h"
 #include "machine/mc2661.h"
 
 
@@ -33,10 +32,6 @@ public:
 	// construction/destruction
 	adam_spi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
 	// not really public
 	DECLARE_READ8_MEMBER( p2_r );
 	DECLARE_WRITE8_MEMBER( p2_w );
@@ -44,6 +39,10 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+
+	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	// device_adamnet_card_interface overrides
 	virtual void adamnet_reset_w(int state) override;
@@ -53,8 +52,6 @@ protected:
 
 
 // device type definition
-extern const device_type ADAM_SPI;
+DECLARE_DEVICE_TYPE(ADAM_SPI, adam_spi_device)
 
-
-
-#endif
+#endif // MAME_BUS_ADAMNET_SPI_H

@@ -19,6 +19,7 @@
 
 */
 
+#include "emu.h"
 #include "ide64.h"
 
 
@@ -38,29 +39,19 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_IDE64 = &device_creator<c64_ide64_cartridge_device>;
+DEFINE_DEVICE_TYPE(C64_IDE64, c64_ide64_cartridge_device, "c64_ide64", "C64 IDE64 cartridge")
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( c64_ide64 )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
-static MACHINE_CONFIG_FRAGMENT( c64_ide64 )
+
+MACHINE_CONFIG_MEMBER( c64_ide64_cartridge_device::device_add_mconfig )
 	MCFG_ATMEL_29C010_ADD(AT29C010A_TAG)
 	MCFG_DS1302_ADD(DS1302_TAG, XTAL_32_768kHz)
 
 	MCFG_ATA_INTERFACE_ADD(ATA_TAG, ata_devices, "hdd", nullptr, false)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor c64_ide64_cartridge_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( c64_ide64 );
-}
 
 
 //-------------------------------------------------
@@ -95,7 +86,7 @@ ioport_constructor c64_ide64_cartridge_device::device_input_ports() const
 //-------------------------------------------------
 
 c64_ide64_cartridge_device::c64_ide64_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, C64_IDE64, "C64 IDE64 cartridge", tag, owner, clock, "c64_ide64", __FILE__),
+	device_t(mconfig, C64_IDE64, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_flash_rom(*this, AT29C010A_TAG),
 	m_rtc(*this, DS1302_TAG),

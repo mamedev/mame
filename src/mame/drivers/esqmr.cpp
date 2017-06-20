@@ -200,22 +200,25 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "machine/esqvfd.h"
+
 #include "machine/68340.h"
 #include "sound/es5506.h"
 
-#include "machine/esqvfd.h"
+#include "speaker.h"
+
 
 class esqmr_state : public driver_device
 {
 public:
 	esqmr_state(const machine_config &mconfig, device_type type, const char *tag)
-	: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_sq1vfd(*this, "sq1vfd")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_sq1vfd(*this, "sq1vfd")
 	{ }
 
-	required_device<m68340cpu_device> m_maincpu;
-	required_device<esq2x40_sq1_t> m_sq1vfd;
+	required_device<m68340_cpu_device> m_maincpu;
+	required_device<esq2x40_sq1_device> m_sq1vfd;
 
 	virtual void machine_reset() override;
 
@@ -245,11 +248,11 @@ READ16_MEMBER(esqmr_state::esq5506_read_adc)
 	return 0;
 }
 
-static MACHINE_CONFIG_START( mr, esqmr_state )
+static MACHINE_CONFIG_START( mr )
 	MCFG_CPU_ADD("maincpu", M68340, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(mr_map)
 
-	MCFG_ESQ2x40_SQ1_ADD("sq1vfd")
+	MCFG_ESQ2X40_SQ1_ADD("sq1vfd")
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("ensoniq", ES5506, XTAL_16MHz)

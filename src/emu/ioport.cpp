@@ -634,6 +634,8 @@ ioport_field::ioport_field(ioport_port &port, ioport_type type, ioport_value def
 				if (device().subtag(def->tag) == fulltag && def->mask == m_mask)
 					m_defvalue = def->defvalue & m_mask;
 		}
+
+		m_flags |= FIELD_FLAG_TOGGLE;
 	}
 }
 
@@ -703,6 +705,24 @@ const input_seq &ioport_field::defseq(input_seq_type seqtype) const
 
 	// otherwise, return the sequence as-is
 	return m_seq[seqtype];
+}
+
+
+//-------------------------------------------------
+//  set_defseq - dynamically alter the default
+//  input sequence for the given input field
+//-------------------------------------------------
+
+void ioport_field::set_defseq(input_seq_type seqtype, const input_seq &newseq)
+{
+	const bool was_changed = seq(seqtype) != defseq(seqtype);
+
+	// set the new sequence
+	m_seq[seqtype] = newseq;
+
+	// also update live state unless previously customized
+	if (m_live != nullptr && !was_changed)
+		m_live->seq[seqtype] = newseq;
 }
 
 
@@ -1368,9 +1388,9 @@ ioport_field_live::ioport_field_live(ioport_field &field, analog_field *analog)
 	if (field.type_class() == INPUT_CLASS_KEYBOARD && field.specific_name() == nullptr)
 	{
 		// loop through each character on the field
-		for (int which = 0; ; which++)
+		for (int which = 0; which < 4; which++)
 		{
-			char32_t ch = field.keyboard_code(which);
+			char32_t const ch = field.keyboard_code(which);
 			if (ch == 0)
 				break;
 			name.append(string_format("%-*s ", std::max(SPACE_COUNT - 1, 0), field.key_name(which)));
@@ -3111,13 +3131,6 @@ ioport_configurer& ioport_configurer::onoff_alloc(const char *name, ioport_value
 {
 	// allocate a field normally
 	field_alloc(IPT_DIPSWITCH, defval, mask, name);
-
-	// special case service mode
-	if (name == DEF_STR(Service_Mode))
-	{
-		field_set_toggle();
-		m_curfield->m_seq[SEQ_TYPE_STANDARD].set(KEYCODE_F2);
-	}
 
 	// expand the diplocation
 	if (diplocation != nullptr)

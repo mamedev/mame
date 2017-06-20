@@ -7,20 +7,21 @@
 *************************************************************************/
 
 #include "emu.h"
+#include "includes/qix.h"
+
 #include "cpu/m6800/m6800.h"
 #include "cpu/m6809/m6809.h"
-#include "includes/qix.h"
-#include "sound/sn76496.h"
 #include "sound/discrete.h"
+#include "sound/sn76496.h"
+#include "speaker.h"
+
+
 
 /* Discrete Sound Input Nodes */
 #define QIX_DAC_DATA        NODE_01
 #define QIX_VOL_DATA        NODE_02
 #define QIX_VOL_DATA_L      NODE_03
 #define QIX_VOL_DATA_R      NODE_04
-
-
-
 
 
 
@@ -169,7 +170,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-MACHINE_CONFIG_FRAGMENT( qix_audio )
+MACHINE_CONFIG_START( qix_audio )
 	MCFG_CPU_ADD("audiocpu", M6802, SOUND_CLOCK_OSC/2)      /* 0.92 MHz */
 	MCFG_CPU_PROGRAM_MAP(audio_map)
 
@@ -203,7 +204,7 @@ MACHINE_CONFIG_FRAGMENT( qix_audio )
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_FRAGMENT( slither_audio )
+MACHINE_CONFIG_START( slither_audio )
 	MCFG_DEVICE_ADD("sndpia0", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(IOPORT("P2"))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(qix_state, slither_coinctl_w))

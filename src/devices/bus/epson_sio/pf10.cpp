@@ -10,6 +10,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "pf10.h"
 
 
@@ -17,7 +18,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type EPSON_PF10 = &device_creator<epson_pf10_device>;
+DEFINE_DEVICE_TYPE(EPSON_PF10, epson_pf10_device, "epson_pf10", "EPSON PF-10 Portable Floppy Unit")
 
 
 //-------------------------------------------------
@@ -55,15 +56,14 @@ const tiny_rom_entry *epson_pf10_device::device_rom_region() const
 
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
 static SLOT_INTERFACE_START( pf10_floppies )
 	SLOT_INTERFACE( "smd165", EPSON_SMD_165 )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_FRAGMENT( pf10 )
+MACHINE_CONFIG_MEMBER( epson_pf10_device::device_add_mconfig )
 	MCFG_CPU_ADD("maincpu", HD6303Y, XTAL_4_9152MHz) // HD63A03XF
 	MCFG_CPU_PROGRAM_MAP(cpu_mem)
 	MCFG_CPU_IO_MAP(cpu_io)
@@ -77,11 +77,6 @@ static MACHINE_CONFIG_FRAGMENT( pf10 )
 	MCFG_EPSON_SIO_PIN(DEVWRITELINE(DEVICE_SELF, epson_pf10_device, pinc_w))
 MACHINE_CONFIG_END
 
-machine_config_constructor epson_pf10_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( pf10 );
-}
-
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -92,7 +87,7 @@ machine_config_constructor epson_pf10_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 epson_pf10_device::epson_pf10_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, EPSON_PF10, "EPSON PF-10 Portable Floppy Unit", tag, owner, clock, "epson_pf10", __FILE__),
+	device_t(mconfig, EPSON_PF10, tag, owner, clock),
 	device_epson_sio_interface(mconfig, *this),
 	m_cpu(*this, "maincpu"),
 	m_fdc(*this, "upd765a"),

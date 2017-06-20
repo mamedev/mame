@@ -76,13 +76,16 @@ Side 2 = 0x8F7DDD (or 0x880000 | ( 0x77 << 12 ) | 0x0DDD)
 *********************************************************/
 
 #include "emu.h"
+#include "audio/cliffhgr.h"
+
 #include "cpu/z80/z80.h"
-#include "render.h"
 #include "machine/ldpr8210.h"
 #include "video/tms9928a.h"
-#include "sound/discrete.h"
 #include "machine/nvram.h"
-#include "audio/cliffhgr.h"
+
+#include "render.h"
+#include "speaker.h"
+
 
 #define CLIFF_ENABLE_SND_1  NODE_01
 #define CLIFF_ENABLE_SND_2  NODE_02
@@ -671,7 +674,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( cliffhgr, cliffhgr_state )
+static MACHINE_CONFIG_START( cliffhgr )
 
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)       /* 4MHz */
 	MCFG_CPU_PROGRAM_MAP(mainmem)
@@ -681,8 +684,8 @@ static MACHINE_CONFIG_START( cliffhgr, cliffhgr_state )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_LASERDISC_PR8210_ADD("laserdisc")
-	MCFG_LASERDISC_OVERLAY_DEVICE(TMS9928A_TOTAL_HORZ, TMS9928A_TOTAL_VERT_NTSC, "tms9928a", tms9928a_device, screen_update)
-	MCFG_LASERDISC_OVERLAY_CLIP(TMS9928A_HORZ_DISPLAY_START-12, TMS9928A_HORZ_DISPLAY_START+32*8+12-1, TMS9928A_VERT_DISPLAY_START_NTSC - 12, TMS9928A_VERT_DISPLAY_START_NTSC+24*8+12-1)
+	MCFG_LASERDISC_OVERLAY_DEVICE(tms9928a_device::TOTAL_HORZ, tms9928a_device::TOTAL_VERT_NTSC, "tms9928a", tms9928a_device, screen_update)
+	MCFG_LASERDISC_OVERLAY_CLIP(tms9928a_device::HORZ_DISPLAY_START-12, tms9928a_device::HORZ_DISPLAY_START+32*8+12-1, tms9928a_device::VERT_DISPLAY_START_NTSC - 12, tms9928a_device::VERT_DISPLAY_START_NTSC+24*8+12-1)
 
 	/* start with the TMS9928a video configuration */
 	MCFG_DEVICE_ADD( "tms9928a", TMS9128, XTAL_10_738635MHz / 2 )   /* TMS9128NL on the board */
@@ -778,7 +781,7 @@ DRIVER_INIT_MEMBER(cliffhgr_state,cliff)
  *
  *************************************/
 
-GAME( 1983, cliffhgr,  0,        cliffhgr, cliffhgr, cliffhgr_state,  cliff, ROT0, "Stern Electronics", "Cliff Hanger (set 1)", 0)
-GAME( 1983, cliffhgra, cliffhgr, cliffhgr, cliffhgra, cliffhgr_state, cliff, ROT0, "Stern Electronics", "Cliff Hanger (set 2)", 0)
-GAME( 1983, cliffhgra2,cliffhgr, cliffhgr, cliffhgra, cliffhgr_state, cliff, ROT0, "Stern Electronics", "Cliff Hanger (set 3)", 0)
-GAME( 1983, goaltogo,  0,        cliffhgr, goaltogo, cliffhgr_state,  cliff, ROT0, "Stern Electronics", "Goal To Go", MACHINE_NOT_WORKING)
+GAME( 1983, cliffhgr,  0,        cliffhgr, cliffhgr,  cliffhgr_state, cliff, ROT0, "Stern Electronics", "Cliff Hanger (set 1)", 0 )
+GAME( 1983, cliffhgra, cliffhgr, cliffhgr, cliffhgra, cliffhgr_state, cliff, ROT0, "Stern Electronics", "Cliff Hanger (set 2)", 0 )
+GAME( 1983, cliffhgra2,cliffhgr, cliffhgr, cliffhgra, cliffhgr_state, cliff, ROT0, "Stern Electronics", "Cliff Hanger (set 3)", 0 )
+GAME( 1983, goaltogo,  0,        cliffhgr, goaltogo,  cliffhgr_state, cliff, ROT0, "Stern Electronics", "Goal To Go",           MACHINE_NOT_WORKING )

@@ -81,12 +81,17 @@ Preliminary COP MCU memory map
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/legionna.h"
+
+#include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "sound/3812intf.h"
 #include "sound/ym2151.h"
-#include "cpu/m68000/m68000.h"
 #include "machine/seicop.h"
-#include "includes/legionna.h"
+
+#include "screen.h"
+#include "speaker.h"
+
 
 /*****************************************************************************/
 
@@ -1151,7 +1156,7 @@ GFXDECODE_END
 
 /*****************************************************************************/
 
-static MACHINE_CONFIG_START( legionna, legionna_state )
+static MACHINE_CONFIG_START( legionna )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,20000000/2)  /* ??? */
@@ -1191,7 +1196,7 @@ static MACHINE_CONFIG_START( legionna, legionna_state )
 	MCFG_YM3812_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", 1320000, OKIM6295_PIN7_LOW)
+	MCFG_OKIM6295_ADD("oki", 1320000, PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
@@ -1202,7 +1207,7 @@ static MACHINE_CONFIG_START( legionna, legionna_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( heatbrl, legionna_state )
+static MACHINE_CONFIG_START( heatbrl )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,20000000/2)  /* ??? */
@@ -1244,7 +1249,7 @@ static MACHINE_CONFIG_START( heatbrl, legionna_state )
 	MCFG_YM3812_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", 1320000, OKIM6295_PIN7_LOW)
+	MCFG_OKIM6295_ADD("oki", 1320000, PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
@@ -1254,7 +1259,7 @@ static MACHINE_CONFIG_START( heatbrl, legionna_state )
 	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym3812_device, write))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( godzilla, legionna_state )
+static MACHINE_CONFIG_START( godzilla )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 20000000/2)
@@ -1298,7 +1303,7 @@ static MACHINE_CONFIG_START( godzilla, legionna_state )
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 
-	MCFG_OKIM6295_ADD("oki", 1320000, OKIM6295_PIN7_LOW)
+	MCFG_OKIM6295_ADD("oki", 1320000, PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
@@ -1308,7 +1313,7 @@ static MACHINE_CONFIG_START( godzilla, legionna_state )
 	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym2151_device, write))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( denjinmk, legionna_state )
+static MACHINE_CONFIG_START( denjinmk )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 20000000/2)
@@ -1351,7 +1356,7 @@ static MACHINE_CONFIG_START( denjinmk, legionna_state )
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 
-	MCFG_OKIM6295_ADD("oki", 1320000, OKIM6295_PIN7_LOW)
+	MCFG_OKIM6295_ADD("oki", 1320000, PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
@@ -1361,7 +1366,7 @@ static MACHINE_CONFIG_START( denjinmk, legionna_state )
 	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym2151_device, write))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( grainbow, legionna_state )
+static MACHINE_CONFIG_START( grainbow )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 20000000/2)
@@ -1404,7 +1409,7 @@ static MACHINE_CONFIG_START( grainbow, legionna_state )
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 
-	MCFG_OKIM6295_ADD("oki", 1320000, OKIM6295_PIN7_LOW)
+	MCFG_OKIM6295_ADD("oki", 1320000, PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
@@ -1415,7 +1420,7 @@ static MACHINE_CONFIG_START( grainbow, legionna_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( cupsoc, legionna_state )
+static MACHINE_CONFIG_START( cupsoc )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,20000000/2)
@@ -1457,7 +1462,7 @@ static MACHINE_CONFIG_START( cupsoc, legionna_state )
 	MCFG_YM3812_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", 1320000, OKIM6295_PIN7_LOW)
+	MCFG_OKIM6295_ADD("oki", 1320000, PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
@@ -2180,6 +2185,9 @@ ROM_START( cupsoc )
 
 	ROM_REGION( 0x080000, "user1", 0 )
 	ROM_LOAD( "copx-d1.bin", 0x000000, 0x080000, CRC(029bc402) SHA1(0f64e4c32d95abfa3920b39ed3cf0cc6eb50191b) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "soc07.u0910", 0x000, 0x200, NO_DUMP ) // N82S147AN
 ROM_END
 
 ROM_START( cupsoca )
@@ -2217,6 +2225,9 @@ ROM_START( cupsoca )
 
 	ROM_REGION( 0x080000, "user1", 0 )
 	ROM_LOAD( "copx-d1.bin", 0x000000, 0x080000, CRC(029bc402) SHA1(0f64e4c32d95abfa3920b39ed3cf0cc6eb50191b) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "soc07.u0910", 0x000, 0x200, NO_DUMP ) // N82S147AN
 ROM_END
 
 ROM_START( cupsocb )
@@ -2254,6 +2265,9 @@ ROM_START( cupsocb )
 
 	ROM_REGION( 0x080000, "user1", 0 )
 	ROM_LOAD( "copx-d1.bin", 0x000000, 0x080000, CRC(029bc402) SHA1(0f64e4c32d95abfa3920b39ed3cf0cc6eb50191b) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "soc07.u0910", 0x000, 0x200, NO_DUMP ) // N82S147AN
 ROM_END
 
 ROM_START( cupsocs )
@@ -2291,6 +2305,9 @@ ROM_START( cupsocs )
 
 	ROM_REGION( 0x080000, "user1", 0 )
 	ROM_LOAD( "copx-d1.bin", 0x000000, 0x080000, CRC(029bc402) SHA1(0f64e4c32d95abfa3920b39ed3cf0cc6eb50191b) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "soc07.u0910", 0x000, 0x200, NO_DUMP ) // N82S147AN
 ROM_END
 
 
@@ -2330,6 +2347,9 @@ ROM_START( cupsocs2 )
 
 	ROM_REGION( 0x080000, "user1", 0 )
 	ROM_LOAD( "copx-d1.bin", 0x000000, 0x080000, CRC(029bc402) SHA1(0f64e4c32d95abfa3920b39ed3cf0cc6eb50191b) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "soc07.u0910", 0x000, 0x200, NO_DUMP ) // N82S147AN
 ROM_END
 
 ROM_START( olysoc92 )
@@ -2367,6 +2387,9 @@ ROM_START( olysoc92 )
 
 	ROM_REGION( 0x080000, "user1", 0 )
 	ROM_LOAD( "copx-d1.bin", 0x000000, 0x080000, CRC(029bc402) SHA1(0f64e4c32d95abfa3920b39ed3cf0cc6eb50191b) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "soc07.u0910", 0x000, 0x200, NO_DUMP ) // N82S147AN
 ROM_END
 
 ROM_START( olysoc92a )
@@ -2404,6 +2427,9 @@ ROM_START( olysoc92a )
 
 	ROM_REGION( 0x080000, "user1", 0 )
 	ROM_LOAD( "copx-d1.bin", 0x000000, 0x080000, CRC(029bc402) SHA1(0f64e4c32d95abfa3920b39ed3cf0cc6eb50191b) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "soc07.u0910", 0x000, 0x200, NO_DUMP ) // N82S147AN
 ROM_END
 
 
@@ -2412,7 +2438,7 @@ ROM_START( olysoc92b )
 	ROM_LOAD32_BYTE( "1", 0x000000, 0x040000, CRC(d4f37bf2) SHA1(af06364a602bd0ac2b9506de792bef003281e9d4) ) // == cupsocb    Seibu Cup Soccer (set 3)
 	ROM_LOAD32_BYTE( "2", 0x000001, 0x040000, CRC(6967d6f9) SHA1(292f59cf501064cdfb20acd8295fee7e93c9bc95) ) // same as Seibu Cup Soccer (set 3) except last byte is 02 instead of 01
 	ROM_LOAD32_BYTE( "3", 0x000002, 0x040000, CRC(226f65f9) SHA1(106a2f807aaf0f2e1fbcb1ffec6ccf4d2d7addd8) ) // == cupsocb    Seibu Cup Soccer (set 3)
-	ROM_LOAD32_BYTE( "4", 0x000003, 0x040000, CRC(8ff16a9e) SHA1(c29986cec74e183d18eaaf69ba6ca20b75590298) ) // == cupsocb    Seibu Cup Soccer (set 3)
+	ROM_LOAD32_BYTE( "4", 0x000003, 0x040000, CRC(8ff16a9e) SHA1(c29986cec74e183d18eaaf69ba6ca20b75590298) ) // sldh == cupsocb    Seibu Cup Soccer (set 3)
 
 	ROM_REGION( 0x20000, "audiocpu", 0 )    /* Z80 code, banked data */
 	ROM_LOAD( "7",   0x000000, 0x08000, CRC(f63329f9) SHA1(51736de48efc14415cfdf169b43623d4c95fde2b) )
@@ -2421,7 +2447,7 @@ ROM_START( olysoc92b )
 
 	ROM_REGION( 0x020000, "char", 0 )
 	ROM_LOAD16_BYTE( "6", 0x000000, 0x010000, CRC(7edb1700) SHA1(db30c01fc0e5b9f3c2d6139f89ec88936bc75b38) )
-	ROM_LOAD16_BYTE( "5", 0x000001, 0x010000, CRC(ec21c8dc) SHA1(93a9bf13d7c53e76762307c028f427ff2888629c) )
+	ROM_LOAD16_BYTE( "5", 0x000001, 0x010000, CRC(ec21c8dc) SHA1(93a9bf13d7c53e76762307c028f427ff2888629c) )  // sldh
 
 	ROM_REGION( 0x200000, "sprite", 0 )
 	ROM_LOAD( "obj.8c", 0x000000, 0x100000, CRC(e2377895) SHA1(1d1c7f31a08a464139cdaf383a5e1ade0717dc9f) )
@@ -2442,6 +2468,9 @@ ROM_START( olysoc92b )
 
 	ROM_REGION( 0x080000, "user1", 0 )
 	ROM_LOAD( "copx-d1.bin", 0x000000, 0x080000, CRC(029bc402) SHA1(0f64e4c32d95abfa3920b39ed3cf0cc6eb50191b) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "soc07.u0910", 0x000, 0x200, NO_DUMP ) // N82S147AN
 ROM_END
 
 
@@ -2504,25 +2533,25 @@ DRIVER_INIT_MEMBER(legionna_state,legiongfx)
 
 
 
-GAME( 1992, legionna, 0,        legionna, legionna, legionna_state, legiongfx, ROT0, "TAD Corporation",                  "Legionnaire (World)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAME( 1992, legionnau,legionna, legionna, legionna, legionna_state, legiongfx, ROT0, "TAD Corporation (Fabtek license)", "Legionnaire (US)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAME( 1992, legionnaj,legionna, legionna, legionna, legionna_state, legiongfx, ROT0, "TAD Corporation",                  "Legionnaire (Japan)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1992, legionna, 0,        legionna, legionna, legionna_state, legiongfx, ROT0, "TAD Corporation",                  "Legionnaire (World)", 0 )
+GAME( 1992, legionnau,legionna, legionna, legionna, legionna_state, legiongfx, ROT0, "TAD Corporation (Fabtek license)", "Legionnaire (US)", 0 )
+GAME( 1992, legionnaj,legionna, legionna, legionna, legionna_state, legiongfx, ROT0, "TAD Corporation",                  "Legionnaire (Japan)", 0 )
 
-GAME( 1992, heatbrl,  0,        heatbrl,  heatbrl, driver_device,  0,         ROT0, "TAD Corporation", "Heated Barrel (World version 3)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAME( 1992, heatbrl2, heatbrl,  heatbrl,  heatbrl, driver_device,  0,         ROT0, "TAD Corporation", "Heated Barrel (World version 2)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAME( 1992, heatbrlo, heatbrl,  heatbrl,  heatbrl, driver_device,  0,         ROT0, "TAD Corporation", "Heated Barrel (World old version)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAME( 1992, heatbrlu, heatbrl,  heatbrl,  heatbrl, driver_device,  0,         ROT0, "TAD Corporation", "Heated Barrel (US)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAME( 1992, heatbrle, heatbrl,  heatbrl,  heatbrl, driver_device,  0,         ROT0, "TAD Corporation (Electronic Devices license)", "Heated Barrel (Electronic Devices license)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1992, heatbrl,  0,        heatbrl,  heatbrl,  legionna_state, 0,         ROT0, "TAD Corporation", "Heated Barrel (World version 3)", 0 )
+GAME( 1992, heatbrl2, heatbrl,  heatbrl,  heatbrl,  legionna_state, 0,         ROT0, "TAD Corporation", "Heated Barrel (World version 2)", 0 )
+GAME( 1992, heatbrlo, heatbrl,  heatbrl,  heatbrl,  legionna_state, 0,         ROT0, "TAD Corporation", "Heated Barrel (World old version)", 0 )
+GAME( 1992, heatbrlu, heatbrl,  heatbrl,  heatbrl,  legionna_state, 0,         ROT0, "TAD Corporation", "Heated Barrel (US)", 0 )
+GAME( 1992, heatbrle, heatbrl,  heatbrl,  heatbrl,  legionna_state, 0,         ROT0, "TAD Corporation (Electronic Devices license)", "Heated Barrel (Electronic Devices license)", 0 )
 
-GAME( 1993, godzilla, 0,        godzilla, godzilla, driver_device, 0,         ROT0, "Banpresto", "Godzilla (Japan)", 0 )
-GAME( 1993, grainbow, 0,        grainbow, grainbow, driver_device, 0,         ROT0, "Banpresto", "SD Gundam Sangokushi Rainbow Tairiku Senki", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAME( 1993, denjinmk, 0,        denjinmk, denjinmk, driver_device, 0,         ROT0, "Winkysoft (Banpresto license)", "Denjin Makai", MACHINE_IMPERFECT_COLORS )
+GAME( 1993, godzilla, 0,        godzilla, godzilla, legionna_state, 0,         ROT0, "Banpresto", "Godzilla (Japan)", 0 )
+GAME( 1993, grainbow, 0,        grainbow, grainbow, legionna_state, 0,         ROT0, "Banpresto", "SD Gundam Sangokushi Rainbow Tairiku Senki", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1993, denjinmk, 0,        denjinmk, denjinmk, legionna_state, 0,         ROT0, "Winkysoft (Banpresto license)", "Denjin Makai", MACHINE_IMPERFECT_COLORS )
 
-GAME( 1992, cupsoc,   0,        cupsoc,   cupsoc, legionna_state,  cupsoc,    ROT0, "Seibu Kaihatsu", "Seibu Cup Soccer (set 1)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAME( 1992, cupsoca,  cupsoc,   cupsoc,   cupsoc, legionna_state,  cupsoc,    ROT0, "Seibu Kaihatsu", "Seibu Cup Soccer (set 2)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAME( 1992, cupsocb,  cupsoc,   cupsoc,   cupsoc, legionna_state,  cupsocs,   ROT0, "Seibu Kaihatsu", "Seibu Cup Soccer (set 3)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAME( 1992, cupsocs,  cupsoc,   cupsocs,  cupsoc, legionna_state,  cupsocs,   ROT0, "Seibu Kaihatsu", "Seibu Cup Soccer :Selection: (set 1)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAME( 1992, cupsocs2, cupsoc,   cupsocs,  cupsoc, legionna_state,  cupsocs,   ROT0, "Seibu Kaihatsu", "Seibu Cup Soccer :Selection: (set 2)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAME( 1992, olysoc92, cupsoc,   cupsoc,   cupsoc, legionna_state,  olysoc92,  ROT0, "Seibu Kaihatsu", "Olympic Soccer '92 (set 1)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAME( 1992, olysoc92a,cupsoc,   cupsoc,   cupsoc, legionna_state,  olysoc92,  ROT0, "Seibu Kaihatsu", "Olympic Soccer '92 (set 2)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAME( 1992, olysoc92b,cupsoc,   cupsoc,   cupsoc, legionna_state,  olysoc92,  ROT0, "Seibu Kaihatsu", "Olympic Soccer '92 (set 3)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1992, cupsoc,   0,        cupsoc,   cupsoc,   legionna_state, cupsoc,    ROT0, "Seibu Kaihatsu", "Seibu Cup Soccer (set 1)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1992, cupsoca,  cupsoc,   cupsoc,   cupsoc,   legionna_state, cupsoc,    ROT0, "Seibu Kaihatsu", "Seibu Cup Soccer (set 2)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1992, cupsocb,  cupsoc,   cupsoc,   cupsoc,   legionna_state, cupsocs,   ROT0, "Seibu Kaihatsu", "Seibu Cup Soccer (set 3)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1992, cupsocs,  cupsoc,   cupsocs,  cupsoc,   legionna_state, cupsocs,   ROT0, "Seibu Kaihatsu", "Seibu Cup Soccer :Selection: (set 1)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1992, cupsocs2, cupsoc,   cupsocs,  cupsoc,   legionna_state, cupsocs,   ROT0, "Seibu Kaihatsu", "Seibu Cup Soccer :Selection: (set 2)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1992, olysoc92, cupsoc,   cupsoc,   cupsoc,   legionna_state, olysoc92,  ROT0, "Seibu Kaihatsu", "Olympic Soccer '92 (set 1)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1992, olysoc92a,cupsoc,   cupsoc,   cupsoc,   legionna_state, olysoc92,  ROT0, "Seibu Kaihatsu", "Olympic Soccer '92 (set 2)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1992, olysoc92b,cupsoc,   cupsoc,   cupsoc,   legionna_state, olysoc92,  ROT0, "Seibu Kaihatsu", "Olympic Soccer '92 (set 3)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )

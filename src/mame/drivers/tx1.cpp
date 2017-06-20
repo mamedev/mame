@@ -41,14 +41,16 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/i86/i86.h"
-#include "machine/i8255.h"
-#include "sound/ay8910.h"
-#include "rendlay.h"
 #include "includes/tx1.h"
+
+#include "cpu/i86/i86.h"
+#include "cpu/z80/z80.h"
+#include "machine/i8255.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
+#include "sound/ay8910.h"
+#include "rendlay.h"
+#include "speaker.h"
 
 #include "tx1.lh"
 #include "buggyboy.lh"
@@ -452,6 +454,7 @@ static uint8_t bit_reverse8(uint8_t val)
 	return val;
 }
 
+// Tazmi TZ2103 custom 4-channel A/D converter @ 7.5 MHz
 READ8_MEMBER(tx1_state::bb_analog_r)
 {
 	if (offset == 0)
@@ -603,7 +606,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( tx1, tx1_state )
+static MACHINE_CONFIG_START( tx1 )
 	MCFG_CPU_ADD("main_cpu", I8086, CPU_MASTER_CLOCK / 3)
 	MCFG_CPU_PROGRAM_MAP(tx1_main)
 
@@ -645,7 +648,7 @@ static MACHINE_CONFIG_START( tx1, tx1_state )
 	MCFG_SCREEN_ADD("rscreen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(TX1_PIXEL_CLOCK, TX1_HTOTAL, TX1_HBEND, TX1_HBSTART, TX1_VTOTAL, TX1_VBEND, TX1_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(tx1_state, screen_update_tx1_right)
-	MCFG_SCREEN_VBLANK_DRIVER(tx1_state, screen_eof_tx1)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(tx1_state, screen_vblank_tx1))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(tx1_state,tx1)
@@ -666,7 +669,7 @@ static MACHINE_CONFIG_START( tx1, tx1_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( buggyboy, tx1_state )
+static MACHINE_CONFIG_START( buggyboy )
 	MCFG_CPU_ADD("main_cpu", I8086, CPU_MASTER_CLOCK / 3)
 	MCFG_CPU_PROGRAM_MAP(buggyboy_main)
 
@@ -705,7 +708,7 @@ static MACHINE_CONFIG_START( buggyboy, tx1_state )
 	MCFG_SCREEN_ADD("rscreen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(BB_PIXEL_CLOCK, BB_HTOTAL, BB_HBEND, BB_HBSTART, BB_VTOTAL, BB_VBEND, BB_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(tx1_state, screen_update_buggyboy_right)
-	MCFG_SCREEN_VBLANK_DRIVER(tx1_state, screen_eof_buggyboy)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(tx1_state, screen_vblank_buggyboy))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 256)
@@ -730,7 +733,7 @@ static MACHINE_CONFIG_START( buggyboy, tx1_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( buggybjr, tx1_state )
+static MACHINE_CONFIG_START( buggybjr )
 	MCFG_CPU_ADD("main_cpu", I8086, CPU_MASTER_CLOCK / 3)
 	MCFG_CPU_PROGRAM_MAP(buggybjr_main)
 
@@ -751,7 +754,7 @@ static MACHINE_CONFIG_START( buggybjr, tx1_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(BB_PIXEL_CLOCK, BB_HTOTAL, BB_HBEND, BB_HBSTART, BB_VTOTAL, BB_VBEND, BB_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(tx1_state, screen_update_buggybjr)
-	MCFG_SCREEN_VBLANK_DRIVER(tx1_state, screen_eof_buggyboy)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(tx1_state, screen_vblank_buggyboy))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 256)
@@ -1240,8 +1243,8 @@ ROM_END
  *
  *************************************/
 
-GAMEL( 1983, tx1,        0,        tx1,      tx1, driver_device,      0,     ROT0, "Tatsumi (Atari/Namco/Taito license)", "TX-1 (World)", MACHINE_IMPERFECT_SOUND, layout_tx1 )
-GAMEL( 1983, tx1jb,      tx1,      tx1,      tx1j, driver_device,     0,     ROT0, "Tatsumi", "TX-1 (Japan rev. B)",                      MACHINE_IMPERFECT_SOUND, layout_tx1 )
-GAMEL( 1983, tx1jc,      tx1,      tx1,      tx1j, driver_device,     0,     ROT0, "Tatsumi", "TX-1 (Japan rev. C)",                      MACHINE_IMPERFECT_SOUND, layout_tx1 )
-GAMEL( 1985, buggyboy,   0,        buggyboy, buggyboy, driver_device, 0,     ROT0, "Tatsumi", "Buggy Boy/Speed Buggy (cockpit)",          0, layout_buggyboy )
-GAMEL( 1986, buggyboyjr, buggyboy, buggybjr, buggybjr, driver_device, 0,     ROT0, "Tatsumi", "Buggy Boy Junior/Speed Buggy (upright)",   0, layout_buggybjr )
+GAMEL( 1983, tx1,        0,        tx1,      tx1,      tx1_state, 0,     ROT0, "Tatsumi (Atari/Namco/Taito license)", "TX-1 (World)",        MACHINE_IMPERFECT_SOUND, layout_tx1 )
+GAMEL( 1983, tx1jb,      tx1,      tx1,      tx1j,     tx1_state, 0,     ROT0, "Tatsumi",                             "TX-1 (Japan rev. B)", MACHINE_IMPERFECT_SOUND, layout_tx1 )
+GAMEL( 1983, tx1jc,      tx1,      tx1,      tx1j,     tx1_state, 0,     ROT0, "Tatsumi",                             "TX-1 (Japan rev. C)", MACHINE_IMPERFECT_SOUND, layout_tx1 )
+GAMEL( 1985, buggyboy,   0,        buggyboy, buggyboy, tx1_state, 0,     ROT0, "Tatsumi", "Buggy Boy/Speed Buggy (cockpit)",          0, layout_buggyboy )
+GAMEL( 1986, buggyboyjr, buggyboy, buggybjr, buggybjr, tx1_state, 0,     ROT0, "Tatsumi", "Buggy Boy Junior/Speed Buggy (upright)",   0, layout_buggybjr )

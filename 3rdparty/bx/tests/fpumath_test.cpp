@@ -1,10 +1,30 @@
 /*
- * Copyright 2010-2016 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
 #include "test.h"
 #include <bx/fpumath.h>
+
+#if !BX_COMPILER_MSVC || BX_COMPILER_MSVC >= 1800
+#include <cmath>
+TEST_CASE("isFinite, isInfinite, isNan", "")
+{
+	for (uint64_t ii = 0; ii < UINT32_MAX; ii += rand()%(1<<13)+1)
+	{
+		union { uint32_t ui; float f; } u = { uint32_t(ii) };
+		REQUIRE(std::isnan(u.f) == bx::isNan(u.f) );
+		REQUIRE(std::isfinite(u.f) == bx::isFinite(u.f) );
+		REQUIRE(std::isinf(u.f) == bx::isInfinite(u.f) );
+	}
+}
+#endif // !BX_COMPILER_MSVC || BX_COMPILER_MSVC >= 1800
+
+TEST_CASE("ToBits", "")
+{
+	REQUIRE(UINT32_C(0x12345678)         == bx::floatToBits( bx::bitsToFloat( UINT32_C(0x12345678) ) ) );
+	REQUIRE(UINT64_C(0x123456789abcdef0) == bx::doubleToBits(bx::bitsToDouble(UINT32_C(0x123456789abcdef0) ) ) );
+}
 
 void mtxCheck(const float* _a, const float* _b)
 {
@@ -35,7 +55,7 @@ void mtxCheck(const float* _a, const float* _b)
 	}
 }
 
-TEST(Quaternion)
+TEST_CASE("quaternion", "")
 {
 	float mtxQ[16];
 	float mtx[16];

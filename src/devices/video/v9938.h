@@ -6,11 +6,12 @@
 
 ***************************************************************************/
 
+#ifndef MAME_VIDEO_V9938_H
+#define MAME_VIDEO_V9938_H
+
 #pragma once
 
-#ifndef __V9938_H__
-#define __V9938_H__
-
+#include "screen.h"
 
 
 //**************************************************************************
@@ -36,7 +37,7 @@
 		v99x8_device::VERTICAL_ADJUST * 2, \
 		v99x8_device::VVISIBLE_NTSC * 2 - 1 - v99x8_device::VERTICAL_ADJUST * 2) \
 	MCFG_SCREEN_UPDATE_DEVICE(_v9938_tag, v9938_device, screen_update) \
-	MCFG_SCREEN_PALETTE(_v9938_tag":palette")
+	MCFG_SCREEN_PALETTE(_v9938_tag)
 
 #define MCFG_V99X8_SCREEN_ADD_PAL(_screen_tag, _v9938_tag, _clock) \
 	MCFG_SCREEN_ADD(_screen_tag, RASTER) \
@@ -48,10 +49,10 @@
 		v99x8_device::VERTICAL_ADJUST * 2, \
 		v99x8_device::VVISIBLE_PAL * 2 - 1 - v99x8_device::VERTICAL_ADJUST * 2) \
 	MCFG_SCREEN_UPDATE_DEVICE(_v9938_tag, v9938_device, screen_update) \
-	MCFG_SCREEN_PALETTE(_v9938_tag":palette")
+	MCFG_SCREEN_PALETTE(_v9938_tag)
 
 #define MCFG_V99X8_INTERRUPT_CALLBACK(_irq) \
-	downcast<v99x8_device *>(device)->set_interrupt_callback(DEVCB_##_irq);
+	devcb = &downcast<v99x8_device *>(device)->set_interrupt_callback(DEVCB_##_irq);
 
 
 //**************************************************************************
@@ -59,8 +60,8 @@
 //**************************************************************************
 
 // device type definition
-extern const device_type V9938;
-extern const device_type V9958;
+DECLARE_DEVICE_TYPE(V9938, v9938_device)
+DECLARE_DEVICE_TYPE(V9958, v9958_device)
 
 
 
@@ -72,16 +73,11 @@ extern const device_type V9958;
 
 class v99x8_device :    public device_t,
 						public device_memory_interface,
+						public device_palette_interface,
 						public device_video_interface
 {
-protected:
-	// construction/destruction
-	v99x8_device(const machine_config &mconfig, device_type type, const char *name, const char *shortname, const char *tag, device_t *owner, uint32_t clock);
-
 public:
-	template<class _irq> void set_interrupt_callback(_irq irq) {
-		m_int_callback.set_callback(irq);
-	}
+	template <class Object> devcb_base &set_interrupt_callback(Object &&irq) { return m_int_callback.set_callback(std::forward<Object>(irq)); }
 	int get_transpen();
 	bitmap_ind16 &get_bitmap() { return m_bitmap; }
 	void update_mouse_state(int mx_delta, int my_delta, int button_state);
@@ -103,26 +99,29 @@ public:
 	/* RESET pin */
 	void reset_line(int state) { if (state==ASSERT_LINE) device_reset(); }
 
-	static const int HTOTAL = 684;
-	static const int HVISIBLE = 544;
-	static const int VTOTAL_NTSC = 262;
-	static const int VTOTAL_PAL = 313;
-	static const int VVISIBLE_NTSC = 26 + 192 + 25;
-	static const int VVISIBLE_PAL = 53 + 192 + 49;
+	static constexpr int HTOTAL = 684;
+	static constexpr int HVISIBLE = 544;
+	static constexpr int VTOTAL_NTSC = 262;
+	static constexpr int VTOTAL_PAL = 313;
+	static constexpr int VVISIBLE_NTSC = 26 + 192 + 25;
+	static constexpr int VVISIBLE_PAL = 53 + 192 + 49;
 	// Looking at some youtube videos of real units on real monitors
 	// there appear to be small vertical timing differences. Some (LCD)
 	// monitors show the full borders, other CRT monitors seem to
 	// display ~5 lines less at the top and bottom of the screen.
-	static const int VERTICAL_ADJUST = 5;
-	static const int TOP_ERASE = 13;
-	static const int VERTICAL_SYNC = 3;
+	static constexpr int VERTICAL_ADJUST = 5;
+	static constexpr int TOP_ERASE = 13;
+	static constexpr int VERTICAL_SYNC = 3;
 
 protected:
-	static const device_timer_id TIMER_LINE = 0;
+	// construction/destruction
+	v99x8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int model);
+
+	static constexpr device_timer_id TIMER_LINE = 0;
 	const address_space_config      m_space_config;
 	address_space*                  m_vram_space;
 
-	int m_model;
+	const int m_model;
 
 	// device overrides
 	virtual void device_start() override;
@@ -130,7 +129,9 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_DATA) const override { return (spacenum == AS_DATA) ? &m_space_config : nullptr; }
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const override { return (spacenum == AS_DATA) ? &m_space_config : nullptr; }
+
+	virtual void palette_init() = 0;
 
 	void configure_pal_ntsc();
 	void set_screen_parameters();
@@ -144,24 +145,24 @@ private:
 	void check_int();
 	void register_write(int reg, int data);
 
-	void default_border(const pen_t *pens, uint16_t *ln);
-	void graphic7_border(const pen_t *pens, uint16_t *ln);
-	void graphic5_border(const pen_t *pens, uint16_t *ln);
-	void mode_text1(const pen_t *pens, uint16_t *ln, int line);
-	void mode_text2(const pen_t *pens, uint16_t *ln, int line);
-	void mode_multi(const pen_t *pens, uint16_t *ln, int line);
-	void mode_graphic1(const pen_t *pens, uint16_t *ln, int line);
-	void mode_graphic23(const pen_t *pens, uint16_t *ln, int line);
-	void mode_graphic4(const pen_t *pens, uint16_t *ln, int line);
-	void mode_graphic5(const pen_t *pens, uint16_t *ln, int line);
-	void mode_graphic6(const pen_t *pens, uint16_t *ln, int line);
-	void mode_graphic7(const pen_t *pens, uint16_t *ln, int line);
-//  template<typename _PixelType, int _Width> void mode_yae(const pen_t *pens, _PixelType *ln, int line);
-//  template<typename _PixelType, int _Width> void mode_yjk(const pen_t *pens, _PixelType *ln, int line);
-	void mode_unknown(const pen_t *pens, uint16_t *ln, int line);
-	void default_draw_sprite(const pen_t *pens, uint16_t *ln, uint8_t *col);
-	void graphic5_draw_sprite(const pen_t *pens, uint16_t *ln, uint8_t *col);
-	void graphic7_draw_sprite(const pen_t *pens, uint16_t *ln, uint8_t *col);
+	void default_border(uint16_t *ln);
+	void graphic7_border(uint16_t *ln);
+	void graphic5_border(uint16_t *ln);
+	void mode_text1(uint16_t *ln, int line);
+	void mode_text2(uint16_t *ln, int line);
+	void mode_multi(uint16_t *ln, int line);
+	void mode_graphic1(uint16_t *ln, int line);
+	void mode_graphic23(uint16_t *ln, int line);
+	void mode_graphic4(uint16_t *ln, int line);
+	void mode_graphic5(uint16_t *ln, int line);
+	void mode_graphic6(uint16_t *ln, int line);
+	void mode_graphic7(uint16_t *ln, int line);
+//  template<typename _PixelType, int _Width> void mode_yae(_PixelType *ln, int line);
+//  template<typename _PixelType, int _Width> void mode_yjk(_PixelType *ln, int line);
+	void mode_unknown(uint16_t *ln, int line);
+	void default_draw_sprite(uint16_t *ln, uint8_t *col);
+	void graphic5_draw_sprite(uint16_t *ln, uint8_t *col);
+	void graphic7_draw_sprite(uint16_t *ln, uint8_t *col);
 
 	void sprite_mode1(int line, uint8_t *col);
 	void sprite_mode2(int line, uint8_t *col);
@@ -256,13 +257,12 @@ private:
 	struct v99x8_mode
 	{
 		uint8_t m;
-		void (v99x8_device::*visible_16)(const pen_t *, uint16_t*, int);
-		void (v99x8_device::*border_16)(const pen_t *, uint16_t*);
+		void (v99x8_device::*visible_16)(uint16_t*, int);
+		void (v99x8_device::*border_16)(uint16_t*);
 		void (v99x8_device::*sprites)(int, uint8_t*);
-		void (v99x8_device::*draw_sprite_16)(const pen_t *, uint16_t*, uint8_t*);
+		void (v99x8_device::*draw_sprite_16)(uint16_t*, uint8_t*);
 	} ;
 	static const v99x8_mode s_modes[];
-	required_device<palette_device> m_palette;
 	emu_timer *m_line_timer;
 	uint8_t m_pal_ntsc;
 	int m_scanline_start;
@@ -279,9 +279,9 @@ class v9938_device : public v99x8_device
 public:
 	v9938_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_PALETTE_INIT(v9938);
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void palette_init() override;
+	virtual u32 palette_entries() const override { return 512; }
 };
 
 class v9958_device : public v99x8_device
@@ -289,11 +289,10 @@ class v9958_device : public v99x8_device
 public:
 	v9958_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_PALETTE_INIT(v9958);
-
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void palette_init() override;
+	virtual u32 palette_entries() const override { return 19780; }
 };
 
 
-#endif
+#endif // MAME_DEVICES_VIDEO_V9938_H

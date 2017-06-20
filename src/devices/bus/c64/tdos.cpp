@@ -129,6 +129,7 @@ BASIC commands (SYS 32768 to activate)
 
 */
 
+#include "emu.h"
 #include "tdos.h"
 
 
@@ -145,29 +146,18 @@ BASIC commands (SYS 32768 to activate)
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_TDOS = &device_creator<c64_tdos_cartridge_device>;
+DEFINE_DEVICE_TYPE(C64_TDOS, c64_tdos_cartridge_device, "c64_tdos", "C64 TDOS cartridge")
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( c64_multiscreen )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( c64_tdos )
+MACHINE_CONFIG_MEMBER( c64_tdos_cartridge_device::device_add_mconfig )
 	MCFG_DEVICE_ADD(MC68A52P_TAG, MC6852, XTAL_6_5MHz)
 
 	MCFG_C64_PASSTHRU_EXPANSION_SLOT_ADD()
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor c64_tdos_cartridge_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( c64_tdos );
-}
 
 
 //-------------------------------------------------
@@ -202,7 +192,7 @@ ioport_constructor c64_tdos_cartridge_device::device_input_ports() const
 //-------------------------------------------------
 
 c64_tdos_cartridge_device::c64_tdos_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, C64_TDOS, "C64 TDOS cartridge", tag, owner, clock, "c64_tdos", __FILE__),
+	device_t(mconfig, C64_TDOS, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_ssda(*this, MC68A52P_TAG),
 	m_exp(*this, C64_EXPANSION_SLOT_TAG),

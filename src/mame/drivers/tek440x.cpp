@@ -42,11 +42,13 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/mos6551.h"    // debug tty
 #include "machine/mc146818.h"
-#include "bus/rs232/rs232.h"
+#include "screen.h"
+
 
 class tek440x_state : public driver_device
 {
@@ -178,7 +180,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( tek4404, tek440x_state )
+static MACHINE_CONFIG_START( tek4404 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68010, 166666666)
@@ -234,5 +236,5 @@ ROM_END
  *  Game driver(s)
  *
  *************************************/
-/*    YEAR  NAME      PARENT    COMPAT   MACHINE   INPUT   DEVICE       INIT    COMPANY    FULLNAME  FLAGS*/
-COMP( 1984, tek4404,    0,      0,       tek4404, tek4404, driver_device,  0,   "Tektronix", "4404", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME      PARENT  COMPAT   MACHINE  INPUT    DEVICE         INIT  COMPANY      FULLNAME  FLAGS
+COMP( 1984, tek4404,  0,      0,       tek4404, tek4404, tek440x_state, 0,    "Tektronix", "4404",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

@@ -30,41 +30,41 @@ TODO
 
 #include "emu.h"
 #include "cpu/s2650/s2650.h"
-#include "machine/keyboard.h"
-#include "imagedev/snapquik.h"
 #include "imagedev/cassette.h"
-#include "sound/wave.h"
+#include "imagedev/snapquik.h"
+#include "machine/keyboard.h"
 #include "sound/beep.h"
-
-#define KEYBOARD_TAG "keyboard"
+#include "sound/wave.h"
+#include "screen.h"
+#include "speaker.h"
 
 class cd2650_state : public driver_device
 {
 public:
 	cd2650_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_p_videoram(*this, "videoram"),
-		m_maincpu(*this, "maincpu"),
-		m_beep(*this, "beeper"),
-		m_cass(*this, "cassette")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_p_videoram(*this, "videoram")
+		, m_p_chargen(*this, "chargen")
+		, m_beep(*this, "beeper")
+		, m_cass(*this, "cassette")
 	{
 	}
 
 	DECLARE_READ8_MEMBER(keyin_r);
 	DECLARE_WRITE8_MEMBER(beep_w);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	void kbd_put(u8 data);
 	DECLARE_READ8_MEMBER(cass_r);
 	DECLARE_WRITE_LINE_MEMBER(cass_w);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(cd2650);
-	const uint8_t *m_p_chargen;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_shared_ptr<uint8_t> m_p_videoram;
 
 private:
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
-	virtual void video_start() override;
 	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<uint8_t> m_p_videoram;
+	required_region_ptr<u8> m_p_chargen;
 	required_device<beep_device> m_beep;
 	required_device<cassette_image_device> m_cass;
 };
@@ -115,11 +115,6 @@ void cd2650_state::machine_reset()
 {
 	m_term_data = 0x80;
 	m_beep->set_state(0);
-}
-
-void cd2650_state::video_start()
-{
-	m_p_chargen = memregion("chargen")->base();
 }
 
 uint32_t cd2650_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -187,7 +182,7 @@ static GFXDECODE_START( cd2650 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, cd2650_charlayout, 0, 1 )
 GFXDECODE_END
 
-WRITE8_MEMBER( cd2650_state::kbd_put )
+void cd2650_state::kbd_put(u8 data)
 {
 	if (data)
 		m_term_data = data;
@@ -262,7 +257,7 @@ QUICKLOAD_LOAD_MEMBER( cd2650_state, cd2650 )
 	return result;
 }
 
-static MACHINE_CONFIG_START( cd2650, cd2650_state )
+static MACHINE_CONFIG_START( cd2650 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",S2650, XTAL_1MHz)
 	MCFG_CPU_PROGRAM_MAP(cd2650_mem)
@@ -291,8 +286,8 @@ static MACHINE_CONFIG_START( cd2650, cd2650_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
-	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(WRITE8(cd2650_state, kbd_put))
+	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
+	MCFG_GENERIC_KEYBOARD_CB(PUT(cd2650_state, kbd_put))
 	MCFG_CASSETTE_ADD( "cassette" )
 MACHINE_CONFIG_END
 
@@ -319,5 +314,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   CLASS          INIT     COMPANY        FULLNAME       FLAGS */
-COMP( 1977, cd2650, 0,      0,       cd2650,    cd2650, driver_device,  0,   "Central Data",   "CD 2650", 0 )
+//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   CLASS          INIT  COMPANY         FULLNAME   FLAGS
+COMP( 1977, cd2650, 0,      0,       cd2650,    cd2650, cd2650_state,  0,    "Central Data", "CD 2650", 0 )

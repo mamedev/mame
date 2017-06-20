@@ -74,7 +74,7 @@
 */
 
 #include "emu.h"
-#include "softlist.h"
+
 #include "bus/ql/exp.h"
 #include "bus/ql/rom.h"
 #include "bus/rs232/rs232.h"
@@ -84,8 +84,13 @@
 #include "machine/qimi.h"
 #include "machine/ram.h"
 #include "machine/zx8302.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
 #include "video/zx8301.h"
+
+#include "screen.h"
+#include "softlist.h"
+#include "speaker.h"
+
 
 #define SCREEN_TAG  "screen"
 
@@ -144,9 +149,9 @@ public:
 	required_device<rs232_port_device> m_ser1;
 	required_device<rs232_port_device> m_ser2;
 	required_device<ram_device> m_ram;
-	required_device<ql_expansion_slot_t> m_exp;
-	required_device<ql_rom_cartridge_slot_t> m_cart;
-	optional_device<qimi_t> m_qimi;
+	required_device<ql_expansion_slot_device> m_exp;
+	required_device<ql_rom_cartridge_slot_device> m_cart;
+	optional_device<qimi_device> m_qimi;
 	required_memory_region m_rom;
 	required_ioport_array<8> m_y;
 	required_ioport_array<2> m_joy;
@@ -162,7 +167,7 @@ public:
 	DECLARE_WRITE8_MEMBER( ipc_port1_w );
 	DECLARE_WRITE8_MEMBER( ipc_port2_w );
 	DECLARE_READ8_MEMBER( ipc_port2_r );
-	DECLARE_READ8_MEMBER( ipc_t1_r );
+	DECLARE_READ_LINE_MEMBER( ipc_t1_r );
 	DECLARE_READ8_MEMBER( ipc_bus_r );
 	DECLARE_WRITE_LINE_MEMBER( ql_baudx4_w );
 	DECLARE_WRITE_LINE_MEMBER( ql_comdata_w );
@@ -435,7 +440,7 @@ WRITE8_MEMBER( ql_state::ipc_port2_w )
 //  ipc_t1_r -
 //-------------------------------------------------
 
-READ8_MEMBER( ql_state::ipc_t1_r )
+READ_LINE_MEMBER( ql_state::ipc_t1_r )
 {
 	return m_baudx4;
 }
@@ -498,10 +503,6 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( ipc_io, AS_IO, 8, ql_state )
 	AM_RANGE(0x00, 0x7f) AM_WRITE(ipc_w)
 	AM_RANGE(0x27, 0x28) AM_READNOP // IPC reads these to set P0 (bus) to Hi-Z mode
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(ipc_port1_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(ipc_port2_r, ipc_port2_w)
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(ipc_t1_r)
-	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_READ(ipc_bus_r) AM_WRITENOP
 ADDRESS_MAP_END
 
 
@@ -887,13 +888,18 @@ void ql_state::machine_reset()
 //  MACHINE_CONFIG( ql )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( ql, ql_state )
+static MACHINE_CONFIG_START( ql )
 	// basic machine hardware
 	MCFG_CPU_ADD(M68008_TAG, M68008, X1/2)
 	MCFG_CPU_PROGRAM_MAP(ql_mem)
 
 	MCFG_CPU_ADD(I8749_TAG, I8749, X4)
 	MCFG_CPU_IO_MAP(ipc_io)
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(ql_state, ipc_port1_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(ql_state, ipc_port2_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(ql_state, ipc_port2_w))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(ql_state, ipc_t1_r))
+	MCFG_MCS48_PORT_BUS_IN_CB(READ8(ql_state, ipc_bus_r))
 
 	// video hardware
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
@@ -1253,15 +1259,15 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   INIT    COMPANY                     FULLNAME        FLAGS
-COMP( 1984, ql,     0,      0,      ql,         ql, driver_device,     0,      "Sinclair Research Ltd",    "QL (UK)",      MACHINE_SUPPORTS_SAVE )
-COMP( 1985, ql_us,  ql,     0,      ql_ntsc,    ql, driver_device,     0,      "Sinclair Research Ltd",    "QL (USA)",     MACHINE_SUPPORTS_SAVE )
-COMP( 1985, ql_es,  ql,     0,      ql,         ql_es, driver_device,  0,      "Sinclair Research Ltd",    "QL (Spain)",   MACHINE_SUPPORTS_SAVE )
-COMP( 1985, ql_fr,  ql,     0,      ql,         ql_fr, driver_device,  0,      "Sinclair Research Ltd",    "QL (France)",  MACHINE_NOT_WORKING )
-COMP( 1985, ql_de,  ql,     0,      ql,         ql_de, driver_device,  0,      "Sinclair Research Ltd",    "QL (Germany)", MACHINE_SUPPORTS_SAVE )
-COMP( 1985, ql_it,  ql,     0,      ql,         ql_it, driver_device,  0,      "Sinclair Research Ltd",    "QL (Italy)",   MACHINE_SUPPORTS_SAVE )
-COMP( 1985, ql_se,  ql,     0,      ql,         ql_se, driver_device,  0,      "Sinclair Research Ltd",    "QL (Sweden)",  MACHINE_NOT_WORKING )
-COMP( 1985, ql_dk,  ql,     0,      ql,         ql_dk, driver_device,  0,      "Sinclair Research Ltd",    "QL (Denmark)", MACHINE_NOT_WORKING )
-COMP( 1985, ql_gr,  ql,     0,      ql,         ql, driver_device,     0,      "Sinclair Research Ltd",    "QL (Greece)",  MACHINE_SUPPORTS_SAVE )
-COMP( 1984, tonto,  0,      0,      opd,        ql, driver_device,     0,      "British Telecom Business Systems", "Merlin M1800 Tonto", MACHINE_NOT_WORKING )
-//COMP( 1986, megaopd,tonto,    0,      megaopd,    ql, driver_device,     0,      "International Computer Limited", "MegaOPD (USA)", MACHINE_NOT_WORKING )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   STATE      INIT    COMPANY                             FULLNAME              FLAGS
+COMP( 1984, ql,     0,      0,      ql,         ql,     ql_state,  0,      "Sinclair Research Ltd",            "QL (UK)",            MACHINE_SUPPORTS_SAVE )
+COMP( 1985, ql_us,  ql,     0,      ql_ntsc,    ql,     ql_state,  0,      "Sinclair Research Ltd",            "QL (USA)",           MACHINE_SUPPORTS_SAVE )
+COMP( 1985, ql_es,  ql,     0,      ql,         ql_es,  ql_state,  0,      "Sinclair Research Ltd",            "QL (Spain)",         MACHINE_SUPPORTS_SAVE )
+COMP( 1985, ql_fr,  ql,     0,      ql,         ql_fr,  ql_state,  0,      "Sinclair Research Ltd",            "QL (France)",        MACHINE_NOT_WORKING )
+COMP( 1985, ql_de,  ql,     0,      ql,         ql_de,  ql_state,  0,      "Sinclair Research Ltd",            "QL (Germany)",       MACHINE_SUPPORTS_SAVE )
+COMP( 1985, ql_it,  ql,     0,      ql,         ql_it,  ql_state,  0,      "Sinclair Research Ltd",            "QL (Italy)",         MACHINE_SUPPORTS_SAVE )
+COMP( 1985, ql_se,  ql,     0,      ql,         ql_se,  ql_state,  0,      "Sinclair Research Ltd",            "QL (Sweden)",        MACHINE_NOT_WORKING )
+COMP( 1985, ql_dk,  ql,     0,      ql,         ql_dk,  ql_state,  0,      "Sinclair Research Ltd",            "QL (Denmark)",       MACHINE_NOT_WORKING )
+COMP( 1985, ql_gr,  ql,     0,      ql,         ql,     ql_state,  0,      "Sinclair Research Ltd",            "QL (Greece)",        MACHINE_SUPPORTS_SAVE )
+COMP( 1984, tonto,  0,      0,      opd,        ql,     ql_state,  0,      "British Telecom Business Systems", "Merlin M1800 Tonto", MACHINE_NOT_WORKING )
+//COMP( 1986, megaopd,tonto,    0,      megaopd,    ql, ql_state,  0,      "International Computer Limited", "MegaOPD (USA)", MACHINE_NOT_WORKING )

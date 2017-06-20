@@ -308,24 +308,26 @@
 
 **************************************************************************************************/
 
+#include "emu.h"
+#include "cpu/z80/z80.h"
+#include "machine/eepromser.h"
+#include "machine/i8255.h"
+#include "machine/nvram.h"
+#include "machine/v3021.h"
+#include "machine/watchdog.h"
+#include "sound/ay8910.h"
+#include "video/mc6845.h"
+#include "video/resnet.h"
+#include "screen.h"
+#include "speaker.h"
+
+#include "fortecrd.lh"
+
 
 #define MASTER_CLOCK    XTAL_12MHz
 #define CPU_CLOCK       (MASTER_CLOCK/4)
 #define CRTC_CLOCK      (MASTER_CLOCK/8)
 #define AY_CLOCK        (MASTER_CLOCK/8)
-
-#include "emu.h"
-#include "cpu/z80/z80.h"
-#include "machine/eepromser.h"
-#include "machine/watchdog.h"
-#include "sound/ay8910.h"
-#include "machine/i8255.h"
-#include "machine/v3021.h"
-#include "video/mc6845.h"
-#include "machine/nvram.h"
-#include "video/resnet.h"
-
-#include "fortecrd.lh"
 
 
 class fortecar_state : public driver_device
@@ -670,7 +672,7 @@ void fortecar_state::machine_reset()
 *         Machine Drivers          *
 ***********************************/
 
-static MACHINE_CONFIG_START( fortecar, fortecar_state )
+static MACHINE_CONFIG_START( fortecar )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)      /* 3 MHz, measured */
 	MCFG_CPU_PROGRAM_MAP(fortecar_map)
@@ -779,6 +781,6 @@ DRIVER_INIT_MEMBER(fortecar_state, fortecar)
 *          Game Drivers            *
 ***********************************/
 
-/*     YEAR  NAME      PARENT    MACHINE   INPUT     STATE           INIT      ROT    COMPANY       FULLNAME                        FLAGS                LAYOUT */
+//     YEAR  NAME      PARENT    MACHINE   INPUT     STATE           INIT      ROT   COMPANY        FULLNAME                        FLAGS                LAYOUT
 GAMEL( 1994, fortecrd, 0,        fortecar, fortecar, fortecar_state, fortecar, ROT0, "Fortex Ltd", "Forte Card (Ver 110, Spanish)", 0,                   layout_fortecrd )
 GAMEL( 1994, fortecar, fortecrd, fortecar, fortecar, fortecar_state, fortecar, ROT0, "Fortex Ltd", "Forte Card (Ver 103, English)", MACHINE_NOT_WORKING, layout_fortecrd )

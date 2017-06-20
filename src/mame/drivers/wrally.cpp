@@ -104,10 +104,13 @@ The PCB has a layout that can either use the 4 rom set of I7, I9, I11 & I 13 or 
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/wrally.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"
 #include "sound/okim6295.h"
-#include "includes/wrally.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 static ADDRESS_MAP_START( wrally_map, AS_PROGRAM, 16, wrally_state )
@@ -250,7 +253,7 @@ static GFXDECODE_START( wrally )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( wrally, wrally_state )
+static MACHINE_CONFIG_START( wrally )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,XTAL_24MHz/2)        /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(wrally_map)
@@ -280,7 +283,7 @@ static MACHINE_CONFIG_START( wrally, wrally_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_1MHz, OKIM6295_PIN7_HIGH)                 /* verified on pcb */
+	MCFG_OKIM6295_ADD("oki", XTAL_1MHz, PIN7_HIGH)                 /* verified on pcb */
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -387,7 +390,7 @@ ROM_START( wrallyat ) /* Board Marked 930217, Atari License */
 ROM_END
 
 
-GAME( 1993, wrally,   0,      wrally, wrally, driver_device, 0, ROT0, "Gaelco", "World Rally (Version 1.0, Checksum 0E56)", MACHINE_SUPPORTS_SAVE ) /* Dallas DS5002FP power failure shows as: "Tension  baja " */
-GAME( 1993, wrallya,  wrally, wrally, wrally, driver_device, 0, ROT0, "Gaelco", "World Rally (Version 1.0, Checksum 3873)", MACHINE_SUPPORTS_SAVE ) /* Dallas DS5002FP power failure shows as: "Power  Failure" */
-GAME( 1993, wrallyb,  wrally, wrally, wrally, driver_device, 0, ROT0, "Gaelco", "World Rally (Version 1.0, Checksum 8AA2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, wrallyat, wrally, wrally, wrally, driver_device, 0, ROT0, "Gaelco (Atari license)", "World Rally (US, 930217)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, wrally,   0,      wrally, wrally, wrally_state, 0, ROT0, "Gaelco", "World Rally (Version 1.0, Checksum 0E56)", MACHINE_SUPPORTS_SAVE ) /* Dallas DS5002FP power failure shows as: "Tension  baja " */
+GAME( 1993, wrallya,  wrally, wrally, wrally, wrally_state, 0, ROT0, "Gaelco", "World Rally (Version 1.0, Checksum 3873)", MACHINE_SUPPORTS_SAVE ) /* Dallas DS5002FP power failure shows as: "Power  Failure" */
+GAME( 1993, wrallyb,  wrally, wrally, wrally, wrally_state, 0, ROT0, "Gaelco", "World Rally (Version 1.0, Checksum 8AA2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, wrallyat, wrally, wrally, wrally, wrally_state, 0, ROT0, "Gaelco (Atari license)", "World Rally (US, 930217)", MACHINE_SUPPORTS_SAVE )

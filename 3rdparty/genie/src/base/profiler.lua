@@ -564,7 +564,7 @@ function _profiler._pretty_name(self,func)
 	end
 
 	if info.source then
-		name = name .. "@" .. info.source
+		name = name
 	else
 		if info.what == "C" then
 			name = name .. "@?"

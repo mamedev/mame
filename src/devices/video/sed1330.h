@@ -6,12 +6,11 @@
 
 **********************************************************************/
 
+#ifndef MAME_VIDEO_SED1330_H
+#define MAME_VIDEO_SED1330_H
+
 #pragma once
 
-#ifndef __SED1330__
-#define __SED1330__
-
-#include "emu.h"
 
 
 
@@ -57,7 +56,7 @@ protected:
 	virtual void device_reset() override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const override;
 
 	inline uint8_t readbyte(offs_t address);
 	inline void writebyte(offs_t address, uint8_t m_data);
@@ -119,8 +118,6 @@ private:
 
 
 // device type definition
-extern const device_type SED1330;
+DECLARE_DEVICE_TYPE(SED1330, sed1330_device)
 
-
-
-#endif
+#endif // MAME_VIDEO_SED1330_H

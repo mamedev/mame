@@ -20,13 +20,16 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
+#include "includes/spy.h"
+#include "includes/konamipt.h"
+
 #include "cpu/m6809/m6809.h"
+#include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/3812intf.h"
-#include "includes/konamipt.h"
-#include "includes/spy.h"
+#include "speaker.h"
+
 
 INTERRUPT_GEN_MEMBER(spy_state::spy_interrupt)
 {
@@ -489,7 +492,7 @@ void spy_state::machine_reset()
 	m_old_3f90 = -1;
 }
 
-static MACHINE_CONFIG_START( spy, spy_state )
+static MACHINE_CONFIG_START( spy )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 3000000) /* ? */
@@ -605,5 +608,5 @@ ROM_START( spyu )
 ROM_END
 
 
-GAME( 1989, spy,  0,   spy, spy, driver_device, 0, ROT0, "Konami", "S.P.Y. - Special Project Y (World ver. N)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, spyu, spy, spy, spy, driver_device, 0, ROT0, "Konami", "S.P.Y. - Special Project Y (US ver. M)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, spy,  0,   spy, spy, spy_state, 0, ROT0, "Konami", "S.P.Y. - Special Project Y (World ver. N)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, spyu, spy, spy, spy, spy_state, 0, ROT0, "Konami", "S.P.Y. - Special Project Y (US ver. M)", MACHINE_SUPPORTS_SAVE )

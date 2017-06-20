@@ -5,9 +5,11 @@
 //  drawbgfx.cpp - BGFX renderer
 //
 //============================================================
+#include <bx/fpumath.h>
+#include <bx/readerwriter.h>
+
 #if defined(SDLMAME_WIN32) || defined(OSD_WINDOWS) || defined(OSD_UWP)
 // standard windows headers
-#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #if defined(SDLMAME_WIN32)
 #include <SDL2/SDL_syswm.h>
@@ -22,10 +24,8 @@
 #include "rendutil.h"
 #include "aviwrite.h"
 
-#include <bgfx/bgfxplatform.h>
 #include <bgfx/bgfx.h>
-#include <bx/fpumath.h>
-#include <bx/readerwriter.h>
+#include <bgfx/platform.h>
 #include <algorithm>
 
 #include "drawbgfx.h"
@@ -867,7 +867,7 @@ int renderer_bgfx::draw(int update)
 
 void renderer_bgfx::update_recording()
 {
-	bgfx::blit(s_current_view > 0 ? s_current_view - 1 : 0, m_avi_texture, 0, 0, m_avi_target->target());
+	bgfx::blit(s_current_view > 0 ? s_current_view - 1 : 0, m_avi_texture, 0, 0, bgfx::getTexture(m_avi_target->target()));
 	bgfx::readTexture(m_avi_texture, m_avi_data);
 
 	int i = 0;
@@ -1261,7 +1261,7 @@ void renderer_bgfx::allocate_buffer(render_primitive *prim, uint32_t blend, bgfx
 		}
 	}
 
-	if (vertices > 0 && bgfx::checkAvailTransientVertexBuffer(vertices, ScreenVertex::ms_decl))
+	if (vertices > 0 && vertices==bgfx::getAvailTransientVertexBuffer(vertices, ScreenVertex::ms_decl))
 	{
 		bgfx::allocTransientVertexBuffer(buffer, vertices, ScreenVertex::ms_decl);
 	}

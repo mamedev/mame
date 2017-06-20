@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#ifndef NCR5390_H
-#define NCR5390_H
+#ifndef MAME_MACHINE_NCR5390_H
+#define MAME_MACHINE_NCR5390_H
+
+#pragma once
 
 #include "machine/nscsi_bus.h"
 
@@ -17,10 +19,10 @@ public:
 	ncr5390_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<ncr5390_device &>(device).m_irq_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_drq_handler(device_t &device, _Object object) { return downcast<ncr5390_device &>(device).m_drq_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb) { return downcast<ncr5390_device &>(device).m_irq_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_drq_handler(device_t &device, Object &&cb) { return downcast<ncr5390_device &>(device).m_drq_handler.set_callback(std::forward<Object>(cb)); }
 
-	DECLARE_ADDRESS_MAP(map, 8);
+	virtual DECLARE_ADDRESS_MAP(map, 8);
 
 	DECLARE_READ8_MEMBER(tcount_lo_r);
 	DECLARE_WRITE8_MEMBER(tcount_lo_w);
@@ -48,6 +50,8 @@ public:
 	void dma_w(uint8_t val);
 
 protected:
+	ncr5390_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -212,7 +216,10 @@ private:
 	void command_pop_and_chain();
 	void check_irq();
 
+protected:
 	void reset_soft();
+
+private:
 	void reset_disconnect();
 
 	uint8_t fifo_pop();
@@ -227,6 +234,34 @@ private:
 	devcb_write_line m_drq_handler;
 };
 
-extern const device_type NCR5390;
+class ncr53c94_device : public ncr5390_device
+{
+public:
+	ncr53c94_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-#endif
+	virtual DECLARE_ADDRESS_MAP(map, 8) override;
+
+	DECLARE_WRITE8_MEMBER(conf_w);
+
+	DECLARE_WRITE8_MEMBER(test_w);
+	DECLARE_READ8_MEMBER(conf2_r) { return config2; };
+	DECLARE_WRITE8_MEMBER(conf2_w) { config2 = data; };
+	DECLARE_READ8_MEMBER(conf3_r) { return config3; };
+	DECLARE_WRITE8_MEMBER(conf3_w) { config3 = data; };
+	DECLARE_WRITE8_MEMBER(fifo_align_w) { fifo_align = data; };
+
+protected:
+	virtual void device_start() override;
+	void reset_soft();
+
+private:
+	bool test_mode;
+	u8 config2;
+	u8 config3;
+	u8 fifo_align;
+};
+
+DECLARE_DEVICE_TYPE(NCR5390, ncr5390_device)
+DECLARE_DEVICE_TYPE(NCR53C94, ncr53c94_device)
+
+#endif // MAME_MACHINE_NCR5390_H

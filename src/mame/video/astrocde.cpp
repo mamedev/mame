@@ -439,14 +439,14 @@ TIMER_CALLBACK_MEMBER(astrocde_state::scanline_callback)
 		if ((m_interrupt_enabl & 0x04) == 0)
 		{
 			m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_interrupt_vector);
-			timer_set(m_screen->time_until_vblank_end(), TIMER_INTERRUPT_OFF);
+			m_intoff_timer->adjust(m_screen->time_until_vblank_end());
 		}
 
 		/* mode 1 means assert for 1 instruction */
 		else
 		{
 			m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, m_interrupt_vector);
-			timer_set(m_maincpu->cycles_to_attotime(1), TIMER_INTERRUPT_OFF);
+			m_intoff_timer->adjust(m_maincpu->cycles_to_attotime(1));
 		}
 	}
 

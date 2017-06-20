@@ -6,6 +6,7 @@
 //
 //============================================================
 
+#include "emu.h"
 #import "debugconsole.h"
 
 #import "debugcommandhistory.h"
@@ -48,6 +49,7 @@
 	[regScroll setHasVerticalScroller:YES];
 	[regScroll setAutohidesScrollers:YES];
 	[regScroll setBorderType:NSBezelBorder];
+	[regScroll setDrawsBackground:NO];
 	[regScroll setDocumentView:regView];
 	[regView release];
 
@@ -59,6 +61,7 @@
 	[dasmScroll setHasVerticalScroller:YES];
 	[dasmScroll setAutohidesScrollers:YES];
 	[dasmScroll setBorderType:NSBezelBorder];
+	[dasmScroll setDrawsBackground:NO];
 	[dasmScroll setDocumentView:dasmView];
 	[dasmView release];
 
@@ -70,6 +73,7 @@
 	[consoleScroll setHasVerticalScroller:YES];
 	[consoleScroll setAutohidesScrollers:YES];
 	[consoleScroll setBorderType:NSBezelBorder];
+	[consoleScroll setDrawsBackground:NO];
 	[consoleScroll setDocumentView:consoleView];
 	[consoleView release];
 
@@ -160,7 +164,7 @@
 
 	windowFrame.size.width += adjustment.width;
 	windowFrame.size.height += adjustment.height; // not used - better to go for fixed height
-	windowFrame.size.height = std::min(512.0, available.size.height);
+	windowFrame.size.height = std::min(CGFloat(512.0), available.size.height);
 	windowFrame.size.width = std::min(windowFrame.size.width, available.size.width);
 	windowFrame.origin.x = available.origin.x + available.size.width - windowFrame.size.width;
 	windowFrame.origin.y = available.origin.y;

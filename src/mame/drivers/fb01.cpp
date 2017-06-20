@@ -7,14 +7,19 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "sound/ym2151.h"
-#include "machine/nvram.h"
-#include "video/hd44780.h"
-#include "machine/i8251.h"
-#include "machine/clock.h"
+
 #include "bus/midi/midi.h"
+#include "cpu/z80/z80.h"
+#include "machine/clock.h"
+#include "machine/i8251.h"
+#include "machine/nvram.h"
+#include "sound/ym2151.h"
+#include "video/hd44780.h"
+
 #include "rendlay.h"
+#include "screen.h"
+#include "speaker.h"
+
 #include "fb01.lh"
 
 
@@ -167,7 +172,7 @@ PALETTE_INIT_MEMBER(fb01_state, fb01)
 }
 
 
-static MACHINE_CONFIG_START( fb01, fb01_state )
+static MACHINE_CONFIG_START( fb01 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)
 	MCFG_CPU_PROGRAM_MAP(fb01_mem)
@@ -226,5 +231,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME  PARENT  COMPAT   MACHINE  INPUT  INIT                  COMPANY   FULLNAME  FLAGS */
-CONS( 1986, fb01, 0,      0,       fb01,    fb01,  driver_device,   0,   "Yamaha", "FB-01",  MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME  PARENT  COMPAT   MACHINE  INPUT  STATE        INIT  COMPANY   FULLNAME  FLAGS
+CONS( 1986, fb01, 0,      0,       fb01,    fb01,  fb01_state,  0,    "Yamaha", "FB-01",  MACHINE_SUPPORTS_SAVE )

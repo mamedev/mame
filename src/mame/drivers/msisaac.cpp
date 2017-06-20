@@ -9,10 +9,14 @@
 ****************************************************************************/
 
 #include "emu.h"
+#include "includes/msisaac.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/m6805/m6805.h"
 #include "sound/ay8910.h"
-#include "includes/msisaac.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 /*
 TO DO:
@@ -459,7 +463,7 @@ void msisaac_state::machine_reset()
 #endif
 }
 
-static MACHINE_CONFIG_START( msisaac, msisaac_state )
+static MACHINE_CONFIG_START( msisaac )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)
@@ -554,4 +558,4 @@ ROM_START( msisaac )
 ROM_END
 
 
-GAME( 1985, msisaac, 0,     msisaac, msisaac, driver_device, 0, ROT270, "Taito Corporation", "Metal Soldier Isaac II", MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, msisaac, 0,     msisaac, msisaac, msisaac_state, 0, ROT270, "Taito Corporation", "Metal Soldier Isaac II", MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

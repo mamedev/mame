@@ -10,17 +10,13 @@
  *
  */
 
+#ifndef MAME_BUS_ISA_OMTI8621_H
+#define MAME_BUS_ISA_OMTI8621_H
+
 #pragma once
 
-#ifndef ISA_OMTI8621_H_
-#define ISA_OMTI8621_H_
-
-#include "emu.h"
 #include "isa.h"
 #include "machine/pc_fdc.h"
-
-#define OMTI_MAX_LUN 1
-#define CDB_SIZE 10
 
 /***************************************************************************
  FUNCTION PROTOTYPES
@@ -33,30 +29,28 @@ class omti_disk_image_device;
 class omti8621_device : public device_t, public device_isa16_card_interface
 {
 public:
-	omti8621_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-	~omti8621_device() {}
-
 	DECLARE_READ16_MEMBER(read);
 	DECLARE_WRITE16_MEMBER(write);
 
 	static void set_verbose(int on_off);
 
-	required_device<pc_fdc_interface> m_fdc;
-	required_ioport m_iobase;
-	required_ioport m_biosopts;
-
-	DECLARE_WRITE_LINE_MEMBER( fdc_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
-
 protected:
+	static constexpr unsigned OMTI_MAX_LUN = 1;
+	static constexpr unsigned CDB_SIZE = 10;
+
+	omti8621_device(
+			const machine_config &mconfig,
+			device_type type,
+			const char *tag,
+			device_t *owner,
+			uint32_t clock);
+
 	// device-level overrides
-	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 
 	virtual uint8_t dack_r(int line) override;
@@ -65,9 +59,17 @@ protected:
 
 	void set_interrupt(enum line_state line_state);
 
+	required_device<pc_fdc_interface> m_fdc;
+	required_ioport m_iobase;
+	required_ioport m_biosopts;
+
 	omti_disk_image_device *our_disks[OMTI_MAX_LUN+1];
 
 private:
+	DECLARE_WRITE_LINE_MEMBER( fdc_irq_w );
+	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
+
 	uint16_t jumper;
 
 	uint8_t omti_state;
@@ -136,7 +138,7 @@ public:
 	omti8621_pc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
-extern const device_type ISA16_OMTI8621;
+DECLARE_DEVICE_TYPE(ISA16_OMTI8621, omti8621_pc_device)
 
 /* ----- omti8621 for apollo device interface ----- */
 
@@ -151,8 +153,8 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
-extern const device_type ISA16_OMTI8621_APOLLO;
+DECLARE_DEVICE_TYPE(ISA16_OMTI8621_APOLLO, omti8621_apollo_device)
 
 //###############################################################
 
-#endif /* OMTI8621_H_ */
+#endif // MAME_BUS_ISA_OMTI8621_H

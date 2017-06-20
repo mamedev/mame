@@ -122,6 +122,8 @@ video z80
 #include "sound/ay8910.h"
 #include "video/resnet.h"
 #include "video/mb_vcu.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 #define MAZERBLA 0x01
@@ -220,7 +222,7 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(mazerbla);
 	uint32_t screen_update_mazerbla(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void screen_eof(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	INTERRUPT_GEN_MEMBER(sound_interrupt);
 	TIMER_CALLBACK_MEMBER(deferred_ls670_0_w);
 	TIMER_CALLBACK_MEMBER(deferred_ls670_1_w);
@@ -289,7 +291,7 @@ uint32_t mazerbla_state::screen_update_mazerbla(screen_device &screen, bitmap_rg
 	return 0;
 }
 
-void mazerbla_state::screen_eof(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(mazerbla_state::screen_vblank)
 {
 	if (state)
 	{
@@ -1439,7 +1441,7 @@ void mazerbla_state::machine_reset()
 	memset(m_lookup_ram, 0, ARRAY_LENGTH(m_lookup_ram));
 }
 
-static MACHINE_CONFIG_START( mazerbla, mazerbla_state )
+static MACHINE_CONFIG_START( mazerbla )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK)  /* 4 MHz, no NMI, IM2 - vectors at 0xf8, 0xfa, 0xfc */
@@ -1481,7 +1483,7 @@ static MACHINE_CONFIG_START( mazerbla, mazerbla_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( greatgun, mazerbla_state )
+static MACHINE_CONFIG_START( greatgun )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK)  /* 4 MHz, no NMI, IM2 - vectors at 0xf8, 0xfa, 0xfc */
@@ -1513,7 +1515,7 @@ static MACHINE_CONFIG_START( greatgun, mazerbla_state )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mazerbla_state, screen_update_mazerbla)
-	MCFG_SCREEN_VBLANK_DRIVER(mazerbla_state, screen_eof)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(mazerbla_state, screen_vblank))
 
 	MCFG_PALETTE_ADD("palette", 256+1)
 	MCFG_PALETTE_INIT_OWNER(mazerbla_state, mazerbla)
@@ -1664,4 +1666,4 @@ DRIVER_INIT_MEMBER(mazerbla_state,greatgun)
 
 GAME( 1983, mazerbla,  0,        mazerbla,  mazerbla, mazerbla_state, mazerbla, ROT0, "Stern Electronics", "Mazer Blazer (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1983, mazerblaa, mazerbla, mazerbla,  mazerbla, mazerbla_state, mazerbla, ROT0, "Stern Electronics", "Mazer Blazer (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, greatgun,  0,        greatgun,  greatgun, mazerbla_state, greatgun, ROT0, "Stern Electronics", "Great Guns", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, greatgun,  0,        greatgun,  greatgun, mazerbla_state, greatgun, ROT0, "Stern Electronics", "Great Guns",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

@@ -16,10 +16,24 @@ HNZVC
 
 #define OP_HANDLER(_name) void m6800_cpu_device::_name ()
 
-//OP_HANDLER( illegal )
-OP_HANDLER( illegal )
+//OP_HANDLER( illegl1 )
+OP_HANDLER( illegl1 )
 {
-	logerror("m6800: illegal opcode: address %04X, op %02X\n",PC-1,(int) M_RDOP_ARG(PC-1)&0xFF);
+	logerror("m6800: illegal 1-byte opcode: address %04X, op %02X\n",PC-1,(int) M_RDOP_ARG(PC-1)&0xFF);
+}
+
+//OP_HANDLER( illegl2 )
+OP_HANDLER( illegl2 )
+{
+	logerror("m6800: illegal 2-byte opcode: address %04X, op %02X\n",PC-1,(int) M_RDOP_ARG(PC-1)&0xFF);
+	PC++;
+}
+
+//OP_HANDLER( illegl3 )
+OP_HANDLER( illegl3 )
+{
+	logerror("m6800: illegal 3-byte opcode: address %04X, op %02X\n",PC-1,(int) M_RDOP_ARG(PC-1)&0xFF);
+	PC += 2;
 }
 
 /* HD63701 only */
@@ -27,7 +41,7 @@ OP_HANDLER( illegal )
 OP_HANDLER( trap )
 {
 	logerror("m6800: illegal opcode: address %04X, op %02X\n",PC-1,(int) M_RDOP_ARG(PC-1)&0xFF);
-	TAKE_TRAP;
+	TAKE_TRAP();
 }
 
 /* $00 ILLEGAL */
@@ -205,7 +219,7 @@ OP_HANDLER( slp )
 {
 	/* wait for next IRQ (same as waiting of wai) */
 	m_wai_state |= M6800_SLP;
-	EAT_CYCLES;
+	EAT_CYCLES();
 }
 
 /* $1b ABA inherent ***** */
@@ -445,7 +459,7 @@ OP_HANDLER( wai )
 	PUSHBYTE(B);
 	PUSHBYTE(CC);
 	CHECK_IRQ_LINES();
-	if (m_wai_state & M6800_WAI) EAT_CYCLES;
+	if (m_wai_state & M6800_WAI) EAT_CYCLES();
 }
 
 /* $3f SWI absolute indirect ----- */

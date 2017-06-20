@@ -20,10 +20,13 @@ displayed.
 ***************************************************************************/
 
 #include "emu.h"
+#include "audio/seibu.h"
+
 #include "cpu/nec/nec.h"
 #include "sound/2203intf.h"
-#include "audio/seibu.h"
 #include "video/hd63484.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class shanghai_state : public driver_device
@@ -189,8 +192,8 @@ static INPUT_PORTS_START( kothello )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("DSW")
-	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
@@ -199,21 +202,43 @@ static INPUT_PORTS_START( kothello )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_4C ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:4,5,6")
+	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x38, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x18, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x28, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_4C ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x03, 0x01, "Move Timer (Versus)" ) PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(    0x03, "20 Seconds" )
+	PORT_DIPSETTING(    0x01, "25 Seconds" )
+	PORT_DIPSETTING(    0x02, "30 Seconds" )
+	PORT_DIPSETTING(    0x00, "35 Seconds" )
+	PORT_DIPNAME( 0x0c, 0x04, "Move Timer (Puzzle)" ) PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPSETTING(    0x0c, "30 Seconds" )
+	PORT_DIPSETTING(    0x04, "35 Seconds" )
+	PORT_DIPSETTING(    0x08, "40 Seconds" )
+	PORT_DIPSETTING(    0x00, "45 Seconds" )
+	PORT_DIPNAME( 0x30, 0x10, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPSETTING(    0x30, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Medium_Easy ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Medium_Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
+	PORT_DIPNAME( 0xc0, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:7,8") // alleged to be number of losses to end tsume mode
+	PORT_DIPSETTING(    0xc0, "1" )
+	PORT_DIPSETTING(    0x40, "2" )
+	PORT_DIPSETTING(    0x80, "3" )
+	PORT_DIPSETTING(    0x00, "4" )
 INPUT_PORTS_END
 
 
@@ -378,7 +403,7 @@ static ADDRESS_MAP_START( hd63484_map, AS_0, 16, shanghai_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_RAM
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( shanghai, shanghai_state )
+static MACHINE_CONFIG_START( shanghai )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V30, XTAL_16MHz/2) /* NEC D70116C-8 */
@@ -414,7 +439,7 @@ static MACHINE_CONFIG_START( shanghai, shanghai_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( shangha2, shanghai_state )
+static MACHINE_CONFIG_START( shangha2 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V30, XTAL_16MHz/2) /* ? */
@@ -449,7 +474,7 @@ static MACHINE_CONFIG_START( shangha2, shanghai_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( kothello, shanghai_state )
+static MACHINE_CONFIG_START( kothello )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V30, XTAL_16MHz)
@@ -481,7 +506,8 @@ static MACHINE_CONFIG_START( kothello, shanghai_state )
 	/* same as standard seibu ym2203, but also reads "DSW" */
 	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_16MHz/4)
 	MCFG_YM2203_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW"))
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
 	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
@@ -652,8 +678,8 @@ ROM_END
 
 
 
-GAME( 1988, shanghai,  0,        shanghai, shanghai, driver_device, 0, ROT0, "Sunsoft", "Shanghai (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, shanghaij, shanghai, shanghai, shanghai, driver_device, 0, ROT0, "Sunsoft", "Shanghai (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, shangha2,  0,        shangha2, shangha2, driver_device, 0, ROT0, "Sunsoft", "Shanghai II (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, shangha2a, shangha2, shangha2, shangha2, driver_device, 0, ROT0, "Sunsoft", "Shanghai II (Japan, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, kothello,  0,        kothello, kothello, driver_device, 0, ROT0, "Success", "Kyuukyoku no Othello", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, shanghai,  0,        shanghai, shanghai, shanghai_state, 0, ROT0, "Sunsoft", "Shanghai (World)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, shanghaij, shanghai, shanghai, shanghai, shanghai_state, 0, ROT0, "Sunsoft", "Shanghai (Japan)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, shangha2,  0,        shangha2, shangha2, shanghai_state, 0, ROT0, "Sunsoft", "Shanghai II (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, shangha2a, shangha2, shangha2, shangha2, shanghai_state, 0, ROT0, "Sunsoft", "Shanghai II (Japan, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, kothello,  0,        kothello, kothello, shanghai_state, 0, ROT0, "Success", "Kyuukyoku no Othello",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

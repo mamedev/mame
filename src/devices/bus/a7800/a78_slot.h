@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli
-#ifndef __A78_SLOT_H
-#define __A78_SLOT_H
+#ifndef MAME_BUS_A7800_A78_SLOT_H
+#define MAME_BUS_A7800_A78_SLOT_H
+
+#pragma once
 
 #include "softlist_dev.h"
 
@@ -19,8 +21,8 @@ enum
 	A78_TYPE2,          // Atari SuperGame pcb (8x16K banks with bankswitch)
 	A78_TYPE3,          // as TYPE1 + POKEY chip on the PCB
 	A78_TYPE6,          // as TYPE1 + RAM IC on the PCB
-	A78_TYPE8,          // Rescue on Fractalus, as TYPE0 + 2K Mirror RAM IC on the PCB
- 	A78_TYPEA,          // Alien Brigade, Crossbow (9x16K banks with diff bankswitch)
+	A78_TYPEA,          // Alien Brigade, Crossbow (9x16K banks with diff bankswitch)
+ 	A78_TYPE8,          // Rescue on Fractalus, as TYPE0 + 2K Mirror RAM IC on the PCB
 	A78_ABSOLUTE,       // F18 Hornet
 	A78_ACTIVISION,     // Double Dragon, Rampage
 	A78_HSC,            // Atari HighScore cart
@@ -43,7 +45,6 @@ class device_a78_cart_interface : public device_slot_card_interface
 {
 public:
 	// construction/destruction
-	device_a78_cart_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_a78_cart_interface();
 
 	// memory accessor
@@ -67,6 +68,8 @@ public:
 	uint32_t get_nvram_size() { return m_nvram.size(); }
 
 protected:
+	device_a78_cart_interface(const machine_config &mconfig, device_t &device);
+
 	// internal state
 	uint8_t *m_rom;
 	uint32_t m_rom_size;
@@ -76,9 +79,6 @@ protected:
 	uint32_t m_base_rom;
 	int m_bank_mask;
 };
-
-
-void a78_partialhash(util::hash_collection &dest, const unsigned char *data, unsigned long length, const char *functions);
 
 
 // ======================> a78_cart_slot_device
@@ -94,7 +94,6 @@ public:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_config_complete() override;
 
 	// image-level overrides
 	virtual image_init_result call_load() override;
@@ -112,10 +111,10 @@ public:
 	virtual bool is_reset_on_load() const override { return 1; }
 	virtual const char *image_interface() const override { return "a7800_cart"; }
 	virtual const char *file_extensions() const override { return "bin,a78"; }
-	virtual device_image_partialhash_func get_partial_hash() const override { return &a78_partialhash; }
+	virtual u32 unhashed_header_length() const override { return 128; }
 
 	// slot interface overrides
-	virtual std::string get_default_card_software() override;
+	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_04xx);
@@ -132,13 +131,13 @@ private:
 	int m_type;
 
 	image_verify_result verify_header(char *header);
-	int validate_header(int head, bool log);
+	int validate_header(int head, bool log) const;
 	void internal_header_logging(uint8_t *header, uint32_t len);
 };
 
 
 // device type definition
-extern const device_type A78_CART_SLOT;
+DECLARE_DEVICE_TYPE(A78_CART_SLOT, a78_cart_slot_device)
 
 
 /***************************************************************************
@@ -152,4 +151,4 @@ extern const device_type A78_CART_SLOT;
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
 
-#endif
+#endif // MAME_BUS_A7800_A78_SLOT_H

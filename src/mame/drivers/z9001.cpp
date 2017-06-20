@@ -29,48 +29,50 @@ ToDo:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/z80pio.h"
-#include "machine/z80ctc.h"
 #include "cpu/z80/z80daisy.h"
-#include "sound/wave.h"
 #include "imagedev/cassette.h"
+#include "machine/z80ctc.h"
+#include "machine/z80pio.h"
 #include "sound/beep.h"
+#include "sound/wave.h"
+#include "screen.h"
+#include "speaker.h"
 
 // temporary
 #include "machine/keyboard.h"
-
-#define KEYBOARD_TAG "keyboard"
 
 class z9001_state : public driver_device
 {
 public:
 	z9001_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_framecnt(0),
-		m_beeper(*this, "beeper"),
-		m_cass(*this, "cassette"),
-		m_p_colorram(*this, "colorram"),
-		m_p_videoram(*this, "videoram")
+		: driver_device(mconfig, type, tag)
+		, m_framecnt(0)
+		, m_maincpu(*this, "maincpu")
+		, m_beeper(*this, "beeper")
+		, m_cass(*this, "cassette")
+		, m_p_colorram(*this, "colorram")
+		, m_p_videoram(*this, "videoram")
+		, m_p_chargen(*this, "chargen")
 	{
 	}
 
-	required_device<cpu_device> m_maincpu;
+	void kbd_put(u8 data);
+	DECLARE_WRITE8_MEMBER(port88_w);
+	DECLARE_WRITE_LINE_MEMBER(cass_w);
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_callback);
+	uint32_t screen_update_z9001(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+private:
 	uint8_t m_framecnt;
+	bool m_cassbit;
+	virtual void machine_reset() override;
+	//virtual void machine_start();
+	required_device<cpu_device> m_maincpu;
 	required_device<beep_device> m_beeper;
 	required_device<cassette_image_device> m_cass;
 	required_shared_ptr<uint8_t> m_p_colorram;
 	required_shared_ptr<uint8_t> m_p_videoram;
-	DECLARE_WRITE8_MEMBER(kbd_put);
-	DECLARE_WRITE8_MEMBER(port88_w);
-	DECLARE_WRITE_LINE_MEMBER(cass_w);
-	const uint8_t *m_p_chargen;
-	bool m_cassbit;
-	virtual void machine_reset() override;
-	//virtual void machine_start();
-	virtual void video_start() override;
-	uint32_t screen_update_z9001(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_callback);
+	required_region_ptr<u8> m_p_chargen;
 };
 
 static ADDRESS_MAP_START(z9001_mem, AS_PROGRAM, 8, z9001_state)
@@ -126,11 +128,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(z9001_state::timer_callback)
 void z9001_state::machine_reset()
 {
 	m_maincpu->set_state_int(Z80_PC, 0xf000);
-}
-
-void z9001_state::video_start()
-{
-	m_p_chargen = memregion("chargen")->base();
 }
 
 uint32_t z9001_state::screen_update_z9001(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -190,7 +187,7 @@ static const gfx_layout z9001_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-WRITE8_MEMBER( z9001_state::kbd_put )
+void z9001_state::kbd_put(u8 data)
 {
 	m_maincpu->space(AS_PROGRAM).write_byte(0x0025, data);
 }
@@ -200,7 +197,7 @@ static GFXDECODE_START( z9001 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( z9001, z9001_state )
+static MACHINE_CONFIG_START( z9001 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_9_8304MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(z9001_mem)
@@ -227,8 +224,8 @@ static MACHINE_CONFIG_START( z9001, z9001_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
-	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(WRITE8(z9001_state, kbd_put))
+	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
+	MCFG_GENERIC_KEYBOARD_CB(PUT(z9001_state, kbd_put))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("z9001_timer", z9001_state, timer_callback, attotime::from_msec(10))
 
 	MCFG_DEVICE_ADD("z80pio1", Z80PIO, XTAL_9_8304MHz / 4)
@@ -307,10 +304,10 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME      PARENT   COMPAT   MACHINE    INPUT    CLASS        INIT  COMPANY      FULLNAME       FLAGS */
-COMP( 1984, z9001,    0,       0,       z9001,     z9001, driver_device,   0,   "Robotron", "Z9001 (KC 85/1.10)", MACHINE_NOT_WORKING )
-COMP( 1986, kc85_111, z9001,   0,       z9001,     z9001, driver_device,   0,   "Robotron", "KC 85/1.11", MACHINE_NOT_WORKING )
-COMP( 1987, kc87_10,  z9001,   0,       z9001,     z9001, driver_device,   0,   "Robotron", "KC 87.10", MACHINE_NOT_WORKING )
-COMP( 1987, kc87_11,  z9001,   0,       z9001,     z9001, driver_device,   0,   "Robotron", "KC 87.11", MACHINE_NOT_WORKING )
-COMP( 1987, kc87_20,  z9001,   0,       z9001,     z9001, driver_device,   0,   "Robotron", "KC 87.20", MACHINE_NOT_WORKING )
-COMP( 1987, kc87_21,  z9001,   0,       z9001,     z9001, driver_device,   0,   "Robotron", "KC 87.21", MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT   COMPAT  MACHINE  INPUT  CLASS        INIT  COMPANY     FULLNAME              FLAGS
+COMP( 1984, z9001,    0,       0,      z9001,   z9001, z9001_state, 0,    "Robotron", "Z9001 (KC 85/1.10)", MACHINE_NOT_WORKING )
+COMP( 1986, kc85_111, z9001,   0,      z9001,   z9001, z9001_state, 0,    "Robotron", "KC 85/1.11",         MACHINE_NOT_WORKING )
+COMP( 1987, kc87_10,  z9001,   0,      z9001,   z9001, z9001_state, 0,    "Robotron", "KC 87.10",           MACHINE_NOT_WORKING )
+COMP( 1987, kc87_11,  z9001,   0,      z9001,   z9001, z9001_state, 0,    "Robotron", "KC 87.11",           MACHINE_NOT_WORKING )
+COMP( 1987, kc87_20,  z9001,   0,      z9001,   z9001, z9001_state, 0,    "Robotron", "KC 87.20",           MACHINE_NOT_WORKING )
+COMP( 1987, kc87_21,  z9001,   0,      z9001,   z9001, z9001_state, 0,    "Robotron", "KC 87.21",           MACHINE_NOT_WORKING )

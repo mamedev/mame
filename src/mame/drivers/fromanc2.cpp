@@ -19,11 +19,14 @@
 ******************************************************************************/
 
 #include "emu.h"
+#include "includes/fromanc2.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "sound/2610intf.h"
-#include "includes/fromanc2.h"
 #include "rendlay.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /*************************************
@@ -155,6 +158,12 @@ WRITE8_MEMBER(fromanc2_state::fromanc2_subcpu_rombank_w)
 	membank("bank2")->set_entry((data & 0x0c) >> 2);
 }
 
+// custom handler allowing byte-smeared writes
+WRITE16_MEMBER(fromanc2_state::uart_w)
+{
+	m_uart->ins8250_w(space, offset, data & 0xff);
+}
+
 
 /*************************************
  *
@@ -254,8 +263,7 @@ static ADDRESS_MAP_START( fromanc4_main_map, AS_PROGRAM, 16, fromanc2_state )
 	AM_RANGE(0xe30000, 0xe30013) AM_WRITENOP                        // ???
 	AM_RANGE(0xe40000, 0xe40013) AM_WRITENOP                        // ???
 
-	AM_RANGE(0xe50000, 0xe50009) AM_WRITENOP                        // EXT-COMM PORT ?
-	AM_RANGE(0xe5000c, 0xe5000d) AM_READNOP                         // EXT-COMM PORT ?
+	AM_RANGE(0xe50000, 0xe5000f) AM_DEVREAD8("uart", ns16550_device, ins8250_r, 0x00ff) AM_WRITE(uart_w) // EXT-COMM PORT ?
 ADDRESS_MAP_END
 
 
@@ -498,7 +506,7 @@ void fromanc2_state::machine_reset()
 	m_datalatch_2l = 0;
 }
 
-static MACHINE_CONFIG_START( fromanc2, fromanc2_state )
+static MACHINE_CONFIG_START( fromanc2 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,32000000/2)      /* 16.00 MHz */
@@ -558,7 +566,7 @@ static MACHINE_CONFIG_START( fromanc2, fromanc2_state )
 	MCFG_SOUND_ROUTE(2, "mono", 0.75)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( fromancr, fromanc2_state )
+static MACHINE_CONFIG_START( fromancr )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,32000000/2)      /* 16.00 MHz */
@@ -618,20 +626,22 @@ static MACHINE_CONFIG_START( fromancr, fromanc2_state )
 	MCFG_SOUND_ROUTE(2, "mono", 0.75)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( fromanc4, fromanc2_state )
+static MACHINE_CONFIG_START( fromanc4 )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,32000000/2)      /* 16.00 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)      /* 16.00 MHz */
 	MCFG_CPU_PROGRAM_MAP(fromanc4_main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", fromanc2_state,  fromanc2_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80,32000000/4)        /* 8.00 MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_32MHz/4)        /* 8.00 MHz */
 	MCFG_CPU_PROGRAM_MAP(fromanc2_sound_map)
 	MCFG_CPU_IO_MAP(fromanc2_sound_io_map)
 
 	MCFG_MACHINE_START_OVERRIDE(fromanc2_state,fromanc4)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+
+	MCFG_DEVICE_ADD("uart", NS16550, 2000000) // actual type is TL16C550CFN; clock unknown
 
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", "lpalette", fromancr)
@@ -808,5 +818,5 @@ DRIVER_INIT_MEMBER(fromanc2_state,fromanc4)
  *************************************/
 
 GAME( 1995, fromanc2, 0, fromanc2, fromanc2, fromanc2_state, fromanc2, ROT0, "Video System Co.", "Taisen Idol-Mahjong Final Romance 2 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, fromancr, 0, fromancr, fromanc2, fromanc2_state, fromanc2, ROT0, "Video System Co.", "Taisen Mahjong Final Romance R (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, fromanc4, 0, fromanc4, fromanc4, fromanc2_state, fromanc4, ROT0, "Video System Co.", "Taisen Mahjong Final Romance 4 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, fromancr, 0, fromancr, fromanc2, fromanc2_state, fromanc2, ROT0, "Video System Co.", "Taisen Mahjong Final Romance R (Japan)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1998, fromanc4, 0, fromanc4, fromanc4, fromanc2_state, fromanc4, ROT0, "Video System Co.", "Taisen Mahjong Final Romance 4 (Japan)",      MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )

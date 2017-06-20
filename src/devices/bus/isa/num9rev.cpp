@@ -5,12 +5,14 @@
 
 #include "emu.h"
 #include "num9rev.h"
+#include "screen.h"
+
 
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ISA8_NUM_9_REV = &device_creator<isa8_number_9_rev_device>;
+DEFINE_DEVICE_TYPE(ISA8_NUM_9_REV, isa8_number_9_rev_device, "number_9_rev", "Number Nine Revolution 512x32/1024x8")
 
 static ADDRESS_MAP_START( upd7220_map, AS_0, 16, isa8_number_9_rev_device )
 	AM_RANGE(0x00000, 0x3ffff) AM_NOP
@@ -45,7 +47,12 @@ UPD7220_DISPLAY_PIXELS_MEMBER( isa8_number_9_rev_device::hgdc_display_pixels )
 	}
 }
 
-static MACHINE_CONFIG_FRAGMENT( num_9_rev )
+
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( isa8_number_9_rev_device::device_add_mconfig )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_SIZE(512, 448)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 448-1)
@@ -59,16 +66,6 @@ static MACHINE_CONFIG_FRAGMENT( num_9_rev )
 	MCFG_VIDEO_SET_SCREEN("screen")
 MACHINE_CONFIG_END
 
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor isa8_number_9_rev_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( num_9_rev );
-}
-
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -78,12 +75,12 @@ machine_config_constructor isa8_number_9_rev_device::device_mconfig_additions() 
 //-------------------------------------------------
 
 isa8_number_9_rev_device::isa8_number_9_rev_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, ISA8_NUM_9_REV, "Number Nine Revolution 512x32/1024x8", tag, owner, clock, "number_9_rev", __FILE__),
-		device_isa8_card_interface(mconfig, *this),
-		m_upd7220(*this, "upd7220"),
-		m_palette(*this, "palette"),
-		m_ram(1024*1024),
-		m_overlay(1024), m_bank(0), m_mode(0), m_1024(false)
+	device_t(mconfig, ISA8_NUM_9_REV, tag, owner, clock),
+	device_isa8_card_interface(mconfig, *this),
+	m_upd7220(*this, "upd7220"),
+	m_palette(*this, "palette"),
+	m_ram(1024*1024),
+	m_overlay(1024), m_bank(0), m_mode(0), m_1024(false)
 {
 }
 

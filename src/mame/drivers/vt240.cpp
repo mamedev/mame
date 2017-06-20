@@ -19,12 +19,14 @@
 #include "machine/bankdev.h"
 #include "machine/x2212.h"
 #include "video/upd7220.h"
+#include "screen.h"
+
 
 #define VERBOSE_DBG 0       /* general debug messages */
 
 #define DBG_LOG(N,M,A) \
 	do { \
-	if(VERBOSE_DBG>=N) \
+		if(VERBOSE_DBG>=N) \
 		{ \
 			logerror("%11.6f at %s: ",machine().time().as_double(),machine().describe_context()); \
 			logerror A; \
@@ -35,20 +37,22 @@ class vt240_state : public driver_device
 {
 public:
 	vt240_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_i8085(*this, "charcpu"),
-		m_i8251(*this, "i8251"),
-		m_duart(*this, "duart"),
-		m_host(*this, "host"),
-		m_hgdc(*this, "upd7220"),
-		m_bank(*this, "bank"),
-		m_nvram(*this, "x2212"),
-		m_palette(*this, "palette"),
-		m_rom(*this, "maincpu"),
-		m_video_ram(*this, "vram"),
-		m_monitor(*this, "monitor"),
-		m_lk201(*this, "lk201"){ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_i8085(*this, "charcpu")
+		, m_i8251(*this, "i8251")
+		, m_duart(*this, "duart")
+		, m_host(*this, "host")
+		, m_hgdc(*this, "upd7220")
+		, m_bank(*this, "bank")
+		, m_nvram(*this, "x2212")
+		, m_palette(*this, "palette")
+		, m_rom(*this, "maincpu")
+		, m_video_ram(*this, "vram")
+		, m_monitor(*this, "monitor")
+		, m_lk201(*this, "lk201")
+	{
+	}
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_i8085;
@@ -374,7 +378,7 @@ WRITE8_MEMBER(vt240_state::vom_w)
 
 READ16_MEMBER(vt240_state::vram_r)
 {
-	if(!BIT(m_reg0, 3) || space.debugger_access())
+	if(!BIT(m_reg0, 3) || machine().side_effect_disabled())
 	{
 		offset = ((offset & 0x18000) >> 1) | (offset & 0x3fff);
 		return m_video_ram[offset & 0x7fff];
@@ -634,7 +638,7 @@ static INPUT_PORTS_START( vt240 )
 	PORT_CONFSETTING(0x01, "Color")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( vt240, vt240_state )
+static MACHINE_CONFIG_START( vt240 )
 	MCFG_CPU_ADD("maincpu", T11, XTAL_7_3728MHz) // confirm
 	MCFG_CPU_PROGRAM_MAP(vt240_mem)
 	MCFG_T11_INITIAL_MODE(5 << 13)
@@ -770,7 +774,7 @@ ROM_START( vt240 )
 ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT          CLASS   INIT    COMPANY                      FULLNAME       FLAGS */
-COMP( 1983, vt240,  0,      0,       vt240,    vt240, driver_device,   0,  "Digital Equipment Corporation", "VT240", MACHINE_IMPERFECT_GRAPHICS )
-//COMP( 1983, vt241,  0,      0,       vt220,     vt220, driver_device,   0,  "Digital Equipment Corporation", "VT241", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1983, vt240,  0,      0,       vt240,    vt240, vt240_state,   0,  "Digital Equipment Corporation", "VT240", MACHINE_IMPERFECT_GRAPHICS )
+//COMP( 1983, vt241,  0,      0,       vt220,     vt220, vt240_state,   0,  "Digital Equipment Corporation", "VT241", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 // NOTE: the only difference between VT240 and VT241 is the latter comes with a VR241 Color monitor, while the former comes with a mono display; the ROMs and operation are identical.
-COMP( 1983, mc7105, 0,      0,       mc7105,    vt240, driver_device,   0,  "Elektronika",                  "MC7105", MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1983, mc7105, 0,      0,       mc7105,    vt240, vt240_state,   0,  "Elektronika",                  "MC7105", MACHINE_IMPERFECT_GRAPHICS )

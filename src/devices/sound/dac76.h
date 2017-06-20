@@ -19,12 +19,11 @@
 
 ***************************************************************************/
 
+#ifndef MAME_SOUND_DAC76_H
+#define MAME_SOUND_DAC76_H
+
 #pragma once
 
-#ifndef __DAC76_H__
-#define __DAC76_H__
-
-#include "emu.h"
 
 
 //**************************************************************************
@@ -71,6 +70,6 @@ private:
 };
 
 // device type definition
-extern const device_type DAC76;
+DECLARE_DEVICE_TYPE(DAC76, dac76_device)
 
-#endif // __DAC76_H__
+#endif // MAME_SOUND_DAC76_H

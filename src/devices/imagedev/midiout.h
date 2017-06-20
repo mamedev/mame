@@ -8,8 +8,8 @@
 
 *********************************************************************/
 
-#ifndef __MIDIOUT_H__
-#define __MIDIOUT_H__
+#ifndef MAME_DEVICES_IMAGEDEV_MIDIOUT_H
+#define MAME_DEVICES_IMAGEDEV_MIDIOUT_H
 
 
 /***************************************************************************
@@ -55,8 +55,6 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	virtual void device_config_complete() override;
-
 	// serial overrides
 	virtual void rcv_complete() override;    // Rx completed receiving byte
 
@@ -65,9 +63,9 @@ private:
 };
 
 // device type definition
-extern const device_type MIDIOUT;
+DECLARE_DEVICE_TYPE(MIDIOUT, midiout_device)
 
 // device iterator
-typedef device_type_iterator<&device_creator<midiout_device>, midiout_device> midiout_device_iterator;
+typedef device_type_iterator<midiout_device> midiout_device_iterator;
 
-#endif /* __MIDIOUT_H__ */
+#endif // MAME_DEVICES_IMAGEDEV_MIDIOUT_H

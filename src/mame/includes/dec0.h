@@ -10,6 +10,12 @@
 class dec0_state : public driver_device
 {
 public:
+	enum class mcu_type {
+		EMULATED,
+		BADDUDES_SIM,
+		BIRDTRY_SIM
+	};
+
 	dec0_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -47,9 +53,9 @@ public:
 	optional_shared_ptr<uint8_t> m_robocop_shared_ram;
 	optional_shared_ptr<uint8_t> m_hippodrm_shared_ram;
 
-	int m_game;
-	int m_i8751_return;
-	int m_i8751_command;
+	mcu_type m_game;
+	uint16_t m_i8751_return;
+	uint16_t m_i8751_command;
 	int m_slyspy_state;
 	int m_hippodrm_msb;
 	int m_hippodrm_lsb;
@@ -85,7 +91,7 @@ public:
 	DECLARE_DRIVER_INIT(hbarrel);
 	DECLARE_DRIVER_INIT(slyspy);
 	DECLARE_DRIVER_INIT(birdtry);
-	DECLARE_DRIVER_INIT(baddudes);
+	DECLARE_DRIVER_INIT(drgninja);
 	DECLARE_DRIVER_INIT(midresb);
 	DECLARE_DRIVER_INIT(ffantasybl);
 
@@ -134,14 +140,12 @@ public:
 	uint16_t m_automat_scroll_regs[4];
 
 	DECLARE_WRITE16_MEMBER(automat_control_w);
-	DECLARE_WRITE16_MEMBER(secretab_sound_w);
 	DECLARE_READ16_MEMBER( automat_palette_r );
 	DECLARE_WRITE16_MEMBER( automat_palette_w );
 	DECLARE_WRITE16_MEMBER( automat_scroll_w )
 	{
 		COMBINE_DATA(&m_automat_scroll_regs[offset]);
 	}
-	DECLARE_READ8_MEMBER(sound_command_r);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	DECLARE_WRITE_LINE_MEMBER(msm1_vclk_cb);
 	DECLARE_WRITE_LINE_MEMBER(msm2_vclk_cb);

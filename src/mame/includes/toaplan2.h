@@ -5,9 +5,6 @@
 //#define USE_HD64x180          /* Define if CPU support is available */
 //#define TRUXTON2_STEREO       /* Uncomment to hear truxton2 music in stereo */
 
-// We encode priority with colour in the tilemaps, so need a larger palette
-#define T2PALETTE_LENGTH 0x10000
-
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"
 #include "machine/gen_latch.h"
@@ -16,15 +13,14 @@
 #include "machine/upd4992.h"
 #include "video/gp9001.h"
 #include "sound/okim6295.h"
+#include "screen.h"
+
+// We encode priority with colour in the tilemaps, so need a larger palette
+#define T2PALETTE_LENGTH 0x10000
 
 class toaplan2_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_RAISE_IRQ
-	};
-
 	toaplan2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_shared_ram(*this, "shared_ram"),
@@ -106,9 +102,7 @@ public:
 	DECLARE_READ8_MEMBER(fixeight_region_r);
 	DECLARE_WRITE8_MEMBER(raizing_z80_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(raizing_oki_bankswitch_w);
-	DECLARE_WRITE16_MEMBER(bgaregga_soundlatch_w);
 	DECLARE_READ8_MEMBER(bgaregga_E01D_r);
-	DECLARE_WRITE8_MEMBER(bgaregga_E00C_w);
 	DECLARE_READ16_MEMBER(batrider_z80_busack_r);
 	DECLARE_WRITE16_MEMBER(batrider_z80_busreq_w);
 	DECLARE_READ16_MEMBER(batrider_z80rom_r);
@@ -140,7 +134,7 @@ public:
 	DECLARE_DRIVER_INIT(batrider);
 	DECLARE_DRIVER_INIT(enmadaio);
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
-	DECLARE_MACHINE_START(toaplan2);
+	virtual void machine_start() override;
 	DECLARE_MACHINE_RESET(toaplan2);
 	DECLARE_VIDEO_START(toaplan2);
 	DECLARE_MACHINE_RESET(ghox);
@@ -162,19 +156,15 @@ public:
 	uint32_t screen_update_batsugun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_truxton2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_bootleg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_toaplan2(screen_device &screen, bool state);
-	INTERRUPT_GEN_MEMBER(toaplan2_vblank_irq1);
-	INTERRUPT_GEN_MEMBER(toaplan2_vblank_irq2);
-	INTERRUPT_GEN_MEMBER(toaplan2_vblank_irq4);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_toaplan2);
+	IRQ_CALLBACK_MEMBER(fixeightbl_irq_ack);
+	IRQ_CALLBACK_MEMBER(pipibibsbl_irq_ack);
 	INTERRUPT_GEN_MEMBER(bbakraid_snd_interrupt);
 	void truxton2_postload();
 	void create_tx_tilemap(int dx = 0, int dx_flipped = 0);
-	void toaplan2_vblank_irq(int irq_line);
 
 	DECLARE_WRITE8_MEMBER(pwrkick_coin_w);
 	DECLARE_WRITE8_MEMBER(pwrkick_coin_lockout_w);
 
 	DECLARE_WRITE_LINE_MEMBER(toaplan2_reset);
-protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

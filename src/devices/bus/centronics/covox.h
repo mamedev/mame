@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef __CENTRONICS_COVOX_H__
-#define __CENTRONICS_COVOX_H__
+#ifndef MAME_BUS_CENTRONICS_COVOX_H
+#define MAME_BUS_CENTRONICS_COVOX_H
 
 #pragma once
 
@@ -23,12 +23,12 @@ public:
 	// construction/destruction
 	centronics_covox_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	virtual DECLARE_WRITE_LINE_MEMBER( input_data0 ) override { if (state) m_data |= 0x01; else m_data &= ~0x01; update_dac(); }
 	virtual DECLARE_WRITE_LINE_MEMBER( input_data1 ) override { if (state) m_data |= 0x02; else m_data &= ~0x02; update_dac(); }
@@ -48,7 +48,7 @@ private:
 };
 
 // device type definition
-extern const device_type CENTRONICS_COVOX;
+DECLARE_DEVICE_TYPE(CENTRONICS_COVOX, centronics_covox_device)
 
 // ======================> centronics_covox_stereo_device
 
@@ -59,12 +59,12 @@ public:
 	// construction/destruction
 	centronics_covox_stereo_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	virtual DECLARE_WRITE_LINE_MEMBER( input_strobe ) override { m_strobe = state; update_dac(); }
 	virtual DECLARE_WRITE_LINE_MEMBER( input_data0 ) override { if (state) m_data |= 0x01; else m_data &= ~0x01; update_dac(); }
@@ -89,6 +89,6 @@ private:
 };
 
 // device type definition
-extern const device_type CENTRONICS_COVOX_STEREO;
+DECLARE_DEVICE_TYPE(CENTRONICS_COVOX_STEREO, centronics_covox_stereo_device)
 
-#endif /* __CENTRONICS_COVOX_H__ */
+#endif // MAME_BUS_CENTRONICS_COVOX_H

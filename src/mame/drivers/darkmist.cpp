@@ -29,8 +29,9 @@ TODO:
 */
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "includes/darkmist.h"
+#include "cpu/z80/z80.h"
+#include "speaker.h"
 
 void darkmist_state::machine_start()
 {
@@ -236,7 +237,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(darkmist_state::scanline)
 
 
 
-static MACHINE_CONFIG_START( darkmist, darkmist_state )
+static MACHINE_CONFIG_START( darkmist )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,4000000)         /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(memmap)

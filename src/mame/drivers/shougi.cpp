@@ -83,6 +83,8 @@ PROM  : Type MB7051
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "video/resnet.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class shougi_state : public driver_device
@@ -396,7 +398,7 @@ INTERRUPT_GEN_MEMBER(shougi_state::vblank_nmi)
 }
 
 
-static MACHINE_CONFIG_START( shougi, shougi_state )
+static MACHINE_CONFIG_START( shougi )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_10MHz/4)
@@ -487,6 +489,6 @@ ROM_START( shougi2 )
 ROM_END
 
 
-/*    YEAR  NAME     PARENT  MACHINE  INPUT    INIT              MONITOR, COMPANY, FULLNAME, FLAGS */
-GAME( 1982, shougi,  0,      shougi,  shougi,  driver_device, 0, ROT0, "Alpha Denshi Co. (Tehkan license)", "Shougi", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, shougi2, 0,      shougi,  shougi2, driver_device, 0, ROT0, "Alpha Denshi Co. (Tehkan license)", "Shougi Part II", MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME     PARENT  MACHINE  INPUT    STATE         INIT  MONITOR  COMPANY                              FULLNAME          FLAGS */
+GAME( 1982, shougi,  0,      shougi,  shougi,  shougi_state, 0,    ROT0,    "Alpha Denshi Co. (Tehkan license)", "Shougi",         MACHINE_SUPPORTS_SAVE )
+GAME( 1982, shougi2, 0,      shougi,  shougi2, shougi_state, 0,    ROT0,    "Alpha Denshi Co. (Tehkan license)", "Shougi Part II", MACHINE_SUPPORTS_SAVE )

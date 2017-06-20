@@ -14,6 +14,7 @@
 
 */
 
+#include "emu.h"
 #include "comxpl80.h"
 
 
@@ -30,7 +31,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type COMX_PL80 = &device_creator<comx_pl80_device>;
+DEFINE_DEVICE_TYPE(COMX_PL80, comx_pl80_device, "comx_pl80", "COMX PL-80")
 
 
 //-------------------------------------------------
@@ -94,26 +95,15 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( comxpl80 )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( comxpl80 )
+MACHINE_CONFIG_MEMBER( comx_pl80_device::device_add_mconfig )
 	MCFG_CPU_ADD(CX005_TAG, M6805, 4000000) // CX005: some kind of MC6805/MC68HC05 clone
 	MCFG_CPU_PROGRAM_MAP(comxpl80_mem)
 	MCFG_CPU_IO_MAP(comxpl80_io)
 	MCFG_DEVICE_DISABLE()
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor comx_pl80_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( comxpl80 );
-}
 
 
 //-------------------------------------------------
@@ -159,7 +149,7 @@ ioport_constructor comx_pl80_device::device_input_ports() const
 //-------------------------------------------------
 
 comx_pl80_device::comx_pl80_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, COMX_PL80, "COMX PL-80", tag, owner, clock, "comx_pl80", __FILE__),
+	: device_t(mconfig, COMX_PL80, tag, owner, clock),
 		device_centronics_peripheral_interface(mconfig, *this),
 		m_plotter(*this, "gfx1"),
 		m_font(*this, "FONT"),

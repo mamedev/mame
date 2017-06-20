@@ -64,7 +64,12 @@ function hiscore.startplugin()
 		  emu.print_verbose("hiscore: " .. cputag .. " device not found")
 		  return nil
 		end
-		mem = cpu.spaces[space];
+		local rgnname, rgntype = space:match("([^/]*)/?([^/]*)")
+		if rgntype == "share" then
+			mem = manager:machine():memory().shares[rgnname]
+		else
+			mem = cpu.spaces[space]
+		end
 		if not mem then
 		  emu.print_verbose("hiscore: " .. space .. " space not found")
 		  return nil;

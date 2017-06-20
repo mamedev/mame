@@ -110,9 +110,12 @@ cc_p14.j2 8192 0xedc6a1eb M5L2764k
 */
 
 #include "emu.h"
+#include "includes/mainsnk.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-#include "includes/mainsnk.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 void mainsnk_state::machine_start()
@@ -386,7 +389,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_CONFIG_START( mainsnk, mainsnk_state )
+static MACHINE_CONFIG_START( mainsnk )
 
 	MCFG_CPU_ADD("maincpu", Z80, 3360000)
 	MCFG_CPU_PROGRAM_MAP(main_map)
@@ -488,5 +491,5 @@ ROM_START( canvas )
 ROM_END
 
 
-GAME( 1984, mainsnk,   0,   mainsnk, mainsnk, driver_device, 0,   ROT0, "SNK", "Main Event (1984)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, canvas,    0,   mainsnk, canvas, driver_device,  0,   ROT0, "SNK", "Canvas Croquis", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, mainsnk,   0,   mainsnk, mainsnk, mainsnk_state, 0,   ROT0, "SNK", "Main Event (1984)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, canvas,    0,   mainsnk, canvas,  mainsnk_state, 0,   ROT0, "SNK", "Canvas Croquis", MACHINE_SUPPORTS_SAVE )

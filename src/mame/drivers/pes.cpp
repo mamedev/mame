@@ -53,20 +53,23 @@ Address map:
   port 3.7: write, /RD (general) and /OE (pin 22) for unpopulated 6164 SRAM
 
 */
+#include "emu.h"
+#include "includes/pes.h"
+
+#include "cpu/mcs51/mcs51.h"
+#include "sound/tms5220.h"
+#include "speaker.h"
+
+
 #define CPU_CLOCK       XTAL_10_245MHz
 
 #undef DEBUG_FIFO
 #undef DEBUG_SERIAL_CB
 #undef DEBUG_PORTS
 
-/* Core includes */
-#include "emu.h"
-#include "includes/pes.h"
-#include "cpu/mcs51/mcs51.h"
-#include "sound/tms5220.h"
 
 /* Devices */
-WRITE8_MEMBER(pes_state::pes_kbd_input)
+void pes_state::pes_kbd_input(u8 data)
 {
 #ifdef DEBUG_FIFO
 	fprintf(stderr,"keyboard input: %c, ", data);
@@ -114,15 +117,13 @@ WRITE8_MEMBER(pes_state::data_from_i8031)
 }
 
 /* Port Handlers */
-WRITE8_MEMBER( pes_state::rsws_w )
+WRITE8_MEMBER( pes_state::rsq_wsq_w )
 {
-	m_wsstate = data&0x1; // /ws is bit 0
-	m_rsstate = (data&0x2)>>1; // /rs is bit 1
 #ifdef DEBUG_PORTS
-	logerror("port0 write: RSWS states updated: /RS: %d, /WS: %d\n", m_rsstate, m_wsstate);
+	logerror("port0 write: RSWS states updated: /RS: %d, /WS: %d\n", (data&0x2)>>1, data&0x1);
 #endif
-	m_speech->rsq_w(m_rsstate);
-	m_speech->wsq_w(m_wsstate);
+	/* /RS is bit 1, /WS is bit 0 */
+	m_speech->combined_rsq_wsq_w(space, 0, data&0x3);
 }
 
 WRITE8_MEMBER( pes_state::port1_w )
@@ -230,7 +231,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(i80c31_io, AS_IO, 8, pes_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x0, 0x0) AM_WRITE(rsws_w) /* /WS(0) and /RS(1) */
+	AM_RANGE(0x0, 0x0) AM_WRITE(rsq_wsq_w) /* /WS(0) and /RS(1) */
 	AM_RANGE(0x1, 0x1) AM_READWRITE(port1_r, port1_w) /* tms5220 reads and writes */
 	AM_RANGE(0x3, 0x3) AM_READWRITE(port3_r, port3_w) /* writes and reads from port 3, see top of file */
 ADDRESS_MAP_END
@@ -244,7 +245,7 @@ INPUT_PORTS_END
 /******************************************************************************
  Machine Drivers
 ******************************************************************************/
-static MACHINE_CONFIG_START( pes, pes_state )
+static MACHINE_CONFIG_START( pes )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I80C31, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(i80c31_mem)
@@ -258,7 +259,7 @@ static MACHINE_CONFIG_START( pes, pes_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(pes_state, pes_kbd_input))
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(pes_state, pes_kbd_input))
 MACHINE_CONFIG_END
 
 /******************************************************************************
@@ -277,5 +278,5 @@ ROM_END
  Drivers
 ******************************************************************************/
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   INIT    COMPANY                        FULLNAME            FLAGS */
-COMP( 1987, pes,    0,      0,      pes,        pes, driver_device,    0, "Pacific Educational Systems", "VPU-01 Speech box", MACHINE_NOT_WORKING )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT  STATE       INIT  COMPANY                        FULLNAME             FLAGS
+COMP( 1987, pes,    0,      0,      pes,        pes,   pes_state,  0,    "Pacific Educational Systems", "VPU-01 Speech box", MACHINE_NOT_WORKING )

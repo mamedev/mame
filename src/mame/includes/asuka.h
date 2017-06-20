@@ -8,6 +8,7 @@
 
 #include "machine/taitoio.h"
 #include "sound/msm5205.h"
+#include "machine/74157.h"
 #include "video/pc090oj.h"
 #include "video/tc0100scn.h"
 #include "video/tc0110pcr.h"
@@ -26,26 +27,30 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_msm(*this, "msm"),
+		m_adpcm_select(*this, "adpcm_select"),
+		m_sound_data(*this, "ymsnd"),
 		m_pc090oj(*this, "pc090oj"),
 		m_tc0100scn(*this, "tc0100scn"),
 		m_tc0110pcr(*this, "tc0110pcr"),
 		m_tc0220ioc(*this, "tc0220ioc") { }
 
 	/* video-related */
-	uint16_t      m_video_ctrl;
-	uint16_t      m_video_mask;
+	u16         m_video_ctrl;
+	u16         m_video_mask;
 
 	/* c-chip */
 	int         m_current_round;
 	int         m_current_bank;
 
-	uint8_t       m_cval[26];
-	uint8_t       m_cc_port;
-	uint8_t       m_restart_status;
+	u8          m_cval[26];
+	u8          m_cc_port;
+	u8          m_restart_status;
 
 	/* misc */
-	int         m_adpcm_pos;
-	int         m_adpcm_data;
+	u16         m_adpcm_pos;
+	bool        m_adpcm_ff;
+
+	emu_timer *m_cadash_int5_timer;
 
 	optional_shared_ptr<uint8_t> m_cadash_shared_ram;
 
@@ -53,10 +58,13 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	optional_device<msm5205_device> m_msm;
+	optional_device<ls157_device> m_adpcm_select;
+	optional_region_ptr<u8> m_sound_data;
 	required_device<pc090oj_device> m_pc090oj;
 	required_device<tc0100scn_device> m_tc0100scn;
 	required_device<tc0110pcr_device> m_tc0110pcr;
 	optional_device<tc0220ioc_device> m_tc0220ioc;
+	DECLARE_WRITE8_MEMBER(coin_control_w);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(asuka_msm5205_address_w);
 	DECLARE_READ16_MEMBER(cadash_share_r);
@@ -69,8 +77,9 @@ public:
 	virtual void machine_reset() override;
 	uint32_t screen_update_bonzeadv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_asuka(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_asuka(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_asuka);
 	INTERRUPT_GEN_MEMBER(cadash_interrupt);
+	DECLARE_DRIVER_INIT(cadash);
 
 	/*----------- defined in machine/bonzeadv.c -----------*/
 	void WriteLevelData();

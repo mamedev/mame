@@ -108,6 +108,7 @@
     Michael Zapf, June 2012
 */
 
+#include "emu.h"
 #include "tms9900.h"
 
 #define NOPRG -1
@@ -174,8 +175,8 @@ enum
     twice their number. Accordingly, the TMS9900 has a CRU bitmask 0x0fff.
 ****************************************************************************/
 
-tms99xx_device::tms99xx_device(const machine_config &mconfig, device_type type,  const char *name, const char *tag, int databus_width, int prg_addr_bits, int cru_addr_bits, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
+tms99xx_device::tms99xx_device(const machine_config &mconfig, device_type type, const char *tag, int databus_width, int prg_addr_bits, int cru_addr_bits, device_t *owner, uint32_t clock)
+	: cpu_device(mconfig, type, tag, owner, clock),
 		m_program_config("program", ENDIANNESS_BIG, databus_width, prg_addr_bits),
 		m_io_config("cru", ENDIANNESS_BIG, 8, cru_addr_bits),
 		m_prgspace(nullptr),
@@ -203,7 +204,7 @@ tms99xx_device::~tms99xx_device()
 ****************************************************************************/
 
 tms9900_device::tms9900_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms99xx_device(mconfig, TMS9900, "TMS9900", tag, 16, 16, 12, owner, clock, "tms9900", __FILE__)
+	: tms99xx_device(mconfig, TMS9900, tag, 16, 16, 12, owner, clock)
 {
 }
 
@@ -419,9 +420,8 @@ void tms99xx_device::state_string_export(const device_state_entry &entry, std::s
 uint16_t tms99xx_device::read_workspace_register_debug(int reg)
 {
 	int temp = m_icount;
-	m_prgspace->set_debugger_access(true);
+	auto dis = machine().disable_side_effect();
 	uint16_t value = m_prgspace->read_word((WP+(reg<<1)) & m_prgaddr_mask & 0xfffe);
-	m_prgspace->set_debugger_access(false);
 	m_icount = temp;
 	return value;
 }
@@ -429,9 +429,8 @@ uint16_t tms99xx_device::read_workspace_register_debug(int reg)
 void tms99xx_device::write_workspace_register_debug(int reg, uint16_t data)
 {
 	int temp = m_icount;
-	m_prgspace->set_debugger_access(true);
+	auto dis = machine().disable_side_effect();
 	m_prgspace->write_word((WP+(reg<<1)) & m_prgaddr_mask & 0xfffe, data);
-	m_prgspace->set_debugger_access(false);
 	m_icount = temp;
 }
 
@@ -2776,4 +2775,4 @@ offs_t tms99xx_device::disasm_disassemble(std::ostream &stream, offs_t pc, const
 }
 
 
-const device_type TMS9900 = &device_creator<tms9900_device>;
+DEFINE_DEVICE_TYPE(TMS9900, tms9900_device, "tms9900", "TMS9900")

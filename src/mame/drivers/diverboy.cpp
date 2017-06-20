@@ -53,6 +53,8 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/gen_latch.h"
 #include "sound/okim6295.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 
@@ -263,7 +265,7 @@ void diverboy_state::machine_start()
 {
 }
 
-static MACHINE_CONFIG_START( diverboy, diverboy_state )
+static MACHINE_CONFIG_START( diverboy )
 
 	MCFG_CPU_ADD("maincpu", M68000, 12000000) /* guess */
 	MCFG_CPU_PROGRAM_MAP(diverboy_map)
@@ -291,7 +293,7 @@ static MACHINE_CONFIG_START( diverboy, diverboy_state )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", 1320000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 1320000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -338,4 +340,4 @@ ROM_END
 
 
 
-GAME( 1992, diverboy, 0, diverboy, diverboy, driver_device, 0, ORIENTATION_FLIP_X, "Gamart (Electronic Devices Italy license)", "Diver Boy", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, diverboy, 0, diverboy, diverboy, diverboy_state, 0, ORIENTATION_FLIP_X, "Gamart (Electronic Devices Italy license)", "Diver Boy", MACHINE_SUPPORTS_SAVE )

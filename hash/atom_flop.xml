@@ -65,6 +65,18 @@
 		</part>
 	</software>
 
+	<software name="galxians">
+		<description>Galaxians (12K)</description>
+		<year>1982</year>
+		<publisher>Aardvark</publisher>
+		<info name="usage" value="Load with *RUN&quot;GALAXI&quot;" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102400">
+				<rom name="Galaxians(Aardvark).dsk" size="102400" crc="142fff89" sha1="5edca5333d5584ed64f980f15c67698873db93ff" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="hardhath">
 		<description>Hard Hat Harry (32K)</description>
 		<year>2011</year>
@@ -152,6 +164,19 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
 				<rom name="jungle.dsk" size="102400" crc="92c50fe2" sha1="a6ffbdbf0f2f7b5c4038d44632a14e1b89682db0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="manicmin">
+		<description>Manic Miner (32K)</description>
+		<year>2017</year>
+		<publisher>Retro Software</publisher>
+		<info name="author" value="Kees van Oss" />
+		<info name="usage" value="Load with *RUN&quot;MMRUN&quot;" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102400">
+				<rom name="mm.dsk" size="102400" crc="744d5ac9" sha1="7990c552cacf4af428251afc2fde452bdd2bb1af" offset="0" />
 			</dataarea>
 		</part>
 	</software>

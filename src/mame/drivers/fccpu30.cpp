@@ -70,6 +70,14 @@
  *
  * History of Force Computers
  *---------------------------
+ * 1981 Force Computers was founded in San Jose, California. Over time a European headquarter was opened
+ *      in Munich, Germany, and a Japanese headquarter in Tokyo
+ * 1996 Force was aquired by Solectron Corporation in 1996
+ * 2004 Force was sold off from Solectron to Motorola
+ * 2008 Force was aquired by Emerson as part of the Motorola Embedded Division
+ * 2016 Force was aquired by Platinum Equity as part of the Emerson Network Power Division
+ *
+ * Force developed and produced VME board products based on SPARC, Pentium, PowerPC and 68K.
  *
  * Misc links about Force Computes and this board:
  *------------------------------------------------
@@ -188,6 +196,9 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "bus/vme/vme.h"
+#include "bus/vme/vme_fcisio.h"
+#include "bus/vme/vme_fcscsi.h"
 #include "machine/msm6242.h"
 #include "machine/ram.h" // For variants that only differs in amount of RAM
 #include "machine/scnxx562.h"
@@ -198,17 +209,21 @@
 #include "machine/clock.h"
 //#include "machine/timekpr.h"
 
-#define VERBOSE 0
+//#define LOG_GENERAL (1U <<  0)
+#define LOG_SETUP   (1U <<  1)
+#define LOG_READ    (1U <<  2)
+#define LOG_INT     (1U <<  3)
+#define LOG_INIT    (1U <<  4)
 
-#define LOGPRINT(x)  { do { if (VERBOSE) logerror x; } while (0); }
-#define LOG(x)      {} LOGPRINT(x)
-#define LOGINIT(x)  {} LOGPRINT(x)
-#define LOGR(x)     {}
-#define LOGSETUP(x) {}
-#define LOGINT(x)   {}
-#if VERBOSE >= 2
-#define logerror printf
-#endif
+//#define VERBOSE (LOG_GENERAL | LOG_SETUP)
+//#define LOG_OUTPUT_FUNC printf
+
+#include "logmacro.h"
+
+#define LOGSETUP(...) LOGMASKED(LOG_SETUP,  __VA_ARGS__)
+#define LOGR(...)     LOGMASKED(LOG_READ,   __VA_ARGS__)
+#define LOGINT(...)   LOGMASKED(LOG_INT,    __VA_ARGS__)
+#define LOGINIT(...)  LOGMASKED(LOG_INIT,   __VA_ARGS__)
 
 #ifdef _MSC_VER
 #define FUNCNAME __func__
@@ -333,7 +348,7 @@ INPUT_PORTS_END
 /* Start it up */
 void cpu30_state::machine_start ()
 {
-	LOGINIT(("%s\n", FUNCNAME));
+	LOGINIT("%s\n", FUNCNAME);
 
 	save_pointer (NAME (m_sysrom), sizeof(m_sysrom));
 	save_pointer (NAME (m_sysram), sizeof(m_sysram));
@@ -347,7 +362,7 @@ void cpu30_state::machine_start ()
 
 void cpu30_state::machine_reset ()
 {
-	LOGINIT(("%s\n", FUNCNAME));
+	LOGINIT("%s\n", FUNCNAME);
 
 	/* Reset pointer to bootvector in ROM for bootvector handler bootvect_r */
 	if (m_sysrom == &m_sysram[0]) /* Condition needed because memory map is not setup first time */
@@ -355,50 +370,50 @@ void cpu30_state::machine_reset ()
 }
 
 /*                                                                              setup board ID */
-DRIVER_INIT_MEMBER( cpu30_state, cpu30x )      { LOGINIT(("%s\n", FUNCNAME)); m_board_id = 0x50; }
-DRIVER_INIT_MEMBER( cpu30_state, cpu30xa )     { LOGINIT(("%s\n", FUNCNAME)); m_board_id = 0x50; }
-DRIVER_INIT_MEMBER( cpu30_state, cpu30za )     { LOGINIT(("%s\n", FUNCNAME)); m_board_id = 0x50; }
-DRIVER_INIT_MEMBER( cpu30_state, cpu30zbe )    { LOGINIT(("%s\n", FUNCNAME)); m_board_id = 0x50; }
-DRIVER_INIT_MEMBER( cpu30_state, cpu30be8 )    { LOGINIT(("%s\n", FUNCNAME)); m_board_id = 0x50; }
-DRIVER_INIT_MEMBER( cpu30_state, cpu30be16 )   { LOGINIT(("%s\n", FUNCNAME)); m_board_id = 0x50; }
-DRIVER_INIT_MEMBER( cpu30_state, cpu30lite4 )  { LOGINIT(("%s\n", FUNCNAME)); m_board_id = 0x50; }
-DRIVER_INIT_MEMBER( cpu30_state, cpu30lite8 )  { LOGINIT(("%s\n", FUNCNAME)); m_board_id = 0x50; }
-DRIVER_INIT_MEMBER( cpu30_state, cpu33 )       { LOGINIT(("%s\n", FUNCNAME)); m_board_id = 0x68; } // 0x60 skips FGA prompt
+DRIVER_INIT_MEMBER( cpu30_state, cpu30x )      { LOGINIT("%s\n", FUNCNAME); m_board_id = 0x50; }
+DRIVER_INIT_MEMBER( cpu30_state, cpu30xa )     { LOGINIT("%s\n", FUNCNAME); m_board_id = 0x50; }
+DRIVER_INIT_MEMBER( cpu30_state, cpu30za )     { LOGINIT("%s\n", FUNCNAME); m_board_id = 0x50; }
+DRIVER_INIT_MEMBER( cpu30_state, cpu30zbe )    { LOGINIT("%s\n", FUNCNAME); m_board_id = 0x50; }
+DRIVER_INIT_MEMBER( cpu30_state, cpu30be8 )    { LOGINIT("%s\n", FUNCNAME); m_board_id = 0x50; }
+DRIVER_INIT_MEMBER( cpu30_state, cpu30be16 )   { LOGINIT("%s\n", FUNCNAME); m_board_id = 0x50; }
+DRIVER_INIT_MEMBER( cpu30_state, cpu30lite4 )  { LOGINIT("%s\n", FUNCNAME); m_board_id = 0x50; }
+DRIVER_INIT_MEMBER( cpu30_state, cpu30lite8 )  { LOGINIT("%s\n", FUNCNAME); m_board_id = 0x50; }
+DRIVER_INIT_MEMBER( cpu30_state, cpu33 )       { LOGINIT("%s\n", FUNCNAME); m_board_id = 0x68; } // 0x60 skips FGA prompt
 
 /* Mock FDC driver */
 READ8_MEMBER (cpu30_state::fdc_r){
-	LOG(("%s\n * FDC read Offset: %04x\n", FUNCNAME, offset));
+	LOG("%s\n * FDC read Offset: %04x\n", FUNCNAME, offset);
 	return 1;
 }
 
 WRITE8_MEMBER (cpu30_state::fdc_w){
-	LOG(("%s\n * FDC write Offset: %04x Data: %02x\n", FUNCNAME, offset, data));
+	LOG("%s\n * FDC write Offset: %04x Data: %02x\n", FUNCNAME, offset, data);
 }
 
 /* Mock SCSI driver */
 READ8_MEMBER (cpu30_state::scsi_r){
-	LOG(("%s\n * SCSI read Offset: %04x\n", FUNCNAME, offset));
+	LOG("%s\n * SCSI read Offset: %04x\n", FUNCNAME, offset);
 	return 1;
 }
 
 WRITE8_MEMBER (cpu30_state::scsi_w){
-	LOG(("%s\n * SCSI write Offset: %04x Data: %02x\n", FUNCNAME, offset, data));
+	LOG("%s\n * SCSI write Offset: %04x Data: %02x\n", FUNCNAME, offset, data);
 }
 
 /* 1 = board is in slot 1, 0 = board is NOT in slot 1 */
 READ8_MEMBER (cpu30_state::slot1_status_r){
-	LOG(("%s\n", FUNCNAME));
+	LOG("%s\n", FUNCNAME);
 	return 1;
 }
 
 /* Boot vector handler, the PCB hardwires the first 8 bytes from 0xff800000 to 0x0 at reset*/
 READ32_MEMBER (cpu30_state::bootvect_r){
-	LOG(("%s\n", FUNCNAME));
+	LOG("%s\n", FUNCNAME);
 	return m_sysrom[offset];
 }
 
 WRITE32_MEMBER (cpu30_state::bootvect_w){
-	LOG(("%s\n", FUNCNAME));
+	LOG("%s\n", FUNCNAME);
 	m_sysram[offset % sizeof(m_sysram)] &= ~mem_mask;
 	m_sysram[offset % sizeof(m_sysram)] |= (data & mem_mask);
 	m_sysrom = &m_sysram[0]; // redirect all upcomming accesses to masking RAM until reset.
@@ -459,42 +474,42 @@ WRITE32_MEMBER (cpu30_state::bootvect_w){
  * "To start VMEPROM, the rotary switches must both be set to 'F':" Hmm...
  */
 READ8_MEMBER (cpu30_state::rotary_rd){
-	LOG(("%s\n", FUNCNAME));
+	LOG("%s\n", FUNCNAME);
 	return 0xff; // TODO: make this configurable from commandline or artwork
 }
 
 // PIT#1 Port B TODO: implement floppy and dma control
 READ8_MEMBER (cpu30_state::flop_dmac_r){
-	LOG(("%s\n", FUNCNAME));
+	LOG("%s\n", FUNCNAME);
 	return 0xff;
 }
 
 WRITE8_MEMBER (cpu30_state::flop_dmac_w){
-	LOG(("%s(%02x)\n", FUNCNAME, data));
+	LOG("%s(%02x)\n", FUNCNAME, data);
 }
 
 #define FPCP_SENSE 0x40 /* Port C bit 6 is low if a Floating Point Co Processor is installed */
 // PIT#1 Port C TODO: implement timer+port interrupts
 // TODO: Connect PC0, PC1, PC4 and PC7 to B5 and/or P2 connector
 READ8_MEMBER (cpu30_state::pit1c_r){
-	LOG(("%s\n", FUNCNAME));
+	LOG("%s\n", FUNCNAME);
 	m_maincpu->set_fpu_enable(1);    // Lets assume the FPCP is always installed ( which is default for 68030 atm )
 	return 0xff & ~FPCP_SENSE; // Should really be command line for the edge cases...
 }
 
 WRITE8_MEMBER (cpu30_state::pit1c_w){
-	LOG(("%s(%02x)\n", FUNCNAME, data));
+	LOG("%s(%02x)\n", FUNCNAME, data);
 }
 
 // PIT#2 Port A TODO: Connect to B5 and /or P2 connector
 READ8_MEMBER (cpu30_state::pit2a_r){
-	LOG(("%s\n", FUNCNAME));
+	LOG("%s\n", FUNCNAME);
 	logerror("Unsupported user i/o on PIT2 port A detected\n");
 	return 0xff;
 }
 
 WRITE8_MEMBER (cpu30_state::pit2a_w){
-	LOG(("%s(%02x)\n", FUNCNAME, data));
+	LOG("%s(%02x)\n", FUNCNAME, data);
 	logerror("Unsupported user i/o on PIT2 port A detected\n");
 }
 
@@ -519,7 +534,7 @@ WRITE8_MEMBER (cpu30_state::pit2a_w){
 READ8_MEMBER (cpu30_state::board_mem_id_rd)
 {
 	int sz;
-	LOG(("%s\n", FUNCNAME));
+	LOG("%s\n", FUNCNAME);
 	switch (m_ram->size())
 	{
 	case (1024 * 1024 * 32): sz = 0; break;
@@ -557,56 +572,56 @@ READ8_MEMBER (cpu30_state::board_mem_id_rd)
 	//  return 0x10 + sz;// CPU-22 p4
 	//  return 0x20 + sz;// p1: Wait until hard disk is up to speed
 	//  printf("SIZE:%02x\n", sz);
-	LOG(("- Board ID:%02x Size:%02x\n", m_board_id, sz));
+	LOG("- Board ID:%02x Size:%02x\n", m_board_id, sz);
 	return m_board_id + sz;
 }
 
 // PIT#2 Port C TODO: implement timer interrupt, DMA i/o, memory control and Hardware ID
 READ8_MEMBER (cpu30_state::pit2c_r){
-	LOG(("%s\n", FUNCNAME));
+	LOG("%s\n", FUNCNAME);
 	return 0xfe;
 }
 
 WRITE8_MEMBER (cpu30_state::pit2c_w){
-	LOG(("%s(%02x)\n", FUNCNAME, data));
+	LOG("%s(%02x)\n", FUNCNAME, data);
 }
 
 #if 0
 /* Dummy VME access methods until the VME bus device is ready for use */
 READ16_MEMBER (cpu30_state::vme_a24_r){
-	LOG (logerror ("vme_a24_r\n"));
+	LOG("%s\n", FUNCNAME);
 	return (uint16_t) 0;
 }
 
 WRITE16_MEMBER (cpu30_state::vme_a24_w){
-	LOG (logerror ("vme_a24_w\n"));
+	LOG("%s(%02x)\n", FUNCNAME, data);
 }
 
 READ16_MEMBER (cpu30_state::vme_a16_r){
-	LOG (logerror ("vme_16_r\n"));
+	LOG("%s\n", FUNCNAME);
 	return (uint16_t) 0;
 }
 
 WRITE16_MEMBER (cpu30_state::vme_a16_w){
-	LOG (logerror ("vme_a16_w\n"));
+	LOG("%s(%02x)\n", FUNCNAME, data);
 }
 #endif
 
 WRITE_LINE_MEMBER(cpu30_state::fga_irq_callback)
 {
-	LOGINT(("%s(%02x)\n", FUNCNAME, state));
+	LOGINT("%s(%02x)\n", FUNCNAME, state);
 
 	fga_irq_state = state;
 	fga_irq_level = m_fga002->get_irq_level();
-	LOGINT((" - FGA irq level  %02x\n", fga_irq_level));
+	LOGINT(" - FGA irq level  %02x\n", fga_irq_level);
 	update_irq_to_maincpu();
 }
 
 void cpu30_state::update_irq_to_maincpu()
 {
-	LOGINT(("%s()\n", FUNCNAME));
-	LOGINT((" - fga_irq_level: %02x\n", fga_irq_level));
-	LOGINT((" - fga_irq_state: %02x\n", fga_irq_state));
+	LOGINT("%s()\n", FUNCNAME);
+	LOGINT(" - fga_irq_level: %02x\n", fga_irq_level);
+	LOGINT(" - fga_irq_state: %02x\n", fga_irq_state);
 	switch (fga_irq_level & 0x07)
 	{
 	case 1: m_maincpu->set_input_line(M68K_IRQ_1, fga_irq_state); break;
@@ -620,16 +635,23 @@ void cpu30_state::update_irq_to_maincpu()
 	}
 }
 
+static SLOT_INTERFACE_START(fccpu30_vme_cards)
+	SLOT_INTERFACE("fcisio", VME_FCISIO1)
+	SLOT_INTERFACE("fcscsi", VME_FCSCSI1)
+SLOT_INTERFACE_END
+
 /*
  * Machine configuration
  */
-static MACHINE_CONFIG_START (cpu30, cpu30_state)
+static MACHINE_CONFIG_START (cpu30)
 	/* basic machine hardware */
 	MCFG_CPU_ADD ("maincpu", M68030, XTAL_25MHz)
 	MCFG_CPU_PROGRAM_MAP (cpu30_mem)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("fga002", fga002_device, iack)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
+	MCFG_VME_DEVICE_ADD("vme")
+	MCFG_VME_SLOT_ADD ("vme", 1, fccpu30_vme_cards, nullptr)
 	/* Terminal Port config */
 	/* Force CPU30 series of boards has up to four serial ports, p1-p4, the FGA boot uses p4 as console and subsequent
 	   firmware uses p1 as console and in an operating system environment there may be user login shells on the other.
@@ -676,7 +698,7 @@ static MACHINE_CONFIG_START (cpu30, cpu30_state)
 	/* DUSCC2 interrupt signal REQN is connected to LOCAL IRQ5 of the FGA-002 and level is programmable */
 	MCFG_DUSCC_OUT_INT_CB(DEVWRITELINE("fga002", fga002_device, lirq5_w))
 
-	MCFG_RS232_PORT_ADD (RS232P1_TAG, default_rs232_devices, nullptr)
+	MCFG_RS232_PORT_ADD (RS232P1_TAG, default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("duscc", duscc68562_device, rxb_w))
 	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("duscc", duscc68562_device, ctsb_w))
 
@@ -688,7 +710,7 @@ static MACHINE_CONFIG_START (cpu30, cpu30_state)
 	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("duscc2", duscc68562_device, rxb_w))
 	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("duscc2", duscc68562_device, ctsb_w))
 
-	MCFG_RS232_PORT_ADD (RS232P4_TAG, default_rs232_devices, nullptr)
+	MCFG_RS232_PORT_ADD (RS232P4_TAG, default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("duscc", duscc68562_device, rxa_w))
 	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("duscc", duscc68562_device, ctsa_w))
 
@@ -861,7 +883,7 @@ ROM_END
 /*
  * System ROM information
  *
- * FGA-002 Bootprom version 3.1 is released May 28, 1990, coprighted by FORCE Computers Gmbh
+ * FGA-002 Bootprom version 3.1 is released May 28, 1990, coprighted by FORCE Computers GmbH
  *
  * Bootprom PIT setup sequence - To start VMEPROM, the rotary switches must both be set to 'F' (PI/T #1 port A)
  * --------------------------------------------------------------------------------------------------------------
@@ -999,30 +1021,30 @@ void fga002_device::check_interrupts()()
  */
 
 /* Driver */
-/*    YEAR  NAME          PARENT  COMPAT   MACHINE         INPUT     CLASS          INIT         COMPANY                   FULLNAME                FLAGS */
-COMP (1988, fccpu30,      0,       0,      cpu30,          cpu30,    driver_device,      0,      "Force Computers Gmbh",   "SYS68K/CPU-30",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
-COMP (1988, fccpu30x,     fccpu30,   0,      cpu30x,         cpu30,    cpu30_state,   cpu30x,      "Force Computers Gmbh",   "SYS68K/CPU-30X",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
-COMP (1988, fccpu30xa,    fccpu30,   0,      cpu30xa,        cpu30,    cpu30_state,   cpu30xa,     "Force Computers Gmbh",   "SYS68K/CPU-30XA",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
-COMP (1988, fccpu30za,    fccpu30,   0,      cpu30za,        cpu30,    cpu30_state,   cpu30za,     "Force Computers Gmbh",   "SYS68K/CPU-30ZA",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
-COMP (1996, fccpu30zbe,   fccpu30,   0,      cpu30zbe,       cpu30,    cpu30_state,   cpu30zbe,    "Force Computers Gmbh",   "SYS68K/CPU-30ZBE",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
-COMP (1996, fccpu30be8,   fccpu30,   0,      cpu30be8,       cpu30,    cpu30_state,   cpu30be8,    "Force Computers Gmbh",   "SYS68K/CPU-30BE/8",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
-COMP (1996, fccpu30be16,  fccpu30,   0,      cpu30be16,      cpu30,    cpu30_state,   cpu30be16,   "Force Computers Gmbh",   "SYS68K/CPU-30BE/16",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
-COMP (1996, fccpu30lite4, fccpu30,   0,      cpu30lite4,     cpu30,    cpu30_state,   cpu30lite4,  "Force Computers Gmbh",   "SYS68K/CPU-30Lite/4",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
-COMP (1996, fccpu30lite8, fccpu30,   0,      cpu30lite8,     cpu30,    cpu30_state,   cpu30lite8,  "Force Computers Gmbh",   "SYS68K/CPU-30Lite/8",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
-COMP (199?, fccpu33,      fccpu30,   0,      cpu33,          cpu30,    cpu30_state,   cpu33,       "Force Computers Gmbh",   "SYS68K/CPU-33",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
+/*    YEAR  NAME          PARENT     COMPAT  MACHINE         INPUT     CLASS          INIT         COMPANY                   FULLNAME                FLAGS */
+COMP (1988, fccpu30,      0,         0,      cpu30,          cpu30,    cpu30_state,   0,           "Force Computers GmbH",   "SYS68K/CPU-30",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
+COMP (1988, fccpu30x,     fccpu30,   0,      cpu30x,         cpu30,    cpu30_state,   cpu30x,      "Force Computers GmbH",   "SYS68K/CPU-30X",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
+COMP (1988, fccpu30xa,    fccpu30,   0,      cpu30xa,        cpu30,    cpu30_state,   cpu30xa,     "Force Computers GmbH",   "SYS68K/CPU-30XA",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
+COMP (1988, fccpu30za,    fccpu30,   0,      cpu30za,        cpu30,    cpu30_state,   cpu30za,     "Force Computers GmbH",   "SYS68K/CPU-30ZA",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
+COMP (1996, fccpu30zbe,   fccpu30,   0,      cpu30zbe,       cpu30,    cpu30_state,   cpu30zbe,    "Force Computers GmbH",   "SYS68K/CPU-30ZBE",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
+COMP (1996, fccpu30be8,   fccpu30,   0,      cpu30be8,       cpu30,    cpu30_state,   cpu30be8,    "Force Computers GmbH",   "SYS68K/CPU-30BE/8",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
+COMP (1996, fccpu30be16,  fccpu30,   0,      cpu30be16,      cpu30,    cpu30_state,   cpu30be16,   "Force Computers GmbH",   "SYS68K/CPU-30BE/16",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
+COMP (1996, fccpu30lite4, fccpu30,   0,      cpu30lite4,     cpu30,    cpu30_state,   cpu30lite4,  "Force Computers GmbH",   "SYS68K/CPU-30Lite/4",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
+COMP (1996, fccpu30lite8, fccpu30,   0,      cpu30lite8,     cpu30,    cpu30_state,   cpu30lite8,  "Force Computers GmbH",   "SYS68K/CPU-30Lite/8",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
+COMP (199?, fccpu33,      fccpu30,   0,      cpu33,          cpu30,    cpu30_state,   cpu33,       "Force Computers GmbH",   "SYS68K/CPU-33",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
 
 /* Below are not fully configured variants defaulting to generic cpu30 */
 
 /* The following boards were manufactured for Ericsson to be used in their fixed network switches. They support hot swap and the Ericsson APNbus */
 /* SYS68K/CPU-30SEN-R/32 assumed as generic until spec is found. 25 MHz 68030 based CPU board with DMAC, 32 MByte Shared RAM capacity and VMEPROM.
    4 MByte System Flash memory, SCSI via on-board EAGLE Controller FC68165 with DMA, 2 serial I/O ports, APNbus interface, VMEPROM firmware */
-COMP (1997, fccpu30senr,    0,      0,       cpu30,        cpu30, driver_device, 0,   "Force Computers Gmbh",   "SYS68K/CPU-30SEN-R", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
+COMP (1997, fccpu30senr,    0,      0,       cpu30,        cpu30, cpu30_state, 0,   "Force Computers GmbH",   "SYS68K/CPU-30SEN-R", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
 /* SYS68K/CPU-30SEN-R-501/4 assumed as generic until spec is found. 25 MHz 68030 based CPU board with DMAC, 4 MByte Shared RAM capacity and VMEPROM.
    48V DC/DC onboard, metric backplane connectors, BYB501 PCB formfactor (TVJ807). 4 MByte System Flash memory, SCSI via onboard EAGLEController
    FC68165 with DMA, 2 serial I/O ports, APNbus interface, VMEPROM firmware*/
-COMP (1997, fccpu30senr501, 0,      0,       cpu30,        cpu30, driver_device, 0,   "Force Computers Gmbh",   "SYS68K/CPU-30SEN-R-501", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
+COMP (1997, fccpu30senr501, 0,      0,       cpu30,        cpu30, cpu30_state, 0,   "Force Computers GmbH",   "SYS68K/CPU-30SEN-R-501", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
 
 /*CPU-33XB MC68030 25MHz CPU, 68882 FPC, 1MB, 2 SERIAL, RS-232, VME BOARD*/
-//COMP (1990, cpu33xb,      0,      0,       cpu30,        cpu30, driver_device, 0,   "Force Computers Gmbh",   "SYS68K/CPU-33XB",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
+//COMP (1990, cpu33xb,      0,      0,       cpu30,        cpu30, cpu30_state, 0,   "Force Computers GmbH",   "SYS68K/CPU-33XB",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
 /*CPU-33B/4 MC68030 25MHz CPU, 68882 FPC, 1MB, 2 SERIAL, RS-232, VME BOARD*/
-//COMP (1990, cpu30b4,      0,      0,       cpu30,        cpu30, driver_device, 0,   "Force Computers Gmbh",   "SYS68K/CPU-33B/4",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
+//COMP (1990, cpu30b4,      0,      0,       cpu30,        cpu30, cpu30_state, 0,   "Force Computers GmbH",   "SYS68K/CPU-33B/4",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )

@@ -172,13 +172,17 @@ Blitter Timing
 */
 
 #include "emu.h"
-#include "cpu/sh4/sh4.h"
+
 #include "cpu/sh4/sh3comn.h"
-#include "profiler.h"
+#include "cpu/sh4/sh4.h"
 #include "machine/rtc9701.h"
+#include "machine/serflash.h"
 #include "sound/ymz770.h"
 #include "video/epic12.h"
-#include "machine/serflash.h"
+
+#include "profiler.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 
@@ -428,7 +432,7 @@ void cv1k_state::machine_reset()
 	m_blitter->reset();
 }
 
-static MACHINE_CONFIG_START( cv1k, cv1k_state )
+static MACHINE_CONFIG_START( cv1k )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH3BE, XTAL_12_8MHz*8) // 102.4MHz

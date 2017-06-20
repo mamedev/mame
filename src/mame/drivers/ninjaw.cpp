@@ -316,11 +316,14 @@ rumbling on a subwoofer in the cabinet.)
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/ninjaw.h"
+#include "includes/taitoipt.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/2610intf.h"
-#include "includes/taitoipt.h"
-#include "includes/ninjaw.h"
+#include "screen.h"
+#include "speaker.h"
 
 #include "ninjaw.lh"
 
@@ -342,6 +345,15 @@ WRITE16_MEMBER(ninjaw_state::cpua_ctrl_w)
 	parse_control();
 
 	logerror("CPU #0 PC %06x: write %04x to cpu control\n", space.device().safe_pc(), data);
+}
+
+
+WRITE8_MEMBER(ninjaw_state::coin_control_w)
+{
+	machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
+	machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
+	machine().bookkeeping().coin_counter_w(0, data & 0x04);
+	machine().bookkeeping().coin_counter_w(1, data & 0x08);
 }
 
 
@@ -411,8 +423,7 @@ WRITE16_MEMBER(ninjaw_state::tc0100scn_triple_screen_w)
 static ADDRESS_MAP_START( ninjaw_master_map, AS_PROGRAM, 16, ninjaw_state )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM                                                     /* main ram */
-	AM_RANGE(0x200000, 0x200001) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, portreg_r, portreg_w, 0x00ff)
-	AM_RANGE(0x200002, 0x200003) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, port_r, port_w, 0x00ff)
+	AM_RANGE(0x200000, 0x200003) AM_DEVREADWRITE8("tc0040ioc", tc0040ioc_device, read, write, 0x00ff)
 	AM_RANGE(0x210000, 0x210001) AM_WRITE(cpua_ctrl_w)
 	AM_RANGE(0x220000, 0x220003) AM_READWRITE(sound_r,sound_w)
 	AM_RANGE(0x240000, 0x24ffff) AM_RAM AM_SHARE("share1")
@@ -434,8 +445,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( ninjaw_slave_map, AS_PROGRAM, 16, ninjaw_state )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08ffff) AM_RAM /* main ram */
-	AM_RANGE(0x200000, 0x200001) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, portreg_r, portreg_w, 0x00ff)
-	AM_RANGE(0x200002, 0x200003) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, port_r, port_w, 0x00ff)
+	AM_RANGE(0x200000, 0x200003) AM_DEVREADWRITE8("tc0040ioc", tc0040ioc_device, read, write, 0x00ff)
 	AM_RANGE(0x240000, 0x24ffff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x260000, 0x263fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x280000, 0x293fff) AM_DEVREAD("tc0100scn_1", tc0100scn_device, word_r) AM_WRITE(tc0100scn_triple_screen_w) /* tilemaps (1st screen/all screens) */
@@ -447,8 +457,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( darius2_master_map, AS_PROGRAM, 16, ninjaw_state )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM                         /* main ram */
-	AM_RANGE(0x200000, 0x200001) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, portreg_r, portreg_w, 0x00ff)
-	AM_RANGE(0x200002, 0x200003) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, port_r, port_w, 0x00ff)
+	AM_RANGE(0x200000, 0x200003) AM_DEVREADWRITE8("tc0040ioc", tc0040ioc_device, read, write, 0x00ff)
 	AM_RANGE(0x210000, 0x210001) AM_WRITE(cpua_ctrl_w)
 	AM_RANGE(0x220000, 0x220003) AM_READWRITE(sound_r,sound_w)
 	AM_RANGE(0x240000, 0x24ffff) AM_RAM AM_SHARE("share1")
@@ -467,8 +476,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( darius2_slave_map, AS_PROGRAM, 16, ninjaw_state )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08ffff) AM_RAM                                                     /* main ram */
-	AM_RANGE(0x200000, 0x200001) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, portreg_r, portreg_w, 0x00ff)
-	AM_RANGE(0x200002, 0x200003) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, port_r, port_w, 0x00ff)
+	AM_RANGE(0x200000, 0x200003) AM_DEVREADWRITE8("tc0040ioc", tc0040ioc_device, read, write, 0x00ff)
 	AM_RANGE(0x240000, 0x24ffff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x260000, 0x263fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x280000, 0x293fff) AM_DEVREAD("tc0100scn_1", tc0100scn_device, word_r) AM_WRITE(tc0100scn_triple_screen_w) /* tilemaps (1st screen/all screens) */
@@ -649,7 +657,7 @@ private:
 
 extern const device_type SUBWOOFER;
 
-const device_type SUBWOOFER = &device_creator<subwoofer_device>;
+const device_type SUBWOOFER = device_creator<subwoofer_device>;
 
 subwoofer_device::subwoofer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SUBWOOFER, "Subwoofer", tag, owner, clock),
@@ -720,7 +728,7 @@ void ninjaw_state::machine_reset()
 	machine().sound().system_enable(true);  /* mixer enabled */
 }
 
-static MACHINE_CONFIG_START( ninjaw, ninjaw_state )
+static MACHINE_CONFIG_START( ninjaw )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,16000000/2)  /* 8 MHz ? */
@@ -736,12 +744,13 @@ static MACHINE_CONFIG_START( ninjaw, ninjaw_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* CPU slices */
 
-	MCFG_DEVICE_ADD("tc0220ioc", TC0220IOC, 0)
-	MCFG_TC0220IOC_READ_0_CB(IOPORT("DSWA"))
-	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
-	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
-	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
-	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
+	MCFG_DEVICE_ADD("tc0040ioc", TC0040IOC, 0)
+	MCFG_TC0040IOC_READ_0_CB(IOPORT("DSWA"))
+	MCFG_TC0040IOC_READ_1_CB(IOPORT("DSWB"))
+	MCFG_TC0040IOC_READ_2_CB(IOPORT("IN0"))
+	MCFG_TC0040IOC_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0040IOC_WRITE_4_CB(WRITE8(ninjaw_state, coin_control_w))
+	MCFG_TC0040IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ninjaw)
@@ -840,7 +849,7 @@ static MACHINE_CONFIG_START( ninjaw, ninjaw_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( darius2, ninjaw_state )
+static MACHINE_CONFIG_START( darius2 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,16000000/2)  /* 8 MHz ? */
@@ -856,12 +865,13 @@ static MACHINE_CONFIG_START( darius2, ninjaw_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* CPU slices */
 
-	MCFG_DEVICE_ADD("tc0220ioc", TC0220IOC, 0)
-	MCFG_TC0220IOC_READ_0_CB(IOPORT("DSWA"))
-	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
-	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
-	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
-	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
+	MCFG_DEVICE_ADD("tc0040ioc", TC0040IOC, 0)
+	MCFG_TC0040IOC_READ_0_CB(IOPORT("DSWA"))
+	MCFG_TC0040IOC_READ_1_CB(IOPORT("DSWB"))
+	MCFG_TC0040IOC_READ_2_CB(IOPORT("IN0"))
+	MCFG_TC0040IOC_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0040IOC_WRITE_4_CB(WRITE8(ninjaw_state, coin_control_w))
+	MCFG_TC0040IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ninjaw)
@@ -1174,8 +1184,8 @@ ROM_END
 
 /* Working Games */
 
-//    YEAR, NAME,    PARENT, MACHINE, INPUT,   INIT,MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1987, ninjaw,  0,      ninjaw,  ninjaw, driver_device,  0,   ROT0,   "Taito Corporation Japan",   "The Ninja Warriors (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ninjawj, ninjaw, ninjaw,  ninjawj, driver_device, 0,   ROT0,   "Taito Corporation",         "The Ninja Warriors (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ninjawu, ninjaw, ninjaw,  ninjawj, driver_device,  0,   ROT0,  "Taito Corporation America (licensed to Romstar)", "The Ninja Warriors (US)", MACHINE_SUPPORTS_SAVE ) /* Uses same coinage as World, see notes */
-GAME( 1989, darius2, 0,      darius2, darius2, driver_device, 0,   ROT0,   "Taito Corporation",         "Darius II (triple screen) (Japan)", MACHINE_SUPPORTS_SAVE )
+//    YEAR, NAME,    PARENT, MACHINE, INPUT,   STATE         INIT,MONITOR,COMPANY,                     FULLNAME,FLAGS
+GAME( 1987, ninjaw,  0,      ninjaw,  ninjaw,  ninjaw_state, 0,   ROT0,   "Taito Corporation Japan",   "The Ninja Warriors (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ninjawj, ninjaw, ninjaw,  ninjawj, ninjaw_state, 0,   ROT0,   "Taito Corporation",         "The Ninja Warriors (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ninjawu, ninjaw, ninjaw,  ninjawj, ninjaw_state, 0,   ROT0,   "Taito Corporation America (licensed to Romstar)", "The Ninja Warriors (US)", MACHINE_SUPPORTS_SAVE ) /* Uses same coinage as World, see notes */
+GAME( 1989, darius2, 0,      darius2, darius2, ninjaw_state, 0,   ROT0,   "Taito Corporation",         "Darius II (triple screen) (Japan)", MACHINE_SUPPORTS_SAVE )

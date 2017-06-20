@@ -191,14 +191,19 @@ Beeper Circuit, all ICs shown:
 
 
 #include "emu.h"
+#include "cpu/mcs48/mcs48.h"        //Keyboard MCU ... talks to the 8278 on the keyboard circuit
 #include "cpu/z80/z80.h"
-#include "machine/wd_fdc.h"
 #include "machine/bankdev.h"
 #include "machine/ram.h"
-#include "formats/itt3030_dsk.h"
-#include "video/tms9927.h"          //Display hardware
+#include "machine/wd_fdc.h"
 #include "sound/beep.h"
-#include "cpu/mcs48/mcs48.h"        //Keyboard MCU ... talks to the 8278 on the keyboard circuit
+#include "video/tms9927.h"          //Display hardware
+
+#include "screen.h"
+#include "speaker.h"
+
+#include "formats/itt3030_dsk.h"
+
 
 #define MAIN_CLOCK XTAL_4.194MHz
 
@@ -222,35 +227,15 @@ public:
 		, m_palette(*this, "palette")
 	{ }
 
-	// devices
-	required_device<cpu_device> m_maincpu;
-	required_device<i8741_device> m_kbdmcu;
-	required_device<ram_device> m_ram;
-	required_device<crt5027_device> m_crtc;
-	required_device<address_map_bank_device> m_48kbank;
-	required_device<fd1791_t> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
-	required_device<beep_device> m_beep;
-
-	required_ioport_array<16> m_keyrows;
-
-	// shared pointers
-	required_shared_ptr<uint8_t> m_vram;
-
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-protected:
-	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 public:
 
 	DECLARE_READ8_MEMBER(vsync_r);
 	DECLARE_WRITE8_MEMBER( beep_w );
 	DECLARE_WRITE8_MEMBER(bank_w);
-	DECLARE_READ8_MEMBER(kbd_matrix_r);
+	DECLARE_READ_LINE_MEMBER(kbd_matrix_r);
 	DECLARE_WRITE8_MEMBER(kbd_matrix_w);
 	DECLARE_READ8_MEMBER(kbd_port2_r);
 	DECLARE_WRITE8_MEMBER(kbd_port2_w);
@@ -264,6 +249,27 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(fdcdrq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdchld_w);
 	DECLARE_PALETTE_INIT(itt3030);
+
+protected:
+	// driver_device overrides
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	// devices
+	required_device<cpu_device> m_maincpu;
+	required_device<i8741_device> m_kbdmcu;
+	required_device<ram_device> m_ram;
+	required_device<crt5027_device> m_crtc;
+	required_device<address_map_bank_device> m_48kbank;
+	required_device<fd1791_device> m_fdc;
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
+	required_device<beep_device> m_beep;
+
+	required_ioport_array<16> m_keyrows;
+
+	// shared pointers
+	required_shared_ptr<uint8_t> m_vram;
 
 private:
 	uint8_t m_kbdclk, m_kbdread, m_kbdport2;
@@ -457,7 +463,7 @@ static ADDRESS_MAP_START( itt3030_io, AS_IO, 8, itt3030_state )
 	AM_RANGE(0xf6, 0xf6) AM_WRITE(bank_w)
 ADDRESS_MAP_END
 
-READ8_MEMBER(itt3030_state::kbd_matrix_r)
+READ_LINE_MEMBER(itt3030_state::kbd_matrix_r)
 {
 	return m_kbdread;
 }
@@ -488,17 +494,6 @@ READ8_MEMBER(itt3030_state::kbd_port2_r)
 {
 	return m_kbdport2;
 }
-
-// Schematics + i8278 datasheet says:
-// Port 1 goes to the keyboard matrix.
-// bits 0-2 select bit to read back, bits 3-6 choose column to read from, bit 7 clocks the process (rising edge strobes the row, falling edge reads the data)
-// T0 is the key matrix return
-// pin 23 is the UPI-41 host IRQ line, it's unknown how it's connected to the Z80
-static ADDRESS_MAP_START( kbdmcu_io, AS_IO, 8, itt3030_state )
-	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(kbd_matrix_r)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(kbd_matrix_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(kbd_port2_r, kbd_port2_w)
-ADDRESS_MAP_END
 
 static INPUT_PORTS_START( itt3030 )
 	PORT_START("ROW.0")
@@ -661,15 +656,23 @@ PALETTE_INIT_MEMBER(itt3030_state, itt3030)
 	palette.set_pen_color(2, rgb_t::black());
 }
 
-static MACHINE_CONFIG_START( itt3030, itt3030_state )
+static MACHINE_CONFIG_START( itt3030 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80,XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(itt3030_map)
 	MCFG_CPU_IO_MAP(itt3030_io)
 
+	// Schematics + i8278 datasheet says:
+	// Port 1 goes to the keyboard matrix.
+	// bits 0-2 select bit to read back, bits 3-6 choose column to read from, bit 7 clocks the process (rising edge strobes the row, falling edge reads the data)
+	// T0 is the key matrix return
+	// pin 23 is the UPI-41 host IRQ line, it's unknown how it's connected to the Z80
 	MCFG_CPU_ADD("kbdmcu", I8741, XTAL_6MHz)
-	MCFG_CPU_IO_MAP(kbdmcu_io)
+	MCFG_MCS48_PORT_T0_IN_CB(READLINE(itt3030_state, kbd_matrix_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(itt3030_state, kbd_matrix_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(itt3030_state, kbd_port2_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(itt3030_state, kbd_port2_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -730,4 +733,4 @@ ROM_START( itt3030 )
 	ROM_LOAD( "8741ad.bin", 0x0000, 0x0400, CRC(cabf4394) SHA1(e5d1416b568efa32b578ca295a29b7b5d20c0def))
 ROM_END
 
-COMP( 1982, itt3030,  0,   0,  itt3030,  itt3030,  driver_device, 0,  "ITT RFA",      "ITT3030", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1982, itt3030,  0,   0,  itt3030,  itt3030,  itt3030_state, 0,  "ITT RFA",      "ITT3030", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

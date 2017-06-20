@@ -323,10 +323,9 @@
         ITV4400 = IT custom blitter
 
 
-    ---------------------
-    Slick Shot/Poker Dice
-    ---------------------
-    (Likely Dyno Bop as well)
+    ------------------------------
+    Slick Shot/Poker Dice/Dyno Bop
+    ------------------------------
 
         +------------------------------------+-+
         |   Z80PGM   4Mhz      itvs5         | |
@@ -497,18 +496,21 @@
 
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
+#include "includes/itech8.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6809/hd6309.h"
 #include "cpu/m6809/m6809.h"
-#include "machine/6821pia.h"
+#include "cpu/z80/z80.h"
 #include "machine/6522via.h"
+#include "machine/6821pia.h"
 #include "machine/nvram.h"
-#include "includes/itech8.h"
 #include "sound/2203intf.h"
 #include "sound/2608intf.h"
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
+
+#include "speaker.h"
 
 
 #define FULL_LOGGING    0
@@ -1653,7 +1655,7 @@ WRITE_LINE_MEMBER(itech8_state::generate_tms34061_interrupt)
 
 /************* core pieces ******************/
 
-static MACHINE_CONFIG_START( itech8_core_lo, itech8_state )
+static MACHINE_CONFIG_START( itech8_core_lo )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, CLOCK_8MHz/4)
@@ -1695,7 +1697,7 @@ static MACHINE_CONFIG_DERIVED( itech8_core_hi, itech8_core_lo )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_FRAGMENT( itech8_sound_ym2203 )
+static MACHINE_CONFIG_START( itech8_sound_ym2203 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("soundcpu", M6809, CLOCK_8MHz/4)
@@ -1710,12 +1712,12 @@ static MACHINE_CONFIG_FRAGMENT( itech8_sound_ym2203 )
 	MCFG_SOUND_ROUTE(2, "mono", 0.07)
 	MCFG_SOUND_ROUTE(3, "mono", 0.75)
 
-	MCFG_OKIM6295_ADD("oki", CLOCK_8MHz/8, OKIM6295_PIN7_HIGH) // was /128, not /132, so unsure so pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", CLOCK_8MHz/8, PIN7_HIGH) // was /128, not /132, so unsure so pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_FRAGMENT( itech8_sound_ym2608b )
+static MACHINE_CONFIG_START( itech8_sound_ym2608b )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("soundcpu", M6809, CLOCK_8MHz/4)
@@ -1729,7 +1731,7 @@ static MACHINE_CONFIG_FRAGMENT( itech8_sound_ym2608b )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_FRAGMENT( itech8_sound_ym3812 )
+static MACHINE_CONFIG_START( itech8_sound_ym3812 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("soundcpu", M6809, CLOCK_8MHz/4)
@@ -1745,12 +1747,12 @@ static MACHINE_CONFIG_FRAGMENT( itech8_sound_ym3812 )
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("soundcpu", M6809_FIRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
-	MCFG_OKIM6295_ADD("oki", CLOCK_8MHz/8, OKIM6295_PIN7_HIGH) // was /128, not /132, so unsure so pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", CLOCK_8MHz/8, PIN7_HIGH) // was /128, not /132, so unsure so pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_FRAGMENT( itech8_sound_ym3812_external )
+static MACHINE_CONFIG_START( itech8_sound_ym3812_external )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("soundcpu", M6809, CLOCK_8MHz/4)
@@ -1761,7 +1763,7 @@ static MACHINE_CONFIG_FRAGMENT( itech8_sound_ym3812_external )
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("soundcpu", M6809_FIRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
-	MCFG_OKIM6295_ADD("oki", CLOCK_8MHz/8, OKIM6295_PIN7_HIGH) // was /128, not /132, so unsure so pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", CLOCK_8MHz/8, PIN7_HIGH) // was /128, not /132, so unsure so pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 
@@ -2244,16 +2246,14 @@ ROM_START( slikshot16 )
 ROM_END
 
 
-
-
 ROM_START( dynobop )
 	ROM_REGION( 0x1c000, "maincpu", 0 )
-	ROM_LOAD( "dynobop.u5", 0x04000, 0x4000, CRC(98452c40) SHA1(9b9316fc258792e0d825f16e0fadf8e0c35a864e) )
-	ROM_CONTINUE(           0x10000, 0xc000 )
-	ROM_COPY( "maincpu", 0x14000, 0x8000, 0x8000 )
+	ROM_LOAD( "dyno_pgm_1.1_u5.u5", 0x04000, 0x4000, CRC(98452c40) SHA1(9b9316fc258792e0d825f16e0fadf8e0c35a864e) )
+	ROM_CONTINUE(                   0x10000, 0xc000 )
+	ROM_COPY( "maincpu",   0x14000, 0x08000, 0x8000 )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "dynobop.u27", 0x08000, 0x8000, CRC(a37d862b) SHA1(922eeae184df2c5c28040da27699dd55744f8dca) )
+	ROM_LOAD( "dyno_snd-u27.u27", 0x08000, 0x8000, CRC(a37d862b) SHA1(922eeae184df2c5c28040da27699dd55744f8dca) )
 
 	ROM_REGION( 0x10000, "sub", 0 )
 	ROM_LOAD( "dynobop.u53", 0x00000, 0x0800, CRC(04b85918) SHA1(409aef2e71937c7654334999df9313909d757966) )
@@ -2262,11 +2262,11 @@ ROM_START( dynobop )
 	ROM_CONTINUE(            0x00000, 0x0800 )
 
 	ROM_REGION( 0xc0000, "grom", 0 )
-	ROM_LOAD( "dynobop.gr0", 0x00000, 0x20000, CRC(3525a7a3) SHA1(fe0b08203c135d55507506936dc34e1503e4906b) )
-	ROM_LOAD( "dynobop.gr1", 0x20000, 0x20000, CRC(1544a232) SHA1(60bba76537c82887db8e38c6a87c528afdd385d0) )
+	ROM_LOAD( "grom00-dyno.grom0", 0x00000, 0x20000, CRC(3525a7a3) SHA1(fe0b08203c135d55507506936dc34e1503e4906b) )
+	ROM_LOAD( "grom01-dyno.grom1", 0x20000, 0x20000, CRC(1544a232) SHA1(60bba76537c82887db8e38c6a87c528afdd385d0) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
-	ROM_LOAD( "dynobop.sr0", 0x00000, 0x10000, CRC(b355bf1d) SHA1(c9745638feb33ec181b8d9a894421f9854286cd9) )
+	ROM_LOAD( "dyno_vr-srom0.srom0", 0x00000, 0x10000, CRC(b355bf1d) SHA1(c9745638feb33ec181b8d9a894421f9854286cd9) )
 ROM_END
 
 
@@ -2737,47 +2737,47 @@ DRIVER_INIT_MEMBER(itech8_state,rimrockn)
  *************************************/
 
 /* Wheel of Fortune-style PCB */
-GAME( 1989, wfortune, 0,        wfortune,          wfortune, driver_device, 0,        ROT0,   "GameTek", "Wheel Of Fortune (set 1)", 0 )
-GAME( 1989, wfortunea,wfortune, wfortune,          wfortune, driver_device, 0,        ROT0,   "GameTek", "Wheel Of Fortune (set 2)", 0 )
+GAME( 1989, wfortune, 0,        wfortune,           wfortune, itech8_state, 0,        ROT0,   "GameTek", "Wheel Of Fortune (set 1)", 0 )
+GAME( 1989, wfortunea,wfortune, wfortune,           wfortune, itech8_state, 0,        ROT0,   "GameTek", "Wheel Of Fortune (set 2)", 0 )
 
 /* Grudge Match-style PCB */
-GAME( 1989, grmatch,  0,        grmatch,           grmatch, itech8_state,  grmatch,  ROT0,   "Yankee Game Technology", "Grudge Match (Yankee Game Technology)", 0 )
+GAME( 1989, grmatch,  0,        grmatch,            grmatch,  itech8_state, grmatch,  ROT0,   "Yankee Game Technology", "Grudge Match (Yankee Game Technology)", 0 )
 
 /* Strata Bowling-style PCB */
-GAME( 1990, stratab,  0,        stratab_hi,        stratab, driver_device,  0,        ROT270, "Strata/Incredible Technologies", "Strata Bowling (V3)", 0 ) // still says V1 in service mode?
-GAME( 1990, stratab1, stratab,  stratab_hi,        stratab, driver_device,  0,        ROT270, "Strata/Incredible Technologies", "Strata Bowling (V1)", 0 )
-GAME( 1990, gtg,      0,        stratab_hi,        gtg, driver_device,      0,        ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf (Joystick, v3.1)", 0 )
-GAME( 1989, gtgt,     gtg,      stratab_hi,        gtgt, driver_device,     0,        ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf (Trackball, v2.0)", 0 )
-GAME( 1989, gtgt1,    gtg,      stratab_hi,        gtgt, driver_device,     0,        ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf (Trackball, v1.0)", 0 )
-GAME( 1989, gtg2t,    gtg2,     stratab_hi,        gtg2t, driver_device,    0,        ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf II (Trackball, V1.1)", 0 )
-GAME( 1991, gtg2j,    gtg2,     stratab_lo,        gtg, driver_device,      0,        ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf II (Joystick, V1.0)", 0 )
+GAME( 1990, stratab,  0,        stratab_hi,         stratab,  itech8_state, 0,        ROT270, "Strata/Incredible Technologies", "Strata Bowling (V3)", 0 ) // still says V1 in service mode?
+GAME( 1990, stratab1, stratab,  stratab_hi,         stratab,  itech8_state, 0,        ROT270, "Strata/Incredible Technologies", "Strata Bowling (V1)", 0 )
+GAME( 1990, gtg,      0,        stratab_hi,         gtg,      itech8_state, 0,        ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf (Joystick, v3.1)", 0 )
+GAME( 1989, gtgt,     gtg,      stratab_hi,         gtgt,     itech8_state, 0,        ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf (Trackball, v2.0)", 0 )
+GAME( 1989, gtgt1,    gtg,      stratab_hi,         gtgt,     itech8_state, 0,        ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf (Trackball, v1.0)", 0 )
+GAME( 1989, gtg2t,    gtg2,     stratab_hi,         gtg2t,    itech8_state, 0,        ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf II (Trackball, V1.1)", 0 )
+GAME( 1991, gtg2j,    gtg2,     stratab_lo,         gtg,      itech8_state, 0,        ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf II (Joystick, V1.0)", 0 )
 
 /* Slick Shot-style PCB */
 GAME( 1990, slikshot,  0,        slikshot_hi,       slikshot, itech8_state, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V2.2)", MACHINE_MECHANICAL )
 GAME( 1990, slikshot17,slikshot, slikshot_hi,       slikshot, itech8_state, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V1.7)", MACHINE_MECHANICAL )
 GAME( 1990, slikshot16,slikshot, slikshot_hi,       slikshot, itech8_state, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V1.6)", MACHINE_MECHANICAL )
-GAME( 1990, dynobop,   0,        slikshot_hi,       dynobop,  itech8_state, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Dyno Bop", MACHINE_MECHANICAL )
+GAME( 1990, dynobop,   0,        slikshot_hi,       dynobop,  itech8_state, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Dyno Bop (V1.1)", MACHINE_MECHANICAL )
 GAME( 1990, sstrike,   0,        sstrike,           sstrike,  itech8_state, sstrike,  ROT270, "Strata/Incredible Technologies", "Super Strike Bowling", MACHINE_MECHANICAL )
-GAME( 1991, pokrdice,  0,        slikshot_lo_noz80, pokrdice, driver_device,0,        ROT90,  "Strata/Incredible Technologies", "Poker Dice", 0 )
+GAME( 1991, pokrdice,  0,        slikshot_lo_noz80, pokrdice, itech8_state, 0,        ROT90,  "Strata/Incredible Technologies", "Poker Dice", 0 )
 GAME( 1990, stratabs,  stratab,  sstrike,           stratabs, itech8_state, sstrike,  ROT270, "Strata/Incredible Technologies", "Strata Bowling (V1 4T, Super Strike Bowling type PCB)", MACHINE_NOT_WORKING ) // need to figure out the control hookup for this set, service mode indicates it's still a trackball like stratab
 
 /* Hot Shots Tennis-style PCB */
 GAME( 1990, hstennis,  0,        hstennis_hi,       hstennis, itech8_state, hstennis, ROT90,  "Strata/Incredible Technologies", "Hot Shots Tennis (V1.1)", 0 )
 GAME( 1990, hstennis10,hstennis, hstennis_hi,       hstennis, itech8_state, hstennis, ROT90,  "Strata/Incredible Technologies", "Hot Shots Tennis (V1.0)", 0 )
 GAME( 1991, arlingtn,  0,        hstennis_hi,       arlingtn, itech8_state, arligntn, ROT0,   "Strata/Incredible Technologies", "Arlington Horse Racing (v1.21-D)", 0 )
-GAME( 1991, peggle,    0,        hstennis_lo,       peggle, itech8_state,   peggle,   ROT90,  "Strata/Incredible Technologies", "Peggle (Joystick, v1.0)", 0 )
-GAME( 1991, pegglet,   peggle,   hstennis_lo,       pegglet, itech8_state,  peggle,   ROT90,  "Strata/Incredible Technologies", "Peggle (Trackball, v1.0)", 0 )
+GAME( 1991, peggle,    0,        hstennis_lo,       peggle,   itech8_state, peggle,   ROT90,  "Strata/Incredible Technologies", "Peggle (Joystick, v1.0)", 0 )
+GAME( 1991, pegglet,   peggle,   hstennis_lo,       pegglet,  itech8_state, peggle,   ROT90,  "Strata/Incredible Technologies", "Peggle (Trackball, v1.0)", 0 )
 GAME( 1992, neckneck,  0,        hstennis_lo,       neckneck, itech8_state, neckneck, ROT0,   "Bundra Games/Incredible Technologies", "Neck-n-Neck (v1.2)", 0 )
 
 /* Rim Rockin' Basketball-style PCB */
-GAME( 1991, rimrockn,   0,        rimrockn,          rimrockn, itech8_state, rimrockn, ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V2.2)", 0 )
-GAME( 1991, rimrockn20, rimrockn, rimrockn,          rimrockn, itech8_state, rimrockn, ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V2.0)", 0 )
-GAME( 1991, rimrockn16, rimrockn, rimrockn,          rimrockn, itech8_state, rimrockn, ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V1.6)", 0 )
-GAME( 1991, rimrockn12, rimrockn, rimrockn,          rimrockn, itech8_state, rimrockn, ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V1.2)", 0 )
+GAME( 1991, rimrockn,   0,        rimrockn,         rimrockn, itech8_state, rimrockn, ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V2.2)", 0 )
+GAME( 1991, rimrockn20, rimrockn, rimrockn,         rimrockn, itech8_state, rimrockn, ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V2.0)", 0 )
+GAME( 1991, rimrockn16, rimrockn, rimrockn,         rimrockn, itech8_state, rimrockn, ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V1.6)", 0 )
+GAME( 1991, rimrockn12, rimrockn, rimrockn,         rimrockn, itech8_state, rimrockn, ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V1.2)", 0 )
 
 /* Ninja Clowns-style PCB */
-GAME( 1991, ninclown, 0,        ninclown,          ninclown, driver_device, 0,        ROT0,   "Strata/Incredible Technologies", "Ninja Clowns (08/27/91)", 0 )
+GAME( 1991, ninclown, 0,        ninclown,           ninclown, itech8_state, 0,        ROT0,   "Strata/Incredible Technologies", "Ninja Clowns (08/27/91)", 0 )
 
 /* Golden Tee Golf II-style PCB */
-GAME( 1992, gpgolf,   0,        gtg2,              gpgolf, driver_device,   0,        ROT0,   "Strata/Incredible Technologies", "Golden Par Golf (Joystick, V1.1)", 0 )
-GAME( 1992, gtg2,     0,        gtg2,              gtg2, driver_device,     0,        ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf II (Trackball, V2.2)", 0 )
+GAME( 1992, gpgolf,   0,        gtg2,               gpgolf,   itech8_state, 0,        ROT0,   "Strata/Incredible Technologies", "Golden Par Golf (Joystick, V1.1)", 0 )
+GAME( 1992, gtg2,     0,        gtg2,               gtg2,     itech8_state, 0,        ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf II (Trackball, V2.2)", 0 )

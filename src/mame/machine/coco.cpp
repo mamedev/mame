@@ -57,8 +57,11 @@ DAC and bitbanger values written should be reflected in the read.
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "includes/coco.h"
+
 #include "cpu/m6809/m6809.h"
+#include "screen.h"
 
 
 
@@ -84,10 +87,12 @@ coco_state::coco_state(const machine_config &mconfig, device_type type, const ch
 	m_pia_0(*this, PIA0_TAG),
 	m_pia_1(*this, PIA1_TAG),
 	m_dac(*this, "dac"),
+	m_sbs(*this, "sbs"),
 	m_wave(*this, WAVE_TAG),
 	m_cococart(*this, CARTRIDGE_TAG),
 	m_ram(*this, RAM_TAG),
 	m_cassette(*this, "cassette"),
+	m_floating(*this, FLOATING_TAG),
 	m_rs232(*this, RS232_TAG),
 	m_vhd_0(*this, VHD0_TAG),
 	m_vhd_1(*this, VHD1_TAG),
@@ -95,7 +100,8 @@ coco_state::coco_state(const machine_config &mconfig, device_type type, const ch
 	m_beckerportconfig(*this, BECKERPORT_TAG),
 	m_keyboard(*this, "row%u", 0),
 	m_joystick_type_control(*this, CTRL_SEL_TAG),
-	m_joystick_hires_control(*this, HIRES_INTF_TAG)
+	m_joystick_hires_control(*this, HIRES_INTF_TAG),
+	m_in_floating_bus_read(false)
 {
 }
 
@@ -121,10 +127,10 @@ void coco_state::analog_port_start(analog_input_t *analog, const char *rx_tag, c
 
 void coco_state::device_start()
 {
-	/* call base device_start */
+	// call base device_start
 	driver_device::device_start();
 
-	/* look up analog ports */
+	// look up analog ports
 	analog_port_start(&m_joystick, JOYSTICK_RX_TAG, JOYSTICK_RY_TAG,
 		JOYSTICK_LX_TAG, JOYSTICK_LY_TAG, JOYSTICK_BUTTONS_TAG);
 	analog_port_start(&m_rat_mouse, RAT_MOUSE_RX_TAG, RAT_MOUSE_RY_TAG,
@@ -132,15 +138,17 @@ void coco_state::device_start()
 	analog_port_start(&m_diecom_lightgun, DIECOM_LIGHTGUN_RX_TAG, DIECOM_LIGHTGUN_RY_TAG,
 		DIECOM_LIGHTGUN_LX_TAG, DIECOM_LIGHTGUN_LY_TAG, DIECOM_LIGHTGUN_BUTTONS_TAG);
 
-	/* timers */
+	// timers
 	m_hiresjoy_transition_timer[0] = timer_alloc(TIMER_HIRES_JOYSTICK_X);
 	m_hiresjoy_transition_timer[1] = timer_alloc(TIMER_HIRES_JOYSTICK_Y);
 	m_diecom_lightgun_timer = timer_alloc(TIMER_DIECOM_LIGHTGUN);
 
-	/* cart base update */
+	// cart slot
 	m_cococart->set_cart_base_update(cococart_base_update_delegate(&coco_state::update_cart_base, this));
+	m_cococart->set_line_delay(cococart_slot_device::line::NMI, 12);	// 12 allowed one more instruction to finished after the line is pulled
+	m_cococart->set_line_delay(cococart_slot_device::line::HALT, 6);	// 6 allowed one more instruction to finished after the line is pulled
 
-	/* save state support */
+	// save state support
 	save_item(NAME(m_dac_output));
 	save_item(NAME(m_hiresjoy_ca));
 	save_item(NAME(m_dclg_previous_bit));
@@ -243,7 +251,7 @@ void coco_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 // CoCo 1/2 you should get $F627 instead.
 //-------------------------------------------------
 
-uint8_t coco_state::floating_bus_read(void)
+uint8_t coco_state::floating_bus_read()
 {
 	uint8_t result;
 
@@ -286,6 +294,31 @@ uint8_t coco_state::floating_bus_read(void)
 	return result;
 }
 
+
+//-------------------------------------------------
+//  floating_space_read
+//-------------------------------------------------
+
+uint8_t coco_state::floating_space_read(offs_t offset)
+{
+	// The "floating space" is intended to be a catch all for address space
+	// not handled by the normal CoCo infrastructure, but may be read directly
+	// by cartridge hardware and other miscellany
+	//
+	// Most of the time, the read below will result in floating_bus_read() being
+	// invoked
+	return m_floating->read8(m_floating->space(address_spacenum::AS_0), offset);
+}
+
+
+//-------------------------------------------------
+//  floating_space_write
+//-------------------------------------------------
+
+void coco_state::floating_space_write(offs_t offset, uint8_t data)
+{
+	m_floating->write8(m_floating->space(address_spacenum::AS_0), offset, data);
+}
 
 
 /***************************************************************************
@@ -657,28 +690,20 @@ coco_state::soundmux_status_t coco_state::soundmux_status(void)
 
 void coco_state::update_sound(void)
 {
-	/* PB1 will drive the sound output.  This is a rarely
-	 * used single bit sound mode. It is always connected thus
-	 * cannot be disabled.
-	 *
-	 * Source:  Page 31 of the Tandy Color Computer Serice Manual
-	 */
-	uint8_t single_bit_sound = (m_pia_1->b_output() & 0x02) ? 0x80 : 0x00;
-
 	/* determine the sound mux status */
 	soundmux_status_t status = soundmux_status();
 
 	/* the SC77526 DAC chip internally biases the AC-coupled sound inputs for Cassette and Cartridge at the midpoint of the 3.9v output range */
 	bool bCassSoundEnable = (status == (SOUNDMUX_ENABLE | SOUNDMUX_SEL1));
 	bool bCartSoundEnable = (status == (SOUNDMUX_ENABLE | SOUNDMUX_SEL2));
-	uint8_t cassette_sound = (bCassSoundEnable ? 0x40 : 0);
-	uint8_t cart_sound = (bCartSoundEnable ? 0x40 : 0);
+	uint8_t cassette_sound = (bCassSoundEnable ? 0x20 : 0);
+	uint8_t cart_sound = (bCartSoundEnable ? 0x20 : 0);
 
 	/* determine the value to send to the DAC (this is used by the Joystick read as well as audio out) */
 	m_dac_output = (m_pia_1->a_output() & 0xFC) >> 2;
-	uint8_t dac_sound =  (status == SOUNDMUX_ENABLE ? m_dac_output << 1 : 0);
+	uint8_t dac_sound =  (status == SOUNDMUX_ENABLE ? m_dac_output : 0);
 
-	/* The CoCo uses a single DAC for both audio output and joystick axis position measurement.
+	/* The CoCo uses the main 6-bit DAC for both audio output and joystick axis position measurement.
 	 * To avoid introducing artifacts while reading the axis positions, some software will disable
 	 * the audio output while using the DAC to read the joystick.  On a real CoCo, there is a low-pass
 	 * filter (C57 on the CoCo 3) which will hold the audio level for very short periods of time,
@@ -692,14 +717,14 @@ void coco_state::update_sound(void)
 		m_analog_audio_level = dac_sound + cassette_sound + cart_sound;
 	}
 
-	m_dac->write(single_bit_sound + m_analog_audio_level);
+	m_dac->write(m_analog_audio_level);
 
 	/* determine the cassette sound status */
 	cassette_state cas_sound = bCassSoundEnable ? CASSETTE_SPEAKER_ENABLED : CASSETTE_SPEAKER_MUTED;
 	m_cassette->change_state(cas_sound, CASSETTE_MASK_SPEAKER);
 
 	/* determine the cartridge sound status */
-	m_cococart->cart_set_line(
+	m_cococart->set_line_value(
 		cococart_slot_device::line::SOUND_ENABLE,
 		bCartSoundEnable ? cococart_slot_device::line_value::ASSERT : cococart_slot_device::line_value::CLEAR);
 }
@@ -999,7 +1024,13 @@ void coco_state::pia1_pa_changed(uint8_t data)
 
 void coco_state::pia1_pb_changed(uint8_t data)
 {
-	update_sound();     // singe_bit_sound is connected to PIA1 PB1
+	/* PB1 will drive the sound output.  This is a rarely
+	 * used single bit sound mode. It is always connected thus
+	 * cannot be disabled.
+	 *
+	 * Source:  Page 31 of the Tandy Color Computer Serice Manual
+	 */
+	m_sbs->write(BIT(data, 1));
 }
 
 
@@ -1102,7 +1133,7 @@ void coco_state::poll_hires_joystick(void)
 //  current_vhd
 //-------------------------------------------------
 
-coco_vhd_image_device *coco_state::current_vhd(void)
+coco_vhd_image_device *coco_state::current_vhd()
 {
 	switch(m_vhd_select)
 	{
@@ -1128,7 +1159,7 @@ READ8_MEMBER( coco_state::ff60_read )
 	}
 	else
 	{
-		result = floating_bus_read();
+		result = floating_space_read(0xFF60 + offset);
 	}
 
 	return result;
@@ -1151,6 +1182,10 @@ WRITE8_MEMBER( coco_state::ff60_write )
 		/* writes to $FF86 will switch the VHD */
 		m_vhd_select = data;
 	}
+	else
+	{
+		floating_space_write(0xFF60 + offset, data);
+	}
 }
 
 
@@ -1170,9 +1205,8 @@ READ8_MEMBER( coco_state::ff40_read )
 		return m_beckerport->read(space, offset-1, mem_mask);
 	}
 
-	return m_cococart->read(space, offset, mem_mask);
+	return m_cococart->scs_read(space, offset, mem_mask);
 }
-
 
 
 //-------------------------------------------------
@@ -1186,9 +1220,8 @@ WRITE8_MEMBER( coco_state::ff40_write )
 		return m_beckerport->write(space, offset-1, data, mem_mask);
 	}
 
-	m_cococart->write(space, offset, data, mem_mask);
+	m_cococart->scs_write(space, offset, data, mem_mask);
 }
-
 
 
 //-------------------------------------------------
@@ -1199,6 +1232,17 @@ void coco_state::cart_w(bool state)
 {
 	m_pia_1->cb1_w(state);
 }
+
+
+//-------------------------------------------------
+//  cartridge_space
+//-------------------------------------------------
+
+address_space &coco_state::cartridge_space()
+{
+	return m_floating->space(address_spacenum::AS_0);
+}
+
 
 /***************************************************************************
   DISASSEMBLY OVERRIDE (OS9 syscalls)

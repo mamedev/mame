@@ -24,12 +24,11 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_CBM2_EXP_H
+#define MAME_BUS_CBM2_EXP_H
+
 #pragma once
 
-#ifndef __CBM2_EXPANSION_SLOT__
-#define __CBM2_EXPANSION_SLOT__
-
-#include "emu.h"
 #include "softlist_dev.h"
 
 
@@ -77,7 +76,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override { update_names(); }
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -96,7 +94,7 @@ protected:
 	virtual const char *file_extensions() const override { return "20,40,60"; }
 
 	// slot interface overrides
-	virtual std::string get_default_card_software() override;
+	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	device_cbm2_expansion_card_interface *m_card;
 };
@@ -110,13 +108,14 @@ class device_cbm2_expansion_card_interface : public device_slot_card_interface
 
 public:
 	// construction/destruction
-	device_cbm2_expansion_card_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_cbm2_expansion_card_interface();
 
 	virtual uint8_t cbm2_bd_r(address_space &space, offs_t offset, uint8_t data, int csbank1, int csbank2, int csbank3) { return data; };
 	virtual void cbm2_bd_w(address_space &space, offs_t offset, uint8_t data, int csbank1, int csbank2, int csbank3) { };
 
 protected:
+	device_cbm2_expansion_card_interface(const machine_config &mconfig, device_t &device);
+
 	optional_shared_ptr<uint8_t> m_bank1;
 	optional_shared_ptr<uint8_t> m_bank2;
 	optional_shared_ptr<uint8_t> m_bank3;
@@ -126,11 +125,10 @@ protected:
 
 
 // device type definition
-extern const device_type CBM2_EXPANSION_SLOT;
+DECLARE_DEVICE_TYPE(CBM2_EXPANSION_SLOT, cbm2_expansion_slot_device)
 
 
 SLOT_INTERFACE_EXTERN( cbm2_expansion_cards );
 
 
-
-#endif
+#endif // MAME_BUS_CBM2_EXP_H

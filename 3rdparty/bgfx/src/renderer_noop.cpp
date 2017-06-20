@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -177,7 +177,7 @@ namespace bgfx { namespace noop
 		{
 		}
 
-		void saveScreenShot(const char* /*_filePath*/) BX_OVERRIDE
+		void requestScreenShot(FrameBufferHandle /*_handle*/, const char* /*_filePath*/) BX_OVERRIDE
 		{
 		}
 
@@ -190,6 +190,10 @@ namespace bgfx { namespace noop
 		}
 
 		void setMarker(const char* /*_marker*/, uint32_t /*_size*/) BX_OVERRIDE
+		{
+		}
+
+		void invalidateOcclusionQuery(OcclusionQueryHandle /*_handle*/) BX_OVERRIDE
 		{
 		}
 

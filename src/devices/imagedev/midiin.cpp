@@ -16,14 +16,14 @@
     IMPLEMENTATION
 ***************************************************************************/
 
-const device_type MIDIIN = &device_creator<midiin_device>;
+DEFINE_DEVICE_TYPE(MIDIIN, midiin_device, "midiin", "MIDI In image device")
 
 /*-------------------------------------------------
     ctor
 -------------------------------------------------*/
 
 midiin_device::midiin_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MIDIIN, "MIDI In image device", tag, owner, clock, "midiin", __FILE__),
+	: device_t(mconfig, MIDIIN, tag, owner, clock),
 		device_image_interface(mconfig, *this),
 		device_serial_interface(mconfig, *this),
 		m_midi(nullptr),
@@ -56,15 +56,6 @@ void midiin_device::device_reset()
 	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
 	set_rcv_rate(0);
 	set_tra_rate(31250);
-}
-
-/*-------------------------------------------------
-    device_config_complete
--------------------------------------------------*/
-
-void midiin_device::device_config_complete(void)
-{
-	update_names();
 }
 
 /*-------------------------------------------------

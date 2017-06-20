@@ -53,9 +53,6 @@ using namespace Windows::UI::Core;
 #define MAKE_DI_SCAN(scan, isextended) (scan & 0x7f) | (isextended ? 0x80 : 0x00)
 #define WINOSD(machine) downcast<windows_osd_interface*>(&machine.osd())
 
-#undef min
-#undef max
-
 //============================================================
 //  PARAMETERS
 //============================================================
@@ -773,9 +770,9 @@ void win_window_info::create(running_machine &machine, int index, std::shared_pt
 
 	// make the window title
 	if (video_config.numscreens == 1)
-		sprintf(window->m_title, "%s: %s [%s]", emulator_info::get_appname(), machine.system().description, machine.system().name);
+		sprintf(window->m_title, "%s: %s [%s]", emulator_info::get_appname(), machine.system().type.fullname(), machine.system().name);
 	else
-		sprintf(window->m_title, "%s: %s [%s] - Screen %d", emulator_info::get_appname(), machine.system().description, machine.system().name, index);
+		sprintf(window->m_title, "%s: %s [%s] - Screen %d", emulator_info::get_appname(), machine.system().type.fullname(), machine.system().name, index);
 
 	// set the initial maximized state
 	window->m_startmaximized = options.maximize();

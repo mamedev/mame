@@ -14,7 +14,7 @@ looping over a complex control structure. Could these be derived from the
 
 TODO:
 - Layout including lamps
-- Hook up a ticket dispenser and solve the "HOPPER ERROR" issue
+- Hopper only works in "COIN HOPPER" mode
 - Do button 5 or remaining DIPs actually do anything outside service mode?
 
 ============================================================================
@@ -72,6 +72,9 @@ U0564 LH28F800SU OBJ4-1
 #include "machine/eepromser.h"
 #include "machine/rtc4543.h"
 #include "machine/nvram.h"
+#include "machine/ticket.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class feversoc_state : public driver_device
@@ -83,10 +86,12 @@ public:
 		m_mainram2(*this, "workram2"),
 		m_nvram(*this, "nvram"),
 		m_spriteram(*this, "spriteram"),
+		m_in(*this, {"IN1", "IN0"}),
 		m_maincpu(*this, "maincpu"),
 		m_oki(*this, "oki"),
 		m_eeprom(*this, "eeprom"),
 		m_rtc(*this, "rtc"),
+		m_hopper(*this, "hopper"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
@@ -94,16 +99,19 @@ public:
 	required_shared_ptr<uint32_t> m_mainram2;
 	required_shared_ptr<uint32_t> m_nvram;
 	required_shared_ptr<uint32_t> m_spriteram;
-	DECLARE_READ32_MEMBER(in0_r);
-	DECLARE_WRITE32_MEMBER(output_w);
+	required_ioport_array<2> m_in;
+	DECLARE_READ16_MEMBER(in_r);
+	DECLARE_WRITE16_MEMBER(output_w);
+	DECLARE_WRITE16_MEMBER(output2_w);
 	DECLARE_DRIVER_INIT(feversoc);
-	virtual void video_start() override;
 	uint32_t screen_update_feversoc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(feversoc_irq);
+	DECLARE_WRITE16_MEMBER(feversoc_irq_ack);
 	required_device<sh2_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<jrc6355e_device> m_rtc;
+	required_device<ticket_dispenser_device> m_hopper;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 };
@@ -111,9 +119,6 @@ public:
 
 #define MASTER_CLOCK XTAL_28_63636MHz
 
-void feversoc_state::video_start()
-{
-}
 
 uint32_t feversoc_state::screen_update_feversoc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -146,48 +151,45 @@ uint32_t feversoc_state::screen_update_feversoc(screen_device &screen, bitmap_in
 
 
 
-READ32_MEMBER(feversoc_state::in0_r)
+READ16_MEMBER(feversoc_state::in_r)
 {
-	uint32_t io0 = (ioport("IN1")->read()&0xffff) << 16;
-	uint32_t io1 = (ioport("IN0")->read()&0xffff) << 0;
-	return io0 | io1;
+	return m_in[offset]->read() & 0xffff;
 }
 
-WRITE32_MEMBER(feversoc_state::output_w)
+WRITE16_MEMBER( feversoc_state::output_w )
 {
-	if(ACCESSING_BITS_16_31)
-	{
-		machine().bookkeeping().coin_lockout_w(0,~data>>16 & 0x40);
-		machine().bookkeeping().coin_lockout_w(1,~data>>16 & 0x40);
-		machine().bookkeeping().coin_counter_w(0,data>>16 & 1);
-		//data>>16 & 2 coin out
-		machine().bookkeeping().coin_counter_w(1,data>>16 & 4);
-		//data>>16 & 8 coin hopper
-		m_oki->set_rom_bank(((data>>16) & 0x20)>>5);
+	machine().bookkeeping().coin_lockout_w(0, ~data & 0x40);
+	machine().bookkeeping().coin_lockout_w(1, ~data & 0x40);
+	machine().bookkeeping().coin_counter_w(0, data & 1);
+	// data & 2 coin out counter
+	machine().bookkeeping().coin_counter_w(1, data & 4);
+	m_hopper->motor_w((data & 0x08) >> 3); // coin hopper or prize hopper
+	m_oki->set_rom_bank((data & 0x20) >> 5);
 
-		m_eeprom->di_write((data & 0x80000000) ? 1 : 0);
-		m_eeprom->clk_write((data & 0x40000000) ? ASSERT_LINE : CLEAR_LINE);
-		m_eeprom->cs_write((data & 0x20000000) ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->di_write((data & 0x8000) ? 1 : 0);
+	m_eeprom->clk_write((data & 0x4000) ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->cs_write((data & 0x2000) ? ASSERT_LINE : CLEAR_LINE);
 
-		m_rtc->data_w((data & 0x08000000) ? 1 : 0);
-		m_rtc->wr_w((data & 0x04000000) ? ASSERT_LINE : CLEAR_LINE);
-		m_rtc->clk_w((data & 0x02000000) ? ASSERT_LINE : CLEAR_LINE);
-		m_rtc->ce_w((data & 0x01000000) ? ASSERT_LINE : CLEAR_LINE);
-	}
-	if(ACCESSING_BITS_0_15)
-	{
-		machine().output().set_lamp_value(1, BIT(data, 0)); // LAMP1
-		machine().output().set_lamp_value(2, BIT(data, 1)); // LAMP2
-		machine().output().set_lamp_value(3, BIT(data, 2)); // LAMP3
-		machine().output().set_lamp_value(4, BIT(data, 3)); // LAMP4
-		machine().output().set_lamp_value(5, BIT(data, 4)); // LAMP5
-		machine().output().set_lamp_value(6, BIT(data, 5)); // LAMP6
-		machine().output().set_lamp_value(7, BIT(data, 6)); // LAMP7
-
-		machine().bookkeeping().coin_counter_w(2,data & 0x2000); //key in
-		//data & 0x4000 key out
-	}
+	m_rtc->data_w((data & 0x0800) ? 1 : 0);
+	m_rtc->wr_w((data & 0x0400) ? ASSERT_LINE : CLEAR_LINE);
+	m_rtc->clk_w((data & 0x0200) ? ASSERT_LINE : CLEAR_LINE);
+	m_rtc->ce_w((data & 0x0100) ? ASSERT_LINE : CLEAR_LINE);
 }
+
+WRITE16_MEMBER( feversoc_state::output2_w )
+{
+	machine().output().set_lamp_value(1, BIT(data, 0)); // LAMP1
+	machine().output().set_lamp_value(2, BIT(data, 1)); // LAMP2
+	machine().output().set_lamp_value(3, BIT(data, 2)); // LAMP3
+	machine().output().set_lamp_value(4, BIT(data, 3)); // LAMP4
+	machine().output().set_lamp_value(5, BIT(data, 4)); // LAMP5
+	machine().output().set_lamp_value(6, BIT(data, 5)); // LAMP6
+	machine().output().set_lamp_value(7, BIT(data, 6)); // LAMP7
+
+	machine().bookkeeping().coin_counter_w(2, data & 0x2000); // key in
+	//data & 0x4000 key out
+}
+
 
 static ADDRESS_MAP_START( feversoc_map, AS_PROGRAM, 32, feversoc_state )
 	AM_RANGE(0x00000000, 0x0003ffff) AM_ROM
@@ -195,9 +197,10 @@ static ADDRESS_MAP_START( feversoc_map, AS_PROGRAM, 32, feversoc_state )
 	AM_RANGE(0x02030000, 0x0203ffff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x02034000, 0x0203dfff) AM_RAM AM_SHARE("workram2") //work ram
 	AM_RANGE(0x0203e000, 0x0203ffff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x06000000, 0x06000003) AM_WRITE(output_w)
-	AM_RANGE(0x06000004, 0x06000007) AM_WRITENOP //???
-	AM_RANGE(0x06000008, 0x0600000b) AM_READ(in0_r)
+	AM_RANGE(0x06000000, 0x06000003) AM_WRITE16(output_w, 0xffff0000)
+	AM_RANGE(0x06000000, 0x06000003) AM_WRITE16(output2_w, 0x0000ffff)
+	AM_RANGE(0x06000004, 0x06000007) AM_WRITE16(feversoc_irq_ack, 0x0000ffff)
+	AM_RANGE(0x06000008, 0x0600000b) AM_READ16(in_r, 0xffffffff)
 	AM_RANGE(0x0600000c, 0x0600000f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff0000)
 	//AM_RANGE(0x06010000, 0x0601007f) AM_DEVREADWRITE("obj", seibu_encrypted_sprite_device, read, write) AM_RAM
 	AM_RANGE(0x06010060, 0x06010063) AM_WRITENOP // sprite buffering
@@ -232,7 +235,7 @@ static INPUT_PORTS_START( feversoc )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN ) PORT_NAME("Key In (Service)")
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hopper") PORT_TOGGLE PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("rtc", rtc4543_device, data_r)
 	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Service_Mode ) ) PORT_DIPLOCATION( "DIP1:1" )
@@ -247,6 +250,7 @@ static INPUT_PORTS_START( feversoc )
 	PORT_DIPUNKNOWN_DIPLOC( 0x2000, 0x2000, "DIP1:6" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x4000, 0x4000, "DIP1:7" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x8000, 0x8000, "DIP1:8" )
+
 	PORT_START("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SLOT_STOP1 ) PORT_NAME("Stop 1 (BTN1)")
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SLOT_STOP2 ) PORT_NAME("Stop 2 (BTN2)")
@@ -261,10 +265,15 @@ INPUT_PORTS_END
 
 INTERRUPT_GEN_MEMBER(feversoc_state::feversoc_irq)
 {
-	m_maincpu->set_input_line(8, HOLD_LINE );
+	m_maincpu->set_input_line(8, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( feversoc, feversoc_state )
+WRITE16_MEMBER(feversoc_state::feversoc_irq_ack)
+{
+	m_maincpu->set_input_line(8, CLEAR_LINE);
+}
+
+static MACHINE_CONFIG_START( feversoc )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",SH2,MASTER_CLOCK)
@@ -287,7 +296,7 @@ static MACHINE_CONFIG_START( feversoc, feversoc_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", MASTER_CLOCK/16, OKIM6295_PIN7_LOW) //pin 7 & frequency not verified (clock should be 28,6363 / n)
+	MCFG_OKIM6295_ADD("oki", MASTER_CLOCK/16, PIN7_LOW) //pin 7 & frequency not verified (clock should be 28,6363 / n)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.6)
 
 	MCFG_EEPROM_SERIAL_93C56_ADD("eeprom")
@@ -295,6 +304,8 @@ static MACHINE_CONFIG_START( feversoc, feversoc_state )
 	MCFG_JRC6355E_ADD("rtc", XTAL_32_768kHz)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
+
+	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(60), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH )
 MACHINE_CONFIG_END
 
 /***************************************************************************

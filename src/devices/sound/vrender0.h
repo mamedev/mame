@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:ElSemi
-#pragma once
+#ifndef MAME_SOUND_VRENDER0_H
+#define MAME_SOUND_VRENDER0_H
 
-#ifndef __VRENDER0_H__
-#define __VRENDER0_H__
+#pragma once
 
 
 //**************************************************************************
@@ -30,7 +30,6 @@ class vrender0_device : public device_t,
 {
 public:
 	vrender0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~vrender0_device() { }
 
 	// static configuration
 	static void set_reg_base(device_t &device, int base) { downcast<vrender0_device &>(device).m_reg_base = base; }
@@ -57,7 +56,6 @@ private:
 	void VR0_RenderAudio(int nsamples, stream_sample_t *l, stream_sample_t *r);
 };
 
-extern const device_type VRENDER0;
+DECLARE_DEVICE_TYPE(VRENDER0, vrender0_device)
 
-
-#endif /* __VRENDER0_H__ */
+#endif // MAME_SOUND_VRENDER0_H

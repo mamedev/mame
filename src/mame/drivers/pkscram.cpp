@@ -15,8 +15,10 @@ driver by David Haywood and few bits by Pierpaolo Prazzoli
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "sound/2203intf.h"
 #include "machine/nvram.h"
+#include "sound/2203intf.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class pkscram_state : public driver_device
@@ -297,7 +299,7 @@ void pkscram_state::machine_reset()
 	scanline_timer->adjust(m_screen->time_until_pos(interrupt_scanline), interrupt_scanline);
 }
 
-static MACHINE_CONFIG_START( pkscramble, pkscram_state )
+static MACHINE_CONFIG_START( pkscramble )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000 )
 	MCFG_CPU_PROGRAM_MAP(pkscramble_map)
@@ -342,4 +344,4 @@ ROM_START( pkscram )
 ROM_END
 
 
-GAME( 1993, pkscram, 0, pkscramble, pkscramble, driver_device, 0, ROT0, "Cosmo Electronics Corporation", "PK Scramble", MACHINE_SUPPORTS_SAVE)
+GAME( 1993, pkscram, 0, pkscramble, pkscramble, pkscram_state, 0, ROT0, "Cosmo Electronics Corporation", "PK Scramble", MACHINE_SUPPORTS_SAVE )

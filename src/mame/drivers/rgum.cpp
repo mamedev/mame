@@ -14,11 +14,13 @@ The ppi at 3000-3003 seems to be a dual port communication thing with the z80.
 */
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "cpu/m6502/m65c02.h"
-#include "video/mc6845.h"
+#include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "sound/ay8910.h"
+#include "video/mc6845.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class rgum_state : public driver_device
@@ -236,7 +238,7 @@ static GFXDECODE_START( rgum )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( rgum, rgum_state )
+static MACHINE_CONFIG_START( rgum )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M65C02,24000000/16)      /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(rgum_map)
@@ -292,4 +294,4 @@ ROM_START( rgum )
 ROM_END
 
 
-GAME( 199?, rgum, 0, rgum, rgum, driver_device, 0, ROT0, "<unknown>",         "Royal Gum (Italy)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 199?, rgum, 0, rgum, rgum, rgum_state, 0, ROT0, "<unknown>",         "Royal Gum (Italy)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

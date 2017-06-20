@@ -80,6 +80,8 @@ ROMS: All ROM labels say only "PROM" and a number.
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class pturn_state : public driver_device
@@ -496,7 +498,7 @@ void pturn_state::machine_reset()
 	m_soundlatch->clear_w(space,0,0);
 }
 
-static MACHINE_CONFIG_START( pturn, pturn_state )
+static MACHINE_CONFIG_START( pturn )
 	MCFG_CPU_ADD("maincpu", Z80, 12000000/3)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pturn_state,  main_intgen)
@@ -514,7 +516,7 @@ static MACHINE_CONFIG_START( pturn, pturn_state )
 	MCFG_SCREEN_UPDATE_DRIVER(pturn_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 0x100)
+	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 0x100)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pturn)
 

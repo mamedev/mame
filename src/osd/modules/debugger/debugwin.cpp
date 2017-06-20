@@ -6,6 +6,7 @@
 //
 //============================================================
 
+#include "emu.h"
 #include "debug_module.h"
 #include "modules/osdmodule.h"
 
@@ -20,10 +21,7 @@
 #include "win/memorywininfo.h"
 #include "win/pointswininfo.h"
 #include "win/uimetrics.h"
-#undef min
-#undef max
 
-#include "emu.h"
 #include "debugger.h"
 #include "debug/debugcpu.h"
 
@@ -156,7 +154,7 @@ void debugger_windows::wait_for_debugger(device_t &device, bool firststop)
 void debugger_windows::debugger_update()
 {
 	// if we're running live, do some checks
-	if (!winwindow_has_focus() && m_machine && !m_machine->debugger().cpu().is_stopped() && (m_machine->phase() == MACHINE_PHASE_RUNNING))
+	if (!winwindow_has_focus() && m_machine && !m_machine->debugger().cpu().is_stopped() && (m_machine->phase() == machine_phase::RUNNING))
 	{
 		// see if the interrupt key is pressed and break if it is
 		if (seq_pressed())

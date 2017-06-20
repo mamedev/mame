@@ -12,7 +12,6 @@
 
     TODO:
     - how does dual-CPU work?
-    - EAG IRQ level/timing is unknown
     - USART is not emulated
     - V9(68030 @ 32MHz) is faster than V10(68040 @ 25MHz) but it should be the other
       way around, culprit is unemulated cache?
@@ -51,15 +50,15 @@ V6-V11 are on model 6117. Older 1986 model 6081/6088/6089 uses a 6502 CPU.
 Hardware info:
 --------------
 - MC68HC000P12F 16MHz CPU, 16MHz XTAL
-- MB1422A DRAM Controller, 25MHz XTAL near, 4 DRAM slots(V2: slot 1 and 2 64KB)
+- MB1422A DRAM Controller, 25MHz XTAL near, 4 DRAM slots
+  (V2: slot 2 & 3 64KB, V3: slot 2 & 3 256KB)
 - 2*27C512 64KB EPROM, 2*KM6264AL-10 8KB SRAM, 2*AT28C64X 8KB EEPROM
 - OKI M82C51A-2 USART, 4.9152MHz XTAL
 - other special: magnet sensors, external module slot, serial port
 
-IRQ source is unknown. Several possibilities:
-- NE555 timer IC
-- MM/SN74HC4060 binary counter IC (near the M82C51A)
-- one of the XTALs, plus divider of course
+IRQ source is a 4,9152MHz quartz crystal (Y3) connected to a 74HC4060 (U8,
+ripple counter/divider). From Q13 output (counter=8192) we obtain the IRQ signal
+applied to IPL1 of 68000 (pin 24) 4,9152 MHz / 8192 = 600 Hz.
 
 The module slot pinout is different from SCC series. The data on those appears
 to be compatible with EAG though and will load fine with an adapter.
@@ -155,22 +154,28 @@ B0000x-xxxxxx: see V7, -800000
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/fidelz80.h"
+#include "includes/fidelbase.h"
+
 #include "cpu/m68000/m68000.h"
+#include "machine/ram.h"
 #include "machine/nvram.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
 
 // internal artwork
 #include "fidel_ex_68k.lh" // clickable
 #include "fidel_eag_68k.lh" // clickable
 
 
-class fidel68k_state : public fidelz80base_state
+class fidel68k_state : public fidelbase_state
 {
 public:
 	fidel68k_state(const machine_config &mconfig, device_type type, const char *tag)
-		: fidelz80base_state(mconfig, type, tag)
+		: fidelbase_state(mconfig, type, tag),
+		m_ram(*this, "ram")
 	{ }
+
+	optional_device<ram_device> m_ram;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(M68K_IRQ_2, ASSERT_LINE); }
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE); }
@@ -179,6 +184,7 @@ public:
 	DECLARE_WRITE8_MEMBER(fexcel68k_mux_w);
 
 	// EAG(6114/6117)
+	DECLARE_DRIVER_INIT(eag);
 	void eag_prepare_display();
 	DECLARE_READ8_MEMBER(eag_input1_r);
 	DECLARE_WRITE8_MEMBER(eag_leds_w);
@@ -199,7 +205,7 @@ public:
 WRITE8_MEMBER(fidel68k_state::fexcel68k_mux_w)
 {
 	// a1-a3,d0: 74259
-	uint8_t mask = 1 << offset;
+	u8 mask = 1 << offset;
 	m_led_select = (m_led_select & ~mask) | ((data & 1) ? mask : 0);
 
 	// 74259 Q0-Q3: 74145 A-D (Q4-Q7 N/C)
@@ -218,7 +224,7 @@ void fidel68k_state::eag_prepare_display()
 {
 	// Excel 68000: 4*7seg leds, 8*8 chessboard leds
 	// EAG: 8*7seg leds(2 panels), (8+1)*8 chessboard leds
-	uint8_t seg_data = BITSWAP8(m_7seg_data,0,1,3,2,7,5,6,4);
+	u8 seg_data = BITSWAP8(m_7seg_data,0,1,3,2,7,5,6,4);
 	set_display_segmask(0x1ff, 0x7f);
 	display_matrix(16, 9, m_led_data << 8 | seg_data, m_inp_mux);
 }
@@ -254,7 +260,7 @@ WRITE8_MEMBER(fidel68k_state::eag_mux_w)
 	// d0-d3: 74145 A-D
 	// 74145 0-8: input mux, digit/led select
 	// 74145 9: speaker out
-	uint16_t sel = 1 << (data & 0xf);
+	u16 sel = 1 << (data & 0xf);
 	m_dac->write(BIT(sel, 9));
 	m_inp_mux = sel & 0x1ff;
 	eag_prepare_display();
@@ -288,10 +294,15 @@ ADDRESS_MAP_END
 
 // EAG
 
+DRIVER_INIT_MEMBER(fidel68k_state, eag)
+{
+	// eag_map: DRAM slots at $200000-$2fffff - V1/V2: 128K, V3: 512K, V4: 1M
+	m_maincpu->space(AS_PROGRAM).install_ram(0x200000, 0x200000 + m_ram->size() - 1, m_ram->pointer());
+}
+
 static ADDRESS_MAP_START( eag_map, AS_PROGRAM, 16, fidel68k_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x104000, 0x107fff) AM_RAM
-	AM_RANGE(0x200000, 0x2fffff) AM_RAM // DRAM slots
 	AM_RANGE(0x300000, 0x30000f) AM_MIRROR(0x000010) AM_READWRITE8(eag_input1_r, eag_leds_w, 0x00ff)
 	AM_RANGE(0x300000, 0x30000f) AM_MIRROR(0x000010) AM_WRITE8(eag_7seg_w, 0xff00) AM_READNOP
 	AM_RANGE(0x400000, 0x407fff) AM_READ8(eag_cart_r, 0xff00)
@@ -334,173 +345,8 @@ ADDRESS_MAP_END
     Input Ports
 ******************************************************************************/
 
-static INPUT_PORTS_START( cb_buttons )
-	PORT_START("IN.0")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
-
-	PORT_START("IN.1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
-
-	PORT_START("IN.2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
-
-	PORT_START("IN.3")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
-
-	PORT_START("IN.4")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
-
-	PORT_START("IN.5")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
-
-	PORT_START("IN.6")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
-
-	PORT_START("IN.7")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( cb_magnets )
-	PORT_START("IN.0")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-
-	PORT_START("IN.1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-
-	PORT_START("IN.2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-
-	PORT_START("IN.3")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-
-	PORT_START("IN.4")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-
-	PORT_START("IN.5")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-
-	PORT_START("IN.6")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-
-	PORT_START("IN.7")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE PORT_NAME("Board Sensor")
-INPUT_PORTS_END
-
-
 static INPUT_PORTS_START( fexcel68k )
-	PORT_INCLUDE( cb_buttons )
+	PORT_INCLUDE( fidel_cb_buttons )
 
 	PORT_START("IN.8")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_NAME("Clear")
@@ -515,7 +361,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( eag )
-	PORT_INCLUDE( cb_magnets )
+	PORT_INCLUDE( fidel_cb_magnets )
 
 	PORT_MODIFY("IN.0")
 	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_NAME("CL")
@@ -543,16 +389,16 @@ INPUT_PORTS_END
     Machine Drivers
 ******************************************************************************/
 
-static MACHINE_CONFIG_START( fexcel68k, fidel68k_state )
+static MACHINE_CONFIG_START( fexcel68k )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz) // HD68HC000P12
 	MCFG_CPU_PROGRAM_MAP(fexcel68k_map)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", fidel68k_state, irq_on, attotime::from_hz(618)) // theoretical frequency from 556 timer (22nf, 91K + 20K POT @ 14.8K, 0.1K), measurement was 580Hz
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", fidel68k_state, irq_on, attotime::from_hz(618)) // theoretical frequency from 556 timer (22nF, 91K + 20K POT @ 14.8K, 0.1K), measurement was 580Hz
 	MCFG_TIMER_START_DELAY(attotime::from_hz(618) - attotime::from_nsec(1525)) // active for 1.525us
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel68k_state, irq_off, attotime::from_hz(618))
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelz80base_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_fidel_ex_68k)
 
 	/* sound hardware */
@@ -562,17 +408,23 @@ static MACHINE_CONFIG_START( fexcel68k, fidel68k_state )
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( eag, fidel68k_state )
+static MACHINE_CONFIG_START( eag )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(eag_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(fidel68k_state, irq2_line_hold, 600) // complete guess
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", fidel68k_state, irq_on, attotime::from_hz(XTAL_4_9152MHz/0x2000)) // 600Hz
+	MCFG_TIMER_START_DELAY(attotime::from_hz(XTAL_4_9152MHz/0x2000) - attotime::from_nsec(8250)) // active for 8.25us
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel68k_state, irq_off, attotime::from_hz(XTAL_4_9152MHz/0x2000))
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelz80base_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_fidel_eag_68k)
+
+	MCFG_RAM_ADD("ram")
+	MCFG_RAM_DEFAULT_SIZE("1M")
+	MCFG_RAM_EXTRA_OPTIONS("128K, 512K, 1M")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
@@ -583,7 +435,7 @@ static MACHINE_CONFIG_START( eag, fidel68k_state )
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "fidel_scc")
 	MCFG_GENERIC_EXTENSIONS("bin,dat")
-	MCFG_GENERIC_LOAD(fidelz80base_state, scc_cartridge)
+	MCFG_GENERIC_LOAD(fidelbase_state, scc_cartridge)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "fidel_scc")
 MACHINE_CONFIG_END
 
@@ -592,31 +444,33 @@ static MACHINE_CONFIG_DERIVED( eagv7, eag )
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", M68020, XTAL_20MHz)
 	MCFG_CPU_PROGRAM_MAP(eagv7_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(fidel68k_state, irq2_line_hold, 600) // complete guess
+
+	MCFG_RAM_REMOVE("ram")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( eagv9, eag )
+static MACHINE_CONFIG_DERIVED( eagv9, eagv7 )
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", M68030, XTAL_32MHz)
 	MCFG_CPU_PROGRAM_MAP(eagv7_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(fidel68k_state, irq2_line_hold, 600) // complete guess
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( eagv10, eag )
+static MACHINE_CONFIG_DERIVED( eagv10, eagv7 )
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", M68040, XTAL_25MHz)
 	MCFG_CPU_PROGRAM_MAP(eagv11_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(fidel68k_state, irq2_line_hold, 600) // complete guess
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( eagv11, eag )
+static MACHINE_CONFIG_DERIVED( eagv11, eagv7 )
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", M68EC040, XTAL_36MHz*2*2) // wrong! should be M68EC060 @ 72MHz
 	MCFG_CPU_PROGRAM_MAP(eagv11_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(fidel68k_state, irq2_line_hold, 600) // complete guess
+
+	MCFG_CPU_PERIODIC_INT_DRIVER(fidel68k_state, irq2_line_hold, 600)
+	MCFG_DEVICE_REMOVE("irq_on") // 8.25us is too long
+	MCFG_DEVICE_REMOVE("irq_off")
 MACHINE_CONFIG_END
 
 
@@ -632,10 +486,16 @@ ROM_START( fexcel68k ) // model 6094, PCB label 510.1120B01
 ROM_END
 
 
-ROM_START( feagv2 )
+ROM_START( feagv2 ) // from a V2 board
 	ROM_REGION16_BE( 0x20000, "maincpu", 0 )
-	ROM_LOAD16_BYTE("6114_e5.u18", 0x00000, 0x10000, CRC(f9c7bada) SHA1(60e545f829121b9a4f1100d9e85ac83797715e80) ) // 27c512
-	ROM_LOAD16_BYTE("6114_o5.u19", 0x00001, 0x10000, CRC(04f97b22) SHA1(8b2845dd115498f7b385e8948eca6a5893c223d1) ) // "
+	ROM_LOAD16_BYTE("6114_e5_yellow.u22", 0x00000, 0x10000, CRC(f9c7bada) SHA1(60e545f829121b9a4f1100d9e85ac83797715e80) ) // 27c512
+	ROM_LOAD16_BYTE("6114_o5_green.u19",  0x00001, 0x10000, CRC(04f97b22) SHA1(8b2845dd115498f7b385e8948eca6a5893c223d1) ) // "
+ROM_END
+
+ROM_START( feagv2a ) // from a V3 board
+	ROM_REGION16_BE( 0x20000, "maincpu", 0 )
+	ROM_LOAD16_BYTE("elite_1.6_e.u22", 0x00000, 0x10000, CRC(c8b89ccc) SHA1(d62e0a72f54b793ab8853468a81255b62f874658) )
+	ROM_LOAD16_BYTE("elite_1.6_o.u19", 0x00001, 0x10000, CRC(904c7061) SHA1(742110576cf673321440bc81a4dae4c949b49e38) )
 ROM_END
 
 ROM_START( feagv7 )
@@ -666,11 +526,12 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-/*    YEAR  NAME       PARENT   COMPAT  MACHINE    INPUT      INIT              COMPANY, FULLNAME, FLAGS */
-CONS( 1987, fexcel68k, 0,       0,      fexcel68k, fexcel68k, driver_device, 0, "Fidelity Electronics", "Excel 68000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME       PARENT  CMP MACHINE    INPUT      STATE           INIT  COMPANY, FULLNAME, FLAGS
+CONS( 1987, fexcel68k, 0,       0, fexcel68k, fexcel68k, fidel68k_state, 0,    "Fidelity Electronics", "Excel 68000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1989, feagv2,    0,       0,      eag,       eag,       driver_device, 0, "Fidelity Electronics", "Elite Avant Garde (model 6114-2/3/4)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1990, feagv7,    feagv2,  0,      eagv7,     eag,       driver_device, 0, "Fidelity Electronics", "Elite Avant Garde (model 6117-7)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1990, feagv9,    feagv2,  0,      eagv9,     eag,       driver_device, 0, "Fidelity Electronics", "Elite Avant Garde (model 6117-9)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1990, feagv10,   feagv2,  0,      eagv10,    eag,       driver_device, 0, "Fidelity Electronics", "Elite Avant Garde (model 6117-10)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 2002, feagv11,   feagv2,  0,      eagv11,    eag,       driver_device, 0, "hack (Wilfried Bucke)", "Elite Avant Garde (model 6117-11)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1989, feagv2,    0,       0, eag,       eag,       fidel68k_state, eag,  "Fidelity Electronics", "Elite Avant Garde (model 6114-2/3/4, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1989, feagv2a,   feagv2,  0, eag,       eag,       fidel68k_state, eag,  "Fidelity Electronics", "Elite Avant Garde (model 6114-2/3/4, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, feagv7,    feagv2,  0, eagv7,     eag,       fidel68k_state, 0,    "Fidelity Electronics", "Elite Avant Garde (model 6117-7)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, feagv9,    feagv2,  0, eagv9,     eag,       fidel68k_state, 0,    "Fidelity Electronics", "Elite Avant Garde (model 6117-9)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, feagv10,   feagv2,  0, eagv10,    eag,       fidel68k_state, 0,    "Fidelity Electronics", "Elite Avant Garde (model 6117-10)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 2002, feagv11,   feagv2,  0, eagv11,    eag,       fidel68k_state, 0,    "hack (Wilfried Bucke)", "Elite Avant Garde (model 6117-11)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

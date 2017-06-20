@@ -18,7 +18,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_tc0080vco(*this, "tc0080vco"),
-		m_tc0220ioc(*this, "tc0220ioc"),
+		m_tc0040ioc(*this, "tc0040ioc"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
@@ -29,10 +29,11 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<tc0080vco_device> m_tc0080vco;
-	required_device<tc0220ioc_device> m_tc0220ioc;
+	optional_device<tc0040ioc_device> m_tc0040ioc;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
+	DECLARE_WRITE8_MEMBER(coin_control_w);
 	DECLARE_READ8_MEMBER(syvalion_input_bypass_r);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	virtual void machine_start() override;

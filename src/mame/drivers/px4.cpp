@@ -9,19 +9,26 @@
 
 ***************************************************************************/
 
+#include "emu.h"
+
+#include "bus/centronics/ctronics.h"
+#include "bus/epson_sio/epson_sio.h"
+#include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
-#include "machine/ram.h"
-#include "bus/epson_sio/epson_sio.h"
-#include "bus/centronics/ctronics.h"
 #include "imagedev/cassette.h"
-#include "machine/ram.h"
 #include "machine/nvram.h"
-#include "sound/speaker.h"
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
-#include "coreutil.h"
+#include "machine/ram.h"
+#include "machine/ram.h"
+#include "sound/spkrdev.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
+#include "coreutil.h"
+
 #include "px4.lh"
 
 
@@ -1466,7 +1473,7 @@ PALETTE_INIT_MEMBER( px4p_state, px4p )
 //  MACHINE DRIVERS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( px4, px4_state )
+static MACHINE_CONFIG_START( px4 )
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_7_3728MHz / 2)    // uPD70008
 	MCFG_CPU_PROGRAM_MAP(px4_mem)
@@ -1532,7 +1539,7 @@ static MACHINE_CONFIG_START( px4, px4_state )
 	MCFG_SOFTWARE_LIST_ADD("epson_cpm_list", "epson_cpm")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED_CLASS( px4p, px4, px4p_state )
+static MACHINE_CONFIG_DERIVED( px4p, px4 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(px4p_io)
 

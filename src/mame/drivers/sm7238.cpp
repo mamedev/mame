@@ -9,10 +9,9 @@
 
     To do:
     - handle more text_control_w bits
-    - more character attributes incl. double width and height, color
     - 80/132 columns switching on the fly, reverse video
-    - smooth scroll
     - graphics option
+    - colors
     - run vblank from timer output?
     - document hardware and ROM variants, verify if pixel stretching is done
 
@@ -28,6 +27,7 @@
 #include "machine/pic8259.h"
 #include "machine/km035.h"
 #include "machine/nvram.h"
+#include "screen.h"
 
 #define KSM_COLUMNS 80  // or 132
 
@@ -55,30 +55,26 @@
 class sm7238_state : public driver_device
 {
 public:
-	sm7238_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_p_videoram(*this, "videoram"),
-		m_maincpu(*this, "maincpu"),
-		m_nvram(*this, "nvram"),
-		m_pic8259(*this, "pic8259"),
-		m_i8251line(*this, "i8251line"),
-		m_rs232(*this, "rs232"),
-		m_i8251kbd(*this, "i8251kbd"),
-		m_keyboard(*this, "keyboard"),
-		m_i8251prn(*this, "i8251prn"),
-		m_printer(*this, "prtr"),
-		m_t_hblank(*this, "t_hblank"),
-		m_t_vblank(*this, "t_vblank"),
-		m_t_color(*this, "t_color"),
-		m_t_iface(*this, "t_iface"),
-		m_screen(*this, "screen")
+	sm7238_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_nvram(*this, "nvram")
+		, m_p_videoram(*this, "videoram")
+		, m_p_chargen(*this, "chargen")
+		, m_pic8259(*this, "pic8259")
+		, m_i8251line(*this, "i8251line")
+		, m_rs232(*this, "rs232")
+		, m_i8251kbd(*this, "i8251kbd")
+		, m_keyboard(*this, "keyboard")
+		, m_i8251prn(*this, "i8251prn")
+		, m_printer(*this, "prtr")
+		, m_t_hblank(*this, "t_hblank")
+		, m_t_vblank(*this, "t_vblank")
+		, m_t_color(*this, "t_color")
+		, m_t_iface(*this, "t_iface")
+		, m_screen(*this, "screen")
 	{ }
 
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof(screen_device &screen, bool state);
-	TIMER_DEVICE_CALLBACK_MEMBER( scanline_callback );
 	DECLARE_PALETTE_INIT(sm7238);
 
 	DECLARE_WRITE_LINE_MEMBER(write_keyboard_clock);
@@ -86,26 +82,25 @@ public:
 
 	DECLARE_WRITE8_MEMBER(control_w);
 	DECLARE_WRITE8_MEMBER(text_control_w);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 private:
-	uint32_t draw_scanline(uint16_t *p, uint16_t offset, uint8_t scanline);
-	rectangle m_tmpclip;
-	bitmap_ind16 m_tmpbmp;
-
 	void text_memory_clear();
 	void recompute_parameters();
 
-	const uint8_t *m_p_chargen;
-	struct {
+	struct
+	{
 		uint8_t control;
-		uint8_t stride;
 		uint16_t ptr;
+		int stride;
 	} m_video;
 
-protected:
-	required_shared_ptr<uint8_t> m_p_videoram;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<nvram_device> m_nvram;
+	required_shared_ptr<uint8_t> m_p_videoram;
+	required_region_ptr<u8> m_p_chargen;
 	required_device<pic8259_device> m_pic8259;
 	required_device<i8251_device> m_i8251line;
 	required_device<rs232_port_device> m_rs232;
@@ -154,10 +149,6 @@ void sm7238_state::machine_reset()
 
 void sm7238_state::video_start()
 {
-	m_p_chargen = memregion("chargen")->base();
-
-	m_tmpclip = rectangle(0, KSM_DISP_HORZ-1, 0, KSM_DISP_VERT-1);
-	m_tmpbmp.allocate(KSM_DISP_HORZ, KSM_DISP_VERT);
 }
 
 WRITE8_MEMBER(sm7238_state::control_w)
@@ -175,7 +166,8 @@ WRITE8_MEMBER(sm7238_state::text_control_w)
 	if (!BIT(data, 2) && !BIT(data, 3))
 		text_memory_clear();
 
-	if (BIT((data ^ m_video.control), 0)) {
+	if (BIT((data ^ m_video.control), 0))
+	{
 		m_video.stride = BIT(data, 0) ? 80 : 132;
 //      recompute_parameters();
 	}
@@ -195,98 +187,18 @@ WRITE_LINE_MEMBER(sm7238_state::write_printer_clock)
 	m_i8251prn->write_rxc(state);
 }
 
-uint32_t sm7238_state::draw_scanline(uint16_t *p, uint16_t offset, uint8_t scanline)
-{
-	uint8_t attr, fg, bg, ra, gfx;
-	uint16_t x, chr;
-	int dw;
-
-	ra = scanline % 10;
-
-	for (x = offset; x < offset + m_video.stride; x++)
-	{
-		chr = m_p_videoram[x] << 4;
-		attr = m_p_videoram[x + 0x1000];
-		gfx = m_p_chargen[chr | ra] ^ 255;
-
-		bg = 0; fg = 1;
-
-		/* Process attributes */
-		if ((BIT(attr, 1)) && (ra == 9))
-		{
-			gfx = 0xff; // underline
-		}
-		// 2 = blink
-		if (BIT(attr, 3))
-		{
-			gfx ^= 0xff; // reverse video
-		}
-		if (BIT(attr, 4))
-			fg = 2; // highlight
-		else
-			fg = 1;
-
-		dw = 0; // BIT(attr, 4);
-		*p++ = BIT(gfx, 7) ? fg : bg;
-		if (dw)
-		*p++ = BIT(gfx, 7) ? fg : bg;
-		*p++ = BIT(gfx, 6) ? fg : bg;
-		if (dw)
-		*p++ = BIT(gfx, 6) ? fg : bg;
-		*p++ = BIT(gfx, 5) ? fg : bg;
-		if (dw)
-		*p++ = BIT(gfx, 5) ? fg : bg;
-		*p++ = BIT(gfx, 4) ? fg : bg;
-		if (dw)
-		*p++ = BIT(gfx, 4) ? fg : bg;
-		*p++ = BIT(gfx, 3) ? fg : bg;
-		if (dw)
-		*p++ = BIT(gfx, 3) ? fg : bg;
-		*p++ = BIT(gfx, 2) ? fg : bg;
-		if (dw)
-		*p++ = BIT(gfx, 2) ? fg : bg;
-		*p++ = BIT(gfx, 1) ? fg : bg;
-		if (dw)
-		*p++ = BIT(gfx, 1) ? fg : bg;
-		*p++ = BIT(gfx, 0) ? fg : bg;
-		if (dw)
-		*p++ = BIT(gfx, 0) ? fg : bg;
-	}
-	return 0;
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER(sm7238_state::scanline_callback)
-{
-	uint16_t y = m_screen->vpos();
-	uint16_t o = m_video.ptr;
-
-	if (y < KSM_VERT_START) return;
-	y -= KSM_VERT_START;
-	if (y >= KSM_DISP_VERT) return;
-
-	if (y == 0)
-		m_video.ptr = 0;
-	else if (y%10 == 0) {
-		m_video.ptr = m_p_videoram[m_video.ptr + m_video.stride + 1] |
-			(m_p_videoram[m_video.ptr + 0x1000 + m_video.stride + 1] << 8);
-		m_video.ptr &= 0x0fff;
-		DBG_LOG(2,"scanline_cb",("y %d row %d old ptr %04x new ptr %04x\n", y, y%10, o, m_video.ptr));
-	}
-
-	draw_scanline(&m_tmpbmp.pix16(y), m_video.ptr, y%10);
-}
-
 void sm7238_state::text_memory_clear()
 {
 	int y = 0, ptr = 0;
 
-	do {
+	do
+	{
 		memset(&m_p_videoram[ptr], 0x20, m_video.stride);
 		memset(&m_p_videoram[ptr + 0x1000], 0x20, m_video.stride);
 		ptr = m_p_videoram[ptr + m_video.stride + 1] | (m_p_videoram[ptr + 0x1000 + m_video.stride + 1] << 8);
 		ptr &= 0x0fff;
 		y++;
-	} while (y<26);
+	} while (y < 26);
 }
 
 void sm7238_state::recompute_parameters()
@@ -301,14 +213,97 @@ void sm7238_state::recompute_parameters()
 
 uint32_t sm7238_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	if (BIT(m_video.control, 3))
-	copybitmap(bitmap, m_tmpbmp, 0, 0, KSM_HORZ_START, KSM_VERT_START, cliprect);
-	return 0;
-}
+	uint8_t y, ra, gfx, fg, bg, attr, ctl1, ctl2 = 0;
+	uint16_t chr, sy = KSM_VERT_START, ma = 0, x = 0;
+	bool double_width = false, double_height = false, bottom_half = false;
 
-void sm7238_state::screen_eof(screen_device &screen, bool state)
-{
-	m_pic8259->ir2_w(state);
+	if (!BIT(m_video.control, 3))
+	{
+		bitmap.fill(0);
+		return 0;
+	}
+
+	for (y = 0; y < 26; y++)
+	{
+		for (ra = 0; ra < 10; ra++)
+		{
+			if (y == 1 && ctl2 && ra < ctl2)
+				continue;
+
+			uint16_t *p = &bitmap.pix16(sy++, KSM_HORZ_START);
+
+			for (x = ma; x < ma + m_video.stride; x++)
+			{
+				chr = m_p_videoram[x] << 4;
+				attr = m_p_videoram[x + 0x1000];
+				if (double_height)
+				{
+					gfx = m_p_chargen[chr | (bottom_half ? (5 + (ra >> 1)) : (ra >> 1))] ^ 255;
+				}
+				else
+				{
+					gfx = m_p_chargen[chr | ra] ^ 255;
+				}
+
+				bg = 0;
+				fg = 1;
+
+				/* Process attributes */
+				if ((BIT(attr, 1)) && (ra == 9))
+				{
+					gfx = 0xff; // underline
+				}
+				// 2 = blink
+				if (BIT(attr, 3))
+				{
+					gfx ^= 0xff; // reverse video
+				}
+				if (BIT(attr, 4))
+					fg = 2; // highlight
+				else
+					fg = 1;
+
+				*p++ = BIT(gfx, 7) ? fg : bg;
+				if (double_width)
+				*p++ = BIT(gfx, 7) ? fg : bg;
+				*p++ = BIT(gfx, 6) ? fg : bg;
+				if (double_width)
+				*p++ = BIT(gfx, 6) ? fg : bg;
+				*p++ = BIT(gfx, 5) ? fg : bg;
+				if (double_width)
+				*p++ = BIT(gfx, 5) ? fg : bg;
+				*p++ = BIT(gfx, 4) ? fg : bg;
+				if (double_width)
+				*p++ = BIT(gfx, 4) ? fg : bg;
+				*p++ = BIT(gfx, 3) ? fg : bg;
+				if (double_width)
+				*p++ = BIT(gfx, 3) ? fg : bg;
+				*p++ = BIT(gfx, 2) ? fg : bg;
+				if (double_width)
+				*p++ = BIT(gfx, 2) ? fg : bg;
+				*p++ = BIT(gfx, 1) ? fg : bg;
+				if (double_width)
+				*p++ = BIT(gfx, 1) ? fg : bg;
+				*p++ = BIT(gfx, 0) ? fg : bg;
+				if (double_width)
+				*p++ = BIT(gfx, 0) ? fg : bg;
+
+				if (double_width) x++;
+			}
+		}
+		ctl1 = m_p_videoram[ma + 0x1000 + m_video.stride];
+		double_width  = BIT(ctl1, 6);
+		double_height = BIT(ctl1, 7);
+		bottom_half   = BIT(ctl1, 5);
+
+		ctl2 = m_p_videoram[ma + 0x1000 + m_video.stride + 1] >> 4;
+
+		ma = m_p_videoram[ma + m_video.stride + 1] |
+			(m_p_videoram[ma + 0x1000 + m_video.stride + 1] << 8);
+		ma &= 0x0fff;
+	}
+
+	return 0;
 }
 
 
@@ -337,13 +332,11 @@ PALETTE_INIT_MEMBER(sm7238_state, sm7238)
 	palette.set_pen_color(2, 0x00, 0xff, 0x00); // highlight
 }
 
-static MACHINE_CONFIG_START( sm7238, sm7238_state )
+static MACHINE_CONFIG_START( sm7238 )
 	MCFG_CPU_ADD("maincpu", I8080, XTAL_16_5888MHz/9)
 	MCFG_CPU_PROGRAM_MAP(sm7238_mem)
 	MCFG_CPU_IO_MAP(sm7238_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
-
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", sm7238_state, scanline_callback, "screen", 0, 1)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -358,14 +351,14 @@ static MACHINE_CONFIG_START( sm7238, sm7238_state )
 		KSM_TOTAL_VERT, KSM_VERT_START, KSM_VERT_START+KSM_DISP_VERT);
 #endif
 	MCFG_SCREEN_UPDATE_DRIVER(sm7238_state, screen_update)
-	MCFG_SCREEN_VBLANK_DRIVER(sm7238_state, screen_eof)
+	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("pic8259", pic8259_device, ir2_w))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 3)
 	MCFG_PALETTE_INIT_OWNER(sm7238_state, sm7238)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sm7238)
 
-	MCFG_PIC8259_ADD( "pic8259", INPUTLINE("maincpu", 0), VCC, NOOP)
+	MCFG_PIC8259_ADD("pic8259", INPUTLINE("maincpu", 0), VCC, NOOP)
 
 	MCFG_DEVICE_ADD("t_hblank", PIT8253, 0)
 	MCFG_PIT8253_CLK1(XTAL_16_384MHz/9) // XXX workaround -- keyboard is slower and doesn't sync otherwise
@@ -429,5 +422,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    INIT                      COMPANY     FULLNAME       FLAGS */
-COMP( 1989, sm7238,   0,      0,       sm7238,    0,       driver_device,     0,     "USSR",     "SM 7238",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_KEYBOARD)
+//    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    STATE             INIT   COMPANY     FULLNAME       FLAGS
+COMP( 1989, sm7238,   0,      0,       sm7238,    0,       sm7238_state,     0,     "USSR",     "SM 7238",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_KEYBOARD)

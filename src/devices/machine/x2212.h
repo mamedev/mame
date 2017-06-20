@@ -8,10 +8,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_X2212_H
+#define MAME_MACHINE_X2212_H
 
-#ifndef __X2212_H__
-#define __X2212_H__
+#pragma once
 
 
 
@@ -49,7 +49,6 @@ class x2212_device :    public device_t,
 public:
 	// construction/destruction
 	x2212_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	x2212_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, int size_data);
 
 	// inline configuration helpers
 	static void static_set_auto_save(device_t &device);
@@ -62,6 +61,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( recall );
 
 protected:
+	x2212_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int size_data);
+
 	// internal helpers
 	void store();
 	void recall();
@@ -91,11 +92,11 @@ protected:
 	bool        m_store;
 	bool        m_array_recall;
 
-	int m_size_data;
+	int const m_size_data;
 	optional_region_ptr<uint8_t> m_default_data;
 };
 
-class x2210_device :    public x2212_device
+class x2210_device : public x2212_device
 {
 public:
 	x2210_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -103,8 +104,7 @@ public:
 
 
 // device type definition
-extern const device_type X2212;
-extern const device_type X2210;
+DECLARE_DEVICE_TYPE(X2212, x2212_device)
+DECLARE_DEVICE_TYPE(X2210, x2210_device)
 
-
-#endif
+#endif // MAME_MACHINE_X2212_H

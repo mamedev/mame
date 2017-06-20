@@ -25,12 +25,15 @@
 *******************************************************************************/
 
 #include "emu.h"
+#include "includes/actfancr.h"
+
 #include "cpu/m6502/m6502.h"
 #include "cpu/h6280/h6280.h"
 #include "sound/2203intf.h"
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
-#include "includes/actfancr.h"
+#include "screen.h"
+#include "speaker.h"
 
 /******************************************************************************/
 
@@ -51,12 +54,6 @@ READ8_MEMBER(actfancr_state::triothep_control_r)
 	}
 
 	return 0xff;
-}
-
-WRITE8_MEMBER(actfancr_state::actfancr_sound_w)
-{
-	m_soundlatch->write(space, 0, data & 0xff);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 /******************************************************************************/
@@ -87,7 +84,7 @@ static ADDRESS_MAP_START( actfan_map, AS_PROGRAM, 8, actfancr_state )
 	AM_RANGE(0x130002, 0x130002) AM_READ_PORT("DSW1")
 	AM_RANGE(0x130003, 0x130003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x140000, 0x140001) AM_READ_PORT("SYSTEM") /* VBL */
-	AM_RANGE(0x150000, 0x150001) AM_WRITE(actfancr_sound_w)
+	AM_RANGE(0x150000, 0x150000) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x1f0000, 0x1f3fff) AM_RAM AM_SHARE("main_ram") /* Main ram */
 ADDRESS_MAP_END
 
@@ -101,7 +98,7 @@ static ADDRESS_MAP_START( triothep_map, AS_PROGRAM, 8, actfancr_state )
 	AM_RANGE(0x060010, 0x06001f) AM_DEVWRITE("tilegen1", deco_bac06_device, pf_control1_8bit_swap_w)
 	AM_RANGE(0x064000, 0x0647ff) AM_DEVREADWRITE("tilegen1", deco_bac06_device, pf_data_8bit_swap_r, pf_data_8bit_swap_w)
 	AM_RANGE(0x066400, 0x0667ff) AM_DEVREADWRITE("tilegen1", deco_bac06_device, pf_rowscroll_8bit_swap_r, pf_rowscroll_8bit_swap_w)
-	AM_RANGE(0x100000, 0x100001) AM_WRITE(actfancr_sound_w)
+	AM_RANGE(0x100000, 0x100000) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x110000, 0x110001) AM_WRITE(actfancr_buffer_spriteram_w)
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x130000, 0x1305ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
@@ -287,7 +284,7 @@ MACHINE_RESET_MEMBER(actfancr_state,triothep)
 
 /******************************************************************************/
 
-static MACHINE_CONFIG_START( actfancr, actfancr_state )
+static MACHINE_CONFIG_START( actfancr )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", H6280, 21477200/3) /* Should be accurate */
@@ -326,6 +323,7 @@ static MACHINE_CONFIG_START( actfancr, actfancr_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_SOUND_ADD("ym1", YM2203, 1500000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.90)
@@ -337,11 +335,11 @@ static MACHINE_CONFIG_START( actfancr, actfancr_state )
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 
-	MCFG_OKIM6295_ADD("oki", 1024188, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 1024188, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.85)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( triothep, actfancr_state )
+static MACHINE_CONFIG_START( triothep )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",H6280,XTAL_21_4772MHz/3) /* XIN=21.4772Mhz, verified on pcb */
@@ -383,6 +381,7 @@ static MACHINE_CONFIG_START( triothep, actfancr_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_SOUND_ADD("ym1", YM2203, XTAL_12MHz/8) /* verified on pcb */
 	MCFG_SOUND_ROUTE(0, "mono", 0.90)
@@ -394,7 +393,7 @@ static MACHINE_CONFIG_START( triothep, actfancr_state )
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_1_056MHz, OKIM6295_PIN7_HIGH) /* verified on pcb */
+	MCFG_OKIM6295_ADD("oki", XTAL_1_056MHz, PIN7_HIGH) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.85)
 MACHINE_CONFIG_END
 
@@ -568,8 +567,8 @@ ROM_END
 
 /******************************************************************************/
 
-GAME( 1989, actfancr, 0,        actfancr, actfancr, driver_device, 0, ROT0, "Data East Corporation", "Act-Fancer Cybernetick Hyper Weapon (World revision 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, actfancr1,actfancr, actfancr, actfancr, driver_device, 0, ROT0, "Data East Corporation", "Act-Fancer Cybernetick Hyper Weapon (World revision 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, actfancrj,actfancr, actfancr, actfancr, driver_device, 0, ROT0, "Data East Corporation", "Act-Fancer Cybernetick Hyper Weapon (Japan revision 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, triothep, 0,        triothep, triothep, driver_device, 0, ROT0, "Data East Corporation", "Trio The Punch - Never Forget Me... (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, triothepj,triothep, triothep, triothep, driver_device, 0, ROT0, "Data East Corporation", "Trio The Punch - Never Forget Me... (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, actfancr, 0,        actfancr, actfancr, actfancr_state, 0, ROT0, "Data East Corporation", "Act-Fancer Cybernetick Hyper Weapon (World revision 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, actfancr1,actfancr, actfancr, actfancr, actfancr_state, 0, ROT0, "Data East Corporation", "Act-Fancer Cybernetick Hyper Weapon (World revision 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, actfancrj,actfancr, actfancr, actfancr, actfancr_state, 0, ROT0, "Data East Corporation", "Act-Fancer Cybernetick Hyper Weapon (Japan revision 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, triothep, 0,        triothep, triothep, actfancr_state, 0, ROT0, "Data East Corporation", "Trio The Punch - Never Forget Me... (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, triothepj,triothep, triothep, triothep, actfancr_state, 0, ROT0, "Data East Corporation", "Trio The Punch - Never Forget Me... (Japan)", MACHINE_SUPPORTS_SAVE )

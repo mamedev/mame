@@ -3,6 +3,7 @@
 
 #include "machine/gen_latch.h"
 #include "sound/msm5232.h"
+#include "machine/taito68705interface.h"
 
 class nycaptor_state : public driver_device
 {
@@ -16,7 +17,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_subcpu(*this, "sub"),
-		m_mcu(*this, "mcu"),
+		m_bmcu(*this, "bmcu"),
 		m_msm(*this, "msm"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
@@ -36,21 +37,6 @@ public:
 	uint8_t m_char_bank;
 	uint8_t m_palette_bank;
 
-	/* mcu */
-	uint8_t m_from_main;
-	uint8_t m_from_mcu;
-	int m_mcu_sent;
-	int m_main_sent;
-	uint8_t m_port_a_in;
-	uint8_t m_port_a_out;
-	uint8_t m_ddr_a;
-	uint8_t m_port_b_in;
-	uint8_t m_port_b_out;
-	uint8_t m_ddr_b;
-	uint8_t m_port_c_in;
-	uint8_t m_port_c_out;
-	uint8_t m_ddr_c;
-
 	/* misc */
 	int m_generic_control_reg;
 	int m_sound_nmi_enable;
@@ -64,7 +50,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_subcpu;
-	optional_device<cpu_device> m_mcu;
+	optional_device<taito68705_mcu_device> m_bmcu;
 	required_device<msm5232_device> m_msm;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -88,17 +74,7 @@ public:
 	DECLARE_READ8_MEMBER(cyclshtg_mcu_status_r1);
 	DECLARE_WRITE8_MEMBER(cyclshtg_generic_control_w);
 	DECLARE_READ8_MEMBER(unk_r);
-	DECLARE_READ8_MEMBER(nycaptor_68705_port_a_r);
-	DECLARE_WRITE8_MEMBER(nycaptor_68705_port_a_w);
-	DECLARE_WRITE8_MEMBER(nycaptor_68705_ddr_a_w);
-	DECLARE_READ8_MEMBER(nycaptor_68705_port_b_r);
-	DECLARE_WRITE8_MEMBER(nycaptor_68705_port_b_w);
-	DECLARE_WRITE8_MEMBER(nycaptor_68705_ddr_b_w);
-	DECLARE_READ8_MEMBER(nycaptor_68705_port_c_r);
-	DECLARE_WRITE8_MEMBER(nycaptor_68705_port_c_w);
-	DECLARE_WRITE8_MEMBER(nycaptor_68705_ddr_c_w);
-	DECLARE_WRITE8_MEMBER(nycaptor_mcu_w);
-	DECLARE_READ8_MEMBER(nycaptor_mcu_r);
+
 	DECLARE_READ8_MEMBER(nycaptor_mcu_status_r1);
 	DECLARE_READ8_MEMBER(nycaptor_mcu_status_r2);
 	DECLARE_WRITE8_MEMBER(nycaptor_videoram_w);

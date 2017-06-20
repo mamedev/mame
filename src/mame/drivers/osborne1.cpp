@@ -58,6 +58,23 @@ Schematics specify a WD1793 floppy controller, but we're using the Fujitsu
 equivalent MB8877 here.  Is it known that the original machines used one or
 the other exclusively?  In any case MAME emulates them identically.
 
+Installation of the SCREEN-PAC requires the CPU and character generator ROM
+to be transplanted to the add-on board, and cables run to the sockets that
+previously held these chips.  It contains additional RAM clocked at twice
+the speed of the main system RAM.  Writes to video memory get sent to this
+RAM as well as the main system RAM, so there are actually two live copies
+of video RAM at all times.  The SCREEN-PAC supports switching between
+normal and double horizontal resolution (52x24 or 104x24) at exactly 60Hz.
+
+The Nuevo Video board also requires the CPU to be transplanted to it and has
+a pair of RAMs holding a copy of video memory.  However it has its own
+character generator ROM, so the mainboard's character generator ROM doesn't
+need to be moved.  However, it doesn't behave like the SCREEN-PAC.  It uses
+a Synertek SY6545-1 with its pixel clock derived from a 12.288MHz crystal
+mapped at 0x04/0x05 in I/O space.  It runs at 640x240 (80x24) at just below
+60Hz and doesn't allow resolution switching.  We don't know how contention
+for video RAM is handled, or whether the CRTC can generate VBL interrupts.
+
 
 TODO:
 
@@ -66,11 +83,20 @@ TODO:
   Centronics parallel over the same physical interface, so this should be
   tested, too.
 
+* Complete emulation of the Nuevo Video board (interrupts, CRTC video RAM
+  updates).  It would be nice to get a schematic for this.
+
 ***************************************************************************/
 
+#include "emu.h"
 #include "includes/osborne1.h"
+
 #include "bus/rs232/rs232.h"
+#include "screen.h"
+#include "speaker.h"
+
 #include "softlist.h"
+
 
 #define MAIN_CLOCK  15974400
 
@@ -92,7 +118,18 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( osborne1_io, AS_IO, 8, osborne1_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+
 	AM_RANGE( 0x00, 0x03 ) AM_MIRROR( 0xfc ) AM_WRITE(bankswitch_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( osborne1nv_io, AS_IO, 8, osborne1_state )
+	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+
+	AM_RANGE( 0x00, 0x03 ) AM_WRITE(bankswitch_w)
+	AM_RANGE( 0x04, 0x04 ) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
+	AM_RANGE( 0x05, 0x05 ) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
+	// seems to be something at 0x06 as well, but no idea what - BIOS writes 0x07 on boot
 ADDRESS_MAP_END
 
 
@@ -172,15 +209,13 @@ static INPUT_PORTS_START( osborne1 )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_DIPNAME( 0x08, 0, "Alpha Lock" ) PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_CAPSLOCK) PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK)) PORT_TOGGLE PORT_NAME("Alpha Lock")
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("RESET")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RESET") PORT_CODE(KEYCODE_F12)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RESET") PORT_CODE(KEYCODE_F12) PORT_CHANGED_MEMBER(DEVICE_SELF, osborne1_state, reset_key, 0)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -199,6 +234,13 @@ static INPUT_PORTS_START( osborne1 )
 	PORT_CONFNAME(0x01, 0x00, "Video Output")
 	PORT_CONFSETTING(0x00, "Standard")
 	PORT_CONFSETTING(0x01, "SCREEN-PAC")
+INPUT_PORTS_END
+
+INPUT_PORTS_START( osborne1nv )
+	PORT_INCLUDE(osborne1)
+
+	PORT_MODIFY("CNF")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
 
@@ -237,7 +279,7 @@ static GFXDECODE_START( osborne1 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( osborne1, osborne1_state )
+static MACHINE_CONFIG_START( osborne1 )
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(osborne1_mem)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(osborne1_op)
@@ -296,28 +338,55 @@ static MACHINE_CONFIG_START( osborne1, osborne1_state )
 	MCFG_SOFTWARE_LIST_ADD("flop_list","osborne1")
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_DERIVED( osborne1nv, osborne1 )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(osborne1nv_io)
+
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_NO_PALETTE
+	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
+
+	MCFG_MC6845_ADD("crtc", SY6545_1, "screen", XTAL_12_288MHz/8)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_UPDATE_ROW_CB(osborne1nv_state, crtc_update_row)
+	MCFG_MC6845_ADDR_CHANGED_CB(osborne1nv_state, crtc_update_addr_changed)
+MACHINE_CONFIG_END
+
 
 ROM_START( osborne1 )
-	ROM_REGION(0x1000, "maincpu", 0)
+	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_SYSTEM_BIOS( 0, "ver144", "BIOS version 1.44" )
-	ROMX_LOAD( "3a10082-00rev-e.ud11", 0x0000, 0x1000, CRC(c0596b14) SHA1(ee6a9cc9be3ddc5949d3379351c1d58a175ce9ac), ROM_BIOS(1) )
+	ROMX_LOAD( "3a10082-00rev-e.ud11",   0x0000, 0x1000, CRC(c0596b14) SHA1(ee6a9cc9be3ddc5949d3379351c1d58a175ce9ac), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "verA", "BIOS version A" )
-	ROMX_LOAD( "osba.bin", 0x0000, 0x1000, NO_DUMP, ROM_BIOS(2) )
+	ROMX_LOAD( "osba.bin",               0x0000, 0x1000, NO_DUMP,                                                      ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS( 2, "ver12", "BIOS version 1.2" )
-	ROMX_LOAD( "osb12.bin", 0x0000, 0x1000, NO_DUMP, ROM_BIOS(3) )
+	ROMX_LOAD( "osb12.bin",              0x0000, 0x1000, NO_DUMP,                                                      ROM_BIOS(3) )
 	ROM_SYSTEM_BIOS( 3, "ver121", "BIOS version 1.2.1" )
-	ROMX_LOAD( "osb121.bin", 0x0000, 0x1000, NO_DUMP, ROM_BIOS(4) )
+	ROMX_LOAD( "osb121.bin",             0x0000, 0x1000, NO_DUMP,                                                      ROM_BIOS(4) )
 	ROM_SYSTEM_BIOS( 4, "ver13", "BIOS version 1.3" )
-	ROMX_LOAD( "osb13.bin", 0x0000, 0x1000, NO_DUMP, ROM_BIOS(5) )
-	ROM_SYSTEM_BIOS( 5, "ver14", "BISO version 1.4" )
-	ROMX_LOAD( "rev1.40.ud11", 0x0000, 0x1000, CRC(3d966335) SHA1(0c60b97a3154a75868efc6370d26995eadc7d927), ROM_BIOS(6) )
-	ROM_SYSTEM_BIOS( 6, "ver143", "BIOS version 1.43" )
-	ROMX_LOAD( "rev1.43.ud11", 0x0000, 0x1000, CRC(91a48e3c) SHA1(c37b83f278d21e6e92d80f9c057b11f7f22d88d4), ROM_BIOS(7) )
+	ROMX_LOAD( "osb13.bin",              0x0000, 0x1000, NO_DUMP,                                                      ROM_BIOS(5) )
+	ROM_SYSTEM_BIOS( 5, "ver14", "BIOS version 1.4" )
+	ROMX_LOAD( "rev1.40.ud11",           0x0000, 0x1000, CRC(3d966335) SHA1(0c60b97a3154a75868efc6370d26995eadc7d927), ROM_BIOS(6) )
+	ROM_SYSTEM_BIOS( 6, "ver143",   "BIOS version 1.43" )
+	ROMX_LOAD( "rev1.43.ud11",           0x0000, 0x1000, CRC(91a48e3c) SHA1(c37b83f278d21e6e92d80f9c057b11f7f22d88d4), ROM_BIOS(7) )
+
 	ROM_REGION( 0x800, "chargen", 0 )
 	ROM_LOAD( "7a3007-00.ud15", 0x0000, 0x800, CRC(6c1eab0d) SHA1(b04459d377a70abc9155a5486003cb795342c801) )
 	//ROM_LOAD( "char.ua15", 0x0000, 0x800, CRC(5297C109) SHA1(e1a59d87edd66e6c226102cb0688e9cb74dbb594) ) // this is CHRROM from v1.4 BIOS MB. I don't know how to hook up diff CHR to ROM_BIOS(6)
-
 ROM_END
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        COMPANY     FULLNAME        FLAGS */
-COMP( 1981, osborne1,   0,      0,      osborne1,   osborne1, osborne1_state,   osborne1,   "Osborne",  "Osborne-1",    MACHINE_SUPPORTS_SAVE )
+ROM_START( osborne1nv )
+	ROM_REGION(0x1000, "maincpu", 0)
+	ROM_LOAD( "monrom-rev1.51-12.ud11", 0x0000, 0x1000, CRC(298da402) SHA1(7fedd070936ccfe98f96d6e0ac71689666da79cb) )
+
+	ROM_REGION( 0x0800, "chargen", 0 )
+	ROM_LOAD( "7a3007-00.ud15", 0x0000, 0x800, CRC(6c1eab0d) SHA1(b04459d377a70abc9155a5486003cb795342c801) )
+
+	ROM_REGION( 0x0800, "nuevo", 0 )
+	ROM_LOAD( "character_generator_6-29-84.14", 0x0000, 0x800, CRC(6c1eab0d) SHA1(b04459d377a70abc9155a5486003cb795342c801) )
+ROM_END
+
+//    YEAR  NAME        PARENT    COMPAT  MACHINE     INPUT       CLASS              INIT        COMPANY          FULLNAME                   FLAGS
+COMP( 1981, osborne1,   0,        0,      osborne1,   osborne1,   osborne1_state,    osborne1,   "Osborne",       "Osborne-1",               MACHINE_SUPPORTS_SAVE )
+COMP( 1984, osborne1nv, osborne1, 0,      osborne1nv, osborne1nv, osborne1nv_state,  osborne1,   "Osborne/Nuevo", "Osborne-1 (Nuevo Video)", MACHINE_SUPPORTS_SAVE )

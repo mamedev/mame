@@ -6,12 +6,11 @@
 
 *********************************************************************/
 
+#ifndef MAME_MACHINE_APRICOTKB_H
+#define MAME_MACHINE_APRICOTKB_H
+
 #pragma once
 
-#ifndef __APRICOT_KEYBOARD__
-#define __APRICOT_KEYBOARD__
-
-#include "emu.h"
 
 
 
@@ -46,11 +45,6 @@ public:
 
 	template<class _Object> static devcb_base &set_txd_wr_callback(device_t &device, _Object object) { return downcast<apricot_keyboard_device &>(device).m_write_txd.set_callback(object); }
 
-	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual ioport_constructor device_input_ports() const override;
-
 	uint8_t read_keyboard();
 
 	DECLARE_READ8_MEMBER( kb_lo_r );
@@ -67,6 +61,11 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
+
 private:
 	devcb_write_line   m_write_txd;
 
@@ -78,8 +77,8 @@ private:
 
 
 // device type definition
-extern const device_type APRICOT_KEYBOARD;
+DECLARE_DEVICE_TYPE(APRICOT_KEYBOARD, apricot_keyboard_device)
 
 
 
-#endif
+#endif // MAME_MACHINE_APRICOTKB_H

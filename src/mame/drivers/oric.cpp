@@ -20,18 +20,24 @@
 *********************************************************************/
 
 #include "emu.h"
+
+#include "bus/centronics/ctronics.h"
 #include "bus/oricext/oricext.h"
 #include "cpu/m6502/m6502.h"
-#include "sound/ay8910.h"
-#include "sound/wave.h"
+#include "imagedev/cassette.h"
+#include "imagedev/floppy.h"
 #include "machine/6522via.h"
 #include "machine/mos6551.h"
-#include "bus/centronics/ctronics.h"
-#include "imagedev/floppy.h"
-#include "imagedev/cassette.h"
 #include "machine/wd_fdc.h"
+#include "sound/ay8910.h"
+#include "sound/wave.h"
+
+#include "screen.h"
+#include "speaker.h"
+
 #include "formats/oric_dsk.h"
 #include "formats/oric_tap.h"
+
 
 class oric_state : public driver_device
 {
@@ -78,7 +84,7 @@ public:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	uint32_t screen_update_oric(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void vblank_w(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(vblank_w);
 
 protected:
 	required_device<cpu_device> m_maincpu;
@@ -156,7 +162,7 @@ protected:
 	};
 
 	required_device<via6522_device> m_via2;
-	required_device<fd1793_t> m_fdc;
+	required_device<fd1793_device> m_fdc;
 	required_memory_region m_telmatic;
 	required_memory_region m_teleass;
 	required_memory_region m_hyperbas;
@@ -191,7 +197,7 @@ The telestrat has the memory regions split into 16k blocks.
 Memory region &c000-&ffff can be ram or rom. */
 static ADDRESS_MAP_START(telestrat_mem, AS_PROGRAM, 8, telestrat_state )
 	AM_RANGE( 0x0300, 0x030f) AM_DEVREADWRITE("via6522", via6522_device, read, write)
-	AM_RANGE( 0x0310, 0x0313) AM_DEVREADWRITE("fdc", fd1793_t, read, write)
+	AM_RANGE( 0x0310, 0x0313) AM_DEVREADWRITE("fdc", fd1793_device, read, write)
 	AM_RANGE( 0x0314, 0x0314) AM_READWRITE(port_314_r, port_314_w)
 	AM_RANGE( 0x0318, 0x0318) AM_READ(port_318_r)
 	AM_RANGE( 0x031c, 0x031f) AM_DEVREADWRITE("acia", mos6551_device, read, write)
@@ -356,7 +362,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(oric_state::update_tape)
 		m_via->write_cb1(m_cassette->input() > 0.0038);
 }
 
-void oric_state::vblank_w(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(oric_state::vblank_w)
 {
 	if(m_config->read())
 		m_via->write_cb1(state);
@@ -760,7 +766,7 @@ static INPUT_PORTS_START(telstrat)
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( oric, oric_state )
+static MACHINE_CONFIG_START( oric )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_12MHz/12)
 	MCFG_CPU_PROGRAM_MAP(oric_mem)
@@ -773,7 +779,7 @@ static MACHINE_CONFIG_START( oric, oric_state )
 	MCFG_SCREEN_SIZE(40*6, 28*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40*6-1, 0, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(oric_state, screen_update_oric)
-	MCFG_SCREEN_VBLANK_DRIVER(oric_state, vblank_w)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(oric_state, vblank_w))
 
 	MCFG_PALETTE_ADD_3BIT_RGB("palette")
 
@@ -822,7 +828,7 @@ static SLOT_INTERFACE_START( telestrat_floppies )
 	SLOT_INTERFACE( "3dsdd", FLOPPY_3_DSDD )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_DERIVED_CLASS( telstrat, oric, telestrat_state )
+static MACHINE_CONFIG_DERIVED( telstrat, oric )
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(telestrat_mem)
 
@@ -947,9 +953,9 @@ ROM_START(prav8dd)
 ROM_END
 
 
-/*    YEAR   NAME       PARENT  COMPAT  MACHINE     INPUT       INIT    COMPANY         FULLNAME */
-COMP( 1983, oric1,      0,      0,      oric,       oric, driver_device,       0,    "Tangerine",    "Oric 1" , 0)
-COMP( 1984, orica,      oric1,  0,      oric,       orica, driver_device,      0,    "Tangerine",    "Oric Atmos" , 0)
-COMP( 1985, prav8d,     oric1,  0,      prav8d,     prav8d, driver_device,     0,    "Pravetz",      "Pravetz 8D", 0)
-COMP( 1989, prav8dd,    oric1,  0,      prav8d,     prav8d, driver_device,     0,    "Pravetz",      "Pravetz 8D (Disk ROM)", MACHINE_UNOFFICIAL)
-COMP( 1986, telstrat,   oric1,  0,      telstrat,   telstrat, driver_device,   0,    "Tangerine",    "Oric Telestrat", 0 )
+//    YEAR  NAME       PARENT  COMPAT  MACHINE     INPUT     STATE            INIT  COMPANY      FULLNAME                 FLAGS
+COMP( 1983, oric1,     0,      0,      oric,       oric,     oric_state,      0,    "Tangerine", "Oric 1" ,               0 )
+COMP( 1984, orica,     oric1,  0,      oric,       orica,    oric_state,      0,    "Tangerine", "Oric Atmos" ,           0 )
+COMP( 1985, prav8d,    oric1,  0,      prav8d,     prav8d,   oric_state,      0,    "Pravetz",   "Pravetz 8D",            0 )
+COMP( 1989, prav8dd,   oric1,  0,      prav8d,     prav8d,   oric_state,      0,    "Pravetz",   "Pravetz 8D (Disk ROM)", MACHINE_UNOFFICIAL )
+COMP( 1986, telstrat,  oric1,  0,      telstrat,   telstrat, telestrat_state, 0,    "Tangerine", "Oric Telestrat",        0 )

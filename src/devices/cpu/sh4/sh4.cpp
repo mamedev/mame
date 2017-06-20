@@ -25,12 +25,14 @@
  *****************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "sh4.h"
 #include "sh4regs.h"
 #include "sh4comn.h"
 #include "sh3comn.h"
 #include "sh4tmu.h"
+
+#include "debugger.h"
+
 
 #if SH4_USE_FASTRAM_OPTIMIZATION
 void sh34_base_device::add_fastram(offs_t start, offs_t end, uint8_t readonly, void *base)
@@ -55,10 +57,10 @@ CPU_DISASSEMBLE( sh4 );
 CPU_DISASSEMBLE( sh4be );
 
 
-const device_type SH3LE = &device_creator<sh3_device>;
-const device_type SH3BE = &device_creator<sh3be_device>;
-const device_type SH4LE = &device_creator<sh4_device>;
-const device_type SH4BE = &device_creator<sh4be_device>;
+DEFINE_DEVICE_TYPE(SH3LE, sh3_device,   "sh3le", "SH-3 (little)")
+DEFINE_DEVICE_TYPE(SH3BE, sh3be_device, "sh3be", "SH-3 (big)")
+DEFINE_DEVICE_TYPE(SH4LE, sh4_device,   "sh4le", "SH-4 (little)")
+DEFINE_DEVICE_TYPE(SH4BE, sh4be_device, "sh4be", "SH-4 (big)")
 
 
 #if 0
@@ -89,8 +91,8 @@ static ADDRESS_MAP_START( sh3_internal_map, AS_PROGRAM, 64, sh3_base_device )
 ADDRESS_MAP_END
 
 
-sh34_base_device::sh34_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, endianness_t endianness, address_map_constructor internal)
-	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, __FILE__)
+sh34_base_device::sh34_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness, address_map_constructor internal)
+	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", endianness, 64, 32, 0, internal)
 	, m_io_config("io", endianness, 64, 8)
 	, c_md2(0)
@@ -118,40 +120,40 @@ sh34_base_device::sh34_base_device(const machine_config &mconfig, device_type ty
 }
 
 
-sh3_base_device::sh3_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, endianness_t endianness)
-	: sh34_base_device(mconfig, type, name, tag, owner, clock, shortname, endianness, ADDRESS_MAP_NAME(sh3_internal_map))
+sh3_base_device::sh3_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness)
+	: sh34_base_device(mconfig, type, tag, owner, clock, endianness, ADDRESS_MAP_NAME(sh3_internal_map))
 {
 	m_cpu_type = CPU_TYPE_SH3;
 }
 
 
-sh4_base_device::sh4_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, endianness_t endianness)
-	: sh34_base_device(mconfig, type, name, tag, owner, clock, shortname, endianness, ADDRESS_MAP_NAME(sh4_internal_map))
+sh4_base_device::sh4_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness)
+	: sh34_base_device(mconfig, type, tag, owner, clock, endianness, ADDRESS_MAP_NAME(sh4_internal_map))
 {
 	m_cpu_type = CPU_TYPE_SH4;
 }
 
 
 sh3_device::sh3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sh3_base_device(mconfig, SH3LE, "SH-3 (little)", tag, owner, clock, "sh3", ENDIANNESS_LITTLE)
+	: sh3_base_device(mconfig, SH3LE, tag, owner, clock, ENDIANNESS_LITTLE)
 {
 }
 
 
 sh3be_device::sh3be_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sh3_base_device(mconfig, SH3BE, "SH-3 (big)", tag, owner, clock, "sh3be", ENDIANNESS_BIG)
+	: sh3_base_device(mconfig, SH3BE, tag, owner, clock, ENDIANNESS_BIG)
 {
 }
 
 
 sh4_device::sh4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sh4_base_device(mconfig, SH4LE, "SH-4 (little)", tag, owner, clock, "sh4", ENDIANNESS_LITTLE)
+	: sh4_base_device(mconfig, SH4LE, tag, owner, clock, ENDIANNESS_LITTLE)
 {
 }
 
 
 sh4be_device::sh4be_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sh4_base_device(mconfig, SH4BE, "SH-4 (big)", tag, owner, clock, "sh4be", ENDIANNESS_BIG)
+	: sh4_base_device(mconfig, SH4BE, tag, owner, clock, ENDIANNESS_BIG)
 {
 }
 
@@ -2556,21 +2558,7 @@ inline void sh34_base_device::PREFM(const uint16_t opcode)
  *  OPCODE DISPATCHERS
  *****************************************************************************/
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+// TODO: current SZ=1(64bit) FMOVs correct for SH4 in LE mode only
 
 /*  FMOV.S  @Rm+,FRn PR=0 SZ=0 1111nnnnmmmm1001 */
 /*  FMOV    @Rm+,DRn PR=0 SZ=1 1111nnn0mmmm1001 */
@@ -2580,33 +2568,34 @@ inline void sh34_base_device::FMOVMRIFR(const uint16_t opcode)
 {
 	uint32_t m = Rm; uint32_t n = Rn;
 
-	if (m_fpu_pr) { /* PR = 1 */
-		n = n & 14;
-		m_ea = m_r[m];
-		m_r[m] += 8;
-		m_xf[n+NATIVE_ENDIAN_VALUE_LE_BE(1,0)] = RL(m_ea );
-		m_xf[n+NATIVE_ENDIAN_VALUE_LE_BE(0,1)] = RL(m_ea+4 );
-	} else {              /* PR = 0 */
-		if (m_fpu_sz) { /* SZ = 1 */
-			if (n & 1) {
-				n = n & 14;
-				m_ea = m_r[m];
-				m_xf[n] = RL(m_ea );
-				m_r[m] += 4;
-				m_xf[n+1] = RL(m_ea+4 );
-				m_r[m] += 4;
-			} else {
-				m_ea = m_r[m];
-				m_fr[n] = RL(m_ea );
-				m_r[m] += 4;
-				m_fr[n+1] = RL(m_ea+4 );
-				m_r[m] += 4;
-			}
-		} else {              /* SZ = 0 */
+	if (m_fpu_sz) { /* SZ = 1 */
+		if (n & 1) {
+			n &= 14;
+#ifdef LSB_FIRST
+			n ^= m_fpu_pr;
+#endif
+			m_ea = m_r[m];
+			m_xf[n] = RL(m_ea );
+			m_r[m] += 4;
+			m_xf[n^1] = RL(m_ea+4 );
+			m_r[m] += 4;
+		} else {
+#ifdef LSB_FIRST
+			n ^= m_fpu_pr;
+#endif
 			m_ea = m_r[m];
 			m_fr[n] = RL(m_ea );
 			m_r[m] += 4;
+			m_fr[n^1] = RL(m_ea+4 );
+			m_r[m] += 4;
 		}
+	} else {              /* SZ = 0 */
+		m_ea = m_r[m];
+#ifdef LSB_FIRST
+		n ^= m_fpu_pr;
+#endif
+		m_fr[n] = RL(m_ea );
+		m_r[m] += 4;
 	}
 }
 
@@ -2618,27 +2607,29 @@ inline void sh34_base_device::FMOVFRMR(const uint16_t opcode)
 {
 	uint32_t m = Rm; uint32_t n = Rn;
 
-	if (m_fpu_pr) { /* PR = 1 */
-		m= m & 14;
-		m_ea = m_r[n];
-		WL(m_ea,m_xf[m+NATIVE_ENDIAN_VALUE_LE_BE(1,0)] );
-		WL(m_ea+4,m_xf[m+NATIVE_ENDIAN_VALUE_LE_BE(0,1)] );
-	} else {              /* PR = 0 */
-		if (m_fpu_sz) { /* SZ = 1 */
-			if (m & 1) {
-				m= m & 14;
-				m_ea = m_r[n];
-				WL(m_ea,m_xf[m] );
-				WL(m_ea+4,m_xf[m+1] );
-			} else {
-				m_ea = m_r[n];
-				WL(m_ea,m_fr[m] );
-				WL(m_ea+4,m_fr[m+1] );
-			}
-		} else {              /* SZ = 0 */
+	if (m_fpu_sz) { /* SZ = 1 */
+		if (m & 1) {
+			m &= 14;
+#ifdef LSB_FIRST
+			m ^= m_fpu_pr;
+#endif
+			m_ea = m_r[n];
+			WL(m_ea,m_xf[m] );
+			WL(m_ea+4,m_xf[m^1] );
+		} else {
+#ifdef LSB_FIRST
+			m ^= m_fpu_pr;
+#endif
 			m_ea = m_r[n];
 			WL(m_ea,m_fr[m] );
+			WL(m_ea+4,m_fr[m^1] );
 		}
+	} else {              /* SZ = 0 */
+		m_ea = m_r[n];
+#ifdef LSB_FIRST
+		m ^= m_fpu_pr;
+#endif
+		WL(m_ea,m_fr[m] );
 	}
 }
 
@@ -2650,31 +2641,32 @@ inline void sh34_base_device::FMOVFRMDR(const uint16_t opcode)
 {
 	uint32_t m = Rm; uint32_t n = Rn;
 
-	if (m_fpu_pr) { /* PR = 1 */
-		m= m & 14;
-		m_r[n] -= 8;
-		m_ea = m_r[n];
-		WL(m_ea,m_xf[m+NATIVE_ENDIAN_VALUE_LE_BE(1,0)] );
-		WL(m_ea+4,m_xf[m+NATIVE_ENDIAN_VALUE_LE_BE(0,1)] );
-	} else {              /* PR = 0 */
-		if (m_fpu_sz) { /* SZ = 1 */
-			if (m & 1) {
-				m= m & 14;
-				m_r[n] -= 8;
-				m_ea = m_r[n];
-				WL(m_ea,m_xf[m] );
-				WL(m_ea+4,m_xf[m+1] );
-			} else {
-				m_r[n] -= 8;
-				m_ea = m_r[n];
-				WL(m_ea,m_fr[m] );
-				WL(m_ea+4,m_fr[m+1] );
-			}
-		} else {              /* SZ = 0 */
-			m_r[n] -= 4;
+	if (m_fpu_sz) { /* SZ = 1 */
+		if (m & 1) {
+			m &= 14;
+#ifdef LSB_FIRST
+			m ^= m_fpu_pr;
+#endif
+			m_r[n] -= 8;
+			m_ea = m_r[n];
+			WL(m_ea,m_xf[m] );
+			WL(m_ea+4,m_xf[m^1] );
+		} else {
+#ifdef LSB_FIRST
+			m ^= m_fpu_pr;
+#endif
+			m_r[n] -= 8;
 			m_ea = m_r[n];
 			WL(m_ea,m_fr[m] );
+			WL(m_ea+4,m_fr[m^1] );
 		}
+	} else {              /* SZ = 0 */
+		m_r[n] -= 4;
+		m_ea = m_r[n];
+#ifdef LSB_FIRST
+		m ^= m_fpu_pr;
+#endif
+		WL(m_ea,m_fr[m] );
 	}
 }
 
@@ -2686,27 +2678,29 @@ inline void sh34_base_device::FMOVFRS0(const uint16_t opcode)
 {
 	uint32_t m = Rm; uint32_t n = Rn;
 
-	if (m_fpu_pr) { /* PR = 1 */
-		m= m & 14;
-		m_ea = m_r[0] + m_r[n];
-		WL(m_ea,m_xf[m+NATIVE_ENDIAN_VALUE_LE_BE(1,0)] );
-		WL(m_ea+4,m_xf[m+NATIVE_ENDIAN_VALUE_LE_BE(0,1)] );
-	} else {              /* PR = 0 */
-		if (m_fpu_sz) { /* SZ = 1 */
-			if (m & 1) {
-				m= m & 14;
-				m_ea = m_r[0] + m_r[n];
-				WL(m_ea,m_xf[m] );
-				WL(m_ea+4,m_xf[m+1] );
-			} else {
-				m_ea = m_r[0] + m_r[n];
-				WL(m_ea,m_fr[m] );
-				WL(m_ea+4,m_fr[m+1] );
-			}
-		} else {              /* SZ = 0 */
+	if (m_fpu_sz) { /* SZ = 1 */
+		if (m & 1) {
+			m &= 14;
+#ifdef LSB_FIRST
+			m ^= m_fpu_pr;
+#endif
+			m_ea = m_r[0] + m_r[n];
+			WL(m_ea,m_xf[m] );
+			WL(m_ea+4,m_xf[m^1] );
+		} else {
+#ifdef LSB_FIRST
+			m ^= m_fpu_pr;
+#endif
 			m_ea = m_r[0] + m_r[n];
 			WL(m_ea,m_fr[m] );
+			WL(m_ea+4,m_fr[m^1] );
 		}
+	} else {              /* SZ = 0 */
+		m_ea = m_r[0] + m_r[n];
+#ifdef LSB_FIRST
+		m ^= m_fpu_pr;
+#endif
+		WL(m_ea,m_fr[m] );
 	}
 }
 
@@ -2718,27 +2712,29 @@ inline void sh34_base_device::FMOVS0FR(const uint16_t opcode)
 {
 	uint32_t m = Rm; uint32_t n = Rn;
 
-	if (m_fpu_pr) { /* PR = 1 */
-		n= n & 14;
-		m_ea = m_r[0] + m_r[m];
-		m_xf[n+NATIVE_ENDIAN_VALUE_LE_BE(1,0)] = RL(m_ea );
-		m_xf[n+NATIVE_ENDIAN_VALUE_LE_BE(0,1)] = RL(m_ea+4 );
-	} else {              /* PR = 0 */
-		if (m_fpu_sz) { /* SZ = 1 */
-			if (n & 1) {
-				n= n & 14;
-				m_ea = m_r[0] + m_r[m];
-				m_xf[n] = RL(m_ea );
-				m_xf[n+1] = RL(m_ea+4 );
-			} else {
-				m_ea = m_r[0] + m_r[m];
-				m_fr[n] = RL(m_ea );
-				m_fr[n+1] = RL(m_ea+4 );
-			}
-		} else {              /* SZ = 0 */
+	if (m_fpu_sz) { /* SZ = 1 */
+		if (n & 1) {
+			n &= 14;
+#ifdef LSB_FIRST
+			n ^= m_fpu_pr;
+#endif
+			m_ea = m_r[0] + m_r[m];
+			m_xf[n] = RL(m_ea );
+			m_xf[n^1] = RL(m_ea+4 );
+		} else {
+#ifdef LSB_FIRST
+			n ^= m_fpu_pr;
+#endif
 			m_ea = m_r[0] + m_r[m];
 			m_fr[n] = RL(m_ea );
+			m_fr[n^1] = RL(m_ea+4 );
 		}
+	} else {              /* SZ = 0 */
+		m_ea = m_r[0] + m_r[m];
+#ifdef LSB_FIRST
+		n ^= m_fpu_pr;
+#endif
+		m_fr[n] = RL(m_ea );
 	}
 }
 
@@ -2751,35 +2747,29 @@ inline void sh34_base_device::FMOVMRFR(const uint16_t opcode)
 {
 	uint32_t m = Rm; uint32_t n = Rn;
 
-	if (m_fpu_pr) { /* PR = 1 */
+	if (m_fpu_sz) { /* SZ = 1 */
 		if (n & 1) {
-			n= n & 14;
+			n &= 14;
+#ifdef LSB_FIRST
+			n ^= m_fpu_pr;
+#endif
 			m_ea = m_r[m];
-			m_xf[n+NATIVE_ENDIAN_VALUE_LE_BE(1,0)] = RL(m_ea );
-			m_xf[n+NATIVE_ENDIAN_VALUE_LE_BE(0,1)] = RL(m_ea+4 );
+			m_xf[n] = RL(m_ea );
+			m_xf[n^1] = RL(m_ea+4 );
 		} else {
-			n= n & 14;
-			m_ea = m_r[m];
-			m_fr[n+NATIVE_ENDIAN_VALUE_LE_BE(1,0)] = RL(m_ea );
-			m_fr[n+NATIVE_ENDIAN_VALUE_LE_BE(0,1)] = RL(m_ea+4 );
-		}
-	} else {              /* PR = 0 */
-		if (m_fpu_sz) { /* SZ = 1 */
-			if (n & 1) {
-				n= n & 14;
-				m_ea = m_r[m];
-				m_xf[n] = RL(m_ea );
-				m_xf[n+1] = RL(m_ea+4 );
-			} else {
-				n= n & 14;
-				m_ea = m_r[m];
-				m_fr[n] = RL(m_ea );
-				m_fr[n+1] = RL(m_ea+4 );
-			}
-		} else {              /* SZ = 0 */
+#ifdef LSB_FIRST
+			n ^= m_fpu_pr;
+#endif
 			m_ea = m_r[m];
 			m_fr[n] = RL(m_ea );
+			m_fr[n^1] = RL(m_ea+4 );
 		}
+	} else {              /* SZ = 0 */
+		m_ea = m_r[m];
+#ifdef LSB_FIRST
+		n ^= m_fpu_pr;
+#endif
+		m_fr[n] = RL(m_ea );
 	}
 }
 
@@ -2792,9 +2782,14 @@ inline void sh34_base_device::FMOVFR(const uint16_t opcode)
 {
 	uint32_t m = Rm; uint32_t n = Rn;
 
-	if ((m_fpu_sz == 0) && (m_fpu_pr == 0)) /* SZ = 0 */
+	if (m_fpu_sz == 0)  {  /* SZ = 0 */
+#ifdef LSB_FIRST
+		n ^= m_fpu_pr;
+		m ^= m_fpu_pr;
+#endif
 		m_fr[n] = m_fr[m];
-	else { /* SZ = 1 or PR = 1 */
+	}
+	else { /* SZ = 1 */
 		if (m & 1) {
 			if (n & 1) {
 				m_xf[n & 14] = m_xf[m & 14];
@@ -2818,25 +2813,41 @@ inline void sh34_base_device::FMOVFR(const uint16_t opcode)
 /*  FLDI1  FRn 1111nnnn10011101 */
 inline void sh34_base_device::FLDI1(const uint16_t opcode)
 {
+#ifdef LSB_FIRST
+	m_fr[Rn ^ m_fpu_pr] = 0x3F800000;
+#else
 	m_fr[Rn] = 0x3F800000;
+#endif
 }
 
 /*  FLDI0  FRn 1111nnnn10001101 */
 inline void sh34_base_device::FLDI0(const uint16_t opcode)
 {
+#ifdef LSB_FIRST
+	m_fr[Rn ^ m_fpu_pr] = 0;
+#else
 	m_fr[Rn] = 0;
+#endif
 }
 
 /*  FLDS FRm,FPUL 1111mmmm00011101 */
 inline void sh34_base_device:: FLDS(const uint16_t opcode)
 {
+#ifdef LSB_FIRST
+	m_fpul = m_fr[Rn ^ m_fpu_pr];
+#else
 	m_fpul = m_fr[Rn];
+#endif
 }
 
 /*  FSTS FPUL,FRn 1111nnnn00001101 */
 inline void sh34_base_device:: FSTS(const uint16_t opcode)
 {
+#ifdef LSB_FIRST
+	m_fr[Rn ^ m_fpu_pr] = m_fpul;
+#else
 	m_fr[Rn] = m_fpul;
+#endif
 }
 
 /* FRCHG 1111101111111101 */

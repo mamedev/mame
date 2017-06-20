@@ -22,15 +22,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type Z88_1024K_FLASH =  &device_creator<z88_1024k_flash_device>;
-
-//-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( z88_flash )
-//-------------------------------------------------
-
-static MACHINE_CONFIG_FRAGMENT(z88_flash)
-	MCFG_INTEL_E28F008SA_ADD(FLASH_TAG)
-MACHINE_CONFIG_END
+DEFINE_DEVICE_TYPE(Z88_1024K_FLASH, z88_1024k_flash_device, "z88_1024k_flash", "Z88 1024KB Flash")
 
 
 //**************************************************************************
@@ -42,9 +34,9 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 z88_1024k_flash_device::z88_1024k_flash_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: device_t(mconfig, Z88_1024K_FLASH, "Z88 1024KB Flash", tag, owner, clock, "z88_1024k_flash", __FILE__),
-		device_z88cart_interface( mconfig, *this ),
-		m_flash(*this, FLASH_TAG)
+	: device_t(mconfig, Z88_1024K_FLASH, tag, owner, clock)
+	, device_z88cart_interface(mconfig, *this)
+	, m_flash(*this, FLASH_TAG)
 {
 }
 
@@ -58,13 +50,12 @@ void z88_1024k_flash_device::device_start()
 
 
 //-------------------------------------------------
-//  device_mconfig_additions
+//  device_add_mconfig
 //-------------------------------------------------
 
-machine_config_constructor z88_1024k_flash_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( z88_flash );
-}
+MACHINE_CONFIG_MEMBER(z88_1024k_flash_device::device_add_mconfig)
+	MCFG_INTEL_E28F008SA_ADD(FLASH_TAG)
+MACHINE_CONFIG_END
 
 /*-------------------------------------------------
     get_cart_base

@@ -69,11 +69,12 @@
 
 
 #include "emu.h"
+#include "includes/arcadecl.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/watchdog.h"
 #include "sound/okim6295.h"
 #include "video/atarimo.h"
-#include "includes/arcadecl.h"
+#include "speaker.h"
 
 
 #define MASTER_CLOCK        XTAL_14_31818MHz
@@ -316,7 +317,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( arcadecl, arcadecl_state )
+static MACHINE_CONFIG_START( arcadecl )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK)
@@ -350,7 +351,7 @@ static MACHINE_CONFIG_START( arcadecl, arcadecl_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", MASTER_CLOCK/4/3, OKIM6295_PIN7_LOW)
+	MCFG_OKIM6295_ADD("oki", MASTER_CLOCK/4/3, PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -399,5 +400,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1992, arcadecl, 0, arcadecl, arcadecl, driver_device, 0, ROT0, "Atari Games", "Arcade Classics (prototype)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, sparkz,   0, sparkz,   sparkz,   driver_device, 0, ROT0, "Atari Games", "Sparkz (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, arcadecl, 0, arcadecl, arcadecl, arcadecl_state, 0, ROT0, "Atari Games", "Arcade Classics (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, sparkz,   0, sparkz,   sparkz,   arcadecl_state, 0, ROT0, "Atari Games", "Sparkz (prototype)",          MACHINE_SUPPORTS_SAVE )

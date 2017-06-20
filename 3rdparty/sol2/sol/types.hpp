@@ -106,10 +106,14 @@ namespace sol {
 		};
 	} // detail
 
-	struct nil_t {};
+	struct lua_nil_t {};
+	const lua_nil_t lua_nil{};
+	inline bool operator==(lua_nil_t, lua_nil_t) { return true; }
+	inline bool operator!=(lua_nil_t, lua_nil_t) { return false; }
+#ifndef __OBJC__
+	typedef lua_nil_t nil_t;
 	const nil_t nil{};
-	inline bool operator==(nil_t, nil_t) { return true; }
-	inline bool operator!=(nil_t, nil_t) { return false; }
+#endif
 
 	struct metatable_key_t {};
 	const metatable_key_t metatable_key = {};
@@ -190,6 +194,12 @@ namespace sol {
 		operator int() const { return index; }
 	};
 
+	struct ref_index {
+		int index;
+		ref_index(int idx) : index(idx) {}
+		operator int() const { return index; }
+	};
+
 	struct lightuserdata_value {
 		void* value;
 		lightuserdata_value(void* data) : value(data) {}
@@ -252,14 +262,14 @@ namespace sol {
 	struct closure {
 		lua_CFunction c_function;
 		std::tuple<Upvalues...> upvalues;
-		closure(lua_CFunction f, Upvalues... upvalues) : c_function(f), upvalues(std::forward<Upvalues>(upvalues)...) {}
+		closure(lua_CFunction f, Upvalues... targetupvalues) : c_function(f), upvalues(std::forward<Upvalues>(targetupvalues)...) {}
 	};
 
 	template <>
 	struct closure<> {
 		lua_CFunction c_function;
 		int upvalues;
-		closure(lua_CFunction f, int upvalues = 0) : c_function(f), upvalues(upvalues) {}
+		closure(lua_CFunction f, int upvalue_count = 0) : c_function(f), upvalues(upvalue_count) {}
 	};
 
 	typedef closure<> c_closure;
@@ -333,7 +343,7 @@ namespace sol {
 		memory = LUA_ERRMEM,
 		gc = LUA_ERRGCMM,
 		handler = LUA_ERRERR,
-		dead,
+		dead = -1,
 	};
 
 	enum class load_status : int {
@@ -346,7 +356,10 @@ namespace sol {
 
 	enum class type : int {
 		none = LUA_TNONE,
-		nil = LUA_TNIL,
+		lua_nil = LUA_TNIL,
+#ifndef __OBJC__
+		nil = lua_nil,
+#endif // Objective C++ Keyword
 		string = LUA_TSTRING,
 		number = LUA_TNUMBER,
 		thread = LUA_TTHREAD,
@@ -355,7 +368,7 @@ namespace sol {
 		userdata = LUA_TUSERDATA,
 		lightuserdata = LUA_TLIGHTUSERDATA,
 		table = LUA_TTABLE,
-		poly = none | nil | string | number | thread |
+		poly = none | lua_nil | string | number | thread |
 		table | boolean | function | userdata | lightuserdata
 	};
 
@@ -389,6 +402,8 @@ namespace sol {
 		bitwise_and,
 		bitwise_or,
 		bitwise_xor,
+		pairs,
+		next
 	};
 
 	typedef meta_function meta_method;
@@ -398,7 +413,7 @@ namespace sol {
 		"__newindex",
 	} };
 
-	const std::array<std::string, 21> meta_function_names = { {
+	const std::array<std::string, 29> meta_function_names = { {
 		"new",
 		"__index",
 		"__newindex",
@@ -419,6 +434,17 @@ namespace sol {
 		"__lt",
 		"__le",
 		"__gc",
+		
+		"__idiv",
+		"__shl",
+		"__shr",
+		"__bnot",
+		"__band",
+		"__bor",
+		"__bxor",
+
+		"__pairs",
+		"__next"
 	} };
 
 	inline const std::string& name_of(meta_function mf) {
@@ -562,13 +588,13 @@ namespace sol {
 		struct lua_type_of<bool> : std::integral_constant<type, type::boolean> {};
 
 		template <>
-		struct lua_type_of<nil_t> : std::integral_constant<type, type::nil> { };
+		struct lua_type_of<lua_nil_t> : std::integral_constant<type, type::lua_nil> { };
 
 		template <>
-		struct lua_type_of<nullopt_t> : std::integral_constant<type, type::nil> { };
+		struct lua_type_of<nullopt_t> : std::integral_constant<type, type::lua_nil> { };
 
 		template <>
-		struct lua_type_of<std::nullptr_t> : std::integral_constant<type, type::nil> { };
+		struct lua_type_of<std::nullptr_t> : std::integral_constant<type, type::lua_nil> { };
 
 		template <>
 		struct lua_type_of<sol::error> : std::integral_constant<type, type::string> { };
@@ -731,11 +757,15 @@ namespace sol {
 	template <>
 	struct is_transparent_argument<variadic_args> : std::true_type {};
 
+	template <typename T>
+	struct is_variadic_arguments : std::is_same<T, variadic_args> {};
+
 	template <typename Signature>
 	struct lua_bind_traits : meta::bind_traits<Signature> {
 	private:
 		typedef meta::bind_traits<Signature> base_t;
 	public:
+		typedef std::integral_constant<bool, meta::count_for<is_transparent_argument, typename base_t::args_list>::value != 0> runtime_variadics_t;
 		static const std::size_t true_arity = base_t::arity;
 		static const std::size_t arity = base_t::arity - meta::count_for<is_transparent_argument, typename base_t::args_list>::value;
 		static const std::size_t true_free_arity = base_t::free_arity;

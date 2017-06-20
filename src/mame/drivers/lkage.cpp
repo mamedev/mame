@@ -86,10 +86,14 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/m6805/m6805.h"
-#include "sound/2203intf.h"
+
 #include "includes/lkage.h"
+#include "cpu/m6805/m6805.h"
+#include "cpu/z80/z80.h"
+#include "sound/2203intf.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 #define MAIN_CPU_CLOCK      (XTAL_12MHz/2)
 #define SOUND_CPU_CLOCK     (XTAL_8MHz/2)
@@ -139,7 +143,6 @@ static ADDRESS_MAP_START( lkage_map, AS_PROGRAM, 8, lkage_state )
 	AM_RANGE(0xf000, 0xf003) AM_RAM AM_SHARE("vreg") /* video registers */
 	AM_RANGE(0xf060, 0xf060) AM_WRITE(lkage_sound_command_w)
 	AM_RANGE(0xf061, 0xf061) AM_WRITENOP AM_READ(sound_status_r)
-	AM_RANGE(0xf062, 0xf062) AM_READWRITE(lkage_mcu_r,lkage_mcu_w)
 	AM_RANGE(0xf063, 0xf063) AM_WRITENOP /* pulsed; nmi on sound cpu? */
 	AM_RANGE(0xf080, 0xf080) AM_READ_PORT("DSW1")
 	AM_RANGE(0xf081, 0xf081) AM_READ_PORT("DSW2")
@@ -147,13 +150,24 @@ static ADDRESS_MAP_START( lkage_map, AS_PROGRAM, 8, lkage_state )
 	AM_RANGE(0xf083, 0xf083) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xf084, 0xf084) AM_READ_PORT("P1")
 	AM_RANGE(0xf086, 0xf086) AM_READ_PORT("P2")
-	AM_RANGE(0xf087, 0xf087) AM_READ(lkage_mcu_status_r)
 	AM_RANGE(0xf0a0, 0xf0a3) AM_RAM /* unknown */
 	AM_RANGE(0xf0c0, 0xf0c5) AM_RAM AM_SHARE("scroll")
 	AM_RANGE(0xf0e1, 0xf0e1) AM_WRITENOP /* pulsed */
 	AM_RANGE(0xf100, 0xf15f) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xf160, 0xf1ff) AM_RAM /* unknown - no valid sprite data */
 	AM_RANGE(0xf400, 0xffff) AM_RAM_WRITE(lkage_videoram_w) AM_SHARE("videoram")
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( lkage_map_mcu, AS_PROGRAM, 8, lkage_state )
+	AM_IMPORT_FROM(lkage_map)
+	AM_RANGE(0xf062, 0xf062) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, data_r, data_w)
+	AM_RANGE(0xf087, 0xf087) AM_READ(mcu_status_r)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( lkage_map_boot, AS_PROGRAM, 8, lkage_state )
+	AM_IMPORT_FROM(lkage_map)
+	AM_RANGE(0xf062, 0xf062) AM_READWRITE(fake_mcu_r, fake_mcu_w)
+	AM_RANGE(0xf087, 0xf087) AM_READ(fake_status_r)
 ADDRESS_MAP_END
 
 
@@ -166,17 +180,6 @@ static ADDRESS_MAP_START( lkage_io_map, AS_IO, 8, lkage_state )
 	AM_RANGE(0x4000, 0x7fff) AM_READ(port_fetch_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( lkage_m68705_map, AS_PROGRAM, 8, lkage_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE(lkage_68705_port_a_r,lkage_68705_port_a_w)
-	AM_RANGE(0x0001, 0x0001) AM_READWRITE(lkage_68705_port_b_r,lkage_68705_port_b_w)
-	AM_RANGE(0x0002, 0x0002) AM_READWRITE(lkage_68705_port_c_r,lkage_68705_port_c_w)
-	AM_RANGE(0x0004, 0x0004) AM_WRITE(lkage_68705_ddr_a_w)
-	AM_RANGE(0x0005, 0x0005) AM_WRITE(lkage_68705_ddr_b_w)
-	AM_RANGE(0x0006, 0x0006) AM_WRITE(lkage_68705_ddr_c_w)
-	AM_RANGE(0x0010, 0x007f) AM_RAM
-	AM_RANGE(0x0080, 0x07ff) AM_ROM
-ADDRESS_MAP_END
 
 /***************************************************************************/
 
@@ -489,20 +492,6 @@ void lkage_state::machine_start()
 	save_item(NAME(m_mcu_val));
 	save_item(NAME(m_sound_nmi_enable));
 	save_item(NAME(m_pending_nmi));
-
-	save_item(NAME(m_port_a_in));
-	save_item(NAME(m_port_a_out));
-	save_item(NAME(m_ddr_a));
-	save_item(NAME(m_port_b_in));
-	save_item(NAME(m_port_b_out));
-	save_item(NAME(m_ddr_b));
-	save_item(NAME(m_port_c_in));
-	save_item(NAME(m_port_c_out));
-	save_item(NAME(m_ddr_c));
-	save_item(NAME(m_mcu_sent));
-	save_item(NAME(m_main_sent));
-	save_item(NAME(m_from_main));
-	save_item(NAME(m_from_mcu));
 }
 
 void lkage_state::machine_reset()
@@ -514,26 +503,13 @@ void lkage_state::machine_reset()
 	m_sound_nmi_enable = 0;
 	m_pending_nmi = 0;
 
-	m_port_a_in = 0;
-	m_port_a_out = 0;
-	m_ddr_a = 0;
-	m_port_b_in = 0;
-	m_port_b_out = 0;
-	m_ddr_b = 0;
-	m_port_c_in = 0;
-	m_port_c_out = 0;
-	m_ddr_c = 0;
-	m_mcu_sent = 0;
-	m_main_sent = 0;
-	m_from_main = 0;
-	m_from_mcu = 0;
 }
 
-static MACHINE_CONFIG_START( lkage, lkage_state )
+static MACHINE_CONFIG_START( lkage )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(lkage_map)
+	MCFG_CPU_PROGRAM_MAP(lkage_map_mcu)
 	MCFG_CPU_IO_MAP(lkage_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", lkage_state,  irq0_line_hold)
 
@@ -541,8 +517,7 @@ static MACHINE_CONFIG_START( lkage, lkage_state )
 	MCFG_CPU_PROGRAM_MAP(lkage_sound_map)
 								/* IRQs are triggered by the YM2203 */
 
-	MCFG_CPU_ADD("mcu", M68705,MCU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(lkage_m68705_map)
+	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU,MCU_CLOCK)
 
 
 	/* video hardware */
@@ -579,11 +554,11 @@ static MACHINE_CONFIG_START( lkage, lkage_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( lkageb, lkage_state )
+static MACHINE_CONFIG_START( lkageb )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,MAIN_CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(lkage_map)
+	MCFG_CPU_PROGRAM_MAP(lkage_map_boot)
 	MCFG_CPU_IO_MAP(lkage_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", lkage_state,  irq0_line_hold)
 
@@ -633,7 +608,7 @@ ROM_START( lkage )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 code (sound CPU) */
 	ROM_LOAD( "a54-04.54",   0x0000, 0x8000, CRC(541faf9a) SHA1(b142ff3bd198f700697ec06ea92db3109ab5818e) )
 
-	ROM_REGION( 0x10000, "mcu", 0 ) /* 68705 MCU code */
+	ROM_REGION( 0x00800, "bmcu:mcu", 0 ) /* 68705 MCU code */
 	ROM_LOAD( "a54-09.53",   0x0000, 0x0800, CRC(0e8b8846) SHA1(a4a105462b0127229bb7edfadd2e581c7e40f1cc) )
 
 	ROM_REGION( 0x4000, "user1", 0 ) /* data */
@@ -663,7 +638,7 @@ ROM_START( lkageo )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 code (sound CPU) */
 	ROM_LOAD( "a54-04.54",   0x0000, 0x8000, CRC(541faf9a) SHA1(b142ff3bd198f700697ec06ea92db3109ab5818e) )
 
-	ROM_REGION( 0x10000, "mcu", 0 ) /* 68705 MCU code */
+	ROM_REGION( 0x00800, "bmcu:mcu", 0 ) /* 68705 MCU code */
 	ROM_LOAD( "a54-09.53",   0x0000, 0x0800, CRC(0e8b8846) SHA1(a4a105462b0127229bb7edfadd2e581c7e40f1cc) )
 
 	ROM_REGION( 0x4000, "user1", 0 ) /* data */
@@ -693,7 +668,7 @@ ROM_START( lkageoo )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 code (sound CPU) */
 	ROM_LOAD( "a54-04.54",   0x0000, 0x8000, CRC(541faf9a) SHA1(b142ff3bd198f700697ec06ea92db3109ab5818e) )
 
-	ROM_REGION( 0x10000, "mcu", 0 ) /* 68705 MCU code */
+	ROM_REGION( 0x00800, "bmcu:mcu", 0 ) /* 68705 MCU code */
 	ROM_LOAD( "a54-09.53",   0x0000, 0x0800, CRC(0e8b8846) SHA1(a4a105462b0127229bb7edfadd2e581c7e40f1cc) )
 
 	ROM_REGION( 0x4000, "user1", 0 ) /* data */
@@ -876,7 +851,7 @@ ROM_START( bygone )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 code (sound CPU) */
 	ROM_LOAD( "a53_07.ic54",   0x0000, 0x8000, CRC(72f69a77) SHA1(dfc1050a4123b3c83ae733ece1b6fe2836beb901) )
 
-	ROM_REGION( 0x10000, "mcu", 0 ) /* 68705 MCU code */
+	ROM_REGION( 0x00800, "bmcu:mcu", 0 ) /* 68705 MCU code */
 	ROM_LOAD( "a51_09.ic53",   0x0000, 0x0800, CRC(0e8b8846) SHA1(a4a105462b0127229bb7edfadd2e581c7e40f1cc) ) /* the same as lkage */
 
 	ROM_REGION( 0x4000, "user1", 0 ) /* data */
@@ -893,7 +868,16 @@ ROM_START( bygone )
 ROM_END
 
 
-/*Note: This probably uses another MCU dump,which is undumped.*/
+READ8_MEMBER(lkage_state::mcu_status_r)
+{
+	// bit 0 = when 1, MCU is ready to receive data from main CPU
+	// bit 1 = when 1, MCU has sent data to the main CPU
+	return
+		((CLEAR_LINE == m_bmcu->host_semaphore_r()) ? 0x01 : 0x00) |
+		((CLEAR_LINE != m_bmcu->mcu_semaphore_r()) ? 0x02 : 0x00);
+}
+
+// Note: This probably uses another MCU program, which is undumped.
 
 READ8_MEMBER(lkage_state::fake_mcu_r)
 {
@@ -945,23 +929,16 @@ DRIVER_INIT_MEMBER(lkage_state,lkage)
 	m_sprite_dx=0;
 }
 
-DRIVER_INIT_MEMBER(lkage_state,lkageb)
-{
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xf062, 0xf062, read8_delegate(FUNC(lkage_state::fake_mcu_r),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xf087, 0xf087, read8_delegate(FUNC(lkage_state::fake_status_r),this));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xf062, 0xf062, write8_delegate(FUNC(lkage_state::fake_mcu_w),this));
-	m_sprite_dx=0;
-}
 
 DRIVER_INIT_MEMBER(lkage_state,bygone)
 {
 	m_sprite_dx=1;
 }
 
-GAME( 1984, lkage,    0,        lkage,    lkage, lkage_state,    lkage,    ROT0, "Taito Corporation", "The Legend of Kage", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, lkageo,   lkage,    lkage,    lkage, lkage_state,    lkage,    ROT0, "Taito Corporation", "The Legend of Kage (older)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, lkageoo,  lkage,    lkage,    lkage, lkage_state,    lkage,    ROT0, "Taito Corporation", "The Legend of Kage (oldest)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, lkageb,   lkage,    lkageb,   lkageb, lkage_state,   lkageb,   ROT0, "bootleg", "The Legend of Kage (bootleg set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, lkageb2,  lkage,    lkageb,   lkageb, lkage_state,   lkageb,   ROT0, "bootleg", "The Legend of Kage (bootleg set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, lkageb3,  lkage,    lkageb,   lkageb, lkage_state,   lkageb,   ROT0, "bootleg", "The Legend of Kage (bootleg set 3)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, bygone,   0,        lkage,    bygone, lkage_state,   bygone,   ROT0, "Taito Corporation", "Bygone (prototype)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, lkage,    0,        lkage,    lkage,  lkage_state,   lkage,    ROT0, "Taito Corporation", "The Legend of Kage",                 MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, lkageo,   lkage,    lkage,    lkage,  lkage_state,   lkage,    ROT0, "Taito Corporation", "The Legend of Kage (older)",         MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, lkageoo,  lkage,    lkage,    lkage,  lkage_state,   lkage,    ROT0, "Taito Corporation", "The Legend of Kage (oldest)",        MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, lkageb,   lkage,    lkageb,   lkageb, lkage_state,   lkage,    ROT0, "bootleg",           "The Legend of Kage (bootleg set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, lkageb2,  lkage,    lkageb,   lkageb, lkage_state,   lkage,    ROT0, "bootleg",           "The Legend of Kage (bootleg set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, lkageb3,  lkage,    lkageb,   lkageb, lkage_state,   lkage,    ROT0, "bootleg",           "The Legend of Kage (bootleg set 3)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, bygone,   0,        lkage,    bygone, lkage_state,   bygone,   ROT0, "Taito Corporation", "Bygone (prototype)",                 MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

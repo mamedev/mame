@@ -254,15 +254,17 @@
 
 ***************************************************************************************************/
 
-#define MASTER_CLOCK    XTAL_10MHz
-#define CPU_CLOCK       (MASTER_CLOCK/16)
-
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 //#include "cpu/m6805/m6805.h"
-#include "video/mc6845.h"
 #include "machine/6821pia.h"
 #include "sound/discrete.h"
+#include "video/mc6845.h"
+#include "screen.h"
+
+
+#define MASTER_CLOCK    XTAL_10MHz
+#define CPU_CLOCK       (MASTER_CLOCK/16)
 
 
 class blitz_state : public driver_device
@@ -273,7 +275,8 @@ public:
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode")
+	{ }
 
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
@@ -699,7 +702,7 @@ GFXDECODE_END
 *              Machine Drivers               *
 *********************************************/
 
-static MACHINE_CONFIG_START( megadpkr, blitz_state )
+static MACHINE_CONFIG_START( megadpkr )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, CPU_CLOCK)
@@ -830,6 +833,6 @@ ROM_END
 *                Game Drivers                *
 *********************************************/
 
-/*    YEAR  NAME       PARENT    MACHINE   INPUT     STATE          INIT  ROT     COMPANY              FULLNAME                                    FLAGS */
-GAME( 1990, megadpkr,  0,        megadpkr, megadpkr, driver_device, 0,    ROT0,  "Blitz System Inc.", "Mega Double Poker (conversion kit, set 1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1990, megadpkrb, megadpkr, megadpkr, megadpkr, driver_device, 0,    ROT0,  "Blitz System Inc.", "Mega Double Poker (conversion kit, set 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+/*    YEAR  NAME       PARENT    MACHINE   INPUT     STATE        INIT  ROT    COMPANY              FULLNAME                                     FLAGS */
+GAME( 1990, megadpkr,  0,        megadpkr, megadpkr, blitz_state, 0,    ROT0,  "Blitz System Inc.", "Mega Double Poker (conversion kit, set 1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1990, megadpkrb, megadpkr, megadpkr, megadpkr, blitz_state, 0,    ROT0,  "Blitz System Inc.", "Mega Double Poker (conversion kit, set 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

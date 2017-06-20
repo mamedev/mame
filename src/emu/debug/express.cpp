@@ -114,7 +114,7 @@ public:
 	// construction/destruction
 	integer_symbol_entry(symbol_table &table, const char *name, symbol_table::read_write rw, u64 *ptr = nullptr);
 	integer_symbol_entry(symbol_table &table, const char *name, u64 constval);
-	integer_symbol_entry(symbol_table &table, const char *name, void *ref, symbol_table::getter_func getter, symbol_table::setter_func setter);
+	integer_symbol_entry(symbol_table &table, const char *name, void *ref, symbol_table::getter_func getter, symbol_table::setter_func setter, const std::string &format);
 
 	// symbol access
 	virtual bool is_lval() const override;
@@ -203,11 +203,12 @@ const char *expression_error::code_string() const
 //  symbol_entry - constructor
 //-------------------------------------------------
 
-symbol_entry::symbol_entry(symbol_table &table, symbol_type type, const char *name, void *ref)
+symbol_entry::symbol_entry(symbol_table &table, symbol_type type, const char *name, const std::string &format, void *ref)
 	: m_next(nullptr),
 		m_table(table),
 		m_type(type),
 		m_name(name),
+		m_format(format),
 		m_ref(ref)
 {
 }
@@ -232,7 +233,7 @@ symbol_entry::~symbol_entry()
 //-------------------------------------------------
 
 integer_symbol_entry::integer_symbol_entry(symbol_table &table, const char *name, symbol_table::read_write rw, u64 *ptr)
-	: symbol_entry(table, SMT_INTEGER, name, (ptr == nullptr) ? &m_value : ptr),
+	: symbol_entry(table, SMT_INTEGER, name, "", (ptr == nullptr) ? &m_value : ptr),
 		m_getter(internal_getter),
 		m_setter((rw == symbol_table::READ_ONLY) ? nullptr : internal_setter),
 		m_value(0)
@@ -241,7 +242,7 @@ integer_symbol_entry::integer_symbol_entry(symbol_table &table, const char *name
 
 
 integer_symbol_entry::integer_symbol_entry(symbol_table &table, const char *name, u64 constval)
-	: symbol_entry(table, SMT_INTEGER, name, &m_value),
+	: symbol_entry(table, SMT_INTEGER, name, "", &m_value),
 		m_getter(internal_getter),
 		m_setter(nullptr),
 		m_value(constval)
@@ -249,8 +250,8 @@ integer_symbol_entry::integer_symbol_entry(symbol_table &table, const char *name
 }
 
 
-integer_symbol_entry::integer_symbol_entry(symbol_table &table, const char *name, void *ref, symbol_table::getter_func getter, symbol_table::setter_func setter)
-	: symbol_entry(table, SMT_INTEGER, name, ref),
+integer_symbol_entry::integer_symbol_entry(symbol_table &table, const char *name, void *ref, symbol_table::getter_func getter, symbol_table::setter_func setter, const std::string &format)
+	: symbol_entry(table, SMT_INTEGER, name, format, ref),
 		m_getter(getter),
 		m_setter(setter),
 		m_value(0)
@@ -323,7 +324,7 @@ void integer_symbol_entry::internal_setter(symbol_table &table, void *symref, u6
 //-------------------------------------------------
 
 function_symbol_entry::function_symbol_entry(symbol_table &table, const char *name, void *ref, int minparams, int maxparams, symbol_table::execute_func execute)
-	: symbol_entry(table, SMT_FUNCTION, name, ref),
+	: symbol_entry(table, SMT_FUNCTION, name, "", ref),
 		m_minparams(minparams),
 		m_maxparams(maxparams),
 		m_execute(execute)
@@ -434,10 +435,10 @@ void symbol_table::add(const char *name, u64 value)
 //  add - add a new register symbol
 //-------------------------------------------------
 
-void symbol_table::add(const char *name, void *ref, getter_func getter, setter_func setter)
+void symbol_table::add(const char *name, void *ref, getter_func getter, setter_func setter, const std::string &format_string)
 {
 	m_symlist.erase(name);
-	m_symlist.emplace(name, std::make_unique<integer_symbol_entry>(*this, name, ref, getter, setter));
+	m_symlist.emplace(name, std::make_unique<integer_symbol_entry>(*this, name, ref, getter, setter, format_string));
 }
 
 
@@ -516,7 +517,7 @@ expression_error::error_code symbol_table::memory_valid(const char *name, expres
 //  memory_value - return a value read from memory
 //-------------------------------------------------
 
-u64 symbol_table::memory_value(const char *name, expression_space space, u32 offset, int size)
+u64 symbol_table::memory_value(const char *name, expression_space space, u32 offset, int size, bool disable_se)
 {
 	// walk up the table hierarchy to find the owner
 	for (symbol_table *symtable = this; symtable != nullptr; symtable = symtable->m_parent)
@@ -524,7 +525,7 @@ u64 symbol_table::memory_value(const char *name, expression_space space, u32 off
 		{
 			expression_error::error_code err = symtable->m_memory_valid(symtable->m_memory_param, name, space);
 			if (err != expression_error::NO_SUCH_MEMORY_SPACE && symtable->m_memory_read != nullptr)
-				return symtable->m_memory_read(symtable->m_memory_param, name, space, offset, size);
+				return symtable->m_memory_read(symtable->m_memory_param, name, space, offset, size, disable_se);
 			return 0;
 		}
 	return 0;
@@ -535,7 +536,7 @@ u64 symbol_table::memory_value(const char *name, expression_space space, u32 off
 //  set_memory_value - write a value to memory
 //-------------------------------------------------
 
-void symbol_table::set_memory_value(const char *name, expression_space space, u32 offset, int size, u64 value)
+void symbol_table::set_memory_value(const char *name, expression_space space, u32 offset, int size, u64 value, bool disable_se)
 {
 	// walk up the table hierarchy to find the owner
 	for (symbol_table *symtable = this; symtable != nullptr; symtable = symtable->m_parent)
@@ -543,7 +544,7 @@ void symbol_table::set_memory_value(const char *name, expression_space space, u3
 		{
 			expression_error::error_code err = symtable->m_memory_valid(symtable->m_memory_param, name, space);
 			if (err != expression_error::NO_SUCH_MEMORY_SPACE && symtable->m_memory_write != nullptr)
-				symtable->m_memory_write(symtable->m_memory_param, name, space, offset, size, value);
+				symtable->m_memory_write(symtable->m_memory_param, name, space, offset, size, value, disable_se);
 			return;
 		}
 }
@@ -683,7 +684,7 @@ void parsed_expression::print_tokens(FILE *out)
 					case TVL_ASSIGNBXOR:    fprintf(out, "^=\n");                   break;
 					case TVL_ASSIGNBOR:     fprintf(out, "|=\n");                   break;
 					case TVL_COMMA:         fprintf(out, ",\n");                    break;
-					case TVL_MEMORYAT:      fprintf(out, "mem@\n");                 break;
+					case TVL_MEMORYAT:      fprintf(out, token.memory_size_effect() ? "mem!\n" : "mem@\n");break;
 					case TVL_EXECUTEFUNC:   fprintf(out, "execute\n");              break;
 					default:                fprintf(out, "INVALID OPERATOR\n");     break;
 				}
@@ -872,11 +873,17 @@ void parsed_expression::parse_symbol_or_number(parse_token &token, const char *&
 		string++;
 	}
 
-	// check for memory @ operators
-	if (string[0] == '@')
+	// check for memory @ and ! operators
+	if (string[0] == '@' || string[0] == '!')
 	{
-		string += 1;
-		return parse_memory_operator(token, buffer.c_str());
+		try {
+			bool disable_se = string[0] == '@';
+			parse_memory_operator(token, buffer.c_str(), disable_se);
+			string += 1;
+			return;
+		} catch(const expression_error &) {
+			// Try some other operator instead
+		}
 	}
 
 	// empty string is automatically invalid
@@ -925,35 +932,70 @@ void parsed_expression::parse_symbol_or_number(parse_token &token, const char *&
 	if (buffer.compare("rshift") == 0)
 		{ token.configure_operator(TVL_RSHIFT, 5); return; }
 
-	// if we have an 0x prefix, we must be a hex value
-	if (buffer[0] == '0' && buffer[1] == 'x')
-		return parse_number(token, buffer.c_str() + 2, 16, expression_error::INVALID_NUMBER);
-
+	switch (buffer[0])
+	{
 	// if we have a # prefix, we must be a decimal value
-	if (buffer[0] == '#')
+	case '#':
 		return parse_number(token, buffer.c_str() + 1, 10, expression_error::INVALID_NUMBER);
 
 	// if we have a $ prefix, we are a hex value
-	if (buffer[0] == '$')
+	case '$':
 		return parse_number(token, buffer.c_str() + 1, 16, expression_error::INVALID_NUMBER);
 
-	// check for a symbol match
-	symbol_entry *symbol = m_symtable->find_deep(buffer.c_str());
-	if (symbol != nullptr)
-	{
-		token.configure_symbol(*symbol);
-
-		// if this is a function symbol, synthesize an execute function operator
-		if (symbol->is_function())
+	case '0':
+		switch (buffer[1])
 		{
-			parse_token &newtoken = m_tokenlist.append(*global_alloc(parse_token(string - stringstart)));
-			newtoken.configure_operator(TVL_EXECUTEFUNC, 0);
-		}
-		return;
-	}
+		// if we have an 0x prefix, we must be a hex value
+		case 'x':
+		case 'X':
+			return parse_number(token, buffer.c_str() + 2, 16, expression_error::INVALID_NUMBER);
 
-	// attempt to parse as a number in the default base
-	parse_number(token, buffer.c_str(), DEFAULT_BASE, expression_error::UNKNOWN_SYMBOL);
+		// if we have an 0o prefix, we must be an octal value
+		case 'o':
+		case 'O':
+			return parse_number(token, buffer.c_str() + 2, 8, expression_error::INVALID_NUMBER);
+
+		// if we have an 0b prefix, we must be a binary value
+		case 'b':
+		case 'B':
+			try
+			{
+				return parse_number(token, buffer.c_str() + 2, 2, expression_error::INVALID_NUMBER);
+			}
+			catch (expression_error const &err)
+			{
+				// this is really a hack, but 0B1234 could also hex depending on default base
+				if (expression_error::INVALID_NUMBER == err)
+					return parse_number(token, buffer.c_str(), DEFAULT_BASE, expression_error::INVALID_NUMBER);
+				else
+					throw;
+			}
+
+		// TODO: for octal address spaces, treat 0123 as octal
+		default:
+			; // fall through
+		}
+		// fall through
+
+	default:
+		// check for a symbol match
+		symbol_entry *symbol = m_symtable->find_deep(buffer.c_str());
+		if (symbol != nullptr)
+		{
+			token.configure_symbol(*symbol);
+
+			// if this is a function symbol, synthesize an execute function operator
+			if (symbol->is_function())
+			{
+				parse_token &newtoken = m_tokenlist.append(*global_alloc(parse_token(string - stringstart)));
+				newtoken.configure_operator(TVL_EXECUTEFUNC, 0);
+			}
+			return;
+		}
+
+		// attempt to parse as a number in the default base
+		parse_number(token, buffer.c_str(), DEFAULT_BASE, expression_error::UNKNOWN_SYMBOL);
+	}
 }
 
 
@@ -1061,7 +1103,7 @@ void parsed_expression::parse_quoted_string(parse_token &token, const char *&str
 //  forms of memory operators
 //-------------------------------------------------
 
-void parsed_expression::parse_memory_operator(parse_token &token, const char *string)
+void parsed_expression::parse_memory_operator(parse_token &token, const char *string, bool disable_se)
 {
 	// if there is a '.', it means we have a name
 	const char *startstring = string;
@@ -1138,7 +1180,7 @@ void parsed_expression::parse_memory_operator(parse_token &token, const char *st
 	}
 
 	// configure the token
-	token.configure_operator(TVL_MEMORYAT, 2).set_memory_size(memsize).set_memory_space(memspace).set_memory_source(namestring);
+	token.configure_operator(TVL_MEMORYAT, 2).set_memory_size(memsize).set_memory_space(memspace).set_memory_source(namestring).set_memory_side_effect(disable_se);
 }
 
 
@@ -1681,8 +1723,9 @@ u64 parsed_expression::parse_token::get_lval_value(symbol_table *table)
 		return m_symbol->value();
 
 	// or get the value from the memory callbacks
-	else if (is_memory() && table != nullptr)
-		return table->memory_value(m_string, memory_space(), address(), 1 << memory_size());
+	else if (is_memory() && table != nullptr) {
+		return table->memory_value(m_string, memory_space(), address(), 1 << memory_size(), memory_side_effect());
+	}
 
 	return 0;
 }
@@ -1701,7 +1744,7 @@ inline void parsed_expression::parse_token::set_lval_value(symbol_table *table, 
 
 	// or set the value via the memory callbacks
 	else if (is_memory() && table != nullptr)
-		table->set_memory_value(m_string, memory_space(), address(), 1 << memory_size(), value);
+		table->set_memory_value(m_string, memory_space(), address(), 1 << memory_size(), value, memory_side_effect());
 }
 
 

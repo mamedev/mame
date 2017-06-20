@@ -7,10 +7,10 @@
     Core network interface functions and definitions.
 ***************************************************************************/
 
-#pragma once
-
 #ifndef MAME_EMU_NETWORK_H
 #define MAME_EMU_NETWORK_H
+
+#pragma once
 
 // ======================> network_manager
 
@@ -30,4 +30,4 @@ private:
 	running_machine &   m_machine;                  // reference to our machine
 };
 
-#endif /* MAME_EMU_NETWORK_H */
+#endif // MAME_EMU_NETWORK_H

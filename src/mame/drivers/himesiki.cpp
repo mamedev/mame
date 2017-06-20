@@ -92,10 +92,14 @@ A                                                   12.000MHz
 */
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "sound/2203intf.h"
 #include "includes/himesiki.h"
+
+#include "cpu/z80/z80.h"
 #include "machine/i8255.h"
+#include "sound/2203intf.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 #define MCLK    XTAL_12MHz // this is on the video board
 #define CLK2    XTAL_8MHz // near the CPUs
@@ -418,7 +422,7 @@ void himesiki_state::machine_reset()
 	m_flipscreen = 0;
 }
 
-static MACHINE_CONFIG_START( himesiki, himesiki_state )
+static MACHINE_CONFIG_START( himesiki )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CLK2) /* it's a 6.000 MHz rated part, but near the 8 Mhz XTAL?? - Android skips lots of frames at 6, crashes at 4 */
@@ -559,8 +563,8 @@ ROM_START( androidp )
 ROM_END
 
 
-GAME( 1989, himesiki, 0,         himesiki, himesiki,  driver_device, 0, ROT90, "Hi-Soft", "Himeshikibu (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, himesiki, 0,         himesiki, himesiki,  himesiki_state, 0, ROT90, "Hi-Soft", "Himeshikibu (Japan)", MACHINE_SUPPORTS_SAVE )
 
 // the game changed significantly between these 2 versions
-GAME( 198?, androidp,  0,          himesiki, androidp,  driver_device, 0, ROT90, "Nasco", "Android (prototype, later build)", MACHINE_SUPPORTS_SAVE )
-GAME( 198?, androidpo, androidp,   himesiki, androidpo, driver_device, 0, ROT90, "Nasco", "Android (prototype, early build)", MACHINE_SUPPORTS_SAVE )
+GAME( 198?, androidp,  0,          himesiki, androidp,  himesiki_state, 0, ROT90, "Nasco", "Android (prototype, later build)", MACHINE_SUPPORTS_SAVE )
+GAME( 198?, androidpo, androidp,   himesiki, androidpo, himesiki_state, 0, ROT90, "Nasco", "Android (prototype, early build)", MACHINE_SUPPORTS_SAVE )

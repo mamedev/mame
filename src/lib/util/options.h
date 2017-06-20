@@ -8,8 +8,8 @@
 
 ***************************************************************************/
 
-#ifndef __OPTIONS_H__
-#define __OPTIONS_H__
+#ifndef MAME_LIB_UTIL_OPTIONS_H
+#define MAME_LIB_UTIL_OPTIONS_H
 
 #include "corefile.h"
 #include <unordered_map>
@@ -81,7 +81,6 @@ public:
 		const char *default_value() const { return m_defdata.c_str(); }
 		const char *minimum() const { return m_minimum.c_str(); }
 		const char *maximum() const { return m_maximum.c_str(); }
-		uint32_t seqid() const { return m_seqid; }
 		int type() const { return (m_flags & OPTION_TYPE_MASK); }
 		uint32_t flags() const { return m_flags; }
 		bool is_header() const { return type() == OPTION_HEADER; }
@@ -103,7 +102,6 @@ public:
 		// internal state
 		entry *                 m_next;             // link to the next data
 		uint32_t                  m_flags;            // flags from the entry
-		uint32_t                  m_seqid;            // sequence ID; bumped on each change
 		bool                    m_error_reported;   // have we reported an error on this option yet?
 		int                     m_priority;         // priority of the data set
 		const char *            m_description;      // description for this item
@@ -130,7 +128,8 @@ public:
 
 	// getters
 	entry *first() const { return m_entrylist.first(); }
-	const char *command() const { return m_command.c_str(); }
+	const std::string &command() const { return m_command; }
+	const std::vector<std::string> &command_arguments() const { assert(!m_command.empty()); return m_command_arguments; }
 	entry *get_entry(const char *name) const;
 
 	// range iterators
@@ -147,8 +146,9 @@ public:
 	void remove_entry(entry &delentry);
 
 	// parsing/input
-	bool parse_command_line(int argc, char **argv, int priority, std::string &error_string);
-	bool parse_ini_file(util::core_file &inifile, int priority, int ignore_priority, std::string &error_string);
+	bool parse_command_line(std::vector<std::string> &args, int priority, std::string &error_string);
+	bool parse_ini_file(util::core_file &inifile, int priority, bool ignore_unknown_options, std::string &error_string);
+	bool pluck_from_command_line(std::vector<std::string> &args, const std::string &name, std::string &result);
 
 	// reverting
 	void revert(int priority_hi = OPTION_PRIORITY_MAXIMUM, int priority_lo = OPTION_PRIORITY_DEFAULT);
@@ -164,9 +164,7 @@ public:
 	bool bool_value(const char *name) const { return (atoi(value(name)) != 0); }
 	int int_value(const char *name) const { return atoi(value(name)); }
 	float float_value(const char *name) const { return atof(value(name)); }
-	uint32_t seqid(const char *name) const;
 	bool exists(const char *name) const;
-	bool is_changed(const char *name) const;
 
 	// setting
 	bool set_value(const char *name, const char *value, int priority, std::string &error_string);
@@ -176,23 +174,38 @@ public:
 	void mark_changed(const char *name);
 
 	// misc
-	static const char *unadorned(int x = 0) { return s_option_unadorned[std::min(x, MAX_UNADORNED_OPTIONS)]; }
+	static const char *unadorned(int x = 0) { return s_option_unadorned[std::min(x, MAX_UNADORNED_OPTIONS - 1)]; }
 	int options_count() const { return m_entrylist.count(); }
+
+protected:
+	// This is a hook to allow option value retrieval to be overridden for various reasons; this is a crude
+	// extensibility mechanism that should really be replaced by something better
+	enum class override_get_value_result
+	{
+		NONE,
+		OVERRIDE,
+		SKIP
+	};
+
+	virtual void value_changed(const std::string &name, const std::string &value) {}
+	virtual override_get_value_result override_get_value(const char *name, std::string &value) const { return override_get_value_result::NONE; }
+	virtual bool override_set_value(const char *name, const std::string &value) { return false; }
 
 private:
 	// internal helpers
 	void reset();
 	void append_entry(entry &newentry);
 	void copyfrom(const core_options &src);
-	bool validate_and_set_data(entry &curentry, const char *newdata, int priority, std::string &error_string);
+	bool validate_and_set_data(entry &curentry, std::string &&newdata, int priority, std::string &error_string);
 
 	// internal state
 	simple_list<entry>      m_entrylist;            // head of list of entries
 	std::unordered_map<std::string,entry *>       m_entrymap;             // map for fast lookup
 	std::string             m_command;              // command found
+	std::vector<std::string>    m_command_arguments;    // command arguments
 	static const char *const s_option_unadorned[];  // array of unadorned option "names"
 };
 
 
 
-#endif /* __OPTIONS_H__ */
+#endif // MAME_LIB_UTIL_OPTIONS_H

@@ -139,11 +139,14 @@ Notes:
 */
 
 #include "emu.h"
+#include "includes/djboy.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/mcs51/mcs51.h"
 #include "sound/2203intf.h"
 #include "sound/okim6295.h"
-#include "includes/djboy.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /* KANEKO BEAST state */
@@ -544,7 +547,7 @@ void djboy_state::machine_reset()
 	m_z80_to_beast_full = 0;
 }
 
-static MACHINE_CONFIG_START( djboy, djboy_state )
+static MACHINE_CONFIG_START( djboy )
 
 	MCFG_CPU_ADD("maincpu", Z80, 6000000)
 	MCFG_CPU_PROGRAM_MAP(cpu0_am)
@@ -573,7 +576,7 @@ static MACHINE_CONFIG_START( djboy, djboy_state )
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(djboy_state, screen_update_djboy)
-	MCFG_SCREEN_VBLANK_DRIVER(djboy_state, screen_eof_djboy)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(djboy_state, screen_vblank_djboy))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", djboy)
@@ -589,10 +592,10 @@ static MACHINE_CONFIG_START( djboy, djboy_state )
 	MCFG_SOUND_ADD("ymsnd", YM2203, 3000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_OKIM6295_ADD("oki1", 12000000 / 8, OKIM6295_PIN7_LOW)
+	MCFG_OKIM6295_ADD("oki1", 12000000 / 8, PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_OKIM6295_ADD("oki2", 12000000 / 8, OKIM6295_PIN7_LOW)
+	MCFG_OKIM6295_ADD("oki2", 12000000 / 8, PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

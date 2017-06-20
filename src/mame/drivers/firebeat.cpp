@@ -137,18 +137,23 @@ Keyboard Mania 2nd Mix - dongle, program CD, audio CD
 */
 
 #include "emu.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/powerpc/ppc.h"
 #include "machine/ataintf.h"
-#include "machine/intelfsh.h"
-#include "machine/rtc65271.h"
-#include "machine/ins8250.h"
-#include "machine/midikbd.h"
 #include "machine/atapicdr.h"
-#include "sound/ymz280b.h"
+#include "machine/ins8250.h"
+#include "machine/intelfsh.h"
+#include "machine/midikbd.h"
+#include "machine/rtc65271.h"
 #include "sound/cdda.h"
 #include "sound/rf5c400.h"
+#include "sound/ymz280b.h"
 #include "video/k057714.h"
+
+#include "screen.h"
+#include "speaker.h"
+
 #include "firebeat.lh"
 
 
@@ -1263,7 +1268,7 @@ WRITE_LINE_MEMBER( firebeat_state::ata_interrupt )
 	m_maincpu->set_input_line(INPUT_LINE_IRQ4, state);
 }
 
-static MACHINE_CONFIG_FRAGMENT( cdrom_config )
+static MACHINE_CONFIG_START( cdrom_config )
 	MCFG_DEVICE_MODIFY("cdda")
 	MCFG_SOUND_ROUTE(0, "^^^^lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "^^^^rspeaker", 1.0)
@@ -1273,7 +1278,7 @@ static SLOT_INTERFACE_START(firebeat_ata_devices)
 	SLOT_INTERFACE("cdrom", ATAPI_FIXED_CDROM)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( firebeat, firebeat_state )
+static MACHINE_CONFIG_START( firebeat )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PPC403GCX, XTAL_64MHz)
@@ -1333,7 +1338,7 @@ static MACHINE_CONFIG_START( firebeat, firebeat_state )
 	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE(DEVICE_SELF_OWNER, firebeat_state, midi_uart_ch1_irq_callback))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( firebeat2, firebeat_state )
+static MACHINE_CONFIG_START( firebeat2 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PPC403GCX, XTAL_64MHz)

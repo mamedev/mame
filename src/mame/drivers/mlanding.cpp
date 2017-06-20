@@ -44,14 +44,18 @@
 ****************************************************************************/
 
 #include "emu.h"
+#include "includes/taitoipt.h"
+#include "audio/taitosnd.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/tms32025/tms32025.h"
 #include "cpu/z80/z80.h"
-#include "includes/taitoipt.h"
 #include "machine/z80ctc.h"
-#include "audio/taitosnd.h"
-#include "sound/ym2151.h"
 #include "sound/msm5205.h"
+#include "sound/ym2151.h"
+
+#include "screen.h"
+#include "speaker.h"
 
 
 
@@ -761,7 +765,8 @@ static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 16, mlanding_state )
 	AM_RANGE(0x060000, 0x060001) AM_WRITE(dsp_control_w)
 	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAMBANK("dma_ram")
 	AM_RANGE(0x1c4000, 0x1cffff) AM_RAM AM_SHARE("sub_com_ram")
-	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_SHARE("dot_ram")
+	AM_RANGE(0x200000, 0x2007ff) AM_RAM
+	AM_RANGE(0x200800, 0x203fff) AM_RAM AM_SHARE("dot_ram")
 ADDRESS_MAP_END
 
 
@@ -777,7 +782,7 @@ static ADDRESS_MAP_START( dsp_map_prog, AS_PROGRAM, 16, mlanding_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dsp_map_data, AS_DATA, 16, mlanding_state )
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("dot_ram")
+	AM_RANGE(0x0400, 0x1fff) AM_RAM AM_SHARE("dot_ram")
 ADDRESS_MAP_END
 
 /*************************************
@@ -917,7 +922,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( mlanding, mlanding_state )
+static MACHINE_CONFIG_START( mlanding )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000) // Appears to be 68000P8 in PCB photo
@@ -972,11 +977,11 @@ static MACHINE_CONFIG_START( mlanding, mlanding_state )
 
 	MCFG_SOUND_ADD("msm1", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(mlanding_state, msm5205_1_vck)) // VCK function
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      // 8 kHz, 4-bit
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      // 8 kHz, 4-bit
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MCFG_SOUND_ADD("msm2", MSM5205, 384000)
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_SEX_4B)      // Slave mode, 4-bit
+	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)      // Slave mode, 4-bit
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
 
@@ -1026,4 +1031,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1987, mlanding, 0, mlanding, mlanding, driver_device, 0, ROT0, "Taito America Corporation", "Midnight Landing (Germany)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, mlanding, 0, mlanding, mlanding, mlanding_state, 0, ROT0, "Taito America Corporation", "Midnight Landing (Germany)", MACHINE_SUPPORTS_SAVE )

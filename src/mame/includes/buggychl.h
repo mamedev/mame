@@ -4,9 +4,10 @@
     buggychl
 */
 
-#include "machine/buggychl.h"
+#include "machine/taito68705interface.h"
 #include "machine/gen_latch.h"
 #include "sound/msm5232.h"
+#include "screen.h"
 
 class buggychl_state : public driver_device
 {
@@ -20,7 +21,6 @@ public:
 		m_scrollh(*this, "scrollh"),
 		m_audiocpu(*this, "audiocpu"),
 		m_maincpu(*this, "maincpu"),
-		m_mcu(*this, "mcu"),
 		m_bmcu(*this, "bmcu"),
 		m_msm(*this, "msm"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -53,8 +53,7 @@ public:
 	/* devices */
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_mcu;
-	required_device<buggychl_mcu_device> m_bmcu;
+	required_device<taito68705_mcu_device> m_bmcu;
 	required_device<msm5232_device> m_msm;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
@@ -66,6 +65,7 @@ public:
 	DECLARE_WRITE8_MEMBER(nmi_disable_w);
 	DECLARE_WRITE8_MEMBER(nmi_enable_w);
 	DECLARE_WRITE8_MEMBER(sound_enable_w);
+	DECLARE_READ8_MEMBER(mcu_status_r);
 	DECLARE_WRITE8_MEMBER(buggychl_chargen_w);
 	DECLARE_WRITE8_MEMBER(buggychl_sprite_lookup_bank_w);
 	DECLARE_WRITE8_MEMBER(buggychl_sprite_lookup_w);

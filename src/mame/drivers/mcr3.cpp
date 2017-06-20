@@ -7,9 +7,9 @@
     driver by Christopher Kirmse, Aaron Giles
 
     Games supported:
-        * Demolition Derby (Monoboard version) (Turbo Chip Squeak)
-        * Sarge (Turbo Chip Squeak)
-        * Max RPM (Turbo Chip Squeak)
+        * Demolition Derby (Monoboard version) (Turbo Cheap Squeak)
+        * Sarge (Turbo Cheap Squeak)
+        * Max RPM (Turbo Cheap Squeak)
         * Rampage (Sounds Good)
         * Power Drive (Sounds Good)
         * Star Guards (Sounds Good)
@@ -104,13 +104,16 @@
 
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "machine/z80ctc.h"
-#include "audio/midway.h"
-#include "audio/csd.h"
-#include "machine/nvram.h"
 #include "includes/mcr.h"
 #include "includes/mcr3.h"
+#include "audio/midway.h"
+#include "audio/csd.h"
+
+#include "cpu/z80/z80.h"
+#include "machine/nvram.h"
+#include "machine/z80ctc.h"
+
+#include "speaker.h"
 
 #include "spyhunt.lh"
 #include "turbotag.lh"
@@ -166,7 +169,7 @@ WRITE8_MEMBER(mcr3_state::demoderm_op6_w)
 	if (data & 0x40) m_input_mux = 1;
 
 	/* low 5 bits control the turbo CS */
-	m_turbo_chip_squeak->write(space, offset, data);
+	m_turbo_cheap_squeak->write(space, offset, data);
 }
 
 
@@ -270,7 +273,7 @@ WRITE8_MEMBER(mcr3_state::maxrpm_op6_w)
 		m_maxrpm_adc_select = (m_maxrpm_adc_control >> 1) & 3;
 
 	/* low 5 bits control the turbo CS */
-	m_turbo_chip_squeak->write(space, offset, data);
+	m_turbo_cheap_squeak->write(space, offset, data);
 }
 
 
@@ -406,7 +409,7 @@ READ8_MEMBER(mcr3_state::spyhunt_ip2_r)
 
 WRITE8_MEMBER(mcr3_state::spyhunt_op4_w)
 {
-	/* Spy Hunter uses port 4 for talking to the Chip Squeak Deluxe */
+	/* Spy Hunter uses port 4 for talking to the Cheap Squeak Deluxe */
 	/* (and for toggling the lamps and muxing the analog inputs) */
 
 	/* mux select is in bit 7 */
@@ -436,7 +439,7 @@ WRITE8_MEMBER(mcr3_state::spyhunt_op4_w)
 	}
 	m_last_op4 = data;
 
-	/* low 5 bits go to control the Chip Squeak Deluxe */
+	/* low 5 bits go to control the Cheap Squeak Deluxe */
 	m_cheap_squeak_deluxe->sr_w(space, offset, data & 0x0f);
 	m_cheap_squeak_deluxe->sirq_w(BIT(data, 4));
 }
@@ -1081,7 +1084,7 @@ GFXDECODE_END
  *************************************/
 
 /* Core MCR monoboard system with no sound */
-static MACHINE_CONFIG_START( mcrmono, mcr3_state )
+static MACHINE_CONFIG_START( mcrmono )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)
@@ -1124,11 +1127,11 @@ MACHINE_CONFIG_END
 /*************************************/
 
 
-/* Sarge/Demolition Derby Mono/Max RPM = MCR monoboard with Turbo Chip Squeak */
+/* Sarge/Demolition Derby Mono/Max RPM = MCR monoboard with Turbo Cheap Squeak */
 static MACHINE_CONFIG_DERIVED( mono_tcs, mcrmono )
 
 	/* basic machine hardware */
-	MCFG_SOUND_ADD("tcs", MIDWAY_TURBO_CHIP_SQUEAK, 0)
+	MCFG_SOUND_ADD("tcs", MIDWAY_TURBO_CHEAP_SQUEAK, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -1565,7 +1568,7 @@ DRIVER_INIT_MEMBER(mcr3_state,demoderm)
 DRIVER_INIT_MEMBER(mcr3_state,sarge)
 {
 	mcr_common_init();
-	m_maincpu->space(AS_IO).install_write_handler(0x06, 0x06, write8_delegate(FUNC(midway_turbo_chip_squeak_device::write),m_turbo_chip_squeak.target()));
+	m_maincpu->space(AS_IO).install_write_handler(0x06, 0x06, write8_delegate(FUNC(midway_turbo_cheap_squeak_device::write),m_turbo_cheap_squeak.target()));
 }
 
 

@@ -16,18 +16,22 @@ Wicat - various systems.
 
 */
 
+#include "emu.h"
+
 #include "bus/rs232/rs232.h"
+#include "cpu/8x300/8x300.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z8000/z8000.h"
-#include "cpu/8x300/8x300.h"
 #include "machine/6522via.h"
-#include "machine/mm58274c.h"
-#include "machine/mc2661.h"
-#include "machine/im6402.h"
-#include "video/i8275.h"
 #include "machine/am9517a.h"
-#include "machine/x2212.h"
+#include "machine/im6402.h"
+#include "machine/mc2661.h"
+#include "machine/mm58274c.h"
 #include "machine/wd_fdc.h"
+#include "machine/x2212.h"
+#include "video/i8275.h"
+#include "screen.h"
+
 #include "wicat.lh"
 
 class wicat_state : public driver_device
@@ -117,7 +121,7 @@ public:
 	required_device<x2210_device> m_videosram;
 	required_device<palette_device> m_palette;
 	required_memory_region m_chargen;
-	required_device<fd1795_t> m_fdc;
+	required_device<fd1795_device> m_fdc;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) { return 0; }
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -273,6 +277,10 @@ static INPUT_PORTS_START( wicat )
 
 INPUT_PORTS_END
 
+static SLOT_INTERFACE_START(wicat_floppies)
+	SLOT_INTERFACE("525qd", FLOPPY_525_QD)
+SLOT_INTERFACE_END
+
 void wicat_state::driver_start()
 {
 	m_video_timer = timer_alloc(VIDEO_TIMER);
@@ -396,7 +404,7 @@ WRITE8_MEMBER( wicat_state::via_b_w )
 
 READ16_MEMBER( wicat_state::invalid_r )
 {
-	if(!space.debugger_access())
+	if(!machine().side_effect_disabled())
 	{
 		m_maincpu->set_buserror_details(0x300000+offset*2-2,0,m_maincpu->get_fc());
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
@@ -407,7 +415,7 @@ READ16_MEMBER( wicat_state::invalid_r )
 
 WRITE16_MEMBER( wicat_state::invalid_w )
 {
-	if(!space.debugger_access())
+	if(!machine().side_effect_disabled())
 	{
 		m_maincpu->set_buserror_details(0x300000+offset*2-2,1,m_maincpu->get_fc());
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
@@ -755,7 +763,7 @@ I8275_DRAW_CHARACTER_MEMBER(wicat_state::wicat_display_pixels)
 	}
 }
 
-static MACHINE_CONFIG_START( wicat, wicat_state )
+static MACHINE_CONFIG_START( wicat )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(wicat_mem)
@@ -896,8 +904,16 @@ static MACHINE_CONFIG_START( wicat, wicat_state )
 	MCFG_CPU_PROGRAM_MAP(wicat_wd1000_mem)
 	MCFG_CPU_IO_MAP(wicat_wd1000_io)
 	MCFG_FD1795_ADD("fdc",XTAL_8MHz)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", wicat_floppies, "525qd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", wicat_floppies, nullptr, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:2", wicat_floppies, nullptr, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:3", wicat_floppies, nullptr, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 
-
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "wicat")
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -985,5 +1001,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   CLASS         INIT    COMPANY          FULLNAME       FLAGS */
-COMP( 1982, wicat, 0,       0,     wicat, wicat, driver_device, 0, "Millennium Systems", "Wicat System 150", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT  COMPANY               FULLNAME            FLAGS
+COMP( 1982, wicat, 0,      0,      wicat,   wicat, wicat_state, 0,    "Millennium Systems", "Wicat System 150", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

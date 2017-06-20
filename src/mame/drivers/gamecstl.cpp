@@ -66,10 +66,11 @@
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
-#include "machine/lpci.h"
-#include "machine/pcshare.h"
-#include "machine/pckeybrd.h"
 #include "machine/idectrl.h"
+#include "machine/lpci.h"
+#include "machine/pckeybrd.h"
+#include "machine/pcshare.h"
+#include "screen.h"
 
 
 class gamecstl_state : public pcat_base_state
@@ -427,7 +428,7 @@ void gamecstl_state::machine_reset()
 	membank("bank1")->set_base(memregion("bios")->base() + 0x30000);
 }
 
-static MACHINE_CONFIG_START( gamecstl, gamecstl_state )
+static MACHINE_CONFIG_START( gamecstl )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PENTIUM3, 200000000)
 	MCFG_CPU_PROGRAM_MAP(gamecstl_map)
@@ -492,5 +493,5 @@ ROM_END
 
 /*****************************************************************************/
 
-GAME(2002, gamecstl, 0,        gamecstl, gamecstl, gamecstl_state, gamecstl, ROT0, "Cristaltec", "GameCristal", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME(2002, gamecstl, 0,        gamecstl, gamecstl, gamecstl_state, gamecstl, ROT0, "Cristaltec", "GameCristal",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 GAME(2002, gamecst2, gamecstl, gamecstl, gamecstl, gamecstl_state, gamecstl, ROT0, "Cristaltec", "GameCristal (version 2.613)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

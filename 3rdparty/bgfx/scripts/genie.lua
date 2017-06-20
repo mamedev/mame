@@ -1,5 +1,5 @@
 --
--- Copyright 2010-2016 Branimir Karadzic. All rights reserved.
+-- Copyright 2010-2017 Branimir Karadzic. All rights reserved.
 -- License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
 --
 
@@ -86,10 +86,6 @@ if not os.isdir(BX_DIR) then
 	os.exit()
 end
 
-defines {
-	"BX_CONFIG_ENABLE_MSVC_LEVEL4_WARNINGS=1"
-}
-
 dofile (path.join(BX_DIR, "scripts/toolchain.lua"))
 if not toolchain(BGFX_BUILD_DIR, BGFX_THIRD_PARTY_DIR) then
 	return -- no action specified
@@ -141,9 +137,14 @@ function exampleProject(_name)
 		path.join(BGFX_DIR, "examples", _name, "**.bin.h"),
 	}
 
+	flags {
+		"FatalWarnings",
+	}
+
 	links {
-		"bgfx",
 		"example-common",
+		"bgfx",
+		"bx",
 	}
 
 	if _OPTIONS["with-sdl"] then
@@ -363,6 +364,8 @@ dofile "bgfx.lua"
 group "libs"
 bgfxProject("", "StaticLib", {})
 
+dofile(path.join(BX_DIR, "scripts/bx.lua"))
+
 if _OPTIONS["with-examples"] or _OPTIONS["with-tools"] then
 	group "examples"
 	dofile "example-common.lua"
@@ -401,6 +404,7 @@ if _OPTIONS["with-examples"] then
 	exampleProject("29-debugdraw")
 	exampleProject("30-picking")
 	exampleProject("31-rsm")
+	exampleProject("32-particles")
 
 	-- C99 source doesn't compile under WinRT settings
 	if not premake.vstudio.iswinrt() then

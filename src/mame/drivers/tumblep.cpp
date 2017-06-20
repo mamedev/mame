@@ -42,13 +42,16 @@ Stephh's notes (based on the games M68000 code and some tests) :
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/tumblep.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/h6280/h6280.h"
 #include "machine/decocrpt.h"
 #include "sound/ym2151.h"
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
-#include "includes/tumblep.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 #define TUMBLEP_HACK    0
@@ -277,7 +280,7 @@ void tumblep_state::machine_start()
 {
 }
 
-static MACHINE_CONFIG_START( tumblep, tumblep_state )
+static MACHINE_CONFIG_START( tumblep )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14000000)
@@ -328,7 +331,7 @@ static MACHINE_CONFIG_START( tumblep, tumblep_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
 
-	MCFG_OKIM6295_ADD("oki", 1023924, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 1023924, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END

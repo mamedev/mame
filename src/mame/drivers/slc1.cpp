@@ -50,7 +50,9 @@ Pasting doesn't work, but if it did...
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
+#include "speaker.h"
+
 #include "slc1.lh"
 
 
@@ -250,7 +252,7 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( slc1, slc1_state )
+static MACHINE_CONFIG_START( slc1 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 2500000)
 	MCFG_CPU_PROGRAM_MAP(slc1_map)
@@ -281,5 +283,5 @@ ROM_START(slc1)
 ROM_END
 
 
-/*    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT    INIT      COMPANY    FULLNAME */
-COMP( 1989, slc1,     0,      0,      slc1,       slc1, driver_device,    0,      "Dr. Dieter Scheuschner",  "SLC-1" , 0 )
+/*    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT  STATE          INIT  COMPANY                   FULLNAME */
+COMP( 1989, slc1,     0,      0,      slc1,       slc1,  slc1_state,    0,    "Dr. Dieter Scheuschner", "SLC-1" , 0 )

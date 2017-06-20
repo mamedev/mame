@@ -19,14 +19,16 @@
 \*********************************************************************/
 
 #include "emu.h"
+#include "bus/scsi/scsi.h"
+#include "bus/scsi/scsicd.h"
 #include "cpu/mips/mips3.h"
 #include "cpu/mips/r3000.h"
 #include "machine/8530scc.h"
-#include "machine/sgi.h"
 #include "machine/eepromser.h"
-#include "bus/scsi/scsi.h"
-#include "bus/scsi/scsicd.h"
+#include "machine/sgi.h"
 #include "machine/wd33c93.h"
+#include "screen.h"
+#include "speaker.h"
 
 class indigo_state : public driver_device
 {
@@ -566,12 +568,12 @@ static INPUT_PORTS_START( indigo )
 	PORT_BIT ( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_FRAGMENT( cdrom_config )
+static MACHINE_CONFIG_START( cdrom_config )
 	MCFG_DEVICE_MODIFY( "cdda" )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "^^^^mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( indigo3k, indigo_state )
+static MACHINE_CONFIG_START( indigo3k )
 	MCFG_CPU_ADD("maincpu", R3041, 33000000)
 	MCFG_R3000_ENDIANNESS(ENDIANNESS_BIG)
 	MCFG_CPU_PROGRAM_MAP(indigo3k_map)
@@ -624,6 +626,6 @@ ROM_START( indigo4k )
 	ROM_LOAD( "ip20prom.070-8116-004.bin", 0x000000, 0x080000, CRC(940d960e) SHA1(596aba530b53a147985ff3f6f853471ce48c866c) )
 ROM_END
 
-/*    YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     CLASS         INIT    COMPANY   FULLNAME */
-COMP( 1991, indigo3k, 0,        0,        indigo3k, indigo,   driver_device, 0,     "Silicon Graphics Inc", "IRIS Indigo (R3000, 33MHz)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1993, indigo4k, 0,        0,        indigo4k, indigo,   driver_device, 0,         "Silicon Graphics Inc", "IRIS Indigo (R4400, 150MHz, Ver. 4.0.5D Rev A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     CLASS         INIT   COMPANY                 FULLNAME                                          FLAGS
+COMP( 1991, indigo3k, 0,        0,        indigo3k, indigo,   indigo_state, 0,     "Silicon Graphics Inc", "IRIS Indigo (R3000, 33MHz)",                     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1993, indigo4k, 0,        0,        indigo4k, indigo,   indigo_state, 0,     "Silicon Graphics Inc", "IRIS Indigo (R4400, 150MHz, Ver. 4.0.5D Rev A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

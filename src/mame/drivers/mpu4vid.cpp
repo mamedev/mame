@@ -176,26 +176,33 @@ TODO:
         approximation of the SCN2674 scanline logic, but this is perhaps better served as a proper device.
  ***********************************************************************************************************/
 #include "emu.h"
-#include "machine/6821pia.h"
-#include "machine/6840ptm.h"
-#include "machine/nvram.h"
+#include "includes/mpu4.h"
 
 #include "cpu/m6809/m6809.h"
+#include "cpu/m68000/m68000.h"
+
+#include "machine/6821pia.h"
+#include "machine/6840ptm.h"
+#include "machine/6850acia.h"
+#include "machine/meters.h"
+#include "machine/nvram.h"
+#include "machine/roc10937.h"
+#include "machine/steppers.h"
+
 #include "sound/ay8910.h"
 #include "sound/okim6376.h"
-#include "sound/ym2413.h"
-#include "sound/upd7759.h"
-#include "machine/steppers.h"
-#include "machine/roc10937.h"
-#include "machine/meters.h"
-#include "video/scn2674.h"
-#include "video/ef9369.h"
-#include "cpu/m68000/m68000.h"
-#include "machine/6850acia.h"
 #include "sound/saa1099.h"
+#include "sound/upd7759.h"
+#include "sound/ym2413.h"
+
+#include "video/ef9369.h"
+#include "video/scn2674.h"
+
+#include "screen.h"
+#include "speaker.h"
+
 #include "crmaze2p.lh"
 #include "crmaze4p.lh"
-#include "includes/mpu4.h"
 
 
 struct bt471_t
@@ -431,7 +438,7 @@ VIDEO_START_MEMBER(mpu4vid_state,mpu4_vid)
 	assert(m_gfx_index != MAX_GFX_ELEMENTS);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(m_gfx_index+0, std::make_unique<gfx_element>(*m_palette, mpu4_vid_char_8x8_layout, reinterpret_cast<uint8_t *>(m_vid_vidram.target()), NATIVE_ENDIAN_VALUE_LE_BE(8,0), m_palette->entries() / 16, 0));
+	m_gfxdecode->set_gfx(m_gfx_index+0, std::make_unique<gfx_element>(m_palette, mpu4_vid_char_8x8_layout, reinterpret_cast<uint8_t *>(m_vid_vidram.target()), NATIVE_ENDIAN_VALUE_LE_BE(8,0), m_palette->entries() / 16, 0));
 }
 
 EF9369_COLOR_UPDATE( mpu4vid_state::ef9369_color_update )
@@ -1167,8 +1174,7 @@ static ADDRESS_MAP_START( mpu4_68k_map, AS_PROGRAM, 16, mpu4vid_state )
 	AM_RANGE(0x000000, 0x7fffff) AM_ROM
 	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_SHARE("vid_mainram")
 //  AM_RANGE(0x810000, 0x81ffff) AM_RAM /* ? */
-	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE8("saa", saa1099_device, data_w, 0x00ff)
-	AM_RANGE(0x900002, 0x900003) AM_DEVWRITE8("saa", saa1099_device, control_w, 0x00ff)
+	AM_RANGE(0x900000, 0x900003) AM_DEVWRITE8("saa", saa1099_device, write, 0x00ff)
 	AM_RANGE(0xa00000, 0xa00001) AM_DEVREADWRITE8("ef9369", ef9369_device, data_r, data_w, 0x00ff)
 	AM_RANGE(0xa00002, 0xa00003) AM_DEVWRITE8("ef9369", ef9369_device, address_w, 0x00ff)
 /*  AM_RANGE(0xa00004, 0xa0000f) AM_READWRITE(mpu4_vid_unmap_r, mpu4_vid_unmap_w) */
@@ -1185,8 +1191,7 @@ static ADDRESS_MAP_START( mpu4oki_68k_map, AS_PROGRAM, 16, mpu4vid_state )
 	AM_RANGE(0x600000, 0x63ffff) AM_RAM /* The Mating Game has an extra 256kB RAM on the program card */
 //  AM_RANGE(0x640000, 0x7fffff) AM_NOP /* Possible bug, reads and writes here */
 	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_SHARE("vid_mainram")
-	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE8("saa", saa1099_device, data_w, 0x00ff)
-	AM_RANGE(0x900002, 0x900003) AM_DEVWRITE8("saa", saa1099_device, control_w, 0x00ff)
+	AM_RANGE(0x900000, 0x900003) AM_DEVWRITE8("saa", saa1099_device, write, 0x00ff)
 	AM_RANGE(0xa00000, 0xa00001) AM_DEVREADWRITE8("ef9369", ef9369_device, data_r, data_w, 0x00ff)
 	AM_RANGE(0xa00002, 0xa00003) AM_DEVWRITE8("ef9369", ef9369_device, address_w, 0x00ff)
 	AM_RANGE(0xb00000, 0xb0000f) AM_DEVREADWRITE8("scn2674_vid", scn2674_device, read, write,0x00ff)
@@ -1205,8 +1210,7 @@ static ADDRESS_MAP_START( bwbvid_68k_map, AS_PROGRAM, 16, mpu4vid_state )
 	AM_RANGE(0x000000, 0x7fffff) AM_ROM
 	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_SHARE("vid_mainram")
 	AM_RANGE(0x810000, 0x81ffff) AM_RAM /* ? */
-	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE8("saa", saa1099_device, data_w, 0x00ff)
-	AM_RANGE(0x900002, 0x900003) AM_DEVWRITE8("saa", saa1099_device, control_w, 0x00ff)
+	AM_RANGE(0x900000, 0x900003) AM_DEVWRITE8("saa", saa1099_device, write, 0x00ff)
 	AM_RANGE(0xa00000, 0xa00001) AM_DEVREADWRITE8("ef9369", ef9369_device, data_r, data_w, 0x00ff)
 	AM_RANGE(0xa00002, 0xa00003) AM_DEVWRITE8("ef9369", ef9369_device, address_w, 0x00ff)
 //  AM_RANGE(0xa00000, 0xa0000f) AM_READWRITE(bt471_r,bt471_w) //Some games use this
@@ -1223,8 +1227,7 @@ static ADDRESS_MAP_START( bwbvid5_68k_map, AS_PROGRAM, 16, mpu4vid_state )
 	AM_RANGE(0x000000, 0x7fffff) AM_ROM
 	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_SHARE("vid_mainram")
 	AM_RANGE(0x810000, 0x81ffff) AM_RAM /* ? */
-	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE8("saa", saa1099_device, data_w, 0x00ff)
-	AM_RANGE(0x900002, 0x900003) AM_DEVWRITE8("saa", saa1099_device, control_w, 0x00ff)
+	AM_RANGE(0x900000, 0x900003) AM_DEVWRITE8("saa", saa1099_device, write, 0x00ff)
 	AM_RANGE(0xa00000, 0xa00001) AM_DEVREADWRITE8("ef9369", ef9369_device, data_r, data_w, 0x00ff)
 	AM_RANGE(0xa00002, 0xa00003) AM_DEVWRITE8("ef9369", ef9369_device, address_w, 0x00ff)
 	//AM_RANGE(0xa00000, 0xa00003) AM_READWRITE8(bt471_r,bt471_w,0x00ff) Some games use this
@@ -1260,7 +1263,7 @@ ADDRESS_MAP_END
 
 
 
-static MACHINE_CONFIG_START( mpu4_vid, mpu4vid_state )
+static MACHINE_CONFIG_START( mpu4_vid )
 	MCFG_CPU_ADD("maincpu", M6809, MPU4_MASTER_CLOCK/4 )
 	MCFG_CPU_PROGRAM_MAP(mpu4_6809_map)
 
@@ -3569,28 +3572,28 @@ ROM_END
 AMLD versions do not pay out, and instead just feature highscore tables. These were mainly intended for locations unwilling to pay for gaming licenses.
 The AMLD Crystal Maze versions appear to be a mixture of the original game modules and Team Challenge's scoring system. This would suggest they were all made ~1994. */
 
-GAME(  199?,v4bios,     0,          mod2,   mpu4, driver_device,        0,          ROT0, "Barcrest","MPU4 Video Firmware",MACHINE_IS_BIOS_ROOT )
+GAME(  199?,v4bios,     0,          mod2,       mpu4,     mpu4_state,       0,          ROT0, "Barcrest","MPU4 Video Firmware",MACHINE_IS_BIOS_ROOT )
 
 #define GAME_FLAGS MACHINE_NOT_WORKING
 
-GAMEL( 1993,v4cmaze,    v4bios,     crmaze,     crmaze, mpu4vid_state,      crmaze,     ROT0, "Barcrest","The Crystal Maze (v1.3) (MPU4 Video)",GAME_FLAGS,layout_crmaze2p )//SWP 0.9
-GAMEL( 1993,v4cmazedat, v4cmaze,    crmaze,     crmaze, mpu4vid_state,      crmaze,     ROT0, "Barcrest","The Crystal Maze (v1.3, Datapak) (MPU4 Video)",GAME_FLAGS,layout_crmaze2p )//SWP 0.9D
-GAMEL( 1993,v4cmazea,   v4cmaze,    crmaze,     crmaze, mpu4vid_state,      crmazea,    ROT0, "Barcrest","The Crystal Maze (v0.1, AMLD) (MPU4 Video)",GAME_FLAGS,layout_crmaze2p )//SWP 0.9 (actually newer than the 1.1 set then??)
-GAMEL( 1993,v4cmazeb,   v4cmaze,    crmaze,     crmaze, mpu4vid_state,      v4cmazeb,   ROT0, "Barcrest","The Crystal Maze (v1.2) (MPU4 Video)",GAME_FLAGS,layout_crmaze2p )//SWP 0.9
-GAMEL( 1993,v4cmazec,   v4cmaze,    crmaze,     crmaze, mpu4vid_state,      v4cmazeb,   ROT0, "Barcrest","The Crystal Maze (v1.3 alt) (MPU4 Video)",GAME_FLAGS,layout_crmaze2p )//SWP 0.9
-GAMEL( 1993,v4cmazed,   v4cmaze,    crmaze,     crmaze, mpu4vid_state,      v4cmazeb,   ROT0, "Barcrest","The Crystal Maze (v1.1) (MPU4 Video)",GAME_FLAGS,layout_crmaze2p )//SWP 0.6
+GAMEL( 1993,v4cmaze,    v4bios,     crmaze,     crmaze,   mpu4vid_state,    crmaze,     ROT0, "Barcrest","The Crystal Maze (v1.3) (MPU4 Video)",GAME_FLAGS,layout_crmaze2p )//SWP 0.9
+GAMEL( 1993,v4cmazedat, v4cmaze,    crmaze,     crmaze,   mpu4vid_state,    crmaze,     ROT0, "Barcrest","The Crystal Maze (v1.3, Datapak) (MPU4 Video)",GAME_FLAGS,layout_crmaze2p )//SWP 0.9D
+GAMEL( 1993,v4cmazea,   v4cmaze,    crmaze,     crmaze,   mpu4vid_state,    crmazea,    ROT0, "Barcrest","The Crystal Maze (v0.1, AMLD) (MPU4 Video)",GAME_FLAGS,layout_crmaze2p )//SWP 0.9 (actually newer than the 1.1 set then??)
+GAMEL( 1993,v4cmazeb,   v4cmaze,    crmaze,     crmaze,   mpu4vid_state,    v4cmazeb,   ROT0, "Barcrest","The Crystal Maze (v1.2) (MPU4 Video)",GAME_FLAGS,layout_crmaze2p )//SWP 0.9
+GAMEL( 1993,v4cmazec,   v4cmaze,    crmaze,     crmaze,   mpu4vid_state,    v4cmazeb,   ROT0, "Barcrest","The Crystal Maze (v1.3 alt) (MPU4 Video)",GAME_FLAGS,layout_crmaze2p )//SWP 0.9
+GAMEL( 1993,v4cmazed,   v4cmaze,    crmaze,     crmaze,   mpu4vid_state,    v4cmazeb,   ROT0, "Barcrest","The Crystal Maze (v1.1) (MPU4 Video)",GAME_FLAGS,layout_crmaze2p )//SWP 0.6
 
-GAMEL( 1993,v4cmaze2,   v4bios,     crmaze,     crmaze, mpu4vid_state,      crmaze2,    ROT0, "Barcrest","The New Crystal Maze Featuring Ocean Zone (v2.2) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )//SWP 1.0
-GAMEL( 1993,v4cmaze2d,  v4cmaze2,   crmaze,     crmaze, mpu4vid_state,      crmaze2,    ROT0, "Barcrest","The New Crystal Maze Featuring Ocean Zone (v2.2, Datapak) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )//SWP 1.0D
-GAMEL( 1993,v4cmaze2a,  v4cmaze2,   crmaze,     crmaze, mpu4vid_state,      crmaze2a,   ROT0, "Barcrest","The New Crystal Maze Featuring Ocean Zone (v0.1, AMLD) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )//SWP 1.0 /* unprotected? proto? */
-GAMEL( 1993,v4cmaze2b,  v4cmaze2,   crmaze,     crmaze, mpu4vid_state,      crmaze2,    ROT0, "Barcrest","The New Crystal Maze Featuring Ocean Zone (v2.0) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )//SWP 1.0
-GAMEL( 1993,v4cmaze2c,  v4cmaze2,   crmaze,     crmaze, mpu4vid_state,      crmaze2,    ROT0, "Barcrest","The New Crystal Maze Featuring Ocean Zone (v?.?) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )// bad rom?
+GAMEL( 1993,v4cmaze2,   v4bios,     crmaze,     crmaze,   mpu4vid_state,    crmaze2,    ROT0, "Barcrest","The New Crystal Maze Featuring Ocean Zone (v2.2) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )//SWP 1.0
+GAMEL( 1993,v4cmaze2d,  v4cmaze2,   crmaze,     crmaze,   mpu4vid_state,    crmaze2,    ROT0, "Barcrest","The New Crystal Maze Featuring Ocean Zone (v2.2, Datapak) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )//SWP 1.0D
+GAMEL( 1993,v4cmaze2a,  v4cmaze2,   crmaze,     crmaze,   mpu4vid_state,    crmaze2a,   ROT0, "Barcrest","The New Crystal Maze Featuring Ocean Zone (v0.1, AMLD) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )//SWP 1.0 /* unprotected? proto? */
+GAMEL( 1993,v4cmaze2b,  v4cmaze2,   crmaze,     crmaze,   mpu4vid_state,    crmaze2,    ROT0, "Barcrest","The New Crystal Maze Featuring Ocean Zone (v2.0) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )//SWP 1.0
+GAMEL( 1993,v4cmaze2c,  v4cmaze2,   crmaze,     crmaze,   mpu4vid_state,    crmaze2,    ROT0, "Barcrest","The New Crystal Maze Featuring Ocean Zone (v?.?) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )// bad rom?
 
-GAMEL( 1994,v4cmaze3,   v4bios,     crmaze,     crmaze, mpu4vid_state,      crmaze3,    ROT0, "Barcrest","The Crystal Maze Team Challenge (v0.9) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )//SWP 0.7
-GAMEL( 1994,v4cmaze3d,  v4cmaze3,   crmaze,     crmaze, mpu4vid_state,      crmaze3,    ROT0, "Barcrest","The Crystal Maze Team Challenge (v0.9, Datapak) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )//SWP 0.7D
-GAMEL( 1994,v4cmaze3a,  v4cmaze3,   crmaze,     crmaze, mpu4vid_state,      crmaze3a,   ROT0, "Barcrest","The Crystal Maze Team Challenge (v1.2, AMLD) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )//SWP 0.7
-GAMEL( 1994,v4cmaze3b,  v4cmaze3,   crmaze,     crmaze, mpu4vid_state,      v4cmazeb,   ROT0, "Barcrest","The Crystal Maze Team Challenge (v0.8) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )//SWP 0.7
-GAMEL( 1994,v4cmaze3c,  v4cmaze3,   crmaze,     crmaze, mpu4vid_state,      v4cmazeb,   ROT0, "Barcrest","The Crystal Maze Team Challenge (v?.?) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )// missing one program rom
+GAMEL( 1994,v4cmaze3,   v4bios,     crmaze,     crmaze,   mpu4vid_state,    crmaze3,    ROT0, "Barcrest","The Crystal Maze Team Challenge (v0.9) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )//SWP 0.7
+GAMEL( 1994,v4cmaze3d,  v4cmaze3,   crmaze,     crmaze,   mpu4vid_state,    crmaze3,    ROT0, "Barcrest","The Crystal Maze Team Challenge (v0.9, Datapak) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )//SWP 0.7D
+GAMEL( 1994,v4cmaze3a,  v4cmaze3,   crmaze,     crmaze,   mpu4vid_state,    crmaze3a,   ROT0, "Barcrest","The Crystal Maze Team Challenge (v1.2, AMLD) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )//SWP 0.7
+GAMEL( 1994,v4cmaze3b,  v4cmaze3,   crmaze,     crmaze,   mpu4vid_state,    v4cmazeb,   ROT0, "Barcrest","The Crystal Maze Team Challenge (v0.8) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )//SWP 0.7
+GAMEL( 1994,v4cmaze3c,  v4cmaze3,   crmaze,     crmaze,   mpu4vid_state,    v4cmazeb,   ROT0, "Barcrest","The Crystal Maze Team Challenge (v?.?) (MPU4 Video)",GAME_FLAGS,layout_crmaze4p )// missing one program rom
 
 GAME(  199?,v4turnov,   v4bios,     mpu4_vid,   turnover, mpu4vid_state,    turnover,   ROT0, "Barcrest","Turnover (v2.3) (MPU4 Video)",GAME_FLAGS )
 
@@ -3598,14 +3601,14 @@ GAME(  1990,v4skltrk,   v4bios,     mpu4_vid,   skiltrek, mpu4vid_state,    skil
 GAME(  1990,v4skltrka,  v4skltrk,   mpu4_vid,   skiltrek, mpu4vid_state,    skiltrek,   ROT0, "Barcrest","Skill Trek (v1.1) (MPU4 Video, set 2)",GAME_FLAGS ) // 12 pound max
 GAME(  1990,v4sklcsh,   v4bios,     mpu4_vid,   skiltrek, mpu4vid_state,    v4barqst,   ROT0, "Barcrest","Skill Cash (v1.1) (MPU4 Video)",GAME_FLAGS )
 
-GAME(  1989,v4addlad,   v4bios,     mpu4_vid,   adders, mpu4vid_state,      adders,     ROT0, "Barcrest","Adders and Ladders (v2.1) (MPU4 Video)",GAME_FLAGS )
-GAME(  1989,v4addlad20, v4addlad,   mpu4_vid,   adders, mpu4vid_state,      adders,     ROT0, "Barcrest","Adders and Ladders (v2.0) (MPU4 Video)",GAME_FLAGS )
+GAME(  1989,v4addlad,   v4bios,     mpu4_vid,   adders,   mpu4vid_state,    adders,     ROT0, "Barcrest","Adders and Ladders (v2.1) (MPU4 Video)",GAME_FLAGS )
+GAME(  1989,v4addlad20, v4addlad,   mpu4_vid,   adders,   mpu4vid_state,    adders,     ROT0, "Barcrest","Adders and Ladders (v2.0) (MPU4 Video)",GAME_FLAGS )
 
 GAME(  1989,v4time,     v4bios,     mpu4_vid,   skiltrek, mpu4vid_state,    timemchn,   ROT0, "Barcrest","Time Machine (v2.0) (MPU4 Video)",GAME_FLAGS )
 
 //Year is a guess, based on the use of the 'Coin Man' logo
-GAME(  1996?,v4mate,    v4bios,     mating,     mating, mpu4vid_state,      mating,     ROT0, "Barcrest","The Mating Game (v0.4) (MPU4 Video)",GAME_FLAGS )//SWP 0.2 /* Using crmaze controls for now, cabinet has trackball */
-GAME(  1996?,v4mated,   v4mate,     mating,     mating, mpu4vid_state,      mating,     ROT0, "Barcrest","The Mating Game (v0.4, Datapak) (MPU4 Video)",GAME_FLAGS )//SWP 0.2D
+GAME(  1996?,v4mate,    v4bios,     mating,     mating,   mpu4vid_state,    mating,     ROT0, "Barcrest","The Mating Game (v0.4) (MPU4 Video)",GAME_FLAGS )//SWP 0.2 /* Using crmaze controls for now, cabinet has trackball */
+GAME(  1996?,v4mated,   v4mate,     mating,     mating,   mpu4vid_state,    mating,     ROT0, "Barcrest","The Mating Game (v0.4, Datapak) (MPU4 Video)",GAME_FLAGS )//SWP 0.2D
 
 /* Games below are missing question ROMs */
 
@@ -3636,39 +3639,39 @@ GAME(  1991,v4opt3d,    v4opt3,     mpu4_vid,   mpu4, mpu4vid_state,        v4op
 
 /* Games below are newer BwB games and use their own BIOS ROMs and hardware setups*/
 
-GAME(  199?,v4vgpok,    0,          bwbvid,     mpu4, driver_device,        0,          ROT0, "BwB","Vegas Poker (prototype, release 2) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?,v4vgpok,    0,          bwbvid,     mpu4, mpu4vid_state,        0,          ROT0, "BwB","Vegas Poker (prototype, release 2) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?,v4psi,      0,          bwbvid,     mpu4, mpu4vid_state,        prizeinv,   ROT0, "BwB","Prize Space Invaders (v1.1) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?,v4psia,     0,          bwbvid,     mpu4, mpu4vid_state,        prizeinv,   ROT0, "BwB","Prize Space Invaders (v1.2) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?,v4psib,     0,          bwbvid,     mpu4, mpu4vid_state,        prizeinv,   ROT0, "BwB","Prize Space Invaders (v2.0?) (MPU4 Video)",GAME_FLAGS ) // bad dump
-GAME(  199?,v4blox,     0,          bwbvid,     mpu4, driver_device,        0,          ROT0, "BwB","Blox (v2.0) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?,v4bloxd,    v4blox,     bwbvid,     mpu4, driver_device,        0,          ROT0, "BwB","Blox (v2.0, Datapak) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?,v4blox,     0,          bwbvid,     mpu4, mpu4vid_state,        0,          ROT0, "BwB","Blox (v2.0) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?,v4bloxd,    v4blox,     bwbvid,     mpu4, mpu4vid_state,        0,          ROT0, "BwB","Blox (v2.0, Datapak) (MPU4 Video)",GAME_FLAGS )
 GAME(  1996,v4reno,     0,          bwbvid5,    mpu4, mpu4vid_state,        prizeinv,   ROT0, "BwB","Reno Reels (20p/10GBP Cash, release A) (MPU4 Video)",GAME_FLAGS )
 
-GAME(  199?,v4bigfrt,   0,          bwbvid,     mpu4, driver_device,        0,          ROT0, "BwB","Big Fruits (v2.0?) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?,v4bubbnk,   0,          bwbvid,     mpu4, driver_device,        0,          ROT0, "BwB","Bubbly Bonk (v4.0?) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?,v4mazbel,   0,          bwbvid,     mpu4, driver_device,        0,          ROT0, "BwB","Mazooma Belle (v2.5) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?,v4mazbla,   0,          bwbvid,     mpu4, driver_device,        0,          ROT0, "BwB","Mazooma Belle (v1.5) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?,v4shpwnd,   0,          bwbvid,     mpu4, driver_device,        0,          ROT0, "BwB","Shop Window (v2.0) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?,v4bigfrt,   0,          bwbvid,     mpu4, mpu4vid_state,        0,          ROT0, "BwB","Big Fruits (v2.0?) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?,v4bubbnk,   0,          bwbvid,     mpu4, mpu4vid_state,        0,          ROT0, "BwB","Bubbly Bonk (v4.0?) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?,v4mazbel,   0,          bwbvid,     mpu4, mpu4vid_state,        0,          ROT0, "BwB","Mazooma Belle (v2.5) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?,v4mazbla,   0,          bwbvid,     mpu4, mpu4vid_state,        0,          ROT0, "BwB","Mazooma Belle (v1.5) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?,v4shpwnd,   0,          bwbvid,     mpu4, mpu4vid_state,        0,          ROT0, "BwB","Shop Window (v2.0) (MPU4 Video)",GAME_FLAGS )
 
-GAME(  199?,v4redhtp,   0,          bwbvid,     mpu4, driver_device,        0,          ROT0, "BwB","Red Hot Poker (20p/10GBP Cash, release 3) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?,v4tetrs,    0,          bwbvid,     mpu4, driver_device,        0,          ROT0, "BwB","BwB Tetris v 2.2 (MPU4 Video)",GAME_FLAGS )
+GAME(  199?,v4redhtp,   0,          bwbvid,     mpu4, mpu4vid_state,        0,          ROT0, "BwB","Red Hot Poker (20p/10GBP Cash, release 3) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?,v4tetrs,    0,          bwbvid,     mpu4, mpu4vid_state,        0,          ROT0, "BwB","BwB Tetris v 2.2 (MPU4 Video)",GAME_FLAGS )
 
-GAME(  199?,v4big40,    0,          bwbvid,     mpu4, driver_device,        0,          ROT0, "BwB","Big 40 Poker (Bwb) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?,v4bulblx,   0,          bwbvid,     mpu4, driver_device,        0,          ROT0, "BwB","Bullion Blox (Bwb) (MPU4 Video)",GAME_FLAGS ) // is this the same game as v4blox?
-GAME(  199?,v4cshinf,   0,          bwbvid,     mpu4, driver_device,        0,          ROT0, "BwB","Cash Inferno (Bwb) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?,v4dbltak,   0,          bwbvid,     mpu4, driver_device,        0,          ROT0, "BwB","Double Take (Bwb) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?,v4gldrsh,   0,          bwbvid,     mpu4, driver_device,        0,          ROT0, "BwB","Gold Rush (Bwb) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?,v4mdice,    0,          bwbvid,     mpu4, driver_device,        0,          ROT0, "BwB","Miami Dice (Bwb) (MPU4 Video)",GAME_FLAGS ) // is this the same as the Nova game below?
-GAME(  199?,v4monte,    0,          bwbvid,     mpu4, driver_device,        0,          ROT0, "BwB","Monte Carlo Or Bust (Bwb) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?,v4ovrmn3,   0,          bwbvid,     mpu4, driver_device,        0,          ROT0, "BwB","Over Moon Pt3 (Bwb) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?,v4pztet,    0,          bwbvid,     mpu4, driver_device,        0,          ROT0, "BwB","Prize Tetris (Bwb) (MPU4 Video, set 1)",GAME_FLAGS ) // is this the same as v4tetrs?
-GAME(  199?,v4pzteta,   v4pztet,    bwbvid,     mpu4, driver_device,        0,          ROT0, "BwB","Prize Tetris (Bwb) (MPU4 Video, set 2)",GAME_FLAGS )
-GAME(  199?,v4rhmaz,    0,          bwbvid,     mpu4, driver_device,        0,          ROT0, "BwB","Red Hot Mazooma Belle (Bwb) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?,v4sunbst,   0,          bwbvid,     mpu4, driver_device,        0,          ROT0, "BwB","Sunburst (Bwb) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?,v4timebn,   0,          bwbvid,     mpu4, driver_device,        0,          ROT0, "BwB","Time Bandit (Bwb) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?,v4sixx,     0,          bwbvid,     mpu4, driver_device,        0,          ROT0, "BwB","6-X (Bwb) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?,v4megbuk,   0,          bwbvid,     mpu4, driver_device,        0,          ROT0, "BwB","Megabucks Poker (Bwb) (MPU4 Video)",GAME_FLAGS ) // no video roms!
-GAME(  199?,v4rencas,   0,          bwbvid,     mpu4, driver_device,        0,          ROT0, "BwB","Reno Casino (Bwb) (MPU4 Video)",GAME_FLAGS ) // no video roms!
+GAME(  199?,v4big40,    0,          bwbvid,     mpu4, mpu4vid_state,        0,          ROT0, "BwB","Big 40 Poker (Bwb) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?,v4bulblx,   0,          bwbvid,     mpu4, mpu4vid_state,        0,          ROT0, "BwB","Bullion Blox (Bwb) (MPU4 Video)",GAME_FLAGS ) // is this the same game as v4blox?
+GAME(  199?,v4cshinf,   0,          bwbvid,     mpu4, mpu4vid_state,        0,          ROT0, "BwB","Cash Inferno (Bwb) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?,v4dbltak,   0,          bwbvid,     mpu4, mpu4vid_state,        0,          ROT0, "BwB","Double Take (Bwb) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?,v4gldrsh,   0,          bwbvid,     mpu4, mpu4vid_state,        0,          ROT0, "BwB","Gold Rush (Bwb) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?,v4mdice,    0,          bwbvid,     mpu4, mpu4vid_state,        0,          ROT0, "BwB","Miami Dice (Bwb) (MPU4 Video)",GAME_FLAGS ) // is this the same as the Nova game below?
+GAME(  199?,v4monte,    0,          bwbvid,     mpu4, mpu4vid_state,        0,          ROT0, "BwB","Monte Carlo Or Bust (Bwb) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?,v4ovrmn3,   0,          bwbvid,     mpu4, mpu4vid_state,        0,          ROT0, "BwB","Over Moon Pt3 (Bwb) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?,v4pztet,    0,          bwbvid,     mpu4, mpu4vid_state,        0,          ROT0, "BwB","Prize Tetris (Bwb) (MPU4 Video, set 1)",GAME_FLAGS ) // is this the same as v4tetrs?
+GAME(  199?,v4pzteta,   v4pztet,    bwbvid,     mpu4, mpu4vid_state,        0,          ROT0, "BwB","Prize Tetris (Bwb) (MPU4 Video, set 2)",GAME_FLAGS )
+GAME(  199?,v4rhmaz,    0,          bwbvid,     mpu4, mpu4vid_state,        0,          ROT0, "BwB","Red Hot Mazooma Belle (Bwb) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?,v4sunbst,   0,          bwbvid,     mpu4, mpu4vid_state,        0,          ROT0, "BwB","Sunburst (Bwb) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?,v4timebn,   0,          bwbvid,     mpu4, mpu4vid_state,        0,          ROT0, "BwB","Time Bandit (Bwb) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?,v4sixx,     0,          bwbvid,     mpu4, mpu4vid_state,        0,          ROT0, "BwB","6-X (Bwb) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?,v4megbuk,   0,          bwbvid,     mpu4, mpu4vid_state,        0,          ROT0, "BwB","Megabucks Poker (Bwb) (MPU4 Video)",GAME_FLAGS ) // no video roms!
+GAME(  199?,v4rencas,   0,          bwbvid,     mpu4, mpu4vid_state,        0,          ROT0, "BwB","Reno Casino (Bwb) (MPU4 Video)",GAME_FLAGS ) // no video roms!
 
 
 /* Uncertain BIOS */
@@ -3678,6 +3681,6 @@ GAME(  199?,v4frfact,   v4bios,     crmaze,     crmaze, mpu4vid_state,      crma
 /* Nova - is this the same video board? One of the games displays 'Resetting' but the others do nothing interesting and access strange addresses */
 /* All contain BwB video in the BIOS rom tho */
 GAME(  199?,v4cybcas,   0,          bwbvid5,    mpu4, mpu4vid_state,        cybcas,     ROT0, "Nova","Cyber Casino (Nova) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?,v4miami,    0,          bwbvid5,    mpu4, driver_device,        0,          ROT0, "Nova","Miami Dice (Nova) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?,v4missis,   0,          bwbvid5,    mpu4, driver_device,        0,          ROT0, "Nova","Mississippi Lady (Nova) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?,v4picdil,   0,          bwbvid5,    mpu4, driver_device,        0,          ROT0, "Nova","Piccadilly Nights (Nova) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?,v4miami,    0,          bwbvid5,    mpu4, mpu4vid_state,        0,          ROT0, "Nova","Miami Dice (Nova) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?,v4missis,   0,          bwbvid5,    mpu4, mpu4vid_state,        0,          ROT0, "Nova","Mississippi Lady (Nova) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?,v4picdil,   0,          bwbvid5,    mpu4, mpu4vid_state,        0,          ROT0, "Nova","Piccadilly Nights (Nova) (MPU4 Video)",GAME_FLAGS )

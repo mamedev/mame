@@ -8,6 +8,7 @@
 
 #include "sound/samples.h"
 #include "sound/sn76477.h"
+#include "screen.h"
 
 class astrof_state : public driver_device
 {

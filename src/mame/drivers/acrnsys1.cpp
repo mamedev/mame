@@ -52,6 +52,8 @@ Note that left-most digit is not wired up, and therefore will always be blank.
 #include "machine/74145.h"
 #include "imagedev/cassette.h"
 #include "sound/wave.h"
+#include "speaker.h"
+
 #include "acrnsys1.lh"
 
 
@@ -240,7 +242,7 @@ INPUT_PORTS_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( acrnsys1, acrnsys1_state )
+static MACHINE_CONFIG_START( acrnsys1 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 1008000)  /* 1.008 MHz */
 	MCFG_CPU_PROGRAM_MAP(acrnsys1_map)
@@ -278,5 +280,5 @@ ROM_END
     GAME DRIVERS
 ***************************************************************************/
 
-/*    YEAR  NAME      PARENT COMPAT MACHINE   INPUT     INIT  COMPANY  FULLNAME    FLAGS */
-COMP( 1978, acrnsys1, 0,     0,     acrnsys1, acrnsys1, driver_device, 0,    "Acorn", "Acorn System 1", 0 )
+/*    YEAR  NAME      PARENT COMPAT MACHINE   INPUT     STATE           INIT  COMPANY  FULLNAME          FLAGS */
+COMP( 1978, acrnsys1, 0,     0,     acrnsys1, acrnsys1, acrnsys1_state, 0,    "Acorn", "Acorn System 1", 0 )

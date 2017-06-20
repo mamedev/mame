@@ -129,9 +129,9 @@ void mame_machine_manager::start_luaengine()
 			emu_file file(options().ini_path(), OPEN_FLAG_READ);
 			if (file.open("plugin.ini") == osd_file::error::NONE)
 			{
-				bool result = m_plugins->parse_ini_file((util::core_file&)file, OPTION_PRIORITY_MAME_INI, OPTION_PRIORITY_DRIVER_INI, error);
+				bool result = m_plugins->parse_ini_file((util::core_file&)file, OPTION_PRIORITY_MAME_INI, OPTION_PRIORITY_MAME_INI < OPTION_PRIORITY_DRIVER_INI, error);
 				if (!result)
-					osd_printf_error("**Error loading plugin.ini**");
+					osd_printf_error("**Error loading plugin.ini**\n");
 			}
 		}
 		for (auto &curentry : *m_plugins)
@@ -214,6 +214,11 @@ int mame_machine_manager::execute()
 			validity_checker valid(m_options);
 			valid.set_verbose(false);
 			valid.check_shared_source(*system);
+		}
+
+		// reevaluate slot options until nothing changes
+		while (mame_options::reevaluate_slot_options(m_options))
+		{
 		}
 
 		// create the machine configuration
@@ -299,7 +304,10 @@ void mame_machine_manager::create_custom(running_machine& machine)
 
 	// start favorite manager
 	m_favorite = std::make_unique<favorite_manager>(machine, m_ui->options());
+}
 
+void mame_machine_manager::load_cheatfiles(running_machine& machine)
+{
 	// set up the cheat engine
 	m_cheat = std::make_unique<cheat_manager>(machine);
 }
@@ -318,10 +326,16 @@ void emulator_info::display_ui_chooser(running_machine& machine)
 		ui::menu_select_game::force_game_select(mui, container);
 }
 
-int emulator_info::start_frontend(emu_options &options, osd_interface &osd, int argc, char *argv[])
+int emulator_info::start_frontend(emu_options &options, osd_interface &osd, std::vector<std::string> &args)
 {
 	cli_frontend frontend(options, osd);
-	return frontend.execute(argc, argv);
+	return frontend.execute(args);
+}
+
+int emulator_info::start_frontend(emu_options &options, osd_interface &osd, int argc, char *argv[])
+{
+	std::vector<std::string> args(argv, argv + argc);
+	return start_frontend(options, osd, args);
 }
 
 void emulator_info::draw_user_interface(running_machine& machine)

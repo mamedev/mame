@@ -1,12 +1,15 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
 #include "emu.h"
-#include "rendlay.h"
 #include "includes/comx35.h"
+
 #include "cpu/cosmac/cosmac.h"
 #include "sound/cdp1869.h"
 #include "sound/wave.h"
 #include "video/mc6845.h"
+#include "rendlay.h"
+#include "screen.h"
+#include "speaker.h"
 
 WRITE8_MEMBER( comx35_state::cdp1869_w )
 {
@@ -85,14 +88,14 @@ void comx35_state::video_start()
 
 /* Machine Drivers */
 
-MACHINE_CONFIG_FRAGMENT( comx35_pal_video )
-	MCFG_CDP1869_SCREEN_PAL_ADD(CDP1869_TAG, SCREEN_TAG, CDP1869_DOT_CLK_PAL)
+MACHINE_CONFIG_START( comx35_pal_video )
+	MCFG_CDP1869_SCREEN_PAL_ADD(CDP1869_TAG, SCREEN_TAG, cdp1869_device::DOT_CLK_PAL)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_CDP1869_ADD(CDP1869_TAG, CDP1869_DOT_CLK_PAL, cdp1869_page_ram)
-	MCFG_CDP1869_COLOR_CLOCK(CDP1869_COLOR_CLK_PAL)
+	MCFG_CDP1869_ADD(CDP1869_TAG, cdp1869_device::DOT_CLK_PAL, cdp1869_page_ram)
+	MCFG_CDP1869_COLOR_CLOCK(cdp1869_device::COLOR_CLK_PAL)
 	MCFG_CDP1869_CHAR_PCB_READ_OWNER(comx35_state, comx35_pcb_r)
 	MCFG_CDP1869_CHAR_RAM_READ_OWNER(comx35_state, comx35_charram_r)
 	MCFG_CDP1869_CHAR_RAM_WRITE_OWNER(comx35_state, comx35_charram_w)
@@ -105,14 +108,14 @@ MACHINE_CONFIG_FRAGMENT( comx35_pal_video )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_FRAGMENT( comx35_ntsc_video )
-	MCFG_CDP1869_SCREEN_NTSC_ADD(CDP1869_TAG, SCREEN_TAG, CDP1869_DOT_CLK_NTSC)
+MACHINE_CONFIG_START( comx35_ntsc_video )
+	MCFG_CDP1869_SCREEN_NTSC_ADD(CDP1869_TAG, SCREEN_TAG, cdp1869_device::DOT_CLK_NTSC)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_CDP1869_ADD(CDP1869_TAG, CDP1869_DOT_CLK_NTSC, cdp1869_page_ram)
-	MCFG_CDP1869_COLOR_CLOCK(CDP1869_COLOR_CLK_NTSC)
+	MCFG_CDP1869_ADD(CDP1869_TAG, cdp1869_device::DOT_CLK_NTSC, cdp1869_page_ram)
+	MCFG_CDP1869_COLOR_CLOCK(cdp1869_device::COLOR_CLK_NTSC)
 	MCFG_CDP1869_CHAR_PCB_READ_OWNER(comx35_state, comx35_pcb_r)
 	MCFG_CDP1869_CHAR_RAM_READ_OWNER(comx35_state, comx35_charram_r)
 	MCFG_CDP1869_CHAR_RAM_WRITE_OWNER(comx35_state, comx35_charram_w)

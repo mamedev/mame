@@ -216,17 +216,20 @@ DIP locations verified for:
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/z180/z180.h"
-#include "cpu/m68000/m68000.h"
+#include "includes/asuka.h"
 #include "includes/taitoipt.h"
 #include "audio/taitosnd.h"
+
+#include "cpu/m68000/m68000.h"
+#include "cpu/z180/z180.h"
+#include "cpu/z80/z80.h"
+#include "machine/bonzeadv.h"
 #include "machine/watchdog.h"
 #include "sound/2610intf.h"
-#include "sound/ym2151.h"
 #include "sound/msm5205.h"
-#include "includes/asuka.h"
-#include "machine/bonzeadv.h"
+#include "sound/ym2151.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /***********************************************************
@@ -248,7 +251,7 @@ void asuka_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 
 INTERRUPT_GEN_MEMBER(asuka_state::cadash_interrupt)
 {
-	timer_set(m_maincpu->cycles_to_attotime(500), TIMER_CADASH_INTERRUPT5);
+	m_cadash_int5_timer->adjust(m_maincpu->cycles_to_attotime(500));
 	device.execute().set_input_line(4, HOLD_LINE);  /* interrupt vector 4 */
 }
 
@@ -271,16 +274,16 @@ WRITE8_MEMBER(asuka_state::sound_bankswitch_2151_w)
 
 WRITE_LINE_MEMBER(asuka_state::asuka_msm5205_vck)
 {
-	if (m_adpcm_data != -1)
+	if (!state)
+		return;
+
+	m_adpcm_ff = !m_adpcm_ff;
+	m_adpcm_select->select_w(m_adpcm_ff);
+
+	if (m_adpcm_ff)
 	{
-		m_msm->data_w(m_adpcm_data & 0x0f);
-		m_adpcm_data = -1;
-	}
-	else
-	{
-		m_adpcm_data = memregion("ymsnd")->base()[m_adpcm_pos];
+		m_adpcm_select->ba_w(m_sound_data[m_adpcm_pos]);
 		m_adpcm_pos = (m_adpcm_pos + 1) & 0xffff;
-		m_msm->data_w(m_adpcm_data >> 4);
 	}
 }
 
@@ -292,6 +295,7 @@ WRITE8_MEMBER(asuka_state::asuka_msm5205_address_w)
 WRITE8_MEMBER(asuka_state::asuka_msm5205_start_w)
 {
 	m_msm->reset_w(0);
+	m_adpcm_ff = false;
 }
 
 WRITE8_MEMBER(asuka_state::asuka_msm5205_stop_w)
@@ -308,6 +312,15 @@ READ16_MEMBER(asuka_state::cadash_share_r)
 WRITE16_MEMBER(asuka_state::cadash_share_w)
 {
 	m_cadash_shared_ram[offset] = data & 0xff;
+}
+
+
+WRITE8_MEMBER(asuka_state::coin_control_w)
+{
+	machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
+	machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
+	machine().bookkeeping().coin_counter_w(0, data & 0x04);
+	machine().bookkeeping().coin_counter_w(1, data & 0x08);
 }
 
 
@@ -778,7 +791,7 @@ void asuka_state::machine_start()
 	membank("audiobank")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x04000);
 
 	save_item(NAME(m_adpcm_pos));
-	save_item(NAME(m_adpcm_data));
+	save_item(NAME(m_adpcm_ff));
 
 	save_item(NAME(m_current_round));
 	save_item(NAME(m_current_bank));
@@ -792,7 +805,7 @@ void asuka_state::machine_start()
 void asuka_state::machine_reset()
 {
 	m_adpcm_pos = 0;
-	m_adpcm_data = -1;
+	m_adpcm_ff = false;
 	m_current_round = 0;
 	m_current_bank = 0;
 	m_video_ctrl = 0;
@@ -803,7 +816,7 @@ void asuka_state::machine_reset()
 	memset(m_cval, 0, 26);
 }
 
-void asuka_state::screen_eof_asuka(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(asuka_state::screen_vblank_asuka)
 {
 	// rising edge
 	if (state)
@@ -812,7 +825,7 @@ void asuka_state::screen_eof_asuka(screen_device &screen, bool state)
 	}
 }
 
-static MACHINE_CONFIG_START( bonzeadv, asuka_state )
+static MACHINE_CONFIG_START( bonzeadv )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)    /* checked on PCB */
@@ -834,7 +847,7 @@ static MACHINE_CONFIG_START( bonzeadv, asuka_state )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 3*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(asuka_state, screen_update_bonzeadv)
-	MCFG_SCREEN_VBLANK_DRIVER(asuka_state, screen_eof_asuka)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(asuka_state, screen_vblank_asuka))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", asuka)
@@ -868,7 +881,7 @@ static MACHINE_CONFIG_START( bonzeadv, asuka_state )
 	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( asuka, asuka_state )
+static MACHINE_CONFIG_START( asuka )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)   /* verified on pcb */
@@ -886,6 +899,7 @@ static MACHINE_CONFIG_START( asuka, asuka_state )
 	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
 	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
 	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(asuka_state, coin_control_w))
 	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
@@ -895,7 +909,7 @@ static MACHINE_CONFIG_START( asuka, asuka_state )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(asuka_state, screen_update_asuka)
-	MCFG_SCREEN_VBLANK_DRIVER(asuka_state, screen_eof_asuka)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(asuka_state, screen_vblank_asuka))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", asuka)
@@ -927,15 +941,18 @@ static MACHINE_CONFIG_START( asuka, asuka_state )
 
 	MCFG_SOUND_ADD("msm", MSM5205, XTAL_384kHz) /* verified on pcb */
 	MCFG_MSM5205_VCLK_CB(WRITELINE(asuka_state, asuka_msm5205_vck))  /* VCK function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8 kHz */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MCFG_DEVICE_ADD("adpcm_select", LS157, 0)
+	MCFG_74157_OUT_CB(DEVWRITE8("msm", msm5205_device, data_w))
 
 	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
 	MCFG_TC0140SYT_MASTER_CPU("maincpu")
 	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( cadash, asuka_state )
+static MACHINE_CONFIG_START( cadash )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)   /* 68000p12 running at 16Mhz, verified on pcb  */
@@ -957,6 +974,7 @@ static MACHINE_CONFIG_START( cadash, asuka_state )
 	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
 	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
 	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(asuka_state, coin_control_w))
 	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
@@ -966,7 +984,7 @@ static MACHINE_CONFIG_START( cadash, asuka_state )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(asuka_state, screen_update_bonzeadv)
-	MCFG_SCREEN_VBLANK_DRIVER(asuka_state, screen_eof_asuka)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(asuka_state, screen_vblank_asuka))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", asuka)
@@ -1002,7 +1020,7 @@ static MACHINE_CONFIG_START( cadash, asuka_state )
 	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( mofflott, asuka_state )
+static MACHINE_CONFIG_START( mofflott )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)    /* 8 MHz ??? */
@@ -1020,6 +1038,7 @@ static MACHINE_CONFIG_START( mofflott, asuka_state )
 	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
 	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
 	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(asuka_state, coin_control_w))
 	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
@@ -1029,7 +1048,7 @@ static MACHINE_CONFIG_START( mofflott, asuka_state )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(asuka_state, screen_update_asuka)
-	MCFG_SCREEN_VBLANK_DRIVER(asuka_state, screen_eof_asuka)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(asuka_state, screen_vblank_asuka))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", asuka)
@@ -1061,15 +1080,18 @@ static MACHINE_CONFIG_START( mofflott, asuka_state )
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(asuka_state, asuka_msm5205_vck))  /* VCK function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8 kHz */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MCFG_DEVICE_ADD("adpcm_select", LS157, 0)
+	MCFG_74157_OUT_CB(DEVWRITE8("msm", msm5205_device, data_w))
 
 	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
 	MCFG_TC0140SYT_MASTER_CPU("maincpu")
 	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( galmedes, asuka_state )
+static MACHINE_CONFIG_START( galmedes )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)    /* 8 MHz ??? */
@@ -1087,6 +1109,7 @@ static MACHINE_CONFIG_START( galmedes, asuka_state )
 	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
 	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
 	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(asuka_state, coin_control_w))
 	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
@@ -1096,7 +1119,7 @@ static MACHINE_CONFIG_START( galmedes, asuka_state )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(asuka_state, screen_update_asuka)
-	MCFG_SCREEN_VBLANK_DRIVER(asuka_state, screen_eof_asuka)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(asuka_state, screen_vblank_asuka))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", asuka)
@@ -1131,7 +1154,7 @@ static MACHINE_CONFIG_START( galmedes, asuka_state )
 	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( eto, asuka_state )
+static MACHINE_CONFIG_START( eto )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)    /* 8 MHz ??? */
@@ -1149,6 +1172,7 @@ static MACHINE_CONFIG_START( eto, asuka_state )
 	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
 	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
 	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(asuka_state, coin_control_w))
 	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
@@ -1158,7 +1182,7 @@ static MACHINE_CONFIG_START( eto, asuka_state )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(asuka_state, screen_update_asuka)
-	MCFG_SCREEN_VBLANK_DRIVER(asuka_state, screen_eof_asuka)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(asuka_state, screen_vblank_asuka))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", asuka)
@@ -1563,10 +1587,10 @@ ROM_END
 
 ROM_START( cadashi )
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 512k for 68000 code */
-	ROM_LOAD16_BYTE( "c21-14it",  0x00000, 0x20000, CRC(d1d9e613) SHA1(296c188daec962bdb4e78e20f1cc4c7d1f4dda09) ) /* need correct Taito ID #s for these roms */
-	ROM_LOAD16_BYTE( "c21-16it",  0x00001, 0x20000, CRC(142256ef) SHA1(9ffc64d7c900bfa0300de9e6d18c7458f4c76ed7) ) /* ID numbers should be at least 26 or higher */
-	ROM_LOAD16_BYTE( "c21-13it",  0x40000, 0x20000, CRC(c9cf6e30) SHA1(872c871cd60e0aa7149660277f67f90748d82743) )
-	ROM_LOAD16_BYTE( "c21-17it",  0x40001, 0x20000, CRC(641fc9dd) SHA1(1497e39f6b250de39ef2785aaca7e68a803612fa) )
+	ROM_LOAD16_BYTE( "c21_27-1.ic11",  0x00000, 0x20000, CRC(d1d9e613) SHA1(296c188daec962bdb4e78e20f1cc4c7d1f4dda09) )
+	ROM_LOAD16_BYTE( "c21_29-1.ic15",  0x00001, 0x20000, CRC(142256ef) SHA1(9ffc64d7c900bfa0300de9e6d18c7458f4c76ed7) )
+	ROM_LOAD16_BYTE( "c21_26-1.ic10",  0x40000, 0x20000, CRC(c9cf6e30) SHA1(872c871cd60e0aa7149660277f67f90748d82743) )
+	ROM_LOAD16_BYTE( "c21_28-1.ic14",  0x40001, 0x20000, CRC(641fc9dd) SHA1(1497e39f6b250de39ef2785aaca7e68a803612fa) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "c21-02.9",  0x00000, 0x80000, CRC(205883b9) SHA1(5aafee8cab3f949a7db91bcc26912f331041b51e) ) /* SCR tiles (8 x 8) */
@@ -1723,31 +1747,35 @@ ROM_START( eto )
 	ROM_LOAD( "eto-5.ic27", 0x00000, 0x10000, CRC(b3689da0) SHA1(812d2e0a794403df9f0a5035784f14cd070ea080) ) /* banked */
 ROM_END
 
+DRIVER_INIT_MEMBER(asuka_state, cadash)
+{
+	m_cadash_int5_timer = timer_alloc(TIMER_CADASH_INTERRUPT5);
+}
 
-GAME( 1988, bonzeadv,  0,        bonzeadv, bonzeadv, driver_device, 0, ROT0,   "Taito Corporation Japan",   "Bonze Adventure (World, Newer)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, bonzeadvo, bonzeadv, bonzeadv, bonzeadv, driver_device, 0, ROT0,   "Taito Corporation Japan",   "Bonze Adventure (World, Older)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, bonzeadvu, bonzeadv, bonzeadv, jigkmgri, driver_device, 0, ROT0,   "Taito America Corporation", "Bonze Adventure (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, jigkmgri,  bonzeadv, bonzeadv, jigkmgri, driver_device, 0, ROT0,   "Taito Corporation",         "Jigoku Meguri (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, bonzeadvp, bonzeadv, bonzeadv, jigkmgri, driver_device, 0, ROT0,   "Taito Corporation Japan",   "Bonze Adventure (World, prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, bonzeadv,  0,        bonzeadv, bonzeadv, asuka_state, 0,      ROT0,   "Taito Corporation Japan",   "Bonze Adventure (World, Newer)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, bonzeadvo, bonzeadv, bonzeadv, bonzeadv, asuka_state, 0,      ROT0,   "Taito Corporation Japan",   "Bonze Adventure (World, Older)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, bonzeadvu, bonzeadv, bonzeadv, jigkmgri, asuka_state, 0,      ROT0,   "Taito America Corporation", "Bonze Adventure (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, jigkmgri,  bonzeadv, bonzeadv, jigkmgri, asuka_state, 0,      ROT0,   "Taito Corporation",         "Jigoku Meguri (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, bonzeadvp, bonzeadv, bonzeadv, jigkmgri, asuka_state, 0,      ROT0,   "Taito Corporation Japan",   "Bonze Adventure (World, prototype)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, asuka,     0,        asuka,    asuka, driver_device,    0, ROT270, "Taito Corporation",         "Asuka & Asuka (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, asukaj,    asuka,    asuka,    asuka, driver_device,    0, ROT270, "Taito Corporation",         "Asuka & Asuka (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, asuka,     0,        asuka,    asuka,    asuka_state, 0,      ROT270, "Taito Corporation",         "Asuka & Asuka (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, asukaj,    asuka,    asuka,    asuka,    asuka_state, 0,      ROT270, "Taito Corporation",         "Asuka & Asuka (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, mofflott,  0,        mofflott, mofflott, driver_device, 0, ROT270, "Taito Corporation",         "Maze of Flott (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mofflott,  0,        mofflott, mofflott, asuka_state, 0,      ROT270, "Taito Corporation",         "Maze of Flott (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, cadash,    0,        cadash,   cadash, driver_device,   0, ROT0,   "Taito Corporation Japan",   "Cadash (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
-GAME( 1989, cadashj,   cadash,   cadash,   cadashj, driver_device,  0, ROT0,   "Taito Corporation",         "Cadash (Japan, version 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
-GAME( 1989, cadashj1,  cadash,   cadash,   cadashj, driver_device,  0, ROT0,   "Taito Corporation",         "Cadash (Japan, version 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
-GAME( 1989, cadashjo,  cadash,   cadash,   cadashj, driver_device,  0, ROT0,   "Taito Corporation",         "Cadash (Japan, oldest version)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
-GAME( 1989, cadashu,   cadash,   cadash,   cadashu, driver_device,  0, ROT0,   "Taito America Corporation", "Cadash (US, version 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
-GAME( 1989, cadashi,   cadash,   cadash,   cadash, driver_device,   0, ROT0,   "Taito Corporation Japan",   "Cadash (Italy)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
-GAME( 1989, cadashf,   cadash,   cadash,   cadash, driver_device,   0, ROT0,   "Taito Corporation Japan",   "Cadash (France)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
-GAME( 1989, cadashg,   cadash,   cadash,   cadash, driver_device,   0, ROT0,   "Taito Corporation Japan",   "Cadash (Germany, version 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
-GAME( 1989, cadashp,   cadash,   cadash,   cadashj, driver_device,  0, ROT0,   "Taito Corporation Japan",   "Cadash (World, prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN)
+GAME( 1989, cadash,    0,        cadash,   cadash,   asuka_state, cadash, ROT0,   "Taito Corporation Japan",   "Cadash (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
+GAME( 1989, cadashj,   cadash,   cadash,   cadashj,  asuka_state, cadash, ROT0,   "Taito Corporation",         "Cadash (Japan, version 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
+GAME( 1989, cadashj1,  cadash,   cadash,   cadashj,  asuka_state, cadash, ROT0,   "Taito Corporation",         "Cadash (Japan, version 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
+GAME( 1989, cadashjo,  cadash,   cadash,   cadashj,  asuka_state, cadash, ROT0,   "Taito Corporation",         "Cadash (Japan, oldest version)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
+GAME( 1989, cadashu,   cadash,   cadash,   cadashu,  asuka_state, cadash, ROT0,   "Taito America Corporation", "Cadash (US, version 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
+GAME( 1989, cadashi,   cadash,   cadash,   cadash,   asuka_state, cadash, ROT0,   "Taito Corporation Japan",   "Cadash (Italy)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
+GAME( 1989, cadashf,   cadash,   cadash,   cadash,   asuka_state, cadash, ROT0,   "Taito Corporation Japan",   "Cadash (France)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
+GAME( 1989, cadashg,   cadash,   cadash,   cadash,   asuka_state, cadash, ROT0,   "Taito Corporation Japan",   "Cadash (Germany, version 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
+GAME( 1989, cadashp,   cadash,   cadash,   cadashj,  asuka_state, cadash, ROT0,   "Taito Corporation Japan",   "Cadash (World, prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN)
 
-GAME( 1992, galmedes,  0,        galmedes, galmedes, driver_device, 0, ROT270, "Visco",                     "Galmedes (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, galmedes,  0,        galmedes, galmedes, asuka_state, 0,      ROT270, "Visco",                     "Galmedes (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1993, earthjkr,  0,        galmedes, earthjkr, driver_device, 0, ROT270, "Visco",                     "U.N. Defense Force: Earth Joker (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, earthjkrp, earthjkr, galmedes, earthjkr, driver_device, 0, ROT270, "Visco",                     "U.N. Defense Force: Earth Joker (Japan, prototype?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, earthjkr,  0,        galmedes, earthjkr, asuka_state, 0,      ROT270, "Visco",                     "U.N. Defense Force: Earth Joker (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, earthjkrp, earthjkr, galmedes, earthjkr, asuka_state, 0,      ROT270, "Visco",                     "U.N. Defense Force: Earth Joker (Japan, prototype?)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1994, eto,       0,        eto,      eto, driver_device,      0, ROT0,   "Visco",                     "Kokontouzai Eto Monogatari (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, eto,       0,        eto,      eto,      asuka_state, 0,      ROT0,   "Visco",                     "Kokontouzai Eto Monogatari (Japan)", MACHINE_SUPPORTS_SAVE )

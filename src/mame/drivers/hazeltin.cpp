@@ -24,6 +24,7 @@ References:
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/i8085/i8085.h"
 #include "machine/ay31015.h"
 #include "machine/clock.h"
@@ -32,6 +33,9 @@ References:
 #include "machine/netlist.h"
 #include "machine/nl_hazelvid.h"
 #include "netlist/devices/net_lib.h"
+
+#include "screen.h"
+
 
 #define CPU_TAG         "maincpu"
 #define NETLIST_TAG     "videobrd"
@@ -44,10 +48,12 @@ References:
 #define MISCKEYS_TAG    "misc_keys"
 #define SCREEN_TAG      "screen"
 #define BAUD_PROM_TAG   "u39"
-#define NL_PROM_TAG     "videobrd:u71"
-#define NL_EPROM_TAG    "videobrd:u78"
-#define VIDEO_PROM_TAG  "u71"
-#define CHAR_EPROM_TAG  "u78"
+//#define NL_PROM_TAG     "videobrd:u71"
+//#define NL_EPROM_TAG    "videobrd:u78"
+// VIDEO_PROM at u71
+#define VIDEO_PROM_TAG  NETLIST_TAG ":u90_702128_82s129.bin"
+// CHAR_EPROM at u78
+#define CHAR_EPROM_TAG  NETLIST_TAG ":u83_chr.bin"
 #define VIDEO_OUT_TAG   "videobrd:video_out"
 #define VBLANK_OUT_TAG  "videobrd:vblank"
 #define TVINTERQ_OUT_TAG "videobrd:tvinterq"
@@ -79,8 +85,6 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, CPU_TAG)
 		, m_video_board(*this, NETLIST_TAG)
-		, m_u71(*this, NL_PROM_TAG)
-		, m_u78(*this, NL_EPROM_TAG)
 		, m_u9(*this, "videobrd:u9")
 		, m_u10(*this, "videobrd:u10")
 		, m_u11(*this, "videobrd:u11")
@@ -163,38 +167,36 @@ public:
 
 private:
 	required_device<cpu_device> m_maincpu;
-	required_device<netlist_mame_device_t> m_video_board;
-	required_device<netlist_mame_rom_t> m_u71;
-	required_device<netlist_mame_rom_t> m_u78;
-	required_device<netlist_ram_pointer_t> m_u9;
-	required_device<netlist_ram_pointer_t> m_u10;
-	required_device<netlist_ram_pointer_t> m_u11;
-	required_device<netlist_ram_pointer_t> m_u12;
-	required_device<netlist_ram_pointer_t> m_u13;
-	required_device<netlist_ram_pointer_t> m_u14;
-	required_device<netlist_ram_pointer_t> m_u15;
-	required_device<netlist_ram_pointer_t> m_u16;
-	required_device<netlist_ram_pointer_t> m_u22;
-	required_device<netlist_ram_pointer_t> m_u23;
-	required_device<netlist_ram_pointer_t> m_u24;
-	required_device<netlist_ram_pointer_t> m_u25;
-	required_device<netlist_ram_pointer_t> m_u26;
-	required_device<netlist_ram_pointer_t> m_u27;
-	required_device<netlist_ram_pointer_t> m_u28;
-	required_device<netlist_ram_pointer_t> m_u29;
-	required_device<netlist_mame_logic_input_t> m_cpu_db0;
-	required_device<netlist_mame_logic_input_t> m_cpu_db1;
-	required_device<netlist_mame_logic_input_t> m_cpu_db2;
-	required_device<netlist_mame_logic_input_t> m_cpu_db3;
-	required_device<netlist_mame_logic_input_t> m_cpu_db4;
-	required_device<netlist_mame_logic_input_t> m_cpu_db5;
-	required_device<netlist_mame_logic_input_t> m_cpu_db6;
-	required_device<netlist_mame_logic_input_t> m_cpu_db7;
-	required_device<netlist_mame_logic_input_t> m_cpu_ba4;
-	required_device<netlist_mame_logic_input_t> m_cpu_iowq;
-	required_device<netlist_mame_analog_output_t> m_video_out;
-	required_device<netlist_mame_analog_output_t> m_vblank_out;
-	required_device<netlist_mame_analog_output_t> m_tvinterq_out;
+	required_device<netlist_mame_device> m_video_board;
+	required_device<netlist_mame_ram_pointer_device> m_u9;
+	required_device<netlist_mame_ram_pointer_device> m_u10;
+	required_device<netlist_mame_ram_pointer_device> m_u11;
+	required_device<netlist_mame_ram_pointer_device> m_u12;
+	required_device<netlist_mame_ram_pointer_device> m_u13;
+	required_device<netlist_mame_ram_pointer_device> m_u14;
+	required_device<netlist_mame_ram_pointer_device> m_u15;
+	required_device<netlist_mame_ram_pointer_device> m_u16;
+	required_device<netlist_mame_ram_pointer_device> m_u22;
+	required_device<netlist_mame_ram_pointer_device> m_u23;
+	required_device<netlist_mame_ram_pointer_device> m_u24;
+	required_device<netlist_mame_ram_pointer_device> m_u25;
+	required_device<netlist_mame_ram_pointer_device> m_u26;
+	required_device<netlist_mame_ram_pointer_device> m_u27;
+	required_device<netlist_mame_ram_pointer_device> m_u28;
+	required_device<netlist_mame_ram_pointer_device> m_u29;
+	required_device<netlist_mame_logic_input_device> m_cpu_db0;
+	required_device<netlist_mame_logic_input_device> m_cpu_db1;
+	required_device<netlist_mame_logic_input_device> m_cpu_db2;
+	required_device<netlist_mame_logic_input_device> m_cpu_db3;
+	required_device<netlist_mame_logic_input_device> m_cpu_db4;
+	required_device<netlist_mame_logic_input_device> m_cpu_db5;
+	required_device<netlist_mame_logic_input_device> m_cpu_db6;
+	required_device<netlist_mame_logic_input_device> m_cpu_db7;
+	required_device<netlist_mame_logic_input_device> m_cpu_ba4;
+	required_device<netlist_mame_logic_input_device> m_cpu_iowq;
+	required_device<netlist_mame_analog_output_device> m_video_out;
+	required_device<netlist_mame_analog_output_device> m_vblank_out;
+	required_device<netlist_mame_analog_output_device> m_tvinterq_out;
 	required_device<ay31015_device> m_uart;
 	required_device<ay3600_device> m_kbdc;
 	required_ioport m_baud_dips;
@@ -684,7 +686,7 @@ static GFXDECODE_START( hazl1500 )
 	GFXDECODE_ENTRY( CHAR_EPROM_TAG, 0x0000, hazl1500_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( hazl1500, hazl1500_state )
+static MACHINE_CONFIG_START( hazl1500 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(CPU_TAG, I8080, XTAL_18MHz/9) // 18MHz crystal on schematics, using an i8224 clock gen/driver IC
 	MCFG_CPU_PROGRAM_MAP(hazl1500_mem)
@@ -711,9 +713,6 @@ static MACHINE_CONFIG_START( hazl1500, hazl1500_state )
 
 	MCFG_DEVICE_ADD(NETLIST_TAG, NETLIST_CPU, VIDEOBRD_CLOCK)
 	MCFG_NETLIST_SETUP(hazelvid)
-
-	MCFG_NETLIST_ROM_REGION(NETLIST_TAG, VIDEO_PROM_TAG, VIDEO_PROM_TAG, "u90_702128_82s129.bin", 0x0000, 0x0100)
-	MCFG_NETLIST_ROM_REGION(NETLIST_TAG, CHAR_EPROM_TAG, CHAR_EPROM_TAG, "u83_chr.bin", 0x0000, 0x0800)
 
 	// First 1K
 	MCFG_NETLIST_RAM_POINTER(NETLIST_TAG, "u22", "u22")
@@ -785,5 +784,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME      PARENT    COMPAT   MACHINE   INPUT     CLASS          INIT    COMPANY                     FULLNAME            FLAGS */
-COMP( 1977, hazl1500, 0,        0,       hazl1500, hazl1500, driver_device, 0,      "Hazeltine Corporation",    "Hazeltine 1500",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+//    YEAR  NAME      PARENT    COMPAT   MACHINE   INPUT     CLASS           INIT    COMPANY                     FULLNAME            FLAGS
+COMP( 1977, hazl1500, 0,        0,       hazl1500, hazl1500, hazl1500_state, 0,      "Hazeltine Corporation",    "Hazeltine 1500",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)

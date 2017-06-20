@@ -15,6 +15,7 @@ I've not had a chance to wire up the board yet, but it might be possible to writ
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "screen.h"
 
 
 class intrscti_state : public driver_device
@@ -175,7 +176,7 @@ static GFXDECODE_START( intrscti )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( intrscti, intrscti_state )
+static MACHINE_CONFIG_START( intrscti )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)        /* ? MHz */

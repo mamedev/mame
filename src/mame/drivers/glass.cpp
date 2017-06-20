@@ -12,9 +12,13 @@ except for the Promat licensed Korean version which is unprotected.
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/glass.h"
+
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
-#include "includes/glass.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 WRITE16_MEMBER(glass_state::clr_int_w)
 {
@@ -195,7 +199,7 @@ void glass_state::machine_reset()
 		m_blitter_serial_buffer[i] = 0;
 }
 
-static MACHINE_CONFIG_START( glass, glass_state )
+static MACHINE_CONFIG_START( glass )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)      /* 12 MHz verified on PCB */
@@ -219,7 +223,7 @@ static MACHINE_CONFIG_START( glass, glass_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_1MHz, OKIM6295_PIN7_HIGH) /* 1MHz Resonator & pin 7 high verified on PCB */
+	MCFG_OKIM6295_ADD("oki", XTAL_1MHz, PIN7_HIGH) /* 1MHz Resonator & pin 7 high verified on PCB */
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

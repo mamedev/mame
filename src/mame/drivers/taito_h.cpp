@@ -143,12 +143,15 @@ some kind of zoom table?
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/m68000/m68000.h"
+#include "includes/taito_h.h"
 #include "includes/taitoipt.h"
 #include "audio/taitosnd.h"
+
+#include "cpu/z80/z80.h"
+#include "cpu/m68000/m68000.h"
 #include "sound/2610intf.h"
-#include "includes/taito_h.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /***************************************************************************
@@ -164,9 +167,9 @@ some kind of zoom table?
 
 READ8_MEMBER(taitoh_state::syvalion_input_bypass_r)
 {
-	/* Bypass TC0220IOC controller for analog input */
+	/* Bypass TC0040IOC controller for analog input */
 
-	uint8_t   port = m_tc0220ioc->port_r(space, 0); /* read port number */
+	uint8_t   port = m_tc0040ioc->port_r(space, 0); /* read port number */
 
 	switch( port )
 	{
@@ -207,13 +210,21 @@ READ8_MEMBER(taitoh_state::syvalion_input_bypass_r)
 				return 0x00;
 
 		default:
-			return m_tc0220ioc->portreg_r(space, offset);
+			return m_tc0040ioc->portreg_r(space, offset);
 	}
 }
 
 WRITE8_MEMBER(taitoh_state::sound_bankswitch_w)
 {
 	membank("z80bank")->set_entry(data & 3);
+}
+
+WRITE8_MEMBER(taitoh_state::coin_control_w)
+{
+	machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
+	machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
+	machine().bookkeeping().coin_counter_w(0, data & 0x04);
+	machine().bookkeeping().coin_counter_w(1, data & 0x08);
 }
 
 
@@ -226,8 +237,8 @@ WRITE8_MEMBER(taitoh_state::sound_bankswitch_w)
 static ADDRESS_MAP_START( syvalion_map, AS_PROGRAM, 16, taitoh_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_MIRROR(0x010000) AM_RAM AM_SHARE("m68000_mainram")
-	AM_RANGE(0x200000, 0x200001) AM_READ8(syvalion_input_bypass_r, 0x00ff) AM_DEVWRITE8("tc0220ioc", tc0220ioc_device, portreg_w, 0x00ff)
-	AM_RANGE(0x200002, 0x200003) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, port_r, port_w, 0x00ff)
+	AM_RANGE(0x200000, 0x200001) AM_READ8(syvalion_input_bypass_r, 0x00ff) AM_DEVWRITE8("tc0040ioc", tc0040ioc_device, portreg_w, 0x00ff)
+	AM_RANGE(0x200002, 0x200003) AM_DEVREADWRITE8("tc0040ioc", tc0040ioc_device, port_r, port_w, 0x00ff)
 	AM_RANGE(0x300000, 0x300001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0x00ff)
 	AM_RANGE(0x300002, 0x300003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0x00ff)
 	AM_RANGE(0x400000, 0x420fff) AM_DEVREADWRITE("tc0080vco", tc0080vco_device, word_r, word_w)
@@ -237,8 +248,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( recordbr_map, AS_PROGRAM, 16, taitoh_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_MIRROR(0x010000) AM_RAM AM_SHARE("m68000_mainram")
-	AM_RANGE(0x200000, 0x200001) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, portreg_r, portreg_w, 0x00ff)
-	AM_RANGE(0x200002, 0x200003) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, port_r, port_w, 0x00ff)
+	AM_RANGE(0x200000, 0x200003) AM_DEVREADWRITE8("tc0040ioc", tc0040ioc_device, read, write, 0x00ff)
 	AM_RANGE(0x300000, 0x300001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0x00ff)
 	AM_RANGE(0x300002, 0x300003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0x00ff)
 	AM_RANGE(0x400000, 0x420fff) AM_DEVREADWRITE("tc0080vco", tc0080vco_device, word_r, word_w)
@@ -250,8 +260,7 @@ static ADDRESS_MAP_START( tetristh_map, AS_PROGRAM, 16, taitoh_state )
 	AM_RANGE(0x100000, 0x10ffff) AM_MIRROR(0x010000) AM_RAM AM_SHARE("m68000_mainram")
 	AM_RANGE(0x200000, 0x200001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0x00ff)
 	AM_RANGE(0x200002, 0x200003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0x00ff)
-	AM_RANGE(0x300000, 0x300001) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, portreg_r, portreg_w, 0x00ff)
-	AM_RANGE(0x300002, 0x300003) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, port_r, port_w, 0x00ff)
+	AM_RANGE(0x300000, 0x300003) AM_DEVREADWRITE8("tc0040ioc", tc0040ioc_device, read, write, 0x00ff)
 	AM_RANGE(0x400000, 0x420fff) AM_DEVREADWRITE("tc0080vco", tc0080vco_device, word_r, word_w)
 	AM_RANGE(0x500800, 0x500fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 ADDRESS_MAP_END
@@ -625,7 +634,7 @@ void taitoh_state::machine_start()
 }
 
 
-static MACHINE_CONFIG_START( syvalion, taitoh_state )
+static MACHINE_CONFIG_START( syvalion )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2)     /* 12 MHz */
@@ -638,12 +647,13 @@ static MACHINE_CONFIG_START( syvalion, taitoh_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_DEVICE_ADD("tc0220ioc", TC0220IOC, 0)
-	MCFG_TC0220IOC_READ_0_CB(IOPORT("DSWA"))
-	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
-	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
-	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
-	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
+	MCFG_DEVICE_ADD("tc0040ioc", TC0040IOC, 0)
+	MCFG_TC0040IOC_READ_0_CB(IOPORT("DSWA"))
+	MCFG_TC0040IOC_READ_1_CB(IOPORT("DSWB"))
+	MCFG_TC0040IOC_READ_2_CB(IOPORT("IN0"))
+	MCFG_TC0040IOC_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0040IOC_WRITE_4_CB(WRITE8(taitoh_state, coin_control_w))
+	MCFG_TC0040IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -680,7 +690,7 @@ static MACHINE_CONFIG_START( syvalion, taitoh_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( recordbr, taitoh_state )
+static MACHINE_CONFIG_START( recordbr )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2)     /* 12 MHz */
@@ -693,12 +703,13 @@ static MACHINE_CONFIG_START( recordbr, taitoh_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_DEVICE_ADD("tc0220ioc", TC0220IOC, 0)
-	MCFG_TC0220IOC_READ_0_CB(IOPORT("DSWA"))
-	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
-	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
-	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
-	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
+	MCFG_DEVICE_ADD("tc0040ioc", TC0040IOC, 0)
+	MCFG_TC0040IOC_READ_0_CB(IOPORT("DSWA"))
+	MCFG_TC0040IOC_READ_1_CB(IOPORT("DSWB"))
+	MCFG_TC0040IOC_READ_2_CB(IOPORT("IN0"))
+	MCFG_TC0040IOC_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0040IOC_WRITE_4_CB(WRITE8(taitoh_state, coin_control_w))
+	MCFG_TC0040IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -743,7 +754,7 @@ static MACHINE_CONFIG_DERIVED( tetristh, recordbr )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( dleague, taitoh_state )
+static MACHINE_CONFIG_START( dleague )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2)     /* 12 MHz */
@@ -761,6 +772,7 @@ static MACHINE_CONFIG_START( dleague, taitoh_state )
 	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
 	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
 	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(taitoh_state, coin_control_w))
 	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
@@ -1040,11 +1052,11 @@ ROM_START( dleaguej )
 ROM_END
 
 
-/*  ( YEAR  NAME      PARENT    MACHINE   INPUT     INIT              MONITOR  COMPANY                      FULLNAME */
-GAME( 1988, syvalion, 0,        syvalion, syvalion, driver_device, 0, ROT0,    "Taito Corporation",         "Syvalion (Japan)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1988, syvalionp, syvalion,syvalion, syvalionp,driver_device, 0, ROT0,    "Taito Corporation",         "Syvalion (World, prototype)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1988, recordbr, 0,        recordbr, recordbr, driver_device, 0, ROT0,    "Taito Corporation Japan",   "Recordbreaker (World)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1988, gogold,   recordbr, recordbr, gogold,   driver_device, 0, ROT0,    "Taito Corporation",         "Go For The Gold (Japan)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1988, tetristh, tetris,   tetristh, tetristh, driver_device, 0, ROT0,    "Sega",                      "Tetris (Japan, Taito H-System)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, dleague,  0,        dleague,  dleague,  driver_device, 0, ROT0,    "Taito America Corporation", "Dynamite League (US)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1990, dleaguej, dleague,  dleague,  dleaguej, driver_device, 0, ROT0,    "Taito Corporation",         "Dynamite League (Japan)",  MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME       PARENT    MACHINE   INPUT      STATE         INIT  MONITOR  COMPANY                      FULLNAME                          FLAGS
+GAME( 1988, syvalion,  0,        syvalion, syvalion,  taitoh_state, 0,    ROT0,    "Taito Corporation",         "Syvalion (Japan)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1988, syvalionp, syvalion, syvalion, syvalionp, taitoh_state, 0,    ROT0,    "Taito Corporation",         "Syvalion (World, prototype)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1988, recordbr,  0,        recordbr, recordbr,  taitoh_state, 0,    ROT0,    "Taito Corporation Japan",   "Recordbreaker (World)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1988, gogold,    recordbr, recordbr, gogold,    taitoh_state, 0,    ROT0,    "Taito Corporation",         "Go For The Gold (Japan)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1988, tetristh,  tetris,   tetristh, tetristh,  taitoh_state, 0,    ROT0,    "Sega",                      "Tetris (Japan, Taito H-System)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, dleague,   0,        dleague,  dleague,   taitoh_state, 0,    ROT0,    "Taito America Corporation", "Dynamite League (US)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1990, dleaguej,  dleague,  dleague,  dleaguej,  taitoh_state, 0,    ROT0,    "Taito Corporation",         "Dynamite League (Japan)",        MACHINE_SUPPORTS_SAVE )

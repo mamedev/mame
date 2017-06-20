@@ -70,12 +70,15 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/raiden.h"
+
 #include "cpu/nec/nec.h"
 #include "cpu/z80/z80.h"
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
-#include "includes/raiden.h"
 #include "video/seibu_crtc.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /******************************************************************************/
@@ -315,7 +318,7 @@ INTERRUPT_GEN_MEMBER(raiden_state::raiden_interrupt)
 	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xc8/4); /* VBL */
 }
 
-static MACHINE_CONFIG_START( raiden, raiden_state )
+static MACHINE_CONFIG_START( raiden )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V30,XTAL_20MHz/2) /* NEC V30 CPU, 20MHz verified on pcb */
@@ -340,7 +343,7 @@ static MACHINE_CONFIG_START( raiden, raiden_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(raiden_state, screen_update_raiden)
-	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
+	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", raiden)
@@ -354,7 +357,7 @@ static MACHINE_CONFIG_START( raiden, raiden_state )
 	MCFG_YM3812_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_12MHz/12, OKIM6295_PIN7_HIGH) // frequency and pin 7 verified
+	MCFG_OKIM6295_ADD("oki", XTAL_12MHz/12, PIN7_HIGH) // frequency and pin 7 verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
@@ -448,6 +451,10 @@ ROM_START( raiden ) /* from a board with 2 daughter cards, no official board #s?
 
 	ROM_REGION( 0x40000, "oki", 0 )  /* ADPCM samples */
 	ROM_LOAD( "7.u203", 0x00000, 0x10000, CRC(8f927822) SHA1(592f2719f2c448c3b4b239eeaec078b411e12dbb) )
+
+	ROM_REGION( 0x0200, "proms", 0 ) // N82S135N bipolar PROMs
+	ROM_LOAD( "rd010.u087", 0x0000, 0x0100, NO_DUMP )
+	ROM_LOAD( "rd012.u094", 0x0100, 0x0100, NO_DUMP )
 ROM_END
 
 ROM_START( raidena )
@@ -481,6 +488,10 @@ ROM_START( raidena )
 
 	ROM_REGION( 0x40000, "oki", 0 )  /* ADPCM samples */
 	ROM_LOAD( "7.u203", 0x00000, 0x10000, CRC(8f927822) SHA1(592f2719f2c448c3b4b239eeaec078b411e12dbb) )
+
+	ROM_REGION( 0x0200, "proms", 0 ) // N82S135N bipolar PROMs
+	ROM_LOAD( "rd010.u087", 0x0000, 0x0100, NO_DUMP )
+	ROM_LOAD( "rd012.u094", 0x0100, 0x0100, NO_DUMP )
 ROM_END
 
 ROM_START( raident )
@@ -514,6 +525,10 @@ ROM_START( raident )
 
 	ROM_REGION( 0x40000, "oki", 0 )  /* ADPCM samples */
 	ROM_LOAD( "7.u203", 0x00000, 0x10000, CRC(8f927822) SHA1(592f2719f2c448c3b4b239eeaec078b411e12dbb) )
+
+	ROM_REGION( 0x0200, "proms", 0 ) // N82S135N bipolar PROMs
+	ROM_LOAD( "rd010.u087", 0x0000, 0x0100, NO_DUMP )
+	ROM_LOAD( "rd012.u094", 0x0100, 0x0100, NO_DUMP )
 ROM_END
 
 ROM_START( raidenu )
@@ -547,6 +562,10 @@ ROM_START( raidenu )
 
 	ROM_REGION( 0x40000, "oki", 0 )  /* ADPCM samples */
 	ROM_LOAD( "7.u203", 0x00000, 0x10000, CRC(8f927822) SHA1(592f2719f2c448c3b4b239eeaec078b411e12dbb) )
+
+	ROM_REGION( 0x0200, "proms", 0 ) // N82S135N bipolar PROMs
+	ROM_LOAD( "rd010.u087", 0x0000, 0x0100, NO_DUMP )
+	ROM_LOAD( "rd012.u094", 0x0100, 0x0100, NO_DUMP )
 ROM_END
 
 ROM_START( raidenk ) /* Same board as above. Not sure why the sound CPU would be decrypted */
@@ -580,6 +599,10 @@ ROM_START( raidenk ) /* Same board as above. Not sure why the sound CPU would be
 
 	ROM_REGION( 0x40000, "oki", 0 )  /* ADPCM samples */
 	ROM_LOAD( "7.u203", 0x00000, 0x10000, CRC(8f927822) SHA1(592f2719f2c448c3b4b239eeaec078b411e12dbb) )
+
+	ROM_REGION( 0x0200, "proms", 0 ) // N82S135N bipolar PROMs
+	ROM_LOAD( "rd010.u087", 0x0000, 0x0100, NO_DUMP )
+	ROM_LOAD( "rd012.u094", 0x0100, 0x0100, NO_DUMP )
 ROM_END
 
 ROM_START( raidenkb ) /* Korean bootleg board. ROMs for main, sub, audiocpu, chars and oki match raidenk, while object and tile ROMs are differently split */
@@ -623,6 +646,9 @@ ROM_START( raidenkb ) /* Korean bootleg board. ROMs for main, sub, audiocpu, cha
 
 	ROM_REGION( 0x40000, "oki", 0 )  /* ADPCM samples */
 	ROM_LOAD( "7.u203", 0x00000, 0x10000, CRC(8f927822) SHA1(592f2719f2c448c3b4b239eeaec078b411e12dbb) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "82s147.h7", 0x0000, 0x0200, NO_DUMP )
 ROM_END
 
 ROM_START( raidenb )/* Different hardware, Main & Sub CPU code not encrypted. */
@@ -693,6 +719,10 @@ ROM_START( raidenua )/* Different hardware, Main, Sub & sound CPU code not encry
 
 	ROM_REGION( 0x40000, "oki", 0 )  /* ADPCM samples */
 	ROM_LOAD( "7.x10", 0x00000, 0x10000, CRC(2051263e) SHA1(dff96caa11adf619360d88704e3af8427ddfe524) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "prom.n2", 0x0000, 0x0100, NO_DUMP )
+	ROM_LOAD( "prom.u3", 0x0100, 0x0100, NO_DUMP )
 ROM_END
 
 
@@ -749,7 +779,7 @@ GAME( 1990, raidenk,  raiden, raiden,  raiden, raiden_state,  raiden,  ROT270, "
 GAME( 1990, raidenkb, raiden, raiden,  raiden, raiden_state,  raiden,  ROT270, "bootleg", "Raiden (Korea, bootleg)", MACHINE_SUPPORTS_SAVE )
 
 /* Alternate hardware; SEI8904 + SEI9008 PCBs. Main & Sub CPU code not encrypted */
-GAME( 1990, raidenua, raiden, raidenu, raiden, driver_device, 0,       ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden (US set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, raidenua, raiden, raidenu, raiden, raiden_state,  0,       ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden (US set 2)", MACHINE_SUPPORTS_SAVE )
 
 /* Alternate hardware. Main, Sub & Sound CPU code not encrypted. It also sports Seibu custom CRTC. */
-GAME( 1990, raidenb,  raiden, raidenb, raiden, driver_device, 0,       ROT270, "Seibu Kaihatsu", "Raiden (set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, raidenb,  raiden, raidenb, raiden, raiden_state,  0,       ROT270, "Seibu Kaihatsu", "Raiden (set 3)", MACHINE_SUPPORTS_SAVE )

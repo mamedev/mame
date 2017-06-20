@@ -100,8 +100,12 @@
 
 
 
+#include "emu.h"
 #include "includes/tdv2324.h"
+
+#include "screen.h"
 #include "softlist.h"
+
 
 READ8_MEMBER( tdv2324_state::tdv2324_main_io_30 )
 {
@@ -253,7 +257,7 @@ SLOT_INTERFACE_END
 //  MACHINE_CONFIG( tdv2324 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( tdv2324, tdv2324_state )
+static MACHINE_CONFIG_START( tdv2324 )
 	// basic system hardware
 	MCFG_CPU_ADD(P8085AH_0_TAG, I8085A, 8700000/2) // ???
 	MCFG_CPU_PROGRAM_MAP(tdv2324_mem)
@@ -345,5 +349,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     INIT  COMPANY     FULLNAME     FLAGS
-COMP( 1983, tdv2324,        0,      0,      tdv2324,        tdv2324, driver_device,     0,      "Tandberg",     "TDV 2324",     MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT    STATE          INIT  COMPANY     FULLNAME    FLAGS
+COMP( 1983, tdv2324,  0,      0,      tdv2324,  tdv2324, tdv2324_state, 0,    "Tandberg", "TDV 2324", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

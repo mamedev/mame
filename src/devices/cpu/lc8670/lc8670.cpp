@@ -31,7 +31,7 @@
 //  CONSTANTS
 //**************************************************************************
 
-const device_type LC8670 = &device_creator<lc8670_cpu_device>;
+DEFINE_DEVICE_TYPE(LC8670, lc8670_cpu_device, "lc8670", "Sanyo LC8670")
 
 
 //**************************************************************************
@@ -171,13 +171,13 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 lc8670_cpu_device::lc8670_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, LC8670, "Sanyo LC8670", tag, owner, clock, "lc8670", __FILE__),
-		m_program_config("program", ENDIANNESS_BIG, 8, 16, 0),
-		m_data_config("data", ENDIANNESS_BIG, 8, 9, 0, ADDRESS_MAP_NAME(lc8670_internal_map)),
-		m_io_config("io", ENDIANNESS_BIG, 8, 8, 0),
-		m_pc(0),
-		m_ppc(0),
-		m_bankswitch_func(*this)
+	: cpu_device(mconfig, LC8670, tag, owner, clock)
+	, m_program_config("program", ENDIANNESS_BIG, 8, 16, 0)
+	, m_data_config("data", ENDIANNESS_BIG, 8, 9, 0, ADDRESS_MAP_NAME(lc8670_internal_map))
+	, m_io_config("io", ENDIANNESS_BIG, 8, 8, 0)
+	, m_pc(0)
+	, m_ppc(0)
+	, m_bankswitch_func(*this)
 {
 	memset(m_sfr, 0x00, sizeof(m_sfr));
 	memset(m_timer0, 0x00, sizeof(m_timer0));
@@ -204,7 +204,7 @@ void lc8670_cpu_device::device_start()
 
 	// setup timers
 	m_basetimer = timer_alloc(BASE_TIMER);
-	m_basetimer->adjust(attotime::from_hz(m_clocks[LC8670_SUB_CLOCK]), 0, attotime::from_hz(m_clocks[LC8670_SUB_CLOCK]));
+	m_basetimer->adjust(attotime::from_hz(m_clocks[unsigned(clock_source::SUB)]), 0, attotime::from_hz(m_clocks[unsigned(clock_source::SUB)]));
 	m_clocktimer = timer_alloc(CLOCK_TIMER);
 
 	// register state for debugger
@@ -914,7 +914,7 @@ WRITE8_MEMBER(lc8670_cpu_device::mram_w)
 
 READ8_MEMBER(lc8670_cpu_device::xram_r)
 {
-	if (!(REG_VCCR & 0x40) || space.debugger_access())  // XRAM access enabled
+	if (!(REG_VCCR & 0x40) || machine().side_effect_disabled())  // XRAM access enabled
 	{
 		uint8_t * xram_bank = m_xram + (REG_XBNK & 0x03) * 0x60;
 
@@ -937,7 +937,7 @@ READ8_MEMBER(lc8670_cpu_device::xram_r)
 
 WRITE8_MEMBER(lc8670_cpu_device::xram_w)
 {
-	if (!(REG_VCCR & 0x40) || space.debugger_access())  // XRAM access enabled
+	if (!(REG_VCCR & 0x40) || machine().side_effect_disabled())  // XRAM access enabled
 	{
 		uint8_t * xram_bank = m_xram + (REG_XBNK & 0x03) * 0x60;
 
@@ -977,7 +977,7 @@ READ8_MEMBER(lc8670_cpu_device::regs_r)
 		case 0x66:
 		{
 			uint8_t data = m_vtrbf[((REG_VRMAD2<<8) | REG_VRMAD1) & 0x1ff];
-			if (!space.debugger_access() && (REG_VSEL & 0x10))
+			if (!machine().side_effect_disabled() && (REG_VSEL & 0x10))
 			{
 				uint16_t vrmad = (REG_VRMAD1 | (REG_VRMAD2<<8)) + 1;
 				REG_VRMAD1 = vrmad & 0xff;
@@ -989,7 +989,7 @@ READ8_MEMBER(lc8670_cpu_device::regs_r)
 		// write-only registers
 		case 0x20: case 0x23: case 0x24: case 0x27:
 		case 0x45: case 0x46: case 0x4d:
-			if(!space.debugger_access())    logerror("%s: read write-only SFR %04x\n", machine().describe_context(), offset);
+			if(!machine().side_effect_disabled())    logerror("%s: read write-only SFR %04x\n", machine().describe_context(), offset);
 			return 0xff;
 	}
 	return m_sfr[offset];
@@ -1044,7 +1044,7 @@ WRITE8_MEMBER(lc8670_cpu_device::regs_w)
 			break;
 		case 0x66:
 			m_vtrbf[((REG_VRMAD2<<8) | REG_VRMAD1) & 0x1ff] = data;
-			if (!space.debugger_access() && (REG_VSEL & 0x10))
+			if (!machine().side_effect_disabled() && (REG_VSEL & 0x10))
 			{
 				uint16_t vrmad = (REG_VRMAD1 | (REG_VRMAD2<<8)) + 1;
 				REG_VRMAD1 = vrmad & 0xff;
@@ -1058,7 +1058,7 @@ WRITE8_MEMBER(lc8670_cpu_device::regs_w)
 
 		// read-only registers
 		case 0x12: case 0x14: case 0x5c:
-			if(!space.debugger_access())    logerror("%s: write read-only SFR %04x = %02x\n", machine().describe_context(), offset, data);
+			if(!machine().side_effect_disabled())    logerror("%s: write read-only SFR %04x = %02x\n", machine().describe_context(), offset, data);
 			return;
 	}
 
@@ -1168,14 +1168,14 @@ inline void lc8670_cpu_device::change_clock_source()
 	switch(REG_OCR & 0x30)
 	{
 		case 0x00:
-			new_clock = m_clocks[LC8670_RC_CLOCK];
+			new_clock = m_clocks[unsigned(clock_source::RC)];
 			break;
 		case 0x20:
-			new_clock = m_clocks[LC8670_SUB_CLOCK];
+			new_clock = m_clocks[unsigned(clock_source::SUB)];
 			break;
 		case 0x10:
 		case 0x30:
-			new_clock = m_clocks[LC8670_CF_CLOCK];
+			new_clock = m_clocks[unsigned(clock_source::CF)];
 			break;
 	}
 

@@ -25,7 +25,6 @@
     SIDE POCKET                         JAPAN/USA   conflict in current info
     SMURFS                              PAL         we have Rev A, Rev 0 needed (does it exist?)
     SUMISEI HOME TANMATSU               JAPAN
-    TOM & JERRY                         JAPAN
     VALIS III                           JAPAN       we have v1.1 (Rev A?), v1.0 (Rev 0?) needed
     WONDER MIDI                         JAPAN
     WORLD CUP SOCCER                    JAPAN/USA   we have v1.0 (Rev ?), v1.2 (Rev ?) and v1.3 (Rev B), v1.1 (Rev ?) needed
@@ -60,7 +59,6 @@ Known undumped pirates
   * Chinese Checkers (by RealTec) - 中國象棋 ?
   * Shizen Mahjong / Competition Mahjong (by Sachen, apparently dumped but hoarded)
   * Magic 7 Block - 百変七巧板
-  * Chinese Battle Chess (?) - 戦 棊
 
 NOTE
 
@@ -3143,8 +3141,8 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		</part>
 	</software>
 
-
-	<software name="gameto" supported="no"> <!-- It needs full EEPROM support -->
+	<!-- Moans about the Modem not hooked up -->
+	<software name="gameto" supported="no">
 		<description>Game Toshokan (Jpn, Rev. A)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
@@ -4816,11 +4814,12 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Mega Games I (Euro)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
+		<info name="release" value="19921001"/>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="pcb" value="171-5978BA"/>
+			<feature name="pcb" value="171-5978BA"/> <!-- Also found with 171-5978B -->
 			<feature name="u1" value="MPR-15009 W50"/> <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
-				<rom name="mpr-15009 w50.u1" size="1048576" crc="db753224" sha1="076df34a01094ce0893f32600e24323567e2a23b" offset="0x000000"/>
+				<rom name="MPR-15009 W50.u1" size="1048576" crc="db753224" sha1="076df34a01094ce0893f32600e24323567e2a23b" offset="0x000000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5491,6 +5490,23 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 				<rom name="nba 97 b2.u1" size="2097152" crc="7024843a" sha1="1671451ab4ab6991e13db70671054c0f2c652a95" offset="0x000000"/>
 			</dataarea>
 			<dataarea name="sram" size="16384">
+			</dataarea>
+		</part>
+	</software>
+
+
+	<software name="bullvsblj" cloneof="bullvsbl">
+		<description>NBA Playoffs - Bulls Vs Blazers (Jpn)</description>
+		<year>1993</year>
+		<publisher>Electronic Arts Victor</publisher>
+		<info name="serial" value="EM20017"/>
+		<info name="release" value="19930730"/>
+		<info name="alt_title" value="NBAプレイオフ ブルズVSブレイザーズ"/>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="PWA P10001 REV G"/>
+			<feature name="u1" value="EM200017"/>
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="EM20017.bin" size="1048576" crc="eae8c000" sha1="66a25cf2d7ddf17dde137e29381202f48456d173" offset="0x000000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7385,11 +7401,12 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Sonic the Hedgehog (Euro, USA)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
+		<info name="release" value="19910623"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5703"/>
 			<feature name="ic1" value="MPR-13913-F, MPR-13913 W33"/>
 			<dataarea name="rom" width="16" endianness="big" size="524288">
-				<rom name="mpr-13913-f.ic1" size="524288" crc="f9394e97" sha1="6ddb7de1e17e7f6cdb88927bd906352030daa194" offset="0x000000"/>
+				<rom name="MPR-13913-F.ic1" size="524288" crc="f9394e97" sha1="6ddb7de1e17e7f6cdb88927bd906352030daa194" offset="0x000000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9255,6 +9272,22 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 	</software>
 
 
+	<software name="worldillj" cloneof="worldill">
+		<description>World of Illusion - Fushigi na Magic Box (Jpn)</description>
+		<year>1992</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="G-4080"/>
+		<info name="release" value="19921218"/>
+		<info name="alt_title" value="ワールド オブ イリュージョン アイラブ ミッキー&amp;ドナルド - ふしぎなマジックボックス"/>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5978BA"/>
+			<feature name="u1" value="MPR-15283-F"/>   <!-- location not really marked on PCB, using u1 for consistency -->
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="mpr-15283-f.u1" size="1048576" crc="cb9ee238" sha1="c79935fdeb680a1a2e76db1aef2c6897e6ee8e4d" offset="0x000000"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="wsb98">
 		<description>World Series Baseball '98 (USA)</description>
 		<year>1997</year>
@@ -9728,6 +9761,51 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		</part>
 	</software>
 
+<!--
+Confirmed dump but no pcb pic
+-->
+
+	<software name="shikinjo">
+		<description>Shikinjoh (Jpn)</description>
+		<year>1991</year>
+		<publisher>Sunsoft</publisher>
+		<info name="serial" value="T-15053"/>
+		<info name="release" value="19910427"/>
+		<info name="alt_title" value="紫禁城"/>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="524288">
+				<rom name="shikinjoh (jpn).bin" size="524288" crc="5ea0c97d" sha1="34add3f084636d671b48e77a771329f23f8083cd" offset="0x000000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tomjerryj" cloneof="tomjerry">
+		<description>Tom and Jerry - Frantic Antics (Jpn)</description>
+		<year>1993</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="T-166013"/>
+		<info name="release" value="19941216"/>
+		<info name="alt_title" value="トムとジェリー"/>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="tom and jerry - frantic antics (jpn).bin" size="1048576" crc="f800c814" sha1="736d015e29fa98980399dfaa8118b4baa5dff393" offset="0x000000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="valis3j" cloneof="valis3">
+		<description>Valis III (Jpn, Rev. A)</description>
+		<year>1991</year>
+		<publisher>Reno</publisher>
+		<info name="serial" value="T-49023"/>
+		<info name="release" value="19910322"/>
+		<info name="alt_title" value="ヴァリスIII"/>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="valis iii (jpn) (rev a).bin" size="1048576" crc="4d49a166" sha1="640c3d4f341c8a9b19e5deafae33e7742f109e2d" offset="0x000000"/>
+			</dataarea>
+		</part>
+	</software>
 
 <!--
 Old scrambled/interleaved dumps.
@@ -11242,6 +11320,18 @@ but dumps still have to be confirmed.
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="battletech - a game of armored combat (usa).bin" size="2097152" crc="409e5d14" sha1="ee22ae12053928b652f9b9f513499181b01c8429" offset="0x000000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="btlchess">
+		<description>Zhan Qi - Chinese Battle Chess (Tw)</description>
+		<year>199?</year>
+		<publisher>Creaton</publisher>
+		<info name="alt_title" value="戦棊 - Chinese Battle Chess"/>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="chinese battle chess.rom" size="1048576" crc="9d3dde48" sha1="bc256272419564c48e17c6824d734dc9e86c03b5" offset="0x000000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -20130,20 +20220,6 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="bullvsblj" cloneof="bullvsbl">
-		<description>NBA Playoffs - Bulls Vs Blazers (Jpn)</description>
-		<year>1993</year>
-		<publisher>Electronic Arts Victor</publisher>
-		<info name="serial" value="EM20017"/>
-		<info name="release" value="19930730"/>
-		<info name="alt_title" value="NBAプレイオフ ブルズVSブレイザーズ"/>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" width="16" endianness="big" size="1048576">
-				<rom name="nba playoffs - bulls vs blazers (jpn).bin" size="1048576" crc="eae8c000" sha1="66a25cf2d7ddf17dde137e29381202f48456d173" offset="0x000000"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="bullvsblj1" cloneof="bullvsbl">
 		<description>NBA Playoffs - Bulls Vs Blazers (Jpn, Alt)</description>
 		<year>1993</year>
@@ -23957,20 +24033,6 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="shikinjo">
-		<description>Shikinjoh (Jpn)</description>
-		<year>1991</year>
-		<publisher>Sunsoft</publisher>
-		<info name="serial" value="T-15053"/>
-		<info name="release" value="19910427"/>
-		<info name="alt_title" value="紫禁城"/>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" width="16" endianness="big" size="524288">
-				<rom name="shikinjoh (jpn).bin" size="524288" crc="5ea0c97d" sha1="34add3f084636d671b48e77a771329f23f8083cd" offset="0x000000"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="shinfrceu" cloneof="shinfrce">
 		<description>Shining Force - The Legacy of Great Intention (USA)</description>
 		<year>1992</year>
@@ -24546,46 +24608,54 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="skp10" cloneof="sk">
+	<software name="skp06" cloneof="sk">
 		<description>Sonic &amp; Knuckles (Prototype 0606, 19940606, 10.02)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" width="16" endianness="big" size="2097152">
+			<feature name="slot" value="rom_sk"/>
+			<dataarea name="rom" width="16" endianness="big" size="3407872">
 				<rom name="sonic &amp; knuckles (prototype 0606 - jun 06, 1994, 10.02).bin" size="2097152" crc="03a52f63" sha1="173524ffae78438b5ddd039ec8b8def786f28aee" offset="0x000000"/>
+				<rom name="sonic &amp; knuckles (s2k chip) (prototype 0606 - jun 05, 1994, 22.25).bin" size="262144" crc="bd619ea9" sha1="f557741d93f8d3e8a84099ab88f0331ced2875c8" offset="0x300000"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="skp08" cloneof="sk">
+	<software name="skp05" cloneof="sk">
 		<description>Sonic &amp; Knuckles (Prototype 0608, 19940608, 05.03)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" width="16" endianness="big" size="2097152">
+			<feature name="slot" value="rom_sk"/>
+			<dataarea name="rom" width="16" endianness="big" size="3407872">
 				<rom name="sonic &amp; knuckles (prototype 0608 - jun 08, 1994, 05.03).bin" size="2097152" crc="7a6c1317" sha1="a55b784590e602a82719d6721b2789f686564d2b" offset="0x000000"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="skp06" cloneof="sk">
-		<description>Sonic &amp; Knuckles (Prototype 0610, 19940610, 07.49)</description>
-		<year>1994</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" width="16" endianness="big" size="2097152">
-				<rom name="sonic &amp; knuckles (prototype 0610 - jun 10, 1994, 07.49).bin" size="2097152" crc="7092f368" sha1="bc67cb9edb8958a66723a8346c9d58d43d18ca80" offset="0x000000"/>
+				<rom name="sonic &amp; knuckles (s2k chip) (prototype 0608 - jun 08, 1994, 03.35).bin" size="262144" crc="6a5dcbe6" sha1="f27434f63ce45de92c361b0b3aabdfde80c237da" offset="0x300000"/>
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="skp04" cloneof="sk">
+		<description>Sonic &amp; Knuckles (Prototype 0610, 19940610, 07.49)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_sk"/>
+			<dataarea name="rom" width="16" endianness="big" size="3407872">
+				<rom name="sonic &amp; knuckles (prototype 0610 - jun 10, 1994, 07.49).bin" size="2097152" crc="7092f368" sha1="bc67cb9edb8958a66723a8346c9d58d43d18ca80" offset="0x000000"/>
+				<rom name="sonic &amp; knuckles (s2k chip) (prototype 0610 - jun 10, 1994, 03.11).bin" size="262144" crc="0f6ff22b" sha1="d2b4003a7110f258641b7b76d7716acbcb3b62ab" offset="0x300000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="skp03" cloneof="sk">
 		<description>Sonic &amp; Knuckles (Prototype 0612, 19940612, 18.27)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" width="16" endianness="big" size="2097152">
+			<feature name="slot" value="rom_sk"/>
+			<dataarea name="rom" width="16" endianness="big" size="3407872">
 				<rom name="sonic &amp; knuckles (prototype 0612 - jun 12, 1994, 18.27).bin" size="2097152" crc="b0a253e8" sha1="8585b617e6828bf0b255d4ef747384db7ff67826" offset="0x000000"/>
+				<rom name="sonic &amp; knuckles (s2k chip) (prototype 0612 - jun 12, 1994, 18.18).bin" size="262144" crc="9a5f8183" sha1="eb29700a161a1949ed3057a3580911c7932315a5" offset="0x300000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -24595,8 +24665,10 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" width="16" endianness="big" size="2097152">
+			<feature name="slot" value="rom_sk"/>
+			<dataarea name="rom" width="16" endianness="big" size="3407872">
 				<rom name="sonic &amp; knuckles (prototype 0618 - jun 18, 1994, 09.15).bin" size="2097152" crc="2615f5dc" sha1="e365c42a2c754b9df98b5b74dbc3e7f94c1a84f4" offset="0x000000"/>
+				<rom name="sonic &amp; knuckles (s2k chip) (prototype 0618 - jun 18, 1994, 9.07).bin" size="262144" crc="4dcfd55c" sha1="70429f1d80503a0632f603bf762fe0bbaa881d22" offset="0x300000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -24606,86 +24678,32 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" width="16" endianness="big" size="2097152">
+			<feature name="slot" value="rom_sk"/>
+			<dataarea name="rom" width="16" endianness="big" size="3407872">
 				<rom name="sonic &amp; knuckles (prototype 0619 - jun 19, 1994, 08.18).bin" size="2097152" crc="1ea5b9d1" sha1="b84d197e646ceece8681d35af3b4014c1bbeae35" offset="0x000000"/>
+				<rom name="sonic &amp; knuckles (s2k chip) (prototype 0618 - jun 18, 1994, 9.07).bin" size="262144" crc="4dcfd55c" sha1="70429f1d80503a0632f603bf762fe0bbaa881d22" offset="0x300000"/>
 			</dataarea>
 		</part>
 	</software>
 
-<!-- These are just dumps of the mpr-16911-s.ic2 lock-on chip. should be matched with the SK data above to get proper sets to be locked on Sonic 2... -->
-	<software name="skp11" cloneof="sk" supported="no">
-		<description>Sonic &amp; Knuckles (Prototype 0606, 19940605, 22.25, S2K chip)</description>
-		<year>1994</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" width="16" endianness="big" size="262144">
-				<rom name="sonic &amp; knuckles (s2k chip) (prototype 0606 - jun 05, 1994, 22.25).bin" size="262144" crc="bd619ea9" sha1="f557741d93f8d3e8a84099ab88f0331ced2875c8" offset="0x000000"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="skp09" cloneof="sk" supported="no">
-		<description>Sonic &amp; Knuckles (Prototype 0608, 19940608, 03.35, S2K chip)</description>
-		<year>1994</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" width="16" endianness="big" size="262144">
-				<rom name="sonic &amp; knuckles (s2k chip) (prototype 0608 - jun 08, 1994, 03.35).bin" size="262144" crc="6a5dcbe6" sha1="f27434f63ce45de92c361b0b3aabdfde80c237da" offset="0x000000"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="skp07" cloneof="sk" supported="no">
-		<description>Sonic &amp; Knuckles (Prototype 0610, 19940610, 03.11, S2K chip)</description>
-		<year>1994</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" width="16" endianness="big" size="262144">
-				<rom name="sonic &amp; knuckles (s2k chip) (prototype 0610 - jun 10, 1994, 03.11).bin" size="262144" crc="0f6ff22b" sha1="d2b4003a7110f258641b7b76d7716acbcb3b62ab" offset="0x000000"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="skp05" cloneof="sk" supported="no">
-		<description>Sonic &amp; Knuckles (Prototype 0612, 19940612, 18.18, S2K chip)</description>
-		<year>1994</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" width="16" endianness="big" size="262144">
-				<rom name="sonic &amp; knuckles (s2k chip) (prototype 0612 - jun 12, 1994, 18.18).bin" size="262144" crc="9a5f8183" sha1="eb29700a161a1949ed3057a3580911c7932315a5" offset="0x000000"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="skp03" cloneof="sk" supported="no">
-		<description>Sonic &amp; Knuckles (Prototype 0618, 19940618, 9.07, S2K chip)</description>
-		<year>1994</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" width="16" endianness="big" size="262144">
-				<rom name="sonic &amp; knuckles (s2k chip) (prototype 0618 - jun 18, 1994, 9.07).bin" size="262144" crc="4dcfd55c" sha1="70429f1d80503a0632f603bf762fe0bbaa881d22" offset="0x000000"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="knucklp">
-		<description>Knuckles in Sonic 2 (Prototype 0524, 19940527, 10.46)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" width="16" endianness="big" size="4194304">
-				<rom name="knuckles in sonic 2 (prototype 0524 - may 27, 1994, 10.46).bin" size="4194304" crc="8878c1a8" sha1="3a827d575f5a484c24e6c31417f32d6c5f0045de" offset="0x000000"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="skp12" cloneof="sk">
+	<software name="skp07" cloneof="sk">
 		<description>Sonic &amp; Knuckles (Prototype 0525, 19940525, 15.28)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
 				<rom name="sonic &amp; knuckles (prototype 0525 - may 25, 1994, 15.28).bin" size="4194304" crc="8e8dadd0" sha1="5f2c4dc4e739d562e9f0525361ba83f3e0551e21" offset="0x000000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="knucklp">
+		<description>Knuckles in Sonic 2 (Prototype 0524, 19940527, 10.46)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="knuckles in sonic 2 (prototype 0524 - may 27, 1994, 10.46).bin" size="4194304" crc="8878c1a8" sha1="3a827d575f5a484c24e6c31417f32d6c5f0045de" offset="0x000000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -28201,20 +28219,6 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="valis3j" cloneof="valis3">
-		<description>Valis III (Jpn, Rev. A)</description>
-		<year>1991</year>
-		<publisher>Reno</publisher>
-		<info name="serial" value="T-49023"/>
-		<info name="release" value="19910322"/>
-		<info name="alt_title" value="ヴァリスIII"/>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" width="16" endianness="big" size="1048576">
-				<rom name="valis iii (jpn) (rev a).bin" size="1048576" crc="4d49a166" sha1="640c3d4f341c8a9b19e5deafae33e7742f109e2d" offset="0x000000"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="vaportr">
 		<description>Vapor Trail (USA)</description>
 		<year>1991</year>
@@ -29458,20 +29462,6 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="world heroes (usa) (prototype - mar 30, 1994).bin" size="2097152" crc="50c797cb" sha1="8c4dc2b06e0734fc8e39997f8da6295d187e316e" offset="0x000000"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="worldillj" cloneof="worldill">
-		<description>World of Illusion - Fushigi na Magic Box (Jpn)</description>
-		<year>1992</year>
-		<publisher>Sega</publisher>
-		<info name="serial" value="G-4080"/>
-		<info name="release" value="19921218"/>
-		<info name="alt_title" value="ワールド オブ イリュージョン アイラブ ミッキー&amp;ドナルド - ふしぎなマジックボックス"/>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" width="16" endianness="big" size="1048576">
-				<rom name="world of illusion - fushigi na magic box (jpn).bin" size="1048576" crc="cb9ee238" sha1="c79935fdeb680a1a2e76db1aef2c6897e6ee8e4d" offset="0x000000"/>
 			</dataarea>
 		</part>
 	</software>

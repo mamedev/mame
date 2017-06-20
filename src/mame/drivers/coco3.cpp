@@ -12,6 +12,7 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "includes/coco3.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6809/hd6309.h"
@@ -43,7 +44,7 @@ static ADDRESS_MAP_START( coco3_mem, AS_PROGRAM, 8, coco3_state )
 	AM_RANGE(0xFF20, 0xFF3F) AM_READWRITE(ff20_read, ff20_write)
 	AM_RANGE(0xFF40, 0xFF5F) AM_READWRITE(ff40_read, ff40_write)
 	AM_RANGE(0xFF60, 0xFF8F) AM_READWRITE(ff60_read, ff60_write)
-	AM_RANGE(0xFF90, 0xFFDF) AM_DEVREADWRITE(GIME_TAG, gime_base_device, read, write)
+	AM_RANGE(0xFF90, 0xFFDF) AM_DEVREADWRITE(GIME_TAG, gime_device, read, write)
 
 	// While Tepolt and other sources say that the interrupt vectors are mapped to
 	// the same memory accessed at $BFFx, William Astle offered evidence that this
@@ -221,7 +222,6 @@ static INPUT_PORTS_START( coco3 )
 	PORT_INCLUDE( coco3_keyboard )
 	PORT_INCLUDE( coco3_joystick )
 	PORT_INCLUDE( coco_analog_control )
-	PORT_INCLUDE( coco_cart_autostart )
 	PORT_INCLUDE( coco_rat_mouse )
 	PORT_INCLUDE( coco_lightgun )
 	PORT_INCLUDE( coco_rtc )
@@ -241,9 +241,12 @@ DEVICE_INPUT_DEFAULTS_END
 //  MACHINE CONFIGURATION
 //**************************************************************************
 
-static MACHINE_CONFIG_START( coco3, coco3_state )
+static MACHINE_CONFIG_START( coco3 )
+	MCFG_DEVICE_MODIFY(":")
+	MCFG_DEVICE_CLOCK(XTAL_3_579545MHz)
+
 	// basic machine hardware
-	MCFG_CPU_ADD(MAINCPU_TAG, M6809E, XTAL_3_579545MHz)
+	MCFG_CPU_ADD(MAINCPU_TAG, M6809E, DERIVED_CLOCK(1, 1))
 	MCFG_CPU_PROGRAM_MAP(coco3_mem)
 	MCFG_CPU_DISASSEMBLE_OVERRIDE(coco_state, dasm_override)
 
@@ -322,6 +325,9 @@ static MACHINE_CONFIG_START( coco3, coco3_state )
 	MCFG_RAM_DEFAULT_SIZE("512K")
 	MCFG_RAM_EXTRA_OPTIONS("128K,2M,8M")
 
+	// floating space
+	MCFG_FRAGMENT_ADD(coco_floating)
+
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("cart_list","coco_cart")
 
@@ -341,7 +347,7 @@ static MACHINE_CONFIG_DERIVED( coco3p, coco3 )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( coco3h, coco3 )
-	MCFG_CPU_REPLACE(MAINCPU_TAG, HD6309, XTAL_3_579545MHz)
+	MCFG_CPU_REPLACE(MAINCPU_TAG, HD6309, DERIVED_CLOCK(1, 1))
 	MCFG_CPU_PROGRAM_MAP(coco3_mem)
 MACHINE_CONFIG_END
 
@@ -371,7 +377,7 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-COMP(  1986,    coco3,      coco,   0,      coco3,     coco3, driver_device,     0,      "Tandy Radio Shack",            "Color Computer 3 (NTSC)", 0)
-COMP(  1986,    coco3p,     coco,   0,      coco3p,    coco3, driver_device,     0,      "Tandy Radio Shack",            "Color Computer 3 (PAL)", 0)
-COMP(  19??,    coco3h,     coco,   0,      coco3h,    coco3, driver_device,     0,      "Tandy Radio Shack",            "Color Computer 3 (NTSC; HD6309)", MACHINE_UNOFFICIAL)
-COMP(  19??,    coco3dw1,   coco,   0,      coco3dw1,  coco3, driver_device,     0,      "Tandy Radio Shack",            "Color Computer 3 (NTSC; HDB-DOS)", MACHINE_UNOFFICIAL)
+COMP(  1986,    coco3,      coco,   0,      coco3,     coco3, coco3_state, 0,      "Tandy Radio Shack", "Color Computer 3 (NTSC)",          0 )
+COMP(  1986,    coco3p,     coco,   0,      coco3p,    coco3, coco3_state, 0,      "Tandy Radio Shack", "Color Computer 3 (PAL)",           0 )
+COMP(  19??,    coco3h,     coco,   0,      coco3h,    coco3, coco3_state, 0,      "Tandy Radio Shack", "Color Computer 3 (NTSC; HD6309)",  MACHINE_UNOFFICIAL )
+COMP(  19??,    coco3dw1,   coco,   0,      coco3dw1,  coco3, coco3_state, 0,      "Tandy Radio Shack", "Color Computer 3 (NTSC; HDB-DOS)", MACHINE_UNOFFICIAL )

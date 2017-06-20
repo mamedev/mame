@@ -8,7 +8,7 @@
 
     Games supported:
         * Xenopohobe (Sounds Good)
-        * Spy Hunter II (Sounds Good/Turbo Chip Squeak)
+        * Spy Hunter II (Sounds Good/Turbo Cheap Squeak)
         * Blasted (Sounds Good)
         * Arch Rivals
         * Tri-Sports
@@ -55,9 +55,12 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/mcr68.h"
+
 #include "cpu/m68000/m68000.h"
 #include "machine/nvram.h"
-#include "includes/mcr68.h"
+
+#include "speaker.h"
 
 
 
@@ -111,7 +114,7 @@ READ16_MEMBER(mcr68_state::spyhunt2_port_0_r)
 READ16_MEMBER(mcr68_state::spyhunt2_port_1_r)
 {
 	int result = ioport("IN1")->read();
-	return result | ((m_turbo_chip_squeak->read(space, 0) & 1) << 7);
+	return result | ((m_turbo_cheap_squeak->read(space, 0) & 1) << 7);
 }
 
 
@@ -119,8 +122,8 @@ WRITE16_MEMBER(mcr68_state::spyhunt2_control_w)
 {
 	COMBINE_DATA(&m_control_word);
 
-/*  m_turbo_chip_squeak->reset_write(~m_control_word & 0x0080);*/
-	m_turbo_chip_squeak->write(space, offset, (m_control_word >> 8) & 0x001f);
+/*  m_turbo_cheap_squeak->reset_write(~m_control_word & 0x0080);*/
+	m_turbo_cheap_squeak->write(space, offset, (m_control_word >> 8) & 0x001f);
 
 	m_sounds_good->reset_write(~m_control_word & 0x2000);
 	m_sounds_good->write(space, offset, (m_control_word >> 8) & 0x001f);
@@ -886,7 +889,7 @@ GFXDECODE_END
 
 =================================================================*/
 
-static MACHINE_CONFIG_START( mcr68, mcr68_state )
+static MACHINE_CONFIG_START( mcr68 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 7723800)
@@ -945,7 +948,7 @@ static MACHINE_CONFIG_DERIVED( spyhunt2, mcr68 )
 	/* basic machine hardware */
 	MCFG_SOUND_ADD("sg", MIDWAY_SOUNDS_GOOD, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-	MCFG_SOUND_ADD("tcs", MIDWAY_TURBO_CHIP_SQUEAK, 0)
+	MCFG_SOUND_ADD("tcs", MIDWAY_TURBO_CHEAP_SQUEAK, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 

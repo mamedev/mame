@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -73,24 +73,34 @@ namespace bgfx { namespace glsl
 			optimizedShader = bx::strnl(optimizedShader);
 		}
 
-		if (0 != _version)
 		{
 			char* code = const_cast<char*>(optimizedShader);
 			strReplace(code, "gl_FragDepthEXT", "gl_FragDepth");
 
+			strReplace(code, "texture2DLodARB", "texture2DLod");
 			strReplace(code, "texture2DLodEXT", "texture2DLod");
-			strReplace(code, "texture2DProjLodEXT", "texture2DProjLod");
-			strReplace(code, "textureCubeLodEXT", "textureCubeLod");
+			strReplace(code, "texture2DGradARB", "texture2DGrad");
 			strReplace(code, "texture2DGradEXT", "texture2DGrad");
-			strReplace(code, "texture2DProjGradEXT", "texture2DProjGrad");
+
+			strReplace(code, "textureCubeLodARB", "textureCubeLod");
+			strReplace(code, "textureCubeLodEXT", "textureCubeLod");
+			strReplace(code, "textureCubeGradARB", "textureCubeGrad");
 			strReplace(code, "textureCubeGradEXT", "textureCubeGrad");
 
+			strReplace(code, "texture2DProjLodARB", "texture2DProjLod");
+			strReplace(code, "texture2DProjLodEXT", "texture2DProjLod");
+			strReplace(code, "texture2DProjGradARB", "texture2DProjGrad");
+			strReplace(code, "texture2DProjGradEXT", "texture2DProjGrad");
+
+			strReplace(code, "shadow2DARB", "shadow2D");
 			strReplace(code, "shadow2DEXT", "shadow2D");
+			strReplace(code, "shadow2DProjARB", "shadow2DProj");
 			strReplace(code, "shadow2DProjEXT", "shadow2DProj");
 		}
 
 		UniformArray uniforms;
 
+		if (target != kGlslTargetMetal)
 		{
 			const char* parse = optimizedShader;
 
@@ -181,6 +191,65 @@ namespace bgfx { namespace glsl
 				}
 			}
 		}
+		else
+		{
+			const char* parse = strstr(optimizedShader, "struct xlatMtlShaderUniform {");
+			const char* end   = parse;
+			if (NULL != parse)
+			{
+				parse += strlen("struct xlatMtlShaderUniform {");
+				end   = strstr(parse, "};");
+			}
+
+			while ( parse < end
+			&&     *parse != '\0')
+			{
+				parse = bx::strws(parse);
+				const char* eol = strchr(parse, ';');
+				if (NULL != eol)
+				{
+					const char* typen = parse;
+
+					char uniformType[256];
+					parse = bx::strword(parse);
+					bx::strlcpy(uniformType, typen, parse-typen+1);
+					const char* name = parse = bx::strws(parse);
+
+					char uniformName[256];
+					uint8_t num = 1;
+					const char* array = bx::strnstr(name, "[", eol-parse);
+					if (NULL != array)
+					{
+						bx::strlcpy(uniformName, name, array-name+1);
+
+						char arraySize[32];
+						const char* arrayEnd = bx::strnstr(array, "]", eol-array);
+						bx::strlcpy(arraySize, array+1, arrayEnd-array);
+						num = uint8_t(atoi(arraySize) );
+					}
+					else
+					{
+						bx::strlcpy(uniformName, name, eol-name+1);
+					}
+
+					Uniform un;
+					un.type = nameToUniformTypeEnum(uniformType);
+
+					if (UniformType::Count != un.type)
+					{
+						BX_TRACE("name: %s (type %d, num %d)", uniformName, un.type, num);
+
+						un.name = uniformName;
+						un.num = num;
+						un.regIndex = 0;
+						un.regCount = num;
+						uniforms.push_back(un);
+					}
+
+					parse = eol + 1;
+				}
+			}
+		}
 
 		uint16_t count = (uint16_t)uniforms.size();
 		bx::write(_writer, count);
@@ -191,7 +260,7 @@ namespace bgfx { namespace glsl
 			uint8_t nameSize = (uint8_t)un.name.size();
 			bx::write(_writer, nameSize);
 			bx::write(_writer, un.name.c_str(), nameSize);
-			uint8_t uniformType = un.type;
+			uint8_t uniformType = uint8_t(un.type);
 			bx::write(_writer, uniformType);
 			bx::write(_writer, un.num);
 			bx::write(_writer, un.regIndex);

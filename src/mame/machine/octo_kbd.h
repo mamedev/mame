@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Barry Rodewald
-#ifndef OCTO_KBD_H
-#define OCTO_KBD_H
+#ifndef MAME_MACHINE_OCTO_KBD_H
+#define MAME_MACHINE_OCTO_KBD_H
+
+#pragma once
 
 #include "bus/rs232/keyboard.h"
 
@@ -27,6 +29,6 @@ private:
 	uint8_t m_enabled;  // keyboard enabled?
 };
 
-extern const device_type OCTOPUS_KEYBOARD;
+DECLARE_DEVICE_TYPE(OCTOPUS_KEYBOARD, octopus_keyboard_device)
 
-#endif // OCTO_KBD_H
+#endif // MAME_MACHINE_OCTO_KBD_H

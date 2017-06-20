@@ -4,28 +4,28 @@
 
     Game Driver for Video System Mahjong series.
 
-    Idol-Mahjong Final Romance (Japan)
+    Idol-Mahjong Final Romance (アイドル麻雀ファイナルロマンス)
     (c)1991 Video System Co.,Ltd.
 
-    Nekketsu Mahjong Sengen! AFTER 5 (Japan)
+    Nekketsu Mahjong Sengen! AFTER 5 (熱血麻雀宣言! AFTER 5)
     (c)1991 Video System Co.,Ltd.
 
-    Mahjong Daiyogen (Japan)
+    Mahjong Daiyogen (麻雀大予言)
     (c)1990 Video System Co.,Ltd.
 
-    Mahjong Fun Club - Idol Saizensen (Japan)
+    Mahjong Fun Club - Idol Saizensen (麻雀ファンクラブ アイドル最前線)
     (c)1989 Video System Co.,Ltd.
 
-    Mahjong Natsu Monogatari (Mahjong Summer Story) (Japan)
+    Mahjong Natsu Monogatari (Mahjong Summer Story) (麻雀夏物語)
     (c)1989 Video System Co.,Ltd.
 
-    Natsuiro Mahjong (Mahjong Summer Story) (Japan)
+    Natsuiro Mahjong (Mahjong Summer Color) (夏色麻雀)
     (c)1989 Video System Co.,Ltd.
 
-    Idol-Mahjong Housoukyoku (Japan)
+    Idol-Mahjong Housoukyoku (アイドル麻雀放送局)
     (c)1988 System Service Co.,Ltd.
 
-    Rettou Juudan Nekkyoku Janshi - Higashi Nippon Hen (Japan)
+    Rettou Juudan Nekkyoku Janshi - Higashi Nippon Hen (列島縦断熱局雀士 東日本編)
     (c)1988 Video System Co.,Ltd.
 
     Driver by Takahiro Nogi <nogi@kt.rim.or.jp> 2001/02/04 -
@@ -37,9 +37,9 @@ Memo:
 
 - 2player's input is not supported.
 
-- Identify CRT Controller and fix layer misalignment in nekkyoku due of dynamic 
-  changes. Actually same custom component as other V-System games of the era, 
-  @seealso aerofgt.cpp 
+- Identify CRT Controller and fix layer misalignment in nekkyoku due of dynamic
+  changes. Actually same custom component as other V-System games of the era,
+  @seealso aerofgt.cpp
 
 - nekkyoku: soft reset enables flip screen without any real reason.
 
@@ -80,11 +80,14 @@ with the following code:
 ******************************************************************************/
 
 #include "emu.h"
+#include "includes/fromance.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-#include "sound/ym2413.h"
 #include "sound/msm5205.h"
-#include "includes/fromance.h"
+#include "sound/ym2413.h"
+#include "video/vsystem_gga.h"
+#include "speaker.h"
 
 
 /*************************************
@@ -305,8 +308,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( nekkyoku_sub_io_map, AS_IO, 8, fromance_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x10) AM_WRITE(fromance_crtc_data_w)
-	AM_RANGE(0x11, 0x11) AM_WRITE(fromance_crtc_register_w)
+	AM_RANGE(0x10, 0x11) AM_DEVWRITE("gga", vsystem_gga_device, write)
 	AM_RANGE(0x12, 0x12) AM_READNOP             // unknown
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(fromance_rombank_w)
 	AM_RANGE(0xe1, 0xe1) AM_READ(fromance_busycheck_sub_r) AM_WRITE(fromance_gfxreg_w)
@@ -319,8 +321,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( idolmj_sub_io_map, AS_IO, 8, fromance_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x10) AM_WRITE(fromance_crtc_data_w)
-	AM_RANGE(0x11, 0x11) AM_WRITE(fromance_crtc_register_w)
+	AM_RANGE(0x10, 0x11) AM_DEVWRITE("gga", vsystem_gga_device, write)
 	AM_RANGE(0x12, 0x12) AM_READNOP             // unknown
 	AM_RANGE(0x20, 0x20) AM_WRITE(fromance_rombank_w)
 	AM_RANGE(0x21, 0x21) AM_READ(fromance_busycheck_sub_r) AM_WRITE(fromance_gfxreg_w)
@@ -328,13 +329,12 @@ static ADDRESS_MAP_START( idolmj_sub_io_map, AS_IO, 8, fromance_state )
 	AM_RANGE(0x26, 0x26) AM_READWRITE(fromance_commanddata_r, fromance_busycheck_sub_w)
 	AM_RANGE(0x27, 0x27) AM_WRITE(fromance_adpcm_reset_w)
 	AM_RANGE(0x28, 0x28) AM_WRITE(fromance_adpcm_w)
-	AM_RANGE(0x29, 0x2a) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
+	AM_RANGE(0x29, 0x2a) AM_DEVWRITE("aysnd", ym2149_device, data_address_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fromance_sub_io_map, AS_IO, 8, fromance_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x10) AM_WRITE(fromance_crtc_data_w)
-	AM_RANGE(0x11, 0x11) AM_WRITE(fromance_crtc_register_w)
+	AM_RANGE(0x10, 0x11) AM_DEVWRITE("gga", vsystem_gga_device, write)
 	AM_RANGE(0x12, 0x12) AM_READNOP             // unknown
 	AM_RANGE(0x20, 0x20) AM_WRITE(fromance_rombank_w)
 	AM_RANGE(0x21, 0x21) AM_READ(fromance_busycheck_sub_r) AM_WRITE(fromance_gfxreg_w)
@@ -902,8 +902,6 @@ MACHINE_START_MEMBER(fromance_state,fromance)
 
 MACHINE_RESET_MEMBER(fromance_state,fromance)
 {
-	int i;
-
 	m_directionflag = 0;
 	m_commanddata = 0;
 	m_portselect = 0;
@@ -923,13 +921,9 @@ MACHINE_RESET_MEMBER(fromance_state,fromance)
 	m_scrolly[1] = 0;
 	m_gfxreg = 0;
 	m_flipscreen = 0;
-	m_crtc_register = 0;
-
-	for (i = 0; i < 0x10; i++)
-		m_crtc_data[i] = 0;
 }
 
-static MACHINE_CONFIG_START( nekkyoku, fromance_state )
+static MACHINE_CONFIG_START( nekkyoku )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,12000000/2)     /* 6.00 Mhz ? */
@@ -954,22 +948,25 @@ static MACHINE_CONFIG_START( nekkyoku, fromance_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fromance)
 	MCFG_PALETTE_ADD("palette", 1024)
 
+	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, 0)
+	MCFG_VSYSTEM_GGA_REGISTER_WRITE_CB(WRITE8(fromance_state, fromance_gga_data_w))
+
 	MCFG_VIDEO_START_OVERRIDE(fromance_state,nekkyoku)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 12000000/6)
+	MCFG_SOUND_ADD("aysnd", AY8910, 12000000/6) // type not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(fromance_state, fromance_adpcm_int)) /* IRQ handler */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8 KHz */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 KHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( idolmj, fromance_state )
+static MACHINE_CONFIG_START( idolmj )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,12000000/2)     /* 6.00 Mhz ? */
@@ -994,22 +991,25 @@ static MACHINE_CONFIG_START( idolmj, fromance_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fromance)
 	MCFG_PALETTE_ADD("palette", 2048)
 
+	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, 0)
+	MCFG_VSYSTEM_GGA_REGISTER_WRITE_CB(WRITE8(fromance_state, fromance_gga_data_w))
+
 	MCFG_VIDEO_START_OVERRIDE(fromance_state,fromance)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 12000000/6)
+	MCFG_SOUND_ADD("aysnd", YM2149, 12000000/6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(fromance_state, fromance_adpcm_int)) /* IRQ handler */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8 KHz */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 KHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( fromance, fromance_state )
+static MACHINE_CONFIG_START( fromance )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,12000000/2)     /* 6.00 Mhz ? */
@@ -1034,6 +1034,9 @@ static MACHINE_CONFIG_START( fromance, fromance_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fromance)
 	MCFG_PALETTE_ADD("palette", 2048)
 
+	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, 0)
+	MCFG_VSYSTEM_GGA_REGISTER_WRITE_CB(WRITE8(fromance_state, fromance_gga_data_w))
+
 	MCFG_VIDEO_START_OVERRIDE(fromance_state,fromance)
 
 	/* sound hardware */
@@ -1044,7 +1047,7 @@ static MACHINE_CONFIG_START( fromance, fromance_state )
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(fromance_state, fromance_adpcm_int)) /* IRQ handler */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8 KHz */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 KHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
 
@@ -1268,11 +1271,11 @@ ROM_END
  *
  *************************************/
 
-GAME( 1988, nekkyoku,  0,       nekkyoku, nekkyoku, driver_device, 0, ROT0, "Video System Co.", "Rettou Juudan Nekkyoku Janshi - Higashi Nippon Hen (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1988, idolmj,    0,       idolmj,   idolmj, driver_device,   0, ROT0, "System Service", "Idol-Mahjong Housoukyoku (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, mjnatsu,   0,       fromance, mjnatsu, driver_device,  0, ROT0, "Video System Co.", "Mahjong Natsu Monogatari (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, natsuiro,  mjnatsu, fromance, mjnatsu, driver_device,  0, ROT0, "Video System Co.", "Natsuiro Mahjong (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, mfunclub,  0,       fromance, mjnatsu, driver_device, 0, ROT0, "Video System Co.", "Mahjong Fun Club - Idol Saizensen (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, daiyogen,  0,       fromance, daiyogen, driver_device, 0, ROT0, "Video System Co.", "Mahjong Daiyogen (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, nmsengen,  0,       fromance, nmsengen, driver_device, 0, ROT0, "Video System Co.", "Nekketsu Mahjong Sengen! AFTER 5 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, fromance,  0,       fromance, fromance, driver_device, 0, ROT0, "Video System Co.", "Idol-Mahjong Final Romance (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, nekkyoku,  0,       nekkyoku, nekkyoku, fromance_state, 0, ROT0, "Video System Co.", "Rettou Juudan Nekkyoku Janshi - Higashi Nippon Hen (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1988, idolmj,    0,       idolmj,   idolmj,   fromance_state, 0, ROT0, "System Service",   "Idol-Mahjong Housoukyoku (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mjnatsu,   0,       fromance, mjnatsu,  fromance_state, 0, ROT0, "Video System Co.", "Mahjong Natsu Monogatari (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, natsuiro,  mjnatsu, fromance, mjnatsu,  fromance_state, 0, ROT0, "Video System Co.", "Natsuiro Mahjong (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mfunclub,  0,       fromance, mjnatsu,  fromance_state, 0, ROT0, "Video System Co.", "Mahjong Fun Club - Idol Saizensen (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, daiyogen,  0,       fromance, daiyogen, fromance_state, 0, ROT0, "Video System Co.", "Mahjong Daiyogen (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, nmsengen,  0,       fromance, nmsengen, fromance_state, 0, ROT0, "Video System Co.", "Nekketsu Mahjong Sengen! AFTER 5 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, fromance,  0,       fromance, fromance, fromance_state, 0, ROT0, "Video System Co.", "Idol-Mahjong Final Romance (Japan)", MACHINE_SUPPORTS_SAVE )

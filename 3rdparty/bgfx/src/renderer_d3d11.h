@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -182,14 +182,14 @@ namespace bgfx { namespace d3d11
 		{
 			BX_CHECK(NULL != _vsh->m_ptr, "Vertex shader doesn't exist.");
 			m_vsh = _vsh;
-			memcpy(&m_predefined[0], _vsh->m_predefined, _vsh->m_numPredefined*sizeof(PredefinedUniform) );
+			bx::memCopy(&m_predefined[0], _vsh->m_predefined, _vsh->m_numPredefined*sizeof(PredefinedUniform) );
 			m_numPredefined = _vsh->m_numPredefined;
 
 			if (NULL != _fsh)
 			{
 				BX_CHECK(NULL != _fsh->m_ptr, "Fragment shader doesn't exist.");
 				m_fsh = _fsh;
-				memcpy(&m_predefined[m_numPredefined], _fsh->m_predefined, _fsh->m_numPredefined*sizeof(PredefinedUniform) );
+				bx::memCopy(&m_predefined[m_numPredefined], _fsh->m_predefined, _fsh->m_numPredefined*sizeof(PredefinedUniform) );
 				m_numPredefined += _fsh->m_numPredefined;
 			}
 		}
@@ -269,6 +269,7 @@ namespace bgfx { namespace d3d11
 			, m_denseIdx(UINT16_MAX)
 			, m_num(0)
 			, m_numTh(0)
+			, m_needPresent(false)
 		{
 		}
 
@@ -279,6 +280,8 @@ namespace bgfx { namespace d3d11
 		void postReset();
 		void resolve();
 		void clear(const Clear& _clear, const float _palette[][4]);
+		void set();
+		HRESULT present(uint32_t _syncInterval);
 
 		ID3D11RenderTargetView* m_rtv[BGFX_CONFIG_MAX_FRAME_BUFFER_ATTACHMENTS-1];
 		ID3D11ShaderResourceView* m_srv[BGFX_CONFIG_MAX_FRAME_BUFFER_ATTACHMENTS-1];
@@ -291,6 +294,7 @@ namespace bgfx { namespace d3d11
 		uint16_t m_denseIdx;
 		uint8_t m_num;
 		uint8_t m_numTh;
+		bool m_needPresent;
 	};
 
 	struct TimerQueryD3D11
@@ -334,6 +338,7 @@ namespace bgfx { namespace d3d11
 		void begin(Frame* _render, OcclusionQueryHandle _handle);
 		void end();
 		void resolve(Frame* _render, bool _wait = false);
+		void invalidate(OcclusionQueryHandle _handle);
 
 		struct Query
 		{
@@ -341,7 +346,7 @@ namespace bgfx { namespace d3d11
 			OcclusionQueryHandle m_handle;
 		};
 
-		Query m_query[BGFX_CONFIG_MAX_OCCUSION_QUERIES];
+		Query m_query[BGFX_CONFIG_MAX_OCCLUSION_QUERIES];
 		bx::RingBufferControl m_control;
 	};
 

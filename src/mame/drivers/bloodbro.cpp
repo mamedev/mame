@@ -130,12 +130,15 @@ DIP locations verified for Blood Bros. & Sky Smasher via manual & DIP-SW setting
 **************************************************************************/
 
 #include "emu.h"
+#include "includes/bloodbro.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
-#include "includes/bloodbro.h"
 #include "video/seibu_crtc.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /* Memory Maps */
@@ -479,7 +482,7 @@ WRITE16_MEMBER( bloodbro_state::weststry_layer_scroll_w )
 
 /* Machine Drivers */
 
-static MACHINE_CONFIG_START( bloodbro, bloodbro_state )
+static MACHINE_CONFIG_START( bloodbro )
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(bloodbro_map)
@@ -514,7 +517,7 @@ static MACHINE_CONFIG_START( bloodbro, bloodbro_state )
 	MCFG_YM3812_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_12MHz/12, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL_12MHz/12, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
@@ -581,6 +584,9 @@ ROM_START( bloodbro )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "bb_08.u095.5a",  0x00000, 0x20000, CRC(deb1b975) SHA1(08f2e9a0a23171201b71d381d091edcd3787c287) )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "cb006.u083.6c", 0x0000, 0x0100, CRC(b2b89a74) SHA1(1878823801048d677aef9702feedd5bf775e62d0) ) // N82S135N
 ROM_END
 
 ROM_START( bloodbroa )
@@ -607,6 +613,9 @@ ROM_START( bloodbroa )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "bb_08.u095.5a",  0x00000, 0x20000, CRC(deb1b975) SHA1(08f2e9a0a23171201b71d381d091edcd3787c287) )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "cb006.u083.6c", 0x0000, 0x0100, CRC(b2b89a74) SHA1(1878823801048d677aef9702feedd5bf775e62d0) ) // N82S135N
 ROM_END
 
 ROM_START( bloodbrob )
@@ -633,6 +642,9 @@ ROM_START( bloodbrob )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "bb_08.u095.5a",  0x00000, 0x20000, CRC(deb1b975) SHA1(08f2e9a0a23171201b71d381d091edcd3787c287) )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "cb006.u083.6c", 0x0000, 0x0100, CRC(b2b89a74) SHA1(1878823801048d677aef9702feedd5bf775e62d0) ) // N82S135N
 ROM_END
 
 
@@ -706,6 +718,9 @@ ROM_START( skysmash )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "rom1", 0x00000, 0x20000, CRC(e69986f6) SHA1(de38bf2d5638cb40740882e1abccf7928e43a5a6) )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "ss006.u083.4j", 0x0000, 0x0100, NO_DUMP ) // N82S135N
 ROM_END
 
 
@@ -720,8 +735,8 @@ DRIVER_INIT_MEMBER(bloodbro_state,weststry)
 
 /* Game Drivers */
 
-GAME( 1990, bloodbro, 0,        bloodbro, bloodbro, driver_device, 0, ROT0,   "TAD Corporation", "Blood Bros. (set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, bloodbroa,bloodbro, bloodbro, bloodbro, driver_device, 0, ROT0,   "TAD Corporation", "Blood Bros. (set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, bloodbrob,bloodbro, bloodbro, bloodbro, driver_device, 0, ROT0,   "TAD Corporation", "Blood Bros. (set 3)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, bloodbro, 0,        bloodbro, bloodbro, bloodbro_state, 0,        ROT0,   "TAD Corporation", "Blood Bros. (set 1)",                 MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, bloodbroa,bloodbro, bloodbro, bloodbro, bloodbro_state, 0,        ROT0,   "TAD Corporation", "Blood Bros. (set 2)",                 MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, bloodbrob,bloodbro, bloodbro, bloodbro, bloodbro_state, 0,        ROT0,   "TAD Corporation", "Blood Bros. (set 3)",                 MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1990, weststry, bloodbro, weststry, weststry, bloodbro_state, weststry, ROT0,   "bootleg (Datsu)", "West Story (bootleg of Blood Bros.)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, skysmash, 0,        skysmash, skysmash, driver_device, 0, ROT270, "Nihon System",    "Sky Smasher", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, skysmash, 0,        skysmash, skysmash, bloodbro_state, 0,        ROT270, "Nihon System",    "Sky Smasher",                         MACHINE_SUPPORTS_SAVE )

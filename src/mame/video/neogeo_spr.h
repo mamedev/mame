@@ -1,7 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail,Ernesto Corvi,Andrew Prime,Zsolt Vasvari
 // thanks-to:Fuzz
-#define VERBOSE     (0)
+#ifndef MAME_VIDEO_NEOGEO_SPR_H
+#define MAME_VIDEO_NEOGEO_SPR_H
+
+#pragma once
 
 // todo, move these back, currently the sprite code needs some of the values tho
 #define NEOGEO_MASTER_CLOCK                     (24000000)
@@ -21,9 +24,6 @@
 class neosprite_base_device : public device_t
 {
 public:
-	neosprite_base_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock,  device_type type);
-//  neosprite_base_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
 	virtual void optimize_sprite_data();
 	virtual void set_optimized_sprite_data(uint8_t* sprdata, uint32_t mask);
 
@@ -80,6 +80,13 @@ public:
 	int m_bppshift; // 4 for 4bpp gfx (NeoGeo) 8 for 8bpp gfx (Midas)
 
 protected:
+	neosprite_base_device(
+			const machine_config &mconfig,
+			device_type type,
+			const char *tag,
+			device_t *owner,
+			uint32_t clock);
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	uint32_t get_region_mask(uint8_t* rgn, uint32_t rgn_size);
@@ -89,8 +96,6 @@ protected:
 	screen_device* m_screen;
 	const pen_t   *m_pens;
 };
-
-//extern const device_type NEOGEO_SPRITE_BASE;
 
 
 class neosprite_regular_device : public neosprite_base_device
@@ -102,7 +107,7 @@ public:
 
 };
 
-extern const device_type NEOGEO_SPRITE_REGULAR;
+DECLARE_DEVICE_TYPE(NEOGEO_SPRITE_REGULAR, neosprite_regular_device)
 
 
 class neosprite_optimized_device : public neosprite_base_device
@@ -119,10 +124,7 @@ private:
 	uint32_t optimize_helper(std::vector<uint8_t> &spritegfx, uint8_t* region_sprites, uint32_t region_sprites_size);
 };
 
-extern const device_type NEOGEO_SPRITE_OPTIMZIED;
-
-
-
+DECLARE_DEVICE_TYPE(NEOGEO_SPRITE_OPTIMZIED, neosprite_optimized_device)
 
 
 class neosprite_midas_device : public neosprite_base_device
@@ -142,4 +144,6 @@ public:
 
 };
 
-extern const device_type NEOGEO_SPRITE_MIDAS;
+DECLARE_DEVICE_TYPE(NEOGEO_SPRITE_MIDAS, neosprite_midas_device)
+
+#endif // MAME_VIDEO_NEOGEO_SPR_H

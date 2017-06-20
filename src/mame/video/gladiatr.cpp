@@ -16,7 +16,7 @@
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(gladiatr_state::bg_get_tile_info)
+TILE_GET_INFO_MEMBER(gladiatr_state_base::bg_get_tile_info)
 {
 	uint8_t attr = m_colorram[tile_index];
 
@@ -26,7 +26,7 @@ TILE_GET_INFO_MEMBER(gladiatr_state::bg_get_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(gladiatr_state::fg_get_tile_info)
+TILE_GET_INFO_MEMBER(gladiatr_state_base::fg_get_tile_info)
 {
 	SET_TILE_INFO_MEMBER(0,
 			m_textram[tile_index] + (m_fg_tile_bank << 8),
@@ -42,10 +42,10 @@ TILE_GET_INFO_MEMBER(gladiatr_state::fg_get_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START_MEMBER(gladiatr_state,ppking)
+VIDEO_START_MEMBER(ppking_state,ppking)
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gladiatr_state::bg_get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,64);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gladiatr_state::fg_get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,64);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ppking_state::bg_get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,64);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ppking_state::fg_get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,64);
 
 	m_fg_tilemap->set_transparent_pen(0);
 
@@ -90,44 +90,44 @@ VIDEO_START_MEMBER(gladiatr_state,gladiatr)
 
 ***************************************************************************/
 
-WRITE8_MEMBER(gladiatr_state::videoram_w)
+WRITE8_MEMBER(gladiatr_state_base::videoram_w)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(gladiatr_state::colorram_w)
+WRITE8_MEMBER(gladiatr_state_base::colorram_w)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(gladiatr_state::textram_w)
+WRITE8_MEMBER(gladiatr_state_base::textram_w)
 {
 	m_textram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(gladiatr_state::paletteram_w)
+WRITE8_MEMBER(gladiatr_state_base::paletteram_w)
 {
 	int r,g,b;
 
-	m_generic_paletteram_8[offset] = data;
+	m_paletteram[offset] = data;
 	offset &= 0x3ff;
 
-	r = (m_generic_paletteram_8[offset] >> 0) & 0x0f;
-	g = (m_generic_paletteram_8[offset] >> 4) & 0x0f;
-	b = (m_generic_paletteram_8[offset + 0x400] >> 0) & 0x0f;
+	r = (m_paletteram[offset] >> 0) & 0x0f;
+	g = (m_paletteram[offset] >> 4) & 0x0f;
+	b = (m_paletteram[offset + 0x400] >> 0) & 0x0f;
 
-	r = (r << 1) + ((m_generic_paletteram_8[offset + 0x400] >> 4) & 0x01);
-	g = (g << 1) + ((m_generic_paletteram_8[offset + 0x400] >> 5) & 0x01);
-	b = (b << 1) + ((m_generic_paletteram_8[offset + 0x400] >> 6) & 0x01);
+	r = (r << 1) + ((m_paletteram[offset + 0x400] >> 4) & 0x01);
+	g = (g << 1) + ((m_paletteram[offset + 0x400] >> 5) & 0x01);
+	b = (b << 1) + ((m_paletteram[offset + 0x400] >> 6) & 0x01);
 
-	m_palette->set_pen_color(offset,pal5bit(r),pal5bit(g),pal5bit(b));
+	m_palette->set_pen_color(offset, pal5bit(r), pal5bit(g), pal5bit(b));
 }
 
 
-WRITE8_MEMBER(gladiatr_state::spritebuffer_w)
+WRITE8_MEMBER(gladiatr_state_base::spritebuffer_w)
 {
 	m_sprite_buffer = data & 1;
 }
@@ -138,7 +138,7 @@ WRITE8_MEMBER(gladiatr_state::gladiatr_spritebank_w)
 }
 
 
-WRITE8_MEMBER(gladiatr_state::ppking_video_registers_w)
+WRITE8_MEMBER(ppking_state::ppking_video_registers_w)
 {
 	switch (offset & 0x300)
 	{
@@ -204,7 +204,7 @@ WRITE8_MEMBER(gladiatr_state::gladiatr_video_registers_w)
 
 ***************************************************************************/
 
-void gladiatr_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+void gladiatr_state_base::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int offs;
 
@@ -254,7 +254,7 @@ void gladiatr_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 
 
-uint32_t gladiatr_state::screen_update_ppking(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t ppking_state::screen_update_ppking(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	draw_sprites(bitmap,cliprect);

@@ -13,6 +13,7 @@ MAX_SECTORS     5       and granules of sectors
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "includes/trs80.h"
 
 
@@ -566,10 +567,10 @@ WRITE8_MEMBER( trs80_state::lnw80_fe_w )
 		mem.install_readwrite_handler (0x37e0, 0x37e3, read8_delegate(FUNC(trs80_state::trs80_irq_status_r), this), write8_delegate(FUNC(trs80_state::trs80_motor_w), this));
 		mem.install_readwrite_handler (0x37e8, 0x37eb, read8_delegate(FUNC(trs80_state::trs80_printer_r), this), write8_delegate(FUNC(trs80_state::trs80_printer_w), this));
 		mem.install_read_handler (0x37ec, 0x37ec, read8_delegate(FUNC(trs80_state::trs80_wd179x_r), this));
-		mem.install_write_handler (0x37ec, 0x37ec, write8_delegate(FUNC(fd1793_t::cmd_w),(fd1793_t*)m_fdc));
-		mem.install_readwrite_handler (0x37ed, 0x37ed, read8_delegate(FUNC(fd1793_t::track_r),(fd1793_t*)m_fdc), write8_delegate(FUNC(fd1793_t::track_w),(fd1793_t*)m_fdc));
-		mem.install_readwrite_handler (0x37ee, 0x37ee, read8_delegate(FUNC(fd1793_t::sector_r),(fd1793_t*)m_fdc), write8_delegate(FUNC(fd1793_t::sector_w),(fd1793_t*)m_fdc));
-		mem.install_readwrite_handler (0x37ef, 0x37ef, read8_delegate(FUNC(fd1793_t::data_r),(fd1793_t*)m_fdc),write8_delegate( FUNC(fd1793_t::data_w),(fd1793_t*)m_fdc));
+		mem.install_write_handler (0x37ec, 0x37ec, write8_delegate(FUNC(fd1793_device::cmd_w),(fd1793_device*)m_fdc));
+		mem.install_readwrite_handler (0x37ed, 0x37ed, read8_delegate(FUNC(fd1793_device::track_r),(fd1793_device*)m_fdc), write8_delegate(FUNC(fd1793_device::track_w),(fd1793_device*)m_fdc));
+		mem.install_readwrite_handler (0x37ee, 0x37ee, read8_delegate(FUNC(fd1793_device::sector_r),(fd1793_device*)m_fdc), write8_delegate(FUNC(fd1793_device::sector_w),(fd1793_device*)m_fdc));
+		mem.install_readwrite_handler (0x37ef, 0x37ef, read8_delegate(FUNC(fd1793_device::data_r),(fd1793_device*)m_fdc),write8_delegate( FUNC(fd1793_device::data_w),(fd1793_device*)m_fdc));
 		mem.install_read_handler (0x3800, 0x38ff, 0, 0x0300, 0, read8_delegate(FUNC(trs80_state::trs80_keyboard_r), this));
 		mem.install_readwrite_handler (0x3c00, 0x3fff, read8_delegate(FUNC(trs80_state::trs80_videoram_r), this), write8_delegate(FUNC(trs80_state::trs80_videoram_w), this));
 	}
@@ -757,24 +758,11 @@ WRITE8_MEMBER( trs80_state::trs80_motor_w )
  *************************************/
 READ8_MEMBER( trs80_state::trs80_keyboard_r )
 {
-	uint8_t result = 0;
+	u8 i, result = 0;
 
-	if (offset & 1)
-		result |= m_io_line0->read();
-	if (offset & 2)
-		result |= m_io_line1->read();
-	if (offset & 4)
-		result |= m_io_line2->read();
-	if (offset & 8)
-		result |= m_io_line3->read();
-	if (offset & 16)
-		result |= m_io_line4->read();
-	if (offset & 32)
-		result |= m_io_line5->read();
-	if (offset & 64)
-		result |= m_io_line6->read();
-	if (offset & 128)
-		result |= m_io_line7->read();
+	for (i = 0; i < 8; i++)
+		if (BIT(offset, i))
+			result |= m_io_keyboard[i]->read();
 
 	return result;
 }

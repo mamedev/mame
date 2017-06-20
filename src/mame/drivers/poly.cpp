@@ -36,12 +36,13 @@
 #include "machine/6840ptm.h"
 #include "machine/6850acia.h"
 #include "machine/clock.h"
-#include "machine/mc6854.h"
-#include "video/saa5050.h"
 #include "machine/keyboard.h"
-#include "sound/speaker.h"
+#include "machine/mc6854.h"
+#include "sound/spkrdev.h"
+#include "video/saa5050.h"
+#include "screen.h"
+#include "speaker.h"
 
-#define KEYBOARD_TAG "keyboard"
 
 class poly_state : public driver_device
 {
@@ -58,7 +59,7 @@ public:
 	{
 	}
 
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	void kbd_put(u8 data);
 	DECLARE_READ8_MEMBER(pia1_b_in);
 	DECLARE_READ8_MEMBER(videoram_r);
 	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
@@ -126,7 +127,7 @@ READ8_MEMBER( poly_state::videoram_r )
 	return m_videoram[offset];
 }
 
-WRITE8_MEMBER( poly_state::kbd_put )
+void poly_state::kbd_put(u8 data)
 {
 	m_term_data = data | 0x80;
 
@@ -150,7 +151,7 @@ WRITE_LINE_MEMBER( poly_state::ptm_o3_callback )
 	m_speaker->level_w(state);
 }
 
-static MACHINE_CONFIG_START( poly, poly_state )
+static MACHINE_CONFIG_START( poly )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809E, XTAL_12MHz / 3) // 12.0576MHz
 	MCFG_CPU_PROGRAM_MAP(poly_mem)
@@ -198,8 +199,8 @@ static MACHINE_CONFIG_START( poly, poly_state )
 
 	MCFG_DEVICE_ADD("adlc", MC6854, 0)
 
-	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(WRITE8(poly_state, kbd_put))
+	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
+	MCFG_GENERIC_KEYBOARD_CB(PUT(poly_state, kbd_put))
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -224,5 +225,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR   NAME    PARENT  COMPAT   MACHINE    INPUT  CLASS           INIT    COMPANY     FULLNAME       FLAGS */
-COMP( 1981,  poly1,  0,      0,       poly,      poly, driver_device,    0,   "Polycorp", "Poly-1 Educational Computer", MACHINE_NOT_WORKING )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT  COMPANY     FULLNAME                       FLAGS
+COMP( 1981, poly1, 0,      0,      poly,    poly,  poly_state, 0,    "Polycorp", "Poly-1 Educational Computer", MACHINE_NOT_WORKING )

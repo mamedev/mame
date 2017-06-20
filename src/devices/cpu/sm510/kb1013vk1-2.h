@@ -6,8 +6,10 @@
 
 */
 
-#ifndef _KB1013VK12_H_
-#define _KB1013VK12_H_
+#ifndef MAME_CPU_SM510_KB1013VK1_2_H
+#define MAME_CPU_SM510_KB1013VK1_2_H
+
+#pragma once
 
 #include "sm500.h"
 
@@ -16,17 +18,13 @@
 
 // ..
 
-
-
-
-
 class kb1013vk12_device : public sm500_device
 {
 public:
-	kb1013vk12_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	kb1013vk12_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options) override;
 	virtual void execute_one() override;
 
 	// opcode handlers
@@ -35,7 +33,6 @@ protected:
 };
 
 
-extern const device_type KB1013VK12;
+DECLARE_DEVICE_TYPE(KB1013VK12, kb1013vk12_device)
 
-
-#endif /* _KB1013VK12_H_ */
+#endif // MAME_CPU_SM510_KB1013VK1_2_H

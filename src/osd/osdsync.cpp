@@ -7,7 +7,6 @@
 //============================================================
 #if defined(OSD_WINDOWS) || defined(SDLMAME_WIN32)
 // standard windows headers
-#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <process.h>
 #include <tchar.h>
@@ -21,8 +20,6 @@
 #include <atomic>
 #include <thread>
 #include <vector>
-#undef min
-#undef max
 #include <algorithm>
 // MAME headers
 #include "osdcore.h"

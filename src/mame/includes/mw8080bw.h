@@ -12,6 +12,7 @@
 #include "sound/discrete.h"
 #include "sound/sn76477.h"
 #include "sound/samples.h"
+#include "screen.h"
 
 
 #define MW8080BW_MASTER_CLOCK             (19968000.0)
@@ -91,8 +92,9 @@ public:
 	std::unique_ptr<uint8_t[]> m_scattered_colorram;
 	std::unique_ptr<uint8_t[]> m_scattered_colorram2;
 
-	/* timer */
+	/* timers */
 	emu_timer   *m_interrupt_timer;
+	emu_timer   *m_maze_tone_timer;
 
 	/* other devices */
 	optional_device<samples_device> m_samples;
@@ -168,7 +170,7 @@ public:
 	uint32_t screen_update_spcenctr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_phantom2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_invaders(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void screen_eof_phantom2(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_phantom2);
 	TIMER_CALLBACK_MEMBER(maze_tone_timing_timer_callback);
 	TIMER_CALLBACK_MEMBER(mw8080bw_interrupt_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(spcenctr_strobe_timer_callback);

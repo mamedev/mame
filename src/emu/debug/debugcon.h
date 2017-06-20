@@ -8,13 +8,15 @@
 
 *********************************************************************/
 
-#ifndef __DEBUGCON_H__
-#define __DEBUGCON_H__
+#ifndef MAME_EMU_DEBUG_DEBUGCON_H
+#define MAME_EMU_DEBUG_DEBUGCON_H
+
+#pragma once
+
+#include "textbuf.h"
 
 #include <functional>
 
-#include "emu.h"
-#include "textbuf.h"
 
 /***************************************************************************
     CONSTANTS
@@ -77,7 +79,7 @@ public:
 	/* command handling */
 	CMDERR          execute_command(const char *command, bool echo);
 	CMDERR          validate_command(const char *command);
-	void            register_command(const char *command, u32 flags, int ref, int minparams, int maxparams, std::function<void(int, int, const char **)> handler);
+	void            register_command(const char *command, u32 flags, int ref, int minparams, int maxparams, std::function<void(int, const std::vector<std::string> &)> handler);
 
 	/* console management */
 	void            vprintf(util::format_argument_pack<std::ostream> const &args);
@@ -117,7 +119,7 @@ private:
 		char            command[32];
 		const char *    params;
 		const char *    help;
-		std::function<void(int, int, const char **)> handler;
+		std::function<void(int, const std::vector<std::string> &)> handler;
 		u32             flags;
 		int             ref;
 		int             minparams;
@@ -132,4 +134,4 @@ private:
 	debug_command   *m_commandlist;
 };
 
-#endif
+#endif // MAME_EMU_DEBUG_DEBUGCON_H

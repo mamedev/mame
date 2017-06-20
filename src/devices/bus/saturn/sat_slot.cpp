@@ -29,17 +29,18 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type SATURN_CART_SLOT = &device_creator<sat_cart_slot_device>;
+DEFINE_DEVICE_TYPE(SATURN_CART_SLOT, sat_cart_slot_device, "sat_cart_slot", "Saturn Cartridge Slot")
 
 
 //-------------------------------------------------
 //  device_sat_cart_interface - constructor
 //-------------------------------------------------
 
-device_sat_cart_interface::device_sat_cart_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device), m_cart_type(0),
-		m_rom(nullptr),
-		m_rom_size(0)
+device_sat_cart_interface::device_sat_cart_interface(const machine_config &mconfig, device_t &device, int cart_type) :
+	device_slot_card_interface(mconfig, device),
+	m_cart_type(cart_type),
+	m_rom(nullptr),
+	m_rom_size(0)
 {
 }
 
@@ -102,9 +103,9 @@ void device_sat_cart_interface::dram1_alloc(uint32_t size)
 //  sat_cart_slot_device - constructor
 //-------------------------------------------------
 sat_cart_slot_device::sat_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-						device_t(mconfig, SATURN_CART_SLOT, "Saturn Cartridge Slot", tag, owner, clock, "sat_cart_slot", __FILE__),
-						device_image_interface(mconfig, *this),
-						device_slot_interface(mconfig, *this), m_cart(nullptr)
+	device_t(mconfig, SATURN_CART_SLOT, tag, owner, clock),
+	device_image_interface(mconfig, *this),
+	device_slot_interface(mconfig, *this), m_cart(nullptr)
 {
 }
 
@@ -126,18 +127,6 @@ void sat_cart_slot_device::device_start()
 	m_cart = dynamic_cast<device_sat_cart_interface *>(get_card_device());
 }
 
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void sat_cart_slot_device::device_config_complete()
-{
-	// set brief and instance name
-	update_names();
-}
-
 
 
 /*-------------------------------------------------
@@ -149,18 +138,18 @@ image_init_result sat_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		bool is_rom = ((software_entry() == nullptr) || ((software_entry() != nullptr) && get_software_region("rom")));
+		bool is_rom = (!loaded_through_softlist() || (loaded_through_softlist() && get_software_region("rom")));
 
 		if (is_rom)
 		{
 			// from fullpath, only ROM carts
-			uint32_t len = (software_entry() != nullptr) ? get_software_region_length("rom") : length();
+			uint32_t len = loaded_through_softlist() ? get_software_region_length("rom") : length();
 			uint32_t *ROM;
 
 			m_cart->rom_alloc(len, tag());
 			ROM = m_cart->get_rom_base();
 
-			if (software_entry() != nullptr)
+			if (loaded_through_softlist())
 				memcpy(ROM, get_software_region("rom"), len);
 			else
 				fread(ROM, len);
@@ -208,7 +197,7 @@ void sat_cart_slot_device::call_unload()
  get default card software
  -------------------------------------------------*/
 
-std::string sat_cart_slot_device::get_default_card_software()
+std::string sat_cart_slot_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
 	return software_get_default_slot("rom");
 }

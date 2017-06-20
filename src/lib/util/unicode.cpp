@@ -2,13 +2,23 @@
 // copyright-holders:Aaron Giles
 /*********************************************************************
 
-    unicode.c
+    unicode.cpp
 
     Unicode related functions
 
 ***************************************************************************/
 
 #include "unicode.h"
+
+#ifdef _WIN32
+#include "strconv.h"
+#define UTF8PROC_DLLEXPORT
+#endif
+
+#include <utf8proc.h>
+
+#include <codecvt>
+#include <locale>
 
 
 //-------------------------------------------------
@@ -342,6 +352,119 @@ int utf16f_from_uchar(char16_t *utf16string, size_t count, char32_t uchar)
 	if (rc >= 2)
 		utf16string[1] = flipendian_int16(buf[1]);
 	return rc;
+}
+
+
+//-------------------------------------------------
+// wstring_from_utf8
+//-------------------------------------------------
+
+std::wstring wstring_from_utf8(const std::string &utf8string)
+{
+#ifdef WIN32
+	// for some reason, using codecvt yields bad results on MinGW (but not MSVC)
+	return osd::text::to_wstring(utf8string);
+#else
+	std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
+	return converter.from_bytes(utf8string);
+#endif
+}
+
+
+//-------------------------------------------------
+// utf8_from_wstring
+//-------------------------------------------------
+
+std::string utf8_from_wstring(const std::wstring &string)
+{
+#ifdef WIN32
+	// for some reason, using codecvt yields bad results on MinGW (but not MSVC)
+	return osd::text::from_wstring(string);
+#else
+	std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
+	return converter.to_bytes(string);
+#endif
+}
+
+
+//-------------------------------------------------
+//  internal_normalize_unicode - uses utf8proc to
+//  normalize unicode
+//-------------------------------------------------
+
+static std::string internal_normalize_unicode(const char *s, size_t length, unicode_normalization_form normalization_form, bool null_terminated)
+{
+	// convert the normalization form
+	int options;
+	switch (normalization_form)
+	{
+	case unicode_normalization_form::C:
+		options = UTF8PROC_STABLE | UTF8PROC_COMPOSE;
+		break;
+	case unicode_normalization_form::D:
+		options = UTF8PROC_STABLE | UTF8PROC_DECOMPOSE;
+		break;
+	case unicode_normalization_form::KC:
+		options = UTF8PROC_STABLE | UTF8PROC_COMPOSE | UTF8PROC_COMPAT;
+		break;
+	case unicode_normalization_form::KD:
+		options = UTF8PROC_STABLE | UTF8PROC_DECOMPOSE | UTF8PROC_COMPAT;
+		break;
+	default:
+		throw false;
+	}
+
+	// was this null terminated?
+	if (null_terminated)
+		options |= UTF8PROC_NULLTERM;
+
+	// invoke utf8proc
+	utf8proc_uint8_t *utf8proc_result;
+	utf8proc_ssize_t utf8proc_result_length = utf8proc_map((utf8proc_uint8_t *) s, length, &utf8proc_result, (utf8proc_option_t)options);
+
+	// conver the result
+	std::string result;
+	if (utf8proc_result)
+	{
+		if (utf8proc_result_length > 0)
+			result = std::string((const char *)utf8proc_result, utf8proc_result_length);
+		free(utf8proc_result);
+	}
+
+	return result;
+}
+
+
+//-------------------------------------------------
+//  normalize_unicode - uses utf8proc to normalize
+//  unicode
+//-------------------------------------------------
+
+std::string normalize_unicode(const std::string &s, unicode_normalization_form normalization_form)
+{
+	return internal_normalize_unicode(s.c_str(), s.length(), normalization_form, false);
+}
+
+
+//-------------------------------------------------
+//  normalize_unicode - uses utf8proc to normalize
+//  unicode
+//-------------------------------------------------
+
+std::string normalize_unicode(const char *s, unicode_normalization_form normalization_form)
+{
+	return internal_normalize_unicode(s, 0, normalization_form, true);
+}
+
+
+//-------------------------------------------------
+//  normalize_unicode - uses utf8proc to normalize
+//  unicode
+//-------------------------------------------------
+
+std::string normalize_unicode(const char *s, size_t length, unicode_normalization_form normalization_form)
+{
+	return internal_normalize_unicode(s, length, normalization_form, false);
 }
 
 

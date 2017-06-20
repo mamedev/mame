@@ -1,10 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
 #include "emu.h"
-#include "cpu/cosmac/cosmac.h"
-#include "sound/cdp1869.h"
-#include "sound/ay8910.h"
 #include "includes/cidelsa.h"
+#include "speaker.h"
+
 
 /* Register Access */
 
@@ -149,7 +148,7 @@ WRITE8_MEMBER( draco_state::psg_pb_w )
 
 /* Machine Drivers */
 
-MACHINE_CONFIG_FRAGMENT( destryer_video )
+MACHINE_CONFIG_START( destryer_video )
 	MCFG_CDP1869_SCREEN_PAL_ADD(CDP1869_TAG, SCREEN_TAG, DESTRYER_CHR2)
 	MCFG_SCREEN_DEFAULT_POSITION(1.226, 0.012, 1.4, 0.044)
 
@@ -163,7 +162,7 @@ MACHINE_CONFIG_FRAGMENT( destryer_video )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_FRAGMENT( altair_video )
+MACHINE_CONFIG_START( altair_video )
 	MCFG_CDP1869_SCREEN_PAL_ADD(CDP1869_TAG, SCREEN_TAG, ALTAIR_CHR2)
 	MCFG_SCREEN_DEFAULT_POSITION(1.226, 0.012, 1.4, 0.044)
 
@@ -177,7 +176,7 @@ MACHINE_CONFIG_FRAGMENT( altair_video )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_FRAGMENT( draco_video )
+MACHINE_CONFIG_START( draco_video )
 	MCFG_CDP1869_SCREEN_PAL_ADD(CDP1869_TAG, SCREEN_TAG, DRACO_CHR2)
 	MCFG_SCREEN_DEFAULT_POSITION(1.226, 0.012, 1.360, 0.024)
 

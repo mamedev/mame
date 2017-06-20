@@ -6,10 +6,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_SOUND_I5000_H
+#define MAME_SOUND_I5000_H
 
-#ifndef __I5000_H__
-#define __I5000_H__
+#pragma once
 
 #include "sound/okiadpcm.h"
 
@@ -39,14 +39,14 @@ public:
 	DECLARE_READ16_MEMBER(read);
 	DECLARE_WRITE16_MEMBER(write);
 
-	sound_stream *m_stream;
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+
+	sound_stream *m_stream;
 
 private:
 	struct channel_t
@@ -85,5 +85,6 @@ private:
 
 // device type definition
 extern const device_type I5000_SND;
+DECLARE_DEVICE_TYPE(I5000_SND, i5000snd_device)
 
-#endif /* __I5000_H__ */
+#endif // MAME_SOUND_I5000_H

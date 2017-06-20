@@ -1,8 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Jarek Parchanski
-#ifndef __TAITO8741__
-#define __TAITO8741__
+#ifndef MAME_MACHINE_TAITO8741_H
+#define MAME_MACHINE_TAITO8741_H
 
+#pragma once
 
 /****************************************************************************
   gladiatr and Great Swordsman set.
@@ -38,32 +39,13 @@
 
 class taito8741_4pack_device : public device_t
 {
-	struct I8741 {
-		int number;
-		uint8_t toData;    /* to host data      */
-		uint8_t fromData;  /* from host data    */
-		uint8_t fromCmd;   /* from host command */
-		uint8_t status;    /* b0 = rd ready,b1 = wd full,b2 = cmd ?? */
-		uint8_t mode;
-		uint8_t phase;
-		uint8_t txd[8];
-		uint8_t rxd[8];
-		uint8_t parallelselect;
-		uint8_t txpoint;
-		int connect;
-		uint8_t pending4a;
-		int serial_out;
-		int coins;
-	};
-
 public:
 	taito8741_4pack_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~taito8741_4pack_device() {}
 
-	template<class _Object> static devcb_base &set_port_handler_0_callback(device_t &device, _Object object) { return downcast<taito8741_4pack_device &>(device).m_port_handler_0_r.set_callback(object); }
-	template<class _Object> static devcb_base &set_port_handler_1_callback(device_t &device, _Object object) { return downcast<taito8741_4pack_device &>(device).m_port_handler_1_r.set_callback(object); }
-	template<class _Object> static devcb_base &set_port_handler_2_callback(device_t &device, _Object object) { return downcast<taito8741_4pack_device &>(device).m_port_handler_2_r.set_callback(object); }
-	template<class _Object> static devcb_base &set_port_handler_3_callback(device_t &device, _Object object) { return downcast<taito8741_4pack_device &>(device).m_port_handler_3_r.set_callback(object); }
+	template <class Object> static devcb_base &set_port_handler_0_callback(device_t &device, Object &&cb) { return downcast<taito8741_4pack_device &>(device).m_port_handler_0_r.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_port_handler_1_callback(device_t &device, Object &&cb) { return downcast<taito8741_4pack_device &>(device).m_port_handler_1_r.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_port_handler_2_callback(device_t &device, Object &&cb) { return downcast<taito8741_4pack_device &>(device).m_port_handler_2_r.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_port_handler_3_callback(device_t &device, Object &&cb) { return downcast<taito8741_4pack_device &>(device).m_port_handler_3_r.set_callback(std::forward<Object>(cb)); }
 
 	static void static_set_mode(device_t &device, int num, uint8_t mode) { downcast<taito8741_4pack_device &>(device).m_taito8741[num].mode = mode; }
 	static void static_set_connect(device_t &device, int num, int conn) { downcast<taito8741_4pack_device &>(device).m_taito8741[num].connect = conn; }
@@ -92,6 +74,24 @@ protected:
 	virtual void device_reset() override;
 
 private:
+	struct I8741 {
+		int number;
+		uint8_t toData;    /* to host data      */
+		uint8_t fromData;  /* from host data    */
+		uint8_t fromCmd;   /* from host command */
+		uint8_t status;    /* b0 = rd ready,b1 = wd full,b2 = cmd ?? */
+		uint8_t mode;
+		uint8_t phase;
+		uint8_t txd[8];
+		uint8_t rxd[8];
+		uint8_t parallelselect;
+		uint8_t txpoint;
+		int connect;
+		uint8_t pending4a;
+		int serial_out;
+		int coins;
+	};
+
 	void hostdata_w(I8741 *st,int data);
 	int hostdata_r(I8741 *st);
 	int hostcmd_r(I8741 *st);
@@ -107,83 +107,6 @@ private:
 };
 
 
-extern const device_type TAITO8741_4PACK;
+DECLARE_DEVICE_TYPE(TAITO8741_4PACK, taito8741_4pack_device)
 
-
-/****************************************************************************
-  joshi Volleyball set.
-****************************************************************************/
-
-#define MCFG_JOSVOLLY8741_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, JOSVOLLY8741_4PACK, 0)
-
-#define MCFG_JOSVOLLY8741_PORT_HANDLERS(_devcb0, _devcb1, _devcb2, _devcb3) \
-	devcb = &josvolly8741_4pack_device::set_port_handler_0_callback(*device, DEVCB_##_devcb0); \
-	devcb = &josvolly8741_4pack_device::set_port_handler_1_callback(*device, DEVCB_##_devcb1); \
-	devcb = &josvolly8741_4pack_device::set_port_handler_2_callback(*device, DEVCB_##_devcb2); \
-	devcb = &josvolly8741_4pack_device::set_port_handler_3_callback(*device, DEVCB_##_devcb3);
-
-#define MCFG_JOSVOLLY8741_CONNECT(_con0, _con1, _con2, _con3) \
-	josvolly8741_4pack_device::static_set_connect(*device, 0, _con0);   \
-	josvolly8741_4pack_device::static_set_connect(*device, 1, _con1);   \
-	josvolly8741_4pack_device::static_set_connect(*device, 2, _con2);   \
-	josvolly8741_4pack_device::static_set_connect(*device, 3, _con3);
-
-
-class josvolly8741_4pack_device : public device_t
-{
-	struct JV8741  {
-		uint8_t cmd;
-		uint8_t sts;
-		uint8_t txd;
-		uint8_t outport;
-		uint8_t rxd;
-		uint8_t connect;
-		uint8_t rst;
-	};
-
-public:
-	josvolly8741_4pack_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~josvolly8741_4pack_device() {}
-
-	template<class _Object> static devcb_base &set_port_handler_0_callback(device_t &device, _Object object) { return downcast<josvolly8741_4pack_device &>(device).m_port_handler_0_r.set_callback(object); }
-	template<class _Object> static devcb_base &set_port_handler_1_callback(device_t &device, _Object object) { return downcast<josvolly8741_4pack_device &>(device).m_port_handler_1_r.set_callback(object); }
-	template<class _Object> static devcb_base &set_port_handler_2_callback(device_t &device, _Object object) { return downcast<josvolly8741_4pack_device &>(device).m_port_handler_2_r.set_callback(object); }
-	template<class _Object> static devcb_base &set_port_handler_3_callback(device_t &device, _Object object) { return downcast<josvolly8741_4pack_device &>(device).m_port_handler_3_r.set_callback(object); }
-
-	static void static_set_connect(device_t &device, int num, int conn) { downcast<josvolly8741_4pack_device &>(device).m_i8741[num].connect = conn; }
-
-	DECLARE_READ8_MEMBER( read_0 ) { return read(0,offset); }
-	DECLARE_WRITE8_MEMBER( write_0 ) { write(0,offset,data); }
-	DECLARE_READ8_MEMBER( read_1 ) { return read(1,offset); }
-	DECLARE_WRITE8_MEMBER( write_1 ) { write(1,offset,data); }
-
-	DECLARE_WRITE8_MEMBER( nmi_enable_w ) { m_nmi_enable = 1; }
-
-	TIMER_CALLBACK_MEMBER( tx );
-protected:
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-
-private:
-	void update(int num);
-	void write(int num, int offset, int data);
-	uint8_t read(int num,int offset);
-	uint8_t port_read(int num);
-
-	// internal state
-	JV8741 m_i8741[4];
-	int m_nmi_enable;
-
-	devcb_read8 m_port_handler_0_r;
-	devcb_read8 m_port_handler_1_r;
-	devcb_read8 m_port_handler_2_r;
-	devcb_read8 m_port_handler_3_r;
-};
-
-
-extern const device_type JOSVOLLY8741_4PACK;
-
-
-#endif
+#endif // MAME_MACHINE_TAITO8741_H

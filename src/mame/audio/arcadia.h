@@ -1,7 +1,7 @@
 // license:GPL-2.0+
 // copyright-holders:Peter Trauner
-#ifndef ARCADIA_SOUND_H_
-#define ARCADIA_SOUND_H_
+#ifndef MAME_AUDIO_ARCADIA_H
+#define MAME_AUDIO_ARCADIA_H
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
@@ -16,8 +16,7 @@
 
 // ======================> arcadia_sound_device
 
-class arcadia_sound_device : public device_t,
-								public device_sound_interface
+class arcadia_sound_device : public device_t, public device_sound_interface
 {
 public:
 	// construction/destruction
@@ -39,6 +38,6 @@ protected:
 };
 
 // device type definition
-extern const device_type ARCADIA_SOUND;
+DECLARE_DEVICE_TYPE(ARCADIA_SOUND, arcadia_sound_device)
 
-#endif /* ARCADIA_SOUND_H_ */
+#endif // MAME_AUDIO_ARCADIA_H

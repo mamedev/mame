@@ -33,7 +33,7 @@
 		local objdirs = {}
 		local additionalobjdirs = {}
 		for _, file in ipairs(prj.allfiles) do
-			if path.isSourceFile(file) then
+			if path.issourcefile(file) then
 				objdirs[_MAKE.esc(path.getdirectory(path.trimdots(file)))] = 1
 			end
 		end
@@ -101,10 +101,15 @@
 				prj.archivesplit_size=200
 			end
 			if (not prj.options.ArchiveSplit) then
+                _p('ifeq (posix,$(SHELLTYPE))')
+                _p('\t$(SILENT) rm -f  $(TARGET)')
+                _p('else')
+                _p('\t$(SILENT) if exist $(subst /,\\\\,$(TARGET)) del $(subst /,\\\\,$(TARGET))')
+                _p('endif')
 				_p('\t$(SILENT) $(LINKCMD) $(OBJECTS)' .. (os.is("MacOSX") and " 2>&1 > /dev/null | sed -e '/.o) has no symbols$$/d'" or ""))
 			else
 				_p('\t$(call RM,$(TARGET))')
-				_p('\t$(call max_args,$(SILENT) $(LINKCMD),'.. prj.archivesplit_size ..',$(OBJECTS))' .. (os.is("MacOSX") and " 2>&1 > /dev/null | sed -e '/.o) has no symbols$$/d'" or ""))
+				_p('\t@$(call max_args,$(LINKCMD),'.. prj.archivesplit_size ..',$(OBJECTS))' .. (os.is("MacOSX") and " 2>&1 > /dev/null | sed -e '/.o) has no symbols$$/d'" or ""))
 				_p('\t$(SILENT) $(LINKCMD_NDX)')
 			end
 		else
@@ -257,7 +262,7 @@
 		_p('  ifdef WINDRES')
 		_p('    RESCOMP = $(WINDRES)')
 		_p('  else')
-		_p('    RESCOMP = windres')
+		_p('    RESCOMP = %s', cc.rc or 'windres')
 		_p('  endif')
 		_p('endif')
 		_p('')
@@ -313,7 +318,7 @@
 		-- add objects for compilation, and remove any that are excluded per config.
 		_p('  OBJECTS := \\')
 		for _, file in ipairs(cfg.files) do
-			if path.isSourceFile(file) then
+			if path.issourcefile(file) then
 				-- check if file is excluded.
 				if not is_excluded(prj, cfg, file) then
 					-- if not excluded, add it.
@@ -518,7 +523,7 @@
 		table.sort(prj.allfiles)
 
 		for _, file in ipairs(prj.allfiles or {}) do
-			if path.isSourceFile(file) then
+			if path.issourcefile(file) then
 				if (path.isobjcfile(file)) then
 					_p('$(OBJDIR)/%s.o: %s $(GCH_OBJC) $(MAKEFILE)'
 						, _MAKE.esc(path.trimdots(path.removeext(file)))

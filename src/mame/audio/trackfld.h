@@ -1,14 +1,17 @@
 // license:BSD-3-Clause
 // copyright-holders:Chris Hardy
+#ifndef MAME_AUDIO_TRACKFLD_H
+#define MAME_AUDIO_TRACKFLD_H
+
+#pragma once
+
 #include "sound/vlm5030.h"
 #include "cpu/m6800/m6800.h"
 
-class trackfld_audio_device : public device_t,
-									public device_sound_interface
+class trackfld_audio_device : public device_t, public device_sound_interface
 {
 public:
 	trackfld_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~trackfld_audio_device() {}
 
 	DECLARE_WRITE8_MEMBER(konami_sh_irqtrigger_w );
 	DECLARE_READ8_MEMBER(trackfld_sh_timer_r );
@@ -19,7 +22,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -35,4 +37,6 @@ private:
 	vlm5030_device *m_vlm;
 };
 
-extern const device_type TRACKFLD_AUDIO;
+DECLARE_DEVICE_TYPE(TRACKFLD_AUDIO, trackfld_audio_device)
+
+#endif // MAME_AUDIO_TRACKFLD_H

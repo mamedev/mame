@@ -53,8 +53,12 @@ Notes:
 */
 
 
+#include "emu.h"
 #include "includes/vixen.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 
 //**************************************************************************
@@ -75,18 +79,14 @@ void vixen_state::update_interrupt()
 
 READ8_MEMBER( vixen_state::opram_r )
 {
-	if (!space.debugger_access())
+	if (!machine().side_effect_disabled())
 		membank("bank3")->set_entry(0); // read videoram
-	bool const prev_debugger_access(m_program->debugger_access());
-	m_program->set_debugger_access(space.debugger_access());
-	uint8_t const data(m_program->read_byte(offset));
-	m_program->set_debugger_access(prev_debugger_access);
-	return data;
+	return m_program->read_byte(offset);
 }
 
 READ8_MEMBER( vixen_state::oprom_r )
 {
-	if (!space.debugger_access())
+	if (!machine().side_effect_disabled())
 		membank("bank3")->set_entry(1); // read rom
 	return m_rom[offset];
 }
@@ -281,7 +281,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( vixen_io, AS_IO, 8, vixen_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE(FDC1797_TAG, fd1797_t, read, write)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE(FDC1797_TAG, fd1797_device, read, write)
 	AM_RANGE(0x04, 0x04) AM_MIRROR(0x03) AM_READWRITE(status_r, cmd_w)
 	AM_RANGE(0x08, 0x08) AM_MIRROR(0x01) AM_DEVREADWRITE(P8155H_TAG, i8155_device, read, write)
 	AM_RANGE(0x0c, 0x0d) AM_DEVWRITE(P8155H_TAG, i8155_device, ale_w)
@@ -737,7 +737,7 @@ void vixen_state::machine_reset()
 //  MACHINE_CONFIG( vixen )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( vixen, vixen_state )
+static MACHINE_CONFIG_START( vixen )
 	// basic machine hardware
 	MCFG_CPU_ADD(Z8400A_TAG, Z80, XTAL_23_9616MHz/6)
 	MCFG_CPU_PROGRAM_MAP(vixen_mem)
@@ -844,5 +844,5 @@ DRIVER_INIT_MEMBER(vixen_state,vixen)
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE    INPUT    CLASS         INIT    COMPANY      FULLNAME       FLAGS
+//    YEAR  NAME    PARENT  COMPAT  MACHINE    INPUT    CLASS         INIT    COMPANY      FULLNAME      FLAGS
 COMP( 1984, vixen,  0,       0,     vixen,     vixen,   vixen_state,  vixen,  "Osborne",   "Vixen",      0 )

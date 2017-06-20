@@ -13,6 +13,9 @@
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "rendlay.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 #define VERBOSE_LEVEL ( 0 )
 
@@ -216,7 +219,7 @@ DRIVER_INIT_MEMBER(mini2440_state,mini2440)
 	// do nothing
 }
 
-static MACHINE_CONFIG_START( mini2440, mini2440_state )
+static MACHINE_CONFIG_START( mini2440 )
 	MCFG_CPU_ADD("maincpu", ARM920T, 400000000)
 	MCFG_CPU_PROGRAM_MAP(mini2440_map)
 
@@ -251,7 +254,7 @@ static MACHINE_CONFIG_START( mini2440, mini2440_state )
 	MCFG_S3C2440_NAND_DATA_W_CB(WRITE8(mini2440_state, s3c2440_nand_data_w))
 
 	MCFG_DEVICE_ADD("nand", NAND, 0)
-	MCFG_NAND_TYPE(NAND_CHIP_K9F1G08U0B)
+	MCFG_NAND_TYPE(K9F1G08U0B)
 	MCFG_NAND_RNB_CALLBACK(DEVWRITELINE("s3c2440", s3c2440_device, frnb_w))
 MACHINE_CONFIG_END
 

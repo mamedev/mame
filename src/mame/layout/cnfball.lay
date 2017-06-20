@@ -55,11 +55,9 @@
 
 		<bezel name="digit7" element="digit"><bounds x="19.5" y="16.5" width="12" height="15" /></bezel>
 		<bezel name="digit6" element="digit"><bounds x="35.5" y="16.5" width="12" height="15" /></bezel>
-		<bezel element="digit"><bounds x="51.5" y="16.5" width="12" height="15" /></bezel> <!-- N/C or unpopulated -->
 		<bezel name="digit5" element="digit"><bounds x="67.5" y="16.5" width="12" height="15" /></bezel>
 		<bezel name="digit4" element="digit"><bounds x="83.5" y="16.5" width="12" height="15" /></bezel>
 		<bezel name="digit3" element="digit"><bounds x="99.5" y="16.5" width="12" height="15" /></bezel>
-		<bezel element="digit"><bounds x="115.5" y="16.5" width="12" height="15" /></bezel> <!-- N/C or unpopulated -->
 		<bezel name="digit1" element="digit"><bounds x="131.5" y="16.5" width="12" height="15" /></bezel>
 		<bezel name="digit0" element="digit"><bounds x="147.5" y="16.5" width="12" height="15" /></bezel>
 

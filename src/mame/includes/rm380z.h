@@ -7,11 +7,13 @@ Research Machines RM 380Z
 
 */
 
-#ifndef RM380Z_H_
-#define RM380Z_H_
+#ifndef MAME_INCLUDES_RM380Z_H
+#define MAME_INCLUDES_RM380Z_H
 
-#include "emu.h"
+#pragma once
+
 #include "cpu/z80/z80.h"
+#include "imagedev/cassette.h"
 #include "machine/ram.h"
 #include "imagedev/flopdrv.h"
 #include "machine/wd_fdc.h"
@@ -59,13 +61,11 @@ private:
 
 	int writenum;
 
-protected:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 
-public:
-
 	uint8_t m_port0;
+	uint8_t m_port0_mask;
 	uint8_t m_port0_kbd;
 	uint8_t m_port1;
 	uint8_t m_fbfd;
@@ -87,15 +87,20 @@ public:
 	int m_videomode;
 	int m_old_videomode;
 
-	required_device<cpu_device> m_maincpu;
-	required_device<ram_device> m_messram;
-	required_device<fd1771_t> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
+	emu_timer *m_static_vblank_timer;
 
+	required_device<cpu_device> m_maincpu;
+	optional_device<cassette_image_device> m_cassette;
+	optional_device<ram_device> m_messram;
+	optional_device<fd1771_device> m_fdc;
+	optional_device<floppy_connector> m_floppy0;
+	optional_device<floppy_connector> m_floppy1;
+
+public:
 	rm380z_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, RM380Z_MAINCPU_TAG),
+		m_cassette(*this, "cassette"),
 		m_messram(*this, RAM_TAG),
 		m_fdc(*this, "wd1771"),
 		m_floppy0(*this, "wd1771:0"),
@@ -122,13 +127,19 @@ public:
 
 	DECLARE_WRITE8_MEMBER(disk_0_control);
 
-	DECLARE_WRITE8_MEMBER( keyboard_put );
+	void keyboard_put(u8 data);
+
+	DECLARE_DRIVER_INIT(rm380z);
+	DECLARE_DRIVER_INIT(rm380z34d);
+	DECLARE_DRIVER_INIT(rm380z34e);
+	DECLARE_DRIVER_INIT(rm480z);
+	DECLARE_MACHINE_RESET(rm480z);
 
 	void config_memory_map();
 	void update_screen(bitmap_ind16 &bitmap);
 	uint32_t screen_update_rm380z(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_rm480z(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(static_vblank_timer);
 };
 
-
-#endif
+#endif // MAME_INCLUDES_RM380Z_H

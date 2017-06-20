@@ -41,6 +41,9 @@ so it could be by them instead
 #include "emu.h"
 #include "cpu/i86/i86.h"
 #include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 class hotblock_state : public driver_device
 {
@@ -138,8 +141,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( hotblock_io, AS_IO, 8, hotblock_state )
 	AM_RANGE(0x0000, 0x0000) AM_WRITE(port0_w)
 	AM_RANGE(0x0004, 0x0004) AM_READWRITE(port4_r, port4_w)
-	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0x8001, 0x8001) AM_DEVREAD("aysnd", ay8910_device, data_r)
+	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE("aysnd", ym2149_device, address_data_w)
+	AM_RANGE(0x8001, 0x8001) AM_DEVREAD("aysnd", ym2149_device, data_r)
 ADDRESS_MAP_END
 
 
@@ -203,7 +206,7 @@ static INPUT_PORTS_START( hotblock )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( hotblock, hotblock_state )
+static MACHINE_CONFIG_START( hotblock )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8088, 10000000)
@@ -226,7 +229,7 @@ static MACHINE_CONFIG_START( hotblock, hotblock_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 1000000)
+	MCFG_SOUND_ADD("aysnd", YM2149, 1000000)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("P1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("P2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -238,4 +241,4 @@ ROM_START( hotblock )
 	ROM_LOAD( "hotblk6.ic5", 0x080000, 0x080000, CRC(3176d231) SHA1(ac22fd0e9820c6714f51a3d8315eb5d43ef91eeb) )
 ROM_END
 
-GAME( 1993, hotblock, 0,        hotblock, hotblock, driver_device, 0, ROT0,  "NIX?", "Hot Blocks - Tetrix II", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, hotblock, 0,        hotblock, hotblock, hotblock_state, 0, ROT0,  "NIX?", "Hot Blocks - Tetrix II", MACHINE_SUPPORTS_SAVE )

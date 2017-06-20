@@ -53,7 +53,7 @@ const abc800_format::format abc800_format::formats[] = {
 
 	{   //  80K 5 1/4 inch single density single sided
 		floppy_image::FF_525, floppy_image::SSSD, floppy_image::FM,
-		4000, 16, 40, 1, 128, {}, 1, {}, 28, 11, 27
+		4000, 16, 40, 1, 128, {}, -1, { 1,2,11,12,5,6,15,16,9,10,3,4,13,14,7,8 }, 28, 11, 27
 	},
 
 	// track description
@@ -77,7 +77,7 @@ const abc800_format::format abc800_format::formats[] = {
 
 	{   //  160K 5 1/4 inch double density single sided
 		floppy_image::FF_525, floppy_image::SSDD, floppy_image::MFM,
-		2000, 16, 40, 1, 256, {}, 1, {}, 55, 22, 54
+		2000, 16, 40, 1, 256, {}, -1, { 1,8,15,6,13,4,11,2,9,16,7,14,5,12,3,10 }, 55, 22, 54
 	},
 
 	// track description
@@ -142,3 +142,26 @@ const abc800_format::format abc800_format::formats[] = {
 };
 
 const floppy_format_type FLOPPY_ABC800_FORMAT = &floppy_image_format_creator<abc800_format>;
+
+void abc800_format::build_sector_description(const format &f, uint8_t *sectdata, desc_s *sectors, int track, int head) const
+{
+	if(f.sector_base_id == -1) {
+		for(int i=0; i<f.sector_count; i++) {
+			int cur_offset = 0;
+			for(int j=0; j<f.sector_count; j++)
+				if(f.per_sector_id[j] < f.per_sector_id[i])
+					cur_offset += f.sector_base_size ? f.sector_base_size : f.per_sector_size[j];
+			sectors[i].data = sectdata + cur_offset;
+			sectors[i].size = f.sector_base_size ? f.sector_base_size : f.per_sector_size[i];
+			sectors[i].sector_id = i + f.per_sector_id[0];
+		}
+	} else {
+		int cur_offset = 0;
+		for(int i=0; i<f.sector_count; i++) {
+			sectors[i].data = sectdata + cur_offset;
+			sectors[i].size = f.sector_base_size ? f.sector_base_size : f.per_sector_size[i];
+			cur_offset += sectors[i].size;
+			sectors[i].sector_id = i + f.sector_base_id;
+		}
+	}
+}

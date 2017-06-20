@@ -1942,8 +1942,11 @@ void ppc_device::generate_branch(drcuml_block *block, compiler_state *compiler, 
 	}
 	else
 	{
-		generate_update_cycles(block, &compiler_temp, mem(srcptr), true);              // <subtract cycles>
-		UML_HASHJMP(block, m_core->mode, mem(srcptr), *m_nocode);   // hashjmp <mode>,<rsreg>,nocode
+		generate_update_cycles(block, &compiler_temp, mem(srcptr), true);    // <subtract cycles>
+
+		/* clear two LSBs of the target address to prevent branching to an invalid address */
+		UML_AND(block, I0, mem(srcptr), 0xFFFFFFFC);      // and i0, 0xFFFFFFFC
+		UML_HASHJMP(block, m_core->mode, I0, *m_nocode);  // hashjmp <mode>,i0,nocode
 	}
 
 	/* update the label */

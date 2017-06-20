@@ -15,11 +15,14 @@
 
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "machine/seicop.h"
 #include "sound/okim6295.h"
-#include "machine/gen_latch.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 #define MAIN_CLOCK XTAL_8MHz
 
@@ -536,7 +539,7 @@ static GFXDECODE_START( seicupbl_csb )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( cupsocbl, seicupbl_state )
+static MACHINE_CONFIG_START( cupsocbl )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,12000000)
@@ -576,7 +579,7 @@ static MACHINE_CONFIG_START( cupsocbl, seicupbl_state )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -683,8 +686,8 @@ ROM_END
 /* slight changes in the program roms compared to above set, all remaining roms were the same */
 ROM_START( cupsocsb2 )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
-	ROM_LOAD16_BYTE( "4", 0x00001, 0x80000, CRC(83db76f8) SHA1(ffcd0a728de58871b945c15cc27da374b587e170) )
-	ROM_LOAD16_BYTE( "5", 0x00000, 0x80000, CRC(c01e88c6) SHA1(8f90261792343c92ddd877ab8a2480b5aac82961) )
+	ROM_LOAD16_BYTE( "4", 0x00001, 0x80000, CRC(83db76f8) SHA1(ffcd0a728de58871b945c15cc27da374b587e170) ) // sldh
+	ROM_LOAD16_BYTE( "5", 0x00000, 0x80000, CRC(c01e88c6) SHA1(8f90261792343c92ddd877ab8a2480b5aac82961) ) // sldh
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Z80 code */
 	ROM_LOAD( "sc_01.bin",    0x000000, 0x08000, CRC(cea39d6d) SHA1(f0b79c03ffafdd1e57673d6d4836becbe415110b) )
@@ -805,6 +808,6 @@ ROM_START( cupsocsb3 )
 ROM_END
 
 
-GAME( 1992, cupsocsb, cupsoc,   cupsocbl, cupsoc, driver_device,  0,    ROT0, "bootleg", "Seibu Cup Soccer :Selection: (bootleg, set 1)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAME( 1992, cupsocsb2,cupsoc,   cupsocbl, cupsoc, driver_device,  0,    ROT0, "bootleg", "Seibu Cup Soccer :Selection: (bootleg, set 2)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAME( 1992, cupsocsb3,cupsoc,   cupsocbl, cupsoc, driver_device,  0,    ROT0, "bootleg", "Seibu Cup Soccer :Selection: (bootleg, set 3)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1992, cupsocsb, cupsoc,   cupsocbl, cupsoc, seicupbl_state,  0,    ROT0, "bootleg", "Seibu Cup Soccer :Selection: (bootleg, set 1)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1992, cupsocsb2,cupsoc,   cupsocbl, cupsoc, seicupbl_state,  0,    ROT0, "bootleg", "Seibu Cup Soccer :Selection: (bootleg, set 2)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1992, cupsocsb3,cupsoc,   cupsocbl, cupsoc, seicupbl_state,  0,    ROT0, "bootleg", "Seibu Cup Soccer :Selection: (bootleg, set 3)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )

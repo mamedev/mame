@@ -132,16 +132,19 @@
 
 *******************************************************************************/
 
-
-#define MASTER_CLOCK    XTAL_12_4725MHz    /* 12.4725 MHz */
-
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
-#include "video/mc6845.h"
 #include "machine/6821pia.h"
-#include "sound/ay8910.h"
 #include "machine/nvram.h"
+#include "sound/ay8910.h"
+#include "video/mc6845.h"
+#include "screen.h"
+#include "speaker.h"
+
 #include "miniboy7.lh"
+
+
+#define MASTER_CLOCK    XTAL_12_4725MHz    /* 12.4725 MHz */
 
 
 class miniboy7_state : public driver_device
@@ -498,7 +501,7 @@ GFXDECODE_END
 *         Machine Drivers          *
 ***********************************/
 
-static MACHINE_CONFIG_START( miniboy7, miniboy7_state )
+static MACHINE_CONFIG_START( miniboy7 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 16) /* guess */
@@ -621,6 +624,6 @@ ROM_END
 *           Game Drivers           *
 ***********************************/
 
-//     YEAR  NAME       PARENT    MACHINE   INPUT     STATE          INIT   ROT    COMPANY                     FULLNAME             FLAGS             LAYOUT
-GAMEL( 1983, miniboy7,  0,        miniboy7, miniboy7, driver_device, 0,     ROT0, "Bonanza Enterprises, Ltd", "Mini-Boy 7 (set 1)", MACHINE_NO_COCKTAIL, layout_miniboy7 )
-GAMEL( 1983, miniboy7a, miniboy7, miniboy7, miniboy7, driver_device, 0,     ROT0, "Bonanza Enterprises, Ltd", "Mini-Boy 7 (set 2)", MACHINE_NO_COCKTAIL, layout_miniboy7 )
+//     YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT   ROT   COMPANY                     FULLNAME              FLAGS                LAYOUT
+GAMEL( 1983, miniboy7,  0,        miniboy7, miniboy7, miniboy7_state, 0,     ROT0, "Bonanza Enterprises, Ltd", "Mini-Boy 7 (set 1)", MACHINE_NO_COCKTAIL, layout_miniboy7 )
+GAMEL( 1983, miniboy7a, miniboy7, miniboy7, miniboy7, miniboy7_state, 0,     ROT0, "Bonanza Enterprises, Ltd", "Mini-Boy 7 (set 2)", MACHINE_NO_COCKTAIL, layout_miniboy7 )

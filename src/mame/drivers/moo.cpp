@@ -115,14 +115,16 @@ Bucky:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/moo.h"
+#include "includes/konamipt.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
 #include "sound/ym2151.h"
 #include "sound/okim6295.h"
 #include "sound/k054539.h"
-#include "includes/konamipt.h"
-#include "includes/moo.h"
+#include "speaker.h"
 
 #define MOO_DEBUG 0
 #define MOO_DMADELAY (100)
@@ -219,29 +221,9 @@ INTERRUPT_GEN_MEMBER(moo_state::moobl_interrupt)
 	device.execute().set_input_line(5, HOLD_LINE);
 }
 
-WRITE16_MEMBER(moo_state::sound_cmd1_w)
-{
-	if ((data & 0x00ff0000) == 0)
-	{
-		data &= 0xff;
-		m_soundlatch->write(space, 0, data);
-	}
-}
-
-WRITE16_MEMBER(moo_state::sound_cmd2_w)
-{
-	if ((data & 0x00ff0000) == 0)
-		m_soundlatch2->write(space, 0, data & 0xff);
-}
-
 WRITE16_MEMBER(moo_state::sound_irq_w)
 {
 	m_soundcpu->set_input_line(0, HOLD_LINE);
-}
-
-READ16_MEMBER(moo_state::sound_status_r)
-{
-	return m_soundlatch3->read(space, 0);
 }
 
 WRITE8_MEMBER(moo_state::sound_bankswitch_w)
@@ -328,10 +310,7 @@ static ADDRESS_MAP_START( moo_map, AS_PROGRAM, 16, moo_state )
 	AM_RANGE(0x0ce000, 0x0ce01f) AM_WRITE(moo_prot_w)
 	AM_RANGE(0x0d0000, 0x0d001f) AM_DEVREADWRITE8("k053252", k053252_device, read, write, 0x00ff)                  /* CCU regs (ignored) */
 	AM_RANGE(0x0d4000, 0x0d4001) AM_WRITE(sound_irq_w)
-	AM_RANGE(0x0d600c, 0x0d600d) AM_WRITE(sound_cmd1_w)
-	AM_RANGE(0x0d600e, 0x0d600f) AM_WRITE(sound_cmd2_w)
-	AM_RANGE(0x0d6014, 0x0d6015) AM_READ(sound_status_r)
-	AM_RANGE(0x0d6000, 0x0d601f) AM_RAM                         /* sound regs fall through */
+	AM_RANGE(0x0d6000, 0x0d601f) AM_DEVICE8("k054321", k054321_device, main_map, 0x00ff)
 	AM_RANGE(0x0d8000, 0x0d8007) AM_DEVWRITE("k056832", k056832_device, b_word_w)        /* VSCCS regs */
 	AM_RANGE(0x0da000, 0x0da001) AM_READ_PORT("P1_P3")
 	AM_RANGE(0x0da002, 0x0da003) AM_READ_PORT("P2_P4")
@@ -394,10 +373,7 @@ static ADDRESS_MAP_START( bucky_map, AS_PROGRAM, 16, moo_state )
 	AM_RANGE(0x0d0000, 0x0d001f) AM_DEVREADWRITE8("k053252", k053252_device, read, write, 0x00ff)                  /* CCU regs (ignored) */
 	AM_RANGE(0x0d2000, 0x0d20ff) AM_DEVREADWRITE("k054000", k054000_device, lsb_r, lsb_w)
 	AM_RANGE(0x0d4000, 0x0d4001) AM_WRITE(sound_irq_w)
-	AM_RANGE(0x0d600c, 0x0d600d) AM_WRITE(sound_cmd1_w)
-	AM_RANGE(0x0d600e, 0x0d600f) AM_WRITE(sound_cmd2_w)
-	AM_RANGE(0x0d6014, 0x0d6015) AM_READ(sound_status_r)
-	AM_RANGE(0x0d6000, 0x0d601f) AM_RAM                         /* sound regs fall through */
+	AM_RANGE(0x0d6000, 0x0d601f) AM_DEVICE8("k054321", k054321_device, main_map, 0x00ff)
 	AM_RANGE(0x0d8000, 0x0d8007) AM_DEVWRITE("k056832", k056832_device, b_word_w)        /* VSCCS regs */
 	AM_RANGE(0x0da000, 0x0da001) AM_READ_PORT("P1_P3")
 	AM_RANGE(0x0da002, 0x0da003) AM_READ_PORT("P2_P4")
@@ -425,9 +401,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, moo_state )
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe22f) AM_DEVREADWRITE("k054539", k054539_device, read, write)
 	AM_RANGE(0xec00, 0xec01) AM_DEVREADWRITE("ymsnd", ym2151_device,read,write)
-	AM_RANGE(0xf000, 0xf000) AM_DEVWRITE("soundlatch3", generic_latch_8_device, write)
-	AM_RANGE(0xf002, 0xf002) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xf003, 0xf003) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
+	AM_RANGE(0xf000, 0xf003) AM_DEVICE("k054321", k054321_device, sound_map)
 	AM_RANGE(0xf800, 0xf800) AM_WRITE(sound_bankswitch_w)
 ADDRESS_MAP_END
 
@@ -516,7 +490,7 @@ MACHINE_RESET_MEMBER(moo_state,moo)
 	m_sprite_colorbase = 0;
 }
 
-static MACHINE_CONFIG_START( moo, moo_state )
+static MACHINE_CONFIG_START( moo )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2) // 16MHz verified
@@ -567,9 +541,7 @@ static MACHINE_CONFIG_START( moo, moo_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch3")
+	MCFG_K054321_ADD("k054321", ":lspeaker", ":rspeaker")
 
 	MCFG_YM2151_ADD("ymsnd", XTAL_32MHz/8) // 4MHz verified
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
@@ -580,7 +552,7 @@ static MACHINE_CONFIG_START( moo, moo_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( moobl, moo_state )
+static MACHINE_CONFIG_START( moobl )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16100000)
@@ -625,7 +597,7 @@ static MACHINE_CONFIG_START( moobl, moo_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -863,6 +835,42 @@ ROM_START( buckyea ) /* Version EA */
 	ROM_LOAD( "bucky.nv", 0x0000, 0x080, CRC(6a5986f3) SHA1(3efddeed261b09031c582e12318f00c2cbb214ea) )
 ROM_END
 
+ROM_START( buckyjaa ) /* Version JA */
+	ROM_REGION( 0x240000, "maincpu", 0 )
+	/* main program */
+	ROM_LOAD16_BYTE( "173_ja_a01.05", 0x000000, 0x040000, CRC(0a32bde7) SHA1(17b7654fd69eb1b82e2949ef324ce599113360aa) )   /* JAA */
+	ROM_LOAD16_BYTE( "173_ja_a02.06", 0x000001, 0x040000, CRC(3e6f3955) SHA1(09ca39da8bdb37cb5517fe59cff5467c0623c380) )   /* JAA */
+
+	/* data */
+	ROM_LOAD16_BYTE( "173a03.t5", 0x200000, 0x20000, CRC(cd724026) SHA1(525445499604b713da4d8bc0a88e428654ceab95) )
+	ROM_LOAD16_BYTE( "173a04.t6", 0x200001, 0x20000, CRC(7dd54d6f) SHA1(b0ee8ec445b92254bca881eefd4449972fed506a) )
+
+	ROM_REGION( 0x050000, "soundcpu", 0 )
+	/* Z80 sound program */
+	ROM_LOAD( "173a07.f5",  0x000000, 0x040000, CRC(4cdaee71) SHA1(bdc05d4475415f6fac65d7cdbc48df398e57845e) )
+	ROM_RELOAD(             0x010000, 0x040000 )
+
+	ROM_REGION( 0x200000, "gfx1", 0 )
+	/* tilemaps */
+	ROM_LOAD32_WORD( "173a05.t8",  0x000000, 0x100000, CRC(d14333b4) SHA1(d1a15ead2d156e1fceca0bf202ab3962411caf11) )
+	ROM_LOAD32_WORD( "173a06.t10", 0x000002, 0x100000, CRC(6541a34f) SHA1(15cf481498e3b7e0b2f7bfe5434121cc3bd65662) )
+
+	ROM_REGION( 0x800000, "gfx2", 0 )
+	/* sprites */
+	ROM_LOAD64_WORD( "173a10.b8",  0x000000, 0x200000, CRC(42fb0a0c) SHA1(d68c932cfabdec7896698b433525fe47ef4698d0) )
+	ROM_LOAD64_WORD( "173a11.a8",  0x000002, 0x200000, CRC(b0d747c4) SHA1(0cf1ee1b9a35ded31a81c321df2a076f7b588971) )
+	ROM_LOAD64_WORD( "173a12.b10", 0x000004, 0x200000, CRC(0fc2ad24) SHA1(6eda1043ee1266b8ba938a03a90bc7787210a936) )
+	ROM_LOAD64_WORD( "173a13.a10", 0x000006, 0x200000, CRC(4cf85439) SHA1(8c298bf0e659a830a1830a1180f4ce71215ade45) )
+
+	ROM_REGION( 0x400000, "k054539", 0 )
+	/* K054539 samples */
+	ROM_LOAD( "173a08.b6",  0x000000, 0x200000, CRC(dcdded95) SHA1(8eeb546a0b60a35a6dce36c5ee872e6c93c577c9) )
+	ROM_LOAD( "173a09.a6",  0x200000, 0x200000, CRC(c93697c4) SHA1(0528a604868267a30d281b822c187df118566691) )
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_LOAD( "buckyja.nv", 0x0000, 0x080, CRC(2f280a74) SHA1(c4b4472da57599587325bad6d9e7760916076816) )
+ROM_END
+
 ROM_START( buckyuab ) /* Version UA */
 	ROM_REGION( 0x240000, "maincpu", 0 )
 	/* main program */
@@ -991,12 +999,13 @@ ROM_START( moomesabl )
 ROM_END
 
 
-GAME( 1992, moomesa,    0,       moo,     moo,   driver_device, 0, ROT0, "Konami",  "Wild West C.O.W.-Boys of Moo Mesa (ver EAB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, moomesauac, moomesa, moo,     moo,   driver_device, 0, ROT0, "Konami",  "Wild West C.O.W.-Boys of Moo Mesa (ver UAC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, moomesauab, moomesa, moo,     moo,   driver_device, 0, ROT0, "Konami",  "Wild West C.O.W.-Boys of Moo Mesa (ver UAB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, moomesaaab, moomesa, moo,     moo,   driver_device, 0, ROT0, "Konami",  "Wild West C.O.W.-Boys of Moo Mesa (ver AAB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, moomesabl,  moomesa, moobl,   moo,   driver_device, 0, ROT0, "bootleg", "Wild West C.O.W.-Boys of Moo Mesa (bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // based on Version AA
-GAME( 1992, bucky,      0,       bucky,   bucky, driver_device, 0, ROT0, "Konami",  "Bucky O'Hare (ver EAB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, buckyea,    bucky,   bucky,   bucky, driver_device, 0, ROT0, "Konami",  "Bucky O'Hare (ver EA)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, buckyuab,   bucky,   bucky,   bucky, driver_device, 0, ROT0, "Konami",  "Bucky O'Hare (ver UAB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, buckyaab,   bucky,   bucky,   bucky, driver_device, 0, ROT0, "Konami",  "Bucky O'Hare (ver AAB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, moomesa,    0,       moo,     moo,   moo_state, 0, ROT0, "Konami",  "Wild West C.O.W.-Boys of Moo Mesa (ver EAB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, moomesauac, moomesa, moo,     moo,   moo_state, 0, ROT0, "Konami",  "Wild West C.O.W.-Boys of Moo Mesa (ver UAC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, moomesauab, moomesa, moo,     moo,   moo_state, 0, ROT0, "Konami",  "Wild West C.O.W.-Boys of Moo Mesa (ver UAB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, moomesaaab, moomesa, moo,     moo,   moo_state, 0, ROT0, "Konami",  "Wild West C.O.W.-Boys of Moo Mesa (ver AAB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, moomesabl,  moomesa, moobl,   moo,   moo_state, 0, ROT0, "bootleg", "Wild West C.O.W.-Boys of Moo Mesa (bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // based on Version AA
+GAME( 1992, bucky,      0,       bucky,   bucky, moo_state, 0, ROT0, "Konami",  "Bucky O'Hare (ver EAB)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, buckyea,    bucky,   bucky,   bucky, moo_state, 0, ROT0, "Konami",  "Bucky O'Hare (ver EA)",                       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, buckyjaa,   bucky,   bucky,   bucky, moo_state, 0, ROT0, "Konami",  "Bucky O'Hare (ver JAA)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, buckyuab,   bucky,   bucky,   bucky, moo_state, 0, ROT0, "Konami",  "Bucky O'Hare (ver UAB)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, buckyaab,   bucky,   bucky,   bucky, moo_state, 0, ROT0, "Konami",  "Bucky O'Hare (ver AAB)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

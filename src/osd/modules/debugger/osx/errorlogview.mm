@@ -6,6 +6,7 @@
 //
 //============================================================
 
+#include "emu.h"
 #import "errorlogview.h"
 
 #include "debug/debugvw.h"

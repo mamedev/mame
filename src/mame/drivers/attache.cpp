@@ -52,19 +52,24 @@
  */
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
-#include "sound/ay8910.h"
+#include "machine/am9517a.h"
 #include "machine/msm5832.h"
+#include "machine/nvram.h"
+#include "machine/ram.h"
+#include "machine/upd765.h"
+#include "machine/z80ctc.h"
 #include "machine/z80dart.h"
 #include "machine/z80pio.h"
-#include "machine/z80ctc.h"
-#include "machine/am9517a.h"
-#include "machine/upd765.h"
+#include "sound/ay8910.h"
 #include "video/tms9927.h"
-#include "machine/ram.h"
-#include "machine/nvram.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 
 class attache_state : public driver_device
 {
@@ -131,7 +136,6 @@ public:
 
 	// overrides
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void vblank_int(screen_device &screen, bool state);
 	virtual void driver_start() override;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -222,7 +226,7 @@ private:
 // bit 7 = subscript (superscript and subscript combined produces strikethrough)
 uint32_t attache_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint8_t x,y,bit,scan,data;
+	uint8_t x,y,vy,start,bit,scan,data;
 	uint8_t dbl_mode = 0;  // detemines which half of character to display when using double size attribute,
 							// as it can start on either odd or even character cells.
 
@@ -265,12 +269,16 @@ uint32_t attache_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	// Text output
 	for(y=0;y<(bitmap.height()-1)/10;y++)  // lines
 	{
+		start = m_crtc->upscroll_offset();
+		vy = (start + y) % 24;
+
 		for(x=0;x<(bitmap.width()-1)/8;x++)  // columns
 		{
 			assert(((y*128)+x) >= 0 && ((y*128)+x) < ARRAY_LENGTH(m_char_ram));
-			uint8_t ch = m_char_ram[(y*128)+x];
-			pen_t fg = m_palette->pen(m_attr_ram[(y*128)+x] & 0x08 ? 2 : 1); // brightness
-			if(m_attr_ram[(y*128)+x] & 0x10) // double-size
+			assert(((vy*128)+x) >= 0 && ((vy*128)+x) < ARRAY_LENGTH(m_char_ram));
+			uint8_t ch = m_char_ram[(vy*128)+x];
+			pen_t fg = m_palette->pen(m_attr_ram[(vy*128)+x] & 0x08 ? 2 : 1); // brightness
+			if(m_attr_ram[(vy*128)+x] & 0x10) // double-size
 				dbl_mode++;
 			else
 				dbl_mode = 0;
@@ -278,16 +286,16 @@ uint32_t attache_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 			for(scan=0;scan<10;scan++)  // 10 scanlines per line
 			{
 				data = m_char_rom->base()[ch*16+scan];
-				if((m_attr_ram[(y*128)+x] & 0xc0) != 0xc0)  // if not strikethrough
+				if((m_attr_ram[(vy*128)+x] & 0xc0) != 0xc0)  // if not strikethrough
 				{
-					if(m_attr_ram[(y*128)+x] & 0x40)  // superscript
+					if(m_attr_ram[(vy*128)+x] & 0x40)  // superscript
 					{
 						if(scan >= 5)
 							data = 0;
 						else
 							data = m_char_rom->base()[ch*16+(scan*2)+1];
 					}
-					if(m_attr_ram[(y*128)+x] & 0x80)  // subscript
+					if(m_attr_ram[(vy*128)+x] & 0x80)  // subscript
 					{
 						if(scan < 5)
 							data = 0;
@@ -295,13 +303,13 @@ uint32_t attache_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 							data = m_char_rom->base()[ch*16+((scan-5)*2)+1];
 					}
 				}
-				if((m_attr_ram[(y*128)+x] & 0x20) && scan == 9)  // underline
+				if((m_attr_ram[(vy*128)+x] & 0x20) && scan == 9)  // underline
 					data = 0xff;
-				if((m_attr_ram[(y*128)+x] & 0xc0) == 0xc0 && scan == 3)  // strikethrough
+				if((m_attr_ram[(vy*128)+x] & 0xc0) == 0xc0 && scan == 3)  // strikethrough
 					data = 0xff;
-				if(m_attr_ram[(y*128)+x] & 0x04)  // reverse
+				if(m_attr_ram[(vy*128)+x] & 0x04)  // reverse
 					data = ~data;
-				if(m_attr_ram[(y*128)+x] & 0x10) // double-size
+				if(m_attr_ram[(vy*128)+x] & 0x10) // double-size
 				{
 					uint8_t newdata = 0;
 					if(dbl_mode & 1)
@@ -333,11 +341,6 @@ uint32_t attache_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 		}
 	}
 	return 0;
-}
-
-void attache_state::vblank_int(screen_device &screen, bool state)
-{
-	m_ctc->trg2(state);
 }
 
 READ8_MEMBER(attache_state::rom_r)
@@ -630,6 +633,7 @@ WRITE8_MEMBER(attache_state::display_data_w)
 		break;
 	case DISP_CRTC:
 		m_crtc->write(space, m_crtc_reg_select, data);
+		//logerror("CRTC: write reg %02x, data %02x\n",m_crtc_reg_select,data);
 		break;
 	case DISP_ATTR:
 		m_attr_ram[(m_attr_line*128)+(param & 0x7f)] = data;
@@ -754,7 +758,7 @@ static ADDRESS_MAP_START( attache_io , AS_IO, 8, attache_state)
 	AM_RANGE(0xe0, 0xed) AM_DEVREADWRITE("dma",am9517a_device,read,write) AM_MIRROR(0xff00)
 	AM_RANGE(0xee, 0xee) AM_WRITE(display_command_w) AM_MIRROR(0xff00)
 	AM_RANGE(0xef, 0xef) AM_READWRITE(dma_mask_r, dma_mask_w) AM_MIRROR(0xff00)
-	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE("sio",z80sio0_device,ba_cd_r, ba_cd_w) AM_MIRROR(0xff00)
+	AM_RANGE(0xe6, 0xe7) AM_DEVREADWRITE("sio",z80sio0_device,ba_cd_r, ba_cd_w) AM_MIRROR(0xff00)
 	AM_RANGE(0xf4, 0xf7) AM_DEVREADWRITE("ctc",z80ctc_device,read,write) AM_MIRROR(0xff00)
 	AM_RANGE(0xf8, 0xfb) AM_DEVREADWRITE("pio",z80pio_device,read_alt,write_alt) AM_MIRROR(0xff00)
 	AM_RANGE(0xfc, 0xfd) AM_DEVICE("fdc",upd765a_device,map) AM_MIRROR(0xff00)
@@ -908,7 +912,7 @@ void attache_state::machine_reset()
 	m_kb_bitpos = 0;
 }
 
-static MACHINE_CONFIG_START( attache, attache_state )
+static MACHINE_CONFIG_START( attache )
 	MCFG_CPU_ADD("maincpu",Z80,XTAL_8MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(attache_map)
 	MCFG_CPU_IO_MAP(attache_io)
@@ -922,7 +926,7 @@ static MACHINE_CONFIG_START( attache, attache_state )
 	MCFG_SCREEN_SIZE(640,240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(attache_state, screen_update)
-	MCFG_SCREEN_VBLANK_DRIVER(attache_state, vblank_int)
+	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("ctc", z80ctc_device, trg2))
 
 	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
 
@@ -992,5 +996,5 @@ ROM_START( attache )
 	ROM_LOAD("u630.bin",  0x0000, 0x0100, CRC(f7a5c821) SHA1(fea07d9ac7e4e5f4f72aa7b2159deaedbd662ead) )
 ROM_END
 
-/*    YEAR  NAME    PARENT  COMPAT      MACHINE     INPUT    DEVICE            INIT    COMPANY      FULLNAME     FLAGS */
-COMP( 1982, attache, 0,      0,         attache,    attache, driver_device,    0,      "Otrona",   "Attach\xC3\xA9",    MACHINE_IMPERFECT_GRAPHICS|MACHINE_NOT_WORKING)
+//    YEAR  NAME    PARENT  COMPAT      MACHINE     INPUT    DEVICE            INIT    COMPANY     FULLNAME             FLAGS
+COMP( 1982, attache, 0,      0,         attache,    attache, attache_state,    0,      "Otrona",   "Attach\xC3\xA9",    MACHINE_IMPERFECT_GRAPHICS )

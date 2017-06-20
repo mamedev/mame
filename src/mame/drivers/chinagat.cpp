@@ -69,17 +69,18 @@ Input is unique but has a few similarities to DD2 (the coin inputs)
 Dip locations and factory settings verified with China Gate US manual.
 */
 
-
-
 #include "emu.h"
+#include "includes/ddragon.h"
+
 #include "cpu/m6809/hd6309.h"
 #include "cpu/m6809/m6809.h"
-#include "cpu/z80/z80.h"
 #include "cpu/mcs48/mcs48.h"
-#include "sound/ym2151.h"
+#include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
 #include "sound/okim6295.h"
-#include "includes/ddragon.h"
+#include "sound/ym2151.h"
+#include "speaker.h"
+
 
 #define MAIN_CLOCK      XTAL_12MHz
 #define PIXEL_CLOCK     MAIN_CLOCK / 2
@@ -96,16 +97,17 @@ public:
 	DECLARE_MACHINE_START(chinagat);
 	DECLARE_MACHINE_RESET(chinagat);
 	DECLARE_VIDEO_START(chinagat);
-	DECLARE_WRITE8_MEMBER( chinagat_interrupt_w );
-	DECLARE_WRITE8_MEMBER( chinagat_video_ctrl_w );
-	DECLARE_WRITE8_MEMBER( chinagat_bankswitch_w );
-	DECLARE_WRITE8_MEMBER( chinagat_sub_bankswitch_w );
+	DECLARE_WRITE8_MEMBER(interrupt_w);
+	DECLARE_WRITE8_MEMBER(video_ctrl_w);
+	DECLARE_WRITE8_MEMBER(bankswitch_w);
+	DECLARE_WRITE8_MEMBER(sub_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(sub_irq_ack_w);
 	DECLARE_READ8_MEMBER( saiyugoub1_mcu_command_r );
 	DECLARE_WRITE8_MEMBER( saiyugoub1_mcu_command_w );
 	DECLARE_WRITE8_MEMBER( saiyugoub1_adpcm_rom_addr_w );
 	DECLARE_WRITE8_MEMBER( saiyugoub1_adpcm_control_w );
 	DECLARE_WRITE8_MEMBER( saiyugoub1_m5205_clk_w );
-	DECLARE_READ8_MEMBER( saiyugoub1_m5205_irq_r );
+	DECLARE_READ_LINE_MEMBER(saiyugoub1_m5205_irq_r);
 	DECLARE_WRITE_LINE_MEMBER(saiyugoub1_m5205_irq_w);
 	optional_device<msm5205_device> m_adpcm;
 };
@@ -159,13 +161,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(chinagat_state::chinagat_scanline)
 		scanline = 0;
 }
 
-WRITE8_MEMBER(chinagat_state::chinagat_interrupt_w )
+WRITE8_MEMBER(chinagat_state::interrupt_w)
 {
 	switch (offset)
 	{
 		case 0: /* 3e00 - SND irq */
 			m_soundlatch->write(space, 0, data);
-			m_soundcpu->set_input_line(m_sound_irq, (m_sound_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE );
 			break;
 
 		case 1: /* 3e01 - NMI ack */
@@ -181,12 +182,12 @@ WRITE8_MEMBER(chinagat_state::chinagat_interrupt_w )
 			break;
 
 		case 4: /* 3e04 - sub CPU IRQ ack */
-			m_subcpu->set_input_line(m_sprite_irq, (m_sprite_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE );
+			m_subcpu->set_input_line(m_sprite_irq, ASSERT_LINE);
 			break;
 	}
 }
 
-WRITE8_MEMBER(chinagat_state::chinagat_video_ctrl_w )
+WRITE8_MEMBER(chinagat_state::video_ctrl_w)
 {
 	/***************************
 	---- ---x   X Scroll MSB
@@ -200,14 +201,19 @@ WRITE8_MEMBER(chinagat_state::chinagat_video_ctrl_w )
 	flip_screen_set(~data & 0x04);
 }
 
-WRITE8_MEMBER(chinagat_state::chinagat_bankswitch_w )
+WRITE8_MEMBER(chinagat_state::bankswitch_w)
 {
 	membank("bank1")->set_entry(data & 0x07); // shall we check (data & 7) < 6 (# of banks)?
 }
 
-WRITE8_MEMBER(chinagat_state::chinagat_sub_bankswitch_w )
+WRITE8_MEMBER(chinagat_state::sub_bankswitch_w)
 {
 	membank("bank4")->set_entry(data & 0x07); // shall we check (data & 7) < 6 (# of banks)?
+}
+
+WRITE8_MEMBER(chinagat_state::sub_irq_ack_w)
+{
+	m_subcpu->set_input_line(m_sprite_irq, CLEAR_LINE);
 }
 
 READ8_MEMBER(chinagat_state::saiyugoub1_mcu_command_r )
@@ -303,7 +309,7 @@ WRITE8_MEMBER(chinagat_state::saiyugoub1_m5205_clk_w )
 #endif
 }
 
-READ8_MEMBER(chinagat_state::saiyugoub1_m5205_irq_r )
+READ_LINE_MEMBER(chinagat_state::saiyugoub1_m5205_irq_r )
 {
 	if (m_adpcm_sound_irq)
 	{
@@ -325,11 +331,11 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, chinagat_state )
 	AM_RANGE(0x3000, 0x317f) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x3400, 0x357f) AM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0x3800, 0x397f) AM_WRITE_BANK("bank3") AM_SHARE("spriteram")
-	AM_RANGE(0x3e00, 0x3e04) AM_WRITE(chinagat_interrupt_w)
+	AM_RANGE(0x3e00, 0x3e04) AM_WRITE(interrupt_w)
 	AM_RANGE(0x3e06, 0x3e06) AM_WRITEONLY AM_SHARE("scrolly_lo")
 	AM_RANGE(0x3e07, 0x3e07) AM_WRITEONLY AM_SHARE("scrollx_lo")
-	AM_RANGE(0x3f00, 0x3f00) AM_WRITE(chinagat_video_ctrl_w)
-	AM_RANGE(0x3f01, 0x3f01) AM_WRITE(chinagat_bankswitch_w)
+	AM_RANGE(0x3f00, 0x3f00) AM_WRITE(video_ctrl_w)
+	AM_RANGE(0x3f01, 0x3f01) AM_WRITE(bankswitch_w)
 	AM_RANGE(0x3f00, 0x3f00) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x3f01, 0x3f01) AM_READ_PORT("DSW1")
 	AM_RANGE(0x3f02, 0x3f02) AM_READ_PORT("DSW2")
@@ -341,8 +347,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, chinagat_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(chinagat_sub_bankswitch_w)
-	AM_RANGE(0x2800, 0x2800) AM_WRITEONLY /* Called on CPU start and after return from jump table */
+	AM_RANGE(0x2000, 0x2000) AM_WRITE(sub_bankswitch_w)
+	AM_RANGE(0x2800, 0x2800) AM_WRITE(sub_irq_ack_w) /* Called on CPU start and after return from jump table */
 //  AM_RANGE(0x2a2b, 0x2a2b) AM_READNOP /* What lives here? */
 //  AM_RANGE(0x2a30, 0x2a30) AM_READNOP /* What lives here? */
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank4")
@@ -386,14 +392,6 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( i8748_map, AS_PROGRAM, 8, chinagat_state )
 	AM_RANGE(0x0000, 0x03ff) AM_ROM
 	AM_RANGE(0x0400, 0x07ff) AM_ROM     /* i8749 version */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( i8748_portmap, AS_IO, 8, chinagat_state )
-	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_READ(saiyugoub1_mcu_command_r)
-	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_WRITE(saiyugoub1_m5205_clk_w)      /* Drives the clock on the m5205 at 1/8 of this frequency */
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(saiyugoub1_m5205_irq_r)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(saiyugoub1_adpcm_rom_addr_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(saiyugoub1_adpcm_control_w)
 ADDRESS_MAP_END
 
 
@@ -455,20 +453,20 @@ static INPUT_PORTS_START( chinagat )
 	PORT_DIPSETTING(    0x40, "4" )
 
 	PORT_START("P1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
 	PORT_START("P2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
@@ -543,7 +541,7 @@ MACHINE_RESET_MEMBER(chinagat_state,chinagat)
 }
 
 
-static MACHINE_CONFIG_START( chinagat, chinagat_state )
+static MACHINE_CONFIG_START( chinagat )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309, MAIN_CLOCK / 2)     /* 1.5 MHz (12MHz oscillator / 4 internally) */
@@ -577,17 +575,18 @@ static MACHINE_CONFIG_START( chinagat, chinagat_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", INPUT_LINE_NMI))
 
 	MCFG_YM2151_ADD("ymsnd", 3579545)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.80)
 	MCFG_SOUND_ROUTE(1, "mono", 0.80)
 
-	MCFG_OKIM6295_ADD("oki", 1065000, OKIM6295_PIN7_HIGH) // pin 7 not verified, clock frequency estimated with recording
+	MCFG_OKIM6295_ADD("oki", 1065000, PIN7_HIGH) // pin 7 not verified, clock frequency estimated with recording
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( saiyugoub1, chinagat_state )
+static MACHINE_CONFIG_START( saiyugoub1 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, MAIN_CLOCK / 8)      /* 68B09EP 1.5 MHz (12MHz oscillator) */
@@ -602,7 +601,12 @@ static MACHINE_CONFIG_START( saiyugoub1, chinagat_state )
 
 	MCFG_CPU_ADD("mcu", I8748, 9263750)     /* 9.263750 MHz oscillator, divided by 3*5 internally */
 	MCFG_CPU_PROGRAM_MAP(i8748_map)
-	MCFG_CPU_IO_MAP(i8748_portmap)
+	MCFG_MCS48_PORT_BUS_IN_CB(READ8(chinagat_state, saiyugoub1_mcu_command_r))
+	//MCFG_MCS48_PORT_T0_CLK_CUSTOM(chinagat_state, saiyugoub1_m5205_clk_w)      /* Drives the clock on the m5205 at 1/8 of this frequency */
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(chinagat_state, saiyugoub1_m5205_irq_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(chinagat_state, saiyugoub1_adpcm_rom_addr_w))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(chinagat_state, saiyugoub1_adpcm_control_w))
+
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* heavy interleaving to sync up sprite<->main cpu's */
 
@@ -625,6 +629,7 @@ static MACHINE_CONFIG_START( saiyugoub1, chinagat_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", INPUT_LINE_NMI))
 
 	MCFG_YM2151_ADD("ymsnd", 3579545)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
@@ -633,11 +638,11 @@ static MACHINE_CONFIG_START( saiyugoub1, chinagat_state )
 
 	MCFG_SOUND_ADD("adpcm", MSM5205, 9263750 / 24)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(chinagat_state, saiyugoub1_m5205_irq_w)) /* Interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S64_4B)          /* vclk input mode (6030Hz, 4-bit) */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S64_4B)          /* vclk input mode (6030Hz, 4-bit) */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( saiyugoub2, chinagat_state )
+static MACHINE_CONFIG_START( saiyugoub2 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, MAIN_CLOCK / 8)      /* 1.5 MHz (12MHz oscillator) */
@@ -671,6 +676,7 @@ static MACHINE_CONFIG_START( saiyugoub2, chinagat_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", INPUT_LINE_NMI))
 
 	MCFG_SOUND_ADD("ym1", YM2203, 3579545)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
@@ -904,15 +910,14 @@ DRIVER_INIT_MEMBER(chinagat_state,chinagat)
 
 	m_technos_video_hw = 1;
 	m_sprite_irq = M6809_IRQ_LINE;
-	m_sound_irq = INPUT_LINE_NMI;
 
 	membank("bank1")->configure_entries(0, 6, &MAIN[0x10000], 0x4000);
 	membank("bank4")->configure_entries(0, 6, &SUB[0x10000], 0x4000);
 }
 
 
-/*   ( YEAR  NAME      PARENT    MACHINE   INPUT     INIT    MONITOR COMPANY    FULLNAME     FLAGS ) */
-GAME( 1988, chinagat,   0,        chinagat,   chinagat, chinagat_state, chinagat, ROT0, "Technos Japan (Taito / Romstar license)", "China Gate (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, saiyugou,   chinagat, chinagat,   chinagat, chinagat_state, chinagat, ROT0, "Technos Japan", "Sai Yu Gou Ma Roku (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, saiyugoub1, chinagat, saiyugoub1, chinagat, chinagat_state, chinagat, ROT0, "bootleg", "Sai Yu Gou Ma Roku (Japan bootleg 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, saiyugoub2, chinagat, saiyugoub2, chinagat, chinagat_state, chinagat, ROT0, "bootleg", "Sai Yu Gou Ma Roku (Japan bootleg 2)", MACHINE_SUPPORTS_SAVE )
+//  ( YEAR  NAME        PARENT    MACHINE     INPUT     STATE           INIT      MONITOR COMPANY    FULLNAME     FLAGS ) */
+GAME( 1988, chinagat,   0,        chinagat,   chinagat, chinagat_state, chinagat, ROT0,   "Technos Japan (Taito / Romstar license)", "China Gate (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, saiyugou,   chinagat, chinagat,   chinagat, chinagat_state, chinagat, ROT0,   "Technos Japan", "Sai Yu Gou Ma Roku (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, saiyugoub1, chinagat, saiyugoub1, chinagat, chinagat_state, chinagat, ROT0,   "bootleg", "Sai Yu Gou Ma Roku (Japan bootleg 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, saiyugoub2, chinagat, saiyugoub2, chinagat, chinagat_state, chinagat, ROT0,   "bootleg", "Sai Yu Gou Ma Roku (Japan bootleg 2)", MACHINE_SUPPORTS_SAVE )

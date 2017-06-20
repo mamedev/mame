@@ -6,6 +6,7 @@
 
 *********************************************************************/
 
+#include "emu.h"
 #include "turbo.h"
 
 
@@ -22,7 +23,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type TURBO_KONTROLLER = &device_creator<turbo_kontroller_device>;
+DEFINE_DEVICE_TYPE(TURBO_KONTROLLER, turbo_kontroller_device, "unidisk", "Turbo-Kontroller")
 
 
 //-------------------------------------------------
@@ -78,26 +79,15 @@ static const z80_daisy_config daisy_chain[] =
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( turbo_kontroller )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( turbo_kontroller )
+MACHINE_CONFIG_MEMBER( turbo_kontroller_device::device_add_mconfig )
 	MCFG_CPU_ADD(Z80_TAG, Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(turbo_kontroller_mem)
 	MCFG_CPU_IO_MAP(turbo_kontroller_io)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor turbo_kontroller_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( turbo_kontroller );
-}
 
 
 
@@ -110,7 +100,7 @@ machine_config_constructor turbo_kontroller_device::device_mconfig_additions() c
 //-------------------------------------------------
 
 turbo_kontroller_device::turbo_kontroller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TURBO_KONTROLLER, "Turbo-Kontroller", tag, owner, clock, "unidisk", __FILE__),
+	: device_t(mconfig, TURBO_KONTROLLER, tag, owner, clock),
 		device_abcbus_card_interface(mconfig, *this),
 		m_maincpu(*this, Z80_TAG)
 {

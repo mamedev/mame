@@ -110,6 +110,7 @@ www.multitech.com
 #include "sound/es1373.h"
 #include "machine/iteagle_fpga.h"
 #include "machine/pci-ide.h"
+#include "screen.h"
 
 
 //*************************************
@@ -152,7 +153,7 @@ void iteagle_state::machine_reset()
 #define PCI_ID_VIDEO    ":pci:09.0"
 #define PCI_ID_EEPROM   ":pci:0a.0"
 
-static MACHINE_CONFIG_START( iteagle, iteagle_state )
+static MACHINE_CONFIG_START( iteagle )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", VR4310LE, 166666666)
@@ -161,6 +162,8 @@ static MACHINE_CONFIG_START( iteagle, iteagle_state )
 
 	MCFG_PCI_ROOT_ADD(                ":pci")
 	MCFG_VRC4373_ADD(                 PCI_ID_NILE, ":maincpu")
+	MCFG_VRC4373_SET_RAM(0x00800000)
+	MCFG_VRC4373_SET_SIMM0(0x02000000)
 	MCFG_ITEAGLE_PERIPH_ADD(          PCI_ID_PERIPH)
 	MCFG_IDE_PCI_ADD(                 PCI_ID_IDE, 0x1080C693, 0x00, 0x0)
 	MCFG_IDE_PCI_IRQ_ADD(             ":maincpu", MIPS3_IRQ2)
@@ -582,20 +585,20 @@ ROM_END
  *
  *************************************/
 
-GAME( 2000, iteagle,          0,  iteagle,  iteagle,  driver_device, 0, ROT0, "Incredible Technologies", "Eagle BIOS", MACHINE_IS_BIOS_ROOT )
-GAME( 1998, virtpool,   iteagle,  virtpool, virtpool, driver_device, 0, ROT0, "Incredible Technologies", "Virtual Pool", MACHINE_NOT_WORKING ) // random lockups on loading screens
-GAME( 2002, carnking,   iteagle,  carnking, bbh,  driver_device, 0, ROT0, "Incredible Technologies", "Carnival King (v1.00.11)", 0 )
-GAME( 2000, gtfore01,   iteagle,  gtfore01, iteagle,  driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! (v1.00.25)", 0 )
-GAME( 2001, gtfore02,   iteagle,  gtfore02, iteagle,  driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2002 (v2.01.06)", 0 )
-GAME( 2002, gtfore03,   iteagle,  gtfore03, iteagle,  driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2003 (v3.00.10)", 0 )
-GAME( 2002, gtfore03a,  gtfore03, gtfore03, iteagle,  driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2003 (v3.00.09)", 0 )
-GAME( 2003, gtfore04,   iteagle,  gtfore04, iteagle,  driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2004 Extra (v4.00.08)", 0 )
-GAME( 2003, gtfore04a,  gtfore04, gtfore04, iteagle,  driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2004 (v4.00.00)", 0 )
-GAME( 2004, gtfore05,   iteagle,  gtfore05, iteagle,  driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2005 Extra (v5.01.06)", 0 )
-GAME( 2004, gtfore05a,  gtfore05, gtfore05, iteagle,  driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2005 Extra (v5.01.02)", 0 )
-GAME( 2004, gtfore05b,  gtfore05, gtfore05, iteagle,  driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2005 Extra (v5.01.00)", 0 )
-GAME( 2004, gtfore05c,  gtfore05, gtfore05, iteagle,  driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2005 Extra (v5.00.00)", 0 )
-GAME( 2005, gtfore06,   iteagle,  gtfore06, iteagle,  driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2006 Complete (v6.00.01)", 0 )
-GAME( 2002, bbhsc,      iteagle,  bbhsc,    bbh,  driver_device, 0, ROT0, "Incredible Technologies", "Big Buck Hunter - Shooter's Challenge (v1.50.07)", MACHINE_NOT_WORKING ) // doesn't boot
-GAME( 2002, bbh2sp,     iteagle,  bbh2sp,   bbh,  driver_device, 0, ROT0, "Incredible Technologies", "Big Buck Hunter II - Sportsman's Paradise (v2.02.11)", MACHINE_NOT_WORKING ) // SW51-2 needs to be off
-GAME( 2006, bbhcotw,    iteagle,  bbhcotw,  bbh,  driver_device, 0, ROT0, "Incredible Technologies", "Big Buck Hunter Call of the Wild (v3.02.5)", MACHINE_NOT_WORKING ) // random lockups
+GAME( 2000, iteagle,    0,        iteagle,  iteagle,  iteagle_state, 0, ROT0, "Incredible Technologies", "Eagle BIOS", MACHINE_IS_BIOS_ROOT )
+GAME( 1998, virtpool,   iteagle,  virtpool, virtpool, iteagle_state, 0, ROT0, "Incredible Technologies", "Virtual Pool", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // random lockups on loading screens
+GAME( 2002, carnking,   iteagle,  carnking, bbh,      iteagle_state, 0, ROT0, "Incredible Technologies", "Carnival King (v1.00.11)", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, gtfore01,   iteagle,  gtfore01, iteagle,  iteagle_state, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! (v1.00.25)", MACHINE_SUPPORTS_SAVE )
+GAME( 2001, gtfore02,   iteagle,  gtfore02, iteagle,  iteagle_state, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2002 (v2.01.06)", MACHINE_SUPPORTS_SAVE )
+GAME( 2002, gtfore03,   iteagle,  gtfore03, iteagle,  iteagle_state, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2003 (v3.00.10)", MACHINE_SUPPORTS_SAVE )
+GAME( 2002, gtfore03a,  gtfore03, gtfore03, iteagle,  iteagle_state, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2003 (v3.00.09)", MACHINE_SUPPORTS_SAVE )
+GAME( 2003, gtfore04,   iteagle,  gtfore04, iteagle,  iteagle_state, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2004 Extra (v4.00.08)", MACHINE_SUPPORTS_SAVE )
+GAME( 2003, gtfore04a,  gtfore04, gtfore04, iteagle,  iteagle_state, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2004 (v4.00.00)", MACHINE_SUPPORTS_SAVE )
+GAME( 2004, gtfore05,   iteagle,  gtfore05, iteagle,  iteagle_state, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2005 Extra (v5.01.06)", MACHINE_SUPPORTS_SAVE )
+GAME( 2004, gtfore05a,  gtfore05, gtfore05, iteagle,  iteagle_state, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2005 Extra (v5.01.02)", MACHINE_SUPPORTS_SAVE )
+GAME( 2004, gtfore05b,  gtfore05, gtfore05, iteagle,  iteagle_state, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2005 Extra (v5.01.00)", MACHINE_SUPPORTS_SAVE )
+GAME( 2004, gtfore05c,  gtfore05, gtfore05, iteagle,  iteagle_state, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2005 Extra (v5.00.00)", MACHINE_SUPPORTS_SAVE )
+GAME( 2005, gtfore06,   iteagle,  gtfore06, iteagle,  iteagle_state, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2006 Complete (v6.00.01)", MACHINE_SUPPORTS_SAVE )
+GAME( 2002, bbhsc,      iteagle,  bbhsc,    bbh,      iteagle_state, 0, ROT0, "Incredible Technologies", "Big Buck Hunter - Shooter's Challenge (v1.50.07)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // doesn't boot
+GAME( 2002, bbh2sp,     iteagle,  bbh2sp,   bbh,      iteagle_state, 0, ROT0, "Incredible Technologies", "Big Buck Hunter II - Sportsman's Paradise (v2.02.11)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // SW51-2 needs to be off
+GAME( 2006, bbhcotw,    iteagle,  bbhcotw,  bbh,      iteagle_state, 0, ROT0, "Incredible Technologies", "Big Buck Hunter Call of the Wild (v3.02.5)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // random lockups

@@ -13,12 +13,16 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/rollerg.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/konami.h" /* for the callback and the firq irq definition */
 #include "machine/watchdog.h"
 #include "sound/3812intf.h"
 #include "sound/k053260.h"
-#include "includes/rollerg.h"
+
+#include "speaker.h"
+
 
 WRITE8_MEMBER(rollerg_state::rollerg_0010_w)
 {
@@ -65,7 +69,7 @@ void rollerg_state::device_timer(emu_timer &timer, device_timer_id id, int param
 WRITE8_MEMBER(rollerg_state::sound_arm_nmi_w)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-	timer_set(attotime::from_usec(50), TIMER_NMI);   /* kludge until the K053260 is emulated correctly */
+	m_nmi_timer->adjust(attotime::from_usec(50));   /* kludge until the K053260 is emulated correctly */
 }
 
 READ8_MEMBER(rollerg_state::pip_r)
@@ -222,6 +226,8 @@ void rollerg_state::machine_start()
 	membank("bank1")->configure_entries(6, 2, &ROM[0x10000], 0x4000);
 	membank("bank1")->set_entry(0);
 
+	m_nmi_timer = timer_alloc(TIMER_NMI);
+
 	save_item(NAME(m_readzoomroms));
 }
 
@@ -236,7 +242,7 @@ WRITE8_MEMBER( rollerg_state::banking_callback )
 }
 
 
-static MACHINE_CONFIG_START( rollerg, rollerg_state )
+static MACHINE_CONFIG_START( rollerg )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI, 3000000)        /* ? */
@@ -342,5 +348,5 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1991, rollerg,  0,       rollerg, rollerg, driver_device, 0, ROT0, "Konami", "Rollergames (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, rollergj, rollerg, rollerg, rollerg, driver_device, 0, ROT0, "Konami", "Rollergames (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, rollerg,  0,       rollerg, rollerg, rollerg_state, 0, ROT0, "Konami", "Rollergames (US)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1991, rollergj, rollerg, rollerg, rollerg, rollerg_state, 0, ROT0, "Konami", "Rollergames (Japan)", MACHINE_SUPPORTS_SAVE )

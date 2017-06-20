@@ -13,8 +13,10 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/z80pio.h"
 #include "sound/beep.h"
+#include "machine/z80pio.h"
+#include "speaker.h"
+
 #include "sc2.lh"
 
 class sc2_state : public driver_device
@@ -45,7 +47,7 @@ public:
 
 READ8_MEMBER( sc2_state::sc2_beep )
 {
-	//if (!space.debugger_access())
+	//if (!machine().side_effect_disabled())
 	{
 		m_beep_state = ~m_beep_state;
 
@@ -195,7 +197,7 @@ WRITE8_MEMBER( sc2_state::pio_port_b_w )
 		m_kp_matrix = data;
 }
 
-static MACHINE_CONFIG_START( sc2, sc2_state )
+static MACHINE_CONFIG_START( sc2 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(sc2_mem)
@@ -234,5 +236,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY                        FULLNAME       FLAGS */
-COMP( 1981, sc2,    0,      0,       sc2,       sc2, driver_device,     0,  "VEB Mikroelektronik Erfurt", "Schachcomputer SC2", MACHINE_SUPPORTS_SAVE)
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  STATE      INIT  COMPANY                       FULLNAME              FLAGS
+COMP( 1981, sc2,  0,      0,      sc2,     sc2,   sc2_state, 0,    "VEB Mikroelektronik Erfurt", "Schachcomputer SC2", MACHINE_SUPPORTS_SAVE )

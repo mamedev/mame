@@ -6,6 +6,7 @@
 //
 //============================================================
 
+#include "emu.h"
 #import "disassemblyviewer.h"
 
 #import "debugconsole.h"
@@ -88,6 +89,7 @@
 	[dasmScroll setHasVerticalScroller:YES];
 	[dasmScroll setAutohidesScrollers:YES];
 	[dasmScroll setBorderType:NSNoBorder];
+	[dasmScroll setDrawsBackground:NO];
 	[dasmScroll setDocumentView:dasmView];
 	[dasmView release];
 	[[window contentView] addSubview:dasmScroll];

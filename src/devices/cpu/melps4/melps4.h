@@ -6,47 +6,47 @@
 
 */
 
-#ifndef _MELPS4_H_
-#define _MELPS4_H_
+#ifndef MAME_CPU_MELPS4_MELPS4_H
+#define MAME_CPU_MELPS4_MELPS4_H
 
-#include "emu.h"
+#pragma once
 
 
 // I/O ports setup
 
 // K input or A/D input port, up to 16 pins
 #define MCFG_MELPS4_READ_K_CB(_devcb) \
-	melps4_cpu_device::set_read_k_callback(*device, DEVCB_##_devcb);
+	devcb = &melps4_cpu_device::set_read_k_callback(*device, DEVCB_##_devcb);
 
 // D discrete I/O port, up to 16 pins - offset 0-15 for bit, 16 for all pins clear
 #define MCFG_MELPS4_READ_D_CB(_devcb) \
-	melps4_cpu_device::set_read_d_callback(*device, DEVCB_##_devcb);
+	devcb = &melps4_cpu_device::set_read_d_callback(*device, DEVCB_##_devcb);
 #define MCFG_MELPS4_WRITE_D_CB(_devcb) \
-	melps4_cpu_device::set_write_d_callback(*device, DEVCB_##_devcb);
+	devcb = &melps4_cpu_device::set_write_d_callback(*device, DEVCB_##_devcb);
 
 // 8-bit S generic I/O port
 #define MCFG_MELPS4_READ_S_CB(_devcb) \
-	melps4_cpu_device::set_read_s_callback(*device, DEVCB_##_devcb);
+	devcb = &melps4_cpu_device::set_read_s_callback(*device, DEVCB_##_devcb);
 #define MCFG_MELPS4_WRITE_S_CB(_devcb) \
-	melps4_cpu_device::set_write_s_callback(*device, DEVCB_##_devcb);
+	devcb = &melps4_cpu_device::set_write_s_callback(*device, DEVCB_##_devcb);
 
 // 4-bit F generic I/O port
 #define MCFG_MELPS4_READ_F_CB(_devcb) \
-	melps4_cpu_device::set_read_f_callback(*device, DEVCB_##_devcb);
+	devcb = &melps4_cpu_device::set_read_f_callback(*device, DEVCB_##_devcb);
 #define MCFG_MELPS4_WRITE_F_CB(_devcb) \
-	melps4_cpu_device::set_write_f_callback(*device, DEVCB_##_devcb);
+	devcb = &melps4_cpu_device::set_write_f_callback(*device, DEVCB_##_devcb);
 
 // 4-bit G generic output port
 #define MCFG_MELPS4_WRITE_G_CB(_devcb) \
-	melps4_cpu_device::set_write_g_callback(*device, DEVCB_##_devcb);
+	devcb = &melps4_cpu_device::set_write_g_callback(*device, DEVCB_##_devcb);
 
 // 1-bit U generic output port
 #define MCFG_MELPS4_WRITE_U_CB(_devcb) \
-	melps4_cpu_device::set_write_u_callback(*device, DEVCB_##_devcb);
+	devcb = &melps4_cpu_device::set_write_u_callback(*device, DEVCB_##_devcb);
 
 // T timer I/O pin (use execute_set_input for reads)
 #define MCFG_MELPS4_WRITE_T_CB(_devcb) \
-	melps4_cpu_device::set_write_t_callback(*device, DEVCB_##_devcb);
+	devcb = &melps4_cpu_device::set_write_t_callback(*device, DEVCB_##_devcb);
 
 
 #define MELPS4_PORTD_CLR 16
@@ -100,46 +100,23 @@ enum
 class melps4_cpu_device : public cpu_device
 {
 public:
-	// construction/destruction
-	melps4_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, int d_pins, uint8_t sm_page, uint8_t int_page, const char *shortname, const char *source)
-		: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
-		, m_program_config("program", ENDIANNESS_LITTLE, 16, prgwidth, -1, program)
-		, m_data_config("data", ENDIANNESS_LITTLE, 8, datawidth, 0, data)
-		, m_prgwidth(prgwidth)
-		, m_datawidth(datawidth)
-		, m_d_pins(d_pins)
-		, m_sm_page(sm_page)
-		, m_int_page(int_page)
-		, m_xami_mask(0xf)
-		, m_sp_mask(0x7<<4)
-		, m_ba_op(0x01)
-		, m_stack_levels(3)
-		, m_read_k(*this)
-		, m_read_d(*this)
-		, m_read_s(*this)
-		, m_read_f(*this)
-		, m_write_d(*this)
-		, m_write_s(*this)
-		, m_write_f(*this)
-		, m_write_g(*this)
-		, m_write_u(*this)
-		, m_write_t(*this)
-	{ }
-
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_read_k_callback(device_t &device, _Object object) { return downcast<melps4_cpu_device &>(device).m_read_k.set_callback(object); }
-	template<class _Object> static devcb_base &set_read_d_callback(device_t &device, _Object object) { return downcast<melps4_cpu_device &>(device).m_read_d.set_callback(object); }
-	template<class _Object> static devcb_base &set_read_s_callback(device_t &device, _Object object) { return downcast<melps4_cpu_device &>(device).m_read_s.set_callback(object); }
-	template<class _Object> static devcb_base &set_read_f_callback(device_t &device, _Object object) { return downcast<melps4_cpu_device &>(device).m_read_f.set_callback(object); }
+	template <class Object> static devcb_base &set_read_k_callback(device_t &device, Object &&cb) { return downcast<melps4_cpu_device &>(device).m_read_k.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_read_d_callback(device_t &device, Object &&cb) { return downcast<melps4_cpu_device &>(device).m_read_d.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_read_s_callback(device_t &device, Object &&cb) { return downcast<melps4_cpu_device &>(device).m_read_s.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_read_f_callback(device_t &device, Object &&cb) { return downcast<melps4_cpu_device &>(device).m_read_f.set_callback(std::forward<Object>(cb)); }
 
-	template<class _Object> static devcb_base &set_write_d_callback(device_t &device, _Object object) { return downcast<melps4_cpu_device &>(device).m_write_d.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_s_callback(device_t &device, _Object object) { return downcast<melps4_cpu_device &>(device).m_write_s.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_f_callback(device_t &device, _Object object) { return downcast<melps4_cpu_device &>(device).m_write_f.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_g_callback(device_t &device, _Object object) { return downcast<melps4_cpu_device &>(device).m_write_g.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_u_callback(device_t &device, _Object object) { return downcast<melps4_cpu_device &>(device).m_write_u.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_t_callback(device_t &device, _Object object) { return downcast<melps4_cpu_device &>(device).m_write_t.set_callback(object); }
+	template <class Object> static devcb_base &set_write_d_callback(device_t &device, Object &&cb) { return downcast<melps4_cpu_device &>(device).m_write_d.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_write_s_callback(device_t &device, Object &&cb) { return downcast<melps4_cpu_device &>(device).m_write_s.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_write_f_callback(device_t &device, Object &&cb) { return downcast<melps4_cpu_device &>(device).m_write_f.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_write_g_callback(device_t &device, Object &&cb) { return downcast<melps4_cpu_device &>(device).m_write_g.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_write_u_callback(device_t &device, Object &&cb) { return downcast<melps4_cpu_device &>(device).m_write_u.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_write_t_callback(device_t &device, Object &&cb) { return downcast<melps4_cpu_device &>(device).m_write_t.set_callback(std::forward<Object>(cb)); }
 
 protected:
+	// construction/destruction
+	melps4_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, int d_pins, uint8_t sm_page, uint8_t int_page);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -177,32 +154,32 @@ protected:
 	int m_d_pins;           // number of D port pins and bitmask: 11 on '40,'41,'42,'44, 8 on '43, 12 on '45,'46, 16 on '47
 	int m_d_mask;           // "
 
-	uint8_t m_sm_page;        // subroutine default page: 14 on '40 to '44, 2 on '45,'46, 0 on '47
-	uint8_t m_int_page;       // interrupt routine page: 12 on '40 to '44, 1 on '45,'46, 2 on '47
-	uint8_t m_xami_mask;      // mask option for XAMI opcode on '40,'41,'45 (0xf for others)
-	uint16_t m_sp_mask;       // SP opcode location(middle 4 bits): 7 on '40 to '46, 3 on '47
-	uint16_t m_ba_op;         // BA opcode location: 1 on '40 to '46, N/A on '47
-	uint8_t m_stack_levels;   // 3 levels on MELPS 4, 12 levels on MELPS 41/42
+	uint8_t m_sm_page;      // subroutine default page: 14 on '40 to '44, 2 on '45,'46, 0 on '47
+	uint8_t m_int_page;     // interrupt routine page: 12 on '40 to '44, 1 on '45,'46, 2 on '47
+	uint8_t m_xami_mask;    // mask option for XAMI opcode on '40,'41,'45 (0xf for others)
+	uint16_t m_sp_mask;     // SP opcode location(middle 4 bits): 7 on '40 to '46, 3 on '47
+	uint16_t m_ba_op;       // BA opcode location: 1 on '40 to '46, N/A on '47
+	uint8_t m_stack_levels; // 3 levels on MELPS 4, 12 levels on MELPS 41/42
 
 	// internal state, misc regs
-	uint16_t m_pc;            // program counter (11 or 10-bit)
+	uint16_t m_pc;          // program counter (11 or 10-bit)
 	uint16_t m_prev_pc;
-	uint16_t m_stack[12];     // callstack (SK0-SKx, same size as PC)
+	uint16_t m_stack[12];   // callstack (SK0-SKx, same size as PC)
 	uint16_t m_op;
 	uint16_t m_prev_op;
-	uint8_t m_bitmask;        // opcode bit argument
+	uint8_t m_bitmask;      // opcode bit argument
 
-	uint16_t m_port_d;        // last written port data
-	uint8_t m_port_s;         // "
-	uint8_t m_port_f;         // "
-	uint8_t m_port_t;         // "
+	uint16_t m_port_d;      // last written port data
+	uint8_t m_port_s;       // "
+	uint8_t m_port_f;       // "
+	uint8_t m_port_t;       // "
 
 	bool m_sm, m_sms;       // subroutine mode flag + irq stack
 	bool m_ba_flag;         // temp flag indicates BA opcode was executed
-	uint8_t m_sp_param;       // temp register holding SP opcode parameter
-	uint8_t m_cps;            // DP,CY or DP',CY' selected
+	uint8_t m_sp_param;     // temp register holding SP opcode parameter
+	uint8_t m_cps;          // DP,CY or DP',CY' selected
 	bool m_skip;            // skip next opcode
-	uint8_t m_inte;           // interrupt enable flag
+	uint8_t m_inte;         // interrupt enable flag
 	int m_intp;             // external interrupt polarity ('40 to '44)
 	bool m_irqflag[3];      // irq flags: exf, 1f, 2f (external, timer 1, timer 2)
 	int m_int_state;        // INT pin state
@@ -210,24 +187,24 @@ protected:
 	bool m_prohibit_irq;    // interrupt is prohibited during certain opcodes
 	bool m_possible_irq;    // indicate that irq needs to be rechecked
 
-	uint8_t m_tmr_count[2];   // timer active count
-	uint8_t m_tmr_reload;     // timer(2) auto reload
+	uint8_t m_tmr_count[2]; // timer active count
+	uint8_t m_tmr_reload;   // timer(2) auto reload
 	bool m_tmr_irq_enabled[2];
 
 	// work registers (unless specified, each is 4-bit)
-	uint8_t m_a;              // accumulator
-	uint8_t m_b;              // generic
-	uint8_t m_e;              // 8-bit register, hold data for S output
-	uint8_t m_y, m_y2;        // RAM index Y, Y' (Z.XX.YYYY is DP aka Data Pointer)
-	uint8_t m_x, m_x2;        // RAM index X, X', 2-bit
-	uint8_t m_z, m_z2;        // RAM index Z, Z', 1-bit, optional
-	uint8_t m_cy, m_cy2;      // carry flag(s)
+	uint8_t m_a;            // accumulator
+	uint8_t m_b;            // generic
+	uint8_t m_e;            // 8-bit register, hold data for S output
+	uint8_t m_y, m_y2;      // RAM index Y, Y' (Z.XX.YYYY is DP aka Data Pointer)
+	uint8_t m_x, m_x2;      // RAM index X, X', 2-bit
+	uint8_t m_z, m_z2;      // RAM index Z, Z', 1-bit, optional
+	uint8_t m_cy, m_cy2;    // carry flag(s)
 
-	uint8_t m_h;              // A/D converter H or generic
-	uint8_t m_l;              // A/D converter L or generic
-	uint8_t m_c;              // A/D converter counter
-	uint8_t m_v;              // timer control V
-	uint8_t m_w;              // timer control W
+	uint8_t m_h;            // A/D converter H or generic
+	uint8_t m_l;            // A/D converter L or generic
+	uint8_t m_c;            // A/D converter counter
+	uint8_t m_v;            // timer control V
+	uint8_t m_w;            // timer control W
 
 	// i/o handlers
 	devcb_read16 m_read_k;
@@ -362,5 +339,4 @@ protected:
 };
 
 
-
-#endif /* _MELPS4_H_ */
+#endif // MAME_CPU_MELPS4_MELPS4_H

@@ -17,19 +17,19 @@
 //  sns_rom_device - constructor
 //-------------------------------------------------
 
-const device_type SNS_PFEST94 = &device_creator<sns_pfest94_device>;
+DEFINE_DEVICE_TYPE(SNS_PFEST94, sns_pfest94_device, "sns_pfest94", "SNES Powerfest '94")
 
 
 sns_pfest94_device::sns_pfest94_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SNS_PFEST94, "SNES Powerfest '94", tag, owner, clock, "sns_pfest94", __FILE__),
-		device_sns_cart_interface(mconfig, *this),
-		m_upd7725(*this, "dsp"),
-		m_dsw(*this, "DIPSW"),
-		m_base_bank(0),
-		m_mask(0),
-		m_status(0),
-		m_count(0),
-		pfest94_timer(nullptr)
+	: device_t(mconfig, SNS_PFEST94, tag, owner, clock)
+	, device_sns_cart_interface(mconfig, *this)
+	, m_upd7725(*this, "dsp")
+	, m_dsw(*this, "DIPSW")
+	, m_base_bank(0)
+	, m_mask(0)
+	, m_status(0)
+	, m_count(0)
+	, pfest94_timer(nullptr)
 {
 }
 
@@ -216,24 +216,14 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( snes_dsp )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( snes_dsp_pfest94 )
+MACHINE_CONFIG_MEMBER( sns_pfest94_device::device_add_mconfig )
 	MCFG_CPU_ADD("dsp", UPD7725, 8000000)
 	MCFG_CPU_PROGRAM_MAP(dsp_prg_map_lorom)
 	MCFG_CPU_DATA_MAP(dsp_data_map_lorom)
 MACHINE_CONFIG_END
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor sns_pfest94_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( snes_dsp_pfest94 );
-}
 
 //-------------------------------------------------
 //  Dipswitch

@@ -57,6 +57,8 @@ $842f = lives
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class ddayjlc_state : public driver_device
@@ -508,7 +510,7 @@ PALETTE_INIT_MEMBER(ddayjlc_state, ddayjlc)
 	}
 }
 
-static MACHINE_CONFIG_START( ddayjlc, ddayjlc_state )
+static MACHINE_CONFIG_START( ddayjlc )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,12000000/3)

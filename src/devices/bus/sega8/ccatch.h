@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli
-#ifndef __SEGA8_CCATCH_H
-#define __SEGA8_CCATCH_H
+#ifndef MAME_BUS_SEGA8_CCATCH_H
+#define MAME_BUS_SEGA8_CCATCH_H
+
+#pragma once
 
 #include "sega8_slot.h"
 #include "rom.h"
@@ -19,17 +21,14 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(write_cart) override;
 	virtual DECLARE_WRITE8_MEMBER(write_mapper) override {}
 
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
 protected:
+	virtual void device_add_mconfig(machine_config &config) override;
+
 	required_device<sega8_card_slot_device> m_card;
 };
 
 
-
-
-
 // device type definition
-extern const device_type SEGA8_ROM_CARDCATCH;
+DECLARE_DEVICE_TYPE(SEGA8_ROM_CARDCATCH, sega8_cardcatch_device)
 
-#endif
+#endif // MAME_BUS_SEGA8_CCATCH_H

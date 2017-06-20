@@ -122,6 +122,8 @@ as well as Up Right, Cocktail or Flip Screen from the service menu.
 #include "cpu/h8/h8s2357.h"
 #include "sound/okim9810.h"
 #include "machine/eepromser.h"
+#include "screen.h"
+#include "speaker.h"
 
 class invqix_state : public driver_device
 {
@@ -275,7 +277,7 @@ WRITE16_MEMBER(invqix_state::vctl_w)
 static ADDRESS_MAP_START(invqix_prg_map, AS_PROGRAM, 16, invqix_state)
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM AM_REGION("program", 0)
 	AM_RANGE(0x200000, 0x21ffff) AM_RAM
-	AM_RANGE(0x400000, 0x400001) AM_DEVWRITE8("oki", okim9810_device, write_TMP_register, 0x00ff)
+	AM_RANGE(0x400000, 0x400001) AM_DEVWRITE8("oki", okim9810_device, write_tmp_register, 0x00ff)
 	AM_RANGE(0x400000, 0x400001) AM_DEVWRITE8("oki", okim9810_device, write, 0xff00)
 	AM_RANGE(0x400002, 0x400003) AM_DEVREAD8("oki", okim9810_device, read, 0xff00)
 	AM_RANGE(0x600000, 0x61ffff) AM_RAM AM_SHARE("vram")
@@ -325,7 +327,7 @@ static INPUT_PORTS_START( invqix )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( invqix, invqix_state )
+static MACHINE_CONFIG_START( invqix )
 	MCFG_CPU_ADD("maincpu", H8S2394, XTAL_20MHz)
 	MCFG_CPU_PROGRAM_MAP(invqix_prg_map)
 	MCFG_CPU_IO_MAP(invqix_io_map)
@@ -362,4 +364,4 @@ ROM_START( invqix )
 	ROM_LOAD16_WORD_SWAP( "93c46.ic6", 0x000000, 0x000080, CRC(564b744e) SHA1(4d9ea7dc253797c513258d07a936dfb63d8ed18c) )
 ROM_END
 
-GAME( 2003, invqix, 0, invqix, invqix, driver_device, 0, ROT270, "Taito / Namco", "Space Invaders / Qix Silver Anniversary Edition (Ver. 2.03)", MACHINE_SUPPORTS_SAVE )
+GAME( 2003, invqix, 0, invqix, invqix, invqix_state, 0, ROT270, "Taito / Namco", "Space Invaders / Qix Silver Anniversary Edition (Ver. 2.03)", MACHINE_SUPPORTS_SAVE )

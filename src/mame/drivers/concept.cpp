@@ -32,12 +32,15 @@
 */
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
 #include "includes/concept.h"
+
+#include "cpu/m68000/m68000.h"
 #include "bus/a2bus/a2corvus.h"
 #include "bus/a2bus/corvfdc01.h"
 #include "bus/a2bus/corvfdc02.h"
 #include "bus/rs232/rs232.h"
+#include "screen.h"
+#include "speaker.h"
 
 static ADDRESS_MAP_START(concept_memmap, AS_PROGRAM, 16, concept_state )
 	AM_RANGE(0x000000, 0x000007) AM_ROM AM_REGION("maincpu", 0x010000)  /* boot ROM mirror */
@@ -205,7 +208,7 @@ SLOT_INTERFACE_END
 
 
 
-static MACHINE_CONFIG_START( concept, concept_state )
+static MACHINE_CONFIG_START( concept )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8182000)        /* 16.364 MHz / 2 */
 	MCFG_CPU_PROGRAM_MAP(concept_memmap)
@@ -312,5 +315,5 @@ ROM_START( concept )
 	ROM_LOAD16_BYTE( "mb20l.bin",    0x000001, 0x001000, CRC(b4b59de9) SHA1(3e8b8b5950b5359203c054f94af1fc5b8f0495b9) )
 ROM_END
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT    INIT  COMPANY           FULLNAME */
-COMP( 1982, concept,  0,    0,  concept,  concept, driver_device, 0,    "Corvus Systems", "Concept" , 0 )
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT    STATE          INIT  COMPANY           FULLNAME */
+COMP( 1982, concept,  0,        0,      concept,  concept, concept_state, 0,    "Corvus Systems", "Concept" , 0 )

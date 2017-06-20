@@ -172,20 +172,19 @@ static const uint32_t mouse_bitmap[32*32] =
 //-------------------------------------------------
 
 mame_ui_manager::mame_ui_manager(running_machine &machine)
-	: ui_manager(machine),
-		m_font(nullptr),
-		m_handler_callback(nullptr),
-		m_handler_param(0),
-		m_single_step(false),
-		m_showfps(false),
-		m_showfps_end(0),
-		m_show_profiler(false),
-		m_popup_text_end(0),
-		m_mouse_arrow_texture(nullptr),
-		m_mouse_show(false),
-		m_load_save_hold(false)
-{
-}
+	: ui_manager(machine)
+	, m_font(nullptr)
+	, m_handler_callback(nullptr)
+	, m_handler_callback_type(ui_callback_type::GENERAL)
+	, m_handler_param(0)
+	, m_single_step(false)
+	, m_showfps(false)
+	, m_showfps_end(0)
+	, m_show_profiler(false)
+	, m_popup_text_end(0)
+	, m_mouse_arrow_texture(nullptr)
+	, m_mouse_show(false)
+	, m_load_save_hold(false) {}
 
 mame_ui_manager::~mame_ui_manager()
 {
@@ -255,6 +254,16 @@ void mame_ui_manager::initialize(running_machine &machine)
 	else
 	{
 		slider_current = nullptr;
+	}
+
+	// if no test switch found, assign its input sequence to a service mode DIP
+	if (!m_machine_info->has_test_switch() && m_machine_info->has_dips())
+	{
+		const char *const service_mode_dipname = ioport_configurer::string_from_token(DEF_STR(Service_Mode));
+		for (auto &port : machine.ioport().ports())
+			for (ioport_field &field : port.second->fields())
+				if (field.type() == IPT_DIPSWITCH && strcmp(field.name(), service_mode_dipname) == 0)
+					field.set_defseq(machine.ioport().type_seq(IPT_SERVICE));
 	}
 }
 
@@ -332,8 +341,7 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 					messagebox_text = machine_info().mandatory_images();
 				if (!messagebox_text.empty())
 				{
-					std::string warning;
-					warning.assign(_("This driver requires images to be loaded in the following device(s): ")).append(messagebox_text.substr(0, messagebox_text.length() - 2));
+					std::string warning = std::string(_("This driver requires images to be loaded in the following device(s): ")) + messagebox_text;
 					ui::menu_file_manager::force_file_manager(*this, machine().render().ui_container(), warning.c_str());
 				}
 				break;
@@ -394,7 +402,7 @@ void mame_ui_manager::update_and_render(render_container &container)
 	container.empty();
 
 	// if we're paused, dim the whole screen
-	if (machine().phase() >= MACHINE_PHASE_RESET && (single_step() || machine().paused()))
+	if (machine().phase() >= machine_phase::RESET && (single_step() || machine().paused()))
 	{
 		int alpha = (1.0f - machine().options().pause_brightness()) * 255.0f;
 		if (ui::menu::stack_has_special_main_menu(machine()))
@@ -406,7 +414,7 @@ void mame_ui_manager::update_and_render(render_container &container)
 	}
 
 	// render any cheat stuff at the bottom
-	if (machine().phase() >= MACHINE_PHASE_RESET)
+	if (machine().phase() >= machine_phase::RESET)
 		mame_machine_manager::instance()->cheat().render_text(*this, container);
 
 	// call the current UI handler
@@ -1008,7 +1016,7 @@ void mame_ui_manager::start_load_state()
 void mame_ui_manager::image_handler_ingame()
 {
 	// run display routine for devices
-	if (machine().phase() == MACHINE_PHASE_RUNNING)
+	if (machine().phase() == machine_phase::RUNNING)
 	{
 		auto layout = create_layout(machine().render().ui_container());
 
@@ -1103,7 +1111,7 @@ uint32_t mame_ui_manager::handler_ingame(render_container &container)
 	}
 
 	// is the natural keyboard enabled?
-	if (machine().ioport().natkeyboard().in_use() && (machine().phase() == MACHINE_PHASE_RUNNING))
+	if (machine().ioport().natkeyboard().in_use() && (machine().phase() == machine_phase::RUNNING))
 		process_natural_keyboard();
 
 	if (!ui_disabled)
@@ -1268,7 +1276,7 @@ uint32_t mame_ui_manager::handler_ingame(render_container &container)
 
 uint32_t mame_ui_manager::handler_load_save(render_container &container, uint32_t state)
 {
-	char filename[20];
+	std::string filename;
 	char file = 0;
 
 	// if we're not in the middle of anything, skip
@@ -1332,7 +1340,7 @@ uint32_t mame_ui_manager::handler_load_save(render_container &container, uint32_
 			for (input_item_id id = ITEM_ID_BUTTON1; id <= ITEM_ID_BUTTON32; ++id)
 				if (machine().input().code_pressed_once(input_code(DEVICE_CLASS_JOYSTICK, joy_index, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, id)))
 				{
-					snprintf(filename, sizeof(filename), "joy%i-%i", joy_index, id - ITEM_ID_BUTTON1 + 1);
+					filename = util::string_format("joy%i-%i", joy_index, id - ITEM_ID_BUTTON1 + 1);
 					found = true;
 					break;
 				}
@@ -1342,19 +1350,19 @@ uint32_t mame_ui_manager::handler_load_save(render_container &container, uint32_
 	}
 	else
 	{
-		sprintf(filename, "%c", file);
+		filename = util::string_format("%c", file);
 	}
 
 	// display a popup indicating that the save will proceed
 	if (state == LOADSAVE_SAVE)
 	{
 		machine().popmessage(_("Save to position %s"), filename);
-		machine().schedule_save(filename);
+		machine().schedule_save(std::move(filename));
 	}
 	else
 	{
 		machine().popmessage(_("Load from position %s"), filename);
-		machine().schedule_load(filename);
+		machine().schedule_load(std::move(filename));
 	}
 
 	// avoid handling the name of the save state slot as a seperate input
@@ -2225,9 +2233,9 @@ void mame_ui_manager::load_ui_options()
 	emu_file file(machine().options().ini_path(), OPEN_FLAG_READ);
 	if (file.open("ui.ini") == osd_file::error::NONE)
 	{
-		bool result = options().parse_ini_file((util::core_file&)file, OPTION_PRIORITY_MAME_INI, OPTION_PRIORITY_DRIVER_INI, error);
+		bool result = options().parse_ini_file((util::core_file&)file, OPTION_PRIORITY_MAME_INI, OPTION_PRIORITY_MAME_INI < OPTION_PRIORITY_DRIVER_INI, error);
 		if (!result)
-			osd_printf_error("**Error loading ui.ini**");
+			osd_printf_error("**Error loading ui.ini**\n");
 	}
 }
 
@@ -2266,10 +2274,10 @@ void mame_ui_manager::save_main_option()
 		emu_file file(machine().options().ini_path(), OPEN_FLAG_READ);
 		if (file.open(emulator_info::get_configname(), ".ini") == osd_file::error::NONE)
 		{
-			bool result = options.parse_ini_file((util::core_file&)file, OPTION_PRIORITY_MAME_INI, OPTION_PRIORITY_DRIVER_INI, error);
+			bool result = options.parse_ini_file((util::core_file&)file, OPTION_PRIORITY_MAME_INI, OPTION_PRIORITY_MAME_INI < OPTION_PRIORITY_DRIVER_INI, error);
 			if (!result)
 			{
-				osd_printf_error("**Error loading %s.ini**", emulator_info::get_configname());
+				osd_printf_error("**Error loading %s.ini**\n", emulator_info::get_configname());
 				return;
 			}
 		}

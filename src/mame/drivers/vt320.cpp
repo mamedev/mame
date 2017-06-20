@@ -11,15 +11,18 @@
 #include "emu.h"
 #include "cpu/mcs51/mcs51.h"
 #include "machine/ram.h"
+#include "screen.h"
 
 
 class vt320_state : public driver_device
 {
 public:
 	vt320_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_maincpu(*this, "maincpu"),
-		m_ram(*this, RAM_TAG) { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_ram(*this, RAM_TAG)
+	{
+	}
 
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -81,7 +84,7 @@ uint32_t vt320_state::screen_update_vt320(screen_device &screen, bitmap_ind16 &b
 }
 
 
-static MACHINE_CONFIG_START( vt320, vt320_state )
+static MACHINE_CONFIG_START( vt320 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8051, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(vt320_mem)
@@ -118,8 +121,8 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY                    FULLNAME       FLAGS */
-COMP( 1987, vt320,   0,      0,       vt320,     vt320, driver_device,   0, "Digital Equipment Corporation", "VT320", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-//COMP( 1989?, vt330,  0,      0,       vt320,     vt320, driver_device,   0, "Digital Equipment Corporation", "VT330", MACHINE_NOT_WORKING)
-//COMP( 1989?, vt340,  0,      0,       vt320,     vt320, driver_device,   0, "Digital Equipment Corporation", "VT340", MACHINE_NOT_WORKING)
-//COMP( 1990?, vt340p, 0,      0,       vt320,     vt320, driver_device,   0, "Digital Equipment Corporation", "VT340+", MACHINE_NOT_WORKING)
+/*    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT   STATE         INIT  COMPANY                          FULLNAME   FLAGS */
+COMP( 1987, vt320,   0,      0,       vt320,     vt320,  vt320_state,  0,    "Digital Equipment Corporation", "VT320",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//COMP( 1989?, vt330,  0,      0,       vt320,     vt320,  vt320_state,  0,    "Digital Equipment Corporation", "VT330",   MACHINE_NOT_WORKING)
+//COMP( 1989?, vt340,  0,      0,       vt320,     vt320,  vt320_state,  0,    "Digital Equipment Corporation", "VT340",   MACHINE_NOT_WORKING)
+//COMP( 1990?, vt340p, 0,      0,       vt320,     vt320,  vt320_state,  0,    "Digital Equipment Corporation", "VT340+",  MACHINE_NOT_WORKING)

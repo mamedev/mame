@@ -423,35 +423,41 @@ test1f diagnostic hacks:
 ****************************************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
-#include "machine/eepromser.h"
-#include "cpu/sh2/sh2.h"
-#include "cpu/scudsp/scudsp.h"
-#include "sound/scsp.h"
-#include "sound/cdda.h"
-#include "machine/smpc.h"
-#include "machine/nvram.h"
 #include "includes/saturn.h"
+
+#include "cpu/m68000/m68000.h"
+#include "cpu/scudsp/scudsp.h"
+#include "cpu/sh2/sh2.h"
 #include "imagedev/chd_cd.h"
-#include "coreutil.h"
+#include "machine/eepromser.h"
+#include "machine/nvram.h"
+#include "machine/smpc.h"
+#include "machine/stvcd.h"
+#include "sound/cdda.h"
+#include "sound/scsp.h"
 #include "video/stvvdp1.h"
 #include "video/stvvdp2.h"
-#include "machine/stvcd.h"
 
-#include "bus/saturn/sat_slot.h"
-#include "bus/saturn/rom.h"
-#include "bus/saturn/dram.h"
 #include "bus/saturn/bram.h"
+#include "bus/saturn/dram.h"
+#include "bus/saturn/rom.h"
+#include "bus/saturn/sat_slot.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
+#include "coreutil.h"
+
 
 class sat_console_state : public saturn_state
 {
 public:
 	sat_console_state(const machine_config &mconfig, device_type type, const char *tag)
-				: saturn_state(mconfig, type, tag)
-				, m_exp(*this, "exp")
-				, m_nvram(*this, "nvram")
-				, m_smpc_nv(*this, "smpc_nv")
+		: saturn_state(mconfig, type, tag)
+		, m_exp(*this, "exp")
+		, m_nvram(*this, "nvram")
+		, m_smpc_nv(*this, "smpc_nv")
 	{ }
 
 	DECLARE_INPUT_CHANGED_MEMBER(nmi_reset);
@@ -591,7 +597,7 @@ void sat_console_state::nvram_init(nvram_device &nvram, void *data, size_t size)
 	memcpy(data, init, sizeof(init));
 }
 
-void saturn_state::debug_scuirq_command(int ref, int params, const char **param)
+void saturn_state::debug_scuirq_command(int ref, const std::vector<std::string> &params)
 {
 	debugger_console con = machine().debugger().console();
 	const char *const irqnames[16] = {
@@ -602,7 +608,7 @@ void saturn_state::debug_scuirq_command(int ref, int params, const char **param)
 		con.printf("%s irq enabled: %s\n",irqnames[irq_lv],(m_scu.ism & (1 << irq_lv)) == 0 ? "1" : "0");
 }
 
-void saturn_state::debug_scudma_command(int ref, int params, const char **param)
+void saturn_state::debug_scudma_command(int ref, const std::vector<std::string> &params)
 {
 	debugger_console con = machine().debugger().console();
 
@@ -615,7 +621,7 @@ void saturn_state::debug_scudma_command(int ref, int params, const char **param)
 	}
 }
 
-void saturn_state::debug_help_command(int ref, int params, const char **param)
+void saturn_state::debug_help_command(int ref, const std::vector<std::string> &params)
 {
 	debugger_console con = machine().debugger().console();
 
@@ -626,17 +632,17 @@ void saturn_state::debug_help_command(int ref, int params, const char **param)
 }
 
 
-void saturn_state::debug_commands(int ref, int params, const char **param)
+void saturn_state::debug_commands(int ref, const std::vector<std::string> &params)
 {
-	if (params < 1)
+	if (params.size() < 1)
 		return;
 
-	if (strcmp("scudma", param[0]) == 0)
-		debug_scudma_command(ref, params - 1, param + 1);
-	else if(strcmp("scuirq", param[0]) == 0)
-		debug_scuirq_command(ref, params - 1, param + 1);
-	else if(strcmp("help", param[0]) == 0)
-		debug_help_command(ref, params - 1, param + 1);
+	if (params[0] == "scudma")
+		debug_scudma_command(ref, params);
+	else if (params[0] == "scuirq")
+		debug_scuirq_command(ref, params);
+	else if (params[0] == "help")
+		debug_help_command(ref, params);
 }
 
 
@@ -648,7 +654,7 @@ MACHINE_START_MEMBER(sat_console_state, saturn)
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
 		using namespace std::placeholders;
-		machine().debugger().console().register_command("saturn", CMDFLAG_NONE, 0, 1, 4, std::bind(&saturn_state::debug_commands, this, _1, _2, _3));
+		machine().debugger().console().register_command("saturn", CMDFLAG_NONE, 0, 1, 4, std::bind(&saturn_state::debug_commands, this, _1, _2));
 	}
 
 	machine().device<scsp_device>("scsp")->set_ram_base(m_sound_ram);
@@ -783,7 +789,7 @@ MACHINE_RESET_MEMBER(sat_console_state,saturn)
 }
 
 
-static MACHINE_CONFIG_START( saturn, sat_console_state )
+static MACHINE_CONFIG_START( saturn )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH2, MASTER_CLOCK_352/2) // 28.6364 MHz
@@ -986,7 +992,7 @@ ROM_START(hisaturn)
 	ROM_COPY( "maincpu",0x000000,0,0x080000)
 ROM_END
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE INPUT   INIT        COMPANY     FULLNAME            FLAGS */
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE   INPUT   STATE              INIT        COMPANY     FULLNAME            FLAGS */
 CONS( 1994, saturn,     0,      0,      saturnus, saturn, sat_console_state, saturnus,   "Sega",     "Saturn (USA)",     MACHINE_NOT_WORKING )
 CONS( 1994, saturnjp,   saturn, 0,      saturnjp, saturn, sat_console_state, saturnjp,   "Sega",     "Saturn (Japan)",   MACHINE_NOT_WORKING )
 CONS( 1994, saturneu,   saturn, 0,      saturneu, saturn, sat_console_state, saturneu,   "Sega",     "Saturn (PAL)",     MACHINE_NOT_WORKING )

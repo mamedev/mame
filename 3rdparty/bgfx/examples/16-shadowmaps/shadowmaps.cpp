@@ -257,12 +257,12 @@ void mtxYawPitchRoll(float* __restrict _result
 		            , float _roll
 		            )
 {
-	float sroll  = sinf(_roll);
-	float croll  = cosf(_roll);
-	float spitch = sinf(_pitch);
-	float cpitch = cosf(_pitch);
-	float syaw   = sinf(_yaw);
-	float cyaw   = cosf(_yaw);
+	float sroll  = bx::fsin(_roll);
+	float croll  = bx::fcos(_roll);
+	float spitch = bx::fsin(_pitch);
+	float cpitch = bx::fcos(_pitch);
+	float syaw   = bx::fsin(_yaw);
+	float cyaw   = bx::fcos(_yaw);
 
 	_result[ 0] = sroll * spitch * syaw + croll * cyaw;
 	_result[ 1] = sroll * cpitch;
@@ -875,12 +875,6 @@ struct Mesh
 		mem = bgfx::makeRef(_indices, size);
 		group.m_ibh = bgfx::createIndexBuffer(mem);
 
-		//TODO:
-		// group.m_sphere = ...
-		// group.m_aabb = ...
-		// group.m_obb = ...
-		// group.m_prims = ...
-
 		m_groups.push_back(group);
 	}
 
@@ -890,29 +884,29 @@ struct Mesh
 #define BGFX_CHUNK_MAGIC_IB  BX_MAKEFOURCC('I', 'B', ' ', 0x0)
 #define BGFX_CHUNK_MAGIC_PRI BX_MAKEFOURCC('P', 'R', 'I', 0x0)
 
-		bx::CrtFileReader reader;
-		bx::open(&reader, _filePath);
+		bx::FileReaderI* reader = entry::getFileReader();
+		bx::open(reader, _filePath);
 
 		Group group;
 
 		uint32_t chunk;
-		while (4 == bx::read(&reader, chunk) )
+		while (4 == bx::read(reader, chunk) )
 		{
 			switch (chunk)
 			{
 			case BGFX_CHUNK_MAGIC_VB:
 				{
-					bx::read(&reader, group.m_sphere);
-					bx::read(&reader, group.m_aabb);
-					bx::read(&reader, group.m_obb);
+					bx::read(reader, group.m_sphere);
+					bx::read(reader, group.m_aabb);
+					bx::read(reader, group.m_obb);
 
-					bgfx::read(&reader, m_decl);
+					bgfx::read(reader, m_decl);
 					uint16_t stride = m_decl.getStride();
 
 					uint16_t numVertices;
-					bx::read(&reader, numVertices);
+					bx::read(reader, numVertices);
 					const bgfx::Memory* mem = bgfx::alloc(numVertices*stride);
-					bx::read(&reader, mem->data, mem->size);
+					bx::read(reader, mem->data, mem->size);
 
 					group.m_vbh = bgfx::createVertexBuffer(mem, m_decl);
 				}
@@ -921,9 +915,9 @@ struct Mesh
 			case BGFX_CHUNK_MAGIC_IB:
 				{
 					uint32_t numIndices;
-					bx::read(&reader, numIndices);
+					bx::read(reader, numIndices);
 					const bgfx::Memory* mem = bgfx::alloc(numIndices*2);
-					bx::read(&reader, mem->data, mem->size);
+					bx::read(reader, mem->data, mem->size);
 					group.m_ibh = bgfx::createIndexBuffer(mem);
 				}
 				break;
@@ -931,31 +925,31 @@ struct Mesh
 			case BGFX_CHUNK_MAGIC_PRI:
 				{
 					uint16_t len;
-					bx::read(&reader, len);
+					bx::read(reader, len);
 
 					std::string material;
 					material.resize(len);
-					bx::read(&reader, const_cast<char*>(material.c_str() ), len);
+					bx::read(reader, const_cast<char*>(material.c_str() ), len);
 
 					uint16_t num;
-					bx::read(&reader, num);
+					bx::read(reader, num);
 
 					for (uint32_t ii = 0; ii < num; ++ii)
 					{
-						bx::read(&reader, len);
+						bx::read(reader, len);
 
 						std::string name;
 						name.resize(len);
-						bx::read(&reader, const_cast<char*>(name.c_str() ), len);
+						bx::read(reader, const_cast<char*>(name.c_str() ), len);
 
 						Primitive prim;
-						bx::read(&reader, prim.m_startIndex);
-						bx::read(&reader, prim.m_numIndices);
-						bx::read(&reader, prim.m_startVertex);
-						bx::read(&reader, prim.m_numVertices);
-						bx::read(&reader, prim.m_sphere);
-						bx::read(&reader, prim.m_aabb);
-						bx::read(&reader, prim.m_obb);
+						bx::read(reader, prim.m_startIndex);
+						bx::read(reader, prim.m_numIndices);
+						bx::read(reader, prim.m_startVertex);
+						bx::read(reader, prim.m_numVertices);
+						bx::read(reader, prim.m_sphere);
+						bx::read(reader, prim.m_aabb);
+						bx::read(reader, prim.m_obb);
 
 						group.m_prims.push_back(prim);
 					}
@@ -966,12 +960,12 @@ struct Mesh
 				break;
 
 			default:
-				DBG("%08x at %d", chunk, reader.seek() );
+				DBG("%08x at %d", chunk, bx::seek(reader) );
 				break;
 			}
 		}
 
-		bx::close(&reader);
+		bx::close(reader);
 	}
 
 	void unload()
@@ -1019,7 +1013,7 @@ struct Mesh
 			{
 				for (uint8_t ii = 0; ii < ShadowMapRenderTargets::Count; ++ii)
 				{
-					bgfx::setTexture(4 + ii, s_shadowMap[ii], s_rtShadowMap[ii]);
+					bgfx::setTexture(4 + ii, s_shadowMap[ii], bgfx::getTexture(s_rtShadowMap[ii]) );
 				}
 			}
 
@@ -1063,7 +1057,7 @@ bgfx::VertexDecl PosColorTexCoord0Vertex::ms_decl;
 
 void screenSpaceQuad(float _textureWidth, float _textureHeight, bool _originBottomLeft = true, float _width = 1.0f, float _height = 1.0f)
 {
-	if (bgfx::checkAvailTransientVertexBuffer(3, PosColorTexCoord0Vertex::ms_decl) )
+	if (3 == bgfx::getAvailTransientVertexBuffer(3, PosColorTexCoord0Vertex::ms_decl) )
 	{
 		bgfx::TransientVertexBuffer vb;
 		bgfx::allocTransientVertexBuffer(&vb, 3, PosColorTexCoord0Vertex::ms_decl);
@@ -1169,7 +1163,7 @@ void splitFrustum(float* _splits, uint8_t _numSplits, float _near, float _far, f
 	{
 		float si = float(int8_t(ff) ) / numSlicesf;
 
-		const float nearp = l*(_near*powf(ratio, si) ) + (1 - l)*(_near + (_far - _near)*si);
+		const float nearp = l*(_near*bx::fpow(ratio, si) ) + (1 - l)*(_near + (_far - _near)*si);
 		_splits[nn] = nearp;          //near
 		_splits[ff] = nearp * 1.005f; //far from previous split
 	}
@@ -1962,9 +1956,9 @@ int _main_(int _argc, char** _argv)
 	const float camAspect  = float(int32_t(viewState.m_width) ) / float(int32_t(viewState.m_height) );
 	const float camNear    = 0.1f;
 	const float camFar     = 2000.0f;
-	const float projHeight = 1.0f/tanf(bx::toRad(camFovy)*0.5f);
+	const float projHeight = 1.0f/bx::ftan(bx::toRad(camFovy)*0.5f);
 	const float projWidth  = projHeight * camAspect;
-	bx::mtxProj(viewState.m_proj, camFovy, camAspect, camNear, camFar);
+	bx::mtxProj(viewState.m_proj, camFovy, camAspect, camNear, camFar, bgfx::getCaps()->homogeneousDepth);
 	cameraGetViewMtx(viewState.m_view);
 
 	float timeAccumulatorLight = 0.0f;
@@ -2175,16 +2169,16 @@ int _main_(int _argc, char** _argv)
 		if (settings.m_updateScene)  { timeAccumulatorScene += deltaTime; }
 
 		// Setup lights.
-		pointLight.m_position.m_x = cosf(timeAccumulatorLight) * 20.0f;
+		pointLight.m_position.m_x = bx::fcos(timeAccumulatorLight) * 20.0f;
 		pointLight.m_position.m_y = 26.0f;
-		pointLight.m_position.m_z = sinf(timeAccumulatorLight) * 20.0f;
+		pointLight.m_position.m_z = bx::fsin(timeAccumulatorLight) * 20.0f;
 		pointLight.m_spotDirectionInner.m_x = -pointLight.m_position.m_x;
 		pointLight.m_spotDirectionInner.m_y = -pointLight.m_position.m_y;
 		pointLight.m_spotDirectionInner.m_z = -pointLight.m_position.m_z;
 
-		directionalLight.m_position.m_x = -cosf(timeAccumulatorLight);
+		directionalLight.m_position.m_x = -bx::fcos(timeAccumulatorLight);
 		directionalLight.m_position.m_y = -1.0f;
-		directionalLight.m_position.m_z = -sinf(timeAccumulatorLight);
+		directionalLight.m_position.m_z = -bx::fsin(timeAccumulatorLight);
 
 		// Setup instance matrices.
 		float mtxFloor[16];
@@ -2251,9 +2245,9 @@ int _main_(int _argc, char** _argv)
 				, 0.0f
 				, float(ii)
 				, 0.0f
-				, sinf(float(ii)*2.0f*bx::pi/float(numTrees) ) * 60.0f
+				, bx::fsin(float(ii)*2.0f*bx::pi/float(numTrees) ) * 60.0f
 				, 0.0f
-				, cosf(float(ii)*2.0f*bx::pi/float(numTrees) ) * 60.0f
+				, bx::fcos(float(ii)*2.0f*bx::pi/float(numTrees) ) * 60.0f
 				);
 		}
 
@@ -2300,7 +2294,7 @@ int _main_(int _argc, char** _argv)
 			{
 				const float fovx = 143.98570868f + 3.51f + settings.m_fovXAdjust;
 				const float fovy = 125.26438968f + 9.85f + settings.m_fovYAdjust;
-				const float aspect = tanf(bx::toRad(fovx*0.5f) )/tanf(bx::toRad(fovy*0.5f) );
+				const float aspect = bx::ftan(bx::toRad(fovx*0.5f) )/bx::ftan(bx::toRad(fovy*0.5f) );
 
 				bx::mtxProj(lightProj[ProjType::Vertical]
 						, fovx
@@ -2324,7 +2318,7 @@ int _main_(int _argc, char** _argv)
 
 			const float fovx = 143.98570868f + 7.8f + settings.m_fovXAdjust;
 			const float fovy = 125.26438968f + 3.0f + settings.m_fovYAdjust;
-			const float aspect = tanf(bx::toRad(fovx*0.5f) )/tanf(bx::toRad(fovy*0.5f) );
+			const float aspect = bx::ftan(bx::toRad(fovx*0.5f) )/bx::ftan(bx::toRad(fovy*0.5f) );
 
 			bx::mtxProj(lightProj[ProjType::Horizontal], fovy, aspect, currentSmSettings->m_near, currentSmSettings->m_far);
 
@@ -2350,7 +2344,7 @@ int _main_(int _argc, char** _argv)
 
 				bx::mtxTranspose(mtxYpr[ii], mtxTmp);
 
-				memcpy(lightView[ii], mtxYpr[ii], 12*sizeof(float) );
+				bx::memCopy(lightView[ii], mtxYpr[ii], 12*sizeof(float) );
 				lightView[ii][12] = tmp[0];
 				lightView[ii][13] = tmp[1];
 				lightView[ii][14] = tmp[2];
@@ -2429,8 +2423,8 @@ int _main_(int _argc, char** _argv)
 				if (settings.m_stabilize)
 				{
 					const float quantizer = 64.0f;
-					scalex = quantizer / ceilf(quantizer / scalex);
-					scaley = quantizer / ceilf(quantizer / scaley);
+					scalex = quantizer / bx::fceil(quantizer / scalex);
+					scaley = quantizer / bx::fceil(quantizer / scaley);
 				}
 
 				offsetx = 0.5f * (maxproj[0] + minproj[0]) * scalex;
@@ -2439,8 +2433,8 @@ int _main_(int _argc, char** _argv)
 				if (settings.m_stabilize)
 				{
 					const float halfSize = currentShadowMapSizef * 0.5f;
-					offsetx = ceilf(offsetx * halfSize) / halfSize;
-					offsety = ceilf(offsety * halfSize) / halfSize;
+					offsetx = bx::fceil(offsetx * halfSize) / halfSize;
+					offsety = bx::fceil(offsety * halfSize) / halfSize;
 				}
 
 				float mtxCrop[16];
@@ -2697,7 +2691,7 @@ int _main_(int _argc, char** _argv)
 			// Craft stencil mask for point light shadow map packing.
 			if(LightType::PointLight == settings.m_lightType && settings.m_stencilPack)
 			{
-				if (bgfx::checkAvailTransientVertexBuffer(6, posDecl) )
+				if (6 == bgfx::getAvailTransientVertexBuffer(6, posDecl) )
 				{
 					struct Pos
 					{
@@ -2822,12 +2816,12 @@ int _main_(int _argc, char** _argv)
 		if (bVsmOrEsm
 		&&  currentSmSettings->m_doBlur)
 		{
-			bgfx::setTexture(4, s_shadowMap[0], s_rtShadowMap[0]);
+			bgfx::setTexture(4, s_shadowMap[0], bgfx::getTexture(s_rtShadowMap[0]) );
 			bgfx::setState(BGFX_STATE_RGB_WRITE|BGFX_STATE_ALPHA_WRITE);
 			screenSpaceQuad(currentShadowMapSizef, currentShadowMapSizef, s_flipV);
 			bgfx::submit(RENDERVIEW_VBLUR_0_ID, s_programs.m_vBlur[depthType]);
 
-			bgfx::setTexture(4, s_shadowMap[0], s_rtBlur);
+			bgfx::setTexture(4, s_shadowMap[0], bgfx::getTexture(s_rtBlur) );
 			bgfx::setState(BGFX_STATE_RGB_WRITE|BGFX_STATE_ALPHA_WRITE);
 			screenSpaceQuad(currentShadowMapSizef, currentShadowMapSizef, s_flipV);
 			bgfx::submit(RENDERVIEW_HBLUR_0_ID, s_programs.m_hBlur[depthType]);
@@ -2838,12 +2832,12 @@ int _main_(int _argc, char** _argv)
 				{
 					const uint8_t viewId = RENDERVIEW_VBLUR_0_ID + jj;
 
-					bgfx::setTexture(4, s_shadowMap[0], s_rtShadowMap[ii]);
+					bgfx::setTexture(4, s_shadowMap[0], bgfx::getTexture(s_rtShadowMap[ii]) );
 					bgfx::setState(BGFX_STATE_RGB_WRITE|BGFX_STATE_ALPHA_WRITE);
 					screenSpaceQuad(currentShadowMapSizef, currentShadowMapSizef, s_flipV);
 					bgfx::submit(viewId, s_programs.m_vBlur[depthType]);
 
-					bgfx::setTexture(4, s_shadowMap[0], s_rtBlur);
+					bgfx::setTexture(4, s_shadowMap[0], bgfx::getTexture(s_rtBlur) );
 					bgfx::setState(BGFX_STATE_RGB_WRITE|BGFX_STATE_ALPHA_WRITE);
 					screenSpaceQuad(currentShadowMapSizef, currentShadowMapSizef, s_flipV);
 					bgfx::submit(viewId+1, s_programs.m_hBlur[depthType]);
@@ -3078,7 +3072,7 @@ int _main_(int _argc, char** _argv)
 		// Draw depth rect.
 		if (settings.m_drawDepthBuffer)
 		{
-			bgfx::setTexture(4, s_shadowMap[0], s_rtShadowMap[0]);
+			bgfx::setTexture(4, s_shadowMap[0], bgfx::getTexture(s_rtShadowMap[0]) );
 			bgfx::setState(BGFX_STATE_RGB_WRITE|BGFX_STATE_ALPHA_WRITE);
 			screenSpaceQuad(currentShadowMapSizef, currentShadowMapSizef, s_flipV);
 			bgfx::submit(RENDERVIEW_DRAWDEPTH_0_ID, s_programs.m_drawDepth[depthType]);
@@ -3087,7 +3081,7 @@ int _main_(int _argc, char** _argv)
 			{
 				for (uint8_t ii = 1; ii < settings.m_numSplits; ++ii)
 				{
-					bgfx::setTexture(4, s_shadowMap[0], s_rtShadowMap[ii]);
+					bgfx::setTexture(4, s_shadowMap[0], bgfx::getTexture(s_rtShadowMap[ii]) );
 					bgfx::setState(BGFX_STATE_RGB_WRITE|BGFX_STATE_ALPHA_WRITE);
 					screenSpaceQuad(currentShadowMapSizef, currentShadowMapSizef, s_flipV);
 					bgfx::submit(RENDERVIEW_DRAWDEPTH_0_ID+ii, s_programs.m_drawDepth[depthType]);

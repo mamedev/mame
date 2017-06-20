@@ -5,7 +5,6 @@
 #ifndef __COMX35__
 #define __COMX35__
 
-#include "emu.h"
 #include "bus/comx35/exp.h"
 #include "cpu/cosmac/cosmac.h"
 #include "imagedev/cassette.h"

@@ -1,8 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
 #include "emu.h"
-#include "sound/cdp1869.h"
 #include "includes/tmc600.h"
+
+#include "sound/cdp1869.h"
+#include "speaker.h"
+
 
 WRITE8_MEMBER( tmc600_state::vismac_register_w )
 {
@@ -123,17 +126,17 @@ static GFXDECODE_START( tmc600 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, tmc600_charlayout, 0, 36 )
 GFXDECODE_END
 
-MACHINE_CONFIG_FRAGMENT( tmc600_video )
+MACHINE_CONFIG_START( tmc600_video )
 	// video hardware
-	MCFG_CDP1869_SCREEN_PAL_ADD(CDP1869_TAG, SCREEN_TAG, CDP1869_DOT_CLK_PAL)
+	MCFG_CDP1869_SCREEN_PAL_ADD(CDP1869_TAG, SCREEN_TAG, cdp1869_device::DOT_CLK_PAL)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("blink", tmc600_state, blink_tick, attotime::from_hz(2))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", CDP1869_TAG":palette", tmc600)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_CDP1869_ADD(CDP1869_TAG, CDP1869_DOT_CLK_PAL, cdp1869_page_ram)
-	MCFG_CDP1869_COLOR_CLOCK(CDP1869_COLOR_CLK_PAL)
+	MCFG_CDP1869_ADD(CDP1869_TAG, cdp1869_device::DOT_CLK_PAL, cdp1869_page_ram)
+	MCFG_CDP1869_COLOR_CLOCK(cdp1869_device::COLOR_CLK_PAL)
 	MCFG_CDP1869_CHAR_PCB_READ_OWNER(tmc600_state, tmc600_pcb_r)
 	MCFG_CDP1869_CHAR_RAM_READ_OWNER(tmc600_state, tmc600_char_ram_r)
 	MCFG_CDP1869_PAL_NTSC_CALLBACK(VCC)

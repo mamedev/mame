@@ -18,15 +18,18 @@
 *******************************************************************************/
 
 #include "emu.h"
+#include "includes/konamipt.h"
+
 #include "cpu/m6809/konami.h"
 #include "cpu/z80/z80.h"
 #include "machine/bankdev.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
+#include "sound/ym2151.h"
 #include "video/k052109.h"
 #include "video/k051960.h"
-#include "sound/ym2151.h"
-#include "includes/konamipt.h"
+
+#include "speaker.h"
 
 
 //**************************************************************************
@@ -267,7 +270,7 @@ INPUT_PORTS_END
 //  MACHINE DEFINTIONS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( blockhl, blockhl_state )
+static MACHINE_CONFIG_START( blockhl )
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", KONAMI, XTAL_24MHz/8)     // Konami 052526
 	MCFG_CPU_PROGRAM_MAP(main_map)
@@ -375,5 +378,5 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME     PARENT   MACHINE  INPUT    CLASS          INIT  ROT   COMPANY   FULLNAME          FLAGS
-GAME( 1989, blockhl, 0,       blockhl, blockhl, driver_device, 0,    ROT0, "Konami", "Block Hole",     MACHINE_SUPPORTS_SAVE )
-GAME( 1989, quarth,  blockhl, blockhl, blockhl, driver_device, 0,    ROT0, "Konami", "Quarth (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, blockhl, 0,       blockhl, blockhl, blockhl_state, 0,    ROT0, "Konami", "Block Hole",     MACHINE_SUPPORTS_SAVE )
+GAME( 1989, quarth,  blockhl, blockhl, blockhl, blockhl_state, 0,    ROT0, "Konami", "Quarth (Japan)", MACHINE_SUPPORTS_SAVE )

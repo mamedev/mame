@@ -22,13 +22,14 @@
 
 #include "emu.h"
 #include "atarirle.h"
+#include "screen.h"
 
 
 //**************************************************************************
 //  CONSTANTS
 //**************************************************************************
 
-const device_type ATARI_RLE_OBJECTS = &device_creator<atari_rle_objects_device>;
+DEFINE_DEVICE_TYPE(ATARI_RLE_OBJECTS, atari_rle_objects_device, "atari_rle", "Atari RLE Motion Objects")
 
 enum { atarirle_hilite_index = -1 };
 
@@ -67,7 +68,7 @@ inline int atari_rle_objects_device::round_to_powerof2(int value)
 //-------------------------------------------------
 
 atari_rle_objects_device::atari_rle_objects_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ATARI_RLE_OBJECTS, "Atari RLE Motion Objects", tag, owner, clock, "atari_rle", __FILE__),
+	: device_t(mconfig, ATARI_RLE_OBJECTS, tag, owner, clock),
 		device_video_interface(mconfig, *this),
 		m_rombase(*this, DEVICE_SELF)
 {

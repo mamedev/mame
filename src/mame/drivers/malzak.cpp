@@ -65,11 +65,13 @@
 */
 
 #include "emu.h"
+#include "includes/malzak.h"
+
 #include "cpu/s2650/s2650.h"
+#include "machine/nvram.h"
 #include "sound/sn76477.h"
 #include "video/saa5050.h"
-#include "machine/nvram.h"
-#include "includes/malzak.h"
+#include "speaker.h"
 
 
 READ8_MEMBER(malzak_state::fake_VRLE_r)
@@ -297,7 +299,7 @@ void malzak_state::machine_reset()
 	m_malzak_y = 0;
 }
 
-static MACHINE_CONFIG_START( malzak, malzak_state )
+static MACHINE_CONFIG_START( malzak )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", S2650, 3800000/4)
@@ -411,5 +413,5 @@ ROM_START( malzak2 )
 ROM_END
 
 
-GAME( 19??, malzak,   0,       malzak,  malzak, driver_device,  0,        ROT0, "Kitronix", "Malzak", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 19??, malzak2, malzak,   malzak2, malzak2, driver_device, 0,        ROT0, "Kitronix", "Malzak II", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 19??, malzak,   0,       malzak,  malzak,  malzak_state, 0,        ROT0, "Kitronix", "Malzak",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 19??, malzak2, malzak,   malzak2, malzak2, malzak_state, 0,        ROT0, "Kitronix", "Malzak II", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

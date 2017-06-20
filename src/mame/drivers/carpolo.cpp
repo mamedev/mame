@@ -19,10 +19,12 @@
 ****************************************************************************/
 
 #include "emu.h"
+#include "includes/carpolo.h"
+
 #include "cpu/m6502/m6502.h"
 #include "machine/74153.h"
 #include "machine/6821pia.h"
-#include "includes/carpolo.h"
+#include "screen.h"
 
 
 
@@ -229,7 +231,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( carpolo, carpolo_state )
+static MACHINE_CONFIG_START( carpolo )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_11_289MHz/12)       /* 940.75 kHz */
@@ -286,7 +288,7 @@ static MACHINE_CONFIG_START( carpolo, carpolo_state )
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 239, 0, 255)
 	MCFG_SCREEN_UPDATE_DRIVER(carpolo_state, screen_update_carpolo)
-	MCFG_SCREEN_VBLANK_DRIVER(carpolo_state, screen_eof_carpolo)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(carpolo_state, screen_vblank_carpolo))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", carpolo)

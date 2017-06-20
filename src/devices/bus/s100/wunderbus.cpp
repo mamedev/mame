@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "wunderbus.h"
 #include "bus/rs232/rs232.h"
 
@@ -30,7 +31,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type S100_WUNDERBUS = &device_creator<s100_wunderbus_device>;
+DEFINE_DEVICE_TYPE(S100_WUNDERBUS, s100_wunderbus_device, "s100_wunderbus", "Morrow Winderbus I/O")
 
 
 //-------------------------------------------------
@@ -82,10 +83,11 @@ WRITE_LINE_MEMBER( s100_wunderbus_device::rtc_tp_w )
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( s100_wunderbus )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( s100_wunderbus )
+
+MACHINE_CONFIG_MEMBER( s100_wunderbus_device::device_add_mconfig )
 	MCFG_PIC8259_ADD(I8259A_TAG, DEVWRITELINE(DEVICE_SELF, s100_wunderbus_device, pic_int_w), VCC, NOOP)
 	MCFG_DEVICE_ADD(INS8250_1_TAG, INS8250, XTAL_18_432MHz/10)
 	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
@@ -127,17 +129,6 @@ static MACHINE_CONFIG_FRAGMENT( s100_wunderbus )
 
 	MCFG_UPD1990A_ADD(UPD1990C_TAG, XTAL_32_768kHz, NOOP, DEVWRITELINE(DEVICE_SELF, s100_wunderbus_device, rtc_tp_w))
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor s100_wunderbus_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( s100_wunderbus );
-}
 
 
 //-------------------------------------------------
@@ -237,7 +228,7 @@ ioport_constructor s100_wunderbus_device::device_input_ports() const
 //-------------------------------------------------
 
 s100_wunderbus_device::s100_wunderbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, S100_WUNDERBUS, "Wunderbus I/O", tag, owner, clock, "s100_wunderbus", __FILE__),
+	device_t(mconfig, S100_WUNDERBUS, tag, owner, clock),
 	device_s100_card_interface(mconfig, *this),
 	m_pic(*this, I8259A_TAG),
 	m_ace1(*this, INS8250_1_TAG),

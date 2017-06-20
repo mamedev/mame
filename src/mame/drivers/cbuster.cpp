@@ -32,12 +32,16 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/cbuster.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/h6280/h6280.h"
-#include "includes/cbuster.h"
 #include "sound/2203intf.h"
 #include "sound/ym2151.h"
 #include "sound/okim6295.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 WRITE16_MEMBER(cbuster_state::twocrude_control_w)
 {
@@ -294,7 +298,7 @@ void cbuster_state::machine_reset()
 	m_pri = 0;
 }
 
-static MACHINE_CONFIG_START( twocrude, cbuster_state )
+static MACHINE_CONFIG_START( twocrude )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2) /* Custom chip 59 @ 12MHz Verified */
@@ -364,10 +368,10 @@ static MACHINE_CONFIG_START( twocrude, cbuster_state )
 	MCFG_SOUND_ROUTE(0, "mono", 0.45)
 	MCFG_SOUND_ROUTE(1, "mono", 0.45)
 
-	MCFG_OKIM6295_ADD("oki1", XTAL_32_22MHz/32, OKIM6295_PIN7_HIGH) /* 1.0068MHz Verified */
+	MCFG_OKIM6295_ADD("oki1", XTAL_32_22MHz/32, PIN7_HIGH) /* 1.0068MHz Verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL_32_22MHz/16, OKIM6295_PIN7_HIGH) /* 2.01375MHz Verified */
+	MCFG_OKIM6295_ADD("oki2", XTAL_32_22MHz/16, PIN7_HIGH) /* 2.01375MHz Verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 

@@ -118,21 +118,24 @@ How does the Super Famicom Box operates
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/snes.h"
+
 #include "cpu/z180/z180.h"
 #include "machine/s3520cf.h"
 #include "video/mb90082.h"
-#include "includes/snes.h"
 #include "rendlay.h"
+#include "speaker.h"
+
 
 class sfcbox_state : public snes_state
 {
 public:
 	sfcbox_state(const machine_config &mconfig, device_type type, const char *tag)
-		: snes_state(mconfig, type, tag),
-		m_bios(*this, "bios"),
-		m_mb90082(*this,"mb90082"),
-		m_s3520cf(*this, "s3520cf")
-		{ }
+		: snes_state(mconfig, type, tag)
+		, m_bios(*this, "bios")
+		, m_mb90082(*this,"mb90082")
+		, m_s3520cf(*this, "s3520cf")
+	{ }
 
 	required_device<cpu_device> m_bios;
 	required_device<mb90082_device> m_mb90082;
@@ -442,7 +445,7 @@ void sfcbox_state::machine_reset()
 	m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( sfcbox, sfcbox_state )
+static MACHINE_CONFIG_START( sfcbox )
 
 	/* base snes hardware */
 	MCFG_CPU_ADD("maincpu", _5A22, 3580000*6)   /* 2.68Mhz, also 3.58Mhz */
@@ -571,8 +574,8 @@ ROM_START( pss64 )
 ROM_END
 
 
-GAME( 1994, sfcbox,      0,     sfcbox,      snes, snes_state,    snes,    ROT0, "Nintendo",                   "Super Famicom Box BIOS", MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING )
-GAME( 1994, pss61, sfcbox, sfcbox, snes, snes_state, snes, ROT0, "Nintendo", "Super Mario Kart / Super Mario Collection / Star Fox (Super Famicom Box)", MACHINE_NOT_WORKING )
-GAME( 1994, pss62, sfcbox, sfcbox, snes, snes_state, snes, ROT0, "T&E Soft / I'Max", "New Super 3D Golf Simulation - Waialae No Kiseki / Super Mahjong 2 (Super Famicom Box)", MACHINE_NOT_WORKING )
-GAME( 1994, pss63, sfcbox, sfcbox, snes, snes_state, snes, ROT0, "Nintendo / BPS", "Super Donkey Kong / Super Tetris 2 + Bombliss (Super Famicom Box)", MACHINE_NOT_WORKING )
-GAME( 199?, pss64, sfcbox, sfcbox, snes, snes_state, snes, ROT0, "Nintendo / Hudson Soft", "Super Donkey Kong / Super Bomberman 2 (Super Famicom Box)", MACHINE_NOT_WORKING )
+GAME( 1994, sfcbox, 0,      sfcbox, snes, sfcbox_state, snes, ROT0, "Nintendo",               "Super Famicom Box BIOS", MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING )
+GAME( 1994, pss61,  sfcbox, sfcbox, snes, sfcbox_state, snes, ROT0, "Nintendo",               "Super Mario Kart / Super Mario Collection / Star Fox (Super Famicom Box)", MACHINE_NOT_WORKING )
+GAME( 1994, pss62,  sfcbox, sfcbox, snes, sfcbox_state, snes, ROT0, "T&E Soft / I'Max",       "New Super 3D Golf Simulation - Waialae No Kiseki / Super Mahjong 2 (Super Famicom Box)", MACHINE_NOT_WORKING )
+GAME( 1994, pss63,  sfcbox, sfcbox, snes, sfcbox_state, snes, ROT0, "Nintendo / BPS",         "Super Donkey Kong / Super Tetris 2 + Bombliss (Super Famicom Box)", MACHINE_NOT_WORKING )
+GAME( 199?, pss64,  sfcbox, sfcbox, snes, sfcbox_state, snes, ROT0, "Nintendo / Hudson Soft", "Super Donkey Kong / Super Bomberman 2 (Super Famicom Box)", MACHINE_NOT_WORKING )

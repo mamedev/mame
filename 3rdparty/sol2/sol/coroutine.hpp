@@ -72,10 +72,25 @@ namespace sol {
 	public:
 		coroutine() noexcept = default;
 		coroutine(const coroutine&) noexcept = default;
+		coroutine(coroutine&&) noexcept = default;
 		coroutine& operator=(const coroutine&) noexcept = default;
+		coroutine& operator=(coroutine&&) noexcept = default;
+		template <typename T, meta::enable<meta::neg<std::is_same<meta::unqualified_t<T>, coroutine>>, std::is_base_of<reference, meta::unqualified_t<T>>> = meta::enabler>
+		coroutine(T&& r) : reference(std::forward<T>(r)) {}
+		coroutine(lua_nil_t r) : reference(r) {}
+		coroutine(const stack_reference& r) noexcept : coroutine(r.lua_state(), r.stack_index()) {}
+		coroutine(stack_reference&& r) noexcept : coroutine(r.lua_state(), r.stack_index()) {}
+		template <typename T, meta::enable<meta::neg<std::is_integral<meta::unqualified_t<T>>>, meta::neg<std::is_same<T, ref_index>>> = meta::enabler>
+		coroutine(lua_State* L, T&& r) : coroutine(L, sol::ref_index(r.registry_index())) {}
 		coroutine(lua_State* L, int index = -1) : reference(L, index) {
 #ifdef SOL_CHECK_ARGUMENTS
 			stack::check<coroutine>(L, index, type_panic);
+#endif // Safety
+		}
+		coroutine(lua_State* L, ref_index index) : reference(L, index) {
+#ifdef SOL_CHECK_ARGUMENTS
+			auto pp = stack::push_pop(*this);
+			stack::check<coroutine>(L, -1, type_panic);
 #endif // Safety
 		}
 

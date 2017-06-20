@@ -1,32 +1,30 @@
 // license:BSD-3-Clause
 // copyright-holders:Peter Trauner
-#pragma once
+#ifndef MAME_SOUND_SIDVOICE_H
+#define MAME_SOUND_SIDVOICE_H
 
-#ifndef __SIDVOICE_H__
-#define __SIDVOICE_H__
+#pragma once
 
 
 /*
   approximation of the sid6581 chip
   this part is for 1 (of the 3) voices of a chip
 */
-#include "sound/mos6581.h"
-
-struct sw_storage
-{
-	uint16_t len;
-#if defined(DIRECT_FIXPOINT)
-	uint32_t stp;
-#else
-	uint32_t pnt;
-	int16_t stp;
-#endif
-};
-
 struct SID6581_t;
 
 struct sidOperator
 {
+	struct sw_storage
+	{
+		uint16_t len;
+#if defined(DIRECT_FIXPOINT)
+		uint32_t stp;
+#else
+		uint32_t pnt;
+		int16_t stp;
+#endif
+	};
+
 	SID6581_t *sid;
 	uint8_t reg[7];
 	uint32_t SIDfreq;
@@ -57,8 +55,8 @@ struct sidOperator
 	uint16_t cycleLen, cycleLenPnt;
 #endif
 
-	int8_t(*outProc)(sidOperator *);
-	void(*waveProc)(sidOperator *);
+	int8_t (*outProc)(sidOperator *);
+	void (*waveProc)(sidOperator *);
 
 #if defined(DIRECT_FIXPOINT)
 	cpuLword waveStep, waveStepAdd;
@@ -67,7 +65,7 @@ struct sidOperator
 	uint32_t waveStepPnt, waveStepAddPnt;
 #endif
 	uint16_t waveStepOld;
-	struct sw_storage wavePre[2];
+	sw_storage wavePre[2];
 
 #if defined(DIRECT_FIXPOINT) && defined(LARGE_NOISE_TABLE)
 	cpuLword noiseReg;
@@ -95,17 +93,20 @@ struct sidOperator
 #endif
 	uint8_t enveVol, enveSusVol;
 	uint16_t enveShortAttackCount;
+
+	void clear();
+
+	void set();
+	void set2();
+	static int8_t wave_calc_normal(sidOperator *pVoice);
+
+private:
+	void wave_calc_cycle_len();
 };
 
 typedef int8_t (*ptr2sidFunc)(sidOperator *);
 typedef uint16_t (*ptr2sidUwordFunc)(sidOperator *);
 typedef void (*ptr2sidVoidFunc)(sidOperator *);
-
-void sidClearOperator( sidOperator* pVoice );
-
-void sidEmuSet(sidOperator* pVoice);
-void sidEmuSet2(sidOperator* pVoice);
-int8_t sidWaveCalcNormal(sidOperator* pVoice);
 
 void sidInitWaveformTables(int type);
 void sidInitMixerEngine(running_machine &machine);
@@ -117,4 +118,4 @@ extern ptr2sidVoidFunc sid8580ModeNormalTable[16];
 extern ptr2sidVoidFunc sid8580ModeRingTable[16];
 #endif
 
-#endif /* __SIDVOICE_H__ */
+#endif // MAME_SOUND_SIDVOICE_H

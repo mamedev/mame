@@ -46,6 +46,8 @@ MR_01-.3A    [a0b758aa]
 #include "sound/okim6295.h"
 #include "video/bufsprite.h"
 #include "video/decospr.h"
+#include "screen.h"
+#include "speaker.h"
 
 // mirage_state was also defined in mess/drivers/mirage.c
 class miragemj_state : public driver_device
@@ -282,7 +284,7 @@ void miragemj_state::machine_reset()
 	m_mux_data = 0;
 }
 
-static MACHINE_CONFIG_START( mirage, miragemj_state )
+static MACHINE_CONFIG_START( mirage )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 28000000/2)
@@ -300,7 +302,7 @@ static MACHINE_CONFIG_START( mirage, miragemj_state )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(miragemj_state, screen_update_mirage)
-	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
+	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mirage)
@@ -329,10 +331,10 @@ static MACHINE_CONFIG_START( mirage, miragemj_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki_bgm", 2000000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki_bgm", 2000000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_OKIM6295_ADD("oki_sfx", 1000000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki_sfx", 1000000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 

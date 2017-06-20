@@ -12,8 +12,10 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "sound/okim6295.h"
 #include "machine/bankdev.h"
+#include "sound/okim6295.h"
+#include "screen.h"
+#include "speaker.h"
 
 #define MCLK 16000000
 
@@ -36,7 +38,7 @@ public:
 		m_bg1_regs_y(*this, "bg1_regs_y"),
 		m_bg2_regs_x(*this, "bg2_regs_x"),
 		m_bg2_regs_y(*this, "bg2_regs_y")
-		{ }
+	{ }
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -392,7 +394,7 @@ void cultures_state::machine_reset()
 
 
 
-static MACHINE_CONFIG_START( cultures, cultures_state )
+static MACHINE_CONFIG_START( cultures )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MCLK/2) /* 8.000 MHz */
@@ -424,7 +426,7 @@ static MACHINE_CONFIG_START( cultures, cultures_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", MCLK/8, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", MCLK/8, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki_map)
 
@@ -494,4 +496,4 @@ ROM_START( cultures )
 ROM_END
 
 
-GAME( 1994, cultures, 0, cultures, cultures, driver_device, 0, ROT0, "Face", "Jibun wo Migaku Culture School Mahjong Hen", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, cultures, 0, cultures, cultures, cultures_state, 0, ROT0, "Face", "Jibun wo Migaku Culture School Mahjong Hen", MACHINE_SUPPORTS_SAVE )

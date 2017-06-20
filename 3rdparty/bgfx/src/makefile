@@ -1,6 +1,6 @@
 #
-# Copyright 2011-2016 Branimir Karadzic. All rights reserved.
-# License: http://www.opensource.org/licenses/BSD-2-Clause
+# Copyright 2011-2017 Branimir Karadzic. All rights reserved.
+# License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
 #
 
 THISDIR:=$(dir $(lastword $(MAKEFILE_LIST)))
@@ -27,6 +27,8 @@ define shader-embedded
 	@echo [$(<)]
 	 $(SILENT) $(SHADERC) --type $(1) --platform linux                 -f $(<) -o $(SHADER_TMP) --bin2c $(basename $(<))_glsl
 	 @cat $(SHADER_TMP) > $(@)
+	-$(SILENT) $(SHADERC) --type $(1) --platform linux   -p spirv      -f $(<) -o $(SHADER_TMP) --bin2c $(basename $(<))_spv
+	-@cat $(SHADER_TMP) >> $(@)
 	-$(SILENT) $(SHADERC) --type $(1) --platform windows -p $(2)  -O 3 -f $(<) -o $(SHADER_TMP) --bin2c $(basename $(<))_dx9
 	-@cat $(SHADER_TMP) >> $(@)
 	-$(SILENT) $(SHADERC) --type $(1) --platform windows -p $(3)  -O 3 -f $(<) -o $(SHADER_TMP) --bin2c $(basename $(<))_dx11

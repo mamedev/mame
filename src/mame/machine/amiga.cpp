@@ -156,9 +156,10 @@ void amiga_state::machine_start()
 	m_irq_timer = timer_alloc(TIMER_AMIGA_IRQ);
 	m_blitter_timer = timer_alloc(TIMER_AMIGA_BLITTER);
 	m_serial_timer = timer_alloc(TIMER_SERIAL);
+	m_scanline_timer = timer_alloc(TIMER_SCANLINE);
 
 	// start the scanline timer
-	timer_set(m_screen->time_until_pos(0), TIMER_SCANLINE);
+	m_scanline_timer->adjust(m_screen->time_until_pos(0));
 }
 
 WRITE_LINE_MEMBER( amiga_state::m68k_reset )
@@ -188,7 +189,7 @@ WRITE_LINE_MEMBER( amiga_state::kbreset_w )
 	// this is connected to the gary chip, gary then resets the 68k, agnus, paula and the cias
 	if (!state)
 	{
-		m_sound->reset();
+		m_paula->reset();
 		machine_reset();
 		m_maincpu->reset();
 	}
@@ -293,11 +294,11 @@ TIMER_CALLBACK_MEMBER( amiga_state::scanline_callback )
 	m_cia_1->tod_w((scanline & 1) ^ BIT(CUSTOM_REG(REG_VPOSR), 15));
 
 	// force a sound update
-	m_sound->update();
+	m_paula->update();
 
 	// set timer for next line
 	scanline = (scanline + 1) % m_screen->height();
-	timer_set(m_screen->time_until_pos(scanline), TIMER_SCANLINE, scanline);
+	m_scanline_timer->adjust(m_screen->time_until_pos(scanline), scanline);
 }
 
 
@@ -371,6 +372,11 @@ TIMER_CALLBACK_MEMBER( amiga_state::amiga_irq_proc )
 {
 	update_irqs();
 	m_irq_timer->reset();
+}
+
+WRITE_LINE_MEMBER( amiga_state::paula_int_w )
+{
+	set_interrupt(INTENA_SETCLR | (0x80 << state));
 }
 
 
@@ -1267,6 +1273,9 @@ WRITE16_MEMBER( amiga_state::custom_chip_w )
 	if (LOG_CUSTOM)
 		logerror("%06X:write to custom %s = %04X\n", space.device().safe_pc(), amiga_custom_names[offset & 0xff], data);
 
+	// paula will handle some of those registers
+	m_paula->reg_w(space, offset, data, mem_mask);
+
 	switch (offset)
 	{
 		case REG_BLTDDAT:   case REG_DMACONR:   case REG_VPOSR:     case REG_VHPOSR:
@@ -1427,8 +1436,6 @@ WRITE16_MEMBER( amiga_state::custom_chip_w )
 			break;
 
 		case REG_DMACON:
-			m_sound->update();
-
 			/* bits BBUSY (14) and BZERO (13) are read-only */
 			data &= 0x9fff;
 			data = (data & 0x8000) ? (CUSTOM_REG(offset) | (data & 0x7fff)) : (CUSTOM_REG(offset) & ~(data & 0x7fff));
@@ -1480,20 +1487,8 @@ WRITE16_MEMBER( amiga_state::custom_chip_w )
 			break;
 
 		case REG_ADKCON:
-			m_sound->update();
 			data = (data & 0x8000) ? (CUSTOM_REG(offset) | (data & 0x7fff)) : (CUSTOM_REG(offset) & ~(data & 0x7fff));
 			m_fdc->adkcon_set(data);
-			break;
-
-		case REG_AUD0LCL:   case REG_AUD0LCH:   case REG_AUD0LEN:   case REG_AUD0PER:   case REG_AUD0VOL:
-		case REG_AUD1LCL:   case REG_AUD1LCH:   case REG_AUD1LEN:   case REG_AUD1PER:   case REG_AUD1VOL:
-		case REG_AUD2LCL:   case REG_AUD2LCH:   case REG_AUD2LEN:   case REG_AUD2PER:   case REG_AUD2VOL:
-		case REG_AUD3LCL:   case REG_AUD3LCH:   case REG_AUD3LEN:   case REG_AUD3PER:   case REG_AUD3VOL:
-			m_sound->update();
-			break;
-
-		case REG_AUD0DAT:   case REG_AUD1DAT:   case REG_AUD2DAT:   case REG_AUD3DAT:
-			m_sound->data_w((offset - REG_AUD0DAT) / 8, data);
 			break;
 
 		case REG_BPL1PTH:   case REG_BPL2PTH:   case REG_BPL3PTH:   case REG_BPL4PTH:
@@ -1575,7 +1570,7 @@ void amiga_state::serial_adjust()
 	amiga_state *state = this;
 
 	uint32_t divisor = (CUSTOM_REG(REG_SERPER) & 0x7fff) + 1;
-	uint32_t baud = m_sound->clock() / divisor;
+	uint32_t baud = m_paula->clock() / divisor;
 
 	m_serial_timer->adjust(attotime::from_hz(baud) / 2, 0, attotime::from_hz(baud));
 }

@@ -11,6 +11,7 @@
 #include "cpu/i86/i86.h"
 #include "machine/pic8259.h"
 #include "video/upd7220.h"
+#include "screen.h"
 
 
 class if800_state : public driver_device
@@ -79,7 +80,7 @@ static ADDRESS_MAP_START( upd7220_map, AS_0, 16, if800_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_RAM AM_SHARE("video_ram")
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( if800, if800_state )
+static MACHINE_CONFIG_START( if800 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8086, 8000000)
 	MCFG_CPU_PROGRAM_MAP(if800_map)
@@ -113,5 +114,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY           FULLNAME       FLAGS */
-COMP( 1985, if800,  0,      0,       if800,     if800, driver_device,    0,     "Oki Electric",   "if800 model 60", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE        INIT   COMPANY           FULLNAME          FLAGS
+COMP( 1985, if800,  0,      0,       if800,     if800, if800_state, 0,     "Oki Electric",   "if800 model 60", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

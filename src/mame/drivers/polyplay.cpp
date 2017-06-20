@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Martin Buchholz
+// thanks-to:James Wallace, Martin Buchholz, Juergen Oppermann, Volker Hann, Jan-Ole Christian
 /***************************************************************************
 
       Poly-Play
@@ -16,57 +17,103 @@
         provided me with schematics and service manuals.
 
 
+TODO:
+  - get other rom versions and games
+
+
+NOTES:
+  The hardware is based on the K1520 PC system, with video output coming through a standard Colormat TV.
+
+  There are at least two revisions:
+
+  - Revision 1 -
+  2319-84-01   FAZ     Graphics card (Color and Sound Logic)
+  2319-84-02   ABS     Graphics card (1KiB ROM for Charset)
+  012-7100     ZRE     CPU-Board K2521 (3KiB ROM, 1KiB RAM)
+  012-7040     PFS-1   ROM Board K3820 #1 - Games 1 to 4 (16KiB ROM)
+  012-7040     PFS-2   ROM Board K3820 #2 - Games 5 to 8 (16KiB ROM)
+
+  - Revision 2 -
+  2319-84-01   FAZ     Graphics card (Color and Sound Logic)
+  2319-84-02   ABS     Graphics card (1KiB ROM for Charset)
+  02 899-0101  ZRE-PP  CPU-Board (56KiB ROM, 64KiB* RAM)
+
+  Basically revision 2 combines the ZRE, PFS-1 and PFS-2 onto a single board.
+
+
 memory map:
+  - Revision 1 -
+  0000 - 0fff ZRE    OS ROM                         (0000 - 03ff)
+                     Game ROM used for Abfahrtslauf (0400 - 07ff)
+                     Menu Screen ROM                (0800 - 0cff)
+                     Work RAM                       (0d00 - 0fff)
 
-0000 - 03ff OS ROM
-0400 - 07ff Game ROM (used for Abfahrtslauf)
-0800 - 0cff Menu Screen ROM
+  1000 - 4fff PFS-1  Abfahrtslauf          (1000 - 1bff)
+                     Hirschjagd            (1c00 - 27ff)
+                     Hase und Wolf         (2800 - 3fff)
+                     Schmetterlingsfang    (4000 - 4fff)
 
-0d00 - 0fff work RAM
+  5000 - 8fff PFS-2  Schiessbude           (5000 - 5fff)
+                     Autorennen            (6000 - 73ff)
+                     opto-akust. Merkspiel (7400 - 7fff)
+                     Wasserrohrbruch       (8000 - 8fff)
 
-1000 - 4fff GAME ROM (pcb 2 - Abfahrtslauf          (1000 - 1bff)
-                              Hirschjagd            (1c00 - 27ff)
-                              Hase und Wolf         (2800 - 3fff)
-                              Schmetterlingsfang    (4000 - 4fff)
-5000 - 8fff GAME ROM (pcb 1 - Schiessbude           (5000 - 5fff)
-                              Autorennen            (6000 - 73ff)
-                              opto-akust. Merkspiel (7400 - 7fff)
-                              Wasserrohrbruch       (8000 - 8fff)
+  e800 - ebff ABS   Character ROM (chr 00..7f) 1 bit per pixel
+  ec00 - f7ff ABS   Character RAM (chr 80..ff) 3 bit per pixel
+  f800 - ffff FAZ   Video RAM
 
-e800 - ebff character ROM (chr 00..7f) 1 bit per pixel
-ec00 - f7ff character RAM (chr 80..ff) 3 bit per pixel
-f800 - ffff video RAM
+  - Revision 2 -
+  0000 - 0fff ZRE-PP OS and Menu ROM       (0000 - 1fff)
+                     Game ROM #1           (2000 - 3fff)
+                     Game ROM #2           (4000 - 5fff)
+                     Game ROM #3           (6000 - 7fff)
+                     Game ROM #4           (8000 - 9fff)
+                     Game ROM #5           (a000 - bfff)
+                     Game ROM #6           (c000 - dfff)
 
-I/O ports:
+  e800 - ebff ABS   Character ROM (chr 00..7f) 1 bit per pixel
+  ec00 - f7ff ABS   Character RAM (chr 80..ff) 3 bit per pixel
+  f800 - ffff FAZ   Video RAM
 
-read:
 
-83        IN1
-          used as hardware random number generator
+i/o ports:
+  - Revision 1 -
+  80 - 83 ZRE    UB857D  (Z80 CTC)
+  84 - 87 ZRE    UB855D  (Z80 PIO)
 
-84        IN0
-          bit 0 = fire button
-          bit 1 = right
-          bit 2 = left
-          bit 3 = up
-          bit 4 = down
-          bit 5 = unused
-          bit 6 = Summe Spiele
-          bit 7 = coinage (+IRQ to make the game acknowledge it)
+  - Revision 2 -
+  80 - 83 ZRE-PP UB857D  (Z80 CTC)
+  84 - 87 ZRE-PP UB855D  (Z80 PIO)
+  88 - 8B ZRE-PP UB8560D (Z80 SIO)
 
-85        bit 0-4 = light organ (unemulated :)) )
-          bit 5-7 = sound parameter (unemulated, it's very difficult to
-                    figure out how those work)
+  read:
+  83        CTC COUNT 3 (IN1)
+            used as hardware random number generator
 
-86        ???
+  84        PIO PORT A (IN0)
+            bit 0 = fire button
+            bit 1 = right
+            bit 2 = left
+            bit 3 = up
+            bit 4 = down
+            bit 5 = unused*
+            bit 6 = bookkeeping (Summe Spiele)
+            bit 7 = coin sensor (+IRQ to make the game acknowledge it)
 
-87        PIO Control register
+  85        PIO PORT B
+            bit 0-2 = light organ
+            bit 3-4 = control panel (not connected)
+            bit 5-7 = sound parameter (not used on production units?)
 
-write:
-80        Sound Channel 1
-81        Sound Channel 2
-82        generates 40 Hz timer for timeout in game title screens
-83        generates main 75 Hz timer interrupt
+  86        PIO CTRL A
+
+  87        PIO CTRL B
+
+  write:
+  80        CTC COUNT 1 - Sound Channel 1
+  81        CTC COUNT 2 - Sound Channel 2
+  82        CTC COUNT 3 - generates 40 Hz timer for timeout in game title screens
+  83        CTC COUNT 4 - generates main 75 Hz timer interrupt
 
 The Poly-Play has a simple bookmarking system which can be activated
 setting Bit 6 of PORTA (Summe Spiele) to low. It reads a double word
@@ -75,62 +122,117 @@ I currently haven't figured out how the I/O port handling for the book-
 mark system works.
 
 Uniquely the Poly-Play has a light organ which totally confuses you whilst
-playing the automaton. Bits 1-5 of PORTB control the organ but it's not
-emulated now. ;) (An external artwork file could be created that simulates
-this.)
+playing the automaton. Bits 0-2 of PORTB control the organ.
 
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "sound/samples.h"
 #include "includes/polyplay.h"
 
+#include "cpu/z80/z80.h"
+#include "cpu/z80/z80daisy.h"
+
+#include "screen.h"
+#include "speaker.h"
+
+#include "polyplay.lh"
+
+
+static const z80_daisy_config daisy_chain_zre[] =
+{
+	{ Z80CTC_TAG },
+	{ Z80PIO_TAG },
+	{ nullptr }
+};
+
+static const z80_daisy_config daisy_chain_zrepp[] =
+{
+	{ Z80CTC_TAG },
+	{ Z80PIO_TAG },
+	{ Z80SIO_TAG },
+	{ nullptr }
+};
+
+INTERRUPT_GEN_MEMBER(polyplay_state::nmi_handler)
+{
+	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+}
 
 /* I/O Port handling */
-
-
-/* timer handling */
-
-
-void polyplay_state::machine_reset()
+WRITE_LINE_MEMBER(polyplay_state::ctc_zc2_w)
 {
-	m_channel1_active = 0;
-	m_channel1_const = 0;
-	m_channel2_active = 0;
-	m_channel2_const = 0;
-
-	set_channel1(0);
-	play_channel1(0);
-	set_channel2(0);
-	play_channel2(0);
-
-	m_timer = machine().device<timer_device>("timer");
+	//osd_printf_verbose("ctc_z2_w: %02x\n", state);
 }
 
-
-INTERRUPT_GEN_MEMBER(polyplay_state::periodic_interrupt)
+READ8_MEMBER(polyplay_state::pio_porta_r)
 {
-	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x4e);
+	return m_in0_port->read();
 }
 
-
-INTERRUPT_GEN_MEMBER(polyplay_state::coin_interrupt)
+WRITE8_MEMBER(polyplay_state::pio_porta_w)
 {
-	if (ioport("INPUT")->read() & 0x80)
-		m_last = 0;
-	else
+	//osd_printf_verbose("pio_porta_w: %02x\n", data);
+}
+
+READ8_MEMBER(polyplay_state::pio_portb_r)
+{
+	uint8_t result = 0x00;
+	//osd_printf_verbose("pio_portb_r: %02x\n", result);
+	return result;
+}
+
+WRITE8_MEMBER(polyplay_state::pio_portb_w)
+{
+	uint8_t lightState = data & 0x07;
+	//uint8_t soundState = data & 0xe0;
+
+	// there is a DS8205D attached to bit 0 and 1
+	switch (lightState)
 	{
-		if (m_last == 0)    /* coin inserted */
-			device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x50);
+		case 0:
+			output().set_lamp_value(1, 1);
+			output().set_lamp_value(2, 0);
+			output().set_lamp_value(3, 0);
+			output().set_lamp_value(4, 0);
+			break;
 
-		m_last = 1;
+		case 1:
+			output().set_lamp_value(1, 0);
+			output().set_lamp_value(2, 1);
+			output().set_lamp_value(3, 0);
+			output().set_lamp_value(4, 0);
+			break;
+
+		case 2:
+			output().set_lamp_value(1, 0);
+			output().set_lamp_value(2, 0);
+			output().set_lamp_value(3, 1);
+			output().set_lamp_value(4, 0);
+			break;
+
+		case 3:
+			output().set_lamp_value(1, 0);
+			output().set_lamp_value(2, 0);
+			output().set_lamp_value(3, 0);
+			output().set_lamp_value(4, 1);
+			break;
+
+		default:
+			output().set_lamp_value(1, 0);
+			output().set_lamp_value(2, 0);
+			output().set_lamp_value(3, 0);
+			output().set_lamp_value(4, 0);
+			break;
 	}
 }
 
+INPUT_CHANGED_MEMBER(polyplay_state::input_changed)
+{
+	m_z80pio->port_a_write(m_in0_port->read());
+}
 
 /* memory mapping */
-static ADDRESS_MAP_START( polyplay_map, AS_PROGRAM, 8, polyplay_state )
+static ADDRESS_MAP_START( polyplay_mem_zre, AS_PROGRAM, 8, polyplay_state )
 	AM_RANGE(0x0000, 0x0bff) AM_ROM
 	AM_RANGE(0x0c00, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x8fff) AM_ROM
@@ -139,91 +241,42 @@ static ADDRESS_MAP_START( polyplay_map, AS_PROGRAM, 8, polyplay_state )
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( polyplay_mem_zrepp, AS_PROGRAM, 8, polyplay_state )
+	AM_RANGE(0x0000, 0xbfff) AM_ROM
 
-/* port mapping */
-static ADDRESS_MAP_START( polyplay_io_map, AS_IO, 8, polyplay_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x81) AM_WRITE(polyplay_sound_channel)
-	AM_RANGE(0x82, 0x82) AM_WRITE(polyplay_start_timer2)
-	AM_RANGE(0x83, 0x83) AM_READ(polyplay_random_read)
-	AM_RANGE(0x84, 0x84) AM_READ_PORT("INPUT")
+	AM_RANGE(0xc000, 0xcfff) AM_RAM
+
+	AM_RANGE(0xd000, 0xd7ff) AM_ROM AM_REGION("gfx1", 0)
+
+	AM_RANGE(0xea00, 0xebff) AM_RAM
+	AM_RANGE(0xec00, 0xf7ff) AM_RAM_WRITE(polyplay_characterram_w) AM_SHARE("characterram")
+
+	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
 
+/* port mapping */
+static ADDRESS_MAP_START( polyplay_io_zre, AS_IO, 8, polyplay_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
+	AM_RANGE(0x84, 0x87) AM_DEVREADWRITE(Z80PIO_TAG, z80pio_device, read, write)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( polyplay_io_zrepp, AS_IO, 8, polyplay_state )
+	AM_IMPORT_FROM(polyplay_io_zre)
+	AM_RANGE(0x88, 0x8b) AM_DEVREADWRITE(Z80SIO_TAG, z80sio_device, cd_ba_r, cd_ba_w)
+ADDRESS_MAP_END
 
 static INPUT_PORTS_START( polyplay )
-	PORT_START("INPUT") /* IN0 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Bookkeeping Info") PORT_CODE(KEYCODE_F2)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, polyplay_state, input_changed, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, polyplay_state, input_changed, 0) PORT_8WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, polyplay_state, input_changed, 0) PORT_8WAY
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, polyplay_state, input_changed, 0) PORT_8WAY
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, polyplay_state, input_changed, 0) PORT_8WAY
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CHANGED_MEMBER(DEVICE_SELF, polyplay_state, input_changed, 0)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CHANGED_MEMBER(DEVICE_SELF, polyplay_state, input_changed, 0) PORT_NAME("Bookkeeping Info") PORT_CODE(KEYCODE_F2)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, polyplay_state, input_changed, 0)
 INPUT_PORTS_END
-
-
-WRITE8_MEMBER(polyplay_state::polyplay_sound_channel)
-{
-	switch(offset) {
-	case 0x00:
-		if (m_channel1_const) {
-			if (data <= 1) {
-				set_channel1(0);
-			}
-			m_channel1_const = 0;
-			play_channel1(data*m_prescale1);
-
-		}
-		else {
-			m_prescale1 = (data & 0x20) ? 16 : 1;
-			if (data & 0x04) {
-				set_channel1(1);
-				m_channel1_const = 1;
-			}
-			if ((data == 0x41) || (data == 0x65) || (data == 0x45)) {
-				set_channel1(0);
-				play_channel1(0);
-			}
-		}
-		break;
-	case 0x01:
-		if (m_channel2_const) {
-			if (data <= 1) {
-				set_channel2(0);
-			}
-			m_channel2_const = 0;
-			play_channel2(data*m_prescale2);
-
-		}
-		else {
-			m_prescale2 = (data & 0x20) ? 16 : 1;
-			if (data & 0x04) {
-				set_channel2(1);
-				m_channel2_const = 1;
-			}
-			if ((data == 0x41) || (data == 0x65) || (data == 0x45)) {
-				set_channel2(0);
-				play_channel2(0);
-			}
-		}
-		break;
-	}
-}
-
-WRITE8_MEMBER(polyplay_state::polyplay_start_timer2)
-{
-	if (data == 0x03)
-		m_timer->reset();
-
-	if (data == 0xb5)
-		m_timer->adjust(attotime::from_hz(40), 0, attotime::from_hz(40));
-}
-
-READ8_MEMBER(polyplay_state::polyplay_random_read)
-{
-	return machine().rand() & 0xff;
-}
 
 /* graphic structures */
 static const gfx_layout charlayout_1_bit =
@@ -249,25 +302,33 @@ static const gfx_layout charlayout_3_bit =
 };
 
 static GFXDECODE_START( polyplay )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout_1_bit, 0, 1 )
-	GFXDECODE_ENTRY( nullptr,   0xec00, charlayout_3_bit, 2, 1 )
+	GFXDECODE_ENTRY( "gfx1",  0x0000, charlayout_1_bit, 0, 1 )
+	GFXDECODE_ENTRY( nullptr, 0xec00, charlayout_3_bit, 2, 1 )
 GFXDECODE_END
 
 
 /* the machine driver */
-
-static MACHINE_CONFIG_START( polyplay, polyplay_state )
-
+static MACHINE_CONFIG_START( polyplay_zre )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 9830400/4)
-	MCFG_CPU_PROGRAM_MAP(polyplay_map)
-	MCFG_CPU_IO_MAP(polyplay_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(polyplay_state, periodic_interrupt, 75)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", polyplay_state,  coin_interrupt)
+	MCFG_CPU_ADD(Z80CPU_TAG, Z80, POLYPLAY_MAIN_CLOCK / 4) /* UB880D */
+	MCFG_Z80_DAISY_CHAIN(daisy_chain_zre)
+	MCFG_CPU_PROGRAM_MAP(polyplay_mem_zre)
+	MCFG_CPU_IO_MAP(polyplay_io_zre)
+	MCFG_CPU_PERIODIC_INT_DRIVER(polyplay_state, nmi_handler, 100) /* A302 - zero cross detection from AC (50Hz) */
 
+	/* devices */
+	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, POLYPLAY_MAIN_CLOCK / 4) /* UB857D */
+	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80CPU_TAG, INPUT_LINE_IRQ0))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE(polyplay_state, ctc_zc0_w))
+	MCFG_Z80CTC_ZC1_CB(WRITELINE(polyplay_state, ctc_zc1_w))
+	//MCFG_Z80CTC_ZC2_CB(WRITELINE(polyplay_state, ctc_zc2_w))
 
-	MCFG_TIMER_DRIVER_ADD("timer", polyplay_state, polyplay_timer_callback)
-
+	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, POLYPLAY_MAIN_CLOCK / 4) /* UB855D */
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80CPU_TAG, INPUT_LINE_IRQ0))
+	MCFG_Z80PIO_IN_PA_CB(READ8(polyplay_state, pio_porta_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(polyplay_state, pio_porta_w))
+	MCFG_Z80PIO_IN_PB_CB(READ8(polyplay_state, pio_portb_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(polyplay_state, pio_portb_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -283,17 +344,30 @@ static MACHINE_CONFIG_START( polyplay, polyplay_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker1", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	MCFG_SOUND_ADD("speaker2", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+MACHINE_CONFIG_END
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SAMPLES_CHANNELS(2)
-	MCFG_SAMPLES_START_CB(polyplay_state, sh_start)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+static MACHINE_CONFIG_START( polyplay_zrepp )
+	MCFG_FRAGMENT_ADD( polyplay_zre )
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY(Z80CPU_TAG) /* UB880D */
+	MCFG_Z80_DAISY_CHAIN(daisy_chain_zrepp)
+	MCFG_CPU_PROGRAM_MAP(polyplay_mem_zrepp)
+	MCFG_CPU_IO_MAP(polyplay_io_zrepp)
+
+	/* devices */
+	MCFG_Z80SIO_ADD(Z80SIO_TAG, POLYPLAY_MAIN_CLOCK / 4, 0, 0, 0, 0) /* UB8560D */
+	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE(Z80CPU_TAG, INPUT_LINE_IRQ0))
 MACHINE_CONFIG_END
 
 
 /* ROM loading and mapping */
 ROM_START( polyplay )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x10000, Z80CPU_TAG, 0 )
 	ROM_LOAD( "cpu_0000.37",       0x0000, 0x0400, CRC(87884c5f) SHA1(849c6b3f40496c694a123d6eec268a7128c037f0) )
 	ROM_LOAD( "cpu_0400.36",       0x0400, 0x0400, CRC(d5c84829) SHA1(baa8790e77db66e1e543b3a0e5390cc71256de2f) )
 	ROM_LOAD( "cpu_0800.35",       0x0800, 0x0400, CRC(5f36d08e) SHA1(08ecf8143e818a9844b4f168e68629d6d4481a8a) )
@@ -334,11 +408,32 @@ ROM_START( polyplay )
 	ROM_LOAD( "char.1",            0x0000, 0x0400, CRC(5242dd6b) SHA1(ba8f317df62fe4360757333215ce3c8223c68c4e) )
 ROM_END
 
+ROM_START( polyplay2 )
+	ROM_REGION( 0x10000, Z80CPU_TAG, 0 )
+	ROM_LOAD( "2_1.ROM",           0x0000, 0x2000, CRC(d728ca42) SHA1(7359a59ba7f205b3ac95c8a0946093f24bdaa4da) )
+	ROM_LOAD( "2_2.ROM",           0x2000, 0x2000, CRC(52316236) SHA1(88c159621d40953240c5d2f1d6dcebb8f5e1ee81) )
+	ROM_LOAD( "2_3.ROM",           0x4000, 0x2000, CRC(e199d303) SHA1(fea2c3c659222553f36b3e922c6ac017f7111025) )
+	ROM_LOAD( "2_4.ROM",           0x6000, 0x2000, CRC(1324c2e2) SHA1(c0102d5abbb2f4dbb5b8dff5ad515bc3f2af9166) )
+	ROM_LOAD( "2_5.ROM",           0x8000, 0x2000, CRC(2e959fe9) SHA1(1f0a80bb26d0ae332d4a4313ec22ab7eefcf1e34) )
+	ROM_LOAD( "2_6.ROM",           0xA000, 0x2000, CRC(85774542) SHA1(420349a0d812bc0052a77cbc6c5ab84262e58b32) )
 
-TIMER_DEVICE_CALLBACK_MEMBER(polyplay_state::polyplay_timer_callback)
-{
-	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x4c);
-}
+	ROM_REGION( 0x800, "gfx1", 0 )
+	ROM_LOAD( "1_1.bin",           0x0000, 0x0800, CRC(4f028af9) SHA1(319537234069b43cfffafe567cc599ae05f24e23) )
+ROM_END
+
+ROM_START( polyplay2c )
+	ROM_REGION( 0x10000, Z80CPU_TAG, 0 )
+	ROM_LOAD( "2_1.bin",           0x0000, 0x2000, CRC(bf22f44f) SHA1(dd412b45f49ceffe336d905043c7af2447c577a0) )
+	ROM_LOAD( "2_2.bin",           0x2000, 0x2000, CRC(e54b8be8) SHA1(23037102eab60fd03c349ad154b2498139e84dd4) )
+	ROM_LOAD( "2_3.bin",           0x4000, 0x2000, CRC(ac43ec6b) SHA1(1662e10d80d47c1e3c54d4ef232c0d671fecce96) )
+	ROM_LOAD( "2_4.bin",           0x6000, 0x2000, CRC(703f3d46) SHA1(5ab571cb63ffdbce86b6e452988402e5c1098009) )
+	ROM_LOAD( "2_5.bin",           0x8000, 0x2000, CRC(d5ef6ed8) SHA1(317f251dc85b412b1390651d39a95ce57dd92999) )
+
+	ROM_REGION( 0x800, "gfx1", 0 )
+	ROM_LOAD( "1_1.bin",           0x0000, 0x0800, CRC(4f028af9) SHA1(319537234069b43cfffafe567cc599ae05f24e23) )
+ROM_END
 
 /* game driver */
-GAME( 1986, polyplay, 0, polyplay, polyplay, driver_device, 0, ROT0, "VEB Polytechnik Karl-Marx-Stadt", "Poly-Play", 0 )
+GAMEL( 1986, polyplay,   0,         polyplay_zre,   polyplay, polyplay_state, 0, ROT0, "VEB Polytechnik Karl-Marx-Stadt", "Poly-Play (ZRE)",            0, layout_polyplay )
+GAMEL( 1989, polyplay2,  0,         polyplay_zrepp, polyplay, polyplay_state, 0, ROT0, "VEB Polytechnik Karl-Marx-Stadt", "Poly-Play (ZRE-PP)",         0, layout_polyplay )
+GAMEL( 1989, polyplay2c, polyplay2, polyplay_zrepp, polyplay, polyplay_state, 0, ROT0, "VEB Polytechnik Karl-Marx-Stadt", "Poly-Play (ZRE-PP - Czech)", 0, layout_polyplay )

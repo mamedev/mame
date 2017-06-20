@@ -30,6 +30,7 @@
 
 #include "emu.h"
 #include "includes/m90.h"
+#include "screen.h"
 
 
 inline void m90_state::get_tile_info(tile_data &tileinfo,int tile_index,int layer,int page_mask)

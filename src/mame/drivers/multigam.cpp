@@ -109,6 +109,8 @@ Eproms are 27512,27010,274001
 #include "emu.h"
 #include "cpu/m6502/n2a03.h"
 #include "video/ppu2c0x.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class multigam_state : public driver_device
@@ -581,11 +583,11 @@ WRITE8_MEMBER(multigam_state::multigam3_mmc3_rom_switch_w)
 
 		case 0x6000: /* disable irqs */
 			machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
-			m_ppu->set_scanline_callback(ppu2c0x_scanline_delegate());
+			m_ppu->set_scanline_callback(ppu2c0x_device::scanline_delegate());
 		break;
 
 		case 0x6001: /* enable irqs */
-			m_ppu->set_scanline_callback(ppu2c0x_scanline_delegate(FUNC(multigam_state::multigam3_mmc3_scanline_cb),this));
+			m_ppu->set_scanline_callback(ppu2c0x_device::scanline_delegate(FUNC(multigam_state::multigam3_mmc3_scanline_cb),this));
 		break;
 	}
 }
@@ -710,7 +712,7 @@ void multigam_state::multigam_init_mapper02(uint8_t* prg_base, int prg_size)
 
 	m_mapper02_prg_base = prg_base;
 	m_mapper02_prg_size = prg_size;
-	m_ppu->set_scanline_callback(ppu2c0x_scanline_delegate());
+	m_ppu->set_scanline_callback(ppu2c0x_device::scanline_delegate());
 }
 
 /******************************************************
@@ -867,7 +869,7 @@ void multigam_state::multigam_init_mmc1(uint8_t *prg_base, int prg_size, int chr
 	m_mmc1_prg_size = prg_size;
 	m_mmc1_chr_bank_base = chr_bank_base;
 
-	m_ppu->set_scanline_callback(ppu2c0x_scanline_delegate());
+	m_ppu->set_scanline_callback(ppu2c0x_device::scanline_delegate());
 }
 
 
@@ -930,7 +932,7 @@ void multigam_state::supergm3_set_bank()
 		// title screen
 		memcpy(mem + 0x8000, mem + 0x18000, 0x8000);
 		membank("bank10")->set_base(mem + 0x6000);
-		m_ppu->set_scanline_callback(ppu2c0x_scanline_delegate());
+		m_ppu->set_scanline_callback(ppu2c0x_device::scanline_delegate());
 	}
 	else if ((m_supergm3_prg_bank & 0x40) == 0)
 	{
@@ -1210,9 +1212,9 @@ MACHINE_START_MEMBER(multigam_state,supergm3)
 	m_multigmc_mmc3_6000_ram = std::make_unique<uint8_t[]>(0x2000);
 }
 
-static MACHINE_CONFIG_START( multigam, multigam_state )
+static MACHINE_CONFIG_START( multigam )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", N2A03, N2A03_DEFAULTCLOCK)
+	MCFG_CPU_ADD("maincpu", N2A03, NTSC_APU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(multigam_map)
 
 
@@ -1460,5 +1462,5 @@ GAME( 1992, multigmb, multigam, multigam, multigam, multigam_state, multigam, RO
 GAME( 1992, multigm2, 0,        multigm3, multigm2, multigam_state, multigm3, ROT0, "Seo Jin",   "Multi Game 2", 0 )
 GAME( 1992, multigm3, 0,        multigm3, multigm3, multigam_state, multigm3, ROT0, "Seo Jin",   "Multi Game III", 0 )
 GAME( 1992, multigmt, 0,        multigmt, multigmt, multigam_state, multigmt, ROT0, "Tung Sheng Electronics", "Multi Game (Tung Sheng Electronics)", 0 )
-GAME( 1994, sgmt1,    0,        supergm3, sgmt1,    driver_device, 0,         ROT0, "<unknown>", "Super Game Mega Type 1", 0 )
-GAME( 1996, supergm3, 0,        supergm3, supergm3, driver_device, 0,         ROT0, "<unknown>", "Super Game III", 0 )
+GAME( 1994, sgmt1,    0,        supergm3, sgmt1,    multigam_state, 0,        ROT0, "<unknown>", "Super Game Mega Type 1", 0 )
+GAME( 1996, supergm3, 0,        supergm3, supergm3, multigam_state, 0,        ROT0, "<unknown>", "Super Game III", 0 )

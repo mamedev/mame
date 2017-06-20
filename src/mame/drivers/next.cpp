@@ -25,12 +25,17 @@
 ****************************************************************************/
 
 
+#include "emu.h"
 #include "includes/next.h"
-#include "formats/pc_dsk.h"
-#include "formats/mfi_dsk.h"
+
 #include "machine/nscsi_cd.h"
 #include "machine/nscsi_hd.h"
+#include "screen.h"
 #include "softlist.h"
+
+#include "formats/mfi_dsk.h"
+#include "formats/pc_dsk.h"
+
 
 uint32_t next_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
@@ -79,7 +84,7 @@ uint32_t next_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 /* Dummy catcher for any unknown r/w */
 READ8_MEMBER( next_state::io_r )
 {
-	if(!space.debugger_access())
+	if(!machine().side_effect_disabled())
 		printf("io_r %08x (%08x)\n",offset+0x02000000, space.device().safe_pc());
 
 	if(offset == 0xc0)
@@ -90,21 +95,21 @@ READ8_MEMBER( next_state::io_r )
 
 WRITE8_MEMBER( next_state::io_w )
 {
-	if(!space.debugger_access())
+	if(!machine().side_effect_disabled())
 		printf("io_w %08x, %02x (%08x)\n",offset+0x02000000,data, space.device().safe_pc());
 }
 
 /* map ROM at 0x01000000-0x0101ffff? */
 READ32_MEMBER( next_state::rom_map_r )
 {
-	if(0 && !space.debugger_access())
+	if(0 && !machine().side_effect_disabled())
 		printf("%08x ROM MAP?\n",space.device().safe_pc());
 	return 0x01000000;
 }
 
 READ32_MEMBER( next_state::scr2_r )
 {
-	if(0 && !space.debugger_access())
+	if(0 && !machine().side_effect_disabled())
 		printf("%08x\n",space.device().safe_pc());
 	/*
 	x--- ---- ---- ---- ---- ---- ---- ---- dsp reset
@@ -141,7 +146,7 @@ READ32_MEMBER( next_state::scr2_r )
 
 WRITE32_MEMBER( next_state::scr2_w )
 {
-	if(0 && !space.debugger_access())
+	if(0 && !machine().side_effect_disabled())
 		printf("scr2_w %08x (%08x)\n", data, space.device().safe_pc());
 	COMBINE_DATA(&scr2);
 
@@ -895,13 +900,13 @@ void next_state::machine_reset()
 	dma_drq_w(4, true); // soundout
 }
 
-void next_state::vblank_w(screen_device &screen, bool vblank_state)
+WRITE_LINE_MEMBER(next_state::vblank_w)
 {
 	if(vbl_enabled) {
 		if(screen_color)
-			irq_set(13, vblank_state);
+			irq_set(13, state);
 		else
-			irq_set(5, vblank_state);
+			irq_set(5, state);
 	}
 }
 
@@ -1003,13 +1008,13 @@ static SLOT_INTERFACE_START( next_scsi_devices )
 	SLOT_INTERFACE_INTERNAL("ncr5390", NCR5390)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_FRAGMENT( ncr5390 )
+static MACHINE_CONFIG_START( ncr5390 )
 	MCFG_DEVICE_CLOCK(10000000)
 	MCFG_NCR5390_IRQ_HANDLER(DEVWRITELINE(":", next_state, scsi_irq))
 	MCFG_NCR5390_DRQ_HANDLER(DEVWRITELINE(":", next_state, scsi_drq))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( next_base, next_state )
+static MACHINE_CONFIG_START( next_base )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1018,7 +1023,7 @@ static MACHINE_CONFIG_START( next_base, next_state )
 	MCFG_SCREEN_UPDATE_DRIVER(next_state, screen_update)
 	MCFG_SCREEN_SIZE(1120, 900)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1120-1, 0, 832-1)
-	MCFG_SCREEN_VBLANK_DRIVER(next_state, vblank_w)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(next_state, vblank_w))
 
 	// devices
 	MCFG_NSCSI_BUS_ADD("scsibus")
@@ -1211,12 +1216,12 @@ DRIVER_INIT_MEMBER(next_state,nextctc)
 
 /* Driver */
 
-/*    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY                 FULLNAME                      FLAGS */
-COMP( 1987, next,    0,      0,       next,      next, next_state,    next,    "Next Software Inc",   "NeXT Cube",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1990, nexts,   0,      0,       nexts,     next, next_state,    nexts,   "Next Software Inc",   "NeXTstation",                MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1990, nexts2,  nexts,  0,       nexts2,    next, next_state,    nexts2,  "Next Software Inc",   "NeXTstation (X15 variant)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1990, nextsc,  nexts,  0,       nextsc,    next, next_state,    nextsc,  "Next Software Inc",   "NeXTstation color",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1990, nextst,  0,      0,       nextst,    next, next_state,    nextst,  "Next Software Inc",   "NeXTstation turbo",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1990, nextstc, nextst, 0,       nextstc,   next, next_state,    nextstc, "Next Software Inc",   "NeXTstation turbo color",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( ????, nextct,  nextst, 0,       nextct,    next, next_state,    nextct,  "Next Software Inc",   "NeXT Cube turbo",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( ????, nextctc, nextst, 0,       nextctc,   next, next_state,    nextctc, "Next Software Inc",   "NeXT Cube turbo color",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT STATE         INIT     COMPANY                FULLNAME                      FLAGS
+COMP( 1987, next,    0,      0,       next,      next, next_state,   next,    "Next Software Inc",   "NeXT Cube",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1990, nexts,   0,      0,       nexts,     next, next_state,   nexts,   "Next Software Inc",   "NeXTstation",                MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1990, nexts2,  nexts,  0,       nexts2,    next, next_state,   nexts2,  "Next Software Inc",   "NeXTstation (X15 variant)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1990, nextsc,  nexts,  0,       nextsc,    next, next_state,   nextsc,  "Next Software Inc",   "NeXTstation color",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1990, nextst,  0,      0,       nextst,    next, next_state,   nextst,  "Next Software Inc",   "NeXTstation turbo",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1990, nextstc, nextst, 0,       nextstc,   next, next_state,   nextstc, "Next Software Inc",   "NeXTstation turbo color",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( ????, nextct,  nextst, 0,       nextct,    next, next_state,   nextct,  "Next Software Inc",   "NeXT Cube turbo",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( ????, nextctc, nextst, 0,       nextctc,   next, next_state,   nextctc, "Next Software Inc",   "NeXT Cube turbo color",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

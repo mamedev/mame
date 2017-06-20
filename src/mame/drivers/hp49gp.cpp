@@ -10,6 +10,7 @@
 #include "cpu/arm7/arm7.h"
 #include "machine/s3c2410.h"
 #include "rendlay.h"
+#include "screen.h"
 
 #define VERBOSE_LEVEL ( 0 )
 
@@ -275,7 +276,7 @@ DRIVER_INIT_MEMBER(hp49gp_state,hp49gp)
 	lcd_spi_init();
 }
 
-static MACHINE_CONFIG_START( hp49gp, hp49gp_state )
+static MACHINE_CONFIG_START( hp49gp )
 	MCFG_CPU_ADD("maincpu", ARM9, 400000000)
 	MCFG_CPU_PROGRAM_MAP(hp49gp_map)
 

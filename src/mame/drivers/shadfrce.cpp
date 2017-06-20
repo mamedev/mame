@@ -140,11 +140,13 @@ lev 7 : 0x7c : 0000 11d0 - just rte
 */
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
+#include "includes/shadfrce.h"
+
 #include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
 #include "sound/ym2151.h"
-#include "includes/shadfrce.h"
+#include "speaker.h"
 
 
 WRITE16_MEMBER(shadfrce_state::flip_screen)
@@ -538,7 +540,7 @@ GFXDECODE_END
 
 /* Machine Driver Bits */
 
-static MACHINE_CONFIG_START( shadfrce, shadfrce_state )
+static MACHINE_CONFIG_START( shadfrce )
 
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_28MHz / 2)          /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(shadfrce_map)
@@ -552,7 +554,7 @@ static MACHINE_CONFIG_START( shadfrce, shadfrce_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_28MHz / 4, 448, 0, 320, 272, 8, 248)   /* HTOTAL and VTOTAL are guessed */
 	MCFG_SCREEN_UPDATE_DRIVER(shadfrce_state, screen_update)
-	MCFG_SCREEN_VBLANK_DRIVER(shadfrce_state, screen_eof)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(shadfrce_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", shadfrce)
@@ -569,7 +571,7 @@ static MACHINE_CONFIG_START( shadfrce, shadfrce_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_13_4952MHz/8, OKIM6295_PIN7_HIGH) /* verified on pcb */
+	MCFG_OKIM6295_ADD("oki", XTAL_13_4952MHz/8, PIN7_HIGH) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END
@@ -665,6 +667,6 @@ ROM_START( shadfrcej )
 ROM_END
 
 
-GAME( 1993, shadfrce,   0,        shadfrce, shadfrce, driver_device, 0, ROT0, "Technos Japan", "Shadow Force (World, Version 3)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, shadfrceu,  shadfrce, shadfrce, shadfrce, driver_device, 0, ROT0, "Technos Japan", "Shadow Force (US, Version 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, shadfrcej,  shadfrce, shadfrce, shadfrce, driver_device, 0, ROT0, "Technos Japan", "Shadow Force (Japan, Version 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, shadfrce,   0,        shadfrce, shadfrce, shadfrce_state, 0, ROT0, "Technos Japan", "Shadow Force (World, Version 3)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, shadfrceu,  shadfrce, shadfrce, shadfrce, shadfrce_state, 0, ROT0, "Technos Japan", "Shadow Force (US, Version 2)",    MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, shadfrcej,  shadfrce, shadfrce, shadfrce, shadfrce_state, 0, ROT0, "Technos Japan", "Shadow Force (Japan, Version 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

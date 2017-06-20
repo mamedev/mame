@@ -111,13 +111,16 @@ Notes:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "video/bufsprite.h"
-#include "sound/okim9810.h"
-#include "sound/ymz280b.h"
 #include "machine/eepromser.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
 #include "machine/watchdog.h"
+#include "sound/okim9810.h"
+#include "sound/ymz280b.h"
+#include "video/bufsprite.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 class sigmab98_state : public driver_device
 {
@@ -247,7 +250,7 @@ public:
 
 	virtual void video_start() override;
 	uint32_t screen_update_sigmab98(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_sammymdl(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_sammymdl);
 	INTERRUPT_GEN_MEMBER(sigmab98_vblank_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(sammymdl_irq);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri_mask);
@@ -1142,7 +1145,7 @@ WRITE8_MEMBER(sigmab98_state::vblank_w)
 	m_vblank = (m_vblank & ~0x03) | (data & 0x03);
 }
 
-void sigmab98_state::screen_eof_sammymdl(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(sigmab98_state::screen_vblank_sammymdl)
 {
 	// rising edge
 	if (state)
@@ -1233,7 +1236,7 @@ static ADDRESS_MAP_START( animalc_io, AS_IO, 8, sigmab98_state )
 	AM_RANGE( 0x32, 0x32 ) AM_WRITE(sammymdl_leds_w )
 	AM_RANGE( 0x34, 0x34 ) AM_READ(unk_34_r )
 	AM_RANGE( 0x90, 0x90 ) AM_DEVWRITE("oki", okim9810_device, write )
-	AM_RANGE( 0x91, 0x91 ) AM_DEVWRITE("oki", okim9810_device, write_TMP_register )
+	AM_RANGE( 0x91, 0x91 ) AM_DEVWRITE("oki", okim9810_device, write_tmp_register )
 	AM_RANGE( 0x92, 0x92 ) AM_DEVREAD("oki", okim9810_device, read )
 	AM_RANGE( 0xb0, 0xb0 ) AM_WRITE(sammymdl_hopper_w )
 	AM_RANGE( 0xc0, 0xc0 ) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w )  // 1
@@ -1477,7 +1480,7 @@ static ADDRESS_MAP_START( haekaka_io, AS_IO, 8, sigmab98_state )
 	AM_RANGE( 0x31, 0x31 ) AM_WRITE(haekaka_coin_w )
 	AM_RANGE( 0x32, 0x32 ) AM_WRITE(haekaka_leds_w )
 	AM_RANGE( 0x90, 0x90 ) AM_DEVWRITE("oki", okim9810_device, write )
-	AM_RANGE( 0x91, 0x91 ) AM_DEVWRITE("oki", okim9810_device, write_TMP_register )
+	AM_RANGE( 0x91, 0x91 ) AM_DEVWRITE("oki", okim9810_device, write_tmp_register )
 	AM_RANGE( 0x92, 0x92 ) AM_DEVREAD("oki", okim9810_device, read )
 	AM_RANGE( 0xb0, 0xb0 ) AM_WRITE(sammymdl_hopper_w )
 	AM_RANGE( 0xc0, 0xc0 ) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w )  // 1
@@ -1724,7 +1727,7 @@ static ADDRESS_MAP_START( itazuram_io, AS_IO, 8, sigmab98_state )
 	AM_RANGE( 0x31, 0x31 ) AM_WRITE(sammymdl_coin_w )
 	AM_RANGE( 0x32, 0x32 ) AM_WRITE(sammymdl_leds_w )
 	AM_RANGE( 0x90, 0x90 ) AM_DEVWRITE("oki", okim9810_device, write )
-	AM_RANGE( 0x91, 0x91 ) AM_DEVWRITE("oki", okim9810_device, write_TMP_register )
+	AM_RANGE( 0x91, 0x91 ) AM_DEVWRITE("oki", okim9810_device, write_tmp_register )
 	AM_RANGE( 0x92, 0x92 ) AM_DEVREAD("oki", okim9810_device, read )
 	AM_RANGE( 0xb0, 0xb0 ) AM_WRITE(sammymdl_hopper_w )
 	AM_RANGE( 0xc0, 0xc0 ) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w )  // 1
@@ -1953,7 +1956,7 @@ static ADDRESS_MAP_START( tdoboon_io, AS_IO, 8, sigmab98_state )
 	AM_RANGE( 0x31, 0x31 ) AM_WRITE(sammymdl_coin_w )
 	AM_RANGE( 0x32, 0x32 ) AM_WRITE(sammymdl_leds_w )
 	AM_RANGE( 0x90, 0x90 ) AM_DEVWRITE("oki", okim9810_device, write )
-	AM_RANGE( 0x91, 0x91 ) AM_DEVWRITE("oki", okim9810_device, write_TMP_register )
+	AM_RANGE( 0x91, 0x91 ) AM_DEVWRITE("oki", okim9810_device, write_tmp_register )
 	AM_RANGE( 0x92, 0x92 ) AM_DEVREAD("oki", okim9810_device, read )
 	AM_RANGE( 0xb0, 0xb0 ) AM_WRITE(sammymdl_hopper_w )
 	AM_RANGE( 0xc0, 0xc0 ) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w )  // 1
@@ -2145,7 +2148,7 @@ INTERRUPT_GEN_MEMBER(sigmab98_state::sigmab98_vblank_interrupt)
 	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x5a);
 }
 
-static MACHINE_CONFIG_START( sigmab98, sigmab98_state )
+static MACHINE_CONFIG_START( sigmab98 )
 	MCFG_CPU_ADD("maincpu", Z80, 10000000)  // !! TAXAN KY-80, clock @X1? !!
 	MCFG_CPU_PROGRAM_MAP(gegege_mem_map)
 	MCFG_CPU_IO_MAP(gegege_io_map)
@@ -2226,7 +2229,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(sigmab98_state::sammymdl_irq)
 		m_maincpu->set_input_line_and_vector(0,HOLD_LINE, m_timer1_vector);
 }
 
-static MACHINE_CONFIG_START( sammymdl, sigmab98_state )
+static MACHINE_CONFIG_START( sammymdl )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_20MHz / 2)    // !! KL5C80A120FP @ 10MHz? (actually 4 times faster than Z80) !!
 	MCFG_CPU_PROGRAM_MAP( animalc_map )
 	MCFG_CPU_IO_MAP( animalc_io )
@@ -2247,7 +2250,7 @@ static MACHINE_CONFIG_START( sammymdl, sigmab98_state )
 	MCFG_SCREEN_SIZE(0x140, 0x100)
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x140-1, 0, 0xf0-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sigmab98_state, screen_update_sigmab98)
-	MCFG_SCREEN_VBLANK_DRIVER(sigmab98_state, screen_eof_sammymdl)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(sigmab98_state, screen_vblank_sammymdl))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sigmab98)

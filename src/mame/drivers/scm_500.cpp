@@ -37,7 +37,7 @@ void scm_500_state::machine_reset()
 {
 }
 
-static MACHINE_CONFIG_START( scm_500, scm_500_state )
+static MACHINE_CONFIG_START( scm_500 )
 
 	// unknown CPU
 
@@ -80,5 +80,5 @@ ROM_START( scm_500 )
 	ROM_LOAD_BIOS( 4, "STNDXGR_307", 0x00000, 0x10000, CRC(4d0d91c6) SHA1(85ff5d43ec331bcd4cde6aaf82f6143acc7e020c)  ) // USA 03.07 (could be 500E specific)
 ROM_END
 
-GAME( 1987, scm_500,  0,    scm_500, scm_500, driver_device,  0, ROT0, "Standard Change-Makers", "Standard Change-Makers System 500 / 500E", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1987, scm_500,  0,    scm_500, scm_500, scm_500_state,  0, ROT0, "Standard Change-Makers", "Standard Change-Makers System 500 / 500E", MACHINE_IS_SKELETON_MECHANICAL )
 // 1995 - 500E - same basic hw?

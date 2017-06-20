@@ -7,6 +7,8 @@
 #include "machine/nvram.h"
 #include "machine/pgmcrypt.h"
 #include "sound/ics2115.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class igs_fear_state : public driver_device
@@ -73,7 +75,7 @@ WRITE_LINE_MEMBER(igs_fear_state::sound_irq)
 }
 
 
-static MACHINE_CONFIG_START( igs_fear, igs_fear_state )
+static MACHINE_CONFIG_START( igs_fear )
 	MCFG_CPU_ADD("maincpu",ARM7, 50000000/2)
 	MCFG_CPU_PROGRAM_MAP(igs_igs_fear_map)
 

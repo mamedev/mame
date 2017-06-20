@@ -44,23 +44,18 @@
 
 
 #include "emu.h"
-#include "cpu/g65816/g65816.h"
 #include "includes/apple2.h"
 #include "includes/apple2e.h"
-#include "imagedev/flopdrv.h"
-#include "formats/ap2_dsk.h"
-#include "formats/ap_dsk35.h"
 #include "includes/apple2gs.h"
-#include "machine/sonydriv.h"
-#include "machine/appldriv.h"
-#include "sound/es5503.h"
-#include "machine/applefdc.h"
-#include "machine/z80scc.h"
-#include "sound/speaker.h"
-#include "machine/ram.h"
 
-#include "bus/a2bus/a2bus.h"
-#include "bus/a2bus/a2lang.h"
+#include "cpu/g65816/g65816.h"
+#include "imagedev/flopdrv.h"
+#include "machine/appldriv.h"
+#include "machine/applefdc.h"
+#include "machine/sonydriv.h"
+#include "machine/z80scc.h"
+#include "sound/es5503.h"
+
 #include "bus/a2bus/a2diskii.h"
 #include "bus/a2bus/a2mockingboard.h"
 #include "bus/a2bus/a2cffa.h"
@@ -79,9 +74,13 @@
 //#include "bus/a2bus/a2udrive.h"
 #include "bus/a2bus/a2hsscsi.h"
 
-#include "bus/rs232/rs232.h"
-
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
+#include "formats/ap_dsk35.h"
+#include "formats/ap2_dsk.h"
+
 
 static const gfx_layout apple2gs_text_layout =
 {
@@ -308,7 +307,7 @@ static SLOT_INTERFACE_START(apple2_cards)
 	SLOT_INTERFACE("hsscsi", A2BUS_HSSCSI)  /* Apple II High-Speed SCSI Card */
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( apple2gs, apple2gs_state )
+static MACHINE_CONFIG_START( apple2gs )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", G65816, APPLE2GS_14M/5)
 	MCFG_CPU_PROGRAM_MAP(apple2gs_map)
@@ -376,7 +375,6 @@ static MACHINE_CONFIG_START( apple2gs, apple2gs_state )
 	MCFG_A2BUS_OUT_IRQ_CB(WRITELINE(apple2gs_state, a2bus_irq_w))
 	MCFG_A2BUS_OUT_NMI_CB(WRITELINE(apple2gs_state, a2bus_nmi_w))
 	MCFG_A2BUS_OUT_INH_CB(WRITELINE(apple2gs_state, a2bus_inh_w))
-	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl0", A2BUS_LANG, NOOP)
 	MCFG_A2BUS_SLOT_ADD("a2bus", "sl1", apple2_cards, nullptr)
 	MCFG_A2BUS_SLOT_ADD("a2bus", "sl2", apple2_cards, nullptr)
 	MCFG_A2BUS_SLOT_ADD("a2bus", "sl3", apple2_cards, nullptr)
@@ -581,10 +579,10 @@ ROM_START(apple2gsr0p2)  // 3/10/1986 Cortland prototype, boots as "Apple //'ing
 	ROM_LOAD( "341-0132-d.e12", 0x000, 0x800, CRC(c506efb9) SHA1(8e14e85c645187504ec9d162b3ea614a0c421d32) )
 ROM_END
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT       INIT      COMPANY            FULLNAME */
-COMP( 1989, apple2gs,     0,   apple2,  apple2gs,   apple2gs, driver_device, 0, "Apple Computer", "Apple IIgs (ROM03)", MACHINE_SUPPORTS_SAVE )
-COMP( 198?, apple2gsr3p,  apple2gs, 0,  apple2gs,   apple2gs, driver_device, 0, "Apple Computer", "Apple IIgs (ROM03 prototype)", MACHINE_NOT_WORKING )
-COMP( 1987, apple2gsr1,   apple2gs, 0,  apple2gsr1, apple2gs, driver_device, 0, "Apple Computer", "Apple IIgs (ROM01)", MACHINE_SUPPORTS_SAVE )
-COMP( 1986, apple2gsr0,   apple2gs, 0,  apple2gsr1, apple2gs, driver_device, 0, "Apple Computer", "Apple IIgs (ROM00)", MACHINE_SUPPORTS_SAVE )
-COMP( 1986, apple2gsr0p,  apple2gs, 0,  apple2gsr1, apple2gs, driver_device, 0, "Apple Computer", "Apple IIgs (ROM00 prototype 6/19/1986)", MACHINE_SUPPORTS_SAVE )
-COMP( 1986, apple2gsr0p2, apple2gs, 0,  apple2gsr1, apple2gs, driver_device, 0, "Apple Computer", "Apple IIgs (ROM00 prototype 3/10/1986)", MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME          PARENT    COMPAT  MACHINE     INPUT     STATE           INIT  COMPANY           FULLNAME */
+COMP( 1989, apple2gs,     0,        apple2, apple2gs,   apple2gs, apple2gs_state, 0,    "Apple Computer", "Apple IIgs (ROM03)", MACHINE_SUPPORTS_SAVE )
+COMP( 198?, apple2gsr3p,  apple2gs, 0,      apple2gs,   apple2gs, apple2gs_state, 0,    "Apple Computer", "Apple IIgs (ROM03 prototype)", MACHINE_NOT_WORKING )
+COMP( 1987, apple2gsr1,   apple2gs, 0,      apple2gsr1, apple2gs, apple2gs_state, 0,    "Apple Computer", "Apple IIgs (ROM01)", MACHINE_SUPPORTS_SAVE )
+COMP( 1986, apple2gsr0,   apple2gs, 0,      apple2gsr1, apple2gs, apple2gs_state, 0,    "Apple Computer", "Apple IIgs (ROM00)", MACHINE_SUPPORTS_SAVE )
+COMP( 1986, apple2gsr0p,  apple2gs, 0,      apple2gsr1, apple2gs, apple2gs_state, 0,    "Apple Computer", "Apple IIgs (ROM00 prototype 6/19/1986)", MACHINE_SUPPORTS_SAVE )
+COMP( 1986, apple2gsr0p2, apple2gs, 0,      apple2gsr1, apple2gs, apple2gs_state, 0,    "Apple Computer", "Apple IIgs (ROM00 prototype 3/10/1986)", MACHINE_SUPPORTS_SAVE )

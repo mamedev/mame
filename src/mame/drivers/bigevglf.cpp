@@ -58,10 +58,12 @@ J1100072A
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/bigevglf.h"
+
+#include "cpu/m6805/m6805.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-#include "cpu/m6805/m6805.h"
-#include "includes/bigevglf.h"
+#include "speaker.h"
 
 
 WRITE8_MEMBER(bigevglf_state::beg_banking_w)
@@ -332,7 +334,11 @@ READ8_MEMBER(bigevglf_state::sub_cpu_mcu_coin_port_r)
 
 	*/
 	m_mcu_coin_bit5 ^= 0x20;
-	return bigevglf_mcu_status_r(space, 0) | (ioport("PORT04")->read() & 3) | m_mcu_coin_bit5;  /* bit 0 and bit 1 - coin inputs */
+	return
+		(ioport("PORT04")->read() & 0x03) |
+		((CLEAR_LINE == m_bmcu->host_semaphore_r()) ? 0x08 : 0x00) |
+		((CLEAR_LINE != m_bmcu->mcu_semaphore_r()) ? 0x10 : 0x00) |
+		m_mcu_coin_bit5;  /* bit 0 and bit 1 - coin inputs */
 }
 
 static ADDRESS_MAP_START( bigevglf_sub_portmap, AS_IO, 8, bigevglf_state )
@@ -346,8 +352,8 @@ static ADDRESS_MAP_START( bigevglf_sub_portmap, AS_IO, 8, bigevglf_state )
 	AM_RANGE(0x06, 0x06) AM_READ_PORT("DSW2")
 	AM_RANGE(0x07, 0x07) AM_READNOP
 	AM_RANGE(0x08, 0x08) AM_WRITE(beg_port08_w) /* muxed port select + other unknown stuff */
-	AM_RANGE(0x0b, 0x0b) AM_READ(bigevglf_mcu_r)
-	AM_RANGE(0x0c, 0x0c) AM_WRITE(bigevglf_mcu_w)
+	AM_RANGE(0x0b, 0x0b) AM_DEVREAD("bmcu", taito68705_mcu_device, data_r)
+	AM_RANGE(0x0c, 0x0c) AM_DEVWRITE("bmcu", taito68705_mcu_device, data_w)
 	AM_RANGE(0x0e, 0x0e) AM_WRITENOP /* 0-enable MCU, 1-keep reset line ASSERTED; D0 goes to the input of ls74 and the /Q of this ls74 goes to reset line on 68705 */
 	AM_RANGE(0x10, 0x17) AM_WRITE(beg13_a_clr_w)
 	AM_RANGE(0x18, 0x1f) AM_WRITE(beg13_b_set_w)
@@ -364,7 +370,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, bigevglf_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xc801) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
+	AM_RANGE(0xc800, 0xc801) AM_DEVWRITE("aysnd", ym2149_device, address_data_w)
 	AM_RANGE(0xca00, 0xca0d) AM_DEVWRITE("msm", msm5232_device, write)
 	AM_RANGE(0xcc00, 0xcc00) AM_WRITENOP
 	AM_RANGE(0xce00, 0xce00) AM_WRITENOP
@@ -376,20 +382,6 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, bigevglf_state )
 ADDRESS_MAP_END
 
 
-/*********************************************************************************/
-/* MCU */
-
-static ADDRESS_MAP_START( m68705_map, AS_PROGRAM, 8, bigevglf_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE(bigevglf_68705_port_a_r, bigevglf_68705_port_a_w)
-	AM_RANGE(0x0001, 0x0001) AM_READWRITE(bigevglf_68705_port_b_r, bigevglf_68705_port_b_w)
-	AM_RANGE(0x0002, 0x0002) AM_READWRITE(bigevglf_68705_port_c_r, bigevglf_68705_port_c_w)
-	AM_RANGE(0x0004, 0x0004) AM_WRITE(bigevglf_68705_ddr_a_w)
-	AM_RANGE(0x0005, 0x0005) AM_WRITE(bigevglf_68705_ddr_b_w)
-	AM_RANGE(0x0006, 0x0006) AM_WRITE(bigevglf_68705_ddr_c_w)
-	AM_RANGE(0x0010, 0x007f) AM_RAM
-	AM_RANGE(0x0080, 0x07ff) AM_ROM
-ADDRESS_MAP_END
 
 
 static const gfx_layout gfxlayout =
@@ -424,20 +416,10 @@ void bigevglf_state::machine_start()
 	save_item(NAME(m_from_sound));
 	save_item(NAME(m_sound_state));
 
-	save_item(NAME(m_main_sent));
-	save_item(NAME(m_mcu_sent));
+
 	save_item(NAME(m_mcu_coin_bit5));
 
-	save_item(NAME(m_port_a_in));
-	save_item(NAME(m_port_a_out));
-	save_item(NAME(m_ddr_a));
-	save_item(NAME(m_port_b_in));
-	save_item(NAME(m_port_b_out));
-	save_item(NAME(m_ddr_b));
-	save_item(NAME(m_port_c_in));
-	save_item(NAME(m_port_c_out));
-	save_item(NAME(m_ddr_c));
-	save_item(NAME(m_from_mcu));
+
 }
 
 void bigevglf_state::machine_reset()
@@ -457,24 +439,11 @@ void bigevglf_state::machine_reset()
 	m_from_sound = 0;
 	m_sound_state = 0;
 
-	m_main_sent = 0;
-	m_mcu_sent = 0;
 	m_mcu_coin_bit5 = 0;
-
-	m_port_a_in = 0;
-	m_port_a_out = 0;
-	m_ddr_a = 0;
-	m_port_b_in = 0;
-	m_port_b_out = 0;
-	m_ddr_b = 0;
-	m_port_c_in = 0;
-	m_port_c_out = 0;
-	m_ddr_c = 0;
-	m_from_mcu = 0;
 }
 
 
-static MACHINE_CONFIG_START( bigevglf, bigevglf_state )
+static MACHINE_CONFIG_START( bigevglf )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,10000000/2)     /* 5 MHz ? */
@@ -493,8 +462,7 @@ static MACHINE_CONFIG_START( bigevglf, bigevglf_state )
 	    2 irqs/frame give good music tempo but also SOUND ERROR in test mode,
 	    4 irqs/frame give SOUND OK in test mode but music seems to be running too fast */
 
-	MCFG_CPU_ADD("mcu", M68705,2000000) /* ??? */
-	MCFG_CPU_PROGRAM_MAP(m68705_map)
+	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU, 2000000) /* ??? */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame - interleaving is forced on the fly */
 
@@ -514,8 +482,8 @@ static MACHINE_CONFIG_START( bigevglf, bigevglf_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 8000000/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15) /* YM2149 really */
+	MCFG_SOUND_ADD("aysnd", YM2149, 8000000/4)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
 	MCFG_SOUND_ADD("msm", MSM5232, 8000000/4)
 	MCFG_MSM5232_SET_CAPACITORS(0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6) /* 0.65 (???) uF capacitors */
@@ -559,7 +527,7 @@ ROM_START( bigevglf )
 	ROM_LOAD( "a67-17",   0x4000, 0x4000, CRC(9f57deae) SHA1(dbdb3d77c3de0113ef6671aec854e4e44ee162ef))
 	ROM_LOAD( "a67-18",   0x8000, 0x4000, CRC(40d54fed) SHA1(bfa0922809bffafec15d3ef59ac8b8ad653860a1))
 
-	ROM_REGION( 0x0800, "mcu", 0 )
+	ROM_REGION( 0x0800, "bmcu:mcu", 0 )
 	ROM_LOAD( "a67_19-1", 0x0000, 0x0800, CRC(25691658) SHA1(aabf47abac43abe2ffed18ead1cb94e587149e6e))
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
@@ -590,7 +558,7 @@ ROM_START( bigevglfj )
 	ROM_LOAD( "a67-17",   0x4000, 0x4000, CRC(9f57deae) SHA1(dbdb3d77c3de0113ef6671aec854e4e44ee162ef))
 	ROM_LOAD( "a67-18",   0x8000, 0x4000, CRC(40d54fed) SHA1(bfa0922809bffafec15d3ef59ac8b8ad653860a1))
 
-	ROM_REGION( 0x0800, "mcu", 0 )
+	ROM_REGION( 0x0800, "bmcu:mcu", 0 )
 	ROM_LOAD( "a67_19-1", 0x0000, 0x0800, CRC(25691658) SHA1(aabf47abac43abe2ffed18ead1cb94e587149e6e))
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
@@ -606,5 +574,5 @@ DRIVER_INIT_MEMBER(bigevglf_state,bigevglf)
 	membank("bank1")->configure_entries(0, 0xff, &ROM[0x10000], 0x800);
 }
 
-GAME( 1986, bigevglf,  0,        bigevglf, bigevglf, bigevglf_state, bigevglf, ROT270, "Taito America Corporation", "Big Event Golf (US)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, bigevglfj, bigevglf, bigevglf, bigevglfj, bigevglf_state,bigevglf, ROT270, "Taito Corporation", "Big Event Golf (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, bigevglf,  0,        bigevglf, bigevglf,  bigevglf_state, bigevglf, ROT270, "Taito America Corporation", "Big Event Golf (US)",    MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, bigevglfj, bigevglf, bigevglf, bigevglfj, bigevglf_state, bigevglf, ROT270, "Taito Corporation",         "Big Event Golf (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

@@ -19,13 +19,6 @@
 #define MAC8390_839X  "dp83902"
 
 
-MACHINE_CONFIG_FRAGMENT( asntm3b )
-	MCFG_DEVICE_ADD(MAC8390_839X, DP8390D, 0)
-	MCFG_DP8390D_IRQ_CB(WRITELINE(nubus_mac8390_device, dp_irq_w))
-	MCFG_DP8390D_MEM_READ_CB(READ8(nubus_mac8390_device, dp_mem_read))
-	MCFG_DP8390D_MEM_WRITE_CB(WRITE8(nubus_mac8390_device, dp_mem_write))
-MACHINE_CONFIG_END
-
 ROM_START( asntm3nb )
 	ROM_REGION(0x4000, MAC8390_ROM_REGION, 0)
 	ROM_LOAD( "asante_mc3b.bin", 0x000000, 0x004000, CRC(4f86d451) SHA1(d0a41df667e6b51fbc63f9251d593f4fc49104ba) )
@@ -40,19 +33,20 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type NUBUS_ASNTMC3NB = &device_creator<nubus_asntmc3nb_device>;
-const device_type NUBUS_APPLEENET = &device_creator<nubus_appleenet_device>;
+DEFINE_DEVICE_TYPE(NUBUS_ASNTMC3NB, nubus_asntmc3nb_device, "nb_amc3b", "Asante MC3NB Ethernet card")
+DEFINE_DEVICE_TYPE(NUBUS_APPLEENET, nubus_appleenet_device, "nb_aenet", "Apple NuBus Ethernet card")
 
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor nubus_mac8390_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( asntm3b );
-}
+MACHINE_CONFIG_MEMBER( nubus_mac8390_device::device_add_mconfig )
+	MCFG_DEVICE_ADD(MAC8390_839X, DP8390D, 0)
+	MCFG_DP8390D_IRQ_CB(WRITELINE(nubus_mac8390_device, dp_irq_w))
+	MCFG_DP8390D_MEM_READ_CB(READ8(nubus_mac8390_device, dp_mem_read))
+	MCFG_DP8390D_MEM_WRITE_CB(WRITE8(nubus_mac8390_device, dp_mem_write))
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -76,20 +70,20 @@ const tiny_rom_entry *nubus_appleenet_device::device_rom_region() const
 //  nubus_mac8390_device - constructor
 //-------------------------------------------------
 
-nubus_mac8390_device::nubus_mac8390_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-		device_t(mconfig, NUBUS_ASNTMC3NB, name, tag, owner, clock, shortname, source),
-		device_nubus_card_interface(mconfig, *this),
-		m_dp83902(*this, MAC8390_839X)
+nubus_mac8390_device::nubus_mac8390_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	device_nubus_card_interface(mconfig, *this),
+	m_dp83902(*this, MAC8390_839X)
 {
 }
 
 nubus_asntmc3nb_device::nubus_asntmc3nb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		nubus_mac8390_device(mconfig, NUBUS_ASNTMC3NB, "Asante MC3NB Ethernet card", tag, owner, clock, "nb_amc3b", __FILE__)
+	nubus_mac8390_device(mconfig, NUBUS_ASNTMC3NB, tag, owner, clock)
 {
 }
 
 nubus_appleenet_device::nubus_appleenet_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		nubus_mac8390_device(mconfig, NUBUS_APPLEENET, "Apple NuBus Ethernet card", tag, owner, clock, "nb_aenet", __FILE__)
+	nubus_mac8390_device(mconfig, NUBUS_APPLEENET, tag, owner, clock)
 {
 }
 
@@ -101,7 +95,7 @@ void nubus_mac8390_device::device_start()
 {
 	uint32_t slotspace;
 	char mac[7];
-	uint32_t num = rand();
+	uint32_t num = machine().rand();
 	memset(m_prom, 0x57, 16);
 	sprintf(mac+2, "\x1b%c%c%c", (num >> 16) & 0xff, (num >> 8) & 0xff, num & 0xff);
 	mac[0] = mac[1] = 0;  // avoid gcc warning

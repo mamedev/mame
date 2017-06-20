@@ -537,7 +537,7 @@ void rollext_state::machine_start()
 }
 
 
-static MACHINE_CONFIG_START(rollext, rollext_state)
+static MACHINE_CONFIG_START(rollext)
 	MCFG_CPU_ADD("maincpu", TMS32082_MP, 60000000)
 	MCFG_CPU_PROGRAM_MAP(memmap)
 	//MCFG_CPU_VBLANK_INT_DRIVER("screen", rollext_state, vblank_interrupt)

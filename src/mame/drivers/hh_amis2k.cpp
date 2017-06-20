@@ -25,7 +25,8 @@
 
 #include "emu.h"
 #include "cpu/amis2000/amis2000.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
+#include "speaker.h"
 
 #include "wildfire.lh" // this is a test layout, use external artwork
 
@@ -48,14 +49,14 @@ public:
 	required_device<speaker_sound_device> m_speaker;
 	required_device<timer_device> m_a12_decay_timer;
 
-	uint8_t m_d;
-	uint16_t m_a;
-	uint8_t m_q2;
-	uint8_t m_q3;
+	u8 m_d;
+	u16 m_a;
+	u8 m_q2;
+	u8 m_q3;
 
-	uint16_t m_display_state[0x10];
-	uint16_t m_display_cache[0x10];
-	uint8_t m_display_decay[0x100];
+	u16 m_display_state[0x10];
+	u16 m_display_cache[0x10];
+	u8 m_display_decay[0x100];
 
 	DECLARE_WRITE8_MEMBER(write_d);
 	DECLARE_WRITE16_MEMBER(write_a);
@@ -110,7 +111,7 @@ inline bool wildfire_state::index_is_7segled(int index)
 
 void wildfire_state::display_update()
 {
-	uint16_t active_state[0x10];
+	u16 active_state[0x10];
 
 	for (int i = 0; i < 0x10; i++)
 	{
@@ -292,7 +293,7 @@ enum
 	lG = 0x01
 };
 
-static const uint8_t wildfire_7seg_table[0x10] =
+static const u8 wildfire_7seg_table[0x10] =
 {
 	0x7e, 0x30, 0x6d, 0x79, 0x33, 0x5b, 0x5f, 0x70, 0x7f, 0x7b, // 0-9 unaltered
 	0x77,           // A -> unused?
@@ -304,7 +305,7 @@ static const uint8_t wildfire_7seg_table[0x10] =
 };
 
 
-static MACHINE_CONFIG_START( wildfire, wildfire_state )
+static MACHINE_CONFIG_START( wildfire )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", AMI_S2152, MASTER_CLOCK)
@@ -342,4 +343,5 @@ ROM_START( wildfire )
 ROM_END
 
 
-CONS( 1979, wildfire, 0, 0, wildfire, wildfire, driver_device, 0, "Parker Brothers", "Wildfire (patent)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK ) // note: pretty sure that it matches the commercial release
+//    YEAR  NAME      PARENT CMP MACHINE   INPUT     STATE        INIT  COMPANY, FULLNAME, FLAGS
+CONS( 1979, wildfire, 0,      0, wildfire, wildfire, wildfire_state, 0, "Parker Brothers", "Wildfire (patent)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK ) // note: pretty sure that it matches the commercial release

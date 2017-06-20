@@ -11,6 +11,7 @@
 **********************************************************************/
 
 
+#include "emu.h"
 #include "watford.h"
 
 
@@ -18,15 +19,15 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type BBC_WEDDB2 = &device_creator<bbc_weddb2_device>;
-const device_type BBC_WEDDB3 = &device_creator<bbc_weddb3_device>;
+DEFINE_DEVICE_TYPE(BBC_WEDDB2, bbc_weddb2_device, "bbc_weddb2", "Watford Electronics DDB2 1772 FDC")
+DEFINE_DEVICE_TYPE(BBC_WEDDB3, bbc_weddb3_device, "bbc_weddb3", "Watford Electronics DDB3 1770 FDC")
 
 
 //-------------------------------------------------
 //  MACHINE_DRIVER( watford )
 //-------------------------------------------------
 
-FLOPPY_FORMATS_MEMBER( floppy_formats )
+FLOPPY_FORMATS_MEMBER( bbc_watfordfdc_device::floppy_formats )
 	FLOPPY_ACORN_SSD_FORMAT,
 	FLOPPY_ACORN_DSD_FORMAT,
 	FLOPPY_FSD_FORMAT
@@ -39,26 +40,6 @@ static SLOT_INTERFACE_START( bbc_floppies_525 )
 	SLOT_INTERFACE("525dd",   FLOPPY_525_DD)
 	SLOT_INTERFACE("525qd",   FLOPPY_525_QD)
 SLOT_INTERFACE_END
-
-static MACHINE_CONFIG_FRAGMENT( weddb2 )
-	MCFG_WD1772_ADD("wd1772", XTAL_16MHz / 2)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(bbc_weddb2_device, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(bbc_weddb2_device, fdc_drq_w))
-	MCFG_FLOPPY_DRIVE_ADD("wd1772:0", bbc_floppies_525, "525qd", floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("wd1772:1", bbc_floppies_525, "525qd", floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_FRAGMENT( weddb3 )
-	MCFG_WD1770_ADD("wd1770", XTAL_16MHz / 2)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(bbc_weddb3_device, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(bbc_weddb3_device, fdc_drq_w))
-	MCFG_FLOPPY_DRIVE_ADD("wd1770:0", bbc_floppies_525, "525qd", floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("wd1770:1", bbc_floppies_525, "525qd", floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-MACHINE_CONFIG_END
 
 ROM_START( weddb2 )
 	ROM_REGION(0x4000, "dfs_rom", 0)
@@ -80,19 +61,28 @@ ROM_END
 
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor bbc_weddb2_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( weddb2 );
-}
+MACHINE_CONFIG_MEMBER( bbc_weddb2_device::device_add_mconfig )
+	MCFG_WD1772_ADD("wd1772", XTAL_16MHz / 2)
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(bbc_weddb2_device, fdc_intrq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(bbc_weddb2_device, fdc_drq_w))
+	MCFG_FLOPPY_DRIVE_ADD("wd1772:0", bbc_floppies_525, "525qd", floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+	MCFG_FLOPPY_DRIVE_ADD("wd1772:1", bbc_floppies_525, "525qd", floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+MACHINE_CONFIG_END
 
-machine_config_constructor bbc_weddb3_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( weddb3 );
-}
+MACHINE_CONFIG_MEMBER( bbc_weddb3_device::device_add_mconfig )
+	MCFG_WD1770_ADD("wd1770", XTAL_16MHz / 2)
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(bbc_weddb3_device, fdc_intrq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(bbc_weddb3_device, fdc_drq_w))
+	MCFG_FLOPPY_DRIVE_ADD("wd1770:0", bbc_floppies_525, "525qd", floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+	MCFG_FLOPPY_DRIVE_ADD("wd1770:1", bbc_floppies_525, "525qd", floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+MACHINE_CONFIG_END
 
 const tiny_rom_entry *bbc_weddb2_device::device_rom_region() const
 {
@@ -113,14 +103,14 @@ const tiny_rom_entry *bbc_weddb3_device::device_rom_region() const
 //  bbc_watfordfdc_device - constructor
 //-------------------------------------------------
 
-bbc_watfordfdc_device::bbc_watfordfdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+bbc_watfordfdc_device::bbc_watfordfdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_bbc_fdc_interface(mconfig, *this)
 {
 }
 
 bbc_weddb2_device::bbc_weddb2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: bbc_watfordfdc_device(mconfig, BBC_WEDDB2, "Watford Electronics DDB2 1772 FDC", tag, owner, clock, "bbc_weddb2", __FILE__),
+	: bbc_watfordfdc_device(mconfig, BBC_WEDDB2, tag, owner, clock),
 	m_dfs_rom(*this, "dfs_rom"),
 	m_fdc(*this, "wd1772"),
 	m_floppy0(*this, "wd1772:0"),
@@ -129,7 +119,7 @@ bbc_weddb2_device::bbc_weddb2_device(const machine_config &mconfig, const char *
 }
 
 bbc_weddb3_device::bbc_weddb3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: bbc_watfordfdc_device(mconfig, BBC_WEDDB3, "Watford Electronics DDB3 1770 FDC", tag, owner, clock, "bbc_weddb3", __FILE__),
+	: bbc_watfordfdc_device(mconfig, BBC_WEDDB3, tag, owner, clock),
 	m_dfs_rom(*this, "dfs_rom"),
 	m_fdc(*this, "wd1770"),
 	m_floppy0(*this, "wd1770:0"),
@@ -148,7 +138,7 @@ void bbc_weddb2_device::device_start()
 	m_slot = dynamic_cast<bbc_fdc_slot_device *>(owner());
 
 	space.install_readwrite_handler(0xfe80, 0xfe83, READ8_DELEGATE(bbc_weddb2_device, wd177xl_read), WRITE8_DELEGATE(bbc_weddb2_device, wd177xl_write));
-	space.install_readwrite_handler(0xfe84, 0xfe8f, READ8_DEVICE_DELEGATE(m_fdc, wd_fdc_t, read), WRITE8_DEVICE_DELEGATE(m_fdc, wd_fdc_t, write));
+	space.install_readwrite_handler(0xfe84, 0xfe8f, READ8_DEVICE_DELEGATE(m_fdc, wd_fdc_device_base, read), WRITE8_DEVICE_DELEGATE(m_fdc, wd_fdc_device_base, write));
 }
 
 void bbc_weddb3_device::device_start()
@@ -158,7 +148,7 @@ void bbc_weddb3_device::device_start()
 	m_slot = dynamic_cast<bbc_fdc_slot_device *>(owner());
 
 	space.install_readwrite_handler(0xfe80, 0xfe83, READ8_DELEGATE(bbc_weddb3_device, wd177xl_read), WRITE8_DELEGATE(bbc_weddb3_device, wd177xl_write));
-	space.install_readwrite_handler(0xfe84, 0xfe8f, READ8_DEVICE_DELEGATE(m_fdc, wd_fdc_t, read), WRITE8_DEVICE_DELEGATE(m_fdc, wd_fdc_t, write));
+	space.install_readwrite_handler(0xfe84, 0xfe8f, READ8_DEVICE_DELEGATE(m_fdc, wd_fdc_device_base, read), WRITE8_DEVICE_DELEGATE(m_fdc, wd_fdc_device_base, write));
 }
 
 //-------------------------------------------------

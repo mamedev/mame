@@ -59,6 +59,7 @@ chdman createhd -o ST125N.chd -chs 41921,1,1 -ss 512
 
 */
 
+#include "emu.h"
 #include <functional>
 
 #include "includes/rmnimbus.h"
@@ -231,7 +232,7 @@ void rmnimbus_state::machine_start()
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
 		using namespace std::placeholders;
-		machine().debugger().console().register_command("nimbus_debug", CMDFLAG_NONE, 0, 0, 1, std::bind(&rmnimbus_state::debug_command, this, _1, _2, _3));
+		machine().debugger().console().register_command("nimbus_debug", CMDFLAG_NONE, 0, 0, 1, std::bind(&rmnimbus_state::debug_command, this, _1, _2));
 
 		/* set up the instruction hook */
 		m_maincpu->debug()->set_instruction_hook(instruction_hook);
@@ -241,12 +242,12 @@ void rmnimbus_state::machine_start()
 	m_fdc->dden_w(0);
 }
 
-void rmnimbus_state::debug_command(int ref, int params, const char *param[])
+void rmnimbus_state::debug_command(int ref, const std::vector<std::string> &params)
 {
-	if (params > 0)
+	if (params.size() > 0)
 	{
 		int temp;
-		sscanf(param[0],"%d",&temp);
+		sscanf(params[0].c_str(), "%d", &temp);
 		m_debug_machine = temp;
 	}
 	else
@@ -1486,7 +1487,7 @@ void rmnimbus_state::rmni_sound_reset()
 {
 	m_msm->reset_w(1);
 
-	m_last_playmode = MSM5205_S48_4B;
+	m_last_playmode = msm5205_device::S48_4B;
 	m_msm->playmode_w(m_last_playmode);
 
 	m_ay8910_a=0;

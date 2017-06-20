@@ -5,7 +5,6 @@
 #ifndef _IMDS2_H_
 #define _IMDS2_H_
 
-#include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "cpu/mcs48/mcs48.h"
 #include "machine/i8257.h"
@@ -42,8 +41,8 @@ class imds2_state : public driver_device
 	DECLARE_READ8_MEMBER(imds2_kb_read);
 	DECLARE_READ8_MEMBER(imds2_kb_port_p2_r);
 	DECLARE_WRITE8_MEMBER(imds2_kb_port_p1_w);
-	DECLARE_READ8_MEMBER(imds2_kb_port_t0_r);
-	DECLARE_READ8_MEMBER(imds2_kb_port_t1_r);
+	DECLARE_READ_LINE_MEMBER(imds2_kb_port_t0_r);
+	DECLARE_READ_LINE_MEMBER(imds2_kb_port_t1_r);
 	DECLARE_WRITE8_MEMBER(imds2_ioc_dbbout_w);
 	DECLARE_WRITE8_MEMBER(imds2_ioc_f0_w);
 	DECLARE_WRITE8_MEMBER(imds2_ioc_set_f1_w);

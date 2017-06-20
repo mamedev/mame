@@ -51,9 +51,9 @@
     4800-4bff RAM Dream Shopper, Van Van Car only.  Pacman uses this block due to a bug in the routine to
          translate the internal pacman location to a screen address when in the right tunnel.
     4c00-4fff RAM
-    8000-bfff ROM Ms Pac-Man, Ponpoko, Lizard Wizard, Dream Shopper, Van Van Car, Woodpecker, Ali Babba all use
+    8000-bfff ROM Ms Pac-Man, Ponpoko, Lizard Wizard, Dream Shopper, Van Van Car, Woodpecker, Ali Baba all use
          portions of the upper memory area.  Pacman and most bootlegs don't have an A15 line to the cpu so most
-         boards that use upper memmory have an auxillary board that plugs into the cpu socket with a ribbon cable.
+         boards that use upper memory have an auxiliary board that plugs into the cpu socket with a ribbon cable.
          There is also a common Ms Pacman hack for pacman bootlegs to wire A15 from the cpu to the address decoder
          in place of the refresh line. The extra eproms are stacked on lower eproms or placed in unused sockets for
          2k roms.
@@ -72,7 +72,7 @@
     4ff0-4fff 8 pairs of two bytes:
               the first byte contains the sprite image number (bits 2-7), Y flip (bit 0),
               X flip (bit 1); the second byte the color.  Note: Only Ponpoko has 8 sprites
-              an original Midway Pacman board containls only the center 6 sprites.
+              an original Midway Pacman board contains only the center 6 sprites.
     5000      interrupt enable
     5001      sound enable
     5002      latch at location 8K has no connection for this address
@@ -254,11 +254,11 @@ notes:
 - maketrxb:  This board looked slightly different than the standard make trax.  The usual Red and Yellow jumper wires
   for sync inversion were smaller and white and the stickers were slightly different.
 
-- Pac and Paint: Even though this seems to be a unique game the marquee shows a paintbush.  The board has standard
+- Pac and Paint: Even though this seems to be a unique game the marquee shows a paintbrush.  The board has standard
   crush roller roms.  It is slightly different from a Make Trax board in that the sync inverter chip is missing and
   there are no jumper wires.
 
-- jumpshotp: This board was acquired by Pokemame from a former midway employee.  The hardware is identical to normal boards
+- jumpshotp: This board was acquired by Pokemame from a former Midway employee.  The hardware is identical to normal boards
   except the daughterboard is missing the epoxy potting.  Board was labeled engineering sample. Code differences
   include dips, starting position and cheerleader text.
 
@@ -293,17 +293,17 @@ Boards:
 -------
 - puckman is the same as pacman except they are slotted to break a part and have ribbon cables to connect the halves.
 
-- All ms pacman boards are pacman boards with an auxillary cpu board installed on a ribbon cable and 5e,5f changed.
+- All ms pacman boards are pacman boards with an auxiliary cpu board installed on a ribbon cable and 5e,5f changed.
 
-- Pacman Plus, Shoot the Bull, Jumpshot are epoxy potted auxillary cpu boards.  The graphics and
+- Pacman Plus, Shoot the Bull, Jumpshot are epoxy potted auxiliary cpu boards.  The graphics and
   color proms are changed as well.  They are labeled Authorized Enhancement Kit Bally/Midway.   Jumpshot=B3172
 
 - The Eyes boards are similar to pacman boards except for the data swapping encryption.  The custom chips are integrated
-  into the board and there is no voltage regulator section.  There is an extra rom at row 6 so row 7 is equivilant to
+  into the board and there is no voltage regulator section.  There is an extra rom at row 6 so row 7 is equivalent to
   pacman row 6.  Program roms are 4k but graphics roms have unpopulated areas for optional 2k roms.
 
 - Piranha and Naughty Mouse use a board known as the GDP-01 bootleg.  It is similar to an eyes board with an extra row
-  of eproms in row 6 to enable 2k program roms. Thee GDP-01 does not requiree a SBC, but 5 SBC chips can be left unpopulated
+  of eproms in row 6 to enable 2k program roms. The GDP-01 does not require a SBC, but 5 SBC chips can be left unpopulated
   and a SBC card(GDP-02) can be installed.
 
 - Make Trax/Crush Roller boards are similar to pacman boards, the chip positions are even mostly the same.  There is no
@@ -312,41 +312,44 @@ Boards:
   offset to one side.  Make trax and Eyes pinouts are similar enough to test each other but are not playable.
 
 - Atlantic City Action, Boardwalk Casino, The Glob, Super Glob, Beastie Feastie, EEEK! all use identical Epos boards
-  with different pals.  Street heat, Drakton on Donkey Kong also use this board.  It is a cpu auxillary board.  It is
+  with different pals.  Street heat, Drakton on Donkey Kong also use this board.  It is a cpu auxiliary board.  It is
   not potted but all the chip labels are removed.
 
 - Porky and 8ball action use the same plug in board for pacman.  It is much larger than most and requires some soldering
   to install.  It includes a new cpu and sound hardware.  Driving force uses a similar board and requires a lot of
   soldering.
 
-- Lizard Wizard is a potted auxillary cpu board.
+- Lizard Wizard is a potted auxiliary cpu board.
 
-- Big Bucks is an auxillary cpu board.
+- Big Bucks is an auxiliary cpu board.
 
-- MTV Trivia is an auxillary cpu board.
+- MTV Trivia is an auxiliary cpu board.
 
-- Truco Clemente runs on a pac bootleg with a handwired cpu/graphics auxillary board.  This supports banking of the
+- Truco Clemente runs on a pac bootleg with a handwired cpu/graphics auxiliary board.  This supports banking of the
   roms and completely bypasses color proms and video output section of pacman.
 
 - Vanvanb was found on a low quality board assumed to be a bootleg of an original.  The 2 sound chips were on a
   daughterboard that plugged into a 40 pin socket. Physically it is very different from pacman, although the fact that
   it uses the same falcon pinout as every other pac boot is a little suspicious.
 
-- Ponpoko uses it's own board.
+- Ponpoko uses its own board.
 
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "includes/pacman.h"
+#include "machine/epos.h"
+#include "machine/jumpshot.h"
+#include "machine/pacplus.h"
+
 #include "cpu/s2650/s2650.h"
+#include "cpu/z80/z80.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "sound/sn76496.h"
-#include "machine/epos.h"
-#include "machine/jumpshot.h"
-#include "machine/pacplus.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /*************************************
@@ -1174,7 +1177,7 @@ static ADDRESS_MAP_START( dremshpr_map, AS_PROGRAM, 8, pacman_state )
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
 
 	/* vanvan: probably a leftover from development: the Sanritsu version writes
-	   the color lookup table here, while the Karateko version writes garbage. */
+	   the color lookup table here, while the Karateco version writes garbage. */
 	AM_RANGE(0xb800, 0xb87f) AM_WRITENOP
 ADDRESS_MAP_END
 
@@ -2374,32 +2377,32 @@ static INPUT_PORTS_START( eeekk )
 	PORT_MODIFY("IN0")
 	PORT_SERVICE_NO_TOGGLE( 0x10, 0x10 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME( "P2 Attack" )
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME( "P1 Attack/2 Player Start" )
 
 	PORT_MODIFY("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR(Lives) )      PORT_DIPLOCATION("SW:1,2")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR(Lives) ) PORT_DIPLOCATION("SW:1,2")
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
 	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPSETTING(    0x00, "6" )
-	PORT_DIPNAME( 0x1c, 0x10, DEF_STR( Difficulty ) )        PORT_DIPLOCATION("SW:3,4,5")
-	PORT_DIPSETTING(    0x00, "8" )
+	PORT_DIPNAME( 0x1c, 0x10, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW:3,4,5")
+	PORT_DIPSETTING(    0x00, "8 (Hard)" )
 	PORT_DIPSETTING(    0x04, "7" )
 	PORT_DIPSETTING(    0x08, "6" )
 	PORT_DIPSETTING(    0x0c, "5" )
 	PORT_DIPSETTING(    0x10, "4" )
 	PORT_DIPSETTING(    0x14, "3" )
 	PORT_DIPSETTING(    0x18, "2" )
-	PORT_DIPSETTING(    0x1c, "1" )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR(Demo_Sounds) )      PORT_DIPLOCATION("SW:6")
+	PORT_DIPSETTING(    0x1c, "1 (Easy)" )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR(Demo_Sounds) ) PORT_DIPLOCATION("SW:6")
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )
 	PORT_DIPSETTING(    0x20, DEF_STR(Off) )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_DIPUNUSED_DIPLOC( 0x40, IP_ACTIVE_LOW, "SW:7")
+	PORT_DIPUNUSED_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW:8")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( vanvan )
@@ -3555,7 +3558,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( pacman, pacman_state )
+static MACHINE_CONFIG_START( pacman )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)
@@ -6583,6 +6586,56 @@ ROM_START( woodpeca )
 ROM_END
 
 
+/*
+Guru-Readme for Number Crash (Hanshin Goraku 1983)
+
+|----------------------------------------------------------------------|
+|        74107   Z80A          LS157  MB7052.4A LS158                  |
+|        LS368 18.432MHz                LS377   LS157                  |
+| LS16   LS367   DIP28A        LS194    LS00    7475            93422  |
+|        LS367                 LS194    LS273   LS20                   |
+| DSW(8) LS367 P1.7E  NC-1.6E  NC-9.5E  LS157   7489  7461       LS161 |
+|2       LS367 LS08   NC-2.6F  NC-10.5F LS86    7489  LS283      LS283 |
+|2             LS138  NC-3.6H  NC-11.5H                          LS174 |
+|W             4099            NC-12.5J LS245   LS158 LS86             |
+|A             LS02   NC-4.6K                   LS157             LS283|
+|Y             LS139  NC-5.6L  LS139                  AM27S03.2K  LS174|
+|              LS42                     2114    P2.3M AM27S03.2L  P3.1M|
+|              LS367  NC-6.6M  LS74     2114    LS74                   |
+|     MB3713                   LS08     2114          LS273      4066  |
+|                     NC-7.6N           2114    LS10  LS02             |
+|                     NC-8.6P  DIP28B   2114                     7416  |
+|         VOLUME      LS367             2114    7416  7416       7416  |
+|----------------------------------------------------------------------|
+Notes: (All IC's shown)
+      Z80A   - Clock input 3.072MHz [18.432/6]
+      7489   - Texas Instruments 7489 64-bit Random Access Read-Write Memory
+      2114   - 1k x 4-bit SRAM
+      AM27S03- AMD AM27S03 (74S189 / 3101 compatible) 64-bit (16word x 4-bit) Inverting-Output Bipolar RAM
+      93422  - AMD 93422 256 x 4-bit TTL Bipolar RAM
+      NC-*   - 2716 EPROM
+      P1     - Fujitsu MB7051 Bipolar PROM
+      P2/3   - Harris 7611 Bipolar PROM
+      MB7052 - Fujitsu MB7052 Bipolar PROM
+      DIP28A - Plug-in daughterboard containing logic
+               |----------|
+               |   LS373  |
+               |   LS245  |
+               |LS02  LS00|
+               |LS74  LS04|
+               |----------|
+
+      DIP28B - Plug-in daughterboard containing logic
+               |----------------------------|
+               |LS257 LS253 LS253 LS253 LS00|
+               |                            |
+               |LS86 LS86 LS86 LS02 LS368   |
+               |----------------------------|
+
+      VSync  - 60.5721Hz
+      HSync  - 15.3892kHz
+*/
+
 ROM_START( numcrash )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "nc-1.6e",      0x0000, 0x0800, CRC(c85a79ba) SHA1(938b6b2920b14a4f0fbcd09fe25873bfd8ddc245) )
@@ -7118,7 +7171,7 @@ DRIVER_INIT_MEMBER(pacman_state,rocktrv2)
 	save_item(NAME(m_rocktrv2_question_bank));
 }
 
-/* The encrpytion is provided by a 74298 sitting on top of the rom at 6f.
+/* The encryption is provided by a 74298 sitting on top of the rom at 6f.
 The select line is tied to a2; a0 and a1 of the eprom are are left out of
 socket and run through the 74298.  Clock is tied to system clock.  */
 DRIVER_INIT_MEMBER(pacman_state,mspacmbe)
@@ -7222,35 +7275,35 @@ DRIVER_INIT_MEMBER(pacman_state,cannonbp)
  *
  *************************************/
 
-/*          rom       parent    machine   inp       init */
-GAME( 1980, puckman,  0,        pacman,   pacman,   driver_device, 0,        ROT90,  "Namco", "Puck Man (Japan set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, puckmanb, puckman,  pacman,   pacman,   driver_device, 0,        ROT90,  "bootleg", "Puck Man (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, puckmanf, puckman,  pacman,   pacman,   driver_device, 0,        ROT90,  "hack", "Puck Man (speedup hack)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, puckmanh, puckman,  pacman,   pacman,   driver_device, 0,        ROT90,  "bootleg (Falcom?)", "Puck Man (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, pacman,   puckman,  pacman,   pacman,   driver_device, 0,        ROT90,  "Namco (Midway license)", "Pac-Man (Midway)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, pacmanso, puckman,  pacman,   pacman,   driver_device, 0,        ROT90,  "Namco (Sonic license)", "Pac-Man (SegaSA / Sonic)", MACHINE_SUPPORTS_SAVE ) // from SegaSA / Sonic, could be licensed, could be bootleg - it ignores the service mode credit settings despite listing them which is suspicious
-GAME( 1980, pacmanf,  puckman,  pacman,   pacman,   driver_device, 0,        ROT90,  "hack", "Pac-Man (Midway, speedup hack)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, puckmod,  puckman,  pacman,   pacman,   driver_device, 0,        ROT90,  "Namco", "Puck Man (Japan set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, pacmod,   puckman,  pacman,   pacman,   driver_device, 0,        ROT90,  "Namco (Midway license)", "Pac-Man (Midway, harder)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, pacmanjpm,puckman,  pacman,   pacman,   driver_device, 0,        ROT90,  "bootleg (JPM)", "Pac-Man (JPM bootleg)", MACHINE_SUPPORTS_SAVE ) // aka 'Muncher', UK bootleg, JPM later made fruit machines etc.
-GAME( 1980, pacmanpe, puckman,  pacman,   pacmanpe, driver_device, 0,        ROT90,  "bootleg (Petaco SA)", "Come Come (Petaco SA bootleg of Puck Man)", MACHINE_SUPPORTS_SAVE ) // might have a speed-up button, check
-GAME( 1980, newpuc2,  puckman,  pacman,   pacman,   driver_device, 0,        ROT90,  "hack", "Newpuc2 (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, newpuc2b, puckman,  pacman,   pacman,   driver_device, 0,        ROT90,  "hack", "Newpuc2 (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, newpuckx, puckman,  pacman,   pacman,   driver_device, 0,        ROT90,  "hack", "New Puck-X", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, pacheart, puckman,  pacman,   pacman,   driver_device, 0,        ROT90,  "hack", "Pac-Man (Hearts)", MACHINE_SUPPORTS_SAVE )
-GAME( 198?, bucaner,  puckman,  pacman,   pacman,   driver_device, 0,        ROT90,  "hack", "Buccaneer", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, hangly,   puckman,  pacman,   pacman,   driver_device, 0,        ROT90,  "hack", "Hangly-Man (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, hangly2,  puckman,  pacman,   pacman,   driver_device, 0,        ROT90,  "hack", "Hangly-Man (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, hangly3,  puckman,  pacman,   pacman,   driver_device, 0,        ROT90,  "hack", "Hangly-Man (set 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, popeyeman,puckman,  pacman,   pacman,   driver_device, 0,        ROT90,  "hack", "Popeye-Man", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, pacuman,  puckman,  pacman,   pacuman,  driver_device, 0,        ROT90,  "bootleg (Recreativos Franco S.A.)", "Pacu-Man (Spanish bootleg of Puck Man)", MACHINE_SUPPORTS_SAVE ) // common bootleg in Spain, code is shifted a bit compared to the Puck Man sets. Title & Manufacturer info from cabinet/PCB, not displayed ingame
-GAME( 1980, crockman, puckman,  pacman,   pacman,   driver_device, 0,        ROT90,  "bootleg (Rene Pierre)", "Crock-Man", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, joyman,   puckman,  pacman,   pacman,   driver_device, 0,        ROT90,  "hack", "Joyman", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, ctrpllrp, puckman,  pacman,   pacman,   driver_device, 0,        ROT90,  "hack", "Caterpillar Pacman Hack", MACHINE_SUPPORTS_SAVE )
+//          rom       parent    machine   inp       state          init
+GAME( 1980, puckman,  0,        pacman,   pacman,   pacman_state,  0,        ROT90,  "Namco", "Puck Man (Japan set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, puckmanb, puckman,  pacman,   pacman,   pacman_state,  0,        ROT90,  "bootleg", "Puck Man (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, puckmanf, puckman,  pacman,   pacman,   pacman_state,  0,        ROT90,  "hack", "Puck Man (speedup hack)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, puckmanh, puckman,  pacman,   pacman,   pacman_state,  0,        ROT90,  "bootleg (Falcom?)", "Puck Man (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, pacman,   puckman,  pacman,   pacman,   pacman_state,  0,        ROT90,  "Namco (Midway license)", "Pac-Man (Midway)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, pacmanso, puckman,  pacman,   pacman,   pacman_state,  0,        ROT90,  "Namco (Sonic license)", "Pac-Man (SegaSA / Sonic)", MACHINE_SUPPORTS_SAVE ) // from SegaSA / Sonic, could be licensed, could be bootleg - it ignores the service mode credit settings despite listing them which is suspicious
+GAME( 1980, pacmanf,  puckman,  pacman,   pacman,   pacman_state,  0,        ROT90,  "hack", "Pac-Man (Midway, speedup hack)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, puckmod,  puckman,  pacman,   pacman,   pacman_state,  0,        ROT90,  "Namco", "Puck Man (Japan set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, pacmod,   puckman,  pacman,   pacman,   pacman_state,  0,        ROT90,  "Namco (Midway license)", "Pac-Man (Midway, harder)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, pacmanjpm,puckman,  pacman,   pacman,   pacman_state,  0,        ROT90,  "bootleg (JPM)", "Pac-Man (JPM bootleg)", MACHINE_SUPPORTS_SAVE ) // aka 'Muncher', UK bootleg, JPM later made fruit machines etc.
+GAME( 1980, pacmanpe, puckman,  pacman,   pacmanpe, pacman_state,  0,        ROT90,  "bootleg (Petaco SA)", "Come Come (Petaco SA bootleg of Puck Man)", MACHINE_SUPPORTS_SAVE ) // might have a speed-up button, check
+GAME( 1980, newpuc2,  puckman,  pacman,   pacman,   pacman_state,  0,        ROT90,  "hack", "Newpuc2 (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, newpuc2b, puckman,  pacman,   pacman,   pacman_state,  0,        ROT90,  "hack", "Newpuc2 (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, newpuckx, puckman,  pacman,   pacman,   pacman_state,  0,        ROT90,  "hack", "New Puck-X", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, pacheart, puckman,  pacman,   pacman,   pacman_state,  0,        ROT90,  "hack", "Pac-Man (Hearts)", MACHINE_SUPPORTS_SAVE )
+GAME( 198?, bucaner,  puckman,  pacman,   pacman,   pacman_state,  0,        ROT90,  "hack", "Buccaneer", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, hangly,   puckman,  pacman,   pacman,   pacman_state,  0,        ROT90,  "hack", "Hangly-Man (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, hangly2,  puckman,  pacman,   pacman,   pacman_state,  0,        ROT90,  "hack", "Hangly-Man (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, hangly3,  puckman,  pacman,   pacman,   pacman_state,  0,        ROT90,  "hack", "Hangly-Man (set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, popeyeman,puckman,  pacman,   pacman,   pacman_state,  0,        ROT90,  "hack", "Popeye-Man", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, pacuman,  puckman,  pacman,   pacuman,  pacman_state,  0,        ROT90,  "bootleg (Recreativos Franco S.A.)", "Pacu-Man (Spanish bootleg of Puck Man)", MACHINE_SUPPORTS_SAVE ) // common bootleg in Spain, code is shifted a bit compared to the Puck Man sets. Title & Manufacturer info from cabinet/PCB, not displayed ingame
+GAME( 1980, crockman, puckman,  pacman,   pacman,   pacman_state,  0,        ROT90,  "bootleg (Rene Pierre)", "Crock-Man", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, joyman,   puckman,  pacman,   pacman,   pacman_state,  0,        ROT90,  "hack", "Joyman", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, ctrpllrp, puckman,  pacman,   pacman,   pacman_state,  0,        ROT90,  "hack", "Caterpillar Pacman Hack", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, piranha,  puckman,  piranha,  mspacman, pacman_state,  eyes,     ROT90,  "GL (US Billiards license)", "Piranha", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, piranhao, puckman,  piranha,  mspacman, pacman_state,  eyes,     ROT90,  "GL (US Billiards license)", "Piranha (older)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, abscam,   puckman,  piranha,  mspacman, pacman_state,  eyes,     ROT90,  "GL (US Billiards license)", "Abscam", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, piranhah, puckman,  pacman,   mspacman, driver_device, 0,        ROT90,  "hack", "Piranha (hack)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, piranhah, puckman,  pacman,   mspacman, pacman_state,  0,        ROT90,  "hack", "Piranha (hack)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1982, pacplus,  0,        pacman,   pacman,   pacman_state,  pacplus,  ROT90,  "Namco (Midway license)", "Pac-Man Plus", MACHINE_SUPPORTS_SAVE )
 
@@ -7260,30 +7313,30 @@ GAME( 1981, mspacmat, mspacman, mspacman, mspacman, pacman_state,  mspacman, ROT
 GAME( 1989, msheartb, mspacman, mspacman, mspacman, pacman_state,  mspacman, ROT90,  "hack (Two-Bit Score)", "Ms. Pac-Man Heart Burn", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, pacgal2,  mspacman, mspacman, mspacman, pacman_state,  mspacman, ROT90,  "bootleg", "Pac-Gal (set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, mspacmancr,mspacman,mspacman, mspacman, pacman_state,  mspacman, ROT90,  "bootleg", "Ms. Pac-Man (bootleg on Crush Roller Hardware)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, mspacmab, mspacman, woodpek,  mspacman, driver_device, 0,        ROT90,  "bootleg", "Ms. Pac-Man (bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, mspacmab2,mspacman, woodpek,  mspacman, driver_device, 0,        ROT90,  "bootleg", "Ms. Pac-Man (bootleg, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, mspacmab, mspacman, woodpek,  mspacman, pacman_state,  0,        ROT90,  "bootleg", "Ms. Pac-Man (bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, mspacmab2,mspacman, woodpek,  mspacman, pacman_state,  0,        ROT90,  "bootleg", "Ms. Pac-Man (bootleg, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, mspacmbe, mspacman, woodpek,  mspacman, pacman_state,  mspacmbe, ROT90,  "bootleg", "Ms. Pac-Man (bootleg, encrypted)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, mspacii,  mspacman, woodpek,  mspacman, pacman_state,  mspacii,  ROT90,  "bootleg (Orca)", "Ms. Pac-Man II (Orca bootleg set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, mspacii2, mspacman, woodpek,  mspacman, pacman_state,  mspacii,  ROT90,  "bootleg (Orca)", "Ms. Pac-Man II (Orca bootleg set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, pacgal,   mspacman, woodpek,  mspacman, driver_device, 0,        ROT90,  "hack", "Pac-Gal (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, mspacpls, mspacman, woodpek,  mspacpls, driver_device, 0,        ROT90,  "hack", "Ms. Pac-Man Plus", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, pacgal,   mspacman, woodpek,  mspacman, pacman_state,  0,        ROT90,  "hack", "Pac-Gal (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, mspacpls, mspacman, woodpek,  mspacpls, pacman_state,  0,        ROT90,  "hack", "Ms. Pac-Man Plus", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, mschamp,  mspacman, mschamp,  mschamp,  pacman_state,  mschamp,  ROT90,  "hack", "Ms. Pacman Champion Edition / Zola-Puc Gal", MACHINE_SUPPORTS_SAVE ) /* Rayglo version */
 GAME( 1995, mschamps, mspacman, mschamp,  mschamp,  pacman_state,  mschamp,  ROT90,  "hack", "Ms. Pacman Champion Edition / Super Zola-Puc Gal", MACHINE_SUPPORTS_SAVE )
 
 // These bootlegs have MADE IN GREECE clearly visible and etched into the PCBs. They were very common in Spain with several operators having their own versions.
 // Based on the PCBs and copyright dates shown they  were produced late 80s / early 90s. Usually they run a version of Ms. Pacman, but were sometimes converted back to regular Pac-Man
-GAME( 198?, mspacmanbg, mspacman,woodpek, mspacman, driver_device, 0,        ROT90,  "bootleg",            "Ms. Pac-Man ('Made in Greece' bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, mspacmanbgd,mspacman,woodpek, mspacman, driver_device, 0,        ROT90,  "bootleg (Datamat)",  "Miss Pukman ('Made in Greece' Datamat bootleg)", MACHINE_SUPPORTS_SAVE ) // shows 'Miss Pukman 1991/1992' but confirmed to be the bootleg distributed by Datamat
-GAME( 1992, mspacmanblt,mspacman,woodpek, mspacman, driver_device, 0,        ROT90,  "bootleg (Triunvi)",  "Come-Cocos (Ms. Pac-Man) ('Made in Greece' Triunvi bootleg)", MACHINE_SUPPORTS_SAVE ) //
-GAME( 1991, mspacmanbcc,mspacman,woodpek, mspacman, driver_device, 0,        ROT90,  "bootleg (Tecnausa)", "Come-Cocos (Ms. Pac-Man) ('Made in Greece' Tecnausa bootleg)", MACHINE_SUPPORTS_SAVE ) // ^ same PCB, also dated 1991, distributed by Tecnausa
-GAME( 1991, mspacmanbhe,mspacman,woodpek, mspacman, driver_device, 0,        ROT90,  "bootleg (Herle SA)", "Come-Cocos (Ms. Pac-Man) ('Made in Greece' Herle SA bootleg)", MACHINE_SUPPORTS_SAVE ) // ^ same PCB
-GAME( 198?, pacmansp,   puckman, pacman,  pacmansp, driver_device, 0,        ROT90,  "bootleg",            "Puck Man (Spanish, 'Made in Greece' bootleg)", MACHINE_SUPPORTS_SAVE ) // probably a further conversion of the mspacmanbg bootleg, still has some MS Pacman code + extra features
+GAME( 198?, mspacmanbg, mspacman,woodpek, mspacman, pacman_state,  0,        ROT90,  "bootleg",            "Ms. Pac-Man ('Made in Greece' bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, mspacmanbgd,mspacman,woodpek, mspacman, pacman_state,  0,        ROT90,  "bootleg (Datamat)",  "Miss Pukman ('Made in Greece' Datamat bootleg)", MACHINE_SUPPORTS_SAVE ) // shows 'Miss Pukman 1991/1992' but confirmed to be the bootleg distributed by Datamat
+GAME( 1992, mspacmanblt,mspacman,woodpek, mspacman, pacman_state,  0,        ROT90,  "bootleg (Triunvi)",  "Come-Cocos (Ms. Pac-Man) ('Made in Greece' Triunvi bootleg)", MACHINE_SUPPORTS_SAVE ) //
+GAME( 1991, mspacmanbcc,mspacman,woodpek, mspacman, pacman_state,  0,        ROT90,  "bootleg (Tecnausa)", "Come-Cocos (Ms. Pac-Man) ('Made in Greece' Tecnausa bootleg)", MACHINE_SUPPORTS_SAVE ) // ^ same PCB, also dated 1991, distributed by Tecnausa
+GAME( 1991, mspacmanbhe,mspacman,woodpek, mspacman, pacman_state,  0,        ROT90,  "bootleg (Herle SA)", "Come-Cocos (Ms. Pac-Man) ('Made in Greece' Herle SA bootleg)", MACHINE_SUPPORTS_SAVE ) // ^ same PCB
+GAME( 198?, pacmansp,   puckman, pacman,  pacmansp, pacman_state,  0,        ROT90,  "bootleg",            "Puck Man (Spanish, 'Made in Greece' bootleg)", MACHINE_SUPPORTS_SAVE ) // probably a further conversion of the mspacmanbg bootleg, still has some MS Pacman code + extra features
 
 
 
-GAME( 1989, clubpacm,  0,        woodpek, mspacman, driver_device, 0,        ROT90,  "Miky SRL", "Pacman Club / Club Lambada (Argentina)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1990, clubpacma, clubpacm, woodpek, mspacman, driver_device, 0,        ROT90,  "Miky SRL", "Pacman Club (set 1, Argentina)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1990, clubpacmb, clubpacm, woodpek, mspacman, driver_device, 0,        ROT90,  "Miky SRL", "Pacman Club (set 2, Argentina)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1989, clubpacm,  0,        woodpek, mspacman, pacman_state,  0,        ROT90,  "Miky SRL", "Pacman Club / Club Lambada (Argentina)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1990, clubpacma, clubpacm, woodpek, mspacman, pacman_state,  0,        ROT90,  "Miky SRL", "Pacman Club (set 1, Argentina)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1990, clubpacmb, clubpacm, woodpek, mspacman, pacman_state,  0,        ROT90,  "Miky SRL", "Pacman Club (set 2, Argentina)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
 GAME( 1985, jumpshot, 0,        pacman,   jumpshot, pacman_state,  jumpshot, ROT90,  "Bally Midway", "Jump Shot", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, jumpshotp,jumpshot, pacman,   jumpshotp,pacman_state,  jumpshot, ROT90,  "Bally Midway", "Jump Shot Engineering Sample", MACHINE_SUPPORTS_SAVE )
@@ -7291,35 +7344,35 @@ GAME( 1985, jumpshotp,jumpshot, pacman,   jumpshotp,pacman_state,  jumpshot, ROT
 GAME( 1985, shootbul, 0,        pacman,   shootbul, pacman_state,  jumpshot, ROT90,  "Bally Midway", "Shoot the Bull", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1981, crush,    0,        pacmanp,  maketrax, pacman_state,  maketrax, ROT90,  "Alpha Denshi Co. / Kural Samno Electric, Ltd.", "Crush Roller (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, crush2,   crush,    pacman,   maketrax, driver_device, 0,        ROT90,  "Alpha Denshi Co. / Kural Esco Electric, Ltd.", "Crush Roller (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, crush2,   crush,    pacman,   maketrax, pacman_state,  0,        ROT90,  "Alpha Denshi Co. / Kural Esco Electric, Ltd.", "Crush Roller (set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, crush3,   crush,    pacmanp,  maketrax, pacman_state,  maketrax, ROT90,  "Alpha Denshi Co. / Kural Electric, Ltd.", "Crush Roller (set 3)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, crush4,   crush,    pacman,   maketrax, pacman_state,  eyes,     ROT90,  "Alpha Denshi Co. / Kural Electric, Ltd.", "Crush Roller (set 4)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, crush5,   crush,    crush4,   crush4,   driver_device, 0,        ROT90,  "Alpha Denshi Co. / Kural TWT", "Crush Roller (set 5)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, crush5,   crush,    crush4,   crush4,   pacman_state,  0,        ROT90,  "Alpha Denshi Co. / Kural TWT", "Crush Roller (set 5)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, maketrax, crush,    pacmanp,  maketrax, pacman_state,  maketrax, ROT270, "Alpha Denshi Co. / Kural (Williams license)", "Make Trax (US set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, maketrxb, crush,    pacmanp,  maketrax, pacman_state,  maketrax, ROT270, "Alpha Denshi Co. / Kural (Williams license)", "Make Trax (US set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, korosuke, crush,    pacmanp,  korosuke, pacman_state,  korosuke, ROT90,  "Alpha Denshi Co. / Kural Electric, Ltd.", "Korosuke Roller (Japan)", MACHINE_SUPPORTS_SAVE ) // ADK considers it a sequel?
-GAME( 1981, crushrlf, crush,    pacman,   maketrax, driver_device, 0,        ROT90,  "bootleg", "Crush Roller (Famaresa PCB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, crushbl,  crush,    pacman,   maketrax, driver_device, 0,        ROT90,  "bootleg", "Crush Roller (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, crushrlf, crush,    pacman,   maketrax, pacman_state,  0,        ROT90,  "bootleg", "Crush Roller (Famaresa PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, crushbl,  crush,    pacman,   maketrax, pacman_state,  0,        ROT90,  "bootleg", "Crush Roller (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, crushbl2, crush,    pacmanp,  mbrush,   pacman_state,  maketrax, ROT90,  "bootleg", "Crush Roller (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, crushbl3, crush,    pacmanp,  mbrush,   pacman_state,  maketrax, ROT90,  "bootleg", "Crush Roller (bootleg set 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, crushs,   crush,    crushs,   crushs,   driver_device, 0,        ROT90,  "bootleg (Sidam)", "Crush Roller (bootleg set 4)", MACHINE_SUPPORTS_SAVE ) // Sidam PCB, no Sidam text
-GAME( 1981, mbrush,   crush,    pacmanp,  mbrush,   pacman_state,  maketrax, ROT90,  "bootleg", "Magic Brush (bootleg of Crush Roller)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, paintrlr, crush,    pacman,   paintrlr, driver_device, 0,        ROT90,  "bootleg", "Paint Roller (bootleg of Crush Roller)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, crushs,   crush,    crushs,   crushs,   pacman_state,  0,        ROT90,  "bootleg (Sidam)", "Crush Roller (bootleg set 4)", MACHINE_SUPPORTS_SAVE ) // Sidam PCB, no Sidam text
+GAME( 1981, mbrush,   crush,    pacmanp,  mbrush,   pacman_state,  maketrax, ROT90,  "bootleg (Olympia)", "Magic Brush (bootleg of Crush Roller)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, paintrlr, crush,    pacman,   paintrlr, pacman_state,  0,        ROT90,  "bootleg", "Paint Roller (bootleg of Crush Roller)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1982, eyes,     0,        pacman,   eyes,     pacman_state,  eyes,     ROT90,  "Techstar (Rock-Ola license)", "Eyes (US set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, eyes2,    eyes,     pacman,   eyes,     pacman_state,  eyes,     ROT90,  "Techstar (Rock-Ola license)", "Eyes (US set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, eyesb,    eyes,     pacman,   eyes,     pacman_state,  eyes,     ROT90,  "bootleg", "Eyes (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, eyeszac,  eyes,     pacman,   eyes,     pacman_state,  eyes,     ROT90,  "Techstar (Zaccaria license)", "Eyes (Italy)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // bad dump
-GAME( 1982, eyeszacb, eyes,     pacman,   eyes,     driver_device, 0,        ROT90,  "bootleg", "Eyes (bootleg set 2, decrypted)", MACHINE_SUPPORTS_SAVE ) // based on Zaccaria version
+GAME( 1982, eyeszacb, eyes,     pacman,   eyes,     pacman_state,  0,        ROT90,  "bootleg", "Eyes (bootleg set 2, decrypted)", MACHINE_SUPPORTS_SAVE ) // based on Zaccaria version
 
 GAME( 1983, mrtnt,    0,        pacman,   mrtnt,    pacman_state,  eyes,     ROT90,  "Techstar (Telko license)", "Mr. TNT", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, gorkans,  mrtnt,    pacman,   mrtnt,    driver_device, 0,        ROT90,  "Techstar", "Gorkans", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, gorkans,  mrtnt,    pacman,   mrtnt,    pacman_state,  0,        ROT90,  "Techstar", "Gorkans", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1985, lizwiz,   0,        woodpek,  lizwiz,   driver_device, 0,        ROT90,  "Techstar (Sunn license)", "Lizard Wizard", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, lizwiz,   0,        woodpek,  lizwiz,   pacman_state,  0,        ROT90,  "Techstar (Sunn license)", "Lizard Wizard", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1983, eggor,    0,        pacman,   mrtnt,    pacman_state,  eyes,     ROT90,  "Telko", "Eggor", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, birdiy,   0,        birdiy,   birdiy,   driver_device, 0,        ROT270, "Mama Top", "Birdiy", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, birdiy,   0,        birdiy,   birdiy,   pacman_state,  0,        ROT270, "Mama Top", "Birdiy", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1981, woodpeck, 0,        woodpek,  woodpek,  pacman_state,  woodpek,  ROT90,  "Amenip (Palcom Queen River)", "Woodpecker (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, woodpeca, woodpeck, woodpek,  woodpek,  pacman_state,  woodpek,  ROT90,  "Amenip", "Woodpecker (set 2)", MACHINE_SUPPORTS_SAVE )
@@ -7331,23 +7384,23 @@ GAME( 1982, ponpoko,  0,        woodpek,  ponpoko,  pacman_state,  ponpoko,  ROT
 GAME( 1982, ponpokov, ponpoko,  woodpek,  ponpoko,  pacman_state,  ponpoko,  ROT0,   "Sigma Enterprises Inc. (Venture Line license)", "Ponpoko (Venture Line)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, candory,  ponpoko,  woodpek,  ponpoko,  pacman_state,  ponpoko,  ROT0,   "bootleg", "Candory (Ponpoko bootleg with Mario)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1982, alibaba,  0,        alibaba,  alibaba,  driver_device, 0,        ROT90,  "Sega", "Ali Baba and 40 Thieves", MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, alibabab, alibaba,  alibaba,  alibaba,  driver_device, 0,        ROT90,  "bootleg", "Mustafa and 40 Thieves (bootleg)", MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, alibaba,  0,        alibaba,  alibaba,  pacman_state,  0,        ROT90,  "Sega", "Ali Baba and 40 Thieves", MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, alibabab, alibaba,  alibaba,  alibaba,  pacman_state,  0,        ROT90,  "bootleg", "Mustafa and 40 Thieves (bootleg)", MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1982, dremshpr, 0,        dremshpr, dremshpr, driver_device, 0,        ROT270, "Sanritsu", "Dream Shopper", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, dremshpr, 0,        dremshpr, dremshpr, pacman_state,  0,        ROT270, "Sanritsu", "Dream Shopper", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, vanvan,   0,        vanvan,   vanvan,   driver_device, 0,        ROT270, "Sanritsu", "Van-Van Car", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, vanvank,  vanvan,   vanvan,   vanvank,  driver_device, 0,        ROT270, "Sanritsu (Karateco license?)", "Van-Van Car (Karateco set 1)", MACHINE_SUPPORTS_SAVE ) // or bootleg?
-GAME( 1983, vanvanb,  vanvan,   vanvan,   vanvank,  driver_device, 0,        ROT270, "Sanritsu (Karateco license?)", "Van-Van Car (Karateco set 2)", MACHINE_SUPPORTS_SAVE ) // "
+GAME( 1983, vanvan,   0,        vanvan,   vanvan,   pacman_state,  0,        ROT270, "Sanritsu", "Van-Van Car", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, vanvank,  vanvan,   vanvan,   vanvank,  pacman_state,  0,        ROT270, "Sanritsu (Karateco license?)", "Van-Van Car (Karateco set 1)", MACHINE_SUPPORTS_SAVE ) // or bootleg?
+GAME( 1983, vanvanb,  vanvan,   vanvan,   vanvank,  pacman_state,  0,        ROT270, "Sanritsu (Karateco license?)", "Van-Van Car (Karateco set 2)", MACHINE_SUPPORTS_SAVE ) // "
 
-GAME( 1983, bwcasino, 0,        acitya,   bwcasino, driver_device, 0,        ROT90,  "Epos Corporation", "Boardwalk Casino", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, acitya,   bwcasino, acitya,   acitya,   driver_device, 0,        ROT90,  "Epos Corporation", "Atlantic City Action", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, bwcasino, 0,        acitya,   bwcasino, pacman_state,  0,        ROT90,  "Epos Corporation", "Boardwalk Casino", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, acitya,   bwcasino, acitya,   acitya,   pacman_state,  0,        ROT90,  "Epos Corporation", "Atlantic City Action", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, theglobp, suprglob, theglobp, theglobp, driver_device, 0,        ROT90,  "Epos Corporation", "The Glob (Pac-Man hardware)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, sprglobp, suprglob, theglobp, theglobp, driver_device, 0,        ROT90,  "Epos Corporation", "Super Glob (Pac-Man hardware)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, sprglbpg, suprglob, pacman,   theglobp, driver_device, 0,        ROT90,  "bootleg", "Super Glob (Pac-Man hardware) (German bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, beastfp,  suprglob, theglobp, theglobp, driver_device, 0,        ROT90,  "Epos Corporation", "Beastie Feastie (conversion kit)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, eeekk,    0,        eeekk,    eeekk,    driver_device, 0,        ROT90,  "Epos Corporation", "Eeekk!", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, theglobp, suprglob, theglobp, theglobp, pacman_state,  0,        ROT90,  "Epos Corporation", "The Glob (Pac-Man hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, sprglobp, suprglob, theglobp, theglobp, pacman_state,  0,        ROT90,  "Epos Corporation", "Super Glob (Pac-Man hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sprglbpg, suprglob, pacman,   theglobp, pacman_state,  0,        ROT90,  "bootleg (Software Labor)", "Super Glob (Pac-Man hardware) (German bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, beastfp,  suprglob, theglobp, theglobp, pacman_state,  0,        ROT90,  "Epos Corporation", "Beastie Feastie (conversion kit)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, eeekk,    0,        eeekk,    eeekk,    pacman_state,  0,        ROT90,  "Epos Corporation", "Eeekk!", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1984, drivfrcp, 0,        drivfrcp, drivfrcp, pacman_state,  drivfrcp, ROT90,  "Shinkai Inc. (Magic Electronics Inc. license)", "Driving Force (Pac-Man conversion)", MACHINE_SUPPORTS_SAVE )
 
@@ -7357,15 +7410,15 @@ GAME( 1985, porky,    0,        porky,    porky,    pacman_state,  porky,    ROT
 
 GAME( 1986, rocktrv2, 0,        rocktrv2, rocktrv2, pacman_state,  rocktrv2, ROT90,  "Triumph Software Inc.", "MTV Rock-N-Roll Trivia (Part 2)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1986, bigbucks, 0,        bigbucks, bigbucks, driver_device, 0,        ROT90,  "Dynasoft Inc.", "Big Bucks", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, bigbucks, 0,        bigbucks, bigbucks, pacman_state,  0,        ROT90,  "Dynasoft Inc.", "Big Bucks", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, numcrash, 0,        numcrash, numcrash, driver_device, 0,        ROT90,  "Hanshin Goraku / Peni", "Number Crash", MACHINE_SUPPORTS_SAVE ) // "Peni soft" related?
+GAME( 1983, numcrash, 0,        numcrash, numcrash, pacman_state,  0,        ROT90,  "Hanshin Goraku / Peni", "Number Crash", MACHINE_SUPPORTS_SAVE ) // "Peni soft" related?
 
 GAME( 1985, cannonbp, 0,        pacman,   cannonbp, pacman_state,  cannonbp, ROT90,  "Novomatic", "Cannon Ball (Pac-Man Hardware)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1999, superabc, 0,        superabc, superabc, pacman_state,  superabc, ROT90,  "hack (Two-Bit Score)", "Super ABC (Pac-Man multigame kit, Sep. 03 1999)", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, superabco,superabc, superabc, superabc, pacman_state,  superabc, ROT90,  "hack (Two-Bit Score)", "Super ABC (Pac-Man multigame kit, Mar. 08 1999)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1981, pengojpm, pengo,    pengojpm, pengojpm, driver_device, 0,        ROT90,  "bootleg", "Pengo (bootleg on Pac-Man hardware, set 1)", MACHINE_SUPPORTS_SAVE ) // conversion of pacmanjpm board with wire mods
-GAME( 1981, pengopac, pengo,    pengojpm, pengojpm, driver_device, 0,        ROT90,  "bootleg", "Pengo (bootleg on Pac-Man hardware, set 2)", MACHINE_SUPPORTS_SAVE ) // different conversion?
-GAME( 1982, pinguinos, pengo,    pengojpm, pengojpm, driver_device, 0,       ROT90,  "bootleg (Aincar)", "Pinguinos (Spanish bootleg on Pac-Man hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, pengojpm, pengo,    pengojpm, pengojpm, pacman_state,  0,        ROT90,  "bootleg", "Pengo (bootleg on Pac-Man hardware, set 1)", MACHINE_SUPPORTS_SAVE ) // conversion of pacmanjpm board with wire mods
+GAME( 1981, pengopac, pengo,    pengojpm, pengojpm, pacman_state,  0,        ROT90,  "bootleg", "Pengo (bootleg on Pac-Man hardware, set 2)", MACHINE_SUPPORTS_SAVE ) // different conversion?
+GAME( 1982, pinguinos,pengo,    pengojpm, pengojpm, pacman_state,  0,        ROT90,  "bootleg (Aincar)", "Pinguinos (Spanish bootleg on Pac-Man hardware)", MACHINE_SUPPORTS_SAVE )

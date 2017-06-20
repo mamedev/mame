@@ -23,14 +23,17 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/gradius3.h"
+#include "includes/konamipt.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/ym2151.h"
-#include "includes/konamipt.h"
-#include "includes/gradius3.h"
+
+#include "speaker.h"
+
 
 READ16_MEMBER(gradius3_state::k052109_halfword_r)
 {
@@ -271,7 +274,7 @@ void gradius3_state::machine_reset()
 
 }
 
-static MACHINE_CONFIG_START( gradius3, gradius3_state )
+static MACHINE_CONFIG_START( gradius3 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
@@ -506,7 +509,7 @@ ROM_END
 
 
 
-GAME( 1989, gradius3,  0,        gradius3, gradius3, driver_device, 0, ROT0, "Konami", "Gradius III (World, program code R)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, gradius3j, gradius3, gradius3, gradius3, driver_device, 0, ROT0, "Konami", "Gradius III (Japan, program code S)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, gradius3js, gradius3, gradius3, gradius3, driver_device, 0, ROT0, "Konami", "Gradius III (Japan, program code S, split)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, gradius3a, gradius3, gradius3, gradius3, driver_device, 0, ROT0, "Konami", "Gradius III (Asia)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, gradius3,   0,        gradius3, gradius3, gradius3_state, 0, ROT0, "Konami", "Gradius III (World, program code R)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1989, gradius3j,  gradius3, gradius3, gradius3, gradius3_state, 0, ROT0, "Konami", "Gradius III (Japan, program code S)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1989, gradius3js, gradius3, gradius3, gradius3, gradius3_state, 0, ROT0, "Konami", "Gradius III (Japan, program code S, split)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, gradius3a,  gradius3, gradius3, gradius3, gradius3_state, 0, ROT0, "Konami", "Gradius III (Asia)",                         MACHINE_SUPPORTS_SAVE )

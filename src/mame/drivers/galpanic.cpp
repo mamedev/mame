@@ -7,13 +7,13 @@ Gals Panic       1990 Kaneko
 driver by Nicola Salmoria
 
 The version of Gals Panic in this driver is the one using the PANDORA chip
-for sprites, other boardsets use a different sprite chip, see expro02.c
+for sprites, other boardsets use a different sprite chip, see expro02.cpp
 
 
 Notes about Gals Panic:
 -----------------------
-The current ROM set is strange because two ROMs overlap two others replacing
-the program.
+The current unprotected ROM set is strange because two ROMs overlap two others
+replacing the program.
 
 It's definitely a Kaneko boardset, but it could very well be they converted
 some other game to run Gals Panic, because there's some ROMs piggybacked
@@ -52,7 +52,7 @@ Stephh's additional notes :
       * In this version, there is a "Coin Mode" Dip Switch, but no
         "Character Test" Dip Switch.
       * Area 0xe00000-0xe00014 is a "calculator" area. I've tried to
-        simulate it (see machine/kaneko_hit.c) by comparing the code
+        simulate it (see machine/kaneko_hit.cpp) by comparing the code
         with the other set. I don't know if there are some other unmapped
         reads, but the game seems to run fine with what I've done.
       * When you press the "Tilt" button, the game enters in an endless
@@ -66,21 +66,24 @@ Stephh's additional notes :
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
+#include "includes/galpanic.h"
+#include "includes/galpnipt.h"
 #include "includes/kaneko16.h"
+
+#include "cpu/m68000/m68000.h"
 #include "machine/watchdog.h"
 #include "sound/okim6295.h"
 #include "video/kan_pand.h"
 #include "machine/kaneko_hit.h"
-#include "includes/galpanic.h"
-#include "includes/galpnipt.h"
+#include "speaker.h"
+
 
 void galpanic_state::machine_start()
 {
 	membank("okibank")->configure_entries(0, 16, memregion("oki")->base(), 0x10000);
 }
 
-void galpanic_state::screen_eof(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(galpanic_state::screen_vblank)
 {
 	// rising edge
 	if (state)
@@ -147,9 +150,12 @@ static ADDRESS_MAP_START( galpanic_map, AS_PROGRAM, 16, galpanic_state )
 	AM_RANGE(0xb00000, 0xb00001) AM_WRITENOP    /* ??? */
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITENOP    /* ??? */
 	AM_RANGE(0xd00000, 0xd00001) AM_WRITENOP    /* ??? */
-	AM_RANGE(0xe00000, 0xe00015) AM_DEVREADWRITE("calc1_mcu", kaneko_hit_device, kaneko_hit_r,kaneko_hit_w)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( galpanica_map, AS_PROGRAM, 16, galpanic_state )
+	AM_IMPORT_FROM(galpanic_map)
+	AM_RANGE(0xe00000, 0xe00015) AM_DEVREADWRITE("calc1_mcu", kaneko_hit_device, kaneko_hit_r,kaneko_hit_w)
+ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( galpanic_oki_map, AS_0, 8, galpanic_state )
 	AM_RANGE(0x00000, 0x2ffff) AM_ROM
@@ -224,7 +230,7 @@ static GFXDECODE_START( galpanic )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( galpanic, galpanic_state )
+static MACHINE_CONFIG_START( galpanic )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz) /* verified on pcb */
@@ -240,7 +246,7 @@ static MACHINE_CONFIG_START( galpanic, galpanic_state )
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(galpanic_state, screen_update)
-	MCFG_SCREEN_VBLANK_DRIVER(galpanic_state, screen_eof)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(galpanic_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", galpanic)
@@ -252,21 +258,22 @@ static MACHINE_CONFIG_START( galpanic, galpanic_state )
 	MCFG_KANEKO_PANDORA_OFFSETS(0, -16)
 	MCFG_KANEKO_PANDORA_GFXDECODE("gfxdecode")
 
-	MCFG_DEVICE_ADD("calc1_mcu", KANEKO_HIT, 0)
-	kaneko_hit_device::set_type(*device, 0);
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_12MHz/6, OKIM6295_PIN7_LOW) /* verified on pcb */
+	MCFG_OKIM6295_ADD("oki", XTAL_12MHz/6, PIN7_LOW) /* verified on pcb */
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, galpanic_oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( galpanica, galpanic )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(galpanica_map)
 
 	/* basic machine hardware */
+	MCFG_DEVICE_ADD("calc1_mcu", KANEKO_HIT, 0)
+	kaneko_hit_device::set_type(*device, 0);
 
 	/* arm watchdog */
 	MCFG_WATCHDOG_MODIFY("watchdog")
@@ -322,5 +329,26 @@ ROM_START( galpanica ) /* PAMERA-04 PCB with the CALC1 MCU used */
 	ROM_LOAD( "pm007e.u",     0x80000, 0x80000, CRC(c7ed7950) SHA1(133258b058d3c562208d0d00b9fac71202647c32) )
 ROM_END
 
-GAME( 1990, galpanic, 0,        galpanic, galpanic,  driver_device, 0, ROT90, "Kaneko",                   "Gals Panic (Unprotected)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, galpanica,galpanic, galpanica,galpanica, driver_device, 0, ROT90, "Kaneko",                   "Gals Panic (MCU Protected)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+ROM_START( galpanicb ) /* PAMERA-04 PCB with the CALC1 MCU used */
+	ROM_REGION( 0x400000, "maincpu", 0 )    /* 68000 code */
+	ROM_LOAD16_BYTE( "pm109p.u88-01.ic6", 0x000000, 0x20000, CRC(a6d60dba) SHA1(2a63642709051c27b9a366c433127426bb579c35) ) // read as 27C010
+	ROM_LOAD16_BYTE( "pm110p.u87-01.ic5", 0x000001, 0x20000, CRC(3214fd48) SHA1(d8d77cb6b74caea2545f4e62eb9223aaf770785a) ) // read as 27C010
+	ROM_LOAD16_BYTE( "pm004e.8",          0x100001, 0x80000, CRC(d3af52bc) SHA1(46be057106388578defecab1cdd1793ec76ebe92) )
+	ROM_LOAD16_BYTE( "pm005e.7",          0x100000, 0x80000, CRC(d7ec650c) SHA1(6c2250c74381497154bf516e0cf1db6bb56bb446) )
+	ROM_LOAD16_BYTE( "pm000e.15",         0x200001, 0x80000, CRC(5d220f3f) SHA1(7ff373e01027c8832712f7a2d732f8e49b875878) )
+	ROM_LOAD16_BYTE( "pm001e.14",         0x200000, 0x80000, CRC(90433eb1) SHA1(8688a85747ad9ecac395d782f130baa64fb9d12b) )
+	ROM_LOAD16_BYTE( "pm002e.17",         0x300001, 0x80000, CRC(713ee898) SHA1(c9f608a57fb90e5ee15eb76a74a7afcc406d5b4e) )
+	ROM_LOAD16_BYTE( "pm003e.16",         0x300000, 0x80000, CRC(6bb060fd) SHA1(4fc3946866c5a55e8340b62b5ad9beae723ce0da) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )   /* sprites */
+	ROM_LOAD( "pm006e.67",    0x000000, 0x100000, CRC(57aec037) SHA1(e6ba095b6892d4dcd76ba3343a97dd98ae29dc24) )
+
+	ROM_REGION( 0x100000, "oki", 0 )    /* OKIM6295 samples */
+	/* 00000-2ffff is fixed, 30000-3ffff is bank switched from all the ROMs */
+	ROM_LOAD( "pm008e.l",     0x00000, 0x80000, CRC(d9379ba8) SHA1(5ae7c743319b1a12f2b101a9f0f8fe0728ed1476) )
+	ROM_LOAD( "pm007e.u",     0x80000, 0x80000, CRC(c7ed7950) SHA1(133258b058d3c562208d0d00b9fac71202647c32) )
+ROM_END
+
+GAME( 1990, galpanic,  0,        galpanic,  galpanic,  galpanic_state, 0, ROT90, "Kaneko", "Gals Panic (Unprotected)",          MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, galpanica, galpanic, galpanica, galpanica, galpanic_state, 0, ROT90, "Kaneko", "Gals Panic (MCU Protected, set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, galpanicb, galpanic, galpanica, galpanica, galpanic_state, 0, ROT90, "Kaneko", "Gals Panic (MCU Protected, set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

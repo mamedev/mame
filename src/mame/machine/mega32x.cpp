@@ -202,27 +202,49 @@ GFX check (these don't explicitly fails):
 #include "sound/volt_reg.h"
 
 
-const device_type SEGA_32X_NTSC = &device_creator<sega_32x_ntsc_device>;
-const device_type SEGA_32X_PAL = &device_creator<sega_32x_pal_device>;
+// Fifa96 needs the CPUs swapped for the gameplay to enter due to some race conditions
+// when using the DRC core.  Needs further investigation, the non-DRC core works either
+// way
+#define _32X_SWAP_MASTER_SLAVE_HACK
+#define _32X_COMMS_PORT_SYNC 0
+#define MAX_HPOSITION 480
+/* need to make some pwm stuff part of device */
+#define PWM_FIFO_SIZE m_pwm_tm_reg // guess, Marsch calls this register as FIFO width
+#define PWM_CLOCK m_32x_pal ? ((MASTER_CLOCK_PAL*3) / 7) : ((MASTER_CLOCK_NTSC*3) / 7)
 
-sega_32x_device::sega_32x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+
+
+#define SH2_VRES_IRQ_LEVEL 14
+#define SH2_VINT_IRQ_LEVEL 12
+#define SH2_HINT_IRQ_LEVEL 10
+#define SH2_CINT_IRQ_LEVEL 8
+#define SH2_PINT_IRQ_LEVEL 6
+
+#define MASTER_CLOCK_NTSC 53693175
+#define MASTER_CLOCK_PAL  53203424
+
+
+DEFINE_DEVICE_TYPE(SEGA_32X_NTSC, sega_32x_ntsc_device, "sega_32x_ntsc", "Sega 32X (NTSC)")
+DEFINE_DEVICE_TYPE(SEGA_32X_PAL,  sega_32x_pal_device,  "sega_32x_pal",  "Sega 32X (PAL)")
+
+sega_32x_device::sega_32x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, m_sh2_shared(*this, "sh2_shared")
 	, m_master_cpu(*this, "32x_master_sh2")
 	, m_slave_cpu(*this, "32x_slave_sh2")
 	, m_ldac(*this, "ldac")
 	, m_rdac(*this, "rdac")
-	, m_sh2_shared(*this, "sh2_shared")
 	, m_palette(*this, finder_base::DUMMY_TAG)
 {
 }
 
 sega_32x_ntsc_device::sega_32x_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sega_32x_device(mconfig, SEGA_32X_NTSC, "sega_32x_ntsc", tag, owner, clock, "sega_32x_ntsc", __FILE__)
+	: sega_32x_device(mconfig, SEGA_32X_NTSC, tag, owner, clock)
 {
 }
 
 sega_32x_pal_device::sega_32x_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sega_32x_device(mconfig, SEGA_32X_PAL, "sega_32x_pal", tag, owner, clock, "sega_32x_pal", __FILE__)
+	: sega_32x_device(mconfig, SEGA_32X_PAL, tag, owner, clock)
 {
 }
 
@@ -1749,7 +1771,7 @@ const rom_entry *sega_32x_device::device_rom_region() const
 #define _32X_INTERLEAVE_LEVEL \
 	MCFG_QUANTUM_TIME(attotime::from_hz(1800000))
 
-static MACHINE_CONFIG_FRAGMENT( _32x_ntsc )
+MACHINE_CONFIG_MEMBER( sega_32x_ntsc_device::device_add_mconfig )
 
 #ifndef _32X_SWAP_MASTER_SLAVE_HACK
 	MCFG_CPU_ADD("32x_master_sh2", SH2, (MASTER_CLOCK_NTSC*3)/7 )
@@ -1779,7 +1801,7 @@ static MACHINE_CONFIG_FRAGMENT( _32x_ntsc )
 	_32X_INTERLEAVE_LEVEL
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( _32x_pal )
+MACHINE_CONFIG_MEMBER( sega_32x_pal_device::device_add_mconfig )
 
 #ifndef _32X_SWAP_MASTER_SLAVE_HACK
 	MCFG_CPU_ADD("32x_master_sh2", SH2, (MASTER_CLOCK_PAL*3)/7 )
@@ -1808,18 +1830,6 @@ static MACHINE_CONFIG_FRAGMENT( _32x_pal )
 
 	_32X_INTERLEAVE_LEVEL
 MACHINE_CONFIG_END
-
-
-
-machine_config_constructor sega_32x_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( _32x_ntsc );
-}
-
-machine_config_constructor sega_32x_pal_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( _32x_pal );
-}
 
 
 void sega_32x_device::device_start()

@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "printer.h"
 #include "bus/centronics/printer.h"
 
@@ -23,7 +24,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type COMX_PRN = &device_creator<comx_prn_device>;
+DEFINE_DEVICE_TYPE(COMX_PRN, comx_prn_device, "comx_prn", "COMX-35 Printer Card")
 
 
 //-------------------------------------------------
@@ -51,10 +52,10 @@ const tiny_rom_entry *comx_prn_device::device_rom_region() const
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( comx_prn )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( comx_prn )
+MACHINE_CONFIG_MEMBER( comx_prn_device::device_add_mconfig )
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit0))
 	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit1))
@@ -64,17 +65,6 @@ static MACHINE_CONFIG_FRAGMENT( comx_prn )
 
 	MCFG_DEVICE_ADD("cent_status_in", INPUT_BUFFER, 0)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor comx_prn_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( comx_prn );
-}
 
 
 
@@ -87,7 +77,7 @@ machine_config_constructor comx_prn_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 comx_prn_device::comx_prn_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, COMX_PRN, "COMX-35 Printer Card", tag, owner, clock, "comx_prn", __FILE__),
+	device_t(mconfig, COMX_PRN, tag, owner, clock),
 	device_comx_expansion_card_interface(mconfig, *this),
 	m_centronics(*this, CENTRONICS_TAG),
 	m_cent_data_out(*this, "cent_data_out"),

@@ -12,8 +12,8 @@
 #include "cpu/i8085/i8085.h"
 #include "video/i8275.h"
 #include "machine/keyboard.h"
+#include "screen.h"
 
-#define KEYBOARD_TAG "keyboard"
 
 class ipds_state : public driver_device
 {
@@ -33,7 +33,7 @@ public:
 	DECLARE_READ8_MEMBER(ipds_b1_r);
 	DECLARE_READ8_MEMBER(ipds_c0_r);
 	DECLARE_WRITE8_MEMBER(ipds_b1_w);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	void kbd_put(u8 data);
 	I8275_DRAW_CHARACTER_MEMBER( crtc_display_pixels );
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
@@ -121,12 +121,12 @@ static GFXDECODE_START( ipds )
 GFXDECODE_END
 
 
-WRITE8_MEMBER( ipds_state::kbd_put )
+void ipds_state::kbd_put(u8 data)
 {
 	m_term_data = data;
 }
 
-static MACHINE_CONFIG_START( ipds, ipds_state )
+static MACHINE_CONFIG_START( ipds )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8085A, XTAL_19_6608MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(ipds_mem)
@@ -146,8 +146,8 @@ static MACHINE_CONFIG_START( ipds, ipds_state )
 	MCFG_I8275_CHARACTER_WIDTH(6)
 	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(ipds_state, crtc_display_pixels)
 
-	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(WRITE8(ipds_state, kbd_put))
+	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
+	MCFG_GENERIC_KEYBOARD_CB(PUT(ipds_state, kbd_put))
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -164,5 +164,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT   COMPANY   FULLNAME       FLAGS */
-COMP( 1982, ipds,  0,       0,       ipds,  ipds, driver_device,     0,     "Intel",   "iPDS",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME   PARENT  COMPAT   MACHINE  INPUT  STATE        INIT   COMPANY   FULLNAME  FLAGS */
+COMP( 1982, ipds,  0,      0,       ipds,    ipds,  ipds_state,  0,     "Intel",  "iPDS",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

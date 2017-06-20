@@ -5,6 +5,7 @@
  *   Xerox AltoII RAM related functions
  *
  *****************************************************************************/
+#include "emu.h"
 #include "alto2cpu.h"
 
 #define DEBUG_WRTRAM        0       //!< define to 1 to print CRAM writes

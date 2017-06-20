@@ -273,10 +273,12 @@ Notes:
 
 #include "emu.h"
 #include "includes/segaorun.h"
+#include "includes/segaipt.h"
+
 #include "machine/fd1089.h"
 #include "sound/ym2151.h"
 #include "sound/segapcm.h"
-#include "includes/segaipt.h"
+#include "speaker.h"
 
 #include "outrun.lh"
 
@@ -608,7 +610,7 @@ void segaorun_state::device_timer(emu_timer &timer, device_timer_id id, int para
 				case 65:
 				case 129:
 				case 193:
-					timer_set(m_screen->time_until_pos(scanline, m_screen->visible_area().max_x + 1), TID_IRQ2_GEN);
+					m_irq2_gen_timer->adjust(m_screen->time_until_pos(scanline, m_screen->visible_area().max_x + 1));
 					next_scanline = scanline + 1;
 					break;
 
@@ -1008,6 +1010,20 @@ static INPUT_PORTS_START( outrun )
 	PORT_DIPSETTING(    0x00, DEF_STR( Unused ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( outruneh )
+	PORT_INCLUDE( outrun_generic )
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SWB:1,2")
+	PORT_DIPSETTING(    0x03, "Moving" )
+	PORT_DIPSETTING(    0x02, "Up Cockpit" )
+	PORT_DIPSETTING(    0x01, "Mini Up" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Unused ) )
+	PORT_DIPNAME( 0x08, 0x08, "Speed Indicator" )  PORT_DIPLOCATION("SWB:4")
+	PORT_DIPSETTING(    0x08, "km/h" )
+	PORT_DIPSETTING(    0x00, "MPH" )
+INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( outrundx )
 	PORT_INCLUDE( outrun_generic )
@@ -1020,6 +1036,22 @@ static INPUT_PORTS_START( outrundx )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPUNUSED_DIPLOC( 0x04, IP_ACTIVE_LOW, "SWB:3" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( outrundxeh )
+	PORT_INCLUDE( outrun_generic )
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SWB:1")
+	PORT_DIPSETTING(    0x00, "Not Moving" )
+	PORT_DIPSETTING(    0x01, "Moving" )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SWB:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x04, IP_ACTIVE_LOW, "SWB:3" )
+	PORT_DIPNAME( 0x08, 0x08, "Speed Indicator" )  PORT_DIPLOCATION("SWB:4")
+	PORT_DIPSETTING(    0x08, "km/h" )
+	PORT_DIPSETTING(    0x00, "MPH" )
 INPUT_PORTS_END
 
 
@@ -1151,7 +1183,7 @@ GFXDECODE_END
 //  GENERIC MACHINE DRIVERS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( outrun_base, segaorun_state )
+static MACHINE_CONFIG_START( outrun_base )
 
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK/4)
@@ -2893,6 +2925,8 @@ DRIVER_INIT_MEMBER(segaorun_state,generic)
 	// allocate a scanline timer
 	m_scanline_timer = timer_alloc(TID_SCANLINE);
 
+	m_irq2_gen_timer = timer_alloc(TID_IRQ2_GEN);
+
 	// configure the NVRAM to point to our workram
 	if (m_nvram != nullptr)
 		m_nvram->set_base(m_workram, m_workram.bytes());
@@ -3003,5 +3037,5 @@ GAME( 1987, shangon3d, shangon, shangon,  shangon,  segaorun_state,shangon, ROT0
 
 // aftermarket modifications, these fix various issues in the game, including making the attract mode work correctly when set to Free Play.
 // see http://reassembler.blogspot.co.uk/2011/08/outrun-enhanced-edition.html
-GAMEL(2013, outrundxeh,  outrun,  outrun,          outrundx, segaorun_state,outrun,  ROT0,   "hack (Chris White)",    "Out Run (deluxe sitdown) (Enhanced Edition v1.0.3)", 0,                                layout_outrun ) // Jan 2013
-GAMEL(2014, outruneh,    outrun,  outrun,          outrun,   segaorun_state,outrun,  ROT0,   "hack (Chris White)",    "Out Run (sitdown/upright, Rev B) (Enhanced Edition v1.1.0)", 0,                        layout_outrun ) // Upright/Sitdown determined by dipswitch settings - July 2014
+GAMEL(2013, outrundxeh,  outrun,  outrun,        outrundxeh, segaorun_state,outrun,  ROT0,   "hack (Chris White)",    "Out Run (deluxe sitdown) (Enhanced Edition v1.0.3)", 0,                                layout_outrun ) // Jan 2013
+GAMEL(2014, outruneh,    outrun,  outrun,        outruneh,   segaorun_state,outrun,  ROT0,   "hack (Chris White)",    "Out Run (sitdown/upright, Rev B) (Enhanced Edition v1.1.0)", 0,                        layout_outrun ) // Upright/Sitdown determined by dipswitch settings - July 2014

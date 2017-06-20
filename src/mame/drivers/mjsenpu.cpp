@@ -44,9 +44,11 @@
 
 #include "emu.h"
 #include "cpu/e132xs/e132xs.h"
-#include "sound/okim6295.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
+#include "sound/okim6295.h"
+#include "screen.h"
+#include "speaker.h"
 
 class mjsenpu_state : public driver_device
 {
@@ -452,7 +454,7 @@ following clocks are on the PCB
 
 */
 
-static MACHINE_CONFIG_START( mjsenpu, mjsenpu_state )
+static MACHINE_CONFIG_START( mjsenpu )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", E132XT, 27000000*2) /* ?? Mhz */
@@ -478,7 +480,7 @@ static MACHINE_CONFIG_START( mjsenpu, mjsenpu_state )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH) /* 1 Mhz? */
+	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH) /* 1 Mhz? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 

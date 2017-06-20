@@ -22,25 +22,29 @@
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "screen.h"
 
 
 class beehive_state : public driver_device
 {
 public:
 	beehive_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_p_videoram(*this, "videoram"){ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_p_videoram(*this, "videoram")
+		, m_p_chargen(*this, "chargen")
+		{ }
 
-	required_device<cpu_device> m_maincpu;
 	DECLARE_READ8_MEMBER(beehive_60_r);
 	DECLARE_WRITE8_MEMBER(beehive_62_w);
-	const uint8_t *m_p_chargen;
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+private:
+	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_p_videoram;
+	required_region_ptr<u8> m_p_chargen;
 	uint8_t m_keyline;
 	virtual void machine_reset() override;
-	virtual void video_start() override;
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 READ8_MEMBER(beehive_state::beehive_60_r)
@@ -229,11 +233,6 @@ void beehive_state::machine_reset()
 {
 }
 
-void beehive_state::video_start()
-{
-	m_p_chargen = memregion("chargen")->base();
-}
-
 /* This system appears to have inline attribute bytes of unknown meaning.
     Currently they are ignored. */
 uint32_t beehive_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -286,7 +285,7 @@ uint32_t beehive_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-static MACHINE_CONFIG_START( beehive, beehive_state )
+static MACHINE_CONFIG_START( beehive )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8085A, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(beehive_mem)
@@ -318,5 +317,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1982, beehive, 0,      0,       beehive,   beehive, driver_device, 0,     "BeeHive", "DM3270", MACHINE_NO_SOUND)
+//    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT    STATE          INIT   COMPANY    FULLNAME  FLAGS
+COMP( 1982, beehive, 0,      0,       beehive,   beehive, beehive_state, 0,     "BeeHive", "DM3270", MACHINE_NO_SOUND)

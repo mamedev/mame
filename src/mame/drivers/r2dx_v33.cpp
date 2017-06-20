@@ -63,14 +63,18 @@ Then it puts settings at 0x9e08 and 0x9e0a (bp 91acb)
 */
 
 #include "emu.h"
+#include "includes/raiden2.h"
+
 #include "cpu/nec/nec.h"
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
 #include "sound/3812intf.h"
 //#include "sound/ym2151.h"
 #include "sound/okim6295.h"
-#include "includes/raiden2.h"
 #include "machine/r2crypt.h"
+
+#include "screen.h"
+#include "speaker.h"
 
 
 class r2dx_v33_state : public raiden2_state
@@ -760,7 +764,7 @@ static ADDRESS_MAP_START( r2dx_oki_map, AS_0, 8, r2dx_v33_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_ROMBANK("okibank")
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( rdx_v33, r2dx_v33_state )
+static MACHINE_CONFIG_START( rdx_v33 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V33, 32000000/2 ) // ?
@@ -792,12 +796,12 @@ static MACHINE_CONFIG_START( rdx_v33, r2dx_v33_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_28_63636MHz/28, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL_28_63636MHz/28, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, r2dx_oki_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( nzerotea, r2dx_v33_state )
+static MACHINE_CONFIG_START( nzerotea )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V33,XTAL_32MHz/2) /* verified on pcb */
@@ -834,7 +838,7 @@ static MACHINE_CONFIG_START( nzerotea, r2dx_v33_state )
 	MCFG_YM3812_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", 1320000, OKIM6295_PIN7_LOW)
+	MCFG_OKIM6295_ADD("oki", 1320000, PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)

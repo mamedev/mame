@@ -73,12 +73,14 @@ TODO:
 ******************************************************************************/
 
 #include "emu.h"
+#include "includes/inufuku.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
 #include "sound/2610intf.h"
-#include "video/vsystem_spr.h"
-#include "includes/inufuku.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /******************************************************************************
@@ -86,25 +88,6 @@ TODO:
     Sound CPU interface
 
 ******************************************************************************/
-
-WRITE16_MEMBER(inufuku_state::inufuku_soundcommand_w)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		/* hack... sound doesn't work otherwise */
-		if (data == 0x08)
-			return;
-
-		m_pending_command = 1;
-		m_soundlatch->write(space, 0, data & 0xff);
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-	}
-}
-
-WRITE8_MEMBER(inufuku_state::pending_command_clear_w)
-{
-	m_pending_command = 0;
-}
 
 WRITE8_MEMBER(inufuku_state::inufuku_soundrombank_w)
 {
@@ -119,9 +102,7 @@ WRITE8_MEMBER(inufuku_state::inufuku_soundrombank_w)
 
 CUSTOM_INPUT_MEMBER(inufuku_state::soundflag_r)
 {
-	uint16_t soundflag = m_pending_command ? 0 : 1;
-
-	return soundflag;
+	return m_soundlatch->pending_r() ? 0 : 1;
 }
 
 /******************************************************************************
@@ -143,7 +124,7 @@ static ADDRESS_MAP_START( inufuku_map, AS_PROGRAM, 16, inufuku_state )
 	AM_RANGE(0x18000a, 0x18000b) AM_READ_PORT("P3")
 
 	AM_RANGE(0x200000, 0x200001) AM_WRITE_PORT("EEPROMOUT")
-	AM_RANGE(0x280000, 0x280001) AM_WRITE(inufuku_soundcommand_w)   // sound command
+	AM_RANGE(0x280000, 0x280001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)   // sound command
 
 	AM_RANGE(0x300000, 0x301fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")                        // palette ram
 	AM_RANGE(0x380000, 0x3801ff) AM_WRITEONLY AM_SHARE("bg_rasterram")                                  // bg raster ram
@@ -177,7 +158,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( inufuku_sound_io_map, AS_IO, 8, inufuku_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(inufuku_soundrombank_w)
-	AM_RANGE(0x04, 0x04) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(pending_command_clear_w)
+	AM_RANGE(0x04, 0x04) AM_DEVREADWRITE("soundlatch", generic_latch_8_device, read, acknowledge_w)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
 ADDRESS_MAP_END
 
@@ -329,8 +310,6 @@ void inufuku_state::machine_start()
 	membank("bank1")->configure_entries(0, 4, &ROM[0x00000], 0x8000);
 	membank("bank1")->set_entry(0);
 
-
-	save_item(NAME(m_pending_command));
 	save_item(NAME(m_bg_scrollx));
 	save_item(NAME(m_bg_scrolly));
 	save_item(NAME(m_tx_scrollx));
@@ -342,7 +321,6 @@ void inufuku_state::machine_start()
 
 void inufuku_state::machine_reset()
 {
-	m_pending_command = 1;
 	m_bg_scrollx = 0;
 	m_bg_scrolly = 0;
 	m_tx_scrollx = 0;
@@ -352,7 +330,7 @@ void inufuku_state::machine_reset()
 	m_tx_palettebank = 0;
 }
 
-static MACHINE_CONFIG_START( inufuku, inufuku_state )
+static MACHINE_CONFIG_START( inufuku )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 32000000/2) /* 16.00 MHz */
@@ -374,7 +352,7 @@ static MACHINE_CONFIG_START( inufuku, inufuku_state )
 	MCFG_SCREEN_SIZE(2048, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 223)
 	MCFG_SCREEN_UPDATE_DRIVER(inufuku_state, screen_update_inufuku)
-	MCFG_SCREEN_VBLANK_DRIVER(inufuku_state, screen_eof_inufuku)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(inufuku_state, screen_vblank_inufuku))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("vsystem_spr", VSYSTEM_SPR, 0)
@@ -392,6 +370,8 @@ static MACHINE_CONFIG_START( inufuku, inufuku_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, 32000000/4)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -477,5 +457,5 @@ ROM_END
 
 ******************************************************************************/
 
-GAME( 1998, inufuku, 0, inufuku, inufuku, driver_device, 0, ROT0, "Video System Co.", "Quiz & Variety Sukusuku Inufuku (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, 3on3dunk, 0, _3on3dunk, inufuku, driver_device, 0, ROT0, "Video System Co.", "3 On 3 Dunk Madness (US, prototype? 1997/02/04)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // tilemap priority is wrong in places (basketball before explosion in attract, highscores)
+GAME( 1998, inufuku,  0, inufuku,   inufuku, inufuku_state, 0, ROT0, "Video System Co.", "Quiz & Variety Sukusuku Inufuku (Japan)",         MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, 3on3dunk, 0, _3on3dunk, inufuku, inufuku_state, 0, ROT0, "Video System Co.", "3 On 3 Dunk Madness (US, prototype? 1997/02/04)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // tilemap priority is wrong in places (basketball before explosion in attract, highscores)

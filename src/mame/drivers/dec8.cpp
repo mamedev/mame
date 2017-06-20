@@ -42,16 +42,20 @@ To do:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/dec8.h"
+
+#include "cpu/m6502/m6502.h"
 #include "cpu/m6809/hd6309.h"
 #include "cpu/m6809/m6809.h"
-#include "cpu/m6502/m6502.h"
 #include "cpu/mcs51/mcs51.h"
-#include "sound/2203intf.h"
-#include "sound/3812intf.h"
-#include "sound/3526intf.h"
-#include "sound/msm5205.h"
-#include "includes/dec8.h"
 #include "machine/deco222.h"
+#include "sound/2203intf.h"
+#include "sound/3526intf.h"
+#include "sound/3812intf.h"
+#include "sound/msm5205.h"
+
+#include "screen.h"
+#include "speaker.h"
 
 
 /******************************************************************************/
@@ -68,7 +72,7 @@ WRITE8_MEMBER(dec8_state::dec8_mxc06_karn_buffer_spriteram_w)
 }
 
 /* Only used by ghostb, gondo, garyoret, other games can control buffering */
-void dec8_state::screen_eof_dec8(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(dec8_state::screen_vblank_dec8)
 {
 	// rising edge
 	if (state)
@@ -1983,7 +1987,7 @@ void dec8_state::machine_reset()
 #define DEC8_VBEND 8
 #define DEC8_VBSTART 256-8
 
-static MACHINE_CONFIG_START( lastmisn, dec8_state )
+static MACHINE_CONFIG_START( lastmisn )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 2000000)
@@ -2036,7 +2040,7 @@ static MACHINE_CONFIG_START( lastmisn, dec8_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( shackled, dec8_state )
+static MACHINE_CONFIG_START( shackled )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 2000000)
@@ -2090,7 +2094,7 @@ static MACHINE_CONFIG_START( shackled, dec8_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( gondo, dec8_state )
+static MACHINE_CONFIG_START( gondo )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309,3000000*4) /* HD63C09EP */
@@ -2119,7 +2123,7 @@ static MACHINE_CONFIG_START( gondo, dec8_state )
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_RAW_PARAMS(DEC8_PIXEL_CLOCK, DEC8_HTOTAL, DEC8_HBEND, DEC8_HBSTART, DEC8_VTOTAL, DEC8_VBEND, DEC8_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(dec8_state, screen_update_gondo)
-	MCFG_SCREEN_VBLANK_DRIVER(dec8_state, screen_eof_dec8)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(dec8_state, screen_vblank_dec8))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gondo)
@@ -2144,7 +2148,7 @@ static MACHINE_CONFIG_START( gondo, dec8_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( garyoret, dec8_state )
+static MACHINE_CONFIG_START( garyoret )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309,3000000*4) /* HD63C09EP */
@@ -2173,7 +2177,7 @@ static MACHINE_CONFIG_START( garyoret, dec8_state )
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_RAW_PARAMS(DEC8_PIXEL_CLOCK, DEC8_HTOTAL, DEC8_HBEND, DEC8_HBSTART, DEC8_VTOTAL, DEC8_VBEND, DEC8_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(dec8_state, screen_update_garyoret)
-	MCFG_SCREEN_VBLANK_DRIVER(dec8_state, screen_eof_dec8)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(dec8_state, screen_vblank_dec8))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gondo)
@@ -2198,7 +2202,7 @@ static MACHINE_CONFIG_START( garyoret, dec8_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ghostb, dec8_state )
+static MACHINE_CONFIG_START( ghostb )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309, 3000000*4)
@@ -2231,7 +2235,7 @@ static MACHINE_CONFIG_START( ghostb, dec8_state )
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_RAW_PARAMS(DEC8_PIXEL_CLOCK, DEC8_HTOTAL, DEC8_HBEND, DEC8_HBSTART, DEC8_VTOTAL, DEC8_VBEND, DEC8_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(dec8_state, screen_update_ghostb)
-	MCFG_SCREEN_VBLANK_DRIVER(dec8_state, screen_eof_dec8)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(dec8_state, screen_vblank_dec8))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ghostb)
@@ -2262,7 +2266,7 @@ static MACHINE_CONFIG_DERIVED( meikyuh, ghostb )
 	MCFG_CPU_PROGRAM_MAP(dec8_s_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( csilver, dec8_state )
+static MACHINE_CONFIG_START( csilver )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, XTAL_12MHz/8) /* verified on pcb */
@@ -2317,11 +2321,11 @@ static MACHINE_CONFIG_START( csilver, dec8_state )
 
 	MCFG_SOUND_ADD("msm", MSM5205, XTAL_384kHz) /* verified on pcb */
 	MCFG_MSM5205_VCLK_CB(WRITELINE(dec8_state, csilver_adpcm_int))  /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8KHz            */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8KHz            */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.88)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( oscar, dec8_state )
+static MACHINE_CONFIG_START( oscar )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309, XTAL_12MHz/2) /* verified on pcb */
@@ -2379,7 +2383,7 @@ static MACHINE_CONFIG_START( oscar, dec8_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( srdarwin, dec8_state )
+static MACHINE_CONFIG_START( srdarwin )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809,2000000)  /* MC68A09EP */
@@ -2425,7 +2429,7 @@ static MACHINE_CONFIG_START( srdarwin, dec8_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( cobracom, dec8_state )
+static MACHINE_CONFIG_START( cobracom )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 2000000)
@@ -2931,6 +2935,43 @@ ROM_START( ghostb3 )
 	ROM_LOAD( "dz20a.11d", 0x0400, 0x0400, CRC(d8fe2d99) SHA1(56f8fcf2f871c7d52d4299a5b9988401ada4319d) )
 ROM_END
 
+ROM_START( ghostb3a )
+	ROM_REGION( 0x50000, "maincpu", 0 )
+	ROM_LOAD( "dz01-2.1d", 0x08000, 0x08000, CRC(1b16890e) SHA1(eebd253d616b6286937b72cfb64612877f383932) )
+	ROM_LOAD( "dz02-.3d",  0x10000, 0x10000, CRC(8e117541) SHA1(7dfa6eabb29f39a615f3e5123bddcc7197ab82d0) ) // == dz02.3d (ghostb3)
+	ROM_LOAD( "dz03-.4d",  0x20000, 0x10000, CRC(5606a8f4) SHA1(e46e887f13f648fe2162cb853b3c20fa60e3d215) ) // == dz03.4d (ghostb3)
+	ROM_LOAD( "dz04-.6d",  0x30000, 0x10000, CRC(490b4525) SHA1(3066b76f8fe99c8f9f1cdf943209883a199a4184) )
+	ROM_LOAD( "dz05-.7d",  0x40000, 0x10000, CRC(b4971d33) SHA1(25e052c4b414c7bd7b6e3ae9c211873902afb5f7) ) // == dz05-1.7d (ghostb3)
+
+	ROM_REGION( 2*0x10000, "audiocpu", 0 )    /* 64K for sound CPU + 64k for decrypted opcodes */
+	ROM_LOAD( "dz06.5f", 0x8000, 0x8000, CRC(798f56df) SHA1(aee33cd0c102015114e17f6cb98945e7cc806f55) )
+
+	ROM_REGION( 0x1000, "mcu", 0 )    /* ID8751H (fake) MCU */
+	ROM_LOAD( "dz.1b", 0x0000, 0x1000, BAD_DUMP CRC(18b7e1e6) SHA1(46b6d914ecee5e743ac805be1545ca44fb016d7d) )
+
+	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
+	ROM_LOAD( "dz00.16b", 0x00000, 0x08000, CRC(992b4f31) SHA1(a9f255286193ccc261a9b6983aabf3c76ebe5ce5) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )    /* sprites */
+	ROM_LOAD( "dz15.14f", 0x00000, 0x10000, CRC(a01a5fd9) SHA1(c15e11fbc0ede9e4a232abe37e6d221d5789ce8e) )
+	ROM_LOAD( "dz16.15f", 0x10000, 0x10000, CRC(5a9a344a) SHA1(f4e8c2bae023ce996e99383873eba23ab6f972a8) )
+	ROM_LOAD( "dz12.9f",  0x20000, 0x10000, CRC(817fae99) SHA1(4179501aedbdf5bb0824bf1c13e033685e57a207) )
+	ROM_LOAD( "dz14.12f", 0x30000, 0x10000, CRC(0abbf76d) SHA1(fefb0cb7b866452b890bcf8c47b1ed95df35095e) )
+	ROM_LOAD( "dz11.8f",  0x40000, 0x10000, CRC(a5e19c24) SHA1(a4aae81a116577ee3cdd9e1a46cae413ae252b76) )
+	ROM_LOAD( "dz13.1f",  0x50000, 0x10000, CRC(3e7c0405) SHA1(2cdcb9a902acecec0729a906b7edb44baf130d32) )
+	ROM_LOAD( "dz17.17f", 0x60000, 0x10000, CRC(40361b8b) SHA1(6ee59129e236ead3d9b828fb9726311b7a4f2ff6) )
+	ROM_LOAD( "dz18.18f", 0x70000, 0x10000, CRC(8d219489) SHA1(0490ad84085d1a60ece1b8ab45f0c551d2ac219d) )
+
+	ROM_REGION( 0x40000, "gfx3", 0 )    /* tiles */
+	ROM_LOAD( "dz07.12f", 0x00000, 0x10000, CRC(e7455167) SHA1(a4582ced57862563ef626a25ced4072bc2c95750) )
+	ROM_LOAD( "dz08.14f", 0x10000, 0x10000, CRC(32f9ddfe) SHA1(2b8c228b0ca938ab7495d53e1a39275a8b872828) )
+	ROM_LOAD( "dz09.15f", 0x20000, 0x10000, CRC(bb6efc02) SHA1(ec501cd4a624d9c36a545dd100bc4f2f8b1e5cc0) )
+	ROM_LOAD( "dz10.17f", 0x30000, 0x10000, CRC(6ef9963b) SHA1(f12a2e2b0451a118234b2995185bb14d4998d430) )
+
+	ROM_REGION( 0x0800, "proms", 0 )
+	ROM_LOAD( "dz19a.10d", 0x0000, 0x0400, CRC(47e1f83b) SHA1(f073eea1f33ed7a4862e4efd143debf1e0ee64b4) )
+	ROM_LOAD( "dz20a.11d", 0x0400, 0x0400, CRC(d8fe2d99) SHA1(56f8fcf2f871c7d52d4299a5b9988401ada4319d) )
+ROM_END
 
 /*
 Meikyuu Hunter G (also known as Maze Hunter)
@@ -3150,7 +3191,7 @@ ROM_START( meikyuha )
 ROM_END
 
 /*
-Main Compoennts
+Main Components
 ---------------
 
 Top board (DATA EAST DE-0250-3):
@@ -3218,12 +3259,12 @@ ROM_START( csilver )
 
 	ROM_REGION( 0x80000, "gfx2", 0 )    /* sprites (3bpp) */
 	ROM_LOAD( "dx14.15k",  0x00000, 0x10000, CRC(80f07915) SHA1(ea100f12ef3a68110af911fa9beeb73b388f069d) )
-	/* 0x10000-0x1ffff empy */
+	/* 0x10000-0x1ffff empty */
 	ROM_LOAD( "dx13.13k",  0x20000, 0x10000, CRC(d32c02e7) SHA1(d0518ec31e9e3f7b4e76fba5d7c05c33c61a9c72) )
-	/* 0x30000-0x3ffff empy */
+	/* 0x30000-0x3ffff empty */
 	ROM_LOAD( "dx12.10k",  0x40000, 0x10000, CRC(ac78b76b) SHA1(c2be347fd950894401123ada8b27bfcfce53e66b) )
-	/* 0x50000-0x5ffff empy */
-	/* 0x60000-0x7ffff empy (no 4th plane) */
+	/* 0x50000-0x5ffff empty */
+	/* 0x60000-0x7ffff empty (no 4th plane) */
 
 	ROM_REGION( 0x80000, "gfx3", 0 )    /* tiles (3bpp) */
 	ROM_LOAD( "dx06.5f",  0x00000, 0x10000, CRC(b6fb208c) SHA1(027d33f0b5feb6f0433134213cfcef96790eaace) )
@@ -3256,12 +3297,12 @@ ROM_START( csilverj )
 
 	ROM_REGION( 0x80000, "gfx2", 0 )    /* sprites (3bpp) */
 	ROM_LOAD( "dx14.b5",  0x00000, 0x10000, CRC(80f07915) SHA1(ea100f12ef3a68110af911fa9beeb73b388f069d) )
-	/* 0x10000-0x1ffff empy */
+	/* 0x10000-0x1ffff empty */
 	ROM_LOAD( "dx13.b4",  0x20000, 0x10000, CRC(d32c02e7) SHA1(d0518ec31e9e3f7b4e76fba5d7c05c33c61a9c72) )
-	/* 0x30000-0x3ffff empy */
+	/* 0x30000-0x3ffff empty */
 	ROM_LOAD( "dx12.b3",  0x40000, 0x10000, CRC(ac78b76b) SHA1(c2be347fd950894401123ada8b27bfcfce53e66b) )
-	/* 0x50000-0x5ffff empy */
-	/* 0x60000-0x7ffff empy (no 4th plane) */
+	/* 0x50000-0x5ffff empty */
+	/* 0x60000-0x7ffff empty (no 4th plane) */
 
 	ROM_REGION( 0x80000, "gfx3", 0 )    /* tiles (3bpp) */
 	ROM_LOAD( "dx06.a7",  0x00000, 0x10000, CRC(b6fb208c) SHA1(027d33f0b5feb6f0433134213cfcef96790eaace) )
@@ -3270,6 +3311,45 @@ ROM_START( csilverj )
 	ROM_LOAD( "dx09.a10", 0x30000, 0x10000, CRC(3192571d) SHA1(240c6c099f1e6edbf0be7d5a4ec396b056c9f70f) )
 	ROM_LOAD( "dx10.b1",  0x40000, 0x10000, CRC(3ef77a32) SHA1(97b97c35a6ca994d2e7a6e7a63101eda9709bcb1) )
 	ROM_LOAD( "dx11.b2",  0x50000, 0x10000, CRC(9cf3d5b8) SHA1(df4974f8412ab1cf65871b8e4e3dbee478bf4d21) )
+ROM_END
+
+/* Same IC positions to World set */
+
+ROM_START( csilverja ) // DE-0250-3 + DE-0251-2
+	ROM_REGION( 0x48000, "maincpu", 0 )
+	ROM_LOAD( "dx03-1.18d", 0x08000, 0x08000, CRC(d42905be) SHA1(5a406466aa9bb2b2591d02fc87289cb93f7358c6) )
+	ROM_LOAD( "dx01.12d",   0x10000, 0x10000, CRC(570fb50c) SHA1(3002f53182834a060fc282be1bc5767906e19ba2) )
+	ROM_LOAD( "dx02.13d",   0x20000, 0x10000, CRC(58625890) SHA1(503a969085f6dcb16687217c48136ea22d07c89f) )
+
+	ROM_REGION( 0x10000, "sub", 0 )    /* CPU 2, 1st 16k is empty */
+	ROM_LOAD( "dx04-1.19d", 0x0000, 0x10000,  CRC(29432691) SHA1(a76ecd27d217c66a0e43f93e29efe83c657925c3) )
+
+	ROM_REGION( 0x18000, "audiocpu", 0 )
+	ROM_LOAD( "dx05.3f", 0x10000, 0x08000,  CRC(eb32cf25) SHA1(9390c88033259c65eb15320e31f5d696970987cc) )
+	ROM_CONTINUE(   0x08000, 0x08000 )
+
+	ROM_REGION( 0x1000, "mcu", 0 )    /* ID8751H MCU */
+	ROM_LOAD( "id8751h.mcu", 0x0000, 0x1000, NO_DUMP )
+
+	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
+	ROM_LOAD( "dx00.3d",  0x00000, 0x08000, CRC(f01ef985) SHA1(d5b823bd7c0efcf3137f8643c5d99a260bed5675) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )    /* sprites (3bpp) */
+	ROM_LOAD( "dx14.15k",  0x00000, 0x10000, CRC(80f07915) SHA1(ea100f12ef3a68110af911fa9beeb73b388f069d) )
+	/* 0x10000-0x1ffff empty */
+	ROM_LOAD( "dx13.13k",  0x20000, 0x10000, CRC(d32c02e7) SHA1(d0518ec31e9e3f7b4e76fba5d7c05c33c61a9c72) )
+	/* 0x30000-0x3ffff empty */
+	ROM_LOAD( "dx12.10k",  0x40000, 0x10000, CRC(ac78b76b) SHA1(c2be347fd950894401123ada8b27bfcfce53e66b) )
+	/* 0x50000-0x5ffff empty */
+	/* 0x60000-0x7ffff empty (no 4th plane) */
+
+	ROM_REGION( 0x80000, "gfx3", 0 )    /* tiles (3bpp) */
+	ROM_LOAD( "dx06.5f",  0x00000, 0x10000, CRC(b6fb208c) SHA1(027d33f0b5feb6f0433134213cfcef96790eaace) )
+	ROM_LOAD( "dx07.7f",  0x10000, 0x10000, CRC(ee3e1817) SHA1(013496976a9ffacf1587b3a6fc0f548becb1ab0e) )
+	ROM_LOAD( "dx08.8f",  0x20000, 0x10000, CRC(705900fe) SHA1(53b9d09f9780a3bf3545bc27a2855ebee3884124) )
+	ROM_LOAD( "dx09.10f", 0x30000, 0x10000, CRC(3192571d) SHA1(240c6c099f1e6edbf0be7d5a4ec396b056c9f70f) )
+	ROM_LOAD( "dx10.12f",  0x40000, 0x10000, CRC(3ef77a32) SHA1(97b97c35a6ca994d2e7a6e7a63101eda9709bcb1) )
+	ROM_LOAD( "dx11.13f",  0x50000, 0x10000, CRC(9cf3d5b8) SHA1(df4974f8412ab1cf65871b8e4e3dbee478bf4d21) )
 ROM_END
 
 ROM_START( oscar )
@@ -3624,26 +3704,28 @@ DRIVER_INIT_MEMBER(dec8_state,cobracom)
 
 /******************************************************************************/
 
-GAME( 1986, lastmisn, 0,        lastmisn, lastmisn, dec8_state,  lastmisn,    ROT270, "Data East USA", "Last Mission (US revision 6)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, lastmisno,lastmisn, lastmisn, lastmisn, dec8_state,  lastmisn,    ROT270, "Data East USA", "Last Mission (US revision 5)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, lastmisnj,lastmisn, lastmisn, lastmisnj, dec8_state, lastmisn,    ROT270, "Data East Corporation", "Last Mission (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, shackled, 0,        shackled, shackled, dec8_state,  shackled,    ROT0,   "Data East USA", "Shackled (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, breywood, shackled, shackled, breywood, dec8_state,  shackled,    ROT0,   "Data East Corporation", "Breywood (Japan revision 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, gondo,    0,        gondo,    gondo, dec8_state,     gondo,       ROT270, "Data East USA", "Gondomania (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, makyosen, gondo,    gondo,    gondo, dec8_state,     gondo,       ROT270, "Data East Corporation", "Makyou Senshi (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, garyoret, 0,        garyoret, garyoret, dec8_state,  garyoret,    ROT0,   "Data East Corporation", "Garyo Retsuden (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ghostb,   0,        ghostb,   ghostb, dec8_state,    ghostb,      ROT0,   "Data East USA", "The Real Ghostbusters (US 2 Players, revision 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ghostb2a, ghostb,   ghostb,   ghostb2a, dec8_state,  ghostb,      ROT0,   "Data East USA", "The Real Ghostbusters (US 2 Players)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ghostb3,  ghostb,   ghostb,   ghostb3, dec8_state,   ghostb,      ROT0,   "Data East USA", "The Real Ghostbusters (US 3 Players)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, meikyuh,  ghostb,   meikyuh,  meikyuh, dec8_state,   meikyuh,     ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, meikyuha, ghostb,   meikyuh,  meikyuh, dec8_state,   meikyuh,     ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, csilver,  0,        csilver,  csilver, dec8_state,   csilver,     ROT0,   "Data East Corporation", "Captain Silver (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, csilverj, csilver,  csilver,  csilverj, dec8_state,  csilver,     ROT0,   "Data East Corporation", "Captain Silver (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, oscar,    0,        oscar,    oscar, dec8_state,     oscar,       ROT0,   "Data East Corporation", "Psycho-Nics Oscar (World revision 0)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, oscaru,   oscar,    oscar,    oscarj, dec8_state,    oscar,       ROT0,   "Data East USA", "Psycho-Nics Oscar (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, oscarj1,  oscar,    oscar,    oscarj, dec8_state,    oscar,       ROT0,   "Data East Corporation", "Psycho-Nics Oscar (Japan revision 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, oscarj2,  oscar,    oscar,    oscarj, dec8_state,    oscar,       ROT0,   "Data East Corporation", "Psycho-Nics Oscar (Japan revision 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, srdarwin, 0,        srdarwin, srdarwin, dec8_state,  srdarwin,    ROT270, "Data East Corporation", "Super Real Darwin (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, srdarwinj,srdarwin, srdarwin, srdarwinj, dec8_state, srdarwin,    ROT270, "Data East Corporation", "Super Real Darwin (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, cobracom, 0,        cobracom, cobracom, dec8_state,  cobracom,    ROT0,   "Data East Corporation", "Cobra-Command (World revision 5)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, cobracomj,cobracom, cobracom, cobracom, dec8_state,  cobracom,    ROT0,   "Data East Corporation", "Cobra-Command (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, lastmisn,  0,        lastmisn, lastmisn,  dec8_state, lastmisn,    ROT270, "Data East USA",         "Last Mission (US revision 6)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, lastmisno, lastmisn, lastmisn, lastmisn,  dec8_state, lastmisn,    ROT270, "Data East USA",         "Last Mission (US revision 5)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, lastmisnj, lastmisn, lastmisn, lastmisnj, dec8_state, lastmisn,    ROT270, "Data East Corporation", "Last Mission (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, shackled,  0,        shackled, shackled,  dec8_state, shackled,    ROT0,   "Data East USA",         "Shackled (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, breywood,  shackled, shackled, breywood,  dec8_state, shackled,    ROT0,   "Data East Corporation", "Breywood (Japan revision 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, gondo,     0,        gondo,    gondo,     dec8_state, gondo,       ROT270, "Data East USA",         "Gondomania (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, makyosen,  gondo,    gondo,    gondo,     dec8_state, gondo,       ROT270, "Data East Corporation", "Makyou Senshi (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, garyoret,  0,        garyoret, garyoret,  dec8_state, garyoret,    ROT0,   "Data East Corporation", "Garyo Retsuden (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ghostb,    0,        ghostb,   ghostb,    dec8_state, ghostb,      ROT0,   "Data East USA",         "The Real Ghostbusters (US 2 Players, revision 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ghostb2a,  ghostb,   ghostb,   ghostb2a,  dec8_state, ghostb,      ROT0,   "Data East USA",         "The Real Ghostbusters (US 2 Players)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ghostb3,   ghostb,   ghostb,   ghostb3,   dec8_state, ghostb,      ROT0,   "Data East USA",         "The Real Ghostbusters (US 3 Players)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ghostb3a,  ghostb,   ghostb,   ghostb3,   dec8_state, ghostb,      ROT0,   "Data East USA",         "The Real Ghostbusters (US 3 Players, revision ?)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // ROMs confirmed working on PCB, confirmed problem with the fake MCU ROM
+GAME( 1987, meikyuh,   ghostb,   meikyuh,  meikyuh,   dec8_state, meikyuh,     ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, meikyuha,  ghostb,   meikyuh,  meikyuh,   dec8_state, meikyuh,     ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, csilver,   0,        csilver,  csilver,   dec8_state, csilver,     ROT0,   "Data East Corporation", "Captain Silver (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, csilverj,  csilver,  csilver,  csilverj,  dec8_state, csilver,     ROT0,   "Data East Corporation", "Captain Silver (Japan, revision 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, csilverja, csilver,  csilver,  csilverj,  dec8_state, csilver,     ROT0,   "Data East Corporation", "Captain Silver (Japan, revision 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, oscar,     0,        oscar,    oscar,     dec8_state, oscar,       ROT0,   "Data East Corporation", "Psycho-Nics Oscar (World revision 0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, oscaru,    oscar,    oscar,    oscarj,    dec8_state, oscar,       ROT0,   "Data East USA",         "Psycho-Nics Oscar (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, oscarj1,   oscar,    oscar,    oscarj,    dec8_state, oscar,       ROT0,   "Data East Corporation", "Psycho-Nics Oscar (Japan revision 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, oscarj2,   oscar,    oscar,    oscarj,    dec8_state, oscar,       ROT0,   "Data East Corporation", "Psycho-Nics Oscar (Japan revision 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, srdarwin,  0,        srdarwin, srdarwin,  dec8_state, srdarwin,    ROT270, "Data East Corporation", "Super Real Darwin (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, srdarwinj, srdarwin, srdarwin, srdarwinj, dec8_state, srdarwin,    ROT270, "Data East Corporation", "Super Real Darwin (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cobracom,  0,        cobracom, cobracom,  dec8_state, cobracom,    ROT0,   "Data East Corporation", "Cobra-Command (World revision 5)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cobracomj, cobracom, cobracom, cobracom,  dec8_state, cobracom,    ROT0,   "Data East Corporation", "Cobra-Command (Japan)", MACHINE_SUPPORTS_SAVE )

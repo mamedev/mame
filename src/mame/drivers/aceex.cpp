@@ -78,7 +78,7 @@ void aceex2814_state::machine_reset()
 
 #define Y1_CLOCK 40320000
 #define Y2_CLOCK 45342720
-static MACHINE_CONFIG_START( aceex2814, aceex2814_state )
+static MACHINE_CONFIG_START( aceex2814 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I80C31, Y2_CLOCK)
@@ -90,5 +90,5 @@ ROM_START( aceex2814 )
 	ROM_LOAD( "dm2814u16-194.bin", 0x00000, 0x10000, CRC(36dc423d) SHA1(0f350b7c533eb5270a72587ab3e050e5fe453006) )
 ROM_END
 
-//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT      CLASS            INIT        COMPANY              FULLNAME           FLAGS
-COMP( 1995, aceex2814,   0,          0,      aceex2814,  aceex2814, driver_device,   0,          "Aceex Corporation", "Aceex 2814", MACHINE_IS_SKELETON )
+//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT      CLASS            INIT        COMPANY              FULLNAME      FLAGS
+COMP( 1995, aceex2814,  0,          0,      aceex2814,  aceex2814, aceex2814_state, 0,          "Aceex Corporation", "Aceex 2814", MACHINE_IS_SKELETON )

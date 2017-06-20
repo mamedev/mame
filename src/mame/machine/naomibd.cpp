@@ -52,6 +52,9 @@
     "M1" type carts: DMA_OFFSET 0 = enable decryptyon/decompression during DMA transfer, ROM_OFFSET - ROM size/mapping select similar to M2 cart type
     "M4" type carts: no effect, ROM_OFFSET bit 29 always return 1 then read, used by BIOS to determine this cart is encrypted and require bit 30 set then read ROM header
 
+    * bit 28 (mode bit 0)
+    "M2" type carts: ROM_OFFSET - master/slave ROM board select
+
     * bit 0 can be set for "M4" type carts, function unknown
 
     Normal address starts with 0xa0000000 to enable auto-advance and 8MB ROM addressing mode.
@@ -70,8 +73,8 @@ DEVICE_ADDRESS_MAP_START(submap, 16, naomi_board)
 	AM_RANGE(0x00, 0xff) AM_READ(default_r)
 ADDRESS_MAP_END
 
-naomi_board::naomi_board(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: naomi_g1_device(mconfig, type, name, tag, owner, clock, shortname, source)
+naomi_board::naomi_board(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: naomi_g1_device(mconfig, type, tag, owner, clock)
 {
 	eeprom_tag = nullptr;
 }

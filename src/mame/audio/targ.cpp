@@ -16,6 +16,7 @@
 #include "emu.h"
 #include "includes/exidy.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
 
 
 
@@ -174,7 +175,7 @@ SAMPLES_START_CB_MEMBER(exidy_state::targ_audio_start)
 }
 
 
-MACHINE_CONFIG_FRAGMENT( spectar_audio )
+MACHINE_CONFIG_START( spectar_audio )
 
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
@@ -190,7 +191,7 @@ MACHINE_CONFIG_FRAGMENT( spectar_audio )
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_FRAGMENT( targ_audio )
+MACHINE_CONFIG_START( targ_audio )
 
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 

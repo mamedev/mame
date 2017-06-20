@@ -26,10 +26,12 @@ Stephh's notes (based on the game M68000 code and some tests) :
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/m68000/m68000.h"
-#include "sound/ay8910.h"
 #include "includes/magmax.h"
+
+#include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
+#include "sound/ay8910.h"
+#include "speaker.h"
 
 
 WRITE16_MEMBER(magmax_state::magmax_sound_w)
@@ -332,7 +334,7 @@ static GFXDECODE_START( magmax )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( magmax, magmax_state )
+static MACHINE_CONFIG_START( magmax )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)   /* verified on pcb */
@@ -424,4 +426,4 @@ ROM_START( magmax )
 ROM_END
 
 
-GAME( 1985, magmax, 0, magmax, magmax, driver_device, 0, ROT0, "Nichibutsu", "Mag Max", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, magmax, 0, magmax, magmax, magmax_state, 0, ROT0, "Nichibutsu", "Mag Max", MACHINE_SUPPORTS_SAVE )

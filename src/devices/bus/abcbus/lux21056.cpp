@@ -71,6 +71,7 @@
 
 */
 
+#include "emu.h"
 #include "lux21056.h"
 #include "bus/scsi/s1410.h"
 
@@ -93,7 +94,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type LUXOR_55_21056 = &device_creator<luxor_55_21056_device>;
+DEFINE_DEVICE_TYPE(LUXOR_55_21056, luxor_55_21056_device, "lux21056", "Luxor 55 21056")
 
 
 //-------------------------------------------------
@@ -239,11 +240,12 @@ WRITE_LINE_MEMBER( luxor_55_21056_device::write_sasi_msg )
 	m_sasi_msg = state;
 }
 
+
 //-------------------------------------------------
-//  MACHINE_DRIVER( luxor_55_21056 )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( luxor_55_21056 )
+MACHINE_CONFIG_MEMBER( luxor_55_21056_device::device_add_mconfig )
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/2)
 	MCFG_CPU_PROGRAM_MAP(luxor_55_21056_mem)
 	MCFG_CPU_IO_MAP(luxor_55_21056_io)
@@ -269,17 +271,6 @@ static MACHINE_CONFIG_FRAGMENT( luxor_55_21056 )
 	MCFG_SCSI_OUTPUT_LATCH_ADD("sasi_data_out", SASIBUS_TAG)
 	MCFG_DEVICE_ADD("sasi_data_in", INPUT_BUFFER, 0)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor luxor_55_21056_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( luxor_55_21056 );
-}
 
 
 //-------------------------------------------------
@@ -338,7 +329,7 @@ ioport_constructor luxor_55_21056_device::device_input_ports() const
 //-------------------------------------------------
 
 luxor_55_21056_device::luxor_55_21056_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, LUXOR_55_21056, "Luxor 55 21056", tag, owner, clock, "lux21056", __FILE__),
+	: device_t(mconfig, LUXOR_55_21056, tag, owner, clock),
 		device_abcbus_card_interface(mconfig, *this),
 		m_maincpu(*this, Z80_TAG),
 		m_dma(*this, Z80DMA_TAG),

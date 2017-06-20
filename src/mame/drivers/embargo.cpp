@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "cpu/s2650/s2650.h"
+#include "screen.h"
 
 
 class embargo_state : public driver_device
@@ -253,7 +254,7 @@ void embargo_state::machine_reset()
  *
  *************************************/
 
-static MACHINE_CONFIG_START( embargo, embargo_state )
+static MACHINE_CONFIG_START( embargo )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", S2650, 625000)
@@ -298,4 +299,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1977, embargo, 0, embargo, embargo, driver_device, 0, ROT0, "Cinematronics", "Embargo", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1977, embargo, 0, embargo, embargo, embargo_state, 0, ROT0, "Cinematronics", "Embargo", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

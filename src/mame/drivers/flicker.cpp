@@ -19,6 +19,7 @@
 
 ************************************************************************************/
 
+#include "emu.h"
 #include "machine/genpin.h"
 #include "cpu/i4004/i4004.h"
 #include "flicker.lh"
@@ -206,7 +207,7 @@ sound to produce. We need to change this to just one pulse per actual sound. */
 }
 
 
-static MACHINE_CONFIG_START( flicker, flicker_state )
+static MACHINE_CONFIG_START( flicker )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I4004, XTAL_5MHz / 8)
 	MCFG_CPU_PROGRAM_MAP(flicker_rom)
@@ -227,5 +228,5 @@ ROM_START(flicker)
 	ROM_LOAD("flicker.rom", 0x0000, 0x0400, CRC(c692e586) SHA1(5cabb28a074d18b589b5b8f700c57e1610071c68))
 ROM_END
 
-//   YEAR    GAME     PARENT  MACHINE   INPUT    CLASS           INIT      ORIENTATION   COMPANY                            DESCRIPTION           FLAGS
-GAME(1974,  flicker,  0,      flicker,  flicker, driver_device,  0,        ROT0,        "Dave Nutting Associates / Bally", "Flicker (prototype)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+//   YEAR    GAME     PARENT  MACHINE   INPUT    CLASS           INIT      ORIENTATION  COMPANY                            DESCRIPTION            FLAGS
+GAME(1974,  flicker,  0,      flicker,  flicker, flicker_state,  0,        ROT0,        "Dave Nutting Associates / Bally", "Flicker (prototype)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )

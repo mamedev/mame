@@ -2,11 +2,10 @@
 // copyright-holders:Couriersud
 #include "nlm_cd4xxx.h"
 
-#include "devices/nld_truthtable.h"
-#include "devices/nld_system.h"
-#include "devices/nld_4020.h"
-#include "devices/nld_4066.h"
-#include "devices/nld_4316.h"
+#include "../devices/nld_system.h"
+#include "../devices/nld_4020.h"
+#include "../devices/nld_4066.h"
+#include "../devices/nld_4316.h"
 
 /*
  *   CD4001BC: Quad 2-Input NOR Buffered B Series Gate
@@ -33,13 +32,13 @@ static NETLIST_START(CD4001_DIP)
 	DUMMY_INPUT(VDD)
 
 	DIPPINS(    /*       +--------------+      */
-		s1.A,   /*    A1 |1     ++    14| VCC  */ VSS.I,
+		s1.A,   /*    A1 |1     ++    14| VCC  */ VDD.I,
 		s1.B,   /*    B1 |2           13| A6   */ s4.B,
 		s1.Q,   /*    A2 |3           12| Y6   */ s4.A,
 		s2.Q,   /*    Y2 |4    4001   11| A5   */ s4.Q,
 		s2.A,   /*    A3 |5           10| Y5   */ s3.Q,
 		s2.B,   /*    Y3 |6            9| A4   */ s3.B,
-		VDD.I,  /*   GND |7            8| Y4   */ s3.A
+		VSS.I,  /*   GND |7            8| Y4   */ s3.A
 				/*       +--------------+      */
 	)
 

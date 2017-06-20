@@ -8,8 +8,8 @@
 
 ***************************************************************************/
 
-#ifndef __M6509_H__
-#define __M6509_H__
+#ifndef MAME_CPU_M6502_M6509_H
+#define MAME_CPU_M6502_M6509_H
 
 #include "m6502.h"
 
@@ -82,6 +82,6 @@ enum {
 	M6509_BY
 };
 
-extern const device_type M6509;
+DECLARE_DEVICE_TYPE(M6509, m6509_device)
 
-#endif
+#endif // MAME_CPU_M6502_M6509_H

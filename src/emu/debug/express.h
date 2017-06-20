@@ -8,14 +8,16 @@
 
 ***************************************************************************/
 
+#ifndef MAME_EMU_DEBUG_EXPRESS_H
+#define MAME_EMU_DEBUG_EXPRESS_H
+
 #pragma once
 
-#ifndef __EXPRESS_H__
-#define __EXPRESS_H__
+#include "emucore.h"
 
 #include <functional>
+#include <unordered_map>
 
-#include "emu.h"
 
 
 //**************************************************************************
@@ -44,10 +46,6 @@ enum expression_space
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
-
-// forward references
-class symbol_table;
-
 
 // ======================> expression_error
 
@@ -116,13 +114,14 @@ protected:
 	};
 
 	// construction/destruction
-	symbol_entry(symbol_table &table, symbol_type type, const char *name, void *ref);
+	symbol_entry(symbol_table &table, symbol_type type, const char *name, const std::string &format, void *ref);
 public:
 	virtual ~symbol_entry();
 
 	// getters
 	symbol_entry *next() const { return m_next; }
 	const char *name() const { return m_name.c_str(); }
+	const std::string &format() const { return m_format; }
 
 	// type checking
 	bool is_function() const { return (m_type == SMT_FUNCTION); }
@@ -138,6 +137,7 @@ protected:
 	symbol_table &  m_table;                    // pointer back to the owning table
 	symbol_type     m_type;                     // type of symbol
 	std::string     m_name;                     // name of the symbol
+	std::string     m_format;                   // format of symbol (or empty if unspecified)
 	void *          m_ref;                      // internal reference
 };
 
@@ -158,8 +158,8 @@ public:
 
 	// callback functions for memory reads/writes
 	typedef std::function<expression_error::error_code(void *cbparam, const char *name, expression_space space)> valid_func;
-	typedef std::function<u64(void *cbparam, const char *name, expression_space space, u32 offset, int size)> read_func;
-	typedef std::function<void(void *cbparam, const char *name, expression_space space, u32 offset, int size, u64 value)> write_func;
+	typedef std::function<u64(void *cbparam, const char *name, expression_space space, u32 offset, int size, bool disable_se)> read_func;
+	typedef std::function<void(void *cbparam, const char *name, expression_space space, u32 offset, int size, u64 value, bool disable_se)> write_func;
 
 	enum read_write
 	{
@@ -181,7 +181,7 @@ public:
 	// symbol access
 	void add(const char *name, read_write rw, u64 *ptr = nullptr);
 	void add(const char *name, u64 constvalue);
-	void add(const char *name, void *ref, getter_func getter, setter_func setter = nullptr);
+	void add(const char *name, void *ref, getter_func getter, setter_func setter = nullptr, const std::string &format_string = "");
 	void add(const char *name, void *ref, int minparams, int maxparams, execute_func execute);
 	symbol_entry *find(const char *name) const { if (name) { auto search = m_symlist.find(name); if (search != m_symlist.end()) return search->second.get(); else return nullptr; } else return nullptr; }
 	symbol_entry *find_deep(const char *name);
@@ -192,8 +192,8 @@ public:
 
 	// memory accessors
 	expression_error::error_code memory_valid(const char *name, expression_space space);
-	u64 memory_value(const char *name, expression_space space, u32 offset, int size);
-	void set_memory_value(const char *name, expression_space space, u32 offset, int size, u64 value);
+	u64 memory_value(const char *name, expression_space space, u32 offset, int size, bool disable_se);
+	void set_memory_value(const char *name, expression_space space, u32 offset, int size, u64 value, bool disable_se);
 
 private:
 	// internal state
@@ -252,8 +252,10 @@ private:
 			TIN_MEMORY_SIZE_MASK    = 3 << TIN_MEMORY_SIZE_SHIFT,
 			TIN_MEMORY_SPACE_SHIFT  = 20,       // 4 bits (20-23)
 			TIN_MEMORY_SPACE_MASK   = 0xf << TIN_MEMORY_SPACE_SHIFT,
-			TIN_PRECEDENCE_SHIFT    = 24,       // 8 bits (24-31)
-			TIN_PRECEDENCE_MASK     = 0xff << TIN_PRECEDENCE_SHIFT
+			TIN_PRECEDENCE_SHIFT    = 24,       // 5 bits (24-28)
+			TIN_PRECEDENCE_MASK     = 0x1f << TIN_PRECEDENCE_SHIFT,
+			TIN_SIDE_EFFECT_SHIFT   = 29,       // 1 bit  (29)
+			TIN_SIDE_EFFECT_MASK    = 1 << TIN_SIDE_EFFECT_SHIFT
 		};
 
 		// types of tokens
@@ -292,6 +294,7 @@ private:
 		bool right_to_left() const { assert(m_type == OPERATOR); return ((m_flags & TIN_RIGHT_TO_LEFT_MASK) != 0); }
 		expression_space memory_space() const { assert(m_type == OPERATOR || m_type == MEMORY); return expression_space((m_flags & TIN_MEMORY_SPACE_MASK) >> TIN_MEMORY_SPACE_SHIFT); }
 		int memory_size() const { assert(m_type == OPERATOR || m_type == MEMORY); return (m_flags & TIN_MEMORY_SIZE_MASK) >> TIN_MEMORY_SIZE_SHIFT; }
+		bool memory_side_effect() const { assert(m_type == OPERATOR || m_type == MEMORY); return (m_flags & TIN_SIDE_EFFECT_MASK) >> TIN_SIDE_EFFECT_SHIFT; }
 
 		// setters
 		parse_token &set_offset(int offset) { m_offset = offset; return *this; }
@@ -308,6 +311,7 @@ private:
 		parse_token &set_right_to_left() { assert(m_type == OPERATOR); m_flags |= TIN_RIGHT_TO_LEFT_MASK; return *this; }
 		parse_token &set_memory_space(expression_space space) { assert(m_type == OPERATOR || m_type == MEMORY); m_flags = (m_flags & ~TIN_MEMORY_SPACE_MASK) | ((space << TIN_MEMORY_SPACE_SHIFT) & TIN_MEMORY_SPACE_MASK); return *this; }
 		parse_token &set_memory_size(int log2ofbits) { assert(m_type == OPERATOR || m_type == MEMORY); m_flags = (m_flags & ~TIN_MEMORY_SIZE_MASK) | ((log2ofbits << TIN_MEMORY_SIZE_SHIFT) & TIN_MEMORY_SIZE_MASK); return *this; }
+		parse_token &set_memory_side_effect(bool disable_se) { assert(m_type == OPERATOR || m_type == MEMORY); m_flags = disable_se ? m_flags | TIN_SIDE_EFFECT_MASK : m_flags & ~TIN_SIDE_EFFECT_MASK; return *this; }
 		parse_token &set_memory_source(const char *string) { assert(m_type == OPERATOR || m_type == MEMORY); m_string = string; return *this; }
 
 		// access
@@ -356,7 +360,7 @@ private:
 	void parse_number(parse_token &token, const char *string, int base, expression_error::error_code errcode);
 	void parse_quoted_char(parse_token &token, const char *&string);
 	void parse_quoted_string(parse_token &token, const char *&string);
-	void parse_memory_operator(parse_token &token, const char *string);
+	void parse_memory_operator(parse_token &token, const char *string, bool disable_se);
 	void normalize_operator(parse_token *prevtoken, parse_token &thistoken);
 	void infix_to_postfix();
 
@@ -382,5 +386,4 @@ private:
 	parse_token         m_token_stack[MAX_STACK_DEPTH]; // token stack (used during execution)
 };
 
-
-#endif
+#endif // MAME_EMU_DEBUG_EXPRESS_H

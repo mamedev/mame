@@ -11,6 +11,7 @@
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "cpu/mcs48/mcs48.h"
+#include "screen.h"
 
 #define T1PROM 1
 #define T1DIRECT 2
@@ -184,6 +185,7 @@ public:
 	DECLARE_MACHINE_RESET(cflyball);
 	DECLARE_MACHINE_RESET(cmanhat);
 	DECLARE_MACHINE_RESET(cocean1a); /* 10 */
+	DECLARE_MACHINE_RESET(cfboy0a1); /* 12 */
 	uint32_t screen_update_decocass(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER(decocass_coin_counter_w);
 	DECLARE_WRITE8_MEMBER(decocass_sound_command_w);

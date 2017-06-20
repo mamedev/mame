@@ -189,17 +189,19 @@
 *************************************************************************************/
 
 
-#define MASTER_CLOCK        XTAL_21_4772MHz
-#define VDP_MEM             0x40000
-
-
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "sound/ay8910.h"
-#include "video/v9938.h"
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
+#include "sound/ay8910.h"
+#include "video/v9938.h"
+#include "speaker.h"
+
 #include "kas89.lh"
+
+
+#define MASTER_CLOCK        XTAL_21_4772MHz
+#define VDP_MEM             0x40000
 
 
 class kas89_state : public driver_device
@@ -750,7 +752,7 @@ INPUT_PORTS_END
 *           Machine Driver            *
 **************************************/
 
-static MACHINE_CONFIG_START( kas89, kas89_state )
+static MACHINE_CONFIG_START( kas89 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)    /* Confirmed */
@@ -855,5 +857,5 @@ DRIVER_INIT_MEMBER(kas89_state,kas89)
 *           Game Driver(s)            *
 **************************************/
 
-/*     YEAR  NAME    PARENT  MACHINE  INPUT  STATE        INIT   ROT     COMPANY       FULLNAME     FLAGS                 LAYOUT */
+//     YEAR  NAME    PARENT  MACHINE  INPUT  STATE        INIT   ROT    COMPANY       FULLNAME      FLAGS                    LAYOUT
 GAMEL( 1989, kas89,  0,      kas89,   kas89, kas89_state, kas89, ROT90, "SFC S.R.L.", "Kasino '89", MACHINE_IMPERFECT_SOUND, layout_kas89 )

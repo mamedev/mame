@@ -50,7 +50,7 @@ void pdp1_state::video_start()
 }
 
 
-void pdp1_state::screen_eof_pdp1(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(pdp1_state::screen_vblank_pdp1)
 {
 	// rising edge
 	if (state)

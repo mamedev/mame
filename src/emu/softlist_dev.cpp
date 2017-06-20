@@ -29,7 +29,8 @@ typedef std::unordered_map<std::string, const software_info *> softlist_map;
 //**************************************************************************
 
 // device type definition
-const device_type SOFTWARE_LIST = &device_creator<software_list_device>;
+DEFINE_DEVICE_TYPE(SOFTWARE_LIST, software_list_device, "software_list", "Software List")
+
 false_software_list_loader false_software_list_loader::s_instance;
 rom_software_list_loader rom_software_list_loader::s_instance;
 image_software_list_loader image_software_list_loader::s_instance;
@@ -79,7 +80,7 @@ bool image_software_list_loader::load_software(device_image_interface &device, s
 //-------------------------------------------------
 
 software_list_device::software_list_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, SOFTWARE_LIST, "Software list", tag, owner, clock, "software_list", __FILE__),
+	: device_t(mconfig, SOFTWARE_LIST, tag, owner, clock),
 	m_list_type(SOFTWARE_LIST_ORIGINAL_SYSTEM),
 	m_filter(nullptr),
 	m_parsed(false),
@@ -145,29 +146,42 @@ void software_list_device::find_approx_matches(const std::string &name, int matc
 	// iterate over our info (will cause a parse if needed)
 	for (const software_info &swinfo : get_info())
 	{
-		const software_part &part = swinfo.parts().front();
-		if ((interface == nullptr || part.matches_interface(interface)) && is_compatible(part) == SOFTWARE_IS_COMPATIBLE)
+		for (const software_part &swpart : swinfo.parts())
 		{
-			// pick the best match between driver name and description
-			int longpenalty = driver_list::penalty_compare(name.c_str(), swinfo.longname().c_str());
-			int shortpenalty = driver_list::penalty_compare(name.c_str(), swinfo.shortname().c_str());
-			int curpenalty = std::min(longpenalty, shortpenalty);
-
-			// insert into the sorted table of matches
-			for (int matchnum = matches - 1; matchnum >= 0; matchnum--)
+			if ((interface == nullptr || swpart.matches_interface(interface)) && is_compatible(swpart) == SOFTWARE_IS_COMPATIBLE)
 			{
-				// stop if we're worse than the current entry
-				if (curpenalty >= penalty[matchnum])
-					break;
+				// pick the best match between driver name and description
+				int longpenalty = driver_list::penalty_compare(name.c_str(), swinfo.longname().c_str());
+				int shortpenalty = driver_list::penalty_compare(name.c_str(), swinfo.shortname().c_str());
+				int curpenalty = std::min(longpenalty, shortpenalty);
 
-				// as long as this isn't the last entry, bump this one down
-				if (matchnum < matches - 1)
+				// make sure it isn't already in the table
+				bool skip = false;
+				for (int matchnum = 0; matchnum < matches; matchnum++)
 				{
-					penalty[matchnum + 1] = penalty[matchnum];
-					list[matchnum + 1] = list[matchnum];
+					if ((penalty[matchnum] == curpenalty) && (swinfo.longname() == list[matchnum]->longname()) && (swinfo.shortname() == list[matchnum]->shortname()))
+						skip = true;
 				}
-				list[matchnum] = &swinfo;
-				penalty[matchnum] = curpenalty;
+
+				if (!skip)
+				{
+					// insert into the sorted table of matches
+					for (int matchnum = matches - 1; matchnum >= 0; matchnum--)
+					{
+						// stop if we're worse than the current entry
+						if (curpenalty >= penalty[matchnum])
+							break;
+
+						// as long as this isn't the last entry, bump this one down
+						if (matchnum < matches - 1)
+						{
+							penalty[matchnum + 1] = penalty[matchnum];
+							list[matchnum + 1] = list[matchnum];
+						}
+						list[matchnum] = &swinfo;
+						penalty[matchnum] = curpenalty;
+					}
+				}
 			}
 		}
 	}
@@ -363,7 +377,7 @@ software_compatibility software_list_device::is_compatible(const software_part &
 //  that can automatically mount this software part
 //-------------------------------------------------
 
-device_image_interface *software_list_device::find_mountable_image(const machine_config &mconfig, const software_part &part)
+device_image_interface *software_list_device::find_mountable_image(const machine_config &mconfig, const software_part &part, std::function<bool(const device_image_interface &)> filter)
 {
 	// if automount="no", don't bother
 	const char *mount = part.feature("automount");
@@ -373,15 +387,32 @@ device_image_interface *software_list_device::find_mountable_image(const machine
 	for (device_image_interface &image : image_interface_iterator(mconfig.root_device()))
 	{
 		const char *interface = image.image_interface();
-		if (interface != nullptr && part.matches_interface(interface))
-		{
-			// mount only if not already mounted
-			const char *option = mconfig.options().value(image.brief_instance_name());
-			if (*option == '\0' && !image.filename())
-				return &image;
-		}
+		if (interface != nullptr && part.matches_interface(interface) && filter(image))
+			return &image;
 	}
 	return nullptr;
+}
+
+
+//-------------------------------------------------
+//  find_mountable_image - find an image interface
+//  that can automatically mount this software part
+//-------------------------------------------------
+
+device_image_interface *software_list_device::find_mountable_image(const machine_config &mconfig, const software_part &part)
+{
+	// Multi-part softlists will distribute individual images serially (e.g. - first floppy to flop1, next one to flop2
+	// etc).  Pre MAME 0.183 relied on the core doing this distribution between calls to find_mountable_image() so it
+	// could check to see if the slot was empty.
+	//
+	// When softlists were refactored in MAME 0.183, this was changed to build a "plan" for what needs to be loaded, so
+	// it was incorrect to check the image slot.  This is why an overload for find_mountable_image() was created that
+	// takes an std::function.  This overload is being preserved for compatibility with existing code, but I regard the
+	// continued existance of this overload is a red flag.
+	return find_mountable_image(
+		mconfig,
+		part,
+		[](const device_image_interface &image) { return !image.exists(); });
 }
 
 

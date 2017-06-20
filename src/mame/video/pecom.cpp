@@ -9,10 +9,11 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "sound/cdp1869.h"
-#include "sound/wave.h"
-#include "cpu/cosmac/cosmac.h"
 #include "includes/pecom.h"
+
+#include "sound/wave.h"
+#include "speaker.h"
+
 
 WRITE8_MEMBER(pecom_state::pecom_cdp1869_w)
 {
@@ -89,15 +90,15 @@ VIDEO_START_MEMBER(pecom_state,pecom)
 	save_pointer(NAME(m_charram.get()), PECOM_CHAR_RAM_SIZE);
 }
 
-MACHINE_CONFIG_FRAGMENT( pecom_video )
-	MCFG_CDP1869_SCREEN_PAL_ADD(CDP1869_TAG, SCREEN_TAG, CDP1869_DOT_CLK_PAL)
+MACHINE_CONFIG_START( pecom_video )
+	MCFG_CDP1869_SCREEN_PAL_ADD(CDP1869_TAG, SCREEN_TAG, cdp1869_device::DOT_CLK_PAL)
 
 	MCFG_VIDEO_START_OVERRIDE(pecom_state,pecom)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_CDP1869_ADD(CDP1869_TAG, CDP1869_DOT_CLK_PAL, cdp1869_page_ram)
-	MCFG_CDP1869_COLOR_CLOCK(CDP1869_COLOR_CLK_PAL)
+	MCFG_CDP1869_ADD(CDP1869_TAG, cdp1869_device::DOT_CLK_PAL, cdp1869_page_ram)
+	MCFG_CDP1869_COLOR_CLOCK(cdp1869_device::COLOR_CLK_PAL)
 	MCFG_CDP1869_CHAR_PCB_READ_OWNER(pecom_state, pecom_pcb_r)
 	MCFG_CDP1869_CHAR_RAM_READ_OWNER(pecom_state, pecom_char_ram_r)
 	MCFG_CDP1869_CHAR_RAM_WRITE_OWNER(pecom_state, pecom_char_ram_w)

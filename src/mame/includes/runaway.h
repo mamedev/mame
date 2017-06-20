@@ -1,5 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Mike Balfour
+#include "screen.h"
+
 class runaway_state : public driver_device
 {
 public:

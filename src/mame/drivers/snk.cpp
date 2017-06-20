@@ -3,7 +3,7 @@
 // thanks-to:Marco Cassili
 /*
 
-snk.c
+snk.cpp
 
 various SNK triple Z80 games
 
@@ -255,7 +255,7 @@ TODO:
 
 - tdfever/fsoccer: the dots in the radar flicker. In fsoccer, this is greatly
   improved by forcing partial screen updates when the sprite RAM is changed (see
-  snk68.c for another game that needs this). tdfever dots still flicker a lot,
+  snk68.cpp for another game that needs this). tdfever dots still flicker a lot,
   however I'm not sure if this is an emulation bug or the real game behaviour.
 
 - psychos: the pcb has glitches (colored lines of length up to 16 pixels) during
@@ -270,13 +270,15 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "includes/snk.h"
+
+#include "cpu/z80/z80.h"
 #include "sound/snkwave.h"
 #include "sound/ay8910.h"
 #include "sound/3526intf.h"
 #include "sound/3812intf.h"
 #include "sound/8950intf.h"
+#include "speaker.h"
 
 
 /*********************************************************************/
@@ -284,7 +286,7 @@ TODO:
 
 READ8_MEMBER(snk_state::snk_cpuA_nmi_trigger_r)
 {
-	if(!space.debugger_access())
+	if(!machine().side_effect_disabled())
 	{
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	}
@@ -298,7 +300,7 @@ WRITE8_MEMBER(snk_state::snk_cpuA_nmi_ack_w)
 
 READ8_MEMBER(snk_state::snk_cpuB_nmi_trigger_r)
 {
-	if(!space.debugger_access())
+	if(!machine().side_effect_disabled())
 	{
 		m_subcpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	}
@@ -3606,7 +3608,7 @@ GFXDECODE_END
 
 /**********************************************************************/
 
-static MACHINE_CONFIG_START( marvins, snk_state )
+static MACHINE_CONFIG_START( marvins )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 3360000)   /* 3.36 MHz */
@@ -3678,7 +3680,7 @@ static MACHINE_CONFIG_DERIVED( madcrush, marvins )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( jcross, snk_state )
+static MACHINE_CONFIG_START( jcross )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 3350000) /* NOT verified */
@@ -3761,7 +3763,7 @@ static MACHINE_CONFIG_DERIVED( hal21, jcross )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( tnk3, snk_state )
+static MACHINE_CONFIG_START( tnk3 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_13_4MHz/4) /* verified on pcb */
@@ -3853,7 +3855,7 @@ static MACHINE_CONFIG_DERIVED( fitegolf2, fitegolf )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( ikari, snk_state )
+static MACHINE_CONFIG_START( ikari )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_13_4MHz/4) /* verified on pcb */
@@ -3879,7 +3881,7 @@ static MACHINE_CONFIG_START( ikari, snk_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ikari)
 
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 0x400)
+	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 0x400)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 
 	MCFG_VIDEO_START_OVERRIDE(snk_state,ikari)
@@ -3912,7 +3914,7 @@ static MACHINE_CONFIG_DERIVED( victroad, ikari )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( bermudat, snk_state )
+static MACHINE_CONFIG_START( bermudat )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz/2) /* verified on pcb */
@@ -3938,7 +3940,7 @@ static MACHINE_CONFIG_START( bermudat, snk_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gwar)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 0x400)
+	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 0x400)
 	MCFG_VIDEO_START_OVERRIDE(snk_state,gwar)
 
 	/* sound hardware */
@@ -4010,7 +4012,7 @@ static MACHINE_CONFIG_DERIVED( choppera, chopper1 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( tdfever, snk_state )
+static MACHINE_CONFIG_START( tdfever )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)
@@ -4036,7 +4038,7 @@ static MACHINE_CONFIG_START( tdfever, snk_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tdfever)
 
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 0x400)
+	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 0x400)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 
 	MCFG_VIDEO_START_OVERRIDE(snk_state,tdfever)
@@ -4159,8 +4161,8 @@ ROM_START( madcrush )
 	ROM_LOAD( "p9.bin",   0x8000, 0x2000, CRC(e3c8c2cb) SHA1(b3e39eacd2609ff0fa0f511bff0fc83e6b3970d4) ) /* Same as Mad Crasher, but different label */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound code */
-	ROM_LOAD( "p1.a6",   0x0000, 0x2000, CRC(2dcd036d) SHA1(4da42ab1e502fff57f5d5787df406289538fa484) ) /* Located on the A2003UP03-01 duaghtercard PCB */
-	ROM_LOAD( "p2.a8",   0x2000, 0x2000, CRC(cc30ae8b) SHA1(ffedc747b9e0b616a163ff8bb1def318e522585b) ) /* Located on the A2003UP03-01 duaghtercard PCB */
+	ROM_LOAD( "p1.a6",   0x0000, 0x2000, CRC(2dcd036d) SHA1(4da42ab1e502fff57f5d5787df406289538fa484) ) /* Located on the A2003UP03-01 daughtercard PCB */
+	ROM_LOAD( "p2.a8",   0x2000, 0x2000, CRC(cc30ae8b) SHA1(ffedc747b9e0b616a163ff8bb1def318e522585b) ) /* Located on the A2003UP03-01 daughtercard PCB */
 
 	ROM_REGION( 0x2000, "tx_tiles", 0 )
 	ROM_LOAD( "p13.e2",    0x0000, 0x2000, CRC(fcdd36ca) SHA1(bb9408e1feaa15949f11d797e3eb91d37c3e0add) ) /* Located on the A2003 UP01-04 PCB */
@@ -4285,7 +4287,7 @@ ROM_START( jcrossa )
 
 	ROM_REGION( 0x6000, "sp16_tiles", 0 )
 	ROM_LOAD( "snk12.bin",     0x0000, 0x2000, CRC(4532509b) SHA1(c99f87e2b06b94d815e6099bccb2aee0edf8c98d) )
-	ROM_LOAD( "snk13.bin ",    0x2000, 0x2000, CRC(70d219bf) SHA1(9ff9f88221edd141e8204ac810434b4290db7cff) )
+	ROM_LOAD( "snk13.bin",     0x2000, 0x2000, CRC(70d219bf) SHA1(9ff9f88221edd141e8204ac810434b4290db7cff) )
 	ROM_LOAD( "snk14.bin",     0x4000, 0x2000, CRC(42a12b9d) SHA1(9f2bdb1f84f444442282cf0fc1f7b3c7f9a9bf48) )
 
 	ROM_REGION( 0x0c00, "proms", 0 )
@@ -5834,6 +5836,53 @@ ROM_START( gwara )
 	ROM_LOAD( "gv1.g5", 0x00000, 0x10000, CRC(2255f8dd) SHA1(fac31b617762d0fa39cf82a658be250b91ab73ce) )
 ROM_END
 
+ROM_START( gwarab )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "gv3 ver 1.bin", 0x00000, 0x10000, CRC(abec5eeb) SHA1(6a6b7f588d6d72a6ee6828e20798fbcc11924e3d) ) // only different ROM from gwara, ver 1 hand-written on label
+
+	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_LOAD( "gv4.p8", 0x00000, 0x10000, CRC(26335a55) SHA1(de3e7d9e204a969745367aa37326d7b3e28c7424) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "gv2.k7", 0x00000, 0x10000, CRC(896682dd) SHA1(dc2125c2378a01291197b2798a5eef6459cf5b99) )
+
+	ROM_REGION( 0x2400, "proms", 0 )
+	ROM_LOAD( "1.k1",        0x0000, 0x0400, CRC(090236a3) SHA1(40d066e34291492c6baf8c120657e3d547274b59) ) /* MB7122, red */
+	ROM_LOAD( "3.l2",        0x0400, 0x0400, CRC(9147de69) SHA1(e4b3b546e429c195e82f97322e2a295882e38a58) ) /* MB7122, green */
+	ROM_LOAD( "2.l1",        0x0800, 0x0400, CRC(7f9c839e) SHA1(2fa60fa335f76891d961c9bd0066fa7f82f76779) ) /* MB7122, blue */
+	ROM_LOAD( "horizon.j8",  0x0c00, 0x0400, CRC(c20b197b) SHA1(504cb28d652029fe87a5411d6239e78d93c83e91) ) /* MB7122E, h-decode */
+	ROM_LOAD( "vertical.k8", 0x1000, 0x0400, CRC(5d0c617f) SHA1(845e52173c33500227cabe1e21b34919d2856215) ) /* MB7122E, v-decode */
+	ROM_LOAD( "ls.bin",      0x1400, 0x1000, CRC(73df921d) SHA1(c0f765da3e0e80d104b0baaa7a83bdcc399254b3) ) /* ls-joystick encoder */
+
+	ROM_REGION( 0x8000, "tx_tiles", 0 )
+	ROM_LOAD( "gv5.a3", 0x0000, 0x08000, CRC(80f73e2e) SHA1(820824fb10f7dfec6247b46dde8ff7124bde3734) )
+
+	ROM_REGION( 0x40000, "bg_tiles", 0 )
+	ROM_LOAD( "gv13.ef1", 0x00000, 0x10000, CRC(f1dcdaef) SHA1(d9b65e7f4025787037628528d3bef699be2eb874) )
+	ROM_LOAD( "gv12.d1",  0x10000, 0x10000, CRC(326e4e5e) SHA1(6935429925d748bb43072429db0d3b08ffdbc95d) )
+	ROM_LOAD( "gv11.c1",  0x20000, 0x10000, CRC(0aa70967) SHA1(a6cbadbb960280b5e79660c0bbd43089ced39a44) )
+	ROM_LOAD( "gv10.a1",  0x30000, 0x10000, CRC(b7686336) SHA1(d654d282862ff00488be38fb9c1302c8bb6f7e7c) )
+
+	ROM_REGION( 0x40000, "sp16_tiles", 0 )
+	ROM_LOAD( "gv9.g3",  0x00000, 0x10000, CRC(58600f7d) SHA1(3dcd25d1ed07e6f74f3316ebe41768eb155f4c45) )
+	ROM_LOAD( "gv8.e3",  0x10000, 0x10000, CRC(a3f9b463) SHA1(ee83d18cf08972c792b05c277b1ca25d732e294d) )
+	ROM_LOAD( "gv7.cd3", 0x20000, 0x10000, CRC(092501be) SHA1(85d9a8922dde6824805a4b8e6c52b2a9ad092df9) )
+	ROM_LOAD( "gv6.b3",  0x30000, 0x10000, CRC(25801ea6) SHA1(1aa61716d6be399a1eee2ee5079f13da0f1bd4e8) )
+
+	ROM_REGION( 0x80000, "sp32_tiles", 0 )
+	ROM_LOAD( "gv14.f10",  0x00000, 0x10000, CRC(2b46edff) SHA1(db97e042621dcbedfeed71937ead6d715899d4f7) )
+	ROM_LOAD( "gv15.h10",  0x10000, 0x10000, CRC(be19888d) SHA1(bc7b1b6236d41685faacc2008d51ae2da9a82909) )
+	ROM_LOAD( "gv16.j10",  0x20000, 0x10000, CRC(2d653f0c) SHA1(99eb7883822b10f61b6e922c0d0519aacac83732) )
+	ROM_LOAD( "gv17.l10",  0x30000, 0x10000, CRC(ebbf3ba2) SHA1(bc3631c43058faf1ec6b21ed8017b744afee6f5d) )
+	ROM_LOAD( "gv18.m10",  0x40000, 0x10000, CRC(aeb3707f) SHA1(58d1a71cf83ab0f5f0dd67d441edbc8ece8c2ba5) )
+	ROM_LOAD( "gv19.pn10", 0x50000, 0x10000, CRC(0808f95f) SHA1(f67763cceb287a02e3b946ade52105a72161e540) )
+	ROM_LOAD( "gv20.r10",  0x60000, 0x10000, CRC(8dfc7b87) SHA1(e3d75020aa1b90f12633f6515a0386f87441b225) )
+	ROM_LOAD( "gv21.s10",  0x70000, 0x10000, CRC(06822aac) SHA1(630d438cbebe0b5af571948d0d3f4996f52aae1d) )
+
+	ROM_REGION( 0x10000, "ym2", 0 )
+	ROM_LOAD( "gv1.g5", 0x00000, 0x10000, CRC(2255f8dd) SHA1(fac31b617762d0fa39cf82a658be250b91ab73ce) )
+ROM_END
+
 ROM_START( gwarj )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "7y3047",  0x00000, 0x10000, CRC(7f8a880c) SHA1(1eb1c3eb45aa933118e5bd116eb3f81f39063ae3) )
@@ -6393,57 +6442,58 @@ DRIVER_INIT_MEMBER(snk_state,countryc)
 
 
 
-GAME( 1983, marvins,  0,        marvins,  marvins, driver_device,  0,        ROT270, "SNK", "Marvin's Maze", 0 )
-GAME( 1984, vangrd2,  0,        vangrd2,  vangrd2, driver_device,  0,        ROT270, "SNK", "Vanguard II", 0 )
-GAME( 1984, madcrash, 0,        vangrd2,  madcrash, driver_device, 0,        ROT0,   "SNK", "Mad Crasher", 0 )
-GAME( 1984, madcrush, madcrash, madcrush, madcrash, driver_device, 0,        ROT0,   "SNK", "Mad Crusher (Japan)", 0 )
+GAME( 1983, marvins,   0,        marvins,   marvins,   snk_state, 0,        ROT270, "SNK",     "Marvin's Maze", 0 )
+GAME( 1984, vangrd2,   0,        vangrd2,   vangrd2,   snk_state, 0,        ROT270, "SNK",     "Vanguard II", 0 )
+GAME( 1984, madcrash,  0,        vangrd2,   madcrash,  snk_state, 0,        ROT0,   "SNK",     "Mad Crasher", 0 )
+GAME( 1984, madcrush,  madcrash, madcrush,  madcrash,  snk_state, 0,        ROT0,   "SNK",     "Mad Crusher (Japan)", 0 )
 
-GAME( 1984, jcross,   0,        jcross,   jcross, driver_device,   0,        ROT270, "SNK", "Jumping Cross (set 1)", 0 )
-GAME( 1984, jcrossa,  jcross,   jcross,   jcross, driver_device,   0,        ROT270, "SNK", "Jumping Cross (set 2)", 0 )
-GAME( 1984, sgladiat, 0,        sgladiat, sgladiat, driver_device, 0,        ROT0,   "SNK", "Gladiator 1984", 0 )
-GAME( 1985, hal21,    0,        hal21,    hal21, driver_device,    0,        ROT270, "SNK", "HAL21", 0 )
-GAME( 1985, hal21j,   hal21,    hal21,    hal21, driver_device,    0,        ROT270, "SNK", "HAL21 (Japan)", 0 )
+GAME( 1984, jcross,    0,        jcross,    jcross,    snk_state, 0,        ROT270, "SNK",     "Jumping Cross (set 1)", 0 )
+GAME( 1984, jcrossa,   jcross,   jcross,    jcross,    snk_state, 0,        ROT270, "SNK",     "Jumping Cross (set 2)", 0 )
+GAME( 1984, sgladiat,  0,        sgladiat,  sgladiat,  snk_state, 0,        ROT0,   "SNK",     "Gladiator 1984", 0 )
+GAME( 1985, hal21,     0,        hal21,     hal21,     snk_state, 0,        ROT270, "SNK",     "HAL21", 0 )
+GAME( 1985, hal21j,    hal21,    hal21,     hal21,     snk_state, 0,        ROT270, "SNK",     "HAL21 (Japan)", 0 )
 
-GAME( 1985, aso,      0,        aso,      aso, driver_device,      0,        ROT270, "SNK", "ASO - Armored Scrum Object", 0 )
-GAME( 1985, alphamis, aso,      aso,      alphamis, driver_device, 0,        ROT270, "SNK", "Alpha Mission", 0 )
-GAME( 1985, arian,    aso,      aso,      alphamis, driver_device, 0,        ROT270, "SNK", "Arian Mission", 0 )
-GAME( 1985, tnk3,     0,        tnk3,     tnk3, driver_device,     0,        ROT270, "SNK", "T.N.K III (US)", 0 )
-GAME( 1985, tnk3j,    tnk3,     tnk3,     tnk3, driver_device,     0,        ROT270, "SNK", "T.A.N.K (Japan)", 0 )
-GAME( 1986, athena,   0,        athena,   athena, driver_device,   0,        ROT0,   "SNK", "Athena", 0 )
-GAME( 1988, fitegolf, 0,        fitegolf, fitegolf, driver_device, 0,        ROT0,   "SNK", "Fighting Golf (World?)", 0 )
-GAME( 1988, fitegolfu,fitegolf, fitegolf, fitegolfu, driver_device,0,        ROT0,   "SNK", "Fighting Golf (US)", 0 )
-GAME( 1988, fitegolf2,fitegolf, fitegolf2,fitegolfu, driver_device,0,        ROT0,   "SNK", "Fighting Golf (US, Ver 2)", 0 )
-GAME( 1988, countryc, 0,        fitegolf, countryc, snk_state, countryc,     ROT0,   "SNK", "Country Club", 0 )
+GAME( 1985, aso,       0,        aso,       aso,       snk_state, 0,        ROT270, "SNK",     "ASO - Armored Scrum Object", 0 )
+GAME( 1985, alphamis,  aso,      aso,       alphamis,  snk_state, 0,        ROT270, "SNK",     "Alpha Mission", 0 )
+GAME( 1985, arian,     aso,      aso,       alphamis,  snk_state, 0,        ROT270, "SNK",     "Arian Mission", 0 )
+GAME( 1985, tnk3,      0,        tnk3,      tnk3,      snk_state, 0,        ROT270, "SNK",     "T.N.K III (US)", 0 )
+GAME( 1985, tnk3j,     tnk3,     tnk3,      tnk3,      snk_state, 0,        ROT270, "SNK",     "T.A.N.K (Japan)", 0 )
+GAME( 1986, athena,    0,        athena,    athena,    snk_state, 0,        ROT0,   "SNK",     "Athena", 0 )
+GAME( 1988, fitegolf,  0,        fitegolf,  fitegolf,  snk_state, 0,        ROT0,   "SNK",     "Fighting Golf (World?)", 0 )
+GAME( 1988, fitegolfu, fitegolf, fitegolf,  fitegolfu, snk_state, 0,        ROT0,   "SNK",     "Fighting Golf (US)", 0 )
+GAME( 1988, fitegolf2, fitegolf, fitegolf2, fitegolfu, snk_state, 0,        ROT0,   "SNK",     "Fighting Golf (US, Ver 2)", 0 )
+GAME( 1988, countryc,  0,        fitegolf,  countryc,  snk_state, countryc, ROT0,   "SNK",     "Country Club", 0 )
 
-GAME( 1986, ikari,    0,        ikari,    ikari, driver_device,    0,        ROT270, "SNK", "Ikari Warriors (US JAMMA)", 0 ) // distributed by Tradewest(?)
-GAME( 1986, ikaria,   ikari,    ikari,    ikaria, driver_device,   0,        ROT270, "SNK", "Ikari Warriors (US)", 0 ) // distributed by Tradewest(?)
-GAME( 1986, ikarinc,  ikari,    ikari,    ikarinc, driver_device,  0,        ROT270, "SNK", "Ikari Warriors (US No Continues)", 0 ) // distributed by Tradewest(?)
-GAME( 1986, ikarijp,  ikari,    ikari,    ikarinc, driver_device,  0,        ROT270, "SNK", "Ikari (Japan No Continues)", 0 )
-GAME( 1986, ikarijpb, ikari,    ikari,    ikarijpb, driver_device, 0,        ROT270, "bootleg", "Ikari (Joystick hack bootleg)", 0 )
-GAME( 1986, ikariram, ikari,    ikari,    ikarijpb, driver_device, 0,        ROT270, "bootleg", "Rambo 3 (bootleg of Ikari, Joystick hack)", 0 )
-GAME( 1986, victroad, 0,        victroad, victroad, driver_device, 0,        ROT270, "SNK", "Victory Road", 0 )
-GAME( 1986, dogosoke, victroad, victroad, victroad, driver_device, 0,        ROT270, "SNK", "Dogou Souken", 0 )
-GAME( 1986, dogosokb, victroad, victroad, dogosokb, driver_device, 0,        ROT270, "bootleg", "Dogou Souken (Joystick hack bootleg)", 0 )
+GAME( 1986, ikari,     0,        ikari,     ikari,     snk_state, 0,        ROT270, "SNK",     "Ikari Warriors (US JAMMA)", 0 ) // distributed by Tradewest(?)
+GAME( 1986, ikaria,    ikari,    ikari,     ikaria,    snk_state, 0,        ROT270, "SNK",     "Ikari Warriors (US)", 0 ) // distributed by Tradewest(?)
+GAME( 1986, ikarinc,   ikari,    ikari,     ikarinc,   snk_state, 0,        ROT270, "SNK",     "Ikari Warriors (US No Continues)", 0 ) // distributed by Tradewest(?)
+GAME( 1986, ikarijp,   ikari,    ikari,     ikarinc,   snk_state, 0,        ROT270, "SNK",     "Ikari (Japan No Continues)", 0 )
+GAME( 1986, ikarijpb,  ikari,    ikari,     ikarijpb,  snk_state, 0,        ROT270, "bootleg", "Ikari (Joystick hack bootleg)", 0 )
+GAME( 1986, ikariram,  ikari,    ikari,     ikarijpb,  snk_state, 0,        ROT270, "bootleg", "Rambo 3 (bootleg of Ikari, Joystick hack)", 0 )
+GAME( 1986, victroad,  0,        victroad,  victroad,  snk_state, 0,        ROT270, "SNK",     "Victory Road", 0 )
+GAME( 1986, dogosoke,  victroad, victroad,  victroad,  snk_state, 0,        ROT270, "SNK",     "Dogou Souken", 0 )
+GAME( 1986, dogosokb,  victroad, victroad,  dogosokb,  snk_state, 0,        ROT270, "bootleg", "Dogou Souken (Joystick hack bootleg)", 0 )
 
-GAME( 1987, bermudat, 0,        bermudat, bermudat, driver_device, 0,        ROT270, "SNK", "Bermuda Triangle (World?)", 0 )
-GAME( 1987, bermudatj,bermudat, bermudat, bermudat, driver_device, 0,        ROT270, "SNK", "Bermuda Triangle (Japan)", 0 )
-GAME( 1987, worldwar, 0,        bermudat, worldwar, driver_device, 0,        ROT270, "SNK", "World Wars (World?)", 0 )
-GAME( 1987, bermudata,worldwar, bermudat, bermudaa, driver_device, 0,        ROT270, "SNK", "Bermuda Triangle (World Wars) (US)", 0 )
-GAME( 1987, psychos,  0,        psychos,  psychos, driver_device,  0,        ROT0,   "SNK", "Psycho Soldier (US)", 0 )
-GAME( 1987, psychosj, psychos,  psychos,  psychos, driver_device,  0,        ROT0,   "SNK", "Psycho Soldier (Japan)", 0 )
-GAME( 1987, gwar,     0,        gwar,     gwar, driver_device,     0,        ROT270, "SNK", "Guerrilla War (US)", 0 )
-GAME( 1987, gwarj,    gwar,     gwar,     gwar, driver_device,     0,        ROT270, "SNK", "Guevara (Japan)", 0 )
-GAME( 1987, gwara,    gwar,     gwara,    gwar, driver_device,     0,        ROT270, "SNK", "Guerrilla War (Version 1)", 0 )
-GAME( 1987, gwarb,    gwar,     gwar,     gwarb, driver_device,    0,        ROT270, "bootleg", "Guerrilla War (Joystick hack bootleg)", 0 )
-GAME( 1988, chopper,  0,        chopper1, chopper, driver_device,  0,        ROT270, "SNK", "Chopper I (US set 1)", 0 )
-GAME( 1988, choppera, chopper,  choppera, choppera, driver_device, 0,        ROT270, "SNK", "Chopper I (US set 2)", 0 )
-GAME( 1988, chopperb, chopper,  chopper1, chopper, driver_device,  0,        ROT270, "SNK", "Chopper I (US set 3)", 0 )
-GAME( 1988, legofair, chopper,  chopper1, chopper, driver_device,  0,        ROT270, "SNK", "Koukuu Kihei Monogatari - The Legend of Air Cavalry (Japan)", 0 )
+GAME( 1987, bermudat,  0,        bermudat,  bermudat,  snk_state, 0,        ROT270, "SNK",     "Bermuda Triangle (World?)", 0 )
+GAME( 1987, bermudatj, bermudat, bermudat,  bermudat,  snk_state, 0,        ROT270, "SNK",     "Bermuda Triangle (Japan)", 0 )
+GAME( 1987, worldwar,  0,        bermudat,  worldwar,  snk_state, 0,        ROT270, "SNK",     "World Wars (World?)", 0 )
+GAME( 1987, bermudata, worldwar, bermudat,  bermudaa,  snk_state, 0,        ROT270, "SNK",     "Bermuda Triangle (World Wars) (US)", 0 )
+GAME( 1987, psychos,   0,        psychos,   psychos,   snk_state, 0,        ROT0,   "SNK",     "Psycho Soldier (US)", 0 )
+GAME( 1987, psychosj,  psychos,  psychos,   psychos,   snk_state, 0,        ROT0,   "SNK",     "Psycho Soldier (Japan)", 0 )
+GAME( 1987, gwar,      0,        gwar,      gwar,      snk_state, 0,        ROT270, "SNK",     "Guerrilla War (US)", 0 )
+GAME( 1987, gwarj,     gwar,     gwar,      gwar,      snk_state, 0,        ROT270, "SNK",     "Guevara (Japan)", 0 )
+GAME( 1987, gwara,     gwar,     gwara,     gwar,      snk_state, 0,        ROT270, "SNK",     "Guerrilla War (Version 1, set 1)", 0 )
+GAME( 1987, gwarab,    gwar,     gwara,     gwar,      snk_state, 0,        ROT270, "SNK",     "Guerrilla War (Version 1, set 2)", 0 )
+GAME( 1987, gwarb,     gwar,     gwar,      gwarb,     snk_state, 0,        ROT270, "bootleg", "Guerrilla War (Joystick hack bootleg)", 0 )
+GAME( 1988, chopper,   0,        chopper1,  chopper,   snk_state, 0,        ROT270, "SNK",     "Chopper I (US set 1)", 0 )
+GAME( 1988, choppera,  chopper,  choppera,  choppera,  snk_state, 0,        ROT270, "SNK",     "Chopper I (US set 2)", 0 )
+GAME( 1988, chopperb,  chopper,  chopper1,  chopper,   snk_state, 0,        ROT270, "SNK",     "Chopper I (US set 3)", 0 )
+GAME( 1988, legofair,  chopper,  chopper1,  chopper,   snk_state, 0,        ROT270, "SNK",     "Koukuu Kihei Monogatari - The Legend of Air Cavalry (Japan)", 0 )
 
-GAME( 1987, tdfever,  0,        tdfever,  tdfever, driver_device,  0,        ROT90,  "SNK", "TouchDown Fever (US)", 0 )
-GAME( 1987, tdfeverj, tdfever,  tdfever,  tdfever, driver_device,  0,        ROT90,  "SNK", "TouchDown Fever (Japan)", 0 )
-GAME( 1988, tdfever2, tdfever,  tdfever2, tdfever, driver_device,  0,        ROT90,  "SNK", "TouchDown Fever 2", 0 ) /* upgrade kit for Touchdown Fever */
-GAME( 1988, fsoccer,  0,        tdfever2, fsoccer, driver_device,  0,        ROT0,   "SNK", "Fighting Soccer (version 4)", 0 )
-GAME( 1988, fsoccerj, fsoccer,  tdfever2, fsoccer, driver_device,  0,        ROT0,   "SNK", "Fighting Soccer (Japan)", 0 )
-GAME( 1988, fsoccerb, fsoccer,  tdfever2, fsoccerb, driver_device, 0,        ROT0,   "bootleg", "Fighting Soccer (Joystick hack bootleg)", 0 )
-GAME( 1988, fsoccerba,fsoccer,  tdfever2, fsoccerb, driver_device, 0,        ROT0,   "bootleg", "Fighting Soccer (Joystick hack bootleg, alt)", 0 )
+GAME( 1987, tdfever,   0,        tdfever,   tdfever,   snk_state, 0,        ROT90,  "SNK",     "TouchDown Fever (US)", 0 )
+GAME( 1987, tdfeverj,  tdfever,  tdfever,   tdfever,   snk_state, 0,        ROT90,  "SNK",     "TouchDown Fever (Japan)", 0 )
+GAME( 1988, tdfever2,  tdfever,  tdfever2,  tdfever,   snk_state, 0,        ROT90,  "SNK",     "TouchDown Fever 2", 0 ) /* upgrade kit for Touchdown Fever */
+GAME( 1988, fsoccer,   0,        tdfever2,  fsoccer,   snk_state, 0,        ROT0,   "SNK",     "Fighting Soccer (version 4)", 0 )
+GAME( 1988, fsoccerj,  fsoccer,  tdfever2,  fsoccer,   snk_state, 0,        ROT0,   "SNK",     "Fighting Soccer (Japan)", 0 )
+GAME( 1988, fsoccerb,  fsoccer,  tdfever2,  fsoccerb,  snk_state, 0,        ROT0,   "bootleg", "Fighting Soccer (Joystick hack bootleg)", 0 )
+GAME( 1988, fsoccerba, fsoccer,  tdfever2,  fsoccerb,  snk_state, 0,        ROT0,   "bootleg", "Fighting Soccer (Joystick hack bootleg, alt)", 0 )

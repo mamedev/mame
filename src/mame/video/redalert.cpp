@@ -402,7 +402,7 @@ uint32_t redalert_state::screen_update_panther(screen_device &screen, bitmap_rgb
  *
  *************************************/
 
-static MACHINE_CONFIG_FRAGMENT( redalert_video_common )
+static MACHINE_CONFIG_START( redalert_video_common )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
@@ -411,14 +411,14 @@ static MACHINE_CONFIG_FRAGMENT( redalert_video_common )
 	MCFG_SCREEN_UPDATE_DRIVER(redalert_state, screen_update_redalert)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_FRAGMENT( redalert_video )
+MACHINE_CONFIG_START( redalert_video )
 
 	MCFG_VIDEO_START_OVERRIDE(redalert_state,redalert)
 	MCFG_FRAGMENT_ADD( redalert_video_common )
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_FRAGMENT( ww3_video )
+MACHINE_CONFIG_START( ww3_video )
 
 	MCFG_VIDEO_START_OVERRIDE(redalert_state, ww3 )
 	MCFG_FRAGMENT_ADD( redalert_video_common )
@@ -432,7 +432,7 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-MACHINE_CONFIG_FRAGMENT( demoneye_video )
+MACHINE_CONFIG_START( demoneye_video )
 	MCFG_VIDEO_START_OVERRIDE(redalert_state,redalert)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -444,7 +444,7 @@ MACHINE_CONFIG_FRAGMENT( demoneye_video )
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_FRAGMENT( panther_video )
+MACHINE_CONFIG_START( panther_video )
 
 	MCFG_VIDEO_START_OVERRIDE(redalert_state,ww3)
 

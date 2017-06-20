@@ -16,12 +16,15 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/blktiger.h"
+
+#include "cpu/mcs51/mcs51.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/2203intf.h"
-#include "cpu/mcs51/mcs51.h"
-#include "includes/blktiger.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /**************************************************
@@ -292,7 +295,7 @@ void blktiger_state::machine_reset()
 	m_i8751_latch = 0;
 }
 
-static MACHINE_CONFIG_START( blktiger, blktiger_state )
+static MACHINE_CONFIG_START( blktiger )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz/4)  /* verified on pcb */
@@ -317,7 +320,7 @@ static MACHINE_CONFIG_START( blktiger, blktiger_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(blktiger_state, screen_update_blktiger)
-	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
+	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", blktiger)
@@ -612,11 +615,11 @@ DRIVER_INIT_MEMBER(blktiger_state,blktigerb3)
 
 	memcpy(src, &buffer[0], len);
 }
-GAME( 1987, blktiger,   0,        blktiger,   blktiger, driver_device, 0, ROT0, "Capcom",  "Black Tiger",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1987, blktigera,  blktiger, blktiger,   blktiger, driver_device, 0, ROT0, "Capcom",  "Black Tiger (older)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1987, blktigerb1, blktiger, blktigerbl, blktiger, driver_device, 0, ROT0, "bootleg", "Black Tiger (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, blktigerb2, blktiger, blktigerbl, blktiger, driver_device, 0, ROT0, "bootleg", "Black Tiger (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, blkdrgon,   blktiger, blktiger,   blktiger, driver_device, 0, ROT0, "Capcom",  "Black Dragon (Japan)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1987, blkdrgonb,  blktiger, blktigerbl, blktiger, driver_device, 0, ROT0, "bootleg", "Black Dragon (bootleg)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1987, blktiger,   0,        blktiger,   blktiger, blktiger_state, 0, ROT0, "Capcom",  "Black Tiger",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1987, blktigera,  blktiger, blktiger,   blktiger, blktiger_state, 0, ROT0, "Capcom",  "Black Tiger (older)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1987, blktigerb1, blktiger, blktigerbl, blktiger, blktiger_state, 0, ROT0, "bootleg", "Black Tiger (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, blktigerb2, blktiger, blktigerbl, blktiger, blktiger_state, 0, ROT0, "bootleg", "Black Tiger (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, blkdrgon,   blktiger, blktiger,   blktiger, blktiger_state, 0, ROT0, "Capcom",  "Black Dragon (Japan)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1987, blkdrgonb,  blktiger, blktigerbl, blktiger, blktiger_state, 0, ROT0, "bootleg", "Black Dragon (bootleg)",      MACHINE_SUPPORTS_SAVE )
 // this board has Capcom markings (boards 87118-A-X1 / 87118-B-X1, but no MCU, a mix of bootleg Black Tiger and Black Dragon roms, and an address swapped sound rom? is the latter an alternative security measure?
 GAME( 1987, blktigerb3, blktiger, blktigerbl, blktiger, blktiger_state, blktigerb3, ROT0, "bootleg", "Black Tiger / Black Dragon (mixed bootleg?)", MACHINE_SUPPORTS_SAVE )

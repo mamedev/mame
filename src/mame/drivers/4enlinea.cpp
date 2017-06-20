@@ -186,6 +186,16 @@
 
 *************************************************************************/
 
+#include "emu.h"
+#include "bus/isa/cga.h"
+#include "bus/isa/isa.h"
+#include "cpu/z80/z80.h"
+#include "sound/ay8910.h"
+#include "video/cgapal.h"
+#include "video/mc6845.h"
+#include "speaker.h"
+
+
 #define MAIN_CLOCK           XTAL_16MHz
 #define SEC_CLOCK            XTAL_8MHz
 #define HCGA_CLOCK           XTAL_14_31818MHz
@@ -195,15 +205,6 @@
 #define SND_AY_CLOCK         SEC_CLOCK /4       /* 2 MHz. (measured) */
 #define CRTC_CLOCK           SEC_CLOCK /2       /* 8 MHz. (measured) */
 
-
-#include "emu.h"
-#include "cpu/z80/z80.h"
-#include "video/mc6845.h"
-#include "sound/ay8910.h"
-#include "bus/isa/isa.h"
-#include "bus/isa/cga.h"
-#include "video/cgapal.h"
-
 class _4enlinea_state : public driver_device
 {
 public:
@@ -211,7 +212,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_ay(*this, "aysnd"),
 		m_maincpu(*this, "maincpu")
-		{ }
+	{ }
 
 
 	required_device<ay8910_device> m_ay;
@@ -257,10 +258,10 @@ const tiny_rom_entry *isa8_cga_4enlinea_device::device_rom_region() const
 	return nullptr;
 }
 
-const device_type ISA8_CGA_4ENLINEA = &device_creator<isa8_cga_4enlinea_device>;
+DEFINE_DEVICE_TYPE(ISA8_CGA_4ENLINEA, isa8_cga_4enlinea_device, "4enlinea_cga", "ISA8 CGA - 4enlinea")
 
 isa8_cga_4enlinea_device::isa8_cga_4enlinea_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		isa8_cga_device( mconfig, ISA8_CGA_4ENLINEA, "ISA8_CGA_4ENLINEA", tag, owner, clock, "4enlinea_cga", __FILE__)
+	isa8_cga_device( mconfig, ISA8_CGA_4ENLINEA, tag, owner, clock)
 {
 }
 
@@ -488,7 +489,7 @@ INTERRUPT_GEN_MEMBER(_4enlinea_state::_4enlinea_audio_irq)
 	device.execute().set_input_line(0, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( 4enlinea, _4enlinea_state )
+static MACHINE_CONFIG_START( 4enlinea )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, PRG_CPU_CLOCK)
@@ -548,5 +549,5 @@ ROM_END
 *           Game Drivers           *
 ***********************************/
 
-/*    YEAR  NAME       PARENT   MACHINE   INPUT     STATE          INIT   ROT    COMPANY       FULLNAME          FLAGS  */
-GAME( 1991, 4enlinea,  0,       4enlinea, 4enlinea, driver_device, 0,     ROT0, "Compumatic", "Cuatro en Linea", MACHINE_NOT_WORKING )
+/*    YEAR  NAME       PARENT   MACHINE   INPUT     STATE            INIT   ROT   COMPANY       FULLNAME           FLAGS  */
+GAME( 1991, 4enlinea,  0,       4enlinea, 4enlinea, _4enlinea_state, 0,     ROT0, "Compumatic", "Cuatro en Linea", MACHINE_NOT_WORKING )

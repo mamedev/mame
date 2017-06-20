@@ -170,11 +170,13 @@ Cisco Heat.
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/cischeat.h"
+
 #include "cpu/m68000/m68000.h"
 #include "sound/ym2151.h"
 #include "sound/okim6295.h"
 #include "machine/jalcrpt.h"
-#include "includes/cischeat.h"
+#include "speaker.h"
 
 #include "cischeat.lh"
 #include "f1gpstar.lh"
@@ -1666,21 +1668,21 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( captflag )
 	PORT_START("Buttons")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP   ) PORT_PLAYER(2) // up left
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2) // down left
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_UP   ) PORT_PLAYER(1) // up right
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) // down right
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP   ) PORT_NAME("Left Red Stick Up")
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN ) PORT_NAME("Left Red Stick Down")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP   ) PORT_NAME("Right White Stick Up")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN ) PORT_NAME("Right White Stick Down")
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN2    ) PORT_IMPULSE(1) // coin 2
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON1  ) // decide
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON2  ) PORT_NAME("Decide Button") // decide
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_COIN1    ) PORT_IMPULSE(1) // coin 1
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_SERVICE1 ) // service
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SERVICE  ) // test
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2  ) // select
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON1  ) PORT_NAME("Select Button") // select
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH,IPT_OUTPUT   ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r) // prize sensor
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN  ) // potery on schems?
 
@@ -1907,7 +1909,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(cischeat_state::bigrun_scanline)
 
 
 
-static MACHINE_CONFIG_START( bigrun, cischeat_state )
+static MACHINE_CONFIG_START( bigrun )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("cpu1", M68000, 10000000)
@@ -1957,11 +1959,11 @@ static MACHINE_CONFIG_START( bigrun, cischeat_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
-	MCFG_OKIM6295_ADD("oki1", STD_OKI_CLOCK, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki1", STD_OKI_CLOCK, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
 
-	MCFG_OKIM6295_ADD("oki2", STD_OKI_CLOCK, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki2", STD_OKI_CLOCK, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
 MACHINE_CONFIG_END
@@ -2085,7 +2087,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(cischeat_state::scudhamm_scanline)
 		m_maincpu->set_input_line(2, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( scudhamm, cischeat_state )
+static MACHINE_CONFIG_START( scudhamm )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000, 12000000)
@@ -2115,11 +2117,11 @@ static MACHINE_CONFIG_START( scudhamm, cischeat_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki1", 2112000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki1", 2112000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5)
 
-	MCFG_OKIM6295_ADD("oki2", 2112000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki2", 2112000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5)
 MACHINE_CONFIG_END
@@ -2172,7 +2174,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(cischeat_state::captflag_scanline)
 		m_maincpu->set_input_line(3, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( captflag, cischeat_state )
+static MACHINE_CONFIG_START( captflag )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000, XTAL_24MHz / 2)  // TMP68000P-12
@@ -2211,12 +2213,12 @@ static MACHINE_CONFIG_START( captflag, cischeat_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki1", 2112000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki1", 2112000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, captflag_oki1_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5)
 
-	MCFG_OKIM6295_ADD("oki2", 2112000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki2", 2112000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, captflag_oki2_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5)
@@ -3600,13 +3602,13 @@ DRIVER_INIT_MEMBER(cischeat_state, captflag)
 
 ***************************************************************************/
 
-GAMEL( 1989, bigrun,   0,        bigrun,   bigrun, cischeat_state,   bigrun,   ROT0,   "Jaleco", "Big Run (11th Rallye version)", MACHINE_IMPERFECT_GRAPHICS, layout_cischeat )    // there's a 13th Rallye version (1991) (only on the SNES? Could just be updated title, 1989 -> 11th Paris-Dakar ...)
+GAMEL( 1989, bigrun,   0,        bigrun,   bigrun,   cischeat_state, bigrun,   ROT0,   "Jaleco", "Big Run (11th Rallye version)", MACHINE_IMPERFECT_GRAPHICS, layout_cischeat )    // there's a 13th Rallye version (1991) (only on the SNES? Could just be updated title, 1989 -> 11th Paris-Dakar ...)
 GAMEL( 1990, cischeat, 0,        cischeat, cischeat, cischeat_state, cischeat, ROT0,   "Jaleco", "Cisco Heat",                    MACHINE_IMPERFECT_GRAPHICS, layout_cischeat )
 GAMEL( 1991, f1gpstar, 0,        f1gpstar, f1gpstar, cischeat_state, f1gpstar, ROT0,   "Jaleco", "Grand Prix Star (v3.0)",        MACHINE_IMPERFECT_GRAPHICS, layout_f1gpstar )
 GAMEL( 1991, f1gpstaro,f1gpstar, f1gpstar, f1gpstar, cischeat_state, f1gpstar, ROT0,   "Jaleco", "Grand Prix Star (v2.0)",        MACHINE_IMPERFECT_GRAPHICS, layout_f1gpstar )
-GAME ( 1992, armchmp2, 0,        armchmp2, armchmp2, driver_device, 0,         ROT270, "Jaleco", "Arm Champs II v2.6",            MACHINE_IMPERFECT_GRAPHICS )
-GAME ( 1992, armchmp2o,armchmp2, armchmp2, armchmp2, driver_device, 0,         ROT270, "Jaleco", "Arm Champs II v1.7",            MACHINE_IMPERFECT_GRAPHICS )
-GAME ( 1992, wildplt,  0,        wildplt,  wildplt, cischeat_state,  f1gpstar, ROT0,   "Jaleco", "Wild Pilot",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // busted timings
+GAME ( 1992, armchmp2, 0,        armchmp2, armchmp2, cischeat_state, 0,        ROT270, "Jaleco", "Arm Champs II v2.6",            MACHINE_IMPERFECT_GRAPHICS )
+GAME ( 1992, armchmp2o,armchmp2, armchmp2, armchmp2, cischeat_state, 0,        ROT270, "Jaleco", "Arm Champs II v1.7",            MACHINE_IMPERFECT_GRAPHICS )
+GAME ( 1992, wildplt,  0,        wildplt,  wildplt,  cischeat_state, f1gpstar, ROT0,   "Jaleco", "Wild Pilot",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // busted timings
 GAMEL( 1993, f1gpstr2, 0,        f1gpstr2, f1gpstr2, cischeat_state, f1gpstar, ROT0,   "Jaleco", "F-1 Grand Prix Star II",        MACHINE_IMPERFECT_GRAPHICS, layout_f1gpstar )
 GAME ( 1993, captflag, 0,        captflag, captflag, cischeat_state, captflag, ROT270, "Jaleco", "Captain Flag (Japan)",          MACHINE_IMPERFECT_GRAPHICS )
-GAME ( 1994, scudhamm, 0,        scudhamm, scudhamm, driver_device, 0,         ROT270, "Jaleco", "Scud Hammer",                   MACHINE_IMPERFECT_GRAPHICS )
+GAME ( 1994, scudhamm, 0,        scudhamm, scudhamm, cischeat_state, 0,        ROT270, "Jaleco", "Scud Hammer",                   MACHINE_IMPERFECT_GRAPHICS )

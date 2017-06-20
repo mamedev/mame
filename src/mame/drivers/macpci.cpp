@@ -41,7 +41,9 @@
 #include "cpu/powerpc/ppc.h"
 #include "imagedev/chd_cd.h"
 #include "sound/cdda.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 READ64_MEMBER( macpci_state::unk1_r )
 {
@@ -87,7 +89,7 @@ uint32_t macpci_state::screen_update_pippin(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-static MACHINE_CONFIG_START( pippin, macpci_state )
+static MACHINE_CONFIG_START( pippin )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PPC603, 66000000)
 	MCFG_CPU_PROGRAM_MAP(pippin_mem)
@@ -165,5 +167,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY            FULLNAME       FLAGS */
-COMP( 1996, pippin,  0,       0,     pippin,    pippin, driver_device,  0,  "Apple / Bandai",   "Pippin @mark", MACHINE_NOT_WORKING)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   STATE          INIT  COMPANY            FULLNAME        FLAGS */
+COMP( 1996, pippin,  0,       0,     pippin,    pippin, macpci_state,  0,    "Apple / Bandai",  "Pippin @mark", MACHINE_NOT_WORKING)

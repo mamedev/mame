@@ -2,6 +2,7 @@
 // copyright-holders:David Graves
 #include "emu.h"
 #include "includes/warriorb.h"
+#include "screen.h"
 
 /************************************************************
             SPRITE DRAW ROUTINE

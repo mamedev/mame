@@ -6,14 +6,16 @@
  *
  ****************************************************************************/
 
-#ifndef PRIMO_H_
-#define PRIMO_H_
+#ifndef MAME_INCLUDES_PRIMO_H
+#define MAME_INCLUDES_PRIMO_H
+
+#pragma once
 
 #include "imagedev/snapquik.h"
 #include "imagedev/cassette.h"
-#include "bus/cbmiec/cbmiec.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
 
+#include "bus/cbmiec/cbmiec.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
@@ -67,4 +69,4 @@ public:
 };
 
 
-#endif /* PRIMO_H_ */
+#endif // MAME_INCLUDES_PRIMO_H

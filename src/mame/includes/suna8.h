@@ -3,6 +3,7 @@
 
 #include "machine/gen_latch.h"
 #include "sound/samples.h"
+#include "screen.h"
 
 #define TILEMAPS 0
 

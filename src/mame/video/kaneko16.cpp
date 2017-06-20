@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "includes/kaneko16.h"
+#include "screen.h"
 
 
 WRITE16_MEMBER(kaneko16_state::kaneko16_display_enable)

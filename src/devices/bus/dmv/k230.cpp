@@ -57,27 +57,6 @@ static ADDRESS_MAP_START(k235_io, AS_IO, 8, dmv_k230_device)
 	AM_RANGE( 0x00, 0xff ) AM_READWRITE(io_r, io_w)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_FRAGMENT( dmv_k230 )
-	MCFG_CPU_ADD("maincpu", I8088, XTAL_15MHz / 3)
-	MCFG_CPU_PROGRAM_MAP(k230_mem)
-	MCFG_CPU_IO_MAP(k230_io)
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_FRAGMENT( dmv_k234 )
-	MCFG_CPU_ADD("maincpu", M68008, XTAL_16MHz / 2)
-	MCFG_CPU_PROGRAM_MAP(k234_mem)
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_FRAGMENT( dmv_k235 )
-	MCFG_CPU_ADD("maincpu", V20, XTAL_15MHz / 3)
-	MCFG_CPU_PROGRAM_MAP(k230_mem)
-	MCFG_CPU_IO_MAP(k235_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
-
-	MCFG_PIC8259_ADD("pic8259", INPUTLINE("maincpu", 0), VCC, NOOP)
-MACHINE_CONFIG_END
-
-
 static INPUT_PORTS_START( dmv_k235 )
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x01, 0x00, "K235 INT7" )  PORT_DIPLOCATION("S:1")
@@ -93,10 +72,10 @@ INPUT_PORTS_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type DMV_K230 = &device_creator<dmv_k230_device>;
-const device_type DMV_K231 = &device_creator<dmv_k231_device>;
-const device_type DMV_K234 = &device_creator<dmv_k234_device>;
-const device_type DMV_K235 = &device_creator<dmv_k235_device>;
+DEFINE_DEVICE_TYPE(DMV_K230, dmv_k230_device, "dmv_k230", "K230 8088 without interrupt controller")
+DEFINE_DEVICE_TYPE(DMV_K231, dmv_k231_device, "dmv_k231", "K231 8088 without interrupt controller")
+DEFINE_DEVICE_TYPE(DMV_K234, dmv_k234_device, "dmv_k234", "K234 68008")
+DEFINE_DEVICE_TYPE(DMV_K235, dmv_k235_device, "dmv_k235", "K235 8088 with interrupt controller")
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -107,19 +86,16 @@ const device_type DMV_K235 = &device_creator<dmv_k235_device>;
 //-------------------------------------------------
 
 dmv_k230_device::dmv_k230_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: device_t(mconfig, DMV_K230, "K230 8088 without interrupt controller", tag, owner, clock, "dmv_k230", __FILE__),
-		device_dmvslot_interface( mconfig, *this ),
-		m_maincpu(*this, "maincpu"),
-		m_rom(*this, "rom"), m_bus(nullptr), m_io(nullptr), m_switch16(0), m_hold(0)
-	{
+	: dmv_k230_device(mconfig, DMV_K230, tag, owner, clock)
+{
 }
 
-dmv_k230_device::dmv_k230_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-		: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_dmvslot_interface( mconfig, *this ),
-		m_maincpu(*this, "maincpu"),
-		m_rom(*this, "rom"), m_bus(nullptr), m_io(nullptr), m_switch16(0), m_hold(0)
-	{
+dmv_k230_device::dmv_k230_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_dmvslot_interface(mconfig, *this)
+	, m_maincpu(*this, "maincpu")
+	, m_rom(*this, "rom"), m_bus(nullptr), m_io(nullptr), m_switch16(0), m_hold(0)
+{
 }
 
 //-------------------------------------------------
@@ -127,7 +103,7 @@ dmv_k230_device::dmv_k230_device(const machine_config &mconfig, device_type type
 //-------------------------------------------------
 
 dmv_k231_device::dmv_k231_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: dmv_k230_device(mconfig, DMV_K231, "K231 8088 without interrupt controller", tag, owner, clock, "dmv_k231", __FILE__)
+	: dmv_k230_device(mconfig, DMV_K231, tag, owner, clock)
 {
 }
 
@@ -136,8 +112,8 @@ dmv_k231_device::dmv_k231_device(const machine_config &mconfig, const char *tag,
 //-------------------------------------------------
 
 dmv_k234_device::dmv_k234_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: dmv_k230_device(mconfig, DMV_K234, "K234 68008", tag, owner, clock, "dmv_k234", __FILE__), m_snr(0)
-	{
+	: dmv_k230_device(mconfig, DMV_K234, tag, owner, clock), m_snr(0)
+{
 }
 
 //-------------------------------------------------
@@ -145,9 +121,7 @@ dmv_k234_device::dmv_k234_device(const machine_config &mconfig, const char *tag,
 //-------------------------------------------------
 
 dmv_k235_device::dmv_k235_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: dmv_k230_device(mconfig, DMV_K235, "K235 8088 with interrupt controller", tag, owner, clock, "dmv_k235", __FILE__),
-		m_pic(*this, "pic8259"),
-		m_dsw(*this, "DSW")
+	: dmv_k230_device(mconfig, DMV_K235, tag, owner, clock), m_pic(*this, "pic8259"), m_dsw(*this, "DSW")
 {
 }
 
@@ -185,24 +159,28 @@ void dmv_k234_device::device_reset()
 }
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor dmv_k230_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( dmv_k230 );
-}
+MACHINE_CONFIG_MEMBER( dmv_k230_device::device_add_mconfig )
+	MCFG_CPU_ADD("maincpu", I8088, XTAL_15MHz / 3)
+	MCFG_CPU_PROGRAM_MAP(k230_mem)
+	MCFG_CPU_IO_MAP(k230_io)
+MACHINE_CONFIG_END
 
-machine_config_constructor dmv_k234_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( dmv_k234 );
-}
+MACHINE_CONFIG_MEMBER( dmv_k234_device::device_add_mconfig )
+	MCFG_CPU_ADD("maincpu", M68008, XTAL_16MHz / 2)
+	MCFG_CPU_PROGRAM_MAP(k234_mem)
+MACHINE_CONFIG_END
 
-machine_config_constructor dmv_k235_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( dmv_k235 );
-}
+MACHINE_CONFIG_MEMBER( dmv_k235_device::device_add_mconfig )
+	MCFG_CPU_ADD("maincpu", V20, XTAL_15MHz / 3)
+	MCFG_CPU_PROGRAM_MAP(k230_mem)
+	MCFG_CPU_IO_MAP(k235_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
+
+	MCFG_PIC8259_ADD("pic8259", INPUTLINE("maincpu", 0), VCC, NOOP)
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  device_rom_region

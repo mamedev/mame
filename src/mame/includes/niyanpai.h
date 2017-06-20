@@ -3,6 +3,7 @@
 
 #include "machine/gen_latch.h"
 #include "machine/tmp68301.h"
+#include "screen.h"
 
 #define VRAM_MAX    3
 

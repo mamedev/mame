@@ -13,7 +13,7 @@ Supported project generators:
  * GNU Makefile
  * Ninja (experimental)
  * Qbs / QtCreator (experimental)
- * Visual Studio 2008, 2010, 2012, 2013, 2015, 15
+ * Visual Studio 2008, 2010, 2012, 2013, 2015, 2017
  * XCode
 
 Download (stable)
@@ -21,7 +21,7 @@ Download (stable)
 
 [![Build Status](https://travis-ci.org/bkaradzic/GENie.svg?branch=master)](https://travis-ci.org/bkaradzic/GENie)
 
-	version 714 (commit 00a4c3ece0ebcda3c1cbb4c34324fb65bd6d7049)
+	version 807 (commit 83efdca3c3c63cb47bd1b4daa8b73d526841f900)
 
 Linux:  
 https://github.com/bkaradzic/bx/raw/master/tools/bin/linux/genie
@@ -92,7 +92,6 @@ intention to keep it compatible with it.
  - Added Green Hills Software compiler support.
  - Added edit & continue support for 64-bit builds in VS2013 upwards.
  - Added `windowstargetplatformversion` to specify VS Windows target version.
- - Added vs15 support.
  - Added `NoWinRT` flag to disable WinRT CX builds.
  - Added `NoBufferSecurityCheck` flag to disable security checks in VS.
  - Added `nopch` file list to exclude files from using PCH.
@@ -113,6 +112,9 @@ intention to keep it compatible with it.
  - Added .natvis file type support for Visual Studio.
  - Added Swift language support for make and ninja build generators.
  - Removed CodeBlocks and CodeLite support.
+ - Added vs2017 support.
+ - Removed vs2008 support.
+ - Added `removeplatforms` that removes VS build target platforms.
 
 Debugging GENie scripts
 -----------------------
@@ -179,7 +181,7 @@ PS3.
 	Drew Solomon, Ted de Munnik, Miodrag Milanović, Brett Vickers, Bill Freist,
 	Terry Hendrix II, Ryan Juckett, Andrew Johnson, Johan Sköld,
 	Alastair Murray, Patrick Munns, Jan-Eric Duden, Phil Stevens, Stuart Carnie,
-	Nikolay Aleksiev.
+	Nikolay Aleksiev, Jon Olson.
 	All rights reserved.
 
 	https://github.com/bkaradzic/genie

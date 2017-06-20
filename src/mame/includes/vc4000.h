@@ -10,7 +10,6 @@
 #ifndef VC4000_H_
 #define VC4000_H_
 
-#include "emu.h"
 #include "audio/vc4000.h"
 #include "cpu/s2650/s2650.h"
 #include "imagedev/snapquik.h"
@@ -19,6 +18,8 @@
 
 #include "bus/vc4000/slot.h"
 #include "bus/vc4000/rom.h"
+
+#include "screen.h"
 
 // define this to use digital inputs instead of the slow
 // autocentering analog mame joys

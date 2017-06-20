@@ -9,9 +9,9 @@
 **********************************************************************/
 
 #include "emu.h"
+#include "includes/thomson.h"
 #include "machine/thomflop.h"
 #include "formats/thom_dsk.h"
-#include "includes/thomson.h"
 #include "machine/6821pia.h"
 #include "machine/ram.h"
 
@@ -363,7 +363,7 @@ DEVICE_IMAGE_LOAD_MEMBER( thomson_state, to7_cartridge )
 	offs_t size;
 	char name[129];
 
-	if (image.software_entry() == nullptr)
+	if (!image.loaded_through_softlist())
 		size = image.length();
 	else
 		size = image.get_software_region_length("rom");
@@ -383,7 +383,7 @@ DEVICE_IMAGE_LOAD_MEMBER( thomson_state, to7_cartridge )
 		return image_init_result::FAIL;
 	}
 
-	if (image.software_entry() == nullptr)
+	if (!image.loaded_through_softlist())
 	{
 		if ( image.fread( pos, size ) != size )
 		{
@@ -462,7 +462,7 @@ READ8_MEMBER( thomson_state::to7_cartridge_r )
 {
 	uint8_t* pos = memregion( "maincpu" )->base() + 0x10000;
 	uint8_t data = pos[offset + (m_thom_cart_bank % m_thom_cart_nb_banks) * 0x4000];
-	if ( !space.debugger_access() )
+	if ( !machine().side_effect_disabled() )
 	{
 		m_thom_cart_bank = offset & 3;
 		to7_update_cart_bank();
@@ -593,21 +593,21 @@ READ8_MEMBER( thomson_state::to7_sys_portb_in )
    because the Data Transmit Ready bit is shared in an incompatible way!
 */
 
-const device_type TO7_IO_LINE = &device_creator<to7_io_line_device>;
+DEFINE_DEVICE_TYPE(TO7_IO_LINE, to7_io_line_device, "to7_io_line", "TO7 Serial source")
 
 //-------------------------------------------------
 //  to7_io_line_device - constructor
 //-------------------------------------------------
 
 to7_io_line_device::to7_io_line_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TO7_IO_LINE, "T07 Serial source", tag, owner, clock, "to7_io_line", __FILE__),
+	: device_t(mconfig, TO7_IO_LINE, tag, owner, clock),
 	m_pia_io(*this, THOM_PIA_IO),
 	m_rs232(*this, "rs232"),
 	m_last_low(0)
 {
 }
 
-static MACHINE_CONFIG_FRAGMENT( to7_io_line )
+MACHINE_CONFIG_MEMBER( to7_io_line_device::device_add_mconfig )
 	/// THIS PIO is part of CC 90-232 expansion
 	MCFG_DEVICE_ADD(THOM_PIA_IO, PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(READ8(to7_io_line_device, porta_in))
@@ -630,10 +630,6 @@ static MACHINE_CONFIG_FRAGMENT( to7_io_line )
 
 MACHINE_CONFIG_END
 
-machine_config_constructor to7_io_line_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( to7_io_line );
-}
 
 void to7_io_line_device::device_start()
 {
@@ -759,7 +755,7 @@ void thomson_state::to7_modem_init()
 
 READ8_MEMBER( thomson_state::to7_modem_mea8000_r )
 {
-	if ( space.debugger_access() )
+	if ( machine().side_effect_disabled() )
 	{
 		return 0;
 	}
@@ -1473,7 +1469,7 @@ DEVICE_IMAGE_LOAD_MEMBER( thomson_state, mo5_cartridge )
 	int j;
 	char name[129];
 
-	if (image.software_entry() == nullptr)
+	if (!image.loaded_through_softlist())
 		size = image.length();
 	else
 		size = image.get_software_region_length("rom");
@@ -1493,7 +1489,7 @@ DEVICE_IMAGE_LOAD_MEMBER( thomson_state, mo5_cartridge )
 		return image_init_result::FAIL;
 	}
 
-	if (image.software_entry() == nullptr)
+	if (!image.loaded_through_softlist())
 	{
 		if ( image.fread(pos, size ) != size )
 		{
@@ -1632,7 +1628,7 @@ READ8_MEMBER( thomson_state::mo5_cartridge_r )
 {
 	uint8_t* pos = memregion( "maincpu" )->base() + 0x10000;
 	uint8_t data = pos[offset + 0xbffc + (m_thom_cart_bank % m_thom_cart_nb_banks) * 0x4000];
-	if ( !space.debugger_access() )
+	if ( !machine().side_effect_disabled() )
 	{
 		m_thom_cart_bank = offset & 3;
 		mo5_update_cart_bank();
@@ -1856,7 +1852,7 @@ READ8_MEMBER( thomson_state::to9_vreg_r )
 	case 0: /* palette data */
 	{
 		uint8_t c =  m_to9_palette_data[ m_to9_palette_idx ];
-		if ( !space.debugger_access() )
+		if ( !machine().side_effect_disabled() )
 		{
 			m_to9_palette_idx = ( m_to9_palette_idx + 1 ) & 31;
 		}
@@ -2036,7 +2032,7 @@ READ8_MEMBER( thomson_state::to9_cartridge_r )
 {
 	uint8_t* pos = memregion( "maincpu" )->base() + 0x10000;
 	uint8_t data = pos[offset + (m_thom_cart_bank % m_thom_cart_nb_banks) * 0x4000];
-	if ( !space.debugger_access() )
+	if ( !machine().side_effect_disabled() )
 	{
 		m_thom_cart_bank = offset & 3;
 		to9_update_cart_bank();
@@ -2190,7 +2186,7 @@ READ8_MEMBER( thomson_state::to9_kbd_r )
 		return m_to9_kbd_status;
 
 	case 1: /* get input data */
-		if ( !space.debugger_access() )
+		if ( !machine().side_effect_disabled() )
 		{
 			m_to9_kbd_status &= ~(ACIA_6850_irq | ACIA_6850_PE);
 			if ( m_to9_kbd_overrun )
@@ -3241,7 +3237,7 @@ READ8_MEMBER( thomson_state::to8_cartridge_r )
 {
 	uint8_t* pos = memregion( "maincpu" )->base() + 0x10000;
 	uint8_t data = pos[offset + (m_thom_cart_bank % m_thom_cart_nb_banks) * 0x4000];
-	if ( !space.debugger_access() )
+	if ( !machine().side_effect_disabled() )
 	{
 		m_thom_cart_bank = offset & 3;
 		to8_update_cart_bank();
@@ -3275,7 +3271,7 @@ void thomson_state::to8_floppy_reset()
 
 READ8_MEMBER( thomson_state::to8_floppy_r )
 {
-	if ( space.debugger_access() )
+	if ( machine().side_effect_disabled() )
 		return 0;
 
 	if ( (m_to8_reg_sys1 & 0x80) && THOM_FLOPPY_EXT )
@@ -3334,7 +3330,7 @@ READ8_MEMBER( thomson_state::to8_gatearray_r )
 	case 1: /* ram register / lightpen register 2 */
 		if ( m_to7_lightpen )
 		{
-			if ( !space.debugger_access() )
+			if ( !machine().side_effect_disabled() )
 			{
 				thom_firq_2( 0 );
 				m_to8_lightpen_intr = 0;
@@ -3419,7 +3415,7 @@ READ8_MEMBER( thomson_state::to8_vreg_r )
 	/* 0xe7dc from external floppy drive aliases the video gate-array */
 	if ( ( offset == 3 ) && ( m_to8_reg_ram & 0x80 ) && ( m_to8_reg_sys1 & 0x80 ) )
 	{
-		if ( space.debugger_access() )
+		if ( machine().side_effect_disabled() )
 			return 0;
 
 		if ( THOM_FLOPPY_EXT )
@@ -3433,7 +3429,7 @@ READ8_MEMBER( thomson_state::to8_vreg_r )
 	case 0: /* palette data */
 	{
 		uint8_t c =  m_to9_palette_data[ m_to9_palette_idx ];
-		if ( !space.debugger_access() )
+		if ( !machine().side_effect_disabled() )
 		{
 			m_to9_palette_idx = ( m_to9_palette_idx + 1 ) & 31;
 		}
@@ -4115,7 +4111,7 @@ READ8_MEMBER( thomson_state::mo6_cartridge_r )
 {
 	uint8_t* pos = memregion( "maincpu" )->base() + 0x10000;
 	uint8_t data = pos[offset + 0xbffc + (m_thom_cart_bank % m_thom_cart_nb_banks) * 0x4000];
-	if ( !space.debugger_access() )
+	if ( !machine().side_effect_disabled() )
 	{
 		m_thom_cart_bank = offset & 3;
 		mo6_update_cart_bank();
@@ -4289,7 +4285,7 @@ READ8_MEMBER( thomson_state::mo6_gatearray_r )
 	case 1: /* ram register / lightpen register 2 */
 		if ( m_to7_lightpen )
 		{
-			if ( !space.debugger_access() )
+			if ( !machine().side_effect_disabled() )
 			{
 				thom_firq_2( 0 );
 				m_to8_lightpen_intr = 0;
@@ -4371,7 +4367,7 @@ READ8_MEMBER( thomson_state::mo6_vreg_r )
 	/* 0xa7dc from external floppy drive aliases the video gate-array */
 	if ( ( offset == 3 ) && ( m_to8_reg_ram & 0x80 ) )
 		{
-		if ( !space.debugger_access() )
+		if ( !machine().side_effect_disabled() )
 			return to7_floppy_r( space, 0xc );
 		}
 
@@ -4552,7 +4548,7 @@ MACHINE_START_MEMBER( thomson_state, mo6 )
 
 READ8_MEMBER( thomson_state::mo5nr_net_r )
 {
-	if ( space.debugger_access() )
+	if ( machine().side_effect_disabled() )
 		return 0;
 
 	if ( to7_controller_type )

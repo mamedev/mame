@@ -38,12 +38,16 @@ ToDo:
 ************************************************************************************/
 
 #include "emu.h"
+#include "machine/genpin.h"
+
 #include "cpu/m6800/m6800.h"
 #include "machine/6821pia.h"
-#include "machine/genpin.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
+
 #include "s3.lh"
+
 
 class s3_state : public genpin_class
 {
@@ -419,7 +423,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( s3_state::irq )
 		m_t_c++;
 }
 
-static MACHINE_CONFIG_START( s3, s3_state )
+static MACHINE_CONFIG_START( s3 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, 3580000)
 	MCFG_CPU_PROGRAM_MAP(s3_main_map)
@@ -478,7 +482,7 @@ static MACHINE_CONFIG_DERIVED( s3a, s3 )
 	MCFG_MACHINE_RESET_OVERRIDE(s3_state, s3a)
 
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
+	MCFG_SOUND_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
@@ -578,10 +582,10 @@ ROM_START(pkrno_l1)
 	ROM_LOAD("sound1.716",   0x0000, 0x0800, CRC(f4190ca3) SHA1(ee234fb5c894fca5876ee6dc7ea8e89e7e0aec9c))
 ROM_END
 
-GAME( 1977, httip_l1, 0, s3,  s3, driver_device, 0, ROT0, "Williams", "Hot Tip (L-1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1977, lucky_l1, 0, s3,  s3, driver_device, 0, ROT0, "Williams", "Lucky Seven (L-1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1978, wldcp_l1, 0, s3a, s3, driver_device, 0, ROT0, "Williams", "World Cup Soccer (L-1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1978, cntct_l1, 0, s3a, s3, driver_device, 0, ROT0, "Williams", "Contact (L-1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1978, disco_l1, 0, s3a, s3, driver_device, 0, ROT0, "Williams", "Disco Fever (L-1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1978, phnix_l1, 0, s3a, s3, driver_device, 0, ROT0, "Williams", "Phoenix (L-1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1978, pkrno_l1, 0, s3a, s3, driver_device, 0, ROT0, "Williams", "Pokerino (L-1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1977, httip_l1, 0, s3,  s3, s3_state, 0, ROT0, "Williams", "Hot Tip (L-1)",          MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1977, lucky_l1, 0, s3,  s3, s3_state, 0, ROT0, "Williams", "Lucky Seven (L-1)",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1978, wldcp_l1, 0, s3a, s3, s3_state, 0, ROT0, "Williams", "World Cup (L-1)",        MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1978, cntct_l1, 0, s3a, s3, s3_state, 0, ROT0, "Williams", "Contact (L-1)",          MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1978, disco_l1, 0, s3a, s3, s3_state, 0, ROT0, "Williams", "Disco Fever (L-1)",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1978, phnix_l1, 0, s3a, s3, s3_state, 0, ROT0, "Williams", "Phoenix (L-1)",          MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1978, pkrno_l1, 0, s3a, s3, s3_state, 0, ROT0, "Williams", "Pokerino (L-1)",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING )

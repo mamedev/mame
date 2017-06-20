@@ -12,13 +12,17 @@ Bruce Tomlin (hardware info)
 
 #include "emu.h"
 #include "includes/vectrex.h"
+
 #include "cpu/m6809/m6809.h"
 #include "machine/6522via.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "sound/volt_reg.h"
 #include "video/vector.h"
+
 #include "softlist.h"
+#include "speaker.h"
+
 
 static ADDRESS_MAP_START(vectrex_map, AS_PROGRAM, 8, vectrex_state )
 	AM_RANGE(0x0000, 0x7fff) AM_NOP // cart area, handled at machine_start
@@ -91,7 +95,7 @@ static SLOT_INTERFACE_START(vectrex_cart)
 	SLOT_INTERFACE_INTERNAL("vec_sram",   VECTREX_ROM_SRAM)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( vectrex, vectrex_state )
+static MACHINE_CONFIG_START( vectrex )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, XTAL_6MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(vectrex_map)
@@ -237,7 +241,7 @@ ROM_END
 
 ***************************************************************************/
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT       COMPANY FULLNAME */
-CONS(1982, vectrex,  0,        0,      vectrex,  vectrex,  vectrex_state, vectrex,    "General Consumer Electronics",   "Vectrex" , ROT270)
+//   YEAR  NAME      PARENT    COMPAT   MACHINE   INPUT     STATE          INIT     MONITOR  COMPANY                         FULLNAME
+CONS(1982, vectrex,  0,        0,       vectrex,  vectrex,  vectrex_state, vectrex,          "General Consumer Electronics", "Vectrex" , ROT270)
 
-GAME(1984, raaspec,  0,        raaspec,  raaspec, vectrex_state,  vectrex, ROT270,    "Roy Abel & Associates",   "Spectrum I+", MACHINE_NOT_WORKING ) //TODO: button labels & timings, a mandatory artwork too?
+GAME(1984, raaspec,  0,                 raaspec, raaspec,   vectrex_state, vectrex, ROT270,  "Roy Abel & Associates",        "Spectrum I+", MACHINE_NOT_WORKING ) //TODO: button labels & timings, a mandatory artwork too?

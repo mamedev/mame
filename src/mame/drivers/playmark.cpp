@@ -61,13 +61,16 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
-#include "machine/eepromser.h"
-#include "cpu/pic16c5x/pic16c5x.h"
-#include "sound/okim6295.h"
 #include "includes/playmark.h"
-#include "machine/ticket.h"
+
+#include "cpu/m68000/m68000.h"
+#include "cpu/pic16c5x/pic16c5x.h"
+#include "machine/eepromser.h"
 #include "machine/nvram.h"
+#include "machine/ticket.h"
+#include "screen.h"
+#include "sound/okim6295.h"
+#include "speaker.h"
 
 
 WRITE16_MEMBER(playmark_state::coinctrl_w)
@@ -256,12 +259,6 @@ WRITE8_MEMBER(playmark_state::hrdtimes_snd_control_w)
 //      logerror("PC$%03x Writing %02x to OKI1, PortC=%02x, Code=%02x\n",space.device().safe_pcbase(),m_oki_command,m_oki_control,m_snd_command);
 		m_oki->write(space, 0, m_oki_command);
 	}
-}
-
-
-READ_LINE_MEMBER(playmark_state::PIC16C5X_T0_clk_r)
-{
-	return 0;
 }
 
 
@@ -1212,7 +1209,7 @@ MACHINE_RESET_MEMBER(playmark_state,playmark)
 	m_dispenser_latch = 0;
 }
 
-static MACHINE_CONFIG_START( bigtwin, playmark_state )
+static MACHINE_CONFIG_START( bigtwin )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz */
@@ -1225,7 +1222,6 @@ static MACHINE_CONFIG_START( bigtwin, playmark_state )
 	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(playmark_state, playmark_oki_w))
 	MCFG_PIC16C5x_READ_C_CB(READ8(playmark_state, playmark_snd_flag_r))
 	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(playmark_state, playmark_snd_control_w))
-	MCFG_PIC16C5x_T0_CB(READLINE(playmark_state, PIC16C5X_T0_clk_r))
 
 	MCFG_MACHINE_START_OVERRIDE(playmark_state,playmark)
 	MCFG_MACHINE_RESET_OVERRIDE(playmark_state,playmark)
@@ -1248,12 +1244,12 @@ static MACHINE_CONFIG_START( bigtwin, playmark_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( bigtwinb, playmark_state )
+static MACHINE_CONFIG_START( bigtwinb )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
@@ -1266,7 +1262,6 @@ static MACHINE_CONFIG_START( bigtwinb, playmark_state )
 	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(playmark_state, playmark_oki_w))
 	MCFG_PIC16C5x_READ_C_CB(READ8(playmark_state, playmark_snd_flag_r))
 	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(playmark_state, playmark_snd_control_w))
-	MCFG_PIC16C5x_T0_CB(READLINE(playmark_state, PIC16C5X_T0_clk_r))
 
 	MCFG_MACHINE_START_OVERRIDE(playmark_state,playmark)
 	MCFG_MACHINE_RESET_OVERRIDE(playmark_state,playmark)
@@ -1289,12 +1284,12 @@ static MACHINE_CONFIG_START( bigtwinb, playmark_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( wbeachvl, playmark_state )
+static MACHINE_CONFIG_START( wbeachvl )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz */
@@ -1308,7 +1303,6 @@ static MACHINE_CONFIG_START( wbeachvl, playmark_state )
 	MCFG_PIC16C5x_READ_C_CB(READ8(playmark_state, playmark_snd_flag_r))
 	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(playmark_state, playmark_snd_control_w))
 //  MCFG_PIC16C5x_WRITE_C_CB(WRITE8(playmark_state, hrdtimes_snd_control_w)) // probably closer to this, but this only supports 2 sample bank bits
-	MCFG_PIC16C5x_T0_CB(READLINE(playmark_state, PIC16C5X_T0_clk_r))
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_EEPROM_SERIAL_DEFAULT_VALUE(0)
@@ -1334,12 +1328,12 @@ static MACHINE_CONFIG_START( wbeachvl, playmark_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( excelsr, playmark_state )
+static MACHINE_CONFIG_START( excelsr )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* 12 MHz */
@@ -1352,7 +1346,6 @@ static MACHINE_CONFIG_START( excelsr, playmark_state )
 	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(playmark_state, playmark_oki_w))
 	MCFG_PIC16C5x_READ_C_CB(READ8(playmark_state, playmark_snd_flag_r))
 	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(playmark_state, playmark_snd_control_w))
-	MCFG_PIC16C5x_T0_CB(READLINE(playmark_state, PIC16C5X_T0_clk_r))
 
 	MCFG_MACHINE_START_OVERRIDE(playmark_state,playmark)
 	MCFG_MACHINE_RESET_OVERRIDE(playmark_state,playmark)
@@ -1375,12 +1368,12 @@ static MACHINE_CONFIG_START( excelsr, playmark_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_1MHz, OKIM6295_PIN7_HIGH) /* 1MHz resonator */
+	MCFG_OKIM6295_ADD("oki", XTAL_1MHz, PIN7_HIGH) /* 1MHz resonator */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( hrdtimes, playmark_state )
+static MACHINE_CONFIG_START( hrdtimes )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* verified on pcb */
@@ -1393,7 +1386,6 @@ static MACHINE_CONFIG_START( hrdtimes, playmark_state )
 	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(playmark_state, playmark_oki_w))
 	MCFG_PIC16C5x_READ_C_CB(READ8(playmark_state, playmark_snd_flag_r))
 	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(playmark_state, hrdtimes_snd_control_w))
-	MCFG_PIC16C5x_T0_CB(READLINE(playmark_state, PIC16C5X_T0_clk_r))
 	MCFG_DEVICE_DISABLE()       /* Internal code is not dumped yet */
 
 	MCFG_MACHINE_START_OVERRIDE(playmark_state,playmark)
@@ -1417,12 +1409,12 @@ static MACHINE_CONFIG_START( hrdtimes, playmark_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_1MHz, OKIM6295_PIN7_HIGH) /* verified on pcb */
+	MCFG_OKIM6295_ADD("oki", XTAL_1MHz, PIN7_HIGH) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( hotmind, playmark_state )
+static MACHINE_CONFIG_START( hotmind )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* verified on pcb */
@@ -1435,7 +1427,6 @@ static MACHINE_CONFIG_START( hotmind, playmark_state )
 	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(playmark_state, playmark_oki_w))
 	MCFG_PIC16C5x_READ_C_CB(READ8(playmark_state, playmark_snd_flag_r))
 	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(playmark_state, hrdtimes_snd_control_w))
-	MCFG_PIC16C5x_T0_CB(READLINE(playmark_state, PIC16C5X_T0_clk_r))
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_EEPROM_SERIAL_DEFAULT_VALUE(0)
@@ -1464,12 +1455,12 @@ static MACHINE_CONFIG_START( hotmind, playmark_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_1MHz, OKIM6295_PIN7_HIGH)  /* verified on pcb */
+	MCFG_OKIM6295_ADD("oki", XTAL_1MHz, PIN7_HIGH)  /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( luckboomh, playmark_state )
+static MACHINE_CONFIG_START( luckboomh )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* verified on pcb */
@@ -1482,7 +1473,6 @@ static MACHINE_CONFIG_START( luckboomh, playmark_state )
 	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(playmark_state, playmark_oki_w))
 	MCFG_PIC16C5x_READ_C_CB(READ8(playmark_state, playmark_snd_flag_r))
 	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(playmark_state, hrdtimes_snd_control_w))
-	MCFG_PIC16C5x_T0_CB(READLINE(playmark_state, PIC16C5X_T0_clk_r))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -1510,7 +1500,7 @@ static MACHINE_CONFIG_START( luckboomh, playmark_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_1MHz, OKIM6295_PIN7_HIGH)  /* verified on pcb */
+	MCFG_OKIM6295_ADD("oki", XTAL_1MHz, PIN7_HIGH)  /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki_map)
 MACHINE_CONFIG_END
@@ -1995,12 +1985,12 @@ DRIVER_INIT_MEMBER(playmark_state,pic_decode)
 
 GAME( 1995, bigtwin,   0,        bigtwin,   bigtwin,   playmark_state, pic_decode, ROT0, "Playmark", "Big Twin", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, bigtwinb,  bigtwin,  bigtwinb,  bigtwinb,  playmark_state, pic_decode, ROT0, "Playmark", "Big Twin (No Girls Conversion)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, wbeachvl,  0,        wbeachvl,  wbeachvl,  driver_device,  0,          ROT0, "Playmark", "World Beach Volley (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, wbeachvl2, wbeachvl, wbeachvl,  wbeachvl,  driver_device,  0,          ROT0, "Playmark", "World Beach Volley (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, wbeachvl3, wbeachvl, wbeachvl,  wbeachvl,  driver_device,  0,          ROT0, "Playmark", "World Beach Volley (set 3)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, wbeachvl,  0,        wbeachvl,  wbeachvl,  playmark_state, 0,          ROT0, "Playmark", "World Beach Volley (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, wbeachvl2, wbeachvl, wbeachvl,  wbeachvl,  playmark_state, 0,          ROT0, "Playmark", "World Beach Volley (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, wbeachvl3, wbeachvl, wbeachvl,  wbeachvl,  playmark_state, 0,          ROT0, "Playmark", "World Beach Volley (set 3)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1996, excelsr,   0,        excelsr,   excelsr,   playmark_state, pic_decode, ROT0, "Playmark", "Excelsior (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, excelsra,  excelsr,  excelsr,   excelsr,   playmark_state, pic_decode, ROT0, "Playmark", "Excelsior (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, hrdtimes,  0,        hrdtimes,  hrdtimes,  driver_device,  0,          ROT0, "Playmark", "Hard Times (set 1)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, hrdtimesa, hrdtimes, hrdtimes,  hrdtimes,  driver_device,  0,          ROT0, "Playmark", "Hard Times (set 2)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, hrdtimes,  0,        hrdtimes,  hrdtimes,  playmark_state, 0,          ROT0, "Playmark", "Hard Times (set 1)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, hrdtimesa, hrdtimes, hrdtimes,  hrdtimes,  playmark_state, 0,          ROT0, "Playmark", "Hard Times (set 2)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1995, hotmind,   0,        hotmind,   hotmind,   playmark_state, pic_decode, ROT0, "Playmark", "Hot Mind (Hard Times hardware)", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, luckboomh, luckboom, luckboomh, luckboomh, playmark_state, pic_decode, ROT0, "Playmark", "Lucky Boom (Hard Times hardware)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

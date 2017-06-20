@@ -3,7 +3,10 @@
 
 /* Williams WPC Fliptronics I */
 
+#include "emu.h"
 #include "includes/wpc_flip1.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 static ADDRESS_MAP_START( wpc_flip1_map, AS_PROGRAM, 8, wpc_flip1_state )
@@ -154,7 +157,7 @@ DRIVER_INIT_MEMBER(wpc_flip1_state,wpc_flip1)
 	wpc_dot_state::init_wpc_dot();
 }
 
-static MACHINE_CONFIG_START( wpc_flip1, wpc_flip1_state )
+static MACHINE_CONFIG_START( wpc_flip1 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 2000000)
 	MCFG_CPU_PROGRAM_MAP(wpc_flip1_map)

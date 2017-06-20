@@ -38,6 +38,9 @@
 #pragma GCC diagnostic ignored "-Wformat-security"              // warning : format string is not a string literal (potentially insecure)
 #pragma GCC diagnostic ignored "-Wdouble-promotion"             // warning: implicit conversion from 'float' to 'double' when passing argument to function
 #pragma GCC diagnostic ignored "-Wconversion"                   // warning: conversion to 'xxxx' from 'xxxx' may alter its value
+#if (__GNUC__ >= 6)
+#pragma GCC diagnostic ignored "-Wmisleading-indentation"       // warning: this 'if' clause does not guard this statement      // GCC 6.0+ only. See #883 on github.
+#endif
 #endif
 
 // Play it nice with Windows users. Notepad in 2015 still doesn't display text data with Unix-style \n.
@@ -359,7 +362,7 @@ void ImGui::ShowTestWindow(bool* p_open)
             ImVec2 pos = ImGui::GetCursorScreenPos();
             ImGui::GetWindowDrawList()->AddRectFilled(ImVec2(pos.x + wrap_width, pos.y), ImVec2(pos.x + wrap_width + 10, pos.y + ImGui::GetTextLineHeight()), IM_COL32(255,0,255,255));
             ImGui::PushTextWrapPos(ImGui::GetCursorPos().x + wrap_width);
-            ImGui::Text("lazy dog. This paragraph is made to fit within %.0f pixels. The quick brown fox jumps over the lazy dog.", wrap_width);
+            ImGui::Text("The lazy dog is a good dog. This paragraph is made to fit within %.0f pixels. Testing a 1 character word. The quick brown fox jumps over the lazy dog.", wrap_width);
             ImGui::GetWindowDrawList()->AddRect(ImGui::GetItemRectMin(), ImGui::GetItemRectMax(), IM_COL32(255,255,0,255));
             ImGui::PopTextWrapPos();
 
@@ -367,7 +370,7 @@ void ImGui::ShowTestWindow(bool* p_open)
             pos = ImGui::GetCursorScreenPos();
             ImGui::GetWindowDrawList()->AddRectFilled(ImVec2(pos.x + wrap_width, pos.y), ImVec2(pos.x + wrap_width + 10, pos.y + ImGui::GetTextLineHeight()), IM_COL32(255,0,255,255));
             ImGui::PushTextWrapPos(ImGui::GetCursorPos().x + wrap_width);
-            ImGui::Text("aaaaaaaa bbbbbbbb, cccccccc,dddddddd. eeeeeeee   ffffffff. gggggggg!hhhhhhhh");
+            ImGui::Text("aaaaaaaa bbbbbbbb, c cccccccc,dddddddd. d eeeeeeee   ffffffff. gggggggg!hhhhhhhh");
             ImGui::GetWindowDrawList()->AddRect(ImGui::GetItemRectMin(), ImGui::GetItemRectMax(), IM_COL32(255,255,0,255));
             ImGui::PopTextWrapPos();
 
@@ -1120,7 +1123,8 @@ void ImGui::ShowTestWindow(bool* p_open)
             ImGui::BeginChild("scrolling", ImVec2(0, ImGui::GetItemsLineHeightWithSpacing()*7 + 30), true, ImGuiWindowFlags_HorizontalScrollbar);
             for (int line = 0; line < lines; line++)
             {
-                // Display random stuff
+                // Display random stuff (for the sake of this trivial demo we are using basic Button+SameLine. If you want to create your own time line for a real application you may be better off 
+                // manipulating the cursor position yourself, aka using SetCursorPos/SetCursorScreenPos to position the widgets yourself. You may also want to use the lower-level ImDrawList API)
                 int num_buttons = 10 + ((line & 1) ? line * 9 : line * 3);
                 for (int n = 0; n < num_buttons; n++)
                 {
@@ -1178,6 +1182,8 @@ void ImGui::ShowTestWindow(bool* p_open)
             const char* names[] = { "Bream", "Haddock", "Mackerel", "Pollock", "Tilefish" };
             static bool toggles[] = { true, false, false, false, false };
 
+            // Simple selection popup
+            // (If you want to show the current selection inside the Button itself, you may want to build a string using the "###" operator to preserve a constant ID with a variable label)
             if (ImGui::Button("Select.."))
                 ImGui::OpenPopup("select");
             ImGui::SameLine();
@@ -1192,6 +1198,7 @@ void ImGui::ShowTestWindow(bool* p_open)
                 ImGui::EndPopup();
             }
 
+            // Showing a menu with toggles
             if (ImGui::Button("Toggle.."))
                 ImGui::OpenPopup("toggle");
             if (ImGui::BeginPopup("toggle"))
@@ -1226,8 +1233,8 @@ void ImGui::ShowTestWindow(bool* p_open)
             }
 
             if (ImGui::Button("Popup Menu.."))
-                ImGui::OpenPopup("popup from button");
-            if (ImGui::BeginPopup("popup from button"))
+                ImGui::OpenPopup("FilePopup");
+            if (ImGui::BeginPopup("FilePopup"))
             {
                 ShowExampleMenuFile();
                 ImGui::EndPopup();
@@ -1733,7 +1740,7 @@ void ImGui::ShowStyleEditor(ImGuiStyle* ref)
             ImFont* font = atlas->Fonts[i];
             ImGui::BulletText("Font %d: \'%s\', %.2f px, %d glyphs", i, font->ConfigData ? font->ConfigData[0].Name : "", font->FontSize, font->Glyphs.Size);
             ImGui::TreePush((void*)(intptr_t)i);
-            if (i > 0) { ImGui::SameLine(); if (ImGui::SmallButton("Set as default")) { atlas->Fonts[i] = atlas->Fonts[0]; atlas->Fonts[0] = font; } }
+            ImGui::SameLine(); if (ImGui::SmallButton("Set as default")) ImGui::GetIO().FontDefault = font;
             ImGui::PushFont(font);
             ImGui::Text("The quick brown fox jumps over the lazy dog");
             ImGui::PopFont();
@@ -1804,6 +1811,7 @@ void ImGui::ShowStyleEditor(ImGuiStyle* ref)
     ImGui::PopItemWidth();
 }
 
+// Demonstrate creating a fullscreen menu bar and populating it.
 static void ShowExampleAppMainMenuBar()
 {
     if (ImGui::BeginMainMenuBar())
@@ -1882,6 +1890,7 @@ static void ShowExampleMenuFile()
     if (ImGui::MenuItem("Quit", "Alt+F4")) {}
 }
 
+// Demonstrate creating a window which gets auto-resized according to its content.
 static void ShowExampleAppAutoResize(bool* p_open)
 {
     if (!ImGui::Begin("Example: Auto-resizing window", p_open, ImGuiWindowFlags_AlwaysAutoResize))
@@ -1898,6 +1907,7 @@ static void ShowExampleAppAutoResize(bool* p_open)
     ImGui::End();
 }
 
+// Demonstrate creating a window with custom resize constraints.
 static void ShowExampleAppConstrainedResize(bool* p_open)
 {
     struct CustomConstraints // Helper functions to demonstrate programmatic constraints
@@ -1935,6 +1945,7 @@ static void ShowExampleAppConstrainedResize(bool* p_open)
     ImGui::End();
 }
 
+// Demonstrate creating a simple static window with no decoration.
 static void ShowExampleAppFixedOverlay(bool* p_open)
 {
     ImGui::SetNextWindowPos(ImVec2(10,10));
@@ -1949,10 +1960,12 @@ static void ShowExampleAppFixedOverlay(bool* p_open)
     ImGui::End();
 }
 
+// Demonstrate using "##" and "###" in identifiers to manipulate ID generation.
+// Read section "How can I have multiple widgets with the same label? Can I have widget without a label? (Yes). A primer on the purpose of labels/IDs." about ID.
 static void ShowExampleAppManipulatingWindowTitle(bool*)
 {
     // By default, Windows are uniquely identified by their title.
-    // You can use the "##" and "###" markers to manipulate the display/ID. Read FAQ at the top of this file!
+    // You can use the "##" and "###" markers to manipulate the display/ID.
 
     // Using "##" to display same title but have unique identifier.
     ImGui::SetNextWindowPos(ImVec2(100,100), ImGuiSetCond_FirstUseEver);
@@ -1974,6 +1987,7 @@ static void ShowExampleAppManipulatingWindowTitle(bool*)
     ImGui::End();
 }
 
+// Demonstrate using the low-level ImDrawList to draw custom shapes. 
 static void ShowExampleAppCustomRendering(bool* p_open)
 {
     ImGui::SetNextWindowSize(ImVec2(350,560), ImGuiSetCond_FirstUseEver);
@@ -2041,20 +2055,20 @@ static void ShowExampleAppCustomRendering(bool* p_open)
 
         bool adding_preview = false;
         ImGui::InvisibleButton("canvas", canvas_size);
+        ImVec2 mouse_pos_in_canvas = ImVec2(ImGui::GetIO().MousePos.x - canvas_pos.x, ImGui::GetIO().MousePos.y - canvas_pos.y);
+        if (adding_line)
+        {
+            adding_preview = true;
+            points.push_back(mouse_pos_in_canvas);
+            if (!ImGui::GetIO().MouseDown[0])
+                adding_line = adding_preview = false;
+        }
         if (ImGui::IsItemHovered())
         {
-            ImVec2 mouse_pos_in_canvas = ImVec2(ImGui::GetIO().MousePos.x - canvas_pos.x, ImGui::GetIO().MousePos.y - canvas_pos.y);
             if (!adding_line && ImGui::IsMouseClicked(0))
             {
                 points.push_back(mouse_pos_in_canvas);
                 adding_line = true;
-            }
-            if (adding_line)
-            {
-                adding_preview = true;
-                points.push_back(mouse_pos_in_canvas);
-                if (!ImGui::GetIO().MouseDown[0])
-                    adding_line = adding_preview = false;
             }
             if (ImGui::IsMouseClicked(1) && !points.empty())
             {
@@ -2073,6 +2087,7 @@ static void ShowExampleAppCustomRendering(bool* p_open)
     ImGui::End();
 }
 
+// Demonstrating creating a simple console window, with scrolling, filtering, completion and history.
 // For the console example, here we are using a more C++ like approach of declaring a class to hold the data and the functions.
 struct ExampleAppConsole
 {
@@ -2302,7 +2317,7 @@ struct ExampleAppConsole
                         for (int i = 0; i < candidates.Size && all_candidates_matches; i++)
                             if (i == 0)
                                 c = toupper(candidates[i][match_len]);
-                            else if (c != toupper(candidates[i][match_len]))
+                            else if (c == 0 || c != toupper(candidates[i][match_len]))
                                 all_candidates_matches = false;
                         if (!all_candidates_matches)
                             break;
@@ -2423,6 +2438,7 @@ struct ExampleAppLog
     }
 };
 
+// Demonstrate creating a simple log window with basic filtering.
 static void ShowExampleAppLog(bool* p_open)
 {
     static ExampleAppLog log;
@@ -2440,6 +2456,7 @@ static void ShowExampleAppLog(bool* p_open)
     log.Draw("Example: Log", p_open);
 }
 
+// Demonstrate create a window with multiple child windows.
 static void ShowExampleAppLayout(bool* p_open)
 {
     ImGui::SetNextWindowSize(ImVec2(500, 440), ImGuiSetCond_FirstUseEver);
@@ -2485,6 +2502,7 @@ static void ShowExampleAppLayout(bool* p_open)
     ImGui::End();
 }
 
+// Demonstrate create a simple property editor.
 static void ShowExampleAppPropertyEditor(bool* p_open)
 {
     ImGui::SetNextWindowSize(ImVec2(430,450), ImGuiSetCond_FirstUseEver);
@@ -2557,6 +2575,7 @@ static void ShowExampleAppPropertyEditor(bool* p_open)
     ImGui::End();
 }
 
+// Demonstrate/test rendering huge amount of text, and the incidence of clipping.
 static void ShowExampleAppLongText(bool* p_open)
 {
     ImGui::SetNextWindowSize(ImVec2(520,600), ImGuiSetCond_FirstUseEver);

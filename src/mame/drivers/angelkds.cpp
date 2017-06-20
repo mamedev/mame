@@ -124,13 +124,15 @@ Dumped by Chackn
 
 
 #include "emu.h"
+#include "includes/angelkds.h"
+
 #include "cpu/z80/z80.h"
+#include "machine/i8255.h"
 #include "machine/segacrp2_device.h"
 #include "sound/2203intf.h"
-#include "includes/angelkds.h"
-#include "machine/i8255.h"
 
-
+#include "screen.h"
+#include "speaker.h"
 
 
 
@@ -509,7 +511,7 @@ void angelkds_state::machine_reset()
 	m_bgtopbank = 0;
 }
 
-static MACHINE_CONFIG_START( angelkds, angelkds_state )
+static MACHINE_CONFIG_START( angelkds )
 
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_6MHz)
 	MCFG_CPU_PROGRAM_MAP(main_map)

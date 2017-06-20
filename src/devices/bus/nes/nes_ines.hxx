@@ -221,7 +221,7 @@ static const nes_mmc mmc_list[] =
 	{ 187, UNL_KOF96 },
 	{ 188, BANDAI_KARAOKE },
 	{ 189, TXC_TW },
-	// 190 Unused
+	{ 190, ZEMINA_BOARD },
 	{ 191, WAIXING_TYPE_B },
 	{ 192, WAIXING_TYPE_C },
 	{ 193, NTDEC_FIGHTINGHERO },
@@ -691,7 +691,7 @@ void nes_cart_slot_device::call_load_ines()
 	if (!ines20)
 	{
 		logerror("Loaded game in iNES format:\n");
-		logerror("-- Mapper %d\n", mapper);
+		logerror("-- Mapper %u\n", mapper);
 		logerror("-- PRG 0x%x (%d x 16k chunks)\n", prg_size, prg_size / 0x4000);
 		logerror("-- VROM 0x%x (%d x 8k chunks)\n", vrom_size, vrom_size / 0x2000);
 		logerror("-- VRAM 0x%x (%d x 8k chunks)\n", vram_size, vram_size / 0x2000);
@@ -707,8 +707,8 @@ void nes_cart_slot_device::call_load_ines()
 	else
 	{
 		logerror("Loaded game in Extended iNES format:\n");
-		logerror("-- Mapper: %d\n", mapper);
-		logerror("-- Submapper: %d\n", (header[8] & 0xf0) >> 4);
+		logerror("-- Mapper: %u\n", mapper);
+		logerror("-- Submapper: %u\n", (header[8] & 0xf0) >> 4);
 		logerror("-- PRG 0x%x (%d x 16k chunks)\n", prg_size, prg_size / 0x4000);
 		logerror("-- VROM 0x%x (%d x 8k chunks)\n", vrom_size, vrom_size / 0x2000);
 		logerror("-- VRAM 0x%x (%d x 8k chunks)\n", vram_size, vram_size / 0x2000);
@@ -811,7 +811,7 @@ void nes_cart_slot_device::call_load_ines()
 	}
 }
 
-const char * nes_cart_slot_device::get_default_card_ines(uint8_t *ROM, uint32_t len)
+const char * nes_cart_slot_device::get_default_card_ines(get_default_card_software_hook &hook, const uint8_t *ROM, uint32_t len) const
 {
 	uint8_t mapper, submapper = 0;
 	bool ines20 = false;
@@ -837,7 +837,7 @@ const char * nes_cart_slot_device::get_default_card_ines(uint8_t *ROM, uint32_t 
 	}
 
 	// use info from nes.hsi if available!
-	if (hashfile_extrainfo(*this, mapinfo))
+	if (hook.hashfile_extrainfo(mapinfo))
 	{
 		if (4 == sscanf(mapinfo.c_str(),"%d %d %d %d", &mapint1, &mapint2, &mapint3, &mapint4))
 		{

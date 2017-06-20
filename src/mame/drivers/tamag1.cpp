@@ -10,7 +10,9 @@
 
 #include "emu.h"
 #include "cpu/e0c6200/e0c6s46.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
+#include "screen.h"
+#include "speaker.h"
 
 #include "tama.lh"
 
@@ -126,7 +128,7 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( tama, tamag1_state )
+static MACHINE_CONFIG_START( tama )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", E0C6S46, XTAL_32_768kHz)
@@ -162,9 +164,12 @@ MACHINE_CONFIG_END
 
 ROM_START( tama )
 	ROM_REGION( 0x3000, "maincpu", 0 )
-	ROM_LOAD( "test.b", 0x0000, 0x3000, CRC(4372220e) SHA1(6e13d015113e16198c0059b9d0c38d7027ae7324) ) // this rom is on the die too, test pin enables it?
 	ROM_LOAD( "tama.b", 0x0000, 0x3000, CRC(5c864cb1) SHA1(4b4979cf92dc9d2fb6d7295a38f209f3da144f72) )
+
+	ROM_REGION( 0x3000, "maincpu:test", 0 )
+	ROM_LOAD( "test.b", 0x0000, 0x3000, CRC(4372220e) SHA1(6e13d015113e16198c0059b9d0c38d7027ae7324) ) // this rom is on the die too, test pin enables it?
 ROM_END
 
 
-CONS( 1997, tama, 0, 0, tama, tama, driver_device, 0, "Bandai", "Tamagotchi (USA)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME  PARENT CMP MACHINE INPUT STATE      INIT  COMPANY, FULLNAME, FLAGS
+CONS( 1997, tama, 0,      0, tama,   tama, tamag1_state, 0, "Bandai", "Tamagotchi (USA)", MACHINE_SUPPORTS_SAVE )

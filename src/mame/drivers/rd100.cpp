@@ -13,6 +13,7 @@
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
+#include "screen.h"
 
 
 
@@ -85,7 +86,7 @@ MACHINE_RESET_MEMBER( rd100_state, rd100 )
 {
 }
 
-static MACHINE_CONFIG_START( rd100, rd100_state )
+static MACHINE_CONFIG_START( rd100 )
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu",M6809E, XTAL_4MHz)  // freq unknown
 	MCFG_CPU_PROGRAM_MAP(rd100_mem)
@@ -111,5 +112,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   CLASS          INIT    COMPANY FULLNAME       FLAGS */
-COMP( 1989, rd100,  0,      0,       rd100,     rd100,  rd100_state,   rd100,  "Data", "RD100", MACHINE_IS_SKELETON )
+//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   CLASS          INIT    COMPANY  FULLNAME  FLAGS
+COMP( 1989, rd100,  0,      0,       rd100,     rd100,  rd100_state,   rd100,  "Data",  "RD100",  MACHINE_IS_SKELETON )

@@ -14,12 +14,15 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/holeland.h"
+
 #include "cpu/z80/z80.h"
+#include "machine/nvram.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "sound/sp0256.h"
-#include "machine/nvram.h"
-#include "includes/holeland.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 static ADDRESS_MAP_START( holeland_map, AS_PROGRAM, 8, holeland_state )
@@ -265,7 +268,7 @@ static GFXDECODE_START( crzrally )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( holeland, holeland_state )
+static MACHINE_CONFIG_START( holeland )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 3355700) /* measured 298ns on PCB */
@@ -285,7 +288,7 @@ static MACHINE_CONFIG_START( holeland, holeland_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", holeland)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 256)
+	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 	MCFG_VIDEO_START_OVERRIDE(holeland_state,holeland)
 
 	/* sound hardware */
@@ -340,7 +343,7 @@ Notes:
 
 */
 
-static MACHINE_CONFIG_START( crzrally, holeland_state )
+static MACHINE_CONFIG_START( crzrally )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 20000000/4)        /* 5 MHz */
@@ -362,7 +365,7 @@ static MACHINE_CONFIG_START( crzrally, holeland_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", crzrally)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 256)
+	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 	MCFG_VIDEO_START_OVERRIDE(holeland_state,crzrally)
 
 	/* sound hardware */
@@ -530,8 +533,8 @@ ROM_START( crzrallyg )
 ROM_END
 
 
-GAME( 1984, holeland,  0,        holeland, holeland, driver_device, 0, ROT0,   "Tecfri", "Hole Land (Japan)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, holeland2, holeland, holeland, holeland2, driver_device, 0, ROT0,   "Tecfri", "Hole Land (Spain)",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) //attract is different
-GAME( 1985, crzrally,  0,        crzrally, crzrally, driver_device, 0, ROT270, "Tecfri", "Crazy Rally (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, crzrallya, crzrally, crzrally, crzrally, driver_device, 0, ROT270, "Tecfri", "Crazy Rally (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, crzrallyg, crzrally, crzrally, crzrally, driver_device, 0, ROT270, "Tecfri (Gecas license)", "Crazy Rally (Gecas license)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, holeland,  0,        holeland, holeland,  holeland_state, 0, ROT0,   "Tecfri",                 "Hole Land (Japan)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, holeland2, holeland, holeland, holeland2, holeland_state, 0, ROT0,   "Tecfri",                 "Hole Land (Spain)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) //attract is different
+GAME( 1985, crzrally,  0,        crzrally, crzrally,  holeland_state, 0, ROT270, "Tecfri",                 "Crazy Rally (set 1)",         MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, crzrallya, crzrally, crzrally, crzrally,  holeland_state, 0, ROT270, "Tecfri",                 "Crazy Rally (set 2)",         MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, crzrallyg, crzrally, crzrally, crzrally,  holeland_state, 0, ROT270, "Tecfri (Gecas license)", "Crazy Rally (Gecas license)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

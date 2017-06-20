@@ -8,12 +8,16 @@
 
 ***************************************************************************/
 
-#pragma once
-
 #ifndef MAME_FRONTEND_UI_MAINMENU_H
 #define MAME_FRONTEND_UI_MAINMENU_H
 
+#pragma once
+
+#include "ui/menu.h"
+
+
 namespace ui {
+
 class menu_main : public menu
 {
 public:

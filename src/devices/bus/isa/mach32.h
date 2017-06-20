@@ -6,10 +6,11 @@
  *  Created on: 16/05/2014
  */
 
-#ifndef MACH32_H_
-#define MACH32_H_
+#ifndef MAME_BUS_ISA_MACH32_H
+#define MAME_BUS_ISA_MACH32_H
 
-#include "emu.h"
+#pragma once
+
 #include "video/pc_vga.h"
 #include "machine/eepromser.h"
 
@@ -19,7 +20,6 @@ class mach32_8514a_device : public mach8_device
 public:
 	// construction/destruction
 	mach32_8514a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	mach32_8514a_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	DECLARE_READ16_MEMBER(mach32_chipid_r) { return m_chip_ID; }
 	DECLARE_WRITE16_MEMBER(mach32_clksel_w) { mach8.clksel = data; }  // read only on the mach8
@@ -27,6 +27,8 @@ public:
 	DECLARE_WRITE16_MEMBER(mach32_mem_boundary_w) { m_membounds = data; if(data & 0x10) logerror("ATI: Unimplemented memory boundary activated."); }
 
 protected:
+	mach32_8514a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_config_complete() override;
@@ -41,7 +43,6 @@ class mach32_device : public ati_vga_device
 public:
 	// construction/destruction
 	mach32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	mach32_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	required_device<mach32_8514a_device> m_8514a;  // provides accelerated 2D drawing, derived from the Mach8 device
 
@@ -121,11 +122,14 @@ public:
 	DECLARE_READ16_MEMBER(mach32_mem_boundary_r) { return m_8514a->mach32_mem_boundary_r(space,offset,mem_mask); }
 	DECLARE_WRITE16_MEMBER(mach32_mem_boundary_w) { m_8514a->mach32_mem_boundary_w(space,offset,data,mem_mask); }  // read only on the mach8
 	DECLARE_READ16_MEMBER(mach32_status_r) { return vga_vblank() << 1; }
+
 protected:
+	mach32_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 /*
@@ -138,9 +142,10 @@ class mach64_8514a_device : public mach32_8514a_device
 public:
 	// construction/destruction
 	mach64_8514a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	mach64_8514a_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 protected:
+	mach64_8514a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_config_complete() override;
@@ -152,23 +157,25 @@ class mach64_device : public mach32_device
 public:
 	// construction/destruction
 	mach64_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	mach64_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
-	required_device<mach64_8514a_device> m_8514a;  // provides accelerated 2D drawing, derived from the Mach8 device
-
-	DECLARE_WRITE16_MEMBER(mach64_config1_w) {  }  // why does the mach64 BIOS write to these, they are read only on the mach32 and earlier
-	DECLARE_WRITE16_MEMBER(mach64_config2_w) {  }
+	DECLARE_WRITE16_MEMBER(mach64_config1_w) { }  // why does the mach64 BIOS write to these, they are read only on the mach32 and earlier
+	DECLARE_WRITE16_MEMBER(mach64_config2_w) { }
 
 protected:
+	mach64_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
-};
-// device type definition
-extern const device_type ATIMACH32;
-extern const device_type ATIMACH32_8514A;
-extern const device_type ATIMACH64;
-extern const device_type ATIMACH64_8514A;
+	virtual void device_add_mconfig(machine_config &config) override;
 
-#endif /* MACH32_H_ */
+	required_device<mach64_8514a_device> m_8514a;  // provides accelerated 2D drawing, derived from the Mach8 device
+};
+
+// device type definition
+DECLARE_DEVICE_TYPE(ATIMACH32,       mach32_device)
+DECLARE_DEVICE_TYPE(ATIMACH32_8514A, mach32_8514a_device)
+DECLARE_DEVICE_TYPE(ATIMACH64,       mach64_device)
+DECLARE_DEVICE_TYPE(ATIMACH64_8514A, mach64_8514a_device)
+
+#endif // MAME_BUS_ISA_MACH32_H

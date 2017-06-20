@@ -16,17 +16,22 @@ Magic Sticks:
 */
 
 #include "emu.h"
+#include "includes/playmark.h"
+
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"
 #include "sound/okim6295.h"
-#include "includes/playmark.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 class powerbal_state : public playmark_state
 {
 public:
 	powerbal_state(const machine_config &mconfig, device_type type, const char *tag)
-		: playmark_state(mconfig, type, tag),
-			m_eeprom(*this, "eeprom") { }
+		: playmark_state(mconfig, type, tag)
+		, m_eeprom(*this, "eeprom")
+	{ }
 
 	/* powerbal-specific */
 	int         m_tilebank;
@@ -192,7 +197,7 @@ static INPUT_PORTS_START( powerbal )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unused ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unused ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unused ) ) /* Manual shows this as "Weapon"  Off for Yes and On for No - Meaning is unknown */
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Language ) )
@@ -486,7 +491,7 @@ MACHINE_RESET_MEMBER(powerbal_state,powerbal)
 	configure_oki_banks();
 }
 
-static MACHINE_CONFIG_START( powerbal, powerbal_state )
+static MACHINE_CONFIG_START( powerbal )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz */
@@ -514,12 +519,12 @@ static MACHINE_CONFIG_START( powerbal, powerbal_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( magicstk, powerbal_state )
+static MACHINE_CONFIG_START( magicstk )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz */
@@ -550,7 +555,7 @@ static MACHINE_CONFIG_START( magicstk, powerbal_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki_map)
 MACHINE_CONFIG_END
@@ -699,7 +704,7 @@ DRIVER_INIT_MEMBER(powerbal_state,magicstk)
 *      Game Drivers      *
 *************************/
 
-/*    YEAR  NAME      PARENT   MACHINE   INPUT     INIT      ROT    COMPANY     FULLNAME                      FLAGS */
+//    YEAR  NAME      PARENT   MACHINE   INPUT     STATE           INIT      ROT   COMPANY     FULLNAME                       FLAGS
 GAME( 1994, powerbal, 0,       powerbal, powerbal, powerbal_state, powerbal, ROT0, "Playmark", "Power Balls",                 MACHINE_SUPPORTS_SAVE )
 GAME( 1995, magicstk, 0,       magicstk, magicstk, powerbal_state, magicstk, ROT0, "Playmark", "Magic Sticks",                MACHINE_SUPPORTS_SAVE )
 GAME( 1995, hotminda, hotmind, magicstk, hotminda, powerbal_state, magicstk, ROT0, "Playmark", "Hot Mind (adjustable prize)", MACHINE_SUPPORTS_SAVE )

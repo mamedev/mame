@@ -5,17 +5,18 @@
 
 #include "emu.h"
 #include "k057714.h"
+#include "screen.h"
 
 
 #define DUMP_VRAM 0
 #define PRINT_GCU 0
 
 
-const device_type K057714 = &device_creator<k057714_device>;
+DEFINE_DEVICE_TYPE(K057714, k057714_device, "k057714", "k057714_device GCU")
 
 k057714_device::k057714_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, K057714, "K057714 GCU", tag, owner, clock, "k057714", __FILE__),
-	m_irq(*this)
+	: device_t(mconfig, K057714, tag, owner, clock)
+	, m_irq(*this)
 {
 }
 

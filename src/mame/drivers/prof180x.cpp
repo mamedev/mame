@@ -24,11 +24,12 @@
 
 
 #include "emu.h"
+#include "includes/prof180x.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/ram.h"
-#include "bus/centronics/ctronics.h"
 #include "machine/upd765.h"
-#include "includes/prof180x.h"
+#include "screen.h"
 #include "softlist.h"
 
 uint32_t prof180x_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -233,7 +234,7 @@ void prof180x_state::machine_reset()
 	}
 }
 
-static MACHINE_CONFIG_START( prof180x, prof180x_state )
+static MACHINE_CONFIG_START( prof180x )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(HD64180_TAG, Z80, XTAL_9_216MHz)
 	MCFG_CPU_PROGRAM_MAP(prof180x_mem)
@@ -325,6 +326,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1986, prof180x,  0,       0,  prof180x,   prof180x, driver_device,     0,  "Conitec Datensysteme",   "PROF-180X",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1992, prof181x,  prof180x,0,  prof180x,   prof180x, driver_device,     0,  "Conitec Datensysteme",   "PROF-181X",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    STATE            INIT  COMPANY                   FULLNAME       FLAGS */
+COMP( 1986, prof180x,  0,       0,  prof180x,   prof180x, prof180x_state, 0,    "Conitec Datensysteme",   "PROF-180X",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1992, prof181x,  prof180x,0,  prof180x,   prof180x, prof180x_state, 0,    "Conitec Datensysteme",   "PROF-181X",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

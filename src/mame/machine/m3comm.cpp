@@ -103,30 +103,23 @@ static ADDRESS_MAP_START( m3comm_mem, AS_PROGRAM, 16, m3comm_device )
 ADDRESS_MAP_END
 
 
-MACHINE_CONFIG_FRAGMENT( m3comm )
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE(M3COMM, m3comm_device, "m3comm", "Model 3 Communication Board")
+
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( m3comm_device::device_add_mconfig )
 	MCFG_CPU_ADD(M68K_TAG, M68000, 10000000) // random
 	MCFG_CPU_PROGRAM_MAP(m3comm_mem)
 
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
 MACHINE_CONFIG_END
-
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-const device_type M3COMM = &device_creator<m3comm_device>;
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor m3comm_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( m3comm );
-}
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -137,12 +130,12 @@ machine_config_constructor m3comm_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 m3comm_device::m3comm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, M3COMM, "MODEL-3 COMMUNICATION BD", tag, owner, clock, "m3comm", __FILE__),
+	device_t(mconfig, M3COMM, tag, owner, clock),
+	m_line_rx(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE ),
+	m_line_tx(OPEN_FLAG_READ),
 	m68k_ram(*this, "m68k_ram"),
 	m_commcpu(*this, M68K_TAG),
-	m_ram(*this, RAM_TAG),
-	m_line_rx(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE ),
-	m_line_tx(OPEN_FLAG_READ)
+	m_ram(*this, RAM_TAG)
 {
 	// prepare localhost "filename"
 	m_localhost[0] = 0;

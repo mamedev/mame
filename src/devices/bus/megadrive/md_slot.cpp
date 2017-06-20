@@ -51,9 +51,9 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type MD_CART_SLOT = &device_creator<md_cart_slot_device>;
-const device_type PICO_CART_SLOT = &device_creator<pico_cart_slot_device>;
-const device_type COPERA_CART_SLOT = &device_creator<copera_cart_slot_device>;
+DEFINE_DEVICE_TYPE(MD_CART_SLOT,     md_cart_slot_device,     "md_cart_slot",     "Mega Drive Cartridge Slot")
+DEFINE_DEVICE_TYPE(PICO_CART_SLOT,   pico_cart_slot_device,   "pico_cart_slot",   "Pico Cartridge Slot")
+DEFINE_DEVICE_TYPE(COPERA_CART_SLOT, copera_cart_slot_device, "copera_cart_slot", "Copera Cartridge Slot")
 
 //**************************************************************************
 //    MD cartridges Interface
@@ -160,27 +160,27 @@ uint32_t device_md_cart_interface::get_padded_size(uint32_t size)
 //-------------------------------------------------
 //  base_md_cart_slot_device - constructor
 //-------------------------------------------------
-base_md_cart_slot_device::base_md_cart_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-						device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-						device_image_interface(mconfig, *this),
-						device_slot_interface(mconfig, *this),
-						m_type(SEGA_STD), m_cart(nullptr),
-						m_must_be_loaded(1)
+base_md_cart_slot_device::base_md_cart_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	device_image_interface(mconfig, *this),
+	device_slot_interface(mconfig, *this),
+	m_type(SEGA_STD), m_cart(nullptr),
+	m_must_be_loaded(1)
 {
 }
 
 md_cart_slot_device::md_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-						base_md_cart_slot_device(mconfig, MD_CART_SLOT, "MD Cartridge Slot", tag, owner, clock, "md_cart_slot", __FILE__)
+	base_md_cart_slot_device(mconfig, MD_CART_SLOT, tag, owner, clock)
 {
 }
 
 pico_cart_slot_device::pico_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-						base_md_cart_slot_device(mconfig, PICO_CART_SLOT, "Pico Cartridge Slot", tag, owner, clock, "pico_cart_slot", __FILE__)
+	base_md_cart_slot_device(mconfig, PICO_CART_SLOT, tag, owner, clock)
 {
 }
 
 copera_cart_slot_device::copera_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-						base_md_cart_slot_device(mconfig, COPERA_CART_SLOT, "Copera Cartridge Slot", tag, owner, clock, "copera_cart_slot", __FILE__)
+	base_md_cart_slot_device(mconfig, COPERA_CART_SLOT, tag, owner, clock)
 {
 }
 
@@ -199,18 +199,6 @@ base_md_cart_slot_device::~base_md_cart_slot_device()
 void base_md_cart_slot_device::device_start()
 {
 	m_cart = dynamic_cast<device_md_cart_interface *>(get_card_device());
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void base_md_cart_slot_device::device_config_complete()
-{
-	// set brief and instance name
-	update_names();
 }
 
 
@@ -332,7 +320,7 @@ image_init_result base_md_cart_slot_device::call_load()
 		// STEP 1: load the file image and keep a copy for later banking
 		// STEP 2: identify the cart type
 		// The two steps are carried out differently if we are loading from a list or not
-		if (software_entry() == nullptr)
+		if (!loaded_through_softlist())
 			res = load_nonlist();
 		else
 			res = load_list();
@@ -414,7 +402,7 @@ static int genesis_is_SMD(unsigned char *buf, unsigned int len)
 	if (len > 0x2081 && buf[0x2080] == ' ' && buf[0x0080] == 'S' && buf[0x2081] == 'E' && buf[0x0081] == 'G')
 		return 1;
 
-	/* jap baseball 94 */
+	/* jpn baseball 94 */
 	if (len > (0xf0 + 9) && !strncmp("OL R-AEAL", (const char *) &buf[0xf0], 9))
 		return 1;
 
@@ -683,7 +671,7 @@ void base_md_cart_slot_device::setup_nvram()
 
 
 
-int base_md_cart_slot_device::get_cart_type(uint8_t *ROM, uint32_t len)
+int base_md_cart_slot_device::get_cart_type(const uint8_t *ROM, uint32_t len)
 {
 	int type = SEGA_STD;
 
@@ -913,24 +901,22 @@ int base_md_cart_slot_device::get_cart_type(uint8_t *ROM, uint32_t len)
  get default card software
  -------------------------------------------------*/
 
-std::string base_md_cart_slot_device::get_default_card_software()
+std::string base_md_cart_slot_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
-	if (open_image_file(mconfig().options()))
+	if (hook.image_file())
 	{
 		const char *slot_string;
-		uint32_t len = m_file->size(), offset = 0;
+		uint32_t len = hook.image_file()->size(), offset = 0;
 		std::vector<uint8_t> rom(len);
 		int type;
 
-		m_file->read(&rom[0], len);
+		hook.image_file()->read(&rom[0], len);
 
 		if (genesis_is_SMD(&rom[0x200], len - 0x200))
 				offset = 0x200;
 
 		type = get_cart_type(&rom[offset], len - offset);
 		slot_string = md_get_slot(type);
-
-		clear();
 
 		return std::string(slot_string);
 	}
@@ -1008,7 +994,7 @@ void base_md_cart_slot_device::file_logging(uint8_t *ROM8, uint32_t rom_len, uin
 	logerror("FILE DETAILS\n");
 	logerror("============\n");
 	logerror("Name: %s\n", basename());
-	logerror("File Size: 0x%08x\n", (software_entry() == nullptr) ? (int)length() : (int)get_software_region_length("rom"));
+	logerror("File Size: 0x%08x\n", !loaded_through_softlist() ? (int)length() : (int)get_software_region_length("rom"));
 	logerror("Detected type: %s\n", md_get_slot(m_type));
 	logerror("ROM (Allocated) Size: 0x%X\n", rom_len);
 	logerror("NVRAM: %s\n", nvram_len ? "Yes" : "No");

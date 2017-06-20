@@ -4,30 +4,33 @@
 // A "virtual" driver to play vgm files
 // Use with mame vgmplay -bitb file.vgm
 
-#include <zlib.h>
-
 #include "emu.h"
-#include "debugger.h"
+
 #include "imagedev/bitbngr.h"
 
-#include "cpu/m6502/n2a03.h"
 #include "cpu/h6280/h6280.h"
-#include "sound/2612intf.h"
-#include "sound/ym2151.h"
-#include "sound/ym2413.h"
+#include "cpu/m6502/n2a03.h"
 #include "sound/2203intf.h"
+#include "sound/2612intf.h"
 #include "sound/3526intf.h"
 #include "sound/3812intf.h"
 #include "sound/ay8910.h"
-#include "sound/c6280.h"
-#include "sound/sn76496.h"
-#include "sound/k053260.h"
-#include "sound/segapcm.h"
-#include "sound/multipcm.h"
-#include "sound/gb.h"
-#include "sound/pokey.h"
 #include "sound/c352.h"
+#include "sound/c6280.h"
+#include "sound/gb.h"
+#include "sound/k053260.h"
+#include "sound/multipcm.h"
 #include "sound/okim6295.h"
+#include "sound/pokey.h"
+#include "sound/segapcm.h"
+#include "sound/sn76496.h"
+#include "sound/ym2151.h"
+#include "sound/ym2413.h"
+
+#include "debugger.h"
+#include "speaker.h"
+
+#include <zlib.h>
 
 #define AS_IO16             AS_1
 #define MCFG_CPU_IO16_MAP   MCFG_CPU_DATA_MAP
@@ -125,7 +128,7 @@ private:
 	void blocks_clear();
 };
 
-const device_type VGMPLAY = &device_creator<vgmplay_device>;
+DEFINE_DEVICE_TYPE(VGMPLAY, vgmplay_device, "vgmplay_core", "VGM Player engine")
 
 class vgmplay_state : public driver_device
 {
@@ -179,7 +182,7 @@ private:
 };
 
 vgmplay_device::vgmplay_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	cpu_device(mconfig, VGMPLAY, "VGM Player engine", tag, owner, clock, "vgmplay_core", __FILE__),
+	cpu_device(mconfig, VGMPLAY, tag, owner, clock),
 	m_file_config("file", ENDIANNESS_LITTLE, 8, 32),
 	m_io_config("io", ENDIANNESS_LITTLE, 8, 32),
 	m_io16_config("io16", ENDIANNESS_LITTLE, 16, 32)
@@ -1286,7 +1289,7 @@ static ADDRESS_MAP_START( h6280_io_map, AS_IO, 8, vgmplay_state )
 	AM_RANGE(0, 3) AM_NOP
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( vgmplay, vgmplay_state )
+static MACHINE_CONFIG_START( vgmplay )
 	MCFG_CPU_ADD("vgmplay", VGMPLAY, 44100)
 	MCFG_CPU_PROGRAM_MAP( file_map )
 	MCFG_CPU_IO_MAP( soundchips_map )
@@ -1393,7 +1396,7 @@ static MACHINE_CONFIG_START( vgmplay, vgmplay_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
 
-	MCFG_OKIM6295_ADD("okim6295", 1000000, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("okim6295", 1000000, PIN7_HIGH)
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, okim6295_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
@@ -1402,5 +1405,4 @@ MACHINE_CONFIG_END
 ROM_START( vgmplay )
 ROM_END
 
-CONS( 2016, vgmplay, 0, 0, vgmplay, vgmplay, driver_device, 0, "MAME", "VGM player", 0)
-
+CONS( 2016, vgmplay, 0, 0, vgmplay, vgmplay, vgmplay_state, 0, "MAME", "VGM player", 0 )

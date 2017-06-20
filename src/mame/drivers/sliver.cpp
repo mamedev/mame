@@ -65,11 +65,16 @@ Notes:
 */
 
 #include "emu.h"
+
 #include "cpu/m68000/m68000.h"
+#include "cpu/mcs51/mcs51.h"
 #include "machine/gen_latch.h"
 #include "sound/okim6295.h"
-#include "cpu/mcs51/mcs51.h"
 #include "video/ramdac.h"
+
+#include "screen.h"
+#include "speaker.h"
+
 #include "jpeglib.h"
 
 
@@ -498,7 +503,7 @@ TIMER_DEVICE_CALLBACK_MEMBER ( sliver_state::obj_irq_cb )
 	m_maincpu->set_input_line(3, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( sliver, sliver_state )
+static MACHINE_CONFIG_START( sliver )
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(sliver_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", sliver_state, irq4_line_hold)
@@ -524,7 +529,7 @@ static MACHINE_CONFIG_START( sliver, sliver_state )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH)
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.6)
@@ -556,8 +561,8 @@ ROM_END
 
 ROM_START( slivera )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
-	ROM_LOAD16_BYTE( "ka-4.bin", 0x00001, 0x20000, CRC(044d1046) SHA1(dd6da44e65dccae7e2ea0c72c3f8d1452ae8c9e2) )
-	ROM_LOAD16_BYTE( "ka-5.bin", 0x00000, 0x20000, CRC(c2e8b785) SHA1(84444495c4ecb8da50fef0998dbd9b4352f46582) )
+	ROM_LOAD16_BYTE( "ka-4.bin", 0x00001, 0x20000, CRC(044d1046) SHA1(dd6da44e65dccae7e2ea0c72c3f8d1452ae8c9e2) ) // sldh
+	ROM_LOAD16_BYTE( "ka-5.bin", 0x00000, 0x20000, CRC(c2e8b785) SHA1(84444495c4ecb8da50fef0998dbd9b4352f46582) ) // sldh
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 8031 */
 	ROM_LOAD( "ka-1.bin", 0x000000, 0x10000, CRC(56e616a2) SHA1(f8952aba62ae0410e300d99e95dc8b752543af1e) )
@@ -573,11 +578,11 @@ ROM_START( slivera )
 	ROM_LOAD16_BYTE( "ka-7.bin", 0x100001, 0x40000, CRC(1c5d6fb9) SHA1(372533264eb41a5f57b2a59eb039adb6334f36c5) )
 
 	ROM_REGION( 0x180000, "user2", 0 ) /* JPEG(!) compressed GFX */
-	ROM_LOAD( "ka-10.bin", 0x000000, 0x80000, CRC(639ad3ca) SHA1(d3c6a071aac62a3048e9f5bf2eb835619aa1a83b) )
-	ROM_LOAD( "ka-11.bin", 0x080000, 0x80000, CRC(47c05898) SHA1(51f7bb4ccaa5440a31aae9c02ed255243a3c8e22) )
+	ROM_LOAD( "ka-10.bin", 0x000000, 0x80000, CRC(639ad3ca) SHA1(d3c6a071aac62a3048e9f5bf2eb835619aa1a83b) ) // sldh
+	ROM_LOAD( "ka-11.bin", 0x080000, 0x80000, CRC(47c05898) SHA1(51f7bb4ccaa5440a31aae9c02ed255243a3c8e22) ) // sldh
 	// no rom 12 on PCB, played through the game and doesn't seem to be required for this gfx set, all girls present.
 ROM_END
 
 
-GAME( 1996, sliver,  0,        sliver, sliver, driver_device, 0, ROT0,  "Hollow Corp", "Sliver (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, slivera, sliver,   sliver, sliver, driver_device, 0, ROT0,  "Hollow Corp", "Sliver (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, sliver,  0,        sliver, sliver, sliver_state, 0, ROT0,  "Hollow Corp", "Sliver (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, slivera, sliver,   sliver, sliver, sliver_state, 0, ROT0,  "Hollow Corp", "Sliver (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

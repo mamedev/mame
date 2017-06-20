@@ -47,11 +47,13 @@ TODO:
 
 ***********************************************************************************/
 
-
 #include "emu.h"
 #include "cpu/i86/i86.h"
 #include "cpu/z80/z80.h"
 //#include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 #define I86_CLOCK XTAL_24MHz
 #define Z80_CLOCK XTAL_16MHz
@@ -282,7 +284,7 @@ PALETTE_INIT_MEMBER(molecula_state, molecula)
 {
 }
 
-static MACHINE_CONFIG_START( molecula, molecula_state )
+static MACHINE_CONFIG_START( molecula )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("filecpu",Z80,Z80_CLOCK/2)
@@ -353,4 +355,4 @@ ROM_START( molecula )
 	ROM_LOAD( "wait_16r4.jed", 0x000000, 0x00caef, CRC(3aacfeb4) SHA1(1af1a8046e5a8a0337c85b55adceaef6e45702b7) )
 ROM_END
 
-COMP( 1982, molecula,  0,   0,   molecula,  molecula, driver_device,  0,  "MOLECULAR",      "MOLECULAR Computer", MACHINE_IS_SKELETON )
+COMP( 1982, molecula,  0,   0,   molecula,  molecula, molecula_state,  0,  "MOLECULAR",      "MOLECULAR Computer", MACHINE_IS_SKELETON )

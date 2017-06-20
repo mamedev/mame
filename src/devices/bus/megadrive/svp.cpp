@@ -34,22 +34,20 @@
 //  md_rom_device - constructor
 //-------------------------------------------------
 
-const device_type MD_ROM_SVP = &device_creator<md_rom_svp_device>;
+DEFINE_DEVICE_TYPE(MD_ROM_SVP, md_rom_svp_device, "md_rom_svp", "MD Virtua Racing")
 
-md_rom_svp_device::md_rom_svp_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-							: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-							device_md_cart_interface( mconfig, *this ),
-							m_svp(*this, "svp"),
-							m_test_ipt(*this, "MEMORY_TEST"), m_emu_status(0), m_xst(0), m_xst2(0)
-						{
+md_rom_svp_device::md_rom_svp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_md_cart_interface(mconfig, *this)
+	, m_svp(*this, "svp")
+	, m_test_ipt(*this, "MEMORY_TEST")
+	, m_emu_status(0), m_xst(0), m_xst2(0)
+{
 }
 
 md_rom_svp_device::md_rom_svp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-							: device_t(mconfig, MD_ROM_SVP, "MD Virtua Racing", tag, owner, clock, "md_rom_svp", __FILE__),
-							device_md_cart_interface( mconfig, *this ),
-							m_svp(*this, "svp"),
-							m_test_ipt(*this, "MEMORY_TEST"), m_emu_status(0), m_xst(0), m_xst2(0)
-						{
+	: md_rom_svp_device(mconfig, MD_ROM_SVP, tag, owner, clock)
+{
 }
 
 
@@ -342,25 +340,16 @@ ADDRESS_MAP_START( md_svp_ext_map, AS_IO, 16, md_rom_svp_device )
 	AM_RANGE(7*2, 7*2+1) AM_READWRITE(read_al, write_al)
 ADDRESS_MAP_END
 
+
 //-------------------------------------------------
-//  MACHINE_DRIVER( md_svp )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( md_svp )
+MACHINE_CONFIG_MEMBER( md_rom_svp_device::device_add_mconfig )
 	MCFG_CPU_ADD("svp", SSP1601, MASTER_CLOCK_NTSC / 7 * 3) /* ~23 MHz (guessed) */
 	MCFG_CPU_PROGRAM_MAP(md_svp_ssp_map)
 	MCFG_CPU_IO_MAP(md_svp_ext_map)
 MACHINE_CONFIG_END
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor md_rom_svp_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( md_svp );
-}
 
 ioport_constructor md_rom_svp_device::device_input_ports() const
 {

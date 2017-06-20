@@ -1,10 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:Mirko Buffoni
 /*
-EA pin - defined by architecture, must implement:
-   1 means external access, bypassing internal ROM
-   reimplement as a push, not a pull
-T0 output clock
+    TODO:
+    - EA pin - defined by architecture, must implement:
+      1 means external access, bypassing internal ROM
+      reimplement as a push, not a pull
+    - T0 output clock
+    - get rid of i/o addressmap, use devcb for mcu pins
+    - add CMOS devices, 1 new opcode(01 HALT)
 */
 
 /***************************************************************************
@@ -125,17 +128,16 @@ T0 output clock
 #define ram_r(a)        m_data->read_byte(a)
 #define ram_w(a,V)      m_data->write_byte(a, V)
 
-/* ports are mapped to AS_IO */
+/* ports are mapped to AS_IO and callbacks */
 #define ext_r(a)        m_io->read_byte(a)
 #define ext_w(a,V)      m_io->write_byte(a, V)
-#define port_r(a)       m_io->read_byte(MCS48_PORT_P0 + a)
-#define port_w(a,V)     m_io->write_byte(MCS48_PORT_P0 + a, V)
-#define test_r(a)       m_io->read_byte(MCS48_PORT_T0 + a)
-#define test_w(a,V)     m_io->write_byte(MCS48_PORT_T0 + a, V)
-#define bus_r()         m_io->read_byte(MCS48_PORT_BUS)
-#define bus_w(V)        m_io->write_byte(MCS48_PORT_BUS, V)
-#define ea_r()          m_io->read_byte(MCS48_PORT_EA)
-#define prog_w(V)       m_io->write_byte(MCS48_PORT_PROG, V)
+#define port_r(a)       m_port_in_cb[a-1]()
+#define port_w(a,V)     m_port_out_cb[a-1](V)
+#define test_r(a)       m_test_in_cb[a]()
+#define test_w(a,V)     m_test_out_cb[a](V)
+#define bus_r()         m_bus_in_cb()
+#define bus_w(V)        m_bus_out_cb(V)
+#define prog_w(V)       m_prog_out_cb(V)
 
 /* r0-r7 map to memory via the regptr */
 #define R0              m_regptr[0]
@@ -149,25 +151,25 @@ T0 output clock
 
 
 
-const device_type I8021 = &device_creator<i8021_device>;
-const device_type I8022 = &device_creator<i8022_device>;
-const device_type I8035 = &device_creator<i8035_device>;
-const device_type I8048 = &device_creator<i8048_device>;
-const device_type I8648 = &device_creator<i8648_device>;
-const device_type I8748 = &device_creator<i8748_device>;
-const device_type I8039 = &device_creator<i8039_device>;
-const device_type I8049 = &device_creator<i8049_device>;
-const device_type I8749 = &device_creator<i8749_device>;
-const device_type I8040 = &device_creator<i8040_device>;
-const device_type I8050 = &device_creator<i8050_device>;
-const device_type I8041 = &device_creator<i8041_device>;
-const device_type I8741 = &device_creator<i8741_device>;
-const device_type I8042 = &device_creator<i8042_device>;
-const device_type I8242 = &device_creator<i8242_device>;
-const device_type I8742 = &device_creator<i8742_device>;
-const device_type MB8884 = &device_creator<mb8884_device>;
-const device_type N7751 = &device_creator<n7751_device>;
-const device_type M58715 = &device_creator<m58715_device>;
+DEFINE_DEVICE_TYPE(I8021, i8021_device, "i8021", "I8021")
+DEFINE_DEVICE_TYPE(I8022, i8022_device, "i8022", "I8022")
+DEFINE_DEVICE_TYPE(I8035, i8035_device, "i8035", "I8035")
+DEFINE_DEVICE_TYPE(I8048, i8048_device, "i8048", "I8048")
+DEFINE_DEVICE_TYPE(I8648, i8648_device, "i8648", "I8648")
+DEFINE_DEVICE_TYPE(I8748, i8748_device, "i8748", "I8748")
+DEFINE_DEVICE_TYPE(I8039, i8039_device, "i8039", "I8039")
+DEFINE_DEVICE_TYPE(I8049, i8049_device, "i8049", "I8049")
+DEFINE_DEVICE_TYPE(I8749, i8749_device, "i8749", "I8749")
+DEFINE_DEVICE_TYPE(I8040, i8040_device, "i8040", "I8040")
+DEFINE_DEVICE_TYPE(I8050, i8050_device, "i8050", "I8050")
+DEFINE_DEVICE_TYPE(I8041, i8041_device, "i8041", "I8041")
+DEFINE_DEVICE_TYPE(I8741, i8741_device, "i8741", "I8741")
+DEFINE_DEVICE_TYPE(I8042, i8042_device, "i8042", "I8042")
+DEFINE_DEVICE_TYPE(I8242, i8242_device, "i8242", "I8242")
+DEFINE_DEVICE_TYPE(I8742, i8742_device, "i8742", "I8742")
+DEFINE_DEVICE_TYPE(MB8884, mb8884_device, "mb8884", "MB8884")
+DEFINE_DEVICE_TYPE(N7751, n7751_device, "n7751", "N7751")
+DEFINE_DEVICE_TYPE(M58715, m58715_device, "m58715", "M58715")
 
 
 /***************************************************************************
@@ -200,13 +202,20 @@ static ADDRESS_MAP_START(data_8bit, AS_DATA, 8, mcs48_cpu_device)
 ADDRESS_MAP_END
 
 
-mcs48_cpu_device::mcs48_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, int rom_size, int ram_size, uint8_t feature_mask)
-	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, __FILE__)
+mcs48_cpu_device::mcs48_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int rom_size, int ram_size, uint8_t feature_mask)
+	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 12, 0
-		, ( ( rom_size == 1024 ) ? ADDRESS_MAP_NAME(program_10bit) : ( ( rom_size == 2048 ) ? ADDRESS_MAP_NAME(program_11bit) : ( ( rom_size == 4096 ) ? ADDRESS_MAP_NAME(program_12bit) : nullptr ) ) ))
+		, (rom_size == 1024) ? ADDRESS_MAP_NAME(program_10bit) : (rom_size == 2048) ? ADDRESS_MAP_NAME(program_11bit) : (rom_size == 4096) ? ADDRESS_MAP_NAME(program_12bit) : nullptr)
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, ( ( ram_size == 64 ) ? 6 : ( ( ram_size == 128 ) ? 7 : 8 ) ), 0
-		, ( ( ram_size == 64 ) ? ADDRESS_MAP_NAME(data_6bit) : ( ( ram_size == 128 ) ? ADDRESS_MAP_NAME(data_7bit) : ADDRESS_MAP_NAME(data_8bit) ) ))
-	, m_io_config("io", ENDIANNESS_LITTLE, 8, 9, 0)
+		, (ram_size == 64) ? ADDRESS_MAP_NAME(data_6bit) : (ram_size == 128) ? ADDRESS_MAP_NAME(data_7bit) : ADDRESS_MAP_NAME(data_8bit))
+	, m_io_config("io", ENDIANNESS_LITTLE, 8, 8, 0)
+	, m_port_in_cb{{*this}, {*this}}
+	, m_port_out_cb{{*this}, {*this}}
+	, m_bus_in_cb(*this)
+	, m_bus_out_cb(*this)
+	, m_test_in_cb{{*this}, {*this}}
+	, m_t0_clk_func()
+	, m_prog_out_cb(*this)
 	, m_psw(0)
 	, m_feature_mask(feature_mask)
 	, m_int_rom_size(rom_size)
@@ -224,102 +233,102 @@ mcs48_cpu_device::mcs48_cpu_device(const machine_config &mconfig, device_type ty
 }
 
 i8021_device::i8021_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mcs48_cpu_device(mconfig, I8021, "I8021", tag, owner, clock, "i8021", 1024, 64)
+	: mcs48_cpu_device(mconfig, I8021, tag, owner, clock, 1024, 64)
 {
 }
 
 i8022_device::i8022_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mcs48_cpu_device(mconfig, I8022, "I8022", tag, owner, clock, "i8022", 2048, 128)
+	: mcs48_cpu_device(mconfig, I8022, tag, owner, clock, 2048, 128)
 {
 }
 
 i8035_device::i8035_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mcs48_cpu_device(mconfig, I8035, "I8035", tag, owner, clock, "i8035", 0, 64)
+	: mcs48_cpu_device(mconfig, I8035, tag, owner, clock, 0, 64)
 {
 }
 
 i8048_device::i8048_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mcs48_cpu_device(mconfig, I8048, "I8048", tag, owner, clock, "i8048", 1024, 64)
+	: mcs48_cpu_device(mconfig, I8048, tag, owner, clock, 1024, 64)
 {
 }
 
 i8648_device::i8648_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mcs48_cpu_device(mconfig, I8648, "I8648", tag, owner, clock, "i8648", 1024, 64)
+	: mcs48_cpu_device(mconfig, I8648, tag, owner, clock, 1024, 64)
 {
 }
 
 i8748_device::i8748_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mcs48_cpu_device(mconfig, I8748, "I8748", tag, owner, clock, "i8748", 1024, 64)
+	: mcs48_cpu_device(mconfig, I8748, tag, owner, clock, 1024, 64)
 {
 }
 
 i8039_device::i8039_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mcs48_cpu_device(mconfig, I8039, "I8039", tag, owner, clock, "i8039", 0, 128)
+	: mcs48_cpu_device(mconfig, I8039, tag, owner, clock, 0, 128)
 {
 }
 
 i8049_device::i8049_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mcs48_cpu_device(mconfig, I8049, "I8049", tag, owner, clock, "i8049", 2048, 128)
+	: mcs48_cpu_device(mconfig, I8049, tag, owner, clock, 2048, 128)
 {
 }
 
 i8749_device::i8749_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mcs48_cpu_device(mconfig, I8749, "I8749", tag, owner, clock, "i8749", 2048, 128)
+	: mcs48_cpu_device(mconfig, I8749, tag, owner, clock, 2048, 128)
 {
 }
 
 i8040_device::i8040_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mcs48_cpu_device(mconfig, I8040, "I8040", tag, owner, clock, "i8040", 0, 256)
+	: mcs48_cpu_device(mconfig, I8040, tag, owner, clock, 0, 256)
 {
 }
 
 i8050_device::i8050_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mcs48_cpu_device(mconfig, I8050, "I8050", tag, owner, clock, "i8050", 4096, 256)
+	: mcs48_cpu_device(mconfig, I8050, tag, owner, clock, 4096, 256)
 {
 }
 
 mb8884_device::mb8884_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mcs48_cpu_device(mconfig, MB8884, "MB8884", tag, owner, clock, "mb8884", 0, 64)
+	: mcs48_cpu_device(mconfig, MB8884, tag, owner, clock, 0, 64)
 {
 }
 
 n7751_device::n7751_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mcs48_cpu_device(mconfig, N7751, "N7751", tag, owner, clock, "n7751", 1024, 64)
+	: mcs48_cpu_device(mconfig, N7751, tag, owner, clock, 1024, 64)
 {
 }
 
 m58715_device::m58715_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mcs48_cpu_device(mconfig, M58715, "M58715", tag, owner, clock, "m58715", 2048, 128)
+	: mcs48_cpu_device(mconfig, M58715, tag, owner, clock, 2048, 128)
 {
 }
 
-upi41_cpu_device::upi41_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, int rom_size, int ram_size)
-	: mcs48_cpu_device(mconfig, type, name, tag, owner, clock, shortname, rom_size, ram_size, UPI41_FEATURE)
+upi41_cpu_device::upi41_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int rom_size, int ram_size)
+	: mcs48_cpu_device(mconfig, type, tag, owner, clock, rom_size, ram_size, UPI41_FEATURE)
 {
 }
 
 i8041_device::i8041_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: upi41_cpu_device(mconfig, I8041, "I8041", tag, owner, clock, "i8041", 1024, 128)
+	: upi41_cpu_device(mconfig, I8041, tag, owner, clock, 1024, 128)
 {
 }
 
 i8741_device::i8741_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: upi41_cpu_device(mconfig, I8741, "I8741", tag, owner, clock, "i8741", 1024, 128)
+	: upi41_cpu_device(mconfig, I8741, tag, owner, clock, 1024, 128)
 {
 }
 
 i8042_device::i8042_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: upi41_cpu_device(mconfig, I8042, "I8042", tag, owner, clock, "i8042", 2048, 256)
+	: upi41_cpu_device(mconfig, I8042, tag, owner, clock, 2048, 256)
 {
 }
 
 i8242_device::i8242_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: upi41_cpu_device(mconfig, I8242, "I8242", tag, owner, clock, "i8242", 2048, 256)
+	: upi41_cpu_device(mconfig, I8242, tag, owner, clock, 2048, 256)
 {
 }
 
 i8742_device::i8742_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: upi41_cpu_device(mconfig, I8742, "I8742", tag, owner, clock, "i8742", 2048, 256)
+	: upi41_cpu_device(mconfig, I8742, tag, owner, clock, 2048, 256)
 {
 }
 
@@ -513,16 +522,16 @@ uint8_t mcs48_cpu_device::p2_mask()
     the 8243 expander chip
 -------------------------------------------------*/
 
-void mcs48_cpu_device::expander_operation(uint8_t operation, uint8_t port)
+void mcs48_cpu_device::expander_operation(expander_op operation, uint8_t port)
 {
 	/* put opcode/data on low 4 bits of P2 */
-	port_w(2, m_p2 = (m_p2 & 0xf0) | (operation << 2) | (port & 3));
+	port_w(2, m_p2 = (m_p2 & 0xf0) | (uint8_t(operation) << 2) | (port & 3));
 
 	/* generate high-to-low transition on PROG line */
 	prog_w(0);
 
 	/* put data on low 4 bits of P2 */
-	if (operation != 0)
+	if (operation != EXPANDER_OP_READ)
 		port_w(2, m_p2 = (m_p2 & 0xf0) | (m_a & 0x0f));
 	else
 		m_a = port_r(2) | 0x0f;
@@ -588,10 +597,10 @@ OPHANDLER( anl_a_n )        { m_a &= argument_fetch(); return 2; }
 OPHANDLER( anl_bus_n )      { bus_w(bus_r() & argument_fetch()); return 2; }
 OPHANDLER( anl_p1_n )       { port_w(1, m_p1 &= argument_fetch()); return 2; }
 OPHANDLER( anl_p2_n )       { port_w(2, m_p2 &= argument_fetch() | ~p2_mask()); return 2; }
-OPHANDLER( anld_p4_a )      { expander_operation(MCS48_EXPANDER_OP_AND, 4); return 2; }
-OPHANDLER( anld_p5_a )      { expander_operation(MCS48_EXPANDER_OP_AND, 5); return 2; }
-OPHANDLER( anld_p6_a )      { expander_operation(MCS48_EXPANDER_OP_AND, 6); return 2; }
-OPHANDLER( anld_p7_a )      { expander_operation(MCS48_EXPANDER_OP_AND, 7); return 2; }
+OPHANDLER( anld_p4_a )      { expander_operation(EXPANDER_OP_AND, 4); return 2; }
+OPHANDLER( anld_p5_a )      { expander_operation(EXPANDER_OP_AND, 5); return 2; }
+OPHANDLER( anld_p6_a )      { expander_operation(EXPANDER_OP_AND, 6); return 2; }
+OPHANDLER( anld_p7_a )      { expander_operation(EXPANDER_OP_AND, 7); return 2; }
 
 OPHANDLER( call_0 )         { execute_call(argument_fetch() | 0x000); return 2; }
 OPHANDLER( call_1 )         { execute_call(argument_fetch() | 0x100); return 2; }
@@ -658,7 +667,10 @@ OPHANDLER( en_dma )         { m_dma_enabled = true; port_w(2, m_p2); return 1; }
 OPHANDLER( en_flags )       { m_flags_enabled = true; port_w(2, m_p2); return 1; }
 OPHANDLER( ent0_clk )
 {
-	logerror("MCS-48 PC:%04X - Unimplemented opcode = %02x\n", m_pc - 1, program_r(m_pc - 1));
+	if (!m_t0_clk_func.isnull())
+		m_t0_clk_func(clock() / 3);
+	else
+		logerror("T0 clock enabled\n");
 	return 1;
 }
 
@@ -762,14 +774,14 @@ OPHANDLER( mov_xr1_a )      { ram_w(R1, m_a); return 1; }
 OPHANDLER( mov_xr0_n )      { ram_w(R0, argument_fetch()); return 2; }
 OPHANDLER( mov_xr1_n )      { ram_w(R1, argument_fetch()); return 2; }
 
-OPHANDLER( movd_a_p4 )      { expander_operation(MCS48_EXPANDER_OP_READ, 4); return 2; }
-OPHANDLER( movd_a_p5 )      { expander_operation(MCS48_EXPANDER_OP_READ, 5); return 2; }
-OPHANDLER( movd_a_p6 )      { expander_operation(MCS48_EXPANDER_OP_READ, 6); return 2; }
-OPHANDLER( movd_a_p7 )      { expander_operation(MCS48_EXPANDER_OP_READ, 7); return 2; }
-OPHANDLER( movd_p4_a )      { expander_operation(MCS48_EXPANDER_OP_WRITE, 4); return 2; }
-OPHANDLER( movd_p5_a )      { expander_operation(MCS48_EXPANDER_OP_WRITE, 5); return 2; }
-OPHANDLER( movd_p6_a )      { expander_operation(MCS48_EXPANDER_OP_WRITE, 6); return 2; }
-OPHANDLER( movd_p7_a )      { expander_operation(MCS48_EXPANDER_OP_WRITE, 7); return 2; }
+OPHANDLER( movd_a_p4 )      { expander_operation(EXPANDER_OP_READ, 4); return 2; }
+OPHANDLER( movd_a_p5 )      { expander_operation(EXPANDER_OP_READ, 5); return 2; }
+OPHANDLER( movd_a_p6 )      { expander_operation(EXPANDER_OP_READ, 6); return 2; }
+OPHANDLER( movd_a_p7 )      { expander_operation(EXPANDER_OP_READ, 7); return 2; }
+OPHANDLER( movd_p4_a )      { expander_operation(EXPANDER_OP_WRITE, 4); return 2; }
+OPHANDLER( movd_p5_a )      { expander_operation(EXPANDER_OP_WRITE, 5); return 2; }
+OPHANDLER( movd_p6_a )      { expander_operation(EXPANDER_OP_WRITE, 6); return 2; }
+OPHANDLER( movd_p7_a )      { expander_operation(EXPANDER_OP_WRITE, 7); return 2; }
 
 OPHANDLER( movp_a_xa )      { m_a = program_r((m_pc & 0xf00) | m_a); return 2; }
 OPHANDLER( movp3_a_xa )     { m_a = program_r(0x300 | m_a); return 2; }
@@ -796,10 +808,10 @@ OPHANDLER( orl_a_n )        { m_a |= argument_fetch(); return 2; }
 OPHANDLER( orl_bus_n )      { bus_w(bus_r() | argument_fetch()); return 2; }
 OPHANDLER( orl_p1_n )       { port_w(1, m_p1 |= argument_fetch()); return 2; }
 OPHANDLER( orl_p2_n )       { port_w(2, m_p2 |= argument_fetch() & p2_mask()); return 2; }
-OPHANDLER( orld_p4_a )      { expander_operation(MCS48_EXPANDER_OP_OR, 4); return 2; }
-OPHANDLER( orld_p5_a )      { expander_operation(MCS48_EXPANDER_OP_OR, 5); return 2; }
-OPHANDLER( orld_p6_a )      { expander_operation(MCS48_EXPANDER_OP_OR, 6); return 2; }
-OPHANDLER( orld_p7_a )      { expander_operation(MCS48_EXPANDER_OP_OR, 7); return 2; }
+OPHANDLER( orld_p4_a )      { expander_operation(EXPANDER_OP_OR, 4); return 2; }
+OPHANDLER( orld_p5_a )      { expander_operation(EXPANDER_OP_OR, 5); return 2; }
+OPHANDLER( orld_p6_a )      { expander_operation(EXPANDER_OP_OR, 6); return 2; }
+OPHANDLER( orld_p7_a )      { expander_operation(EXPANDER_OP_OR, 7); return 2; }
 
 OPHANDLER( outl_bus_a )     { bus_w(m_a); return 2; }
 OPHANDLER( outl_p1_a )      { port_w(1, m_p1 = m_a); return 2; }
@@ -937,6 +949,13 @@ const mcs48_cpu_device::mcs48_ophandler mcs48_cpu_device::s_opcode_table[256]=
     INITIALIZATION/RESET
 ***************************************************************************/
 
+void mcs48_cpu_device::device_config_complete()
+{
+	m_t0_clk_func.bind_relative_to(*owner());
+	if (!m_t0_clk_func.isnull())
+		m_t0_clk_func(clock() / 3);
+}
+
 /*-------------------------------------------------
     mcs48_init - generic MCS-48 initialization
 -------------------------------------------------*/
@@ -963,6 +982,17 @@ void mcs48_cpu_device::device_start()
 	m_direct = &m_program->direct();
 	m_data = &space(AS_DATA);
 	m_io = &space(AS_IO);
+
+	// resolve callbacks
+	for (auto &cb : m_port_in_cb)
+		cb.resolve_safe(0xff);
+	for (auto &cb : m_port_out_cb)
+		cb.resolve_safe();
+	m_bus_in_cb.resolve_safe(0xff);
+	m_bus_out_cb.resolve_safe();
+	for (auto &cb : m_test_in_cb)
+		cb.resolve_safe(0);
+	m_prog_out_cb.resolve_safe();
 
 	/* set up the state table */
 	{
@@ -1043,6 +1073,8 @@ void mcs48_cpu_device::device_reset()
 	m_sts = 0;
 	m_flags_enabled = false;
 	m_dma_enabled = false;
+	if (!m_t0_clk_func.isnull())
+		m_t0_clk_func(0);
 
 	/* confirmed from interrupt logic description */
 	m_irq_in_progress = false;
@@ -1238,6 +1270,16 @@ WRITE8_MEMBER( upi41_cpu_device::upi41_master_w )
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(upi41_cpu_device::master_callback), this), (offset << 8) | data);
 }
 
+
+READ8_MEMBER(mcs48_cpu_device::p1_r)
+{
+	return m_p1;
+}
+
+READ8_MEMBER(mcs48_cpu_device::p2_r)
+{
+	return m_p2;
+}
 
 
 /***************************************************************************

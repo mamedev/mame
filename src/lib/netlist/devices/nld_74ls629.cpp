@@ -40,7 +40,7 @@
 
 
 #include "nld_74ls629.h"
-#include "analog/nld_twoterm.h"
+#include "../analog/nlid_twoterm.h"
 
 namespace netlist
 {
@@ -55,12 +55,12 @@ namespace netlist
 		, m_out(*this, "m_out", 0)
 		, m_inc(*this, "m_inc", netlist_time::zero())
 		{
-			connect_late(m_FB, m_Y);
+			connect(m_FB, m_Y);
 		}
 
 		NETLIB_RESETI()
 		{
-			m_enableq = 1;
+			m_enableq = 0;
 			m_out = 0;
 			m_inc = netlist_time::zero();
 		}
@@ -89,9 +89,9 @@ namespace netlist
 		{
 			register_subalias("GND",    m_R_FC.m_N);
 
-			connect_late(m_FC, m_R_FC.m_P);
-			connect_late(m_RNG, m_R_RNG.m_P);
-			connect_late(m_R_FC.m_N, m_R_RNG.m_N);
+			connect(m_FC, m_R_FC.m_P);
+			connect(m_RNG, m_R_RNG.m_P);
+			connect(m_R_FC.m_N, m_R_RNG.m_N);
 
 			register_subalias("Y", m_clock.m_Y);
 		}
@@ -108,8 +108,8 @@ namespace netlist
 
 	public:
 		NETLIB_SUB(SN74LS629clk) m_clock;
-		NETLIB_SUB(R_base) m_R_FC;
-		NETLIB_SUB(R_base) m_R_RNG;
+		analog::NETLIB_SUB(R_base) m_R_FC;
+		analog::NETLIB_SUB(R_base) m_R_RNG;
 
 		logic_input_t m_ENQ;
 		analog_input_t m_RNG;
@@ -133,7 +133,7 @@ namespace netlist
 
 			register_subalias("8",  m_1.m_R_FC.m_N);
 			register_subalias("9",  m_1.m_R_FC.m_N);
-			connect_late(m_1.m_R_FC.m_N, m_2.m_R_FC.m_N);
+			connect(m_1.m_R_FC.m_N, m_2.m_R_FC.m_N);
 
 			register_subalias("10",  m_2.m_clock.m_Y);
 

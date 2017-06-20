@@ -246,7 +246,7 @@ Stephh's notes (based on the game M68000 code and some tests) :
       * all reference to TAITO and "Operation Wolf" have been changed or "blanked"
       * "(c) 1988 BEAR CORPORATION KOREA" / "ALL RIGHTS RESERVED"
       * ROM check test "noped" (code at 0x00bb72)
-  - Notes on bootleg c-chip (similar to what is in machine/opwolf.c) :
+  - Notes on bootleg c-chip (similar to what is in machine/opwolf.cpp) :
       * always Engish language (thus the Dip Switch change to "Unused")
       * round 4 in "demo mode" instead of round 5
       * "service" button doesn't add credits (it works in the "test mode" though)
@@ -274,13 +274,17 @@ register. So what is controlling priority.
 #define SOUND_CPU_CLOCK     (XTAL_8MHz / 2)     /* clock for Z80 sound CPU */
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/m68000/m68000.h"
-#include "includes/taitoipt.h"
-#include "audio/taitosnd.h"
-#include "sound/ym2151.h"
-#include "sound/msm5205.h"
 #include "includes/opwolf.h"
+#include "audio/taitosnd.h"
+
+#include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
+#include "includes/taitoipt.h"
+#include "sound/msm5205.h"
+#include "sound/ym2151.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 READ16_MEMBER(opwolf_state::cchip_r)
 {
@@ -435,6 +439,8 @@ ADDRESS_MAP_END
 
 void opwolf_state::machine_start()
 {
+	m_opwolf_timer = timer_alloc(TIMER_OPWOLF);
+
 	save_item(NAME(m_sprite_ctrl));
 	save_item(NAME(m_sprites_flipscreen));
 
@@ -768,7 +774,7 @@ GFXDECODE_END
                  MACHINE DRIVERS
 ***********************************************************/
 
-static MACHINE_CONFIG_START( opwolf, opwolf_state )
+static MACHINE_CONFIG_START( opwolf )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, CPU_CLOCK ) /* 8 MHz */
@@ -814,13 +820,13 @@ static MACHINE_CONFIG_START( opwolf, opwolf_state )
 
 	MCFG_SOUND_ADD("msm1", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(opwolf_state, opwolf_msm5205_vck_1)) /* VCK function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8 kHz */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
 
 	MCFG_SOUND_ADD("msm2", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(opwolf_state, opwolf_msm5205_vck_2)) /* VCK function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8 kHz */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
 
@@ -839,7 +845,7 @@ MACHINE_CONFIG_END
 
 
 
-static MACHINE_CONFIG_START( opwolfb, opwolf_state ) /* OSC clocks unknown for the bootleg, but changed to match original sets */
+static MACHINE_CONFIG_START( opwolfb ) /* OSC clocks unknown for the bootleg, but changed to match original sets */
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, CPU_CLOCK ) /* 8 MHz ??? */
@@ -888,13 +894,13 @@ static MACHINE_CONFIG_START( opwolfb, opwolf_state ) /* OSC clocks unknown for t
 
 	MCFG_SOUND_ADD("msm1", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(opwolf_state, opwolf_msm5205_vck_1)) /* VCK function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8 kHz */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
 
 	MCFG_SOUND_ADD("msm2", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(opwolf_state, opwolf_msm5205_vck_2)) /* VCK function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8 kHz */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
 
@@ -1111,10 +1117,10 @@ DRIVER_INIT_MEMBER(opwolf_state,opwolfp)
 
 // MACHINE_IMPERFECT_SOUND is present because the credit sound appears to double trigger.  All other sounds seem correct.
 
-/*    year  rom       parent    machine   inp       init */
-GAME( 1987, opwolf,   0,        opwolf,   opwolf,  opwolf_state,  opwolf,   ROT0, "Taito Corporation Japan", "Operation Wolf (World, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, opwolfa,  opwolf,   opwolf,   opwolf,  opwolf_state,  opwolf,   ROT0, "Taito Corporation Japan", "Operation Wolf (World, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, opwolfj,  opwolf,   opwolf,   opwolfu, opwolf_state,  opwolf,   ROT0, "Taito Corporation", "Operation Wolf (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, opwolfu,  opwolf,   opwolf,   opwolfu, opwolf_state,  opwolf,   ROT0, "Taito America Corporation", "Operation Wolf (US)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+//    year  rom       parent    machine   inp      state          init
+GAME( 1987, opwolf,   0,        opwolf,   opwolf,  opwolf_state,  opwolf,   ROT0, "Taito Corporation Japan",          "Operation Wolf (World, set 1)",              MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, opwolfa,  opwolf,   opwolf,   opwolf,  opwolf_state,  opwolf,   ROT0, "Taito Corporation Japan",          "Operation Wolf (World, set 2)",              MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, opwolfj,  opwolf,   opwolf,   opwolfu, opwolf_state,  opwolf,   ROT0, "Taito Corporation",                "Operation Wolf (Japan)",                     MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, opwolfu,  opwolf,   opwolf,   opwolfu, opwolf_state,  opwolf,   ROT0, "Taito America Corporation",        "Operation Wolf (US)",                        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1987, opwolfb,  opwolf,   opwolfb,  opwolfb, opwolf_state,  opwolfb,  ROT0, "bootleg (Bear Corporation Korea)", "Operation Bear (bootleg of Operation Wolf)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, opwolfp,  opwolf,   opwolfp,  opwolfp, opwolf_state,  opwolfp,  ROT0, "Taito Corporation", "Operation Wolf (Japan, prototype)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // unprotected
+GAME( 1987, opwolfp,  opwolf,   opwolfp,  opwolfp, opwolf_state,  opwolfp,  ROT0, "Taito Corporation",                "Operation Wolf (Japan, prototype)",          MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // unprotected

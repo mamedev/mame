@@ -2,12 +2,13 @@
 // copyright-holders:Carl
 // psx multitap emulation
 
+#include "emu.h"
 #include "multitap.h"
 
-const device_type PSX_MULTITAP = &device_creator<psx_multitap_device>;
+DEFINE_DEVICE_TYPE(PSX_MULTITAP, psx_multitap_device, "psx_multitap", "Playstation Multitap")
 
 psx_multitap_device::psx_multitap_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
-	device_t(mconfig, PSX_MULTITAP, "Playstation Multitap", tag, owner, clock, "psx_multitap", __FILE__),
+	device_t(mconfig, PSX_MULTITAP, tag, owner, clock),
 	device_psx_controller_interface(mconfig, *this),
 	m_activeport(0),
 	m_singlemode(false),
@@ -20,17 +21,12 @@ psx_multitap_device::psx_multitap_device(const machine_config& mconfig, const ch
 {
 }
 
-static MACHINE_CONFIG_FRAGMENT( psx_multitap )
+MACHINE_CONFIG_MEMBER( psx_multitap_device::device_add_mconfig )
 	MCFG_PSX_CTRL_PORT_ADD("a", psx_controllers_nomulti, "digital_pad")
 	MCFG_PSX_CTRL_PORT_ADD("b", psx_controllers_nomulti, nullptr)
 	MCFG_PSX_CTRL_PORT_ADD("c", psx_controllers_nomulti, nullptr)
 	MCFG_PSX_CTRL_PORT_ADD("d", psx_controllers_nomulti, nullptr)
 MACHINE_CONFIG_END
-
-machine_config_constructor psx_multitap_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( psx_multitap );
-}
 
 void psx_multitap_device::device_start()
 {

@@ -9,14 +9,12 @@
 #ifndef __OSDWINDOW__
 #define __OSDWINDOW__
 
-#include "emu.h"
 #include "render.h"
 #include "osdhelper.h"
 #include "../frontend/mame/ui/menuitem.h"
 
 // standard windows headers
 #ifdef OSD_WINDOWS
-#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <windowsx.h>
 #include <mmsystem.h>
@@ -26,8 +24,6 @@
 // forward declaration
 struct SDL_Window;
 #endif
-#undef min
-#undef max
 
 //============================================================
 //  TYPE DEFINITIONS

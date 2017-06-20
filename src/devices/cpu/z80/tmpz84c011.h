@@ -7,12 +7,11 @@
 
 ***************************************************************************/
 
+#ifndef MAME_CPU_Z80_TMPZ84C011_H
+#define MAME_CPU_Z80_TMPZ84C011_H
+
 #pragma once
 
-#ifndef __TMPZ84C011__
-#define __TMPZ84C011__
-
-#include "emu.h"
 #include "z80.h"
 #include "machine/z80ctc.h"
 
@@ -124,13 +123,9 @@ public:
 	DECLARE_WRITE8_MEMBER( tmpz84c011_dir_pd_w ) { m_pio_dir[3] = data; }
 	DECLARE_WRITE8_MEMBER( tmpz84c011_dir_pe_w ) { m_pio_dir[4] = data; }
 
-	DECLARE_WRITE_LINE_MEMBER( zc0_cb_trampoline_w ) { m_zc0_cb(state); }
-	DECLARE_WRITE_LINE_MEMBER( zc1_cb_trampoline_w ) { m_zc1_cb(state); }
-	DECLARE_WRITE_LINE_MEMBER( zc2_cb_trampoline_w ) { m_zc2_cb(state); }
-
 protected:
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -169,11 +164,15 @@ private:
 	devcb_write_line m_zc0_cb;
 	devcb_write_line m_zc1_cb;
 	devcb_write_line m_zc2_cb;
+
+	DECLARE_WRITE_LINE_MEMBER( zc0_cb_trampoline_w ) { m_zc0_cb(state); }
+	DECLARE_WRITE_LINE_MEMBER( zc1_cb_trampoline_w ) { m_zc1_cb(state); }
+	DECLARE_WRITE_LINE_MEMBER( zc2_cb_trampoline_w ) { m_zc2_cb(state); }
 };
 
 
 // device type definition
-extern const device_type TMPZ84C011;
+DECLARE_DEVICE_TYPE(TMPZ84C011, tmpz84c011_device)
 
 
-#endif /// __TMPZ84C011__
+#endif // MAME_CPU_Z80_TMPZ84C011_H

@@ -126,6 +126,7 @@ CN1 standard DB15 VGA connector (15KHz)
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"
 #include "video/pc_vga.h"
+#include "screen.h"
 
 
 class pntnpuzl_state : public driver_device
@@ -135,7 +136,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_eeprom(*this, "eeprom")
-		{ }
+	{ }
 
 	uint16_t m_eeprom_data;
 	uint16_t m_pntpzl_200000;
@@ -345,7 +346,7 @@ static INPUT_PORTS_START( pntnpuzl )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_D)
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( pntnpuzl, pntnpuzl_state )
+static MACHINE_CONFIG_START( pntnpuzl )
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)//??
 	MCFG_CPU_PROGRAM_MAP(pntnpuzl_map)
 

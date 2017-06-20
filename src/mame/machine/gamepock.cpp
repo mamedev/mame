@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol
 #include "emu.h"
-#include "sound/speaker.h"
-#include "cpu/upd7810/upd7810.h"
 #include "includes/gamepock.h"
+
+#include "cpu/upd7810/upd7810.h"
 
 
 void gamepock_state::hd44102ch_w( int which, int c_d, uint8_t data )

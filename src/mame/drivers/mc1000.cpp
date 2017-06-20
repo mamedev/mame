@@ -22,16 +22,21 @@
 
 */
 
-#include "softlist.h"
 #include "emu.h"
+
+#include "bus/centronics/ctronics.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
+#include "machine/ram.h"
+#include "machine/rescap.h"
+#include "sound/ay8910.h"
 #include "video/mc6845.h"
 #include "video/mc6847.h"
-#include "sound/ay8910.h"
-#include "bus/centronics/ctronics.h"
-#include "machine/rescap.h"
-#include "machine/ram.h"
+
+#include "screen.h"
+#include "softlist.h"
+#include "speaker.h"
+
 
 #define SCREEN_TAG      "screen"
 #define Z80_TAG         "u13"
@@ -526,7 +531,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mc1000_state::ne555_tick)
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, param);
 }
 
-static MACHINE_CONFIG_START( mc1000, mc1000_state )
+static MACHINE_CONFIG_START( mc1000 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, 3579545)
@@ -588,5 +593,5 @@ ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT        COMPANY             FULLNAME        FLAGS */
-COMP( 1985, mc1000,     0,          0,      mc1000,     mc1000, driver_device, 0, "CCE",            "MC-1000",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   STATE         INIT  COMPANY   FULLNAME        FLAGS */
+COMP( 1985, mc1000,     0,          0,      mc1000,     mc1000, mc1000_state, 0,    "CCE",    "MC-1000",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

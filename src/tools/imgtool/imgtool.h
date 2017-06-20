@@ -261,10 +261,11 @@ namespace imgtool
 };
 
 /* ----- special ----- */
-int imgtool_validitychecks(void);
+bool imgtool_validitychecks(void);
 void unknown_partition_get_info(const imgtool_class *imgclass, uint32_t state, union imgtoolinfo *info);
 
 char *strncpyz(char *dest, const char *source, size_t len);
 void rtrim(char *buf);
+std::string extract_padded_filename(const char *source, size_t filename_length, size_t extension_length);
 
 #endif /* IMGTOOL_H */

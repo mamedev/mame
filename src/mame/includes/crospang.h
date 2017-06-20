@@ -38,7 +38,6 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_WRITE16_MEMBER(crospang_soundlatch_w);
 	DECLARE_WRITE16_MEMBER(bestri_tilebank_w);
 	DECLARE_WRITE16_MEMBER(bestri_bg_scrolly_w);
 	DECLARE_WRITE16_MEMBER(bestri_fg_scrolly_w);

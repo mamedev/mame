@@ -653,17 +653,6 @@ enum
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// forward declarations
-namespace util { namespace xml { class data_node; } }
-class ioport_list;
-class ioport_port;
-struct ioport_port_live;
-class ioport_field;
-struct ioport_field_live;
-class ioport_manager;
-class natural_keyboard;
-class analog_field;
-
 // constructor function pointer
 typedef void(*ioport_constructor)(device_t &owner, ioport_list &portlist, std::string &errorbuf);
 
@@ -1058,6 +1047,8 @@ public:
 	const input_seq &seq(input_seq_type seqtype = SEQ_TYPE_STANDARD) const;
 	const input_seq &defseq(input_seq_type seqtype = SEQ_TYPE_STANDARD) const;
 	const input_seq &defseq_unresolved(input_seq_type seqtype = SEQ_TYPE_STANDARD) const { return m_seq[seqtype]; }
+	void set_defseq(const input_seq &newseq) { set_defseq(SEQ_TYPE_STANDARD, newseq); }
+	void set_defseq(input_seq_type seqtype, const input_seq &newseq);
 	bool has_dynamic_read() const { return !m_read.isnull(); }
 	bool has_dynamic_write() const { return !m_write.isnull(); }
 
@@ -1375,8 +1366,6 @@ struct ioport_port_live
 	ioport_value            outputvalue;        // current value for outputs
 };
 
-
-enum class config_type;
 
 // ======================> ioport_manager
 
@@ -1822,4 +1811,4 @@ inline device_t &ioport_setting::device() const { return m_field.device(); }
 inline running_machine &ioport_setting::machine() const { return m_field.machine(); }
 
 
-#endif  // MAME_EMU_IOPORT_H */
+#endif // MAME_EMU_IOPORT_H

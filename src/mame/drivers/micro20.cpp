@@ -56,8 +56,14 @@ public:
 	DECLARE_WRITE8_MEMBER(portb_w);
 	DECLARE_WRITE8_MEMBER(portc_w);
 
+	DECLARE_WRITE_LINE_MEMBER(timerirq_w)
+	{
+		m_maincpu->set_input_line(M68K_IRQ_4, state);
+	}
+
 private:
 	u8 m_tin;
+	u8 m_h4;
 };
 
 void micro20_state::machine_start()
@@ -80,13 +86,18 @@ void micro20_state::machine_reset()
 
 TIMER_DEVICE_CALLBACK_MEMBER(micro20_state::micro20_timer)
 {
-	m_pit->update_tin(m_tin);
+	m_pit->update_tin(m_tin ? ASSERT_LINE : CLEAR_LINE);
+	if ((!m_h4) && (m_tin))
+	{
+		m_maincpu->set_input_line(M68K_IRQ_6, HOLD_LINE);
+	}
 	m_tin ^= 1;
 }
 
 WRITE_LINE_MEMBER(micro20_state::h4_w)
 {
 	printf("h4_w: %d\n", state);
+	m_h4 = state ^ 1;
 }
 
 WRITE_LINE_MEMBER(micro20_state::m68k_reset_callback)
@@ -130,16 +141,16 @@ static ADDRESS_MAP_START(micro20_map, AS_PROGRAM, 32, micro20_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0x00200000, 0x002fffff) AM_READ(buserror_r)
 	AM_RANGE(0x00800000, 0x0083ffff) AM_ROM AM_REGION("bootrom", 0)
-	AM_RANGE(0xffff8000, 0xffff8003) AM_DEVREADWRITE8(FDC_TAG, wd1772_t, status_r, cmd_w,    0xff000000)
-	AM_RANGE(0xffff8000, 0xffff8003) AM_DEVREADWRITE8(FDC_TAG, wd1772_t, track_r, track_w,   0x00ff0000)
-	AM_RANGE(0xffff8000, 0xffff8003) AM_DEVREADWRITE8(FDC_TAG, wd1772_t, sector_r, sector_w, 0x0000ff00)
-	AM_RANGE(0xffff8000, 0xffff8003) AM_DEVREADWRITE8(FDC_TAG, wd1772_t, data_r, data_w,     0x000000ff)
+	AM_RANGE(0xffff8000, 0xffff8003) AM_DEVREADWRITE8(FDC_TAG, wd1772_device, status_r, cmd_w,    0xff000000)
+	AM_RANGE(0xffff8000, 0xffff8003) AM_DEVREADWRITE8(FDC_TAG, wd1772_device, track_r, track_w,   0x00ff0000)
+	AM_RANGE(0xffff8000, 0xffff8003) AM_DEVREADWRITE8(FDC_TAG, wd1772_device, sector_r, sector_w, 0x0000ff00)
+	AM_RANGE(0xffff8000, 0xffff8003) AM_DEVREADWRITE8(FDC_TAG, wd1772_device, data_r, data_w,     0x000000ff)
 	AM_RANGE(0xffff8080, 0xffff808f) AM_DEVREADWRITE8(DUART_A_TAG, mc68681_device, read, write, 0xffffffff)
 	AM_RANGE(0xffff80a0, 0xffff80af) AM_DEVREADWRITE8(DUART_B_TAG, mc68681_device, read, write, 0xffffffff)
 	AM_RANGE(0xffff80c0, 0xffff80df) AM_DEVREADWRITE8(PIT_TAG, pit68230_device, read, write, 0xffffffff)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( micro20, micro20_state )
+static MACHINE_CONFIG_START( micro20 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(MAINCPU_TAG, M68020, XTAL_16_67MHz)
 	MCFG_CPU_PROGRAM_MAP(micro20_map)
@@ -155,6 +166,7 @@ static MACHINE_CONFIG_START( micro20, micro20_state )
 	MCFG_WD1772_ADD(FDC_TAG, XTAL_16_67MHz / 2)
 
 	MCFG_DEVICE_ADD(PIT_TAG, PIT68230, XTAL_16_67MHz / 2)
+	MCFG_PIT68230_TIMER_IRQ_CB(WRITELINE(micro20_state, timerirq_w))
 	MCFG_PIT68230_H4_CB(WRITELINE(micro20_state, h4_w))
 	MCFG_PIT68230_PB_OUTPUT_CB(WRITE8(micro20_state, portb_w))
 	MCFG_PIT68230_PC_OUTPUT_CB(WRITE8(micro20_state, portc_w))
@@ -188,6 +200,4 @@ ROM_START( micro20 )
 	ROM_LOAD32_BYTE( "d24-31_u13_d115.bin", 0x000000, 0x010000, CRC(3646d943) SHA1(97ee54063e2fe49fef2ff68d0f2e39345a75eac5) )
 ROM_END
 
-COMP( 1984, micro20,  0,        0,      micro20,  micro20, driver_device, 0,  "GMX", "Micro 20",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-
-
+COMP( 1984, micro20,  0,        0,      micro20,  micro20, micro20_state, 0,  "GMX", "Micro 20",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

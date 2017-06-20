@@ -40,10 +40,12 @@ Stephh's notes (based on the games Z80 code and some tests) :
 
 #include "emu.h"
 #include "includes/espial.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
-
+#include "screen.h"
+#include "speaker.h"
 
 
 
@@ -313,7 +315,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_CONFIG_START( espial, espial_state )
+static MACHINE_CONFIG_START( espial )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 3072000)   /* 3.072 MHz */
@@ -444,6 +446,6 @@ ROM_END
 
 
 
-GAME( 1983, espial,  0,      espial,  espial, driver_device,  0, ROT0,  "Orca / Thunderbolt", "Espial (Europe)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, espialu, espial, espial,  espial, driver_device,  0, ROT0,  "Orca / Thunderbolt", "Espial (US?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, netwars, 0,      netwars, netwars, driver_device, 0, ROT90, "Orca (Esco Trading Co license)", "Net Wars", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, espial,  0,      espial,  espial,  espial_state, 0, ROT0,  "Orca / Thunderbolt", "Espial (Europe)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, espialu, espial, espial,  espial,  espial_state, 0, ROT0,  "Orca / Thunderbolt", "Espial (US?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, netwars, 0,      netwars, netwars, espial_state, 0, ROT90, "Orca (Esco Trading Co license)", "Net Wars", MACHINE_SUPPORTS_SAVE )

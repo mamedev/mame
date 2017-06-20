@@ -31,6 +31,7 @@
 #define DEVCB_INPUTLINE(_tag, _line) devcb_base::inputline_desc(_tag, _line)
 #define DEVCB_ASSERTLINE(_tag, _line) devcb_base::assertline_desc(_tag, _line)
 #define DEVCB_CLEARLINE(_tag, _line) devcb_base::clearline_desc(_tag, _line)
+#define DEVCB_HOLDLINE(_tag, _line) devcb_base::holdline_desc(_tag, _line)
 #define DEVCB_VCC DEVCB_CONSTANT(1)
 #define DEVCB_GND DEVCB_CONSTANT(0)
 
@@ -104,7 +105,8 @@ protected:
 		CALLBACK_CONSTANT,
 		CALLBACK_INPUTLINE,
 		CALLBACK_ASSERTLINE,
-		CALLBACK_CLEARLINE
+		CALLBACK_CLEARLINE,
+		CALLBACK_HOLDLINE
 	};
 
 	// construction/destruction
@@ -176,6 +178,14 @@ public:
 	{
 	public:
 		clearline_desc(const char *tag, int inputnum) { m_tag = tag; m_inputnum = inputnum; }
+		const char *m_tag;
+		int m_inputnum;
+	};
+
+	class holdline_desc
+	{
+	public:
+		holdline_desc(const char *tag, int inputnum) { m_tag = tag; m_inputnum = inputnum; }
 		const char *m_tag;
 		int m_inputnum;
 	};
@@ -300,6 +310,7 @@ public:
 	devcb_base &set_callback(inputline_desc inputline) { reset(CALLBACK_INPUTLINE); m_target_tag = inputline.m_tag; m_target_int = inputline.m_inputnum; return *this; }
 	devcb_base &set_callback(assertline_desc inputline) { reset(CALLBACK_ASSERTLINE); m_target_tag = inputline.m_tag; m_target_int = inputline.m_inputnum; return *this; }
 	devcb_base &set_callback(clearline_desc inputline) { reset(CALLBACK_CLEARLINE); m_target_tag = inputline.m_tag; m_target_int = inputline.m_inputnum; return *this; }
+	devcb_base &set_callback(holdline_desc inputline) { reset(CALLBACK_HOLDLINE); m_target_tag = inputline.m_tag; m_target_int = inputline.m_inputnum; return *this; }
 	devcb_write_base &chain_alloc();
 
 	// resolution
@@ -326,6 +337,7 @@ private:
 	void write_inputline_adapter(address_space &space, offs_t offset, u64 data, u64 mask);
 	void write_assertline_adapter(address_space &space, offs_t offset, u64 data, u64 mask);
 	void write_clearline_adapter(address_space &space, offs_t offset, u64 data, u64 mask);
+	void write_holdline_adapter(address_space &space, offs_t offset, u64 data, u64 mask);
 
 	// configuration
 	write_line_delegate m_writeline;            // copy of registered line writer

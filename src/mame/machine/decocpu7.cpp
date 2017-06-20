@@ -1,10 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
+#include "emu.h"
 #include "decocpu7.h"
 
+DEFINE_DEVICE_TYPE(DECO_CPU7, deco_cpu7_device, "decocpu7", "DECO CPU-7")
+
+
 deco_cpu7_device::deco_cpu7_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	m6502_device(mconfig, DECO_CPU7, "DECO CPU-7", tag, owner, clock, "decocpu7", __FILE__)
+	m6502_device(mconfig, DECO_CPU7, tag, owner, clock)
 {
 }
 

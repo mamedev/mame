@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Takahiro Nogi
 #include "includes/nb1413m3.h"
+#include "screen.h"
 
 class pastelg_state : public driver_device
 {
@@ -36,6 +37,7 @@ public:
 	int m_palbank;
 	std::unique_ptr<uint8_t[]> m_videoram;
 	int m_flipscreen_old;
+	emu_timer *m_blitter_timer;
 
 	DECLARE_READ8_MEMBER(pastelg_sndrom_r);
 	DECLARE_READ8_MEMBER(pastelg_irq_ack_r);

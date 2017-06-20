@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "dela_ep64.h"
 
 
@@ -14,30 +15,19 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_DELA_EP64 = &device_creator<c64_dela_ep64_cartridge_device>;
+DEFINE_DEVICE_TYPE(C64_DELA_EP64, c64_dela_ep64_cartridge_device, "c64_dela_ep64", "C64 Rex 64KB EPROM cartridge")
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( c64_dela_ep64 )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( c64_dela_ep64 )
+MACHINE_CONFIG_MEMBER( c64_dela_ep64_cartridge_device::device_add_mconfig )
 	MCFG_GENERIC_SOCKET_ADD("eprom1", generic_linear_slot, nullptr)
 	MCFG_GENERIC_EXTENSIONS("rom,bin")
 	MCFG_GENERIC_SOCKET_ADD("eprom2", generic_linear_slot, nullptr)
 	MCFG_GENERIC_EXTENSIONS("rom,bin")
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor c64_dela_ep64_cartridge_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( c64_dela_ep64 );
-}
 
 
 //**************************************************************************
@@ -49,7 +39,7 @@ machine_config_constructor c64_dela_ep64_cartridge_device::device_mconfig_additi
 //-------------------------------------------------
 
 c64_dela_ep64_cartridge_device::c64_dela_ep64_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, C64_DELA_EP64, "C64 Rex 64KB EPROM cartridge", tag, owner, clock, "c64_dela_ep64", __FILE__),
+	device_t(mconfig, C64_DELA_EP64, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_eprom1(*this, "eprom1"),
 	m_eprom2(*this, "eprom2"), m_bank(0), m_reset(0), m_rom0_ce(0), m_rom1_ce(0), m_rom2_ce(0)

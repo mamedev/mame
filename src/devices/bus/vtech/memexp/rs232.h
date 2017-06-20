@@ -6,12 +6,11 @@
 
 ***************************************************************************/
 
+#ifndef MAME_BUS_VTECH_MEMEXP_RS232_H
+#define MAME_BUS_VTECH_MEMEXP_RS232_H
+
 #pragma once
 
-#ifndef __VTECH_MEMEXP_RS232_H__
-#define __VTECH_MEMEXP_RS232_H__
-
-#include "emu.h"
 #include "memexp.h"
 #include "bus/rs232/rs232.h"
 
@@ -20,31 +19,31 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> rs232_interface_device
+// ======================> vtech_rs232_interface_device
 
-class rs232_interface_device : public device_t, public device_memexp_interface
+class vtech_rs232_interface_device : public device_t, public device_vtech_memexp_interface
 {
 public:
 	// construction/destruction
-	rs232_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	DECLARE_WRITE_LINE_MEMBER( rs232_rx_w );
-	DECLARE_READ8_MEMBER( receive_data_r );
-	DECLARE_WRITE8_MEMBER( transmit_data_w );
+	vtech_rs232_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 private:
+	DECLARE_WRITE_LINE_MEMBER( rs232_rx_w );
+	DECLARE_READ8_MEMBER( receive_data_r );
+	DECLARE_WRITE8_MEMBER( transmit_data_w );
+
 	required_device<rs232_port_device> m_rs232;
 
 	int m_rx;
 };
 
 // device type definition
-extern const device_type RS232_INTERFACE;
+DECLARE_DEVICE_TYPE(VTECH_RS232_INTERFACE, vtech_rs232_interface_device)
 
-#endif // __VTECH_MEMEXP_RS232_H__
+#endif // MAME_BUS_VTECH_MEMEXP_RS232_H

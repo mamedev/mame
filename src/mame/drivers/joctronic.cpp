@@ -3,6 +3,7 @@
 // PINBALL
 // Skeleton driver for Joctronic pinballs.
 
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/74157.h"
 #include "machine/nvram.h"
@@ -10,6 +11,8 @@
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/msm5205.h"
+#include "speaker.h"
+
 
 class joctronic_state : public driver_device
 {
@@ -21,7 +24,7 @@ public:
 		, m_oki(*this, "oki")
 		, m_adpcm_select(*this, "adpcm_select")
 		, m_soundbank(*this, "soundbank")
-		{ }
+	{ }
 
 	DECLARE_READ8_MEMBER(csin_r);
 	DECLARE_WRITE8_MEMBER(control_port_w);
@@ -233,7 +236,7 @@ WRITE8_MEMBER(joctronic_state::resint_w)
 WRITE8_MEMBER(joctronic_state::slalom03_oki_bank_w)
 {
 	m_soundbank->set_entry((data & 0xc0) >> 6);
-	m_oki->playmode_w(BIT(data, 1) ? MSM5205_S48_4B : MSM5205_S96_4B); // to S1 on MSM5205
+	m_oki->s1_w(BIT(data, 1));
 	m_oki->reset_w(BIT(data, 0));
 }
 
@@ -307,7 +310,7 @@ void joctronic_state::machine_reset()
 static INPUT_PORTS_START( joctronic )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( joctronic, joctronic_state )
+static MACHINE_CONFIG_START( joctronic )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/4) // 3 MHz - uses WAIT
 	MCFG_CPU_PROGRAM_MAP(maincpu_map) // 139
@@ -343,7 +346,7 @@ static MACHINE_CONFIG_START( joctronic, joctronic_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( slalom03, joctronic_state )
+static MACHINE_CONFIG_START( slalom03 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2) // 6 MHz - uses WAIT
 	MCFG_CPU_PROGRAM_MAP(slalom03_maincpu_map) // 138, 368, 32
@@ -379,7 +382,7 @@ static MACHINE_CONFIG_START( slalom03, joctronic_state )
 	MCFG_74157_OUT_CB(DEVWRITE8("oki", msm5205_device, data_w))
 
 	MCFG_SOUND_ADD("oki", MSM5205, XTAL_12MHz/2/16) // 375 kHz
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S96_4B) // frequency modifiable during operation
+	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B) // frequency modifiable during operation
 	MCFG_MSM5205_VCLK_CB(WRITELINE(joctronic_state, vclk_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
@@ -394,11 +397,13 @@ MACHINE_CONFIG_END
 / Punky Willy (1986)
 /-------------------------------------------------------------------*/
 ROM_START(punkywil)
+	// Both ROMs are 27128, according to a text file accompanying
+	// the bad dump (which had a 512K overdump of the sound ROM)
 	ROM_REGION(0x4000, "maincpu", 0)
-	ROM_LOAD("PUNKIY C.P.U", 0x0000, 0x1200, BAD_DUMP CRC(c46ba6e7) SHA1(d2dd1139bc1f59937b40662f8563c68c87d8e2af)) // underdumped 2764, 27128 or 27256
+	ROM_LOAD("PUNKIY C.P.U", 0x0000, 0x1200, BAD_DUMP CRC(c46ba6e7) SHA1(d2dd1139bc1f59937b40662f8563c68c87d8e2af)) // 0c6c (???)
 
 	ROM_REGION(0x4000, "soundcpu", 0)
-	ROM_LOAD("pw_sound.bin", 0x0000, 0x4000, CRC(b2e3a201) SHA1(e3b0a5b22827683382b61c21607201cd470062ee))
+	ROM_LOAD("pw_sound.bin", 0x0000, 0x4000, CRC(b2e3a201) SHA1(e3b0a5b22827683382b61c21607201cd470062ee)) // d55c (???)
 ROM_END
 
 
@@ -436,7 +441,7 @@ ROM_START(slalom03)
 ROM_END
 
 
-GAME( 1986, punkywil, 0, joctronic, joctronic, driver_device, 0, ROT0, "Joctronic", "Punky Willy", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1986, walkyria, 0, joctronic, joctronic, driver_device, 0, ROT0, "Joctronic", "Walkyria", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1987, bldyrolr, 0, bldyrolr,  joctronic, driver_device, 0, ROT0, "Playbar", "Bloody Roller", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1988, slalom03, 0, slalom03,  joctronic, driver_device, 0, ROT0, "Stargame", "Slalom Code 0.3", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1986, punkywil, 0, joctronic, joctronic, joctronic_state, 0, ROT0, "Joctronic", "Punky Willy",     MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1986, walkyria, 0, joctronic, joctronic, joctronic_state, 0, ROT0, "Joctronic", "Walkyria",        MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1987, bldyrolr, 0, bldyrolr,  joctronic, joctronic_state, 0, ROT0, "Playbar",   "Bloody Roller",   MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1988, slalom03, 0, slalom03,  joctronic, joctronic_state, 0, ROT0, "Stargame",  "Slalom Code 0.3", MACHINE_IS_SKELETON_MECHANICAL )

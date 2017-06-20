@@ -43,6 +43,9 @@ Notes:
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 #define MASTER_CLOCK     XTAL_12MHz
 #define SOUND_CLOCK      XTAL_45MHz
@@ -549,7 +552,7 @@ void mwarr_state::machine_reset()
 	m_which = 0;
 }
 
-static MACHINE_CONFIG_START( mwarr, mwarr_state )
+static MACHINE_CONFIG_START( mwarr )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK)
@@ -573,10 +576,10 @@ static MACHINE_CONFIG_START( mwarr, mwarr_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki1", SOUND_CLOCK/48 , OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki1", SOUND_CLOCK/48 , PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki2", SOUND_CLOCK/48 , OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki2", SOUND_CLOCK/48 , PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -653,4 +656,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 199?, mwarr, 0, mwarr, mwarr, driver_device, 0, ROT0,  "Elettronica Video-Games S.R.L.", "Mighty Warriors", MACHINE_SUPPORTS_SAVE )
+GAME( 199?, mwarr, 0, mwarr, mwarr, mwarr_state, 0, ROT0,  "Elettronica Video-Games S.R.L.", "Mighty Warriors", MACHINE_SUPPORTS_SAVE )

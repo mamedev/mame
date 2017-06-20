@@ -71,11 +71,14 @@ Secret menu hack [totmejan only] (I couldn't find official way to enter, so it's
 *******************************************************************************************/
 
 #include "emu.h"
-#include "cpu/nec/nec.h"
 #include "audio/seibu.h"
+
+#include "cpu/nec/nec.h"
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
 #include "video/seibu_crtc.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class goodejan_state : public driver_device
@@ -627,7 +630,7 @@ WRITE16_MEMBER( goodejan_state::layer_scroll_w )
 
 
 
-static MACHINE_CONFIG_START( goodejan, goodejan_state )
+static MACHINE_CONFIG_START( goodejan )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V30, GOODEJAN_MHZ2/2)
@@ -662,7 +665,7 @@ static MACHINE_CONFIG_START( goodejan, goodejan_state )
 	MCFG_YM3812_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", GOODEJAN_MHZ2/16, OKIM6295_PIN7_LOW)
+	MCFG_OKIM6295_ADD("oki", GOODEJAN_MHZ2/16, PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
@@ -705,7 +708,7 @@ ROM_START( totmejan )
 	ROM_REGION( 0x80000, "oki", 0 )  /* ADPCM samples */
 	ROM_LOAD( "e-jan.0911", 0x00000, 0x80000, CRC(a7fb93c2) SHA1(c2e1300f142032c087c96e1a785af28a6d678947) )
 
-	ROM_REGION( 0x200, "user1", 0 ) /* not used */
+	ROM_REGION( 0x100, "proms", 0 ) /* not used */
 	ROM_LOAD( "fmj08.083", 0x000, 0x100, CRC(9657b7ad) SHA1(e9b469c2b3534593f7fe0ea19cbbf93b55957e42) )
 ROM_END
 
@@ -737,7 +740,7 @@ ROM_START( goodejan )
 	ROM_REGION( 0x80000, "oki", 0 )  /* ADPCM samples */
 	ROM_LOAD( "e-jan.911", 0x00000, 0x80000, CRC(6d2cbc35) SHA1(61f47e2a94b8877906224f46d8301a26a0b9e55f) )
 
-	ROM_REGION( 0x200, "user1", 0 ) /* not used */
+	ROM_REGION( 0x100, "proms", 0 ) /* not used */
 	ROM_LOAD( "fmj08.083", 0x000, 0x100, CRC(9657b7ad) SHA1(e9b469c2b3534593f7fe0ea19cbbf93b55957e42) )
 ROM_END
 
@@ -769,10 +772,10 @@ ROM_START( goodejana )
 	ROM_REGION( 0x80000, "oki", 0 )  /* ADPCM samples */
 	ROM_LOAD( "e-jan.911", 0x00000, 0x80000, CRC(6d2cbc35) SHA1(61f47e2a94b8877906224f46d8301a26a0b9e55f) )
 
-	ROM_REGION( 0x200, "user1", 0 ) /* not used */
+	ROM_REGION( 0x100, "proms", 0 ) /* not used */
 	ROM_LOAD( "fmj08.083", 0x000, 0x100, CRC(9657b7ad) SHA1(e9b469c2b3534593f7fe0ea19cbbf93b55957e42) )
 ROM_END
 
-GAME( 1991, totmejan, 0,        totmejan, goodejan, driver_device, 0, ROT0, "Seibu Kaihatsu (Tecmo license)", "Tottemo E Jong", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, goodejan, 0,        goodejan, goodejan, driver_device, 0, ROT0, "Seibu Kaihatsu (Tecmo license)", "Good E Jong -Kachinuki Mahjong Syoukin Oh!!- (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, goodejana,goodejan, goodejan, goodejan, driver_device, 0, ROT0, "Seibu Kaihatsu (Tecmo license)", "Good E Jong -Kachinuki Mahjong Syoukin Oh!!- (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, totmejan, 0,        totmejan, goodejan, goodejan_state, 0, ROT0, "Seibu Kaihatsu (Tecmo license)", "Tottemo E Jong",                                       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, goodejan, 0,        goodejan, goodejan, goodejan_state, 0, ROT0, "Seibu Kaihatsu (Tecmo license)", "Good E Jong -Kachinuki Mahjong Syoukin Oh!!- (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, goodejana,goodejan, goodejan, goodejan, goodejan_state, 0, ROT0, "Seibu Kaihatsu (Tecmo license)", "Good E Jong -Kachinuki Mahjong Syoukin Oh!!- (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

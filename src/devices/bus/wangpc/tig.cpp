@@ -14,7 +14,10 @@
 
 */
 
+#include "emu.h"
 #include "tig.h"
+
+#include "screen.h"
 
 
 
@@ -52,7 +55,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type WANGPC_TIG = &device_creator<wangpc_tig_device>;
+DEFINE_DEVICE_TYPE(WANGPC_TIG, wangpc_tig_device, "wangpc_tig", "Want PC Text/Image/Graphics Controller")
 
 
 //-------------------------------------------------
@@ -106,10 +109,10 @@ UPD7220_DISPLAY_PIXELS_MEMBER( wangpc_tig_device::hgdc_display_pixels )
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( wangpc_tig )
+//  MACHINE_CONFIG_START( wangpc_tig )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( wangpc_tig )
+MACHINE_CONFIG_MEMBER( wangpc_tig_device::device_add_mconfig )
 	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
 	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, wangpc_tig_device, screen_update)
 	MCFG_SCREEN_SIZE(80*10, 25*12)
@@ -131,17 +134,6 @@ static MACHINE_CONFIG_FRAGMENT( wangpc_tig )
 MACHINE_CONFIG_END
 
 
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor wangpc_tig_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( wangpc_tig );
-}
-
-
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -151,7 +143,7 @@ machine_config_constructor wangpc_tig_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 wangpc_tig_device::wangpc_tig_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, WANGPC_TIG, "Wang PC TIG Controller", tag, owner, clock, "wangpc_tig", __FILE__),
+	device_t(mconfig, WANGPC_TIG, tag, owner, clock),
 	device_wangpcbus_card_interface(mconfig, *this),
 	m_hgdc0(*this, UPD7720_0_TAG),
 	m_hgdc1(*this, UPD7720_1_TAG),

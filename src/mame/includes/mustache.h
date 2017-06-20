@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina
 #include "audio/seibu.h"    // for seibu_sound_decrypt on the MAIN cpu (not sound)
+#include "screen.h"
 
 class mustache_state : public driver_device
 {
@@ -36,7 +37,6 @@ public:
 
 	DECLARE_DRIVER_INIT(mustache);
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(mustache);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );

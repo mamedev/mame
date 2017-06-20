@@ -26,7 +26,11 @@
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "video/ramdac.h"
+#include "screen.h"
+#include "speaker.h"
+
 #include "chsuper.lh"
+
 
 class chsuper_state : public driver_device
 {
@@ -347,7 +351,7 @@ ADDRESS_MAP_END
 *     Machine Drivers      *
 ***************************/
 
-static MACHINE_CONFIG_START( chsuper, chsuper_state )
+static MACHINE_CONFIG_START( chsuper )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z180, XTAL_12MHz / 4)   /* HD64180RP8, 8 MHz? */

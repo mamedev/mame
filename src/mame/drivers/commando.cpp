@@ -45,10 +45,13 @@ Note : there is an ingame typo bug that doesn't display the bonus life values
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/commando.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "sound/2203intf.h"
-#include "includes/commando.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /* Memory Maps */
@@ -245,7 +248,7 @@ void commando_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( commando, commando_state )
+static MACHINE_CONFIG_START( commando )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, PHI_MAIN)  // ???
@@ -265,11 +268,11 @@ static MACHINE_CONFIG_START( commando, commando_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(commando_state, screen_update_commando)
-	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
+	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", commando)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 256)
+	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
 

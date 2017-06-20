@@ -219,6 +219,8 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/bwidow.h"
+
 #include "cpu/m6502/m6502.h"
 #include "machine/watchdog.h"
 #include "video/vector.h"
@@ -227,7 +229,7 @@
 #include "sound/pokey.h"
 #include "sound/discrete.h"
 
-#include "includes/bwidow.h"
+#include "screen.h"
 
 
 
@@ -447,7 +449,7 @@ static INPUT_PORTS_START( bwidow )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )  // To fit "Coin A" Dip Switch
 	PORT_BIT( 0x0c, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Diagnostic Step") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Diagnostic Step")
 	/* bit 6 is the VG HALT bit. We set it to "low" */
 	/* per default (busy vector processor). */
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER("avg", avg_device, done_r, nullptr)
@@ -525,7 +527,7 @@ static INPUT_PORTS_START( gravitar )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )  // To fit "Coin A" Dip Switch
 	PORT_BIT( 0x0c, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Diagnostic Step") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Diagnostic Step")
 	/* bit 6 is the VG HALT bit. We set it to "low" */
 	/* per default (busy vector processor). */
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER("avg", avg_device, done_r, nullptr)
@@ -633,7 +635,7 @@ static INPUT_PORTS_START( spacduel )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )  // To fit "Coin A" Dip Switch
 	PORT_BIT( 0x0c, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Diagnostic Step") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Diagnostic Step")
 	/* bit 6 is the VG HALT bit. We set it to "low" */
 	/* per default (busy vector processor). */
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER("avg", avg_device, done_r, nullptr)
@@ -729,7 +731,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( bwidow, bwidow_state )
+static MACHINE_CONFIG_START( bwidow )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 8)
@@ -1061,13 +1063,13 @@ ROM_END
  *
  *************************************/
 
-GAME( 1980, spacduel, 0,        spacduel, spacduel, driver_device, 0, ROT0, "Atari", "Space Duel (version 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, spacduel1,spacduel, spacduel, spacduel, driver_device, 0, ROT0, "Atari", "Space Duel (version 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, spacduel0,spacduel, spacduel, spacduel, driver_device, 0, ROT0, "Atari", "Space Duel (prototype)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, bwidow,   0,        bwidow,   bwidow, driver_device,   0, ROT0, "Atari", "Black Widow", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, bwidowp,  bwidow,   bwidowp,  bwidow, driver_device,   0, ROT0, "Atari", "Black Widow (prototype)", MACHINE_NOT_WORKING )
-GAME( 1982, gravitar, 0,        gravitar, gravitar, driver_device, 0, ROT0, "Atari", "Gravitar (version 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, gravitar2,gravitar, gravitar, gravitar, driver_device, 0, ROT0, "Atari", "Gravitar (version 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, gravitar1,gravitar, gravitar, gravitar, driver_device, 0, ROT0, "Atari", "Gravitar (version 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, lunarbat, gravitar, gravitar, gravitar, driver_device, 0, ROT0, "Atari", "Lunar Battle (prototype, later)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, lunarba1, gravitar, lunarbat, lunarbat, driver_device, 0, ROT0, "Atari", "Lunar Battle (prototype, earlier)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, spacduel, 0,        spacduel, spacduel, bwidow_state, 0, ROT0, "Atari", "Space Duel (version 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, spacduel1,spacduel, spacduel, spacduel, bwidow_state, 0, ROT0, "Atari", "Space Duel (version 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, spacduel0,spacduel, spacduel, spacduel, bwidow_state, 0, ROT0, "Atari", "Space Duel (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bwidow,   0,        bwidow,   bwidow,   bwidow_state, 0, ROT0, "Atari", "Black Widow", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bwidowp,  bwidow,   bwidowp,  bwidow,   bwidow_state, 0, ROT0, "Atari", "Black Widow (prototype)", MACHINE_NOT_WORKING )
+GAME( 1982, gravitar, 0,        gravitar, gravitar, bwidow_state, 0, ROT0, "Atari", "Gravitar (version 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, gravitar2,gravitar, gravitar, gravitar, bwidow_state, 0, ROT0, "Atari", "Gravitar (version 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, gravitar1,gravitar, gravitar, gravitar, bwidow_state, 0, ROT0, "Atari", "Gravitar (version 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, lunarbat, gravitar, gravitar, gravitar, bwidow_state, 0, ROT0, "Atari", "Lunar Battle (prototype, later)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, lunarba1, gravitar, lunarbat, lunarbat, bwidow_state, 0, ROT0, "Atari", "Lunar Battle (prototype, earlier)", MACHINE_SUPPORTS_SAVE )

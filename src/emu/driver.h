@@ -89,8 +89,6 @@
 //**************************************************************************
 
 // forward declarations
-class gfxdecode_device;
-class palette_device;
 typedef delegate<void ()> driver_callback_delegate;
 
 
@@ -120,15 +118,8 @@ public:
 	};
 
 	// inline configuration helpers
-	static void static_set_game(device_t &device, const game_driver &game);
+	void set_game_driver(const game_driver &game);
 	static void static_set_callback(device_t &device, callback_type type, driver_callback_delegate callback);
-
-	// generic helpers
-	template<class _DriverClass, void (_DriverClass::*_Function)()>
-	static void driver_init_wrapper(running_machine &machine)
-	{
-		(machine.driver_data<_DriverClass>()->*_Function)();
-	}
 
 	// dummy driver_init callbacks
 	void init_0() { }
@@ -206,6 +197,7 @@ protected:
 
 	// device-level overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;
 	virtual void device_reset_after_children() override;
@@ -223,16 +215,6 @@ private:
 	u8                          m_flip_screen_x;
 	u8                          m_flip_screen_y;
 };
-
-
-// this template function creates a stub which constructs a device
-template<class _DriverClass>
-device_t *driver_device_creator(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-{
-	assert(owner == nullptr);
-	assert(clock == 0);
-	return global_alloc_clear<_DriverClass>(mconfig, &driver_device_creator<_DriverClass>, tag);
-}
 
 
 #endif  /* MAME_EMU_DRIVER_H */

@@ -581,6 +581,34 @@ Raiden Fighters Jet    (All Mask ROMs stamped 'RAIDEN-FJET')
 
 
 
+Mahjong Adapter Layout
+----------------------
+
+(C)SXX2C MAHJANG IF SEIBU KAIHATSU INC.
+|------------|  |---------------------------------------------|  |------------|
+|            |--|                  J A M M A                  |--|            |
+|   E  E                                                               E  E   |
+|   X  X                                                               X  X   |
+|   C  C     74LS393   16.9344MHz    jumpers        74LS174  74LS174   C  C   |
+|   N  N                                                               N  N   |
+|   4  3     74LS393       *                        74LS174  74LS174   2  1   |
+|                                                                             |
+|   74LS138   74LS04       **           ***         74LS174  74LS174          |
+|                                                                             |
+|   74LS161   SN7406            resistor package     ****    74LS148          |
+|                                                                             |
+|          |---|                   5 6 P M J                    |---|         |
+|----------|   |------------------------------------------------|   |---------|
+Notes:
+*     : Unpopulated location for ULN2003
+**    : Unpopulated location for 16V8-25 GAL
+***   : Unpopulated location for 74LS161
+****  : Unpopulated location for 74LS148
+
+This board is used by E Jong High School to encode the mahjong inputs onto the
+SPI motherboard's JAMMA connector.
+
+
 There were some single PCBs made that run just one game. These are shown below.
 
 
@@ -846,18 +874,23 @@ Notes:
 */
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
+#include "includes/seibuspi.h"
+
 #include "cpu/i386/i386.h"
+#include "cpu/z80/z80.h"
+#include "machine/7200fifo.h"
 #include "machine/ds2404.h"
 #include "machine/eepromser.h"
 #include "machine/intelfsh.h"
-#include "machine/7200fifo.h"
+#include "machine/seibuspi.h"
 #include "sound/okim6295.h"
 #include "sound/ymf271.h"
 #include "sound/ymz280b.h"
-#include "machine/seibuspi.h"
 #include "video/seibu_crtc.h"
-#include "includes/seibuspi.h"
+
+#include "screen.h"
+#include "speaker.h"
+
 
 // default values written to CRTC (note: SYS386F does not have this chip)
 #define PIXEL_CLOCK  (XTAL_28_63636MHz/4)
@@ -1830,7 +1863,7 @@ MACHINE_RESET_MEMBER(seibuspi_state,spi)
 	m_z80_prg_transfer_pos = 0;
 }
 
-static MACHINE_CONFIG_START( spi, seibuspi_state )
+static MACHINE_CONFIG_START( spi )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I386, XTAL_50MHz/2) // AMD or Intel 386DX, 25MHz
@@ -1959,7 +1992,7 @@ MACHINE_CONFIG_END
 
 /* SYS386I */
 
-static MACHINE_CONFIG_START( sys386i, seibuspi_state )
+static MACHINE_CONFIG_START( sys386i )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I386, XTAL_40MHz) // AMD 386DX, 40MHz
@@ -1987,10 +2020,10 @@ static MACHINE_CONFIG_START( sys386i, seibuspi_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki1", XTAL_28_63636MHz/20, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki1", XTAL_28_63636MHz/20, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL_28_63636MHz/20, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki2", XTAL_28_63636MHz/20, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -2016,7 +2049,7 @@ DRIVER_INIT_MEMBER(seibuspi_state,sys386f)
 	}
 }
 
-static MACHINE_CONFIG_START( sys386f, seibuspi_state )
+static MACHINE_CONFIG_START( sys386f )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I386, XTAL_50MHz/2) // Intel i386DX, 25MHz
@@ -3979,7 +4012,7 @@ GAME( 1995, viprp1ot,   viprp1,   spi,     spi_3button, seibuspi_state, viprp1, 
 GAME( 1995, viprp1oj,   viprp1,   spi,     spi_3button, seibuspi_state, viprp1o,  ROT270, "Seibu Kaihatsu",                         "Viper Phase 1 (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1995, viprp1hk,   viprp1,   spi,     spi_3button, seibuspi_state, viprp1,   ROT270, "Seibu Kaihatsu (Metrotainment license)", "Viper Phase 1 (Hong Kong)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) /* "=HONG KONG=" seems part of title */
 
-GAME( 1996, ejanhs,     0,        ejanhs,  spi_ejanhs,  seibuspi_state, ejanhs,   ROT0,   "Seibu Kaihatsu",                         "E-Jan High School (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1996, ejanhs,     0,        ejanhs,  spi_ejanhs,  seibuspi_state, ejanhs,   ROT0,   "Seibu Kaihatsu",                         "E Jong High School (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
 GAME( 1996, rdft,       0,        spi,     spi_3button, seibuspi_state, rdft,     ROT270, "Seibu Kaihatsu (Tuning license)",        "Raiden Fighters (Germany)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1996, rdftj,      rdft,     spi,     spi_3button, seibuspi_state, rdft,     ROT270, "Seibu Kaihatsu",                         "Raiden Fighters (Japan set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

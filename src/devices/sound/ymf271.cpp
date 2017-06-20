@@ -1744,10 +1744,10 @@ void ymf271_device::device_reset()
 		m_irq_handler(0);
 }
 
-const device_type YMF271 = &device_creator<ymf271_device>;
+DEFINE_DEVICE_TYPE(YMF271, ymf271_device, "ymf271", "Yamaha YMF271")
 
 ymf271_device::ymf271_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, YMF271, "YMF271", tag, owner, clock, "ymf271", __FILE__)
+	: device_t(mconfig, YMF271, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_timerA(0)
 	, m_timerB(0)
@@ -1771,14 +1771,4 @@ ymf271_device::ymf271_device(const machine_config &mconfig, const char *tag, dev
 	memset(m_slots, 0, sizeof(m_slots));
 	memset(m_groups, 0, sizeof(m_groups));
 	memset(m_regs_main, 0, sizeof(m_regs_main));
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void ymf271_device::device_config_complete()
-{
 }

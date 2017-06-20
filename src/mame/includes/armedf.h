@@ -120,4 +120,5 @@ public:
 	DECLARE_READ16_MEMBER(latch_r);
 	DECLARE_WRITE8_MEMBER(main_sharedram_w);
 	DECLARE_READ8_MEMBER(main_sharedram_r);
+	DECLARE_WRITE8_MEMBER(mcu_spritelist_w);
 };

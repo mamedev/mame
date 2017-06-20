@@ -355,11 +355,12 @@ private:
 
 				auto tmp = new i8089_instruction(m_pc, m_oprom + m_pc);
 				m_pc += tmp->length();
+				std::string sub = tmp->buffer();
 
 				if (m_w == 0)
-					sprintf(m_buffer, "movb %s, %s", tmp->buffer(), m_offset);
+					sprintf(m_buffer, "movb %s, %s", sub.c_str(), m_offset);
 				else
-					sprintf(m_buffer, "mov %s, %s", tmp->buffer(), m_offset);
+					sprintf(m_buffer, "mov %s, %s", sub.c_str(), m_offset);
 
 				delete(tmp);
 			}

@@ -3,7 +3,7 @@
 #define IRQ_ADDRESS 0xf
 
 #define saturn_assert(x) \
-	do { if (!(x)) logerror("SATURN '%s' assertion failed: %s at %s:%i, pc=%05x\n", tag(), #x, __FILE__, __LINE__, m_pc); } while (0)
+	do { if (!(x)) logerror("SATURN assertion failed: %s at %s:%i, pc=%05x\n", #x, __FILE__, __LINE__, m_pc); } while (0)
 
 int saturn_device::READ_OP()
 {
@@ -202,24 +202,24 @@ void saturn_device::saturn_push(uint32_t adr)
 
 void saturn_device::saturn_interrupt_on()
 {
-	LOG(( "SATURN '%s' at %05x: INTON\n", tag(), m_pc-4 ));
+	LOG("SATURN at %05x: INTON\n", m_pc-4);
 	m_irq_enable=1;
 	if (m_irq_state)
 	{
-		LOG(( "SATURN '%s' set_irq_line(ASSERT)\n", tag()));
+		LOG("SATURN set_irq_line(ASSERT)\n");
 		m_pending_irq=1;
 	}
 }
 
 void saturn_device::saturn_interrupt_off()
 {
-	LOG(( "SATURN '%s' at %05x: INTOFF\n", tag(), m_pc-4 ));
+	LOG("SATURN at %05x: INTOFF\n", m_pc-4);
 	m_irq_enable=0;
 }
 
 void saturn_device::saturn_reset_interrupt()
 {
-	LOG(( "SATURN '%s' at %05x: RSI\n", tag(), m_pc-5 ));
+	LOG("SATURN at %05x: RSI\n", m_pc-5);
 	m_rsi_func(ASSERT_LINE);
 }
 
@@ -250,7 +250,7 @@ void saturn_device::saturn_shutdown()
 {
 	m_sleeping=1;
 	m_irq_enable=1;
-	LOG(( "SATURN '%s' at %05x: SHUTDN\n", tag(), m_pc-3 ));
+	LOG("SATURN at %05x: SHUTDN\n", m_pc-3);
 }
 
 void saturn_device::saturn_bus_command_b()
@@ -473,7 +473,7 @@ void saturn_device::saturn_return_carry_clear()
 
 void saturn_device::saturn_return_interrupt()
 {
-	LOG(( "SATURN '%s' at %05x: RTI\n", tag(), m_pc-2 ));
+	LOG("SATURN at %05x: RTI\n", tag(), m_pc-2);
 	m_in_irq=0; /* set to 1 when an IRQ is taken */
 	m_pc=saturn_pop();
 //  m_icount-=10;

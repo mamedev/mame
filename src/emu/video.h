@@ -25,21 +25,14 @@
 //**************************************************************************
 
 // number of levels of frameskipping supported
-const int FRAMESKIP_LEVELS = 12;
-const int MAX_FRAMESKIP = FRAMESKIP_LEVELS - 2;
+constexpr int FRAMESKIP_LEVELS = 12;
+constexpr int MAX_FRAMESKIP = FRAMESKIP_LEVELS - 2;
 
 #define LCD_FRAMES_PER_SECOND   30
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
-
-// forward references
-class render_target;
-class screen_device;
-class avi_file;
-
-
 
 // ======================> video_manager
 
@@ -190,9 +183,6 @@ private:
 	attotime            m_avi_frame_period;         // period of a single movie frame
 	attotime            m_avi_next_frame_time;      // time of next frame
 	u32                 m_avi_frame;                // current movie frame number
-
-	// movie recording - dummy
-	bool                m_dummy_recording;          // indicates if snapshot should be created of every frame
 
 	static const bool   s_skiptable[FRAMESKIP_LEVELS][FRAMESKIP_LEVELS];
 

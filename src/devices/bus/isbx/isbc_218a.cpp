@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "isbc_218a.h"
 
 
@@ -21,7 +22,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ISBC_218A = &device_creator<isbc_218a_device>;
+DEFINE_DEVICE_TYPE(ISBC_218A, isbc_218a_device, "isbc_218a", "ISBX 218a for ISBC")
 
 
 //-------------------------------------------------
@@ -49,27 +50,15 @@ SLOT_INTERFACE_END
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( isbc_218a )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( isbc_218a )
+MACHINE_CONFIG_MEMBER( isbc_218a_device::device_add_mconfig )
 	MCFG_I8272A_ADD(I8272_TAG, true)
 	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(isbc_218a_device, fdc_irq))
 	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(isbc_218a_device, fdc_drq))
 	MCFG_FLOPPY_DRIVE_ADD(I8272_TAG":0", isbc_218a_floppies, "525dd", isbc_218a_device::floppy_formats)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor isbc_218a_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( isbc_218a );
-}
-
 
 
 //**************************************************************************
@@ -81,7 +70,7 @@ machine_config_constructor isbc_218a_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 isbc_218a_device::isbc_218a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, ISBC_218A, "ISBX 218a for ISBC", tag, owner, clock, "isbc_218a", __FILE__),
+	device_t(mconfig, ISBC_218A, tag, owner, clock),
 	device_isbx_card_interface(mconfig, *this),
 	m_fdc(*this, I8272_TAG),
 	m_floppy0(*this, I8272_TAG":0"), m_reset(false), m_motor(false)

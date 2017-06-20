@@ -111,7 +111,6 @@ Sound
     Mapped @0x8010-0x8016
     Had to patch es8712.c to start playing on 0x8016 write and to prevent continuous looping.
     There's a test on bit1 at offset 0 (0x8010), so this may be a "read status" kind of port.
-    For now reading at 8010 always reports ready.
 
 
 Ports
@@ -220,20 +219,25 @@ TODO :
     - Hook up the OKI M5202
 */
 
+#include "emu.h"
+
+#include "cpu/z80/z80.h"
+#include "machine/i8255.h"
+#include "machine/nvram.h"
+#include "machine/ticket.h"
+#include "sound/2203intf.h"
+#include "sound/es8712.h"
+
+#include "screen.h"
+#include "speaker.h"
+
+
 #define MAIN_CLOCK        XTAL_12MHz
 #define CPU_CLOCK         MAIN_CLOCK / 4
 #define YM2203_CLOCK      MAIN_CLOCK / 4
 #define ES8712_CLOCK      8000              // 8Khz, it's the only clock for sure (pin13) it come from pin14 of M5205.
 
 #define HOPPER_PULSE      50          // time between hopper pulses in milliseconds (not right for attendant pay)
-
-#include "emu.h"
-#include "cpu/z80/z80.h"
-#include "sound/es8712.h"
-#include "sound/2203intf.h"
-#include "machine/i8255.h"
-#include "machine/nvram.h"
-#include "machine/ticket.h"
 
 
 class witch_state : public driver_device
@@ -286,7 +290,6 @@ public:
 	DECLARE_WRITE8_MEMBER(write_a006);
 	DECLARE_WRITE8_MEMBER(write_a008);
 	DECLARE_READ8_MEMBER(prot_read_700x);
-	DECLARE_READ8_MEMBER(read_8010);
 	DECLARE_WRITE8_MEMBER(xscroll_w);
 	DECLARE_WRITE8_MEMBER(yscroll_w);
 	DECLARE_DRIVER_INIT(witch);
@@ -460,12 +463,6 @@ READ8_MEMBER(witch_state::prot_read_700x)
 	return memregion("sub")->base()[0x7000+offset];
 }
 
-/*
- * Status from ES8712?
- * BIT1 is zero when no sample is playing?
- */
-READ8_MEMBER(witch_state::read_8010){   return 0x00; }
-
 WRITE8_MEMBER(witch_state::xscroll_w)
 {
 	m_scrollx=data;
@@ -502,7 +499,7 @@ static ADDRESS_MAP_START( map_sub, AS_PROGRAM, 8, witch_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
 	AM_RANGE(0x8008, 0x8009) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
-	AM_RANGE(0x8010, 0x8016) AM_READ(read_8010) AM_DEVWRITE("essnd", es8712_device, es8712_w)
+	AM_RANGE(0x8010, 0x8016) AM_DEVREADWRITE("essnd", es8712_device, read, write)
 	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE("ppi1", i8255_device, read, write)
 	AM_RANGE(0xa004, 0xa007) AM_DEVREADWRITE("ppi2", i8255_device, read, write)
 	AM_RANGE(0xa008, 0xa008) AM_WRITE(write_a008)
@@ -764,7 +761,7 @@ void witch_state::machine_reset()
 	m_motor_active = (ioport("YM_PortB")->read() & 0x08) ? 0 : 1;
 }
 
-static MACHINE_CONFIG_START( witch, witch_state )
+static MACHINE_CONFIG_START( witch )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)    /* 3 MHz */
 	MCFG_CPU_PROGRAM_MAP(map_main)

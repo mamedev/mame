@@ -1,11 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert, R. Belmont, hap
+#ifndef MAME_SOUND_YMF271_H
+#define MAME_SOUND_YMF271_H
+
 #pragma once
 
-#ifndef __YMF271_H__
-#define __YMF271_H__
-
-#include "emu.h"
 
 #define MCFG_YMF271_IRQ_HANDLER(_devcb) \
 	devcb = &ymf271_device::set_irq_handler(*device, DEVCB_##_devcb);
@@ -22,22 +21,22 @@ public:
 	ymf271_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<ymf271_device &>(device).m_irq_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_ext_read_handler(device_t &device, _Object object) { return downcast<ymf271_device &>(device).m_ext_read_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_ext_write_handler(device_t &device, _Object object) { return downcast<ymf271_device &>(device).m_ext_write_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb) { return downcast<ymf271_device &>(device).m_irq_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_ext_read_handler(device_t &device, Object &&cb) { return downcast<ymf271_device &>(device).m_ext_read_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_ext_write_handler(device_t &device, Object &&cb) { return downcast<ymf271_device &>(device).m_ext_write_handler.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+
 private:
 	struct YMF271Slot
 	{
@@ -160,7 +159,6 @@ private:
 	devcb_write8 m_ext_write_handler;
 };
 
-extern const device_type YMF271;
+DECLARE_DEVICE_TYPE(YMF271, ymf271_device)
 
-
-#endif /* __YMF271_H__ */
+#endif // MAME_SOUND_YMF271_H

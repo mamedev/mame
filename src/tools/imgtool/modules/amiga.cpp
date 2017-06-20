@@ -2386,7 +2386,6 @@ void amiga_floppy_get_info(const imgtool_class *imgclass, uint32_t state, union 
 		case IMGTOOLINFO_INT_DIRECTORY_EXTRA_BYTES:      info->i = sizeof(amiga_iterator); break;
 		case IMGTOOLINFO_INT_SUPPORTS_LASTMODIFIED_TIME: info->i = 1; break;
 		case IMGTOOLINFO_INT_PATH_SEPARATOR:             info->i = '/'; break;
-		case IMGTOOLINFO_INT_CHARSET:                    info->i = IMGTOOL_CHARSET_ISO_8859_1; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case IMGTOOLINFO_STR_NAME:                       strcpy(info->s = imgtool_temp_str(), "amiga_floppy"); break;
@@ -2415,5 +2414,6 @@ void amiga_floppy_get_info(const imgtool_class *imgclass, uint32_t state, union 
 		case IMGTOOLINFO_PTR_GET_ICON_INFO:              info->get_iconinfo = amiga_image_geticoninfo; break;
 		case IMGTOOLINFO_PTR_SUGGEST_TRANSFER:           info->suggest_transfer = amiga_image_suggesttransfer; break;
 		case IMGTOOLINFO_PTR_CREATEIMAGE_OPTGUIDE:       info->createimage_optguide = &amiga_createimage_optionguide; break;
+		case IMGTOOLINFO_PTR_CHARCONVERTER:              info->charconverter = &imgtool::charconverter_iso_8859_1; break;
 	}
 }

@@ -12,9 +12,12 @@
 #include "emu.h"
 #include "v53.h"
 
+#include "necpriv.h"
 
-const device_type V53 = &device_creator<v53_device>;
-const device_type V53A =&device_creator<v53a_device>;
+
+
+DEFINE_DEVICE_TYPE(V53,  v53_device,  "v53",  "V53")
+DEFINE_DEVICE_TYPE(V53A, v53a_device, "v53a", "V53A")
 
 WRITE8_MEMBER(v53_base_device::BSEL_w)
 {
@@ -475,7 +478,7 @@ WRITE_LINE_MEMBER(v53_base_device::internal_irq_w)
 }
 
 
-static MACHINE_CONFIG_FRAGMENT( v53 )
+MACHINE_CONFIG_MEMBER( v53_base_device::device_add_mconfig )
 
 	MCFG_DEVICE_ADD("pit", PIT8254, 0) // functionality identical to uPD71054
 	MCFG_PIT8253_CLK0(16000000) // manual implicitly claims that these runs at same speed as the CPU
@@ -505,7 +508,7 @@ static MACHINE_CONFIG_FRAGMENT( v53 )
 	MCFG_AM9517A_OUT_DACK_3_CB(WRITELINE(v53_base_device, dma_dack3_trampoline_w))
 
 
-	MCFG_PIC8259_ADD( "upd71059pic", WRITELINE(v53_base_device, internal_irq_w), VCC, READ8(v53_base_device,get_pic_ack))
+	MCFG_PIC8259_ADD( "upd71059pic", WRITELINE(v53_base_device, internal_irq_w), VCC, READ8(v53_base_device, get_pic_ack))
 
 
 
@@ -520,14 +523,9 @@ static MACHINE_CONFIG_FRAGMENT( v53 )
 
 MACHINE_CONFIG_END
 
-machine_config_constructor v53_base_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( v53 );
-}
 
-
-v53_base_device::v53_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, offs_t fetch_xor, uint8_t prefetch_size, uint8_t prefetch_cycles, uint32_t chip_type)
-	: nec_common_device(mconfig, type, name, tag, owner, clock, shortname, __FILE__, true, fetch_xor, prefetch_size, prefetch_cycles, chip_type),
+v53_base_device::v53_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, offs_t fetch_xor, uint8_t prefetch_size, uint8_t prefetch_cycles, uint32_t chip_type)
+	: nec_common_device(mconfig, type, tag, owner, clock, true, fetch_xor, prefetch_size, prefetch_cycles, chip_type),
 	m_io_space_config( "io", ENDIANNESS_LITTLE, 16, 16, 0, ADDRESS_MAP_NAME( v53_internal_port_map ) ),
 	m_v53tcu(*this, "pit"),
 	m_v53dmau(*this, "upd71071dma"),
@@ -567,12 +565,12 @@ v53_base_device::v53_base_device(const machine_config &mconfig, device_type type
 
 
 v53_device::v53_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: v53_base_device(mconfig, V53, "V53", tag, owner, clock, "v53", BYTE_XOR_LE(0), 6, 1, V33_TYPE)
+	: v53_base_device(mconfig, V53, tag, owner, clock, BYTE_XOR_LE(0), 6, 1, V33_TYPE)
 {
 }
 
 
 v53a_device::v53a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: v53_base_device(mconfig, V53A, "V53A", tag, owner, clock, "v53a", BYTE_XOR_LE(0), 6, 1, V33_TYPE)
+	: v53_base_device(mconfig, V53A, tag, owner, clock, BYTE_XOR_LE(0), 6, 1, V33_TYPE)
 {
 }

@@ -95,7 +95,8 @@ Nemo (World 901109)                                          1990  89624B-3   NM
 Nemo (World 901130)                                                89624B-3   NM24B            IOB1  88622-C-5    CPS-B-15  DL-0411-10010  None
 Nemo (Japan 901120)                                                89625B-1   NM22B            ?     ?            CPS-B-15  DL-0411-10010
 
-Street Fighter II: The World Warrior (World 910214)          1991  90629B-2   STF29            IOB1  90632C-1     CPS-B-17  DL-0411-10012  C632
+Street Fighter II: The World Warrior (World 910129)          1991  90629B-2   STF29            IOB1  90632C-1     CPS-B-17  DL-0411-10012  C632
+Street Fighter II: The World Warrior (World 910214)                90629B-2   STF29            IOB1  90632C-1     CPS-B-17  DL-0411-10012  C632
 Street Fighter II: The World Warrior (World 910228)                90629B-3   STF29            IOB2  90632C-1     CPS-B-18  DL-0411-10013  C632B
 Street Fighter II: The World Warrior (World 910318)                90629B-3   STF29            IOB1  90632C-1     CPS-B-05  DL-0411-10006  C632
 Street Fighter II: The World Warrior (World 910522)                90629B-3   STF29            IOB1  90632C-1     CPS-B-11  DL-0411-10004  C632
@@ -1466,6 +1467,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"sf2eb",       CPS_B_17,     mapper_STF29,  0x36 },
 	{"sf2ed",       CPS_B_05,     mapper_STF29,  0x36 },
 	{"sf2ee",       CPS_B_18,     mapper_STF29,  0x3c },
+	{"sf2em",       CPS_B_17,     mapper_STF29,  0x36 },
 	{"sf2ebbl",     CPS_B_17,     mapper_STF29,  0x36, 0, 0, 1  },
 	{"sf2ebbl2",    CPS_B_17,     mapper_STF29,  0x36, 0, 0, 1  },
 	{"sf2ebbl3",    CPS_B_17,     mapper_STF29,  0x36, 0, 0, 1  },
@@ -1553,7 +1555,8 @@ static const struct CPS1config cps1_config_table[]=
 	{"sf2mdt",      CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
 	{"sf2mdta",     CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
 	{"sf2mdtb",     CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
-	{"sf2b",        CPS_B_17,     mapper_STF29,  0x36, 0, 0, 1  },
+	{"sf2b",        CPS_B_17,     mapper_STF29,  0x36, 0, 0, 1 },
+	{"sf2ceupl",    HACK_B_1,     mapper_S9263B, 0x36, 0, 0, 1 },
 	{"varth",       CPS_B_04,     mapper_VA63B },   /* CPSB test has been patched out (60=0008) register is also written to, possibly leftover from development */  // wrong, this set uses VA24B, dumped but equations still not added
 	{"varthb",      CPS_B_04,     mapper_VA63B, 0, 0, 0, 0x0F },
 	{"varthr1",     CPS_B_04,     mapper_VA63B },   /* CPSB test has been patched out (60=0008) register is also written to, possibly leftover from development */  // wrong, this set uses VA24B, dumped but equations still not added
@@ -1572,6 +1575,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"dino",        CPS_B_21_QS2, mapper_CD63B },   /* layer enable never used */
 	{"dinou",       CPS_B_21_QS2, mapper_CD63B },   /* layer enable never used */
 	{"dinoj",       CPS_B_21_QS2, mapper_CD63B },   /* layer enable never used */
+	{"dinoa",       CPS_B_21_QS2, mapper_CD63B },   /* layer enable never used */
 	{"dinopic",     CPS_B_21_QS2, mapper_CD63B },   /* layer enable never used */
 	{"dinopic2",    CPS_B_21_QS2, mapper_CD63B },   /* layer enable never used */
 	{"dinohunt",    CPS_B_21_DEF, mapper_CD63B },   /* Chinese bootleg */
@@ -3087,7 +3091,7 @@ if (0 && machine().input().code_pressed(KEYCODE_Z))
 	return 0;
 }
 
-void cps_state::screen_eof_cps1(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(cps_state::screen_vblank_cps1)
 {
 	// rising edge
 	if (state)

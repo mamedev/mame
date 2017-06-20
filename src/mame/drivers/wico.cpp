@@ -36,9 +36,13 @@ ToDo:
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "machine/genpin.h"
+
 #include "cpu/m6809/m6809.h"
 #include "sound/sn76496.h"
+#include "speaker.h"
+
 #include "wico.lh"
 
 
@@ -423,7 +427,7 @@ void wico_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( wico, wico_state )
+static MACHINE_CONFIG_START( wico )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("ccpu", M6809, 10000000 / 8)
 	MCFG_CPU_PROGRAM_MAP(ccpu_map)
@@ -459,4 +463,4 @@ ROM_END
 / Big Top  (1977)
 /-------------------------------------------------------------------*/
 
-GAME(1984,  aftor,  0,  wico,  wico, driver_device,  0,  ROT0,  "Wico", "Af-Tor", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME(1984,  aftor,  0,  wico,  wico, wico_state,  0,  ROT0,  "Wico", "Af-Tor", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)

@@ -174,10 +174,14 @@ Notes:
 */
 
 #include "emu.h"
+#include "includes/n64.h"
+
 #include "cpu/rsp/rsp.h"
 #include "cpu/mips/mips3.h"
 #include "sound/dmadac.h"
-#include "includes/n64.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 class aleck64_state : public n64_state
 {
@@ -478,7 +482,7 @@ static INPUT_PORTS_START( aleck64 )
 	PORT_START("IN1")
 	PORT_BIT( 0xff00ffff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE_NO_TOGGLE( 0x00200000, IP_ACTIVE_LOW )
-	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service Button") PORT_CODE(KEYCODE_7)
+	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Service Button")
 	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_COIN1 )
 INPUT_PORTS_END
@@ -590,7 +594,7 @@ static INPUT_PORTS_START( mtetrisc )
 	PORT_START("IN1")
 	PORT_BIT( 0xffcc, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE_NO_TOGGLE( 0x0020, IP_ACTIVE_LOW )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service Button") PORT_CODE(KEYCODE_7)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Service Button")
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 INPUT_PORTS_END
@@ -696,7 +700,7 @@ static INPUT_PORTS_START( starsldr )
 	PORT_START("IN1")
 	PORT_BIT( 0xff00ffff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE_NO_TOGGLE( 0x00200000, IP_ACTIVE_LOW )
-	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service Button") PORT_CODE(KEYCODE_7)
+	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Service Button")
 	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_COIN1 )
 INPUT_PORTS_END
@@ -730,8 +734,8 @@ static INPUT_PORTS_START( doncdoon )
 
 	PORT_START("IN1")
 	PORT_BIT(0xffc0ffff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Test Button")
-	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service Button") PORT_CODE(KEYCODE_7)
+	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Test Button")
+	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Service Button")
 	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_START2 )
@@ -763,8 +767,8 @@ static INPUT_PORTS_START( twrshaft )
 	PORT_DIPSETTING( 0x00000000, DEF_STR( On ) )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Test Button")
-	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service Button") PORT_CODE(KEYCODE_7)
+	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Test Button")
+	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Service Button")
 	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_START1 )
@@ -850,7 +854,7 @@ static INPUT_PORTS_START( hipai )
 
 	PORT_START("IN1")
 	PORT_BIT( 0xffebffff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service Button") PORT_CODE(KEYCODE_7)
+	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Service Button")
 	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_COIN1 )
 INPUT_PORTS_END
 
@@ -894,7 +898,7 @@ static INPUT_PORTS_START( srmvs )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( aleck64, aleck64_state )
+static MACHINE_CONFIG_START( aleck64 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", VR4300BE, 93750000)
@@ -919,7 +923,7 @@ static MACHINE_CONFIG_START( aleck64, aleck64_state )
 	MCFG_SCREEN_SIZE(640, 525)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(aleck64_state, screen_update_n64)
-	MCFG_SCREEN_VBLANK_DRIVER(aleck64_state, screen_eof_n64)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(aleck64_state, screen_vblank_n64))
 
 	MCFG_PALETTE_ADD("palette", 0x1000)
 
@@ -1223,13 +1227,13 @@ ROM_END
 GAME( 1998, aleck64,  0,        aleck64, aleck64, aleck64_state,  aleck64, ROT0, "Nintendo / Seta", "Aleck64 PIF BIOS", MACHINE_IS_BIOS_ROOT)
 
 // games
-GAME( 1998, 11beat,   aleck64,  aleck64, 11beat, aleck64_state,   aleck64, ROT0, "Hudson", "Eleven Beat", MACHINE_IMPERFECT_GRAPHICS ) // crashes at kick off / during attract with DRC
-GAME( 1998, mtetrisc, aleck64,  a64_e90, mtetrisc, aleck64_state, aleck64, ROT0, "Capcom", "Magical Tetris Challenge (981009 Japan)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS ) // missing E90 gfxs (playfield)
-GAME( 1998, starsldr, aleck64,  aleck64, starsldr, aleck64_state, aleck64, ROT0, "Hudson / Seta", "Star Soldier: Vanishing Earth", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, vivdolls, aleck64,  aleck64, vivdolls, aleck64_state,  aleck64, ROT0, "Visco", "Vivid Dolls", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, srmvs,    aleck64,  aleck64, srmvs, aleck64_state,    aleck64, ROT0, "Seta", "Super Real Mahjong VS", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 2000, mayjin3,  aleck64,  aleck64, aleck64, aleck64_state,  aleck64, ROT0, "Seta / Able Corporation", "Mayjinsen 3", MACHINE_IMPERFECT_SOUND|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 2003, twrshaft, aleck64,  aleck64, twrshaft, aleck64_state, aleck64, ROT0, "Aruze", "Tower & Shaft", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 2003, hipai,    aleck64,  aleck64, hipai, aleck64_state,    aleck64, ROT0, "Aruze / Seta", "Hi Pai Paradise", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 2003, doncdoon, aleck64,  aleck64, doncdoon, aleck64_state, aleck64, ROT0, "Aruze", "Hanabi de Doon! - Don-chan Puzzle", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 2003, kurufev,  aleck64,  aleck64, kurufev, aleck64_state,  aleck64, ROT0, "Aruze / Takumi", "Kurukuru Fever", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, 11beat,   aleck64,  aleck64, 11beat,   aleck64_state, aleck64, ROT0, "Hudson",                  "Eleven Beat", MACHINE_IMPERFECT_GRAPHICS ) // crashes at kick off / during attract with DRC
+GAME( 1998, mtetrisc, aleck64,  a64_e90, mtetrisc, aleck64_state, aleck64, ROT0, "Capcom",                  "Magical Tetris Challenge (981009 Japan)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS ) // missing E90 gfxs (playfield)
+GAME( 1998, starsldr, aleck64,  aleck64, starsldr, aleck64_state, aleck64, ROT0, "Hudson / Seta",           "Star Soldier: Vanishing Earth", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, vivdolls, aleck64,  aleck64, vivdolls, aleck64_state, aleck64, ROT0, "Visco",                   "Vivid Dolls", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, srmvs,    aleck64,  aleck64, srmvs,    aleck64_state, aleck64, ROT0, "Seta",                    "Super Real Mahjong VS", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2000, mayjin3,  aleck64,  aleck64, aleck64,  aleck64_state, aleck64, ROT0, "Seta / Able Corporation", "Mayjinsen 3", MACHINE_IMPERFECT_SOUND|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2003, twrshaft, aleck64,  aleck64, twrshaft, aleck64_state, aleck64, ROT0, "Aruze",                   "Tower & Shaft", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2003, hipai,    aleck64,  aleck64, hipai,    aleck64_state, aleck64, ROT0, "Aruze / Seta",            "Hi Pai Paradise", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2003, doncdoon, aleck64,  aleck64, doncdoon, aleck64_state, aleck64, ROT0, "Aruze",                   "Hanabi de Doon! - Don-chan Puzzle", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2003, kurufev,  aleck64,  aleck64, kurufev,  aleck64_state, aleck64, ROT0, "Aruze / Takumi",          "Kurukuru Fever", MACHINE_IMPERFECT_GRAPHICS )

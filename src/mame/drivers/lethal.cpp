@@ -247,13 +247,16 @@ maybe some sprite placement issues
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/lethal.h"
+
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6809/hd6309.h"
 #include "cpu/z80/z80.h"
-#include "machine/gen_latch.h"
 #include "machine/eepromser.h"
 #include "sound/k054539.h"
-#include "includes/lethal.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 #define MAIN_CLOCK      XTAL_24MHz
 #define SOUND_CLOCK     XTAL_18_432MHz
@@ -288,14 +291,15 @@ INTERRUPT_GEN_MEMBER(lethal_state::lethalen_interrupt)
 		device.execute().set_input_line(HD6309_IRQ_LINE, HOLD_LINE);
 }
 
+READ8_MEMBER(lethal_state::sound_irq_r)
+{
+	m_soundcpu->set_input_line(0, HOLD_LINE);
+	return 0x00;
+}
+
 WRITE8_MEMBER(lethal_state::sound_irq_w)
 {
 	m_soundcpu->set_input_line(0, HOLD_LINE);
-}
-
-READ8_MEMBER(lethal_state::sound_status_r)
-{
-	return 0xf;
 }
 
 WRITE8_MEMBER(lethal_state::le_bankswitch_w)
@@ -342,7 +346,7 @@ static ADDRESS_MAP_START( le_main, AS_PROGRAM, 8, lethal_state )
 	AM_RANGE(0x4000, 0x403f) AM_DEVWRITE("k056832", k056832_device, write)
 	AM_RANGE(0x4040, 0x404f) AM_DEVWRITE("k056832", k056832_device, b_w)
 	AM_RANGE(0x4080, 0x4080) AM_READNOP     // watchdog
-	AM_RANGE(0x4090, 0x4090) AM_READNOP
+	AM_RANGE(0x4090, 0x4090) AM_READWRITE(sound_irq_r, sound_irq_w)
 	AM_RANGE(0x40a0, 0x40a0) AM_READNOP
 	AM_RANGE(0x40c4, 0x40c4) AM_WRITE(control2_w)
 	AM_RANGE(0x40c8, 0x40d0) AM_WRITE(lethalen_palette_control) // PCU1-PCU3 on the schematics
@@ -360,9 +364,7 @@ static ADDRESS_MAP_START( bank4000_map, AS_PROGRAM, 8, lethal_state )
 	// VRD = 0 or 1, CBNK = 0
 	AM_RANGE(0x0840, 0x084f) AM_MIRROR(0x8000) AM_DEVREADWRITE("k053244", k05324x_device, k053244_r, k053244_w)
 	AM_RANGE(0x0880, 0x089f) AM_MIRROR(0x8000) AM_DEVREADWRITE("k054000", k054000_device, read, write)
-	AM_RANGE(0x08c6, 0x08c6) AM_MIRROR(0x8000) AM_DEVWRITE("soundlatch", generic_latch_8_device, write) //cmd_w
-	AM_RANGE(0x08c7, 0x08c7) AM_MIRROR(0x8000) AM_WRITE(sound_irq_w)
-	AM_RANGE(0x08ca, 0x08ca) AM_MIRROR(0x8000) AM_READ(sound_status_r)
+	AM_RANGE(0x08c0, 0x08cf) AM_DEVICE("k054321", k054321_device, main_map)
 	AM_RANGE(0x1000, 0x17ff) AM_MIRROR(0x8000) AM_DEVREADWRITE("k053244", k05324x_device, k053245_r, k053245_w)
 
 	// VRD = 0, CBNK = 0
@@ -382,9 +384,7 @@ static ADDRESS_MAP_START( le_sound, AS_PROGRAM, 8, lethal_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xfa2f) AM_DEVREADWRITE("k054539", k054539_device, read, write)
-	AM_RANGE(0xfc00, 0xfc00) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
-	AM_RANGE(0xfc02, 0xfc02) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xfc03, 0xfc03) AM_READNOP
+	AM_RANGE(0xfc00, 0xfc03) AM_DEVICE("k054321", k054321_device, sound_map)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( lethalen )
@@ -486,7 +486,7 @@ void lethal_state::machine_reset()
 	m_bank4000->set_bank(0);
 }
 
-static MACHINE_CONFIG_START( lethalen, lethal_state )
+static MACHINE_CONFIG_START( lethalen )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309, MAIN_CLOCK/2)    /* verified on pcb */
@@ -534,8 +534,7 @@ static MACHINE_CONFIG_START( lethalen, lethal_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	MCFG_K054321_ADD("k054321", ":lspeaker", ":rspeaker")
 
 	MCFG_DEVICE_ADD("k054539", K054539, XTAL_18_432MHz)
 	MCFG_K054539_TIMER_HANDLER(INPUTLINE("soundcpu", INPUT_LINE_NMI))
@@ -754,14 +753,14 @@ ROM_END
 
 // date strings are at 0x3fd00 in the main program rom
 
-GAME( 1992, lethalen,   0,        lethalen, lethalen,  driver_device, 0, ORIENTATION_FLIP_Y, "Konami", "Lethal Enforcers (ver UAE, 11/19/92 15:04)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // writes UE to eeprom
-GAME( 1992, lethalenub, lethalen, lethalen, lethalen,  driver_device, 0, ORIENTATION_FLIP_Y, "Konami", "Lethal Enforcers (ver UAB, 09/01/92 11:12)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // writes UB to eeprom
-GAME( 1992, lethalenua, lethalen, lethalen, lethalen,  driver_device, 0, ORIENTATION_FLIP_Y, "Konami", "Lethal Enforcers (ver UAA, 08/17/92 21:38)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // writes UA to eeprom
-GAME( 1992, lethalenux, lethalen, lethalen, lethalen,  driver_device, 0, ORIENTATION_FLIP_Y, "Konami", "Lethal Enforcers (ver unknown, US, 08/06/92 15:11, hacked/proto?)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // writes UA to eeprom but earlier than suspected UAA set, might be a proto, might be hacked, fails rom test, definitely a good dump, another identical set was found in Italy
+GAME( 1992, lethalen,   0,        lethalen, lethalen,  lethal_state, 0, ORIENTATION_FLIP_Y, "Konami", "Lethal Enforcers (ver UAE, 11/19/92 15:04)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // writes UE to eeprom
+GAME( 1992, lethalenub, lethalen, lethalen, lethalen,  lethal_state, 0, ORIENTATION_FLIP_Y, "Konami", "Lethal Enforcers (ver UAB, 09/01/92 11:12)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // writes UB to eeprom
+GAME( 1992, lethalenua, lethalen, lethalen, lethalen,  lethal_state, 0, ORIENTATION_FLIP_Y, "Konami", "Lethal Enforcers (ver UAA, 08/17/92 21:38)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // writes UA to eeprom
+GAME( 1992, lethalenux, lethalen, lethalen, lethalen,  lethal_state, 0, ORIENTATION_FLIP_Y, "Konami", "Lethal Enforcers (ver unknown, US, 08/06/92 15:11, hacked/proto?)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // writes UA to eeprom but earlier than suspected UAA set, might be a proto, might be hacked, fails rom test, definitely a good dump, another identical set was found in Italy
 
-GAME( 1992, lethaleneae,lethalen, lethalen, lethalene, driver_device, 0, ORIENTATION_FLIP_Y, "Konami", "Lethal Enforcers (ver EAE, 11/19/92 16:24)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // writes EE to eeprom
-GAME( 1992, lethaleneab,lethalen, lethalen, lethalene, driver_device, 0, ORIENTATION_FLIP_Y, "Konami", "Lethal Enforcers (ver EAB, 10/14/92 19:53)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // writes EC to eeprom, so might actually be EC
-GAME( 1992, lethaleneaa,lethalen, lethalen, lethalene, driver_device, 0, ORIENTATION_FLIP_Y, "Konami", "Lethal Enforcers (ver EAA, 09/09/92 09:44)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // writes EA to eeprom
+GAME( 1992, lethaleneae,lethalen, lethalen, lethalene, lethal_state, 0, ORIENTATION_FLIP_Y, "Konami", "Lethal Enforcers (ver EAE, 11/19/92 16:24)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // writes EE to eeprom
+GAME( 1992, lethaleneab,lethalen, lethalen, lethalene, lethal_state, 0, ORIENTATION_FLIP_Y, "Konami", "Lethal Enforcers (ver EAB, 10/14/92 19:53)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // writes EC to eeprom, so might actually be EC
+GAME( 1992, lethaleneaa,lethalen, lethalen, lethalene, lethal_state, 0, ORIENTATION_FLIP_Y, "Konami", "Lethal Enforcers (ver EAA, 09/09/92 09:44)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // writes EA to eeprom
 
 // different mirror / display setup
-GAME( 1992, lethalenj,  lethalen, lethalej, lethalenj, driver_device, 0, ORIENTATION_FLIP_X, "Konami", "Lethal Enforcers (ver JAD, 12/04/92 17:16)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // writes JC to eeprom?!
+GAME( 1992, lethalenj,  lethalen, lethalej, lethalenj, lethal_state, 0, ORIENTATION_FLIP_X, "Konami", "Lethal Enforcers (ver JAD, 12/04/92 17:16)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // writes JC to eeprom?!

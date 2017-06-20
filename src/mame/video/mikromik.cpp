@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
+#include "emu.h"
 #include "includes/mikromik.h"
+#include "screen.h"
 
 #define HORIZONTAL_CHARACTER_PIXELS 10
 
@@ -123,10 +125,10 @@ PALETTE_INIT_MEMBER( mm1_state, mm1 )
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( mm1m6_video )
+//  MACHINE_CONFIG_START( mm1m6_video )
 //-------------------------------------------------
 
-MACHINE_CONFIG_FRAGMENT( mm1m6_video )
+MACHINE_CONFIG_START( mm1m6_video )
 	MCFG_SCREEN_ADD( SCREEN_TAG, RASTER )
 	MCFG_SCREEN_REFRESH_RATE( 50 )
 	MCFG_SCREEN_UPDATE_DRIVER(mm1_state, screen_update)

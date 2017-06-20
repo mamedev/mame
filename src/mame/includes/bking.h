@@ -1,8 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Mike Balfour, Zsolt Vasvari
 
-#include "machine/buggychl.h"
+#include "machine/taito68705interface.h"
 #include "machine/gen_latch.h"
+#include "screen.h"
 
 class bking_state : public driver_device
 {
@@ -11,12 +12,13 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_playfield_ram(*this, "playfield_ram"),
 		m_audiocpu(*this, "audiocpu"),
-		m_mcu(*this, "mcu"),
 		m_bmcu(*this, "bmcu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch") { }
+		m_soundlatch(*this, "soundlatch")
+	{
+	}
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_playfield_ram;
@@ -51,22 +53,12 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_audiocpu;
-	optional_device<cpu_device> m_mcu;
-	optional_device<buggychl_mcu_device> m_bmcu;
+	optional_device<taito68705_mcu_device> m_bmcu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-#if 0
-	/* 68705 */
-	uint8_t m_port_a_in;
-	uint8_t m_port_a_out;
-	uint8_t m_ddr_a;
-	uint8_t m_port_b_in;
-	uint8_t m_port_b_out;
-	uint8_t m_ddr_b;
-#endif
 	DECLARE_READ8_MEMBER(bking_sndnmi_disable_r);
 	DECLARE_WRITE8_MEMBER(bking_sndnmi_enable_w);
 	DECLARE_WRITE8_MEMBER(bking_soundlatch_w);
@@ -74,6 +66,7 @@ public:
 	DECLARE_WRITE8_MEMBER(bking3_addr_h_w);
 	DECLARE_READ8_MEMBER(bking3_extrarom_r);
 	DECLARE_READ8_MEMBER(bking3_ext_check_r);
+	DECLARE_READ8_MEMBER(bking3_mcu_status_r);
 	DECLARE_WRITE8_MEMBER(bking_xld1_w);
 	DECLARE_WRITE8_MEMBER(bking_yld1_w);
 	DECLARE_WRITE8_MEMBER(bking_xld2_w);
@@ -100,5 +93,5 @@ public:
 	DECLARE_MACHINE_RESET(bking3);
 	DECLARE_MACHINE_RESET(common);
 	uint32_t screen_update_bking(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_bking(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_bking);
 };

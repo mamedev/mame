@@ -12,10 +12,14 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/fastlane.h"
+#include "includes/konamipt.h"
+
 #include "cpu/m6809/hd6309.h"
 #include "machine/watchdog.h"
-#include "includes/konamipt.h"
-#include "includes/fastlane.h"
+
+#include "speaker.h"
+
 
 TIMER_DEVICE_CALLBACK_MEMBER(fastlane_state::fastlane_scanline)
 {
@@ -195,7 +199,7 @@ void fastlane_state::machine_start()
 	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
 }
 
-static MACHINE_CONFIG_START( fastlane, fastlane_state )
+static MACHINE_CONFIG_START( fastlane )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309, XTAL_24MHz/2) // 3MHz(XTAL_24MHz/8) internally
@@ -263,4 +267,4 @@ ROM_START( fastlane )
 ROM_END
 
 
-GAME( 1987, fastlane, 0, fastlane, fastlane, driver_device, 0, ROT90, "Konami", "Fast Lane", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, fastlane, 0, fastlane, fastlane, fastlane_state, 0, ROT90, "Konami", "Fast Lane", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )

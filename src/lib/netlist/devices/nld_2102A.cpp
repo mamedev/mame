@@ -6,6 +6,7 @@
  */
 
 #include "nld_2102A.h"
+#include "../nl_base.h"
 
 #define ADDR2BYTE(a)    ((a) >> 3)
 #define ADDR2BIT(a)     ((a) & 0x7)
@@ -38,7 +39,7 @@ namespace netlist
 
 		logic_output_t m_DO;
 
-		state_var<uint_fast8_t[128]> m_ram; // 1024x1 bits
+		state_var<uint8_t[128]> m_ram; // 1024x1 bits
 		param_ptr_t m_RAM;
 	};
 
@@ -74,15 +75,15 @@ namespace netlist
 			unsigned a = 0;
 			for (std::size_t i=0; i<10; i++)
 			{
-				a |= m_A[i]() << i;
+				a |= (m_A[i]() << i);
 			}
 			const unsigned byte = ADDR2BYTE(a);
 			const unsigned bit = ADDR2BIT(a);
 
 			if (!m_RWQ())
 			{
-				m_ram[byte] &= ~(static_cast<uint_fast8_t>(1)      << bit);
-				m_ram[byte] |=  (static_cast<uint_fast8_t>(m_DI()) << bit);
+				m_ram[byte] &= ~(static_cast<uint8_t>(1)      << bit);
+				m_ram[byte] |=  (static_cast<uint8_t>(m_DI()) << bit);
 			}
 
 			m_DO.push((m_ram[byte] >> bit) & 1, max_delay);

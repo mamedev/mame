@@ -16,7 +16,6 @@
 
 #include <functional>
 
-#include "emu.h"
 #include "sliderchangednotifier.h"
 
 #define SLIDER_NOCHANGE     0x12345678

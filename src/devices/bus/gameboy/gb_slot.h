@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli, Wilbert Pol
-#ifndef __GB_SLOT_H
-#define __GB_SLOT_H
+#ifndef MAME_BUS_GAMEBOY_GB_SLOT_H
+#define MAME_BUS_GAMEBOY_GB_SLOT_H
 
 #include "softlist_dev.h"
 
@@ -55,7 +55,6 @@ class device_gb_cart_interface : public device_slot_card_interface
 {
 public:
 	// construction/destruction
-	device_gb_cart_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_gb_cart_interface();
 
 	// reading and writing
@@ -82,6 +81,9 @@ public:
 
 	void save_ram() { device().save_item(NAME(m_ram)); }
 
+protected:
+	device_gb_cart_interface(const machine_config &mconfig, device_t &device);
+
 	// internal state
 	uint8_t *m_rom;
 	uint32_t m_rom_size;
@@ -103,20 +105,18 @@ public:
 };
 
 
-// ======================> base_gb_cart_slot_device
+// ======================> gb_cart_slot_device_base
 
-class base_gb_cart_slot_device : public device_t,
+class gb_cart_slot_device_base : public device_t,
 								public device_image_interface,
 								public device_slot_interface
 {
 public:
 	// construction/destruction
-	base_gb_cart_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
-	virtual ~base_gb_cart_slot_device();
+	virtual ~gb_cart_slot_device_base();
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_config_complete() override;
 
 	// image-level overrides
 	virtual image_init_result call_load() override;
@@ -124,8 +124,8 @@ public:
 	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
 	int get_type() { return m_type; }
-	int get_cart_type(uint8_t *ROM, uint32_t len);
-	bool get_mmm01_candidate(uint8_t *ROM, uint32_t len);
+	static int get_cart_type(const uint8_t *ROM, uint32_t len);
+	static bool get_mmm01_candidate(const uint8_t *ROM, uint32_t len);
 	// remove me when SGB is properly emulated
 	int get_sgb_hack() { return m_sgb_hack; }
 
@@ -143,7 +143,7 @@ public:
 	virtual const char *file_extensions() const override { return "bin,gb,gbc"; }
 
 	// slot interface overrides
-	virtual std::string get_default_card_software() override;
+	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_rom);
@@ -153,6 +153,8 @@ public:
 
 
 protected:
+	gb_cart_slot_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// Donkey Kong Land 2 + 3 store SGB border tiles differently... this will be hopefully be removed when SGB is properly emulated!
 	int m_sgb_hack;
 
@@ -162,7 +164,7 @@ protected:
 
 // ======================> gb_cart_slot_device
 
-class gb_cart_slot_device :  public base_gb_cart_slot_device
+class gb_cart_slot_device :  public gb_cart_slot_device_base
 {
 public:
 	// construction/destruction
@@ -172,7 +174,7 @@ public:
 
 // ======================> megaduck_cart_slot_device
 
-class megaduck_cart_slot_device :  public base_gb_cart_slot_device
+class megaduck_cart_slot_device :  public gb_cart_slot_device_base
 {
 public:
 	// construction/destruction
@@ -184,15 +186,15 @@ public:
 	virtual const char *file_extensions() const override { return "bin"; }
 
 	// slot interface overrides
-	virtual std::string get_default_card_software() override;
+	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 };
 
 
 
 
 // device type definition
-extern const device_type GB_CART_SLOT;
-extern const device_type MEGADUCK_CART_SLOT;
+DECLARE_DEVICE_TYPE(GB_CART_SLOT,       gb_cart_slot_device)
+DECLARE_DEVICE_TYPE(MEGADUCK_CART_SLOT, megaduck_cart_slot_device)
 
 
 /***************************************************************************
@@ -210,4 +212,4 @@ extern const device_type MEGADUCK_CART_SLOT;
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
 
-#endif
+#endif // MAME_BUS_GAMEBOY_GB_SLOT_H

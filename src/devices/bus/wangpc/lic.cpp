@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "lic.h"
 
 
@@ -22,7 +23,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type WANGPC_LIC = &device_creator<wangpc_lic_device>;
+DEFINE_DEVICE_TYPE(WANGPC_LIC, wangpc_lic_device, "wangpc_lic", "Wang PC-PM070 Local Interconnect")
 
 
 //-------------------------------------------------
@@ -46,22 +47,11 @@ const tiny_rom_entry *wangpc_lic_device::device_rom_region() const
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( wangpc_lic )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( wangpc_lic )
+MACHINE_CONFIG_MEMBER( wangpc_lic_device::device_add_mconfig )
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor wangpc_lic_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( wangpc_lic );
-}
 
 
 
@@ -74,7 +64,7 @@ machine_config_constructor wangpc_lic_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 wangpc_lic_device::wangpc_lic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, WANGPC_LIC, "Wang PC-PM070", tag, owner, clock, "wangpc_lic", __FILE__),
+	device_t(mconfig, WANGPC_LIC, tag, owner, clock),
 	device_wangpcbus_card_interface(mconfig, *this)
 {
 }

@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Phil Stroffolino, Carlos A. Lozano, Rob Rosenbrock
 
+#include "machine/taito68705interface.h"
+
 #include "machine/gen_latch.h"
 #include "sound/msm5205.h"
 
@@ -10,22 +12,24 @@ class renegade_state : public driver_device
 {
 public:
 	renegade_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this,"maincpu"),
-		m_audiocpu(*this, "audiocpu"),
-		m_mcu(*this, "mcu"),
-		m_msm(*this, "msm"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_soundlatch(*this, "soundlatch"),
-		m_fg_videoram(*this, "fg_videoram"),
-		m_bg_videoram(*this, "bg_videoram"),
-		m_spriteram(*this, "spriteram"),
-		m_rombank(*this, "rombank"),
-		m_adpcmrom(*this, "adpcm")  { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this,"maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_mcu(*this, "mcu")
+		, m_msm(*this, "msm")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_soundlatch(*this, "soundlatch")
+		, m_fg_videoram(*this, "fg_videoram")
+		, m_bg_videoram(*this, "bg_videoram")
+		, m_spriteram(*this, "spriteram")
+		, m_rombank(*this, "rombank")
+		, m_adpcmrom(*this, "adpcm")
+	{
+	}
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	optional_device<cpu_device> m_mcu;
+	optional_device<taito68705_mcu_device> m_mcu;
 	required_device<msm5205_device> m_msm;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<generic_latch_8_device> m_soundlatch;
@@ -43,19 +47,6 @@ public:
 	bool m_adpcm_playing;
 
 	bool m_mcu_sim;
-	int m_from_main;
-	int m_from_mcu;
-	int m_main_sent;
-	int m_mcu_sent;
-	uint8_t m_ddr_a;
-	uint8_t m_ddr_b;
-	uint8_t m_ddr_c;
-	uint8_t m_port_a_out;
-	uint8_t m_port_b_out;
-	uint8_t m_port_c_out;
-	uint8_t m_port_a_in;
-	uint8_t m_port_b_in;
-	uint8_t m_port_c_in;
 	uint8_t m_mcu_buffer[MCU_BUFFER_MAX];
 	uint8_t m_mcu_input_size;
 	uint8_t m_mcu_output_byte;
@@ -74,15 +65,6 @@ public:
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
 	DECLARE_WRITE8_MEMBER(coincounter_w);
 	void mcu_process_command();
-	DECLARE_READ8_MEMBER(_68705_port_a_r);
-	DECLARE_WRITE8_MEMBER(_68705_port_a_w);
-	DECLARE_WRITE8_MEMBER(_68705_ddr_a_w);
-	DECLARE_READ8_MEMBER(_68705_port_b_r);
-	DECLARE_WRITE8_MEMBER(_68705_port_b_w);
-	DECLARE_WRITE8_MEMBER(_68705_ddr_b_w);
-	DECLARE_READ8_MEMBER(_68705_port_c_r);
-	DECLARE_WRITE8_MEMBER(_68705_port_c_w);
-	DECLARE_WRITE8_MEMBER(_68705_ddr_c_w);
 	DECLARE_WRITE8_MEMBER(fg_videoram_w);
 	DECLARE_WRITE8_MEMBER(bg_videoram_w);
 	DECLARE_WRITE8_MEMBER(flipscreen_w);

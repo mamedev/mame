@@ -113,10 +113,9 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
+	DECLARE_WRITE8_MEMBER(coin_nibble_w);
 	DECLARE_WRITE16_MEMBER(growl_coin_word_w);
-	DECLARE_WRITE16_MEMBER(taitof2_4p_coin_word_w);
-	DECLARE_WRITE16_MEMBER(ninjak_coin_word_w);
-	DECLARE_READ16_MEMBER(ninjak_input_r);
+	DECLARE_WRITE8_MEMBER(taitof2_4p_coin_word_w);
 	DECLARE_READ16_MEMBER(cameltry_paddle_r);
 	DECLARE_READ16_MEMBER(mjnquest_dsw_r);
 	DECLARE_READ16_MEMBER(mjnquest_input_r);
@@ -169,11 +168,11 @@ public:
 	uint32_t screen_update_taitof2_deadconx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_taitof2_yesnoj(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_taitof2_metalb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_taitof2_no_buffer(screen_device &screen, bool state);
-	void screen_eof_taitof2_partial_buffer_delayed(screen_device &screen, bool state);
-	void screen_eof_taitof2_partial_buffer_delayed_thundfox(screen_device &screen, bool state);
-	void screen_eof_taitof2_full_buffer_delayed(screen_device &screen, bool state);
-	void screen_eof_taitof2_partial_buffer_delayed_qzchikyu(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_no_buffer);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_partial_buffer_delayed);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_partial_buffer_delayed_thundfox);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_full_buffer_delayed);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_partial_buffer_delayed_qzchikyu);
 	INTERRUPT_GEN_MEMBER(taitof2_interrupt);
 	void reset_driveout_sound_region();
 	void taitof2_core_vh_start (int sprite_type, int hide, int flip_hide );

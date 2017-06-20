@@ -440,6 +440,8 @@
 #include "sound/saa1099.h"
 #include "sound/msm5205.h"
 #include "machine/nvram.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class mastboy_state : public driver_device
@@ -729,8 +731,7 @@ static ADDRESS_MAP_START( mastboy_map, AS_PROGRAM, 8, mastboy_state )
 	AM_RANGE(0xff818, 0xff81f) AM_READ_PORT("DSW2")
 
 	AM_RANGE(0xff820, 0xff827) AM_WRITE(bank_w)
-	AM_RANGE(0xff828, 0xff828) AM_DEVWRITE("saa", saa1099_device, data_w)
-	AM_RANGE(0xff829, 0xff829) AM_DEVWRITE("saa", saa1099_device, control_w)
+	AM_RANGE(0xff828, 0xff829) AM_DEVWRITE("saa", saa1099_device, write)
 	AM_RANGE(0xff830, 0xff830) AM_WRITE(msm5205_data_w)
 	AM_RANGE(0xff838, 0xff838) AM_WRITE(irq0_ack_w)
 	AM_RANGE(0xff839, 0xff839) AM_WRITE(msm5205_sambit0_w)
@@ -904,7 +905,7 @@ void mastboy_state::machine_reset()
 
 
 
-static MACHINE_CONFIG_START( mastboy, mastboy_state )
+static MACHINE_CONFIG_START( mastboy )
 	MCFG_CPU_ADD("maincpu", Z180, 12000000/2)   /* HD647180X0CP6-1M1R */
 	MCFG_CPU_PROGRAM_MAP(mastboy_map)
 	MCFG_CPU_IO_MAP(mastboy_io_map)
@@ -933,7 +934,7 @@ static MACHINE_CONFIG_START( mastboy, mastboy_state )
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(mastboy_state, adpcm_int))  /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_SEX_4B)      /* 4KHz 4-bit */
+	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)      /* 4KHz 4-bit */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -1054,6 +1055,6 @@ ROM_START( mastboyia )
 	/*                  0x1c0000 to 0x1fffff EMPTY */
 ROM_END
 
-GAME( 1991, mastboy,  0,          mastboy, mastboy, driver_device, 0, ROT0, "Gaelco", "Master Boy (Spanish, PCB Rev A)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, mastboyi, mastboy,    mastboy, mastboy, driver_device, 0, ROT0, "Gaelco", "Master Boy (Italian, PCB Rev A, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, mastboyia,mastboy,    mastboy, mastboy, driver_device, 0, ROT0, "Gaelco", "Master Boy (Italian, PCB Rev A, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mastboy,  0,          mastboy, mastboy, mastboy_state, 0, ROT0, "Gaelco", "Master Boy (Spanish, PCB Rev A)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mastboyi, mastboy,    mastboy, mastboy, mastboy_state, 0, ROT0, "Gaelco", "Master Boy (Italian, PCB Rev A, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mastboyia,mastboy,    mastboy, mastboy, mastboy_state, 0, ROT0, "Gaelco", "Master Boy (Italian, PCB Rev A, set 2)", MACHINE_SUPPORTS_SAVE )

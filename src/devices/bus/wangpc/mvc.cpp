@@ -15,7 +15,10 @@
 
 */
 
+#include "emu.h"
 #include "mvc.h"
+
+#include "screen.h"
 
 
 
@@ -59,7 +62,7 @@ static const rgb_t PALETTE_MVC[] =
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type WANGPC_MVC = &device_creator<wangpc_mvc_device>;
+DEFINE_DEVICE_TYPE(WANGPC_MVC, wangpc_mvc_device, "wangpc_mvc", "Wang PC Medium Resolution Video Card")
 
 
 //-------------------------------------------------
@@ -130,10 +133,10 @@ WRITE_LINE_MEMBER( wangpc_mvc_device::vsync_w )
 }
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( wangpc_mvc )
+//  MACHINE_CONFIG_START( wangpc_mvc )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( wangpc_mvc )
+MACHINE_CONFIG_MEMBER( wangpc_mvc_device::device_add_mconfig )
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_UPDATE_DEVICE(MC6845_TAG, mc6845_device, screen_update)
 	MCFG_SCREEN_SIZE(80*10, 25*12)
@@ -147,17 +150,6 @@ static MACHINE_CONFIG_FRAGMENT( wangpc_mvc )
 	MCFG_MC6845_UPDATE_ROW_CB(wangpc_mvc_device, crtc_update_row)
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(wangpc_mvc_device, vsync_w))
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor wangpc_mvc_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( wangpc_mvc );
-}
 
 
 
@@ -187,7 +179,7 @@ inline void wangpc_mvc_device::set_irq(int state)
 //-------------------------------------------------
 
 wangpc_mvc_device::wangpc_mvc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, WANGPC_MVC, "Wang PC Medium Resolution Video Card", tag, owner, clock, "wangpc_mvc", __FILE__),
+	device_t(mconfig, WANGPC_MVC, tag, owner, clock),
 	device_wangpcbus_card_interface(mconfig, *this),
 	m_crtc(*this, MC6845_TAG),
 	m_video_ram(*this, "video_ram"),

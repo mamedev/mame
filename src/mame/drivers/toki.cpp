@@ -71,7 +71,7 @@ Notes:
            8 - 8kx8 EPROM (i.e. 27C64)
      BK1/BK2 - 512kx8 DIP40 mask ROM
    OBJ1/OBJ2 - 512kx8 DIP40 mask ROM
-      82S129 - Philips 82S129 1k-bit (256x4) Biploar PROM at location J3
+      82S129 - Philips 82S129 1k-bit (256x4) Bipolar PROM at location J3
       82S135 - Philips 82S135 2k-bit (256x8) Bipolar PROM at location B6
       LA4460 - Sanyo LA4460 12W Power AMP
    SEI0100BU - Custom chip marked 'SEI0100BU YM3931' (SDIP64)
@@ -93,12 +93,15 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/toki.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
-#include "includes/toki.h"
+#include "speaker.h"
+
 
 WRITE16_MEMBER(toki_state::tokib_soundcommand_w)
 {
@@ -482,7 +485,7 @@ GFXDECODE_END
 
 /*****************************************************************************/
 
-static MACHINE_CONFIG_START( toki, toki_state ) /* KOYO 20.000MHz near the cpu */
+static MACHINE_CONFIG_START( toki ) /* KOYO 20.000MHz near the cpu */
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,XTAL_20MHz /2)   /* verified on pcb */
@@ -504,7 +507,7 @@ static MACHINE_CONFIG_START( toki, toki_state ) /* KOYO 20.000MHz near the cpu *
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)  /* verified */
 	MCFG_SCREEN_UPDATE_DRIVER(toki_state, screen_update_toki)
-	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
+	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", toki)
@@ -518,7 +521,7 @@ static MACHINE_CONFIG_START( toki, toki_state ) /* KOYO 20.000MHz near the cpu *
 	MCFG_YM3812_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_12MHz/12, OKIM6295_PIN7_HIGH) // verified on pcb
+	MCFG_OKIM6295_ADD("oki", XTAL_12MHz/12, PIN7_HIGH) // verified on pcb
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
@@ -536,7 +539,7 @@ static MACHINE_CONFIG_DERIVED( jujuba, toki )
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(jujuba_audio_opcodes_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( tokib, toki_state )
+static MACHINE_CONFIG_START( tokib )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)   /* 10MHz causes bad slowdowns with monkey machine rd1, but is correct, 20Mhz XTAL */
@@ -556,7 +559,7 @@ static MACHINE_CONFIG_START( tokib, toki_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)  /* verified */
 	MCFG_SCREEN_UPDATE_DRIVER(toki_state, screen_update_tokib)
-	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
+	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tokib)
@@ -573,7 +576,7 @@ static MACHINE_CONFIG_START( tokib, toki_state )
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(toki_state, tokib_adpcm_int)) /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S96_4B)  /* 4KHz               */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)  /* 4KHz               */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
@@ -612,6 +615,10 @@ ROM_START( toki )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "9.m1",   0x00000, 0x20000, CRC(ae7a6b8b) SHA1(1d410f91354ffd1774896b2e64f20a2043607805) )
+
+	ROM_REGION( 0x0200, "proms", 0 ) /* video-related */
+	ROM_LOAD( "PROM26.B6",      0x0000, 0x0100, CRC(ea6312c6) SHA1(44e2ae948cb79884a3acd8d7d3ff1c9e31562e3e) )
+	ROM_LOAD( "PROM27.J3",      0x0100, 0x0100, CRC(e616ae85) SHA1(49614f87615f1a608eeb90bc68d5fc6d9109a565) )
 ROM_END
 
 
@@ -654,6 +661,10 @@ ROM_START( tokip )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "9 1-M",   0x00000, 0x20000, CRC(ae7a6b8b) SHA1(1d410f91354ffd1774896b2e64f20a2043607805) ) //
+
+	ROM_REGION( 0x0200, "proms", 0 ) /* video-related */
+	ROM_LOAD( "PROM26.B6",      0x0000, 0x0100, CRC(ea6312c6) SHA1(44e2ae948cb79884a3acd8d7d3ff1c9e31562e3e) )
+	ROM_LOAD( "PROM27.J3",      0x0100, 0x0100, CRC(e616ae85) SHA1(49614f87615f1a608eeb90bc68d5fc6d9109a565) )
 ROM_END
 
 ROM_START( tokia )
@@ -683,6 +694,10 @@ ROM_START( tokia )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "9.m1",   0x00000, 0x20000, CRC(ae7a6b8b) SHA1(1d410f91354ffd1774896b2e64f20a2043607805) )
+
+	ROM_REGION( 0x0200, "proms", 0 ) /* video-related */
+	ROM_LOAD( "PROM26.B6",      0x0000, 0x0100, CRC(ea6312c6) SHA1(44e2ae948cb79884a3acd8d7d3ff1c9e31562e3e) )
+	ROM_LOAD( "PROM27.J3",      0x0100, 0x0100, CRC(e616ae85) SHA1(49614f87615f1a608eeb90bc68d5fc6d9109a565) )
 ROM_END
 
 ROM_START( tokiua )
@@ -712,6 +727,10 @@ ROM_START( tokiua )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "9.m1",   0x00000, 0x20000, CRC(ae7a6b8b) SHA1(1d410f91354ffd1774896b2e64f20a2043607805) )
+
+	ROM_REGION( 0x0200, "proms", 0 ) /* video-related */
+	ROM_LOAD( "PROM26.B6",      0x0000, 0x0100, CRC(ea6312c6) SHA1(44e2ae948cb79884a3acd8d7d3ff1c9e31562e3e) )
+	ROM_LOAD( "PROM27.J3",      0x0100, 0x0100, CRC(e616ae85) SHA1(49614f87615f1a608eeb90bc68d5fc6d9109a565) )
 ROM_END
 
 
@@ -742,6 +761,10 @@ ROM_START( tokiu )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "9.m1",   0x00000, 0x20000, CRC(ae7a6b8b) SHA1(1d410f91354ffd1774896b2e64f20a2043607805) )
+
+	ROM_REGION( 0x0200, "proms", 0 ) /* video-related */
+	ROM_LOAD( "PROM26.B6",      0x0000, 0x0100, CRC(ea6312c6) SHA1(44e2ae948cb79884a3acd8d7d3ff1c9e31562e3e) )
+	ROM_LOAD( "PROM27.J3",      0x0100, 0x0100, CRC(e616ae85) SHA1(49614f87615f1a608eeb90bc68d5fc6d9109a565) )
 ROM_END
 
 ROM_START( juju )
@@ -771,6 +794,10 @@ ROM_START( juju )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "9.m1",   0x00000, 0x20000, CRC(ae7a6b8b) SHA1(1d410f91354ffd1774896b2e64f20a2043607805) )
+
+	ROM_REGION( 0x0200, "proms", 0 ) /* video-related */
+	ROM_LOAD( "PROM26.B6",      0x0000, 0x0100, CRC(ea6312c6) SHA1(44e2ae948cb79884a3acd8d7d3ff1c9e31562e3e) )
+	ROM_LOAD( "PROM27.J3",      0x0100, 0x0100, CRC(e616ae85) SHA1(49614f87615f1a608eeb90bc68d5fc6d9109a565) )
 ROM_END
 
 ROM_START( jujuba )

@@ -71,14 +71,15 @@ Notes:
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
+#include "machine/bankdev.h"
+#include "machine/idectrl.h"
+#include "machine/intelfsh.h"
 #include "machine/lpci.h"
 #include "machine/pckeybrd.h"
-#include "machine/idectrl.h"
-#include "video/voodoo.h"
 #include "machine/pcshare.h"
-#include "machine/bankdev.h"
-#include "machine/intelfsh.h"
 #include "machine/terminal.h"
+#include "video/voodoo.h"
+#include "screen.h"
 
 
 class funkball_state : public pcat_base_state
@@ -112,7 +113,7 @@ public:
 
 	DECLARE_WRITE32_MEMBER( flash_w );
 //  DECLARE_WRITE8_MEMBER( bios_ram_w );
-	DECLARE_READ8_MEMBER( test_r );
+	DECLARE_READ8_MEMBER( in_r );
 	DECLARE_READ8_MEMBER( serial_r );
 	DECLARE_WRITE8_MEMBER( serial_w );
 
@@ -227,13 +228,7 @@ READ8_MEMBER( funkball_state::serial_r )
 WRITE8_MEMBER( funkball_state::serial_w )
 {
 	if(offset == 0)
-	{
-		// TODO: hack, main CPU sends a CR only here, actually expecting Windows-style newline.
-		if(data == 0x0d)
-			m_terminal->write(space,0,0x0a);
-		else
-			m_terminal->write(space,0,data);
-	}
+		m_terminal->write(space,0,data);
 }
 
 uint8_t funkball_state::funkball_config_reg_r()
@@ -324,7 +319,7 @@ WRITE8_MEMBER(funkball_state::bios_ram_w)
 	}
 }
 
-READ8_MEMBER( funkball_state::test_r )
+READ8_MEMBER( funkball_state::in_r )
 {
 	return m_inputs[offset]->read();
 }
@@ -373,7 +368,7 @@ static ADDRESS_MAP_START(funkball_io, AS_IO, 32, funkball_state)
 	AM_RANGE(0x0360, 0x0363) AM_WRITE(flash_w)
 
 //  AM_RANGE(0x0320, 0x0323) AM_READ(test_r)
-	AM_RANGE(0x0360, 0x036f) AM_READ8(test_r,0xffffffff) // inputs
+	AM_RANGE(0x0360, 0x036f) AM_READ8(in_r,0xffffffff) // inputs
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( funkball )
@@ -527,6 +522,7 @@ static INPUT_PORTS_START( funkball )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
 	PORT_START("IN.6")
 	PORT_DIPNAME( 0x01, 0x01, "6" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -552,57 +548,28 @@ static INPUT_PORTS_START( funkball )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
 	/* 7-8 P1/P2 E-F "dgDelay" */
 	PORT_START("IN.7")
-	PORT_DIPNAME( 0x01, 0x01, "7" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1        ) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2        ) PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3        ) PORT_PLAYER(1)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4        ) PORT_PLAYER(1)
+
 	PORT_START("IN.8")
-	PORT_DIPNAME( 0x01, 0x01, "8" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1        ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2        ) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3        ) PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4        ) PORT_PLAYER(2)
+
 	PORT_START("IN.9")
 	PORT_DIPNAME( 0x01, 0x01, "9" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -616,18 +583,13 @@ static INPUT_PORTS_START( funkball )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	// keeping pressed either one of these two at POST makes it to go into service mode
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
+
+
 	PORT_START("IN.10")
 	PORT_DIPNAME( 0x01, 0x01, "10" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -802,7 +764,7 @@ void funkball_state::machine_reset()
 	m_voodoo_pci_regs.base_addr = 0xff000000;
 }
 
-static MACHINE_CONFIG_START( funkball, funkball_state )
+static MACHINE_CONFIG_START( funkball )
 	MCFG_CPU_ADD("maincpu", MEDIAGX, 66666666*3.5) // 66,6 MHz x 3.5
 	MCFG_CPU_PROGRAM_MAP(funkball_map)
 	MCFG_CPU_IO_MAP(funkball_io)
@@ -821,7 +783,7 @@ static MACHINE_CONFIG_START( funkball, funkball_state )
 	MCFG_DEVICE_PROGRAM_MAP(flashbank_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
 	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(32)
-	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(64)
+	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(32)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
 
 	/* video hardware */
@@ -860,4 +822,4 @@ ROM_START( funkball )
 ROM_END
 
 
-GAME(1998, funkball, 0, funkball, funkball, driver_device, 0, ROT0, "dgPIX Entertainment Inc.", "Funky Ball", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME(1998, funkball, 0, funkball, funkball, funkball_state, 0, ROT0, "dgPIX Entertainment Inc.", "Funky Ball", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

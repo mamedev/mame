@@ -25,6 +25,8 @@
 #include "cpu/z80/z80.h"
 #include "video/tms9927.h"
 #include "sound/beep.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class micral_state : public driver_device
@@ -245,7 +247,7 @@ MACHINE_RESET_MEMBER( micral_state, micral )
 	m_maincpu->set_state_int(Z80_PC, 0xf800);
 }
 
-static MACHINE_CONFIG_START( micral, micral_state )
+static MACHINE_CONFIG_START( micral )
 	// basic machine hardware
 	MCFG_CPU_ADD( "maincpu", Z80, XTAL_4MHz )
 	MCFG_CPU_PROGRAM_MAP(micral_mem)
@@ -287,5 +289,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    CLASS          INIT     COMPANY       FULLNAME       FLAGS */
-COMP( 1981, micral,  0,      0,      micral,    micral,  micral_state,  micral,  "Bull R2E", "Micral 80-22G", MACHINE_IS_SKELETON )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE    INPUT    CLASS          INIT     COMPANY     FULLNAME         FLAGS
+COMP( 1981, micral, 0,      0,      micral,    micral,  micral_state,  micral,  "Bull R2E", "Micral 80-22G", MACHINE_IS_SKELETON )

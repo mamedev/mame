@@ -42,15 +42,19 @@ ToDO:
 *****************************************************************************************/
 
 #include "emu.h"
+#include "machine/genpin.h"
+
 #include "cpu/i8085/i8085.h"
 #include "cpu/m6800/m6800.h"
 #include "machine/6821pia.h"
-#include "machine/genpin.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/votrax.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
+
 #include "taito.lh"
+
 
 class taito_state : public genpin_class
 {
@@ -320,7 +324,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( taito_state::timer_a )
 	output().set_digit_value(++digit, patterns[m_p_ram[m_out_offs++]&15]);
 }
 
-static MACHINE_CONFIG_START( taito, taito_state )
+static MACHINE_CONFIG_START( taito )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, 19000000/9)
 	MCFG_CPU_PROGRAM_MAP(taito_map)
@@ -375,7 +379,7 @@ static MACHINE_CONFIG_DERIVED( taito4, taito )
 	MCFG_PIA_CB2_HANDLER(WRITELINE(taito_state, pia_cb2_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( taito_ay_audio )
+static MACHINE_CONFIG_START( taito_ay_audio )
 	MCFG_CPU_MODIFY( "audiocpu" )
 	MCFG_CPU_PROGRAM_MAP(taito_sub_map5)
 
@@ -875,14 +879,14 @@ ROM_END
 /-------------------------------*/
 
 /*--------------------------------
-/ Voley Ball
+/ Volley
 /-------------------------------*/
 ROM_START(voleybal)
 	ROM_REGION(0x2800, "roms", 0)
-	ROM_LOAD( "voley1.bin", 0x0000, 0x0800, NO_DUMP)
-	ROM_LOAD( "voley2.bin", 0x0800, 0x0800, NO_DUMP)
-	ROM_LOAD( "voley3.bin", 0x1000, 0x0800, NO_DUMP)
-	ROM_LOAD( "voley4.bin", 0x1800, 0x0800, NO_DUMP)
+	ROM_LOAD( "voley1.bin", 0x0000, 0x0800, CRC(d218b759) SHA1(91dab8a583b9fa897fc0bd17cce2812015b2a82a))
+	ROM_LOAD( "voley2.bin", 0x0800, 0x0800, CRC(59b049cc) SHA1(f3b42debddf7e088f520c020017c0aca56ad0052))
+	ROM_LOAD( "voley3.bin", 0x1000, 0x0800, CRC(f3fdbb37) SHA1(d78bd68e7bdbdbc4447c65b77bd5b30a23d0951c))
+	ROM_LOAD( "voley4.bin", 0x1800, 0x0800, CRC(35168496) SHA1(29ca360368970a0fae51f187ad5a89ad81ae2c6a))
 
 	ROM_REGION(0x8000, "cpu2", 0)
 	ROM_LOAD("voley_s1.bin", 0x2000, 0x1000, CRC(9c825666) SHA1(330ecd9caccb8a1555c5e7302095ae25558c020e))
@@ -961,50 +965,50 @@ ROM_START(mrblkz80)
 ROM_END
 
 // no sound
-GAME(198?,  taitest,    0,          taito,  taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Taito Test Fixture", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(198?,  taitest,    0,          taito,  taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Taito Test Fixture",            MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
 
 // dac (sintetizador)
-GAME(1979,  shock,      0,          shock,  taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Shock", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME(1980,  obaoba,     0,          taito,  taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Oba-Oba (set 1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME(1980,  obaoba1,    obaoba,     taito,  taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Oba-Oba (set 2)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME(1980,  drakor,     0,          taito,  taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Drakor", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME(1980,  meteort,    0,          taito,  taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Meteor (Taito)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME(1981,  sureshop,   0,          taito,  taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Sure Shot (Pinball)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME(1981,  cosmic,     0,          taito,  taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Cosmic", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME(1982,  gemini2k,   0,          taito,  taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Gemini 2000 (set 1)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1982,  gemini2k1,  gemini2k,   taito,  taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Gemini 2000 (set 2)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1982,  vortexp,    0,          taito,  taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Vortex (Pinball)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME(1982,  zarza,      0,          taito,  taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Zarza (set 1)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1982,  zarza1,     zarza,      taito,  taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Zarza (set 2)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1982,  sharkt,     0,          taito2, taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Shark (Taito)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1982,  stest,      0,          taito,  taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Speed Test", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME(1982,  lunelle,    0,          taito2, taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Lunelle", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1980,  rally,      0,          taito,  taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Rally", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME(1979,  shock,      0,          shock,  taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Shock",                         MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME(1980,  obaoba,     0,          taito,  taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Oba-Oba (set 1)",               MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME(1980,  obaoba1,    obaoba,     taito,  taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Oba-Oba (set 2)",               MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME(1980,  drakor,     0,          taito,  taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Drakor",                        MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME(1980,  meteort,    0,          taito,  taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Meteor (Taito)",                MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME(1981,  sureshop,   0,          taito,  taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Sure Shot (Pinball)",           MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME(1981,  cosmic,     0,          taito,  taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Cosmic",                        MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME(1982,  gemini2k,   0,          taito,  taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Gemini 2000 (set 1)",           MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1982,  gemini2k1,  gemini2k,   taito,  taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Gemini 2000 (set 2)",           MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1982,  vortexp,    0,          taito,  taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Vortex (Pinball)",              MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME(1982,  zarza,      0,          taito,  taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Zarza (set 1)",                 MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1982,  zarza1,     zarza,      taito,  taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Zarza (set 2)",                 MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1982,  sharkt,     0,          taito2, taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Shark (Taito)",                 MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1982,  stest,      0,          taito,  taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Speed Test",                    MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME(1982,  lunelle,    0,          taito2, taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Lunelle",                       MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1980,  rally,      0,          taito,  taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Rally",                         MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // dac and vox (sintevox)
-GAME(1981,  fireact,    0,          taito4, taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Fire Action", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981,  cavnegro,   0,          taito4, taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Cavaleiro Negro (set 1)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981,  cavnegro1,  cavnegro,   taito4, taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Cavaleiro Negro (set 2)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981,  cavnegro2,  cavnegro,   taito4, taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Cavaleiro Negro (set 3)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981,  ladylukt,   0,          taito4, taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Lady Luck (Taito)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME(198?,  vegast,     ladylukt,   taito4, taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Vegas (Taito)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME(1982,  titan,      0,          taito4, taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Titan (set 1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME(1982,  titan1,     titan,      taito4, taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Titan (set 2)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME(1982,  hawkman,    0,          taito4, taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Hawkman (set 1)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1982,  hawkman1,   hawkman,    taito4, taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Hawkman (set 2)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981,  fireact,    0,          taito4, taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Fire Action",                   MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981,  cavnegro,   0,          taito4, taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Cavaleiro Negro (set 1)",       MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981,  cavnegro1,  cavnegro,   taito4, taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Cavaleiro Negro (set 2)",       MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981,  cavnegro2,  cavnegro,   taito4, taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Cavaleiro Negro (set 3)",       MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981,  ladylukt,   0,          taito4, taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Lady Luck (Taito)",             MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME(198?,  vegast,     ladylukt,   taito4, taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Vegas (Taito)",                 MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME(1982,  titan,      0,          taito4, taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Titan (set 1)",                 MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME(1982,  titan1,     titan,      taito4, taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Titan (set 2)",                 MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME(1982,  hawkman,    0,          taito4, taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Hawkman (set 1)",               MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1982,  hawkman1,   hawkman,    taito4, taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Hawkman (set 2)",               MACHINE_IS_SKELETON_MECHANICAL)
 
 // dac and ay
-GAME(1982,  snake,      0,          taito5, taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Snake Machine", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME(198?,  voleybal,   0,          taito5, taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Voley Ball",  MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1984,  mrblack,    0,          taito5, taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Mr. Black (set 1)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1985,  mrblack1,   mrblack,    taito5, taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Mr. Black (set 2)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1982,  snake,      0,          taito5, taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Snake Machine",                 MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME(198?,  voleybal,   0,          taito5, taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Volley",                        MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1984,  mrblack,    0,          taito5, taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Mr. Black (set 1)",             MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1985,  mrblack1,   mrblack,    taito5, taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Mr. Black (set 2)",             MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1985,  sshuttle,   0,          taito5, taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Space Shuttle (Taito) (set 1)", MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1985,  sshuttle1,  sshuttle,   taito5, taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Space Shuttle (Taito) (set 2)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(198?,  polar,      0,          taito5, taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Polar Explorer", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(198?,  polar,      0,          taito5, taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Polar Explorer",                MACHINE_IS_SKELETON_MECHANICAL)
 
 // dac, vox and ay
-GAME(1982,  gork,       0,          taito6, taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Gork", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME(198?,  fireactd,   0,          taito6, taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Fire Action Deluxe", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1982,  gork,       0,          taito6, taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Gork",                          MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME(198?,  fireactd,   0,          taito6, taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Fire Action Deluxe",            MACHINE_IS_SKELETON_MECHANICAL)
 
 // different hardware
-GAME(198?,  mrblkz80,   mrblack,    taito,  taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Mr. Black (Z-80 CPU)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(198?,  mrblkz80,   mrblack,    taito,  taito, taito_state, taito,  ROT0,   "Taito do Brasil",  "Mr. Black (Z-80 CPU)",          MACHINE_IS_SKELETON_MECHANICAL)

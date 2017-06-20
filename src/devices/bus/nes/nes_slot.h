@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli
-#ifndef __NES_SLOT_H__
-#define __NES_SLOT_H__
+#ifndef MAME_BUS_NES_NES_SLOT_H
+#define MAME_BUS_NES_NES_SLOT_H
+
+#pragma once
 
 #include "softlist_dev.h"
 
@@ -113,7 +115,7 @@ enum
 	/* Misc: these are needed to convert mappers to boards, I will sort them later */
 	OPENCORP_DAOU306, HES_BOARD, SVISION16_BOARD, RUMBLESTATION_BOARD, JYCOMPANY_A, JYCOMPANY_B, JYCOMPANY_C,
 	MAGICSERIES_MD, KASING_BOARD, FUTUREMEDIA_BOARD, FUKUTAKE_BOARD, SOMARI_SL12,
-	HENGG_SRICH, HENGG_XHZS, HENGG_SHJY3, SUBOR_TYPE0, SUBOR_TYPE1,
+	HENGG_SRICH, HENGG_XHZS, HENGG_SHJY3, SUBOR_TYPE0, SUBOR_TYPE1, SUBOR_TYPE2,
 	KAISER_KS7058, KAISER_KS7032, KAISER_KS7022, KAISER_KS7017,
 	KAISER_KS7012, KAISER_KS7013B, KAISER_KS202, KAISER_KS7031,
 	KAISER_KS7016, KAISER_KS7037,
@@ -125,7 +127,7 @@ enum
 	WAIXING_SGZLZ, WAIXING_SGZ, WAIXING_WXZS, WAIXING_SECURITY, WAIXING_SH2,
 	WAIXING_DQ8, WAIXING_FFV, WAIXING_WXZS2, SUPERGAME_LIONKING, SUPERGAME_BOOGERMAN,
 	KAY_BOARD, HOSENKAN_BOARD, NITRA_TDA, GOUDER_37017, NANJING_BOARD,
-	WHIRLWIND_2706,
+	WHIRLWIND_2706, ZEMINA_BOARD,
 	NOCASH_NOCHR,   // homebrew PCB design which uses NTRAM for CHRRAM
 	BTL_ACTION53,   // homebrew PCB for homebrew multicarts
 	BTL_2A03_PURITANS,   // homebrew PCB
@@ -161,7 +163,6 @@ class device_nes_cart_interface : public device_slot_card_interface
 {
 public:
 	// construction/destruction
-	device_nes_cart_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_nes_cart_interface();
 
 	// reading and writing
@@ -230,6 +231,7 @@ public:
 	uint8_t account_bus_conflict(uint32_t offset, uint8_t data);
 
 protected:
+	device_nes_cart_interface(const machine_config &mconfig, device_t &device);
 
 	// internal state
 	uint8_t *m_prg;
@@ -329,8 +331,6 @@ protected:
 	std::vector<uint16_t> m_prg_bank_map;
 };
 
-void nes_partialhash(util::hash_collection &dest, const unsigned char *data, unsigned long length, const char *functions);
-
 // ======================> nes_cart_slot_device
 
 class nes_cart_slot_device : public device_t,
@@ -344,7 +344,6 @@ public:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_config_complete() override;
 
 	// image-level overrides
 	virtual image_init_result call_load() override;
@@ -363,13 +362,13 @@ public:
 	virtual bool is_reset_on_load() const override { return 1; }
 	virtual const char *image_interface() const override { return "nes_cart"; }
 	virtual const char *file_extensions() const override { return "nes,unf,unif"; }
-	virtual device_image_partialhash_func get_partial_hash() const override { return &nes_partialhash; }
+	virtual u32 unhashed_header_length() const override { return 16; }
 
 	// slot interface overrides
-	virtual std::string get_default_card_software() override;
-	const char * get_default_card_ines(uint8_t *ROM, uint32_t len);
-	const char * get_default_card_unif(uint8_t *ROM, uint32_t len);
-	const char * nes_get_slot(int pcb_id);
+	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
+	const char * get_default_card_ines(get_default_card_software_hook &hook, const uint8_t *ROM, uint32_t len) const;
+	static const char * get_default_card_unif(const uint8_t *ROM, uint32_t len);
+	static const char * nes_get_slot(int pcb_id);
 	int nes_get_pcb_id(const char *slot);
 
 	// reading and writing
@@ -397,15 +396,14 @@ public:
 
 	void set_must_be_loaded(bool _must_be_loaded) { m_must_be_loaded = _must_be_loaded; }
 
-	//private:
-
+//private:
 	device_nes_cart_interface*      m_cart;
 	int m_pcb_id;
 	bool                            m_must_be_loaded;
 };
 
 // device type definition
-extern const device_type NES_CART_SLOT;
+DECLARE_DEVICE_TYPE(NES_CART_SLOT, nes_cart_slot_device)
 
 
 /***************************************************************************
@@ -430,4 +428,4 @@ extern const device_type NES_CART_SLOT;
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, true) \
 	MCFG_NES_CARTRIDGE_NOT_MANDATORY
 
-#endif
+#endif // MAME_BUS_NES_NES_SLOT_H

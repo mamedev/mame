@@ -991,17 +991,21 @@
 #define CRTC_CLOCK     (MASTER_CLOCK/8)
 
 #include "emu.h"
-#include "cpu/m6502/r65c02.h"
+#include "includes/funworld.h"
+
 #include "cpu/m6502/m65sc02.h"
-#include "video/mc6845.h"
+#include "cpu/m6502/r65c02.h"
 #include "machine/6821pia.h"
-#include "sound/ay8910.h"
 #include "machine/nvram.h"
-#include "jollycrd.lh"
+#include "sound/ay8910.h"
+#include "video/mc6845.h"
+#include "screen.h"
+#include "speaker.h"
+
 #include "bonuscrd.lh"
+#include "jollycrd.lh"
 #include "novoplay.lh"
 #include "royalcrd.lh"
-#include "includes/funworld.h"
 
 
 /**********************
@@ -2966,7 +2970,7 @@ MACHINE_RESET_MEMBER(funworld_state, lunapark)
 *     Machine Drivers     *
 **************************/
 
-static MACHINE_CONFIG_START( fw1stpal, funworld_state )
+static MACHINE_CONFIG_START( fw1stpal )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M65SC02, CPU_CLOCK)    /* 2MHz */
 	MCFG_CPU_PROGRAM_MAP(funworld_map)
@@ -5289,12 +5293,15 @@ ROM_END
   Power Card (Fun World)
   Version 0263 / 1993-10-22
 
-  Amatic encrypted CPU
-  based on 65SC02 (bitwise) family
+  Amatic encrypted CPU based on 65SC02 (bitwise) family,
+  with the following components inside:
 
-  Looks like a Bonus Card / Big Deal clone.
-  Inside the program ROM there is a reference to "Mega Card",
-  but the graphics are from Power Card.
+  1x CY7C291A (prom replacement).
+  1x 65SC02 (CPU).
+  1x TI74F245A (3-state octal latch from Texas Instruments).
+  1x 7400 (quad 2-input NAND gate).
+
+  (Same as Mega Card CPU)
 
 
   PCB Layout...
@@ -5368,11 +5375,19 @@ ROM_END
   '---------------'
    1 2 3 4 5 6 7 8
 
+
+  Looks like a Bonus Card / Big Deal clone.
+  Inside the program ROM there is a reference to "Mega Card",
+  but the graphics are from Power Card.
+
 */
 ROM_START( powercrd )
 	ROM_REGION( 0x10000, "maincpu", 0 )  /* need proper decryption */
 	ROM_LOAD( "263a1.bin",  0x8000, 0x8000, CRC(9e5e477d) SHA1(428464a64bea8cb478bc8033859baa47d7de0297) )  /* just the 2nd half */
 	ROM_LOAD( "263a2.bin",  0x4000, 0x8000, CRC(11b1a13f) SHA1(766c1a45c238467d6a292795f5a159187966ceec) )  /* just the 2nd half */
+
+	ROM_REGION( 0x0800, "decode", 0 )  /* from the CY7C291A inside of the custom CPU */
+	ROM_LOAD( "powercrd_cy7c291a.bin",  0x0000, 0x0800, CRC(f1d8f35d) SHA1(2b5f9222a81a627d43fd8448385f85c71c24b914) )  /* new dump */
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "power_c_zg2.ic11",   0x0000, 0x8000, CRC(108380bb) SHA1(922beffe3c06f391239125e6f4ccc86ec6980c45) )
@@ -5383,6 +5398,143 @@ ROM_START( powercrd )
 
 	ROM_REGION( 0x0200, "plds", 0 )
 	ROM_LOAD( "powercrd_tibpal16l8.bin",  0x0000, 0x0104, CRC(b5c0a96d) SHA1(3547700e276326a27009202b2e82bc649abb33db) )
+ROM_END
+
+
+/*
+
+  Mega Card (MC3).
+  Ver. 0210.
+  Fun World, 1993.
+
+  Encrypted poker game.
+
+  1x Custom encrypted Fun World CPU based on 65SC02 (Same as Power Card).
+  1x GM68B45S CRTC.
+  2x EF6821P PIAs.
+  1x AY38910A.
+  2x ULN2003AN (out).
+  1x PAL16L8ACN (PLD).
+  1x Maxim MAX690CPA (Microprocessor Supervisory Circuits).
+
+  RAM:
+  1x GoldStar GM76C28-10.
+  1x KM6264BL-10.
+
+  ROM:
+  4x 27C256 (two for program, two for GFX).
+  1x N82S147AN bipolar PROM.
+
+  Other:
+
+  1x 16MHz Xtal.
+  1x 8 DIP switches bank.
+  1x 3V. CR2025 lithium battery.
+
+  1X 17x2 Pin male connector.
+  1X 22x2 Pin edge connector.
+  1X 8x2 Pin edge connector.
+
+
+
+  PCB layout:
+
+  .----------------------------------------------------------------------------------------------------------------------.
+  |                                                                                                                      |
+  |   .--------.                    .--------.                                                  .-------.                |
+  |   |        |   .------------.   |        |                                                  |       |                |
+  |   |        |   |  GD74LS157 |   |        |                                                  |       |   .---.        '---.
+  |   |        |   '------------'   |Goldstar|                                                  |       |   |   | .---. 8 ---|
+  |   |GOLDSTAR|                    |        |                                                  |       |   |ULN| |   |   ---|
+  |   |        |   .------------.   |GM76C28 |                                                  |       |   |200| |74L| P ---|
+  |   |        |   |  GD74LS157 |   |  -10   |                                                  |       |   |3AN| |S04| I ---|
+  |   |GM68B45S|   '------------'   |        |                                                  |AY38910|   |   | |P  | N ---|
+  |   |        |                    |        |                                                  |A/P    |   |   | |   |   ---|
+  |   |        |   .------------.   |        |         .-------------------------------------.  |       |   '---' |   | C ---|
+  |   |        |   |  GD74LS157 |   |        |         |## ooooooooooooooooooooooooooooooo ##|  |       |         '---' O ---|
+  |   |        |   '------------'   |        |         |## ooooooooooooooooooooooooooooooo ##|  |       |               N ---|
+  |   |        |                    '--------'         '-------------------------------------'  |       |    .---.      N ---|
+  |   |        |   .------------.                                                               |       |    |   |        ---|
+  |   |        |   |  GD74LS157 |                           .--------------.  .--------------.  |       |    |ULN|       .---'
+  |   |        |   '------------'                           |  PAL16L8ACN  |  | EMPTY SOCKET |  |       |    |200|       |
+  |   |        |                                            '--------------'  '--------------'  |       |    |3AN|       |
+  |   |        |     .------------------.   .-----.         .--------------------------------.  |       |    |   |       |
+  |   '--------'     |                  |   |XTAL |         |Lfnd. Nr: 0057                  |  '-------'    '---'       |
+  |                  |    KM6264BL-10   |   |16.00|         |Type: 'F'                       |  .-------.                |
+  | .-------------.  |                  |   |0MHz |         |Datum: 17.3.93                  |  |       |                |
+  | |  GD74LS245  |  |                  |   |     |         |                                |  |       |                |
+  | '-------------'  '------------------'   '-----'         |                     FUN WORLD  |  |       |                '---.
+  |                                                         |                                |  |       |                 ---|
+  | .-------------.        .------------.                   '--------------------------------'  |       |                 ---|
+  | | HD74LS374P  |        | HD74LS374P |                                                       |EF6821P|                 ---|
+  | '-------------'        '------------'   .---.        .---.          .--------------------.  |       |                 ---|
+  |                                         |GD7|        |GD7|          |                    |  |       |                 ---|
+  |.--------------------.    .----------.   |4LS|        |4LS|          |    EMPTY SOCKET    |  |       |    .---.        ---|
+  ||MEGA                |    |74LS194AN |   |368|        |245|          |                    |  |       |    |  8|        ---|
+  ||ZG 1                |    '----------'   |A  |        |   |          |                    |  |       |    |   |        ---|
+  ||              27C256|                   |   |        |   |          '--------------------'  |       |    |   |     22 ---|
+  ||                IC10|    .----------.   '---'        |   |                                  |       |    |DIP|        ---|
+  |'--------------------'    |74LS194AN |                |   |          .--------------------.  |       |    |   |      P ---|
+  |                          '----------'                |   |          |MEGA MC 3           |  |       |    |   |      I ---|
+  |                                                      '---'          | 210/F/1            |  |       |    |   |      N ---|
+  |.--------------------.    .----------.                               |              27C256|  |       |    |  1|        ---|
+  ||MEGA                |    |74LS194AN |   .---.   .---.   .---.       |                IC37|  |       |    '---'      C ---|
+  ||ZG 2                |    '----------'   |GD7|   |MN7|   |GD7|       '--------------------'  '-------'               O ---|
+  ||              27C256|                   |4LS|   |4HC|   |4LS|                               .-------.               N ---|
+  ||                IC11|    .----------.   |393|   |241|   |139|       .--------------------.  |       |               N ---|
+  |'--------------------'    |74LS194AN |   |   |   |   |   |   |       |MEGA MC 3           |  |       |               E ---|
+  |                          '----------'   |   |   |   |   |   |       | 210/F/2            |  |       |               C ---|
+  |                                         '---'   |   |   '---'       |              27C256|  |       |               T ---|
+  |.----------.  .----------.                       |   |               |                IC41|  |       |               O ---|
+  ||GD74LS174 |  |HD74LS02P |                       |   |               '--------------------'  |EF6821P|               R ---|
+  |'----------'  '----------'                       '---'                                       |       |                 ---|
+  |                                           -------                                    .---.  |       |                 ---|
+  |.---.  .---.  .---.              .---.   / CR-2025 \                                  |HD7|  |       |                 ---|
+  ||GD7|  |   |  |HD7|              |MAX|  |  LITHIUM  |                                 |4LS|  |       |                 ---|
+  ||4LS|  |N82|  |4LS|              |690|  |  BATTERY  |                                 |02P|  |       |                 ---|
+  ||174|  |S14|  |374|              '---'   \  +3V.   /                                  |   |  |       |                 ---|
+  ||   |  |7AN|  |P  |              Maxim     -------                                    |   |  |       |                 ---|
+  ||   |  |   |  |   |            MAX690CPA                                              '---'  |       |                 ---|
+  |'---'  |   |  |   |                                                                          |       |                .---'
+  |       |   |  |   |                                                                          |       |                |
+  |       '---'  '---'                                                                          '-------'                |
+  |                                                                                                                      |
+  '----------------------------------------------------------------------------------------------------------------------'
+
+
+  The encrypted CPU:
+
+  It's a DIP40 custom IC. It has inside a PLCC28 IC and 3 dies:
+
+  The PLCC28 chip is a CY7C291A (prom replacement)
+  DIE#1 is a TI74F245A, a 3-state octal latch from Texas Instruments.
+  DIE#2 is the CPU, a 65SC02.
+  DIE#3 is a 7400, a quad 2-input NAND gate.
+
+  Is unknown how they are connected.
+
+*/
+
+ROM_START( megacard )
+	ROM_REGION( 0x10000, "maincpu", 0 )  /* need proper decryption */
+	ROM_LOAD( "mega_mc3_210-f-1.ic37",  0x8000, 0x8000, CRC(747f5ed1) SHA1(06757bb6a792dca93978b17b54c28e413e3720b1) )  /* just the 2nd half */
+	ROM_LOAD( "mega_mc3_210-f-2.ic41",  0x4000, 0x8000, CRC(373094d2) SHA1(8aed2502e89b0e7522e88f351ac256f1afad7ee8) )  /* just the 2nd half */
+
+	ROM_REGION( 0x0300, "die_65sc02", 0 )  /* from the 65SC02 die inside of the custom CPU */
+	ROM_LOAD( "gteu65decoderom.bin",   0x0000, 0x02f1, CRC(089af0c6) SHA1(0f46a73a7859a694a07ebe74d476fae80e57e329) )
+
+	ROM_REGION( 0x0800, "decode", 0 )  /* from the CY7C291A inside of the custom CPU */
+	ROM_LOAD( "megacard_cy7291a.bin",  0x0000, 0x0800, CRC(596f01ac) SHA1(a8606a1dd385fbb46b1a96f11a759fa6580803d8) )  /* new dump */
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "mega_zg2.ic11",   0x0000, 0x8000, CRC(0993d380) SHA1(e5e2386948fba2fb6b79339af27bd1d0f1e198ca) )
+	ROM_LOAD( "mega_zg1.ic10",   0x8000, 0x8000, CRC(de2e2dd0) SHA1(17962d84838f39de41bc7a41d399fd18cd0bd5b7) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "n82s147an.bin",  0x0000, 0x0200, CRC(136245f3) SHA1(715309982fcafbce88b08237ca46acec31273938) )
+
+	ROM_REGION( 0x0200, "plds", 0 )
+	ROM_LOAD( "megacard_pal16l8.bin",  0x0000, 0x0117, CRC(3159a548) SHA1(ad904fa35b78570e44323469967803e34ef4bc0c) )
 ROM_END
 
 
@@ -6745,89 +6897,90 @@ DRIVER_INIT_MEMBER(funworld_state, rcdinch)
 /*     YEAR  NAME       PARENT    MACHINE   INPUT      STATE           INIT      ROT    COMPANY            FULLNAME                                          FLAGS                  LAYOUT */
 
 // Jolly Card based...
-GAMEL( 1985, jollycrd,  0,        fw1stpal, funworld,  driver_device,  0,        ROT0, "TAB Austria",     "Jolly Card (Austrian, set 1)",                    0,                       layout_jollycrd )
-GAMEL( 1985, jollycrda, jollycrd, fw1stpal, funworld,  driver_device,  0,        ROT0, "TAB Austria",     "Jolly Card (Austrian, set 2)",                    0,                       layout_jollycrd )
-GAMEL( 1985, jolyc3x3,  jollycrd, fw1stpal, funworld,  driver_device,  0,        ROT0, "TAB Austria",     "Jolly Card (3x3 deal)",                           0,                       layout_jollycrd )
-GAMEL( 1993, jolycmzs,  jollycrd, cuoreuno, jolyc980,  driver_device,  0,        ROT0, "MZS Tech",        "Jolly Card Professional 2.0 (MZS Tech)",          0,                       layout_jollycrd )
-GAMEL( 2000, jolyc980,  jollycrd, cuoreuno, jolyc980,  driver_device,  0,        ROT0, "Spale Soft",      "Jolly Card Professional 2.0 (Spale Soft)",        0,                       layout_jollycrd )
-GAMEL( 1998, jolycdev,  jollycrd, fw1stpal, funworld,  driver_device,  0,        ROT0, "TAB Austria / Evona Electronic", "Jolly Card (Evona Electronic)",    0,                       layout_jollycrd )
-GAMEL( 1985, jolyccra,  jollycrd, cuoreuno, jolycdcr,  driver_device,  0,        ROT0, "TAB Austria",     "Jolly Card (Croatian, set 1)",                    0,                       layout_jollycrd )
-GAMEL( 1993, jolyccrb,  jollycrd, cuoreuno, jolycdcr,  driver_device,  0,        ROT0, "Soft Design",     "Jolly Card (Croatian, set 2)",                    0,                       layout_jollycrd )
-GAMEL( 1985, sjcd2kx3,  jollycrd, fw1stpal, funworld,  driver_device,  0,        ROT0, "M.P.",            "Super Joly 2000 - 3x",                            0,                       layout_jollycrd )
-GAME(  1986, jolycdab,  jollycrd, fw1stpal, funworld,  driver_device,  0,        ROT0, "Inter Games",     "Jolly Card (Austrian, Fun World, bootleg)",       MACHINE_NOT_WORKING )
+GAMEL( 1985, jollycrd,  0,        fw1stpal, funworld,  funworld_state, 0,        ROT0, "TAB Austria",     "Jolly Card (Austrian, set 1)",                    0,                       layout_jollycrd )
+GAMEL( 1985, jollycrda, jollycrd, fw1stpal, funworld,  funworld_state, 0,        ROT0, "TAB Austria",     "Jolly Card (Austrian, set 2)",                    0,                       layout_jollycrd )
+GAMEL( 1985, jolyc3x3,  jollycrd, fw1stpal, funworld,  funworld_state, 0,        ROT0, "TAB Austria",     "Jolly Card (3x3 deal)",                           0,                       layout_jollycrd )
+GAMEL( 1993, jolycmzs,  jollycrd, cuoreuno, jolyc980,  funworld_state, 0,        ROT0, "MZS Tech",        "Jolly Card Professional 2.0 (MZS Tech)",          0,                       layout_jollycrd )
+GAMEL( 2000, jolyc980,  jollycrd, cuoreuno, jolyc980,  funworld_state, 0,        ROT0, "Spale Soft",      "Jolly Card Professional 2.0 (Spale Soft)",        0,                       layout_jollycrd )
+GAMEL( 1998, jolycdev,  jollycrd, fw1stpal, funworld,  funworld_state, 0,        ROT0, "TAB Austria / Evona Electronic", "Jolly Card (Evona Electronic)",    0,                       layout_jollycrd )
+GAMEL( 1985, jolyccra,  jollycrd, cuoreuno, jolycdcr,  funworld_state, 0,        ROT0, "TAB Austria",     "Jolly Card (Croatian, set 1)",                    0,                       layout_jollycrd )
+GAMEL( 1993, jolyccrb,  jollycrd, cuoreuno, jolycdcr,  funworld_state, 0,        ROT0, "Soft Design",     "Jolly Card (Croatian, set 2)",                    0,                       layout_jollycrd )
+GAMEL( 1985, sjcd2kx3,  jollycrd, fw1stpal, funworld,  funworld_state, 0,        ROT0, "M.P.",            "Super Joly 2000 - 3x",                            0,                       layout_jollycrd )
+GAME(  1986, jolycdab,  jollycrd, fw1stpal, funworld,  funworld_state, 0,        ROT0, "Inter Games",     "Jolly Card (Austrian, Fun World, bootleg)",       MACHINE_NOT_WORKING )
 GAMEL( 1992, jolycdsp,  jollycrd, cuoreuno, jolycdit,  funworld_state, ctunk,    ROT0, "TAB Austria",     "Jolly Card (Spanish, blue TAB board, encrypted)", 0,                       layout_royalcrd )
-GAMEL( 1990, jolycdid,  jollycrd, cuoreuno, jolycdcr,  driver_device,  0,        ROT0, "bootleg",         "Jolly Card (Italian, different colors, set 1)",   0,                       layout_jollycrd ) // italian, CPLD, different colors.
-GAMEL( 1990, jolycdie,  jollycrd, cuoreuno, jolycdib,  driver_device,  0,        ROT0, "bootleg",         "Jolly Card (Italian, different colors, set 2)",   0,                       layout_jollycrd ) // not from TAB blue PCB
+GAMEL( 1990, jolycdid,  jollycrd, cuoreuno, jolycdcr,  funworld_state, 0,        ROT0, "bootleg",         "Jolly Card (Italian, different colors, set 1)",   0,                       layout_jollycrd ) // italian, CPLD, different colors.
+GAMEL( 1990, jolycdie,  jollycrd, cuoreuno, jolycdib,  funworld_state, 0,        ROT0, "bootleg",         "Jolly Card (Italian, different colors, set 2)",   0,                       layout_jollycrd ) // not from TAB blue PCB
 
 // Bonus Card based...
-GAMEL( 1986, bonuscrd,  0,        fw2ndpal, bonuscrd,  driver_device,  0,        ROT0, "Fun World",       "Bonus Card (Austrian)",                           MACHINE_IMPERFECT_COLORS,   layout_bonuscrd ) // use fw1stpal machine for green background
-GAMEL( 1986, bonuscrda, bonuscrd, fw2ndpal, bonuscrd,  driver_device,  0,        ROT0, "Fun World",       "Bonus Card (Austrian, ATG Electronic hack)",      MACHINE_IMPERFECT_COLORS,   layout_bonuscrd ) // use fw1stpal machine for green background
-GAMEL( 1986, bigdeal,   bonuscrd, fw2ndpal, bigdeal,   driver_device,  0,        ROT0, "Fun World",       "Big Deal (Hungarian, set 1)",                     MACHINE_IMPERFECT_COLORS,   layout_bonuscrd )
-GAMEL( 1986, bigdealb,  bonuscrd, fw2ndpal, bigdeal,   driver_device,  0,        ROT0, "Fun World",       "Big Deal (Hungarian, set 2)",                     MACHINE_IMPERFECT_COLORS,   layout_bonuscrd )
-GAME(  1993, powercrd,  0,        fw2ndpal, funworld,  driver_device,  0,        ROT0, "Fun World",       "Power Card (Ver 0263, encrypted)",                MACHINE_NOT_WORKING )                         // clone of Bonus Card.
+GAMEL( 1986, bonuscrd,  0,        fw2ndpal, bonuscrd,  funworld_state, 0,        ROT0, "Fun World",       "Bonus Card (Austrian)",                           MACHINE_IMPERFECT_COLORS,   layout_bonuscrd ) // use fw1stpal machine for green background
+GAMEL( 1986, bonuscrda, bonuscrd, fw2ndpal, bonuscrd,  funworld_state, 0,        ROT0, "Fun World",       "Bonus Card (Austrian, ATG Electronic hack)",      MACHINE_IMPERFECT_COLORS,   layout_bonuscrd ) // use fw1stpal machine for green background
+GAMEL( 1986, bigdeal,   bonuscrd, fw2ndpal, bigdeal,   funworld_state, 0,        ROT0, "Fun World",       "Big Deal (Hungarian, set 1)",                     MACHINE_IMPERFECT_COLORS,   layout_bonuscrd )
+GAMEL( 1986, bigdealb,  bonuscrd, fw2ndpal, bigdeal,   funworld_state, 0,        ROT0, "Fun World",       "Big Deal (Hungarian, set 2)",                     MACHINE_IMPERFECT_COLORS,   layout_bonuscrd )
 
 // CMC Italian jamma PCB's...
-GAMEL( 1996, cuoreuno,  0,        cuoreuno, cuoreuno,  driver_device,  0,        ROT0, "C.M.C.",          "Cuore 1 (Italian)",                               0,                       layout_jollycrd )
-GAMEL( 1997, elephfam,  0,        cuoreuno, cuoreuno,  driver_device,  0,        ROT0, "C.M.C.",          "Elephant Family (Italian, new)",                  0,                       layout_jollycrd )
-GAMEL( 1996, elephfmb,  elephfam, cuoreuno, cuoreuno,  driver_device,  0,        ROT0, "C.M.C.",          "Elephant Family (Italian, old)",                  0,                       layout_jollycrd )
-GAMEL( 1996, pool10,    0,        cuoreuno, pool10,    driver_device,  0,        ROT0, "C.M.C.",          "Pool 10 (Italian, set 1)",                        0,                       layout_jollycrd )
-GAMEL( 1996, pool10b,   pool10,   cuoreuno, cuoreuno,  driver_device,  0,        ROT0, "C.M.C.",          "Pool 10 (Italian, set 2)",                        0,                       layout_jollycrd )
-GAMEL( 1996, pool10c,   pool10,   cuoreuno, cuoreuno,  driver_device,  0,        ROT0, "C.M.C.",          "Pool 10 (Italian, set 3)",                        0,                       layout_jollycrd )
-GAMEL( 1997, pool10d,   pool10,   cuoreuno, cuoreuno,  driver_device,  0,        ROT0, "C.M.C.",          "Pool 10 (Italian, set 4)",                        0,                       layout_jollycrd )
-GAMEL( 1997, pool10f,   pool10,   cuoreuno, cuoreuno,  driver_device,  0,        ROT0, "C.M.C.",          "Pool 10 (Italian, set 5)",                        0,                       layout_jollycrd )
-GAMEL( 1996, pool10g,   pool10,   cuoreuno, cuoreuno,  driver_device,  0,        ROT0, "C.M.C.",          "Pool 10 (Italian, set 6)",                        0,                       layout_jollycrd )
-GAMEL( 1996, pool10h,   pool10,   cuoreuno, pool10,    driver_device,  0,        ROT0, "C.M.C.",          "Pool 10 (Italian, set 7)",                        0,                       layout_jollycrd )
-GAMEL( 1997, pool10i,   pool10,   cuoreuno, pool10,    driver_device,  0,        ROT0, "C.M.C.",          "Pool 10 (Italian, set 8)",                        0,                       layout_jollycrd )
-GAMEL( 2001, royal,     pool10,   royalcd1, royal,     driver_device,  0,        ROT0, "<unknown>",       "Royal (Pool 10 hack)",                            0,                       layout_jollycrd )
-GAMEL( 1997, tortufam,  0,        cuoreuno, cuoreuno,  driver_device,  0,        ROT0, "C.M.C.",          "Tortuga Family (Italian)",                        0,                       layout_jollycrd )
-GAMEL( 1996, potgame,   0,        cuoreuno, cuoreuno,  driver_device,  0,        ROT0, "C.M.C.",          "Pot Game (Italian)",                              0,                       layout_jollycrd )
-GAMEL( 1996, bottle10,  0,        cuoreuno, cuoreuno,  driver_device,  0,        ROT0, "C.M.C.",          "Bottle 10 (Italian, set 1)",                      0,                       layout_jollycrd )
-GAMEL( 1996, bottl10b,  bottle10, cuoreuno, cuoreuno,  driver_device,  0,        ROT0, "C.M.C.",          "Bottle 10 (Italian, set 2)",                      0,                       layout_jollycrd )
-GAMEL( 1998, lunapark,  0,        lunapark, lunapark,  driver_device,  0,        ROT0, "<unknown>",       "Luna Park (set 1, dual program)",                 0,                       layout_jollycrd ) // mirrored video RAM (4000/5000 to 6000/7000).
-GAMEL( 1998, lunaparkb, lunapark, lunapark, lunapark,  driver_device,  0,        ROT0, "<unknown>",       "Luna Park (set 2, dual program)",                 0,                       layout_jollycrd ) // mirrored video RAM (4000/5000 to 6000/7000).
-GAMEL( 1998, lunaparkc, lunapark, cuoreuno, cuoreuno,  driver_device,  0,        ROT0, "<unknown>",       "Luna Park (set 3)",                               0,                       layout_jollycrd ) // regular video RAM 6000/7000.
-GAMEL( 1998, crystal,   0,        cuoreuno, cuoreuno,  driver_device,  0,        ROT0, "J.C.D. srl",      "Crystal Colours (CMC hardware)",                  0,                       layout_jollycrd )
+GAMEL( 1996, cuoreuno,  0,        cuoreuno, cuoreuno,  funworld_state, 0,        ROT0, "C.M.C.",          "Cuore 1 (Italian)",                               0,                       layout_jollycrd )
+GAMEL( 1997, elephfam,  0,        cuoreuno, cuoreuno,  funworld_state, 0,        ROT0, "C.M.C.",          "Elephant Family (Italian, new)",                  0,                       layout_jollycrd )
+GAMEL( 1996, elephfmb,  elephfam, cuoreuno, cuoreuno,  funworld_state, 0,        ROT0, "C.M.C.",          "Elephant Family (Italian, old)",                  0,                       layout_jollycrd )
+GAMEL( 1996, pool10,    0,        cuoreuno, pool10,    funworld_state, 0,        ROT0, "C.M.C.",          "Pool 10 (Italian, set 1)",                        0,                       layout_jollycrd )
+GAMEL( 1996, pool10b,   pool10,   cuoreuno, cuoreuno,  funworld_state, 0,        ROT0, "C.M.C.",          "Pool 10 (Italian, set 2)",                        0,                       layout_jollycrd )
+GAMEL( 1996, pool10c,   pool10,   cuoreuno, cuoreuno,  funworld_state, 0,        ROT0, "C.M.C.",          "Pool 10 (Italian, set 3)",                        0,                       layout_jollycrd )
+GAMEL( 1997, pool10d,   pool10,   cuoreuno, cuoreuno,  funworld_state, 0,        ROT0, "C.M.C.",          "Pool 10 (Italian, set 4)",                        0,                       layout_jollycrd )
+GAMEL( 1997, pool10f,   pool10,   cuoreuno, cuoreuno,  funworld_state, 0,        ROT0, "C.M.C.",          "Pool 10 (Italian, set 5)",                        0,                       layout_jollycrd )
+GAMEL( 1996, pool10g,   pool10,   cuoreuno, cuoreuno,  funworld_state, 0,        ROT0, "C.M.C.",          "Pool 10 (Italian, set 6)",                        0,                       layout_jollycrd )
+GAMEL( 1996, pool10h,   pool10,   cuoreuno, pool10,    funworld_state, 0,        ROT0, "C.M.C.",          "Pool 10 (Italian, set 7)",                        0,                       layout_jollycrd )
+GAMEL( 1997, pool10i,   pool10,   cuoreuno, pool10,    funworld_state, 0,        ROT0, "C.M.C.",          "Pool 10 (Italian, set 8)",                        0,                       layout_jollycrd )
+GAMEL( 2001, royal,     pool10,   royalcd1, royal,     funworld_state, 0,        ROT0, "<unknown>",       "Royal (Pool 10 hack)",                            0,                       layout_jollycrd )
+GAMEL( 1997, tortufam,  0,        cuoreuno, cuoreuno,  funworld_state, 0,        ROT0, "C.M.C.",          "Tortuga Family (Italian)",                        0,                       layout_jollycrd )
+GAMEL( 1996, potgame,   0,        cuoreuno, cuoreuno,  funworld_state, 0,        ROT0, "C.M.C.",          "Pot Game (Italian)",                              0,                       layout_jollycrd )
+GAMEL( 1996, bottle10,  0,        cuoreuno, cuoreuno,  funworld_state, 0,        ROT0, "C.M.C.",          "Bottle 10 (Italian, set 1)",                      0,                       layout_jollycrd )
+GAMEL( 1996, bottl10b,  bottle10, cuoreuno, cuoreuno,  funworld_state, 0,        ROT0, "C.M.C.",          "Bottle 10 (Italian, set 2)",                      0,                       layout_jollycrd )
+GAMEL( 1998, lunapark,  0,        lunapark, lunapark,  funworld_state, 0,        ROT0, "<unknown>",       "Luna Park (set 1, dual program)",                 0,                       layout_jollycrd ) // mirrored video RAM (4000/5000 to 6000/7000).
+GAMEL( 1998, lunaparkb, lunapark, lunapark, lunapark,  funworld_state, 0,        ROT0, "<unknown>",       "Luna Park (set 2, dual program)",                 0,                       layout_jollycrd ) // mirrored video RAM (4000/5000 to 6000/7000).
+GAMEL( 1998, lunaparkc, lunapark, cuoreuno, cuoreuno,  funworld_state, 0,        ROT0, "<unknown>",       "Luna Park (set 3)",                               0,                       layout_jollycrd ) // regular video RAM 6000/7000.
+GAMEL( 1998, crystal,   0,        cuoreuno, cuoreuno,  funworld_state, 0,        ROT0, "J.C.D. srl",      "Crystal Colours (CMC hardware)",                  0,                       layout_jollycrd )
 
 // Royal Card based...
-GAMEL( 1991, royalcrd,  0,        royalcd2, royalcrd,  driver_device,  0,        ROT0, "TAB Austria",     "Royal Card (Austrian, set 1)",                    0,                       layout_jollycrd )
-GAMEL( 1991, royalcrda, royalcrd, royalcd2, royalcrd,  driver_device,  0,        ROT0, "TAB Austria",     "Royal Card (Austrian, set 2)",                    0,                       layout_jollycrd )
-GAMEL( 1991, royalcrdb, royalcrd, royalcd1, royalcrd,  driver_device,  0,        ROT0, "TAB Austria",     "Royal Card (Austrian/Polish, set 3)",             0,                       layout_jollycrd )
-GAMEL( 1991, royalcrdc, royalcrd, royalcd2, royalcrd,  driver_device,  0,        ROT0, "TAB Austria",     "Royal Card (Austrian, set 4)",                    MACHINE_IMPERFECT_GRAPHICS, layout_jollycrd )
-GAMEL( 1991, royalcrdd, royalcrd, royalcd1, royalcrd,  driver_device,  0,        ROT0, "TAB Austria",     "Royal Card (Austrian, set 5)",                    0,                       layout_royalcrd )
-GAMEL( 1991, royalcrde, royalcrd, royalcd1, royalcrd,  driver_device,  0,        ROT0, "TAB Austria",     "Royal Card (Austrian, set 6)",                    0,                       layout_jollycrd )
-GAMEL( 1991, royalcrdt, royalcrd, royalcd1, royalcrd,  driver_device,  0,        ROT0, "TAB Austria",     "Royal Card (TAB original)",                       0,                       layout_jollycrd )
+GAMEL( 1991, royalcrd,  0,        royalcd2, royalcrd,  funworld_state, 0,        ROT0, "TAB Austria",     "Royal Card (Austrian, set 1)",                    0,                       layout_jollycrd )
+GAMEL( 1991, royalcrda, royalcrd, royalcd2, royalcrd,  funworld_state, 0,        ROT0, "TAB Austria",     "Royal Card (Austrian, set 2)",                    0,                       layout_jollycrd )
+GAMEL( 1991, royalcrdb, royalcrd, royalcd1, royalcrd,  funworld_state, 0,        ROT0, "TAB Austria",     "Royal Card (Austrian/Polish, set 3)",             0,                       layout_jollycrd )
+GAMEL( 1991, royalcrdc, royalcrd, royalcd2, royalcrd,  funworld_state, 0,        ROT0, "TAB Austria",     "Royal Card (Austrian, set 4)",                    MACHINE_IMPERFECT_GRAPHICS, layout_jollycrd )
+GAMEL( 1991, royalcrdd, royalcrd, royalcd1, royalcrd,  funworld_state, 0,        ROT0, "TAB Austria",     "Royal Card (Austrian, set 5)",                    0,                       layout_royalcrd )
+GAMEL( 1991, royalcrde, royalcrd, royalcd1, royalcrd,  funworld_state, 0,        ROT0, "TAB Austria",     "Royal Card (Austrian, set 6)",                    0,                       layout_jollycrd )
+GAMEL( 1991, royalcrdt, royalcrd, royalcd1, royalcrd,  funworld_state, 0,        ROT0, "TAB Austria",     "Royal Card (TAB original)",                       0,                       layout_jollycrd )
 GAME(  1991, royalcrdf, royalcrd, royalcd1, royalcrd,  funworld_state, royalcdc, ROT0, "Evona Electronic","Royal Card (Slovak, encrypted)",                  MACHINE_NOT_WORKING )
-GAMEL( 1990, royalcrdg, royalcrd, royalcd1, royalcrd,  driver_device,  0,        ROT0, "bootleg",         "Royal Card (Austrian, set 7, CMC C1030 HW)",      0,                       layout_jollycrd ) // big CPLD
-GAMEL( 1991, royalcrdh, royalcrd, royalcd2, royalcrd,  driver_device,  0,        ROT0, "TAB Austria",     "Royal Card (Austrian, set 8)",                    0 ,                      layout_jollycrd )
-GAMEL( 1991, royalcdfr, royalcrd, royalcd1, royalcrd,  driver_device,  0,        ROT0, "TAB Austria",     "Royal Card (French)",                             0,                       layout_jollycrd )
-GAME(  1993, royalcrdp, royalcrd, cuoreuno, royalcrd,  driver_device,  0,        ROT0, "Digital Dreams",  "Royal Card v2.0 Professional",                    0 )
-GAMEL( 199?, witchryl,  0,        witchryl, witchryl,  driver_device,  0,        ROT0, "Video Klein",     "Witch Royal (Export version 2.1)",                0,                       layout_jollycrd )
+GAMEL( 1990, royalcrdg, royalcrd, royalcd1, royalcrd,  funworld_state, 0,        ROT0, "bootleg",         "Royal Card (Austrian, set 7, CMC C1030 HW)",      0,                       layout_jollycrd ) // big CPLD
+GAMEL( 1991, royalcrdh, royalcrd, royalcd2, royalcrd,  funworld_state, 0,        ROT0, "TAB Austria",     "Royal Card (Austrian, set 8)",                    0 ,                      layout_jollycrd )
+GAMEL( 1991, royalcdfr, royalcrd, royalcd1, royalcrd,  funworld_state, 0,        ROT0, "TAB Austria",     "Royal Card (French)",                             0,                       layout_jollycrd )
+GAME(  1993, royalcrdp, royalcrd, cuoreuno, royalcrd,  funworld_state, 0,        ROT0, "Digital Dreams",  "Royal Card v2.0 Professional",                    0 )
+GAMEL( 199?, witchryl,  0,        witchryl, witchryl,  funworld_state, 0,        ROT0, "Video Klein",     "Witch Royal (Export version 2.1)",                0,                       layout_jollycrd )
 
 // Lucky Lady based...
-GAMEL( 1991, lluck3x3,  royalcrd, cuoreuno, royalcrd,  driver_device,  0,        ROT0, "TAB Austria",     "Lucky Lady (3x3 deal)",                           0,                       layout_jollycrd )
-GAMEL( 1991, lluck4x1,  royalcrd, royalcd1, royalcrd,  driver_device,  0,        ROT0, "TAB Austria",     "Lucky Lady (4x1 aces)",                           0,                       layout_jollycrd )
+GAMEL( 1991, lluck3x3,  royalcrd, cuoreuno, royalcrd,  funworld_state, 0,        ROT0, "TAB Austria",     "Lucky Lady (3x3 deal)",                           0,                       layout_jollycrd )
+GAMEL( 1991, lluck4x1,  royalcrd, royalcd1, royalcrd,  funworld_state, 0,        ROT0, "TAB Austria",     "Lucky Lady (4x1 aces)",                           0,                       layout_jollycrd )
 
 // Magic Card 2 based...
-GAMEL( 1996, magicrd2,  0,        magicrd2, magicrd2,  driver_device,  0,        ROT0, "Impera",          "Magic Card II (Bulgarian)",                       0,                       layout_jollycrd )
-GAMEL( 1996, magicrd2a, magicrd2, magicrd2, magicrd2,  driver_device,  0,        ROT0, "Impera",          "Magic Card II (Nov, Yugoslavian)",                0,                       layout_jollycrd )
+GAMEL( 1996, magicrd2,  0,        magicrd2, magicrd2,  funworld_state, 0,        ROT0, "Impera",          "Magic Card II (Bulgarian)",                       0,                       layout_jollycrd )
+GAMEL( 1996, magicrd2a, magicrd2, magicrd2, magicrd2,  funworld_state, 0,        ROT0, "Impera",          "Magic Card II (Nov, Yugoslavian)",                0,                       layout_jollycrd )
 GAME(  1996, magicrd2b, magicrd2, magicrd2, magicrd2,  funworld_state, magicd2b, ROT0, "Impera",          "Magic Card II (green TAB or Impera board)",       0 )
 GAME(  1996, magicrd2c, magicrd2, magicrd2, magicrd2,  funworld_state, magicd2c, ROT0, "Impera",          "Magic Card II (blue TAB board, encrypted)",       0 )
 
 // Joker Card based...
-GAMEL( 1993, vegasslw,  0,        fw2ndpal, vegasslw,  driver_device,  0,        ROT0, "Fun World",       "Royal Vegas Joker Card (slow deal)",              0,                       layout_jollycrd )
-GAMEL( 1993, vegasfst,  vegasslw, fw2ndpal, vegasfst,  driver_device,  0,        ROT0, "Soft Design",     "Royal Vegas Joker Card (fast deal)",              0,                       layout_jollycrd )
-GAMEL( 1993, vegasfte,  vegasslw, fw2ndpal, vegasfte,  driver_device,  0,        ROT0, "Soft Design",     "Royal Vegas Joker Card (fast deal, English gfx)", 0,                       layout_jollycrd )
-GAMEL( 1993, vegasmil,  vegasslw, fw2ndpal, vegasmil,  driver_device,  0,        ROT0, "Mile",            "Royal Vegas Joker Card (fast deal, Mile)",        0,                       layout_jollycrd )
+GAMEL( 1993, vegasslw,  0,        fw2ndpal, vegasslw,  funworld_state, 0,        ROT0, "Fun World",       "Royal Vegas Joker Card (slow deal)",              0,                       layout_jollycrd )
+GAMEL( 1993, vegasfst,  vegasslw, fw2ndpal, vegasfst,  funworld_state, 0,        ROT0, "Soft Design",     "Royal Vegas Joker Card (fast deal)",              0,                       layout_jollycrd )
+GAMEL( 1993, vegasfte,  vegasslw, fw2ndpal, vegasfte,  funworld_state, 0,        ROT0, "Soft Design",     "Royal Vegas Joker Card (fast deal, English gfx)", 0,                       layout_jollycrd )
+GAMEL( 1993, vegasmil,  vegasslw, fw2ndpal, vegasmil,  funworld_state, 0,        ROT0, "Mile",            "Royal Vegas Joker Card (fast deal, Mile)",        0,                       layout_jollycrd )
 
 // Jolly Joker based...
-GAMEL( 198?, jolyjokr,  0,        fw1stpal, funworld,  driver_device,  0,        ROT0, "Impera",          "Jolly Joker (98bet, set 1)",                      0,                       layout_jollycrd )
-GAMEL( 198?, jolyjokra, jolyjokr, fw1stpal, jolyjokra, driver_device,  0,        ROT0, "Impera",          "Jolly Joker (98bet, set 2)",                      0,                       layout_jollycrd )
-GAMEL( 198?, jolyjokrb, jolyjokr, fw1stpal, funworld,  driver_device,  0,        ROT0, "Impera",          "Jolly Joker (40bet, Croatian hack)",              0,                       layout_jollycrd )
-GAMEL( 198?, jolyjokrc, jolyjokr, fw1stpal, funworld,  driver_device,  0,        ROT0, "Apple Time",      "Jolly Joker (Apple Time)",                        MACHINE_NOT_WORKING,     layout_jollycrd ) // bad program ROM...
+GAMEL( 198?, jolyjokr,  0,        fw1stpal, funworld,  funworld_state, 0,        ROT0, "Impera",          "Jolly Joker (98bet, set 1)",                      0,                       layout_jollycrd )
+GAMEL( 198?, jolyjokra, jolyjokr, fw1stpal, jolyjokra, funworld_state, 0,        ROT0, "Impera",          "Jolly Joker (98bet, set 2)",                      0,                       layout_jollycrd )
+GAMEL( 198?, jolyjokrb, jolyjokr, fw1stpal, funworld,  funworld_state, 0,        ROT0, "Impera",          "Jolly Joker (40bet, Croatian hack)",              0,                       layout_jollycrd )
+GAMEL( 198?, jolyjokrc, jolyjokr, fw1stpal, funworld,  funworld_state, 0,        ROT0, "Apple Time",      "Jolly Joker (Apple Time)",                        MACHINE_NOT_WORKING,     layout_jollycrd ) // bad program ROM...
 
 // Encrypted games...
 GAME(  1992, multiwin,  0,        fw1stpal, funworld,  funworld_state, multiwin, ROT0, "Fun World",       "Multi Win (Ver.0167, encrypted)",                 MACHINE_NOT_WORKING )
-GAME(  1993, jokercrd,  0,        fw2ndpal, funworld,  driver_device,  0,        ROT0, "Vesely Svet",     "Joker Card (Ver.A267BC, encrypted)",              MACHINE_NOT_WORKING )
+GAME(  1993, powercrd,  0,        fw2ndpal, funworld,  funworld_state, 0,        ROT0, "Fun World",       "Power Card (Ver 0263, encrypted)",                MACHINE_NOT_WORKING )                      // clone of Bonus Card.
+GAME(  1993, megacard,  0,        fw2ndpal, funworld,  funworld_state, 0,        ROT0, "Fun World",       "Mega Card (Ver.0210, encrypted)",                 MACHINE_NOT_WORKING )
+GAME(  1993, jokercrd,  0,        fw2ndpal, funworld,  funworld_state, 0,        ROT0, "Vesely Svet",     "Joker Card (Ver.A267BC, encrypted)",              MACHINE_NOT_WORKING )
 GAME(  198?, saloon,    0,        saloon,   saloon,    funworld_state, saloon,   ROT0, "<unknown>",       "Saloon (French, encrypted)",                      MACHINE_NOT_WORKING )
 
 // Encrypted TAB blue PCB...
@@ -6845,14 +6998,14 @@ GAME(  199?, mongolnw,  0,        royalcd1, royalcrd,  funworld_state, mongolnw,
 GAME(  199?, soccernw,  0,        royalcd1, royalcrd,  funworld_state, soccernw, ROT0, "<unknown>",       "Soccer New (Italian)",                            MACHINE_UNEMULATED_PROTECTION )
 
 // Other games...
-GAME(  198?, funquiz,   0,        funquiz,  funquiz,   driver_device,  0,        ROT0, "Fun World / Oehlinger", "Fun World Quiz (Austrian)",                 0 )
-GAMEL( 1986, novoplay,  0,        fw2ndpal, novoplay,  driver_device,  0,        ROT0, "Admiral/Novomatic",     "Novo Play Multi Card / Club Card",          0,                       layout_novoplay )
-GAME(  1991, intrgmes,  0,        intrgmes, funworld,  driver_device,  0,        ROT0, "Inter Games",           "Unknown Inter Games poker",                 MACHINE_NOT_WORKING )
-GAMEL( 1985, fw_a7_11,  0,        fw_a7_11, funworld,  driver_device,  0,        ROT0, "Fun World",             "Unknown Fun World A7-11 game 1",             MACHINE_NOT_WORKING,     layout_jollycrd )
-GAMEL( 1985, fw_a7_11a, fw_a7_11, fw_a7_11, funworld,  driver_device,  0,        ROT0, "Fun World",             "Unknown Fun World A7-11 game 2",             MACHINE_NOT_WORKING,     layout_jollycrd )
-GAMEL( 1991, fw_a0_1,   0,        fw_a7_11, funworld,  driver_device,  0,        ROT0, "Fun World",             "Unknown Fun World A0-1 game",                MACHINE_NOT_WORKING,     layout_jollycrd )
+GAME(  198?, funquiz,   0,        funquiz,  funquiz,   funworld_state, 0,        ROT0, "Fun World / Oehlinger", "Fun World Quiz (Austrian)",                 0 )
+GAMEL( 1986, novoplay,  0,        fw2ndpal, novoplay,  funworld_state, 0,        ROT0, "Admiral/Novomatic",     "Novo Play Multi Card / Club Card",          0,                       layout_novoplay )
+GAME(  1991, intrgmes,  0,        intrgmes, funworld,  funworld_state, 0,        ROT0, "Inter Games",           "Unknown Inter Games poker",                 MACHINE_NOT_WORKING )
+GAMEL( 1985, fw_a7_11,  0,        fw_a7_11, funworld,  funworld_state, 0,        ROT0, "Fun World",             "Unknown Fun World A7-11 game 1",             MACHINE_NOT_WORKING,     layout_jollycrd )
+GAMEL( 1985, fw_a7_11a, fw_a7_11, fw_a7_11, funworld,  funworld_state, 0,        ROT0, "Fun World",             "Unknown Fun World A7-11 game 2",             MACHINE_NOT_WORKING,     layout_jollycrd )
+GAMEL( 1991, fw_a0_1,   0,        fw_a7_11, funworld,  funworld_state, 0,        ROT0, "Fun World",             "Unknown Fun World A0-1 game",                MACHINE_NOT_WORKING,     layout_jollycrd )
 
 // These are 2-in-1 stealth boards, they can run the Poker game, or, using completely separate hardware on the same PCB, a NES / MSX Multigames!
-GAMEL( 1991, royalcrd_nes,  royalcrd,        royalcd2, royalcrd,  driver_device,  0,        ROT0, "bootleg",     "Royal Card (stealth with NES multigame)",  MACHINE_NOT_WORKING,     layout_jollycrd )
-GAMEL( 1991, royalcrd_msx,  royalcrd,        royalcd2, royalcrd,  driver_device,  0,        ROT0, "bootleg",     "Royal Card (stealth with MSX multigame)",  MACHINE_NOT_WORKING,     layout_jollycrd )
+GAMEL( 1991, royalcrd_nes,  royalcrd,        royalcd2, royalcrd,  funworld_state, 0,        ROT0, "bootleg",     "Royal Card (stealth with NES multigame)",  MACHINE_NOT_WORKING,     layout_jollycrd )
+GAMEL( 1991, royalcrd_msx,  royalcrd,        royalcd2, royalcrd,  funworld_state, 0,        ROT0, "bootleg",     "Royal Card (stealth with MSX multigame)",  MACHINE_NOT_WORKING,     layout_jollycrd )
 

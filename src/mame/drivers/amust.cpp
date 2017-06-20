@@ -82,13 +82,15 @@ ToDo:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "video/mc6845.h"
-#include "machine/upd765.h"
+#include "machine/i8251.h"
+#include "machine/i8255.h"
 #include "machine/keyboard.h"
 #include "machine/pit8253.h"
-#include "machine/i8255.h"
-#include "machine/i8251.h"
+#include "machine/upd765.h"
 #include "sound/beep.h"
+#include "video/mc6845.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class amust_state : public driver_device
@@ -103,6 +105,8 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_palette(*this, "palette")
 		, m_maincpu(*this, "maincpu")
+		, m_p_videoram(*this, "videoram")
+		, m_p_chargen(*this, "chargen")
 		, m_beep(*this, "beeper")
 		, m_fdc (*this, "fdc")
 		, m_floppy0(*this, "fdc:0")
@@ -124,20 +128,21 @@ public:
 	DECLARE_READ8_MEMBER(port0a_r);
 	DECLARE_WRITE8_MEMBER(port0a_w);
 	DECLARE_WRITE8_MEMBER(port0d_w);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	void kbd_put(u8 data);
 	INTERRUPT_GEN_MEMBER(irq_vs);
 	MC6845_UPDATE_ROW(crtc_update_row);
-	uint8_t *m_p_videoram;
-	const uint8_t *m_p_chargen;
-	required_device<palette_device> m_palette;
+
 private:
-	uint8_t m_port04;
-	uint8_t m_port06;
-	uint8_t m_port08;
-	uint8_t m_port0a;
-	uint8_t m_term_data;
+	u8 m_port04;
+	u8 m_port06;
+	u8 m_port08;
+	u8 m_port0a;
+	u8 m_term_data;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	required_device<palette_device> m_palette;
 	required_device<cpu_device> m_maincpu;
+	required_region_ptr<u8> m_p_videoram;
+	required_region_ptr<u8> m_p_chargen;
 	required_device<beep_device> m_beep;
 	required_device<upd765a_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
@@ -213,7 +218,7 @@ INPUT_PORTS_END
 
 READ8_MEMBER( amust_state::port00_r )
 {
-	uint8_t ret = m_term_data;
+	u8 ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
@@ -311,7 +316,7 @@ WRITE8_MEMBER( amust_state::port0d_w )
 	m_p_videoram[video_address] = data;
 }
 
-WRITE8_MEMBER( amust_state::kbd_put )
+void amust_state::kbd_put(u8 data)
 {
 	m_term_data = data;
 }
@@ -337,9 +342,9 @@ GFXDECODE_END
 MC6845_UPDATE_ROW( amust_state::crtc_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint8_t chr,gfx,inv;
-	uint16_t mem,x;
-	uint32_t *p = &bitmap.pix32(y);
+	u8 chr,gfx,inv;
+	u16 mem,x;
+	u32 *p = &bitmap.pix32(y);
 
 	for (x = 0; x < x_count; x++)
 	{
@@ -365,8 +370,6 @@ MC6845_UPDATE_ROW( amust_state::crtc_update_row )
 
 MACHINE_RESET_MEMBER( amust_state, amust )
 {
-	m_p_chargen = memregion("chargen")->base();
-	m_p_videoram = memregion("videoram")->base();
 	membank("bankr0")->set_entry(0); // point at rom
 	membank("bankw0")->set_entry(0); // always write to ram
 	address_space &space = m_maincpu->space(AS_PROGRAM);
@@ -381,14 +384,14 @@ MACHINE_RESET_MEMBER( amust_state, amust )
 
 DRIVER_INIT_MEMBER( amust_state, amust )
 {
-	uint8_t *main = memregion("maincpu")->base();
+	u8 *main = memregion("maincpu")->base();
 
 	membank("bankr0")->configure_entry(1, &main[0xf800]);
 	membank("bankr0")->configure_entry(0, &main[0x10800]);
 	membank("bankw0")->configure_entry(0, &main[0xf800]);
 }
 
-static MACHINE_CONFIG_START( amust, amust_state )
+static MACHINE_CONFIG_START( amust )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_16MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(amust_mem)
@@ -418,7 +421,7 @@ static MACHINE_CONFIG_START( amust, amust_state )
 	MCFG_MC6845_UPDATE_ROW_CB(amust_state, crtc_update_row)
 
 	MCFG_DEVICE_ADD("keybd", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(WRITE8(amust_state, kbd_put))
+	MCFG_GENERIC_KEYBOARD_CB(PUT(amust_state, kbd_put))
 	MCFG_UPD765A_ADD("fdc", false, true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", amust_floppies, "drive0", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
@@ -473,5 +476,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    CLASS          INIT     COMPANY       FULLNAME       FLAGS */
-COMP( 1983, amust,  0,      0,       amust,     amust,   amust_state,   amust,  "Amust", "Amust Executive 816", MACHINE_NOT_WORKING )
+//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    CLASS          INIT     COMPANY  FULLNAME               FLAGS
+COMP( 1983, amust,  0,      0,       amust,     amust,   amust_state,   amust,  "Amust",  "Amust Executive 816", MACHINE_NOT_WORKING )

@@ -85,9 +85,13 @@ Noted added by ClawGrip 28-Mar-2008:
 */
 
 #include "emu.h"
+#include "includes/wc90b.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
-#include "includes/wc90b.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 #define TEST_DIPS false /* enable to test unmapped dip switches */
 
@@ -346,7 +350,7 @@ void wc90b_state::machine_start()
 }
 
 
-static MACHINE_CONFIG_START( wc90b, wc90b_state )
+static MACHINE_CONFIG_START( wc90b )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK)
@@ -388,7 +392,7 @@ static MACHINE_CONFIG_START( wc90b, wc90b_state )
 
 	MCFG_SOUND_ADD("msm", MSM5205, MSM5205_CLOCK)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(wc90b_state, adpcm_int))      /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S96_4B)  /* 4KHz 4-bit */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)  /* 4KHz 4-bit */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
@@ -530,6 +534,6 @@ ROM_START( wc90ba )
 ROM_END
 
 
-GAME( 1989, wc90b1, wc90, wc90b, wc90b, driver_device, 0, ROT0, "bootleg", "Euro League (Italian hack of Tecmo World Cup '90)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, wc90b2, wc90, wc90b, wc90b, driver_device, 0, ROT0, "bootleg", "Worldcup '90", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, wc90ba, wc90, wc90b, wc90b, driver_device, 0, ROT0, "bootleg", "Euro League (Italian hack of Tecmo World Cup '90 - alt version)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wc90b1, wc90, wc90b, wc90b, wc90b_state, 0, ROT0, "bootleg", "Euro League (Italian hack of Tecmo World Cup '90)",               MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wc90b2, wc90, wc90b, wc90b, wc90b_state, 0, ROT0, "bootleg", "Worldcup '90",                                                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wc90ba, wc90, wc90b, wc90b, wc90b_state, 0, ROT0, "bootleg", "Euro League (Italian hack of Tecmo World Cup '90 - alt version)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

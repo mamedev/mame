@@ -222,12 +222,15 @@ Stephh's notes (based on the games M68000 code and some tests) :
 */
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
-#include "sound/okim6295.h"
 #include "sound/3812intf.h"
+#include "sound/okim6295.h"
 #include "video/decospr.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 class nmg5_state : public driver_device
 {
@@ -971,7 +974,7 @@ void nmg5_state::machine_reset()
 	m_input_data = 0;
 }
 
-static MACHINE_CONFIG_START( nmg5, nmg5_state )
+static MACHINE_CONFIG_START( nmg5 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
@@ -1013,7 +1016,7 @@ static MACHINE_CONFIG_START( nmg5, nmg5_state )
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", 1000000 , OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", 1000000 , PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1445,7 +1448,7 @@ ROM_START( wondstcka )
 	ROM_LOAD( "3.u80", 0x380000, 0x80000, CRC(553c5781) SHA1(d5f694f6a50f51c80845a15e58d263fa629c3522) )
 
 	ROM_REGION( 0x280000, "gfx2", 0 )   /* 16x16x5 */
-	ROM_LOAD( "8.u83 ",  0x000000, 0x80000, CRC(f51cf9c6) SHA1(6d0fc749bab918ff6a9d7fae8be7c65823349283) )
+	ROM_LOAD( "8.u83",   0x000000, 0x80000, CRC(f51cf9c6) SHA1(6d0fc749bab918ff6a9d7fae8be7c65823349283) )
 //  ROM_LOAD( "9.u82",   0x080000, 0x80000, CRC(8c6cff4d) SHA1(5a217ff60f10bf5c58091c189b3509d1361a16b3) ) // bad dump
 	ROM_LOAD( "9.u82",   0x080000, 0x80000, CRC(ddd3c60c) SHA1(19b68a44c877d0bf630d07b18541ef9636f5adac) )
 	ROM_LOAD( "7.u105",  0x100000, 0x80000, CRC(a7fc624d) SHA1(b336ab6e16555db30f9366bf5b797b5ba3ea767c) )

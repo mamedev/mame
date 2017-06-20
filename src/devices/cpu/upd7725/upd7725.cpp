@@ -21,14 +21,15 @@
 //**************************************************************************
 
 // device type definition
-const device_type UPD7725 = &device_creator<upd7725_device>;
-const device_type UPD96050 = &device_creator<upd96050_device>;
+DEFINE_DEVICE_TYPE(UPD7725,  upd7725_device,  "upd7725",  "uPD7725")
+DEFINE_DEVICE_TYPE(UPD96050, upd96050_device, "upd96050", "uPD96050")
 
-necdsp_device::necdsp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t abits, uint32_t dbits, const char *name, const char *shortname, const char *source)
-	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
+necdsp_device::necdsp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t abits, uint32_t dbits)
+	: cpu_device(mconfig, type, tag, owner, clock),
 		m_program_config("program", ENDIANNESS_BIG, 32, abits, -2), // data bus width, address bus width, -2 means DWORD-addressable
 		m_data_config("data", ENDIANNESS_BIG, 16, dbits, -1), m_icount(0),   // -1 for WORD-addressable
 		m_irq(0),
+		m_irq_firing(0),
 		m_program(nullptr),
 		m_data(nullptr),
 		m_direct(nullptr),
@@ -48,12 +49,12 @@ necdsp_device::necdsp_device(const machine_config &mconfig, device_type type, co
 
 
 upd7725_device::upd7725_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: necdsp_device(mconfig, UPD7725, tag, owner, clock, 11, 11, "uPD7725", "upd7725", __FILE__)
+	: necdsp_device(mconfig, UPD7725, tag, owner, clock, 11, 11)
 {
 }
 
 upd96050_device::upd96050_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: necdsp_device(mconfig, UPD96050, tag, owner, clock, 14, 12, "uPD96050", "upd96050", __FILE__)
+	: necdsp_device(mconfig, UPD96050, tag, owner, clock, 14, 12)
 {
 }
 
@@ -112,11 +113,30 @@ void necdsp_device::device_start()
 	save_item(NAME(regs.n));
 	save_item(NAME(regs.a));
 	save_item(NAME(regs.b));
+	save_item(NAME(regs.flaga.s1));
+	save_item(NAME(regs.flaga.s0));
+	save_item(NAME(regs.flaga.c));
+	save_item(NAME(regs.flaga.z));
+	save_item(NAME(regs.flaga.ov1));
+	save_item(NAME(regs.flaga.ov0));
+	save_item(NAME(regs.flaga.ov0p));
+	save_item(NAME(regs.flaga.ov0pp));
+	save_item(NAME(regs.flagb.s1));
+	save_item(NAME(regs.flagb.s0));
+	save_item(NAME(regs.flagb.c));
+	save_item(NAME(regs.flagb.z));
+	save_item(NAME(regs.flagb.ov1));
+	save_item(NAME(regs.flagb.ov0));
+	save_item(NAME(regs.flagb.ov0p));
+	save_item(NAME(regs.flagb.ov0pp));
 	save_item(NAME(regs.tr));
 	save_item(NAME(regs.trb));
 	save_item(NAME(regs.dr));
+	save_item(NAME(regs.si));
 	save_item(NAME(regs.so));
 	save_item(NAME(regs.idb));
+	save_item(NAME(regs.siack));
+	save_item(NAME(regs.soack));
 	save_item(NAME(regs.sr.rqm));
 	save_item(NAME(regs.sr.usf0));
 	save_item(NAME(regs.sr.usf1));
@@ -130,22 +150,17 @@ void necdsp_device::device_start()
 	save_item(NAME(regs.sr.p1));
 	save_item(NAME(regs.stack));
 	save_item(NAME(dataRAM));
+	save_item(NAME(m_irq));
+	save_item(NAME(m_irq_firing));
 
 	m_icountptr = &m_icount;
-}
 
-//-------------------------------------------------
-//  device_reset - reset the device
-//-------------------------------------------------
-
-void necdsp_device::device_reset()
-{
 	for (auto & elem : dataRAM)
 	{
 		elem = 0x0000;
 	}
-
-	regs.pc = 0x0000;
+	// reset registers not reset by the /RESET line (according to section 3.6.1 on the upd7725 advanced production datasheet)
+	m_irq = 0; // not a register, but the current irq pin state
 	regs.rp = 0x0000;
 	regs.dp = 0x0000;
 	regs.sp = 0x0;
@@ -155,15 +170,34 @@ void necdsp_device::device_reset()
 	regs.n = 0x0000;
 	regs.a = 0x0000;
 	regs.b = 0x0000;
-	regs.flaga = 0x00;
-	regs.flagb = 0x00;
 	regs.tr = 0x0000;
 	regs.trb = 0x0000;
-	regs.sr = 0x0000;
 	regs.dr = 0x0000;
 	regs.si = 0x0000;
 	regs.so = 0x0000;
 	regs.idb = 0x0000;
+}
+
+//-------------------------------------------------
+//  device_reset - reset the device
+//-------------------------------------------------
+
+void necdsp_device::device_reset()
+{
+	// according to 3.6.1 on the upd7725 advanced production datasheet, /RESET resets the following only:
+	regs.pc = 0x0000;
+	regs.sr = 0x0000;
+	m_out_p0_cb(regs.sr.p0);
+	m_out_p1_cb(regs.sr.p1);
+	// TODO: drq callback, once added, should be forced to the inactive state here
+	// TODO: the sorq pin state is also reset to 'low' state
+	regs.flaga = 0x00;
+	regs.flagb = 0x00;
+	regs.siack = 0;
+	regs.soack = 0;
+
+	// the irq state (if mid-irq) is assumed to also be reset, since the pulse width of reset must be more than 4 opcode clocks
+	m_irq_firing = 0;
 }
 
 //-------------------------------------------------
@@ -174,7 +208,9 @@ void necdsp_device::device_reset()
 
 const address_space_config *necdsp_device::memory_space_config(address_spacenum spacenum) const
 {
-	return (spacenum == AS_PROGRAM) ? &m_program_config : &m_data_config;
+	return  (spacenum == AS_PROGRAM) ? &m_program_config :
+		(spacenum == AS_DATA) ? &m_data_config :
+		nullptr;
 }
 
 
@@ -275,8 +311,12 @@ void necdsp_device::execute_set_input(int inputnum, int state)
 	switch (inputnum)
 	{
 	case NECDSP_INPUT_LINE_INT:
-		//TODO: detect rising edge; if rising edge found AND IE = 1, push PC, pc = 0x100; else do nothing
-		m_irq = state; // set old state to current state
+		if ((!m_irq && (CLEAR_LINE != state)) && regs.sr.ei) // detect rising edge AND if EI == 1;
+		{
+			m_irq_firing = 1;
+			regs.sr.ei = 0;
+		}
+		m_irq = (ASSERT_LINE == state); // set old state to current state
 		break;
 	// add more when needed
 	}
@@ -326,8 +366,26 @@ void necdsp_device::execute_run()
 			debugger_instruction_hook(this, regs.pc);
 		}
 
-		opcode = m_direct->read_dword(regs.pc<<2)>>8;
-		regs.pc++;
+		if (m_irq_firing == 0) // normal opcode
+		{
+			opcode = m_direct->read_dword(regs.pc<<2)>>8;
+			regs.pc++;
+		}
+		else if (m_irq_firing == 1) // if we're in an interrupt cycle, execute a op 'nop' first...
+		{
+			// NOP: OP  PSEL ALU  ASL DPL DPHM   RPDCR SRC  DST
+			//      00  00   0000 0   00  000(0) 0     0000 0000
+			opcode = 0x000000;
+			m_irq_firing = 2;
+		}
+		else // m_irq_firing == 2 // ...then a call to 100
+		{
+			// LCALL: JP BRCH      NA          BNK(all 0s on 7725)
+			//        10 101000000 00100000000 00
+			opcode = 0xA80400;
+			m_irq_firing = 0;
+		}
+
 		switch(opcode >> 22)
 		{
 			case 0: exec_op(opcode); break;
@@ -367,8 +425,8 @@ void necdsp_device::exec_op(uint32_t opcode) {
 	case  8: regs.idb = regs.dr; regs.sr.rqm = 1; break;
 	case  9: regs.idb = regs.dr; break;
 	case 10: regs.idb = regs.sr; break;
-	case 11: regs.idb = regs.si; break;  //MSB
-	case 12: regs.idb = regs.si; break;  //LSB
+	case 11: regs.idb = regs.si; break;  //MSB = first bit in from serial, 'natural' SI register order
+	case 12: regs.idb = BITSWAP16(regs.si, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15); break;  //LSB = first bit in from serial, 'reversed' SI register order
 	case 13: regs.idb = regs.k; break;
 	case 14: regs.idb = regs.l; break;
 	case 15: regs.idb = dataRAM[regs.dp]; break;
@@ -526,6 +584,11 @@ void necdsp_device::exec_jp(uint32_t opcode) {
 		case 0x0b2: if((regs.dp & 0x0f) == 0x0f) regs.pc = jps; return;  //JDPLF
 		case 0x0b3: if((regs.dp & 0x0f) != 0x0f) regs.pc = jps; return;  //JDPLNF
 
+		case 0x0b4: if(regs.siack == 0) regs.pc = jps; return;  //JNSIAK
+		case 0x0b6: if(regs.siack == 1) regs.pc = jps; return;  //JSIAK
+		case 0x0b8: if(regs.soack == 0) regs.pc = jps; return;  //JNSOAK
+		case 0x0ba: if(regs.soack == 1) regs.pc = jps; return;  //JSOAK
+
 		case 0x0bc: if(regs.sr.rqm == 0) regs.pc = jps; return;  //JNRQM
 		case 0x0be: if(regs.sr.rqm == 1) regs.pc = jps; return;  //JRQM
 
@@ -552,11 +615,11 @@ void necdsp_device::exec_ld(uint32_t opcode) {
 	case  5: regs.rp = id; break;
 	case  6: regs.dr = id; regs.sr.rqm = 1; break;
 	case  7: regs.sr = (regs.sr & 0x907c) | (id & ~0x907c);
-				m_out_p0_cb(regs.sr&0x1);
-				m_out_p1_cb((regs.sr&0x2)>>1);
+				m_out_p0_cb(regs.sr.p0);
+				m_out_p1_cb(regs.sr.p1);
 				break;
-	case  8: regs.so = id; break;  //LSB
-	case  9: regs.so = id; break;  //MSB
+	case  8: regs.so = BITSWAP16(id, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15); break;  //LSB first output, output tapped at bit 15 shifting left
+	case  9: regs.so = id; break;  //MSB first output, output tapped at bit 15 shifting left
 	case 10: regs.k = id; break;
 	case 11: regs.k = id; regs.l = m_data->read_word(regs.rp<<1); break;
 	case 12: regs.l = id; regs.k = dataRAM[regs.dp | 0x40]; break;

@@ -138,10 +138,13 @@ Stephh's notes (based on the games M68000 code and some tests) :
 ******************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/m68000/m68000.h"
-#include "sound/2610intf.h"
 #include "includes/mcatadv.h"
+
+#include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
+#include "sound/2610intf.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /*** Main CPU ***/
@@ -425,7 +428,7 @@ void mcatadv_state::machine_start()
 	save_item(NAME(m_palette_bank2));
 }
 
-static MACHINE_CONFIG_START( mcatadv, mcatadv_state )
+static MACHINE_CONFIG_START( mcatadv )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz) /* verified on pcb */
@@ -444,7 +447,7 @@ static MACHINE_CONFIG_START( mcatadv, mcatadv_state )
 	MCFG_SCREEN_SIZE(320, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mcatadv_state, screen_update_mcatadv)
-	MCFG_SCREEN_VBLANK_DRIVER(mcatadv_state, screen_eof_mcatadv)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(mcatadv_state, screen_vblank_mcatadv))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mcatadv)
@@ -665,9 +668,9 @@ ROM_START( nostk )
 ROM_END
 
 
-GAME( 1993, mcatadv,  0,       mcatadv, mcatadv, driver_device, 0, ROT0,   "Wintechno", "Magical Cat Adventure", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, mcatadvj, mcatadv, mcatadv, mcatadv, driver_device, 0, ROT0,   "Wintechno", "Magical Cat Adventure (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, catt,     mcatadv, mcatadv, mcatadv, driver_device, 0, ROT0,   "Wintechno", "Catt (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, nost,     0,       nost,    nost, driver_device,    0, ROT270, "Face",      "Nostradamus", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, nostj,    nost,    nost,    nost, driver_device,    0, ROT270, "Face",      "Nostradamus (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, nostk,    nost,    nost,    nost, driver_device,    0, ROT270, "Face",      "Nostradamus (Korea)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, mcatadv,  0,       mcatadv, mcatadv, mcatadv_state, 0, ROT0,   "Wintechno", "Magical Cat Adventure",         MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, mcatadvj, mcatadv, mcatadv, mcatadv, mcatadv_state, 0, ROT0,   "Wintechno", "Magical Cat Adventure (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, catt,     mcatadv, mcatadv, mcatadv, mcatadv_state, 0, ROT0,   "Wintechno", "Catt (Japan)",                  MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, nost,     0,       nost,    nost,    mcatadv_state, 0, ROT270, "Face",      "Nostradamus",                   MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, nostj,    nost,    nost,    nost,    mcatadv_state, 0, ROT270, "Face",      "Nostradamus (Japan)",           MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, nostk,    nost,    nost,    nost,    mcatadv_state, 0, ROT270, "Face",      "Nostradamus (Korea)",           MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

@@ -144,6 +144,7 @@ tc3 = TestClass03(tc1)
 	TestClass01& tc1 = lua["tc1"];
 	TestClass02& tc2 = lua["tc2"];
 	TestClass03& tc3 = lua["tc3"];
+	REQUIRE(tc0.Thing() == 123);
 	REQUIRE(tc1.a == 1);
 	REQUIRE(tc2.a == 1);
 	REQUIRE(tc2.b == 123);

@@ -2,6 +2,7 @@
 // copyright-holders:Nicola Salmoria
 #include "emu.h"
 #include "includes/aerofgt.h"
+#include "screen.h"
 
 /***************************************************************************
 
@@ -84,6 +85,7 @@ void aerofgt_state::aerofgt_register_state_globals(  )
 	save_item(NAME(m_bg1scrolly));
 	save_item(NAME(m_bg2scrollx));
 	save_item(NAME(m_bg2scrolly));
+	save_item(NAME(m_flip_screen));
 	save_item(NAME(m_charpalettebank));
 	save_item(NAME(m_spritepalettebank));
 }
@@ -194,32 +196,22 @@ void aerofgt_state::setbank( tilemap_t *tmap, int num, int bank )
 	}
 }
 
-WRITE16_MEMBER(aerofgt_state::pspikes_gfxbank_w)
+WRITE8_MEMBER(aerofgt_state::pspikes_gfxbank_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		setbank(m_bg1_tilemap, 0, (data & 0xf0) >> 4);
-		setbank(m_bg1_tilemap, 1, data & 0x0f);
-	}
+	setbank(m_bg1_tilemap, 0, (data & 0xf0) >> 4);
+	setbank(m_bg1_tilemap, 1, data & 0x0f);
 }
 
-
-WRITE16_MEMBER(aerofgt_state::karatblz_gfxbank_w)
+WRITE8_MEMBER(aerofgt_state::karatblz_gfxbank_w)
 {
-	if (ACCESSING_BITS_8_15)
-	{
-		setbank(m_bg1_tilemap, 0, (data & 0x0100) >> 8);
-		setbank(m_bg2_tilemap, 1, (data & 0x0800) >> 11);
-	}
+	setbank(m_bg1_tilemap, 0, (data & 0x01));
+	setbank(m_bg2_tilemap, 1, (data & 0x08) >> 3);
 }
 
-WRITE16_MEMBER(aerofgt_state::spinlbrk_gfxbank_w)
+WRITE8_MEMBER(aerofgt_state::spinlbrk_gfxbank_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		setbank(m_bg1_tilemap, 0, (data & 0x07));
-		setbank(m_bg2_tilemap, 1, (data & 0x38) >> 3);
-	}
+	setbank(m_bg1_tilemap, 0, (data & 0x07));
+	setbank(m_bg2_tilemap, 1, (data & 0x38) >> 3);
 }
 
 WRITE16_MEMBER(aerofgt_state::turbofrc_gfxbank_w)
@@ -264,17 +256,33 @@ WRITE16_MEMBER(aerofgt_state::aerofgt_bg2scrolly_w)
 	COMBINE_DATA(&m_bg2scrolly);
 }
 
-WRITE16_MEMBER(aerofgt_state::pspikes_palette_bank_w)
+WRITE8_MEMBER(aerofgt_state::pspikes_palette_bank_w)
 {
-	if (ACCESSING_BITS_0_7)
+	m_spritepalettebank = data & 0x03;
+	if (m_charpalettebank != (data & 0x1c) >> 2)
 	{
-		m_spritepalettebank = data & 0x03;
-		if (m_charpalettebank != (data & 0x1c) >> 2)
-		{
-			m_charpalettebank = (data & 0x1c) >> 2;
-			m_bg1_tilemap->mark_all_dirty();
-		}
+		m_charpalettebank = (data & 0x1c) >> 2;
+		m_bg1_tilemap->mark_all_dirty();
 	}
+
+	m_flip_screen = BIT(data, 7);
+	m_bg1_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+}
+
+WRITE8_MEMBER(aerofgt_state::spinlbrk_flip_screen_w)
+{
+	m_flip_screen = BIT(data, 7);
+	m_bg1_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	m_bg2_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+}
+
+WRITE8_MEMBER(aerofgt_state::turbofrc_flip_screen_w)
+{
+	m_flip_screen = BIT(data, 7);
+	m_bg1_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	m_bg2_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+
+	// bit 6 = ?
 }
 
 
@@ -298,8 +306,8 @@ uint32_t aerofgt_state::screen_update_pspikes(screen_device &screen, bitmap_ind1
 	screen.priority().fill(0, cliprect);
 
 	m_bg1_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	m_spr_old->turbofrc_draw_sprites(m_spriteram3,m_spriteram3.bytes(),m_spritepalettebank, bitmap, cliprect, screen.priority(), 1);
-	m_spr_old->turbofrc_draw_sprites(m_spriteram3,m_spriteram3.bytes(),m_spritepalettebank, bitmap, cliprect, screen.priority(), 0);
+	m_spr_old->turbofrc_draw_sprites(m_spriteram3,m_spriteram3.bytes(),m_spritepalettebank, bitmap, cliprect, screen.priority(), 1, m_flip_screen);
+	m_spr_old->turbofrc_draw_sprites(m_spriteram3,m_spriteram3.bytes(),m_spritepalettebank, bitmap, cliprect, screen.priority(), 0, m_flip_screen);
 	return 0;
 }
 
@@ -317,11 +325,11 @@ uint32_t aerofgt_state::screen_update_karatblz(screen_device &screen, bitmap_ind
 	m_bg2_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	/* we use the priority buffer so sprites are drawn front to back */
-	m_spr_old2->turbofrc_draw_sprites(m_spriteram3+0x200,m_spriteram3.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 1);
-	m_spr_old2->turbofrc_draw_sprites(m_spriteram3+0x200,m_spriteram3.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 0);
+	m_spr_old2->turbofrc_draw_sprites(m_spriteram3+0x200,m_spriteram3.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 1, m_flip_screen);
+	m_spr_old2->turbofrc_draw_sprites(m_spriteram3+0x200,m_spriteram3.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 0, m_flip_screen);
 
-	m_spr_old->turbofrc_draw_sprites(m_spriteram3+0x000,m_spriteram3.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 1);
-	m_spr_old->turbofrc_draw_sprites(m_spriteram3+0x000,m_spriteram3.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 0);
+	m_spr_old->turbofrc_draw_sprites(m_spriteram3+0x000,m_spriteram3.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 1, m_flip_screen);
+	m_spr_old->turbofrc_draw_sprites(m_spriteram3+0x000,m_spriteram3.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 0, m_flip_screen);
 	return 0;
 }
 
@@ -343,11 +351,11 @@ uint32_t aerofgt_state::screen_update_spinlbrk(screen_device &screen, bitmap_ind
 	m_bg2_tilemap->draw(screen, bitmap, cliprect, 0, 1);
 
 	/* we use the priority buffer so sprites are drawn front to back */
-	m_spr_old->turbofrc_draw_sprites(m_spriteram3+0x000,m_spriteram3.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 0);
-	m_spr_old->turbofrc_draw_sprites(m_spriteram3+0x000,m_spriteram3.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 1);
+	m_spr_old->turbofrc_draw_sprites(m_spriteram3+0x000,m_spriteram3.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 0, m_flip_screen);
+	m_spr_old->turbofrc_draw_sprites(m_spriteram3+0x000,m_spriteram3.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 1, m_flip_screen);
 
-	m_spr_old2->turbofrc_draw_sprites(m_spriteram3+0x200,m_spriteram3.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 0);
-	m_spr_old2->turbofrc_draw_sprites(m_spriteram3+0x200,m_spriteram3.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 1);
+	m_spr_old2->turbofrc_draw_sprites(m_spriteram3+0x200,m_spriteram3.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 0, m_flip_screen);
+	m_spr_old2->turbofrc_draw_sprites(m_spriteram3+0x200,m_spriteram3.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 1, m_flip_screen);
 	return 0;
 }
 
@@ -359,10 +367,10 @@ uint32_t aerofgt_state::screen_update_turbofrc(screen_device &screen, bitmap_ind
 	scrolly = m_bg1scrolly + 2;
 	for (i = 0; i < 256; i++)
 //      m_bg1_tilemap->set_scrollx((i + scrolly) & 0x1ff, m_rasterram[i] - 11);
-		m_bg1_tilemap->set_scrollx((i + scrolly) & 0x1ff, m_rasterram[7] - 11);
-	m_bg1_tilemap->set_scrolly(0, scrolly);
-	m_bg2_tilemap->set_scrollx(0, m_bg2scrollx - 7);
-	m_bg2_tilemap->set_scrolly(0, m_bg2scrolly + 2);
+		m_bg1_tilemap->set_scrollx((i + scrolly) & 0x1ff, m_rasterram[7] - 11 - (m_flip_screen ? 188 : 0));
+	m_bg1_tilemap->set_scrolly(0, scrolly - (m_flip_screen ? 2 : 0));
+	m_bg2_tilemap->set_scrollx(0, m_bg2scrollx - (m_flip_screen ? 185 : 7));
+	m_bg2_tilemap->set_scrolly(0, m_bg2scrolly + (m_flip_screen ? 0 : 2));
 
 	screen.priority().fill(0, cliprect);
 
@@ -370,11 +378,11 @@ uint32_t aerofgt_state::screen_update_turbofrc(screen_device &screen, bitmap_ind
 	m_bg2_tilemap->draw(screen, bitmap, cliprect, 0, 1);
 
 	/* we use the priority buffer so sprites are drawn front to back */
-	m_spr_old2->turbofrc_draw_sprites(m_spriteram3+0x200,m_spriteram3.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 1); //ship
-	m_spr_old2->turbofrc_draw_sprites(m_spriteram3+0x200,m_spriteram3.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 0); //intro
+	m_spr_old2->turbofrc_draw_sprites(m_spriteram3+0x200,m_spriteram3.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 1, m_flip_screen); //ship
+	m_spr_old2->turbofrc_draw_sprites(m_spriteram3+0x200,m_spriteram3.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 0, m_flip_screen); //intro
 
-	m_spr_old->turbofrc_draw_sprites(m_spriteram3+0x000,m_spriteram3.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 1); //enemy
-	m_spr_old->turbofrc_draw_sprites(m_spriteram3+0x000,m_spriteram3.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 0); //enemy
+	m_spr_old->turbofrc_draw_sprites(m_spriteram3+0x000,m_spriteram3.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 1, m_flip_screen); //enemy
+	m_spr_old->turbofrc_draw_sprites(m_spriteram3+0x000,m_spriteram3.bytes()/2,m_spritepalettebank, bitmap, cliprect, screen.priority(), 0, m_flip_screen); //enemy
 	return 0;
 }
 
@@ -836,7 +844,7 @@ uint32_t aerofgt_state::screen_update_wbbc97(screen_device &screen, bitmap_rgb32
 		m_bg1_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 	}
 
-	m_spr_old->turbofrc_draw_sprites(m_spriteram3,m_spriteram3.bytes(),m_spritepalettebank, bitmap, cliprect, screen.priority(), 1);
-	m_spr_old->turbofrc_draw_sprites(m_spriteram3,m_spriteram3.bytes(),m_spritepalettebank, bitmap, cliprect, screen.priority(), 0);
+	m_spr_old->turbofrc_draw_sprites(m_spriteram3,m_spriteram3.bytes(),m_spritepalettebank, bitmap, cliprect, screen.priority(), 1, m_flip_screen);
+	m_spr_old->turbofrc_draw_sprites(m_spriteram3,m_spriteram3.bytes(),m_spritepalettebank, bitmap, cliprect, screen.priority(), 0, m_flip_screen);
 	return 0;
 }

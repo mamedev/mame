@@ -7,15 +7,10 @@
     Speaker output sound device.
 
 ***************************************************************************/
-
-#pragma once
-
-#ifndef __EMU_H__
-#error Dont include this file directly; include emu.h instead.
-#endif
-
 #ifndef MAME_EMU_SPEAKER_H
 #define MAME_EMU_SPEAKER_H
+
+#pragma once
 
 
 //**************************************************************************
@@ -23,7 +18,7 @@
 //**************************************************************************
 
 // device type definition
-extern const device_type SPEAKER;
+DECLARE_DEVICE_TYPE(SPEAKER, speaker_device)
 
 
 
@@ -50,11 +45,8 @@ extern const device_type SPEAKER;
 
 // ======================> speaker_device
 
-class speaker_device : public device_t,
-						public device_mixer_interface
+class speaker_device : public device_t, public device_mixer_interface
 {
-	friend resource_pool_object<speaker_device>::~resource_pool_object();
-
 public:
 	// construction/destruction
 	speaker_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
@@ -85,7 +77,7 @@ protected:
 
 
 // speaker device iterator
-typedef device_type_iterator<&device_creator<speaker_device>, speaker_device> speaker_device_iterator;
+typedef device_type_iterator<speaker_device> speaker_device_iterator;
 
 
 #endif  /* MAME_EMU_SPEAKER_H */

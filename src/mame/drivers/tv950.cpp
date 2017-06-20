@@ -35,11 +35,12 @@
 ****************************************************************************/
 
 #include "emu.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/m6502/m6502.h"
-#include "video/mc6845.h"
 #include "machine/6522via.h"
 #include "machine/mos6551.h"
-#include "bus/rs232/rs232.h"
+#include "video/mc6845.h"
+#include "screen.h"
 
 #define ACIA1_TAG   "acia1"
 #define ACIA2_TAG   "acia2"
@@ -265,7 +266,7 @@ MC6845_UPDATE_ROW( tv950_state::crtc_update_row )
 	m_row = (m_row + 1) % 250;
 }
 
-static MACHINE_CONFIG_START( tv950, tv950_state )
+static MACHINE_CONFIG_START( tv950 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK/14)
 	MCFG_CPU_PROGRAM_MAP(tv950_mem)
@@ -317,5 +318,5 @@ ROM_START( tv950 )
 ROM_END
 
 /* Driver */
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE         INIT    COMPANY    FULLNAME       FLAGS */
-COMP( 1981, tv950,  0,      0,       tv950,     tv950, driver_device,  0,  "TeleVideo", "TV950", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE        INIT  COMPANY      FULLNAME  FLAGS
+COMP( 1981, tv950,  0,      0,      tv950,   tv950, tv950_state, 0,    "TeleVideo", "TV950",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

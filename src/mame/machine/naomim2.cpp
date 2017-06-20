@@ -11,10 +11,10 @@ Naomi cartridge type M2/3 mapping
 
 NAOMI_ROM_OFFSET bit29: ROM size/mapping selection, 0 - 4MB ROM mode, 1 - 8MB ROM mode
 
-bit28: Bank selection.
-    in the case of flash-based 171-7885A ROM boards two of them can be stacked at once
-    onto main board. each must be configured as Bank 0 or 1 via some (currently unknown) jumper.
-    this bit selects which one ROM board will be accessed.
+bit28: master/slave ROM board select.
+  flash-based 171-7885A ROM board JP4 select master (access at 0xxxxxxx) or slave (access at 1xxxxxxx) mode.
+  then set to slave it can be stacked with another type M2/3 ROM board.
+  this bit selects which one ROM board will be accessed.
 
 note: if ROM is not mounted its area readed as 0xFF
 
@@ -52,8 +52,8 @@ note: if ROM is not mounted its area readed as 0xFF
 |0D000000 |                   |                      | 6N MA13 (16MB)                                    |
 |0E000000 |                   |                      | 6M MA14 (16MB)                                    |
 |0F000000 |                   |                      | 6L MA15 (16MB)                                    |
-|10000000 |                   |                      | 6K MA16 (16MB)                                    |
-|11000000 |                   |                      | 6J MA17 (16MB)                                    |
+|10000000 | Slave ROM board   | Slave ROM board      | 6K MA16 (16MB)                                    |
+|11000000 | area              | area                 | 6J MA17 (16MB)                                    |
 |12000000 |                   |                      | 6H MA18 (16MB)                                    |
 |13000000 |                   |                      | 6F MA19 (16MB)                                    |
 |14000000 |                   |                      | 6E MA20 (16MB)                                    |
@@ -104,17 +104,17 @@ note: if ROM is not mounted its area readed as 0xFF
 +---------+-------------------+---------------------+----------------------------------------------------+
 |08000000 | mirror    (128MB) | mirror      (128MB) | mirror         (128MB)                             |
 +---------+-------------------+---------------------+----------------------------------------------------+
-|10000000 | FF filled (256MB) | FF filled   (256MB) | FF filled      (256MB) (or MA16-23 in 4MB mode?)   |
+|10000000 | slave ROM board   | slave ROM board     | FF filled      (256MB) (or MA16-23 in 4MB mode?)   |
 +---------+-------------------+---------------------+----------------------------------------------------+
 
 ********************************************************************************************************/
 
-const device_type NAOMI_M2_BOARD = &device_creator<naomi_m2_board>;
+DEFINE_DEVICE_TYPE(NAOMI_M2_BOARD, naomi_m2_board, "naomi_m2_board", "Sega NAOMI M2 Board")
 
 naomi_m2_board::naomi_m2_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: naomi_board(mconfig, NAOMI_M2_BOARD, "Sega NAOMI M2 Board", tag, owner, clock, "naomi_m2_board", __FILE__),
-	m_cryptdevice(*this, "segam2crypt"),
-	m_region(*this, DEVICE_SELF)
+	: naomi_board(mconfig, NAOMI_M2_BOARD, tag, owner, clock)
+	, m_cryptdevice(*this, "segam2crypt")
+	, m_region(*this, DEVICE_SELF)
 {
 }
 
@@ -200,12 +200,7 @@ uint16_t naomi_m2_board::read_callback(uint32_t addr)
 	}
 }
 
-static MACHINE_CONFIG_FRAGMENT( naomim2 )
+MACHINE_CONFIG_MEMBER( naomi_m2_board::device_add_mconfig )
 	MCFG_DEVICE_ADD("segam2crypt", SEGA315_5881_CRYPT, 0)
 	MCFG_SET_READ_CALLBACK(naomi_m2_board, read_callback)
 MACHINE_CONFIG_END
-
-machine_config_constructor naomi_m2_board::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( naomim2 );
-}

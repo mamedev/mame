@@ -105,12 +105,15 @@ Known Issues
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/gijoe.h"
+#include "includes/konamipt.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
 #include "sound/k054539.h"
-#include "includes/konamipt.h"
-#include "includes/gijoe.h"
+#include "speaker.h"
+
 
 #define JOE_DEBUG 0
 #define JOE_DMADELAY (attotime::from_nsec(42700 + 341300))
@@ -189,23 +192,9 @@ INTERRUPT_GEN_MEMBER(gijoe_state::gijoe_interrupt)
 		device.execute().set_input_line(5, HOLD_LINE);
 }
 
-WRITE16_MEMBER(gijoe_state::sound_cmd_w)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		data &= 0xff;
-		m_soundlatch->write(space, 0, data);
-	}
-}
-
 WRITE16_MEMBER(gijoe_state::sound_irq_w)
 {
 	m_audiocpu->set_input_line(0, HOLD_LINE);
-}
-
-READ16_MEMBER(gijoe_state::sound_status_r)
-{
-	return m_soundlatch2->read(space, 0);
 }
 
 static ADDRESS_MAP_START( gijoe_map, AS_PROGRAM, 16, gijoe_state )
@@ -221,9 +210,7 @@ static ADDRESS_MAP_START( gijoe_map, AS_PROGRAM, 16, gijoe_state )
 	AM_RANGE(0x190000, 0x190fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x1a0000, 0x1a001f) AM_DEVWRITE("k053251", k053251_device, lsb_w)
 	AM_RANGE(0x1b0000, 0x1b003f) AM_DEVWRITE("k056832", k056832_device, word_w)
-	AM_RANGE(0x1c000c, 0x1c000d) AM_WRITE(sound_cmd_w)
-	AM_RANGE(0x1c0014, 0x1c0015) AM_READ(sound_status_r)
-	AM_RANGE(0x1c0000, 0x1c001f) AM_RAM
+	AM_RANGE(0x1c0000, 0x1c001f) AM_DEVICE8("k054321", k054321_device, main_map, 0x00ff)
 	AM_RANGE(0x1d0000, 0x1d0001) AM_WRITE(sound_irq_w)
 	AM_RANGE(0x1e0000, 0x1e0001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x1e0002, 0x1e0003) AM_READ_PORT("P3_P4")
@@ -242,9 +229,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, gijoe_state )
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xfa2f) AM_DEVREADWRITE("k054539", k054539_device, read, write)
-	AM_RANGE(0xfc00, 0xfc00) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
-	AM_RANGE(0xfc02, 0xfc02) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x0000, 0xffff) AM_ROM
+	AM_RANGE(0xfc00, 0xfc03) AM_DEVICE("k054321", k054321_device, sound_map)
+	AM_RANGE(0x0000, 0xefff) AM_ROM
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( gijoe )
@@ -303,7 +289,7 @@ void gijoe_state::machine_reset()
 	m_cur_control2 = 0;
 }
 
-static MACHINE_CONFIG_START( gijoe, gijoe_state )
+static MACHINE_CONFIG_START( gijoe )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)   /* 16MHz Confirmed */
@@ -344,8 +330,7 @@ static MACHINE_CONFIG_START( gijoe, gijoe_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	MCFG_K054321_ADD("k054321", ":lspeaker", ":rspeaker")
 
 	MCFG_DEVICE_ADD("k054539", K054539, XTAL_18_432MHz)
 	MCFG_K054539_TIMER_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
@@ -469,7 +454,7 @@ ROM_START( gijoej )
 ROM_END
 
 
-GAME( 1992, gijoe,  0,     gijoe, gijoe, driver_device, 0, ROT0, "Konami", "G.I. Joe (World, EAB, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, gijoea, gijoe, gijoe, gijoe, driver_device, 0, ROT0, "Konami", "G.I. Joe (World, EB8, prototype?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, gijoeu, gijoe, gijoe, gijoe, driver_device, 0, ROT0, "Konami", "G.I. Joe (US, UAB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, gijoej, gijoe, gijoe, gijoe, driver_device, 0, ROT0, "Konami", "G.I. Joe (Japan, JAA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, gijoe,  0,     gijoe, gijoe, gijoe_state, 0, ROT0, "Konami", "G.I. Joe (World, EAB, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, gijoea, gijoe, gijoe, gijoe, gijoe_state, 0, ROT0, "Konami", "G.I. Joe (World, EB8, prototype?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, gijoeu, gijoe, gijoe, gijoe, gijoe_state, 0, ROT0, "Konami", "G.I. Joe (US, UAB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, gijoej, gijoe, gijoe, gijoe, gijoe_state, 0, ROT0, "Konami", "G.I. Joe (Japan, JAA)", MACHINE_SUPPORTS_SAVE )

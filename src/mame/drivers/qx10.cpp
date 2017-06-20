@@ -31,19 +31,24 @@
 ****************************************************************************/
 
 
+#include "emu.h"
+
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
-#include "machine/pit8253.h"
-#include "machine/pic8259.h"
-#include "machine/z80dart.h"
-#include "machine/mc146818.h"
-#include "machine/i8255.h"
 #include "machine/am9517a.h"
-#include "video/upd7220.h"
-#include "machine/upd765.h"
-#include "machine/ram.h"
+#include "machine/i8255.h"
+#include "machine/mc146818.h"
+#include "machine/pic8259.h"
+#include "machine/pit8253.h"
 #include "machine/qx10kbd.h"
+#include "machine/ram.h"
+#include "machine/upd765.h"
+#include "machine/z80dart.h"
+#include "video/upd7220.h"
+
+#include "screen.h"
 #include "softlist.h"
+
 
 #define MAIN_CLK    15974400
 
@@ -660,7 +665,7 @@ static SLOT_INTERFACE_START(keyboard)
 	SLOT_INTERFACE("qx10", QX10_KEYBOARD)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( qx10, qx10_state )
+static MACHINE_CONFIG_START( qx10 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, MAIN_CLK / 4)
 	MCFG_CPU_PROGRAM_MAP(qx10_mem)
@@ -783,5 +788,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 1983, qx10,  0,       0,  qx10,   qx10, driver_device,     0,       "Epson",   "QX-10",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+/*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  STATE        INIT     COMPANY   FULLNAME       FLAGS */
+COMP( 1983, qx10,  0,      0,      qx10,    qx10,  qx10_state,  0,       "Epson",  "QX-10",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

@@ -7,10 +7,11 @@
  *
  */
 
-#ifndef TRANSTAPE_H_
-#define TRANSTAPE_H_
+#ifndef MAME_BUS_CPC_TRANSTAPE_H
+#define MAME_BUS_CPC_TRANSTAPE_H
 
-#include "emu.h"
+#pragma once
+
 #include "cpcexp.h"
 
 class cpc_transtape_device  : public device_t,
@@ -50,6 +51,6 @@ private:
 };
 
 // device type definition
-extern const device_type CPC_TRANSTAPE;
+DECLARE_DEVICE_TYPE(CPC_TRANSTAPE, cpc_transtape_device)
 
-#endif /* TRANSTAPE_H_ */
+#endif // MAME_BUS_CPC_TRANSTAPE_H

@@ -10,16 +10,20 @@
 
 #include "emu.h"
 #include "includes/tceptor.h"
+
 #include "cpu/m6502/m65c02.h"
 #include "cpu/m6809/m6809.h"
-#include "cpu/m6800/m6800.h"
+#include "cpu/m6800/m6801.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/nvram.h"
 #include "sound/dac.h"
 #include "sound/ym2151.h"
 #include "sound/volt_reg.h"
 #include "rendlay.h"
+#include "speaker.h"
+
 #include "tceptor2.lh"
+
 
 /*******************************************************************/
 
@@ -340,7 +344,7 @@ void tceptor_state::machine_reset()
 
 /*******************************************************************/
 
-static MACHINE_CONFIG_START( tceptor, tceptor_state )
+static MACHINE_CONFIG_START( tceptor )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 49152000/32)
@@ -400,7 +404,7 @@ static MACHINE_CONFIG_START( tceptor, tceptor_state )
 	MCFG_SCREEN_SIZE(38*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(2*8, 34*8-1 + 2*8, 0*8, 28*8-1 + 0)
 	MCFG_SCREEN_UPDATE_DRIVER(tceptor_state, screen_update_tceptor_3d_right)
-	MCFG_SCREEN_VBLANK_DRIVER(tceptor_state, screen_eof_tceptor)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(tceptor_state, screen_vblank_tceptor))
 	MCFG_SCREEN_PALETTE("palette")
 
 
@@ -538,6 +542,6 @@ ROM_START( tceptor2 )
 ROM_END
 
 
-/*   ( YEAR  NAME      PARENT    MACHINE   INPUT     INIT      MONITOR   COMPANY FULLNAME ) */
-GAME ( 1986, tceptor,  0,        tceptor,  tceptor, driver_device,  0,        ROT0,     "Namco",  "Thunder Ceptor", 0)
-GAMEL( 1986, tceptor2, tceptor,  tceptor,  tceptor2, driver_device, 0,        ROT0,     "Namco",  "Thunder Ceptor II", 0, layout_tceptor2)
+//   ( YEAR  NAME      PARENT    MACHINE   INPUT     STATE          INIT      MONITOR   COMPANY   FULLNAME             FLAGS )
+GAME ( 1986, tceptor,  0,        tceptor,  tceptor,  tceptor_state, 0,        ROT0,     "Namco",  "Thunder Ceptor",    0)
+GAMEL( 1986, tceptor2, tceptor,  tceptor,  tceptor2, tceptor_state, 0,        ROT0,     "Namco",  "Thunder Ceptor II", 0, layout_tceptor2)

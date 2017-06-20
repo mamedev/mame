@@ -1,12 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz
-#pragma once
-
 #ifndef VERIFONE_TRANZ330_H
 #define VERIFONE_TRANZ330_H
 
-// single-driver build must have emu.h here
-#include "emu.h"
+#pragma once
 
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
@@ -16,7 +13,7 @@
 #include "machine/msm6242.h"
 #include "machine/roc10937.h"
 #include "bus/rs232/rs232.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
 #include "machine/clock.h"
 
 #define CPU_TAG     "cpu"
@@ -62,7 +59,7 @@ private:
 	required_device<z80dart_device>         m_dart;
 	required_device<z80pio_device>          m_pio;
 	required_device<msm6242_device>         m_rtc;
-	required_device<mic10937_t>             m_vfd;
+	required_device<mic10937_device>        m_vfd;
 	required_device<rs232_port_device>      m_rs232;
 	required_device<speaker_sound_device>   m_speaker;
 	required_ioport_array<4>                m_keypad;

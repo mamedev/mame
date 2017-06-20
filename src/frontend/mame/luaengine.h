@@ -17,6 +17,10 @@
 #ifndef __LUA_ENGINE_H__
 #define __LUA_ENGINE_H__
 
+#if defined(__GNUC__) && (__GNUC__ > 6)
+#pragma GCC diagnostic ignored "-Wnoexcept-type"
+#endif
+
 #include <map>
 #include <condition_variable>
 #define SOL_SAFE_USERTYPE
@@ -120,6 +124,7 @@ private:
 	void on_machine_resume();
 	void on_machine_frame();
 
+	void resume(void *ptr, int nparam);
 	void register_function(sol::function func, const char *id);
 	bool execute_function(const char *id);
 	sol::object call_plugin(const std::string &name, sol::object in);

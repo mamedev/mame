@@ -161,6 +161,8 @@ public:
 	emu_timer *m_stv_rtc_timer;
 	uint8_t     m_port_sel,m_mux_data;
 	uint8_t     m_system_output;
+	uint8_t     m_ioga_mode;
+	uint8_t     m_ioga_portg;
 	uint16_t    m_serial_tx;
 
 	required_device<sh2_device> m_maincpu;
@@ -689,10 +691,10 @@ public:
 	DECLARE_READ8_MEMBER( stv_SMPC_r );
 	DECLARE_WRITE8_MEMBER( stv_SMPC_w );
 
-	void debug_scudma_command(int ref, int params, const char **param);
-	void debug_scuirq_command(int ref, int params, const char **param);
-	void debug_help_command(int ref, int params, const char **param);
-	void debug_commands(int ref, int params, const char **param);
+	void debug_scudma_command(int ref, const std::vector<std::string> &params);
+	void debug_scuirq_command(int ref, const std::vector<std::string> &params);
+	void debug_help_command(int ref, const std::vector<std::string> &params);
+	void debug_commands(int ref, const std::vector<std::string> &params);
 
 };
 

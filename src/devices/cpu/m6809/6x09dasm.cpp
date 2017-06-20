@@ -5,7 +5,7 @@
     6x09dasm.cpp - a 6809/6309/Konami opcode disassembler
 
     Based on:
-        6809dasm.c - a 6809 opcode disassembler
+        6309dasm.c - a 6309 opcode disassembler
         Version 1.0 5-AUG-2000
         Copyright Tim Lindner
 

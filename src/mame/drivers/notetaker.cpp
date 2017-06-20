@@ -75,6 +75,7 @@ DONE:
   - both cpus boot, reset and system int controls are accessed at fffea from either cpu; emulatorcpu's 8k of ram lives at the beginning of its address space, but can be disabled in favor of mainram at the same addresses
 */
 
+#include "emu.h"
 #include "cpu/i86/i86.h"
 #include "machine/ay31015.h"
 #include "machine/pic8259.h"
@@ -82,6 +83,9 @@ DONE:
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "video/tms9927.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 class notetaker_state : public driver_device
 {
@@ -111,7 +115,7 @@ public:
 	required_device<ay31015_device> m_eiauart;
 	required_device<crt5027_device> m_crtc;
 	required_device<dac_word_interface> m_dac;
-	required_device<fd1791_t> m_fdc;
+	required_device<fd1791_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	floppy_image_device *m_floppy;
 
@@ -229,7 +233,7 @@ TIMER_CALLBACK_MEMBER(notetaker_state::timer_fifoclk)
 	}
 	m_outfifo_tail_ptr&=0xF;
 	m_dac->write(data);
-	m_FIFO_timer->adjust(attotime::from_hz(((XTAL_960kHz/10)/4)/((m_FrSel0<<3)+(m_FrSel1<<2)+(m_FrSel2<<1)+1))); // FIFO timer is clocked by 960khz divided by 10 (74ls162 decade counter), divided by 4 (mc14568B with divider 1 pins set to 4), divided by 1,3,5,7,9,11,13,15 (or 0,2,4,6,8,10,12,14?)
+	m_FIFO_timer->adjust(attotime::from_hz(((XTAL_960kHz/10)/4)/((m_FrSel0<<3)+(m_FrSel1<<2)+(m_FrSel2<<1)+1)));
 }
 
 uint32_t notetaker_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -281,7 +285,7 @@ WRITE16_MEMBER(notetaker_state::IPConReg_w)
 /* * Keyboard hd6402 */
 READ16_MEMBER( notetaker_state::ReadKeyData_r )
 {
-	return 0xFF00||m_kbduart->get_received_data();
+	return 0xFF00|m_kbduart->get_received_data();
 }
 
 READ16_MEMBER( notetaker_state::ReadOPStatus_r ) // 74ls368 hex inverter at #l7 provides 4 bits, inverted
@@ -337,7 +341,7 @@ WRITE16_MEMBER(notetaker_state::FIFOReg_w)
 	m_FrSel2 = (data&0x0400)?1:0;
 	m_TabletXOn = (data&0x0200)?1:0;
 	m_TabletYOn = (data&0x0100)?1:0;
-	m_FIFO_timer->adjust(attotime::from_hz(((XTAL_960kHz/10)/4)/((m_FrSel0<<3)+(m_FrSel1<<2)+(m_FrSel2<<1)+1))); // FIFO timer is clocked by 960khz divided by 10 (74ls162 decade counter), divided by 4 (mc14568B with divider 1 pins set to 4), divided by 1,3,5,7,9,11,13,15 (or off,2,4,6,8,10,12,14?)
+	m_FIFO_timer->adjust(attotime::from_hz(((XTAL_960kHz/10)/4)/((m_FrSel0<<3)+(m_FrSel1<<2)+(m_FrSel2<<1)+1)));
 	logerror("Write to 0x60 FIFOReg_w of %04x; fifo timer set to %d hz\n", data, (((XTAL_960kHz/10)/4)/((m_FrSel0<<3)+(m_FrSel1<<2)+(m_FrSel2<<1)+1)));
 }
 
@@ -358,7 +362,12 @@ WRITE16_MEMBER(notetaker_state::FIFOBus_w)
 
 WRITE16_MEMBER( notetaker_state::DiskReg_w )
 {
-	// See http://bitsavers.trailing-edge.com/pdf/xerox/notetaker/memos/19781023_More_NoteTaker_IO_Information.pdf but note that bit 12 (called bit 3 in documentation) was changed between oct 1978 and 1979 to reset the disk controller digital-PLL as ClrDiskCont' rather than acting as ProgBitClk0, which is permanently wired high instead, meaning only the 4.5Mhz - 18Mhz dot clocks are available for the CRTC.
+	/* See http://bitsavers.trailing-edge.com/pdf/xerox/notetaker/memos/19781023_More_NoteTaker_IO_Information.pdf
+	   but note that bit 12 (called bit 3 in documentation) was changed between
+	   oct 1978 and 1979 to reset the disk controller digital-PLL as
+	   ClrDiskCont' rather than acting as ProgBitClk0, which is permanently
+	   wired high instead, meaning only the 4.5Mhz - 18Mhz dot clocks are
+	   available for the CRTC. */
 	m_ADCSpd0 = (data&0x8000)?1:0;
 	m_ADCSpd1 = (data&0x4000)?1:0;
 	m_StopWordClock_q = (data&0x2000)?1:0;
@@ -416,7 +425,7 @@ WRITE16_MEMBER( notetaker_state::LoadDispAddr_w )
 /* EIA hd6402 */
 READ16_MEMBER( notetaker_state::ReadEIAData_r )
 {
-	return 0xFF00||m_eiauart->get_received_data();
+	return 0xFF00|m_eiauart->get_received_data();
 }
 
 READ16_MEMBER( notetaker_state::ReadEIAStatus_r ) // 74ls368 hex inverter at #f1 provides 2 bits, inverted
@@ -591,7 +600,7 @@ static ADDRESS_MAP_START(notetaker_iocpu_io, AS_IO, 16, notetaker_state)
 	//AM_RANGE(0xa0, 0xa1) AM_MIRROR(0x7E18) AM_DEVREADWRITE("debug8255", 8255_device, read, write) // debugger board 8255
 	AM_RANGE(0xc0, 0xc1) AM_MIRROR(0x7E1E) AM_WRITE(FIFOBus_w) // DAC data write to FIFO
 	AM_RANGE(0x100, 0x101) AM_MIRROR(0x7E1E) AM_WRITE(DiskReg_w) // I/O register (adc speed, crtc pixel clock and clock enable, +5 and +12v relays for floppy, etc)
-	AM_RANGE(0x120, 0x127) AM_MIRROR(0x7E18) AM_DEVREADWRITE8("wd1791", fd1791_t, read, write, 0x00FF) // floppy controller
+	AM_RANGE(0x120, 0x127) AM_MIRROR(0x7E18) AM_DEVREADWRITE8("wd1791", fd1791_device, read, write, 0x00FF) // floppy controller
 	AM_RANGE(0x140, 0x15f) AM_MIRROR(0x7E00) AM_DEVREADWRITE8("crt5027", crt5027_device, read, write, 0x00FF) // crt controller
 	AM_RANGE(0x160, 0x161) AM_MIRROR(0x7E1E) AM_WRITE(LoadDispAddr_w) // loads the start address for the display framebuffer
 	AM_RANGE(0x1a0, 0x1a1) AM_MIRROR(0x7E10) AM_READ(ReadEIAStatus_r) // read eia fifo state
@@ -662,8 +671,14 @@ static ADDRESS_MAP_START(notetaker_emulatorcpu_mem, AS_PROGRAM, 16, notetaker_st
     AM_RANGE(0xFFFC0, 0xFFFDF) AM_READWRITE(proc_illinst_r, proc_illinst_w)
     AM_RANGE(0xFFFE0, 0xFFFEF) AM_READWRITE(proc_control_r, proc_control_w)
 ADDRESS_MAP_END
+*/
 
-// note everything in the emulatorcpu's io range is incompletely decoded; so if 0x1800 is accessed it will write to both the debug 8255 AND the pic8259! I'm not sure the code abuses this or not, but it might do so to both write registers and clear parity at once, or something similar.
+/* note everything in the emulatorcpu's io range is incompletely decoded; so if
+   0x1800 is accessed it will write to both the debug 8255 AND the pic8259!
+   I'm not sure the code abuses this or not, but it might do so to both write
+   registers and clear parity at once, or something similar. */
+
+/*
 static ADDRESS_MAP_START(notetaker_emulatorcpu_io, AS_IO, 16, notetaker_state)
     ADDRESS_MAP_UNMAP_HIGH
     AM_RANGE(0x800, 0x803) AM_MIRROR(0x07FC) AM_DEVREADWRITE8("emupic8259", pic8259_device, read, write, 0x00ff)
@@ -734,7 +749,10 @@ void notetaker_state::ip_reset()
 	m_SHConA = 0;
 	m_SetSH = 0;
 	// handle consequences of above
-	m_FIFO_timer->adjust(attotime::from_hz(((XTAL_960kHz/10)/4)/((m_FrSel0<<3)+(m_FrSel1<<2)+(m_FrSel2<<1)+1))); // FIFO timer is clocked by 960khz divided by 10 (74ls162 decade counter), divided by 4 (mc14568B with divider 1 pins set to 4), divided by 1,3,5,7,9,11,13,15 (or 0,2,4,6,8,10,12,14?)
+	m_FIFO_timer->adjust(attotime::from_hz(((XTAL_960kHz/10)/4)/((m_FrSel0<<3)+(m_FrSel1<<2)+(m_FrSel2<<1)+1))); // See below
+	/* FIFO timer is clocked by 960khz divided by 10 (74ls162 decade counter),
+	   divided by 4 (mc14568B with divider 1 pins set to 4), divided by
+	   1,3,5,7,9,11,13,15 (or 0,2,4,6,8,10,12,14?) */
 	// todo: handle tablet and sample/hold stuff as well
 	// reset the DiskReg latches at #c4 and #b4 on the disk/display/eia controller board
 	m_ADCSpd0 = 0;
@@ -775,7 +793,7 @@ void notetaker_state::ep_reset()
 static INPUT_PORTS_START( notetakr )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( notetakr, notetaker_state )
+static MACHINE_CONFIG_START( notetakr )
 	/* basic machine hardware */
 	/* IO CPU: 8086@8MHz */
 	MCFG_CPU_ADD("iocpu", I8086, XTAL_24MHz/3) /* iD8086-2 @ E4A; 24Mhz crystal divided down to 8Mhz by i8284 clock generator */
@@ -804,8 +822,15 @@ static MACHINE_CONFIG_START( notetakr, notetaker_state )
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* Devices */
-	MCFG_DEVICE_ADD( "crt5027", CRT5027, (XTAL_36MHz/4)/8) // the clock for the crt5027 is configurable rate; 36MHz xtal divided by 1*, 2, 3, 4, 5, 6, 7, or 8 (* because this is a 74s163 this setting probably means divide by 1; documentation at http://bitsavers.trailing-edge.com/pdf/xerox/notetaker/memos/19790605_Definition_of_8086_Ports.pdf claims it is 1.5, which makes no sense) and secondarily divided by 8 (again by two to load the 16 bit output shifters after this)
-	// on reset, bitclk is 000 so divider is (36mhz/8)/8; during boot it is written with 101, changing the divider to (36mhz/4)/8
+	MCFG_DEVICE_ADD( "crt5027", CRT5027, (XTAL_36MHz/4)/8) // See below
+	/* the clock for the crt5027 is configurable rate; 36MHz xtal divided by 1*,
+	   2, 3, 4, 5, 6, 7, or 8 (* because this is a 74s163 this setting probably
+	   means divide by 1; documentation at
+	   http://bitsavers.trailing-edge.com/pdf/xerox/notetaker/memos/19790605_Definition_of_8086_Ports.pdf
+	   claims it is 1.5, which makes no sense) and secondarily divided by 8
+	   (again by two to load the 16 bit output shifters after this).
+	   on reset, bitclk is 000 so divider is (36mhz/8)/8; during boot it is
+	   written with 101, changing the divider to (36mhz/4)/8 */
 	// TODO: for now, we just hack it to the latter setting from start; this should be handled correctly in ip_reset();
 	MCFG_TMS9927_CHAR_WIDTH(8) //(8 pixels per column/halfword, 16 pixels per fullword)
 	// TODO: below is HACKED to trigger the odd/even int ir4 instead of vblank int ir7 since ir4 is required for anything to be drawn to screen! hence with the hack this interrupt triggers twice as often as it should
@@ -900,6 +925,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR      NAME  PARENT  COMPAT   MACHINE     INPUT            STATE      INIT  COMPANY     FULLNAME                FLAGS */
-COMP( 1978, notetakr,      0,      0, notetakr, notetakr, notetaker_state, notetakr, "Xerox", "NoteTaker", MACHINE_IS_SKELETON)
-//COMP( 1978, notetakr,      0,      0, notetakr, notetakr, driver_device, notetakr, "Xerox", "NoteTaker", MACHINE_IS_SKELETON)
+//    YEAR  NAME       PARENT  COMPAT  MACHINE   INPUT     STATE            INIT      COMPANY  FULLNAME     FLAGS
+COMP( 1978, notetakr,  0,      0,      notetakr, notetakr, notetaker_state, notetakr, "Xerox", "NoteTaker", MACHINE_IS_SKELETON)

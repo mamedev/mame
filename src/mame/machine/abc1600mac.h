@@ -5,13 +5,12 @@
     Luxor ABC 1600 Memory Access Controller emulation
 
 **********************************************************************/
+#ifndef MAME_MACHINE_ABC1600MAC_H
+#define MAME_MACHINE_ABC1600MAC_H
 
 #pragma once
 
-#ifndef __ABC1600_MAC__
-#define __ABC1600_MAC__
 
-#include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/watchdog.h"
 
@@ -48,10 +47,6 @@ class abc1600_mac_device : public device_t,
 public:
 	abc1600_mac_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-
 	void set_cpu_tag(const char *cpu_tag) { m_cpu_tag = cpu_tag; }
 
 	virtual DECLARE_ADDRESS_MAP(map, 8);
@@ -84,6 +79,10 @@ protected:
 
 	// device_memory_interface overrides
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_PROGRAM) const override;
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 
 private:
 	enum
@@ -133,8 +132,7 @@ private:
 
 
 // device type definition
-extern const device_type ABC1600_MAC;
+DECLARE_DEVICE_TYPE(ABC1600_MAC, abc1600_mac_device)
 
 
-
-#endif
+#endif // MAME_MACHINE_ABC1600MAC_H

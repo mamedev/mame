@@ -21,71 +21,85 @@ static const char *const op_names[] =   {   "??",       "nop",  "ex",   "exx",  
 ALLOW_SAVE_TYPE(tlcs90_device::e_mode); // allow save_item on a non-fundamental type
 
 
-const device_type TMP90840 = &device_creator<tmp90840_device>;
-const device_type TMP90841 = &device_creator<tmp90841_device>;
-const device_type TMP90845 = &device_creator<tmp90845_device>;
-const device_type TMP91640 = &device_creator<tmp91640_device>;
-const device_type TMP91641 = &device_creator<tmp91641_device>;
+DEFINE_DEVICE_TYPE(TMP90840,  tmp90840_device,  "tmp90840",  "TMP90840")
+DEFINE_DEVICE_TYPE(TMP90841,  tmp90841_device,  "tmp90841",  "TMP90841")
+DEFINE_DEVICE_TYPE(TMP90845,  tmp90845_device,  "tmp90845",  "TMP90845")
+DEFINE_DEVICE_TYPE(TMP91640,  tmp91640_device,  "tmp91640",  "TMP91640")
+DEFINE_DEVICE_TYPE(TMP91641,  tmp91641_device,  "tmp91641",  "TMP91641")
+DEFINE_DEVICE_TYPE(TMP90PH44, tmp90ph44_device, "tmp90ph44", "TMP90PH44")
 
 
 static ADDRESS_MAP_START(tmp90840_mem, AS_PROGRAM, 8, tlcs90_device)
 	AM_RANGE(   0x0000,     0x1fff          )   AM_ROM  // 8KB ROM (internal)
-	AM_RANGE(   0xfec0,     0xffc0          )   AM_RAM  // 256b RAM (internal)
+	AM_RANGE(   0xfec0,     0xffbf          )   AM_RAM  // 256b RAM (internal)
 	AM_RANGE(   T90_IOBASE, T90_IOBASE+47   )   AM_READWRITE( t90_internal_registers_r, t90_internal_registers_w )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(tmp90841_mem, AS_PROGRAM, 8, tlcs90_device)
 //  AM_RANGE(   0x0000,     0x1fff          )   AM_ROM  // rom-less
-	AM_RANGE(   0xfec0,     0xffc0          )   AM_RAM  // 256b RAM (internal)
+	AM_RANGE(   0xfec0,     0xffbf          )   AM_RAM  // 256b RAM (internal)
 	AM_RANGE(   T90_IOBASE, T90_IOBASE+47   )   AM_READWRITE( t90_internal_registers_r, t90_internal_registers_w )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(tmp91640_mem, AS_PROGRAM, 8, tlcs90_device )
 	AM_RANGE(   0x0000,     0x3fff          ) AM_ROM    // 16KB ROM (internal)
-	AM_RANGE(   0xfdc0,     0xffc0          ) AM_RAM    // 512b RAM (internal)
+	AM_RANGE(   0xfdc0,     0xffbf          ) AM_RAM    // 512b RAM (internal)
 	AM_RANGE(   T90_IOBASE, T90_IOBASE+47   ) AM_READWRITE( t90_internal_registers_r, t90_internal_registers_w )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(tmp91641_mem, AS_PROGRAM, 8, tlcs90_device )
 //  AM_RANGE(   0x0000,     0x3fff          ) AM_ROM    // rom-less
-	AM_RANGE(   0xfdc0,     0xffc0          ) AM_RAM    // 512b RAM (internal)
+	AM_RANGE(   0xfdc0,     0xffbf          ) AM_RAM    // 512b RAM (internal)
 	AM_RANGE(   T90_IOBASE, T90_IOBASE+47   ) AM_READWRITE( t90_internal_registers_r, t90_internal_registers_w )
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START(tmp90ph44_mem, AS_PROGRAM, 8, tlcs90_device )
+	AM_RANGE(   0x0000,     0x3fff          ) AM_ROM    // 16KB PROM (internal)
+	AM_RANGE(   0xfdc0,     0xffbf          ) AM_RAM    // 512b RAM (internal)
+	AM_RANGE(   T90_IOBASE, T90_IOBASE+55   ) AM_READWRITE( t90_internal_registers_r, t90_internal_registers_w ) // TODO: has 8 more registers
+ADDRESS_MAP_END
 
-tlcs90_device::tlcs90_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, address_map_constructor program_map)
-	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
+
+tlcs90_device::tlcs90_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor program_map)
+	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 20, 0, program_map)
-	, m_io_config("io", ENDIANNESS_LITTLE, 8, 16, 0)
+	, m_port_read_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
+	, m_port_write_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
 {
 }
 
 
 tmp90840_device::tmp90840_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tlcs90_device(mconfig, TMP90840, "TMP90840", tag, owner, clock, "tmp90840", __FILE__, ADDRESS_MAP_NAME(tmp90840_mem))
+	: tlcs90_device(mconfig, TMP90840, tag, owner, clock, ADDRESS_MAP_NAME(tmp90840_mem))
 {
 }
 
 tmp90841_device::tmp90841_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tlcs90_device(mconfig, TMP90841, "TMP90841", tag, owner, clock, "tmp90841", __FILE__, ADDRESS_MAP_NAME(tmp90841_mem))
+	: tlcs90_device(mconfig, TMP90841, tag, owner, clock, ADDRESS_MAP_NAME(tmp90841_mem))
 {
 }
 
 tmp90845_device::tmp90845_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tlcs90_device(mconfig, TMP90841, "TMP90845", tag, owner, clock, "tmp90845", __FILE__, ADDRESS_MAP_NAME(tmp90841_mem))
+	: tlcs90_device(mconfig, TMP90845, tag, owner, clock, ADDRESS_MAP_NAME(tmp90841_mem))
 {
 }
 
 
 
 tmp91640_device::tmp91640_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tlcs90_device(mconfig, TMP91640, "TMP91640", tag, owner, clock, "tmp91640", __FILE__, ADDRESS_MAP_NAME(tmp91640_mem))
+	: tlcs90_device(mconfig, TMP91640, tag, owner, clock, ADDRESS_MAP_NAME(tmp91640_mem))
 {
 }
 
 
 tmp91641_device::tmp91641_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tlcs90_device(mconfig, TMP91641, "TMP91641", tag, owner, clock, "tmp91641", __FILE__, ADDRESS_MAP_NAME(tmp91641_mem))
+	: tlcs90_device(mconfig, TMP91641, tag, owner, clock, ADDRESS_MAP_NAME(tmp91641_mem))
+{
+}
+
+
+tmp90ph44_device::tmp90ph44_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: tlcs90_device(mconfig, TMP90PH44, tag, owner, clock, ADDRESS_MAP_NAME(tmp90ph44_mem))
 {
 }
 
@@ -2316,26 +2330,26 @@ FFED    BX      R/W     Reset   Description
 
 READ8_MEMBER( tlcs90_device::t90_internal_registers_r )
 {
-	#define RIO     m_io->read_byte( T90_IOBASE+offset )
-
 	uint8_t data = m_internal_registers[offset];
 	switch ( T90_IOBASE + offset )
 	{
 		case T90_P3:    // 7,4,1,0
-			return (data & 0x6c) | (RIO & 0x93);
+			return (data & 0x6c) | (m_port_read_cb[3]() & 0x93);
 
 		case T90_P4:    // only output
 			return data & 0x0f;
 
 		case T90_P5:
-			return (RIO & 0x3f);
+			return (m_port_read_cb[5]() & 0x3f);
 
 		case T90_P6:
+			return (data & 0xf0) | (m_port_read_cb[6]() & 0x0f);
+
 		case T90_P7:
-			return (data & 0xf0) | (RIO & 0x0f);
+			return (data & 0xf0) | (m_port_read_cb[7]() & 0x0f);
 
 		case T90_P8:    // 2,1,0
-			return (data & 0x08) | (RIO & 0x07);
+			return (data & 0x08) | (m_port_read_cb[8]() & 0x07);
 
 		case T90_BX:
 		case T90_BY:
@@ -2510,8 +2524,6 @@ TIMER_CALLBACK_MEMBER( tlcs90_device::t90_timer4_callback )
 
 WRITE8_MEMBER( tlcs90_device::t90_internal_registers_w )
 {
-	#define WIO     m_io->write_byte( T90_IOBASE+offset, data )
-
 	uint8_t out_mask;
 	uint8_t old = m_internal_registers[offset];
 	switch ( T90_IOBASE + offset )
@@ -2573,7 +2585,7 @@ WRITE8_MEMBER( tlcs90_device::t90_internal_registers_w )
 
 		case T90_P3:
 			data &= 0x6c;
-			WIO;
+			m_port_write_cb[3](data);
 			break;
 
 		case T90_P4:
@@ -2582,7 +2594,7 @@ WRITE8_MEMBER( tlcs90_device::t90_internal_registers_w )
 			if (out_mask)
 			{
 				data &= out_mask;
-				WIO;
+				m_port_write_cb[4](data);
 			}
 			break;
 
@@ -2604,7 +2616,7 @@ WRITE8_MEMBER( tlcs90_device::t90_internal_registers_w )
 			if (out_mask)
 			{
 				data &= out_mask;
-				WIO;
+				m_port_write_cb[6](data);
 			}
 			break;
 
@@ -2626,7 +2638,7 @@ WRITE8_MEMBER( tlcs90_device::t90_internal_registers_w )
 			if (out_mask)
 			{
 				data &= out_mask;
-				WIO;
+				m_port_write_cb[7](data);
 			}
 			break;
 
@@ -2636,7 +2648,7 @@ WRITE8_MEMBER( tlcs90_device::t90_internal_registers_w )
 			if (out_mask)
 			{
 				data &= out_mask;
-				WIO;
+				m_port_write_cb[8](data);
 			}
 			break;
 
@@ -2653,7 +2665,10 @@ WRITE8_MEMBER( tlcs90_device::t90_internal_registers_w )
 
 void tlcs90_device::device_start()
 {
-	int i, p;
+	for (auto &cb : m_port_read_cb)
+		cb.resolve_safe(0xff);
+	for (auto &cb : m_port_write_cb)
+		cb.resolve_safe();
 
 	save_item(NAME(m_prvpc.w.l));
 	save_item(NAME(m_pc.w.l));
@@ -2694,9 +2709,9 @@ void tlcs90_device::device_start()
 	save_item(NAME(m_cyc_f));
 	save_item(NAME(m_addr));
 
-	for (i = 0; i < 256; i++)
+	for (int i = 0; i < 256; i++)
 	{
-		p = 0;
+		int p = 0;
 		if( i&0x01 ) ++p;
 		if( i&0x02 ) ++p;
 		if( i&0x04 ) ++p;
@@ -2736,13 +2751,12 @@ void tlcs90_device::device_start()
 	m_addr = 0;
 
 	m_program = &space(AS_PROGRAM);
-	m_io = &space(AS_IO);
 
 	m_timer_period = attotime::from_hz(unscaled_clock()) * 8;
 
 	// Timers
 
-	for (i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++)
 		m_timer[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tlcs90_device::t90_timer_callback),this));
 
 	m_timer[4] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tlcs90_device::t90_timer4_callback),this));

@@ -57,8 +57,11 @@ Added Dip locations according to manual.
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6502/m6502.h"
 #include "includes/copsnrob.h"
+
+#include "cpu/m6502/m6502.h"
+#include "speaker.h"
+
 #include "copsnrob.lh"
 
 
@@ -244,7 +247,7 @@ void copsnrob_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( copsnrob, copsnrob_state )
+static MACHINE_CONFIG_START( copsnrob )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502,14318180/16)      /* 894886.25 kHz */
@@ -317,4 +320,4 @@ ROM_END
  *
  *************************************/
 
-GAMEL( 1976, copsnrob, 0, copsnrob, copsnrob, driver_device, 0, ROT0, "Atari", "Cops'n Robbers", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_copsnrob )
+GAMEL( 1976, copsnrob, 0, copsnrob, copsnrob, copsnrob_state, 0, ROT0, "Atari", "Cops'n Robbers", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_copsnrob )

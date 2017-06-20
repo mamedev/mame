@@ -13,4 +13,22 @@
 		</screen>
 	</view>
 
+	<view name="Left Screen">
+		<screen index="1">
+			<bounds x="0" y="0" width="4" height="3" />
+		</screen>
+	</view>
+
+	<view name="Center Screen">
+		<screen index="0">
+			<bounds x="0" y="0" width="4" height="3" />
+		</screen>
+	</view>
+
+	<view name="Right Screen">
+		<screen index="2">
+			<bounds x="0" y="0" width="4" height="3" />
+		</screen>
+	</view>
+
 </mamelayout>

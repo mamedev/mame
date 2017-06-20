@@ -6,12 +6,11 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_ISA_MC1502_ROM_H
+#define MAME_BUS_ISA_MC1502_ROM_H
+
 #pragma once
 
-#ifndef __MC1502_ROM__
-#define __MC1502_ROM__
-
-#include "emu.h"
 #include "isa.h"
 
 //**************************************************************************
@@ -36,7 +35,7 @@ protected:
 
 
 // device type definition
-extern const device_type MC1502_ROM;
+DECLARE_DEVICE_TYPE(MC1502_ROM, mc1502_rom_device)
 
 
-#endif
+#endif // MAME_BUS_ISA_MC1502_ROM_H

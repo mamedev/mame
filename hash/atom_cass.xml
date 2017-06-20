@@ -82,6 +82,17 @@
 		</part>
 	</software>
 
+	<software name="backgamm">
+		<description>Backgammon</description>
+		<year>1981</year>
+		<publisher>Bug Byte</publisher>
+		<part name="cass1" interface="atom_cass">
+			<dataarea name="cass" size="4007">
+				<rom name="Backgammon(BugByte).hq.uef" size="4007" crc="beba4486" sha1="30c122855456bef98391d8d06c23ae30a8bb5e99" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="breakout">
 		<description>Breakout (4K)</description>
 		<year>1981</year>
@@ -135,6 +146,17 @@
 		</part>
 	</software>
 
+	<software name="cylonatt">
+		<description>Cylon Attack</description>
+		<year>1982</year>
+		<publisher>A&amp;F Software</publisher>
+		<part name="cass1" interface="atom_cass">
+			<dataarea name="cass" size="3866">
+				<rom name="CylonAttack(AnF).hq.uef" size="3866" crc="8a10cef1" sha1="75190d1e922623423ee52ecfc1913b843d052aca" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="deathsat">
 		<description>Death Satellite (12K)</description>
 		<year>1982</year>
@@ -164,6 +186,17 @@
 		<part name="cass1" interface="atom_cass">
 			<dataarea name="cass" size="5116">
 				<rom name="demondungeon(programpower).hq.uef" size="5116" crc="3f82cb6f" sha1="326b7b29a56735df61c4f75e3cb5899be85b1e5f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="earlywar">
+		<description>Early Warning</description>
+		<year>1982</year>
+		<publisher>A&amp;F Software</publisher>
+		<part name="cass1" interface="atom_cass">
+			<dataarea name="cass" size="3340">
+				<rom name="EarlyWarning(AnF).hq.uef" size="3340" crc="c4896e06" sha1="603359d551114ff91df7dd6627f7a64efce46dc7" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -366,6 +399,17 @@
 		</part>
 	</software>
 
+	<software name="minefld">
+		<description>Minefield</description>
+		<year>1982</year>
+		<publisher>A&amp;F Software</publisher>
+		<part name="cass1" interface="atom_cass">
+			<dataarea name="cass" size="3859">
+				<rom name="Minefield(AnF).hq.uef" size="3859" crc="71c88da9" sha1="6744df000a59138a2eeafe8a36eab2f97ca7619d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="omegamis">
 		<description>Omega Mission</description>
 		<year>1982</year>
@@ -441,6 +485,17 @@
 		<part name="cass1" interface="atom_cass">
 			<dataarea name="cass" size="3800">
 				<rom name="swarm(programpower).hq.uef" size="3800" crc="9e6706e9" sha1="563811e318bad804b874089fa2733906104494c0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tangled">
+		<description>Tangled</description>
+		<year>1982</year>
+		<publisher>A&amp;F Software</publisher>
+		<part name="cass1" interface="atom_cass">
+			<dataarea name="cass" size="2378">
+				<rom name="Tangled(AnF).hq.uef" size="2378" crc="488b976d" sha1="acf65680369a7b7e516c72ded2b74ecd1c971ff9" offset="0" />
 			</dataarea>
 		</part>
 	</software>

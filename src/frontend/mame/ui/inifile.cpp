@@ -159,7 +159,9 @@ favorite_manager::favorite_manager(running_machine &machine, ui_options &moption
 
 void favorite_manager::add_favorite_game(const game_driver *driver)
 {
-	m_list.emplace(driver->description, ui_software_info{ driver->name, driver->description, "", "", "", 0, "", driver, "", "", "", 1, "", "", "", true });
+	m_list.emplace(driver->type.fullname(),
+				   ui_software_info{driver->name, driver->type.fullname(), "", "", "", 0, "", driver, "", "", "",
+									1, "", "", "", true});
 	save_favorite_games();
 }
 
@@ -188,10 +190,10 @@ void favorite_manager::add_favorite_game()
 	auto software_avail = false;
 	for (device_image_interface &image : image_interface_iterator(machine().root_device()))
 	{
-		if (image.exists() && image.software_entry())
+		if (image.exists() && image.loaded_through_softlist())
 		{
-			auto swinfo = image.software_entry();
-			auto part = image.part_entry();
+			const software_info *swinfo = image.software_entry();
+			const software_part *part = image.part_entry();
 			ui_software_info tmpmatches;
 			tmpmatches.shortname = swinfo->shortname();
 			tmpmatches.longname = image.longname();
@@ -203,7 +205,7 @@ void favorite_manager::add_favorite_game()
 			tmpmatches.driver = &machine().system();
 			tmpmatches.listname = strensure(image.software_list_name());
 			tmpmatches.interface = part->interface();
-			tmpmatches.instance = strensure(image.instance_name());
+			tmpmatches.instance = image.instance_name();
 			tmpmatches.startempty = 0;
 			tmpmatches.parentlongname.clear();
 			if (!swinfo->parentname().empty())

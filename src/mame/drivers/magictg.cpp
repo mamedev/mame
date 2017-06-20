@@ -132,11 +132,13 @@ Medium size chip with heat sink on it
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/mips/mips3.h"
 #include "cpu/adsp2100/adsp2100.h"
+#include "cpu/mips/mips3.h"
+#include "machine/lpci.h"
 #include "sound/dmadac.h"
 #include "video/voodoo.h"
-#include "machine/lpci.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /* TODO: Two 3Dfx Voodoo chipsets are used in SLI configuration */
@@ -895,7 +897,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( magictg, magictg_state )
+static MACHINE_CONFIG_START( magictg )
 	MCFG_CPU_ADD("mips", R5000BE, 150000000) /* TODO: CPU type and clock are unknown */
 	//MCFG_MIPS3_ICACHE_SIZE(16384) /* TODO: Unknown */
 	//MCFG_MIPS3_DCACHE_SIZE(16384) /* TODO: Unknown */
@@ -1011,5 +1013,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1997, magictg,  0,       magictg, magictg, driver_device, 0, ROT0, "Acclaim", "Magic the Gathering: Armageddon (set 1)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1997, magictga, magictg, magictg, magictg, driver_device, 0, ROT0, "Acclaim", "Magic the Gathering: Armageddon (set 2)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1997, magictg,  0,       magictg, magictg, magictg_state, 0, ROT0, "Acclaim", "Magic the Gathering: Armageddon (set 1)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1997, magictga, magictg, magictg, magictg, magictg_state, 0, ROT0, "Acclaim", "Magic the Gathering: Armageddon (set 2)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

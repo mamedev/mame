@@ -10,6 +10,7 @@
 #include "debugger.h"
 #include "includes/dc.h"
 #include "cpu/sh4/sh4.h"
+#include "cpu/arm7/arm7core.h"
 #include "machine/mie.h"
 #include "machine/naomig1.h"
 #include "video/powervr2.h"
@@ -718,7 +719,46 @@ WRITE32_MEMBER(dc_state::dc_arm_aica_w)
 	m_aica->write(space, offset*2, data, mem_mask&0xffff);
 }
 
+READ64_MEMBER(dc_state::sh4_soundram_r )
+{
+	return *((uint64_t *)dc_sound_ram.target()+offset);
+}
+
+WRITE64_MEMBER(dc_state::sh4_soundram_w )
+{
+	COMBINE_DATA((uint64_t *)dc_sound_ram.target() + offset);
+}
+
+WRITE_LINE_MEMBER(dc_state::aica_irq)
+{
+	m_soundcpu->set_input_line(ARM7_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+WRITE_LINE_MEMBER(dc_state::sh4_aica_irq)
+{
+	if(state)
+		dc_sysctrl_regs[SB_ISTEXT] |= IST_EXT_AICA;
+	else
+		dc_sysctrl_regs[SB_ISTEXT] &= ~IST_EXT_AICA;
+
+	dc_update_interrupt_status();
+}
+
+MACHINE_RESET_MEMBER(dc_state,dc_console)
+{
+	dc_state::machine_reset();
+	m_aica->set_ram_base(dc_sound_ram, 2*1024*1024);
+}
+
 TIMER_DEVICE_CALLBACK_MEMBER(dc_state::dc_scanline)
 {
 	m_powervr2->pvr_scanline_timer(param);
+}
+
+// crude cheat pending SH4 DRC, especially useful for inp playback
+INPUT_CHANGED_MEMBER(dc_state::mastercpu_cheat_r)
+{
+	const u32 CPU_CLOCK = (200000000);
+	const u32 timing_value[4] = { CPU_CLOCK, CPU_CLOCK/2, CPU_CLOCK/4, CPU_CLOCK/16 };
+	m_maincpu->set_unscaled_clock(timing_value[newval]);
 }

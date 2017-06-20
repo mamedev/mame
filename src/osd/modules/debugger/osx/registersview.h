@@ -10,7 +10,6 @@
 
 #import "debugview.h"
 
-#include "emu.h"
 
 #import <Cocoa/Cocoa.h>
 

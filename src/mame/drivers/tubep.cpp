@@ -101,12 +101,14 @@ TP-S.1 TP-S.2 TP-S.3 TP-B.1  8212 TP-B.2 TP-B.3          TP-B.4
 
 
 #include "emu.h"
+#include "includes/tubep.h"
+
 #include "cpu/m6800/m6800.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6805/m6805.h"
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
-#include "includes/tubep.h"
+#include "speaker.h"
 
 
 /*************************************
@@ -560,11 +562,9 @@ WRITE8_MEMBER(tubep_state::rjammer_voice_frequency_select_w)
 	/* bit 0 of data selects voice frequency on MSM5205 */
 	// 0 -4 KHz; 1- 8KHz
 	if (data & 1)
-		m_msm->playmode_w(MSM5205_S48_4B); /* 8 KHz */
+		m_msm->playmode_w(msm5205_device::S48_4B); /* 8 KHz */
 	else
-		m_msm->playmode_w(MSM5205_S96_4B); /* 4 KHz */
-
-	return;
+		m_msm->playmode_w(msm5205_device::S96_4B); /* 4 KHz */
 }
 
 
@@ -855,7 +855,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( tubep, tubep_state )
+static MACHINE_CONFIG_START( tubep )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80,16000000 / 4)    /* 4 MHz */
@@ -889,8 +889,6 @@ static MACHINE_CONFIG_START( tubep, tubep_state )
 	MCFG_PALETTE_ADD("palette", 32 + 256*64)
 
 	MCFG_PALETTE_INIT_OWNER(tubep_state,tubep)
-	MCFG_VIDEO_START_OVERRIDE(tubep_state,tubep)
-	MCFG_VIDEO_RESET_OVERRIDE(tubep_state,tubep)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -920,7 +918,7 @@ static MACHINE_CONFIG_DERIVED( tubepb, tubep )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( rjammer, tubep_state )
+static MACHINE_CONFIG_START( rjammer )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80,16000000 / 4)    /* 4 MHz */
@@ -953,8 +951,6 @@ static MACHINE_CONFIG_START( rjammer, tubep_state )
 	MCFG_PALETTE_ADD("palette", 64)
 
 	MCFG_PALETTE_INIT_OWNER(tubep_state,rjammer)
-	MCFG_VIDEO_START_OVERRIDE(tubep_state,tubep)
-	MCFG_VIDEO_RESET_OVERRIDE(tubep_state,tubep)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -976,7 +972,7 @@ static MACHINE_CONFIG_START( rjammer, tubep_state )
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(tubep_state, rjammer_adpcm_vck))          /* VCK function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)              /* 8 KHz (changes at run time) */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)              /* 8 KHz (changes at run time) */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1176,7 +1172,7 @@ ROM_END
  *
  *************************************/
 
-/*     year  rom      parent  machine  inp   init */
-GAME( 1984, tubep,   0,      tubep,   tubep, driver_device,   0, ROT0, "Nichibutsu / Fujitek", "Tube Panic", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, tubepb,  tubep,  tubepb,  tubepb, driver_device,  0, ROT0, "bootleg", "Tube Panic (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, rjammer, 0,      rjammer, rjammer, driver_device, 0, ROT0, "Nichibutsu / Alice", "Roller Jammer", MACHINE_SUPPORTS_SAVE )
+//    year  rom      parent  machine  inp      state        init
+GAME( 1984, tubep,   0,      tubep,   tubep,   tubep_state, 0,    ROT0, "Nichibutsu / Fujitek", "Tube Panic",           MACHINE_SUPPORTS_SAVE )
+GAME( 1984, tubepb,  tubep,  tubepb,  tubepb,  tubep_state, 0,    ROT0, "bootleg",              "Tube Panic (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, rjammer, 0,      rjammer, rjammer, tubep_state, 0,    ROT0, "Nichibutsu / Alice",   "Roller Jammer",        MACHINE_SUPPORTS_SAVE )

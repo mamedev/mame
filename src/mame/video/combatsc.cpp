@@ -431,7 +431,7 @@ uint32_t combatsc_state::screen_update_combatsc(screen_device &screen, bitmap_in
 	{
 		rectangle clip;
 		clip = cliprect;
-		
+
 		for (i = 0; i < 32; i++)
 		{
 			// scrollram [0x20]-[0x3f]: char enable (presumably bit 0 only)
@@ -439,7 +439,7 @@ uint32_t combatsc_state::screen_update_combatsc(screen_device &screen, bitmap_in
 			if(m_scrollram[base_scroll] == 0)
 				continue;
 
-		
+
 			clip.min_y = i * 8;
 			clip.max_y = clip.min_y + 7;
 

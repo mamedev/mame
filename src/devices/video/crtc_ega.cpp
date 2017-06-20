@@ -11,27 +11,36 @@
 #include "emu.h"
 #include "crtc_ega.h"
 
+#include "screen.h"
 
-#define LOG     (1)
+#define VERBOSE 1
+#include "logmacro.h"
 
 
-const device_type CRTC_EGA = &device_creator<crtc_ega_device>;
+DEFINE_DEVICE_TYPE(CRTC_EGA, crtc_ega_device, "crtc_ega", "IBM EGA CRT Controller")
 
 
 crtc_ega_device::crtc_ega_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, CRTC_EGA, "crtc_EGA", tag, owner, clock, "crtc_ega", __FILE__),
-		device_video_interface(mconfig, *this, false),
-		m_res_out_de_cb(*this),
-		m_res_out_hsync_cb(*this),
-		m_res_out_vsync_cb(*this),
-		m_res_out_vblank_cb(*this), m_horiz_char_total(0), m_horiz_disp(0), m_horiz_blank_start(0), m_horiz_blank_end(0), m_ena_vert_access(0), m_de_skew(0), m_horiz_retr_start(0), m_horiz_retr_end(0),
-	m_horiz_retr_skew(0), m_vert_total(0), m_preset_row_scan(0), m_byte_panning(0), m_max_ras_addr(0), m_scan_doubling(0), m_cursor_start_ras(0), m_cursor_disable(0), m_cursor_end_ras(0), m_cursor_skew(0),
-	m_disp_start_addr(0), m_cursor_addr(0), m_light_pen_addr(0), m_vert_retr_start(0), m_vert_retr_end(0), m_protect(0), m_bandwidth(0), m_vert_disp_end(0), m_offset(0), m_underline_loc(0), m_vert_blank_start(0),
-	m_vert_blank_end(0), m_mode_control(0), m_line_compare(0), m_register_address_latch(0), m_cursor_state(false), m_cursor_blink_count(0),
-		m_hpixels_per_column(0), m_cur(0), m_hsync(0), m_vsync(0), m_vblank(0), m_de(0), m_character_counter(0), m_hsync_width_counter(0), m_line_counter(0), m_raster_counter(0), m_vsync_width_counter(0),
-	m_line_enable_ff(false), m_vsync_ff(0), m_adjust_active(0), m_line_address(0), m_cursor_x(0), m_line_timer(nullptr), m_de_off_timer(nullptr), m_cur_on_timer(nullptr), m_cur_off_timer(nullptr),
-	m_hsync_on_timer(nullptr), m_hsync_off_timer(nullptr), m_light_pen_latch_timer(nullptr), m_horiz_pix_total(0), m_vert_pix_total(0), m_max_visible_x(0), m_max_visible_y(0), m_hsync_on_pos(0),
-	m_hsync_off_pos(0), m_vsync_on_pos(0), m_vsync_off_pos(0), m_current_disp_addr(0), m_light_pen_latched(0), m_has_valid_parameters(false)
+	: device_t(mconfig, CRTC_EGA, tag, owner, clock), device_video_interface(mconfig, *this, false)
+	, m_res_out_de_cb(*this), m_res_out_hsync_cb(*this), m_res_out_vsync_cb(*this), m_res_out_vblank_cb(*this)
+	, m_horiz_char_total(0), m_horiz_disp(0), m_horiz_blank_start(0), m_horiz_blank_end(0)
+	, m_ena_vert_access(0), m_de_skew(0)
+	, m_horiz_retr_start(0), m_horiz_retr_end(0), m_horiz_retr_skew(0)
+	, m_vert_total(0), m_preset_row_scan(0), m_byte_panning(0), m_max_ras_addr(0), m_scan_doubling(0)
+	, m_cursor_start_ras(0), m_cursor_disable(0), m_cursor_end_ras(0), m_cursor_skew(0)
+	, m_disp_start_addr(0), m_cursor_addr(0), m_light_pen_addr(0)
+	, m_vert_retr_start(0), m_vert_retr_end(0)
+	, m_protect(0), m_bandwidth(0), m_vert_disp_end(0), m_offset(0), m_underline_loc(0)
+	, m_vert_blank_start(0), m_vert_blank_end(0)
+	, m_mode_control(0), m_line_compare(0), m_register_address_latch(0)
+	, m_cursor_state(false), m_cursor_blink_count(0)
+	, m_hpixels_per_column(0), m_cur(0), m_hsync(0), m_vsync(0), m_vblank(0), m_de(0)
+	, m_character_counter(0), m_hsync_width_counter(0), m_line_counter(0), m_raster_counter(0), m_vsync_width_counter(0)
+	, m_line_enable_ff(false), m_vsync_ff(0), m_adjust_active(0), m_line_address(0), m_cursor_x(0)
+	, m_line_timer(nullptr), m_de_off_timer(nullptr), m_cur_on_timer(nullptr), m_cur_off_timer(nullptr), m_hsync_on_timer(nullptr), m_hsync_off_timer(nullptr), m_light_pen_latch_timer(nullptr)
+	, m_horiz_pix_total(0), m_vert_pix_total(0), m_max_visible_x(0), m_max_visible_y(0)
+	, m_hsync_on_pos(0), m_hsync_off_pos(0), m_vsync_on_pos(0), m_vsync_off_pos(0)
+	, m_current_disp_addr(0), m_light_pen_latched(0), m_has_valid_parameters(false)
 {
 }
 
@@ -71,7 +80,7 @@ READ8_MEMBER( crtc_ega_device::register_r )
 
 WRITE8_MEMBER( crtc_ega_device::register_w )
 {
-	if (LOG)  logerror("%s CRTC_EGA: reg 0x%02x = 0x%02x\n", machine().describe_context(), m_register_address_latch, data);
+	LOG("%s CRTC_EGA: reg 0x%02x = 0x%02x\n", machine().describe_context(), m_register_address_latch, data);
 
 	switch (m_register_address_latch)
 	{
@@ -189,7 +198,7 @@ void crtc_ega_device::recompute_parameters(bool postload)
 
 			rectangle visarea(0, max_visible_x, 0, max_visible_y);
 
-			if (LOG) logerror("CRTC_EGA config screen: HTOTAL: 0x%x  VTOTAL: 0x%x  MAX_X: 0x%x  MAX_Y: 0x%x  HSYNC: 0x%x-0x%x  VSYNC: 0x%x-0x%x  Freq: %ffps\n",
+			LOG("CRTC_EGA config screen: HTOTAL: 0x%x  VTOTAL: 0x%x  MAX_X: 0x%x  MAX_Y: 0x%x  HSYNC: 0x%x-0x%x  VSYNC: 0x%x-0x%x  Freq: %ffps\n",
 								horiz_pix_total, vert_pix_total, max_visible_x, max_visible_y, hsync_on_pos, hsync_off_pos - 1, vsync_on_pos, vsync_off_pos - 1, 1 / ATTOSECONDS_TO_DOUBLE(refresh));
 
 			if ( m_screen != nullptr )
@@ -200,7 +209,7 @@ void crtc_ega_device::recompute_parameters(bool postload)
 		else
 		{
 			m_has_valid_parameters = false;
-			if (LOG) logerror("CRTC_EGA bad config screen: HTOTAL: 0x%x  VTOTAL: 0x%x  MAX_X: 0x%x  MAX_Y: 0x%x  HSYNC: 0x%x-0x%x  VSYNC: 0x%x-0x%x\n",
+			LOG("CRTC_EGA bad config screen: HTOTAL: 0x%x  VTOTAL: 0x%x  MAX_X: 0x%x  MAX_Y: 0x%x  HSYNC: 0x%x-0x%x  VSYNC: 0x%x-0x%x\n",
 								horiz_pix_total, vert_pix_total, max_visible_x, max_visible_y, hsync_on_pos, hsync_off_pos - 1, vsync_on_pos, vsync_off_pos - 1);
 
 		}

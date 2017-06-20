@@ -23,17 +23,24 @@
  *  - data sheets from Intel and Motorola
  */
 
+#include "emu.h"
+
 #define VERBOSE 0
 
 #include "includes/apollo.h"
-#include "debugger.h"
+
 #include "cpu/m68000/m68kcpu.h"
 #include "sound/beep.h"
-#include "apollo_dsp.lh"
 
 // we use set_verbose
 #include "bus/isa/omti8621.h"
 #include "bus/isa/3c505.h"
+
+#include "debugger.h"
+#include "speaker.h"
+
+#include "apollo_dsp.lh"
+
 
 #define TERMINAL_TAG "terminal"
 
@@ -678,7 +685,7 @@ static ADDRESS_MAP_START(dn3500_map, AS_PROGRAM, 32, apollo_state )
 		AM_RANGE(0x010200, 0x0102ff) AM_READWRITE8(cache_status_register_r, cache_control_register_w, 0xffffffff )
 		AM_RANGE(0x010300, 0x0103ff) AM_READWRITE8(task_alias_register_r , task_alias_register_w , 0xffffffff )
 		AM_RANGE(0x010400, 0x0104ff) AM_DEVREADWRITE8(APOLLO_SIO_TAG, apollo_sio, read, write, 0xffffffff )
-		AM_RANGE(0x010500, 0x0105ff) AM_DEVREADWRITE8(APOLLO_SIO2_TAG, mc68681_device, read, write, 0x00ff00ff )
+		AM_RANGE(0x010500, 0x0105ff) AM_DEVREADWRITE8(APOLLO_SIO2_TAG, apollo_sio, read, write, 0xffffffff )
 		AM_RANGE(0x010800, 0x0108ff) AM_DEVREADWRITE8(APOLLO_PTM_TAG, ptm6840_device, read, write, 0x00ff00ff )
 		AM_RANGE(0x010900, 0x0109ff) AM_READWRITE8(apollo_rtc_r, apollo_rtc_w, 0xffffffff )
 		AM_RANGE(0x010c00, 0x010cff) AM_READWRITE8(/*"dma1",*/apollo_dma_1_r, apollo_dma_1_w, 0xffffffff )
@@ -722,7 +729,7 @@ static ADDRESS_MAP_START(dsp3500_map, AS_PROGRAM, 32, apollo_state )
 		AM_RANGE(0x010200, 0x0102ff) AM_READWRITE8(cache_status_register_r, cache_control_register_w, 0xffffffff )
 		AM_RANGE(0x010300, 0x0103ff) AM_READWRITE8(task_alias_register_r , task_alias_register_w , 0xffffffff )
 		AM_RANGE(0x010400, 0x0104ff) AM_DEVREADWRITE8(APOLLO_SIO_TAG, apollo_sio, read, write, 0xffffffff )
-		AM_RANGE(0x010500, 0x0105ff) AM_DEVREADWRITE8(APOLLO_SIO2_TAG, mc68681_device, read, write, 0x00ff00ff )
+		AM_RANGE(0x010500, 0x0105ff) AM_DEVREADWRITE8(APOLLO_SIO2_TAG, apollo_sio, read, write, 0xffffffff )
 		AM_RANGE(0x010800, 0x0108ff) AM_DEVREADWRITE8(APOLLO_PTM_TAG, ptm6840_device, read, write, 0x00ff00ff )
 		AM_RANGE(0x010900, 0x0109ff) AM_READWRITE8(apollo_rtc_r, apollo_rtc_w, 0xffffffff )
 		AM_RANGE(0x010c00, 0x010cff) AM_READWRITE8(/*"dma1",*/apollo_dma_1_r, apollo_dma_1_w, 0xffffffff )
@@ -816,7 +823,7 @@ static ADDRESS_MAP_START(dn5500_map, AS_PROGRAM, 32, apollo_state )
 		AM_RANGE(0x010200, 0x0102ff) AM_READWRITE8(cache_status_register_r, cache_control_register_w, 0xffffffff )
 		AM_RANGE(0x010300, 0x0103ff) AM_READWRITE8(task_alias_register_r , task_alias_register_w , 0xffffffff )
 		AM_RANGE(0x010400, 0x0104ff) AM_DEVREADWRITE8(APOLLO_SIO_TAG, apollo_sio, read, write, 0xffffffff )
-		AM_RANGE(0x010500, 0x0105ff) AM_DEVREADWRITE8(APOLLO_SIO2_TAG, mc68681_device, read, write, 0x00ff00ff )
+		AM_RANGE(0x010500, 0x0105ff) AM_DEVREADWRITE8(APOLLO_SIO2_TAG, apollo_sio, read, write, 0xffffffff )
 		AM_RANGE(0x010800, 0x0108ff) AM_DEVREADWRITE8(APOLLO_PTM_TAG, ptm6840_device, read, write, 0x00ff00ff )
 		AM_RANGE(0x010900, 0x0109ff) AM_READWRITE8(apollo_rtc_r, apollo_rtc_w, 0xffffffff )
 		AM_RANGE(0x010c00, 0x010cff) AM_READWRITE8(/*"dma1",*/apollo_dma_1_r, apollo_dma_1_w, 0xffffffff )
@@ -863,7 +870,7 @@ static ADDRESS_MAP_START(dsp5500_map, AS_PROGRAM, 32, apollo_state )
 		AM_RANGE(0x010200, 0x0102ff) AM_READWRITE8(cache_status_register_r, cache_control_register_w, 0xffffffff )
 		AM_RANGE(0x010300, 0x0103ff) AM_READWRITE8(task_alias_register_r , task_alias_register_w , 0xffffffff )
 		AM_RANGE(0x010400, 0x0104ff) AM_DEVREADWRITE8(APOLLO_SIO_TAG, apollo_sio, read, write, 0xffffffff )
-		AM_RANGE(0x010500, 0x0105ff) AM_DEVREADWRITE8(APOLLO_SIO2_TAG, mc68681_device, read, write, 0x00ff00ff )
+		AM_RANGE(0x010500, 0x0105ff) AM_DEVREADWRITE8(APOLLO_SIO2_TAG, apollo_sio, read, write, 0xffffffff )
 		AM_RANGE(0x010800, 0x0108ff) AM_DEVREADWRITE8(APOLLO_PTM_TAG, ptm6840_device, read, write, 0x00ff00ff )
 		AM_RANGE(0x010900, 0x0109ff) AM_READWRITE8(apollo_rtc_r, apollo_rtc_w, 0xffffffff )
 		AM_RANGE(0x010c00, 0x010cff) AM_READWRITE8(/*"dma1",*/apollo_dma_1_r, apollo_dma_1_w, 0xffffffff )
@@ -1041,7 +1048,7 @@ READ_LINE_MEMBER( apollo_state::apollo_kbd_is_german )
  MACHINE DRIVERS
  ***************************************************************************/
 
-static MACHINE_CONFIG_START( dn3500, apollo_state )
+static MACHINE_CONFIG_START( dn3500 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(MAINCPU, M68030, 25000000) /* 25 MHz 68030 */
 	MCFG_CPU_PROGRAM_MAP(dn3500_map)
@@ -1067,7 +1074,7 @@ static MACHINE_CONFIG_START( dn3500, apollo_state )
 #endif
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( dsp3500, apollo_state )
+static MACHINE_CONFIG_START( dsp3500 )
 	MCFG_CPU_ADD(MAINCPU, M68030, 25000000) /* 25 MHz 68030 */
 	MCFG_CPU_PROGRAM_MAP(dsp3500_map)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(apollo_state,apollo_irq_acknowledge)
@@ -1115,7 +1122,7 @@ static MACHINE_CONFIG_DERIVED( dn3000, dn3500 )
 	MCFG_RAM_EXTRA_OPTIONS("4M")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( dsp3000, apollo_state )
+static MACHINE_CONFIG_START( dsp3000 )
 	MCFG_CPU_ADD(MAINCPU, M68020PMMU, 12000000) /* 12 MHz */
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(apollo_state,apollo_irq_acknowledge)
 	MCFG_CPU_PROGRAM_MAP(dsp3000_map)
@@ -1161,7 +1168,7 @@ static MACHINE_CONFIG_DERIVED( dn5500, dn3500 )
 	MCFG_CPU_PROGRAM_MAP(dn5500_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( dsp5500, apollo_state )
+static MACHINE_CONFIG_START( dsp5500 )
 	MCFG_CPU_ADD(MAINCPU, M68040, 25000000) /* 25 MHz */
 	MCFG_CPU_PROGRAM_MAP(dsp5500_map)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(apollo_state,apollo_irq_acknowledge)
@@ -1243,15 +1250,15 @@ ROM_END
 #define DSP_FLAGS 0
 //#define DSP_FLAGS MACHINE_NO_SOUND
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT   INIT    COMPANY     FULLNAME                         FLAGS */
-COMP( 1989, dn3500,          0, 0,      dn3500_15i, dn3500, apollo_state, dn3500, "Apollo",   "Apollo DN3500", DN_FLAGS )
-COMP( 1989, dsp3500,    dn3500, 0,      dsp3500,    dsp3500, apollo_state,dsp3500,"Apollo",   "Apollo DSP3500",                DSP_FLAGS )
-COMP( 1989, dn3500_19i, dn3500, 0,      dn3500_19i, dn3500, apollo_state, dn3500, "Apollo",   "Apollo DN3500 19\" Monochrome", DN_FLAGS )
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT    STATE         INIT     COMPANY     FULLNAME                         FLAGS */
+COMP( 1989, dn3500,          0, 0,      dn3500_15i, dn3500,  apollo_state, dn3500,  "Apollo",   "Apollo DN3500",                 DN_FLAGS )
+COMP( 1989, dsp3500,    dn3500, 0,      dsp3500,    dsp3500, apollo_state, dsp3500, "Apollo",   "Apollo DSP3500",                DSP_FLAGS )
+COMP( 1989, dn3500_19i, dn3500, 0,      dn3500_19i, dn3500,  apollo_state, dn3500,  "Apollo",   "Apollo DN3500 19\" Monochrome", DN_FLAGS )
 
-COMP( 1988, dn3000,     dn3500, 0,      dn3000_15i, dn3500, apollo_state, dn3000, "Apollo",   "Apollo DN3000", DN_FLAGS )
-COMP( 1988, dsp3000,    dn3500, 0,      dsp3000,    dsp3500, apollo_state,dsp3000,"Apollo",   "Apollo DSP3000",                DSP_FLAGS )
-COMP( 1988, dn3000_19i, dn3500, 0,      dn3000_19i, dn3500, apollo_state, dn3000, "Apollo",   "Apollo DN3000 19\" Monochrome", DN_FLAGS )
+COMP( 1988, dn3000,     dn3500, 0,      dn3000_15i, dn3500,  apollo_state, dn3000,  "Apollo",   "Apollo DN3000",                 DN_FLAGS )
+COMP( 1988, dsp3000,    dn3500, 0,      dsp3000,    dsp3500, apollo_state, dsp3000, "Apollo",   "Apollo DSP3000",                DSP_FLAGS )
+COMP( 1988, dn3000_19i, dn3500, 0,      dn3000_19i, dn3500,  apollo_state, dn3000,  "Apollo",   "Apollo DN3000 19\" Monochrome", DN_FLAGS )
 
-COMP( 1991, dn5500,     dn3500, 0,      dn5500_15i, dn3500, apollo_state, dn5500, "Apollo",   "Apollo DN5500", MACHINE_NOT_WORKING )
-COMP( 1991, dsp5500,    dn3500, 0,      dsp5500,    dsp3500, apollo_state,dsp5500,"Apollo",   "Apollo DSP5500",                MACHINE_NOT_WORKING )
-COMP( 1991, dn5500_19i, dn3500, 0,      dn5500_19i, dn3500, apollo_state, dn5500, "Apollo",   "Apollo DN5500 19\" Monochrome", MACHINE_NOT_WORKING )
+COMP( 1991, dn5500,     dn3500, 0,      dn5500_15i, dn3500,  apollo_state, dn5500,  "Apollo",   "Apollo DN5500",                 MACHINE_NOT_WORKING )
+COMP( 1991, dsp5500,    dn3500, 0,      dsp5500,    dsp3500, apollo_state, dsp5500, "Apollo",   "Apollo DSP5500",                MACHINE_NOT_WORKING )
+COMP( 1991, dn5500_19i, dn3500, 0,      dn5500_19i, dn3500,  apollo_state, dn5500,  "Apollo",   "Apollo DN5500 19\" Monochrome", MACHINE_NOT_WORKING )

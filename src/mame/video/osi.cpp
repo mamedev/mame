@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder, Robbbert, Wilbert Pol
+#include "emu.h"
 #include "includes/osi.h"
+#include "screen.h"
 
 /* Palette Initialization */
 
@@ -25,7 +27,6 @@ PALETTE_INIT_MEMBER(sb2m600_state, osi630)
 
 void sb2m600_state::video_start()
 {
-	m_p_chargen = memregion("chargen")->base();
 	uint16_t addr;
 
 	/* randomize video memory contents */
@@ -145,7 +146,7 @@ uint32_t uk101_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 /* Machine Drivers */
 
-MACHINE_CONFIG_FRAGMENT( osi600_video )
+MACHINE_CONFIG_START( osi600_video )
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(X1/256/256) // 60 Hz
 	MCFG_SCREEN_UPDATE_DRIVER(sb2m600_state, screen_update)
@@ -156,7 +157,7 @@ MACHINE_CONFIG_FRAGMENT( osi600_video )
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_FRAGMENT( uk101_video )
+MACHINE_CONFIG_START( uk101_video )
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_UPDATE_DRIVER(uk101_state, screen_update)
@@ -167,7 +168,7 @@ MACHINE_CONFIG_FRAGMENT( uk101_video )
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_FRAGMENT( osi630_video )
+MACHINE_CONFIG_START( osi630_video )
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(X1/256/256) // 60 Hz
 	MCFG_SCREEN_UPDATE_DRIVER(sb2m600_state, screen_update)

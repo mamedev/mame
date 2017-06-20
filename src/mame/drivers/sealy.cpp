@@ -27,12 +27,14 @@ Notes:
 
 ***************************************************************************/
 
-// 13.0 MHz? PCB is labeled with 13.5M
-#define MAIN_CLOCK  13000000
-
 #include "emu.h"
 #include "cpu/h8/h83048.h"
 #include "sound/okim6295.h"
+#include "screen.h"
+#include "speaker.h"
+
+// 13.0 MHz? PCB is labeled with 13.5M
+#define MAIN_CLOCK  13000000
 
 class sealy_state : public driver_device
 {
@@ -93,7 +95,7 @@ static GFXDECODE_START( sealy )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( sealy, sealy_state )
+static MACHINE_CONFIG_START( sealy )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", H83044, MAIN_CLOCK) /* wrong CPU, but we have not a M16C core ATM */
@@ -113,7 +115,7 @@ static MACHINE_CONFIG_START( sealy, sealy_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", MAIN_CLOCK/13, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", MAIN_CLOCK/13, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -134,4 +136,4 @@ ROM_START( crzyddz )
 ROM_END
 
 
-GAME( 2004?, crzyddz,  0, sealy, sealy, driver_device, 0, ROT0, "Sealy", "Crazy Dou Di Zhu", MACHINE_IS_SKELETON )
+GAME( 2004?, crzyddz,  0, sealy, sealy, sealy_state, 0, ROT0, "Sealy", "Crazy Dou Di Zhu", MACHINE_IS_SKELETON )

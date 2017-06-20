@@ -5,9 +5,9 @@
 */
 
 #include "emu.h"
-#include "debugger.h"
 #include "patinhofeio_cpu.h"
-#include "includes/patinhofeio.h"
+#include "debugger.h"
+#include "includes/patinhofeio.h" // FIXME: this is a dependency from devices on MAME
 
 #define PC       m_pc //The program counter is called "contador de instrucoes" (IC) in portuguese
 #define ACC      m_acc
@@ -49,7 +49,7 @@ void patinho_feio_cpu_device::compute_effective_address(unsigned int addr){
 	}
 }
 
-const device_type PATINHO_FEIO  = &device_creator<patinho_feio_cpu_device>;
+DEFINE_DEVICE_TYPE(PATO_FEIO_CPU, patinho_feio_cpu_device, "pato_feio_cpu", "Patinho Feio CPU")
 
 //Internal 4kbytes of RAM
 static ADDRESS_MAP_START(prog_8bit, AS_PROGRAM, 8, patinho_feio_cpu_device)
@@ -57,15 +57,15 @@ static ADDRESS_MAP_START(prog_8bit, AS_PROGRAM, 8, patinho_feio_cpu_device)
 ADDRESS_MAP_END
 
 patinho_feio_cpu_device::patinho_feio_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, PATINHO_FEIO, "PATINHO FEIO", tag, owner, clock, "patinho_feio_cpu", __FILE__),
-		m_program_config("program", ENDIANNESS_LITTLE, 8, 12, 0, ADDRESS_MAP_NAME(prog_8bit)),
-		m_icount(0),
-		m_rc_read_cb(*this),
-		m_buttons_read_cb(*this),
-		/* These arrays of *this are very ugly. I wonder if there's a better way of coding this... */
-		m_iodev_read_cb{*this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this},
-		m_iodev_write_cb{*this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this},
-		m_iodev_status_cb{*this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this}
+	: cpu_device(mconfig, PATO_FEIO_CPU, tag, owner, clock)
+	, m_program_config("program", ENDIANNESS_LITTLE, 8, 12, 0, ADDRESS_MAP_NAME(prog_8bit))
+	, m_icount(0)
+	, m_rc_read_cb(*this)
+	, m_buttons_read_cb(*this)
+	// These arrays of *this are very ugly. I wonder if there's a better way of coding this...
+	, m_iodev_read_cb{*this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this}
+	, m_iodev_write_cb{*this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this}
+	, m_iodev_status_cb{*this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this}
 {
 }
 

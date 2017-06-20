@@ -12,7 +12,7 @@
 Notes:
 
 - mjcamerb and mmcamera is the medal version of mjcamera, however the
-   two don't run on the same hardware. mjcamera is in nbmj8688.c.
+   two don't run on the same hardware. mjcamera is in nbmj8688.cpp.
 
 - In mjfocus(Medal Type), sometimes CPU's hands are forced out from the screen.
   This is correct behaviour.
@@ -42,12 +42,14 @@ TODO:
 
 #include "emu.h"
 #include "includes/nbmj8891.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
 #include "sound/3812intf.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
 
 
 DRIVER_INIT_MEMBER(nbmj8891_state,gionbana)
@@ -1555,31 +1557,8 @@ static INPUT_PORTS_START( club90s )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("DSWB")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_START("DSWB") // not populated on the PCB
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, nbmj8891_state, nb1413m3_busyflag_r, nullptr)    // DRAW BUSY
@@ -2219,7 +2198,7 @@ static INPUT_PORTS_START( taiwanmb )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( gionbana, nbmj8891_state )
+static MACHINE_CONFIG_START( gionbana )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 20000000/4)    /* 5.00 MHz ? */
@@ -3558,38 +3537,38 @@ ROM_START( hnageman )
 ROM_END
 
 
-//     YEAR,     NAME,   PARENT,  MACHINE,    INPUT,     INIT, MONITOR,COMPANY,FULLNAME,FLAGS)
-GAME( 1988, msjiken,   0,        msjiken,  msjiken,   driver_device,        0, ROT270, "Nichibutsu", "Mahjong Satsujin Jiken (Japan 881017)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, hanamomo,  0,        hanamomo, hanamomo,  driver_device,        0, ROT0,   "Nichibutsu", "Mahjong Hana no Momoko gumi (Japan 881201)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, hanamomb,  hanamomo, hanamomo, hanamomo,  driver_device,        0, ROT0,   "Nichibutsu", "Mahjong Hana no Momoko gumi (Japan 881125)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, telmahjn,  0,        telmahjn, msjiken, nbmj8891_state, telmahjn, ROT270, "Nichibutsu", "Telephone Mahjong (Japan 890111)", MACHINE_SUPPORTS_SAVE )
+//    YEAR, NAME,      PARENT,   MACHINE,  INPUT,    STATE,          INIT,     MONITOR,COMPANY,FULLNAME,FLAGS)
+GAME( 1988, msjiken,   0,        msjiken,  msjiken,  nbmj8891_state, 0,        ROT270, "Nichibutsu", "Mahjong Satsujin Jiken (Japan 881017)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, hanamomo,  0,        hanamomo, hanamomo, nbmj8891_state, 0,        ROT0,   "Nichibutsu", "Mahjong Hana no Momoko gumi (Japan 881201)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, hanamomb,  hanamomo, hanamomo, hanamomo, nbmj8891_state, 0,        ROT0,   "Nichibutsu", "Mahjong Hana no Momoko gumi (Japan 881125)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, telmahjn,  0,        telmahjn, msjiken,  nbmj8891_state, telmahjn, ROT270, "Nichibutsu", "Telephone Mahjong (Japan 890111)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, gionbana,  0,        gionbana, gionbana, nbmj8891_state, gionbana, ROT0,   "Nichibutsu", "Gionbana (Japan 890120)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, mgion,     0,        mgion,    mgion,     driver_device,        0, ROT0,   "Nichibutsu", "Gionbana [BET] (Japan 890207)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mgion,     0,        mgion,    mgion,    nbmj8891_state, 0,        ROT0,   "Nichibutsu", "Gionbana [BET] (Japan 890207)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, omotesnd,  0,        omotesnd, omotesnd, nbmj8891_state, omotesnd, ROT0,   "Anime Tec", "Omotesandou (Japan 890215)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, abunai,    0,        abunai,   abunai,    driver_device,        0, ROT0,   "Green Soft", "Abunai Houkago - Mou Matenai (Japan 890325)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, mjfocus,   0,        mjfocus,  mjfocus, nbmj8891_state,  mjfocus,  ROT0,   "Nichibutsu", "Mahjong Focus (Japan 890313)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, abunai,    0,        abunai,   abunai,   nbmj8891_state, 0,        ROT0,   "Green Soft", "Abunai Houkago - Mou Matenai (Japan 890325)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mjfocus,   0,        mjfocus,  mjfocus,  nbmj8891_state, mjfocus,  ROT0,   "Nichibutsu", "Mahjong Focus (Japan 890313)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, mjfocusm,  mjfocus,  mjfocusm, mjfocusm, nbmj8891_state, mjfocusm, ROT0,   "Nichibutsu", "Mahjong Focus [BET] (Japan 890510)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, peepshow,  mjfocus,  mjfocus,  mjfocus, nbmj8891_state, mjfocus,  ROT0,   "AC", "Nozokimeguri Mahjong Peep Show (Japan 890404)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, mjcamerb,  0,        mjcamerb, mjcamerb, driver_device,         0, ROT0,   "Miki Syouji", "Mahjong Camera Kozou (set 2) (Japan 881109)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, mmcamera,  mjcamerb, mmcamera, mmcamera, driver_device,         0, ROT0,   "Miki Syouji", "Mahjong Camera Kozou [BET] (Japan 890509)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, scandal,   0,        scandal,  scandal, nbmj8891_state,  scandal,  ROT0,   "Nichibutsu", "Scandal Mahjong (Japan 890213)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, scandalm,  scandal,  scandalm, scandalm, driver_device,         0, ROT0,   "Nichibutsu", "Scandal Mahjong [BET] (Japan 890217)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, peepshow,  mjfocus,  mjfocus,  mjfocus,  nbmj8891_state, mjfocus,  ROT0,   "AC", "Nozokimeguri Mahjong Peep Show (Japan 890404)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mjcamerb,  0,        mjcamerb, mjcamerb, nbmj8891_state, 0,        ROT0,   "Miki Syouji", "Mahjong Camera Kozou (set 2) (Japan 881109)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mmcamera,  mjcamerb, mmcamera, mmcamera, nbmj8891_state, 0,        ROT0,   "Miki Syouji", "Mahjong Camera Kozou [BET] (Japan 890509)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, scandal,   0,        scandal,  scandal,  nbmj8891_state, scandal,  ROT0,   "Nichibutsu", "Scandal Mahjong (Japan 890213)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, scandalm,  scandal,  scandalm, scandalm, nbmj8891_state, 0,        ROT0,   "Nichibutsu", "Scandal Mahjong [BET] (Japan 890217)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, mgmen89,   0,        mgmen89,  mgmen89,  nbmj8891_state, mgmen89,  ROT0,   "Nichibutsu", "Mahjong G-MEN'89 (Japan 890425)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, mjnanpas,  0,        mjnanpas, mjnanpas, nbmj8891_state, mjnanpas, ROT0,   "Brooks", "Mahjong Nanpa Story (Japan 890713)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, mjnanpaa,  mjnanpas, mjnanpas, mjnanpaa, nbmj8891_state, mjnanpas, ROT0,   "Brooks", "Mahjong Nanpa Story (Japan 890712)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, mjnanpau,  mjnanpas, mjnanpas, mjnanpas, nbmj8891_state, mjnanpas, ROT0,   "Brooks", "Mahjong Nanpa Story (Ura) (Japan 890805)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, bananadr,  0,        bananadr, bananadr, driver_device,         0, ROT0,   "Digital Soft", "Mahjong Banana Dream [BET] (Japan 891124)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, mladyhtr,  0,        mladyhtr, mladyhtr, driver_device,         0, ROT0,   "Nichibutsu", "Mahjong The Lady Hunter (Japan 900509)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, chinmoku,  0,        chinmoku, chinmoku, driver_device,         0, ROT0,   "Nichibutsu", "Mahjong Chinmoku no Hentai (Japan 900511)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, maiko,     0,        maiko,    maiko,    driver_device,         0, ROT0,   "Nichibutsu", "Maikobana (Japan 900802)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, mmaiko,    0,        mmaiko,   mmaiko,   driver_device,         0, ROT0,   "Nichibutsu", "Maikobana [BET] (Japan 900911)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, hnxmasev,  0,        hnxmasev, maiko,    driver_device,         0, ROT180, "Nichibutsu / AV Japan", "AV Hanafuda Hana no Christmas Eve (Japan 901204)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, hnageman,  0,        hnageman, maiko,    driver_device,         0, ROT180, "Nichibutsu / AV Japan", "AV Hanafuda Hana no Ageman (Japan 900716)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, club90s,   0,        club90s,  club90s,  driver_device,         0, ROT0,   "Nichibutsu", "Mahjong CLUB 90's (set 1) (Japan 900919)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, club90sa,  club90s,  club90s,  club90s,  driver_device,         0, ROT0,   "Nichibutsu", "Mahjong CLUB 90's (set 2) (Japan 900919)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, lovehous,  club90s,  lovehous, lovehous, driver_device,         0, ROT0,   "Nichibutsu", "Mahjong Love House [BET] (Japan 901024)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, hanaoji,   0,        hanaoji,  hanaoji,  driver_device,         0, ROT0,   "Nichibutsu", "Hana to Ojisan [BET] (ver 1.01, 1991/12/09)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, hanaojia,  hanaoji,  hanaoji,  hanaoji,  driver_device,         0, ROT0,   "Nichibutsu", "Hana to Ojisan [BET] (ver 1.00, 1991/08/23)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, taiwanmb,  0,        taiwanmb, taiwanmb, driver_device,         0, ROT0,   "Miki Syouji", "Taiwan Mahjong [BET] (Japan 881208)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pairsnb,   0,        pairsnb, pairsnb,  nbmj8891_state,  pairsnb,  ROT0,   "Nichibutsu", "Pairs (Nichibutsu) (Japan 890822)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pairsten,  pairsnb,  pairsten, pairsnb, nbmj8891_state,  pairsten, ROT0,   "System Ten", "Pairs (System Ten) (Japan 890826)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bananadr,  0,        bananadr, bananadr, nbmj8891_state, 0,        ROT0,   "Digital Soft", "Mahjong Banana Dream [BET] (Japan 891124)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, mladyhtr,  0,        mladyhtr, mladyhtr, nbmj8891_state, 0,        ROT0,   "Nichibutsu", "Mahjong The Lady Hunter (Japan 900509)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, chinmoku,  0,        chinmoku, chinmoku, nbmj8891_state, 0,        ROT0,   "Nichibutsu", "Mahjong Chinmoku no Hentai (Japan 900511)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, maiko,     0,        maiko,    maiko,    nbmj8891_state, 0,        ROT0,   "Nichibutsu", "Maikobana (Japan 900802)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, mmaiko,    0,        mmaiko,   mmaiko,   nbmj8891_state, 0,        ROT0,   "Nichibutsu", "Maikobana [BET] (Japan 900911)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hnxmasev,  0,        hnxmasev, maiko,    nbmj8891_state, 0,        ROT180, "Nichibutsu / AV Japan", "AV Hanafuda Hana no Christmas Eve (Japan 901204)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hnageman,  0,        hnageman, maiko,    nbmj8891_state, 0,        ROT180, "Nichibutsu / AV Japan", "AV Hanafuda Hana no Ageman (Japan 900716)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, club90s,   0,        club90s,  club90s,  nbmj8891_state, 0,        ROT0,   "Nichibutsu", "Mahjong CLUB 90's (set 1) (Japan 900919)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, club90sa,  club90s,  club90s,  club90s,  nbmj8891_state, 0,        ROT0,   "Nichibutsu", "Mahjong CLUB 90's (set 2) (Japan 900919)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, lovehous,  club90s,  lovehous, lovehous, nbmj8891_state, 0,        ROT0,   "Nichibutsu", "Mahjong Love House [BET] (Japan 901024)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, hanaoji,   0,        hanaoji,  hanaoji,  nbmj8891_state, 0,        ROT0,   "Nichibutsu", "Hana to Ojisan [BET] (ver 1.01, 1991/12/09)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, hanaojia,  hanaoji,  hanaoji,  hanaoji,  nbmj8891_state, 0,        ROT0,   "Nichibutsu", "Hana to Ojisan [BET] (ver 1.00, 1991/08/23)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, taiwanmb,  0,        taiwanmb, taiwanmb, nbmj8891_state, 0,        ROT0,   "Miki Syouji", "Taiwan Mahjong [BET] (Japan 881208)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pairsnb,   0,        pairsnb,  pairsnb,  nbmj8891_state, pairsnb,  ROT0,   "Nichibutsu", "Pairs (Nichibutsu) (Japan 890822)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pairsten,  pairsnb,  pairsten, pairsnb,  nbmj8891_state, pairsten, ROT0,   "System Ten", "Pairs (System Ten) (Japan 890826)", MACHINE_SUPPORTS_SAVE )

@@ -254,15 +254,18 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "sound/sn76496.h"
-#include "sound/samples.h"
-#include "machine/gen_latch.h"
-#include "machine/segacrpt_device.h"
-#include "machine/i8255.h"
-#include "audio/segasnd.h"
 #include "includes/zaxxon.h"
+#include "audio/segasnd.h"
 
+#include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
+#include "machine/i8255.h"
+#include "machine/segacrpt_device.h"
+#include "sound/samples.h"
+#include "sound/sn76496.h"
+
+#include "screen.h"
+#include "speaker.h"
 
 
 /*************************************
@@ -300,10 +303,10 @@ INPUT_CHANGED_MEMBER(zaxxon_state::service_switch)
 }
 
 
-INTERRUPT_GEN_MEMBER(zaxxon_state::vblank_int)
+WRITE_LINE_MEMBER(zaxxon_state::vblank_int)
 {
-	if (m_int_enabled)
-		device.execute().set_input_line(0, ASSERT_LINE);
+	if (state && m_int_enabled)
+		m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
 
@@ -911,12 +914,11 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( root, zaxxon_state )
+static MACHINE_CONFIG_START( root )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/16)
 	MCFG_CPU_PROGRAM_MAP(zaxxon_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", zaxxon_state,  vblank_int)
 
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(zaxxon_state, zaxxon_sound_a_w))
@@ -932,7 +934,7 @@ static MACHINE_CONFIG_START( root, zaxxon_state )
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(zaxxon_state, screen_update_zaxxon)
 	MCFG_SCREEN_PALETTE("palette")
-
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(zaxxon_state, vblank_int))
 MACHINE_CONFIG_END
 
 
@@ -954,7 +956,6 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( szaxxone, zaxxon )
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_5013, MASTER_CLOCK/16)
 	MCFG_CPU_PROGRAM_MAP(zaxxon_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", zaxxon_state,  vblank_int)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 	MCFG_SEGACRPT_SET_SIZE(0x6000)
@@ -965,7 +966,6 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( futspye, root )
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_5061, MASTER_CLOCK/16)
 	MCFG_CPU_PROGRAM_MAP(zaxxon_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", zaxxon_state,  vblank_int)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 	MCFG_SEGACRPT_SET_SIZE(0x6000)
@@ -987,7 +987,6 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( razmataze, root )
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_5098,  MASTER_CLOCK/16)
 	MCFG_CPU_PROGRAM_MAP(ixion_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", zaxxon_state,  vblank_int)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 	MCFG_SEGACRPT_SET_SIZE(0x6000)
@@ -1007,7 +1006,6 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( ixion, razmataze )
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_5013, MASTER_CLOCK/16)
 	MCFG_CPU_PROGRAM_MAP(ixion_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", zaxxon_state,  vblank_int)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 	MCFG_SEGACRPT_SET_SIZE(0x6000)
@@ -1578,25 +1576,25 @@ DRIVER_INIT_MEMBER(zaxxon_state,razmataz)
  *************************************/
 
 /* these games run on standard Zaxxon hardware */
-GAME( 1982, zaxxon,   0,      zaxxon,   zaxxon, driver_device,   0,        ROT90,  "Sega",    "Zaxxon (set 1, rev D)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, zaxxon2,  zaxxon, zaxxon,   zaxxon, driver_device,   0,        ROT90,  "Sega",    "Zaxxon (set 2, unknown rev)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, zaxxon3,  zaxxon, zaxxon,   zaxxon, driver_device,   0,        ROT90,  "Sega",    "Zaxxon (set 3, unknown rev)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, zaxxonj,  zaxxon, szaxxon,  zaxxon, zaxxon_state,    zaxxonj,  ROT90,  "Sega",    "Zaxxon (Japan)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, zaxxonb,  zaxxon, szaxxon,  zaxxon, zaxxon_state,    zaxxonj,  ROT90,  "bootleg", "Jackson",         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, zaxxon,   0,      zaxxon,    zaxxon,   zaxxon_state,   0,        ROT90,  "Sega",    "Zaxxon (set 1, rev D)",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, zaxxon2,  zaxxon, zaxxon,    zaxxon,   zaxxon_state,   0,        ROT90,  "Sega",    "Zaxxon (set 2, unknown rev)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, zaxxon3,  zaxxon, zaxxon,    zaxxon,   zaxxon_state,   0,        ROT90,  "Sega",    "Zaxxon (set 3, unknown rev)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, zaxxonj,  zaxxon, szaxxon,   zaxxon,   zaxxon_state,   zaxxonj,  ROT90,  "Sega",    "Zaxxon (Japan)",               MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, zaxxonb,  zaxxon, szaxxon,   zaxxon,   zaxxon_state,   zaxxonj,  ROT90,  "bootleg", "Jackson",                      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 /* standard Zaxxon hardware but extra sound board plugged into 8255 PPI socket and encrypted cpu */
-GAME( 1982, szaxxon,  0,      szaxxone,  szaxxon, driver_device,   0,  ROT90,  "Sega",    "Super Zaxxon (315-5013)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, szaxxon,  0,      szaxxone,  szaxxon,  zaxxon_state,   0,        ROT90,  "Sega",    "Super Zaxxon (315-5013)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 /* standard Zaxxon hardware? but encrypted cpu */
-GAME( 1984, futspy,   0,      futspye,  futspy, driver_device,    0,   ROT90,  "Sega",    "Future Spy (315-5061)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, futspy,   0,      futspye,   futspy,   zaxxon_state,   0,        ROT90,  "Sega",    "Future Spy (315-5061)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 /* these games run on modified Zaxxon hardware with no skewing, extra inputs, and a */
 /* G-80 Universal Sound Board */
-GAME( 1983, razmataz, 0,      razmataze,  razmataz, zaxxon_state,   razmataz, ROT90,  "Sega",    "Razzmatazz", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, ixion,    0,      ixion,      ixion,    driver_device,  0,        ROT270, "Sega",    "Ixion (prototype)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
+GAME( 1983, razmataz, 0,      razmataze, razmataz, zaxxon_state,   razmataz, ROT90,  "Sega",    "Razzmatazz",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, ixion,    0,      ixion,     ixion,    zaxxon_state,   0,        ROT270, "Sega",    "Ixion (prototype)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
 
 /* these games run on a slightly newer Zaxxon hardware with more ROM space and a */
 /* custom sprite DMA chip */
-GAME( 1983, congo,    0,      congo,    congo, driver_device,    0,        ROT90,  "Sega",    "Congo Bongo (Rev C, 2 board stack)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, congoa,   congo,  congo,    congo, driver_device,    0,        ROT90,  "Sega",    "Congo Bongo (Rev C, 3 board stack)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, tiptop,   congo,  congo,    congo, driver_device,    0,        ROT90,  "Sega",    "Tip Top (3 board stack)",     MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, congo,    0,      congo,     congo,   zaxxon_state,    0,        ROT90,  "Sega",    "Congo Bongo (Rev C, 2 board stack)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, congoa,   congo,  congo,     congo,   zaxxon_state,    0,        ROT90,  "Sega",    "Congo Bongo (Rev C, 3 board stack)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, tiptop,   congo,  congo,     congo,   zaxxon_state,    0,        ROT90,  "Sega",    "Tip Top (3 board stack)",            MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

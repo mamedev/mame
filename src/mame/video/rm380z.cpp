@@ -8,6 +8,7 @@ RM 380Z video code
 */
 
 
+#include "emu.h"
 #include "includes/rm380z.h"
 
 
@@ -51,7 +52,7 @@ void rm380z_state::init_graphic_chars()
 
 void rm380z_state::config_videomode()
 {
-	if (m_port0&0x20)
+	if (m_port0&0x20&m_port0_mask)
 	{
 		// 80 cols
 		m_videomode=RM380Z_VIDEOMODE_80COL;
@@ -403,4 +404,41 @@ void rm380z_state::update_screen(bitmap_ind16 &bitmap)
 			//putChar(0x44,0x00,10,10,bitmap,pChar,m_videomode);
 		}
 	}
+}
+
+// This needs the attributes etc from above to be added
+uint32_t rm380z_state::screen_update_rm480z(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	uint8_t *chargen = memregion("chargen")->base();
+	uint8_t y,ra,chr,gfx;
+	uint16_t sy=0,ma=0,x;
+
+	for (y = 0; y < RM380Z_SCREENROWS; y++)
+	{
+		for (ra = 0; ra < 11; ra++)
+		{
+			uint16_t *p = &bitmap.pix16(sy++);
+
+			for (x = ma; x < ma + 64; x++)
+			{
+				gfx = 0;
+				if (ra < 10)
+				{
+					chr = m_vramchars[x];
+					gfx = chargen[(chr<<4) | ra ];
+				}
+				/* Display a scanline of a character */
+				*p++ = BIT(gfx, 7);
+				*p++ = BIT(gfx, 6);
+				*p++ = BIT(gfx, 5);
+				*p++ = BIT(gfx, 4);
+				*p++ = BIT(gfx, 3);
+				*p++ = BIT(gfx, 2);
+				*p++ = BIT(gfx, 1);
+				*p++ = BIT(gfx, 0);
+			}
+		}
+		ma+=64;
+	}
+	return 0;
 }

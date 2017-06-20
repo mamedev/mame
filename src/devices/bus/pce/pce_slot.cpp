@@ -19,7 +19,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type PCE_CART_SLOT = &device_creator<pce_cart_slot_device>;
+DEFINE_DEVICE_TYPE(PCE_CART_SLOT, pce_cart_slot_device, "pce_cart_slot", "PCE/TG16 Cartridge Slot")
 
 //**************************************************************************
 //    PCE cartridges Interface
@@ -136,11 +136,11 @@ void device_pce_cart_interface::rom_map_setup(uint32_t size)
 //  pce_cart_slot_device - constructor
 //-------------------------------------------------
 pce_cart_slot_device::pce_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-						device_t(mconfig, PCE_CART_SLOT, "PCE & TG16 Cartridge Slot", tag, owner, clock, "pce_cart_slot", __FILE__),
-						device_image_interface(mconfig, *this),
-						device_slot_interface(mconfig, *this),
-						m_interface("pce_cart"),
-						m_type(PCE_STD), m_cart(nullptr)
+	device_t(mconfig, PCE_CART_SLOT, tag, owner, clock),
+	device_image_interface(mconfig, *this),
+	device_slot_interface(mconfig, *this),
+	m_interface("pce_cart"),
+	m_type(PCE_STD), m_cart(nullptr)
 {
 }
 
@@ -160,18 +160,6 @@ pce_cart_slot_device::~pce_cart_slot_device()
 void pce_cart_slot_device::device_start()
 {
 	m_cart = dynamic_cast<device_pce_cart_interface *>(get_card_device());
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void pce_cart_slot_device::device_config_complete()
-{
-	// set brief and instance name
-	update_names();
 }
 
 
@@ -227,11 +215,11 @@ image_init_result pce_cart_slot_device::call_load()
 	if (m_cart)
 	{
 		uint32_t offset;
-		uint32_t len = (software_entry() == nullptr) ? length() : get_software_region_length("rom");
+		uint32_t len = !loaded_through_softlist() ? length() : get_software_region_length("rom");
 		uint8_t *ROM;
 
 		// From fullpath, check for presence of a header and skip it
-		if (software_entry() == nullptr && (len % 0x4000) == 512)
+		if (!loaded_through_softlist() && (len % 0x4000) == 512)
 		{
 			logerror("Rom-header found, skipping\n");
 			offset = 512;
@@ -242,7 +230,7 @@ image_init_result pce_cart_slot_device::call_load()
 		m_cart->rom_alloc(len, tag());
 		ROM = m_cart->get_rom_base();
 
-		if (software_entry() == nullptr)
+		if (!loaded_through_softlist())
 			fread(ROM, len);
 		else
 			memcpy(ROM, get_software_region("rom"), len);
@@ -263,7 +251,7 @@ image_init_result pce_cart_slot_device::call_load()
 
 		m_cart->rom_map_setup(len);
 
-		if (software_entry() == nullptr)
+		if (!loaded_through_softlist())
 			m_type = get_cart_type(ROM, len);
 		else
 		{
@@ -299,7 +287,7 @@ void pce_cart_slot_device::call_unload()
  fullpath
  -------------------------------------------------*/
 
-int pce_cart_slot_device::get_cart_type(uint8_t *ROM, uint32_t len)
+int pce_cart_slot_device::get_cart_type(const uint8_t *ROM, uint32_t len)
 {
 	int type = PCE_STD;
 
@@ -327,22 +315,21 @@ int pce_cart_slot_device::get_cart_type(uint8_t *ROM, uint32_t len)
  get default card software
  -------------------------------------------------*/
 
-std::string pce_cart_slot_device::get_default_card_software()
+std::string pce_cart_slot_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
-	if (open_image_file(mconfig().options()))
+	if (hook.image_file())
 	{
 		const char *slot_string;
-		uint32_t len = m_file->size();
+		uint32_t len = hook.image_file()->size();
 		std::vector<uint8_t> rom(len);
 		int type;
 
-		m_file->read(&rom[0], len);
+		hook.image_file()->read(&rom[0], len);
 
 		type = get_cart_type(&rom[0], len);
 		slot_string = pce_get_slot(type);
 
 		//printf("type: %s\n", slot_string);
-		clear();
 
 		return std::string(slot_string);
 	}

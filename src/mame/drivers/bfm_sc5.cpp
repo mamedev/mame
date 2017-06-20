@@ -12,14 +12,14 @@
 
 
 #include "emu.h"
-
 #include "includes/bfm_sc5.h"
 
-
-#include "machine/mcf5206e.h"
-#include "bfm_sc5.lh"
-#include "video/awpvid.h"
 #include "machine/bfm_sc45_helper.h"
+#include "machine/mcf5206e.h"
+#include "video/awpvid.h"
+#include "speaker.h"
+
+#include "bfm_sc5.lh"
 
 
 
@@ -209,7 +209,7 @@ WRITE8_MEMBER(bfm_sc5_state::bfm_sc5_duart_output_w)
 	logerror("bfm_sc5_duart_output_w\n");
 }
 
-MACHINE_CONFIG_START( bfm_sc5, bfm_sc5_state )
+MACHINE_CONFIG_START( bfm_sc5 )
 	MCFG_CPU_ADD("maincpu", MCF5206E, 40000000) /* MCF5206eFT */
 	MCFG_CPU_PROGRAM_MAP(sc5_map)
 	MCFG_MCF5206E_PERIPHERAL_ADD("maincpu_onboard")

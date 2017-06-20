@@ -46,13 +46,13 @@
 #include "cococart.h"
 #include "coco_fdc.h"
 #include "imagedev/flopdrv.h"
-#include "includes/coco.h"
 #include "machine/msm6242.h"
 #include "machine/ds1315.h"
 #include "machine/wd_fdc.h"
 #include "formats/dmk_dsk.h"
 #include "formats/jvc_dsk.h"
 #include "formats/vdk_dsk.h"
+#include "formats/sdf_dsk.h"
 
 
 /***************************************************************************
@@ -72,11 +72,10 @@
 
 class coco_fdc_device_base : public coco_family_fdc_device_base
 {
-public:
-	// construction/destruction
-	coco_fdc_device_base(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
-
 protected:
+	// construction/destruction
+	coco_fdc_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	enum class rtc_type
 	{
 		DISTO = 0x00,
@@ -85,9 +84,9 @@ protected:
 	};
 
 	// device-level overrides
-	virtual DECLARE_READ8_MEMBER(read) override;
-	virtual DECLARE_WRITE8_MEMBER(write) override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual DECLARE_READ8_MEMBER(scs_read) override;
+	virtual DECLARE_WRITE8_MEMBER(scs_write) override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	// methods
 	virtual void update_lines() override;
@@ -95,7 +94,7 @@ protected:
 	rtc_type real_time_clock();
 
 	// devices
-	required_device<wd1773_t>                   m_wd17xx;
+	required_device<wd1773_device>              m_wd17xx;
 	required_device<ds1315_device>              m_ds1315;
 	required_device_array<floppy_connector, 4>  m_floppies;
 
@@ -114,22 +113,27 @@ protected:
 FLOPPY_FORMATS_MEMBER( coco_family_fdc_device_base::floppy_formats )
 	FLOPPY_DMK_FORMAT,
 	FLOPPY_JVC_FORMAT,
-	FLOPPY_VDK_FORMAT
+	FLOPPY_VDK_FORMAT,
+	FLOPPY_SDF_FORMAT
 FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START( coco_fdc_floppies )
 	SLOT_INTERFACE("qd", FLOPPY_525_QD)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_FRAGMENT(coco_fdc)
+MACHINE_CONFIG_MEMBER(coco_fdc_device_base::device_add_mconfig )
 	MCFG_WD1773_ADD(WD_TAG, XTAL_8MHz)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(coco_fdc_device_base, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(coco_fdc_device_base, fdc_drq_w))
 
 	MCFG_FLOPPY_DRIVE_ADD(WD_TAG ":0", coco_fdc_floppies, "qd", coco_fdc_device_base::floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD(WD_TAG ":1", coco_fdc_floppies, "qd", coco_fdc_device_base::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(WD_TAG ":2", coco_fdc_floppies, "", coco_fdc_device_base::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(WD_TAG ":3", coco_fdc_floppies, "", coco_fdc_device_base::floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+	MCFG_FLOPPY_DRIVE_ADD(WD_TAG ":2", coco_fdc_floppies, nullptr, coco_fdc_device_base::floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+	MCFG_FLOPPY_DRIVE_ADD(WD_TAG ":3", coco_fdc_floppies, nullptr, coco_fdc_device_base::floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	MCFG_DEVICE_ADD(DISTO_TAG, MSM6242, XTAL_32_768kHz)
 	MCFG_DS1315_ADD(CLOUD9_TAG)
@@ -182,8 +186,8 @@ uint8_t* coco_family_fdc_device_base::get_cart_base()
 //  coco_fdc_device_base - constructor
 //-------------------------------------------------
 
-coco_fdc_device_base::coco_fdc_device_base(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: coco_family_fdc_device_base(mconfig, type, name, tag, owner, clock, shortname, source)
+coco_fdc_device_base::coco_fdc_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: coco_family_fdc_device_base(mconfig, type, tag, owner, clock)
 	, m_wd17xx(*this, WD_TAG)
 	, m_ds1315(*this, CLOUD9_TAG)
 	, m_floppies(*this, WD_TAG ":%u", 0)
@@ -213,17 +217,6 @@ coco_fdc_device_base::rtc_type coco_fdc_device_base::real_time_clock()
 
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor coco_fdc_device_base::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME(coco_fdc);
-}
-
-
-//-------------------------------------------------
 //  update_lines - CoCo specific disk
 //  controller lines
 //-------------------------------------------------
@@ -235,10 +228,10 @@ void coco_fdc_device_base::update_lines()
 		set_dskreg(dskreg() & ~0x80);  // clear halt enable
 
 	// set the NMI line
-	cart_set_line(cococart_slot_device::line::NMI, intrq() && (dskreg() & 0x20));
+	set_line_value(line::NMI, intrq() && (dskreg() & 0x20));
 
 	// set the HALT line
-	cart_set_line(cococart_slot_device::line::HALT, !drq() && (dskreg() & 0x80));
+	set_line_value(line::HALT, !drq() && (dskreg() & 0x80));
 }
 
 
@@ -265,12 +258,11 @@ void coco_fdc_device_base::dskreg_w(uint8_t data)
 			data);
 	}
 
-	/* An email from John Kowalski informed me that if the DS3 is
-	 * high, and one of the other drive bits is selected (DS0-DS2), then the
-	 * second side of DS0, DS1, or DS2 is selected.  If multiple bits are
-	 * selected in other situations, then both drives are selected, and any
-	 * read signals get yucky.
-	 */
+	// An email from John Kowalski informed me that if the DS3 is
+	// high, and one of the other drive bits is selected (DS0-DS2), then the
+	// second side of DS0, DS1, or DS2 is selected.  If multiple bits are
+	// selected in other situations, then both drives are selected, and any
+	// read signals get yucky.
 
 	if (data & 0x04)
 		drive = 2;
@@ -285,7 +277,7 @@ void coco_fdc_device_base::dskreg_w(uint8_t data)
 	{
 		floppy_image_device *floppy = m_floppies[i]->get_device();
 		if (floppy)
-			floppy->mon_w(i == drive ? CLEAR_LINE : ASSERT_LINE);
+			floppy->mon_w(((i == drive) && (data & 0x08)) ? CLEAR_LINE : ASSERT_LINE);
 	}
 
 	head = ((data & 0x40) && (drive != 3)) ? 1 : 0;
@@ -305,14 +297,14 @@ void coco_fdc_device_base::dskreg_w(uint8_t data)
 
 
 //-------------------------------------------------
-//  read
+//  scs_read
 //-------------------------------------------------
 
-READ8_MEMBER(coco_fdc_device_base::read)
+READ8_MEMBER(coco_fdc_device_base::scs_read)
 {
 	uint8_t result = 0;
 
-	switch(offset & 0xEF)
+	switch(offset & 0x1F)
 	{
 		case 8:
 			result = m_wd17xx->status_r(space, 0);
@@ -329,38 +321,37 @@ READ8_MEMBER(coco_fdc_device_base::read)
 	}
 
 	/* other stuff for RTCs */
-	switch(offset)
+	switch (offset)
 	{
-		case 0x10:  /* FF50 */
-			if (real_time_clock() == rtc_type::DISTO)
-				result = m_disto_msm6242->read(space,m_msm6242_rtc_address);
-			break;
+	case 0x10:  /* FF50 */
+		if (real_time_clock() == rtc_type::DISTO)
+			result = m_disto_msm6242->read(space, m_msm6242_rtc_address);
+		break;
 
-		case 0x38:  /* FF78 */
-			if (real_time_clock() == rtc_type::CLOUD9)
-				m_ds1315->read_0(space, offset);
-			break;
+	case 0x38:  /* FF78 */
+		if (real_time_clock() == rtc_type::CLOUD9)
+			m_ds1315->read_0(space, offset);
+		break;
 
-		case 0x39:  /* FF79 */
-			if (real_time_clock() == rtc_type::CLOUD9)
-				m_ds1315->read_1(space, offset);
-			break;
+	case 0x39:  /* FF79 */
+		if (real_time_clock() == rtc_type::CLOUD9)
+			m_ds1315->read_1(space, offset);
+		break;
 
-		case 0x3C:  /* FF7C */
-			if (real_time_clock() == rtc_type::CLOUD9)
-				result = m_ds1315->read_data(space, offset);
-			break;
+	case 0x3C:  /* FF7C */
+		if (real_time_clock() == rtc_type::CLOUD9)
+			result = m_ds1315->read_data(space, offset);
+		break;
 	}
 	return result;
 }
 
 
-
 //-------------------------------------------------
-//  write
+//  scs_write
 //-------------------------------------------------
 
-WRITE8_MEMBER(coco_fdc_device_base::write)
+WRITE8_MEMBER(coco_fdc_device_base::scs_write)
 {
 	switch(offset & 0x1F)
 	{
@@ -378,7 +369,6 @@ WRITE8_MEMBER(coco_fdc_device_base::write)
 			m_wd17xx->sector_w(space, 0, data);
 			break;
 		case 11:
-			//printf("data w %02x\n", data);
 			m_wd17xx->data_w(space, 0, data);
 			break;
 	};
@@ -415,7 +405,7 @@ namespace
 	public:
 		// construction/destruction
 		coco_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-			: coco_fdc_device_base(mconfig, COCO_FDC, "CoCo FDC", tag, owner, clock, "coco_fdc", __FILE__)
+			: coco_fdc_device_base(mconfig, COCO_FDC, tag, owner, clock)
 		{
 		}
 
@@ -429,7 +419,8 @@ namespace
 	};
 
 }
-const device_type COCO_FDC = &device_creator<coco_fdc_device>;
+
+DEFINE_DEVICE_TYPE(COCO_FDC, coco_fdc_device, "coco_fdc", "CoCo FDC")
 
 
 //**************************************************************************
@@ -451,7 +442,7 @@ namespace
 	public:
 		// construction/destruction
 		coco_fdc_v11_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-			: coco_fdc_device_base(mconfig, COCO_FDC_V11, "CoCo FDC v1.1", tag, owner, clock, "coco_fdc_v11", __FILE__)
+			: coco_fdc_device_base(mconfig, COCO_FDC_V11, tag, owner, clock)
 		{
 		}
 
@@ -462,9 +453,9 @@ namespace
 			return ROM_NAME(coco_fdc_v11);
 		}
 	};
-};
+}
 
-const device_type COCO_FDC_V11 = &device_creator<coco_fdc_v11_device>;
+DEFINE_DEVICE_TYPE(COCO_FDC_V11, coco_fdc_v11_device, "coco_fdc_v11", "CoCo FDC v1.1")
 
 
 //**************************************************************************
@@ -486,7 +477,7 @@ namespace
 	public:
 		// construction/destruction
 		coco3_hdb1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-			: coco_fdc_device_base(mconfig, COCO3_HDB1, "CoCo3 HDB-DOS", tag, owner, clock, "coco3_hdb1", __FILE__)
+			: coco_fdc_device_base(mconfig, COCO3_HDB1, tag, owner, clock)
 		{
 		}
 
@@ -497,9 +488,9 @@ namespace
 			return ROM_NAME(coco3_hdb1);
 		}
 	};
-};
+}
 
-const device_type COCO3_HDB1 = &device_creator<coco3_hdb1_device>;
+DEFINE_DEVICE_TYPE(COCO3_HDB1, coco3_hdb1_device, "coco3_hdb1", "CoCo3 HDB-DOS")
 
 //**************************************************************************
 //              CP400 FDC
@@ -517,7 +508,7 @@ namespace
 	public:
 		// construction/destruction
 		cp400_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-			: coco_fdc_device_base(mconfig, CP400_FDC, "CP400 FDC", tag, owner, clock, "cp400_fdc", __FILE__)
+			: coco_fdc_device_base(mconfig, CP400_FDC, tag, owner, clock)
 		{
 		}
 
@@ -528,6 +519,6 @@ namespace
 			return ROM_NAME(cp400_fdc);
 		}
 	};
-};
+}
 
-const device_type CP400_FDC = &device_creator<cp400_fdc_device>;
+DEFINE_DEVICE_TYPE(CP400_FDC, cp400_fdc_device, "cp400_fdc", "CP400 FDC")

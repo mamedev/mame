@@ -39,10 +39,14 @@ ToDo:
 *******************************************************************************/
 
 
-#include "machine/genpin.h"
+#include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/genpin.h"
 #include "machine/i8155.h"
 #include "sound/astrocde.h"
+#include "screen.h"
+#include "speaker.h"
+
 #include "g627.lh"
 
 
@@ -282,7 +286,7 @@ WRITE8_MEMBER( g627_state::lamp_w )
 	}
 }
 
-static MACHINE_CONFIG_START( g627, g627_state )
+static MACHINE_CONFIG_START( g627 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 14138000/8)
 	MCFG_CPU_PROGRAM_MAP(g627_map)

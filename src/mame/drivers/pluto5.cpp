@@ -179,6 +179,7 @@
 
 #include "emu.h"
 #include "machine/68340.h"
+#include "speaker.h"
 
 class pluto5_state : public driver_device
 {
@@ -197,7 +198,7 @@ public:
 protected:
 
 	// devices
-	required_device<m68340cpu_device> m_maincpu;
+	required_device<m68340_cpu_device> m_maincpu;
 public:
 	DECLARE_DRIVER_INIT(hb);
 	virtual void machine_start() override;
@@ -250,7 +251,7 @@ void pluto5_state::machine_start()
 
 }
 
-static MACHINE_CONFIG_START( pluto5, pluto5_state )
+static MACHINE_CONFIG_START( pluto5 )
 	MCFG_CPU_ADD("maincpu", M68340, 16000000)
 	MCFG_CPU_PROGRAM_MAP(pluto5_map)
 

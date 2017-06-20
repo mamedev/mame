@@ -30,10 +30,13 @@
 
 #include "emu.h"
 #include "cpu/m6502/r65c02.h"
-#include "video/seta001.h"
-#include "sound/ay8910.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
+#include "sound/ay8910.h"
+#include "video/seta001.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 class thedealr_state : public driver_device
 {
@@ -44,7 +47,7 @@ public:
 		m_subcpu(*this, "subcpu"),
 		m_seta001(*this, "spritegen"),
 		m_palette(*this, "palette")
-		{ }
+	{ }
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -71,7 +74,7 @@ public:
 	// video
 	DECLARE_PALETTE_INIT(thedealr);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 };
 
 /***************************************************************************
@@ -102,7 +105,7 @@ uint32_t thedealr_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-void thedealr_state::screen_eof(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(thedealr_state::screen_vblank)
 {
 	// rising edge
 	if (state)
@@ -520,7 +523,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(thedealr_state::thedealr_interrupt)
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( thedealr, thedealr_state )
+static MACHINE_CONFIG_START( thedealr )
 
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", R65C02, XTAL_16MHz/8)   // 2 MHz?
@@ -548,7 +551,7 @@ static MACHINE_CONFIG_START( thedealr, thedealr_state )
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0+30, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(thedealr_state, screen_update)
-	MCFG_SCREEN_VBLANK_DRIVER(thedealr_state, screen_eof)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(thedealr_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", thedealr)
@@ -589,4 +592,4 @@ ROM_START( thedealr )
 	ROM_LOAD( "xb0-u68.u68", 0x200, 0x200, CRC(c0c54d43) SHA1(5ce352fb888c8e683014c73e6da00ec95f2ae572) )
 ROM_END
 
-GAME( 1988?, thedealr, 0, thedealr, thedealr, driver_device, 0, ROT0, "Visco Games", "The Dealer (Visco)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988?, thedealr, 0, thedealr, thedealr, thedealr_state, 0, ROT0, "Visco Games", "The Dealer (Visco)", MACHINE_SUPPORTS_SAVE )

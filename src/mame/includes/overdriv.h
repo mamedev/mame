@@ -10,6 +10,7 @@
 #include "video/k053246_k053247_k055673.h"
 #include "video/k053251.h"
 #include "video/konami_helper.h"
+#include "screen.h"
 
 class overdriv_state : public driver_device
 {
@@ -31,6 +32,7 @@ public:
 	int       m_zoom_colorbase[2];
 	int       m_road_colorbase[2];
 	int       m_sprite_colorbase;
+	emu_timer *m_objdma_end_timer;
 
 	/* misc */
 	uint16_t     m_cpuB_ctrl;

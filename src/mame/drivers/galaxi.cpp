@@ -33,14 +33,17 @@
 
 ***************************************************************************/
 
-#define CPU_CLOCK       (XTAL_10MHz)
-#define SND_CLOCK       (XTAL_16MHz)/16
-
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
 #include "machine/nvram.h"
+#include "screen.h"
+#include "speaker.h"
+
 #include "galaxi.lh"
+
+#define CPU_CLOCK       (XTAL_10MHz)
+#define SND_CLOCK       (XTAL_16MHz)/16
 
 class galaxi_state : public driver_device
 {
@@ -442,7 +445,7 @@ void galaxi_state::machine_reset()
                               Machine Drivers
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( galaxi, galaxi_state )
+static MACHINE_CONFIG_START( galaxi )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, CPU_CLOCK)
@@ -467,7 +470,7 @@ static MACHINE_CONFIG_START( galaxi, galaxi_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", SND_CLOCK, OKIM6295_PIN7_LOW)  // ?
+	MCFG_OKIM6295_ADD("oki", SND_CLOCK, PIN7_LOW)  // ?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -573,7 +576,7 @@ ROM_END
                                Game Drivers
 ***************************************************************************/
 
-/*     YEAR  NAME      PARENT  MACHINE   INPUT     STATE          INIT  ROT    COMPANY   FULLNAME                       FLAGS                   LAYOUT  */
-GAMEL( 2000, galaxi,   0,      galaxi,   galaxi,   driver_device, 0,    ROT0, "B.R.L.", "Galaxi (v2.0)",                MACHINE_SUPPORTS_SAVE,  layout_galaxi )
-GAMEL( 2000, magjoker, 0,      magjoker, magjoker, driver_device, 0,    ROT0, "B.R.L.", "Magic Joker (v1.25.10.2000)",  MACHINE_SUPPORTS_SAVE,  layout_galaxi )
-GAMEL( 2001, lastfour, 0,      lastfour, magjoker, driver_device, 0,    ROT0, "B.R.L.", "Last Four (09:12 16/01/2001)", MACHINE_SUPPORTS_SAVE,  layout_galaxi )
+//     YEAR  NAME      PARENT  MACHINE   INPUT     STATE         INIT  ROT   COMPANY   FULLNAME                        FLAGS                   LAYOUT
+GAMEL( 2000, galaxi,   0,      galaxi,   galaxi,   galaxi_state, 0,    ROT0, "B.R.L.", "Galaxi (v2.0)",                MACHINE_SUPPORTS_SAVE,  layout_galaxi )
+GAMEL( 2000, magjoker, 0,      magjoker, magjoker, galaxi_state, 0,    ROT0, "B.R.L.", "Magic Joker (v1.25.10.2000)",  MACHINE_SUPPORTS_SAVE,  layout_galaxi )
+GAMEL( 2001, lastfour, 0,      lastfour, magjoker, galaxi_state, 0,    ROT0, "B.R.L.", "Last Four (09:12 16/01/2001)", MACHINE_SUPPORTS_SAVE,  layout_galaxi )

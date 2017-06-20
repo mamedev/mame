@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli
-#ifndef __ARCADIA_SLOT_H
-#define __ARCADIA_SLOT_H
+#ifndef MAME_BUS_ARCADIA_SLOT_H
+#define MAME_BUS_ARCADIA_SLOT_H
 
 #include "softlist_dev.h"
 
@@ -54,10 +54,6 @@ public:
 	arcadia_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~arcadia_cart_slot_device();
 
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_config_complete() override;
-
 	// image-level overrides
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override {}
@@ -75,13 +71,15 @@ public:
 	virtual const char *file_extensions() const override { return "bin"; }
 
 	// slot interface overrides
-	virtual std::string get_default_card_software() override;
+	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_rom);
 	virtual DECLARE_READ8_MEMBER(extra_rom);
 
 protected:
+	// device-level overrides
+	virtual void device_start() override;
 
 	int m_type;
 	device_arcadia_cart_interface*       m_cart;
@@ -90,7 +88,7 @@ protected:
 
 
 // device type definition
-extern const device_type EA2001_CART_SLOT;
+DECLARE_DEVICE_TYPE(EA2001_CART_SLOT, arcadia_cart_slot_device)
 
 
 /***************************************************************************
@@ -102,4 +100,5 @@ extern const device_type EA2001_CART_SLOT;
 #define MCFG_ARCADIA_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
 	MCFG_DEVICE_ADD(_tag, EA2001_CART_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
-#endif
+
+#endif // MAME_BUS_ARCADIA_SLOT_H

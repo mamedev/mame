@@ -1,9 +1,66 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
+#ifndef MAME_CPU_TLCS90_TLCS90_H
+#define MAME_CPU_TLCS90_TLCS90_H
+
 #pragma once
 
-#ifndef __TLCS90_H__
-#define __TLCS90_H__
+
+// I/O callbacks
+#define MCFG_TLCS90_PORT_P0_READ_CB(_devcb) \
+	devcb = &tlcs90_device::set_port_read_cb(*device, 0, DEVCB_##_devcb);
+
+#define MCFG_TLCS90_PORT_P1_READ_CB(_devcb) \
+	devcb = &tlcs90_device::set_port_read_cb(*device, 1, DEVCB_##_devcb);
+
+#define MCFG_TLCS90_PORT_P2_READ_CB(_devcb) \
+	devcb = &tlcs90_device::set_port_read_cb(*device, 2, DEVCB_##_devcb);
+
+#define MCFG_TLCS90_PORT_P3_READ_CB(_devcb) \
+	devcb = &tlcs90_device::set_port_read_cb(*device, 3, DEVCB_##_devcb);
+
+#define MCFG_TLCS90_PORT_P4_READ_CB(_devcb) \
+	devcb = &tlcs90_device::set_port_read_cb(*device, 4, DEVCB_##_devcb);
+
+#define MCFG_TLCS90_PORT_P5_READ_CB(_devcb) \
+	devcb = &tlcs90_device::set_port_read_cb(*device, 5, DEVCB_##_devcb);
+
+#define MCFG_TLCS90_PORT_P6_READ_CB(_devcb) \
+	devcb = &tlcs90_device::set_port_read_cb(*device, 6, DEVCB_##_devcb);
+
+#define MCFG_TLCS90_PORT_P7_READ_CB(_devcb) \
+	devcb = &tlcs90_device::set_port_read_cb(*device, 7, DEVCB_##_devcb);
+
+#define MCFG_TLCS90_PORT_P8_READ_CB(_devcb) \
+	devcb = &tlcs90_device::set_port_read_cb(*device, 8, DEVCB_##_devcb);
+
+
+#define MCFG_TLCS90_PORT_P0_WRITE_CB(_devcb) \
+	devcb = &tlcs90_device::set_port_write_cb(*device, 0, DEVCB_##_devcb);
+
+#define MCFG_TLCS90_PORT_P1_WRITE_CB(_devcb) \
+	devcb = &tlcs90_device::set_port_write_cb(*device, 1, DEVCB_##_devcb);
+
+#define MCFG_TLCS90_PORT_P2_WRITE_CB(_devcb) \
+	devcb = &tlcs90_device::set_port_write_cb(*device, 2, DEVCB_##_devcb);
+
+#define MCFG_TLCS90_PORT_P3_WRITE_CB(_devcb) \
+	devcb = &tlcs90_device::set_port_write_cb(*device, 3, DEVCB_##_devcb);
+
+#define MCFG_TLCS90_PORT_P4_WRITE_CB(_devcb) \
+	devcb = &tlcs90_device::set_port_write_cb(*device, 4, DEVCB_##_devcb);
+
+#define MCFG_TLCS90_PORT_P5_WRITE_CB(_devcb) \
+	devcb = &tlcs90_device::set_port_write_cb(*device, 5, DEVCB_##_devcb);
+
+#define MCFG_TLCS90_PORT_P6_WRITE_CB(_devcb) \
+	devcb = &tlcs90_device::set_port_write_cb(*device, 6, DEVCB_##_devcb);
+
+#define MCFG_TLCS90_PORT_P7_WRITE_CB(_devcb) \
+	devcb = &tlcs90_device::set_port_write_cb(*device, 7, DEVCB_##_devcb);
+
+#define MCFG_TLCS90_PORT_P8_WRITE_CB(_devcb) \
+	devcb = &tlcs90_device::set_port_write_cb(*device, 8, DEVCB_##_devcb);
 
 
 #define T90_IOBASE  0xffc0
@@ -23,10 +80,10 @@ DECLARE_ENUM_OPERATORS(tlcs90_e_irq)
 
 class tlcs90_device : public cpu_device
 {
-public:
-	// construction/destruction
-	tlcs90_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, address_map_constructor program_map);
+	static constexpr int MAX_PORTS = 9;
+	//static constexpr int MAX_ANALOG_INPUTS = 16;
 
+public:
 	DECLARE_READ8_MEMBER( t90_internal_registers_r );
 	DECLARE_WRITE8_MEMBER( t90_internal_registers_w );
 
@@ -35,6 +92,24 @@ public:
 
 protected:
 	enum _e_op {    UNKNOWN,    NOP,    EX,     EXX,    LD,     LDW,    LDA,    LDI,    LDIR,   LDD,    LDDR,   CPI,    CPIR,   CPD,    CPDR,   PUSH,   POP,    JP,     JR,     CALL,   CALLR,      RET,    RETI,   HALT,   DI,     EI,     SWI,    DAA,    CPL,    NEG,    LDAR,   RCF,    SCF,    CCF,    TSET,   BIT,    SET,    RES,    INC,    DEC,    INCX,   DECX,   INCW,   DECW,   ADD,    ADC,    SUB,    SBC,    AND,    XOR,    OR,     CP,     RLC,    RRC,    RL,     RR,     SLA,    SRA,    SLL,    SRL,    RLD,    RRD,    DJNZ,   MUL,    DIV     };
+
+
+public:
+	// static configuration
+	template<class Object> static devcb_base &set_port_read_cb(device_t &device, int port, Object &&object)
+	{
+		assert(port >= 0 && port < MAX_PORTS);
+		return downcast<tlcs90_device &>(device).m_port_read_cb[port].set_callback(std::forward<Object>(object));
+	}
+	template<class Object> static devcb_base &set_port_write_cb(device_t &device, int port, Object &&object)
+	{
+		assert(port >= 0 && port < MAX_PORTS);
+		return downcast<tlcs90_device &>(device).m_port_write_cb[port].set_callback(std::forward<Object>(object));
+	}
+
+protected:
+	// construction/destruction
+	tlcs90_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor program_map);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -50,7 +125,7 @@ protected:
 	virtual void execute_burn(int32_t cycles) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : nullptr ); }
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : nullptr; }
 
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
@@ -70,14 +145,15 @@ private:
 	};
 
 	address_space_config m_program_config;
-	address_space_config m_io_config;
+
+	devcb_read8 m_port_read_cb[MAX_PORTS];
+	devcb_write8 m_port_write_cb[MAX_PORTS];
 
 	PAIR        m_prvpc,m_pc,m_sp,m_af,m_bc,m_de,m_hl,m_ix,m_iy;
 	PAIR        m_af2,m_bc2,m_de2,m_hl2;
 	uint8_t       m_halt, m_after_EI;
 	uint16_t      m_irq_state, m_irq_mask;
 	address_space *m_program;
-	address_space *m_io;
 	int     m_icount;
 	int         m_extra_cycles;       // extra cycles for interrupts
 	uint8_t       m_internal_registers[48];
@@ -166,6 +242,7 @@ public:
 	tmp90845_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
+
 class tmp91640_device : public tlcs90_device
 {
 public:
@@ -182,10 +259,19 @@ public:
 };
 
 
-extern const device_type TMP90840;
-extern const device_type TMP90841;
-extern const device_type TMP90845;
-extern const device_type TMP91640;
-extern const device_type TMP91641;
+class tmp90ph44_device : public tlcs90_device
+{
+public:
+	// construction/destruction
+	tmp90ph44_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
 
-#endif /* __TLCS90_H__ */
+
+DECLARE_DEVICE_TYPE(TMP90840,  tmp90840_device)
+DECLARE_DEVICE_TYPE(TMP90841,  tmp90841_device)
+DECLARE_DEVICE_TYPE(TMP90845,  tmp90845_device)
+DECLARE_DEVICE_TYPE(TMP91640,  tmp91640_device)
+DECLARE_DEVICE_TYPE(TMP91641,  tmp91641_device)
+DECLARE_DEVICE_TYPE(TMP90PH44, tmp90ph44_device)
+
+#endif // MAME_CPU_TLCS90_TLCS90_H

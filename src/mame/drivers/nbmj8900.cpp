@@ -27,10 +27,12 @@ TODO:
 
 #include "emu.h"
 #include "includes/nbmj8900.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/3812intf.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
 
 
 DRIVER_INIT_MEMBER(nbmj8900_state,ohpaipee)
@@ -299,7 +301,7 @@ INPUT_PORTS_END
 
 
 
-static MACHINE_CONFIG_START( ohpaipee, nbmj8900_state )
+static MACHINE_CONFIG_START( ohpaipee )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 20000000/4)    /* 5.00 MHz ? */

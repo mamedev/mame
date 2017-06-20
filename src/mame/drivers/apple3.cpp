@@ -19,7 +19,6 @@
 #include "emu.h"
 #include "includes/apple3.h"
 #include "includes/apple2.h"
-#include "bus/rs232/rs232.h"
 #include "sound/volt_reg.h"
 #include "formats/ap2_dsk.h"
 
@@ -28,7 +27,11 @@
 #include "bus/a2bus/a2thunderclock.h"
 #include "bus/a2bus/mouse.h"
 
+#include "bus/rs232/rs232.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 static ADDRESS_MAP_START( apple3_map, AS_PROGRAM, 8, apple3_state )
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(apple3_memory_r, apple3_memory_w)
@@ -49,7 +52,7 @@ FLOPPY_FORMATS_MEMBER( apple3_state::floppy_formats )
 	FLOPPY_A216S_FORMAT, FLOPPY_RWTS18_FORMAT, FLOPPY_EDD_FORMAT
 FLOPPY_FORMATS_END
 
-static MACHINE_CONFIG_START( apple3, apple3_state )
+static MACHINE_CONFIG_START( apple3 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 2000000)        /* 2 MHz */
 	MCFG_M6502_SYNC_CALLBACK(WRITELINE(apple3_state, apple3_sync_w))
@@ -350,5 +353,5 @@ ROM_START(apple3)
 	ROM_LOAD( "apple3.rom", 0x0000, 0x1000, CRC(55e8eec9) SHA1(579ee4cd2b208d62915a0aa482ddc2744ff5e967))
 ROM_END
 
-/*     YEAR     NAME        PARENT  COMPAT  MACHINE    INPUT    INIT    COMPANY             FULLNAME */
-COMP( 1980, apple3,     0,      0,      apple3,    apple3, apple3_state,    apple3,     "Apple Computer",   "Apple ///", MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE    INPUT   STATE         INIT    COMPANY           FULLNAME */
+COMP( 1980, apple3,     0,      0,      apple3,    apple3, apple3_state, apple3, "Apple Computer", "Apple ///", MACHINE_SUPPORTS_SAVE )

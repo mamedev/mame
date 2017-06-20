@@ -47,12 +47,15 @@ ToDo:
 ************************************************************************************/
 
 #include "emu.h"
+#include "machine/genpin.h"
+
 #include "cpu/m6800/m6800.h"
 #include "machine/6821pia.h"
-#include "machine/genpin.h"
 #include "sound/dac.h"
 #include "sound/hc55516.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
+
 #include "s6.lh"
 
 
@@ -393,7 +396,7 @@ DRIVER_INIT_MEMBER( s6_state, s6 )
 	m_irq_timer->adjust(attotime::from_ticks(980,3580000/4),1);
 }
 
-static MACHINE_CONFIG_START( s6, s6_state )
+static MACHINE_CONFIG_START( s6 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6808, 3580000) // 6802 or 6808 could be used here
 	MCFG_CPU_PROGRAM_MAP(s6_main_map)
@@ -446,7 +449,7 @@ static MACHINE_CONFIG_START( s6, s6_state )
 	MCFG_CPU_PROGRAM_MAP(s6_audio_map)
 
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
+	MCFG_SOUND_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
@@ -636,15 +639,15 @@ ROM_START(frpwr_l2)
 ROM_END
 
 
-GAME( 1979, lzbal_l2, 0,        s6, s6, s6_state, s6, ROT0, "Williams", "Laser Ball (L-2)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1980, lzbal_t2, lzbal_l2, s6, s6, s6_state, s6, ROT0, "Williams", "Laser Ball (T-2)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1980, scrpn_l1, 0,        s6, s6, s6_state, s6, ROT0, "Williams", "Scorpion (L-1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1980, scrpn_t1, scrpn_l1, s6, s6, s6_state, s6, ROT0, "Williams", "Scorpion (T-1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1979, blkou_l1, 0,        s6, s6, s6_state, s6, ROT0, "Williams", "Blackout (L-1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1979, blkou_t1, blkou_l1, s6, s6, s6_state, s6, ROT0, "Williams", "Blackout (T-1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1979, lzbal_l2, 0,        s6, s6, s6_state, s6, ROT0, "Williams", "Laser Ball (L-2)",              MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1980, lzbal_t2, lzbal_l2, s6, s6, s6_state, s6, ROT0, "Williams", "Laser Ball (T-2)",              MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1980, scrpn_l1, 0,        s6, s6, s6_state, s6, ROT0, "Williams", "Scorpion (L-1)",                MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1980, scrpn_t1, scrpn_l1, s6, s6, s6_state, s6, ROT0, "Williams", "Scorpion (T-1)",                MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1979, blkou_l1, 0,        s6, s6, s6_state, s6, ROT0, "Williams", "Blackout (L-1)",                MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1979, blkou_t1, blkou_l1, s6, s6, s6_state, s6, ROT0, "Williams", "Blackout (T-1)",                MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
 GAME( 1979, blkou_f1, blkou_l1, s6, s6, s6_state, s6, ROT0, "Williams", "Blackout (L-1, French Speech)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1979, grgar_l1, 0,        s6, s6, s6_state, s6, ROT0, "Williams", "Gorgar (L-1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1979, grgar_t1, grgar_l1, s6, s6, s6_state, s6, ROT0, "Williams", "Gorgar (T-1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1980, frpwr_l6, 0,        s6, s6, s6_state, s6, ROT0, "Williams", "Firepower (L-6)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-GAME( 1980, frpwr_t6, frpwr_l6, s6, s6, s6_state, s6, ROT0, "Williams", "Firepower (T-6)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-GAME( 1980, frpwr_l2, frpwr_l6, s6, s6, s6_state, s6, ROT0, "Williams", "Firepower (L-2)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME( 1979, grgar_l1, 0,        s6, s6, s6_state, s6, ROT0, "Williams", "Gorgar (L-1)",                  MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1979, grgar_t1, grgar_l1, s6, s6, s6_state, s6, ROT0, "Williams", "Gorgar (T-1)",                  MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1980, frpwr_l6, 0,        s6, s6, s6_state, s6, ROT0, "Williams", "Firepower (L-6)",               MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME( 1980, frpwr_t6, frpwr_l6, s6, s6, s6_state, s6, ROT0, "Williams", "Firepower (T-6)",               MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME( 1980, frpwr_l2, frpwr_l6, s6, s6, s6_state, s6, ROT0, "Williams", "Firepower (L-2)",               MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

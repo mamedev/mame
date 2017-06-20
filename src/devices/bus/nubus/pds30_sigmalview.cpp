@@ -8,19 +8,13 @@
 
 #include "emu.h"
 #include "pds30_sigmalview.h"
+#include "screen.h"
 
 #define LVIEW_SCREEN_NAME "lview_screen"
 #define LVIEW_ROM_REGION  "lview_rom"
 
 #define VRAM_SIZE   (0x80000)  // 512K?
 
-MACHINE_CONFIG_FRAGMENT( lview )
-	MCFG_SCREEN_ADD( LVIEW_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, nubus_lview_device, screen_update)
-	MCFG_SCREEN_SIZE(832,600)
-	MCFG_SCREEN_REFRESH_RATE(70)
-	MCFG_SCREEN_VISIBLE_AREA(0, 832-1, 0, 600-1)
-MACHINE_CONFIG_END
 
 ROM_START( lview )
 	ROM_REGION(0x4000, LVIEW_ROM_REGION, 0)
@@ -31,18 +25,20 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type PDS030_LVIEW = &device_creator<nubus_lview_device>;
+DEFINE_DEVICE_TYPE(PDS030_LVIEW, nubus_lview_device, "pd3_lviw", "Sigma Designs L-View")
 
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor nubus_lview_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( lview );
-}
+MACHINE_CONFIG_MEMBER( nubus_lview_device::device_add_mconfig )
+	MCFG_SCREEN_ADD( LVIEW_SCREEN_NAME, RASTER)
+	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, nubus_lview_device, screen_update)
+	MCFG_SCREEN_SIZE(832,600)
+	MCFG_SCREEN_REFRESH_RATE(70)
+	MCFG_SCREEN_VISIBLE_AREA(0, 832-1, 0, 600-1)
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -62,20 +58,18 @@ const tiny_rom_entry *nubus_lview_device::device_rom_region() const
 //-------------------------------------------------
 
 nubus_lview_device::nubus_lview_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, PDS030_LVIEW, "Sigma Designs L-View", tag, owner, clock, "pd3_lviw", __FILE__),
-		device_video_interface(mconfig, *this),
-		device_nubus_card_interface(mconfig, *this), m_vram32(nullptr), m_vbl_disable(0), m_toggle(0), m_timer(nullptr), m_protstate(0)
+	nubus_lview_device(mconfig, PDS030_LVIEW, tag, owner, clock)
 {
-	m_assembled_tag = std::string(tag).append(":").append(LVIEW_SCREEN_NAME);
-	m_screen_tag = m_assembled_tag.c_str();
+	(void)m_toggle;
 }
 
-nubus_lview_device::nubus_lview_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_video_interface(mconfig, *this),
-		device_nubus_card_interface(mconfig, *this), m_vram32(nullptr), m_vbl_disable(0), m_toggle(0), m_timer(nullptr), m_protstate(0)
+nubus_lview_device::nubus_lview_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	device_video_interface(mconfig, *this),
+	device_nubus_card_interface(mconfig, *this),
+	m_vram32(nullptr), m_vbl_disable(0), m_toggle(0), m_timer(nullptr), m_protstate(0),
+	m_assembled_tag(util::string_format("%s:%s", tag, LVIEW_SCREEN_NAME))
 {
-	m_assembled_tag = std::string(tag).append(":").append(LVIEW_SCREEN_NAME);
 	m_screen_tag = m_assembled_tag.c_str();
 }
 

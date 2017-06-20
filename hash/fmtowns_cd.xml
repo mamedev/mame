@@ -345,6 +345,24 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
+	<software name="fbc1121">
+		<!--
+		 Origin: P2P
+		<rom name="IMAGE.CCD" size="4739" crc="07402a20" sha1="376a14d20416fa7f59aab0f36a514b01353cdf6e"/>
+		<rom name="IMAGE.cue" size="1243" crc="f920c1b0" sha1="664fa6f17de2261dae1f235026b796cea6947a84"/>
+		<rom name="IMAGE.img" size="514429440" crc="a41e8093" sha1="fb2f641ce75e31a756fbb8387c87b43a0228af41"/>
+		<rom name="IMAGE.sub" size="20997120" crc="0db76ce5" sha1="7ec6d6a578de84315ce574ec7a86803e4dbab10a"/>
+		 -->
+		<description>F-BASIC386 Compiler v1.1 L21</description>
+		<year>1991</year>
+		<publisher>富士通 (Fujitsu)</publisher>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="fbc1121" sha1="5ea72d3c25554a3bdcd64085ff4271cb5b0aac46" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="gnutowns">
 		<!--
 		 Origin: Neo Kobe Collection
@@ -4588,6 +4606,26 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
+	<software name="kyosekai">
+		<!--
+		Origin: P2P
+		<rom name="Image.cdm" size="16308" crc="fc679a5d" sha1="e683986e8df93dcc460ca150698ab793a4a881af"/>
+		<rom name="Image.cue" size="3374" crc="47db8d96" sha1="e83a4a957b90174cd1d52f69c82fe3ad6beacf64"/>
+		<rom name="Image.img" size="553449120" crc="816170b7" sha1="a290b336ed71de2ce5179ac2c166935b2272a39e"/>
+		<rom name="Image.sub" size="22589760" crc="cee3fbf0" sha1="eee987efcfa16a997299a8d4ce433fffd87ecf6f"/>
+		-->
+		<description>Dennou Ehon - Kyouryuu no Sekai</description>
+		<year>1990</year>
+		<publisher>電脳商会 (Dennou Shoukai)</publisher>
+		<info name="alt_title" value="電脳絵本 恐竜の世界" />
+		<info name="release" value="199004xx" />
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="kyosekai" sha1="05ae0457c1dc8da8d265831cad64e40a41a7adaf" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="kyrandia">
 		<!--
 		Origin: Neo Kobe Collection
@@ -6024,6 +6062,26 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="okiraku towns gear" sha1="a614a4471c91a19fe33bf903a5f699907bad813e" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="okuhoso">
+		<!--
+		Origin: P2P
+		<rom name="okuhoso.ccd" size="11116" crc="26688b0b" sha1="1071eaacf599a5f5fbb1d1bad7d975497288a4f0"/>
+		<rom name="okuhoso.cue" size="2223" crc="37596253" sha1="b8fb0e8f3b509c1dfea2ffabe055d154ce41e944"/>
+		<rom name="okuhoso.img" size="709483152" crc="e5f29292" sha1="c7b9514595a3e3131ac099ca69f51f123343ad10"/>
+		<rom name="okuhoso.sub" size="28958496" crc="406766d4" sha1="b1699dc438d45539719954a9fc5e180f94706a3f"/>
+		-->
+		<description>Hyper Oku no Hosomichi</description>
+		<year>1991</year>
+		<publisher>CRI</publisher>
+		<info name="alt_title" value="ハイパー奥の細道" />
+		<info name="release" value="199103xx" />
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="okuhoso" sha1="7d30d096899dc10b2a88cf132e9a478464b0fa3a" />
 			</diskarea>
 		</part>
 	</software>
@@ -7486,6 +7544,24 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="softcon2" sha1="204589dd46a5e2db1a65c9252e17844868650583" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="sokobanp">
+		<!--
+		Origin: P2P
+		<rom name="SBPT_U_100.BIN" size="566890800" crc="50bc3f0a" sha1="a6bf593b34a3ac19c72b86a347dbfb2f8c7732f8"/>
+		<rom name="SBPT_U_100.CUE" size="778" crc="e36880a2" sha1="d20ad1992eefe148caeb9b07465d2346e8e32cd0"/>
+		-->
+		<description>Soko-ban Perfect</description>
+		<year>1990</year>
+		<publisher>シンキングラビット (Thinking Rabbit)</publisher>
+		<info name="alt_title" value="倉庫番パーフェクト" />
+		<info name="release" value="199007xx" />
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="sbpt_u_100" sha1="50a4dc0e4fa24d7d6663da79a3d917480aa19468" />
 			</diskarea>
 		</part>
 	</software>
@@ -8967,6 +9043,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
+
 	<software name="yojusenk">
 		<!--
 		Origin: Neo Kobe Collection
@@ -8975,13 +9052,34 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Youjuu Senki - A.D. 2048.img" size="73735200" crc="c564c47f" sha1="74cb81be807b323f0abf8de633ae4c00dfe9b486"/>
 		<rom name="Youjuu Senki - A.D. 2048.sub" size="3009600" crc="7f503cf3" sha1="4e802b74e492bd1321f932de6c0bfdc473a5ebfb"/>
 		-->
-		<description>Yojuu Senki - A.D. 2048</description>
+		<description>Youjuu Senki - A.D. 2048</description>
 		<year>1993</year>
 		<publisher>ディー・オー (D.O.)</publisher>
 		<info name="release" value="199311xx" />
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="youjuu senki - a.d. 2048" sha1="724d7aaaae57be82231eacfca5fe0501a9683277" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- PC-98x1 / FM Towns hybrid, also included in pc98_cd.xml -->
+	<software name="yojusen2">
+		<!--
+		Origin: P2P
+		<rom name="Image.cdm" size="3205" crc="ca4446d3" sha1="8028e2647ef572de3dcf27ce5332f7ca00530a42"/>
+		<rom name="Image.cue" size="586" crc="b6b20ac9" sha1="b8bc72b8d909546d1078b1921ec04f526e746e3a"/>
+		<rom name="Image.img" size="649808208" crc="16f70c96" sha1="29b587dbcdaae2d471b7c13c1ce5c5825bc86eaf"/>
+		<rom name="Image.sub" size="26522784" crc="af8cb6ad" sha1="f77df38b35d73e8bc3e20033a8878af0e9c03ea8"/>
+		-->
+		<description>Youjuu Senki 2 - Reimei no Senshi</description>
+		<year>1993</year>
+		<publisher>ディー・オー (D.O.)</publisher>
+		<info name="alt_title" value="妖獣戦記2 黎明の戦士" />
+		<info name="release" value="199402xx" />
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="yojusen2" sha1="219f6731e9960291832df99d43ee52ab5d62bc52" />
 			</diskarea>
 		</part>
 	</software>

@@ -15,6 +15,9 @@
 #include "video/rgbutil.h"
 
 #include <ctype.h>
+#include <type_traits>
+#include <typeindex>
+#include <typeinfo>
 
 
 //**************************************************************************
@@ -126,15 +129,15 @@ void validity_checker::validate_tag(const char *tag)
 //-------------------------------------------------
 
 validity_checker::validity_checker(emu_options &options)
-	: m_drivlist(options),
-		m_errors(0),
-		m_warnings(0),
-		m_print_verbose(options.verbose()),
-		m_current_driver(nullptr),
-		m_current_config(nullptr),
-		m_current_device(nullptr),
-		m_current_ioport(nullptr),
-		m_validate_all(false)
+	: m_drivlist(options)
+	, m_errors(0)
+	, m_warnings(0)
+	, m_print_verbose(options.verbose())
+	, m_current_driver(nullptr)
+	, m_current_config(nullptr)
+	, m_current_device(nullptr)
+	, m_current_ioport(nullptr)
+	, m_validate_all(false)
 {
 	// pre-populate the defstr map with all the default strings
 	for (int strnum = 1; strnum < INPUT_STRING_COUNT; strnum++)
@@ -180,7 +183,7 @@ void validity_checker::check_shared_source(const game_driver &driver)
 	// then iterate over all drivers and check the ones that share the same source file
 	m_drivlist.reset();
 	while (m_drivlist.next())
-		if (strcmp(driver.source_file, m_drivlist.driver().source_file) == 0)
+		if (strcmp(driver.type.source(), m_drivlist.driver().type.source()) == 0)
 			validate_one(m_drivlist.driver());
 
 	// cleanup
@@ -219,6 +222,10 @@ bool validity_checker::check_all_matching(const char *string)
 	while (m_drivlist.next())
 		if (m_drivlist.matches(string, m_drivlist.driver().name))
 			validate_one(m_drivlist.driver());
+
+	// validate devices
+	if (!string)
+		validate_device_types();
 
 	// cleanup
 	validate_end();
@@ -272,7 +279,7 @@ void validity_checker::validate_one(const game_driver &driver)
 {
 	// help verbose validation detect configuration-related crashes
 	if (m_print_verbose)
-		output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "Validating driver %s (%s)...\n", driver.name, core_filename_extract_base(driver.source_file).c_str());
+		output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "Validating driver %s (%s)...\n", driver.name, core_filename_extract_base(driver.type.source()).c_str());
 
 	// set the current driver
 	m_current_driver = &driver;
@@ -291,10 +298,10 @@ void validity_checker::validate_one(const game_driver &driver)
 	// wrap in try/except to catch fatalerrors
 	try
 	{
-		machine_config config(driver, m_drivlist.options());
+		machine_config config(driver, m_blank_options);
 		m_current_config = &config;
 		validate_driver();
-		validate_roms();
+		validate_roms(m_current_config->root_device());
 		validate_inputs();
 		validate_devices();
 		m_current_config = nullptr;
@@ -308,7 +315,7 @@ void validity_checker::validate_one(const game_driver &driver)
 	if (m_errors > start_errors || m_warnings > start_warnings || !m_verbose_text.empty())
 	{
 		if (!m_print_verbose)
-			output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "Driver %s (file %s): ", driver.name, core_filename_extract_base(driver.source_file).c_str());
+			output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "Driver %s (file %s): ", driver.name, core_filename_extract_base(driver.type.source()).c_str());
 		output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "%d errors, %d warnings\n", m_errors - start_errors, m_warnings - start_warnings);
 		if (m_errors > start_errors)
 			output_indented_errors(m_error_text, "Errors");
@@ -1343,14 +1350,14 @@ void validity_checker::validate_driver()
 	if (!m_names_map.insert(std::make_pair(m_current_driver->name, m_current_driver)).second)
 	{
 		const game_driver *match = m_names_map.find(m_current_driver->name)->second;
-		osd_printf_error("Driver name is a duplicate of %s(%s)\n", core_filename_extract_base(match->source_file).c_str(), match->name);
+		osd_printf_error("Driver name is a duplicate of %s(%s)\n", core_filename_extract_base(match->type.source()).c_str(), match->name);
 	}
 
 	// check for duplicate descriptions
-	if (!m_descriptions_map.insert(std::make_pair(m_current_driver->description, m_current_driver)).second)
+	if (!m_descriptions_map.insert(std::make_pair(m_current_driver->type.fullname(), m_current_driver)).second)
 	{
-		const game_driver *match = m_descriptions_map.find(m_current_driver->description)->second;
-		osd_printf_error("Driver description is a duplicate of %s(%s)\n", core_filename_extract_base(match->source_file).c_str(), match->name);
+		const game_driver *match = m_descriptions_map.find(m_current_driver->type.fullname())->second;
+		osd_printf_error("Driver description is a duplicate of %s(%s)\n", core_filename_extract_base(match->type.source()).c_str(), match->name);
 	}
 
 	// determine if we are a clone
@@ -1417,8 +1424,16 @@ void validity_checker::validate_driver()
 
 	// make sure sound-less drivers are flagged
 	sound_interface_iterator iter(m_current_config->root_device());
-	if ((m_current_driver->flags & MACHINE_IS_BIOS_ROOT) == 0 && iter.first() == nullptr && (m_current_driver->flags & MACHINE_NO_SOUND) == 0 && (m_current_driver->flags & MACHINE_NO_SOUND_HW) == 0)
+	if ((m_current_driver->flags & MACHINE_IS_BIOS_ROOT) == 0 && !iter.first() && (m_current_driver->flags & (MACHINE_NO_SOUND | MACHINE_NO_SOUND_HW)) == 0)
 		osd_printf_error("Driver is missing MACHINE_NO_SOUND flag\n");
+
+	// catch invalid flag combinations
+	if ((m_current_driver->flags & MACHINE_WRONG_COLORS) && (m_current_driver->flags & MACHINE_IMPERFECT_COLORS))
+		osd_printf_error("Driver cannot have colours that are both completely wrong and imperfect\n");
+	if ((m_current_driver->flags & MACHINE_NO_SOUND_HW) && (m_current_driver->flags & (MACHINE_NO_SOUND | MACHINE_IMPERFECT_SOUND)))
+		osd_printf_error("Machine without sound hardware cannot have unemulated sound\n");
+	if ((m_current_driver->flags & MACHINE_NO_SOUND) && (m_current_driver->flags & MACHINE_IMPERFECT_SOUND))
+		osd_printf_error("Driver cannot have sound emulation that's both imperfect and not present\n");
 }
 
 
@@ -1426,10 +1441,10 @@ void validity_checker::validate_driver()
 //  validate_roms - validate ROM definitions
 //-------------------------------------------------
 
-void validity_checker::validate_roms()
+void validity_checker::validate_roms(device_t &root)
 {
 	// iterate, starting with the driver's ROMs and continuing with device ROMs
-	for (device_t &device : device_iterator(m_current_config->root_device()))
+	for (device_t &device : device_iterator(root))
 	{
 		// track the current device
 		m_current_device = &device;
@@ -1809,47 +1824,184 @@ void validity_checker::validate_devices()
 
 		// look for duplicates
 		if (!device_map.insert(device.tag()).second)
-			osd_printf_error("Multiple devices with the same tag '%s' defined\n", device.tag());
-
-		// all devices must have a shortname
-		if (strcmp(device.shortname(), "") == 0)
-			osd_printf_error("Device does not have short name defined\n");
-
-		// all devices must have a source file defined
-		if (strcmp(device.source(), "") == 0)
-			osd_printf_error("Device does not have source file location defined\n");
+			osd_printf_error("Multiple devices with the same tag defined\n");
 
 		// check for device-specific validity check
 		device.validity_check(*this);
 
 		// done with this device
 		m_current_device = nullptr;
-	}
 
-	// if device is slot cart device, we must have a shortname
-	std::unordered_set<std::string> slot_device_map;
-	for (const device_slot_interface &slot : slot_interface_iterator(m_current_config->root_device()))
-	{
-		for (auto &option : slot.option_list())
+		// if it's a slot, iterate over possible cards (don't recurse, or you'll stack infinite tee connectors)
+		device_slot_interface *const slot = dynamic_cast<device_slot_interface *>(&device);
+		if (slot != nullptr && !slot->fixed())
 		{
-			std::string temptag("_");
-			temptag.append(option.second->name());
-			device_t *dev = const_cast<machine_config &>(*m_current_config).device_add(&m_current_config->root_device(), temptag.c_str(), option.second->devtype(), 0);
+			for (auto &option : slot->option_list())
+			{
+				// the default option is already instantiated here, so don't try adding it again
+				if (slot->default_option() != nullptr && option.first == slot->default_option())
+					continue;
 
-			// notify this device and all its subdevices that they are now configured
-			for (device_t &device : device_iterator(*dev))
-				if (!device.configured())
-					device.config_complete();
+				device_t *const card = m_current_config->device_add(&slot->device(), option.second->name(), option.second->devtype(), option.second->clock());
 
-			if (strcmp(dev->shortname(), "") == 0) {
-				if (slot_device_map.insert(dev->name()).second)
-					osd_printf_error("Device '%s' is slot cart device but does not have short name defined\n", dev->name());
+				const char *const def_bios = option.second->default_bios();
+				if (def_bios)
+					device_t::static_set_default_bios_tag(*card, def_bios);
+				machine_config_constructor const additions = option.second->machine_config();
+				if (additions)
+					(*additions)(*m_current_config, card, card);
+
+				for (device_slot_interface &subslot : slot_interface_iterator(*card))
+				{
+					if (subslot.fixed())
+					{
+						device_slot_option const *const suboption = subslot.option(subslot.default_option());
+						if (suboption)
+						{
+							device_t *const sub_card = m_current_config->device_add(&subslot.device(), suboption->name(), suboption->devtype(), suboption->clock());
+							const char *const sub_bios = suboption->default_bios();
+							if (sub_bios)
+								device_t::static_set_default_bios_tag(*sub_card, sub_bios);
+							machine_config_constructor const sub_additions = suboption->machine_config();
+							if (sub_additions)
+								(*sub_additions)(*m_current_config, sub_card, sub_card);
+						}
+					}
+				}
+
+				for (device_t &card_dev : device_iterator(*card))
+					card_dev.config_complete();
+				validate_roms(*card);
+
+				for (device_t &card_dev : device_iterator(*card))
+				{
+					m_current_device = &card_dev;
+					card_dev.findit(true);
+					card_dev.validity_check(*this);
+					m_current_device = nullptr;
+				}
+
+				m_current_config->device_remove(&slot->device(), option.second->name());
+			}
+		}
+	}
+}
+
+
+//-------------------------------------------------
+//  validate_devices_types - check validity of
+//  registered device types
+//-------------------------------------------------
+
+void validity_checker::validate_device_types()
+{
+	// reset error/warning state
+	int start_errors = m_errors;
+	int start_warnings = m_warnings;
+	m_error_text.clear();
+	m_warning_text.clear();
+	m_verbose_text.clear();
+
+	std::unordered_map<std::string, std::add_pointer_t<device_type> > device_name_map, device_shortname_map;
+	std::unordered_set<std::type_index> device_types;
+	machine_config config(GAME_NAME(___empty), m_drivlist.options());
+	for (device_type type : registered_device_types)
+	{
+		if (!device_types.emplace(type.type()).second)
+		{
+			osd_printf_error("Device class '%s' registered multiple times\n", type.type().name());
+		}
+		else
+		{
+			device_t *const dev = config.device_add(&config.root_device(), "_tmp", type, 0);
+
+			char const *name((dev->shortname() && *dev->shortname()) ? dev->shortname() : type.type().name());
+			std::string const description((dev->source() && *dev->source()) ? util::string_format("%s(%s)", core_filename_extract_base(dev->source()).c_str(), name) : name);
+
+			// ensure shortname exists
+			if (!dev->shortname() || !*dev->shortname())
+			{
+				osd_printf_error("Device %s does not have short name defined\n", description.c_str());
+			}
+			else
+			{
+				// make sure the device name is not too long
+				if (strlen(dev->shortname()) > 32)
+					osd_printf_error("Device short name must be 32 characters or less\n");
+
+				// check for invalid characters in shortname
+				for (char const *s = dev->shortname(); *s; ++s)
+				{
+					if (((*s < '0') || (*s > '9')) && ((*s < 'a') || (*s > 'z')) && (*s != '_'))
+					{
+						osd_printf_error("Device %s short name contains invalid characters\n", description.c_str());
+						break;
+					}
+				}
+
+				// check for name conflicts
+				auto const drvname(m_names_map.find(dev->shortname()));
+				auto const devname(device_shortname_map.emplace(dev->shortname(), &type));
+				if (m_names_map.end() != drvname)
+				{
+					game_driver const &dup(*drvname->second);
+					osd_printf_error("Device %s short name is a duplicate of %s(%s)\n", description.c_str(), core_filename_extract_base(dup.type.source()).c_str(), dup.name);
+				}
+				else if (!devname.second)
+				{
+					device_t *const dup = config.device_add(&config.root_device(), "_dup", *devname.first->second, 0);
+					osd_printf_error("Device %s short name is a duplicate of %s(%s)\n", description.c_str(), core_filename_extract_base(dup->source()).c_str(), dup->shortname());
+					config.device_remove(&config.root_device(), "_dup");
+				}
 			}
 
-			const_cast<machine_config &>(*m_current_config).device_remove(&m_current_config->root_device(), temptag.c_str());
+			// ensure name exists
+			if (!dev->name() || !*dev->name())
+			{
+				osd_printf_error("Device %s does not have name defined\n", description.c_str());
+			}
+			else
+			{
+				// check for description conflicts
+				auto const drvdesc(m_descriptions_map.find(dev->name()));
+				auto const devdesc(device_name_map.emplace(dev->name(), &type));
+				if (m_names_map.end() != drvdesc)
+				{
+					game_driver const &dup(*drvdesc->second);
+					osd_printf_error("Device %s name '%s' is a duplicate of %s(%s)\n", description.c_str(), dev->name(), core_filename_extract_base(dup.type.source()).c_str(), dup.name);
+				}
+				else if (!devdesc.second)
+				{
+					device_t *const dup = config.device_add(&config.root_device(), "_dup", *devdesc.first->second, 0);
+					osd_printf_error("Device %s name '%s' is a duplicate of %s(%s)\n", description.c_str(), dev->name(), core_filename_extract_base(dup->source()).c_str(), dup->shortname());
+					config.device_remove(&config.root_device(), "_dup");
+				}
+			}
+
+			// ensure source exists
+			if (!dev->source() || !*dev->source())
+				osd_printf_error("Device %s does not have source defined\n", description.c_str());
+
+			// check that reported type matches supplied type
+			if (dev->type().type() != type.type())
+				osd_printf_error("Device %s reports type '%s' (created with '%s')\n", description.c_str(), dev->type().type().name(), type.type().name());
+
+			config.device_remove(&config.root_device(), "_tmp");
 		}
 	}
 
+	// if we had warnings or errors, output
+	if (m_errors > start_errors || m_warnings > start_warnings || !m_verbose_text.empty())
+	{
+		output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "%d errors, %d warnings\n", m_errors - start_errors, m_warnings - start_warnings);
+		if (m_errors > start_errors)
+			output_indented_errors(m_error_text, "Errors");
+		if (m_warnings > start_warnings)
+			output_indented_errors(m_warning_text, "Warnings");
+		if (!m_verbose_text.empty())
+			output_indented_errors(m_verbose_text, "Messages");
+		output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "\n");
+	}
 }
 
 
@@ -1866,7 +2018,7 @@ void validity_checker::build_output_prefix(std::string &str)
 
 	// if we have a current (non-root) device, indicate that
 	if (m_current_device != nullptr && m_current_device->owner() != nullptr)
-		str.append(m_current_device->name()).append(" device '").append(m_current_device->tag()+1).append("': ");
+		str.append(m_current_device->name()).append(" device '").append(m_current_device->tag() + 1).append("': ");
 
 	// if we have a current port, indicate that as well
 	if (m_current_ioport != nullptr)

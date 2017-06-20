@@ -430,6 +430,39 @@ MACHINE_RESET_MEMBER(decocass_state,cocean1a) /* 10 */
 	m_type1_outmap = MAKE_MAP(0,1,2,3,4,5,6,7);
 }
 
+ /***************************************************************************
+ *
+ *  TYPE1 DONGLE DP-1120/DP-2120 map for Flash Boy/The Deco Kid
+ *
+ * Latched bits                          = $24 (2 latch bits)
+ * Input bits that are passed uninverted = $08 (1 true bits)
+ * Input bits that are passed inverted   = $00 (0 inverted bits)
+ * Remaining bits for addressing PROM    = $D3 (5 bits)
+ * Latched bit #0:
+ * Input bit position  = 2
+ * Output bit position = 2
+ * Type                = Inverting latch
+ * Latched bit #1:
+ * Input bit position  = 5
+ * Output bit position = 5
+ * Type                = Non-inverting latch
+ *
+ ***************************************************************************/
+
+static uint8_t type1_map1120[8] = { T1PROM,T1PROM,T1LATCHINV,T1DIRECT,T1PROM,T1LATCH,T1PROM,T1PROM };
+
+
+MACHINE_RESET_MEMBER(decocass_state,cfboy0a1) /* 12 */
+{
+	decocass_state::machine_reset();
+	LOG(0,("dongle type #1 (DP-1120 map)\n"));
+	m_dongle_r = read8_delegate(FUNC(decocass_state::decocass_type1_r),this);
+	m_type1_map = type1_map1120;
+	m_type1_inmap = MAKE_MAP(0,1,2,3,4,5,6,7);
+	m_type1_outmap = MAKE_MAP(0,1,2,3,4,5,6,7);
+}
+
+
 
 /***************************************************************************
  *

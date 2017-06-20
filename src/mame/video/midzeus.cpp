@@ -351,7 +351,7 @@ uint32_t midzeus_state::screen_update_midzeus(screen_device &screen, bitmap_ind1
 	poly->wait("VIDEO_UPDATE");
 
 	/* normal update case */
-	if (!machine().input().code_pressed(KEYCODE_W))
+	if (!machine().input().code_pressed(KEYCODE_V))
 	{
 		const void *base = waveram1_ptr_from_expanded_addr(m_zeusbase[0xcc]);
 		int xoffs = screen.visible_area().min_x;

@@ -45,29 +45,28 @@
 
  */
 
-#ifndef VME_H_
-#define VME_H_
+#ifndef MAME_BUS_VME_VME_H
+#define MAME_BUS_VME_VME_H
 
 #pragma once
 
-#include "emu.h"
 
 //**************************************************************************
-//	CONSTANTS
+//  CONSTANTS
 //**************************************************************************
 
 #define VME_BUS_TAG        "vme"
 
 // Callbacks to the board from the VME bus comes through here
 #define MCFG_VME_J1_CB(_devcb) \
-	devcb = &vme_p1_slot_device::static_set_vme_j1_callback(*device, DEVCB_##_devcb);
+	devcb = &vme_slot_device::static_set_vme_j1_callback(*device, DEVCB_##_devcb);
 
-SLOT_INTERFACE_EXTERN(vme_p1_slot1);
-SLOT_INTERFACE_EXTERN(vme_p1_slots);
+//SLOT_INTERFACE_EXTERN(vme_slot1); // Disabled until we know how to combine a board driver and a slot device.
+SLOT_INTERFACE_EXTERN(vme_slots);
 
-class device_vme_p1_card_interface; // This interface is standardized
+class device_vme_card_interface; // This interface is standardized
 
-class vme_p1_slot_device : public device_t,
+class vme_slot_device : public device_t,
 	public device_slot_interface
 {
 public:
@@ -78,7 +77,7 @@ public:
 		DS0,
 		DS1,
 		BERR,
-	    DTACK,
+		DTACK,
 		WRITE
 	};
 
@@ -90,77 +89,70 @@ public:
 	};
 
 	// construction/destruction
-	vme_p1_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vme_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	vme_p1_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+	template <class Object> static devcb_base &static_set_vme_j1_callback(device_t &device, Object &&cb)  { return downcast<vme_slot_device &>(device).m_vme_j1_callback.set_callback(std::forward<Object>(cb)); }
 
-	template<class _Object> static devcb_base &static_set_vme_j1_callback(device_t &device, _Object object)  { return downcast<vme_p1_slot_device &>(device).m_vme_j1_callback.set_callback(object); }
+	static void static_set_vme_slot(device_t &device, const char *tag, const char *slottag);
+	static void static_update_vme_chains(device_t &device, uint32_t slot_nbr);
+
+	virtual DECLARE_READ8_MEMBER(read8);
+	virtual DECLARE_WRITE8_MEMBER(write8);
+
+protected:
+	vme_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_config_complete() override;
 
-	static void static_set_vme_p1_slot(device_t &device, const char *tag, const char *slottag);
 	// configuration
-	const char *m_vme_p1_tag, *m_vme_p1_slottag;
-
-	virtual DECLARE_READ8_MEMBER(read8);
-	virtual DECLARE_WRITE8_MEMBER(write8);
+	const char *m_vme_tag, *m_vme_slottag;
 
 	// callbacks
 	devcb_write_line        m_vme_j1_callback;
-	device_vme_p1_card_interface *m_card;
-private:
+	device_vme_card_interface *m_card;
 };
 
-extern const device_type VME_P1;
+DECLARE_DEVICE_TYPE(VME, vme_device)
 
-#define MCFG_VME_P1_DEVICE_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, VME_P1, 0)
+//**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
 
-class vme_p1_card_interface;
+#define MCFG_VME_DEVICE_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, VME, 0)
 
-class vme_p1_device : public device_t
+#define MCFG_VME_CPU(_cputag) \
+	vme_device::static_set_cputag(*device, _cputag);
+
+#define MCFG_VME_BUS_OWNER_SPACES() \
+	vme_device::static_use_owner_spaces(*device);
+
+class vme_card_interface;
+
+class vme_device : public device_t,
+	public device_memory_interface
 {
 public:
-	vme_p1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	vme_p1_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
-	~vme_p1_device();
-
-	void add_vme_p1_card(device_vme_p1_card_interface *card);
-	void install_device(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler, uint32_t mask);
-	void install_device(offs_t start, offs_t end, read16_delegate rhandler, write16_delegate whandler, uint32_t mask);
-	void install_device(offs_t start, offs_t end, read32_delegate rhandler, write32_delegate whandler, uint32_t mask);
-protected:
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	simple_list<device_vme_p1_card_interface> m_device_list;
-};
-
-
-
-// device type definition
-extern const device_type VME_P1_SLOT;
-
-class device_vme_p1_card_interface : public device_slot_card_interface
-{
-public:
-	// construction/destruction
-	device_vme_p1_card_interface(const machine_config &mconfig, device_t &device);
-	virtual ~device_vme_p1_card_interface();
-	void set_vme_p1_device();
-
-	virtual DECLARE_READ8_MEMBER(read8);
-	virtual DECLARE_WRITE8_MEMBER(write8);	
-	device_t *m_device;
+	vme_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	~vme_device();
 
 	// inline configuration
-	static void static_set_vme_p1_tag(device_t &device, const char *tag, const char *slottag);
-	vme_p1_device  *m_vme_p1;
-	const char *m_vme_p1_tag, *m_vme_p1_slottag;
-	int m_slot;
-	device_vme_p1_card_interface *m_next;
+	static void static_set_cputag(device_t &device, const char *tag);
+	static void static_use_owner_spaces(device_t &device);
+
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const override
+	{
+		switch (spacenum)
+		{
+		case AS_PROGRAM: return &m_a32_config;
+		default:         return nullptr;
+		}
+	}
+	const address_space_config m_a32_config;
+
+	void add_vme_card(device_vme_card_interface *card);
 
 	//
 	// Address Modifiers
@@ -175,9 +167,11 @@ public:
 	   Short addressing AM codes indicate that address lines A02-A15 are being used to select a BYTE(0-3) group.
 	   Standard addressing AM codes ,indicate that address lines A02-A23 are being used to select a BYTE(0-3) group.
 	   Extended addressing AM codes indicate that address lines A02-A31 are being used to select a BYTE(0-3) group.*/
-	enum 
-	{   // Defined and User Defined Address Modifier Values, The rest us Reserved between 0x00 and 0x3F
-		AMOD_EXTENDED_NON_PRIV_DATA = 0x09,
+
+	enum vme_amod_t
+	{   // Defined and User Defined Address Modifier Values (long bnames from VME standard text. please use short)
+		AMOD_EXTENDED_NON_PRIV_DATA = 0x09, //A32 SC (Single Cycle)
+		A32_SC                      = 0x09, //A32 SC (Single Cycle)
 		AMOD_EXTENDED_NON_PRIV_PRG  = 0x0A,
 		AMOD_EXTENDED_NON_PRIV_BLK  = 0x0B,
 		AMOD_EXTENDED_SUPERVIS_DATA = 0x0D,
@@ -185,242 +179,83 @@ public:
 		AMOD_EXTENDED_SUPERVIS_BLK  = 0x0F,
 		AMOD_USER_DEFINED_FIRST     = 0x10,
 		AMOD_USER_DEFINED_LAST      = 0x1F,
-		AMOD_SHORT_NON_PRIV_ACCESS  = 0x29,
+		AMOD_SHORT_NON_PRIV_ACCESS  = 0x29, //A16 SC
+		A16_SC                      = 0x29, //A16 SC
 		AMOD_SHORT_SUPERVIS_ACCESS  = 0x2D,
-		AMOD_STANDARD_NON_PRIV_DATA = 0x39,
+		AMOD_STANDARD_NON_PRIV_DATA = 0x39, //A24 SC
+		A24_SC                      = 0x39, //A24 SC
 		AMOD_STANDARD_NON_PRIV_PRG  = 0x3A,
-		AMOD_STANDARD_NON_PRIV_BLK  = 0x3B,
+		AMOD_STANDARD_NON_PRIV_BLK  = 0x3B, //A24 BLT
 		AMOD_STANDARD_SUPERVIS_DATA = 0x3D,
 		AMOD_STANDARD_SUPERVIS_PRG  = 0x3E,
 		AMOD_STANDARD_SUPERVIS_BLK  = 0x3F
 	};
-};
+	void install_device(vme_amod_t amod, offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler, uint32_t mask);
+	//  void install_device(vme_amod_t amod, offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler);
+	void install_device(vme_amod_t amod, offs_t start, offs_t end, read16_delegate rhandler, write16_delegate whandler, uint32_t mask);
+	void install_device(vme_amod_t amod, offs_t start, offs_t end, read32_delegate rhandler, write32_delegate whandler, uint32_t mask);
 
-SLOT_INTERFACE_EXTERN(vme_p1_slot1);
-
-#define MCFG_VME_P1_SLOT_ADD(_tag, _slot_tag, _slot_intf,_def_slot)	\
-	MCFG_DEVICE_ADD(_slot_tag, VME_P1_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
-	vme_p1_slot_device::static_set_vme_p1_slot(*device, _tag, _slot_tag);
-
-#define MCFG_VME_P1_SLOT_REMOVE(_tag)        \
-	MCFG_DEVICE_REMOVE(_tag)
-
-
-#if 0
-// Callbacks to the board from the VME bus comes through here
-#define MCFG_VME_J2_CB(_devcb) \
-	devcb = &vme_p2_slot_device::static_set_j2_callback(*device, DEVCB_##_devcb);
-
-class device_vme_p2_interface; // This interface often has custom/propritary A and C rows
-
-class vme_p2_slot_device : public device_t,
-	public device_slot_interface
-{
-public:
-
-	// construction/destruction
-	vme_p2_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	template<class _Object> static devcb_base &static_set_vme_j2_callback(device_t &device, _Object object)  { return downcast<vme_p2_slot_device &>(device).m_vme_j2_callback.set_callback(object); }
-
-	// device-level overrides
-	virtual void device_start() override;
-
-	// callbacks
-	devcb_write_line        m_vme_j2_callback;
-private:
-	device_vme_p2_interface *m_vme_p2;
-};
-
-// device type definition
-extern const device_type VME_P2_SLOT;
-
-class device_vme_p2_interface : public device_slot_card_interface
-{
-public:
-	// construction/destruction
-	device_vme_p2_interface(const machine_config &mconfig, device_t &device);
-	virtual ~device_vme_p2_interface();
-
-	virtual DECLARE_READ32_MEMBER(read32);
-	virtual DECLARE_WRITE32_MEMBER(write32);
-};
-
-#define MCFG_VME_P2_ADD(_tag,_slot_intf,_def_slot) \
-	MCFG_DEVICE_ADD(_tag, VME_P2_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
-
-#define MCFG_VME_P2_REMOVE(_tag)        \
-	MCFG_DEVICE_REMOVE(_tag)
-#endif
-#if 0
-//**************************************************************************
-//	INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_VME16_SLOT_ADD(_vmetag, _tag, _slot_intf, _def_slot, _fixed) \
-	MCFG_DEVICE_ADD(_tag, VME16_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _fixed) \
-	vme16_slot_device::static_set_vme16_slot(*device, _vmetag, _tag);
-
-//**************************************************************************
-//	TYPE DEFINITIONS
-//**************************************************************************
-
-class device_vme16_card_interface;
-
-// 
-// The VME device
-//
-class vme_device : public device_t
-,public device_memory_interface
-{
-public:
-	// construction/destruction
-	vme_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	vme_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
-
-	// inline configuration
-	static void static_set_cputag(device_t &device, const char *tag);
-
-	void install_device(offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_delegate rhandler, write8_delegate whandler);
-	void install_device(offs_t start, offs_t end, offs_t mask, offs_t mirror, read16_delegate rhandler, write16_delegate whandler);
-	void install_device(offs_t start, offs_t end, offs_t mask, offs_t mirror, read32_delegate rhandler, write32_delegate whandler);
-	void install_bank(offs_t start, offs_t end, offs_t mask, offs_t mirror, const char *tag, uint8_t *data);
-	void unmap_bank(offs_t start, offs_t end, offs_t mask, offs_t mirror);
-	void install_rom(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, const char *tag, const char *region);
-	void install_memory(offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_delegate rhandler, write8_delegate whandler);
-	void set_irq_line(int slot, int state);
 protected:
-	void install_space(address_spacenum spacenum, offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_delegate rhandler, write8_delegate whandler);
-
-	// address spaces
-	address_space *m_prgspace;
-	int  m_prgwidth;
-	bool m_allocspaces;
+	vme_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	simple_list<device_vme_card_interface> m_device_list;
 
 	// internal state
 	cpu_device   *m_maincpu;
-	const address_space_config m_program16_config;
-	const address_space_config m_program24_config;
-	const address_space_config m_program32_config;
+
+	// address spaces
+	address_space *m_prgspace;
+	int m_prgwidth;
+	bool m_allocspaces;
+
+	const char                 *m_cputag;
+
 };
 
-class vme16_device : public vme_device
-{
- public:
-	vme16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	vme16_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
-
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const override;
-
-	DECLARE_READ16_MEMBER ( vme_r );
-	DECLARE_WRITE16_MEMBER( vme_w );
-
-	void add_vme16_card(device_vme16_card_interface *card);
-};
-
-class vme24_device : public vme_device
-{
- public:
-	vme24_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	vme24_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
-
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const override;
-
-	DECLARE_READ16_MEMBER ( vme_r );
-	DECLARE_WRITE16_MEMBER( vme_w );
-
-	void add_vme24_card(device_vme16_card_interface *card);
-};
-
-class vme32_device : public vme_device
-{
- public:
-	vme32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	vme32_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
-
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const override;
-
-	DECLARE_READ32_MEMBER ( vme_r );
-	DECLARE_WRITE32_MEMBER( vme_w );
-
-	//	void add_vme32_card(device_vme16_card_interface *card);
-};
-
-//
-// The SLOT device
-//
-class vme16_slot_device : public device_t,
-	public device_slot_interface
-{
-public:
-	// construction/destruction
-	vme16_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	vme16_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
-	virtual ~vme16_slot_device();
-
-	//template<class _Object> static devcb_base &set_out_irq2_callback(device_t &device, _Object object) { return downcast<vme16_slot_device &>(device).m_out_irq2_cb.set_callback(object); }
-
-	//DECLARE_WRITE_LINE_MEMBER( irq2_w );
-
-	// inline configuration
-	static void static_set_vme16_slot(device_t &device, const char *tag, const char *slottag);
-
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-
-protected:
-
-	// configuration
-	const char *m_vme16_tag, *m_vme16_slottag;
-
-	device_vme16_card_interface *m_slot;
-};
 
 
 // device type definition
-extern const device_type VME16_SLOT;
-extern const device_type VME16;
-extern const device_type VME24;
-extern const device_type VME32;
+DECLARE_DEVICE_TYPE(VME_SLOT, vme_slot_device)
 
-//
-// The CARD device
-//
-class device_vme16_card_interface : public device_slot_card_interface
+class device_vme_card_interface : public device_slot_card_interface
 {
-	friend class vme16_device;
+	template <class ElementType> friend class simple_list;
 public:
+	// inline configuration
+	static void static_set_vme_tag(device_t &device, const char *tag, const char *slottag);
+
 	// construction/destruction
-	device_vme16_card_interface(const machine_config &mconfig, device_t &device);
-	virtual ~device_vme16_card_interface();
-
-	device_vme16_card_interface *next() const { return m_next; }
-
+	virtual ~device_vme_card_interface();
 	void set_vme_device();
 
-	// inline configuration
-	static void static_set_vmebus(device_t &device, device_t *vme_device);
-public:
-	vme16_device  *m_vme;
-	device_t     *m_vme_dev;
-	device_vme16_card_interface *m_next;
+	virtual DECLARE_READ8_MEMBER(read8);
+	virtual DECLARE_WRITE8_MEMBER(write8);
+
+	device_vme_card_interface(const machine_config &mconfig, device_t &device);
+
+protected:
+	device_t *m_device;
+
+	vme_device  *m_vme;
+	const char *m_vme_tag, *m_vme_slottag;
+	int m_slot;
+
+private:
+	device_vme_card_interface *m_next;
 };
 
-#if 0
-	// reset
-	virtual void vme16_reset_w() { };
+#define MCFG_VME_SLOT_ADD(_tag, _slotnbr, _slot_intf,_def_slot)            \
+	{   std::string stag = "slot" + std::to_string(_slotnbr);              \
+		MCFG_DEVICE_ADD(stag.c_str(), VME_SLOT, 0);                        \
+		MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false);          \
+		vme_slot_device::static_set_vme_slot(*device, _tag, stag.c_str()); \
+		vme_slot_device::static_update_vme_chains(*device, _slotnbr);      \
+	}
 
-};
-#endif
-#endif
+#define MCFG_VME_SLOT_REMOVE(_tag)        \
+	MCFG_DEVICE_REMOVE(_tag)
 
-
-#endif /* VME_H_ */
+#endif // MAME_BUS_VME_VME_H

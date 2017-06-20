@@ -46,7 +46,7 @@ static const char *const s_mnemonics[] =
 };
 
 // number of bits per opcode parameter, 99 means (XY) parameter, negative means reversed bit-order
-static const int8_t s_bits[] =
+static const s8 s_bits[] =
 {
 	0,
 	0, 0, 0, 0, 0, 4,
@@ -65,7 +65,7 @@ static const int8_t s_bits[] =
 #define _OVER DASMFLAG_STEP_OVER
 #define _OUT  DASMFLAG_STEP_OUT
 
-static const uint32_t s_flags[] =
+static const u32 s_flags[] =
 {
 	0,
 	0, 0, 0, 0, 0, 0,
@@ -82,7 +82,7 @@ static const uint32_t s_flags[] =
 };
 
 // next program counter in sequence (relative)
-static const int8_t s_next_pc[0x40] =
+static const s8 s_next_pc[0x40] =
 {
 	1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
 	16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 32+0x40 /* rollback */,
@@ -91,7 +91,7 @@ static const int8_t s_next_pc[0x40] =
 };
 
 
-static const uint8_t hmcs40_mnemonic[0x400] =
+static const u8 hmcs40_mnemonic[0x400] =
 {
 /*  0      1      2      3      4      5      6      7      8      9      A      B      C      D      E      F  */
 	/* 0x000 */
@@ -186,9 +186,9 @@ static const uint8_t hmcs40_mnemonic[0x400] =
 
 CPU_DISASSEMBLE(hmcs40)
 {
-	uint16_t op = (oprom[0] | oprom[1] << 8) & 0x3ff;
-	uint8_t instr = hmcs40_mnemonic[op];
-	int8_t bits = s_bits[instr];
+	u16 op = (oprom[0] | oprom[1] << 8) & 0x3ff;
+	u8 instr = hmcs40_mnemonic[op];
+	s8 bits = s_bits[instr];
 
 	// special case for (XY) opcode
 	if (bits == 99)
@@ -207,7 +207,7 @@ CPU_DISASSEMBLE(hmcs40)
 		// opcode parameter
 		if (bits != 0)
 		{
-			uint8_t param = op;
+			u8 param = op;
 
 			// reverse bits
 			if (bits < 0)

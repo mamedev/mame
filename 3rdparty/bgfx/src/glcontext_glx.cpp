@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -155,10 +155,12 @@ namespace bgfx { namespace gl
 			if (NULL != glXCreateContextAttribsARB)
 			{
 				BX_TRACE("Create GL 3.1 context.");
+				int32_t flags = BGFX_CONFIG_DEBUG ? GLX_CONTEXT_DEBUG_BIT_ARB : 0;
 				const int contextAttrs[] =
 				{
 					GLX_CONTEXT_MAJOR_VERSION_ARB, 3,
 					GLX_CONTEXT_MINOR_VERSION_ARB, 1,
+					GLX_CONTEXT_FLAGS_ARB, flags,
 					GLX_CONTEXT_PROFILE_MASK_ARB, GLX_CONTEXT_CORE_PROFILE_BIT_ARB,
 					0,
 				};
@@ -259,6 +261,7 @@ namespace bgfx { namespace gl
 	void GlContext::destroySwapChain(SwapChainGL* _swapChain)
 	{
 		BX_DELETE(g_allocator, _swapChain);
+		glXMakeCurrent( (::Display*)g_platformData.ndt, (::Window)g_platformData.nwh, m_context);
 	}
 
 	void GlContext::swap(SwapChainGL* _swapChain)

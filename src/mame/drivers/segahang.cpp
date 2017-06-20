@@ -17,12 +17,14 @@
 
 #include "emu.h"
 #include "includes/segahang.h"
+#include "includes/segaipt.h"
+
 #include "machine/fd1089.h"
 #include "machine/fd1094.h"
 #include "sound/2203intf.h"
 #include "sound/ym2151.h"
 #include "sound/segapcm.h"
-#include "includes/segaipt.h"
+#include "speaker.h"
 
 
 
@@ -744,7 +746,7 @@ GFXDECODE_END
 //  GENERIC MACHINE DRIVERS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( shared_base, segahang_state )
+static MACHINE_CONFIG_START( shared_base )
 
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK_25MHz/4)
@@ -819,7 +821,7 @@ static MACHINE_CONFIG_DERIVED( endurord_base, sharrier_base )
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segahang_state, irq4_line_hold)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( sound_board_2203 )
+static MACHINE_CONFIG_START( sound_board_2203 )
 
 	// basic machine hardware
 	MCFG_CPU_ADD("soundcpu", Z80, MASTER_CLOCK_8MHz/2)
@@ -847,7 +849,7 @@ static MACHINE_CONFIG_FRAGMENT( sound_board_2203 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_FRAGMENT( sound_board_2203x2 )
+static MACHINE_CONFIG_START( sound_board_2203x2 )
 
 	// basic machine hardware
 	MCFG_CPU_ADD("soundcpu", Z80, MASTER_CLOCK_8MHz/2)
@@ -885,7 +887,7 @@ static MACHINE_CONFIG_FRAGMENT( sound_board_2203x2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_FRAGMENT( sound_board_2151 )
+static MACHINE_CONFIG_START( sound_board_2151 )
 
 	// basic machine hardware
 	MCFG_CPU_ADD("soundcpu", Z80, MASTER_CLOCK_8MHz/2)

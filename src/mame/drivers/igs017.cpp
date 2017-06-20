@@ -45,6 +45,7 @@ Notes:
 ************************************************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/z180/z180.h"
 #include "machine/i8255.h"
@@ -54,6 +55,10 @@ Notes:
 #include "machine/igs022.h"
 #include "machine/ticket.h"
 #include "video/igs017_igs031.h"
+
+#include "screen.h"
+#include "speaker.h"
+
 
 class igs017_state : public driver_device
 {
@@ -3244,7 +3249,7 @@ MACHINE_RESET_MEMBER(igs017_state,iqblocka)
 	m_input_select = 0;
 }
 
-static MACHINE_CONFIG_START( iqblocka, igs017_state )
+static MACHINE_CONFIG_START( iqblocka )
 	MCFG_CPU_ADD("maincpu", Z180, XTAL_16MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(iqblocka_map)
 	MCFG_CPU_IO_MAP(iqblocka_io)
@@ -3278,7 +3283,7 @@ static MACHINE_CONFIG_START( iqblocka, igs017_state )
 	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_16MHz / 16, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL_16MHz / 16, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
@@ -3309,7 +3314,7 @@ MACHINE_RESET_MEMBER(igs017_state,mgcs)
 	memset(m_igs_magic, 0, sizeof(m_igs_magic));
 }
 
-static MACHINE_CONFIG_START( mgcs, igs017_state )
+static MACHINE_CONFIG_START( mgcs )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_22MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(mgcs)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, mgcs_interrupt, "screen", 0, 1)
@@ -3340,7 +3345,7 @@ static MACHINE_CONFIG_START( mgcs, igs017_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", XTAL_8MHz / 8, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL_8MHz / 8, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
@@ -3348,7 +3353,7 @@ MACHINE_CONFIG_END
 
 // lhzb2
 
-static MACHINE_CONFIG_START( lhzb2, igs017_state )
+static MACHINE_CONFIG_START( lhzb2 )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_22MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(lhzb2)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, mgcs_interrupt, "screen", 0, 1)
@@ -3386,7 +3391,7 @@ static MACHINE_CONFIG_START( lhzb2, igs017_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", XTAL_8MHz / 8, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL_8MHz / 8, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
@@ -3400,7 +3405,7 @@ MACHINE_RESET_MEMBER(igs017_state,lhzb2a)
 	lhzb2a_input_addr_w(m_maincpu->space(AS_PROGRAM), 0, 0xf0);
 }
 
-static MACHINE_CONFIG_START( lhzb2a, igs017_state )
+static MACHINE_CONFIG_START( lhzb2a )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_22MHz/2)
 	MCFG_CPU_PROGRAM_MAP(lhzb2a)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, mgcs_interrupt, "screen", 0, 1)
@@ -3429,7 +3434,7 @@ static MACHINE_CONFIG_START( lhzb2a, igs017_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", XTAL_22MHz / 22, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL_22MHz / 22, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
@@ -3437,7 +3442,7 @@ MACHINE_CONFIG_END
 
 // slqz2
 
-static MACHINE_CONFIG_START( slqz2, igs017_state )
+static MACHINE_CONFIG_START( slqz2 )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_22MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(slqz2)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, mgcs_interrupt, "screen", 0, 1)
@@ -3473,7 +3478,7 @@ static MACHINE_CONFIG_START( slqz2, igs017_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", XTAL_8MHz / 8, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL_8MHz / 8, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
@@ -3481,7 +3486,7 @@ MACHINE_CONFIG_END
 
 // sdmg2
 
-static MACHINE_CONFIG_START( sdmg2, igs017_state )
+static MACHINE_CONFIG_START( sdmg2 )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_22MHz/2)
 	MCFG_CPU_PROGRAM_MAP(sdmg2)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, mgcs_interrupt, "screen", 0, 1)
@@ -3511,7 +3516,7 @@ static MACHINE_CONFIG_START( sdmg2, igs017_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", XTAL_22MHz / 22, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL_22MHz / 22, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
@@ -3529,7 +3534,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(igs017_state::mgdh_interrupt)
 		m_maincpu->set_input_line(3, HOLD_LINE); // lev 3 instead of 2
 }
 
-static MACHINE_CONFIG_START( mgdha, igs017_state )
+static MACHINE_CONFIG_START( mgdha )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_22MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(mgdha_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, mgdh_interrupt, "screen", 0, 1)
@@ -3558,14 +3563,14 @@ static MACHINE_CONFIG_START( mgdha, igs017_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", XTAL_22MHz / 22, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL_22MHz / 22, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
 
 // tjsb
 
-static MACHINE_CONFIG_START( tjsb, igs017_state )
+static MACHINE_CONFIG_START( tjsb )
 	MCFG_CPU_ADD("maincpu", Z180, XTAL_16MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(tjsb_map)
 	MCFG_CPU_IO_MAP(tjsb_io)
@@ -3601,14 +3606,14 @@ static MACHINE_CONFIG_START( tjsb, igs017_state )
 	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_16MHz / 16, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL_16MHz / 16, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
 
 // spkrform
 
-static MACHINE_CONFIG_START( spkrform, igs017_state )
+static MACHINE_CONFIG_START( spkrform )
 	MCFG_CPU_ADD("maincpu", Z180, XTAL_16MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(spkrform_map)
 	MCFG_CPU_IO_MAP(spkrform_io)
@@ -3642,7 +3647,7 @@ static MACHINE_CONFIG_START( spkrform, igs017_state )
 	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_16MHz / 16, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL_16MHz / 16, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 

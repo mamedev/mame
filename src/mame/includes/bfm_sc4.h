@@ -2,6 +2,10 @@
 // copyright-holders:David Haywood
 /* Scorpion 4 + 5 driver related includes */
 /* mainly used for stuff which is currently shared between sc4 / 5 sets to avoid duplication */
+#ifndef MAME_INCLUDES_BFP_SC4_H
+#define MAME_INCLUDES_BFP_SC4_H
+
+#pragma once
 
 #include "machine/sec.h"
 #include "machine/steppers.h" // stepper motor
@@ -95,8 +99,8 @@ public:
 public:
 
 	required_device<mc68681_device> m_duart;
-	optional_device<bfm_bda_t> m_vfd0;
-	optional_device<bfmdm01_device> m_dm01;
+	optional_device<bfm_bda_device> m_vfd0;
+	optional_device<bfm_dm01_device> m_dm01;
 	required_device<ymz280b_device> m_ymz;
 
 	// serial vfd
@@ -139,7 +143,7 @@ public:
 		m_dochk41 = false;
 	}
 
-	required_device<m68307cpu_device> m_maincpu;
+	required_device<m68307_cpu_device> m_maincpu;
 	required_memory_region m_cpuregion;
 	// devices
 	required_device<nvram_device> m_nvram;
@@ -638,7 +642,7 @@ public:
 	DECLARE_MACHINE_START(adder4);
 
 	// devices
-	required_device<m68340cpu_device> m_adder4cpu;
+	required_device<m68340_cpu_device> m_adder4cpu;
 };
 
 
@@ -3373,3 +3377,5 @@ INPUT_PORTS_EXTERN( sc4_raw );
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
 	/* not for either of these games? */ \
 	ROM_LOAD( "casroysnd.bin", 0x00000, 0x80000, CRC(cf1d4b59) SHA1(1b2bc74c6fcc43197a6f295bc34554da01f7b517) )
+
+#endif // MAME_INCLUDES_BFP_SC4_H

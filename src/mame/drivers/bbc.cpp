@@ -40,6 +40,7 @@
 
 /* Core includes */
 #include "emu.h"
+#include "includes/bbc.h"
 
 /* Components */
 #include "bus/rs232/rs232.h"
@@ -50,8 +51,6 @@
 #include "bus/econet/econet.h"
 #include "sound/tms5220.h"          /* Speech */
 #include "video/saa5050.h"          /* Teletext */
-#include "bbc.lh"
-#include "bbcm.lh"
 
 /* Devices */
 #include "formats/acorn_dsk.h"
@@ -59,8 +58,12 @@
 #include "imagedev/cassette.h"
 #include "formats/uef_cas.h"
 #include "formats/csw_cas.h"
-#include "includes/bbc.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
+#include "bbc.lh"
+#include "bbcm.lh"
 
 /******************************************************************************
 A  = BBC Model A
@@ -218,7 +221,7 @@ static ADDRESS_MAP_START( bbcbp_mem, AS_PROGRAM, 8, bbc_state )
 	AM_RANGE(0xfe30, 0xfe3f) AM_READWRITE(bbc_fe_r, bbc_page_selectbp_w)                        /* R: fe30-fe3f  NC             Not Connected                   */
 																																															/* W: fe30-fe3f  84LS161        Paged ROM selector              */
 	AM_RANGE(0xfe80, 0xfe83) AM_WRITE(bbc_wd1770_status_w)                                      /*    fe80-fe83  1770 FDC       Drive control register          */
-	AM_RANGE(0xfe84, 0xfe9f) AM_DEVREADWRITE("wd1770", wd1770_t, read, write)                   /*    fe84-fe9f  1770 FDC       Floppy disc controller          */
+	AM_RANGE(0xfe84, 0xfe9f) AM_DEVREADWRITE("wd1770", wd1770_device, read, write)              /*    fe84-fe9f  1770 FDC       Floppy disc controller          */
 	AM_IMPORT_FROM(bbc_base)
 ADDRESS_MAP_END
 
@@ -231,7 +234,7 @@ static ADDRESS_MAP_START( bbcbp128_mem, AS_PROGRAM, 8, bbc_state )
 	AM_RANGE(0xfe30, 0xfe3f) AM_READWRITE(bbc_fe_r, bbc_page_selectbp_w)                        /* R: fe30-fe3f  NC             Not Connected                   */
 																																															/* W: fe30-fe3f  84LS161        Paged ROM selector              */
 	AM_RANGE(0xfe80, 0xfe83) AM_WRITE(bbc_wd1770_status_w)                                      /*    fe80-fe83  1770 FDC       Drive control register          */
-	AM_RANGE(0xfe84, 0xfe9f) AM_DEVREADWRITE("wd1770", wd1770_t, read, write)                   /*    fe84-fe9f  1770 FDC       Floppy disc controller          */
+	AM_RANGE(0xfe84, 0xfe9f) AM_DEVREADWRITE("wd1770", wd1770_device, read, write)              /*    fe84-fe9f  1770 FDC       Floppy disc controller          */
 	AM_IMPORT_FROM(bbc_base)
 ADDRESS_MAP_END
 
@@ -807,7 +810,7 @@ WRITE_LINE_MEMBER(bbc_state::econet_clk_w)
 }
 
 // 4 x EPROM sockets (16K) in BBC-A, these should grow to 16 for BBC-B and later...
-static MACHINE_CONFIG_FRAGMENT( bbc_eprom_sockets )
+static MACHINE_CONFIG_START( bbc_eprom_sockets )
 MCFG_GENERIC_SOCKET_ADD("exp_rom1", generic_linear_slot, "bbc_cart")
 MCFG_GENERIC_EXTENSIONS("bin,rom")
 MCFG_GENERIC_LOAD(bbc_state, exp1_load)
@@ -833,7 +836,7 @@ MACHINE_CONFIG_END
 ****************************************************************************/
 
 
-static MACHINE_CONFIG_START( bbca, bbc_state )
+static MACHINE_CONFIG_START( bbca )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_16MHz/8)         /* 2.00 MHz */
 	MCFG_CPU_PROGRAM_MAP(bbca_mem)
@@ -1266,7 +1269,7 @@ MACHINE_CONFIG_END
 ****************************************************************************/
 
 
-static MACHINE_CONFIG_START( bbcm, bbc_state )
+static MACHINE_CONFIG_START( bbcm )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M65SC02, XTAL_16MHz/8)        /* 2.00 MHz */
 	MCFG_CPU_PROGRAM_MAP(bbcm_mem)

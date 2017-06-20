@@ -11,12 +11,15 @@
 ****************************************************************************/
 
 #include "emu.h"
+#include "includes/pasopia.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "video/mc6845.h"
-#include "includes/pasopia.h"
+#include "screen.h"
+
 
 class pasopia_state : public driver_device
 {
@@ -24,6 +27,8 @@ public:
 	pasopia_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_p_chargen(*this, "chargen")
+		, m_p_vram(*this, "vram")
 		, m_ppi0(*this, "ppi8255_0")
 		, m_ppi1(*this, "ppi8255_1")
 		, m_ppi2(*this, "ppi8255_2")
@@ -57,12 +62,12 @@ private:
 	uint8_t m_mux_data;
 	bool m_video_wl;
 	bool m_ram_bank;
-	uint8_t *m_p_vram;
+	emu_timer *m_pio_timer;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void video_start() override;
-
 	required_device<cpu_device> m_maincpu;
+	required_region_ptr<u8> m_p_chargen;
+	required_region_ptr<u8> m_p_vram;
 	required_device<i8255_device> m_ppi0;
 	required_device<i8255_device> m_ppi1;
 	required_device<i8255_device> m_ppi2;
@@ -79,14 +84,9 @@ TIMER_CALLBACK_MEMBER( pasopia_state::pio_timer )
 	m_pio->port_b_write(keyb_r(generic_space(),0,0xff));
 }
 
-void pasopia_state::video_start()
-{
-}
-
 MC6845_UPDATE_ROW( pasopia_state::crtc_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint8_t *m_p_chargen = memregion("chargen")->base();
 	uint8_t chr,gfx,fg=7,bg=0; // colours need to be determined
 	uint16_t mem,x;
 	uint32_t *p = &bitmap.pix32(y);
@@ -148,7 +148,6 @@ INPUT_PORTS_END
 
 void pasopia_state::machine_start()
 {
-	m_p_vram = memregion("vram")->base();
 	m_hblank = 0;
 	membank("bank1")->set_entry(0);
 	membank("bank2")->set_entry(0);
@@ -274,10 +273,11 @@ We preset all banks here, so that bankswitching will incur no speed penalty.
 	membank("bank1")->configure_entries(0, 2, &ram[0x00000], 0x10000);
 	membank("bank2")->configure_entry(0, &ram[0x10000]);
 
-	machine().scheduler().timer_pulse(attotime::from_hz(50), timer_expired_delegate(FUNC(pasopia_state::pio_timer),this));
+	m_pio_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pasopia_state::pio_timer), this));
+	m_pio_timer->adjust(attotime::from_hz(50), 0, attotime::from_hz(50));
 }
 
-static MACHINE_CONFIG_START( pasopia, pasopia_state )
+static MACHINE_CONFIG_START( pasopia )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(pasopia_map)
@@ -338,5 +338,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT    INIT      COMPANY      FULLNAME       FLAGS */
-COMP( 1986, pasopia, 0,      0,       pasopia,   pasopia, pasopia_state, pasopia, "Toshiba",   "Pasopia", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT    STATE          INIT     COMPANY      FULLNAME   FLAGS
+COMP( 1986, pasopia, 0,      0,       pasopia,   pasopia, pasopia_state, pasopia, "Toshiba",   "Pasopia", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

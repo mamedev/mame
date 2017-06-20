@@ -21,6 +21,8 @@ PAL16R6A 11H
 */
 
 #include "emu.h"
+#include "includes/dietgo.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/h6280/h6280.h"
 #include "sound/ym2151.h"
@@ -28,7 +30,8 @@ PAL16R6A 11H
 #include "machine/decocrpt.h"
 #include "machine/deco102.h"
 #include "machine/gen_latch.h"
-#include "includes/dietgo.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 READ16_MEMBER( dietgo_state::dietgo_protection_region_0_104_r )
@@ -206,7 +209,7 @@ void dietgo_state::machine_start()
 {
 }
 
-static MACHINE_CONFIG_START( dietgo, dietgo_state )
+static MACHINE_CONFIG_START( dietgo )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_28MHz/2) /* DE102 (verified on pcb) */
@@ -265,7 +268,7 @@ static MACHINE_CONFIG_START( dietgo, dietgo_state )
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1)) /* IRQ 2 */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_32_22MHz/32, OKIM6295_PIN7_HIGH) /* verified on pcb */
+	MCFG_OKIM6295_ADD("oki", XTAL_32_22MHz/32, PIN7_HIGH) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 

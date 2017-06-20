@@ -179,14 +179,19 @@ fefc34a - start of mem_size, which queries ECC registers for each memory board
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m68000/m68000.h"
-#include "machine/timekpr.h"
-#include "machine/ram.h"
-#include "machine/z80scc.h"
 #include "machine/bankdev.h"
 #include "machine/nvram.h"
+#include "machine/ram.h"
+#include "machine/timekpr.h"
+#include "machine/z80scc.h"
+
 #include "bus/rs232/rs232.h"
 #include "bus/sunkbd/sunkbd.h"
+
+#include "screen.h"
+
 
 #define TIMEKEEPER_TAG  "timekpr"
 #define SCC1_TAG        "scc1"
@@ -387,7 +392,7 @@ READ32_MEMBER( sun3_state::tl_mmu_r )
 {
 	uint8_t fc = m_maincpu->get_fc();
 
-	if ((fc == 3) && !space.debugger_access())
+	if ((fc == 3) && !machine().side_effect_disabled())
 	{
 		int page;
 
@@ -453,7 +458,7 @@ READ32_MEMBER( sun3_state::tl_mmu_r )
 	}
 
 	// debugger hack
-	if ((space.debugger_access()) && (offset >= (0xfef0000>>2)) && (offset <= (0xfefffff>>2)))
+	if (machine().side_effect_disabled() && (offset >= (0xfef0000>>2)) && (offset <= (0xfefffff>>2)))
 	{
 		return m_rom_ptr[offset & 0x3fff];
 	}
@@ -482,7 +487,7 @@ READ32_MEMBER( sun3_state::tl_mmu_r )
 
 		//printf("pmeg %d, entry %d = %08x, virt %08x => tmp %08x\n", pmeg, entry, m_pagemap[entry], offset << 2, tmp);
 
-	//  if (!space.debugger_access())
+	//  if (!machine().side_effect_disabled())
 		//printf("sun3: Translated addr: %08x, type %d (page %d page entry %08x, orig virt %08x, FC %d)\n", tmp << 2, (m_pagemap[entry] >> 26) & 3, entry, m_pagemap[entry], offset<<2, fc);
 
 		switch ((m_pagemap[entry] >> 26) & 3)
@@ -507,7 +512,7 @@ READ32_MEMBER( sun3_state::tl_mmu_r )
 	}
 	else
 	{
-//      if (!space.debugger_access()) printf("sun3: pagemap entry not valid! (PC=%x)\n", m_maincpu->pc);
+//      if (!machine().side_effect_disabled()) printf("sun3: pagemap entry not valid! (PC=%x)\n", m_maincpu->pc);
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 		m_buserr = BE_INVALID;
@@ -515,7 +520,7 @@ READ32_MEMBER( sun3_state::tl_mmu_r )
 		return 0xffffffff;
 	}
 
-	if (!space.debugger_access()) logerror("sun3: Unmapped read @ %08x (FC %d, mask %08x, PC=%x, seg %x)\n", offset<<2, fc, mem_mask, m_maincpu->pc, offset>>15);
+	if (!machine().side_effect_disabled()) logerror("sun3: Unmapped read @ %08x (FC %d, mask %08x, PC=%x, seg %x)\n", offset<<2, fc, mem_mask, m_maincpu->pc, offset>>15);
 
 	return 0xffffffff;
 }
@@ -633,7 +638,7 @@ WRITE32_MEMBER( sun3_state::tl_mmu_w )
 		uint32_t tmp = (m_pagemap[entry] & 0x7ffff) << 11;
 		tmp |= (offset & 0x7ff);
 
-		//if (!space.debugger_access()) printf("sun3: Translated addr: %08x, type %d (page entry %08x, orig virt %08x)\n", tmp << 2, (m_pagemap[entry] >> 26) & 3, m_pagemap[entry], offset<<2);
+		//if (!machine().side_effect_disabled()) printf("sun3: Translated addr: %08x, type %d (page entry %08x, orig virt %08x)\n", tmp << 2, (m_pagemap[entry] >> 26) & 3, m_pagemap[entry], offset<<2);
 
 		switch ((m_pagemap[entry] >> 26) & 3)
 		{
@@ -657,7 +662,7 @@ WRITE32_MEMBER( sun3_state::tl_mmu_w )
 	}
 	else
 	{
-		//if (!space.debugger_access()) printf("sun3: pagemap entry not valid!\n");
+		//if (!machine().side_effect_disabled()) printf("sun3: pagemap entry not valid!\n");
 		m_buserr = BE_INVALID;
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
@@ -945,7 +950,7 @@ void sun3_state::machine_reset()
 }
 
 // The base Sun 3004 CPU board
-static MACHINE_CONFIG_START( sun3, sun3_state )
+static MACHINE_CONFIG_START( sun3 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68020, 16670000)
 	MCFG_CPU_PROGRAM_MAP(sun3_mem)
@@ -1048,7 +1053,7 @@ static MACHINE_CONFIG_DERIVED( sun3200, sun3 )
 	MCFG_RAM_EXTRA_OPTIONS("64M,96M,128M")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sun3_50, sun3_state )
+static MACHINE_CONFIG_START( sun3_50 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68020, 15700000)
 	MCFG_CPU_PROGRAM_MAP(sun3_mem)
@@ -1252,10 +1257,10 @@ ROM_START( sun3_e )
 	ROM_LOAD( "sun3-e-idprom.bin", 0x000000, 0x000020, CRC(d1a92116) SHA1(4836f3188f2c3dd5ba49ab66e0b55caa6b1b1791) )
 ROM_END
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY         FULLNAME       FLAGS */
-COMP( 198?, sun3_50,   0,       0,       sun3_50,   sun3, driver_device,     0,  "Sun Microsystems", "Sun 3/50", MACHINE_NOT_WORKING | MACHINE_NO_SOUND) // Model 25
-COMP( 1988, sun3_60,   0,       0,       sun3_60,   sun3, driver_device,     0,  "Sun Microsystems", "Sun 3/60", MACHINE_NOT_WORKING | MACHINE_NO_SOUND) // Ferrari
-COMP( 198?, sun3_110,  0,       0,       sun3,      sun3, driver_device,     0,  "Sun Microsystems", "Sun 3/110", MACHINE_NOT_WORKING | MACHINE_NO_SOUND) // Prism
-COMP( 1985, sun3_150,  0,       0,       sun3,      sun3, driver_device,     0,  "Sun Microsystems", "Sun 3/75/140/150/160/180", MACHINE_NOT_WORKING | MACHINE_NO_SOUND) // AKA Carrera
-COMP( 198?, sun3_260,  0,       0,       sun3200,   sun3, driver_device,     0,  "Sun Microsystems", "Sun 3/260/280", MACHINE_NOT_WORKING | MACHINE_NO_SOUND) // Prism
-COMP( 198?, sun3_e,    0,       0,       sun3e,     sun3, driver_device,     0,  "Sun Microsystems", "Sun 3/E", MACHINE_NOT_WORKING | MACHINE_NO_SOUND) // Polaris
+//    YEAR  NAME       PARENT  COMPAT   MACHINE    INPUT  STATE       INIT  COMPANY             FULLNAME                    FLAGS
+COMP( 198?, sun3_50,   0,      0,       sun3_50,   sun3,  sun3_state, 0,    "Sun Microsystems", "Sun 3/50",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Model 25
+COMP( 1988, sun3_60,   0,      0,       sun3_60,   sun3,  sun3_state, 0,    "Sun Microsystems", "Sun 3/60",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Ferrari
+COMP( 198?, sun3_110,  0,      0,       sun3,      sun3,  sun3_state, 0,    "Sun Microsystems", "Sun 3/110",                MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Prism
+COMP( 1985, sun3_150,  0,      0,       sun3,      sun3,  sun3_state, 0,    "Sun Microsystems", "Sun 3/75/140/150/160/180", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // AKA Carrera
+COMP( 198?, sun3_260,  0,      0,       sun3200,   sun3,  sun3_state, 0,    "Sun Microsystems", "Sun 3/260/280",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Prism
+COMP( 198?, sun3_e,    0,      0,       sun3e,     sun3,  sun3_state, 0,    "Sun Microsystems", "Sun 3/E",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Polaris

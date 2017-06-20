@@ -11,6 +11,8 @@ defines {
 	"_WIN32_WINNT=0x0603",
 	"NTDDI_VERSION=0x06030000",
 	"MODERN_WIN_API",
+	"WIN32_LEAN_AND_MEAN",
+	"NOMINMAX",
 }
 
 flags {

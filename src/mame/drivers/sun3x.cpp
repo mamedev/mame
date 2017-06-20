@@ -7,7 +7,6 @@
   status: 3/80 POSTs, 3/460 needs its unique RTC chip (also used by non-3x Sun 3s).
 
   TODO:
-    - Z8530 SCC needs to actually speak serial so we can hook up the mouse and keyboard.
     - Improve interrupt controller emulation.
     - Figure out how the IOMMU works.
     - Intersil 7170 device for 3/460 and 3/480 (they use the same PROMs).
@@ -129,17 +128,23 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
-#include "machine/timekpr.h"
-#include "machine/z80scc.h"
+
 #include "bus/scsi/scsi.h"
-#include "bus/scsi/scsihd.h"
 #include "bus/scsi/scsicd.h"
-#include "machine/ncr539x.h"
-#include "machine/upd765.h"
-#include "formats/pc_dsk.h"
+#include "bus/scsi/scsihd.h"
+#include "cpu/m68000/m68000.h"
 #include "formats/mfi_dsk.h"
+#include "formats/pc_dsk.h"
+#include "machine/ncr539x.h"
+#include "machine/timekpr.h"
+#include "machine/upd765.h"
+#include "machine/z80scc.h"
+
 #include "bus/rs232/rs232.h"
+#include "bus/sunkbd/sunkbd.h"
+
+#include "screen.h"
+
 
 #define TIMEKEEPER_TAG  "timekpr"
 #define SCC1_TAG        "scc1"
@@ -148,6 +153,7 @@
 #define FDC_TAG         "fdc"
 #define RS232A_TAG      "rs232a"
 #define RS232B_TAG      "rs232b"
+#define KEYBOARD_TAG    "keyboard"
 
 class sun3x_state : public driver_device
 {
@@ -160,7 +166,7 @@ public:
 		m_fdc(*this, FDC_TAG),
 		m_p_ram(*this, "p_ram"),
 		m_bw2_vram(*this, "bw2_vram")
-		{ }
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<z80scc_device> m_scc1;
@@ -568,7 +574,7 @@ static SLOT_INTERFACE_START( sun_floppies )
 	SLOT_INTERFACE( "35hd", FLOPPY_35_HD )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( sun3_80, sun3x_state )
+static MACHINE_CONFIG_START( sun3_80 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68030, 20000000)
 	MCFG_CPU_PROGRAM_MAP(sun3_80_mem)
@@ -576,6 +582,11 @@ static MACHINE_CONFIG_START( sun3_80, sun3x_state )
 	MCFG_M48T02_ADD(TIMEKEEPER_TAG)
 
 	MCFG_SCC8530_ADD(SCC1_TAG, XTAL_4_9152MHz, 0, 0, 0, 0)
+	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE(KEYBOARD_TAG, sun_keyboard_port_device, write_txd))
+
+	MCFG_SUNKBD_PORT_ADD(KEYBOARD_TAG, default_sun_keyboard_devices, "type3hle")
+	MCFG_SUNKBD_RXD_HANDLER(DEVWRITELINE(SCC1_TAG, z80scc_device, rxa_w))
+
 	MCFG_SCC8530_ADD(SCC2_TAG, XTAL_4_9152MHz, 0, 0, 0, 0)
 	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE(RS232A_TAG, rs232_port_device, write_txd))
 	MCFG_Z80SCC_OUT_TXDB_CB(DEVWRITELINE(RS232B_TAG, rs232_port_device, write_txd))
@@ -610,7 +621,7 @@ static MACHINE_CONFIG_START( sun3_80, sun3x_state )
 	MCFG_SCREEN_REFRESH_RATE(72)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sun3_460, sun3x_state )
+static MACHINE_CONFIG_START( sun3_460 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68030, 33000000)
 	MCFG_CPU_PROGRAM_MAP(sun3_460_mem)
@@ -679,6 +690,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY         FULLNAME       FLAGS */
-COMP( 198?, sun3_80,   0,       0,   sun3_80,   sun3x, driver_device,     0,  "Sun Microsystems", "Sun 3/80", MACHINE_NOT_WORKING | MACHINE_NO_SOUND) // Hydra
-COMP( 198?, sun3_460,  0,       0,   sun3_460,  sun3x, driver_device,     0,  "Sun Microsystems", "Sun 3/460/470/480", MACHINE_NOT_WORKING | MACHINE_NO_SOUND) // Pegasus
+//    YEAR  NAME      PARENT  COMPAT  MACHINE    INPUT  STATE        INIT  COMPANY             FULLNAME             FLAGS
+COMP( 198?, sun3_80,  0,      0,      sun3_80,   sun3x, sun3x_state, 0,    "Sun Microsystems", "Sun 3/80",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Hydra
+COMP( 198?, sun3_460, 0,      0,      sun3_460,  sun3x, sun3x_state, 0,    "Sun Microsystems", "Sun 3/460/470/480", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Pegasus

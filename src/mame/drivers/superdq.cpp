@@ -19,14 +19,16 @@
 
 *************************************************************************/
 
-#define MASTER_CLOCK    20000000
-
-
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "sound/sn76496.h"
 #include "machine/ldv1000.h"
+#include "sound/sn76496.h"
 #include "video/resnet.h"
+#include "speaker.h"
+
+
+#define MASTER_CLOCK    20000000
+
 
 class superdq_state : public driver_device
 {
@@ -323,7 +325,7 @@ void superdq_state::machine_start()
 }
 
 
-static MACHINE_CONFIG_START( superdq, superdq_state )
+static MACHINE_CONFIG_START( superdq )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/8)
@@ -412,6 +414,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1984, superdq,  0,        superdq, superdq, driver_device, 0, ROT0, "Universal", "Super Don Quix-ote (Long Scenes)", MACHINE_NOT_WORKING )
-GAME( 1984, superdqs, superdq,  superdq, superdq, driver_device, 0, ROT0, "Universal", "Super Don Quix-ote (Short Scenes)", MACHINE_NOT_WORKING )
-GAME( 1984, superdqa, superdq,  superdq, superdq, driver_device, 0, ROT0, "Universal", "Super Don Quix-ote (Short Scenes, Alt)", MACHINE_NOT_WORKING )
+GAME( 1984, superdq,  0,        superdq, superdq, superdq_state, 0, ROT0, "Universal", "Super Don Quix-ote (Long Scenes)",       MACHINE_NOT_WORKING )
+GAME( 1984, superdqs, superdq,  superdq, superdq, superdq_state, 0, ROT0, "Universal", "Super Don Quix-ote (Short Scenes)",      MACHINE_NOT_WORKING )
+GAME( 1984, superdqa, superdq,  superdq, superdq, superdq_state, 0, ROT0, "Universal", "Super Don Quix-ote (Short Scenes, Alt)", MACHINE_NOT_WORKING )

@@ -38,14 +38,18 @@ Limit for help/undo (matta):
 */
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
+
 #include "cpu/mcs48/mcs48.h"
+#include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "machine/i8243.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "video/mc6845.h"
+
+#include "screen.h"
+#include "speaker.h"
 
 
 #define TILE_WIDTH 6
@@ -102,7 +106,6 @@ public:
 	DECLARE_WRITE8_MEMBER(ay_data_w);
 	DECLARE_READ8_MEMBER(n7751_rom_r);
 	DECLARE_READ8_MEMBER(n7751_command_r);
-	DECLARE_READ8_MEMBER(n7751_t1_r);
 	DECLARE_WRITE8_MEMBER(n7751_p2_w);
 	DECLARE_WRITE8_MEMBER(n7751_rom_control_w);
 	virtual void machine_start() override;
@@ -310,27 +313,12 @@ WRITE8_MEMBER(othello_state::n7751_p2_w)
 	i8243_device *device = machine().device<i8243_device>("n7751_8243");
 
 	/* write to P2; low 4 bits go to 8243 */
-	device->i8243_p2_w(space, offset, data & 0x0f);
+	device->p2_w(space, offset, data & 0x0f);
 
 	/* output of bit $80 indicates we are ready (1) or busy (0) */
 	/* no other outputs are used */
 	m_n7751_busy = data;
 }
-
-READ8_MEMBER(othello_state::n7751_t1_r)
-{
-	/* T1 - labelled as "TEST", connected to ground */
-	return 0;
-}
-
-static ADDRESS_MAP_START( n7751_portmap, AS_IO, 8, othello_state )
-	AM_RANGE(MCS48_PORT_T1,   MCS48_PORT_T1) AM_READ(n7751_t1_r)
-	AM_RANGE(MCS48_PORT_P2,   MCS48_PORT_P2) AM_READ(n7751_command_r)
-	AM_RANGE(MCS48_PORT_BUS,  MCS48_PORT_BUS) AM_READ(n7751_rom_r)
-	AM_RANGE(MCS48_PORT_P1,   MCS48_PORT_P1) AM_DEVWRITE("dac", dac_byte_interface, write)
-	AM_RANGE(MCS48_PORT_P2,   MCS48_PORT_P2) AM_WRITE(n7751_p2_w)
-	AM_RANGE(MCS48_PORT_PROG, MCS48_PORT_PROG) AM_DEVWRITE("n7751_8243", i8243_device, i8243_prog_w)
-ADDRESS_MAP_END
 
 static INPUT_PORTS_START( othello )
 	PORT_START("DSW")
@@ -401,7 +389,7 @@ void othello_state::machine_reset()
 	m_n7751_busy = 0;
 }
 
-static MACHINE_CONFIG_START( othello, othello_state )
+static MACHINE_CONFIG_START( othello )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80,XTAL_8MHz/2)
@@ -414,7 +402,12 @@ static MACHINE_CONFIG_START( othello, othello_state )
 	MCFG_CPU_IO_MAP(audio_portmap)
 
 	MCFG_CPU_ADD("n7751", N7751, XTAL_6MHz)
-	MCFG_CPU_IO_MAP(n7751_portmap)
+	MCFG_MCS48_PORT_T1_IN_CB(GND) // labelled as "TEST", connected to ground
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(othello_state, n7751_command_r))
+	MCFG_MCS48_PORT_BUS_IN_CB(READ8(othello_state, n7751_rom_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(DEVWRITE8("dac", dac_byte_interface, write))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(othello_state, n7751_p2_w))
+	MCFG_MCS48_PORT_PROG_OUT_CB(DEVWRITELINE("n7751_8243", i8243_device, prog_w))
 
 	MCFG_I8243_ADD("n7751_8243", NOOP, WRITE8(othello_state,n7751_rom_control_w))
 
@@ -471,4 +464,4 @@ ROM_START( othello )
 	ROM_LOAD( "7.ic42",   0x4000, 0x2000, CRC(a76705f7) SHA1(b7d2a65d65d065732ddd0b3b738749369b382b48))
 ROM_END
 
-GAME( 1984, othello,  0,       othello,  othello, driver_device,  0, ROT0, "Success", "Othello (version 3.0)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, othello,  0,       othello,  othello, othello_state,  0, ROT0, "Success", "Othello (version 3.0)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

@@ -15,15 +15,17 @@
 
   FIP = fluorescent indicator panel
   g = number of grids
-  A = revision of the VFD
-  M = custom display
-  20 = unique display part number
+  r = revision of the VFD
+  c = custom display
+  s = unique display part number
 
 
   known chips:
 
   serial  device   etc.
 ----------------------------------------------------------------
+ *055     uPD546C  1979, Fidelity Checker Challenger (CR)
+
  @017     uPD552C  1979, Bambino UFO Master-Blaster Station (ET-02)
  @042     uPD552C  1980, Tomy Cosmic Combat (TN-??)
  @043     uPD552C  1979, Bambino Kick The Goal Soccer (ET-10)
@@ -50,6 +52,7 @@
 
  @511     uPD557LC 1980, Takatoku Toys Game Robot 9/Mego Fabulous Fred
  @512     uPD557LC 1980, Castle Toy Tactix
+ *513     uPD557LC 1980, Castle Toy Name That Tune
 
  @060     uPD650C  1979, Mattel Computer Gin
  *085     uPD650C  1980, Roland TR-808
@@ -66,7 +69,11 @@ TODO:
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "includes/hh_ucom4.h"
+#include "video/hlcd0515.h"
+#include "screen.h"
+#include "speaker.h"
 
 // internal artwork
 #include "efball.lh"
@@ -75,7 +82,7 @@ TODO:
 #include "mvbfree.lh"
 #include "tactix.lh" // clickable
 
-#include "hh_ucom4_test.lh" // common test-layout - no svg artwork(yet), use external artwork
+//#include "hh_ucom4_test.lh" // common test-layout - no svg artwork(yet), use external artwork
 
 
 // machine start/reset
@@ -129,7 +136,7 @@ void hh_ucom4_state::machine_reset()
 
 void hh_ucom4_state::display_update()
 {
-	uint32_t active_state[0x20];
+	u32 active_state[0x20];
 
 	for (int y = 0; y < m_display_maxy; y++)
 	{
@@ -142,7 +149,7 @@ void hh_ucom4_state::display_update()
 				m_display_decay[y][x] = m_display_wait;
 
 			// determine active state
-			uint32_t ds = (m_display_decay[y][x] != 0) ? 1 : 0;
+			u32 ds = (m_display_decay[y][x] != 0) ? 1 : 0;
 			active_state[y] |= (ds << x);
 		}
 	}
@@ -197,12 +204,12 @@ void hh_ucom4_state::set_display_size(int maxx, int maxy)
 	m_display_maxy = maxy;
 }
 
-void hh_ucom4_state::display_matrix(int maxx, int maxy, uint32_t setx, uint32_t sety, bool update)
+void hh_ucom4_state::display_matrix(int maxx, int maxy, u32 setx, u32 sety, bool update)
 {
 	set_display_size(maxx, maxy);
 
 	// update current state
-	uint32_t mask = (1 << maxx) - 1;
+	u32 mask = (1 << maxx) - 1;
 	for (int y = 0; y < maxy; y++)
 		m_display_state[y] = (sety >> y & 1) ? ((setx & mask) | (1 << maxx)) : 0;
 
@@ -213,9 +220,9 @@ void hh_ucom4_state::display_matrix(int maxx, int maxy, uint32_t setx, uint32_t 
 
 // generic input handlers
 
-uint8_t hh_ucom4_state::read_inputs(int columns)
+u8 hh_ucom4_state::read_inputs(int columns)
 {
-	uint8_t ret = 0;
+	u8 ret = 0;
 
 	// read selected input rows
 	for (int i = 0; i < columns; i++)
@@ -239,7 +246,7 @@ void hh_ucom4_state::set_interrupt(int state)
 
 	if (state != m_int)
 	{
-		if (machine().phase() >= MACHINE_PHASE_RESET)
+		if (machine().phase() >= machine_phase::RESET)
 			m_maincpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 		m_int = state;
 	}
@@ -294,8 +301,8 @@ public:
 
 void ufombs_state::prepare_display()
 {
-	uint16_t grid = BITSWAP16(m_grid,15,14,13,12,11,10,9,3,2,1,0,4,5,6,7,8);
-	uint16_t plate = BITSWAP16(m_plate,15,14,13,12,11,7,10,6,9,5,8,4,0,1,2,3);
+	u16 grid = BITSWAP16(m_grid,15,14,13,12,11,10,9,3,2,1,0,4,5,6,7,8);
+	u16 plate = BITSWAP16(m_plate,15,14,13,12,11,7,10,6,9,5,8,4,0,1,2,3);
 	display_matrix(10, 9, plate, grid);
 }
 
@@ -332,16 +339,16 @@ static INPUT_PORTS_START( ufombs )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY
 
 	PORT_START("IN.1") // port B
-	PORT_CONFNAME( 0x07, 0x01, "Skill Level" )
+	PORT_CONFNAME( 0x07, 0x01, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(    0x01, "1" )
 	PORT_CONFSETTING(    0x02, "2" )
 	PORT_CONFSETTING(    0x04, "3" )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static const int16_t ufombs_speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
+static const s16 ufombs_speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
 
-static MACHINE_CONFIG_START( ufombs, ufombs_state )
+static MACHINE_CONFIG_START( ufombs )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NEC_D552, 400000) // approximation
@@ -406,7 +413,7 @@ public:
 
 void ssfball_state::prepare_display()
 {
-	uint32_t plate = BITSWAP24(m_plate,23,22,21,20,19,11,7,3,12,17,13,18,16,14,15,10,9,8,0,1,2,4,5,6);
+	u32 plate = BITSWAP24(m_plate,23,22,21,20,19,11,7,3,12,17,13,18,16,14,15,10,9,8,0,1,2,4,5,6);
 	display_matrix(16, 9, plate, m_grid);
 }
 
@@ -485,9 +492,9 @@ static INPUT_PORTS_START( ssfball )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
 INPUT_PORTS_END
 
-static const int16_t ssfball_speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
+static const s16 ssfball_speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
 
-static MACHINE_CONFIG_START( ssfball, ssfball_state )
+static MACHINE_CONFIG_START( ssfball )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NEC_D553, 400000) // approximation
@@ -550,7 +557,7 @@ public:
 
 void bmsoccer_state::prepare_display()
 {
-	uint32_t plate = BITSWAP24(m_plate,23,22,21,20,19,11,7,3,12,17,13,18,16,14,15,8,4,0,9,5,1,10,6,2);
+	u32 plate = BITSWAP24(m_plate,23,22,21,20,19,11,7,3,12,17,13,18,16,14,15,8,4,0,9,5,1,10,6,2);
 	display_matrix(16, 9, plate, m_grid);
 }
 
@@ -605,17 +612,17 @@ static INPUT_PORTS_START( bmsoccer )
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.2") // port B
-	PORT_CONFNAME( 0x01, 0x00, "Skill Level" )
+	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x01, "2" )
-	PORT_CONFNAME( 0x02, 0x00, "Players" )
+	PORT_CONFNAME( 0x02, 0x00, DEF_STR( Players ) )
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x02, "2" )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Display/Banana Shoot")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Shoot")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( bmsoccer, bmsoccer_state )
+static MACHINE_CONFIG_START( bmsoccer )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NEC_D552, 400000) // approximation
@@ -673,8 +680,8 @@ public:
 
 void bmsafari_state::prepare_display()
 {
-	uint16_t grid = BITSWAP16(m_grid,15,14,13,12,11,10,9,0,1,2,3,4,5,6,7,8);
-	uint16_t plate = BITSWAP16(m_plate,15,14,13,12,11,7,10,2,9,5,8,4,0,1,6,3);
+	u16 grid = BITSWAP16(m_grid,15,14,13,12,11,10,9,0,1,2,3,4,5,6,7,8);
+	u16 plate = BITSWAP16(m_plate,15,14,13,12,11,7,10,2,9,5,8,4,0,1,6,3);
 	display_matrix(10, 9, plate, grid);
 }
 
@@ -710,7 +717,7 @@ WRITE8_MEMBER(bmsafari_state::speaker_w)
 
 static INPUT_PORTS_START( bmsafari )
 	PORT_START("IN.0") // port A
-	PORT_CONFNAME( 0x07, 0x04, "Skill Level" )
+	PORT_CONFNAME( 0x07, 0x04, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(    0x04, "1" )
 	PORT_CONFSETTING(    0x02, "2" )
 	PORT_CONFSETTING(    0x01, "3" )
@@ -723,7 +730,7 @@ static INPUT_PORTS_START( bmsafari )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( bmsafari, bmsafari_state )
+static MACHINE_CONFIG_START( bmsafari )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NEC_D552, 400000) // approximation
@@ -783,7 +790,7 @@ public:
 
 void splasfgt_state::prepare_display()
 {
-	uint32_t plate = BITSWAP24(m_plate,23,22,21,20,19,18,17,13,1,0,8,6,0,10,11,14,15,16,9,5,7,4,2,3);
+	u32 plate = BITSWAP24(m_plate,23,22,21,20,19,18,17,13,1,0,8,6,0,10,11,14,15,16,9,5,7,4,2,3);
 	display_matrix(16, 9, plate, m_grid);
 }
 
@@ -861,19 +868,19 @@ static INPUT_PORTS_START( splasfgt )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.4") // port A
-	PORT_CONFNAME( 0x01, 0x00, "Players" )
+	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Players ) )
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x01, "2" )
-	PORT_CONFNAME( 0x02, 0x00, "Skill Level" )
+	PORT_CONFNAME( 0x02, 0x00, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x02, "2" )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static const int16_t splasfgt_speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
+static const s16 splasfgt_speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
 
-static MACHINE_CONFIG_START( splasfgt, splasfgt_state )
+static MACHINE_CONFIG_START( splasfgt )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NEC_D553, 400000) // approximation
@@ -935,8 +942,8 @@ public:
 
 void bcclimbr_state::prepare_display()
 {
-	uint8_t grid = BITSWAP8(m_grid,7,6,0,1,2,3,4,5);
-	uint32_t plate = BITSWAP24(m_plate,23,22,21,20,16,17,18,19,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0);
+	u8 grid = BITSWAP8(m_grid,7,6,0,1,2,3,4,5);
+	u32 plate = BITSWAP24(m_plate,23,22,21,20,16,17,18,19,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0);
 	display_matrix(20, 6, plate, grid);
 }
 
@@ -977,7 +984,7 @@ static INPUT_PORTS_START( bcclimbr )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_RIGHT )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( bcclimbr, bcclimbr_state )
+static MACHINE_CONFIG_START( bcclimbr )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NEC_D553, XTAL_400kHz)
@@ -1100,7 +1107,7 @@ static INPUT_PORTS_START( tactix )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( tactix, tactix_state )
+static MACHINE_CONFIG_START( tactix )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NEC_D557L, 400000) // approximation
@@ -1153,8 +1160,8 @@ public:
 
 void invspace_state::prepare_display()
 {
-	uint16_t grid = BITSWAP16(m_grid,15,14,13,12,11,10,8,9,7,6,5,4,3,2,1,0);
-	uint32_t plate = BITSWAP24(m_plate,23,22,21,20,19,9,14,13,8,15,11,10,7,11,3,2,6,10,1,5,9,0,4,8);
+	u16 grid = BITSWAP16(m_grid,15,14,13,12,11,10,8,9,7,6,5,4,3,2,1,0);
+	u32 plate = BITSWAP24(m_plate,23,22,21,20,19,9,14,13,8,15,11,10,7,11,3,2,6,10,1,5,9,0,4,8);
 	display_matrix(19, 9, plate, grid);
 }
 
@@ -1194,7 +1201,7 @@ static INPUT_PORTS_START( invspace )
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( invspace, invspace_state )
+static MACHINE_CONFIG_START( invspace )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NEC_D552, XTAL_400kHz)
@@ -1237,8 +1244,6 @@ MACHINE_CONFIG_END
   - USA: Electronic Football (aka Pro-Bowl Football)
   - Japan: American Football
 
-  note: MAME external artwork is not needed for this game
-
 ***************************************************************************/
 
 class efball_state : public hh_ucom4_state
@@ -1257,7 +1262,7 @@ public:
 
 void efball_state::prepare_display()
 {
-	uint16_t plate = BITSWAP16(m_plate,15,14,13,12,11,4,3,0,2,1,6,10,9,5,8,7);
+	u16 plate = BITSWAP16(m_plate,15,14,13,12,11,4,3,0,2,1,6,10,9,5,8,7);
 	display_matrix(11, 10, plate, m_grid);
 }
 
@@ -1289,7 +1294,7 @@ static INPUT_PORTS_START( efball )
 	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(    0x00, "Amateur" )
 	PORT_CONFSETTING(    0x01, "Professional" )
-	PORT_CONFNAME( 0x02, 0x02, "Players" )
+	PORT_CONFNAME( 0x02, 0x02, DEF_STR( Players ) )
 	PORT_CONFSETTING(    0x02, "1" )
 	PORT_CONFSETTING(    0x00, "2" )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START ) PORT_NAME("P1 Down-Field")
@@ -1312,7 +1317,7 @@ static INPUT_PORTS_START( efball )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( efball, efball_state )
+static MACHINE_CONFIG_START( efball )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NEC_D553, XTAL_400kHz)
@@ -1370,8 +1375,8 @@ public:
 
 void galaxy2_state::prepare_display()
 {
-	uint16_t grid = BITSWAP16(m_grid,15,14,13,12,11,10,0,1,2,3,4,5,6,7,8,9);
-	uint16_t plate = BITSWAP16(m_plate,15,3,2,6,1,5,4,0,11,10,7,12,14,13,8,9);
+	u16 grid = BITSWAP16(m_grid,15,14,13,12,11,10,0,1,2,3,4,5,6,7,8,9);
+	u16 plate = BITSWAP16(m_plate,15,3,2,6,1,5,4,0,11,10,7,12,14,13,8,9);
 	display_matrix(15, 10, plate, grid);
 }
 
@@ -1411,7 +1416,7 @@ static INPUT_PORTS_START( galaxy2 )
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( galaxy2, galaxy2_state )
+static MACHINE_CONFIG_START( galaxy2 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NEC_D553, XTAL_400kHz)
@@ -1481,8 +1486,8 @@ public:
 
 void astrocmd_state::prepare_display()
 {
-	uint16_t grid = BITSWAP16(m_grid,15,14,13,12,11,10,9,8,4,5,6,7,0,1,2,3);
-	uint32_t plate = BITSWAP24(m_plate,23,22,21,20,19,3,2,12,13,14,15,16,17,18,0,1,4,8,5,9,7,11,6,10);
+	u16 grid = BITSWAP16(m_grid,15,14,13,12,11,10,9,8,4,5,6,7,0,1,2,3);
+	u32 plate = BITSWAP24(m_plate,23,22,21,20,19,3,2,12,13,14,15,16,17,18,0,1,4,8,5,9,7,11,6,10);
 	display_matrix(17, 9, plate, grid);
 }
 
@@ -1529,7 +1534,7 @@ static INPUT_PORTS_START( astrocmd )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( astrocmd, astrocmd_state )
+static MACHINE_CONFIG_START( astrocmd )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NEC_D553, XTAL_400kHz)
@@ -1625,7 +1630,7 @@ static INPUT_PORTS_START( edracula )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( edracula, edracula_state )
+static MACHINE_CONFIG_START( edracula )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NEC_D553, XTAL_400kHz)
@@ -1660,8 +1665,8 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Mattel Computer Gin
-  * NEC uCOM-43 MCU, label D650C 060
-  * Hughes HLCD0569 LCD driver
+  * NEC uCOM-43 MCU, label D650C 060 (die label same)
+  * Hughes HLCD0530 LCD driver, 5 by 14 segments LCD panel, no sound
 
 ***************************************************************************/
 
@@ -1669,22 +1674,32 @@ class mcompgin_state : public hh_ucom4_state
 {
 public:
 	mcompgin_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_ucom4_state(mconfig, type, tag)
+		: hh_ucom4_state(mconfig, type, tag),
+		m_lcd(*this, "lcd")
 	{ }
 
-	void prepare_display();
-	DECLARE_WRITE8_MEMBER(unk_w);
+	required_device<hlcd0530_device> m_lcd;
+
+	DECLARE_WRITE32_MEMBER(lcd_output_w);
+	DECLARE_WRITE8_MEMBER(lcd_w);
 };
 
 // handlers
 
-void mcompgin_state::prepare_display()
+WRITE32_MEMBER(mcompgin_state::lcd_output_w)
 {
+	// uses ROW0-4, COL11-24
+	display_matrix(24, 8, data, 1 << offset);
 }
 
-WRITE8_MEMBER(mcompgin_state::unk_w)
+WRITE8_MEMBER(mcompgin_state::lcd_w)
 {
-	// E=lcd
+	// E0: HLCD0569 _CS
+	// E1: HLCD0569 clock
+	// E2: HLCD0569 data in
+	m_lcd->write_cs(data & 1);
+	m_lcd->write_data(data >> 2 & 1);
+	m_lcd->write_clock(data >> 1 & 1);
 }
 
 
@@ -1692,39 +1707,32 @@ WRITE8_MEMBER(mcompgin_state::unk_w)
 
 static INPUT_PORTS_START( mcompgin )
 	PORT_START("IN.0") // port A
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) // 21 select
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) // 23 deal
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) // 22 discard
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) // 20 draw
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Select")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Deal / Gin")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Discard")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Draw")
 
 	PORT_START("IN.1") // port B
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 ) // 24 comp
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON6 ) // 25 score
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON7 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON8 )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Compare")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Score")
+	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( mcompgin, mcompgin_state )
+static MACHINE_CONFIG_START( mcompgin )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", NEC_D650, 400000) // approximation
+	MCFG_CPU_ADD("maincpu", NEC_D650, XTAL_400kHz) // TDK FCR400K
 	MCFG_UCOM4_READ_A_CB(IOPORT("IN.0"))
 	MCFG_UCOM4_READ_B_CB(IOPORT("IN.1"))
-	MCFG_UCOM4_WRITE_C_CB(WRITE8(mcompgin_state, unk_w))
-	MCFG_UCOM4_WRITE_D_CB(WRITE8(mcompgin_state, unk_w))
-	MCFG_UCOM4_WRITE_E_CB(WRITE8(mcompgin_state, unk_w))
-	MCFG_UCOM4_WRITE_F_CB(WRITE8(mcompgin_state, unk_w))
-	MCFG_UCOM4_WRITE_G_CB(WRITE8(mcompgin_state, unk_w))
-	MCFG_UCOM4_WRITE_H_CB(WRITE8(mcompgin_state, unk_w))
-	MCFG_UCOM4_WRITE_I_CB(WRITE8(mcompgin_state, unk_w))
+	MCFG_UCOM4_WRITE_E_CB(WRITE8(mcompgin_state, lcd_w))
 
+	/* video hardware */
+	MCFG_DEVICE_ADD("lcd", HLCD0530, 500) // C=0.01uF
+	MCFG_HLCD0515_WRITE_COLS_CB(WRITE32(mcompgin_state, lcd_output_w))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_mcompgin)
 
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	/* no sound! */
 MACHINE_CONFIG_END
 
 
@@ -1737,8 +1745,6 @@ MACHINE_CONFIG_END
   * PCB label Mego 79 rev F
   * NEC uCOM-43 MCU, label D553C 049
   * cyan VFD display Futaba DM-4.5 91
-
-  note: MAME external artwork is not needed for this game
 
 ***************************************************************************/
 
@@ -1759,8 +1765,8 @@ public:
 
 void mvbfree_state::prepare_display()
 {
-	uint16_t grid = BITSWAP16(m_grid,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15);
-	uint16_t plate = BITSWAP16(m_plate,15,14,13,12,11,10,0,1,2,3,4,5,6,7,8,9);
+	u16 grid = BITSWAP16(m_grid,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15);
+	u16 plate = BITSWAP16(m_plate,15,14,13,12,11,10,0,1,2,3,4,5,6,7,8,9);
 	display_matrix(10, 14, plate, grid);
 }
 
@@ -1809,7 +1815,7 @@ static INPUT_PORTS_START( mvbfree )
 	PORT_CONFSETTING(    0x08, "3" )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( mvbfree, mvbfree_state )
+static MACHINE_CONFIG_START( mvbfree )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NEC_D553, 400000) // approximation
@@ -1845,8 +1851,8 @@ MACHINE_CONFIG_END
 
   known releases:
   - Japan: Game Robot 9
-  - USA: Fabulous Fred - The Ultimate Electronic Game, distributed by Mego
-  - Mexico: Fabuloso Fred, distributed by Ensueño Toys (also released as
+  - USA: Fabulous Fred - The Ultimate Electronic Game, published by Mego
+  - Mexico: Fabuloso Fred, published by Ensueño Toys (also released as
     12-button version, a clone of Tandy-12)
 
   Accessories were included for some of the minigames.
@@ -1928,7 +1934,7 @@ static INPUT_PORTS_START( grobot9 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_ucom4_state, single_interrupt_line, nullptr) PORT_NAME("Start-Pitch")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( grobot9, grobot9_state )
+static MACHINE_CONFIG_START( grobot9 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NEC_D557L, 160000) // approximation
@@ -1980,8 +1986,8 @@ public:
 
 void tccombat_state::prepare_display()
 {
-	uint16_t grid = BITSWAP16(m_grid,15,14,13,12,11,10,9,8,3,2,1,0,7,6,5,4);
-	uint32_t plate = BITSWAP24(m_plate,23,22,21,20,11,15,3,10,14,2,9,13,1,0,12,8,15,1,5,0,3,7,2,6);
+	u16 grid = BITSWAP16(m_grid,15,14,13,12,11,10,9,8,3,2,1,0,7,6,5,4);
+	u32 plate = BITSWAP24(m_plate,23,22,21,20,11,15,3,10,14,2,9,13,1,0,12,8,15,1,5,0,3,7,2,6);
 	display_matrix(20, 9, plate, grid);
 }
 
@@ -2011,14 +2017,14 @@ WRITE8_MEMBER(tccombat_state::plate_w)
 static INPUT_PORTS_START( tccombat )
 	PORT_START("IN.0") // port A
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_CONFNAME( 0x02, 0x02, "Skill Level" )
+	PORT_CONFNAME( 0x02, 0x02, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(    0x02, "1" )
 	PORT_CONFSETTING(    0x00, "2" )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( tccombat, tccombat_state )
+static MACHINE_CONFIG_START( tccombat )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NEC_D552, 400000) // approximation
@@ -2145,7 +2151,7 @@ static INPUT_PORTS_START( tmtennis )
 	PORT_CONFSETTING(     0x001, "Practice" )
 	PORT_CONFSETTING(     0x100, "Pro 1" ) // -> difficulty_switch
 	PORT_CONFSETTING(     0x000, "Pro 2" )
-	PORT_CONFNAME( 0x02, 0x00, "Players" )
+	PORT_CONFNAME( 0x02, 0x00, DEF_STR( Players ) )
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x02, "2" )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("P2 Button 1")
@@ -2161,7 +2167,6 @@ INPUT_CHANGED_MEMBER(tmtennis_state::difficulty_switch)
 	set_clock();
 }
 
-
 void tmtennis_state::set_clock()
 {
 	// MCU clock is from an LC circuit oscillating by default at ~360kHz,
@@ -2176,7 +2181,7 @@ void tmtennis_state::machine_reset()
 	set_clock();
 }
 
-static MACHINE_CONFIG_START( tmtennis, tmtennis_state )
+static MACHINE_CONFIG_START( tmtennis )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NEC_D552, 360000) // see set_clock
@@ -2243,8 +2248,8 @@ public:
 
 void tmpacman_state::prepare_display()
 {
-	uint8_t grid = BITSWAP8(m_grid,0,1,2,3,4,5,6,7);
-	uint32_t plate = BITSWAP24(m_plate,23,22,21,20,19,16,17,18,11,10,9,8,0,2,3,1,4,5,6,7,12,13,14,15) | 0x100;
+	u8 grid = BITSWAP8(m_grid,0,1,2,3,4,5,6,7);
+	u32 plate = BITSWAP24(m_plate,23,22,21,20,19,16,17,18,11,10,9,8,0,2,3,1,4,5,6,7,12,13,14,15) | 0x100;
 	display_matrix(19, 8, plate, grid);
 }
 
@@ -2285,7 +2290,7 @@ static INPUT_PORTS_START( tmpacman )
 	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( tmpacman, tmpacman_state )
+static MACHINE_CONFIG_START( tmpacman )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NEC_D553, XTAL_430kHz)
@@ -2348,7 +2353,7 @@ public:
 
 void tmscramb_state::prepare_display()
 {
-	uint32_t plate = BITSWAP24(m_plate,23,22,21,20,19,18,17,3,15,2,14,1,13,16,0,12,8,4,9,5,10,6,11,7) | 0x400;
+	u32 plate = BITSWAP24(m_plate,23,22,21,20,19,18,17,3,15,2,14,1,13,16,0,12,8,4,9,5,10,6,11,7) | 0x400;
 	display_matrix(17, 10, plate, m_grid);
 }
 
@@ -2388,7 +2393,7 @@ static INPUT_PORTS_START( tmscramb )
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( tmscramb, tmscramb_state )
+static MACHINE_CONFIG_START( tmscramb )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NEC_D553, XTAL_400kHz)
@@ -2450,8 +2455,8 @@ public:
 
 void tcaveman_state::prepare_display()
 {
-	uint8_t grid = BITSWAP8(m_grid,0,1,2,3,4,5,6,7);
-	uint32_t plate = BITSWAP24(m_plate,23,22,21,20,19,10,11,5,6,7,8,0,9,2,18,17,16,3,15,14,13,12,4,1) | 0x40;
+	u8 grid = BITSWAP8(m_grid,0,1,2,3,4,5,6,7);
+	u32 plate = BITSWAP24(m_plate,23,22,21,20,19,10,11,5,6,7,8,0,9,2,18,17,16,3,15,14,13,12,4,1) | 0x40;
 	display_matrix(19, 8, plate, grid);
 }
 
@@ -2488,7 +2493,7 @@ static INPUT_PORTS_START( tcaveman )
 	PORT_CONFSETTING(    0x08, "Professional" )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( tcaveman, tcaveman_state )
+static MACHINE_CONFIG_START( tcaveman )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NEC_D553, XTAL_400kHz)
@@ -2611,7 +2616,7 @@ static INPUT_PORTS_START( alnchase )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP    ) PORT_PLAYER(2)
 
 	PORT_START("IN.2") // port B
-	PORT_CONFNAME( 0x01, 0x01, "Players" )
+	PORT_CONFNAME( 0x01, 0x01, DEF_STR( Players ) )
 	PORT_CONFSETTING(    0x01, "1" )
 	PORT_CONFSETTING(    0x00, "2" )
 	PORT_CONFNAME( 0x02, 0x00, DEF_STR( Difficulty ) )
@@ -2620,7 +2625,7 @@ static INPUT_PORTS_START( alnchase )
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( alnchase, alnchase_state )
+static MACHINE_CONFIG_START( alnchase )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NEC_D553, XTAL_400kHz)
@@ -2770,7 +2775,7 @@ ROM_END
 
 ROM_START( mcompgin )
 	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "d650c-060", 0x0000, 0x0800, BAD_DUMP CRC(92a4d8be) SHA1(d67f14a2eb53b79a7d9eb08103325299bc643781) ) // d5 stuck: xx1x xxxx
+	ROM_LOAD( "d650c-060", 0x0000, 0x0800, CRC(985e6da6) SHA1(ea4102a10a5741f06297c5426156e4b2f0d85a68) )
 ROM_END
 
 
@@ -2841,36 +2846,36 @@ ROM_END
 
 
 
-/*    YEAR  NAME      PARENT COMPAT MACHINE  INPUT     INIT              COMPANY, FULLNAME, FLAGS */
-CONS( 1979, ufombs,   0,        0, ufombs,   ufombs,   driver_device, 0, "Bambino", "UFO Master-Blaster Station", MACHINE_SUPPORTS_SAVE )
-CONS( 1979, ssfball,  0,        0, ssfball,  ssfball,  driver_device, 0, "Bambino", "Superstar Football", MACHINE_SUPPORTS_SAVE )
-CONS( 1979, bmsoccer, 0,        0, bmsoccer, bmsoccer, driver_device, 0, "Bambino", "Kick The Goal Soccer", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, bmsafari, 0,        0, bmsafari, bmsafari, driver_device, 0, "Bambino", "Safari (Bambino)", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, splasfgt, 0,        0, splasfgt, splasfgt, driver_device, 0, "Bambino", "Space Laser Fight", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT   CMP MACHINE   INPUT     STATE        INIT  COMPANY, FULLNAME, FLAGS
+CONS( 1979, ufombs,   0,        0, ufombs,   ufombs,   ufombs_state,   0, "Bambino", "UFO Master-Blaster Station", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, ssfball,  0,        0, ssfball,  ssfball,  ssfball_state,  0, "Bambino", "Superstar Football", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, bmsoccer, 0,        0, bmsoccer, bmsoccer, bmsoccer_state, 0, "Bambino", "Kick The Goal Soccer", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, bmsafari, 0,        0, bmsafari, bmsafari, bmsafari_state, 0, "Bambino", "Safari (Bambino)", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, splasfgt, 0,        0, splasfgt, splasfgt, splasfgt_state, 0, "Bambino", "Space Laser Fight", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1982, bcclimbr, 0,        0, bcclimbr, bcclimbr, driver_device, 0, "Bandai", "Crazy Climber (Bandai)", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, bcclimbr, 0,        0, bcclimbr, bcclimbr, bcclimbr_state, 0, "Bandai", "Crazy Climber (Bandai)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1980, tactix,   0,        0, tactix,   tactix,   driver_device, 0, "Castle Toy", "Tactix (Castle Toy)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1980, tactix,   0,        0, tactix,   tactix,   tactix_state,   0, "Castle Toy", "Tactix (Castle Toy)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1980, invspace, 0,        0, invspace, invspace, driver_device, 0, "Epoch", "Invader From Space", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, efball,   0,        0, efball,   efball,   driver_device, 0, "Epoch", "Electronic Football (Epoch)", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, galaxy2,  0,        0, galaxy2,  galaxy2,  driver_device, 0, "Epoch", "Galaxy II (VFD Rev. D)", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, galaxy2b, galaxy2,  0, galaxy2b, galaxy2,  driver_device, 0, "Epoch", "Galaxy II (VFD Rev. B)", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, astrocmd, 0,        0, astrocmd, astrocmd, driver_device, 0, "Epoch", "Astro Command", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, edracula, 0,        0, edracula, edracula, driver_device, 0, "Epoch", "Dracula (Epoch)", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, invspace, 0,        0, invspace, invspace, invspace_state, 0, "Epoch", "Invader From Space", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, efball,   0,        0, efball,   efball,   efball_state,   0, "Epoch", "Electronic Football (Epoch)", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, galaxy2,  0,        0, galaxy2,  galaxy2,  galaxy2_state,  0, "Epoch", "Galaxy II (VFD Rev. D)", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, galaxy2b, galaxy2,  0, galaxy2b, galaxy2,  galaxy2_state,  0, "Epoch", "Galaxy II (VFD Rev. B)", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, astrocmd, 0,        0, astrocmd, astrocmd, astrocmd_state, 0, "Epoch", "Astro Command", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, edracula, 0,        0, edracula, edracula, edracula_state, 0, "Epoch", "Dracula (Epoch)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1979, mcompgin, 0,        0, mcompgin, mcompgin, driver_device, 0, "Mattel", "Computer Gin", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1979, mcompgin, 0,        0, mcompgin, mcompgin, mcompgin_state, 0, "Mattel", "Computer Gin", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
-CONS( 1979, mvbfree,  0,        0, mvbfree,  mvbfree,  driver_device, 0, "Mego", "Mini-Vid Break Free", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, mvbfree,  0,        0, mvbfree,  mvbfree,  mvbfree_state,  0, "Mego", "Mini-Vid Break Free", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1980, grobot9,  0,        0, grobot9,  grobot9,  driver_device, 0, "Takatoku Toys", "Game Robot 9", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // some of the minigames: ***
+CONS( 1980, grobot9,  0,        0, grobot9,  grobot9,  grobot9_state,  0, "Takatoku Toys", "Game Robot 9", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // some of the minigames: ***
 
-CONS( 1980, tccombat, 0,        0, tccombat, tccombat, driver_device, 0, "Tomy", "Cosmic Combat", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, tmtennis, 0,        0, tmtennis, tmtennis, driver_device, 0, "Tomy", "Tennis (Tomy)", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, tmpacman, 0,        0, tmpacman, tmpacman, driver_device, 0, "Tomy", "Pac Man (Tomy)", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, tmscramb, 0,        0, tmscramb, tmscramb, driver_device, 0, "Tomy", "Scramble (Tomy)", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, tcaveman, 0,        0, tcaveman, tcaveman, driver_device, 0, "Tomy", "Caveman (Tomy)", MACHINE_SUPPORTS_SAVE )
-CONS( 1984, alnchase, 0,        0, alnchase, alnchase, driver_device, 0, "Tomy", "Alien Chase", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, tccombat, 0,        0, tccombat, tccombat, tccombat_state, 0, "Tomy", "Cosmic Combat", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, tmtennis, 0,        0, tmtennis, tmtennis, tmtennis_state, 0, "Tomy", "Tennis (Tomy)", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, tmpacman, 0,        0, tmpacman, tmpacman, tmpacman_state, 0, "Tomy", "Pac Man (Tomy)", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, tmscramb, 0,        0, tmscramb, tmscramb, tmscramb_state, 0, "Tomy", "Scramble (Tomy)", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, tcaveman, 0,        0, tcaveman, tcaveman, tcaveman_state, 0, "Tomy", "Caveman (Tomy)", MACHINE_SUPPORTS_SAVE )
+CONS( 1984, alnchase, 0,        0, alnchase, alnchase, alnchase_state, 0, "Tomy", "Alien Chase", MACHINE_SUPPORTS_SAVE )
 
 // ***: As far as MAME is concerned, the game is emulated fine. But for it to be playable, it requires interaction
 // with other, unemulatable, things eg. game board/pieces, playing cards, pen & paper, etc.

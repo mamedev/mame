@@ -28,8 +28,13 @@
 
 ****************************************************************************/
 
+#include "emu.h"
 #include "includes/x07.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 
 /***************************************************************************
     T6834 IMPLEMENTATION
@@ -1004,7 +1009,7 @@ void x07_state::kb_irq()
 	{
 		m_regs_r[0] = 0;
 		m_regs_r[1] = m_t6834_ram[0x400];
-		memcpy(m_t6834_ram + 0x400, m_t6834_ram + 0x401, 0xff);
+		memmove(m_t6834_ram + 0x400, m_t6834_ram + 0x401, 0xff);
 		m_kb_size--;
 		m_regs_r[2] |= 0x01;
 		m_maincpu->set_input_line(NSC800_RSTA, ASSERT_LINE);
@@ -1052,7 +1057,7 @@ DEVICE_IMAGE_LOAD_MEMBER( x07_state, x07_card )
 	uint32_t size = m_card->common_get_size("rom");
 
 	// check card type
-	if (image.software_entry() != nullptr)
+	if (image.loaded_through_softlist())
 	{
 		const char *card_type = image.get_feature("card_type");
 
@@ -1472,7 +1477,7 @@ void x07_state::machine_reset()
 	m_maincpu->set_state_int(Z80_PC, 0xc3c3);
 }
 
-static MACHINE_CONFIG_START( x07, x07_state )
+static MACHINE_CONFIG_START( x07 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NSC800, XTAL_15_36MHz / 4)

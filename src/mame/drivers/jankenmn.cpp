@@ -145,8 +145,6 @@
 
 ***************************************************************************/
 
-#define MASTER_CLOCK        XTAL_2_5MHz
-
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
@@ -154,7 +152,11 @@
 #include "machine/i8255.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
+
 #include "jankenmn.lh"
+
+#define MASTER_CLOCK        XTAL_2_5MHz
 
 
 class jankenmn_state : public driver_device
@@ -360,7 +362,7 @@ static const z80_daisy_config daisy_chain[] =
 *               Machine Config               *
 *********************************************/
 
-static MACHINE_CONFIG_START( jankenmn, jankenmn_state )
+static MACHINE_CONFIG_START( jankenmn )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK)  /* 2.5 MHz */
 	MCFG_Z80_DAISY_CHAIN(daisy_chain)
@@ -387,7 +389,7 @@ static MACHINE_CONFIG_START( jankenmn, jankenmn_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
+	MCFG_SOUND_ADD("dac", AD7523, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
@@ -414,5 +416,5 @@ ROM_END
 *                Game Drivers                *
 *********************************************/
 
-/*     YEAR  NAME      PARENT  MACHINE   INPUT     STATE          INIT  ROT    COMPANY    FULLNAME                   FLAGS...            LAYOUT */
-GAMEL( 1991, jankenmn, 0,      jankenmn, jankenmn, driver_device, 0,    ROT0, "Sunwise", "Janken Man Kattara Ageru", MACHINE_SUPPORTS_SAVE, layout_jankenmn )
+//     YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT  ROT   COMPANY    FULLNAME                    FLAGS                  LAYOUT
+GAMEL( 1991, jankenmn, 0,      jankenmn, jankenmn, jankenmn_state, 0,    ROT0, "Sunwise", "Janken Man Kattara Ageru", MACHINE_SUPPORTS_SAVE, layout_jankenmn )

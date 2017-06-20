@@ -3,12 +3,16 @@
 
 
 #include "emu.h"
-#include "cpu/upd7810/upd7810.h"
-#include "sound/speaker.h"
-#include "bus/generic/carts.h"
 #include "includes/gamepock.h"
+
+#include "bus/generic/carts.h"
+#include "cpu/upd7810/upd7810.h"
+
 #include "rendlay.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 
 static ADDRESS_MAP_START(gamepock_mem, AS_PROGRAM, 8, gamepock_state)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -17,13 +21,6 @@ static ADDRESS_MAP_START(gamepock_mem, AS_PROGRAM, 8, gamepock_state)
 	//AM_RANGE(0x4000,0xbfff) AM_ROM        // mapped by the cartslot
 	AM_RANGE(0xc000,0xc7ff) AM_MIRROR(0x0800) AM_RAM
 	AM_RANGE(0xff80,0xffff) AM_RAM              /* 128 bytes microcontroller RAM */
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START(gamepock_io, AS_IO, 8, gamepock_state )
-	AM_RANGE( 0x00, 0x00 ) AM_WRITE( port_a_w )
-	AM_RANGE( 0x01, 0x01 ) AM_READWRITE( port_b_r, port_b_w )
-	AM_RANGE( 0x02, 0x02 ) AM_READ( port_c_r )
 ADDRESS_MAP_END
 
 
@@ -44,10 +41,13 @@ static INPUT_PORTS_START( gamepock )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( gamepock, gamepock_state )
+static MACHINE_CONFIG_START( gamepock )
 	MCFG_CPU_ADD("maincpu", UPD78C06, XTAL_6MHz)    /* uPD78C06AG */
 	MCFG_CPU_PROGRAM_MAP( gamepock_mem)
-	MCFG_CPU_IO_MAP( gamepock_io)
+	MCFG_UPD7810_PORTA_WRITE_CB(WRITE8(gamepock_state, port_a_w))
+	MCFG_UPD7810_PORTB_READ_CB(READ8(gamepock_state, port_b_r))
+	MCFG_UPD7810_PORTB_WRITE_CB(WRITE8(gamepock_state, port_b_w))
+	MCFG_UPD7810_PORTC_READ_CB(READ8(gamepock_state, port_c_r))
 	MCFG_UPD7810_TO(WRITELINE(gamepock_state,gamepock_to_w))
 
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -80,4 +80,4 @@ ROM_START( gamepock )
 ROM_END
 
 
-CONS( 1984, gamepock, 0, 0, gamepock, gamepock, driver_device, 0, "Epoch", "Game Pocket Computer", 0 )
+CONS( 1984, gamepock, 0, 0, gamepock, gamepock, gamepock_state, 0, "Epoch", "Game Pocket Computer", 0 )

@@ -6,12 +6,11 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_CBMIEC_CBMIEC_H
+#define MAME_BUS_CBMIEC_CBMIEC_H
+
 #pragma once
 
-#ifndef __CBM_IEC__
-#define __CBM_IEC__
-
-#include "emu.h"
 
 
 
@@ -32,19 +31,19 @@
 
 
 #define MCFG_CBM_IEC_BUS_SRQ_CALLBACK(_write) \
-	downcast<cbm_iec_device *>(device)->set_srq_callback(DEVCB_##_write);
+	devcb = &downcast<cbm_iec_device *>(device)->set_srq_callback(DEVCB_##_write);
 
 #define MCFG_CBM_IEC_BUS_ATN_CALLBACK(_write) \
-	downcast<cbm_iec_device *>(device)->set_atn_callback(DEVCB_##_write);
+	devcb = &downcast<cbm_iec_device *>(device)->set_atn_callback(DEVCB_##_write);
 
 #define MCFG_CBM_IEC_BUS_CLK_CALLBACK(_write) \
-	downcast<cbm_iec_device *>(device)->set_clk_callback(DEVCB_##_write);
+	devcb = &downcast<cbm_iec_device *>(device)->set_clk_callback(DEVCB_##_write);
 
 #define MCFG_CBM_IEC_BUS_DATA_CALLBACK(_write) \
-	downcast<cbm_iec_device *>(device)->set_data_callback(DEVCB_##_write);
+	devcb = &downcast<cbm_iec_device *>(device)->set_data_callback(DEVCB_##_write);
 
 #define MCFG_CBM_IEC_BUS_RESET_CALLBACK(_write) \
-	downcast<cbm_iec_device *>(device)->set_reset_callback(DEVCB_##_write);
+	devcb = &downcast<cbm_iec_device *>(device)->set_reset_callback(DEVCB_##_write);
 
 
 #define MCFG_CBM_IEC_SLOT_ADD(_tag, _address, _slot_intf, _def_slot) \
@@ -78,11 +77,11 @@ public:
 	// construction/destruction
 	cbm_iec_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _write> void set_srq_callback(_write wr) { m_write_srq.set_callback(wr); }
-	template<class _write> void set_atn_callback(_write wr) { m_write_atn.set_callback(wr); }
-	template<class _write> void set_clk_callback(_write wr) { m_write_clk.set_callback(wr); }
-	template<class _write> void set_data_callback(_write wr) { m_write_data.set_callback(wr); }
-	template<class _write> void set_reset_callback(_write wr) { m_write_reset.set_callback(wr); }
+	template <class Object> devcb_base &set_srq_callback(Object &&wr) { return m_write_srq.set_callback(std::forward<Object>(wr)); }
+	template <class Object> devcb_base &set_atn_callback(Object &&wr) { return m_write_atn.set_callback(std::forward<Object>(wr)); }
+	template <class Object> devcb_base &set_clk_callback(Object &&wr) { return m_write_clk.set_callback(std::forward<Object>(wr)); }
+	template <class Object> devcb_base &set_data_callback(Object &&wr) { return m_write_data.set_callback(std::forward<Object>(wr)); }
+	template <class Object> devcb_base &set_reset_callback(Object &&wr) { return m_write_reset.set_callback(std::forward<Object>(wr)); }
 
 	void add_device(cbm_iec_slot_device *slot, device_t *target);
 
@@ -180,18 +179,20 @@ class device_cbm_iec_interface : public device_slot_card_interface
 
 public:
 	// construction/destruction
-	device_cbm_iec_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_cbm_iec_interface();
 
 	device_cbm_iec_interface *next() const { return m_next; }
 	device_cbm_iec_interface *m_next;
 
 	// optional operation overrides
-	virtual void cbm_iec_srq(int state) { };
-	virtual void cbm_iec_atn(int state) { };
-	virtual void cbm_iec_clk(int state) { };
-	virtual void cbm_iec_data(int state) { };
-	virtual void cbm_iec_reset(int state) { };
+	virtual void cbm_iec_srq(int state) { }
+	virtual void cbm_iec_atn(int state) { }
+	virtual void cbm_iec_clk(int state) { }
+	virtual void cbm_iec_data(int state) { }
+	virtual void cbm_iec_reset(int state) { }
+
+protected:
+	device_cbm_iec_interface(const machine_config &mconfig, device_t &device);
 
 	cbm_iec_device *m_bus;
 	cbm_iec_slot_device *m_slot;
@@ -199,12 +200,11 @@ public:
 
 
 // device type definition
-extern const device_type CBM_IEC;
-extern const device_type CBM_IEC_SLOT;
+DECLARE_DEVICE_TYPE(CBM_IEC,      cbm_iec_device)
+DECLARE_DEVICE_TYPE(CBM_IEC_SLOT, cbm_iec_slot_device)
 
 
 SLOT_INTERFACE_EXTERN( cbm_iec_devices );
 
 
-
-#endif
+#endif // MAME_BUS_CBMIEC_CBMIEC_H

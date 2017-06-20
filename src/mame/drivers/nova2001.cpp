@@ -122,10 +122,14 @@ e000 - e7ff        R/W      Work RAM
 ******************************************************************************/
 
 #include "emu.h"
+#include "includes/nova2001.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
-#include "includes/nova2001.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 #define MAIN_CLOCK XTAL_12MHz
 
@@ -634,7 +638,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( nova2001, nova2001_state )
+static MACHINE_CONFIG_START( nova2001 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK/4)  // 3 MHz verified on schematics
@@ -672,7 +676,7 @@ static MACHINE_CONFIG_START( nova2001, nova2001_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ninjakun, nova2001_state )
+static MACHINE_CONFIG_START( ninjakun )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK/4)  // 3 MHz
@@ -716,7 +720,7 @@ static MACHINE_CONFIG_START( ninjakun, nova2001_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( pkunwar, nova2001_state )
+static MACHINE_CONFIG_START( pkunwar )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK/4)  // 3 MHz
@@ -753,7 +757,7 @@ static MACHINE_CONFIG_START( pkunwar, nova2001_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( raiders5, nova2001_state )
+static MACHINE_CONFIG_START( raiders5 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK/4)  // 3 MHz
@@ -1022,12 +1026,12 @@ DRIVER_INIT_MEMBER(nova2001_state,raiders5)
 
 // many of these don't explicitly state Japan, eg. Nova 2001 could easily be used anywhere.
 
-//    YEAR, NAME,      PARENT,   MACHINE,  INPUT,    INIT,     MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1983, nova2001,  0,        nova2001, nova2001, driver_device, 0,        ROT0,   "UPL", "Nova 2001 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, nova2001h, nova2001, nova2001, nova2001, driver_device, 0,        ROT0,   "UPL", "Nova 2001 (Japan, hack?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, nova2001u, nova2001, nova2001, nova2001, driver_device, 0,        ROT0,   "UPL (Universal license)", "Nova 2001 (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, ninjakun,  0,        ninjakun, ninjakun, driver_device, 0,        ROT0,   "UPL (Taito license)", "Ninjakun Majou no Bouken", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, pkunwar,   0,        pkunwar,  pkunwar, nova2001_state,  pkunwar,  ROT0,   "UPL", "Penguin-Kun Wars (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, pkunwarj,  pkunwar,  pkunwar,  pkunwar, nova2001_state,  pkunwar,  ROT0,   "UPL", "Penguin-Kun Wars (Japan)", MACHINE_SUPPORTS_SAVE )
+//    YEAR, NAME,      PARENT,   MACHINE,  INPUT,    STATE,          INIT,     MONITOR,COMPANY,FULLNAME,FLAGS
+GAME( 1983, nova2001,  0,        nova2001, nova2001, nova2001_state, 0,        ROT0,   "UPL", "Nova 2001 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, nova2001h, nova2001, nova2001, nova2001, nova2001_state, 0,        ROT0,   "UPL", "Nova 2001 (Japan, hack?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, nova2001u, nova2001, nova2001, nova2001, nova2001_state, 0,        ROT0,   "UPL (Universal license)", "Nova 2001 (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, ninjakun,  0,        ninjakun, ninjakun, nova2001_state, 0,        ROT0,   "UPL (Taito license)", "Ninjakun Majou no Bouken", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, pkunwar,   0,        pkunwar,  pkunwar,  nova2001_state, pkunwar,  ROT0,   "UPL", "Penguin-Kun Wars (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, pkunwarj,  pkunwar,  pkunwar,  pkunwar,  nova2001_state, pkunwar,  ROT0,   "UPL", "Penguin-Kun Wars (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, raiders5,  0,        raiders5, raiders5, nova2001_state, raiders5, ROT0,   "UPL", "Raiders5", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, raiders5t, raiders5, raiders5, raiders5, nova2001_state, raiders5, ROT0,   "UPL (Taito license)", "Raiders5 (Japan)", MACHINE_SUPPORTS_SAVE )

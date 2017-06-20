@@ -10,8 +10,9 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/mcs48/mcs48.h"
 #include "includes/segag80r.h"
+
+#include "cpu/mcs48/mcs48.h"
 #include "machine/i8255.h"
 #include "machine/i8243.h"
 #include "sound/samples.h"
@@ -29,23 +30,13 @@
 #define SEGA005_555_TIMER_FREQ      (1.44 / ((15000 + 2 * 4700) * 1.5e-6))
 #define SEGA005_COUNTER_FREQ        (100000)    /* unknown, just a guess */
 
-const device_type SEGA005 = &device_creator<sega005_sound_device>;
+DEFINE_DEVICE_TYPE(SEGA005, sega005_sound_device, "sega005_sound", "Sega 005 Audio Custom")
 
 sega005_sound_device::sega005_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SEGA005, "Sega 005 Audio Custom", tag, owner, clock, "sega005_sound", __FILE__),
-		device_sound_interface(mconfig, *this),
-		m_sega005_sound_timer(nullptr),
-		m_sega005_stream(nullptr)
-{
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void sega005_sound_device::device_config_complete()
+	: device_t(mconfig, SEGA005, tag, owner, clock)
+	, device_sound_interface(mconfig, *this)
+	, m_sega005_sound_timer(nullptr)
+	, m_sega005_stream(nullptr)
 {
 }
 
@@ -240,7 +231,7 @@ static const char *const astrob_sample_names[] =
 };
 
 
-MACHINE_CONFIG_FRAGMENT( astrob_sound_board )
+MACHINE_CONFIG_START( astrob_sound_board )
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("samples", SAMPLES, 0)
@@ -427,7 +418,7 @@ static const char *const sega005_sample_names[] =
 };
 
 
-MACHINE_CONFIG_FRAGMENT( 005_sound_board )
+MACHINE_CONFIG_START( 005_sound_board )
 
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(segag80r_state, sega005_sound_a_w))
@@ -589,7 +580,7 @@ static const char *const spaceod_sample_names[] =
 };
 
 
-MACHINE_CONFIG_FRAGMENT( spaceod_sound_board )
+MACHINE_CONFIG_START( spaceod_sound_board )
 
 	/* sound hardware */
 
@@ -683,28 +674,11 @@ static const char *const monsterb_sample_names[] =
 
 /*************************************
  *
- *  N7751 memory maps
- *
- *************************************/
-
-static ADDRESS_MAP_START( monsterb_7751_portmap, AS_IO, 8, segag80r_state )
-	AM_RANGE(MCS48_PORT_T1,   MCS48_PORT_T1) AM_READ(n7751_t1_r)
-	AM_RANGE(MCS48_PORT_P2,   MCS48_PORT_P2) AM_READ(n7751_command_r)
-	AM_RANGE(MCS48_PORT_BUS,  MCS48_PORT_BUS) AM_READ(n7751_rom_r)
-	AM_RANGE(MCS48_PORT_P1,   MCS48_PORT_P1) AM_DEVWRITE("dac", dac_byte_interface, write)
-	AM_RANGE(MCS48_PORT_P2,   MCS48_PORT_P2) AM_WRITE(n7751_p2_w)
-	AM_RANGE(MCS48_PORT_PROG, MCS48_PORT_PROG) AM_DEVWRITE("audio_8243", i8243_device, i8243_prog_w)
-ADDRESS_MAP_END
-
-
-
-/*************************************
- *
  *  Machine driver
  *
  *************************************/
 
-MACHINE_CONFIG_FRAGMENT( monsterb_sound_board )
+MACHINE_CONFIG_START( monsterb_sound_board )
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(segag80r_state, monsterb_sound_a_w))
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(segag80r_state, monsterb_sound_b_w))
@@ -713,7 +687,12 @@ MACHINE_CONFIG_FRAGMENT( monsterb_sound_board )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("audiocpu", N7751, 6000000)
-	MCFG_CPU_IO_MAP(monsterb_7751_portmap)
+	MCFG_MCS48_PORT_T1_IN_CB(GND) // labelled as "TEST", connected to ground
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(segag80r_state, n7751_command_r))
+	MCFG_MCS48_PORT_BUS_IN_CB(READ8(segag80r_state, n7751_rom_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(DEVWRITE8("dac", dac_byte_interface, write))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(segag80r_state, n7751_p2_w))
+	MCFG_MCS48_PORT_PROG_OUT_CB(DEVWRITELINE("audio_8243", i8243_device, prog_w))
 
 	MCFG_I8243_ADD("audio_8243", NOOP, WRITE8(segag80r_state,n7751_rom_control_w))
 
@@ -857,16 +836,9 @@ WRITE8_MEMBER(segag80r_state::n7751_p2_w)
 {
 	i8243_device *device = machine().device<i8243_device>("audio_8243");
 	/* write to P2; low 4 bits go to 8243 */
-	device->i8243_p2_w(space, offset, data & 0x0f);
+	device->p2_w(space, offset, data & 0x0f);
 
 	/* output of bit $80 indicates we are ready (1) or busy (0) */
 	/* no other outputs are used */
 	m_n7751_busy = data >> 7;
-}
-
-
-READ8_MEMBER(segag80r_state::n7751_t1_r)
-{
-	/* T1 - labelled as "TEST", connected to ground */
-	return 0;
 }

@@ -108,10 +108,13 @@ DIP locations verified for:
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6809/m6809.h"
-#include "cpu/m6800/m6800.h"
-#include "machine/watchdog.h"
 #include "includes/baraduke.h"
+
+#include "cpu/m6809/m6809.h"
+#include "cpu/m6800/m6801.h"
+#include "machine/watchdog.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 WRITE8_MEMBER(baraduke_state::inputport_select_w)
@@ -367,7 +370,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_CONFIG_START( baraduke, baraduke_state )
+static MACHINE_CONFIG_START( baraduke )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, XTAL_49_152MHz/32)
@@ -387,7 +390,7 @@ static MACHINE_CONFIG_START( baraduke, baraduke_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_49_152MHz/8, 384, 0, 36*8, 264, 2*8, 30*8)
 	MCFG_SCREEN_UPDATE_DRIVER(baraduke_state, screen_update_baraduke)
-	MCFG_SCREEN_VBLANK_DRIVER(baraduke_state, screen_eof_baraduke)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(baraduke_state, screen_vblank_baraduke))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", baraduke)

@@ -23,7 +23,9 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class photon2_state : public driver_device
@@ -55,7 +57,7 @@ public:
 	DECLARE_PALETTE_INIT(photon2);
 
 	uint32_t screen_update_spectrum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_spectrum(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_spectrum);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(spec_interrupt_hack);
 };
@@ -135,7 +137,7 @@ static inline unsigned char get_display_color (unsigned char color, int invert)
 
 /* Code to change the FLASH status every 25 frames. Note this must be
    independent of frame skip etc. */
-void photon2_state::screen_eof_spectrum(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(photon2_state::screen_vblank_spectrum)
 {
 	// rising edge
 	if (state)
@@ -344,7 +346,7 @@ void photon2_state::machine_start()
 	save_item(NAME(m_nmi_enable));
 }
 
-static MACHINE_CONFIG_START( photon2, photon2_state )
+static MACHINE_CONFIG_START( photon2 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 3500000)        /* 3.5 MHz */
 	MCFG_CPU_PROGRAM_MAP(spectrum_mem)
@@ -359,7 +361,7 @@ static MACHINE_CONFIG_START( photon2, photon2_state )
 	MCFG_SCREEN_SIZE(SPEC_SCREEN_WIDTH, SPEC_SCREEN_HEIGHT)
 	MCFG_SCREEN_VISIBLE_AREA(0, SPEC_SCREEN_WIDTH-1, 0, SPEC_SCREEN_HEIGHT-1)
 	MCFG_SCREEN_UPDATE_DRIVER(photon2_state, screen_update_spectrum)
-	MCFG_SCREEN_VBLANK_DRIVER(photon2_state, screen_eof_spectrum)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(photon2_state, screen_vblank_spectrum))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 16)
@@ -406,6 +408,6 @@ ROM_START( brod )
 	ROM_LOAD( "brod13.bin", 0xa000, 0x2000, CRC(1177cd17) SHA1(58c5c09a7b857ce6311339c4d0f4d8c1a7e232a3) )
 ROM_END
 
-GAME( 19??,  kok,   0,      photon2, photon2, driver_device, 0, ROT0, "bootleg", "Povar / Sobrat' Buran / Agroprom (Arcade multi-game bootleg of ZX Spectrum 'Cookie', 'Jetpac' & 'Pssst')", MACHINE_SUPPORTS_SAVE ) // originals (c)1983 ACG / Ultimate
-GAME( 19??,  black, 0,      photon2, black, driver_device,   0, ROT0, "bootleg", "Czernyj Korabl (Arcade bootleg of ZX Spectrum 'Blackbeard')", MACHINE_SUPPORTS_SAVE ) // original (c)1988 Toposoft
-GAME( 19??,  brod,  0,      photon2, black, driver_device,   0, ROT0, "bootleg", "Brodjaga (Arcade bootleg of ZX Spectrum 'Inspector Gadget and the Circus of Fear')", MACHINE_SUPPORTS_SAVE ) // original (c)1987 BEAM software
+GAME( 19??,  kok,   0,      photon2, photon2, photon2_state, 0, ROT0, "bootleg", "Povar / Sobrat' Buran / Agroprom (Arcade multi-game bootleg of ZX Spectrum 'Cookie', 'Jetpac' & 'Pssst')", MACHINE_SUPPORTS_SAVE ) // originals (c)1983 ACG / Ultimate
+GAME( 19??,  black, 0,      photon2, black,   photon2_state, 0, ROT0, "bootleg", "Czernyj Korabl (Arcade bootleg of ZX Spectrum 'Blackbeard')",                                              MACHINE_SUPPORTS_SAVE ) // original (c)1988 Toposoft
+GAME( 19??,  brod,  0,      photon2, black,   photon2_state, 0, ROT0, "bootleg", "Brodjaga (Arcade bootleg of ZX Spectrum 'Inspector Gadget and the Circus of Fear')",                       MACHINE_SUPPORTS_SAVE ) // original (c)1987 BEAM software
