@@ -31089,6 +31089,7 @@ pitagjr                         // Pitagorin Junior
 @source:pitnrun.cpp
 pitnrun                         // PR  (c) 1984 Taito Corporation
 pitnruna                        // PR  (c) 1984 Taito Corporation
+jumpkun							// prototype
 
 @source:pk8000.cpp
 hobby                           //
