@@ -891,7 +891,9 @@ void debugger_cpu::process_source_file()
 		if (!buf.empty())
 			m_machine.debugger().console().execute_command(buf, true);
 	}
-	m_source_file.reset();
+
+	if (m_source_file && !m_source_file->good())
+		m_source_file.reset();
 }
 
 
