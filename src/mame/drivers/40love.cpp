@@ -950,7 +950,9 @@ ROM_START( 40lovej )
 	ROM_LOAD( "a30-13.u39", 0xa000, 0x2000, BAD_DUMP CRC(e806630f) SHA1(09022aae88ea0171a0aacf3260fa3a95e8faeb21) )
 
 	ROM_REGION( 0x0800, "bmcu:mcu", 0 )  /* 2k for the microcontroller */
-    ROM_LOAD( "a30_14",       0x000000, 0x000800, CRC(a4f770ce) SHA1(868e98528e8824e7329e9a298603e456bbc1f1f0) )
+	 // taken from World set, the provided one causes bad hw
+	ROM_LOAD( "a30-14"    , 0x0000, 0x0800, BAD_DUMP CRC(c4690279) SHA1(60bc77e03b9be434bb97a374a2fedeb8d049a660) )
+//    ROM_LOAD( "a30_14",       0x000000, 0x000800, BAD_DUMP CRC(a4f770ce) SHA1(868e98528e8824e7329e9a298603e456bbc1f1f0) )
 
     ROM_REGION( 0x8000, "gfx1", 0 )
     ROM_LOAD( "a30_04.18",    0x000000, 0x004000, CRC(529a7489) SHA1(cf3fa83f16e2e62c1a4aa74b00080f1e167865a6) )
@@ -1043,6 +1045,6 @@ ROM_START( undoukai )
 ROM_END
 
 GAME( 1984, 40love,   0,        40love,   40love,   fortyl_state, 40love,   ROT0, "Taito Corporation", "Forty-Love (World)",           MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1984, 40lovej,  40love,   40love,   40love,   fortyl_state, 40love,   ROT0, "Taito Corporation", "Forty-Love (Japan)",           MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // bad HW
+GAME( 1984, 40lovej,  40love,   40love,   40love,   fortyl_state, 40love,   ROT0, "Taito Corporation", "Forty-Love (Japan)",           MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 GAME( 1984, fieldday, 0,        undoukai, undoukai, fortyl_state, undoukai, ROT0, "Taito Corporation", "Field Day",            MACHINE_SUPPORTS_SAVE )
 GAME( 1984, undoukai, fieldday, undoukai, undoukai, fortyl_state, undoukai, ROT0, "Taito Corporation", "The Undoukai (Japan)", MACHINE_SUPPORTS_SAVE )
