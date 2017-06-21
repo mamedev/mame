@@ -27,8 +27,6 @@ MBC1 Mapper
 The MBC1 mapper has two modes: 2MB ROM/8KB RAM or 512KB ROM/32KB RAM.
 Initially, the mapper operates in 2MB ROM/8KB RAM mode.
 
-This mode is selected by writing into the 6000-7FFF memory area:
-
 0000-1FFF - Writing to this area enables (value 0x0A) or disables (not 0x0A) the
             SRAM.
 2000-3FFF - Writing a value 0bXXXBBBBB into the 2000-3FFF memory area selects the
