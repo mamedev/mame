@@ -18,9 +18,7 @@
                   The 68705 code for this one was not available; Brad Oliver[?]
                   made it up from the bootleg A75-06.IC16 by changing the level
                   data pointer table.
-    arkanoidj   Japanese version.  Final revision, MCU code not dumped.
-                  Someone[who?] made a placeholder MCU for this set based on the
-                  bootleg A75-06.IC16 by changing the level data pointer table.
+    arkanoidj   Japanese version.  Final revision, MCU code properly dumped.
     arkanoidja  Japanese version.  A later revision with level selector.
                   The 68705 code for this one was not available; Brad Oliver[?]
                   made it up from the bootleg A75-06.IC16 by changing the level
@@ -1508,13 +1506,13 @@ MACHINE_CONFIG_END
     A75 23   = MC68705P5 MCU code, v2.0 Japan w/level select (NOT DUMPED, PLACEHOLDER HACKED FROM BOOTLEG MCU)
     A75 24   = Z80 code v2.1 1/2 Japan
     A75 25   = Z80 code v2.1 2/2 Japan
-    A75 26   = MC68705P5 MCU code, v2.1 Japan (NOT DUMPED, PLACEHOLDER HACKED FROM BOOTLEG MCU)
+    A75 26   = MC68705P5 MCU code, v2.1 Japan (verified. dumped from MCU)
     A75 27   = Z80 code 1/2 Tournament
     A75 28   = Z80 code 2/2 Tournament
     A75 29   = GFX 1/3 Tournament
     A75 30   = GFX 2/3 Tournament
     A75 31   = GFX 3/3 Tournament
-    A75 32   = MC68705P5 MCU code, Tournament (NOT DUMPED, PLACEHOLDER HACKED FROM BOOTLEG MCU)
+    A75 32   = MC68705P5 MCU code, Tournament (verified. dumped from MCU)
     A75 33   = PROM red Tournament
     A75 34   = PROM green Tournament
     A75 35   = PROM blue Tournament
@@ -1612,7 +1610,7 @@ ROM_START( arkanoidj ) // V2.1 Japan
 	ROM_LOAD( "a75_25.ic16",   0x8000, 0x8000, CRC(c13b2038) SHA1(0b8197b48e57ffe9ccad0ebbc24891d1da7c9880) )
 
 	ROM_REGION( 0x0800, "mcu:mcu", 0 )  /* 2k for the microcontroller */
-	ROM_LOAD( "a75-26.ic14",  0x0000, 0x0800, BAD_DUMP CRC(962960d4) SHA1(64b065a54b1658364db569ac06b717eb7bdd186e) ) /* Hand crafted based on the bootleg a75-06 chip, need the real data here */
+	ROM_LOAD( "a75-26.ic14",  0x0000, 0x0800, CRC(9c382c67) SHA1(c8518b726c40bf6ede494b38763dde4918309ef3) ) // verified authentic, dumped from actual MCU
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
 	ROM_LOAD( "a75-03.ic64",   0x00000, 0x8000, CRC(038b74ba) SHA1(ac053cc4908b4075f918748b89570e07a0ba5116) )
@@ -1671,7 +1669,7 @@ ROM_START( arkatour ) // Tournament version
 	ROM_LOAD( "a75-28.ic16",   0x8000, 0x8000, CRC(326aca4d) SHA1(5a194b7a0361236d471b24905dc6434372f81252) )
 
 	ROM_REGION( 0x0800, "mcu:mcu", 0 )  /* 2k for the microcontroller */
-	ROM_LOAD( "a75-32.ic14",  0x0000, 0x0800, BAD_DUMP CRC(d3249559) SHA1(b1542764450016614e9e03cedd6a2f1e59961789)  ) /* Hand crafted based on the bootleg a75-06 chip, need the real data here */
+	ROM_LOAD( "a75-32.ic14",  0x0000, 0x0800, CRC(8c20d15c) SHA1(912996bf08de318e19dc420261f554a09dacd443)  ) // verified authentic, dumped from actual MCU
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
 	ROM_LOAD( "a75-29.ic64",   0x00000, 0x8000, CRC(5ddea3cf) SHA1(58f16515898b7cc2697bf7663a60d9ca0db6da95) )

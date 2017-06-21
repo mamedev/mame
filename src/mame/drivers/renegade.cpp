@@ -19,7 +19,6 @@ IRQ is used to handle coin inputs
 
 Known issues:
 - coin counter isn't working properly (interrupt related?)
-- kuniokun MCU internal ROM needs to be dumped
 
 Memory Map (Preliminary):
 
@@ -176,25 +175,6 @@ WRITE8_MEMBER(renegade_state::sound_w)
 	m_audiocpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 }
 
-/**************************************************************************/
-/*  MCU Simulation
-**
-**  Renegade and Nekketsu Kouha Kunio Kun MCU behaviors are identical,
-**  except for the initial MCU status byte, and command encryption table
-**  (and enemy health??)
-*/
-
-
-static const uint8_t kuniokun_xor_table[0x2a] =
-{
-	0x48, 0x8a, 0x48, 0xa5, 0x01, 0x48, 0xa9, 0x00,
-	0x85, 0x01, 0xa2, 0x10, 0x26, 0x10, 0x26, 0x11,
-	0x26, 0x01, 0xa5, 0x01, 0xc5, 0x00, 0x90, 0x04,
-	0xe5, 0x00, 0x85, 0x01, 0x26, 0x10, 0x26, 0x11,
-	0xca, 0xd0, 0xed, 0x68, 0x85, 0x01, 0x68, 0xaa,
-	0x68, 0x60
-};
-
 void renegade_state::machine_start()
 {
 	m_rombank->configure_entries(0, 2, memregion("maincpu")->base(), 0x4000);
@@ -204,276 +184,22 @@ void renegade_state::machine_start()
 	save_item(NAME(m_adpcm_playing));
 }
 
-DRIVER_INIT_MEMBER(renegade_state, renegade)
-{
-	m_mcu_sim = false;
-}
-
-DRIVER_INIT_MEMBER(renegade_state, kuniokun)
-{
-	m_mcu_sim = true;
-	m_mcu_checksum = 0x85;
-	m_mcu_encrypt_table = kuniokun_xor_table;
-	m_mcu_encrypt_table_len = 0x2a;
-
-	subdevice("mcu:mcu")->execute().suspend(SUSPEND_REASON_DISABLE, 1);
-
-	save_item(NAME(m_mcu_buffer));
-	save_item(NAME(m_mcu_input_size));
-	save_item(NAME(m_mcu_output_byte));
-	save_item(NAME(m_mcu_key));
-}
-
-DRIVER_INIT_MEMBER(renegade_state, kuniokunb)
-{
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-
-	/* Remove the MCU handlers */
-	space.unmap_readwrite(0x3804, 0x3804);
-	space.unmap_read(0x3805, 0x3805);
-}
-
 
 /***************************************************************************
 
-    MCU simulation
+    MCU interface
 
 ***************************************************************************/
 
 READ8_MEMBER(renegade_state::mcu_reset_r)
 {
-	if (m_mcu_sim == true)
-	{
-		m_mcu_key = -1;
-		m_mcu_input_size = 0;
-		m_mcu_output_byte = 0;
-	}
-	else
-	{
-		m_mcu->reset_w(PULSE_LINE);
-	}
+	m_mcu->reset_w(PULSE_LINE);
 	return 0;
-}
-
-WRITE8_MEMBER(renegade_state::mcu_w)
-{
-	if (m_mcu_sim == true)
-	{
-		m_mcu_output_byte = 0;
-
-		if (m_mcu_key < 0)
-		{
-			m_mcu_key = 0;
-			m_mcu_input_size = 1;
-			m_mcu_buffer[0] = data;
-		}
-		else
-		{
-			data ^= m_mcu_encrypt_table[m_mcu_key++];
-			if (m_mcu_key == m_mcu_encrypt_table_len)
-				m_mcu_key = 0;
-			if (m_mcu_input_size < MCU_BUFFER_MAX)
-				m_mcu_buffer[m_mcu_input_size++] = data;
-		}
-	}
-	else
-	{
-		m_mcu->data_w(space, offset, data, mem_mask);
-	}
-}
-
-void renegade_state::mcu_process_command()
-{
-	m_mcu_input_size = 0;
-	m_mcu_output_byte = 0;
-
-	switch (m_mcu_buffer[0])
-	{
-	/* 0x0d: stop MCU when ROM check fails */
-
-	case 0x10:
-		m_mcu_buffer[0] = m_mcu_checksum;
-		break;
-
-	case 0x26: /* sound code -> sound command */
-		{
-			int sound_code = m_mcu_buffer[1];
-			static const uint8_t sound_command_table[256] =
-			{
-				0xa0, 0xa1, 0xa2, 0x80, 0x81, 0x82, 0x83, 0x84,
-				0x85, 0x86, 0x87, 0x88, 0x89, 0x8a, 0x8b, 0x8c,
-				0x8d, 0x8e, 0x8f, 0x97, 0x96, 0x9b, 0x9a, 0x95,
-				0x9e, 0x98, 0x90, 0x93, 0x9d, 0x9c, 0xa3, 0x91,
-				0x9f, 0x99, 0xa6, 0xae, 0x94, 0xa5, 0xa4, 0xa7,
-				0x92, 0xab, 0xac, 0xb0, 0xb1, 0xb2, 0xb3, 0xb4,
-				0xb5, 0xb6, 0xb7, 0xb8, 0xb9, 0xba, 0xbb, 0x00,
-				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-				0x00, 0x00, 0x00, 0x00, 0x00, 0x20, 0x20, 0x20,
-				0x50, 0x50, 0x90, 0x30, 0x30, 0x00, 0x00, 0x00,
-				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-				0x00, 0x00, 0x00, 0x80, 0xa0, 0x00, 0x00, 0x00,
-				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-				0x00, 0x40, 0x40, 0x00, 0x00, 0x00, 0x00, 0x00,
-				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-				0x20, 0x00, 0x00, 0x10, 0x10, 0x00, 0x00, 0x90,
-				0x30, 0x30, 0x30, 0xb0, 0xb0, 0xb0, 0xb0, 0xf0,
-				0xf0, 0xf0, 0xf0, 0xd0, 0xf0, 0x00, 0x00, 0x00,
-				0x00, 0x10, 0x10, 0x50, 0x30, 0xb0, 0xb0, 0xf0,
-				0xf0, 0xf0, 0xf0, 0xf0, 0xf0, 0x00, 0x00, 0x00,
-				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10,
-				0x10, 0x10, 0x30, 0x30, 0x20, 0x00, 0x00, 0x00,
-				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-				0x00, 0x00, 0x00, 0x00, 0x00, 0x0f, 0x0f, 0x0f,
-				0x0f, 0x0f, 0x0f, 0x0f, 0x0f, 0x0f, 0x0f, 0x0f,
-				0x0f, 0x0f, 0x0f, 0x0f, 0x0f, 0x8f, 0x8f, 0x0f,
-				0x0f, 0x0f, 0x0f, 0x0f, 0x0f, 0x0f, 0x0f, 0x0f,
-				0x0f, 0x0f, 0x0f, 0x0f, 0x0f, 0xff, 0xff, 0xff,
-				0xef, 0xef, 0xcf, 0x8f, 0x8f, 0x0f, 0x0f, 0x0f
-			};
-			m_mcu_buffer[0] = 1;
-			m_mcu_buffer[1] = sound_command_table[sound_code];
-		}
-		break;
-
-	case 0x33: /* joy bits -> joy dir */
-		{
-			int joy_bits = m_mcu_buffer[2];
-			static const uint8_t joy_table[0x10] =
-			{
-				0, 3, 7, 0, 1, 2, 8, 0, 5, 4, 6, 0, 0, 0, 0, 0
-			};
-			m_mcu_buffer[0] = 1;
-			m_mcu_buffer[1] = joy_table[joy_bits & 0xf];
-		}
-		break;
-
-	case 0x44: /* 0x44, 0xff, DSW2, stage# -> difficulty */
-		{
-			int difficulty = m_mcu_buffer[2] & 0x3;
-			int stage = m_mcu_buffer[3];
-			static const uint8_t difficulty_table[4] = { 5, 3, 1, 2 };
-			int result = difficulty_table[difficulty];
-
-			if (stage == 0)
-				result--;
-			result += stage / 4;
-			if (result > 0x21)
-				result += 0xc0;
-
-			m_mcu_buffer[0] = 1;
-			m_mcu_buffer[1] = result;
-		}
-		break;
-
-	case 0x55: /* 0x55, 0x00, 0x00, 0x00, DSW2 -> timer */
-		{
-			int difficulty = m_mcu_buffer[4] & 0x3;
-			static const uint16_t table[4] =
-			{
-				0x4001, 0x5001, 0x1502, 0x0002
-			};
-
-			m_mcu_buffer[0] = 3;
-			m_mcu_buffer[2] = table[difficulty] >> 8;
-			m_mcu_buffer[3] = table[difficulty] & 0xff;
-		}
-		break;
-
-	case 0x41: /* 0x41, 0x00, 0x00, stage# -> ? */
-		{
-//          int stage = m_mcu_buffer[3];
-			m_mcu_buffer[0] = 2;
-			m_mcu_buffer[1] = 0x20;
-			m_mcu_buffer[2] = 0x78;
-		}
-		break;
-
-	case 0x40: /* 0x40, 0x00, difficulty, enemy_type -> enemy health */
-		{
-			int difficulty = m_mcu_buffer[2];
-			int enemy_type = m_mcu_buffer[3];
-			int health;
-
-			if (enemy_type <= 4)
-			{
-				health = 0x18 + difficulty * 2;
-				if (health > 0x40)
-					health = 0x40;  /* max 0x40 */
-			}
-			else
-			{
-				health = 0x06 + difficulty * 2;
-				if (health > 0x20)
-					health = 0x20;  /* max 0x20 */
-			}
-			logerror("e_type:0x%02x diff:0x%02x -> 0x%02x\n", enemy_type, difficulty, health);
-			m_mcu_buffer[0] = 1;
-			m_mcu_buffer[1] = health;
-		}
-		break;
-
-	case 0x42: /* 0x42, 0x00, stage#, character# -> enemy_type */
-		{
-			int stage = m_mcu_buffer[2] & 0x3;
-			int indx = m_mcu_buffer[3];
-			int enemy_type=0;
-
-			static const int table[] =
-			{
-				0x01, 0x06, 0x06, 0x05, 0x05, 0x05, 0x05, 0x05, /* for stage#: 0 */
-				0x02, 0x0a, 0x0a, 0x09, 0x09, 0x09, 0x09,   /* for stage#: 1 */
-				0x03, 0x0e, 0x0e, 0x0e, 0x0d, 0x0d, 0x0d, 0x0d, /* for stage#: 2 */
-				0x04, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, /* for stage#: 3 */
-				0x3d, 0x23, 0x26, 0x0a, 0xb6, 0x11, 0xa4, 0x0f, /* strange data (maybe out of table) */
-			};
-			int offset = stage * 8 + indx;
-
-			if (stage >= 2)
-				offset--;
-
-			enemy_type = table[offset];
-
-			m_mcu_buffer[0] = 1;
-			m_mcu_buffer[1] = enemy_type;
-		}
-		break;
-
-	default:
-		logerror("unknown MCU command: %02x\n", m_mcu_buffer[0]);
-		break;
-	}
-}
-
-READ8_MEMBER(renegade_state::mcu_r)
-{
-	if (m_mcu_sim == true)
-	{
-		int result = 1;
-
-		if (m_mcu_input_size)
-			mcu_process_command();
-
-		if (m_mcu_output_byte < MCU_BUFFER_MAX)
-			result = m_mcu_buffer[m_mcu_output_byte++];
-
-		return result;
-	}
-	else
-	{
-		return m_mcu->data_r(space, offset, mem_mask);
-	}
 }
 
 CUSTOM_INPUT_MEMBER(renegade_state::mcu_status_r)
 {
-	if (m_mcu_sim == true)
-	{
-		return 0x01;
-	}
-	else if (m_mcu)
+	if (m_mcu.found())
 	{
 		return
 			((CLEAR_LINE == m_mcu->host_semaphore_r()) ? 0x01 : 0x00) |
@@ -510,7 +236,7 @@ WRITE8_MEMBER(renegade_state::coincounter_w)
 
 /********************************************************************************************/
 
-static ADDRESS_MAP_START( renegade_map, AS_PROGRAM, 8, renegade_state )
+static ADDRESS_MAP_START( renegade_nomcu_map, AS_PROGRAM, 8, renegade_state )
 	AM_RANGE(0x0000, 0x17ff) AM_RAM
 	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE(fg_videoram_w) AM_SHARE("fg_videoram")
 	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_SHARE("spriteram")
@@ -521,12 +247,17 @@ static ADDRESS_MAP_START( renegade_map, AS_PROGRAM, 8, renegade_state )
 	AM_RANGE(0x3801, 0x3801) AM_READ_PORT("IN1") AM_WRITE(scroll_msb_w)       /* Player#2 controls, coin triggers */
 	AM_RANGE(0x3802, 0x3802) AM_READ_PORT("DSW2") AM_WRITE(sound_w) /* DIP2  various IO ports */
 	AM_RANGE(0x3803, 0x3803) AM_READ_PORT("DSW1") AM_WRITE(flipscreen_w)   /* DIP1 */
-	AM_RANGE(0x3804, 0x3804) AM_READWRITE(mcu_r, mcu_w)
-	AM_RANGE(0x3805, 0x3805) AM_READWRITE(mcu_reset_r, bankswitch_w)
+	AM_RANGE(0x3805, 0x3805) AM_READNOP AM_WRITE(bankswitch_w)
 	AM_RANGE(0x3806, 0x3806) AM_WRITENOP // ?? watchdog
 	AM_RANGE(0x3807, 0x3807) AM_WRITE(coincounter_w)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("rombank")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( renegade_map, AS_PROGRAM, 8, renegade_state )
+	AM_RANGE(0x3804, 0x3804) AM_DEVREADWRITE("mcu", taito68705_mcu_device, data_r, data_w)
+	AM_RANGE(0x3805, 0x3805) AM_READ(mcu_reset_r)
+	AM_IMPORT_FROM(renegade_nomcu_map)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( renegade_sound_map, AS_PROGRAM, 8, renegade_state )
@@ -780,6 +511,9 @@ MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( kuniokunb, renegade )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(renegade_nomcu_map)
+
 	MCFG_DEVICE_REMOVE("mcu")
 MACHINE_CONFIG_END
 
@@ -834,8 +568,8 @@ ROM_START( kuniokun )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "n0-5.bin",     0x8000, 0x8000, CRC(3587de3b) SHA1(f82e758254b21eb0c5a02469c72adb86d9577065) )
 
-	ROM_REGION( 0x0800, "mcu:mcu", 0 )
-	ROM_LOAD( "mcu",          0x0000, 0x0800, NO_DUMP )
+	ROM_REGION( 0x0800, "mcu:mcu", 0 ) // MC68705P3
+	ROM_LOAD( "nz-0.bin",     0x0000, 0x0800, CRC(650bb5f0) SHA1(56a9679e3265de244ce2191a81b709992f012111) )
 
 	ROM_REGION( 0x08000, "chars", 0 )
 	ROM_LOAD( "ta18-25.bin",  0x0000, 0x8000, CRC(9bd2bea3) SHA1(fa79c9d4c71c1dbbf0e14cb8d6870f1f94b9af88) )
@@ -909,6 +643,6 @@ ROM_END
 
 
 
-GAME( 1986, renegade,  0,        renegade,  renegade, renegade_state, renegade,  ROT0, "Technos Japan (Taito America license)", "Renegade (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, kuniokun,  renegade, renegade,  renegade, renegade_state, kuniokun,  ROT0, "Technos Japan", "Nekketsu Kouha Kunio-kun (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, kuniokunb, renegade, kuniokunb, renegade, renegade_state, kuniokunb, ROT0, "bootleg", "Nekketsu Kouha Kunio-kun (Japan bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, renegade,  0,        renegade,  renegade, renegade_state, 0, ROT0, "Technos Japan (Taito America license)", "Renegade (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, kuniokun,  renegade, renegade,  renegade, renegade_state, 0, ROT0, "Technos Japan", "Nekketsu Kouha Kunio-kun (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, kuniokunb, renegade, kuniokunb, renegade, renegade_state, 0, ROT0, "bootleg", "Nekketsu Kouha Kunio-kun (Japan bootleg)", MACHINE_SUPPORTS_SAVE )
