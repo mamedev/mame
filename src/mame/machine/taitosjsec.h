@@ -7,12 +7,11 @@
 
 #include "cpu/m6805/m68705.h"
 
-// TODO: there should be a device representing the whole security board with both the Z80 and 68705
-
 
 DECLARE_DEVICE_TYPE(TAITO_SJ_SECURITY_MCU, taito_sj_security_mcu_device)
 
-
+#define MCFG_TAITO_SJ_SECURITY_MCU_INT_MODE(mode) \
+		taito_sj_security_mcu_device::set_int_mode(*device, taito_sj_security_mcu_device::int_mode::mode);
 #define MCFG_TAITO_SJ_SECURITY_MCU_68READ_CB(cb) \
 		devcb = &taito_sj_security_mcu_device::set_68read_cb(*device, DEVCB_##cb);
 #define MCFG_TAITO_SJ_SECURITY_MCU_68WRITE_CB(cb) \
@@ -25,6 +24,15 @@ DECLARE_DEVICE_TYPE(TAITO_SJ_SECURITY_MCU, taito_sj_security_mcu_device)
 class taito_sj_security_mcu_device : public device_t
 {
 public:
+	enum class int_mode
+	{
+		NONE,
+		LATCH,
+		WRITE
+	};
+
+	static void set_int_mode(device_t &device, int_mode mode)
+	{ downcast<taito_sj_security_mcu_device &>(device).m_int_mode = mode; }
 	template <typename Obj> static devcb_base &set_68read_cb(device_t &device, Obj &&cb)
 	{ return downcast<taito_sj_security_mcu_device &>(device).m_68read_cb.set_callback(std::forward<Obj>(cb)); }
 	template <typename Obj> static devcb_base &set_68write_cb(device_t &device, Obj &&cb)
@@ -67,6 +75,7 @@ private:
 
 	required_device<m68705p_device> m_mcu;
 
+	int_mode m_int_mode;
 	devcb_read8 m_68read_cb;
 	devcb_write8 m_68write_cb;
 	devcb_write_line m_68intrq_cb;

@@ -1814,6 +1814,7 @@ static MACHINE_CONFIG_DERIVED( mcu, nomcu )
 	MCFG_CPU_PROGRAM_MAP(taitosj_main_mcu_map)
 
 	MCFG_CPU_ADD("bmcu", TAITO_SJ_SECURITY_MCU, XTAL_3MHz)   /* xtal is 3MHz, divided by 4 internally */
+	MCFG_TAITO_SJ_SECURITY_MCU_INT_MODE(LATCH)
 	MCFG_TAITO_SJ_SECURITY_MCU_68READ_CB(READ8(taitosj_state, mcu_mem_r))
 	MCFG_TAITO_SJ_SECURITY_MCU_68WRITE_CB(WRITE8(taitosj_state, mcu_mem_w))
 	MCFG_TAITO_SJ_SECURITY_MCU_68INTRQ_CB(WRITELINE(taitosj_state, mcu_intrq_w))

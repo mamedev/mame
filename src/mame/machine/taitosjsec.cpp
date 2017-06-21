@@ -13,6 +13,7 @@ taito_sj_security_mcu_device::taito_sj_security_mcu_device(
 		u32 clock)
 	: device_t(mconfig,TAITO_SJ_SECURITY_MCU, tag, owner, clock)
 	, m_mcu(*this, "mcu")
+	, m_int_mode(int_mode::NONE)
 	, m_68read_cb(*this)
 	, m_68write_cb(*this)
 	, m_68intrq_cb(*this)
@@ -54,7 +55,10 @@ WRITE8_MEMBER(taito_sj_security_mcu_device::data_w)
 	if (BIT(offset, 0))
 	{
 		// ZINTRQ
-		// FIXME: this can be jumpered to /INT on the MCU
+		// if jumpered this way, the Z80 write strobe pulses the MCU interrupt line
+		// should be PULSE_LINE because it's edge sensitive, but diexec only allows PULSE_LINE on reset and NMI
+		if (int_mode::WRITE == m_int_mode)
+			m_mcu->set_input_line(M68705_IRQ_LINE, HOLD_LINE);
 	}
 	else
 	{
@@ -77,7 +81,8 @@ WRITE_LINE_MEMBER(taito_sj_security_mcu_device::reset_w)
 	{
 		m_zaccept = true;
 		m_zready = false;
-		m_mcu->set_input_line(M68705_IRQ_LINE, CLEAR_LINE);
+		if (int_mode::LATCH == m_int_mode)
+			m_mcu->set_input_line(M68705_IRQ_LINE, CLEAR_LINE);
 	}
 	m_mcu->set_input_line(INPUT_LINE_RESET, state);
 }
@@ -112,7 +117,8 @@ void taito_sj_security_mcu_device::device_reset()
 {
 	m_zaccept = true;
 	m_zready = false;
-	m_mcu->set_input_line(M68705_IRQ_LINE, CLEAR_LINE);
+	if (int_mode::LATCH == m_int_mode)
+		m_mcu->set_input_line(M68705_IRQ_LINE, CLEAR_LINE);
 }
 
 MACHINE_CONFIG_MEMBER(taito_sj_security_mcu_device::device_add_mconfig)
@@ -158,7 +164,8 @@ WRITE8_MEMBER(taito_sj_security_mcu_device::mcu_pb_w)
 	if (BIT(diff & data, 1))
 	{
 		machine().scheduler().synchronize(timer_expired_delegate(FUNC(taito_sj_security_mcu_device::do_mcu_read), this));
-		m_mcu->set_input_line(M68705_IRQ_LINE, CLEAR_LINE);
+		if (int_mode::LATCH == m_int_mode)
+			m_mcu->set_input_line(M68705_IRQ_LINE, CLEAR_LINE);
 	}
 
 	// 68LWR
@@ -218,7 +225,7 @@ TIMER_CALLBACK_MEMBER(taito_sj_security_mcu_device::do_host_write)
 	if (!m_reset)
 	{
 		m_zready = true;
-		// FIXME: this can be jumpered off if ZINTRQ is being used
-		m_mcu->set_input_line(M68705_IRQ_LINE, ASSERT_LINE);
+		if (int_mode::LATCH == m_int_mode)
+			m_mcu->set_input_line(M68705_IRQ_LINE, ASSERT_LINE);
 	}
 }
