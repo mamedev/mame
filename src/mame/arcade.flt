@@ -359,6 +359,7 @@ exprraid.cpp
 exterm.cpp
 extrema.cpp
 exzisus.cpp
+ez2d.cpp
 f1gp.cpp
 f-32.cpp
 famibox.cpp
