@@ -2683,6 +2683,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/ym3802.h,MACHINES["YM3802"] = true
+---------------------------------------------------
+
+if (MACHINES["YM3802"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/ym3802.cpp",
+		MAME_DIR .. "src/devices/machine/ym3802.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/z80ctc.h,MACHINES["Z80CTC"] = true
 ---------------------------------------------------
 

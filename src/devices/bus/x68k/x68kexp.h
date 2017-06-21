@@ -105,9 +105,15 @@ public:
 
 	// reset
 	virtual void x68k_reset_w() { }
-
+	
+	void set_vector(uint8_t vector) { m_vector = vector; }
+	uint8_t vector() { return m_vector; }
+	
 protected:
 	device_x68k_expansion_card_interface(const machine_config &mconfig, device_t &device);
+
+private:
+	uint8_t m_vector;
 };
 
 
@@ -130,6 +136,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( irq4_w );
 	DECLARE_WRITE_LINE_MEMBER( nmi_w );
 	DECLARE_WRITE_LINE_MEMBER( reset_w );
+
+	uint8_t vector() { return m_card->vector(); }
 
 protected:
 	// device-level overrides
