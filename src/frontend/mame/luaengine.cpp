@@ -1164,7 +1164,43 @@ void lua_engine::initialize()
 				}),
 			"popmessage", sol::overload([](running_machine &m, const char *str) { m.popmessage("%s", str); },
 					[](running_machine &m) { m.popmessage(); }),
-			"logerror", [](running_machine &m, const char *str) { m.logerror("[luaengine] %s\n", str); } );
+			"logerror", [](running_machine &m, const char *str) { m.logerror("[luaengine] %s\n", str); },
+			"save_string", [this](running_machine &m) -> sol::object {
+					const char *name;
+					void *base;
+					u32 size, count;
+					int index = 0;
+					std::string state;
+					if(!m.scheduler().can_save())
+						return sol::make_object(sol(), sol::nil);
+					m.save().dispatch_presave();
+					name = m.save().indexed_item(index, base, size, count);
+					while(name)
+					{
+						state.append((const char *)base, size * count);
+						name = m.save().indexed_item(index, base, size, count);
+						index++;
+					}
+					return sol::make_object(sol(), state);
+				},
+			"load_string", [this](running_machine &m, const std::string &state) -> sol::object {
+					const char *name;
+					void *base;
+					u32 size, count;
+					int index = 0, pos = 0;
+					name = m.save().indexed_item(index, base, size, count);
+					while(name)
+					{
+						if(((size * count) + pos) > state.length())
+							return sol::make_object(sol(), "load_error");
+						memcpy(base, &state[pos], size * count);
+						pos += size * count;
+						name = m.save().indexed_item(index, base, size, count);
+						index++;
+					}
+					m.save().dispatch_postload();
+					return sol::make_object(sol(), sol::nil);
+				});
 
 /* game_driver - this should be self explanatory
  */

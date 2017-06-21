@@ -377,7 +377,7 @@ bool device_scheduler::can_save() const
 {
 	// if any live temporary timers exit, fail
 	for (emu_timer *timer = m_timer_list; timer != nullptr; timer = timer->next())
-		if (timer->m_temporary && !timer->expire().is_never())
+		if (timer->m_temporary && !timer->expire().is_never() && timer->enabled())
 		{
 			machine().logerror("Failed save state attempt due to anonymous timers:\n");
 			dump_timers();
