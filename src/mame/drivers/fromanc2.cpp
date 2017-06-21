@@ -642,6 +642,9 @@ static MACHINE_CONFIG_START( fromanc4 )
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	MCFG_DEVICE_ADD("uart", NS16550, 2000000) // actual type is TL16C550CFN; clock unknown
+	MCFG_INS8250_OUT_INT_CB(INPUTLINE("maincpu", M68K_IRQ_2))
+	//MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("link", rs232_port_device, write_txd))
+	//MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE("link", rs232_port_device, write_rts))
 
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", "lpalette", fromancr)
