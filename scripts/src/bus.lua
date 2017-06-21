@@ -2631,6 +2631,8 @@ if (BUSES["X68K"]~=null) then
 		MAME_DIR .. "src/devices/bus/x68k/x68k_neptunex.h",
 		MAME_DIR .. "src/devices/bus/x68k/x68k_scsiext.cpp",
 		MAME_DIR .. "src/devices/bus/x68k/x68k_scsiext.h",
+		MAME_DIR .. "src/devices/bus/x68k/x68k_midi.cpp",
+		MAME_DIR .. "src/devices/bus/x68k/x68k_midi.h",
 	}
 end
 
