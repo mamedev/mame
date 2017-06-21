@@ -3632,6 +3632,8 @@ files {
 	MAME_DIR .. "src/mame/includes/buggychl.h",
 	MAME_DIR .. "src/mame/machine/taito68705interface.cpp",
 	MAME_DIR .. "src/mame/machine/taito68705interface.h",
+	MAME_DIR .. "src/mame/machine/taitosjsec.cpp",
+	MAME_DIR .. "src/mame/machine/taitosjsec.h",
 	MAME_DIR .. "src/mame/video/buggychl.cpp",
 	MAME_DIR .. "src/mame/drivers/capr1.cpp",
 	MAME_DIR .. "src/mame/drivers/caprcyc.cpp",
