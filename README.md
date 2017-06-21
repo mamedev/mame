@@ -1,3 +1,8 @@
+# **Libretro notice** #
+
+Before sending bug reports to the upstream bug tracker, make sure the bugs are reproducible in the latest standalone release.
+
+--------
 
 # **MAME** #
 
