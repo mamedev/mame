@@ -129,35 +129,7 @@ void ym3802_device::reset_midi_timer()
 		if(!(divisor & 0x08))
 			rate = m_clkf_rate / 32;
 		else
-		{
-			switch(divisor & 0x07)
-			{
-				case 0:
-					rate = m_clkf_rate / 64;
-					break;
-				case 1:
-					rate = m_clkf_rate / 128;
-					break;
-				case 2:
-					rate = m_clkf_rate / 256;
-					break;
-				case 3:
-					rate = m_clkf_rate / 512;
-					break;
-				case 4:
-					rate = m_clkf_rate / 1024;
-					break;
-				case 5:
-					rate = m_clkf_rate / 2048;
-					break;
-				case 6:
-					rate = m_clkf_rate / 4096;
-					break;
-				case 7:
-					rate = m_clkf_rate / 8192;
-					break;
-			}
-		}
+			rate = m_clkf_rate / (64 << (divisor & 0x07));
 	}
 	
 	if(rate != m_prev_rate)
