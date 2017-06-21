@@ -735,6 +735,19 @@ if (BUSES["HPHIL"]~=null) then
 	}
 end
 
+---------------------------------------------------
+--
+--@src/devices/bus/hp_dio/hp_dio.h,BUSES["HPDIO"] = true
+---------------------------------------------------
+
+if (BUSES["HPDIO"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/hp_dio/hp_dio.cpp",
+		MAME_DIR .. "src/devices/bus/hp_dio/hp_dio.h",
+		MAME_DIR .. "src/devices/bus/hp_dio/hp98544.cpp",
+		MAME_DIR .. "src/devices/bus/hp_dio/hp98544.h",
+	}
+end
 
 ---------------------------------------------------
 --
