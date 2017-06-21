@@ -6,8 +6,6 @@
 #include "machine/gen_latch.h"
 #include "sound/msm5205.h"
 
-#define MCU_BUFFER_MAX 6
-
 class renegade_state : public driver_device
 {
 public:
@@ -46,25 +44,14 @@ public:
 	uint32_t m_adpcm_end;
 	bool m_adpcm_playing;
 
-	bool m_mcu_sim;
-	uint8_t m_mcu_buffer[MCU_BUFFER_MAX];
-	uint8_t m_mcu_input_size;
-	uint8_t m_mcu_output_byte;
-	int8_t m_mcu_key;
-	int m_mcu_checksum;
-	const uint8_t *m_mcu_encrypt_table;
-	int m_mcu_encrypt_table_len;
 	int32_t m_scrollx;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
 
 	DECLARE_WRITE8_MEMBER(sound_w);
 	DECLARE_READ8_MEMBER(mcu_reset_r);
-	DECLARE_WRITE8_MEMBER(mcu_w);
-	DECLARE_READ8_MEMBER(mcu_r);
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
 	DECLARE_WRITE8_MEMBER(coincounter_w);
-	void mcu_process_command();
 	DECLARE_WRITE8_MEMBER(fg_videoram_w);
 	DECLARE_WRITE8_MEMBER(bg_videoram_w);
 	DECLARE_WRITE8_MEMBER(flipscreen_w);
@@ -81,9 +68,6 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 
-	DECLARE_DRIVER_INIT(kuniokun);
-	DECLARE_DRIVER_INIT(kuniokunb);
-	DECLARE_DRIVER_INIT(renegade);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
