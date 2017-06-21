@@ -6,23 +6,6 @@
 
 #pragma once
 
-// mcga control register
-#define MCGA_CTRL_OPTMASK    0x0003
-#define MCGA_CTRL_CBITFRCRD  0x0004
-#define MCGA_CTRL_CBITFRCSUB 0x0008
-#define MCGA_CTRL_ENREFRESH  0x0010
-#define MCGA_CTRL_ENMSBE     0x0100
-#define MCGA_CTRL_ENMMBE     0x0200
-#define MCGA_CTRL_ENECC      0x0400
-#define MCGA_CTRL_WRPROT     0x8000
-
-// rom writes bit 0x80 to test if fmcc or mcga
-#define MCGA_CTRL_MASK       0x871f
-#define FMCC_CTRL_MASK       0x8fff
-
-// mcga error register
-#define MCGA_ERROR_VALID     0x00008000
-
 class interpro_mcga_device : public device_t
 {
 public:
@@ -32,8 +15,31 @@ public:
 
 	DECLARE_READ16_MEMBER(reg00_r) { return m_reg[0]; }
 	DECLARE_WRITE16_MEMBER(reg00_w) { m_reg[0] = data; }
+
+	enum control_mask 
+	{
+		CONTROL_OPTMASK    = 0x0003,
+		CONTROL_CBITFRCRD  = 0x0004,
+		CONTROL_CBITFRCSUB = 0x0008,
+		CONTROL_ENREFRESH  = 0x0010,
+		CONTROL_ENMSBE     = 0x0100,
+		CONTROL_ENMMBE     = 0x0200,
+		CONTROL_ENECC      = 0x0400,
+		CONTROL_WRPROT     = 0x8000,
+
+		CONTROL_MASK       = 0x871f
+	};
 	DECLARE_READ16_MEMBER(control_r) { return m_control; }
 	virtual DECLARE_WRITE16_MEMBER(control_w);
+
+	enum error_mask 
+	{
+		ERROR_SYND  = 0x00ff,
+		ERROR_MMBE  = 0x0100,
+		ERROR_MSBE  = 0x0200,
+		ERROR_ADDR  = 0x1c00,
+		ERROR_VALID = 0x8000
+	};
 	DECLARE_READ16_MEMBER(error_r) { return m_error; }
 	DECLARE_WRITE16_MEMBER(error_w) { m_error = data; }
 	DECLARE_READ8_MEMBER(frcrd_r) { return m_frcrd; }
@@ -44,6 +50,11 @@ public:
 	DECLARE_WRITE16_MEMBER(reg28_w) { m_reg[1] = data; }
 	DECLARE_READ16_MEMBER(reg30_r) { return m_reg[2]; }
 	DECLARE_WRITE16_MEMBER(reg30_w) { m_reg[2] = data; }
+
+	enum memsize_mask 
+	{
+		MEMSIZE_ADDR = 0x007f
+	};
 	DECLARE_READ16_MEMBER(memsize_r) { return m_memsize; }
 	DECLARE_WRITE16_MEMBER(memsize_w) { m_memsize = data; }
 
@@ -69,8 +80,38 @@ public:
 
 	virtual DECLARE_ADDRESS_MAP(map, 32) override;
 
+	enum control_mask 
+	{
+		CONTROL_CBITFRCRD  = 0x0004,
+		CONTROL_CBITFRCSUB = 0x0008,
+		CONTROL_ENREFRESH  = 0x0010,
+		CONTROL_ENMSBENMI  = 0x0020,
+		CONTROL_ENMMBENMI  = 0x0040,
+		CONTROL_ENSTICKY   = 0x0080,
+		CONTROL_ENMERR     = 0x0100,
+		CONTROL_ENMMBE     = 0x0200,
+		CONTROL_ENECC      = 0x0400,
+		CONTROL_ENRMWCOR   = 0x0800,
+		CONTROL_WRPROT     = 0x8000,
+
+		CONTROL_MASK       = 0x8fff
+	};
 	DECLARE_WRITE16_MEMBER(control_w) override;
 
+	enum error_mask 
+	{
+		ERROR_SYND  = 0x00ff,
+		ERROR_MMBE  = 0x0100,
+		ERROR_MSBE  = 0x0200,
+		ERROR_MTYPE = 0x0400,
+		ERROR_VALID = 0x8000
+	};
+
+	enum error_control_mask 
+	{
+		ERROR_CONTROL_CYCLE = 0x003f,
+		ERROR_CONTROL_TAG   = 0x01c0
+	};
 	DECLARE_READ16_MEMBER(error_control_r) { return m_error_control; }
 	DECLARE_WRITE16_MEMBER(error_control_w) { m_error_control = data; }
 

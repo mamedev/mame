@@ -93,13 +93,14 @@ WRITE32_MEMBER(interpro_sga_device::ddtc1_w)
 
 	// when complete, we indicate by setting DMAEND(2) - 2 is probably the channel
 	// we also turn off the INTBERR and INTMMBE flags
-	m_ipoll &= ~(0x20000 | 0x10000);
+	m_ipoll &= ~(IPOLL_INTBERR | IPOLL_INTMMBE);
 	m_ipoll |= 0x200;
 
+#if 0
 	// if the address is invalid, fake a bus error
 	if ((m_dspad1 & 0xfffff000) == 0x40000000 || (m_ddpad1 & 0xfffff) == 0x40000000)
 	{
-		m_ipoll |= 0x10000;
+		m_ipoll |= IPOLL_INTBERR;
 
 		// error cycle - bit 0x10 indicates source address error (dspad1)
 		// now expecting 0x5463?
@@ -112,4 +113,5 @@ WRITE32_MEMBER(interpro_sga_device::ddtc1_w)
 		// 0x5433 = BERR|SNAPOK | BG(ICAMMU)? | CT(33)
 		// 0x5463 = BERR|SNAPOK | BG(ICAMMU)? | TAG(1) | CT(23)
 	}
+#endif
 }

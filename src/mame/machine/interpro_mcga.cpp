@@ -41,6 +41,7 @@ DEVICE_ADDRESS_MAP_START(map, 32, interpro_fmcc_device)
 	AM_RANGE(0x28, 0x2b) AM_READWRITE16(reg28_r, reg28_w, 0xffff)
 	AM_RANGE(0x30, 0x33) AM_READWRITE16(reg30_r, reg30_w, 0xffff)
 	AM_RANGE(0x38, 0x3b) AM_READWRITE16(memsize_r, memsize_w, 0xffff)
+	AM_RANGE(0x40, 0x43) AM_NOP // unknown
 	AM_RANGE(0x48, 0x4b) AM_READWRITE16(error_control_r, error_control_w, 0xffff)
 ADDRESS_MAP_END
 
@@ -69,29 +70,29 @@ void interpro_mcga_device::device_start()
 void interpro_mcga_device::device_reset()
 {
 	m_reg[0] = 0x00ff;
-	m_control = MCGA_CTRL_ENREFRESH | MCGA_CTRL_CBITFRCSUB | MCGA_CTRL_CBITFRCRD;
+	m_control = CONTROL_ENREFRESH | CONTROL_CBITFRCSUB | CONTROL_CBITFRCRD;
 	m_reg[1] = 0x00ff;
 	m_memsize = 0x0340;
 }
 
 WRITE16_MEMBER(interpro_mcga_device::control_w)
 {
-	m_control = data & MCGA_CTRL_MASK;
+	m_control = data & CONTROL_MASK;
 
 	// HACK: set or clear error status depending on ENMMBE bit
-	if (data & MCGA_CTRL_ENMMBE)
-		m_error |= MCGA_ERROR_VALID;
-	//      else
-	//          error &= ~MCGA_ERROR_VALID;
+	if (data & CONTROL_ENMMBE)
+		m_error |= ERROR_VALID;
+	//else
+	//	m_error &= ~ERROR_VALID;
 }
 
 WRITE16_MEMBER(interpro_fmcc_device::control_w)
 {
-	m_control = data & FMCC_CTRL_MASK;
+	m_control = data & CONTROL_MASK;
 
 	// HACK: set or clear error status depending on ENMMBE bit
-	if (data & MCGA_CTRL_ENMMBE)
-		m_error |= MCGA_ERROR_VALID;
-	//      else
-	//          error &= ~MCGA_ERROR_VALID;
+	if (data & CONTROL_ENMMBE)
+		m_error |= ERROR_VALID;
+	//else
+	//	m_error &= ~ERROR_VALID;
 }

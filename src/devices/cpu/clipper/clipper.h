@@ -8,8 +8,13 @@
 
 #include <limits.h>
 
+// convenience macros for dealing with the psw and ssw
+#define PSW(mask) (m_psw & PSW_##mask)
+#define SSW(mask) (m_ssw & SSW_##mask)
+
 class clipper_device : public cpu_device
 {
+protected:
 	enum registers
 	{
 		CLIPPER_R0, CLIPPER_R1, CLIPPER_R2, CLIPPER_R3, CLIPPER_R4, CLIPPER_R5, CLIPPER_R6, CLIPPER_R7,
@@ -101,6 +106,15 @@ class clipper_device : public cpu_device
 		SSW_P   = 0x80000000, // previous mode
 	};
 
+	enum clipper_ssw_id 
+	{
+		SSW_ID_C400R0 = 0x00000,
+		SSW_ID_C400R1 = 0x04000,
+		SSW_ID_C400R2 = 0x08000,
+		SSW_ID_C400R3 = 0x0c000,
+		SSW_ID_C400R4 = 0x10000
+	};
+
 	enum exception_vectors
 	{
 		// data memory trap group
@@ -167,7 +181,7 @@ public:
 	DECLARE_READ32_MEMBER(ssw) { return m_ssw; }
 
 protected:
-	clipper_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	clipper_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, const u32 cpuid);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -194,6 +208,8 @@ protected:
 	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; } // smallest instruction
 	virtual uint32_t disasm_max_opcode_bytes() const override { return 8; } // largest instruction
 	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options) override;
+
+	void set_ssw(u32 data) { m_ssw = (m_ssw & SSW(ID)) | (data & ~SSW(ID)); }
 
 	// core registers
 	u32 m_pc;

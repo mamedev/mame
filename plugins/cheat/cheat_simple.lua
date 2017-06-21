@@ -25,7 +25,7 @@ local codefuncs = {}
 
 local function prepare_rom_cheat(desc, region, addr, val, size, banksize, comp)
 	local cheat = { desc = desc, region = { rom = region } }
-	cheat.script = { off = "if on then rom:write_u8(addr, save) end" }
+	cheat.script = { off = "if on then rom:write_u" .. size .. "(addr, save) end" }
 	if banksize and comp then
 		local rom = manager:machine():memory().regions[region]
 		local bankaddr = addr & (banksize - 1)
@@ -47,7 +47,7 @@ local function prepare_rom_cheat(desc, region, addr, val, size, banksize, comp)
 				on = true
 				addr = %d
 				save = rom:read_u%d(addr)
-				rom:write_u8(addr, %d)]], addr, size, val)
+				rom:write_u%d(addr, %d)]], addr, size, size, val)
 	return cheat
 end
 
