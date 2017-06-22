@@ -111,7 +111,7 @@ ROM_START( ez2d2m )
 	ROM_LOAD( "62090211.rom", 0x000000, 0x00b000, CRC(5669135b) SHA1(b704ce0d20b71e40563d12bcc45bd1240227be74) )
 
 	DISK_REGION( "ide:0:hdd:image" ) 
-	DISK_IMAGE( "ez2d2m", 0, SHA1(939e6b202c270477ff0a5db070b28ac90dc2d84c) )
+	DISK_IMAGE( "ez2d2m", 0, SHA1(431f0bef3b81f83dad3818bca8994faa8ce9d5b7) )
 ROM_END
 
 GAME( 2001, ez2d2m,  0,   ez2d, ez2d, ez2d_state,  0, ROT0, "Amuse World", "Ez2dancer 2nd Move",  MACHINE_IS_SKELETON )
