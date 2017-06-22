@@ -11,7 +11,7 @@
 
 #include "emu.h"
 
-#include "cpu/sm510/kb1013vk1-2.h"
+#include "cpu/sm510/sm500.h"
 #include "sound/spkrdev.h"
 
 #include "screen.h"

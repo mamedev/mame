@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 
-// shared opcode handlers
+// SM510 shared opcode handlers
 
 #include "emu.h"
 #include "sm510.h"
