@@ -32,7 +32,7 @@ s2650_device::s2650_device(const machine_config &mconfig, const char *tag, devic
 	: cpu_device(mconfig, S2650, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 15)
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 8)
-	, m_data_config("io", ENDIANNESS_LITTLE, 8, 1)
+	, m_data_config("data", ENDIANNESS_LITTLE, 8, 1)
 	, m_sense_handler(*this)
 	, m_flag_handler(*this), m_intack_handler(*this)
 	, m_ppc(0), m_page(0), m_iar(0), m_ea(0), m_psl(0), m_psu(0), m_r(0)
