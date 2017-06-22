@@ -9,10 +9,11 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine.h"
-#include "emuopts.h"
 #include "ui/state.h"
+#include "emuopts.h"
 
+
+namespace ui {
 
 /***************************************************************************
     ANONYMOUS NAMESPACE
@@ -41,9 +42,9 @@ input_code keyboard_code(input_item_id id)
 std::string keyboard_input_item_name(input_item_id id)
 {
 	if (id >= ITEM_ID_A && id <= ITEM_ID_Z)
-		return std::string(1, (char)(id - ITEM_ID_A + 'a'));
+		return std::string(1, char(id - ITEM_ID_A + 'a'));
 	if (id >= ITEM_ID_0 && id <= ITEM_ID_9)
-		return std::string(1, (char)(id - ITEM_ID_0 + '0'));
+		return std::string(1, char(id - ITEM_ID_0 + '0'));
 
 	// only supported for A-Z/0-9
 	throw false;
@@ -70,8 +71,6 @@ std::pair<std::string, std::string> code_item_pair(const running_machine &machin
 
 
 };
-
-namespace ui {
 
 /***************************************************************************
     FILE ENTRY
