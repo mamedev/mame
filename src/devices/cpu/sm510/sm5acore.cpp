@@ -49,7 +49,7 @@ sm5l_device::sm5l_device(const machine_config &mconfig, const char *tag, device_
 }
 
 kb1013vk12_device::kb1013vk12_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: sm5a_device(mconfig, SM5L, tag, owner, clock, 1, 11, ADDRESS_MAP_NAME(program_1_8k), 7, ADDRESS_MAP_NAME(data_5x13x4))
+	: sm5a_device(mconfig, KB1013VK12, tag, owner, clock, 1, 11, ADDRESS_MAP_NAME(program_1_8k), 7, ADDRESS_MAP_NAME(data_5x13x4))
 {
 }
 
