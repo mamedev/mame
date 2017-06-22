@@ -180,14 +180,14 @@ static std::string internal_strtrimspace(std::string& str, bool right_only)
 		start = std::find_if(
 			str.begin(),
 			str.end(),
-			[](char c) { return !isspace(c); });
+			[](char c) { return !isspace(uint8_t(c)); });
 	}
 
 	// identify the end
 	std::string::iterator end = std::find_if(
 		str.rbegin(),
-		str.rend(),
-		[](char c) { return !isspace(c); }).base();
+		std::string::reverse_iterator(start),
+		[](char c) { return !isspace(uint8_t(c)); }).base();
 
 	// extract the string
 	str = end > start
