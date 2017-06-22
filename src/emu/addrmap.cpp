@@ -47,17 +47,6 @@ address_map_entry::address_map_entry(device_t &device, address_map &map, offs_t 
 		m_bytemirror(0),
 		m_bytemask(0)
 {
-	if (map.m_globalmask != 0 && (start & ~map.m_globalmask) != 0)
-	{
-		osd_printf_warning("AS_%d map entry start %08X lies outside global address mask %08X\n", map.m_spacenum, start, map.m_globalmask);
-		m_addrstart &= map.m_globalmask;
-	}
-
-	if (map.m_globalmask != 0 && (end & ~map.m_globalmask) != 0)
-	{
-		osd_printf_warning("AS_%d map entry end %08X lies outside global address mask %08X\n", map.m_spacenum, end, map.m_globalmask);
-		m_addrend &= map.m_globalmask;
-	}
 }
 
 
@@ -635,6 +624,10 @@ void address_map::map_validity_check(validity_checker &valid, address_spacenum s
 	if (m_databits != datawidth)
 		osd_printf_error("Wrong memory handlers provided for %s space! (width = %d, memory = %08x)\n", spaceconfig.m_name, datawidth, m_databits);
 
+	offs_t globalmask = 0xffffffffUL >> (32 - spaceconfig.m_addrbus_width);
+	if (m_globalmask != 0)
+		globalmask = m_globalmask;
+
 	// loop over entries and look for errors
 	for (address_map_entry &entry : m_entrylist)
 	{
@@ -662,6 +655,12 @@ void address_map::map_validity_check(validity_checker &valid, address_spacenum s
 		// look for inverted start/end pairs
 		if (byteend < bytestart)
 			osd_printf_error("Wrong %s memory read handler start = %08x > end = %08x\n", spaceconfig.m_name, entry.m_addrstart, entry.m_addrend);
+
+		// look for ranges outside the global mask
+		if (entry.m_addrstart & ~globalmask)
+			osd_printf_error("In %s memory range %x-%x, start address is outside of the global address mask %x\n", spaceconfig.m_name, entry.m_addrstart, entry.m_addrend, globalmask);
+		if (entry.m_addrend & ~globalmask)
+			osd_printf_error("In %s memory range %x-%x, end address is outside of the global address mask %x\n", spaceconfig.m_name, entry.m_addrstart, entry.m_addrend, globalmask);
 
 		// look for misaligned entries
 		if ((bytestart & (alignunit - 1)) != 0 || (byteend & (alignunit - 1)) != (alignunit - 1))
