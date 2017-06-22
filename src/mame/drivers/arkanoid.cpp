@@ -14,10 +14,7 @@
     arkanoid    The earlier revisions. They each differ in the country byte. These
     arkanoiduo    versions work fine both the bootleg A75-06.IC16 MCU rom and the
     arkanoidjb    genuine decapped Taito A75__06.IC16 MC68705 MCU.
-    arkanoidu   USA version. A later revision, code has been inserted NOT patched.
-                  The 68705 code for this one was not available; Brad Oliver[?]
-                  made it up from the bootleg A75-06.IC16 by changing the level
-                  data pointer table.
+    arkanoidu   USA version. MCU code properly dumped.
     arkanoidj   Japanese version.  Final revision, MCU code properly dumped.
     arkanoidja  Japanese version.  A later revision with level selector.
                   The 68705 code for this one was not available; Brad Oliver[?]
@@ -142,8 +139,7 @@ K1100181A (ROMSTAR version added sticker)
 Notes:
       Z80         - Zilog Z0840006 CPU. Clock input 6.000MHz (12/2)
       YM2149F     - Yamaha YM2149F software-controlled sound generator (SSG). Clock input 1.5MHz (12/8)
-      A75_06.IC14 - Motorola MC68705P5 micro-controller. Clock input 3.000MHz (12/4). Labelled 'A75 06' for
-                    ROMSTAR version. Note original Taito version 68705 and Tournament Arkanoid MCUs work fine.
+      A75_06.IC14 - Motorola MC68705P5 micro-controller. Clock input 3.000MHz (12/4).
       A75_*       - 27C256 EPROMs labelled 'A75 xx'. xx = 01, 03, 04, 05 etc. See ROM loading in the src for exact ROM usage.
       A75-0*      - MMI 63S241 bipolar PROMs. Compatible with MB7116, 7621, DM74S571N etc
       TMM2018     - Toshiba TMM2018 2k x8 SRAM (DIP24)
@@ -1500,7 +1496,7 @@ MACHINE_CONFIG_END
     (A75 12 through 17 are unknown, could be another two sets of z80 code plus mc68705p5)
     A75 18   = Z80 code v2.0 2/2 USA/Romstar
     A75 19   = Z80 code v2.0 1/2 USA/Romstar
-    A75 20   = MC68705P5 MCU code, v2.0 USA/Romstar (NOT DUMPED, PLACEHOLDER HACKED FROM BOOTLEG MCU)
+    A75 20   = MC68705P5 MCU code, v2.0 USA/Romstar (verified. dumped from MCU)
     A75 21   = Z80 code v2.0 1/2 Japan w/level select
     A75 22   = Z80 code v2.0 2/2 Japan w/level select
     A75 23   = MC68705P5 MCU code, v2.0 Japan w/level select (NOT DUMPED, PLACEHOLDER HACKED FROM BOOTLEG MCU)
@@ -1563,7 +1559,7 @@ ROM_START( arkanoidu ) // V2.0 US/Romstar
 	ROM_LOAD( "a75-18.ic16",   0x8000, 0x8000, CRC(cdc08301) SHA1(05f54353cc8333af14fa985a2764960e20e8161a) )
 
 	ROM_REGION( 0x0800, "mcu:mcu", 0 )  /* 2k for the microcontroller */
-	ROM_LOAD( "a75-20.ic14",   0x0000, 0x0800, BAD_DUMP CRC(de518e47) SHA1(b8eddd1c566505fb69e3d1207c7a9720dfb9f503) ) /* Hand crafted based on the bootleg a75-06 chip, need the real data here */
+	ROM_LOAD( "a75__20.ic14",   0x0000, 0x0800, CRC(3994ee92) SHA1(31f6577956f49ba0b0705b490ce3254033795552) ) // verified authentic v2.0 MCU from Taito/Romstar US Board
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
 	ROM_LOAD( "a75-03.ic64",   0x00000, 0x8000, CRC(038b74ba) SHA1(ac053cc4908b4075f918748b89570e07a0ba5116) )
