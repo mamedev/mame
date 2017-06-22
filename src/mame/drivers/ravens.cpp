@@ -102,7 +102,7 @@ public:
 	DECLARE_WRITE8_MEMBER(leds_w);
 	void kbd_put(u8 data);
 	DECLARE_MACHINE_RESET(ravens2);
-	DECLARE_READ8_MEMBER(cass_r);
+	DECLARE_READ_LINE_MEMBER(cass_r);
 	DECLARE_WRITE_LINE_MEMBER(cass_w);
 	DECLARE_QUICKLOAD_LOAD_MEMBER( ravens );
 	uint8_t m_term_char;
@@ -117,7 +117,7 @@ WRITE_LINE_MEMBER( ravens_state::cass_w )
 	m_cass->output(state ? -1.0 : +1.0);
 }
 
-READ8_MEMBER( ravens_state::cass_r )
+READ_LINE_MEMBER( ravens_state::cass_r )
 {
 	return (m_cass->input() > 0.03) ? 1 : 0;
 }
@@ -214,7 +214,6 @@ static ADDRESS_MAP_START( ravens_io, AS_IO, 8, ravens_state )
 	AM_RANGE(0x09, 0x09) AM_WRITE(leds_w) // LED output port
 	AM_RANGE(0x10, 0x15) AM_WRITE(display_w) // 6-led display
 	AM_RANGE(0x17, 0x17) AM_READ(port17_r) // pushbuttons
-	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(cass_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ravens2_io, AS_IO, 8, ravens_state )
@@ -222,7 +221,6 @@ static ADDRESS_MAP_START( ravens2_io, AS_IO, 8, ravens_state )
 	AM_RANGE(0x07, 0x07) AM_READ(port07_r)
 	AM_RANGE(0x1b, 0x1b) AM_WRITE(port1b_w)
 	AM_RANGE(0x1c, 0x1c) AM_WRITE(port1c_w)
-	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(cass_r)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -333,7 +331,8 @@ static MACHINE_CONFIG_START( ravens )
 	MCFG_CPU_ADD("maincpu",S2650, XTAL_1MHz) // frequency is unknown
 	MCFG_CPU_PROGRAM_MAP(ravens_mem)
 	MCFG_CPU_IO_MAP(ravens_io)
-	MCFG_S2650_FLAG_HANDLER(WRITELINE(ravens_state, cass_w))
+	MCFG_S2650_SENSE_INPUT(READLINE(ravens_state, cass_r))
+	MCFG_S2650_FLAG_OUTPUT(WRITELINE(ravens_state, cass_w))
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_ravens)
@@ -353,7 +352,8 @@ static MACHINE_CONFIG_START( ravens2 )
 	MCFG_CPU_ADD("maincpu",S2650, XTAL_1MHz) // frequency is unknown
 	MCFG_CPU_PROGRAM_MAP(ravens_mem)
 	MCFG_CPU_IO_MAP(ravens2_io)
-	MCFG_S2650_FLAG_HANDLER(WRITELINE(ravens_state, cass_w))
+	MCFG_S2650_SENSE_INPUT(READLINE(ravens_state, cass_r))
+	MCFG_S2650_FLAG_OUTPUT(WRITELINE(ravens_state, cass_w))
 
 	MCFG_MACHINE_RESET_OVERRIDE(ravens_state, ravens2)
 

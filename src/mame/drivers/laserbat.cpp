@@ -192,8 +192,6 @@ static ADDRESS_MAP_START( laserbat_io_map, AS_IO, 8, laserbat_state_base )
 	AM_RANGE(0x05, 0x05)                    AM_WRITE(wcov_w)
 	AM_RANGE(0x06, 0x06)                    AM_WRITE(ct_io_w)
 	AM_RANGE(0x07, 0x07)                    AM_WRITE(csound2_w)
-
-	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
 ADDRESS_MAP_END
 
 
@@ -278,9 +276,6 @@ static INPUT_PORTS_START( laserbat_base )
 	PORT_DIPNAME( 0x80, 0x80, "Coin C" )                PORT_DIPLOCATION("SW-2:8")
 	PORT_DIPSETTING(    0x00, DEF_STR(2C_1C) )
 	PORT_DIPSETTING(    0x80, DEF_STR(1C_1C) )
-
-	PORT_START("SENSE")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 INPUT_PORTS_END
 
 
@@ -473,6 +468,7 @@ static MACHINE_CONFIG_START( laserbat_base )
 	MCFG_CPU_PROGRAM_MAP(laserbat_map)
 	MCFG_CPU_IO_MAP(laserbat_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", laserbat_state_base, laserbat_interrupt)
+	MCFG_S2650_SENSE_INPUT(DEVREADLINE("screen", screen_device, vblank))
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -1198,7 +1198,7 @@ void tms5110_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	m_romclk_hack_state = !m_romclk_hack_state;
 }
 
-READ8_MEMBER( tms5110_device::romclk_hack_r )
+READ_LINE_MEMBER( tms5110_device::romclk_hack_r )
 {
 	/* bring up to date first */
 	m_stream->update();

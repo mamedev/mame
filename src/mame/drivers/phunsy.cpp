@@ -57,7 +57,7 @@ public:
 	DECLARE_WRITE8_MEMBER(phunsy_ctrl_w);
 	DECLARE_WRITE8_MEMBER(phunsy_data_w);
 	void kbd_put(u8 data);
-	DECLARE_READ8_MEMBER(cass_r);
+	DECLARE_READ_LINE_MEMBER(cass_r);
 	DECLARE_WRITE_LINE_MEMBER(cass_w);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(phunsy);
 	DECLARE_PALETTE_INIT(phunsy);
@@ -80,7 +80,7 @@ WRITE_LINE_MEMBER( phunsy_state::cass_w )
 	m_cass->output(state ? -1.0 : +1.0);
 }
 
-READ8_MEMBER( phunsy_state::cass_r )
+READ_LINE_MEMBER(phunsy_state::cass_r)
 {
 	return (m_cass->input() > 0.03) ? 0 : 1;
 }
@@ -96,9 +96,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( phunsy_io, AS_IO, 8, phunsy_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( S2650_CTRL_PORT, S2650_CTRL_PORT ) AM_WRITE( phunsy_ctrl_w )
-	AM_RANGE( S2650_DATA_PORT,S2650_DATA_PORT) AM_READWRITE( phunsy_data_r, phunsy_data_w )
-	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(cass_r)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( phunsy_data, AS_DATA, 8, phunsy_state )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_WRITE(phunsy_ctrl_w)
+	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READWRITE(phunsy_data_r, phunsy_data_w)
 ADDRESS_MAP_END
 
 
@@ -332,7 +335,9 @@ static MACHINE_CONFIG_START( phunsy )
 	MCFG_CPU_ADD("maincpu",S2650, XTAL_1MHz)
 	MCFG_CPU_PROGRAM_MAP(phunsy_mem)
 	MCFG_CPU_IO_MAP(phunsy_io)
-	MCFG_S2650_FLAG_HANDLER(WRITELINE(phunsy_state, cass_w))
+	MCFG_CPU_DATA_MAP(phunsy_data)
+	MCFG_S2650_SENSE_INPUT(READLINE(phunsy_state, cass_r))
+	MCFG_S2650_FLAG_OUTPUT(WRITELINE(phunsy_state, cass_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

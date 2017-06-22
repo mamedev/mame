@@ -669,7 +669,7 @@ static ADDRESS_MAP_START( spcwarp, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x6000, 0x6fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hunchbkg_io, AS_IO, 8, galaxold_state )
+static ADDRESS_MAP_START( hunchbkg_data, AS_DATA, 8, galaxold_state )
 	AM_RANGE(S2650_DATA_PORT,  S2650_DATA_PORT) AM_READNOP // not used
 ADDRESS_MAP_END
 
@@ -698,7 +698,6 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( drivfrcg_io, AS_IO, 8, galaxold_state )
 	AM_RANGE(0x00, 0x00) AM_READ(drivfrcg_port0_r)
-	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE") AM_WRITENOP
 ADDRESS_MAP_END
 
 
@@ -728,7 +727,6 @@ static ADDRESS_MAP_START( racknrol_io, AS_IO, 8, galaxold_state )
 //  AM_RANGE(0x1e, 0x1e) AM_WRITENOP
 //  AM_RANGE(0x1f, 0x1f) AM_WRITENOP
 	AM_RANGE(0x20, 0x3f) AM_WRITE(racknrol_tiles_bank_w) AM_SHARE("racknrol_tbank")
-	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
 ADDRESS_MAP_END
 
 READ8_MEMBER(galaxold_state::hexpoola_data_port_r)
@@ -748,8 +746,10 @@ READ8_MEMBER(galaxold_state::hexpoola_data_port_r)
 static ADDRESS_MAP_START( hexpoola_io, AS_IO, 8, galaxold_state )
 	AM_RANGE(0x00, 0x00) AM_READNOP
 	AM_RANGE(0x20, 0x3f) AM_WRITE(racknrol_tiles_bank_w) AM_SHARE("racknrol_tbank")
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( hexpoola_data, AS_DATA, 8, galaxold_state )
 	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READ(hexpoola_data_port_r) AM_DEVWRITE("snsnd", sn76496_device, write)
-	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
 ADDRESS_MAP_END
 
 READ8_MEMBER(galaxold_state::bullsdrtg_data_port_r)
@@ -773,11 +773,8 @@ READ8_MEMBER(galaxold_state::bullsdrtg_data_port_r)
 	return 0;
 }
 
-static ADDRESS_MAP_START( bullsdrtg_io_map, AS_IO, 8, galaxold_state )
-	AM_RANGE(0x00, 0x00) AM_READNOP
-	AM_RANGE(0x20, 0x3f) AM_WRITE(racknrol_tiles_bank_w) AM_SHARE("racknrol_tbank")
+static ADDRESS_MAP_START( bullsdrtg_data_map, AS_IO, 8, galaxold_state )
 	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READ(bullsdrtg_data_port_r) AM_DEVWRITE("snsnd", sn76496_device, write)
-	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
 ADDRESS_MAP_END
 
 /* Lives Dips are spread across two input ports */
@@ -1875,9 +1872,6 @@ static INPUT_PORTS_START( drivfrcg )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
-
-	PORT_START("SENSE")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 INPUT_PORTS_END
 
 
@@ -1939,9 +1933,6 @@ static INPUT_PORTS_START( racknrol )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
-
-	PORT_START("SENSE")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 INPUT_PORTS_END
 
 
@@ -2003,9 +1994,6 @@ static INPUT_PORTS_START( trvchlng )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
-
-	PORT_START("SENSE")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 INPUT_PORTS_END
 
 
@@ -2392,6 +2380,7 @@ static MACHINE_CONFIG_START( drivfrcg )
 	MCFG_CPU_PROGRAM_MAP(drivfrcg)
 	MCFG_CPU_IO_MAP(drivfrcg_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaxold_state,  hunchbks_vh_interrupt)
+	MCFG_S2650_SENSE_INPUT(DEVREADLINE("screen", screen_device, vblank)) // ???
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2441,7 +2430,7 @@ static MACHINE_CONFIG_DERIVED( hunchbkg, galaxold_base )
 	MCFG_CPU_REPLACE("maincpu", S2650, PIXEL_CLOCK / 4)
 
 	MCFG_CPU_PROGRAM_MAP(hunchbkg)
-	MCFG_CPU_IO_MAP(hunchbkg_io)
+	MCFG_CPU_DATA_MAP(hunchbkg_data)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(galaxold_state,hunchbkg_irq_callback)
 
 	MCFG_DEVICE_MODIFY("7474_9m_1")
@@ -2477,6 +2466,7 @@ static MACHINE_CONFIG_START( racknrol )
 	MCFG_CPU_PROGRAM_MAP(racknrol)
 	MCFG_CPU_IO_MAP(racknrol_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaxold_state,  hunchbks_vh_interrupt)
+	MCFG_S2650_SENSE_INPUT(DEVREADLINE("screen", screen_device, vblank)) MCFG_DEVCB_INVERT // ???
 
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", galaxian)
@@ -2503,6 +2493,7 @@ static MACHINE_CONFIG_START( hexpoola )
 	MCFG_CPU_ADD("maincpu", S2650, PIXEL_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(racknrol)
 	MCFG_CPU_IO_MAP(hexpoola_io)
+	MCFG_CPU_DATA_MAP(hexpoola_data)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaxold_state,  hunchbks_vh_interrupt)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", galaxian)
@@ -2550,7 +2541,8 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( bullsdrtg, hexpoola )
 
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(bullsdrtg_io_map)
+	MCFG_CPU_DATA_MAP(bullsdrtg_data_map)
+	MCFG_S2650_SENSE_INPUT(DEVREADLINE("screen", screen_device, vblank)) // ???
 MACHINE_CONFIG_END
 
 

@@ -66,7 +66,7 @@ public:
 	DECLARE_WRITE8_MEMBER(quizshow_audio_w);
 	DECLARE_WRITE8_MEMBER(quizshow_video_disable_w);
 	DECLARE_READ8_MEMBER(quizshow_timing_r);
-	DECLARE_READ8_MEMBER(quizshow_tape_signal_r);
+	DECLARE_READ_LINE_MEMBER(quizshow_tape_signal_r);
 	DECLARE_WRITE8_MEMBER(quizshow_main_ram_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(quizshow_tape_headpos_r);
 	DECLARE_INPUT_CHANGED_MEMBER(quizshow_category_select);
@@ -206,10 +206,10 @@ READ8_MEMBER(quizshow_state::quizshow_timing_r)
 	return ret;
 }
 
-READ8_MEMBER(quizshow_state::quizshow_tape_signal_r)
+READ_LINE_MEMBER(quizshow_state::quizshow_tape_signal_r)
 {
 	// TODO (for now, hold INS to fastforward and it'll show garbage questions where D is always(?) the right answer)
-	return machine().rand() & 0x80;
+	return machine().rand() & 1;
 }
 
 WRITE8_MEMBER(quizshow_state::quizshow_main_ram_w)
@@ -238,9 +238,6 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( quizshow_io_map, AS_IO, 8, quizshow_state )
 	ADDRESS_MAP_UNMAP_HIGH
-//  AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_NOP // unused
-//  AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_NOP // unused
-	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(quizshow_tape_signal_r)
 ADDRESS_MAP_END
 
 
@@ -384,6 +381,7 @@ static MACHINE_CONFIG_START( quizshow )
 	MCFG_CPU_ADD("maincpu", S2650, MASTER_CLOCK / 16) // divider guessed
 	MCFG_CPU_PROGRAM_MAP(quizshow_mem_map)
 	MCFG_CPU_IO_MAP(quizshow_io_map)
+	MCFG_S2650_SENSE_INPUT(READLINE(quizshow_state, quizshow_tape_signal_r))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("clock_timer", quizshow_state, quizshow_clock_timer_cb, attotime::from_hz(PIXEL_CLOCK / (HTOTAL * 8))) // 8V
 
 	/* video hardware */
