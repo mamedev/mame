@@ -467,7 +467,7 @@ ROM_START( cfrogger )
 	ROM_LOAD( "m58846-701p", 0x0000, 0x1000, CRC(ba52a242) SHA1(7fa53b617f4bb54be32eb209e9b88131e11cb518) )
 
 	ROM_REGION( 786255, "svg", 0)
-	ROM_LOAD( "cfrogger.svg", 0, 786255, CRC(d8d6e2b6) SHA1(bc9a0260b211ed07021dfe1cc19a993569f4c544) ) // by kevtris, ver. 19 may 2015
+	ROM_LOAD( "cfrogger.svg", 0, 786255, CRC(d8d6e2b6) SHA1(bc9a0260b211ed07021dfe1cc19a993569f4c544) )
 ROM_END
 
 
@@ -476,7 +476,7 @@ ROM_START( gjungler )
 	ROM_LOAD( "m58846-702p", 0x0000, 0x1000, CRC(94ab7060) SHA1(3389bc115d1df8d01a30611fa9e95a900d32b29b) )
 
 	ROM_REGION( 419696, "svg", 0)
-	ROM_LOAD( "gjungler.svg", 0, 419696, BAD_DUMP CRC(c5f6d1f2) SHA1(5032f35326ca689c8e329f760e380cdc9f5dff86) ) // by hap/kevtris, ver. 25 apr 2016 - BAD_DUMP: needs cleanup/redo
+	ROM_LOAD( "gjungler.svg", 0, 419696, CRC(c5f6d1f2) SHA1(5032f35326ca689c8e329f760e380cdc9f5dff86) )
 ROM_END
 
 
