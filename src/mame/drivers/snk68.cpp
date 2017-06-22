@@ -96,13 +96,19 @@ WRITE16_MEMBER(snk68_state::protection_w)
 	}
 }
 
+WRITE8_MEMBER(snk68_state::sound_w)
+{
+	m_soundlatch->write(space, 0, data);
+	m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE); // caused by 74123
+}
+
 /*******************************************************************************/
 
 static ADDRESS_MAP_START( pow_map, AS_PROGRAM, 16, snk68_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x043fff) AM_RAM
 	AM_RANGE(0x080000, 0x080001) AM_READ(control_1_r)
-	AM_RANGE(0x080000, 0x080001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0xff00)
+	AM_RANGE(0x080000, 0x080001) AM_WRITE8(sound_w, 0xff00)
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITE(pow_flipscreen_w)   // + char bank
 	AM_RANGE(0x0e0000, 0x0e0001) AM_READNOP /* Watchdog or IRQ ack */
@@ -119,7 +125,7 @@ static ADDRESS_MAP_START( searchar_map, AS_PROGRAM, 16, snk68_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x043fff) AM_RAM
 	AM_RANGE(0x080000, 0x080005) AM_READ(protcontrols_r) /* Player 1 & 2 */
-	AM_RANGE(0x080000, 0x080001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0xff00)
+	AM_RANGE(0x080000, 0x080001) AM_WRITE8(sound_w, 0xff00)
 	AM_RANGE(0x080006, 0x080007) AM_WRITE(protection_w) /* top byte unknown, bottom is protection in ikari3 and streetsm */
 	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITE(searchar_flipscreen_w)
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READ(rotary_1_r) /* Player 1 rotary */
@@ -614,7 +620,6 @@ static MACHINE_CONFIG_START( pow )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", INPUT_LINE_NMI))
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_8MHz/2) /* verified on pcb  */
