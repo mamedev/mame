@@ -41,7 +41,6 @@ public:
 	required_device<generic_latch_8_device> m_soundlatch;
 
 	DECLARE_WRITE_LINE_MEMBER(irq_handler);
-	DECLARE_WRITE16_MEMBER(blockout_sound_command_w);
 	DECLARE_WRITE16_MEMBER(blockout_irq6_ack_w);
 	DECLARE_WRITE16_MEMBER(blockout_irq5_ack_w);
 	DECLARE_WRITE16_MEMBER(blockout_paletteram_w);
