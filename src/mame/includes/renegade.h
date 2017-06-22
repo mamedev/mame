@@ -48,7 +48,6 @@ public:
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
 
-	DECLARE_WRITE8_MEMBER(sound_w);
 	DECLARE_READ8_MEMBER(mcu_reset_r);
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
 	DECLARE_WRITE8_MEMBER(coincounter_w);
