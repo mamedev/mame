@@ -44,6 +44,8 @@ consolewin_info::consolewin_info(debugger_windows_interface &debugger) :
 			m_devices_menu = CreatePopupMenu();
 			for (device_image_interface &img : iter)
 			{
+				if (!img.user_loadable())
+					continue;
 				osd::text::tstring tc_buf = osd::text::to_tstring(string_format("%s : %s", img.device().name(), img.exists() ? img.filename() : "[no image]"));
 				AppendMenu(m_devices_menu, MF_ENABLED, 0, tc_buf.c_str());
 			}
@@ -161,6 +163,9 @@ void consolewin_info::update_menu()
 		uint32_t cnt = 0;
 		for (device_image_interface &img : image_interface_iterator(machine().root_device()))
 		{
+			if (!img.user_loadable())
+				continue;
+
 			HMENU const devicesubmenu = CreatePopupMenu();
 
 			UINT_PTR const new_item = ID_DEVICE_OPTIONS + (cnt * DEVOPTION_MAX);
@@ -173,8 +178,9 @@ void consolewin_info::update_menu()
 			if (img.is_readonly())
 				flags_for_writing |= MF_GRAYED;
 
-			if (get_softlist_info(&img))
-				AppendMenu(devicesubmenu, MF_STRING, new_item + DEVOPTION_ITEM, TEXT("Mount Item..."));
+			// not working properly, removed for now until investigation can be done
+			//if (get_softlist_info(&img))
+			//	AppendMenu(devicesubmenu, MF_STRING, new_item + DEVOPTION_ITEM, TEXT("Mount Item..."));
 
 			AppendMenu(devicesubmenu, MF_STRING, new_item + DEVOPTION_OPEN, TEXT("Mount File..."));
 
@@ -541,6 +547,8 @@ bool consolewin_info::get_softlist_info(device_image_interface *img)
 			{
 				for (device_image_interface &image : image_interface_iterator(machine().root_device()))
 				{
+					if (!image.user_loadable())
+						continue;
 					if (!has_software && (opt_name == image.instance_name()))
 					{
 						const char *interface = image.image_interface();
