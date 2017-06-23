@@ -60,22 +60,18 @@
 #define IOGA_DMA_FLOPPY  2
 #define IOGA_DMA_SERIAL  3
 
-// dma write values
-#define IOGA_DMA_CTRL_WMASK   0xfd000e00
+// dma control register
+
+// are these "commands"?
 #define IOGA_DMA_CTRL_RESET_L 0x61000000 // do not clear bus error bit
 #define IOGA_DMA_CTRL_RESET   0x60400000 // clear bus error bit
 
+// uncertain about these
 #define IOGA_DMA_CTRL_START   0x10000000
-#define IOGA_DMA_CTRL_WRITE   0x40000000 // indicates memory to device transfer
-#define IOGA_DMA_CTRL_BUSY    0x02000000
-#define IOGA_DMA_CTRL_BERR    0x00400000  // iogadiag code expects 0x60400000 on bus error
+#define IOGA_DMA_CTRL_ENABLE  0x20000000
 #define IOGA_DMA_CTRL_X       0x00800000  // another error bit?
 #define IOGA_DMA_CTRL_Y       0x01000000  // turned off if either of two above are found
-#define IOGA_DMA_CTRL_TCZERO  0x00000001
 
-// DMA_ENABLE, INT_ENABLE,
-
-//#define IOGA_DMA_CTRL_START   0x63000800 // perhaps start a transfer? - maybe the 8 is the channel?
 #define IOGA_DMA_CTRL_UNK1    0x60000000 // don't know yet
 #define IOGA_DMA_CTRL_UNK2    0x67000600 // forced berr with nmi and interrupts disabled
 #define IOGA_DMA_CTRL_UNK3    0xbf000600 // set by scsidiag before executing scsi "transfer information" command
@@ -138,7 +134,7 @@ public:
 		ARBCTL_BGR_ETHA = 0x0100
 	};
 	DECLARE_READ16_MEMBER(arbctl_r) { return m_arbctl; }
-	DECLARE_WRITE16_MEMBER(arbctl_w) { m_arbctl = data; }
+	DECLARE_WRITE16_MEMBER(arbctl_w);
 	DECLARE_READ32_MEMBER(timer2_r) { return m_timer_reg[2]; }
 	DECLARE_READ32_MEMBER(timer3_r);
 
@@ -174,11 +170,13 @@ public:
 
 	enum nmictrl_mask 
 	{
-		NMI_EDGE      = 0x02,
-		NMI_PENDING   = 0x08,
-		NMI_ENABLE_IN = 0x10,
+		NMI_ALL     = 0x01,
+		NMI_ENABLE1 = 0x02,
+		NMI_EDGE    = 0x04,
+		NMI_NEGPOL  = 0x08,
+		NMI_ENABLE2 = 0x10,
 
-		NMI_ENABLE    = NMI_ENABLE_IN | NMI_EDGE
+		NMI_IE      = NMI_ENABLE1 | NMI_ENABLE2
 	};
 	DECLARE_READ8_MEMBER(nmictrl_r) { return m_nmictrl; }
 	DECLARE_WRITE8_MEMBER(nmictrl_w);
@@ -186,6 +184,17 @@ public:
 	DECLARE_READ16_MEMBER(softint_vector_r) { return m_swicr[offset]; }
 	DECLARE_WRITE16_MEMBER(softint_vector_w);
 
+	enum dma_ctrl_mask 
+	{
+        DMA_CTRL_TCZERO = 0x00000001, // transfer count zero
+        DMA_CTRL_BERR   = 0x00400000, // bus error
+        DMA_CTRL_BUSY   = 0x02000000, // set until arbiter grants bus access
+
+        DMA_CTRL_WRITE  = 0x40000000, // indicates memory to device transfer
+        DMA_CTRL_FORCED = 0x60000000,
+
+        DMA_CTRL_WMASK  = 0xfd000e00  // writable fields
+	};
 	DECLARE_READ32_MEMBER(dma_plotter_r) { return dma_r(space, offset, mem_mask, IOGA_DMA_PLOTTER); }
 	DECLARE_WRITE32_MEMBER(dma_plotter_w) { dma_w(space, offset, data, mem_mask, IOGA_DMA_PLOTTER); }
 	DECLARE_READ32_MEMBER(dma_scsi_r) { return dma_r(space, offset, mem_mask, IOGA_DMA_SCSI); }
@@ -263,6 +272,8 @@ private:
 		int drq_state;
 		devcb_read8 device_r;
 		devcb_write8 device_w;
+
+		const u16 arb_mask;
 	} m_dma_channel[IOGA_DMA_CHANNELS];
 	u32 m_dma_plotter_eosl;
 
@@ -278,7 +289,7 @@ private:
 	u32 m_active_interrupt_number;
 
 	u32 m_hwint_forced;
-	//bool m_nmi_forced;
+	bool m_nmi_pending;
 
 	u16 m_hwicr[IOGA_INTERRUPT_COUNT];
 	u8 m_softint;
