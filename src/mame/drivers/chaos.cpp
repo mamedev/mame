@@ -72,7 +72,10 @@ static ADDRESS_MAP_START( chaos_io, AS_IO, 8, chaos_state )
 	AM_RANGE(0x90, 0x90) AM_READ(port90_r)
 	AM_RANGE(0x91, 0x91) AM_READ(port91_r)
 	AM_RANGE(0x92, 0x92) AM_DEVWRITE("terminal", generic_terminal_device, write)
-	AM_RANGE(0x101, 0x103) AM_NOP // stops error log filling up while using debug
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( chaos_data, AS_DATA, 8, chaos_state )
+	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_NOP // stops error log filling up while using debug
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -143,6 +146,7 @@ static MACHINE_CONFIG_START( chaos )
 	MCFG_CPU_ADD("maincpu", S2650, XTAL_1MHz)
 	MCFG_CPU_PROGRAM_MAP(chaos_mem)
 	MCFG_CPU_IO_MAP(chaos_io)
+	MCFG_CPU_DATA_MAP(chaos_data)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)

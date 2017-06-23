@@ -63,7 +63,7 @@ public:
 
 	// this is only used by cvs.c
 	// it is not related at all to the speech generation and conflicts with the new ROM controller interface.
-	DECLARE_READ8_MEMBER( romclk_hack_r );
+	DECLARE_READ_LINE_MEMBER( romclk_hack_r );
 
 	void set_frequency(int frequency);
 

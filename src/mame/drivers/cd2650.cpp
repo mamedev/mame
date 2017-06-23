@@ -54,7 +54,7 @@ public:
 	DECLARE_READ8_MEMBER(keyin_r);
 	DECLARE_WRITE8_MEMBER(beep_w);
 	void kbd_put(u8 data);
-	DECLARE_READ8_MEMBER(cass_r);
+	DECLARE_READ_LINE_MEMBER(cass_r);
 	DECLARE_WRITE_LINE_MEMBER(cass_w);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(cd2650);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -81,7 +81,7 @@ WRITE_LINE_MEMBER( cd2650_state::cass_w )
 	m_cass->output(state ? -1.0 : +1.0);
 }
 
-READ8_MEMBER( cd2650_state::cass_r )
+READ_LINE_MEMBER( cd2650_state::cass_r )
 {
 	return (m_cass->input() > 0.03) ? 1 : 0;
 }
@@ -102,8 +102,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cd2650_io, AS_IO, 8, cd2650_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	//AM_RANGE(0x80, 0x84) disk i/o
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( cd2650_data, AS_DATA, 8, cd2650_state)
 	AM_RANGE(S2650_DATA_PORT,S2650_DATA_PORT) AM_READWRITE(keyin_r, beep_w)
-	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(cass_r)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -262,7 +264,9 @@ static MACHINE_CONFIG_START( cd2650 )
 	MCFG_CPU_ADD("maincpu",S2650, XTAL_1MHz)
 	MCFG_CPU_PROGRAM_MAP(cd2650_mem)
 	MCFG_CPU_IO_MAP(cd2650_io)
-	MCFG_S2650_FLAG_HANDLER(WRITELINE(cd2650_state, cass_w))
+	MCFG_CPU_DATA_MAP(cd2650_data)
+	MCFG_S2650_SENSE_INPUT(READLINE(cd2650_state, cass_r))
+	MCFG_S2650_FLAG_OUTPUT(WRITELINE(cd2650_state, cass_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

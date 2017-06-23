@@ -129,10 +129,6 @@ static ADDRESS_MAP_START( arcadia_mem, AS_PROGRAM, 8, arcadia_state )
 	AM_RANGE( 0x1800, 0x1aff) AM_READWRITE(video_r, video_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( arcadia_io, AS_IO, 8, arcadia_state )
-	AM_RANGE( S2650_SENSE_PORT,S2650_SENSE_PORT) AM_READ(vsync_r)
-ADDRESS_MAP_END
-
 /* The Emerson Arcadia 2001 controllers have 2 fire buttons on the side,
    but actually they are wired to keypad button #2. The following definitions
    are meant to document this fact. The keypad has the following layout:
@@ -477,7 +473,7 @@ static MACHINE_CONFIG_START( arcadia )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", S2650, 3580000/4)        /* 0.895 MHz */
 	MCFG_CPU_PROGRAM_MAP(arcadia_mem)
-	MCFG_CPU_IO_MAP(arcadia_io)
+	MCFG_S2650_SENSE_INPUT(READLINE(arcadia_state, vsync_r))
 	MCFG_CPU_PERIODIC_INT_DRIVER(arcadia_state, video_line,  262*60)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 

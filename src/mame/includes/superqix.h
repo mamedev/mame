@@ -39,6 +39,7 @@ public:
 
 	//general machine stuff
 	bool m_invert_coin_lockout;
+	bool m_invert_p2_spinner;
 	int m_gfxbank;
 	bool m_show_bitmap;
 	bool m_nmi_mask;
@@ -68,6 +69,8 @@ public:
 	DECLARE_DRIVER_INIT(perestro);
 	DECLARE_DRIVER_INIT(sqix);
 	DECLARE_DRIVER_INIT(sqixr0);
+	DECLARE_DRIVER_INIT(pbillian);
+	DECLARE_DRIVER_INIT(hotsmash);
 	TILE_GET_INFO_MEMBER(sqix_get_bg_tile_info);
 	DECLARE_MACHINE_START(superqix);
 	DECLARE_VIDEO_START(superqix);
@@ -107,15 +110,15 @@ public:
 		, m_dsw(*this, "DSW%u", 1)
 		, m_dials(*this, "DIAL%u", 1)
 		, m_plungers(*this, "PLUNGER%u", 1)
+		, m_launchbtns(*this, "LAUNCH%u", 1)
 		, m_mcu(*this, "mcu")
 		, m_samples(*this, "samples")
 		, m_samples_region(*this, "samples")
 		, m_samplebuf()
-		, m_curr_player(0)
 		, m_portB_out(0xff)
 		, m_portC_out(0xff)
-		, m_oldpos{ 0, 0 }
-		, m_sign{ 0, 0 }
+		, m_dial_oldpos{ 0, 0 }
+		, m_dial_sign{ 0, 0 }
 	{
 	}
 
@@ -125,13 +128,8 @@ public:
 	DECLARE_READ8_MEMBER(hotsmash_Z80_mcu_r);
 
 	DECLARE_WRITE8_MEMBER(pbillian_sample_trigger_w);
-	DECLARE_WRITE8_MEMBER(pbillian_Z80_mcu_w);
 	DECLARE_WRITE8_MEMBER(pbillian_0410_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(pbillian_semaphore_input_r);
-
-	DECLARE_READ8_MEMBER(hotsmash_ay_port_a_r);
-	DECLARE_READ8_MEMBER(pbillian_ay_port_a_r);
-	DECLARE_READ8_MEMBER(pbillian_ay_port_b_r);
 
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 
@@ -145,37 +143,27 @@ public:
 	u32 screen_update_pbillian(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
-	enum
-	{
-		HLE_68705_WRITE
-	};
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	TIMER_CALLBACK_MEMBER(hle_68705_w_cb);
-
 	virtual void machine_init_common() override;
 
-	int read_dial(int player);
+	int read_inputs(int player);
 
 	void pbillian_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	required_ioport_array<2>        m_dsw;
 	required_ioport_array<2>        m_dials;
 	optional_ioport_array<2>        m_plungers;
+	optional_ioport_array<2>        m_launchbtns;
 	optional_device<m68705p_device> m_mcu;
 	optional_device<samples_device> m_samples;
 	optional_region_ptr<u8>         m_samples_region;
 
 	std::unique_ptr<s16[]>          m_samplebuf;
 
-	// HLE-related for prebillian
-	int m_curr_player;
-
 	// 68705 related
 	u8  m_portB_out;
 	u8  m_portC_out;
 
 	// spinner quadrature stuff
-	int m_oldpos[2];
-	int m_sign[2];
+	int m_dial_oldpos[2];
+	int m_dial_sign[2];
 };

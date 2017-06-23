@@ -739,11 +739,14 @@ bool debug_view_memory::read(u8 size, offs_t offs, u64 &data)
 	// if no raw data, just use the standard debug routines
 	if (source.m_space != nullptr)
 	{
-		offs_t dummyaddr = offs;
-
 		auto dis = machine().disable_side_effect();
 
-		bool ismapped = m_no_translation ? true : source.m_memintf->translate(source.m_space->spacenum(), TRANSLATE_READ_DEBUG, dummyaddr);
+		bool ismapped = offs <= m_maxaddr;
+		if (ismapped && !m_no_translation)
+		{
+			offs_t dummyaddr = offs;
+			ismapped = source.m_memintf->translate(source.m_space->spacenum(), TRANSLATE_READ_DEBUG, dummyaddr);
+		}
 		data = ~u64(0);
 		if (ismapped)
 		{

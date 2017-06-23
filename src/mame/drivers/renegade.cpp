@@ -169,12 +169,6 @@ WRITE_LINE_MEMBER(renegade_state::adpcm_int)
 	}
 }
 
-WRITE8_MEMBER(renegade_state::sound_w)
-{
-	m_soundlatch->write(space, offset, data);
-	m_audiocpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
-}
-
 void renegade_state::machine_start()
 {
 	m_rombank->configure_entries(0, 2, memregion("maincpu")->base(), 0x4000);
@@ -245,7 +239,7 @@ static ADDRESS_MAP_START( renegade_nomcu_map, AS_PROGRAM, 8, renegade_state )
 	AM_RANGE(0x3100, 0x31ff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("IN0") AM_WRITE(scroll_lsb_w)       /* Player#1 controls, P1,P2 start */
 	AM_RANGE(0x3801, 0x3801) AM_READ_PORT("IN1") AM_WRITE(scroll_msb_w)       /* Player#2 controls, coin triggers */
-	AM_RANGE(0x3802, 0x3802) AM_READ_PORT("DSW2") AM_WRITE(sound_w) /* DIP2  various IO ports */
+	AM_RANGE(0x3802, 0x3802) AM_READ_PORT("DSW2") AM_DEVWRITE("soundlatch", generic_latch_8_device, write) /* DIP2  various IO ports */
 	AM_RANGE(0x3803, 0x3803) AM_READ_PORT("DSW1") AM_WRITE(flipscreen_w)   /* DIP1 */
 	AM_RANGE(0x3805, 0x3805) AM_READNOP AM_WRITE(bankswitch_w)
 	AM_RANGE(0x3806, 0x3806) AM_WRITENOP // ?? watchdog
@@ -498,6 +492,7 @@ static MACHINE_CONFIG_START( renegade )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", M6809_IRQ_LINE))
 
 	MCFG_SOUND_ADD("ymsnd", YM3526, 12000000/4)
 	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", M6809_FIRQ_LINE))

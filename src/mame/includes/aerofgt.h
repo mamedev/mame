@@ -79,7 +79,7 @@ public:
 	uint32_t aerofgt_ol2_tile_callback( uint32_t code );
 
 	/* handlers */
-	DECLARE_WRITE8_MEMBER(aerfboot_soundlatch_w);
+	DECLARE_WRITE8_MEMBER(karatblzbl_soundlatch_w);
 	DECLARE_READ8_MEMBER(pending_command_r);
 	DECLARE_WRITE8_MEMBER(aerofgt_sh_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(spinlbrk_sh_bankswitch_w);

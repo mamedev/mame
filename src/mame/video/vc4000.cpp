@@ -350,9 +350,9 @@ WRITE8_MEMBER( vc4000_state::vc4000_video_w )
 }
 
 
-READ8_MEMBER( vc4000_state::vc4000_vsync_r )
+READ_LINE_MEMBER(vc4000_state::vc4000_vsync_r)
 {
-	return m_video.line >= VC4000_END_LINE ? 0x80 : 0;
+	return m_video.line >= VC4000_END_LINE ? ASSERT_LINE : CLEAR_LINE;
 }
 
 static const char led[20][12+1] =

@@ -999,7 +999,8 @@ wsjr_15                         // (c) 1991
 zortonbr                        // (c) 1993 Web Picmatic
 
 @source:alien.cpp
-alien                           // (c) 2005
+alien                           // (c) 2005 Capcom
+pingu                           // (c) 2006 The Pygos Group / Capcom
 
 @source:aliens.cpp
 aliens                          // GX875 (c) 1990 (World)
@@ -12318,6 +12319,9 @@ exzisus                         // B12 (c) 1987 Taito Corporation (Japan)
 exzisusa                        // B23 (c) 1987 Taito Corporation (Japan)
 exzisust                        // B23 (c) 1987 TAD Corp (based on Japan Conversion)
 
+@source:ez2d.cpp
+ez2d2m                          // 2001 Amuse World
+
 @source:f1gp.cpp
 f1gp                            // (c) 1991 Video System Co.
 f1gp2                           // (c) 1992 Video System Co.
@@ -13015,6 +13019,7 @@ mshuttle                        // (c) 1981 Nichibutsu
 mshuttle2                       // (c) 1981 Nichibutsu
 mshuttlej                       // (c) 1981 Nichibutsu
 mshuttlej2                      // (c) 1981 Nichibutsu
+ncentury                        // bootleg (Petaco S.A.)
 offensiv                        // bootleg (Video Dens)
 omegab                          // bootleg
 omni                            // bootleg
@@ -13741,6 +13746,7 @@ potnpkre                        // Bootleg
 potnpkrf                        // Bootleg
 potnpkrg                        // Bootleg
 potnpkrh                        // Bootleg
+potnpkri                        // Bootleg
 pottnpkr                        // Bootleg
 royale                          // Unknown
 royalea                         // Unknown
@@ -35284,6 +35290,7 @@ beautyb                         // (c) 1991 AMT
 ddcrewbl                        //
 dduxbl                          // (c) 1989 (Datsu bootleg)
 eswatbl                         // bootleg
+eswatbl2                        // bootleg
 goldnaxeb1                      // bootleg
 goldnaxeb2                      // bootleg
 iqpipe                          // (c) 1991 AMT
