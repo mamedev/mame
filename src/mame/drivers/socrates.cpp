@@ -110,7 +110,8 @@ public:
 		m_cart(*this, "cartslot"),
 		m_bios_reg(*this, "maincpu"),
 		m_vram_reg(*this, "vram"),
-		m_rombank(*this, "rombank"),
+		m_rombank1(*this, "rombank1"),
+		m_rombank2(*this, "rombank2"),
 		m_rambank1(*this, "rambank1"),
 		m_rambank2(*this, "rambank2")
 		{ }
@@ -121,14 +122,15 @@ public:
 	memory_region *m_cart_reg;
 	required_memory_region m_bios_reg;
 	required_memory_region m_vram_reg;
-	optional_device<address_map_bank_device> m_rombank;
-	optional_device<address_map_bank_device> m_rambank1;
-	optional_device<address_map_bank_device> m_rambank2;
+	required_device<address_map_bank_device> m_rombank1;
+	optional_device<address_map_bank_device> m_rombank2; // iqunlimz only
+	required_device<address_map_bank_device> m_rambank1;
+	required_device<address_map_bank_device> m_rambank2;
 
 	rgb_t m_palette_val[256];
 
 	uint8_t m_data[8];
-	uint8_t m_rom_bank;
+	uint8_t m_rom_bank[2];
 	uint8_t m_ram_bank;
 	uint16_t m_scroll_offset;
 	uint8_t m_kb_latch_low[2];
@@ -144,8 +146,8 @@ public:
 	uint8_t m_speech_load_settings_count; // number of times load settings has happened
 	DECLARE_READ8_MEMBER(socrates_rom_bank_r);
 	DECLARE_WRITE8_MEMBER(socrates_rom_bank_w);
-	DECLARE_READ8_MEMBER(socrates_ram_bank_r);
-	DECLARE_WRITE8_MEMBER(socrates_ram_bank_w);
+	DECLARE_READ8_MEMBER(common_ram_bank_r);
+	DECLARE_WRITE8_MEMBER(common_ram_bank_w);
 	DECLARE_READ8_MEMBER(socrates_cart_r);
 	DECLARE_READ8_MEMBER(read_f3);
 	DECLARE_WRITE8_MEMBER(kbmcu_strobe);
@@ -185,24 +187,13 @@ class iqunlim_state : public socrates_state
 {
 public:
 	iqunlim_state(const machine_config &mconfig, device_type type, const char *tag)
-		: socrates_state(mconfig, type, tag),
-			m_bank1(*this, "bank1"),
-			m_bank2(*this, "bank2"),
-			m_bank3(*this, "bank3"),
-			m_bank4(*this, "bank4")
+		: socrates_state(mconfig, type, tag)
 		{ }
-
-	required_memory_bank m_bank1;
-	required_memory_bank m_bank2;
-	required_memory_bank m_bank3;
-	required_memory_bank m_bank4;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER( colors_w );
-	DECLARE_READ8_MEMBER( rombank_r );
-	DECLARE_WRITE8_MEMBER( rombank_w );
-	DECLARE_READ8_MEMBER( rambank_r );
-	DECLARE_WRITE8_MEMBER( rambank_w );
+	DECLARE_READ8_MEMBER( iqunlimz_rom_bank_r );
+	DECLARE_WRITE8_MEMBER( iqunlimz_rom_bank_w );
 	DECLARE_READ8_MEMBER( keyboard_r );
 	DECLARE_WRITE8_MEMBER( keyboard_clear );
 	DECLARE_READ8_MEMBER( video_regs_r );
@@ -211,13 +202,10 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER( send_input );
 
 protected:
-	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	int get_color(int index, int y);
 
 private:
-	uint8_t   m_rombank[2];
-	uint8_t   m_rambank;
 	uint8_t   m_colors[8];
 	uint8_t   m_video_regs[4];
 
@@ -289,7 +277,9 @@ void socrates_state::machine_reset()
 {
 	m_cart_reg = memregion(util::string_format("%s%s", m_cart->tag(), GENERIC_ROM_REGION_TAG).c_str());
 
-	m_rombank->set_bank(0xF3); // actually set semi-randomly on real console but we need to initialize it somewhere...
+	m_rom_bank[0] = m_rom_bank[1] = 0x0;
+	m_rombank1->set_bank(0x0); // actually set semi-randomly on real console but we need to initialize it somewhere...
+	m_ram_bank = 0;
 	m_rambank1->set_bank(0x0);// the actual console sets it semi randomly on power up, and the bios cleans it up.
 	m_rambank2->set_bank(0x0);
 	m_kb_latch_low[0] = 0xFF;
@@ -335,29 +325,32 @@ DRIVER_INIT_MEMBER(socrates_state,socrates)
 
 READ8_MEMBER(socrates_state::socrates_rom_bank_r)
 {
-	return m_rom_bank;
+	return m_rom_bank[0];
 }
 
 WRITE8_MEMBER(socrates_state::socrates_rom_bank_w)
 {
-	m_rom_bank = data;
-	m_rombank->set_bank(data);
+	m_rom_bank[0] = data;
+	m_rombank1->set_bank(data);
 }
 
-READ8_MEMBER(socrates_state::socrates_ram_bank_r)
+READ8_MEMBER(socrates_state::common_ram_bank_r)
 {
 	return m_ram_bank;
 }
 
-WRITE8_MEMBER(socrates_state::socrates_ram_bank_w)
+WRITE8_MEMBER(socrates_state::common_ram_bank_w)
 {
 	m_ram_bank = data;
-	m_rambank1->set_bank(data&0x3);
-	m_rambank2->set_bank((data&0xC)>>2);
+	m_rambank1->set_bank(((data>>2) & 0x0c) | ((data>>0) & 0x03));
+	m_rambank2->set_bank(((data>>4) & 0x0c) | ((data>>2) & 0x03));
 }
 
 READ8_MEMBER(socrates_state::socrates_cart_r)
 {
+	// demangle the offset, offset passed is bits 11111111 11111111 00000000 00000000
+	// where . is 0                               EDCBA987 65432.10 FEDCBA98 76543210
+	offset = ((offset&0x3FFFF)|((offset&0xF80000)>>1));
 	if (m_cart_reg)
 	{
 		offset &= (m_cart->get_rom_size()-1);
@@ -876,66 +869,28 @@ WRITE8_MEMBER( iqunlim_state::video_regs_w )
 	m_video_regs[offset] = data;
 }
 
-void iqunlim_state::machine_start()
-{
-	m_cart_reg = memregion(util::string_format("%s%s", m_cart->tag(), GENERIC_ROM_REGION_TAG).c_str());
-
-	uint8_t *bios = m_bios_reg->base();
-	uint8_t *cart = m_cart_reg ? m_cart_reg->base() : m_bios_reg->base();
-	uint8_t *ram  = m_vram_reg->base();
-
-	m_bank1->configure_entries(0x00, 0x10, bios, 0x4000);
-	m_bank1->configure_entries(0x10, 0x10, cart , 0x4000);
-	m_bank1->configure_entries(0x20, 0x10, bios + 0x40000, 0x4000);
-	m_bank1->configure_entries(0x30, 0x10, cart + 0x40000, 0x4000);
-
-	m_bank2->configure_entries(0x00, 0x10, bios, 0x4000);
-	m_bank2->configure_entries(0x10, 0x10, cart , 0x4000);
-	m_bank2->configure_entries(0x20, 0x10, bios + 0x40000, 0x4000);
-	m_bank2->configure_entries(0x30, 0x10, cart + 0x40000, 0x4000);
-
-	m_bank3->configure_entries(0x00, 0x08, ram, 0x4000);
-	m_bank4->configure_entries(0x00, 0x08, ram, 0x4000);
-}
-
 void iqunlim_state::machine_reset()
 {
 	socrates_state::machine_reset();
 
-	m_rambank = m_rombank[0] = m_rombank[1] = 0;
 	memset(m_colors, 0, 8);
 	memset(m_video_regs, 0, 4);
 	m_kb_queue.head = m_kb_queue.tail = 0;
 
-	m_bank1->set_entry(0x00);
-	m_bank2->set_entry(0x00);
-	m_bank3->set_entry(0x00);
-	m_bank4->set_entry(0x00);
 }
 
-READ8_MEMBER( iqunlim_state::rombank_r )
+READ8_MEMBER( iqunlim_state::iqunlimz_rom_bank_r )
 {
-	return m_rombank[offset];
+	return m_rom_bank[offset];
 }
 
-WRITE8_MEMBER( iqunlim_state::rombank_w )
+WRITE8_MEMBER( iqunlim_state::iqunlimz_rom_bank_w )
 {
-	memory_bank *bank = offset ? m_bank1 : m_bank2;
-	bank->set_entry(data & 0x3f);
-
-	m_rombank[offset] = data;
-}
-
-READ8_MEMBER( iqunlim_state::rambank_r )
-{
-	return m_rambank;
-}
-
-WRITE8_MEMBER( iqunlim_state::rambank_w )
-{
-	m_bank3->set_entry(((data>>2) & 0x0c) | ((data>>0) & 0x03));
-	m_bank4->set_entry(((data>>4) & 0x0c) | ((data>>2) & 0x03));
-	m_rambank = data;
+	m_rom_bank[offset] = data;
+	if (offset)
+		m_rombank1->set_bank(data&0x3f);
+	else
+		m_rombank2->set_bank(data&0x3f);
 }
 
 WRITE8_MEMBER( iqunlim_state::colors_w )
@@ -990,27 +945,28 @@ READ8_MEMBER( iqunlim_state::keyboard_r )
 static ADDRESS_MAP_START(z80_mem, AS_PROGRAM, 8, socrates_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_ROM /* system rom, bank 0 (fixed) */
-	AM_RANGE(0x4000, 0x7fff) AM_DEVICE("rombank", address_map_bank_device, amap8) /* banked rom space; system rom is banks 0 through F, cartridge rom is banks 10 onward, usually banks 10 through 17. area past the end of the cartridge, and the whole 10-ff area when no cartridge is inserted, reads as 0xF3 */
+	AM_RANGE(0x4000, 0x7fff) AM_DEVICE("rombank1", address_map_bank_device, amap8) /* banked rom space; system rom is banks 0 through F, cartridge rom is banks 10 onward, usually banks 10 through 17. area past the end of the cartridge, and the whole 10-ff area when no cartridge is inserted, reads as 0xF3 */
 	AM_RANGE(0x8000, 0xbfff) AM_DEVICE("rambank1", address_map_bank_device, amap8) /* banked ram 'window' 0 */
 	AM_RANGE(0xc000, 0xffff) AM_DEVICE("rambank2", address_map_bank_device, amap8) /* banked ram 'window' 1 */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rombank_map, AS_PROGRAM, 8, socrates_state )
+static ADDRESS_MAP_START( socrates_rombank_map, AS_PROGRAM, 8, socrates_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x040000, 0x3fffff) AM_READ(socrates_cart_r)
+	AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_REGION("maincpu", 0) AM_MIRROR(0xF00000)      // xxxx 00** **** **** **** ****
+	AM_RANGE(0x040000, 0x07ffff) AM_READ(socrates_cart_r) AM_SELECT(0xF80000)            // **** *1** **** **** **** ****
+	AM_RANGE(0x080000, 0x0bffff) AM_READ(read_f3)                                        // xxxx 10** **** **** **** ****
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rambank_map, AS_PROGRAM, 8, socrates_state )
+static ADDRESS_MAP_START( socrates_rambank_map, AS_PROGRAM, 8, socrates_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xffff) AM_RAM AM_REGION("vram", 0)
+	AM_RANGE(0x0000, 0xffff) AM_RAM AM_REGION("vram", 0) AM_MIRROR(0x30000)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(z80_io, AS_IO, 8, socrates_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(socrates_rom_bank_r, socrates_rom_bank_w) AM_MIRROR(0x7) /* rom bank select - RW - 8 bits */
-	AM_RANGE(0x08, 0x08) AM_READWRITE(socrates_ram_bank_r, socrates_ram_bank_w) AM_MIRROR(0x7) /* ram banks select - RW - 4 low bits; Format: 0b****HHLL where LL controls whether window 0 points at ram area: 0b00: 0x0000-0x3fff; 0b01: 0x4000-0x7fff; 0b10: 0x8000-0xbfff; 0b11: 0xc000-0xffff. HH controls the same thing for window 1 */
+	AM_RANGE(0x08, 0x08) AM_READWRITE(common_ram_bank_r, common_ram_bank_w) AM_MIRROR(0x7) /* ram banks select - RW - 4 low bits; Format: 0b****HHLL where LL controls whether window 0 points at ram area: 0b00: 0x0000-0x3fff; 0b01: 0x4000-0x7fff; 0b10: 0x8000-0xbfff; 0b11: 0xc000-0xffff. HH controls the same thing for window 1 */
 	AM_RANGE(0x10, 0x17) AM_READWRITE(read_f3, socrates_sound_w) AM_MIRROR (0x8) /* sound section:
 	0x10 - W - frequency control for channel 1 (louder channel) - 01=high pitch, ff=low; time between 1->0/0->1 transitions = (XTAL_21_4772MHz/(512+256) / (freq_reg+1)) (note that this is double the actual frequency since each full low and high squarewave pulse is two transitions)
 	0x11 - W - frequency control for channel 2 (softer channel) - 01=high pitch, ff=low; same equation as above
@@ -1032,19 +988,31 @@ static ADDRESS_MAP_START(z80_io, AS_IO, 8, socrates_state )
 	AM_RANGE(0x70, 0xFF) AM_READ(read_f3) // nothing mapped here afaik
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(iqunlim_mem, AS_PROGRAM, 8, iqunlim_state)
+static ADDRESS_MAP_START(iqunlimz_mem, AS_PROGRAM, 8, iqunlim_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank2")
-	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank3")
-	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank4")
+	AM_RANGE(0x0000, 0x3fff) AM_DEVICE("rombank1", address_map_bank_device, amap8)
+	AM_RANGE(0x4000, 0x7fff) AM_DEVICE("rombank2", address_map_bank_device, amap8)
+	AM_RANGE(0x8000, 0xbfff) AM_DEVICE("rambank1", address_map_bank_device, amap8)
+	AM_RANGE(0xc000, 0xffff) AM_DEVICE("rambank2", address_map_bank_device, amap8)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( iqunlim_io , AS_IO, 8, iqunlim_state)
+static ADDRESS_MAP_START( iqunlimz_rombank_map, AS_PROGRAM, 8, iqunlim_state )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_REGION("maincpu", 0) AM_MIRROR(0xF00000)      // xxxx 00** **** **** **** ****
+	AM_RANGE(0x040000, 0x07ffff) AM_READ(socrates_cart_r) AM_SELECT(0xF80000)            // **** *1** **** **** **** ****
+	AM_RANGE(0x080000, 0x0bffff) AM_ROM AM_REGION("maincpu", 0x40000) AM_MIRROR(0xF00000)// xxxx 10** **** **** **** ****
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( iqunlimz_rambank_map, AS_PROGRAM, 8, iqunlim_state )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x3ffff) AM_RAM AM_REGION("vram", 0)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( iqunlimz_io , AS_IO, 8, iqunlim_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_READWRITE(rombank_r, rombank_w) AM_MIRROR(0x06)
-	AM_RANGE(0x08, 0x08) AM_READWRITE(rambank_r, rambank_w) AM_MIRROR(0x07)
+	AM_RANGE(0x00, 0x01) AM_READWRITE(iqunlimz_rom_bank_r, iqunlimz_rom_bank_w) AM_MIRROR(0x06)
+	AM_RANGE(0x08, 0x08) AM_READWRITE(common_ram_bank_r, common_ram_bank_w) AM_MIRROR(0x07)
 	AM_RANGE(0x10, 0x17) AM_WRITE(socrates_sound_w) AM_MIRROR (0x08)
 	AM_RANGE(0x20, 0x21) AM_WRITE(socrates_scroll_w) AM_MIRROR (0x0e)
 	AM_RANGE(0x50, 0x51) AM_READWRITE(keyboard_r, keyboard_clear)
@@ -1377,20 +1345,20 @@ static MACHINE_CONFIG_START( socrates )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", socrates_state,  assert_irq)
 	//MCFG_MACHINE_START_OVERRIDE(socrates_state,socrates)
 
-	MCFG_DEVICE_ADD("rombank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(rombank_map)
+	MCFG_DEVICE_ADD("rombank1", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(socrates_rombank_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
 	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
 
 	MCFG_DEVICE_ADD("rambank1", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(rambank_map)
+	MCFG_DEVICE_PROGRAM_MAP(socrates_rambank_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
 	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
 
 	MCFG_DEVICE_ADD("rambank2", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(rambank_map)
+	MCFG_DEVICE_PROGRAM_MAP(socrates_rambank_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
 	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
@@ -1427,20 +1395,20 @@ static MACHINE_CONFIG_START( socrates_pal )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", socrates_state,  assert_irq)
 	//MCFG_MACHINE_START_OVERRIDE(socrates_state,socrates)
 
-	MCFG_DEVICE_ADD("rombank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(rombank_map)
+	MCFG_DEVICE_ADD("rombank1", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(socrates_rombank_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
 	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
 
 	MCFG_DEVICE_ADD("rambank1", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(rambank_map)
+	MCFG_DEVICE_PROGRAM_MAP(socrates_rambank_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
 	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
 
 	MCFG_DEVICE_ADD("rambank2", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(rambank_map)
+	MCFG_DEVICE_PROGRAM_MAP(socrates_rambank_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
 	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
@@ -1485,9 +1453,33 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( iqunlimz )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz) /* not accurate */
-	MCFG_CPU_PROGRAM_MAP(iqunlim_mem)
-	MCFG_CPU_IO_MAP(iqunlim_io)
+	MCFG_CPU_PROGRAM_MAP(iqunlimz_mem)
+	MCFG_CPU_IO_MAP(iqunlimz_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", iqunlim_state,  assert_irq)
+
+	MCFG_DEVICE_ADD("rombank1", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(iqunlimz_rombank_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
+
+	MCFG_DEVICE_ADD("rombank2", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(iqunlimz_rombank_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
+
+	MCFG_DEVICE_ADD("rambank1", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(iqunlimz_rambank_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
+
+	MCFG_DEVICE_ADD("rambank2", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(iqunlimz_rambank_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1612,7 +1604,7 @@ ROM_START( iqunlimz )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "vtech.bin", 0x000000, 0x080000, CRC(f100c8a7) SHA1(6ad2a8accae2dd5c5c46ae953eef33cdd1ea3cf9) )
 
-	ROM_REGION( 0x20000, "vram", ROMREGION_ERASE )
+	ROM_REGION( 0x40000, "vram", ROMREGION_ERASE )
 ROM_END
 
 
