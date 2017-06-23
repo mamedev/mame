@@ -171,6 +171,13 @@ public:
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	struct
+	{
+		uint8_t   buffer[8];
+		int     head;
+		int     tail;
+	} m_kb_queue;
 };
 
 
@@ -214,12 +221,6 @@ private:
 	uint8_t   m_colors[8];
 	uint8_t   m_video_regs[4];
 
-	struct
-	{
-		uint8_t   buffer[8];
-		int     head;
-		int     tail;
-	} m_kb_queue;
 };
 
 /* Defines */
@@ -581,7 +582,7 @@ WRITE8_MEMBER(socrates_state::reset_speech)// i/o 60: reset speech synth
 logerror("write to i/o 0x60 of %x\n",data);
 }
 
-/* stuff below belongs in video/nc.c */
+/* stuff below belongs in video/socrates.c */
 /* graphics section:
 	0x20 - W - lsb offset of screen display
 	0x21 - W - msb offset of screen display
@@ -751,7 +752,7 @@ uint32_t socrates_state::screen_update_socrates(screen_device &screen, bitmap_in
 	return 0;
 }
 
-/* below belongs in sound/nc.c */
+/* below belongs in sound/socrates.c */
 
 WRITE8_MEMBER(socrates_state::socrates_sound_w)
 {
@@ -1425,6 +1426,24 @@ static MACHINE_CONFIG_START( socrates_pal )
 	MCFG_QUANTUM_TIME(attotime::from_hz(50))
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", socrates_state,  assert_irq)
 	//MCFG_MACHINE_START_OVERRIDE(socrates_state,socrates)
+
+	MCFG_DEVICE_ADD("rombank", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(rombank_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
+
+	MCFG_DEVICE_ADD("rambank1", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(rambank_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
+
+	MCFG_DEVICE_ADD("rambank2", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(rambank_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
