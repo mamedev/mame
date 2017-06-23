@@ -78,7 +78,7 @@ void sm500_device::execute_one()
 		case 0x70: op_ssr(); break;
 
 		case 0x80: case 0x90: case 0xa0: case 0xb0:
-			op_t(); break; // aka tr
+			op_tr(); break;
 		case 0xc0: case 0xd0: case 0xe0: case 0xf0:
 			op_trs(); break;
 

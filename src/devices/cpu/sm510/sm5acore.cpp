@@ -28,7 +28,7 @@ static ADDRESS_MAP_START(data_5x13x4, AS_DATA, 8, sm510_base_device)
 	AM_RANGE(0x10, 0x1c) AM_RAM
 	AM_RANGE(0x20, 0x2c) AM_RAM
 	AM_RANGE(0x30, 0x3c) AM_RAM
-	AM_RANGE(0x40, 0x4c) AM_RAM
+	AM_RANGE(0x40, 0x4c) AM_MIRROR(0x30) AM_RAM
 ADDRESS_MAP_END
 
 
@@ -77,7 +77,7 @@ void sm5a_device::execute_one()
 		case 0x70: op_ssr(); break; // LP
 
 		case 0x80: case 0x90: case 0xa0: case 0xb0:
-			op_t(); break; // BR (LP+this=JMP)
+			op_tr(); break; // BR (LP+this=JMP)
 		case 0xc0: case 0xd0: case 0xe0: case 0xf0:
 			op_trs(); break; // CBR/CZP (LP+this=CAL)
 
