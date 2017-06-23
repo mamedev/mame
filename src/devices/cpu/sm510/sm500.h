@@ -76,12 +76,21 @@ public:
 	sm500_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	sm500_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
+	sm500_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int o_mask, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
 
 	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options) override;
 	virtual void execute_one() override;
 	virtual void get_opcode_param() override;
+	
+	int m_o_mask; // number of 4-bit O pins minus 1
+	u8 m_ox[9];   // W' latch, max 9
+	u8 m_o[9];    // W latch(O outputs)
+	u8 m_cn;      // Cn(digit select)
+	u8 m_mx;      // m'(digit DP select)
 
+	void shift_w();
+	u8 get_digit();
+	
 	// opcode handlers
 	virtual void op_lb() override;
 	virtual void op_incb() override;
@@ -92,9 +101,13 @@ protected:
 	virtual void op_ssr();
 	virtual void op_trs();
 
-	virtual void op_pdtw();
+	virtual void op_atbp() override;
+	virtual void op_ptw() override;
 	virtual void op_tw();
+	virtual void op_pdtw();
 	virtual void op_dtw();
+	virtual void op_wr() override;
+	virtual void op_ws() override;
 
 	virtual void op_ats();
 	virtual void op_exksa();
@@ -112,7 +125,7 @@ public:
 	sm5a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	sm5a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
+	sm5a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int o_mask, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
 	
 	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options) override;
 	virtual void execute_one() override;
