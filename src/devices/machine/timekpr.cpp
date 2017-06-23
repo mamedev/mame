@@ -165,7 +165,7 @@ m48t58_device::m48t58_device(const machine_config &mconfig, const char *tag, dev
 mk48t08_device::mk48t08_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: timekeeper_device(mconfig, MK48T08, tag, owner, clock, 0x2000)
 {
-	m_offset_watchdog = 0x1ff7;
+	m_offset_watchdog = -1;
 	m_offset_control = 0x1ff8;
 	m_offset_seconds = 0x1ff9;
 	m_offset_minutes = 0x1ffa;
@@ -385,7 +385,7 @@ WRITE8_MEMBER( timekeeper_device::write )
 			m_day = ( m_day & ~DAY_CEB ) | ( data & DAY_CEB );
 		}
 	}
-	else if (offset == m_offset_watchdog)
+	else if (offset == m_offset_watchdog && type() == M48T37)
 	{
 		if ((data & 0x7f) == 0) {
 			m_watchdog_timer->adjust(attotime::never);
@@ -411,7 +411,7 @@ READ8_MEMBER( timekeeper_device::read )
 	{
 		result &= ~DATE_BL;
 	}
-	else if( offset == m_offset_flags && (type() == MK48T08 || type() == M48T37) )
+	else if( offset == m_offset_flags && type() == M48T37 )
 	{
 		// Clear the watchdog flag
 		m_data[m_offset_flags] &= ~FLAGS_WDF;
