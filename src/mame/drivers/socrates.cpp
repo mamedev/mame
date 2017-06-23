@@ -14,7 +14,6 @@ TODO:
       800khz clock/10khz output with between 1 and 4 t6684F vsm roms
       attached; create a sound driver for this!
     * fix glitches with keyboard input (double keys still don't work, super painter letter entry still doesn't work)
-    * hook up hblank (m_hblankstate is inited 0 right now and never changed)
     * hook up mouse
     * add waitstates for ram access (lack of this causes the system to run
       way too fast)
@@ -82,12 +81,12 @@ TODO:
 ******************************************************************************/
 
 /* Core includes */
-#include "emu.h"
 #include "audio/socrates.h"
+#include "cpu/z80/z80.h"
 
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
-#include "cpu/z80/z80.h"
+#include "machine/bankdev.h"
 
 #include "screen.h"
 #include "softlist.h"
@@ -110,18 +109,23 @@ public:
 		m_screen(*this, "screen"),
 		m_cart(*this, "cartslot"),
 		m_bios_reg(*this, "maincpu"),
-		m_vram_reg(*this, "vram")
+		m_vram_reg(*this, "vram"),
+		m_rombank(*this, "rombank"),
+		m_rambank1(*this, "rambank1"),
+		m_rambank2(*this, "rambank2")
 		{ }
 	required_device<cpu_device> m_maincpu;
 	required_device<socrates_snd_device> m_sound;
 	required_device<screen_device> m_screen;
 	required_device<generic_slot_device> m_cart;
-
-	rgb_t m_palette_val[256];
-
+	memory_region *m_cart_reg;
 	required_memory_region m_bios_reg;
 	required_memory_region m_vram_reg;
-	memory_region *m_cart_reg;
+	optional_device<address_map_bank_device> m_rombank;
+	optional_device<address_map_bank_device> m_rambank1;
+	optional_device<address_map_bank_device> m_rambank2;
+
+	rgb_t m_palette_val[256];
 
 	uint8_t m_data[8];
 	uint8_t m_rom_bank;
@@ -132,8 +136,6 @@ public:
 	uint8_t m_kb_latch_mouse;
 	uint8_t m_kbmcu_rscount; // how many pokes the kbmcu has taken in the last frame
 	uint8_t m_io40_latch; // what was last written to speech reg (for open bus)?
-	uint8_t m_hblankstate; // are we in hblank?
-	uint8_t m_vblankstate; // are we in vblank?
 	uint8_t m_speech_running; // is speech synth talking?
 	uint32_t m_speech_address; // address in speech space
 	uint8_t m_speech_settings; // speech settings (nybble 0: ? externrom ? ?; nybble 1: ? ? ? ?)
@@ -144,6 +146,7 @@ public:
 	DECLARE_WRITE8_MEMBER(socrates_rom_bank_w);
 	DECLARE_READ8_MEMBER(socrates_ram_bank_r);
 	DECLARE_WRITE8_MEMBER(socrates_ram_bank_w);
+	DECLARE_READ8_MEMBER(socrates_cart_r);
 	DECLARE_READ8_MEMBER(read_f3);
 	DECLARE_WRITE8_MEMBER(kbmcu_strobe);
 	DECLARE_READ8_MEMBER(status_and_speech);
@@ -162,8 +165,6 @@ public:
 	INTERRUPT_GEN_MEMBER(assert_irq);
 	TIMER_CALLBACK_MEMBER(clear_speech_cb);
 	TIMER_CALLBACK_MEMBER(clear_irq_cb);
-	void socrates_set_rom_bank();
-	void socrates_set_ram_bank();
 	void socrates_update_kb();
 	void socrates_check_kb_latch();
 	rgb_t socrates_create_color(uint8_t color);
@@ -227,23 +228,6 @@ private:
 
 /* Devices */
 
-void socrates_state::socrates_set_rom_bank()
-{
-	if (m_cart_reg && m_rom_bank >= 0x10)
-	{
-		int bank =  m_rom_bank % (m_cart->get_rom_size() / 0x4000);
-		membank("bank1")->set_base(m_cart_reg->base() + (bank * 0x4000));
-	}
-	else
-		membank("bank1")->set_base(m_bios_reg->base() + (m_rom_bank * 0x4000));
-}
-
-void socrates_state::socrates_set_ram_bank()
-{
-	membank("bank2")->set_base(m_vram_reg->base() + ( (m_ram_bank & 0x3) * 0x4000)); // window 0
-	membank("bank3")->set_base(m_vram_reg->base() + (((m_ram_bank & 0xc) >> 2) * 0x4000)); // window 1
-}
-
 void socrates_state::socrates_update_kb(  )
 {
 	static const char *const rownames[] = { "keyboard_40", "keyboard_41", "keyboard_42", "keyboard_43", "keyboard_44" };
@@ -302,13 +286,11 @@ void socrates_state::socrates_check_kb_latch(  ) // if kb[1] is full and kb[0] i
 
 void socrates_state::machine_reset()
 {
-	std::string region_tag;
-	m_cart_reg = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
+	m_cart_reg = memregion(util::string_format("%s%s", m_cart->tag(), GENERIC_ROM_REGION_TAG).c_str());
 
-	m_rom_bank = 0xF3; // actually set semi-randomly on real console but we need to initialize it somewhere...
-	socrates_set_rom_bank();
-	m_ram_bank = 0;  // the actual console sets it semi randomly on power up, and the bios cleans it up.
-	socrates_set_ram_bank();
+	m_rombank->set_bank(0xF3); // actually set semi-randomly on real console but we need to initialize it somewhere...
+	m_rambank1->set_bank(0x0);// the actual console sets it semi randomly on power up, and the bios cleans it up.
+	m_rambank2->set_bank(0x0);
 	m_kb_latch_low[0] = 0xFF;
 	m_kb_latch_high[0] = 0x8F;
 	m_kb_latch_low[1] = 0x00;
@@ -316,8 +298,6 @@ void socrates_state::machine_reset()
 	m_kb_latch_mouse = 0;
 	m_kbmcu_rscount = 0;
 	m_io40_latch = 0;
-	m_hblankstate = 0;
-	m_vblankstate = 0;
 	m_speech_running = 0;
 	m_speech_address = 0;
 	m_speech_settings = 0;
@@ -360,7 +340,7 @@ READ8_MEMBER(socrates_state::socrates_rom_bank_r)
 WRITE8_MEMBER(socrates_state::socrates_rom_bank_w)
 {
 	m_rom_bank = data;
-	socrates_set_rom_bank();
+	m_rombank->set_bank(data);
 }
 
 READ8_MEMBER(socrates_state::socrates_ram_bank_r)
@@ -370,8 +350,20 @@ READ8_MEMBER(socrates_state::socrates_ram_bank_r)
 
 WRITE8_MEMBER(socrates_state::socrates_ram_bank_w)
 {
-	m_ram_bank = data&0xF;
-	socrates_set_ram_bank();
+	m_ram_bank = data;
+	m_rambank1->set_bank(data&0x3);
+	m_rambank2->set_bank((data&0xC)>>2);
+}
+
+READ8_MEMBER(socrates_state::socrates_cart_r)
+{
+	if (m_cart_reg)
+	{
+		offset &= (m_cart->get_rom_size()-1);
+		return (*(m_cart_reg->base()+offset));
+	}
+	else
+		return 0xF3;
 }
 
 READ8_MEMBER(socrates_state::read_f3)// used for read-only i/o ports as mame/mess doesn't have a way to set the unmapped area to read as 0xF3
@@ -409,8 +401,8 @@ uint8_t *speechromext = memregion("speechext")->base();
 	int temp = 0;
 	temp |= (m_speech_running)?0x80:0;
 	temp |= 0x40; // unknown, possibly IR mcu busy
-	temp |= (m_vblankstate)?0:0x20;
-	temp |= (m_hblankstate)?0:0x10;
+	temp |= (m_screen->vblank())?0:0x20;
+	temp |= (m_screen->hblank())?0:0x10;
 	switch(m_io40_latch&0xF0) // what was last opcode sent?
 	{
 		case 0x60: case 0xE0:// speech status 'read' register
@@ -590,7 +582,11 @@ logerror("write to i/o 0x60 of %x\n",data);
 }
 
 /* stuff below belongs in video/nc.c */
-
+/* graphics section:
+	0x20 - W - lsb offset of screen display
+	0x21 - W - msb offset of screen display
+	resulting screen line is one of 512 total offsets on 128-byte boundaries in the whole 64k ram
+	*/
 WRITE8_MEMBER(socrates_state::socrates_scroll_w)
 {
 	if (offset == 0)
@@ -881,8 +877,7 @@ WRITE8_MEMBER( iqunlim_state::video_regs_w )
 
 void iqunlim_state::machine_start()
 {
-	std::string region_tag;
-	m_cart_reg = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
+	m_cart_reg = memregion(util::string_format("%s%s", m_cart->tag(), GENERIC_ROM_REGION_TAG).c_str());
 
 	uint8_t *bios = m_bios_reg->base();
 	uint8_t *cart = m_cart_reg ? m_cart_reg->base() : m_bios_reg->base();
@@ -994,9 +989,20 @@ READ8_MEMBER( iqunlim_state::keyboard_r )
 static ADDRESS_MAP_START(z80_mem, AS_PROGRAM, 8, socrates_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_ROM /* system rom, bank 0 (fixed) */
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1") /* banked rom space; system rom is banks 0 through F, cartridge rom is banks 10 onward, usually banks 10 through 17. area past the end of the cartridge, and the whole 10-ff area when no cartridge is inserted, reads as 0xF3 */
-	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank2") /* banked ram 'window' 0 */
-	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank3") /* banked ram 'window' 1 */
+	AM_RANGE(0x4000, 0x7fff) AM_DEVICE("rombank", address_map_bank_device, amap8) /* banked rom space; system rom is banks 0 through F, cartridge rom is banks 10 onward, usually banks 10 through 17. area past the end of the cartridge, and the whole 10-ff area when no cartridge is inserted, reads as 0xF3 */
+	AM_RANGE(0x8000, 0xbfff) AM_DEVICE("rambank1", address_map_bank_device, amap8) /* banked ram 'window' 0 */
+	AM_RANGE(0xc000, 0xffff) AM_DEVICE("rambank2", address_map_bank_device, amap8) /* banked ram 'window' 1 */
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( rombank_map, AS_PROGRAM, 8, socrates_state )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_REGION("maincpu", 0)
+	AM_RANGE(0x040000, 0x3fffff) AM_READ(socrates_cart_r)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( rambank_map, AS_PROGRAM, 8, socrates_state )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0xffff) AM_RAM AM_REGION("vram", 0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(z80_io, AS_IO, 8, socrates_state )
@@ -1014,13 +1020,9 @@ static ADDRESS_MAP_START(z80_io, AS_IO, 8, socrates_state )
 	No writes to ram seem to change the waveforms produced, in my limited testing.
 	0x80 produces about a very very quiet 1/8 duty cycle wave at 60hz or so
 	0xC0 produces a DMC wave read from an unknown address at around 342hz
-	0x
+	<todo: test the others, maybe take samples?>
 	*/
-	AM_RANGE(0x20, 0x21) AM_READWRITE(read_f3, socrates_scroll_w) AM_MIRROR (0xe) /* graphics section:
-	0x20 - W - lsb offset of screen display
-	0x21 - W - msb offset of screen display
-	resulting screen line is one of 512 total offsets on 128-byte boundaries in the whole 64k ram
-	*/
+	AM_RANGE(0x20, 0x21) AM_READWRITE(read_f3, socrates_scroll_w) AM_MIRROR (0xe) 
 	AM_RANGE(0x30, 0x30) AM_READWRITE(read_f3, kbmcu_strobe) AM_MIRROR (0xf) /* resets the keyboard IR decoder MCU */
 	AM_RANGE(0x40, 0x40) AM_READWRITE(status_and_speech, speech_command ) AM_MIRROR(0xf) /* reads status register for vblank/hblank/speech, also reads and writes speech module */
 	AM_RANGE(0x50, 0x50) AM_READWRITE(socrates_keyboard_low_r, socrates_keyboard_clear) AM_MIRROR(0xE) /* Keyboard keycode low, latched on keypress, can be unlatched by writing anything here */
@@ -1355,7 +1357,6 @@ INPUT_PORTS_END
 TIMER_CALLBACK_MEMBER(socrates_state::clear_irq_cb)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
-	m_vblankstate = 0;
 }
 
 INTERRUPT_GEN_MEMBER(socrates_state::assert_irq)
@@ -1363,7 +1364,6 @@ INTERRUPT_GEN_MEMBER(socrates_state::assert_irq)
 	device.execute().set_input_line(0, ASSERT_LINE);
 	timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(44), TIMER_CLEAR_IRQ);
 // 44 is a complete and total guess, need to properly measure how many clocks/microseconds the int line is high for.
-	m_vblankstate = 1;
 	m_kbmcu_rscount = 0; // clear the mcu poke count
 }
 
@@ -1375,6 +1375,24 @@ static MACHINE_CONFIG_START( socrates )
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", socrates_state,  assert_irq)
 	//MCFG_MACHINE_START_OVERRIDE(socrates_state,socrates)
+
+	MCFG_DEVICE_ADD("rombank", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(rombank_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
+
+	MCFG_DEVICE_ADD("rambank1", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(rambank_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
+
+	MCFG_DEVICE_ADD("rambank2", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(rambank_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
