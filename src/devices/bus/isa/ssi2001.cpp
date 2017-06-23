@@ -10,17 +10,12 @@
 
 DEFINE_DEVICE_TYPE(ISA8_SSI2001, ssi2001_device, "ssi2001", "Innovation SSI-2001 Audio Adapter")
 
-static MACHINE_CONFIG_START( ssi2001 )
+MACHINE_CONFIG_MEMBER( ssi2001_device::device_add_mconfig )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("sid6581", MOS6581, XTAL_14_31818MHz/16)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	MCFG_PC_JOY_ADD("pc_joy")
 MACHINE_CONFIG_END
-
-machine_config_constructor ssi2001_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( ssi2001 );
-}
 
 ssi2001_device::ssi2001_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, ISA8_SSI2001, tag, owner, clock),

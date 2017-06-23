@@ -288,10 +288,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( calorie_sound_io_map, AS_IO, 8, calorie_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
-	AM_RANGE(0x01, 0x01) AM_DEVREAD("ay1", ay8910_device, data_r)
-	AM_RANGE(0x10, 0x11) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
-	AM_RANGE(0x11, 0x11) AM_DEVREAD("ay2", ay8910_device, data_r)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay1", ym2149_device, address_data_w)
+	AM_RANGE(0x01, 0x01) AM_DEVREAD("ay1", ym2149_device, data_r)
+	AM_RANGE(0x10, 0x11) AM_DEVWRITE("ay2", ym2149_device, address_data_w)
+	AM_RANGE(0x11, 0x11) AM_DEVREAD("ay2", ym2149_device, data_r)
 	// 3rd ?
 	AM_RANGE(0x00, 0xff) AM_WRITE(bogus_w)
 ADDRESS_MAP_END
@@ -484,14 +484,14 @@ static MACHINE_CONFIG_START( calorie )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", AY8910, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)  /* YM2149 really */
+	MCFG_SOUND_ADD("ay1", YM2149, 1500000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)  /* YM2149 really */
+	MCFG_SOUND_ADD("ay2", YM2149, 1500000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
 
-	MCFG_SOUND_ADD("ay3", AY8910, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)  /* YM2149 really */
+	MCFG_SOUND_ADD("ay3", YM2149, 1500000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( caloriee, calorie )

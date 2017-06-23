@@ -478,7 +478,7 @@ WRITE_LINE_MEMBER(v53_base_device::internal_irq_w)
 }
 
 
-static MACHINE_CONFIG_START( v53 )
+MACHINE_CONFIG_MEMBER( v53_base_device::device_add_mconfig )
 
 	MCFG_DEVICE_ADD("pit", PIT8254, 0) // functionality identical to uPD71054
 	MCFG_PIT8253_CLK0(16000000) // manual implicitly claims that these runs at same speed as the CPU
@@ -508,7 +508,7 @@ static MACHINE_CONFIG_START( v53 )
 	MCFG_AM9517A_OUT_DACK_3_CB(WRITELINE(v53_base_device, dma_dack3_trampoline_w))
 
 
-	MCFG_PIC8259_ADD( "upd71059pic", WRITELINE(v53_base_device, internal_irq_w), VCC, READ8(v53_base_device,get_pic_ack))
+	MCFG_PIC8259_ADD( "upd71059pic", WRITELINE(v53_base_device, internal_irq_w), VCC, READ8(v53_base_device, get_pic_ack))
 
 
 
@@ -522,11 +522,6 @@ static MACHINE_CONFIG_START( v53 )
 	MCFG_I8251_SYNDET_HANDLER(WRITELINE(v53_base_device, scu_syndet_trampoline_cb))
 
 MACHINE_CONFIG_END
-
-machine_config_constructor v53_base_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( v53 );
-}
 
 
 v53_base_device::v53_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, offs_t fetch_xor, uint8_t prefetch_size, uint8_t prefetch_cycles, uint32_t chip_type)

@@ -77,10 +77,12 @@ static ADDRESS_MAP_START( subhuntr_map, AS_PROGRAM, 8, subhuntr_state )
 	AM_RANGE(0x1c00, 0x1fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( subhuntr_io_map, AS_IO, 8, subhuntr_state )
+static ADDRESS_MAP_START( subhuntr_io_map, AS_PROGRAM, 8, subhuntr_state )
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( subhuntr_data_map, AS_DATA, 8, subhuntr_state )
 //  AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_READWRITE( ,  )
 //  AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READWRITE( ,  )
-	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -90,8 +92,6 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 static INPUT_PORTS_START( subhuntr )
-	PORT_START("SENSE")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 INPUT_PORTS_END
 
 
@@ -136,7 +136,9 @@ static MACHINE_CONFIG_START( subhuntr )
 	MCFG_CPU_ADD("maincpu", S2650, 14318180/4/2)
 	MCFG_CPU_PROGRAM_MAP(subhuntr_map)
 	MCFG_CPU_IO_MAP(subhuntr_io_map)
+	MCFG_CPU_DATA_MAP(subhuntr_data_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", subhuntr_state, subhuntr_interrupt)
+	MCFG_S2650_SENSE_INPUT(DEVREADLINE("screen", screen_device, vblank))
 
 //  MCFG_DEVICE_ADD("s2636", S2636, 0)
 //  MCFG_S2636_WORKRAM_SIZE(0x100)

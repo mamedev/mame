@@ -25,7 +25,6 @@ taito_en_device::taito_en_device(const machine_config &mconfig, const char *tag,
 	m_ensoniq(*this, "ensoniq"),
 	m_duart68681(*this, "duart68681"),
 	m_mb87078(*this, "mb87078"),
-	m_snd_shared_ram(*this, ":snd_shared"),
 	m_es5510_dol_latch(0),
 	m_es5510_dil_latch(0),
 	m_es5510_dadr_latch(0),
@@ -79,30 +78,6 @@ void taito_en_device::device_reset()
  *  Handlers
  *
  *************************************/
-
-READ8_MEMBER( taito_en_device::en_68000_share_r )
-{
-	switch (offset & 3)
-	{
-		case 0: return (m_snd_shared_ram[offset/4]&0xff000000)>>24;
-		case 1: return (m_snd_shared_ram[offset/4]&0x00ff0000)>>16;
-		case 2: return (m_snd_shared_ram[offset/4]&0x0000ff00)>>8;
-		case 3: return (m_snd_shared_ram[offset/4]&0x000000ff)>>0;
-	}
-
-	return 0;
-}
-
-WRITE8_MEMBER( taito_en_device::en_68000_share_w )
-{
-	switch (offset & 3)
-	{
-		case 0: m_snd_shared_ram[offset/4] = (m_snd_shared_ram[offset/4]&0x00ffffff)|(data<<24);
-		case 1: m_snd_shared_ram[offset/4] = (m_snd_shared_ram[offset/4]&0xff00ffff)|(data<<16);
-		case 2: m_snd_shared_ram[offset/4] = (m_snd_shared_ram[offset/4]&0xffff00ff)|(data<<8);
-		case 3: m_snd_shared_ram[offset/4] = (m_snd_shared_ram[offset/4]&0xffffff00)|(data<<0);
-	}
-}
 
 WRITE16_MEMBER( taito_en_device::en_es5505_bank_w )
 {
@@ -221,7 +196,7 @@ WRITE16_MEMBER( taito_en_device::es5510_dsp_w )
 
 static ADDRESS_MAP_START( en_sound_map, AS_PROGRAM, 16, taito_en_device )
 	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_MIRROR(0x30000) AM_SHARE("share1")
-	AM_RANGE(0x140000, 0x140fff) AM_READWRITE8(en_68000_share_r, en_68000_share_w, 0xff00)
+	AM_RANGE(0x140000, 0x140fff) AM_DEVREADWRITE8("dpram", mb8421_device, right_r, right_w, 0xff00)
 	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE("ensoniq", es5505_device, read, write)
 	AM_RANGE(0x260000, 0x2601ff) AM_READWRITE(es5510_dsp_r, es5510_dsp_w) //todo: hook up cpu/es5510
 	AM_RANGE(0x280000, 0x28001f) AM_DEVREADWRITE8("duart68681", mc68681_device, read, write, 0x00ff)
@@ -304,6 +279,8 @@ MACHINE_CONFIG_MEMBER( taito_en_device::device_add_mconfig )
 
 	MCFG_DEVICE_ADD("mb87078", MB87078, 0)
 	MCFG_MB87078_GAIN_CHANGED_CB(WRITE8(taito_en_device, mb87078_gain_changed))
+
+	MCFG_DEVICE_ADD("dpram", MB8421, 0) // host accesses this from the other side
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

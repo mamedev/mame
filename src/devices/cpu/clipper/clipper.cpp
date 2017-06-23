@@ -28,10 +28,6 @@
 #define R1 (m_info.r1)
 #define R2 (m_info.r2)
 
-// convenience macros for dealing with the psw
-#define PSW(mask) (m_psw & PSW_##mask)
-#define SSW(mask) (m_ssw & SSW_##mask)
-
 // macros for setting psw condition codes
 #define FLAGS(C,V,Z,N) \
 	m_psw = (m_psw & ~(PSW_C | PSW_V | PSW_Z | PSW_N)) | (((C) << 3) | ((V) << 2) | ((Z) << 1) | ((N) << 0));
@@ -57,17 +53,19 @@ DEFINE_DEVICE_TYPE(CLIPPER_C300, clipper_c300_device, "clipper_c300", "C300 CLIP
 DEFINE_DEVICE_TYPE(CLIPPER_C400, clipper_c400_device, "clipper_c400", "C400 CLIPPER")
 
 clipper_c100_device::clipper_c100_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: clipper_device(mconfig, CLIPPER_C100, tag, owner, clock) { }
+	: clipper_device(mconfig, CLIPPER_C100, tag, owner, clock, 0) { }
 
 clipper_c300_device::clipper_c300_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: clipper_device(mconfig, CLIPPER_C300, tag, owner, clock) { }
+	: clipper_device(mconfig, CLIPPER_C300, tag, owner, clock, 0) { }
 
 clipper_c400_device::clipper_c400_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: clipper_device(mconfig, CLIPPER_C400, tag, owner, clock) { }
+	: clipper_device(mconfig, CLIPPER_C400, tag, owner, clock, SSW_ID_C400R4) { }
 
-clipper_device::clipper_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+clipper_device::clipper_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, const u32 cpuid)
 	: cpu_device(mconfig, type, tag, owner, clock),
 	m_pc(0),
+	m_psw(0),
+	m_ssw(cpuid),
 	m_r(m_rs),
 	m_insn_config("insn", ENDIANNESS_LITTLE, 32, 32, 0),
 	m_data_config("data", ENDIANNESS_LITTLE, 32, 32, 0),
@@ -170,7 +168,7 @@ void clipper_device::device_reset()
 	 *   ssw: EI, TP, M, U, K, KU, UU, P cleared, ID set from hardware, others undefined
 	 */
 	m_psw = 0;
-	m_ssw = 0;
+	set_ssw(0);
 
 	m_r = SSW(U) ? m_ru : m_rs;
 
@@ -425,7 +423,7 @@ int clipper_device::execute_instruction ()
 			m_psw = m_r[R2];
 		else if (!SSW(U) && (R1 == 1 || R1 == 3))
 		{
-			m_ssw = m_r[R2];
+			set_ssw(m_r[R2]);
 			m_r = SSW(U) ? m_ru : m_rs;
 		}
 		// FLAGS: CVZN
@@ -1272,7 +1270,7 @@ int clipper_device::execute_instruction ()
 					(m_info.macro >> 4) & 0xf, m_rs[(m_info.macro >> 4) & 0xf], m_pc, m_data->read_dword(m_rs[(m_info.macro >> 4) & 0xf] + 8));
 
 				m_psw = m_data->read_dword(m_rs[(m_info.macro >> 4) & 0xf] + 0);
-				m_ssw = m_data->read_dword(m_rs[(m_info.macro >> 4) & 0xf] + 4);
+				set_ssw(m_data->read_dword(m_rs[(m_info.macro >> 4) & 0xf] + 4));
 				next_pc = m_data->read_dword(m_rs[(m_info.macro >> 4) & 0xf] + 8);
 
 				m_rs[(m_info.macro >> 4) & 0xf] += 12;
@@ -1348,7 +1346,7 @@ u32 clipper_device::intrap(u32 vector, u32 pc, u32 cts, u32 mts)
 	m_rs[15] -= 24;
 
 	// load ssw from trap vector and set previous mode
-	m_ssw = (m_data->read_dword(vector + 0) & ~SSW_P) | (SSW(U) << 1);
+	set_ssw((m_data->read_dword(vector + 0) & ~(SSW(P))) | (SSW(U) << 1));
 
 	// clear psw
 	m_psw = 0;

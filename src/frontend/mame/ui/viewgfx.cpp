@@ -46,6 +46,8 @@ struct ui_gfx_info
 	uint8_t columns[MAX_GFX_ELEMENTS];    // number of items per row
 	int   offset[MAX_GFX_ELEMENTS];     // current offset of top,left item
 	int   color[MAX_GFX_ELEMENTS];      // current color selected
+	device_palette_interface *palette[MAX_GFX_ELEMENTS]; // associated palette (maybe multiple choice one day?)
+	int color_count[MAX_GFX_ELEMENTS]; // Range of color values
 };
 
 struct ui_gfx_state
@@ -116,7 +118,7 @@ static void palette_handler(mame_ui_manager &mui, render_container &container, u
 
 // graphics set handling
 static void gfxset_handle_keys(running_machine &machine, ui_gfx_state &state, int xcells, int ycells);
-static void gfxset_draw_item(running_machine &machine, gfx_element &gfx, int index, bitmap_rgb32 &bitmap, int dstx, int dsty, int color, int rotate);
+static void gfxset_draw_item(running_machine &machine, gfx_element &gfx, int index, bitmap_rgb32 &bitmap, int dstx, int dsty, int color, int rotate, device_palette_interface *dpalette);
 static void gfxset_update_bitmap(running_machine &machine, ui_gfx_state &state, int xcells, int ycells, gfx_element &gfx);
 static void gfxset_handler(mame_ui_manager &mui, render_container &container, ui_gfx_state &state);
 
@@ -191,6 +193,21 @@ static void ui_gfx_count_devices(running_machine &machine, ui_gfx_state &state)
 		{
 			state.gfxdev[state.gfxset.devcount].interface = &interface;
 			state.gfxdev[state.gfxset.devcount].setcount = count;
+			for (uint8_t slot = 0; slot != count; slot++) {
+				auto gfx = interface.gfx(slot);
+				if (gfx->has_palette())
+				{
+					state.gfxdev[state.gfxset.devcount].palette[slot] = &gfx->palette();
+					state.gfxdev[state.gfxset.devcount].color_count[slot] = gfx->colors();
+				}
+				else
+				{
+					state.gfxdev[state.gfxset.devcount].palette[slot] = state.palette.interface;
+					state.gfxdev[state.gfxset.devcount].color_count[slot] = state.palette.interface->entries() / gfx->granularity();
+					if (!state.gfxdev[state.gfxset.devcount].color_count[slot])
+						state.gfxdev[state.gfxset.devcount].color_count[slot] = 1;						
+				}
+			}
 			if (++state.gfxset.devcount == MAX_GFX_DECODERS)
 				break;
 		}
@@ -703,7 +720,7 @@ static void gfxset_handler(mame_ui_manager &mui, render_container &container, ui
 		}
 	}
 	if (!found_pixel)
-		util::stream_format(title_buf, " %dx%d COLOR %X/%X", gfx.width(), gfx.height(), info.color[set], gfx.colors());
+		util::stream_format(title_buf, " %dx%d COLOR %X/%X", gfx.width(), gfx.height(), info.color[set], info.color_count[set]);
 
 	// expand the outer box to fit the title
 	const std::string title = title_buf.str();
@@ -862,8 +879,8 @@ static void gfxset_handle_keys(running_machine &machine, ui_gfx_state &state, in
 	{ info.color[set] += 1; state.bitmap_dirty = true; }
 
 	// clamp within range
-	if (info.color[set] >= (int)gfx.colors())
-	{ info.color[set] = gfx.colors() - 1; state.bitmap_dirty = true; }
+	if (info.color[set] >= info.color_count[set])
+	{ info.color[set] = info.color_count[set] - 1; state.bitmap_dirty = true; }
 	if (info.color[set] < 0)
 	{ info.color[set] = 0; state.bitmap_dirty = true; }
 }
@@ -927,7 +944,7 @@ static void gfxset_update_bitmap(running_machine &machine, ui_gfx_state &state, 
 
 					// only render if there is data
 					if (index < gfx.elements())
-						gfxset_draw_item(machine, gfx, index, *state.bitmap, cellbounds.min_x, cellbounds.min_y, info.color[set], info.rotate[set]);
+						gfxset_draw_item(machine, gfx, index, *state.bitmap, cellbounds.min_x, cellbounds.min_y, info.color[set], info.rotate[set], info.palette[set]);
 
 					// otherwise, fill with transparency
 					else
@@ -952,11 +969,12 @@ static void gfxset_update_bitmap(running_machine &machine, ui_gfx_state &state, 
 //  the view
 //-------------------------------------------------
 
-static void gfxset_draw_item(running_machine &machine, gfx_element &gfx, int index, bitmap_rgb32 &bitmap, int dstx, int dsty, int color, int rotate)
+static void gfxset_draw_item(running_machine &machine, gfx_element &gfx, int index, bitmap_rgb32 &bitmap, int dstx, int dsty, int color, int rotate, device_palette_interface *dpalette)
 {
 	int width = (rotate & ORIENTATION_SWAP_XY) ? gfx.height() : gfx.width();
 	int height = (rotate & ORIENTATION_SWAP_XY) ? gfx.width() : gfx.height();
-	const rgb_t *palette = gfx.palette().palette()->entry_list_raw() + gfx.colorbase() + color * gfx.granularity();
+	const rgb_t *palette = dpalette->palette()->entry_list_raw() + gfx.colorbase() + color * gfx.granularity();
+
 	int x, y;
 
 	// loop over rows in the cell

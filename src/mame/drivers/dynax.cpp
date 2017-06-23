@@ -1402,15 +1402,6 @@ static ADDRESS_MAP_START( tenkai_map, AS_PROGRAM, 8, dynax_state )
 	AM_RANGE( 0x100e1, 0x100e7 ) AM_WRITE(tenkai_blitter_rev2_w)    // Blitter (inverted scroll values)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tenkai_io_map, AS_IO, 8, dynax_state )
-	AM_RANGE( T90_P3, T90_P3 ) AM_READWRITE(tenkai_p3_r, tenkai_p3_w)
-	AM_RANGE( T90_P4, T90_P4 ) AM_WRITE(tenkai_p4_w)
-	AM_RANGE( T90_P5, T90_P5 ) AM_READ(tenkai_p5_r)
-	AM_RANGE( T90_P6, T90_P6 ) AM_WRITE(tenkai_p6_w)
-	AM_RANGE( T90_P7, T90_P7 ) AM_WRITE(tenkai_p7_w)
-	AM_RANGE( T90_P8, T90_P8 ) AM_READWRITE(tenkai_p8_r, tenkai_p8_w)
-ADDRESS_MAP_END
-
 /***************************************************************************
                                 Mahjong Gekisha
 ***************************************************************************/
@@ -1542,10 +1533,6 @@ static ADDRESS_MAP_START( gekisha_map, AS_PROGRAM, 8, dynax_state )
 	AM_RANGE(  0x0000,  0x6fff ) AM_ROM
 	AM_RANGE(  0x7000,  0x7fff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(  0x8000,  0xffff ) AM_READWRITE(gekisha_8000_r, gekisha_8000_w)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( gekisha_io_map, AS_IO, 8, dynax_state )
-	AM_RANGE( T90_P4, T90_P4 ) AM_WRITE(gekisha_p4_w)
 ADDRESS_MAP_END
 
 
@@ -4952,7 +4939,14 @@ static MACHINE_CONFIG_START( tenkai )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",TMP91640, 21472700 / 2)
 	MCFG_CPU_PROGRAM_MAP(tenkai_map)
-	MCFG_CPU_IO_MAP(tenkai_io_map)
+	MCFG_TLCS90_PORT_P3_READ_CB(READ8(dynax_state, tenkai_p3_r))
+	MCFG_TLCS90_PORT_P3_WRITE_CB(WRITE8(dynax_state, tenkai_p3_w))
+	MCFG_TLCS90_PORT_P4_WRITE_CB(WRITE8(dynax_state, tenkai_p4_w))
+	MCFG_TLCS90_PORT_P5_READ_CB(READ8(dynax_state, tenkai_p5_r))
+	MCFG_TLCS90_PORT_P6_WRITE_CB(WRITE8(dynax_state, tenkai_p6_w))
+	MCFG_TLCS90_PORT_P7_WRITE_CB(WRITE8(dynax_state, tenkai_p7_w))
+	MCFG_TLCS90_PORT_P8_READ_CB(READ8(dynax_state, tenkai_p8_r))
+	MCFG_TLCS90_PORT_P8_WRITE_CB(WRITE8(dynax_state, tenkai_p8_w))
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", dynax_state, tenkai_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_START_OVERRIDE(dynax_state,tenkai)
@@ -5023,7 +5017,7 @@ static MACHINE_CONFIG_START( gekisha )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",TMP90841, XTAL_10MHz )   // ?
 	MCFG_CPU_PROGRAM_MAP(gekisha_map)
-	MCFG_CPU_IO_MAP(gekisha_io_map)
+	MCFG_TLCS90_PORT_P4_WRITE_CB(WRITE8(dynax_state, gekisha_p4_w))
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dynax_state,  irq0_line_hold)
 
 	MCFG_MACHINE_START_OVERRIDE(dynax_state,gekisha)

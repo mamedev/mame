@@ -498,7 +498,6 @@ protected:
 
 	// device-level overrides
 	virtual const tiny_rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual void device_add_mconfig(machine_config &config);
 	virtual ioport_constructor device_input_ports() const;
 	virtual void device_config_complete();

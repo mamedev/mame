@@ -229,10 +229,10 @@ DEVICE_INPUT_DEFAULTS_END
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_START( softbox )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( softbox )
+MACHINE_CONFIG_MEMBER( softbox_device::device_add_mconfig )
 	// basic machine hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/2)
 	MCFG_CPU_PROGRAM_MAP(softbox_mem)
@@ -275,17 +275,6 @@ static MACHINE_CONFIG_START( softbox )
 	MCFG_HARDDISK_INTERFACE("corvus_hdd")
 	//MCFG_IMI7000_BUS_ADD("imi5000h", nullptr, nullptr, nullptr)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor softbox_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( softbox );
-}
 
 
 //-------------------------------------------------

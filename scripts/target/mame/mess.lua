@@ -394,7 +394,7 @@ MACHINES["COM8116"] = true
 MACHINES["CR589"] = true
 MACHINES["CS4031"] = true
 MACHINES["CS8221"] = true
---MACHINES["CXD1095"] = true
+MACHINES["CXD1095"] = true
 MACHINES["DM9334"] = true
 MACHINES["DP8390"] = true
 --MACHINES["DS1204"] = true
@@ -415,6 +415,7 @@ MACHINES["HD63450"] = true
 MACHINES["HD64610"] = true
 MACHINES["HP_TACO"] = true
 MACHINES["I2CMEM"] = true
+MACHINES["I7220"] = true
 MACHINES["I80130"] = true
 MACHINES["I8089"] = true
 MACHINES["I8155"] = true
@@ -536,6 +537,7 @@ MACHINES["SMC91C9X"] = true
 MACHINES["SMPC"] = true
 MACHINES["STVCD"] = true
 MACHINES["TC0091LVC"] = true
+--MACHINES["TE7750"] = true
 MACHINES["TIMEKPR"] = true
 MACHINES["TMC0430"] = true
 MACHINES["TMP68301"] = true
@@ -573,6 +575,7 @@ MACHINES["X2212"] = true
 MACHINES["X76F041"] = true
 MACHINES["X76F100"] = true
 MACHINES["YM2148"] = true
+MACHINES["YM3802"] = true
 MACHINES["Z80CTC"] = true
 MACHINES["Z80DART"] = true
 MACHINES["Z80SIO"] = true
@@ -655,6 +658,7 @@ BUSES["GAMEGEAR"] = true
 BUSES["GBA"] = true
 BUSES["GENERIC"] = true
 BUSES["HPHIL"] = true
+BUSES["HPDIO"] = true
 BUSES["IEEE488"] = true
 BUSES["IMI7000"] = true
 BUSES["INTV"] = true
@@ -783,6 +787,7 @@ FORMATS["DCP_DSK"] = true
 FORMATS["DIM_DSK"] = true
 FORMATS["DIP_DSK"] = true
 FORMATS["DMK_DSK"] = true
+FORMATS["SDF_DSK"] = true
 FORMATS["EP64_DSK"] = true
 FORMATS["DMV_DSK"] = true
 FORMATS["ESQ16_DSK"] = true
@@ -954,6 +959,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"galaxy",
 		"gamepark",
 		"gi",
+		"gridcomp",
 		"grundy",
 		"hartung",
 		"heathkit",
@@ -1997,6 +2003,13 @@ files {
 	MAME_DIR .. "src/mame/drivers/hh_pic16.cpp",
 }
 
+createMESSProjects(_target, _subtarget, "gridcomp")
+files {
+	MAME_DIR .. "src/mame/drivers/gridcomp.cpp",
+	MAME_DIR .. "src/mame/machine/gridkeyb.cpp",
+	MAME_DIR .. "src/mame/machine/gridkeyb.h",
+}
+
 createMESSProjects(_target, _subtarget, "grundy")
 files {
 	MAME_DIR .. "src/mame/drivers/newbrain.cpp",
@@ -2434,6 +2447,7 @@ files {
 
 createMESSProjects(_target, _subtarget, "nokia")
 files {
+	MAME_DIR .. "src/mame/drivers/dbox.cpp",
 	MAME_DIR .. "src/mame/drivers/mikromik.cpp",
 	MAME_DIR .. "src/mame/includes/mikromik.h",
 	MAME_DIR .. "src/mame/machine/mm1kb.cpp",

@@ -112,22 +112,6 @@ static const char *const hdc_command_names[] =
 	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr  /* 0xF8-0xFF */
 };
 
-static MACHINE_CONFIG_START( xt_hdc_config )
-	MCFG_DEVICE_ADD("hdc",XT_HDC,0)
-	MCFG_XTHDC_IRQ_HANDLER(WRITELINE(isa8_hdc_device,irq_w))
-	MCFG_XTHDC_DRQ_HANDLER(WRITELINE(isa8_hdc_device,drq_w))
-	MCFG_HARDDISK_ADD("hdc:primary")
-	MCFG_HARDDISK_ADD("hdc:slave")
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_START( ec1841_hdc_config )
-	MCFG_DEVICE_ADD("hdc",EC1841_HDC,0)
-	MCFG_XTHDC_IRQ_HANDLER(WRITELINE(isa8_hdc_ec1841_device,irq_w))
-	MCFG_XTHDC_DRQ_HANDLER(WRITELINE(isa8_hdc_ec1841_device,drq_w))
-	MCFG_HARDDISK_ADD("hdc:primary")
-	MCFG_HARDDISK_ADD("hdc:slave")
-MACHINE_CONFIG_END
-
 ROM_START( hdc )
 	ROM_REGION(0x02000,"hdc", 0)
 	// Bios taken from WD1002A-WX1
@@ -931,19 +915,24 @@ DEFINE_DEVICE_TYPE(ISA8_HDC,        isa8_hdc_device,        "isa_hdc",        "F
 DEFINE_DEVICE_TYPE(ISA8_HDC_EC1841, isa8_hdc_ec1841_device, "isa_hdc_ec1841", "EC1841 HDC Card")
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor isa8_hdc_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( xt_hdc_config );
-}
+MACHINE_CONFIG_MEMBER( isa8_hdc_device::device_add_mconfig )
+	MCFG_DEVICE_ADD("hdc",XT_HDC,0)
+	MCFG_XTHDC_IRQ_HANDLER(WRITELINE(isa8_hdc_device,irq_w))
+	MCFG_XTHDC_DRQ_HANDLER(WRITELINE(isa8_hdc_device,drq_w))
+	MCFG_HARDDISK_ADD("hdc:primary")
+	MCFG_HARDDISK_ADD("hdc:slave")
+MACHINE_CONFIG_END
 
-machine_config_constructor isa8_hdc_ec1841_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( ec1841_hdc_config );
-}
+MACHINE_CONFIG_MEMBER( isa8_hdc_ec1841_device::device_add_mconfig )
+	MCFG_DEVICE_ADD("hdc",EC1841_HDC,0)
+	MCFG_XTHDC_IRQ_HANDLER(WRITELINE(isa8_hdc_ec1841_device,irq_w))
+	MCFG_XTHDC_DRQ_HANDLER(WRITELINE(isa8_hdc_ec1841_device,drq_w))
+	MCFG_HARDDISK_ADD("hdc:primary")
+	MCFG_HARDDISK_ADD("hdc:slave")
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
-// copyright-holders:hap
+// copyright-holders:hap, Igor
 
-// SM500 opcode handlers
+// SM500 shared opcode handlers
 
 #include "emu.h"
 #include "sm500.h"
@@ -24,6 +24,18 @@ void sm500_device::op_incb()
 	// INCB: increment BL, skip next on overflow, of 3rd bit!
 	m_bl = (m_bl + 1) & 0xf;
 	m_skip = (m_bl == 8);
+}
+
+void sm500_device::op_sbm()
+{
+	// SBM: set RAM address high bit
+	m_bm |= 4;
+}
+
+void sm500_device::op_rbm()
+{
+	// RBM: reset RAM address high bit
+	m_bm &= ~4;
 }
 
 

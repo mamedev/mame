@@ -840,8 +840,8 @@ private:
 	inline uint8_t READ8(uint32_t address) { return m_program->read_byte(address << 0); }
 	inline void WRITE8(uint32_t address, uint8_t data){     m_program->write_byte(address << 0, data); }
 
-	inline  uint64_t READAUX(uint64_t address) { return m_io->read_dword(address *4); }
-	inline void WRITEAUX(uint64_t address, uint32_t data) { m_io->write_dword(address *4, data); }
+	inline uint64_t READAUX(uint64_t address) { return m_io->read_dword(address); }
+	inline void WRITEAUX(uint64_t address, uint32_t data) { m_io->write_dword(address, data); }
 
 
 	int check_condition(uint8_t condition);

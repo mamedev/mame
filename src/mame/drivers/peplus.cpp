@@ -2099,6 +2099,29 @@ PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
 	ROM_LOAD( "cap435.u37", 0x0000, 0x0100, CRC(038cabc6) SHA1(c6514b4f9dbed6ab2631f563f7e00648661ebdbb) )
 ROM_END
 
+ROM_START( pepk1002 ) /* Normal (non-plus) board : Jake's Jacks - Gold River Gaming Hall & Resort - (PK1002) */
+/*
+                                     2-T  Q-A
+PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4J  SF  RF  (Bonus)
+-----------------------------------------------------------------
+  ????      1    2    3   4    5   8  25  40  80  50 250    800
+  % Range: 95.1-97.1%  Optimum: 99.1%  Hit Frequency: 45.5%
+     Programs Available: PK1002
+*/
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "pk1002-pc082.u58",  0x00000, 0x8000, CRC(55353658) SHA1(cc4bceb3f83c8bdaff411b988b1920060e9d9ad1) ) /* Game Version: PC082 */
+	ROM_RELOAD(                     0x08000, 0x8000) /* 32K version build for the original PE boards (non-plus) */
+
+	ROM_REGION( 0x020000, "gfx1", 0 )
+	ROM_LOAD( "mr0-cg534.u52",   0x00000, 0x4000, CRC(57180734) SHA1(39ed464e6dbe6d17af1528aa5031349b6c4eb029) )
+	ROM_LOAD( "mg0-cg534.u53",   0x08000, 0x4000, CRC(4ef5ef35) SHA1(94b9f37c4a3a8dea1eaeeafa31e19819dcad7290) )
+	ROM_LOAD( "mb0-cg534.u54",   0x10000, 0x4000, CRC(dd0d224c) SHA1(39d1d62e12a7f8edc76cb498b006006b52ba007f) )
+	ROM_LOAD( "mx0-cg534.u55",   0x18000, 0x4000, CRC(079dfe4b) SHA1(a767eba04c11b67c61654b513cf077869a216295) )
+
+	ROM_REGION( 0x100, "proms", 0 )
+	ROM_LOAD( "cap435.u37", 0x0000, 0x0100, CRC(038cabc6) SHA1(c6514b4f9dbed6ab2631f563f7e00648661ebdbb) )
+ROM_END
+
 ROM_START( pepk1004 ) /* Normal board (non-plus) : Deuces Wild Poker (PK1004) */
 /*
                                         w/D     w/oD
@@ -14090,6 +14113,7 @@ GAMEL(1987, pepk0873a, pepk0858, peplus, nonplus_poker, peplus_state, nonplus,  
 GAMEL(1987, pepk0885,  pepk0858, peplus, nonplus_poker, peplus_state, nonplus,  ROT0,  "IGT - International Game Technology", "Player's Edge (PK0885-PC056) Deuces Wild Poker (El Cortez)",    MACHINE_NOT_WORKING, layout_pe_poker )
 GAMEL(1987, pepk0930,  pepk0858, peplus, nonplus_poker, peplus_state, nonplus,  ROT0,  "IGT - International Game Technology", "Player's Edge (PK0930-PC093) Deuces Wild Poker",                MACHINE_NOT_WORKING, layout_pe_poker )
 GAMEL(1987, pepk0930a, pepk0858, peplus, nonplus_poker, peplus_state, nonplus,  ROT0,  "IGT - International Game Technology", "Player's Edge (PK0930-PC075) Deuces Wild Poker",                MACHINE_NOT_WORKING, layout_pe_poker )
+GAMEL(1987, pepk1002,  0,        peplus, nonplus_poker, peplus_state, nonplus,  ROT0,  "IGT - International Game Technology", "Player's Edge (PK1002-PC082) Jake's Jacks Bonus Poker",         MACHINE_NOT_WORKING, layout_pe_poker )
 GAMEL(1987, pepk1004,  pepk0858, peplus, nonplus_poker, peplus_state, nonplus,  ROT0,  "IGT - International Game Technology", "Player's Edge (PK1004-PC075) Deuces Wild Poker",                MACHINE_NOT_WORKING, layout_pe_poker )
 GAMEL(1987, pepk1013,  pepk0719, peplus, nonplus_poker, peplus_state, nonplus,  ROT0,  "IGT - International Game Technology", "Player's Edge (PK1013-PC087) Tens or Better",                   MACHINE_NOT_WORKING, layout_pe_poker )
 GAMEL(1987, pepk1020,  0,        peplus, nonplus_poker, peplus_state, nonplus,  ROT0,  "IGT - International Game Technology", "Player's Edge (PK1020-PC078) 4 of a Kind Bonus Poker",          MACHINE_NOT_WORKING, layout_pe_poker )

@@ -231,10 +231,10 @@ FLOPPY_FORMATS_END
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( abc_fd2 )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( abc_fd2 )
+MACHINE_CONFIG_MEMBER( abc_fd2_device::device_add_mconfig )
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_4MHz/2)
 	MCFG_CPU_PROGRAM_MAP(abc_fd2_mem)
 	MCFG_CPU_IO_MAP(abc_fd2_io)
@@ -255,18 +255,6 @@ static MACHINE_CONFIG_START( abc_fd2 )
 	MCFG_FLOPPY_DRIVE_ADD(FD1771_TAG ":0", abc_fd2_floppies, "525sssd", abc_fd2_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1771_TAG ":1", abc_fd2_floppies, "525sssd", abc_fd2_device::floppy_formats)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor abc_fd2_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( abc_fd2 );
-}
-
 
 
 //**************************************************************************

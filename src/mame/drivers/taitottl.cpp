@@ -253,5 +253,5 @@ ROM_END
 
 GAME( 1977, gunman,    0,       taitottl, 0, taitottl_state,  0, ROT0, "Taito", "Gunman [TTL]",        MACHINE_IS_SKELETON )
 GAME( 1977, missilex,  0,       taitottl, 0, taitottl_state,  0, ROT0, "Taito", "Missile-X [TTL]",     MACHINE_IS_SKELETON )
-GAME( 1977, ttblock,   0,       taitottl, 0, taitottl_state,  0, ROT0, "Taito", "T.T. Block [TTL]",    MACHINE_IS_SKELETON )
+GAME( 1977, ttblock,   0,       taitottl, 0, taitottl_state,  0, ROT0, "Taito", "T.T Block [TTL]",    MACHINE_IS_SKELETON )
 GAME( 1979, zzblock,   0,       taitottl, 0, taitottl_state,  0, ROT0, "Taito", "Zun Zun Block [TTL]", MACHINE_IS_SKELETON )

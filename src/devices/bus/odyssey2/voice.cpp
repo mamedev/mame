@@ -38,11 +38,12 @@ void o2_voice_device::device_start()
 	save_item(NAME(m_lrq_state));
 }
 
+
 //-------------------------------------------------
-//  MACHINE_CONFIG_START( sub_slot )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( o2voice )
+MACHINE_CONFIG_MEMBER( o2_voice_device::device_add_mconfig )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("sp0256_speech", SP0256, 3120000)
@@ -52,17 +53,6 @@ static MACHINE_CONFIG_START( o2voice )
 
 	MCFG_O2_CARTRIDGE_ADD("subslot", o2_cart, nullptr)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor o2_voice_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( o2voice );
-}
 
 
 ROM_START( o2voice )

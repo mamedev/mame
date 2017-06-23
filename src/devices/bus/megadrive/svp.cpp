@@ -340,25 +340,16 @@ ADDRESS_MAP_START( md_svp_ext_map, AS_IO, 16, md_rom_svp_device )
 	AM_RANGE(7*2, 7*2+1) AM_READWRITE(read_al, write_al)
 ADDRESS_MAP_END
 
+
 //-------------------------------------------------
-//  MACHINE_DRIVER( md_svp )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( md_svp )
+MACHINE_CONFIG_MEMBER( md_rom_svp_device::device_add_mconfig )
 	MCFG_CPU_ADD("svp", SSP1601, MASTER_CLOCK_NTSC / 7 * 3) /* ~23 MHz (guessed) */
 	MCFG_CPU_PROGRAM_MAP(md_svp_ssp_map)
 	MCFG_CPU_IO_MAP(md_svp_ext_map)
 MACHINE_CONFIG_END
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor md_rom_svp_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( md_svp );
-}
 
 ioport_constructor md_rom_svp_device::device_input_ports() const
 {

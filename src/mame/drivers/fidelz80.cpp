@@ -13,10 +13,6 @@
     such as Arena(in editmode).
 
     TODO:
-    - Our i8255 device emulation writes $FF to ports A/B on reset, causing a bug
-      with speech at boot for VCC and UVC. The core problem is lack of tri-state
-      pins emulation(with pullup/pulldown), for now there's a workaround which
-      can be removed together with this note when we implement it across MAME.
     - VBRC card scanner
     - VBRC MCU T1 is unknown
     - Z80 WAIT pin is not fully emulated, affecting VBRC speech busy state
@@ -811,10 +807,6 @@ MACHINE_START_MEMBER(fidelz80_state,vcc)
 
 WRITE8_MEMBER(fidelz80_state::vcc_ppi_porta_w)
 {
-	// pull output low during reset (see TODO)
-	if (machine().phase() == machine_phase::RESET)
-		data = 0;
-
 	// d0-d6: digit segment data, bits are xABCDEFG
 	m_7seg_data = BITSWAP8(data,7,0,1,2,3,4,5,6);
 	vcc_prepare_display();
@@ -841,10 +833,6 @@ READ8_MEMBER(fidelz80_state::vcc_ppi_portb_r)
 
 WRITE8_MEMBER(fidelz80_state::vcc_ppi_portb_w)
 {
-	// pull output low during reset (see TODO)
-	if (machine().phase() == machine_phase::RESET)
-		data = 0;
-
 	// d0,d2-d5: digit/led select
 	// _d6: enable language switches
 	m_led_select = data;
@@ -1697,9 +1685,11 @@ static MACHINE_CONFIG_START( cc10 )
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(fidelz80_state, cc10_ppi_porta_w))
+	MCFG_I8255_TRISTATE_PORTA_CB(CONSTANT(0))
 	MCFG_I8255_IN_PORTB_CB(IOPORT("LEVEL"))
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(fidelz80_state, vcc_ppi_portb_w))
 	MCFG_I8255_IN_PORTC_CB(READ8(fidelz80_state, vcc_ppi_portc_r))
+	MCFG_I8255_TRISTATE_PORTB_CB(CONSTANT(0))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(fidelz80_state, vcc_ppi_portc_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
@@ -1721,8 +1711,10 @@ static MACHINE_CONFIG_START( vcc )
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(fidelz80_state, vcc_ppi_porta_w))
+	MCFG_I8255_TRISTATE_PORTA_CB(CONSTANT(0))
 	MCFG_I8255_IN_PORTB_CB(READ8(fidelz80_state, vcc_ppi_portb_r))
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(fidelz80_state, vcc_ppi_portb_w))
+	MCFG_I8255_TRISTATE_PORTB_CB(CONSTANT(0))
 	MCFG_I8255_IN_PORTC_CB(READ8(fidelz80_state, vcc_ppi_portc_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(fidelz80_state, vcc_ppi_portc_w))
 

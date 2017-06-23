@@ -2877,7 +2877,7 @@ void debugger_commands::execute_map(int ref, const std::vector<std::string> &par
 		taddress = space->address_to_byte(address) & space->bytemask();
 		if (space->device().memory().translate(space->spacenum(), intention, taddress))
 		{
-			const char *mapname = space->get_handler_string((intention == TRANSLATE_WRITE_DEBUG) ? ROW_WRITE : ROW_READ, taddress);
+			const char *mapname = space->get_handler_string((intention == TRANSLATE_WRITE_DEBUG) ? read_or_write::WRITE : read_or_write::READ, taddress);
 			m_console.printf(
 					"%7s: %0*X logical == %0*X physical -> %s\n",
 					intnames[intention & 3],

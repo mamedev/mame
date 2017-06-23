@@ -2,15 +2,18 @@
 // copyright-holders:hap, Igor
 /*
 
-  KB1013VK1-2 MCU core implementation
+  Sharp SM5A MCU core implementation
 
 */
 
 #include "emu.h"
-#include "kb1013vk1-2.h"
+#include "sm500.h"
 #include "debugger.h"
 
+
 // MCU types
+DEFINE_DEVICE_TYPE(SM5A, sm5a_device, "sm5a", "SM5A")
+DEFINE_DEVICE_TYPE(SM5L, sm5l_device, "sm5l", "SM5L")
 DEFINE_DEVICE_TYPE(KB1013VK12, kb1013vk12_device, "kb1013vk1_2", "KB1013VK1-2")
 
 
@@ -28,18 +31,34 @@ static ADDRESS_MAP_START(data_5x13x4, AS_DATA, 8, sm510_base_device)
 	AM_RANGE(0x40, 0x4c) AM_RAM
 ADDRESS_MAP_END
 
+
 // device definitions
+sm5a_device::sm5a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: sm5a_device(mconfig, SM5A, tag, owner, clock, 1 /* stack levels */, 11 /* prg width */, ADDRESS_MAP_NAME(program_1_8k), 7 /* data width */, ADDRESS_MAP_NAME(data_5x13x4))
+{
+}
+
+sm5a_device::sm5a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data)
+	: sm500_device(mconfig, type, tag, owner, clock, stack_levels, prgwidth, program, datawidth, data)
+{
+}
+
+sm5l_device::sm5l_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: sm5a_device(mconfig, SM5L, tag, owner, clock, 1, 11, ADDRESS_MAP_NAME(program_1_8k), 7, ADDRESS_MAP_NAME(data_5x13x4))
+{
+}
+
 kb1013vk12_device::kb1013vk12_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: sm500_device(mconfig, KB1013VK12, tag, owner, clock, 1 /* stack levels */, 11 /* prg width */, ADDRESS_MAP_NAME(program_1_8k), 7 /* data width */, ADDRESS_MAP_NAME(data_5x13x4))
+	: sm5a_device(mconfig, KB1013VK12, tag, owner, clock, 1, 11, ADDRESS_MAP_NAME(program_1_8k), 7, ADDRESS_MAP_NAME(data_5x13x4))
 {
 }
 
 
 // disasm
-offs_t kb1013vk12_device::disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options)
+offs_t sm5a_device::disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options)
 {
-	extern CPU_DISASSEMBLE(kb1013vk12);
-	return CPU_DISASSEMBLE_NAME(kb1013vk12)(this, stream, pc, oprom, opram, options);
+	extern CPU_DISASSEMBLE(sm5a);
+	return CPU_DISASSEMBLE_NAME(sm5a)(this, stream, pc, oprom, opram, options);
 }
 
 
@@ -48,7 +67,7 @@ offs_t kb1013vk12_device::disasm_disassemble(std::ostream &stream, offs_t pc, co
 //  execute
 //-------------------------------------------------
 
-void kb1013vk12_device::execute_one()
+void sm5a_device::execute_one()
 {
 	switch (m_op & 0xf0)
 	{
@@ -78,7 +97,7 @@ void kb1013vk12_device::execute_one()
 			{
 		case 0x00: op_skip(); break; // NOP
 		case 0x01: op_atr(); break; // OAR
-		case 0x02: op_bs1(); break; // *BS1
+		case 0x02: op_sbm(); break; // *BS1
 		case 0x03: op_atbp(); break;
 		case 0x08: op_add(); break; // AM
 		case 0x09: op_add11(); break; // AC
@@ -108,7 +127,7 @@ void kb1013vk12_device::execute_one()
 		case 0x68: op_rmf(); break; // CLL
 		case 0x69: op_smf(); break; // LD0
 		case 0x6a: op_kta(); break; // ICD
-		case 0x6b: op_bs0(); break; // *BS0
+		case 0x6b: op_rbm(); break; // *BS0
 		case 0x6c: op_decb(); break; // DEC
 		case 0x6d: op_comcb(); break; // CMS
 		case 0x6e: op_rtn0(); break; // RT

@@ -233,38 +233,28 @@ void sns_rom_bsx_device::bsx_base::write(uint32_t offset, uint8_t data)
 	}
 }
 
-//-------------------------------------------------
-//  MACHINE_CONFIG_START( bs_slot )
-//-------------------------------------------------
 
 static SLOT_INTERFACE_START(bsx_cart)
 	SLOT_INTERFACE_INTERNAL("bsmempak",  SNS_BSMEMPAK)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( bs_slot )
+
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( sns_rom_bsx_device::device_add_mconfig )
 	MCFG_SNS_BSX_CARTRIDGE_ADD("bs_slot", bsx_cart, nullptr)
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_MEMBER( sns_rom_bsxlo_device::device_add_mconfig )
+	MCFG_SNS_BSX_CARTRIDGE_ADD("bs_slot", bsx_cart, nullptr)
+MACHINE_CONFIG_END
 
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
+MACHINE_CONFIG_MEMBER( sns_rom_bsxhi_device::device_add_mconfig )
+	MCFG_SNS_BSX_CARTRIDGE_ADD("bs_slot", bsx_cart, nullptr)
+MACHINE_CONFIG_END
 
-machine_config_constructor sns_rom_bsx_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( bs_slot );
-}
-
-machine_config_constructor sns_rom_bsxlo_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( bs_slot );
-}
-
-machine_config_constructor sns_rom_bsxhi_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( bs_slot );
-}
 
 /*-------------------------------------------------
  mapper specific handlers

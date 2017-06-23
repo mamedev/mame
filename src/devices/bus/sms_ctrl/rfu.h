@@ -29,22 +29,22 @@ public:
 	// construction/destruction
 	sms_rapid_fire_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual ioport_constructor device_input_ports() const override;
-
-	DECLARE_WRITE_LINE_MEMBER(th_pin_w);
-	DECLARE_READ32_MEMBER(pixel_r);
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+
+	// optional information overrides
+	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	// device_sms_control_port_interface overrides
 	virtual uint8_t peripheral_r() override;
 	virtual void peripheral_w(uint8_t data) override;
 
 private:
+	DECLARE_WRITE_LINE_MEMBER(th_pin_w);
+	DECLARE_READ32_MEMBER(pixel_r);
+
 	required_ioport m_rfire_sw;
 	required_device<sms_control_port_device> m_subctrl_port;
 

@@ -169,6 +169,11 @@ WRITE8_MEMBER( ramdac_device::pal_w )
 	reg_increment(0);
 }
 
+READ8_MEMBER( ramdac_device::mask_r )
+{
+	return m_pal_mask;
+}
+
 WRITE8_MEMBER( ramdac_device::mask_w )
 {
 	m_pal_mask = data;

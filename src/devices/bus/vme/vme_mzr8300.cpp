@@ -118,10 +118,16 @@ DEFINE_DEVICE_TYPE(VME_MZR8300, vme_mzr8300_card_device, "mzr8300", "Mizar 8300 
 
 /* These values are borrowed just to get the terminal going and should be replaced
  * once a proper serial board hardware (ie MZ 8300) is found and emulated. */
+
+
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
 #define BAUDGEN_CLOCK XTAL_19_6608MHz /* fake */
 #define SIO_CLOCK (BAUDGEN_CLOCK / 128) /* This will give prompt */
 
-MACHINE_CONFIG_START( mzr8300 )
+MACHINE_CONFIG_MEMBER( vme_mzr8300_card_device::device_add_mconfig )
 	MCFG_UPD7201_ADD("sio0", XTAL_4MHz, SIO_CLOCK, SIO_CLOCK, SIO_CLOCK, SIO_CLOCK )
 
 	MCFG_Z80SIO_OUT_TXDB_CB(DEVWRITELINE("rs232p1", rs232_port_device, write_txd))
@@ -135,17 +141,6 @@ MACHINE_CONFIG_START( mzr8300 )
 	MCFG_Z80SIO_ADD("sio1", XTAL_4MHz, 0, 0, 0, 0 )
 MACHINE_CONFIG_END
 
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-
-machine_config_constructor vme_mzr8300_card_device::device_mconfig_additions() const
-{
-	LOG("%s %s\n", tag(), FUNCNAME);
-	return MACHINE_CONFIG_NAME( mzr8300 );
-}
 
 //**************************************************************************
 //  LIVE DEVICE

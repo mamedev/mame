@@ -138,9 +138,10 @@ public:
 	// construction/destruction
 	nes_sunsoft_5_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
 	virtual DECLARE_WRITE8_MEMBER(write_h) override;
+
+protected:
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	required_device<ay8910_device> m_ym2149;

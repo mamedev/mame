@@ -1127,11 +1127,11 @@ INPUT_PORTS_END
 	ROM_LOAD("opr14747.bin",   0x0a0000,  0x20000, CRC(a4ad5e19) SHA1(7d7ec300eeb9a8de1590011e37108688c092f329) ) \
 	ROM_LOAD("opr14748.bin",   0x0c0000,  0x20000, CRC(4a532cb8) SHA1(23280ebbcd6b2bc8a8e643a2d07a58d6598301b8) ) \
 \
-	/*ROM_REGION32_LE( 0x2000, "315_5571", 0)*/ \
-	/*ROM_LOAD("315-5571.bin", 0, 0x2000, CRC(1233db2a) SHA1(06760409d40f3d9117fd3e7c7ab62dfd70aa2a4d) )*/ \
+	ROM_REGION32_LE( 0x2000, "315_5571", 0) \
+	ROM_LOAD("315-5571.bin", 0, 0x2000, CRC(1233db2a) SHA1(06760409d40f3d9117fd3e7c7ab62dfd70aa2a4d) ) \
 \
-	/*ROM_REGION32_LE( 0x2000, "315_5572", 0)*/ \
-	/*ROM_LOAD("315-5572.bin", 0, 0x2000, CRC(0a534a3b) SHA1(b8c988bc414b3ad3cd036ba5a64b5ee04a4758b4) )*/
+	ROM_REGION32_LE( 0x2000, "315_5572", 0) \
+	ROM_LOAD("315-5572.bin", 0, 0x2000, CRC(0a534a3b) SHA1(b8c988bc414b3ad3cd036ba5a64b5ee04a4758b4) )
 
 ROM_START( vf )
 	MODEL1_CPU_BOARD
@@ -1225,7 +1225,7 @@ ROM_START( vr )
 
 	ROM_REGION( 0x2000, "tgp", 0 ) /* TGP program rom */
 	// The real internal TGP rom
-	/*ROM_LOAD("315-5573.bin", 0, 0x2000, CRC(ec913af2) SHA1(a18bf6c9d7b35f8b9e513a7d279f13a30b32a961) )*/
+	ROM_LOAD("315-5573.bin", 0, 0x2000, CRC(ec913af2) SHA1(a18bf6c9d7b35f8b9e513a7d279f13a30b32a961) )
 
 	// this is the Daytona TGP program with some modifications needed for Virtua Racing
 	// Kept here for now to avoid instantly breaking the game until the tgp is up to it
@@ -1289,7 +1289,7 @@ ROM_START( vformula )
 
 	ROM_REGION( 0x2000, "tgp", 0 ) /* TGP program rom */
 	// The real internal TGP rom
-	/*ROM_LOAD("315-5573.bin", 0, 0x2000, CRC(ec913af2) SHA1(a18bf6c9d7b35f8b9e513a7d279f13a30b32a961) )*/
+	ROM_LOAD("315-5573.bin", 0, 0x2000, CRC(ec913af2) SHA1(a18bf6c9d7b35f8b9e513a7d279f13a30b32a961) )
 
 	// this is the Daytona TGP program with some modifications needed for Virtua Racing
 	// Kept here for now to avoid instantly breaking the game until the tgp is up to it

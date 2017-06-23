@@ -24,15 +24,6 @@ DEFINE_DEVICE_TYPE(A2BUS_PIC, a2bus_pic_device, "a2pic", "Apple Parallel Interfa
 #define PIC_ROM_REGION  "pic_rom"
 #define PIC_CENTRONICS_TAG "pic_ctx"
 
-MACHINE_CONFIG_START( pic )
-	MCFG_CENTRONICS_ADD(PIC_CENTRONICS_TAG, centronics_devices, "printer")
-	MCFG_CENTRONICS_DATA_INPUT_BUFFER("ctx_data_in")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(a2bus_pic_device, ack_w))
-
-	MCFG_DEVICE_ADD("ctx_data_in", INPUT_BUFFER, 0)
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("ctx_data_out", PIC_CENTRONICS_TAG)
-MACHINE_CONFIG_END
-
 ROM_START( pic )
 	ROM_REGION(0x000200, PIC_ROM_REGION, 0)
 	ROM_LOAD( "341-0057.bin", 0x000000, 0x000200, CRC(0d2d84ee) SHA1(bfc5b863d37e59875a6159528eb0f2b6082063b5) )
@@ -77,14 +68,17 @@ ioport_constructor a2bus_pic_device::device_input_ports() const
 }
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor a2bus_pic_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( pic );
-}
+MACHINE_CONFIG_MEMBER( a2bus_pic_device::device_add_mconfig )
+	MCFG_CENTRONICS_ADD(PIC_CENTRONICS_TAG, centronics_devices, "printer")
+	MCFG_CENTRONICS_DATA_INPUT_BUFFER("ctx_data_in")
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(a2bus_pic_device, ack_w))
+
+	MCFG_DEVICE_ADD("ctx_data_in", INPUT_BUFFER, 0)
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("ctx_data_out", PIC_CENTRONICS_TAG)
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region

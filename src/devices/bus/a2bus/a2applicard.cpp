@@ -37,12 +37,6 @@ static ADDRESS_MAP_START( z80_io, AS_IO, 8, a2bus_applicard_device )
 	AM_RANGE(0x00, 0x60) AM_MIRROR(0xff00) AM_READWRITE(z80_io_r, z80_io_w)
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_START( a2applicard )
-	MCFG_CPU_ADD(Z80_TAG, Z80, 6000000) // Z80 runs at 6 MHz
-	MCFG_CPU_PROGRAM_MAP(z80_mem)
-	MCFG_CPU_IO_MAP(z80_io)
-MACHINE_CONFIG_END
-
 ROM_START( a2applicard )
 	ROM_REGION(0x800, Z80_ROM_REGION, 0)
 	ROM_LOAD( "applicard-v9.bin", 0x000000, 0x000800, CRC(1d461000) SHA1(71d633be864b6084362e85108a4e600cbe6e44fe) )
@@ -53,14 +47,14 @@ ROM_END
 ***************************************************************************/
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor a2bus_applicard_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( a2applicard );
-}
+MACHINE_CONFIG_MEMBER( a2bus_applicard_device::device_add_mconfig )
+	MCFG_CPU_ADD(Z80_TAG, Z80, 6000000) // Z80 runs at 6 MHz
+	MCFG_CPU_PROGRAM_MAP(z80_mem)
+	MCFG_CPU_IO_MAP(z80_io)
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  device_rom_region - device-specific ROMs

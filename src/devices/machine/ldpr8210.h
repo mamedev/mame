@@ -69,7 +69,7 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	// subclass overrides
 	virtual void player_vsync(const vbi_metadata &vbi, int fieldnum, const attotime &curtime) override;
@@ -85,16 +85,17 @@ protected:
 	virtual void update_audio_squelch() { set_audio_squelch((m_i8049_port1 & 0x40) || !(m_pia.portb & 0x01), (m_i8049_port1 & 0x40) || !(m_pia.portb & 0x02)); }
 
 public:
-	// internal read/write handlers
 	DECLARE_READ8_MEMBER( i8049_pia_r );
 	DECLARE_WRITE8_MEMBER( i8049_pia_w );
+
+protected:
+	// internal read/write handlers
 	DECLARE_READ8_MEMBER( i8049_bus_r );
 	DECLARE_WRITE8_MEMBER( i8049_port1_w );
 	DECLARE_WRITE8_MEMBER( i8049_port2_w );
 	DECLARE_READ_LINE_MEMBER( i8049_t0_r );
 	DECLARE_READ_LINE_MEMBER( i8049_t1_r );
 
-protected:
 	// pioneer PIA subclass
 	class pioneer_pia
 	{
@@ -165,20 +166,21 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	// internal helpers
 	virtual bool override_control() const override { return m_controlthis; }
 	virtual void update_audio_squelch() override { set_audio_squelch(m_audio_squelch, m_audio_squelch); }
 
 public:
+	DECLARE_READ8_MEMBER( i8748_data_r );
+
+private:
 	// internal read/write handlers
 	DECLARE_READ8_MEMBER( i8748_port2_r );
 	DECLARE_WRITE8_MEMBER( i8748_port2_w );
-	DECLARE_READ8_MEMBER( i8748_data_r );
 	DECLARE_READ_LINE_MEMBER( i8748_t0_r );
 
-protected:
 	// internal state
 	required_device<i8748_device> m_i8748_cpu;
 	uint8_t               m_audio_squelch;            // audio squelch value

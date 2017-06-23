@@ -6,7 +6,7 @@
 
   Barcrest:
 
-  Machine Processor Unit / MPU0 techincally
+  Machine Processor Unit / MPU0 technically
    -- No ram/roms, lots of discrete DTL logic
 
   MPU1
@@ -57,9 +57,12 @@ protected:
 
 static ADDRESS_MAP_START( mpu2_basemap, AS_PROGRAM, 8, mpu2_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff) // A14/A15 Not Connected
-	AM_RANGE(0x1000, 0x17ff) AM_ROM AM_REGION("maskrom", 0)
+	AM_RANGE(0x0000, 0x007f) AM_RAM
 	AM_RANGE(0x0800, 0x0fff) AM_ROM AM_REGION("romp1", 0)
-	AM_RANGE(0x3800, 0x3fff) AM_ROM AM_REGION("romp2", 0)
+	AM_RANGE(0x1000, 0x17ff) AM_ROM AM_REGION("maskrom", 0)
+	AM_RANGE(0x1800, 0x1fff) AM_ROM AM_REGION("romp2", 0) AM_MIRROR(0x2000)
+	AM_RANGE(0x2000, 0x2003) AM_RAM // maybe a 6821?
+	AM_RANGE(0x2004, 0x2007) AM_RAM // maybe a 6821?
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( mpu2 )

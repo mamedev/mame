@@ -434,6 +434,7 @@ public:
 	virtual void machine_reset() override;
 	uint32_t screen_update_viper(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(viper_vblank);
+	WRITE_LINE_MEMBER(voodoo_pciint);
 	TIMER_CALLBACK_MEMBER(epic_global_timer_callback);
 	TIMER_CALLBACK_MEMBER(ds2430_timer_callback);
 #if VIPER_DEBUG_EPIC_REGS
@@ -2278,7 +2279,6 @@ INPUT_PORTS_END
 
 /*****************************************************************************/
 
-
 INTERRUPT_GEN_MEMBER(viper_state::viper_vblank)
 {
 	mpc8240_interrupt(MPC8240_IRQ0);
@@ -2287,7 +2287,16 @@ INTERRUPT_GEN_MEMBER(viper_state::viper_vblank)
 
 WRITE_LINE_MEMBER(viper_state::voodoo_vblank)
 {
-	mpc8240_interrupt(MPC8240_IRQ4);
+	// FIXME: The driver seems to hang using the voodoo vblank signa
+	//if (state)
+	//	mpc8240_interrupt(MPC8240_IRQ0);
+	//mpc8240_interrupt(MPC8240_IRQ3);
+}
+
+WRITE_LINE_MEMBER(viper_state::voodoo_pciint)
+{
+	if (state)
+		mpc8240_interrupt(MPC8240_IRQ4);
 }
 
 void viper_state::machine_start()
@@ -2325,7 +2334,7 @@ static MACHINE_CONFIG_START( viper )
 	MCFG_CPU_ADD("maincpu", MPC8240, 200000000)
 	MCFG_PPC_BUS_FREQUENCY(100000000)
 	MCFG_CPU_PROGRAM_MAP(viper_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", viper_state,  viper_vblank)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", viper_state, viper_vblank)
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
 	MCFG_PCI_BUS_LEGACY_DEVICE(0, "mpc8240", mpc8240_pci_r, mpc8240_pci_w)
@@ -2338,6 +2347,7 @@ static MACHINE_CONFIG_START( viper )
 	MCFG_VOODOO_SCREEN_TAG("screen")
 	MCFG_VOODOO_CPU_TAG("maincpu")
 	MCFG_VOODOO_VBLANK_CB(WRITELINE(viper_state,voodoo_vblank))
+	MCFG_VOODOO_PCIINT_CB(WRITELINE(viper_state, voodoo_pciint))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

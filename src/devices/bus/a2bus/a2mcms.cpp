@@ -41,7 +41,15 @@ DEFINE_DEVICE_TYPE(A2BUS_MCMS2, a2bus_mcms2_device, "a2mcms2", "Mountain Compute
 #define MCFG_MCMS_IRQ_CALLBACK(_cb) \
 	devcb = &mcms_device::set_irq_cb(*device, DEVCB_##_cb);
 
-MACHINE_CONFIG_START( a2mcms )
+/***************************************************************************
+    FUNCTION PROTOTYPES
+***************************************************************************/
+
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( a2bus_mcms1_device::device_add_mconfig )
 	MCFG_SPEAKER_STANDARD_STEREO("mcms_l", "mcms_r")
 
 	MCFG_DEVICE_ADD(ENGINE_TAG, MCMS, 1000000)
@@ -50,20 +58,6 @@ MACHINE_CONFIG_START( a2mcms )
 	MCFG_SOUND_ROUTE(0, "mcms_l", 1.0)
 	MCFG_SOUND_ROUTE(1, "mcms_r", 1.0)
 MACHINE_CONFIG_END
-
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor a2bus_mcms1_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( a2mcms );
-}
 
 //**************************************************************************
 //  LIVE DEVICE - Card 1

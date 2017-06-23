@@ -35,18 +35,6 @@
 
 DEFINE_DEVICE_TYPE(P1_HDC, p1_hdc_device, "p1_hdc", "Poisk-1 MFM disk B942")
 
-static MACHINE_CONFIG_START( hdc_b942 )
-	MCFG_DEVICE_ADD(KM1809VG7_TAG, WD2010, 5000000) // XXX clock?
-	MCFG_WD2010_IN_DRDY_CB(VCC)
-	MCFG_WD2010_IN_INDEX_CB(VCC)
-	MCFG_WD2010_IN_WF_CB(VCC)
-	MCFG_WD2010_IN_TK000_CB(VCC)
-	MCFG_WD2010_IN_SC_CB(VCC)
-
-	MCFG_HARDDISK_ADD("hard0")
-	MCFG_HARDDISK_ADD("hard1")
-MACHINE_CONFIG_END
-
 
 //-------------------------------------------------
 //  ROM( p1_hdc )
@@ -67,14 +55,20 @@ ROM_END
 
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor p1_hdc_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME(hdc_b942);
-}
+MACHINE_CONFIG_MEMBER( p1_hdc_device::device_add_mconfig )
+	MCFG_DEVICE_ADD(KM1809VG7_TAG, WD2010, 5000000) // XXX clock?
+	MCFG_WD2010_IN_DRDY_CB(VCC)
+	MCFG_WD2010_IN_INDEX_CB(VCC)
+	MCFG_WD2010_IN_WF_CB(VCC)
+	MCFG_WD2010_IN_TK000_CB(VCC)
+	MCFG_WD2010_IN_SC_CB(VCC)
+
+	MCFG_HARDDISK_ADD("hard0")
+	MCFG_HARDDISK_ADD("hard1")
+MACHINE_CONFIG_END
 
 
 //-------------------------------------------------

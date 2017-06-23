@@ -63,7 +63,8 @@ ADDRESS_MAP_END
 tlcs90_device::tlcs90_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor program_map)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 20, 0, program_map)
-	, m_io_config("io", ENDIANNESS_LITTLE, 8, 16, 0)
+	, m_port_read_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
+	, m_port_write_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
 {
 }
 
@@ -2329,26 +2330,26 @@ FFED    BX      R/W     Reset   Description
 
 READ8_MEMBER( tlcs90_device::t90_internal_registers_r )
 {
-	#define RIO     m_io->read_byte( T90_IOBASE+offset )
-
 	uint8_t data = m_internal_registers[offset];
 	switch ( T90_IOBASE + offset )
 	{
 		case T90_P3:    // 7,4,1,0
-			return (data & 0x6c) | (RIO & 0x93);
+			return (data & 0x6c) | (m_port_read_cb[3]() & 0x93);
 
 		case T90_P4:    // only output
 			return data & 0x0f;
 
 		case T90_P5:
-			return (RIO & 0x3f);
+			return (m_port_read_cb[5]() & 0x3f);
 
 		case T90_P6:
+			return (data & 0xf0) | (m_port_read_cb[6]() & 0x0f);
+
 		case T90_P7:
-			return (data & 0xf0) | (RIO & 0x0f);
+			return (data & 0xf0) | (m_port_read_cb[7]() & 0x0f);
 
 		case T90_P8:    // 2,1,0
-			return (data & 0x08) | (RIO & 0x07);
+			return (data & 0x08) | (m_port_read_cb[8]() & 0x07);
 
 		case T90_BX:
 		case T90_BY:
@@ -2523,8 +2524,6 @@ TIMER_CALLBACK_MEMBER( tlcs90_device::t90_timer4_callback )
 
 WRITE8_MEMBER( tlcs90_device::t90_internal_registers_w )
 {
-	#define WIO     m_io->write_byte( T90_IOBASE+offset, data )
-
 	uint8_t out_mask;
 	uint8_t old = m_internal_registers[offset];
 	switch ( T90_IOBASE + offset )
@@ -2586,7 +2585,7 @@ WRITE8_MEMBER( tlcs90_device::t90_internal_registers_w )
 
 		case T90_P3:
 			data &= 0x6c;
-			WIO;
+			m_port_write_cb[3](data);
 			break;
 
 		case T90_P4:
@@ -2595,7 +2594,7 @@ WRITE8_MEMBER( tlcs90_device::t90_internal_registers_w )
 			if (out_mask)
 			{
 				data &= out_mask;
-				WIO;
+				m_port_write_cb[4](data);
 			}
 			break;
 
@@ -2617,7 +2616,7 @@ WRITE8_MEMBER( tlcs90_device::t90_internal_registers_w )
 			if (out_mask)
 			{
 				data &= out_mask;
-				WIO;
+				m_port_write_cb[6](data);
 			}
 			break;
 
@@ -2639,7 +2638,7 @@ WRITE8_MEMBER( tlcs90_device::t90_internal_registers_w )
 			if (out_mask)
 			{
 				data &= out_mask;
-				WIO;
+				m_port_write_cb[7](data);
 			}
 			break;
 
@@ -2649,7 +2648,7 @@ WRITE8_MEMBER( tlcs90_device::t90_internal_registers_w )
 			if (out_mask)
 			{
 				data &= out_mask;
-				WIO;
+				m_port_write_cb[8](data);
 			}
 			break;
 
@@ -2666,7 +2665,10 @@ WRITE8_MEMBER( tlcs90_device::t90_internal_registers_w )
 
 void tlcs90_device::device_start()
 {
-	int i, p;
+	for (auto &cb : m_port_read_cb)
+		cb.resolve_safe(0xff);
+	for (auto &cb : m_port_write_cb)
+		cb.resolve_safe();
 
 	save_item(NAME(m_prvpc.w.l));
 	save_item(NAME(m_pc.w.l));
@@ -2707,9 +2709,9 @@ void tlcs90_device::device_start()
 	save_item(NAME(m_cyc_f));
 	save_item(NAME(m_addr));
 
-	for (i = 0; i < 256; i++)
+	for (int i = 0; i < 256; i++)
 	{
-		p = 0;
+		int p = 0;
 		if( i&0x01 ) ++p;
 		if( i&0x02 ) ++p;
 		if( i&0x04 ) ++p;
@@ -2749,13 +2751,12 @@ void tlcs90_device::device_start()
 	m_addr = 0;
 
 	m_program = &space(AS_PROGRAM);
-	m_io = &space(AS_IO);
 
 	m_timer_period = attotime::from_hz(unscaled_clock()) * 8;
 
 	// Timers
 
-	for (i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++)
 		m_timer[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tlcs90_device::t90_timer_callback),this));
 
 	m_timer[4] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tlcs90_device::t90_timer4_callback),this));

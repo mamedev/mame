@@ -144,6 +144,7 @@ d6809.cpp
 dai.cpp
 daruma.cpp
 datum.cpp
+dbox.cpp
 dccons.cpp
 dct11em.cpp
 dectalk.cpp
@@ -226,6 +227,7 @@ goupil.cpp
 gp2x.cpp
 gp32.cpp
 grfd2301.cpp
+gridcomp.cpp
 h19.cpp
 h8.cpp
 h89.cpp

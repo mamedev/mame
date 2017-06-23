@@ -130,8 +130,8 @@ static ADDRESS_MAP_START( ojankohs_io_map, AS_IO, 8, ojankohs_state )
 	AM_RANGE(0x03, 0x03) AM_WRITE(ojankohs_adpcm_reset_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(ojankohs_flipscreen_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE(ojankohs_msm5205_w)
-	AM_RANGE(0x06, 0x06) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0x06, 0x07) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
+	AM_RANGE(0x06, 0x06) AM_DEVREAD("aysnd", ym2149_device, data_r)
+	AM_RANGE(0x06, 0x07) AM_DEVWRITE("aysnd", ym2149_device, data_address_w)
 	AM_RANGE(0x10, 0x11) AM_DEVWRITE("gga", vsystem_gga_device, write)
 ADDRESS_MAP_END
 
@@ -736,7 +736,7 @@ static MACHINE_CONFIG_START( ojankohs )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 12000000/6)
+	MCFG_SOUND_ADD("aysnd", YM2149, 12000000/6)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(ojankohs_state, ojankohs_dipsw1_r))
 	MCFG_AY8910_PORT_B_READ_CB(READ8(ojankohs_state, ojankohs_dipsw2_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)

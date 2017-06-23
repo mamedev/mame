@@ -64,40 +64,6 @@ WRITE_LINE_MEMBER(kc_d002_device::out_halt_w)
 	m_slot->m_out_halt_cb(state);
 }
 
-static MACHINE_CONFIG_START( kc_d002 )
-	MCFG_DEVICE_ADD("m0", KCCART_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(kc85_cart, nullptr, false)
-	MCFG_KCCART_SLOT_NEXT_SLOT("m4")
-	MCFG_KCCART_SLOT_OUT_IRQ_CB(WRITELINE(kc_d002_device, out_irq_w))
-	MCFG_KCCART_SLOT_OUT_NMI_CB(WRITELINE(kc_d002_device, out_nmi_w))
-	MCFG_KCCART_SLOT_OUT_HALT_CB(WRITELINE(kc_d002_device, out_halt_w))
-	MCFG_DEVICE_ADD("m4", KCCART_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(kc85_cart, nullptr, false)
-	MCFG_KCCART_SLOT_NEXT_SLOT("m8")
-	MCFG_KCCART_SLOT_OUT_IRQ_CB(WRITELINE(kc_d002_device, out_irq_w))
-	MCFG_KCCART_SLOT_OUT_NMI_CB(WRITELINE(kc_d002_device, out_nmi_w))
-	MCFG_KCCART_SLOT_OUT_HALT_CB(WRITELINE(kc_d002_device, out_halt_w))
-	MCFG_DEVICE_ADD("m8", KCCART_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(kc85_cart, nullptr, false)
-	MCFG_KCCART_SLOT_NEXT_SLOT("mc")
-	MCFG_KCCART_SLOT_OUT_IRQ_CB(WRITELINE(kc_d002_device, out_irq_w))
-	MCFG_KCCART_SLOT_OUT_NMI_CB(WRITELINE(kc_d002_device, out_nmi_w))
-	MCFG_KCCART_SLOT_OUT_HALT_CB(WRITELINE(kc_d002_device, out_halt_w))
-	MCFG_DEVICE_ADD("mc", KCCART_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(kc85_cart, nullptr, false)
-	MCFG_KCCART_SLOT_NEXT_SLOT("exp")
-	MCFG_KCCART_SLOT_OUT_IRQ_CB(WRITELINE(kc_d002_device, out_irq_w))
-	MCFG_KCCART_SLOT_OUT_NMI_CB(WRITELINE(kc_d002_device, out_nmi_w))
-	MCFG_KCCART_SLOT_OUT_HALT_CB(WRITELINE(kc_d002_device, out_halt_w))
-
-	// expansion interface
-	MCFG_DEVICE_ADD("exp", KCCART_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(kc85_exp, nullptr, false)
-	MCFG_KCEXP_SLOT_NEXT_SLOT(nullptr)
-	MCFG_KCEXP_SLOT_OUT_IRQ_CB(WRITELINE(kc_d002_device, out_irq_w))
-	MCFG_KCEXP_SLOT_OUT_NMI_CB(WRITELINE(kc_d002_device, out_nmi_w))
-	MCFG_KCEXP_SLOT_OUT_HALT_CB(WRITELINE(kc_d002_device, out_halt_w))
-MACHINE_CONFIG_END
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -139,13 +105,43 @@ void kc_d002_device::device_reset()
 }
 
 //-------------------------------------------------
-//  device_mconfig_additions
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor kc_d002_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( kc_d002 );
-}
+MACHINE_CONFIG_MEMBER( kc_d002_device::device_add_mconfig )
+	MCFG_DEVICE_ADD("m0", KCCART_SLOT, 0)
+	MCFG_DEVICE_SLOT_INTERFACE(kc85_cart, nullptr, false)
+	MCFG_KCCART_SLOT_NEXT_SLOT("m4")
+	MCFG_KCCART_SLOT_OUT_IRQ_CB(WRITELINE(kc_d002_device, out_irq_w))
+	MCFG_KCCART_SLOT_OUT_NMI_CB(WRITELINE(kc_d002_device, out_nmi_w))
+	MCFG_KCCART_SLOT_OUT_HALT_CB(WRITELINE(kc_d002_device, out_halt_w))
+	MCFG_DEVICE_ADD("m4", KCCART_SLOT, 0)
+	MCFG_DEVICE_SLOT_INTERFACE(kc85_cart, nullptr, false)
+	MCFG_KCCART_SLOT_NEXT_SLOT("m8")
+	MCFG_KCCART_SLOT_OUT_IRQ_CB(WRITELINE(kc_d002_device, out_irq_w))
+	MCFG_KCCART_SLOT_OUT_NMI_CB(WRITELINE(kc_d002_device, out_nmi_w))
+	MCFG_KCCART_SLOT_OUT_HALT_CB(WRITELINE(kc_d002_device, out_halt_w))
+	MCFG_DEVICE_ADD("m8", KCCART_SLOT, 0)
+	MCFG_DEVICE_SLOT_INTERFACE(kc85_cart, nullptr, false)
+	MCFG_KCCART_SLOT_NEXT_SLOT("mc")
+	MCFG_KCCART_SLOT_OUT_IRQ_CB(WRITELINE(kc_d002_device, out_irq_w))
+	MCFG_KCCART_SLOT_OUT_NMI_CB(WRITELINE(kc_d002_device, out_nmi_w))
+	MCFG_KCCART_SLOT_OUT_HALT_CB(WRITELINE(kc_d002_device, out_halt_w))
+	MCFG_DEVICE_ADD("mc", KCCART_SLOT, 0)
+	MCFG_DEVICE_SLOT_INTERFACE(kc85_cart, nullptr, false)
+	MCFG_KCCART_SLOT_NEXT_SLOT("exp")
+	MCFG_KCCART_SLOT_OUT_IRQ_CB(WRITELINE(kc_d002_device, out_irq_w))
+	MCFG_KCCART_SLOT_OUT_NMI_CB(WRITELINE(kc_d002_device, out_nmi_w))
+	MCFG_KCCART_SLOT_OUT_HALT_CB(WRITELINE(kc_d002_device, out_halt_w))
+
+	// expansion interface
+	MCFG_DEVICE_ADD("exp", KCCART_SLOT, 0)
+	MCFG_DEVICE_SLOT_INTERFACE(kc85_exp, nullptr, false)
+	MCFG_KCEXP_SLOT_NEXT_SLOT(nullptr)
+	MCFG_KCEXP_SLOT_OUT_IRQ_CB(WRITELINE(kc_d002_device, out_irq_w))
+	MCFG_KCEXP_SLOT_OUT_NMI_CB(WRITELINE(kc_d002_device, out_nmi_w))
+	MCFG_KCEXP_SLOT_OUT_HALT_CB(WRITELINE(kc_d002_device, out_halt_w))
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  input_ports - device-specific input ports

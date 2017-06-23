@@ -884,11 +884,9 @@ static ADDRESS_MAP_START( usb_map_rom, AS_PROGRAM, 8, usb_sound_device )
 ADDRESS_MAP_END
 
 MACHINE_CONFIG_MEMBER( usb_rom_sound_device::device_add_mconfig )
+	usb_sound_device::device_add_mconfig(config);
 
 	/* CPU for the usb board */
-	MCFG_CPU_ADD("ourcpu", I8035, USB_MASTER_CLOCK)     /* divide by 15 in CPU */
+	MCFG_CPU_MODIFY("ourcpu")
 	MCFG_CPU_PROGRAM_MAP(usb_map_rom)
-	MCFG_CPU_IO_MAP(usb_portmap)
-
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("usb_timer", usb_sound_device, increment_t1_clock_timer_cb, attotime::from_hz(USB_2MHZ_CLOCK / 256))
 MACHINE_CONFIG_END

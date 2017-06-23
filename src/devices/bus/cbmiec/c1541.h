@@ -39,10 +39,36 @@ class c1541_device_base :  public device_t,
 						public device_cbm_iec_interface,
 						public device_c64_floppy_parallel_interface
 {
-public:
+protected:
+	// construction/destruction
+	c1541_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
+
+	// device_cbm_iec_interface overrides
+	virtual void cbm_iec_atn(int state) override;
+	virtual void cbm_iec_reset(int state) override;
+
+	// device_c64_floppy_parallel_interface overrides
+	virtual void parallel_data_w(uint8_t data) override;
+	virtual void parallel_strobe_w(int state) override;
+
+	required_device<floppy_image_device> m_floppy;
+
+private:
+	enum
+	{
+		LED_POWER = 0,
+		LED_ACT
+	};
+
+	inline void set_iec_data();
 
 	DECLARE_WRITE_LINE_MEMBER( via0_irq_w );
 	virtual DECLARE_READ8_MEMBER( via0_pa_r );
@@ -58,35 +84,10 @@ public:
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
-protected:
-	// construction/destruction
-	c1541_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-
-	// device_cbm_iec_interface overrides
-	virtual void cbm_iec_atn(int state) override;
-	virtual void cbm_iec_reset(int state) override;
-
-	// device_c64_floppy_parallel_interface overrides
-	virtual void parallel_data_w(uint8_t data) override;
-	virtual void parallel_strobe_w(int state) override;
-
-	enum
-	{
-		LED_POWER = 0,
-		LED_ACT
-	};
-
-	inline void set_iec_data();
-
 	required_device<m6502_device> m_maincpu;
 	required_device<via6522_device> m_via0;
 	required_device<via6522_device> m_via1;
 	required_device<c64h156_device> m_ga;
-	required_device<floppy_image_device> m_floppy;
 	required_ioport m_address;
 
 	// IEC bus
@@ -106,6 +107,7 @@ public:
 	// construction/destruction
 	c1540_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
 };
@@ -119,6 +121,7 @@ public:
 	// construction/destruction
 	c1541_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
 };
@@ -132,10 +135,12 @@ public:
 	// construction/destruction
 	c1541c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
+private:
 	// not really public
 	virtual DECLARE_READ8_MEMBER( via0_pa_r ) override;
 };
@@ -149,6 +154,7 @@ public:
 	// construction/destruction
 	c1541ii_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
 };
@@ -162,6 +168,7 @@ public:
 	// construction/destruction
 	sx1541_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
 };
@@ -175,6 +182,7 @@ public:
 	// construction/destruction
 	fsd1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
 };
@@ -188,6 +196,7 @@ public:
 	// construction/destruction
 	fsd2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
@@ -204,6 +213,7 @@ public:
 	// construction/destruction
 	csd1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
 };
@@ -217,9 +227,10 @@ public:
 	// construction/destruction
 	c1541_dolphin_dos_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 
@@ -231,9 +242,10 @@ public:
 	// construction/destruction
 	c1541_professional_dos_v1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 
@@ -245,25 +257,27 @@ public:
 	// construction/destruction
 	c1541_prologic_dos_classic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
 	// not really public
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
+protected:
+	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
 	DECLARE_READ8_MEMBER( pia_r );
 	DECLARE_WRITE8_MEMBER( pia_w );
-
-	DECLARE_WRITE8_MEMBER( pia_pa_w );
-	DECLARE_READ8_MEMBER( pia_pb_r );
-	DECLARE_WRITE8_MEMBER( pia_pb_w );
 
 protected:
 	required_device<pia6821_device> m_pia;
 	required_device<output_latch_device> m_cent_data_out;
 	required_memory_region m_mmu_rom;
+
+private:
+	DECLARE_WRITE8_MEMBER( pia_pa_w );
+	DECLARE_READ8_MEMBER( pia_pb_r );
+	DECLARE_WRITE8_MEMBER( pia_pb_w );
 };
 
 
@@ -275,6 +289,7 @@ public:
 	// construction/destruction
 	indus_gt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
 };

@@ -263,13 +263,13 @@
 		<publisher>Acornsoft</publisher>
 		<info name="release" value="SNG37" />
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Program"/>
+			<feature name="part_id" value="Program disc"/>
 			<dataarea name="flop" size="102461">
 				<rom name="033 acheton program.fsd" size="102461" crc="0c6c46ca" sha1="6322945135310ea8ae1dbf2f1aced77f21688008" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Database"/>
+			<feature name="part_id" value="Database disc"/>
 			<dataarea name="flop" size="105079">
 				<rom name="033 acheton data.fsd" size="105079" crc="86fdca91" sha1="57f448a17868f0bdbbc6a415464220da0c418f72" offset="0" />
 			</dataarea>
@@ -1787,13 +1787,13 @@
 		<year>1987</year>
 		<publisher>Bug Byte</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
+			<feature name="part_id" value="Side A: Master Version"/>
 			<dataarea name="flop" size="104937">
 				<rom name="226 dunjunz side a.fsd" size="104937" crc="25fc923b" sha1="9d05d9f79b506129347eeaf28711409058d029c9" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
+			<feature name="part_id" value="Side B: BBC B Version"/>
 			<dataarea name="flop" size="104937">
 				<rom name="226 dunjunz side b.fsd" size="104937" crc="3f717792" sha1="915acda5b0522d96dabad0e3e0cfb0d1b260cae4" offset="0" />
 			</dataarea>
@@ -1933,7 +1933,7 @@
 	</software>
 
 	<software name="discdup3m" cloneof="discdup3">
-		<description>Disc Duplicator 3 (modified to copy itself)</description>
+		<description>Disc Duplicator 3 [modified to copy itself]</description>
 		<year>1985</year>
 		<publisher>FSoft</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2084,7 +2084,7 @@
 	<software name="crosswds">
 		<description>Crosswords</description>
 		<year>1986</year>
-		<publisher>H.S.Software</publisher>
+		<publisher>Highlight Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="100224">
 				<rom name="344 crosswords.fsd" size="100224" crc="703fe0a0" sha1="fabc8e0d7481e8f16efdefa13a7b38b080515f01" offset="0" />
@@ -2095,7 +2095,7 @@
 	<software name="readrigh">
 		<description>Read-Right-Away</description>
 		<year>1986</year>
-		<publisher>H.S.Software</publisher>
+		<publisher>Highlight Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="58293">
 				<rom name="346 read-right-away.fsd" size="58293" crc="3801fa45" sha1="96f0009bd0c7ef6906a075ef2aba206b9ef7a1a4" offset="0" />
@@ -2566,13 +2566,13 @@
 		<year>1988</year>
 		<publisher>Mandarin</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Game"/>
+			<feature name="part_id" value="Game side"/>
 			<dataarea name="flop" size="209864">
 				<rom name="345 time and magik game side.fsd" size="209864" crc="03dd16fe" sha1="09c2bbaaf1a98292093933c139e3946b41faeddb" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Pictures"/>
+			<feature name="part_id" value="Pictures side"/>
 			<dataarea name="flop" size="209849">
 				<rom name="345 time and magik pictures side.fsd" size="209849" crc="c8f7b4d5" sha1="4662ba6a2dd6445b293465165630bdfce6d9b4c1" offset="0" />
 			</dataarea>
@@ -2584,13 +2584,13 @@
 		<year>1988</year>
 		<publisher>Mandarin</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Game"/>
+			<feature name="part_id" value="Game side"/>
 			<dataarea name="flop" size="209868">
 				<rom name="350 lancelot game side.fsd" size="209868" crc="c4189869" sha1="5d65d025aded494d6030cf281d2bffe31049739d" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Pictures"/>
+			<feature name="part_id" value="Pictures side"/>
 			<dataarea name="flop" size="209872">
 				<rom name="350 lancelot pictures side.fsd" size="209872" crc="1a29bbe1" sha1="fb60bc459afc8b66b84a40a409076adad3b0b4f3" offset="0" />
 			</dataarea>
@@ -3784,7 +3784,7 @@
 	<software name="bertboot">
 		<description>Bert Boot</description>
 		<year>1984</year>
-		<publisher>H.S.Software</publisher>
+		<publisher>Highlight Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="21593">
 				<rom name="212 bert boot.fsd" size="21593" crc="01f34468" sha1="1428fefdbe06b89e3f410b8aa8b3788bddfb2f72" offset="0" />
@@ -3795,7 +3795,7 @@
 	<software name="roadcft1">
 		<description>Roadcraft 1</description>
 		<year>1984</year>
-		<publisher>H.S.Software</publisher>
+		<publisher>Highlight Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="21595">
 				<rom name="213 roadcraft 1.fsd" size="21595" crc="0ee47b08" sha1="3aca175651cd0daa237d2d9d40588aa8fc247775" offset="0" />

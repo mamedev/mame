@@ -176,6 +176,9 @@ static ADDRESS_MAP_START( main_io_map, AS_IO, 8, embargo_state )
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN0") AM_WRITE(port_1_w)
 	AM_RANGE(0x02, 0x02) AM_READWRITE(dial_r, port_2_w)
 	AM_RANGE(0x03, 0x03) AM_WRITENOP /* always 0xFE */
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( main_data_map, AS_DATA, 8, embargo_state )
 	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READ_PORT("IN2")
 	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_READWRITE(input_port_bit_r, input_select_w)
 ADDRESS_MAP_END
@@ -260,7 +263,7 @@ static MACHINE_CONFIG_START( embargo )
 	MCFG_CPU_ADD("maincpu", S2650, 625000)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_io_map)
-
+	MCFG_CPU_DATA_MAP(main_data_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

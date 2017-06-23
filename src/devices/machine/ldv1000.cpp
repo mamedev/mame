@@ -84,28 +84,6 @@ static const z80_daisy_config daisy_chain[] =
 };
 
 
-static MACHINE_CONFIG_START( ldv1000 )
-	MCFG_CPU_ADD("ldv1000", Z80, XTAL_5MHz/2)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain)
-	MCFG_CPU_PROGRAM_MAP(ldv1000_map)
-	MCFG_CPU_IO_MAP(ldv1000_portmap)
-
-	MCFG_DEVICE_ADD("ldvctc", Z80CTC, XTAL_5MHz/2)
-	MCFG_Z80CTC_INTR_CB(WRITELINE(pioneer_ldv1000_device, ctc_interrupt))
-
-	MCFG_DEVICE_ADD("ldvppi0", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(pioneer_ldv1000_device, ppi0_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(pioneer_ldv1000_device, ppi0_portb_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(pioneer_ldv1000_device, ppi0_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(pioneer_ldv1000_device, ppi0_portc_w))
-
-	MCFG_DEVICE_ADD("ldvppi1", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(pioneer_ldv1000_device, ppi1_porta_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(pioneer_ldv1000_device, ppi1_portb_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(pioneer_ldv1000_device, ppi1_portc_w))
-MACHINE_CONFIG_END
-
-
 ROM_START( ldv1000 )
 	ROM_REGION( 0x2000, "ldv1000", 0 )
 	ROM_LOAD( "z03_1001_vyw-053_v1-0.bin", 0x0000, 0x2000, CRC(31ec4687) SHA1(52f91c304a878ba02b2fa1cda1a9489d6dd5a34f) )
@@ -289,14 +267,29 @@ const tiny_rom_entry *pioneer_ldv1000_device::device_rom_region() const
 
 
 //-------------------------------------------------
-//  device_mconfig_additions - return a pointer to
-//  our machine config fragment
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor pioneer_ldv1000_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME(ldv1000);
-}
+MACHINE_CONFIG_MEMBER( pioneer_ldv1000_device::device_add_mconfig )
+	MCFG_CPU_ADD("ldv1000", Z80, XTAL_5MHz/2)
+	MCFG_Z80_DAISY_CHAIN(daisy_chain)
+	MCFG_CPU_PROGRAM_MAP(ldv1000_map)
+	MCFG_CPU_IO_MAP(ldv1000_portmap)
+
+	MCFG_DEVICE_ADD("ldvctc", Z80CTC, XTAL_5MHz/2)
+	MCFG_Z80CTC_INTR_CB(WRITELINE(pioneer_ldv1000_device, ctc_interrupt))
+
+	MCFG_DEVICE_ADD("ldvppi0", I8255, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(pioneer_ldv1000_device, ppi0_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(pioneer_ldv1000_device, ppi0_portb_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(pioneer_ldv1000_device, ppi0_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(pioneer_ldv1000_device, ppi0_portc_w))
+
+	MCFG_DEVICE_ADD("ldvppi1", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(pioneer_ldv1000_device, ppi1_porta_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(pioneer_ldv1000_device, ppi1_portb_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(pioneer_ldv1000_device, ppi1_portc_w))
+MACHINE_CONFIG_END
 
 
 //-------------------------------------------------

@@ -577,7 +577,7 @@ void ncr5390_device::delay_cycles(int cycles)
 
 READ8_MEMBER(ncr5390_device::tcount_lo_r)
 {
-	logerror("%s: tcount_lo_r %02x (%08x)\n", tag(), tcount & 0xff, space.device().safe_pc());
+	logerror("%s: tcount_lo_r %02x (%s)\n", tag(), tcount & 0xff, machine().describe_context());
 	return tcount;
 }
 
@@ -585,12 +585,12 @@ WRITE8_MEMBER(ncr5390_device::tcount_lo_w)
 {
 	tcount = (tcount & 0xff00) | data;
 	status &= ~S_TC0;
-	logerror("%s: tcount_lo_w %02x (%08x)\n", tag(), data, space.device().safe_pc());
+	logerror("%s: tcount_lo_w %02x (%s)\n", tag(), data, machine().describe_context());
 }
 
 READ8_MEMBER(ncr5390_device::tcount_hi_r)
 {
-	logerror("%s: tcount_hi_r %02x (%08x)\n", tag(), tcount >> 8, space.device().safe_pc());
+	logerror("%s: tcount_hi_r %02x (%s)\n", tag(), tcount >> 8, machine().describe_context());
 	return tcount >> 8;
 }
 
@@ -598,7 +598,7 @@ WRITE8_MEMBER(ncr5390_device::tcount_hi_w)
 {
 	tcount = (tcount & 0x00ff) | (data << 8);
 	status &= ~S_TC0;
-	logerror("%s: tcount_hi_w %02x (%08x)\n", tag(), data, space.device().safe_pc());
+	logerror("%s: tcount_hi_w %02x (%s)\n", tag(), data, machine().describe_context());
 }
 
 uint8_t ncr5390_device::fifo_pop()
@@ -638,13 +638,13 @@ WRITE8_MEMBER(ncr5390_device::fifo_w)
 
 READ8_MEMBER(ncr5390_device::command_r)
 {
-	logerror("%s: command_r (%08x)\n", tag(), space.device().safe_pc());
+	logerror("%s: command_r (%s)\n", tag(), machine().describe_context());
 	return command[0];
 }
 
 WRITE8_MEMBER(ncr5390_device::command_w)
 {
-	logerror("%s: command_w %02x (%08x)\n", tag(), data, space.device().safe_pc());
+	logerror("%s: command_w %02x (%s)\n", tag(), data, machine().describe_context());
 	if(command_pos == 2) {
 		status |= S_GROSS_ERROR;
 		check_irq();
@@ -787,7 +787,7 @@ READ8_MEMBER(ncr5390_device::status_r)
 {
 	uint32_t ctrl = scsi_bus->ctrl_r();
 	uint8_t res = status | (ctrl & S_MSG ? 4 : 0) | (ctrl & S_CTL ? 2 : 0) | (ctrl & S_INP ? 1 : 0);
-	logerror("%s: status_r %02x (%08x)\n", tag(), res, space.device().safe_pc());
+	logerror("%s: status_r %02x (%s)\n", tag(), res, machine().describe_context());
 	if(irq)
 		status &= ~(S_GROSS_ERROR|S_PARITY|S_TCC);
 	return res;
@@ -808,7 +808,7 @@ READ8_MEMBER(ncr5390_device::istatus_r)
 	if(res)
 		command_pop_and_chain();
 
-	logerror("%s: istatus_r %02x (%08x)\n", tag(), res, space.device().safe_pc());
+	logerror("%s: istatus_r %02x (%s)\n", tag(), res, machine().describe_context());
 	return res;
 }
 
@@ -819,7 +819,7 @@ WRITE8_MEMBER(ncr5390_device::timeout_w)
 
 READ8_MEMBER(ncr5390_device::seq_step_r)
 {
-	logerror("%s: seq_step_r %d (%08x)\n", tag(), seq, space.device().safe_pc());
+	logerror("%s: seq_step_r %d (%s)\n", tag(), seq, machine().describe_context());
 	return seq;
 }
 
@@ -932,5 +932,5 @@ WRITE8_MEMBER(ncr53c94_device::conf_w)
 WRITE8_MEMBER(ncr53c94_device::test_w)
 {
 	if (test_mode)
-		logerror("%s: test_w %d (%08x) - test mode not implemented\n", tag(), data, space.device().safe_pc());
+		logerror("%s: test_w %d (%s) - test mode not implemented\n", tag(), data, machine().describe_context());
 }

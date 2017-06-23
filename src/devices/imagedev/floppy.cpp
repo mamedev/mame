@@ -738,7 +738,7 @@ uint32_t floppy_image_device::find_position(attotime &base, const attotime &when
 	}
 
 	uint32_t res = (delta*floppy_ratio_1).as_ticks(1000000000/1000);
-	if (res > 200000000) {
+	if (res >= 200000000) {
 		// Due to rounding errors in the previous operation,
 		// 'res' sometimes overflows 2E+8
 		res -= 200000000;
@@ -1344,16 +1344,12 @@ void floppy_sound_device::sound_stream_update(sound_stream &stream, stream_sampl
 
 #define FLOPSPK "flopsndout"
 
-MACHINE_CONFIG_START( floppy_img )
+MACHINE_CONFIG_MEMBER( floppy_image_device::device_add_mconfig )
 	MCFG_SPEAKER_STANDARD_MONO(FLOPSPK)
 	MCFG_SOUND_ADD(FLOPSND_TAG, FLOPPYSOUND, 44100)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, FLOPSPK, 0.5)
 MACHINE_CONFIG_END
 
-machine_config_constructor floppy_image_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( floppy_img );
-}
 
 DEFINE_DEVICE_TYPE(FLOPPYSOUND, floppy_sound_device, "flopsnd", "Floppy sound")
 

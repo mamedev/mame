@@ -30,6 +30,11 @@
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
 	static_cast<floppy_connector *>(device)->set_formats(_formats);
 
+#define MCFG_FLOPPY_DRIVE_ADD_FIXED(_tag, _slot_intf, _def_slot, _formats)  \
+	MCFG_DEVICE_ADD(_tag, FLOPPY_CONNECTOR, 0) \
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, true) \
+	static_cast<floppy_connector *>(device)->set_formats(_formats);
+
 #define MCFG_FLOPPY_DRIVE_SOUND(_doit) \
 	static_cast<floppy_connector *>(device)->enable_sound(_doit);
 
@@ -149,7 +154,7 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	virtual void setup_characteristics() = 0;
 

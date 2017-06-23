@@ -342,245 +342,6 @@ READ8_MEMBER(fortyl_state::pix2_r)
 }
 
 
-/****************************************************************************
-                        fake MCU (undoukai and field day)
-****************************************************************************/
-
-static const uint8_t mcu_data0[0x80] =
-{
-	0x0a,0x08,0x0f,0x07,0x06,0x05,0x04,0x00,
-	0x0a,0x0b,0x15,0x02,0x03,0x15,0x0a,0x08,
-	0x0f,0x07,0x06,0x05,0x04,0x0c,0x01,0x0c,
-	0x01,0x15,0x0b,0x0a,0x00,0x0d,0x0e,0x15,
-	0x0a,0x08,0x0f,0x07,0x06,0x05,0x04,0x0b,
-	0x09,0x0c,0x01,0x0c,0x01,0x15,0x0a,0x08,
-	0x0f,0x07,0x06,0x05,0x04,0x0c,0x0c,0x01,
-	0x0c,0x0c,0xff,0xe1,0x23,0xc5,0xc9,0x15,
-
-	0x3e,0x4a,0xcd,0x2b,0x00,0x4e,0x79,0xf6,
-	0xa0,0xe6,0xa2,0xcb,0xcf,0xf5,0x0e,0x62,
-	0xcd,0x35,0x00,0xcb,0xc9,0x79,0xe6,0x02,
-	0x5f,0xe1,0x4b,0x69,0x3e,0x00,0x2e,0x38,
-	0xb5,0x6f,0x06,0x23,0x11,0xfe,0xdf,0x1a,
-	0x27,0x77,0xe6,0x01,0x5f,0x16,0x00,0xcb,
-	0xfe,0x19,0x05,0x78,0x20,0xee,0xc1,0xe1,
-	0x23,0xc5,0xc9,0xee,0x37,0x28,0xc0,0xc5
-};
-
-static const uint8_t mcu_data1[0x80] =
-{
-	0x00,0x78,0xef,0x66,0xdc,0x50,0xc2,0x33,
-	0xa1,0x0c,0x74,0xd9,0x3a,0x96,0xef,0x42,
-	0x90,0xd9,0x1c,0x58,0x8f,0xbe,0xe6,0x07,
-	0x20,0x31,0x39,0x39,0x2f,0x1c,0x00,0xda,
-	0xa9,0x6d,0x27,0xd6,0x79,0x11,0x9c,0x1b,
-	0x8e,0xf3,0x4c,0x97,0xd5,0x05,0x27,0x3a,
-	0x3f,0x35,0x1b,0xf3,0xbb,0x73,0x1c,0xb4,
-	0x3c,0xb3,0x1a,0x6f,0xb4,0xe7,0x09,0x19,
-	0x17,0x04,0xde,0xa6,0x5c,0xff,0x90,0x0e,
-	0x78,0xd0,0x15,0x47,0x65,0x70,0x68,0x4c,
-	0x1c,0xd9,0x82,0x18,0x99,0x07,0x60,0xa6,
-	0xd8,0xf6,0x00,0x30,0x08,0x31,0x02,0xb7,
-	0x81,0xfa,0x30,0x02,0x01,0x01,0x14,0x30,
-	0x07,0xd6,0x7e,0x30,0x1d,0x15,0x25,0xff,
-	0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
-	0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff
-};
-
-static const uint8_t mcu_data2[0x80] =
-{
-	0x00,0x04,0x08,0x00,0x11,0x16,0x1a,0x1f,
-	0x23,0x28,0x2c,0x30,0x35,0x39,0x3d,0x42,
-	0x46,0x4a,0x4f,0x53,0x57,0x5b,0x5f,0x64,
-	0x68,0x6c,0x70,0x74,0x78,0x7c,0x80,0x83,
-	0x87,0x8b,0x8f,0x92,0x96,0x9a,0x90,0xa1,
-	0xa4,0xa7,0xa8,0xae,0xb1,0xb5,0xb8,0xbb,
-	0xbe,0xc1,0xc4,0xc6,0xc9,0xcc,0xcf,0xd1,
-	0xd4,0xd6,0xd9,0xdb,0xdd,0xdf,0xe2,0xe4,
-	0xe6,0xe8,0xe9,0xeb,0xed,0xee,0xf0,0xf2,
-	0xf3,0xf4,0xf6,0xf7,0xf8,0xf9,0xfa,0xfb,
-	0xfc,0xfc,0xfd,0xfe,0xfe,0xff,0xff,0xff,
-	0xff,0xff,0x00,0x3d,0x26,0xbe,0xd6,0x6c,
-	0x30,0xa6,0xb7,0x81,0x01,0x04,0x14,0xb6,
-	0xa4,0x97,0x02,0xb7,0x81,0x1b,0x13,0x23,
-	0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
-	0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff
-};
-
-
-WRITE8_MEMBER(fortyl_state::undoukai_mcu_w)
-{
-	int ram_adr = m_mcu_ram[0x1b5] * 0x100 + m_mcu_ram[0x1b4];
-
-	int d, i;
-
-	//  logerror("mcu_w %02x\n", data);
-
-
-	if (m_mcu_cmd != -1)
-	{
-		m_mcu_in[(m_mcu_cmd & 0x10) >> 4][m_mcu_cmd & 0x0f] = data;
-		m_mcu_cmd = -1;
-	}
-	else
-	{
-		switch (data)
-		{
-			case 0xc0:
-			case 0xc1:
-			case 0xc2:
-			case 0xc3:
-			case 0xc4:
-			case 0xc5:
-			case 0xc6:
-			case 0xc7:
-				m_mcu_cmd = (data & 0x0f) | 0x10;
-				break;
-
-			case 0xb0:
-			case 0xb1:
-			case 0xb2:
-			case 0xb3:
-				m_mcu_cmd = data & 0x0f;
-				break;
-
-			case 0x30:
-			case 0x31:
-			case 0x32:
-			case 0x33:
-			case 0x34:
-			case 0x35:
-			case 0x36:
-			case 0x37:
-			case 0x38:
-			case 0x39:
-				m_from_mcu = m_mcu_out[0][data & 0x0f];
-				break;
-
-			case 0x40:
-			case 0x41:
-			case 0x42:
-				m_from_mcu = m_mcu_out[1][data & 0x0f];
-				break;
-
-
-			case 0x01:
-				m_mcu_out[0][0] = (m_mcu_in[0][0] ^ (m_mcu_in[0][0] >> 4)) & 0x0f;
-				break;
-
-			case 0x02:
-				if (m_mcu_in[0][3] != 0x00)
-				{
-					m_mcu_out[0][1] = 0x0c;
-					m_mcu_out[0][2] = 0x00;
-				}
-				else
-				{
-					m_mcu_out[0][2] = 0xa2;
-					switch (m_mcu_in[0][0] & 0x03)
-					{
-						case 0: m_mcu_out[0][1] = 0x55; break;
-						case 1: m_mcu_out[0][1] = 0x3d; break;
-						case 2: m_mcu_out[0][1] = 0x45; break;
-						case 3: m_mcu_out[0][1] = 0x4d; break;
-					}
-				}
-				break;
-
-			case 0x03:
-				m_mcu_out[0][1] = (((m_mcu_in[0][0] * 8) & 0x38) -1) & 0xff ;
-
-				if (m_mcu_in[0][1] | m_mcu_in[0][2])
-					d = 0x40;
-				else
-					d = 0x00;
-
-				for (i = 0; i < 8; i++)
-					m_mcu_out[0][i + 2] = mcu_data0[((m_mcu_out[0][1] + i) & 0x3f) + d];
-				break;
-
-			case 0x04:
-				m_mcu_out[0][0] = ((m_mcu_in[0][0] & 0x0f) << 4) + (m_mcu_in[0][1] & 0x0f);
-				m_mcu_out[0][1] = ((m_mcu_in[0][2] & 0x0f) << 4) + (m_mcu_in[0][3] & 0x0f);
-				break;
-
-			case 0x05:
-//              m_mcu_out[0][0] = 255 * cos(PI * m_mcu_in[0][0] / 180);
-//              m_mcu_out[0][1] = 255 * sin(PI * m_mcu_in[0][0] / 180);
-
-				d = m_mcu_in[0][0] & 0x7f;
-				m_mcu_out[0][0] = mcu_data1[d];
-				m_mcu_out[0][1] = mcu_data2[d];
-				break;
-
-			case 0x06:
-				if (m_mcu_in[0][0] != 0x00)
-					m_mcu_out[0][0] = 0xfa;
-				else
-					switch (m_mcu_in[0][1])
-					{
-						case 0x00: m_mcu_out[0][0] = 0x02; break;
-						case 0x01: m_mcu_out[0][0] = 0x01; break;
-						case 0x02: m_mcu_out[0][0] = 0x01; break;
-						case 0x03: m_mcu_out[0][0] = 0x04; break;
-						case 0x04: m_mcu_out[0][0] = 0x01; break;
-						case 0x05: m_mcu_out[0][0] = 0x14; break;
-						case 0x06: m_mcu_out[0][0] = 0x14; break;
-						case 0x07: m_mcu_out[0][0] = 0xb6; break;
-						default:
-						//  popmessage("cmd06: %02x %02x", m_mcu_in[0][0], m_mcu_in[0][1]);
-							logerror("cmd06: %02x %02x\n", m_mcu_in[0][0], m_mcu_in[0][1]);
-					}
-				break;
-
-			case 0x07:
-				switch (m_mcu_in[0][0] & 7)
-				{
-					case 0: m_mcu_out[0][0] = 0x1d; break;
-					case 1: m_mcu_out[0][0] = 0x1b; break;
-					case 2: m_mcu_out[0][0] = 0x15; break;
-					case 3: m_mcu_out[0][0] = 0x13; break;
-					case 4: m_mcu_out[0][0] = 0x25; break;
-					case 5: m_mcu_out[0][0] = 0x23; break;
-					case 6: m_mcu_out[0][0] = 0xff; break;
-					case 7: m_mcu_out[0][0] = 0xff; break;
-				}
-				break;
-
-			case 0x0e:
-
-				if(ram_adr >= 0xa000 && ram_adr < 0xa800)
-				{
-					ram_adr = ram_adr - 0xa000;
-					m_mcu_out[1][0] = m_mcu_ram[ram_adr];
-					m_mcu_out[1][1] = m_mcu_ram[ram_adr + 1];
-					m_mcu_out[1][2] = m_mcu_ram[ram_adr + 2] & 0x0f;
-				}
-				break;
-
-			default:
-				m_from_mcu = 0x5d;
-
-//              popmessage("unknown cmd%02x: %02x %02x %02x %02x", data, m_mcu_in[0][0], m_mcu_in[0][1], m_mcu_in[0][2], m_mcu_in[0][3]);
-//              logerror("unknown cmd%02x: %02x %02x %02x %02x\n", data, m_mcu_in[0][0], m_mcu_in[0][1], m_mcu_in[0][2], m_mcu_in[0][3]);
-		}
-	}
-}
-
-READ8_MEMBER(fortyl_state::undoukai_mcu_r)
-{
-	//  logerror("mcu_r %02x\n", m_from_mcu);
-
-	return m_from_mcu;
-}
-
-READ8_MEMBER(fortyl_state::undoukai_mcu_status_r)
-{
-	int res = 3;
-
-	return res;
-}
-
 /***************************************************************************/
 
 DRIVER_INIT_MEMBER(fortyl_state,undoukai)
@@ -668,8 +429,8 @@ static ADDRESS_MAP_START( undoukai_map, AS_PROGRAM, 8, fortyl_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("mcu_ram") /* M5517P on main board */
-	AM_RANGE(0xa800, 0xa800) AM_READWRITE(undoukai_mcu_r, undoukai_mcu_w)
-	AM_RANGE(0xa801, 0xa801) AM_READWRITE(undoukai_mcu_status_r, pix1_w)        //pixel layer related
+	AM_RANGE(0xa800, 0xa800) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, data_r, data_w)
+	AM_RANGE(0xa801, 0xa801) AM_READWRITE(fortyl_mcu_status_r, pix1_w)        //pixel layer related
 	AM_RANGE(0xa802, 0xa802) AM_WRITE(bank_select_w)
 	AM_RANGE(0xa803, 0xa803) AM_READWRITE(pix2_r, pix2_w)       //pixel layer related
 	AM_RANGE(0xa804, 0xa804) AM_READWRITE(from_snd_r, sound_command_w)
@@ -988,18 +749,6 @@ MACHINE_START_MEMBER(fortyl_state,40love)
 	save_item(NAME(m_snd_ctrl3));
 }
 
-MACHINE_START_MEMBER(fortyl_state,undoukai)
-{
-	MACHINE_START_CALL_MEMBER(40love);
-
-	/* fake mcu */
-	save_item(NAME(m_from_mcu));
-	save_item(NAME(m_mcu_cmd));
-	save_item(NAME(m_mcu_in[0]));
-	save_item(NAME(m_mcu_in[1]));
-	save_item(NAME(m_mcu_out[0]));
-	save_item(NAME(m_mcu_out[1]));
-}
 
 MACHINE_RESET_MEMBER(fortyl_state,common)
 {
@@ -1025,25 +774,6 @@ MACHINE_RESET_MEMBER(fortyl_state,common)
 MACHINE_RESET_MEMBER(fortyl_state,40love)
 {
 	MACHINE_RESET_CALL_MEMBER(common);
-}
-
-MACHINE_RESET_MEMBER(fortyl_state,undoukai)
-{
-	int i;
-
-	MACHINE_RESET_CALL_MEMBER(common);
-
-	/* fake mcu */
-	m_from_mcu = 0xff;
-	m_mcu_cmd = -1;
-
-	for (i = 0; i < 16; i++)
-	{
-		m_mcu_in[0][i] = 0;
-		m_mcu_in[1][i] = 0;
-		m_mcu_out[0][i] = 0;
-		m_mcu_out[1][i] = 0;
-	}
 }
 
 static MACHINE_CONFIG_START( 40love )
@@ -1115,10 +845,11 @@ static MACHINE_CONFIG_START( undoukai )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(fortyl_state, irq0_line_hold, 2*60)    /* source/number of IRQs is unknown */
 
-//  MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU, 18432000/6)
-
-	MCFG_MACHINE_START_OVERRIDE(fortyl_state,undoukai)
-	MCFG_MACHINE_RESET_OVERRIDE(fortyl_state,undoukai)  /* init machine */
+	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU, 18432000/6)
+	
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	MCFG_MACHINE_START_OVERRIDE(fortyl_state,40love)
+	MCFG_MACHINE_RESET_OVERRIDE(fortyl_state,40love)  /* init machine */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1203,6 +934,42 @@ ROM_START( 40love )
 
 ROM_END
 
+ROM_START( 40lovej )
+	ROM_REGION( 0x14000, "maincpu", 0 ) /* Z80 main CPU */
+    ROM_LOAD( "a30_01.70",    0x000000, 0x004000, CRC(1b89829e) SHA1(d875a4e3586fd9fb2e354e4353c9144ad68ce620) )
+    ROM_LOAD( "a30_02.71",    0x004000, 0x004000, CRC(1468e71e) SHA1(e251ddf42ab51e9c391c213f54b709b71a3f1519) )
+	ROM_LOAD( "a30_03.72",    0x010000, 0x004000, CRC(dbc0049d) SHA1(1fca22ca0794564bbd1f946afb644fef0342acca) )
+	
+	ROM_REGION( 0x10000, "audiocpu", ROMREGION_ERASEFF ) /* Z80 sound CPU */
+	// not in the provided set, identical?
+	ROM_LOAD( "a30-08.u08", 0x0000, 0x2000, BAD_DUMP CRC(2fc42ee1) SHA1(b56e5f9acbcdc476252e188f41ad7249dba6f8e1) )
+	ROM_LOAD( "a30-09.u09", 0x2000, 0x2000, BAD_DUMP CRC(3a75abce) SHA1(ad2df26789d38196c0677c22ab8f176e99604b18) )
+	ROM_LOAD( "a30-10.u10", 0x4000, 0x2000, BAD_DUMP CRC(393c4b5b) SHA1(a8e1dd5c33e929bc832cccc13b85ecd13fff1eb2) )
+	ROM_LOAD( "a30-11.u37", 0x6000, 0x2000, BAD_DUMP CRC(11b2c6d2) SHA1(d55690512a37c4df2386a845e0cfb14f8052295b) )
+	ROM_LOAD( "a30-12.u38", 0x8000, 0x2000, BAD_DUMP CRC(f7afd475) SHA1(dd09d5ca7fec5e0454f9efb8ebc722561010f124) )
+	ROM_LOAD( "a30-13.u39", 0xa000, 0x2000, BAD_DUMP CRC(e806630f) SHA1(09022aae88ea0171a0aacf3260fa3a95e8faeb21) )
+
+	ROM_REGION( 0x0800, "bmcu:mcu", 0 )  /* 2k for the microcontroller */
+	 // taken from World set, the provided one causes bad hw
+	ROM_LOAD( "a30-14"    , 0x0000, 0x0800, BAD_DUMP CRC(c4690279) SHA1(60bc77e03b9be434bb97a374a2fedeb8d049a660) )
+//    ROM_LOAD( "a30_14",       0x000000, 0x000800, BAD_DUMP CRC(a4f770ce) SHA1(868e98528e8824e7329e9a298603e456bbc1f1f0) )
+
+    ROM_REGION( 0x8000, "gfx1", 0 )
+    ROM_LOAD( "a30_04.18",    0x000000, 0x004000, CRC(529a7489) SHA1(cf3fa83f16e2e62c1a4aa74b00080f1e167865a6) )
+    ROM_LOAD( "a30_05.19",    0x004000, 0x004000, CRC(7017e5f1) SHA1(fc614fd41109a9a6236ed4a331eda74e5d49b946) )
+	
+    ROM_REGION( 0x8000, "gfx2", 0 )
+    ROM_LOAD( "a30_06.59",    0x000000, 0x004000, CRC(f744ea8e) SHA1(0bf6deabfac47237347af810332bc3716e3a26f0) )
+    ROM_LOAD( "a30_07.60",    0x004000, 0x004000, CRC(b2af1359) SHA1(6a21e38cfb65d52b7e1209101f0dd497f9a71f46) )
+
+	ROM_REGION( 0x1000, "proms", 0 )
+	// not provided
+	ROM_LOAD( "a30-15.u03", 0x0000, 0x0400, BAD_DUMP CRC(55e38cc7) SHA1(823a6d7f29eadf5d12702d782d4297b0d4c65a0e) )  /* red */
+	ROM_LOAD( "a30-16.u01", 0x0400, 0x0400, BAD_DUMP CRC(13997e20) SHA1(9fae1cf633409a88263dc66a17b1c2eeccd05f4f) )  /* green */
+	ROM_LOAD( "a30-17.u02", 0x0800, 0x0400, BAD_DUMP CRC(5031f2f3) SHA1(1836d82fdc9f39cb318a791af2a935c27baabfd7) )  /* blue */
+	ROM_LOAD( "a30-18.u13", 0x0c00, 0x0400, BAD_DUMP CRC(78697c0f) SHA1(31382ed4c0d44024f7f57a9de6407527f4d5b0d1) )  /* ??? */	
+ROM_END
+
 ROM_START( fieldday )
 	ROM_REGION( 0x14000, "maincpu", 0 ) /* Z80 main CPU  */
 	ROM_LOAD( "a17_44.bin", 0x00000, 0x2000, CRC(d59812e1) SHA1(f3e7e2f09fba5964c92813cd652aa093fe3e4415) )
@@ -1221,8 +988,8 @@ ROM_START( fieldday )
 	ROM_LOAD( "a17_28.bin", 0x8000, 0x2000, CRC(1a4d1dae) SHA1(fbc3c55ad9f15ead432c136eec648fe22e523ea7) )
 	ROM_LOAD( "a17_29.bin", 0xa000, 0x2000, CRC(3c540007) SHA1(549e7ff260214c538913ff548dcb088987845911) )
 
-	ROM_REGION( 0x0800, "cpu2", 0 ) /* 2k for the microcontroller */
-	ROM_LOAD( "a17_14.bin", 0x0000, 0x0800, NO_DUMP )
+	ROM_REGION( 0x0800, "bmcu:mcu", 0 )  /* 2k for the microcontroller */
+	ROM_LOAD( "a17_14.bin", 0x0000, 0x0800, CRC(a686894d) SHA1(0578747a1869db98ee1962822491103f3f082cba) )
 
 	ROM_REGION( 0x8000, "gfx1", 0 )
 	ROM_LOAD( "a17_36.bin", 0x0000, 0x2000, CRC(e3dd51f7) SHA1(95a97ea925c5bc7bdc00887e6d17d817b36befc4) )
@@ -1259,8 +1026,8 @@ ROM_START( undoukai )
 	ROM_LOAD( "a17-12.38s", 0x8000, 0x2000, CRC(cb7e6dcd) SHA1(5286c6d340c1d465caebae5dd7e3d4ff8b7f8f5e) )
 	ROM_LOAD( "a17-13.39s", 0xa000, 0x2000, CRC(0a40930e) SHA1(8c4b9fa0aed67a3e269c2136ef81791fc8acd1da) )
 
-	ROM_REGION( 0x0800, "cpu2", 0 ) /* 2k for the microcontroller */
-	ROM_LOAD( "a17-14.41c", 0x0000, 0x0800, NO_DUMP )
+	ROM_REGION( 0x0800, "bmcu:mcu", 0 )  /* 2k for the microcontroller */
+	ROM_LOAD( "a17_14.bin", 0x0000, 0x0800, CRC(a686894d) SHA1(0578747a1869db98ee1962822491103f3f082cba) )
 
 	ROM_REGION( 0x8000, "gfx1", 0 )
 	ROM_LOAD( "a17-04.18v", 0x0000, 0x4000, CRC(84dabee2) SHA1(698f12ee4201665988248853dafbf4b16dfc6517) )
@@ -1277,6 +1044,7 @@ ROM_START( undoukai )
 	ROM_LOAD( "a17-18.23v", 0x0c00, 0x0400, CRC(3023a1da) SHA1(08ce4c6e99d04b358d66f0588852311d07183619) )  /* ??? */
 ROM_END
 
-GAME( 1984, 40love,   0,        40love,   40love,   fortyl_state, 40love,   ROT0, "Taito Corporation", "Forty-Love",           MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1984, 40love,   0,        40love,   40love,   fortyl_state, 40love,   ROT0, "Taito Corporation", "Forty-Love (World)",           MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1984, 40lovej,  40love,   40love,   40love,   fortyl_state, 40love,   ROT0, "Taito Corporation", "Forty-Love (Japan)",           MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 GAME( 1984, fieldday, 0,        undoukai, undoukai, fortyl_state, undoukai, ROT0, "Taito Corporation", "Field Day",            MACHINE_SUPPORTS_SAVE )
 GAME( 1984, undoukai, fieldday, undoukai, undoukai, fortyl_state, undoukai, ROT0, "Taito Corporation", "The Undoukai (Japan)", MACHINE_SUPPORTS_SAVE )

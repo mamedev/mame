@@ -18,15 +18,6 @@ class nubus_mac8390_device :
 		public device_t,
 		public device_nubus_card_interface
 {
-public:
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-
-	void dp_irq_w(int state);
-	DECLARE_READ8_MEMBER(dp_mem_read);
-	DECLARE_WRITE8_MEMBER(dp_mem_write);
-
 protected:
 	// construction/destruction
 	nubus_mac8390_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -34,6 +25,10 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	DECLARE_READ8_MEMBER(asntm3b_ram_r);
 	DECLARE_WRITE8_MEMBER(asntm3b_ram_w);
@@ -43,6 +38,10 @@ protected:
 	required_device<dp8390_device> m_dp83902;
 
 private:
+	void dp_irq_w(int state);
+	DECLARE_READ8_MEMBER(dp_mem_read);
+	DECLARE_WRITE8_MEMBER(dp_mem_write);
+
 	uint8_t m_ram[0x20000];
 	uint8_t m_prom[16];
 };

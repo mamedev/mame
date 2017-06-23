@@ -277,16 +277,11 @@ READ8_MEMBER(cvs_state::cvs_input_r)
  *
  *************************************/
 #if 0
-READ8_MEMBER(cvs_state::cvs_393hz_clock_r)
+READ_LINE_MEMBER(cvs_state::cvs_393hz_clock_r)
 {
-	return m_cvs_393hz_clock ? 0x80 : 0;
+	return m_cvs_393hz_clock;
 }
 #endif
-
-READ8_MEMBER(cvs_state::tms_clock_r)
-{
-	return m_tms5110->romclk_hack_r(space, 0) ? 0x80 : 0;
-}
 
 TIMER_CALLBACK_MEMBER(cvs_state::cvs_393hz_timer_cb)
 {
@@ -463,10 +458,12 @@ static ADDRESS_MAP_START( cvs_main_cpu_map, AS_PROGRAM, 8, cvs_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cvs_main_cpu_io_map, AS_IO, 8, cvs_state )
-	AM_RANGE(0x00, 0xff) AM_READ(cvs_input_r) AM_WRITE(cvs_scroll_w)
+	AM_RANGE(0x00, 0xff) AM_READWRITE(cvs_input_r, cvs_scroll_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( cvs_main_cpu_data_map, AS_DATA, 8, cvs_state )
+	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_READWRITE(cvs_collision_r, audio_command_w)
 	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READWRITE(cvs_collision_clear, cvs_video_fx_w)
-	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_READ(cvs_collision_r) AM_WRITE(audio_command_w)
-	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
 ADDRESS_MAP_END
 
 /*************************************
@@ -486,12 +483,6 @@ static ADDRESS_MAP_START( cvs_dac_cpu_map, AS_PROGRAM, 8, cvs_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( cvs_dac_cpu_io_map, AS_IO, 8, cvs_state )
-	/* doesn't look like it is used at all */
-	//AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(cvs_393hz_clock_r)
-ADDRESS_MAP_END
-
-
 
 /*************************************
  *
@@ -507,13 +498,6 @@ static ADDRESS_MAP_START( cvs_speech_cpu_map, AS_PROGRAM, 8, cvs_state )
 	AM_RANGE(0x1d80, 0x1d80) AM_READ(cvs_speech_command_r)
 	AM_RANGE(0x1ddc, 0x1dde) AM_WRITE(cvs_tms5110_ctl_w) AM_SHARE("tms5110_ctl")
 	AM_RANGE(0x1ddf, 0x1ddf) AM_WRITE(cvs_tms5110_pdc_w)
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( cvs_speech_cpu_io_map, AS_IO, 8, cvs_state )
-/* romclk is much more probable, 393 Hz results in timing issues */
-//  AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(cvs_393hz_clock_r)
-	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(tms_clock_r)
 ADDRESS_MAP_END
 
 
@@ -583,9 +567,6 @@ static INPUT_PORTS_START( cvs )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x10, "5" )
 	PORT_DIPUNUSED( 0x20, IP_ACTIVE_HIGH )                  /* can't tell if it's ACTIVE_HIGH or ACTIVE_LOW */
-
-	PORT_START("SENSE")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cvs_registration )
@@ -980,16 +961,21 @@ static MACHINE_CONFIG_START( cvs )
 	MCFG_CPU_ADD("maincpu", S2650, XTAL_14_31818MHz/16)
 	MCFG_CPU_PROGRAM_MAP(cvs_main_cpu_map)
 	MCFG_CPU_IO_MAP(cvs_main_cpu_io_map)
+	MCFG_CPU_DATA_MAP(cvs_main_cpu_data_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cvs_state, cvs_main_cpu_interrupt)
-	MCFG_S2650_FLAG_HANDLER(WRITELINE(cvs_state, write_s2650_flag))
+	MCFG_S2650_SENSE_INPUT(DEVREADLINE("screen", screen_device, vblank))
+	MCFG_S2650_FLAG_OUTPUT(WRITELINE(cvs_state, write_s2650_flag))
 
 	MCFG_CPU_ADD("audiocpu", S2650, XTAL_14_31818MHz/16)
 	MCFG_CPU_PROGRAM_MAP(cvs_dac_cpu_map)
-	MCFG_CPU_IO_MAP(cvs_dac_cpu_io_map)
+	/* doesn't look like it is used at all */
+	//MCFG_S2650_SENSE_INPUT(READLINE(cvs_state, cvs_393hz_clock_r))
 
 	MCFG_CPU_ADD("speechcpu", S2650, XTAL_14_31818MHz/16)
 	MCFG_CPU_PROGRAM_MAP(cvs_speech_cpu_map)
-	MCFG_CPU_IO_MAP(cvs_speech_cpu_io_map)
+	/* romclk is much more probable, 393 Hz results in timing issues */
+	//MCFG_S2650_SENSE_INPUT(READLINE(cvs_state, cvs_393hz_clock_r))
+	MCFG_S2650_SENSE_INPUT(DEVREADLINE("tms", tms5110_device, romclk_hack_r))
 
 	MCFG_MACHINE_START_OVERRIDE(cvs_state,cvs)
 	MCFG_MACHINE_RESET_OVERRIDE(cvs_state,cvs)

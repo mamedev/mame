@@ -23,24 +23,23 @@ public:
 	// construction/destruction
 	iq151_staper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
-	// i8255 callbacks
-	DECLARE_READ8_MEMBER( ppi_porta_r );
-	DECLARE_WRITE8_MEMBER( ppi_portb_w );
-	DECLARE_WRITE8_MEMBER( ppi_portc_w );
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	// iq151cart_interface overrides
 	virtual void io_read(offs_t offset, uint8_t &data) override;
 	virtual void io_write(offs_t offset, uint8_t data) override;
 
 private:
+	// i8255 callbacks
+	DECLARE_READ8_MEMBER( ppi_porta_r );
+	DECLARE_WRITE8_MEMBER( ppi_portb_w );
+	DECLARE_WRITE8_MEMBER( ppi_portc_w );
 
 	static const device_timer_id TIMER_PRINTER = 0;
 

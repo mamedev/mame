@@ -962,12 +962,6 @@ WRITE8_MEMBER(polepos_state::bootleg_soundlatch_w)
 		m_soundlatch->write(space, 0, data | 0xfc);
 }
 
-READ8_MEMBER(polepos_state::sound_z80_nmi_ack_r)
-{
-	m_sound_z80->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-	return 0xff;
-}
-
 static ADDRESS_MAP_START( topracern_io, AS_IO, 8, polepos_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_IMPORT_FROM(z80_io)
@@ -982,7 +976,7 @@ static ADDRESS_MAP_START( sound_z80_bootleg_map, AS_PROGRAM, 8, polepos_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2700, 0x27ff) AM_RAM
 	AM_RANGE(0x4000, 0x4000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x6000, 0x6000) AM_READ(sound_z80_nmi_ack_r)
+	AM_RANGE(0x6000, 0x6000) AM_DEVREAD("soundlatch", generic_latch_8_device, acknowledge_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_z80_bootleg_iomap, AS_IO, 8, polepos_state )
@@ -1066,7 +1060,8 @@ static MACHINE_CONFIG_DERIVED( polepos2bi, topracern )
 	MCFG_CPU_IO_MAP(sound_z80_bootleg_iomap)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(ASSERTLINE("soundz80bl", INPUT_LINE_NMI))
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundz80bl", INPUT_LINE_NMI))
+	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
 	MCFG_SOUND_ADD("tms", TMS5220, 600000) /* ? Mhz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)

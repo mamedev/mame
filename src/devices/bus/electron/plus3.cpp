@@ -31,7 +31,7 @@ DEFINE_DEVICE_TYPE(ELECTRON_PLUS3, electron_plus3_device, "electron_plus3", "Aco
 //  MACHINE_DRIVER( plus3 )
 //-------------------------------------------------
 
-FLOPPY_FORMATS_MEMBER(floppy_formats)
+FLOPPY_FORMATS_MEMBER(electron_plus3_device::floppy_formats)
 	FLOPPY_ACORN_SSD_FORMAT,
 	FLOPPY_ACORN_DSD_FORMAT,
 	FLOPPY_ACORN_ADFS_OLD_FORMAT
@@ -43,23 +43,6 @@ SLOT_INTERFACE_START(electron_floppies)
 	SLOT_INTERFACE("525dd",   FLOPPY_525_DD)
 	SLOT_INTERFACE("525qd",   FLOPPY_525_QD)
 SLOT_INTERFACE_END
-
-
-MACHINE_CONFIG_START( plus3 )
-	/* fdc */
-	MCFG_WD1770_ADD("fdc", XTAL_16MHz / 2)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", electron_floppies, "35dd", floppy_formats)
-	MCFG_SLOT_FIXED(true)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", electron_floppies, nullptr, floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-
-	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("flop_ls", "electron_flop")
-
-	/* pass-through */
-	MCFG_ELECTRON_PASSTHRU_EXPANSION_SLOT_ADD(nullptr)
-MACHINE_CONFIG_END
 
 
 ROM_START( plus3 )
@@ -79,14 +62,24 @@ ROM_START( plus3 )
 ROM_END
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor electron_plus3_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( plus3 );
-}
+MACHINE_CONFIG_MEMBER( electron_plus3_device::device_add_mconfig )
+	/* fdc */
+	MCFG_WD1770_ADD("fdc", XTAL_16MHz / 2)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", electron_floppies, "35dd", floppy_formats)
+	MCFG_SLOT_FIXED(true)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", electron_floppies, nullptr, floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+
+	/* software lists */
+	MCFG_SOFTWARE_LIST_ADD("flop_ls", "electron_flop")
+
+	/* pass-through */
+	MCFG_ELECTRON_PASSTHRU_EXPANSION_SLOT_ADD(nullptr)
+MACHINE_CONFIG_END
 
 const tiny_rom_entry *electron_plus3_device::device_rom_region() const
 {

@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
 
+#include "machine/6850acia.h"
 #include "machine/gen_latch.h"
 #include "video/vsystem_spr.h"
 #include "video/vsystem_spr2.h"
@@ -32,7 +33,8 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_k053936(*this, "k053936"),
 		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch") { }
+		m_soundlatch(*this, "soundlatch"),
+		m_acia(*this, "acia") { }
 
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_sharedram;
@@ -63,9 +65,6 @@ public:
 	uint32_t f1gp_old_tile_callback( uint32_t code );
 	uint32_t f1gp_ol2_tile_callback( uint32_t code );
 
-	/* misc */
-	int       m_pending_command;
-
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	optional_device<vsystem_spr2_device> m_spr_old; // f1gp
@@ -76,11 +75,10 @@ public:
 	optional_device<k053936_device> m_k053936;
 	required_device<palette_device> m_palette;
 	optional_device<generic_latch_8_device> m_soundlatch; // not f1gpb
+	required_device<acia6850_device> m_acia;
 
 	DECLARE_WRITE8_MEMBER(f1gp_sh_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(sound_command_w);
 	DECLARE_READ8_MEMBER(command_pending_r);
-	DECLARE_WRITE8_MEMBER(pending_command_clear_w);
 	DECLARE_WRITE16_MEMBER(f1gpb_misc_w);
 	DECLARE_READ16_MEMBER(f1gp_zoomdata_r);
 	DECLARE_WRITE16_MEMBER(f1gp_zoomdata_w);

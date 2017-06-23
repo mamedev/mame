@@ -122,7 +122,6 @@ CPU_DISASSEMBLE( i960 );
 CPU_DISASSEMBLE( ie15 );
 CPU_DISASSEMBLE( jaguardsp );
 CPU_DISASSEMBLE( jaguargpu );
-CPU_DISASSEMBLE( kb1013vk12 );
 CPU_DISASSEMBLE( konami );
 CPU_DISASSEMBLE( lh5801 );
 CPU_DISASSEMBLE( lr35902 );
@@ -177,6 +176,7 @@ CPU_DISASSEMBLE( sharc );
 CPU_DISASSEMBLE( sm500 );
 CPU_DISASSEMBLE( sm510 );
 CPU_DISASSEMBLE( sm511 );
+CPU_DISASSEMBLE( sm5a );
 CPU_DISASSEMBLE( sm8500 );
 CPU_DISASSEMBLE( spc700 );
 CPU_DISASSEMBLE( ssem );
@@ -296,7 +296,6 @@ static const dasm_table_entry dasm_table[] =
 	{ "ie15",        _8bit,  0, CPU_DISASSEMBLE_NAME(ie15) },
 	{ "jaguardsp",   _16be,  0, CPU_DISASSEMBLE_NAME(jaguardsp) },
 	{ "jaguargpu",   _16be,  0, CPU_DISASSEMBLE_NAME(jaguargpu) },
-	{ "kb1013vk12",  _8bit,  0, CPU_DISASSEMBLE_NAME(kb1013vk12) },
 	{ "konami",      _8bit,  0, CPU_DISASSEMBLE_NAME(konami) },
 	{ "lh5801",      _8bit,  0, CPU_DISASSEMBLE_NAME(lh5801) },
 	{ "lr35902",     _8bit,  0, CPU_DISASSEMBLE_NAME(lr35902) },
@@ -351,6 +350,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "sm500",       _8bit,  0, CPU_DISASSEMBLE_NAME(sm500) },
 	{ "sm510",       _8bit,  0, CPU_DISASSEMBLE_NAME(sm510) },
 	{ "sm511",       _8bit,  0, CPU_DISASSEMBLE_NAME(sm511) },
+	{ "sm5a",        _8bit,  0, CPU_DISASSEMBLE_NAME(sm5a) },
 	{ "sm8500",      _8bit,  0, CPU_DISASSEMBLE_NAME(sm8500) },
 	{ "sparcv7",     _32be,  0, CPU_DISASSEMBLE_NAME(sparcv7) },
 	{ "sparcv8",     _32be,  0, CPU_DISASSEMBLE_NAME(sparcv8) },

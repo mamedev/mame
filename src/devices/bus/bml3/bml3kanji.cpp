@@ -29,23 +29,10 @@ ROM_START( kanji )
 	ROM_LOAD("kanji.rom", 0x00000, 0x20000, BAD_DUMP CRC(de99a726) SHA1(65fead5d0d779b242f6e0ac25fcc9899dc343101))
 ROM_END
 
-MACHINE_CONFIG_START( kanji )
-	// nothing to add
-MACHINE_CONFIG_END
 
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor bml3bus_kanji_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( kanji );
-}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region

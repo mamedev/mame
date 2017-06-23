@@ -298,7 +298,7 @@ static ADDRESS_MAP_START( leapster_map, AS_PROGRAM, 32, leapster_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( leapster_aux, AS_IO, 32, leapster_state )
-	AM_RANGE(0x00000012c, 0x00000012f) AM_WRITE(leapster_aux004b_w) // this address isn't used by ARC internal stuff afaik, so probably leapster specific
+	AM_RANGE(0x00000004b, 0x00000004b) AM_WRITE(leapster_aux004b_w) // this address isn't used by ARC internal stuff afaik, so probably leapster specific
 ADDRESS_MAP_END
 
 static MACHINE_CONFIG_START( leapster )

@@ -27,23 +27,26 @@ public:
 	// construction/destruction
 	mc1502_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
 
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
 	TIMER_CALLBACK_MEMBER(motor_callback);
 
 	DECLARE_READ8_MEMBER(mc1502_fdc_r);
 	DECLARE_READ8_MEMBER(mc1502_fdcv2_r);
 	DECLARE_WRITE8_MEMBER(mc1502_fdc_w);
-	DECLARE_WRITE_LINE_MEMBER(mc1502_fdc_irq_drq);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+
 private:
+	DECLARE_FLOPPY_FORMATS(floppy_formats);
+
+	DECLARE_WRITE_LINE_MEMBER(mc1502_fdc_irq_drq);
+
 	required_device<fd1793_device> m_fdc;
 	int motor_on;
 	emu_timer *motor_timer;

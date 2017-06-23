@@ -30,17 +30,13 @@ public:
 	// construction/destruction
 	compis_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
-	DECLARE_WRITE_LINE_MEMBER( fdc_irq );
-	DECLARE_WRITE_LINE_MEMBER( fdc_drq );
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	// device_isbx_card_interface overrides
 	virtual uint8_t mcs0_r(address_space &space, offs_t offset) override;
@@ -51,6 +47,10 @@ protected:
 	virtual void opt1_w(int state) override;
 
 private:
+	DECLARE_WRITE_LINE_MEMBER( fdc_irq );
+	DECLARE_WRITE_LINE_MEMBER( fdc_drq );
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
+
 	required_device<i8272a_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;

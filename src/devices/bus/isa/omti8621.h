@@ -34,10 +34,6 @@ public:
 
 	static void set_verbose(int on_off);
 
-	DECLARE_WRITE_LINE_MEMBER( fdc_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
-
 protected:
 	static constexpr unsigned OMTI_MAX_LUN = 1;
 	static constexpr unsigned CDB_SIZE = 10;
@@ -54,7 +50,7 @@ protected:
 	virtual void device_reset() override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 
 	virtual uint8_t dack_r(int line) override;
@@ -70,6 +66,10 @@ protected:
 	omti_disk_image_device *our_disks[OMTI_MAX_LUN+1];
 
 private:
+	DECLARE_WRITE_LINE_MEMBER( fdc_irq_w );
+	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
+
 	uint16_t jumper;
 
 	uint8_t omti_state;

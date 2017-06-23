@@ -56,15 +56,14 @@ const tiny_rom_entry *epson_pf10_device::device_rom_region() const
 
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
 static SLOT_INTERFACE_START( pf10_floppies )
 	SLOT_INTERFACE( "smd165", EPSON_SMD_165 )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( pf10 )
+MACHINE_CONFIG_MEMBER( epson_pf10_device::device_add_mconfig )
 	MCFG_CPU_ADD("maincpu", HD6303Y, XTAL_4_9152MHz) // HD63A03XF
 	MCFG_CPU_PROGRAM_MAP(cpu_mem)
 	MCFG_CPU_IO_MAP(cpu_io)
@@ -77,11 +76,6 @@ static MACHINE_CONFIG_START( pf10 )
 	MCFG_EPSON_SIO_RX(DEVWRITELINE(DEVICE_SELF, epson_pf10_device, rxc_w))
 	MCFG_EPSON_SIO_PIN(DEVWRITELINE(DEVICE_SELF, epson_pf10_device, pinc_w))
 MACHINE_CONFIG_END
-
-machine_config_constructor epson_pf10_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( pf10 );
-}
 
 
 //**************************************************************************

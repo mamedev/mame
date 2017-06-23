@@ -50,27 +50,15 @@ SLOT_INTERFACE_END
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( isbc_218a )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( isbc_218a )
+MACHINE_CONFIG_MEMBER( isbc_218a_device::device_add_mconfig )
 	MCFG_I8272A_ADD(I8272_TAG, true)
 	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(isbc_218a_device, fdc_irq))
 	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(isbc_218a_device, fdc_drq))
 	MCFG_FLOPPY_DRIVE_ADD(I8272_TAG":0", isbc_218a_floppies, "525dd", isbc_218a_device::floppy_formats)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor isbc_218a_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( isbc_218a );
-}
-
 
 
 //**************************************************************************

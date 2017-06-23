@@ -3385,7 +3385,12 @@ void psxcpu_device::set_disable_rom_berr(bool mode)
 	m_disable_rom_berr = mode;
 }
 
-static MACHINE_CONFIG_START( psx )
+
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( psxcpu_device::device_add_mconfig )
 	MCFG_DEVICE_ADD( "irq", PSX_IRQ, 0 )
 	MCFG_PSX_IRQ_HANDLER( INPUTLINE( DEVICE_SELF, PSXCPU_IRQ0 ) )
 
@@ -3410,13 +3415,3 @@ static MACHINE_CONFIG_START( psx )
 	MCFG_RAM_ADD( "ram" )
 	MCFG_RAM_DEFAULT_VALUE( 0x00 )
 MACHINE_CONFIG_END
-
-//-------------------------------------------------
-//  machine_config_additions - return a pointer to
-//  the device's machine fragment
-//-------------------------------------------------
-
-machine_config_constructor psxcpu_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( psx );
-}

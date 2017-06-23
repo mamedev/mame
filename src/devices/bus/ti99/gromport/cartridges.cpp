@@ -81,7 +81,7 @@ static const pcb_type sw_pcbdefs[] =
 };
 
 ti99_cartridge_device::ti99_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-:   bus8z_device(mconfig, TI99_CART, tag, owner, clock),
+:   device_t(mconfig, TI99_CART, tag, owner, clock),
 	device_image_interface(mconfig, *this),
 	m_pcbtype(0),
 	m_slot(0),
@@ -389,7 +389,7 @@ void ti99_cartridge_device::device_config_complete()
 /*
     5 GROMs that may be contained in a cartridge
 */
-static MACHINE_CONFIG_START( ti99_cartridge )
+MACHINE_CONFIG_MEMBER( ti99_cartridge_device::device_add_mconfig )
 	MCFG_GROM_ADD( GROM3_TAG, 3, CARTGROM_TAG, 0x0000, WRITELINE(ti99_cartridge_device, ready_line))
 	MCFG_GROM_ADD( GROM4_TAG, 4, CARTGROM_TAG, 0x2000, WRITELINE(ti99_cartridge_device, ready_line))
 	MCFG_GROM_ADD( GROM5_TAG, 5, CARTGROM_TAG, 0x4000, WRITELINE(ti99_cartridge_device, ready_line))
@@ -397,10 +397,6 @@ static MACHINE_CONFIG_START( ti99_cartridge )
 	MCFG_GROM_ADD( GROM7_TAG, 7, CARTGROM_TAG, 0x8000, WRITELINE(ti99_cartridge_device, ready_line))
 MACHINE_CONFIG_END
 
-machine_config_constructor ti99_cartridge_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( ti99_cartridge );
-}
 
 /*
     Memory area for one cartridge. For most cartridges we only need 8 KiB for

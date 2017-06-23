@@ -31,13 +31,13 @@ public:
 	virtual DECLARE_READ8_MEMBER( iorq_r ) override;
 	virtual DECLARE_WRITE8_MEMBER( iorq_w ) override;
 
-	DECLARE_WRITE_LINE_MEMBER( busy_w );
-
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 
 private:
+	DECLARE_WRITE_LINE_MEMBER( busy_w );
+
 	required_device<centronics_device> m_centronics;
 	required_device<output_latch_device> m_cent_data_out;
 

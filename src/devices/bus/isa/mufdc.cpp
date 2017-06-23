@@ -28,11 +28,6 @@
 DEFINE_DEVICE_TYPE(ISA8_FDC344, fdc344_device, "fdc344", "Ably-Tech FDC-344")
 DEFINE_DEVICE_TYPE(ISA8_FDCMAG, fdcmag_device, "fdcmag", "Magitronic Multi Floppy Controller Card")
 
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
 FLOPPY_FORMATS_MEMBER( mufdc_device::floppy_formats )
 	FLOPPY_PC_FORMAT,
 	FLOPPY_NASLITE_FORMAT
@@ -45,7 +40,11 @@ static SLOT_INTERFACE_START( drives )
 	SLOT_INTERFACE("35dd", FLOPPY_35_DD)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( mufdc_device )
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( mufdc_device::device_add_mconfig )
 	MCFG_MCS3201_ADD("fdc")
 	MCFG_MCS3201_INPUT_HANDLER(READ8(mufdc_device, fdc_input_r))
 	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(mufdc_device, fdc_irq_w))
@@ -55,11 +54,6 @@ static MACHINE_CONFIG_START( mufdc_device )
 	MCFG_FLOPPY_DRIVE_ADD("fdc:2", drives, nullptr, mufdc_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:3", drives, nullptr, mufdc_device::floppy_formats)
 MACHINE_CONFIG_END
-
-machine_config_constructor mufdc_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( mufdc_device );
-}
 
 //-------------------------------------------------
 //  input_ports - device-specific input ports

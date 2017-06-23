@@ -402,10 +402,10 @@ WRITE_LINE_MEMBER( cubo_state::akiko_int_w )
 
 WRITE8_MEMBER( cubo_state::akiko_cia_0_port_a_write )
 {
-	/* bit 1 = cd audio mute */
+	/* bit 0 = cd audio mute */
 	m_cdda->set_output_gain( 0, ( data & 1 ) ? 0.0 : 1.0 );
 
-	/* bit 2 = Power Led on Amiga */
+	/* bit 1 = Power Led on Amiga */
 	output().set_led_value(0, (data & 2) ? 0 : 1);
 
 	handle_joystick_cia(data, m_cia_0->read(space, 2));
@@ -1369,8 +1369,8 @@ INPUT_PORTS_END
 GAME( 1993, cubo,     0,    cubo, cubo,     cubo_state, cubo,     ROT0, "Commodore",  "Cubo BIOS",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_IS_BIOS_ROOT )
 GAME( 1995, cndypuzl, cubo, cubo, cndypuzl, cubo_state, cndypuzl, ROT0, "CD Express", "Candy Puzzle (v1.0)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1995, haremchl, cubo, cubo, haremchl, cubo_state, haremchl, ROT0, "CD Express", "Harem Challenge",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1995, lsrquiz,  cubo, cubo, lsrquiz,  cubo_state, lsrquiz,  ROT0, "CD Express", "Laser Quiz Italy",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )  /* no player 2 inputs (ingame) */
-GAME( 1995, lsrquiz2, cubo, cubo, lsrquiz2, cubo_state, lsrquiz2, ROT0, "CD Express", "Laser Quiz 2 Italy (v1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1995, lsrquiz,  cubo, cubo, lsrquiz,  cubo_state, lsrquiz,  ROT0, "CD Express", "Laser Quiz Italy",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )  /* no player 2 inputs (ingame), wrong pitch for most gfxs */
+GAME( 1995, lsrquiz2, cubo, cubo, lsrquiz2, cubo_state, lsrquiz2, ROT0, "CD Express", "Laser Quiz 2 Italy (v1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* wrong pitch for some gfxs, crashes during gameplay */
 GAME( 1995, lasstixx, cubo, cubo, lasstixx, cubo_state, lasstixx, ROT0, "CD Express", "Laser Strixx 2",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1995, mgnumber, cubo, cubo, mgnumber, cubo_state, mgnumber, ROT0, "CD Express", "Magic Number",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1996, mgprem11, cubo, cubo, mgprem11, cubo_state, mgprem11, ROT0, "CD Express", "Magic Premium (v1.1)",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

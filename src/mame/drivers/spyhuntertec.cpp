@@ -489,14 +489,14 @@ static ADDRESS_MAP_START( spyhuntertec_sound_portmap, AS_IO, 8, spyhuntertec_sta
 
 	AM_RANGE(0x00, 0x00) AM_WRITE(sound_irq_ack)
 
-	AM_RANGE(0x0012, 0x0013) AM_DEVWRITE("ay3", ay8910_device, address_data_w)
-	AM_RANGE(0x0012, 0x0012) AM_DEVREAD("ay3", ay8910_device, data_r)
+	AM_RANGE(0x0012, 0x0013) AM_DEVWRITE("ay3", ay8912_device, address_data_w)
+	AM_RANGE(0x0012, 0x0012) AM_DEVREAD("ay3", ay8912_device, data_r)
 
-	AM_RANGE(0x0014, 0x0015) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
-	AM_RANGE(0x0014, 0x0014) AM_DEVREAD("ay1", ay8910_device, data_r)
+	AM_RANGE(0x0014, 0x0015) AM_DEVWRITE("ay1", ay8912_device, address_data_w)
+	AM_RANGE(0x0014, 0x0014) AM_DEVREAD("ay1", ay8912_device, data_r)
 
-	AM_RANGE(0x0018, 0x0019) AM_DEVWRITE("ay2", ay8910_device, address_data_w) // data written to port a
-	AM_RANGE(0x0018, 0x0018) AM_DEVREAD("ay2", ay8910_device, data_r) // actually read
+	AM_RANGE(0x0018, 0x0019) AM_DEVWRITE("ay2", ay8912_device, address_data_w) // data written to port a
+	AM_RANGE(0x0018, 0x0018) AM_DEVREAD("ay2", ay8912_device, data_r) // actually read
 
 ADDRESS_MAP_END
 

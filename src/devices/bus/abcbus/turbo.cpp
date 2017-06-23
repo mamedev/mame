@@ -79,26 +79,15 @@ static const z80_daisy_config daisy_chain[] =
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( turbo_kontroller )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( turbo_kontroller )
+MACHINE_CONFIG_MEMBER( turbo_kontroller_device::device_add_mconfig )
 	MCFG_CPU_ADD(Z80_TAG, Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(turbo_kontroller_mem)
 	MCFG_CPU_IO_MAP(turbo_kontroller_io)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor turbo_kontroller_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( turbo_kontroller );
-}
 
 
 

@@ -120,10 +120,10 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( interpod )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( interpod )
+MACHINE_CONFIG_MEMBER( interpod_device::device_add_mconfig )
 	MCFG_CPU_ADD(R6502_TAG, M6502, 1000000)
 	MCFG_CPU_PROGRAM_MAP(interpod_mem)
 
@@ -133,17 +133,6 @@ static MACHINE_CONFIG_START( interpod )
 
 	MCFG_CBM_IEEE488_ADD(nullptr)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor interpod_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( interpod );
-}
 
 
 //**************************************************************************

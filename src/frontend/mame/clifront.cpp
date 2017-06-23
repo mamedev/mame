@@ -437,7 +437,7 @@ void cli_frontend::listclones(const std::vector<std::string> &args)
 	{
 		int clone_of = drivlist.clone();
 		if (clone_of != -1 && (drivlist.driver(clone_of).flags & MACHINE_IS_BIOS_ROOT) == 0)
-			osd_printf_info("%-16s %-8s\n", drivlist.driver().name, drivlist.driver(clone_of).name);
+			osd_printf_info("%-16s %s\n", drivlist.driver().name, drivlist.driver(clone_of).name);
 	}
 }
 
@@ -483,7 +483,10 @@ void cli_frontend::listbrothers(const std::vector<std::string> &args)
 	while (drivlist.next())
 	{
 		int clone_of = drivlist.clone();
-		osd_printf_info("%-20s %-16s %-16s\n", core_filename_extract_base(drivlist.driver().type.source()).c_str(), drivlist.driver().name, (clone_of == -1 ? "" : drivlist.driver(clone_of).name));
+		if (clone_of != -1)
+			osd_printf_info("%-20s %-16s %s\n", core_filename_extract_base(drivlist.driver().type.source()).c_str(), drivlist.driver().name, (clone_of == -1 ? "" : drivlist.driver(clone_of).name));
+		else
+			osd_printf_info("%-20s %s\n", core_filename_extract_base(drivlist.driver().type.source()).c_str(), drivlist.driver().name);
 	}
 }
 
@@ -794,25 +797,33 @@ void cli_frontend::listslots(const std::vector<std::string> &args)
 		for (const device_slot_interface &slot : slot_interface_iterator(drivlist.config()->root_device()))
 		{
 			if (slot.fixed()) continue;
+
+			// build a list of user-selectable options
+			std::vector<device_slot_option *> option_list;
+			for (auto &option : slot.option_list())
+				if (option.second->selectable())
+					option_list.push_back(option.second.get());
+
+			// sort them by name
+			std::sort(option_list.begin(), option_list.end(), [](device_slot_option *opt1, device_slot_option *opt2) {
+				return strcmp(opt1->name(), opt2->name()) < 0;
+			});
+
+
 			// output the line, up to the list of extensions
 			printf("%-16s %-16s ", first ? drivlist.driver().name : "", slot.device().tag()+1);
 
 			bool first_option = true;
 
 			// get the options and print them
-			for (auto &option : slot.option_list())
+			for (device_slot_option *opt : option_list)
 			{
-				if (option.second->selectable())
-				{
-					std::unique_ptr<device_t> dev = option.second->devtype()(*drivlist.config(), "dummy", &drivlist.config()->root_device(), 0);
-					dev->config_complete();
-					if (first_option)
-						printf("%-16s %s\n", option.second->name(),dev->name());
-					else
-						printf("%-34s%-16s %s\n", "", option.second->name(),dev->name());
+				if (first_option)
+					printf("%-16s %s\n", opt->name(), opt->devtype().fullname());
+				else
+					printf("%-34s%-16s %s\n", "", opt->name(), opt->devtype().fullname());
 
-					first_option = false;
-				}
+				first_option = false;
 			}
 			if (first_option)
 				printf("%-16s %s\n", "[none]","No options available");
@@ -844,7 +855,7 @@ void cli_frontend::listmedia(const std::vector<std::string> &args)
 
 	// print header
 	printf("%-16s %-16s %-10s %s\n", "SYSTEM", "MEDIA NAME", "(brief)", "IMAGE FILE EXTENSIONS SUPPORTED");
-	printf("%s %s-%s %s\n", std::string(16,'-').c_str(), std::string(16,'-').c_str(), std::string(10,'-').c_str(), std::string(34,'-').c_str());
+	printf("%s %s-%s %s\n", std::string(16,'-').c_str(), std::string(16,'-').c_str(), std::string(10,'-').c_str(), std::string(31,'-').c_str());
 
 	// iterate over drivers
 	while (drivlist.next())

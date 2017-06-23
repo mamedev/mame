@@ -14,13 +14,8 @@
     arkanoid    The earlier revisions. They each differ in the country byte. These
     arkanoiduo    versions work fine both the bootleg A75-06.IC16 MCU rom and the
     arkanoidjb    genuine decapped Taito A75__06.IC16 MC68705 MCU.
-    arkanoidu   USA version. A later revision, code has been inserted NOT patched.
-                  The 68705 code for this one was not available; Brad Oliver[?]
-                  made it up from the bootleg A75-06.IC16 by changing the level
-                  data pointer table.
-    arkanoidj   Japanese version.  Final revision, MCU code not dumped.
-                  Someone[who?] made a placeholder MCU for this set based on the
-                  bootleg A75-06.IC16 by changing the level data pointer table.
+    arkanoidu   USA version. MCU code properly dumped.
+    arkanoidj   Japanese version.  Final revision, MCU code properly dumped.
     arkanoidja  Japanese version.  A later revision with level selector.
                   The 68705 code for this one was not available; Brad Oliver[?]
                   made it up from the bootleg A75-06.IC16 by changing the level
@@ -43,6 +38,10 @@
     the collision detection routine which sometimes reads from unmapped addresses
     above $F000. For these addresses it is vital to read zero values, or else the
     player will die for no reason.
+
+    Some bootleg boards substitute an AY-3-8910A for the YM2149. Since the clock
+    divider of the GI PSG cannot be configured, this effectively doubles the
+    pitch of music and sound effects on actual hardware!
 
 Measured Clocks:
     Z80 - 5997077Hz (6Mhz)
@@ -140,8 +139,7 @@ K1100181A (ROMSTAR version added sticker)
 Notes:
       Z80         - Zilog Z0840006 CPU. Clock input 6.000MHz (12/2)
       YM2149F     - Yamaha YM2149F software-controlled sound generator (SSG). Clock input 1.5MHz (12/8)
-      A75_06.IC14 - Motorola MC68705P5 micro-controller. Clock input 3.000MHz (12/4). Labelled 'A75 06' for
-                    ROMSTAR version. Note original Taito version 68705 and Tournament Arkanoid MCUs work fine.
+      A75_06.IC14 - Motorola MC68705P5 micro-controller. Clock input 3.000MHz (12/4).
       A75_*       - 27C256 EPROMs labelled 'A75 xx'. xx = 01, 03, 04, 05 etc. See ROM loading in the src for exact ROM usage.
       A75-0*      - MMI 63S241 bipolar PROMs. Compatible with MB7116, 7621, DM74S571N etc
       TMM2018     - Toshiba TMM2018 2k x8 SRAM (DIP24)
@@ -1389,6 +1387,14 @@ static MACHINE_CONFIG_DERIVED( bootleg, arkanoid )
 	MCFG_DEVICE_REMOVE("mcu")
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( aysnd, bootleg )
+	MCFG_SOUND_REPLACE("aysnd", AY8910, XTAL_12MHz/4)
+	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("UNUSED"))
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW"))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.66)
+MACHINE_CONFIG_END
+
 
 static MACHINE_CONFIG_START( hexa )
 
@@ -1490,19 +1496,19 @@ MACHINE_CONFIG_END
     (A75 12 through 17 are unknown, could be another two sets of z80 code plus mc68705p5)
     A75 18   = Z80 code v2.0 2/2 USA/Romstar
     A75 19   = Z80 code v2.0 1/2 USA/Romstar
-    A75 20   = MC68705P5 MCU code, v2.0 USA/Romstar (NOT DUMPED, PLACEHOLDER HACKED FROM BOOTLEG MCU)
+    A75 20   = MC68705P5 MCU code, v2.0 USA/Romstar (verified. dumped from MCU)
     A75 21   = Z80 code v2.0 1/2 Japan w/level select
     A75 22   = Z80 code v2.0 2/2 Japan w/level select
     A75 23   = MC68705P5 MCU code, v2.0 Japan w/level select (NOT DUMPED, PLACEHOLDER HACKED FROM BOOTLEG MCU)
     A75 24   = Z80 code v2.1 1/2 Japan
     A75 25   = Z80 code v2.1 2/2 Japan
-    A75 26   = MC68705P5 MCU code, v2.1 Japan (NOT DUMPED, PLACEHOLDER HACKED FROM BOOTLEG MCU)
+    A75 26   = MC68705P5 MCU code, v2.1 Japan (verified. dumped from MCU)
     A75 27   = Z80 code 1/2 Tournament
     A75 28   = Z80 code 2/2 Tournament
     A75 29   = GFX 1/3 Tournament
     A75 30   = GFX 2/3 Tournament
     A75 31   = GFX 3/3 Tournament
-    A75 32   = MC68705P5 MCU code, Tournament (NOT DUMPED, PLACEHOLDER HACKED FROM BOOTLEG MCU)
+    A75 32   = MC68705P5 MCU code, Tournament (verified. dumped from MCU)
     A75 33   = PROM red Tournament
     A75 34   = PROM green Tournament
     A75 35   = PROM blue Tournament
@@ -1553,7 +1559,7 @@ ROM_START( arkanoidu ) // V2.0 US/Romstar
 	ROM_LOAD( "a75-18.ic16",   0x8000, 0x8000, CRC(cdc08301) SHA1(05f54353cc8333af14fa985a2764960e20e8161a) )
 
 	ROM_REGION( 0x0800, "mcu:mcu", 0 )  /* 2k for the microcontroller */
-	ROM_LOAD( "a75-20.ic14",   0x0000, 0x0800, BAD_DUMP CRC(de518e47) SHA1(b8eddd1c566505fb69e3d1207c7a9720dfb9f503) ) /* Hand crafted based on the bootleg a75-06 chip, need the real data here */
+	ROM_LOAD( "a75__20.ic14",   0x0000, 0x0800, CRC(3994ee92) SHA1(31f6577956f49ba0b0705b490ce3254033795552) ) // verified authentic v2.0 MCU from Taito/Romstar US Board
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
 	ROM_LOAD( "a75-03.ic64",   0x00000, 0x8000, CRC(038b74ba) SHA1(ac053cc4908b4075f918748b89570e07a0ba5116) )
@@ -1600,7 +1606,7 @@ ROM_START( arkanoidj ) // V2.1 Japan
 	ROM_LOAD( "a75_25.ic16",   0x8000, 0x8000, CRC(c13b2038) SHA1(0b8197b48e57ffe9ccad0ebbc24891d1da7c9880) )
 
 	ROM_REGION( 0x0800, "mcu:mcu", 0 )  /* 2k for the microcontroller */
-	ROM_LOAD( "a75-26.ic14",  0x0000, 0x0800, BAD_DUMP CRC(962960d4) SHA1(64b065a54b1658364db569ac06b717eb7bdd186e) ) /* Hand crafted based on the bootleg a75-06 chip, need the real data here */
+	ROM_LOAD( "a75__26.ic14",  0x0000, 0x0800, CRC(9c382c67) SHA1(c8518b726c40bf6ede494b38763dde4918309ef3) ) // verified authentic, dumped from actual MCU
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
 	ROM_LOAD( "a75-03.ic64",   0x00000, 0x8000, CRC(038b74ba) SHA1(ac053cc4908b4075f918748b89570e07a0ba5116) )
@@ -1659,7 +1665,7 @@ ROM_START( arkatour ) // Tournament version
 	ROM_LOAD( "a75-28.ic16",   0x8000, 0x8000, CRC(326aca4d) SHA1(5a194b7a0361236d471b24905dc6434372f81252) )
 
 	ROM_REGION( 0x0800, "mcu:mcu", 0 )  /* 2k for the microcontroller */
-	ROM_LOAD( "a75-32.ic14",  0x0000, 0x0800, BAD_DUMP CRC(d3249559) SHA1(b1542764450016614e9e03cedd6a2f1e59961789)  ) /* Hand crafted based on the bootleg a75-06 chip, need the real data here */
+	ROM_LOAD( "a75__32.ic14",  0x0000, 0x0800, CRC(8c20d15c) SHA1(912996bf08de318e19dc420261f554a09dacd443)  ) // verified authentic, dumped from actual MCU
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
 	ROM_LOAD( "a75-29.ic64",   0x00000, 0x8000, CRC(5ddea3cf) SHA1(58f16515898b7cc2697bf7663a60d9ca0db6da95) )
@@ -1963,6 +1969,9 @@ ROM_START( tetrsark )
 	ROM_LOAD( "ic17.1",      0x00000, 0x8000, CRC(1a505eda) SHA1(92f171a12cf0c326d29c244514718df04b998426) )
 	ROM_LOAD( "ic16.2",      0x08000, 0x8000, CRC(157bc4df) SHA1(b2c704148e7e3ca61ab51308ee0d66ea1088bff3) )
 
+	ROM_REGION( 0x800, "mcu", 0 )
+	ROM_LOAD( "14_mc68705p5_rom.bin", 0x000, 0x800, CRC(dfbc4239) SHA1(d97c44d90d09142fd00731c1e44646bcba0402ec) ) // unused, not programmed
+
 	ROM_REGION( 0x18000, "gfx1", 0 )
 	ROM_LOAD( "ic64.3",      0x00000, 0x8000, CRC(c3e9b290) SHA1(6e99520606c654e531dbeb9a598cfbb443c24dff) )
 	ROM_LOAD( "ic63.4",      0x08000, 0x8000, CRC(de9a368f) SHA1(ffbb2479200648da3f3e7ab7cebcdb604f6dfb3d) )
@@ -2209,11 +2218,11 @@ GAME( 1986, arkblock,    arkanoid, bootleg,  arkangc,   arkanoid_state, arkblock
 GAME( 1986, arkbloc2,    arkanoid, bootleg,  arkangc,   arkanoid_state, arkbloc2, ROT90,  "bootleg (Game Corporation)",                  "Block (Game Corporation bootleg, set 2)",     MACHINE_SUPPORTS_SAVE )
 GAME( 1986, arkbloc3,    arkanoid, bootleg,  block2,    arkanoid_state, block2,   ROT90,  "bootleg (Game Corporation)",                  "Block (Game Corporation bootleg, set 3)",     MACHINE_SUPPORTS_SAVE ) // Both these sets (arkblock3, block2) have an extra unknown rom
 GAME( 1986, block2,      arkanoid, bootleg,  block2,    arkanoid_state, block2,   ROT90,  "bootleg (S.P.A. Co.)",                        "Block 2 (S.P.A. Co. bootleg)",                MACHINE_SUPPORTS_SAVE ) //  and scrambled gfx roms with 'space invader' themed gfx
-GAME( 1986, arkgcbl,     arkanoid, bootleg,  arkgcbl,   arkanoid_state, arkgcbl,  ROT90,  "bootleg",                                     "Arkanoid (bootleg on Block hardware, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, arkgcbla,    arkanoid, bootleg,  arkgcbl,   arkanoid_state, arkgcbl,  ROT90,  "bootleg",                                     "Arkanoid (bootleg on Block hardware, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, arkgcbl,     arkanoid, aysnd,    arkgcbl,   arkanoid_state, arkgcbl,  ROT90,  "bootleg",                                     "Arkanoid (bootleg on Block hardware, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, arkgcbla,    arkanoid, aysnd,    arkgcbl,   arkanoid_state, arkgcbl,  ROT90,  "bootleg",                                     "Arkanoid (bootleg on Block hardware, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, paddle2,     arkanoid, bootleg,  paddle2,   arkanoid_state, paddle2,  ROT90,  "bootleg",                                     "Paddle 2 (bootleg on Block hardware)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1986, arkatayt,    arkanoid, bootleg,  arkatayt,  arkanoid_state, 0,        ROT90,  "bootleg (Tayto)",                             "Arkanoid (Tayto bootleg)",                    MACHINE_SUPPORTS_SAVE )
-GAME( 1986, arktayt2,    arkanoid, bootleg,  arktayt2,  arkanoid_state, 0,        ROT90,  "bootleg (Tayto)",                             "Arkanoid (Tayto bootleg, harder)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1986, arkatayt,    arkanoid, aysnd,    arkatayt,  arkanoid_state, 0,        ROT90,  "bootleg (Tayto)",                             "Arkanoid (Tayto bootleg)",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1986, arktayt2,    arkanoid, aysnd,    arktayt2,  arkanoid_state, 0,        ROT90,  "bootleg (Tayto)",                             "Arkanoid (Tayto bootleg, harder)",            MACHINE_SUPPORTS_SAVE )
 // Other games
 GAME( 1987, arkatour,    0,        arkanoid, arkanoid,  arkanoid_state, 0,        ROT90,  "Taito America Corporation (Romstar license)", "Tournament Arkanoid (US)",                    MACHINE_SUPPORTS_SAVE )
 

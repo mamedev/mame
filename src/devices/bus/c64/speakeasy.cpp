@@ -28,26 +28,15 @@ DEFINE_DEVICE_TYPE(C64_SPEAKEASY, c64_speakeasy_cartridge_device, "c64_speakeasy
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( speakeasy )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( speakeasy )
+MACHINE_CONFIG_MEMBER( c64_speakeasy_cartridge_device::device_add_mconfig )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD(SC01A_TAG, VOTRAX_SC01, 720000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.85)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor c64_speakeasy_cartridge_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( speakeasy );
-}
 
 
 

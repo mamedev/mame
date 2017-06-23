@@ -26,7 +26,7 @@
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/wd_fdc.h"
-#include "machine/z80dart.h"
+#include "machine/z80sio.h"
 #include "sound/sn76496.h"
 #include "video/mc6845.h"
 #include "screen.h"
@@ -99,7 +99,7 @@ private:
 	required_device<i8255_device> m_ppi;
 	required_device<pic8259_device> m_pic;
 	required_device<pit8253_device> m_pit;
-	required_device<z80sio0_device> m_sio;
+	required_device<z80sio_device> m_sio;
 	required_device<rs232_port_device> m_rs232;
 	required_device<centronics_device> m_centronics;
 	required_device<wd2797_device> m_fdc;
@@ -331,10 +331,10 @@ static ADDRESS_MAP_START( apricot_io, AS_IO, 16, apricot_state )
 	AM_RANGE(0x48, 0x4f) AM_DEVREADWRITE8("ic17", i8255_device, read, write, 0x00ff)
 	AM_RANGE(0x50, 0x51) AM_MIRROR(0x06) AM_DEVWRITE8("ic7", sn76489_device, write, 0x00ff)
 	AM_RANGE(0x58, 0x5f) AM_DEVREADWRITE8("ic16", pit8253_device, read, write, 0x00ff)
-	AM_RANGE(0x60, 0x61) AM_READ8(sio_da_r, 0x00ff) AM_DEVWRITE8("ic15", z80sio0_device, da_w, 0x00ff)
-	AM_RANGE(0x62, 0x63) AM_READ8(sio_ca_r, 0x00ff) AM_DEVWRITE8("ic15", z80sio0_device, ca_w, 0x00ff)
-	AM_RANGE(0x64, 0x65) AM_READ8(sio_db_r, 0x00ff) AM_DEVWRITE8("ic15", z80sio0_device, db_w, 0x00ff)
-	AM_RANGE(0x66, 0x67) AM_READ8(sio_cb_r, 0x00ff) AM_DEVWRITE8("ic15", z80sio0_device, cb_w, 0x00ff)
+	AM_RANGE(0x60, 0x61) AM_READ8(sio_da_r, 0x00ff) AM_DEVWRITE8("ic15", z80sio_device, da_w, 0x00ff)
+	AM_RANGE(0x62, 0x63) AM_READ8(sio_ca_r, 0x00ff) AM_DEVWRITE8("ic15", z80sio_device, ca_w, 0x00ff)
+	AM_RANGE(0x64, 0x65) AM_READ8(sio_db_r, 0x00ff) AM_DEVWRITE8("ic15", z80sio_device, db_w, 0x00ff)
+	AM_RANGE(0x66, 0x67) AM_READ8(sio_cb_r, 0x00ff) AM_DEVWRITE8("ic15", z80sio_device, cb_w, 0x00ff)
 	AM_RANGE(0x68, 0x69) AM_MIRROR(0x04) AM_DEVWRITE8("ic30", hd6845_device, address_w, 0x00ff)
 	AM_RANGE(0x6a, 0x6b) AM_MIRROR(0x04) AM_DEVREADWRITE8("ic30", hd6845_device, register_r, register_w, 0x00ff)
 	AM_RANGE(0x70, 0x71) AM_MIRROR(0x04) AM_WRITE8(i8089_ca1_w, 0x00ff)
@@ -408,36 +408,37 @@ static MACHINE_CONFIG_START( apricot )
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("ic14", ttl153_device, i2b_w))
 
 	MCFG_TTL153_ADD("ic14")
-	MCFG_TTL153_ZA_CB(DEVWRITELINE("ic15", z80sio0_device, rxca_w))
-	MCFG_TTL153_ZB_CB(DEVWRITELINE("ic15", z80sio0_device, txca_w))
+	MCFG_TTL153_ZA_CB(DEVWRITELINE("ic15", z80sio_device, rxca_w))
+	MCFG_TTL153_ZB_CB(DEVWRITELINE("ic15", z80sio_device, txca_w))
 
-	MCFG_Z80SIO0_ADD("ic15", XTAL_15MHz / 6, 0, 0, XTAL_4MHz / 16, XTAL_4MHz / 16)
-	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE("rs232", rs232_port_device, write_rts))
-	MCFG_Z80DART_OUT_WRDYA_CB(DEVWRITELINE("ic71", i8089_device, drq2_w))
-	MCFG_Z80DART_OUT_TXDB_CB(DEVWRITELINE("kbd", apricot_keyboard_bus_device, out_w))
-	MCFG_Z80DART_OUT_DTRB_CB(DEVWRITELINE("ic14", ttl153_device, s0_w))
-	MCFG_Z80DART_OUT_RTSB_CB(DEVWRITELINE("ic14", ttl153_device, s1_w))
-	MCFG_Z80DART_OUT_INT_CB(DEVWRITELINE("ic31", pic8259_device, ir5_w))
+	MCFG_Z80SIO_ADD("ic15", XTAL_15MHz / 6, 0, 0, XTAL_4MHz / 16, XTAL_4MHz / 16)
+	MCFG_Z80SIO_CPU("ic91")
+	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_Z80SIO_OUT_DTRA_CB(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
+	MCFG_Z80SIO_OUT_RTSA_CB(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_Z80SIO_OUT_WRDYA_CB(DEVWRITELINE("ic71", i8089_device, drq2_w))
+	MCFG_Z80SIO_OUT_TXDB_CB(DEVWRITELINE("kbd", apricot_keyboard_bus_device, out_w))
+	MCFG_Z80SIO_OUT_DTRB_CB(DEVWRITELINE("ic14", ttl153_device, s0_w))
+	MCFG_Z80SIO_OUT_RTSB_CB(DEVWRITELINE("ic14", ttl153_device, s1_w))
+	MCFG_Z80SIO_OUT_INT_CB(DEVWRITELINE("ic31", pic8259_device, ir5_w))
 
 	// rs232 port
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
 	// note: missing a receive clock callback to support external clock mode (i1 to 153)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("ic15", z80sio0_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("ic15", z80sio0_device, dcda_w))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("ic15", z80sio0_device, synca_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("ic15", z80sio0_device, ctsa_w))  MCFG_DEVCB_XOR(1)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("ic15", z80sio_device, rxa_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("ic15", z80sio_device, dcda_w))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("ic15", z80sio_device, synca_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("ic15", z80sio_device, ctsa_w))  MCFG_DEVCB_XOR(1)
 
 	// keyboard
 	MCFG_APRICOT_KEYBOARD_INTERFACE_ADD("kbd", "hle")
-	MCFG_APRICOT_KEYBOARD_IN_HANDLER(DEVWRITELINE("ic15", z80sio0_device, rxb_w))
+	MCFG_APRICOT_KEYBOARD_IN_HANDLER(DEVWRITELINE("ic15", z80sio_device, rxb_w))
 
 	// centronics printer
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
 	MCFG_CENTRONICS_DATA_INPUT_BUFFER("cent_data_in")
-	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE("ic15", z80dart_device, ctsb_w))
-	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE("ic15", z80dart_device, dcdb_w))
+	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE("ic15", z80sio_device, ctsb_w))
+	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE("ic15", z80sio_device, dcdb_w))
 	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(apricot_state, write_centronics_fault))
 	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(apricot_state, write_centronics_perror))
 	//MCFG_CENTRONICS_SELECT_HANDLER() // schematic page 294 says this is connected to pc4, but that is an output to the printer

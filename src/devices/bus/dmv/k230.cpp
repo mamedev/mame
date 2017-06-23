@@ -57,27 +57,6 @@ static ADDRESS_MAP_START(k235_io, AS_IO, 8, dmv_k230_device)
 	AM_RANGE( 0x00, 0xff ) AM_READWRITE(io_r, io_w)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( dmv_k230 )
-	MCFG_CPU_ADD("maincpu", I8088, XTAL_15MHz / 3)
-	MCFG_CPU_PROGRAM_MAP(k230_mem)
-	MCFG_CPU_IO_MAP(k230_io)
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_START( dmv_k234 )
-	MCFG_CPU_ADD("maincpu", M68008, XTAL_16MHz / 2)
-	MCFG_CPU_PROGRAM_MAP(k234_mem)
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_START( dmv_k235 )
-	MCFG_CPU_ADD("maincpu", V20, XTAL_15MHz / 3)
-	MCFG_CPU_PROGRAM_MAP(k230_mem)
-	MCFG_CPU_IO_MAP(k235_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
-
-	MCFG_PIC8259_ADD("pic8259", INPUTLINE("maincpu", 0), VCC, NOOP)
-MACHINE_CONFIG_END
-
-
 static INPUT_PORTS_START( dmv_k235 )
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x01, 0x00, "K235 INT7" )  PORT_DIPLOCATION("S:1")
@@ -180,24 +159,28 @@ void dmv_k234_device::device_reset()
 }
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor dmv_k230_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( dmv_k230 );
-}
+MACHINE_CONFIG_MEMBER( dmv_k230_device::device_add_mconfig )
+	MCFG_CPU_ADD("maincpu", I8088, XTAL_15MHz / 3)
+	MCFG_CPU_PROGRAM_MAP(k230_mem)
+	MCFG_CPU_IO_MAP(k230_io)
+MACHINE_CONFIG_END
 
-machine_config_constructor dmv_k234_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( dmv_k234 );
-}
+MACHINE_CONFIG_MEMBER( dmv_k234_device::device_add_mconfig )
+	MCFG_CPU_ADD("maincpu", M68008, XTAL_16MHz / 2)
+	MCFG_CPU_PROGRAM_MAP(k234_mem)
+MACHINE_CONFIG_END
 
-machine_config_constructor dmv_k235_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( dmv_k235 );
-}
+MACHINE_CONFIG_MEMBER( dmv_k235_device::device_add_mconfig )
+	MCFG_CPU_ADD("maincpu", V20, XTAL_15MHz / 3)
+	MCFG_CPU_PROGRAM_MAP(k230_mem)
+	MCFG_CPU_IO_MAP(k235_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
+
+	MCFG_PIC8259_ADD("pic8259", INPUTLINE("maincpu", 0), VCC, NOOP)
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  device_rom_region

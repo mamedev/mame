@@ -47,10 +47,10 @@ const tiny_rom_entry *cst_q_plus4_device::device_rom_region() const
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_START( cst_q_plus4 )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( cst_q_plus4 )
+MACHINE_CONFIG_MEMBER( cst_q_plus4_device::device_add_mconfig )
 	MCFG_DEVICE_ADD(MC6821_TAG, PIA6821, 0)
 
 	MCFG_QL_EXPANSION_SLOT_ADD("exp1", ql_expansion_cards, nullptr)
@@ -65,17 +65,6 @@ static MACHINE_CONFIG_START( cst_q_plus4 )
 	MCFG_QL_EXPANSION_SLOT_ADD("exp4", ql_expansion_cards, nullptr)
 	MCFG_QL_EXPANSION_SLOT_EXTINTL_CALLBACK(WRITELINE(cst_q_plus4_device, exp4_extintl_w))
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor cst_q_plus4_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( cst_q_plus4 );
-}
 
 
 

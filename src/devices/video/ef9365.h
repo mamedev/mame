@@ -83,11 +83,11 @@ private:
 	int get_char_pix( unsigned char c, int x, int y );
 	void plot(int x_pos,int y_pos);
 	int draw_character( unsigned char c, int block, int smallblock );
-	int draw_vector(int x1,int y1,int x2,int y2);
-	unsigned int get_x_reg();
-	unsigned int get_y_reg();
-	void set_x_reg(unsigned int x);
-	void set_y_reg(unsigned int y);
+	int draw_vector(uint16_t start_x,uint16_t start_y,short delta_x,short delta_y);
+	uint16_t get_x_reg();
+	uint16_t get_y_reg();
+	void set_x_reg(uint16_t x);
+	void set_y_reg(uint16_t y);
 	void screen_scanning( int force_clear );
 	void set_busy_flag(int period);
 	void set_video_mode(void);

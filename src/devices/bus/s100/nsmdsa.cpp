@@ -53,24 +53,13 @@ SLOT_INTERFACE_END
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_START( mds_a )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( mds_a )
+MACHINE_CONFIG_MEMBER( s100_mds_a_device::device_add_mconfig )
 	MCFG_FLOPPY_DRIVE_ADD("floppy0", mds_a_floppies, "525sd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("floppy1", mds_a_floppies, "525sd", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor s100_mds_a_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( mds_a );
-}
 
 
 

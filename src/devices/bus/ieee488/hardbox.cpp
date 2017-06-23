@@ -260,11 +260,12 @@ WRITE8_MEMBER( hardbox_device::ppi1_pc_w )
 	machine().output().set_led_value(LED_READY, !BIT(data, 2));
 }
 
+
 //-------------------------------------------------
-//  MACHINE_CONFIG_START( hardbox )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( hardbox )
+MACHINE_CONFIG_MEMBER( hardbox_device::device_add_mconfig )
 	// basic machine hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/2)
 	MCFG_CPU_PROGRAM_MAP(hardbox_mem)
@@ -292,17 +293,6 @@ static MACHINE_CONFIG_START( hardbox )
 	MCFG_HARDDISK_ADD("harddisk4")
 	MCFG_HARDDISK_INTERFACE("corvus_hdd")
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor hardbox_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( hardbox );
-}
 
 
 //-------------------------------------------------

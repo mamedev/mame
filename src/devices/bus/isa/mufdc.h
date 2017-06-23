@@ -32,17 +32,6 @@
 
 class mufdc_device : public device_t, public device_isa8_card_interface
 {
-public:
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual ioport_constructor device_input_ports() const override;
-
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
-
-	DECLARE_READ8_MEMBER( fdc_input_r );
-	DECLARE_WRITE_LINE_MEMBER( fdc_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
-
 protected:
 	// construction/destruction
 	mufdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -51,12 +40,22 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
+
 	// device_isa8_card_interface
 	virtual uint8_t dack_r(int line) override;
 	virtual void dack_w(int line, uint8_t data) override;
 	virtual void eop_w(int state) override;
 
 private:
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
+
+	DECLARE_READ8_MEMBER( fdc_input_r );
+	DECLARE_WRITE_LINE_MEMBER( fdc_irq_w );
+	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
+
 	required_device<pc_fdc_interface> m_fdc;
 	required_ioport m_config;
 };

@@ -414,10 +414,6 @@ void ti99_gkracker_device::device_reset()
 	m_grom_selected = false;
 }
 
-static MACHINE_CONFIG_START( gkracker_slot )
-	MCFG_DEVICE_ADD("cartridge", TI99_CART, 0)
-MACHINE_CONFIG_END
-
 /*
     The GRAMKracker ROM
 */
@@ -432,10 +428,9 @@ const tiny_rom_entry *ti99_gkracker_device::device_rom_region() const
 	return ROM_NAME( gkracker_rom );
 }
 
-machine_config_constructor ti99_gkracker_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( gkracker_slot );
-}
+MACHINE_CONFIG_MEMBER( ti99_gkracker_device::device_add_mconfig )
+	MCFG_DEVICE_ADD("cartridge", TI99_CART, 0)
+MACHINE_CONFIG_END
 
 INPUT_PORTS_START(gkracker)
 	PORT_START( GKSWITCH1_TAG )

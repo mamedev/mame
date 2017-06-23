@@ -597,9 +597,6 @@ WRITE8_MEMBER(nes_sunsoft_5_device::write_h)
 	}
 }
 
-//-------------------------------------------------
-//  MACHINE_DRIVER( sun_5b )
-//-------------------------------------------------
 
 // From NESdev wiki: The 5B's audio is driven by the CPU clock (1.78977267 MHz),
 // but like the NES's APU, the YM2149F has an optional clock divider which
@@ -608,7 +605,12 @@ WRITE8_MEMBER(nes_sunsoft_5_device::write_h)
 // YM2149F operating in this mode. To use an AY-3-8910 as a substitute,
 // you would need an external divider to reduce the clock speed by half.
 
-static MACHINE_CONFIG_START( sun_5b )
+
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( nes_sunsoft_5_device::device_add_mconfig )
 
 	// additional sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("addon")
@@ -618,13 +620,3 @@ static MACHINE_CONFIG_START( sun_5b )
 	MCFG_SOUND_ADD("ay", YM2149, (XTAL_21_4772MHz/12)/2) // divide by 2 for the internal divider
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 0.50)
 MACHINE_CONFIG_END
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor nes_sunsoft_5_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( sun_5b );
-}

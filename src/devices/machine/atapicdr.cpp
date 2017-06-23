@@ -26,21 +26,15 @@ atapi_fixed_cdrom_device::atapi_fixed_cdrom_device(const machine_config &mconfig
 {
 }
 
-static MACHINE_CONFIG_START( atapicdr )
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( atapi_cdrom_device::device_add_mconfig )
 	MCFG_CDROM_ADD("image")
 	MCFG_CDROM_INTERFACE("cdrom")
 	MCFG_SOUND_ADD("cdda", CDDA, 0)
 MACHINE_CONFIG_END
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor atapi_cdrom_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( atapicdr );
-}
 
 void atapi_cdrom_device::device_start()
 {

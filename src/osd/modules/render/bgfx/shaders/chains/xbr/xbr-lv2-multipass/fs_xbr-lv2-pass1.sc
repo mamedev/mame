@@ -41,46 +41,10 @@ uniform vec4 u_target_dims;
 
 #define round(X) floor((X)+0.5)
 
-const float coef          = 2.0;
-const vec4 eq_threshold = vec4(15.0, 15.0, 15.0, 15.0);
-const float y_weight      = 48.0;
-const float u_weight      = 7.0;
-const float v_weight      = 6.0;
-const mat4 yuv            = mat4(
-	 0.299,  0.587,  0.114,  0.0,
-	-0.169, -0.331,  0.499,  0.0,
-	 0.499, -0.418, -0.0813, 0.0,
-	 0.0, 0.0, 0.0, 0.0
-);
-
-const mat4 yuv_weighted   = mat4(
-	48.0 * vec4( 0.299,  0.587,  0.114,  0.0),
-	 7.0 * vec4(-0.169, -0.331,  0.499,  0.0),
-	 6.0 * vec4( 0.499, -0.418, -0.0813, 0.0),
-	 0.0 * vec4( 0.0,    0.0,    0.0,    0.0)
-);
-
 vec4 df(vec4 A, vec4 B)
 {
 	return vec4(abs(A-B));
 }
-
-float c_df(vec3 c1, vec3 c2)
-{
-	vec3 df = abs(c1 - c2);
-	return df.r + df.g + df.b;
-}
-
-vec4 le(vec4 A, vec4 B)
-{
-	return vec4(lessThanEqual(A, B));
-}
-
-vec4 weighted_distance(vec4 a, vec4 b, vec4 c, vec4 d, vec4 e, vec4 f, vec4 g, vec4 h)
-{
-	return (df(a,b) + df(a,c) + df(d,e) + df(d,f) + 4.0*df(g,h));
-}
-
 
 vec3 remapFrom01(vec3 v, vec3 low, vec3 high)
 {
@@ -107,6 +71,10 @@ vec4 unpack_info(float i)
 
 void main()
 {
+	float coef          = 2.0;
+
+	vec4 yuv_weighted   = 48.0 * vec4(0.299, 0.587, 0.114, 0.0);
+
 	vec2 fp = fract(v_texcoord0 * u_tex_size0.xy);
 
 	vec4 B  = texture2D(ORIG_texture, v_texcoord1.xy);
@@ -115,8 +83,8 @@ void main()
 	vec4 F  = texture2D(ORIG_texture, v_texcoord2.zw);
 	vec4 H  = texture2D(ORIG_texture, v_texcoord1.xw);
 
-	vec4 b = mul(mat4(B, D, H, F), yuv_weighted[0]);
-	vec4 e = mul(mat4(E, E, E, E), yuv_weighted[0]);
+	vec4 b = instMul(yuv_weighted, mat4(B, D, H, F));
+	vec4 e = instMul(yuv_weighted, mat4(E, E, E, E));
 	vec4 d = b.yzwx;
 	vec4 f = b.wxyz;
 	vec4 h = b.zwxy;
@@ -154,12 +122,12 @@ void main()
 	fx30 = edr_left * fx30;
 	fx60 = edr_up * fx60;
 
-	vec4 px = le(df(e,f), df(e,h));
+	vec4 px = vec4(lessThanEqual(df(e,f), df(e,h)));
 
 	vec4 maximo = max(max(fx30, fx60), fx45);
 
 	mat4 pix = mat4(mix(E, mix(H, F, px.x), maximo.x), mix(E, mix(F, B, px.y), maximo.y), mix(E, mix(B, D, px.z), maximo.z), mix(E, mix(D, H, px.w), maximo.w));
-	vec4 pixel = mul(pix, yuv_weighted[0]);
+	vec4 pixel = instMul(yuv_weighted, pix);
 	
 	vec4 diff = df(pixel,e);
 

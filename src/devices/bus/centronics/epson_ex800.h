@@ -30,17 +30,6 @@ public:
 	// construction/destruction
 	epson_ex800_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual ioport_constructor device_input_ports() const override;
-
-	DECLARE_READ8_MEMBER(porta_r);
-	DECLARE_READ8_MEMBER(portb_r);
-	DECLARE_READ8_MEMBER(portc_r);
-	DECLARE_WRITE8_MEMBER(porta_w);
-	DECLARE_WRITE8_MEMBER(portb_w);
-	DECLARE_WRITE8_MEMBER(portc_w);
 	DECLARE_READ8_MEMBER(devsel_r);
 	DECLARE_WRITE8_MEMBER(devsel_w);
 	DECLARE_READ8_MEMBER(gate5a_r);
@@ -57,7 +46,19 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
+
 private:
+	DECLARE_READ8_MEMBER(porta_r);
+	DECLARE_READ8_MEMBER(portb_r);
+	DECLARE_READ8_MEMBER(portc_r);
+	DECLARE_WRITE8_MEMBER(porta_w);
+	DECLARE_WRITE8_MEMBER(portb_w);
+	DECLARE_WRITE8_MEMBER(portc_w);
+
 	required_device<cpu_device> m_maincpu;
 	required_device<beep_device> m_beeper;
 

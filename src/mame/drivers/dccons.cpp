@@ -680,6 +680,16 @@ ROM_START( dcjp )
 	ROM_LOAD( "dcjp_ntsc.bin", 0x000000, 0x020000, CRC(f77c15a1) SHA1(66fd8ee40b207ce03a5fd6abbc00d27bbd5f92bd) ) // from VA0 with 1.004 BIOS
 ROM_END
 
+// unauthorised portable modification
+ROM_START( dctream )
+	ROM_REGION(0x200000, "maincpu", 0)
+	// multi-region hack of mpr-21931/1.01d BIOS, hardware checksum protection passes OK due to algorithm weakness
+	ROM_LOAD( "dc_bios.bin", 0x000000, 0x200000, CRC(cff88d0d) SHA1(e3f84705b183ffded0a349ac7f2ab00be2ab74ee) ) // dumped in software way, ROM label unknown
+
+	ROM_REGION(0x020000, "dcflash", 0)
+	ROM_LOAD( "dc_flash.bin", 0x000000, 0x020000, CRC(727ea7ec) SHA1(b027913a8c00d4edaef83c440dd6c59090b387f2) )
+ROM_END
+
 // normally, with DIP switch 4 off, HKT-100/110/120 AKA "Katana Set 5.xx", will be booted from flash ROM IC507 (first 2 dumps below)
 // otherwise it boots from EPROM which contain system checker software (last dump)
 ROM_START( dcdev )
@@ -704,4 +714,5 @@ ROM_END
 CONS( 1999, dc,     dcjp,   0,      dc,     dc,   dc_cons_state,   dcus,   "Sega", "Dreamcast (USA, NTSC)", MACHINE_NOT_WORKING )
 CONS( 1998, dcjp,   0,      0,      dc,     dc,   dc_cons_state,   dcjp,   "Sega", "Dreamcast (Japan, NTSC)", MACHINE_NOT_WORKING )
 CONS( 1999, dceu,   dcjp,   0,      dc,     dc,   dc_cons_state,   dcus,   "Sega", "Dreamcast (Europe, PAL)", MACHINE_NOT_WORKING )
+CONS( 200?, dctream,dcjp,   0,      dc,     dc,   dc_cons_state,   dcus,"unknown", "Treamcast", MACHINE_NOT_WORKING )
 CONS( 1998, dcdev,  0,      0,      dc,     dc,   dc_cons_state,   dc,     "Sega", "HKT-0120 Sega Dreamcast Development Box", MACHINE_NOT_WORKING )

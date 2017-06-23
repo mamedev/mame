@@ -60,25 +60,15 @@ public:
 	DECLARE_READ8_MEMBER( fdc_r );
 	DECLARE_WRITE8_MEMBER( fdc_w );
 
-	DECLARE_READ8_MEMBER( pio_pa_r );
-	DECLARE_WRITE8_MEMBER( pio_pa_w );
-	DECLARE_READ8_MEMBER( pio_pb_r );
-	DECLARE_WRITE8_MEMBER( pio_pb_w );
-
-	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
-
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
-
-	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual ioport_constructor device_input_ports() const override;
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	// device_abcbus_interface overrides
 	virtual void abcbus_cs(uint8_t data) override;
@@ -89,6 +79,16 @@ protected:
 	virtual void abcbus_c3(uint8_t data) override;
 
 private:
+	DECLARE_READ8_MEMBER( pio_pa_r );
+	DECLARE_WRITE8_MEMBER( pio_pa_w );
+	DECLARE_READ8_MEMBER( pio_pb_r );
+	DECLARE_WRITE8_MEMBER( pio_pb_w );
+
+	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
+	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
+
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
+
 	required_device<cpu_device> m_maincpu;
 	required_device<z80pio_device> m_pio;
 	required_device<mb8876_device> m_fdc;

@@ -17,11 +17,10 @@
 DEFINE_DEVICE_TYPE(SV601, sv601_device, "sv601", "SV-601 Super Expander")
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( sv601 )
+MACHINE_CONFIG_MEMBER( sv601_device::device_add_mconfig )
 	MCFG_SVI_SLOT_BUS_ADD
 	MCFG_SVI_SLOT_INT_HANDLER(WRITELINE(sv601_device, int_w))
 	MCFG_SVI_SLOT_ROMDIS_HANDLER(WRITELINE(sv601_device, romdis_w))
@@ -34,11 +33,6 @@ static MACHINE_CONFIG_START( sv601 )
 	MCFG_SVI_SLOT_ADD("5", svi_slot_cards, nullptr)
 	MCFG_SVI_SLOT_ADD("6", svi_slot_cards, nullptr)
 MACHINE_CONFIG_END
-
-machine_config_constructor sv601_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( sv601 );
-}
 
 
 //**************************************************************************

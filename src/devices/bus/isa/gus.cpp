@@ -1231,7 +1231,26 @@ void gf1_device::eop_w(int state)
 
 /* 16-bit ISA card device implementation */
 
-static MACHINE_CONFIG_START( gus_config )
+static INPUT_PORTS_START( gus_joy )
+	PORT_START("gus_joy")
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW,   IPT_UNUSED ) // x/y ad stick to digital converters
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,   IPT_BUTTON1) PORT_NAME("GUS Joystick Button 1")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,   IPT_BUTTON2) PORT_NAME("GUS Joystick Button 2")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,   IPT_BUTTON3) PORT_NAME("GUS Joystick Button 3")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,   IPT_BUTTON4) PORT_NAME("GUS Joystick Button 4")
+
+	PORT_START("gus_joy_1")
+	PORT_BIT(0xff,0x80,IPT_AD_STICK_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_MINMAX(1,0xff) PORT_CODE_DEC(KEYCODE_LEFT) PORT_CODE_INC(KEYCODE_RIGHT) PORT_CODE_DEC(JOYCODE_X_LEFT_SWITCH) PORT_CODE_INC(JOYCODE_X_RIGHT_SWITCH)
+
+	PORT_START("gus_joy_2")
+	PORT_BIT(0xff,0x80,IPT_AD_STICK_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_MINMAX(1,0xff) PORT_CODE_DEC(KEYCODE_UP) PORT_CODE_INC(KEYCODE_DOWN) PORT_CODE_DEC(JOYCODE_Y_UP_SWITCH) PORT_CODE_INC(JOYCODE_Y_DOWN_SWITCH)
+INPUT_PORTS_END
+
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( isa16_gus_device::device_add_mconfig )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
 	MCFG_SOUND_ADD("gf1",GGF1,GF1_CLOCK)
 	MCFG_SOUND_ROUTE(0,"lspeaker",0.50)
@@ -1258,31 +1277,6 @@ static MACHINE_CONFIG_START( gus_config )
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, 31250*16)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(isa16_gus_device, write_acia_clock))
 MACHINE_CONFIG_END
-
-static INPUT_PORTS_START( gus_joy )
-	PORT_START("gus_joy")
-	PORT_BIT( 0x0f, IP_ACTIVE_LOW,   IPT_UNUSED ) // x/y ad stick to digital converters
-	PORT_BIT( 0x10, IP_ACTIVE_LOW,   IPT_BUTTON1) PORT_NAME("GUS Joystick Button 1")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,   IPT_BUTTON2) PORT_NAME("GUS Joystick Button 2")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW,   IPT_BUTTON3) PORT_NAME("GUS Joystick Button 3")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,   IPT_BUTTON4) PORT_NAME("GUS Joystick Button 4")
-
-	PORT_START("gus_joy_1")
-	PORT_BIT(0xff,0x80,IPT_AD_STICK_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_MINMAX(1,0xff) PORT_CODE_DEC(KEYCODE_LEFT) PORT_CODE_INC(KEYCODE_RIGHT) PORT_CODE_DEC(JOYCODE_X_LEFT_SWITCH) PORT_CODE_INC(JOYCODE_X_RIGHT_SWITCH)
-
-	PORT_START("gus_joy_2")
-	PORT_BIT(0xff,0x80,IPT_AD_STICK_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_MINMAX(1,0xff) PORT_CODE_DEC(KEYCODE_UP) PORT_CODE_INC(KEYCODE_DOWN) PORT_CODE_DEC(JOYCODE_Y_UP_SWITCH) PORT_CODE_INC(JOYCODE_Y_DOWN_SWITCH)
-INPUT_PORTS_END
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor isa16_gus_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( gus_config );
-}
 
 ioport_constructor isa16_gus_device::device_input_ports() const
 {

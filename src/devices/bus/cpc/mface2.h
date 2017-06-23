@@ -39,20 +39,21 @@ public:
 	// construction/destruction
 	cpc_multiface2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
 	int multiface_hardware_enabled();
 	void multiface_rethink_memory();
 	void multiface_stop();
 	int multiface_io_write(uint16_t offset, uint8_t data);
 	void check_button_state();
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	cpc_expansion_slot_device *m_slot;

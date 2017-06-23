@@ -35,7 +35,6 @@ public:
 	// construction/destruction
 	nes_jf13_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual DECLARE_WRITE8_MEMBER(write_m) override;
 
 	virtual void pcb_reset() override;
@@ -43,6 +42,8 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	required_device<samples_device> m_samples;
@@ -97,8 +98,10 @@ public:
 	// construction/destruction
 	nes_jf17_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual DECLARE_WRITE8_MEMBER(write_h) override;
+
+protected:
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	required_device<samples_device> m_samples;
@@ -133,8 +136,10 @@ public:
 	// construction/destruction
 	nes_jf19_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual DECLARE_WRITE8_MEMBER(write_h) override;
+
+protected:
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	required_device<samples_device> m_samples;
@@ -195,7 +200,8 @@ public:
 	// construction/destruction
 	nes_jf23_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual machine_config_constructor device_mconfig_additions() const override;
+protected:
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	virtual DECLARE_WRITE8_MEMBER(write_h) override { ss88006_adpcm_write(space, offset, data, m_samples); }
@@ -212,7 +218,8 @@ public:
 	// construction/destruction
 	nes_jf24_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual machine_config_constructor device_mconfig_additions() const override;
+protected:
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	virtual DECLARE_WRITE8_MEMBER(write_h) override { ss88006_adpcm_write(space, offset, data, m_samples); }
@@ -229,7 +236,8 @@ public:
 	// construction/destruction
 	nes_jf29_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual machine_config_constructor device_mconfig_additions() const override;
+protected:
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	virtual DECLARE_WRITE8_MEMBER(write_h) override { ss88006_adpcm_write(space, offset, data, m_samples); }
@@ -246,7 +254,8 @@ public:
 	// construction/destruction
 	nes_jf33_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual machine_config_constructor device_mconfig_additions() const override;
+protected:
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	virtual DECLARE_WRITE8_MEMBER(write_h) override { ss88006_adpcm_write(space, offset, data, m_samples); }

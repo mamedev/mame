@@ -85,7 +85,7 @@ DEFINE_DEVICE_TYPE_NS(TI99_IOPORT, bus::ti99::internal, ioport_device, "ti99_iop
 namespace bus { namespace ti99 { namespace internal {
 
 ioport_device::ioport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	:   bus8z_device(mconfig, TI99_IOPORT, tag, owner, clock),
+	:   device_t(mconfig, TI99_IOPORT, tag, owner, clock),
 		device_slot_interface(mconfig, *this),
 		m_console_extint(*this),
 		m_console_ready(*this),

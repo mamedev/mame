@@ -22,7 +22,7 @@
 
 namespace bus { namespace ti99 { namespace peb {
 
-class ti_pcode_card_device : public ti_expansion_card_device
+class ti_pcode_card_device : public device_t, public device_ti99_peribox_card_interface
 {
 public:
 	ti_pcode_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -34,7 +34,6 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(clock_in) override;
 
-	DECLARE_WRITE_LINE_MEMBER( ready_line );
 	DECLARE_INPUT_CHANGED_MEMBER( switch_changed );
 
 protected:
@@ -42,10 +41,12 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_config_complete() override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 
 private:
+	DECLARE_WRITE_LINE_MEMBER( ready_line );
+
 	void                debugger_read(address_space& space, uint16_t addr, uint8_t& value);
 	tmc0430_device*     m_grom[8];
 	uint8_t*              m_rom;

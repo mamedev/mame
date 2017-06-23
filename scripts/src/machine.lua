@@ -1026,6 +1026,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/i7220.h,MACHINES["I7220"] = true
+---------------------------------------------------
+
+if (MACHINES["I7220"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/i7220.cpp",
+		MAME_DIR .. "src/devices/machine/i7220.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/i8155.h,MACHINES["I8155"] = true
 ---------------------------------------------------
 
@@ -2008,6 +2020,8 @@ if (MACHINES["PCI"]~=null) then
 		MAME_DIR .. "src/devices/machine/vrc5074.h",
 		MAME_DIR .. "src/devices/machine/gt64xxx.cpp",
 		MAME_DIR .. "src/devices/machine/gt64xxx.h",
+		MAME_DIR .. "src/devices/machine/sis85c496.cpp",
+		MAME_DIR .. "src/devices/machine/sis85c496.h",
 	}
 end
 
@@ -2367,6 +2381,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/te7750.h,MACHINES["TE7750"] = true
+---------------------------------------------------
+
+if (MACHINES["TE7750"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/te7750.cpp",
+		MAME_DIR .. "src/devices/machine/te7750.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/timekpr.h,MACHINES["TIMEKPR"] = true
 ---------------------------------------------------
 
@@ -2652,6 +2678,18 @@ if (MACHINES["YM2148"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/ym2148.cpp",
 		MAME_DIR .. "src/devices/machine/ym2148.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/ym3802.h,MACHINES["YM3802"] = true
+---------------------------------------------------
+
+if (MACHINES["YM3802"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/ym3802.cpp",
+		MAME_DIR .. "src/devices/machine/ym3802.h",
 	}
 end
 

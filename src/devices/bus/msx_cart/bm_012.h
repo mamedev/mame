@@ -18,16 +18,16 @@ class msx_cart_bm_012_device : public device_t, public msx_cart_interface
 public:
 	msx_cart_bm_012_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-
-	DECLARE_WRITE_LINE_MEMBER(midi_in);
-
 protected:
 	virtual void device_start() override;
 
+	// device-level overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+
 private:
+	DECLARE_WRITE_LINE_MEMBER(midi_in);
+
 	required_device<tmpz84c015_device> m_tmpz84c015af;
 	required_device<z80pio_device> m_bm012_pio;
 	required_device<midi_port_device> m_mdthru;

@@ -35,7 +35,9 @@ public:
 	/* sound-related */
 	int            m_pulse;
 	int            m_timer; // kludge for ym3526 in mightguy
-
+	uint8_t		   m_prot_command;
+	uint8_t		   m_prot_reg[6];
+	
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -51,6 +53,9 @@ public:
 	DECLARE_WRITE8_MEMBER(cop01_background_w);
 	DECLARE_WRITE8_MEMBER(cop01_foreground_w);
 	DECLARE_WRITE8_MEMBER(cop01_vreg_w);
+	DECLARE_WRITE8_MEMBER(prot_address_w);
+	DECLARE_WRITE8_MEMBER(prot_data_w);
+	DECLARE_READ8_MEMBER(prot_data_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(mightguy_area_r);
 	DECLARE_DRIVER_INIT(mightguy);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);

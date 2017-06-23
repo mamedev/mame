@@ -45,6 +45,7 @@
 
 #include "emu.h"
 #include "audio/taito_en.h"
+#include "machine/taitoio.h"
 #include "includes/gunbustr.h"
 
 #include "cpu/m68000/m68000.h"
@@ -73,51 +74,17 @@ INTERRUPT_GEN_MEMBER(gunbustr_state::gunbustr_interrupt)
 	device.execute().set_input_line(4, HOLD_LINE);
 }
 
-CUSTOM_INPUT_MEMBER(gunbustr_state::coin_word_r)
+WRITE8_MEMBER(gunbustr_state::coin_word_w)
 {
-	return m_coin_word;
-}
-
-WRITE32_MEMBER(gunbustr_state::gunbustr_input_w)
-{
-	switch (offset)
+	if (m_coin_lockout)
 	{
-		case 0x00:
-		{
-			if (ACCESSING_BITS_24_31)
-			{
-				/* $400000 is watchdog */
-				m_watchdog->watchdog_reset();
-			}
-
-			if (ACCESSING_BITS_0_7)
-			{
-				m_eeprom->clk_write((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
-				m_eeprom->di_write((data & 0x40) >> 6);
-				m_eeprom->cs_write((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
-			}
-			break;
-		}
-
-		case 0x01:
-		{
-			if (ACCESSING_BITS_24_31)
-			{
-				if (m_coin_lockout)
-				{
-					machine().bookkeeping().coin_lockout_w(0, ~data & 0x01000000);
-					machine().bookkeeping().coin_lockout_w(1, ~data & 0x02000000);
-				}
-
-				// game does not write a separate counter for coin 2! maybe in linked mode?
-				machine().bookkeeping().coin_counter_w(0, data & 0x04000000);
-				machine().bookkeeping().coin_counter_w(1, data & 0x04000000);
-				m_coin_word = (data >> 16) &0xffff;
-			}
-			//logerror("CPU #0 PC %06x: write input %06x\n",device->safe_pc(),offset);
-			break;
-		}
+		machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
+		machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
 	}
+
+	// game does not write a separate counter for coin 2! maybe in linked mode?
+	machine().bookkeeping().coin_counter_w(0, data & 0x04);
+	machine().bookkeeping().coin_counter_w(1, data & 0x04);
 }
 
 WRITE32_MEMBER(gunbustr_state::motor_control_w)
@@ -153,10 +120,8 @@ static ADDRESS_MAP_START( gunbustr_map, AS_PROGRAM, 32, gunbustr_state )
 	AM_RANGE(0x200000, 0x21ffff) AM_RAM AM_SHARE("ram")                                     /* main CPUA ram */
 	AM_RANGE(0x300000, 0x301fff) AM_RAM AM_SHARE("spriteram")               /* Sprite ram */
 	AM_RANGE(0x380000, 0x380003) AM_WRITE(motor_control_w)                                          /* motor, lamps etc. */
-	AM_RANGE(0x390000, 0x3907ff) AM_RAM AM_SHARE("snd_shared")                                      /* Sound shared ram */
-	AM_RANGE(0x400000, 0x400003) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x400004, 0x400007) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x400000, 0x400007) AM_WRITE(gunbustr_input_w)                                         /* eerom etc. */
+	AM_RANGE(0x390000, 0x3907ff) AM_DEVREADWRITE8("taito_en:dpram", mb8421_device, left_r, left_w, 0xffffffff) /* Sound shared ram */
+	AM_RANGE(0x400000, 0x400007) AM_DEVREADWRITE8("tc0510nio", tc0510nio_device, read, write, 0xffffffff)
 	AM_RANGE(0x500000, 0x500003) AM_READWRITE(gunbustr_gun_r, gunbustr_gun_w)                       /* gun coord read */
 	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, long_r, long_w)
 	AM_RANGE(0x830000, 0x83002f) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, ctrl_long_r, ctrl_long_w)
@@ -169,59 +134,45 @@ ADDRESS_MAP_END
 ***********************************************************/
 
 static INPUT_PORTS_START( gunbustr )
-	PORT_START("P1_P2")
-	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1)  /* Freeze input */
-	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
-	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_START("SPECIAL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1)  /* Freeze input */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 
-	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_START("INPUTS")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+
+	PORT_START("EXTRA")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("SYSTEM")
-	PORT_SERVICE_NO_TOGGLE( 0x00000001, IP_ACTIVE_LOW )
-	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, gunbustr_state,coin_word_r, nullptr)
+	PORT_SERVICE_NO_TOGGLE( 0x01, IP_ACTIVE_LOW )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	/* Light gun inputs */
 
@@ -285,7 +236,15 @@ static MACHINE_CONFIG_START( gunbustr )
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	MCFG_DEVICE_ADD("tc0510nio", TC0510NIO, 0)
+	MCFG_TC0510NIO_READ_0_CB(IOPORT("EXTRA"))
+	MCFG_TC0510NIO_READ_2_CB(IOPORT("INPUTS"))
+	MCFG_TC0510NIO_READ_3_CB(IOPORT("SPECIAL"))
+	MCFG_TC0510NIO_WRITE_3_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write)) MCFG_DEVCB_BIT(5)
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, di_write)) MCFG_DEVCB_BIT(6)
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write)) MCFG_DEVCB_BIT(4)
+	MCFG_TC0510NIO_WRITE_4_CB(WRITE8(gunbustr_state, coin_word_w))
+	MCFG_TC0510NIO_READ_7_CB(IOPORT("SYSTEM"))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -440,6 +399,6 @@ DRIVER_INIT_MEMBER(gunbustr_state,gunbustrj)
 	m_coin_lockout = false;
 }
 
-GAME( 1992, gunbustr,  0,        gunbustr, gunbustr, gunbustr_state, gunbustr, ORIENTATION_FLIP_X, "Taito Corporation Japan",   "Gunbuster (World)", 0 )
-GAME( 1992, gunbustru, gunbustr, gunbustr, gunbustr, gunbustr_state, gunbustr, ORIENTATION_FLIP_X, "Taito America Corporation", "Gunbuster (US)",    0 )
-GAME( 1992, gunbustrj, gunbustr, gunbustr, gunbustr, gunbustr_state, gunbustrj,ORIENTATION_FLIP_X, "Taito Corporation",         "Gunbuster (Japan)", 0 )
+GAME( 1992, gunbustr,  0,        gunbustr, gunbustr, gunbustr_state, gunbustr, ORIENTATION_FLIP_X, "Taito Corporation Japan",   "Gunbuster (World)", MACHINE_NODEVICE_LAN )
+GAME( 1992, gunbustru, gunbustr, gunbustr, gunbustr, gunbustr_state, gunbustr, ORIENTATION_FLIP_X, "Taito America Corporation", "Gunbuster (US)",    MACHINE_NODEVICE_LAN )
+GAME( 1992, gunbustrj, gunbustr, gunbustr, gunbustr, gunbustr_state, gunbustrj,ORIENTATION_FLIP_X, "Taito Corporation",         "Gunbuster (Japan)", MACHINE_NODEVICE_LAN )

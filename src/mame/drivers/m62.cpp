@@ -2199,6 +2199,6 @@ GAME( 1986, yanchamr, kidniki,  kidniki,  kidniki,  m62_state, kidniki,  ROT0,  
 GAME( 1987, lithero,  kidniki,  kidniki,  kidniki,  m62_state, kidniki,  ROT0,   "bootleg", "Little Hero", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAME( 1985, spelunkr, 0,        spelunkr, spelunkr, m62_state, spelunkr, ROT0,   "Irem (licensed from Broderbund)", "Spelunker", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAME( 1985, spelunkrj,spelunkr, spelunkr, spelunkr, m62_state, spelunkr, ROT0,   "Irem (licensed from Broderbund)", "Spelunker (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1986, spelunk2, 0,        spelunk2, spelunk2, m62_state, spelunk2, ROT0,   "Irem (licensed from Broderbund)", "Spelunker II", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1986, spelunk2, 0,        spelunk2, spelunk2, m62_state, spelunk2, ROT0,   "Irem (licensed from Broderbund)", "Spelunker II - 23 no Kagi (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAME( 1986, youjyudn, 0,        youjyudn, youjyudn, m62_state, youjyudn, ROT270, "Irem", "Youjyuden (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAME( 1985, horizon,  0,        horizon,  horizon,  m62_state, 0,        ROT0,   "Irem", "Horizon (Irem)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )

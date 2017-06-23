@@ -451,11 +451,13 @@ void ecb_grip21_device::kb_w(uint8_t data)
 //  MACHINE CONFIGURATION
 //**************************************************************************
 
+
 //-------------------------------------------------
-//  MACHINE_CONFIG_START( grip )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( grip )
+
+MACHINE_CONFIG_MEMBER( ecb_grip21_device::device_add_mconfig )
 	// basic machine hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/4)
 	MCFG_Z80_DAISY_CHAIN(grip_daisy_chain)
@@ -510,17 +512,6 @@ static MACHINE_CONFIG_START( grip )
 	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(PUT(ecb_grip21_device, kb_w))
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor ecb_grip21_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( grip );
-}
 
 
 //**************************************************************************

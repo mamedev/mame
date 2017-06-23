@@ -937,23 +937,21 @@ TIMER_CALLBACK_MEMBER( voodoo_device::vblank_off_callback )
 	/* set internal state and call the client */
 	fbi.vblank = false;
 
-	// TODO: Vblank IRQ enable is VOODOO3 only?
-	if (vd_type >= TYPE_VOODOO_3)
+	// PCI Vblank IRQ enable is VOODOO2 and up
+	if (vd_type >= TYPE_VOODOO_2)
 	{
 		if (reg[intrCtrl].u & 0x8)       // call IRQ handler if VSYNC interrupt (falling) is enabled
 		{
 			reg[intrCtrl].u |= 0x200;        // VSYNC int (falling) active
-
-			if (!m_vblank.isnull())
-				m_vblank(false);
+			reg[intrCtrl].u &= ~0x80000000;
+			if (!m_pciint.isnull())
+				m_pciint(true);
 
 		}
 	}
-	else
-	{
-		if (!m_vblank.isnull())
-			m_vblank(false);
-	}
+	// External vblank handler
+	if (!m_vblank.isnull())
+		m_vblank(false);
 
 	/* go to the end of the next frame */
 	adjust_vblank_timer(this);
@@ -993,22 +991,20 @@ TIMER_CALLBACK_MEMBER( voodoo_device::vblank_callback )
 	/* set internal state and call the client */
 	fbi.vblank = true;
 
-	// TODO: Vblank IRQ enable is VOODOO3 only?
-	if (vd_type >= TYPE_VOODOO_3)
+	// PCI Vblank IRQ enable is VOODOO2 and up
+	if (vd_type >= TYPE_VOODOO_2)
 	{
 		if (reg[intrCtrl].u & 0x4)       // call IRQ handler if VSYNC interrupt (rising) is enabled
 		{
 			reg[intrCtrl].u |= 0x100;        // VSYNC int (rising) active
-
-			if (!m_vblank.isnull())
-				m_vblank(true);
+			reg[intrCtrl].u &= ~0x80000000;
+			if (!m_pciint.isnull())
+				m_pciint(true);
 		}
 	}
-	else
-	{
-		if (!m_vblank.isnull())
-			m_vblank(true);
-	}
+	// External vblank handler
+	if (!m_vblank.isnull())
+		m_vblank(true);
 }
 
 
@@ -2188,6 +2184,15 @@ int32_t voodoo_device::register_w(voodoo_device *vd, offs_t offset, uint32_t dat
 	/* switch off the register */
 	switch (regnum)
 	{
+		case intrCtrl:
+			vd->reg[regnum].u = data;
+			// Setting bit 31 clears the PCI interrupts
+			if (data & 0x80000000) {
+				// Clear pci interrupt
+				if (!vd->m_pciint.isnull())
+					vd->m_pciint(false);
+			}
+			break;
 		/* Vertex data is 12.4 formatted fixed point */
 		case fvertexAx:
 			data = float_to_int32(data, 4);
@@ -2490,14 +2495,16 @@ int32_t voodoo_device::register_w(voodoo_device *vd, offs_t offset, uint32_t dat
 
 		case userIntrCMD:
 			poly_wait(vd->poly, vd->regnames[regnum]);
-			//fatalerror("userIntrCMD\n");
+			// Bit 5 of intrCtrl enables user interrupts
+			if (vd->reg[intrCtrl].u & 0x20) {
+				// Bits 19:12 are set to cmd 9:2, bit 11 is user interrupt flag
+				vd->reg[intrCtrl].u |= ((data << 10) & 0x000ff000) | 0x800;
+				vd->reg[intrCtrl].u &= ~0x80000000;
 
-			vd->reg[intrCtrl].u |= 0x1800;
-			vd->reg[intrCtrl].u &= ~0x80000000;
-
-			// TODO: rename vblank_client for less confusion?
-			if (!vd->m_vblank.isnull())
-				vd->m_vblank(true);
+				// Signal pci interrupt handler
+				if (!vd->m_pciint.isnull())
+					vd->m_pciint(true);
+			}
 			break;
 
 		/* gamma table access -- Voodoo/Voodoo2 only */
@@ -3247,7 +3254,7 @@ int32_t voodoo_device::lfb_w(voodoo_device* vd, offs_t offset, uint32_t data, ui
 			depth += scry * vd->fbi.rowpixels;
 
 		/* compute dithering */
-		COMPUTE_DITHER_POINTERS(vd->reg[fbzMode].u, y);
+		COMPUTE_DITHER_POINTERS(vd->reg[fbzMode].u, y, vd->reg[fogMode].u);
 
 		/* loop over up to two pixels */
 		for (pix = 0; mask; pix++)
@@ -4956,6 +4963,7 @@ void voodoo_device::device_start()
 	freq = clock();
 	m_vblank.resolve();
 	m_stall.resolve();
+	m_pciint.resolve();
 
 	/* create a multiprocessor work queue */
 	poly = poly_alloc(machine(), 64, sizeof(poly_extra_data), 0);
@@ -5767,6 +5775,7 @@ voodoo_device::voodoo_device(const machine_config &mconfig, device_type type, co
 	, m_cputag(nullptr)
 	, m_vblank(*this)
 	, m_stall(*this)
+	, m_pciint(*this)
 	, vd_type(vdt)
 {
 }

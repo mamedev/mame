@@ -77,7 +77,6 @@ public:
 	DECLARE_WRITE8_MEMBER(sndcmd_lapbylap_w);
 	DECLARE_WRITE8_MEMBER(lamp_w) { };
 	DECLARE_WRITE8_MEMBER(disp_w);
-	DECLARE_WRITE_LINE_MEMBER(vck_w);
 	DECLARE_WRITE_LINE_MEMBER(qc7a_w);
 	DECLARE_WRITE_LINE_MEMBER(q9a_w);
 	DECLARE_WRITE_LINE_MEMBER(qc9b_w);
@@ -1252,16 +1251,6 @@ void inder_state::update_mus()
 		m_13->ba_w(0);
 }
 
-WRITE_LINE_MEMBER( inder_state::vck_w )
-{
-	// The order of these writes is sensitive, though the schematic (not to scale)
-	// makes it seem that both 74HCT74 clock inputs should be raised simultaneously
-	m_9b->clock_w(0);
-	m_9a->clock_w(0);
-	m_9b->clock_w(1);
-	m_9a->clock_w(1);
-}
-
 WRITE_LINE_MEMBER( inder_state::qc7a_w )
 {
 	m_msm->reset_w(state);
@@ -1424,7 +1413,9 @@ static MACHINE_CONFIG_START( inder )
 	MCFG_FRAGMENT_ADD( genpin_audio )
 	MCFG_SPEAKER_STANDARD_MONO("msmvol")
 	MCFG_SOUND_ADD("msm", MSM5205, XTAL_384kHz)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(inder_state, vck_w))
+	MCFG_MSM5205_VCK_CALLBACK(DEVWRITELINE("9a", ttl7474_device, clock_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("9b", ttl7474_device, clock_w)) // order of writes is sensitive
+
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 4KHz 4-bit */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "msmvol", 1.0)
 
@@ -1472,10 +1463,10 @@ static MACHINE_CONFIG_START( inder )
 	MCFG_DEVICE_ADD("7a", TTL7474, 0)
 	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(inder_state, qc7a_w))
 
-	MCFG_DEVICE_ADD("9a", TTL7474, 0)
+	MCFG_DEVICE_ADD("9a", TTL7474, 0) // HCT74
 	MCFG_7474_OUTPUT_CB(WRITELINE(inder_state, q9a_w))
 
-	MCFG_DEVICE_ADD("9b", TTL7474, 0)
+	MCFG_DEVICE_ADD("9b", TTL7474, 0) // HCT74
 	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(inder_state, qc9b_w))
 
 	MCFG_DEVICE_ADD("13", HCT157, 0)
@@ -1635,7 +1626,7 @@ ROM_START(metalman)
 
 	ROM_REGION(0x80000, "user2", 0)
 	ROM_LOAD("sound_m2.bin", 0x00000, 0x20000, CRC(349df1fe) SHA1(47e7ddbdc398396e40bb5340e5edcb8baf06c255))
-	ROM_LOAD("sound_m3.bin", 0x40000, 0x20000, CRC(4d9f5ed2) SHA1(bc6b7c70369c25eddddac5304497f30cee7675d4))
+	ROM_LOAD("sound_m3.bin", 0x40000, 0x20000, CRC(15ef1866) SHA1(4ffa3b29bf3c30a9a5bc622adde16a1a13833b22))
 ROM_END
 
 

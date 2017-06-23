@@ -3,7 +3,7 @@
 
 #include "emu.h"
 
-#define NEW_SCSI 0
+#define NEW_SCSI 1
 
 #include "includes/interpro.h"
 #include "debugger.h"
@@ -20,91 +20,81 @@
 // machine start
 void interpro_state::machine_start()
 {
-	m_system_reg[SREG_CTRL2] = CTRL2_COLDSTART | CTRL2_PWRENA | CTRL2_PWRUP;
+	m_sreg_ctrl2 = CTRL2_COLDSTART | CTRL2_PWRENA | CTRL2_PWRUP;
 }
 
 void interpro_state::machine_reset()
 {
 	// flash rom requires the following values
-	m_system_reg[SREG_ERROR] = 0x00;
-	m_system_reg[SREG_STATUS] = 0x400;
-	m_system_reg[SREG_CTRL1] = CTRL1_FLOPRDY;
+	m_sreg_error = 0x00;
+	m_sreg_status = 0x400;
+	m_sreg_ctrl1 = CTRL1_FLOPRDY;
 }
 
-WRITE16_MEMBER(interpro_state::system_w)
+WRITE16_MEMBER(interpro_state::sreg_ctrl1_w)
 {
-	switch (offset)
-	{
-	case SREG_LED:
-		LOG_SYSTEM("LED value %d at %s\n", data, machine().describe_context());
-		break;
+	LOG_SYSTEM("system control register 1 write data 0x%x (%s)\n", data, machine().describe_context());
 
-	case SREG_STATUS: // not sure if writable?
-		break;
+	if ((data ^ m_sreg_ctrl1) & CTRL1_LEDDP)
+		LOG_SYSTEM("LED decimal point %s\n", data & CTRL1_LEDDP ? "on" : "off");
 
-	case SREG_CTRL1:
-		LOG_SYSTEM("system control register 1 write data 0x%x pc %s\n", data, machine().describe_context());
-
-		if ((data ^ m_system_reg[offset]) & CTRL1_LEDDP)
-			LOG_SYSTEM("LED decimal point %s\n", data & CTRL1_LEDDP ? "on" : "off");
-
-		m_system_reg[offset] = data;
-		break;
-
-	case SREG_CTRL2:
-		LOG_SYSTEM("system control register 2 write data 0x%x at %s\n", data, machine().describe_context());
-		if (data & CTRL2_RESET)
-		{
-			m_system_reg[SREG_CTRL2] &= ~CTRL2_COLDSTART;
-
-			machine().schedule_soft_reset();
-		}
-		else
-			m_system_reg[offset] = data & 0x0f; // top four bits are not persistent
-		break;
-	}
+	m_sreg_ctrl1 = data;
 }
 
-READ16_MEMBER(interpro_state::system_r)
+WRITE16_MEMBER(interpro_state::sreg_ctrl2_w)
 {
-	LOG_SYSTEM("system register read offset %d at %s\n", offset, machine().describe_context());
-	switch (offset)
+	LOG_SYSTEM("system control register 2 write data 0x%x (%s)\n", data, machine().describe_context());
+	if (data & CTRL2_RESET)
 	{
-	case SREG_ERROR:
-	case SREG_STATUS:
-	case SREG_CTRL1:
-	case SREG_CTRL2:
-	default:
-		return m_system_reg[offset];
-		break;
+		m_sreg_ctrl1 &= ~CTRL2_COLDSTART;
+
+		machine().schedule_soft_reset();
 	}
+	else
+		m_sreg_ctrl1 = data & CTRL2_WMASK;
 }
 
-READ32_MEMBER(interpro_state::idprom_r)
+READ16_MEMBER(interpro_state::sreg_error_r)
+{
+	u16 result = m_sreg_error;
+
+	// clear error register on read
+	m_sreg_error = 0;
+
+	return result;
+}
+
+READ8_MEMBER(interpro_state::idprom_r)
 {
 	LOG_IDPROM("idprom read offset 0x%x mask 0x%08x at %s\n", offset, mem_mask, machine().describe_context());
 
-	// abitrary fake number for now, not working properly
-	u32 speed = 20000000;
-	u32 speed1 = speed >> 24;
-	u32 speed2 = speed >> 16;
-	u32 speed3 = speed >> 8;
+	// compute femtoseconds per cycle from main cpu clock
+	u32 speed = 1'000'000'000'000'000 / m_maincpu->clock();
 
-	static uint8_t idprom[] = {
+	static u8 idprom[] = {
 		// module type id
-		'M', 'P', 'C', 'B',
-		'0', '1', '4', '5',
+		0x00, 0x00, 0x00, 0x00, // board type MSMT/MPCB - detected by feature[3]
+		'1', '2', '3',          // board number
+		'A',                    // board revision
 
 		// ECO bytes
 		0x87, 0x65, 0x43, 0x21,
 		0xbb, 0xcc, 0xdd, 0xee,
 
 		// the following 8 bytes are "feature bytes"
-		// the feature bytes contain a 32 bit word which is divided by 40000
-		// if they're empty, a default value of 50 000 000 is used
-		// perhaps this is a system speed (50MHz)?
-		0x2, 0x34, 0x56, 0x78,
-		(u8)speed, (u8)speed3, (u8)speed2, (u8)speed1,
+
+		// for a 2700/2800/2500 system board, the first feature byte selects the variant
+		//   model = (feature[0] & 0x2) ? (feature[0] & 0x8 ? 2700 : 2800) : 2500
+
+		// 0x0a, // 2700 series
+		0x02, // 2800 series
+		// 0x00, // 2500 series
+
+		0x00, 0x00, 
+		0x80, // board type, 0x80 = MPCB, 0x00 = MSMT
+
+		// for the system boards, these bytes contain cpu clock speed (as femtoseconds per cycle, big-endian)
+		(u8)(speed >> 24), (u8)(speed >> 16), (u8)(speed >> 8), (u8)(speed >> 0),
 
 		// reserved bytes
 		0xff, 0xff,
@@ -113,8 +103,14 @@ READ32_MEMBER(interpro_state::idprom_r)
 		// boot rom tests for family == 0x41 or 0x42
 		// if so, speed read from feature bytes 2 & 3
 		// if not, read speed from feature bytes 4-7
-		0x41, 0x00, // 2800-series CPU
-		//0x24, 0x00, // 2000-series system board
+
+		//0x24, 0x00, // 2000
+
+		// 0x31, 0x00, // 2400
+		0x39, 0x00, // 2700/2800/2500 depending on first feature byte (0xa, 0x2, 0x0)
+		// 0x40, 0x00, // 6700
+		// 0x41, 0x00, // idprom reports as 2800 series cpu?
+		//0x42, 0x00, // 6800 series
 
 		// footprint and checksum
 		0x55, 0xaa, 0x55, 0x00
@@ -124,13 +120,13 @@ READ32_MEMBER(interpro_state::idprom_r)
 	{
 	case 0x1f:
 	{
-		uint8_t sum = 0;
+		u8 sum = 0;
 
 		// compute the checksum (sum of all bytes must be == 0x00)
 		for (int i = 0; i < 0x20; i++)
 			sum += idprom[i];
 
-		return 0x100 - (sum & 0xff);
+		return 0x100 - sum;
 	}
 
 	default:
@@ -138,19 +134,74 @@ READ32_MEMBER(interpro_state::idprom_r)
 	}
 }
 
-READ32_MEMBER(interpro_state::slot0_r)
+READ8_MEMBER(interpro_state::slot0_r)
 {
+#if 0
 	// a known graphics board idprom
-	static uint8_t slot0[] = {
+	static u8 slot0[] = {
 		0x00, 0x00, 0x00, 0x00, '9',  '6',  '3',  'A',  // board
 		0xfe, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, // eco
 		0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, // features
 		0xff, 0xff,                                     // reserved
 		0x22, 0x00,                                     // family
-		0x55, 0xaa, 0x55, 0x00
+		0x55, 0xaa, 0x55,                               // footprint
+		0x00                                            // checksum
 	};
+#else
+	static u8 slot0[] = {
+		0x00, 0x00, 0x00, 0x00, '1',  '1',  '1',  'A',  // board
+		0x01, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, // eco
+		0xff, 0xff, 0xff, 0x7f, 0xff, 0xff, 0xff, 0xff, // features
+		0xff, 0xff,                                     // reserved
+		0x05, 0x00,                                     // family
+		0x55, 0xaa, 0x55,                               // footprint
+		0x00                                            // checksum
+	};
+#endif
+	switch (offset)
+	{
+	case 0x1f:
+	{
+		u8 sum = 0;
 
-	return ((uint8_t *)&slot0)[offset % 32];
+		// compute the checksum (sum of all bytes must be == 0x00)
+		for (int i = 0; i < 0x20; i++)
+			sum += slot0[i];
+
+		return 0x100 - sum;
+	}
+
+	default:
+		return slot0[offset];
+	}
+}
+
+READ32_MEMBER(interpro_state::unmapped_r)
+{
+	// check if non-existent memory errors are enabled
+	if (m_srarb->tmctrl_r(space, offset, mem_mask) & interpro_srarb_device::TMCTRL_ENNEM)
+	{
+		// flag non-existent memory error in system error register
+		m_sreg_error |= (ERROR_SRXNEM | ERROR_SRXVALID);
+
+		// tell ioga to raise a bus error
+		m_ioga->bus_error(space, interpro_ioga_device::BINFO_BERR | interpro_ioga_device::BINFO_SNAPOK, offset << 2);
+	}
+
+	return space.unmap();
+}
+
+WRITE32_MEMBER(interpro_state::unmapped_w)
+{
+	// check if non-existent memory errors are enabled
+	if (m_srarb->tmctrl_r(space, offset, mem_mask) & interpro_srarb_device::TMCTRL_ENNEM)
+	{
+		// flag non-existent memory error in system error register
+		m_sreg_error |= (ERROR_SRXNEM | ERROR_SRXVALID);
+
+		// tell ioga to raise a bus error
+		m_ioga->bus_error(space, interpro_ioga_device::BINFO_BERR | interpro_ioga_device::BINFO_SNAPOK, offset << 2);
+	}
 }
 
 WRITE8_MEMBER(interpro_state::rtc_w)
@@ -271,6 +322,19 @@ WRITE8_MEMBER(interpro_state::scsi_dma_w)
 
 DRIVER_INIT_MEMBER(interpro_state, ip2800)
 {
+	// FIXME: not all memory sizes are reported properly using fdm "5 inqhw" and "optimum_memory" commands
+
+	// 16 = reports 16M, banks empty?
+	// 32 = reports 16M, banks empty?
+	// 64 = reports 128M, 16x8
+	// 128 = reports 128M, 16x8
+	// 256 = reports 256M, 32x8
+
+	// grab the main memory space from the mmu
+	address_space &space = m_mmu->space(AS_0);
+
+	// map the configured ram
+	space.install_ram(0, m_ram->mask(), m_ram->pointer());
 }
 
 #if NEW_SCSI
@@ -280,7 +344,7 @@ static SLOT_INTERFACE_START(interpro_scsi_devices)
 	SLOT_INTERFACE_INTERNAL(INTERPRO_SCSI_ADAPTER_TAG, NCR53C94)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_FRAGMENT(interpro_scsi_adapter)
+static MACHINE_CONFIG_START(interpro_scsi_adapter)
 	MCFG_DEVICE_CLOCK(XTAL_12_5MHz)
 	MCFG_NCR5390_IRQ_HANDLER(DEVWRITELINE(":" INTERPRO_IOGA_TAG, interpro_ioga_device, ir0_w))
 	MCFG_NCR5390_DRQ_HANDLER(DEVWRITELINE(":" INTERPRO_IOGA_TAG, interpro_ioga_device, drq_scsi))
@@ -296,50 +360,49 @@ static ADDRESS_MAP_START(clipper_data_map, AS_DATA, 32, interpro_state)
 	AM_RANGE(0x00000000, 0xffffffff) AM_DEVREADWRITE32(INTERPRO_MMU_TAG, cammu_device, data_r, data_w, 0xffffffff)
 ADDRESS_MAP_END
 
-// these maps represent the real main, i/o and boot spaces of the system
-static ADDRESS_MAP_START(interpro_main_map, AS_0, 32, interpro_state)
-	AM_RANGE(0x00000000, 0x00ffffff) AM_RAM // 16M RAM
-
-	AM_RANGE(0x40000000, 0x4000003f) AM_DEVICE(INTERPRO_MCGA_TAG, interpro_fmcc_device, map)
-	AM_RANGE(0x4f007e00, 0x4f007eff) AM_DEVICE(INTERPRO_SGA_TAG, interpro_sga_device, map)
-
-	AM_RANGE(0x7f000100, 0x7f00011f) AM_DEVICE8(INTERPRO_FDC_TAG, n82077aa_device, map, 0xff)
-	AM_RANGE(0x7f000200, 0x7f0002ff) AM_DEVICE(INTERPRO_SRARB_TAG, interpro_srarb_device, map)
-	AM_RANGE(0x7f000300, 0x7f00030f) AM_READWRITE16(system_r, system_w, 0xffff)
-	AM_RANGE(0x7f000400, 0x7f00040f) AM_DEVREADWRITE8(INTERPRO_SCC1_TAG, scc85c30_device, ba_cd_inv_r, ba_cd_inv_w, 0xff)
-	AM_RANGE(0x7f000410, 0x7f00041f) AM_DEVREADWRITE8(INTERPRO_SCC2_TAG, scc85230_device, ba_cd_inv_r, ba_cd_inv_w, 0xff)
-	AM_RANGE(0x7f000500, 0x7f0006ff) AM_READWRITE8(rtc_r, rtc_w, 0xff)
-	AM_RANGE(0x7f000700, 0x7f00077f) AM_READ(idprom_r)
-	AM_RANGE(0x7f001000, 0x7f001fff) AM_READWRITE8(scsi_r, scsi_w, 0x0000ff00)
-
-	AM_RANGE(0x7f0fff00, 0x7f0fffff) AM_DEVICE(INTERPRO_IOGA_TAG, interpro_ioga_device, map)
-
-	AM_RANGE(0x7f100000, 0x7f11ffff) AM_ROM AM_REGION(INTERPRO_EPROM_TAG, 0)
-	AM_RANGE(0x7f180000, 0x7f1bffff) AM_ROM AM_REGION(INTERPRO_FLASH_TAG, 0)
-
-	AM_RANGE(0x08000000, 0x08000fff) AM_NOP // bogus
-	AM_RANGE(0x8f000000, 0x8f0fffff) AM_NOP // AM_READ(slot0_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START(interpro_io_map, AS_1, 32, interpro_state)
-	AM_RANGE(0x00000000, 0x00001fff) AM_DEVICE(INTERPRO_MMU_TAG, cammu_device, map)
-
+static ADDRESS_MAP_START(interpro_common_map, AS_0, 32, interpro_state)
 	AM_RANGE(0x40000000, 0x4000004f) AM_DEVICE(INTERPRO_MCGA_TAG, interpro_fmcc_device, map)
 	AM_RANGE(0x4f007e00, 0x4f007eff) AM_DEVICE(INTERPRO_SGA_TAG, interpro_sga_device, map)
 
 	AM_RANGE(0x7f000100, 0x7f00011f) AM_DEVICE8(INTERPRO_FDC_TAG, n82077aa_device, map, 0xff)
 	AM_RANGE(0x7f000200, 0x7f0002ff) AM_DEVICE(INTERPRO_SRARB_TAG, interpro_srarb_device, map)
-	AM_RANGE(0x7f000300, 0x7f00030f) AM_READWRITE16(system_r, system_w, 0xffff)
+
+	AM_RANGE(0x7f000300, 0x7f000303) AM_READ16(sreg_error_r, 0xffff)
+	AM_RANGE(0x7f000304, 0x7f000307) AM_READWRITE16(sreg_status_r, sreg_led_w, 0xffff)
+	AM_RANGE(0x7f000308, 0x7f00030b) AM_READWRITE16(sreg_ctrl1_r, sreg_ctrl1_w, 0xffff)
+	AM_RANGE(0x7f00030c, 0x7f00030f) AM_READWRITE16(sreg_ctrl2_r, sreg_ctrl2_w, 0xffff)
+
+	AM_RANGE(0x7f00031c, 0x7f00031f) AM_READWRITE16(sreg_ctrl3_r, sreg_ctrl3_w, 0xffff)
+
 	AM_RANGE(0x7f000400, 0x7f00040f) AM_DEVREADWRITE8(INTERPRO_SCC1_TAG, scc85c30_device, ba_cd_inv_r, ba_cd_inv_w, 0xff)
 	AM_RANGE(0x7f000410, 0x7f00041f) AM_DEVREADWRITE8(INTERPRO_SCC2_TAG, scc85230_device, ba_cd_inv_r, ba_cd_inv_w, 0xff)
 	AM_RANGE(0x7f000500, 0x7f0006ff) AM_READWRITE8(rtc_r, rtc_w, 0xff)
-	AM_RANGE(0x7f000700, 0x7f00077f) AM_READ(idprom_r)
+	AM_RANGE(0x7f000700, 0x7f00077f) AM_READ8(idprom_r, 0xff)
 	AM_RANGE(0x7f001000, 0x7f001fff) AM_READWRITE8(scsi_r, scsi_w, 0x0000ff00)
 
 	AM_RANGE(0x7f0fff00, 0x7f0fffff) AM_DEVICE(INTERPRO_IOGA_TAG, interpro_ioga_device, map)
 
 	AM_RANGE(0x08000000, 0x08000fff) AM_NOP // bogus
-	AM_RANGE(0x8f000000, 0x8f0fffff) AM_NOP // AM_READ(slot0_r)
+	AM_RANGE(0x87000000, 0x8700007f) AM_READ8(slot0_r, 0xff)
+
+	// 2800 (CBUS?) slots are mapped as follows
+	AM_RANGE(0x87000000, 0x8700007f) AM_MIRROR(0x78000000) AM_READWRITE(unmapped_r, unmapped_w)
+ADDRESS_MAP_END
+
+// these maps represent the real main, i/o and boot spaces of the system
+static ADDRESS_MAP_START(interpro_main_map, AS_0, 32, interpro_state)
+	AM_RANGE(0x00000000, 0x00ffffff) AM_RAM AM_SHARE(RAM_TAG)
+
+	AM_RANGE(0x7f100000, 0x7f11ffff) AM_ROM AM_REGION(INTERPRO_EPROM_TAG, 0)
+	AM_RANGE(0x7f180000, 0x7f1bffff) AM_ROM AM_REGION(INTERPRO_FLASH_TAG, 0)
+
+	AM_IMPORT_FROM(interpro_common_map)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(interpro_io_map, AS_1, 32, interpro_state)
+	AM_RANGE(0x00000000, 0x00001fff) AM_DEVICE(INTERPRO_MMU_TAG, cammu_device, map)
+
+	AM_IMPORT_FROM(interpro_common_map)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(interpro_boot_map, AS_2, 32, interpro_state)
@@ -360,7 +423,7 @@ static INPUT_PORTS_START(ip2800)
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START(ip2800)
-	MCFG_CPU_ADD(INTERPRO_CPU_TAG, CLIPPER_C400, XTAL_10MHz)
+	MCFG_CPU_ADD(INTERPRO_CPU_TAG, CLIPPER_C400, XTAL_12_5MHz)
 	MCFG_CPU_PROGRAM_MAP(clipper_insn_map)
 	MCFG_CPU_DATA_MAP(clipper_data_map)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE(INTERPRO_IOGA_TAG, interpro_ioga_device, inta_cb)
@@ -371,25 +434,46 @@ static MACHINE_CONFIG_START(ip2800)
 	MCFG_DEVICE_ADDRESS_MAP(AS_2, interpro_boot_map)
 	MCFG_CAMMU_SSW_CB(DEVREAD32(INTERPRO_CPU_TAG, clipper_device, ssw))
 
-	// serial controllers and rs232 bus
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("16M")
+	MCFG_RAM_EXTRA_OPTIONS("32M,64M,128M,256M")
+
+	// TODO: work out serial port assignments for mouse, console, keyboard and ?
+	// first serial controller and devices
 	MCFG_SCC85C30_ADD(INTERPRO_SCC1_TAG, XTAL_4_9152MHz, 0, 0, 0, 0)
 
-	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_txd))
-	MCFG_Z80SCC_OUT_TXDB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_txd))
+	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE(INTERPRO_SERIAL1_TAG, rs232_port_device, write_txd))
+	MCFG_Z80SCC_OUT_TXDB_CB(DEVWRITELINE(INTERPRO_SERIAL2_TAG, rs232_port_device, write_txd))
 	MCFG_Z80SCC_OUT_INT_CB(DEVWRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, ir11_w))
 
-	MCFG_RS232_PORT_ADD("rs232a", default_rs232_devices, nullptr)
+	// is this the keyboard port?
+	MCFG_RS232_PORT_ADD(INTERPRO_SERIAL1_TAG, default_rs232_devices, nullptr) // "keyboard"
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(INTERPRO_SCC1_TAG, z80scc_device, rxa_w))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(INTERPRO_SCC1_TAG, z80scc_device, dcda_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(INTERPRO_SCC1_TAG, z80scc_device, ctsa_w))
 
-	// the following port is known as "port 2"
-	MCFG_RS232_PORT_ADD("rs232b", default_rs232_devices, "terminal")
+	// eprom uses this serial port for console (show_config calls it "port 2")
+	MCFG_RS232_PORT_ADD(INTERPRO_SERIAL2_TAG, default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(INTERPRO_SCC1_TAG, z80scc_device, rxb_w))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(INTERPRO_SCC1_TAG, z80scc_device, dcdb_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(INTERPRO_SCC1_TAG, z80scc_device, ctsb_w))
 
+	// second serial controller and devices
 	MCFG_SCC85230_ADD(INTERPRO_SCC2_TAG, XTAL_4_9152MHz, 0, 0, 0, 0)
+
+	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE(INTERPRO_SERIAL3_TAG, rs232_port_device, write_txd))
+	MCFG_Z80SCC_OUT_TXDB_CB(DEVWRITELINE(INTERPRO_SERIAL4_TAG, rs232_port_device, write_txd))
+	MCFG_Z80SCC_OUT_INT_CB(DEVWRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, ir11_w))
+
+	MCFG_RS232_PORT_ADD(INTERPRO_SERIAL3_TAG, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(INTERPRO_SCC1_TAG, z80scc_device, rxa_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(INTERPRO_SCC1_TAG, z80scc_device, dcda_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(INTERPRO_SCC1_TAG, z80scc_device, ctsa_w))
+
+	MCFG_RS232_PORT_ADD(INTERPRO_SERIAL4_TAG, default_rs232_devices, nullptr) //"terminal")
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(INTERPRO_SCC1_TAG, z80scc_device, rxb_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(INTERPRO_SCC1_TAG, z80scc_device, dcdb_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(INTERPRO_SCC1_TAG, z80scc_device, ctsb_w))
 
 	// real-time clock/non-volatile memory
 	MCFG_MC146818_ADD(INTERPRO_RTC_TAG, XTAL_32_768kHz)
@@ -408,9 +492,9 @@ static MACHINE_CONFIG_START(ip2800)
 #if NEW_SCSI
 	MCFG_NSCSI_BUS_ADD(INTERPRO_SCSI_TAG)
 	MCFG_NSCSI_ADD(INTERPRO_SCSI_TAG ":0", interpro_scsi_devices, "harddisk", false)
-	MCFG_NSCSI_ADD(INTERPRO_SCSI_TAG ":1", interpro_scsi_devices, "cdrom", false)
+	MCFG_NSCSI_ADD(INTERPRO_SCSI_TAG ":1", interpro_scsi_devices, nullptr, false)
 	MCFG_NSCSI_ADD(INTERPRO_SCSI_TAG ":2", interpro_scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD(INTERPRO_SCSI_TAG ":3", interpro_scsi_devices, nullptr, false)
+	MCFG_NSCSI_ADD(INTERPRO_SCSI_TAG ":3", interpro_scsi_devices, "cdrom", false)
 	MCFG_NSCSI_ADD(INTERPRO_SCSI_TAG ":4", interpro_scsi_devices, nullptr, false)
 	MCFG_NSCSI_ADD(INTERPRO_SCSI_TAG ":5", interpro_scsi_devices, nullptr, false)
 	MCFG_NSCSI_ADD(INTERPRO_SCSI_TAG ":6", interpro_scsi_devices, nullptr, false)
@@ -419,7 +503,7 @@ static MACHINE_CONFIG_START(ip2800)
 #else
 	MCFG_DEVICE_ADD(INTERPRO_SCSI_TAG, SCSI_PORT, 0)
 	MCFG_SCSIDEV_ADD(INTERPRO_SCSI_TAG ":" SCSI_PORT_DEVICE1, "harddisk", SCSIHD, SCSI_ID_0)
-	MCFG_SCSIDEV_ADD(INTERPRO_SCSI_TAG ":" SCSI_PORT_DEVICE2, "cdrom", SCSICD, SCSI_ID_3)
+	MCFG_SCSIDEV_ADD(INTERPRO_SCSI_TAG ":" SCSI_PORT_DEVICE3, "cdrom", SCSICD, SCSI_ID_3)
 
 	MCFG_DEVICE_ADD(INTERPRO_SCSI_ADAPTER_TAG, NCR539X, XTAL_12_5MHz)
 	MCFG_LEGACY_SCSI_PORT(INTERPRO_SCSI_TAG)

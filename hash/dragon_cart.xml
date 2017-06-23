@@ -353,7 +353,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<publisher>Premier Microsystems</publisher>
 		<info name="author" value="J.G. Johnson &amp; P.J. Rihan" />
 		<part name="cart" interface="coco_cart">
-			<!--<feature name="slot" value="delta_fdc" />-->
+			<!--<feature name="slot" value="premier_fdc" />-->
 			<dataarea name="rom" size="8192">
 				<rom name="deltados (1983)(premier micros).rom" size="8192" crc="149eb4dd" sha1="eb686ce6afe63e4d4011b333a882ca812c69307f" offset="0" />
 			</dataarea>
@@ -380,6 +380,56 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<part name="cart" interface="coco_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="toolkit (1983) (premier microsystems) [!].rom" size="8192" crc="82ef981a" sha1="b9c0d29382ae1d685f196ab4b53fb75156e12404" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Devices -->
+
+	<software name="epromprg" supported="no">
+		<description>EPROM Programmer</description>
+		<year>198?</year>
+		<publisher>Dragon data</publisher>
+		<part name="cart" interface="coco_cart">
+			<!-- <feature name="slot" value="epromprg" /> -->
+			<dataarea name="rom" size="4096">
+				<rom name="eprom_mkII_v21.rom" size="4096" crc="310bc0a0" sha1="4aba041033410ab912753407ae29e5fe89925440" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sound">
+		<description>Sound Extension Module</description>
+		<year>1983</year>
+		<publisher>J.C.B. (Microsystems)</publisher>
+		<part name="cart" interface="coco_cart">
+			<feature name="slot" value="jcbsnd" />
+			<dataarea name="rom" size="4096">
+				<rom name="D32SEM.ROM" size="4096" crc="4cd0f30b" sha1="d07bb9272e3d3928059853730ff656905a80b68e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="speech" supported="no">
+		<description>Speech Synthesis Module</description>
+		<year>1983</year>
+		<publisher>J.C.B. (Microsystems)</publisher>
+		<part name="cart" interface="coco_cart">
+			<!-- <feature name="slot" value="jcbspch" /> -->
+			<dataarea name="rom" size="4096">
+				<rom name="jcb-speech.rom" size="4096" crc="e88dfe36" sha1="df3f64a7a3beeb91469932035af5e4f8a7872aad" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ultradrv" supported="no">
+		<description>Ultra Drive</description>
+		<year>1984</year>
+		<publisher>Ikon Computer Products</publisher>
+		<part name="cart" interface="coco_cart">
+			<!-- <feature name="slot" value="ultradrv" /> -->
+			<dataarea name="rom" size="4096">
+				<rom name="Dragonfly Tape system v1.3.rom" size="4096" crc="72618948" sha1="12cc90afc7eb1c0b0b720d4722f8d47e39932893" offset="0" />
 			</dataarea>
 		</part>
 	</software>

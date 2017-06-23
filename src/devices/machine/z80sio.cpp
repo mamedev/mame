@@ -104,17 +104,13 @@ DEFINE_DEVICE_TYPE(UPD7201_NEW,    upd7201_new_device, "upd7201_new",    "NEC uP
 DEFINE_DEVICE_TYPE(I8274_NEW,      i8274_new_device,   "i8274_new",      "Intel 8274 MPSC (new)") // Remove trailing N when z80dart.cpp's 8274 implementation is fully replaced
 
 //-------------------------------------------------
-//  device_mconfig_additions -
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
-MACHINE_CONFIG_START( z80sio )
+MACHINE_CONFIG_MEMBER( z80sio_device::device_add_mconfig )
 	MCFG_DEVICE_ADD(CHANA_TAG, Z80SIO_CHANNEL, 0)
 	MCFG_DEVICE_ADD(CHANB_TAG, Z80SIO_CHANNEL, 0)
 MACHINE_CONFIG_END
 
-machine_config_constructor z80sio_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( z80sio );
-}
 
 //**************************************************************************
 //  LIVE DEVICE

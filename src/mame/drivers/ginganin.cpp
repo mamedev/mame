@@ -101,7 +101,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, ginganin_state )
 	AM_RANGE(0x0800, 0x0807) AM_DEVREADWRITE("6840ptm", ptm6840_device, read, write)
 	AM_RANGE(0x1800, 0x1800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("ymsnd", y8950_device, write)
-	AM_RANGE(0x2800, 0x2801) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
+	AM_RANGE(0x2800, 0x2801) AM_DEVWRITE("psg", ym2149_device, address_data_w)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -276,7 +276,7 @@ static MACHINE_CONFIG_START( ginganin )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, SOUND_CLOCK / 2)
+	MCFG_SOUND_ADD("psg", YM2149, SOUND_CLOCK / 2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	MCFG_SOUND_ADD("ymsnd", Y8950, SOUND_CLOCK) /* The Y8950 is basically a YM3526 with ADPCM built in */

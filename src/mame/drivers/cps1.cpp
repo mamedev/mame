@@ -339,7 +339,7 @@ INTERRUPT_GEN_MEMBER(cps_state::cps1_interrupt)
 	/* Strider also has a IRQ4 handler. It is input port related, but the game */
 	/* works without it. It is the *only* CPS1 game to have that. */
 	/* ...until we found out that ganbare relies on it, see below */
-	device.execute().set_input_line(2, HOLD_LINE);
+	device.execute().set_input_line(2, ASSERT_LINE);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(cps_state::ganbare_interrupt)
@@ -347,7 +347,17 @@ TIMER_DEVICE_CALLBACK_MEMBER(cps_state::ganbare_interrupt)
 	/* not sure on the timing or source of this - the game needs it once per frame, */
 	/* otherwise you get a "HARD ERROR" after boot */
 	if (param == 0)
-		m_maincpu->set_input_line(4, HOLD_LINE);
+		m_maincpu->set_input_line(4, ASSERT_LINE);
+}
+
+IRQ_CALLBACK_MEMBER(cps_state::cps1_int_ack)
+{
+	// clear the IPL1 and IPL2 flip-flops
+	m_maincpu->set_input_line(2, CLEAR_LINE);
+	m_maincpu->set_input_line(4, CLEAR_LINE);
+
+	// assert VPA
+	return M68K_INT_ACK_AUTOVECTOR;
 }
 
 
@@ -3296,6 +3306,7 @@ static MACHINE_CONFIG_START( cps1_10MHz )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz )    /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cps_state, cps1_interrupt)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(cps_state, cps1_int_ack)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)  /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sub_map)
@@ -3367,6 +3378,7 @@ static MACHINE_CONFIG_DERIVED( qsound, cps1_12MHz )
 	MCFG_CPU_REPLACE("maincpu", M68000, XTAL_12MHz )    /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(qsound_main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cps_state, cps1_interrupt)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(cps_state, cps1_int_ack)
 
 	MCFG_CPU_REPLACE("audiocpu", Z80, XTAL_8MHz)  /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(qsound_sub_map)

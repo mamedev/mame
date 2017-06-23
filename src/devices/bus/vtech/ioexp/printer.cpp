@@ -20,20 +20,14 @@
 DEFINE_DEVICE_TYPE(VTECH_PRINTER_INTERFACE, vtech_printer_interface_device, "vtech_printer", "Laser/VZ Printer Interface")
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( printer_interface )
+MACHINE_CONFIG_MEMBER( vtech_printer_interface_device::device_add_mconfig )
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(vtech_printer_interface_device, busy_w))
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("latch", "centronics")
 MACHINE_CONFIG_END
-
-machine_config_constructor vtech_printer_interface_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( printer_interface );
-}
 
 
 //**************************************************************************

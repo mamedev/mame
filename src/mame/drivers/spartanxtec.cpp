@@ -224,14 +224,14 @@ static ADDRESS_MAP_START( spartanxtec_sound_io, AS_IO, 8, spartanxtec_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x0000, 0x0000) AM_WRITE( sound_irq_ack )
 
-	AM_RANGE(0x0012, 0x0013) AM_DEVWRITE("ay3", ay8910_device, address_data_w)
-	AM_RANGE(0x0012, 0x0012) AM_DEVREAD("ay3", ay8910_device, data_r)
+	AM_RANGE(0x0012, 0x0013) AM_DEVWRITE("ay3", ay8912_device, address_data_w)
+	AM_RANGE(0x0012, 0x0012) AM_DEVREAD("ay3", ay8912_device, data_r)
 
-	AM_RANGE(0x0014, 0x0015) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
-	AM_RANGE(0x0014, 0x0014) AM_DEVREAD("ay1", ay8910_device, data_r)
+	AM_RANGE(0x0014, 0x0015) AM_DEVWRITE("ay1", ay8912_device, address_data_w)
+	AM_RANGE(0x0014, 0x0014) AM_DEVREAD("ay1", ay8912_device, data_r)
 
-	AM_RANGE(0x0018, 0x0019) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
-	AM_RANGE(0x0018, 0x0018) AM_DEVREAD("ay2", ay8910_device, data_r)
+	AM_RANGE(0x0018, 0x0019) AM_DEVWRITE("ay2", ay8912_device, address_data_w)
+	AM_RANGE(0x0018, 0x0018) AM_DEVREAD("ay2", ay8912_device, data_r)
 ADDRESS_MAP_END
 
 
@@ -389,11 +389,11 @@ static MACHINE_CONFIG_START( spartanxtec )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", AY8910, 1000000)
+	MCFG_SOUND_ADD("ay1", AY8912, 1000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD("ay2", AY8910, 1000000)
+	MCFG_SOUND_ADD("ay2", AY8912, 1000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD("ay3", AY8910, 1000000)
+	MCFG_SOUND_ADD("ay3", AY8912, 1000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 MACHINE_CONFIG_END

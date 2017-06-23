@@ -61,6 +61,17 @@
 		</part>
 	</software>
 
+	<software name="btcodes">
+		<description>BT Codes Search</description>
+		<year>1993</year>
+		<publisher>N.D.U.G.</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="184332">
+				<rom name="BT Codes Search (1993)(NDUG)[!].vdk" size="184332" crc="f38e553f" sha1="9a89abe10c393262d4d1174195c216dca03ac00a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cad6809">
 		<description>CAD-6809</description>
 		<year>1988</year>
@@ -94,6 +105,28 @@
 		</part>
 	</software>
 
+	<software name="compcmpnd" cloneof="compcmpn">
+		<description>Composer Companion (Dragonfire)</description>
+		<year>1986</year>
+		<publisher>Dragonfire Services</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="184332">
+				<rom name="Composer Companion (Dragonfire Services)(1986)[!].vdk" size="184332" crc="eb4437d8" sha1="4b0cea63a5093809f58c2fcf3da18c3b309af3a0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="composerxp" cloneof="composerx">
+		<description>Composer X (PSE)</description>
+		<year>1988</year>
+		<publisher>PSE Computers</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="184332">
+				<rom name="Composer X (PSE Computers)(1988)[!].vdk" size="184332" crc="27929f51" sha1="36b503235e25ed93d2b646c0695d568457b7c2b5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="composerx">
 		<description>Composer X</description>
 		<year>1988</year>
@@ -101,6 +134,17 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
 				<rom name="Composer X (1988)(Pulser Software)[!].vdk" size="184332" crc="9d09688f" sha1="6be7ddfe478a4eb665090b697a021a471de0442e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="copycatp" cloneof="copycat">
+		<description>Copycat (PSE)</description>
+		<year>1988</year>
+		<publisher>PSE Computers</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="184332">
+				<rom name="Copycat (PSE Computers)(1988)[!].vdk" size="184332" crc="d8c47c7a" sha1="4fb7b38a59614f8213622f74672ad768abfca898" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -216,6 +260,17 @@
 		</part>
 	</software>
 
+	<software name="dchrome">
+		<description>DCHROME &amp; SCANNER</description>
+		<year>1989</year>
+		<publisher>D.P.S</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="184332">
+				<rom name="DCHROME &amp; SCANNER (1989)(D.P.S)[!].vdk" size="184332" crc="5af1a82e" sha1="cde765aabe45edc7b39af64876ff93c9a1035ed7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="deluxdlp">
 		<description>Delux.D for Trojan Light Pen</description>
 		<year>198?</year>
@@ -223,6 +278,28 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184355">
 				<rom name="Delux.D for Trojan Light Pen (198x)(Pamcomms)[!].vdk" size="184355" crc="75d52a05" sha1="33e21f95dc8311538367b633893d2d874b2b720d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="desktop">
+		<description>Desktop</description>
+		<year>1989</year>
+		<publisher>N.D.U.G.</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="184332">
+				<rom name="Desktop (1989)(NDUG)[!].vdk" size="184332" crc="f13cd025" sha1="2e7dac40d4a58ad39f92c8321db5ef92e260d513" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dsktpubl2" cloneof="dsktopubl">
+		<description>Desk Top Publisher V2</description>
+		<year>1990</year>
+		<publisher>Knight Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="184332">
+				<rom name="Desktop Publisher v2 (KCS)(1990)[!].vdk" size="184332" crc="79d004c7" sha1="1a2742303df5018ce77dccd1d2dfce2eec9233a1" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -245,6 +322,17 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
 				<rom name="Discup (198x)(Pulser Software)[!].vdk" size="184332" crc="e30f35fd" sha1="e2611e5112a1881d10dd482f5f645bad16e1a67b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="discupp" cloneof="discup">
+		<description>Discup (PSE)</description>
+		<year>1985</year>
+		<publisher>PSE Computers</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="184332">
+				<rom name="Discup (PSE Computers)(1985)[!].vdk" size="184332" crc="0179dc3b" sha1="f18483f1684065538f27e34430e839926cc19d13" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -278,6 +366,22 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
 				<rom name="Diskbase (1987)(Pulser Software)[!].vdk" size="184332" crc="6e572fc3" sha1="958c32770b1ffd2e8b4b1be37943a4e5d2973940" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="drgndetor">
+		<description>Dragon Detour</description>
+		<year>1993</year>
+		<publisher>N.D.U.G.</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="184332">
+				<rom name="Dragon Detour (NDUG)(1993)[!].vdk" size="184332" crc="d3840620" sha1="7b515b35ee0752d639183cd12b1cd731baef2e38" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="184332">
+				<rom name="Dragon Detour Sector Save Disk (NDUG)(1993)[!].VDK" size="184332" crc="8d1e813a" sha1="30375665647b129b16f9756ac25a3f6a59753e60" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -355,13 +459,24 @@
 		</part>
 	</software>
 
-	<software name="dynafast">
+	<software name="dynafast140" cloneof="dynafast">
 		<description>DynaFast v1.4.0</description>
 		<year>1984</year>
 		<publisher>Compusense</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
 				<rom name="Dynafast v1.4.0 (198x)(Compusense)[!].vdk" size="184332" crc="ef834916" sha1="dacf6282c51a9a1468232ab11f7b95b491961ee1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dynafast">
+		<description>DynaFast v1.5.0</description>
+		<year>1984</year>
+		<publisher>Compusense</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102412">
+				<rom name="Dynafast v1.5 (1984)(Compusense Ltd)[!].vdk" size="102412" crc="6f57191a" sha1="4b86a6a7128efe98eb3b99fa66adb7b2d44b2358" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -465,6 +580,17 @@
 		</part>
 	</software>
 
+	<software name="fedit">
+		<description>FEdit</description>
+		<year>1991</year>
+		<publisher>G.E.Hovland</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="184332">
+				<rom name="FEDIT (Hovland, G.E.)(1991)[!].vdk" size="184332" crc="8feb35be" sha1="ce96413229e9a93825460b952c980f00a8f97d48" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="filmastr">
 		<description>Filmastr</description>
 		<year>1984</year>
@@ -509,6 +635,17 @@
 		</part>
 	</software>
 
+	<software name="forthcomp">
+		<description>Forth Compiler (DeltaDOS)</description>
+		<year>1985</year>
+		<publisher>N.D.U.G.</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102412">
+				<rom name="Forth Compiler (1985)(NDUG)[!][DELTA].vdk" size="102412" crc="44d0a07c" sha1="bfbcbec8ebe763eb382f105416dbf4d2a1e104f9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="forthosp">
 		<description>Forth OS Plus</description>
 		<year>1985</year>
@@ -516,6 +653,17 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
 				<rom name="Forth OS Plus (198x)(N.D.U.G)[!].vdk" size="184332" crc="622d867b" sha1="7bb081a35e7385d9f3c143f27de8b8b7181bc768" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gldnold">
+		<description>Golden Oldies</description>
+		<year>198?</year>
+		<publisher>Pamcomms</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="184332">
+				<rom name="Golden Oldies (198x)(Pamcomms Ltd)[!].vdk" size="184332" crc="81e69933" sha1="fd31bf634149134b3d0b510c6b7ad8c1cd1c352d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -685,6 +833,17 @@
 		</part>
 	</software>
 
+	<software name="mlangtutt">
+		<description>Machine Language Tutorial</description>
+		<year>1983</year>
+		<publisher>T&amp;D Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="184332">
+				<rom name="Machine Language Tutorial (1983)(T&amp;D Software)[!].vdk" size="184332" crc="9a2cbf2d" sha1="820a7bdd41c9b5af373397c148bac2361d344444" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mlangtut">
 		<description>Ezee Machine Code Tutorial</description>
 		<year>1990</year>
@@ -808,6 +967,17 @@
 		</part>
 	</software>
 
+	<software name="mandragor">
+		<description>Mandragore</description>
+		<year>198?</year>
+		<publisher>PSE Computers</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="184332">
+				<rom name="Mandragore (PSE Computers)(198x)[!].vdk" size="184332" crc="a908bde5" sha1="a515c8acaa5ece7c68232bf61ef0555138524864" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mrdig">
 		<description>Mr Dig</description>
 		<year>1984</year>
@@ -830,6 +1000,17 @@
 		</part>
 	</software>
 
+	<software name="multidisk">
+		<description>Multi-Disk</description>
+		<year>1985</year>
+		<publisher>Ian Elkiington</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="184332">
+				<rom name="Multi-Disk (1985)(Elkiington, Ian)[!].vdk" size="184332" crc="83fe596b" sha1="9791e6decc38b1309708153cdce009b843ca111b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="nos9lvl1">
 		<description>NitrOS-9/6809 Level 1 v3.2.4</description>
 		<year>2010</year>
@@ -848,6 +1029,17 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368652">
 				<rom name="NitrOS9-6809-Level1-v030204-DS40-51 Column (2010)(Phill Harvey-Smith)[!].vdk" size="368652" crc="1bb2ca15" sha1="51e35756d5c0803a2775af5fe8dd10d7658b5c2c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="orngbasep" cloneof="orngbase">
+		<description>Orange Base</description>
+		<year>198?</year>
+		<publisher>PSE Computers</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="184332">
+				<rom name="Orange Base (PSE Computers)(198x)[!].vdk" size="184332" crc="54daa678" sha1="7bd538d19a85416fb3844a81f74ced7dbb27e6f1" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -929,6 +1121,17 @@
 		</part>
 	</software>
 
+	<software name="pyradv">
+		<description>PyrAdventure</description>
+		<year>1987</year>
+		<publisher>PSE Computers</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="184332">
+				<rom name="PyrAdventure (PSE Computers)(198x)[!].vdk" size="184332" crc="f8a63c2d" sha1="8d1a2a8732f59ee7bdc77d51ca6b097b2dade3b9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="rainbowr13" cloneof="rainbowr">
 		<description>Rainbow Writer v1.3</description>
 		<year>1983</year>
@@ -969,6 +1172,17 @@
 		</part>
 	</software>
 
+	<software name="rolaball2">
+		<description>RolaBall2</description>
+		<year>1988</year>
+		<publisher>Starship Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="184332">
+				<rom name="RolaBall2 (Starship Software)(1988)[!].vdk" size="184332" crc="06d03a07" sha1="c039dd325429273c5c3fad8922b116beb49c40a0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="rotabb">
 		<description>Revenge of the Alien Bongo Beast</description>
 		<year>198?</year>
@@ -991,6 +1205,17 @@
 		</part>
 	</software>
 
+	<software name="shaolinmp">
+		<description>Shaolin Master Plus</description>
+		<year>198?</year>
+		<publisher>Pulser Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="184332">
+				<rom name="Shaolin Master Plus (Pulser Software)(198x)[!].vdk" size="184332" crc="f7c3e35f" sha1="d11965e564128389b58c0bcceea37cd9fff27cb2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="srcmaker">
 		<description>Source Maker</description>
 		<year>198?</year>
@@ -1009,6 +1234,17 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184343">
 				<rom name="Speed Racer (198x)(Microdeal)[!].vdk" size="184343" crc="ec98a1f4" sha1="5c5164ace7034fbc4dff5c65fac3b5bb61a0b633" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spritdesp" cloneof="spritedes">
+		<description>Sprite Designer (PSE)</description>
+		<year>1987</year>
+		<publisher>PSE Computers</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="184332">
+				<rom name="Sprite Designer (PSE Computers)(198x)[!].vdk" size="184332" crc="0f0a42dd" sha1="9d24133827af9df417e824b734b22a2ab3d11fe6" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1057,8 +1293,30 @@
 		</part>
 	</software>
 
+	<software name="supanova">
+		<description>Supa Nova</description>
+		<year>1988</year>
+		<publisher>Orange Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="184332">
+				<rom name="Supa Nova (1988)(Orange Software)[!].vdk" size="184332" crc="c73a1f62" sha1="e5f44cf994838e40d85e51c354a39908b3712bc1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="superwrtr2">
+		<description>Super Writer 2</description>
+		<year>198?</year>
+		<publisher>PSE Computers</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="184332">
+				<rom name="Super Writer 2 (PSE Computers)(198x)[!].vdk" size="184332" crc="4bddf1fc" sha1="5ff2a34b355021a5d8e22fb95b897c0f5754ff54" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="telewritrd" cloneof="telewritr">
-		<description>Telewriter (DeltaDOS)</description>
+		<description>Telewriter Premier DOS</description>
 		<year>1985</year>
 		<publisher>Microdeal</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1069,12 +1327,45 @@
 	</software>
 
 	<software name="telewritr">
-		<description>Telewriter</description>
-		<year>198?</year>
+		<description>Telewriter Dragon DOS</description>
+		<year>1985</year>
 		<publisher>Microdeal</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
 				<rom name="Telewriter (198x)(Microdeal)[!].vdk" size="184332" crc="ab3b0d05" sha1="1dc3f71cc58821c7fbbf6a63970e7f5bd914fb7a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="telewritr1" cloneof="telewritr">
+		<description>Telewriter V1</description>
+		<year>1985</year>
+		<publisher>Microdeal</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="184332">
+				<rom name="TeleWriter v1 (1985)(Microdeal)[!].vdk" size="184332" crc="f19a85af" sha1="2d569dd97375dc9d7264f4d92f4e6842f3a27d72" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="telewritr2" cloneof="telewritr">
+		<description>Telewriter V2</description>
+		<year>1985</year>
+		<publisher>Microdeal</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="184332">
+				<rom name="TeleWriter v2 (1985)(Microdeal)[!].vdk" size="184332" crc="ed81999f" sha1="4a6090eafdc809d28f35a2ea6bdf0eecdcb2d218" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="telewritr4" cloneof="telewritr">
+		<description>Telewriter V4 (DDOS4)</description>
+		<year>1985</year>
+		<publisher>Microdeal</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="184332">
+				<rom name="TeleWriter v4 (1985](Microdeal)[DDOS4].vdk" size="184332" crc="d39ae1e3" sha1="b655e6741446a3ea7eccd9f26870372e6dc91775" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1101,6 +1392,28 @@
 		</part>
 	</software>
 
+	<software name="fundisc">
+		<description>The Fun Disc!</description>
+		<year>1988</year>
+		<publisher>N.D.U.G.</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="184332">
+				<rom name="The Fun Disc! (1988)(NDUG)[!].vdk" size="184332" crc="147e1655" sha1="5ef6768fae60137226abb4cb837abe312c1659aa" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hobbit">
+		<description>The Hobbit</description>
+		<year>2016</year>
+		<publisher>Pere Serrat</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368896">
+				<rom name="The Hobbit (2016)(Pere Serrat)(v16g3).vdk" size="368896" crc="d581c398" sha1="bdca936e45f48680abc59df4beea03b88e02b625" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ringdark">
 		<description>The Ring of Darkness</description>
 		<year>1983</year>
@@ -1108,6 +1421,17 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184340">
 				<rom name="The Ring Of Darkness (19xx)(Wintersoft).vdk" size="184340" crc="9612727b" sha1="8c8e3bd7d2e69454e2640eb283c17198ba53d2a8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="utilpackp" cloneof="utilpack">
+		<description>Utility Pack (PSE)</description>
+		<year>1990</year>
+		<publisher>PSE Computers</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="184332">
+				<rom name="Utility Pack (PSE Computers)(198x)[!].vdk" size="184332" crc="c3227362" sha1="efc2533f908fb3819c60a46e42db516ccfd8aa82" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1163,6 +1487,17 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
 				<rom name="WIMP (1988)(Dragonfire Services)[!].vdk" size="184332" crc="51c33f6b" sha1="fde76405fa0e0852fd7b1310d2ae931338422025" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wimpa" cloneof="wimp">
+		<description>W.I.M.P. (1989)</description>
+		<year>1989</year>
+		<publisher>Dragonfire Services</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="183820">
+				<rom name="WIMP (1989)(Dragonfire Services)[!].vdk" size="183820" crc="33de1007" sha1="0eaff58e5f8fd295275a8ed725d0c99fab57073b" offset="0" />
 			</dataarea>
 		</part>
 	</software>

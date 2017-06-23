@@ -79,15 +79,6 @@
 #define MAIN_CLOCK XTAL_10MHz
 #define AUDIO_CLOCK XTAL_3_579545MHz
 
-WRITE16_MEMBER(blockout_state::blockout_sound_command_w)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		m_soundlatch->write(space, offset, data & 0xff);
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-	}
-}
-
 WRITE16_MEMBER(blockout_state::blockout_irq6_ack_w)
 {
 	m_maincpu->set_input_line(6, CLEAR_LINE);
@@ -113,7 +104,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, blockout_state )
 	AM_RANGE(0x100008, 0x100009) AM_READ_PORT("DSW2")
 	AM_RANGE(0x100010, 0x100011) AM_WRITE(blockout_irq6_ack_w)
 	AM_RANGE(0x100012, 0x100013) AM_WRITE(blockout_irq5_ack_w)
-	AM_RANGE(0x100014, 0x100015) AM_WRITE(blockout_sound_command_w)
+	AM_RANGE(0x100014, 0x100015) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x100016, 0x100017) AM_WRITENOP    /* don't know, maybe reset sound CPU */
 	AM_RANGE(0x180000, 0x1bffff) AM_RAM_WRITE(blockout_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x1d4000, 0x1dffff) AM_RAM /* work RAM */
@@ -133,7 +124,7 @@ static ADDRESS_MAP_START( agress_map, AS_PROGRAM, 16, blockout_state )
 	AM_RANGE(0x100008, 0x100009) AM_READ_PORT("DSW2")
 	AM_RANGE(0x100010, 0x100011) AM_WRITE(blockout_irq6_ack_w)
 	AM_RANGE(0x100012, 0x100013) AM_WRITE(blockout_irq5_ack_w)
-	AM_RANGE(0x100014, 0x100015) AM_WRITE(blockout_sound_command_w)
+	AM_RANGE(0x100014, 0x100015) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x100016, 0x100017) AM_WRITENOP    /* don't know, maybe reset sound CPU */
 	AM_RANGE(0x180000, 0x1bffff) AM_RAM_WRITE(blockout_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x1d4000, 0x1dffff) AM_RAM /* work RAM */
@@ -322,6 +313,7 @@ static MACHINE_CONFIG_START( blockout )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_YM2151_ADD("ymsnd", AUDIO_CLOCK)
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE(blockout_state,irq_handler))

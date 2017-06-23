@@ -44,7 +44,7 @@ public:
 	virtual void bk32_w(int state) override;
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 
 private:

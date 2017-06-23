@@ -23,6 +23,7 @@ void t10mmc::t10_start(device_t &device)
 	device.save_item(NAME(m_num_subblocks));
 	device.save_item(NAME(m_cur_subblock));
 	device.save_item(NAME(m_audio_sense));
+	device.save_item(NAME(m_sotc));
 }
 
 void t10mmc::t10_reset()
@@ -42,6 +43,7 @@ void t10mmc::t10_reset()
 	m_num_subblocks = 1;
 	m_cur_subblock = 0;
 	m_audio_sense = 0;
+	m_sotc = 0;
 }
 
 // scsicd_exec_command
@@ -288,37 +290,49 @@ void t10mmc::ExecCommand()
 		break;
 
 	case T10MMC_CMD_PLAY_AUDIO_TRACK_INDEX:
-		// be careful: tracks here are zero-based, but the SCSI command
-		// uses the real CD track number which is 1-based!
-		m_device->logerror("T10MMC: PLAY AUDIO T/I: strk %d idx %d etrk %d idx %d frames %d\n", command[4], command[5], command[7], command[8], m_blocks);
-		m_lba = cdrom_get_track_start(m_cdrom, command[4]-1);
-		m_blocks = cdrom_get_track_start(m_cdrom, command[7]-1) - m_lba;
 		if (command[4] > command[7])
 		{
-			m_blocks = 0;
-		}
-
-		if (command[4] == command[7])
-		{
-			m_blocks = cdrom_get_track_start(m_cdrom, command[4]) - m_lba;
-		}
-
-		trk = cdrom_get_track(m_cdrom, m_lba);
-
-		if (cdrom_get_track_type(m_cdrom, trk) == CD_TRACK_AUDIO)
-		{
-			m_cdda->start_audio(m_lba, m_blocks);
-			m_audio_sense = SCSI_SENSE_ASC_ASCQ_AUDIO_PLAY_OPERATION_IN_PROGRESS;
+			// TODO: check error
+			set_sense(SCSI_SENSE_KEY_ILLEGAL_REQUEST, SCSI_SENSE_ASC_ASCQ_AUDIO_PLAY_OPERATION_STOPPED_DUE_TO_ERROR);
+			m_status_code = SCSI_STATUS_CODE_CHECK_CONDITION;
 		}
 		else
 		{
-			m_device->logerror("T10MMC: track is NOT audio!\n");
-			set_sense(SCSI_SENSE_KEY_ILLEGAL_REQUEST, SCSI_SENSE_ASC_ASCQ_ILLEGAL_MODE_FOR_THIS_TRACK);
-		}
+			// be careful: tracks here are zero-based, but the SCSI command
+			// uses the real CD track number which is 1-based!
+			m_device->logerror("T10MMC: PLAY AUDIO T/I: strk %d idx %d etrk %d idx %d frames %d\n", command[4], command[5], command[7], command[8], m_blocks);
+			int end_track = cdrom_get_last_track(m_cdrom);
+			if (end_track > command[7])
+				end_track = command[7];
 
-		m_phase = SCSI_PHASE_STATUS;
-		m_status_code = SCSI_STATUS_CODE_GOOD;
-		m_transfer_length = 0;
+			// HACK: assume index 0 & 1 means beginning of track and anything else means end of track
+			if (command[8] <= 1)
+				end_track--;
+
+			if (m_sotc)
+				end_track = command[4];
+
+			m_lba = cdrom_get_track_start(m_cdrom, command[4] - 1);
+			m_blocks = cdrom_get_track_start(m_cdrom, end_track) - m_lba;
+			trk = cdrom_get_track(m_cdrom, m_lba);
+
+			if (cdrom_get_track_type(m_cdrom, trk) == CD_TRACK_AUDIO)
+			{
+				m_cdda->start_audio(m_lba, m_blocks);
+				m_audio_sense = SCSI_SENSE_ASC_ASCQ_AUDIO_PLAY_OPERATION_IN_PROGRESS;
+				m_status_code = SCSI_STATUS_CODE_GOOD;
+			}
+			else
+			{
+				m_device->logerror("T10MMC: track is NOT audio!\n");
+				// TODO: check error
+				set_sense(SCSI_SENSE_KEY_ILLEGAL_REQUEST, SCSI_SENSE_ASC_ASCQ_ILLEGAL_MODE_FOR_THIS_TRACK);
+				m_status_code = SCSI_STATUS_CODE_CHECK_CONDITION;
+			}
+
+			m_phase = SCSI_PHASE_STATUS;
+			m_transfer_length = 0;
+		}
 		break;
 
 	case T10MMC_CMD_PAUSE_RESUME:
@@ -701,7 +715,7 @@ void t10mmc::ReadData( uint8_t *data, int dataLength )
 			case 0xe:   // CD Audio control page
 				data[0] = 0x8e; // page E, parameter is savable
 				data[1] = 0x0e; // page length
-				data[2] = 0x04; // IMMED = 1, SOTC = 0
+				data[2] = (1 << 2) | (m_sotc << 1); // IMMED = 1
 				data[3] = data[4] = data[5] = data[6] = data[7] = 0; // reserved
 
 				// connect each audio channel to 1 output port
@@ -776,6 +790,7 @@ void t10mmc::WriteData( uint8_t *data, int dataLength )
 				break;
 
 			case 0xe:   // audio page
+				m_sotc = (data[2] >> 1) & 1;
 				m_device->logerror("Ch 0 route: %x vol: %x\n", data[8], data[9]);
 				m_device->logerror("Ch 1 route: %x vol: %x\n", data[10], data[11]);
 				m_device->logerror("Ch 2 route: %x vol: %x\n", data[12], data[13]);
