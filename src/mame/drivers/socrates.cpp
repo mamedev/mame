@@ -144,8 +144,8 @@ public:
 	uint8_t m_speech_dummy_read; // have we done a dummy read yet?
 	uint8_t m_speech_load_address_count; // number of times load address has happened
 	uint8_t m_speech_load_settings_count; // number of times load settings has happened
-	DECLARE_READ8_MEMBER(socrates_rom_bank_r);
-	DECLARE_WRITE8_MEMBER(socrates_rom_bank_w);
+	DECLARE_READ8_MEMBER(common_rom_bank_r);
+	DECLARE_WRITE8_MEMBER(common_rom_bank_w);
 	DECLARE_READ8_MEMBER(common_ram_bank_r);
 	DECLARE_WRITE8_MEMBER(common_ram_bank_w);
 	DECLARE_READ8_MEMBER(socrates_cart_r);
@@ -192,8 +192,6 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER( colors_w );
-	DECLARE_READ8_MEMBER( iqunlimz_rom_bank_r );
-	DECLARE_WRITE8_MEMBER( iqunlimz_rom_bank_w );
 	DECLARE_READ8_MEMBER( keyboard_r );
 	DECLARE_WRITE8_MEMBER( keyboard_clear );
 	DECLARE_READ8_MEMBER( video_regs_r );
@@ -323,15 +321,18 @@ DRIVER_INIT_MEMBER(socrates_state,socrates)
 	m_maincpu->set_clock_scale(0.45f); /* RAM access waitstates etc. aren't emulated - slow the CPU to compensate */
 }
 
-READ8_MEMBER(socrates_state::socrates_rom_bank_r)
+READ8_MEMBER(socrates_state::common_rom_bank_r)
 {
-	return m_rom_bank[0];
+	return m_rom_bank[offset];
 }
 
-WRITE8_MEMBER(socrates_state::socrates_rom_bank_w)
+WRITE8_MEMBER(socrates_state::common_rom_bank_w)
 {
-	m_rom_bank[0] = data;
-	m_rombank1->set_bank(data);
+	m_rom_bank[offset] = data;
+	if (offset && m_rombank2)
+		m_rombank2->set_bank(data);
+	else
+		m_rombank1->set_bank(data);
 }
 
 READ8_MEMBER(socrates_state::common_ram_bank_r)
@@ -879,20 +880,6 @@ void iqunlim_state::machine_reset()
 
 }
 
-READ8_MEMBER( iqunlim_state::iqunlimz_rom_bank_r )
-{
-	return m_rom_bank[offset];
-}
-
-WRITE8_MEMBER( iqunlim_state::iqunlimz_rom_bank_w )
-{
-	m_rom_bank[offset] = data;
-	if (offset)
-		m_rombank1->set_bank(data&0x3f);
-	else
-		m_rombank2->set_bank(data&0x3f);
-}
-
 WRITE8_MEMBER( iqunlim_state::colors_w )
 {
 	m_colors[offset] = data;
@@ -965,7 +952,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(z80_io, AS_IO, 8, socrates_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(socrates_rom_bank_r, socrates_rom_bank_w) AM_MIRROR(0x7) /* rom bank select - RW - 8 bits */
+	AM_RANGE(0x00, 0x00) AM_READWRITE(common_rom_bank_r, common_rom_bank_w) AM_MIRROR(0x7) /* rom bank select - RW - 8 bits */
 	AM_RANGE(0x08, 0x08) AM_READWRITE(common_ram_bank_r, common_ram_bank_w) AM_MIRROR(0x7) /* ram banks select - RW - 4 low bits; Format: 0b****HHLL where LL controls whether window 0 points at ram area: 0b00: 0x0000-0x3fff; 0b01: 0x4000-0x7fff; 0b10: 0x8000-0xbfff; 0b11: 0xc000-0xffff. HH controls the same thing for window 1 */
 	AM_RANGE(0x10, 0x17) AM_READWRITE(read_f3, socrates_sound_w) AM_MIRROR (0x8) /* sound section:
 	0x10 - W - frequency control for channel 1 (louder channel) - 01=high pitch, ff=low; time between 1->0/0->1 transitions = (XTAL_21_4772MHz/(512+256) / (freq_reg+1)) (note that this is double the actual frequency since each full low and high squarewave pulse is two transitions)
@@ -990,8 +977,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(iqunlimz_mem, AS_PROGRAM, 8, iqunlim_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_DEVICE("rombank1", address_map_bank_device, amap8)
-	AM_RANGE(0x4000, 0x7fff) AM_DEVICE("rombank2", address_map_bank_device, amap8)
+	AM_RANGE(0x0000, 0x3fff) AM_DEVICE("rombank2", address_map_bank_device, amap8)
+	AM_RANGE(0x4000, 0x7fff) AM_DEVICE("rombank1", address_map_bank_device, amap8)
 	AM_RANGE(0x8000, 0xbfff) AM_DEVICE("rambank1", address_map_bank_device, amap8)
 	AM_RANGE(0xc000, 0xffff) AM_DEVICE("rambank2", address_map_bank_device, amap8)
 ADDRESS_MAP_END
@@ -1011,7 +998,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( iqunlimz_io , AS_IO, 8, iqunlim_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_READWRITE(iqunlimz_rom_bank_r, iqunlimz_rom_bank_w) AM_MIRROR(0x06)
+	AM_RANGE(0x00, 0x01) AM_READWRITE(common_rom_bank_r, common_rom_bank_w) AM_MIRROR(0x06)
 	AM_RANGE(0x08, 0x08) AM_READWRITE(common_ram_bank_r, common_ram_bank_w) AM_MIRROR(0x07)
 	AM_RANGE(0x10, 0x17) AM_WRITE(socrates_sound_w) AM_MIRROR (0x08)
 	AM_RANGE(0x20, 0x21) AM_WRITE(socrates_scroll_w) AM_MIRROR (0x0e)
