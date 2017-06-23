@@ -453,9 +453,9 @@ bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 }
 
 
-void consolewin_info::process_string(char const *string)
+void consolewin_info::process_string(std::string const &string)
 {
-	if (string[0] == 0) // an empty string is a single step
+	if (string.empty()) // an empty string is a single step
 		machine().debugger().cpu().get_visible_cpu()->debug()->single_step();
 	else                // otherwise, just process the command
 		machine().debugger().console().execute_command(string, true);
