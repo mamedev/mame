@@ -11084,6 +11084,7 @@ cbnj                            // 27         Bump 'n' Jump
 cbtime                          // 26 1982.08 Hamburger/Burger Time
 cburnrub                        // 27 1982.11 Burnin' Rubber
 cburnrub2                       // 27
+cburnrubj						//
 cdiscon1                        // 19 1982.04 Disco No.1
 cdsteljn                        // 14 1981.06 DS Telejan
 cexplore                        // 18 1982.02 Explorer
@@ -11092,6 +11093,7 @@ cfghtice                        // 40 1984.04 Fighting Ice Hockey
 cfishing                        // 25 1982.10 Fishing
 cflyball                        // 35 1983.?? Flying Ball/Bampoline
 cgraplop                        // 28 1982.11 Cluster Buster / Graplop
+cgraplopj						//
 cgraplop2                       // 28
 chamburger                      // 26 1982.08 Hamburger (Japan)
 chwy                            // 01 1980.12 Highway Chase
@@ -11116,6 +11118,7 @@ cprogolfj                       // 13 1981.08 Tournament Pro Golf (Japan)
 cpsoccer                        // 33 1982.08 Pro Soccer
 cpsoccerj                       // 33 1982.08 Pro Soccer (Japan)
 cptennis                        // 22 1982.06 Pro Tennis
+cptennisj
 cscrtry                         // 38 1984.03 Scrum Try
 cscrtry2                        // 38
 csdtenis                        // 34 1983.09 Super Doubles Tennis
