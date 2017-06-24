@@ -892,6 +892,11 @@ static MACHINE_CONFIG_DERIVED( clocknch, decocass )
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_state,clocknch)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( clocknchj, decocass )
+
+	/* basic machine hardware */
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_state,clocknchj)
+MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( cfboy0a1, decocass ) /* 12 */
 
@@ -1271,6 +1276,16 @@ ROM_START( clocknch )
 	ROM_LOAD( "clocknch.cas",  0x0000, 0x8000, CRC(c9d163a4) SHA1(3ef55a8d8f603059e263776c08eb81f2cf18b75c) )
 ROM_END
 
+ROM_START( clocknchj )
+	DECOCASS_BIOS_A_ROMS
+
+	ROM_REGION( 0x00020, "dongle", 0 )    /* dongle data */
+	ROM_LOAD( "a-0061.dgl",   0x0000, 0x0020, CRC(1bc9fccb) SHA1(ffc59c7660d5c87a8deca294f80260b6bc7c3027) ) /* ? */
+
+	ROM_REGION( 0x10000, "cassette", 0 )      /* (max) 64k for cassette image */
+	ROM_LOAD( "dt-1111-a-0.bin",  0x0000, 0x6300, CRC(9753e815) SHA1(fd0c8e4733e1548fe47a4d34a2f6ce48d9303e22) )
+ROM_END
+
 /* 12 Flash Boy (early vertical Japan version, then horizontal version), The Deco Kid (early vertical World version, then vertical version) */
 ROM_START( cfboy0a1 ) // version MD 0-A-1 verified, 105 blocks, decrypted main data CRC(7ca358f0)
 	DECOCASS_BIOS_AO_ROMS
@@ -1462,6 +1477,17 @@ ROM_START( cptennis )
 	ROM_LOAD( "cptennis.cas", 0x0000, 0x8000, CRC(6bb257fe) SHA1(7554bf1996bc9e9c04a276aab050708d70103f54) )
 ROM_END
 
+ROM_START( cptennisj )
+	DECOCASS_BIOS_A_ROMS
+
+	ROM_REGION( 0x00800, "dongle", 0 )    /* dongle data */
+	ROM_LOAD( "dp-1220-a-0.rom", 0x0000, 0x0800, CRC(1c603239) SHA1(6c97cfbb581f72e8c26a3fc5f06f9d6aa56883ba) )
+
+	ROM_REGION( 0x10000, "cassette", 0 )      /* (max) 64k for cassette image */
+	ROM_LOAD( "dt-1222-a-0.bin", 0x0000, 0x6a00, CRC(ee29eba7) SHA1(fd3aebb81d83120d1afb4d9a216332363d695234) )
+ROM_END
+
+
 
 /* The Following use Dongle Type 3 (unknown part number?)
     (dongle data differs for each game)      */
@@ -1542,6 +1568,16 @@ ROM_START( cbnj )
 	ROM_LOAD( "cbnj.cas",       0x0000, 0x8000, CRC(eed41560) SHA1(85d5df76efac33cd10427f659c4259afabb3daaf) )
 ROM_END
 
+ROM_START( cburnrubj )
+	DECOCASS_BIOS_A_ROMS
+
+	ROM_REGION( 0x01000, "dongle", 0 )    /* dongle data */
+	ROM_LOAD( "dp-127_b.pro",   0x0000, 0x1000, CRC(9f396832) SHA1(0e302fd094474ac792882948a018c73ce76e0759) )
+
+	ROM_REGION( 0x10000, "cassette", 0 )      /* (max) 64k for cassette image */
+	ROM_LOAD( "dt-1271-a-0.bin",   0x0000, 0x7800, CRC(6bd0adab) SHA1(4c536991e4ec6cbdf4b74497dae9f0dba17ebb95) )
+ROM_END
+
 /* 28 Graplop / Cluster Buster */
 ROM_START( cgraplop )
 	DECOCASS_BIOS_B_ROMS
@@ -1551,6 +1587,16 @@ ROM_START( cgraplop )
 
 	ROM_REGION( 0x10000, "cassette", 0 )      /* (max) 64k for cassette image */
 	ROM_LOAD( "cgraplop.cas", 0x0000, 0x8000, CRC(d2c1c1bb) SHA1(db67304caa11540363735e7d4bf03507ccbe9980) )
+ROM_END
+
+ROM_START( cgraplopj )
+	DECOCASS_BIOS_A_ROMS
+
+	ROM_REGION( 0x01000, "dongle", 0 )    /* dongle data */
+	ROM_LOAD( "cgraplop.pro", 0x0000, 0x1000, CRC(ee93787d) SHA1(0c753d62fdce2fdbd5b329a5aa259a967d07a651) )
+
+	ROM_REGION( 0x10000, "cassette", 0 )      /* (max) 64k for cassette image */
+	ROM_LOAD( "dt-1280-a-0.bin", 0x0000, 0x7800, CRC(a0d7d1a7) SHA1(4260edd19786b6cf4cd0c426783637f0c61ca007) )
 ROM_END
 
 ROM_START( cgraplop2 )
@@ -1833,6 +1879,7 @@ DRIVER_INIT_MEMBER(decocass_state,cdsteljn)
 /* 10 */ GAME( 1981, cocean1a,  decocass, cocean1a, cocean1a, decocass_state, decocass, ROT270, "Data East Corporation", "Ocean to Ocean (Medal) (DECO Cassette MD) (No.10/Ver.1,Japan)", 0 ) /* no lever, 1P/2P buttons used to switch player, cocktail mode not emulated */
 /*    */ GAME( 1981, cocean6b,  cocean1a, cocean1a, cocean1a, decocass_state, decocass, ROT270, "Data East Corporation", "Ocean to Ocean (Medal) (DECO Cassette MD) (No.10/Ver.6,US)", 0 ) /* lever, 1P/2P buttons used to switch player, cocktail mode not emulated */
 /* 11 */ GAME( 1981, clocknch,  decocass, clocknch, clocknch, decocass_state, decocass, ROT270, "Data East Corporation", "Lock'n'Chase (DECO Cassette) (US)", 0 )
+/*    */ GAME( 1981, clocknchj, clocknch, clocknchj,clocknch, decocass_state, decocass, ROT270, "Data East Corporation", "Lock'n'Chase (DECO Cassette) (Japan)", 0 )
 /* 12 */ GAME( 1981, cfboy0a1,  decocass, cfboy0a1, cfboy0a1, decocass_state, decocass, ROT270, "Data East Corporation", "Flash Boy (vertical) [DECO Cassette MD] (No.12/Ver.0/Set.1,Japan)", 0 )
 /* 13 */ GAME( 1981, cprogolf,  decocass, cprogolf, cprogolf, decocass_state, decocass, ROT270, "Data East Corporation", "Tournament Pro Golf (DECO Cassette) (US)", 0 )
 /*    */ GAME( 1981, cprogolfj, cprogolf, cprogolfj,cprogolf, decocass_state, decocass, ROT270, "Data East Corporation", "Tournament Pro Golf (DECO Cassette) (Japan)", 0 )
@@ -1848,6 +1895,7 @@ DRIVER_INIT_MEMBER(decocass_state,cdsteljn)
 /* 20 */ GAME( 1982, ctornado,  decocass, ctornado, ctornado, decocass_state, decocass, ROT270, "Data East Corporation", "Tornado (DECO Cassette) (US)", 0 )
 /* 21 */ GAME( 1982, cmissnx,   decocass, cmissnx,  cmissnx,  decocass_state, decocass, ROT270, "Data East Corporation", "Mission-X (DECO Cassette) (US)", 0 )
 /* 22 */ GAME( 1982, cptennis,  decocass, cptennis, decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Pro Tennis (DECO Cassette) (US)", 0 )
+/*    */ GAME( 1982, cptennisj, cptennis, cptennis, decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Pro Tennis (DECO Cassette) (Japan)", 0 )
 /* 23 */ GAME( 1982, cprogolf18,cprogolf, cprogolfj,cprogolf, decocass_state, decocass, ROT270, "Data East Corporation", "18 Challenge Pro Golf (DECO Cassette) (Japan)", 0 ) // 1982.?? 18 Hole Pro Golf
 /* 24 */ // 1982.07 Tsumego Kaisyou
 /* 25 */ GAME( 1982, cadanglr,  decocass, cfishing, cfishing, decocass_state, decocass, ROT270, "Data East Corporation", "Angler Dangler (DECO Cassette) (US)", 0 )
@@ -1856,8 +1904,10 @@ DRIVER_INIT_MEMBER(decocass_state,cdsteljn)
 /*    */ GAME( 1982, chamburger,cbtime,   cbtime,   cbtime,   decocass_state, decocass, ROT270, "Data East Corporation", "Hamburger (DECO Cassette) (Japan)", 0 )
 /* 27 */ GAME( 1982, cburnrub,  decocass, cburnrub, decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Burnin' Rubber (DECO Cassette) (US) (set 1)", 0 )
 /*    */ GAME( 1982, cburnrub2, cburnrub, cburnrub, decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Burnin' Rubber (DECO Cassette) (US) (set 2)", 0 )
+/*    */ GAME( 1982, cburnrubj, cburnrub, cburnrub, decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Burnin' Rubber (DECO Cassette) (Japan)", 0 )
 /*    */ GAME( 1982, cbnj,      cburnrub, cburnrub, decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Bump 'n' Jump (DECO Cassette) (US)", 0 ) // was marked 'Japan' but uses the type B (US) bios
 /* 28 */ GAME( 1983, cgraplop,  decocass, cgraplop, cgraplop, decocass_state, decocass, ROT270, "Data East Corporation", "Cluster Buster (DECO Cassette) (US)", 0 )
+/*    */ GAME( 1983, cgraplopj, cgraplop, cgraplop, cgraplop, decocass_state, decocass, ROT270, "Data East Corporation", "Graplop (DECO Cassette) (Japan)", 0 )
 /*    */ GAME( 1983, cgraplop2, cgraplop, cgraplop2,cgraplop, decocass_state, decocass, ROT270, "Data East Corporation", "Graplop (no title screen) (DECO Cassette) (US)", 0 ) // a version with title screen exists, see reference videos
 /* 29 */ GAME( 1983, clapapa,   decocass, clapapa,  decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Rootin' Tootin' / La-Pa-Pa (DECO Cassette) (US)" , 0) /* Displays 'La-Pa-Pa during attract */
 /*    */ GAME( 1983, clapapa2,  clapapa,  clapapa,  decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Rootin' Tootin' (DECO Cassette) (US)" , 0) /* Displays 'Rootin' Tootin' during attract */
