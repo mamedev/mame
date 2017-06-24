@@ -337,6 +337,15 @@ static uint8_t type1_latch_26_pass_3_inv_2_table[8] = { T1PROM,T1PROM,T1LATCHINV
 
 /***************************************************************************
  *
+ *  TYPE1 DONGLE (DE-0061?)
+ *  - Treasure Island (Region D)
+ *
+ ***************************************************************************/
+
+static uint8_t type1_latch_ctisland3[8] = { T1LATCHINV,T1PROM,T1PROM,T1DIRECT,T1PROM, T1PROM,T1LATCH,T1PROM };
+
+/***************************************************************************
+ *
  *  TYPE1 DONGLE (DE-0061)
  *  - Test Tape
  *
@@ -1323,6 +1332,16 @@ MACHINE_RESET_MEMBER(decocass_state,ctisland)
 	m_type1_map = type1_latch_26_pass_3_inv_2_table;
 	m_type1_inmap = MAKE_MAP(2,1,0,3,4,5,6,7);
 	m_type1_outmap = MAKE_MAP(2,1,0,3,4,5,6,7);
+}
+
+MACHINE_RESET_MEMBER(decocass_state,ctisland3)
+{
+	decocass_state::machine_reset();
+	LOG(0,("dongle type #1 (DE-0061 custom)\n"));
+	m_dongle_r = read8_delegate(FUNC(decocass_state::decocass_type1_r),this);
+	m_type1_map = type1_latch_ctisland3;
+	m_type1_inmap = MAKE_MAP(0,1,2,3,4,5,6,7);  // correct for handcrafted prom
+	m_type1_outmap = MAKE_MAP(0,1,2,3,4,5,6,7); // ^
 }
 
 MACHINE_RESET_MEMBER(decocass_state,cexplore)
