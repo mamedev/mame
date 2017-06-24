@@ -209,7 +209,7 @@ READ8_MEMBER(quizshow_state::quizshow_timing_r)
 READ_LINE_MEMBER(quizshow_state::quizshow_tape_signal_r)
 {
 	// TODO (for now, hold INS to fastforward and it'll show garbage questions where D is always(?) the right answer)
-	return machine().rand() & 1;
+	return BIT(machine().rand(), 7); // better than machine().rand() & 1 for some reason
 }
 
 WRITE8_MEMBER(quizshow_state::quizshow_main_ram_w)
