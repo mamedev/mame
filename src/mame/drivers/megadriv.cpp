@@ -441,6 +441,13 @@ ROM_START(genesis_tmss)
 	ROM_LOAD( "tmss_usa.bin", 0x0000,  0x4000, CRC(5f5e64eb) SHA1(453fca4e1db6fae4a10657c4451bccbb71955628) )
 ROM_END
 
+ROM_START(dcat16)
+	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_WORD_SWAP( "MG6025.U1", 0x0000,  0x800000, CRC(5453d673) SHA1(b9f8d849cbed81fe73525229f4897ccaeeb7a833) )
+
+	ROM_REGION( 0x10000, "soundcpu", ROMREGION_ERASEFF)
+ROM_END
+
 /*************************************
  *
  *  Driver initialization
@@ -1087,3 +1094,6 @@ CONS( 1994, multmega,   cdx,       0,      md_scd,          md, md_cons_state,  
 CONS( 1994, 32x_scd,    0,         0,      genesis_32x_scd, md, md_cons_state,     genesis,   "Sega",   "Sega CD with 32X (USA, NTSC)", MACHINE_NOT_WORKING )
 CONS( 1995, 32x_mcd,    32x_scd,   0,      md_32x_scd,      md, md_cons_state,     md_eur,    "Sega",   "Mega-CD with 32X (Europe, PAL)", MACHINE_NOT_WORKING )
 CONS( 1994, 32x_mcdj,   32x_scd,   0,      mdj_32x_scd,     md, md_cons_state,     md_jpn,    "Sega",   "Mega-CD with 32X (Japan, NTSC)", MACHINE_NOT_WORKING )
+
+/* clone hardware - not sure if this hardware is running some kind of emulator, or enhanced MD clone, or just custom banking */
+CONS( 200?, dcat16,    0,         0,      dcat16_megadriv,     md, md_cons_state,     genesis,   "Firecore",   "D-CAT16 (Mega Drive handheld)",  MACHINE_NOT_WORKING )

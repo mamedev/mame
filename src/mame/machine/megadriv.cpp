@@ -474,16 +474,17 @@ static ADDRESS_MAP_START( megadriv_map, AS_PROGRAM, 16, md_base_state )
 	AM_RANGE(0xa11100, 0xa11101) AM_READWRITE(megadriv_68k_check_z80_bus,megadriv_68k_req_z80_bus)
 	AM_RANGE(0xa11200, 0xa11201) AM_WRITE(megadriv_68k_req_z80_reset)
 
-	/* these are fake - remove allocs in video_start to use these to view ram instead */
-//  AM_RANGE(0xb00000, 0xb0ffff) AM_RAM AM_SHARE("megadrive_vdp_vram")
-//  AM_RANGE(0xb10000, 0xb1007f) AM_RAM AM_SHARE("megadrive_vdp_vsram")
-//  AM_RANGE(0xb10100, 0xb1017f) AM_RAM AM_SHARE("megadrive_vdp_cram")
-
 	AM_RANGE(0xc00000, 0xc0001f) AM_DEVREADWRITE("gen_vdp", sega315_5313_device, vdp_r, vdp_w)
 	AM_RANGE(0xd00000, 0xd0001f) AM_DEVREADWRITE("gen_vdp", sega315_5313_device, vdp_r, vdp_w) // the earth defend
 	AM_RANGE(0xe00000, 0xe0ffff) AM_RAM AM_MIRROR(0x1f0000) AM_SHARE("megadrive_ram")
 //  AM_RANGE(0xff0000, 0xffffff) AM_READONLY
 	/*       0xe00000 - 0xffffff) == MAIN RAM (64kb, Mirrored, most games use ff0000 - ffffff) */
+ADDRESS_MAP_END
+
+
+ADDRESS_MAP_START( dcat16_megadriv_map, AS_PROGRAM, 16, md_base_state )
+	AM_RANGE(0x000000, 0x7fffff) AM_ROM
+	AM_IMPORT_FROM(megadriv_map)
 ADDRESS_MAP_END
 
 
@@ -936,6 +937,24 @@ MACHINE_CONFIG_START( md_ntsc )
 	MCFG_SOUND_ADD("snsnd", SEGAPSG, MASTER_CLOCK_NTSC/15)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) /* 3.58 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25) /* 3.58 MHz */
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START( dcat16_megadriv )
+	MCFG_FRAGMENT_ADD( md_ntsc )
+
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(dcat16_megadriv_map)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(md_base_state,genesis_int_callback)
+
+	MCFG_MACHINE_START_OVERRIDE(md_cons_state, md_common)
+	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, megadriv)
+
+	MCFG_SCREEN_MODIFY("megadriv")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(md_cons_state, screen_vblank_console))
+
+//  has SD card slot instead?
+//	MCFG_MD_CARTRIDGE_ADD("mdslot", md_cart, nullptr)
+//	MCFG_SOFTWARE_LIST_ADD("cart_list","megadriv")
 MACHINE_CONFIG_END
 
 /************ PAL hardware has a different master clock *************/
