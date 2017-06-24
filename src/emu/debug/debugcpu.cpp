@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /*********************************************************************
 
-    debugcpu.c
+    debugcpu.cpp
 
     Debugger CPU/memory interface engine.
 
@@ -25,6 +25,7 @@
 #include "xmlfile.h"
 
 #include <ctype.h>
+#include <fstream>
 
 
 enum
@@ -45,7 +46,6 @@ debugger_cpu::debugger_cpu(running_machine &machine)
 	, m_livecpu(nullptr)
 	, m_visiblecpu(nullptr)
 	, m_breakcpu(nullptr)
-	, m_source_file(nullptr)
 	, m_symtable(nullptr)
 	, m_execution_state(EXECUTION_STATE_STOPPED)
 	, m_bpindex(1)
@@ -189,23 +189,23 @@ symbol_table* debugger_cpu::get_visible_symtable()
 
 void debugger_cpu::source_script(const char *file)
 {
-	/* close any existing source file */
-	if (m_source_file != nullptr)
-	{
-		fclose(m_source_file);
-		m_source_file = nullptr;
-	}
+	// close any existing source file
+	m_source_file.reset();
 
-	/* open a new one if requested */
+	// open a new one if requested 
 	if (file != nullptr)
 	{
-		m_source_file = fopen(file, "r");
-		if (!m_source_file)
+		auto source_file = std::make_unique<std::ifstream>(file, std::ifstream::in);
+		if (source_file->fail())
 		{
 			if (m_machine.phase() == machine_phase::RUNNING)
 				m_machine.debugger().console().printf("Cannot open command file '%s'\n", file);
 			else
 				fatalerror("Cannot open command file '%s'\n", file);
+		}
+		else
+		{
+			m_source_file = std::move(source_file);
 		}
 	}
 }
@@ -871,35 +871,31 @@ void debugger_cpu::reset_transient_flags()
 
 void debugger_cpu::process_source_file()
 {
-	/* loop until the file is exhausted or until we are executing again */
-	while (m_source_file != nullptr && m_execution_state == EXECUTION_STATE_STOPPED)
+	std::string buf;
+
+	// loop until the file is exhausted or until we are executing again
+	while (m_execution_state == EXECUTION_STATE_STOPPED
+			&& m_source_file 
+			&& std::getline(*m_source_file, buf))
 	{
-		/* stop at the end of file */
-		if (feof(m_source_file))
-		{
-			fclose(m_source_file);
-			m_source_file = nullptr;
-			return;
-		}
+		// strip out comments (text after '//')
+		size_t pos = buf.find("//");
+		if (pos != std::string::npos)
+			buf.resize(pos);
 
-		/* fetch the next line */
-		char buf[512];
-		memset(buf, 0, sizeof(buf));
-		fgets(buf, sizeof(buf), m_source_file);
+		// strip whitespace
+		strtrimrightspace(buf);
 
-		/* strip out comments (text after '//') */
-		char *s = strstr(buf, "//");
-		if (s)
-			*s = '\0';
-
-		/* strip whitespace */
-		int i = (int)strlen(buf);
-		while((i > 0) && (isspace(u8(buf[i-1]))))
-			buf[--i] = '\0';
-
-		/* execute the command */
-		if (buf[0])
+		// execute the command
+		if (!buf.empty())
 			m_machine.debugger().console().execute_command(buf, true);
+	}
+
+	if (m_source_file && !m_source_file->good())
+	{
+		if (m_source_file->fail())
+			m_machine.debugger().console().printf("I/O error, script processing terminated\n");
+		m_source_file.reset();
 	}
 }
 
@@ -2755,7 +2751,7 @@ void device_debug::breakpoint_check(offs_t pc)
 
 			// if we hit, evaluate the action
 			if (!bp->m_action.empty())
-				m_device.machine().debugger().console().execute_command(bp->m_action.c_str(), false);
+				m_device.machine().debugger().console().execute_command(bp->m_action, false);
 
 			// print a notification, unless the action made us go again
 			if (debugcpu.execution_state() == EXECUTION_STATE_STOPPED)
@@ -2774,7 +2770,7 @@ void device_debug::breakpoint_check(offs_t pc)
 			// if we hit, evaluate the action
 			if (!rp->m_action.empty())
 			{
-				m_device.machine().debugger().console().execute_command(rp->m_action.c_str(), false);
+				m_device.machine().debugger().console().execute_command(rp->m_action, false);
 			}
 
 			// print a notification, unless the action made us go again
@@ -2887,7 +2883,7 @@ void debugger_cpu::watchpoint_check(address_space& space, int type, offs_t addre
 			m_execution_state = EXECUTION_STATE_STOPPED;
 
 			// if we hit, evaluate the action
-			if (strlen(wp->action()) > 0)
+			if (!wp->action().empty())
 				m_machine.debugger().console().execute_command(wp->action(), false);
 
 			// print a notification, unless the action made us go again
@@ -3336,7 +3332,7 @@ void device_debug::tracer::update(offs_t pc)
 
 	// execute any trace actions first
 	if (!m_action.empty())
-		m_debug.m_device.machine().debugger().console().execute_command(m_action.c_str(), false);
+		m_debug.m_device.machine().debugger().console().execute_command(m_action, false);
 
 	// print the address
 	std::string buffer;

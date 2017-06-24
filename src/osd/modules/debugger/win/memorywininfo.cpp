@@ -286,7 +286,7 @@ void memorywin_info::draw_contents(HDC dc)
 void memorywin_info::process_string(std::string &&string)
 {
 	// set the string to the memory view
-	downcast<memoryview_info *>(m_views[0].get())->set_expression(string.c_str());
+	downcast<memoryview_info *>(m_views[0].get())->set_expression(string);
 
 	// select everything in the edit text box
 	editwnd_select_all();

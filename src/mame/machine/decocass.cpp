@@ -462,6 +462,35 @@ MACHINE_RESET_MEMBER(decocass_state,cfboy0a1) /* 12 */
 	m_type1_outmap = MAKE_MAP(0,1,2,3,4,5,6,7);
 }
 
+/*
+
+TYPE 1
+* Latched bits                          = $48 (2 latch bits)
+* Input bits that are passed uninverted = $04 (1 true bits)
+* Input bits that are passed inverted   = $00 (0 inverted bits)
+* Remaining bits for addressing PROM    = $B3 (5 bits)
+* Latched bit #0:
+- Input bit position  = 3
+- Output bit position = 3
+- Type                = Inverting latch
+* Latched bit #1:
+- Input bit position  = 6
+- Output bit position = 6
+- Type                = Non-inverting latch
+
+*/
+
+static uint8_t type1_map_clocknchj[8] = { T1PROM,T1PROM,T1DIRECT,T1LATCHINV,T1PROM,T1PROM,T1LATCH,T1PROM };
+
+MACHINE_RESET_MEMBER(decocass_state,clocknchj) /* 11 */
+{
+	decocass_state::machine_reset();
+	LOG(0,("dongle type #1x (type1_map_clocknchj map)\n"));
+	m_dongle_r = read8_delegate(FUNC(decocass_state::decocass_type1_r),this);
+	m_type1_map = type1_map_clocknchj;
+	m_type1_inmap = MAKE_MAP(0,1,2,3,4,5,6,7);
+	m_type1_outmap = MAKE_MAP(0,1,2,3,4,5,6,7);
+}
 
 
 /***************************************************************************

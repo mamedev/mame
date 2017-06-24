@@ -83,7 +83,6 @@ static BOOL internal_set_window_text(HWND window, LPCTSTR t_text)
 
 BOOL win_set_window_text_utf8(HWND window, const char *text)
 {
-	BOOL result = FALSE;
 	LPCTSTR t_text = nullptr;
 	osd::text::tstring ts_text;
 

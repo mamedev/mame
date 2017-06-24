@@ -129,7 +129,7 @@ void disasmwin_info::draw_contents(HDC dc)
 void disasmwin_info::process_string(std::string &&string)
 {
 	// set the string to the disasm view
-	downcast<disasmview_info *>(m_views[0].get())->set_expression(string.c_str());
+	downcast<disasmview_info *>(m_views[0].get())->set_expression(string);
 
 	// select everything in the edit text box
 	editwnd_select_all();

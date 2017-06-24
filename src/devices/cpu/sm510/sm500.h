@@ -85,11 +85,16 @@ protected:
 	int m_o_mask; // number of 4-bit O pins minus 1
 	u8 m_ox[9];   // W' latch, max 9
 	u8 m_o[9];    // W latch(O outputs)
-	u8 m_cn;      // Cn(digit select)
+	u8 m_cn;      // CN(digit select)
 	u8 m_mx;      // m'(digit DP select)
+	u8 m_cb;      // CB(PC high bit buffer)
+	bool m_rsub;  // R(in subroutine)
 
 	void shift_w();
 	u8 get_digit();
+	void set_su(u8 su) { m_stack[0] = (m_stack[0] & ~0x3c0) | (su << 6); }
+	u8 get_su() { return m_stack[0] >> 6 & 0xf; }
+	virtual int get_trs_field() { return 0; }
 	
 	// opcode handlers
 	virtual void op_lb() override;
@@ -98,7 +103,9 @@ protected:
 	virtual void op_rbm();
 
 	virtual void op_comcb();
+	virtual void op_rtn0() override;
 	virtual void op_ssr();
+	virtual void op_tr();
 	virtual void op_trs();
 
 	virtual void op_atbp() override;
@@ -129,6 +136,7 @@ protected:
 	
 	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options) override;
 	virtual void execute_one() override;
+	virtual int get_trs_field() override { return 1; }
 };
 
 class sm5l_device : public sm5a_device

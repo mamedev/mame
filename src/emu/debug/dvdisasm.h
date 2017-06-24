@@ -75,7 +75,7 @@ public:
 	offs_t selected_address();
 
 	// setters
-	void set_expression(const char *expression);
+	void set_expression(const std::string &expression);
 	void set_right_column(disasm_right_column contents);
 	void set_backward_steps(u32 steps);
 	void set_disasm_width(u32 width);

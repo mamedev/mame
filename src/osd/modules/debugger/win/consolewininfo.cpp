@@ -567,7 +567,7 @@ void consolewin_info::process_string(std::string &&string)
 	if (string.empty()) // an empty string is a single step
 		machine().debugger().cpu().get_visible_cpu()->debug()->single_step();
 	else                // otherwise, just process the command
-		machine().debugger().console().execute_command(string.c_str(), true);
+		machine().debugger().console().execute_command(string, true);
 
 	// clear the edit text box
 	set_editwnd_text("");

@@ -77,7 +77,7 @@ public:
 	debugger_console(running_machine &machine);
 
 	/* command handling */
-	CMDERR          execute_command(const char *command, bool echo);
+	CMDERR          execute_command(const std::string &command, bool echo);
 	CMDERR          validate_command(const char *command);
 	void            register_command(const char *command, u32 flags, int ref, int minparams, int maxparams, std::function<void(int, const std::vector<std::string> &)> handler);
 
@@ -111,7 +111,7 @@ private:
 
 	void trim_parameter(char **paramptr, bool keep_quotes);
 	CMDERR internal_execute_command(bool execute, int params, char **param);
-	CMDERR internal_parse_command(const char *original_command, bool execute);
+	CMDERR internal_parse_command(const std::string &original_command, bool execute);
 
 	struct debug_command
 	{

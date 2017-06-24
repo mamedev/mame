@@ -126,10 +126,12 @@ private:
 	enum
 	{
 		TIMER_SYSTEM_CLOCK = 0x200,  // CLK input - anywhere from 1MHz up to 4MHz
-		TIMER_MIDI_CLOCK,            // CLKM input - usually either 1MHz or 0.5MHz, or CLKF input - usually 614.4kHz
+		TIMER_TX_CLOCK,
+		TIMER_MIDI_CLOCK            // CLKM input - usually either 1MHz or 0.5MHz, or CLKF input - usually 614.4kHz
 	};
 
 	void transmit_clk();
+	void midi_clk();
 	void reset_midi_timer();
 	void set_comms_mode();
 	void set_irq(uint8_t irq);
@@ -140,6 +142,7 @@ private:
 	devcb_read_line m_rxd_handler;
 	emu_timer* m_clock_timer;
 	emu_timer* m_midi_timer;
+	emu_timer* m_midi_counter_timer;
 	
 	std::vector<uint8_t> m_reg;
 	uint8_t m_wdr;
@@ -147,6 +150,10 @@ private:
 	uint8_t m_irq_status;
 	uint16_t m_general_counter;
 	uint16_t m_midi_counter;
+	uint16_t m_midi_counter_base;
+	uint8_t m_midi_counter_divider;
+	uint8_t m_click_counter;
+	uint8_t m_click_counter_base;
 	uint8_t m_vector;
 	
 	std::queue<uint8_t> m_tx_fifo;

@@ -44,7 +44,7 @@ void sm500_device::op_lb()
 
 void sm500_device::op_incb()
 {
-	// INCB: same as SM510, but overflow on 3rd bit!
+	// INCB: increment BL, but overflow on 3rd bit!
 	sm510_base_device::op_incb();
 	m_skip = (m_bl == 8);
 }
@@ -66,14 +66,47 @@ void sm500_device::op_rbm()
 
 void sm500_device::op_comcb()
 {
+	// COMCB: complement CB
+	m_cb ^= 1;
+}
+
+void sm500_device::op_rtn0()
+{
+	// RTN0(RTN): return from subroutine
+	sm510_base_device::op_rtn0();
+	m_rsub = false;
 }
 
 void sm500_device::op_ssr()
 {
+	// SSR x: set stack upper bits, also sets E flag for next opcode
+	set_su(m_op & 0xf);
+}
+
+void sm500_device::op_tr()
+{
+	// TR x: jump (long or short)
+	m_pc = (m_pc & ~0x3f) | (m_op & 0x3f);
+	if (!m_rsub)
+		do_branch(m_cb, get_su(), m_pc & 0x3f);
 }
 
 void sm500_device::op_trs()
 {
+	// TRS x: call subroutine
+	if (!m_rsub)
+	{
+		m_rsub = true;
+		u8 su = get_su();
+		push_stack();
+		do_branch(get_trs_field(), 0, m_op & 0x3f);
+		
+		// E flag was set?
+		if ((m_prev_op & 0xf0) == 0x70)
+			do_branch(m_cb, su, m_pc & 0x3f);
+	}
+	else
+		m_pc = (m_pc & ~0xff) | (m_op << 2 & 0xc0) | (m_op & 0xf);
 }
 
 
@@ -81,7 +114,7 @@ void sm500_device::op_trs()
 
 void sm500_device::op_atbp()
 {
-	// ATBP: same as SM510, and set Cn with ACC3
+	// ATBP: same as SM510, and set CN with ACC3
 	sm510_base_device::op_atbp();
 	m_cn = m_acc >> 3 & 1;
 }
@@ -164,6 +197,6 @@ void sm500_device::op_smf()
 
 void sm500_device::op_comcn()
 {
-	// COMCN: complement Cn flag
+	// COMCN: complement CN flag
 	m_cn ^= 1;
 }

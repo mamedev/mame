@@ -728,7 +728,7 @@ inline uint8_t s2650_device::ARG()
  ***************************************************************/
 #define M_CPSU()                                                \
 {                                                               \
-	uint8_t cpsu = ARG();                                   \
+	uint8_t cpsu = ARG() & ~SI;                                 \
 	set_psu(m_psu & ~cpsu);                       \
 	m_icount -= check_irq_line();                   \
 }
@@ -855,7 +855,7 @@ void s2650_device::device_start()
 	state_add( S2650_FO,   "FO", m_debugger_temp).mask(0x01).callimport().callexport().formatstr("%01X");
 
 	state_add( STATE_GENPC, "GENPC", m_debugger_temp).callexport().noshow();
-	state_add( STATE_GENPCBASE, "CURPC", m_debugger_temp).callexport().noshow();
+	state_add( STATE_GENPCBASE, "CURPC", m_ppc).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_debugger_temp).formatstr("%16s").noshow();
 
 	m_icountptr = &m_icount;
@@ -1352,7 +1352,7 @@ void s2650_device::execute_run()
 				break;
 			case 0x92:      /* LPSU */
 				m_icount -= 6;
-				set_psu((R0 & ~PSU34) & ~SI);
+				set_psu((R0 & ~PSU34 & ~SI) | (m_psu & SI));
 				break;
 			case 0x93:      /* LPSL */
 				m_icount -= 6;
