@@ -893,7 +893,7 @@ void debugger_cpu::process_source_file()
 
 	if (m_source_file && !m_source_file->good())
 	{
-		if (m_source_file->fail())
+		if (!m_source_file->eof())
 			m_machine.debugger().console().printf("I/O error, script processing terminated\n");
 		m_source_file.reset();
 	}
